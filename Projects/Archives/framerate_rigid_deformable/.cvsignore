@@ -1,2 +1,0 @@
-Debug Release *.ncb *.suo obj obj_debug .sconsign
-framerate_rigid_deformable framerate_rigid_deformable_debug framerate_rigid_deformable_optdebug framerate_rigid_deformable_profile framerate_rigid_deformable_opteron framerate_rigid_deformable_nocona framerate_rigid_deformable_nocona_debug

@@ -1,3 +1,0 @@
-Debug Release *.ncb *.suo obj obj_debug obj_profile obj_pentium obj_opteron obj_nocona obj_nocona_debug
-Profiling*
-.emacs_project_config

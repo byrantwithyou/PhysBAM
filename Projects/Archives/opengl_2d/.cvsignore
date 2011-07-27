@@ -1,3 +1,0 @@
-Debug Release *.ncb *.suo obj obj_debug .sconsign
-opengl_2d opengl_2d_debug opengl_2d_profile opengl_2d_opteron opengl_2d_nocona opengl_2d_nocona_debug opengl_2d_pentium4 opengl_2d_pentium4_debug
-.emacs_project_config

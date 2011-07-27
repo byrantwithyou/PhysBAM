@@ -1,3 +1,0 @@
-Debug Release *.ncb *.suo obj obj_debug .sconsign
-tet_sim_fracture tet_sim_fracture_debug tet_sim_fracture_profile
-tet_sim_fracture_nocona tet_sim_fracture_nocona_debug
