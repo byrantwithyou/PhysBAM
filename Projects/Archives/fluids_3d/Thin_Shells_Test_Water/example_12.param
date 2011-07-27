@@ -1,0 +1,13 @@
+fluids_parameters.grid.resolution = 181 181 136
+fluids_parameters.grid.minimum_corner = -0.5 0 .5
+fluids_parameters.grid.maximum_corner = 3.5 4 3.5
+fluids_parameters.write_debug_data = true
+fluids_parameters.restart_data_write_rate = 1
+cloth_resolution = 101 126
+fluids_parameters.incompressible_iterations = 10000
+fluids_parameters.levelset_substeps = 0.95
+
+add_bodies = false
+solids_parameters.preroll_frames = 0
+fluids_parameters.use_solid_fluid_coupling = true
+use_collision_aware_signed_distance = true

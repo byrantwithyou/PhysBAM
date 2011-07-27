@@ -1,0 +1,1457 @@
+Parsing command line...
+[Parsing command line...] 0.000427359 s
+Initializing PETSc...0.000879092 s
+Initializing random number generator with seed 5489...2.794e-06 s
+Evaluating level set function over (fine) grid...0.116117 s
+Allocating system...4.5746e-05 s
+Building interface system...
+Initializing sign_of_cell_index...0.0017475 s
+Initializing embedding cells...0.000184451 s
+  # of embedding cells = 850
+Initializing embedding indices in embedding system...0.00135709 s
+  # of embedding vertices = 2878
+Initializing embedding system...0.376036 s
+Initializing beta and regular subsystem stencils...0.00189521 s
+Initializing regular subsystem rhs...0.000835023 s
+Computing system statistics...0.000728304 s
+  max diag = 4.23047
+  min diag = 9.49244e-16
+    ratio = 4.45667e+15
+  max abs stencil sum = 2.36017e-16
+Setting Dirichlet grid bc's...0.000414578 s
+[Building interface system...] 0.383878 s
+Evaluating constraint residual norm of continuous solution...0.000687796 s
+  0.000551409
+Allocating approximate solution...3.8204e-05 s
+Selecting indys...0.00163666 s
+  # of indys = 156
+Aggregating constraints...0.00150613 s
+  max indy weight = 0.0266034
+  min indy weight = 7.77317e-12
+    ratio = 3.42247e+09
+Evaluating aggregate constraint residual norm of continuous solution...1.8019e-05 s
+  0.00484975
+Building Z^T*A*Z embedding subsystem...0.0558887 s
+Evaluating Z^T*(f - A*c)...6.2089e-05 s
+Evaluating Z^T*A*Z residual norm of continuous solution...0.00169274 s
+  0.0607252
+Solving with PETSc CG solver...
+Initializing PETSc index <-> PhysBAM index mappings...0.00126671 s
+  # of petsc dofs = 6196
+Constructing Jacobi scaling coefficients...0.000546787 s
+Constructing matrix in CSR format and Jacobi scaling...0.01875 s
+  # of nonzeros (estimated) = 316325
+  # of nonzeros (actual)    = 310112
+Constructing rhs of Jacobi-scaled system...0.000145341 s
+Executing KSPSolve...0.142299 s
+KSP Object:
+  type: cg
+  maximum iterations=49568
+  tolerances:  relative=1e-14, absolute=1.17549e-38, divergence=10000
+  left preconditioning
+  using nonzero initial guess
+  using PRECONDITIONED norm type for convergence test
+PC Object:
+  type: icc
+    0 levels of fill
+    tolerance for zero pivot 1e-12
+    using Manteuffel shift
+    matrix ordering: natural
+    factor fill ratio given 1, needed 0.50999
+      Factored matrix follows:
+        Matrix Object:
+          type=seqsbaij, rows=6196, cols=6196
+          package used to perform factorization: petsc
+          total: nonzeros=158154, allocated nonzeros=158154
+              block size is 1
+  linear system matrix = precond matrix:
+  Matrix Object:
+    type=seqaij, rows=6196, cols=6196
+    total: nonzeros=310112, allocated nonzeros=0
+      not using I-node routines
+KSP info:
+  KSPGetConvergedReason = CONVERGED_RTOL (2)
+  # of iterations = 35
+  (approximate preconditioned) residual norm = 6.03464e-13
+  (estimated) extreme singular values = 1.48662, 0.206186
+  (estimated) condition # = 7.21012
+[Solving with PETSc CG solver...] 0.227623 s
+Evaluating c + Z*v...4.0717e-05 s
+Evaluating error norm in approximate solution...0.00110559 s
+  |     u_continuous  -      u_approx |_{infty} = 0.250144
+  |grad(u_continuous) - grad(u_approx)|_{infty} = 1.61662
+[Total execution time: 0.794282 s]
+Parsing command line...
+[Parsing command line...] 0.000423797 s
+Initializing PETSc...0.000896274 s
+Initializing random number generator with seed 5489...3.283e-06 s
+Evaluating level set function over (fine) grid...0.359875 s
+Allocating system...0.0001188 s
+Building interface system...
+Initializing sign_of_cell_index...0.00574347 s
+Initializing embedding cells...0.000244165 s
+  # of embedding cells = 2036
+Initializing embedding indices in embedding system...0.00358719 s
+  # of embedding vertices = 7312
+Initializing embedding system...0.870032 s
+Initializing beta and regular subsystem stencils...0.00706235 s
+Initializing regular subsystem rhs...0.00383862 s
+Computing system statistics...0.00187719 s
+  max diag = 3.03125
+  min diag = 1.09197e-16
+    ratio = 2.77594e+16
+  max abs stencil sum = 1.77636e-15
+Setting Dirichlet grid bc's...0.000932101 s
+[Building interface system...] 0.894675 s
+Evaluating constraint residual norm of continuous solution...0.00223143 s
+  0.000100627
+Allocating approximate solution...9.666e-05 s
+Selecting indys...0.00492011 s
+  # of indys = 390
+Aggregating constraints...0.00401881 s
+  max indy weight = 0.0125075
+  min indy weight = 3.02134e-13
+    ratio = 4.13973e+10
+Evaluating aggregate constraint residual norm of continuous solution...5.7829e-05 s
+  0.000777191
+Building Z^T*A*Z embedding subsystem...0.13492 s
+Evaluating Z^T*(f - A*c)...0.000214762 s
+Evaluating Z^T*A*Z residual norm of continuous solution...0.00409843 s
+  0.0274076
+Solving with PETSc CG solver...
+Initializing PETSc index <-> PhysBAM index mappings...0.00283081 s
+  # of petsc dofs = 18891
+Constructing Jacobi scaling coefficients...0.00218135 s
+Constructing matrix in CSR format and Jacobi scaling...0.0509744 s
+  # of nonzeros (estimated) = 827999
+  # of nonzeros (actual)    = 810873
+Constructing rhs of Jacobi-scaled system...0.000254641 s
+Executing KSPSolve...0.562753 s
+KSP Object:
+  type: cg
+  maximum iterations=151128
+  tolerances:  relative=1e-14, absolute=1.17549e-38, divergence=10000
+  left preconditioning
+  using nonzero initial guess
+  using PRECONDITIONED norm type for convergence test
+PC Object:
+  type: icc
+    0 levels of fill
+    tolerance for zero pivot 1e-12
+    using Manteuffel shift
+    matrix ordering: natural
+    factor fill ratio given 1, needed 0.511649
+      Factored matrix follows:
+        Matrix Object:
+          type=seqsbaij, rows=18891, cols=18891
+          package used to perform factorization: petsc
+          total: nonzeros=414882, allocated nonzeros=414882
+              block size is 1
+  linear system matrix = precond matrix:
+  Matrix Object:
+    type=seqaij, rows=18891, cols=18891
+    total: nonzeros=810873, allocated nonzeros=0
+      not using I-node routines
+KSP info:
+  KSPGetConvergedReason = CONVERGED_RTOL (2)
+  # of iterations = 52
+  (approximate preconditioned) residual norm = 1.48542e-12
+  (estimated) extreme singular values = 1.53321, 0.0900501
+  (estimated) condition # = 17.0262
+[Solving with PETSc CG solver...] 0.78208 s
+Evaluating c + Z*v...0.000161403 s
+Evaluating error norm in approximate solution...0.00520499 s
+  |     u_continuous  -      u_approx |_{infty} = 0.161428
+  |grad(u_continuous) - grad(u_approx)|_{infty} = 1.44648
+[Total execution time: 2.19923 s]
+Parsing command line...
+[Parsing command line...] 0.000424705 s
+Initializing PETSc...0.000816654 s
+Initializing random number generator with seed 5489...3.073e-06 s
+Evaluating level set function over (fine) grid...0.829978 s
+Allocating system...0.000246819 s
+Building interface system...
+Initializing sign_of_cell_index...0.0136711 s
+Initializing embedding cells...0.000294939 s
+  # of embedding cells = 3536
+Initializing embedding indices in embedding system...0.00782397 s
+  # of embedding vertices = 13278
+Initializing embedding system...1.54269 s
+Initializing beta and regular subsystem stencils...0.0133041 s
+Initializing regular subsystem rhs...0.00793187 s
+Computing system statistics...0.00433442 s
+  max diag = 2.35693
+  min diag = 8.74481e-17
+    ratio = 2.69524e+16
+  max abs stencil sum = 1.17961e-16
+Setting Dirichlet grid bc's...0.00180686 s
+[Building interface system...] 1.59417 s
+Evaluating constraint residual norm of continuous solution...0.00389344 s
+  2.26105e-05
+Allocating approximate solution...0.000170134 s
+Selecting indys...0.00870467 s
+  # of indys = 723
+Aggregating constraints...0.00713722 s
+  max indy weight = 0.00539969
+  min indy weight = 4.46203e-13
+    ratio = 1.21014e+10
+Evaluating aggregate constraint residual norm of continuous solution...0.000127739 s
+  0.000214132
+Building Z^T*A*Z embedding subsystem...0.23584 s
+Evaluating Z^T*(f - A*c)...0.000457879 s
+Evaluating Z^T*A*Z residual norm of continuous solution...0.00726552 s
+  0.0122527
+Solving with PETSc CG solver...
+Initializing PETSc index <-> PhysBAM index mappings...0.00566888 s
+  # of petsc dofs = 41853
+Constructing Jacobi scaling coefficients...0.00403494 s
+Constructing matrix in CSR format and Jacobi scaling...0.0905226 s
+  # of nonzeros (estimated) = 1453325
+  # of nonzeros (actual)    = 1420423
+Constructing rhs of Jacobi-scaled system...0.000468356 s
+Executing KSPSolve...1.36149 s
+KSP Object:
+  type: cg
+  maximum iterations=334824
+  tolerances:  relative=1e-14, absolute=1.17549e-38, divergence=10000
+  left preconditioning
+  using nonzero initial guess
+  using PRECONDITIONED norm type for convergence test
+PC Object:
+  type: icc
+    0 levels of fill
+    tolerance for zero pivot 1e-12
+    using Manteuffel shift
+    matrix ordering: natural
+    factor fill ratio given 1, needed 0.514733
+      Factored matrix follows:
+        Matrix Object:
+          type=seqsbaij, rows=41853, cols=41853
+          package used to perform factorization: petsc
+          total: nonzeros=731138, allocated nonzeros=731138
+              block size is 1
+  linear system matrix = precond matrix:
+  Matrix Object:
+    type=seqaij, rows=41853, cols=41853
+    total: nonzeros=1420423, allocated nonzeros=0
+      not using I-node routines
+KSP info:
+  KSPGetConvergedReason = CONVERGED_RTOL (2)
+  # of iterations = 70
+  (approximate preconditioned) residual norm = 1.70405e-12
+  (estimated) extreme singular values = 1.49683, 0.0482337
+  (estimated) condition # = 31.0328
+[Solving with PETSc CG solver...] 1.72573 s
+Evaluating c + Z*v...0.000337822 s
+Evaluating error norm in approximate solution...0.00878987 s
+  |     u_continuous  -      u_approx |_{infty} = 0.103639
+  |grad(u_continuous) - grad(u_approx)|_{infty} = 1.13182
+[Total execution time: 4.43297 s]
+Parsing command line...
+[Parsing command line...] 0.000425334 s
+Initializing PETSc...0.000822311 s
+Initializing random number generator with seed 5489...3.143e-06 s
+Evaluating level set function over (fine) grid...1.60356 s
+Allocating system...0.000425822 s
+Building interface system...
+Initializing sign_of_cell_index...0.0272002 s
+Initializing embedding cells...0.000450198 s
+  # of embedding cells = 5618
+Initializing embedding indices in embedding system...0.0148163 s
+  # of embedding vertices = 21778
+Initializing embedding system...2.44964 s
+Initializing beta and regular subsystem stencils...0.0305774 s
+Initializing regular subsystem rhs...0.0200144 s
+Computing system statistics...0.00875621 s
+  max diag = 1.92675
+  min diag = 9.97246e-17
+    ratio = 1.93207e+16
+  max abs stencil sum = 1.11022e-15
+Setting Dirichlet grid bc's...0.00299465 s
+[Building interface system...] 2.5583 s
+Evaluating constraint residual norm of continuous solution...0.00852196 s
+  8.85133e-06
+Allocating approximate solution...0.000319593 s
+Selecting indys...0.0156413 s
+  # of indys = 1174
+Aggregating constraints...0.0113639 s
+  max indy weight = 0.00283135
+  min indy weight = 1.10647e-13
+    ratio = 2.55889e+10
+Evaluating aggregate constraint residual norm of continuous solution...0.000306254 s
+  0.000121128
+Building Z^T*A*Z embedding subsystem...0.368766 s
+Evaluating Z^T*(f - A*c)...0.00077035 s
+Evaluating Z^T*A*Z residual norm of continuous solution...0.0120015 s
+  0.0065642
+Solving with PETSc CG solver...
+Initializing PETSc index <-> PhysBAM index mappings...0.0126518 s
+  # of petsc dofs = 78636
+Constructing Jacobi scaling coefficients...0.0075578 s
+Constructing matrix in CSR format and Jacobi scaling...0.159674 s
+  # of nonzeros (estimated) = 2420128
+  # of nonzeros (actual)    = 2365742
+Constructing rhs of Jacobi-scaled system...0.000821752 s
+Executing KSPSolve...2.86853 s
+KSP Object:
+  type: cg
+  maximum iterations=629088
+  tolerances:  relative=1e-14, absolute=1.17549e-38, divergence=10000
+  left preconditioning
+  using nonzero initial guess
+  using PRECONDITIONED norm type for convergence test
+PC Object:
+  type: icc
+    0 levels of fill
+    tolerance for zero pivot 1e-12
+    using Manteuffel shift
+    matrix ordering: natural
+    factor fill ratio given 1, needed 0.51662
+      Factored matrix follows:
+        Matrix Object:
+          type=seqsbaij, rows=78636, cols=78636
+          package used to perform factorization: petsc
+          total: nonzeros=1222189, allocated nonzeros=1222189
+              block size is 1
+  linear system matrix = precond matrix:
+  Matrix Object:
+    type=seqaij, rows=78636, cols=78636
+    total: nonzeros=2365742, allocated nonzeros=0
+      not using I-node routines
+KSP info:
+  KSPGetConvergedReason = CONVERGED_RTOL (2)
+  # of iterations = 87
+  (approximate preconditioned) residual norm = 2.1535e-12
+  (estimated) extreme singular values = 1.51889, 0.0299807
+  (estimated) condition # = 50.6624
+[Solving with PETSc CG solver...] 3.49263 s
+Evaluating c + Z*v...0.000617885 s
+Evaluating error norm in approximate solution...0.0247905 s
+  |     u_continuous  -      u_approx |_{infty} = 0.0616891
+  |grad(u_continuous) - grad(u_approx)|_{infty} = 0.824682
+[Total execution time: 8.11324 s]
+Parsing command line...
+[Parsing command line...] 0.000425892 s
+Initializing PETSc...0.000834743 s
+Initializing random number generator with seed 5489...3.562e-06 s
+Evaluating level set function over (fine) grid...2.78281 s
+Allocating system...0.000782153 s
+Building interface system...
+Initializing sign_of_cell_index...0.0469614 s
+Initializing embedding cells...0.000533239 s
+  # of embedding cells = 8132
+Initializing embedding indices in embedding system...0.0249191 s
+  # of embedding vertices = 31936
+Initializing embedding system...3.51572 s
+Initializing beta and regular subsystem stencils...0.0556958 s
+Initializing regular subsystem rhs...0.0349347 s
+Computing system statistics...0.0121459 s
+  max diag = 1.62891
+  min diag = 6.44723e-17
+    ratio = 2.52652e+16
+  max abs stencil sum = 1.05471e-15
+Setting Dirichlet grid bc's...0.00469194 s
+[Building interface system...] 3.70123 s
+Evaluating constraint residual norm of continuous solution...0.00916883 s
+  4.2573e-06
+Allocating approximate solution...0.000808273 s
+Selecting indys...0.0279254 s
+  # of indys = 1720
+Aggregating constraints...0.0179213 s
+  max indy weight = 0.00168665
+  min indy weight = 4.99721e-14
+    ratio = 3.37518e+10
+Evaluating aggregate constraint residual norm of continuous solution...0.000568369 s
+  4.4515e-05
+Building Z^T*A*Z embedding subsystem...0.511053 s
+Evaluating Z^T*(f - A*c)...0.00124122 s
+Evaluating Z^T*A*Z residual norm of continuous solution...0.0170718 s
+  0.00512742
+Solving with PETSc CG solver...
+Initializing PETSc index <-> PhysBAM index mappings...0.0186559 s
+  # of petsc dofs = 131897
+Constructing Jacobi scaling coefficients...0.0140845 s
+Constructing matrix in CSR format and Jacobi scaling...0.233656 s
+  # of nonzeros (estimated) = 3604770
+  # of nonzeros (actual)    = 3525331
+Constructing rhs of Jacobi-scaled system...0.00131427 s
+Executing KSPSolve...5.20444 s
+KSP Object:
+  type: cg
+  maximum iterations=1055176
+  tolerances:  relative=1e-14, absolute=1.17549e-38, divergence=10000
+  left preconditioning
+  using nonzero initial guess
+  using PRECONDITIONED norm type for convergence test
+PC Object:
+  type: icc
+    0 levels of fill
+    tolerance for zero pivot 1e-12
+    using Manteuffel shift
+    matrix ordering: natural
+    factor fill ratio given 1, needed 0.518707
+      Factored matrix follows:
+        Matrix Object:
+          type=seqsbaij, rows=131897, cols=131897
+          package used to perform factorization: petsc
+          total: nonzeros=1828614, allocated nonzeros=1828614
+              block size is 1
+  linear system matrix = precond matrix:
+  Matrix Object:
+    type=seqaij, rows=131897, cols=131897
+    total: nonzeros=3525331, allocated nonzeros=0
+      not using I-node routines
+KSP info:
+  KSPGetConvergedReason = CONVERGED_RTOL (2)
+  # of iterations = 105
+  (approximate preconditioned) residual norm = 3.06579e-12
+  (estimated) extreme singular values = 1.82331, 0.0202069
+  (estimated) condition # = 90.2318
+[Solving with PETSc CG solver...] 6.11285 s
+Evaluating c + Z*v...0.00077007 s
+Evaluating error norm in approximate solution...0.0418362 s
+  |     u_continuous  -      u_approx |_{infty} = 0.0349287
+  |grad(u_continuous) - grad(u_approx)|_{infty} = 0.802049
+[Total execution time: 13.2474 s]
+Parsing command line...
+[Parsing command line...] 0.000429733 s
+Initializing PETSc...0.000854647 s
+Initializing random number generator with seed 5489...3.143e-06 s
+Evaluating level set function over (fine) grid...4.36994 s
+Allocating system...0.00121657 s
+Building interface system...
+Initializing sign_of_cell_index...0.075327 s
+Initializing embedding cells...0.000901442 s
+  # of embedding cells = 11090
+Initializing embedding indices in embedding system...0.0390423 s
+  # of embedding vertices = 43898
+Initializing embedding system...4.79741 s
+Initializing beta and regular subsystem stencils...0.0746804 s
+Initializing regular subsystem rhs...0.0532926 s
+Computing system statistics...0.0208501 s
+  max diag = 1.41062
+  min diag = 3.723e-17
+    ratio = 3.78894e+16
+  max abs stencil sum = 8.88178e-16
+Setting Dirichlet grid bc's...0.00639872 s
+[Building interface system...] 5.07568 s
+Evaluating constraint residual norm of continuous solution...0.0191879 s
+  2.3011e-06
+Allocating approximate solution...0.000877137 s
+Selecting indys...0.0312539 s
+  # of indys = 2370
+Aggregating constraints...0.0274969 s
+  max indy weight = 0.001249
+  min indy weight = 2.78166e-14
+    ratio = 4.49013e+10
+Evaluating aggregate constraint residual norm of continuous solution...0.000802477 s
+  1.98157e-05
+Building Z^T*A*Z embedding subsystem...0.702376 s
+Evaluating Z^T*(f - A*c)...0.00175357 s
+Evaluating Z^T*A*Z residual norm of continuous solution...0.0234537 s
+  0.00398625
+Solving with PETSc CG solver...
+Initializing PETSc index <-> PhysBAM index mappings...0.025864 s
+  # of petsc dofs = 204772
+Constructing Jacobi scaling coefficients...0.020745 s
+Constructing matrix in CSR format and Jacobi scaling...0.325516 s
+  # of nonzeros (estimated) = 4982134
+  # of nonzeros (actual)    = 4872846
+Constructing rhs of Jacobi-scaled system...0.00207596 s
+Executing KSPSolve...8.47494 s
+KSP Object:
+  type: cg
+  maximum iterations=1638176
+  tolerances:  relative=1e-14, absolute=1.17549e-38, divergence=10000
+  left preconditioning
+  using nonzero initial guess
+  using PRECONDITIONED norm type for convergence test
+PC Object:
+  type: icc
+    0 levels of fill
+    tolerance for zero pivot 1e-12
+    using Manteuffel shift
+    matrix ordering: natural
+    factor fill ratio given 1, needed 0.521012
+      Factored matrix follows:
+        Matrix Object:
+          type=seqsbaij, rows=204772, cols=204772
+          package used to perform factorization: petsc
+          total: nonzeros=2538809, allocated nonzeros=2538809
+              block size is 1
+  linear system matrix = precond matrix:
+  Matrix Object:
+    type=seqaij, rows=204772, cols=204772
+    total: nonzeros=4872846, allocated nonzeros=0
+      not using I-node routines
+KSP info:
+  KSPGetConvergedReason = CONVERGED_RTOL (2)
+  # of iterations = 122
+  (approximate preconditioned) residual norm = 3.77634e-12
+  (estimated) extreme singular values = 1.56982, 0.0145314
+  (estimated) condition # = 108.03
+[Solving with PETSc CG solver...] 9.70222 s
+Evaluating c + Z*v...0.000998312 s
+Evaluating error norm in approximate solution...0.0666097 s
+  |     u_continuous  -      u_approx |_{infty} = 0.0203541
+  |grad(u_continuous) - grad(u_approx)|_{infty} = 0.518472
+[Total execution time: 20.0532 s]
+Parsing command line...
+[Parsing command line...] 0.00042715 s
+Initializing PETSc...0.000830832 s
+Initializing random number generator with seed 5489...3.073e-06 s
+Evaluating level set function over (fine) grid...6.46231 s
+Allocating system...0.0017366 s
+Building interface system...
+Initializing sign_of_cell_index...0.113695 s
+Initializing embedding cells...0.00109469 s
+  # of embedding cells = 14396
+Initializing embedding indices in embedding system...0.057982 s
+  # of embedding vertices = 57124
+Initializing embedding system...6.27149 s
+Initializing beta and regular subsystem stencils...0.086903 s
+Initializing regular subsystem rhs...0.0635046 s
+Computing system statistics...0.024609 s
+  max diag = 1.24384
+  min diag = 3.11886e-17
+    ratio = 3.98811e+16
+  max abs stencil sum = 6.02816e-17
+Setting Dirichlet grid bc's...0.00808881 s
+[Building interface system...] 6.63765 s
+Evaluating constraint residual norm of continuous solution...0.0219065 s
+  1.34905e-06
+Allocating approximate solution...0.00136386 s
+Selecting indys...0.0457038 s
+  # of indys = 3120
+Aggregating constraints...0.0326586 s
+  max indy weight = 0.000964513
+  min indy weight = 2.44009e-14
+    ratio = 3.95278e+10
+Evaluating aggregate constraint residual norm of continuous solution...0.00106452 s
+  1.20579e-05
+Building Z^T*A*Z embedding subsystem...0.880856 s
+Evaluating Z^T*(f - A*c)...0.00238117 s
+Evaluating Z^T*A*Z residual norm of continuous solution...0.0315371 s
+  0.00183698
+Solving with PETSc CG solver...
+Initializing PETSc index <-> PhysBAM index mappings...0.0317927 s
+  # of petsc dofs = 300067
+Constructing Jacobi scaling coefficients...0.0264675 s
+Constructing matrix in CSR format and Jacobi scaling...0.441674 s
+  # of nonzeros (estimated) = 6715044
+  # of nonzeros (actual)    = 6572557
+Constructing rhs of Jacobi-scaled system...0.00292886 s
+Executing KSPSolve...13.3799 s
+KSP Object:
+  type: cg
+  maximum iterations=2400536
+  tolerances:  relative=1e-14, absolute=1.17549e-38, divergence=10000
+  left preconditioning
+  using nonzero initial guess
+  using PRECONDITIONED norm type for convergence test
+PC Object:
+  type: icc
+    0 levels of fill
+    tolerance for zero pivot 1e-12
+    using Manteuffel shift
+    matrix ordering: natural
+    factor fill ratio given 1, needed 0.522827
+      Factored matrix follows:
+        Matrix Object:
+          type=seqsbaij, rows=300067, cols=300067
+          package used to perform factorization: petsc
+          total: nonzeros=3436312, allocated nonzeros=3436312
+              block size is 1
+  linear system matrix = precond matrix:
+  Matrix Object:
+    type=seqaij, rows=300067, cols=300067
+    total: nonzeros=6572557, allocated nonzeros=0
+      not using I-node routines
+KSP info:
+  KSPGetConvergedReason = CONVERGED_RTOL (2)
+  # of iterations = 140
+  (approximate preconditioned) residual norm = 4.5156e-12
+  (estimated) extreme singular values = 1.65246, 0.0109168
+  (estimated) condition # = 151.369
+[Solving with PETSc CG solver...] 15.0455 s
+Evaluating c + Z*v...0.00145067 s
+Evaluating error norm in approximate solution...0.0703971 s
+  |     u_continuous  -      u_approx |_{infty} = 0.0289248
+  |grad(u_continuous) - grad(u_approx)|_{infty} = 0.684022
+[Total execution time: 29.2749 s]
+Parsing command line...
+[Parsing command line...] 0.000433296 s
+Initializing PETSc...0.000871758 s
+Initializing random number generator with seed 5489...3.073e-06 s
+Evaluating level set function over (fine) grid...12.4194 s
+Allocating system...0.00331439 s
+Building interface system...
+Initializing sign_of_cell_index...0.221629 s
+Initializing embedding cells...0.00165293 s
+  # of embedding cells = 22564
+Initializing embedding indices in embedding system...0.112019 s
+  # of embedding vertices = 89864
+Initializing embedding system...9.80943 s
+Initializing beta and regular subsystem stencils...0.198589 s
+Initializing regular subsystem rhs...0.15881 s
+Computing system statistics...0.0554762 s
+  max diag = 1.00584
+  min diag = 2.60303e-17
+    ratio = 3.86413e+16
+  max abs stencil sum = 6.66134e-16
+Setting Dirichlet grid bc's...0.0144689 s
+[Building interface system...] 10.5895 s
+Evaluating constraint residual norm of continuous solution...0.0441997 s
+  5.51876e-07
+Allocating approximate solution...0.00338255 s
+Selecting indys...0.0700933 s
+  # of indys = 4858
+Aggregating constraints...0.050949 s
+  max indy weight = 0.00061686
+  min indy weight = 1.6211e-14
+    ratio = 3.8052e+10
+Evaluating aggregate constraint residual norm of continuous solution...0.00175365 s
+  6.31242e-06
+Building Z^T*A*Z embedding subsystem...1.44698 s
+Evaluating Z^T*(f - A*c)...0.00396231 s
+Evaluating Z^T*A*Z residual norm of continuous solution...0.0521716 s
+  0.00117757
+Solving with PETSc CG solver...
+Initializing PETSc index <-> PhysBAM index mappings...0.0634084 s
+  # of petsc dofs = 571515
+Constructing Jacobi scaling coefficients...0.0492479 s
+Constructing matrix in CSR format and Jacobi scaling...0.771399 s
+  # of nonzeros (estimated) = 11290458
+  # of nonzeros (actual)    = 11065939
+Constructing rhs of Jacobi-scaled system...0.00563808 s
+Executing KSPSolve...30.2809 s
+KSP Object:
+  type: cg
+  maximum iterations=4572120
+  tolerances:  relative=1e-14, absolute=1.17549e-38, divergence=10000
+  left preconditioning
+  using nonzero initial guess
+  using PRECONDITIONED norm type for convergence test
+PC Object:
+  type: icc
+    0 levels of fill
+    tolerance for zero pivot 1e-12
+    using Manteuffel shift
+    matrix ordering: natural
+    factor fill ratio given 1, needed 0.525823
+      Factored matrix follows:
+        Matrix Object:
+          type=seqsbaij, rows=571515, cols=571515
+          package used to perform factorization: petsc
+          total: nonzeros=5818727, allocated nonzeros=5818727
+              block size is 1
+  linear system matrix = precond matrix:
+  Matrix Object:
+    type=seqaij, rows=571515, cols=571515
+    total: nonzeros=11065939, allocated nonzeros=0
+      not using I-node routines
+KSP info:
+  KSPGetConvergedReason = CONVERGED_RTOL (2)
+  # of iterations = 183
+  (approximate preconditioned) residual norm = 5.76533e-12
+  (estimated) extreme singular values = 1.88852, 0.00682082
+  (estimated) condition # = 276.876
+[Solving with PETSc CG solver...] 33.1503 s
+Evaluating c + Z*v...0.00216026 s
+Evaluating error norm in approximate solution...0.194758 s
+  |     u_continuous  -      u_approx |_{infty} = 0.0183151
+  |grad(u_continuous) - grad(u_approx)|_{infty} = 0.663979
+[Total execution time: 58.0943 s]
+Parsing command line...
+[Parsing command line...] 0.000426521 s
+Initializing PETSc...0.000823918 s
+Initializing random number generator with seed 5489...3.073e-06 s
+Evaluating level set function over (fine) grid...21.4716 s
+Allocating system...0.00536849 s
+Building interface system...
+Initializing sign_of_cell_index...0.388855 s
+Initializing embedding cells...0.00248432 s
+  # of embedding cells = 32448
+Initializing embedding indices in embedding system...0.192626 s
+  # of embedding vertices = 129514
+Initializing embedding system...14.1956 s
+Initializing beta and regular subsystem stencils...0.337725 s
+Initializing regular subsystem rhs...0.27682 s
+Computing system statistics...0.0848678 s
+  max diag = 0.844238
+  min diag = 2.1214e-17
+    ratio = 3.97962e+16
+  max abs stencil sum = 5.82867e-16
+Setting Dirichlet grid bc's...0.0210141 s
+[Building interface system...] 15.5255 s
+Evaluating constraint residual norm of continuous solution...0.0648859 s
+  2.66235e-07
+Allocating approximate solution...0.00569605 s
+Selecting indys...0.104083 s
+  # of indys = 7148
+Aggregating constraints...0.0857956 s
+  max indy weight = 0.000429842
+  min indy weight = 9.31443e-15
+    ratio = 4.6148e+10
+Evaluating aggregate constraint residual norm of continuous solution...0.00260969 s
+  2.53452e-06
+Building Z^T*A*Z embedding subsystem...2.02327 s
+Evaluating Z^T*(f - A*c)...0.0063821 s
+Evaluating Z^T*A*Z residual norm of continuous solution...0.0782151 s
+  0.000659195
+Solving with PETSc CG solver...
+Initializing PETSc index <-> PhysBAM index mappings...0.10812 s
+  # of petsc dofs = 970282
+Constructing Jacobi scaling coefficients...0.0834067 s
+Constructing matrix in CSR format and Jacobi scaling...1.1986 s
+  # of nonzeros (estimated) = 17199597
+  # of nonzeros (actual)    = 16875858
+Constructing rhs of Jacobi-scaled system...0.0105397 s
+Executing KSPSolve...55.7812 s
+KSP Object:
+  type: cg
+  maximum iterations=7762256
+  tolerances:  relative=1e-14, absolute=1.17549e-38, divergence=10000
+  left preconditioning
+  using nonzero initial guess
+  using PRECONDITIONED norm type for convergence test
+PC Object:
+  type: icc
+    0 levels of fill
+    tolerance for zero pivot 1e-12
+    using Manteuffel shift
+    matrix ordering: natural
+    factor fill ratio given 1, needed 0.528748
+      Factored matrix follows:
+        Matrix Object:
+          type=seqsbaij, rows=970282, cols=970282
+          package used to perform factorization: petsc
+          total: nonzeros=8923070, allocated nonzeros=8923070
+              block size is 1
+  linear system matrix = precond matrix:
+  Matrix Object:
+    type=seqaij, rows=970282, cols=970282
+    total: nonzeros=16875858, allocated nonzeros=0
+      not using I-node routines
+KSP info:
+  KSPGetConvergedReason = CONVERGED_RTOL (2)
+  # of iterations = 216
+  (approximate preconditioned) residual norm = 6.02729e-12
+  (estimated) extreme singular values = 1.70298, 0.00465654
+  (estimated) condition # = 365.719
+[Solving with PETSc CG solver...] 60.2118 s
+Evaluating c + Z*v...0.00314775 s
+Evaluating error norm in approximate solution...0.335417 s
+  |     u_continuous  -      u_approx |_{infty} = 0.00979646
+  |grad(u_continuous) - grad(u_approx)|_{infty} = 0.424842
+[Total execution time: 100.009 s]
+Parsing command line...
+[Parsing command line...] 0.000425194 s
+Initializing PETSc...0.000836978 s
+Initializing random number generator with seed 5489...3.003e-06 s
+Evaluating level set function over (fine) grid...33.9259 s
+Allocating system...0.00948968 s
+Building interface system...
+Initializing sign_of_cell_index...0.615759 s
+Initializing embedding cells...0.00365738 s
+  # of embedding cells = 44312
+Initializing embedding indices in embedding system...0.302532 s
+  # of embedding vertices = 177062
+Initializing embedding system...19.3124 s
+Initializing beta and regular subsystem stencils...0.529459 s
+Initializing regular subsystem rhs...0.442413 s
+Computing system statistics...0.159311 s
+  max diag = 0.727348
+  min diag = 1.84621e-17
+    ratio = 3.93969e+16
+  max abs stencil sum = 5.68989e-16
+Setting Dirichlet grid bc's...0.0325076 s
+[Building interface system...] 21.4355 s
+Evaluating constraint residual norm of continuous solution...0.101494 s
+  1.43768e-07
+Allocating approximate solution...0.00808008 s
+Selecting indys...0.148654 s
+  # of indys = 9595
+Aggregating constraints...0.13664 s
+  max indy weight = 0.000311773
+  min indy weight = 7.76713e-15
+    ratio = 4.014e+10
+Evaluating aggregate constraint residual norm of continuous solution...0.00377716 s
+  1.36147e-06
+Building Z^T*A*Z embedding subsystem...2.85912 s
+Evaluating Z^T*(f - A*c)...0.00950365 s
+Evaluating Z^T*A*Z residual norm of continuous solution...0.112035 s
+  0.000439631
+Solving with PETSc CG solver...
+Initializing PETSc index <-> PhysBAM index mappings...0.179105 s
+  # of petsc dofs = 1521833
+Constructing Jacobi scaling coefficients...0.13058 s
+Constructing matrix in CSR format and Jacobi scaling...1.78717 s
+  # of nonzeros (estimated) = 24812360
+  # of nonzeros (actual)    = 24369769
+Constructing rhs of Jacobi-scaled system...0.0168265 s
+Executing KSPSolve...97.6804 s
+KSP Object:
+  type: cg
+  maximum iterations=12174664
+  tolerances:  relative=1e-14, absolute=1.17549e-38, divergence=10000
+  left preconditioning
+  using nonzero initial guess
+  using PRECONDITIONED norm type for convergence test
+PC Object:
+  type: icc
+    0 levels of fill
+    tolerance for zero pivot 1e-12
+    using Manteuffel shift
+    matrix ordering: natural
+    factor fill ratio given 1, needed 0.531224
+      Factored matrix follows:
+        Matrix Object:
+          type=seqsbaij, rows=1521833, cols=1521833
+          package used to perform factorization: petsc
+          total: nonzeros=12945801, allocated nonzeros=12945801
+              block size is 1
+  linear system matrix = precond matrix:
+  Matrix Object:
+    type=seqaij, rows=1521833, cols=1521833
+    total: nonzeros=24369769, allocated nonzeros=0
+      not using I-node routines
+KSP info:
+  KSPGetConvergedReason = CONVERGED_RTOL (2)
+  # of iterations = 258
+  (approximate preconditioned) residual norm = 8.04992e-12
+  (estimated) extreme singular values = 2.18101, 0.00337975
+  (estimated) condition # = 645.318
+[Solving with PETSc CG solver...] 104.132 s
+Evaluating c + Z*v...0.00468572 s
+Evaluating error norm in approximate solution...0.532376 s
+  |     u_continuous  -      u_approx |_{infty} = 0.00823756
+  |grad(u_continuous) - grad(u_approx)|_{infty} = 0.393002
+[Total execution time: 163.537 s]
+Parsing command line...
+[Parsing command line...] 0.000424635 s
+Initializing PETSc...0.000823638 s
+Initializing random number generator with seed 5489...3.073e-06 s
+Evaluating level set function over (fine) grid...50.3987 s
+Allocating system...0.015142 s
+Building interface system...
+Initializing sign_of_cell_index...0.922647 s
+Initializing embedding cells...0.00713659 s
+  # of embedding cells = 57768
+Initializing embedding indices in embedding system...0.457152 s
+  # of embedding vertices = 230936
+Initializing embedding system...25.2231 s
+Initializing beta and regular subsystem stencils...0.646793 s
+Initializing regular subsystem rhs...0.520244 s
+Computing system statistics...0.214621 s
+  max diag = 0.638878
+  min diag = 1.62751e-17
+    ratio = 3.9255e+16
+  max abs stencil sum = 4.2067e-17
+Setting Dirichlet grid bc's...0.0381958 s
+[Building interface system...] 28.0777 s
+Evaluating constraint residual norm of continuous solution...0.119464 s
+  8.42638e-08
+Allocating approximate solution...0.0128225 s
+Selecting indys...0.198154 s
+  # of indys = 12624
+Aggregating constraints...0.195232 s
+  max indy weight = 0.000242141
+  min indy weight = 5.31398e-15
+    ratio = 4.55668e+10
+Evaluating aggregate constraint residual norm of continuous solution...0.0054273 s
+  8.55568e-07
+Building Z^T*A*Z embedding subsystem...3.60704 s
+Evaluating Z^T*(f - A*c)...0.0136188 s
+Evaluating Z^T*A*Z residual norm of continuous solution...0.151761 s
+  0.000331523
+Solving with PETSc CG solver...
+Initializing PETSc index <-> PhysBAM index mappings...0.324477 s
+  # of petsc dofs = 2249533
+Constructing Jacobi scaling coefficients...0.204669 s
+Constructing matrix in CSR format and Jacobi scaling...2.5731 s
+  # of nonzeros (estimated) = 34130151
+  # of nonzeros (actual)    = 33552933
+Constructing rhs of Jacobi-scaled system...0.02544 s
+Executing KSPSolve...156.716 s
+KSP Object:
+  type: cg
+  maximum iterations=17996264
+  tolerances:  relative=1e-14, absolute=1.17549e-38, divergence=10000
+  left preconditioning
+  using nonzero initial guess
+  using PRECONDITIONED norm type for convergence test
+PC Object:
+  type: icc
+    0 levels of fill
+    tolerance for zero pivot 1e-12
+    using Manteuffel shift
+    matrix ordering: natural
+    factor fill ratio given 1, needed 0.533522
+      Factored matrix follows:
+        Matrix Object:
+          type=seqsbaij, rows=2249533, cols=2249533
+          package used to perform factorization: petsc
+          total: nonzeros=17901233, allocated nonzeros=17901233
+              block size is 1
+  linear system matrix = precond matrix:
+  Matrix Object:
+    type=seqaij, rows=2249533, cols=2249533
+    total: nonzeros=33552933, allocated nonzeros=0
+      not using I-node routines
+KSP info:
+  KSPGetConvergedReason = CONVERGED_RTOL (2)
+  # of iterations = 295
+  (approximate preconditioned) residual norm = 7.10573e-12
+  (estimated) extreme singular values = 2.13056, 0.00256257
+  (estimated) condition # = 831.418
+[Solving with PETSc CG solver...] 165.94 s
+Evaluating c + Z*v...0.00626029 s
+Evaluating error norm in approximate solution...0.551706 s
+  |     u_continuous  -      u_approx |_{infty} = 0.00470168
+  |grad(u_continuous) - grad(u_approx)|_{infty} = 0.263396
+[Total execution time: 249.447 s]
+Parsing command line...
+[Parsing command line...] 0.000428197 s
+Initializing PETSc...0.000852972 s
+Initializing random number generator with seed 5489...3.004e-06 s
+Evaluating level set function over (fine) grid...71.842 s
+Allocating system...0.0203115 s
+Building interface system...
+Initializing sign_of_cell_index...1.30653 s
+Initializing embedding cells...0.00700243 s
+  # of embedding cells = 73206
+Initializing embedding indices in embedding system...0.638476 s
+  # of embedding vertices = 292732
+Initializing embedding system...31.993 s
+Initializing beta and regular subsystem stencils...1.12789 s
+Initializing regular subsystem rhs...0.945958 s
+Computing system statistics...0.325912 s
+  max diag = 0.569589
+  min diag = 1.45193e-17
+    ratio = 3.92297e+16
+  max abs stencil sum = 3.747e-16
+Setting Dirichlet grid bc's...0.052937 s
+[Building interface system...] 36.461 s
+Evaluating constraint residual norm of continuous solution...0.199217 s
+  5.26059e-08
+Allocating approximate solution...0.0164856 s
+Selecting indys...0.266282 s
+  # of indys = 15939
+Aggregating constraints...0.223848 s
+  max indy weight = 0.000188871
+  min indy weight = 4.13788e-15
+    ratio = 4.56444e+10
+Evaluating aggregate constraint residual norm of continuous solution...0.0072232 s
+  5.25409e-07
+Building Z^T*A*Z embedding subsystem...4.69421 s
+Evaluating Z^T*(f - A*c)...0.0180049 s
+Evaluating Z^T*A*Z residual norm of continuous solution...0.199324 s
+  0.000185157
+Solving with PETSc CG solver...
+Initializing PETSc index <-> PhysBAM index mappings...0.503116 s
+  # of petsc dofs = 3179052
+Constructing Jacobi scaling coefficients...0.292284 s
+Constructing matrix in CSR format and Jacobi scaling...3.46093 s
+  # of nonzeros (estimated) = 45683726
+  # of nonzeros (actual)    = 44952054
+Constructing rhs of Jacobi-scaled system...0.0357134 s
+Executing KSPSolve...236.596 s
+KSP Object:
+  type: cg
+  maximum iterations=25432416
+  tolerances:  relative=1e-14, absolute=1.17549e-38, divergence=10000
+  left preconditioning
+  using nonzero initial guess
+  using PRECONDITIONED norm type for convergence test
+PC Object:
+  type: icc
+    0 levels of fill
+    tolerance for zero pivot 1e-12
+    using Manteuffel shift
+    matrix ordering: natural
+    factor fill ratio given 1, needed 0.53536
+      Factored matrix follows:
+        Matrix Object:
+          type=seqsbaij, rows=3179052, cols=3179052
+          package used to perform factorization: petsc
+          total: nonzeros=24065553, allocated nonzeros=24065553
+              block size is 1
+  linear system matrix = precond matrix:
+  Matrix Object:
+    type=seqaij, rows=3179052, cols=3179052
+    total: nonzeros=44952054, allocated nonzeros=0
+      not using I-node routines
+KSP info:
+  KSPGetConvergedReason = CONVERGED_RTOL (2)
+  # of iterations = 329
+  (approximate preconditioned) residual norm = 9.56992e-12
+  (estimated) extreme singular values = 1.75744, 0.00201
+  (estimated) condition # = 874.347
+[Solving with PETSc CG solver...] 249.026 s
+Evaluating c + Z*v...0.0083065 s
+Evaluating error norm in approximate solution...1.1322 s
+  |     u_continuous  -      u_approx |_{infty} = 0.00336477
+  |grad(u_continuous) - grad(u_approx)|_{infty} = 0.259309
+[Total execution time: 364.315 s]
+Parsing command line...
+[Parsing command line...] 0.000429733 s
+Initializing PETSc...0.000827409 s
+Initializing random number generator with seed 5489...3.003e-06 s
+Evaluating level set function over (fine) grid...98.5204 s
+Allocating system...0.0239848 s
+Building interface system...
+Initializing sign_of_cell_index...1.79536 s
+Initializing embedding cells...0.00926151 s
+  # of embedding cells = 90320
+Initializing embedding indices in embedding system...0.874904 s
+  # of embedding vertices = 361160
+Initializing embedding system...39.5106 s
+Initializing beta and regular subsystem stencils...1.55289 s
+Initializing regular subsystem rhs...1.30009 s
+Computing system statistics...0.507576 s
+  max diag = 0.513855
+  min diag = 1.31518e-17
+    ratio = 3.90712e+16
+  max abs stencil sum = 3.747e-16
+Setting Dirichlet grid bc's...0.0718253 s
+[Building interface system...] 45.7053 s
+Evaluating constraint residual norm of continuous solution...0.267474 s
+  3.452e-08
+Allocating approximate solution...0.0235408 s
+Selecting indys...0.360149 s
+  # of indys = 19862
+Aggregating constraints...0.322704 s
+  max indy weight = 0.000155116
+  min indy weight = 3.4969e-15
+    ratio = 4.43583e+10
+Evaluating aggregate constraint residual norm of continuous solution...0.00973343 s
+  3.3525e-07
+Building Z^T*A*Z embedding subsystem...5.91558 s
+Evaluating Z^T*(f - A*c)...0.0239439 s
+Evaluating Z^T*A*Z residual norm of continuous solution...0.255515 s
+  0.00014707
+Solving with PETSc CG solver...
+Initializing PETSc index <-> PhysBAM index mappings...0.724263 s
+  # of petsc dofs = 4333999
+Constructing Jacobi scaling coefficients...0.42508 s
+Constructing matrix in CSR format and Jacobi scaling...4.72265 s
+  # of nonzeros (estimated) = 58963993
+  # of nonzeros (actual)    = 58061319
+Constructing rhs of Jacobi-scaled system...0.0531528 s
+Executing KSPSolve...354.326 s
+KSP Object:
+  type: cg
+  maximum iterations=34671992
+  tolerances:  relative=1e-14, absolute=1.17549e-38, divergence=10000
+  left preconditioning
+  using nonzero initial guess
+  using PRECONDITIONED norm type for convergence test
+PC Object:
+  type: icc
+    0 levels of fill
+    tolerance for zero pivot 1e-12
+    using Manteuffel shift
+    matrix ordering: natural
+    factor fill ratio given 1, needed 0.537323
+      Factored matrix follows:
+        Matrix Object:
+          type=seqsbaij, rows=4333999, cols=4333999
+          package used to perform factorization: petsc
+          total: nonzeros=31197659, allocated nonzeros=31197659
+              block size is 1
+  linear system matrix = precond matrix:
+  Matrix Object:
+    type=seqaij, rows=4333999, cols=4333999
+    total: nonzeros=58061319, allocated nonzeros=0
+      not using I-node routines
+KSP info:
+  KSPGetConvergedReason = CONVERGED_RTOL (2)
+  # of iterations = 374
+  (approximate preconditioned) residual norm = 1.03796e-11
+  (estimated) extreme singular values = 2.05298, 0.00161834
+  (estimated) condition # = 1268.57
+[Solving with PETSc CG solver...] 370.919 s
+Evaluating c + Z*v...0.0105958 s
+Evaluating error norm in approximate solution...1.54673 s
+  |     u_continuous  -      u_approx |_{infty} = 0.00263061
+  |grad(u_continuous) - grad(u_approx)|_{infty} = 0.226234
+[Total execution time: 524.154 s]
+Parsing command line...
+[Parsing command line...] 0.000425334 s
+Initializing PETSc...0.000854927 s
+Initializing random number generator with seed 5489...3.213e-06 s
+Evaluating level set function over (fine) grid...130.24 s
+Allocating system...0.0359298 s
+Building interface system...
+Initializing sign_of_cell_index...2.39397 s
+Initializing embedding cells...0.0121034 s
+  # of embedding cells = 109386
+Initializing embedding indices in embedding system...1.1699 s
+  # of embedding vertices = 437436
+Initializing embedding system...47.7902 s
+Initializing beta and regular subsystem stencils...2.05756 s
+Initializing regular subsystem rhs...1.73623 s
+Computing system statistics...0.577326 s
+  max diag = 0.468054
+  min diag = 1.21843e-17
+    ratio = 3.84144e+16
+  max abs stencil sum = 3.46945e-16
+Setting Dirichlet grid bc's...0.0776965 s
+[Building interface system...] 55.9083 s
+Evaluating constraint residual norm of continuous solution...0.348828 s
+  2.35695e-08
+Allocating approximate solution...0.0338669 s
+Selecting indys...0.460435 s
+  # of indys = 24042
+Aggregating constraints...0.357803 s
+  max indy weight = 0.000125139
+  min indy weight = 2.83504e-15
+    ratio = 4.41402e+10
+Evaluating aggregate constraint residual norm of continuous solution...0.012384 s
+  2.66751e-07
+Building Z^T*A*Z embedding subsystem...7.4487 s
+Evaluating Z^T*(f - A*c)...0.0305903 s
+Evaluating Z^T*A*Z residual norm of continuous solution...0.321353 s
+  0.000118231
+Solving with PETSc CG solver...
+Initializing PETSc index <-> PhysBAM index mappings...1.11088 s
+  # of petsc dofs = 5739909
+Constructing Jacobi scaling coefficients...0.543452 s
+Constructing matrix in CSR format and Jacobi scaling...6.08156 s
+  # of nonzeros (estimated) = 75014709
+  # of nonzeros (actual)    = 73921389
+Constructing rhs of Jacobi-scaled system...0.070721 s
+Executing KSPSolve...495.976 s
+KSP Object:
+  type: cg
+  maximum iterations=45919272
+  tolerances:  relative=1e-14, absolute=1.17549e-38, divergence=10000
+  left preconditioning
+  using nonzero initial guess
+  using PRECONDITIONED norm type for convergence test
+PC Object:
+  type: icc
+    0 levels of fill
+    tolerance for zero pivot 1e-12
+    using Manteuffel shift
+    matrix ordering: natural
+    factor fill ratio given 1, needed 0.538824
+      Factored matrix follows:
+        Matrix Object:
+          type=seqsbaij, rows=5739909, cols=5739909
+          package used to perform factorization: petsc
+          total: nonzeros=39830649, allocated nonzeros=39830649
+              block size is 1
+  linear system matrix = precond matrix:
+  Matrix Object:
+    type=seqaij, rows=5739909, cols=5739909
+    total: nonzeros=73921389, allocated nonzeros=0
+      not using I-node routines
+KSP info:
+  KSPGetConvergedReason = CONVERGED_RTOL (2)
+  # of iterations = 411
+  (approximate preconditioned) residual norm = 1.04503e-11
+  (estimated) extreme singular values = 2.00501, 0.00133102
+  (estimated) condition # = 1506.37
+[Solving with PETSc CG solver...] 517.24 s
+Evaluating c + Z*v...0.0134129 s
+Evaluating error norm in approximate solution...2.06812 s
+  |     u_continuous  -      u_approx |_{infty} = 0.00319684
+  |grad(u_continuous) - grad(u_approx)|_{infty} = 0.248888
+[Total execution time: 714.832 s]
+Parsing command line...
+[Parsing command line...] 0.000431339 s
+Initializing PETSc...0.000814908 s
+Initializing random number generator with seed 5489...3.282e-06 s
+Evaluating level set function over (fine) grid...169.855 s
+Allocating system...0.0424963 s
+Building interface system...
+Initializing sign_of_cell_index...3.11052 s
+Initializing embedding cells...0.0157324 s
+  # of embedding cells = 130046
+Initializing embedding indices in embedding system...1.5126 s
+  # of embedding vertices = 520064
+Initializing embedding system...57.1204 s
+Initializing beta and regular subsystem stencils...2.68446 s
+Initializing regular subsystem rhs...2.26083 s
+Computing system statistics...0.807737 s
+  max diag = 0.429749
+  min diag = 1.10829e-17
+    ratio = 3.87759e+16
+  max abs stencil sum = 3.19189e-16
+Setting Dirichlet grid bc's...0.0960806 s
+[Building interface system...] 67.7237 s
+Evaluating constraint residual norm of continuous solution...0.452158 s
+  1.66431e-08
+Allocating approximate solution...0.0378139 s
+Selecting indys...0.602178 s
+  # of indys = 28650
+Aggregating constraints...0.471534 s
+  max indy weight = 0.000107789
+  min indy weight = 2.36127e-15
+    ratio = 4.56488e+10
+Evaluating aggregate constraint residual norm of continuous solution...0.0156026 s
+  1.82374e-07
+Building Z^T*A*Z embedding subsystem...8.50615 s
+Evaluating Z^T*(f - A*c)...0.0381367 s
+Evaluating Z^T*A*Z residual norm of continuous solution...0.399427 s
+  9.23344e-05
+Solving with PETSc CG solver...
+Initializing PETSc index <-> PhysBAM index mappings...1.5074 s
+  # of petsc dofs = 7420439
+Constructing Jacobi scaling coefficients...0.729834 s
+Constructing matrix in CSR format and Jacobi scaling...7.7675 s
+  # of nonzeros (estimated) = 93374097
+  # of nonzeros (actual)    = 92074183
+Constructing rhs of Jacobi-scaled system...0.0927218 s
+Executing KSPSolve...679.435 s
+KSP Object:
+  type: cg
+  maximum iterations=59363512
+  tolerances:  relative=1e-14, absolute=1.17549e-38, divergence=10000
+  left preconditioning
+  using nonzero initial guess
+  using PRECONDITIONED norm type for convergence test
+PC Object:
+  type: icc
+    0 levels of fill
+    tolerance for zero pivot 1e-12
+    using Manteuffel shift
+    matrix ordering: natural
+    factor fill ratio given 1, needed 0.540296
+      Factored matrix follows:
+        Matrix Object:
+          type=seqsbaij, rows=7420439, cols=7420439
+          package used to perform factorization: petsc
+          total: nonzeros=49747311, allocated nonzeros=49747311
+              block size is 1
+  linear system matrix = precond matrix:
+  Matrix Object:
+    type=seqaij, rows=7420439, cols=7420439
+    total: nonzeros=92074183, allocated nonzeros=0
+      not using I-node routines
+KSP info:
+  KSPGetConvergedReason = CONVERGED_RTOL (2)
+  # of iterations = 440
+  (approximate preconditioned) residual norm = 1.34451e-11
+  (estimated) extreme singular values = 1.89378, 0.00111387
+  (estimated) condition # = 1700.18
+[Solving with PETSc CG solver...] 706.625 s
+Evaluating c + Z*v...0.0166354 s
+Evaluating error norm in approximate solution...2.72766 s
+  |     u_continuous  -      u_approx |_{infty} = 0.00199014
+  |grad(u_continuous) - grad(u_approx)|_{infty} = 0.184611
+[Total execution time: 957.88 s]
+Parsing command line...
+[Parsing command line...] 0.000465911 s
+Initializing PETSc...0.000861282 s
+Initializing random number generator with seed 5489...3.003e-06 s
+Evaluating level set function over (fine) grid...216.667 s
+Allocating system...0.0504802 s
+Building interface system...
+Initializing sign_of_cell_index...3.97727 s
+Initializing embedding cells...0.0196484 s
+  # of embedding cells = 152792
+Initializing embedding indices in embedding system...1.92461 s
+  # of embedding vertices = 611076
+Initializing embedding system...66.8805 s
+Initializing beta and regular subsystem stencils...3.38817 s
+Initializing regular subsystem rhs...2.88139 s
+Computing system statistics...1.10041 s
+  max diag = 0.397237
+  min diag = 1.01777e-17
+    ratio = 3.90301e+16
+  max abs stencil sum = 3.05311e-16
+Setting Dirichlet grid bc's...0.117159 s
+[Building interface system...] 80.429 s
+Evaluating constraint residual norm of continuous solution...0.560135 s
+  1.20844e-08
+Allocating approximate solution...0.0458227 s
+Selecting indys...0.685503 s
+  # of indys = 33619
+Aggregating constraints...0.503378 s
+  max indy weight = 9.14171e-05
+  min indy weight = 2.07948e-15
+    ratio = 4.39616e+10
+Evaluating aggregate constraint residual norm of continuous solution...0.0186547 s
+  1.35151e-07
+Building Z^T*A*Z embedding subsystem...10.0753 s
+Evaluating Z^T*(f - A*c)...0.0461927 s
+Evaluating Z^T*A*Z residual norm of continuous solution...0.483806 s
+  6.86817e-05
+Solving with PETSc CG solver...
+Initializing PETSc index <-> PhysBAM index mappings...2.05374 s
+  # of petsc dofs = 9401248
+Constructing Jacobi scaling coefficients...1.00254 s
+Constructing matrix in CSR format and Jacobi scaling...9.84012 s
+  # of nonzeros (estimated) = 114435146
+  # of nonzeros (actual)    = 112907686
+Constructing rhs of Jacobi-scaled system...0.115136 s
+Executing KSPSolve...977.438 s
+KSP Object:
+  type: cg
+  maximum iterations=75209984
+  tolerances:  relative=1e-14, absolute=1.17549e-38, divergence=10000
+  left preconditioning
+  using nonzero initial guess
+  using PRECONDITIONED norm type for convergence test
+PC Object:
+  type: icc
+    0 levels of fill
+    tolerance for zero pivot 1e-12
+    using Manteuffel shift
+    matrix ordering: natural
+    factor fill ratio given 1, needed 0.541632
+      Factored matrix follows:
+        Matrix Object:
+          type=seqsbaij, rows=9401248, cols=9401248
+          package used to perform factorization: petsc
+          total: nonzeros=61154467, allocated nonzeros=61154467
+              block size is 1
+  linear system matrix = precond matrix:
+  Matrix Object:
+    type=seqaij, rows=9401248, cols=9401248
+    total: nonzeros=112907686, allocated nonzeros=0
+      not using I-node routines
+KSP info:
+  KSPGetConvergedReason = CONVERGED_RTOL (2)
+  # of iterations = 517
+  (approximate preconditioned) residual norm = 1.34714e-11
+  (estimated) extreme singular values = 2.54229, 0.000945871
+  (estimated) condition # = 2687.77
+[Solving with PETSc CG solver...] 1012.1 s
+Evaluating c + Z*v...0.0200686 s
+Evaluating error norm in approximate solution...3.41842 s
+  |     u_continuous  -      u_approx |_{infty} = 0.00193707
+  |grad(u_continuous) - grad(u_approx)|_{infty} = 0.177717
+[Total execution time: 1325.55 s]
+Parsing command line...
+[Parsing command line...] 0.000703022 s
+Initializing PETSc...0.0543262 s
+Initializing random number generator with seed 5489...4.47e-06 s
+Evaluating level set function over (fine) grid...269.619 s
+Allocating system...0.0647225 s
+Building interface system...
+Initializing sign_of_cell_index...4.94185 s
+Initializing embedding cells...0.0244791 s
+  # of embedding cells = 177136
+Initializing embedding indices in embedding system...2.39837 s
+  # of embedding vertices = 708432
+Initializing embedding system...77.9353 s
+Initializing beta and regular subsystem stencils...4.2669 s
+Initializing regular subsystem rhs...3.61985 s
+Computing system statistics...1.56733 s
+  max diag = 0.369299
+  min diag = 9.31826e-18
+    ratio = 3.96317e+16
+  max abs stencil sum = 2.91434e-16
+Setting Dirichlet grid bc's...0.146177 s
+[Building interface system...] 95.0724 s
+Evaluating constraint residual norm of continuous solution...0.705466 s
+  8.98587e-09
+Allocating approximate solution...0.0598076 s
+Selecting indys...0.841422 s
+  # of indys = 39162
+Aggregating constraints...0.559712 s
+  max indy weight = 7.92293e-05
+  min indy weight = 1.7772e-15
+    ratio = 4.45809e+10
+Evaluating aggregate constraint residual norm of continuous solution...0.0226967 s
+  1.12122e-07
+Building Z^T*A*Z embedding subsystem...11.9657 s
+Evaluating Z^T*(f - A*c)...0.0564509 s
+Evaluating Z^T*A*Z residual norm of continuous solution...0.588493 s
+  5.70219e-05
+Solving with PETSc CG solver...
+Initializing PETSc index <-> PhysBAM index mappings...2.58068 s
+  # of petsc dofs = 11705679
+Constructing Jacobi scaling coefficients...1.31688 s
+Constructing matrix in CSR format and Jacobi scaling...11.9479 s
+  # of nonzeros (estimated) = 138200101
+  # of nonzeros (actual)    = 136429247
+Constructing rhs of Jacobi-scaled system...0.14531 s
+Executing KSPSolve...1272.55 s
+KSP Object:
+  type: cg
+  maximum iterations=93645432
+  tolerances:  relative=1e-14, absolute=1.17549e-38, divergence=10000
+  left preconditioning
+  using nonzero initial guess
+  using PRECONDITIONED norm type for convergence test
+PC Object:
+  type: icc
+    0 levels of fill
+    tolerance for zero pivot 1e-12
+    using Manteuffel shift
+    matrix ordering: natural
+    factor fill ratio given 1, needed 0.5429
+      Factored matrix follows:
+        Matrix Object:
+          type=seqsbaij, rows=11705679, cols=11705679
+          package used to perform factorization: petsc
+          total: nonzeros=74067463, allocated nonzeros=74067463
+              block size is 1
+  linear system matrix = precond matrix:
+  Matrix Object:
+    type=seqaij, rows=11705679, cols=11705679
+    total: nonzeros=136429247, allocated nonzeros=0
+      not using I-node routines
+KSP info:
+  KSPGetConvergedReason = CONVERGED_RTOL (2)
+  # of iterations = 521
+  (approximate preconditioned) residual norm = 1.46631e-11
+  (estimated) extreme singular values = 1.95978, 0.000813124
+  (estimated) condition # = 2410.19
+[Solving with PETSc CG solver...] 1340.21 s
+Evaluating c + Z*v...0.0261503 s
+Evaluating error norm in approximate solution...7.11011 s
+  |     u_continuous  -      u_approx |_{infty} = 0.00117
+  |grad(u_continuous) - grad(u_approx)|_{infty} = 0.176404
+[Total execution time: 1752.17 s]
+Parsing command line...
+[Parsing command line...] 0.00342348 s
+Initializing PETSc...0.115988 s
+Initializing random number generator with seed 5489...4.609e-06 s
+Evaluating level set function over (fine) grid...328.764 s
+Allocating system...0.0734693 s
+Building interface system...
+Initializing sign_of_cell_index...6.0693 s
+Initializing embedding cells...0.0307425 s
+  # of embedding cells = 203504
+Initializing embedding indices in embedding system...2.93401 s
+  # of embedding vertices = 813956
+Initializing embedding system...88.699 s
+Initializing beta and regular subsystem stencils...5.20006 s
+Initializing regular subsystem rhs...4.43591 s
+Computing system statistics...1.43999 s
+  max diag = 0.345031
+  min diag = 8.77334e-18
+    ratio = 3.93272e+16
+  max abs stencil sum = 2.91434e-16
+Setting Dirichlet grid bc's...0.146999 s
+[Building interface system...] 109.135 s
+Evaluating constraint residual norm of continuous solution...0.867225 s
+  6.81604e-09
+Allocating approximate solution...0.0725901 s
+Selecting indys...1.01018 s
+  # of indys = 44834
+Aggregating constraints...0.732386 s
+  max indy weight = 6.84058e-05
+  min indy weight = 1.53548e-15
+    ratio = 4.45502e+10
+Evaluating aggregate constraint residual norm of continuous solution...0.0269102 s
+  7.78001e-08
+Building Z^T*A*Z embedding subsystem...13.8135 s
+Evaluating Z^T*(f - A*c)...0.0653121 s
+Evaluating Z^T*A*Z residual norm of continuous solution...0.690352 s
+  4.99118e-05
+Solving with PETSc CG solver...
+Initializing PETSc index <-> PhysBAM index mappings...3.39967 s
+  # of petsc dofs = 14359665
+Constructing Jacobi scaling coefficients...1.76512 s
+Constructing matrix in CSR format and Jacobi scaling...14.4994 s
+  # of nonzeros (estimated) = 165222793
+  # of nonzeros (actual)    = 163188053
+Constructing rhs of Jacobi-scaled system...0.175453 s
+Executing KSPSolve...

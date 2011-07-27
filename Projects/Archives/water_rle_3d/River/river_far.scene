@@ -1,0 +1,232 @@
+// river scene
+
+Camera{
+    Location=       11.7625 11.2337 -8.26516
+    Look_At=        5.06955 -1.60154 1.11052
+    Pseudo_Up=      -0.488906 0.666258 0.563092
+    Field_Of_View=  26.4602
+    Focal_Distance= .1
+    Aspect_Ratio=   1.33333
+
+    //Width=       320
+    //Height=      240
+    Width=       640
+    Height=      480
+    //Width=       1280
+    //Height=      1024
+
+    //Output_Filename="high_%03d.png"
+    Output_Filename="Output_Far/final_%03d.png"
+}
+
+
+Material{
+    Type="Infinite_Reflection"
+    Name="sky_shader"
+    Filename="Common/sky.bmp"
+    Scale=0.4
+}
+
+Options{
+    High_Quality=true
+    Spatial_Partition=true
+    Background_Color=0 0 0
+    Use_Photon_Map=false
+    Use_Irradiance_Cache=true
+    Irradiance_Cache_Samples=10
+    Number_Of_Photons_In_Estimate=100
+    Global_Photons=100000
+    Caustic_Photons=100000
+//    Volume_Photons=10000
+    Background_Shader=sky_shader
+}
+
+Light{
+    Name=light1
+    Type=Directional
+    //Position=8.84861 4.94296 -2.48557
+    //Position=4.84861 4.94296 -2.48557
+    Direction=0 -1 0
+    Color=1 1 1
+    Power=.6
+}
+
+Light{
+    Name=light2
+    Type=Directional
+    Direction=-4.84861 -4.94296 2.48557
+    Color=1 1 1
+    Power=1.8
+}
+
+
+//Colors for shaders
+
+Material{
+    Name="GroundColor"
+    Type="Color"
+    Color=1 .775 .5431
+}
+Material{
+    Name="GroundShader"
+    Type="Lambertian"
+    Shader="GroundColor"
+    Reflectivity=0.0
+}
+Material{
+    Name="RedColor"
+    Type="Color"
+    Color=1 .3 .2
+}
+
+Material{
+    Name=SunColor
+    Type="Color"
+    Color=1 1 1
+}   
+
+Material{
+    Name="WaterShader"
+    Type="Transparent"
+    Reflectivity=0.0
+}
+
+Volume_Material {
+    Name="Absorption"
+    Type="Attenuation_Shader"
+    //Spectrum=0.3  0.3 .0
+    Spectrum=1 .6 .3
+    //Absorption=2.5
+    Absorption=20
+}
+
+Material{
+    Name="WaterShader"
+    Type="Transparent"
+    Fresnel=true
+    Shift_Direction=normal
+    Reflectivity=0.2
+}
+
+Material{
+    Name="FloorTexture"
+    Type="Image_Texture"
+    Filename="Common/blue.bmp"
+    Cubic_Interpolation=false
+}
+Material{
+    Name="FloorShader"
+    Type="Lambertian"
+    Shader="FloorTexture"
+    Reflectivity=0.5
+}
+Material{
+    Name="WallShader"
+    Type="Lambertian"
+    Shader="GroundColor"
+    Reflectivity=0.5
+}
+Material{
+    Name="RedShader"
+    Type="Lambertian"
+    Shader="RedColor"
+    Reflectivity=0.5
+}
+Material{
+    Name="WallShader"
+    Type="Lambertian"
+    Shader="GroundColor"
+    Reflectivity=0.5
+}
+Material{
+    Name="CanyonShader"
+    Type="RLE_River"
+    Reflectance=.3
+    Diffuse=1 .775 .5431
+
+    Noise_Amplitude=.15
+    Noise_Frequency=20
+    Noise_Bands=15
+
+    Distance_Color=.145 .22 .075
+    Distance_Length=1.9
+}
+Object{
+    Name="RLE_Object"
+    Type="RLE_Levelset"
+    Shader="WaterShader"
+//    Shader="RedShader"
+    Volume_Shader="Absorption"
+    Index_Of_Refraction=1.33
+    Grid_Filename="Input/adjusted_rle_grid.%d"
+    Phi_Filename="Input/adjusted_rle_levelset.%d"
+    Phi_Object_Filename="Input/adjusted_rle_object_levelset.%d"
+    Extrapolate_Into_Objects=true
+    //Use_Collision_Aware_Interpolation=true
+}
+
+// canyon
+
+//List_Object{
+//    Name="rigidbodies"
+//    Type="Rigid_Body_List"
+//    Prefix="Input"
+//    Shader="WallShader"
+//    //Add_To_Collisions=true
+//    //Load_Implicit_Surfaces=true
+//} 
+
+Object{
+    Name="canyon"
+    Type="Triangulated_Surface"
+    //Filename="Input/decent_river_coarse.tri.gz"
+    Filename="Input/decent_river.tri.gz"
+    //Shader="WallShader"
+    Shader="CanyonShader"
+    Triangles_Per_Hierarchy_Group=10
+} 
+
+Transform{
+    Type=Push
+}
+Transform{
+    Type=Rotate
+    Axis=0 0 1
+    Radians=-.19739555984988078
+}
+Object{
+    Name="front_box"
+    Type="Box"
+    Shader="CanyonShader"
+    Xmin=-10000
+    Xmax=10000
+    Ymin=-100
+    Ymax=0
+    Zmin=-10000
+    Zmax=-.4
+}
+Object{
+    Name="back_box"
+    Type="Box"
+    Shader="CanyonShader"
+    Xmin=-10000
+    Xmax=10000
+    Ymin=-100
+    Ymax=0
+    Zmin=1.4
+    Zmax=10000
+}
+Object{
+    Name="left_box"
+    Type="Box"
+    Shader="CanyonShader"
+    Xmin=-10000
+    Xmax=0
+    Ymin=-100
+    Ymax=0
+    Zmin=-10000
+    Zmax=10000
+}
+Transform{
+    Type=Pop
+}

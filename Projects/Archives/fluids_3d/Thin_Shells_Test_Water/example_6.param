@@ -1,0 +1,4 @@
+solids_parameters.preroll_frames = 0
+add_bodies = false
+fluids_parameters.write_debug_data = false
+fluids_parameters.restart_data_write_rate = 10

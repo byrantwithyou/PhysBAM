@@ -1,0 +1,3 @@
+Debug Release *.ncb *.suo .sconsign
+water_rle_2d water_rle_2d_debug
+water_rle_2d_nocona water_rle_2d_nocona_debug

@@ -1,0 +1,130 @@
+Camera{
+    Location=       6.76562 4.10335 -7.77272
+    Look_At=        -0.0298743 1.04605 0.698595
+    Pseudo_Up=      -0.18773 0.962322 0.196709
+    Field_Of_View=  26.4602
+    Focal_Distance= .1
+    Aspect_Ratio=   1.33333
+
+    Width=           640
+    Height=          480
+//    Width=           1280
+//    Height=          960
+//    Width=           1024
+//    Height=          768
+//    Width=           800
+//    Height=          600
+    Output_Filename= "Output/frame_%05d.png"
+//    imin=1
+//    imax=1
+}
+Options{
+    High_Quality=true
+}
+
+/////////////////////////////////////////////// lights
+
+Light{
+    Name=top_light
+    Type=Directional
+    Direction=0 -1 .5
+    Color=1 1 1
+    Power=.5
+}
+Light{
+    Name=left_light
+    Type=Point
+    Position=-10 20 -10
+    Color=1 1 1
+    Power=300
+}
+Light{
+    Name=right_light
+    Type=Point
+    Position=5 15 -15
+    Color=1 1 1
+    Power=300
+}
+
+/////////////////////////////////////////////// standard shaders
+
+Material{
+    Name=WhiteColor
+    Type=Color
+    Color=1 1 1
+}
+Material{
+    Name=GroundColor
+    Type=Color
+//    Color=.775 .5431 0
+     Color=.5 .261 0.1
+}   
+Material{
+    Name=GroundShader
+    Type=Lambertian
+    Reflectance=9
+    Shader=GroundColor
+
+//    Type=Phong
+//    Shader=WhiteColor
+//    Diffuse=.775 .5431 0
+//    Specular=.775 .5431 0
+//    Specular_Exponent=10
+}
+Material{
+    Name=BlueColor
+    Type=Color
+    Color=.3374 .3187 .9
+}
+Material{
+    Name=BlueShader
+    Type=Phong
+    Shader=WhiteColor
+    Diffuse=.3374 .3187 .9
+    Specular=.3374 .3187 .9
+    Specular_Exponent=10
+}
+Material{
+    Name=BrightBlueShader
+    Type=Phong
+    Shader=WhiteColor
+    Diffuse=.3374 .3187 .9
+    Specular=.5061 .4781 1.35
+    Specular_Exponent=10
+}
+Material{
+    Name=GoldColor
+    Type=Color
+    Color=.8 .498039 .196078
+}
+Material{
+    Name=GoldShader
+    Type=Phong
+    Shader=WhiteColor
+    Diffuse=.8 .498039 .196078
+    Specular=.8 .498039 .196078
+    Specular_Exponent=10
+}
+
+/////////////////////////////////////////////// ground
+
+Object{
+    Name=ground
+    Type=Plane
+    Position=0 -1e-4 0
+    Normal=0 1 0
+    Shader=GroundShader
+}
+
+/////////////////////////////////////////////// cubic torus
+
+List_Object{
+    Name=torus
+    Type=Deformable_Object_List
+    Prefix=Input
+    Shader=BrightBlueShader
+    Preserve_Creases=true
+    //Crease_Threshold=.18
+    //Spatial_Partition=true
+}
+

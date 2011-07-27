@@ -1,0 +1,98 @@
+#include "basic_shaders.scene"
+//Colors for shaders
+Material{
+	Name="RedColor"
+	Type="Color"
+	Color=0.5 0 0
+}
+Material{
+	Name="BlueColor"
+	Type="Color"
+	Color=0 0 0.5 
+}
+Material{
+	Name="RedShader"
+	Type="Lambertian"
+	Shader="RedColor"
+	Reflectivity=0.1
+}
+Material{
+	Name="BlueShader"
+	Type="Lambertian"
+	Shader="BlueColor"
+	Reflectivity=0.1
+}
+Material{
+	Name="GroundColor"
+	Type="Color"
+	Color= .775 .5431
+}
+Material{
+	Name="GroundShader"
+	Type="Lambertian"
+	Shader="GroundTan"
+	Reflectivity=0.5
+}
+Material{
+	Type=           "Color"
+	Name=           "Gray"
+	Color=          0.4 0.4 0.4
+}
+Material{
+	Type=           "Lambertian"
+	Name=           "GrayMatte"
+	Shader=         "Gray"
+	Reflectivity=    0.1
+	// Ambient=        .04 .04 .04
+}
+Camera{
+	Location=	-1.26288 0.117942 -2.54687
+	Look_At=	0.00179415 0.0602127 0.000163132
+	Pseudo_Up=	0.0203512 0.999714 0.0125543
+	Field_Of_View=	26.0156
+	Focal_Distance=	.1
+	Aspect_Ratio=	1.31013
+	Width=           640
+	Height=          480
+	Output_Filename= "armadillo_twist/armadillo_test_render_second.rgb"
+}
+Options{
+	High_Quality=false
+	Spatial_Partition=false
+	Gamma_Correction=1
+//	Background_Color=0.5 0.3 0.3
+}
+
+Light{
+	Name=light1
+	Type=Rectangle
+	Position=-2.0 2 -5.0
+	U_Vector=2 0 -.5
+	V_Vector=0 2 0
+	U_Samples=9
+	V_Samples=9
+	Power=4000
+}
+
+// Objects
+Object{
+	Name="body"
+	Type="Triangulated_Surface"
+	Flip_Normal=false
+	Filename="C:\Bao\ArmadData\tri_surface_%d.tri"	
+    	Smooth_Normals=true
+    	Preserve_Creases=false
+    
+	// model starts out about 2m tall; we want it to be ~0.3m tall
+	Scale=1.0
+	Shader=GrayMatte
+	//ReflectionShader="White"	
+}
+// Objects
+Object{
+	Name="ground"
+	Type="Plane"
+	Position=0 -0.257 0
+	Normal=0 1 0
+	Shader="GroundShader"
+}

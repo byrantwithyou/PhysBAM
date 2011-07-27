@@ -1,0 +1,14 @@
+body {
+font:12px/1.2 Arial, sans-serif;
+padding: 0px;
+margin: 20px 20px 0px 20px;
+max-width:11in;}
+
+td { font:12px/1.2 Arial, sans-serif; padding: 2px; max-width:11in; border: 1px solid black;}
+table{border:1px solid black;empty-cells:show;border-collapse:collapse;}
+th{font:12px/1.2 Arial, sans-serif; color: white; background: #0000aa;}
+table.progress {border:0px;}
+td.progress{border:0px;padding: 0px;}
+h1 {color: darkblue; font-size: 175%;}
+h2 {font-size: 150%;}
+h3 {font-size: 125%;}

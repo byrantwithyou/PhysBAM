@@ -1,0 +1,126 @@
+// Spotlight whose light is shadowed by a sphere in air volumetric shading provides volumetric shadow
+#include "basic_shaders.scene"
+Camera{
+	Location=       -3 1 0
+	Look_At=        0 1 0
+	Pseudo_Up=      0 1 0
+	Field_Of_View=  70
+	Focal_Distance=  1
+	Aspect_Ratio=    1.333
+	Width=           640
+	Height=          480
+	Output_Filename="noirrad.png"
+}
+Options{
+	High_Quality=false
+	Spatial_Partition=false
+	Background_Color=0 0 0
+	Use_Photon_Map=true
+	Use_Irradiance_Cache=false
+	Irradiance_Cache_Samples=100
+	Number_Of_Photons_In_Estimate=50
+	Max_Irradance_Cache_Distance=.01
+	Max_Photon_Distance=.01
+	Global_Photons= 50000
+	Caustic_Photons=50000	
+}
+// Area
+Light{
+	Name=light1
+	Type=Rectangle
+	Position=-0.25 2 -0.25
+	U_Vector=0.5 0 0
+	V_Vector=0 0 0.5
+	U_Samples=6
+	V_Samples=6
+	Power=200
+}
+
+//Colors for shaders
+Material{
+	Name="RedColor"
+	Type="Color"
+	Color=1 0 0
+}
+Material{
+	Name="BlueColor"
+	Type="Color"
+	Color=0 0 1
+}
+Material{
+	Name="WhiteColor"
+	Type="Color"
+	Color=1 1 1
+}
+Material{
+	Name="WhiteWallShader"
+	Type="Lambertian"
+	Shader="WhiteColor"
+	Reflectance=.5
+}
+Material{
+	Name="BlueWallShader"
+	Type="Lambertian"
+	Shader="BlueColor"
+	Reflectance=.5
+}
+Material{
+	Name="RedWallShader"
+	Type="Lambertian"
+	Shader="RedColor"
+	Reflectance=.5
+}
+
+
+Object{
+	Name="floor"
+	Type="Triangulated_Surface"
+	Filename="../../../../Public_Data/Rendering/cornell_floor.tri"
+	Shader="WhiteWallShader"
+}
+
+Object{
+	Name="backwall"
+	Type="Triangulated_Surface"
+	Filename="../../../../Public_Data/Rendering/cornell_backwall.tri"
+	Shader="WhiteWallShader"
+}
+
+Object{
+	Name="rightwall"
+	Type="Triangulated_Surface"
+	Filename="../../../../Public_Data/Rendering/cornell_rightwall.tri"
+	Shader="BlueWallShader"
+}
+
+Object{
+	Name="leftwall"
+	Type="Triangulated_Surface"
+	Filename="../../../../Public_Data/Rendering/cornell_leftwall.tri"
+	Shader="RedWallShader"
+}
+
+Object{
+	Name="ceiling"
+	Type="Triangulated_Surface"
+	Filename="../../../../Public_Data/Rendering/cornell_ceiling.tri"
+	Shader="WhiteWallShader"
+}
+
+Object{
+	Name="mirror_sphere"
+	Type="Sphere"
+	Position=.2 .3 .388
+	Radius=.3
+	Shader="Mirror"
+}
+Object{
+	Name="glass_sphere"
+	Type="Sphere"
+	Index_Of_Refraction=1.52
+	Position=-.4 .3 -.419
+	Radius=.3
+	Shader="Glass"
+}
+
+

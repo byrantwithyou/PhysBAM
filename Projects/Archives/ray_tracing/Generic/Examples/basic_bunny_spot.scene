@@ -1,0 +1,110 @@
+// Spotlight whose light is shadowed by a sphere in air volumetric shading provides volumetric shadow
+#include "basic_shaders.scene"
+Camera{
+	Location=       0 1 -4
+	Look_At=        0 1 0
+	Pseudo_Up=      0 1 0
+	Field_Of_View=  70
+	Focal_Distance=  1
+	Aspect_Ratio=    1.333
+	Width=           640
+	Height=          480
+	Output_Filename= "rgb/basic_sphere.rgb"
+}
+Options{
+	High_Quality=true
+	Spatial_Partition=true
+	Background_Color=0 0 0
+}
+// Point
+Light{
+	Name=light2
+	Type=Point
+	Position=0.5 3 -6
+	Power=500
+}
+// Spotlight
+Light{
+	Name=light1
+	Type=Spotlight
+	Position=4 20 -2
+	Direction=-.2049 -.9733 .1024
+	Cone_Angle=.2
+	Penumbra_Angle=.05
+	Power=100
+}
+//Colors for shaders
+Material{
+	Name="BunnyColor"
+	Type="Color"
+	Color=1 1 1
+}
+Material{
+	Name="BunnyShader"
+	Type="Lambertian"
+	Shader="BunnyColor"
+	Reflectivity=0.5
+	Ambient=0.1 0.1 0.1
+}
+// Objects
+Object{
+	Name="ground"
+	Type="Plane"
+	Position=0 0 0
+	Normal=0 1 0
+	Shader="GroundShader"
+}
+
+Transform{
+	Type="Translate"
+	Vector=-.2 -0.5 0
+}
+
+Transform{
+	Type="Rotate"
+	Axis=0 1 0
+	Radians=3
+}
+
+Object{
+	Name="Bunny"
+	Type="Triangulated_Surface"
+	Shader="BunnyShader"
+	Scale=2
+	Filename="../../../../Public_Data/Triangulated_Surfaces/bunny.tri"
+	Smooth_Normals=true
+	Preserve_Creases=true
+	Preserve_Creases_Threshold=0.9
+}
+
+Transform{
+	Type="Translate"
+	Vector=.75 0 0
+}
+
+Transform{
+	Type="Rotate"
+	Axis=0 1 0
+	Radians=3
+}
+
+Object{
+	Name="Bunny2"
+	Type="Triangulated_Surface"
+	Shader="BunnyShader"
+	Scale=2
+	Filename="../../../../Public_Data/Triangulated_Surfaces/bunny.tri"
+	Smooth_Normals=true
+	Preserve_Creases=true
+	Preserve_Creases_Threshold=0.9
+}
+
+
+
+//Object{
+//	Name="sphere"
+//	Type="Sphere"
+//	Position=0 1 0
+//	Radius=1
+//	Shader="SphereShader"
+//}

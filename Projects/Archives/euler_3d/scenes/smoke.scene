@@ -1,0 +1,148 @@
+#include "basic_shaders.scene"
+Camera{
+    Location=   [3.26744 1.37581 7.72319]
+    Look_At=    [0 0 0]
+    Pseudo_Up=  [-0.0486211 0.986686 -0.155199]
+    Field_Of_View=  26.4602
+    Focal_Distance= .1
+
+	Aspect_Ratio=	0.75
+	Width=480
+	Height=640
+	Output_Filename="output/frame.%05d.png"
+}
+//Material{
+//        Name=sky
+//        Type=Infinite_Reflection
+//        Filename="Common/skylight-day.pbi"
+//}
+Options{
+	High_Quality=true
+	Spatial_Partition=true
+	Background_Color=0 0 0
+	Use_Photon_Map=false
+	Volume_Photons=100
+}
+Light{
+	Name=light1
+	Type=Point
+	Position=10.266 10.5707 10.9381
+	Color=0.75 0.75 0.75
+	Power=20000
+	Casts_Shadows=false
+}
+Light{
+	Name=light2
+	Type=Point
+	Position=10.3362 10.0733 -10.0066
+	Color=0.75 0.75 0.75
+	Power=5000
+	Casts_Shadows=false
+}
+Light{
+	Name=light3
+	Type=Point
+	Position=1.126 10.5642 20.301
+	Color=0.75 0.75 0.75
+	Power=5000
+	Casts_Shadows=false
+}
+Material{
+    Name="Null"
+    Type="Phong"
+    Shader="White"
+    Diffuse=0 0 0
+    Specular=0 0 0
+    Specular_Exponent=1
+}
+Material{
+	Name=GlassShader
+	Type=Transparent
+	Fresnel=true
+	Shift_Direction=ray
+	Reflectivity=0.01
+}
+Object{
+	Name="ground"
+	Type="Plane"
+	Position=0 -5 0
+	Normal=0 1 0
+	Shader="GroundShader"
+}
+Object{
+	Name="backplane"
+	Type="Plane"
+	Position=0 0 -200
+	Normal=0 0 1
+	Shader="GroundShader"
+}
+Material{
+    Name="K"
+    Type="Color"
+        Color=.4 .2 .1
+}
+Material{
+    Name="GroundShader"
+    Type="Lambertian"
+    Shader="K"
+    Diffuse=.2 .2 .2
+    Specular=.1 .1 .1
+    Specular_Exponent=35
+    Ambient=.1 .1 .1
+}
+Material{
+    Name="Red"
+    Type="Color"
+    Color=.8 .10 .2
+}
+Material{
+    Name="RedShader"
+    Type="Phong"
+    Shader="Red"
+    Diffuse=.6 .6 .6
+    Specular=1 1 1
+    Specular_Exponent=5
+    Ambient=.1 .1 .1
+}
+
+//Object{
+//    Name="Background"
+//    Type="Box"
+//    Xmin=-120
+//    Xmax=140
+//    Ymin=0
+//    Ymax=100
+//    Zmin=-500
+//    Zmax=-500.1
+//    Shader="Null"
+//}
+
+Volume_Material{
+	Name="SmokeShader"
+	Type="Voxel_Shader"
+	Absorption=0
+	Scattering=1
+	Inscattering_Amplification=30
+}
+List_Object{
+    Name="Rigid"
+    Type="Rigid_Body_List"
+	Prefix="input"
+    Shader="RedShader"
+    Range=1
+    Add_To_Collisions=true
+}
+Object{
+    Name="firevolume"
+	Type="Voxel_Data"
+	Grid_Filename="input/common/grid"
+	Density_Filename="input/%d/density_gradient"
+	Volume_Shader="SmokeShader"
+	Volume_Step=0.02
+        Use_Collision_Aware_Interpolation=false
+        New_Secondary_Marching=false
+        Use_Secondary_Solver=false
+        Thin_Shells_Bisection=false
+        With_Stupid_Fix=false
+        Precompute_Single_Scattering=true
+}

@@ -1,0 +1,220 @@
+#include "basic_shaders.scene"
+Camera{
+	Location=       13.3809 6.31758 -2.74556
+	Look_At=        2.28706 0.587815 1.95763
+	Pseudo_Up=      -0.419055 0.901322 0.109592
+	Field_Of_View=  26.4602
+	Focal_Distance= .1
+	Aspect_Ratio=   1.33333
+
+	Width=           640
+	Height=          480
+	Output_Filename= "Output/funnel"
+	Keep_Old_Files=	 true
+}
+Material{
+	Name=sky
+	Type=Infinite_Reflection
+	Filename="Common/skylight-day.exr"
+	Keep_Old_Files=true
+        Rotation=90
+}
+Options{
+	High_Quality=true
+	Spatial_Partition=false
+	Background_Shader=sky
+}
+//------------------------------------------------------------
+//             LIGHTS
+//------------------------------------------------------------
+Light{
+	Name=BackLeft
+	Type=Point
+	Position=-10 5 -1
+	Color=1 1 1
+	Power=1500
+}
+Light{
+	Name=BackRight
+	Type=Point
+	Position=-6 5 7
+	Color=1 1 1
+	Power=1750
+}
+Light{
+        Name=Front
+        Type=Point
+        Position=10 5 0
+        Color=1 1 1
+        Power=7000
+}
+//------------------------------------------------------------
+//             SHADERS
+//------------------------------------------------------------
+Material{
+        Name=WallTexture
+        Type=Image_Texture
+        Filename="Common/gray.bmp"
+        Cubic_Interpolation=false
+}
+Material{
+	Name=WallShader
+	Type=Lambertian
+	Shader=WallTexture
+        Reflectivity=0.5
+}
+Material{
+	Name=GlassShader
+	Type=Transparent
+	Fresnel=true
+	Shift_Direction=ray
+	Reflectivity=0.01
+}
+Material{
+    Name=RedColor
+    Type=Color
+    Color=0.5 0 0
+}
+Material{
+    Name=BlueColor
+    Type=Color
+    Color=0 0 0.5
+}
+Material{
+    Name=RedShader
+    Type=Lambertian
+    Shader=RedColor
+    Reflectance=0.2
+}
+Material{
+	Name=BlendShader
+	Type=Octree_Scalar_Field_Blend
+	Reflectivity1=0.1
+	Reflectivity2=0.01
+	Field1="Input/refined_octree_levelset.%d"
+	Blend_Band=0.3
+	Blend_Mode=2
+}
+Material{
+	Name=WaterShader
+	Type=Transparent
+	Reflectivity=0.1
+	Shift_Direction=ray
+}
+Material{
+	Name=OpaqueWaterShader
+	Type=Lambertian
+	Shader=BlueColor
+	Reflectivity=0.3
+}
+Volume_Material{
+        Name=absorption
+        Type=Attenuation_Shader
+        Spectrum=0.9 0.6 0.3
+        Absorption=10
+}
+Material{
+	Name=AbsorptionBlendShader
+	Type=Octree_Scalar_Field_Attenuation_Blend
+	Spectrum1=0.9 0.6 0.3
+	Absorption1=10
+	Spectrum2=0.3 0.3 0.3
+	Absorption2=1
+	Field1="Input/refined_octree_levelset.%d"
+	Blend_Band=0.3
+	Blend_Mode=2
+}
+//------------------------------------------------------------
+//             CLOTH
+//------------------------------------------------------------
+List_Object{
+	Name=cloth
+	Type=Deformable_Object_List
+	Prefix=Input
+	Shader=RedShader
+        Add_To_Collisions=true
+	Smooth_Normals=true
+	Preserve_Creases=false
+	Priority=100
+}
+//------------------------------------------------------------
+//             WATER
+//------------------------------------------------------------
+Object{
+	Name=water
+	Type=Octree_Levelset
+	Position=0 0 0
+	Grid_Filename="Input/merged_octree_grid.%d"
+	Phi_Filename="Input/union_octree_levelset.%d"
+//	Shader=BlendShader
+	Shader=WaterShader
+//	Shader=OpaqueWaterShader
+//	Volume_Shader=absorption
+	Volume_Shader=AbsorptionBlendShader
+
+	Use_Collision_Aware_Interpolation=true
+	New_Secondary_Marching=false
+	Use_Secondary_Solver=false
+	Thin_Shells_Bisection=false
+	With_Stupid_Fix=false
+
+	Priority=1
+}
+//------------------------------------------------------------
+//             WALLS
+//------------------------------------------------------------
+Object{
+        Name=GlassBox
+        Type=Wall
+        Xmin=0
+	Xmax=4
+	Ymin=-2
+//	Ymax=1.2
+//	Ymax=.4
+	Ymax=.8
+	Zmin=0
+	Zmax=4
+        Show_Xmax=true
+        Show_Xmin=true
+	Show_Ymax=false
+	Show_Ymin=false
+	Show_Zmax=true
+	Show_Zmin=true
+	Shrink=.001
+        Thickness=.075
+	Shader=GlassShader
+        Index_Of_Refraction=1.5
+        Priority=3
+        Support_Transparent_Overlapping_Objects=true
+}
+Object{
+        Name=Ground
+        Type=Plane
+        Position=0 -.799 0
+        Normal=0 1 0
+        Shader=WallShader
+        Texture_Vector1=.08 0 0
+        Texture_Vector2=0 0 .08
+	Priority=2
+}
+//Object{
+//        Name=Floor
+//        Type=Wall
+//        Xmin=-20
+//	Xmax=20
+//	Ymin=-.8
+//	Ymax=3.2
+//	Zmin=-20
+//	Zmax=20
+//        Show_Xmin=false
+//        Show_Xmax=false
+//	Show_Ymin=true
+// 	Show_Ymax=false
+//        Show_Zmin=false
+//        Show_Zmax=false
+//	Shrink=.001
+//        Thickness=0
+//	Shader=WallShader
+//        Priority=3
+//        Texture_Scale=.08
+//}

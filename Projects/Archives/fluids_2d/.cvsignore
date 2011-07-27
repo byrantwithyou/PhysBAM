@@ -1,0 +1,5 @@
+Debug Release *.ncb *.suo .sconsign
+fluids_2d fluids_2d_debug
+fluids_2d_pentium4 fluids_2d_pentium4_debug
+fluids_2d_nocona fluids_2d_nocona_debug
+.emacs_project_config

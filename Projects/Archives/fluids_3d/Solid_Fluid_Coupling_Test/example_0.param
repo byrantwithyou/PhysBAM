@@ -1,0 +1,23 @@
+use_neumann_for_body=false
+add_gravity_to_object=false
+subtract_last_pressure_force_from_object=true
+
+number_of_bodies=3
+
+//rigid_body_1.position=.20333 .28123 .5
+//rigid_body_1.density=2
+
+//rigid_body_1.position=.20333 .08123 .5
+//rigid_body_2.position=.50333 .08123 .5
+//rigid_body_3.position=.80333 .08123 .5
+
+//rigid_body_1.position=.40333 .720333 .5
+//rigid_body_1.density=0.5
+//rigid_body_2.position=.60333 .720333 .5
+//rigid_body_2.density=0.5
+
+last_frame=1000
+fluids_parameters.incompressible_iterations=10000
+//fluids_parameters.grid.resolution=121 121 91
+
+fluids_parameters.number_particles_per_cell=8

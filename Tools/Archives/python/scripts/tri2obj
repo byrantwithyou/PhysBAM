@@ -1,0 +1,37 @@
+#!/usr/bin/python
+
+import os
+import sys
+import optparse
+from struct import *
+
+from physbam import *
+
+parser = optparse.OptionParser("usage: %prog [options] input.tri output.obj")
+parser.add_option('-s','--scale',default=1,type='float',help='scale factor between output and input')
+(options,args)=parser.parse_args()
+if len(args)!=2: parser.error("invalid number of arguments")
+scale=options.scale
+
+tri=TRIANGULATED_SURFACE_f.Create()
+Read_From_File("float",args[0],tri)
+output=open(args[1],'w')
+
+# write format
+output.write(
+'''# simple obj file format:
+#   # vertex at coordinates (x,y,z)
+#   v x y z
+#   # triangle with vertices a,b,c
+#   f a b c
+#   # vertices are indexed starting from 1
+
+''')
+
+for p in tri.particles.X:
+    output.write("v %5g %5g %5g\n"%tuple(p/scale))
+
+# write triangles
+for t in tri.mesh.elements:
+    output.write("f %s %s %s\n"%tuple(t))
+

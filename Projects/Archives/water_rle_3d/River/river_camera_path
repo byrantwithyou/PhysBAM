@@ -1,0 +1,81 @@
+Camera_Frame{
+        Frame =         0
+        Location=       3.40965 3.32991 -0.688759
+        Look_At=        1.31733 -0.0267774 0.589032
+        Pseudo_Up=      -0.577543 0.579056 0.575447
+        Field_Of_View=  26.4602
+        Focal_Distance= .1
+        Aspect_Ratio=   1.33333
+}
+Camera_Frame{
+        Frame =         40
+        Location=       3.40965 3.32991 -0.688759
+        Look_At=        1.31733 -0.0267774 0.589032
+        Pseudo_Up=      -0.577543 0.579056 0.575447
+        Field_Of_View=  26.4602
+        Focal_Distance= .1
+        Aspect_Ratio=   1.33333
+}
+Camera_Frame{
+        Frame =         70
+        Location=       3.96726 4.53794 -1.34396
+        Look_At=        1.73924 -0.270976 0.63842
+        Pseudo_Up=      -0.64438 0.52698 0.554136
+        Field_Of_View=  26.4602
+        Focal_Distance= .1
+        Aspect_Ratio=   1.33333
+}
+Camera_Frame{
+        Frame =         150
+        Location=       5.38485 4.59164 -1.48873
+        Look_At=        2.89912 -0.77352 0.722944
+        Pseudo_Up=      -0.64438 0.52698 0.554136
+        Field_Of_View=  26.4602
+        Focal_Distance= .1
+        Aspect_Ratio=   1.33333
+}
+Camera_Frame{
+        Frame =         190
+        Location=       7.71729 4.29131 -0.577562
+        Look_At=        4.43476 -1.46062 0.81985
+        Pseudo_Up=      -0.779583 0.52708 0.338284
+        Field_Of_View=  26.4602
+        Focal_Distance= .1
+        Aspect_Ratio=   1.33333
+}
+Camera_Frame{
+        Frame =         300
+        Location=       6.47675 5.35049 -1.07211
+        Look_At=        4.45745 -1.53399 0.751372
+        Pseudo_Up=      -0.561893 0.36184 0.743874
+        Field_Of_View=  26.4602
+        Focal_Distance= .1
+        Aspect_Ratio=   1.33333
+}
+Camera_Frame{
+        Frame =         420
+        Location=       7.22906 5.05053 -1.32927
+        Look_At=        5.45208 -1.80713 0.818645
+        Pseudo_Up=      -0.527738 0.375402 0.761949
+        Field_Of_View=  26.4602
+        Focal_Distance= .1
+        Aspect_Ratio=   1.33333
+}
+Camera_Frame{
+        Frame =         600
+        Location=       9.39894 7.44887 -2.14769
+        Look_At=        6.90659 -2.16952 0.864922
+        Pseudo_Up=      -0.527738 0.375402 0.761949
+        Field_Of_View=  26.4602
+        Focal_Distance= .1
+        Aspect_Ratio=   1.33333
+}
+Camera_Frame{
+        Frame =         700
+        Location=       11.7625 11.2337 -8.26516
+        Look_At=        5.06955 -1.60154 1.11052
+        Pseudo_Up=      -0.488906 0.666258 0.563092
+        Field_Of_View=  26.4602
+        Focal_Distance= .1
+        Aspect_Ratio=   1.33333
+}

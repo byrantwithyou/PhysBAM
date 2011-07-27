@@ -1,0 +1,91 @@
+// Spotlight whose light is shadowed by a sphere in air volumetric shading provides volumetric shadow
+#include "basic_shaders.scene"
+Material{
+  Type=Color
+  Name=blackShader
+  Color=1 1 1
+  }
+Camera{
+	Location=       0 4 -6
+	Look_At=        0 1 0
+	Pseudo_Up=      0 1 0
+	Field_Of_View=  70
+	Focal_Distance=  1
+	Aspect_Ratio=    1.333
+	Width=           640
+	Height=          480
+	Output_Filename= "basic_sphere.png"
+}
+Options{
+	High_Quality=false
+	Spatial_Partition=false
+	Background_Color=0 0 0
+	Use_Photon_Map=false
+	Global_Photons=10000
+	Caustic_Photons=10000
+	Volume_Photons=100
+	Background_Shader=blackShader
+}
+Light{
+	Name=light1
+	Type=Point
+	Position=3 4 1
+	Color=0.5 .5 0.5
+	Power=1000
+}
+Light{
+	Name=light2
+	Type=Point
+	Position=-3 4 1
+	Color=.5 0.5 .5
+	Power=1000
+}
+//Colors for shaders
+Material{
+	Name="RedColor"
+	Type="Color"
+	Color=0.5 0 0
+}
+Material{
+	Name="BlueColor"
+	Type="Color"
+	Color=0 0 0.5 
+}
+Material{
+	Name="RedShader"
+	Type="Lambertian"
+	Shader="RedColor"
+	Reflectivity=0.1
+}
+Material{
+	Name="BlueShader"
+	Type="Lambertian"
+	Shader="BlueColor"
+	Reflectivity=0.1
+}
+Material{
+	Name="GroundColor"
+	Type="Color"
+	Color= .775 .5431
+}
+Material{
+	Name="GroundShader"
+	Type="Lambertian"
+	Shader="GroundColor"
+	Reflectivity=0.5
+}
+// Objects
+Object{
+	Name="red_sphere"
+	Type="Sphere"
+	Position=-.7 1 0
+	Radius=.5
+	Shader="RedShader"
+}
+Object{
+	Name="blue_sphere"
+	Type="Sphere"
+	Position=.7 1 0
+	Radius=.5
+	Shader="BlueShader"
+}

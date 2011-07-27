@@ -1,0 +1,190 @@
+Camera{
+        Location=       3.97581 0.146254 26.0785
+        Look_At=        3.97581 0.146254 2.04334e-13
+        Pseudo_Up=      0 1 0
+        Field_Of_View=  26.4602
+        Focal_Distance= .1
+        Aspect_Ratio=   1.33333
+
+   Width=           640
+   Height=          480
+   Width=           320
+   Height=          240
+   Width=           1280
+   Height=          960
+    Output_Filename="output/row-sphere-incomp-hires-near.%05d.png"
+}
+
+Material{
+        Name=sky
+        Type=Infinite_Reflection
+        Filename="../skylight-day.pbi"
+}
+Options{
+    High_Quality=true
+    Spatial_Partition=false
+//    Background_Shader=sky
+}
+
+//////////////////////////// Lighting
+Light{
+    Type=Point
+    Position=0 50 0
+    Color=1 1 1
+    Power=20000
+}
+Light{
+    Type=Point
+    Position=0 100 150
+    Color=1 1 1
+    Power=40000
+    Casts_Shadows=false
+}
+Light{
+    Type=Point
+    Position=-100 100 150
+    Color=1 1 1
+    Power=40000
+    Casts_Shadows=false
+}
+Light{
+    Type=Point
+    Position=100 100 150
+    Color=1 1 1
+    Power=40000
+    Casts_Shadows=false
+}
+Light{
+    Type=Point
+    Position=-100 100 0
+    Color=1 1 1
+    Power=40000
+    Casts_Shadows=false
+}
+Light{
+    Type=Point
+    Position=100 100 0
+    Color=1 1 1
+    Power=40000
+    Casts_Shadows=false
+}
+////////////////////////////// Shaders
+#include "../common-shaders.scene"
+Material{
+    Name="GrayShader2"
+    Type="Phong"
+    Shader="White"
+    Diffuse=.0 .0 .0
+    Specular=.8 .8 .8
+    Specular_Exponent=5
+}
+Material{
+        Name=WallTexture
+        Type=Image_Texture
+        Filename="../white-stripe-tiled.png"
+        Cubic_Interpolation=false
+}
+Material{
+	Name=WallShader
+	Type=Lambertian
+	Shader=WallTexture
+        Reflectivity=0.5
+}
+Material{
+    Name="Striped"
+    Type="Phong"
+    Shader="WallShader"
+    Diffuse=.5 .5 .5
+    Specular=.8 .8 .8
+    Specular_Exponent=5
+}
+Material{
+    Name="WhiteShader2"
+    Type="Lambertian"
+    Shader="White"
+    Reflectivity=0.5
+}
+Material{
+    Type="Blend"
+    Name="SemireflectiveBlackShader2"
+    Shader1="Reflection"
+    Shader2="GrayShader2"
+//    Shader1="GrayShader"
+    Blend_Fraction=.8
+}
+Material{
+        Name=StripBlend
+        Type=Sum_Shader
+        Shader_1=SemireflectiveBlackShader2
+        Shader_2=WallShader
+}
+Material{
+        Name=StripBlend2
+        Type=MaskedBlend
+        MaskShader=WallTexture
+        Shader1=SemireflectiveBlackShader2
+        Shader2=WhiteShader
+}
+Material{
+        Name=Checker
+        Type=Checker
+        Scale=1
+        Shader1=BlueShader
+        Shader2=RedShader
+}
+//////////////////////////// Objects
+
+Object{
+    Name="Ground"
+    Type="Plane"
+    Position= 0 -1 0
+    Normal = 0 1 0
+    Shader="GroundShader"
+}
+
+Object{
+    Name="Background"
+    Type="Box"
+    Xmin=-120
+    Xmax=140
+    Ymin=0
+    Ymax=100
+    Zmin=-500
+    Zmax=-501
+    Shader="Null"
+}
+
+List_Object{
+    Name="Rigid"
+    Type="Rigid_Body_List"
+    Prefix="input"
+    Shader="StripBlend"
+    Texture_Coordinate_File="../sphere-texture-coordinates.dat.gz"
+//    Shader="SemireflectiveBlackShader2"
+    Smooth_Normals=true
+    Subdivide_Geometry=false
+    Preserve_Creases=false
+    Range=1,2,3,4
+}
+
+List_Object{
+    Name="Deformable"
+    Type="Deformable_Object"
+    Prefix="input"
+    Shader="YellowShader"
+    Smooth_Normals=true
+    Preserve_Creases=false
+    Subdivide_Geometry=false
+    Range=1
+}
+
+List_Object{
+    Name="Deformable"
+    Type="Deformable_Object"
+    Prefix="input"
+    Shader="YellowShader"
+    Smooth_Normals=true
+    Preserve_Creases=false
+    Subdivide_Geometry=false
+    Range=2
+}

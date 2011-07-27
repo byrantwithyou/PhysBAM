@@ -1,0 +1,14 @@
+scalable_rigids
+scalable_rigids_debug
+scalable_rigids_profile
+scalable_rigids_nocona
+scalable_rigids_nocona_debug
+Makefile.defs
+Makefile.*.defs
+obj
+obj_debug
+obj_profile
+output
+tmp
+prof*
+gmon.out

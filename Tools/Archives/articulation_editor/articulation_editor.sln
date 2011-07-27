@@ -1,0 +1,67 @@
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gzstream", "..\..\External_Libraries\gzstream\gzstream.vcproj", "{CFE01F23-CA91-45DC-9770-2120F4F26D9F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PhysBAM", "..\..\Public_Library\PhysBAM.vcproj", "{BECBDC32-D856-4A8E-8C46-3D9E99D72CA0}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PhysBAM_OpenGL", "..\..\Public_Library\PhysBAM_OpenGL.vcproj", "{282ED465-A3ED-4881-9FA3-8A58FFE4C299}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "articulation_editor", "articulation_editor.vcproj", "{EA176DA9-C4FB-46DC-96EC-D406A5EE0451}"
+	ProjectSection(ProjectDependencies) = postProject
+		{282ED465-A3ED-4881-9FA3-8A58FFE4C299} = {282ED465-A3ED-4881-9FA3-8A58FFE4C299}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Debug|x64 = Debug|x64
+		Profiling Release|Win32 = Profiling Release|Win32
+		Profiling Release|x64 = Profiling Release|x64
+		Release|Win32 = Release|Win32
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CFE01F23-CA91-45DC-9770-2120F4F26D9F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{CFE01F23-CA91-45DC-9770-2120F4F26D9F}.Debug|Win32.Build.0 = Debug|Win32
+		{CFE01F23-CA91-45DC-9770-2120F4F26D9F}.Debug|x64.ActiveCfg = Debug|x64
+		{CFE01F23-CA91-45DC-9770-2120F4F26D9F}.Debug|x64.Build.0 = Debug|x64
+		{CFE01F23-CA91-45DC-9770-2120F4F26D9F}.Profiling Release|Win32.ActiveCfg = Release|Win32
+		{CFE01F23-CA91-45DC-9770-2120F4F26D9F}.Profiling Release|Win32.Build.0 = Release|Win32
+		{CFE01F23-CA91-45DC-9770-2120F4F26D9F}.Profiling Release|x64.ActiveCfg = Release|x64
+		{CFE01F23-CA91-45DC-9770-2120F4F26D9F}.Profiling Release|x64.Build.0 = Release|x64
+		{CFE01F23-CA91-45DC-9770-2120F4F26D9F}.Release|Win32.ActiveCfg = Release|Win32
+		{CFE01F23-CA91-45DC-9770-2120F4F26D9F}.Release|Win32.Build.0 = Release|Win32
+		{CFE01F23-CA91-45DC-9770-2120F4F26D9F}.Release|x64.ActiveCfg = Release|x64
+		{CFE01F23-CA91-45DC-9770-2120F4F26D9F}.Release|x64.Build.0 = Release|x64
+		{BECBDC32-D856-4A8E-8C46-3D9E99D72CA0}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BECBDC32-D856-4A8E-8C46-3D9E99D72CA0}.Debug|Win32.Build.0 = Debug|Win32
+		{BECBDC32-D856-4A8E-8C46-3D9E99D72CA0}.Debug|x64.ActiveCfg = Debug|x64
+		{BECBDC32-D856-4A8E-8C46-3D9E99D72CA0}.Debug|x64.Build.0 = Debug|x64
+		{BECBDC32-D856-4A8E-8C46-3D9E99D72CA0}.Profiling Release|Win32.ActiveCfg = Profiling Release|Win32
+		{BECBDC32-D856-4A8E-8C46-3D9E99D72CA0}.Profiling Release|Win32.Build.0 = Profiling Release|Win32
+		{BECBDC32-D856-4A8E-8C46-3D9E99D72CA0}.Profiling Release|x64.ActiveCfg = Profiling Release|x64
+		{BECBDC32-D856-4A8E-8C46-3D9E99D72CA0}.Profiling Release|x64.Build.0 = Profiling Release|x64
+		{BECBDC32-D856-4A8E-8C46-3D9E99D72CA0}.Release|Win32.ActiveCfg = Release|Win32
+		{BECBDC32-D856-4A8E-8C46-3D9E99D72CA0}.Release|Win32.Build.0 = Release|Win32
+		{BECBDC32-D856-4A8E-8C46-3D9E99D72CA0}.Release|x64.ActiveCfg = Release|x64
+		{BECBDC32-D856-4A8E-8C46-3D9E99D72CA0}.Release|x64.Build.0 = Release|x64
+		{282ED465-A3ED-4881-9FA3-8A58FFE4C299}.Debug|Win32.ActiveCfg = Debug|Win32
+		{282ED465-A3ED-4881-9FA3-8A58FFE4C299}.Debug|x64.ActiveCfg = Debug|x64
+		{282ED465-A3ED-4881-9FA3-8A58FFE4C299}.Profiling Release|Win32.ActiveCfg = Profiling Release|Win32
+		{282ED465-A3ED-4881-9FA3-8A58FFE4C299}.Profiling Release|x64.ActiveCfg = Profiling Release|x64
+		{282ED465-A3ED-4881-9FA3-8A58FFE4C299}.Release|Win32.ActiveCfg = Release|Win32
+		{282ED465-A3ED-4881-9FA3-8A58FFE4C299}.Release|x64.ActiveCfg = Release|x64
+		{EA176DA9-C4FB-46DC-96EC-D406A5EE0451}.Debug|Win32.ActiveCfg = Debug|Win32
+		{EA176DA9-C4FB-46DC-96EC-D406A5EE0451}.Debug|Win32.Build.0 = Debug|Win32
+		{EA176DA9-C4FB-46DC-96EC-D406A5EE0451}.Debug|x64.ActiveCfg = Debug|Win32
+		{EA176DA9-C4FB-46DC-96EC-D406A5EE0451}.Profiling Release|Win32.ActiveCfg = Release|Win32
+		{EA176DA9-C4FB-46DC-96EC-D406A5EE0451}.Profiling Release|Win32.Build.0 = Release|Win32
+		{EA176DA9-C4FB-46DC-96EC-D406A5EE0451}.Profiling Release|x64.ActiveCfg = Release|Win32
+		{EA176DA9-C4FB-46DC-96EC-D406A5EE0451}.Release|Win32.ActiveCfg = Release|Win32
+		{EA176DA9-C4FB-46DC-96EC-D406A5EE0451}.Release|Win32.Build.0 = Release|Win32
+		{EA176DA9-C4FB-46DC-96EC-D406A5EE0451}.Release|x64.ActiveCfg = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

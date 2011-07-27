@@ -1,0 +1,8 @@
+# SConscript
+
+Import('env Automatic_Program')
+Automatic_Program(env)
+
+#Automatic_Program(env,'Burning_Paper/render_preprocess')
+#Automatic_Program(env,'Burning_Paper/adjust_temperature_16')
+#Automatic_Program(env,'Burning_Paper/animate_translation_16')

@@ -1,0 +1,2 @@
+Debug Release *.ncb *.suo obj obj_debug .sconsign
+solids_3d solids_3d_debug solids_3d_optdebug solids_3d_profile solids_3d_opteron solids_3d_nocona solids_3d_nocona_debug

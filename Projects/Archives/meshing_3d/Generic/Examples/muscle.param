@@ -1,0 +1,8 @@
+levelset=Arm_Output/arm_skin.phi
+bcc_lattice_cell_size=.02
+max_subdivision_levels=2
+attraction_coefficient=.3
+spring_stiffness_multiplier=.005
+curvature_subdivision_threshold_multiplier=5
+interpolation_error_subdivision_threshold_multiplier=5
+allow_tangential_velocity_slip=true

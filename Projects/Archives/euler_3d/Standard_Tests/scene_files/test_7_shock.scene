@@ -1,0 +1,282 @@
+#include "basic_shaders.scene"
+Camera{
+    Location=   [-2.76097 1.08012 6.35622]
+    Look_At=    [0.113234 -0.192301 0.0729939]
+    Pseudo_Up=  [0.07534 0.983462 -0.164699]
+    Field_Of_View=  26.4602
+    Focal_Distance= .1
+    Aspect_Ratio=   1.33333
+
+	Aspect_Ratio=1.33
+    Width=640
+	Height=480
+	//Width=320
+	//Height=240
+	Output_Filename="output_shock_th_200/frame.%05d.png"
+}
+Options{
+	High_Quality=false
+	Spatial_Partition=false
+	Use_Photon_Map=true
+	Use_Irradiance_Cache=false
+	Number_Of_Photons_In_Estimate=1000
+	Global_Photons=1000000
+}
+// Lights
+Light{
+	Name=light1
+	Type=Point
+	Position=10.266 10.5707 10.9381
+	Color=0.75 0.75 0.75
+	Power=2000
+	Casts_Shadows=false
+}
+Light{
+	Name=light2
+	Type=Point
+	Position=10.3362 10.0733 -10.0066
+	Color=0.75 0.75 0.75
+	Power=5000
+	Casts_Shadows=false
+}
+Light{
+	Name=light3
+	Type=Point
+	Position=1.126 10.5642 20.301
+	Color=0.75 0.75 0.75
+	Power=5000
+	Casts_Shadows=false
+}
+// Background objects
+Object{
+	Name="ground"
+	Type="Plane"
+	Position=0 -5 0
+	Normal=0 1 0
+	Shader="GroundShader"
+}
+Object{
+	Name="backplane"
+	Type="Plane"
+	Position=0 0 -200
+	Normal=0 0 1
+	Shader="GroundShader"
+}
+
+// Shaders for rigid bodies
+
+Material{
+    Name="R"
+    Type="Color"
+    Color=.84 .14 .14
+}
+Material{
+    Name="G"
+    Type="Color"
+    Color=.21 .67 .27
+}
+Material{
+    Name="B"
+    Type="Color"
+    Color=.28 .32 .99
+}
+Material{
+    Name="Gray"
+    Type="Color"
+    Color=.1 .1 .1
+}
+Material{
+    Name="ShaderR"
+    Type="Phong"
+    Shader="R"
+    Diffuse=.6 .6 .6
+    Specular=1 1 1
+    Specular_Exponent=5
+    Ambient=.1 .1 .1
+}
+Material{
+    Name="ShaderG"
+    Type="Phong"
+    Shader="G"
+    Diffuse=.6 .6 .6
+    Specular=1 1 1
+    Specular_Exponent=5
+    Ambient=.1 .1 .1
+}
+Material{
+    Name="ShaderB"
+    Type="Phong"
+    Shader="B"
+    Diffuse=.6 .6 .6
+    Specular=1 1 1
+    Specular_Exponent=5
+    Ambient=.1 .1 .1
+}
+Material{
+    Name="ShaderGray"
+    Type="Phong"
+    Shader="Gray"
+    Diffuse=.6 .6 .6
+    Specular=0 0 0
+    Specular_Exponent=5
+    Ambient=1 1 1
+}
+
+// Rigid body Objects
+
+List_Object{
+    Name="Base Boxes"
+    Type="Rigid_Body_List"
+	Prefix="input"
+    Shader="ShaderR"
+    Range=1-2
+    Add_To_Collisions=true
+}
+
+List_Object{
+    Name="Plank1"
+    Type="Rigid_Body_List"
+	Prefix="input"
+    Shader="ShaderB"
+    Range=3
+    Add_To_Collisions=true
+}
+
+List_Object{
+    Name="Middle Boxes"
+    Type="Rigid_Body_List"
+	Prefix="input"
+    Shader="ShaderR"
+    Range=4-5
+    Add_To_Collisions=true
+}
+
+List_Object{
+    Name="Plank2"
+    Type="Rigid_Body_List"
+	Prefix="input"
+    Shader="ShaderB"
+    Range=6
+    Add_To_Collisions=true
+}
+
+List_Object{
+    Name="Sphere"
+    Type="Rigid_Body_List"
+	Prefix="input"
+    Shader="ShaderG"
+    Range=7
+    Add_To_Collisions=true
+}
+List_Object{
+    Name="RightWall"
+    Type="Rigid_Body_List"
+	Prefix="input"
+    Shader="ShaderGray"
+    Range=8
+    Add_To_Collisions=true
+}
+//List_Object{
+//    Name="BackWall"
+//    Type="Rigid_Body_List"
+//	Prefix="input"
+//    Shader="ShaderGray"
+//    Range=10
+//    Add_To_Collisions=true
+//}
+//Light{
+//        Type="Fire_Voxel"
+//        Voxel_Object="firevolume"
+//        Fire_Shader="FlameShader"
+//}
+
+Volume_Material{
+	Name="ShockShader"
+	Type="Voxel_Shader"
+
+	Absorption=0
+	Scattering=0
+
+	//White_Point_Temperature=3100
+	White_Point_Temperature=5400
+	Use_LMS_Scaling=false
+    //Use_Blackbody_Ramp=false
+	Emission_Amplification=3000
+	Inscattering_Amplification=0
+}
+Object{
+    Name="ShockVolume"
+	Type="Voxel_Data"
+	Grid_Filename="input/common/grid"
+	Density_Filename="input/%d/pressure_gradient"
+	Temperature_Filename="input/%d/temperature"
+	Volume_Shader="ShockShader"
+	Volume_Step=0.01
+    
+    Temperature_Scale=1
+    Temperature_Offset=0
+    Clamp_Low_Temperature=true
+    Temperature_Lowest=.1
+    Clamp_High_Temperature=true
+    Temperature_Highest=2900
+
+    Density_Scale=.0001
+    Density_Offset=-200
+    Clamp_Low_Density=true
+    Density_Lowest=0
+    Clamp_High_Density=false
+    //Density_Highest=1
+
+    Use_Collision_Aware_Interpolation=false
+    New_Secondary_Marching=false
+    Use_Secondary_Solver=false
+    Thin_Shells_Bisection=false
+    With_Stupid_Fix=false
+    Precompute_Single_Scattering=true
+}
+
+//Volume_Material{
+//	Name="SmokeShader"
+//	Type="Voxel_Shader"
+//
+//	Absorption=1
+//	Scattering=15
+//
+//	//White_Point_Temperature=3100
+//	White_Point_Temperature=5400
+//	Use_LMS_Scaling=false
+//    //Use_Blackbody_Ramp=false
+//	Emission_Amplification=500
+//	Inscattering_Amplification=15
+//}
+//Object{
+//    Name="smokevolume"
+//	Type="Voxel_Data"
+//	Grid_Filename="input/common/grid"
+//	Density_Filename="input/%d/density"
+//	Temperature_Filename="input/%d/temperature"
+//	Volume_Shader="SmokeShader"
+//	Volume_Step=0.05
+//    
+//    Temperature_Scale=1
+//    Temperature_Offset=0
+//    Clamp_Low_Temperature=true
+//    Temperature_Lowest=.1
+//    Clamp_High_Temperature=true
+//    Temperature_Highest=2900
+//
+//    //Density_Scale=0.00083144
+//    Density_Scale=.001
+//    Density_Offset=-50.0
+//    Clamp_Low_Density=true
+//    Density_Lowest=0
+//    Clamp_High_Density=true
+//    Density_Highest=1
+//
+//    Use_Collision_Aware_Interpolation=false
+//    New_Secondary_Marching=false
+//    Use_Secondary_Solver=false
+//    Thin_Shells_Bisection=false
+//    With_Stupid_Fix=false
+//    Precompute_Single_Scattering=true
+//}

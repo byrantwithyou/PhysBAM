@@ -1,0 +1,164 @@
+Camera{
+    Location=   0.657292 1 -2
+    Look_At=    0.751307 0.48539 0.491282
+    Pseudo_Up=  -0.00939134 0.98408 0.177478
+    Field_Of_View=  35
+    Focal_Distance= .1
+    Aspect_Ratio=   1.33333
+
+    Width=           640
+    Height=          480
+    Output_Filename= "Output/final_%03d.png"
+}
+Material{
+    Type="Infinite_Reflection"
+    Name="sky"
+    Filename="Common/skylight-day.exr"
+}
+
+Options{
+    Spatial_Partition=false
+    Background_Color=.8 .8 1
+    Use_Photon_Map=true
+    Use_Irradiance_Cache=true
+
+    //High_Quality=false
+    //Irradiance_Cache_Samples=20
+    //Number_Of_Photons_In_Estimate=75
+    //Global_Photons=100000
+    //Caustic_Photons=100000
+
+    High_Quality=true
+    Irradiance_Cache_Samples=80
+    Number_Of_Photons_In_Estimate=200
+    Global_Photons=100000
+    Caustic_Photons=500000
+
+    Background_Shader=sky
+}
+
+Light{
+    Name=TopSpot
+    Type=Spotlight
+    Position=.75 2.6 0
+    Color=1 1 1
+    Power=65
+    Direction=0 -.7 0
+    Cone_Angle=.85
+    Penumbra_Angle=.75
+}
+
+Material{
+    Name="WhiteColor"
+    Type="Color"
+    Color=1 1 1
+}
+Material{
+    Name="BluishColor"
+    Type="Color"
+    Color=.7 .7 1
+}
+Material{
+    Name="WhiteShader"
+    Type="Lambertian"
+    Shader="WhiteColor"
+}
+
+Material{
+    Name="GrayShader"
+    Type="Lambertian"
+    Reflectivity=0.2
+    Shader="WhiteColor"
+}
+
+Material{
+    Name="OrangeColor"
+    Type="Color"
+    Color=.6 .3 .1
+}
+Material{
+    Name="BallShader"
+    Type="Lambertian"
+    Reflectivity=0.5
+    Shader="OrangeColor"
+}
+Material{
+    Name="FloorTexture"
+    Type="Image_Texture"
+    Filename="Common/blue.bmp"
+    Cubic_Interpolation=false
+}
+Material{
+    Name="WallTexture"
+    Type="Image_Texture"
+    Filename="Common/gray.bmp"
+    Cubic_Interpolation=false
+}
+Material{
+    Name="FloorShader"
+    Type="Lambertian"
+    Shader="FloorTexture"
+    Reflectivity=0.5
+}
+Material{
+    Name="WallShader"
+    Type="Lambertian"
+    Shader="WallTexture"
+    Reflectivity=0.5
+}
+
+Material{
+    Name="WaterSurfaceShader"
+    Type="Transparent"
+    Reflectivity=0.05
+}
+
+Object{
+    Name=Walls
+    Type=Wall
+    Xmin=0
+    Xmax=1.5
+    Ymin=0
+    Ymax=1.5
+    Zmin=0
+    Zmax=1
+    Show_Zmin=false
+    Show_Ymax=false
+    Show_Ymin=false
+    Shrink=.0005
+    Shader="WallShader"
+}
+
+Object{
+    Name=Floor
+    Type=Wall
+    Xmin=0
+    Xmax=1.5
+    Ymin=0
+    Ymax=1.5
+    Zmin=0
+    Zmax=1
+    Show_Zmin=false
+    Show_Xmin=false
+    Show_Xmax=false
+    Show_Ymax=false
+    Show_Zmax=false
+    Shrink=.0005
+    Shader="FloorShader"
+}
+
+List_Object{
+    Name="rigidbodies"
+    Type="Rigid_Body_List"
+    Prefix="Rigid"
+    Shader="BallShader"
+}
+
+Object{
+    Name="water"
+    Type="RLE_Levelset"
+    Shader="WaterSurfaceShader"
+    Index_Of_Refraction=1.33
+    Grid_Filename="Input/rle_grid.%d"
+    Phi_Filename="Input/rle_levelset.%d"
+}

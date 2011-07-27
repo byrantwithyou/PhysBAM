@@ -1,0 +1,4 @@
+.emacs_project_config
+fluids_mpi_merge fluids_mpi_merge_debug
+fluids_mpi_merge_pentium4 fluids_mpi_merge_debug_pentium4
+fluids_mpi_merge_nocona fluids_mpi_merge_nocona_debug

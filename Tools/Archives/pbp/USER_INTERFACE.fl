@@ -1,0 +1,257 @@
+# data file for the Fltk User Interface Designer (fluid)
+version 1.0107 
+header_name {.h} 
+code_name {.cpp}
+class USER_INTERFACE {open
+} {
+  Function {USER_INTERFACE(int argc,char *argv[])} {open
+  } {
+    Fl_Window window {
+      label {pbp - Video Player} open
+      xywh {325 239 950 755} type Double
+      code0 {window->resizable(video_window);} visible
+    } {
+      Fl_Box video_window {
+        label label
+        xywh {0 25 950 610}
+        code0 {\#include "VIDEO_WINDOW.h"}
+        class {PhysBAM::VIDEO_WINDOW}
+      }
+      Fl_Menu_Bar {} {
+        label {Zoom to actual} open
+        xywh {-2 0 1080 25}
+      } {
+        Submenu {} {
+          label File open
+          xywh {0 0 100 20}
+        } {
+          MenuItem add_file {
+            label {Add Video...}
+            callback {char* filename=fl_file_chooser("Choose Vieo File","*.avi","");
+if(filename){
+	video_window->Add_File(filename);
+	Update_Sequence_UI();Update_UI();
+        video_window->Resize_Parent(window);
+	window->damage(1);}}
+            xywh {0 0 100 20} shortcut 0x4006f
+            code0 {\#include <FL/Fl_File_Chooser.H>}
+            code1 {\#include <Arrays/LIST_ARRAY.h>}
+          }
+          MenuItem add_file_new_sequence {
+            label {Add Video to New Sequence...}
+            callback {char* filename=fl_file_chooser("Choose Vieo File","*.avi","");
+if(filename){
+	video_window->Add_File(filename,true);
+	Update_Sequence_UI();Update_UI();
+        video_window->Resize_Parent(window);
+	window->damage(1);}}
+            xywh {0 0 40 25} shortcut 0x4006e
+          }
+          MenuItem {} {
+            label {Add Frame Sequence...}
+            xywh {0 0 40 25} divider
+          }
+          MenuItem exit_menu_item {
+            label Exit
+            callback {exit(0);}
+            xywh {0 0 100 20} shortcut 0x40071
+          }
+        }
+        Submenu {} {
+          label View open
+          xywh {0 0 100 20}
+        } {
+          MenuItem view_center {
+            label Center
+            callback {video_window->Center_Video_Current();}
+            xywh {0 0 100 20} shortcut 0x66
+          }
+          MenuItem view_zoom {
+            label {Zoom to Fit}
+            callback {video_window->Zoom_Video_Current();}
+            xywh {0 0 100 20} shortcut 0x67
+          }
+          MenuItem view_zoom_actual {
+            label {Zoom to actual}
+            callback {video_window->Zoom_Actual_Current();}
+            xywh {0 0 36 21} shortcut 0x61
+          }
+          MenuItem view_loop_current {
+            label {Loop Current}
+            callback {video_window->Loop_Next(0);
+Update_UI();}
+            xywh {0 0 36 21} shortcut 0x77
+          }
+          MenuItem view_loop_next {
+            label {Loop Next}
+            callback {video_window->Loop_Next(1);
+Update_UI();}
+            xywh {5 5 36 21} shortcut 0x65
+          }
+          MenuItem view_loop_all {
+            label {View Loop All}
+            callback {video_window->Loop_All();
+Update_UI();}
+            xywh {0 0 36 21}
+          }
+        }
+      }
+      Fl_Group {} {open
+        xywh {0 715 795 35}
+        code0 {o->resizable(NULL);}
+      } {
+        Fl_Button play_button {
+          label {@>}
+          callback {video_window->Play();
+Update_UI();}
+          xywh {122 720 30 30} shortcut 0x70
+        }
+        Fl_Button stop_button {
+          label {@square}
+          callback {video_window->Stop();
+Update_UI();}
+          tooltip Stop xywh {93 720 30 30} shortcut 0x72
+        }
+        Fl_Value_Slider frame_rate_slider {
+          label {Frame Rate}
+          callback {video_window->Frame_Rate((int)frame_rate_slider->value());}
+          xywh {331 720 190 30} type Horizontal align 4 minimum 1 maximum 100 step 1 value 24
+        }
+        Fl_Value_Output frames_per_second {
+          label {FPS:}
+          xywh {561 720 46 30} maximum 100 step 0.1
+        }
+        Fl_Button in_button {
+          label {@|<}
+          callback {video_window->Frame(video_window->In());
+Update_UI();}
+          tooltip {Jump to In Frame} xywh {5 720 30 30} shortcut 0x5b
+        }
+        Fl_Button back_frame {
+          label {@<|}
+          callback {video_window->Frame(video_window->Frame()-1);
+Update_UI();}
+          tooltip {Backward Frame} xywh {64 720 30 30} shortcut 0x40073
+        }
+        Fl_Button out_button {
+          label {@>|}
+          callback {video_window->Frame(video_window->Out());
+Update_UI();}
+          tooltip {Jump to Out Frame} xywh {209 720 30 30} shortcut 0x5d
+        }
+        Fl_Button forward_frame {
+          label {@|>}
+          callback {video_window->Frame(video_window->Frame()+1);
+Update_UI();}
+          tooltip {Forward Frame} xywh {151 720 30 30} shortcut 0x73
+        }
+        Fl_Button set_in_point {
+          label {@[]<}
+          callback {video_window->In(video_window->Frame());
+Update_UI();}
+          xywh {35 720 30 30} shortcut 0x7b
+        }
+        Fl_Button set_out_point {
+          label {@>[]}
+          callback {video_window->Out(video_window->Frame());
+Update_UI();}
+          xywh {180 720 30 30} shortcut 0x7d
+        }
+      }
+      Fl_Value_Input in_frame {
+        label In
+        callback {video_window->In((int)in_frame->value());
+Update_UI();}
+        xywh {0 657 45 25} align 1 when 8
+      }
+      Fl_Value_Input out_frame {
+        label Out
+        callback {video_window->Out((int)out_frame->value());
+Update_UI();}
+        xywh {734 657 40 23} align 1 when 8
+      }
+      Fl_Value_Input frame_value {
+        label Frame
+        callback {video_window->Frame((int)frame_value->value());
+Update_UI();}
+        xywh {734 689 40 25} align 2 when 4
+      }
+      Fl_Box timeline {
+        label label
+        callback {PhysBAM::VECTOR<int,2> values=timeline->Subrange();
+video_window->In(values[1]);
+video_window->Out(values[2]);
+video_window->Frame((int)timeline->Frame());}
+        xywh {47 657 685 60} box DOWN_BOX labeltype NO_LABEL
+        code0 {\#include "TIMELINE.h"}
+        class {TIMELINE<float>}
+      }
+      Fl_Browser sequence_list {
+        label Sequences
+        callback {if(sequence_list->value()) video_window->Select_View(sequence_list->value());
+Update_Sequence_UI();}
+        xywh {780 655 167 90} type Select align 1
+        code0 {\#include <Fl/Fl_Select_Browser.H>}
+        class Fl_Select_Browser
+      }
+    }
+    code {Fl::add_timeout((float)1/video_window->Frame_Rate(),Frame_Timer,this);} {}
+    code {PhysBAM::LIST_ARRAY<PhysBAM::LIST_ARRAY<std::string> > files;
+int index=files.Append_Element(PhysBAM::LIST_ARRAY<std::string>());
+bool multiple=true;
+for(int curr=1;curr<argc;curr++){
+        std::cout<<"    (multiple "<<multiple<<")"<<std::endl;
+	if(strcmp(argv[curr],"-c")==0) multiple=false;
+	else{
+		files(index).Append_Element(argv[curr]);
+		std::cout<<"reading "<<argv[curr]<<std::endl;
+		if(!multiple && curr+1 != argc){
+		        std::cout<<"adding new guy "<<std::endl;
+			files.Append_Element(PhysBAM::LIST_ARRAY<std::string>());
+			index++;}
+		multiple=true;}
+}
+if(files(index).m==0) files.Remove_Index_Lazy(index);
+video_window->Load_Files(files);
+Update_Sequence_UI();
+if(video_window->Valid()) video_window->Resize_Parent(window);} {}
+    code {video_window->Set_Callback(Window_Callback,this);} {selected
+    }
+  }
+  Function {Update_UI()} {open
+  } {
+    code {if(video_window->Valid()){
+        play_button->label(video_window->Playing()?"@||":"@>");
+	in_frame->value(video_window->In());
+	out_frame->value(video_window->Out());
+	frame_rate_slider->value(video_window->Frame_Rate());
+        frames_per_second->value(video_window->frames_per_second);
+	timeline->Range(video_window->Min(),video_window->Max(),video_window->Frame()); 
+	timeline->Subrange(video_window->In(),video_window->Out());
+	frame_value->value(video_window->Frame());
+        window->label(video_window->Title().c_str());
+        }} {}
+  }
+  Function {Frame_Timer(void* data)} {open return_type {static void}
+  } {
+    code {USER_INTERFACE* ui=(USER_INTERFACE*)data;
+ui->video_window->Update_Frame();
+ui->Update_UI();
+Fl::repeat_timeout((float)1/ui->video_window->Frame_Rate(),Frame_Timer,ui);} {}
+  }
+  Function {Update_Sequence_UI()} {open return_type void
+  } {
+    code {timeline->Init_Sequence(video_window->Video_Sequences(),video_window->Video_Names());
+sequence_list->clear();
+const PhysBAM::LIST_ARRAY<std::string>& view_names=video_window->View_Names();
+for(int i=1;i<=view_names.m;i++){
+	sequence_list->add(view_names(i).c_str());}
+int selected_view_index=video_window->Selected_View();
+if(selected_view_index) sequence_list->select(selected_view_index);} {}
+  }
+  Function {Window_Callback(void* data)} {open return_type {static void}
+  } {
+    code {USER_INTERFACE& ui=*(USER_INTERFACE*)data;
+ui.Update_Sequence_UI();} {}
+  }
+} 

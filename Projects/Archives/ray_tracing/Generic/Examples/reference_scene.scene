@@ -1,0 +1,553 @@
+#include "basic_shaders.scene" 
+Camera{
+// Normal in your face view
+//    Location=       -0.0145 1.8 -5.75
+//    Look_At=        -0.0145 1.8 0
+
+// side-angle view
+//    Location=       -2.7 1.8 -5.2
+//    Look_At=        -0.1545 1.8 -1.7
+//    Location=-1.2 1.8 -5.73
+//    Look_At=        0.1 1.8 -1.7
+
+// side-angle view (further away)
+//    Location=       -3.8455 1.8 -4.0
+//    Look_At=        -0.1545 1.8 -1.2
+//    Location=       -5.4 1.8 -10.4
+//    Look_At=        -0.1545 1.8 -1.7
+
+// side-angle view (close up)
+////    Location=       -2.0 1.8 -2.6
+//    Location=       1.9 1.8 -2.6
+//    Look_At=        -0.1545 1.8 -1.2
+
+// OTHER side-angle view
+//    Location=1.2 1.8 -5.73
+//    Look_At=0.1 1.8 -1.7
+//    Location=1.5 2.2 -5.5
+//    Look_At=0.1 1.8 -1.7
+//    Location=2.0 2.15 -5.2
+//    Look_At=0.1 1.85 -1.7
+    Location=2.1 2.15 -5.2
+    Look_At=0.2 1.85 -1.7
+
+    Pseudo_Up=      0 1 0
+    Field_Of_View=  20
+    Focal_Distance=  1
+    Aspect_Ratio=    1.333
+    Width=           640
+    Height=          480
+    Output_Filename="face"
+}
+Options{
+// high quality uses 4 subpixels for each pixel
+    High_Quality=false
+    Spatial_Partition=false
+    Background_Color=0.0 0.0 0.0
+}
+// Pointlight
+
+//Light{
+//   Name=light1
+//    Type=Point
+//    Position=.3 2 -3.5
+////    Power=550
+////    Power=530
+//    Power=500
+//}
+//Light{
+//    Name=light2
+//    Type=Point
+////    Position=-2.2 0.6 -1.5
+//    Position=-2.2 0.6 -2.0
+//    Power=320
+//}
+Light{
+   Name=light1
+    Type=Point
+    Position=-.3 2 -3.5
+//    Position=.3 2 -3.5
+    Power=500
+}
+Light{
+    Name=light2
+    Type=Point
+//    Position=2.2 0.6 -2.0
+    Position=2.2 0.6 -2.5
+    Power=320
+}
+
+// Shaders
+Material{
+    Name="FaceTextureShader"
+    Type="Image_Texture"
+//    Filename="../../../../Public_Data/Face_Data/Face_Textures/hrc_baseline_blur_changed_lips_no_collar.bmp"
+//    Filename="../../../../Public_Data/Face_Data/Face_Textures/hrc_baseline_blur_changed_lips_no_collar_changed_eyelid.bmp"
+//    Filename="../../../../Public_Data/Face_Data/Face_Textures/hrc_baseline_blur_changed_lips_no_collar_hair_fix.bmp"
+//    Filename="../../../../Public_Data/Face_Data/Face_Textures/hrc_baseline_blur_changed_lips_no_collar_hair_eye_fix.bmp"
+    Filename="../../../../Public_Data/Face_Data/Face_Textures/hrc_baseline_blur_changed_lips_no_collar_hair_eye_nose_fix2.bmp"
+}
+Material{
+    Name="EyeTextureShader"
+    Type="Image_Texture"
+    Filename="../../../../Public_Data/Face_Data/Face_Textures/eye3_processed4.bmp"
+}
+
+Material{
+    Type="Lambertian"
+    Name="LambertianTexture"
+    Shader="FaceTextureShader"
+    Reflectance=0.3
+}
+Material{
+    Type="Lambertian"
+    Name="LambertianTexture2"
+    Shader="EyeTextureShader"
+    Reflectance=0.15
+}
+
+Material{
+    Type="Reflection_Map"
+    Name="Eye_Reflection_Map"
+    Filename="../../../../Public_Data/Face_Data/Face_Textures/eye3_processed_reflection_map.bmp"
+}
+
+//Material{
+//	Type=           "Lambertian"
+//	Name=           "EyeLashShader"
+//	Shader=         "GroundTan"
+//	Reflectance=    .15
+//	Ambient=        0 0 0
+//}
+
+Material{
+    Type="Normal_Image_Bump_Map"
+    Name="NormalBumpMapped"
+    Shader="LambertianTexture"
+    Filename="../../../../Public_Data/Face_Data/Face_Textures/hrc_baseline_touchup_bump_map.bmp"
+}   
+
+// for use with BSSRDF
+Material{
+    Name="NormalShader1"
+    Type="Normal_Image_Bump_Map"
+    Filename="../../../../Public_Data/Face_Data/Face_Textures/hrc_baseline_touchup_bump_map.bmp"
+}
+
+Material{
+    Name="Skin_BSSRDF_Texture_Shader"
+    Type="BSSRDF"
+    Shader="FaceTextureShader"
+    Normal_Map_Shader="NormalShader1"
+//    Sigma_s_Prime=10.9 15.9 17.9
+//    Sigma_a=0.13 0.70 1.45
+//    Sigma_s_Prime=32.7 47.7 53.7
+//    Sigma_a=.39 2.1 4.35
+//    Sigma_s_Prime=109 159 179
+//    Sigma_a=1.3 7.0 14.5
+    Sigma_s_Prime=109 159 179
+    Sigma_a=1.3 5.0 10.0
+    Use_Texture_In_Irradiance_Precomputation=false
+    Diffuse_Reflectance=.63 .44 .34
+    Index_Of_Refraction=1.3
+//	Error_Criterion=.5
+	Error_Criterion=.1
+//    Specular_Color=0.4 0.3 0.3
+    Specular_Color=1.4 1.3 1.3 
+//    Eccentricity=0.2
+    Eccentricity=0.3
+}
+
+Material{
+    Name="Eye_BSSRDF_Texture_Shader"
+    Type="BSSRDF"
+    Shader="EyeTextureShader"
+    Reflection_Shader="Eye_Reflection_Map"
+    Reflectiveness=0.1
+    Sigma_s_Prime=545 795 895
+    Sigma_a=7.5 35 72.5
+    Diffuse_Reflectance=.83 .79 .75
+    Index_Of_Refraction=1.337
+//    Error_Criterion=0.2
+	Error_Criterion=1.0
+//    Specular_Color=20 20 20
+    Specular_Color=300 300 300
+    Eccentricity=0.018
+    Reflectiveness=0.5
+    Use_Texture_In_Irradiance_Precomputation=true
+}
+
+Material{
+	Name="TeethColor"
+	Type="Color"
+//    Color=.545 .52 .475
+//    Color=.616 .525 .434
+    Color=.616 .525 .40
+}
+Material{
+	Name="TeethShader"
+	Type="Lambertian"
+	Shader="TeethColor"
+	Reflectance=0.2
+	Ambient=0 0 0
+}
+Material{
+    Name="DummyTeethColor"
+    Type="Color"
+    Color=.13 .13 .13
+}
+//Material{
+//    Name="TeethShader"
+//    Type="Phong"
+//    Shader="DummyTeethColor"
+//    Ambient=0 0 0
+//    Diffuse=.616 .525 .434
+//    Specular=.4 .4 .4
+//    Specular_Exponent=80
+//}
+Material{
+    Name="Teeth_BSSRDF_Shader"
+    Type="BSSRDF"
+    Shader="TeethColor"
+// Marble
+//    Sigma_s_Prime=2.19 2.63 3.00
+//    Sigma_a=.0021 .0041 .0071
+//    Sigma_s_Prime=219 263 300
+//    Sigma_a=.21 .41 .71
+//    Sigma_s_Prime=138 226 300
+//    Sigma_a=.42 .82 1.42
+//    Sigma_s_Prime=552 904 1200
+//    Sigma_a=1.87 3.28 5.68
+//    Sigma_s_Prime=690 1130 1500
+//    Sigma_a=2.34 4.1 7.1
+    Sigma_s_Prime=518 848 1125
+    Sigma_a=1.78 3.08 5.33
+    Diffuse_Reflectance=.83 .79 .75
+    Index_Of_Refraction=1.337
+    Error_Criterion=0.1
+    Specular_Color=6 6 6
+//    Eccentricity=0.025
+    Eccentricity=0.11
+    Use_Texture_In_Irradiance_Precomputation=true
+}
+
+Material{
+	Type=           "Lambertian"
+	Name=           "ShirtShader"
+	Shader=         "GroundTan"
+	Reflectance=    .1
+	Ambient=        0 0 0
+}
+Material{
+    Name="ShirtTextureShader"
+    Type="Image_Texture"
+    Filename="../../../../Public_Data/Face_Data/Face_Textures/cloth3.bmp"
+}
+Material{
+    Type="Lambertian"
+    Name="ShirtLambertianTextureShader"
+    Shader="ShirtTextureShader"
+    Reflectance=0.2
+}
+Material{
+    Type="Normal_Image_Bump_Map"
+    Name="BumpMappedShirtLambertianTextureShader"
+    Shader="ShirtLambertianTextureShader"
+    Filename="../../../../Public_Data/Face_Data/Face_Textures/cloth3_bump_map.bmp"
+}   
+
+//mouth texture/shader stuff
+Material{
+    Name="MouthTextureShader"
+    Type="Image_Texture"
+    Filename="../../../../Public_Data/Face_Data/Face_Textures/mouth_texture.bmp"
+}
+
+Material{
+    Type="Lambertian"
+    Name="MouthLambertianTextureShader"
+    Shader="MouthTextureShader"
+    Reflectance=0.3
+}
+
+Material{
+    Name="MouthBumpMapped"
+    Type="Normal_Image_Bump_Map"
+    Filename="../../../../Public_Data/Face_Data/Face_Textures/mouth_texture_bump.bmp"
+}   
+
+// for use with BSSRDF
+
+Material{
+    Name="Mouth_BSSRDF_Texture_Shader"
+    Type="BSSRDF"
+    Shader="MouthTextureShader"
+    Normal_Map_Shader="MouthBumpMapped"
+    Sigma_s_Prime=100 100 100
+//    Sigma_a=0.75 0.75 0.75
+    Sigma_a=1.25 1.25 1.25
+    Diffuse_Reflectance=.83 .79 .75
+    Index_Of_Refraction=1.337
+//    Error_Criterion=0.2
+	Error_Criterion=1.0
+//    Specular_Color=2 2 2
+    Specular_Color=1 1 1
+    Eccentricity=0.5
+//    Eccentricity=0.18
+    Reflectiveness=0.5
+    Use_Texture_In_Irradiance_Precomputation=true
+}
+
+Material{
+	Name="TargetMarkerColor"
+	Type="Color"
+    Color=0.7 0.2 0.2
+}
+Material{
+	Name="TargetMarkerShader"
+	Type="Lambertian"
+	Shader="TargetMarkerColor"
+	Reflectance=0.3
+	Ambient=0 0 0
+}
+Material{
+	Name="EmbeddedMarkerColor"
+	Type="Color"
+    Color=0.2 0.7 0.2
+}
+Material{
+	Name="EmbeddedMarkerShader"
+	Type="Lambertian"
+	Shader="EmbeddedMarkerColor"
+	Reflectance=0.3
+	Ambient=0 0 0
+}
+
+// Objects
+
+Transform{
+    Type="Push"
+}
+Transform{
+    Type="Translate"
+    Vector=0 1.8 -1
+}
+Transform{
+    Type="Rotate"
+    Axis=0 0 1
+    Radians=3.14159
+}
+Transform{
+    Type="Rotate"
+    Axis=0 1 0
+    Radians=3.14159
+}
+Transform{
+    Type="Rotate"
+    Axis=1 0 0
+    Radians=1.570795
+}
+
+//The Face
+Object{
+    Name="face"
+    Type="Triangulated_Surface"
+    Filename="<face_model_filename>"
+    Texture_Coordinate_File="<face_uv_filename>"
+    Sample_Locations_File="<face_samples_filename>"
+
+    Smooth_Normals=true
+    Preserve_Creases=false
+    Scale= 4.5 
+//    Shader="LambertianTexture"
+    Shader="Skin_BSSRDF_Texture_Shader"
+    Uses_BSSRDF=true
+    Flip_Normal=true
+}
+
+Object{
+    Name="upperteeth"
+    Type="Triangulated_Surface"
+    Filename=<upperteeth_filename>
+    Sample_Locations_File="../../../../Public_Data/Face_Data/Face_Meshes/upperteeth_face_fitted_s4.5_100k.samples"
+  
+    Smooth_Normals=true
+    Preserve_Creases=false
+    Scale=4.5
+//    Shader="TeethShader"
+    Shader="Teeth_BSSRDF_Shader"
+    Uses_BSSRDF=true
+    Flip_Normal=true
+}
+
+Object{
+    Name="lowerteeth"
+    Type="Triangulated_Surface"
+    Filename=<lowerteeth_filename>
+    Sample_Locations_File="../../../../Public_Data/Face_Data/Face_Meshes/lowerteeth_face_fitted_s4.5_100k.samples"
+  
+    Smooth_Normals=true
+    Preserve_Creases=false
+    Scale=4.5
+//    Shader="TeethShader"
+    Shader="Teeth_BSSRDF_Shader"
+    Uses_BSSRDF=true
+    Flip_Normal=true
+}
+
+Object{
+    Name="lowermouth"
+    Type="Triangulated_Surface"
+    Filename=<lowermouth_filename>
+    Sample_Locations_File="../../../../Public_Data/Face_Data/Face_Meshes/lower_mouth.samples"
+  
+    Smooth_Normals=true
+    Preserve_Creases=false
+    Scale=4.5
+    Texture_Coordinate_File=<lower_mouth_uv_filename>
+//    Shader="MouthLambertianTextureShader"
+    Shader="Mouth_BSSRDF_Texture_Shader"
+    Uses_BSSRDF=true
+    Flip_Normal=false
+}
+
+//Left Eyelashes
+//Object{
+//    Name="eyelashes1"
+//    Type="Triangulated_Surface"
+//    Filename="../../../../Public_Data/Face_Data/Face_Meshes/eyelashes_left_hrc.tri"
+//    Shader=EyeLashShader
+//    Smooth_Normals=true
+//    Preserve_Creases=false
+//    Scale= 4.5 
+//}
+//
+//Right Eyelashes
+//Object{
+//    Name="eyelashes2"
+//    Type="Triangulated_Surface"
+//    Filename="../../../../Public_Data/Face_Data/Face_Meshes/eyelashes_right_hrc.tri"
+//    Shader=EyeLashShader
+//    Smooth_Normals=true
+//    Preserve_Creases=false
+//    Scale=4.5 
+//}
+
+// Left Eye
+//Transform{
+//    Type="Push"
+//}
+//Transform{
+//    Type="Translate"
+//    Vector=0.130 1.885 -1.335
+//}
+//Transform{
+//    Type="Rotate"
+//    Axis=0 0 1
+//    Radians=3.14159
+//}
+//Transform{
+//    Type="Rotate"
+//    Axis=0 1 0
+//    Radians=3.2
+//}
+//Transform{
+//    Type="Rotate"
+//    Axis=1 0 0
+//    Radians=1.5
+//}
+Object{
+    Name="eye1"
+    Type="Triangulated_Surface"
+    Filename=<left_eye_filename>
+    Texture_Coordinate_File="../../../../Public_Data/Face_Data/Face_Meshes/eye_hrc_baseline.uv"
+    Sample_Locations_File="../../../../Public_Data/Face_Data/Face_Meshes/eye_hrc_baseline_s3.45_100k.samples"
+    Smooth_Normals=true
+    Preserve_Creases=false
+//    Scale=3.45
+    Scale=4.5
+//    Shader="LambertianTexture2"
+    Shader="Eye_BSSRDF_Texture_Shader"
+    Uses_BSSRDF=true
+    Flip_Normal=true
+}
+
+// Right Eye
+//Transform{
+//    Type="Push"
+//}
+//Transform{
+//    Type="Translate"
+//    Vector=-0.157 1.885 -1.345
+//}
+//Transform{
+//    Type="Rotate"
+//    Axis=0 0 1
+//    Radians=3.14159
+//}
+//Transform{
+//    Type="Rotate"
+//    Axis=0 1 0
+//    Radians=3.14159
+//}
+//Transform{
+//    Type="Rotate"
+//    Axis=1 0 0
+//    Radians=1.55
+//}
+Object{
+    Name="eye2"
+    Type="Triangulated_Surface"
+    Filename=<right_eye_filename>
+    Texture_Coordinate_File="../../../../Public_Data/Face_Data/Face_Meshes/eye_hrc_baseline.uv"
+    Sample_Locations_File="../../../../Public_Data/Face_Data/Face_Meshes/eye_hrc_baseline_s3.45_100k.samples"
+    Smooth_Normals=true
+    Preserve_Creases=false
+//    Scale=3.45
+    Scale=4.5
+//    Shader="LambertianTexture2"
+    Shader="Eye_BSSRDF_Texture_Shader"
+    Uses_BSSRDF=true
+    Flip_Normal=true
+}
+
+Object{
+    Name="neck_and_shoulders"
+    Type="Triangulated_Surface"
+    Filename=<neck_and_shoulders_filename>
+    Texture_Coordinate_File="../../../../Public_Data/Face_Data/Face_Meshes/neck_shoulder.uv"
+    Smooth_Normals=true
+    Preserve_Creases=false
+    Scale=4.5
+//    Shader="ShirtShader"
+//    Shader="ShirtLambertianTextureShader"
+    Shader="BumpMappedShirtLambertianTextureShader"
+    Flip_Normal=true
+}
+
+//Object{
+//    Name="target_markers"
+//    Type="Triangulated_Surface"
+//    Filename="<target_markers_model_filename>"
+
+//    Smooth_Normals=true
+//    Scale=0.00001 //4.5 
+//    Shader="TargetMarkerShader"
+//    Flip_Normal=true
+//}
+
+//Object{
+//    Name="embedded_markers"
+//    Type="Triangulated_Surface"
+//    Filename="<embedded_markers_model_filename>"
+
+//    Smooth_Normals=true
+//    Scale=4.5 
+//    Shader="EmbeddedMarkerShader"
+//    Flip_Normal=true
+//}
+
+Transform{
+    Type="Pop"
+}
+

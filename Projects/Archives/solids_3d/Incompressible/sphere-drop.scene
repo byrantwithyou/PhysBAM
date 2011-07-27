@@ -1,0 +1,97 @@
+Camera{
+        Location=       2.95819 3.46963 -14.7029
+        Look_At=        -0.00834533 1.4216 0.384855
+        Pseudo_Up=      0 1 0
+        Field_Of_View=  26.4602
+        Focal_Distance= .1
+        Aspect_Ratio=   1.33333
+
+	Width=           640
+	Height=          480
+	Output_Filename="/data/cajpan/PhysBAM/Rendered_Images/poisson_0.3/poisson.0.3.%d.png"
+        
+}
+
+Options{
+	High_Quality=true
+}
+
+// Lighting
+Light{
+        Type=Spotlight
+        Position= 2 4 -6
+        Color=1 1 1
+        Power=400
+        Direction=-2 -4 6
+        Cone_Angle=pi
+        Penumbra_Angle=2*pi
+}
+
+Light{
+        Type=Spotlight
+        Position=-10 0 -8
+        Color=1 1 1
+        Power=300
+        Direction=10 0 8
+        Cone_Angle=pi
+        Penumbra_Angle=3*pi/2       
+}
+
+%Light{
+        Type=Spotlight
+        Position=-5 10 1
+        Color=1 1 1
+        Power=200
+        Direction= 5 -2 -1
+        Cone_Angle=pi
+        Penumbra_Angle=3*pi/2 
+}
+
+//Colors for shaders
+
+Material{
+	Name="GoldColor"
+	Type="Color"
+        Color=.8 .498039 .196078
+}
+Material{
+	Name="SphereShader"
+	Type="Phong"
+	Shader="GoldColor"
+        Diffuse=.8 .498039 .196078
+        Specular=.8 .498039 .196078
+        Specular_Exponent=10
+}
+
+Material{
+	Name="GroundColor"
+	Type="Color"
+        Color= 1 .775 .5431
+}
+
+Material{
+	Name="GroundShader"
+	Type="Lambertian"
+	Shader="GroundColor"
+        Ambient=.06 .06 .06
+	Reflectivity=0.5
+}
+
+// Objects
+Object{
+        Name="Ground"
+        Type="Plane"
+        Position= 0 -.005 0
+        Normal = 0 1 0
+        Shader="GroundShader"
+}
+
+List_Object{
+        Type="Deformable_Object"
+        Name="Deformable"
+        Prefix="/n/pressure/data/cas43/PhysBAM/Projects/solids_3d/Incompressible/paper-ball-drop/poisson-tests/Test_5_fr200_rt0_p0.3_hires_stiff2"
+        Shader="SphereShader"
+        Smooth_Normals=true
+        Preserve_Creases=false
+        Range=1
+}

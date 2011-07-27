@@ -1,0 +1,126 @@
+Camera{
+	//From side 
+	Location=       0.40 1.4 -5
+	// from diagonal
+	//Location=       4.3891 1.2 -3.3891
+	Look_At=        0.5 1.4 0.5
+	Pseudo_Up=      0 1 0
+	Field_Of_View=  50
+	Focal_Distance=  1
+	Aspect_Ratio=    1.333
+	Width=           640
+	Height=          480
+	Output_Filename= "rgb/image.%d.rgb"
+}
+//Light{
+//	Type=Point
+//	Position=0.5 3 0.5
+//	Power=1000
+//}
+Options{
+	High_Quality=true
+	Spatial_Partition=false
+	Use_Photon_Map=true
+	Use_Irradiance_Cache=false
+	Number_Of_Photons_In_Estimate=1000
+	Global_Photons=1000000
+}
+
+#include "basic_shaders.scene"
+
+
+Material{
+	Name="CoreColor"
+	Type="Color"
+	Color=0 0 1
+}
+
+Material{
+	Name="CoreShader"
+	Type="Lambertian"
+	Shader="CoreColor"
+	Reflectance=0.5
+}
+
+Material{
+	Name="BlueCoreShader"
+	Type="Shell_Emission"
+	Shell_Amplification_Factor=10
+}
+
+Object{
+	Name="core"
+	Type="Levelset"
+	Negate=true
+	Shader="BlueCoreShader"
+	Filename="input/levelset.%d"
+	//Filename="sphere.phi"
+}
+
+
+Volume_Material{
+	Name="FlameShader"
+	Type="Voxel_Fire_Shader"
+	Absorption=.5	
+	Scattering=0
+	//White_Point_Temperature=3100
+	White_Point_Temperature=3400
+	Blue_Core_Levelset="core"
+	Use_LMS_Scaling=true
+	//Emission_Amplification=14
+	Emission_Amplification=17
+}
+
+Object{
+        Name="firevolume"
+	Type="Voxel_Data"
+	Grid_Filename="input/grid"
+	Density_Filename="input/density.%d"
+	Temperature_Filename="input/temperature.%d"
+	Volume_Shader="FlameShader"
+	Volume_Step=0.05
+}
+
+Light{
+        Type="Fire_Voxel"
+        Voxel_Object="firevolume"
+        Fire_Shader="FlameShader"
+}
+
+
+//Material{
+//	Type="Ember_Shader"
+//	Name="ember_shader"
+//	Ember_Amplification=200
+//	Fire_Shader="FlameShader"
+//}
+
+//Object{
+//	Name="embers"
+//	Type="Particle_Spheres"
+//	Particles_Filename="input/negative_particles.%d"
+//	Radius=0.02
+//	Shader="ember_shader"
+//}
+
+
+Transform{
+	Type=Push
+}
+// Tepee scene
+Transform{
+	Type=Translate
+	Vector=-.5 0 .5
+}
+#include "tepee.scene"
+
+Object{
+	Name="ground"
+	Type=Triangulated_Surface
+	Filename="ground.tri"
+	Shader="GroundShader"
+}
+
+Transform{
+	Type=Pop
+}

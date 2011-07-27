@@ -1,0 +1,2 @@
+Debug Release *.ncb *.suo obj obj_debug .sconsign
+deformable_rigid_coupling deformable_rigid_coupling_debug deformable_rigid_coupling_optdebug deformable_rigid_coupling_profile deformable_rigid_coupling_opteron deformable_rigid_coupling_nocona deformable_rigid_coupling_nocona_debug

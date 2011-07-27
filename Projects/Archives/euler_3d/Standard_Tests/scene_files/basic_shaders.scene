@@ -1,0 +1,50 @@
+//#####################################################################
+// PhysBAM standard Ground Plane Shader
+//#####################################################################
+Material{
+	Type=           "Color"
+	Name=           "GroundTan"
+	Color=          1 0.775 0.5431
+}
+Material{
+	Type=           "Lambertian"
+	Name=           "GroundShader"
+	Shader=         "GroundTan"
+	Reflectance=    .75
+	Ambient=        0 0 0
+}
+//#####################################################################
+// White Matte Useful for Solid Models
+//#####################################################################
+Material{
+	Type=           "Color"
+	Name=           "White"
+	Color=          1 1 1
+}
+Material{
+	Type=           "Lambertian"
+	Name=           "WhiteMatte"
+	Shader=         "White"
+	Reflectance=    0.6
+	Ambient=        0.1 0.1 0.1
+}
+//#####################################################################
+// Mirror Shader
+//#####################################################################
+Material{
+	Type=           "Transparent"
+	Name=           "Mirror"
+	Reflectivity=   1.0
+	Shift_Direction="normal"
+	Fresnel=        false
+}
+//#####################################################################
+// Mirror Shader
+//#####################################################################
+Material{
+	Type=           "Transparent"
+	Name=           "Glass"
+	Reflectivity=   0.1
+	Fresnel=        true
+	Shift_Direction="normal"
+}

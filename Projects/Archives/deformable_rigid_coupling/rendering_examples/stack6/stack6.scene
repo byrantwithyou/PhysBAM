@@ -1,0 +1,391 @@
+Camera{
+	Location=	-32.0752 6.08367 -27.8307
+	Look_At=	-2.39401 4.83089 1.64526
+	Pseudo_Up=	0.0212408 0.999552 0.021094
+	Field_Of_View=	26.4602
+	Focal_Distance=	.1
+	Aspect_Ratio=	1.33333
+
+   Width=           640
+   Height=          480
+   Width=           320
+   Height=          240
+   Width=           1280
+   Height=          960
+    Output_Filename="output/stack6.%05d.png"
+}
+
+//Material{
+//        Name=sky
+//        Type=Infinite_Reflection
+//        Filename="../skylight-day.pbi"
+//}
+Options{
+    High_Quality=true
+    Spatial_Partition=false
+}
+//////////////////////////// Lighting
+//Light{
+//Type=Rectangle
+//Position=0 100 0
+//U_Vector=30 0 0
+//V_Vector=0 0 30
+//U_Samples=1
+//V_Samples=1
+//Color=1 1 1
+//Power=5000
+//}
+
+//#include "light_ring_20.scene"
+#include "../common-shaders.scene"
+
+Light{
+    Type=Point
+    Position=10 1 -40
+    Color=1 1 1
+    Power=2000
+    Casts_Shadows=false
+}
+Light{
+    Type=Point
+    Position=-10 1 40
+    Color=1 1 1
+    Power=2000
+    Casts_Shadows=false
+}
+Light{
+    Type=Point
+    Position=-20 50 0
+    Color=1 1 1
+    Power=12800
+    Casts_Shadows=true
+}
+Light{
+    Type=Point
+    Position=40 1 -10
+    Color=1 1 1
+    Power=2000
+    Casts_Shadows=false
+}
+Light{
+    Type=Point
+    Position=-40 1 10
+    Color=1 1 1
+    Power=2000
+    Casts_Shadows=false
+}
+
+////////////////////////////// Shaders
+Material{
+    Name="RigidColor"
+    Type="Color"
+    Color=1 1 1
+}
+Material{
+    Name="DeformColor"
+    Type="Color"
+    Color=.90 .35 .09
+    //Color=.04 .07 .12
+}
+Material{
+    Name="BallColor"
+    Type="Color"
+    Color=1 1 1
+}
+Material{
+    Type="Transparent"
+    Name="Reflection"
+    Reflectivity=1
+}
+Material{
+    Type="Transparent"
+    Name="Reflection2"
+    Reflectivity=0
+}
+Material{
+    Name="ShaderSolid"
+    Type="Phong"
+    Shader="RigidColor"
+    Diffuse=1 1 1
+    Specular=2 2 2
+    Specular_Exponent=35
+}
+Material{
+    Name="ShaderDeform"
+    Type="Phong"
+    Shader="DeformColor"
+    Diffuse=1 1 1
+    Specular=0.1 0.1 0.1
+    Specular_Exponent=25
+}
+Material{
+    Name="ShaderBall"
+    Type="Phong"
+    Shader="BallColor"
+    Diffuse=0.2 0.2 0.2
+    Specular=2 2 2
+    Specular_Exponent=35
+}
+Material{
+    Name="GroundColor"
+    Type="Color"
+    Color= 1 .775 .5431
+}
+Material{
+    Name="GroundShader"
+    Type="Lambertian"
+    Shader="GroundColor"
+    Reflectivity=0.5
+}
+Material{
+    Name="LatheR"
+    Type="Color"
+//        Color=.84 .64 .64
+//        Color=.70 .40 .40
+//        Color=.83 .19 .19
+        Color=1 .3 .4
+}
+Material{
+    Name="LatheO"
+    Type="Color"
+//        Color=.85 .69 .49
+//        Color=.72 .47 .24
+        Color=1 1 1
+}
+Material{
+    Name="LatheY"
+    Type="Color"
+//        Color=.89 .89 .56
+//        Color=.79 .79 .31
+        Color=.99 .99 .28
+}
+Material{
+    Name="LatheG"
+    Type="Color"
+//        Color=.49 .78 .55
+//        Color=.24 .60 .30
+        Color=.21 .67 .27
+}
+Material{
+    Name="LatheB"
+    Type="Color"
+//        Color=.56 .59 .89
+//        Color=.31 .34 .79
+        Color=.28 .32 .99
+}
+Material{
+    Name="LatheP"
+    Type="Color"
+//        Color=.76 .56 .89
+//        Color=.57 .31 .79
+        Color=.63 .28 .99
+}
+Material{
+    Name="Yellow"
+    Type="Color"
+//        Color=.87 .88 .50
+//        Color=.75 .77 .25
+        Color=.9 .7 .15
+}
+Material{
+    Name="Blue"
+    Type="Color"
+//        Color=.33 .37 .91
+//        Color=.10 .13 .82
+        Color=.08 .10 1
+}
+Material{
+    Name="Red"
+    Type="Color"
+//        Color=.33 .37 .91
+//        Color=.10 .13 .82
+        Color=.8 .10 .2
+}
+Material{
+    Name="LatheShaderR"
+    Type="Phong"
+    Shader="LatheR"
+    Diffuse=.6 .6 .6
+    Specular=2 2 2
+    Specular_Exponent=35
+}
+Material{
+    Name="LatheShaderO"
+    Type="Phong"
+    Shader="LatheO"
+    Diffuse=.6 .6 .6
+    Specular=2 2 2
+    Specular_Exponent=35
+}
+Material{
+    Name="LatheShaderY"
+    Type="Phong"
+    Shader="LatheY"
+    Diffuse=.6 .6 .6
+    Specular=2 2 2
+    Specular_Exponent=35
+}
+Material{
+    Name="LatheShaderG"
+    Type="Phong"
+    Shader="LatheG"
+    Diffuse=.6 .6 .6
+    Specular=2 2 2
+    Specular_Exponent=35
+}
+Material{
+    Name="LatheShaderB"
+    Type="Phong"
+    Shader="LatheB"
+    Diffuse=.6 .6 .6
+    Specular=2 2 2
+    Specular_Exponent=35
+}
+Material{
+    Name="LatheShaderP"
+    Type="Phong"
+    Shader="LatheP"
+    Diffuse=.6 .6 .6
+    Specular=2 2 2
+    Specular_Exponent=35
+}
+Material{
+    Name="YellowShader"
+    Type="Phong"
+    Shader="Yellow"
+    Diffuse=.6 .6 .6
+    Specular=2 2 2
+    Specular_Exponent=35
+}
+Material{
+    Name="BlueShader"
+    Type="Phong"
+    Shader="Blue"
+    Diffuse=.6 .6 .6
+    Specular=2 2 2
+    Specular_Exponent=35
+}
+Material{
+    Name="RedShader"
+    Type="Phong"
+    Shader="Red"
+    Diffuse=.6 .6 .6
+    Specular=2 2 2
+    Specular_Exponent=5
+}
+Material{
+    Name="White"
+    Type="Color"
+    Color= 1 1 1
+}
+Material{
+    Name="BlackShader"
+    Type="Phong"
+    Shader="White"
+    Diffuse=0 0 0
+    Specular=2 2 2
+    Specular_Exponent=35
+}
+Material{
+    Name="Null"
+    Type="Phong"
+    Shader="White"
+    Diffuse=0 0 0
+    Specular=0 0 0
+    Specular_Exponent=1
+}
+Material{
+    Name="BackgroundShader"
+    Type="Phong"
+    Shader="White"
+    Diffuse=.1 .1 .1
+    Specular=.2 .2 .2
+    Specular_Exponent=35
+}
+Material{
+    Name="GrayShader"
+    Type="Phong"
+    Shader="White"
+    Diffuse=.01 .01 .01
+    Specular=.8 .8 .8
+    Specular_Exponent=5
+}
+Material{
+    Type="Blend"
+    Name="SemireflectiveBlackShader"
+    Shader1="Reflection"
+    Shader2="GrayShader"
+//    Shader1="GrayShader"
+    Blend_Fraction=.4
+}
+Material{
+    Type="Blend"
+    Name="ShaderRigid"
+    Shader1="Reflection"
+    Shader2="ShaderSolid"
+    Blend_Fraction=1
+}
+
+//////////////////////////// Objects
+
+Object{
+    Name="Ground"
+    Type="Plane"
+    Position= 0 0 0
+    Normal = 0 1 0
+    Shader="GroundShader"
+}
+
+List_Object{
+    Name="Rigid"
+    Type="Rigid_Body_List"
+    Prefix="input"
+    //Shader="ShaderSolid"
+    //Shader="LatheShaderY"
+    Shader="SemireflectiveBlackShader"
+    Smooth_Normals=false
+    Subdivide_Geometry=false
+    Preserve_Creases=true
+    Range=1,2,3
+}
+
+List_Object{
+    Name="Rigid"
+    Type="Rigid_Body_List"
+    Prefix="input"
+    Shader="SemireflectiveBlackShader"
+    Smooth_Normals=true
+    Subdivide_Geometry=true
+    Preserve_Creases=false
+    Range=4
+}
+
+List_Object{
+    Name="Deformable"
+    Type="Deformable_Object"
+    Prefix="input"
+    Shader="PumpkinShader"
+    Smooth_Normals=true
+    Preserve_Creases=true
+    Range=1
+}
+
+List_Object{
+    Name="Deformable"
+    Type="Deformable_Object"
+    Prefix="input"
+    Shader="PumpkinShader"
+    Smooth_Normals=true
+    Preserve_Creases=true
+    Range=2
+}
+
+List_Object{
+    Name="Deformable"
+    Type="Deformable_Object"
+    Prefix="input"
+    Shader="PumpkinShader"
+    Smooth_Normals=true
+    Preserve_Creases=true
+    Range=3
+}

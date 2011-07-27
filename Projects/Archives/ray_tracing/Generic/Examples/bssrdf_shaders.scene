@@ -1,0 +1,57 @@
+Material{
+	Name="MarbleBSSRDFShader"
+	Type="BSSRDF"
+//	Sigma_s_Prime=2.19 2.62 3.00
+//	Sigma_a=.0021 .0041 .0071
+//	Sigma_s_Prime=21.9 26.2 30.0
+//	Sigma_a=.021 .041 .071
+	Sigma_s_Prime=11.9 18.2 10.0
+	Sigma_a=.041 .011 .071
+//	Sigma_s_Prime=2190 2620 3000
+//	Sigma_a=2.1 4.1 7.1
+	Diffuse_Reflectance=.83 .79 .75
+	Index_Of_Refraction=1.5
+	Specular_Color=0.008 0.008 0.008
+	Specular_Exponent=4.5
+	Error_Criterion=0.2
+}
+Material{
+	Name="Skin1BSSRDFShader"
+	Type="BSSRDF"
+	Sigma_s_Prime=74 88 101
+	Sigma_a=3.2 17 48
+	Diffuse_Reflectance=.44 .22 .13
+	Index_Of_Refraction=1.3
+	Specular_Color=0.01 0.01 0.01
+	Specular_Exponent=4.5
+	Error_Criterion=0.2
+}
+Material{
+	Name="Skin2BSSRDFShader"
+	Type="BSSRDF"
+	Sigma_s_Prime=109 159 179
+	Sigma_a=1.3 7.0 14.5
+	Diffuse_Reflectance=.63 .44 .34
+	Index_Of_Refraction=1.3
+	Specular_Color=0.01 0.01 0.01
+	Specular_Exponent=4.5
+	Error_Criterion=0.2
+}
+Material{
+	Type="Color"
+	Name="KetchupColor"
+	// color is normalized diffuse_reflectance for ketchup
+	Color=.998 .062 0
+}
+Material{
+	Name="KetchupBSSRDFShader"
+	Type="BSSRDF"
+	Shader="KetchupColor"
+	Sigma_s_Prime=18 7 3
+	Sigma_a=6.1 97 145
+	Diffuse_Reflectance=.16 .01 .00
+	Index_Of_Refraction=1.3
+	Specular_Color=0.03 0.03 0.03
+	Specular_Exponent=7
+	Error_Criterion=0.2
+}
