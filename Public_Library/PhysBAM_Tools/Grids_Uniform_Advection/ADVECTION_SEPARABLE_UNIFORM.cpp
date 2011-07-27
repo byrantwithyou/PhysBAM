@@ -135,6 +135,8 @@ Update_Advection_Equation_Face_Lookup(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z
         Update_Advection_Equation_Helper(*this,node_grid,Z.Component(i),Z_ghost.V_face.Component(i),V_face.Component(i),dt,time);}
 }
 //#####################################################################
+#if defined(_MSC_VER) && _MSC_VER<=1500 // compiler errors on MSVC9 :(
+#else
 template class ADVECTION_SEPARABLE_UNIFORM<GRID<VECTOR<float,1> >,float>;
 template class ADVECTION_SEPARABLE_UNIFORM<GRID<VECTOR<float,2> >,float>;
 template class ADVECTION_SEPARABLE_UNIFORM<GRID<VECTOR<float,3> >,float>;
@@ -142,4 +144,5 @@ template class ADVECTION_SEPARABLE_UNIFORM<GRID<VECTOR<float,3> >,float>;
 template class ADVECTION_SEPARABLE_UNIFORM<GRID<VECTOR<double,1> >,double>;
 template class ADVECTION_SEPARABLE_UNIFORM<GRID<VECTOR<double,2> >,double>;
 template class ADVECTION_SEPARABLE_UNIFORM<GRID<VECTOR<double,3> >,double>;
+#endif
 #endif

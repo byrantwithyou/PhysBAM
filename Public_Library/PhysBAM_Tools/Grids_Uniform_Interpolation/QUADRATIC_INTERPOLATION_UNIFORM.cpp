@@ -25,7 +25,7 @@ template<class T_GRID,class T2,class T_FACE_LOOKUP> QUADRATIC_INTERPOLATION_UNIF
 // Function Clamped_To_Array
 //#####################################################################
 template<class T_GRID,class T2,class T_FACE_LOOKUP> T2 QUADRATIC_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
-Clamped_To_Array(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X) const PHYSBAM_OVERRIDE
+Clamped_To_Array(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X) const
 {
     return From_Base_Node(grid,u,X,INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::Clamped_Index_Interior_End_Minus_One(grid,u,X));
 }
@@ -33,7 +33,7 @@ Clamped_To_Array(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X) const PHYS
 // Function Clamped_To_Array_Weights
 //#####################################################################
 template<class T_GRID,class T2,class T_FACE_LOOKUP> ARRAY<PAIR<typename T_GRID::VECTOR_INT,typename T_GRID::VECTOR_T::SCALAR> > QUADRATIC_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
-Clamped_To_Array_Weights(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X) const PHYSBAM_OVERRIDE
+Clamped_To_Array_Weights(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X) const
 {
     return From_Base_Node_Weights(grid,u,X,INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::Clamped_Index_Interior_End_Minus_One(grid,u,X));
 }
@@ -76,7 +76,7 @@ From_Base_Node_Weights(const GRID<TV>& grid,const ARRAYS_ND_BASE<VECTOR<T2,1> >&
         T a1=(u(index.x+2)+u(index.x)-(T)2*u(index.x+1))/(T)2;T a2=(u(index.x+1)+u(index.x-1)-(T)2*u(index.x))/(T)2;
         if(abs(a1)<abs(a2)){
             if(abs(u(index.x+1))>1e-5){weights.Append(PAIR<TV_INT,T>(TV_INT(index.x),(T)1-w+w*(w-(T)1)/(T)2));weights.Append(PAIR<TV_INT,T>(TV_INT(index.x+1),w-w*(w-(T)1)*((T)1-u(index.x+2)/((T)2*u(index.x+1)))));}
-            else if(abs(u(index.x))>1e-5){weights.Append(PAIR<TV_INT,T>(TV_INT(index.x),(T)1-w+w*(w-(T)1)/(T)2*(1.+u(index.x+2)/u(index.x))));weights.Append(PAIR<TV_INT,T>(TV_INT(index.x+1),w-w*(w-(T)1)));}
+            else if(abs(u(index.x))>1e-5){weights.Append(PAIR<TV_INT,T>(TV_INT(index.x),(T)1-w+w*(w-(T)1)/(T)2*((T)1+u(index.x+2)/u(index.x))));weights.Append(PAIR<TV_INT,T>(TV_INT(index.x+1),w-w*(w-(T)1)));}
             else{weights.Append(PAIR<TV_INT,T>(TV_INT(index.x),(T)1-w));weights.Append(PAIR<TV_INT,T2>(TV_INT(index.x+1),w));}}
         else{
             if(abs(u(index.x))>1e-5){weights.Append(PAIR<TV_INT,T>(TV_INT(index.x),(T)1-w-w*(w-(T)1)*((T)1-u(index.x-1)/((T)2*u(index.x)))));weights.Append(PAIR<TV_INT,T>(TV_INT(index.x+1),w+w*(w-(T)1)/(T)2));}

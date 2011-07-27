@@ -11,8 +11,10 @@
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Krylov_Solvers/PCG_SPARSE.h>
 #include <PhysBAM_Tools/Parallel_Computation/DOMAIN_ITERATOR_THREADED.h>
-#include <PhysBAM_Tools/Parallel_Computation/PTHREAD.h>
 #include <PhysBAM_Tools/Parallel_Computation/THREAD_QUEUE.h>
+#ifdef USE_PTHREADS
+#include <PhysBAM_Tools/Parallel_Computation/PTHREAD.h>
+#endif
 namespace PhysBAM{
 
 template<class TV>

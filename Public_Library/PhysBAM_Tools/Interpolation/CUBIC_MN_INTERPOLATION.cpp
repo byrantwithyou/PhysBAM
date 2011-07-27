@@ -52,10 +52,10 @@ Cubic_MN_Weights(const T alpha) const
     T alpha2=alpha*alpha;
     T alpha3=alpha2*alpha;
     ARRAY<T> weights;
-    weights.Append(-alpha3/2.+alpha2-.5*alpha); //f_k-1
-    weights.Append(alpha3/2.-5*alpha2/2.+1); //f_k
-    weights.Append(-alpha3/2.+2*alpha2+alpha/2.); //f_k+1
-    weights.Append(alpha3/2.-alpha2/2.);  //f_k+2
+    weights.Append((T)(-alpha3/2.+alpha2-.5*alpha)); //f_k-1
+    weights.Append((T)(alpha3/2.-5*alpha2/2.+1.)); //f_k
+    weights.Append((T)(-alpha3/2.+2*alpha2+alpha/2.)); //f_k+1
+    weights.Append((T)(alpha3/2.-alpha2/2.));  //f_k+2
     for(int i=1;i<=weights.m;i++) weights(i)=max((T)0.,min((T)1.,weights(i)));
     return weights;
 }

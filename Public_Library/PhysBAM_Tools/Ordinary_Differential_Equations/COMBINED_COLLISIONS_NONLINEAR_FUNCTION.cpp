@@ -91,11 +91,11 @@ Test_System(const CP* y) const
     LOG::cout<<"Approximated (r): "<<ngr.parameters<<std::endl;
     LOG::cout<<"Approximated (c): "<<ngc.parameters<<std::endl;
 }
-template class COMBINED_COLLISIONS_NONLINEAR_FUNCTION<VECTOR<float,1> >;
-template class COMBINED_COLLISIONS_NONLINEAR_FUNCTION<VECTOR<float,2> >;
-template class COMBINED_COLLISIONS_NONLINEAR_FUNCTION<VECTOR<float,3> >;
+template struct COMBINED_COLLISIONS_NONLINEAR_FUNCTION<VECTOR<float,1> >;
+template struct COMBINED_COLLISIONS_NONLINEAR_FUNCTION<VECTOR<float,2> >;
+template struct COMBINED_COLLISIONS_NONLINEAR_FUNCTION<VECTOR<float,3> >;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-template class COMBINED_COLLISIONS_NONLINEAR_FUNCTION<VECTOR<double,1> >;
-template class COMBINED_COLLISIONS_NONLINEAR_FUNCTION<VECTOR<double,2> >;
-template class COMBINED_COLLISIONS_NONLINEAR_FUNCTION<VECTOR<double,3> >;
+template struct COMBINED_COLLISIONS_NONLINEAR_FUNCTION<VECTOR<double,1> >;
+template struct COMBINED_COLLISIONS_NONLINEAR_FUNCTION<VECTOR<double,2> >;
+template struct COMBINED_COLLISIONS_NONLINEAR_FUNCTION<VECTOR<double,3> >;
 #endif

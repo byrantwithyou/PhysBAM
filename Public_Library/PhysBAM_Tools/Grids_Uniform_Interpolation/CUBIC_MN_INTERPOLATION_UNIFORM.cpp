@@ -97,17 +97,17 @@ From_Base_Node(const CUBIC_MN_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>& cu
 // Function Clamped_To_Array
 //#####################################################################
 template<class T_GRID,class T2,class T_FACE_LOOKUP> T2 CUBIC_MN_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
-Clamped_To_Array(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X) const PHYSBAM_OVERRIDE
+Clamped_To_Array(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X) const
 {
-    return From_Base_Node(*this,grid,u,X,INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::Clamped_Index_Interior_End_Minus_One(grid,u,X)-TV_INT::All_Ones_Vector());
+    return ::From_Base_Node(*this,grid,u,X,INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::Clamped_Index_Interior_End_Minus_One(grid,u,X)-TV_INT::All_Ones_Vector());
 }
 //#####################################################################
 // Function Clamped_To_Array_Weights
 //#####################################################################
 template<class T_GRID,class T2,class T_FACE_LOOKUP> ARRAY<PAIR<typename T_GRID::VECTOR_INT,typename T_GRID::VECTOR_T::SCALAR> > CUBIC_MN_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
-Clamped_To_Array_Weights(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X) const PHYSBAM_OVERRIDE
+Clamped_To_Array_Weights(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X) const
 {
-    return From_Base_Node_Weights(*this,grid,u,X,INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::Clamped_Index_Interior_End_Minus_One(grid,u,X)-TV_INT::All_Ones_Vector());
+    return ::From_Base_Node_Weights(*this,grid,u,X,INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::Clamped_Index_Interior_End_Minus_One(grid,u,X)-TV_INT::All_Ones_Vector());
 }
 namespace{
 //#####################################################################
@@ -143,7 +143,7 @@ template<class T,class TV,class T_GRID,class T2,class T_FACE_LOOKUP,int d> T2
 template<class T_GRID,class T2,class T_FACE_LOOKUP> T2 CUBIC_MN_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
 Periodic(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X) const
 {
-    return From_Base_Node_Periodic(*this,grid,u,X,grid.Cell(X,0)-TV_INT::All_Ones_Vector());
+    return ::From_Base_Node_Periodic(*this,grid,u,X,grid.Cell(X,0)-TV_INT::All_Ones_Vector());
 }
 template class CUBIC_MN_INTERPOLATION_UNIFORM<GRID<VECTOR<float,1> >,float,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,1> > > >;
 template class CUBIC_MN_INTERPOLATION_UNIFORM<GRID<VECTOR<float,2> >,float,FACE_LOOKUP_UNIFORM<GRID<VECTOR<float,2> > > >;

@@ -13,8 +13,8 @@
 #include <iomanip>
 #include <iostream>
 #if defined(WIN32)
-#include <psapi.h>
 #include <windows.h>
+#include <psapi.h>
 #pragma comment(lib,"psapi")
 #elif defined(__linux__) || defined(__APPLE__)
 #include <csignal>

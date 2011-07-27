@@ -89,6 +89,7 @@ public:
     virtual T2 Clamped_To_Array_No_Extrema(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
     virtual ARRAY<PAIR<TV_INT,T> > Clamped_To_Array_Weights(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
     virtual T2 Clamped_To_Array(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
+    virtual ARRAY<PAIR<TV_INT,T> > From_Base_Node_Weights(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X,const TV_INT& index) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
     virtual T2 From_Base_Node(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X,const TV_INT& index) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
     virtual TV From_Block_Face(const T_GRID& grid,const BLOCK_UNIFORM<T_GRID>& block,const typename T_FACE_LOOKUP::LOOKUP& u,const TV& X) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
     virtual T From_Block_Face_Component(const int axis,const T_GRID& grid,const BLOCK_UNIFORM<T_GRID>& block,const typename T_FACE_LOOKUP::LOOKUP& u,const TV& X) const

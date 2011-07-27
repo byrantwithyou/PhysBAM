@@ -19,7 +19,7 @@ static const int COMBINED_COLLISIONS_TYPE_DEFORMABLE=0x40000000;
 
 inline bool Combined_Body_Id_Is_Rigid(COMBINED_BODY_ID id)
 {
-    return Value(id)&COMBINED_COLLISIONS_TYPE_RIGID;
+    return (Value(id)&COMBINED_COLLISIONS_TYPE_RIGID)!=0;
 }
 
 inline int Combined_Body_Id_To_Rigid_Body(COMBINED_BODY_ID id)

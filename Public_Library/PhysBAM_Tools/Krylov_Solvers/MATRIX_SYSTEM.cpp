@@ -26,7 +26,7 @@ template<class T_MATRIX,class T,class VECTOR_T,class T_MATRIX_PRECON> MATRIX_SYS
 // Function Multiply
 //#####################################################################
 template<class T_MATRIX,class T,class VECTOR_T,class T_MATRIX_PRECON> void MATRIX_SYSTEM<T_MATRIX,T,VECTOR_T,T_MATRIX_PRECON>::
-Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const PHYSBAM_OVERRIDE
+Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const
 {
     const VECTOR_T& vx=dynamic_cast<const VECTOR_T&>(x);
     VECTOR_T& vresult=dynamic_cast<VECTOR_T&>(result);
@@ -36,7 +36,7 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const PHY
 // Function Inner_Product
 //#####################################################################
 template<class T_MATRIX,class T,class VECTOR_T,class T_MATRIX_PRECON> double MATRIX_SYSTEM<T_MATRIX,T,VECTOR_T,T_MATRIX_PRECON>::
-Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const PHYSBAM_OVERRIDE
+Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const
 {
     const VECTOR_T& vx=dynamic_cast<const VECTOR_T&>(x),vy=dynamic_cast<const VECTOR_T&>(y);
     return vx.v.Dot_Product_Double_Precision(vx.v,vy.v);
@@ -45,7 +45,7 @@ Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) con
 // Function Convergence_Norm
 //#####################################################################
 template<class T_MATRIX,class T,class VECTOR_T,class T_MATRIX_PRECON> T MATRIX_SYSTEM<T_MATRIX,T,VECTOR_T,T_MATRIX_PRECON>::
-Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& x) const PHYSBAM_OVERRIDE
+Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& x) const
 {
     const VECTOR_T& vx=dynamic_cast<const VECTOR_T&>(x);
     return vx.v.Maximum_Magnitude();
@@ -54,21 +54,21 @@ Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& x) const PHYSBAM_OVERRIDE
 // Function Project
 //#####################################################################
 template<class T_MATRIX,class T,class VECTOR_T,class T_MATRIX_PRECON> void MATRIX_SYSTEM<T_MATRIX,T,VECTOR_T,T_MATRIX_PRECON>::
-Project(KRYLOV_VECTOR_BASE<T>& x) const PHYSBAM_OVERRIDE
+Project(KRYLOV_VECTOR_BASE<T>& x) const
 {
 }
 //#####################################################################
 // Function Set_Boundary_Conditions
 //#####################################################################
 template<class T_MATRIX,class T,class VECTOR_T,class T_MATRIX_PRECON> void MATRIX_SYSTEM<T_MATRIX,T,VECTOR_T,T_MATRIX_PRECON>::
-Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& x) const PHYSBAM_OVERRIDE
+Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& x) const
 {
 }
 //#####################################################################
 // Function Project_Nullspace
 //#####################################################################
 template<class T_MATRIX,class T,class VECTOR_T,class T_MATRIX_PRECON> void MATRIX_SYSTEM<T_MATRIX,T,VECTOR_T,T_MATRIX_PRECON>::
-Project_Nullspace(KRYLOV_VECTOR_BASE<T>& x) const PHYSBAM_OVERRIDE
+Project_Nullspace(KRYLOV_VECTOR_BASE<T>& x) const
 {
 } 
 //#####################################################################
@@ -92,7 +92,7 @@ Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) co
     P->Solve_Forward_Substitution(vr.v,temp_vector->v,true);
     P->Solve_Backward_Substitution(temp_vector->v,vz.v,false,true);
 }
-template class MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_NXN<float>,float,KRYLOV_VECTOR_WRAPPER<float,VECTOR_ND<float> > >;
+template struct MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_NXN<float>,float,KRYLOV_VECTOR_WRAPPER<float,VECTOR_ND<float> > >;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-template class MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_NXN<double>,double,KRYLOV_VECTOR_WRAPPER<double,VECTOR_ND<double> > >;
+template struct MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_NXN<double>,double,KRYLOV_VECTOR_WRAPPER<double,VECTOR_ND<double> > >;
 #endif

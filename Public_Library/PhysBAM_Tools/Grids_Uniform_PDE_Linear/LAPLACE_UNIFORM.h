@@ -88,8 +88,10 @@ public:
     void Set_Dirichlet_Outer_Boundaries();
     virtual void Initialize_Grid(const T_GRID& mac_grid_input);
     virtual void Solve(const T time=0,const bool solution_regions_already_computed=false);
-    void Set_Threaded_Boundary(RANGE<TV_INT>& domain,ARRAY<bool,FACE_INDEX<TV::dimension> >& psi_N);
-    void Solve_Threaded(RANGE<TV_INT>& domain,const GRID<TV>& threaded_grid,const T time=0);
+    // Undefined in cpp.
+    //void Set_Threaded_Boundary(RANGE<TV_INT>& domain,ARRAY<bool,FACE_INDEX<TV::dimension> >& psi_N);
+    // Undefined in cpp.
+    //void Solve_Threaded(RANGE<TV_INT>& domain,const GRID<TV>& threaded_grid,const T time=0);
     virtual void Find_A(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array,ARRAY<VECTOR_ND<T> >& b_array,const ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,T_ARRAYS_INT& cell_index_to_matrix_index);
     virtual void Find_A_Part_One(RANGE<TV_INT>& domain,T_ARRAYS_INT& cell_index_to_matrix_index,ARRAY<ARRAY<int> >& row_counts);
     virtual void Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array,ARRAY<VECTOR_ND<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index);

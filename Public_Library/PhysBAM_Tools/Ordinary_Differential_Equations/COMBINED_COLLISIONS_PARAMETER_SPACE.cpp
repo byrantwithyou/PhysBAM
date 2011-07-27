@@ -71,11 +71,11 @@ Dot(const P& x) const
         dot+=ARRAYS_COMPUTATIONS::Dot_Product(parameters(i),cx.parameters(i));
     return dot;
 }
-template class COMBINED_COLLISIONS_PARAMETER_SPACE<VECTOR<float,1> >;
-template class COMBINED_COLLISIONS_PARAMETER_SPACE<VECTOR<float,2> >;
-template class COMBINED_COLLISIONS_PARAMETER_SPACE<VECTOR<float,3> >;
+template struct COMBINED_COLLISIONS_PARAMETER_SPACE<VECTOR<float,1> >;
+template struct COMBINED_COLLISIONS_PARAMETER_SPACE<VECTOR<float,2> >;
+template struct COMBINED_COLLISIONS_PARAMETER_SPACE<VECTOR<float,3> >;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-template class COMBINED_COLLISIONS_PARAMETER_SPACE<VECTOR<double,1> >;
-template class COMBINED_COLLISIONS_PARAMETER_SPACE<VECTOR<double,2> >;
-template class COMBINED_COLLISIONS_PARAMETER_SPACE<VECTOR<double,3> >;
+template struct COMBINED_COLLISIONS_PARAMETER_SPACE<VECTOR<double,1> >;
+template struct COMBINED_COLLISIONS_PARAMETER_SPACE<VECTOR<double,2> >;
+template struct COMBINED_COLLISIONS_PARAMETER_SPACE<VECTOR<double,3> >;
 #endif

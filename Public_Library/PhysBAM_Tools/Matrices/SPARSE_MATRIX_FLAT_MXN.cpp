@@ -605,7 +605,7 @@ Two_Norm(ARRAY<SPARSE_MATRIX_ENTRY<T> >& q)
 {
     double total=0;
     for(int i=1;i<=q.m;i++) total+=sqr(q(i).a);
-    return sqrt(total);
+    return (T)sqrt(total);
 }
 //#####################################################################
 // Function Construct_Incomplete_LQ_Factorization

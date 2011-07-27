@@ -41,7 +41,7 @@ Solve(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<IN
     temp_interior.Set_Subvector_View(temp,interior_indices);
 
     // adjust x for the null space
-    if(enforce_compatibility && remove_null_space_solution_component) x_interior-=(T)(Global_Sum(x_interior.Sum_Double_Precision(),tid)/global_n);
+    if(enforce_compatibility && remove_null_space_solution_component) x_interior-=(T)(Global_Sum((T)x_interior.Sum_Double_Precision(),tid)/global_n);
 
     // find initial residual, r=b-Ax - reusing b for the residual
 #ifdef USE_PTHREADS
@@ -49,7 +49,7 @@ Solve(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<IN
 #endif
     A.Times(interior_indices,ghost_indices,x,temp);
     b_interior-=temp_interior;
-    if(enforce_compatibility) b_interior-=(T)(Global_Sum(b_interior.Sum_Double_Precision(),tid)/global_n);
+    if(enforce_compatibility) b_interior-=(T)(Global_Sum((T)b_interior.Sum_Double_Precision(),tid)/global_n);
     if(Global_Max(b_interior.Max_Abs())<=global_tolerance){
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         if(show_results) LOG::cout<<"NO ITERATIONS NEEDED"<<std::endl;
@@ -72,10 +72,10 @@ Solve(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<IN
         else z_interior=b_interior; // set z=r when there is no preconditioner
 
         // for Neumann boundary conditions only, make sure z sums to zero
-        if(enforce_compatibility) z_interior-=(T)(Global_Sum(z_interior.Sum_Double_Precision(),tid)/global_n);
+        if(enforce_compatibility) z_interior-=(T)(Global_Sum((T)z_interior.Sum_Double_Precision(),tid)/global_n);
 
         // update search direction
-        rho_old=rho;rho=Global_Sum(VECTOR_ND<T>::Dot_Product_Double_Precision(z_interior,b_interior),tid);
+        rho_old=rho;rho=Global_Sum((T)VECTOR_ND<T>::Dot_Product_Double_Precision(z_interior,b_interior),tid);
         T beta=0;if(iteration==1) p_interior=z_interior;else{beta=(T)(rho/rho_old);for(int i=1;i<=interior_n;i++) p_interior(i)=z_interior(i)+beta*p_interior(i);} // when iteration=1, beta=0
 
         // update solution and residual
@@ -83,11 +83,11 @@ Solve(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<IN
         pthread_barrier_wait(&barr);
 #endif
         A.Times(interior_indices,ghost_indices,p,temp);
-        T alpha=(T)(rho/Global_Sum(VECTOR_ND<T>::Dot_Product_Double_Precision(p_interior,temp_interior),tid));
+        T alpha=(T)(rho/Global_Sum((T)VECTOR_ND<T>::Dot_Product_Double_Precision(p_interior,temp_interior),tid));
         for(int i=1;i<=interior_n;i++){x_interior(i)+=alpha*p_interior(i);b_interior(i)-=alpha*temp_interior(i);}
 
         // remove null space component of b before computing residual norm because we might have converged up to the null space but have some null space component left due to roundoff
-        if(enforce_compatibility) b_interior-=(T)(Global_Sum(b_interior.Sum_Double_Precision(),tid)/global_n);
+        if(enforce_compatibility) b_interior-=(T)(Global_Sum((T)b_interior.Sum_Double_Precision(),tid)/global_n);
 
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         T residual=Global_Max(b_interior.Max_Abs());
@@ -158,13 +158,13 @@ Solve_In_Parts(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,cons
         // update search direction
         threaded_iterator.template Run<VECTOR_ND<T>&,VECTOR_ND<T>&,ARRAY<T>&>(*this,&PCG_SPARSE_THREADED<TV>::Threaded_Dot,z,b,local_sum);
         rho_old=rho;rho=0;for(int i=1;i<=num_intervals;i++) rho+=local_sum(i);
-        threaded_iterator.template Run<VECTOR_ND<T>&,T,T,int>(*this,&PCG_SPARSE_THREADED<TV>::Threaded_Part_Two,z,rho,rho_old,iteration);
+        threaded_iterator.template Run<VECTOR_ND<T>&,T,T,int>(*this,&PCG_SPARSE_THREADED<TV>::Threaded_Part_Two,z,(T)rho,(T)rho_old,iteration);
         
         // update solution and residual
         threaded_iterator.template Run<SPARSE_MATRIX_FLAT_NXN<T>&>(*this,&PCG_SPARSE_THREADED<TV>::Threaded_Part_Three,A);
         threaded_iterator.template Run<VECTOR_ND<T>&,VECTOR_ND<T>&,ARRAY<T>&>(*this,&PCG_SPARSE_THREADED<TV>::Threaded_Dot,p,temp,local_sum);
         T sum=0;for(int i=1;i<=num_intervals;i++) sum+=local_sum(i);
-        threaded_iterator.template Run<VECTOR_ND<T>&,VECTOR_ND<T>&,T>(*this,&PCG_SPARSE_THREADED<TV>::Threaded_Part_Four,x,b,rho/sum);
+        threaded_iterator.template Run<VECTOR_ND<T>&,VECTOR_ND<T>&,T>(*this,&PCG_SPARSE_THREADED<TV>::Threaded_Part_Four,x,b,(T)(rho/sum));
 
         // remove null space component of b before computing residual norm because we might have converged up to the null space but have some null space component left due to roundoff
         if(enforce_compatibility){T sum=0;
@@ -237,13 +237,13 @@ Solve_In_Parts(DOMAIN_ITERATOR_THREADED_ALPHA<PCG_SPARSE_THREADED<TV>,TV>& threa
         // update search direction
         threaded_iterator.template Run<const ARRAY<int,TV_INT>&,const ARRAY<INTERVAL<int> >&,ARRAY<VECTOR_ND<T> >&,ARRAY<VECTOR_ND<T> >&,ARRAY<T>&>(*this,&PCG_SPARSE_THREADED<TV>::Solve_Dot,domain_index,all_interior_indices,z_interior,b_interior,local_sum);
         rho_old=rho;rho=0;for(int i=1;i<=num_domains;i++) rho+=local_sum(i);
-        threaded_iterator.template Run<const ARRAY<int,TV_INT>&,const ARRAY<INTERVAL<int> >&,ARRAY<VECTOR_ND<T> >&,ARRAY<VECTOR_ND<T> >&,T,T,int>(*this,&PCG_SPARSE_THREADED<TV>::Solve_Part_Five,domain_index,all_interior_indices,z_interior,p_interior,rho,rho_old,iteration);
+        threaded_iterator.template Run<const ARRAY<int,TV_INT>&,const ARRAY<INTERVAL<int> >&,ARRAY<VECTOR_ND<T> >&,ARRAY<VECTOR_ND<T> >&,T,T,int>(*this,&PCG_SPARSE_THREADED<TV>::Solve_Part_Five,domain_index,all_interior_indices,z_interior,p_interior,(T)rho,(T)rho_old,iteration);
         
         // update solution and residual
         threaded_iterator.template Run<const ARRAY<int,TV_INT>&,const ARRAY<INTERVAL<int> >&,const ARRAY<ARRAY<INTERVAL<int> > >&,const SPARSE_MATRIX_FLAT_NXN<T>&>(*this,&PCG_SPARSE_THREADED<TV>::Solve_Part_Six,domain_index,all_interior_indices,all_ghost_indices,A);
         threaded_iterator.template Run<const ARRAY<int,TV_INT>&,const ARRAY<INTERVAL<int> >&,ARRAY<VECTOR_ND<T> >&,ARRAY<VECTOR_ND<T> >&,ARRAY<T>&>(*this,&PCG_SPARSE_THREADED<TV>::Solve_Dot,domain_index,all_interior_indices,p_interior,temp_interior,local_sum);
         T sum=0;for(int i=1;i<=num_domains;i++) sum+=local_sum(i);
-        threaded_iterator.template Run<const ARRAY<int,TV_INT>&,const ARRAY<INTERVAL<int> >&,ARRAY<VECTOR_ND<T> >&,ARRAY<VECTOR_ND<T> >&,ARRAY<VECTOR_ND<T> >&,ARRAY<VECTOR_ND<T> >&,T>(*this,&PCG_SPARSE_THREADED<TV>::Solve_Part_Seven,domain_index,all_interior_indices,x_interior,b_interior,p_interior,temp_interior,rho/sum);
+        threaded_iterator.template Run<const ARRAY<int,TV_INT>&,const ARRAY<INTERVAL<int> >&,ARRAY<VECTOR_ND<T> >&,ARRAY<VECTOR_ND<T> >&,ARRAY<VECTOR_ND<T> >&,ARRAY<VECTOR_ND<T> >&,T>(*this,&PCG_SPARSE_THREADED<TV>::Solve_Part_Seven,domain_index,all_interior_indices,x_interior,b_interior,p_interior,temp_interior,(T)(rho/sum));
 
         // remove null space component of b before computing residual norm because we might have converged up to the null space but have some null space component left due to roundoff
         if(enforce_compatibility){T sum=0;
@@ -357,7 +357,7 @@ Solve_Sum(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRA
 {
     RANGE<TV_INT> interior_domain(domain);interior_domain.max_corner-=TV_INT::All_Ones_Vector();interior_domain.min_corner+=TV_INT::All_Ones_Vector();
     int tid=domain_index(interior_domain.min_corner);
-    sum(tid)=interior(tid).Sum_Double_Precision();
+    sum(tid)=(T)interior(tid).Sum_Double_Precision();
 }
 template<class TV> void PCG_SPARSE_THREADED<TV>::
 Solve_Max(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,ARRAY<VECTOR_ND<T> >& interior,ARRAY<T>& sum)
@@ -371,7 +371,7 @@ Solve_Dot(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRA
 {
     RANGE<TV_INT> interior_domain(domain);interior_domain.max_corner-=TV_INT::All_Ones_Vector();interior_domain.min_corner+=TV_INT::All_Ones_Vector();
     int tid=domain_index(interior_domain.min_corner);
-    sum(tid)=VECTOR_ND<T>::Dot_Product_Double_Precision(interior_1(tid),interior_2(tid));
+    sum(tid)=(T)VECTOR_ND<T>::Dot_Product_Double_Precision(interior_1(tid),interior_2(tid));
 }
 template<class TV> void PCG_SPARSE_THREADED<TV>::
 Threaded_Subtract(VECTOR_ND<T>& vector,const T sum,int start_index,int end_index)
@@ -381,12 +381,12 @@ Threaded_Subtract(VECTOR_ND<T>& vector,const T sum,int start_index,int end_index
 template<class TV> void PCG_SPARSE_THREADED<TV>::
 Threaded_Sum(VECTOR_ND<T>& vector,ARRAY<T>& sum,int start_index,int end_index,int tid)
 {
-    sum(tid)=vector.Sum_Double_Precision(start_index,end_index);
+    sum(tid)=(T)vector.Sum_Double_Precision(start_index,end_index);
 }
 template<class TV> void PCG_SPARSE_THREADED<TV>::
 Threaded_Dot(VECTOR_ND<T>& vector1,VECTOR_ND<T>& vector2,ARRAY<T>& sum,int start_index,int end_index,int tid)
 {
-    sum(tid)=VECTOR_ND<T>::Dot_Product_Double_Precision(vector1,vector2,start_index,end_index);
+    sum(tid)=(T)VECTOR_ND<T>::Dot_Product_Double_Precision(vector1,vector2,start_index,end_index);
 }
 template<class TV> void PCG_SPARSE_THREADED<TV>::
 Threaded_Max(VECTOR_ND<T>& vector,ARRAY<T>& sum,int start_index,int end_index,int tid)

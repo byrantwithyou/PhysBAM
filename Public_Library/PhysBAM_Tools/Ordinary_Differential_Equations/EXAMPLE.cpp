@@ -141,7 +141,7 @@ Override_Options()
         substeps_delay_level=parse_args->Get_Integer_Value("-substeps");}
     else if(parse_args->Is_Value_Set("-substeps")) Set_Write_Substeps_Level(parse_args->Get_Integer_Value("-substeps"));
     if(parse_args->Is_Value_Set("-first_frame")) first_frame=parse_args->Get_Integer_Value("-first_frame");
-    if(parse_args->Is_Value_Set("-framerate")) frame_rate=parse_args->Get_Double_Value("-framerate");
+    if(parse_args->Is_Value_Set("-framerate")) frame_rate=(T)parse_args->Get_Double_Value("-framerate");
     if(parse_args->Is_Value_Set("-query_output")){LOG::cout<<output_directory;exit(0);}
     if(parse_args->Is_Value_Set("-dt")) fixed_dt=(T)parse_args->Get_Double_Value("-dt");
 

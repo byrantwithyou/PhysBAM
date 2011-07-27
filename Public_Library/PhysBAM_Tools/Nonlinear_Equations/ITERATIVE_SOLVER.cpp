@@ -299,5 +299,8 @@ Conjugate_Gradient(NONLINEAR_FUNCTION<T(PARAMETER_SPACE<T>)>& F,PARAMETER_SPACE<
     delete &tmp;
 }
 //####################################################################################
+#if defined(_MSC_VER) && _MSC_VER<=1500 // currently broken on MSVC9 :(
+#else
 template class ITERATIVE_SOLVER<float>;
 template class ITERATIVE_SOLVER<double>;
+#endif

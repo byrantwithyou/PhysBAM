@@ -59,6 +59,12 @@ public:
 template<class T>
 struct PARAMETER_SPACE
 {
+private:
+    struct UNUSABLE {};
+public:
+    typedef T SCALAR;
+    typedef UNUSABLE SPIN;
+
     virtual ~PARAMETER_SPACE(){}
 
     virtual PARAMETER_SPACE<T>& Zero_Clone() const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
@@ -82,7 +88,7 @@ struct NONLINEAR_FUNCTION<T(PARAMETER_SPACE<T>)>
 };
 
 template<class T>
-struct PARAMETRIC_LINE<T,T(PARAMETER_SPACE<T>)>:public NONLINEAR_FUNCTION<T(T)>
+struct PARAMETRIC_LINE<T,T(PARAMETER_SPACE<T>)>:public NONLINEAR_FUNCTION<T(PARAMETER_SPACE<T>)>
 {
     typedef PARAMETER_SPACE<T> TV;
     typedef NONLINEAR_FUNCTION<T(PARAMETER_SPACE<T>)> F;

@@ -120,11 +120,11 @@ public:
             for(test_count.z=1;test_count.z<=number_of_domains;test_count.z++) if(number_of_domains%test_count.z==0){
                 if(Minimize_2D_Surface_Area(number_of_domains/test_count.z,x,y,test_count.x)){
                     test_count.y=number_of_domains/(test_count.x*test_count.z);
-                    T surface_area=test_count.x*(y*z)+test_count.y*(x*z)+test_count.z*(x*y);
+                    T surface_area=((T)test_count.x)*(y*z)+((T)test_count.y)*(x*z)+((T)test_count.z)*(x*y);
                     if(surface_area<minimum_surface_area){count=test_count;minimum_surface_area=surface_area;}}
                 if(Minimize_2D_Surface_Area(number_of_domains/test_count.z,x,y,test_count.y)){
                     test_count.x=number_of_domains/(test_count.y*test_count.z);
-                    T surface_area=test_count.x*(y*z)+test_count.y*(x*z)+test_count.z*(x*y);
+                    T surface_area=((T)test_count.x)*(y*z)+((T)test_count.y)*(x*z)+((T)test_count.z)*(x*y);
                     if(surface_area<minimum_surface_area){count=test_count;minimum_surface_area=surface_area;}}}
             if(minimum_surface_area==INT_MAX){LOG::cerr<<"Don't know how to divide domain in all directions."<<std::endl;PHYSBAM_NOT_IMPLEMENTED();}}
         PHYSBAM_ASSERT(count.x*count.y*count.z==number_of_domains);

@@ -440,7 +440,7 @@ Find_And_Read_Central_Header()
     if(read_start<=0){LOG::cerr<<"ZIP: Invalid read buffer size"<<std::endl;return false;}
     istream.read(buf,read_start);
     int found=-1;
-    for(unsigned int i=0;i<read_start-3;i++){
+    for(unsigned int i=0;(int)i<read_start-3;i++){
         if(buf[i]==0x50 && buf[i+1]==0x4b && buf[i+2]==0x05 && buf[i+3]==0x06){found=i;break;}}
     delete [] buf;
     if(found==-1){LOG::cerr<<"ZIP: Failed to find zip header"<<std::endl;return false;}

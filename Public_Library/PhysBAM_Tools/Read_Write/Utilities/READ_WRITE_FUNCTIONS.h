@@ -31,6 +31,31 @@ inline std::ostream& operator<<(std::ostream& output_stream,R (*func)(A,B,C,D))
 //#####################################################################
 // Read_Binary
 //#####################################################################
+#if defined(_MSC_VER) && _MSC_VER<=1500 // error C2770 workaround
+
+namespace Detail_READ_WRITE_FUNCTIONS{
+template<class RW,class T,bool=HAS_TYPED_READ<T>::value,bool=IS_BINARY_IO_SAFE<T,RW>::value>
+struct READ_BINARY_DISPATCH;
+template<class RW,class T>
+struct READ_BINARY_DISPATCH<RW,T,false,false>
+{static void Apply(std::istream& input,T& d)
+{Read_Write<T,RW>::Read(input,d);}};
+template<class RW,class T>
+struct READ_BINARY_DISPATCH<RW,T,false,true>
+{static void Apply(std::istream& input,T& d)
+{input.read(reinterpret_cast<char*>(&d),sizeof(T));}};
+template<class RW,class T,bool dummy>
+struct READ_BINARY_DISPATCH<RW,T,true,dummy>
+{static void Apply(std::istream& input,T& d)
+{TYPED_ISTREAM typed_input(input,STREAM_TYPE(RW()));d.Read(typed_input);}};
+}
+
+template<class RW,class T> inline void
+Read_Binary(std::istream& input,T& d)
+{Detail_READ_WRITE_FUNCTIONS::READ_BINARY_DISPATCH<RW,T>::Apply(input,d);}
+
+#else
+
 template<class RW,class T> inline typename DISABLE_IF<OR<HAS_TYPED_READ<T>::value,IS_BINARY_IO_SAFE<T,RW>::value>::value>::TYPE
 Read_Binary(std::istream& input,T& d)
 {Read_Write<T,RW>::Read(input,d);}
@@ -42,6 +67,8 @@ Read_Binary(std::istream& input,T& d)
 template<class RW,class T> inline typename ENABLE_IF<HAS_TYPED_READ<T>::value>::TYPE
 Read_Binary(std::istream& input,T& d)
 {TYPED_ISTREAM typed_input(input,STREAM_TYPE(RW()));d.Read(typed_input);}
+
+#endif
 
 template<class T> inline typename DISABLE_IF<HAS_TYPED_READ<T>::value>::TYPE
 Read_Binary(TYPED_ISTREAM& input,T& d)
@@ -59,21 +86,45 @@ Read_Binary(TYPED_ISTREAM& input,T& d)
 //#####################################################################
 // Write_Binary
 //#####################################################################
-template<class RW,class T> inline typename ENABLE_IF<!HAS_TYPED_READ<T>::value && !IS_BINARY_IO_SAFE<T,RW>::value>::TYPE
-Write_Binary(std::ostream& output,const T& d)
-{
-    Read_Write<T,RW>::Write(output,d);
+
+#if defined(_MSC_VER) && _MSC_VER<=1500 // error C2770 workaround
+
+namespace Detail_READ_WRITE_FUNCTIONS{
+template<class RW,class T,bool=HAS_TYPED_WRITE<T>::value,bool=IS_BINARY_IO_SAFE<T,RW>::value>
+struct WRITE_BINARY_DISPATCH;
+template<class RW,class T>
+struct WRITE_BINARY_DISPATCH<RW,T,false,false>
+{static void Apply(std::ostream& output,const T& d)
+{Read_Write<T,RW>::Write(output,d);}};
+template<class RW,class T>
+struct WRITE_BINARY_DISPATCH<RW,T,false,true>
+{static void Apply(std::ostream& output,const T& d)
+{output.write(reinterpret_cast<const char*>(&d),sizeof(T));}};
+template<class RW,class T,bool dummy>
+struct WRITE_BINARY_DISPATCH<RW,T,true,dummy>
+{static void Apply(std::ostream& output,const T& d)
+{TYPED_OSTREAM typed_output(output,STREAM_TYPE(RW()));d.Write(typed_output);}};
 }
 
-template<class RW,class T> inline typename ENABLE_IF<!HAS_TYPED_READ<T>::value && IS_BINARY_IO_SAFE<T,RW>::value>::TYPE
+template<class RW,class T> inline void
+Write_Binary(std::ostream& output,const T& d)
+{Detail_READ_WRITE_FUNCTIONS::WRITE_BINARY_DISPATCH<RW,T>::Apply(output,d);}
+
+#else
+
+template<class RW,class T> inline typename ENABLE_IF<!HAS_TYPED_WRITE<T>::value && !IS_BINARY_IO_SAFE<T,RW>::value>::TYPE
+Write_Binary(std::ostream& output,const T& d)
+{Read_Write<T,RW>::Write(output,d);}
+
+template<class RW,class T> inline typename ENABLE_IF<!HAS_TYPED_WRITE<T>::value && IS_BINARY_IO_SAFE<T,RW>::value>::TYPE
 Write_Binary(std::ostream& output,const T& d)
 {output.write(reinterpret_cast<const char*>(&d),sizeof(T));}
 
 template<class RW,class T> inline typename ENABLE_IF<HAS_TYPED_WRITE<T>::value>::TYPE
 Write_Binary(std::ostream& output,const T& d)
-{
-    TYPED_OSTREAM typed_output(output,STREAM_TYPE(RW()));d.Write(typed_output);
-}
+{TYPED_OSTREAM typed_output(output,STREAM_TYPE(RW()));d.Write(typed_output);}
+
+#endif
 
 template<class T> inline typename DISABLE_IF<HAS_TYPED_WRITE<T>::value>::TYPE
 Write_Binary(TYPED_OSTREAM& output,const T& d)
@@ -238,6 +289,33 @@ Write_Binary(output,d7);Write_Binary(output,d8);Write_Binary(output,d9);}
 // Read/Write_Binary_Array
 //#####################################################################
 // array is C-style (zero-based) array
+#if defined(_MSC_VER) && _MSC_VER<=1500 // error C2770 workaround
+
+namespace Detail_READ_WRITE_FUNCTIONS{
+template<class RW,class T,bool=IS_BINARY_IO_SAFE<T,RW>::value>
+struct BINARY_ARRAY_DISPATCH{
+static void Read(std::istream& input,T* array,const int number_of_elements)
+{for(int i=0;i<number_of_elements;i++) Read_Write<T,RW>::Read(input,array[i]);}
+static void Write(std::ostream& output,const T* array,const int number_of_elements)
+{for(int i=0;i<number_of_elements;i++) Read_Write<T,RW>::Write(output,array[i]);}};
+template<class RW,class T>
+struct BINARY_ARRAY_DISPATCH<RW,T,true>{
+static void Read(std::istream& input,T* array,const int number_of_elements)
+{input.read(reinterpret_cast<char*>(array),number_of_elements*sizeof(T));}
+static void Write(std::ostream& output,const T* array,const int number_of_elements)
+{if(number_of_elements) output.write(reinterpret_cast<const char*>(array),number_of_elements*sizeof(T));}};
+}
+
+template<class RW,class T> inline void
+Read_Binary_Array(std::istream& input,T* array,const int number_of_elements)
+{Detail_READ_WRITE_FUNCTIONS::BINARY_ARRAY_DISPATCH<RW,T>::Read(input,array,number_of_elements);}
+
+template<class RW,class T> inline void
+Write_Binary_Array(std::ostream& output,const T* array,const int number_of_elements)
+{Detail_READ_WRITE_FUNCTIONS::BINARY_ARRAY_DISPATCH<RW,T>::Write(output,array,number_of_elements);}
+
+#else
+
 template<class RW,class T> inline typename ENABLE_IF<IS_BINARY_IO_SAFE<T,RW>::value>::TYPE
 Read_Binary_Array(std::istream& input,T* array,const int number_of_elements)
 {input.read(reinterpret_cast<char*>(array),number_of_elements*sizeof(T));}
@@ -253,6 +331,8 @@ Write_Binary_Array(std::ostream& output,const T* array,const int number_of_eleme
 template<class RW,class T> inline typename DISABLE_IF<IS_BINARY_IO_SAFE<T,RW>::value>::TYPE
 Write_Binary_Array(std::ostream& output,const T* array,const int number_of_elements)
 {for(int i=0;i<number_of_elements;i++) Read_Write<T,RW>::Write(output,array[i]);}
+
+#endif
 //#####################################################################
 }
 #include <PhysBAM_Tools/Read_Write/Utilities/READ_WRITE.h>

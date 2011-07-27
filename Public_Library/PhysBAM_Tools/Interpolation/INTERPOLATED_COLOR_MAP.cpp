@@ -43,13 +43,13 @@ Initialize_Colors(T min_value,T max_value,bool log_scale,bool reverse,bool two_s
     colors.Add_Control_Point(a+4*d,VECTOR<T,3>(0,1,1));
     colors.Add_Control_Point(a+5*d,VECTOR<T,3>(0,0,1));
     if(two_sets){
-        colors.Add_Control_Point(a+6*d,VECTOR<T,3>(.3,0,.3));
-        colors.Add_Control_Point(a+7*d,VECTOR<T,3>(.3,0,0));
-        colors.Add_Control_Point(a+8*d,VECTOR<T,3>(.3,.3,0));
-        colors.Add_Control_Point(a+9*d,VECTOR<T,3>(0,.3,0));
-        colors.Add_Control_Point(a+10*d,VECTOR<T,3>(0,.3,.3));
-        colors.Add_Control_Point(a+11*d,VECTOR<T,3>(0,0,.3));}
-    colors.Add_Control_Point(a+6*(1+two_sets)*d,VECTOR<T,3>());
+        colors.Add_Control_Point(a+6*d,VECTOR<T,3>((T).3,(T)0,(T).3));
+        colors.Add_Control_Point(a+7*d,VECTOR<T,3>((T).3,(T)0,(T)0));
+        colors.Add_Control_Point(a+8*d,VECTOR<T,3>((T).3,(T).3,(T)0));
+        colors.Add_Control_Point(a+9*d,VECTOR<T,3>((T)0,(T).3,(T)0));
+        colors.Add_Control_Point(a+10*d,VECTOR<T,3>((T)0,(T).3,(T).3));
+        colors.Add_Control_Point(a+11*d,VECTOR<T,3>((T)0,(T)0,(T).3));}
+    colors.Add_Control_Point(a+(T)(6*(1+two_sets))*d,VECTOR<T,3>());
 }
 //#####################################################################
 // Function operator ()

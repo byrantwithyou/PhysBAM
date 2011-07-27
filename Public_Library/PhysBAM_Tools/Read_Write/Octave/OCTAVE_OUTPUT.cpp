@@ -341,6 +341,14 @@ Write_Entry(T x)
 //#####################################################################
 // Function Write_Entry
 //#####################################################################
+template<class T> template<class T2> void OCTAVE_OUTPUT<T>::
+Write_Entry(const T2& x)
+{
+    Write_Entry((T)x);
+}
+//#####################################################################
+// Function Write_Entry
+//#####################################################################
 template<class T> template<class T2,int d> void OCTAVE_OUTPUT<T>::
 Write_Entry(const VECTOR<T2,d>& x)
 {

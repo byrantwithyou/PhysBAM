@@ -91,7 +91,7 @@ Test_Symmetry(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& w,KRYLO
 #endif
         V=Vector(V.y,V.z,V.x);
         // rescale to avoid overflow
-        T scale=1/sqrt(Ax_dot_Ax);
+        T scale=(T)(1/sqrt(Ax_dot_Ax));
         *V.x*=scale;
         *V.y*=scale;}
 }

@@ -29,7 +29,7 @@ CUBIC(const T c3_input,const T c2_input,const T c1_input,const T c0_input)
 // Function operator()
 //#####################################################################
 template<class T> T CUBIC<T>::
-operator()(const T x) const PHYSBAM_OVERRIDE
+operator()(const T x) const
 {
     return Value(x);
 }
@@ -37,7 +37,7 @@ operator()(const T x) const PHYSBAM_OVERRIDE
 // Function Prime
 //#####################################################################
 template<class T> T CUBIC<T>::
-Prime(const T x) const PHYSBAM_OVERRIDE
+Prime(const T x) const
 {
     return (3*c3*x+2*c2)*x+c1;
 }

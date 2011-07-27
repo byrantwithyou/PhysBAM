@@ -42,7 +42,7 @@ public:
     {return T_LINEAR_INTERPOLATION_MAC_HELPER::Interpolate_Face(block,u,X);}
 
     T From_Block_Face_Component(const int axis,const T_GRID& grid,const BLOCK_UNIFORM<T_GRID>& block,const typename T_FACE_LOOKUP::LOOKUP& u,const TV& X) const PHYSBAM_OVERRIDE;
-    ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> > From_Block_Face_Component_Weights(const int axis,const T_GRID& grid,const BLOCK_UNIFORM<T_GRID>& block,const typename T_FACE_LOOKUP::LOOKUP& u,const TV& X) const PHYSBAM_OVERRIDE;
+    ARRAY<PAIR<FACE_INDEX<T_GRID::VECTOR_T::dimension>,T> > From_Block_Face_Component_Weights(const int axis,const T_GRID& grid,const BLOCK_UNIFORM<T_GRID>& block,const typename T_FACE_LOOKUP::LOOKUP& u,const TV& X) const PHYSBAM_OVERRIDE;
 
     VECTOR<TV,2> Extrema_From_Block_Face(const T_GRID& grid,const BLOCK_UNIFORM<T_GRID>& block,const typename T_FACE_LOOKUP::LOOKUP& u_min,
         const typename T_FACE_LOOKUP::LOOKUP& u_max,const TV& X) const

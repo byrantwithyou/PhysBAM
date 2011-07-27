@@ -32,7 +32,7 @@ namespace
 
     template<class T> static bool streamable_string_to_value(const std::string& value_string,T& value)
     {std::istringstream value_string_stream(value_string);
-    return value_string_stream>>value;}
+    return !!(value_string_stream>>value);}
 
     static bool is_dash_parameter_name(const std::string &str,std::string *parameter_name=0)
     {if(str.length()>1 && str[0]=='-'){

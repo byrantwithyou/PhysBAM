@@ -13,8 +13,10 @@
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Parallel_Computation/LAPLACE_MPI.h>
 #include <PhysBAM_Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
-#include <PhysBAM_Tools/Parallel_Computation/PTHREAD.h>
 #include <PhysBAM_Tools/Parallel_Computation/SPARSE_MATRIX_PARTITION.h>
+#ifdef USE_PTHREADS
+#include <PhysBAM_Tools/Parallel_Computation/PTHREAD.h>
+#endif
 namespace PhysBAM{
 
 class GRAPH;

@@ -350,7 +350,7 @@ public:
 
     void Cell(const TV& location,TV_INT& index,const int number_of_ghost_cells) const // returns the left, bottom and front
     {int number_of_ghost_cells_plus_one=number_of_ghost_cells+1; // Add before casting to avoid negatives rounding up to zero
-    index=TV_INT((location-domain.min_corner)*one_over_dX+number_of_ghost_cells_plus_one)-number_of_ghost_cells;}
+    index=TV_INT((location-domain.min_corner)*one_over_dX+(T)number_of_ghost_cells_plus_one)-number_of_ghost_cells;}
 
     TV_INT Cell(const TV& location,const int number_of_ghost_cells) const // returns the left, bottom and front
     {TV_INT index;Cell(location,index,number_of_ghost_cells);return index;}
@@ -392,13 +392,13 @@ public:
     {return clamp(1+TV_INT(((location-domain.min_corner)*one_over_dX-MAC_offset)),1+TV_INT(),counts-1);}
         
     TV_INT Clamped_Index_End_Minus_One(const TV& location,const int number_of_ghost_cells) const
-    {return clamp(1+TV_INT((location-domain.min_corner)*one_over_dX-MAC_offset+number_of_ghost_cells)-number_of_ghost_cells,TV_INT()-(number_of_ghost_cells-1),counts+(number_of_ghost_cells-1));}
+    {return clamp(1+TV_INT((location-domain.min_corner)*one_over_dX-MAC_offset+(T)number_of_ghost_cells)-number_of_ghost_cells,TV_INT()-(number_of_ghost_cells-1),counts+(number_of_ghost_cells-1));}
 
     TV_INT Clamp_To_Cell(const TV& location) const
     {return clamp(1+TV_INT((location-domain.min_corner)*one_over_dX),TV_INT::All_Ones_Vector(),numbers_of_cells);}
 
     TV_INT Clamp_To_Cell(const TV& location,const int number_of_ghost_cells) const
-    {return clamp(1+TV_INT((location-domain.min_corner)*one_over_dX+number_of_ghost_cells)-number_of_ghost_cells,TV_INT::All_Ones_Vector()-number_of_ghost_cells,numbers_of_cells+number_of_ghost_cells);}
+    {return clamp(1+TV_INT((location-domain.min_corner)*one_over_dX+(T)number_of_ghost_cells)-number_of_ghost_cells,TV_INT::All_Ones_Vector()-number_of_ghost_cells,numbers_of_cells+number_of_ghost_cells);}
 
     RANGE<TV_INT> Clamp_To_Cell(const RANGE<TV>& box,const int number_of_ghost_cells) const
     {return RANGE<TV_INT>(Clamp_To_Cell(box.Minimum_Corner(),number_of_ghost_cells),Clamp_To_Cell(box.Maximum_Corner(),number_of_ghost_cells));}
