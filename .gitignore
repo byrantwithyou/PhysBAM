@@ -1,0 +1,10 @@
+SConstruct.options
+build
+
+*.gz
+
+*.ncb
+*.suo
+*.user
+Debug
+Release
