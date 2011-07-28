@@ -10,6 +10,11 @@
 #include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/SCALAR_POLICY.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_FORWARD.h>
+
+#ifdef DIFFERENCE
+#undef DIFFERENCE
+#endif
+
 namespace PhysBAM{
 
 template<class T1,class T2,class ENABLER=void> struct CAN_ASSIGN;

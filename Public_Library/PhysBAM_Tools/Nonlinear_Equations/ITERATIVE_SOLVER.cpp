@@ -255,6 +255,12 @@ Conjugate_Gradient(NONLINEAR_FUNCTION<T(T,T)>& F,T& x,T& y,const T alpha_max)
 template<class T> void ITERATIVE_SOLVER<T>::
 Conjugate_Gradient(NONLINEAR_FUNCTION<T(PARAMETER_SPACE<T>)>& F,PARAMETER_SPACE<T>& x,const T alpha_max,const int restart_iterations)
 {
+#if defined(_MSC_VER) && _MSC_VER<=1500
+    // MSVC9 has issues with the
+    //     PARAMETRIC_LINE<T,T(TV)> line(F,x,s,tmp);
+    // and I haven't found a workaround yet...
+    PHYSBAM_NOT_IMPLEMENTED();
+#else
     typedef PARAMETER_SPACE<T> TV;
     iterations=0;
     T Fx=F(x);
@@ -297,10 +303,8 @@ Conjugate_Gradient(NONLINEAR_FUNCTION<T(PARAMETER_SPACE<T>)>& F,PARAMETER_SPACE<
     delete &grad_old;
     delete &s;
     delete &tmp;
+#endif
 }
 //####################################################################################
-#if defined(_MSC_VER) && _MSC_VER<=1500 // currently broken on MSVC9 :(
-#else
 template class ITERATIVE_SOLVER<float>;
 template class ITERATIVE_SOLVER<double>;
-#endif

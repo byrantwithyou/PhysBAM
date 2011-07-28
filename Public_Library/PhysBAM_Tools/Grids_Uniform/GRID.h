@@ -413,7 +413,7 @@ public:
     {return domain;}
 
     RANGE<TV> Ghost_Domain(const int number_of_ghost_cells) const
-    {TV expand(dX*number_of_ghost_cells);return RANGE<TV>(domain.min_corner-expand,domain.max_corner+expand);}
+    {TV expand(dX*(T)number_of_ghost_cells);return RANGE<TV>(domain.min_corner-expand,domain.max_corner+expand);}
 
     const TV_INT& Counts() const
     {return counts;}
