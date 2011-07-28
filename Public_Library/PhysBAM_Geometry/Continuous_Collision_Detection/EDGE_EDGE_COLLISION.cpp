@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
+#include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/INTERVAL.h>
 #include <PhysBAM_Tools/Nonlinear_Equations/ITERATIVE_SOLVER.h>
@@ -63,8 +64,10 @@ Edge_Edge_Collision(const SEGMENT_3D<T>& seg_fault,const SEGMENT_3D<T>& segment,
     for(int k=1;k<=num_intervals;k++){
         T collision_time=dt*(T)iterative_solver.Bisection_Secant_Root(cubic,intervals(k).min_corner,intervals(k).max_corner);
         SEGMENT_3D<T> segment2(seg_fault.x1+collision_time*v1,seg_fault.x2+collision_time*v2);
-        if(segment2.Edge_Edge_Interaction(SEGMENT_3D<T>(segment.x1+collision_time*v3,segment.x2+collision_time*v4),v1,v2,v3,v4,collision_thickness,distance,normal,weights,relative_speed,
-                small_number,exit_early)) return true;}
+        PHYSBAM_FATAL_ERROR("Missing parameter \"allow_negative_weights\" in Edge_Edge_Interaction call below.");
+        static_cast<void>(distance);}
+        //if(segment2.Edge_Edge_Interaction(SEGMENT_3D<T>(segment.x1+collision_time*v3,segment.x2+collision_time*v4),v1,v2,v3,v4,collision_thickness,distance,normal,weights,relative_speed,
+        //        small_number,exit_early)) return true;}
 
     return false;
 }

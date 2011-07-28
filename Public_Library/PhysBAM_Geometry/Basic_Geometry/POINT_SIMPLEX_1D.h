@@ -101,7 +101,7 @@ public:
     {if(x1.x-thickness_over_two <= point.x && x1.x+thickness_over_two >= point.x) return true;
     else return false;}
 
-    VECTOR<T,0> Principal_Curvatures(const TV& X) const PHYSBAM_OVERRIDE
+    VECTOR<T,0> Principal_Curvatures(const TV& X) const
     {return VECTOR<T,0>();}
 
     static std::string Name()

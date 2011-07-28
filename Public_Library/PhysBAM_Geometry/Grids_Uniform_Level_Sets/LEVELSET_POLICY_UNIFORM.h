@@ -21,7 +21,7 @@ template<class T_GRID> class FAST_LEVELSET;
 template<class T_GRID> class LEVELSET_MULTIPLE_UNIFORM;
 template<class T_GRID> class PARTICLE_LEVELSET_UNIFORM;
 template<class T_GRID> class PARTICLE_LEVELSET_EVOLUTION_UNIFORM;
-template<class T_GRID,class T2> struct EXTRAPOLATION_UNIFORM;
+template<class T_GRID,class T2> class EXTRAPOLATION_UNIFORM;
 
 template<class T> struct LEVELSET_POLICY<GRID<VECTOR<T,1> > >
 {

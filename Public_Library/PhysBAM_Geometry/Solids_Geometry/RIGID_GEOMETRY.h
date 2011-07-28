@@ -172,7 +172,12 @@ public:
     const RANGE<TV>& Object_Space_Bounding_Box() const;
     bool Simplex_Intersection(RAY<TV>& ray,const T collision_thickness) const;
     RANGE<TV> World_Space_Simplex_Bounding_Box(const int id) const;
+#if defined(_MSC_VER) && _MSC_VER<=1500
+    typedef typename BASIC_SIMPLEX_POLICY<TV,TV::dimension-1>::SIMPLEX WORLD_SPACE_SIMPLEX_RESULT;
+    WORLD_SPACE_SIMPLEX_RESULT World_Space_Simplex(const int id) const;
+#else
     typename BASIC_SIMPLEX_POLICY<TV,TV::dimension-1>::SIMPLEX World_Space_Simplex(const int id) const;
+#endif
     RANGE<TV> World_Space_Simplex_Bounding_Box(const int id,const FRAME<TV>& frame) const;
     void Interpolate_Between_States(const RIGID_GEOMETRY_STATE<TV>& state1,const RIGID_GEOMETRY_STATE<TV>& state2,const T time,RIGID_GEOMETRY_STATE<TV>& interpolated_state);
     void Compute_Velocity_Between_States(const RIGID_GEOMETRY_STATE<TV>& state1,const RIGID_GEOMETRY_STATE<TV>& state2,RIGID_GEOMETRY_STATE<TV>& result_state);

@@ -35,7 +35,7 @@ Fill_Level(const GRID<TV>& grid,const T_LEVELSET& phi,int ghost,MAPPING& m,ARRAY
     ARRAY<TV_INT> inside;
     m.node_to_index.Resize(grid.Domain_Indices(ghost+1)); // Need an extra ring for the sentinals
     m.index_to_node.Append(TV_INT::All_Ones_Vector()*INT_MAX); // First index is the "outside" index.
-    normal.Append(TV::All_Ones_Vector()*INT_MAX);
+    normal.Append(TV::All_Ones_Vector()*FLT_MAX);
 
     // Cells that must be solved for normally.
     for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next()){

@@ -15,7 +15,7 @@
 #include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_3D.h>
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
 namespace PhysBAM{
-template<class T_GRID> class GRID_ARRAYS_POLICY;
+template<class T_GRID> struct GRID_ARRAYS_POLICY;
 template<class T_GRID,class COLLISION_GEOMETRY_ID> class OBJECTS_IN_CELL;
 
 namespace RASTERIZATION{

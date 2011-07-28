@@ -4,6 +4,7 @@
 //#####################################################################
 // Class RIGID_GEOMETRY_COLLECTION
 //#####################################################################
+#include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
@@ -26,7 +27,8 @@ struct ALLOCATE_GEOMETRY_HELPER:public ALLOCATE_HELPER<TV>
 {
     RIGID_GEOMETRY_COLLECTION<TV>& collection;
     ALLOCATE_GEOMETRY_HELPER(RIGID_GEOMETRY_COLLECTION<TV>& collection_input): collection(collection_input) {}
-    RIGID_GEOMETRY<TV>* Create(int index=0) PHYSBAM_OVERRIDE {return new RIGID_GEOMETRY<TV>(collection,index);}
+    RIGID_GEOMETRY<TV>* Create(int index=0) PHYSBAM_OVERRIDE {PHYSBAM_FATAL_ERROR("Missing parameter \"create_collision_geometry\" in RIGID_GEOMETRY<TV> constructor call below.");return 0;}
+    //RIGID_GEOMETRY<TV>* Create(int index=0) PHYSBAM_OVERRIDE {return new RIGID_GEOMETRY<TV>(collection,index);}
     virtual ~ALLOCATE_GEOMETRY_HELPER(){}
 };
 //#####################################################################

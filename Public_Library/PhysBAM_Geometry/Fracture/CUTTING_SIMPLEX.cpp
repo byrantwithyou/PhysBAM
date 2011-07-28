@@ -136,11 +136,11 @@ Get_Adaptive_Weights(VECTOR<GET_ADAPTIVE_WEIGHTS_RESULT_TYPE,d>& adaptive_weight
         adaptive_weights[j].Set(node_index,j,local_weight,local_error,shared);}
 }
 //#####################################################################
-template class CUTTING_SIMPLEX<float,2>;
-template class CUTTING_SIMPLEX<float,3>;
+template struct CUTTING_SIMPLEX<float,2>;
+template struct CUTTING_SIMPLEX<float,3>;
 template void CUTTING_SIMPLEX<float,3>::Get_Adaptive_Weights<2>(VECTOR<VECTOR<CUTTING_SIMPLEX_COORDINATE<float,3>,3>,2>&,VECTOR<int,2> const&) const;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-template class CUTTING_SIMPLEX<double,2>;
-template class CUTTING_SIMPLEX<double,3>;
+template struct CUTTING_SIMPLEX<double,2>;
+template struct CUTTING_SIMPLEX<double,3>;
 template void CUTTING_SIMPLEX<double,3>::Get_Adaptive_Weights<2>(VECTOR<VECTOR<CUTTING_SIMPLEX_COORDINATE<double,3>,3>,2>&,VECTOR<int,2> const&) const;
 #endif

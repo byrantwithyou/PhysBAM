@@ -7,7 +7,7 @@
 
 namespace PhysBAM{
 template<class T_GRID> struct COLLISION_GEOMETRY_COLLECTION_POLICY;
-template<class T_GRID> struct GRID_BASED_COLLISION_GEOMETRY_UNIFORM;
+template<class T_GRID> class GRID_BASED_COLLISION_GEOMETRY_UNIFORM;
 
 template<class TV> class GRID;
 

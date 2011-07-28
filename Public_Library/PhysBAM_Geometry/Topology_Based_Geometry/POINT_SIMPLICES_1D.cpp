@@ -63,7 +63,7 @@ Inside(const TV& location,T thickness_over_two) const
 {
     for(int i=1;i<=mesh.elements.m;i++){
         POINT_SIMPLEX_1D<T> point_simplex=point_simplex_list?(*point_simplex_list)(i):Get_Element(i);
-        T direction=mesh.directions(i)?1:-1;
+        T direction=(T)(mesh.directions(i)?1:-1);
         T robust_point_simplex_location=point_simplex.x1.x+direction*thickness_over_two;
         if(direction*(location.x-robust_point_simplex_location)>0) return false;}
     return true;
