@@ -26,8 +26,8 @@ struct ARRAY_WRAPPER_FUNCTION
 public:
     typedef typename boost::mpl::if_<
         boost::is_const< T_ARRAY >,
-        typename T_ARRAY::ELEMENT const,
-        typename T_ARRAY::ELEMENT /***/
+        typename T_ARRAY::value_type const,
+        typename T_ARRAY::value_type /***/
     >::type & result_type;
 
     template< class T_INT >

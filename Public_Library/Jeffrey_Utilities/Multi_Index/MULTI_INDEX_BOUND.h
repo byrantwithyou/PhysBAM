@@ -15,9 +15,9 @@
 #include <boost/mpl/if.hpp>
 #include <boost/type_traits/is_convertible.hpp>
 
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/BEGIN_END_TAG.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOUND_ITERATOR.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 namespace PhysBAM
 {

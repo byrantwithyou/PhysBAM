@@ -8,12 +8,9 @@
 #define PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_IDENTITY_TYPE_HPP
 
 #define PHYSBAM_IDENTITY_TYPE( ParenthesizedT ) \
-    PhysBAM::Detail_IDENTITY_TYPE::IDENTITY_TYPE_IMPL< void ParenthesizedT >::type
+    PhysBAM_Detail_IDENTITY_TYPE::IDENTITY_TYPE_IMPL< void ParenthesizedT >::type
 
-namespace PhysBAM
-{
-
-namespace Detail_IDENTITY_TYPE
+namespace PhysBAM_Detail_IDENTITY_TYPE
 {
 
 template< class >
@@ -22,8 +19,6 @@ template< class T >
 struct IDENTITY_TYPE_IMPL< void ( T ) >
 { typedef T type; };
 
-} // namespace Detail_IDENTITY_TYPE
-
-} // namespace PhysBAM
+} // namespace PhysBAM_Detail_IDENTITY_TYPE
 
 #endif // #ifndef PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_IDENTITY_TYPE_HPP

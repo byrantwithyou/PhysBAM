@@ -23,12 +23,12 @@
 #include <boost/spirit/home/support/argument.hpp>
 #include <boost/spirit/home/support/context.hpp>
 
+#include <Jeffrey_Utilities/Parsing/RATIONAL_REAL_PARSER.h>
+#include <Jeffrey_Utilities/Parsing/VECTOR_GRAMMAR.h>
 #include <PhysBAM_Tools/Matrices/QUATERNION.h>
 #include <PhysBAM_Tools/Matrices/ROTATION.h>
 #include <PhysBAM_Tools/Vectors/COMPLEX.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
-#include <Jeffrey_Utilities/Parsing/RATIONAL_REAL_PARSER.h>
-#include <Jeffrey_Utilities/Parsing/VECTOR_GRAMMAR.h>
 
 namespace PhysBAM
 {

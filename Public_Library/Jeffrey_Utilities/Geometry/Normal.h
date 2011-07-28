@@ -10,8 +10,8 @@
 
 #include <cmath>
 
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/Geometry/Area_Weighted_Normal.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 namespace PhysBAM
 {

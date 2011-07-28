@@ -10,8 +10,8 @@
 #ifndef PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_GEOMETRY_AREA_WEIGHTED_NORMAL_HPP
 #define PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_GEOMETRY_AREA_WEIGHTED_NORMAL_HPP
 
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/Geometry/Cross_Product.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 namespace PhysBAM
 {

@@ -8,10 +8,10 @@
 #ifndef PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_ALGORITHM_FIND_ALL_IF_HPP
 #define PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_ALGORITHM_FIND_ALL_IF_HPP
 
+#include <cassert>
+
 #include <numeric>
 #include <vector>
-
-#include <cassert>
 
 #include <boost/mpl/assert.hpp>
 #include <boost/thread/thread.hpp>
@@ -86,6 +86,12 @@ Find_All_If_MT(
     >));
     typedef Detail_Count_If::COUNT_IF_HELPER<T_P> COUNT_IF_HELPER_;
     typedef Detail_Find_All_If::FIND_ALL_IF_HELPER< T_P, T_F, VALUE_TYPE > FIND_ALL_IF_HELPER_;
+    assert(n_thread >= 1);
+
+    if(n_thread == 1) {
+        Find_All_If(n_thread, min_index, max_index, p, f, result);
+        return;
+    }
 
     const unsigned int n = static_cast< unsigned int >(1 + (max_index - min_index));
 

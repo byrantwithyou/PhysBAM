@@ -45,6 +45,12 @@ For_Each_MT(
 {
     typedef Detail_For_Each::FOR_EACH_HELPER<F> FOR_EACH_HELPER_;
     assert(n_thread >= 1);
+
+    if(n_thread == 1) {
+        For_Each(min_index, max_index, f);
+        return;
+    }
+
     const unsigned int n = static_cast< unsigned int >(1 + (max_index - min_index));
     boost::thread_group threads;
     for(unsigned int i = 0; i != n_thread; ++i) {

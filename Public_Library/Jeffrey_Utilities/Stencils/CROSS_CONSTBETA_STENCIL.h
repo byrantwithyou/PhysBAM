@@ -17,9 +17,9 @@
 #include <boost/mpl/assert.hpp>
 #include <boost/type_traits/is_same.hpp>
 
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/LOOP.h>
 #include <Jeffrey_Utilities/Stencils/STENCIL_PROXY_CONCEPT.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 namespace PhysBAM
 {

@@ -14,12 +14,12 @@
 
 #include <boost/foreach.hpp>
 
-#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/Algorithm/For_Each.h>
 #include <Jeffrey_Utilities/DIRECT_INIT_CTOR.h>
 #include <Jeffrey_Utilities/Multi_Index/Multi_Index_Box_Intersect.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_CUBE.h>
+#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 namespace PhysBAM
 {
@@ -120,6 +120,7 @@ Shift_Level_Set_Away_From_Vertices_MT(
         SHIFT_LEVEL_SET_AWAY_FROM_VERTICES_HELPER<
             T, T_MULTI_INDEX_BOX
         > SHIFT_LEVEL_SET_AWAY_FROM_VERTICES_HELPER_;
+    assert(n_thread >= 1);
     assert(0 <= min_dist_to_vertex && min_dist_to_vertex <= 0.5f);
     assert(sign_of_zero == -1 || sign_of_zero == +1);
     For_Each_MT(

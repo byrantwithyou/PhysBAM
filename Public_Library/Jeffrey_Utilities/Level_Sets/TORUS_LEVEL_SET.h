@@ -11,8 +11,8 @@
 
 #include <boost/math/special_functions/pow.hpp>
 
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/DIRECT_INIT_CTOR.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 namespace PhysBAM
 {

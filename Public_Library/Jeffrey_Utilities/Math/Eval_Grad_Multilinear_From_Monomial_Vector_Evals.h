@@ -7,10 +7,11 @@
 #ifndef PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_MATH_EVAL_GRAD_MULTILINEAR_FROM_MONOMIAL_VECTOR_EVALS_HPP
 #define PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_MATH_EVAL_GRAD_MULTILINEAR_FROM_MONOMIAL_VECTOR_EVALS_HPP
 
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <boost/mpl/int.hpp>
 #include <boost/mpl/vector/vector10_c.hpp>
 #include <boost/preprocessor/tuple/rem.hpp>
+
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 namespace PhysBAM
 {

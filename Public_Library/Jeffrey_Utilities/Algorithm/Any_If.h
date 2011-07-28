@@ -8,11 +8,11 @@
 #ifndef PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_ALGORITHM_ANY_IF_HPP
 #define PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_ALGORITHM_ANY_IF_HPP
 
+#include <cassert>
+
 #include <functional>
 #include <numeric>
 #include <vector>
-
-#include <cassert>
 
 #include <boost/thread/thread.hpp>
 
@@ -50,6 +50,11 @@ Any_If_MT(
     const P& p)
 {
     typedef Detail_Any_If::ANY_IF_HELPER<P> ANY_IF_HELPER_;
+    assert(n_thread >= 1);
+
+    if(n_thread)
+        return Any_If(min_index, max_index, p);
+
     const unsigned int n = static_cast< unsigned int >(1 + (max_index - min_index));
     std::vector<int> bools(n_thread, false);
     boost::thread_group threads;

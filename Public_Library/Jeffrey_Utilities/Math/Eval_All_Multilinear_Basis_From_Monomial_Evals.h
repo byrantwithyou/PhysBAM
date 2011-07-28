@@ -7,10 +7,10 @@
 #ifndef PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_MATH_EVAL_ALL_MULTILINEAR_BASIS_FROM_MONOMIAL_EVALS_HPP
 #define PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_MATH_EVAL_ALL_MULTILINEAR_BASIS_FROM_MONOMIAL_EVALS_HPP
 
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/Math/Eval_Multilinear_From_Monomial_Evals.h>
 #include <Jeffrey_Utilities/Multi_Index/STATIC_MULTI_INDEX_CUBE.h>
 #include <Jeffrey_Utilities/VECTOR_OPS.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 namespace PhysBAM
 {

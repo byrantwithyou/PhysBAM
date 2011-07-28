@@ -13,11 +13,11 @@
 
 #include <boost/mpl/assert.hpp>
 
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/BEGIN_END_TAG.h>
 #include <Jeffrey_Utilities/ITERATOR_FACADE.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_FWD.h>
 #include <Jeffrey_Utilities/Multi_Index/STATIC_MULTI_INDEX_CUBE.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 #define PHYSBAM_STATIC_MULTI_INDEX_CUBE_ITERATOR_USE_LINEAR_INDEX
 

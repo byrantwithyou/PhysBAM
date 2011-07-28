@@ -13,13 +13,13 @@
 
 #include <limits>
 
-#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/Geometry/Divide_Cube2.h>
 #include <Jeffrey_Utilities/Level_Sets/Shift_Level_Set_Away_From_Vertices.h>
 #include <Jeffrey_Utilities/Math/STATIC_POW.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_CUBE.h>
 #include <Jeffrey_Utilities/Multi_Index/STATIC_MULTI_INDEX_CUBE.h>
+#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 namespace PhysBAM
 {

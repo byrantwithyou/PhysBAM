@@ -134,33 +134,27 @@ Exact_Resize(
 { a.Exact_Resize(new_size, initialize_new_elements); }
 
 //#####################################################################
-// As_Raw_Array(T_ARRAY& a) -> ARRAY_VIEW< ... >
-// As_Const_Raw_Array(T_ARRAY& a) -> ARRAY_VIEW< const ... >
+// As_Array_View(T_ARRAY& a) -> ARRAY_VIEW< ... >
+// As_Const_Array_View(const T_ARRAY& a) -> ARRAY_VIEW< ... >
 //#####################################################################
 
 template< class T_ARRAY >
 inline ARRAY_VIEW<
-    typename PROPAGATE_CONST<
-        T_ARRAY,
-        typename T_ARRAY::ELEMENT
-    >::type,
+    typename PROPAGATE_CONST< T_ARRAY, typename T_ARRAY::ELEMENT >::type,
     typename T_ARRAY::INDEX
 >
-As_Raw_Array(T_ARRAY& a)
+As_Array_View(T_ARRAY& a)
 {
     return ARRAY_VIEW<
-        typename PROPAGATE_CONST<
-            T_ARRAY,
-            typename T_ARRAY::ELEMENT
-        >::type,
+        typename PROPAGATE_CONST< T_ARRAY, typename T_ARRAY::ELEMENT >::type,
         typename T_ARRAY::INDEX
     >(a);
 }
 
 template< class T_ARRAY >
-inline ARRAY_VIEW< typename T_ARRAY::ELEMENT const >
-As_Const_Raw_Array(const T_ARRAY& a)
-{ return ARRAY_VIEW< typename T_ARRAY::ELEMENT const >(a); }
+inline ARRAY_VIEW< typename T_ARRAY::ELEMENT const, typename T_ARRAY::INDEX >
+As_Const_Array_View(const T_ARRAY& a)
+{ return ARRAY_VIEW< typename T_ARRAY::ELEMENT const, typename T_ARRAY::INDEX >(a); }
 
 } // namespace PhysBAM
 

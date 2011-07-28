@@ -8,10 +8,10 @@
 #ifndef PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_ALGORITHM_COUNT_IF_HPP
 #define PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_ALGORITHM_COUNT_IF_HPP
 
+#include <cassert>
+
 #include <numeric>
 #include <vector>
-
-#include <cassert>
 
 #include <boost/thread/thread.hpp>
 
@@ -43,13 +43,18 @@ struct COUNT_IF_HELPER;
 } // namespace Detail_Count_If
 
 template< class P >
-inline void
+inline int
 Count_If_MT(
     const unsigned int n_thread,
     const int min_index, const int max_index,
     const P& p)
 {
     typedef Detail_Count_If::COUNT_IF_HELPER<P> COUNT_IF_HELPER_;
+    assert(n_thread >= 1);
+
+    if(n_thread == 1)
+        return Count_If(min_index, max_index, p);
+
     const unsigned int n = static_cast< unsigned int >(1 + (max_index - min_index));
     std::vector<int> counts(n_thread, 0);
     boost::thread_group threads;

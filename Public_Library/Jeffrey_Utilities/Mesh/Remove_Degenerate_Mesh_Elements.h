@@ -8,9 +8,9 @@
 #ifndef PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_MESH_REMOVE_DEGENERATE_MESH_ELEMENTS_HPP
 #define PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_MESH_REMOVE_DEGENERATE_MESH_ELEMENTS_HPP
 
+#include <Jeffrey_Utilities/Remove_If.h>
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
-#include <Jeffrey_Utilities/Remove_If.h>
 
 namespace PhysBAM
 {
