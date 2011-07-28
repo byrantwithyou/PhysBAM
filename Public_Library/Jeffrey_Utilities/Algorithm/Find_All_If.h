@@ -89,7 +89,7 @@ Find_All_If_MT(
     assert(n_thread >= 1);
 
     if(n_thread == 1) {
-        Find_All_If(n_thread, min_index, max_index, p, f, result);
+        Find_All_If(min_index, max_index, p, f, result);
         return;
     }
 

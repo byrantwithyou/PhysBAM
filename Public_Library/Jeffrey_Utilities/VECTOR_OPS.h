@@ -13,6 +13,7 @@
 #include <boost/utility/enable_if.hpp>
 
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <PhysBAM_Tools/Vectors/VECTOR_EXPRESSION.h>
 
 namespace PhysBAM
 {
@@ -95,8 +96,8 @@ Replace(VECTOR<T,N>& v, const T& x, const T& y)
 //#####################################################################
 
 template< class T, int N >
-inline typename boost::disable_if<
-    boost::is_same< T, int >,
+inline typename boost::disable_if_c<
+    (N > 3) || boost::is_same< T, int >::value,
     VECTOR<T,N>
 >::type
 operator*(const int c, VECTOR<T,N> v)
@@ -106,9 +107,19 @@ operator*(const int c, VECTOR<T,N> v)
     return v;
 }
 
+template< class T_C, class T, int N >
+inline typename boost::disable_if_c<
+    (N <= 3)
+ || !boost::is_same< T_C, int >::value
+ || boost::is_same< T, int >::value,
+    VECTOR_SCALE< int, VECTOR<T,N> >
+>::type
+operator*(const T_C c, const VECTOR<T,N>& v)
+{ return VECTOR_SCALE< int, VECTOR<T,N> >(c, v); }
+
 template< class T, int N >
-inline typename boost::disable_if<
-    boost::is_same< T, int >,
+inline typename boost::disable_if_c<
+    (N > 3) || boost::is_same< T, int >::value,
     VECTOR<T,N>
 >::type
 operator*(VECTOR<T,N> v, const int c)
@@ -117,6 +128,16 @@ operator*(VECTOR<T,N> v, const int c)
         v[i] *= c;
     return v;
 }
+
+template< class T, int N, class T_C >
+inline typename boost::disable_if_c<
+    (N <= 3)
+ || boost::is_same< T, int >::value
+ || !boost::is_same< T_C, int >::value,
+    VECTOR_SCALE< int, VECTOR<T,N> >
+>::type
+operator*(const VECTOR<T,N>& v, const T_C c)
+{ return VECTOR_SCALE< int, VECTOR<T,N> >(c, v); }
 
 template< class T, int N >
 inline typename boost::disable_if<

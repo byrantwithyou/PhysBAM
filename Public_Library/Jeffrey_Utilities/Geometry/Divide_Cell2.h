@@ -13,6 +13,7 @@
 
 #include <limits>
 
+#include <Jeffrey_Utilities/ARRAY_OPS.h>
 #include <Jeffrey_Utilities/Geometry/Divide_Cube2.h>
 #include <Jeffrey_Utilities/Level_Sets/Shift_Level_Set_Away_From_Vertices.h>
 #include <Jeffrey_Utilities/Math/STATIC_POW.h>
@@ -49,14 +50,14 @@ Divide_Cell2(
     if(min_dist_to_vertex != 0)
         Shift_Level_Set_Away_From_Vertices(
             STATIC_MULTI_INDEX_CUBE<D,-1,+1>(),
-            ARRAY_VIEW<T>(STATIC_POW_C<3,D>::value, &phi_of_cube2_vertex[1]),
+            Make_Array_View(STATIC_POW_C<3,D>::value, &phi_of_cube2_vertex[1]),
             min_dist_to_vertex,
             sign_of_zero
         );
 
     Divide_Cube2(
         dx,
-        ARRAY_VIEW< const T >(STATIC_POW_C<3,D>::value, &phi_of_cube2_vertex[1]),
+        Make_Const_Array_View(STATIC_POW_C<3,D>::value, &phi_of_cube2_vertex[1]),
         polytope_visitor,
         sign_of_zero
     );

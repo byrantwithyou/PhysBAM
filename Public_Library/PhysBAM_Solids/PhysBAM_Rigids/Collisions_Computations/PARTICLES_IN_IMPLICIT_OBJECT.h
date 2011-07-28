@@ -18,7 +18,6 @@ template<class T,class ID> class ARRAY_VIEW;
 template<class T,class ID> class ARRAY;
 template<class TV> class IMPLICIT_OBJECT;
 template<class T,int d> class VECTOR;
-template<class T,int m_input,int n_input> class MATRIX;
 template<class K,class T> class HASHTABLE;
 template<class TV> class GEOMETRY_PARTICLES;
 template<class TV,class T_ARRAY> class PARTICLE_HIERARCHY;

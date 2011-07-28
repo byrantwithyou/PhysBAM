@@ -136,6 +136,8 @@ Exact_Resize(
 //#####################################################################
 // As_Array_View(T_ARRAY& a) -> ARRAY_VIEW< ... >
 // As_Const_Array_View(const T_ARRAY& a) -> ARRAY_VIEW< ... >
+// Make_Array_View(int n, T* p) -> ARRAY_VIEW<T>
+// Make_Const_Array_View(int n, const T* p) -> ARRAY_VIEW< const T >
 //#####################################################################
 
 template< class T_ARRAY >
@@ -155,6 +157,16 @@ template< class T_ARRAY >
 inline ARRAY_VIEW< typename T_ARRAY::ELEMENT const, typename T_ARRAY::INDEX >
 As_Const_Array_View(const T_ARRAY& a)
 { return ARRAY_VIEW< typename T_ARRAY::ELEMENT const, typename T_ARRAY::INDEX >(a); }
+
+template< class T >
+inline ARRAY_VIEW<T>
+Make_Array_View(const int n, T* const p)
+{ return ARRAY_VIEW<T>(n, p); }
+
+template< class T >
+inline ARRAY_VIEW< const T >
+Make_Const_Array_View(const int n, const T* const p)
+{ return ARRAY_VIEW< const T >(n, p); }
 
 } // namespace PhysBAM
 
