@@ -33,13 +33,13 @@ public:
     virtual ~RIGID_BODY_PARTICLES();
 
 private:
-    void Delete_Particle(const int index) PHYSBAM_OVERRIDE
+    void Delete_Particle(const int index)
     {PHYSBAM_FATAL_ERROR();}
 
-    void Delete_Particles_On_Deletion_List(const bool preserve_order=false) PHYSBAM_OVERRIDE
+    void Delete_Particles_On_Deletion_List(const bool preserve_order=false)
     {PHYSBAM_FATAL_ERROR();}
 
-    void Add_To_Deletion_List(const int index) PHYSBAM_OVERRIDE
+    void Add_To_Deletion_List(const int index)
     {PHYSBAM_FATAL_ERROR();}
 public:
     void Remove_Body(const int p)

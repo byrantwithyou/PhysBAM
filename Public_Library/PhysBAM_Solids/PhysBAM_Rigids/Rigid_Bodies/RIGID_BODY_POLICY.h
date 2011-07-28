@@ -7,12 +7,11 @@
 #ifndef __RIGID_BODY_POLICY__
 #define __RIGID_BODY_POLICY__
 
+#include <PhysBAM_Tools/Matrices/MATRIX_FORWARD.h>
+
 namespace PhysBAM{
 
 template<class TV> struct RIGID_BODY_POLICY;
-template<class T,int m,int n> class MATRIX;
-template<class T,int d> class DIAGONAL_MATRIX;
-template<class T,int d> class SYMMETRIC_MATRIX;
 template<class T,int d> class VECTOR;
 
 //#####################################################################

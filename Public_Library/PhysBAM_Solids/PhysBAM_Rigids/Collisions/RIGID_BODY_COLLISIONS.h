@@ -18,23 +18,15 @@
 #include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_BODY_PARTICLE_INTERSECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Joints/JOINT_ID.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Parallel_Computation/MPI_RIGIDS.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_FORWARD.h>
 #include <string>
 namespace PhysBAM{
 
 template<class TV> class RIGIDS_EVOLUTION;
-template<class TV> class RIGID_BODY_COLLECTION;
 template<class TV> class RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES;
-template<class TV> class RIGID_BODY_INTERSECTIONS;
-template<class TV> class RIGID_BODY_PARTICLE_INTERSECTION;
 template<class TV> class RIGID_BODY_CLUSTER_BINDINGS;
-template<class TV> class RIGID_BODY_CONTACT_GRAPH;
-template<class TV> class RIGID_BODY;
 template<class TV> class FRACTURE_PATTERN;
-template<class TV> class RIGID_DEFORMABLE_COLLISIONS;
-class RIGID_BODY_SKIP_COLLISION_CHECK;
-class RIGID_BODY_COLLISION_MANAGER;
 template<class TV> class ARTICULATED_RIGID_BODY;
-template<class TV> class RIGID_BODY_STATE;
 template<class TV> class RIGID_BODY_COLLISION_PARAMETERS;
 template<class TV> class RIGIDS_COLLISION_CALLBACKS;
 
