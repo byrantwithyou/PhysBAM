@@ -350,7 +350,7 @@ Solve(T_FACE_ARRAYS_SCALAR& incompressible_face_velocities,const T dt,const T cu
         euler_projection.elliptic_solver->psi_D=boundary_condition_collection.psi_D;
         Warn_For_Exposed_Dirichlet_Cell(euler_projection.elliptic_solver->psi_D,euler_projection.elliptic_solver->psi_N);}
 
-    T fluid_tolerance=1e-6*divergence_scaling*fluids_parameters.grid->Cell_Size();
+    T fluid_tolerance=(T)(1e-6*divergence_scaling*fluids_parameters.grid->Cell_Size());
     if(!fluid_tolerance) fluid_tolerance=solids_parameters.implicit_solve_parameters.cg_tolerance;
     PHYSBAM_DEBUG_WRITE_SUBSTEP("Before Cholesky factorization",0,1);
 

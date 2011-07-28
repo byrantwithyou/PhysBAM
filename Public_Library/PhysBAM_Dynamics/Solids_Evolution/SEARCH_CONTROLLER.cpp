@@ -956,7 +956,7 @@ Compute_Gradient(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
 template<class T_GRID> bool SEARCH_CONTROLLER<T_GRID>::
 Compute_Gradient_From_Graph(ENVIRONMENTAL_STATE<T_GRID>* current_state)
 {
-    T threshold=1e-3;
+    T threshold=(T)1e-3;
     //TODO: Read these from the example
     //if(FILE_UTILITIES::File_Exists("/disk2/bvuong/PhysBAM/Tools/preprocess_controller_data/test_graph")) FILE_UTILITIES::Read_From_File<float>("/disk2/bvuong/PhysBAM/Tools/preprocess_controller_data/test_graph",states_graph);
     //if(FILE_UTILITIES::File_Exists("/disk2/bvuong/PhysBAM/Tools/preprocess_controller_data/test_hashtable")) FILE_UTILITIES::Read_From_File<float>("/disk2/bvuong/PhysBAM/Tools/preprocess_controller_data/test_hashtable",hashtable);

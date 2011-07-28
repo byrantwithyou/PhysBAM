@@ -35,7 +35,7 @@ public:
     {assert(1<=i && i<=12);return i<=9?affine_transform.x[i-1]:translation[i-9];}
 
     T Identity(const int i) const
-    {assert(1<=i && i<=12);return (i==1 || i==5 || i==9)?1:0;}
+    {assert(1<=i && i<=12);return (T)((i==1 || i==5 || i==9)?1:0);}
 
 //#####################################################################
     T Rigidity_Penalty() const;

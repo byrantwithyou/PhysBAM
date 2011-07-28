@@ -131,7 +131,7 @@ private:
     void Warn_For_Exposed_Dirichlet_Cell(const T_ARRAYS_BOOL& psi_D,const T_FACE_ARRAYS_BOOL& psi_N);
     void Set_Cached_Psi_N_And_Coupled_Face_Data(const COLLISION_AWARE_INDEX_MAP<TV>& index_map,
         const MATRIX_SOLID_INTERPOLATION<TV>& solid_interpolation,const T time);
-    void Fill_Coupled_Face_Data(const COUPLING_CONSTRAINT_ID number_of_coupling_faces,const ARRAY<FACE_INDEX<TV::dimension> >& indexed_faces,
+    void Fill_Coupled_Face_Data(const COUPLING_CONSTRAINT_ID number_of_coupling_faces,const ARRAY<FACE_INDEX<TV_input::dimension> >& indexed_faces,
         const ARRAY<T,COUPLING_CONSTRAINT_ID>& coupling_face_data,T_FACE_ARRAYS_SCALAR& face_data);
     void Get_Coupled_Faces_And_Interpolated_Solid_Velocities(const COLLISION_AWARE_INDEX_MAP<TV>& index_map,
         const MATRIX_SOLID_INTERPOLATION<TV>& solid_interpolation,const T_FACE_ARRAYS_BOOL& psi_N_domain,T_FACE_ARRAYS_BOOL& psi_N,

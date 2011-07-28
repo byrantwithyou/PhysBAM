@@ -43,7 +43,7 @@ Second_Order_Mass_Correction(const ARRAY<T,TV_INT>& phi)
         if((phi1>0)==(phi2>0)) continue;
         T theta=LEVELSET_UTILITIES<T>::Theta(phi1,phi2);
         if(phi1>0) theta=1-theta; // theta relative to phi2, since it is inside.
-        if(theta<1e-8) theta=1e-8;
+        if(theta<1e-8) theta=(T)1e-8;
         one_over_fluid_mass_at_faces(i)/=theta;}
 }
 //#####################################################################

@@ -19,9 +19,13 @@
 #include <PhysBAM_Dynamics/Parallel_Computation/MPI_UNIFORM_PARTICLES.h>
 #include <PhysBAM_Dynamics/Particles/PARTICLE_LEVELSET_PARTICLES.h>
 #include <PhysBAM_Dynamics/Particles/PARTICLE_LEVELSET_REMOVED_PARTICLES.h>
+#ifdef USE_PTHREADS
 #include <ext/atomicity.h>
+#endif
 using namespace PhysBAM;
+#ifdef USE_PTHREADS
 using namespace __gnu_cxx;
+#endif
 //#####################################################################
 // Constructor
 //##################################################################### 
@@ -29,7 +33,9 @@ template<class T_GRID> PARTICLE_LEVELSET_UNIFORM<T_GRID>::
 PARTICLE_LEVELSET_UNIFORM(T_GRID& grid_input,T_ARRAYS_SCALAR& phi_input,const int number_of_ghost_cells_input)
     :PARTICLE_LEVELSET<T_GRID>(grid_input,phi_input,number_of_ghost_cells_input),mpi_grid(0),vof_advection(0),thread_queue(0)
 {
+#ifdef USE_PTHREADS
     pthread_mutex_init(&cell_lock,0);
+#endif
 }
 //#####################################################################
 // Destructor
@@ -37,7 +43,9 @@ PARTICLE_LEVELSET_UNIFORM(T_GRID& grid_input,T_ARRAYS_SCALAR& phi_input,const in
 template<class T_GRID> PARTICLE_LEVELSET_UNIFORM<T_GRID>::
 ~PARTICLE_LEVELSET_UNIFORM()
 {
+#ifdef USE_PTHREADS
     pthread_mutex_destroy(&cell_lock);
+#endif
     delete vof_advection;
     for(NODE_ITERATOR iterator(levelset.grid,positive_particles.Domain_Indices());iterator.Valid();iterator.Next()) Delete_All_Particles_In_Cell(iterator.Node_Index());
 }
@@ -76,8 +84,13 @@ Seed_Particles(const T time,const bool verbose)
 // Function Attract_Individual_Particle_To_Interface
 //#####################################################################
 template<class T_GRID> bool PARTICLE_LEVELSET_UNIFORM<T_GRID>::
+#ifdef USE_PTHREADS
 Attract_Individual_Particle_To_Interface_And_Adjust_Radius(T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,PARTICLE_LEVELSET_PARTICLES<TV>& cell_particles,const T phi_min,const T phi_max,const BLOCK_UNIFORM<T_GRID>& block,
     const int index,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T time,const bool delete_particles_that_leave_original_cell,RANDOM_NUMBERS<T>& local_random,ARRAY<ARRAY<TRIPLE<TV_INT,PARTICLE_LEVELSET_PARTICLES<TV>*,int> >,TV_INT>& list_to_process,ARRAY<pthread_mutex_t>* mutexes,const ARRAY<int,TV_INT>* domain_index)
+#else
+Attract_Individual_Particle_To_Interface_And_Adjust_Radius(T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,PARTICLE_LEVELSET_PARTICLES<TV>& cell_particles,const T phi_min,const T phi_max,const BLOCK_UNIFORM<T_GRID>& block,
+    const int index,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T time,const bool delete_particles_that_leave_original_cell,RANDOM_NUMBERS<T>& local_random,ARRAY<ARRAY<TRIPLE<TV_INT,PARTICLE_LEVELSET_PARTICLES<TV>*,int> >,TV_INT>& list_to_process,void* mutexes,const void* domain_index)
+#endif
 {
     T phi=levelset.Phi(cell_particles.X(index));bool inside=(phi>=phi_min && phi<=phi_max);
     TV_INT current_block_index=block.block_index;
@@ -470,6 +483,7 @@ Update_Particle_Cells(T_ARRAYS_PARTICLES& particles)
         Exchange_Boundary_Particles(*mpi_grid,template_particles,particles,(int)(cfl_number+(T)1.5),*this);}
     LOG::Time("updating particle cells");
     Consistency_Check(domain,particles);
+#ifdef USE_PTHREADS
     if(thread_queue){
         DOMAIN_ITERATOR_THREADED_ALPHA<PARTICLE_LEVELSET_UNIFORM<T_GRID>,TV> threaded_iterator(domain,thread_queue);
 
@@ -490,6 +504,9 @@ Update_Particle_Cells(T_ARRAYS_PARTICLES& particles)
         threaded_iterator.template Run<T_ARRAYS_PARTICLES&>(*this,&PARTICLE_LEVELSET_UNIFORM<T_GRID>::Delete_Marked_Particles,particles);
 
         for(int i=1;i<=threaded_iterator.domains.m;i++)pthread_mutex_destroy(&mutexes(i));}
+#else
+    if(false){}
+#endif
     else{
         ARRAY<ARRAY<int>,TV_INT> number_of_particles_per_block(levelset.grid.Block_Indices());
         ARRAY<ARRAY<TRIPLE<TV_INT,T_PARTICLES*,int> >,TV_INT> list_to_process(domain.Thickened(1));
@@ -530,7 +547,11 @@ Update_Particle_Cells_Find_List(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLES& partic
 // Function Update_Particle_Cells_Threaded
 //#####################################################################
 template<class T_GRID> template<class T_ARRAYS_PARTICLES> void PARTICLE_LEVELSET_UNIFORM<T_GRID>::
+#ifdef USE_PTHREADS
 Update_Particle_Cells_Part_Two_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLES& particles,const ARRAY<ARRAY<int>,TV_INT>& number_of_particles_per_block,ARRAY<ARRAY<TRIPLE<TV_INT,typename T_ARRAYS_PARTICLES::ELEMENT,int> >,TV_INT>& list_to_process,ARRAY<pthread_mutex_t>* mutexes,const ARRAY<int,TV_INT>* domain_index)
+#else
+Update_Particle_Cells_Part_Two_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLES& particles,const ARRAY<ARRAY<int>,TV_INT>& number_of_particles_per_block,ARRAY<ARRAY<TRIPLE<TV_INT,typename T_ARRAYS_PARTICLES::ELEMENT,int> >,TV_INT>& list_to_process,void* mutexes,const void* domain_index)
+#endif
 {
     typedef typename REMOVE_POINTER<typename T_ARRAYS_PARTICLES::ELEMENT>::TYPE T_PARTICLES;
     const T_PARTICLES& template_particles=choice<(2-IS_SAME<T_PARTICLES,PARTICLE_LEVELSET_PARTICLES<TV> >::value)>(this->template_particles,this->template_removed_particles);
@@ -544,7 +565,11 @@ Update_Particle_Cells_Part_Two_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLES
 // Function Update_Particle_Cells_Threaded
 //#####################################################################
 template<class T_GRID> template<class T_ARRAYS_PARTICLES> void PARTICLE_LEVELSET_UNIFORM<T_GRID>::
+#ifdef USE_PTHREADS
 Update_Particle_Cells_Part_Three_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLES& particles,const ARRAY<ARRAY<int>,TV_INT>& number_of_particles_per_block,ARRAY<ARRAY<TRIPLE<TV_INT,typename T_ARRAYS_PARTICLES::ELEMENT,int> >,TV_INT>& list_to_process,ARRAY<pthread_mutex_t>* mutexes,const ARRAY<int,TV_INT>* domain_index)
+#else
+Update_Particle_Cells_Part_Three_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLES& particles,const ARRAY<ARRAY<int>,TV_INT>& number_of_particles_per_block,ARRAY<ARRAY<TRIPLE<TV_INT,typename T_ARRAYS_PARTICLES::ELEMENT,int> >,TV_INT>& list_to_process,void* mutexes,const void* domain_index)
+#endif
 {
     typedef typename REMOVE_POINTER<typename T_ARRAYS_PARTICLES::ELEMENT>::TYPE T_PARTICLES;
     for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT final_block=iterator.Node_Index();
@@ -657,6 +682,7 @@ Reseed_Add_Particles(T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,T_ARRAYS_PA
     //ARRAY<ARRAY<TRIPLE<PARTICLE_LEVELSET_PARTICLES<TV>*,TV_INT,int> >,TV_INT> move_particles(domain);
     Consistency_Check(domain,particles);
     ARRAY<int,TV_INT> number_of_particles_to_add(domain);
+#ifdef USE_PTHREADS
     if(thread_queue){
         DOMAIN_ITERATOR_THREADED_ALPHA<PARTICLE_LEVELSET_UNIFORM<T_GRID>,TV> threaded_iterator(domain,thread_queue);
         threaded_iterator.template Run<T_ARRAYS_PARTICLE_LEVELSET_PARTICLES&,T_ARRAYS_PARTICLE_LEVELSET_PARTICLES&,int,T_ARRAYS_BOOL*,ARRAY<int,TV_INT>&>(*this,&PARTICLE_LEVELSET_UNIFORM<T_GRID>::Reseed_Add_Particles_Threaded_Part_One,particles,other_particles,sign,cell_centered_mask,number_of_particles_to_add);
@@ -674,6 +700,9 @@ Reseed_Add_Particles(T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,T_ARRAYS_PA
         threaded_iterator.template Run<T_ARRAYS_PARTICLE_LEVELSET_PARTICLES&,const ARRAY<ARRAY<int>,TV_INT>&,ARRAY<ARRAY<TRIPLE<TV_INT,PARTICLE_LEVELSET_PARTICLES<TV>*,int> >,TV_INT>&,ARRAY<pthread_mutex_t>*,const ARRAY<int,TV_INT>*>(*this,&PARTICLE_LEVELSET_UNIFORM<T_GRID>::Update_Particle_Cells_Part_Two_Threaded,particles,number_of_particles_per_block,list_to_process,&mutexes,&domain_index);
         threaded_iterator.template Run<T_ARRAYS_PARTICLE_LEVELSET_PARTICLES&,const ARRAY<ARRAY<int>,TV_INT>&,ARRAY<ARRAY<TRIPLE<TV_INT,PARTICLE_LEVELSET_PARTICLES<TV>*,int> >,TV_INT>&,ARRAY<pthread_mutex_t>*,const ARRAY<int,TV_INT>*>(*this,&PARTICLE_LEVELSET_UNIFORM<T_GRID>::Update_Particle_Cells_Part_Three_Threaded,particles,number_of_particles_per_block,list_to_process,&mutexes,&domain_index);
         threaded_iterator.template Run<T_ARRAYS_PARTICLE_LEVELSET_PARTICLES&>(*this,&PARTICLE_LEVELSET_UNIFORM<T_GRID>::Delete_Marked_Particles,particles);}
+#else
+    if(false){}
+#endif
     else{
         ARRAY<ARRAY<int>,TV_INT> number_of_particles_per_block(levelset.grid.Block_Indices());
         ARRAY<ARRAY<TRIPLE<TV_INT,PARTICLE_LEVELSET_PARTICLES<TV>*,int> >,TV_INT> list_to_process(domain.Thickened(1));
@@ -717,7 +746,11 @@ Reseed_Add_Particles_Threaded_Part_One(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLE_L
 // Function Reseed_Add_Particles
 //#####################################################################
 template<class T_GRID> void PARTICLE_LEVELSET_UNIFORM<T_GRID>::
+#ifdef USE_PTHREADS
 Reseed_Add_Particles_Threaded_Part_Two(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,const int sign,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T time,const ARRAY<int,TV_INT>& number_of_particles_to_add,ARRAY<ARRAY<TRIPLE<TV_INT,PARTICLE_LEVELSET_PARTICLES<TV>*,int> >,TV_INT>& list_to_process,ARRAY<pthread_mutex_t>* mutexes,const ARRAY<int,TV_INT>* domain_index)
+#else
+Reseed_Add_Particles_Threaded_Part_Two(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,const int sign,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T time,const ARRAY<int,TV_INT>& number_of_particles_to_add,ARRAY<ARRAY<TRIPLE<TV_INT,PARTICLE_LEVELSET_PARTICLES<TV>*,int> >,TV_INT>& list_to_process,void* mutexes,const void* domain_index)
+#endif
 {
     RANDOM_NUMBERS<T> local_random;
     for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block_index=iterator.Node_Index();
@@ -739,7 +772,13 @@ Reseed_Add_Particles_Threaded_Part_Two(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLE_L
             if(local_cell_particles!=cell_particles){
                 if(store_unique_particle_id) id=cell_particles->array_collection->template Get_Array<int>(ATTRIBUTE_ID_ID);
                 if(vof_advection) material_volume=cell_particles->array_collection->template Get_Array<T>(ATTRIBUTE_ID_MATERIAL_VOLUME);}
-            if(id) (*id)(index)= __exchange_and_add(&last_unique_particle_id,1);
+            if(id) {
+#ifdef USE_PTHREADS
+                (*id)(index)= __exchange_and_add(&last_unique_particle_id,1);
+#else
+                (*id)(index)=last_unique_particle_id++;
+#endif
+            }
             if(material_volume) (*material_volume)(index)=0;
             cell_particles->quantized_collision_distance(index)=(unsigned short)(local_random.Get_Number()*USHRT_MAX);
             cell_particles->X(index)=local_random.Get_Uniform_Vector(block_bounding_box);
@@ -768,7 +807,7 @@ template<class T_GRID> void PARTICLE_LEVELSET_UNIFORM<T_GRID>::
 Identify_Escaped_Particles(const BLOCK_UNIFORM<T_GRID>& block,PARTICLE_LEVELSET_PARTICLES<TV>& particles,ARRAY<bool>& escaped,const int sign)
 {
     bool near_objects=levelset.collision_body_list?levelset.collision_body_list->Occupied_Block(block):false;
-    bool enable_collision_aware_already = levelset.collision_unaware_interpolation;
+    bool enable_collision_aware_already = levelset.collision_unaware_interpolation != 0;
     if(near_objects && !enable_collision_aware_already) {
         levelset.Enable_Collision_Aware_Interpolation(sign);}
     escaped.Resize(particles.array_collection->Size());ARRAYS_COMPUTATIONS::Fill(escaped,false);T one_over_radius_multiplier=-sign/outside_particle_distance_multiplier;
@@ -1027,9 +1066,13 @@ Remove_Escaped_Particles(const BLOCK_UNIFORM<T_GRID>& block,PARTICLE_LEVELSET_PA
         cell_particles=cell_particles->next;
         if(cell_particles) Identify_Escaped_Particles(block,*cell_particles,local_escaped,sign);}
     if(near_objects) levelset.Disable_Collision_Aware_Interpolation();
+#ifdef USE_PTHREADS
     if(thread_queue) pthread_mutex_lock(&cell_lock);
+#endif
     removed_particle_times.Append_Elements(removed_particle_times_local);
+#ifdef USE_PTHREADS
     if(thread_queue) pthread_mutex_unlock(&cell_lock);
+#endif
     return removed;
 }
 //#####################################################################
@@ -1087,7 +1130,7 @@ Fix_Momentum_With_Escaped_Particles(const TV& location,const T_FACE_ARRAYS_SCALA
     if(!removed_particles->array_collection->Size() && force) Add_Negative_Particle(location,momentum_lost/mass_scaling*linear_interpolation_collidable.Clamped_To_Array_Face(levelset.grid,V_lookup_collidable_lookup,location).Normalized(),(unsigned short)(random.Get_Number()*USHRT_MAX));
     if(near_objects) levelset.Disable_Collision_Aware_Interpolation();
     PHYSBAM_ASSERT(!force||removed_particles->array_collection->Size());
-    return removed_particles->array_collection->Size();
+    return removed_particles->array_collection->Size() != 0;
 }
 //#####################################################################
 // Function Remove_Escaped_Particles
@@ -1153,11 +1196,16 @@ Reincorporate_Removed_Particles(const BLOCK_UNIFORM<T_GRID>& block,PARTICLE_LEVE
             for(int i=1;i<=T_GRID::dimension;++i){
                 TV_INT face_index(cell_index);
                 typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE &face_velocity=V->Component(i);
+#ifdef USE_PTHREADS
                 if(thread_queue) pthread_mutex_lock(&cell_lock); //TODO (mlentine) Remove this with thread_safe code
+#endif
                 if(face_velocity.Valid_Index(face_index)) face_velocity(face_index)+=half_impulse[i];
                 face_index[i]+=1;
                 if(face_velocity.Valid_Index(face_index)) face_velocity(face_index)+=half_impulse[i];
-                if(thread_queue) pthread_mutex_unlock(&cell_lock);}}
+#ifdef USE_PTHREADS
+                if(thread_queue) pthread_mutex_unlock(&cell_lock);
+#endif
+            }}
         removed_particles.radius(k)=clamp(removed_particles.radius(k),minimum_particle_radius,maximum_particle_radius);
         Move_Particle(removed_particles,*particles,k);}// maybe recalculate radius to get rid of raining effect?
     if(near_objects) levelset.Disable_Collision_Aware_Interpolation();
@@ -1229,7 +1277,6 @@ Add_Negative_Particle(const TV& location,const TV& particle_velocity,const unsig
 {
     //PHYSBAM_NOT_IMPLEMENTED(); // TODO: figure out whether/how this should be collision aware
     // TODO: still need to figure out whether this should be collision aware, but for now I need it
-
     TV_INT block=levelset.grid.Block_Index(location,3);
     if(!negative_particles.Valid_Index(block)) return;
     if(levelset.Phi(location)<minimum_particle_radius){
@@ -1241,7 +1288,12 @@ Add_Negative_Particle(const TV& location,const TV& particle_velocity,const unsig
         if(store_unique_particle_id){
             ARRAY_VIEW<int>* id=cell_particles->array_collection->template Get_Array<int>(ATTRIBUTE_ID_ID);
             PHYSBAM_ASSERT(id);
-            (*id)(index)=__exchange_and_add(&last_unique_particle_id,1);}
+#ifdef USE_PTHREADS
+            (*id)(index)=__exchange_and_add(&last_unique_particle_id,1);
+#else
+            (*id)(index)=last_unique_particle_id++;
+#endif
+        }
         if(vof_advection){
             ARRAY_VIEW<T>* material_volume=cell_particles->array_collection->template Get_Array<T>(ATTRIBUTE_ID_MATERIAL_VOLUME);
             PHYSBAM_ASSERT(material_volume);
@@ -1254,7 +1306,12 @@ Add_Negative_Particle(const TV& location,const TV& particle_velocity,const unsig
         if(store_unique_particle_id){
             ARRAY_VIEW<int>* id=removed_negative_particles(block)->array_collection->template Get_Array<int>(ATTRIBUTE_ID_ID);
             PHYSBAM_ASSERT(id);
-            (*id)(index)=__exchange_and_add(&last_unique_particle_id,1);}}
+#ifdef USE_PTHREADS
+            (*id)(index)=__exchange_and_add(&last_unique_particle_id,1);
+#else
+            (*id)(index)=last_unique_particle_id++;
+#endif
+        }}
 }
 //#####################################################################
 // Function Exchange_Overlap_Particles

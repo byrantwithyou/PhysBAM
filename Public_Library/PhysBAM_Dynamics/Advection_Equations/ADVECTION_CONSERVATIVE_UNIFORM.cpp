@@ -75,7 +75,7 @@ Update_Advection_Equation_Cell(const T_GRID& grid,T_ARRAYS_T2& Z,const T_ARRAYS_
 template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION> void ADVECTION_CONSERVATIVE_UNIFORM<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>::
 Clamp_Weights_To_Objects(const GRID<TV>& grid,ARRAY<PAIR<TV_INT,T> >& weights)
 {
-    T delta=1e-5;
+    T delta=(T)1e-5;
     for(int i=1;i<=weights.m;i++) if(ghost_box.Lazy_Inside(grid.Center(weights(i).x))) weights(i).y=0;
     T sum=0;for(int i=1;i<=weights.m;i++) sum+=weights(i).y;
     if(sum>delta && sum!=1) for(int i=1;i<=weights.m;i++) weights(i).y/=sum;
@@ -85,7 +85,7 @@ Clamp_Weights_To_Objects(const GRID<TV>& grid,ARRAY<PAIR<TV_INT,T> >& weights)
 template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION> void ADVECTION_CONSERVATIVE_UNIFORM<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>::
 Clamp_Weights_To_Objects(const GRID<TV>& grid,ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >& weights)
 {
-    T delta=1e-5;
+    T delta=(T)1e-5;
     for(int i=1;i<=weights.m;i++) if(ghost_box.Lazy_Inside(grid.Axis_X_Face(weights(i).x))) weights(i).y=0;
     T sum=0;for(int i=1;i<=weights.m;i++) sum+=weights(i).y;
     if(sum>delta && sum!=1) for(int i=1;i<=weights.m;i++) weights(i).y/=sum;
@@ -95,7 +95,7 @@ Clamp_Weights_To_Objects(const GRID<TV>& grid,ARRAY<PAIR<FACE_INDEX<TV::dimensio
 template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION> void ADVECTION_CONSERVATIVE_UNIFORM<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>::
 Clamp_Weights_To_Grid(const RANGE<TV_INT>& inside_domain,ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >& weights)
 {
-    T delta=1e-5;
+    T delta=(T)1e-5;
     for(int i=1;i<=weights.m;i++) if(!inside_domain.Lazy_Inside(weights(i).x.index)) for(int j=1;j<=TV::dimension;j++){
         TV_INT index=TV_INT::All_Ones_Vector()*2;index(j)=weights(i).x.index(j);
         if(!inside_domain.Lazy_Inside(index)){
@@ -148,7 +148,7 @@ Is_MPI_Boundary(const RANGE<TV_INT>& inside_domain,const TV_INT& index)
 template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION> void ADVECTION_CONSERVATIVE_UNIFORM<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>::
 Clean_Weights(ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >& weights)
 {
-    bool rescale=false;T delta=1e-4;
+    bool rescale=false;T delta=(T)1e-4;
     for(int i=1;i<=weights.m;i++){
         assert(weights(i).y>-delta);
         if(weights(i).y<delta){weights(i).y=0;rescale=true;}}
@@ -173,7 +173,7 @@ template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION> void ADV
 Cell_Diffusion_Helper(FACE_ITERATOR& iterator,ARRAY<T,TV_INT>& sum_jc_cell,T_ARRAYS_T2& Z)
 {
     if(ghost_box.Lazy_Inside(iterator.grid.Center(iterator.First_Cell_Index())) || ghost_box.Lazy_Inside(iterator.grid.Center(iterator.Second_Cell_Index()))) return;
-    T wjc_diff=(sum_jc_cell(iterator.First_Cell_Index())-sum_jc_cell(iterator.Second_Cell_Index()))/2.;
+    T wjc_diff=(T)((sum_jc_cell(iterator.First_Cell_Index())-sum_jc_cell(iterator.Second_Cell_Index()))/2.);
     T Z_diff=wjc_diff>0?wjc_diff/sum_jc_cell(iterator.First_Cell_Index()):wjc_diff/sum_jc_cell(iterator.Second_Cell_Index());
     sum_jc_cell(iterator.Second_Cell_Index())+=wjc_diff;sum_jc_cell(iterator.First_Cell_Index())-=wjc_diff;
     T2 local_Z=wjc_diff>0?Z(iterator.First_Cell_Index()):Z(iterator.Second_Cell_Index());
@@ -185,7 +185,7 @@ Face_Diffusion_Helper(const GRID<TV>& grid,FACE_INDEX<TV::dimension>& first_face
 { 
     if(inside && !((*inside)(first_face_index) && (*inside)(second_face_index))) return;
     if(ghost_box.Lazy_Inside(grid.Axis_X_Face(first_face_index)) || ghost_box.Lazy_Inside(grid.Axis_X_Face(second_face_index))) return;
-    T wjc_diff=(sum_jc(first_face_index)-sum_jc(second_face_index))/2.;
+    T wjc_diff=(T)((sum_jc(first_face_index)-sum_jc(second_face_index))/2.);
     T Z_diff=wjc_diff>0?wjc_diff/sum_jc(first_face_index):wjc_diff/sum_jc(second_face_index);
     sum_jc(second_face_index)+=wjc_diff;sum_jc(first_face_index)-=wjc_diff;
     T local_Z=wjc_diff>0?Z(first_face_index):Z(second_face_index);
@@ -448,7 +448,7 @@ Update_Advection_Equation_Face_Lookup(T_GRID& grid,T_ARRAYS_SCALAR& phi1,T_ARRAY
     const T_FACE_LOOKUP* Z_min_ghost,const T_FACE_LOOKUP* Z_max_ghost,T_FACE_ARRAYS_SCALAR* Z_min,T_FACE_ARRAYS_SCALAR* Z_max)
 {
     static bool first=true;
-    T delta=1e-5;
+    T delta=(T)1e-5;
     T_LEVELSET lsv1(grid,phi1),lsv2(grid,phi2);
     T_FACE_ARRAYS_BOOL inside1(grid,2*number_of_ghost_cells+1),inside2(grid,2*number_of_ghost_cells+1);
     BOUNDARY_UNIFORM<T_GRID,T> boundary_scalar;boundary_scalar.Set_Fixed_Boundary(true,1);
@@ -585,8 +585,8 @@ Update_Advection_Equation_Face_Lookup(T_GRID& grid,T_ARRAYS_SCALAR& phi1,T_ARRAY
                         for(int i=1;i<=forward_weights.m;i++) forward_weights(i).y=0;
                         ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> > forward_weights_local=interpolation.Clamped_To_Array_Face_Component_Weights(face.axis,grid,Z_ghost.Starting_Point_Face(face.axis,face.index),X_start);
                         for(int i=1;i<=forward_weights_local.m;i++){
-                            momentum_lost(forward_weights_local(i).x.index)+=density*grid.dX.Product()*forward_weights_local(i).y*remaining/2.;
-                            momentum_lost(forward_weights_local(i).x.index+TV_INT::Axis_Vector(forward_weights_local(i).x.axis))+=density*grid.dX.Product()*forward_weights_local(i).y*remaining/2.;}}}}
+                            momentum_lost(forward_weights_local(i).x.index)+=(T)(density*grid.dX.Product()*forward_weights_local(i).y*remaining/2.);
+                            momentum_lost(forward_weights_local(i).x.index+TV_INT::Axis_Vector(forward_weights_local(i).x.axis))+=(T)(density*grid.dX.Product()*forward_weights_local(i).y*remaining/2.);}}}}
             else weights_to(face).Append(PAIR<FACE_INDEX<TV::dimension>,T>(FACE_INDEX<TV::dimension>(),remaining));}
         Clamp_Weights_To_Grid(inside_domain,forward_weights);
         Clamp_Weights_To_Objects(grid,forward_weights);
@@ -680,7 +680,7 @@ Update_Advection_Equation_Face_Lookup(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z
     LINEAR_INTERPOLATION_UNIFORM<T_GRID,T> linear;
     int ghost_cells=number_of_ghost_cells;
     RANGE<TV> domain_x=grid.domain;domain_x.min_corner-=grid.dX*1.5;domain_x.max_corner+=grid.dX*1.5;
-    RANGE<TV> real_domain=grid.domain;real_domain.min_corner-=grid.dX*(1+1e-5);real_domain.max_corner+=grid.dX*(1+1e-5);
+    RANGE<TV> real_domain=grid.domain;real_domain.min_corner-=grid.dX*((T)(1+1e-5));real_domain.max_corner+=grid.dX*((T)(1+1e-5));
     for(FACE_ITERATOR iterator(grid,cfl);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> face=iterator.Full_Index();
         if(ghost_box.Lazy_Inside(iterator.Location())) continue;
         RANGE<TV_INT> ghost_domain=grid.Domain_Indices(number_of_ghost_cells);ghost_domain.max_corner+=TV_INT::Axis_Vector(face.axis);

@@ -359,7 +359,7 @@ Parse_Late_Options()
 // Function Adjust_Particle_For_Domain_Boundaries
 //#####################################################################
 template<class TV> void PLS_FSI_EXAMPLE<TV>::
-Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int index,TV& V,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time) PHYSBAM_OVERRIDE
+Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int index,TV& V,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time)
 {
     // remove this for speed - don't call the function for the other particles
     if(particle_type==PARTICLE_LEVELSET_POSITIVE || particle_type==PARTICLE_LEVELSET_REMOVED_POSITIVE) return;

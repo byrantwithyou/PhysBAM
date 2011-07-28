@@ -46,18 +46,18 @@ public:
     for(int i=1;i<=use_multiphase_strain.m;i++)if(use_multiphase_strain(i))strains(i)=new FLUID_STRAIN_UNIFORM<T_GRID>(grid);}
 
     // overrides version from BASE
-    void Advance_One_Time_Step_Forces(const T dt,const T time,const bool implicit_viscosity=false,const T_ARRAYS_SCALAR* phi_ghost=0) PHYSBAM_OVERRIDE
+    void Advance_One_Time_Step_Forces(const T dt,const T time,const bool implicit_viscosity=false,const T_ARRAYS_SCALAR* phi_ghost=0)
     {PHYSBAM_NOT_IMPLEMENTED();/*PHYSBAM_ASSERT(!phi_ghost);Advance_One_Time_Step_Forces(dt,time,implicit_viscosity,0,0);*/}
 
     // overrides version from BASE
-    void Advance_One_Time_Step_Convection(const T dt,const T time,T_FACE_ARRAYS_SCALAR& face_velocities_to_advect) PHYSBAM_OVERRIDE
+    void Advance_One_Time_Step_Convection(const T dt,const T time,T_FACE_ARRAYS_SCALAR& face_velocities_to_advect)
     {PHYSBAM_NOT_IMPLEMENTED();/*Advance_One_Time_Step_Convection(dt,time,face_velocities_to_advect,0);*/}
     
 //#####################################################################
     void Advance_One_Time_Step_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,const bool implicit_viscosity,const ARRAY<T_ARRAYS_SCALAR>* phi_ghost,
         const ARRAY<bool>* pseudo_dirichlet_regions,const int number_of_ghost_cells);
     void Advance_One_Time_Step_Convection(const T dt,const T time,T_FACE_ARRAYS_SCALAR& advecting_face_velocities,T_FACE_ARRAYS_SCALAR& face_velocities_to_advect,const ARRAY<bool>* pseudo_dirichlet_regions,const int number_of_ghost_cells);
-    void Advance_One_Time_Step_Implicit_Part(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,const bool implicit_viscosity=false) PHYSBAM_OVERRIDE;
+    void Advance_One_Time_Step_Implicit_Part(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,const bool implicit_viscosity=false);
     void Calculate_Pressure_Jump(const T dt,const T time);
     T CFL(T_FACE_ARRAYS_SCALAR& face_velocities,const bool inviscid=false,const bool viscous_only=false) const;
     void Set_Dirichlet_Boundary_Conditions(ARRAY<T_ARRAYS_SCALAR>& phis,const ARRAY<bool>& dirichlet_regions,const ARRAY<T>* pressures=0);
@@ -65,7 +65,7 @@ public:
     void Compute_Vorticity_Confinement_Force(const T_GRID& grid,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,T_ARRAYS_VECTOR& F) PHYSBAM_OVERRIDE;
 protected:
     void Discretize_Explicit_Viscous_Terms(const T dt){PHYSBAM_NOT_IMPLEMENTED();}
-    void Implicit_Viscous_Update(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time) PHYSBAM_OVERRIDE;
+    void Implicit_Viscous_Update(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
 //#####################################################################
 };
 }

@@ -126,7 +126,7 @@ public:
 
 //#####################################################################
     void Project(KRYLOV_VECTOR_BASE<T>& bV) const PHYSBAM_OVERRIDE;
-    void Project() const;
+    //void Project() const;
     void Get_Pressure(const VECTOR_T& V,ARRAY<T,TV_INT>& fluid_pressures) const;
     void Zero_Coupling_Faces_Values(T_FACE_ARRAYS_SCALAR& face_array) const;
     void Apply_Lambda_To_Euler_State(const VECTOR_T& V,const ARRAY<T,COUPLING_CONSTRAINT_ID>& coupled_faces_solid_interpolated_velocity_n,
@@ -137,7 +137,7 @@ public:
     void Print_Matrix(const VECTOR_T& vec) const;
     void Print_Each_Matrix(int n) const;
     T Residual_Linf_Norm(const VECTOR_T& x,const VECTOR_T& rhs) const;
-    void Apply(const KRYLOV_VECTOR_BASE<T>& bV,KRYLOV_VECTOR_BASE<T>& bF) const PHYSBAM_OVERRIDE;
+    //void Apply(const KRYLOV_VECTOR_BASE<T>& bV,KRYLOV_VECTOR_BASE<T>& bF) const PHYSBAM_OVERRIDE;
     void Test_Matrix() const;
     void Test_Incompressibility(const ARRAY<T,FACE_INDEX<TV::dimension> >& fluid_velocity,const ARRAY<T>& constrained_fluid_velocity) const;
     void Test_Viscosity(const VECTOR_T& V,const VECTOR_T& B) const;

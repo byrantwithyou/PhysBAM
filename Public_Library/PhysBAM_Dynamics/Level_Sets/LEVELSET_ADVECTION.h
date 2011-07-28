@@ -24,8 +24,10 @@ template<class T_GRID> struct BOUNDARY_POLICY;
 template<class T_GRID>
 class LEVELSET_ADVECTION
 {
+public:
+    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR SCALAR;
+private:
     typedef typename LEVELSET_POLICY<T_GRID>::LEVELSET T_LEVELSET;
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
     typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_ARRAYS_BOOL;
     typedef typename ADVECTION_COLLIDABLE_POLICY<T_GRID>::ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL T_ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL;
     typedef typename COLLISION_GEOMETRY_COLLECTION_POLICY<T_GRID>::GRID_BASED_COLLISION_GEOMETRY T_GRID_BASED_COLLISION_GEOMETRY;
@@ -37,28 +39,28 @@ class LEVELSET_ADVECTION
 public:
     T_LEVELSET* levelset;
 
-    ADVECTION<T_GRID,T>* advection;
+    ADVECTION<T_GRID,SCALAR>* advection;
 
     T_ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL* nested_semi_lagrangian_collidable;
-    ADVECTION_WRAPPER_COLLIDABLE_CELL<T_GRID,T,T_FACE_LOOKUP,T_ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL,T_FACE_LOOKUP_COLLIDABLE>* semi_lagrangian_collidable;
+    ADVECTION_WRAPPER_COLLIDABLE_CELL<T_GRID,SCALAR,T_FACE_LOOKUP,T_ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL,T_FACE_LOOKUP_COLLIDABLE>* semi_lagrangian_collidable;
 
     int reinitialization_runge_kutta_order;
-    T reinitialization_cfl;
+    SCALAR reinitialization_cfl;
     int reinitialization_spatial_order;
 
     LEVELSET_ADVECTION(T_LEVELSET* _levelset);
     ~LEVELSET_ADVECTION();
 
-    void Set_Custom_Advection(ADVECTION<T_GRID,T>& advection_input)
+    void Set_Custom_Advection(ADVECTION<T_GRID,SCALAR>& advection_input)
     {advection=&advection_input;}
-    void Use_Semi_Lagrangian_Collidable_Advection(const T_GRID_BASED_COLLISION_GEOMETRY& body_list,const T phi_replacement_value,const T_FACE_ARRAYS_BOOL& face_velocities_valid_mask_input);
-    void HJ_WENO(const int m,const T dx,const ARRAY<T,VECTOR<int,1> >& phi,ARRAY<T,VECTOR<int,1> >& phix_minus,ARRAY<T,VECTOR<int,1> >& phix_plus) const;
-    void HJ_ENO(const int order,const int m,const T dx,const ARRAY<T,VECTOR<int,1> >& phi,ARRAY<T,VECTOR<int,1> >& phix_minus,ARRAY<T,VECTOR<int,1> >& phix_plus) const; 
+    void Use_Semi_Lagrangian_Collidable_Advection(const T_GRID_BASED_COLLISION_GEOMETRY& body_list,const SCALAR phi_replacement_value,const T_FACE_ARRAYS_BOOL& face_velocities_valid_mask_input);
+    void HJ_WENO(const int m,const SCALAR dx,const ARRAY<SCALAR,VECTOR<int,1> >& phi,ARRAY<SCALAR,VECTOR<int,1> >& phix_minus,ARRAY<SCALAR,VECTOR<int,1> >& phix_plus) const;
+    void HJ_ENO(const int order,const int m,const SCALAR dx,const ARRAY<SCALAR,VECTOR<int,1> >& phi,ARRAY<SCALAR,VECTOR<int,1> >& phix_minus,ARRAY<SCALAR,VECTOR<int,1> >& phix_plus) const; 
 
     void Set_Reinitialization_Runge_Kutta_Order(const int order=3)
     {assert(order >=1 && order <=3);reinitialization_runge_kutta_order=order;}
 
-    void Set_Reinitialization_CFL(const T cfl=.5)
+    void Set_Reinitialization_CFL(const SCALAR cfl=.5)
     {reinitialization_cfl=cfl;assert(cfl <= 1);}
 
     void Use_WENO_For_Reinitialization() // 5th order

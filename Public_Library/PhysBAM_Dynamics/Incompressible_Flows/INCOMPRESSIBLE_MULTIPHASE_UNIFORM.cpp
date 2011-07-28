@@ -86,7 +86,7 @@ Advance_One_Time_Step_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,co
             for(FACE_ITERATOR iterator(grid,0,T_GRID::WHOLE_REGION,0,axis);iterator.Valid();iterator.Next())
                 phi_face(iterator.Face_Index())=(T).5*(phi_ghost(iterator.First_Cell_Index())+phi_ghost(iterator.Second_Cell_Index()));
             int extrapolation_bandwidth=3;
-            T_EXTRAPOLATION_SCALAR extrapolate(face_grid,phi_face,face_velocity,number_of_ghost_cells);extrapolate.Set_Band_Width(extrapolation_bandwidth);
+            T_EXTRAPOLATION_SCALAR extrapolate(face_grid,phi_face,face_velocity,number_of_ghost_cells);extrapolate.Set_Band_Width((T)extrapolation_bandwidth);
             extrapolate.Extrapolate();}
         strains(i)->Update_Strain_Equation_Multiphase(dt,time,projection.densities(i),face_velocities,face_velocities_temp,*projection.poisson_collidable->levelset_multiple,i,number_of_ghost_cells);}
 

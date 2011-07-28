@@ -555,14 +555,20 @@ Dump_Extra_Velocities(const VECTOR_ND<T>& fluid_velocity_vector)
 }
 //#####################################################################
 template class FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<float,2> >;
+#if defined(_MSC_VER) && _MSC_VER<=1500
+#else
 template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<float,1> >::Dump_Extra_Velocities(const VECTOR_ND<float>&);
 template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<float,1> >::Fill_Extra_Velocities(VECTOR_ND<float>&) const;
 template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<float,3> >::Dump_Extra_Velocities(const VECTOR_ND<float>&);
 template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<float,3> >::Fill_Extra_Velocities(VECTOR_ND<float>&) const;
+#endif
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<double,2> >;
+#if defined(_MSC_VER) && _MSC_VER<=1500
+#else
 template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<double,1> >::Dump_Extra_Velocities(const VECTOR_ND<double>&);
 template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<double,1> >::Fill_Extra_Velocities(VECTOR_ND<double>&) const;
 template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<double,3> >::Dump_Extra_Velocities(const VECTOR_ND<double>&);
 template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<double,3> >::Fill_Extra_Velocities(VECTOR_ND<double>&) const;
+#endif
 #endif

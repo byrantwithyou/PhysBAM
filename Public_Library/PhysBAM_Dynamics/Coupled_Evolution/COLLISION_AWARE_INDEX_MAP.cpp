@@ -209,7 +209,7 @@ Print(int id) const
     char buff[1000];
     sprintf(buff, "index_map-%i.txt", id);
     OCTAVE_OUTPUT<T> oo(buff);
-    oo.Write("last_coupling_cell",last_coupling_cell);
+    oo.Write("last_coupling_cell",(T)last_coupling_cell);
     ARRAY<VECTOR<int,TV::m+1> > flat_faces;
     for(int i=1;i<=indexed_faces.m;i++) flat_faces.Append(indexed_faces(i).index.Insert(indexed_faces(i).axis,1));
     oo.Write("indexed_faces",flat_faces);

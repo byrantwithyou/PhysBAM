@@ -22,9 +22,11 @@ namespace PhysBAM {
 template<class T_GRID>
 class LEVELSET_ADVECTION_UNIFORM:public LEVELSET_ADVECTION<T_GRID>
 {
+public:
+    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR SCALAR;typedef typename T_GRID::VECTOR_INT TV_INT;
+private:
     typedef LEVELSET_ADVECTION<T_GRID> BASE;
     typedef typename LEVELSET_POLICY<T_GRID>::LEVELSET T_LEVELSET;
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef typename T_GRID::VECTOR_INT TV_INT;
     typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_ARRAYS_BOOL;
     typedef typename ADVECTION_COLLIDABLE_POLICY<T_GRID>::ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL T_ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL;
     typedef typename COLLISION_GEOMETRY_COLLECTION_POLICY<T_GRID>::GRID_BASED_COLLISION_GEOMETRY T_GRID_BASED_COLLISION_GEOMETRY;
@@ -38,7 +40,7 @@ public:
     using BASE::reinitialization_cfl;using BASE::reinitialization_runge_kutta_order;using BASE::reinitialization_spatial_order;
 
     VOF_ADVECTION<TV>* vof_advection;
-    ADVECTION_MACCORMACK_UNIFORM<T_GRID,T,ADVECTION<T_GRID,T> >* advection_maccormack;
+    ADVECTION_MACCORMACK_UNIFORM<T_GRID,SCALAR,ADVECTION<T_GRID,SCALAR> >* advection_maccormack;
 
     LEVELSET_ADVECTION_UNIFORM(T_LEVELSET* _levelset):
         BASE(_levelset),vof_advection(0),advection_maccormack(0)
@@ -46,12 +48,12 @@ public:
 
     void Use_Maccormack_Advection(const T_ARRAYS_BOOL& cell_mask);
     void Set_VOF_Advection(VOF_ADVECTION<TV>& vof_advection_input);
-    T Approximate_Negative_Material(const T interface_thickness=3,const T time=0) const;
-    T Approximate_Positive_Material(const T interface_thickness=3,const T time=0) const;
-    T Negative_Cell_Fraction(const TV_INT& cell) const;
+    SCALAR Approximate_Negative_Material(const SCALAR interface_thickness=3,const SCALAR time=0) const;
+    SCALAR Approximate_Positive_Material(const SCALAR interface_thickness=3,const SCALAR time=0) const;
+    SCALAR Negative_Cell_Fraction(const TV_INT& cell) const;
     void Negative_Material(T_ARRAYS_SCALAR& masses) const;
-    T Negative_Material() const;
-    T Positive_Material() const;
+    SCALAR Negative_Material() const;
+    SCALAR Positive_Material() const;
 };
 
 }

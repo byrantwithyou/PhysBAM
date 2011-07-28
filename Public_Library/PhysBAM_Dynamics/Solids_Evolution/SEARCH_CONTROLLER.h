@@ -59,7 +59,7 @@ class ENVIRONMENTAL_STATE
 
     bool operator==(const ENVIRONMENTAL_STATE<T_GRID>& state) const
     {
-        T threshold=1e-5;
+        T threshold=(T)1e-5;
         if(incorporate_fluids) for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()) if(abs(this->pressures(iterator.Cell_Index())-state.pressures(iterator.Cell_Index()))>threshold) return false;
         else if(abs(this->external_force_mag-state.external_force_mag)>1e-5||(this->external_force_dir-state.external_force_dir).Magnitude()>threshold) return false;
         TV vector;vector.Fill(0);vector(1)=1;for(JOINT_ID i(1);i<=this->angles.Size();i++){if(((this->angles(i).Inverse_Rotate(state.angles(i).Rotate(vector)))-vector).Magnitude()>threshold) return false;}
@@ -236,12 +236,12 @@ public:
 
 //#####################################################################
     void Update_Position_Based_State(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
-    void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const;
-    void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const;
-    void Add_Force_Differential(ARRAY_VIEW<const TV> dX,ARRAY_VIEW<TV> dF,const T time) const;
-    void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const;
-    void Add_Velocity_Independent_Forces_Helper(ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time,const RIGID_BODY<TV>& rigid_body,const TV& location,
-        const TV& impulse,const T_SPIN& angular_impulse) const;
+    //void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const;
+    //void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const;
+    //void Add_Force_Differential(ARRAY_VIEW<const TV> dX,ARRAY_VIEW<TV> dF,const T time) const;
+    //void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const;
+    //void Add_Velocity_Independent_Forces_Helper(ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time,const RIGID_BODY<TV>& rigid_body,const TV& location,
+    //    const TV& impulse,const T_SPIN& angular_impulse) const;
     JOINT_FUNCTION<TV>* Create_Joint_Function(const JOINT_ID joint_id);
     void Save_Position(ARRAY<TV>& X,ARRAY<TV>& rigid_X,ARRAY<ROTATION<TV> >& rigid_rotation);
     void Restore_Position(ARRAY_VIEW<const TV> X,ARRAY_VIEW<const TV> rigid_X,ARRAY_VIEW<const ROTATION<TV> > rigid_rotation);
@@ -262,8 +262,8 @@ public:
     void Create_Clusters_From_Joint_List(const ARRAY<bool,JOINT_ID>& blocking_joint,ARRAY<ARRAY<int> >& body_lists,ARRAY<VECTOR<int,2>,JOINT_ID>& adjacent_lists);
     void Create_All_Clusters(RIGID_BODY_COLLISION_MANAGER_HASH* collision_manager);
     void Remove_Clusters();
-    TWIST<TV> Adjust_Force_For_New_Joint(JOINT_STATE from_state,JOINT_STATE to_state,TWIST<TV> force);
-    T Adjust_Force_For_New_Joint(JOINT_STATE from_state,JOINT_STATE to_state,T force);
+    //TWIST<TV> Adjust_Force_For_New_Joint(JOINT_STATE from_state,JOINT_STATE to_state,TWIST<TV> force);
+    //T Adjust_Force_For_New_Joint(JOINT_STATE from_state,JOINT_STATE to_state,T force);
     T Evaluate_Force(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,const T dx,const T magnitude,const VECTOR_ND<T>* grad);
     PAIR<T,T_SPIN> Evaluate_Force_For_Joint(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,const JOINT_ID joint,const int dimension,const T dx_multiplier);
     T Evaluate_Force_To_Stay(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,int hack=false);

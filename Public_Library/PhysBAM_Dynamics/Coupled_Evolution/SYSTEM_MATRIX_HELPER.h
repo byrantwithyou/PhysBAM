@@ -13,7 +13,7 @@
 namespace PhysBAM{
 
 template<class T> struct SYSTEM_MATRIX_HELPER;
-template<class T> struct SPARSE_MATRIX_FLAT_MXN;
+template<class T> class SPARSE_MATRIX_FLAT_MXN;
 
 template<class T>
 struct SYSTEM_MATRIX_BASE

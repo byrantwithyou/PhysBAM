@@ -372,7 +372,7 @@ Setup_Tolerances(const VECTOR_T& F,const VECTOR_ND<T>& fluid_velocity,const GENE
 {
     GENERALIZED_VELOCITY<TV> solids_velocity_star_projected(temporary_velocities,temporary_twists,solid_system->solid_body_collection);
 
-    T eps=1e-5;
+    T eps=(T)1e-5;
     if(solid_node){
         for(FORCE_AGGREGATE_ID i(1);i<=F.force_coefficients.Size();i++)
             tolerances.force_coefficients(i)=max(eps,(T)1e-2*abs(F.force_coefficients(i)));
@@ -382,7 +382,7 @@ Setup_Tolerances(const VECTOR_T& F,const VECTOR_ND<T>& fluid_velocity,const GENE
     if(fluid_node){
         fluid_gradient->Collect_Maxabs_Velocity(fluid_velocity,tolerances.pressure);
         T eps_velocity=eps*index_map.grid.Face_Sizes()[1];
-        T scaling_factor=1e-5;
+        T scaling_factor=(T)1e-5;
         tolerances.pressure*=scaling_factor;
         for(int i=1;i<=index_map.real_cell_indices.m;++i){int index=index_map.real_cell_indices(i);
             if(tolerances.pressure(index)<eps_velocity) tolerances.pressure(index)=eps_velocity;}

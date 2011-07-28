@@ -138,7 +138,7 @@ Distance(const ARRAY<T>& weights,int base)
 {
     T distance=0;
     for(int i=1;i<=activations.m;i++){
-        T mean=.5*abs((activations_save(i)+activations(i)));
+        T mean=(T)(.5*abs((activations_save(i)+activations(i))));
         distance+=weights(base+i)*pow(activations_save(i)-activations(i),2)/(mean?mean:1);}
     return sqrt(distance);
 }

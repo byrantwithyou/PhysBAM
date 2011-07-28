@@ -21,7 +21,7 @@ using namespace PhysBAM;
 template<class T_GRID> void LEVELSET_ADVECTION_UNIFORM<T_GRID>::
 Use_Maccormack_Advection(const T_ARRAYS_BOOL& cell_mask)
 {
-    advection_maccormack=new ADVECTION_MACCORMACK_UNIFORM<T_GRID,T,ADVECTION<T_GRID,T> >(*advection,0,&cell_mask,0);
+    advection_maccormack=new ADVECTION_MACCORMACK_UNIFORM<T_GRID,SCALAR,ADVECTION<T_GRID,SCALAR> >(*advection,0,&cell_mask,0);
     Set_Custom_Advection(*advection_maccormack);
 }
 //#####################################################################
@@ -57,7 +57,7 @@ Negative_Material(T_ARRAYS_SCALAR& masses) const
 template<class T_GRID> typename T_GRID::VECTOR_T::SCALAR LEVELSET_ADVECTION_UNIFORM<T_GRID>::
 Negative_Material() const
 { 
-    T total_area=0;
+    SCALAR total_area=0;
     vof_advection->Set_Full_Cell_Size(levelset->grid.Cell_Size());vof_advection->Set_Up_For_Refinement();
     for(CELL_ITERATOR iterator(levelset->grid);iterator.Valid();iterator.Next()) total_area+=vof_advection->Negative_Material(iterator.Cell_Index());
     return total_area*levelset->grid.Cell_Size();
@@ -75,13 +75,13 @@ Positive_Material() const
 //#####################################################################
 // calculates the approximate area using Heaviside functions
 template<class T_GRID> typename T_GRID::VECTOR_T::SCALAR LEVELSET_ADVECTION_UNIFORM<T_GRID>::
-Approximate_Negative_Material(const T interface_thickness,const T time) const
+Approximate_Negative_Material(const SCALAR interface_thickness,const SCALAR time) const
 {
     T_GRID& grid=levelset->grid;
     T_ARRAYS_SCALAR& phi=levelset->phi;
     T_GRID node_grid=grid.Is_MAC_Grid()?grid.Get_Regular_Grid_At_MAC_Positions():grid;
-    T interface_half_width=interface_thickness*grid.dX.Max()/2,volume=0;
-    for(NODE_ITERATOR iterator(node_grid);iterator.Valid();iterator.Next()) volume+=LEVELSET_UTILITIES<T>::Heaviside(-phi(iterator.Node_Index()),interface_half_width);
+    SCALAR interface_half_width=interface_thickness*grid.dX.Max()/2,volume=0;
+    for(NODE_ITERATOR iterator(node_grid);iterator.Valid();iterator.Next()) volume+=LEVELSET_UTILITIES<SCALAR>::Heaviside(-phi(iterator.Node_Index()),interface_half_width);
     return volume*grid.Cell_Size();
 }
 //#####################################################################
@@ -89,13 +89,13 @@ Approximate_Negative_Material(const T interface_thickness,const T time) const
 //#####################################################################
 // calculates the approximate area using Heaviside functions
 template<class T_GRID> typename T_GRID::VECTOR_T::SCALAR LEVELSET_ADVECTION_UNIFORM<T_GRID>::
-Approximate_Positive_Material(const T interface_thickness,const T time) const
+Approximate_Positive_Material(const SCALAR interface_thickness,const SCALAR time) const
 {
     T_GRID& grid=levelset->grid;
     T_ARRAYS_SCALAR& phi=levelset->phi;
     T_GRID node_grid=grid.Is_MAC_Grid()?grid.Get_Regular_Grid_At_MAC_Positions():grid;
-    T interface_half_width=interface_thickness*grid.dX.Max()/2,volume=0;
-    for(NODE_ITERATOR iterator(node_grid);iterator.Valid();iterator.Next()) volume+=LEVELSET_UTILITIES<T>::Heaviside(phi(iterator.Node_Index()),interface_half_width);
+    SCALAR interface_half_width=interface_thickness*grid.dX.Max()/2,volume=0;
+    for(NODE_ITERATOR iterator(node_grid);iterator.Valid();iterator.Next()) volume+=LEVELSET_UTILITIES<SCALAR>::Heaviside(phi(iterator.Node_Index()),interface_half_width);
     return volume*grid.Cell_Size();
 }
 

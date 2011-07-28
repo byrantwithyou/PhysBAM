@@ -83,7 +83,7 @@ public:
     T density,outside_density,density_fuel;
     T surface_tension;
     bool variable_surface_tension;
-    T viscosity,viscosity_fuel;
+    T viscosity,outside_viscosity,viscosity_fuel;
     bool variable_viscosity;
     bool implicit_viscosity,use_explicit_part_of_implicit_viscosity;
     int implicit_viscosity_iterations;

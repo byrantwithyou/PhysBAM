@@ -13,7 +13,7 @@
 namespace PhysBAM{
 
 template<class TV> class UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO;
-template<class TV> class COLLISION_FACE_INFO;
+template<class TV> struct COLLISION_FACE_INFO;
 
 template<class TV>
 class UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED:public UNIFORM_GRID_ITERATOR_FACE<TV>

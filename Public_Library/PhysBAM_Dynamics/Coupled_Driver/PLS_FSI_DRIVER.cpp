@@ -229,7 +229,7 @@ Initialize()
         example.Update_Fluid_Parameters((T)1./example.frame_rate,time);
 
         int extrapolation_ghost_cells=2*example.fluids_parameters.number_of_ghost_cells+2;
-        T extrapolation_bandwidth=extrapolation_ghost_cells-1;
+        T extrapolation_bandwidth=(T)(extrapolation_ghost_cells-1);
         T_ARRAYS_SCALAR exchanged_phi_ghost(grid.Domain_Indices(extrapolation_ghost_cells));
         particle_levelset_evolution->particle_levelset.levelset.boundary->Fill_Ghost_Cells(grid,particle_levelset_evolution->phi,exchanged_phi_ghost,0,time,extrapolation_ghost_cells);
 //        Extrapolate_Velocity_Across_Interface(example.fluid_collection.incompressible_fluid_collection.face_velocities,particle_levelset_evolution->Particle_Levelset(1).levelset,extrapolation_bandwidth);
@@ -339,7 +339,7 @@ Extrapolate_Velocity_Across_Interface(T time,T dt)
             if(phi_face(index) >= delta && !fixed_face(index)) face_velocity(index)=(T)0;}
 
         EXTRAPOLATION_UNIFORM<GRID<TV>,T> extrapolate(face_grid,phi_face,face_velocity,extrapolation_ghost_cells);
-        extrapolate.Set_Band_Width(band_width);
+        extrapolate.Set_Band_Width((T)band_width);
         extrapolate.Set_Custom_Seed_Done(&fixed_face);
         extrapolate.Extrapolate();}
 }
@@ -439,7 +439,7 @@ Advect_Fluid(const T dt,const int substep)
     Write_Substep("before advection",substep,1);
 
     int extrapolation_ghost_cells=2*example.fluids_parameters.number_of_ghost_cells+2;
-    T extrapolation_bandwidth=extrapolation_ghost_cells-1;
+    T extrapolation_bandwidth=(T)(extrapolation_ghost_cells-1);
     T_ARRAYS_SCALAR exchanged_phi_ghost(grid.Domain_Indices(extrapolation_ghost_cells));
     particle_levelset_evolution->particle_levelset.levelset.boundary->Fill_Ghost_Cells(grid,particle_levelset_evolution->phi,exchanged_phi_ghost,0,time+dt,extrapolation_ghost_cells);
     if(example.convection_order>1){

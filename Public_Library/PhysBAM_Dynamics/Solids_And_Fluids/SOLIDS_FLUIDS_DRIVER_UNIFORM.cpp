@@ -31,6 +31,7 @@
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Euler_Equations/EULER_UNIFORM.h>
 #include <PhysBAM_Fluids/PhysBAM_Fluids/Coupled_Evolution/COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/DETONATION_SHOCK_DYNAMICS.h>
+#include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/INCOMPRESSIBLE_UNIFORM.h>
 #include <PhysBAM_Dynamics/Boundaries/BOUNDARY_PHI_WATER.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/SOLID_FLUID_COUPLED_EVOLUTION.h>
@@ -312,11 +313,11 @@ Initialize()
             int extrapolation_ghost_cells=2*example.fluids_parameters.number_of_ghost_cells+2;
             T_ARRAYS_SCALAR exchanged_phi_ghost(grid.Domain_Indices(extrapolation_ghost_cells));
             particle_levelset_evolution->particle_levelset.levelset.boundary->Fill_Ghost_Cells(grid,particle_levelset_evolution->phi,exchanged_phi_ghost,0,time,extrapolation_ghost_cells);
-            incompressible->Extrapolate_Velocity_Across_Interface(example.fluid_collection.incompressible_fluid_collection.face_velocities,exchanged_phi_ghost,example.fluids_parameters.enforce_divergence_free_extrapolation,example.fluids_parameters.number_of_ghost_cells,0,TV(),
+            incompressible->Extrapolate_Velocity_Across_Interface(example.fluid_collection.incompressible_fluid_collection.face_velocities,exchanged_phi_ghost,example.fluids_parameters.enforce_divergence_free_extrapolation,(T)example.fluids_parameters.number_of_ghost_cells,0,TV(),
                 &collision_bodies_affecting_fluid.face_neighbors_visible);}
         else if(number_of_regions>=2 && example.fluids_parameters.dirichlet_regions.Number_True()>0){
             incompressible_multiphase->Extrapolate_Velocity_Across_Interface(example.fluid_collection.incompressible_fluid_collection.face_velocities,phi_dirichlet_regions,
-                example.fluids_parameters.enforce_divergence_free_extrapolation,example.fluids_parameters.number_of_ghost_cells,0,TV(),&collision_bodies_affecting_fluid.face_neighbors_visible);}}
+                example.fluids_parameters.enforce_divergence_free_extrapolation,(T)example.fluids_parameters.number_of_ghost_cells,0,TV(),&collision_bodies_affecting_fluid.face_neighbors_visible);}}
     
     if(example.fluids_parameters.compressible){
         T fictitious_dt=(T)1./example.frame_rate;
@@ -327,7 +328,7 @@ Initialize()
             T_ARRAYS_SCALAR exchanged_phi_ghost(grid.Domain_Indices(extrapolation_ghost_cells));
             particle_levelset_evolution->particle_levelset.levelset.boundary->Fill_Ghost_Cells(grid,particle_levelset_evolution->phi,exchanged_phi_ghost,0,time,extrapolation_ghost_cells);
             euler->Fill_Ghost_Cells(fictitious_dt,time,extrapolation_ghost_cells);
-            COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES<TV>::Extrapolate_Compressible_State_Into_Incompressible_Region(fictitious_dt,time,example.fluids_parameters.number_of_ghost_cells,extrapolation_ghost_cells,*euler->eos,euler->grid,
+            COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES<TV>::Extrapolate_Compressible_State_Into_Incompressible_Region(fictitious_dt,time,(T)example.fluids_parameters.number_of_ghost_cells,extrapolation_ghost_cells,*euler->eos,euler->grid,
                 exchanged_phi_ghost,fluid_collection.incompressible_fluid_collection.face_velocities,euler->U_ghost,euler->U);}}
 
     if(number_of_regions==1 && example.fluids_parameters.monitor_mass){
@@ -831,25 +832,25 @@ Project_Fluid(const T dt_projection,const T time_projection,const int substep)
         LOG::Time("extrapolating velocity across interface");
         if(fluids_parameters.use_sph_for_removed_negative_particles && fluids_parameters.sph_evolution->use_two_way_coupling){
             incompressible->Extrapolate_Velocity_Across_Interface(example.fluid_collection.incompressible_fluid_collection.face_velocities,particle_levelset_evolution->phi,
-                fluids_parameters.enforce_divergence_free_extrapolation,example.fluids_parameters.number_of_ghost_cells,0,TV(),&collision_bodies_affecting_fluid.face_neighbors_visible,&fluids_parameters.sph_evolution->valid_particle_face_velocities);}
+                fluids_parameters.enforce_divergence_free_extrapolation,(T)example.fluids_parameters.number_of_ghost_cells,0,TV(),&collision_bodies_affecting_fluid.face_neighbors_visible,&fluids_parameters.sph_evolution->valid_particle_face_velocities);}
         else if(number_of_regions==1){
             // makes MPI work. TODO: make phi in levelset store 8 by default
             int extrapolation_ghost_cells=2*example.fluids_parameters.number_of_ghost_cells+2;
             T_ARRAYS_SCALAR exchanged_phi_ghost(grid.Domain_Indices(extrapolation_ghost_cells));
             particle_levelset_evolution->particle_levelset.levelset.boundary->Fill_Ghost_Cells(grid,particle_levelset_evolution->phi,exchanged_phi_ghost,0,time_projection+dt_projection,extrapolation_ghost_cells);
             incompressible->Extrapolate_Velocity_Across_Interface(example.fluid_collection.incompressible_fluid_collection.face_velocities,exchanged_phi_ghost,
-                fluids_parameters.enforce_divergence_free_extrapolation,example.fluids_parameters.number_of_ghost_cells,0,TV(),&collision_bodies_affecting_fluid.face_neighbors_visible);
+                fluids_parameters.enforce_divergence_free_extrapolation,(T)example.fluids_parameters.number_of_ghost_cells,0,TV(),&collision_bodies_affecting_fluid.face_neighbors_visible);
             if(fluids_parameters.use_strain){LOG::Time("extrapolating strain across interface");
                 incompressible->strain->Extrapolate_Strain_Across_Interface(particle_levelset_evolution->phi);}
 
             if(example.fluids_parameters.compressible){
                 euler->Fill_Ghost_Cells(dt_projection,time_projection,extrapolation_ghost_cells);
-                COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES<TV>::Extrapolate_Compressible_State_Into_Incompressible_Region(dt_projection,time_projection,example.fluids_parameters.number_of_ghost_cells,extrapolation_ghost_cells,*euler->eos,euler->grid,
+                COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES<TV>::Extrapolate_Compressible_State_Into_Incompressible_Region(dt_projection,time_projection,(T)example.fluids_parameters.number_of_ghost_cells,extrapolation_ghost_cells,*euler->eos,euler->grid,
                     exchanged_phi_ghost,fluid_collection.incompressible_fluid_collection.face_velocities,euler->U_ghost,euler->U);}}
         else if(number_of_regions>=2){
             if(fluids_parameters.dirichlet_regions.Number_True()>0){
                 incompressible_multiphase->Extrapolate_Velocity_Across_Interface(example.fluid_collection.incompressible_fluid_collection.face_velocities,
-                    incompressible_multiphase->levelset_for_dirichlet_regions->phi,fluids_parameters.enforce_divergence_free_extrapolation,example.fluids_parameters.number_of_ghost_cells,0,TV(),
+                    incompressible_multiphase->levelset_for_dirichlet_regions->phi,fluids_parameters.enforce_divergence_free_extrapolation,(T)example.fluids_parameters.number_of_ghost_cells,0,TV(),
                     &collision_bodies_affecting_fluid.face_neighbors_visible);}
             for(int i=1;i<=fluids_parameters.use_multiphase_strain.m;i++) if(fluids_parameters.use_multiphase_strain(i)){
                 incompressible_multiphase->strains(i)->Extrapolate_Strain_Across_Interface(particle_levelset_evolution_multiple->phis(i));}}
@@ -1252,7 +1253,7 @@ Advance_Fluid_One_Time_Step_Implicit_Part(const bool done,const T dt,const int s
         LOG::Time("extrapolating velocity across interface");
         if(fluids_parameters.use_sph_for_removed_negative_particles && fluids_parameters.sph_evolution->use_two_way_coupling){
             incompressible->Extrapolate_Velocity_Across_Interface(example.fluid_collection.incompressible_fluid_collection.face_velocities,
-                particle_levelset_evolution->phi,fluids_parameters.enforce_divergence_free_extrapolation,example.fluids_parameters.number_of_ghost_cells,0,TV(),&collision_bodies_affecting_fluid.face_neighbors_visible,
+                particle_levelset_evolution->phi,fluids_parameters.enforce_divergence_free_extrapolation,(T)example.fluids_parameters.number_of_ghost_cells,0,TV(),&collision_bodies_affecting_fluid.face_neighbors_visible,
                 &fluids_parameters.sph_evolution->valid_particle_face_velocities);}
         else if(number_of_regions==1){
             // makes MPI work. TODO: make phi in levelset store 8 by default
@@ -1260,7 +1261,7 @@ Advance_Fluid_One_Time_Step_Implicit_Part(const bool done,const T dt,const int s
             T_ARRAYS_SCALAR exchanged_phi_ghost(grid.Domain_Indices(extrapolation_ghost_cells));
             particle_levelset_evolution->particle_levelset.levelset.boundary->Fill_Ghost_Cells(grid,particle_levelset_evolution->phi,exchanged_phi_ghost,0,time+dt,extrapolation_ghost_cells);
             incompressible->Extrapolate_Velocity_Across_Interface(example.fluid_collection.incompressible_fluid_collection.face_velocities,exchanged_phi_ghost,
-                fluids_parameters.enforce_divergence_free_extrapolation,example.fluids_parameters.number_of_ghost_cells,0,TV(),&collision_bodies_affecting_fluid.face_neighbors_visible);
+                fluids_parameters.enforce_divergence_free_extrapolation,(T)example.fluids_parameters.number_of_ghost_cells,0,TV(),&collision_bodies_affecting_fluid.face_neighbors_visible);
             if(fluids_parameters.use_strain){LOG::Time("extrapolating strain across interface");
                 incompressible->strain->Extrapolate_Strain_Across_Interface(particle_levelset_evolution->phi);}
             if(example.fluids_parameters.compressible){
@@ -1272,7 +1273,7 @@ Advance_Fluid_One_Time_Step_Implicit_Part(const bool done,const T dt,const int s
         else if(number_of_regions>=2){
             if(fluids_parameters.dirichlet_regions.Number_True()>0){
                 incompressible_multiphase->Extrapolate_Velocity_Across_Interface(example.fluid_collection.incompressible_fluid_collection.face_velocities,incompressible_multiphase->levelset_for_dirichlet_regions->phi,
-                    fluids_parameters.enforce_divergence_free_extrapolation,example.fluids_parameters.number_of_ghost_cells,0,TV(),&collision_bodies_affecting_fluid.face_neighbors_visible);
+                    fluids_parameters.enforce_divergence_free_extrapolation,(T)example.fluids_parameters.number_of_ghost_cells,0,TV(),&collision_bodies_affecting_fluid.face_neighbors_visible);
                 incompressible_multiphase->boundary->Apply_Boundary_Condition_Face(incompressible->grid,example.fluid_collection.incompressible_fluid_collection.face_velocities,time+dt);}
             for(int i=1;i<=fluids_parameters.use_multiphase_strain.m;i++) if(fluids_parameters.use_multiphase_strain(i)){
                 incompressible_multiphase->strains(i)->Extrapolate_Strain_Across_Interface(particle_levelset_evolution_multiple->phis(i));}}
