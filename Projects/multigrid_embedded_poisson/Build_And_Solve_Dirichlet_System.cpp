@@ -14,13 +14,6 @@
 #include <boost/function.hpp>
 #include <boost/preprocessor/seq/enum.hpp>
 
-#include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Arrays/ARRAY_DIFFERENCE.h>
-#include <PhysBAM_Tools/Arrays/ARRAY_NEGATION.h>
-#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_MIN_MAX.h>
-#include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/ARRAY_OPS.h>
 #include <Jeffrey_Utilities/BASIC_TIMER.h>
 #include <Jeffrey_Utilities/Eval_Grid_Function.h>
@@ -33,6 +26,13 @@
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOUND.h>
 #include <Jeffrey_Utilities/Stencils/INDEX_TRANSFORM_STENCIL_PROXY.h>
 #include <Jeffrey_Utilities/VECTOR_OPS.h>
+#include <PhysBAM_Tools/Arrays/ARRAY.h>
+#include <PhysBAM_Tools/Arrays/ARRAY_DIFFERENCE.h>
+#include <PhysBAM_Tools/Arrays/ARRAY_NEGATION.h>
+#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
+#include <PhysBAM_Tools/Arrays_Computations/ARRAY_MIN_MAX.h>
+#include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 #include "AGGREGATE_CONSTRAINT_SYSTEM.h"
 #include "Aggregate_Constraints.h"
@@ -106,11 +106,12 @@ int Build_And_Solve_Dirichlet_System(
 
     std::cout << "Building Dirichlet system..." << std::endl;
     timer.Restart();
-   Build_Dirichlet_System(
-			  problem, main_params,
+    Build_Dirichlet_System(
+        problem, main_params,
         phi_of_fine_index,
-			  regular_subsys, embedding_subsys, ARRAY_VIEW<T>(system_rhs),
-        constraint_system, constraint_rhs);
+        regular_subsys, embedding_subsys, As_Array_View(system_rhs),
+        constraint_system, constraint_rhs
+    );
     std::cout << "[Building Dirichlet system...] " << timer.Elapsed() << " s" << std::endl;
 
     const int n_embedding = embedding_subsys.stencils.Size();
@@ -124,7 +125,7 @@ int Build_And_Solve_Dirichlet_System(
         main_params.general.n_thread,
         min_x, max_x, multi_index_bound,
         problem.u,
-        ARRAY_VIEW<T>(u_continuous)
+        As_Array_View(u_continuous)
     );
     {
         ARRAY<T> constraint_residual(-constraint_rhs);
@@ -207,7 +208,7 @@ int Build_And_Solve_Dirichlet_System(
                 ),
                 indyable,
                 problem.min_relative_indy_weight,
-                As_Raw_Array(indy_index_of_constraint_index),
+                As_Array_View(indy_index_of_constraint_index),
                 aggregate_constraint_system.index_of_indy_index
             );
         }
@@ -230,9 +231,9 @@ int Build_And_Solve_Dirichlet_System(
                     &CONSTRAINT_SYSTEM_TYPE::Multi_Index_Stencil_Proxy
                 >(constraint_system)
             ),
-            As_Const_Raw_Array(indy_index_of_constraint_index),
-            As_Const_Raw_Array(aggregate_constraint_system.index_of_indy_index),
-            As_Raw_Array(aggregate_constraint_system.value_of_indy_index),
+            As_Const_Array_View(indy_index_of_constraint_index),
+            As_Const_Array_View(aggregate_constraint_system.index_of_indy_index),
+            As_Array_View(aggregate_constraint_system.value_of_indy_index),
             BOUND_FAST_MEM_FN<
                 typename AGGREGATE_CONSTRAINT_SYSTEM_TYPE::INDYLESS_STENCIL_PROXY_TYPE
                     (AGGREGATE_CONSTRAINT_SYSTEM_TYPE::*)( int ),
@@ -294,16 +295,16 @@ int Build_And_Solve_Dirichlet_System(
             ZTAZ_EMBEDDING_SUBSYS_TYPE ztaz_embedding_subsys(multi_index_bound);
             Init_ZTAZ_Embedding(
                 embedding_subsys.stencil_index_of_linear_index,
-                As_Const_Raw_Array(embedding_subsys.linear_index_of_stencil_index),
+                As_Const_Array_View(embedding_subsys.linear_index_of_stencil_index),
                 aggregate_constraint_system.indy_index_of_index,
-                As_Const_Raw_Array(aggregate_constraint_system.index_of_indy_index),
+                As_Const_Array_View(aggregate_constraint_system.index_of_indy_index),
                 Make_Compose_Function(
                     BOUND_FAST_MEM_FN<
                         typename REGULAR_SUBSYS_TYPE::CONST_LINEAR_INDEX_STENCIL_PROXY_TYPE
                             (REGULAR_SUBSYS_TYPE::*)( int ) const,
                         &REGULAR_SUBSYS_TYPE::Linear_Index_Stencil_Proxy
                     >(regular_subsys),
-                    As_Const_Raw_Array(aggregate_constraint_system.index_of_indy_index)
+                    As_Const_Array_View(aggregate_constraint_system.index_of_indy_index)
                 ),
                 ztaz_embedding_subsys.stencil_index_of_linear_index,
                 ztaz_embedding_subsys.linear_index_of_stencil_index
@@ -322,15 +323,15 @@ int Build_And_Solve_Dirichlet_System(
                     &EMBEDDING_SUBSYS_TYPE::Linear_Index_Stencil_Proxy
                 >(embedding_subsys),
                 aggregate_constraint_system.indy_index_of_index,
-                As_Const_Raw_Array(aggregate_constraint_system.index_of_indy_index),
+                As_Const_Array_View(aggregate_constraint_system.index_of_indy_index),
                 aggregate_constraint_system.stencils_containing_index,
-                As_Const_Raw_Array(aggregate_constraint_system.value_of_indy_index),
+                As_Const_Array_View(aggregate_constraint_system.value_of_indy_index),
                 BOUND_FAST_MEM_FN<
                     typename AGGREGATE_CONSTRAINT_SYSTEM_TYPE::CONST_INDYLESS_STENCIL_PROXY_TYPE
                         (AGGREGATE_CONSTRAINT_SYSTEM_TYPE::*)( int ) const,
                     &AGGREGATE_CONSTRAINT_SYSTEM_TYPE::Indyless_Stencil_Proxy
                 >(aggregate_constraint_system),
-                As_Const_Raw_Array(ztaz_embedding_subsys.linear_index_of_stencil_index),
+                As_Const_Array_View(ztaz_embedding_subsys.linear_index_of_stencil_index),
                 BOUND_FAST_MEM_FN<
                     typename ZTAZ_EMBEDDING_SUBSYS_TYPE::LINEAR_INDEX_STENCIL_PROXY_TYPE
                         (ZTAZ_EMBEDDING_SUBSYS_TYPE::*)( int ),
@@ -507,10 +508,10 @@ int Build_And_Solve_Dirichlet_System(
             multi_index_bound
         ),
         Make_Compose_Function(
-            As_Const_Raw_Array(regular_subsys.sign_of_cell_index),
+            As_Const_Array_View(regular_subsys.sign_of_cell_index),
             cell_multi_index_bound
         ),
-        As_Const_Raw_Array(u_approx),
+        As_Const_Array_View(u_approx),
         max_u_error, max_grad_u_error
     );
     std::cout << timer.Elapsed() << " s" << std::endl;

@@ -11,8 +11,6 @@
 
 #include <iostream>
 
-#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/ARRAY_OPS.h>
 #include <Jeffrey_Utilities/BASIC_TIMER.h>
 #include <Jeffrey_Utilities/Functional/APPLY_ASSIGN_FUNCTION.h>
@@ -22,6 +20,8 @@
 #include <Jeffrey_Utilities/Grid/VISIT_IF_SIGN_PREDICATE_GRID_VISITOR.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOUND.h>
 #include <Jeffrey_Utilities/VECTOR_OPS.h>
+#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 #include "Build_Domain_Regular_Subsys_Beta.h"
 #include "Build_Domain_Regular_Subsys_Rhs.h"
@@ -116,7 +116,7 @@ Init_Beta_And_Stencils(
     // TODO: MT
     Visit_Cells_With_Sign_Via_Cell_Sign(
         cell_multi_index_bound.Size(),
-        As_Const_Raw_Array(regular_subsys.sign_of_cell_index),
+        As_Const_Array_View(regular_subsys.sign_of_cell_index),
         Make_Visit_If_Sign_Predicate_Grid_Visitor(
             Make_Equal_Function(-1),
             Make_Init_Cross_Constbeta_Stencil_Cell_Visitor(
@@ -143,13 +143,13 @@ Init_Beta_And_Stencils(
     // TODO: MT
     Visit_Cells_With_Sign_Via_Cell_Sign(
         cell_multi_index_bound.Size(),
-        As_Const_Raw_Array(regular_subsys.sign_of_cell_index),
+        As_Const_Array_View(regular_subsys.sign_of_cell_index),
         Make_Visit_If_Sign_Predicate_Grid_Visitor(
             Make_Equal_Function(-1),
             Make_Init_Cross_Stencil_Cell_Visitor(
                 regular_subsys.dx,
                 cell_multi_index_bound,
-                As_Const_Raw_Array(regular_subsys.beta_of_cell_index),
+                As_Const_Array_View(regular_subsys.beta_of_cell_index),
                 Make_Array_Wrapper_Function(regular_subsys.stencil_of_index)
             )
         )

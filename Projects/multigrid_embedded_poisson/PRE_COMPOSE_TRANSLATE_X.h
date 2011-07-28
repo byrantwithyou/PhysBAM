@@ -7,9 +7,9 @@
 #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_PRE_COMPOSE_TRANSLATE_X_HPP
 #define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_PRE_COMPOSE_TRANSLATE_X_HPP
 
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/DIRECT_INIT_CTOR.h>
 #include <Jeffrey_Utilities/IDENTITY_TYPE.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 namespace PhysBAM
 {

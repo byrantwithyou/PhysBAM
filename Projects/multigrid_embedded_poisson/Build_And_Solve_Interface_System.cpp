@@ -15,12 +15,6 @@
 #include <boost/preprocessor/seq/enum.hpp>
 #include <boost/ref.hpp>
 
-#include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Arrays/ARRAY_DIFFERENCE.h>
-#include <PhysBAM_Tools/Arrays/ARRAY_NEGATION.h>
-#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_MIN_MAX.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/Algorithm/For_Each.h>
 #include <Jeffrey_Utilities/ARRAY_OPS.h>
 #include <Jeffrey_Utilities/BASIC_TIMER.h>
@@ -40,6 +34,12 @@
 #include <Jeffrey_Utilities/Stencils/INDEX_TRANSFORM_STENCIL_PROXY.h>
 #include <Jeffrey_Utilities/Stencils/ZERO_STENCIL_PROXY.h>
 #include <Jeffrey_Utilities/VECTOR_OPS.h>
+#include <PhysBAM_Tools/Arrays/ARRAY.h>
+#include <PhysBAM_Tools/Arrays/ARRAY_DIFFERENCE.h>
+#include <PhysBAM_Tools/Arrays/ARRAY_NEGATION.h>
+#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
+#include <PhysBAM_Tools/Arrays_Computations/ARRAY_MIN_MAX.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 #include "AGGREGATE_CONSTRAINT_SYSTEM.h"
 #include "Aggregate_Constraints.h"
@@ -287,7 +287,7 @@ int Build_And_Solve_Interface_System(
                 >(constraint_system),
                 indyable,
                 problem.min_relative_indy_weight,
-                As_Raw_Array(indy_index_of_constraint_index),
+                As_Array_View(indy_index_of_constraint_index),
                 aggregate_constraint_system.index_of_indy_index
             );
         }
@@ -307,9 +307,9 @@ int Build_And_Solve_Interface_System(
                     (CONSTRAINT_SYSTEM_TYPE::*)( int ) const,
                 &CONSTRAINT_SYSTEM_TYPE::Stencil_Proxy
             >(constraint_system),
-            As_Const_Raw_Array(indy_index_of_constraint_index),
-            As_Const_Raw_Array(aggregate_constraint_system.index_of_indy_index),
-            As_Raw_Array(aggregate_constraint_system.value_of_indy_index),
+            As_Const_Array_View(indy_index_of_constraint_index),
+            As_Const_Array_View(aggregate_constraint_system.index_of_indy_index),
+            As_Array_View(aggregate_constraint_system.value_of_indy_index),
             BOUND_FAST_MEM_FN<
                 typename AGGREGATE_CONSTRAINT_SYSTEM_TYPE::INDYLESS_STENCIL_PROXY_TYPE
                     (AGGREGATE_CONSTRAINT_SYSTEM_TYPE::*)( int ),
@@ -371,9 +371,9 @@ int Build_And_Solve_Interface_System(
             ZTAZ_EMBEDDING_SUBSYS_TYPE ztaz_embedding_subsys;
             Init_ZTAZ_Embedding(
                 embedding_subsys.stencil_index_of_index,
-                As_Const_Raw_Array(embedding_subsys.index_of_stencil_index),
+                As_Const_Array_View(embedding_subsys.index_of_stencil_index),
                 aggregate_constraint_system.indy_index_of_index,
-                As_Const_Raw_Array(aggregate_constraint_system.index_of_indy_index),
+                As_Const_Array_View(aggregate_constraint_system.index_of_indy_index),
                 Make_Constant_Function(ZERO_STENCIL_PROXY<int,T>()), // okay, since all indys are virtual
                 ztaz_embedding_subsys.stencil_index_of_index,
                 ztaz_embedding_subsys.index_of_stencil_index
@@ -388,15 +388,15 @@ int Build_And_Solve_Interface_System(
                     &EMBEDDING_SUBSYS_TYPE::Stencil_Proxy
                 >(embedding_subsys),
                 aggregate_constraint_system.indy_index_of_index,
-                As_Const_Raw_Array(aggregate_constraint_system.index_of_indy_index),
+                As_Const_Array_View(aggregate_constraint_system.index_of_indy_index),
                 aggregate_constraint_system.stencils_containing_index,
-                As_Const_Raw_Array(aggregate_constraint_system.value_of_indy_index),
+                As_Const_Array_View(aggregate_constraint_system.value_of_indy_index),
                 BOUND_FAST_MEM_FN<
                     typename AGGREGATE_CONSTRAINT_SYSTEM_TYPE::CONST_INDYLESS_STENCIL_PROXY_TYPE
                         (AGGREGATE_CONSTRAINT_SYSTEM_TYPE::*)( int ) const,
                     &AGGREGATE_CONSTRAINT_SYSTEM_TYPE::Indyless_Stencil_Proxy
                 >(aggregate_constraint_system),
-                As_Const_Raw_Array(ztaz_embedding_subsys.index_of_stencil_index),
+                As_Const_Array_View(ztaz_embedding_subsys.index_of_stencil_index),
                 BOUND_FAST_MEM_FN<
                     typename ZTAZ_EMBEDDING_SUBSYS_TYPE::STENCIL_PROXY_TYPE
                         (ZTAZ_EMBEDDING_SUBSYS_TYPE::*)( int ),
@@ -574,10 +574,10 @@ int Build_And_Solve_Interface_System(
         -1,
         index_transform.sign_of_grid_index,
         Make_Compose_Function(
-            As_Const_Raw_Array(regular_subsys.sign_of_cell_index),
+            As_Const_Array_View(regular_subsys.sign_of_cell_index),
             cell_multi_index_bound
         ),
-        ARRAY_VIEW<const T>(multi_index_bound.Size(), u_approx.Get_Array_Pointer()),
+        Make_Const_Array_View(multi_index_bound.Size(), u_approx.Get_Array_Pointer()),
         max_u_error, max_grad_u_error
     );
     Evaluate_Error(
@@ -585,10 +585,10 @@ int Build_And_Solve_Interface_System(
         +1,
         index_transform.sign_of_grid_index,
         Make_Compose_Function(
-            As_Const_Raw_Array(regular_subsys.sign_of_cell_index),
+            As_Const_Array_View(regular_subsys.sign_of_cell_index),
             cell_multi_index_bound
         ),
-        ARRAY_VIEW<const T>(multi_index_bound.Size(), u_approx.Get_Array_Pointer()),
+        Make_Const_Array_View(multi_index_bound.Size(), u_approx.Get_Array_Pointer()),
         max_u_error, max_grad_u_error
     );
     std::cout << timer.Elapsed() << " s" << std::endl;

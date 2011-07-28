@@ -9,7 +9,6 @@
 
 #include <cassert>
 
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/Functional/ARRAY_WRAPPER_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/COMPOSE_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/Pre_Compose_Translate.h>
@@ -22,6 +21,7 @@
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_CUBE.h>
 #include <Jeffrey_Utilities/Multi_Index/Multi_Index_X.h>
 #include <Jeffrey_Utilities/Multi_Index/STATIC_MULTI_INDEX_CUBE.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 #include "Evaluate_Cell_Local_Integrations.h"
 #include "Init_Cell_Local_Embedding_Domain_System.h"

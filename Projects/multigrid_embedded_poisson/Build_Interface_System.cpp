@@ -12,10 +12,6 @@
 #include <boost/preprocessor/seq/enum.hpp>
 #include <boost/ref.hpp>
 
-#include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
-#include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/ARRAY_OPS.h>
 #include <Jeffrey_Utilities/BASIC_TIMER.h>
 #include <Jeffrey_Utilities/DIRECT_INIT_CTOR.h>
@@ -35,6 +31,10 @@
 #include <Jeffrey_Utilities/Stencils/INDEX_TRANSFORM_STENCIL_PROXY.h>
 #include <Jeffrey_Utilities/VECTOR_OPS.h>
 #include <Jeffrey_Utilities/VISITOR_SEQUENCE.h>
+#include <PhysBAM_Tools/Arrays/ARRAY.h>
+#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
+#include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 #include "BETA_GRAD_U_DOT_N.h"
 #include "Build_Interface_Embedding_Subsys.h"
@@ -120,7 +120,7 @@ int Build_Interface_System(
 
     Build_Interface_Embedding_Subsys(
         main_params,
-        As_Const_Raw_Array(regular_subsys.sign_of_cell_index),
+        As_Const_Array_View(regular_subsys.sign_of_cell_index),
         POST_EMBEDDING_INIT_VISITOR< T, D, T_EMBEDDING_SUBSYS >(
             main_params,
             embedding_subsys, system_rhs,
@@ -140,7 +140,7 @@ int Build_Interface_System(
     Build_Interface_Regular_Subsys(
         problem, main_params,
         phi_of_fine_index,
-        regular_subsys, ARRAY_VIEW<T>(system_rhs)
+        regular_subsys, As_Array_View(system_rhs)
     );
 
     const int n_embedding = embedding_subsys.stencils.Size();

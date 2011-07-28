@@ -15,10 +15,6 @@
 #include <boost/thread/locks.hpp>
 #include <boost/thread/mutex.hpp>
 
-#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <Jeffrey_Utilities/BASIC_TIMER.h>
 #include <Jeffrey_Utilities/DIRECT_INIT_CTOR.h>
 #include <Jeffrey_Utilities/Functional/COMPOSE_FUNCTION.h>
@@ -37,6 +33,10 @@
 #include <Jeffrey_Utilities/VECTOR_OPS.h>
 #include <Jeffrey_Utilities/VISITOR_SEQUENCE.h>
 #include <Jeffrey_Utilities/Write_Mesh_Object_To_File.h>
+#include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
+#include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 #include "Params/MAIN_PARAMS.h"
 #include "RAND_MT19937_UNIFORM_REAL.h"

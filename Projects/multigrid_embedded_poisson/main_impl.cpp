@@ -10,11 +10,12 @@
 #include <boost/random/variate_generator.hpp>
 #include <boost/variant/apply_visitor.hpp>
 
+#include <Jeffrey_Utilities/ARRAY_OPS.h>
+#include <Jeffrey_Utilities/BASIC_TIMER.h>
+#include <Jeffrey_Utilities/VECTOR_OPS.h>
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
-#include <Jeffrey_Utilities/BASIC_TIMER.h>
-#include <Jeffrey_Utilities/VECTOR_OPS.h>
 
 #include "Params/EXAMPLE_PARAMS.h"
 #include "Params/MAIN_PARAMS.h"
@@ -91,7 +92,7 @@ int main_impl(int argc, char* argv[])
     std::cout.flush();
     timer.Restart();
     ARRAY<T> phi_of_fine_index((2 * As_Vector<int>(main_params.grid.n_cell) + 1).Product(), false); // uninit'ed
-    Eval_Phi_Over_Fine_Grid(main_params, ARRAY_VIEW<T>(phi_of_fine_index));
+    Eval_Phi_Over_Fine_Grid(main_params, As_Array_View(phi_of_fine_index));
     std::cout << timer.Elapsed() << " s" << std::endl;
 
     main_result = boost::apply_visitor(

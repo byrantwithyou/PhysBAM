@@ -7,9 +7,9 @@
 #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_COARSEN_EMBEDDING_HPP
 #define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_COARSEN_EMBEDDING_HPP
 
+#include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_FWD.h>
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
 #include <PhysBAM_Tools/Data_Structures/DATA_STRUCTURES_FORWARD.h>
-#include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_FWD.h>
 
 namespace PhysBAM
 {

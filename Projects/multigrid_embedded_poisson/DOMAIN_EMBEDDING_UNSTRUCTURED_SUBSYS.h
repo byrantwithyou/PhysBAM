@@ -11,11 +11,11 @@
 
 #include <boost/foreach.hpp>
 
-#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOUND.h>
 #include <Jeffrey_Utilities/Stencils/INDEX_TRANSFORM_STENCIL_PROXY.h>
 #include <Jeffrey_Utilities/Stencils/UNSTRUCTURED_STENCIL.h>
 #include <Jeffrey_Utilities/Stencils/UNSTRUCTURED_STENCIL_PROXY.h>
+#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 
 #include "DOMAIN_EMBEDDING_SUBSYS_BASE.h"
 

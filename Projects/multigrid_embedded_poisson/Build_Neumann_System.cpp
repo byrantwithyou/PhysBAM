@@ -11,8 +11,6 @@
 
 #include <boost/preprocessor/seq/enum.hpp>
 
-#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/ARRAY_OPS.h>
 #include <Jeffrey_Utilities/BASIC_TIMER.h>
 #include <Jeffrey_Utilities/DIRECT_INIT_CTOR.h>
@@ -30,6 +28,8 @@
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_X_FUNCTION.h>
 #include <Jeffrey_Utilities/Multi_Index/Visit_Multi_Index_Box_Boundary.h>
 #include <Jeffrey_Utilities/VECTOR_OPS.h>
+#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 #include "BETA_GRAD_U_DOT_N.h"
 #include "Build_Domain_Embedding_Subsys.h"
@@ -103,7 +103,7 @@ int Build_Neumann_System(
 
     Build_Domain_Embedding_Subsys(
         main_params,
-        As_Const_Raw_Array(regular_subsys.sign_of_cell_index),
+        As_Const_Array_View(regular_subsys.sign_of_cell_index),
         POST_INIT_EMBEDDING_VISITOR(),
         EMBEDDED_CELL_VISITOR< T, D, T_EMBEDDING_SUBSYS >(
             problem, main_params,

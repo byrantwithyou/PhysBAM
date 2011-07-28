@@ -12,11 +12,6 @@
 
 #include <boost/preprocessor/seq/enum.hpp>
 
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_MIN_MAX.h>
-#include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Arrays/ARRAY_NEGATION.h>
-#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/Algorithm/Any_If.h>
 #include <Jeffrey_Utilities/ARRAY_OPS.h>
 #include <Jeffrey_Utilities/BASIC_TIMER.h>
@@ -24,10 +19,14 @@
 #include <Jeffrey_Utilities/Eval_Grid_Function.h>
 #include <Jeffrey_Utilities/Functional/COMPOSE_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/SIGN_FUNCTION.h>
-#include <Jeffrey_Utilities/Multi_Index/CONVERT_INDEX_FUNCTION.h>
 #include <Jeffrey_Utilities/Multi_Index/FINE_MULTI_INDEX_FUNCTION.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOUND.h>
 #include <Jeffrey_Utilities/VECTOR_OPS.h>
+#include <PhysBAM_Tools/Arrays_Computations/ARRAY_MIN_MAX.h>
+#include <PhysBAM_Tools/Arrays/ARRAY.h>
+#include <PhysBAM_Tools/Arrays/ARRAY_NEGATION.h>
+#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 #include "Build_Neumann_System.h"
 #include "DOMAIN_EMBEDDING_CUBE_SUBSYS.h"
@@ -99,7 +98,7 @@ int Build_And_Solve_Neumann_System(
     Build_Neumann_System(
         problem, main_params,
         phi_of_fine_index,
-        regular_subsys, embedding_subsys, ARRAY_VIEW<T>(system_rhs)
+        regular_subsys, embedding_subsys, As_Array_View(system_rhs)
     );
     std::cout << "[Building Neumann system...] " << timer.Elapsed() << " s" << std::endl;
 
@@ -111,7 +110,7 @@ int Build_And_Solve_Neumann_System(
         main_params.general.n_thread,
         min_x, max_x, multi_index_bound,
         problem.u,
-        ARRAY_VIEW<T>(u_continuous)
+        As_Array_View(u_continuous)
     );
     {
         ARRAY<T> residual(-system_rhs);
@@ -210,13 +209,13 @@ int Build_And_Solve_Neumann_System(
             phi_of_fine_index,
             fine_multi_index_bound,
             FINE_MULTI_INDEX_FUNCTION<2>(),
-            Make_Convert_Index_Function< MULTI_INDEX_TYPE >(multi_index_bound)
+            multi_index_bound
         ),
         Make_Compose_Function(
-            As_Const_Raw_Array(regular_subsys.sign_of_cell_index),
+            As_Const_Array_View(regular_subsys.sign_of_cell_index),
             cell_multi_index_bound
         ),
-        ARRAY_VIEW<const T>(u_approx),
+        As_Const_Array_View(u_approx),
         max_u_error, max_grad_u_error
     );
     std::cout << timer.Elapsed() << " s" << std::endl;
