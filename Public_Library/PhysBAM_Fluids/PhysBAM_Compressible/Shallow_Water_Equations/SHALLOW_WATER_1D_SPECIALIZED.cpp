@@ -87,7 +87,9 @@ CFL()
     return 1/dt_convect;
 }
 //#####################################################################
+#if 0 // broken
 template class SHALLOW_WATER_1D_SPECIALIZED<float>;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class SHALLOW_WATER_1D_SPECIALIZED<double>;
+#endif
 #endif

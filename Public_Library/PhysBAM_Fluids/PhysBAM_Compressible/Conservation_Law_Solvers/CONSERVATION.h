@@ -22,6 +22,7 @@
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <PhysBAM_Tools/Utilities/STATIC_ASSERT.h>
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Conservation_Law_Solvers/CONSERVATION_CALLBACKS.h>
 namespace PhysBAM{
 
@@ -34,6 +35,7 @@ template<class TV> class GRID;
 template<class T_GRID,int d>
 class CONSERVATION
 {
+    STATIC_ASSERT(T_GRID::dimension+2==d);
     typedef typename T_GRID::SCALAR T;
     typedef typename T_GRID::VECTOR_T TV;
     typedef typename T_GRID::VECTOR_INT TV_INT;

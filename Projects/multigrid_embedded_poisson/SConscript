@@ -3,25 +3,37 @@
 import os
 Import('env Automatic_Program')
 
-if 'PETSC_DIR' not in os.environ:
-    Return()
-
 env = env.Copy()
-env.Append( CPPPATH = [
-    os.environ['PETSC_DIR'] + '/include',
-    os.environ['PETSC_DIR'] + '/' + os.environ['PETSC_ARCH'] + '/include',
-    os.environ['PETSC_DIR'] + '/include/mpiuni'
-] )
 env.Append( LIBPATH = [
-    os.environ['PETSC_DIR'] + '/' + os.environ['PETSC_ARCH'] + '/lib'
+    os.environ['BOOST_ROOT'] + '/lib'
+] )
+env.Append( RPATH = [
+    os.environ['BOOST_ROOT'] + '/lib'
 ] )
 env.Append( LIBS = [
     'boost_program_options',
     'boost_thread',
-    'petsc', 'X11', 'lapack', 'blas'
+    'X11', 'lapack', 'blas'
 ] )
 
-Automatic_Program( env, 'multigrid_embedded_poisson_3d_v2', [
+if 'PETSC_DIR' in os.environ:
+    env.Append( CPPPATH = [
+        os.environ['PETSC_DIR'] + '/include',
+        os.environ['PETSC_DIR'] + '/' + os.environ['PETSC_ARCH'] + '/include',
+        os.environ['PETSC_DIR'] + '/include/mpiuni'
+    ] )
+    env.Append( LIBPATH = [
+        os.environ['PETSC_DIR'] + '/' + os.environ['PETSC_ARCH'] + '/lib'
+    ] )
+    env.Append( LIBS = [
+        'petsc'
+    ] )
+else:
+    env.Append( CPPDEFINES = [
+        'PHYSBAM_NO_PETSC'
+    ] )
+
+Automatic_Program( env, 'multigrid_embedded_poisson', [
     'Build_And_Solve_Dirichlet_System.cpp',
     'Build_And_Solve_Interface_System.cpp',
     'Build_And_Solve_Neumann_System.cpp',

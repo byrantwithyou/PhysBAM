@@ -64,6 +64,7 @@ Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1>
     template class CONSERVATION_CENTRAL_ENO<T_GRID,1>; \
     template class CONSERVATION_CENTRAL_ENO<T_GRID,2>;
 #define P(...) __VA_ARGS__
+#if 0 // broken
 INSTANTIATION_HELPER(P(GRID<VECTOR<float,1> >))
 INSTANTIATION_HELPER(P(GRID<VECTOR<float,2> >))
 INSTANTIATION_HELPER(P(GRID<VECTOR<float,3> >))
@@ -71,4 +72,5 @@ INSTANTIATION_HELPER(P(GRID<VECTOR<float,3> >))
 INSTANTIATION_HELPER(P(GRID<VECTOR<double,1> >))
 INSTANTIATION_HELPER(P(GRID<VECTOR<double,2> >))
 INSTANTIATION_HELPER(P(GRID<VECTOR<double,3> >))
+#endif
 #endif

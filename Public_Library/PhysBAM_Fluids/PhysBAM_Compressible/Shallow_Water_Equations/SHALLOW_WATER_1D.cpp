@@ -43,7 +43,9 @@ CFL()
     return 1/dt_convect;
 }
 //#####################################################################
+#if 0 // broken
 template class SHALLOW_WATER_1D<float>;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class SHALLOW_WATER_1D<double>;
+#endif
 #endif

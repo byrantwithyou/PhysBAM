@@ -13,7 +13,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T> void BURGERS_1D<T>::
 Euler_Step(const T dt,const T time)
-{  
+{
     int m=grid.counts.x;
     int ghost_cells=3;
 
@@ -44,7 +44,9 @@ CFL()
     return 1/max(dt_convect,1/max_time_step);
 }
 //#####################################################################
+#if 0 // broken
 template class BURGERS_1D<float>;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class BURGERS_1D<double>;
+#endif
 #endif

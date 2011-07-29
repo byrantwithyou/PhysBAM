@@ -168,7 +168,9 @@ Eigenvectors(const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,const int j,MATRIX<T,d,
     R(5,5)=Y;
 }  
 //#####################################################################
+#if 0 // broken
 template class REACTIVE_EULER_2D_EIGENSYSTEM_G<float>;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class REACTIVE_EULER_2D_EIGENSYSTEM_G<double>;
+#endif
 #endif

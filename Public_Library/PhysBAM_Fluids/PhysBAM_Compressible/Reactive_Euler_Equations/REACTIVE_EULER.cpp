@@ -35,6 +35,7 @@ e(const T rho,const T rho_u,const T rho_v,const T rho_w,const T E)
     return E/rho-(sqr(rho_u/rho)+sqr(rho_v/rho)+sqr(rho_w/rho))/2;
 }
 //#####################################################################
+#if 0
 template class REACTIVE_EULER<GRID<VECTOR<float,1> > >;
 template class REACTIVE_EULER<GRID<VECTOR<float,2> > >;
 template class REACTIVE_EULER<GRID<VECTOR<float,3> > >;
@@ -42,4 +43,5 @@ template class REACTIVE_EULER<GRID<VECTOR<float,3> > >;
 template class REACTIVE_EULER<GRID<VECTOR<double,1> > >;
 template class REACTIVE_EULER<GRID<VECTOR<double,2> > >;
 template class REACTIVE_EULER<GRID<VECTOR<double,3> > >;
+#endif
 #endif
