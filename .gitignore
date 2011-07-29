@@ -1,5 +1,7 @@
 SConstruct.options
 build
+*_nocona
+*_nocona_debug
 
 *.gz
 
