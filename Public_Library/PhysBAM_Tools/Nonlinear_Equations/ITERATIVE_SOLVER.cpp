@@ -299,5 +299,13 @@ Conjugate_Gradient(NONLINEAR_FUNCTION<T(PARAMETER_SPACE<T>)>& F,PARAMETER_SPACE<
     delete &tmp;
 }
 //####################################################################################
+#if defined(_MSC_VER) && _MSC_VER<=1500
+// MSVC9 has issues implicitly instantiating these within
+// ITERATIVE_SOLVER<T>::Conjugate_Gradient.
+template class NONLINEAR_FUNCTION<float(PARAMETER_SPACE<float>)>;
+template class NONLINEAR_FUNCTION<double(PARAMETER_SPACE<double>)>;
+template class PARAMETRIC_LINE<float,float(PARAMETER_SPACE<float>)>;
+template class PARAMETRIC_LINE<double,double(PARAMETER_SPACE<double>)>;
+#endif
 template class ITERATIVE_SOLVER<float>;
 template class ITERATIVE_SOLVER<double>;

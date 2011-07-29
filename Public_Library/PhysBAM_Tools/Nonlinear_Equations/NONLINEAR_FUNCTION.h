@@ -75,8 +75,9 @@ public:
 };
 
 template<class T>
-struct NONLINEAR_FUNCTION<T(PARAMETER_SPACE<T>)>
+class NONLINEAR_FUNCTION<T(PARAMETER_SPACE<T>)>
 {
+public:
     typedef PARAMETER_SPACE<T> TV;
 
     virtual ~NONLINEAR_FUNCTION(){}
@@ -88,8 +89,9 @@ struct NONLINEAR_FUNCTION<T(PARAMETER_SPACE<T>)>
 };
 
 template<class T>
-struct PARAMETRIC_LINE<T,T(PARAMETER_SPACE<T>)>:public NONLINEAR_FUNCTION<T(T)>
+class PARAMETRIC_LINE<T,T(PARAMETER_SPACE<T>)>:public NONLINEAR_FUNCTION<T(T)>
 {
+public:
     typedef PARAMETER_SPACE<T> TV;
     typedef NONLINEAR_FUNCTION<T(PARAMETER_SPACE<T>)> F;
     const F& f;
