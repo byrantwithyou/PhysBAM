@@ -85,8 +85,10 @@ public:
     void Restore_Self_Collision_Free_State();
     void Compute_Intersecting_Segment_Face_Pairs();
 private:
-    template<class S> void Compute_Intersecting_Pairs_Helper(typename IF<!INTS_EQUAL<d,1>::value,const TV*,UNUSABLE>::TYPE input);
-    template<class S> void Compute_Intersecting_Pairs_Helper(typename IF<INTS_EQUAL<d,1>::value,const TV*,UNUSABLE>::TYPE input);
+    typedef typename IF<d==1,const TV*,UNUSABLE>::TYPE COMPUTE_INTERSECTING_PAIRS_HELPER_INPUT_WHEN_D_EQ_1;
+    typedef typename IF<d!=1,const TV*,UNUSABLE>::TYPE COMPUTE_INTERSECTING_PAIRS_HELPER_INPUT_WHEN_D_NE_1;
+    template<class S> void Compute_Intersecting_Pairs_Helper(COMPUTE_INTERSECTING_PAIRS_HELPER_INPUT_WHEN_D_NE_1 input);
+    template<class S> void Compute_Intersecting_Pairs_Helper(COMPUTE_INTERSECTING_PAIRS_HELPER_INPUT_WHEN_D_EQ_1 input);
 //#####################################################################
 };
 }

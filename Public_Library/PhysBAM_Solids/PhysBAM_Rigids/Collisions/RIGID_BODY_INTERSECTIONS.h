@@ -79,7 +79,7 @@ public:
 private:
     const PARTICLE_PARTITION<TV>& Particle_Partition(const RIGID_BODY<TV>& rigid_body) const;
     const PARTICLE_HIERARCHY<TV>& Particle_Hierarchy(const RIGID_BODY<TV>& rigid_body) const;
-    const T_SIMPLEX_HIERARCHY& Simplex_Hierarchy(const RIGID_BODY<TV>& rigid_body) const;
+    //const T_SIMPLEX_HIERARCHY& Simplex_Hierarchy(const RIGID_BODY<TV>& rigid_body) const;
     void Particles_In_Levelset(const int particle_body_id,const int levelset_body_id,
         ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<TV> >& particle_intersections,const T contour_value=0,const bool exit_early=false) const;
     T_ORIENTED_BOX Oriented_Box2_In_Body1_Coordinates(const RIGID_BODY<TV>& body1,const RIGID_BODY<TV>& body2) const;

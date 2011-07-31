@@ -11,6 +11,10 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:4355) // 'this' : used in base member initializer list
+#endif
 template<class T> SURFACE_TENSION<T>::
 SURFACE_TENSION(const STREAM_TYPE stream_type)
     :BASE(stream_type,1),solids_tests(*this,solid_body_collection),run_self_tests(false),print_poisson_matrix(false),print_index_map(false),
@@ -24,6 +28,9 @@ SURFACE_TENSION(const STREAM_TYPE stream_type)
     debug_particles.Store_Velocity(true);
     Store_Debug_Particles(&debug_particles);
 }
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 //#####################################################################
 // Destructor
 //#####################################################################
@@ -88,11 +95,11 @@ Parse_Options()
     last_frame=100;
     frame_rate=24;
 
-    kg=parse_args->Get_Double_Value("-kg");
-    m=parse_args->Get_Double_Value("-m");
-    s=parse_args->Get_Double_Value("-s");
+    kg=(T)parse_args->Get_Double_Value("-kg");
+    m=(T)parse_args->Get_Double_Value("-m");
+    s=(T)parse_args->Get_Double_Value("-s");
     frame_rate/=s;
-    laplace_number=parse_args->Get_Double_Value("-la");
+    laplace_number=(T)parse_args->Get_Double_Value("-la");
     use_T_nu=parse_args->Is_Value_Set("-tnu");
 
     fluids_parameters.cfl=(T).9;
@@ -137,9 +144,9 @@ Parse_Options()
     solids_fluids_parameters.use_leakproof_solve=false;
     if(parse_args->Is_Value_Set("-leakproof")) solids_fluids_parameters.use_leakproof_solve=true;
 
-    fluids_parameters.viscosity=parse_args->Get_Double_Value("-viscosity")*kg/s;
+    fluids_parameters.viscosity=(T)(parse_args->Get_Double_Value("-viscosity")*kg/s);
     if(fluids_parameters.viscosity) fluids_parameters.implicit_viscosity=true;
-    fluids_parameters.surface_tension=parse_args->Get_Double_Value("-surface_tension")*kg*m/(s*s);
+    fluids_parameters.surface_tension=(T)(parse_args->Get_Double_Value("-surface_tension")*kg*m/(s*s));
     solid_refinement=parse_args->Get_Integer_Value("-solid_refinement");
 
     fluids_parameters.use_removed_positive_particles=true;fluids_parameters.use_removed_negative_particles=true;
@@ -151,8 +158,8 @@ Parse_Options()
 
     use_decoupled_viscosity=parse_args->Is_Value_Set("-use_decoupled_viscosity");
     fluids_parameters.use_coupled_implicit_viscosity=!use_decoupled_viscosity;
-    max_dt=parse_args->Get_Double_Value("-max_dt")*s;
-    exact_dt=parse_args->Get_Double_Value("-dt")*s;
+    max_dt=(T)(parse_args->Get_Double_Value("-max_dt")*s);
+    exact_dt=(T)(parse_args->Get_Double_Value("-dt")*s);
     if(parse_args->Is_Value_Set("-explicit_solid")) implicit_solid=false;
     if(parse_args->Is_Value_Set("-build_surface")) rebuild_surface=true;
     solid_body_collection.print_energy=parse_args->Get_Option_Value("-print_energy");
@@ -330,7 +337,7 @@ Initialize_Phi()
     else if(test_number==2) phi.Fill(1);
     else if(test_number==4 || test_number==5){
         for(UNIFORM_GRID_ITERATOR_CELL<TV> it(*fluids_parameters.grid);it.Valid();it.Next()){
-            TV dX=it.Location()-TV(.5*m,.5*m);
+            TV dX=it.Location()-TV((T)(.5*m),(T)(.5*m));
             T distance=dX.Magnitude();
             T angle=atan2(dX.y,dX.x);
             T radius=circle_radius+circle_perturbation*cos(oscillation_mode*angle);
@@ -501,7 +508,7 @@ Kang_Circle(bool use_surface)
         */
         last_frame=1000;
         surface_tension=fluids_parameters.surface_tension;
-        T density=1000,D=.8;
+        T density=1000,D=(T).8;
         T T_sig=D*sqrt(density*D/surface_tension),
             T_nu=T_sig*sqrt(laplace_number);
         LOG::cout<<"T_sig="<<T_sig<<", T_nu="<<T_nu<<std::endl;
@@ -515,7 +522,7 @@ Kang_Circle(bool use_surface)
         if(laplace_number) fluids_parameters.viscosity=sqrt(surface_tension*D*density/laplace_number)*kg/s;
         // this is for infinite La
         else fluids_parameters.viscosity=0*kg/s;}
-    if(parse_args->Is_Value_Set("-viscosity")) fluids_parameters.viscosity=parse_args->Get_Double_Value("-viscosity")*kg/s;
+    if(parse_args->Is_Value_Set("-viscosity")) fluids_parameters.viscosity=(T)(parse_args->Get_Double_Value("-viscosity")*kg/s);
     if(fluids_parameters.viscosity) fluids_parameters.implicit_viscosity=true;
     fluids_parameters.cfl=(T).9;
 //    solids_parameters.write_static_variables_every_frame=true;
@@ -571,16 +578,16 @@ Oscillating_Circle(bool use_surface)
     fluids_parameters.use_particle_levelset=true;
 
     circle_radius=(T)1/3*m;
-    circle_perturbation=circle_radius*parse_args->Get_Double_Value("-epsilon");
+    circle_perturbation=(T)(circle_radius*parse_args->Get_Double_Value("-epsilon"));
     oscillation_mode=parse_args->Get_Integer_Value("-oscillation_mode");
     fluids_parameters.surface_tension=(T)2/3*kg*m/(s*s);
     fluids_parameters.density=27*kg/(m*m);
     omega=sqrt(oscillation_mode*(oscillation_mode*oscillation_mode-1)*fluids_parameters.surface_tension/(fluids_parameters.density*circle_radius*circle_radius*circle_radius));
-    T period=2*pi/omega;
+    T period=(T)(2*pi/omega);
     LOG::cout<<"Analytic period of oscillation: "<<period<<std::endl;
 
     // Forces here
-    if(T linear_force=parse_args->Get_Double_Value("-linear_force")){
+    if(T linear_force=(T)(parse_args->Get_Double_Value("-linear_force"))){
         SPHERE<TV> circle;
         TRIANGULATED_AREA<T>* area=&solids_tests.Copy_And_Add_Structure(*TESSELLATION::Generate_Triangles(circle,solid_refinement));
         LINEAR_POINT_ATTRACTION<TV>* stf=new LINEAR_POINT_ATTRACTION<TV>(*area,TV(.5,.5),linear_force);
@@ -603,7 +610,7 @@ Oscillating_Circle(bool use_surface)
         SPHERE<TV> object;
         front_tracked_structure=&solids_tests.Copy_And_Add_Structure(*TESSELLATION::Tessellate_Boundary(object,solid_refinement));
         for(int i=1;i<=front_tracked_structure->particles.X.m;i++){
-            T angle=i*2*pi/front_tracked_structure->particles.X.m;
+            T angle=(T)(i*2*pi/front_tracked_structure->particles.X.m);
             T radius=circle_radius+circle_perturbation*cos(oscillation_mode*angle);
             front_tracked_structure->particles.X(i)=TV((T).5*m+radius*cos(angle),(T).5*m+radius*sin(angle));}
         ARRAYS_COMPUTATIONS::Fill(solid_body_collection.deformable_body_collection.particles.mass,(T)1);
@@ -698,7 +705,7 @@ Test_Analytic_Velocity(T time)
         if(fluids_parameters.particle_levelset_evolution->Levelset(1).Phi(it.Location())>fluids_parameters.grid->dX.Min()*0){
             fluid_collection.incompressible_fluid_collection.face_velocities(it.Full_Index())=0;
             continue;}
-        TV dX=it.Location()-TV(.5*m,.5*m);
+        TV dX=it.Location()-TV((T)(.5*m),(T)(.5*m));
         T r=dX.Magnitude();
         T theta=atan2(dX.y,dX.x);
         TV u=-epsilon*omega*rh*pow(r/rh,oscillation_mode-1)*sin(omega*time)*TV(cos((1-oscillation_mode)*theta),sin((1-oscillation_mode)*theta));
@@ -708,7 +715,7 @@ Test_Analytic_Velocity(T time)
         cnt++;
         fluid_collection.incompressible_fluid_collection.face_velocities(it.Full_Index())-=u(it.Axis());}
     T max_u=fabs(epsilon*omega*rh*sin(omega*time));
-    if(max_u<1e-10) max_u=1e-10;
+    if(max_u<1e-10) max_u=(T)1e-10;
 
     LOG::cout<<"error velocity "<<max_error<<"        "<<L1_error/cnt<<"         "<<max_error/max_u<<"        "<<L1_error/cnt/max_u<<std::endl;
     
@@ -730,7 +737,7 @@ Test_Analytic_Pressure(T time)
     ARRAY<T,TV_INT>& p=dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>&>(*solids_evolution).pressure;
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(*fluids_parameters.grid);it.Valid();it.Next()){
         if(fluids_parameters.particle_levelset_evolution->Levelset(1).Phi(it.Location())>fluids_parameters.grid->dX.Min()*0) continue;
-        TV dX=it.Location()-TV(.5*m,.5*m);
+        TV dX=it.Location()-TV((T)(.5*m),(T)(.5*m));
         T r=dX.Magnitude();
         T theta=atan2(dX.y,dX.x);
         T q=fluids_parameters.surface_tension/rh+epsilon/oscillation_mode*omega*omega*rh*rh*pow(r/rh,oscillation_mode)*cos(omega*time)*cos(oscillation_mode*theta);
@@ -739,7 +746,7 @@ Test_Analytic_Pressure(T time)
         L1_error+=error;
         cnt++;}
     T max_p=fluids_parameters.surface_tension/rh+epsilon/oscillation_mode*omega*omega*rh*rh*fabs(cos(omega*time));
-    if(max_p<1e-10) max_p=1e-10;
+    if(max_p<1e-10) max_p=(T)1e-10;
 
     LOG::cout<<"error pressure "<<max_error<<"        "<<L1_error/cnt<<"      "<<max_error/max_p<<"        "<<L1_error/cnt/max_p<<std::endl;
 }
@@ -753,8 +760,8 @@ Solid_Circle()
     SPHERE<TV> object(TV(),1);
     solids_tests.Copy_And_Add_Structure(*TESSELLATION::Tessellate_Boundary(object,solid_refinement));
     particles.mass+=(T)1/particles.mass.m;
-    if(make_ellipse) for(int i=1;i<=particles.X.m;i++) particles.X(i)*=TV(.9,1.1);
-    if(T rand=fluids_parameters.viscosity=parse_args->Get_Double_Value("-rand")){
+    if(make_ellipse) for(int i=1;i<=particles.X.m;i++) particles.X(i)*=TV((T).9,(T)1.1);
+    if(T rand=fluids_parameters.viscosity=(T)(parse_args->Get_Double_Value("-rand"))){
         RANDOM_NUMBERS<T> random;
         random.Set_Seed(1234);
         ARRAY<TV> dX(particles.X.m);
@@ -912,7 +919,7 @@ Limit_Dt(T& dt,const T time)
     if(exact_dt) dt=exact_dt;
     if(test_number==12){
         T dx=fluids_parameters.grid->dX.Min();
-        T dt_surface=sqrt(dx*fluids_parameters.density/(pi*surface_tension))*dx;
+        T dt_surface=(T)(sqrt(dx*fluids_parameters.density/(pi*surface_tension))*dx);
         dt=min(dt,dt_surface);}
 }
 //#####################################################################
@@ -1138,7 +1145,7 @@ FSI_Analytic_Test()
         Add_Thin_Shell_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(b));
         rigid_body_collection.Rigid_Body(b).is_static=true;}
 
-    RIGID_BODY<TV>& rigid_body=solids_tests.Add_Analytic_Box(m*TV(solid_width,1.2),5);
+    RIGID_BODY<TV>& rigid_body=solids_tests.Add_Analytic_Box(m*TV(solid_width,(T)1.2),5);
     rigid_body.Set_Frame(FRAME<TV>(m*TV((T).5,.5)));
     rigid_body.Set_Coefficient_Of_Restitution((T)0);
     rigid_body.Set_Mass(solid_density*solid_width);
@@ -1175,12 +1182,12 @@ Postprocess_Frame(const int frame)
             T phi1=phi(cell1),phi2=phi(cell2);
             if(phi1<=0 || phi2<=0){
                 T v=fabs(fluid_collection.incompressible_fluid_collection.face_velocities(it.Full_Index()));
-                mx=fmax(v,mx);
+                mx=std::max(v,mx);
                 sum+=v;
                 count++;}}
         LOG::cout<<"Parasitic current error:  L1="<<sum/count<<"  Linf="<<mx<<std::endl;}
     if(test_number==12){
-        T D=.8,sum=0;
+        T D=(T).8,sum=0;
         T U_sig=sqrt(surface_tension/(fluids_parameters.density*D));
         int num=0;
         for(UNIFORM_GRID_ITERATOR_FACE<TV> it(*fluids_parameters.grid);it.Valid();it.Next()){
@@ -1198,7 +1205,7 @@ Postprocess_Substep(const T dt,const T time)
     if(test_number==6 && solid_body_collection.rigid_body_collection.rigid_body_particle.X.m>=3) solid_body_collection.rigid_body_collection.rigid_body_particle.X(3)=TV(.5,.5)*m;
     if(test_number==4 || test_number==5){
         // location test
-        TV p((.5+circle_radius)*m,.5*m);
+        TV p((T)((.5+circle_radius)*m),(T)(.5*m));
         T value=fluids_parameters.particle_levelset_evolution->Levelset(1).Phi(p);
         for(int i=0;i<5;i++){
             p(1)-=value;
@@ -1225,18 +1232,18 @@ Debug_Particle_Set_Attribute(ATTRIBUTE_ID id,const ATTR& attr)
     attribute->Last()=attr;
 }
 template class SURFACE_TENSION<float>;
-template void Add_Debug_Particle<VECTOR<float,1> >(VECTOR<float,1> const&,VECTOR<float,3> const&);
-template void Add_Debug_Particle<VECTOR<float,2> >(VECTOR<float,2> const&,VECTOR<float,3> const&);
-template void Add_Debug_Particle<VECTOR<float,3> >(VECTOR<float,3> const&,VECTOR<float,3> const&);
-template void Debug_Particle_Set_Attribute<VECTOR<float,1>,VECTOR<float,1> >(ATTRIBUTE_ID,VECTOR<float,1> const&);
-template void Debug_Particle_Set_Attribute<VECTOR<float,2>,VECTOR<float,2> >(ATTRIBUTE_ID,VECTOR<float,2> const&);
-template void Debug_Particle_Set_Attribute<VECTOR<float,3>,VECTOR<float,3> >(ATTRIBUTE_ID,VECTOR<float,3> const&);
+template void PhysBAM::Add_Debug_Particle<VECTOR<float,1> >(VECTOR<float,1> const&,VECTOR<float,3> const&);
+template void PhysBAM::Add_Debug_Particle<VECTOR<float,2> >(VECTOR<float,2> const&,VECTOR<float,3> const&);
+template void PhysBAM::Add_Debug_Particle<VECTOR<float,3> >(VECTOR<float,3> const&,VECTOR<float,3> const&);
+template void PhysBAM::Debug_Particle_Set_Attribute<VECTOR<float,1>,VECTOR<float,1> >(ATTRIBUTE_ID,VECTOR<float,1> const&);
+template void PhysBAM::Debug_Particle_Set_Attribute<VECTOR<float,2>,VECTOR<float,2> >(ATTRIBUTE_ID,VECTOR<float,2> const&);
+template void PhysBAM::Debug_Particle_Set_Attribute<VECTOR<float,3>,VECTOR<float,3> >(ATTRIBUTE_ID,VECTOR<float,3> const&);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class SURFACE_TENSION<double>;
-template void Add_Debug_Particle<VECTOR<double,1> >(VECTOR<double,1> const&,VECTOR<double,3> const&);
-template void Add_Debug_Particle<VECTOR<double,2> >(VECTOR<double,2> const&,VECTOR<double,3> const&);
-template void Add_Debug_Particle<VECTOR<double,3> >(VECTOR<double,3> const&,VECTOR<double,3> const&);
-template void Debug_Particle_Set_Attribute<VECTOR<double,1>,VECTOR<double,1> >(ATTRIBUTE_ID,VECTOR<double,1> const&);
-template void Debug_Particle_Set_Attribute<VECTOR<double,2>,VECTOR<double,2> >(ATTRIBUTE_ID,VECTOR<double,2> const&);
-template void Debug_Particle_Set_Attribute<VECTOR<double,3>,VECTOR<double,3> >(ATTRIBUTE_ID,VECTOR<double,3> const&);
+template void PhysBAM::Add_Debug_Particle<VECTOR<double,1> >(VECTOR<double,1> const&,VECTOR<double,3> const&);
+template void PhysBAM::Add_Debug_Particle<VECTOR<double,2> >(VECTOR<double,2> const&,VECTOR<double,3> const&);
+template void PhysBAM::Add_Debug_Particle<VECTOR<double,3> >(VECTOR<double,3> const&,VECTOR<double,3> const&);
+template void PhysBAM::Debug_Particle_Set_Attribute<VECTOR<double,1>,VECTOR<double,1> >(ATTRIBUTE_ID,VECTOR<double,1> const&);
+template void PhysBAM::Debug_Particle_Set_Attribute<VECTOR<double,2>,VECTOR<double,2> >(ATTRIBUTE_ID,VECTOR<double,2> const&);
+template void PhysBAM::Debug_Particle_Set_Attribute<VECTOR<double,3>,VECTOR<double,3> >(ATTRIBUTE_ID,VECTOR<double,3> const&);
 #endif

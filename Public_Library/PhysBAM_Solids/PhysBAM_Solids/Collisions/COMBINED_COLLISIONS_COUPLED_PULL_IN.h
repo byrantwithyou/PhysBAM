@@ -17,7 +17,7 @@ namespace PhysBAM{
 
 template<class TV> class DEFORMABLE_BODY_COLLECTION;
 template<class TV> class SOLID_BODY_COLLECTION;
-template<class TV> class COMBINED_COLLISIONS_COUPLED_IMPULSE;
+template<class TV> struct COMBINED_COLLISIONS_COUPLED_IMPULSE;
 template<class TV> class RIGID_DEFORMABLE_COLLISIONS;
 
 // TODO: Update spatial partition.

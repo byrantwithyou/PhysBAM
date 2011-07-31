@@ -25,6 +25,175 @@
 using namespace PhysBAM;
 namespace PhysBAM{template<class TV> void Add_Debug_Particle(const TV& X, const VECTOR<typename TV::SCALAR,3>& color);}
 namespace PhysBAM{template<class TV,class ATTR> void Debug_Particle_Set_Attribute(ATTRIBUTE_ID id,const ATTR& attr);}
+namespace{
+// This construct is necessary due to the explicit instantiation of
+// FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<T,d> > member functions for d!=2.
+template<class TV> struct FLUID_TO_SOLID_INTERPOLATION_CUT_DISPATCH
+{
+    typedef FLUID_TO_SOLID_INTERPOLATION_CUT<TV> T_THIS;
+
+    static void Compute(T_THIS& /*this_*/,const int /*ghost_cells*/)
+    {PHYSBAM_NOT_IMPLEMENTED();}
+    static void Compute_Dirichlet_Cells(T_THIS& /*this_*/)
+    {PHYSBAM_NOT_IMPLEMENTED();}
+};
+template<class T> struct FLUID_TO_SOLID_INTERPOLATION_CUT_DISPATCH<VECTOR<T,2> >
+{
+    typedef VECTOR<T,2> TV;
+    typedef FLUID_TO_SOLID_INTERPOLATION_CUT<TV> T_THIS;
+    typedef typename TV::SCALAR T;
+    typedef VECTOR<int,TV::m> TV_INT;
+    typedef typename T_THIS::ENTRY ENTRY;
+    typedef typename T_THIS::CLIP_ENTRY CLIP_ENTRY;
+    typedef typename T_THIS::CUT_CELL CUT_CELL;
+
+    static void Compute_Dirichlet_Cells(T_THIS& this_)
+    {
+        const COLLISION_AWARE_INDEX_MAP<TV>& index_map=this_.index_map;
+        SEGMENTED_CURVE_2D<T>& curve=this_.curve;
+        HASHTABLE<TV_INT,CUT_CELL>& cut_cells=this_.cut_cells;
+        ARRAY<bool,TV_INT>*& outside_fluid=this_.outside_fluid;
+
+        const ARRAY_VIEW<TV> X(curve.particles.X);
+
+        CLIP_ENTRY ce;
+        for(ce.i=1;ce.i<=curve.mesh.elements.m;ce.i++){
+            SEGMENT_2D<T> segment(X(curve.mesh.elements(ce.i).x),X(curve.mesh.elements(ce.i).y));
+            PHYSBAM_ASSERT(index_map.grid.domain.Lazy_Inside(segment.x1) && index_map.grid.domain.Lazy_Inside(segment.x2));
+            RANGE<TV_INT> box(index_map.grid.Cell(segment.x1,3));
+            box.Enlarge_To_Include_Point(index_map.grid.Cell(segment.x2,3));
+            for(UNIFORM_ARRAY_ITERATOR<TV::m> it(box);it.Valid();it.Next())
+                if(segment.Clip_To_Box(index_map.grid.Cell_Domain(it.index),ce.a,ce.b))
+                    cut_cells.Get_Or_Insert(it.index).clipped_segments.Append(ce);}
+
+        this_.Remove_Degeneracy();
+
+        for(typename  HASHTABLE<TV_INT,CUT_CELL>::ITERATOR it(cut_cells);it.Valid();it.Next()){
+            int number_cut=0;
+            const ARRAY<CLIP_ENTRY>& cut_segments=it.Data().clipped_segments;
+            for(int i=1;i<=cut_segments.m;i++){const CLIP_ENTRY& e=cut_segments(i);number_cut+=(e.a!=0)+(e.b!=1);}
+            if(number_cut>2){
+                EPS_FILE<T> eps("fail-config.eps");
+                eps.Draw_Object(index_map.grid.Cell_Domain(it.Key()));
+                for(int i=1;i<=cut_segments.m;i++){
+                    const CLIP_ENTRY& e=cut_segments(i);
+                    SEGMENT_2D<T> segment(X(curve.mesh.elements(e.i).x),X(curve.mesh.elements(e.i).y));
+                    TV e1=segment.Point_From_Barycentric_Coordinates(e.a);
+                    TV e2=segment.Point_From_Barycentric_Coordinates(e.b);
+                    eps.Line_Color(VECTOR<T,3>::Axis_Vector(i%3+1));
+                    eps.Draw_Line(e1,e2);}}
+            PHYSBAM_ASSERT(number_cut<=2);}
+
+        for(typename HASHTABLE<TV_INT,CUT_CELL>::ITERATOR it(cut_cells);it.Valid();it.Next())
+            (*outside_fluid)(it.Key())=false;
+
+        const_cast<COLLISION_AWARE_INDEX_MAP<TV>&>(index_map).number_extra_cells=cut_cells.Size();
+    }
+
+    static void Compute(T_THIS& this_,const int ghost_cells)
+    {
+        const COLLISION_AWARE_INDEX_MAP<TV>& index_map=this_.index_map;
+        SEGMENTED_CURVE_2D<T>& curve=this_.curve;
+        HASHTABLE<TV_INT,CUT_CELL>& cut_cells=this_.cut_cells;
+        ARRAY<ARRAY<ENTRY> >& entries=this_.entries;
+        HASHTABLE<int>& unused_faces=this_.unused_faces;
+        HASHTABLE<FACE_INDEX<TV::m>,T>& face_lengths=this_.face_lengths;
+        bool& use_cut_volume=this_.use_cut_volume;
+
+        const ARRAY_VIEW<TV> X(curve.particles.X);
+        ARRAY<T> edge_length(curve.mesh.elements.m);
+        ARRAY<T> particle_length(X.m);
+        for(int i=1;i<=curve.mesh.elements.m;i++){
+            T length=(X(curve.mesh.elements(i).x)-X(curve.mesh.elements(i).y)).Magnitude();
+            edge_length(i)=length;
+            particle_length(curve.mesh.elements(i).x)+=length/2;
+            particle_length(curve.mesh.elements(i).y)+=length/2;}
+
+        if(!index_map.two_phase){
+            for(int i=1;i<=index_map.indexed_faces.m;i++){
+                FACE_INDEX<TV::m> face=index_map.indexed_faces(i);
+                if(!index_map.cell_indices(face.First_Cell_Index()) || !index_map.cell_indices(face.Second_Cell_Index())){
+                    unused_faces.Set(i);}}
+            PHYSBAM_DEBUG_WRITE_SUBSTEP("unused faces",0,1);}
+
+        entries.Resize(X.m);
+        int last_face=index_map.indexed_faces.m;
+        int last_cell=index_map.indexed_cells.m;
+        for(typename HASHTABLE<TV_INT,CUT_CELL>::ITERATOR it(cut_cells);it.Valid();it.Next()){
+            const TV_INT& cell=it.Key();
+            CUT_CELL& cc=it.Data();
+            cc.other_cell=index_map.two_phase?++last_cell:0;
+            cc.face=++last_face;
+            for(int i=1;i<=cc.clipped_segments.m;i++){const CLIP_ENTRY& e=cc.clipped_segments(i);
+                SEGMENT_2D<T> segment(X(curve.mesh.elements(e.i).x),X(curve.mesh.elements(e.i).y));
+                TV n=(segment.x2-segment.x1).Rotate_Clockwise_90()*(e.b-e.a);
+                for(int a=1;a<=TV::m;a++)
+                    for(int k=0;k<=1;k++){
+                        FACE_INDEX<TV::m> f(a,cell);
+                        f.index(a)+=k;
+                        this_.Cut_Face(f,n,segment);}}
+            TV N=(cc.segment.x2-cc.segment.x1).Normalized().Rotate_Clockwise_90();
+            for(int i=1;i<=cc.clipped_segments.m;i++){const CLIP_ENTRY& e=cc.clipped_segments(i);
+                T len=(e.b-e.a)*edge_length(e.i);
+                T alpha=(e.a+e.b)/2;
+                T weight_a=(1-alpha)*len/particle_length(curve.mesh.elements(e.i).x);
+                T weight_b=alpha*len/particle_length(curve.mesh.elements(e.i).y);
+                ENTRY ea={weight_a*N,last_face};
+                ENTRY eb={weight_b*N,last_face};
+                entries(curve.mesh.elements(e.i).x).Append(ea);
+                entries(curve.mesh.elements(e.i).y).Append(eb);}}
+
+        T dx=index_map.grid.dX(1);
+        for(typename HASHTABLE<TV_INT,CUT_CELL>::ITERATOR it(cut_cells);it.Valid();it.Next()){
+            const TV_INT& cell=it.Key();
+            CUT_CELL& cc=it.Data();
+            VECTOR<TV,TV::m> edges;
+            int count=0;
+            for(int a=1;a<=TV::m;a++)
+                for(int k=0;k<=1;k++){
+                    FACE_INDEX<TV::m> f(a,cell);
+                    f.index(a)+=k;
+                    switch(this_.Face_Type(index_map.face_indices(f))){
+                        case T_THIS::outside:
+                        case T_THIS::unused:
+                            edges(a)(k+1)=(T)0;
+                            count++;
+                            break;
+                        case T_THIS::inside:
+                            edges(a)(k+1)=dx;
+                            break;
+                        case T_THIS::cut:
+                            edges(a)(k+1)=face_lengths.Get(f);
+                            break;
+                        default:
+                            PHYSBAM_FATAL_ERROR("Should not be a coupled face!");
+                            break;}}
+            if(use_cut_volume)
+            switch(count){
+                case 0:
+                    cc.inside_volume=dx*dx-(T).5*abs(edges(1)(1)-edges(1)(2))*abs(edges(2)(1)-edges(2)(2));
+                    break;
+                case 1:
+                case 2:
+                    cc.inside_volume=(T).5*(edges(1)(1)+edges(1)(2))*(edges(2)(1)+edges(2)(2));
+                    break;
+                default:
+                    PHYSBAM_FATAL_ERROR("Invalid cut cell!");
+                    break;}}
+
+//        for(typename HASHTABLE<TV_INT,CUT_CELL>::ITERATOR it(cut_cells);it.Valid();it.Next())
+//            Add_Debug_Particle(index_map.grid.X(it.Key()),VECTOR<T,3>(0,1,0));
+
+//        for(typename HASHTABLE<FACE_INDEX<TV::m>,T>::ITERATOR it(face_lengths);it.Valid();it.Next())
+//            Add_Debug_Particle(index_map.grid.Axis_X_Face(it.Key()),VECTOR<T,3>(1,0,0));
+//        PHYSBAM_DEBUG_WRITE_SUBSTEP("registered",0,1);
+
+        this_.Compute_Beta();
+        this_.Compute_Gradient();
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("setup interp",0,1);
+    }
+};
+}
 //#####################################################################
 // Constructor
 //#####################################################################
@@ -55,140 +224,13 @@ Setup_Before_Compute(ARRAY<bool,TV_INT>& outside_fluid_input,const ARRAY<bool,FA
 //#####################################################################
 template<class TV> void FLUID_TO_SOLID_INTERPOLATION_CUT<TV>::
 Compute_Dirichlet_Cells()
-{
-    const ARRAY_VIEW<TV> X(curve.particles.X);
-
-    CLIP_ENTRY ce;
-    for(ce.i=1;ce.i<=curve.mesh.elements.m;ce.i++){
-        SEGMENT_2D<T> segment(X(curve.mesh.elements(ce.i).x),X(curve.mesh.elements(ce.i).y));
-        PHYSBAM_ASSERT(index_map.grid.domain.Lazy_Inside(segment.x1) && index_map.grid.domain.Lazy_Inside(segment.x2));
-        RANGE<TV_INT> box(index_map.grid.Cell(segment.x1,3));
-        box.Enlarge_To_Include_Point(index_map.grid.Cell(segment.x2,3));
-        for(UNIFORM_ARRAY_ITERATOR<TV::m> it(box);it.Valid();it.Next())
-            if(segment.Clip_To_Box(index_map.grid.Cell_Domain(it.index),ce.a,ce.b))
-                cut_cells.Get_Or_Insert(it.index).clipped_segments.Append(ce);}
-
-    Remove_Degeneracy();
-
-    for(typename  HASHTABLE<TV_INT,CUT_CELL>::ITERATOR it(cut_cells);it.Valid();it.Next()){
-        int number_cut=0;
-        const ARRAY<CLIP_ENTRY>& cut_segments=it.Data().clipped_segments;
-        for(int i=1;i<=cut_segments.m;i++){const CLIP_ENTRY& e=cut_segments(i);number_cut+=(e.a!=0)+(e.b!=1);}
-        if(number_cut>2){
-            EPS_FILE<T> eps("fail-config.eps");
-            eps.Draw_Object(index_map.grid.Cell_Domain(it.Key()));
-            for(int i=1;i<=cut_segments.m;i++){
-                const CLIP_ENTRY& e=cut_segments(i);
-                SEGMENT_2D<T> segment(X(curve.mesh.elements(e.i).x),X(curve.mesh.elements(e.i).y));
-                TV e1=segment.Point_From_Barycentric_Coordinates(e.a);
-                TV e2=segment.Point_From_Barycentric_Coordinates(e.b);
-                eps.Line_Color(VECTOR<T,3>::Axis_Vector(i%3+1));
-                eps.Draw_Line(e1,e2);}}
-        PHYSBAM_ASSERT(number_cut<=2);}
-
-    for(typename HASHTABLE<TV_INT,CUT_CELL>::ITERATOR it(cut_cells);it.Valid();it.Next())
-        (*outside_fluid)(it.Key())=false;
-
-    const_cast<COLLISION_AWARE_INDEX_MAP<TV>&>(index_map).number_extra_cells=cut_cells.Size();
-}
+{FLUID_TO_SOLID_INTERPOLATION_CUT_DISPATCH<TV>::Compute_Dirichlet_Cells(*this);}
 //#####################################################################
 // Function Compute
 //#####################################################################
 template<class TV> void FLUID_TO_SOLID_INTERPOLATION_CUT<TV>::
 Compute(const int ghost_cells)
-{
-    const ARRAY_VIEW<TV> X(curve.particles.X);
-    ARRAY<T> edge_length(curve.mesh.elements.m);
-    ARRAY<T> particle_length(X.m);
-    for(int i=1;i<=curve.mesh.elements.m;i++){
-        T length=(X(curve.mesh.elements(i).x)-X(curve.mesh.elements(i).y)).Magnitude();
-        edge_length(i)=length;
-        particle_length(curve.mesh.elements(i).x)+=length/2;
-        particle_length(curve.mesh.elements(i).y)+=length/2;}
-
-    if(!index_map.two_phase){
-        for(int i=1;i<=index_map.indexed_faces.m;i++){
-            FACE_INDEX<TV::m> face=index_map.indexed_faces(i);
-            if(!index_map.cell_indices(face.First_Cell_Index()) || !index_map.cell_indices(face.Second_Cell_Index())){
-                unused_faces.Set(i);}}
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("unused faces",0,1);}
-
-    entries.Resize(X.m);
-    int last_face=index_map.indexed_faces.m;
-    int last_cell=index_map.indexed_cells.m;
-    for(typename HASHTABLE<TV_INT,CUT_CELL>::ITERATOR it(cut_cells);it.Valid();it.Next()){
-        const TV_INT& cell=it.Key();
-        CUT_CELL& cc=it.Data();
-        cc.other_cell=index_map.two_phase?++last_cell:0;
-        cc.face=++last_face;
-        for(int i=1;i<=cc.clipped_segments.m;i++){const CLIP_ENTRY& e=cc.clipped_segments(i);
-            SEGMENT_2D<T> segment(X(curve.mesh.elements(e.i).x),X(curve.mesh.elements(e.i).y));
-            TV n=(segment.x2-segment.x1).Rotate_Clockwise_90()*(e.b-e.a);
-            for(int a=1;a<=TV::m;a++)
-                for(int k=0;k<=1;k++){
-                    FACE_INDEX<TV::m> f(a,cell);
-                    f.index(a)+=k;
-                    Cut_Face(f,n,segment);}}
-        TV N=(cc.segment.x2-cc.segment.x1).Normalized().Rotate_Clockwise_90();
-        for(int i=1;i<=cc.clipped_segments.m;i++){const CLIP_ENTRY& e=cc.clipped_segments(i);
-            T len=(e.b-e.a)*edge_length(e.i);
-            T alpha=(e.a+e.b)/2;
-            T weight_a=(1-alpha)*len/particle_length(curve.mesh.elements(e.i).x);
-            T weight_b=alpha*len/particle_length(curve.mesh.elements(e.i).y);
-            ENTRY ea={weight_a*N,last_face};
-            ENTRY eb={weight_b*N,last_face};
-            entries(curve.mesh.elements(e.i).x).Append(ea);
-            entries(curve.mesh.elements(e.i).y).Append(eb);}}
-
-    T dx=index_map.grid.dX(1);
-    for(typename HASHTABLE<TV_INT,CUT_CELL>::ITERATOR it(cut_cells);it.Valid();it.Next()){
-        const TV_INT& cell=it.Key();
-        CUT_CELL& cc=it.Data();
-        VECTOR<TV,TV::m> edges;
-        int count=0;
-        for(int a=1;a<=TV::m;a++)
-            for(int k=0;k<=1;k++){
-                FACE_INDEX<TV::m> f(a,cell);
-                f.index(a)+=k;
-                switch(Face_Type(index_map.face_indices(f))){
-                    case outside:
-                    case unused:
-                        edges(a)(k+1)=(T)0;
-                        count++;
-                        break;
-                    case inside:
-                        edges(a)(k+1)=dx;
-                        break;
-                    case cut:
-                        edges(a)(k+1)=face_lengths.Get(f);
-                        break;
-                    default:
-                        PHYSBAM_FATAL_ERROR("Should not be a coupled face!");
-                        break;}}
-        if(use_cut_volume)
-        switch(count){
-            case 0:
-                cc.inside_volume=dx*dx-(T).5*abs(edges(1)(1)-edges(1)(2))*abs(edges(2)(1)-edges(2)(2));
-                break;
-            case 1:
-            case 2:
-                cc.inside_volume=(T).5*(edges(1)(1)+edges(1)(2))*(edges(2)(1)+edges(2)(2));
-                break;
-            default:
-                PHYSBAM_FATAL_ERROR("Invalid cut cell!");
-                break;}}
-
-//    for(typename HASHTABLE<TV_INT,CUT_CELL>::ITERATOR it(cut_cells);it.Valid();it.Next())
-//        Add_Debug_Particle(index_map.grid.X(it.Key()),VECTOR<T,3>(0,1,0));
-
-//    for(typename HASHTABLE<FACE_INDEX<TV::m>,T>::ITERATOR it(face_lengths);it.Valid();it.Next())
-//        Add_Debug_Particle(index_map.grid.Axis_X_Face(it.Key()),VECTOR<T,3>(1,0,0));
-//    PHYSBAM_DEBUG_WRITE_SUBSTEP("registered",0,1);
-
-    Compute_Beta();
-    Compute_Gradient();
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("setup interp",0,1);
-}
+{FLUID_TO_SOLID_INTERPOLATION_CUT_DISPATCH<TV>::Compute(*this,ghost_cells);}
 //#####################################################################
 // Function Cut_Face
 //#####################################################################
@@ -555,20 +597,14 @@ Dump_Extra_Velocities(const VECTOR_ND<T>& fluid_velocity_vector)
 }
 //#####################################################################
 template class FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<float,2> >;
-#if defined(_MSC_VER) && _MSC_VER<=1500
-#else
 template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<float,1> >::Dump_Extra_Velocities(const VECTOR_ND<float>&);
 template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<float,1> >::Fill_Extra_Velocities(VECTOR_ND<float>&) const;
 template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<float,3> >::Dump_Extra_Velocities(const VECTOR_ND<float>&);
 template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<float,3> >::Fill_Extra_Velocities(VECTOR_ND<float>&) const;
-#endif
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<double,2> >;
-#if defined(_MSC_VER) && _MSC_VER<=1500
-#else
 template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<double,1> >::Dump_Extra_Velocities(const VECTOR_ND<double>&);
 template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<double,1> >::Fill_Extra_Velocities(VECTOR_ND<double>&) const;
 template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<double,3> >::Dump_Extra_Velocities(const VECTOR_ND<double>&);
 template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<double,3> >::Fill_Extra_Velocities(VECTOR_ND<double>&) const;
-#endif
 #endif

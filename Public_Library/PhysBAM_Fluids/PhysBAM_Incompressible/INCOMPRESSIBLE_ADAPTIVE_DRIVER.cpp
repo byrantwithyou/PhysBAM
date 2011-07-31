@@ -95,7 +95,7 @@ Advance_To_Target_Time(const T target_time)
             example.incompressible.Initialize_Grids(local_mac_grid);
             dt=min(dt,example.cfl*example.incompressible.CFL(local_face_velocities));}
         if(time+dt>=target_time){dt=target_time-time;done=true;}
-        else if(time+2*dt>=target_time){dt=.5*(target_time-time);}
+        else if(time+2*dt>=target_time){dt=(T)(.5*(target_time-time));}
 
         LOG::Time("Scalar Advance");
         // scalar update

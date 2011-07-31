@@ -17,7 +17,7 @@ using namespace PhysBAM;
 template<class TV> INCOMPRESSIBLE_ADAPTIVE_EXAMPLE<TV>::
 INCOMPRESSIBLE_ADAPTIVE_EXAMPLE(const STREAM_TYPE stream_type_input)
     :stream_type(stream_type_input),initial_time(0),first_frame(0),last_frame(100),frame_rate(24),
-    output_directory("output"),number_of_ghost_cells(3),cfl(.9),mac_grid(TV_INT(),RANGE<TV>::Unit_Box(),true),
+    output_directory("output"),number_of_ghost_cells(3),cfl((T).9),mac_grid(TV_INT(),RANGE<TV>::Unit_Box(),true),
     projection(mac_grid),incompressible(mac_grid,projection)
 {
     incompressible.Set_Custom_Advection(advection_scalar);

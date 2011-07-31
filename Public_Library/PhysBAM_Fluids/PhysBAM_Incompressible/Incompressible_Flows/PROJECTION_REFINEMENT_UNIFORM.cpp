@@ -21,7 +21,7 @@ PROJECTION_REFINEMENT_UNIFORM(const T_GRID& mac_grid,const int scale,const T alp
     fast_local_projection(scale),beta_face(use_poisson?poisson->beta_face:*new T_FACE_ARRAYS_SCALAR()),alpha(alpha_in),coarse_scale(scale)
 {
     for(int i=1;i<=TV::dimension;i++) for(int j=1;j<2;j++){domain_boundary(i)(j)=true;solid_wall(i)(j)=false;}
-    scale_face_inverse=(TV::dimension==2)?(1./scale):(1./(scale*scale));
+    scale_face_inverse=(T)((TV::dimension==2)?(1./scale):(1./(scale*scale)));
     if(poisson) poisson->Set_Variable_beta(true);
     this->Initialize_Grid(mac_grid); //TODO: Fix this hack
 }
@@ -34,7 +34,7 @@ PROJECTION_REFINEMENT_UNIFORM(const T_GRID& mac_grid,T_LEVELSET& levelset_input,
      beta_face(poisson->beta_face),alpha(alpha_in),coarse_scale(scale)
 {
     for(int i=1;i<=TV::dimension;i++) for(int j=1;j<2;j++){domain_boundary(i)(j)=true;solid_wall(i)(j)=false;}
-    scale_face_inverse=(TV::dimension==2)?(1./scale):(1./(scale*scale));
+    scale_face_inverse=(T)((TV::dimension==2)?(1./scale):(1./(scale*scale)));
 }
 //#####################################################################
 // Destructor
@@ -81,7 +81,7 @@ Average_Velocities_From_Fine_To_Coarse(ARRAY<T,FACE_INDEX<TV::dimension> >& coar
         T factor=0;
         if(iterator.First_Cell_Index()(axis)>0){factor++;}
         if(iterator.Second_Cell_Index()(axis)<=coarse_grid.Counts()(axis)){factor++;}
-        coarse_face_velocities.Component(axis)(iterator.Face_Index())*=factor==1?scale_face_inverse:0.5*scale_face_inverse;}
+        coarse_face_velocities.Component(axis)(iterator.Face_Index())*=(T)(factor==1?scale_face_inverse:0.5*scale_face_inverse);}
 }
 //#####################################################################
 // Function Set_Beta_Face_For_Boundary_Conditions
@@ -103,7 +103,7 @@ Set_Beta_Face_For_Boundary_Conditions(T_FACE_ARRAYS_SCALAR& coarse_face_velociti
             int factor=0;
             if(iterator.First_Cell_Index()(iterator.Axis())>0){factor++;}
             if(iterator.Second_Cell_Index()(iterator.Axis())<=coarse_grid.Counts()(iterator.Axis())){factor++;}
-            beta_face.Component(iterator.Axis())(iterator.Face_Index())*=(factor==1)?scale_face_inverse:0.5*scale_face_inverse;}}
+            beta_face.Component(iterator.Axis())(iterator.Face_Index())*=(T)((factor==1)?scale_face_inverse:0.5*scale_face_inverse);}}
 }
 //#####################################################################
 // Function Set_Coarse_Boundary_Conditions
@@ -167,9 +167,9 @@ Map_Coarse_To_Fine(const T_FACE_ARRAYS_SCALAR& coarse_face_velocities,T_FACE_ARR
             FACE_INDEX<TV::dimension> coarse_index,fine_index=FACE_INDEX<TV::dimension>(axis,cell*coarse_scale+local_iterator.Face_Index()-coarse_scale*TV_INT::All_Ones_Vector());
             if(local_iterator.First_Boundary()) coarse_index=FACE_INDEX<TV::dimension>(axis,coarse_grid.First_Face_Index_In_Cell(axis,cell));
             else coarse_index=FACE_INDEX<TV::dimension>(axis,coarse_grid.Second_Face_Index_In_Cell(axis,cell));
-            T area=beta_face(coarse_index),one_over_area=1./area;
-            T beta=fine_psi_N(fine_index)?0:1;
-            T total_area=TV::dimension==2?coarse_scale:coarse_scale*coarse_scale;
+            T area=beta_face(coarse_index),one_over_area=(T)(1./area);
+            T beta=(T)(fine_psi_N(fine_index)?0:1);
+            T total_area=(T)(TV::dimension==2?coarse_scale:coarse_scale*coarse_scale);
             if(alpha!=1){TV_INT offset;offset(axis)++;sum_index=FACE_INDEX<TV::dimension>(axis,local_iterator.First_Boundary()?TV_INT::All_Ones_Vector():TV_INT::All_Ones_Vector()+offset);}
             if(!fine_psi_N(fine_index))
                 fine_face_velocities(fine_index)=(alpha!=1?((1-alpha)*one_over_area*(coarse_face_velocities(coarse_index)-sum(sum_index)/total_area)):0)+

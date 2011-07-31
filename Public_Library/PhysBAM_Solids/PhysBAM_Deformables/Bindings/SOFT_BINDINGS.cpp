@@ -161,7 +161,7 @@ Adjust_Parents_For_Changes_In_Surface_Children_Velocities(const ARRAY<bool>& par
 template<class TV> bool SOFT_BINDINGS<TV>::
 Need_Bindings_Mapped() const
 {
-    return bindings_using_forces_for_collisions.m;
+    return bindings_using_forces_for_collisions.m!=0;
 }
 //#####################################################################
 // Function Map_Forces_From_Parents

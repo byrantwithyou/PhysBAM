@@ -66,7 +66,7 @@ public:
     template<class T_ARRAY>
     bool Edge_Edge_Interaction(const SEGMENT_3D<T>& segment,const INDIRECT_ARRAY<T_ARRAY,VECTOR<int,4>&> V_edges,const T interaction_distance,T& distance,VECTOR<T,3>& normal,
         VECTOR<T,2>& weights,T& relative_speed,bool allow_negative_weights,const T small_number=0,const bool exit_early=false,const bool verbose=true) const
-    {return Edge_Edge_Interaction(segment,V_edges(1),V_edges(2),V_edges(3),V_edges(4),interaction_distance,distance,normal,weights,relative_speed,small_number,exit_early,verbose);}
+    {return Edge_Edge_Interaction(segment,V_edges(1),V_edges(2),V_edges(3),V_edges(4),interaction_distance,distance,normal,weights,relative_speed,allow_negative_weights,small_number,exit_early,verbose);}
 
     template<class T_ARRAY>
     bool Edge_Edge_Collision(const SEGMENT_3D<T>& segment,const INDIRECT_ARRAY<T_ARRAY,VECTOR<int,4>&> V_edges,const T dt,const T collision_thickness,T& collision_time,

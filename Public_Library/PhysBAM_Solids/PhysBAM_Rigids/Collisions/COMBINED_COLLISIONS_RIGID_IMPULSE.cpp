@@ -187,11 +187,11 @@ Kinetic_Energy_Change(int b,const TV& location,const TWIST<TV>& j) const
     TWIST<TV> twist=Body_Twist(b),rj=rigid_body.Gather(j,location);
     return TV::Dot_Product(twist.linear,rj.linear)+TV::SPIN::Dot_Product(twist.angular,rj.angular);
 }
-template class COMBINED_COLLISIONS_RIGID_IMPULSE<VECTOR<float,1> >;
-template class COMBINED_COLLISIONS_RIGID_IMPULSE<VECTOR<float,2> >;
-template class COMBINED_COLLISIONS_RIGID_IMPULSE<VECTOR<float,3> >;
+template struct COMBINED_COLLISIONS_RIGID_IMPULSE<VECTOR<float,1> >;
+template struct COMBINED_COLLISIONS_RIGID_IMPULSE<VECTOR<float,2> >;
+template struct COMBINED_COLLISIONS_RIGID_IMPULSE<VECTOR<float,3> >;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-template class COMBINED_COLLISIONS_RIGID_IMPULSE<VECTOR<double,1> >;
-template class COMBINED_COLLISIONS_RIGID_IMPULSE<VECTOR<double,2> >;
-template class COMBINED_COLLISIONS_RIGID_IMPULSE<VECTOR<double,3> >;
+template struct COMBINED_COLLISIONS_RIGID_IMPULSE<VECTOR<double,1> >;
+template struct COMBINED_COLLISIONS_RIGID_IMPULSE<VECTOR<double,2> >;
+template struct COMBINED_COLLISIONS_RIGID_IMPULSE<VECTOR<double,3> >;
 #endif

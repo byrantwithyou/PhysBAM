@@ -176,9 +176,9 @@ Update_Position_Based_State(const T time,const bool is_position_update)
     if(print_number_ignored) LOG::cout<<"ignored "<<ignored_elements<<" of "<<total_elements<<" bending elements"<<std::endl;
 }
 template<class T> SIMPLE_TRIANGLE_BENDING_ELEMENTS<T>* PhysBAM::
-Create_Simple_Bending_Elements(PARTICLES<VECTOR<T,3> >& particles,TRIANGLE_MESH& mesh,BINDING_LIST<VECTOR<T,3> >& binding_list,const T stiffness=1e-3,const T damping=1e-3,
-    const bool limit_time_step_by_strain_rate=true,const T max_strain_per_time_step=.1,const bool use_plasticity=false,const T plastic_yield=3,const T plastic_hardening=1,
-    const T cutoff_fraction_of_minimum_area=0,const T cutoff_fraction_of_triangles=0,const bool verbose=true,const bool implicit=false)
+Create_Simple_Bending_Elements(PARTICLES<VECTOR<T,3> >& particles,TRIANGLE_MESH& mesh,BINDING_LIST<VECTOR<T,3> >& binding_list,const T stiffness/*=(T)1e-3*/,const T damping/*=(T)1e-3*/,
+    const bool limit_time_step_by_strain_rate/*=true*/,const T max_strain_per_time_step/*=(T).1*/,const bool use_plasticity/*=false*/,const T plastic_yield/*=3*/,const T plastic_hardening/*=1*/,
+    const T cutoff_fraction_of_minimum_area/*=0*/,const T cutoff_fraction_of_triangles/*=0*/,const bool verbose/*=true*/,const bool implicit/*=false*/)
 {
     SIMPLE_TRIANGLE_BENDING_ELEMENTS<T>* bend=new SIMPLE_TRIANGLE_BENDING_ELEMENTS<T>(particles,binding_list,implicit);
     bend->Set_Quadruples_From_Triangle_Mesh(mesh);
@@ -188,19 +188,19 @@ Create_Simple_Bending_Elements(PARTICLES<VECTOR<T,3> >& particles,TRIANGLE_MESH&
 }
 
 template<class T> SIMPLE_TRIANGLE_BENDING_ELEMENTS<T>* PhysBAM::
-Create_Simple_Bending_Elements(TRIANGULATED_SURFACE<T>& triangulated_surface,BINDING_LIST<VECTOR<T,3> >& binding_list,const T stiffness=1e-3,
-    const T damping=1e-3,const bool limit_time_step_by_strain_rate=true,const T max_strain_per_time_step=.1,const bool use_plasticity=false,const T plastic_yield=3,const T plastic_hardening=1,
-    const T cutoff_fraction_of_minimum_area=0,const T cutoff_fraction_of_triangles=0,const bool verbose=true,const bool implicit=false)
+Create_Simple_Bending_Elements(TRIANGULATED_SURFACE<T>& triangulated_surface,BINDING_LIST<VECTOR<T,3> >& binding_list,const T stiffness/*=(T)1e-3*/,
+    const T damping/*=(T)1e-3*/,const bool limit_time_step_by_strain_rate/*=true*/,const T max_strain_per_time_step/*=(T).1*/,const bool use_plasticity/*=false*/,const T plastic_yield/*=3*/,const T plastic_hardening/*=1*/,
+    const T cutoff_fraction_of_minimum_area/*=0*/,const T cutoff_fraction_of_triangles/*=0*/,const bool verbose/*=true*/,const bool implicit/*=false*/)
 {
     return Create_Simple_Bending_Elements(dynamic_cast<PARTICLES<VECTOR<T,3> >&>(triangulated_surface.particles),triangulated_surface.mesh,binding_list,stiffness,damping,limit_time_step_by_strain_rate,max_strain_per_time_step,use_plasticity,
         plastic_yield,plastic_hardening,cutoff_fraction_of_minimum_area,cutoff_fraction_of_triangles,verbose,implicit);
 }
 //#####################################################################
 template class SIMPLE_TRIANGLE_BENDING_ELEMENTS<float>;
-template SIMPLE_TRIANGLE_BENDING_ELEMENTS<float>* Create_Simple_Bending_Elements<float>(TRIANGULATED_SURFACE<float>&,BINDING_LIST<VECTOR<float,3> >&,float,float,bool,float,bool,
+template SIMPLE_TRIANGLE_BENDING_ELEMENTS<float>* PhysBAM::Create_Simple_Bending_Elements<float>(TRIANGULATED_SURFACE<float>&,BINDING_LIST<VECTOR<float,3> >&,float,float,bool,float,bool,
     float,float,float,float,bool,bool);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class SIMPLE_TRIANGLE_BENDING_ELEMENTS<double>;
-template SIMPLE_TRIANGLE_BENDING_ELEMENTS<double>* Create_Simple_Bending_Elements<double>(TRIANGULATED_SURFACE<double>&,BINDING_LIST<VECTOR<double,3> >&,double,double,bool,double,bool,
+template SIMPLE_TRIANGLE_BENDING_ELEMENTS<double>* PhysBAM::Create_Simple_Bending_Elements<double>(TRIANGULATED_SURFACE<double>&,BINDING_LIST<VECTOR<double,3> >&,double,double,bool,double,bool,
     double,double,double,double,bool,bool);
 #endif

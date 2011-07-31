@@ -49,6 +49,11 @@ public:
         VECTOR<T,2>& normal,VECTOR<T,2>& weights,T& relative_speed,bool allow_negative_weights,const T small_number=0,const bool exit_early=false) const
     {return CONTINUOUS_COLLISION_DETECTION_COMPUTATIONS::Edge_Edge_Collision(*this,point,V_edges,dt,collision_thickness,collision_time,normal,weights,relative_speed,
             allow_negative_weights,small_number,exit_early);}
+
+    template<class T_ARRAY>
+    bool Edge_Edge_Collision(const POINT_2D<T>& point,const INDIRECT_ARRAY<T_ARRAY,VECTOR<int,2>&> V_edges,const T dt,const T collision_thickness,T& collision_time,
+        VECTOR<T,2>& normal,VECTOR<T,2>& weights,T& relative_speed,const T small_number=0,const bool exit_early=false) const
+    {PHYSBAM_NOT_IMPLEMENTED();}
 };
 }
 #endif

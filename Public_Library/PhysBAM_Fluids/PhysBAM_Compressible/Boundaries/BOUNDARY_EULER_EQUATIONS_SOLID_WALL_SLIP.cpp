@@ -59,7 +59,7 @@ Attenuate_To_Far_Field_Values_Using_Riemann_Invariants(const T_ARRAYS_DIMENSION_
     if(flip*(u_velocity+c) > 0) iR=iR_far_field(side)+net_inflow_attenuation*(iR-iR_far_field(side));
 
     u_velocity=(iR-iL)/2;
-    c=(iR-u_velocity)*(gamma-1)*.5;
+    c=(T)((iR-u_velocity)*(gamma-1)*.5);
     rho=pow(sqr(c)/(gamma*S),1/(gamma-1));
     e=euler->eos->e_From_S_And_rho(S,rho);
 

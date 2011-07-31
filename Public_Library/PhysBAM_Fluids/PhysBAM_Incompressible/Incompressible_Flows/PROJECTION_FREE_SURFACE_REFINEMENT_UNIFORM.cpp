@@ -40,7 +40,7 @@ Initialize_Grid(const T_GRID& mac_grid)
     local_phi.Resize(local_grid.Domain_Indices(1));
     coarse_phi.Resize(coarse_grid.Domain_Indices(1));
     fast_local_projection.collidable_solver->Use_External_Level_Set(*new T_LEVELSET(local_grid,local_phi));    
-    levelset_projection.elliptic_solver->Set_Relative_Tolerance(1e-7);
+    levelset_projection.elliptic_solver->Set_Relative_Tolerance((T)1e-7);
     levelset_projection.elliptic_solver->pcg.Set_Maximum_Iterations(400);
     levelset_projection.elliptic_solver->pcg.evolution_solver_type=krylov_solver_cg;
     levelset_projection.elliptic_solver->pcg.cg_restart_iterations=40;

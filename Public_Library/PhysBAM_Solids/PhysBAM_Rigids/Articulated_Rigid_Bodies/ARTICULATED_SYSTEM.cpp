@@ -174,7 +174,7 @@ Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) con
 template<class TV> typename TV::SCALAR ARTICULATED_SYSTEM<TV>::
 Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& x) const
 {
-    return sqrt(Inner_Product(x,x));
+    return (T)sqrt(Inner_Product(x,x));
 }
 //#####################################################################
 // Function Set_Boundary_Conditions

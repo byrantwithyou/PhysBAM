@@ -62,8 +62,8 @@ public:
     {joint_function=joint_function_input;}
 
 //#####################################################################
-    FRAME<TV> Joint_Error() const;
-    virtual VECTOR<bool,T_SPIN::dimension> Angular_Constraints() const;
+    //FRAME<TV> Joint_Error() const;
+    virtual VECTOR<bool,TV::SPIN::dimension> Angular_Constraints() const;
     TV Location(const RIGID_BODY<TV>& parent,const RIGID_BODY<TV>& child) const;
     FRAME<TV> Compute_Current_Joint_Frame(const RIGID_BODY<TV>& parent,const RIGID_BODY<TV>& child) const;
     FRAME<TV> F_pc() const;
@@ -86,8 +86,8 @@ public:
     virtual void Constrain_Angles(T_SPIN& angles) const;
     virtual void Prismatic_Constraint_Matrix(const FRAME<TV>& parent_frame,MATRIX_MXN<T>& constrained_matrix,MATRIX_MXN<T>* unconstrained_matrix=0) const;
     virtual void Angular_Constraint_Matrix(const FRAME<TV>& parent_frame,MATRIX_MXN<T>& angular_constraint_matrix,MATRIX_MXN<T>* angular_unconstrained_matrix=0) const;
-    MATRIX<T,TV::m> Prismatic_Projection_Matrix(const FRAME<TV>& parent_frame) const;
-    MATRIX<T,T_SPIN::m> Angular_Projection_Matrix(const FRAME<TV>& parent_frame) const;
+    MATRIX<typename TV::SCALAR,TV::m> Prismatic_Projection_Matrix(const FRAME<TV>& parent_frame) const;
+    MATRIX<typename TV::SCALAR,TV::SPIN::m> Angular_Projection_Matrix(const FRAME<TV>& parent_frame) const;
 protected:
     template<int d>
     void Constraint_Matrix_Helper(const ROTATION<TV>& orientation,MATRIX_MXN<T>& constrained_matrix,MATRIX_MXN<T>* unconstrained_matrix,const VECTOR<bool,d>& constrain) const;

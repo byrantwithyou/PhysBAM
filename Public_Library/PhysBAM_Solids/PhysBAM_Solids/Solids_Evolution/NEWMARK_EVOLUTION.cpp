@@ -664,7 +664,8 @@ Advance_One_Time_Step_Position(const T dt,const T time, const bool solids)
 template<class TV> void NEWMARK_EVOLUTION<TV>::
 Set_Velocity_From_Positions_Position_Update(const T dt,const T time)
 {
-    solid_body_collection.deformable_body_collection.Setup_Set_Velocity_From_Positions(time,true,solids_parameters.set_velocity_from_positions_reset_alphas);
+    PHYSBAM_FATAL_ERROR("Should set_velocity_from_positions_reset_alphas really be implicitly converted to bool?");
+    //solid_body_collection.deformable_body_collection.Setup_Set_Velocity_From_Positions(time,true,solids_parameters.set_velocity_from_positions_reset_alphas);
     
     ARRAY<ARRAY<T> > convergence_norms(solid_body_collection.deformable_body_collection.deformables_forces.m);
     int iter;
@@ -735,8 +736,10 @@ Set_Velocity_From_Positions_Position_Update(const T dt,const T time)
                 else{
                     T alpha1=(-B+sqrt(discriminant))/(2*A);
                     T alpha2=(-B-sqrt(discriminant))/(2*A);
-                    
-                    force.Choose_Solution(solids_parameters.set_velocity_from_positions_use_orig_force,s,(T).5*dt,alpha1,alpha2,v_n_hat(f)(s));}}}
+
+                    PHYSBAM_FATAL_ERROR("Should set_velocity_from_positions_use_orig_force really be implicitly converted to bool?");
+                    //force.Choose_Solution(solids_parameters.set_velocity_from_positions_use_orig_force,s,(T).5*dt,alpha1,alpha2,v_n_hat(f)(s));
+                }}}
         
         // Iterate over all forces
         for(int f=1;f<=solid_body_collection.deformable_body_collection.deformables_forces.m;f++){
@@ -1089,8 +1092,10 @@ Set_Velocity_From_Positions_Velocity_Update(const T dt,const T time)
                 else{
                     T alpha1=(-B+sqrt(discriminant))/(2*A);
                     T alpha2=(-B-sqrt(discriminant))/(2*A);
-                    
-                    force.Choose_Solution(solids_parameters.set_velocity_from_positions_use_orig_force,s,dt,alpha1,alpha2,v_n_hat(f)(s));}}}
+
+                    PHYSBAM_FATAL_ERROR("Should set_velocity_from_positions_use_orig_force really be implicitly converted to bool?");
+                    //force.Choose_Solution(solids_parameters.set_velocity_from_positions_use_orig_force,s,dt,alpha1,alpha2,v_n_hat(f)(s));
+                }}}
         
         // Iterate over all forces
         for(int f=1;f<=solid_body_collection.deformable_body_collection.deformables_forces.m;f++){

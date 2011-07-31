@@ -379,7 +379,7 @@ void Push_Out(RIGIDS_COLLISION_CALLBACKS<TV>& collision_callbacks,RIGID_BODY_COL
         body.Twist()=TWIST<TV>();
     }
 
-    T tolerance=1e-3;
+    T tolerance=(T)1e-3;
     int iteration_maximum=0;
 
     PROJECTED_GAUSS_SEIDEL::Solve(rigid_body_collection,contacts,tolerance,iteration_maximum);

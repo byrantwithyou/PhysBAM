@@ -175,7 +175,7 @@ Compute_Impulse_Derivative(int e,T scale,const T coefficient_of_restitution,cons
     T adjusted_cor=(coefficient_of_restitution+1)*scale-1;
     T d_adjusted_cor=coefficient_of_restitution+1;
 
-    T ds=1e-5;
+    T ds=(T)1e-5;
 
     TWIST<TV> impulse;
     TWIST<TV> d_impulse;

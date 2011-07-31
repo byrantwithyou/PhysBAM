@@ -93,7 +93,7 @@ Initialize()
     example.Initialize_Confinement();
 
     // setup laplace
-    example.projection.elliptic_solver->Set_Relative_Tolerance(1e-8);
+    example.projection.elliptic_solver->Set_Relative_Tolerance((T)1e-8);
     example.projection.elliptic_solver->pcg.Set_Maximum_Iterations(40);
     example.projection.elliptic_solver->pcg.evolution_solver_type=krylov_solver_cg;
     example.projection.elliptic_solver->pcg.cg_restart_iterations=40;
@@ -211,7 +211,7 @@ Advance_To_Target_Time(const T target_time)
         T dt=example.cfl*example.incompressible.CFL(example.face_velocities);
         if(example.mpi_grid) example.mpi_grid->Synchronize_Dt(dt);
         if(time+dt>=target_time){dt=target_time-time;done=true;}
-        else if(time+2*dt>=target_time){dt=.5*(target_time-time);}
+        else if(time+2*dt>=target_time){dt=(T)(.5*(target_time-time));}
         LOG::cout<<"dt is "<<dt<<std::endl;
         ADVECTION_CONSERVATIVE_UNIFORM<GRID<TV>,T>* advection_conservative=dynamic_cast<ADVECTION_CONSERVATIVE_UNIFORM<GRID<TV>,T>*>(example.incompressible.advection);
         if(advection_conservative){advection_conservative->cfl=example.incompressible.Real_CFL(example.face_velocities,false,false,dt);}

@@ -53,8 +53,8 @@ public:
     {deformables_evolution_callbacks=&deformables_evolution_callbacks_input;}
 
 //#####################################################################
-    void Advance_One_Time_Step_Position(const T dt,const T time) PHYSBAM_OVERRIDE;
-    void Advance_One_Time_Step_Velocity(const T dt,const T time) PHYSBAM_OVERRIDE;
+    void Advance_One_Time_Step_Position(const T dt,const T time);
+    void Advance_One_Time_Step_Velocity(const T dt,const T time);
     bool Adjust_Velocity_For_Self_Repulsion_And_Self_Collisions(const T dt,const T time,int& repulsions_found,int& collisions_found,const bool exit_early=false);
     void Set_External_Positions(ARRAY_VIEW<TV> X,const T time);
     void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time);
@@ -63,14 +63,14 @@ public:
     void Apply_Constraints(const T dt,const T time);
     void Diagnostics(const T dt,const T time,const int velocity_time,const int position_time,int step,const char* description);
     void Print_Maximum_Velocities(const T time) const;
-    void Update_Velocity_Using_Stored_Differences(const T dt,const T time,const int p);
-    void Initialize_Rigid_Bodies(const T frame_rate, const bool restart) PHYSBAM_OVERRIDE;
-    void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time);
+    //void Update_Velocity_Using_Stored_Differences(const T dt,const T time,const int p);
+    void Initialize_Rigid_Bodies(const T frame_rate, const bool restart);
+    //void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time);
     void Euler_Step_Position(const T dt,const T time,const int p);
     void Euler_Step_Position(const T dt,const T time);
-    void Initialize_World_Space_Masses();
-    void Clamp_Velocities();
-    void CFL(const bool verbose);
+    //void Initialize_World_Space_Masses();
+    //void Clamp_Velocities();
+    //void CFL(const bool verbose);
 protected:
     void Average_And_Exchange_Position();
     void Trapezoidal_Step_Velocity(const T dt,const T time);

@@ -59,12 +59,6 @@ public:
 template<class T>
 struct PARAMETER_SPACE
 {
-private:
-    struct UNUSABLE {};
-public:
-    typedef T SCALAR;
-    typedef UNUSABLE SPIN;
-
     virtual ~PARAMETER_SPACE(){}
 
     virtual PARAMETER_SPACE<T>& Zero_Clone() const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
@@ -78,13 +72,13 @@ template<class T>
 class NONLINEAR_FUNCTION<T(PARAMETER_SPACE<T>)>
 {
 public:
-    typedef PARAMETER_SPACE<T> TV;
+    typedef PARAMETER_SPACE<T> T_PARAMETER_SPACE;
 
     virtual ~NONLINEAR_FUNCTION(){}
 //#####################################################################
-    virtual T operator()(const TV& x) const=0;
-    virtual void Gradient(const TV& x,TV& g) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();} // g = grad(x)
-    virtual void Times_Hessian(const TV& x,const TV& y,TV& z) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();} // z = H(x) y
+    virtual T operator()(const T_PARAMETER_SPACE& x) const=0;
+    virtual void Gradient(const T_PARAMETER_SPACE& x,T_PARAMETER_SPACE& g) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();} // g = grad(x)
+    virtual void Times_Hessian(const T_PARAMETER_SPACE& x,const T_PARAMETER_SPACE& y,T_PARAMETER_SPACE& z) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();} // z = H(x) y
 //#####################################################################
 };
 
@@ -92,13 +86,13 @@ template<class T>
 class PARAMETRIC_LINE<T,T(PARAMETER_SPACE<T>)>:public NONLINEAR_FUNCTION<T(T)>
 {
 public:
-    typedef PARAMETER_SPACE<T> TV;
-    typedef NONLINEAR_FUNCTION<T(PARAMETER_SPACE<T>)> F;
+    typedef PARAMETER_SPACE<T> T_PARAMETER_SPACE;
+    typedef NONLINEAR_FUNCTION<T(T_PARAMETER_SPACE)> F;
     const F& f;
-    const TV &x,&dx;
-    TV& tmp;
+    const T_PARAMETER_SPACE &x,&dx;
+    T_PARAMETER_SPACE& tmp;
 
-    PARAMETRIC_LINE(const F& f,const TV& x,const TV& dx,TV& tmp)
+    PARAMETRIC_LINE(const F& f,const T_PARAMETER_SPACE& x,const T_PARAMETER_SPACE& dx,T_PARAMETER_SPACE& tmp)
         :f(f),x(x),dx(dx),tmp(tmp)
     {}
 

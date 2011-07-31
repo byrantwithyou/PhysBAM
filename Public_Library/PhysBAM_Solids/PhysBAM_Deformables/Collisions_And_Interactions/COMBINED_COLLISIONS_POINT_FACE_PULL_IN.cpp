@@ -82,7 +82,7 @@ Discover_Pruned()
     if(update_swept_hierarchies){
         ARRAY<bool> recently_modified(particles.array_collection->Size());ARRAYS_COMPUTATIONS::Fill(recently_modified,true);
         //triangle_collisions.Update_Swept_Hierachies_And_Compute_Pairs(particles.X,triangle_collisions.X_save,recently_modified,1.1*ARRAYS_COMPUTATIONS::Max(triangle_collisions.repulsion_thickness));}
-        triangle_collisions.Update_Swept_Hierachies_And_Compute_Pairs(particles.X,triangle_collisions.geometry.X_self_collision_free,recently_modified,1.1*ARRAYS_COMPUTATIONS::Max(triangle_collisions.repulsion_thickness));}
+        triangle_collisions.Update_Swept_Hierachies_And_Compute_Pairs(particles.X,triangle_collisions.geometry.X_self_collision_free,recently_modified,(T)(1.1*ARRAYS_COMPUTATIONS::Max(triangle_collisions.repulsion_thickness)));}
 
     ARRAY_VIEW<const TV> X=particles.X;
     ARRAY_VIEW<TV> V=particles.V;
@@ -104,7 +104,7 @@ Discover_Pruned()
         T collision_time;
         T relative_speed;
         TV X1_original=X(nodes(1))-dt*V(nodes(1));
-        T detection_thickness=repulsion_thickness*1.1;
+        T detection_thickness=(T)(repulsion_thickness*1.1);
         T distance=0;
         TV face_normal=face.Normal();
 

@@ -37,7 +37,7 @@ public:
     void Advance_To_Target_Time(const T target_time) PHYSBAM_OVERRIDE;
     void Execute_Main_Program() PHYSBAM_OVERRIDE;
     void Initialize() PHYSBAM_OVERRIDE;
-    void Update_Structures() PHYSBAM_OVERRIDE;
+    void Update_Structures();
     void Simulate_To_Frame(const int frame_input) PHYSBAM_OVERRIDE;
     void Write_Output_Files(const int frame) PHYSBAM_OVERRIDE;
 //#####################################################################

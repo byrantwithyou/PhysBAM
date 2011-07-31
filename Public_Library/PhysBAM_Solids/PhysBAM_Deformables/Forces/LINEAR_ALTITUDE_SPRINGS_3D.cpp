@@ -832,8 +832,8 @@ Create_Altitude_Springs(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,
 }
 //#####################################################################
 template class LINEAR_ALTITUDE_SPRINGS_3D<float>;
-template LINEAR_ALTITUDE_SPRINGS_3D<float>* Create_Altitude_Springs<float>(TETRAHEDRALIZED_VOLUME<float>&,float,float,bool,float,bool,float,bool,float,bool);
+template LINEAR_ALTITUDE_SPRINGS_3D<float>* PhysBAM::Create_Altitude_Springs<float>(TETRAHEDRALIZED_VOLUME<float>&,float,float,bool,float,bool,float,bool,float,bool);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class LINEAR_ALTITUDE_SPRINGS_3D<double>;
-template LINEAR_ALTITUDE_SPRINGS_3D<double>* Create_Altitude_Springs<double>(TETRAHEDRALIZED_VOLUME<double>&,double,double,bool,double,bool,double,bool,double,bool);
+template LINEAR_ALTITUDE_SPRINGS_3D<double>* PhysBAM::Create_Altitude_Springs<double>(TETRAHEDRALIZED_VOLUME<double>&,double,double,bool,double,bool,double,bool,double,bool);
 #endif

@@ -38,7 +38,7 @@ namespace PhysBAM{
 template<class TV> TRIANGLE_REPULSIONS<TV>::
 TRIANGLE_REPULSIONS(TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY<TV>& geometry)
     :geometry(geometry),youngs_modulus((T)30),spring_limiter_fraction((T).1),perform_attractions(true),attractions_threshold((T)-2),
-    hierarchy_repulsion_thickness_multiplier(1),repulsion_thickness_detection_multiplier(1.1),mpi_solids(0),use_gauss_jacobi(false)
+    hierarchy_repulsion_thickness_multiplier(1),repulsion_thickness_detection_multiplier((T)1.1),mpi_solids(0),use_gauss_jacobi(false)
 {
     // set parameters
     Set_Repulsion_Thickness();Set_Friction_Coefficient();

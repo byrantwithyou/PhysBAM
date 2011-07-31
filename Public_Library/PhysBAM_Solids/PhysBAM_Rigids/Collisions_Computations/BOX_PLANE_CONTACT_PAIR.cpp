@@ -64,7 +64,7 @@ bool Update_Box_Plane_Contact_Pair(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisi
     if(!intersect){rigid_body_collisions.skip_collision_check.Set_Last_Checked(i1,i2);return false;}  
     if(TV::Dot_Product(body1->Twist().linear-body2->Twist().linear,collision_normal)>=0) return false;
 
-    TV collision_location;for(int i=1;i<=points.m;i++) collision_location+=points(i);collision_location/=points.m;collision_location=body1->Frame()*collision_location;
+    TV collision_location;for(int i=1;i<=points.m;i++) collision_location+=points(i);collision_location/=(T)points.m;collision_location=body1->Frame()*collision_location;
     TV collision_relative_velocity=body1->Pointwise_Object_Velocity(collision_location)-body2->Pointwise_Object_Velocity(collision_location);
 
     collision_callbacks.Swap_States(i1,i2);

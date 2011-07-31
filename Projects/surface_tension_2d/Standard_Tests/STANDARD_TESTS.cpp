@@ -11,6 +11,10 @@ namespace PhysBAM{
 template<class TV> void Add_Debug_Particle(const TV& X, const VECTOR<typename TV::SCALAR,3>& color);
 template<class TV> void Add_Debug_Particle(const TV& X){Add_Debug_Particle(X,VECTOR<typename TV::SCALAR,3>(1,0,0));}
 }
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:4355) // 'this' : used in base member initializer list
+#endif
 template<class T> STANDARD_TESTS<T>::
 STANDARD_TESTS(const STREAM_TYPE stream_type)
     :BASE(stream_type,1,fluids_parameters.WATER),solids_tests(*this,solid_body_collection),run_self_tests(false),print_poisson_matrix(false),print_index_map(false),
@@ -24,6 +28,9 @@ STANDARD_TESTS(const STREAM_TYPE stream_type)
     debug_particles.Store_Velocity(true);
     Store_Debug_Particles(&debug_particles);
 }
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 template<class T> STANDARD_TESTS<T>::
 ~STANDARD_TESTS()
 {
@@ -74,9 +81,9 @@ Parse_Options()
     last_frame=100;
     frame_rate=24;
 
-    kg=parse_args->Get_Double_Value("-kg");
-    m=parse_args->Get_Double_Value("-m");
-    s=parse_args->Get_Double_Value("-s");
+    kg=(T)parse_args->Get_Double_Value("-kg");
+    m=(T)parse_args->Get_Double_Value("-m");
+    s=(T)parse_args->Get_Double_Value("-s");
     frame_rate/=s;
 
     fluids_parameters.cfl=(T).9;
@@ -121,9 +128,9 @@ Parse_Options()
     solids_fluids_parameters.use_leakproof_solve=false;
     if(parse_args->Is_Value_Set("-leakproof")) solids_fluids_parameters.use_leakproof_solve=true;
 
-    fluids_parameters.viscosity=parse_args->Get_Double_Value("-viscosity")*kg/s;
+    fluids_parameters.viscosity=(T)(parse_args->Get_Double_Value("-viscosity")*kg/s);
     if(fluids_parameters.viscosity) fluids_parameters.implicit_viscosity=true;
-    fluids_parameters.surface_tension=parse_args->Get_Double_Value("-surface_tension")*kg*m/(s*s);
+    fluids_parameters.surface_tension=(T)(parse_args->Get_Double_Value("-surface_tension")*kg*m/(s*s));
     solid_refinement=parse_args->Get_Integer_Value("-solid_refinement");
 
     fluids_parameters.use_removed_positive_particles=true;fluids_parameters.use_removed_negative_particles=true;
@@ -135,8 +142,8 @@ Parse_Options()
 
     use_viscous_forces=parse_args->Is_Value_Set("-use_viscous_forces");
     fluids_parameters.use_coupled_implicit_viscosity=parse_args->Is_Value_Set("-use_viscous_forces");
-    max_dt=parse_args->Get_Double_Value("-max_dt")*s;
-    exact_dt=parse_args->Get_Double_Value("-dt")*s;
+    max_dt=(T)(parse_args->Get_Double_Value("-max_dt")*s);
+    exact_dt=(T)(parse_args->Get_Double_Value("-dt")*s);
     if(parse_args->Is_Value_Set("-implicit_solid")) implicit_solid=true;
     if(parse_args->Is_Value_Set("-build_surface")) rebuild_surface=true;
     solid_body_collection.print_energy=parse_args->Get_Option_Value("-print_energy");
@@ -224,7 +231,7 @@ Initialize_Phi()
     else if(test_number==2) phi.Fill(1);
     else if(test_number==4 || test_number==5){
         for(UNIFORM_GRID_ITERATOR_CELL<TV> it(*fluids_parameters.grid);it.Valid();it.Next()){
-            TV dX=it.Location()-TV(.5*m,.5*m);
+            TV dX=it.Location()-TV((T)(.5*m),(T)(.5*m));
             T distance=dX.Magnitude();
             T angle=atan2(dX.y,dX.x);
             T radius=circle_radius+circle_perturbation*cos(oscillation_mode*angle);
@@ -389,11 +396,11 @@ Oscillating_Circle(bool use_surface)
     fluids_parameters.surface_tension=(T)2/3*kg*m/(s*s);
     fluids_parameters.density=27*kg/(m*m);
     T omega=sqrt(oscillation_mode*(oscillation_mode*oscillation_mode-1)*fluids_parameters.surface_tension/(fluids_parameters.density*circle_radius*circle_radius*circle_radius));
-    T period=2*pi/omega;
+    T period=(T)(2*pi/omega);
     LOG::cout<<"Analytic period of oscillation: "<<period<<std::endl;
 
     // Forces here
-    if(T linear_force=parse_args->Get_Double_Value("-linear_force")){
+    if(T linear_force=(T)parse_args->Get_Double_Value("-linear_force")){
         SPHERE<TV> circle;
         TRIANGULATED_AREA<T>* area=&solids_tests.Copy_And_Add_Structure(*TESSELLATION::Generate_Triangles(circle,solid_refinement));
         LINEAR_POINT_ATTRACTION<TV>* stf=new LINEAR_POINT_ATTRACTION<TV>(*area,TV(.5,.5),linear_force);
@@ -416,7 +423,7 @@ Oscillating_Circle(bool use_surface)
         SPHERE<TV> object;
         front_tracked_structure=&solids_tests.Copy_And_Add_Structure(*TESSELLATION::Tessellate_Boundary(object,solid_refinement));
         for(int i=1;i<=front_tracked_structure->particles.X.m;i++){
-            T angle=i*2*pi/front_tracked_structure->particles.X.m;
+            T angle=(T)(i*2*pi/front_tracked_structure->particles.X.m);
             T radius=circle_radius+circle_perturbation*cos(oscillation_mode*angle);
             front_tracked_structure->particles.X(i)=TV((T).5*m+radius*cos(angle),(T).5*m+radius*sin(angle));}
         ARRAYS_COMPUTATIONS::Fill(solid_body_collection.deformable_body_collection.particles.mass,(T)1);
@@ -444,8 +451,8 @@ Solid_Circle()
     SPHERE<TV> object(TV(),1);
     solids_tests.Copy_And_Add_Structure(*TESSELLATION::Tessellate_Boundary(object,solid_refinement));
     particles.mass+=(T)1/particles.mass.m;
-    if(make_ellipse) for(int i=1;i<=particles.X.m;i++) particles.X(i)*=TV(.9,1.1);
-    if(T rand=fluids_parameters.viscosity=parse_args->Get_Double_Value("-rand")){
+    if(make_ellipse) for(int i=1;i<=particles.X.m;i++) particles.X(i)*=TV((T).9,(T)1.1);
+    if(T rand=fluids_parameters.viscosity=(T)parse_args->Get_Double_Value("-rand")){
         RANDOM_NUMBERS<T> random;
         random.Set_Seed(1234);
         ARRAY<TV> dX(particles.X.m);
@@ -771,7 +778,7 @@ FSI_Analytic_Test()
         Add_Thin_Shell_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(b));
         rigid_body_collection.Rigid_Body(b).is_static=true;}
 
-    RIGID_BODY<TV>& rigid_body=solids_tests.Add_Analytic_Box(m*TV(solid_width,1.2),5);
+    RIGID_BODY<TV>& rigid_body=solids_tests.Add_Analytic_Box(m*TV(solid_width,(T)1.2),5);
     rigid_body.Set_Frame(FRAME<TV>(m*TV((T).5,.5)));
     rigid_body.Set_Coefficient_Of_Restitution((T)0);
     rigid_body.Set_Mass(solid_density*solid_width);

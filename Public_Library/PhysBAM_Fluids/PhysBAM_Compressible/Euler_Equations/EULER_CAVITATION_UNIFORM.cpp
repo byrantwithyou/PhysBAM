@@ -218,7 +218,7 @@ Compute_Face_Pressure_From_Cell_Pressures(const T_GRID& face_grid,T_FACE_ARRAYS_
     TV_INT first_cell_index,second_cell_index;int axis;
     for(FACE_ITERATOR iterator(face_grid);iterator.Valid();iterator.Next()){
         first_cell_index=iterator.First_Cell_Index();second_cell_index=iterator.Second_Cell_Index();axis=iterator.Axis();
-        p_face.Component(axis)(iterator.Face_Index())=(p_cell(first_cell_index)+p_cell(second_cell_index))*.5;}
+        p_face.Component(axis)(iterator.Face_Index())=(T)((p_cell(first_cell_index)+p_cell(second_cell_index))*.5);}
 }
 //#####################################################################
 // Apply_Pressure

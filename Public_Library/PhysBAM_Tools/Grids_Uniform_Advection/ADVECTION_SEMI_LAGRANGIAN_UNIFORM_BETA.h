@@ -8,6 +8,7 @@
 #define __ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA__
 
 #include <PhysBAM_Tools/Advection/ADVECTION.h>
+#include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_UNIFORM_FORWARD.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/AVERAGING_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <PhysBAM_Tools/Parallel_Computation/THREAD_QUEUE.h>

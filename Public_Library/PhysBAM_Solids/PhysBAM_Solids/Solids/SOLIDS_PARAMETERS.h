@@ -49,7 +49,7 @@ public:
     bool use_backward_euler_position_update;
 
     bool enforce_energy_conservation;
-    bool energy_correction_iterations;
+    int energy_correction_iterations;
 
     bool use_pull_in;
     int pull_in_iterations;

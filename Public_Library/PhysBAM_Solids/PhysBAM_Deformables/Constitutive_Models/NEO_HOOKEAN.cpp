@@ -154,7 +154,7 @@ template<class T,int d> T NEO_HOOKEAN<T,d>::
 Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int simplex) const
 {
     T I1=(F*F.Transposed()).Trace(),J=F.Determinant();
-    if(J<=0) return 1e16; // TODO: Do something smarter here.
+    if(J<=0) return (T)1e16; // TODO: Do something smarter here.
     T log_J=log(J);
     return constant_mu*((T).5*(I1-TV::m)-log_J)+(T).5*constant_lambda*sqr(log_J);
 }

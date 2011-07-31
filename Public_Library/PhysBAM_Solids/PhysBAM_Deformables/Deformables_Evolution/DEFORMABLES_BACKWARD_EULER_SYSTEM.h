@@ -34,10 +34,10 @@ public:
 // Class DEFORMABLES_BACKWARD_EULER_SYSTEM
 //#####################################################################
 // assumes all solids_forces are linear in velocity, with a symmetric negative definite Jacobian.
-template<class TV> class POINT_FACE_REPULSION_PAIR;
-template<class TV> class EDGE_EDGE_REPULSION_PAIR;
-template<class TV> class PRECOMPUTE_PROJECT_POINT_FACE;
-template<class TV> class PRECOMPUTE_PROJECT_EDGE_EDGE;
+template<class TV> struct POINT_FACE_REPULSION_PAIR;
+template<class TV> struct EDGE_EDGE_REPULSION_PAIR;
+template<class TV> struct PRECOMPUTE_PROJECT_POINT_FACE;
+template<class TV> struct PRECOMPUTE_PROJECT_EDGE_EDGE;
 template<class TV>
 class DEFORMABLES_BACKWARD_EULER_SYSTEM:public KRYLOV_SYSTEM_BASE<typename TV::SCALAR>
 {

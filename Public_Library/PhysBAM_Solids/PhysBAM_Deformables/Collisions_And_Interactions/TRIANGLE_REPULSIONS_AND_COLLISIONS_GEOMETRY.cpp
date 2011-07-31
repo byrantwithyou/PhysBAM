@@ -180,13 +180,13 @@ Restore_Self_Collision_Free_State()
 // Function Compute_Intersecting_Segment_Face_Pairs
 //#####################################################################
 template<class TV> template<class S>  void TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY<TV>::
-Compute_Intersecting_Pairs_Helper(typename IF<INTS_EQUAL<d,1>::value,const TV*,UNUSABLE>::TYPE input)
+Compute_Intersecting_Pairs_Helper(COMPUTE_INTERSECTING_PAIRS_HELPER_INPUT_WHEN_D_EQ_1 input)
 {
     PHYSBAM_ASSERT(d==1);
     PHYSBAM_NOT_IMPLEMENTED();
 }
 template<class TV> template<class S> void TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY<TV>::
-Compute_Intersecting_Pairs_Helper(typename IF<!INTS_EQUAL<d,1>::value,const TV*,UNUSABLE>::TYPE input)
+Compute_Intersecting_Pairs_Helper(COMPUTE_INTERSECTING_PAIRS_HELPER_INPUT_WHEN_D_NE_1 input)
 {
     LOG::cout<<"allowing intersections!!!"<<std::endl;
     intersecting_point_face_pairs.Remove_All();intersecting_edge_edge_pairs.Remove_All();

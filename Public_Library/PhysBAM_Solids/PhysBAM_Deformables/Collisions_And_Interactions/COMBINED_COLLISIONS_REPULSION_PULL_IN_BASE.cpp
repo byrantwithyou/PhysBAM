@@ -103,8 +103,11 @@ Diagnose_Impulse(int e,const IMPULSE& impulse,T dt,T time) const
 {
     const COLLISION& col=collisions(e);
 
-    if(TV::Dot_Product(col.total_impulse,col.normal)<=0) // turn this off
-        flagged_for_removal.Append(e);
+    if(TV::Dot_Product(col.total_impulse,col.normal)<=0){ // turn this off
+        PHYSBAM_FATAL_ERROR("Review the following line, and if correct, use \"e!=0\"");
+        // flagged_for_removal has type ARRAY<bool>, so I don't think the following line is correct.
+        //flagged_for_removal.Append(e);
+    }
     return 0;
 }
 //#####################################################################

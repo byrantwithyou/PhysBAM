@@ -13,7 +13,7 @@
 #include <PhysBAM_Solids/PhysBAM_Rigids/Muscles/MUSCLE_FORCE_CURVE.h>
 namespace PhysBAM{
 
-template<class TV> class ATTACHMENT_POINT;
+template<class TV> struct ATTACHMENT_POINT;
 template<class TV> class RIGID_BODY_COLLECTION;
 
 template<class TV>

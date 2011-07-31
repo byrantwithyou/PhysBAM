@@ -194,10 +194,13 @@ public:
     return TWIST<TV>(twist.linear*Mass(),World_Space_Inertia_Tensor_Times(twist.angular));}
 
 //#####################################################################
-    void Effective_Inertia_Inverse(MATRIX<T,TV::m+T_SPIN::m>& extended_mass_inverse,const TV& location) const;
-    void Effective_Inertia(MATRIX<T,TV::m+T_SPIN::m>& extended_mass_inverse,const TV& location) const;
-    void Gather_Matrix(MATRIX<T,TV::m+T_SPIN::m>& gather,const TV& location) const;
-    void Scatter_Matrix(MATRIX<T,TV::m+T_SPIN::m>& scatter,const TV& location) const;
+private:
+    static const int mm=TV::m+T_SPIN::m;
+public:
+    void Effective_Inertia_Inverse(MATRIX<T,mm>& extended_mass_inverse,const TV& location) const;
+    void Effective_Inertia(MATRIX<T,mm>& extended_mass_inverse,const TV& location) const;
+    void Gather_Matrix(MATRIX<T,mm>& gather,const TV& location) const;
+    void Scatter_Matrix(MATRIX<T,mm>& scatter,const TV& location) const;
     TWIST<TV> Effective_Inertia_Inverse_Times(const TWIST<TV>& wrench,const TV& location) const;
     TWIST<TV> Effective_Inertia_Times(const TWIST<TV>& twist,const TV& location) const;
     T Volume() const;

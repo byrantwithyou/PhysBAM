@@ -124,7 +124,7 @@ Discover_Pruned()
         //if(!Edge_Edge_Interaction(X,V,weights,distance,col,repulsion_thickness,triangle_collisions.geometry.small_number)) continue;
 
         T_EDGE edge1,edge2;T repulsion_thickness=Create_Edges(X,V,dt,nodes,triangle_collisions.repulsion_thickness,edge1,edge2);
-        T detection_thickness=1.1*repulsion_thickness;
+        T detection_thickness=(T)(1.1*repulsion_thickness);
         T relative_speed,collision_time;
         T distance=0;
         TV normal;

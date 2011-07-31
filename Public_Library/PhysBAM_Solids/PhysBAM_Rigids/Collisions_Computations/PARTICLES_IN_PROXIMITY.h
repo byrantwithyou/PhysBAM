@@ -59,7 +59,7 @@ ARRAY<int> Convex_Hull(ARRAY<VECTOR<T,2> >& points)
             corner=i;
 
     ARRAY<PAIR<T,int> > angles(points.m);
-    angles(1).x=-pi;
+    angles(1).x=(T)(-pi);
     angles(1).y=1;
 
     /*for(int i=1;i<=angles.m;i++)
@@ -208,12 +208,12 @@ PARTICLE_PARTITION<TV> Build_Particle_Partition(ARRAY<TV>& locations,typename TV
     box.Reset_Bounds(locations(1));
     for(int i=1;i<=n;i++)
         box.Enlarge_To_Include_Point(locations(i));
-    box=box.Thickened(region_threshold/2.0);
+    box=box.Thickened((T)(region_threshold/2.0));
     
     T volume=box.Robust_Size();
 
     T cell_edge=cbrt(volume/n);
-    VECTOR<int,TV::dimension> counts=VECTOR<int,TV::dimension>(box.Edge_Lengths()*(1.0/cell_edge))+VECTOR<int,TV::dimension>::All_Ones_Vector();
+    VECTOR<int,TV::dimension> counts=VECTOR<int,TV::dimension>(box.Edge_Lengths()*((T)(1.0/cell_edge)))+VECTOR<int,TV::dimension>::All_Ones_Vector();
     
     PARTICLE_PARTITION<TV> partition(box,counts,GEOMETRY_PARTICLES<TV>(),false);
     
@@ -315,7 +315,7 @@ ARRAY<int> Eliminate_Redundant_Contact_Points(ARRAY<VECTOR<T,3> >& locations,ARR
     if(!n)
         return ARRAY<int>();
 
-    T normal_threshold=0.9;
+    T normal_threshold=(T)0.9;
     T distance_threshold=sqrt((T)2.0-(T)2.0*normal_threshold);
 
     //group contact points into nearby convex regions with similar normals

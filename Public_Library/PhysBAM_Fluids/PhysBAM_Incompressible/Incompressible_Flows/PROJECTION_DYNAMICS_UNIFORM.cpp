@@ -138,7 +138,7 @@ template<class T_GRID> void PROJECTION_DYNAMICS_UNIFORM<T_GRID>::
 Update_Potential_Energy(T_FACE_ARRAYS_SCALAR& face_velocities_new,T_FACE_ARRAYS_SCALAR& face_velocities_old,T_FACE_ARRAYS_SCALAR& potential_energy,const T dt)
 {
     for(typename GRID<TV>::FACE_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> full_index=iterator.Full_Index();
-        potential_energy(full_index)-=0.5*density*(face_velocities_new(full_index)*face_velocities_new(full_index)-face_velocities_old(full_index)*face_velocities_old(full_index));}
+        potential_energy(full_index)-=(T)(0.5*density*(face_velocities_new(full_index)*face_velocities_new(full_index)-face_velocities_old(full_index)*face_velocities_old(full_index)));}
 }
 //#####################################################################
 // Function Update_Kinetic_Energy
@@ -151,7 +151,7 @@ Update_Potential_Energy(T_FACE_ARRAYS_SCALAR& face_velocities_old,T_FACE_ARRAYS_
     TV one_over_dx=p_grid.one_over_dX;
     ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities(p_grid);
     for(typename GRID<TV>::FACE_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> full_index=iterator.Full_Index();
-        face_velocities(full_index)=(face_velocities_old(full_index)+face_velocities_new(full_index))/2.;}
+        face_velocities(full_index)=(T)((face_velocities_old(full_index)+face_velocities_new(full_index))/2.);}
     Update_Potential_Energy(face_velocities,potential_energy,dt);
     
     for(CELL_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()) for(int i=1;i<=TV::dimension;i++){
@@ -182,7 +182,7 @@ Compare_Potential_Energy(T_FACE_ARRAYS_SCALAR& face_velocities_old,T_FACE_ARRAYS
     T energy_gained_cell_total=0,energy_gained_face_total=0;
     ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities(p_grid);
     for(typename GRID<TV>::FACE_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> full_index=iterator.Full_Index();
-        face_velocities(full_index)=(face_velocities_old(full_index)+face_velocities_new(full_index))/2.;}
+        face_velocities(full_index)=(T)((face_velocities_old(full_index)+face_velocities_new(full_index))/2.);}
     
     ARRAY<T,TV_INT> energy_gained(p_grid.Domain_Indices());
     for(typename GRID<TV>::CELL_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()) energy_gained(iterator.Cell_Index())=0;

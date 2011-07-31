@@ -239,8 +239,6 @@ template<class TV> COMBINED_COLLISIONS<TV>::COLLIDER::
 ~COLLIDER()
 {
 }
-#if defined(_MSC_VER) && _MSC_VER<=1500
-#else
 template class COMBINED_COLLISIONS<VECTOR<float,1> >;
 template class COMBINED_COLLISIONS<VECTOR<float,2> >;
 template class COMBINED_COLLISIONS<VECTOR<float,3> >;
@@ -248,5 +246,4 @@ template class COMBINED_COLLISIONS<VECTOR<float,3> >;
 template class COMBINED_COLLISIONS<VECTOR<double,1> >;
 template class COMBINED_COLLISIONS<VECTOR<double,2> >;
 template class COMBINED_COLLISIONS<VECTOR<double,3> >;
-#endif
 #endif

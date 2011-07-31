@@ -50,15 +50,15 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TW
         if(constant_wind_angular_viscosity) rigid_F(k).angular-=constant_wind_angular_viscosity*rigid_V(k).angular;}
 }
 template<class T_GRID> void RIGID_ETHER_DRAG<T_GRID>::
-Add_Force_Differential(ARRAY_VIEW<const TV> dX,ARRAY_VIEW<TV> dF,const T time) const PHYSBAM_OVERRIDE
+Add_Force_Differential(ARRAY_VIEW<const TV> dX,ARRAY_VIEW<TV> dF,const T time) const
 {
 }
 template<class T_GRID> void RIGID_ETHER_DRAG<T_GRID>::
-Enforce_Definiteness(const bool enforce_definiteness_input) PHYSBAM_OVERRIDE
+Enforce_Definiteness(const bool enforce_definiteness_input)
 {
 }
 template<class T_GRID> void RIGID_ETHER_DRAG<T_GRID>::
-Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const PHYSBAM_OVERRIDE
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) const
 {
 }
 //#####################################################################

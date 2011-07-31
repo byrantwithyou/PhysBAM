@@ -69,7 +69,7 @@ public:
 protected:
     void Save_Position(ARRAY<TV>& X,ARRAY<TV>& rigid_X,ARRAY<ROTATION<TV> >& rigid_rotation);
     void Restore_Position(ARRAY_VIEW<const TV> X,ARRAY_VIEW<const TV> rigid_X,ARRAY_VIEW<const ROTATION<TV> > rigid_Rotation);
-    void Set_Kinematic_Velocities(TWIST<TV>& twist,const T frame_dt,const T time,const int id); // convenience wrapper
+    //void Set_Kinematic_Velocities(TWIST<TV>& twist,const T frame_dt,const T time,const int id); // convenience wrapper
     void Clamp_Velocities();
 public:
     void Initialize_World_Space_Masses();

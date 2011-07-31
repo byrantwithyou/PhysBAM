@@ -13,7 +13,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> LEVELSET_FACE_POISSON_UNIFORM<TV>::
 LEVELSET_FACE_POISSON_UNIFORM(LEVELSET_INDEX_MAP_UNIFORM<TV>& index_map_input)
-    :index_map(index_map_input),theta_threshold(1e-5)
+    :index_map(index_map_input),theta_threshold((T)1e-5)
 {
 }
 //#####################################################################

@@ -12,7 +12,7 @@ namespace PhysBAM{
 
 template<class TV> class TRIANGLE_COLLISIONS;
 template<class TV> class TRIANGLE_REPULSIONS;
-template<class TV> class COMBINED_COLLISIONS_DEFORMABLE_IMPULSE;
+template<class TV> struct COMBINED_COLLISIONS_DEFORMABLE_IMPULSE;
 
 template<class TV,int d>
 class COMBINED_COLLISIONS_REPULSION_PULL_IN_BASE:public COMBINED_COLLISIONS<TV>::COLLIDER

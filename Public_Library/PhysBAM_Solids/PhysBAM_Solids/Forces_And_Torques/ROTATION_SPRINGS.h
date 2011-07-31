@@ -49,7 +49,7 @@ public:
     void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const PHYSBAM_OVERRIDE {}
     void Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> rigid_frequency)
         PHYSBAM_OVERRIDE {} // TODO: write correct CFL
-    void Add_Force_Differential(ARRAY_VIEW<const TV> dX,ARRAY_VIEW<TV> dF,const T time) const PHYSBAM_OVERRIDE {PHYSBAM_NOT_IMPLEMENTED();}
+    void Add_Force_Differential(ARRAY_VIEW<const TV> dX,ARRAY_VIEW<TV> dF,const T time) const {PHYSBAM_NOT_IMPLEMENTED();}
     void Enforce_Definiteness(const bool enforce_definiteness_input) PHYSBAM_OVERRIDE {}
     T CFL_Strain_Rate() const PHYSBAM_OVERRIDE {return FLT_MAX;}
 

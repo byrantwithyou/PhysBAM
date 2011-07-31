@@ -492,9 +492,9 @@ Initialize_From_Tetrahedralized_Volume_And_Triangulated_Surface(TETRAHEDRALIZED_
 // Function Effective_Inertia_Inverse
 //#####################################################################
 template<class TV> void RIGID_BODY<TV>::
-Effective_Inertia_Inverse(MATRIX<T,TV::m+T_SPIN::m>& extended_mass_inverse,const TV& location) const
+Effective_Inertia_Inverse(MATRIX<T,mm>& extended_mass_inverse,const TV& location) const
 {
-    if(Has_Infinite_Inertia()){extended_mass_inverse=MATRIX<T,TV::m+T_SPIN::m>();return;}
+    if(Has_Infinite_Inertia()){extended_mass_inverse=MATRIX<T,mm>();return;}
 
     TV r=location-X();
     MATRIX<T,T_SPIN::m> Ii=World_Space_Inertia_Tensor_Inverse();
@@ -509,7 +509,7 @@ Effective_Inertia_Inverse(MATRIX<T,TV::m+T_SPIN::m>& extended_mass_inverse,const
 // Function Effective_Inertia_At_Point
 //#####################################################################
 template<class TV> void RIGID_BODY<TV>::
-Effective_Inertia(MATRIX<T,TV::m+T_SPIN::m>& extended_mass_inverse,const TV& location) const
+Effective_Inertia(MATRIX<T,mm>& extended_mass_inverse,const TV& location) const
 {
     PHYSBAM_ASSERT(!Has_Infinite_Inertia());
 
@@ -546,13 +546,13 @@ Effective_Inertia_Times(const TWIST<TV>& twist,const TV& location) const
     return TWIST<TV>(twist.linear*Mass()-TV::Cross_Product(omega,r),omega);
 }
 template<class TV> void RIGID_BODY<TV>::
-Gather_Matrix(MATRIX<T,TV::m+T_SPIN::m>& gather,const TV& location) const
+Gather_Matrix(MATRIX<T,mm>& gather,const TV& location) const
 {
     gather.Set_Identity_Matrix();
     gather.Set_Submatrix(1+TV::m,1,MATRIX<T,T_SPIN::m,TV::m>::Cross_Product_Matrix(location-X()));
 }
 template<class TV> void RIGID_BODY<TV>::
-Scatter_Matrix(MATRIX<T,TV::m+T_SPIN::m>& scatter,const TV& location) const
+Scatter_Matrix(MATRIX<T,mm>& scatter,const TV& location) const
 {
     scatter.Set_Identity_Matrix();
     scatter.Set_Submatrix(1,1+TV::m,MATRIX<T,T_SPIN::m,TV::m>::Cross_Product_Matrix(location-X()).Transposed());

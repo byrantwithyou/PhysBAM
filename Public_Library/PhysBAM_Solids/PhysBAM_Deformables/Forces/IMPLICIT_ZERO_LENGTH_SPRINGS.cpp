@@ -147,9 +147,9 @@ Create_Edge_Zero_Length_Springs(PARTICLES<TV>& particles,SEGMENT_MESH& segment_m
 //#####################################################################
 template class IMPLICIT_ZERO_LENGTH_SPRINGS<VECTOR<float,2> >;
 template class IMPLICIT_ZERO_LENGTH_SPRINGS<VECTOR<float,3> >;
-template IMPLICIT_ZERO_LENGTH_SPRINGS<VECTOR<float,3> >* Create_Edge_Zero_Length_Springs<float,VECTOR<float,3> >(PARTICLES<VECTOR<float,3> >&,SEGMENT_MESH&,float,float,bool);
+template IMPLICIT_ZERO_LENGTH_SPRINGS<VECTOR<float,3> >* PhysBAM::Create_Edge_Zero_Length_Springs<float,VECTOR<float,3> >(PARTICLES<VECTOR<float,3> >&,SEGMENT_MESH&,float,float,bool);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class IMPLICIT_ZERO_LENGTH_SPRINGS<VECTOR<double,2> >;
 template class IMPLICIT_ZERO_LENGTH_SPRINGS<VECTOR<double,3> >;
-template IMPLICIT_ZERO_LENGTH_SPRINGS<VECTOR<double,3> >* Create_Edge_Zero_Length_Springs<double,VECTOR<double,3> >(PARTICLES<VECTOR<double,3> >&,SEGMENT_MESH&,double,double,bool);
+template IMPLICIT_ZERO_LENGTH_SPRINGS<VECTOR<double,3> >* PhysBAM::Create_Edge_Zero_Length_Springs<double,VECTOR<double,3> >(PARTICLES<VECTOR<double,3> >&,SEGMENT_MESH&,double,double,bool);
 #endif

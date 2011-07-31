@@ -13,7 +13,7 @@
 namespace PhysBAM{
 
 template<class T> class TETRAHEDRALIZED_VOLUME;
-template<class TV> class ATTACHMENT_POINT;
+template<class TV> struct ATTACHMENT_POINT;
 template<class T_input>
 class ANALYTIC_SURFACE_MUSCLE_SEGMENT:public MUSCLE_SEGMENT<VECTOR<T_input,3> >
 {

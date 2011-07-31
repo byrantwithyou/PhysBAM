@@ -54,27 +54,27 @@ public:
     RIGIDS_EVOLUTION(RIGIDS_PARAMETERS<TV>& rigids_parameters_input,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input);
     ~RIGIDS_EVOLUTION();
 
-    bool Use_CFL() const PHYSBAM_OVERRIDE
+    bool Use_CFL() const
     {return true;}
 
     void Set_Rigids_Evolution_Callbacks(RIGIDS_EVOLUTION_CALLBACKS<TV>& rigids_evolution_callbacks_input)
     {rigids_evolution_callbacks=&rigids_evolution_callbacks_input;}
 
 //#####################################################################
-    void Advance_One_Time_Step_Position(const T dt,const T time,const bool solids) PHYSBAM_OVERRIDE;
-    void Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids) PHYSBAM_OVERRIDE;
+    void Advance_One_Time_Step_Position(const T dt,const T time,const bool solids);
+    void Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids);
     void Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,const T current_position_time,const bool velocity_update);
     void Apply_Constraints(const T dt,const T time);
     void Diagnostics(const T dt,const T time,const int velocity_time,const int position_time,int step,const char* description);
     void Print_Maximum_Velocities(const T time) const;
     void Update_Velocity_Using_Stored_Differences(const T dt,const T time,const int p);
-    void Initialize_Rigid_Bodies(const T frame_rate, const bool restart) PHYSBAM_OVERRIDE;
+    void Initialize_Rigid_Bodies(const T frame_rate, const bool restart);
     void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time);
     void Euler_Step_Position(const T dt,const T time,const int p);
     void Euler_Step_Position(const T dt,const T time);
     void Initialize_World_Space_Masses();
     void Clamp_Velocities();
-    void CFL(const bool verbose);
+    //void CFL(const bool verbose);
     void Restore_Position(ARRAY_VIEW<const TV> rigid_X,ARRAY_VIEW<const ROTATION<TV> > rigid_rotation);
 protected:
     void Average_And_Exchange_Position();

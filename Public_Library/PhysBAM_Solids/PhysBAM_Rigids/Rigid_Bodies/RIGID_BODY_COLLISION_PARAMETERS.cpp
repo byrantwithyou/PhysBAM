@@ -19,7 +19,7 @@ RIGID_BODY_COLLISION_PARAMETERS()
     use_push_out(true),use_legacy_push_out(false),use_projected_gauss_seidel_push_out(false),use_push_out_rotation(true),use_epsilon_scaling(true),use_epsilon_scaling_for_level(true),
     use_shock_propagation(true),use_persistant_contact(false),collision_iterations(5),contact_iterations(10),contact_project_iterations(5),use_analytic_collisions(false),
     use_fracture_pattern(false),allow_refracturing(false),use_fracture_particle_optimization(true),enforce_rigid_rigid_contact_in_cg(true),perform_collisions(true),perform_contact(true),
-    use_combined_collisions(false),test_combined_system(false),use_projected_gauss_seidel(false),contact_proximity(0),projected_gauss_seidel_tolerance(1e-3)
+    use_combined_collisions(false),test_combined_system(false),use_projected_gauss_seidel(false),contact_proximity(0),projected_gauss_seidel_tolerance((T)1e-3)
 {
     Set_Collision_Body_Thickness();
 }

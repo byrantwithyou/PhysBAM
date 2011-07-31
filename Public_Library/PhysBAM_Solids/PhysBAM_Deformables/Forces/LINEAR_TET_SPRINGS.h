@@ -103,12 +103,12 @@ public:
 
 template<class T> LINEAR_TET_SPRINGS<T>*
 Create_Tet_Springs(PARTICLES<VECTOR<T,3> >& particles,TETRAHEDRON_MESH& mesh,const T stiffness,const T overdamping_fraction,
-    const bool use_compressed_by_threshold_only=true,const T fraction_compression=.1,const bool limit_time_step_by_strain_rate=true,const T max_strain_per_time_step=.1,
+    const bool use_compressed_by_threshold_only=true,const T fraction_compression=(T).1,const bool limit_time_step_by_strain_rate=true,const T max_strain_per_time_step=(T).1,
     const bool use_rest_state_for_strain_rate=true,const T restlength_enlargement_fraction=0,const bool verbose=true,const bool implicit=false);
 
 template<class T> LINEAR_TET_SPRINGS<T>*
 Create_Tet_Springs(TETRAHEDRALIZED_VOLUME<T>& volume,const T stiffness,
-    const T overdamping_fraction,const bool use_compressed_by_threshold_only=true,const T fraction_compression=.1,const bool limit_time_step_by_strain_rate=true,
-    const T max_strain_per_time_step=.1,const bool use_rest_state_for_strain_rate=true,const T restlength_enlargement_fraction=0,const bool verbose=true,const bool implicit=false);
+    const T overdamping_fraction,const bool use_compressed_by_threshold_only=true,const T fraction_compression=(T).1,const bool limit_time_step_by_strain_rate=true,
+    const T max_strain_per_time_step=(T).1,const bool use_rest_state_for_strain_rate=true,const T restlength_enlargement_fraction=0,const bool verbose=true,const bool implicit=false);
 }
 #endif

@@ -13,7 +13,7 @@
 namespace PhysBAM{
 
 template<class TV> class RIGID_BODY;
-template<class TV> class RIGID_BODY_PARTICLE_INTERSECTION;
+template<class TV> struct RIGID_BODY_PARTICLE_INTERSECTION;
 template<class T,class ID> class ARRAY_VIEW;
 template<class T,class ID> class ARRAY;
 template<class TV> class IMPLICIT_OBJECT;

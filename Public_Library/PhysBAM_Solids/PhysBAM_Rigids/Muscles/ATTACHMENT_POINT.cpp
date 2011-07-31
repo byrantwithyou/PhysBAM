@@ -39,12 +39,12 @@ Apply_Impulse(const TV& impulse)
 {
     rigid_body.Apply_Impulse_To_Body(Embedded_Position(),impulse);
 }
-template class ATTACHMENT_POINT<VECTOR<float,1> >;
-template class ATTACHMENT_POINT<VECTOR<float,2> >;
-template class ATTACHMENT_POINT<VECTOR<float,3> >;
+template struct ATTACHMENT_POINT<VECTOR<float,1> >;
+template struct ATTACHMENT_POINT<VECTOR<float,2> >;
+template struct ATTACHMENT_POINT<VECTOR<float,3> >;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-template class ATTACHMENT_POINT<VECTOR<double,1> >;
-template class ATTACHMENT_POINT<VECTOR<double,2> >;
-template class ATTACHMENT_POINT<VECTOR<double,3> >;
+template struct ATTACHMENT_POINT<VECTOR<double,1> >;
+template struct ATTACHMENT_POINT<VECTOR<double,2> >;
+template struct ATTACHMENT_POINT<VECTOR<double,3> >;
 #endif
 

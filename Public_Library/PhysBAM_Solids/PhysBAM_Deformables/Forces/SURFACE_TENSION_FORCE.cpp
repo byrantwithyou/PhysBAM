@@ -81,21 +81,21 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
 // Function Add_Force_Differential
 //#####################################################################
 template<class TV> void SURFACE_TENSION_FORCE<TV>::
-Add_Force_Differential(ARRAY_VIEW<const TV> dX,ARRAY_VIEW<TV> dF,const T time) const PHYSBAM_OVERRIDE
+Add_Force_Differential(ARRAY_VIEW<const TV> dX,ARRAY_VIEW<TV> dF,const T time) const
 {
 }
 //#####################################################################
 // Function Enforce_Definiteness
 //#####################################################################
 template<class TV> void SURFACE_TENSION_FORCE<TV>::
-Enforce_Definiteness(const bool enforce_definiteness_input) PHYSBAM_OVERRIDE
+Enforce_Definiteness(const bool enforce_definiteness_input)
 {
 }
 //#####################################################################
 // Function Add_Implicit_Velocity_Independent_Forces
 //#####################################################################
 template<class TV> void SURFACE_TENSION_FORCE<TV>::
-Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
 {
 }
 //#####################################################################
@@ -203,7 +203,7 @@ Dump_Curvatures() const
         A(k.y)+=len;}
     for(int i=1;i<=F.m;i++){
         T K=abs(F(i).Magnitude()/A(i)/surface_tension_coefficient);
-        TV dx=surface.particles.X(i)-.02;
+        TV dx=surface.particles.X(i)-(T).02;
         av+=K;
         n++;
         if(K>mx) mx=K;

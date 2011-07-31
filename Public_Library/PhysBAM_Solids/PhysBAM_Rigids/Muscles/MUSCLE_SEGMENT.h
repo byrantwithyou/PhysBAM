@@ -14,7 +14,7 @@
 #include <string>
 namespace PhysBAM{
 
-template<class TV> class ATTACHMENT_POINT;
+template<class TV> struct ATTACHMENT_POINT;
 template<class TV> class GEOMETRY_PARTICLES;
 template<class T> class QUEUE;
 

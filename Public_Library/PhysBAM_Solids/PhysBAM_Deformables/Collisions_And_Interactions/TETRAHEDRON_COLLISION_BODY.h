@@ -64,7 +64,7 @@ public:
     TV Surface_Normal(const int triangle,const TV& weights) const;
     bool Implicit_Geometry_Lazy_Inside(const TV& location,T contour_value=0) const PHYSBAM_OVERRIDE;
     bool Implicit_Geometry_Lazy_Inside_And_Value(const TV& location,T& phi,T contour_value=0) const PHYSBAM_OVERRIDE;
-    bool Implicit_Geometry_Lazy_Outside_Extended_Levelset_And_Value(const TV& location,T& phi_value,T contour_value=0) const PHYSBAM_OVERRIDE;
+    bool Implicit_Geometry_Lazy_Outside_Extended_Levelset_And_Value(const TV& location,T& phi_value,T contour_value=0) const;
     TV Implicit_Geometry_Normal(const TV& location,const int aggregate=-1) const PHYSBAM_OVERRIDE;
     TV Implicit_Geometry_Normal(const TV& location,T& phi_value,const int aggregate=-1,const int location_particle_index=0) const PHYSBAM_OVERRIDE;
     TV Implicit_Geometry_Extended_Normal(const TV& location,T& phi_value,const int aggregate=-1,const int location_particle_index=0) const PHYSBAM_OVERRIDE;

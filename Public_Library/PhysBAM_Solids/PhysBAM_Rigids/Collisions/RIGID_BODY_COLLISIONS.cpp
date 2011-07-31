@@ -350,7 +350,7 @@ Update_Box_Plane_Collision(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,cons
     rigid_body_collisions.pairs_processed_by_collisions.Set(VECTOR<int,2>(i1,i2).Sorted());
     if(TV::Dot_Product(body1->Twist().linear-body2->Twist().linear,collision_normal)>=0) return false;
 
-    TV collision_location;for(int i=1;i<=points.m;i++) collision_location+=points(i);collision_location/=points.m;collision_location=body1->Frame()*collision_location;
+    TV collision_location;for(int i=1;i<=points.m;i++) collision_location+=points(i);collision_location/=(T)points.m;collision_location=body1->Frame()*collision_location;
     rigid_body_collisions.Update_Collision_Pair_Helper(*body1,*body2,dt,time,collision_location,collision_normal,
         body1->Pointwise_Object_Velocity(collision_location)-body2->Pointwise_Object_Velocity(collision_location),mpi_one_ghost);
     return true;

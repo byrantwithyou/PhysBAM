@@ -33,7 +33,7 @@ public:
 
     virtual void Discover(const T dt,const T time);
     void Discover_Pruned();
-    void Discover_Saved_Pairs();
+    //void Discover_Saved_Pairs();
 //#####################################################################
 };
 }

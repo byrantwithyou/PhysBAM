@@ -95,7 +95,7 @@ Initialize()
     example.Initialize_Confinement();
 
     // setup laplace
-    example.projection.elliptic_solver->Set_Relative_Tolerance(1e-9);
+    example.projection.elliptic_solver->Set_Relative_Tolerance((T)1e-9);
     example.projection.elliptic_solver->pcg.Set_Maximum_Iterations(1000);
     example.projection.elliptic_solver->pcg.evolution_solver_type=krylov_solver_cg;
     example.projection.elliptic_solver->pcg.cg_restart_iterations=40;
@@ -143,7 +143,7 @@ Advance_To_Target_Time(const T target_time)
         T dt=example.cfl*example.incompressible.CFL(example.fine_face_velocities);
         if(example.fine_mpi_grid) example.fine_mpi_grid->Synchronize_Dt(dt);
         if(time+dt>=target_time){dt=target_time-time;done=true;}
-        else if(time+2*dt>=target_time){dt=.5*(target_time-time);}
+        else if(time+2*dt>=target_time){dt=(T)(.5*(target_time-time));}
 
         // kinematic_update
         kinematic_evolution.Set_External_Positions(example.rigid_geometry_collection.particles.X,example.rigid_geometry_collection.particles.rotation,time);

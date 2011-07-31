@@ -134,11 +134,11 @@ Kinetic_Energy(const ARRAY<COMBINED_BODY_ID>& list) const
             ke+=DBASE::Kinetic_Energy(Combined_Body_Id_To_Deformable_Particle(list(i)));}
     return ke;
 }
-template class COMBINED_COLLISIONS_COUPLED_IMPULSE<VECTOR<float,1> >;
-template class COMBINED_COLLISIONS_COUPLED_IMPULSE<VECTOR<float,2> >;
-template class COMBINED_COLLISIONS_COUPLED_IMPULSE<VECTOR<float,3> >;
+template struct COMBINED_COLLISIONS_COUPLED_IMPULSE<VECTOR<float,1> >;
+template struct COMBINED_COLLISIONS_COUPLED_IMPULSE<VECTOR<float,2> >;
+template struct COMBINED_COLLISIONS_COUPLED_IMPULSE<VECTOR<float,3> >;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-template class COMBINED_COLLISIONS_COUPLED_IMPULSE<VECTOR<double,1> >;
-template class COMBINED_COLLISIONS_COUPLED_IMPULSE<VECTOR<double,2> >;
-template class COMBINED_COLLISIONS_COUPLED_IMPULSE<VECTOR<double,3> >;
+template struct COMBINED_COLLISIONS_COUPLED_IMPULSE<VECTOR<double,1> >;
+template struct COMBINED_COLLISIONS_COUPLED_IMPULSE<VECTOR<double,2> >;
+template struct COMBINED_COLLISIONS_COUPLED_IMPULSE<VECTOR<double,3> >;
 #endif
