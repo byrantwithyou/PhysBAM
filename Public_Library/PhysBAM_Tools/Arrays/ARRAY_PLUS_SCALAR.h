@@ -10,6 +10,11 @@
 #include <PhysBAM_Tools/Arrays/ARRAY_EXPRESSION.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Vectors/ARITHMETIC_POLICY.h>
+
+#ifdef DIFFERENCE
+#undef DIFFERENCE
+#endif
+
 namespace PhysBAM{
 
 template<class T1,class T_ARRAY2> class ARRAY_PLUS_SCALAR;

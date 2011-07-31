@@ -2,11 +2,13 @@
 // Copyright 2004, Eran Guendelman.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_COLOR.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_TEXTURE.h>
 #include <cmath>
+#include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <PhysBAM_Tools/Utilities/STATIC_ASSERT.h>
+#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_COLOR.h>
+#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_TEXTURE.h>
 using namespace PhysBAM;
 using namespace std;
 
@@ -66,16 +68,37 @@ OPENGL_TEXTURE::Update_Texture(const OPENGL_COLOR *bitmap)
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GL_RGBA, GL_FLOAT, bitmap);
 }
 
+namespace
+{
+    unsigned long glVersion()
+    {
+        // If this fails...assume OpenGL version >= 1.2 ???
+        PHYSBAM_STATIC_ASSERT((sizeof( GLubyte ) == sizeof( char )));
+        const char* p = reinterpret_cast< const char* >(glGetString(GL_VERSION));
+        assert(p && *p);
+        const unsigned long gl_version_major_number = std::strtoul(p, 0, 10);
+        p = std::strchr(p, '.');
+        assert(p && *p == '.');
+        const unsigned long gl_version_minor_number = std::strtoul(++p, 0, 10);
+        p = std::strpbrk(p, ". ");
+        unsigned long gl_version_release_number = 0;
+        if(p && *p == '.')
+            gl_version_release_number = std::strtoul(++p, 0, 10);
+        return 100*(1000 * gl_version_major_number + gl_version_minor_number) + gl_version_release_number;
+    }
+}
+
 void
 OPENGL_TEXTURE::Set_Smooth_Shading(bool smooth_shading_input)
 {
+    static const unsigned long gl_version = glVersion();
     smooth_shading = smooth_shading_input;
     glBindTexture(GL_TEXTURE_2D,id);
-    if(smooth_shading) {    
+    if(smooth_shading && gl_version >= 100200) {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, /*GL_CLAMP_TO_EDGE*/ 0x812F);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, /*GL_CLAMP_TO_EDGE*/ 0x812F);
     } else {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);

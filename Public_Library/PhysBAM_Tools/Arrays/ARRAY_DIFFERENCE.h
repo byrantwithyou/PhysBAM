@@ -11,6 +11,11 @@
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Vectors/ARITHMETIC_POLICY.h>
 #include <cassert>
+
+#ifdef DIFFERENCE
+#undef DIFFERENCE
+#endif
+
 namespace PhysBAM{
 
 template<class T_ARRAY1,class T_ARRAY2> class ARRAY_DIFFERENCE;
