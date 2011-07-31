@@ -1,4 +1,5 @@
 SConstruct.options
+.sconsign.dblite
 build
 *_nocona
 *_nocona_debug
