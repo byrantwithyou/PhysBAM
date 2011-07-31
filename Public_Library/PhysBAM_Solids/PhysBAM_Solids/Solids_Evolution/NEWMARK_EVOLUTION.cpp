@@ -738,6 +738,8 @@ Set_Velocity_From_Positions_Position_Update(const T dt,const T time)
                     T alpha2=(-B-sqrt(discriminant))/(2*A);
 
                     PHYSBAM_FATAL_ERROR("Should set_velocity_from_positions_use_orig_force really be implicitly converted to bool?");
+                    static_cast<void>(alpha1);
+                    static_cast<void>(alpha2);
                     //force.Choose_Solution(solids_parameters.set_velocity_from_positions_use_orig_force,s,(T).5*dt,alpha1,alpha2,v_n_hat(f)(s));
                 }}}
         
@@ -1094,6 +1096,8 @@ Set_Velocity_From_Positions_Velocity_Update(const T dt,const T time)
                     T alpha2=(-B-sqrt(discriminant))/(2*A);
 
                     PHYSBAM_FATAL_ERROR("Should set_velocity_from_positions_use_orig_force really be implicitly converted to bool?");
+                    static_cast<void>(alpha1);
+                    static_cast<void>(alpha2);
                     //force.Choose_Solution(solids_parameters.set_velocity_from_positions_use_orig_force,s,dt,alpha1,alpha2,v_n_hat(f)(s));
                 }}}
         

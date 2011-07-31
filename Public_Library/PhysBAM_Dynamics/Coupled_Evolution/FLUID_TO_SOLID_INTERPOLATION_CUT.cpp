@@ -41,7 +41,6 @@ template<class T> struct FLUID_TO_SOLID_INTERPOLATION_CUT_DISPATCH<VECTOR<T,2> >
 {
     typedef VECTOR<T,2> TV;
     typedef FLUID_TO_SOLID_INTERPOLATION_CUT<TV> T_THIS;
-    typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
     typedef typename T_THIS::ENTRY ENTRY;
     typedef typename T_THIS::CLIP_ENTRY CLIP_ENTRY;
