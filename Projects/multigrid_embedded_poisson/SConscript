@@ -3,6 +3,9 @@
 import os
 Import('env Automatic_Program')
 
+if 'BOOST_ROOT' not in os.environ:
+    return
+
 env = env.Copy()
 env.Append( LIBPATH = [
     os.environ['BOOST_ROOT'] + '/lib'
