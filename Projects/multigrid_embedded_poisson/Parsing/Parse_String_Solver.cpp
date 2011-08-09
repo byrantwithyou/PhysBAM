@@ -32,7 +32,7 @@
 namespace PhysBAM
 {
 
-namespace Embedded_Poisson_V2
+namespace Multigrid_Embedded_Poisson
 {
 
 int Parse_String_Solver(
@@ -129,6 +129,6 @@ int Parse_String_Solver(
     return 1;
 }
 
-} // namespace Embedded_Poisson_V2
+} // namespace Multigrid_Embedded_Poisson
 
 } // namespace PhysBAM

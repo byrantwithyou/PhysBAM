@@ -17,7 +17,7 @@
 namespace PhysBAM
 {
 
-namespace Embedded_Poisson_V2
+namespace Multigrid_Embedded_Poisson
 {
 
 namespace Petsc
@@ -51,7 +51,7 @@ Print_KSP_Info(const KSP petsc_ksp)
 
 } // namespace Petsc
 
-} // namespace Embedded_Poisson_V2
+} // namespace Multigrid_Embedded_Poisson
 
 } // namespace PhysBAM
 

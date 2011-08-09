@@ -4,21 +4,21 @@
 // license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_PARSING_PRINT_HELP_HPP
-#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_PARSING_PRINT_HELP_HPP
+#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_PARSING_PRINT_HELP_HPP
+#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_PARSING_PRINT_HELP_HPP
 
 #include <iosfwd>
 
 namespace PhysBAM
 {
 
-namespace Embedded_Poisson_V2
+namespace Multigrid_Embedded_Poisson
 {
 
 void Print_Help(std::ostream& out);
 
-} // namespace Embedded_Poisson_V2
+} // namespace Multigrid_Embedded_Poisson
 
 } // namespace PhysBAM
 
-#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_PARSING_PRINT_HELP_HPP
+#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_PARSING_PRINT_HELP_HPP

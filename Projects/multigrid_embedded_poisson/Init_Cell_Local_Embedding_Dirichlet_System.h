@@ -4,8 +4,8 @@
 // license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_INIT_CELL_LOCAL_EMBEDDING_DIRICHLET_SYSTEM_HPP
-#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_INIT_CELL_LOCAL_EMBEDDING_DIRICHLET_SYSTEM_HPP
+#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_INIT_CELL_LOCAL_EMBEDDING_DIRICHLET_SYSTEM_HPP
+#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_INIT_CELL_LOCAL_EMBEDDING_DIRICHLET_SYSTEM_HPP
 
 #include <Jeffrey_Utilities/Functional/Pre_Compose_Translate.h>
 #include <Jeffrey_Utilities/Geometry/INTEGRATE_FUNCTION_OVER_BOUNDARY_POLYTOPE_VISITOR.h>
@@ -24,7 +24,7 @@
 namespace PhysBAM
 {
 
-namespace Embedded_Poisson_V2
+namespace Multigrid_Embedded_Poisson
 {
 
 template<
@@ -100,8 +100,8 @@ void Init_Cell_Local_Embedding_Dirichlet_System(
     constraint_rhs = u_integrated_over_boundary;
 }
 
-} // namespace Embedded_Poisson_V2
+} // namespace Multigrid_Embedded_Poisson
 
 } // namespace PhysBAM
 
-#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_INIT_CELL_LOCAL_EMBEDDING_DIRICHLET_SYSTEM_HPP
+#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_INIT_CELL_LOCAL_EMBEDDING_DIRICHLET_SYSTEM_HPP

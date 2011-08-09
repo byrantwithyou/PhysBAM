@@ -17,7 +17,7 @@
 namespace PhysBAM
 {
 
-namespace Embedded_Poisson_V2
+namespace Multigrid_Embedded_Poisson
 {
 
 namespace Petsc
@@ -33,7 +33,7 @@ Solve_SPD_System_With_ICC_PCG(
 
 } // namespace Petsc
 
-} // namespace Embedded_Poisson_V2
+} // namespace Multigrid_Embedded_Poisson
 
 } // namespace PhysBAM
 

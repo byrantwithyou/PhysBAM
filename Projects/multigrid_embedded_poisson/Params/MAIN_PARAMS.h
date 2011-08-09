@@ -4,8 +4,8 @@
 // license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_PARAMS_MAIN_PARAMS_HPP
-#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_PARAMS_MAIN_PARAMS_HPP
+#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_PARAMS_MAIN_PARAMS_HPP
+#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_PARAMS_MAIN_PARAMS_HPP
 
 #include "EXAMPLE_PARAMS.h"
 #include "GENERAL_PARAMS.h"
@@ -17,7 +17,7 @@
 namespace PhysBAM
 {
 
-namespace Embedded_Poisson_V2
+namespace Multigrid_Embedded_Poisson
 {
 
 template< class T, int D >
@@ -31,8 +31,8 @@ struct MAIN_PARAMS
     OUTPUT_PARAMS output;
 };
 
-} // namespace Embedded_Poisson_V2
+} // namespace Multigrid_Embedded_Poisson
 
 } // namespace PhysBAM
 
-#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_PARAMS_MAIN_PARAMS_HPP
+#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_PARAMS_MAIN_PARAMS_HPP

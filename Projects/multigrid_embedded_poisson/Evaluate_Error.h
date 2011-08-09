@@ -4,8 +4,8 @@
 // license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_EVALUATE_ERROR_HPP
-#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_EVALUATE_ERROR_HPP
+#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_EVALUATE_ERROR_HPP
+#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_EVALUATE_ERROR_HPP
 
 #include <cassert>
 #include <cmath>
@@ -30,7 +30,7 @@
 namespace PhysBAM
 {
 
-namespace Embedded_Poisson_V2
+namespace Multigrid_Embedded_Poisson
 {
 
 template<
@@ -97,8 +97,8 @@ Evaluate_Error(
     }
 }
 
-} // namespace Embedded_Poisson_V2
+} // namespace Multigrid_Embedded_Poisson
 
 } // namespace PhysBAM
 
-#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_EVALUATE_ERROR_HPP
+#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_EVALUATE_ERROR_HPP

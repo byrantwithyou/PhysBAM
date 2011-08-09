@@ -4,8 +4,8 @@
 // license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_COARSEN_EMBEDDING_HPP
-#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_COARSEN_EMBEDDING_HPP
+#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_COARSEN_EMBEDDING_HPP
+#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_COARSEN_EMBEDDING_HPP
 
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_FWD.h>
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
@@ -14,7 +14,7 @@
 namespace PhysBAM
 {
 
-namespace Embedded_Poisson_V2
+namespace Multigrid_Embedded_Poisson
 {
 
 template< int D >
@@ -24,8 +24,8 @@ void Coarsen_Embedding(
     HASHTABLE<int,int>& coarse_embedding_index_of_linear_index,
     ARRAY<int>& coarse_linear_index_of_embedding_index);
 
-} // namespace Embedded_Poisson_V2
+} // namespace Multigrid_Embedded_Poisson
 
 } // namespace PhysBAM
 
-#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_COARSEN_EMBEDDING_HPP
+#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_COARSEN_EMBEDDING_HPP

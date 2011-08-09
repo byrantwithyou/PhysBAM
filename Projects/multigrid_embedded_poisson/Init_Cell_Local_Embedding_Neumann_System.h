@@ -4,8 +4,8 @@
 // license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_INIT_CELL_LOCAL_EMBEDDING_NEUMANN_SYSTEM_HPP
-#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_INIT_CELL_LOCAL_EMBEDDING_NEUMANN_SYSTEM_HPP
+#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_INIT_CELL_LOCAL_EMBEDDING_NEUMANN_SYSTEM_HPP
+#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_INIT_CELL_LOCAL_EMBEDDING_NEUMANN_SYSTEM_HPP
 
 #include <cassert>
 
@@ -32,7 +32,7 @@
 namespace PhysBAM
 {
 
-namespace Embedded_Poisson_V2
+namespace Multigrid_Embedded_Poisson
 {
 
 template<
@@ -145,8 +145,8 @@ void Init_Cell_Local_Embedding_Neumann_System(
 #endif // #ifdef PHYSBAM_EMBEDDED_POISSON_V2_USE_Q_BAR
 }
 
-} // namespace Embedded_Poisson_V2
+} // namespace Multigrid_Embedded_Poisson
 
 } // namespace PhysBAM
 
-#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_INIT_CELL_LOCAL_EMBEDDING_NEUMANN_SYSTEM_HPP
+#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_INIT_CELL_LOCAL_EMBEDDING_NEUMANN_SYSTEM_HPP

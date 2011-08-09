@@ -4,8 +4,8 @@
 // license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_COARSEN_REGULAR_SUBSYS_TO_EMBEDDING_SUBSYS_HPP
-#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_COARSEN_REGULAR_SUBSYS_TO_EMBEDDING_SUBSYS_HPP
+#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_COARSEN_REGULAR_SUBSYS_TO_EMBEDDING_SUBSYS_HPP
+#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_COARSEN_REGULAR_SUBSYS_TO_EMBEDDING_SUBSYS_HPP
 
 #include <cassert>
 
@@ -28,7 +28,7 @@
 namespace PhysBAM
 {
 
-namespace Embedded_Poisson_V2
+namespace Multigrid_Embedded_Poisson
 {
 
 template<
@@ -103,8 +103,8 @@ void Coarsen_Regular_Subsys_To_Embedding_Subsys(
     }
 }
 
-} // namespace Embedded_Poisson_V2
+} // namespace Multigrid_Embedded_Poisson
 
 } // namespace PhysBAM
 
-#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_COARSEN_REGULAR_SUBSYS_TO_EMBEDDING_SUBSYS_HPP
+#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_COARSEN_REGULAR_SUBSYS_TO_EMBEDDING_SUBSYS_HPP

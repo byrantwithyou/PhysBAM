@@ -4,8 +4,8 @@
 // license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_INTERFACE_INDEX_TRANSFORM_HPP
-#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_INTERFACE_INDEX_TRANSFORM_HPP
+#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_INTERFACE_INDEX_TRANSFORM_HPP
+#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_INTERFACE_INDEX_TRANSFORM_HPP
 
 #include <cassert>
 
@@ -14,7 +14,7 @@
 namespace PhysBAM
 {
 
-namespace Embedded_Poisson_V2
+namespace Multigrid_Embedded_Poisson
 {
 
 template<
@@ -230,8 +230,8 @@ INTERFACE_INDEX_TRANSFORM<
 Index_Of_Signed_Grid_Index_Function(const int sign) const
 { return INDEX_OF_SIGNED_GRID_INDEX_FUNCTION(*this, sign); }
 
-} // namespace Embedded_Poisson_V2
+} // namespace Multigrid_Embedded_Poisson
 
 } // namespace PhysBAM
 
-#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_INTERFACE_INDEX_TRANSFORM_HPP
+#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_INTERFACE_INDEX_TRANSFORM_HPP

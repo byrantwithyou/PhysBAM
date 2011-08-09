@@ -4,8 +4,8 @@
 // license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_COARSEN_SIGN_OF_CELL_INDEX_HPP
-#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_COARSEN_SIGN_OF_CELL_INDEX_HPP
+#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_COARSEN_SIGN_OF_CELL_INDEX_HPP
+#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_COARSEN_SIGN_OF_CELL_INDEX_HPP
 
 #include <cassert>
 
@@ -19,7 +19,7 @@
 namespace PhysBAM
 {
 
-namespace Embedded_Poisson_V2
+namespace Multigrid_Embedded_Poisson
 {
 
 template< int D, class T_SIGN >
@@ -56,8 +56,8 @@ void Coarsen_Sign_Of_Cell(
     }
 }
 
-} // namespace Embedded_Poisson_V2
+} // namespace Multigrid_Embedded_Poisson
 
 } // namespace PhysBAM
 
-#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_COARSEN_SIGN_OF_CELL_INDEX_HPP
+#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_COARSEN_SIGN_OF_CELL_INDEX_HPP

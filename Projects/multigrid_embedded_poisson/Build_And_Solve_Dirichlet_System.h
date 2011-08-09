@@ -4,8 +4,8 @@
 // license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_BUILD_AND_SOLVE_DIRICHLET_SYSTEM_HPP
-#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_BUILD_AND_SOLVE_DIRICHLET_SYSTEM_HPP
+#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_BUILD_AND_SOLVE_DIRICHLET_SYSTEM_HPP
+#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_BUILD_AND_SOLVE_DIRICHLET_SYSTEM_HPP
 
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
 
@@ -16,7 +16,7 @@
 namespace PhysBAM
 {
 
-namespace Embedded_Poisson_V2
+namespace Multigrid_Embedded_Poisson
 {
 
 template< class T, int D >
@@ -26,8 +26,8 @@ int Build_And_Solve_Dirichlet_System(
     typename RAND_MT19937_UNIFORM_REAL<T>::type& rand,
     const ARRAY_VIEW<const T> phi_of_fine_index);
 
-} // namespace Embedded_Poisson_V2
+} // namespace Multigrid_Embedded_Poisson
 
 } // namespace PhysBAM
 
-#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_BUILD_AND_SOLVE_DIRICHLET_SYSTEM_HPP
+#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_BUILD_AND_SOLVE_DIRICHLET_SYSTEM_HPP

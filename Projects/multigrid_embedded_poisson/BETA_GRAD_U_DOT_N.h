@@ -4,8 +4,8 @@
 // license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_BETA_GRAD_U_DOT_N_HPP
-#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_BETA_GRAD_U_DOT_N_HPP
+#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_BETA_GRAD_U_DOT_N_HPP
+#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_BETA_GRAD_U_DOT_N_HPP
 
 #include <boost/type_traits/remove_reference.hpp>
 #include <boost/utility/result_of.hpp>
@@ -16,7 +16,7 @@
 namespace PhysBAM
 {
 
-namespace Embedded_Poisson_V2
+namespace Multigrid_Embedded_Poisson
 {
 
 template< class T_BETA, class T_GRAD_U >
@@ -43,8 +43,8 @@ inline BETA_GRAD_U_DOT_N< T_BETA, T_GRAD_U >
 Make_Beta_Grad_U_Dot_N(const T_BETA& beta, const T_GRAD_U& grad_u)
 { return BETA_GRAD_U_DOT_N< T_BETA, T_GRAD_U >(beta, grad_u); }
 
-} // namespace Embedded_Poisson_V2
+} // namespace Multigrid_Embedded_Poisson
 
 } // namespace PhysBAM
 
-#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_BETA_GRAD_U_DOT_N_HPP
+#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_BETA_GRAD_U_DOT_N_HPP

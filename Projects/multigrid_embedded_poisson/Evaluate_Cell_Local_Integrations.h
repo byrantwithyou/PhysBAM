@@ -4,8 +4,8 @@
 // license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_EVALUATE_CELL_LOCAL_INTEGRATIONS_HPP
-#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_EVALUATE_CELL_LOCAL_INTEGRATIONS_HPP
+#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_EVALUATE_CELL_LOCAL_INTEGRATIONS_HPP
+#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_EVALUATE_CELL_LOCAL_INTEGRATIONS_HPP
 
 #include <cassert>
 #include <cmath>
@@ -30,7 +30,7 @@
 namespace PhysBAM
 {
 
-namespace Embedded_Poisson_V2
+namespace Multigrid_Embedded_Poisson
 {
 
 template<
@@ -145,8 +145,8 @@ void Evaluate_Cell_Local_Integrations(
 #endif // #ifndef NDEBUG
 }
 
-} // namespace Embedded_Poisson_V2
+} // namespace Multigrid_Embedded_Poisson
 
 } // namespace PhysBAM
 
-#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_EVALUATE_CELL_LOCAL_INTEGRATIONS_HPP
+#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_EVALUATE_CELL_LOCAL_INTEGRATIONS_HPP

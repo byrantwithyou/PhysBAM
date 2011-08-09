@@ -4,8 +4,8 @@
 // license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_EVAL_PHI_OVER_FINE_GRID_HPP
-#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_EVAL_PHI_OVER_FINE_GRID_HPP
+#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_EVAL_PHI_OVER_FINE_GRID_HPP
+#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_EVAL_PHI_OVER_FINE_GRID_HPP
 
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
 
@@ -14,7 +14,7 @@
 namespace PhysBAM
 {
 
-namespace Embedded_Poisson_V2
+namespace Multigrid_Embedded_Poisson
 {
 
 template< class T, int D >
@@ -24,8 +24,8 @@ Eval_Phi_Over_Fine_Grid(
     ARRAY_VIEW<T> phi_of_fine_index,
     const int sign_of_zero = -1);
 
-} // namespace Embedded_Poisson_V2
+} // namespace Multigrid_Embedded_Poisson
 
 } // namespace PhysBAM
 
-#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_EVAL_PHI_OVER_FINE_GRID_HPP
+#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_EVAL_PHI_OVER_FINE_GRID_HPP

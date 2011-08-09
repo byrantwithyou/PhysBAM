@@ -4,8 +4,8 @@
 // license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_SELECT_INDYS_HPP
-#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_SELECT_INDYS_HPP
+#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_SELECT_INDYS_HPP
+#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_SELECT_INDYS_HPP
 
 #include <cassert>
 #include <cmath>
@@ -29,7 +29,7 @@
 namespace PhysBAM
 {
 
-namespace Embedded_Poisson_V2
+namespace Multigrid_Embedded_Poisson
 {
 
 namespace Detail_Aggregate_Constraints
@@ -182,8 +182,8 @@ struct HAS_GREATER_WEIGHT
 
 } // namespace Detail_Aggregate_Constraints
 
-} // namespace Embedded_Poisson_V2
+} // namespace Multigrid_Embedded_Poisson
 
 } // namespace PhysBAM
 
-#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_SELECT_INDYS_HPP
+#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_SELECT_INDYS_HPP

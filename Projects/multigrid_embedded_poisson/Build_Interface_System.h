@@ -15,7 +15,7 @@
 namespace PhysBAM
 {
 
-namespace Embedded_Poisson_V2
+namespace Multigrid_Embedded_Poisson
 {
 
 template< class T, int D >
@@ -32,7 +32,7 @@ int Build_Interface_System(
     INTERFACE_CONSTRAINT_SYSTEM<T,D>& constraint_system,
     ARRAY<T>& constraint_rhs);
 
-} // namespace Embedded_Poisson_V2
+} // namespace Multigrid_Embedded_Poisson
 
 } // namespace PhysBAM
 

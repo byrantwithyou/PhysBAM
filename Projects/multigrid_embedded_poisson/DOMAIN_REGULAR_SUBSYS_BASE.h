@@ -4,8 +4,8 @@
 // license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_DOMAIN_REGULAR_SUBSYS_BASE_HPP
-#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_DOMAIN_REGULAR_SUBSYS_BASE_HPP
+#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_DOMAIN_REGULAR_SUBSYS_BASE_HPP
+#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_DOMAIN_REGULAR_SUBSYS_BASE_HPP
 
 #include <cassert>
 
@@ -21,7 +21,7 @@
 namespace PhysBAM
 {
 
-namespace Embedded_Poisson_V2
+namespace Multigrid_Embedded_Poisson
 {
 
 template< class T_DERIVED, class T, int D, class T_STENCIL >
@@ -201,8 +201,8 @@ Apply_Transpose(const int linear_index, ARRAY_VIEW<T> y, const T x, const MULTI_
     Derived().Apply_Transpose_Stencil(stencil_of_index(linear_index), linear_index, y, x, strides);
 }
 
-} // namespace Embedded_Poisson_V2
+} // namespace Multigrid_Embedded_Poisson
 
 } // namespace PhysBAM
 
-#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_DOMAIN_REGULAR_SUBSYS_BASE_HPP
+#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_DOMAIN_REGULAR_SUBSYS_BASE_HPP

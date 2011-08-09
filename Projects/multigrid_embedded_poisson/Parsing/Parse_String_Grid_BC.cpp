@@ -21,7 +21,7 @@
 namespace PhysBAM
 {
 
-namespace Embedded_Poisson_V2
+namespace Multigrid_Embedded_Poisson
 {
 
 int Parse_String_Grid_BC(
@@ -44,6 +44,6 @@ int Parse_String_Grid_BC(
     return 1;
 }
 
-} // namespace Embedded_Poisson_V2
+} // namespace Multigrid_Embedded_Poisson
 
 } // namespace PhysBAM

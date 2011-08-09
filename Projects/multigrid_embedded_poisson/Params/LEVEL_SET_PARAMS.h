@@ -4,8 +4,8 @@
 // license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_PARAMS_LEVEL_SET_PARAMS_HPP
-#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_PARAMS_LEVEL_SET_PARAMS_HPP
+#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_PARAMS_LEVEL_SET_PARAMS_HPP
+#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_PARAMS_LEVEL_SET_PARAMS_HPP
 
 #include <boost/function.hpp>
 
@@ -14,7 +14,7 @@
 namespace PhysBAM
 {
 
-namespace Embedded_Poisson_V2
+namespace Multigrid_Embedded_Poisson
 {
 
 template< class T, int D >
@@ -28,8 +28,8 @@ struct LEVEL_SET_PARAMS
     { }
 };
 
-} // namespace Embedded_Poisson_V2
+} // namespace Multigrid_Embedded_Poisson
 
 } // namespace PhysBAM
 
-#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_PARAMS_LEVEL_SET_PARAMS_HPP
+#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_PARAMS_LEVEL_SET_PARAMS_HPP

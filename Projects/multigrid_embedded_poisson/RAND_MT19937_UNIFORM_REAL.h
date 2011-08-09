@@ -4,8 +4,8 @@
 // license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_RAND_MT19937_UNIFORM_REAL_HPP
-#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_RAND_MT19937_UNIFORM_REAL_HPP
+#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_RAND_MT19937_UNIFORM_REAL_HPP
+#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_RAND_MT19937_UNIFORM_REAL_HPP
 
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_real.hpp>
@@ -14,7 +14,7 @@
 namespace PhysBAM
 {
 
-namespace Embedded_Poisson_V2
+namespace Multigrid_Embedded_Poisson
 {
 
 template< class T >
@@ -26,8 +26,8 @@ struct RAND_MT19937_UNIFORM_REAL
     > type;
 };
 
-} // namespace Embedded_Poisson_V2
+} // namespace Multigrid_Embedded_Poisson
 
 } // namespace PhysBAM
 
-#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_RAND_MT19937_UNIFORM_REAL_HPP
+#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_RAND_MT19937_UNIFORM_REAL_HPP

@@ -4,8 +4,8 @@
 // license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_INTERFACE_CONSTRAINT_SYSTEM_HPP
-#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_INTERFACE_CONSTRAINT_SYSTEM_HPP
+#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_INTERFACE_CONSTRAINT_SYSTEM_HPP
+#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_INTERFACE_CONSTRAINT_SYSTEM_HPP
 
 #include <boost/foreach.hpp>
 
@@ -19,7 +19,7 @@
 namespace PhysBAM
 {
 
-namespace Embedded_Poisson_V2
+namespace Multigrid_Embedded_Poisson
 {
 
 template< class T, int D >
@@ -143,8 +143,8 @@ INTERFACE_CONSTRAINT_SYSTEM<T,D>::
 Stencil_Proxy(const int stencil_index) const
 { return CONST_STENCIL_PROXY_TYPE(stencils(stencil_index)); }
 
-} // namespace Embedded_Poisson_V2
+} // namespace Multigrid_Embedded_Poisson
 
 } // namespace PhysBAM
 
-#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_INTERFACE_CONSTRAINT_SYSTEM_HPP
+#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_INTERFACE_CONSTRAINT_SYSTEM_HPP

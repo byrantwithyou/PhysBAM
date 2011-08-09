@@ -24,7 +24,7 @@
 namespace PhysBAM
 {
 
-namespace Embedded_Poisson_V2
+namespace Multigrid_Embedded_Poisson
 {
 
 namespace Petsc
@@ -59,7 +59,7 @@ Add_Stencil_To_Matrix(
 
 } // namespace Petsc
 
-} // namespace Embedded_Poisson_V2
+} // namespace Multigrid_Embedded_Poisson
 
 } // namespace PhysBAM
 

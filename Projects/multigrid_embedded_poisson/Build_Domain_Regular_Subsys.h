@@ -33,7 +33,7 @@
 namespace PhysBAM
 {
 
-namespace Embedded_Poisson_V2
+namespace Multigrid_Embedded_Poisson
 {
 
 template< class T, int D > class DOMAIN_REGULAR_CROSS_CONSTBETA_SUBSYS;
@@ -158,7 +158,7 @@ Init_Beta_And_Stencils(
 
 } // namespace Detail_Build_Domain_Regular_Subsys
 
-} // namespace Embedded_Poisson_V2
+} // namespace Multigrid_Embedded_Poisson
 
 } // namespace PhysBAM
 

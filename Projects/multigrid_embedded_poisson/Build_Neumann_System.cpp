@@ -47,7 +47,7 @@
 namespace PhysBAM
 {
 
-namespace Embedded_Poisson_V2
+namespace Multigrid_Embedded_Poisson
 {
 
 namespace
@@ -264,6 +264,6 @@ EXPLICIT_INSTANTIATION( double, 3 )
 #undef EXPLICIT_INSTANTIATION
 #undef EXPLICIT_INSTANTIATION_HELPER
 
-} // namespace Embedded_Poisson_V2
+} // namespace Multigrid_Embedded_Poisson
 
 } // namespace PhysBAM

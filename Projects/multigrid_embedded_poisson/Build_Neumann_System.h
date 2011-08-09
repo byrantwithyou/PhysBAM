@@ -15,7 +15,7 @@
 namespace PhysBAM
 {
 
-namespace Embedded_Poisson_V2
+namespace Multigrid_Embedded_Poisson
 {
 
 template< class T, int D, class T_REGULAR_SUBSYS, class T_EMBEDDED_SUBSYS >
@@ -27,7 +27,7 @@ int Build_Neumann_System(
     T_EMBEDDED_SUBSYS& embedded_subsys,
     ARRAY_VIEW<T> system_rhs);
 
-} // namespace Embedded_Poisson_V2
+} // namespace Multigrid_Embedded_Poisson
 
 } // namespace PhysBAM
 

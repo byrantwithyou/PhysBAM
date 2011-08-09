@@ -4,15 +4,15 @@
 // license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_SET_DIRICHLET_GRID_BC_VISITOR_HPP
-#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_SET_DIRICHLET_GRID_BC_VISITOR_HPP
+#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_SET_DIRICHLET_GRID_BC_VISITOR_HPP
+#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_SET_DIRICHLET_GRID_BC_VISITOR_HPP
 
 #include <Jeffrey_Utilities/DIRECT_INIT_CTOR.h>
 
 namespace PhysBAM
 {
 
-namespace Embedded_Poisson_V2
+namespace Multigrid_Embedded_Poisson
 {
 
 template<
@@ -43,8 +43,8 @@ Make_Set_Dirichlet_Grid_BC_Visitor(
     const T_RHS& rhs)
 { return SET_DIRICHLET_GRID_BC_VISITOR< T_SYSTEM, T_P_OF_INDEX, T_RHS >(system, p_of_index, rhs); }
 
-} // namespace Embedded_Poisson_V2
+} // namespace Multigrid_Embedded_Poisson
 
 } // namespace PhysBAM
 
-#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_SET_DIRICHLET_GRID_BC_VISITOR_HPP
+#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_SET_DIRICHLET_GRID_BC_VISITOR_HPP

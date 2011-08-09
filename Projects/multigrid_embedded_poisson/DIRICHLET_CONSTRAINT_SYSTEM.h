@@ -4,8 +4,8 @@
 // license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_DIRICHLET_CONSTRAINT_SYSTEM_HPP
-#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_DIRICHLET_CONSTRAINT_SYSTEM_HPP
+#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_DIRICHLET_CONSTRAINT_SYSTEM_HPP
+#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_DIRICHLET_CONSTRAINT_SYSTEM_HPP
 
 #include <cassert>
 
@@ -24,7 +24,7 @@
 namespace PhysBAM
 {
 
-namespace Embedded_Poisson_V2
+namespace Multigrid_Embedded_Poisson
 {
 
 template< class T, int D >
@@ -237,8 +237,8 @@ Multi_Index_Stencil_Proxy(const int stencil_index) const
     return CONST_MULTI_INDEX_STENCIL_PROXY_TYPE(cell_multi_index, stencils(stencil_index));
 }
 
-} // namespace Embedded_Poisson_V2
+} // namespace Multigrid_Embedded_Poisson
 
 } // namespace PhysBAM
 
-#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_DIRICHLET_CONSTRAINT_SYSTEM_HPP
+#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_DIRICHLET_CONSTRAINT_SYSTEM_HPP

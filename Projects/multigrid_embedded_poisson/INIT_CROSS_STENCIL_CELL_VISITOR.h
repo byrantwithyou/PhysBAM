@@ -4,8 +4,8 @@
 // license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_INIT_CROSS_STENCIL_CELL_VISITOR_HPP
-#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_INIT_CROSS_STENCIL_CELL_VISITOR_HPP
+#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_INIT_CROSS_STENCIL_CELL_VISITOR_HPP
+#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_INIT_CROSS_STENCIL_CELL_VISITOR_HPP
 
 #include <boost/foreach.hpp>
 
@@ -18,7 +18,7 @@
 namespace PhysBAM
 {
 
-namespace Embedded_Poisson_V2
+namespace Multigrid_Embedded_Poisson
 {
 
 template< class T, int D, class T_BETA_OF_CELL_INDEX, class T_STENCIL_OF_INDEX >
@@ -60,8 +60,8 @@ Make_Init_Cross_Stencil_Cell_Visitor(
     >(dx, cell_multi_index_bound, beta_of_cell_index, stencil_of_index);
 }
 
-} // namespace Embedded_Poisson_V2
+} // namespace Multigrid_Embedded_Poisson
 
 } // namespace PhysBAM
 
-#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_INIT_CROSS_STENCIL_CELL_VISITOR_HPP
+#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_INIT_CROSS_STENCIL_CELL_VISITOR_HPP

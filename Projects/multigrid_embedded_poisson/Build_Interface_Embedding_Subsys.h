@@ -27,7 +27,7 @@
 namespace PhysBAM
 {
 
-namespace Embedded_Poisson_V2
+namespace Multigrid_Embedded_Poisson
 {
 
 template<
@@ -103,6 +103,7 @@ Build_Interface_Embedding_Subsys(
 template<
     class T, int D,
     class T_SIGN_OF_CELL_INDEX,
+    class T_POST_EMBEDDING_INIT_VISITOR,
     class T_EMBEDDING_CELL_VISITOR,
     class T_EMBEDDING_SUBSYS
 >
@@ -110,6 +111,7 @@ inline int
 Build_Interface_Embedding_Subsys(
     const MAIN_PARAMS<T,D>& main_params,
     const T_SIGN_OF_CELL_INDEX& sign_of_cell_index,
+    const T_POST_EMBEDDING_INIT_VISITOR& post_embedding_init_visitor,
     const T_EMBEDDING_CELL_VISITOR& embedding_cell_visitor,
     T_EMBEDDING_SUBSYS& embedding_subsys)
 {
@@ -117,13 +119,14 @@ Build_Interface_Embedding_Subsys(
     return Build_Interface_Embedding_Subsys(
         main_params,
         sign_of_cell_index,
+        post_embedding_init_visitor,
         embedding_cell_visitor,
         embedding_subsys,
         embedding_cells
     );
 }
 
-} // namespace Embedded_Poisson_V2
+} // namespace Multigrid_Embedded_Poisson
 
 } // namespace PhysBAM
 

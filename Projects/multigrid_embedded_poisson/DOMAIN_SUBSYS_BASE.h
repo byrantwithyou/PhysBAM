@@ -6,8 +6,8 @@
 // TODO: Should probably clean up all the *_Index_Stencil_Proxy_Function's...
 //#####################################################################
 
-#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_DOMAIN_SUBSYS_BASE_HPP
-#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_DOMAIN_SUBSYS_BASE_HPP
+#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_DOMAIN_SUBSYS_BASE_HPP
+#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_DOMAIN_SUBSYS_BASE_HPP
 
 #include <boost/concept/assert.hpp>
 #include <boost/mpl/if.hpp>
@@ -25,7 +25,7 @@
 namespace PhysBAM
 {
 
-namespace Embedded_Poisson_V2
+namespace Multigrid_Embedded_Poisson
 {
 
 template< class T_DERIVED, class T, int D >
@@ -160,8 +160,8 @@ DOMAIN_SUBSYS_BASE< T_DERIVED, T, D >::
 Apply_Transpose(const int linear_index, ARRAY_VIEW<T> y, const T x) const
 { Derived().Apply_Transpose(linear_index, y, x, multi_index_bound.Strides()); }
 
-} // namespace Embedded_Poisson_V2
+} // namespace Multigrid_Embedded_Poisson
 
 } // namespace PhysBAM
 
-#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_DOMAIN_SUBSYS_BASE_HPP
+#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_DOMAIN_SUBSYS_BASE_HPP

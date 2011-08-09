@@ -4,8 +4,8 @@
 // license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_BUILD_DIRICHLET_ZTAZ_EMBEDDING_SUBSYS_HPP
-#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_BUILD_DIRICHLET_ZTAZ_EMBEDDING_SUBSYS_HPP
+#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_BUILD_DIRICHLET_ZTAZ_EMBEDDING_SUBSYS_HPP
+#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_BUILD_DIRICHLET_ZTAZ_EMBEDDING_SUBSYS_HPP
 
 #include <cassert>
 
@@ -26,7 +26,7 @@
 namespace PhysBAM
 {
 
-namespace Embedded_Poisson_V2
+namespace Multigrid_Embedded_Poisson
 {
 
 namespace Detail_Build_Dirichlet_ZTAZ_Embedding_Subsys
@@ -227,8 +227,8 @@ Multiply_System_Z(
 
 } // namespace Detail_Build_Dirichlet_ZTAZ_Embedding_Subsys
 
-} // namespace Embedded_Poisson_V2
+} // namespace Multigrid_Embedded_Poisson
 
 } // namespace PhysBAM
 
-#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_BUILD_DIRICHLET_ZTAZ_EMBEDDING_SUBSYS_HPP
+#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_BUILD_DIRICHLET_ZTAZ_EMBEDDING_SUBSYS_HPP

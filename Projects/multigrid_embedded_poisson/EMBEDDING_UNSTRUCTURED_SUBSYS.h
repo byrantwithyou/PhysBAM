@@ -4,8 +4,8 @@
 // license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_EMBEDDING_UNSTRUCTURED_SUBSYS_HPP
-#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_EMBEDDING_UNSTRUCTURED_SUBSYS_HPP
+#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_EMBEDDING_UNSTRUCTURED_SUBSYS_HPP
+#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_EMBEDDING_UNSTRUCTURED_SUBSYS_HPP
 
 #include <boost/concept/assert.hpp>
 #include <boost/foreach.hpp>
@@ -23,7 +23,7 @@
 namespace PhysBAM
 {
 
-namespace Embedded_Poisson_V2
+namespace Multigrid_Embedded_Poisson
 {
 
 template< class T >
@@ -227,8 +227,8 @@ EMBEDDING_UNSTRUCTURED_SUBSYS<T>::
 Stencil_Proxy_Of_Stencil_Index(const int stencil_index) const
 { return CONST_STENCIL_PROXY_TYPE(stencils(stencil_index)); }
 
-} // namespace Embedded_Poisson_V2
+} // namespace Multigrid_Embedded_Poisson
 
 } // namespace PhysBAM
 
-#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_V2_EMBEDDING_UNSTRUCTURED_SUBSYS_HPP
+#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_EMBEDDING_UNSTRUCTURED_SUBSYS_HPP

@@ -74,15 +74,15 @@ int main(int argc, char* argv[])
         switch(dimension) {
         case 2:
             if(scalar_str == "float")
-                main_result = PhysBAM::Embedded_Poisson_V2::main_impl< float, 2 >(argc, argv);
+                main_result = PhysBAM::Multigrid_Embedded_Poisson::main_impl< float, 2 >(argc, argv);
             else if(scalar_str == "double")
-                main_result = PhysBAM::Embedded_Poisson_V2::main_impl< double, 2 >(argc, argv);
+                main_result = PhysBAM::Multigrid_Embedded_Poisson::main_impl< double, 2 >(argc, argv);
             break;
         case 3:
             if(scalar_str == "float")
-                main_result = PhysBAM::Embedded_Poisson_V2::main_impl< float, 3 >(argc, argv);
+                main_result = PhysBAM::Multigrid_Embedded_Poisson::main_impl< float, 3 >(argc, argv);
             else if(scalar_str == "double")
-                main_result = PhysBAM::Embedded_Poisson_V2::main_impl< double, 3 >(argc, argv);
+                main_result = PhysBAM::Multigrid_Embedded_Poisson::main_impl< double, 3 >(argc, argv);
             break;
         default:;
         }

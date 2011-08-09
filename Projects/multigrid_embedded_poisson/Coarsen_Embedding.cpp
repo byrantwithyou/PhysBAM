@@ -20,7 +20,7 @@
 namespace PhysBAM
 {
 
-namespace Embedded_Poisson_V2
+namespace Multigrid_Embedded_Poisson
 {
 
 template< int D >
@@ -95,6 +95,6 @@ EXPLICIT_INSTANTIATION( 2 )
 EXPLICIT_INSTANTIATION( 3 )
 #undef EXPLICIT_INSTANTIATION
 
-} // namespace Embedded_Poisson_V2
+} // namespace Multigrid_Embedded_Poisson
 
 } // namespace PhysBAM
