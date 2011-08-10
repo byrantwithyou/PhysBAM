@@ -129,7 +129,7 @@ int Build_Interface_System(
         multi_index_bound,
         As_Const_Array_View(regular_subsys.sign_of_cell_index),
         POST_EMBEDDING_INIT_VISITOR< T, D, T_EMBEDDING_SUBSYS >(
-            main_params,
+            multi_index_bound.Size(),
             embedding_subsys, system_rhs,
             constraint_system, constraint_rhs
         ),
@@ -267,7 +267,7 @@ struct POST_EMBEDDING_INIT_VISITOR
 {
     PHYSBAM_DIRECT_INIT_CTOR_DECLARE_PRIVATE_MEMBERS(
         POST_EMBEDDING_INIT_VISITOR,
-        (( typename typename PHYSBAM_IDENTITY_TYPE(( MAIN_PARAMS<T,D> )) const &, main_params ))
+        (( /******/ int const, n_material ))
         (( typename T_EMBEDDING_SUBSYS&, embedding_subsys ))
         (( typename ARRAY<T>&, system_rhs ))
         (( typename typename PHYSBAM_IDENTITY_TYPE(( INTERFACE_CONSTRAINT_SYSTEM<T,D> )) &, constraint_system ))
@@ -277,18 +277,16 @@ public:
     typedef void result_type;
     void operator()() const
     {
-        const MULTI_INDEX_BOUND<D> cell_multi_index_bound(As_Vector<int>(main_params.grid.n_cell));
-        const MULTI_INDEX_BOUND<D> multi_index_bound = cell_multi_index_bound + 1;
-
         const int n_virtual = embedding_subsys.index_of_stencil_index.Size();
         const int n_embedding = 2 * n_virtual;
+
         embedding_subsys.index_of_stencil_index.Preallocate(n_embedding);
         for(int i = 1; i <= n_virtual; ++i)
-            embedding_subsys.index_of_stencil_index.Append(multi_index_bound.Size() + i);
+            embedding_subsys.index_of_stencil_index.Append(n_material + i);
         embedding_subsys.Init_Stencil_Index_Of_Index();
         embedding_subsys.stencils.Exact_Resize(n_embedding, false); // uninit'ed
 
-        system_rhs.Exact_Resize(multi_index_bound.Size() + n_virtual); // init'ed to 0
+        system_rhs.Exact_Resize(n_material + n_virtual); // init'ed to 0
 
         const int n_constraint = constraint_system.cell_index_of_stencil_index.Size();
         constraint_system.Init_Stencil_Index_Of_Cell_Index();

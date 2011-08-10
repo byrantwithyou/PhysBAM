@@ -59,7 +59,7 @@ Build_Domain_Regular_Subsys(
     lout << "Initializing beta and regular subsystem stencils...";
     lout.flush();
     timer.Restart();
-    regular_subsys.Zero_Stencils_MT(n_thread);
+    regular_subsys.Zero_Stencils(n_thread);
     Visit_Cells_With_Sign_Via_Cell_Sign_MT(
         n_thread,
         cell_multi_index_bound.Size(),

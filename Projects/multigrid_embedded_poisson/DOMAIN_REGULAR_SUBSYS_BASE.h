@@ -51,8 +51,7 @@ public:
     BETA_OF_CELL_INDEX_FUNCTION_TYPE Beta_Of_Cell_Index_Function() const;
 
     void Resize(const MULTI_INDEX_BOUND<D>& new_multi_index_bound);
-    void Zero_Stencils();
-    void Zero_Stencils_MT(const unsigned int n_thread);
+    void Zero_Stencils(const unsigned int n_thread);
 
     template< class T_FINE >
     void Coarsen(const T_FINE& fine);
@@ -137,20 +136,16 @@ DOMAIN_REGULAR_SUBSYS_BASE< T_DERIVED, T, D, T_STENCIL >::
 Resize(const MULTI_INDEX_BOUND<D>& new_multi_index_bound)
 {
     multi_index_bound = new_multi_index_bound;
-    sign_of_cell_index.Exact_Resize(Cell_Multi_Index_Bound().Size(), false, false); // uninit'ed
-    stencil_of_index.Exact_Resize(multi_index_bound.Size(), false, false); // uninit'ed
+    sign_of_cell_index.Remove_All();
+    sign_of_cell_index.Exact_Resize(Cell_Multi_Index_Bound().Size(), false); // uninit'ed
+    stencil_of_index.Remove_All();
+    stencil_of_index.Exact_Resize(multi_index_bound.Size(), false); // uninit'ed
 }
 
 template< class T_DERIVED, class T, int D, class T_STENCIL >
 inline void
 DOMAIN_REGULAR_SUBSYS_BASE< T_DERIVED, T, D, T_STENCIL >::
-Zero_Stencils()
-{ Fill(stencil_of_index, STENCIL_TYPE::Construct_Zero()); }
-
-template< class T_DERIVED, class T, int D, class T_STENCIL >
-inline void
-DOMAIN_REGULAR_SUBSYS_BASE< T_DERIVED, T, D, T_STENCIL >::
-Zero_Stencils_MT(const unsigned int n_thread)
+Zero_Stencils(const unsigned int n_thread)
 { Fill_MT(n_thread, stencil_of_index, STENCIL_TYPE::Construct_Zero()); }
 
 template< class T_DERIVED, class T, int D, class T_STENCIL >

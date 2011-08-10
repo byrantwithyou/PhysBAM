@@ -249,10 +249,6 @@
 			>
 		</File>
 		<File
-			RelativePath="..\..\DOMAIN_REGULAR_CROSS_CONSTBETA_SUBSYS.cpp"
-			>
-		</File>
-		<File
 			RelativePath="..\..\DOMAIN_REGULAR_CROSS_SUBSYS.cpp"
 			>
 		</File>

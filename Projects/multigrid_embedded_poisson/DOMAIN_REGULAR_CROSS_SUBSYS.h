@@ -87,8 +87,6 @@ public:
 
     using DOMAIN_REGULAR_SUBSYS_BASE_::Cell_Multi_Index_Bound;
     using DOMAIN_REGULAR_SUBSYS_BASE_::Zero_Stencils;
-    using DOMAIN_REGULAR_SUBSYS_BASE_::Zero_Stencils_MT;
-    using DOMAIN_REGULAR_SUBSYS_BASE_::Set_Dirichlet_Grid_BC;
 
 private:
     friend class DOMAIN_REGULAR_SUBSYS_BASE<
@@ -128,7 +126,8 @@ DOMAIN_REGULAR_CROSS_SUBSYS<T,D>::
 Resize(const MULTI_INDEX_BOUND<D>& new_multi_index_bound)
 {
     DOMAIN_REGULAR_SUBSYS_BASE_::Resize(new_multi_index_bound);
-    beta_of_cell_index.Exact_Resize(Cell_Multi_Index_Bound().Size(), true, false, static_cast<T>(0)); // init'ed to 0
+    beta_of_cell_index.Remove_All();
+    beta_of_cell_index.Exact_Resize(Cell_Multi_Index_Bound().Size(), true); // init'ed to 0
 }
 
 template< class T, int D >
