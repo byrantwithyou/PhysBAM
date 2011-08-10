@@ -128,7 +128,7 @@ DOMAIN_REGULAR_CROSS_SUBSYS<T,D>::
 Resize(const MULTI_INDEX_BOUND<D>& new_multi_index_bound)
 {
     DOMAIN_REGULAR_SUBSYS_BASE_::Resize(new_multi_index_bound);
-    beta_of_cell_index.Resize(Cell_Multi_Index_Bound().Size(), true, false, static_cast<T>(0)); // init'ed to 0
+    beta_of_cell_index.Exact_Resize(Cell_Multi_Index_Bound().Size(), true, false, static_cast<T>(0)); // init'ed to 0
 }
 
 template< class T, int D >

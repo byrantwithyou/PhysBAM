@@ -18,15 +18,15 @@ namespace PhysBAM
 namespace Multigrid_Embedded_Poisson
 {
 
-template< class T, int D >
-struct INTERFACE_CONSTRAINT_SYSTEM;
+template< class T, int D > class DOMAIN_REGULAR_CROSS_SUBSYS;
+template< class T, int D > struct INTERFACE_CONSTRAINT_SYSTEM;
 
-template< class T, int D, class T_REGULAR_SUBSYS, class T_EMBEDDED_SUBSYS >
+template< class T, int D, class T_EMBEDDED_SUBSYS >
 int Build_Interface_System(
     typename EXAMPLE_PARAMS<T,D>::INTERFACE_PARAMS const & problem,
     const MAIN_PARAMS<T,D>& main_params,
     const ARRAY_VIEW<const T> phi_of_fine_index,
-    T_REGULAR_SUBSYS& regular_subsys,
+    DOMAIN_REGULAR_CROSS_SUBSYS<T,D>& regular_subsys,
     T_EMBEDDED_SUBSYS& embedded_subsys,
     ARRAY<T>& system_rhs,
     INTERFACE_CONSTRAINT_SYSTEM<T,D>& constraint_system,

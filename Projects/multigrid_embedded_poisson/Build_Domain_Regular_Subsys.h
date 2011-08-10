@@ -9,26 +9,25 @@
 
 #include <cassert>
 
-#include <iostream>
+#include <iosfwd>
 
 #include <Jeffrey_Utilities/ARRAY_OPS.h>
 #include <Jeffrey_Utilities/BASIC_TIMER.h>
 #include <Jeffrey_Utilities/Functional/APPLY_ASSIGN_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/ARRAY_WRAPPER_FUNCTION.h>
+#include <Jeffrey_Utilities/Functional/COMPOSE_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/EQUAL_FUNCTION.h>
+#include <Jeffrey_Utilities/Grid/CELL_VALUE_VIA_AVERAGE_VERTEX_VALUE.h>
 #include <Jeffrey_Utilities/Grid/Visit_Cells_With_Sign_Via_Cell_Sign.h>
 #include <Jeffrey_Utilities/Grid/VISIT_IF_SIGN_PREDICATE_GRID_VISITOR.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOUND.h>
-#include <Jeffrey_Utilities/VECTOR_OPS.h>
+#include <Jeffrey_Utilities/ONSTREAM.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 
-#include "Build_Domain_Regular_Subsys_Beta.h"
 #include "Build_Domain_Regular_Subsys_Rhs.h"
-#include "INIT_CROSS_CONSTBETA_STENCIL_CELL_VISITOR.h"
+#include "DOMAIN_REGULAR_CROSS_SUBSYS.h"
 #include "INIT_CROSS_STENCIL_CELL_VISITOR.h"
-#include "Params/EXAMPLE_PARAMS.h"
-#include "Params/MAIN_PARAMS.h"
 
 namespace PhysBAM
 {
@@ -36,110 +35,46 @@ namespace PhysBAM
 namespace Multigrid_Embedded_Poisson
 {
 
-template< class T, int D > class DOMAIN_REGULAR_CROSS_CONSTBETA_SUBSYS;
-template< class T, int D > class DOMAIN_REGULAR_CROSS_SUBSYS;
-
-namespace Detail_Build_Domain_Regular_Subsys
-{
-
-template< class T, int D >
-inline void
-Init_Beta_And_Stencils(
-    typename EXAMPLE_PARAMS<T,D>::DOMAIN_PARAMS const & problem,
-    const MAIN_PARAMS<T,D>& main_params,
-    DOMAIN_REGULAR_CROSS_CONSTBETA_SUBSYS<T,D>& regular_subsys);
-
-template< class T, int D >
-inline void
-Init_Beta_And_Stencils(
-    typename EXAMPLE_PARAMS<T,D>::DOMAIN_PARAMS const & problem,
-    const MAIN_PARAMS<T,D>& main_params,
-    DOMAIN_REGULAR_CROSS_SUBSYS<T,D>& regular_subsys);
-
-} // namespace Detail_Build_Domain_Regular_Subsys
-
-template< class T, int D, class T_REGULAR_SUBSYS >
+template< class T, int D, class T_BETA_OF_INDEX, class T_F_OF_INDEX >
 int
 Build_Domain_Regular_Subsys(
-    typename EXAMPLE_PARAMS<T,D>::DOMAIN_PARAMS const & problem,
-    const MAIN_PARAMS<T,D>& main_params,
-    const ARRAY_VIEW<const T> phi_of_fine_index,
-    T_REGULAR_SUBSYS& regular_subsys,
-    ARRAY_VIEW<T> system_rhs)
+    const unsigned int n_thread,
+    const VECTOR<T,D> dx,
+    const MULTI_INDEX_BOUND<D> cell_multi_index_bound,
+    const T_BETA_OF_INDEX& beta_of_index,
+    const T_F_OF_INDEX& f_of_index,
+    DOMAIN_REGULAR_CROSS_SUBSYS<T,D>& regular_subsys,
+    ARRAY_VIEW<T> system_rhs,
+    std::ostream& lout = PhysBAM::nout)
 {
+    assert(n_thread >= 1);
+
     BASIC_TIMER timer;
 
-    const MULTI_INDEX_BOUND<D> cell_multi_index_bound(As_Vector<int>(main_params.grid.n_cell));
-    const MULTI_INDEX_BOUND<D> multi_index_bound = cell_multi_index_bound + 1;
-    const MULTI_INDEX_BOUND<D> fine_multi_index_bound = 2 * multi_index_bound - 1;
-
-    assert(phi_of_fine_index.Size() == fine_multi_index_bound.Size());
     assert(regular_subsys.sign_of_cell_index.Size() == cell_multi_index_bound.Size());
-    assert(regular_subsys.stencil_of_index.Size() == multi_index_bound.Size());
-    assert(system_rhs.Size() == multi_index_bound.Size());
+    assert(regular_subsys.beta_of_cell_index.Size() == cell_multi_index_bound.Size());
+    assert(regular_subsys.stencil_of_index.Size() == (cell_multi_index_bound + 1).Size());
+    assert(system_rhs.Size() == (cell_multi_index_bound + 1).Size());
 
-    std::cout << "Initializing beta and regular subsystem stencils...";
-    std::cout.flush();
+    lout << "Initializing beta and regular subsystem stencils...";
+    lout.flush();
     timer.Restart();
-    regular_subsys.Zero_Stencils_MT(main_params.general.n_thread);
-    Detail_Build_Domain_Regular_Subsys::Init_Beta_And_Stencils(problem, main_params, regular_subsys);
-    std::cout << timer.Elapsed() << " s" << std::endl;
-
-    std::cout << "Initializing regular subsystem rhs...";
-    std::cout.flush();
-    timer.Restart();
-    Build_Domain_Regular_Subsys_Rhs(
-        problem, main_params,
-        regular_subsys, system_rhs,
-        -1 // domain_sign
-    );
-    std::cout << timer.Elapsed() << " s" << std::endl;
-
-    return 0;
-}
-
-namespace Detail_Build_Domain_Regular_Subsys
-{
-
-template< class T, int D >
-inline void
-Init_Beta_And_Stencils(
-    typename EXAMPLE_PARAMS<T,D>::DOMAIN_PARAMS const & problem,
-    const MAIN_PARAMS<T,D>& main_params,
-    DOMAIN_REGULAR_CROSS_CONSTBETA_SUBSYS<T,D>& regular_subsys)
-{
-    const MULTI_INDEX_BOUND<D> cell_multi_index_bound(As_Vector<int>(main_params.grid.n_cell));
-
-    regular_subsys.beta = problem.beta(VECTOR<T,D>());
-    regular_subsys.Init_Beta_Dv_Over_Dx_Dx();
-
-    // TODO: MT
-    Visit_Cells_With_Sign_Via_Cell_Sign(
+    regular_subsys.Zero_Stencils_MT(n_thread);
+    Visit_Cells_With_Sign_Via_Cell_Sign_MT(
+        n_thread,
         cell_multi_index_bound.Size(),
         As_Const_Array_View(regular_subsys.sign_of_cell_index),
         Make_Visit_If_Sign_Predicate_Grid_Visitor(
             Make_Equal_Function(-1),
-            Make_Init_Cross_Constbeta_Stencil_Cell_Visitor(
-                cell_multi_index_bound,
-                Make_Array_Wrapper_Function(regular_subsys.stencil_of_index)
+            Make_Apply_Assign_Function(
+                Make_Array_Wrapper_Function(regular_subsys.beta_of_cell_index),
+                Make_Compose_Function(
+                    Make_Cell_Value_Via_Average_Vertex_Value(beta_of_index),
+                    cell_multi_index_bound
+                )
             )
         )
     );
-}
-
-template< class T, int D >
-inline void
-Init_Beta_And_Stencils(
-    typename EXAMPLE_PARAMS<T,D>::DOMAIN_PARAMS const & problem,
-    const MAIN_PARAMS<T,D>& main_params,
-    DOMAIN_REGULAR_CROSS_SUBSYS<T,D>& regular_subsys)
-{
-    typedef typename DOMAIN_REGULAR_CROSS_SUBSYS<T,D>::SIGN_TYPE SIGN_TYPE;
-    const MULTI_INDEX_BOUND<D> cell_multi_index_bound(As_Vector<int>(main_params.grid.n_cell));
-    assert(regular_subsys.beta_of_cell_index.Size() == cell_multi_index_bound.Size());
-
-    Build_Domain_Regular_Subsys_Beta(problem, main_params, regular_subsys, -1);
-
     // TODO: MT
     Visit_Cells_With_Sign_Via_Cell_Sign(
         cell_multi_index_bound.Size(),
@@ -147,16 +82,32 @@ Init_Beta_And_Stencils(
         Make_Visit_If_Sign_Predicate_Grid_Visitor(
             Make_Equal_Function(-1),
             Make_Init_Cross_Stencil_Cell_Visitor(
-                regular_subsys.dx,
-                cell_multi_index_bound,
+                dx, cell_multi_index_bound,
                 As_Const_Array_View(regular_subsys.beta_of_cell_index),
                 Make_Array_Wrapper_Function(regular_subsys.stencil_of_index)
             )
         )
     );
-}
+    lout << timer.Elapsed() << " s" << std::endl;
 
-} // namespace Detail_Build_Domain_Regular_Subsys
+    lout << "Initializing regular subsystem rhs...";
+    lout.flush();
+    timer.Restart();
+    Build_Domain_Regular_Subsys_Rhs(
+        n_thread,
+        dx.Product(), cell_multi_index_bound,
+        -1, // domain_sign
+        As_Const_Array_View(regular_subsys.sign_of_cell_index),
+        Make_Compose_Function(
+            Make_Cell_Value_Via_Average_Vertex_Value(f_of_index),
+            cell_multi_index_bound
+        ),
+        system_rhs
+    );
+    lout << timer.Elapsed() << " s" << std::endl;
+
+    return 0;
+}
 
 } // namespace Multigrid_Embedded_Poisson
 

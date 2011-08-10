@@ -165,6 +165,10 @@
 				>
 			</File>
 		</Filter>
+		<File
+			RelativePath="..\..\ONULLSTREAM.cpp"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

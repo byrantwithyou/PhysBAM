@@ -37,7 +37,7 @@
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 #include "BETA_GRAD_U_DOT_N.h"
-#include "Build_Interface_Embedding_Subsys.h"
+#include "Build_Embedding_Subsys.h"
 #include "Build_Interface_Regular_Subsys.h"
 #include "DOMAIN_REGULAR_CROSS_SUBSYS.h"
 #include "EMBEDDING_UNSTRUCTURED_SUBSYS.h"
@@ -69,12 +69,12 @@ struct EMBEDDING_CELL_VISITOR;
 
 } // namespace
 
-template< class T, int D, class T_REGULAR_SUBSYS, class T_EMBEDDING_SUBSYS >
+template< class T, int D, class T_EMBEDDING_SUBSYS >
 int Build_Interface_System(
     const typename EXAMPLE_PARAMS<T,D>::INTERFACE_PARAMS& problem,
     const MAIN_PARAMS<T,D>& main_params,
     const ARRAY_VIEW<const T> phi_of_fine_index,
-    T_REGULAR_SUBSYS& regular_subsys,
+    DOMAIN_REGULAR_CROSS_SUBSYS<T,D>& regular_subsys,
     T_EMBEDDING_SUBSYS& embedding_subsys,
     ARRAY<T>& system_rhs,
     INTERFACE_CONSTRAINT_SYSTEM<T,D>& constraint_system,
@@ -90,11 +90,15 @@ int Build_Interface_System(
 
     const VECTOR<T,D> min_x = As_Vector(main_params.grid.min_x);
     const VECTOR<T,D> max_x = As_Vector(main_params.grid.max_x);
+    const VECTOR<T,D> dx = (max_x - min_x) / cell_multi_index_bound.max_multi_index;
 
     assert(phi_of_fine_index.Size() == fine_multi_index_bound.Size());
     assert(system_rhs.Size() == 0);
 
-    typedef SYSTEM_SUM< boost::mpl::vector2< T_REGULAR_SUBSYS&, T_EMBEDDING_SUBSYS& > > SYSTEM_TYPE;
+    typedef SYSTEM_SUM< boost::mpl::vector2<
+        DOMAIN_REGULAR_CROSS_SUBSYS<T,D>&,
+        T_EMBEDDING_SUBSYS&
+    > > SYSTEM_TYPE;
     SYSTEM_TYPE system(boost::fusion::make_vector(
         boost::ref(regular_subsys),
         boost::ref(embedding_subsys))
@@ -118,8 +122,9 @@ int Build_Interface_System(
     );
     std::cout << timer.Elapsed() << " s" << std::endl;
 
-    Build_Interface_Embedding_Subsys(
-        main_params,
+    Build_Embedding_Subsys(
+        main_params.general.n_thread,
+        multi_index_bound,
         As_Const_Array_View(regular_subsys.sign_of_cell_index),
         POST_EMBEDDING_INIT_VISITOR< T, D, T_EMBEDDING_SUBSYS >(
             main_params,
@@ -132,15 +137,33 @@ int Build_Interface_System(
             embedding_subsys, system_rhs,
             constraint_system, constraint_rhs
         ),
-        embedding_subsys,
-        constraint_system.cell_index_of_stencil_index
+        embedding_subsys.index_of_stencil_index,
+        constraint_system.cell_index_of_stencil_index,
+        std::cout
     );
     constraint_system.Init_Stencils_Containing_Index();
 
     Build_Interface_Regular_Subsys(
-        problem, main_params,
-        phi_of_fine_index,
-        regular_subsys, As_Array_View(system_rhs)
+        main_params.general.n_thread,
+        dx, cell_multi_index_bound,
+        Make_Compose_Function(
+            problem.negative.beta,
+            Make_Multi_Index_X_Function(min_x, max_x, multi_index_bound)
+        ),
+        Make_Compose_Function(
+            problem.positive.beta,
+            Make_Multi_Index_X_Function(min_x, max_x, multi_index_bound)
+        ),
+        Make_Compose_Function(
+            problem.negative.f,
+            Make_Multi_Index_X_Function(min_x, max_x, multi_index_bound)
+        ),
+        Make_Compose_Function(
+            problem.positive.f,
+            Make_Multi_Index_X_Function(min_x, max_x, multi_index_bound)
+        ),
+        regular_subsys, As_Array_View(system_rhs),
+        std::cout
     );
 
     const int n_embedding = embedding_subsys.stencils.Size();
@@ -254,10 +277,16 @@ public:
     {
         const MULTI_INDEX_BOUND<D> cell_multi_index_bound(As_Vector<int>(main_params.grid.n_cell));
         const MULTI_INDEX_BOUND<D> multi_index_bound = cell_multi_index_bound + 1;
-        const int n_embedding = embedding_subsys.stencils.Size();
 
-        const int n_virtual = n_embedding / 2;
-        system_rhs.Resize(multi_index_bound.Size() + n_virtual); // init'ed to 0
+        const int n_virtual = embedding_subsys.index_of_stencil_index.Size();
+        const int n_embedding = 2 * n_virtual;
+        embedding_subsys.index_of_stencil_index.Preallocate(n_embedding);
+        for(int i = 1; i <= n_virtual; ++i)
+            embedding_subsys.index_of_stencil_index.Append(multi_index_bound.Size() + i);
+        embedding_subsys.Init_Stencil_Index_Of_Index();
+        embedding_subsys.stencils.Exact_Resize(n_embedding, false); // uninit'ed
+
+        system_rhs.Exact_Resize(multi_index_bound.Size() + n_virtual); // init'ed to 0
 
         const int n_constraint = constraint_system.cell_index_of_stencil_index.Size();
         constraint_system.Init_Stencil_Index_Of_Cell_Index();
@@ -434,22 +463,14 @@ public:
 } // namespace
 
 #define EXPLICIT_INSTANTIATION( T, D ) \
-    EXPLICIT_INSTANTIATION_HELPER( \
-        T, D, \
-        ( DOMAIN_REGULAR_CROSS_SUBSYS< T ) ( D > ), \
-        ( EMBEDDING_UNSTRUCTURED_SUBSYS<T> ) \
-    )
-#define EXPLICIT_INSTANTIATION_HELPER( T, D, T_REGULAR_SUBSYS, T_EMBEDDING_SUBSYS ) \
+    EXPLICIT_INSTANTIATION_HELPER( T, D, ( EMBEDDING_UNSTRUCTURED_SUBSYS<T> ) )
+#define EXPLICIT_INSTANTIATION_HELPER( T, D, T_EMBEDDING_SUBSYS ) \
 template int \
-Build_Interface_System< \
-    T, D, \
-    BOOST_PP_SEQ_ENUM( T_REGULAR_SUBSYS ), \
-    BOOST_PP_SEQ_ENUM( T_EMBEDDING_SUBSYS ) \
->( \
+Build_Interface_System< T, D, BOOST_PP_SEQ_ENUM( T_EMBEDDING_SUBSYS ) >( \
     EXAMPLE_PARAMS<T,D>::INTERFACE_PARAMS const & problem, \
     const MAIN_PARAMS<T,D>& main_params, \
     const ARRAY_VIEW<const T> phi_of_fine_index, \
-    BOOST_PP_SEQ_ENUM( T_REGULAR_SUBSYS )& regular_subsys, \
+    DOMAIN_REGULAR_CROSS_SUBSYS<T,D>& regular_subsys, \
     BOOST_PP_SEQ_ENUM( T_EMBEDDING_SUBSYS )& embedding_subsys, \
     ARRAY<T>& system_rhs, \
     INTERFACE_CONSTRAINT_SYSTEM<T,D>& constraint_system, \

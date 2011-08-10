@@ -4,22 +4,21 @@
 // license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_3D_V2_BUILD_DOMAIN_REGULAR_SUBSYS_RHS_HPP
-#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_3D_V2_BUILD_DOMAIN_REGULAR_SUBSYS_RHS_HPP
+#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_BUILD_DOMAIN_REGULAR_SUBSYS_RHS_HPP
+#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_BUILD_DOMAIN_REGULAR_SUBSYS_RHS_HPP
 
 #include <cassert>
 
-#include <Jeffrey_Utilities/Functional/COMPOSE_FUNCTION.h>
-#include <Jeffrey_Utilities/Grid/CELL_VALUE_VIA_AVERAGE_VERTEX_VALUE.h>
+#include <boost/foreach.hpp>
+
+#include <Jeffrey_Utilities/DIRECT_INIT_CTOR.h>
+#include <Jeffrey_Utilities/Functional/EQUAL_FUNCTION.h>
+#include <Jeffrey_Utilities/Grid/Visit_Cells_With_Sign_Via_Cell_Sign.h>
+#include <Jeffrey_Utilities/Grid/VISIT_IF_SIGN_PREDICATE_GRID_VISITOR.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOUND.h>
-#include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_X_FUNCTION.h>
-#include <Jeffrey_Utilities/VECTOR_OPS.h>
+#include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_CUBE.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
-
-#include "Init_Domain_Regular_Subsys_Rhs.h"
-#include "Params/EXAMPLE_PARAMS.h"
-#include "Params/MAIN_PARAMS.h"
 
 namespace PhysBAM
 {
@@ -27,40 +26,76 @@ namespace PhysBAM
 namespace Multigrid_Embedded_Poisson
 {
 
-template< class T, int D >
-inline void
-Build_Domain_Regular_Subsys_Rhs(
-    typename EXAMPLE_PARAMS<T,D>::DOMAIN_PARAMS const & problem,
-    const MAIN_PARAMS<T,D>& main_params,
-    DOMAIN_REGULAR_CROSS_SUBSYS<T,D>& regular_subsys,
-    ARRAY_VIEW<T> system_rhs,
-    const int domain_sign)
+namespace Detail_Build_Domain_Regular_Subsys_Rhs
 {
-    const MULTI_INDEX_BOUND<D> cell_multi_index_bound(As_Vector<int>(main_params.grid.n_cell));
-    const MULTI_INDEX_BOUND<D> multi_index_bound = cell_multi_index_bound + 1;
-    const VECTOR<T,D> min_x = As_Vector(main_params.grid.min_x);
-    const VECTOR<T,D> max_x = As_Vector(main_params.grid.max_x);
-    assert(system_rhs.Size() >= multi_index_bound.Size());
-    Init_Domain_Regular_Subsys_Rhs_MT(
-        main_params.general.n_thread,
-        regular_subsys.dx.Product(), cell_multi_index_bound,
-        domain_sign,
-        As_Const_Array_View(regular_subsys.sign_of_cell_index),
-        Make_Compose_Function(
-            Make_Cell_Value_Via_Average_Vertex_Value(
-                Make_Compose_Function(
-                    problem.f,
-                    Make_Multi_Index_X_Function(min_x, max_x, multi_index_bound)
-                )
-            ),
-            cell_multi_index_bound
-        ),
-        system_rhs
+
+template< class T, int D, class T_F_OF_CELL_INDEX >
+struct BUILD_DOMAIN_REGULAR_SUBSYS_RHS_VISITOR;
+
+} // namespace Detail_Build_Domain_Regular_Subsys_Rhs
+
+template< class T, int D, class T_SIGN_OF_CELL_INDEX, class T_F_OF_CELL_INDEX >
+void Build_Domain_Regular_Subsys_Rhs(
+    const unsigned int n_thread,
+    const T dv,
+    const MULTI_INDEX_BOUND<D>& cell_multi_index_bound,
+    const int domain_sign,
+    const T_SIGN_OF_CELL_INDEX& sign_of_cell_index,
+    const T_F_OF_CELL_INDEX& f_of_cell_index,
+    ARRAY_VIEW<T> system_rhs)
+{
+    // TODO: Need to stripe the domain...
+    typedef Detail_Build_Domain_Regular_Subsys_Rhs::BUILD_DOMAIN_REGULAR_SUBSYS_RHS_VISITOR<
+        T, D, T_F_OF_CELL_INDEX
+    > BUILD_DOMAIN_REGULAR_SUBSYS_RHS_VISITOR_;
+    assert(n_thread >= 1);
+    assert(system_rhs.Size() >= (cell_multi_index_bound + 1).Size());
+    Visit_Cells_With_Sign_Via_Cell_Sign(
+        cell_multi_index_bound.Size(),
+        sign_of_cell_index,
+        Make_Visit_If_Sign_Predicate_Grid_Visitor(
+            Make_Equal_Function(domain_sign),
+            BUILD_DOMAIN_REGULAR_SUBSYS_RHS_VISITOR_(
+                dv, cell_multi_index_bound,
+                f_of_cell_index,
+                system_rhs
+            )
+        )
     );
 }
+
+namespace Detail_Build_Domain_Regular_Subsys_Rhs
+{
+
+template< class T, int D, class T_F_OF_CELL_INDEX >
+struct BUILD_DOMAIN_REGULAR_SUBSYS_RHS_VISITOR
+{
+    PHYSBAM_DIRECT_INIT_CTOR_DECLARE_PRIVATE_MEMBERS(
+        BUILD_DOMAIN_REGULAR_SUBSYS_RHS_VISITOR,
+        (( typename T const, dv ))
+        (( typename MULTI_INDEX_BOUND<D> const, cell_multi_index_bound ))
+        (( typename T_F_OF_CELL_INDEX const, f_of_cell_index ))
+        (( typename ARRAY_VIEW<T>&, system_rhs ))
+    )
+public:
+    typedef void result_type;
+    void operator()(const int cell_linear_index) const
+    {
+        typedef VECTOR<int,D> MULTI_INDEX_TYPE;
+        const MULTI_INDEX_BOUND<D> multi_index_bound = cell_multi_index_bound + 1;
+        const MULTI_INDEX_TYPE cell_multi_index = cell_multi_index_bound.Multi_Index(cell_linear_index);
+        const T cell_rhs = f_of_cell_index(cell_linear_index) * (dv / (1 << D));
+        BOOST_FOREACH( const MULTI_INDEX_TYPE multi_index, (MULTI_INDEX_CUBE<D,0,1>(cell_multi_index)) ) {
+            const int linear_index = multi_index_bound.Linear_Index(multi_index);
+            system_rhs(linear_index) += cell_rhs;
+        }
+    }
+};
+
+} // namespace Detail_Build_Domain_Regular_Subsys_Rhs
 
 } // namespace Multigrid_Embedded_Poisson
 
 } // namespace PhysBAM
 
-#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_3D_V2_BUILD_DOMAIN_REGULAR_SUBSYS_RHS_HPP
+#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_BUILD_DOMAIN_REGULAR_SUBSYS_RHS_HPP

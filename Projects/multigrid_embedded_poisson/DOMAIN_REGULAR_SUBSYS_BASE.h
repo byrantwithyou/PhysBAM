@@ -137,8 +137,8 @@ DOMAIN_REGULAR_SUBSYS_BASE< T_DERIVED, T, D, T_STENCIL >::
 Resize(const MULTI_INDEX_BOUND<D>& new_multi_index_bound)
 {
     multi_index_bound = new_multi_index_bound;
-    sign_of_cell_index.Resize(Cell_Multi_Index_Bound().Size(), false, false); // uninit'ed
-    stencil_of_index.Resize(multi_index_bound.Size(), false, false); // uninit'ed
+    sign_of_cell_index.Exact_Resize(Cell_Multi_Index_Bound().Size(), false, false); // uninit'ed
+    stencil_of_index.Exact_Resize(multi_index_bound.Size(), false, false); // uninit'ed
 }
 
 template< class T_DERIVED, class T, int D, class T_STENCIL >

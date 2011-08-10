@@ -18,12 +18,14 @@ namespace PhysBAM
 namespace Multigrid_Embedded_Poisson
 {
 
-template< class T, int D, class T_REGULAR_SUBSYS, class T_EMBEDDED_SUBSYS >
+template< class T, int D > class DOMAIN_REGULAR_CROSS_SUBSYS; 
+
+template< class T, int D, class T_EMBEDDED_SUBSYS >
 int Build_Neumann_System(
     typename EXAMPLE_PARAMS<T,D>::NEUMANN_PARAMS const & problem,
     const MAIN_PARAMS<T,D>& main_params,
     const ARRAY_VIEW<const T> phi_of_fine_index,
-    T_REGULAR_SUBSYS& regular_subsys,
+    DOMAIN_REGULAR_CROSS_SUBSYS<T,D>& regular_subsys,
     T_EMBEDDED_SUBSYS& embedded_subsys,
     ARRAY_VIEW<T> system_rhs);
 

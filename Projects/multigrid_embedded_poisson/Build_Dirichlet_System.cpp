@@ -31,8 +31,8 @@
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 
-#include "Build_Domain_Embedding_Subsys.h"
 #include "Build_Domain_Regular_Subsys.h"
+#include "Build_Embedding_Subsys.h"
 #include "DIRICHLET_CONSTRAINT_SYSTEM.h"
 #include "DOMAIN_EMBEDDING_CUBE_SUBSYS.h"
 #include "DOMAIN_REGULAR_CROSS_SUBSYS.h"
@@ -53,19 +53,19 @@ namespace Multigrid_Embedded_Poisson
 namespace
 {
 
-template< class T, int D >
+template< class T, int D, class T_EMBEDDING_SUBSYS >
 struct POST_EMBEDDING_INIT_VISITOR;
 template< class T, int D, class T_EMBEDDING_SUBSYS >
 struct EMBEDDING_CELL_VISITOR;
 
 } // namespace
 
-template< class T, int D, class T_REGULAR_SUBSYS, class T_EMBEDDING_SUBSYS >
+template< class T, int D, class T_EMBEDDING_SUBSYS >
 int Build_Dirichlet_System(
     const typename EXAMPLE_PARAMS<T,D>::DIRICHLET_PARAMS& problem,
     const MAIN_PARAMS<T,D>& main_params,
     const ARRAY_VIEW<const T> phi_of_fine_index,
-    T_REGULAR_SUBSYS& regular_subsys,
+    DOMAIN_REGULAR_CROSS_SUBSYS<T,D>& regular_subsys,
     T_EMBEDDING_SUBSYS& embedding_subsys,
     ARRAY_VIEW<T> system_rhs,
     DIRICHLET_CONSTRAINT_SYSTEM<T,D>& constraint_system,
@@ -81,11 +81,15 @@ int Build_Dirichlet_System(
 
     const VECTOR<T,D> min_x = As_Vector(main_params.grid.min_x);
     const VECTOR<T,D> max_x = As_Vector(main_params.grid.max_x);
+    const VECTOR<T,D> dx = (max_x - min_x) / cell_multi_index_bound.max_multi_index;
 
     assert(phi_of_fine_index.Size() == fine_multi_index_bound.Size());
     assert(system_rhs.Size() == multi_index_bound.Size());
 
-    DOMAIN_SYSTEM< T_REGULAR_SUBSYS&, T_EMBEDDING_SUBSYS& > system(regular_subsys, embedding_subsys);
+    DOMAIN_SYSTEM<
+        DOMAIN_REGULAR_CROSS_SUBSYS<T,D>&,
+        T_EMBEDDING_SUBSYS&
+    > system(regular_subsys, embedding_subsys);
 
     std::cout << "Initializing sign_of_cell_index...";
     std::cout.flush();
@@ -104,24 +108,38 @@ int Build_Dirichlet_System(
     );
     std::cout << timer.Elapsed() << " s" << std::endl;
 
-    Build_Domain_Embedding_Subsys(
-        main_params,
+    Build_Embedding_Subsys(
+        main_params.general.n_thread,
+        multi_index_bound,
         As_Const_Array_View(regular_subsys.sign_of_cell_index),
-        POST_EMBEDDING_INIT_VISITOR< T, D >(constraint_system, constraint_rhs),
+        POST_EMBEDDING_INIT_VISITOR< T, D, T_EMBEDDING_SUBSYS >(
+            embedding_subsys,
+            constraint_system, constraint_rhs
+        ),
         EMBEDDING_CELL_VISITOR< T, D, T_EMBEDDING_SUBSYS >(
             problem, main_params,
             phi_of_fine_index,
             embedding_subsys, system_rhs,
             constraint_system, constraint_rhs
         ),
-        embedding_subsys,
-        constraint_system.cell_linear_index_of_stencil_index
+        embedding_subsys.linear_index_of_stencil_index,
+        constraint_system.cell_linear_index_of_stencil_index,
+        std::cout
     );
 
     Build_Domain_Regular_Subsys(
-        problem, main_params,
-        phi_of_fine_index,
-        regular_subsys, system_rhs
+        main_params.general.n_thread,
+        dx, cell_multi_index_bound,
+        Make_Compose_Function(
+            problem.beta,
+            Make_Multi_Index_X_Function(min_x, max_x, multi_index_bound)
+        ),
+        Make_Compose_Function(
+            problem.f,
+            Make_Multi_Index_X_Function(min_x, max_x, multi_index_bound)
+        ),
+        regular_subsys, system_rhs,
+        std::cout
     );
 
     {
@@ -189,11 +207,12 @@ int Build_Dirichlet_System(
 namespace
 {
 
-template< class T, int D >
+template< class T, int D, class T_EMBEDDING_SUBSYS >
 struct POST_EMBEDDING_INIT_VISITOR
 {
     PHYSBAM_DIRECT_INIT_CTOR_DECLARE_PRIVATE_MEMBERS(
         POST_EMBEDDING_INIT_VISITOR,
+        (( typename T_EMBEDDING_SUBSYS&, embedding_subsys ))
         (( typename typename PHYSBAM_IDENTITY_TYPE(( DIRICHLET_CONSTRAINT_SYSTEM<T,D> )) &, constraint_system ))
         (( typename ARRAY<T>&, constraint_rhs ))
     )
@@ -201,6 +220,10 @@ public:
     typedef void result_type;
     void operator()() const
     {
+        const int n_embedding = embedding_subsys.linear_index_of_stencil_index.Size();
+        embedding_subsys.Init_Stencil_Index_Of_Linear_Index();
+        embedding_subsys.stencils.Exact_Resize(n_embedding, false); // uninit'ed
+        embedding_subsys.Zero_Stencils();
         const int n_constraint = constraint_system.cell_linear_index_of_stencil_index.Size();
         constraint_system.Init_Stencil_Index_Of_Cell_Linear_Index();
         constraint_system.stencils.Exact_Resize(n_constraint);
@@ -271,22 +294,14 @@ public:
 } // namespace
 
 #define EXPLICIT_INSTANTIATION( T, D ) \
-    EXPLICIT_INSTANTIATION_HELPER( \
-        T, D, \
-        ( DOMAIN_REGULAR_CROSS_SUBSYS< T ) ( D > ), \
-        ( DOMAIN_EMBEDDING_CUBE_SUBSYS< T ) ( D > ) \
-    )
-#define EXPLICIT_INSTANTIATION_HELPER( T, D, T_REGULAR_SUBSYS, T_EMBEDDING_SUBSYS ) \
+    EXPLICIT_INSTANTIATION_HELPER( T, D, ( DOMAIN_EMBEDDING_CUBE_SUBSYS< T ) ( D > ) )
+#define EXPLICIT_INSTANTIATION_HELPER( T, D, T_EMBEDDING_SUBSYS ) \
 template int \
-Build_Dirichlet_System< \
-    T, D, \
-    BOOST_PP_SEQ_ENUM( T_REGULAR_SUBSYS ), \
-    BOOST_PP_SEQ_ENUM( T_EMBEDDING_SUBSYS ) \
->( \
+Build_Dirichlet_System< T, D, BOOST_PP_SEQ_ENUM( T_EMBEDDING_SUBSYS ) >( \
     EXAMPLE_PARAMS<T,D>::DIRICHLET_PARAMS const & problem, \
     const MAIN_PARAMS<T,D>& main_params, \
     const ARRAY_VIEW<const T> phi_of_fine_index, \
-    BOOST_PP_SEQ_ENUM( T_REGULAR_SUBSYS )& regular_subsys, \
+    DOMAIN_REGULAR_CROSS_SUBSYS<T,D>& regular_subsys, \
     BOOST_PP_SEQ_ENUM( T_EMBEDDING_SUBSYS )& embedding_subsys, \
     ARRAY_VIEW<T> system_rhs, \
     DIRICHLET_CONSTRAINT_SYSTEM<T,D>& constraint_system, \
