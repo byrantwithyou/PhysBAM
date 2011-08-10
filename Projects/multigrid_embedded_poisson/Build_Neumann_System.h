@@ -7,6 +7,8 @@
 #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_3D_V2_BUILD_NEUMANN_SYSTEM_HPP
 #define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_3D_V2_BUILD_NEUMANN_SYSTEM_HPP
 
+#include <iosfwd>
+
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
 
 #include "Params/EXAMPLE_PARAMS.h"
@@ -27,7 +29,8 @@ int Build_Neumann_System(
     const ARRAY_VIEW<const T> phi_of_fine_index,
     DOMAIN_REGULAR_CROSS_SUBSYS<T,D>& regular_subsys,
     T_EMBEDDED_SUBSYS& embedded_subsys,
-    ARRAY_VIEW<T> system_rhs);
+    ARRAY_VIEW<T> system_rhs,
+    std::ostream& lout);
 
 } // namespace Multigrid_Embedded_Poisson
 

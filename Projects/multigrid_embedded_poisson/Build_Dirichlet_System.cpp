@@ -4,7 +4,7 @@
 // license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#include <iostream>
+#include <iosfwd>
 #include <limits>
 
 #include <boost/preprocessor/seq/enum.hpp>
@@ -25,6 +25,7 @@
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOUND.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_X_FUNCTION.h>
 #include <Jeffrey_Utilities/Multi_Index/Visit_Multi_Index_Box_Boundary.h>
+#include <Jeffrey_Utilities/ONSTREAM.h>
 #include <Jeffrey_Utilities/VECTOR_OPS.h>
 #include <Jeffrey_Utilities/VISITOR_SEQUENCE.h>
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
@@ -69,7 +70,8 @@ int Build_Dirichlet_System(
     T_EMBEDDING_SUBSYS& embedding_subsys,
     ARRAY_VIEW<T> system_rhs,
     DIRICHLET_CONSTRAINT_SYSTEM<T,D>& constraint_system,
-    ARRAY<T>& constraint_rhs)
+    ARRAY<T>& constraint_rhs,
+    std::ostream& lout = PhysBAM::nout)
 {
     typedef VECTOR<int,D> MULTI_INDEX_TYPE;
 
@@ -91,8 +93,8 @@ int Build_Dirichlet_System(
         T_EMBEDDING_SUBSYS&
     > system(regular_subsys, embedding_subsys);
 
-    std::cout << "Initializing sign_of_cell_index...";
-    std::cout.flush();
+    lout << "Initializing sign_of_cell_index...";
+    lout.flush();
     Visit_Cells_With_Sign_Via_Fine_Vertex_Sign_MT<2>(
         main_params.general.n_thread,
         cell_multi_index_bound,
@@ -106,7 +108,7 @@ int Build_Dirichlet_System(
         ),
         -1 // sign_of_zero
     );
-    std::cout << timer.Elapsed() << " s" << std::endl;
+    lout << timer.Elapsed() << " s" << std::endl;
 
     Build_Embedding_Subsys(
         main_params.general.n_thread,
@@ -124,7 +126,7 @@ int Build_Dirichlet_System(
         ),
         embedding_subsys.linear_index_of_stencil_index,
         constraint_system.cell_linear_index_of_stencil_index,
-        std::cout
+        lout
     );
 
     Build_Domain_Regular_Subsys(
@@ -139,12 +141,12 @@ int Build_Dirichlet_System(
             Make_Multi_Index_X_Function(min_x, max_x, multi_index_bound)
         ),
         regular_subsys, system_rhs,
-        std::cout
+        lout
     );
 
     {
-        std::cout << "Computing system statistics...";
-        std::cout.flush();
+        lout << "Computing system statistics...";
+        lout.flush();
         timer.Restart();
         T max_diag = 0;
         T min_diag = std::numeric_limits<T>::infinity();
@@ -158,16 +160,16 @@ int Build_Dirichlet_System(
             }
             max_abs_stencil_sum = std::max(max_abs_stencil_sum, std::abs(stencil_sum));
         }
-        std::cout << timer.Elapsed() << " s" << std::endl;
-        std::cout << "  max diag = " << max_diag << '\n'
-                  << "  min diag = " << min_diag << '\n'
-                  << "    ratio = " << max_diag / min_diag << '\n'
-                  << "  max abs stencil sum = " << max_abs_stencil_sum
-                  << std::endl;
+        lout << timer.Elapsed() << " s" << std::endl;
+        lout << "  max diag = " << max_diag << '\n'
+             << "  min diag = " << min_diag << '\n'
+             << "    ratio = " << max_diag / min_diag << '\n'
+             << "  max abs stencil sum = " << max_abs_stencil_sum
+             << std::endl;
     }
 
-    std::cout << "Setting Dirichlet grid bc's...";
-    std::cout.flush();
+    lout << "Setting Dirichlet grid bc's...";
+    lout.flush();
     timer.Restart();
     Visit_Multi_Index_Box_Boundary(
         multi_index_bound,
@@ -199,7 +201,7 @@ int Build_Dirichlet_System(
             )
         )
     );
-    std::cout << timer.Elapsed() << " s" << std::endl;
+    lout << timer.Elapsed() << " s" << std::endl;
 
     return 0;
 }
@@ -305,7 +307,8 @@ Build_Dirichlet_System< T, D, BOOST_PP_SEQ_ENUM( T_EMBEDDING_SUBSYS ) >( \
     BOOST_PP_SEQ_ENUM( T_EMBEDDING_SUBSYS )& embedding_subsys, \
     ARRAY_VIEW<T> system_rhs, \
     DIRICHLET_CONSTRAINT_SYSTEM<T,D>& constraint_system, \
-    ARRAY<T>& constraint_rhs);
+    ARRAY<T>& constraint_rhs, \
+    std::ostream& lout);
 EXPLICIT_INSTANTIATION( float, 2 )
 EXPLICIT_INSTANTIATION( float, 3 )
 EXPLICIT_INSTANTIATION( double, 2 )

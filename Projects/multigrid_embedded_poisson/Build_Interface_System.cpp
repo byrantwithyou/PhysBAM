@@ -4,7 +4,7 @@
 // license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#include <iostream>
+#include <iosfwd>
 #include <limits>
 
 #include <boost/fusion/container/generation/make_vector.hpp>
@@ -28,6 +28,7 @@
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_CUBE.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_X_FUNCTION.h>
 #include <Jeffrey_Utilities/Multi_Index/Visit_Multi_Index_Box_Boundary.h>
+#include <Jeffrey_Utilities/ONSTREAM.h>
 #include <Jeffrey_Utilities/Stencils/INDEX_TRANSFORM_STENCIL_PROXY.h>
 #include <Jeffrey_Utilities/VECTOR_OPS.h>
 #include <Jeffrey_Utilities/VISITOR_SEQUENCE.h>
@@ -78,7 +79,8 @@ int Build_Interface_System(
     T_EMBEDDING_SUBSYS& embedding_subsys,
     ARRAY<T>& system_rhs,
     INTERFACE_CONSTRAINT_SYSTEM<T,D>& constraint_system,
-    ARRAY<T>& constraint_rhs)
+    ARRAY<T>& constraint_rhs,
+    std::ostream& lout = PhysBAM::nout)
 {
     typedef VECTOR<int,D> MULTI_INDEX_TYPE;
 
@@ -104,8 +106,8 @@ int Build_Interface_System(
         boost::ref(embedding_subsys))
     );
 
-    std::cout << "Initializing sign_of_cell_index...";
-    std::cout.flush();
+    lout << "Initializing sign_of_cell_index...";
+    lout.flush();
     timer.Restart();
     Visit_Cells_With_Sign_Via_Fine_Vertex_Sign_MT<2>(
         main_params.general.n_thread,
@@ -120,7 +122,7 @@ int Build_Interface_System(
         ),
         -1 // sign_of_zero
     );
-    std::cout << timer.Elapsed() << " s" << std::endl;
+    lout << timer.Elapsed() << " s" << std::endl;
 
     Build_Embedding_Subsys(
         main_params.general.n_thread,
@@ -139,7 +141,7 @@ int Build_Interface_System(
         ),
         embedding_subsys.index_of_stencil_index,
         constraint_system.cell_index_of_stencil_index,
-        std::cout
+        lout
     );
     constraint_system.Init_Stencils_Containing_Index();
 
@@ -163,15 +165,15 @@ int Build_Interface_System(
             Make_Multi_Index_X_Function(min_x, max_x, multi_index_bound)
         ),
         regular_subsys, As_Array_View(system_rhs),
-        std::cout
+        lout
     );
 
     const int n_embedding = embedding_subsys.stencils.Size();
     const int n_index = multi_index_bound.Size() + n_embedding;
 
     {
-        std::cout << "Computing system statistics...";
-        std::cout.flush();
+        lout << "Computing system statistics...";
+        lout.flush();
         timer.Restart();
         T max_diag = 0;
         T min_diag = std::numeric_limits<T>::infinity();
@@ -185,16 +187,16 @@ int Build_Interface_System(
             }
             max_abs_stencil_sum = std::max(max_abs_stencil_sum, std::abs(stencil_sum));
         }
-        std::cout << timer.Elapsed() << " s" << std::endl;
-        std::cout << "  max diag = " << max_diag << '\n'
-                  << "  min diag = " << min_diag << '\n'
-                  << "    ratio = " << max_diag / min_diag << '\n'
-                  << "  max abs stencil sum = " << max_abs_stencil_sum
-                  << std::endl;
+        lout << timer.Elapsed() << " s" << std::endl;
+        lout << "  max diag = " << max_diag << '\n'
+             << "  min diag = " << min_diag << '\n'
+             << "    ratio = " << max_diag / min_diag << '\n'
+             << "  max abs stencil sum = " << max_abs_stencil_sum
+             << std::endl;
     }
 
-    std::cout << "Setting Dirichlet grid bc's...";
-    std::cout.flush();
+    lout << "Setting Dirichlet grid bc's...";
+    lout.flush();
     timer.Restart();
     typename Result_Of::MAKE_COMPOSE_FUNCTION<
         typename EXAMPLE_PARAMS<T,D>::SCALAR_FUNCTION_TYPE,
@@ -252,7 +254,7 @@ int Build_Interface_System(
             )
         )
     );
-    std::cout << timer.Elapsed() << " s" << std::endl;
+    lout << timer.Elapsed() << " s" << std::endl;
 
     return 0;
 }
@@ -474,7 +476,8 @@ Build_Interface_System< T, D, BOOST_PP_SEQ_ENUM( T_EMBEDDING_SUBSYS ) >( \
     BOOST_PP_SEQ_ENUM( T_EMBEDDING_SUBSYS )& embedding_subsys, \
     ARRAY<T>& system_rhs, \
     INTERFACE_CONSTRAINT_SYSTEM<T,D>& constraint_system, \
-    ARRAY<T>& constraint_rhs);
+    ARRAY<T>& constraint_rhs, \
+    std::ostream& lout);
 EXPLICIT_INSTANTIATION( float, 2 )
 EXPLICIT_INSTANTIATION( float, 3 )
 EXPLICIT_INSTANTIATION( double, 2 )

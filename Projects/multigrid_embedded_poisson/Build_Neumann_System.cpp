@@ -6,7 +6,7 @@
 
 #include <cassert>
 
-#include <iostream>
+#include <iosfwd>
 #include <limits>
 
 #include <boost/preprocessor/seq/enum.hpp>
@@ -27,6 +27,7 @@
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOUND.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_X_FUNCTION.h>
 #include <Jeffrey_Utilities/Multi_Index/Visit_Multi_Index_Box_Boundary.h>
+#include <Jeffrey_Utilities/ONSTREAM.h>
 #include <Jeffrey_Utilities/VECTOR_OPS.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
@@ -67,7 +68,8 @@ int Build_Neumann_System(
     const ARRAY_VIEW<const T> phi_of_fine_index,
     DOMAIN_REGULAR_CROSS_SUBSYS<T,D>& regular_subsys,
     T_EMBEDDING_SUBSYS& embedding_subsys,
-    ARRAY_VIEW<T> system_rhs)
+    ARRAY_VIEW<T> system_rhs,
+    std::ostream& lout = PhysBAM::nout)
 {
     typedef VECTOR<int,D> MULTI_INDEX_TYPE;
 
@@ -89,8 +91,8 @@ int Build_Neumann_System(
         T_EMBEDDING_SUBSYS&
     > system(regular_subsys, embedding_subsys);
 
-    std::cout << "Initializing sign_of_cell_index...";
-    std::cout.flush();
+    lout << "Initializing sign_of_cell_index...";
+    lout.flush();
     Visit_Cells_With_Sign_Via_Fine_Vertex_Sign_MT<2>(
         main_params.general.n_thread,
         cell_multi_index_bound,
@@ -104,7 +106,7 @@ int Build_Neumann_System(
         ),
         -1 // sign_of_zero
     );
-    std::cout << timer.Elapsed() << " s" << std::endl;
+    lout << timer.Elapsed() << " s" << std::endl;
 
     Build_Embedding_Subsys(
         main_params.general.n_thread,
@@ -117,7 +119,7 @@ int Build_Neumann_System(
             embedding_subsys, system_rhs
         ),
         embedding_subsys.linear_index_of_stencil_index,
-        std::cout
+        lout
     );
 
     Build_Domain_Regular_Subsys(
@@ -132,12 +134,12 @@ int Build_Neumann_System(
             Make_Multi_Index_X_Function(min_x, max_x, multi_index_bound)
         ),
         regular_subsys, system_rhs,
-        std::cout
+        lout
     );
 
     {
-        std::cout << "Computing system statistics...";
-        std::cout.flush();
+        lout << "Computing system statistics...";
+        lout.flush();
         timer.Restart();
         T max_diag = 0;
         T min_diag = std::numeric_limits<T>::infinity();
@@ -151,16 +153,16 @@ int Build_Neumann_System(
             }
             max_abs_stencil_sum = std::max(max_abs_stencil_sum, std::abs(stencil_sum));
         }
-        std::cout << timer.Elapsed() << " s" << std::endl;
-        std::cout << "  max diag = " << max_diag << '\n'
-                  << "  min diag = " << min_diag << '\n'
-                  << "    ratio = " << max_diag / min_diag << '\n'
-                  << "  max abs stencil sum = " << max_abs_stencil_sum
-                  << std::endl;
+        lout << timer.Elapsed() << " s" << std::endl;
+        lout << "  max diag = " << max_diag << '\n'
+             << "  min diag = " << min_diag << '\n'
+             << "    ratio = " << max_diag / min_diag << '\n'
+             << "  max abs stencil sum = " << max_abs_stencil_sum
+             << std::endl;
     }
 
-    std::cout << "Setting Dirichlet grid bc's...";
-    std::cout.flush();
+    lout << "Setting Dirichlet grid bc's...";
+    lout.flush();
     timer.Restart();
     Visit_Multi_Index_Box_Boundary(
         multi_index_bound,
@@ -182,7 +184,7 @@ int Build_Neumann_System(
             )
         )
     );
-    std::cout << timer.Elapsed() << " s" << std::endl;
+    lout << timer.Elapsed() << " s" << std::endl;
 
     return 0;
 }
@@ -275,7 +277,8 @@ Build_Neumann_System< T, D, BOOST_PP_SEQ_ENUM( T_EMBEDDING_SUBSYS ) >( \
     const ARRAY_VIEW<const T> phi_of_fine_index, \
     DOMAIN_REGULAR_CROSS_SUBSYS<T,D>& regular_subsys, \
     BOOST_PP_SEQ_ENUM( T_EMBEDDING_SUBSYS )& embedding_subsys, \
-    ARRAY_VIEW<T> system_rhs);
+    ARRAY_VIEW<T> system_rhs, \
+    std::ostream& lout);
 EXPLICIT_INSTANTIATION( float, 2 )
 EXPLICIT_INSTANTIATION( float, 3 )
 EXPLICIT_INSTANTIATION( double, 2 )

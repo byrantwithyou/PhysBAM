@@ -98,7 +98,8 @@ int Build_And_Solve_Neumann_System(
     Build_Neumann_System(
         problem, main_params,
         phi_of_fine_index,
-        regular_subsys, embedding_subsys, As_Array_View(system_rhs)
+        regular_subsys, embedding_subsys, As_Array_View(system_rhs),
+        std::cout
     );
     std::cout << "[Building Neumann system...] " << timer.Elapsed() << " s" << std::endl;
 

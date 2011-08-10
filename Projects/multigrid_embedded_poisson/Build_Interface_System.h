@@ -7,6 +7,8 @@
 #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_3D_V2_BUILD_INTERFACE_SYSTEM_HPP
 #define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_3D_V2_BUILD_INTERFACE_SYSTEM_HPP
 
+#include <iosfwd>
+
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
 
 #include "Params/EXAMPLE_PARAMS.h"
@@ -30,7 +32,8 @@ int Build_Interface_System(
     T_EMBEDDED_SUBSYS& embedded_subsys,
     ARRAY<T>& system_rhs,
     INTERFACE_CONSTRAINT_SYSTEM<T,D>& constraint_system,
-    ARRAY<T>& constraint_rhs);
+    ARRAY<T>& constraint_rhs,
+    std::ostream& lout);
 
 } // namespace Multigrid_Embedded_Poisson
 

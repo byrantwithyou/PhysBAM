@@ -120,7 +120,8 @@ int Build_And_Solve_Interface_System(
         problem, main_params,
         phi_of_fine_index,
         regular_subsys, embedding_subsys, system_rhs,
-        constraint_system, constraint_rhs
+        constraint_system, constraint_rhs,
+        std::cout
     );
     std::cout << "[Building interface system...] " << timer.Elapsed() << " s" << std::endl;
 

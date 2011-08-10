@@ -110,7 +110,8 @@ int Build_And_Solve_Dirichlet_System(
         problem, main_params,
         phi_of_fine_index,
         regular_subsys, embedding_subsys, As_Array_View(system_rhs),
-        constraint_system, constraint_rhs
+        constraint_system, constraint_rhs,
+        std::cout
     );
     std::cout << "[Building Dirichlet system...] " << timer.Elapsed() << " s" << std::endl;
 
