@@ -43,17 +43,24 @@ void Print_Help(std::ostream& out)
     );
 
     out << "Available example specifications:\n"
-        << "  neumann(<u_id>, <beta_id>)\n"
-        << "  dirichlet(<u_id>, <beta_id>, <constraint>)\n"
-        << "  interface((<u-_id>, <u+_id>), (<beta-_id>, <beta+_id>), <constraint>)\n";
+        << "  neumann(<u>, <beta>)\n"
+        << "  dirichlet(<u>, <beta>, <constraint>)\n"
+        << "  interface((<u->, <beta->), (<u+>, <beta+>), <constraint>)\n";
+
+    out << "Each of <u>, <beta>, <u->, <u+>, <beta->, <beta+> take the form:\n"
+        << "  {<*_id>} |\n"
+        << "  a*{<*_id>} |\n"
+        << "  {<*_id>} + b |\n"
+        << "  a*{<*_id>} + b\n"
+        << "where a,b are scalars and the braces (\"{\", \"}\") are taken literally.\n";
 
     out << "Available u_id's (dimension = 2):\n";
     Visit_U_Examples_Str<2>(phx::ref(out) << "  " << phx_arg::_1 << " : " << phx_arg::_2 << '\n');
-    out << "Available u_id's (dimension = 3):\n";
-    Visit_U_Examples_Str<3>(phx::ref(out) << "  " << phx_arg::_1 << " : " << phx_arg::_2 << '\n');
-
     out << "Available beta_id's (dimension = 2):\n";
     Visit_Beta_Examples_Str<2>(phx::ref(out) << "  " << phx_arg::_1 << " : " << phx_arg::_2 << '\n');
+
+    out << "Available u_id's (dimension = 3):\n";
+    Visit_U_Examples_Str<3>(phx::ref(out) << "  " << phx_arg::_1 << " : " << phx_arg::_2 << '\n');
     out << "Available beta_id's (dimension = 3):\n";
     Visit_Beta_Examples_Str<3>(phx::ref(out) << "  " << phx_arg::_1 << " : " << phx_arg::_2 << '\n');
 

@@ -27,7 +27,6 @@ template<
     class T_SYSTEM_RHS_OF_INDEX
 >
 void Init_Cell_Local_Embedding_Domain_System(
-    const MULTI_INDEX_BOUND<D> multi_index_bound,
     const T_BETA_OF_INDEX beta_of_index,
     const T_F_OF_INDEX f_of_index,
     const VECTOR<int,D> cell_multi_index,

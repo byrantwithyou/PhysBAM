@@ -34,8 +34,8 @@ int Parse_String_Grid_BC(
     std::string::const_iterator it = grid_bc_str.begin();
     const bool b = qi::phrase_parse(
         it, grid_bc_str.end(),
-        qi::lit("neumann")  [phx::ref(grid_bc_id) = EXAMPLE_PARAMS_BASE::GRID_BC_ID_NEUMANN  ] |
-        qi::lit("dirichlet")[phx::ref(grid_bc_id) = EXAMPLE_PARAMS_BASE::GRID_BC_ID_DIRICHLET],
+        qi::lit("neumann-offset") [phx::ref(grid_bc_id) = EXAMPLE_PARAMS_BASE::GRID_BC_ID_NEUMANN_OFFSET] |
+        qi::lit("dirichlet")      [phx::ref(grid_bc_id) = EXAMPLE_PARAMS_BASE::GRID_BC_ID_DIRICHLET     ],
         qi::standard::blank
     );
     if(b && it == grid_bc_str.end())

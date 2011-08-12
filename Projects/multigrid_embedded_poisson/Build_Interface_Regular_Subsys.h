@@ -38,16 +38,20 @@ namespace PhysBAM
 namespace Multigrid_Embedded_Poisson
 {
 
-template< class T, int D, class T_BETA_OF_INDEX, class T_F_OF_INDEX >
+template<
+    class T, int D,
+    class T_BETA_NEGATIVE_OF_INDEX, class T_F_NEGATIVE_OF_INDEX,
+    class T_BETA_POSITIVE_OF_INDEX, class T_F_POSITIVE_OF_INDEX
+>
 int
 Build_Interface_Regular_Subsys(
     const unsigned int n_thread,
     const VECTOR<T,D> dx,
     const MULTI_INDEX_BOUND<D> cell_multi_index_bound,
-    const T_BETA_OF_INDEX& beta_negative_of_index,
-    const T_BETA_OF_INDEX& beta_positive_of_index,
-    const T_F_OF_INDEX& f_negative_of_index,
-    const T_F_OF_INDEX& f_positive_of_index,
+    const T_BETA_NEGATIVE_OF_INDEX& beta_negative_of_index,
+    const T_F_NEGATIVE_OF_INDEX& f_negative_of_index,
+    const T_BETA_POSITIVE_OF_INDEX& beta_positive_of_index,
+    const T_F_POSITIVE_OF_INDEX& f_positive_of_index,
     DOMAIN_REGULAR_CROSS_SUBSYS<T,D>& regular_subsys,
     ARRAY_VIEW<T> system_rhs,
     std::ostream& lout = PhysBAM::nout)

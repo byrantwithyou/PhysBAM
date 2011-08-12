@@ -78,7 +78,7 @@ int Parse_Command_Line(
                           , "example specification (see below) defining the problem type, u, and beta")
         ("grid-bc"        , bpo::value< std::string >(&grid_bc_str)->
                             default_value("dirichlet")
-                          , "grid boundary condition specification (\"dirichlet\" | \"neumann\")")
+                          , "grid boundary condition specification (\"dirichlet\" | \"neumann-offset\")")
         ("solver"         , bpo::value< std::string >(&solver_str)
                           , "solver specification (see below)")
         ("max-iterations" , bpo::value< unsigned int >(&main_params.solver.max_iterations)->

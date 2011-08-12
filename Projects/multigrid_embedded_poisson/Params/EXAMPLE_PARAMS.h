@@ -25,7 +25,7 @@ struct EXAMPLE_PARAMS_BASE
     enum GRID_BC_ID
     {
         GRID_BC_ID_NULL = 0,
-        GRID_BC_ID_NEUMANN,
+        GRID_BC_ID_NEUMANN_OFFSET,
         GRID_BC_ID_DIRICHLET
     } grid_bc_id;
 
