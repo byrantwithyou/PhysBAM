@@ -34,42 +34,71 @@ struct COMPOSE_FUNCTION
 {
     PHYSBAM_DIRECT_INIT_CTOR_DECLARE_PRIVATE_MEMBERS(
         COMPOSE_FUNCTION,
-        (( typename T_F, f ))
-        (( typename T_G, g ))
+        (( typename T_F const, f ))
+        (( typename T_G const, g ))
     )
 public:
 
     template<class> struct result;
     template< class T_THIS, class T >
     struct result< T_THIS ( T ) >
-    {
-        typedef typename PROPAGATE_CONST< T_THIS, T_F >::type MAYBE_CONST_F_TYPE;
-        typedef typename PROPAGATE_CONST< T_THIS, T_G >::type MAYBE_CONST_G_TYPE;
-        typedef typename RESULT_OF<
-            MAYBE_CONST_F_TYPE
-            ( typename RESULT_OF< MAYBE_CONST_G_TYPE ( T ) >::type )
-        >::type type;
-    };
+        : RESULT_OF< const T_F (
+              typename RESULT_OF< const T_G ( T ) >::type
+          ) >
+    { };
 
     template< class T >
     typename result< COMPOSE_FUNCTION ( const T& ) >::type
-    operator()(const T& x)
-    { return f(g(x)); }
-
-    template< class T >
-    typename result< COMPOSE_FUNCTION ( T& ) >::type
-    operator()(T& x)
-    { return f(g(x)); }
-
-    template< class T >
-    typename result< const COMPOSE_FUNCTION ( const T& ) >::type
     operator()(const T& x) const
     { return f(g(x)); }
 
     template< class T >
-    typename result< const COMPOSE_FUNCTION ( T& ) >::type
+    typename result< COMPOSE_FUNCTION ( T& ) >::type
     operator()(T& x) const
     { return f(g(x)); }
+};
+
+template< class T_F, class T_G1, class T_G2 >
+struct COMPOSE2_FUNCTION
+{
+    PHYSBAM_DIRECT_INIT_CTOR_DECLARE_PRIVATE_MEMBERS(
+        COMPOSE2_FUNCTION,
+        (( typename T_F const, f ))
+        (( typename T_G1 const, g1 ))
+        (( typename T_G2 const, g2 ))
+    )
+public:
+
+    template<class> struct result;
+    template< class T_THIS, class T >
+    struct result< T_THIS ( T ) >
+        : RESULT_OF< const T_F (
+              typename RESULT_OF< const T_G1 ( T ) >::type,
+              typename RESULT_OF< const T_G2 ( T ) >::type
+          ) >
+    { };
+    template< class T_THIS, class T1, class T2 >
+    struct result< T_THIS ( T1, T2 ) >
+        : RESULT_OF< const T_F (
+              typename RESULT_OF< const T_G1 ( T1 ) >::type,
+              typename RESULT_OF< const T_G2 ( T2 ) >::type
+          ) >
+    { };
+
+    template< class T >
+    typename result< COMPOSE2_FUNCTION ( const T& ) >::type
+    operator()(const T& x) const
+    { return f(g1(x), g2(x)); }
+
+    template< class T >
+    typename result< COMPOSE2_FUNCTION ( T& ) >::type
+    operator()(T& x) const
+    { return f(g(x)); }
+
+    template< class T1, class T2 >
+    typename result< COMPOSE2_FUNCTION ( const T1&, const T2& ) >::type
+    operator()(const T1& x1, const T2& x2) const
+    { return f(g1(x1), g2(x2)); }
 };
 
 namespace Result_Of
@@ -93,6 +122,11 @@ struct MAKE_COMPOSE_FUNCTION;
 #include BOOST_PP_ITERATE()
 
 #undef REPEAT_DATA
+
+template< class T_F, class T_G1, class T_G2 >
+inline COMPOSE2_FUNCTION< T_F, T_G1, T_G2 >
+Make_Compose2_Function(const T_F& f, const T_G1& g1, const T_G2& g2)
+{ return COMPOSE2_FUNCTION< T_F, T_G1, T_G2 >(f, g1, g2); }
 
 } // namespace PhysBAM
 
