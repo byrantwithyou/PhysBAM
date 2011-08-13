@@ -32,7 +32,7 @@ Divide_Cell2(
     const VECTOR<int,D>& cell_multi_index,
     T_PHI_OF_FINE_INDEX phi_of_fine_index,
     const T_POLYTOPE_VISITOR& polytope_visitor,
-    const float min_dist_to_vertex,
+    const float min_dist_to_vertex = 0.0f,
     const int sign_of_zero = -1)
 {
     typedef VECTOR<int,D> MULTI_INDEX_TYPE;
@@ -70,7 +70,7 @@ Divide_Cell2(
     const VECTOR<int,D>& cell_multi_index,
     const T_PHI_OF_FINE_INDEX& phi_of_fine_index,
     const T_POLYTOPE_VISITOR& polytope_visitor,
-    const int sign_of_zero = -1)
+    const int sign_of_zero)
 {
     Divide_Cell2(
         dx,
