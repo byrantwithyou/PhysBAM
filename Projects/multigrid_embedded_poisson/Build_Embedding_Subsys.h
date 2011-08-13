@@ -85,6 +85,7 @@ Build_Embedding_Subsys(
     lout.flush();
     timer.Restart();
     post_embedding_init_visitor();
+    // TODO: MT
     BOOST_FOREACH( const int cell_linear_index, embedding_cells ) {
         assert(sign_of_cell_index(cell_linear_index) == 0);
         embedding_cell_visitor(cell_linear_index);

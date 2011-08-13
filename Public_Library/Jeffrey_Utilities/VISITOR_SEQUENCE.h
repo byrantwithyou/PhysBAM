@@ -36,6 +36,7 @@ struct VISITOR_SEQUENCE
 
     typedef void result_type;
 
+    void operator()() const;
     template< class T1 >
     void operator()(const T1& x1) const;
     template< class T1, class T2 >
@@ -110,7 +111,7 @@ VISITOR_SEQUENCE(const T_SEQUENCE2& visitors)
 namespace Detail_VISITOR_SEQUENCE
 {
 
-template< class T1, class T2 = void, class T3 = void >
+template< class T1 = void, class T2 = void, class T3 = void >
 struct VISIT_FUNCTION
 {
     VISIT_FUNCTION(T1 x1, T2 x2, T3 x3) : m_x1(x1), m_x2(x2), m_x3(x3) { }
@@ -120,6 +121,15 @@ struct VISIT_FUNCTION
     { visitor(m_x1, m_x2, m_x3); }
 private:
     T1 m_x1; T2 m_x2; T3 m_x3;
+};
+
+template<>
+struct VISIT_FUNCTION< void, void, void >
+{
+    typedef void result_type;
+    template< class T_VISITOR >
+    void operator()(const T_VISITOR& visitor) const
+    { visitor(); }
 };
 
 template< class T1 >
@@ -147,6 +157,15 @@ private:
 };
 
 } // namespace Detail_VISITOR_SEQUENCE
+
+template< class T_SEQUENCE >
+inline void
+VISITOR_SEQUENCE< T_SEQUENCE >::
+operator()() const
+{
+    typedef Detail_VISITOR_SEQUENCE::VISIT_FUNCTION<> VISIT_FUNCTION_;
+    boost::fusion::for_each(m_visitors, VISIT_FUNCTION_());
+}
 
 template< class T_SEQUENCE >
 template< class T1 >

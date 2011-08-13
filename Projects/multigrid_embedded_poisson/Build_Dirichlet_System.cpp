@@ -41,6 +41,8 @@
 #include "Init_Cell_Local_Embedding_Dirichlet_System.h"
 #include "Params/EXAMPLE_PARAMS.h"
 #include "Params/MAIN_PARAMS.h"
+#include "POST_EMBEDDING_INIT_DIRICHLET_CONSTRAINT_VISITOR.h"
+#include "POST_EMBEDDING_INIT_DOMAIN_VISITOR.h"
 #include "Print_System_Statistics.h"
 #include "SET_DIRICHLET_GRID_BC_VISITOR.h"
 
@@ -53,14 +55,6 @@ template const int& HASHTABLE<int,int>::Get(const int&) const;
 
 namespace Multigrid_Embedded_Poisson
 {
-
-namespace
-{
-
-template< class T, int D, class T_EMBEDDING_SUBSYS >
-struct POST_EMBEDDING_INIT_VISITOR;
-
-} // namespace
 
 template< class T, int D, class T_EMBEDDING_SUBSYS >
 int Build_Dirichlet_System(
@@ -134,9 +128,11 @@ int Build_Dirichlet_System(
             main_params.general.n_thread,
             multi_index_bound,
             As_Const_Array_View(regular_subsys.sign_of_cell_index),
-            POST_EMBEDDING_INIT_VISITOR< T, D, T_EMBEDDING_SUBSYS >(
-                embedding_subsys,
-                constraint_system, constraint_rhs
+            Make_Visitor_Sequence(
+                Make_Post_Embedding_Init_Domain_Visitor(embedding_subsys),
+                POST_EMBEDDING_INIT_DIRICHLET_CONSTRAINT_VISITOR<T,D>(
+                    constraint_system, constraint_rhs
+                )
             ),
             Make_Init_Cell_Local_Embedding_Dirichlet_System_Visitor(
                 min_x, max_x, multi_index_bound,
@@ -220,35 +216,6 @@ int Build_Dirichlet_System(
 
     return 0;
 }
-
-namespace
-{
-
-template< class T, int D, class T_EMBEDDING_SUBSYS >
-struct POST_EMBEDDING_INIT_VISITOR
-{
-    PHYSBAM_DIRECT_INIT_CTOR_DECLARE_PRIVATE_MEMBERS(
-        POST_EMBEDDING_INIT_VISITOR,
-        (( typename T_EMBEDDING_SUBSYS&, embedding_subsys ))
-        (( typename typename PHYSBAM_IDENTITY_TYPE(( DIRICHLET_CONSTRAINT_SYSTEM<T,D> )) &, constraint_system ))
-        (( typename ARRAY<T>&, constraint_rhs ))
-    )
-public:
-    typedef void result_type;
-    void operator()() const
-    {
-        const int n_embedding = embedding_subsys.linear_index_of_stencil_index.Size();
-        embedding_subsys.Init_Stencil_Index_Of_Linear_Index();
-        embedding_subsys.stencils.Exact_Resize(n_embedding, false); // uninit'ed
-        embedding_subsys.Zero_Stencils();
-        const int n_constraint = constraint_system.cell_linear_index_of_stencil_index.Size();
-        constraint_system.Init_Stencil_Index_Of_Cell_Linear_Index();
-        constraint_system.stencils.Exact_Resize(n_constraint);
-        constraint_rhs.Exact_Resize(n_constraint);
-    }
-};
-
-} // namespace
 
 #define EXPLICIT_INSTANTIATION( T, D ) \
     EXPLICIT_INSTANTIATION_HELPER( T, D, ( DOMAIN_EMBEDDING_CUBE_SUBSYS< T ) ( D > ) )

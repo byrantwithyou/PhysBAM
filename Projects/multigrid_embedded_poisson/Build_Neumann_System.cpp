@@ -40,6 +40,7 @@
 #include "Init_Cell_Local_Embedding_Neumann_System.h"
 #include "Params/EXAMPLE_PARAMS.h"
 #include "Params/MAIN_PARAMS.h"
+#include "POST_EMBEDDING_INIT_DOMAIN_VISITOR.h"
 #include "Print_System_Statistics.h"
 #include "SET_DIRICHLET_GRID_BC_VISITOR.h"
 #include "SET_NEUMANN_OFFSET_GRID_BC_VISITOR.h"
@@ -51,14 +52,6 @@ namespace PhysBAM
 
 namespace Multigrid_Embedded_Poisson
 {
-
-namespace
-{
-
-template< class T_EMBEDDING_SUBSYS >
-struct POST_EMBEDDING_INIT_VISITOR;
-
-} // namespace
 
 template< class T, int D, class T_EMBEDDING_SUBSYS >
 int Build_Neumann_System(
@@ -115,7 +108,7 @@ int Build_Neumann_System(
         main_params.general.n_thread,
         multi_index_bound,
         As_Const_Array_View(regular_subsys.sign_of_cell_index),
-        POST_EMBEDDING_INIT_VISITOR< T_EMBEDDING_SUBSYS >(embedding_subsys),
+        Make_Post_Embedding_Init_Domain_Visitor(embedding_subsys),
         Make_Init_Cell_Local_Embedding_Neumann_System_Visitor(
             min_x, max_x, multi_index_bound,
             -1, // domain_sign
@@ -209,29 +202,6 @@ int Build_Neumann_System(
 
     return 0;
 }
-
-namespace
-{
-
-template< class T_EMBEDDING_SUBSYS >
-struct POST_EMBEDDING_INIT_VISITOR
-{
-    PHYSBAM_DIRECT_INIT_CTOR_DECLARE_PRIVATE_MEMBERS(
-        POST_EMBEDDING_INIT_VISITOR,
-        (( typename T_EMBEDDING_SUBSYS&, embedding_subsys ))
-    )
-public:
-    typedef void result_type;
-    void operator()() const
-    {
-        const int n_embedding = embedding_subsys.linear_index_of_stencil_index.Size();
-        embedding_subsys.Init_Stencil_Index_Of_Linear_Index();
-        embedding_subsys.stencils.Exact_Resize(n_embedding, false); // uninit'ed
-        embedding_subsys.Zero_Stencils();
-    }
-};
-
-} // namespace
 
 #define EXPLICIT_INSTANTIATION( T, D ) \
     EXPLICIT_INSTANTIATION_HELPER( T, D, ( DOMAIN_EMBEDDING_CUBE_SUBSYS< T ) ( D > ) )
