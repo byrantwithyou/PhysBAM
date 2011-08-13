@@ -100,6 +100,9 @@ int Build_And_Solve_Interface_System(
     const VECTOR<T,D> max_x = As_Vector(main_params.grid.max_x);
     const VECTOR<T,D> dx = (max_x - min_x) / cell_multi_index_bound.max_multi_index;
 
+    const MULTI_INDEX_X_FUNCTION< T, D, MULTI_INDEX_BOUND<D> >
+        x_of_index(min_x, max_x, multi_index_bound);
+
     std::cout << "Allocating system...";
     std::cout.flush();
     timer.Restart();
@@ -125,11 +128,12 @@ int Build_And_Solve_Interface_System(
     );
     std::cout << "[Building interface system...] " << timer.Elapsed() << " s" << std::endl;
 
-    const int n_embedding = embedding_subsys.stencils.Size();
-    const int n_virtual = n_embedding / 2;
-    const int n_index = multi_index_bound.Size() + n_virtual;
+    const int n_embedding  = embedding_subsys.stencils.Size();
+    const int n_virtual    = n_embedding / 2;
+    const int n_index      = multi_index_bound.Size() + n_virtual;
     const int n_constraint = constraint_system.stencils.Size();
 
+    // Construct index_transform.
     typedef BOUND_FAST_MEM_FN<
         const int& (HASHTABLE<int,int>::*)( const int& ) const,
         &HASHTABLE<int,int>::Get
@@ -160,6 +164,11 @@ int Build_And_Solve_Interface_System(
         )
     );
 
+    BOUND_FAST_MEM_FN<
+        int (INDEX_TRANSFORM_TYPE::*)( int ) const,
+        &INDEX_TRANSFORM_TYPE::Grid_Index_Of_Index
+    > grid_index_of_index(index_transform);
+
     std::cout << "Evaluating constraint residual norm of continuous solution...";
     std::cout.flush();
     timer.Restart();
@@ -177,22 +186,8 @@ int Build_And_Solve_Interface_System(
                         &INDEX_TRANSFORM_TYPE::Domain_Sign_Of_Index
                     )
                 ),
-                Make_Compose_Function(
-                    problem.negative.u,
-                    Make_Multi_Index_X_Function(min_x, max_x, multi_index_bound),
-                    PHYSBAM_BOUND_FAST_MEM_FN_TEMPLATE(
-                        index_transform,
-                        &INDEX_TRANSFORM_TYPE::Grid_Index_Of_Index
-                    )
-                ),
-                Make_Compose_Function(
-                    problem.positive.u,
-                    Make_Multi_Index_X_Function(min_x, max_x, multi_index_bound),
-                    PHYSBAM_BOUND_FAST_MEM_FN_TEMPLATE(
-                        index_transform,
-                        &INDEX_TRANSFORM_TYPE::Grid_Index_Of_Index
-                    )
-                )
+                Make_Compose_Function(problem.negative.u, x_of_index, grid_index_of_index),
+                Make_Compose_Function(problem.positive.u, x_of_index, grid_index_of_index)
             )
         )
     );
@@ -246,40 +241,29 @@ int Build_And_Solve_Interface_System(
         aggregate_constraint_system.index_of_indy_index.Preallocate(n_embedding / (2 * (1 << D)));
         {
             boost::function< bool ( int ) > indyable;
+            const BOUND_FAST_MEM_FN<
+                bool (INDEX_TRANSFORM_TYPE::*)( int ) const,
+                &INDEX_TRANSFORM_TYPE::Index_Is_Virtual
+            > index_is_virtual(index_transform);
             switch(problem.constraint_id) {
             case EXAMPLE_PARAMS_BASE::CONSTRAINT_ID_DOUBLE_CELL:
                 indyable = Make_Apply_And_Function(
-                    PHYSBAM_BOUND_FAST_MEM_FN_TEMPLATE(
-                        index_transform,
-                        &INDEX_TRANSFORM_TYPE::Index_Is_Virtual
-                    ),
+                    index_is_virtual,
                     Make_Compose_Function(
                         Make_Vertex_Is_Coarse_Cell_Center<2>(multi_index_bound),
-                        PHYSBAM_BOUND_FAST_MEM_FN_TEMPLATE(
-                            index_transform,
-                            &INDEX_TRANSFORM_TYPE::Grid_Index_Of_Index
-                        )
+                        grid_index_of_index
                     )
                 );
                 break;
             case EXAMPLE_PARAMS_BASE::CONSTRAINT_ID_AGGREGATE:
-                indyable = PHYSBAM_BOUND_FAST_MEM_FN_TEMPLATE(
-                    index_transform,
-                    &INDEX_TRANSFORM_TYPE::Index_Is_Virtual
-                );
+                indyable = index_is_virtual;
                 break;
             default:
                 assert(false);
             }
             Select_Indys(
                 cell_multi_index_bound,
-                Make_Compose_Function(
-                    multi_index_bound,
-                    PHYSBAM_BOUND_FAST_MEM_FN_TEMPLATE(
-                        index_transform,
-                        &INDEX_TRANSFORM_TYPE::Grid_Index_Of_Index
-                    )
-                ),
+                Make_Compose_Function(multi_index_bound, grid_index_of_index),
                 constraint_system.stencil_index_of_cell_index,
                 BOUND_FAST_MEM_FN<
                     typename CONSTRAINT_SYSTEM_TYPE::CONST_STENCIL_PROXY_TYPE
@@ -487,18 +471,20 @@ int Build_And_Solve_Interface_System(
             std::cout << timer.Elapsed() << " s" << std::endl;
 
             // Not necessary since all indys are virtual.
-            // std::cout << "Zero'ing indy stencils in Z^T*A*Z regular subsystem...";
-            // std::cout.flush();
-            // timer.Restart();
-            // for(int indy_index = 1; indy_index <= n_indy; ++indy_index) {
-                // const int index = aggregate_constraint_system.index_of_indy_index(indy_index);
-                // assert(!ztaz_embedding_subsys.stencil_index_of_index.Contains(index));
-                // if(index_transform.Is_Material_Index(index)) {
-                    // const int linear_index = index_transform.Grid_Index_Of_Index(index);
-                    // regular_subsys.Zero_Stencil(linear_index);
-                // }
-            // }
-            // std::cout << timer.Elapsed() << " s" << std::endl;
+#if 0
+            std::cout << "Zero'ing indy stencils in Z^T*A*Z regular subsystem...";
+            std::cout.flush();
+            timer.Restart();
+            for(int indy_index = 1; indy_index <= n_indy; ++indy_index) {
+                const int index = aggregate_constraint_system.index_of_indy_index(indy_index);
+                assert(!ztaz_embedding_subsys.stencil_index_of_index.Contains(index));
+                if(index_transform.Is_Material_Index(index)) {
+                    const int linear_index = grid_index_of_index(index);
+                    regular_subsys.Zero_Stencil(linear_index);
+                }
+            }
+            std::cout << timer.Elapsed() << " s" << std::endl;
+#endif // #if 0
 
             const ZTAZ_SYSTEM_TYPE ztaz_system(boost::fusion::make_vector(
                 boost::ref(regular_subsys),
