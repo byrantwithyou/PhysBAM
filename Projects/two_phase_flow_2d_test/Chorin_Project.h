@@ -25,7 +25,7 @@
 namespace PhysBAM
 {
 
-namespace Two_Phase_Flow_2D
+namespace Two_Phase_Flow_2D_Test
 {
 
 namespace Detail_Chorin_Project
@@ -184,7 +184,7 @@ public:
 
 } // namespace Detail_Chorin_Project
 
-} // namespace Two_Phase_Flow_2D
+} // namespace Two_Phase_Flow_2D_Test
 
 } // namespace PhysBAM
 

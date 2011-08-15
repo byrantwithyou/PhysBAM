@@ -39,6 +39,10 @@ public:
 
     result_type operator()(typename T_ARRAY::INDEX const i) const
     { return array(i); }
+
+    template< class T_INDEX1, class T_INDEX2 >
+    result_type operator()(const T_INDEX1& i1, const T_INDEX2& i2) const
+    { return array(i1, i2); }
 };
 
 template< class T_ARRAY >

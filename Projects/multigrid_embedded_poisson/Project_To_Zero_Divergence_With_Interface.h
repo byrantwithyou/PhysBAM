@@ -7,6 +7,8 @@
 #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_PROJECT_TO_ZERO_DIVERGENCE_WITH_INTERFACE_HPP
 #define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_PROJECT_TO_ZERO_DIVERGENCE_WITH_INTERFACE_HPP
 
+#include <limits>
+
 #include <boost/foreach.hpp>
 #include <boost/fusion/container/generation/make_vector.hpp>
 #include <boost/mpl/vector/vector10.hpp>
@@ -42,6 +44,12 @@
 #include "Select_Indys.h"
 #include "SYSTEM_SUM.h"
 
+#ifndef PHYSBAM_NO_PETSC
+#include <Jeffrey_Utilities/Petsc/CALL_AND_CHKERRQ.h>
+#include "Petsc/Solve_SPD_System_With_ICC_PCG.h"
+#include <petsc.h>
+#endif // #ifndef PHYSBAM_NO_PETSC
+
 namespace PhysBAM
 {
 
@@ -53,8 +61,8 @@ template<
     class T_PHI_OF_FINE_INDEX,
     class T_BETA_NEGATIVE_OF_INDEX,
     class T_BETA_POSITIVE_OF_INDEX,
-    class T_JUMP_U_OF_X,
-    class T_JUMP_BETA_GRAD_U_DOT_N_OF_X_AND_N
+    class T_JUMP_P_OF_X_OF_CELL_INDEX,
+    class T_JUMP_BETA_GRAD_P_DOT_N_OF_X_AND_N_OF_CELL_INDEX
 >
 void Project_To_Zero_Divergence_With_Interface(
     const unsigned int n_thread,
@@ -63,8 +71,8 @@ void Project_To_Zero_Divergence_With_Interface(
     const T_PHI_OF_FINE_INDEX& phi_of_fine_index,
     const T_BETA_NEGATIVE_OF_INDEX& beta_negative_of_index,
     const T_BETA_POSITIVE_OF_INDEX& beta_positive_of_index,
-    const T_JUMP_U_OF_X& jump_u_of_x,
-    const T_JUMP_BETA_GRAD_U_DOT_N_OF_X_AND_N& jump_beta_grad_u_dot_n_of_x_and_n,
+    const T_JUMP_P_OF_X_OF_CELL_INDEX& jump_p_of_x_of_cell_index,
+    const T_JUMP_BETA_GRAD_P_DOT_N_OF_X_AND_N_OF_CELL_INDEX& jump_beta_grad_p_dot_n_of_x_and_n_of_cell_index,
     T_MAC_VECTOR_FIELD mac_vector_field)
 {
     typedef VECTOR<int,D> MULTI_INDEX_TYPE;
@@ -114,7 +122,7 @@ void Project_To_Zero_Divergence_With_Interface(
         divergence_of_mac_vector_field,
         beta_positive_of_index,
         divergence_of_mac_vector_field,
-        jump_u_of_x, jump_beta_grad_u_dot_n_of_x_and_n,
+        jump_p_of_x_of_cell_index, jump_beta_grad_p_dot_n_of_x_and_n_of_cell_index,
         0.0f, // min_dist_to_vertex
         -1, // sign_of_zero
         embedding_subsys, system_rhs,
@@ -270,6 +278,22 @@ void Project_To_Zero_Divergence_With_Interface(
     ARRAY<T> p(n_index); // init'ed to 0
 
     // Solve for p.
+#ifdef PHYSBAM_NO_PETSC
+#else // #ifdef PHYSBAM_NO_PETSC
+    PHYSBAM_PETSC_CALL_AND_CHKERRQ((
+        Petsc::Solve_SPD_System_With_ICC_PCG<T,D>(
+            n_thread,
+            ztaz_system, ztaz_system_rhs,
+            true,                                       // has_constant_vectors_in_null_space
+            std::numeric_limits< unsigned int >::max(), // max_iterations
+            1e-8f,                                      // relative_tolerance
+            std::numeric_limits< float >::min(),        // absolute_tolerance
+            false,                                      // print_residuals
+            true,                                       // precondition
+            p
+        )
+    ));
+#endif // #ifdef PHYSBAM_NO_PETSC
 
     // p <- c + Z*p
     aggregate_constraint_system.Apply_Z(p);
@@ -299,7 +323,10 @@ void Project_To_Zero_Divergence_With_Interface(
                 const int index1 = index_transform.Index_Of_Signed_Grid_Index(grid_index1, sign);
                 const int index2 = index_transform.Index_Of_Signed_Grid_Index(grid_index2, sign);
                 const T dp = (p(index2) - p(index1)) / dx[d];
-                mac_vector_field(d, multi_index2) += dp;
+                const T beta1 = sign == -1 ? beta_negative_of_index(multi_index1) : beta_positive_of_index(multi_index1);
+                const T beta2 = sign == -1 ? beta_negative_of_index(multi_index2) : beta_positive_of_index(multi_index2);
+                const T beta = (beta1 + beta2) / 2;
+                mac_vector_field(d, multi_index2) += beta * dp;
             }
             ++clipped_multi_index_bound.max_multi_index[d];
         }

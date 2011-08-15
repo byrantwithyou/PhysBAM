@@ -149,7 +149,7 @@ template<
     class T_PHI_OF_FINE_INDEX,
     class T_BETA_OF_INDEX,
     class T_F_OF_INDEX,
-    class T_BETA_GRAD_U_DOT_N_OF_X_AND_N,
+    class T_BETA_GRAD_U_DOT_N_OF_X_AND_N_OF_CELL_INDEX,
     class T_SYSTEM_STENCIL_PROXY_OF_INDEX,
     class T_SYSTEM_RHS_OF_INDEX
 >
@@ -165,7 +165,7 @@ struct INIT_CELL_LOCAL_EMBEDDING_NEUMANN_SYSTEM_VISITOR
         (( typename T_PHI_OF_FINE_INDEX const, phi_of_fine_index ))
         (( typename T_BETA_OF_INDEX const, beta_of_index ))
         (( typename T_F_OF_INDEX const, f_of_index ))
-        (( typename T_BETA_GRAD_U_DOT_N_OF_X_AND_N const, beta_grad_u_dot_n_of_x_and_n ))
+        (( typename T_BETA_GRAD_U_DOT_N_OF_X_AND_N_OF_CELL_INDEX const, beta_grad_u_dot_n_of_x_and_n_of_cell_index ))
         (( /******/ float const, min_dist_to_vertex ))
         (( /******/ int const, sign_of_zero ))
         (( typename T_SYSTEM_STENCIL_PROXY_OF_INDEX const, system_stencil_proxy_of_index ))
@@ -189,7 +189,8 @@ public:
             dx,
             domain_sign,
             phi_of_fine_index,
-            beta_of_index, f_of_index, beta_grad_u_dot_n_of_x_and_n,
+            beta_of_index, f_of_index,
+            beta_grad_u_dot_n_of_x_and_n_of_cell_index(cell_multi_index),
             min_dist_to_vertex, sign_of_zero,
             cell_multi_index, x0,
             system_stencil_proxy_of_index, system_rhs_of_index
@@ -202,7 +203,7 @@ template<
     class T_PHI_OF_FINE_INDEX,
     class T_BETA_OF_INDEX,
     class T_F_OF_INDEX,
-    class T_BETA_GRAD_U_DOT_N_OF_X_AND_N,
+    class T_BETA_GRAD_U_DOT_N_OF_X_AND_N_OF_CELL_INDEX,
     class T_SYSTEM_STENCIL_PROXY_OF_INDEX,
     class T_SYSTEM_RHS_OF_INDEX
 >
@@ -211,7 +212,7 @@ inline INIT_CELL_LOCAL_EMBEDDING_NEUMANN_SYSTEM_VISITOR<
     T_PHI_OF_FINE_INDEX,
     T_BETA_OF_INDEX,
     T_F_OF_INDEX,
-    T_BETA_GRAD_U_DOT_N_OF_X_AND_N,
+    T_BETA_GRAD_U_DOT_N_OF_X_AND_N_OF_CELL_INDEX,
     T_SYSTEM_STENCIL_PROXY_OF_INDEX,
     T_SYSTEM_RHS_OF_INDEX
 >
@@ -222,7 +223,7 @@ Make_Init_Cell_Local_Embedding_Neumann_System_Visitor(
     const T_PHI_OF_FINE_INDEX& phi_of_fine_index,
     const T_BETA_OF_INDEX& beta_of_index,
     const T_F_OF_INDEX& f_of_index,
-    const T_BETA_GRAD_U_DOT_N_OF_X_AND_N& beta_grad_u_dot_n_of_x_and_n,
+    const T_BETA_GRAD_U_DOT_N_OF_X_AND_N_OF_CELL_INDEX& beta_grad_u_dot_n_of_x_and_n_of_cell_index,
     const float min_dist_to_vertex,
     const int sign_of_zero,
     const T_SYSTEM_STENCIL_PROXY_OF_INDEX& system_stencil_proxy_of_index,
@@ -233,14 +234,14 @@ Make_Init_Cell_Local_Embedding_Neumann_System_Visitor(
         T_PHI_OF_FINE_INDEX,
         T_BETA_OF_INDEX,
         T_F_OF_INDEX,
-        T_BETA_GRAD_U_DOT_N_OF_X_AND_N,
+        T_BETA_GRAD_U_DOT_N_OF_X_AND_N_OF_CELL_INDEX,
         T_SYSTEM_STENCIL_PROXY_OF_INDEX,
         T_SYSTEM_RHS_OF_INDEX
     >(
         min_x, max_x, multi_index_bound,
         domain_sign,
         phi_of_fine_index,
-        beta_of_index, f_of_index, beta_grad_u_dot_n_of_x_and_n,
+        beta_of_index, f_of_index, beta_grad_u_dot_n_of_x_and_n_of_cell_index,
         min_dist_to_vertex, sign_of_zero,
         system_stencil_proxy_of_index, system_rhs_of_index
     );

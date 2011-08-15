@@ -47,6 +47,10 @@
 #include <PhysBAM_Dynamics/Particles/PARTICLE_LEVELSET_REMOVED_PARTICLES.h>
 #include "PLS_FSI_DRIVER.h"
 #include "PLS_FSI_EXAMPLE.h"
+
+#include <Jeffrey_Utilities/Functional/ARRAY_WRAPPER_FUNCTION.h>
+#include "Chorin_Project.h"
+
 namespace PhysBAM{namespace Two_Phase_Flow_2D_Test{
 //#####################################################################
 // Constructor
@@ -291,8 +295,14 @@ First_Order_Time_Step(int substep,T dt)
     example.solid_body_collection.Update_Position_Based_State(time+dt,true);
 //    example.solid_body_collection.deformable_body_collection.template Find_Force<SURFACE_TENSION_FORCE<VECTOR<T,2> >*>()->Dump_Curvatures();
     slip.two_phase=example.two_phase;
-    // TODO: Change this.
     //slip.Solve(fluid_collection.incompressible_fluid_collection.face_velocities,dt,time,time+dt,false,false);
+    {
+        Chorin_Project(
+            1, // n_thread
+            //example.fluids_parameters.particle_levelset_evolution->phi
+            Make_Array_Wrapper_Function(example.fluid_collection.incompressible_fluid_collection.face_velocities)
+        );
+    }
     Write_Substep("pressure solve",substep,1);
 
     slip.Print_Maximum_Velocities(time);

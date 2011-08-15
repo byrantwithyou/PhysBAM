@@ -160,9 +160,14 @@ int Build_And_Solve_Neumann_System(
         timer.Restart();
         PHYSBAM_PETSC_CALL_AND_CHKERRQ((
             Petsc::Solve_SPD_System_With_ICC_PCG<T,D>(
-                main_params,
+                main_params.general.n_thread,
                 system, system_rhs,
                 has_nontrivial_null_space,
+                main_params.solver.max_iterations,
+                main_params.solver.relative_tolerance,
+                main_params.solver.absolute_tolerance,
+                main_params.solver.print_residuals,
+                main_params.solver.precondition,
                 u_approx
             )
         ));
