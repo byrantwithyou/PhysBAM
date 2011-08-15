@@ -68,6 +68,10 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable:4355) // 'this' : used in base member initializer list
+#endif
 template<class TV> PLS_FSI_EXAMPLE<TV>::
 PLS_FSI_EXAMPLE(const STREAM_TYPE stream_type,const int number_of_regions)
     :BASE((Initialize_Particles(),stream_type)),solids_parameters(*new SOLIDS_PARAMETERS<TV>),solids_fluids_parameters(*new SOLIDS_FLUIDS_PARAMETERS<TV>(this)),
@@ -79,6 +83,9 @@ PLS_FSI_EXAMPLE(const STREAM_TYPE stream_type,const int number_of_regions)
     Set_Minimum_Collision_Thickness();
     Set_Write_Substeps_Level(-1);
 }
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 //#####################################################################
 // Destructor
 //#####################################################################
