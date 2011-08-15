@@ -1,0 +1,9 @@
+# SConscript
+
+Import('env Automatic_Program')
+Automatic_Program(env, "two_phase_flow_2d_test", [
+    "main.cpp",
+    "PLS_FSI_DRIVER.cpp"
+    "PLS_FSI_EXAMPLE.cpp"
+    "SURFACE_TENSION.cpp"
+] )
