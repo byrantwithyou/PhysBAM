@@ -17,6 +17,7 @@
 #include <Jeffrey_Utilities/Functional/APPLY_MINUS_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/ARRAY_WRAPPER_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/COMPOSE_FUNCTION.h>
+#include <Jeffrey_Utilities/Functional/CONSTANT_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/IF_ELSE_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/SIGN_FUNCTION.h>
 #include <Jeffrey_Utilities/Grid/ASSIGN_SIGN_TO_INDEX_GRID_VISITOR.h>
@@ -124,11 +125,14 @@ int Build_Interface_System(
         Make_Compose_Function(problem.negative.f, x_of_index),
         Make_Compose_Function(problem.positive.beta, x_of_index),
         Make_Compose_Function(problem.positive.f, x_of_index),
-        Make_Apply_Minus_Function(problem.positive.u, problem.negative.u),
-        Make_Apply_Minus_Function(
+        Make_Constant_Function(Make_Apply_Minus_Function(
+            problem.positive.u,
+            problem.negative.u
+        )),
+        Make_Constant_Function(Make_Apply_Minus_Function(
             Make_Beta_Grad_U_Dot_N(problem.positive.beta, problem.positive.grad_u),
             Make_Beta_Grad_U_Dot_N(problem.negative.beta, problem.negative.grad_u)
-        ),
+        )),
         0.0f, // min_dist_to_vertex
         -1, // sign_of_zero
         embedding_subsys, system_rhs,

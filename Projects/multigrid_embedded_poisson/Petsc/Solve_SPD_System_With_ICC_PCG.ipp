@@ -34,7 +34,6 @@
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 
-#include "../Params/MAIN_PARAMS.h"
 #include "Add_Stencil_To_Matrix.h"
 #include "Print_KSP_Info.h"
 
@@ -61,9 +60,14 @@ struct SET_PETSC_INDEX_OF_LINEAR_INDEX;
 template< class T, int D, class T_SYSTEM >
 PetscErrorCode
 Solve_SPD_System_With_ICC_PCG(
-    const MAIN_PARAMS<T,D>& main_params,
+    const unsigned int n_thread,
     const T_SYSTEM& system, const ARRAY_VIEW<const T> rhs,
     const bool has_constant_vectors_in_null_space,
+    unsigned int max_iterations,
+    const float relative_tolerance,
+    const float absolute_tolerance,
+    const bool print_residuals,
+    const bool precondition,
     ARRAY_VIEW<T> u_approx)
 {
     typedef Detail_Solve_SPD_System_With_ICC_PCG::INDEX_HAS_NONZERO_STENCIL< T_SYSTEM > INDEX_HAS_NONZERO_STENCIL_;
@@ -79,7 +83,7 @@ Solve_SPD_System_With_ICC_PCG(
     timer.Restart();
     std::vector<int> physbam_index_of_petsc_index;
     Find_All_If_MT(
-        main_params.general.n_thread,
+        n_thread,
         1, n_physbam_index,
         INDEX_HAS_NONZERO_STENCIL_(system),
         physbam_index_of_petsc_index
@@ -87,12 +91,12 @@ Solve_SPD_System_With_ICC_PCG(
     const int n_petsc = static_cast< int >(physbam_index_of_petsc_index.size());
     ARRAY<int> petsc_index_of_physbam_index(n_physbam_index, false); // uninit'ed
     Fill_MT(
-        main_params.general.n_thread,
+        n_thread,
         petsc_index_of_physbam_index,
         std::numeric_limits<int>::max()
     );
     For_Each_MT(
-        main_params.general.n_thread,
+        n_thread,
         0, n_petsc - 1,
         SET_PETSC_INDEX_OF_LINEAR_INDEX_(
             physbam_index_of_petsc_index,
@@ -241,7 +245,7 @@ Solve_SPD_System_With_ICC_PCG(
     {
         PC petsc_pc;
         PHYSBAM_PETSC_CALL_AND_CHKERRQ( KSPGetPC(petsc_ksp, &petsc_pc) );
-        PHYSBAM_PETSC_CALL_AND_CHKERRQ( PCSetType(petsc_pc, main_params.solver.precondition ? PCICC : PCNONE) );
+        PHYSBAM_PETSC_CALL_AND_CHKERRQ( PCSetType(petsc_pc, precondition ? PCICC : PCNONE) );
     }
 
     // If has_constant_vectors_in_null_space, construct the null space (from the
@@ -272,9 +276,8 @@ Solve_SPD_System_With_ICC_PCG(
     PHYSBAM_PETSC_CALL_AND_CHKERRQ( KSPSetInitialGuessNonzero(petsc_ksp, PETSC_TRUE) );
 
     // Set additional solver options.
-    if(main_params.solver.print_residuals)
+    if(print_residuals)
         PHYSBAM_PETSC_CALL_AND_CHKERRQ( KSPMonitorSet(petsc_ksp, &KSPMonitorTrueResidualNorm, PETSC_NULL, PETSC_NULL) );
-    unsigned int max_iterations = main_params.solver.max_iterations;
     if(
         max_iterations == std::numeric_limits< unsigned int >::max() &&
         static_cast< unsigned int >(n_petsc) <= std::numeric_limits< unsigned int >::max() / 8
@@ -282,8 +285,8 @@ Solve_SPD_System_With_ICC_PCG(
         max_iterations = 8 * static_cast< unsigned int >(n_petsc);
     PHYSBAM_PETSC_CALL_AND_CHKERRQ( KSPSetTolerances(
         petsc_ksp,
-        static_cast< PetscReal >(main_params.solver.relative_tolerance),
-        static_cast< PetscReal >(main_params.solver.absolute_tolerance),
+        static_cast< PetscReal >(relative_tolerance),
+        static_cast< PetscReal >(absolute_tolerance),
         PETSC_DEFAULT, // divergence tolerance
         max_iterations
     ) );

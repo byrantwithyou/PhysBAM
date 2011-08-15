@@ -10,6 +10,7 @@
 #include <PhysBAM_Tools/Math_Tools/sqr.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <cmath>
+#include <cstdlib>
 #include <iostream>
 using namespace PhysBAM;
 using ::std::abs;

@@ -41,7 +41,7 @@ template<
     class T_SIGN_OF_CELL_INDEX,
     class T_BETA_NEGATIVE_OF_INDEX, class T_F_NEGATIVE_OF_INDEX,
     class T_BETA_POSITIVE_OF_INDEX, class T_F_POSITIVE_OF_INDEX,
-    class T_JUMP_U_OF_X, class T_JUMP_BETA_GRAD_U_DOT_N_OF_X_AND_N
+    class T_JUMP_U_OF_X_OF_CELL_INDEX, class T_JUMP_BETA_GRAD_U_DOT_N_OF_X_AND_N_OF_CELL_INDEX
 >
 void
 Build_Interface_Embedding_Subsys(
@@ -54,8 +54,8 @@ Build_Interface_Embedding_Subsys(
     const T_F_NEGATIVE_OF_INDEX& f_negative_of_index,
     const T_BETA_POSITIVE_OF_INDEX& beta_positive_of_index,
     const T_F_POSITIVE_OF_INDEX& f_positive_of_index,
-    const T_JUMP_U_OF_X& jump_u_of_x,
-    const T_JUMP_BETA_GRAD_U_DOT_N_OF_X_AND_N& jump_beta_grad_u_dot_n_of_x_and_n,
+    const T_JUMP_U_OF_X_OF_CELL_INDEX& jump_u_of_x_of_cell_index,
+    const T_JUMP_BETA_GRAD_U_DOT_N_OF_X_AND_N_OF_CELL_INDEX& jump_beta_grad_u_dot_n_of_x_and_n_of_cell_index,
     const float min_dist_to_vertex,
     const int sign_of_zero,
     EMBEDDING_UNSTRUCTURED_SUBSYS<T>& embedding_subsys,
@@ -190,7 +190,7 @@ Build_Interface_Embedding_Subsys(
             phi_of_fine_index,
             beta_negative_of_index, f_negative_of_index,
             beta_positive_of_index, f_positive_of_index,
-            jump_u_of_x, jump_beta_grad_u_dot_n_of_x_and_n,
+            jump_u_of_x_of_cell_index, jump_beta_grad_u_dot_n_of_x_and_n_of_cell_index,
             min_dist_to_vertex, sign_of_zero,
             Make_Compose_Function(
                 negative_index_transform_stencil_proxy_function,

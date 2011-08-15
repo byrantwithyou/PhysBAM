@@ -103,7 +103,7 @@ template<
     class T_PHI_OF_FINE_INDEX,
     class T_BETA_OF_INDEX,
     class T_F_OF_INDEX,
-    class T_U_OF_X,
+    class T_U_OF_X_OF_CELL_INDEX,
     class T_SYSTEM_STENCIL_PROXY_OF_INDEX,
     class T_SYSTEM_RHS_OF_INDEX,
     class T_CONSTRAINT_STENCIL_PROXY_OF_CELL_INDEX,
@@ -121,7 +121,7 @@ struct INIT_CELL_LOCAL_EMBEDDING_DIRICHLET_SYSTEM_VISITOR
         (( typename T_PHI_OF_FINE_INDEX const, phi_of_fine_index ))
         (( typename T_BETA_OF_INDEX const, beta_of_index ))
         (( typename T_F_OF_INDEX const, f_of_index ))
-        (( typename T_U_OF_X const, u_of_x ))
+        (( typename T_U_OF_X_OF_CELL_INDEX const, u_of_x_of_cell_index ))
         (( /******/ float const, min_dist_to_vertex ))
         (( /******/ int const, sign_of_zero ))
         (( typename T_SYSTEM_STENCIL_PROXY_OF_INDEX const, system_stencil_proxy_of_index ))
@@ -147,7 +147,8 @@ public:
             dx,
             domain_sign,
             phi_of_fine_index,
-            beta_of_index, f_of_index, u_of_x,
+            beta_of_index, f_of_index,
+            u_of_x_of_cell_index(cell_multi_index),
             min_dist_to_vertex, sign_of_zero,
             cell_multi_index, x0,
             system_stencil_proxy_of_index, system_rhs_of_index,
@@ -162,7 +163,7 @@ template<
     class T_PHI_OF_FINE_INDEX,
     class T_BETA_OF_INDEX,
     class T_F_OF_INDEX,
-    class T_U_OF_X,
+    class T_U_OF_X_OF_CELL_INDEX,
     class T_SYSTEM_STENCIL_PROXY_OF_INDEX,
     class T_SYSTEM_RHS_OF_INDEX,
     class T_CONSTRAINT_STENCIL_PROXY_OF_CELL_INDEX,
@@ -173,7 +174,7 @@ inline INIT_CELL_LOCAL_EMBEDDING_DIRICHLET_SYSTEM_VISITOR<
     T_PHI_OF_FINE_INDEX,
     T_BETA_OF_INDEX,
     T_F_OF_INDEX,
-    T_U_OF_X,
+    T_U_OF_X_OF_CELL_INDEX,
     T_SYSTEM_STENCIL_PROXY_OF_INDEX,
     T_SYSTEM_RHS_OF_INDEX,
     T_CONSTRAINT_STENCIL_PROXY_OF_CELL_INDEX,
@@ -186,7 +187,7 @@ Make_Init_Cell_Local_Embedding_Dirichlet_System_Visitor(
     const T_PHI_OF_FINE_INDEX& phi_of_fine_index,
     const T_BETA_OF_INDEX& beta_of_index,
     const T_F_OF_INDEX& f_of_index,
-    const T_U_OF_X& u_of_x,
+    const T_U_OF_X_OF_CELL_INDEX& u_of_x_of_cell_index,
     const float min_dist_to_vertex,
     const int sign_of_zero,
     const T_SYSTEM_STENCIL_PROXY_OF_INDEX& system_stencil_proxy_of_index,
@@ -199,7 +200,7 @@ Make_Init_Cell_Local_Embedding_Dirichlet_System_Visitor(
         T_PHI_OF_FINE_INDEX,
         T_BETA_OF_INDEX,
         T_F_OF_INDEX,
-        T_U_OF_X,
+        T_U_OF_X_OF_CELL_INDEX,
         T_SYSTEM_STENCIL_PROXY_OF_INDEX,
         T_SYSTEM_RHS_OF_INDEX,
         T_CONSTRAINT_STENCIL_PROXY_OF_CELL_INDEX,
@@ -208,7 +209,7 @@ Make_Init_Cell_Local_Embedding_Dirichlet_System_Visitor(
         min_x, max_x, multi_index_bound,
         domain_sign,
         phi_of_fine_index,
-        beta_of_index, f_of_index, u_of_x,
+        beta_of_index, f_of_index, u_of_x_of_cell_index,
         min_dist_to_vertex, sign_of_zero,
         system_stencil_proxy_of_index, system_rhs_of_index,
         constraint_stencil_proxy_of_cell_index, constraint_rhs_of_cell_index

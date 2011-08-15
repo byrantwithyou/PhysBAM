@@ -11,9 +11,6 @@
 
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
 
-#include "../Params/EXAMPLE_PARAMS.h"
-#include "../Params/MAIN_PARAMS.h"
-
 namespace PhysBAM
 {
 
@@ -26,9 +23,14 @@ namespace Petsc
 template< class T, int D, class T_SYSTEM >
 PetscErrorCode
 Solve_SPD_System_With_ICC_PCG(
-    const MAIN_PARAMS<T,D>& main_params,
+    const unsigned int n_thread,
     const T_SYSTEM& system, const ARRAY_VIEW<const T> rhs,
     const bool has_constant_vectors_in_null_space,
+    unsigned int max_iterations,
+    const float relative_tolerance,
+    const float absolute_tolerance,
+    const bool print_residuals,
+    const bool precondition,
     ARRAY_VIEW<T> u_approx);
 
 } // namespace Petsc

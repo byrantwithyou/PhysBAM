@@ -22,6 +22,7 @@
 #include <PhysBAM_Tools/Vectors/VECTOR_0D.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_BASE.h>
 #include <cmath>
+#include <cstdlib>
 #ifdef DIFFERENCE // Windows workaround.
 #undef DIFFERENCE
 #endif
@@ -31,6 +32,7 @@ using ::std::floor;
 using ::std::ceil;
 using ::std::sin;
 using ::std::cos;
+using ::std::abs;
 
 template<class T>
 class VECTOR<T,1>:public VECTOR_BASE<T,VECTOR<T,1> >

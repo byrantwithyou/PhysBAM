@@ -14,6 +14,7 @@
 #include <Jeffrey_Utilities/Functional/ARRAY_WRAPPER_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/BOUND_FAST_MEM_FN.h>
 #include <Jeffrey_Utilities/Functional/COMPOSE_FUNCTION.h>
+#include <Jeffrey_Utilities/Functional/CONSTANT_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/EQUAL_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/SIGN_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/VISIT_IF.h>
@@ -140,7 +141,7 @@ int Build_Dirichlet_System(
                 Make_Compose_Function(phi_of_fine_index, fine_multi_index_bound),
                 Make_Compose_Function(problem.beta, x_of_index),
                 Make_Compose_Function(problem.f, x_of_index),
-                problem.u,
+                Make_Constant_Function(problem.u),
                 0.0f, // min_dist_to_vertex
                 -1, // sign_of_zero
                 Make_Compose_Function(

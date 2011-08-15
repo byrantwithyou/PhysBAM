@@ -235,7 +235,7 @@ template<
     class T_PHI_OF_FINE_INDEX,
     class T_BETA_NEGATIVE_OF_INDEX, class T_F_NEGATIVE_OF_INDEX,
     class T_BETA_POSITIVE_OF_INDEX, class T_F_POSITIVE_OF_INDEX,
-    class T_JUMP_U_OF_X, class T_JUMP_BETA_GRAD_U_DOT_N_OF_X_AND_N,
+    class T_JUMP_U_OF_X_OF_CELL_INDEX, class T_JUMP_BETA_GRAD_U_DOT_N_OF_X_AND_N_OF_CELL_INDEX,
     class T_SYSTEM_NEGATIVE_STENCIL_PROXY_OF_INDEX,
     class T_SYSTEM_NEGATIVE_RHS_OF_INDEX,
     class T_SYSTEM_POSITIVE_STENCIL_PROXY_OF_INDEX,
@@ -257,8 +257,8 @@ struct INIT_CELL_LOCAL_EMBEDDING_INTERFACE_SYSTEM_VISITOR
         (( typename T_F_NEGATIVE_OF_INDEX const, f_negative_of_index ))
         (( typename T_BETA_POSITIVE_OF_INDEX const, beta_positive_of_index ))
         (( typename T_F_POSITIVE_OF_INDEX const, f_positive_of_index ))
-        (( typename T_JUMP_U_OF_X const, jump_u_of_x ))
-        (( typename T_JUMP_BETA_GRAD_U_DOT_N_OF_X_AND_N const, jump_beta_grad_u_dot_n_of_x_and_n ))
+        (( typename T_JUMP_U_OF_X_OF_CELL_INDEX const, jump_u_of_x_of_cell_index ))
+        (( typename T_JUMP_BETA_GRAD_U_DOT_N_OF_X_AND_N_OF_CELL_INDEX const, jump_beta_grad_u_dot_n_of_x_and_n_of_cell_index ))
         (( /******/ float const, min_dist_to_vertex ))
         (( /******/ int const, sign_of_zero ))
         (( typename T_SYSTEM_NEGATIVE_STENCIL_PROXY_OF_INDEX const, system_negative_stencil_proxy_of_index ))
@@ -288,7 +288,8 @@ public:
             phi_of_fine_index,
             beta_negative_of_index, f_negative_of_index,
             beta_positive_of_index, f_positive_of_index,
-            jump_u_of_x, jump_beta_grad_u_dot_n_of_x_and_n,
+            jump_u_of_x_of_cell_index(cell_multi_index),
+            jump_beta_grad_u_dot_n_of_x_and_n_of_cell_index(cell_multi_index),
             min_dist_to_vertex, sign_of_zero,
             cell_multi_index, x0,
             system_negative_stencil_proxy_of_index, system_negative_rhs_of_index,
@@ -305,7 +306,7 @@ template<
     class T_PHI_OF_FINE_INDEX,
     class T_BETA_NEGATIVE_OF_INDEX, class T_F_NEGATIVE_OF_INDEX,
     class T_BETA_POSITIVE_OF_INDEX, class T_F_POSITIVE_OF_INDEX,
-    class T_JUMP_U_OF_X, class T_JUMP_BETA_GRAD_U_DOT_N_OF_X_AND_N,
+    class T_JUMP_U_OF_X_OF_CELL_INDEX, class T_JUMP_BETA_GRAD_U_DOT_N_OF_X_AND_N_OF_CELL_INDEX,
     class T_SYSTEM_NEGATIVE_STENCIL_PROXY_OF_INDEX,
     class T_SYSTEM_NEGATIVE_RHS_OF_INDEX,
     class T_SYSTEM_POSITIVE_STENCIL_PROXY_OF_INDEX,
@@ -319,7 +320,7 @@ inline INIT_CELL_LOCAL_EMBEDDING_INTERFACE_SYSTEM_VISITOR<
     T_PHI_OF_FINE_INDEX,
     T_BETA_NEGATIVE_OF_INDEX, T_F_NEGATIVE_OF_INDEX,
     T_BETA_POSITIVE_OF_INDEX, T_F_POSITIVE_OF_INDEX,
-    T_JUMP_U_OF_X, T_JUMP_BETA_GRAD_U_DOT_N_OF_X_AND_N,
+    T_JUMP_U_OF_X_OF_CELL_INDEX, T_JUMP_BETA_GRAD_U_DOT_N_OF_X_AND_N_OF_CELL_INDEX,
     T_SYSTEM_NEGATIVE_STENCIL_PROXY_OF_INDEX,
     T_SYSTEM_NEGATIVE_RHS_OF_INDEX,
     T_SYSTEM_POSITIVE_STENCIL_PROXY_OF_INDEX,
@@ -336,8 +337,8 @@ Make_Init_Cell_Local_Embedding_Interface_System_Visitor(
     const T_F_NEGATIVE_OF_INDEX& f_negative_of_index,
     const T_BETA_POSITIVE_OF_INDEX& beta_positive_of_index,
     const T_F_POSITIVE_OF_INDEX& f_positive_of_index,
-    const T_JUMP_U_OF_X& jump_u_of_x,
-    const T_JUMP_BETA_GRAD_U_DOT_N_OF_X_AND_N& jump_beta_grad_u_dot_n_of_x_and_n,
+    const T_JUMP_U_OF_X_OF_CELL_INDEX& jump_u_of_x_of_cell_index,
+    const T_JUMP_BETA_GRAD_U_DOT_N_OF_X_AND_N_OF_CELL_INDEX& jump_beta_grad_u_dot_n_of_x_and_n_of_cell_index,
     const float min_dist_to_vertex,
     const int sign_of_zero,
     const T_SYSTEM_NEGATIVE_STENCIL_PROXY_OF_INDEX& system_negative_stencil_proxy_of_index,
@@ -353,7 +354,7 @@ Make_Init_Cell_Local_Embedding_Interface_System_Visitor(
         T_PHI_OF_FINE_INDEX,
         T_BETA_NEGATIVE_OF_INDEX, T_F_NEGATIVE_OF_INDEX,
         T_BETA_POSITIVE_OF_INDEX, T_F_POSITIVE_OF_INDEX,
-        T_JUMP_U_OF_X, T_JUMP_BETA_GRAD_U_DOT_N_OF_X_AND_N,
+        T_JUMP_U_OF_X_OF_CELL_INDEX, T_JUMP_BETA_GRAD_U_DOT_N_OF_X_AND_N_OF_CELL_INDEX,
         T_SYSTEM_NEGATIVE_STENCIL_PROXY_OF_INDEX,
         T_SYSTEM_NEGATIVE_RHS_OF_INDEX,
         T_SYSTEM_POSITIVE_STENCIL_PROXY_OF_INDEX,
@@ -366,7 +367,7 @@ Make_Init_Cell_Local_Embedding_Interface_System_Visitor(
         phi_of_fine_index,
         beta_negative_of_index, f_negative_of_index,
         beta_positive_of_index, f_positive_of_index,
-        jump_u_of_x, jump_beta_grad_u_dot_n_of_x_and_n,
+        jump_u_of_x_of_cell_index, jump_beta_grad_u_dot_n_of_x_and_n_of_cell_index,
         min_dist_to_vertex, sign_of_zero,
         system_negative_stencil_proxy_of_index, system_negative_rhs_of_index,
         system_positive_stencil_proxy_of_index, system_positive_rhs_of_index,

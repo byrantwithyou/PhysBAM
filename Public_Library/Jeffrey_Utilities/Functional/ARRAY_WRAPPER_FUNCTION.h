@@ -26,8 +26,8 @@ struct ARRAY_WRAPPER_FUNCTION
 public:
     typedef typename boost::mpl::if_<
         boost::is_const< T_ARRAY >,
-        typename T_ARRAY::value_type const,
-        typename T_ARRAY::value_type /***/
+        typename T_ARRAY::ELEMENT const,
+        typename T_ARRAY::ELEMENT /***/
     >::type & result_type;
 
     template< class T_INT >
@@ -39,6 +39,10 @@ public:
 
     result_type operator()(typename T_ARRAY::INDEX const i) const
     { return array(i); }
+
+    template< class T_INDEX1, class T_INDEX2 >
+    result_type operator()(const T_INDEX1& i1, const T_INDEX2& i2) const
+    { return array(i1, i2); }
 };
 
 template< class T_ARRAY >
