@@ -127,7 +127,7 @@
 			<Tool
 				Name="VCLibrarianTool"
 				LinkLibraryDependencies="true"
-				AdditionalDependencies="zlib.lib"
+				AdditionalDependencies="$(ZLIB_ROOT)/msvc9/zlib/$(ConfigurationName)/zlib.lib"
 				AdditionalLibraryDirectories="$(OutDir)"
 			/>
 			<Tool
