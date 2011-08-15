@@ -49,6 +49,11 @@
 #include "PLS_FSI_EXAMPLE.h"
 
 #include <Jeffrey_Utilities/Functional/ARRAY_WRAPPER_FUNCTION.h>
+#include <Jeffrey_Utilities/Functional/BOUND_FAST_MEM_FN.h>
+#include <Jeffrey_Utilities/Functional/CONSTANT_FUNCTION.h>
+#include <Jeffrey_Utilities/Math/MULTI_LINEAR_INTERPOLATE_INDEX_FUNCTION.h>
+#include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOUND.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_POLICY_UNIFORM.h>
 #include "Chorin_Project.h"
 
 namespace PhysBAM{namespace Two_Phase_Flow_2D_Test{
@@ -297,10 +302,33 @@ First_Order_Time_Step(int substep,T dt)
     slip.two_phase=example.two_phase;
     //slip.Solve(fluid_collection.incompressible_fluid_collection.face_velocities,dt,time,time+dt,false,false);
     {
+        const TV dx = fluids_parameters.grid->dX;
+        const TV min_x = fluids_parameters.grid->domain.min_corner + dx/2;
+        const TV max_x = fluids_parameters.grid->domain.max_corner - dx/2;
+        const T sigma = fluids_parameters.surface_tension;
+        const T rho_negative = fluids_parameters.density;
+        const T rho_positive = fluids_parameters.outside_density;
+        const MULTI_INDEX_BOUND< TV::dimension > mac_cell_multi_index_bound(fluids_parameters.grid->numbers_of_cells);
+        typedef typename LEVELSET_POLICY< GRID<TV> >::LEVELSET LEVEL_SET_TYPE;
         Chorin_Project(
             1, // n_thread
-            //example.fluids_parameters.particle_levelset_evolution->phi
-            Make_Array_Wrapper_Function(example.fluid_collection.incompressible_fluid_collection.face_velocities)
+            min_x, max_x, dt,
+            sigma, rho_negative, rho_positive,
+            static_cast<T>(0), // jump_mu
+            mac_cell_multi_index_bound,
+            Make_Multi_Linear_Interpolate_Index_Function<2>(
+                Make_Array_Wrapper_Function(fluids_parameters.particle_levelset_evolution->phi)
+            ), // TODO: Save previous phi...???
+            Make_Multi_Linear_Interpolate_Index_Function<2>(
+                Make_Array_Wrapper_Function(fluids_parameters.particle_levelset_evolution->phi)
+            ),
+            Make_Constant_Function(
+                BOUND_FAST_MEM_FN<
+                    T (LEVEL_SET_TYPE::*)(const TV&) const,
+                    &LEVEL_SET_TYPE::Compute_Curvature
+                >(fluids_parameters.particle_levelset_evolution->particle_levelset.levelset)
+            ),
+            Make_Array_Wrapper_Function(fluid_collection.incompressible_fluid_collection.face_velocities)
         );
     }
     Write_Substep("pressure solve",substep,1);
@@ -656,12 +684,12 @@ Extrapolate_Velocity_Across_Interface(ARRAY<T,FACE_INDEX<TV::m> >& face_velociti
     EXTRAPOLATION_HIGHER_ORDER<TV,T>::Extrapolate_Face(grid,phi,(int)ceil(band_width)+1,face_velocities,20,example.fluids_parameters.number_of_ghost_cells,band_width);
 }
 //#####################################################################
-template class PLS_FSI_DRIVER<VECTOR<float,1> >;
+//template class PLS_FSI_DRIVER<VECTOR<float,1> >;
 template class PLS_FSI_DRIVER<VECTOR<float,2> >;
 template class PLS_FSI_DRIVER<VECTOR<float,3> >;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-template class PLS_FSI_DRIVER<VECTOR<double,1> >;
+//template class PLS_FSI_DRIVER<VECTOR<double,1> >;
 template class PLS_FSI_DRIVER<VECTOR<double,2> >;
-template class PLS_FSI_DRIVER<VECTOR<double,3> >;
+//template class PLS_FSI_DRIVER<VECTOR<double,3> >;
 #endif
 }} // namespace Two_Phase_Flow_2D_Test / namespace PhysBAM

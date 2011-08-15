@@ -62,7 +62,8 @@ template<
     class T_BETA_NEGATIVE_OF_INDEX,
     class T_BETA_POSITIVE_OF_INDEX,
     class T_JUMP_P_OF_X_OF_CELL_INDEX,
-    class T_JUMP_BETA_GRAD_P_DOT_N_OF_X_AND_N_OF_CELL_INDEX
+    class T_JUMP_BETA_GRAD_P_DOT_N_OF_X_AND_N_OF_CELL_INDEX,
+    class T_MAC_VECTOR_FIELD
 >
 void Project_To_Zero_Divergence_With_Interface(
     const unsigned int n_thread,
@@ -198,6 +199,7 @@ void Project_To_Zero_Divergence_With_Interface(
         As_Array_View(indy_index_of_constraint_index),
         aggregate_constraint_system.index_of_indy_index
     );
+    const int n_indy = aggregate_constraint_system.index_of_indy_index.Size();
 
     aggregate_constraint_system.Init_Indy_Index_Of_Index();
     aggregate_constraint_system.value_of_indy_index.Exact_Resize(n_indy); // init'ed to 0
@@ -306,14 +308,14 @@ void Project_To_Zero_Divergence_With_Interface(
 
     // v <- v + grad(p)
     {
-        MULTI_INDEX_BOX<D> clipped_multi_index_bound = multi_index_bound;
+        MULTI_INDEX_BOUND<D> clipped_multi_index_bound = multi_index_bound;
         for(int d = 1; d <= D; ++d) {
             --clipped_multi_index_bound.max_multi_index[d];
             // TODO: MT
             BOOST_FOREACH( const MULTI_INDEX_TYPE multi_index1, clipped_multi_index_bound ) {
                 MULTI_INDEX_TYPE multi_index2 = multi_index1;
                 ++multi_index2[d];
-                MULTI_INDEX_TYPE fine_multi_index = 2 * multi_index - 1;
+                MULTI_INDEX_TYPE fine_multi_index = 2 * multi_index1 - 1;
                 ++fine_multi_index[d];
                 int sign = SIGN_FUNCTION()(phi_of_fine_index(fine_multi_index));
                 if(sign == 0)

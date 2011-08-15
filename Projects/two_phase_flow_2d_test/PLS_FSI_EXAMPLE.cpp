@@ -412,12 +412,12 @@ Update_Fluid_Parameters(const T dt,const T time)
     fluids_parameters.incompressible->projection.Set_Density(fluids_parameters.density);
 }
 //#####################################################################
-template class PLS_FSI_EXAMPLE<VECTOR<float,1> >;
+//template class PLS_FSI_EXAMPLE<VECTOR<float,1> >;
 template class PLS_FSI_EXAMPLE<VECTOR<float,2> >;
-template class PLS_FSI_EXAMPLE<VECTOR<float,3> >;
+//template class PLS_FSI_EXAMPLE<VECTOR<float,3> >;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-template class PLS_FSI_EXAMPLE<VECTOR<double,1> >;
+//template class PLS_FSI_EXAMPLE<VECTOR<double,1> >;
 template class PLS_FSI_EXAMPLE<VECTOR<double,2> >;
-template class PLS_FSI_EXAMPLE<VECTOR<double,3> >;
+//template class PLS_FSI_EXAMPLE<VECTOR<double,3> >;
 #endif
 }} // namespace Two_Phase_Flow_2D_Test / namespace PhysBAM
