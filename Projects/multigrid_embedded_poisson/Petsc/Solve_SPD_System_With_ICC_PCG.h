@@ -23,7 +23,7 @@ namespace Petsc
 template< class T, int D, class T_SYSTEM >
 PetscErrorCode
 Solve_SPD_System_With_ICC_PCG(
-    const MAIN_PARAMS<T,D>& main_params,
+    const unsigned int n_thread,
     const T_SYSTEM& system, const ARRAY_VIEW<const T> rhs,
     const bool has_constant_vectors_in_null_space,
     unsigned int max_iterations,

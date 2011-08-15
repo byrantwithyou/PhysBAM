@@ -65,7 +65,7 @@ template<
     class T_JUMP_BETA_GRAD_P_DOT_N_OF_X_AND_N_OF_CELL_INDEX,
     class T_MAC_VECTOR_FIELD
 >
-void Project_To_Zero_Divergence_With_Interface(
+int Project_To_Zero_Divergence_With_Interface(
     const unsigned int n_thread,
     const VECTOR<T,D> min_x, const VECTOR<T,D> max_x,
     const MULTI_INDEX_BOUND<D> mac_cell_multi_index_bound,
@@ -333,6 +333,8 @@ void Project_To_Zero_Divergence_With_Interface(
             ++clipped_multi_index_bound.max_multi_index[d];
         }
     }
+
+    return 0;
 }
 
 } // namespace Multigrid_Embedded_Poisson

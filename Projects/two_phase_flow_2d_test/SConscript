@@ -1,9 +1,28 @@
 # SConscript
 
+import os
 Import('env Automatic_Program')
-Automatic_Program(env, "two_phase_flow_2d_test", [
+
+if 'PETSC_DIR' in os.environ:
+    env.Append( CPPPATH = [
+        os.environ['PETSC_DIR'] + '/include',
+        os.environ['PETSC_DIR'] + '/' + os.environ['PETSC_ARCH'] + '/include',
+        os.environ['PETSC_DIR'] + '/include/mpiuni'
+    ] )
+    env.Append( LIBPATH = [
+        os.environ['PETSC_DIR'] + '/' + os.environ['PETSC_ARCH'] + '/lib'
+    ] )
+    env.Append( LIBS = [
+        'petsc'
+    ] )
+else:
+    env.Append( CPPDEFINES = [
+        'PHYSBAM_NO_PETSC'
+    ] )
+
+Automatic_Program( env, "two_phase_flow_2d_test", [
     "main.cpp",
-    "PLS_FSI_DRIVER.cpp"
-    "PLS_FSI_EXAMPLE.cpp"
+    "PLS_FSI_DRIVER.cpp",
+    "PLS_FSI_EXAMPLE.cpp",
     "SURFACE_TENSION.cpp"
 ] )
