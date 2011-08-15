@@ -17,6 +17,7 @@
 #include <PhysBAM_Tools/Math_Tools/wrap.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_2D.h>
 #include <cmath>
+#include <cstdlib>
 #ifdef DIFFERENCE // Windows workaround.
 #undef DIFFERENCE
 #endif
@@ -25,6 +26,7 @@ namespace PhysBAM{
 using ::std::exp;
 using ::std::sin;
 using ::std::cos;
+using ::std::abs;
 
 template<class T_ARRAY,class T_INDICES> class INDIRECT_ARRAY;
 

@@ -11,6 +11,7 @@
 #include <PhysBAM_Tools/Vectors/SCALAR_POLICY.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_BASE.h>
 #include <cmath>
+#include <cstdlib>
 #ifdef DIFFERENCE // Windows workaround.
 #undef DIFFERENCE
 #endif
