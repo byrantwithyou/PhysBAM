@@ -8,7 +8,7 @@
 #include <cmath>
 
 #include <algorithm>
-#include <iostream>
+#include <ostream>
 #include <limits>
 #include <vector>
 
@@ -32,15 +32,12 @@
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 
 #include "Add_Stencil_To_Matrix.h"
+#include "GENERIC_SYSTEM_REFERENCE.h"
 #include "Print_KSP_Info.h"
-#include "SYSTEM_REFERENCE.h"
 
 #include "Solve_SPD_System_With_ICC_PCG.h"
 
 namespace PhysBAM
-{
-
-namespace Multigrid_Embedded_Poisson
 {
 
 namespace Petsc
@@ -59,7 +56,7 @@ template< class T >
 PetscErrorCode
 Solve_SPD_System_With_ICC_PCG(
     const unsigned int n_thread,
-    const SYSTEM_REFERENCE<T> system,
+    const GENERIC_SYSTEM_REFERENCE<T> system,
     const ARRAY_VIEW<const T> rhs,
     const bool has_constant_vectors_in_null_space,
     unsigned int max_iterations,
@@ -67,7 +64,8 @@ Solve_SPD_System_With_ICC_PCG(
     const float absolute_tolerance,
     const bool print_residuals,
     const bool precondition,
-    ARRAY_VIEW<T> u_approx)
+    ARRAY_VIEW<T> u_approx,
+    std::ostream& lout /*= PhysBAM::nout*/)
 {
     typedef Detail_Solve_SPD_System_With_ICC_PCG::INDEX_HAS_NONZERO_STENCIL<T> INDEX_HAS_NONZERO_STENCIL_;
     typedef Detail_Solve_SPD_System_With_ICC_PCG::SET_PETSC_INDEX_OF_LINEAR_INDEX SET_PETSC_INDEX_OF_LINEAR_INDEX_;
@@ -77,8 +75,8 @@ Solve_SPD_System_With_ICC_PCG(
     BASIC_TIMER timer;
     MPI_Comm mpi_comm = PETSC_COMM_WORLD;
 
-    std::cout << "Initializing PETSc index <-> PhysBAM index mappings...";
-    std::cout.flush();
+    lout << "Initializing PETSc index <-> PhysBAM index mappings...";
+    lout.flush();
     timer.Restart();
     std::vector<int> physbam_index_of_petsc_index;
     Find_All_If_MT(
@@ -102,13 +100,13 @@ Solve_SPD_System_With_ICC_PCG(
             petsc_index_of_physbam_index
         )
     );
-    std::cout << timer.Elapsed() << " s" << std::endl;
-    std::cout << "  # of petsc dofs = " << n_petsc << std::endl;
+    lout << timer.Elapsed() << " s" << std::endl;
+    lout << "  # of petsc dofs = " << n_petsc << std::endl;
     if(n_petsc == 0)
         return 0;
 
-    std::cout << "Constructing Jacobi scaling coefficients...";
-    std::cout.flush();
+    lout << "Constructing Jacobi scaling coefficients...";
+    lout.flush();
     timer.Restart();
     std::vector< double > jscalings(n_petsc); // init'ed to 0
     for(int i = 0; i != n_petsc; ++i) {
@@ -119,13 +117,13 @@ Solve_SPD_System_With_ICC_PCG(
             diag = 1;
         jscalings[i] = std::sqrt(static_cast< double >(diag));
     }
-    std::cout << timer.Elapsed() << " s" << std::endl;
+    lout << timer.Elapsed() << " s" << std::endl;
 
     std::vector< PetscScalar > petsc_jns_vec_;
     Vec petsc_jns_vec;
     if(has_constant_vectors_in_null_space) {
-        std::cout << "Constructing null-space vector of Jacobi-scaled matrix...";
-        std::cout.flush();
+        lout << "Constructing null-space vector of Jacobi-scaled matrix...";
+        lout.flush();
         timer.Restart();
         petsc_jns_vec_.resize(n_petsc); // init'ed to 0
         // MatNullSpaceCreate requires the null-space vector to have unit 2-norm.
@@ -143,12 +141,12 @@ Solve_SPD_System_With_ICC_PCG(
             &petsc_jns_vec_.front(),
             &petsc_jns_vec
         ) );
-        std::cout << timer.Elapsed() << " s" << std::endl;
+        lout << timer.Elapsed() << " s" << std::endl;
     }
     PHYSBAM_PETSC_SCOPED_DESTROY_IF( Vec, petsc_jns_vec, has_constant_vectors_in_null_space );
 
-    std::cout << "Constructing matrix in CSR format and Jacobi scaling...";
-    std::cout.flush();
+    lout << "Constructing matrix in CSR format and Jacobi scaling...";
+    lout.flush();
     timer.Restart();
     // CSR = Compressed Sparse Row, aka Yale Sparse Matrix Format (according to Wikipedia)
     //       see http://en.wikipedia.org/wiki/Sparse_matrix#Yale_Sparse_Matrix_Format
@@ -200,9 +198,9 @@ Solve_SPD_System_With_ICC_PCG(
         &petsc_jmatrix
     ) );
     PHYSBAM_PETSC_SCOPED_DESTROY( Mat, petsc_jmatrix );
-    std::cout << timer.Elapsed() << " s" << std::endl;
-    std::cout << "  # of nonzeros (estimated) = " << matrix_nnz << std::endl;
-    std::cout << "  # of nonzeros (actual)    = " << petsc_jmatrix_value_index_of_row.back() << std::endl;
+    lout << timer.Elapsed() << " s" << std::endl;
+    lout << "  # of nonzeros (estimated) = " << matrix_nnz << std::endl;
+    lout << "  # of nonzeros (actual)    = " << petsc_jmatrix_value_index_of_row.back() << std::endl;
 
     // Print out how good this so-called null space vector is.
     if(has_constant_vectors_in_null_space) {
@@ -213,15 +211,15 @@ Solve_SPD_System_With_ICC_PCG(
         PHYSBAM_PETSC_CALL_AND_CHKERRQ( MatMult(petsc_jmatrix, petsc_jns_vec, petsc_v) );
         PetscReal jnorm = static_cast< PetscReal >(0);
         PHYSBAM_PETSC_CALL_AND_CHKERRQ( VecNorm(petsc_v, NORM_INFINITY, &jnorm) );
-        std::cout << "  |(J^(-1)*A*J^(-1)) * (J*1)|_{infty} = " << jnorm << std::endl;
+        lout << "  |(J^(-1)*A*J^(-1)) * (J*1)|_{infty} = " << jnorm << std::endl;
         PetscReal norm = 0;
         for(int i = 0; i != n_petsc; ++i)
             norm = std::max(norm, static_cast< PetscReal >(std::abs(petsc_v_[i] * jscalings[i])));
-        std::cout << "  |J * (J^(-1)*A*J^(-1)) * (J*1)|_{infty} = " << norm << std::endl;
+        lout << "  |J * (J^(-1)*A*J^(-1)) * (J*1)|_{infty} = " << norm << std::endl;
     }
 
-    std::cout << "Constructing rhs of Jacobi-scaled system...";
-    std::cout.flush();
+    lout << "Constructing rhs of Jacobi-scaled system...";
+    lout.flush();
     timer.Restart();
     std::vector< PetscScalar > petsc_jrhs_(n_petsc); // init'ed to 0
     for(int i = 0; i != n_petsc; ++i) {
@@ -231,7 +229,7 @@ Solve_SPD_System_With_ICC_PCG(
     Vec petsc_jrhs;
     PHYSBAM_PETSC_CALL_AND_CHKERRQ( VecCreateSeqWithArray(mpi_comm, n_petsc, &petsc_jrhs_.front(), &petsc_jrhs) );
     PHYSBAM_PETSC_SCOPED_DESTROY( Vec, petsc_jrhs );
-    std::cout << timer.Elapsed() << " s" << std::endl;
+    lout << timer.Elapsed() << " s" << std::endl;
 
     // Construct the Petsc KSP object.
     KSP petsc_ksp;
@@ -292,17 +290,17 @@ Solve_SPD_System_With_ICC_PCG(
     PHYSBAM_PETSC_CALL_AND_CHKERRQ( KSPSetComputeSingularValues(petsc_ksp, PETSC_TRUE) );
     PHYSBAM_PETSC_CALL_AND_CHKERRQ( KSPSetUp(petsc_ksp) );
 
-    std::cout << "Executing KSPSolve...";
-    std::cout.flush();
+    lout << "Executing KSPSolve...";
+    lout.flush();
     timer.Restart();
     // petsc_jrhs will be overwritten with the solution.
     PHYSBAM_PETSC_CALL_AND_CHKERRQ( KSPSolve(petsc_ksp, petsc_jrhs, petsc_jrhs) );
-    std::cout << timer.Elapsed() << " s" << std::endl;
+    lout << timer.Elapsed() << " s" << std::endl;
 
     PHYSBAM_PETSC_CALL_AND_CHKERRQ( KSPView(petsc_ksp, PETSC_VIEWER_STDOUT_SELF) );
 
-    std::cout << "KSP info:" << std::endl;
-    PHYSBAM_PETSC_CALL_AND_CHKERRQ( Print_KSP_Info(petsc_ksp) );
+    lout << "KSP info:" << std::endl;
+    PHYSBAM_PETSC_CALL_AND_CHKERRQ( Print_KSP_Info(petsc_ksp, lout) );
 
     // Un-Jacobi scale the CG solution to get the actual approximate solution.
     for(int i = 0; i != n_petsc; ++i) {
@@ -321,7 +319,7 @@ struct INDEX_HAS_NONZERO_STENCIL
 {
     PHYSBAM_DIRECT_INIT_CTOR_DECLARE_PRIVATE_MEMBERS(
         INDEX_HAS_NONZERO_STENCIL,
-        (( typename SYSTEM_REFERENCE<T> const, system ))
+        (( typename GENERIC_SYSTEM_REFERENCE<T> const, system ))
     )
 public:
     typedef bool result_type;
@@ -353,7 +351,7 @@ template \
 PetscErrorCode \
 Solve_SPD_System_With_ICC_PCG<T>( \
     const unsigned int n_thread, \
-    const SYSTEM_REFERENCE<T> system, \
+    const GENERIC_SYSTEM_REFERENCE<T> system, \
     const ARRAY_VIEW<const T> rhs, \
     const bool has_constant_vectors_in_null_space, \
     unsigned int max_iterations, \
@@ -361,13 +359,12 @@ Solve_SPD_System_With_ICC_PCG<T>( \
     const float absolute_tolerance, \
     const bool print_residuals, \
     const bool precondition, \
-    ARRAY_VIEW<T> u_approx);
+    ARRAY_VIEW<T> u_approx, \
+    std::ostream& lout);
 EXPLICIT_INSTANTIATION( float )
 EXPLICIT_INSTANTIATION( double )
 #undef EXPLICIT_INSTANTIATION
 
 } // namespace Petsc
-
-} // namespace Multigrid_Embedded_Poisson
 
 } // namespace PhysBAM

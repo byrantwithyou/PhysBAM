@@ -4,19 +4,19 @@
 // license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_3D_V2_PETSC_SOLVE_SPD_SYSTEM_WITH_ICC_PCG_HPP
-#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_3D_V2_PETSC_SOLVE_SPD_SYSTEM_WITH_ICC_PCG_HPP
+#ifndef PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_PETSC_SOLVE_SPD_SYSTEM_WITH_ICC_PCG_HPP
+#define PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_PETSC_SOLVE_SPD_SYSTEM_WITH_ICC_PCG_HPP
+
+#include <iosfwd>
 
 #include <petsc.h>
 
+#include <Jeffrey_Utilities/ONSTREAM.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 
-#include "SYSTEM_REFERENCE.h"
+#include "GENERIC_SYSTEM_REFERENCE.h"
 
 namespace PhysBAM
-{
-
-namespace Multigrid_Embedded_Poisson
 {
 
 namespace Petsc
@@ -26,7 +26,7 @@ template< class T >
 PetscErrorCode
 Solve_SPD_System_With_ICC_PCG(
     const unsigned int n_thread,
-    const SYSTEM_REFERENCE<T> system,
+    const GENERIC_SYSTEM_REFERENCE<T> system,
     const ARRAY_VIEW<const T> rhs,
     const bool has_constant_vectors_in_null_space,
     unsigned int max_iterations,
@@ -34,12 +34,11 @@ Solve_SPD_System_With_ICC_PCG(
     const float absolute_tolerance,
     const bool print_residuals,
     const bool precondition,
-    ARRAY_VIEW<T> u_approx);
+    ARRAY_VIEW<T> u_approx,
+    std::ostream& lout = PhysBAM::nout);
 
 } // namespace Petsc
 
-} // namespace Multigrid_Embedded_Poisson
-
 } // namespace PhysBAM
 
-#endif // #endif // PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_3D_V2_PETSC_SOLVE_SPD_SYSTEM_WITH_ICC_PCG_HPP
+#endif // #endif // PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_PETSC_SOLVE_SPD_SYSTEM_WITH_ICC_PCG_HPP

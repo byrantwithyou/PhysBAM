@@ -39,10 +39,10 @@
 #include "RAND_MT19937_UNIFORM_REAL.h"
 
 #ifndef PHYSBAM_NO_PETSC
-#include <Jeffrey_Utilities/Petsc/CALL_AND_CHKERRQ.h>
-#include "Petsc/Solve_SPD_System_With_ICC_PCG.h"
-#include "Petsc/SYSTEM_REFERENCE.h"
 #include <petsc.h>
+#include <Jeffrey_Utilities/Petsc/CALL_AND_CHKERRQ.h>
+#include <Jeffrey_Utilities/Petsc/GENERIC_SYSTEM_REFERENCE.h>
+#include <Jeffrey_Utilities/Petsc/Solve_SPD_System_With_ICC_PCG.h>
 #endif // #ifndef PHYSBAM_NO_PETSC
 
 #include "Build_And_Solve_Neumann_System.h"
@@ -161,7 +161,7 @@ int Build_And_Solve_Neumann_System(
         PHYSBAM_PETSC_CALL_AND_CHKERRQ((
             Petsc::Solve_SPD_System_With_ICC_PCG(
                 main_params.general.n_thread,
-                Petsc::SYSTEM_REFERENCE<T>(system),
+                Petsc::GENERIC_SYSTEM_REFERENCE<T>(system),
                 As_Const_Array_View(system_rhs),
                 has_nontrivial_null_space,
                 main_params.solver.max_iterations,
@@ -169,7 +169,8 @@ int Build_And_Solve_Neumann_System(
                 main_params.solver.absolute_tolerance,
                 main_params.solver.print_residuals,
                 main_params.solver.precondition,
-                As_Array_View(u_approx)
+                As_Array_View(u_approx),
+                std::cout
             )
         ));
         std::cout << "[Solving with PETSc CG solver...] " << timer.Elapsed() << " s" << std::endl;

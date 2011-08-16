@@ -4,8 +4,8 @@
 // license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_3D_V2_PETSC_ADD_STENCIL_TO_MATRIX_HPP
-#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_3D_V2_PETSC_ADD_STENCIL_TO_MATRIX_HPP
+#ifndef PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_PETSC_ADD_STENCIL_TO_MATRIX_HPP
+#define PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_PETSC_ADD_STENCIL_TO_MATRIX_HPP
 
 #include <cassert>
 
@@ -22,9 +22,6 @@
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 namespace PhysBAM
-{
-
-namespace Multigrid_Embedded_Poisson
 {
 
 namespace Petsc
@@ -59,8 +56,6 @@ Add_Stencil_To_Matrix(
 
 } // namespace Petsc
 
-} // namespace Multigrid_Embedded_Poisson
-
 } // namespace PhysBAM
 
-#endif // #endif // PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_3D_V2_PETSC_ADD_STENCIL_TO_MATRIX_HPP
+#endif // #endif // PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_PETSC_ADD_STENCIL_TO_MATRIX_HPP
