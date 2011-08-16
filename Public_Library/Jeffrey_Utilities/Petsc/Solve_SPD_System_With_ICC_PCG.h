@@ -12,9 +12,8 @@
 #include <petsc.h>
 
 #include <Jeffrey_Utilities/ONSTREAM.h>
+#include <Jeffrey_Utilities/Petsc/GENERIC_SYSTEM_REFERENCE.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
-
-#include "GENERIC_SYSTEM_REFERENCE.h"
 
 namespace PhysBAM
 {

@@ -10,8 +10,9 @@
 #include <petscksp.h>
 
 #include <Jeffrey_Utilities/ONSTREAM.h>
-#include <Jeffrey_Utilities/Petsc/Print_KSP_Info.h>
 #include <Jeffrey_Utilities/Petsc/CALL_AND_CHKERRQ.h>
+
+#include <Jeffrey_Utilities/Petsc/Print_KSP_Info.h>
 
 namespace PhysBAM
 {

@@ -23,7 +23,10 @@
 #include <Jeffrey_Utilities/Algorithm/For_Each.h>
 #include <Jeffrey_Utilities/BASIC_TIMER.h>
 #include <Jeffrey_Utilities/DIRECT_INIT_CTOR.h>
+#include <Jeffrey_Utilities/Petsc/Add_Stencil_To_Matrix.h>
 #include <Jeffrey_Utilities/Petsc/CALL_AND_CHKERRQ.h>
+#include <Jeffrey_Utilities/Petsc/GENERIC_SYSTEM_REFERENCE.h>
+#include <Jeffrey_Utilities/Petsc/Print_KSP_Info.h>
 #include <Jeffrey_Utilities/Petsc/SCOPED_DESTROY.h>
 #include <Jeffrey_Utilities/Stencils/SKIP_ZERO_VALUE_STENCIL_PROXY.h>
 #include <Jeffrey_Utilities/Stencils/UNSTRUCTURED_STENCIL.h>
@@ -31,11 +34,7 @@
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 
-#include "Add_Stencil_To_Matrix.h"
-#include "GENERIC_SYSTEM_REFERENCE.h"
-#include "Print_KSP_Info.h"
-
-#include "Solve_SPD_System_With_ICC_PCG.h"
+#include <Jeffrey_Utilities/Petsc/Solve_SPD_System_With_ICC_PCG.h>
 
 namespace PhysBAM
 {
@@ -141,9 +140,10 @@ Solve_SPD_System_With_ICC_PCG(
             &petsc_jns_vec_.front(),
             &petsc_jns_vec
         ) );
-        lout << timer.Elapsed() << " s" << std::endl;
     }
     PHYSBAM_PETSC_SCOPED_DESTROY_IF( Vec, petsc_jns_vec, has_constant_vectors_in_null_space );
+    if(has_constant_vectors_in_null_space)
+        lout << timer.Elapsed() << " s" << std::endl;
 
     lout << "Constructing matrix in CSR format and Jacobi scaling...";
     lout.flush();
