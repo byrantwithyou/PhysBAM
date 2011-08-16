@@ -39,7 +39,7 @@ Multi_Linear_Interpolate(
         (STATIC_MULTI_INDEX_CUBE<D,0,1>())
     ) {
         const MULTI_INDEX_TYPE coarse_multi_index = base_coarse_multi_index + coarse_multi_offset;
-        const int unscaled_weight = ((1 - coarse_multi_offset) * (FINE_FACTOR - fine_multi_offset) + coarse_multi_offset * fine_multi_index).Product();
+        const int unscaled_weight = ((1 - coarse_multi_offset) * (FINE_FACTOR - fine_multi_offset) + coarse_multi_offset * fine_multi_offset).Product();
         result += unscaled_weight * f_of_index(coarse_multi_index);
     }
     return result / STATIC_POW_C< FINE_FACTOR, D >::value;

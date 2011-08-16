@@ -10,6 +10,7 @@
 #include <boost/config.hpp>
 
 #include <Jeffrey_Utilities/VECTOR_OPS.h>
+#include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 namespace PhysBAM
@@ -44,6 +45,14 @@ Multi_Index_X(
     const T_MULTI_INDEX_BOX& multi_index_box,
     const int linear_index)
 { return Multi_Index_X(min_x, max_x, multi_index_box, multi_index_box.Multi_Index(linear_index)); }
+
+template< class T, int D, class T_MULTI_INDEX_BOX, class T_INDEX >
+inline VECTOR<T,D>
+Multi_Index_X(
+    const RANGE< VECTOR<T,D> >& min_max_x,
+    const T_MULTI_INDEX_BOX& multi_index_box,
+    const T_INDEX& index)
+{ return Multi_Index_X(min_max_x.min_corner, min_max_x.max_corner, multi_index_box, index); }
 
 } // namespace PhysBAM
 

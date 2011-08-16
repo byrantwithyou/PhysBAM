@@ -306,13 +306,14 @@ First_Order_Time_Step(int substep,T dt)
     slip.two_phase=example.two_phase;
     //slip.Solve(fluid_collection.incompressible_fluid_collection.face_velocities,dt,time,time+dt,false,false);
     {
-        const TV dx = fluids_parameters.grid->dX;
-        const TV min_x = fluids_parameters.grid->domain.min_corner + dx/2;
-        const TV max_x = fluids_parameters.grid->domain.max_corner - dx/2;
+        const GRID<TV> mac_grid = *fluids_parameters.grid;
+        const TV dx = mac_grid.dX;
+        const MULTI_INDEX_BOUND< TV::dimension > mac_cell_multi_index_bound(mac_grid.numbers_of_cells);
+        const TV min_x = mac_grid.domain.min_corner + dx / 2;
+        const TV max_x = mac_grid.domain.max_corner - dx / 2;
         const T sigma = fluids_parameters.surface_tension;
         const T rho_negative = fluids_parameters.density;
         const T rho_positive = fluids_parameters.outside_density;
-        const MULTI_INDEX_BOUND< TV::dimension > mac_cell_multi_index_bound(fluids_parameters.grid->numbers_of_cells);
         typedef typename LEVELSET_POLICY< GRID<TV> >::LEVELSET LEVEL_SET_TYPE;
         Chorin_Project(
             1, // n_thread
