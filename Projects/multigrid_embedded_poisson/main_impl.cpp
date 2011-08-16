@@ -74,9 +74,10 @@ int main_impl(int argc, char* argv[])
         int petsc_argc = 0;
         char** petsc_argv = 0;
         PHYSBAM_PETSC_CALL_AND_CHKERRQ( PetscInitialize(&petsc_argc, &petsc_argv, PETSC_NULL, PETSC_NULL) );
-        std::cout << timer.Elapsed() << " s" << std::endl;
     }
     PHYSBAM_PETSC_SCOPED_FINALIZE_IF( use_petsc );
+    if(use_petsc)
+        std::cout << timer.Elapsed() << " s" << std::endl;
 #endif // #ifndef PHYSBAM_NO_PETSC
 
     std::cout << "Initializing random number generator with seed "
