@@ -56,7 +56,11 @@
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_POLICY_UNIFORM.h>
 #include "Chorin_Project.h"
 
-namespace PhysBAM{namespace Two_Phase_Flow_2D_Test{
+namespace PhysBAM{
+
+template const int& HASHTABLE<int,int>::Get(const int&) const;
+
+namespace Two_Phase_Flow_2D_Test{
 //#####################################################################
 // Constructor
 //#####################################################################
@@ -686,7 +690,7 @@ Extrapolate_Velocity_Across_Interface(ARRAY<T,FACE_INDEX<TV::m> >& face_velociti
 //#####################################################################
 //template class PLS_FSI_DRIVER<VECTOR<float,1> >;
 template class PLS_FSI_DRIVER<VECTOR<float,2> >;
-template class PLS_FSI_DRIVER<VECTOR<float,3> >;
+//template class PLS_FSI_DRIVER<VECTOR<float,3> >;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 //template class PLS_FSI_DRIVER<VECTOR<double,1> >;
 template class PLS_FSI_DRIVER<VECTOR<double,2> >;

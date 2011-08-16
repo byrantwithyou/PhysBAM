@@ -3,26 +3,45 @@
 import os
 Import('env Automatic_Program')
 
-if 'PETSC_DIR' in os.environ:
-    env.Append( CPPPATH = [
-        os.environ['PETSC_DIR'] + '/include',
-        os.environ['PETSC_DIR'] + '/' + os.environ['PETSC_ARCH'] + '/include',
-        os.environ['PETSC_DIR'] + '/include/mpiuni'
-    ] )
+if 'BOOST_ROOT' in os.environ:
+
+    env = env.Copy()
     env.Append( LIBPATH = [
-        os.environ['PETSC_DIR'] + '/' + os.environ['PETSC_ARCH'] + '/lib'
+        os.environ['BOOST_ROOT'] + '/lib'
+    ] )
+    env.Append( RPATH = [
+        os.environ['BOOST_ROOT'] + '/lib'
     ] )
     env.Append( LIBS = [
-        'petsc'
-    ] )
-else:
-    env.Append( CPPDEFINES = [
-        'PHYSBAM_NO_PETSC'
+        'boost_thread',
+        'X11', 'lapack', 'blas'
     ] )
 
-Automatic_Program( env, "two_phase_flow_2d_test", [
-    "main.cpp",
-    "PLS_FSI_DRIVER.cpp",
-    "PLS_FSI_EXAMPLE.cpp",
-    "SURFACE_TENSION.cpp"
-] )
+    sources = [
+        'main.cpp',
+        'PLS_FSI_DRIVER.cpp',
+        'PLS_FSI_EXAMPLE.cpp',
+        'SURFACE_TENSION.cpp'
+    ]
+
+    if 'PETSC_DIR' in os.environ:
+        env.Append( CPPPATH = [
+            os.environ['PETSC_DIR'] + '/include',
+            os.environ['PETSC_DIR'] + '/' + os.environ['PETSC_ARCH'] + '/include',
+            os.environ['PETSC_DIR'] + '/include/mpiuni'
+        ] )
+        env.Append( LIBPATH = [
+            os.environ['PETSC_DIR'] + '/' + os.environ['PETSC_ARCH'] + '/lib'
+        ] )
+        env.Append( LIBS = [
+            'petsc'
+        ] )
+        sources.extend( [
+            '../multigrid_embedded_poisson/Petsc/Solve_SPD_System_With_ICC_PCG.cpp'
+        ] )
+    else:
+        env.Append( CPPDEFINES = [
+            'PHYSBAM_NO_PETSC'
+        ] )
+
+    Automatic_Program( env, "two_phase_flow_2d_test", sources )

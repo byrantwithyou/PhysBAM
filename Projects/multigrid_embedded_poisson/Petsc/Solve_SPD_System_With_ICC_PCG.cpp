@@ -4,9 +4,6 @@
 // license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_3D_V2_PETSC_SOLVE_SPD_SYSTEM_WITH_ICC_PCG_IPP
-#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_3D_V2_PETSC_SOLVE_SPD_SYSTEM_WITH_ICC_PCG_IPP
-
 #include <cassert>
 #include <cmath>
 
@@ -36,6 +33,7 @@
 
 #include "Add_Stencil_To_Matrix.h"
 #include "Print_KSP_Info.h"
+#include "SYSTEM_REFERENCE.h"
 
 #include "Solve_SPD_System_With_ICC_PCG.h"
 
@@ -51,17 +49,18 @@ namespace Petsc
 namespace Detail_Solve_SPD_System_With_ICC_PCG
 {
 
-template< class T_SYSTEM >
+template< class T >
 struct INDEX_HAS_NONZERO_STENCIL;
 struct SET_PETSC_INDEX_OF_LINEAR_INDEX;
 
 } // namespace Detail_Solve_SPD_System_With_ICC_PCG
 
-template< class T, int D, class T_SYSTEM >
+template< class T >
 PetscErrorCode
 Solve_SPD_System_With_ICC_PCG(
     const unsigned int n_thread,
-    const T_SYSTEM& system, const ARRAY_VIEW<const T> rhs,
+    const SYSTEM_REFERENCE<T> system,
+    const ARRAY_VIEW<const T> rhs,
     const bool has_constant_vectors_in_null_space,
     unsigned int max_iterations,
     const float relative_tolerance,
@@ -70,7 +69,7 @@ Solve_SPD_System_With_ICC_PCG(
     const bool precondition,
     ARRAY_VIEW<T> u_approx)
 {
-    typedef Detail_Solve_SPD_System_With_ICC_PCG::INDEX_HAS_NONZERO_STENCIL< T_SYSTEM > INDEX_HAS_NONZERO_STENCIL_;
+    typedef Detail_Solve_SPD_System_With_ICC_PCG::INDEX_HAS_NONZERO_STENCIL<T> INDEX_HAS_NONZERO_STENCIL_;
     typedef Detail_Solve_SPD_System_With_ICC_PCG::SET_PETSC_INDEX_OF_LINEAR_INDEX SET_PETSC_INDEX_OF_LINEAR_INDEX_;
 
     const int n_physbam_index = rhs.Size();
@@ -317,11 +316,12 @@ Solve_SPD_System_With_ICC_PCG(
 namespace Detail_Solve_SPD_System_With_ICC_PCG
 {
 
-template< class T_SYSTEM >
+template< class T >
 struct INDEX_HAS_NONZERO_STENCIL
 {
     PHYSBAM_DIRECT_INIT_CTOR_DECLARE_PRIVATE_MEMBERS(
-        INDEX_HAS_NONZERO_STENCIL, (( typename T_SYSTEM const &, system ))
+        INDEX_HAS_NONZERO_STENCIL,
+        (( typename SYSTEM_REFERENCE<T> const, system ))
     )
 public:
     typedef bool result_type;
@@ -348,10 +348,26 @@ public:
 
 } // namespace Detail_Solve_SPD_System_With_ICC_PCG
 
+#define EXPLICIT_INSTANTIATION( T ) \
+template \
+PetscErrorCode \
+Solve_SPD_System_With_ICC_PCG<T>( \
+    const unsigned int n_thread, \
+    const SYSTEM_REFERENCE<T> system, \
+    const ARRAY_VIEW<const T> rhs, \
+    const bool has_constant_vectors_in_null_space, \
+    unsigned int max_iterations, \
+    const float relative_tolerance, \
+    const float absolute_tolerance, \
+    const bool print_residuals, \
+    const bool precondition, \
+    ARRAY_VIEW<T> u_approx);
+EXPLICIT_INSTANTIATION( float )
+EXPLICIT_INSTANTIATION( double )
+#undef EXPLICIT_INSTANTIATION
+
 } // namespace Petsc
 
 } // namespace Multigrid_Embedded_Poisson
 
 } // namespace PhysBAM
-
-#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_3D_V2_PETSC_SOLVE_SPD_SYSTEM_WITH_ICC_PCG_IPP

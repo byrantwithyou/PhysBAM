@@ -18,24 +18,7 @@ if 'BOOST_ROOT' in os.environ:
         'X11', 'lapack', 'blas'
     ] )
 
-    if 'PETSC_DIR' in os.environ:
-        env.Append( CPPPATH = [
-            os.environ['PETSC_DIR'] + '/include',
-            os.environ['PETSC_DIR'] + '/' + os.environ['PETSC_ARCH'] + '/include',
-            os.environ['PETSC_DIR'] + '/include/mpiuni'
-        ] )
-        env.Append( LIBPATH = [
-            os.environ['PETSC_DIR'] + '/' + os.environ['PETSC_ARCH'] + '/lib'
-        ] )
-        env.Append( LIBS = [
-            'petsc'
-        ] )
-    else:
-        env.Append( CPPDEFINES = [
-            'PHYSBAM_NO_PETSC'
-        ] )
-
-    Automatic_Program( env, 'multigrid_embedded_poisson', [
+    sources = [
         'Build_And_Solve_Dirichlet_System.cpp',
         'Build_And_Solve_Interface_System.cpp',
         'Build_And_Solve_Neumann_System.cpp',
@@ -58,5 +41,27 @@ if 'BOOST_ROOT' in os.environ:
         'Parsing/Parse_String_Level_Set.cpp',
         'Parsing/Parse_String_N_Cell.cpp',
         'Parsing/Parse_String_Solver.cpp',
-        'Parsing/Print_Help.cpp',
-    ] )
+        'Parsing/Print_Help.cpp'
+    ]
+
+    if 'PETSC_DIR' in os.environ:
+        env.Append( CPPPATH = [
+            os.environ['PETSC_DIR'] + '/include',
+            os.environ['PETSC_DIR'] + '/' + os.environ['PETSC_ARCH'] + '/include',
+            os.environ['PETSC_DIR'] + '/include/mpiuni'
+        ] )
+        env.Append( LIBPATH = [
+            os.environ['PETSC_DIR'] + '/' + os.environ['PETSC_ARCH'] + '/lib'
+        ] )
+        env.Append( LIBS = [
+            'petsc'
+        ] )
+        sources.extend( [
+            'Petsc/Solve_SPD_System_With_ICC_PCG.cpp'
+        ] )
+    else:
+        env.Append( CPPDEFINES = [
+            'PHYSBAM_NO_PETSC'
+        ] )
+
+    Automatic_Program( env, 'multigrid_embedded_poisson', sources )

@@ -9,7 +9,9 @@
 
 #include <petsc.h>
 
-#include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
+#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
+
+#include "SYSTEM_REFERENCE.h"
 
 namespace PhysBAM
 {
@@ -20,11 +22,12 @@ namespace Multigrid_Embedded_Poisson
 namespace Petsc
 {
 
-template< class T, int D, class T_SYSTEM >
+template< class T >
 PetscErrorCode
 Solve_SPD_System_With_ICC_PCG(
     const unsigned int n_thread,
-    const T_SYSTEM& system, const ARRAY_VIEW<const T> rhs,
+    const SYSTEM_REFERENCE<T> system,
+    const ARRAY_VIEW<const T> rhs,
     const bool has_constant_vectors_in_null_space,
     unsigned int max_iterations,
     const float relative_tolerance,

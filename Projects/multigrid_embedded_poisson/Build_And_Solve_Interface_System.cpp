@@ -60,7 +60,7 @@
 #ifndef PHYSBAM_NO_PETSC
 #include <Jeffrey_Utilities/Petsc/CALL_AND_CHKERRQ.h>
 #include "Petsc/Solve_SPD_System_With_ICC_PCG.h"
-#include "Petsc/Solve_SPD_System_With_ICC_PCG.ipp"
+#include "Petsc/SYSTEM_REFERENCE.h"
 #include <petsc.h>
 #endif // #ifndef PHYSBAM_NO_PETSC
 
@@ -516,16 +516,17 @@ int Build_And_Solve_Interface_System(
                 std::cout << "Solving with PETSc CG solver..." << std::endl;
                 timer.Restart();
                 PHYSBAM_PETSC_CALL_AND_CHKERRQ((
-                    Petsc::Solve_SPD_System_With_ICC_PCG<T,D>(
+                    Petsc::Solve_SPD_System_With_ICC_PCG(
                         main_params.general.n_thread,
-                        ztaz_system, ztaz_system_rhs,
+                        Petsc::SYSTEM_REFERENCE<T>(ztaz_system),
+                        As_Const_Array_View(ztaz_system_rhs),
                         false, // has_constant_vectors_in_null_space
                         main_params.solver.max_iterations,
                         main_params.solver.relative_tolerance,
                         main_params.solver.absolute_tolerance,
                         main_params.solver.print_residuals,
                         main_params.solver.precondition,
-                        u_approx
+                        As_Array_View(u_approx)
                     )
                 ));
                 std::cout << "[Solving with PETSc CG solver...] " << timer.Elapsed() << " s" << std::endl;

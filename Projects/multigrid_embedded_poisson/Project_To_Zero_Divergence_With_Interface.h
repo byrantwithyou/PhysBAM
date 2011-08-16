@@ -47,6 +47,7 @@
 #ifndef PHYSBAM_NO_PETSC
 #include <Jeffrey_Utilities/Petsc/CALL_AND_CHKERRQ.h>
 #include "Petsc/Solve_SPD_System_With_ICC_PCG.h"
+#include "Petsc/SYSTEM_REFERENCE.h"
 #include <petsc.h>
 #endif // #ifndef PHYSBAM_NO_PETSC
 
@@ -283,16 +284,17 @@ int Project_To_Zero_Divergence_With_Interface(
 #ifdef PHYSBAM_NO_PETSC
 #else // #ifdef PHYSBAM_NO_PETSC
     PHYSBAM_PETSC_CALL_AND_CHKERRQ((
-        Petsc::Solve_SPD_System_With_ICC_PCG<T,D>(
+        Petsc::Solve_SPD_System_With_ICC_PCG<T>(
             n_thread,
-            ztaz_system, ztaz_system_rhs,
+            Petsc::SYSTEM_REFERENCE<T>(ztaz_system),
+            As_Const_Array_View(ztaz_system_rhs),
             true,                                       // has_constant_vectors_in_null_space
             std::numeric_limits< unsigned int >::max(), // max_iterations
             1e-8f,                                      // relative_tolerance
             std::numeric_limits< float >::min(),        // absolute_tolerance
             false,                                      // print_residuals
             true,                                       // precondition
-            p
+            As_Array_View(p)
         )
     ));
 #endif // #ifdef PHYSBAM_NO_PETSC
