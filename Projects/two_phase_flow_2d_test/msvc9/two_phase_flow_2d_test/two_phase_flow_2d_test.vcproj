@@ -62,9 +62,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="PhysBAM_Tools.lib PhysBAM_Geometry.lib PhysBAM_Solids.lib PhysBAM_Fluids.lib PhysBAM_Dynamics.lib"
+				AdditionalDependencies="Jeffrey_Utilities.lib PhysBAM_Tools.lib PhysBAM_Geometry.lib PhysBAM_Solids.lib PhysBAM_Fluids.lib PhysBAM_Dynamics.lib"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;../../../../Public_Library/PhysBAM_Tools/msvc9/PhysBAM_Tools/$(ConfigurationName)&quot;;&quot;../../../../Public_Library/PhysBAM_Geometry/msvc9/PhysBAM_Geometry/$(ConfigurationName)&quot;;&quot;../../../../Public_Library/PhysBAM_Solids/msvc9/PhysBAM_Solids/$(ConfigurationName)&quot;;&quot;../../../../Public_Library/PhysBAM_Fluids/msvc9/PhysBAM_Fluids/$(ConfigurationName)&quot;;&quot;../../../../Public_Library/PhysBAM_Dynamics/msvc9/PhysBAM_Dynamics/$(ConfigurationName)&quot;"
+				AdditionalLibraryDirectories="&quot;$(BOOST_ROOT)/lib&quot;;&quot;../../../../Public_Library/Jeffrey_Utilities/msvc9/Jeffrey_Utilities/$(ConfigurationName)&quot;;&quot;../../../../Public_Library/PhysBAM_Tools/msvc9/PhysBAM_Tools/$(ConfigurationName)&quot;;&quot;../../../../Public_Library/PhysBAM_Geometry/msvc9/PhysBAM_Geometry/$(ConfigurationName)&quot;;&quot;../../../../Public_Library/PhysBAM_Solids/msvc9/PhysBAM_Solids/$(ConfigurationName)&quot;;&quot;../../../../Public_Library/PhysBAM_Fluids/msvc9/PhysBAM_Fluids/$(ConfigurationName)&quot;;&quot;../../../../Public_Library/PhysBAM_Dynamics/msvc9/PhysBAM_Dynamics/$(ConfigurationName)&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"
@@ -138,9 +138,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="PhysBAM_Tools.lib PhysBAM_Geometry.lib PhysBAM_Solids.lib PhysBAM_Fluids.lib PhysBAM_Dynamics.lib"
+				AdditionalDependencies="Jeffrey_Utilities.lib PhysBAM_Tools.lib PhysBAM_Geometry.lib PhysBAM_Solids.lib PhysBAM_Fluids.lib PhysBAM_Dynamics.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;../../../../Public_Library/PhysBAM_Tools/msvc9/PhysBAM_Tools/$(ConfigurationName)&quot;;&quot;../../../../Public_Library/PhysBAM_Geometry/msvc9/PhysBAM_Geometry/$(ConfigurationName)&quot;;&quot;../../../../Public_Library/PhysBAM_Solids/msvc9/PhysBAM_Solids/$(ConfigurationName)&quot;;&quot;../../../../Public_Library/PhysBAM_Fluids/msvc9/PhysBAM_Fluids/$(ConfigurationName)&quot;;&quot;../../../../Public_Library/PhysBAM_Dynamics/msvc9/PhysBAM_Dynamics/$(ConfigurationName)&quot;"
+				AdditionalLibraryDirectories="&quot;$(BOOST_ROOT)/lib&quot;;&quot;../../../../Public_Library/Jeffrey_Utilities/msvc9/Jeffrey_Utilities/$(ConfigurationName)&quot;;&quot;../../../../Public_Library/PhysBAM_Tools/msvc9/PhysBAM_Tools/$(ConfigurationName)&quot;;&quot;../../../../Public_Library/PhysBAM_Geometry/msvc9/PhysBAM_Geometry/$(ConfigurationName)&quot;;&quot;../../../../Public_Library/PhysBAM_Solids/msvc9/PhysBAM_Solids/$(ConfigurationName)&quot;;&quot;../../../../Public_Library/PhysBAM_Fluids/msvc9/PhysBAM_Fluids/$(ConfigurationName)&quot;;&quot;../../../../Public_Library/PhysBAM_Dynamics/msvc9/PhysBAM_Dynamics/$(ConfigurationName)&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"
