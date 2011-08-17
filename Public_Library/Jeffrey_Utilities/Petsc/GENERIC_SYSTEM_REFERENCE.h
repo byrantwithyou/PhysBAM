@@ -37,8 +37,8 @@ struct GENERIC_SYSTEM_REFERENCE
 private:
     struct DISPATCHER;
     template< class T_SYSTEM > struct ACCESSOR;
-    const void* const p_system;
-    const DISPATCHER* const p_dispatcher;
+    const void* const mp_system;
+    const DISPATCHER& m_dispatcher;
 };
 
 //#####################################################################
@@ -49,27 +49,27 @@ template< class T_SYSTEM >
 inline
 GENERIC_SYSTEM_REFERENCE<T>::
 GENERIC_SYSTEM_REFERENCE(const T_SYSTEM& system)
-    : p_system(&system),
-      p_dispatcher(ACCESSOR< T_SYSTEM >::Dispatcher())
+    : mp_system(&system),
+      m_dispatcher(ACCESSOR< T_SYSTEM >::Dispatcher())
 { }
 
 template< class T >
 inline T
 GENERIC_SYSTEM_REFERENCE<T>::
 Diag(const int index) const
-{ return (*p_dispatcher->Diag)(p_system, index); }
+{ return (*m_dispatcher.Diag)(mp_system, index); }
 
 template< class T >
 inline int
 GENERIC_SYSTEM_REFERENCE<T>::
 Stencil_N_Nonzero(const int index) const
-{ return (*p_dispatcher->Stencil_N_Nonzero)(p_system, index); }
+{ return (*m_dispatcher.Stencil_N_Nonzero)(mp_system, index); }
 
 template< class T >
 inline void
 GENERIC_SYSTEM_REFERENCE<T>::
 Add_Stencil_To(const int index, const ADD_STENCIL_TO_STENCIL_PROXY_TYPE& stencil_proxy) const
-{ (*p_dispatcher->Add_Stencil_To)(p_system, index, stencil_proxy); }
+{ (*m_dispatcher.Add_Stencil_To)(mp_system, index, stencil_proxy); }
 
 template< class T >
 struct GENERIC_SYSTEM_REFERENCE<T>::DISPATCHER
@@ -83,14 +83,14 @@ template< class T >
 template< class T_SYSTEM >
 struct GENERIC_SYSTEM_REFERENCE<T>::ACCESSOR
 {
-    static const DISPATCHER* Dispatcher()
+    static const DISPATCHER& Dispatcher()
     {
         static const DISPATCHER dispatcher = {
             &Diag,
             &Stencil_N_Nonzero,
             &Add_Stencil_To
         };
-        return &dispatcher;
+        return dispatcher;
     }
 
     static T Diag(const void* const p_system, const int index)
