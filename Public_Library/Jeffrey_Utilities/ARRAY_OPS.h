@@ -10,11 +10,13 @@
 
 #include <cassert>
 
+#include <algorithm>
 #include <vector>
 
 #include <Jeffrey_Utilities/PROPAGATE_CONST.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
+#include <PhysBAM_Tools/Arrays_Computations/ARRAY_COPY.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_FORWARD.h>
 
 namespace PhysBAM
@@ -181,6 +183,25 @@ At1(const std::vector< T, T_ALLOCATOR >& v, const T_INDEX index)
     typedef typename std::vector< T, T_ALLOCATOR >::size_type size_type;
     return v[static_cast< size_type >(index - 1)];
 }
+
+//#####################################################################
+// Fill(T_ARRAY& a, const U& x) -> void
+//#####################################################################
+
+template< class T, class T_DERIVED, class T_ID, class U >
+inline void
+Fill(ARRAY_BASE< T, T_DERIVED, T_ID >& a, const U& x)
+{ ARRAYS_COMPUTATIONS::Fill(a, x); }
+
+template< class T, class T_DERIVED, class U >
+inline void
+Fill(VECTOR_BASE< T, T_DERIVED >& v, const U& x)
+{ static_cast< T_DERIVED& >(v).Fill(x); }
+
+template< class T, class T_ALLOCATOR, class U >
+inline void
+Fill(std::vector< T, T_ALLOCATOR >& v, const U& x)
+{ std::fill(v.begin(), v.end(), x); }
 
 //#####################################################################
 // Resize(T_ARRAY& a, ... new_size) -> void

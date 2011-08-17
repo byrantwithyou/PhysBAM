@@ -38,7 +38,15 @@ struct VISITOR_SEQUENCE
 
     void operator()() const;
     template< class T1 >
+    void operator()(T1& x1) const;
+    template< class T1 >
     void operator()(const T1& x1) const;
+    template< class T1, class T2 >
+    void operator()(T1& x1, T2& x2) const;
+    template< class T1, class T2 >
+    void operator()(T1& x1, const T2& x2) const;
+    template< class T1, class T2 >
+    void operator()(const T1& x1, T2& x2) const;
     template< class T1, class T2 >
     void operator()(const T1& x1, const T2& x2) const;
     template< class T1, class T2, class T3 >
@@ -171,10 +179,50 @@ template< class T_SEQUENCE >
 template< class T1 >
 inline void
 VISITOR_SEQUENCE< T_SEQUENCE >::
+operator()(T1& x1) const
+{
+    typedef Detail_VISITOR_SEQUENCE::VISIT_FUNCTION< T1& > VISIT_FUNCTION_;
+    boost::fusion::for_each(m_visitors, VISIT_FUNCTION_(x1));
+}
+
+template< class T_SEQUENCE >
+template< class T1 >
+inline void
+VISITOR_SEQUENCE< T_SEQUENCE >::
 operator()(const T1& x1) const
 {
     typedef Detail_VISITOR_SEQUENCE::VISIT_FUNCTION< const T1& > VISIT_FUNCTION_;
     boost::fusion::for_each(m_visitors, VISIT_FUNCTION_(x1));
+}
+
+template< class T_SEQUENCE >
+template< class T1, class T2 >
+inline void
+VISITOR_SEQUENCE< T_SEQUENCE >::
+operator()(T1& x1, T2& x2) const
+{
+    typedef Detail_VISITOR_SEQUENCE::VISIT_FUNCTION< T1&, T2& > VISIT_FUNCTION_;
+    boost::fusion::for_each(m_visitors, VISIT_FUNCTION_(x1, x2));
+}
+
+template< class T_SEQUENCE >
+template< class T1, class T2 >
+inline void
+VISITOR_SEQUENCE< T_SEQUENCE >::
+operator()(T1& x1, const T2& x2) const
+{
+    typedef Detail_VISITOR_SEQUENCE::VISIT_FUNCTION< T1&, const T2& > VISIT_FUNCTION_;
+    boost::fusion::for_each(m_visitors, VISIT_FUNCTION_(x1, x2));
+}
+
+template< class T_SEQUENCE >
+template< class T1, class T2 >
+inline void
+VISITOR_SEQUENCE< T_SEQUENCE >::
+operator()(const T1& x1, T2& x2) const
+{
+    typedef Detail_VISITOR_SEQUENCE::VISIT_FUNCTION< const T1&, T2& > VISIT_FUNCTION_;
+    boost::fusion::for_each(m_visitors, VISIT_FUNCTION_(x1, x2));
 }
 
 template< class T_SEQUENCE >

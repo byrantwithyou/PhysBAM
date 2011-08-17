@@ -10,6 +10,10 @@
 #ifndef PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_FUNCTIONAL_COMPOSE_FUNCTION_HPP
 #define PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_FUNCTIONAL_COMPOSE_FUNCTION_HPP
 
+#include <boost/function_types/function_type.hpp>
+#include <boost/function_types/parameter_types.hpp>
+#include <boost/mpl/joint_view.hpp>
+#include <boost/mpl/single_view.hpp>
 #include <boost/preprocessor/arithmetic/dec.hpp>
 #include <boost/preprocessor/cat.hpp>
 #include <boost/preprocessor/facilities/intercept.hpp>
@@ -39,23 +43,49 @@ struct COMPOSE_FUNCTION
     )
 public:
 
-    template<class> struct result;
-    template< class T_THIS, class T >
-    struct result< T_THIS ( T ) >
+    template< class T_SIGNATURE >
+    struct result
         : RESULT_OF< const T_F (
-              typename RESULT_OF< const T_G ( T ) >::type
+              typename RESULT_OF<
+                  typename boost::function_types::function_type<
+                      boost::mpl::joint_view<
+                          boost::mpl::single_view< const T_G >,
+                          typename boost::function_types::parameter_types< T_SIGNATURE >::type
+                      >
+                  >::type
+              >::type
           ) >
     { };
 
-    template< class T >
-    typename result< COMPOSE_FUNCTION ( const T& ) >::type
-    operator()(const T& x) const
-    { return f(g(x)); }
+    template< class T1 >
+    typename result< const COMPOSE_FUNCTION ( T1& ) >::type
+    operator()(T1& x1) const
+    { return f(g(x1)); }
 
-    template< class T >
-    typename result< COMPOSE_FUNCTION ( T& ) >::type
-    operator()(T& x) const
-    { return f(g(x)); }
+    template< class T1 >
+    typename result< const COMPOSE_FUNCTION ( const T1& ) >::type
+    operator()(const T1& x1) const
+    { return f(g(x1)); }
+
+    template< class T1, class T2 >
+    typename result< const COMPOSE_FUNCTION ( T1&, T2& ) >::type
+    operator()(T1& x1, T2& x2) const
+    { return f(g(x1, x2)); }
+
+    template< class T1, class T2 >
+    typename result< const COMPOSE_FUNCTION ( T1&, const T2& ) >::type
+    operator()(T1& x1, const T2& x2) const
+    { return f(g(x1, x2)); }
+
+    template< class T1, class T2 >
+    typename result< const COMPOSE_FUNCTION ( const T1&, T2& ) >::type
+    operator()(const T1& x1, T2& x2) const
+    { return f(g(x1, x2)); }
+
+    template< class T1, class T2 >
+    typename result< const COMPOSE_FUNCTION ( const T1&, const T2& ) >::type
+    operator()(const T1& x1, const T2& x2) const
+    { return f(g(x1, x2)); }
 };
 
 template< class T_F, class T_G1, class T_G2 >
@@ -86,17 +116,32 @@ public:
     { };
 
     template< class T >
-    typename result< COMPOSE2_FUNCTION ( const T& ) >::type
-    operator()(const T& x) const
+    typename result< const COMPOSE2_FUNCTION ( T& ) >::type
+    operator()(T& x) const
     { return f(g1(x), g2(x)); }
 
     template< class T >
-    typename result< COMPOSE2_FUNCTION ( T& ) >::type
-    operator()(T& x) const
-    { return f(g(x)); }
+    typename result< const COMPOSE2_FUNCTION ( const T& ) >::type
+    operator()(const T& x) const
+    { return f(g1(x), g2(x)); }
 
     template< class T1, class T2 >
-    typename result< COMPOSE2_FUNCTION ( const T1&, const T2& ) >::type
+    typename result< const COMPOSE2_FUNCTION ( T1&, T2& ) >::type
+    operator()(T1& x1, T2& x2) const
+    { return f(g1(x1), g2(x2)); }
+
+    template< class T1, class T2 >
+    typename result< const COMPOSE2_FUNCTION ( T1&, const T2& ) >::type
+    operator()(T1& x1, const T2& x2) const
+    { return f(g1(x1), g2(x2)); }
+
+    template< class T1, class T2 >
+    typename result< const COMPOSE2_FUNCTION ( const T1&, T2& ) >::type
+    operator()(const T1& x1, T2& x2) const
+    { return f(g1(x1), g2(x2)); }
+
+    template< class T1, class T2 >
+    typename result< const COMPOSE2_FUNCTION ( const T1&, const T2& ) >::type
     operator()(const T1& x1, const T2& x2) const
     { return f(g1(x1), g2(x2)); }
 };

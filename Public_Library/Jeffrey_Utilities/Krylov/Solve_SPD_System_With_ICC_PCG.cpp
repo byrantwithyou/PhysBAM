@@ -11,7 +11,10 @@
 #include <limits>
 
 #include <Jeffrey_Utilities/ARRAY_OPS.h>
+#include <Jeffrey_Utilities/Functional/ARGUMENT_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/BOUND_FAST_MEM_FN.h>
+#include <Jeffrey_Utilities/Functional/COMPOSE_FUNCTION.h>
+#include <Jeffrey_Utilities/Functional/FILL_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/NULL_FUNCTION.h>
 #include <Jeffrey_Utilities/GENERIC_SYSTEM_REFERENCE.h>
 #include <Jeffrey_Utilities/Krylov/DOT_PRODUCT_INNER_PRODUCT.h>
@@ -20,6 +23,7 @@
 #include <Jeffrey_Utilities/Krylov/KRYLOV_VECTOR_WRAPPER_ARRAY_VIEW.h>
 #include <Jeffrey_Utilities/Krylov/MAXIMUM_MAGNITUDE_CONVERGENCE_NORM.h>
 #include <Jeffrey_Utilities/SOLVER_PARAMS.h>
+#include <Jeffrey_Utilities/VISITOR_SEQUENCE.h>
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 #include <PhysBAM_Tools/Arrays_Computations/MAGNITUDE.h>
@@ -54,9 +58,8 @@ Solve_SPD_System_With_ICC_PCG(
     ARRAY<T> k(n_index); // init'ed to 0
     ARRAY<T> z(n_index); // init'ed to 0
     system.Apply(x, q);
-    q -= rhs;
-    const float initial_residual = static_cast< float >(ARRAYS_COMPUTATIONS::Maximum_Magnitude(q));
-    const float tolerance = std::max(params.relative_tolerance * initial_residual, params.absolute_tolerance);
+    const float initial_residual_norm = static_cast< float >(ARRAYS_COMPUTATIONS::Maximum_Magnitude(q -= rhs));
+    const float tolerance = std::max(params.relative_tolerance * initial_residual_norm, params.absolute_tolerance);
     const int max_iterations =
         params.max_iterations == std::numeric_limits< unsigned int >::max()
      && n_index <= std::numeric_limits< int >::max() / 4
@@ -68,7 +71,11 @@ Solve_SPD_System_With_ICC_PCG(
     typedef KRYLOV_VECTOR_WRAPPER< T, ARRAY_VIEW<T> > KRYLOV_VECTOR_TYPE;
     cg.Solve(
         Make_Krylov_System_Composer< T, KRYLOV_VECTOR_TYPE >(
-            PHYSBAM_BOUND_FAST_MEM_FN( system, &GENERIC_SYSTEM_REFERENCE<T>::Apply ),
+            Make_Visitor_Sequence(
+                // zero result before GENERIC_SYSTEM_REFERENCE<T>::Apply
+                Make_Compose_Function(FILL1_FUNCTION<T>(0), ARGUMENT_FUNCTION<2>()),
+                PHYSBAM_BOUND_FAST_MEM_FN( system, &GENERIC_SYSTEM_REFERENCE<T>::Apply )
+            ),
             DOT_PRODUCT_INNER_PRODUCT(),
             MAXIMUM_MAGNITUDE_CONVERGENCE_NORM<T>(),
             NULL_FUNCTION(), // project
