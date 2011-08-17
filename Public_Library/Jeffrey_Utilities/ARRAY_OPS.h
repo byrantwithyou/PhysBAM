@@ -8,11 +8,14 @@
 #ifndef PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_ARRAY_OPS_HPP
 #define PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_ARRAY_OPS_HPP
 
+#include <cassert>
+
 #include <vector>
 
 #include <Jeffrey_Utilities/PROPAGATE_CONST.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
+#include <PhysBAM_Tools/Vectors/VECTOR_FORWARD.h>
 
 namespace PhysBAM
 {
@@ -31,6 +34,47 @@ struct ARRAY_VALUE< const T_ARRAY >
 { };
 
 //#####################################################################
+// struct ARRAY_SCALAR_VALUE< T_ARRAY >
+//#####################################################################
+
+template< class T_ARRAY >
+struct ARRAY_SCALAR_VALUE
+    : ARRAY_SCALAR_VALUE< typename ARRAY_VALUE< T_ARRAY >::type >
+{ };
+
+template< class T_ARRAY >
+struct ARRAY_SCALAR_VALUE< const T_ARRAY >
+    : ARRAY_SCALAR_VALUE< T_ARRAY >
+{ };
+
+template<>
+struct ARRAY_SCALAR_VALUE< float >
+{ typedef float type; };
+
+template<>
+struct ARRAY_SCALAR_VALUE< double >
+{ typedef double type; };
+
+//#####################################################################
+// Size(const T_ARRAY& a) -> ...
+//#####################################################################
+
+template< class T, class T_DERIVED, class T_ID >
+inline T_ID
+Size(const ARRAY_BASE< T, T_DERIVED, T_ID >& a)
+{ return static_cast< const T_DERIVED& >(a).Size(); }
+
+template< class T, class T_DERIVED >
+inline int
+Size(const VECTOR_BASE< T, T_DERIVED >& v)
+{ return static_cast< const T_DERIVED& >(v).Size(); }
+
+template< class T, class T_ALLOCATOR >
+inline typename std::vector< T, T_ALLOCATOR >::size_type
+Size(const std::vector< T, T_ALLOCATOR >& v)
+{ return v.size(); }
+
+//#####################################################################
 // Front(T_ARRAY& a) -> ...
 //#####################################################################
 
@@ -43,6 +87,16 @@ template< class T, class T_DERIVED, class T_ID >
 inline const T&
 Front(const ARRAY_BASE< T, T_DERIVED, T_ID >& a)
 { return static_cast< const T_DERIVED& >(a)(1); }
+
+template< class T, class T_DERIVED >
+inline T&
+Front(VECTOR_BASE< T, T_DERIVED >& v)
+{ return static_cast< T_DERIVED& >(v)(1); }
+
+template< class T, class T_DERIVED >
+inline const T&
+Front(const VECTOR_BASE< T, T_DERIVED >& v)
+{ return static_cast< const T_DERIVED& >(v)(1); }
 
 template< class T, class T_ALLOCATOR >
 inline typename std::vector< T, T_ALLOCATOR >::reference
@@ -61,12 +115,22 @@ Front(const std::vector< T, T_ALLOCATOR >& v)
 template< class T, class T_DERIVED, class T_ID >
 inline T&
 Back(ARRAY_BASE< T, T_DERIVED, T_ID >& a)
-{ return static_cast< T_DERIVED& >(a)(static_cast< const T_DERIVED& >(a).Size()); }
+{ return static_cast< T_DERIVED& >(a).Last(); }
 
 template< class T, class T_DERIVED, class T_ID >
 inline const T&
 Back(const ARRAY_BASE< T, T_DERIVED, T_ID >& a)
-{ return static_cast< const T_DERIVED& >(a)(static_cast< const T_DERIVED& >(a).Size()); }
+{ return static_cast< const T_DERIVED& >(a).Last(); }
+
+template< class T, class T_DERIVED >
+inline T&
+Back(VECTOR_BASE< T, T_DERIVED >& v)
+{ return static_cast< T_DERIVED& >(v)(Size(v)); }
+
+template< class T, class T_DERIVED >
+inline const T&
+Back(const VECTOR_BASE< T, T_DERIVED >& v)
+{ return static_cast< const T_DERIVED& >(v)(Size(v)); }
 
 template< class T, class T_ALLOCATOR >
 inline typename std::vector< T, T_ALLOCATOR >::reference
@@ -79,18 +143,44 @@ Back(const std::vector< T, T_ALLOCATOR >& v)
 { return v.back(); }
 
 //#####################################################################
-// Size(const T_ARRAY& a) -> ...
+// At1(T_ARRAY& a, const ... index) -> ...
 //#####################################################################
 
 template< class T, class T_DERIVED, class T_ID >
-inline T_ID
-Size(const ARRAY_BASE< T, T_DERIVED, T_ID >& a)
-{ return static_cast< const T_DERIVED& >(a).Size(); }
+inline T&
+At1(ARRAY_BASE< T, T_DERIVED, T_ID >& a, const T_ID index)
+{ return static_cast< T_DERIVED& >(a)(index); }
 
-template< class T, class T_ALLOCATOR >
-inline typename std::vector< T, T_ALLOCATOR >::size_type
-Size(const std::vector< T, T_ALLOCATOR >& v)
-{ return v.size(); }
+template< class T, class T_DERIVED, class T_ID >
+inline const T&
+At1(const ARRAY_BASE< T, T_DERIVED, T_ID >& a, const T_ID index)
+{ return static_cast< const T_DERIVED& >(a)(index); }
+
+template< class T, class T_DERIVED >
+inline T&
+At1(VECTOR_BASE< T, T_DERIVED >& v, const int index)
+{ return static_cast< T_DERIVED& >(v)(index); }
+
+template< class T, class T_DERIVED >
+inline const T&
+At1(const VECTOR_BASE< T, T_DERIVED >& v, const int index)
+{ return static_cast< const T_DERIVED& >(v)(index); }
+
+template< class T, class T_ALLOCATOR, class T_INDEX >
+inline typename std::vector< T, T_ALLOCATOR >::reference
+At1(std::vector< T, T_ALLOCATOR >& v, const T_INDEX index)
+{
+    typedef typename std::vector< T, T_ALLOCATOR >::size_type size_type;
+    return v[static_cast< size_type >(index - 1)];
+}
+
+template< class T, class T_ALLOCATOR, class T_INDEX >
+inline typename std::vector< T, T_ALLOCATOR >::const_reference
+At1(const std::vector< T, T_ALLOCATOR >& v, const T_INDEX index)
+{
+    typedef typename std::vector< T, T_ALLOCATOR >::size_type size_type;
+    return v[static_cast< size_type >(index - 1)];
+}
 
 //#####################################################################
 // Resize(T_ARRAY& a, ... new_size) -> void
@@ -167,6 +257,75 @@ template< class T >
 inline ARRAY_VIEW< const T >
 Make_Const_Array_View(const int n, const T* const p)
 { return ARRAY_VIEW< const T >(n, p); }
+
+//#####################################################################
+// Scalar_Size(const T_ARRAY& a) -> ...
+//#####################################################################
+
+inline int
+Scalar_Size(float)
+{ return 1; }
+
+inline int
+Scalar_Size(double)
+{ return 1; }
+
+template< class T_ARRAY >
+inline int
+Scalar_Size(const T_ARRAY& a)
+{ return Size(a) == 0 ? 0 : Size(a) * Scalar_Size(Front(a)); }
+
+//#####################################################################
+// Scalar_At1(T_ARRAY& a, const int index) -> ...
+//#####################################################################
+
+inline float&
+Scalar_At1(float& x, const int index)
+{
+    static_cast<void>(index);
+    assert(index == 1);
+    return x;
+}
+
+inline const float&
+Scalar_At1(const float& x, const int index)
+{
+    static_cast<void>(index);
+    assert(index == 1);
+    return x;
+}
+
+inline double&
+Scalar_At1(double& x, const int index)
+{
+    static_cast<void>(index);
+    assert(index == 1);
+    return x;
+}
+
+inline const double&
+Scalar_At1(const double& x, const int index)
+{
+    static_cast<void>(index);
+    assert(index == 1);
+    return x;
+}
+
+template< class T_ARRAY >
+inline typename ARRAY_SCALAR_VALUE< T_ARRAY >::type &
+Scalar_At1(T_ARRAY& a, const int index)
+{
+    const int size = Scalar_Size(Front(a));
+    return Scalar_At1(At1(a, 1 + (index - 1) / size), 1 + (index - 1) % size);
+}
+
+template< class T_ARRAY >
+inline typename ARRAY_SCALAR_VALUE< T_ARRAY >::type const &
+Scalar_At1(const T_ARRAY& a, const int index)
+{
+    const int size = Scalar_Size(Front(a));
+    return Scalar_At1(At1(a, 1 + (index - 1) / size), 1 + (index - 1) % size);
+}
 
 } // namespace PhysBAM
 

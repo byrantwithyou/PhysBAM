@@ -18,6 +18,7 @@
 #include <Jeffrey_Utilities/Multi_Index/Multi_Index_X.h>
 #include <Jeffrey_Utilities/Multi_Index/STATIC_MULTI_INDEX_CUBE.h>
 #include <Jeffrey_Utilities/RESULT_OF.h>
+#include <Jeffrey_Utilities/SOLVER_PARAMS.h>
 #include <Jeffrey_Utilities/VECTOR_OPS.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 
@@ -75,8 +76,11 @@ void Chorin_Project(
         T_KAPPA_OF_X_OF_CELL_INDEX,
         T_MAC_VECTOR_FIELD
     > JUMP_P_OF_X_OF_CELL_INDEX_;
+    SOLVER_PARAMS solver_params;
+    solver_params.relative_tolerance = 1e-8f;
     Multigrid_Embedded_Poisson::Project_To_Zero_Divergence_With_Interface(
         n_thread,
+        solver_params,
         min_x, max_x, mac_cell_multi_index_bound,
         phi_next_of_fine_index,
         Make_Constant_Function(1/rho_negative),

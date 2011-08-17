@@ -146,6 +146,14 @@
 	</References>
 	<Files>
 		<Filter
+			Name="Krylov"
+			>
+			<File
+				RelativePath="..\..\Krylov\Solve_SPD_System_With_ICC_PCG.cpp"
+				>
+			</File>
+		</Filter>
+		<Filter
 			Name="Math"
 			>
 			<File

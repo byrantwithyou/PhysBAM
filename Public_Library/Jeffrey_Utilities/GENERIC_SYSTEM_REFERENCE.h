@@ -4,16 +4,14 @@
 // license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#ifndef PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_PETSC_GENERIC_SYSTEM_REFERENCE_HPP
-#define PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_PETSC_GENERIC_SYSTEM_REFERENCE_HPP
+#ifndef PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_GENERIC_SYSTEM_REFERENCE_HPP
+#define PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_GENERIC_SYSTEM_REFERENCE_HPP
 
 #include <Jeffrey_Utilities/Stencils/UNSTRUCTURED_STENCIL.h>
 #include <Jeffrey_Utilities/Stencils/UNSTRUCTURED_STENCIL_PROXY.h>
+#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 
 namespace PhysBAM
-{
-
-namespace Petsc
 {
 
 template< class T >
@@ -33,6 +31,8 @@ struct GENERIC_SYSTEM_REFERENCE
     void Add_Stencil_To(
         const int index,
         const ADD_STENCIL_TO_STENCIL_PROXY_TYPE& stencil_proxy) const;
+
+    void Apply(const ARRAY_VIEW<const T> x, ARRAY_VIEW<T> y) const;
 
 private:
     struct DISPATCHER;
@@ -72,11 +72,18 @@ Add_Stencil_To(const int index, const ADD_STENCIL_TO_STENCIL_PROXY_TYPE& stencil
 { (*m_dispatcher.Add_Stencil_To)(mp_system, index, stencil_proxy); }
 
 template< class T >
+inline void
+GENERIC_SYSTEM_REFERENCE<T>::
+Apply(const ARRAY_VIEW<const T> x, ARRAY_VIEW<T> y) const
+{ (*m_dispatcher.Apply)(mp_system, x, y); }
+
+template< class T >
 struct GENERIC_SYSTEM_REFERENCE<T>::DISPATCHER
 {
     T (*Diag)(const void* const, const int);
     int (*Stencil_N_Nonzero)(const void* const, const int);
     void (*Add_Stencil_To)(const void* const, const int, const ADD_STENCIL_TO_STENCIL_PROXY_TYPE&);
+    void (*Apply)(const void* const, const ARRAY_VIEW<const T>, ARRAY_VIEW<T>);
 };
 
 template< class T >
@@ -88,7 +95,8 @@ struct GENERIC_SYSTEM_REFERENCE<T>::ACCESSOR
         static const DISPATCHER dispatcher = {
             &Diag,
             &Stencil_N_Nonzero,
-            &Add_Stencil_To
+            &Add_Stencil_To,
+            &Apply
         };
         return dispatcher;
     }
@@ -99,10 +107,10 @@ struct GENERIC_SYSTEM_REFERENCE<T>::ACCESSOR
     { return static_cast< const T_SYSTEM* >(p_system)->Stencil_N_Nonzero(index); }
     static void Add_Stencil_To(const void* const p_system, const int index, const ADD_STENCIL_TO_STENCIL_PROXY_TYPE& stencil_proxy)
     { static_cast< const T_SYSTEM* >(p_system)->Add_Stencil_To(index, stencil_proxy); }
+    static void Apply(const void* const p_system, const ARRAY_VIEW<const T> x, ARRAY_VIEW<T> y)
+    { static_cast< const T_SYSTEM* >(p_system)->Apply(x, y); }
 };
-
-} // namespace Petsc
 
 } // namespace PhysBAM
 
-#endif // #ifndef PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_PETSC_GENERIC_SYSTEM_REFERENCE_HPP
+#endif // #ifndef PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_GENERIC_SYSTEM_REFERENCE_HPP

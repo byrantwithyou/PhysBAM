@@ -46,6 +46,34 @@ public:
     { return (x.*MEM_PTR)(x1); }
 };
 
+template< class T, class T_RESULT, class T1, class T2, T_RESULT (T::*MEM_PTR)( T1, T2 ) >
+struct BOUND_FAST_MEM_FN< T_RESULT (T::*)( T1, T2 ), MEM_PTR >
+{
+    PHYSBAM_DIRECT_INIT_CTOR_DECLARE_PRIVATE_MEMBERS(
+        BOUND_FAST_MEM_FN, (( typename T&, x ))
+    )
+public:
+    typedef T_RESULT result_type;
+    result_type operator()(
+        typename boost::call_traits< T1 >::param_type x1,
+        typename boost::call_traits< T2 >::param_type x2) const
+    { return (x.*MEM_PTR)(x1, x2); }
+};
+
+template< class T, class T_RESULT, class T1, class T2, T_RESULT (T::*MEM_PTR)( T1, T2 ) const >
+struct BOUND_FAST_MEM_FN< T_RESULT (T::*)( T1, T2 ) const, MEM_PTR >
+{
+    PHYSBAM_DIRECT_INIT_CTOR_DECLARE_PRIVATE_MEMBERS(
+        BOUND_FAST_MEM_FN, (( typename T const &, x ))
+    )
+public:
+    typedef T_RESULT result_type;
+    result_type operator()(
+        typename boost::call_traits< T1 >::param_type x1,
+        typename boost::call_traits< T2 >::param_type x2) const
+    { return (x.*MEM_PTR)(x1, x2); }
+};
+
 namespace Detail_BOUND_FAST_MEM_FN
 {
 

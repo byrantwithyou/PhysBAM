@@ -59,8 +59,8 @@
 
 #ifdef PHYSBAM_USE_PETSC
 #include <petsc.h>
+#include <Jeffrey_Utilities/GENERIC_SYSTEM_REFERENCE.h>
 #include <Jeffrey_Utilities/Petsc/CALL_AND_CHKERRQ.h>
-#include <Jeffrey_Utilities/Petsc/GENERIC_SYSTEM_REFERENCE.h>
 #include <Jeffrey_Utilities/Petsc/Solve_SPD_System_With_ICC_PCG.h>
 #endif // #ifdef PHYSBAM_USE_PETSC
 
@@ -514,15 +514,10 @@ int Build_And_Solve_Interface_System(
                 PHYSBAM_PETSC_CALL_AND_CHKERRQ((
                     Petsc::Solve_SPD_System_With_ICC_PCG(
                         main_params.general.n_thread,
-                        Petsc::GENERIC_SYSTEM_REFERENCE<T>(ztaz_system),
+                        main_params.solver,
+                        GENERIC_SYSTEM_REFERENCE<T>(ztaz_system),
                         As_Const_Array_View(ztaz_system_rhs),
                         false, // has_constant_vectors_in_null_space
-                        main_params.solver.precondition,
-                        main_params.solver.max_iterations,
-                        main_params.solver.relative_tolerance,
-                        main_params.solver.absolute_tolerance,
-                        true, // print_diagnostics
-                        main_params.solver.print_residuals,
                         As_Array_View(u_approx),
                         std::cout
                     )

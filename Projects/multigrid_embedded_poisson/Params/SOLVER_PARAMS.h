@@ -10,6 +10,8 @@
 #include <algorithm>
 #include <limits>
 
+#include <Jeffrey_Utilities/SOLVER_PARAMS.h>
+
 namespace PhysBAM
 {
 
@@ -17,6 +19,7 @@ namespace Multigrid_Embedded_Poisson
 {
 
 struct SOLVER_PARAMS
+    : PhysBAM::SOLVER_PARAMS
 {
     enum SOLVER_ID
     {
@@ -28,12 +31,6 @@ struct SOLVER_PARAMS
         SOLVER_ID_MG,
         SOLVER_ID_MGPCG
     } solver_id;
-
-    unsigned int max_iterations;
-    float relative_tolerance;
-    float absolute_tolerance;
-    bool print_residuals;
-    bool precondition;
 
     struct MULTIGRID_PARAMS
     {
@@ -91,13 +88,8 @@ struct SOLVER_PARAMS
     } multigrid;
 
     SOLVER_PARAMS()
-        : solver_id(SOLVER_ID_NULL),
-          max_iterations(std::numeric_limits< unsigned int >::max()),
-          relative_tolerance(std::numeric_limits< float >::epsilon()),
-          absolute_tolerance(std::numeric_limits< float >::min()),
-          print_residuals(false),
-          precondition(true)
-    { }
+        : solver_id(SOLVER_ID_NULL)
+    { this->print_diagnostics = true; }
 };
 
 } // namespace Multigrid_Embedded_Poisson

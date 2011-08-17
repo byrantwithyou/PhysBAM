@@ -6,6 +6,7 @@
 
 #include <cassert>
 
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -19,6 +20,8 @@
 #include <Jeffrey_Utilities/Eval_Grid_Function.h>
 #include <Jeffrey_Utilities/Functional/COMPOSE_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/SIGN_FUNCTION.h>
+#include <Jeffrey_Utilities/GENERIC_SYSTEM_REFERENCE.h>
+#include <Jeffrey_Utilities/Krylov/Solve_SPD_System_With_ICC_PCG.h>
 #include <Jeffrey_Utilities/Multi_Index/FINE_MULTI_INDEX_FUNCTION.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOUND.h>
 #include <Jeffrey_Utilities/VECTOR_OPS.h>
@@ -41,7 +44,6 @@
 #ifdef PHYSBAM_USE_PETSC
 #include <petsc.h>
 #include <Jeffrey_Utilities/Petsc/CALL_AND_CHKERRQ.h>
-#include <Jeffrey_Utilities/Petsc/GENERIC_SYSTEM_REFERENCE.h>
 #include <Jeffrey_Utilities/Petsc/Solve_SPD_System_With_ICC_PCG.h>
 #endif // #ifdef PHYSBAM_USE_PETSC
 
@@ -145,7 +147,17 @@ int Build_And_Solve_Neumann_System(
         assert(false);
         break;
     case SOLVER_PARAMS::SOLVER_ID_PHYSBAM_CG:
-        std::cout << "WARNING: Solver \"physbam-cg\" not yet implemented for Neumann problems." << std::endl;
+        //std::cout << "WARNING: Solver \"physbam-cg\" not yet implemented for Neumann problems." << std::endl;
+        std::cout << "Solving with PhysBAM CG solver..." << std::endl;
+        timer.Restart();
+        PhysBAM::Solve_SPD_System_With_ICC_PCG(
+            main_params.solver,
+            GENERIC_SYSTEM_REFERENCE<T>(system),
+            As_Array_View(system_rhs),
+            has_nontrivial_null_space,
+            As_Array_View(u_approx)
+        );
+        std::cout << "[Solving with PhysBAM CG solver...] " << timer.Elapsed() << " s" << std::endl;
         break;
     case SOLVER_PARAMS::SOLVER_ID_PHYSBAM_MINRES:
         std::cout << "ERROR: Solver \"physbam-minres\" cannot be used to solve Neumann problems." << std::endl;
@@ -157,15 +169,10 @@ int Build_And_Solve_Neumann_System(
         PHYSBAM_PETSC_CALL_AND_CHKERRQ((
             Petsc::Solve_SPD_System_With_ICC_PCG(
                 main_params.general.n_thread,
-                Petsc::GENERIC_SYSTEM_REFERENCE<T>(system),
+                main_params.solver,
+                GENERIC_SYSTEM_REFERENCE<T>(system),
                 As_Const_Array_View(system_rhs),
                 has_nontrivial_null_space,
-                main_params.solver.precondition,
-                main_params.solver.max_iterations,
-                main_params.solver.relative_tolerance,
-                main_params.solver.absolute_tolerance,
-                true, // print_diagnostics
-                main_params.solver.print_residuals,
                 As_Array_View(u_approx),
                 std::cout
             )

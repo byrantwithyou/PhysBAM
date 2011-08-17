@@ -23,11 +23,12 @@
 #include <Jeffrey_Utilities/Algorithm/For_Each.h>
 #include <Jeffrey_Utilities/BASIC_TIMER.h>
 #include <Jeffrey_Utilities/DIRECT_INIT_CTOR.h>
+#include <Jeffrey_Utilities/GENERIC_SYSTEM_REFERENCE.h>
 #include <Jeffrey_Utilities/Petsc/Add_Stencil_To_Matrix.h>
 #include <Jeffrey_Utilities/Petsc/CALL_AND_CHKERRQ.h>
-#include <Jeffrey_Utilities/Petsc/GENERIC_SYSTEM_REFERENCE.h>
 #include <Jeffrey_Utilities/Petsc/Print_KSP_Info.h>
 #include <Jeffrey_Utilities/Petsc/SCOPED_DESTROY.h>
+#include <Jeffrey_Utilities/SOLVER_PARAMS.h>
 #include <Jeffrey_Utilities/Stencils/SKIP_ZERO_VALUE_STENCIL_PROXY.h>
 #include <Jeffrey_Utilities/Stencils/UNSTRUCTURED_STENCIL.h>
 #include <Jeffrey_Utilities/Stencils/UNSTRUCTURED_STENCIL_PROXY.h>
@@ -55,16 +56,11 @@ template< class T >
 PetscErrorCode
 Solve_SPD_System_With_ICC_PCG(
     const unsigned int n_thread,
+    const SOLVER_PARAMS params,
     const GENERIC_SYSTEM_REFERENCE<T> system,
     const ARRAY_VIEW<const T> rhs,
     const bool has_constant_vectors_in_null_space,
-    const bool precondition,
-    unsigned int max_iterations,
-    const float relative_tolerance,
-    const float absolute_tolerance,
-    const bool print_diagnostics,
-    const bool print_residuals,
-    ARRAY_VIEW<T> u_approx,
+    ARRAY_VIEW<T> x,
     std::ostream& lout /*= PhysBAM::nout*/)
 {
     typedef Detail_Solve_SPD_System_With_ICC_PCG::INDEX_HAS_NONZERO_STENCIL<T> INDEX_HAS_NONZERO_STENCIL_;
@@ -243,7 +239,7 @@ Solve_SPD_System_With_ICC_PCG(
     {
         PC petsc_pc;
         PHYSBAM_PETSC_CALL_AND_CHKERRQ( KSPGetPC(petsc_ksp, &petsc_pc) );
-        PHYSBAM_PETSC_CALL_AND_CHKERRQ( PCSetType(petsc_pc, precondition ? PCICC : PCNONE) );
+        PHYSBAM_PETSC_CALL_AND_CHKERRQ( PCSetType(petsc_pc, params.precondition ? PCICC : PCNONE) );
     }
 
     // If has_constant_vectors_in_null_space, construct the null space (from the
@@ -259,7 +255,7 @@ Solve_SPD_System_With_ICC_PCG(
         ) );
     PHYSBAM_PETSC_SCOPED_DESTROY_IF( MatNullSpace, petsc_jnullspace, has_constant_vectors_in_null_space );
     if(has_constant_vectors_in_null_space) {
-        if(print_diagnostics) {
+        if(params.print_diagnostics) {
             PetscTruth is_null_space;
             PHYSBAM_PETSC_CALL_AND_CHKERRQ( MatNullSpaceTest(petsc_jnullspace, petsc_jmatrix, &is_null_space) );
             if(!is_null_space) {
@@ -276,17 +272,17 @@ Solve_SPD_System_With_ICC_PCG(
     PHYSBAM_PETSC_CALL_AND_CHKERRQ( KSPSetInitialGuessNonzero(petsc_ksp, PETSC_TRUE) );
 
     // Set additional solver options.
-    if(print_residuals)
+    if(params.print_residuals)
         PHYSBAM_PETSC_CALL_AND_CHKERRQ( KSPMonitorSet(petsc_ksp, &KSPMonitorTrueResidualNorm, PETSC_NULL, PETSC_NULL) );
-    if(
-        max_iterations == std::numeric_limits< unsigned int >::max() &&
-        static_cast< unsigned int >(n_petsc) <= std::numeric_limits< unsigned int >::max() / 8
-    )
-        max_iterations = 8 * static_cast< unsigned int >(n_petsc);
+    const unsigned int max_iterations =
+        params.max_iterations == std::numeric_limits< unsigned int >::max() &&
+        static_cast< unsigned int >(n_petsc) <= std::numeric_limits< unsigned int >::max() / 4 ?
+        4 * static_cast< unsigned int >(n_petsc) :
+        params.max_iterations;
     PHYSBAM_PETSC_CALL_AND_CHKERRQ( KSPSetTolerances(
         petsc_ksp,
-        static_cast< PetscReal >(relative_tolerance),
-        static_cast< PetscReal >(absolute_tolerance),
+        static_cast< PetscReal >(params.relative_tolerance),
+        static_cast< PetscReal >(params.absolute_tolerance),
         PETSC_DEFAULT, // divergence tolerance
         max_iterations
     ) );
@@ -300,7 +296,7 @@ Solve_SPD_System_With_ICC_PCG(
     PHYSBAM_PETSC_CALL_AND_CHKERRQ( KSPSolve(petsc_ksp, petsc_jrhs, petsc_jrhs) );
     lout << timer.Elapsed() << " s" << std::endl;
 
-    if(print_diagnostics)
+    if(params.print_diagnostics)
         PHYSBAM_PETSC_CALL_AND_CHKERRQ( KSPView(petsc_ksp, PETSC_VIEWER_STDOUT_SELF) );
 
     lout << "KSP info:" << std::endl;
@@ -309,7 +305,7 @@ Solve_SPD_System_With_ICC_PCG(
     // Un-Jacobi scale the CG solution to get the actual approximate solution.
     for(int i = 0; i != n_petsc; ++i) {
         const int physbam_index = physbam_index_of_petsc_index[i];
-        u_approx(physbam_index) = static_cast<T>(petsc_jrhs_[i] / jscalings[i]);
+        x(physbam_index) = static_cast<T>(petsc_jrhs_[i] / jscalings[i]);
     }
 
     return 0;
@@ -355,16 +351,11 @@ template \
 PetscErrorCode \
 Solve_SPD_System_With_ICC_PCG<T>( \
     const unsigned int n_thread, \
+    const SOLVER_PARAMS params, \
     const GENERIC_SYSTEM_REFERENCE<T> system, \
     const ARRAY_VIEW<const T> rhs, \
     const bool has_constant_vectors_in_null_space, \
-    const bool precondition, \
-    unsigned int max_iterations, \
-    const float relative_tolerance, \
-    const float absolute_tolerance, \
-    const bool print_diagnostics, \
-    const bool print_residuals, \
-    ARRAY_VIEW<T> u_approx, \
+    ARRAY_VIEW<T> x, \
     std::ostream& lout);
 EXPLICIT_INSTANTIATION( float )
 EXPLICIT_INSTANTIATION( double )

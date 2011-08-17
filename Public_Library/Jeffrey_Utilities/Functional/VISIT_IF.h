@@ -29,6 +29,12 @@ public:
         if(predicate(x))
             visitor(x);
     }
+    template< class T >
+    void operator()(T& x) const
+    {
+        if(predicate(x))
+            visitor(x);
+    }
 };
 
 template< class T_PREDICATE, class T_VISITOR >

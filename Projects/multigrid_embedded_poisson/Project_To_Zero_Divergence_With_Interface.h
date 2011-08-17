@@ -24,6 +24,7 @@
 #include <Jeffrey_Utilities/Grid/Visit_Cells_With_Sign_Via_Fine_Vertex_Sign.h>
 #include <Jeffrey_Utilities/Multi_Index/FINE_MULTI_INDEX_FUNCTION.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOUND.h>
+#include <Jeffrey_Utilities/SOLVER_PARAMS.h>
 #include <Jeffrey_Utilities/Stencils/ZERO_STENCIL_PROXY.h>
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
@@ -46,8 +47,8 @@
 
 #ifdef PHYSBAM_USE_PETSC
 #include <petsc.h>
+#include <Jeffrey_Utilities/GENERIC_SYSTEM_REFERENCE.h>
 #include <Jeffrey_Utilities/Petsc/CALL_AND_CHKERRQ.h>
-#include <Jeffrey_Utilities/Petsc/GENERIC_SYSTEM_REFERENCE.h>
 #include <Jeffrey_Utilities/Petsc/Solve_SPD_System_With_ICC_PCG.h>
 #endif // #ifdef PHYSBAM_USE_PETSC
 
@@ -68,6 +69,7 @@ template<
 >
 int Project_To_Zero_Divergence_With_Interface(
     const unsigned int n_thread,
+    const SOLVER_PARAMS& solver_params,
     const VECTOR<T,D> min_x, const VECTOR<T,D> max_x,
     const MULTI_INDEX_BOUND<D> mac_cell_multi_index_bound,
     const T_PHI_OF_FINE_INDEX& phi_of_fine_index,
@@ -285,15 +287,10 @@ int Project_To_Zero_Divergence_With_Interface(
     PHYSBAM_PETSC_CALL_AND_CHKERRQ((
         Petsc::Solve_SPD_System_With_ICC_PCG(
             n_thread,
-            Petsc::GENERIC_SYSTEM_REFERENCE<T>(ztaz_system),
+            solver_params,
+            GENERIC_SYSTEM_REFERENCE<T>(ztaz_system),
             As_Const_Array_View(ztaz_system_rhs),
-            true,                                       // has_constant_vectors_in_null_space
-            true,                                       // precondition
-            std::numeric_limits< unsigned int >::max(), // max_iterations
-            1e-8f,                                      // relative_tolerance
-            std::numeric_limits< float >::min(),        // absolute_tolerance
-            false,                                      // print_diagnostics
-            false,                                      // print_residuals
+            true, // has_constant_vectors_in_null_space
             As_Array_View(p)
         )
     ));
