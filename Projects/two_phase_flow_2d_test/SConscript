@@ -6,6 +6,7 @@ Import('env Automatic_Program')
 if 'BOOST_ROOT' in os.environ:
 
     env = env.Copy()
+
     env.Append( LIBPATH = [
         os.environ['BOOST_ROOT'] + '/lib'
     ] )
@@ -25,11 +26,6 @@ if 'BOOST_ROOT' in os.environ:
     ]
 
     if 'PETSC_DIR' in os.environ:
-        env.Append( CPPPATH = [
-            os.environ['PETSC_DIR'] + '/include',
-            os.environ['PETSC_DIR'] + '/' + os.environ['PETSC_ARCH'] + '/include',
-            os.environ['PETSC_DIR'] + '/include/mpiuni'
-        ] )
         env.Append( LIBPATH = [
             os.environ['PETSC_DIR'] + '/' + os.environ['PETSC_ARCH'] + '/lib'
         ] )
@@ -37,11 +33,8 @@ if 'BOOST_ROOT' in os.environ:
             'petsc'
         ] )
         sources.extend( [
-            '../multigrid_embedded_poisson/Petsc/Solve_SPD_System_With_ICC_PCG.cpp'
-        ] )
-    else:
-        env.Append( CPPDEFINES = [
-            'PHYSBAM_NO_PETSC'
+            '../Petsc/Print_KSP_Info.cpp',
+            '../Petsc/Solve_SPD_System_With_ICC_PCG.cpp'
         ] )
 
     Automatic_Program( env, "two_phase_flow_2d_test", sources )

@@ -57,12 +57,12 @@
 #include "Select_Indys.h"
 #include "SYSTEM_SUM.h"
 
-#ifndef PHYSBAM_NO_PETSC
+#ifdef PHYSBAM_USE_PETSC
 #include <petsc.h>
 #include <Jeffrey_Utilities/Petsc/CALL_AND_CHKERRQ.h>
 #include <Jeffrey_Utilities/Petsc/GENERIC_SYSTEM_REFERENCE.h>
 #include <Jeffrey_Utilities/Petsc/Solve_SPD_System_With_ICC_PCG.h>
-#endif // #ifndef PHYSBAM_NO_PETSC
+#endif // #ifdef PHYSBAM_USE_PETSC
 
 #include "Build_And_Solve_Interface_System.h"
 
@@ -215,15 +215,15 @@ int Build_And_Solve_Interface_System(
         case SOLVER_PARAMS::SOLVER_ID_PHYSBAM_MINRES:
             std::cout << "WARNING: Solver \"physbam-minres\" not yet implemented for interface problems." << std::endl;
             break;
-#ifdef PHYSBAM_NO_PETSC
-        case SOLVER_PARAMS::SOLVER_ID_PETSC_MINRES:
-            std::cout << "WARNING: PETSc not supported on this platform." << std::endl;
-            break;
-#else // #ifdef PHYSBAM_NO_PETSC
+#ifdef PHYSBAM_USE_PETSC
         case SOLVER_PARAMS::SOLVER_ID_PETSC_MINRES:
             std::cout << "WARNING: Solver \"petsc-minres\" not yet implemented for interface problems." << std::endl;
             break;
-#endif // #ifdef PHYSBAM_NO_PETSC
+#else // #ifdef PHYSBAM_USE_PETSC
+        case SOLVER_PARAMS::SOLVER_ID_PETSC_MINRES:
+            std::cout << "WARNING: PETSc not supported on this platform." << std::endl;
+            break;
+#endif // #ifdef PHYSBAM_USE_PETSC
         default:
             std::cout << "ERROR: Must use either \"physbam-minres\" or \"petsc-minres\" "
                          "solvers for interface problems with single-cell constraints."
@@ -335,15 +335,15 @@ int Build_And_Solve_Interface_System(
             case SOLVER_PARAMS::SOLVER_ID_PHYSBAM_MINRES:
                 std::cout << "WARNING: Solver \"physbam-minres\" not yet implemented for Dirichlet problems." << std::endl;
                 break;
-#ifdef PHYSBAM_NO_PETSC
-            case SOLVER_PARAMS::SOLVER_ID_PETSC_MINRES:
-                std::cout << "WARNING: PETSc not supported on this platform." << std::endl;
-                break;
-#else // #ifdef PHYSBAM_NO_PETSC
+#ifdef PHYSBAM_USE_PETSC
             case SOLVER_PARAMS::SOLVER_ID_PETSC_MINRES:
                 std::cout << "WARNING: Solver \"petsc-minres\" not yet implemented for Dirichlet problems." << std::endl;
                 break;
-#endif // #ifdef PHYSBAM_NO_PETSC
+#else // #ifdef PHYSBAM_USE_PETSC
+            case SOLVER_PARAMS::SOLVER_ID_PETSC_MINRES:
+                std::cout << "WARNING: PETSc not supported on this platform." << std::endl;
+                break;
+#endif // #ifdef PHYSBAM_USE_PETSC
             default:
                 assert(false);
             }
@@ -507,11 +507,7 @@ int Build_And_Solve_Interface_System(
             case SOLVER_PARAMS::SOLVER_ID_PHYSBAM_CG:
                 std::cout << "WARNING: Solver \"physbam-cg\" not yet implemented for Dirichlet problems." << std::endl;
                 break;
-#ifdef PHYSBAM_NO_PETSC
-            case SOLVER_PARAMS::SOLVER_ID_PETSC_CG:
-                std::cout << "WARNING: PETSc not supported on this platform." << std::endl;
-                break;
-#else // #ifdef PHYSBAM_NO_PETSC
+#ifdef PHYSBAM_USE_PETSC
             case SOLVER_PARAMS::SOLVER_ID_PETSC_CG:
                 std::cout << "Solving with PETSc CG solver..." << std::endl;
                 timer.Restart();
@@ -532,7 +528,11 @@ int Build_And_Solve_Interface_System(
                 ));
                 std::cout << "[Solving with PETSc CG solver...] " << timer.Elapsed() << " s" << std::endl;
                 break;
-#endif // #ifdef PHYSBAM_NO_PETSC
+#else // #ifdef PHYSBAM_USE_PETSC
+            case SOLVER_PARAMS::SOLVER_ID_PETSC_CG:
+                std::cout << "WARNING: PETSc not supported on this platform." << std::endl;
+                break;
+#endif // #ifdef PHYSBAM_USE_PETSC
             case SOLVER_PARAMS::SOLVER_ID_MG:
                 std::cout << "WARNING: Solver \"mg\" not yet implemented for Neumann problems." << std::endl;
                 break;

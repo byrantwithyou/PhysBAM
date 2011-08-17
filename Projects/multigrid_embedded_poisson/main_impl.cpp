@@ -28,11 +28,11 @@
 #include "Lagrangify_Level_Set.h"
 #include "RAND_MT19937_UNIFORM_REAL.h"
 
-#ifndef PHYSBAM_NO_PETSC
+#ifdef PHYSBAM_USE_PETSC
 #include <Jeffrey_Utilities/Petsc/CALL_AND_CHKERRQ.h>
 #include <Jeffrey_Utilities/Petsc/SCOPED_FINALIZE.h>
 #include <petsc.h>
-#endif // #ifdef PHYSBAM_NO_PETSC
+#endif // #ifdef PHYSBAM_USE_PETSC
 
 namespace PhysBAM
 {
@@ -63,7 +63,7 @@ int main_impl(int argc, char* argv[])
     if(main_result != 0)
         return main_result;
 
-#ifndef PHYSBAM_NO_PETSC
+#ifdef PHYSBAM_USE_PETSC
     const bool use_petsc =
         main_params.solver.solver_id == SOLVER_PARAMS::SOLVER_ID_PETSC_CG ||
         main_params.solver.solver_id == SOLVER_PARAMS::SOLVER_ID_PETSC_MINRES;
@@ -78,7 +78,7 @@ int main_impl(int argc, char* argv[])
     PHYSBAM_PETSC_SCOPED_FINALIZE_IF( use_petsc );
     if(use_petsc)
         std::cout << timer.Elapsed() << " s" << std::endl;
-#endif // #ifndef PHYSBAM_NO_PETSC
+#endif // #ifdef PHYSBAM_USE_PETSC
 
     std::cout << "Initializing random number generator with seed "
               << main_params.general.rng_seed

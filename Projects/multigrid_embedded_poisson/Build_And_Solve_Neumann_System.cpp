@@ -38,12 +38,12 @@
 #include "Params/SOLVER_PARAMS.h"
 #include "RAND_MT19937_UNIFORM_REAL.h"
 
-#ifndef PHYSBAM_NO_PETSC
+#ifdef PHYSBAM_USE_PETSC
 #include <petsc.h>
 #include <Jeffrey_Utilities/Petsc/CALL_AND_CHKERRQ.h>
 #include <Jeffrey_Utilities/Petsc/GENERIC_SYSTEM_REFERENCE.h>
 #include <Jeffrey_Utilities/Petsc/Solve_SPD_System_With_ICC_PCG.h>
-#endif // #ifndef PHYSBAM_NO_PETSC
+#endif // #ifdef PHYSBAM_USE_PETSC
 
 #include "Build_And_Solve_Neumann_System.h"
 
@@ -150,11 +150,7 @@ int Build_And_Solve_Neumann_System(
     case SOLVER_PARAMS::SOLVER_ID_PHYSBAM_MINRES:
         std::cout << "ERROR: Solver \"physbam-minres\" cannot be used to solve Neumann problems." << std::endl;
         return 1;
-#ifdef PHYSBAM_NO_PETSC
-    case SOLVER_PARAMS::SOLVER_ID_PETSC_CG:
-        std::cout << "WARNING: PETSc not supported on this platform." << std::endl;
-        break;
-#else // #ifdef PHYSBAM_NO_PETSC
+#ifdef PHYSBAM_USE_PETSC
     case SOLVER_PARAMS::SOLVER_ID_PETSC_CG:
         std::cout << "Solving with PETSc CG solver..." << std::endl;
         timer.Restart();
@@ -175,7 +171,11 @@ int Build_And_Solve_Neumann_System(
         ));
         std::cout << "[Solving with PETSc CG solver...] " << timer.Elapsed() << " s" << std::endl;
         break;
-#endif // #ifdef PHYSBAM_NO_PETSC
+#else // #ifdef PHYSBAM_USE_PETSC
+    case SOLVER_PARAMS::SOLVER_ID_PETSC_CG:
+        std::cout << "WARNING: PETSc not supported on this platform." << std::endl;
+        break;
+#endif // #ifdef PHYSBAM_USE_PETSC
     case SOLVER_PARAMS::SOLVER_ID_PETSC_MINRES:
         std::cout << "ERROR: Solver \"petsc-minres\" cannot be used to solve Neumann problems." << std::endl;
         return 1;
