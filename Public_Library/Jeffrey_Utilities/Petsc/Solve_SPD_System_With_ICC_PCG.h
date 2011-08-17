@@ -28,11 +28,12 @@ Solve_SPD_System_With_ICC_PCG(
     const GENERIC_SYSTEM_REFERENCE<T> system,
     const ARRAY_VIEW<const T> rhs,
     const bool has_constant_vectors_in_null_space,
+    const bool precondition,
     unsigned int max_iterations,
     const float relative_tolerance,
     const float absolute_tolerance,
+    const bool print_diagnostics,
     const bool print_residuals,
-    const bool precondition,
     ARRAY_VIEW<T> u_approx,
     std::ostream& lout = PhysBAM::nout);
 

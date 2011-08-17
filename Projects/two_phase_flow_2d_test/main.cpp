@@ -18,6 +18,12 @@
 #include "SURFACE_TENSION.h"
 //using namespace PhysBAM;
 
+#ifdef PHYSBAM_USE_PETSC
+#include <petsc.h>
+#include <Jeffrey_Utilities/Petsc/CALL_AND_CHKERRQ.h>
+#include <Jeffrey_Utilities/Petsc/SCOPED_FINALIZE.h>
+#endif // #ifdef PHYSBAM_USE_PETSC
+
 int main(int argc,char* argv[])
 {
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
@@ -30,6 +36,15 @@ int main(int argc,char* argv[])
     typedef PhysBAM::VECTOR<T,2> TV;
     typedef PhysBAM::GRID<TV> T_GRID;
     PhysBAM::STREAM_TYPE stream_type((RW()));
+
+#ifdef PHYSBAM_USE_PETSC
+    {
+        int petsc_argc = 0;
+        char** petsc_argv = 0;
+        PHYSBAM_PETSC_CALL_AND_CHKERRQ( PetscInitialize(&petsc_argc, &petsc_argv, PETSC_NULL, PETSC_NULL) );
+    }
+    PHYSBAM_PETSC_SCOPED_FINALIZE();
+#endif // #ifdef PHYSBAM_USE_PETSC
 
     PhysBAM::Two_Phase_Flow_2D_Test::PLS_FSI_EXAMPLE<TV>* example=0;
     example=new PhysBAM::Two_Phase_Flow_2D_Test::SURFACE_TENSION<T>(stream_type);

@@ -58,11 +58,12 @@ Solve_SPD_System_With_ICC_PCG(
     const GENERIC_SYSTEM_REFERENCE<T> system,
     const ARRAY_VIEW<const T> rhs,
     const bool has_constant_vectors_in_null_space,
+    const bool precondition,
     unsigned int max_iterations,
     const float relative_tolerance,
     const float absolute_tolerance,
+    const bool print_diagnostics,
     const bool print_residuals,
-    const bool precondition,
     ARRAY_VIEW<T> u_approx,
     std::ostream& lout /*= PhysBAM::nout*/)
 {
@@ -258,11 +259,13 @@ Solve_SPD_System_With_ICC_PCG(
         ) );
     PHYSBAM_PETSC_SCOPED_DESTROY_IF( MatNullSpace, petsc_jnullspace, has_constant_vectors_in_null_space );
     if(has_constant_vectors_in_null_space) {
-        PetscTruth is_null_space;
-        PHYSBAM_PETSC_CALL_AND_CHKERRQ( MatNullSpaceTest(petsc_jnullspace, petsc_jmatrix, &is_null_space) );
-        if(!is_null_space) {
-            std::cerr << "ERROR: Petsc null space test failed." << std::endl;
-            return 1;
+        if(print_diagnostics) {
+            PetscTruth is_null_space;
+            PHYSBAM_PETSC_CALL_AND_CHKERRQ( MatNullSpaceTest(petsc_jnullspace, petsc_jmatrix, &is_null_space) );
+            if(!is_null_space) {
+                std::cerr << "ERROR: Petsc null space test failed." << std::endl;
+                return 1;
+            }
         }
         PHYSBAM_PETSC_CALL_AND_CHKERRQ( KSPSetNullSpace(petsc_ksp, petsc_jnullspace) );
     }
@@ -297,7 +300,8 @@ Solve_SPD_System_With_ICC_PCG(
     PHYSBAM_PETSC_CALL_AND_CHKERRQ( KSPSolve(petsc_ksp, petsc_jrhs, petsc_jrhs) );
     lout << timer.Elapsed() << " s" << std::endl;
 
-    PHYSBAM_PETSC_CALL_AND_CHKERRQ( KSPView(petsc_ksp, PETSC_VIEWER_STDOUT_SELF) );
+    if(print_diagnostics)
+        PHYSBAM_PETSC_CALL_AND_CHKERRQ( KSPView(petsc_ksp, PETSC_VIEWER_STDOUT_SELF) );
 
     lout << "KSP info:" << std::endl;
     PHYSBAM_PETSC_CALL_AND_CHKERRQ( Print_KSP_Info(petsc_ksp, lout) );
@@ -354,11 +358,12 @@ Solve_SPD_System_With_ICC_PCG<T>( \
     const GENERIC_SYSTEM_REFERENCE<T> system, \
     const ARRAY_VIEW<const T> rhs, \
     const bool has_constant_vectors_in_null_space, \
+    const bool precondition, \
     unsigned int max_iterations, \
     const float relative_tolerance, \
     const float absolute_tolerance, \
+    const bool print_diagnostics, \
     const bool print_residuals, \
-    const bool precondition, \
     ARRAY_VIEW<T> u_approx, \
     std::ostream& lout);
 EXPLICIT_INSTANTIATION( float )

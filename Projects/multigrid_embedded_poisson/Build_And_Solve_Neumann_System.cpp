@@ -160,11 +160,12 @@ int Build_And_Solve_Neumann_System(
                 Petsc::GENERIC_SYSTEM_REFERENCE<T>(system),
                 As_Const_Array_View(system_rhs),
                 has_nontrivial_null_space,
+                main_params.solver.precondition,
                 main_params.solver.max_iterations,
                 main_params.solver.relative_tolerance,
                 main_params.solver.absolute_tolerance,
+                true, // print_diagnostics
                 main_params.solver.print_residuals,
-                main_params.solver.precondition,
                 As_Array_View(u_approx),
                 std::cout
             )

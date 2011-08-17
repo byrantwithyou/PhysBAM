@@ -288,11 +288,12 @@ int Project_To_Zero_Divergence_With_Interface(
             Petsc::GENERIC_SYSTEM_REFERENCE<T>(ztaz_system),
             As_Const_Array_View(ztaz_system_rhs),
             true,                                       // has_constant_vectors_in_null_space
+            true,                                       // precondition
             std::numeric_limits< unsigned int >::max(), // max_iterations
             1e-8f,                                      // relative_tolerance
             std::numeric_limits< float >::min(),        // absolute_tolerance
+            false,                                      // print_diagnostics
             false,                                      // print_residuals
-            true,                                       // precondition
             As_Array_View(p)
         )
     ));

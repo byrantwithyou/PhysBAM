@@ -29,9 +29,9 @@
 #include "RAND_MT19937_UNIFORM_REAL.h"
 
 #ifdef PHYSBAM_USE_PETSC
+#include <petsc.h>
 #include <Jeffrey_Utilities/Petsc/CALL_AND_CHKERRQ.h>
 #include <Jeffrey_Utilities/Petsc/SCOPED_FINALIZE.h>
-#include <petsc.h>
 #endif // #ifdef PHYSBAM_USE_PETSC
 
 namespace PhysBAM
