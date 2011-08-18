@@ -82,7 +82,7 @@ Solve_SPD_System_With_ICC_PCG(
         pcg.modified_incomplete_cholesky_coefficient = static_cast<T>(0.99);
         pcg.maximum_iterations = max_iterations;
 
-        lout << "Constructing matrix in SPARSE_MATRIX_FLAT_NXN...";
+        lout << "Constructing SPARSE_MATRIX_FLAT_NXN matrix...";
         lout.flush();
         timer.Restart();
         SPARSE_MATRIX_FLAT_NXN<T> flat_system;
