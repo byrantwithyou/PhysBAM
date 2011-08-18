@@ -157,8 +157,10 @@ Solve_SPD_System_With_ICC_PCG(
     //       see http://en.wikipedia.org/wiki/Sparse_matrix#Yale_Sparse_Matrix_Format
     int matrix_nnz = 0;
     int max_stencil_nnz = 0;
-    for(int physbam_index = 1; physbam_index <= n_physbam_index; ++physbam_index) {
+    for(int i = 0; i != n_petsc; ++i) {
+        const int physbam_index = physbam_index_of_petsc_index[i];
         const int stencil_nnz = system.Stencil_N_Nonzero(physbam_index);
+        assert(stencil_nnz > 0);
         matrix_nnz += stencil_nnz;
         max_stencil_nnz = std::max(max_stencil_nnz, stencil_nnz);
     }
