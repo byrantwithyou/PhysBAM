@@ -176,6 +176,13 @@ Solve_SPD_System_With_ICC_PCG(
         lout << "Executing CONJUGATE_GRADIENT::Solve..." << std::endl;
         timer.Restart();
         typedef KRYLOV_VECTOR_WRAPPER< T, ARRAY_VIEW<T> > KRYLOV_VECTOR_TYPE;
+        KRYLOV_VECTOR_TYPE kx(x);
+        KRYLOV_VECTOR_TYPE kb(rhs);
+        KRYLOV_VECTOR_TYPE kq(As_Array_View(q));
+        KRYLOV_VECTOR_TYPE ks(As_Array_View(s));
+        KRYLOV_VECTOR_TYPE kr(As_Array_View(r));
+        KRYLOV_VECTOR_TYPE kk(As_Array_View(k));
+        KRYLOV_VECTOR_TYPE kz(As_Array_View(z));
         cg.Solve(
             Make_Krylov_System_Composer< T, KRYLOV_VECTOR_TYPE >(
                 Make_Visitor_Sequence(
@@ -194,13 +201,7 @@ Solve_SPD_System_With_ICC_PCG(
                 true, // use_preconditioner
                 true  // preconditioner_commutes_with_projection
             ),
-            const_cast< KRYLOV_VECTOR_TYPE& >(KRYLOV_VECTOR_TYPE(x)),
-            KRYLOV_VECTOR_TYPE(rhs),
-            const_cast< KRYLOV_VECTOR_TYPE& >(KRYLOV_VECTOR_TYPE(As_Array_View(q))),
-            const_cast< KRYLOV_VECTOR_TYPE& >(KRYLOV_VECTOR_TYPE(As_Array_View(s))),
-            const_cast< KRYLOV_VECTOR_TYPE& >(KRYLOV_VECTOR_TYPE(As_Array_View(r))),
-            const_cast< KRYLOV_VECTOR_TYPE& >(KRYLOV_VECTOR_TYPE(As_Array_View(k))),
-            const_cast< KRYLOV_VECTOR_TYPE& >(KRYLOV_VECTOR_TYPE(As_Array_View(z))),
+            kx, kb, kq, ks, kr, kk, kz,
             tolerance,
             0, // min_iterations
             max_iterations

@@ -82,9 +82,9 @@ Solve_SPD_System_With_ICC_PCG(
         1, n_physbam_index,
         Make_Compose_Function(
             NOT_EQUAL1_FUNCTION<int>(0),
-            PHYSBAM_BOUND_FAST_MEM_FN(
+            PHYSBAM_BOUND_FAST_MEM_FN_TEMPLATE(
                 system,
-                GENERIC_SYSTEM_REFERENCE<T>::Stencil_N_Nonzero
+                &GENERIC_SYSTEM_REFERENCE<T>::Stencil_N_Nonzero
             )
         ),
         physbam_index_of_petsc_index
@@ -346,6 +346,7 @@ PetscErrorCode \
 Solve_SPD_System_With_ICC_PCG<T>( \
     const unsigned int n_thread, \
     const SOLVER_PARAMS params, \
+    const bool has_constant_vectors_in_null_space, \
     const GENERIC_SYSTEM_REFERENCE<T> system, \
     const ARRAY_VIEW<const T> rhs, \
     ARRAY_VIEW<T> x, \
