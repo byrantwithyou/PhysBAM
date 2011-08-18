@@ -7,6 +7,8 @@
 #ifndef PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_AS_SPARSE_MATRIX_FLAT_NXN_H
 #define PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_AS_SPARSE_MATRIX_FLAT_NXN_H
 
+#include <cassert>
+
 #include <algorithm>
 #include <limits>
 
@@ -72,15 +74,16 @@ As_Sparse_Matrix_Flat_NXN(
     int matrix_nnz = 0;
     int max_stencil_nnz = 0;
     for(int flat_index = 1; flat_index <= n_flat_index; ++flat_index) {
-        const int stencil_nnz = system.Stencil_N_Nonzero(flat_index);
+        const int orig_index = orig_index_of_flat_index(flat_index);
+        const int stencil_nnz = system.Stencil_N_Nonzero(orig_index);
+        assert(stencil_nnz > 0);
         matrix_nnz += stencil_nnz;
         max_stencil_nnz = std::max(max_stencil_nnz, stencil_nnz);
     }
     flat_system.Reset();
-    flat_system.offsets.Preallocate(n_flat_index);
+    flat_system.offsets.Preallocate(n_flat_index + 1);
     flat_system.A.Preallocate(matrix_nnz);
     {
-        int value_index = 0;
         UNSTRUCTURED_STENCIL<int,T> system_stencil;
         system_stencil.values.Preallocate(max_stencil_nnz);
         UNSTRUCTURED_STENCIL_PROXY< UNSTRUCTURED_STENCIL<int,T> > system_stencil_proxy(system_stencil);
@@ -97,6 +100,8 @@ As_Sparse_Matrix_Flat_NXN(
             flat_system.Finish_Row();
         }
     }
+    assert(flat_system.offsets.Size() == n_flat_index + 1);
+    assert(flat_system.A.Size() <= matrix_nnz);
 }
 
 namespace Detail_As_Sparse_Matrix_Flat_NXN
