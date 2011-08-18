@@ -116,10 +116,8 @@ Solve_SPD_System_With_ICC_PCG(
     for(int i = 0; i != n_petsc; ++i) {
         const int physbam_index = physbam_index_of_petsc_index[i];
         assert(system.Stencil_N_Nonzero(physbam_index) != 0);
-        T diag = system.Diag(physbam_index);
-        if(diag <= 0)
-            diag = 1;
-        jscalings[i] = std::sqrt(static_cast< double >(diag));
+        const T diag = system.Diag(physbam_index);
+        jscalings[i] = diag > 0 ? std::sqrt(static_cast< double >(diag)) : 1;
     }
     lout << timer.Elapsed() << " s" << std::endl;
 

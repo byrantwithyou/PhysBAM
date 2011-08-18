@@ -48,7 +48,7 @@ Has_Constant_Vectors_In_Null_Space(
     const unsigned int n_thread,
     const int n_index,
     const T_SYSTEM& system,
-    const int threshold_factor = 2)
+    const int threshold_factor = 1024)
 {
     typedef Detail_Has_Constant_Vectors_In_Null_Space::NONZERO_STENCIL_SUM< T, T_SYSTEM > NONZERO_STENCIL_SUM_;
     return !Any_If_MT(

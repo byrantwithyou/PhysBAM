@@ -6,6 +6,7 @@
 //#####################################################################
 
 #include <cassert>
+#include <cmath>
 
 #include <algorithm>
 #include <limits>
@@ -55,9 +56,6 @@ Solve_SPD_System_With_ICC_PCG(
 
     BASIC_TIMER timer;
 
-    // TODO: If non-trivial null space, use project_nullspace.
-    static_cast<void>(has_constant_vectors_in_null_space);
-
     float initial_residual_norm;
     {
         ARRAY<T> t(x.Size()); // init'ed to 0
@@ -77,6 +75,8 @@ Solve_SPD_System_With_ICC_PCG(
     if(params.precondition) {
 
         PCG_SPARSE<T> pcg;
+        pcg.enforce_compatibility = has_constant_vectors_in_null_space;
+        pcg.remove_null_space_solution_component = has_constant_vectors_in_null_space;
         pcg.show_residual = params.print_residuals;
         pcg.show_results = params.print_diagnostics;
         pcg.modified_incomplete_cholesky_coefficient = static_cast<T>(0.99);
@@ -86,18 +86,44 @@ Solve_SPD_System_With_ICC_PCG(
         lout.flush();
         timer.Restart();
         SPARSE_MATRIX_FLAT_NXN<T> flat_system;
-        ARRAY<int> generic_index_of_flat_index;
-        ARRAY<int> flat_index_of_generic_index(x.Size(), false); // uninit'ed
+        ARRAY<int> orig_index_of_flat_index;
+        ARRAY<int> flat_index_of_orig_index(x.Size(), false); // uninit'ed
         As_Sparse_Matrix_Flat_NXN(
             n_thread,
             system,
             flat_system,
-            generic_index_of_flat_index,
-            flat_index_of_generic_index
+            orig_index_of_flat_index,
+            flat_index_of_orig_index
         );
         lout << timer.Elapsed() << " s" << std::endl;
-        const int n_flat_index = generic_index_of_flat_index.Size();
+        const int n_flat_index = orig_index_of_flat_index.Size();
         lout << "  # of flat dofs = " << n_flat_index << std::endl;
+
+        lout << "Constructing Jacobi scaling coefficients...";
+        lout.flush();
+        timer.Restart();
+        ARRAY<double> jscalings(n_flat_index); // init'ed to 0
+        for(int flat_index = 1; flat_index <= n_flat_index; ++flat_index) {
+            const int orig_index = orig_index_of_flat_index(flat_index);
+            assert(system.Stencil_N_Nonzero(orig_index) != 0);
+            const T diag = system.Diag(orig_index);
+            jscalings(flat_index) = diag > 0 ? std::sqrt(static_cast< double >(diag)) : 1;
+        }
+        lout << timer.Elapsed() << " s" << std::endl;
+
+        lout << "Jacobi scaling SPARSE_MATRIX_FLAT_NXN matrix...";
+        lout.flush();
+        for(int flat_index = 1; flat_index <= n_flat_index; ++flat_index) {
+            const int offset_index = flat_system.offsets(flat_index);
+            const int next_offset_index = flat_system.offsets(flat_index + 1);
+            for(int i = offset_index; i != next_offset_index; ++i) {
+                const int other_flat_index = flat_system.A(i).j;
+                flat_system.A(i).a = static_cast<T>(
+                    flat_system.A(i).a / (jscalings(flat_index) * jscalings(other_flat_index))
+                );
+            }
+        }
+        lout << timer.Elapsed() << " s" << std::endl;
 
         lout << "Allocating storage for temporary vectors...";
         lout.flush();
@@ -110,12 +136,11 @@ Solve_SPD_System_With_ICC_PCG(
         VECTOR_ND<T> k(n_flat_index); // init'ed to 0
         VECTOR_ND<T> z(n_flat_index); // init'ed to 0
         for(int flat_index = 1; flat_index <= n_flat_index; ++flat_index) {
-            const int generic_index = generic_index_of_flat_index(flat_index);
-            y(flat_index) = x(generic_index);
-            b(flat_index) = rhs(generic_index);
+            const int orig_index = orig_index_of_flat_index(flat_index);
+            y(flat_index) = static_cast<T>(x(orig_index) * jscalings(flat_index));
+            b(flat_index) = static_cast<T>(rhs(orig_index) / jscalings(flat_index));
         }
         lout << timer.Elapsed() << " s" << std::endl;
-
         lout << "Executing PCG_SPARSE::Solve..." << std::endl;
         timer.Restart();
         pcg.Solve(
@@ -126,13 +151,14 @@ Solve_SPD_System_With_ICC_PCG(
         lout << "[Executing PCG_SPARSE::Solve...] " << timer.Elapsed() << " s" << std::endl;
 
         for(int flat_index = 1; flat_index <= n_flat_index; ++flat_index) {
-            const int generic_index = generic_index_of_flat_index(flat_index);
-            x(generic_index) = y(flat_index);
+            const int orig_index = orig_index_of_flat_index(flat_index);
+            x(orig_index) = static_cast<T>(y(flat_index) / jscalings(flat_index));
         }
 
     }
     else {
 
+        // TODO: If non-trivial null space, use project_nullspace...?
         CONJUGATE_GRADIENT<T> cg;
         cg.print_diagnostics = params.print_diagnostics;
         cg.print_residuals = params.print_residuals;
@@ -155,7 +181,7 @@ Solve_SPD_System_With_ICC_PCG(
                 Make_Visitor_Sequence(
                     // zero result before GENERIC_SYSTEM_REFERENCE<T>::Apply
                     Make_Compose_Function(FILL1_FUNCTION<T>(0), ARGUMENT_FUNCTION<2>()),
-                    PHYSBAM_BOUND_FAST_MEM_FN( system, &GENERIC_SYSTEM_REFERENCE<T>::Apply )
+                    PHYSBAM_BOUND_FAST_MEM_FN_TEMPLATE( system, &GENERIC_SYSTEM_REFERENCE<T>::Apply )
                 ),
                 DOT_PRODUCT_INNER_PRODUCT(),
                 MAXIMUM_MAGNITUDE_CONVERGENCE_NORM<T>(),
@@ -163,7 +189,7 @@ Solve_SPD_System_With_ICC_PCG(
                 NULL_FUNCTION(), // set_boundary_conditions
                 NULL_FUNCTION(), // project_nullspace
                 Make_Safe_Jacobi_Preconditioner(
-                    PHYSBAM_BOUND_FAST_MEM_FN( system, &GENERIC_SYSTEM_REFERENCE<T>::Diag )
+                    PHYSBAM_BOUND_FAST_MEM_FN_TEMPLATE( system, &GENERIC_SYSTEM_REFERENCE<T>::Diag )
                 ),
                 true, // use_preconditioner
                 true  // preconditioner_commutes_with_projection

@@ -77,7 +77,12 @@ void Chorin_Project(
         T_MAC_VECTOR_FIELD
     > JUMP_P_OF_X_OF_CELL_INDEX_;
     SOLVER_PARAMS solver_params;
-    solver_params.relative_tolerance = 1e-8f;
+#ifndef PHYSBAM_USE_PETSC
+    // PhysBAM's ICC PCG seems to perform *worse* than vanilla CG...
+    solver_params.precondition = false;
+#endif // #ifndef PHYSBAM_USE_PETSC
+    solver_params.relative_tolerance = 1e-12f;
+    solver_params.print_diagnostics = true;
     Multigrid_Embedded_Poisson::Project_To_Zero_Divergence_With_Interface(
         n_thread,
         solver_params,
@@ -94,7 +99,8 @@ void Chorin_Project(
             mac_vector_field
         ),
         Make_Constant_Function(CONSTANT_FUNCTION<T>(static_cast<T>(0))),
-        mac_vector_field
+        mac_vector_field,
+        std::cout
     );
 }
 
@@ -174,7 +180,8 @@ public:
         typedef VECTOR<int,D> MULTI_INDEX_TYPE;
         // TODO: Add viscosity terms when jump_mu != 0.
         assert(jump_mu == 0);
-        return dt * sigma * kappa_of_x(x);
+        //return dt * sigma * kappa_of_x(x);
+        return dt * sigma;
 #if 0
         x = (x - x0) / dx_over_2;
         MULTI_INDEX_TYPE fine_cell_multi_index = 2 * cell_multi_index;
