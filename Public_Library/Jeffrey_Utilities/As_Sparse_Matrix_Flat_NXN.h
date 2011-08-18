@@ -62,7 +62,7 @@ As_Sparse_Matrix_Flat_NXN(
     );
     For_Each_MT(
         n_thread,
-        0, n_flat_index - 1,
+        1, n_flat_index,
         SET_FLAT_INDEX_OF_ORIG_INDEX_(
             orig_index_of_flat_index,
             flat_index_of_orig_index
