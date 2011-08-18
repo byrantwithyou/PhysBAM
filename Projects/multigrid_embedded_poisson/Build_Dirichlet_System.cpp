@@ -18,8 +18,7 @@
 #include <Jeffrey_Utilities/Functional/EQUAL_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/SIGN_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/VISIT_IF.h>
-#include <Jeffrey_Utilities/Grid/ASSIGN_SIGN_TO_INDEX_GRID_VISITOR.h>
-#include <Jeffrey_Utilities/Grid/Visit_Cells_With_Sign_Via_Fine_Vertex_Sign.h>
+#include <Jeffrey_Utilities/Grid/Cell_Sign_Via_Fine_Vertex_Sign.h>
 #include <Jeffrey_Utilities/IDENTITY_TYPE.h>
 #include <Jeffrey_Utilities/Multi_Index/FINE_MULTI_INDEX_FUNCTION.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOUND.h>
@@ -57,11 +56,12 @@ template const int& HASHTABLE<int,int>::Get(const int&) const;
 namespace Multigrid_Embedded_Poisson
 {
 
-template< class T, int D, class T_EMBEDDING_SUBSYS >
+template< class T, int D, class T_SIGN, class T_EMBEDDING_SUBSYS >
 int Build_Dirichlet_System(
     const typename EXAMPLE_PARAMS<T,D>::DIRICHLET_PARAMS& problem,
     const MAIN_PARAMS<T,D>& main_params,
     const ARRAY_VIEW<const T> phi_of_fine_index,
+    const ARRAY_VIEW<const T_SIGN> sign_of_cell_index,
     DOMAIN_REGULAR_CROSS_SUBSYS<T,D>& regular_subsys,
     T_EMBEDDING_SUBSYS& embedding_subsys,
     ARRAY_VIEW<T> system_rhs,
@@ -92,23 +92,19 @@ int Build_Dirichlet_System(
     const MULTI_INDEX_X_FUNCTION< T, D, MULTI_INDEX_BOUND<D> >
         x_of_index(min_x, max_x, multi_index_bound);
 
+#ifndef NDEBUG
+    for(int cell_linear_index = 1; cell_linear_index <= cell_multi_index_bound.Size(); ++cell_linear_index) {
+        const MULTI_INDEX_TYPE cell_multi_index = cell_multi_index_bound.Multi_Index(cell_linear_index);
+        const int cell_sign1 = Cell_Sign_Via_Fine_Vertex_Sign<2>(sign_of_fine_index, cell_multi_index, -1);
+        const int cell_sign2 = sign_of_cell_index(cell_linear_index);
+        assert(cell_sign1 == cell_sign2);
+    }
+#endif // #ifndef NDEBUG
+
     DOMAIN_SYSTEM<
         DOMAIN_REGULAR_CROSS_SUBSYS<T,D>&,
         T_EMBEDDING_SUBSYS&
     > system(regular_subsys, embedding_subsys);
-
-    lout << "Initializing sign_of_cell_index...";
-    lout.flush();
-    Visit_Cells_With_Sign_Via_Fine_Vertex_Sign_MT<2>(
-        main_params.general.n_thread,
-        cell_multi_index_bound,
-        sign_of_fine_index,
-        Make_Assign_Sign_To_Index_Grid_Visitor(
-            Make_Array_Wrapper_Function(regular_subsys.sign_of_cell_index)
-        ),
-        -1 // sign_of_zero
-    );
-    lout << timer.Elapsed() << " s" << std::endl;
 
     {
         typedef BOUND_FAST_MEM_FN<
@@ -128,7 +124,7 @@ int Build_Dirichlet_System(
         Build_Embedding_Subsys(
             main_params.general.n_thread,
             multi_index_bound,
-            As_Const_Array_View(regular_subsys.sign_of_cell_index),
+            sign_of_cell_index,
             Make_Visitor_Sequence(
                 Make_Post_Embedding_Init_Domain_Visitor(embedding_subsys),
                 POST_EMBEDDING_INIT_DIRICHLET_CONSTRAINT_VISITOR<T,D>(
@@ -178,6 +174,7 @@ int Build_Dirichlet_System(
     Build_Domain_Regular_Subsys(
         main_params.general.n_thread,
         dx, cell_multi_index_bound,
+        sign_of_cell_index,
         Make_Compose_Function(problem.beta, x_of_index),
         Make_Compose_Function(problem.f, x_of_index),
         regular_subsys, system_rhs,
@@ -218,24 +215,25 @@ int Build_Dirichlet_System(
     return 0;
 }
 
-#define EXPLICIT_INSTANTIATION( T, D ) \
-    EXPLICIT_INSTANTIATION_HELPER( T, D, ( DOMAIN_EMBEDDING_CUBE_SUBSYS< T ) ( D > ) )
-#define EXPLICIT_INSTANTIATION_HELPER( T, D, T_EMBEDDING_SUBSYS ) \
+#define EXPLICIT_INSTANTIATION( T, D, T_SIGN ) \
+    EXPLICIT_INSTANTIATION_HELPER( T, D, T_SIGN, ( DOMAIN_EMBEDDING_CUBE_SUBSYS< T ) ( D > ) )
+#define EXPLICIT_INSTANTIATION_HELPER( T, D, T_SIGN, T_EMBEDDING_SUBSYS ) \
 template int \
-Build_Dirichlet_System< T, D, BOOST_PP_SEQ_ENUM( T_EMBEDDING_SUBSYS ) >( \
+Build_Dirichlet_System< T, D, T_SIGN, BOOST_PP_SEQ_ENUM( T_EMBEDDING_SUBSYS ) >( \
     EXAMPLE_PARAMS<T,D>::DIRICHLET_PARAMS const & problem, \
     const MAIN_PARAMS<T,D>& main_params, \
     const ARRAY_VIEW<const T> phi_of_fine_index, \
+    const ARRAY_VIEW<const T_SIGN> sign_of_cell_index, \
     DOMAIN_REGULAR_CROSS_SUBSYS<T,D>& regular_subsys, \
     BOOST_PP_SEQ_ENUM( T_EMBEDDING_SUBSYS )& embedding_subsys, \
     ARRAY_VIEW<T> system_rhs, \
     DIRICHLET_CONSTRAINT_SYSTEM<T,D>& constraint_system, \
     ARRAY<T>& constraint_rhs, \
     std::ostream& lout);
-EXPLICIT_INSTANTIATION( float, 2 )
-EXPLICIT_INSTANTIATION( float, 3 )
-EXPLICIT_INSTANTIATION( double, 2 )
-EXPLICIT_INSTANTIATION( double, 3 )
+EXPLICIT_INSTANTIATION( float, 2, signed char )
+EXPLICIT_INSTANTIATION( float, 3, signed char )
+EXPLICIT_INSTANTIATION( double, 2, signed char )
+EXPLICIT_INSTANTIATION( double, 3, signed char )
 #undef EXPLICIT_INSTANTIATION
 #undef EXPLICIT_INSTANTIATION_HELPER
 

@@ -56,8 +56,6 @@ public:
     typedef T_REGULAR_SUBSYS REGULAR_SUBSYS_TYPE;
     typedef T_EMBEDDING_SUBSYS EMBEDDING_SUBSYS_TYPE;
 
-    typedef typename boost::remove_reference< T_REGULAR_SUBSYS >::type::SIGN_TYPE SIGN_TYPE;
-
     DOMAIN_SYSTEM(
         typename ADD_REFERENCE_ADD_CONST< T_REGULAR_SUBSYS >::type regular_subsys,
         typename ADD_REFERENCE_ADD_CONST< T_EMBEDDING_SUBSYS >::type embedding_subsys);

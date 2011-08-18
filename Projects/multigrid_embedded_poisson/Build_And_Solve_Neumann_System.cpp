@@ -18,9 +18,13 @@
 #include <Jeffrey_Utilities/BASIC_TIMER.h>
 #include <Jeffrey_Utilities/DIRECT_INIT_CTOR.h>
 #include <Jeffrey_Utilities/Eval_Grid_Function.h>
+#include <Jeffrey_Utilities/Functional/ARRAY_WRAPPER_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/COMPOSE_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/SIGN_FUNCTION.h>
 #include <Jeffrey_Utilities/GENERIC_SYSTEM_REFERENCE.h>
+#include <Jeffrey_Utilities/Grid/ASSIGN_SIGN_TO_INDEX_GRID_VISITOR.h>
+#include <Jeffrey_Utilities/Grid/Visit_Cells_With_Sign_Via_Fine_Vertex_Sign.h>
+#include <Jeffrey_Utilities/Has_Constant_Vectors_In_Null_Space.h>
 #include <Jeffrey_Utilities/Krylov/Solve_SPD_System_With_ICC_PCG.h>
 #include <Jeffrey_Utilities/Multi_Index/FINE_MULTI_INDEX_FUNCTION.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOUND.h>
@@ -86,6 +90,12 @@ int Build_And_Solve_Neumann_System(
     const VECTOR<T,D> max_x = As_Vector(main_params.grid.max_x);
     const VECTOR<T,D> dx = (max_x - min_x) / cell_multi_index_bound.max_multi_index;
 
+    typename Result_Of::MAKE_COMPOSE_FUNCTION<
+        SIGN_FUNCTION, ARRAY_VIEW<const T>, MULTI_INDEX_BOUND<D>
+    >::type const sign_of_fine_index = Make_Compose_Function(
+        SIGN_FUNCTION(), phi_of_fine_index, fine_multi_index_bound
+    );
+
     std::cout << "Allocating system and rhs...";
     std::cout.flush();
     timer.Restart();
@@ -95,11 +105,26 @@ int Build_And_Solve_Neumann_System(
     ARRAY<T> system_rhs(multi_index_bound.Size()); // init'ed to 0
     std::cout << timer.Elapsed() << " s" << std::endl;
 
+    std::cout << "Initializing sign_of_cell_index...";
+    std::cout.flush();
+    ARRAY<signed char> sign_of_cell_index(cell_multi_index_bound.Size()); // init'ed to 0
+    Visit_Cells_With_Sign_Via_Fine_Vertex_Sign_MT<2>(
+        main_params.general.n_thread,
+        cell_multi_index_bound,
+        sign_of_fine_index,
+        Make_Assign_Sign_To_Index_Grid_Visitor(
+            Make_Array_Wrapper_Function(sign_of_cell_index)
+        ),
+        -1 // sign_of_zero
+    );
+    std::cout << timer.Elapsed() << " s" << std::endl;
+
     std::cout << "Building Neumann system..." << std::endl;
     timer.Restart();
     Build_Neumann_System(
         problem, main_params,
         phi_of_fine_index,
+        As_Const_Array_View(sign_of_cell_index),
         regular_subsys, embedding_subsys, As_Array_View(system_rhs),
         std::cout
     );
@@ -125,22 +150,23 @@ int Build_And_Solve_Neumann_System(
     if(main_params.solver.solver_id == SOLVER_PARAMS::SOLVER_ID_NULL)
         return 0;
 
-    std::cout << "Determining if matrix has a (nontrivial) null space...";
-    std::cout.flush();
-    timer.Restart();
-    const bool has_nontrivial_null_space = !Any_If_MT(
-        main_params.general.n_thread,
-        1, multi_index_bound.Size(),
-        INDEX_IS_DIRICHLET< SYSTEM_TYPE >(system)
-    );
-    std::cout << timer.Elapsed() << " s" << std::endl;
-    std::cout << "  " << (has_nontrivial_null_space ? "yes" : "no") << std::endl;
-
     std::cout << "Allocating approximate solution...";
     std::cout.flush();
     timer.Restart();
     ARRAY<T> u_approx(multi_index_bound.Size()); // init'ed to 0
     std::cout << timer.Elapsed() << " s" << std::endl;
+
+    std::cout << "Determining if constant vectors in null space...";
+    std::cout.flush();
+    timer.Restart();
+    const bool has_constant_vectors_in_null_space =
+        Has_Constant_Vectors_In_Null_Space<T>(
+            main_params.general.n_thread,
+            multi_index_bound.Size(),
+            system
+        );
+    std::cout << timer.Elapsed() << " s" << std::endl;
+    std::cout << "  " << (has_constant_vectors_in_null_space ? "yes" : "no") << std::endl;
 
     switch(main_params.solver.solver_id) {
     case SOLVER_PARAMS::SOLVER_ID_NULL:
@@ -151,39 +177,39 @@ int Build_And_Solve_Neumann_System(
         std::cout << "Solving with PhysBAM CG solver..." << std::endl;
         timer.Restart();
         PhysBAM::Solve_SPD_System_With_ICC_PCG(
+            main_params.general.n_thread,
             main_params.solver,
+            has_constant_vectors_in_null_space,
             GENERIC_SYSTEM_REFERENCE<T>(system),
             As_Array_View(system_rhs),
-            has_nontrivial_null_space,
-            As_Array_View(u_approx)
+            As_Array_View(u_approx),
+            std::cout
         );
         std::cout << "[Solving with PhysBAM CG solver...] " << timer.Elapsed() << " s" << std::endl;
         break;
     case SOLVER_PARAMS::SOLVER_ID_PHYSBAM_MINRES:
         std::cout << "ERROR: Solver \"physbam-minres\" cannot be used to solve Neumann problems." << std::endl;
         return 1;
-#ifdef PHYSBAM_USE_PETSC
     case SOLVER_PARAMS::SOLVER_ID_PETSC_CG:
+#ifdef PHYSBAM_USE_PETSC
         std::cout << "Solving with PETSc CG solver..." << std::endl;
         timer.Restart();
         PHYSBAM_PETSC_CALL_AND_CHKERRQ((
             Petsc::Solve_SPD_System_With_ICC_PCG(
                 main_params.general.n_thread,
                 main_params.solver,
+                has_constant_vectors_in_null_space,
                 GENERIC_SYSTEM_REFERENCE<T>(system),
                 As_Const_Array_View(system_rhs),
-                has_nontrivial_null_space,
                 As_Array_View(u_approx),
                 std::cout
             )
         ));
         std::cout << "[Solving with PETSc CG solver...] " << timer.Elapsed() << " s" << std::endl;
-        break;
 #else // #ifdef PHYSBAM_USE_PETSC
-    case SOLVER_PARAMS::SOLVER_ID_PETSC_CG:
         std::cout << "WARNING: PETSc not supported on this platform." << std::endl;
-        break;
 #endif // #ifdef PHYSBAM_USE_PETSC
+        break;
     case SOLVER_PARAMS::SOLVER_ID_PETSC_MINRES:
         std::cout << "ERROR: Solver \"petsc-minres\" cannot be used to solve Neumann problems." << std::endl;
         return 1;
@@ -195,16 +221,13 @@ int Build_And_Solve_Neumann_System(
         break;
     }
 
-    if(has_nontrivial_null_space) {
+    if(has_constant_vectors_in_null_space) {
         T error_sum = 0;
         int count = 0;
         for(int linear_index = 1; linear_index <= multi_index_bound.Size(); ++linear_index) {
             const MULTI_INDEX_TYPE multi_index = multi_index_bound.Multi_Index(linear_index);
             const MULTI_INDEX_TYPE fine_multi_index = 2 * multi_index - 1;
-            const int fine_linear_index = fine_multi_index_bound.Linear_Index(fine_multi_index);
-            const T phi = phi_of_fine_index(fine_linear_index);
-            const int sign = (0 < phi) - (phi < 0);
-            if(sign >= 0)
+            if(sign_of_fine_index(fine_multi_index) > 0)
                 continue;
             error_sum += u_approx(linear_index) - u_continuous(linear_index);
             ++count;
@@ -221,14 +244,12 @@ int Build_And_Solve_Neumann_System(
         problem, main_params,
         -1,
         Make_Compose_Function(
-            SIGN_FUNCTION(),
-            phi_of_fine_index,
-            fine_multi_index_bound,
+            sign_of_fine_index,
             FINE_MULTI_INDEX_FUNCTION<2>(),
             multi_index_bound
         ),
         Make_Compose_Function(
-            As_Const_Array_View(regular_subsys.sign_of_cell_index),
+            As_Const_Array_View(sign_of_cell_index),
             cell_multi_index_bound
         ),
         As_Const_Array_View(u_approx),

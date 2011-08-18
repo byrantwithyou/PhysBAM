@@ -27,7 +27,12 @@
 #include <Jeffrey_Utilities/Functional/EQUAL_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/IF_ELSE_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/SIGN_FUNCTION.h>
+#include <Jeffrey_Utilities/GENERIC_SYSTEM_REFERENCE.h>
+#include <Jeffrey_Utilities/Grid/ASSIGN_SIGN_TO_INDEX_GRID_VISITOR.h>
 #include <Jeffrey_Utilities/Grid/VERTEX_IS_COARSE_CELL_CENTER.h>
+#include <Jeffrey_Utilities/Grid/Visit_Cells_With_Sign_Via_Fine_Vertex_Sign.h>
+#include <Jeffrey_Utilities/Has_Constant_Vectors_In_Null_Space.h>
+#include <Jeffrey_Utilities/Krylov/Solve_SPD_System_With_ICC_PCG.h>
 #include <Jeffrey_Utilities/Multi_Index/FINE_MULTI_INDEX_FUNCTION.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOUND.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_X_FUNCTION.h>
@@ -59,7 +64,6 @@
 
 #ifdef PHYSBAM_USE_PETSC
 #include <petsc.h>
-#include <Jeffrey_Utilities/GENERIC_SYSTEM_REFERENCE.h>
 #include <Jeffrey_Utilities/Petsc/CALL_AND_CHKERRQ.h>
 #include <Jeffrey_Utilities/Petsc/Solve_SPD_System_With_ICC_PCG.h>
 #endif // #ifdef PHYSBAM_USE_PETSC
@@ -100,6 +104,12 @@ int Build_And_Solve_Interface_System(
     const VECTOR<T,D> max_x = As_Vector(main_params.grid.max_x);
     const VECTOR<T,D> dx = (max_x - min_x) / cell_multi_index_bound.max_multi_index;
 
+    typedef typename Result_Of::MAKE_COMPOSE_FUNCTION<
+        SIGN_FUNCTION, ARRAY_VIEW<const T>, MULTI_INDEX_BOUND<D>
+    >::type SIGN_OF_FINE_INDEX_TYPE;
+    const SIGN_OF_FINE_INDEX_TYPE sign_of_fine_index = Make_Compose_Function(
+        SIGN_FUNCTION(), phi_of_fine_index, fine_multi_index_bound
+    );
     const MULTI_INDEX_X_FUNCTION< T, D, MULTI_INDEX_BOUND<D> >
         x_of_index(min_x, max_x, multi_index_bound);
 
@@ -117,11 +127,27 @@ int Build_And_Solve_Interface_System(
     ARRAY<T> constraint_rhs;
     std::cout << timer.Elapsed() << " s" << std::endl;
 
+    std::cout << "Initializing sign_of_cell_index...";
+    std::cout.flush();
+    timer.Restart();
+    ARRAY<signed char> sign_of_cell_index(cell_multi_index_bound.Size()); // init'ed to 0
+    Visit_Cells_With_Sign_Via_Fine_Vertex_Sign_MT<2>(
+        main_params.general.n_thread,
+        cell_multi_index_bound,
+        sign_of_fine_index,
+        Make_Assign_Sign_To_Index_Grid_Visitor(
+            Make_Array_Wrapper_Function(sign_of_cell_index)
+        ),
+        -1 // sign_of_zero
+    );
+    std::cout << timer.Elapsed() << " s" << std::endl;
+
     std::cout << "Building interface system..." << std::endl;
     timer.Restart();
     Build_Interface_System(
         problem, main_params,
         phi_of_fine_index,
+        As_Const_Array_View(sign_of_cell_index),
         regular_subsys, embedding_subsys, system_rhs,
         constraint_system, constraint_rhs,
         std::cout
@@ -140,9 +166,7 @@ int Build_And_Solve_Interface_System(
     > VIRTUAL_INDEX_OFFSET_OF_GRID_INDEX_TYPE;
     typedef ARRAY_VIEW<const int> GRID_INDEX_OF_VIRTUAL_INDEX_OFFSET_TYPE;
     typedef typename Result_Of::MAKE_COMPOSE_FUNCTION<
-        SIGN_FUNCTION,
-        ARRAY_VIEW<const T>,
-        MULTI_INDEX_BOUND<D>,
+        SIGN_OF_FINE_INDEX_TYPE,
         FINE_MULTI_INDEX_FUNCTION<2>,
         MULTI_INDEX_BOUND<D>
     >::type SIGN_OF_GRID_INDEX_TYPE;
@@ -156,9 +180,7 @@ int Build_And_Solve_Interface_System(
         VIRTUAL_INDEX_OFFSET_OF_GRID_INDEX_TYPE(embedding_subsys.stencil_index_of_index),
         GRID_INDEX_OF_VIRTUAL_INDEX_OFFSET_TYPE(embedding_subsys.index_of_stencil_index),
         Make_Compose_Function(
-            SIGN_FUNCTION(),
-            phi_of_fine_index,
-            fine_multi_index_bound,
+            sign_of_fine_index,
             FINE_MULTI_INDEX_FUNCTION<2>(),
             multi_index_bound
         )
@@ -215,15 +237,13 @@ int Build_And_Solve_Interface_System(
         case SOLVER_PARAMS::SOLVER_ID_PHYSBAM_MINRES:
             std::cout << "WARNING: Solver \"physbam-minres\" not yet implemented for interface problems." << std::endl;
             break;
+        case SOLVER_PARAMS::SOLVER_ID_PETSC_MINRES:
 #ifdef PHYSBAM_USE_PETSC
-        case SOLVER_PARAMS::SOLVER_ID_PETSC_MINRES:
             std::cout << "WARNING: Solver \"petsc-minres\" not yet implemented for interface problems." << std::endl;
-            break;
 #else // #ifdef PHYSBAM_USE_PETSC
-        case SOLVER_PARAMS::SOLVER_ID_PETSC_MINRES:
             std::cout << "WARNING: PETSc not supported on this platform." << std::endl;
-            break;
 #endif // #ifdef PHYSBAM_USE_PETSC
+            break;
         default:
             std::cout << "ERROR: Must use either \"physbam-minres\" or \"petsc-minres\" "
                          "solvers for interface problems with single-cell constraints."
@@ -333,17 +353,15 @@ int Build_And_Solve_Interface_System(
         ) {
             switch(main_params.solver.solver_id) {
             case SOLVER_PARAMS::SOLVER_ID_PHYSBAM_MINRES:
-                std::cout << "WARNING: Solver \"physbam-minres\" not yet implemented for Dirichlet problems." << std::endl;
+                std::cout << "WARNING: Solver \"physbam-minres\" not yet implemented for interface problems." << std::endl;
                 break;
+            case SOLVER_PARAMS::SOLVER_ID_PETSC_MINRES:
 #ifdef PHYSBAM_USE_PETSC
-            case SOLVER_PARAMS::SOLVER_ID_PETSC_MINRES:
-                std::cout << "WARNING: Solver \"petsc-minres\" not yet implemented for Dirichlet problems." << std::endl;
-                break;
+                std::cout << "WARNING: Solver \"petsc-minres\" not yet implemented for interface problems." << std::endl;
 #else // #ifdef PHYSBAM_USE_PETSC
-            case SOLVER_PARAMS::SOLVER_ID_PETSC_MINRES:
                 std::cout << "WARNING: PETSc not supported on this platform." << std::endl;
-                break;
 #endif // #ifdef PHYSBAM_USE_PETSC
+                break;
             default:
                 assert(false);
             }
@@ -501,31 +519,52 @@ int Build_And_Solve_Interface_System(
                 std::cout << "  " << ARRAYS_COMPUTATIONS::Maxabs(ztaz_residual) << std::endl;
             }
 
+            std::cout << "Determining if constant vectors in null space...";
+            std::cout.flush();
+            timer.Restart();
+            const bool has_constant_vectors_in_null_space =
+                Has_Constant_Vectors_In_Null_Space<T>(
+                    main_params.general.n_thread,
+                    multi_index_bound.Size(),
+                    ztaz_system
+                );
+            std::cout << timer.Elapsed() << " s" << std::endl;
+            std::cout << "  " << (has_constant_vectors_in_null_space ? "yes" : "no") << std::endl;
+
             switch(main_params.solver.solver_id) {
             case SOLVER_PARAMS::SOLVER_ID_NULL:
                 return 0;
             case SOLVER_PARAMS::SOLVER_ID_PHYSBAM_CG:
-                std::cout << "WARNING: Solver \"physbam-cg\" not yet implemented for Dirichlet problems." << std::endl;
+                std::cout << "Solving with PhysBAM CG solver..." << std::endl;
+                timer.Restart();
+                PhysBAM::Solve_SPD_System_With_ICC_PCG(
+                    main_params.general.n_thread,
+                    main_params.solver,
+                    has_constant_vectors_in_null_space,
+                    GENERIC_SYSTEM_REFERENCE<T>(ztaz_system),
+                    As_Array_View(ztaz_system_rhs),
+                    As_Array_View(u_approx),
+                    std::cout
+                );
+                std::cout << "[Solving with PhysBAM CG solver...] " << timer.Elapsed() << " s" << std::endl;
                 break;
-#ifdef PHYSBAM_USE_PETSC
             case SOLVER_PARAMS::SOLVER_ID_PETSC_CG:
+#ifdef PHYSBAM_USE_PETSC
                 std::cout << "Solving with PETSc CG solver..." << std::endl;
                 timer.Restart();
                 PHYSBAM_PETSC_CALL_AND_CHKERRQ((
                     Petsc::Solve_SPD_System_With_ICC_PCG(
                         main_params.general.n_thread,
                         main_params.solver,
+                        has_constant_vectors_in_null_space,
                         GENERIC_SYSTEM_REFERENCE<T>(ztaz_system),
                         As_Const_Array_View(ztaz_system_rhs),
-                        false, // has_constant_vectors_in_null_space
                         As_Array_View(u_approx),
                         std::cout
                     )
                 ));
                 std::cout << "[Solving with PETSc CG solver...] " << timer.Elapsed() << " s" << std::endl;
-                break;
 #else // #ifdef PHYSBAM_USE_PETSC
-            case SOLVER_PARAMS::SOLVER_ID_PETSC_CG:
                 std::cout << "WARNING: PETSc not supported on this platform." << std::endl;
                 break;
 #endif // #ifdef PHYSBAM_USE_PETSC
@@ -564,7 +603,7 @@ int Build_And_Solve_Interface_System(
         -1,
         index_transform.sign_of_grid_index,
         Make_Compose_Function(
-            As_Const_Array_View(regular_subsys.sign_of_cell_index),
+            As_Const_Array_View(sign_of_cell_index),
             cell_multi_index_bound
         ),
         Make_Const_Array_View(multi_index_bound.Size(), u_approx.Get_Array_Pointer()),
@@ -575,7 +614,7 @@ int Build_And_Solve_Interface_System(
         +1,
         index_transform.sign_of_grid_index,
         Make_Compose_Function(
-            As_Const_Array_View(regular_subsys.sign_of_cell_index),
+            As_Const_Array_View(sign_of_cell_index),
             cell_multi_index_bound
         ),
         Make_Const_Array_View(multi_index_bound.Size(), u_approx.Get_Array_Pointer()),

@@ -10,6 +10,8 @@
 #include <Jeffrey_Utilities/Stencils/UNSTRUCTURED_STENCIL.h>
 #include <Jeffrey_Utilities/Stencils/UNSTRUCTURED_STENCIL_PROXY.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
+#include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
+#include <PhysBAM_Tools/Matrices/MATRIX_FORWARD.h>
 
 namespace PhysBAM
 {
@@ -24,6 +26,7 @@ struct GENERIC_SYSTEM_REFERENCE
 
     T Diag(const int index) const;
     int Stencil_N_Nonzero(const int index) const;
+    T Stencil_Sum(const int index) const;
 
     typedef UNSTRUCTURED_STENCIL_PROXY<
         UNSTRUCTURED_STENCIL<int,T>
@@ -66,6 +69,12 @@ Stencil_N_Nonzero(const int index) const
 { return (*m_dispatcher.Stencil_N_Nonzero)(mp_system, index); }
 
 template< class T >
+inline T
+GENERIC_SYSTEM_REFERENCE<T>::
+Stencil_Sum(const int index) const
+{ return (*m_dispatcher.Stencil_Sum)(mp_system, index); }
+
+template< class T >
 inline void
 GENERIC_SYSTEM_REFERENCE<T>::
 Add_Stencil_To(const int index, const ADD_STENCIL_TO_STENCIL_PROXY_TYPE& stencil_proxy) const
@@ -82,6 +91,7 @@ struct GENERIC_SYSTEM_REFERENCE<T>::DISPATCHER
 {
     T (*Diag)(const void* const, const int);
     int (*Stencil_N_Nonzero)(const void* const, const int);
+    T (*Stencil_Sum)(const void* const, const int);
     void (*Add_Stencil_To)(const void* const, const int, const ADD_STENCIL_TO_STENCIL_PROXY_TYPE&);
     void (*Apply)(const void* const, const ARRAY_VIEW<const T>, ARRAY_VIEW<T>);
 };
@@ -95,6 +105,7 @@ struct GENERIC_SYSTEM_REFERENCE<T>::ACCESSOR
         static const DISPATCHER dispatcher = {
             &Diag,
             &Stencil_N_Nonzero,
+            &Stencil_Sum,
             &Add_Stencil_To,
             &Apply
         };
@@ -105,6 +116,8 @@ struct GENERIC_SYSTEM_REFERENCE<T>::ACCESSOR
     { return static_cast< const T_SYSTEM* >(p_system)->Diag(index); }
     static int Stencil_N_Nonzero(const void* const p_system, const int index)
     { return static_cast< const T_SYSTEM* >(p_system)->Stencil_N_Nonzero(index); }
+    static T Stencil_Sum(const void* const p_system, const int index)
+    { return static_cast< const T_SYSTEM* >(p_system)->Stencil_Sum(index); }
     static void Add_Stencil_To(const void* const p_system, const int index, const ADD_STENCIL_TO_STENCIL_PROXY_TYPE& stencil_proxy)
     { static_cast< const T_SYSTEM* >(p_system)->Add_Stencil_To(index, stencil_proxy); }
     static void Apply(const void* const p_system, const ARRAY_VIEW<const T> x, ARRAY_VIEW<T> y)

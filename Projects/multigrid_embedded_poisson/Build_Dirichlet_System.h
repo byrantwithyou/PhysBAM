@@ -23,11 +23,12 @@ namespace Multigrid_Embedded_Poisson
 template< class T, int D > class DOMAIN_REGULAR_CROSS_SUBSYS; 
 template< class T, int D > struct DIRICHLET_CONSTRAINT_SYSTEM;
 
-template< class T, int D, class T_EMBEDDED_SUBSYS >
+template< class T, int D, class T_SIGN, class T_EMBEDDED_SUBSYS >
 int Build_Dirichlet_System(
     typename EXAMPLE_PARAMS<T,D>::DIRICHLET_PARAMS const & problem,
     const MAIN_PARAMS<T,D>& main_params,
     const ARRAY_VIEW<const T> phi_of_fine_index,
+    const ARRAY_VIEW<const T_SIGN> sign_of_cell_index,
     DOMAIN_REGULAR_CROSS_SUBSYS<T,D>& regular_subsys,
     T_EMBEDDED_SUBSYS& embedded_subsys,
     ARRAY_VIEW<T> system_rhs,

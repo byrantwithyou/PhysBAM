@@ -32,10 +32,8 @@ class DOMAIN_REGULAR_SUBSYS_BASE
 public:
     typedef VECTOR<int,D> MULTI_INDEX_TYPE;
     typedef T_STENCIL STENCIL_TYPE;
-    typedef signed char SIGN_TYPE;
 
     VECTOR<T,D> dx;
-    ARRAY< SIGN_TYPE > sign_of_cell_index;
     ARRAY< STENCIL_TYPE > stencil_of_index;
 
     using DOMAIN_SUBSYS_BASE_::multi_index_bound;
@@ -103,7 +101,6 @@ DOMAIN_REGULAR_SUBSYS_BASE(
     const VECTOR<T,D>& dx_)
     : DOMAIN_SUBSYS_BASE_(multi_index_bound_),
       dx(dx_),
-      sign_of_cell_index((multi_index_bound_ - 1).Size(), false), // uninit'ed
       stencil_of_index(multi_index_bound_.Size(), false) // uninit'ed
 { }
 
@@ -136,8 +133,6 @@ DOMAIN_REGULAR_SUBSYS_BASE< T_DERIVED, T, D, T_STENCIL >::
 Resize(const MULTI_INDEX_BOUND<D>& new_multi_index_bound)
 {
     multi_index_bound = new_multi_index_bound;
-    sign_of_cell_index.Remove_All();
-    sign_of_cell_index.Exact_Resize(Cell_Multi_Index_Bound().Size(), false); // uninit'ed
     stencil_of_index.Remove_All();
     stencil_of_index.Exact_Resize(multi_index_bound.Size(), false); // uninit'ed
 }
@@ -156,11 +151,11 @@ Coarsen(const T_FINE& fine)
 {
     dx = 2 * fine.dx;
     Resize((fine.multi_index_bound + 1) / 2);
-    Coarsen_Sign_Of_Cell_Index(
-        fine.Cell_Multi_Index_Bound(),
-        fine.sign_of_cell_index,
-        sign_of_cell_index
-    );
+    //Coarsen_Sign_Of_Cell_Index(
+    //    fine.Cell_Multi_Index_Bound(),
+    //    fine.sign_of_cell_index,
+    //    sign_of_cell_index
+    //);
     //Derived().Coarsen_Stencils(fine);
 }
 

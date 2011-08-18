@@ -20,8 +20,7 @@
 #include <Jeffrey_Utilities/Functional/CONSTANT_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/IF_ELSE_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/SIGN_FUNCTION.h>
-#include <Jeffrey_Utilities/Grid/ASSIGN_SIGN_TO_INDEX_GRID_VISITOR.h>
-#include <Jeffrey_Utilities/Grid/Visit_Cells_With_Sign_Via_Fine_Vertex_Sign.h>
+#include <Jeffrey_Utilities/Grid/Cell_Sign_Via_Fine_Vertex_Sign.h>
 #include <Jeffrey_Utilities/Multi_Index/FINE_MULTI_INDEX_FUNCTION.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOUND.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_CUBE.h>
@@ -58,11 +57,12 @@ template const int& HASHTABLE<int,int>::Get(const int&) const;
 namespace Multigrid_Embedded_Poisson
 {
 
-template< class T, int D >
+template< class T, int D, class T_SIGN >
 int Build_Interface_System(
     const typename EXAMPLE_PARAMS<T,D>::INTERFACE_PARAMS& problem,
     const MAIN_PARAMS<T,D>& main_params,
     const ARRAY_VIEW<const T> phi_of_fine_index,
+    const ARRAY_VIEW<const T_SIGN> sign_of_cell_index,
     DOMAIN_REGULAR_CROSS_SUBSYS<T,D>& regular_subsys,
     EMBEDDING_UNSTRUCTURED_SUBSYS<T>& embedding_subsys,
     ARRAY<T>& system_rhs,
@@ -93,6 +93,15 @@ int Build_Interface_System(
     const MULTI_INDEX_X_FUNCTION< T, D, MULTI_INDEX_BOUND<D> >
         x_of_index(min_x, max_x, multi_index_bound);
 
+#ifndef NDEBUG
+    for(int cell_linear_index = 1; cell_linear_index <= cell_multi_index_bound.Size(); ++cell_linear_index) {
+        const MULTI_INDEX_TYPE cell_multi_index = cell_multi_index_bound.Multi_Index(cell_linear_index);
+        const int cell_sign1 = Cell_Sign_Via_Fine_Vertex_Sign<2>(sign_of_fine_index, cell_multi_index, -1);
+        const int cell_sign2 = sign_of_cell_index(cell_linear_index);
+        assert(cell_sign1 == cell_sign2);
+    }
+#endif // #ifndef NDEBUG
+
     typedef SYSTEM_SUM< boost::mpl::vector2<
         DOMAIN_REGULAR_CROSS_SUBSYS<T,D>&,
         EMBEDDING_UNSTRUCTURED_SUBSYS<T>&
@@ -102,24 +111,10 @@ int Build_Interface_System(
         boost::ref(embedding_subsys))
     );
 
-    lout << "Initializing sign_of_cell_index...";
-    lout.flush();
-    timer.Restart();
-    Visit_Cells_With_Sign_Via_Fine_Vertex_Sign_MT<2>(
-        main_params.general.n_thread,
-        cell_multi_index_bound,
-        sign_of_fine_index,
-        Make_Assign_Sign_To_Index_Grid_Visitor(
-            Make_Array_Wrapper_Function(regular_subsys.sign_of_cell_index)
-        ),
-        -1 // sign_of_zero
-    );
-    lout << timer.Elapsed() << " s" << std::endl;
-
     Build_Interface_Embedding_Subsys(
         main_params.general.n_thread,
         min_x, max_x, multi_index_bound,
-        As_Const_Array_View(regular_subsys.sign_of_cell_index),
+        sign_of_cell_index,
         Make_Compose_Function(phi_of_fine_index, fine_multi_index_bound),
         Make_Compose_Function(problem.negative.beta, x_of_index),
         Make_Compose_Function(problem.negative.f, x_of_index),
@@ -143,6 +138,7 @@ int Build_Interface_System(
     Build_Interface_Regular_Subsys(
         main_params.general.n_thread,
         dx, cell_multi_index_bound,
+        sign_of_cell_index,
         Make_Compose_Function(problem.negative.beta, x_of_index),
         Make_Compose_Function(problem.negative.f, x_of_index),
         Make_Compose_Function(problem.positive.beta, x_of_index),
@@ -204,22 +200,23 @@ int Build_Interface_System(
     return 0;
 }
 
-#define EXPLICIT_INSTANTIATION( T, D ) \
+#define EXPLICIT_INSTANTIATION( T, D, T_SIGN ) \
 template int \
-Build_Interface_System< T, D >( \
+Build_Interface_System< T, D, T_SIGN >( \
     EXAMPLE_PARAMS<T,D>::INTERFACE_PARAMS const & problem, \
     const MAIN_PARAMS<T,D>& main_params, \
     const ARRAY_VIEW<const T> phi_of_fine_index, \
+    const ARRAY_VIEW<const T_SIGN> sign_of_cell_index, \
     DOMAIN_REGULAR_CROSS_SUBSYS<T,D>& regular_subsys, \
     EMBEDDING_UNSTRUCTURED_SUBSYS<T>& embedding_subsys, \
     ARRAY<T>& system_rhs, \
     INTERFACE_CONSTRAINT_SYSTEM<T,D>& constraint_system, \
     ARRAY<T>& constraint_rhs, \
     std::ostream& lout);
-EXPLICIT_INSTANTIATION( float, 2 )
-EXPLICIT_INSTANTIATION( float, 3 )
-EXPLICIT_INSTANTIATION( double, 2 )
-EXPLICIT_INSTANTIATION( double, 3 )
+EXPLICIT_INSTANTIATION( float, 2, signed char )
+EXPLICIT_INSTANTIATION( float, 3, signed char )
+EXPLICIT_INSTANTIATION( double, 2, signed char )
+EXPLICIT_INSTANTIATION( double, 3, signed char )
 #undef EXPLICIT_INSTANTIATION
 #undef EXPLICIT_INSTANTIATION_HELPER
 

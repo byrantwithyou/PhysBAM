@@ -4,10 +4,11 @@
 // license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_PROJECT_TO_ZERO_DIVERGENCE_WITH_INTERFACE_HPP
-#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_PROJECT_TO_ZERO_DIVERGENCE_WITH_INTERFACE_HPP
+#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_PROJECT_TO_ZERO_DIVERGENCE_WITH_INTERFACE_H
+#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_PROJECT_TO_ZERO_DIVERGENCE_WITH_INTERFACE_H
 
 #include <limits>
+#include <ostream>
 
 #include <boost/foreach.hpp>
 #include <boost/fusion/container/generation/make_vector.hpp>
@@ -15,15 +16,20 @@
 #include <boost/ref.hpp>
 
 #include <Jeffrey_Utilities/ARRAY_OPS.h>
+#include <Jeffrey_Utilities/Divergence_Of_MAC_Vector_Field.h>
+#include <Jeffrey_Utilities/DIVERGENCE_OF_MAC_VECTOR_FIELD_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/ARRAY_WRAPPER_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/BOUND_FAST_MEM_FN.h>
 #include <Jeffrey_Utilities/Functional/COMPOSE_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/CONSTANT_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/SIGN_FUNCTION.h>
+#include <Jeffrey_Utilities/GENERIC_SYSTEM_REFERENCE.h>
 #include <Jeffrey_Utilities/Grid/ASSIGN_SIGN_TO_INDEX_GRID_VISITOR.h>
 #include <Jeffrey_Utilities/Grid/Visit_Cells_With_Sign_Via_Fine_Vertex_Sign.h>
+#include <Jeffrey_Utilities/Krylov/Solve_SPD_System_With_ICC_PCG.h>
 #include <Jeffrey_Utilities/Multi_Index/FINE_MULTI_INDEX_FUNCTION.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOUND.h>
+#include <Jeffrey_Utilities/ONSTREAM.h>
 #include <Jeffrey_Utilities/SOLVER_PARAMS.h>
 #include <Jeffrey_Utilities/Stencils/ZERO_STENCIL_PROXY.h>
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
@@ -47,7 +53,6 @@
 
 #ifdef PHYSBAM_USE_PETSC
 #include <petsc.h>
-#include <Jeffrey_Utilities/GENERIC_SYSTEM_REFERENCE.h>
 #include <Jeffrey_Utilities/Petsc/CALL_AND_CHKERRQ.h>
 #include <Jeffrey_Utilities/Petsc/Solve_SPD_System_With_ICC_PCG.h>
 #endif // #ifdef PHYSBAM_USE_PETSC
@@ -77,7 +82,8 @@ int Project_To_Zero_Divergence_With_Interface(
     const T_BETA_POSITIVE_OF_INDEX& beta_positive_of_index,
     const T_JUMP_P_OF_X_OF_CELL_INDEX& jump_p_of_x_of_cell_index,
     const T_JUMP_BETA_GRAD_P_DOT_N_OF_X_AND_N_OF_CELL_INDEX& jump_beta_grad_p_dot_n_of_x_and_n_of_cell_index,
-    T_MAC_VECTOR_FIELD mac_vector_field)
+    T_MAC_VECTOR_FIELD mac_vector_field,
+    std::ostream& lout = PhysBAM::nout)
 {
     typedef VECTOR<int,D> MULTI_INDEX_TYPE;
 
@@ -94,8 +100,18 @@ int Project_To_Zero_Divergence_With_Interface(
     const MULTI_INDEX_BOUND<D> cell_multi_index_bound = multi_index_bound - 1;
     const VECTOR<T,D> dx = (max_x - min_x) / cell_multi_index_bound.max_multi_index;
 
-    const DIVERGENCE_OF_MAC_VECTOR_FIELD< T, D, T_MAC_VECTOR_FIELD >
-        divergence_of_mac_vector_field(dx, mac_vector_field);
+    const DIVERGENCE_OF_MAC_VECTOR_FIELD_FUNCTION<
+        T, D, T_MAC_VECTOR_FIELD
+    > divergence_of_mac_vector_field(dx, mac_vector_field);
+
+    {
+        T max_abs_div = 0;
+        BOOST_FOREACH( const MULTI_INDEX_TYPE multi_index, multi_index_bound ) {
+            const T div = divergence_of_mac_vector_field(multi_index);
+            max_abs_div = std::max(max_abs_div, std::abs(div));
+        }
+        lout << "max absolute pre-projection divergence = " << max_abs_div << std::endl;
+    }
 
     REGULAR_SUBSYS_TYPE regular_subsys(multi_index_bound, dx);
     EMBEDDING_SUBSYS_TYPE embedding_subsys;
@@ -107,12 +123,13 @@ int Project_To_Zero_Divergence_With_Interface(
     ARRAY<T> system_rhs;
     ARRAY<T> constraint_rhs;
 
+    ARRAY<signed char> sign_of_cell_index(cell_multi_index_bound.Size()); // init'ed to 0
     Visit_Cells_With_Sign_Via_Fine_Vertex_Sign_MT<2>(
         n_thread,
         cell_multi_index_bound,
         Make_Compose_Function(SIGN_FUNCTION(), phi_of_fine_index),
         Make_Assign_Sign_To_Index_Grid_Visitor(
-            Make_Array_Wrapper_Function(regular_subsys.sign_of_cell_index)
+            Make_Array_Wrapper_Function(sign_of_cell_index)
         ),
         -1 // sign_of_zero
     );
@@ -120,27 +137,31 @@ int Project_To_Zero_Divergence_With_Interface(
     Build_Interface_Embedding_Subsys(
         n_thread,
         min_x, max_x, multi_index_bound,
-        As_Const_Array_View(regular_subsys.sign_of_cell_index),
+        As_Const_Array_View(sign_of_cell_index),
         phi_of_fine_index,
         beta_negative_of_index,
         divergence_of_mac_vector_field,
         beta_positive_of_index,
         divergence_of_mac_vector_field,
         jump_p_of_x_of_cell_index, jump_beta_grad_p_dot_n_of_x_and_n_of_cell_index,
-        0.0f, // min_dist_to_vertex
+        //0.0f, // min_dist_to_vertex
+        0.01f, // min_dist_to_vertex
         -1, // sign_of_zero
         embedding_subsys, system_rhs,
-        constraint_system, constraint_rhs
+        constraint_system, constraint_rhs,
+        lout
     );
 
     Build_Interface_Regular_Subsys(
         n_thread,
         dx, cell_multi_index_bound,
+        As_Const_Array_View(sign_of_cell_index),
         beta_negative_of_index,
         divergence_of_mac_vector_field,
         beta_positive_of_index,
         divergence_of_mac_vector_field,
-        regular_subsys, As_Array_View(system_rhs)
+        regular_subsys, As_Array_View(system_rhs),
+        lout
     );
 
     const int n_embedding  = embedding_subsys.stencils.Size();
@@ -288,13 +309,23 @@ int Project_To_Zero_Divergence_With_Interface(
         Petsc::Solve_SPD_System_With_ICC_PCG(
             n_thread,
             solver_params,
+            true, // has_constant_vectors_in_null_space
             GENERIC_SYSTEM_REFERENCE<T>(ztaz_system),
             As_Const_Array_View(ztaz_system_rhs),
-            true, // has_constant_vectors_in_null_space
-            As_Array_View(p)
+            As_Array_View(p),
+            lout
         )
     ));
 #else // #ifdef PHYSBAM_USE_PETSC
+    PhysBAM::Solve_SPD_System_With_ICC_PCG(
+        n_thread,
+        solver_params,
+        true, // has_constant_vectors_in_null_space
+        GENERIC_SYSTEM_REFERENCE<T>(ztaz_system),
+        As_Array_View(ztaz_system_rhs),
+        As_Array_View(p),
+        lout
+    );
 #endif // #ifdef PHYSBAM_USE_PETSC
 
     // p <- c + Z*p
@@ -334,6 +365,15 @@ int Project_To_Zero_Divergence_With_Interface(
         }
     }
 
+    {
+        T max_abs_div = 0;
+        BOOST_FOREACH( const MULTI_INDEX_TYPE multi_index, multi_index_bound ) {
+            const T div = divergence_of_mac_vector_field(multi_index);
+            max_abs_div = std::max(max_abs_div, std::abs(div));
+        }
+        lout << "max absolute post-projection divergence = " << max_abs_div << std::endl;
+    }
+
     return 0;
 }
 
@@ -341,4 +381,4 @@ int Project_To_Zero_Divergence_With_Interface(
 
 } // namespace PhysBAM
 
-#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_PROJECT_TO_ZERO_DIVERGENCE_WITH_INTERFACE_HPP
+#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_PROJECT_TO_ZERO_DIVERGENCE_WITH_INTERFACE_H

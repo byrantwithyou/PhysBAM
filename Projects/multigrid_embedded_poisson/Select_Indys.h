@@ -70,6 +70,8 @@ void Select_Indys(
     const int n_constraint = constraint_index_of_cell_linear_index.Size();
     assert(n_constraint == constraint_index_of_cell_linear_index.Size());
     assert(n_constraint == indy_index_of_constraint_index.Size());
+    if(n_constraint == 0)
+        return;
 
     static const int INVALID_INDY_INDEX = 0;
     ARRAYS_COMPUTATIONS::Fill(indy_index_of_constraint_index,INVALID_INDY_INDEX);

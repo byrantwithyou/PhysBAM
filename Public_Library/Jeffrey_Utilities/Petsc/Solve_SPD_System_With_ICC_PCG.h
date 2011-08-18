@@ -27,9 +27,9 @@ PetscErrorCode
 Solve_SPD_System_With_ICC_PCG(
     const unsigned int n_thread,
     const SOLVER_PARAMS params,
+    const bool has_constant_vectors_in_null_space,
     const GENERIC_SYSTEM_REFERENCE<T> system,
     const ARRAY_VIEW<const T> rhs,
-    const bool has_constant_vectors_in_null_space,
     ARRAY_VIEW<T> x,
     std::ostream& lout = PhysBAM::nout);
 

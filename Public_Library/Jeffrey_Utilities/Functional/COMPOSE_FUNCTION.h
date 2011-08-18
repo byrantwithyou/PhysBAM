@@ -99,19 +99,25 @@ struct COMPOSE2_FUNCTION
     )
 public:
 
-    template<class> struct result;
-    template< class T_THIS, class T >
-    struct result< T_THIS ( T ) >
+    template< class T_SIGNATURE >
+    struct result
         : RESULT_OF< const T_F (
-              typename RESULT_OF< const T_G1 ( T ) >::type,
-              typename RESULT_OF< const T_G2 ( T ) >::type
-          ) >
-    { };
-    template< class T_THIS, class T1, class T2 >
-    struct result< T_THIS ( T1, T2 ) >
-        : RESULT_OF< const T_F (
-              typename RESULT_OF< const T_G1 ( T1 ) >::type,
-              typename RESULT_OF< const T_G2 ( T2 ) >::type
+              typename RESULT_OF<
+                  typename boost::function_types::function_type<
+                      boost::mpl::joint_view<
+                          boost::mpl::single_view< const T_G1 >,
+                          typename boost::function_types::parameter_types< T_SIGNATURE >::type
+                      >
+                  >::type
+              >::type,
+              typename RESULT_OF<
+                  typename boost::function_types::function_type<
+                      boost::mpl::joint_view<
+                          boost::mpl::single_view< const T_G2 >,
+                          typename boost::function_types::parameter_types< T_SIGNATURE >::type
+                      >
+                  >::type
+              >::type
           ) >
     { };
 
@@ -128,22 +134,22 @@ public:
     template< class T1, class T2 >
     typename result< const COMPOSE2_FUNCTION ( T1&, T2& ) >::type
     operator()(T1& x1, T2& x2) const
-    { return f(g1(x1), g2(x2)); }
+    { return f(g1(x1,x2), g2(x1,x2)); }
 
     template< class T1, class T2 >
     typename result< const COMPOSE2_FUNCTION ( T1&, const T2& ) >::type
     operator()(T1& x1, const T2& x2) const
-    { return f(g1(x1), g2(x2)); }
+    { return f(g1(x1,x2), g2(x1,x2)); }
 
     template< class T1, class T2 >
     typename result< const COMPOSE2_FUNCTION ( const T1&, T2& ) >::type
     operator()(const T1& x1, T2& x2) const
-    { return f(g1(x1), g2(x2)); }
+    { return f(g1(x1,x2), g2(x1,x2)); }
 
     template< class T1, class T2 >
     typename result< const COMPOSE2_FUNCTION ( const T1&, const T2& ) >::type
     operator()(const T1& x1, const T2& x2) const
-    { return f(g1(x1), g2(x2)); }
+    { return f(g1(x1,x2), g2(x1,x2)); }
 };
 
 namespace Result_Of

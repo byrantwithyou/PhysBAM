@@ -40,6 +40,7 @@ namespace Multigrid_Embedded_Poisson
 
 template<
     class T, int D,
+    class T_SIGN_OF_CELL_INDEX,
     class T_BETA_NEGATIVE_OF_INDEX, class T_F_NEGATIVE_OF_INDEX,
     class T_BETA_POSITIVE_OF_INDEX, class T_F_POSITIVE_OF_INDEX
 >
@@ -48,6 +49,7 @@ Build_Interface_Regular_Subsys(
     const unsigned int n_thread,
     const VECTOR<T,D> dx,
     const MULTI_INDEX_BOUND<D> cell_multi_index_bound,
+    const T_SIGN_OF_CELL_INDEX& sign_of_cell_index,
     const T_BETA_NEGATIVE_OF_INDEX& beta_negative_of_index,
     const T_F_NEGATIVE_OF_INDEX& f_negative_of_index,
     const T_BETA_POSITIVE_OF_INDEX& beta_positive_of_index,
@@ -58,7 +60,6 @@ Build_Interface_Regular_Subsys(
 {
     BASIC_TIMER timer;
 
-    assert(regular_subsys.sign_of_cell_index.Size() == cell_multi_index_bound.Size());
     assert(regular_subsys.beta_of_cell_index.Size() == cell_multi_index_bound.Size());
     assert(regular_subsys.stencil_of_index.Size() >= (cell_multi_index_bound + 1).Size());
     assert(system_rhs.Size() >= (cell_multi_index_bound + 1).Size());
@@ -70,7 +71,7 @@ Build_Interface_Regular_Subsys(
     Visit_Cells_With_Sign_Via_Cell_Sign_MT(
         n_thread,
         cell_multi_index_bound.Size(),
-        As_Const_Array_View(regular_subsys.sign_of_cell_index),
+        sign_of_cell_index,
         Make_Visit_If_Sign_Predicate_Grid_Visitor(
             Make_Equal_Function(-1),
             Make_Apply_Assign_Function(
@@ -85,7 +86,7 @@ Build_Interface_Regular_Subsys(
     Visit_Cells_With_Sign_Via_Cell_Sign_MT(
         n_thread,
         cell_multi_index_bound.Size(),
-        As_Const_Array_View(regular_subsys.sign_of_cell_index),
+        sign_of_cell_index,
         Make_Visit_If_Sign_Predicate_Grid_Visitor(
             Make_Equal_Function(+1),
             Make_Apply_Assign_Function(
@@ -100,7 +101,7 @@ Build_Interface_Regular_Subsys(
     // TODO: MT
     Visit_Cells_With_Sign_Via_Cell_Sign(
         cell_multi_index_bound.Size(),
-        As_Const_Array_View(regular_subsys.sign_of_cell_index),
+        sign_of_cell_index,
         Make_Visit_If_Sign_Predicate_Grid_Visitor(
             Make_Not_Equal_Function(0),
             Make_Init_Cross_Stencil_Cell_Visitor(
@@ -119,7 +120,7 @@ Build_Interface_Regular_Subsys(
         n_thread,
         dx.Product(), cell_multi_index_bound,
         -1,
-        As_Const_Array_View(regular_subsys.sign_of_cell_index),
+        sign_of_cell_index,
         Make_Compose_Function(
             Make_Cell_Value_Via_Average_Vertex_Value(f_negative_of_index),
             cell_multi_index_bound
@@ -130,7 +131,7 @@ Build_Interface_Regular_Subsys(
         n_thread,
         dx.Product(), cell_multi_index_bound,
         +1,
-        As_Const_Array_View(regular_subsys.sign_of_cell_index),
+        sign_of_cell_index,
         Make_Compose_Function(
             Make_Cell_Value_Via_Average_Vertex_Value(f_positive_of_index),
             cell_multi_index_bound

@@ -23,6 +23,9 @@
 #include <Jeffrey_Utilities/Algorithm/For_Each.h>
 #include <Jeffrey_Utilities/BASIC_TIMER.h>
 #include <Jeffrey_Utilities/DIRECT_INIT_CTOR.h>
+#include <Jeffrey_Utilities/Functional/BOUND_FAST_MEM_FN.h>
+#include <Jeffrey_Utilities/Functional/COMPOSE_FUNCTION.h>
+#include <Jeffrey_Utilities/Functional/NOT_EQUAL_FUNCTION.h>
 #include <Jeffrey_Utilities/GENERIC_SYSTEM_REFERENCE.h>
 #include <Jeffrey_Utilities/Petsc/Add_Stencil_To_Matrix.h>
 #include <Jeffrey_Utilities/Petsc/CALL_AND_CHKERRQ.h>
@@ -46,8 +49,6 @@ namespace Petsc
 namespace Detail_Solve_SPD_System_With_ICC_PCG
 {
 
-template< class T >
-struct INDEX_HAS_NONZERO_STENCIL;
 struct SET_PETSC_INDEX_OF_LINEAR_INDEX;
 
 } // namespace Detail_Solve_SPD_System_With_ICC_PCG
@@ -57,16 +58,17 @@ PetscErrorCode
 Solve_SPD_System_With_ICC_PCG(
     const unsigned int n_thread,
     const SOLVER_PARAMS params,
+    const bool has_constant_vectors_in_null_space,
     const GENERIC_SYSTEM_REFERENCE<T> system,
     const ARRAY_VIEW<const T> rhs,
-    const bool has_constant_vectors_in_null_space,
     ARRAY_VIEW<T> x,
     std::ostream& lout /*= PhysBAM::nout*/)
 {
-    typedef Detail_Solve_SPD_System_With_ICC_PCG::INDEX_HAS_NONZERO_STENCIL<T> INDEX_HAS_NONZERO_STENCIL_;
     typedef Detail_Solve_SPD_System_With_ICC_PCG::SET_PETSC_INDEX_OF_LINEAR_INDEX SET_PETSC_INDEX_OF_LINEAR_INDEX_;
 
-    const int n_physbam_index = rhs.Size();
+    const int n_physbam_index = x.Size();
+    assert(n_physbam_index == x.Size());
+    assert(n_physbam_index == rhs.Size());
 
     BASIC_TIMER timer;
     MPI_Comm mpi_comm = PETSC_COMM_WORLD;
@@ -78,7 +80,13 @@ Solve_SPD_System_With_ICC_PCG(
     Find_All_If_MT(
         n_thread,
         1, n_physbam_index,
-        INDEX_HAS_NONZERO_STENCIL_(system),
+        Make_Compose_Function(
+            NOT_EQUAL1_FUNCTION<int>(0),
+            PHYSBAM_BOUND_FAST_MEM_FN(
+                system,
+                GENERIC_SYSTEM_REFERENCE<T>::Stencil_N_Nonzero
+            )
+        ),
         physbam_index_of_petsc_index
     );
     const int n_petsc = static_cast< int >(physbam_index_of_petsc_index.size());
@@ -289,12 +297,11 @@ Solve_SPD_System_With_ICC_PCG(
     PHYSBAM_PETSC_CALL_AND_CHKERRQ( KSPSetComputeSingularValues(petsc_ksp, PETSC_TRUE) );
     PHYSBAM_PETSC_CALL_AND_CHKERRQ( KSPSetUp(petsc_ksp) );
 
-    lout << "Executing KSPSolve...";
-    lout.flush();
+    lout << "Executing KSPSolve..." << std::endl;
     timer.Restart();
     // petsc_jrhs will be overwritten with the solution.
     PHYSBAM_PETSC_CALL_AND_CHKERRQ( KSPSolve(petsc_ksp, petsc_jrhs, petsc_jrhs) );
-    lout << timer.Elapsed() << " s" << std::endl;
+    lout << "[Executing KSPSolve...] " << timer.Elapsed() << " s" << std::endl;
 
     if(params.print_diagnostics)
         PHYSBAM_PETSC_CALL_AND_CHKERRQ( KSPView(petsc_ksp, PETSC_VIEWER_STDOUT_SELF) );
@@ -313,19 +320,6 @@ Solve_SPD_System_With_ICC_PCG(
 
 namespace Detail_Solve_SPD_System_With_ICC_PCG
 {
-
-template< class T >
-struct INDEX_HAS_NONZERO_STENCIL
-{
-    PHYSBAM_DIRECT_INIT_CTOR_DECLARE_PRIVATE_MEMBERS(
-        INDEX_HAS_NONZERO_STENCIL,
-        (( typename GENERIC_SYSTEM_REFERENCE<T> const, system ))
-    )
-public:
-    typedef bool result_type;
-    bool operator()(const int physbam_index) const
-    { return system.Stencil_N_Nonzero(physbam_index) != 0; }
-};
 
 struct SET_PETSC_INDEX_OF_LINEAR_INDEX
 {
@@ -354,7 +348,6 @@ Solve_SPD_System_With_ICC_PCG<T>( \
     const SOLVER_PARAMS params, \
     const GENERIC_SYSTEM_REFERENCE<T> system, \
     const ARRAY_VIEW<const T> rhs, \
-    const bool has_constant_vectors_in_null_space, \
     ARRAY_VIEW<T> x, \
     std::ostream& lout);
 EXPLICIT_INSTANTIATION( float )

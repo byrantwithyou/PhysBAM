@@ -35,12 +35,18 @@ namespace PhysBAM
 namespace Multigrid_Embedded_Poisson
 {
 
-template< class T, int D, class T_BETA_OF_INDEX, class T_F_OF_INDEX >
+template<
+    class T, int D,
+    class T_SIGN_OF_CELL_INDEX,
+    class T_BETA_OF_INDEX,
+    class T_F_OF_INDEX
+>
 int
 Build_Domain_Regular_Subsys(
     const unsigned int n_thread,
     const VECTOR<T,D> dx,
     const MULTI_INDEX_BOUND<D> cell_multi_index_bound,
+    const T_SIGN_OF_CELL_INDEX& sign_of_cell_index,
     const T_BETA_OF_INDEX& beta_of_index,
     const T_F_OF_INDEX& f_of_index,
     DOMAIN_REGULAR_CROSS_SUBSYS<T,D>& regular_subsys,
@@ -51,7 +57,6 @@ Build_Domain_Regular_Subsys(
 
     BASIC_TIMER timer;
 
-    assert(regular_subsys.sign_of_cell_index.Size() == cell_multi_index_bound.Size());
     assert(regular_subsys.beta_of_cell_index.Size() == cell_multi_index_bound.Size());
     assert(regular_subsys.stencil_of_index.Size() == (cell_multi_index_bound + 1).Size());
     assert(system_rhs.Size() == (cell_multi_index_bound + 1).Size());
@@ -63,7 +68,7 @@ Build_Domain_Regular_Subsys(
     Visit_Cells_With_Sign_Via_Cell_Sign_MT(
         n_thread,
         cell_multi_index_bound.Size(),
-        As_Const_Array_View(regular_subsys.sign_of_cell_index),
+        sign_of_cell_index,
         Make_Visit_If_Sign_Predicate_Grid_Visitor(
             Make_Equal_Function(-1),
             Make_Apply_Assign_Function(
@@ -78,7 +83,7 @@ Build_Domain_Regular_Subsys(
     // TODO: MT
     Visit_Cells_With_Sign_Via_Cell_Sign(
         cell_multi_index_bound.Size(),
-        As_Const_Array_View(regular_subsys.sign_of_cell_index),
+        sign_of_cell_index,
         Make_Visit_If_Sign_Predicate_Grid_Visitor(
             Make_Equal_Function(-1),
             Make_Init_Cross_Stencil_Cell_Visitor(
@@ -97,7 +102,7 @@ Build_Domain_Regular_Subsys(
         n_thread,
         dx.Product(), cell_multi_index_bound,
         -1, // domain_sign
-        As_Const_Array_View(regular_subsys.sign_of_cell_index),
+        sign_of_cell_index,
         Make_Compose_Function(
             Make_Cell_Value_Via_Average_Vertex_Value(f_of_index),
             cell_multi_index_bound

@@ -17,11 +17,17 @@
 #include <Jeffrey_Utilities/ARRAY_OPS.h>
 #include <Jeffrey_Utilities/BASIC_TIMER.h>
 #include <Jeffrey_Utilities/Eval_Grid_Function.h>
+#include <Jeffrey_Utilities/Functional/ARRAY_WRAPPER_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/BOUND_FAST_MEM_FN.h>
 #include <Jeffrey_Utilities/Functional/COMPOSE_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/EQUAL_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/SIGN_FUNCTION.h>
+#include <Jeffrey_Utilities/GENERIC_SYSTEM_REFERENCE.h>
+#include <Jeffrey_Utilities/Grid/ASSIGN_SIGN_TO_INDEX_GRID_VISITOR.h>
 #include <Jeffrey_Utilities/Grid/VERTEX_IS_COARSE_CELL_CENTER.h>
+#include <Jeffrey_Utilities/Grid/Visit_Cells_With_Sign_Via_Fine_Vertex_Sign.h>
+#include <Jeffrey_Utilities/Has_Constant_Vectors_In_Null_Space.h>
+#include <Jeffrey_Utilities/Krylov/Solve_SPD_System_With_ICC_PCG.h>
 #include <Jeffrey_Utilities/Multi_Index/FINE_MULTI_INDEX_FUNCTION.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOUND.h>
 #include <Jeffrey_Utilities/Stencils/INDEX_TRANSFORM_STENCIL_PROXY.h>
@@ -52,7 +58,6 @@
 
 #ifdef PHYSBAM_USE_PETSC
 #include <petsc.h>
-#include <Jeffrey_Utilities/GENERIC_SYSTEM_REFERENCE.h>
 #include <Jeffrey_Utilities/Petsc/CALL_AND_CHKERRQ.h>
 #include <Jeffrey_Utilities/Petsc/Solve_SPD_System_With_ICC_PCG.h>
 #endif // #ifdef PHYSBAM_USE_PETSC
@@ -93,6 +98,12 @@ int Build_And_Solve_Dirichlet_System(
     const VECTOR<T,D> max_x = As_Vector(main_params.grid.max_x);
     const VECTOR<T,D> dx = (max_x - min_x) / cell_multi_index_bound.max_multi_index;
 
+    typename Result_Of::MAKE_COMPOSE_FUNCTION<
+        SIGN_FUNCTION, ARRAY_VIEW<const T>, MULTI_INDEX_BOUND<D>
+    >::type const sign_of_fine_index = Make_Compose_Function(
+        SIGN_FUNCTION(), phi_of_fine_index, fine_multi_index_bound
+    );
+
     std::cout << "Allocating system and rhs...";
     std::cout.flush();
     timer.Restart();
@@ -104,11 +115,26 @@ int Build_And_Solve_Dirichlet_System(
     ARRAY<T> constraint_rhs;
     std::cout << timer.Elapsed() << " s" << std::endl;
 
+    std::cout << "Initializing sign_of_cell_index...";
+    std::cout.flush();
+    ARRAY<signed char> sign_of_cell_index(cell_multi_index_bound.Size()); // init'ed to 0
+    Visit_Cells_With_Sign_Via_Fine_Vertex_Sign_MT<2>(
+        main_params.general.n_thread,
+        cell_multi_index_bound,
+        sign_of_fine_index,
+        Make_Assign_Sign_To_Index_Grid_Visitor(
+            Make_Array_Wrapper_Function(sign_of_cell_index)
+        ),
+        -1 // sign_of_zero
+    );
+    std::cout << timer.Elapsed() << " s" << std::endl;
+
     std::cout << "Building Dirichlet system..." << std::endl;
     timer.Restart();
     Build_Dirichlet_System(
         problem, main_params,
         phi_of_fine_index,
+        As_Const_Array_View(sign_of_cell_index),
         regular_subsys, embedding_subsys, As_Array_View(system_rhs),
         constraint_system, constraint_rhs,
         std::cout
@@ -152,15 +178,13 @@ int Build_And_Solve_Dirichlet_System(
         case SOLVER_PARAMS::SOLVER_ID_PHYSBAM_MINRES:
             std::cout << "WARNING: Solver \"physbam-minres\" not yet implemented for Dirichlet problems." << std::endl;
             break;
+        case SOLVER_PARAMS::SOLVER_ID_PETSC_MINRES:
 #ifdef PHYSBAM_USE_PETSC
-        case SOLVER_PARAMS::SOLVER_ID_PETSC_MINRES:
             std::cout << "WARNING: Solver \"petsc-minres\" not yet implemented for Dirichlet problems." << std::endl;
-            break;
 #else // #ifdef PHYSBAM_USE_PETSC
-        case SOLVER_PARAMS::SOLVER_ID_PETSC_MINRES:
             std::cout << "WARNING: PETSc not supported on this platform." << std::endl;
-            break;
 #endif // #ifdef PHYSBAM_USE_PETSC
+            break;
         default:
             std::cout << "ERROR: Must use either \"physbam-minres\" or \"petsc-minres\" "
                          "solvers for Dirichlet problems with single-cell constraints."
@@ -185,9 +209,7 @@ int Build_And_Solve_Dirichlet_System(
             case EXAMPLE_PARAMS_BASE::CONSTRAINT_ID_AGGREGATE:
                 indyable = Make_Compose_Function(
                     Make_Equal_Function(+1),
-                    SIGN_FUNCTION(),
-                    phi_of_fine_index,
-                    fine_multi_index_bound,
+                    sign_of_fine_index,
                     FINE_MULTI_INDEX_FUNCTION<2>(),
                     multi_index_bound
                 );
@@ -275,12 +297,10 @@ int Build_And_Solve_Dirichlet_System(
             case SOLVER_PARAMS::SOLVER_ID_PHYSBAM_MINRES:
                 std::cout << "WARNING: Solver \"physbam-minres\" not yet implemented for Dirichlet problems." << std::endl;
                 break;
+            case SOLVER_PARAMS::SOLVER_ID_PETSC_MINRES:
 #ifdef  PHYSBAM_USE_PETSC
-            case SOLVER_PARAMS::SOLVER_ID_PETSC_MINRES:
                 std::cout << "WARNING: Solver \"petsc-minres\" not yet implemented for Dirichlet problems." << std::endl;
-                break;
 #else // #ifdef  PHYSBAM_USE_PETSC
-            case SOLVER_PARAMS::SOLVER_ID_PETSC_MINRES:
                 std::cout << "WARNING: PETSc not supported on this platform." << std::endl;
                 break;
 #endif // #ifdef  PHYSBAM_USE_PETSC
@@ -443,34 +463,55 @@ int Build_And_Solve_Dirichlet_System(
                 std::cout << "  " << ARRAYS_COMPUTATIONS::Maxabs(ztaz_residual) << std::endl;
             }
 
+            std::cout << "Determining if constant vectors in null space...";
+            std::cout.flush();
+            timer.Restart();
+            const bool has_constant_vectors_in_null_space =
+                Has_Constant_Vectors_In_Null_Space<T>(
+                    main_params.general.n_thread,
+                    multi_index_bound.Size(),
+                    ztaz_system
+                );
+            std::cout << timer.Elapsed() << " s" << std::endl;
+            std::cout << "  " << (has_constant_vectors_in_null_space ? "yes" : "no") << std::endl;
+
             switch(main_params.solver.solver_id) {
             case SOLVER_PARAMS::SOLVER_ID_NULL:
                 return 0;
             case SOLVER_PARAMS::SOLVER_ID_PHYSBAM_CG:
-                std::cout << "WARNING: Solver \"physbam-cg\" not yet implemented for Dirichlet problems." << std::endl;
+                std::cout << "Solving with PhysBAM CG solver..." << std::endl;
+                timer.Restart();
+                PhysBAM::Solve_SPD_System_With_ICC_PCG(
+                    main_params.general.n_thread,
+                    main_params.solver,
+                    has_constant_vectors_in_null_space,
+                    GENERIC_SYSTEM_REFERENCE<T>(ztaz_system),
+                    As_Array_View(ztaz_system_rhs),
+                    As_Array_View(u_approx),
+                    std::cout
+                );
+                std::cout << "[Solving with PhysBAM CG solver...] " << timer.Elapsed() << " s" << std::endl;
                 break;
-#ifdef PHYSBAM_USE_PETSC
             case SOLVER_PARAMS::SOLVER_ID_PETSC_CG:
+#ifdef PHYSBAM_USE_PETSC
                 std::cout << "Solving with PETSc CG solver..." << std::endl;
                 timer.Restart();
                 PHYSBAM_PETSC_CALL_AND_CHKERRQ((
                     Petsc::Solve_SPD_System_With_ICC_PCG(
                         main_params.general.n_thread,
                         main_params.solver,
+                        has_constant_vectors_in_null_space,
                         GENERIC_SYSTEM_REFERENCE<T>(ztaz_system),
                         As_Const_Array_View(ztaz_system_rhs),
-                        false, // has_constant_vectors_in_null_space
                         As_Array_View(u_approx),
                         std::cout
                     )
                 ));
                 std::cout << "[Solving with PETSc CG solver...] " << timer.Elapsed() << " s" << std::endl;
 #else // #ifdef PHYSBAM_USE_PETSC
-                break;
-            case SOLVER_PARAMS::SOLVER_ID_PETSC_CG:
                 std::cout << "WARNING: PETSc not supported on this platform." << std::endl;
-                break;
 #endif // #ifdef PHYSBAM_USE_PETSC
+                break;
             case SOLVER_PARAMS::SOLVER_ID_MG:
                 std::cout << "WARNING: Solver \"mg\" not yet implemented for Neumann problems." << std::endl;
                 break;
@@ -505,14 +546,12 @@ int Build_And_Solve_Dirichlet_System(
         problem, main_params,
         -1,
         Make_Compose_Function(
-            SIGN_FUNCTION(),
-            phi_of_fine_index,
-            fine_multi_index_bound,
+            sign_of_fine_index,
             FINE_MULTI_INDEX_FUNCTION<2>(),
             multi_index_bound
         ),
         Make_Compose_Function(
-            As_Const_Array_View(regular_subsys.sign_of_cell_index),
+            As_Const_Array_View(sign_of_cell_index),
             cell_multi_index_bound
         ),
         As_Const_Array_View(u_approx),

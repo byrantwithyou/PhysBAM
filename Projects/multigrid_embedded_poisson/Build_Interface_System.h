@@ -24,11 +24,12 @@ template< class T, int D > class DOMAIN_REGULAR_CROSS_SUBSYS;
 template< class T > struct EMBEDDING_UNSTRUCTURED_SUBSYS;
 template< class T, int D > struct INTERFACE_CONSTRAINT_SYSTEM;
 
-template< class T, int D >
+template< class T, int D, class T_SIGN >
 int Build_Interface_System(
     typename EXAMPLE_PARAMS<T,D>::INTERFACE_PARAMS const & problem,
     const MAIN_PARAMS<T,D>& main_params,
     const ARRAY_VIEW<const T> phi_of_fine_index,
+    const ARRAY_VIEW<const T_SIGN> sign_of_cell_index,
     DOMAIN_REGULAR_CROSS_SUBSYS<T,D>& regular_subsys,
     EMBEDDING_UNSTRUCTURED_SUBSYS<T>& embedded_subsys,
     ARRAY<T>& system_rhs,

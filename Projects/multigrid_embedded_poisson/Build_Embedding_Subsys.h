@@ -95,35 +95,6 @@ Build_Embedding_Subsys(
     return 0;
 }
 
-template<
-    int D,
-    class T_SIGN_OF_CELL_INDEX,
-    class T_POST_EMBEDDING_INIT_VISITOR,
-    class T_EMBEDDING_CELL_VISITOR
->
-inline int
-Build_Embedding_Subsys(
-    const unsigned int n_thread,
-    const MULTI_INDEX_BOUND<D> multi_index_bound,
-    const T_SIGN_OF_CELL_INDEX& sign_of_cell_index,
-    const T_POST_EMBEDDING_INIT_VISITOR& post_embedding_init_visitor,
-    const T_EMBEDDING_CELL_VISITOR& embedding_cell_visitor,
-    ARRAY<int>& index_of_stencil_index,
-    std::ostream& lout = PhysBAM::nout)
-{
-    ARRAY<int> embedding_cells;
-    return Build_Embedding_Subsys(
-        n_thread,
-        multi_index_bound,
-        sign_of_cell_index,
-        post_embedding_init_visitor,
-        embedding_cell_visitor,
-        index_of_stencil_index,
-        embedding_cells,
-        lout
-    );
-}
-
 } // namespace Multigrid_Embedded_Poisson
 
 } // namespace PhysBAM

@@ -48,7 +48,6 @@ public:
 
     using DOMAIN_REGULAR_SUBSYS_BASE_::multi_index_bound;
     using DOMAIN_REGULAR_SUBSYS_BASE_::dx;
-    using DOMAIN_REGULAR_SUBSYS_BASE_::sign_of_cell_index;
     using DOMAIN_REGULAR_SUBSYS_BASE_::stencil_of_index;
 
     DOMAIN_REGULAR_CROSS_SUBSYS(
