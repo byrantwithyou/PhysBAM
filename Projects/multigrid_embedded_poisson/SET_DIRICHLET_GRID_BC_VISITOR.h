@@ -41,7 +41,11 @@ Make_Set_Dirichlet_Grid_BC_Visitor(
     T_SYSTEM& system,
     const T_P_OF_INDEX& p_of_index,
     const T_RHS& rhs)
-{ return SET_DIRICHLET_GRID_BC_VISITOR< T_SYSTEM, T_P_OF_INDEX, T_RHS >(system, p_of_index, rhs); }
+{
+    return SET_DIRICHLET_GRID_BC_VISITOR<
+        T_SYSTEM, T_P_OF_INDEX, T_RHS
+    >(system, p_of_index, rhs);
+}
 
 } // namespace Multigrid_Embedded_Poisson
 

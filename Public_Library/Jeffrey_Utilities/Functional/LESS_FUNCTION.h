@@ -20,23 +20,23 @@ struct LESS_FUNCTION
     { return x < y; }
 };
 
-template< class T >
+template< class U >
 struct LESS1_FUNCTION
 {
     PHYSBAM_DIRECT_INIT_CTOR_DECLARE_PRIVATE_MEMBERS(
-        LESS1_FUNCTION, (( typename T const, x ))
+        LESS1_FUNCTION, (( typename U const, y ))
     )
 public:
     typedef bool result_type;
-    template< class U >
-    bool operator()(const U& y) const
+    template< class T >
+    bool operator()(const T& x) const
     { return x < y; }
 };
 
-template< class T >
-inline LESS1_FUNCTION<T>
-Make_Less_Function(const T& x)
-{ return LESS1_FUNCTION<T>(x); }
+template< class U >
+inline LESS1_FUNCTION<U>
+Make_Less_Function(const U& y)
+{ return LESS1_FUNCTION<U>(y); }
 
 } // namespace PhysBAM
 

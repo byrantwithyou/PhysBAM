@@ -130,6 +130,18 @@ int Build_And_Solve_Neumann_System(
     );
     std::cout << "[Building Neumann system...] " << timer.Elapsed() << " s" << std::endl;
 
+    std::cout << "Determining if constant vectors in null space...";
+    std::cout.flush();
+    timer.Restart();
+    const bool has_constant_vectors_in_null_space =
+        Has_Constant_Vectors_In_Null_Space<T>(
+            main_params.general.n_thread,
+            multi_index_bound.Size(),
+            system
+        );
+    std::cout << timer.Elapsed() << " s" << std::endl;
+    std::cout << "  " << (has_constant_vectors_in_null_space ? "yes" : "no") << std::endl;
+
     std::cout << "Evaluating residual norm of continuous solution...";
     std::cout.flush();
     timer.Restart();
@@ -155,18 +167,6 @@ int Build_And_Solve_Neumann_System(
     timer.Restart();
     ARRAY<T> u_approx(multi_index_bound.Size()); // init'ed to 0
     std::cout << timer.Elapsed() << " s" << std::endl;
-
-    std::cout << "Determining if constant vectors in null space...";
-    std::cout.flush();
-    timer.Restart();
-    const bool has_constant_vectors_in_null_space =
-        Has_Constant_Vectors_In_Null_Space<T>(
-            main_params.general.n_thread,
-            multi_index_bound.Size(),
-            system
-        );
-    std::cout << timer.Elapsed() << " s" << std::endl;
-    std::cout << "  " << (has_constant_vectors_in_null_space ? "yes" : "no") << std::endl;
 
     switch(main_params.solver.solver_id) {
     case SOLVER_PARAMS::SOLVER_ID_NULL:
@@ -232,7 +232,13 @@ int Build_And_Solve_Neumann_System(
             error_sum += u_approx(linear_index) - u_continuous(linear_index);
             ++count;
         }
-        u_approx -= error_sum / count;
+        for(int linear_index = 1; linear_index <= multi_index_bound.Size(); ++linear_index) {
+            const MULTI_INDEX_TYPE multi_index = multi_index_bound.Multi_Index(linear_index);
+            const MULTI_INDEX_TYPE fine_multi_index = 2 * multi_index - 1;
+            if(sign_of_fine_index(fine_multi_index) > 0)
+                continue;
+            u_approx(linear_index) -= error_sum / count;
+        }
     }
 
     std::cout << "Evaluating error norm in approximate solution...";

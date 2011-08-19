@@ -11,10 +11,10 @@
 
 #include <iosfwd>
 
-#include <Jeffrey_Utilities/ARRAY_OPS.h>
 #include <Jeffrey_Utilities/BASIC_TIMER.h>
 #include <Jeffrey_Utilities/Functional/APPLY_ASSIGN_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/ARRAY_WRAPPER_FUNCTION.h>
+#include <Jeffrey_Utilities/Functional/BOUND_FAST_MEM_FN.h>
 #include <Jeffrey_Utilities/Functional/COMPOSE_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/EQUAL_FUNCTION.h>
 #include <Jeffrey_Utilities/Grid/CELL_VALUE_VIA_AVERAGE_VERTEX_VALUE.h>
@@ -27,7 +27,6 @@
 
 #include "Build_Domain_Regular_Subsys_Rhs.h"
 #include "DOMAIN_REGULAR_CROSS_SUBSYS.h"
-#include "INIT_CROSS_STENCIL_CELL_VISITOR.h"
 
 namespace PhysBAM
 {
@@ -86,10 +85,9 @@ Build_Domain_Regular_Subsys(
         sign_of_cell_index,
         Make_Visit_If_Sign_Predicate_Grid_Visitor(
             Make_Equal_Function(-1),
-            Make_Init_Cross_Stencil_Cell_Visitor(
-                dx, cell_multi_index_bound,
-                As_Const_Array_View(regular_subsys.beta_of_cell_index),
-                Make_Array_Wrapper_Function(regular_subsys.stencil_of_index)
+            PHYSBAM_BOUND_FAST_MEM_FN_TEMPLATE(
+                regular_subsys,
+                (&DOMAIN_REGULAR_CROSS_SUBSYS<T,D>::Init_Stencils)
             )
         )
     );

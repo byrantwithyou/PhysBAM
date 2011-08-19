@@ -11,6 +11,9 @@
 
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOUND.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_CROSS_ITERATOR.h>
+#include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_CUBE.h>
+#include <Jeffrey_Utilities/Multi_Index/STATIC_MULTI_INDEX_CUBE.h>
+#include <Jeffrey_Utilities/Stencils/Beta_Dv_Over_Dx_Dx.h>
 #include <Jeffrey_Utilities/Stencils/CROSS_STENCIL.h>
 #include <Jeffrey_Utilities/Stencils/CROSS_STENCIL_PROXY.h>
 #include <Jeffrey_Utilities/Stencils/INDEX_TRANSFORM_STENCIL_PROXY.h>
@@ -62,11 +65,15 @@ public:
     T Stencil_Sum(const int linear_index) const;
 
     void Zero_Stencil(const int linear_index);
+    void Init_Stencils(const int cell_linear_index);
     template< class T_RHS_OF_INDEX >
     void Set_Dirichlet_Grid_BC(
         const int linear_index,
         const T p,
         T_RHS_OF_INDEX rhs_of_index);
+    void Set_Pure_Neumann_Offset_Grid_BC(
+        const MULTI_INDEX_TYPE outside_cell_multi_index,
+        const T beta);
 
     typedef CROSS_STENCIL_PROXY< /***/ STENCIL_TYPE > /***/ MULTI_INDEX_STENCIL_PROXY_TYPE;
     typedef CROSS_STENCIL_PROXY< const STENCIL_TYPE > CONST_MULTI_INDEX_STENCIL_PROXY_TYPE;
@@ -156,25 +163,15 @@ Stencil_Sum(const int linear_index) const
 template< class T, int D >
 inline void
 DOMAIN_REGULAR_CROSS_SUBSYS<T,D>::
-Zero_Stencil(const int linear_index)
+Init_Stencils(const int cell_linear_index)
 {
-    STENCIL_TYPE& stencil = stencil_of_index(linear_index);
-    const MULTI_INDEX_TYPE multi_index = multi_index_bound.Multi_Index(linear_index);
-    for(MULTI_INDEX_CROSS_ITERATOR<D> it(multi_index); it.Valid(); ++it) {
-        const MULTI_INDEX_TYPE other_multi_index = *it;
-        const MULTI_INDEX_TYPE multi_offset = other_multi_index - multi_index;
-        if(stencil(multi_offset) == 0)
-            continue;
-        assert(multi_index_bound.Contains(other_multi_index));
-        const int other_linear_index = multi_index_bound.Linear_Index(other_multi_index);
-        if(other_linear_index == linear_index)
-            continue;
-        assert(multi_offset != MULTI_INDEX_TYPE());
-        STENCIL_TYPE& other_stencil = stencil_of_index(other_linear_index);
-        assert(other_stencil(-multi_offset) == stencil(multi_offset));
-        other_stencil(-multi_offset) = static_cast<T>(0);
+    const MULTI_INDEX_TYPE cell_multi_index = Cell_Multi_Index_Bound().Multi_Index(cell_linear_index);
+    const T beta = beta_of_cell_index(cell_linear_index);
+    const VECTOR<T,D> beta_dv_over_dx_dx = Beta_Dv_Over_Dx_Dx(beta, dx);
+    BOOST_FOREACH( const MULTI_INDEX_TYPE multi_index, (MULTI_INDEX_CUBE<D,0,1>(cell_multi_index)) ) {
+        const int linear_index = multi_index_bound.Linear_Index(multi_index);
+        stencil_of_index(linear_index).Add(beta_dv_over_dx_dx, cell_multi_index - multi_index);
     }
-    stencil.Zero();
 }
 
 template< class T, int D >

@@ -159,6 +159,18 @@ int Build_And_Solve_Interface_System(
     const int n_index      = multi_index_bound.Size() + n_virtual;
     const int n_constraint = constraint_system.stencils.Size();
 
+    std::cout << "Determining if constant vectors in null space...";
+    std::cout.flush();
+    timer.Restart();
+    const bool has_constant_vectors_in_null_space =
+        Has_Constant_Vectors_In_Null_Space<T>(
+            main_params.general.n_thread,
+            multi_index_bound.Size(),
+            system
+        );
+    std::cout << timer.Elapsed() << " s" << std::endl;
+    std::cout << "  " << (has_constant_vectors_in_null_space ? "yes" : "no") << std::endl;
+
     // Construct index_transform.
     typedef BOUND_FAST_MEM_FN<
         const int& (HASHTABLE<int,int>::*)( const int& ) const,
@@ -519,18 +531,6 @@ int Build_And_Solve_Interface_System(
                 std::cout << "  " << ARRAYS_COMPUTATIONS::Maxabs(ztaz_residual) << std::endl;
             }
 
-            std::cout << "Determining if constant vectors in null space...";
-            std::cout.flush();
-            timer.Restart();
-            const bool has_constant_vectors_in_null_space =
-                Has_Constant_Vectors_In_Null_Space<T>(
-                    main_params.general.n_thread,
-                    multi_index_bound.Size(),
-                    ztaz_system
-                );
-            std::cout << timer.Elapsed() << " s" << std::endl;
-            std::cout << "  " << (has_constant_vectors_in_null_space ? "yes" : "no") << std::endl;
-
             switch(main_params.solver.solver_id) {
             case SOLVER_PARAMS::SOLVER_ID_NULL:
                 return 0;
@@ -591,6 +591,14 @@ int Build_And_Solve_Interface_System(
             std::cout << timer.Elapsed() << " s" << std::endl;
 
         }
+    }
+
+    if(has_constant_vectors_in_null_space) {
+        T error_sum = 0;
+        for(int index = 1; index <= multi_index_bound.Size(); ++index)
+            error_sum += u_approx(index) - u_continuous(index);
+        for(int index = 1; index <= multi_index_bound.Size(); ++index)
+            u_approx(index) -= error_sum / multi_index_bound.Size();
     }
 
     std::cout << "Evaluating error norm in approximate solution...";

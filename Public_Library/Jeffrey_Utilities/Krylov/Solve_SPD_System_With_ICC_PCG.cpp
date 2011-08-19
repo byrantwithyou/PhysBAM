@@ -30,6 +30,7 @@
 #include <Jeffrey_Utilities/SOLVER_PARAMS.h>
 #include <Jeffrey_Utilities/VISITOR_SEQUENCE.h>
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
+#include <PhysBAM_Tools/Arrays/ARRAY_NEGATION.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 #include <PhysBAM_Tools/Arrays_Computations/MAGNITUDE.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
@@ -53,16 +54,22 @@ Solve_SPD_System_With_ICC_PCG(
     std::ostream& lout /*= PhysBAM::nout*/)
 {
     assert(rhs.Size() == x.Size());
+    static_cast<void>(has_constant_vectors_in_null_space);
 
     BASIC_TIMER timer;
 
     float initial_residual_norm;
     {
-        ARRAY<T> t(x.Size()); // init'ed to 0
-        system.Apply(x, t);
-        initial_residual_norm = static_cast< float >(ARRAYS_COMPUTATIONS::Maximum_Magnitude(t -= rhs));
+        ARRAY<T> r(-rhs);
+        system.Apply(x, r);
+        initial_residual_norm = static_cast< float >(
+            ARRAYS_COMPUTATIONS::Maximum_Magnitude(r)
+        );
     }
-    const float tolerance = std::max(params.relative_tolerance * initial_residual_norm, params.absolute_tolerance);
+    const float tolerance = std::max(
+        params.relative_tolerance * initial_residual_norm,
+        params.absolute_tolerance
+    );
     const int max_iterations =
         params.max_iterations == std::numeric_limits< unsigned int >::max()
      && x.Size() <= std::numeric_limits< int >::max() / 4
@@ -75,12 +82,11 @@ Solve_SPD_System_With_ICC_PCG(
     if(params.precondition) {
 
         PCG_SPARSE<T> pcg;
-        pcg.enforce_compatibility = has_constant_vectors_in_null_space;
-        pcg.remove_null_space_solution_component = has_constant_vectors_in_null_space;
         pcg.show_residual = params.print_residuals;
         pcg.show_results = params.print_diagnostics;
         pcg.modified_incomplete_cholesky_coefficient = static_cast<T>(0.99);
         pcg.maximum_iterations = max_iterations;
+        pcg.incomplete_cholesky = false;
 
         lout << "Constructing SPARSE_MATRIX_FLAT_NXN matrix...";
         lout.flush();
@@ -158,7 +164,6 @@ Solve_SPD_System_With_ICC_PCG(
     }
     else {
 
-        // TODO: If non-trivial null space, use project_nullspace...?
         CONJUGATE_GRADIENT<T> cg;
         cg.print_diagnostics = params.print_diagnostics;
         cg.print_residuals = params.print_residuals;

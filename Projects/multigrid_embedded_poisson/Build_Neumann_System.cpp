@@ -19,11 +19,12 @@
 #include <Jeffrey_Utilities/Functional/COMPOSE_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/CONSTANT_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/EQUAL_FUNCTION.h>
+#include <Jeffrey_Utilities/Functional/LESS_EQUAL_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/SIGN_FUNCTION.h>
-#include <Jeffrey_Utilities/Functional/STATIC_CAST_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/VISIT_IF.h>
 #include <Jeffrey_Utilities/Grid/Cell_Sign_Via_Fine_Vertex_Sign.h>
 #include <Jeffrey_Utilities/Multi_Index/FINE_MULTI_INDEX_FUNCTION.h>
+#include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOX.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOUND.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_X_FUNCTION.h>
 #include <Jeffrey_Utilities/Multi_Index/Visit_Multi_Index_Box_Boundary.h>
@@ -156,25 +157,31 @@ int Build_Neumann_System(
         lout.flush();
         timer.Restart();
         Visit_Multi_Index_Box_Boundary(
-            multi_index_bound,
+            MULTI_INDEX_BOX<D>(MULTI_INDEX_TYPE(), multi_index_bound.max_multi_index),
             Make_Visit_If(
                 Make_Compose_Function(
-                    Make_Equal_Function(-1),
-                    sign_of_fine_index,
-                    FINE_MULTI_INDEX_FUNCTION<2>()
+                    Make_Less_Equal_Function(0),
+                    As_Const_Array_View(sign_of_cell_index),
+                    cell_multi_index_bound,
+                    PHYSBAM_BOUND_FAST_MEM_FN_TEMPLATE(
+                        cell_multi_index_bound,
+                        &MULTI_INDEX_BOUND<D>::Clamp
+                    )
                 ),
                 Make_Set_Neumann_Offset_Grid_BC_Visitor(
-                    multi_index_bound,
+                    dx, cell_multi_index_bound,
+                    regular_subsys,
+                    Make_Compose_Function(
+                        problem.beta,
+                        Make_Multi_Index_X_Function(min_x - dx/2, max_x + dx/2, multi_index_bound + 1)
+                    ),
                     Make_Compose2_Function(
                         Make_Beta_Grad_U_Dot_N(problem.beta, problem.grad_u),
                         Make_Compose_Function(
-                            Make_Multi_Index_X_Function(min_x, max_x, fine_multi_index_bound),
+                            Make_Multi_Index_X_Function(min_x - dx/2, max_x + dx/2, multi_index_bound + 1),
                             ARGUMENT_FUNCTION<1>()
                         ),
-                        Make_Compose_Function(
-                            STATIC_CAST_FUNCTION< VECTOR<T,D> >(),
-                            ARGUMENT_FUNCTION<2>()
-                        )
+                        ARGUMENT_FUNCTION<2>()
                     ),
                     Make_Compose_Function(
                         Make_Array_Wrapper_Function(system_rhs),

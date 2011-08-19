@@ -41,6 +41,7 @@ struct MULTI_INDEX_BOUND
     int Size() const;
 
     bool Contains(const MULTI_INDEX_TYPE multi_index) const;
+    MULTI_INDEX_TYPE Clamp(MULTI_INDEX_TYPE multi_index) const;
 
     MULTI_INDEX_TYPE Strides() const;
 
@@ -154,6 +155,20 @@ Contains(const MULTI_INDEX_TYPE multi_index) const
         if(multi_index[d] < 1 || max_multi_index[d] < multi_index[d])
             return false;
     return true;
+}
+
+template< int D >
+inline typename MULTI_INDEX_BOUND<D>::MULTI_INDEX_TYPE
+MULTI_INDEX_BOUND<D>::
+Clamp(MULTI_INDEX_TYPE multi_index) const
+{
+    for(int d = 1; d <= D; ++d) {
+        if(multi_index[d] < 1)
+            multi_index[d] = 1;
+        else if(max_multi_index[d] < multi_index[d])
+            multi_index[d] = max_multi_index[d];
+    }
+    return multi_index;
 }
 
 namespace Detail_MULTI_INDEX_BOUND

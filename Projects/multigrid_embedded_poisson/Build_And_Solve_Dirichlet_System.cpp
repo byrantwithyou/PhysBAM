@@ -144,6 +144,19 @@ int Build_And_Solve_Dirichlet_System(
     const int n_embedding = embedding_subsys.stencils.Size();
     const int n_constraint = constraint_system.stencils.Size();
 
+    std::cout << "Determining if constant vectors in null space...";
+    std::cout.flush();
+    timer.Restart();
+    const bool has_constant_vectors_in_null_space =
+        n_constraint == 0
+     && Has_Constant_Vectors_In_Null_Space<T>(
+            main_params.general.n_thread,
+            multi_index_bound.Size(),
+            system
+        );
+    std::cout << timer.Elapsed() << " s" << std::endl;
+    std::cout << "  " << (has_constant_vectors_in_null_space ? "yes" : "no") << std::endl;
+
     std::cout << "Evaluating constraint residual norm of continuous solution...";
     std::cout.flush();
     timer.Restart();
@@ -463,18 +476,6 @@ int Build_And_Solve_Dirichlet_System(
                 std::cout << "  " << ARRAYS_COMPUTATIONS::Maxabs(ztaz_residual) << std::endl;
             }
 
-            std::cout << "Determining if constant vectors in null space...";
-            std::cout.flush();
-            timer.Restart();
-            const bool has_constant_vectors_in_null_space =
-                Has_Constant_Vectors_In_Null_Space<T>(
-                    main_params.general.n_thread,
-                    multi_index_bound.Size(),
-                    ztaz_system
-                );
-            std::cout << timer.Elapsed() << " s" << std::endl;
-            std::cout << "  " << (has_constant_vectors_in_null_space ? "yes" : "no") << std::endl;
-
             switch(main_params.solver.solver_id) {
             case SOLVER_PARAMS::SOLVER_ID_NULL:
                 return 0;
@@ -534,6 +535,26 @@ int Build_And_Solve_Dirichlet_System(
             }
             std::cout << timer.Elapsed() << " s" << std::endl;
 
+        }
+    }
+
+    if(has_constant_vectors_in_null_space) {
+        T error_sum = 0;
+        int count = 0;
+        for(int linear_index = 1; linear_index <= multi_index_bound.Size(); ++linear_index) {
+            const MULTI_INDEX_TYPE multi_index = multi_index_bound.Multi_Index(linear_index);
+            const MULTI_INDEX_TYPE fine_multi_index = 2 * multi_index - 1;
+            if(sign_of_fine_index(fine_multi_index) > 0)
+                continue;
+            error_sum += u_approx(linear_index) - u_continuous(linear_index);
+            ++count;
+        }
+        for(int linear_index = 1; linear_index <= multi_index_bound.Size(); ++linear_index) {
+            const MULTI_INDEX_TYPE multi_index = multi_index_bound.Multi_Index(linear_index);
+            const MULTI_INDEX_TYPE fine_multi_index = 2 * multi_index - 1;
+            if(sign_of_fine_index(fine_multi_index) > 0)
+                continue;
+            u_approx(linear_index) -= error_sum / count;
         }
     }
 

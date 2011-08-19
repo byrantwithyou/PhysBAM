@@ -20,23 +20,23 @@ struct EQUAL_FUNCTION
     { return x == y; }
 };
 
-template< class T >
+template< class U >
 struct EQUAL1_FUNCTION
 {
     PHYSBAM_DIRECT_INIT_CTOR_DECLARE_PRIVATE_MEMBERS(
-        EQUAL1_FUNCTION, (( typename T const, x ))
+        EQUAL1_FUNCTION, (( typename U const, y ))
     )    
 public:
     typedef bool result_type;
-    template< class U >
-    bool operator()(const U& y) const
+    template< class T >
+    bool operator()(const T& x) const
     { return x == y; }
 };
 
-template< class T >
-inline EQUAL1_FUNCTION<T>
-Make_Equal_Function(const T& x)
-{ return EQUAL1_FUNCTION<T>(x); }
+template< class U >
+inline EQUAL1_FUNCTION<U>
+Make_Equal_Function(const U& y)
+{ return EQUAL1_FUNCTION<U>(y); }
 
 } // namespace PhysBAM
 
