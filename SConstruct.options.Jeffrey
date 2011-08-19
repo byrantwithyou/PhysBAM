@@ -1,0 +1,51 @@
+# SConstruct.options
+
+import os
+
+CXX = 'g++'
+USE_BOOST       = 0
+USE_BOOSTPYTHON = 0
+USE_BOOSTREGEX  = 0
+USE_FFMPEG      = 0
+USE_FFTW        = 0
+USE_FLTK        = 0
+USE_GL2PS       = 0
+USE_LAM         = 0
+USE_LIBJPEG     = 0
+USE_LIBPNG      = 0
+USE_MPI         = 0
+USE_MPICH       = 0
+USE_NUMPY       = 0
+USE_OPENEXR     = 0
+USE_OPENGL      = 0
+USE_OPENMPI     = 0
+USE_RENDERMAN   = 0
+compile_without_double_support = 0
+compile_without_dyadic_support = 1
+compile_without_rle_support = 1
+
+CPPPATH_EXTRA.extend( [
+    '.',
+    os.environ['BOOST_ROOT']
+] )
+LIBPATH_EXTRA.extend( [
+    os.environ['BOOST_ROOT'] + '/lib'
+] )
+RPATH_EXTRA.extend( [
+    os.environ['BOOST_ROOT'] + '/lib'
+] )
+LIBS_EXTRA.extend( [
+    'X11',
+    'z',
+    'boost_thread'
+] )
+
+if 'PETSC_DIR' in os.environ:
+    CXXFLAGS_EXTRA.extend( [
+        '-DPHYSBAM_USE_PETSC'
+    ] )
+    CPPPATH_EXTRA.extend( [
+        os.environ['PETSC_DIR'] + '/include',
+        os.environ['PETSC_DIR'] + '/' + os.environ['PETSC_ARCH'] + '/include',
+        os.environ['PETSC_DIR'] + '/include/mpiuni'
+    ] )
