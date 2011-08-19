@@ -7,15 +7,8 @@ if 'BOOST_ROOT' in os.environ:
 
     env = env.Copy()
 
-    env.Append( LIBPATH = [
-        os.environ['BOOST_ROOT'] + '/lib'
-    ] )
-    env.Append( RPATH = [
-        os.environ['BOOST_ROOT'] + '/lib'
-    ] )
     env.Append( LIBS = [
-        'boost_thread',
-        'X11', 'lapack', 'blas'
+        'lapack', 'blas'
     ] )
 
     sources = [
