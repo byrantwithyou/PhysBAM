@@ -566,13 +566,13 @@ int Build_And_Solve_Interface_System(
                 std::cout << "[Solving with PETSc CG solver...] " << timer.Elapsed() << " s" << std::endl;
 #else // #ifdef PHYSBAM_USE_PETSC
                 std::cout << "WARNING: PETSc not supported on this platform." << std::endl;
-                break;
 #endif // #ifdef PHYSBAM_USE_PETSC
+                break;
             case SOLVER_PARAMS::SOLVER_ID_MG:
-                std::cout << "WARNING: Solver \"mg\" not yet implemented for Neumann problems." << std::endl;
+                std::cout << "WARNING: Solver \"mg\" not yet implemented for interface problems." << std::endl;
                 break;
             case SOLVER_PARAMS::SOLVER_ID_MGPCG:
-                std::cout << "WARNING: Solver \"mgpcg\" not yet implemented for Neumann problems." << std::endl;
+                std::cout << "WARNING: Solver \"mgpcg\" not yet implemented for interface problems." << std::endl;
                 break;
             default:
                 assert(false);

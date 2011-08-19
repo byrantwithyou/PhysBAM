@@ -513,10 +513,10 @@ int Build_And_Solve_Dirichlet_System(
 #endif // #ifdef PHYSBAM_USE_PETSC
                 break;
             case SOLVER_PARAMS::SOLVER_ID_MG:
-                std::cout << "WARNING: Solver \"mg\" not yet implemented for Neumann problems." << std::endl;
+                std::cout << "WARNING: Solver \"mg\" not yet implemented for Dirichlet problems." << std::endl;
                 break;
             case SOLVER_PARAMS::SOLVER_ID_MGPCG:
-                std::cout << "WARNING: Solver \"mgpcg\" not yet implemented for Neumann problems." << std::endl;
+                std::cout << "WARNING: Solver \"mgpcg\" not yet implemented for Dirichlet problems." << std::endl;
                 break;
             default:
                 assert(false);
