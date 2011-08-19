@@ -180,8 +180,7 @@ public:
         typedef VECTOR<int,D> MULTI_INDEX_TYPE;
         // TODO: Add viscosity terms when jump_mu != 0.
         assert(jump_mu == 0);
-        //return dt * sigma * kappa_of_x(x);
-        return dt * sigma;
+        return dt * sigma * kappa_of_x(x);
 #if 0
         x = (x - x0) / dx_over_2;
         MULTI_INDEX_TYPE fine_cell_multi_index = 2 * cell_multi_index;
