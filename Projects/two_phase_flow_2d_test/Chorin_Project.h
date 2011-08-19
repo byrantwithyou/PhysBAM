@@ -77,10 +77,6 @@ void Chorin_Project(
         T_MAC_VECTOR_FIELD
     > JUMP_P_OF_X_OF_CELL_INDEX_;
     SOLVER_PARAMS solver_params;
-#ifndef PHYSBAM_USE_PETSC
-    // PhysBAM's ICC PCG seems to perform *worse* than vanilla CG...
-    solver_params.precondition = false;
-#endif // #ifndef PHYSBAM_USE_PETSC
     solver_params.relative_tolerance = 1e-12f;
     solver_params.print_diagnostics = true;
     Multigrid_Embedded_Poisson::Project_To_Zero_Divergence_With_Interface(
