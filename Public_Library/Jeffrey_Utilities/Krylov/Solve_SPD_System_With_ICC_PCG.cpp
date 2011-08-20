@@ -54,7 +54,6 @@ Solve_SPD_System_With_ICC_PCG(
     std::ostream& lout /*= PhysBAM::nout*/)
 {
     assert(rhs.Size() == x.Size());
-    static_cast<void>(has_constant_vectors_in_null_space);
 
     BASIC_TIMER timer;
 
@@ -105,6 +104,18 @@ Solve_SPD_System_With_ICC_PCG(
         const int n_flat_index = orig_index_of_flat_index.Size();
         lout << "  # of flat dofs = " << n_flat_index << std::endl;
 
+        if(has_constant_vectors_in_null_space) {
+            const int offset2 = flat_system.offsets(2);
+            assert(flat_system.A(1).j == 1);
+            flat_system.A(1).a = static_cast<T>(1);
+            for(int i = 2; i != offset2; ++i) {
+                const int flat_index = flat_system.A(i).j;
+                assert(flat_index != 1);
+                flat_system(flat_index,1) = static_cast<T>(0);
+                flat_system.A(i).a = static_cast<T>(0);
+            }
+        }
+
         lout << "Constructing Jacobi scaling coefficients...";
         lout.flush();
         timer.Restart();
@@ -146,6 +157,8 @@ Solve_SPD_System_With_ICC_PCG(
             y(flat_index) = static_cast<T>(x(orig_index) * jscalings(flat_index));
             b(flat_index) = static_cast<T>(rhs(orig_index) / jscalings(flat_index));
         }
+        if(has_constant_vectors_in_null_space)
+            b(1) = static_cast<T>(0);
         lout << timer.Elapsed() << " s" << std::endl;
         lout << "Executing PCG_SPARSE::Solve..." << std::endl;
         timer.Restart();
@@ -164,6 +177,7 @@ Solve_SPD_System_With_ICC_PCG(
     }
     else {
 
+        // TODO: Currently has_constant_vectors_in_null_space can be a problem...
         CONJUGATE_GRADIENT<T> cg;
         cg.print_diagnostics = params.print_diagnostics;
         cg.print_residuals = params.print_residuals;
