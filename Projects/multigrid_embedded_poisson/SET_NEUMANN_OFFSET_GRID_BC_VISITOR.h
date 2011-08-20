@@ -24,9 +24,8 @@ namespace Multigrid_Embedded_Poisson
 
 template<
     class T, int D,
-    class T_SYSTEM,
-    class T_BETA_OF_CELL_INDEX,
     class T_Q_OF_CELL_INDEX_AND_NORMAL,
+    class T_F_OF_CELL_INDEX,
     class T_RHS_OF_INDEX
 >
 struct SET_NEUMANN_OFFSET_GRID_BC_VISITOR
@@ -34,10 +33,9 @@ struct SET_NEUMANN_OFFSET_GRID_BC_VISITOR
     PHYSBAM_DIRECT_INIT_CTOR_DECLARE_PRIVATE_MEMBERS(
         SET_NEUMANN_OFFSET_GRID_BC_VISITOR,
         (( typename typename PHYSBAM_IDENTITY_TYPE(( VECTOR<T,D> )) const, dx ))
-        (( typename MULTI_INDEX_BOUND<D> const, cell_multi_index_bound ))
-        (( typename T_SYSTEM&, system ))
-        (( typename T_BETA_OF_CELL_INDEX const, beta_of_cell_index ))
+        (( typename MULTI_INDEX_BOUND<D> const, multi_index_bound ))
         (( typename T_Q_OF_CELL_INDEX_AND_NORMAL const, q_of_cell_index_and_normal ))
+        (( typename T_F_OF_CELL_INDEX const, f_of_cell_index ))
         (( typename T_RHS_OF_INDEX const, rhs_of_index ))
     )
 public:
@@ -45,9 +43,17 @@ public:
     void operator()(const VECTOR<int,D> outside_cell_multi_index) const
     {
         typedef VECTOR<int,D> MULTI_INDEX_TYPE;
-        const T beta = beta_of_cell_index(outside_cell_multi_index);
-        system.Set_Pure_Neumann_Offset_Grid_BC(outside_cell_multi_index, beta);
+        const MULTI_INDEX_BOUND<D> cell_multi_index_bound = multi_index_bound - 1;
         const T dv = dx.Product();
+
+        const T cell_rhs = f_of_cell_index(outside_cell_multi_index) * (dv / (1 << D));
+        BOOST_FOREACH(
+            const MULTI_INDEX_TYPE multi_index,
+            (MULTI_INDEX_CUBE<D,0,1>(outside_cell_multi_index))
+        )
+            if(multi_index_bound.Contains(multi_index))
+                rhs_of_index(multi_index) += cell_rhs;
+
         const MULTI_INDEX_TYPE clamped_cell_multi_index = cell_multi_index_bound.Clamp(outside_cell_multi_index);
         assert((clamped_cell_multi_index - outside_cell_multi_index).Max_Abs() == 1);
         VECTOR<T,D> normal; // init'ed to 0
@@ -71,37 +77,32 @@ public:
 
 template<
     class T, int D,
-    class T_SYSTEM,
-    class T_BETA_OF_CELL_INDEX,
     class T_Q_OF_CELL_INDEX_AND_NORMAL,
+    class T_F_OF_CELL_INDEX,
     class T_RHS_OF_INDEX
 >
 inline SET_NEUMANN_OFFSET_GRID_BC_VISITOR<
     T, D,
-    T_SYSTEM,
-    T_BETA_OF_CELL_INDEX,
     T_Q_OF_CELL_INDEX_AND_NORMAL,
+    T_F_OF_CELL_INDEX,
     T_RHS_OF_INDEX
 >
 Make_Set_Neumann_Offset_Grid_BC_Visitor(
     const VECTOR<T,D>& dx,
-    const MULTI_INDEX_BOUND<D>& cell_multi_index_bound,
-    T_SYSTEM& system,
-    const T_BETA_OF_CELL_INDEX& beta_of_cell_index,
+    const MULTI_INDEX_BOUND<D>& multi_index_bound,
     const T_Q_OF_CELL_INDEX_AND_NORMAL& q_of_cell_index_and_normal,
+    const T_F_OF_CELL_INDEX& f_of_cell_index,
     const T_RHS_OF_INDEX& rhs_of_index)
 {
     return SET_NEUMANN_OFFSET_GRID_BC_VISITOR<
         T, D,
-        T_SYSTEM,
-        T_BETA_OF_CELL_INDEX,
         T_Q_OF_CELL_INDEX_AND_NORMAL,
+        T_F_OF_CELL_INDEX,
         T_RHS_OF_INDEX
     >(
-        dx, cell_multi_index_bound,
-        system,
-        beta_of_cell_index,
+        dx, multi_index_bound,
         q_of_cell_index_and_normal,
+        f_of_cell_index,
         rhs_of_index
     );
 }

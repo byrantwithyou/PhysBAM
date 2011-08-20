@@ -25,13 +25,16 @@
 #include <Jeffrey_Utilities/Functional/SIGN_FUNCTION.h>
 #include <Jeffrey_Utilities/GENERIC_SYSTEM_REFERENCE.h>
 #include <Jeffrey_Utilities/Grid/ASSIGN_SIGN_TO_INDEX_GRID_VISITOR.h>
+#include <Jeffrey_Utilities/Grid/CELL_VALUE_VIA_AVERAGE_VERTEX_VALUE.h>
 #include <Jeffrey_Utilities/Grid/Visit_Cells_With_Sign_Via_Fine_Vertex_Sign.h>
 #include <Jeffrey_Utilities/Krylov/Solve_SPD_System_With_ICC_PCG.h>
 #include <Jeffrey_Utilities/Multi_Index/FINE_MULTI_INDEX_FUNCTION.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOUND.h>
+#include <Jeffrey_Utilities/Multi_Index/Visit_Multi_Index_Box_Boundary.h>
 #include <Jeffrey_Utilities/ONSTREAM.h>
 #include <Jeffrey_Utilities/SOLVER_PARAMS.h>
 #include <Jeffrey_Utilities/Stencils/ZERO_STENCIL_PROXY.h>
+#include <Jeffrey_Utilities/VISITOR_SEQUENCE.h>
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
@@ -49,6 +52,8 @@
 #include "INTERFACE_CONSTRAINT_SYSTEM.h"
 #include "INTERFACE_INDEX_TRANSFORM.h"
 #include "Select_Indys.h"
+#include "SET_NEUMANN_OFFSET_GRID_BC_VISITOR.h"
+#include "SET_PURE_NEUMANN_OFFSET_GRID_BC_VISITOR.h"
 #include "SYSTEM_SUM.h"
 
 #ifdef PHYSBAM_USE_PETSC
@@ -143,7 +148,8 @@ int Project_To_Zero_Divergence_With_Interface(
         divergence_of_mac_vector_field,
         beta_positive_of_index,
         divergence_of_mac_vector_field,
-        jump_p_of_x_of_cell_index, jump_beta_grad_p_dot_n_of_x_and_n_of_cell_index,
+        jump_p_of_x_of_cell_index,
+        jump_beta_grad_p_dot_n_of_x_and_n_of_cell_index,
         //0.0f, // min_dist_to_vertex
         0.01f, // min_dist_to_vertex
         -1, // sign_of_zero
@@ -162,6 +168,34 @@ int Project_To_Zero_Divergence_With_Interface(
         divergence_of_mac_vector_field,
         regular_subsys, As_Array_View(system_rhs),
         lout
+    );
+
+    Visit_Multi_Index_Box_Boundary(
+        MULTI_INDEX_BOX<D>(MULTI_INDEX_TYPE(), multi_index_bound.max_multi_index),
+        Make_Visitor_Sequence(
+            Make_Set_Pure_Neumann_Offset_Grid_BC_Visitor(
+                regular_subsys,
+                Make_Compose_Function(
+                    As_Const_Array_View(regular_subsys.beta_of_cell_index),
+                    cell_multi_index_bound,
+                    PHYSBAM_BOUND_FAST_MEM_FN_TEMPLATE(
+                        cell_multi_index_bound,
+                        &MULTI_INDEX_BOUND<D>::Clamp
+                    )
+                )
+            ),
+            Make_Set_Neumann_Offset_Grid_BC_Visitor(
+                dx, multi_index_bound,
+                CONSTANT_FUNCTION<T>(0), // q_of_cell_index_and_normal
+                Make_Cell_Value_Via_Average_Vertex_Value(
+                    divergence_of_mac_vector_field
+                ),
+                Make_Compose_Function(
+                    Make_Array_Wrapper_Function(system_rhs),
+                    multi_index_bound
+                )
+            )
+        )
     );
 
     const int n_embedding  = embedding_subsys.stencils.Size();

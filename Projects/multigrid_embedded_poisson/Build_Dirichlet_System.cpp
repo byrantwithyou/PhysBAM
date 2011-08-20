@@ -17,12 +17,14 @@
 #include <Jeffrey_Utilities/Functional/COMPOSE_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/CONSTANT_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/EQUAL_FUNCTION.h>
+#include <Jeffrey_Utilities/Functional/LESS_EQUAL_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/SIGN_FUNCTION.h>
-#include <Jeffrey_Utilities/Functional/STATIC_CAST_FUNCTION.h>
+#include <Jeffrey_Utilities/Functional/TRANSLATE_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/VISIT_IF.h>
 #include <Jeffrey_Utilities/Grid/Cell_Sign_Via_Fine_Vertex_Sign.h>
 #include <Jeffrey_Utilities/IDENTITY_TYPE.h>
 #include <Jeffrey_Utilities/Multi_Index/FINE_MULTI_INDEX_FUNCTION.h>
+#include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOX.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOUND.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_X_FUNCTION.h>
 #include <Jeffrey_Utilities/Multi_Index/Visit_Multi_Index_Box_Boundary.h>
@@ -49,6 +51,7 @@
 #include "Print_System_Statistics.h"
 #include "SET_DIRICHLET_GRID_BC_VISITOR.h"
 #include "SET_NEUMANN_OFFSET_GRID_BC_VISITOR.h"
+#include "SET_PURE_NEUMANN_OFFSET_GRID_BC_VISITOR.h"
 
 #include "Build_Dirichlet_System.h"
 
@@ -189,41 +192,57 @@ int Build_Dirichlet_System(
 
     switch(main_params.example.grid_bc_id) {
     case EXAMPLE_PARAMS_BASE::GRID_BC_ID_NEUMANN_OFFSET:
-#if 0
         lout << "Setting Neumann offset grid bc's...";
         lout.flush();
         timer.Restart();
-        Visit_Multi_Index_Box_Boundary(
-            multi_index_bound,
-            Make_Visit_If(
-                Make_Compose_Function(
-                    Make_Equal_Function(-1),
-                    sign_of_fine_index,
-                    FINE_MULTI_INDEX_FUNCTION<2>()
+        {
+            const COMPOSE_FUNCTION<
+                MULTI_INDEX_X_FUNCTION< T, D, MULTI_INDEX_BOUND<D> >,
+                TRANSLATE_FUNCTION<int>
+            > x0_of_cell_index(
+                Make_Multi_Index_X_Function(
+                    min_x - dx/2,
+                    max_x + dx/2,
+                    multi_index_bound + 1
                 ),
-                Make_Set_Neumann_Offset_Grid_BC_Visitor(
-                    dx, multi_index_bound,
-                    Make_Compose2_Function(
-                        Make_Beta_Grad_U_Dot_N(problem.beta, problem.grad_u),
-                        Make_Compose_Function(
-                            Make_Multi_Index_X_Function(min_x, max_x, fine_multi_index_bound),
-                            ARGUMENT_FUNCTION<1>()
-                        ),
-                        Make_Compose_Function(
-                            STATIC_CAST_FUNCTION< VECTOR<T,D> >(),
-                            ARGUMENT_FUNCTION<2>()
+                TRANSLATE_FUNCTION<int>(1)
+            );
+            Visit_Multi_Index_Box_Boundary(
+                MULTI_INDEX_BOX<D>(MULTI_INDEX_TYPE(), multi_index_bound.max_multi_index),
+                Make_Visit_If(
+                    Make_Compose_Function(
+                        Make_Less_Equal_Function(0),
+                        As_Const_Array_View(sign_of_cell_index),
+                        cell_multi_index_bound,
+                        PHYSBAM_BOUND_FAST_MEM_FN_TEMPLATE(
+                            cell_multi_index_bound,
+                            &MULTI_INDEX_BOUND<D>::Clamp
                         )
                     ),
-                    Make_Compose_Function(
-                        Make_Array_Wrapper_Function(system_rhs),
-                        multi_index_bound
+                    Make_Visitor_Sequence(
+                        Make_Set_Pure_Neumann_Offset_Grid_BC_Visitor(
+                            regular_subsys,
+                            Make_Compose_Function(problem.beta, x0_of_cell_index)
+                        ),
+                        Make_Set_Neumann_Offset_Grid_BC_Visitor(
+                            dx, multi_index_bound,
+                            Make_Compose2_Function(
+                                Make_Beta_Grad_U_Dot_N(problem.beta, problem.grad_u),
+                                Make_Compose_Function(x0_of_cell_index, ARGUMENT_FUNCTION<1>()),
+                                ARGUMENT_FUNCTION<2>()
+                            ),
+                            Make_Compose_Function(problem.f, x0_of_cell_index),
+                            Make_Compose_Function(
+                                Make_Array_Wrapper_Function(system_rhs),
+                                multi_index_bound
+                            )
+                        )
                     )
                 )
-            )
-        );
+            );
+        }
         lout << timer.Elapsed() << " s" << std::endl;
         break;
-#endif
     case EXAMPLE_PARAMS_BASE::GRID_BC_ID_DIRICHLET:
         lout << "Setting Dirichlet grid bc's...";
         lout.flush();
