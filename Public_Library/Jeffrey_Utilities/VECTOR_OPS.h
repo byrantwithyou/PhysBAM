@@ -74,6 +74,21 @@ As_Vector(const U (&array)[N])
 }
 
 //#####################################################################
+// Count(const VECTOR<T,N>& v, const T& x) -> int
+//#####################################################################
+
+template< class T, int N >
+inline int
+Count(const VECTOR<T,N>& v, const T& x)
+{
+    int count = 0;
+    for(int i = 1; i <= N; ++i)
+        if(v[i] == x)
+            ++count;
+    return count;
+}
+
+//#####################################################################
 // Replace(VECTOR<T,N>& v, const T& x, const T& y) -> void
 //#####################################################################
 

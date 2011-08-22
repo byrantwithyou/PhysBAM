@@ -4,8 +4,8 @@
 // license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_SET_PURE_NEUMANN_OFFSET_GRID_BC_VISITOR_HPP
-#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_SET_PURE_NEUMANN_OFFSET_GRID_BC_VISITOR_HPP
+#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_INIT_FULL_STENCILS_ON_GRID_BOUNDARY_VISITOR_HPP
+#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_INIT_FULL_STENCILS_ON_GRID_BOUNDARY_VISITOR_HPP
 
 #include <Jeffrey_Utilities/DIRECT_INIT_CTOR.h>
 #include <Jeffrey_Utilities/RESULT_OF.h>
@@ -18,10 +18,10 @@ namespace Multigrid_Embedded_Poisson
 {
 
 template< class T_SYSTEM, class T_BETA_OF_CELL_INDEX >
-struct SET_PURE_NEUMANN_OFFSET_GRID_BC_VISITOR
+struct INIT_FULL_STENCILS_ON_GRID_BOUNDARY_VISITOR
 {
     PHYSBAM_DIRECT_INIT_CTOR_DECLARE_PRIVATE_MEMBERS(
-        SET_PURE_NEUMANN_OFFSET_GRID_BC_VISITOR,
+        INIT_FULL_STENCILS_ON_GRID_BOUNDARY_VISITOR,
         (( typename T_SYSTEM&, system ))
         (( typename T_BETA_OF_CELL_INDEX const, beta_of_cell_index ))
     )
@@ -32,17 +32,17 @@ public:
     {
         typedef typename RESULT_OF< const T_BETA_OF_CELL_INDEX ( VECTOR<int,D> ) >::type BETA_TYPE;
         BETA_TYPE beta = beta_of_cell_index(outside_cell_multi_index);
-        system.Set_Pure_Neumann_Offset_Grid_BC(outside_cell_multi_index, beta);
+        system.Init_Full_Stencils_On_Grid_Boundary(outside_cell_multi_index, beta);
     }
 };
 
 template< class T_SYSTEM, class T_BETA_OF_CELL_INDEX >
-inline SET_PURE_NEUMANN_OFFSET_GRID_BC_VISITOR< T_SYSTEM, T_BETA_OF_CELL_INDEX >
-Make_Set_Pure_Neumann_Offset_Grid_BC_Visitor(
+inline INIT_FULL_STENCILS_ON_GRID_BOUNDARY_VISITOR< T_SYSTEM, T_BETA_OF_CELL_INDEX >
+Make_Init_Full_Stencils_On_Grid_Boundary_Visitor(
     T_SYSTEM& system,
     const T_BETA_OF_CELL_INDEX& beta_of_cell_index)
 {
-    return SET_PURE_NEUMANN_OFFSET_GRID_BC_VISITOR<
+    return INIT_FULL_STENCILS_ON_GRID_BOUNDARY_VISITOR<
         T_SYSTEM, T_BETA_OF_CELL_INDEX
     >(system, beta_of_cell_index);
 }
@@ -51,4 +51,4 @@ Make_Set_Pure_Neumann_Offset_Grid_BC_Visitor(
 
 } // namespace PhysBAM
 
-#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_SET_PURE_NEUMANN_OFFSET_GRID_BC_VISITOR_HPP
+#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_INIT_FULL_STENCILS_ON_GRID_BOUNDARY_VISITOR_HPP

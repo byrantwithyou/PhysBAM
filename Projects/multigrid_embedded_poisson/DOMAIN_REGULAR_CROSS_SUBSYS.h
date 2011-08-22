@@ -66,14 +66,14 @@ public:
 
     void Zero_Stencil(const int linear_index);
     void Init_Stencils(const int cell_linear_index);
+    void Init_Full_Stencils_On_Grid_Boundary(
+        const MULTI_INDEX_TYPE outside_cell_multi_index,
+        const T beta);
     template< class T_RHS_OF_INDEX >
     void Set_Dirichlet_Grid_BC(
         const int linear_index,
         const T p,
         T_RHS_OF_INDEX rhs_of_index);
-    void Set_Pure_Neumann_Offset_Grid_BC(
-        const MULTI_INDEX_TYPE outside_cell_multi_index,
-        const T beta);
 
     typedef CROSS_STENCIL_PROXY< /***/ STENCIL_TYPE > /***/ MULTI_INDEX_STENCIL_PROXY_TYPE;
     typedef CROSS_STENCIL_PROXY< const STENCIL_TYPE > CONST_MULTI_INDEX_STENCIL_PROXY_TYPE;
@@ -199,6 +199,33 @@ Init_Stencils(const int cell_linear_index)
 }
 
 template< class T, int D >
+void
+DOMAIN_REGULAR_CROSS_SUBSYS<T,D>::
+Init_Full_Stencils_On_Grid_Boundary(
+    const MULTI_INDEX_TYPE outside_cell_multi_index,
+    const T beta)
+{
+    assert(!Cell_Multi_Index_Bound().Contains(outside_cell_multi_index));
+    const VECTOR<T,D> beta_dv_over_dx_dx = Beta_Dv_Over_Dx_Dx(beta, dx);
+    BOOST_FOREACH( const MULTI_INDEX_TYPE cell_multi_offset, (STATIC_MULTI_INDEX_CUBE<D,-1,0>()) ) {
+        MULTI_INDEX_TYPE multi_index = outside_cell_multi_index - cell_multi_offset;
+        if(!multi_index_bound.Contains(multi_index))
+            continue;
+        const int linear_index = multi_index_bound.Linear_Index(multi_index);
+        STENCIL_TYPE& stencil = stencil_of_index(linear_index);
+        for(int d = 1; d <= D; ++d) {
+            const int s = 1 + 2 * cell_multi_offset[d];
+            multi_index[d] += s;
+            if(multi_index_bound.Contains(multi_index)) {
+                stencil.Center() += beta_dv_over_dx_dx[d];
+                stencil(d,s) -= beta_dv_over_dx_dx[d];
+            }
+            multi_index[d] -= s;
+        }
+    }
+}
+
+template< class T, int D >
 template< class T_RHS_OF_INDEX >
 inline void
 DOMAIN_REGULAR_CROSS_SUBSYS<T,D>::
@@ -228,33 +255,6 @@ Set_Dirichlet_Grid_BC(
     stencil.Zero();
     stencil.Center() = 1;
     rhs_of_index(linear_index) = p;
-}
-
-template< class T, int D >
-void
-DOMAIN_REGULAR_CROSS_SUBSYS<T,D>::
-Set_Pure_Neumann_Offset_Grid_BC(
-    const MULTI_INDEX_TYPE outside_cell_multi_index,
-    const T beta)
-{
-    assert(!Cell_Multi_Index_Bound().Contains(outside_cell_multi_index));
-    const VECTOR<T,D> beta_dv_over_dx_dx = Beta_Dv_Over_Dx_Dx(beta, dx);
-    BOOST_FOREACH( const MULTI_INDEX_TYPE cell_multi_offset, (STATIC_MULTI_INDEX_CUBE<D,-1,0>()) ) {
-        MULTI_INDEX_TYPE multi_index = outside_cell_multi_index - cell_multi_offset;
-        if(!multi_index_bound.Contains(multi_index))
-            continue;
-        const int linear_index = multi_index_bound.Linear_Index(multi_index);
-        STENCIL_TYPE& stencil = stencil_of_index(linear_index);
-        for(int d = 1; d <= D; ++d) {
-            const int s = 1 + 2 * cell_multi_offset[d];
-            multi_index[d] += s;
-            if(multi_index_bound.Contains(multi_index)) {
-                stencil.Center() += beta_dv_over_dx_dx[d];
-                stencil(d,s) -= beta_dv_over_dx_dx[d];
-            }
-            multi_index[d] -= s;
-        }
-    }
 }
 
 template< class T, int D >

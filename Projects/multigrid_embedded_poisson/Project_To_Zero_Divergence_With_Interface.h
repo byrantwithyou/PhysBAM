@@ -16,16 +16,18 @@
 #include <boost/ref.hpp>
 
 #include <Jeffrey_Utilities/ARRAY_OPS.h>
-#include <Jeffrey_Utilities/Divergence_Of_MAC_Vector_Field.h>
 #include <Jeffrey_Utilities/DIVERGENCE_OF_MAC_VECTOR_FIELD_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/ARRAY_WRAPPER_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/BOUND_FAST_MEM_FN.h>
 #include <Jeffrey_Utilities/Functional/COMPOSE_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/CONSTANT_FUNCTION.h>
+#include <Jeffrey_Utilities/Functional/IF_ELSE_FUNCTION.h>
+#include <Jeffrey_Utilities/Functional/LESS_EQUAL_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/SIGN_FUNCTION.h>
 #include <Jeffrey_Utilities/GENERIC_SYSTEM_REFERENCE.h>
 #include <Jeffrey_Utilities/Grid/ASSIGN_SIGN_TO_INDEX_GRID_VISITOR.h>
 #include <Jeffrey_Utilities/Grid/CELL_VALUE_VIA_AVERAGE_VERTEX_VALUE.h>
+#include <Jeffrey_Utilities/Grid/OUTSIDE_CELL_VALUE_VIA_AVERAGE_INSIDE_VERTEX_VALUE.h>
 #include <Jeffrey_Utilities/Grid/Visit_Cells_With_Sign_Via_Fine_Vertex_Sign.h>
 #include <Jeffrey_Utilities/Krylov/Solve_SPD_System_With_ICC_PCG.h>
 #include <Jeffrey_Utilities/Multi_Index/FINE_MULTI_INDEX_FUNCTION.h>
@@ -45,15 +47,14 @@
 #include "Build_Interface_Embedding_Subsys.h"
 #include "Build_Interface_Regular_Subsys.h"
 #include "Build_ZTAZ_Embedding_Subsys.h"
-#include "DIVERGENCE_OF_MAC_VECTOR_FIELD.h"
 #include "DOMAIN_REGULAR_CROSS_SUBSYS.h"
 #include "EMBEDDING_UNSTRUCTURED_SUBSYS.h"
+#include "INIT_FULL_STENCILS_ON_GRID_BOUNDARY_VISITOR.h"
 #include "Init_ZTAZ_Embedding.h"
 #include "INTERFACE_CONSTRAINT_SYSTEM.h"
 #include "INTERFACE_INDEX_TRANSFORM.h"
 #include "Select_Indys.h"
-#include "SET_NEUMANN_OFFSET_GRID_BC_VISITOR.h"
-#include "SET_PURE_NEUMANN_OFFSET_GRID_BC_VISITOR.h"
+#include "SET_NEUMANN_GRID_BC_VISITOR.h"
 #include "SYSTEM_SUM.h"
 
 #ifdef PHYSBAM_USE_PETSC
@@ -105,6 +106,12 @@ int Project_To_Zero_Divergence_With_Interface(
     const MULTI_INDEX_BOUND<D> cell_multi_index_bound = multi_index_bound - 1;
     const VECTOR<T,D> dx = (max_x - min_x) / cell_multi_index_bound.max_multi_index;
 
+    typedef typename Result_Of::MAKE_COMPOSE_FUNCTION<
+        SIGN_FUNCTION, T_PHI_OF_FINE_INDEX, FINE_MULTI_INDEX_FUNCTION<2>
+    >::type SIGN_OF_INDEX_TYPE;
+    const SIGN_OF_INDEX_TYPE sign_of_index = Make_Compose_Function(
+        SIGN_FUNCTION(), phi_of_fine_index, FINE_MULTI_INDEX_FUNCTION<2>()
+    );
     const DIVERGENCE_OF_MAC_VECTOR_FIELD_FUNCTION<
         T, D, T_MAC_VECTOR_FIELD
     > divergence_of_mac_vector_field(dx, mac_vector_field);
@@ -173,21 +180,22 @@ int Project_To_Zero_Divergence_With_Interface(
     Visit_Multi_Index_Box_Boundary(
         MULTI_INDEX_BOX<D>(MULTI_INDEX_TYPE(), multi_index_bound.max_multi_index),
         Make_Visitor_Sequence(
-            Make_Set_Pure_Neumann_Offset_Grid_BC_Visitor(
+            Make_Init_Full_Stencils_On_Grid_Boundary_Visitor(
                 regular_subsys,
-                Make_Compose_Function(
-                    As_Const_Array_View(regular_subsys.beta_of_cell_index),
+                Make_Outside_Cell_Value_Via_Average_Inside_Vertex_Value(
                     cell_multi_index_bound,
-                    PHYSBAM_BOUND_FAST_MEM_FN_TEMPLATE(
-                        cell_multi_index_bound,
-                        &MULTI_INDEX_BOUND<D>::Clamp
+                    Make_If_Else_Function(
+                        Make_Compose_Function(LESS_EQUAL1_FUNCTION<int>(0), sign_of_index),
+                        beta_negative_of_index,
+                        beta_positive_of_index
                     )
                 )
             ),
-            Make_Set_Neumann_Offset_Grid_BC_Visitor(
+            Make_Set_Neumann_Grid_BC_Visitor(
                 dx, multi_index_bound,
                 CONSTANT_FUNCTION<T>(0), // q_of_cell_index_and_normal
-                Make_Cell_Value_Via_Average_Vertex_Value(
+                Make_Outside_Cell_Value_Via_Average_Inside_Vertex_Value(
+                    cell_multi_index_bound,
                     divergence_of_mac_vector_field
                 ),
                 Make_Compose_Function(
@@ -209,12 +217,7 @@ int Project_To_Zero_Divergence_With_Interface(
         &HASHTABLE<int,int>::Get
     > VIRTUAL_INDEX_OFFSET_OF_GRID_INDEX_TYPE;
     typedef ARRAY_VIEW<const int> GRID_INDEX_OF_VIRTUAL_INDEX_OFFSET_TYPE;
-    typedef typename Result_Of::MAKE_COMPOSE_FUNCTION<
-        SIGN_FUNCTION,
-        T_PHI_OF_FINE_INDEX,
-        FINE_MULTI_INDEX_FUNCTION<2>,
-        MULTI_INDEX_BOUND<D>
-    >::type SIGN_OF_GRID_INDEX_TYPE;
+    typedef COMPOSE_FUNCTION< SIGN_OF_INDEX_TYPE, MULTI_INDEX_BOUND<D> > SIGN_OF_GRID_INDEX_TYPE;
     typedef INTERFACE_INDEX_TRANSFORM<
         VIRTUAL_INDEX_OFFSET_OF_GRID_INDEX_TYPE,
         GRID_INDEX_OF_VIRTUAL_INDEX_OFFSET_TYPE,
@@ -224,12 +227,7 @@ int Project_To_Zero_Divergence_With_Interface(
         multi_index_bound.Size(),
         VIRTUAL_INDEX_OFFSET_OF_GRID_INDEX_TYPE(embedding_subsys.stencil_index_of_index),
         GRID_INDEX_OF_VIRTUAL_INDEX_OFFSET_TYPE(embedding_subsys.index_of_stencil_index),
-        Make_Compose_Function(
-            SIGN_FUNCTION(),
-            phi_of_fine_index,
-            FINE_MULTI_INDEX_FUNCTION<2>(),
-            multi_index_bound
-        )
+        Make_Compose_Function(sign_of_index, multi_index_bound)
     );
 
     BOUND_FAST_MEM_FN<

@@ -4,8 +4,8 @@
 // license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
-#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_SET_NEUMANN_OFFSET_GRID_BC_VISITOR_HPP
-#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_SET_NEUMANN_OFFSET_GRID_BC_VISITOR_HPP
+#ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_SET_NEUMANN_GRID_BC_VISITOR_HPP
+#define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_SET_NEUMANN_GRID_BC_VISITOR_HPP
 
 #include <boost/foreach.hpp>
 
@@ -28,10 +28,10 @@ template<
     class T_F_OF_CELL_INDEX,
     class T_RHS_OF_INDEX
 >
-struct SET_NEUMANN_OFFSET_GRID_BC_VISITOR
+struct SET_NEUMANN_GRID_BC_VISITOR
 {
     PHYSBAM_DIRECT_INIT_CTOR_DECLARE_PRIVATE_MEMBERS(
-        SET_NEUMANN_OFFSET_GRID_BC_VISITOR,
+        SET_NEUMANN_GRID_BC_VISITOR,
         (( typename typename PHYSBAM_IDENTITY_TYPE(( VECTOR<T,D> )) const, dx ))
         (( typename MULTI_INDEX_BOUND<D> const, multi_index_bound ))
         (( typename T_Q_OF_CELL_INDEX_AND_NORMAL const, q_of_cell_index_and_normal ))
@@ -81,20 +81,20 @@ template<
     class T_F_OF_CELL_INDEX,
     class T_RHS_OF_INDEX
 >
-inline SET_NEUMANN_OFFSET_GRID_BC_VISITOR<
+inline SET_NEUMANN_GRID_BC_VISITOR<
     T, D,
     T_Q_OF_CELL_INDEX_AND_NORMAL,
     T_F_OF_CELL_INDEX,
     T_RHS_OF_INDEX
 >
-Make_Set_Neumann_Offset_Grid_BC_Visitor(
+Make_Set_Neumann_Grid_BC_Visitor(
     const VECTOR<T,D>& dx,
     const MULTI_INDEX_BOUND<D>& multi_index_bound,
     const T_Q_OF_CELL_INDEX_AND_NORMAL& q_of_cell_index_and_normal,
     const T_F_OF_CELL_INDEX& f_of_cell_index,
     const T_RHS_OF_INDEX& rhs_of_index)
 {
-    return SET_NEUMANN_OFFSET_GRID_BC_VISITOR<
+    return SET_NEUMANN_GRID_BC_VISITOR<
         T, D,
         T_Q_OF_CELL_INDEX_AND_NORMAL,
         T_F_OF_CELL_INDEX,
@@ -111,4 +111,4 @@ Make_Set_Neumann_Offset_Grid_BC_Visitor(
 
 } // namespace PhysBAM
 
-#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_SET_NEUMANN_OFFSET_GRID_BC_VISITOR_HPP
+#endif // #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_SET_NEUMANN_GRID_BC_VISITOR_HPP

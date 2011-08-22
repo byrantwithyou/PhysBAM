@@ -77,7 +77,7 @@ void Chorin_Project(
         T_MAC_VECTOR_FIELD
     > JUMP_P_OF_X_OF_CELL_INDEX_;
     SOLVER_PARAMS solver_params;
-    solver_params.relative_tolerance = 1e-12f;
+    solver_params.relative_tolerance = 1e-16f;
     solver_params.print_diagnostics = true;
     Multigrid_Embedded_Poisson::Project_To_Zero_Divergence_With_Interface(
         n_thread,
@@ -176,7 +176,9 @@ public:
         typedef VECTOR<int,D> MULTI_INDEX_TYPE;
         // TODO: Add viscosity terms when jump_mu != 0.
         assert(jump_mu == 0);
-        return dt * sigma * kappa_of_x(x);
+        //assert(std::abs(kappa_of_x(x) + 100) < 1);
+        //return -dt * sigma * (-100);
+        return -dt * sigma * kappa_of_x(x);
 #if 0
         x = (x - x0) / dx_over_2;
         MULTI_INDEX_TYPE fine_cell_multi_index = 2 * cell_multi_index;

@@ -11,6 +11,7 @@
 
 #include <Jeffrey_Utilities/DIRECT_INIT_CTOR.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_CUBE.h>
+#include <Jeffrey_Utilities/REMOVE_QUALIFIERS.h>
 #include <Jeffrey_Utilities/RESULT_OF.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 
@@ -29,19 +30,21 @@ public:
     template<class> struct result;
     template< class T_THIS, class T_MULTI_INDEX >
     struct result< T_THIS ( T_MULTI_INDEX ) >
-        : RESULT_OF< const T_VALUE_OF_INDEX ( T_MULTI_INDEX ) >
+        : RESULT_OF< const T_VALUE_OF_INDEX (
+              typename REMOVE_QUALIFIERS< T_MULTI_INDEX >::type
+          ) >
     { };
 
     template< int D >
-    typename RESULT_OF< const T_VALUE_OF_INDEX ( const VECTOR<int,D>& ) >::type
+    typename RESULT_OF< const T_VALUE_OF_INDEX ( VECTOR<int,D> ) >::type
     operator()(const VECTOR<int,D>& cell_multi_index) const
     {
         typedef VECTOR<int,D> MULTI_INDEX_TYPE;
-        typedef typename RESULT_OF< const T_VALUE_OF_INDEX ( const MULTI_INDEX_TYPE& ) >::type RESULT_TYPE;
-        RESULT_TYPE average_value = RESULT_TYPE();
+        typedef typename RESULT_OF< const T_VALUE_OF_INDEX ( MULTI_INDEX_TYPE ) >::type RESULT_TYPE;
+        RESULT_TYPE sum = RESULT_TYPE();
         BOOST_FOREACH( const MULTI_INDEX_TYPE multi_index, (MULTI_INDEX_CUBE<D,0,1>(cell_multi_index)) )
-            average_value += value_of_index(multi_index);
-        return average_value / (1 << D);
+            sum += value_of_index(multi_index);
+        return sum / (1 << D);
     }
 };
 

@@ -24,6 +24,7 @@
 #include <Jeffrey_Utilities/Functional/TRANSLATE_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/VISIT_IF.h>
 #include <Jeffrey_Utilities/Grid/Cell_Sign_Via_Fine_Vertex_Sign.h>
+#include <Jeffrey_Utilities/Grid/CELL_VALUE_VIA_AVERAGE_VERTEX_VALUE.h>
 #include <Jeffrey_Utilities/Multi_Index/FINE_MULTI_INDEX_FUNCTION.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOX.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOUND.h>
@@ -42,13 +43,13 @@
 #include "DOMAIN_REGULAR_CROSS_SUBSYS.h"
 #include "DOMAIN_SYSTEM.h"
 #include "Init_Cell_Local_Embedding_Neumann_System.h"
+#include "INIT_FULL_STENCILS_ON_GRID_BOUNDARY_VISITOR.h"
 #include "Params/EXAMPLE_PARAMS.h"
 #include "Params/MAIN_PARAMS.h"
 #include "POST_EMBEDDING_INIT_DOMAIN_VISITOR.h"
 #include "Print_System_Statistics.h"
 #include "SET_DIRICHLET_GRID_BC_VISITOR.h"
-#include "SET_NEUMANN_OFFSET_GRID_BC_VISITOR.h"
-#include "SET_PURE_NEUMANN_OFFSET_GRID_BC_VISITOR.h"
+#include "SET_NEUMANN_GRID_BC_VISITOR.h"
 
 #include "Build_Neumann_System.h"
 
@@ -184,18 +185,22 @@ int Build_Neumann_System(
                         )
                     ),
                     Make_Visitor_Sequence(
-                        Make_Set_Pure_Neumann_Offset_Grid_BC_Visitor(
+                        Make_Init_Full_Stencils_On_Grid_Boundary_Visitor(
                             regular_subsys,
-                            Make_Compose_Function(problem.beta, x0_of_cell_index)
+                            Make_Cell_Value_Via_Average_Vertex_Value(
+                                Make_Compose_Function(problem.beta, x_of_index)
+                            )
                         ),
-                        Make_Set_Neumann_Offset_Grid_BC_Visitor(
+                        Make_Set_Neumann_Grid_BC_Visitor(
                             dx, multi_index_bound,
                             Make_Compose2_Function(
                                 Make_Beta_Grad_U_Dot_N(problem.beta, problem.grad_u),
                                 Make_Compose_Function(x0_of_cell_index, ARGUMENT_FUNCTION<1>()),
                                 ARGUMENT_FUNCTION<2>()
                             ),
-                            Make_Compose_Function(problem.f, x0_of_cell_index),
+                            Make_Cell_Value_Via_Average_Vertex_Value(
+                                Make_Compose_Function(problem.f, x_of_index)
+                            ),
                             Make_Compose_Function(
                                 Make_Array_Wrapper_Function(system_rhs),
                                 multi_index_bound
