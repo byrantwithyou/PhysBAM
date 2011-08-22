@@ -194,10 +194,7 @@ int Project_To_Zero_Divergence_With_Interface(
             Make_Set_Neumann_Grid_BC_Visitor(
                 dx, multi_index_bound,
                 CONSTANT_FUNCTION<T>(0), // q_of_cell_index_and_normal
-                Make_Outside_Cell_Value_Via_Average_Inside_Vertex_Value(
-                    cell_multi_index_bound,
-                    divergence_of_mac_vector_field
-                ),
+                divergence_of_mac_vector_field,
                 Make_Compose_Function(
                     Make_Array_Wrapper_Function(system_rhs),
                     multi_index_bound

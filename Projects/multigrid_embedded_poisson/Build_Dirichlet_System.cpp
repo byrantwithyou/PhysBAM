@@ -234,9 +234,7 @@ int Build_Dirichlet_System(
                                 Make_Compose_Function(x0_of_cell_index, ARGUMENT_FUNCTION<1>()),
                                 ARGUMENT_FUNCTION<2>()
                             ),
-                            Make_Cell_Value_Via_Average_Vertex_Value(
-                                Make_Compose_Function(problem.f, x_of_index)
-                            ),
+                            Make_Compose_Function(problem.f, x_of_index),
                             Make_Compose_Function(
                                 Make_Array_Wrapper_Function(system_rhs),
                                 multi_index_bound

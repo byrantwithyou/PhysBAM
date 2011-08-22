@@ -101,10 +101,7 @@ Build_Domain_Regular_Subsys(
         dx.Product(), cell_multi_index_bound,
         -1, // domain_sign
         sign_of_cell_index,
-        Make_Compose_Function(
-            Make_Cell_Value_Via_Average_Vertex_Value(f_of_index),
-            cell_multi_index_bound
-        ),
+        f_of_index,
         system_rhs
     );
     lout << timer.Elapsed() << " s" << std::endl;

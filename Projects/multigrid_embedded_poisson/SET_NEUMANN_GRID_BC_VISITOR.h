@@ -25,7 +25,7 @@ namespace Multigrid_Embedded_Poisson
 template<
     class T, int D,
     class T_Q_OF_CELL_INDEX_AND_NORMAL,
-    class T_F_OF_CELL_INDEX,
+    class T_F_OF_INDEX,
     class T_RHS_OF_INDEX
 >
 struct SET_NEUMANN_GRID_BC_VISITOR
@@ -35,7 +35,7 @@ struct SET_NEUMANN_GRID_BC_VISITOR
         (( typename typename PHYSBAM_IDENTITY_TYPE(( VECTOR<T,D> )) const, dx ))
         (( typename MULTI_INDEX_BOUND<D> const, multi_index_bound ))
         (( typename T_Q_OF_CELL_INDEX_AND_NORMAL const, q_of_cell_index_and_normal ))
-        (( typename T_F_OF_CELL_INDEX const, f_of_cell_index ))
+        (( typename T_F_OF_INDEX const, f_of_index ))
         (( typename T_RHS_OF_INDEX const, rhs_of_index ))
     )
 public:
@@ -46,13 +46,12 @@ public:
         const MULTI_INDEX_BOUND<D> cell_multi_index_bound = multi_index_bound - 1;
         const T dv = dx.Product();
 
-        const T cell_rhs = f_of_cell_index(outside_cell_multi_index) * (dv / (1 << D));
         BOOST_FOREACH(
             const MULTI_INDEX_TYPE multi_index,
             (MULTI_INDEX_CUBE<D,0,1>(outside_cell_multi_index))
         )
             if(multi_index_bound.Contains(multi_index))
-                rhs_of_index(multi_index) += cell_rhs;
+                rhs_of_index(multi_index) += f_of_index(multi_index) * (dv / (1 << D));
 
         const MULTI_INDEX_TYPE clamped_cell_multi_index = cell_multi_index_bound.Clamp(outside_cell_multi_index);
         assert((clamped_cell_multi_index - outside_cell_multi_index).Max_Abs() == 1);
@@ -78,31 +77,31 @@ public:
 template<
     class T, int D,
     class T_Q_OF_CELL_INDEX_AND_NORMAL,
-    class T_F_OF_CELL_INDEX,
+    class T_F_OF_INDEX,
     class T_RHS_OF_INDEX
 >
 inline SET_NEUMANN_GRID_BC_VISITOR<
     T, D,
     T_Q_OF_CELL_INDEX_AND_NORMAL,
-    T_F_OF_CELL_INDEX,
+    T_F_OF_INDEX,
     T_RHS_OF_INDEX
 >
 Make_Set_Neumann_Grid_BC_Visitor(
     const VECTOR<T,D>& dx,
     const MULTI_INDEX_BOUND<D>& multi_index_bound,
     const T_Q_OF_CELL_INDEX_AND_NORMAL& q_of_cell_index_and_normal,
-    const T_F_OF_CELL_INDEX& f_of_cell_index,
+    const T_F_OF_INDEX& f_of_index,
     const T_RHS_OF_INDEX& rhs_of_index)
 {
     return SET_NEUMANN_GRID_BC_VISITOR<
         T, D,
         T_Q_OF_CELL_INDEX_AND_NORMAL,
-        T_F_OF_CELL_INDEX,
+        T_F_OF_INDEX,
         T_RHS_OF_INDEX
     >(
         dx, multi_index_bound,
         q_of_cell_index_and_normal,
-        f_of_cell_index,
+        f_of_index,
         rhs_of_index
     );
 }
