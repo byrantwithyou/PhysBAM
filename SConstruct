@@ -389,7 +389,7 @@ def Name_From_Library(env,library):
     else:
         assert(len(library)==1)
         name=os.path.splitext(os.path.basename(library[0].path))[0]
-        assert(name.startswith('lib'),name)
+        # assert(name.startswith('lib'),name)
         return name[3:]
 
 # Generate a wrapper on Posix 
