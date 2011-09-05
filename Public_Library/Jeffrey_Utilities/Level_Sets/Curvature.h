@@ -45,7 +45,7 @@ inline T Curvature(
                 const T phi02 = phi_of_index(linear_index - strides[d1] + strides[d2]);
                 const T phi20 = phi_of_index(linear_index + strides[d1] - strides[d2]);
                 const T phi22 = phi_of_index(linear_index + strides[d1] + strides[d2]);
-                d12phi = ((phi22 - phi20) - (phi02 - phi00)) * (one_over_dx1 * one_over_dx2) / 4;
+                const T d12phi = ((phi22 - phi20) - (phi02 - phi00)) * (one_over_dx1 * one_over_dx2) / 4;
                 result += d1phi[d1] * (d1phi[d2] * d12phi - d1phi[d1] * d2phi[d2])
                        +  d1phi[d2] * (d1phi[d1] * d12phi - d1phi[d2] * d2phi[d1]);
             }
