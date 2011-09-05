@@ -30,6 +30,7 @@ template<class TV> class RIGID_BODY;
 template<class TV> class SOLIDS_FLUIDS_PARAMETERS;
 template<class TV> class SOLID_BODY_COLLECTION;
 template<class T_GRID> class LAPLACE_UNIFORM;
+template<class TV> class KANG_POISSON_VISCOSITY;
 
 template<class TV>
 class PLS_FSI_EXAMPLE:public EXAMPLE<TV>,public EXAMPLE_FORCES_AND_VELOCITIES<TV>,public SOLIDS_EVOLUTION_CALLBACKS<TV>,public SOLIDS_FLUIDS_CALLBACKS<TV>,
@@ -63,6 +64,8 @@ public:
     int convection_order;
     bool use_pls_evolution_for_structure;
     bool two_phase;
+    bool use_kang;
+    KANG_POISSON_VISCOSITY<TV>* kang_poisson_viscosity;
 
     PLS_FSI_EXAMPLE(const STREAM_TYPE stream_type,const int number_of_regions);
     ~PLS_FSI_EXAMPLE();
