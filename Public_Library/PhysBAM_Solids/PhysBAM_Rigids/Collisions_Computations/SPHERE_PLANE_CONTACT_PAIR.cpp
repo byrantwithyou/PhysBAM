@@ -4,9 +4,6 @@
 //#####################################################################
 // Namespace CONTACT_PAIRS
 //##################################################################### 
-#ifndef __SPHERE_PLANE_CONTACT_PAIR__
-#define __SPHERE_PLANE_CONTACT_PAIR__
-
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include <PhysBAM_Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
@@ -80,4 +77,3 @@ INSTANTIATION_HELPER(double,3);
 #endif
 }
 }
-#endif
