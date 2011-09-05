@@ -46,6 +46,9 @@ public:
     T Compute_Curvature(const ARRAY<T,VECTOR<int,1> >& phi_input,const VECTOR<int,1>& index) const
     {return 0;}
 
+    T Compute_Curvature(const VECTOR<int,1>& index) const
+    {return Compute_Curvature(phi,index);}
+
     T Compute_Curvature(const VECTOR<T,1>& location) const
     {return 0;}
 
