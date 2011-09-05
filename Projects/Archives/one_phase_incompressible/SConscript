@@ -1,5 +1,0 @@
-# SConscript
-
-Import('env Automatic_Program')
-Automatic_Program(env,"one_phase_incompressible",["main.cpp"])
-

@@ -1,9 +1,0 @@
-fluids_parameters.grid.resolution = 149 149 112
-domain_scale = 10
-rigid_body_1.density=10
-rigid_body_1.pressure_force_scale=3
-fluids_parameters.incompressible_iterations = 100
-fluids_parameters.use_time_filter_for_pressure_jumps = true
-fluids_parameters.restart_data_write_rate = 10
-fluids_parameters.write_debug_data = false
-source_velocity = 0 -1 0

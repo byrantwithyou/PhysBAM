@@ -1,2 +1,0 @@
-fluids_parameters.grid.resolution = 81 81 81
-fluids_parameters.incompressible_iterations = 20

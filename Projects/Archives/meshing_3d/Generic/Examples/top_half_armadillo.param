@@ -1,7 +1,0 @@
-levelset=Rigid_Bodies/top_half_armadillo.phi
-
-curvature_subdivision_threshold_multiplier=3
-interpolation_error_subdivision_threshold_multiplier=3
-max_subdivision_levels=4
-number_of_force_steps=10
-

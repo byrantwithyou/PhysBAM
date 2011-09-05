@@ -1,8 +1,0 @@
-levelset=Rigid_Bodies/dragon_resized.phi
-//levelset=Rigid_Bodies/dragon_128x128x128.oct
-
-curvature_subdivision_threshold_multiplier=3
-interpolation_error_subdivision_threshold_multiplier=3
-max_subdivision_levels=1
-number_of_force_steps=10
-

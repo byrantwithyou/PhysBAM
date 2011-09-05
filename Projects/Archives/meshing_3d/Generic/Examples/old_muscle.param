@@ -1,6 +1,0 @@
-levelset=../Muscle_Data/triceps+2tendons_flattened_reinitialized_rescaled.phi
-
-curvature_subdivision_threshold=.5
-bcc_lattice_cell_size=.1  //curvature_subdivision_threshold*.26;//[.004, infinity]
-curvature_subdivision_threshold=1 //bcc_lattice_cell_size/.004;
-max_subdivision_levels=2

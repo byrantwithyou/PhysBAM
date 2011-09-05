@@ -1,5 +1,0 @@
-# SConscript
-
-Import('env Automatic_Program')
-Automatic_Program(env,"articulated_rigid_bodies",["main.cpp","Bridge/BRIDGE_EXAMPLE.cpp"])
-
