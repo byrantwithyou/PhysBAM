@@ -1,0 +1,270 @@
+Light{
+Type=Rectangle
+Position=51.3303 21.8225 6.8788
+U_Vector=-2.18256 0 10.2682
+V_Vector=-0.00363659 0.0092832 -0.000772979U_Samples=1
+V_Samples=1
+Color=1 1 1
+Power=3333.33
+}
+Light{
+Type=Rectangle
+Position=49.1478 21.8225 17.147
+U_Vector=-4.26974 0 9.59
+V_Vector=-0.00339641 0.0092832 -0.00151218U_Samples=1
+V_Samples=1
+Color=1 1 1
+Power=3333.33
+}
+Light{
+Type=Rectangle
+Position=44.878 21.8225 26.737
+U_Vector=-6.17031 0 8.4927
+V_Vector=-0.00300779 0.0092832 -0.00218528U_Samples=1
+V_Samples=1
+Color=1 1 1
+Power=3333.33
+}
+Light{
+Type=Rectangle
+Position=38.7077 21.8225 35.2297
+U_Vector=-7.80121 0 7.02424
+V_Vector=-0.00248771 0.0092832 -0.00276288U_Samples=1
+V_Samples=1
+Color=1 1 1
+Power=3333.33
+}
+Light{
+Type=Rectangle
+Position=30.9065 21.8225 42.2539
+U_Vector=-9.09115 0 5.24878
+V_Vector=-0.00185891 0.0092832 -0.00321973U_Samples=1
+V_Samples=1
+Color=1 1 1
+Power=3333.33
+}
+Light{
+Type=Rectangle
+Position=21.8153 21.8225 47.5027
+U_Vector=-9.98377 0 3.24392
+V_Vector=-0.00114887 0.0092832 -0.00353587U_Samples=1
+V_Samples=1
+Color=1 1 1
+Power=3333.33
+}
+Light{
+Type=Rectangle
+Position=11.8316 21.8225 50.7466
+U_Vector=-10.4401 0 1.09729
+V_Vector=-0.000388619 0.0092832 -0.00369746U_Samples=1
+V_Samples=1
+Color=1 1 1
+Power=3333.33
+}
+Light{
+Type=Rectangle
+Position=1.39151 21.8225 51.8439
+U_Vector=-10.4401 0 -1.09729
+V_Vector=0.000388619 0.0092832 -0.00369746U_Samples=1
+V_Samples=1
+Color=1 1 1
+Power=3333.33
+}
+Light{
+Type=Rectangle
+Position=-9.04855 21.8225 50.7466
+U_Vector=-9.98377 0 -3.24393
+V_Vector=0.00114887 0.0092832 -0.00353586U_Samples=1
+V_Samples=1
+Color=1 1 1
+Power=3333.33
+}
+Light{
+Type=Rectangle
+Position=-19.0323 21.8225 47.5027
+U_Vector=-9.09115 0 -5.24878
+V_Vector=0.00185891 0.0092832 -0.00321973U_Samples=1
+V_Samples=1
+Color=1 1 1
+Power=3333.33
+}
+Light{
+Type=Rectangle
+Position=-28.1235 21.8225 42.2539
+U_Vector=-7.80122 0 -7.02425
+V_Vector=0.00248771 0.0092832 -0.00276288U_Samples=1
+V_Samples=1
+Color=1 1 1
+Power=3333.33
+}
+Light{
+Type=Rectangle
+Position=-35.9247 21.8225 35.2297
+U_Vector=-6.1703 0 -8.49269
+V_Vector=0.00300779 0.0092832 -0.00218528U_Samples=1
+V_Samples=1
+Color=1 1 1
+Power=3333.33
+}
+Light{
+Type=Rectangle
+Position=-42.095 21.8225 26.737
+U_Vector=-4.26975 0 -9.59001
+V_Vector=0.00339641 0.0092832 -0.00151218U_Samples=1
+V_Samples=1
+Color=1 1 1
+Power=3333.33
+}
+Light{
+Type=Rectangle
+Position=-46.3647 21.8225 17.147
+U_Vector=-2.18256 0 -10.2682
+V_Vector=0.00363659 0.0092832 -0.000772979U_Samples=1
+V_Samples=1
+Color=1 1 1
+Power=3333.33
+}
+Light{
+Type=Rectangle
+Position=-48.5473 21.8225 6.8788
+U_Vector=0 0 -10.4976
+V_Vector=0.00371783 0.0092832 0U_Samples=1
+V_Samples=1
+Color=1 1 1
+Power=3333.33
+}
+Light{
+Type=Rectangle
+Position=-48.5473 21.8225 -3.61877
+U_Vector=2.18256 0 -10.2682
+V_Vector=0.00363659 0.0092832 0.00077298U_Samples=1
+V_Samples=1
+Color=1 1 1
+Power=3333.33
+}
+Light{
+Type=Rectangle
+Position=-46.3647 21.8225 -13.8869
+U_Vector=4.26975 0 -9.59001
+V_Vector=0.00339641 0.0092832 0.00151218U_Samples=1
+V_Samples=1
+Color=1 1 1
+Power=3333.33
+}
+Light{
+Type=Rectangle
+Position=-42.095 21.8225 -23.4769
+U_Vector=6.17031 0 -8.49269
+V_Vector=0.00300779 0.0092832 0.00218529U_Samples=1
+V_Samples=1
+Color=1 1 1
+Power=3333.33
+}
+Light{
+Type=Rectangle
+Position=-35.9247 21.8225 -31.9696
+U_Vector=7.80122 0 -7.02425
+V_Vector=0.00248771 0.0092832 0.00276289U_Samples=1
+V_Samples=1
+Color=1 1 1
+Power=3333.33
+}
+Light{
+Type=Rectangle
+Position=-28.1235 21.8225 -38.9939
+U_Vector=9.09114 0 -5.24878
+V_Vector=0.00185891 0.0092832 0.00321973U_Samples=1
+V_Samples=1
+Color=1 1 1
+Power=3333.33
+}
+Light{
+Type=Rectangle
+Position=-19.0323 21.8225 -44.2426
+U_Vector=9.98376 0 -3.24392
+V_Vector=0.00114887 0.0092832 0.00353587U_Samples=1
+V_Samples=1
+Color=1 1 1
+Power=3333.33
+}
+Light{
+Type=Rectangle
+Position=-9.04853 21.8225 -47.4866
+U_Vector=10.44 0 -1.09729
+V_Vector=0.000388618 0.0092832 0.00369746U_Samples=1
+V_Samples=1
+Color=1 1 1
+Power=3333.33
+}
+Light{
+Type=Rectangle
+Position=1.39153 21.8225 -48.5839
+U_Vector=10.44 0 1.0973
+V_Vector=-0.000388621 0.0092832 0.00369746U_Samples=1
+V_Samples=1
+Color=1 1 1
+Power=3333.33
+}
+Light{
+Type=Rectangle
+Position=11.8316 21.8225 -47.4866
+U_Vector=9.98376 0 3.24392
+V_Vector=-0.00114887 0.0092832 0.00353587U_Samples=1
+V_Samples=1
+Color=1 1 1
+Power=3333.33
+}
+Light{
+Type=Rectangle
+Position=21.8153 21.8225 -44.2426
+U_Vector=9.09114 0 5.24877
+V_Vector=-0.00185891 0.0092832 0.00321973U_Samples=1
+V_Samples=1
+Color=1 1 1
+Power=3333.33
+}
+Light{
+Type=Rectangle
+Position=30.9065 21.8225 -38.9939
+U_Vector=7.8012 0 7.02423
+V_Vector=-0.00248771 0.0092832 0.00276289U_Samples=1
+V_Samples=1
+Color=1 1 1
+Power=3333.33
+}
+Light{
+Type=Rectangle
+Position=38.7077 21.8225 -31.9696
+U_Vector=6.1703 0 8.4927
+V_Vector=-0.00300779 0.0092832 0.00218528U_Samples=1
+V_Samples=1
+Color=1 1 1
+Power=3333.33
+}
+Light{
+Type=Rectangle
+Position=44.878 21.8225 -23.4769
+U_Vector=4.26974 0 9.58999
+V_Vector=-0.00339641 0.0092832 0.00151218U_Samples=1
+V_Samples=1
+Color=1 1 1
+Power=3333.33
+}
+Light{
+Type=Rectangle
+Position=49.1478 21.8225 -13.8869
+U_Vector=2.18256 0 10.2682
+V_Vector=-0.00363659 0.0092832 0.00077298U_Samples=1
+V_Samples=1
+Color=1 1 1
+Power=3333.33
+}
+Light{
+Type=Rectangle
+Position=51.3303 21.8225 -3.61875
+U_Vector=-3.8147e-06 0 10.4975
+V_Vector=-0.00371783 0.0092832 -1.35102e-09U_Samples=1
+V_Samples=1
+Color=1 1 1
+Power=3333.33
+}

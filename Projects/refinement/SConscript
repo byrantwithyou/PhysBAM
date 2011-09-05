@@ -1,0 +1,6 @@
+# SConscript
+
+Import('env Automatic_Program')
+env=env.Copy(USE_PTHREADS=1)
+env.Append(CXXFLAGS="-DUSE_PTHREADS")
+Automatic_Program(env,"refinement",["main.cpp","Smoke_Tests/REFINEMENT_THREADS.cpp"])

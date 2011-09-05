@@ -1,0 +1,59 @@
+// Spotlight whose light is shadowed by a sphere in air volumetric shading provides volumetric shadow
+#include "basic_shaders.scene"
+Camera{
+	Location=       0 1 -6
+	Look_At=        0 1 0
+	Pseudo_Up=      0 1 0
+	Field_Of_View=  70
+	Focal_Distance=  1
+	Aspect_Ratio=    1.333
+	Width=           640
+	Height=          480
+	Output_Filename= "rgb/basic_sphere.rgb"
+}
+Options{
+	High_Quality=true
+	Spatial_Partition=true
+	Background_Color=0 0 0
+	#Use_Photon_Map=true
+	#Global_Photons=10000
+	#Caustic_Photons=10000
+	#Volume_Photons=0
+}
+// Spotlight
+Light{
+	Name=light1
+	Type=Spotlight
+	Position=4 20 -2
+	Direction=-.2049 -.9733 .1024
+	Cone_Angle=.01
+	Penumbra_Angle=.01
+	Power=50
+}
+//Colors for shaders
+Material{
+	Name="SphereColor"
+	Type="Color"
+	Color=1 1 1
+}
+Material{
+	Name="SphereShader"
+	Type="Lambertian"
+	Shader="SphereColor"
+	Reflectivity=0.5
+}
+// Objects
+Object{
+	Name="ground"
+	Type="Plane"
+	Position=0 0 0
+	Normal=0 1 0
+	Shader="GroundShader"
+}
+Object{
+	Name="sphere"
+	Type="Sphere"
+	Position=0 1 0
+	Radius=1
+	Shader="SphereShader"
+}

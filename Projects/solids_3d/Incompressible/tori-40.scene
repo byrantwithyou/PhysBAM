@@ -1,0 +1,203 @@
+Camera{
+    // old view
+    //Location=       -17.4285 32.2154 -49.609
+    //Look_At=        -1.29586 6.71323 -4.41028
+    //Pseudo_Up=      0.20588 0.881901 0.424104
+    //Field_Of_View=  26.4602
+    //Focal_Distance= .1
+    //Aspect_Ratio=   1.33333
+
+    // top view
+    //Location=       -18.2275 31.3249 10.1334
+    //Look_At=        1.3823 1.69942 1.75608
+    //Pseudo_Up=      0.74636 0.584195 -0.318846
+    //Field_Of_View=  26.4602
+    //Focal_Distance= .1
+    //Aspect_Ratio=   1.33333
+
+    // better view
+    Location=       -23.7986 14.2534 12.7577
+    Look_At=        1.39151 1.82246 1.63002
+    Pseudo_Up=      0.376343 0.911442 -0.166249
+    Field_Of_View=  26.4602
+    Focal_Distance= .1
+    Aspect_Ratio=   1.33333
+
+    Width=           640
+    Height=          480
+    Output_Filename="output/tori_high.%03d.png"
+}
+
+Options{
+    High_Quality=true
+}
+
+//////////////////////////// Lighting
+
+#include "light_ring_30.scene"
+
+%Light{
+    Type=Point
+    Position=-23.7986 14.2534 12.7577
+    Color=1 1 1
+    Power=5000
+}
+
+////////////////////////////// Shaders
+
+Material{
+    Name="Color1"
+    Type="Color"
+        Color=.8 .498039 .196078
+}
+Material{
+    Name="DonutShader1"
+    Type="Phong"
+    Shader="Color1"
+    Diffuse=.8 .498039 .196078
+    Specular=.8 .498039 .196078
+    Specular_Exponent=35
+}
+
+Material{
+    Name="Color2"
+    Type="Color"
+    Color=.157059 .104706 .064706
+}
+Material{
+    Name="DonutShader2"
+    Type="Phong"
+    Shader="Color2"
+    Diffuse=.157059 .104706 .064706
+    Specular=1 1 1
+    Specular_Exponent=35
+}
+Material{
+    Name="Color3"
+    Type="Color"
+    Color=.9 .9 .85
+}
+Material{
+    Name="DonutShader3"
+    Type="Phong"
+    Shader="Color3"
+    Diffuse=.9 .9 .85
+    Specular=1 1 1
+    Specular_Exponent=35
+}
+Material{
+    Name="Color4"
+    Type="Color"
+    Color=.858824 .476471 .239216
+}
+Material{
+    Name="DonutShader4"
+    Type="Phong"
+    Shader="Color4"
+    Diffuse=.858824 .476471 .239216
+    Specular=.858824 .476471 .239216
+    Specular_Exponent=25
+}
+
+Material{
+    Name="GroundColor"
+    Type="Color"
+    Color= 1 .775 .5431
+}
+Material{
+    Name="GroundShader"
+    Type="Lambertian"
+    Shader="GroundColor"
+    Ambient=.06 .06 .06
+    Reflectivity=0.5
+}
+
+Material{
+    Name="BlueColor"
+    Type="Color"
+    //Color=.15 .1 1
+    Color=.25 .3 1
+}
+
+Material{
+    Name="StairShader"
+    Type="Lambertian"
+    Shader="BlueColor"
+    Ambient=.06 .06 .06
+    Reflectivity=0.5
+}
+
+//////////////////////////// Objects
+
+Object{
+    Name="Ground"
+    Type="Plane"
+    Position= 0 -.005 0
+    Normal = 0 1 0
+    Shader="GroundShader"
+}
+
+List_Object{
+    Name="Rigid"
+    Type="Rigid_Body_List"
+    Prefix="input"
+    Shader="StairShader"
+    Smooth_Normals=false
+    Preserve_Creases=true
+    Range=1-16
+}
+
+List_Object{
+    Type="Deformable_Object"
+    Name="Deformable"
+    Split_Object=true
+    Prefix="input"
+    Shader="GroundShader"
+    Smooth_Normals=true
+    Preserve_Creases=false
+    Range=1-40
+
+    Shader1="DonutShader1"
+    Shader2="DonutShader2"
+    Shader3="DonutShader3"
+    Shader4="DonutShader1"
+    Shader5="DonutShader2"
+    Shader6="DonutShader3"
+    Shader7="DonutShader1"
+    Shader8="DonutShader2"
+    Shader9="DonutShader3"
+    Shader10="DonutShader1"
+
+    Shader11="DonutShader1"
+    Shader12="DonutShader2"
+    Shader13="DonutShader3"
+    Shader14="DonutShader1"
+    Shader15="DonutShader2"
+    Shader16="DonutShader3"
+    Shader17="DonutShader1"
+    Shader18="DonutShader2"
+    Shader19="DonutShader3"
+    Shader20="DonutShader1"
+
+    Shader21="DonutShader1"
+    Shader22="DonutShader2"
+    Shader23="DonutShader3"
+    Shader24="DonutShader1"
+    Shader25="DonutShader2"
+    Shader26="DonutShader3"
+    Shader27="DonutShader1"
+    Shader28="DonutShader2"
+    Shader29="DonutShader3"
+    Shader30="DonutShader1"
+
+    Shader31="DonutShader1"
+    Shader32="DonutShader2"
+    Shader33="DonutShader3"
+    Shader34="DonutShader1"
+    Shader35="DonutShader2"
+    Shader36="DonutShader3"
+    Shader37="DonutShader1"
+    Shader38="DonutShader2"
+    Shader39="DonutShader3"
+    Shader40="DonutShader1"
+}

@@ -1,0 +1,6 @@
+# SConscript
+
+Import('env Automatic_Program')
+Automatic_Program(env,"solids_3d",["Hair_Sim_Tests/HAIR_SIM_TESTS.cpp","Hair_Sim_Tests/HAIR_STRAND_TESTS.cpp","Mass_Weighted_Self_Collisions/MASS_WEIGHTED_SELF_COLLISIONS.cpp","Mocap_Flesh/MOCAP_FLESH.cpp","main.cpp"])
+#Automatic_Program(env,'Incompressible/fragment_volumes')
+

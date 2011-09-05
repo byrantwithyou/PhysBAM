@@ -1,0 +1,112 @@
+Camera{
+        Location=       -10.3049 5.83852 -36.4721
+        Look_At=        -4.8734 -2.80891 0.795513
+        Pseudo_Up=      0.0501231 0.974479 0.218809
+        Field_Of_View=  28.3475
+        Focal_Distance= .1
+        Aspect_Ratio=   1.43229
+
+	Width=           640
+	Height=          480
+	Output_Filename="stair.%04d.png"
+        
+}
+
+Options{
+	High_Quality=true
+}
+
+// Lighting
+Light{
+        Type=Spotlight
+        Position= -5 25 -40
+        Color=1 1 1
+        Power=15000
+        Direction=5 -25 40
+        Cone_Angle=pi
+        Penumbra_Angle=2*pi
+}
+//Light{
+//       Type=Spotlight
+//       Position= -10.3 15 -37
+//       Color=1 1 1
+//       Power=3600
+//       Direction=0 -9 25
+//       Cone_Angle=pi
+//       Penumbra_Angle=2*pi      
+//
+Light{
+        Type=Point
+        Position= -10.3049 5.83852 -36.4721
+        Color=1 1 1
+        Power=8000 
+}
+//Colors for shaders
+
+Material{
+	Name="GoldColor"
+	Type="Color"
+        Color=.8 .498039 .196078
+}
+Material{
+        Name="BlueColor"
+        Type="Color"
+        Color=.15 .1 1
+#        Color=.9 .17 .28
+}
+Material{
+	Name="SphereShader"
+	Type="Phong"
+	Shader="GoldColor"
+        Diffuse=.9 .498039 .196078
+        Specular=.8 .498039 .196078
+#        Specular=1 1 1
+        Specular_Exponent=10
+}
+
+Material{
+	Name="GroundColor"
+	Type="Color"
+        Color= 1 .8 .6431
+}
+
+Material{
+	Name="GroundShader"
+	Type="Lambertian"
+	Shader="GroundColor"
+    Ambient=.06 .06 .06
+	Reflectivity=0.5
+}
+Material{
+	Name="StairShader"
+	Type="Lambertian"
+	Shader="BlueColor"
+    Ambient=.06 .06 .06
+	Reflectivity=0.5
+}
+// Objects
+Object{
+        Name="Ground"
+        Type="Plane"
+        Position= 0 -7 0
+        Normal = 0 1 0
+        Shader="GroundShader"
+}
+List_Object{
+        Name="Rigid"
+        Type="Rigid_Body_List"
+        Prefix="Input"
+        Shader="StairShader"
+        Smooth_Normals=false
+        Preserve_Creases=false
+        Range=1-8
+}
+List_Object{
+        Name="Deformable"
+        Type="Deformable_Object"
+        Prefix="Input"
+        Shader=SphereShader
+        Smooth_Normals=true
+        Preserve_Creases=false
+        Range=1
+}

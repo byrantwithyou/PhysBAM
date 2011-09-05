@@ -1,0 +1,26 @@
+#!/usr/bin/python
+from optparse import OptionParser
+import sys
+import re
+import physbam
+
+usage="usage: %prog [options] input.phi [output.tri]"
+parser=OptionParser(usage);
+(options,args)=parser.parse_args();
+if len(args)==0 or len(args)>2:
+    parser.error("incorrect number of arguments");
+    sys.exit(1);
+
+phi_name=args[0]
+if len(args)==1:
+    tri_name=re.sub('\.phi','.tri',phi_name)
+    print "WARNING: output.tri is not specified, guessing %s"%tri_name
+else:
+    tri_name=args[1]
+
+grid=physbam.GRID_Vf3()
+phi=physbam.ARRAYS_3D_f()
+levelset=physbam.LEVELSET_IMPLICIT_OBJECT_Vf3(grid,phi)
+physbam.Read_From_File("float",phi_name,levelset)
+triangulated_surface=physbam.DUALCONTOUR_UNIFORM_Vf3.Create_Triangulated_Surface_From_Levelset(levelset.levelset)
+physbam.Write_To_File("float",tri_name,triangulated_surface)

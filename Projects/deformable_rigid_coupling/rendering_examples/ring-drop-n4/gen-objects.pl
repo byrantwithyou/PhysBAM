@@ -1,0 +1,110 @@
+#!/usr/bin/perl -w
+
+my $poles=25;
+my $rsph=80;
+my $dsph=80;
+my $rtori=80;
+my $dtori=80;
+my $lathe=80;
+
+# poles
+for my $i (1..$poles){
+    print <<EOF
+List_Object{
+    Name="Rigid$i"
+    Type="Rigid_Body_List"
+    Prefix="input"
+    Shader="RedShader"
+    Smooth_Normals=true
+    Subdivide_Geometry=false
+    Preserve_Creases=true
+    Range=$i
+}
+
+EOF
+}
+
+# 80 rigid spheres
+for my $i ($poles+1..$poles+$rsph){
+    print <<EOF
+List_Object{
+    Name="Rigid$i"
+    Type="Rigid_Body_List"
+    Prefix="input"
+    Shader="BlueShader"
+    Smooth_Normals=true
+    Subdivide_Geometry=false
+    Preserve_Creases=false
+    Range=$i
+}
+
+EOF
+}
+
+# 80 rings
+for my $i ($poles+$rsph+1..$poles+$rsph+$rtori){
+    print <<EOF
+List_Object{
+    Name="Rigid$i"
+    Type="Rigid_Body_List"
+    Prefix="input"
+    Shader="YellowShader"
+    Smooth_Normals=true
+    Subdivide_Geometry=false
+    Preserve_Creases=true
+    Range=$i
+}
+
+EOF
+}
+
+# lathe chains
+for my $i ($poles+$rsph+$rtori+1..$poles+$rsph+$rtori+$lathe*6){
+    print <<EOF
+List_Object{
+    Name="Rigid$i"
+    Type="Rigid_Body_List"
+    Prefix="input"
+    Shader="LatheShaderG"
+    Smooth_Normals=true
+    Subdivide_Geometry=false
+    Preserve_Creases=true
+    Range=$i
+}
+
+EOF
+}
+
+# deformable tori
+for my $i (1..$dtori){
+    print <<EOF
+List_Object{
+    Name="Deformable$i"
+    Type="Deformable_Object"
+    Prefix="input"
+    Shader="LatheShaderO"
+    Smooth_Normals=true
+    Preserve_Creases=false
+    Range=$i
+}
+
+EOF
+}
+
+# deformable spheres
+for my $i ($dtori+1..$dtori+$dsph){
+    print <<EOF
+List_Object{
+    Name="Deformable$i"
+    Type="Deformable_Object"
+    Prefix="input"
+    Shader="LatheShaderP"
+    Smooth_Normals=true
+    Preserve_Creases=false
+    Range=$i
+}
+
+EOF
+}
+
+

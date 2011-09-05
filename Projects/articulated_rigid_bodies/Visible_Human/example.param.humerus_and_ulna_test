@@ -1,0 +1,15 @@
+error_half_life=10
+
+#arb.global_post_stabilization=false
+arb.use_epsilon_scale=false
+rigid_body_parameters.use_epsilon_scaling=false
+rigid_body_parameters.use_epsilon_scaling_for_level=false
+arb.extra_iterations_per_contact_level_factor=10
+#arb.static_friction_iterations=1
+solids_parameters.cfl=.005
+
+arb.iterative_tolerance=1e-5
+arb.small_number=1e-5
+arb.line_search_interval_tolerance=1e-5
+arb.max_line_search_iterations=100
+arb.max_iterations=10000

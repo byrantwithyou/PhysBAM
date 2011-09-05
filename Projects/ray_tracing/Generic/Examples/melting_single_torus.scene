@@ -1,0 +1,183 @@
+// Spotlight whose light is shadowed by a sphere in air volumetric shading provides volumetric shadow
+//#include "basic_shaders.scene"
+Camera{
+//#include "Common/camera_script_side"
+//	Location=       1.25 1.25 -2.25
+//	Look_At=        1.25 .75 .5
+//	Field_Of_View=  70
+//	Location=       1.25 3 -4
+//	Look_At=        1.25 .75 .5
+//	Pseudo_Up=      0 1 0
+//	Field_Of_View=  45
+//	Focal_Distance=  1
+//	Aspect_Ratio=    1.333
+//	Width=           320
+//	Height=          240
+	Width=           640
+	Height=          480
+//	Width=           1024
+//	Height=          768
+	Output_Filename= "Output/melting"
+Field_Of_View=  25
+Location= 8.97196 2.99878 3.7362
+Look_At= 1.96494 0.410628 0.909244
+Pseudo_Up= -0.311485 0.945622 -0.0936792
+
+}
+Material{
+        Type="Infinite_Reflection"
+        Name="sky_shader"
+        Filename="Common/skylight-day.exr"
+}
+Material{
+	Name="WaterSurfaceShader"
+	Type="Transparent"
+	Fresnel=true
+	Shift_Direction=normal
+	Reflectivity=0.1
+}
+Material{
+	Name="WallShader"
+	Type="Transparent"
+	Fresnel=true
+	Shift_Direction=normal
+	Reflectivity=0.5
+}
+Options{
+	High_Quality=false
+	Spatial_Partition=true
+	Background_Color=0 0 0
+        Background_Shader="sky_shader"
+}
+Light{
+	Name=light1
+	Type=Directional
+	Color=1 1 1
+	Power=7
+        Direction=0 -.5 1
+}
+Light{
+	Name=light2
+	Type=Directional
+//	Position=1.75 1.6 .5
+//        Position=4 2.0424 1.97812
+//        Position=5 2.3 .5
+//        Position=5 2.3 .5
+	Color=1 1 1
+	Power=5.5
+        Direction=-1 -1 -1
+}
+Light{
+	Name=light3
+	Type=Directional
+	Color=1 1 1
+	Power=7
+        Direction=-.5 -1 0
+}
+Material{
+	Name="BlueColor"
+	Type="Color"
+	Color=.05 .05 1
+}
+Material{
+	Name="BlueColor"
+	Type="Color"
+	Color=0 0 .27
+}
+Material{
+	Name="BlackColor"
+	Type="Color"
+	Color=0 0 0
+}
+//Material{
+//	Name="WallShader"
+//	Type="Lambertian"
+//	Shader="BlackColor"
+//}
+Material{
+	Name="BlueShader"
+	Type="Lambertian"
+	Shader="BlueColor"
+	Reflectance=0.5
+}
+Material{
+        Name="WallTexture"
+        Type="Image_Texture"
+        Filename="Common/gray.bmp"
+	Cubic_Interpolation=false
+}
+Material{
+	Name="GroundShader"
+	Type="Lambertian"
+	Shader="WallTexture"
+        Reflectivity=0.5
+}
+//Material{
+//        Name="WallTransparentShader"
+//	Type="Transparent"
+//	Reflectivity=0.03
+//}
+// Objects
+Volume_Material {
+        Name="absorption"
+        Type="Attenuation_Shader"
+        Spectrum=.3 .3 .05
+        Absorption=60
+}
+Object{
+        Name="Ground"
+	Type="Plane"
+	Position=0 .002 0
+	Normal=0 1 0
+        Shader="GroundShader"
+        Texture_Vector1=.05 0 0
+        Texture_Vector2=0 0 .05
+}
+Object{
+        Name="octree_water"
+	Type="Octree_Levelset"
+	Grid_Filename="Input/octree_grid.%d"
+	Phi_Filename="Input/octree_levelset.%d"
+        Shader="WaterSurfaceShader"
+        Volume_Shader="absorption"
+//        Shader=BlueShader
+	Index_Of_Refraction=1.52
+}
+Object{
+	Name="wall"
+	Type="Wall"
+//        Control="Object"
+//        Object="octree_water"
+        Shrink=.001
+        Thickness=.03
+        Xmin=-.75
+        Xmax=3.65
+        Ymin=0
+        Ymax=1
+        Zmin=-.1
+        Zmax=2.1
+	Show_Xmin=true
+	Show_Xmax=false
+	Show_Ymin=false
+	Show_Ymax=false
+	Show_Zmin=true
+	Show_Zmax=false
+//        Shader="WallTransparentShader"	
+//        Shader="TranslucencyShader"	
+        Shader="WallShader"	
+}
+List_Object{
+        Name="Torus_List"
+        Type="Deformable_Object_List"
+        Smooth_Normals=true
+        Prefix="Input"
+        Shader="BlueShader"
+}
+List_Object{
+        Name="Torus"
+        Type="Deformable_Object_Instance"
+        List_Name="Torus_List"
+        Range=1
+        Shader="BlueShader"
+
+}

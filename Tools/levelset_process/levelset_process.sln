@@ -1,0 +1,35 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "levelset_process", "levelset_process.vcproj", "{8091C051-787F-4E2F-B226-3A99D48C58A4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{BECBDC32-D856-4A8E-8C46-3D9E99D72CA0} = {BECBDC32-D856-4A8E-8C46-3D9E99D72CA0}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PhysBAM", "..\..\Public_Library\PhysBAM.vcproj", "{BECBDC32-D856-4A8E-8C46-3D9E99D72CA0}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Profiling Release = Profiling Release
+		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{8091C051-787F-4E2F-B226-3A99D48C58A4}.Debug.ActiveCfg = Debug|Win32
+		{8091C051-787F-4E2F-B226-3A99D48C58A4}.Debug.Build.0 = Debug|Win32
+		{8091C051-787F-4E2F-B226-3A99D48C58A4}.Profiling Release.ActiveCfg = Release|Win32
+		{8091C051-787F-4E2F-B226-3A99D48C58A4}.Profiling Release.Build.0 = Release|Win32
+		{8091C051-787F-4E2F-B226-3A99D48C58A4}.Release.ActiveCfg = Release|Win32
+		{8091C051-787F-4E2F-B226-3A99D48C58A4}.Release.Build.0 = Release|Win32
+		{BECBDC32-D856-4A8E-8C46-3D9E99D72CA0}.Debug.ActiveCfg = Debug|Win32
+		{BECBDC32-D856-4A8E-8C46-3D9E99D72CA0}.Debug.Build.0 = Debug|Win32
+		{BECBDC32-D856-4A8E-8C46-3D9E99D72CA0}.Profiling Release.ActiveCfg = Profiling Release|Win32
+		{BECBDC32-D856-4A8E-8C46-3D9E99D72CA0}.Profiling Release.Build.0 = Profiling Release|Win32
+		{BECBDC32-D856-4A8E-8C46-3D9E99D72CA0}.Release.ActiveCfg = Release|Win32
+		{BECBDC32-D856-4A8E-8C46-3D9E99D72CA0}.Release.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

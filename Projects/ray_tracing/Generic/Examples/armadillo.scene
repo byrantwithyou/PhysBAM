@@ -1,0 +1,111 @@
+#include "basic_shaders.scene"
+//Colors for shaders
+Material{
+	Name="RedColor"
+	Type="Color"
+	Color=0.5 0 0
+}
+Material{
+	Name="BlueColor"
+	Type="Color"
+	Color=0 0 0.5 
+}
+Material{
+	Name="RedShader"
+	Type="Lambertian"
+	Shader="RedColor"
+	Reflectivity=0.1
+}
+Material{
+	Name="BlueShader"
+	Type="Lambertian"
+	Shader="BlueColor"
+	Reflectivity=0.1
+}
+Material{
+	Name="GroundColor"
+	Type="Color"
+	Color= .775 .5431
+}
+Material{
+	Name="GroundShader"
+	Type="Lambertian"
+	Shader="GroundTan"
+	Reflectivity=0.5
+}
+Material{
+	Type=           "Color"
+	Name=           "Gray"
+	Color=          0.4 0.4 0.4
+}
+Material{
+	Type=           "Lambertian"
+	Name=           "GrayMatte"
+	Shader=         "Gray"
+	Reflectance=    0.6
+	Ambient=        .014 .014 .014
+}
+Camera{
+	Location=	-1.26288 0.117942 -2.54687
+	Look_At=	0.00179415 0.0602127 0.000163132
+	Pseudo_Up=	0.0203512 0.999714 0.0125543
+	Field_Of_View=	26.0156
+	Focal_Distance=	.1
+	Aspect_Ratio=	1.31013
+	Width=           640
+	Height=          480
+	Output_Filename= "armadillo_twist/armadillo.rgb"
+}
+Options{
+	High_Quality=true
+	Spatial_Partition=false
+	Gamma_Correction=4
+//	Background_Color=0.5 0.3 0.3
+}
+// Spotlight
+Light{
+	Name=light1
+	//Type=Spotlight
+	Type=Directional
+	Position=-1.62011 1.0973 -1.42666
+	Direction=1.65 -1.01 1.463
+	//Cone_Angle=.6
+	//Penumbra_Angle=.5
+	Power=5
+}
+Light{
+	Name=light1
+	Type=Point
+	Position=1.62 20 10
+	Color=0.5 .5 0.5
+	Power=1000
+}
+Light{
+	Name=light2
+	Type=Point
+	Position=-1.62 0.5 -2
+	Color=.5 0.5 .5
+	Power=1000
+}
+// Objects
+Object{
+	Name="body"
+	Type="Triangulated_Surface"
+	Flip_Normal=false
+	Filename="C:\Bao\ArmadData\tri_surface_%d.tri"	
+    	Smooth_Normals=true
+    	Preserve_Creases=false
+    
+	// model starts out about 2m tall; we want it to be ~0.3m tall
+	Scale=1.0
+	Shader=GrayMatte
+	//ReflectionShader="White"	
+}
+// Objects
+Object{
+	Name="ground"
+	Type="Plane"
+	Position=0 -0.257 0
+	Normal=0 1 0
+	Shader="GroundShader"
+}

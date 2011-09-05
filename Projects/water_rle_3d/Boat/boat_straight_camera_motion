@@ -1,0 +1,27 @@
+Camera_Frame{
+        Frame =         0
+        Location=       7.5 2.55542 -2.45548
+        Look_At=        1.22368 0.2125768 1.86008
+        Pseudo_Up=      -0.358667 0.894449 0.267055
+        Field_Of_View=  26.4602
+        Focal_Distance= .1
+        Aspect_Ratio=   1.33333
+}
+Camera_Frame{
+        Frame =         40
+        Location=       7.5 2.55542 -2.45548
+        Look_At=        1.22368 0.2125768 1.86008
+        Pseudo_Up=      -0.358667 0.894449 0.267055
+        Field_Of_View=  26.4602
+        Focal_Distance= .1
+        Aspect_Ratio=   1.33333
+}
+Camera_Frame{
+        Frame =         615
+        Location=       7.5 2.55542 -2.45548
+        Look_At=        10.8 0.2125768 1.86008
+        Pseudo_Up=      -0.340307 0.928942 0.1458
+        Field_Of_View=  26.4602
+        Focal_Distance= .1
+        Aspect_Ratio=   1.33333
+}

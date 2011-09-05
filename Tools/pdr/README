@@ -1,0 +1,50 @@
+Instructions for how to use the distributed renderer:
+
+-----------
+The server:
+-----------
+Check out pdr from cvs (cvs co Tools/pdr)
+Install it on a linux machine (cd Tools/pdr/Server;make install)
+Run it (cd /usr/local/pdr;python bin/PDR_SERVER.py)
+
+-----------
+The client:
+-----------
+Currently the client only works in windows. 
+
+1) Get the Java runtime from Sun (insert URL there)
+2) Compile main.java (javac main.java)
+3) Make sure that plink is set up passwordless (with pageant). Test it by typing "plink joint ls". It should give a directory listing back to you.
+4) Run the client (java MAIN)
+
+----------------
+The file-server:
+----------------
+All of your data files should be on a computer that allows for SSH access.
+
+The directory structure should look like this:
+
+The_Render_Directory_Name
+|- Common
+|  |- common_data_a
+|  |- common_piece_of_data_2
+|- Output
+|- Input
+   |- frame.1
+   |- frame.2
+   |- frame.3
+   |- frame.4
+
+In other words, make a Common directory and put the common data in it. Make an empty Output directory for the output files to end up in.  
+All of the per frame data _has_ to end in the frame number.
+
+PDR will copy Input/*.FRAME_NO and Common/* to the slave machine for rendering. Then it will copy the result back into Output
+
+The slave machine directory will be made in /local. The sub-directory is server_machine_name-job_id-frame_number. If a frame dies, it's a good idea to ssh into the slave and manually look at the directory structure to make sure that it is correct. Note that the input directory is deleted when the render terminates (successfully or not)... So that directory will be empty.
+
+NOTE:  The server must be able to write to the output directory (just call chmod 777 -R Output)
+
+-----------------
+Status reporting:
+-----------------
+A status monitoring program for Joint is always running. Point your web browser to "graphics.stanford.edu/~losasso/status"

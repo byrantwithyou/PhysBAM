@@ -1,0 +1,384 @@
+#include "basic_shaders.scene" 
+Camera{
+    Location=       0.0 1.6 -2.0
+    Look_At=        0 2.3 0
+//    Location=       0 1.8 -3.5
+//    Look_At=        0 1.8 0
+    Pseudo_Up=      0 1 0
+    Field_Of_View=  40
+    Focal_Distance=  1
+    Aspect_Ratio=    1.333
+    Width=           640
+    Height=          480
+    Output_Filename= "rgb/bssrdf_test.rgb"
+}
+Options{
+    High_Quality=false
+    Spatial_Partition=false
+    Background_Color=0.0 0.0 0.0
+}
+// Pointlight
+Light{
+    Name=light1
+    Type=Point
+    Position=.3 2 -3.5
+    Power=550
+}
+
+Light{
+    Name=light1
+    Type=Point
+    Position=-1.8 2 -3.5
+    Power=350
+}
+
+
+// Shaders
+Material{
+    Name="TextureShader1"
+    Type="Image_Texture"
+    Filename="../../../../Public_Data/Face_Data/Face_Textures/hrc_baseline_blur.bmp"
+}
+
+Material{
+    Name="TextureShader2"
+    Type="Image_Texture"
+    Filename="../../../../Public_Data/Face_Data/Face_Textures/eye3_processed.bmp"
+}
+
+Material{
+    Type="Lambertian"
+    Name="LambertianTexture"
+    Shader="TextureShader1"
+    Reflectance=0.3 //0.3
+}
+
+Material{
+    Type="Lambertian"
+    Name="LambertianTexture2"
+    Shader="TextureShader2"
+    Reflectance=0.15
+}
+
+Material{
+    Type="Reflection_Map"
+    Name="Eye_Reflection_Map"
+    Filename="../../../../Public_Data/Face_Data/Face_Textures/eye3_processed_reflection_map.bmp"
+}
+
+Material{
+	Type=           "Lambertian"
+	Name=           "EyeLashShader"
+	Shader=         "GroundTan"
+	Reflectance=    .1
+	Ambient=        0 0 0
+}
+
+Material{
+    Type="Normal_Image_Bump_Map"
+    Name="NormalBumpMapped"
+    Shader="LambertianTexture"
+    Filename="../../../../Public_Data/Face_Data/Face_Textures/hrc_baseline_touchup_bump_map.bmp"
+}   
+
+// for use with BSSRDF
+Material{
+    Name="NormalShader1"
+    Type="Normal_Image_Bump_Map"
+    Filename="../../../../Public_Data/Face_Data/Face_Textures/hrc_baseline_touchup_bump_map.bmp"
+}
+
+Material{
+    Name="Skin1BSSRDFShader"
+    Type="BSSRDF"
+    Sigma_s_Prime=7.4 8.8 10.1
+    Sigma_a=.32 1.7 4.8
+    Diffuse_Reflectance=.44 .22 .13
+    Index_Of_Refraction=1.3
+    Error_Criterion=0.2
+    Specular_Color=0.001 0.0005 0.0005
+    Specular_Exponent=4.5
+}
+Material{
+    Name="Skin2BSSRDFShader"
+    Type="BSSRDF"
+    Sigma_s_Prime=10.9 15.9 17.9
+    Sigma_a=0.13 0.70 1.45
+    Diffuse_Reflectance=.63 .44 .34
+    Index_Of_Refraction=1.3
+    Error_Criterion=0.2
+    Specular_Color=0.001 0.0005 0.0005
+    Specular_Exponent=4.5
+}
+Material{
+    Name="Skin1_BSSRDF_Texture_Shader"
+    Type="BSSRDF"
+    Shader="TextureShader1"
+    Sigma_s_Prime=7.4 8.8 10.1
+    Sigma_a=.32 1.7 4.8
+    Diffuse_Reflectance=.44 .22 .13
+    Index_Of_Refraction=1.3
+    Error_Criterion=0.2
+    Specular_Color=0.004 0.002 0.002
+    Specular_Exponent=4.5
+}
+Material{
+    Name="Skin2_BSSRDF_Texture_Shader"
+    Type="BSSRDF"
+    Shader="TextureShader1"
+    Sigma_s_Prime=10.9 15.9 17.9
+    Sigma_a=0.13 0.70 1.45
+    Diffuse_Reflectance=.63 .44 .34
+    Index_Of_Refraction=1.3
+    Error_Criterion=0.2
+    Specular_Color=0.004 0.002 0.002
+    Specular_Exponent=4.5
+}
+
+Material{
+    Name="Skin3_BSSRDF_Texture_Shader"
+    Type="BSSRDF"
+    Shader="TextureShader1"
+    Normal_Map_Shader="NormalShader1"
+    Sigma_s_Prime=10.9 15.9 17.9
+    Sigma_a=0.13 0.70 1.45
+//    Sigma_s_Prime=109 159 179
+//    Sigma_a=1.3 7.0 14.5
+    Diffuse_Reflectance=.63 .44 .34
+    Index_Of_Refraction=1.3
+//    Error_Criterion=0.2
+	Error_Criterion=1.0
+    Specular_Color=0.4 0.3 0.3
+    Eccentricity=0.2
+}
+
+Material{
+    Name="Eye_BSSRDF_Texture_Shader"
+    Type="BSSRDF"
+    Shader="TextureShader2"
+    Reflection_Shader="Eye_Reflection_Map"
+//    Sigma_s_Prime=10 10 10
+//    Sigma_a=.21 .41 .41
+//    Sigma_s_Prime=1090 1590 1790
+//    Sigma_a=13 70 145
+    Sigma_s_Prime=545 795 895
+    Sigma_a=7.5 35 72.5
+    Diffuse_Reflectance=.83 .79 .75
+    Index_Of_Refraction=1.337
+//    Error_Criterion=0.2
+	Error_Criterion=1.0
+    Specular_Color=3 3 3
+    Eccentricity=0.03
+    Reflectiveness=0.5
+    Use_Texture_In_Irradiance_Precomputation=true
+}
+
+// Objects
+
+//The Face
+Transform{
+    Type="Push"
+}
+Transform{
+    Type="Translate"
+    Vector=0 1.8 -1
+}
+Transform{
+    Type="Rotate"
+    Axis=0 0 1
+    Radians=3.14159
+}
+Transform{
+    Type="Rotate"
+    Axis=0 1 0
+    Radians=3.14159
+}
+Transform{
+    Type="Rotate"
+    Axis=1 0 0
+    Radians=1.570795
+}
+
+Object{
+    Name="face"
+    Type="Triangulated_Surface"
+    Filename="../../../../Public_Data/Face_Data/Face_Meshes/CyberWare_Raw/tri/hrc_baseline.tri"
+    Texture_Coordinate_File="../../../../Public_Data/Face_Data/Face_Meshes/CyberWare_Raw/tri/hrc_baseline.uv"
+    Sample_Locations_File="../../../../Public_Data/Face_Data/Face_Meshes/CyberWare_Raw/tri/hrc_baseline_s4.5_100k.samples"
+
+    Smooth_Normals=true
+    Preserve_Creases=false
+    Scale= 4.5 
+//    Shader="LambertianTexture"
+    Shader="Skin3_BSSRDF_Texture_Shader"
+    Uses_BSSRDF=true
+}
+
+
+Transform{
+    Type="Pop"
+}
+
+
+
+
+//First Eye
+Transform{
+    Type="Push"
+}
+Transform{
+    Type="Translate"
+    Vector=0.128 1.89 -1.327
+}
+Transform{
+    Type="Rotate"
+    Axis=0 0 1
+    Radians=3.14159
+}
+Transform{
+    Type="Rotate"
+    Axis=0 1 0
+    Radians=3.4
+}
+Transform{
+    Type="Rotate"
+    Axis=1 0 0
+    Radians=1.5
+}
+Object{
+    Name="eye1"
+    Type="Triangulated_Surface"
+    Filename="../../../../Public_Data/Face_Data/Face_Meshes/eye_hrc_baseline.tri"
+    Texture_Coordinate_File="../../../../Public_Data/Face_Data/Face_Meshes/eye_hrc_baseline.uv"
+    Sample_Locations_File="../../../../Public_Data/Face_Data/Face_Meshes/eye_hrc_baseline_s3.70_100k.samples"
+    Smooth_Normals=true
+    Preserve_Creases=false
+    Scale=3.70
+    Shader="Eye_BSSRDF_Texture_Shader"
+//    Shader="LambertianTexture2"
+    Uses_BSSRDF=true
+    Flip_Normal=false
+}
+Transform{
+    Type="Pop"
+}
+
+//Second Eye
+Transform{
+    Type="Push"
+}
+Transform{
+    Type="Translate"
+    Vector=-0.149 1.89 -1.345
+}
+Transform{
+    Type="Rotate"
+    Axis=0 0 1
+    Radians=3.14159
+}
+Transform{
+    Type="Rotate"
+    Axis=0 1 0
+    Radians=3.4
+}
+Transform{
+    Type="Rotate"
+    Axis=1 0 0
+    Radians=1.6
+}
+Object{
+    Name="eye2"
+    Type="Triangulated_Surface"
+    Filename="../../../../Public_Data/Face_Data/Face_Meshes/eye_hrc_baseline.tri"
+    Texture_Coordinate_File="../../../../Public_Data/Face_Data/Face_Meshes/eye_hrc_baseline.uv"
+    Sample_Locations_File="../../../../Public_Data/Face_Data/Face_Meshes/eye_hrc_baseline_s3.45_100k.samples"
+    Smooth_Normals=true
+    Preserve_Creases=false
+    Scale=3.45
+    Shader="Eye_BSSRDF_Texture_Shader"
+//    Shader="LambertianTexture2"
+    Uses_BSSRDF=true
+    Flip_Normal=false
+}
+Transform{
+    Type="Pop"
+}
+
+
+//Left Eyelashes
+Transform{
+    Type="Push"
+}
+Transform{
+    Type="Translate"
+    Vector=0 1.8 -1
+}
+Transform{
+    Type="Rotate"
+    Axis=0 0 1
+    Radians=3.14159
+}
+Transform{
+    Type="Rotate"
+    Axis=0 1 0
+    Radians=3.14159
+}
+Transform{
+    Type="Rotate"
+    Axis=1 0 0
+    Radians=1.570795
+}
+
+Object{
+    Name="eyelashes1"
+    Type="Triangulated_Surface"
+    Filename="../../../../Public_Data/Face_Data/Face_Meshes/eyelashes_left_hrc.tri"
+    Shader=EyeLashShader
+    Smooth_Normals=true
+    Preserve_Creases=false
+    Scale= 4.5 
+}
+
+
+Transform{
+    Type="Pop"
+}
+
+//Right Eyelashes
+Transform{
+    Type="Push"
+}
+Transform{
+    Type="Translate"
+    Vector=0.01 1.8 -1
+}
+Transform{
+    Type="Rotate"
+    Axis=0 0 1
+    Radians=3.14159
+}
+Transform{
+    Type="Rotate"
+    Axis=0 1 0
+    Radians=3.14159
+}
+Transform{
+    Type="Rotate"
+    Axis=1 0 0
+    Radians=1.570795
+}
+
+Object{
+    Name="eyelashes2"
+    Type="Triangulated_Surface"
+    Filename="../../../../Public_Data/Face_Data/Face_Meshes/eyelashes_right_hrc.tri"
+    Shader=EyeLashShader
+    Smooth_Normals=true
+    Preserve_Creases=false
+    Scale=4.5 
+}
+
+
+Transform{
+    Type="Pop"
+}

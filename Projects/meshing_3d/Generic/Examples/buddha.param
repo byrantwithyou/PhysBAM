@@ -1,0 +1,14 @@
+levelset=Rigid_Bodies/Buddha_rescaled.phi
+
+curvature_subdivision_threshold_multiplier=3
+interpolation_error_subdivision_threshold_multiplier=3
+max_subdivision_levels=2
+dynamic_ether_viscosity=.5
+use_constant_mass=true
+boundary_mass_multiplicative_factor=1
+force_attraction_coefficient=1
+velocity_attraction_coefficient=1
+time_step=(T).25
+number_of_force_steps=40
+number_of_velocity_steps=360
+number_of_initial_optimization_steps=0

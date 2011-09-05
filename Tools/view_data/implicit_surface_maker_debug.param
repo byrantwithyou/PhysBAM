@@ -1,0 +1,31 @@
+Grid_3D {
+    name = "grid1"
+    filename = "grid.debug"
+}
+
+Center_Scalar_Field_3D {
+    name = "colors"
+    value_type = "int"
+    grid = "grid1"
+    mode = "Points"
+    filename = "colors.debug"
+}
+
+Face_Scalar_Field_3D {
+    name = "edge_is_blocked"
+    value_type = "bool"
+    grid = "grid1"
+    filename = "edge_is_blocked.debug"
+}
+
+Triangulated_Surface {
+    grid = "grid1"
+    name = "tri1"
+    filename = "triangulated_surface.debug"
+}
+
+Levelset_3D {
+    grid = "grid1"
+    name = "ls1"
+    filename = "levelset.debug"
+}

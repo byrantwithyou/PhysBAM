@@ -1,0 +1,95 @@
+// Parameters to play with
+//ether_viscosity=0.05
+//ether_angular_viscosity=0.05
+
+// Collisions
+//rigid_body_parameters.collision_iterations=0
+bone_phi=true
+skeleton_collisions=true
+no_collisions_between_joined_bodies=true
+no_net_collisions=true
+
+//rigid_body_parameters.use_shock_propagation=false
+//rigid_body_parameters.use_push_out=false
+
+k_p=50000
+soft_k_p=1000
+
+uniform_mass=1
+//skeleton_mass=500
+
+motion_track="Net/motion_body3"
+track_speedup_factor=2
+
+use_double_point_joints_for_bend=true
+
+// update for restarts
+//settled_net_file="Net/settled_rigid_bodies.run_try_ether_drag_011506-063138.312.gz"
+update_joints=true
+
+arb.global_post_stabilization=false
+net_global_post_stabilization=false
+arb.use_pd_actuators=false
+arb.max_articulated_rigid_body_iterations_scale=.1
+arb.error_half_life=.005
+arb.new_pre_stabilization=true
+
+// --------------------------------------------------------------
+
+// Net
+scale_factor=0.1
+use_cylinders=true
+x_shift=-30
+#y_shift=30
+y_shift=20
+z_shift=-20
+num_rows=5
+num_cols=5
+settled_net_scale=2
+settled_net_shift=2.4 0.8 0
+settled_net_zero_velocities=true
+
+// Other
+frame_rate=60
+last_frame=3000
+
+solids_parameters.gravity=9.8
+solids_parameters.cfl=.5
+rigid_body_parameters.maximum_time_step_fraction=0.5
+
+arb.iterative_tolerance=1e-8
+arb.small_number=1e-8
+arb.line_search_interval_tolerance=1e-8
+arb.max_line_search_iterations=10000
+arb.max_iterations=10000
+arb.use_pd_actuators=true
+
+add_man=false
+man_rotate_x=0
+clamp_thorax_speed=3.5
+
+add_ground=false
+
+//constrain_twist=true
+
+// Motion track
+spline_order=3
+use_motion_track=true
+
+// Corners
+reset_motion_curve_after_restart=true
+move_corners=false
+static_corners=true
+kinematic_corners=false
+corners_start_time=0.66666
+corners_stop_time=2
+corners_stop_fraction=0.6
+
+// Debugging
+//test_frame_tracks=true
+//verbose=true
+//arb.debug_optimization=true
+
+// PROBABLY DON'T NEED TO TOUCH THESE
+//zero_angular_velocity_of_net_joints=true
+//no_collisions=true

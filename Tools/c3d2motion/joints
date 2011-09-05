@@ -1,0 +1,44 @@
+joint_atlas upperback 0 lear rear upperback 0 middleback 0
+joint_axis 0 0 0 0 0 0 0 0
+joint_c3 0 0 0 0 0 0 0 0
+joint_c4 0 0 0 0 0 0 0 0
+joint_c5 0 0 0 0 0 0 0 0
+joint_c6 0 0 0 0 0 0 0 0
+joint_c7 0 0 0 0 0 0 0 0
+#joint_c7_thorax upperback 0 lear rear upperback 0 middleback 0
+joint_l1 middleback 0 upperback 0 middleback 0 lowerback 0
+joint_l2 0 0 0 0 0 0 0 0
+joint_l3 0 0 0 0 0 0 0 0
+joint_l4 0 0 0 0 0 0 0 0
+joint_l5 0 0 0 0 0 0 0 0
+joint_l5_coccyx lowerback 0 middleback 0 lowerback 0 lhip rhip
+joint_r_sternoclavicular upperback 0 middleback 0 rshoulder 0 rclavicle 0
+joint_r_acromioclavicular rshoulder 0 rclavicle 0 rshoulder 0 upperback 0
+joint_r_glenohumeral rshoulder 0 upperback 0 rshoulder 0 relbow 0
+joint_r_humeroulnar relbow 0 rshoulder 0 relbow 0 rwrist 0
+joint_r_radioulnar relbow 0 rwrist 0 relbow 0 rwrist
+joint_r_radiocarpal rwrist 0 relbow 0 rwrist 0 rhand
+joint_r_hip rhip 0 rasis 0 rhip 0 rknee 0
+joint_r_knee rknee 0 rhip 0 rknee 0 rheel 0
+joint_r_patella rhip 0 rknee 0 0 0 0 0
+joint_r_ankle rheel 0 rknee 0 rheel 0 rtoe
+joint_r_toe_1 rheel 0 rtoe 0 0 0 0 0
+joint_r_toe_2 rheel 0 rtoe 0 0 0 0 0
+joint_r_toe_3 rheel 0 rtoe 0 0 0 0 0
+joint_r_toe_4 rheel 0 rtoe 0 0 0 0 0
+joint_r_toe_5 rheel 0 rtoe 0 0 0 0 0
+joint_r_sternoclavicular_left upperback 0 middleback 0 lshoulder 0 lclavicle 0
+joint_r_acromioclavicular_left lshoulder 0 lclavicle 0 lshoulder 0 upperback 0
+joint_r_glenohumeral_left lshoulder 0 upperback 0 lshoulder 0 lelbow 0
+joint_r_humeroulnar_left lelbow 0 lshoulder 0 lelbow 0 lwrist 0
+joint_r_radioulnar_left lelbow 0 lwrist 0 lelbow 0 lwrist 0
+joint_r_radiocarpal_left lwrist 0 lelbow 0 lwrist 0 lhand 0
+joint_r_hip_left lhip 0 lasis 0 lhip 0 lknee 0
+joint_r_knee_left lknee 0 lhip 0 lknee 0 lheel 0
+joint_r_patella_left lhip 0 lknee 0 0 0 0 0
+joint_r_ankle_left lheel 0 lknee 0 lheel 0 ltoe 0
+joint_r_toe_1_left lheel 0 ltoe 0 0 0 0 0
+joint_r_toe_2_left lheel 0 ltoe 0 0 0 0 0
+joint_r_toe_3_left lheel 0 ltoe 0 0 0 0 0
+joint_r_toe_4_left lheel 0 ltoe 0 0 0 0 0
+joint_r_toe_5_left lheel 0 ltoe 0 0 0 0 0

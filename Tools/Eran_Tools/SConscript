@@ -1,0 +1,7 @@
+# SConscript
+
+Import('env Automatic_Program')
+#cpps=['extrude.cpp', 'trimerge_test.cpp', 'reflect_tri.cpp', 'rgdinfo2d.cpp', 'lhs_to_rhs.cpp', 'tetinfo.cpp', 'tri2ply.cpp', 'phi_to_image.cpp', 'compact_particle_array.cpp', 'transform_polygonal_surface.cpp', 'trifix.cpp', 'mpi_merge.cpp', 'ply2tri.cpp', 'octinfo.cpp', 'edit_levelset.cpp', 'trimerge.cpp', 'arraysinfo.cpp', 'phiinfo.cpp', 'reinitialize_levelset.cpp', 'curve2phi2d.cpp', 'watervelinfo.cpp', 'rgdinfo.cpp', 'siminfo.cpp', 'triseal.cpp', 'update_rigid_bodies.cpp', 'linear_subdivide.cpp', 'gridinfo.cpp', 'particlesinfo.cpp', 'heightfield_to_image.cpp', 'image_to_phi.cpp', 'phi2tri.cpp', 'ply2curve2d.cpp', 'create_heightfield.cpp', 'mass_properties_2d.cpp', 'mass_properties.cpp', 'curveinfo2d.cpp', 'resample_heightfield.cpp', 'triinfo.cpp', 'revolve.cpp', 'levelset_process.cpp']
+cpps=['mass_properties.cpp']
+modules=map(lambda x: x.replace(".cpp",""),cpps)
+map(lambda x: Automatic_Program(env,x),modules)

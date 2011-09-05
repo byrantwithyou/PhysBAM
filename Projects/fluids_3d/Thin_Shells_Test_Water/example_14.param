@@ -1,0 +1,4 @@
+fluids_parameters.incompressible_iterations = 200
+fluids_parameters.write_debug_data = false
+fluids_parameters.restart_data_write_rate = 5
+center_offset = 0.4

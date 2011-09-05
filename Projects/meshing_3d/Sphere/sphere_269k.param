@@ -1,0 +1,14 @@
+levelset=<sphere>
+
+use_dynamics=false
+use_optimization=true
+number_of_initial_optimization_steps=5
+number_of_final_optimization_steps=5
+
+bcc_lattice_cell_size=.26
+max_subdivision_levels=3
+attraction_coefficient=.3
+spring_stiffness_multiplier=.005
+curvature_subdivision_threshold_multiplier=.05
+interpolation_error_subdivision_threshold_multiplier=.05
+allow_tangential_velocity_slip=true

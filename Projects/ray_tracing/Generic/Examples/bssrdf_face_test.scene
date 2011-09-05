@@ -1,0 +1,174 @@
+#include "basic_shaders.scene"
+Camera{
+//    Location=       0.1 1.6 -2.0
+//    Look_At=        0 2.3 0
+    Location=       0 1.8 -3.5
+    Look_At=        0 1.8 0
+    Pseudo_Up=      0 1 0
+    Field_Of_View=  40
+    Focal_Distance=  1
+    Aspect_Ratio=    1.333
+    Width=           800
+    Height=          600
+    Output_Filename= "rgb/bssrdf_test.rgb"
+}
+Options{
+    High_Quality=false
+    Spatial_Partition=false
+    Background_Color=0.0 0.0 0.0
+}
+// Pointlight
+Light{
+    Name=light1
+    Type=Point
+    Position=.3 2 -3.5
+//    Power=975
+    Power=150
+}
+// Shaders
+Material{
+    Name="TextureShader1"
+    Type="Image_Texture"
+    Filename="../../../../Public_Data/Face_Data/Face_Textures/hrc_baseline_blur.bmp"
+}
+Material{
+	Type="Lambertian"
+	Name="LambertianTexture"
+	Shader="TextureShader1"
+	Reflectance=1.0
+}
+Material{
+	Type="Normal_Image_Bump_Map"
+	Name="NormalBumpMapped"
+	Shader="LambertianTexture"
+    Filename="../../../../Public_Data/Face_Data/Face_Textures/hrc_baseline_touchup_bump_map.bmp"
+}	
+
+// for use with BSSRDF
+Material{
+    Name="NormalShader1"
+    Type="Normal_Image_Bump_Map"
+    Filename="../../../../Public_Data/Face_Data/Face_Textures/hrc_baseline_touchup_bump_map.bmp"
+}
+
+Material{
+    Name="Skin1BSSRDFShader"
+    Type="BSSRDF"
+    Sigma_s_Prime=7.4 8.8 10.1
+    Sigma_a=.32 1.7 4.8
+    Diffuse_Reflectance=.44 .22 .13
+    Index_Of_Refraction=1.3
+    Error_Criterion=0.2
+    Specular_Color=0.001 0.0005 0.0005
+    Specular_Exponent=4.5
+}
+Material{
+    Name="Skin2BSSRDFShader"
+    Type="BSSRDF"
+    Sigma_s_Prime=10.9 15.9 17.9
+    Sigma_a=0.13 0.70 1.45
+    Diffuse_Reflectance=.63 .44 .34
+    Index_Of_Refraction=1.3
+    Error_Criterion=0.2
+    Specular_Color=0.001 0.0005 0.0005
+    Specular_Exponent=4.5
+}
+Material{
+    Name="Skin1_BSSRDF_Texture_Shader"
+    Type="BSSRDF"
+    Shader="TextureShader1"
+    Sigma_s_Prime=7.4 8.8 10.1
+    Sigma_a=.32 1.7 4.8
+    Diffuse_Reflectance=.44 .22 .13
+    Index_Of_Refraction=1.3
+    Error_Criterion=0.2
+    Specular_Color=0.004 0.002 0.002
+    Specular_Exponent=4.5
+}
+Material{
+    Name="Skin2_BSSRDF_Texture_Shader"
+    Type="BSSRDF"
+    Shader="TextureShader1"
+    Sigma_s_Prime=10.9 15.9 17.9
+    Sigma_a=0.13 0.70 1.45
+    Diffuse_Reflectance=.63 .44 .34
+    Index_Of_Refraction=1.3
+    Error_Criterion=0.2
+    Specular_Color=0.004 0.002 0.002
+    Specular_Exponent=4.5
+}
+
+Material{
+    Name="Skin3_BSSRDF_Texture_Shader"
+    Type="BSSRDF"
+    Shader="TextureShader1"
+    Normal_Map_Shader="NormalShader1"
+    Sigma_s_Prime=10.9 15.9 17.9
+    Sigma_a=0.13 0.70 1.45
+//    Sigma_s_Prime=32.7 47.7 53.7
+//    Sigma_a=.39 2.1 4.35
+    Diffuse_Reflectance=.63 .44 .34
+    Index_Of_Refraction=1.3
+    Error_Criterion=0.2
+    Specular_Color=0.004 0.002 0.002
+    Specular_Exponent=4.5
+}
+
+// Objects
+//Object{
+//    Name="ground"
+//    Type="Plane"
+//    Position=0 0 0
+//    Normal=0 1 0
+//    Shader="GroundShader"
+//}
+Transform{
+    Type="Push"
+}
+Transform{
+    Type="Translate"
+    Vector=0 1.8 -1
+}
+Transform{
+    Type="Rotate"
+    Axis=0 0 1
+    Radians=3.14159
+}
+Transform{
+    Type="Rotate"
+    Axis=0 1 0
+    Radians=3.14159
+}
+Transform{
+    Type="Rotate"
+    Axis=1 0 0
+    Radians=1.570795
+}
+Object{
+    Name="face"
+    Type="Triangulated_Surface"
+//	Filename="../../../../Public_Data/Face_Data/Face_Meshes/CyberWare_Raw/tri/baseline.tri"
+//	Texture_Coordinate_File="../../../../Public_Data/Face_Data/Face_Meshes/CyberWare_Raw/tri/baseline.uv"
+//    Filename="../../../../Public_Data/Face_Data/Face_Meshes/CyberWare_Raw/tri/hrc_baseline.tri"
+//    Filename="../../../../Public_Data/Face_Data/Face_Meshes/Final/eftychis_bald.tri"
+    Filename="face_render.tri"
+//    Texture_Coordinate_File="../../../../Public_Data/Face_Data/Face_Meshes/CyberWare_Raw/tri/hrc_baseline.uv"
+//    Texture_Coordinate_File="../../../../Public_Data/Face_Data/Face_Meshes/Final/eftychis_bald.uv"
+    Texture_Coordinate_File="face_render.uv"
+//    Sample_Locations_File="../../../../Public_Data/Face_Data/Face_Meshes/CyberWare_Raw/tri/hrc_baseline_s4.5_200k.samples"
+
+    Smooth_Normals=true
+    Preserve_Creases=false
+    Scale=4.5 
+//    Shader="Skin2BSSRDFShader"
+//    Shader="WhiteMatte"
+//    Shader="Skin2_BSSRDF_Texture_Shader"
+//    Shader="TextureShader1"
+	Shader="LambertianTexture"
+//	Shader="NormalBumpMapped"
+//    Shader="Skin3_BSSRDF_Texture_Shader"
+//	Uses_BSSRDF=true
+}
+Transform{
+    Type="Pop"
+}

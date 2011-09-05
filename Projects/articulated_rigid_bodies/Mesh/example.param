@@ -1,0 +1,3 @@
+arb.new_pre_stabilization = false
+arb.max_articulated_rigid_body_iterations_scale=.001
+arb.error_half_life=.04166666

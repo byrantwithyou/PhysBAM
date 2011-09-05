@@ -1,0 +1,21 @@
+fluids_parameters.grid.resolution=76 301
+fluids_parameters.grid.minimum_corner=0 0
+fluids_parameters.grid.maximum_corner=0.25 1
+
+add_gravity_to_object=false
+subtract_last_pressure_force_from_object=true
+
+number_of_bodies=2
+mu=0
+extrapolate_combined_solid_fluid_velocity=true
+
+rigid_body_1.position=.12333 .78123
+rigid_body_1.density=0.5
+rigid_body_2.position=.15333 .98123
+rigid_body_2.density=0.5
+
+last_frame=1500
+fluids_parameters.incompressible_iterations=10000
+fluids_parameters.number_particles_per_cell=8
+fluids_parameters.delete_fluid_inside_objects=true
+fluids_parameters.object_friction=0

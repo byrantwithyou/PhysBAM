@@ -1,0 +1,293 @@
+// Spotlight whose light is shadowed by a sphere in air volumetric shading provides volumetric shadow
+//#include "basic_shaders.scene"
+Camera{
+//#include "Common/torus_cage_camera"
+//#include "Common/torus_cage_camera_2"
+//#include "Common/torus_cage_camera_3"
+	Location=	-3.22 5.90391 11.014
+	Look_At=	-0.625238 2.14322 1.73673
+	Pseudo_Up=	0.0392947 0.929835 -0.365872
+	Field_Of_View=	24.8595
+	Focal_Distance=	.1
+	Aspect_Ratio=	1.25
+//#include "Common/torus_cage_camera"
+//	Width=           640
+//	Height=          480
+//	Width=           1280
+//	Height=          960
+	Width=           1024
+	Height=          768
+//	Width=           800
+//	Height=          600
+	Output_Filename= "Output/subframe"
+        imin=1
+        imax=1
+}
+Material{
+        Type="Infinite_Reflection"
+        Name="sky_shader"
+        Filename="Common/skylight-day.exr"
+//        Filename="/data/shinar/distributed_renderer/Common/skylight-day.exr"
+}
+Options{
+//	High_Quality=true
+	High_Quality=true
+	Spatial_Partition=true
+	Background_Color=0 0 0
+        Background_Shader="sky_shader"
+}
+Material{
+	Name="WaterSurfaceShader"
+	Type="Transparent"
+	Fresnel=true
+	Shift_Direction=normal
+	Reflectivity=0.1
+}
+Volume_Material {
+        Name="absorption"
+        Type="Attenuation_Shader"
+//        Spectrum=.025 .02 .01
+        Spectrum=.03 .02 .01
+//        Spectrum=.3 .3 .03
+//        Spectrum=.3 .3 .02
+//        Spectrum=.15 .15 .02
+//        Spectrum=.1 .1 .02
+        Absorption=40
+}
+Volume_Material {
+        Name="absorption2"
+        Type="Attenuation_Shader"
+        Spectrum=.03 .02 .01
+        Absorption=80
+}
+Light{
+        Name="TopRightLight"
+        Type="Point"
+        Color=1 1 1
+        Power=600
+        Position=-2 7 1
+}
+Light{
+        Name="TopLeftLight"
+        Type="Point"
+        Color=1 1 1
+        Power=600
+        Position=2 7 1
+}
+//Light{
+//        Name="ForwardLight"
+//        Type="Point"
+//        Color=1 1 1
+////        Power=800
+//        Position=0 4 3
+//        Power=800
+//}
+Light{
+        Name="BottomFrontLight"
+        Type="Point"
+        Color=1 1 1
+//        Position=0 .5 4
+//        Power=100
+        Position=0 1 8
+        Power=400
+}
+//Light{
+//        Name="UnderTableLight"
+//        Type="Point"
+//        Color=1 1 1
+//        Position=0 .7 -1.7
+//        Power=55
+//}
+//Light{
+//        Name="LeftSideTableLight"
+//        Type="Point"
+//        Color=1 1 1
+//        Position=2 .7 0
+//        Power=25
+//}
+Light{
+        Type="Spotlight"
+        Position=0 1 6
+        Direction=0 -.3 -1
+        Power=15
+        Cone_Angle=.4
+        Penumbra_Angle=.1
+}
+Light{
+        Name="RightSideTableLight"
+        Type="Point"
+        Color=1 1 1
+//        Position=-3 1 -.75
+//        Position=-3 1 1.1
+        Position=-3 1 1.2
+        Power=30
+}
+Light{
+        Name="TableBurner"
+        Type="Spotlight"
+        Position=0 4 0
+        Color=0 0 1
+        Power=1400
+        Cone_Angle=.4
+        Penumbra_Angle=.1
+        Direction=0 -1 0
+        Global=false
+}
+//Light{
+//        Name="GroundLight"
+//        Type="Point"
+//        Position=0 10 0
+//        Power=1400
+//        Global=false
+//}
+Material{
+	Name="LightBlueColor"
+	Type="Color"
+	Color=.3215 .5568 .9372
+}
+Material{
+	Name="TableColor"
+	Type="Color"
+        Color=1 .9 .71
+//        Color=1 .7725 .3215  // softer golden yellow
+//        Color=1 .6902 .0784  // golden yellow
+}
+Material{
+	Name="BlueColor"
+	Type="Color"
+	Color=.5 .5 1
+}
+Material{
+	Name="WhiteColor"
+	Type="Color"
+	Color=1 1 1
+}
+Material{
+	Name="BlueShader"
+	Type="Lambertian"
+	Shader="LightBlueColor"
+	Reflectance=0.5
+}
+Material{
+        Name="WallTexture"
+        Type="Image_Texture"
+        Filename="Common/lightgray.bmp"
+	Cubic_Interpolation=false
+}
+Material{
+        Name="BlackbodyShader"
+        Type="Blackbody_Surface"
+        Emission_Amplification=5
+        White_Point_Temperature=3000
+        Use_LMS_Scaling=true
+        Noise_Scale=100
+        Extent=1.8
+        Base_Temperature=2800
+        Center=0 1 0
+        Averaging_Shader="TableColor"
+        Color=1 .4 .2
+        Animation=true
+        Animation_Start_Frame=0
+        Animation_End_Frame=30
+        Animation_Start_Extent=0
+        Animation_End_Extent=1.8
+        Animation_Start_Base_Temperature=2200
+        Animation_End_Base_Temperature=2800
+}
+Material{
+        Name="TableShader"
+        Type="Phong"
+        Ambient=0 0 0
+        Diffuse=.2 .2 .2
+        Specular=.9 .9 .9
+        Specular_Exponent=4
+//	Shader="TableColor"
+        Shader="BlackbodyShader"
+	Reflectance=0.5
+//        Lights="TableBurner"
+}
+Material{
+        Name="GroundShader"
+	Type="Lambertian"
+	Shader="WhiteColor"
+	Reflectance=1
+//        Lights="GroundLight"
+}
+Material{
+	Name="WallShader"
+	Type="Lambertian"
+	Shader="WallTexture"
+        Reflectivity=0.5
+}
+// Objects
+Object{
+        Name="Ground"
+	Type="Plane"
+	Position=0 .002 0
+	Normal=0 1 0
+        Shader="GroundShader"
+}
+Object{
+	Name="water"
+	Type="Octree_Levelset"
+//	Type="Levelset"
+// 	Filename="Input/levelset.%d"
+//        Phi_Filename="/data/shinar/PhysBAM/Tools/particle_octree/torus_cage_particles/octree_levelset.%d"
+//	Grid_Filename="/data/shinar/PhysBAM/Tools/particle_octree/torus_cage_particles/octree_grid.%d"
+ 	Phi_Filename="Input/octree_levelset.%d"
+	Grid_Filename="Input/octree_grid.%d"
+        Shader="WaterSurfaceShader"
+        Volume_Shader="absorption"
+        Index_Of_Refraction=1.52
+        Support_Transparent_Overlapping_Objects=true        
+}
+Object{
+	Name="tori"
+	Type="Levelset"
+        Filename="Input/object_levelset.%d"
+        Shader="WaterSurfaceShader"
+        Volume_Shader="absorption2"
+        Index_Of_Refraction=1.52
+        Priority=1
+        Support_Transparent_Overlapping_Objects=true        
+}
+Object{
+	Name="wall"
+	Type="Wall"
+        Shrink=.001
+        Xmin=-3
+        Xmax=3
+        Ymin=0
+        Ymax=4
+        Zmin=-3
+        Zmax=3
+	Show_Xmin=false
+	Show_Xmax=true
+	Show_Ymin=false
+	Show_Ymax=false
+	Show_Zmin=true
+        Show_Zmax=false
+        Shader="WallShader"
+        Texture_Scale=.05
+}
+//List_Object{
+//       Name="Torus_List"
+//        Type="Deformable_Object_List"
+//        Smooth_Normals=true
+//        Preserve_Creases=false
+//        Spatial_Partition=true
+//        Prefix="Input"
+//        Shader="BlueShader"
+////        Priority=1
+////        Support_Transparent_Overlapping_Objects=true
+//}
+List_Object{
+        Name="table"
+        Type="Rigid_Body_List"
+        Spatial_Partition=true
+        Prefix="Input"
+        Shader="TableShader"
+//        Support_Transparent_Overlapping_Objects=true        
+//        Priority=2
+//        Shader="BlackbodyShader"
+}

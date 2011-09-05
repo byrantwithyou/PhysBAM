@@ -1,0 +1,119 @@
+Camera{
+        Location=       -19.329 6.10067 12.9367
+        Look_At=        1.48845 1.76292 1.8555
+        Pseudo_Up=      0.159687 0.983501 -0.0850016
+        Field_Of_View=  26.4602
+        Focal_Distance= .1
+        Aspect_Ratio=   1.33333
+
+   Width=           640
+   Height=          480
+   Width=           320
+   Height=          240
+   Width=           1280
+   Height=          960
+    Output_Filename="output/trapped8.%05d.png"
+}
+
+Material{
+        Name=sky
+        Type=Infinite_Reflection
+        Filename="../skylight-day.pbi"
+}
+Options{
+    High_Quality=true
+    Spatial_Partition=false
+//    Background_Shader=sky
+}
+
+//////////////////////////// Lighting
+Light{
+    Type=Point
+    Position=0 50 0
+    Color=1 1 1
+    Power=20000
+}
+Light{
+    Type=Point
+    Position=0 100 150
+    Color=1 1 1
+    Power=40000
+    Casts_Shadows=false
+}
+Light{
+    Type=Point
+    Position=-100 100 150
+    Color=1 1 1
+    Power=40000
+    Casts_Shadows=false
+}
+Light{
+    Type=Point
+    Position=100 100 150
+    Color=1 1 1
+    Power=40000
+    Casts_Shadows=false
+}
+Light{
+    Type=Point
+    Position=-100 100 0
+    Color=1 1 1
+    Power=40000
+    Casts_Shadows=false
+}
+Light{
+    Type=Point
+    Position=100 100 0
+    Color=1 1 1
+    Power=40000
+    Casts_Shadows=false
+}
+////////////////////////////// Shaders
+#include "../common-shaders.scene"
+Material{
+    Name="GrayShader2"
+    Type="Phong"
+    Shader="White"
+    Diffuse=.0 .0 .0
+    Specular=.8 .8 .8
+    Specular_Exponent=5
+}
+Material{
+    Type="Blend"
+    Name="SemireflectiveBlackShader2"
+    Shader1="Reflection"
+    Shader2="GrayShader2"
+//    Shader1="GrayShader"
+    Blend_Fraction=.8
+}
+//////////////////////////// Objects
+Object{
+    Name="Ground"
+    Type="Plane"
+    Position= 0 0 0
+    Normal = 0 1 0
+    Shader="GroundShader"
+}
+
+List_Object{
+    Name="Rigid"
+    Type="Rigid_Body_List"
+    Prefix="input"
+    Shader="SemireflectiveBlackShader2"
+    Smooth_Normals=true
+    Subdivide_Geometry=true
+    Preserve_Creases=false
+    Range=4
+}
+
+List_Object{
+    Name="Deformable"
+    Type="Deformable_Object"
+    Prefix="input"
+    Texture_Coordinate_File1="/n/ring/disk2/cas43/PhysBAM/Personal_Libraries/Craig_Library/Utilities/Rendering/maggot_8y.uv.gz"
+    Shader="MaggotShaderTex"
+    Smooth_Normals=true
+    Preserve_Creases=false
+    Subdivide_Geometry=true
+    Range=1
+}

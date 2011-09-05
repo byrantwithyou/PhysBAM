@@ -1,0 +1,354 @@
+////////////// COLORS //////////////
+Material{
+    Name="LatheR"
+    Type="Color"
+//        Color=.84 .64 .64
+//        Color=.70 .40 .40
+        Color=.83 .19 .19
+}
+Material{
+    Name="LatheO"
+    Type="Color"
+//        Color=.85 .69 .49
+//        Color=.72 .47 .24
+        Color=.96 .48 .15
+}
+Material{
+    Name="LatheY"
+    Type="Color"
+//        Color=.89 .89 .56
+//        Color=.79 .79 .31
+        Color=.99 .99 .28
+}
+Material{
+    Name="LatheG"
+    Type="Color"
+//        Color=.49 .78 .55
+//        Color=.24 .60 .30
+        Color=.21 .67 .27
+}
+Material{
+    Name="LatheB"
+    Type="Color"
+//        Color=.56 .59 .89
+//        Color=.31 .34 .79
+        Color=.28 .32 .99
+}
+Material{
+    Name="LatheP"
+    Type="Color"
+//        Color=.76 .56 .89
+//        Color=.57 .31 .79
+        Color=.63 .28 .99
+}
+Material{
+    Name="Yellow"
+    Type="Color"
+//        Color=.87 .88 .50
+//        Color=.75 .77 .25
+        Color=.85 .85 .20
+}
+Material{
+    Name="Blue"
+    Type="Color"
+//        Color=.33 .37 .91
+//        Color=.10 .13 .82
+        Color=.08 .10 1
+}
+Material{
+    Name="Red"
+    Type="Color"
+//        Color=.33 .37 .91
+//        Color=.10 .13 .82
+        Color=.8 .10 .2
+}
+Material{
+    Name="White"
+    Type="Color"
+    Color= 1 1 1
+}
+Material{
+    Name="GroundColor"
+    Type="Color"
+    Color= 1 .775 .5431
+}
+Material{
+    Name="Pumpkin"
+    Type="Color"
+    Color=.90 .35 .09
+    //Color=.04 .07 .12
+}
+////////////// SHADERS //////////////
+Material{
+    Name="LatheShaderR"
+    Type="Phong"
+    Shader="LatheR"
+    Diffuse=.6 .6 .6
+    Specular=2 2 2
+    Specular_Exponent=35
+}
+Material{
+    Name="LatheShaderO"
+    Type="Phong"
+    Shader="LatheO"
+    Diffuse=.6 .6 .6
+    Specular=2 2 2
+    Specular_Exponent=35
+}
+Material{
+    Name="LatheShaderY"
+    Type="Phong"
+    Shader="LatheY"
+    Diffuse=.6 .6 .6
+    Specular=2 2 2
+    Specular_Exponent=35
+}
+Material{
+    Name="LatheShaderG"
+    Type="Phong"
+    Shader="LatheG"
+    Diffuse=.6 .6 .6
+    Specular=2 2 2
+    Specular_Exponent=35
+}
+Material{
+    Name="LatheShaderB"
+    Type="Phong"
+    Shader="LatheB"
+    Diffuse=.6 .6 .6
+    Specular=2 2 2
+    Specular_Exponent=35
+}
+Material{
+    Name="LatheShaderP"
+    Type="Phong"
+    Shader="LatheP"
+    Diffuse=.6 .6 .6
+    Specular=2 2 2
+    Specular_Exponent=35
+}
+Material{
+    Name="YellowShader"
+    Type="Phong"
+    Shader="Yellow"
+    Diffuse=.6 .6 .6
+    Specular=2 2 2
+    Specular_Exponent=35
+}
+Material{
+    Name="BlueShader"
+    Type="Phong"
+    Shader="Blue"
+    Diffuse=.6 .6 .6
+    Specular=2 2 2
+    Specular_Exponent=35
+}
+Material{
+    Name="RedShader"
+    Type="Phong"
+    Shader="Red"
+    Diffuse=.6 .6 .6
+    Specular=1 1 1
+    Specular_Exponent=5
+}
+Material{
+    Name="WhiteShader"
+    Type="Phong"
+    Shader="White"
+    Diffuse=.6 .6 .6
+    Specular=1 1 1
+    Specular_Exponent=35
+}
+Material{
+    Name="GroundShader"
+    Type="Lambertian"
+    Shader="GroundColor"
+    Reflectivity=0.5
+}
+Material{
+    Name="BlackShader"
+    Type="Phong"
+    Shader="White"
+    Diffuse=0 0 0
+    Specular=2 2 2
+    Specular_Exponent=35
+}
+Material{
+    Name="PumpkinShader"
+    Type="Phong"
+    Shader="Pumpkin"
+    Diffuse=1 1 1
+    Specular=0.1 0.1 0.1
+    Specular_Exponent=25
+}
+Material{
+    Name="Null"
+    Type="Phong"
+    Shader="White"
+    Diffuse=0 0 0
+    Specular=0 0 0
+    Specular_Exponent=1
+}
+Material{
+    Name="BackgroundShader"
+    Type="Phong"
+    Shader="White"
+    Diffuse=.1 .1 .1
+    Specular=.2 .2 .2
+    Specular_Exponent=35
+}
+Material{
+    Name="GrayShader"
+    Type="Phong"
+    Shader="White"
+    Diffuse=.01 .01 .01
+    Specular=.8 .8 .8
+    Specular_Exponent=5
+}
+Material{
+    Type="Transparent"
+    Name="Reflection"
+    Reflectivity=1
+}
+Material{
+    Type="Transparent"
+    Name="Transparent"
+    Reflectivity=0
+}
+Material{
+    Type="Blend"
+    Name="SemireflectiveBlackShader"
+    Shader1="Reflection"
+    Shader2="GrayShader"
+//    Shader1="GrayShader"
+    Blend_Fraction=.4
+}
+
+Material{
+    Name="Maggot"
+    Type="Color"
+    Color=.8 .5 .2
+}
+Material{
+    Name="MaggotShader"
+    Type="Phong"
+    Shader="Maggot"
+    Diffuse=.8 .8 .8
+    Specular=1.5 1.5 1.5
+    Specular_Exponent=45
+}
+Material{
+    Name=MaggotTexture
+    Type=Image_Texture
+    Filename="../maggot-ud.png"
+    Cubic_Interpolation=false
+}
+Material{
+    Name="MaggotLighting"
+    Type="Phong"
+    Shader="MaggotTexture"
+    Diffuse=1 1 1
+    //Specular=10 10 10
+//    Specular=4 4 4
+    Specular=6 6 6
+    Specular_Exponent=15
+}
+Material{
+    Name="MaggotShaderTex"
+    Type="Image_Bump_Map"
+    Shader="MaggotLighting"
+//    Filename="../maggotbumpblurred.png"
+    Filename="../maggotbumpmap4.png"
+    Bump_Height=.02
+}
+Material{
+    Name=FishTexture
+    Type=Image_Texture
+    Filename="../fish.png"
+    Cubic_Interpolation=false
+}
+Material{
+    Name="FishLighting"
+    Type="Phong"
+    Shader="FishTexture"
+    Diffuse=1 1 1
+    //Specular=10 10 10
+//    Specular=4 4 4
+    Specular=6 6 6
+    Specular_Exponent=15
+}
+Material{
+    Name="FishShaderTex"
+    Type="Image_Bump_Map"
+    Shader="FishLighting"
+    Filename="../fishbum.png"
+    Bump_Height=.005
+}
+Material{
+    Name=PlankTexture
+    Type=Image_Texture
+    Filename="../wood.png"
+    Cubic_Interpolation=false
+}
+Material{
+    Name="PlankLighting"
+    Type="Phong"
+    Shader="PlankTexture"
+    Diffuse=.4 .4 .4
+    Specular=1 1 1
+    Specular_Exponent=15
+}
+Material{
+    Name="PlankShaderTex"
+    Type="Image_Bump_Map"
+    Shader="PlankLighting"
+    Filename="../woodbump.png"
+    //Bump_Height=.005
+    Bump_Height=.0
+}
+Material{
+        Name="NoiseShader"
+        Type=Marble
+        Color1=0 .001 .015
+        Color2=.6 .6 .6
+        Octaves=15
+        Lacunarity=1.99
+        Gain=.5
+        Low=.5
+        High=1.19
+}
+
+Material{
+	Name="MarbleShader"
+	Type="Lambertian"
+	Shader="NoiseShader"
+    Ambient=.06 .06 .06
+	Reflectivity=0.5
+}
+Material{
+    Name="WoodNoise"
+    Type="Wood"
+    //Color1=0.6  0.5  0.25
+    //Color2=0.3  0.25 0.125
+    Color1=0.3  0.25  0.125
+    Color2=0.15 0.125 0.05
+    Ring_Frequency=4
+    Ring_Noise=0.02
+    Ring_Noise_Frequency=1
+    Trunk_Wobble=0.1
+    Trunk_Wobble_Frequency=0.025
+    Angular_Wobble=3
+    Angular_Wobble_Frequency=1.5
+    Grain_Frequency=20
+    Ring_Y=2
+    Grain_Y=10
+}
+Material{
+    Name="WoodShader"
+    Type="Phong"
+    Shader="WoodNoise"
+    Diffuse=.8 .8 .8
+    Specular=1.25 1.25 1.25
+    Specular_Exponent=20
+    Reflectivity=1
+}

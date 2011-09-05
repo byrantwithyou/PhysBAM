@@ -1,0 +1,10 @@
+vs=v+(dts/2)*(f+fx*x+fv*vs)
+xx=x+dts*vs
+vv=v+dts*(f+fx*xx+fv*vv)
+@
+vbepu=v+dts*(f+fx*x+fv*vbepu)+dts*r*(g+gx*xbepu+gv*vbepu)
+xbepu=xo+dts*r*vbepu
+vpu=v+dts/2*(f+fx*x+fv*vbepu)+dts/2*r*r*(g+gx*xbepu+gv*vbepu)
+xx=x+vpu*dts
+vv=v+dts*(f+fx*xx+fv*vv)+dts*r*(g+gx*xbevu+gv*vv)
+xbevu=xx+dts*r*vv

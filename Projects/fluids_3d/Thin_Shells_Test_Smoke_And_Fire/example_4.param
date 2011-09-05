@@ -1,0 +1,9 @@
+fluids_parameters.grid.resolution = 31 21 21
+fluids_parameters.confinement_parameter = 0.3
+fluids_parameters.incompressible_iterations = 20
+fluids_parameters.restart_data_write_rate = 1
+deformable_object_1.density = 1
+deformable_object_1.pressure_force_scale = 1
+solids_parameters.perform_self_collision = false
+
+solids_parameters.preroll_frames = 0

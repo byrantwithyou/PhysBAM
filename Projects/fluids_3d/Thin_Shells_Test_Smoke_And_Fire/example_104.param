@@ -1,0 +1,11 @@
+fluids_parameters.use_solid_fluid_coupling = true
+add_bodies = false
+fluids_parameters.grid.resolution = 81 41 41
+fluids_parameters.grid.minimum_corner = 0 1 1
+fluids_parameters.grid.maximum_corner = 4 3 3
+fluids_parameters.cfl = 1
+fluids_parameters.write_debug_data = true
+fluids_parameters.left_wall = false
+fluids_parameters.confinement_parameter = 3
+fluids_parameters.confinement_parameter_fuel = .8
+fluids_parameters.buoyancy_constant = 0.15

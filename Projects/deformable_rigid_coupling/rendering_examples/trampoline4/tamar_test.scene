@@ -1,0 +1,436 @@
+Camera{
+        Location=       34.681 10.7405 -5.49891
+        Look_At=        -0.644669 3.05629 0.288526
+        Pseudo_Up=      -0.207121 0.977727 0.0339328
+        Field_Of_View=  26.4602
+        Focal_Distance= .1
+        Aspect_Ratio=   1.33333
+
+   Width=           160
+   Height=          120
+   Width=           640
+   Height=          480
+   Width=           320
+   Height=          240
+   Width=           1280
+   Height=          960
+    Output_Filename="/tmp/trampoline4.%05d.png"
+}
+
+Options{
+    High_Quality=false
+    Spatial_Partition=true
+}
+//////////////////////////// Lighting
+//Light{
+//Type=Rectangle
+//Position=0 100 0
+//U_Vector=30 0 0
+//V_Vector=0 0 30
+//U_Samples=1
+//V_Samples=1
+//Color=1 1 1
+//Power=5000
+//}
+
+//#include "light_ring_20.scene"
+
+//Light{
+//    Type=Point
+//    Position=-20 10 -20
+//    Color=1 1 1
+//    Power=850
+//}
+//Light{
+//    Type=Point
+//    Position=-20 10 0
+//    Color=1 1 1
+//    Power=850
+//}
+//Light{
+//    Type=Point
+//    Position=-20 10 20
+//    Color=1 1 1
+//    Power=850
+//}
+//Light{
+//    Type=Point
+//    Position=0 10 -20
+//    Color=1 1 1
+//    Power=850
+//}
+Light{
+    Type=Point
+    Position=0 50 0
+    Color=1 1 1
+    Power=8500
+}
+//Light{
+//    Type=Point
+//    Position=0 10 20
+//    Color=1 1 1
+//    Power=850
+//}
+//Light{
+//    Type=Point
+//    Position=20 10 -20
+//    Color=1 1 1
+//    Power=850
+//}
+//Light{
+//    Type=Point
+//    Position=20 10 0
+//    Color=1 1 1
+//    Power=850
+//}
+//Light{
+//    Type=Point
+//    Position=20 10 20
+//    Color=1 1 1
+//    Power=850
+//}
+//
+//Light{
+//    Type=Point
+//    Position=0 1 -40
+//    Color=1 1 1
+//    Power=600
+//}
+//Light{
+//    Type=Point
+//    Position=0 1 40
+//    Color=1 1 1
+//    Power=600
+//}
+//Light{
+//    Type=Point
+//    Position=40 1 -40
+//    Color=1 1 1
+//    Power=600
+//}
+//Light{
+//    Type=Point
+//    Position=40 1 0
+//    Color=1 1 1
+//    Power=600
+//}
+//Light{
+//    Type=Point
+//    Position=40 1 40
+//    Color=1 1 1
+//    Power=600
+//}
+
+////////////////////////////// Shaders
+Material{
+    Name="R"
+    Type="Color"
+//        Color=.70 .40 .40
+        Color=.84 .14 .14
+}
+Material{
+    Name="O"
+    Type="Color"
+//        Color=.72 .47 .24
+        Color=.90 .35 .09
+}
+Material{
+    Name="Y"
+    Type="Color"
+//        Color=.79 .79 .31
+        Color=.67 .59 .15
+}
+Material{
+    Name="G"
+    Type="Color"
+//        Color=.24 .60 .30
+        Color=.09 .54 .14
+}
+Material{
+    Name="B"
+    Type="Color"
+//        Color=.31 .34 .79
+        Color=.14 .17 .94
+}
+Material{
+    Name="P"
+    Type="Color"
+//        Color=.57 .31 .79
+        Color=.49 .14 .94
+}
+Material{
+    Name="K"
+    Type="Color"
+        Color=1 1 1
+}
+Material{
+    Name="ShaderR"
+    Type="Phong"
+    Shader="R"
+    Diffuse=1 1 1
+    Specular=2 2 2
+    Specular_Exponent=35
+}
+Material{
+    Name="ShaderO"
+    Type="Phong"
+    Shader="O"
+    Diffuse=1 1 1
+    Specular=2 2 2
+    Specular_Exponent=35
+}
+Material{
+    Name="ShaderY"
+    Type="Phong"
+    Shader="Y"
+    Diffuse=1 1 1
+    Specular=2 2 2
+    Specular_Exponent=35
+}
+Material{
+    Name="ShaderG"
+    Type="Phong"
+    Shader="G"
+    Diffuse=1 1 1
+    Specular=2 2 2
+    Specular_Exponent=35
+}
+Material{
+    Name="ShaderB"
+    Type="Phong"
+    Shader="B"
+    Diffuse=1 1 1
+    Specular=2 2 2
+    Specular_Exponent=35
+}
+Material{
+    Name="ShaderP"
+    Type="Phong"
+    Shader="P"
+    Diffuse=1 1 1
+    Specular=2 2 2
+    Specular_Exponent=35
+}
+Material{
+    Name="ShaderRim"
+    Type="Phong"
+    Shader="K"
+    Diffuse=0 0 0
+    Specular=2 2 2
+    Specular_Exponent=35
+}
+Material{
+    Name="ShaderSphere"
+    Type="Phong"
+    Shader="K"
+    Diffuse=0 0 0
+    Specular=2 2 2
+    Specular_Exponent=35
+}
+Material{
+    Name="ShaderCloth"
+    Type="Phong"
+    Shader="K"
+    Diffuse=1 1 1
+    Specular=2 2 2
+    Specular_Exponent=35
+}
+Material{
+    Name="GroundColor"
+    Type="Color"
+    Color= 1 .775 .5431
+}
+Material{
+    Name="GroundShader"
+    Type="Lambertian"
+    Shader="GroundColor"
+    Reflectivity=0.5
+}
+//////////////////////////// Objects
+
+Object{
+    Name="Ground"
+    Type="Plane"
+    Position= 0 -2 0
+    Normal = 0 1 0
+    Shader="GroundShader"
+}
+
+List_Object{
+    Name="Rigid"
+    Type="Rigid_Body_List"
+    Prefix="input"
+    Shader="ShaderRim"
+    Smooth_Normals=true
+    Subdivide_Geometry=true
+    Preserve_Creases=false
+    Range=1
+}
+
+List_Object{
+    Name="Rigid"
+    Type="Rigid_Body_List"
+    Prefix="input"
+    Shader="ShaderSphere"
+    Smooth_Normals=true
+    Subdivide_Geometry=true
+    Preserve_Creases=false
+    Scale=.96
+    Range=2,3,4,5,6,7,8,9,10,11
+}
+
+//List_Object{
+//    Name="Rigid"
+//    Type="Rigid_Body_List"
+//    Prefix="input"
+//    Shader="ShaderB"
+//    Smooth_Normals=true
+//    Subdivide_Geometry=true
+//    Preserve_Creases=false
+//    Range=3,6,9,12
+//}
+//
+//List_Object{
+//    Name="Rigid"
+//    Type="Rigid_Body_List"
+//    Prefix="input"
+//    Shader="ShaderP"
+//    Smooth_Normals=true
+//    Subdivide_Geometry=true
+//    Preserve_Creases=false
+//    Range=4,7,10
+//}
+
+//List_Object{
+//    Name="Deformable"
+//    Type="Deformable_Object"
+//    Prefix="input"
+//    Shader="ShaderCloth"
+//    Smooth_Normals=true
+//    Preserve_Creases=false
+//    Range=1
+//}
+
+List_Object{
+    Name="Deformable"
+    Type="Deformable_Object"
+    Prefix="input"
+    Shader="DefShader1"
+    Shader2="ShaderR"
+    Shader7="ShaderY"
+    Smooth_Normals=true
+    Preserve_Creases=false
+    Subdivide_Geometry=false
+    Range=2,7
+}
+
+#List_Object{
+#    Name="Deformable"
+#    Type="Deformable_Object"
+#    Prefix="input"
+#    Shader="ShaderR"
+#    Smooth_Normals=true
+#    Preserve_Creases=false
+#    Subdivide_Geometry=true
+#    Range=2
+#}
+#
+#List_Object{
+#    Name="Deformable"
+#    Type="Deformable_Object"
+#    Prefix="input"
+#    Shader="ShaderY"
+#    Smooth_Normals=true
+#    Preserve_Creases=false
+#    Subdivide_Geometry=true
+#    Range=7
+#}
+
+//List_Object{
+//    Name="Deformable"
+//   Type="Deformable_Object"
+//    Prefix="input"
+//    Shader="ShaderO"
+//    Smooth_Normals=true
+//    Preserve_Creases=false
+//    Subdivide_Geometry=true
+//    Range=3
+//}
+//
+//List_Object{
+//    Name="Deformable"
+//    Type="Deformable_Object"
+//    Prefix="input"
+//    Shader="ShaderY"
+//    Smooth_Normals=true
+//    Preserve_Creases=false
+//    Subdivide_Geometry=true
+//    Range=4
+//}
+//
+//List_Object{
+//    Name="Deformable"
+//    Type="Deformable_Object"
+//    Prefix="input"
+//    Shader="ShaderR"
+//    Smooth_Normals=true
+//    Preserve_Creases=false
+//    Subdivide_Geometry=true
+//    Range=5
+//}
+//
+//List_Object{
+//    Name="Deformable"
+//    Type="Deformable_Object"
+//    Prefix="input"
+//    Shader="ShaderO"
+//    Smooth_Normals=true
+//    Preserve_Creases=false
+//    Subdivide_Geometry=true
+//    Range=6
+//}
+//
+//
+//List_Object{
+//    Name="Deformable"
+//    Type="Deformable_Object"
+//    Prefix="input"
+//    Shader="ShaderR"
+//    Smooth_Normals=true
+//    Preserve_Creases=false
+//    Subdivide_Geometry=true
+//    Range=8
+//}
+//
+//List_Object{
+//    Name="Deformable"
+//    Type="Deformable_Object"
+//    Prefix="input"
+//    Shader="ShaderO"
+//    Smooth_Normals=true
+//    Preserve_Creases=false
+//    Subdivide_Geometry=true
+//    Range=9
+//}
+//
+//List_Object{
+//    Name="Deformable"
+//    Type="Deformable_Object"
+//    Prefix="input"
+//    Shader="ShaderY"
+//    Smooth_Normals=true
+//    Preserve_Creases=false
+//    Subdivide_Geometry=true
+//    Range=10
+//}
+//
+//List_Object{
+//    Name="Deformable"
+//    Type="Deformable_Object"
+//    Prefix="input"
+//    Shader="ShaderR"
+//    Smooth_Normals=true
+//    Preserve_Creases=false
+//    Subdivide_Geometry=true
+//    Range=11
+//}

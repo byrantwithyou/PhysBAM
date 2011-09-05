@@ -1,0 +1,138 @@
+// Spotlight whose light is shadowed by a sphere in air volumetric shading provides volumetric shadow
+Camera{
+	Location=       6 4 -2
+	Look_At=        1 1.1 0
+	Pseudo_Up=      0 1 0
+	Field_Of_View=  70
+	Focal_Distance=  1
+	Aspect_Ratio=    1.333
+	Width=           640
+	Height=          480
+	Output_Filename= "withWall"
+}
+Options{
+	High_Quality=false
+	Spatial_Partition=false
+	Background_Color=0.6 0.6 .9
+}
+// Spotlight
+
+
+Light{
+  	Name=light1
+  	Type=Spotlight
+  	Position=0 7 8
+  	Direction= 0 -2 -3.25
+  	Cone_Angle=.6
+	Penumbra_Angle=.1919
+	Power=600
+}
+
+Light{
+  	Name=light2
+  	Type=Spotlight
+  	Position=-8 7 0
+  	Direction= 3.2 -2 0
+  	Cone_Angle=.6
+	Penumbra_Angle=.1919
+	Power=600
+}
+
+Light{
+	Name=light3
+	Type=Spotlight
+	Position=0 7 -8
+	Direction=0 -2 2.9
+	Cone_Angle=.6
+	Penumbra_Angle=.119
+	Power=600
+}
+
+Light{
+  	Name=light4
+  	Type=Spotlight
+  	Position=8 7 0
+  	Direction= -3.1 -2 .5
+  	Cone_Angle=.6
+	Penumbra_Angle=.1919
+	Power=600
+}
+
+Light{
+  	Name=light5
+  	Type=Spotlight
+  	Position=0 7 0
+  	Direction= 0 -1 0
+  	Cone_Angle=.6
+	Penumbra_Angle=.1919
+	Power=300
+}
+
+
+//Colors for shaders
+Material{
+	Name="SphereColor"
+	Type="Color"
+	Color=1 1 1
+}
+Material{
+	Name="WallColor"
+	Type="Color"
+	Color=0.6 0.6 .9
+}
+// Shaders
+Material{
+	Name="SphereShader"
+	Type="Lambertian"
+	Shader="SphereColor"
+	Reflectance=.07
+}
+Material{
+	Name="WallShader"
+	Type="Lambertian"
+	Shader="WallColor"
+	Reflectance=.4
+}
+// Volumetric homogeneous
+Volume_Material{
+	Type="Homogeneous_Volume_Shader"
+	Name="homogeneous_volume"
+	Scattering=0.1
+	Absorption=0.05
+	Volume_Step=0.01
+}
+// Objects
+Object{
+	Name="ground"
+	Type="Plane"
+	Position=0 0 0
+	Normal=0 1 0
+	Shader="WallShader"
+}
+
+Object{
+	Name="sphere"
+	Type="Sphere"
+	Position=0 2 -.3
+	Radius=.5
+	Shader="SphereShader"
+}
+Object{
+	Name="wall"
+	Type="Wall"
+	Xmin=-1
+	Xmax=1
+	Ymin=0.5
+	Ymax=1.5
+	Zmin=-1
+	Zmax=1
+        Xlow=true
+        Xhigh=false
+        Ylow=true
+        Yhigh=false
+        Zlow=true
+        Zhigh=false
+        Shader="SphereShader"	
+}
+
+

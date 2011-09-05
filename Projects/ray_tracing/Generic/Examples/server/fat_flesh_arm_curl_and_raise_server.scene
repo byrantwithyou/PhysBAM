@@ -1,0 +1,157 @@
+//#####################################################################
+// PhysBAM standard Ground Plane Shader
+//#####################################################################
+Material{
+	Type=           "Color"
+	Name=           "GroundTan"
+	Color=          1 0.775 0.5431
+}
+Material{
+	Type=           "Lambertian"
+	Name=           "GroundShader"
+	Shader=         "GroundTan"
+	Reflectance=    .75
+	Ambient=        0 0 0
+}
+//#####################################################################
+// White Matte Useful for Solid Models
+//#####################################################################
+Material{
+	Type=           "Color"
+	Name=           "White"
+	Color=          1 1 1
+}
+Material{
+	Type=           "Lambertian"
+	Name=           "WhiteMatte"
+	Shader=         "White"
+	Reflectance=    0.6
+	Ambient=        0.1 0.1 0.1
+}
+//#####################################################################
+// Mirror Shader
+//#####################################################################
+Material{
+	Type=           "Transparent"
+	Name=           "Mirror"
+	Reflectivity=   1.0
+	Shift_Direction="normal"
+	Fresnel=        false
+}
+//#####################################################################
+// Mirror Shader
+//#####################################################################
+Material{
+	Type=           "Transparent"
+	Name=           "Glass"
+	Reflectivity=   0.1
+	Fresnel=        true
+	Shift_Direction="normal"
+}
+
+// Shaders
+// Shaders
+Material{
+	Name="SkinFlatColor"
+	Type="Color"
+    Color=.742 .625 .566
+}
+Material{
+	Name="SkinFlatShader"
+	Type="Phong"
+	Shader="SkinFlatColor"
+	Ambient=0 0 0
+	//Diffuse=.742 .625 .566
+	Diffuse=.63 .44 .34
+	Specular=.01 .01 .01
+}
+Material{
+	Name="BoneColor"
+	Type="Color"
+        Color=1.0 1.0 1.0
+}
+
+Material{
+	Name="BoneShader"
+	Type="Lambertian"
+	Shader="BoneColor"
+	Reflectance=0.8
+	Ambient=0.0 0.0 0.0
+}
+Camera{
+	//front
+	Location=	-0.257721 -2.51001 1.14186
+	Look_At=	0.343631 0.137864 1.52
+	Pseudo_Up=	0.012645 -0.00227891 0.999917
+	Field_Of_View=	24.8595
+	Focal_Distance=	.1
+	Aspect_Ratio=	1.25
+
+	//back
+	//Location=	0.796933 2.69552 1.53116
+	//Look_At=	0.294986 0.162781 1.44245
+	//Pseudo_Up=	-0.044161 -0.0262271 0.99868
+	//Field_Of_View=	24.8595
+	//Focal_Distance=	.1
+	//Aspect_Ratio=	1.25
+
+	Width=           640
+	Height=          480
+	Output_Filename= "Output/skin_flesh_front.rgb"
+}
+Options{
+	High_Quality=true
+	Spatial_Partition=true
+//	Background_Color=0.5 0.3 0.3
+}
+// Spotlight
+Light{
+	Name=light1
+	Type=Spotlight
+	//Position=-0.257721 -2.51001 1.42186
+	//Direction=0.6 2.649 0
+	Position=-0.357721 -2.51001 1.42186
+	Direction=0.7 2.649 0
+	Cone_Angle=.5
+	Penumbra_Angle=.4
+	Power=6
+}
+Light{
+	Name=directional2
+	Type=Directional
+	Direction = -1.4 -.2 -1
+	Color=1.0 1.0 1.0	
+	Power = 3.85
+}
+// Objects
+Object{
+	Name="ground"
+	Type="Plane"
+	Position=0 0 0
+	Normal=0 0 1
+	Shader="GroundShader"
+}
+Object{
+	Name="body"
+	Type="Triangulated_Surface"
+	Flip_Normal=false
+	Filename="Input/tri_surface.%d"
+	Sample_Locations_File="point.samples"
+
+    	Smooth_Normals=true
+    	Preserve_Creases=false
+    
+	// model starts out about 2m tall; we want it to be ~0.3m tall
+	Scale=1.0
+	Shader=SkinFlatShader
+	Uses_BSSRDF=false
+}
+
+// Objects
+Object{
+	Name="ground"
+	Type="Plane"
+	Position=0 0 0
+	Normal=0 0 1
+	Shader="GroundShader"
+}
