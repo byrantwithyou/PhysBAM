@@ -59,7 +59,7 @@
 #ifdef PHYSBAM_USE_PETSC
 #include <petsc.h>
 #include <Jeffrey_Utilities/Petsc/CALL_AND_CHKERRQ.h>
-#include <Jeffrey_Utilities/Petsc/Solve_SPD_System_With_ICC_PCG.h>
+#include <Jeffrey_Utilities/Petsc/Petsc_Solve_SPD_System_With_ICC_PCG.h>
 #endif // #ifdef PHYSBAM_USE_PETSC
 
 #include "Build_And_Solve_Dirichlet_System.h"

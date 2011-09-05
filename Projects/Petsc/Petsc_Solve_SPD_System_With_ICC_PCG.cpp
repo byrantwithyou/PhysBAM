@@ -38,7 +38,7 @@
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 
-#include <Jeffrey_Utilities/Petsc/Solve_SPD_System_With_ICC_PCG.h>
+#include <Jeffrey_Utilities/Petsc/Petsc_Solve_SPD_System_With_ICC_PCG.h>
 
 namespace PhysBAM
 {
