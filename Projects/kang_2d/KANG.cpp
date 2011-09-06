@@ -44,6 +44,7 @@ Register_Options()
 {
     BASE::Register_Options();
     parse_args->Add_Integer_Argument("-cg_iterations",3000);
+    parse_args->Add_Double_Argument("-solve_tolerance",1e-14);
     parse_args->Add_Double_Argument("-viscosity",(T)0);
     parse_args->Add_Option_Argument("-test_system");
     parse_args->Add_Option_Argument("-print_matrix");
@@ -92,7 +93,7 @@ Parse_Options()
     solids_parameters.rigid_body_collision_parameters.enforce_rigid_rigid_contact_in_cg=false;
     fluids_parameters.fluid_affects_solid=fluids_parameters.solid_affects_fluid=true;
     fluids_parameters.incompressible_iterations=parse_args->Get_Integer_Value("-cg_iterations");
-    solids_parameters.implicit_solve_parameters.cg_iterations=parse_args->Get_Integer_Value("-cg_iterations");
+    fluids_parameters.incompressible_tolerance=parse_args->Get_Double_Value("-solve_tolerance");
 
     solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
     solids_parameters.use_trapezoidal_rule_for_velocities=false;

@@ -112,6 +112,7 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt,T time) const
 
     T beta_n=1/fluids_parameters.density,beta_p=1/fluids_parameters.outside_density;
     TV one_over_dX_2=sqr(grid.one_over_dX);
+    T mn=FLT_MAX,mx=-mn;
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
         TV_INT cell1=it.First_Cell_Index(),cell2=it.Second_Cell_Index();
 
@@ -130,6 +131,8 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt,T time) const
             T theta=phi1/(phi1-phi2);
             beta_hat=beta1*beta2/(theta*beta1+(1-theta)*beta2);
             pj=Pressure_Jump(cell1,dt)*(1-theta)+Pressure_Jump(cell2,dt)*theta;
+            if(pj>mx) mx=pj;
+            if(pj<mn) mn=pj;
             if(phi1<0) pj=-pj;
             rhs1-=pj*beta_hat*one_over_dX_2(it.Axis());}
 
@@ -152,6 +155,7 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt,T time) const
         if(index1) rhs.v(index1)-=rhs1; // Setting up negative of standard system
         if(index2) rhs.v(index2)+=rhs1;}
 
+    LOG::cout<<"pressure range: "<<mn<<"  "<<mx<<std::endl;
     SPARSE_MATRIX_FLAT_NXN<T> matrix;
     helper.Compact();
     helper.Set_Matrix(num_cells,matrix);
