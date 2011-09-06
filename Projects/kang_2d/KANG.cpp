@@ -60,7 +60,6 @@ Register_Options()
     parse_args->Add_Double_Argument("-m",1,"length unit");
     parse_args->Add_Double_Argument("-s",1,"time unit");
     parse_args->Add_Double_Argument("-kg",1,"mass unit");
-    parse_args->Add_Option_Argument("-low_order_advection");
 }
 //#####################################################################
 // Function Parse_Options
