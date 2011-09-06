@@ -5,11 +5,8 @@
 // Class KANG
 //#####################################################################
 //   1. Circle with surface tension, pressure jump condition
-//   4. Oscillating deformed circle
-//   6. Analytic viscosity test
-//   7. Two-phase rising bubble test
-//   11. Small rising bubble test
-//   12. Popinet example
+//   2. Oscillating deformed circle
+//   3. Two-phase rising bubble test
 //#####################################################################
 #ifndef __KANG__
 #define __KANG__
@@ -81,7 +78,7 @@ public:
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions; // silence -Woverloaded-virtual
     using BASE::Add_Volumetric_Body_To_Fluid_Simulation;using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::two_phase;
     using BASE::parse_args;using BASE::test_number;using BASE::resolution;using BASE::data_directory;using BASE::convection_order;using BASE::use_pls_evolution_for_structure;
-    using BASE::Mark_Outside;
+    using BASE::Mark_Outside;using BASE::use_kang;
 
     SOLIDS_STANDARD_TESTS<TV> solids_tests;
 
@@ -92,36 +89,18 @@ public:
     bool print_each_matrix;
     bool use_full_ic;
     bool output_iterators;
-    bool use_decoupled_viscosity;
     T max_dt;
     T exact_dt;
     T current_dt;
     bool implicit_solid,use_cut_volume,use_low_order_advection;
 
     GEOMETRY_PARTICLES<TV> debug_particles;
-    SEGMENTED_CURVE_2D<T>* front_tracked_structure;
-    SEGMENTED_CURVE_2D<T>* rebuild_curve;
-    ARRAY<TV> saved_tracked_particles_X;
-    DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>* deformable_collisions;
-    FLUID_TO_SOLID_INTERPOLATION_CUT<TV>* fsi;
-
-    int number_surface_particles;
-    bool rebuild_surface;
-    ARRAY<VECTOR<int,2> > particle_segments;
-    FREE_PARTICLES<TV>* free_particles;
-    ARRAY<typename MATRIX_FLUID_INTERPOLATION_EXTRAPOLATED<TV>::ENTRY> fluid_interpolation_entries;
-    ARRAY<int> solid_interpolation_entries;
-    ARRAY<bool,TV_INT>* psi_D;
 
     T circle_radius;
     T circle_perturbation;
     int oscillation_mode;
-    bool use_massless_structure;
-    ARRAY<int>* coupled_particles;
-    bool make_ellipse,use_phi,remesh;
+    bool make_ellipse;
     T m,s,kg;
-    int solid_refinement;
-    T solid_density,solid_width,analytic_solution;
     T omega;
     T laplace_number,surface_tension;
     bool use_T_nu;
@@ -178,7 +157,6 @@ public:
     void Test_Analytic_Velocity(T time);
     void Test_Analytic_Pressure(T time);
     void Solid_Circle();
-    void Adjust_Phi_With_Objects(const T time);
     void Sync_Particle_To_Level_Set(int p);
     void Sync_Front_Tracked_Particles_To_Level_Set();
     void Divide_Segment(int e);
@@ -192,7 +170,6 @@ public:
     void Write_Output_Files(const int frame) const;
     void Initialize_Surface_Particles(int number);
     void Rebuild_Surface();
-    void Substitute_Coupling_Matrices(KRYLOV_SYSTEM_BASE<T>& coupled_system,T dt,T current_velocity_time,T current_position_time,bool velocity_update,bool leakproof_solve) PHYSBAM_OVERRIDE;
     void Advance_One_Time_Step_Begin_Callback(const T dt,const T time) PHYSBAM_OVERRIDE;
     void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE;
     static GEOMETRY_PARTICLES<TV>*  Store_Debug_Particles(GEOMETRY_PARTICLES<TV>* particle=0);
