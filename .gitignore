@@ -11,3 +11,5 @@ build
 *.user
 Debug
 Release
+.emacs_project_config
+*.o
