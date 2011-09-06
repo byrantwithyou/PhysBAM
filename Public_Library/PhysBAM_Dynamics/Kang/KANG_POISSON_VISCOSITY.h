@@ -24,6 +24,7 @@ public:
 
     bool print_matrix;
     bool test_system;
+    mutable ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost;
 
     KANG_POISSON_VISCOSITY(FLUIDS_PARAMETERS_UNIFORM<GRID<TV> >& fluids_parameters_input,const ARRAY<T,TV_INT>& old_phi_input);
     ~KANG_POISSON_VISCOSITY();
@@ -32,7 +33,7 @@ public:
     void Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt,T time) const;
     void Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt,T time) const;
     int Cell_Index(const TV_INT& cell) const;
-    T Pressure_Jump(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const TV_INT& cell,T dt) const;
+    T Pressure_Jump(const TV_INT& cell,T dt) const;
 //#####################################################################
 };
 }

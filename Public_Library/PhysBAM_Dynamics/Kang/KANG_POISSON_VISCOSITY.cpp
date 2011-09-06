@@ -14,6 +14,7 @@
 #include <PhysBAM_Tools/Read_Write/Octave/OCTAVE_OUTPUT.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_ND.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/FAST_LEVELSET.h>
+#include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/INCOMPRESSIBLE_UNIFORM.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/SYSTEM_MATRIX_HELPER.h>
 #include <PhysBAM_Dynamics/Kang/KANG_POISSON_VISCOSITY.h>
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_UNIFORM.h>
@@ -50,7 +51,7 @@ Cell_Index(const TV_INT& cell) const
 // Function Pressure_Jump
 //#####################################################################
 template<class TV> typename TV::SCALAR KANG_POISSON_VISCOSITY<TV>::
-Pressure_Jump(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const TV_INT& cell,T dt) const
+Pressure_Jump(const TV_INT& cell,T dt) const
 {
     typedef typename LEVELSET_POLICY<GRID<TV> >::LEVELSET LEVELSET;
     const LEVELSET& phi=fluids_parameters.particle_levelset_evolution->Levelset(1);
@@ -63,8 +64,8 @@ Pressure_Jump(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const TV_INT& cell,T 
         TV_INT cellp=cell,celln=cell;
         cellp(d)++;
         celln(d)--;
-        TV v1=face_velocities.Cell_Centered_Average(celln);
-        TV v2=face_velocities.Cell_Centered_Average(cellp);
+        TV v1=face_velocities_ghost.Cell_Centered_Average(celln);
+        TV v2=face_velocities_ghost.Cell_Centered_Average(cellp);
         du_n(d)=(T).5*fluids_parameters.grid->one_over_dX(d)*TV::Dot_Product(v2-v1,N);}
 
     T n_du_n=TV::Dot_Product(du_n,N);
@@ -93,39 +94,51 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt,T time) const
     k.v.Resize(num_cells);
     z.v.Resize(num_cells);
 
+    face_velocities_ghost.Resize(*fluids_parameters.grid,3,false);
+    fluids_parameters.incompressible->boundary->Fill_Ghost_Cells_Face(grid,face_velocities,face_velocities_ghost,time+dt,3);
+
     T beta_n=1/fluids_parameters.density,beta_p=1/fluids_parameters.outside_density;
     TV one_over_dx_2=sqr(grid.one_over_dX);
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
         TV_INT cell1=it.First_Cell_Index(),cell2=it.Second_Cell_Index();
+
+        if(cell1(it.Axis())==0 && fluids_parameters.domain_walls(it.Axis())(1)) continue;
+        else if(cell2(it.Axis())>grid.counts(it.Axis()) && fluids_parameters.domain_walls(it.Axis())(2)) continue;
+
         T phi1=phi(cell1),phi2=phi(cell2);
         T beta_hat,rhs1=face_velocities(it.Full_Index())*grid.one_over_dX(it.Axis());
         T beta1=(phi1<0)?beta_n:beta_p;
+
         if((phi1<0)==(phi2<0)){
             beta_hat=beta1;}
         else{
             T beta2=(phi2<0)?beta_n:beta_p;
             T theta=phi1/(phi1-phi2);
             beta_hat=beta1*beta2/(theta*beta1+(1-theta)*beta2);
-            T pj=Pressure_Jump(face_velocities,cell1,dt)*(1-theta)+Pressure_Jump(face_velocities,cell2,dt)*theta;
+            T pj=Pressure_Jump(cell1,dt)*(1-theta)+Pressure_Jump(cell2,dt)*theta;
             rhs1-=pj*beta_hat*grid.one_over_dX(it.Axis());}
 
         T A=beta_hat*one_over_dx_2(it.Axis()); // positive for diagonal, neg for off
         int index1=Cell_Index(cell1),index2=Cell_Index(cell2);
-        helper.data.Append(TRIPLE<int,int,T>(index1,index1,A));
-        helper.data.Append(TRIPLE<int,int,T>(index1,index2,-A));
-        helper.data.Append(TRIPLE<int,int,T>(index2,index1,-A));
-        helper.data.Append(TRIPLE<int,int,T>(index2,index2,A));
+
+        if(cell1(it.Axis())==0){index1=0;}
+        else if(cell2(it.Axis())>grid.counts(it.Axis())){index2=0;}
+        
+        if(index1) helper.data.Append(TRIPLE<int,int,T>(index1,index1,A));
+        if(index1 && index2) helper.data.Append(TRIPLE<int,int,T>(index1,index2,-A));
+        if(index1 && index2) helper.data.Append(TRIPLE<int,int,T>(index2,index1,-A));
+        if(index2) helper.data.Append(TRIPLE<int,int,T>(index2,index2,A));
 
         T beta_G=beta_hat*grid.one_over_dX(it.Axis()); // positive for 2, neg for 1
         grad_helper.Append(TRIPLE<int,int,T>(index1,index2,beta_G));
 
-        rhs.v(index1)-=rhs1; // Setting up negative of standard system
-        rhs.v(index2)+=rhs1;}
+        if(index1) rhs.v(index1)-=rhs1; // Setting up negative of standard system
+        if(index2) rhs.v(index2)+=rhs1;}
 
     SPARSE_MATRIX_FLAT_NXN<T> matrix;
     helper.Compact();
     helper.Set_Matrix(num_cells,matrix);
-    typedef KRYLOV::MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_NXN<T>,T,VECTOR_ND<T> > SYSTEM;
+    typedef KRYLOV::MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_NXN<T>,T,KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > > SYSTEM;
     matrix.Construct_Incomplete_Cholesky_Factorization();
     SYSTEM system(matrix);
     system.P=matrix.C;
@@ -149,7 +162,9 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt,T time) const
 
     int i=1;
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next(),i++){
-        T dp=p.v(grad_helper(i).y)-p.v(grad_helper(i).x);
+        T dp=0;
+        if(grad_helper(i).x) dp-=p.v(grad_helper(i).x);
+        if(grad_helper(i).y) dp+=p.v(grad_helper(i).y);
         face_velocities(it.Full_Index())-=grad_helper(i).z*dp;}
 }
 //#####################################################################
@@ -159,7 +174,11 @@ template<class TV> void KANG_POISSON_VISCOSITY<TV>::
 Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt,T time) const
 {
 }
+template class KANG_POISSON_VISCOSITY<VECTOR<float,1> >;
 template class KANG_POISSON_VISCOSITY<VECTOR<float,2> >;
+template class KANG_POISSON_VISCOSITY<VECTOR<float,3> >;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
+template class KANG_POISSON_VISCOSITY<VECTOR<double,1> >;
 template class KANG_POISSON_VISCOSITY<VECTOR<double,2> >;
+template class KANG_POISSON_VISCOSITY<VECTOR<double,3> >;
 #endif
