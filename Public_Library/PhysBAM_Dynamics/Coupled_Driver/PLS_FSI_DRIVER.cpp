@@ -37,6 +37,7 @@
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_MAC_GRID_SOLID_WALL_SLIP.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/DETONATION_SHOCK_DYNAMICS.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/INCOMPRESSIBLE_UNIFORM.h>
+#include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/PROJECTION_DYNAMICS_UNIFORM.h>
 #include <PhysBAM_Dynamics/Boundaries/BOUNDARY_PHI_WATER.h>
 #include <PhysBAM_Dynamics/Coupled_Driver/PLS_FSI_DRIVER.h>
 #include <PhysBAM_Dynamics/Coupled_Driver/PLS_FSI_EXAMPLE.h>
@@ -140,9 +141,8 @@ Initialize()
     example.Initialize_Bodies();
 
     example.fluids_parameters.particle_levelset_evolution=new typename LEVELSET_POLICY<GRID<TV> >::PARTICLE_LEVELSET_EVOLUTION(*example.fluids_parameters.grid,example.fluids_parameters.number_of_ghost_cells);
-    example.fluids_parameters.projection=0; // TODO: We need to put something non-null here
+    example.fluids_parameters.projection=new PROJECTION_DYNAMICS_UNIFORM<GRID<TV> >(*example.fluids_parameters.grid,example.fluids_parameters.particle_levelset_evolution->Levelset(1));
     example.fluids_parameters.incompressible=new INCOMPRESSIBLE_UNIFORM<GRID<TV> >(*example.fluids_parameters.grid,*example.fluids_parameters.projection);
-    example.fluids_parameters.projection=0;
     example.fluids_parameters.phi_boundary=&example.fluids_parameters.phi_boundary_water; // override default
     example.fluids_parameters.phi_boundary_water.Set_Velocity_Pointer(example.fluid_collection.incompressible_fluid_collection.face_velocities);
     example.fluids_parameters.boundary_mac_slip.Set_Phi(example.fluids_parameters.particle_levelset_evolution->phi);
@@ -155,7 +155,7 @@ Initialize()
     Initialize_Fluids_Grids(); // this needs to be here because the arrays have to be resized for multiphase
 
     example.fluids_parameters.collision_bodies_affecting_fluid->Initialize_Grids();
-    coupled_evolution->Setup_Boundary_Condition_Collection();
+    if(coupled_evolution) coupled_evolution->Setup_Boundary_Condition_Collection();
     example.solids_evolution->time=time;
 
     if(example.restart){
