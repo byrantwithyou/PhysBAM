@@ -78,21 +78,14 @@ public:
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions; // silence -Woverloaded-virtual
     using BASE::Add_Volumetric_Body_To_Fluid_Simulation;using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::two_phase;
     using BASE::parse_args;using BASE::test_number;using BASE::resolution;using BASE::data_directory;using BASE::convection_order;using BASE::use_pls_evolution_for_structure;
-    using BASE::Mark_Outside;using BASE::use_kang;
+    using BASE::Mark_Outside;using BASE::use_kang;using BASE::print_matrix;using BASE::test_system;
 
     SOLIDS_STANDARD_TESTS<TV> solids_tests;
 
-    bool run_self_tests;
-    bool print_poisson_matrix;
-    bool print_index_map;
-    bool print_matrix;
-    bool print_each_matrix;
-    bool use_full_ic;
     bool output_iterators;
     T max_dt;
     T exact_dt;
-    T current_dt;
-    bool implicit_solid,use_cut_volume,use_low_order_advection;
+    bool implicit_solid;
 
     GEOMETRY_PARTICLES<TV> debug_particles;
 
@@ -103,7 +96,6 @@ public:
     T m,s,kg;
     T omega;
     T laplace_number,surface_tension;
-    bool use_T_nu;
 
     KANG(const STREAM_TYPE stream_type);
     virtual ~KANG();

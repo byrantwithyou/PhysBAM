@@ -4,7 +4,9 @@
 //#####################################################################
 // Class KANG_POISSON_VISCOSITY
 //#####################################################################
+#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_RESIDUAL.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>
@@ -20,6 +22,8 @@
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_UNIFORM.h>
 #include <PhysBAM_Dynamics/Solids_And_Fluids/FLUIDS_PARAMETERS_UNIFORM.h>
 using namespace PhysBAM;
+namespace PhysBAM{template<class TV> void Add_Debug_Particle(const TV& X, const VECTOR<typename TV::SCALAR,3>& color);}
+
 //#####################################################################
 // Constructor
 //#####################################################################
@@ -72,6 +76,15 @@ Pressure_Jump(const TV_INT& cell,T dt) const
     T pj_mu=2*dt*(fluids_parameters.outside_viscosity-fluids_parameters.viscosity)*n_du_n;
     return pj_st+pj_mu;
 }
+namespace{
+template<class T>
+struct GRAD_HELPER
+{
+    int i,j;
+    T x;
+    T jmp;
+};
+}
 //#####################################################################
 // Function Project_Fluid
 //#####################################################################
@@ -83,7 +96,7 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt,T time) const
     const GRID<TV>& grid=*fluids_parameters.grid;
 
     SYSTEM_MATRIX_HELPER<T> helper;
-    ARRAY<TRIPLE<int,int,T> > grad_helper;
+    ARRAY<GRAD_HELPER<T> > grad_helper;
     int num_cells=grid.counts.Product();
     KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > p,rhs,q,s,r,k,z;
     p.v.Resize(num_cells);
@@ -98,7 +111,7 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt,T time) const
     fluids_parameters.incompressible->boundary->Fill_Ghost_Cells_Face(grid,face_velocities,face_velocities_ghost,time+dt,3);
 
     T beta_n=1/fluids_parameters.density,beta_p=1/fluids_parameters.outside_density;
-    TV one_over_dx_2=sqr(grid.one_over_dX);
+    TV one_over_dX_2=sqr(grid.one_over_dX);
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
         TV_INT cell1=it.First_Cell_Index(),cell2=it.Second_Cell_Index();
 
@@ -108,6 +121,7 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt,T time) const
         T phi1=phi(cell1),phi2=phi(cell2);
         T beta_hat,rhs1=face_velocities(it.Full_Index())*grid.one_over_dX(it.Axis());
         T beta1=(phi1<0)?beta_n:beta_p;
+        T pj=0;
 
         if((phi1<0)==(phi2<0)){
             beta_hat=beta1;}
@@ -115,10 +129,11 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt,T time) const
             T beta2=(phi2<0)?beta_n:beta_p;
             T theta=phi1/(phi1-phi2);
             beta_hat=beta1*beta2/(theta*beta1+(1-theta)*beta2);
-            T pj=Pressure_Jump(cell1,dt)*(1-theta)+Pressure_Jump(cell2,dt)*theta;
-            rhs1-=pj*beta_hat*grid.one_over_dX(it.Axis());}
+            pj=Pressure_Jump(cell1,dt)*(1-theta)+Pressure_Jump(cell2,dt)*theta;
+            if(phi1<0) pj=-pj;
+            rhs1-=pj*beta_hat*one_over_dX_2(it.Axis());}
 
-        T A=beta_hat*one_over_dx_2(it.Axis()); // positive for diagonal, neg for off
+        T A=beta_hat*one_over_dX_2(it.Axis()); // positive for diagonal, neg for off
         int index1=Cell_Index(cell1),index2=Cell_Index(cell2);
 
         if(cell1(it.Axis())==0){index1=0;}
@@ -130,7 +145,9 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt,T time) const
         if(index2) helper.data.Append(TRIPLE<int,int,T>(index2,index2,A));
 
         T beta_G=beta_hat*grid.one_over_dX(it.Axis()); // positive for 2, neg for 1
-        grad_helper.Append(TRIPLE<int,int,T>(index1,index2,beta_G));
+        GRAD_HELPER<T> gh = {index1,index2,beta_G,pj};
+
+        grad_helper.Append(gh);
 
         if(index1) rhs.v(index1)-=rhs1; // Setting up negative of standard system
         if(index2) rhs.v(index2)+=rhs1;}
@@ -145,7 +162,7 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt,T time) const
 
     if(test_system) system.Test_System(rhs,k,z);
 
-    static int solve_id=1;solve_id++;
+    static int solve_id=0;solve_id++;
     if(print_matrix){
         LOG::cout<<"pressure solve id "<<solve_id<<std::endl;
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("M-%i.txt",solve_id).c_str()).Write("M",matrix);
@@ -160,12 +177,21 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt,T time) const
     solver->Solve(system,p,rhs,q,s,r,k,z,fluids_parameters.incompressible_tolerance,0,fluids_parameters.incompressible_iterations);
     if(print_matrix) OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("x-%i.txt",solve_id).c_str()).Write("x",p.v);
 
+    INTERPOLATED_COLOR_MAP<T> color_map;
+    color_map.Initialize_Colors(-.3,.3,false,false,false);
+
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+        int ci=Cell_Index(it.index);
+        T val=p.v(ci);
+        Add_Debug_Particle(it.Location(), color_map(val));}
+
     int i=1;
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next(),i++){
         T dp=0;
-        if(grad_helper(i).x) dp-=p.v(grad_helper(i).x);
-        if(grad_helper(i).y) dp+=p.v(grad_helper(i).y);
-        face_velocities(it.Full_Index())-=grad_helper(i).z*dp;}
+        if(grad_helper(i).i) dp-=p.v(grad_helper(i).i);
+        if(grad_helper(i).j) dp+=p.v(grad_helper(i).j);
+        dp+=grad_helper(i).jmp;
+        face_velocities(it.Full_Index())-=grad_helper(i).x*dp;}
 }
 //#####################################################################
 // Function Apply_Viscosity

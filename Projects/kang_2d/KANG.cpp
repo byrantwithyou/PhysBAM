@@ -17,10 +17,9 @@ using namespace PhysBAM;
 #endif
 template<class T> KANG<T>::
 KANG(const STREAM_TYPE stream_type)
-    :BASE(stream_type,1),solids_tests(*this,solid_body_collection),run_self_tests(false),print_poisson_matrix(false),print_index_map(false),
-    print_matrix(false),print_each_matrix(false),use_full_ic(false),output_iterators(false),max_dt(0),exact_dt(0),current_dt(0),implicit_solid(true),use_cut_volume(false),use_low_order_advection(false),
+    :BASE(stream_type,1),solids_tests(*this,solid_body_collection),output_iterators(false),max_dt(0),exact_dt(0),
     circle_radius(0),circle_perturbation(0),oscillation_mode(0),make_ellipse(false),m(1),s(1),kg(1),
-    omega(0),laplace_number(0),use_T_nu(false)
+    omega(0),laplace_number(0)
 {
     LOG::cout<<std::setprecision(16);
     debug_particles.array_collection->template Add_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
@@ -36,7 +35,6 @@ KANG(const STREAM_TYPE stream_type)
 template<class T> KANG<T>::
 ~KANG()
 {
-    if(!use_low_order_advection) delete fluids_parameters.incompressible->advection;
 }
 //#####################################################################
 // Function Register_Options
@@ -48,11 +46,7 @@ Register_Options()
     parse_args->Add_Integer_Argument("-cg_iterations",3000);
     parse_args->Add_Double_Argument("-viscosity",(T)0);
     parse_args->Add_Option_Argument("-test_system");
-    parse_args->Add_Option_Argument("-print_poisson_matrix");
-    parse_args->Add_Option_Argument("-print_index_map");
     parse_args->Add_Option_Argument("-print_matrix");
-    parse_args->Add_Option_Argument("-print_each_matrix");
-    parse_args->Add_Option_Argument("-use_full_ic");
     parse_args->Add_Option_Argument("-output_iterators");
     parse_args->Add_Option_Argument("-no_preconditioner");
     parse_args->Add_Option_Argument("-preconditioner");
@@ -66,7 +60,6 @@ Register_Options()
     parse_args->Add_Double_Argument("-m",1,"length unit");
     parse_args->Add_Double_Argument("-s",1,"time unit");
     parse_args->Add_Double_Argument("-kg",1,"mass unit");
-    parse_args->Add_Double_Argument("-rand",0);
     parse_args->Add_Option_Argument("-low_order_advection");
 }
 //#####################################################################
@@ -112,12 +105,8 @@ Parse_Options()
 
     fluids_parameters.use_slip=true;
 //    fluids_parameters.use_slip=parse_args->Is_Value_Set("-slip");
-    run_self_tests=parse_args->Is_Value_Set("-test_system");
-    print_poisson_matrix=parse_args->Is_Value_Set("-print_poisson_matrix");
-    print_index_map=parse_args->Is_Value_Set("-print_index_map");
+    test_system=parse_args->Is_Value_Set("-test_system");
     print_matrix=parse_args->Is_Value_Set("-print_matrix");
-    print_each_matrix=parse_args->Is_Value_Set("-print_each_matrix");
-    use_full_ic=parse_args->Is_Value_Set("-use_full_ic");
     output_iterators=parse_args->Is_Value_Set("-output_iterators");
     fluids_parameters.use_vorticity_confinement=false;
     fluids_parameters.use_preconditioner_for_slip_system=true;
@@ -141,7 +130,6 @@ Parse_Options()
     solid_body_collection.print_energy=parse_args->Get_Option_Value("-print_energy");
     if(parse_args->Is_Value_Set("-make_ellipse")) make_ellipse=true;
     solids_parameters.use_post_cg_constraints=true;
-    if(parse_args->Is_Value_Set("-low_order_advection")) use_low_order_advection=true;
 
     fluids_parameters.gravity=0;
     fluids_parameters.use_levelset_viscosity=false;
@@ -238,17 +226,12 @@ Initialize_Advection()
     fluids_parameters.incompressible->collision_body_list=fluids_parameters.collision_bodies_affecting_fluid;
 
     fluids_parameters.particle_half_bandwidth=16;
-    if(!use_low_order_advection){
-        fluids_parameters.particle_levelset_evolution->runge_kutta_order_particles=3;
-        fluids_parameters.particle_levelset_evolution->runge_kutta_order_levelset=3;
-        fluids_parameters.particle_levelset_evolution->Use_Hamilton_Jacobi_Weno_Advection();
-        fluids_parameters.incompressible->advection=new ADVECTION_HAMILTON_JACOBI_ENO<GRID<TV>,T>;
-        convection_order=3;
-        fluids_parameters.particle_levelset_evolution->Use_Reinitialization();}
-    else{
-        fluids_parameters.particle_levelset_evolution->runge_kutta_order_particles=1;
-        fluids_parameters.particle_levelset_evolution->runge_kutta_order_levelset=1;
-        convection_order=1;}
+    fluids_parameters.particle_levelset_evolution->runge_kutta_order_particles=3;
+    fluids_parameters.particle_levelset_evolution->runge_kutta_order_levelset=3;
+    fluids_parameters.particle_levelset_evolution->Use_Hamilton_Jacobi_Weno_Advection();
+    fluids_parameters.incompressible->advection=new ADVECTION_HAMILTON_JACOBI_ENO<GRID<TV>,T>;
+    convection_order=3;
+    fluids_parameters.particle_levelset_evolution->Use_Reinitialization();
 }
 //#####################################################################
 // Function Initialize_Phi
@@ -282,10 +265,6 @@ Initialize_Phi()
 template<class T> void KANG<T>::
 Preprocess_Substep(const T dt,const T time)
 {
-    current_dt=dt;
-    if(SURFACE_TENSION_FORCE<TV>* force=solid_body_collection.deformable_body_collection.template Find_Force<SURFACE_TENSION_FORCE<TV>*>()) force->dt=dt;
-    if(LINEAR_POINT_ATTRACTION<TV>* force=solid_body_collection.deformable_body_collection.template Find_Force<LINEAR_POINT_ATTRACTION<TV>*>()) force->dt=dt;
-
     if(test_number==2){
         Test_Analytic_Velocity(time);
         Test_Analytic_Pressure(time);}

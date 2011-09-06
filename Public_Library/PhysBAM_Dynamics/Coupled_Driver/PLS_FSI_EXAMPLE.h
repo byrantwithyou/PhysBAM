@@ -65,6 +65,8 @@ public:
     bool use_pls_evolution_for_structure;
     bool two_phase;
     bool use_kang;
+    bool print_matrix;
+    bool test_system;
     KANG_POISSON_VISCOSITY<TV>* kang_poisson_viscosity;
 
     PLS_FSI_EXAMPLE(const STREAM_TYPE stream_type,const int number_of_regions);

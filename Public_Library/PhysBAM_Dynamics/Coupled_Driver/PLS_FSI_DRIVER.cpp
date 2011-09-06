@@ -127,7 +127,9 @@ Initialize()
 
     SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>* coupled_evolution=0;
     if(example.use_kang){
-        example.kang_poisson_viscosity=new KANG_POISSON_VISCOSITY<TV>(example.fluids_parameters,old_phi);}
+        example.kang_poisson_viscosity=new KANG_POISSON_VISCOSITY<TV>(example.fluids_parameters,old_phi);
+        example.kang_poisson_viscosity->print_matrix=example.print_matrix;
+        example.kang_poisson_viscosity->test_system=example.test_system;}
     else{
         example.fluids_parameters.use_poisson=true;
         coupled_evolution=new SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>(example.solids_parameters,example.solid_body_collection,
