@@ -155,9 +155,9 @@ Parse_Options()
             fluids_parameters.domain_walls[2][1]=true;fluids_parameters.domain_walls[2][2]=true;
             break;
         case 4:
-            fluids_parameters.grid->Initialize(resolution+1,resolution+1,0*m,(T)1*m,0*m,(T)1*m);
-            fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=false;
-            fluids_parameters.domain_walls[2][1]=true;fluids_parameters.domain_walls[2][2]=false;
+            fluids_parameters.grid->Initialize(resolution+1,resolution+1,-m,m,-m,m);
+            fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[1][2]=true;
+            fluids_parameters.domain_walls[2][1]=true;fluids_parameters.domain_walls[2][2]=true;
             break;
         default:
             LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
@@ -555,6 +555,22 @@ Debug_Particle_Set_Attribute(ATTRIBUTE_ID id,const ATTR& attr)
     GEOMETRY_PARTICLES<TV>* particles=(GEOMETRY_PARTICLES<TV>*)KANG<T>::Store_Debug_Particles();
     ARRAY_VIEW<ATTR>* attribute=particles->array_collection->template Get_Array<ATTR>(id);
     attribute->Last()=attr;
+}
+//#####################################################################
+// Function Set_Boundary_Conditions_Callback
+//#####################################################################
+template<class T> void KANG<T>::
+Set_Boundary_Conditions_Callback(ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX<TV::dimension> >& psi_N,ARRAY<T,TV_INT>& psi_D_value,
+    ARRAY<T,FACE_INDEX<TV::dimension> >& psi_N_value) const
+{
+    if(test_number==4){
+        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(*fluids_parameters.grid,3,GRID<TV>::GHOST_REGION);it.Valid();it.Next()){
+            TV x=it.Location();
+            psi_D_value(it.index)=sqr(x.x)-sqr(x.y);}}
+    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION);it.Valid();it.Next()){
+        Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));
+        TV x=it.Location();
+        psi_N_value(it.Full_Index())=it.Axis()==1?2*x.x:-2*x.y;}
 }
 template class KANG<float>;
 template void PhysBAM::Add_Debug_Particle<VECTOR<float,1> >(VECTOR<float,1> const&,VECTOR<float,3> const&);

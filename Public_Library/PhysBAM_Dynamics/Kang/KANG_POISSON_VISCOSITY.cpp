@@ -117,8 +117,8 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt,T time) const
             continue;}
         if(psi_n){
             T rhs1=psi_N_value(it.Full_Index())*grid.one_over_dX(it.Axis());
-            if(index1) rhs.v(index1)-=rhs1; // TODO: Check signs here
-            if(index2) rhs.v(index2)+=rhs1;
+            if(index1) rhs.v(index1)+=rhs1; // TODO: Check signs here
+            if(index2) rhs.v(index2)-=rhs1;
             grad_helper.Append(null_helper);
             continue;}
 

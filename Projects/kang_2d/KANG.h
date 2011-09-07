@@ -169,6 +169,8 @@ public:
     void FSI_Analytic_Test();
     void Sine_Wave();
     void Initialize_Sine_Phi();
+    void Set_Boundary_Conditions_Callback(ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX<TV::dimension> >& psi_N,ARRAY<T,TV_INT>& psi_D_value,
+        ARRAY<T,FACE_INDEX<TV::dimension> >& psi_N_value) const PHYSBAM_OVERRIDE;
 //#####################################################################
 };
 
