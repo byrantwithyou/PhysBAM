@@ -65,6 +65,7 @@
 #include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_PARAMETERS.h>
 #include <stdexcept>
 using namespace PhysBAM;
+namespace PhysBAM{template<class TV> void Add_Debug_Particle(const TV& X, const VECTOR<typename TV::SCALAR,3>& color);}
 //#####################################################################
 // Constructor
 //#####################################################################
@@ -409,6 +410,36 @@ Update_Fluid_Parameters(const T dt,const T time)
     fluids_parameters.incompressible->Set_Viscosity(fluids_parameters.viscosity);
     fluids_parameters.incompressible->Set_Variable_Viscosity(fluids_parameters.variable_viscosity);
     fluids_parameters.incompressible->projection.Set_Density(fluids_parameters.density);
+}
+//#####################################################################
+// Function Set_Boundary_Conditions
+//#####################################################################
+template<class TV> void PLS_FSI_EXAMPLE<TV>::
+Set_Boundary_Conditions(ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX<TV::dimension> >& psi_N,ARRAY<T,TV_INT>& psi_D_value,
+    ARRAY<T,FACE_INDEX<TV::dimension> >& psi_N_value) const
+{
+    void Resize(const RANGE<TV_INT>& box,const bool initialize_new_elements=true,const bool copy_existing_elements=true,const T& initialization_value=T());
+
+    psi_D.Resize(fluids_parameters.grid->Domain_Indices(3),false,false);
+    psi_N.Resize(fluids_parameters.grid->Domain_Indices(3),false,false);
+    psi_D_value.Resize(fluids_parameters.grid->Domain_Indices(3),false,false);
+    psi_N_value.Resize(fluids_parameters.grid->Domain_Indices(3),false,false);
+    psi_D.Fill(false);
+    psi_N.Fill(false);
+    psi_D_value.Fill(0);
+    psi_N_value.Fill(0);
+
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(*fluids_parameters.grid,3,GRID<TV>::GHOST_REGION); it.Valid(); it.Next()){
+        psi_D(it.index)=true;
+        Add_Debug_Particle(it.Location(), VECTOR<T,3>(1,0,0));}
+    for(int d=1;d<=TV::m;d++)
+        for(int i=1;i<=2;i++)
+            if(fluids_parameters.domain_walls(d)(i))
+                for(UNIFORM_GRID_ITERATOR_FACE<TV> it(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,i+2*(d-1),0); it.Valid(); it.Next()){
+                    psi_N(it.Full_Index())=true;
+                    Add_Debug_Particle(it.Location(),VECTOR<T,3>(0,1,0));}
+
+    Set_Boundary_Conditions_Callback(psi_D,psi_N,psi_D_value,psi_N_value);
 }
 //#####################################################################
 template class PLS_FSI_EXAMPLE<VECTOR<float,1> >;

@@ -40,18 +40,6 @@ template<class TV> KANG_POISSON_VISCOSITY<TV>::
 {
 }
 //#####################################################################
-// Function Cell_Index
-//#####################################################################
-template<class TV> int KANG_POISSON_VISCOSITY<TV>::
-Cell_Index(const TV_INT& cell) const
-{
-    const TV_INT& counts=fluids_parameters.grid->counts;
-    int r=cell(1)-1;
-    for(int i=2; i<=TV::m; i++)
-        r=r*counts(i)+(cell(i)-1);
-    return r+1;
-}
-//#####################################################################
 // Function Pressure_Jump
 //#####################################################################
 template<class TV> typename TV::SCALAR KANG_POISSON_VISCOSITY<TV>::
@@ -82,7 +70,6 @@ struct GRAD_HELPER
 {
     int i,j;
     T x;
-    T jmp;
 };
 }
 //#####################################################################
@@ -95,9 +82,14 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt,T time) const
     const ARRAY<T,TV_INT>& phi=fluids_parameters.particle_levelset_evolution->Levelset(1).phi;
     const GRID<TV>& grid=*fluids_parameters.grid;
 
+    int num_cells=0;
+    ARRAY<int,TV_INT> cell_index(grid.Domain_Indices(3));
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
+        if(!psi_D(it.index))
+            cell_index(it.index)=++num_cells;
+
     SYSTEM_MATRIX_HELPER<T> helper;
     ARRAY<GRAD_HELPER<T> > grad_helper;
-    int num_cells=grid.counts.Product();
     KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > p,rhs,q,s,r,k,z;
     p.v.Resize(num_cells);
     rhs.v.Resize(num_cells);
@@ -113,11 +105,22 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt,T time) const
     T beta_n=1/fluids_parameters.density,beta_p=1/fluids_parameters.outside_density;
     TV one_over_dX_2=sqr(grid.one_over_dX);
     T mn=FLT_MAX,mx=-mn;
+    GRAD_HELPER<T> null_helper = {0,0,0};
+
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
         TV_INT cell1=it.First_Cell_Index(),cell2=it.Second_Cell_Index();
+        bool psi_n=psi_N(it.Full_Index());
+        int index1=cell_index(cell1),index2=cell_index(cell2);
 
-        if(cell1(it.Axis())==0 && fluids_parameters.domain_walls(it.Axis())(1)) continue;
-        else if(cell2(it.Axis())>grid.counts(it.Axis()) && fluids_parameters.domain_walls(it.Axis())(2)) continue;
+        if(!index1 && !index2){
+            grad_helper.Append(null_helper);
+            continue;}
+        if(psi_n){
+            T rhs1=psi_N_value(it.Full_Index())*grid.one_over_dX(it.Axis());
+            if(index1) rhs.v(index1)-=rhs1; // TODO: Check signs here
+            if(index2) rhs.v(index2)+=rhs1;
+            grad_helper.Append(null_helper);
+            continue;}
 
         T phi1=phi(cell1),phi2=phi(cell2);
         T beta_hat,rhs1=face_velocities(it.Full_Index())*grid.one_over_dX(it.Axis());
@@ -137,20 +140,20 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt,T time) const
             rhs1-=pj*beta_hat*one_over_dX_2(it.Axis());}
 
         T A=beta_hat*one_over_dX_2(it.Axis()); // positive for diagonal, neg for off
-        int index1=Cell_Index(cell1),index2=Cell_Index(cell2);
 
-        if(cell1(it.Axis())==0){index1=0;}
-        else if(cell2(it.Axis())>grid.counts(it.Axis())){index2=0;}
-        
+        if(!index1) rhs1+=A*psi_D_value(cell1);
+        if(!index2) rhs1-=A*psi_D_value(cell2);
+
         if(index1) helper.data.Append(TRIPLE<int,int,T>(index1,index1,A));
         if(index1 && index2) helper.data.Append(TRIPLE<int,int,T>(index1,index2,-A));
         if(index1 && index2) helper.data.Append(TRIPLE<int,int,T>(index2,index1,-A));
         if(index2) helper.data.Append(TRIPLE<int,int,T>(index2,index2,A));
 
         T beta_G=beta_hat*grid.one_over_dX(it.Axis()); // positive for 2, neg for 1
-        GRAD_HELPER<T> gh = {index1,index2,beta_G,pj};
+        GRAD_HELPER<T> gh = {index1,index2,beta_G};
 
         grad_helper.Append(gh);
+        face_velocities(it.Full_Index())-=beta_G*pj;
 
         if(index1) rhs.v(index1)-=rhs1; // Setting up negative of standard system
         if(index2) rhs.v(index2)+=rhs1;}
@@ -185,7 +188,7 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt,T time) const
     color_map.Initialize_Colors(-.3,.3,false,false,false);
 
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
-        int ci=Cell_Index(it.index);
+        int ci=cell_index(it.index);
         T val=p.v(ci);
         Add_Debug_Particle(it.Location(), color_map(val));}
 
@@ -194,7 +197,6 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt,T time) const
         T dp=0;
         if(grad_helper(i).i) dp-=p.v(grad_helper(i).i);
         if(grad_helper(i).j) dp+=p.v(grad_helper(i).j);
-        dp+=grad_helper(i).jmp;
         face_velocities(it.Full_Index())-=grad_helper(i).x*dp;}
 }
 //#####################################################################

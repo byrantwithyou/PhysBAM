@@ -154,60 +154,15 @@ Parse_Options()
             fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;
             fluids_parameters.domain_walls[2][1]=true;fluids_parameters.domain_walls[2][2]=true;
             break;
+        case 4:
+            fluids_parameters.grid->Initialize(resolution+1,resolution+1,0*m,(T)1*m,0*m,(T)1*m);
+            fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=false;
+            fluids_parameters.domain_walls[2][1]=true;fluids_parameters.domain_walls[2][2]=false;
+            break;
         default:
             LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
 
-    Add_Rigid_Body_Walls();
     output_directory=STRING_UTILITIES::string_sprintf("Test_%d",test_number,resolution);
-}
-//#####################################################################
-// Function Add_Rigid_Body_Walls
-//#####################################################################
-template<class T> void KANG<T>::
-Add_Rigid_Body_Walls(const T coefficient_of_restitution,const T coefficient_of_friction,ARRAY<int>* walls_added)
-{
-    RIGID_BODY_COLLECTION<VECTOR<T,2> >& rigid_body_collection=solid_body_collection.rigid_body_collection;
-    VECTOR<T,2> center=fluids_parameters.grid->domain.Center(),size=fluids_parameters.grid->domain.Edge_Lengths();
-    int id;
-
-    if(fluids_parameters.domain_walls(1)(1)){
-        id=rigid_body_collection.Add_Rigid_Body(this->stream_type,data_directory+"/Rigid_Bodies_2D/ground",size.y*(T).00501);
-        rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Restitution(coefficient_of_restitution);
-        rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Friction(coefficient_of_friction);
-        rigid_body_collection.rigid_body_particle.X(id)=VECTOR<T,2>(fluids_parameters.grid->domain.min_corner.x,center.y);
-        rigid_body_collection.rigid_body_particle.rotation(id)=ROTATION<VECTOR<T,2> >::From_Angle(-(T)pi/2);
-        rigid_body_collection.Rigid_Body(id).Set_Name("left wall");
-        rigid_body_collection.Rigid_Body(id).is_static=true;
-        if(walls_added) walls_added->Append(id);}
-
-    if(fluids_parameters.domain_walls(1)(2)){
-        id=rigid_body_collection.Add_Rigid_Body(this->stream_type,data_directory+"/Rigid_Bodies_2D/ground",size.y*(T).00501);
-        rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Restitution(coefficient_of_restitution);
-        rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Friction(coefficient_of_friction);
-        rigid_body_collection.rigid_body_particle.X(id)=VECTOR<T,2>(fluids_parameters.grid->domain.max_corner.x,center.y);
-        rigid_body_collection.rigid_body_particle.rotation(id)=ROTATION<VECTOR<T,2> >::From_Angle((T)pi/2);
-        rigid_body_collection.Rigid_Body(id).Set_Name("right wall");
-        rigid_body_collection.Rigid_Body(id).is_static=true;
-        if(walls_added) walls_added->Append(id);}
-
-    if(fluids_parameters.domain_walls(2)(1)){
-        id=rigid_body_collection.Add_Rigid_Body(this->stream_type,data_directory+"/Rigid_Bodies_2D/ground",size.x*(T).00501);
-        rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Restitution(coefficient_of_restitution);
-        rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Friction(coefficient_of_friction);
-        rigid_body_collection.rigid_body_particle.X(id)=VECTOR<T,2>(center.x,fluids_parameters.grid->domain.min_corner.y);
-        rigid_body_collection.Rigid_Body(id).Set_Name("bottom wall");
-        rigid_body_collection.Rigid_Body(id).is_static=true;
-        if(walls_added) walls_added->Append(id);}
-
-    if(fluids_parameters.domain_walls(2)(2)){
-        id=rigid_body_collection.Add_Rigid_Body(this->stream_type,data_directory+"/Rigid_Bodies_2D/ground",size.x*(T).00501);
-        rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Restitution(coefficient_of_restitution);
-        rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Friction(coefficient_of_friction);
-        rigid_body_collection.rigid_body_particle.X(id)=VECTOR<T,2>(center.x,fluids_parameters.grid->domain.max_corner.y);
-        rigid_body_collection.rigid_body_particle.rotation(id)=ROTATION<VECTOR<T,2> >::From_Angle((T)pi);
-        rigid_body_collection.Rigid_Body(id).Set_Name("top wall");
-        rigid_body_collection.Rigid_Body(id).is_static=true;
-        if(walls_added) walls_added->Append(id);}
 }
 template<class T> void KANG<T>::
 Parse_Late_Options() {BASE::Parse_Late_Options();}
@@ -240,7 +195,7 @@ template<class T> void KANG<T>::
 Initialize_Phi()
 {
     ARRAY<T,VECTOR<int,2> >& phi=fluids_parameters.particle_levelset_evolution->phi;
-    if(test_number==1){
+    if(test_number==1 || test_number==4){
         SPHERE<TV> object(TV((T).02*m,(T).02*m),(T).01*m);
         for(UNIFORM_GRID_ITERATOR_CELL<TV> it(*fluids_parameters.grid);it.Valid();it.Next()){
             TV X=it.Location();
@@ -253,7 +208,6 @@ Initialize_Phi()
             T angle=atan2(dX.y,dX.x);
             T radius=circle_radius+circle_perturbation*cos(oscillation_mode*angle);
             phi(it.index)=distance-radius;}}
-    else if(test_number==3) phi.Fill(-1);
     else if(test_number==3){
         SPHERE<TV> object(TV((T).5*m,(T).5*m),(T).2*m);
         for(UNIFORM_GRID_ITERATOR_CELL<TV> it(*fluids_parameters.grid);it.Valid();it.Next())
@@ -313,9 +267,10 @@ Initialize_Bodies()
 //    RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
 
     switch(test_number){
-        case 1: Kang_Circle(false);break;
-        case 2: Oscillating_Circle(false);break;
-        case 3: Kang_Circle(true);break;
+        case 1: Kang_Circle();break;
+        case 2: Oscillating_Circle();break;
+        case 3: Kang_Circle();break;
+        case 4: Poisson_Test();break;
         default: LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}
 
     // add structures and rigid bodies to collisions
@@ -340,7 +295,7 @@ Initialize_Bodies()
 // Function Kang_Circle
 //#####################################################################
 template<class T> void KANG<T>::
-Kang_Circle(bool use_surface)
+Kang_Circle()
 {
     if(test_number==3){
         fluids_parameters.gravity=(T)(8e-4)*m/(s*s);
@@ -363,10 +318,23 @@ Kang_Circle(bool use_surface)
     fluids_parameters.use_particle_levelset=true;
 }
 //#####################################################################
+// Function Kang_Circle
+//#####################################################################
+template<class T> void KANG<T>::
+Poisson_Test()
+{
+    fluids_parameters.gravity=0;
+    fluids_parameters.density=1;
+    fluids_parameters.outside_density=1;
+    fluids_parameters.viscosity=0;
+    fluids_parameters.surface_tension=0;
+    fluids_parameters.use_particle_levelset=true;
+}
+//#####################################################################
 // Function Oscillating_Circle
 //#####################################################################
 template<class T> void KANG<T>::
-Oscillating_Circle(bool use_surface)
+Oscillating_Circle()
 {
     (*fluids_parameters.grid).Initialize(resolution,resolution,(T)0*m,(T)1*m,(T)0*m,(T)1*m,true);
     fluids_parameters.cfl=(T).9;

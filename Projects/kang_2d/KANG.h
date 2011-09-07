@@ -7,6 +7,7 @@
 //   1. Circle with surface tension, pressure jump condition
 //   2. Oscillating deformed circle
 //   3. Two-phase rising bubble test
+//   4. Poisson Test
 //#####################################################################
 #ifndef __KANG__
 #define __KANG__
@@ -134,7 +135,6 @@ public:
     void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE;
     void Register_Options() PHYSBAM_OVERRIDE;
     void Parse_Options() PHYSBAM_OVERRIDE;
-    void Add_Rigid_Body_Walls(const T coefficient_of_restitution=(T).5,const T coefficient_of_friction=(T).5,ARRAY<int>* walls_added=0);
     void Parse_Late_Options() PHYSBAM_OVERRIDE;
     void Initialize_Advection() PHYSBAM_OVERRIDE;
     void Initialize_Phi() PHYSBAM_OVERRIDE;
@@ -144,8 +144,9 @@ public:
     void Set_Dirichlet_Boundary_Conditions(const T time);
     void Get_Source_Velocities(T_FACE_ARRAYS_SCALAR& face_velocities,T_FACE_ARRAYS_BOOL& psi_N,const T time) PHYSBAM_OVERRIDE;
     void Initialize_Bodies() PHYSBAM_OVERRIDE;
-    void Kang_Circle(bool use_surface);
-    void Oscillating_Circle(bool use_surface);
+    void Kang_Circle();
+    void Poisson_Test();
+    void Oscillating_Circle();
     void Test_Analytic_Velocity(T time);
     void Test_Analytic_Pressure(T time);
     void Solid_Circle();
