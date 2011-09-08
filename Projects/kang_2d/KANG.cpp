@@ -115,7 +115,6 @@ Parse_Options()
     two_phase=true;
 
     fluids_parameters.viscosity=(T)(parse_args->Get_Double_Value("-viscosity")*kg/s);
-    if(fluids_parameters.viscosity) fluids_parameters.implicit_viscosity=true;
     fluids_parameters.surface_tension=(T)(parse_args->Get_Double_Value("-surface_tension")*kg*m/(s*s));
 
     fluids_parameters.use_removed_positive_particles=true;fluids_parameters.use_removed_negative_particles=true;
@@ -158,6 +157,11 @@ Parse_Options()
             fluids_parameters.grid->Initialize(resolution+1,resolution+1,-m,m,-m,m);
             fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[1][2]=true;
             fluids_parameters.domain_walls[2][1]=true;fluids_parameters.domain_walls[2][2]=true;
+            break;
+        case 5:
+            fluids_parameters.grid->Initialize(resolution+1,resolution+1,-m,m,-m,m);
+            fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;
+            fluids_parameters.domain_walls[2][1]=false;fluids_parameters.domain_walls[2][2]=false;
             break;
         default:
             LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
@@ -212,6 +216,9 @@ Initialize_Phi()
         SPHERE<TV> object(TV((T).5*m,(T).5*m),(T).2*m);
         for(UNIFORM_GRID_ITERATOR_CELL<TV> it(*fluids_parameters.grid);it.Valid();it.Next())
             phi(it.index)=-object.Signed_Distance(it.Location());}
+    else if(test_number==5){
+        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(*fluids_parameters.grid);it.Valid();it.Next())
+            phi(it.index)=it.Location().x;}
 }
 //#####################################################################
 // Function Preprocess_Substep
@@ -271,7 +278,10 @@ Initialize_Bodies()
         case 2: Oscillating_Circle();break;
         case 3: Kang_Circle();break;
         case 4: Poisson_Test();break;
+        case 5: Viscosity_Test();break;
         default: LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}
+
+    if(fluids_parameters.viscosity) fluids_parameters.implicit_viscosity=false;
 
     // add structures and rigid bodies to collisions
     deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
@@ -308,7 +318,6 @@ Kang_Circle()
         fluids_parameters.density=(T)1000*kg/(m*m);
         fluids_parameters.outside_density=(T)1*kg/(m*m);}
     if(parse_args->Is_Value_Set("-viscosity")) fluids_parameters.viscosity=(T)(parse_args->Get_Double_Value("-viscosity")*kg/s);
-    if(fluids_parameters.viscosity) fluids_parameters.implicit_viscosity=true;
     fluids_parameters.cfl=(T).9;
 //    solids_parameters.write_static_variables_every_frame=true;
 
@@ -318,7 +327,7 @@ Kang_Circle()
     fluids_parameters.use_particle_levelset=true;
 }
 //#####################################################################
-// Function Kang_Circle
+// Function Poisson_Test
 //#####################################################################
 template<class T> void KANG<T>::
 Poisson_Test()
@@ -327,6 +336,20 @@ Poisson_Test()
     fluids_parameters.density=1;
     fluids_parameters.outside_density=1;
     fluids_parameters.viscosity=0;
+    fluids_parameters.surface_tension=0;
+    fluids_parameters.use_particle_levelset=true;
+}
+//#####################################################################
+// Function Viscosity_Test
+//#####################################################################
+template<class T> void KANG<T>::
+Viscosity_Test()
+{
+    fluids_parameters.gravity=(T)9.8*m/(s*s);
+    fluids_parameters.density=(T)1*kg/(m*m);
+    fluids_parameters.outside_density=(T)2*kg/(m*m);
+    fluids_parameters.viscosity=(T)1*kg/s;
+    fluids_parameters.outside_viscosity=(T)3*kg/s;
     fluids_parameters.surface_tension=0;
     fluids_parameters.use_particle_levelset=true;
 }
@@ -566,11 +589,17 @@ Set_Boundary_Conditions_Callback(ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX
     if(test_number==4){
         for(UNIFORM_GRID_ITERATOR_CELL<TV> it(*fluids_parameters.grid,3,GRID<TV>::GHOST_REGION);it.Valid();it.Next()){
             TV x=it.Location();
-            psi_D_value(it.index)=sqr(x.x)-sqr(x.y);}}
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION);it.Valid();it.Next()){
-        Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));
-        TV x=it.Location();
-        psi_N_value(it.Full_Index())=it.Axis()==1?2*x.x:-2*x.y;}
+            psi_D_value(it.index)=sqr(x.x)-sqr(x.y);}
+        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION);it.Valid();it.Next()){
+            Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));
+            TV x=it.Location();
+            psi_N_value(it.Full_Index())=it.Axis()==1?2*x.x:-2*x.y;}}
+    if(test_number==5){
+        for(int s=1;s<=2;s++)
+            for(UNIFORM_GRID_ITERATOR_FACE<TV> it(*fluids_parameters.grid,1,GRID<TV>::GHOST_REGION,s);it.Valid();it.Next()){
+                Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));
+                psi_N(it.Full_Index())=true;
+                psi_N_value(it.Full_Index())=0;}}
 }
 template class KANG<float>;
 template void PhysBAM::Add_Debug_Particle<VECTOR<float,1> >(VECTOR<float,1> const&,VECTOR<float,3> const&);

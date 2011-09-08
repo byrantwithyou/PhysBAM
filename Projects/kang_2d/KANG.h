@@ -8,6 +8,7 @@
 //   2. Oscillating deformed circle
 //   3. Two-phase rising bubble test
 //   4. Poisson Test
+//   5. Viscosity Test
 //#####################################################################
 #ifndef __KANG__
 #define __KANG__
@@ -146,6 +147,7 @@ public:
     void Initialize_Bodies() PHYSBAM_OVERRIDE;
     void Kang_Circle();
     void Poisson_Test();
+    void Viscosity_Test();
     void Oscillating_Circle();
     void Test_Analytic_Velocity(T time);
     void Test_Analytic_Pressure(T time);
