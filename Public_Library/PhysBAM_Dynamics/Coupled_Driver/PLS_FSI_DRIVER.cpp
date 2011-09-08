@@ -281,6 +281,7 @@ First_Order_Time_Step(int substep,T dt)
     T_GRID& grid=*fluids_parameters.grid;
     FLUID_COLLECTION<TV>& fluid_collection=example.fluid_collection;
     INCOMPRESSIBLE_UNIFORM<T_GRID>* incompressible=fluids_parameters.incompressible;
+    ARRAY<T,FACE_INDEX<TV::m> >& face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
 
     if(example.use_kang) old_phi=fluids_parameters.particle_levelset_evolution->Levelset(1).phi;
 
@@ -293,18 +294,31 @@ First_Order_Time_Step(int substep,T dt)
     if(example.use_pls_evolution_for_structure) Advance_Particles_With_PLS(dt);
 
     Write_Substep("start step",substep,1);
+    if(example.kang_poisson_viscosity && !fluids_parameters.implicit_viscosity){
+        face_velocities_scratch=face_velocities;
+        Write_Substep("explicit viscosity",substep,1);
+        example.kang_poisson_viscosity->Apply_Viscosity(face_velocities,dt,fluids_parameters.implicit_viscosity);
+        Write_Substep("explicit viscosity",substep,1);
+        face_velocities_scratch.Exchange_Arrays(face_velocities,face_velocities_scratch);
+        face_velocities_scratch-=face_velocities;
+        Write_Substep("revert velocity and store difference",substep,1);}
+
     Advect_Fluid(dt,substep);
-    LOG::cout<<"Maximum face velocity (after advect) = ("<<fluid_collection.incompressible_fluid_collection.face_velocities.Maxabs().Magnitude()<<": "<<fluid_collection.incompressible_fluid_collection.face_velocities.Maxabs()<<std::endl;
+    LOG::cout<<"Maximum face velocity (after advect) = ("<<face_velocities.Maxabs().Magnitude()<<": "<<face_velocities.Maxabs()<<std::endl;
     Write_Substep("advect",substep,1);
+    if(example.kang_poisson_viscosity && !fluids_parameters.implicit_viscosity){
+        face_velocities+=face_velocities_scratch;
+        Write_Substep("apply stored explicit viscosity",substep,1);}
+    
 
     example_forces_and_velocities.Update_Time_Varying_Material_Properties(time+dt);
     example.solid_body_collection.Update_Position_Based_State(time+dt,true);
 //    example.solid_body_collection.deformable_body_collection.template Find_Force<SURFACE_TENSION_FORCE<VECTOR<T,2> >*>()->Dump_Curvatures();
     if(slip){
         slip->two_phase=example.two_phase;
-        slip->Solve(fluid_collection.incompressible_fluid_collection.face_velocities,dt,time,time+dt,false,false);}
-    else if(example.kang_poisson_viscosity){
-        example.kang_poisson_viscosity->Project_Fluid(fluid_collection.incompressible_fluid_collection.face_velocities,dt);}
+        slip->Solve(face_velocities,dt,time,time+dt,false,false);}
+    else if(example.kang_poisson_viscosity)
+        example.kang_poisson_viscosity->Project_Fluid(face_velocities,dt);
     Write_Substep("pressure solve",substep,1);
 
     if(slip) slip->Print_Maximum_Velocities(time);
@@ -315,13 +329,13 @@ First_Order_Time_Step(int substep,T dt)
     Write_Substep("euler step position",substep,1);
 
     LOG::Time("extrapolating velocity across interface");
-//    Extrapolate_Velocity_Across_Interface(example.fluid_collection.incompressible_fluid_collection.face_velocities,particle_levelset_evolution->Particle_Levelset(1).levelset,extrapolation_bandwidth);
+//    Extrapolate_Velocity_Across_Interface(example.face_velocities,particle_levelset_evolution->Particle_Levelset(1).levelset,extrapolation_bandwidth);
     if(!example.two_phase) Extrapolate_Velocity_Across_Interface(time,dt);
-        //incompressible->Extrapolate_Velocity_Across_Interface(example.fluid_collection.incompressible_fluid_collection.face_velocities,exchanged_phi_ghost,
+        //incompressible->Extrapolate_Velocity_Across_Interface(example.face_velocities,exchanged_phi_ghost,
         //    fluids_parameters.enforce_divergence_free_extrapolation,extrapolation_bandwidth,0,TV(),&collision_bodies_affecting_fluid.face_neighbors_visible);
     Write_Substep("extrapolate about interface",substep,1);
-    incompressible->boundary->Apply_Boundary_Condition_Face(incompressible->grid,example.fluid_collection.incompressible_fluid_collection.face_velocities,time+dt);
-    LOG::cout<<"Maximum face velocity = ("<<fluid_collection.incompressible_fluid_collection.face_velocities.Maxabs().Magnitude()<<": "<<fluid_collection.incompressible_fluid_collection.face_velocities.Maxabs()<<std::endl;
+    incompressible->boundary->Apply_Boundary_Condition_Face(incompressible->grid,face_velocities,time+dt);
+    LOG::cout<<"Maximum face velocity = ("<<face_velocities.Maxabs().Magnitude()<<": "<<face_velocities.Maxabs()<<std::endl;
 
     Write_Substep("end step",substep,1);
     example.solids_evolution->time+=dt;
@@ -474,16 +488,17 @@ Advect_Fluid(const T dt,const int substep)
     Write_Substep("after advection",substep,1);
 
     if(fluids_parameters.use_body_force) fluids_parameters.callbacks->Get_Body_Force(fluids_parameters.incompressible->force,dt,time);
+    incompressible->Advance_One_Time_Step_Forces(face_velocities,dt,time,fluids_parameters.implicit_viscosity,&particle_levelset_evolution->phi,example.fluids_parameters.number_of_ghost_cells);
+    Write_Substep("after integrate non advection forces",substep,1);
 
     LOG::Time("updating velocity (explicit part without convection)");
     Write_Substep("before viscosity",substep,1);
     if(SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>* coupled_evolution=dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>*>(example.solids_evolution))
         coupled_evolution->Apply_Viscosity(face_velocities,dt,time);
-    else if(example.kang_poisson_viscosity) example.kang_poisson_viscosity->Apply_Viscosity(face_velocities,dt,fluids_parameters.implicit_viscosity);
+    else if(example.kang_poisson_viscosity && fluids_parameters.implicit_viscosity)
+        example.kang_poisson_viscosity->Apply_Viscosity(face_velocities,dt,fluids_parameters.implicit_viscosity);
 
     Write_Substep("after viscosity",substep,1);
-    incompressible->Advance_One_Time_Step_Forces(face_velocities,dt,time,fluids_parameters.implicit_viscosity,&particle_levelset_evolution->phi,example.fluids_parameters.number_of_ghost_cells);
-    Write_Substep("after integrate non advection forces",substep,1);
 
     LOG::Time("effective velocity acceleration structures");
     // revalidate scalars and velocity in body's new position

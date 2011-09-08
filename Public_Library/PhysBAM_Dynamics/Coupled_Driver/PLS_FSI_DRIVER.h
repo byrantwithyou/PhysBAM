@@ -33,6 +33,7 @@ public:
     PLS_FSI_EXAMPLE<TV>& example;
     int current_frame;
     ARRAY<T,TV_INT> old_phi;
+    ARRAY<T,FACE_INDEX<TV::m> > face_velocities_scratch;
 
     PLS_FSI_DRIVER(PLS_FSI_EXAMPLE<TV>& example_input);
     virtual ~PLS_FSI_DRIVER();
