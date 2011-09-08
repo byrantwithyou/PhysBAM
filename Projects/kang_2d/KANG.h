@@ -147,7 +147,8 @@ public:
     void Initialize_Bodies() PHYSBAM_OVERRIDE;
     void Kang_Circle();
     void Poisson_Test();
-    void Viscosity_Test();
+    void Poiseuille_Flow_Test();
+    void Couette_Flow_Test();
     void Oscillating_Circle();
     void Test_Analytic_Velocity(T time);
     void Test_Analytic_Pressure(T time);

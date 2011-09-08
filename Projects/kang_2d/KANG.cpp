@@ -99,12 +99,10 @@ Parse_Options()
     solids_parameters.use_trapezoidal_rule_for_velocities=false;
     solids_parameters.implicit_solve_parameters.cg_restart_iterations=200;
     solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_cg;
-    //solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_cr;
     fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;
     fluids_parameters.domain_walls[2][1]=true;fluids_parameters.domain_walls[2][2]=true;
 
     fluids_parameters.use_slip=true;
-//    fluids_parameters.use_slip=parse_args->Is_Value_Set("-slip");
     test_system=parse_args->Is_Value_Set("-test_system");
     print_matrix=parse_args->Is_Value_Set("-print_matrix");
     output_iterators=parse_args->Is_Value_Set("-output_iterators");
@@ -120,9 +118,7 @@ Parse_Options()
     fluids_parameters.use_removed_positive_particles=true;fluids_parameters.use_removed_negative_particles=true;
     fluids_parameters.write_removed_positive_particles=true;fluids_parameters.write_removed_negative_particles=true;
     fluids_parameters.store_particle_ids=true;
-    // T default_removed_positive_particle_buoyancy_constant=fluids_parameters.removed_positive_particle_buoyancy_constant;
     fluids_parameters.removed_positive_particle_buoyancy_constant=0;
-    //solid_body_collection.print_residuals=true;
 
     max_dt=(T)(parse_args->Get_Double_Value("-max_dt")*s);
     exact_dt=(T)(parse_args->Get_Double_Value("-dt")*s);
@@ -159,6 +155,11 @@ Parse_Options()
             fluids_parameters.domain_walls[2][1]=true;fluids_parameters.domain_walls[2][2]=true;
             break;
         case 5:
+            fluids_parameters.grid->Initialize(resolution+1,resolution+1,-m,m,-m,m);
+            fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;
+            fluids_parameters.domain_walls[2][1]=false;fluids_parameters.domain_walls[2][2]=false;
+            break;
+        case 6:
             fluids_parameters.grid->Initialize(resolution+1,resolution+1,-m,m,-m,m);
             fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;
             fluids_parameters.domain_walls[2][1]=false;fluids_parameters.domain_walls[2][2]=false;
@@ -216,7 +217,7 @@ Initialize_Phi()
         SPHERE<TV> object(TV((T).5*m,(T).5*m),(T).2*m);
         for(UNIFORM_GRID_ITERATOR_CELL<TV> it(*fluids_parameters.grid);it.Valid();it.Next())
             phi(it.index)=-object.Signed_Distance(it.Location());}
-    else if(test_number==5){
+    else if(test_number==5 || test_number==6){
         for(UNIFORM_GRID_ITERATOR_CELL<TV> it(*fluids_parameters.grid);it.Valid();it.Next())
             phi(it.index)=it.Location().x;}
 }
@@ -271,14 +272,14 @@ Initialize_Bodies()
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     PARTICLES<TV>& particles=deformable_body_collection.particles;
-//    RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
 
     switch(test_number){
         case 1: Kang_Circle();break;
         case 2: Oscillating_Circle();break;
         case 3: Kang_Circle();break;
         case 4: Poisson_Test();break;
-        case 5: Viscosity_Test();break;
+        case 5: Poiseuille_Flow_Test();break;
+        case 6: Couette_Flow_Test();break;
         default: LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}
 
     if(fluids_parameters.viscosity) fluids_parameters.implicit_viscosity=false;
@@ -298,7 +299,8 @@ Initialize_Bodies()
     solid_body_collection.deformable_body_collection.soft_bindings.Set_Mass_From_Effective_Mass();
 
     for(int i=1;i<=solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->compute_half_forces=true;
-    for(int k=1;k<=solid_body_collection.deformable_body_collection.deformables_forces.m;k++) solid_body_collection.deformable_body_collection.deformables_forces(k)->compute_half_forces=true;
+    for(int k=1;k<=solid_body_collection.deformable_body_collection.deformables_forces.m;k++)
+        solid_body_collection.deformable_body_collection.deformables_forces(k)->compute_half_forces=true;
     for(int i=1;i<=solid_body_collection.rigid_body_collection.rigids_forces.m;i++) solid_body_collection.rigid_body_collection.rigids_forces(i)->compute_half_forces=true;
 }
 //#####################################################################
@@ -319,11 +321,9 @@ Kang_Circle()
         fluids_parameters.outside_density=(T)1*kg/(m*m);}
     if(parse_args->Is_Value_Set("-viscosity")) fluids_parameters.viscosity=(T)(parse_args->Get_Double_Value("-viscosity")*kg/s);
     fluids_parameters.cfl=(T).9;
-//    solids_parameters.write_static_variables_every_frame=true;
 
     solid_body_collection.Set_CFL_Number(10);
 
-//    fluids_parameters.second_order_cut_cell_method=false;
     fluids_parameters.use_particle_levelset=true;
 }
 //#####################################################################
@@ -340,16 +340,30 @@ Poisson_Test()
     fluids_parameters.use_particle_levelset=true;
 }
 //#####################################################################
-// Function Viscosity_Test
+// Function Poiseuille_Flow_Test
 //#####################################################################
 template<class T> void KANG<T>::
-Viscosity_Test()
+Poiseuille_Flow_Test()
 {
     fluids_parameters.gravity=(T)9.8*m/(s*s);
     fluids_parameters.density=(T)1*kg/(m*m);
     fluids_parameters.outside_density=(T)2*kg/(m*m);
     fluids_parameters.viscosity=(T)1*kg/s;
     fluids_parameters.outside_viscosity=(T)3*kg/s;
+    fluids_parameters.surface_tension=0;
+    fluids_parameters.use_particle_levelset=true;
+}
+//#####################################################################
+// Function Couette_Flow_Test
+//#####################################################################
+template<class T> void KANG<T>::
+Couette_Flow_Test()
+{
+    fluids_parameters.gravity=(T)0*m/(s*s);
+    fluids_parameters.density=(T)1*kg/(m*m);
+    fluids_parameters.outside_density=(T)2*kg/(m*m);
+    fluids_parameters.viscosity=(T)1*kg/s;
+    fluids_parameters.outside_viscosity=(T)1*kg/s;
     fluids_parameters.surface_tension=0;
     fluids_parameters.use_particle_levelset=true;
 }
@@ -361,7 +375,6 @@ Oscillating_Circle()
 {
     (*fluids_parameters.grid).Initialize(resolution,resolution,(T)0*m,(T)1*m,(T)0*m,(T)1*m,true);
     fluids_parameters.cfl=(T).9;
-//    solids_parameters.write_static_variables_every_frame=true;
 
     solid_body_collection.Set_CFL_Number(10);
 
@@ -375,40 +388,6 @@ Oscillating_Circle()
     omega=sqrt(oscillation_mode*(oscillation_mode*oscillation_mode-1)*fluids_parameters.surface_tension/(fluids_parameters.density*circle_radius*circle_radius*circle_radius));
     T period=(T)(2*pi/omega);
     LOG::cout<<"Analytic period of oscillation: "<<period<<std::endl;
-}
-template<class T>
-struct SINE_DIST:public NONLINEAR_FUNCTION<T(T)>
-{
-    T X,Y;
-    virtual ~SINE_DIST(){}
-    virtual T operator()(const T x) const
-    {
-        return (x-X)+(sin(x)-Y)*cos(x);
-    }
-};
-//#####################################################################
-// Function Initialize_Sine_Phi
-//#####################################################################
-template<class T> void KANG<T>::
-Initialize_Sine_Phi()
-{
-    const GRID<TV>& grid=*fluids_parameters.grid;
-    ARRAY<T,VECTOR<int,2> >& phi=fluids_parameters.particle_levelset_evolution->phi;
-    SINE_DIST<T> sd;
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
-        TV X=it.Location();
-        sd.X=X.x;
-        sd.Y=X.y;
-        T mx=ITERATIVE_SOLVER<T>().Bisection_Secant_Root(sd,-2,10);
-        T dist=(X-TV(mx,sin(mx))).Magnitude();
-        T sy=sin(X.x);
-        if(X.y<sy) phi(it.index)=dist;
-        else{
-            T l=grid.domain.min_corner.x-X.x+grid.dX.x*2;
-            T r=X.x-grid.domain.max_corner.x+grid.dX.x*2;
-            T t=X.y-grid.domain.max_corner.y+grid.dX.y*2;
-            T b=-dist;
-            phi(it.index)=std::max(std::max(l,r),std::max(t,b));}}
 }
 //#####################################################################
 // Function Test_Analytic_Velocity
@@ -541,6 +520,8 @@ Add_Debug_Particle(const TV& X, const VECTOR<typename TV::SCALAR,3>& color)
     (*color_attribute)(p)=color;
 }
 //#####################################################################
+// Function Postprocess_Frame
+//#####################################################################
 template<class T> void KANG<T>::
 Postprocess_Frame(const int frame)
 {
@@ -567,6 +548,7 @@ Postprocess_Substep(const T dt,const T time)
         LOG::cout<<"Vel at [.75,.5]: "<<interp.Clamped_To_Array(fluid_collection.incompressible_fluid_collection.face_velocities,p)<<std::endl;
         LOG::cout<<"Analytic Vel at [.75,.5]: "<<-omega*circle_perturbation*pow(T(.25)/circle_radius,oscillation_mode-1)*sin(omega*time)*TV(1,0)<<std::endl;
     }
+    if(test_number==5 || test_number==6) Initialize_Phi();
 }
 //#####################################################################
 // Function Debug_Particle_Set_Attribute
@@ -600,6 +582,15 @@ Set_Boundary_Conditions_Callback(ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX
                 Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));
                 psi_N(it.Full_Index())=true;
                 psi_N_value(it.Full_Index())=0;}}
+    if(test_number==6){
+        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(*fluids_parameters.grid,1,GRID<TV>::GHOST_REGION,1);it.Valid();it.Next()){
+            Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));
+            psi_N(it.Full_Index())=true;
+            psi_N_value(it.Full_Index())=-1;}
+        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(*fluids_parameters.grid,1,GRID<TV>::GHOST_REGION,2);it.Valid();it.Next()){
+            Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));
+            psi_N(it.Full_Index())=true;
+            psi_N_value(it.Full_Index())=1;}}
 }
 template class KANG<float>;
 template void PhysBAM::Add_Debug_Particle<VECTOR<float,1> >(VECTOR<float,1> const&,VECTOR<float,3> const&);
