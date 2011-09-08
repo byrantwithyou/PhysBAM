@@ -434,7 +434,7 @@ public:
     {return Domain_Indices(ghost_cells).Lazy_Inside(cell_index);}
 
     VECTOR<RANGE<TV_INT>,TV::dimension> Face_Indices(const int ghost_cells=0) const
-    {VECTOR<RANGE<TV_INT>,TV::dimension> v;for(int i=1;i<=TV::dimension;i++) v(i)=Get_Axis_X_Face_Grid(i).Node_Indices(ghost_cells);return v;}
+    {VECTOR<RANGE<TV_INT>,TV::dimension> v;for(int i=1;i<=TV::dimension;i++) v(i)=Get_Face_Grid(i).Node_Indices(ghost_cells);return v;}
 
     bool Outside(const TV& location) const
     {return domain.Lazy_Outside(location);}
@@ -445,21 +445,18 @@ public:
     GRID<TV> Get_Regular_Grid() const
     {return GRID<TV>(Numbers_Of_Nodes(),domain,false);}
 
-    GRID<TV> Get_Axis_X_Face_Grid(const int axis) const
+    GRID<TV> Get_Face_Grid(const int axis) const
     {TV_INT numbers=numbers_of_cells;numbers(axis)++;TV offset((T).5*dX);offset(axis)=0;
     return GRID<TV>(TV_INT::Componentwise_Max(TV_INT(),numbers),RANGE<TV>(domain.min_corner+offset,domain.max_corner-offset));}
 
     GRID<TV> Get_X_Face_Grid() const
-    {return Get_Axis_X_Face_Grid(1);}
+    {return Get_Face_Grid(1);}
 
     GRID<TV> Get_Y_Face_Grid() const
-    {return Get_Axis_X_Face_Grid(2);}
+    {return Get_Face_Grid(2);}
 
     GRID<TV> Get_Z_Face_Grid() const
-    {return Get_Axis_X_Face_Grid(3);}
-
-    GRID<TV> Get_Face_Grid(const int axis) const
-    {switch(axis){case 1:return Get_X_Face_Grid();case 2:return Get_Y_Face_Grid();default:assert(axis==3);return Get_Z_Face_Grid();}}
+    {return Get_Face_Grid(3);}
 
     GRID<TV> Get_Regular_Grid_At_MAC_Positions() const
     {assert(Is_MAC_Grid());TV expansion=(T).5*dX;return GRID<TV>(counts,RANGE<TV>(domain.min_corner+expansion,domain.max_corner-expansion));}
