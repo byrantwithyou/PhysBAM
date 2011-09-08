@@ -34,9 +34,13 @@ public:
     ~KANG_POISSON_VISCOSITY();
 
 //#####################################################################
-    void Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt,T time) const;
-    void Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt,T time) const;
+    void Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt) const;
+    void Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt,bool implicit) const;
+    void Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,int axis,T dt,bool implicit) const;
     T Pressure_Jump(const TV_INT& cell,T dt) const;
+    MATRIX<T,TV::m> Viscosity_Jump(const TV_INT& cell) const;
+    MATRIX<T,TV::m> Viscosity_Jump(const FACE_INDEX<TV::m>& cell) const;
+    T Face_Phi(const FACE_INDEX<TV::m>& face) const;
 //#####################################################################
 };
 }
