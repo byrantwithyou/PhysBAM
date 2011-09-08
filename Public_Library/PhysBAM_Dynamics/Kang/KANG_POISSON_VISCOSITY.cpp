@@ -312,8 +312,8 @@ Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,int axis,T dt,bool 
 
         T A=dt*mu_hat*one_over_dX_2(it.Axis()); // positive for diagonal, neg for off
 
-        if(!index1) b.v(index2)+=A*psi_N_value(face1);
-        if(!index2) b.v(index1)-=A*psi_N_value(face2);
+        if(!index1) b.v(index2)+=A*psi_N_value(face1)/r.v(index2);
+        if(!index2) b.v(index1)+=A*psi_N_value(face2)/r.v(index1);
 
         if(index1) helper.data.Append(TRIPLE<int,int,T>(index1,index1,A));
         if(index1 && index2) helper.data.Append(TRIPLE<int,int,T>(index1,index2,-A));
