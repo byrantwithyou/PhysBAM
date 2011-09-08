@@ -304,7 +304,7 @@ First_Order_Time_Step(int substep,T dt)
         slip->two_phase=example.two_phase;
         slip->Solve(fluid_collection.incompressible_fluid_collection.face_velocities,dt,time,time+dt,false,false);}
     else if(example.kang_poisson_viscosity){
-        example.kang_poisson_viscosity->Project_Fluid(fluid_collection.incompressible_fluid_collection.face_velocities,dt,time);}
+        example.kang_poisson_viscosity->Project_Fluid(fluid_collection.incompressible_fluid_collection.face_velocities,dt);}
     Write_Substep("pressure solve",substep,1);
 
     if(slip) slip->Print_Maximum_Velocities(time);
@@ -479,7 +479,7 @@ Advect_Fluid(const T dt,const int substep)
     Write_Substep("before viscosity",substep,1);
     if(SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>* coupled_evolution=dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>*>(example.solids_evolution))
         coupled_evolution->Apply_Viscosity(face_velocities,dt,time);
-    else if(example.kang_poisson_viscosity) example.kang_poisson_viscosity->Apply_Viscosity(face_velocities,dt,time);
+    else if(example.kang_poisson_viscosity) example.kang_poisson_viscosity->Apply_Viscosity(face_velocities,dt,fluids_parameters.implicit_viscosity);
 
     Write_Substep("after viscosity",substep,1);
     incompressible->Advance_One_Time_Step_Forces(face_velocities,dt,time,fluids_parameters.implicit_viscosity,&particle_levelset_evolution->phi,example.fluids_parameters.number_of_ghost_cells);

@@ -202,7 +202,7 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt) const
     SYSTEM system(matrix);
     system.P=matrix.C;
 
-    if(test_system) system.Test_System(rhs,k,z);
+    if(test_system) system.Test_System(r,k,z);
 
     static int solve_id=0;solve_id++;
     if(print_matrix){
@@ -220,7 +220,7 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt) const
     if(print_matrix) OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("x-%i.txt",solve_id).c_str()).Write("x",p.v);
 
     INTERPOLATED_COLOR_MAP<T> color_map;
-    color_map.Initialize_Colors(-.3,.3,false,false,false);
+    color_map.Initialize_Colors(-.3,.3,false,true,false);
 
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
         int ci=cell_index(it.index);
@@ -251,7 +251,6 @@ Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt,bool implicit)
 template<class TV> void KANG_POISSON_VISCOSITY<TV>::
 Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,int axis,T dt,bool implicit) const
 {
-    const ARRAY<T,TV_INT>& phi=fluids_parameters.particle_levelset_evolution->Levelset(1).phi;
     const GRID<TV>& grid=*fluids_parameters.grid;
     const GRID<TV> dual_grid=fluids_parameters.grid->Get_Axis_X_Face_Grid(axis).Get_MAC_Grid_At_Regular_Positions();
 
@@ -266,8 +265,8 @@ Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,int axis,T dt,bool 
     u.v.Resize(num_dual_cells);
     b.v.Resize(num_dual_cells);
     r.v.Resize(num_dual_cells); // used for density before solve
+    q.v.Resize(num_dual_cells);
     if(implicit){
-        q.v.Resize(num_dual_cells);
         s.v.Resize(num_dual_cells);
         k.v.Resize(num_dual_cells);
         z.v.Resize(num_dual_cells);}
@@ -286,7 +285,10 @@ Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,int axis,T dt,bool 
         FACE_INDEX<TV::m> face1(axis,dual_cell1),face2(axis,dual_cell2);
         int index1=dual_cell_index(dual_cell1),index2=dual_cell_index(dual_cell2);
         if(!index1 && !index2) continue;
-        if(psi_D(dual_cell1)) continue;
+        if(it.Axis()==axis){if(psi_D(dual_cell1)) continue;}
+        else{
+            if(!index1 && !psi_N(face1)) continue;
+            if(!index2 && !psi_N(face2)) continue;}
 
         T phi1=Face_Phi(face1),phi2=Face_Phi(face2);
         T mu_hat,mu1=(phi1<0)?mu_n:mu_p,muj=0;
@@ -303,7 +305,7 @@ Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,int axis,T dt,bool 
             if(index1) b.v(index1)+=muj*(1-theta)/(mu2*r.v(index1));
             if(index2) b.v(index2)+=muj*theta/(mu1*r.v(index2));}
 
-        T A=mu_hat*one_over_dX_2(it.Axis()); // positive for diagonal, neg for off
+        T A=dt*mu_hat*one_over_dX_2(it.Axis()); // positive for diagonal, neg for off
 
         if(!index1) b.v(index2)+=A*psi_N_value(face1);
         if(!index2) b.v(index1)-=A*psi_N_value(face2);
@@ -312,47 +314,48 @@ Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,int axis,T dt,bool 
         if(index1 && index2) helper.data.Append(TRIPLE<int,int,T>(index1,index2,-A));
         if(index1 && index2) helper.data.Append(TRIPLE<int,int,T>(index2,index1,-A));
         if(index2) helper.data.Append(TRIPLE<int,int,T>(index2,index2,A));}
-/*
+
+    if(implicit) for(int i=1;i<=r.v.n;i++) helper.data.Append(TRIPLE<int,int,T>(i,i,r.v(i)));
+
     SPARSE_MATRIX_FLAT_NXN<T> matrix;
     helper.Compact();
     helper.Set_Matrix(num_dual_cells,matrix);
-    typedef KRYLOV::MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_NXN<T>,T,KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > > SYSTEM;
-    matrix.Construct_Incomplete_Cholesky_Factorization();
-    SYSTEM system(matrix);
-    system.P=matrix.C;
-
-    if(test_system) system.Test_System(b,k,z);
 
     static int solve_id=0;solve_id++;
     if(print_matrix){
-        LOG::cout<<"pressure solve id "<<solve_id<<std::endl;
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("M-%i.txt",solve_id).c_str()).Write("M",matrix);
-        if(system.P) OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("Z-%i.txt",solve_id).c_str()).Write("Z",*system.P);
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("b-%i.txt",solve_id).c_str()).Write("b",rhs.v);}
+        LOG::cout<<"viscosity id "<<solve_id<<std::endl;
+        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("visc-rho-%i.txt",solve_id).c_str()).Write("rho",r.v);
+        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("visc-vM-%i.txt",solve_id).c_str()).Write("M",matrix);
+        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("visc-b-%i.txt",solve_id).c_str()).Write("b",b.v);}
 
-    CONJUGATE_RESIDUAL<T> cr;
-    CONJUGATE_GRADIENT<T> cg;
-    SYMMQMR<T> qm;
-    KRYLOV_SOLVER<T>* solver=&cg;
-    solver->restart_iterations=fluids_parameters.cg_restart_iterations;
-    solver->Solve(system,p,rhs,q,s,r,k,z,fluids_parameters.incompressible_tolerance,0,fluids_parameters.incompressible_iterations);
-    if(print_matrix) OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("x-%i.txt",solve_id).c_str()).Write("x",p.v);
+    if(implicit){
+        typedef KRYLOV::MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_NXN<T>,T,KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > > SYSTEM;
+        matrix.Construct_Incomplete_Cholesky_Factorization();
+        SYSTEM system(matrix);
+        system.P=matrix.C;
+        b.v*=r.v;
+        if(print_matrix && system.P) OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("visc-Z-%i.txt",solve_id).c_str()).Write("Z",*system.P);
+        CONJUGATE_RESIDUAL<T> cr;
+        CONJUGATE_GRADIENT<T> cg;
+        SYMMQMR<T> qm;
+        KRYLOV_SOLVER<T>* solver=&cg;
+        solver->restart_iterations=fluids_parameters.cg_restart_iterations;
+        if(test_system) system.Test_System(r,k,z);
+        solver->Solve(system,u,b,q,s,r,k,z,fluids_parameters.incompressible_tolerance,0,fluids_parameters.incompressible_iterations);
+    }
+    else{
+        matrix.Times(u.v,q.v);
+        q.v/=r.v;
+        u.v=b.v-q.v;}
+    if(print_matrix) OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("visc-u-%i.txt",solve_id).c_str()).Write("u",u.v);
 
     INTERPOLATED_COLOR_MAP<T> color_map;
-    color_map.Initialize_Colors(-.3,.3,false,false,false);
+    color_map.Initialize_Colors(u.v.Min(),u.v.Max(),false,true,false);
 
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(dual_grid);it.Valid();it.Next()){
-        int ci=cell_index(it.index);
-        T val=p.v(ci);
-        Add_Debug_Particle(it.Location(), color_map(val));}
-
-    int i=1;
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(dual_grid);it.Valid();it.Next(),i++){
-        T dp=0;
-        if(grad_helper(i).i) dp-=p.v(grad_helper(i).i);
-        if(grad_helper(i).j) dp+=p.v(grad_helper(i).j);
-        face_velocities(it.Full_Index())-=grad_helper(i).x*dp;}
-*/
+        int ci=dual_cell_index(it.index);
+        T val=u.v(ci);
+        Add_Debug_Particle(it.Location(),color_map(val));}
 }
 template class KANG_POISSON_VISCOSITY<VECTOR<float,1> >;
 template class KANG_POISSON_VISCOSITY<VECTOR<float,2> >;
