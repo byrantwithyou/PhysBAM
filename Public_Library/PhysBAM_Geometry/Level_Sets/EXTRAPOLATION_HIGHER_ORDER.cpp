@@ -174,7 +174,7 @@ template<class TV,class T2> void EXTRAPOLATION_HIGHER_ORDER<TV,T2>::
 Extrapolate_Face(const GRID<TV>& grid,const T_LEVELSET& phi,int ghost,ARRAY<T2,FACE_INDEX<TV::m> >& u,int iterations,int order,T distance)
 {
     for(int i=1;i<=TV::m;i++){
-        GRID<TV> node_grid(grid.Get_Axis_X_Face_Grid(i));
+        GRID<TV> node_grid(grid.Get_Face_Grid(i));
         Extrapolate_Node(node_grid,phi,ghost,u.Component(i),iterations,order,distance);}
 }
 template class EXTRAPOLATION_HIGHER_ORDER<VECTOR<float,1>,float>;
