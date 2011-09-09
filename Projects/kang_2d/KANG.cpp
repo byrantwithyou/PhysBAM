@@ -231,7 +231,7 @@ Preprocess_Substep(const T dt,const T time)
 template<class T> void KANG<T>::
 Preprocess_Frame(const int frame)
 {
-    if(test_number==6 && frame==1){
+    if(0 && test_number==6 && frame==1){
         ARRAY<T,FACE_INDEX<TV::m> >& u=fluid_collection.incompressible_fluid_collection.face_velocities;
         T mu0=fluids_parameters.viscosity;
         T mu1=fluids_parameters.outside_viscosity;
@@ -370,7 +370,7 @@ Couette_Flow_Test()
     fluids_parameters.outside_viscosity=(T)2*kg/s;
     fluids_parameters.surface_tension=0;
     fluids_parameters.use_particle_levelset=true;
-    uleft=1*m/s;
+    uleft=-1*m/s;
     uright=1*m/s;
 }
 //#####################################################################
