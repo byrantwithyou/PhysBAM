@@ -91,9 +91,11 @@ Viscosity_Jump(const TV_INT& cell) const
         TV v2=face_velocities_ghost.Cell_Centered_Average(cellp);
         du.Column(d)=(T).5*fluids_parameters.grid->one_over_dX(d)*(v2-v1);}
 
-    TV two_du_n=(T)2*du*N;
-    MATRIX<T,TV::m> J2=du+MATRIX<T,TV::m>::Outer_Product(TV::Dot_Product(two_du_n,N)*N-two_du_n,N);
-    return J2*(fluids_parameters.outside_viscosity-fluids_parameters.viscosity);
+    T dmu=fluids_parameters.outside_viscosity-fluids_parameters.viscosity;
+    MATRIX<T,TV::m> NN=MATRIX<T,TV::m>::Outer_Product(N,N),TT=(T)1-NN;
+    MATRIX<T,TV::m> J=dmu*(du*TT+NN*du*NN-NN*du*TT);
+    LOG::cout<<cell<<"     "<<J<<std::endl;
+    return J;
 }
 //#####################################################################
 // Function Viscosity_Jump

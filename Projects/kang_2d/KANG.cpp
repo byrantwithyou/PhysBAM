@@ -237,6 +237,16 @@ Preprocess_Substep(const T dt,const T time)
 template<class T> void KANG<T>::
 Preprocess_Frame(const int frame)
 {
+    if(test_number==6 && frame==1){
+        ARRAY<T,FACE_INDEX<TV::m> >& u=fluid_collection.incompressible_fluid_collection.face_velocities;
+        T mu0=fluids_parameters.viscosity;
+        T mu1=fluids_parameters.outside_viscosity;
+        T v0=(mu1-mu0)/(mu1+mu0);
+        T dx=fluids_parameters.grid->dX(1);
+        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(*fluids_parameters.grid,0,GRID<TV>::WHOLE_REGION,0,2);it.Valid();it.Next()){
+            TV x=it.Location();
+            if(x.x>0) u(it.Full_Index())=(1-v0)/(1+dx/2)*x.x+v0;
+            else u(it.Full_Index())=(1+v0)/(1+dx/2)*x.x+v0;}}
 }
 //#####################################################################
 // Function Initialize_Velocities
@@ -361,9 +371,9 @@ Couette_Flow_Test()
 {
     fluids_parameters.gravity=(T)0*m/(s*s);
     fluids_parameters.density=(T)1*kg/(m*m);
-    fluids_parameters.outside_density=(T)2*kg/(m*m);
+    fluids_parameters.outside_density=(T)1*kg/(m*m);
     fluids_parameters.viscosity=(T)1*kg/s;
-    fluids_parameters.outside_viscosity=(T)1*kg/s;
+    fluids_parameters.outside_viscosity=(T)2*kg/s;
     fluids_parameters.surface_tension=0;
     fluids_parameters.use_particle_levelset=true;
 }
