@@ -94,7 +94,6 @@ Viscosity_Jump(const TV_INT& cell) const
     T dmu=fluids_parameters.outside_viscosity-fluids_parameters.viscosity;
     MATRIX<T,TV::m> NN=MATRIX<T,TV::m>::Outer_Product(N,N),TT=(T)1-NN;
     MATRIX<T,TV::m> J=dmu*(du*TT+NN*du*NN-NN*du*TT);
-    LOG::cout<<cell<<"     "<<J<<std::endl;
     return J;
 }
 //#####################################################################
