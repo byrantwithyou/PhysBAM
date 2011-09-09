@@ -81,6 +81,7 @@ public:
     using BASE::Add_Volumetric_Body_To_Fluid_Simulation;using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::two_phase;
     using BASE::parse_args;using BASE::test_number;using BASE::resolution;using BASE::data_directory;using BASE::convection_order;using BASE::use_pls_evolution_for_structure;
     using BASE::Mark_Outside;using BASE::use_kang;using BASE::print_matrix;using BASE::test_system;
+    using BASE::m;using BASE::s;using BASE::kg;
 
     SOLIDS_STANDARD_TESTS<TV> solids_tests;
 
@@ -95,9 +96,9 @@ public:
     T circle_perturbation;
     int oscillation_mode;
     bool make_ellipse;
-    T m,s,kg;
     T omega;
     T laplace_number,surface_tension;
+    T uleft,uright;
 
     KANG(const STREAM_TYPE stream_type);
     virtual ~KANG();

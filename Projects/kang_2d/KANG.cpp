@@ -18,8 +18,8 @@ using namespace PhysBAM;
 template<class T> KANG<T>::
 KANG(const STREAM_TYPE stream_type)
     :BASE(stream_type,1),solids_tests(*this,solid_body_collection),output_iterators(false),max_dt(0),exact_dt(0),
-    circle_radius(0),circle_perturbation(0),oscillation_mode(0),make_ellipse(false),m(1),s(1),kg(1),
-    omega(0),laplace_number(0)
+    circle_radius(0),circle_perturbation(0),oscillation_mode(0),make_ellipse(false),
+    omega(0),laplace_number(0),uleft(0),uright(0)
 {
     LOG::cout<<std::setprecision(16);
     debug_particles.array_collection->template Add_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
@@ -58,9 +58,6 @@ Register_Options()
     parse_args->Add_Integer_Argument("-oscillation_mode",2);
     parse_args->Add_Option_Argument("-make_ellipse");
     parse_args->Add_Double_Argument("-epsilon",.05);
-    parse_args->Add_Double_Argument("-m",1,"length unit");
-    parse_args->Add_Double_Argument("-s",1,"time unit");
-    parse_args->Add_Double_Argument("-kg",1,"mass unit");
 }
 //#####################################################################
 // Function Parse_Options
@@ -72,9 +69,6 @@ Parse_Options()
     last_frame=100;
     frame_rate=24;
 
-    kg=(T)parse_args->Get_Double_Value("-kg");
-    m=(T)parse_args->Get_Double_Value("-m");
-    s=(T)parse_args->Get_Double_Value("-s");
     frame_rate/=s;
 
     fluids_parameters.cfl=(T).9;
@@ -241,12 +235,12 @@ Preprocess_Frame(const int frame)
         ARRAY<T,FACE_INDEX<TV::m> >& u=fluid_collection.incompressible_fluid_collection.face_velocities;
         T mu0=fluids_parameters.viscosity;
         T mu1=fluids_parameters.outside_viscosity;
-        T v0=(mu1-mu0)/(mu1+mu0);
+        T v0=(mu1*uright+mu0*uleft)/(mu1+mu0);
         T dx=fluids_parameters.grid->dX(1);
         for(UNIFORM_GRID_ITERATOR_FACE<TV> it(*fluids_parameters.grid,0,GRID<TV>::WHOLE_REGION,0,2);it.Valid();it.Next()){
             TV x=it.Location();
-            if(x.x>0) u(it.Full_Index())=(1-v0)/(1+dx/2)*x.x+v0;
-            else u(it.Full_Index())=(1+v0)/(1+dx/2)*x.x+v0;}}
+            if(x.x>0) u(it.Full_Index())=(uright-v0)/(1+dx/2)*x.x+v0;
+            else u(it.Full_Index())=(-uleft+v0)/(1+dx/2)*x.x+v0;}}
 }
 //#####################################################################
 // Function Initialize_Velocities
@@ -376,6 +370,8 @@ Couette_Flow_Test()
     fluids_parameters.outside_viscosity=(T)2*kg/s;
     fluids_parameters.surface_tension=0;
     fluids_parameters.use_particle_levelset=true;
+    uleft=1*m/s;
+    uright=1*m/s;
 }
 //#####################################################################
 // Function Oscillating_Circle
@@ -596,11 +592,11 @@ Set_Boundary_Conditions_Callback(ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX
         for(UNIFORM_GRID_ITERATOR_FACE<TV> it(*fluids_parameters.grid,1,GRID<TV>::GHOST_REGION,1);it.Valid();it.Next()){
             Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));
             psi_N(it.Full_Index())=true;
-            psi_N_value(it.Full_Index())=-1;}
+            psi_N_value(it.Full_Index())=uleft;}
         for(UNIFORM_GRID_ITERATOR_FACE<TV> it(*fluids_parameters.grid,1,GRID<TV>::GHOST_REGION,2);it.Valid();it.Next()){
             Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));
             psi_N(it.Full_Index())=true;
-            psi_N_value(it.Full_Index())=1;}}
+            psi_N_value(it.Full_Index())=uright;}}
 }
 template class KANG<float>;
 template void PhysBAM::Add_Debug_Particle<VECTOR<float,1> >(VECTOR<float,1> const&,VECTOR<float,3> const&);

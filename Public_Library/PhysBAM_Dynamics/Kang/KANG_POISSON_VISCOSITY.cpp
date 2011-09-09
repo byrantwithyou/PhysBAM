@@ -305,10 +305,10 @@ Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,int axis,T dt,bool 
         else{
             T mu2=(phi2<0)?mu_n:mu_p;
             T theta=phi1/(phi1-phi2);
-            mu_hat=mu1*mu2/(theta*mu1+(1-theta)*mu2);
+            mu_hat=mu1*mu2/(theta*mu2+(1-theta)*mu1);
             muj=Viscosity_Jump(face1)(axis,it.Axis())*(1-theta)+Viscosity_Jump(face2)(axis,it.Axis())*theta;
             if(phi1<0) muj=-muj;
-            muj*=mu_hat*dual_grid.one_over_dX(it.Axis());
+            muj*=mu_hat*dt*dual_grid.one_over_dX(it.Axis());
             if(index1) b.v(index1)+=muj*(1-theta)/(mu2*r.v(index1));
             if(index2) b.v(index2)+=muj*theta/(mu1*r.v(index2));}
 

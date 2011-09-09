@@ -68,6 +68,7 @@ public:
     bool print_matrix;
     bool test_system;
     KANG_POISSON_VISCOSITY<TV>* kang_poisson_viscosity;
+    T m,s,kg;
 
     PLS_FSI_EXAMPLE(const STREAM_TYPE stream_type,const int number_of_regions);
     ~PLS_FSI_EXAMPLE();
