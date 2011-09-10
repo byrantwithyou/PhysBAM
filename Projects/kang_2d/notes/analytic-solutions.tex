@@ -1,0 +1,73 @@
+\documentclass{article}
+\usepackage{fullpage}
+\usepackage{amsmath}
+
+\newcommand{\q}{\quad\quad}
+\newcommand{\gp}[1]{{\left({#1}\right)}}
+\newcommand{\z}{\mathbf{0}}
+\newcommand{\tr}{\mbox{tr}}
+\newcommand{\uu}{\mathbf{u}}
+\newcommand{\II}{\mathbf{I}}
+\renewcommand{\gg}{\mathbf{g}}
+\renewcommand{\uu}{\mathbf{u}}
+\newcommand{\nn}{\mathbf{n}}
+\renewcommand{\tt}{\mathbf{t}}
+%\newcommand{\ta}{\mbox{\boldmath{\ensuremath{\tau}}}}
+\newcommand{\ta}{\pmb{\tau}}
+\newcommand{\mx}[1]{\begin{pmatrix} #1 \end{pmatrix}}
+\newcommand{\px}[2]{\frac{\partial #1}{\partial #2}}
+
+\begin{document}
+
+\section{Navier-Stokes Equations}
+
+$$ \rho \uu_t + \rho (\uu \cdot \nabla) \uu + \nabla p = \nabla\cdot \ta + \rho \gg $$
+
+$$ \ta = \mu (\nabla \uu + \nabla \uu^T) $$
+
+$$ \left[ \mx{\nn & \tt}^T (p \II - \ta) \nn \right] = \mx{\sigma \kappa \\ 0} $$
+
+$$ \nabla \cdot \uu = 0 $$
+
+\section{Poiseuille Flow}
+
+Poisseuille Flow describes steady state flow through a long, narrow channel.  We assume no-slip boundary conditions on the channel walls, with the additional assumption that the channel
+has infinite length. We assume the flow to be parallel to the channel and laminar, so that $u = 0$.  We also assume translational symmetry along the channel, so that $\px{v}{y}=0$.
+Since we will introduce an interface with a jump discontinuity across it, it will be convenient to treat boundary conditions later.  With these assumptions, we have
+$$ \uu = \mx{0 \\ v} \q \nabla\uu = \mx{0 & 0 \\ v_x & 0} \q \ta = \mu v_x \mx{0 & 1 \\ 1 & 0} \q \uu_t = \z$$
+$$ (\uu \cdot \nabla) \uu = \nabla\uu \uu = \mx{0 & 0 \\ v_x & 0} \mx{0 \\ v} = \z \q \nabla \cdot \uu = \tr\mx{0 & 0 \\ v_x & 0} = 0 $$
+$$ \nabla p = \mx{p_x \\ p_y} \q \nabla\cdot \ta = \mx{0 \\ \mu v_{xx}} \q \rho \gg = \mx{0 \\ -\rho g} $$
+$$ \mx{p_x \\ p_y} = \mx{0 \\ \mu v_{xx} - \rho g} \q p_x = 0 \q \mu v_{xx} = p_y + \rho g $$
+$$ \nn = \mx{1 \\ 0} \q \tt = \mx{0 \\ 1} $$
+We note that there are many solutions to the last equation, since there could be a pressure gradient forcing the fluid to flow in addition to gravity.  We assume that there is no such
+pressure gradient, so that $p_y = 0$.  This implies that pressure is constant, and it leads to
+$$ v = \frac{\rho g}{2 \mu} x^2 + a x + b, $$
+for some constants $a$ and $b$.
+
+Next, consider that the left wall is at $x = -w$, the interface is at $x = 0$, and the right wall is at $x = w$.  The velocity to the left of the interface is $v^-$ with density $\rho^-$
+and viscosity $\mu^-$.  Similarly, $v^+$, $\rho^+$, and $\mu^+$ describe the fluid to the right of the interface.  We assume density and viscosity are piecewise constant.  Assuming that
+a velocity of $v^0$ is obtained at the interface, the boundary conditions lead to
+$$ v^- = \frac{\rho^- g}{2 \mu^-} x^2 + \gp{\frac{\rho^- g}{2 \mu^-} w + \frac{v^0}{w}} x + v^0 \q v^+ = \frac{\rho^+ g}{2 \mu^+} x^2 - \gp{\frac{\rho^+ g}{2 \mu^+} w + \frac{v^0}{w}} x
++ v^0 $$
+To find $v^0$, we need to consider jump conditions.
+$$ \mx{\sigma \kappa \\ 0} = \z \q \left[ \mx{\nn & \tt}^T (p \II - \ta) \nn \right] = [p] \mx{1 \\ 0}  - [\mu v_x] \mx{0 \\ 1} \q [p] = 0 \q [\mu v_x] = 0 $$
+$$ 0 = [\mu v_x] = \mu^+ \gp{-\frac{\rho^+ g}{2 \mu^+} w - \frac{v^0}{w}} - \mu^- \gp{\frac{\rho^- g}{2 \mu^-} w + \frac{v^0}{w}} = 
+-\frac{g w (\rho^+ + \rho^-)}{2} - \frac{v^0 (\mu^+ + \mu^-)}{w} $$
+$$ v^0  = -\frac{g w^2 (\rho^+ + \rho^-)}{2 (\mu^+ + \mu^-)} $$
+
+\section{Couette Flow}
+
+Couette Flow describes steady state shearing flow through a long, narrow channel.  We assume no-slip forced boundary conditions on the channel walls, with the additional assumption that
+the channel has infinite length. We assume the flow to be parallel to the channel and laminar, so that $u = 0$.  We also assume translational symmetry along the channel, so that
+$\px{v}{y}=0$.  Since we will introduce an interface with a jump discontinuity across it, it will be convenient to treat boundary conditions later.  This case differs from Poiseuille
+Flow in that $g = 0$, so that $v = a x + b$.  With an interface in the middle of the channel, the new boundary conditions are $v = v_L$ at $x = -w$ and $v=v_R$ at $x = w$.
+$$ v^+ = \frac{v_R - v^0}{w} x + v^0 \q v^- = -\frac{v_L - v^0}{w} x + v^0 $$
+The jump conditions are the same as before, so
+$$ \mu^+ \frac{v_R - v^0}{w} + \mu^- \frac{v_L - v^0}{w} = 0 \q v^0 = \frac{\mu^- v_L + \mu^+ v_R}{\mu^+ + \mu^-} $$
+
+\section{Circular Couette Flow}
+
+
+
+\end{document}
+
