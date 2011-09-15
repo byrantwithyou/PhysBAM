@@ -8,7 +8,10 @@
 //   2. Oscillating deformed circle
 //   3. Two-phase rising bubble test
 //   4. Poisson Test
-//   5. Viscosity Test
+//   5. Poiseuille Flow Test
+//   6. Couette Flow Test
+//   7. Circular Couette Flow Test
+//   9. Kang Example 1
 //#####################################################################
 #ifndef __KANG__
 #define __KANG__
@@ -150,6 +153,8 @@ public:
     void Poisson_Test();
     void Poiseuille_Flow_Test();
     void Couette_Flow_Test();
+    void Circular_Couette_Flow_Test();
+    void Kang_Example_1();
     void Oscillating_Circle();
     void Test_Analytic_Velocity(T time);
     void Test_Analytic_Pressure(T time);

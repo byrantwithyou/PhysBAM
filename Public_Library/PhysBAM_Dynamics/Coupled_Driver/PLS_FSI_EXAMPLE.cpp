@@ -435,13 +435,14 @@ Set_Boundary_Conditions(ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX<TV::dime
     psi_D_value.Fill(0);
     psi_N_value.Fill(0);
 
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(*fluids_parameters.grid,3,GRID<TV>::GHOST_REGION); it.Valid(); it.Next()){
+    GRID<TV>& grid=*fluids_parameters.grid;
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,3,GRID<TV>::GHOST_REGION);it.Valid();it.Next()){
         psi_D(it.index)=true;
         Add_Debug_Particle(it.Location(), VECTOR<T,3>(1,0,0));}
     for(int d=1;d<=TV::m;d++)
         for(int i=1;i<=2;i++)
             if(fluids_parameters.domain_walls(d)(i))
-                for(UNIFORM_GRID_ITERATOR_FACE<TV> it(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,i+2*(d-1),0); it.Valid(); it.Next()){
+                for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,0,GRID<TV>::BOUNDARY_REGION,i+2*(d-1),0);it.Valid();it.Next()){
                     psi_N(it.Full_Index())=true;
                     Add_Debug_Particle(it.Location(),VECTOR<T,3>(0,1,0));}
 
