@@ -162,6 +162,9 @@ Parse_Options()
             break;
         case 7:
             grid.Initialize(resolution+1,resolution+1,-m,m,-m,m);
+            r_n = (T)0.2*m;
+            r_I = (T)0.6*m;
+            r_p = (T)1.0*m;
             break;
         case 9:
             grid.Initialize(resolution+1,3*resolution/2+1,-(T)0.01*m,+(T)0.01*m,-(T)0.01*m,(T)0.02*m);
@@ -231,7 +234,7 @@ Initialize_Phi()
                 phi(it.index)=it.Location().x;
             break;}
         case 7:{
-            SPHERE<TV> object(TV((T)0.0*m,(T)0.0*m),(T)0.6*m);
+            SPHERE<TV> object(TV((T)0.0*m,(T)0.0*m),r_I*m);
             for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
                 phi(it.index)=object.Signed_Distance(it.Location());
             break;}
@@ -417,8 +420,8 @@ Circular_Couette_Flow_Test()
     fluids_parameters.outside_viscosity=(T)1*kg/s;
     fluids_parameters.surface_tension=0;
     fluids_parameters.use_particle_levelset=true;
-    uleft=1*m/s;
-    uright=1*m/s;
+    u_n0=1*m/s;
+    u_p0=1*m/s;
 }
 //#####################################################################
 // Function Kang_Example_1
@@ -670,20 +673,28 @@ Set_Boundary_Conditions_Callback(ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX
                 psi_N(it.Full_Index())=true;
                 psi_N_value(it.Full_Index())=uright;}
             break;
-        case 7:
+        case 7:{
+            T mu_n=fluids_parameters.viscosity;
+            T mu_p=fluids_parameters.outside_viscosity;
+            T w_n=mu_n*r_n*(r_p*r_p-r_I*r_I),w_p=mu_p*r_p*(r_I*r_I-r_n*r_n);
+            T u_I0=r_I*(w_n*u_n0+w_p*u_p0)/(w_n*r_n+w_p*r_p);
+            T a_n=(r_I*u_I0-r_n*u_n0)/(r_I*r_I-r_n*r_n);
+            T a_p=(r_p*u_p0-r_I*u_I0)/(r_p*r_p-r_I*r_I);
+            T b_n=r_I*r_n*(r_I*u_n0-r_n*u_I0)/(r_I*r_I-r_n*r_n);
+            T b_p=r_p*r_I*(r_p*u_nI-r_I*u_p0)/(r_p*r_p-r_I*r_I);
             for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
-                TV x=it.Location();
-                psi_D(it.index)=x.Magnitude()<=(T)0.2 || (T)1.0<=x.Magnitude();}
+                T r=it.Location().Magnitude();
+                psi_D(it.index)=r<=r_n || r_p<=r;}
             for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
                 TV_INT cell1=it.First_Cell_Index(),cell2=it.Second_Cell_Index();
                 if(!psi_D(cell1) && !psi_D(cell2)) continue;
-                TV x=it.Location();
-                T uboundary=x.Magnitude()<(T)0.6?uleft:uright;
                 psi_N(it.Full_Index())=true;
-                //psi_N_value(it.Full_Index())=uboundary*TV(-x.y/std::abs(x.y),x.x/std::abs(x.x))[it.Axis()];
-                psi_N_value(it.Full_Index())=(uboundary/x.Magnitude())*TV(-x.y,x.x)[it.Axis()];
-            }
-            break;
+                TV x=it.Location();
+                T r=x.Magnitude();
+                if(r!=0){
+                    T u=r<r_I?a_n*r+beta_n/r:a_p*r+beta_p/r;
+                    psi_N_value(it.Full_Index())=u*TV(-x.y/r,x.x/r)[it.Axis()];}}
+            break;}
         case 9:
             //assert(!psi_D(TV_INT::All_Ones_Vector()));
             //psi_D(TV_INT::All_Ones_Vector())=true;

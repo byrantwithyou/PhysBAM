@@ -101,7 +101,11 @@ public:
     bool make_ellipse;
     T omega;
     T laplace_number,surface_tension;
+
     T uleft,uright;
+
+    // for Circular Couette and Poiseuille flow tests
+    T r_n,r_I,r_p,u_n0,u_p0;
 
     KANG(const STREAM_TYPE stream_type);
     virtual ~KANG();
