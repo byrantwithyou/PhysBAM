@@ -7,7 +7,7 @@ env=env.Copy(USE_RENDERING=1,USE_OPENGL=0,USE_MPI=0)
 Generic_Render=Automatic_Library(env,'PhysBAM_Generic_Render',['Generic'])
 libsuffix=""
 if not env['shared']: libsuffix="_static"
-env.Append(LIBS=["PhysBAM_Generic_Render"+libsuffix],LIBPATH=['#'+variant_build+'/Projects/Archives/ray_tracing'],RPATH=[Dir('#'+variant_build+'/Projects/Archives/ray_tracing').abspath])
+env.Append(LIBS=["PhysBAM_Generic_Render"+libsuffix],LIBPATH=['#'+variant_build+'/Projects/ray_tracing'],RPATH=[Dir('#'+variant_build+'/Projects/ray_tracing').abspath])
 
 # ray_tracing_preview
 envpreview=env.Copy(USE_OPENGL=1)

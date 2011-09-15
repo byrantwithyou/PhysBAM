@@ -4,9 +4,6 @@
 //#####################################################################
 // Namespace CONTACT_PAIRS
 //##################################################################### 
-#ifndef __LEVELSET_CONTACT_PAIR__
-#define __LEVELSET_CONTACT_PAIR__
-
 #include <PhysBAM_Tools/Matrices/FRAME.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
@@ -91,4 +88,3 @@ INSTANTIATION_HELPER(double,3);
 #endif
 }
 }
-#endif

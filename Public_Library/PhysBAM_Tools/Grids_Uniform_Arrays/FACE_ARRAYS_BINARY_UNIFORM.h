@@ -63,6 +63,9 @@ public:
     ARRAY& operator+=(const ARRAY& a)
     {for(int side=1;side<=2;side++)for(int i=1;i<=dimension;i++) Component(side,i)+=a.Component(side,i);return *this;}
 
+    ARRAY& operator-=(const ARRAY& a)
+    {for(int side=1;side<=2;side++)for(int i=1;i<=dimension;i++) Component(side,i)-=a.Component(side,i);return *this;}
+
     void Resize(const RANGE<TV_INT>& domain,const bool initialize_new_elements=true,const bool copy_existing_elements=true,const T& initialization_value=T())
     {BASE::Resize(domain,initialize_new_elements,copy_existing_elements,initialization_value);u2.Resize(domain,initialize_new_elements,copy_existing_elements,initialization_value);}
 

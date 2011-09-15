@@ -4,6 +4,7 @@
 //#####################################################################
 #include <PhysBAM_Tools/Arrays_Computations/SORT.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/SYSTEM_MATRIX_HELPER.h>
 using namespace PhysBAM;
@@ -65,6 +66,20 @@ Set_Matrix(int m,int n,SPARSE_MATRIX_FLAT_MXN<T>& M) const
     M.m=m;
     M.A.Remove_All();
     M.offsets.Resize(m+1);
+    for(int i=1;i<=data.m;i++) M.offsets(data(i).x+1)++;
+    for(int i=1;i<M.offsets.m;i++) M.offsets(i+1)+=M.offsets(i);
+    for(int i=1;i<=data.m;i++) M.A.Append(SPARSE_MATRIX_ENTRY<T>(data(i).y,data(i).z));
+}
+//#####################################################################
+// Function Set_Matrix
+//#####################################################################
+template<class T> void SYSTEM_MATRIX_HELPER<T>::
+Set_Matrix(int n,SPARSE_MATRIX_FLAT_NXN<T>& M) const
+{
+    M.Reset();
+    M.n=n;
+    M.A.Remove_All();
+    M.offsets.Resize(n+1);
     for(int i=1;i<=data.m;i++) M.offsets(data(i).x+1)++;
     for(int i=1;i<M.offsets.m;i++) M.offsets(i+1)+=M.offsets(i);
     for(int i=1;i<=data.m;i++) M.A.Append(SPARSE_MATRIX_ENTRY<T>(data(i).y,data(i).z));

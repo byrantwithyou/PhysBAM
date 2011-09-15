@@ -393,7 +393,7 @@ def Name_From_Library(env,library):
         return name[3:]
 
 # Generate a wrapper on Posix 
-wrapper_template_file=File('#Scripts/Archives/scons/wrapper_template')
+wrapper_template_file=File('#Scripts/scons/wrapper_template')
 wrapper_template=None
 def Generate_Wrapper(source,target,env):
     global wrapper_template,wrapper_template_file
@@ -512,10 +512,10 @@ Find_SConscripts(env,'Tests')
 Find_SConscripts(env,'Tools')
 if os.path.exists('Scripts/SConscript'):
     env.SConscript(variant_build+'/Scripts/SConscript')
-if os.path.exists('Personal_Libraries/Archives/Andy_Library'):
-    env.SConscript(variant_build+'/Personal_Libraries/Archives/Andy_Library/modeling/SConscript')
-    env.SConscript(variant_build+'/Personal_Libraries/Archives/Andy_Library/hair_modeling/SConscript')
-    env.SConscript(variant_build+'/Personal_Libraries/Archives/Andy_Library/rendering/SConscript')
-if os.path.exists('Personal_Libraries/Archives/Craig_Library'):
-    env.SConscript(variant_build+'/Personal_Libraries/Archives/Craig_Library/Utilities/Rendering/SConscript')
-    env.SConscript(variant_build+'/Personal_Libraries/Archives/Craig_Library/Utilities/Mesh_Manipulation/SConscript')
+if os.path.exists('Personal_Libraries/Andy_Library'):
+    env.SConscript(variant_build+'/Personal_Libraries/Andy_Library/modeling/SConscript')
+    env.SConscript(variant_build+'/Personal_Libraries/Andy_Library/hair_modeling/SConscript')
+    env.SConscript(variant_build+'/Personal_Libraries/Andy_Library/rendering/SConscript')
+if os.path.exists('Personal_Libraries/Craig_Library'):
+    env.SConscript(variant_build+'/Personal_Libraries/Craig_Library/Utilities/Rendering/SConscript')
+    env.SConscript(variant_build+'/Personal_Libraries/Craig_Library/Utilities/Mesh_Manipulation/SConscript')

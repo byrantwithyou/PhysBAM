@@ -34,7 +34,7 @@ for file,destfile in files:
     shutil.copy(file,destdir+"/"+destfile)
 
 print "Writing wrapper script"
-wrapper=open(os.path.join(os.environ["PHYSBAM"],"Scripts","Archives","scons","wrapper_template")).read()%(".",".",destbinary)
+wrapper=open(os.path.join(os.environ["PHYSBAM"],"Scripts","scons","wrapper_template")).read()%(".",".",destbinary)
 open(os.path.join(destdir,os.path.basename(binary)),"w").write(wrapper)
 os.chmod(os.path.join(destdir,os.path.basename(binary)),0755)
 

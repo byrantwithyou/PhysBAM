@@ -30,6 +30,7 @@ template<class TV> class RIGID_BODY;
 template<class TV> class SOLIDS_FLUIDS_PARAMETERS;
 template<class TV> class SOLID_BODY_COLLECTION;
 template<class T_GRID> class LAPLACE_UNIFORM;
+template<class TV> class KANG_POISSON_VISCOSITY;
 
 template<class TV>
 class PLS_FSI_EXAMPLE:public EXAMPLE<TV>,public EXAMPLE_FORCES_AND_VELOCITIES<TV>,public SOLIDS_EVOLUTION_CALLBACKS<TV>,public SOLIDS_FLUIDS_CALLBACKS<TV>,
@@ -63,6 +64,11 @@ public:
     int convection_order;
     bool use_pls_evolution_for_structure;
     bool two_phase;
+    bool use_kang;
+    bool print_matrix;
+    bool test_system;
+    KANG_POISSON_VISCOSITY<TV>* kang_poisson_viscosity;
+    T m,s,kg;
 
     PLS_FSI_EXAMPLE(const STREAM_TYPE stream_type,const int number_of_regions);
     ~PLS_FSI_EXAMPLE();
@@ -124,6 +130,10 @@ public:
     virtual void Update_Melting_Substep_Parameters(const T dt,const T time){}
     void Parse_Late_Options() PHYSBAM_OVERRIDE;
     template<class T_MPI> void Adjust_Output_Directory_For_MPI(const T_MPI mpi);
+    virtual void Set_Boundary_Conditions_Callback(ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX<TV::dimension> >& psi_N,ARRAY<T,TV_INT>& psi_D_value,
+        ARRAY<T,FACE_INDEX<TV::dimension> >& psi_N_value) const {PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
+    void Set_Boundary_Conditions(ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX<TV::dimension> >& psi_N,ARRAY<T,TV_INT>& psi_D_value,
+        ARRAY<T,FACE_INDEX<TV::dimension> >& psi_N_value) const;
 };
 }
 #endif

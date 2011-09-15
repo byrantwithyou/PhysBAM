@@ -17,7 +17,7 @@ public:
 
     LINEAR_INTERPOLATION_MAC(GRID<TV>& grid)
     {
-        for(int d=1;d<=TV::m;d++) grids(d)=grid.Get_Axis_X_Face_Grid(d);
+        for(int d=1;d<=TV::m;d++) grids(d)=grid.Get_Face_Grid(d);
     }
 
     VECTOR<T2,TV::m> Clamped_To_Array(const ARRAY<T2,FACE_INDEX<TV::m> >& V,const TV& X) const

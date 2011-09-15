@@ -51,6 +51,7 @@
         ("gcc-4.1.1-64" .  ("/usr/local/compilers/gcc-4.1.1-x86_64-x86_64/bin/gcc" 
                             "/usr/local/compilers/gcc-4.1.1-x86_64-x86_64/bin/g++" 
                             "/usr/local/compilers/icecream/gcc-4.1.1-x86_64-x86_64.tar.bz2,i686:/usr/local/compilers/icecream/gcc-4.1.1-i686-x86_64.tar.bz2"))
+        ("g++" .  ("/usr/bin/gcc" "/usr/bin/g++" "none"))
         ("icc" .  ("icc" "icc" "none"))))
 
 ;#####################################################################
@@ -652,17 +653,18 @@
 
 ;(setq physbam-compiler (if (string= (getenv "PLATFORM") "nocona")  "/usr/local/compilers/gcc-3.4-64/bin/g++" "icc"))
 (setq physbam-project-type "release")
-(setq physbam-compile-count 64)
+(setq physbam-compile-count 4)
 (setq physbam-tee-output t) ; dump output to buffer on runs
 (setq compile-command (format "make -k" physbam-project-directory))
 (setq tags-file-name (format "%s/TAGS" (getenv "PHYSBAM")))
-(setq physbam-compile-mode "icecream")
+(setq physbam-compile-mode "single")
 ; Setup default project to be currenct directory
 (setq physbam-output-directory (format "%s/Projects/articulated_rigid_bodies/Blocks/output" (getenv "PHYSBAM")))
 ; Read project settings
 ;(physbam-read-project-settings)
 ; NOTE ALL FUNCTIONS THAT MODIFY STATUS AND SAVE SHOULD BE BELOW ABOVE READ PROJECT SETTINGS
 (physbam-set-compiler (if (or (string= (getenv "PLATFORM") "opteron") (string= (getenv "PLATFORM") "nocona"))  "gcc-4.0.1-64" "gcc-4.0.1"))
+(physbam-set-compiler "g++")
 (physbam-setup-compile-command nil)
 (setq truncate-partial-width-windows nil)
 (setq compilation-scroll-output t) ; scroll to end by default

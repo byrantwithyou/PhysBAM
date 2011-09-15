@@ -17,9 +17,9 @@ namespace PhysBAM{
 template<class TV>
 class PLS_FSI_DRIVER:public DRIVER<TV>,public NONCOPYABLE
 {
-    typedef typename TV::SCALAR T;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef DRIVER<TV> BASE;
-    typedef GRID<TV> T_GRID;typedef typename T_GRID::VECTOR_INT TV_INT;typedef VECTOR<T,T_GRID::dimension+2> TV_DIMENSION;
+    typedef GRID<TV> T_GRID;typedef VECTOR<T,T_GRID::dimension+2> TV_DIMENSION;
     typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR T_ARRAYS_SCALAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_ARRAYS_BOOL;
     typedef typename LEVELSET_POLICY<T_GRID>::FAST_LEVELSET_T T_FAST_LEVELSET;
@@ -32,6 +32,8 @@ public:
 
     PLS_FSI_EXAMPLE<TV>& example;
     int current_frame;
+    ARRAY<T,TV_INT> old_phi;
+    ARRAY<T,FACE_INDEX<TV::m> > face_velocities_scratch;
 
     PLS_FSI_DRIVER(PLS_FSI_EXAMPLE<TV>& example_input);
     virtual ~PLS_FSI_DRIVER();

@@ -44,6 +44,9 @@ public:
     static VECTOR<T,2> Normal_At_Node(const T_GRID& grid,const ARRAY<T,VECTOR<int,2> >& phi,const VECTOR<int,2>& index)
     {int i=index.x,j=index.y;return VECTOR<T,2>((phi(i+1,j)-phi(i-1,j))*grid.one_over_dX.x,(phi(i,j+1)-phi(i,j-1))*grid.one_over_dX.y).Normalized();}
 
+    T Compute_Curvature(const VECTOR<int,2>& index) const
+    {return Compute_Curvature(phi,index);}
+
 //#####################################################################
     SYMMETRIC_MATRIX<T,2> Hessian(const VECTOR<T,2>& X) const;
     VECTOR<T,1> Principal_Curvatures(const VECTOR<T,2>& X) const;

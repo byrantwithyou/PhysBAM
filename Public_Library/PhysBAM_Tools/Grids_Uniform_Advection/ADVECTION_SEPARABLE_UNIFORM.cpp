@@ -145,7 +145,7 @@ Update_Advection_Equation_Face_Lookup(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z
     for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(grid);iterator.Valid();iterator.Next()) V_face(iterator.Full_Index())=averaging.Face_To_Face_Vector(grid,iterator.Full_Index(),V);
 
     for(int i=1;i<=TV::m;i++){
-        GRID<TV> node_grid(grid.Get_Axis_X_Face_Grid(i));
+        GRID<TV> node_grid(grid.Get_Face_Grid(i));
         UPDATE_ADVECTION_EQUATION_HELPER<TV::dimension>::Apply(*this,node_grid,Z.Component(i),Z_ghost.V_face.Component(i),V_face.Component(i),dt,time);}
 }
 //#####################################################################

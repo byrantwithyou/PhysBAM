@@ -37,10 +37,12 @@
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_MAC_GRID_SOLID_WALL_SLIP.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/DETONATION_SHOCK_DYNAMICS.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/INCOMPRESSIBLE_UNIFORM.h>
+#include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/PROJECTION_DYNAMICS_UNIFORM.h>
 #include <PhysBAM_Dynamics/Boundaries/BOUNDARY_PHI_WATER.h>
 #include <PhysBAM_Dynamics/Coupled_Driver/PLS_FSI_DRIVER.h>
 #include <PhysBAM_Dynamics/Coupled_Driver/PLS_FSI_EXAMPLE.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/SOLID_FLUID_COUPLED_EVOLUTION_SLIP.h>
+#include <PhysBAM_Dynamics/Kang/KANG_POISSON_VISCOSITY.h>
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_UNIFORM.h>
 #include <PhysBAM_Dynamics/Parallel_Computation/MPI_SOLID_FLUID.h>
 #include <PhysBAM_Dynamics/Parallel_Computation/MPI_UNIFORM_PARTICLES.h>
@@ -123,21 +125,30 @@ Initialize()
     example.Initialize_Fluids_Grids();
     GRID<TV>& grid=*example.fluids_parameters.grid;
 
-    example.fluids_parameters.use_poisson=true;
-    SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>* coupled_evolution=new SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>(example.solids_parameters,example.solid_body_collection,
-        example.fluids_parameters,example.solids_fluids_parameters,example.fluid_collection);
-    delete example.solids_evolution;
-    example.solids_evolution=coupled_evolution;
-    example.fluids_parameters.projection=coupled_evolution;
-    SOLIDS_EVOLUTION<TV>& solids_evolution=*coupled_evolution;
-
-    solids_evolution.Set_Solids_Evolution_Callbacks(example);
+    SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>* coupled_evolution=0;
+    if(example.use_kang){
+        example.kang_poisson_viscosity=new KANG_POISSON_VISCOSITY<TV>(example.fluids_parameters,old_phi);
+        example.kang_poisson_viscosity->print_matrix=example.print_matrix;
+        example.kang_poisson_viscosity->test_system=example.test_system;}
+    else{
+        example.fluids_parameters.use_poisson=true;
+        coupled_evolution=new SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>(example.solids_parameters,example.solid_body_collection,
+            example.fluids_parameters,example.solids_fluids_parameters,example.fluid_collection);
+        delete example.solids_evolution;
+        example.solids_evolution=coupled_evolution;
+        example.fluids_parameters.projection=coupled_evolution;
+        SOLIDS_EVOLUTION<TV>& solids_evolution=*coupled_evolution;
+        solids_evolution.Set_Solids_Evolution_Callbacks(example);}
+    
     example.Initialize_Bodies();
 
+    if(example.use_kang)
+        example.Set_Boundary_Conditions(example.kang_poisson_viscosity->psi_D,example.kang_poisson_viscosity->psi_N,
+            example.kang_poisson_viscosity->psi_D_value,example.kang_poisson_viscosity->psi_N_value);
+
     example.fluids_parameters.particle_levelset_evolution=new typename LEVELSET_POLICY<GRID<TV> >::PARTICLE_LEVELSET_EVOLUTION(*example.fluids_parameters.grid,example.fluids_parameters.number_of_ghost_cells);
-    example.fluids_parameters.projection=coupled_evolution;
+    example.fluids_parameters.projection=new PROJECTION_DYNAMICS_UNIFORM<GRID<TV> >(*example.fluids_parameters.grid,example.fluids_parameters.particle_levelset_evolution->Levelset(1));
     example.fluids_parameters.incompressible=new INCOMPRESSIBLE_UNIFORM<GRID<TV> >(*example.fluids_parameters.grid,*example.fluids_parameters.projection);
-    example.fluids_parameters.projection=0;
     example.fluids_parameters.phi_boundary=&example.fluids_parameters.phi_boundary_water; // override default
     example.fluids_parameters.phi_boundary_water.Set_Velocity_Pointer(example.fluid_collection.incompressible_fluid_collection.face_velocities);
     example.fluids_parameters.boundary_mac_slip.Set_Phi(example.fluids_parameters.particle_levelset_evolution->phi);
@@ -150,17 +161,17 @@ Initialize()
     Initialize_Fluids_Grids(); // this needs to be here because the arrays have to be resized for multiphase
 
     example.fluids_parameters.collision_bodies_affecting_fluid->Initialize_Grids();
-    coupled_evolution->Setup_Boundary_Condition_Collection();
-    solids_evolution.time=time;
+    if(coupled_evolution) coupled_evolution->Setup_Boundary_Condition_Collection();
+    example.solids_evolution->time=time;
 
     if(example.restart){
         LOG::SCOPE scope("reading solids data");
         example.Read_Output_Files_Solids(example.restart_frame);
-        solids_evolution.time=time=example.Time_At_Frame(example.restart_frame);}
+        example.solids_evolution->time=time=example.Time_At_Frame(example.restart_frame);}
 
-    solids_evolution.Initialize_Deformable_Objects(example.frame_rate,example.restart);
+    example.solids_evolution->Initialize_Deformable_Objects(example.frame_rate,example.restart);
 
-    solids_evolution.Initialize_Rigid_Bodies(example.frame_rate,example.restart);
+    example.solids_evolution->Initialize_Rigid_Bodies(example.frame_rate,example.restart);
 
     // time
     particle_levelset_evolution->Set_Time(time);
@@ -256,7 +267,8 @@ Initialize_Fluids_Grids()
     fluids_parameters.incompressible->valid_mask.Resize(grid.Domain_Indices(example.fluids_parameters.number_of_ghost_cells),true,true,true);
     fluids_parameters.incompressible->grid=grid.Get_MAC_Grid();
 //    p.Resize(p_grid.Domain_Indices(1));p_save_for_projection.Resize(p_grid.Domain_Indices(1));face_velocities_save_for_projection.Resize(p_grid);
-    dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>&>(solids_evolution).Initialize_Grid_Arrays();
+    if(SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>* slip=dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>*>(&solids_evolution))
+        slip->Initialize_Grid_Arrays();
 }
 //#####################################################################
 // Function First_Order_Time_Step
@@ -267,10 +279,13 @@ First_Order_Time_Step(int substep,T dt)
     FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters=example.fluids_parameters;
     GRID_BASED_COLLISION_GEOMETRY_UNIFORM<T_GRID>& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
     EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities=*example.solid_body_collection.example_forces_and_velocities;
-    SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>& slip=dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>&>(*example.solids_evolution);
+    SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>* slip=dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>*>(example.solids_evolution);
     T_GRID& grid=*fluids_parameters.grid;
     FLUID_COLLECTION<TV>& fluid_collection=example.fluid_collection;
     INCOMPRESSIBLE_UNIFORM<T_GRID>* incompressible=fluids_parameters.incompressible;
+    ARRAY<T,FACE_INDEX<TV::m> >& face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
+
+    if(example.use_kang) old_phi=fluids_parameters.particle_levelset_evolution->Levelset(1).phi;
 
     example.solid_body_collection.Print_Energy(time,1);
     collision_bodies_affecting_fluid.Rasterize_Objects(); // non-swept
@@ -281,32 +296,48 @@ First_Order_Time_Step(int substep,T dt)
     if(example.use_pls_evolution_for_structure) Advance_Particles_With_PLS(dt);
 
     Write_Substep("start step",substep,1);
+    if(example.kang_poisson_viscosity && !fluids_parameters.implicit_viscosity){
+        face_velocities_scratch=face_velocities;
+        Write_Substep("explicit viscosity",substep,1);
+        example.kang_poisson_viscosity->Apply_Viscosity(face_velocities,dt,fluids_parameters.implicit_viscosity);
+        Write_Substep("explicit viscosity",substep,1);
+        face_velocities_scratch.Exchange_Arrays(face_velocities,face_velocities_scratch);
+        face_velocities_scratch-=face_velocities;
+        Write_Substep("revert velocity and store difference",substep,1);}
+
     Advect_Fluid(dt,substep);
-    LOG::cout<<"Maximum face velocity (after advect) = ("<<fluid_collection.incompressible_fluid_collection.face_velocities.Maxabs().Magnitude()<<": "<<fluid_collection.incompressible_fluid_collection.face_velocities.Maxabs()<<std::endl;
+    LOG::cout<<"Maximum face velocity (after advect) = ("<<face_velocities.Maxabs().Magnitude()<<": "<<face_velocities.Maxabs()<<std::endl;
     Write_Substep("advect",substep,1);
+    if(example.kang_poisson_viscosity && !fluids_parameters.implicit_viscosity){
+        face_velocities+=face_velocities_scratch;
+        Write_Substep("apply stored explicit viscosity",substep,1);}
+    
 
     example_forces_and_velocities.Update_Time_Varying_Material_Properties(time+dt);
     example.solid_body_collection.Update_Position_Based_State(time+dt,true);
 //    example.solid_body_collection.deformable_body_collection.template Find_Force<SURFACE_TENSION_FORCE<VECTOR<T,2> >*>()->Dump_Curvatures();
-    slip.two_phase=example.two_phase;
-    slip.Solve(fluid_collection.incompressible_fluid_collection.face_velocities,dt,time,time+dt,false,false);
+    if(slip){
+        slip->two_phase=example.two_phase;
+        slip->Solve(face_velocities,dt,time,time+dt,false,false);}
+    else if(example.kang_poisson_viscosity)
+        example.kang_poisson_viscosity->Project_Fluid(face_velocities,dt);
     Write_Substep("pressure solve",substep,1);
 
-    slip.Print_Maximum_Velocities(time);
+    if(slip) slip->Print_Maximum_Velocities(time);
 
 //        if(incompressible) T_ARRAYS_SCALAR::Copy(incompressible->projection.p,incompressible->projection.p_save_for_projection); // save the good pressure for later
-    if(!example.use_pls_evolution_for_structure) slip.Euler_Step_Position(dt,time+dt);
+    if(!example.use_pls_evolution_for_structure && slip) slip->Euler_Step_Position(dt,time+dt);
 
     Write_Substep("euler step position",substep,1);
 
     LOG::Time("extrapolating velocity across interface");
-//    Extrapolate_Velocity_Across_Interface(example.fluid_collection.incompressible_fluid_collection.face_velocities,particle_levelset_evolution->Particle_Levelset(1).levelset,extrapolation_bandwidth);
+//    Extrapolate_Velocity_Across_Interface(example.face_velocities,particle_levelset_evolution->Particle_Levelset(1).levelset,extrapolation_bandwidth);
     if(!example.two_phase) Extrapolate_Velocity_Across_Interface(time,dt);
-        //incompressible->Extrapolate_Velocity_Across_Interface(example.fluid_collection.incompressible_fluid_collection.face_velocities,exchanged_phi_ghost,
+        //incompressible->Extrapolate_Velocity_Across_Interface(example.face_velocities,exchanged_phi_ghost,
         //    fluids_parameters.enforce_divergence_free_extrapolation,extrapolation_bandwidth,0,TV(),&collision_bodies_affecting_fluid.face_neighbors_visible);
     Write_Substep("extrapolate about interface",substep,1);
-    incompressible->boundary->Apply_Boundary_Condition_Face(incompressible->grid,example.fluid_collection.incompressible_fluid_collection.face_velocities,time+dt);
-    LOG::cout<<"Maximum face velocity = ("<<fluid_collection.incompressible_fluid_collection.face_velocities.Maxabs().Magnitude()<<": "<<fluid_collection.incompressible_fluid_collection.face_velocities.Maxabs()<<std::endl;
+    incompressible->boundary->Apply_Boundary_Condition_Face(incompressible->grid,face_velocities,time+dt);
+    LOG::cout<<"Maximum face velocity = ("<<face_velocities.Maxabs().Magnitude()<<": "<<face_velocities.Maxabs()<<std::endl;
 
     Write_Substep("end step",substep,1);
     example.solids_evolution->time+=dt;
@@ -459,14 +490,17 @@ Advect_Fluid(const T dt,const int substep)
     Write_Substep("after advection",substep,1);
 
     if(fluids_parameters.use_body_force) fluids_parameters.callbacks->Get_Body_Force(fluids_parameters.incompressible->force,dt,time);
+    incompressible->Advance_One_Time_Step_Forces(face_velocities,dt,time,fluids_parameters.implicit_viscosity,&particle_levelset_evolution->phi,example.fluids_parameters.number_of_ghost_cells);
+    Write_Substep("after integrate non advection forces",substep,1);
 
     LOG::Time("updating velocity (explicit part without convection)");
     Write_Substep("before viscosity",substep,1);
     if(SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>* coupled_evolution=dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>*>(example.solids_evolution))
         coupled_evolution->Apply_Viscosity(face_velocities,dt,time);
+    else if(example.kang_poisson_viscosity && fluids_parameters.implicit_viscosity)
+        example.kang_poisson_viscosity->Apply_Viscosity(face_velocities,dt,fluids_parameters.implicit_viscosity);
+
     Write_Substep("after viscosity",substep,1);
-    incompressible->Advance_One_Time_Step_Forces(face_velocities,dt,time,fluids_parameters.implicit_viscosity,&particle_levelset_evolution->phi,example.fluids_parameters.number_of_ghost_cells);
-    Write_Substep("after integrate non advection forces",substep,1);
 
     LOG::Time("effective velocity acceleration structures");
     // revalidate scalars and velocity in body's new position

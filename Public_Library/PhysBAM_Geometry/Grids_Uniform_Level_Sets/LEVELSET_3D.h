@@ -38,6 +38,9 @@ public:
     {int i=index.x,j=index.y,ij=index.z;return VECTOR<T,3>((phi(i+1,j,ij)-phi(i-1,j,ij))*grid.one_over_dX.x,(phi(i,j+1,ij)-phi(i,j-1,ij))*grid.one_over_dX.y,(phi(i,j,ij+1)-phi(i,j,ij-1))
         *grid.one_over_dX.z).Normalized();}
 
+    T Compute_Curvature(const VECTOR<int,3>& index) const
+    {return Compute_Curvature(phi,index);}
+
 //#####################################################################
     SYMMETRIC_MATRIX<T,3> Hessian(const VECTOR<T,3>& X) const;
     VECTOR<T,2> Principal_Curvatures(const VECTOR<T,3>& X) const;

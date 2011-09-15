@@ -2,10 +2,10 @@
 // Copyright 2007-2009, Geoffrey Irving, Tamar Shinar.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-// Namespace KRYLOV
+// Namespace MATRIX_SYSTEM
 //#####################################################################
-#ifndef __KRYLOV__
-#define __KRYLOV__
+#ifndef __MATRIX_SYSTEM__
+#define __MATRIX_SYSTEM__
 
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>

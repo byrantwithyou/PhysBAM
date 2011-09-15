@@ -22,7 +22,7 @@ else: operation=symlink_wrapper
 
 scripts_directory=os.path.abspath(os.path.dirname(sys.argv[0]))
 physbam_directory=os.path.abspath(os.path.join(scripts_directory,'..','..','..'))
-assert(scripts_directory==os.path.join(physbam_directory,'Scripts','Archives','scons'))
+assert(scripts_directory==os.path.join(physbam_directory,'Scripts','scons'))
 
 for root,dirs,files in os.walk(scripts_directory):
     destdir=os.path.join(physbam_directory,relative_path(scripts_directory,root))

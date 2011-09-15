@@ -16,14 +16,9 @@ using namespace PhysBAM;
 template<class TV> EXAMPLE<TV>::
 EXAMPLE(const STREAM_TYPE stream_type_input)
     :stream_type(stream_type_input),initial_time(0),first_frame(0),last_frame(120),frame_rate(24),frame_title(""),write_substeps_level(-1),write_first_frame(true),write_last_frame(true),write_time(true),
-    output_directory("output"),data_directory("../../Public_Data/Archives"),auto_restart(false),restart(false),restart_frame(0),write_output_files(true),write_frame_title(true),
+    output_directory("output"),data_directory("../../Public_Data"),auto_restart(false),restart(false),restart_frame(0),write_output_files(true),write_frame_title(true),
     abort_when_dt_below(0),parse_args(0),mpi_world(0),want_mpi_world(false),need_finish_logging(false),test_number(0),fixed_dt((T)0),substeps_delay_frame(-1),substeps_delay_level(-1)
 {
-    ARRAY<std::string> directory_tokens;
-    STRING_UTILITIES::Split(FILE_UTILITIES::Get_Working_Directory(),"/",directory_tokens);
-    bool is_archived_project=false;
-    for(int i=1;i<=directory_tokens.Size();++i) if(STRING_UTILITIES::Ends_With(directory_tokens(i), "Archives")) is_archived_project=true;
-    if(is_archived_project) data_directory = "../" + data_directory;
 }
 //#####################################################################
 // ~EXAMPLE

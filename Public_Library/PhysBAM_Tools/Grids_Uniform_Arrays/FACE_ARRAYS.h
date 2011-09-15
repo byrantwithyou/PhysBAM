@@ -63,6 +63,9 @@ public:
     ARRAY& operator+=(const ARRAY& a)
     {data+=a.data;return *this;}
 
+    ARRAY& operator-=(const ARRAY& a)
+    {data-=a.data;return *this;}
+
     const RANGE<TV_INT>& Domain_Indices() const
     {return domain_indices;}
 
@@ -176,4 +179,5 @@ public:
 //#####################################################################
 };
 }
+#include <PhysBAM_Tools/Read_Write/Grids_Uniform_Arrays/READ_WRITE_FACE_ARRAYS.h>
 #endif

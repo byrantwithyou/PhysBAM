@@ -33,7 +33,8 @@ Initialize_Colors(T min_value,T max_value,bool log_scale,bool reverse,bool two_s
     if(use_log){
         mn=std::log(std::abs(mn));
         mx=std::log(std::abs(mx));}
-    PHYSBAM_ASSERT(mn<mx);
+    PHYSBAM_ASSERT(mn<=mx);
+    if(mn==mx){mx+=1;mn-=1;}
     T a=mn,d=(mx-mn)/(6*(1+two_sets));
     if(reverse){a=mx,d=-d;}
     colors.Add_Control_Point(a+0*d,VECTOR<T,3>(1,1,1));

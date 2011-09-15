@@ -1295,7 +1295,7 @@ void Break_Levelset()
     GRID<TV>& grid=*new GRID<TV>;
     ARRAY<T,VECTOR<int,3> >& phi=*new ARRAY<T,VECTOR<int,3> >;
     LEVELSET_3D<GRID<TV> > levelset(grid,phi);
-    data_directory="../../../Public_Data/Archives/";
+    data_directory="../../../Public_Data/";
     FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/Rigid_Bodies/sphere_66k.phi",data_directory.c_str()),levelset);
     TV_INT counts=TV_INT::All_Ones_Vector()*10;counts(2)=10;
     GRID<TV> body_grid(counts,levelset.grid.Domain());
