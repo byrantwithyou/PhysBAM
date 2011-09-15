@@ -78,7 +78,7 @@ namespace Multigrid_Embedded_Poisson
 
 template< class T, int D >
 int Build_And_Solve_Interface_System(
-    const typename EXAMPLE_PARAMS<T,D>::INTERFACE_PARAMS& problem,
+    typename EXAMPLE_PARAMS<T,D>::INTERFACE_PARAMS const & problem,
     const MAIN_PARAMS<T,D>& main_params,
     typename RAND_MT19937_UNIFORM_REAL<T>::type& rand,
     const ARRAY_VIEW<const T> phi_of_fine_index)
@@ -648,7 +648,7 @@ int Build_And_Solve_Interface_System(
 
 #define EXPLICIT_INSTANTIATION( T, D ) \
 template int Build_And_Solve_Interface_System<T,D>( \
-    const EXAMPLE_PARAMS<T,D>::INTERFACE_PARAMS& problem, \
+    EXAMPLE_PARAMS<T,D>::INTERFACE_PARAMS const & problem, \
     const MAIN_PARAMS<T,D>& main_params, \
     RAND_MT19937_UNIFORM_REAL<T>::type& rand, \
     const ARRAY_VIEW<const T> phi_of_fine_index);
