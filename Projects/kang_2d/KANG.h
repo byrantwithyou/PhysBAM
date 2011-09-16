@@ -11,6 +11,7 @@
 //   5. Poiseuille Flow Test
 //   6. Couette Flow Test
 //   7. Circular Couette Flow Test
+//   8. Radial Flow Test
 //   9. Kang Example 1
 //#####################################################################
 #ifndef __KANG__
@@ -104,7 +105,7 @@ public:
 
     T uleft,uright;
 
-    // for Circular Couette and Poiseuille flow tests
+    // for tests 7 and 8
     T r_n,r_I,r_p,u_n0,u_p0;
 
     KANG(const STREAM_TYPE stream_type);
@@ -158,6 +159,7 @@ public:
     void Poiseuille_Flow_Test();
     void Couette_Flow_Test();
     void Circular_Couette_Flow_Test();
+    void Radial_Flow_Test();
     void Kang_Example_1();
     void Oscillating_Circle();
     void Test_Analytic_Velocity(T time);
