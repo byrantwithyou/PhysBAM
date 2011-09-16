@@ -78,10 +78,11 @@ $$ \left( \frac{p_r}{\rho r} - \gamma^2 \right) \mx{x \\ y} = \frac{\mu}{\rho r}
 Since the LHS and RHS are orthogonal vectors, each must be identically zero, hence
 $$ p_r = \rho r \gamma^2 \q r \gamma'' + 3 \gamma' = 0. $$
 The latter ODE in $\gamma$ easily solves to $\gamma(r) = \alpha + \beta r^{-2}$ for some constants $\alpha$ and $\beta$, which then gives
-$$ p(r) = \frac{\rho}{2} \left( \alpha^2 r^2 + 4 \alpha \beta \log r - \beta^2 r^{-2} \right). $$
+$$ p(r) = \frac{\rho}{2} \left( \alpha^2 r^2 + 4 \alpha \beta \log r - \beta^2 r^{-2} \right) $$
+plus an additive constant.
 
 Let us now consider the jump conditions on $\uu$ and $p$ for an interface $\Gamma$ corresponding to a circle of radius $r_I$ centered at the origin.  Thus, $\nn$ and $\tt$ are simply $\mx{x \\ y}$ and $\mx{-y \\ x}$, respectively, along $\Gamma$, and the curvature of $\Gamma$ is a constant $1/r_I$.  Some more algebra yields
-$$ \left[ \mx{\nn & \tt}^T \left( p\II - \tau \right) \nn \right] = \mx{[p] \\ r_I [\mu \gamma']}, $$
+$$ \left[ \mx{\nn & \tt}^T \left( p\II - \ta \right) \nn \right] = \mx{[p] \\ r_I [\mu \gamma']}, $$
 and hence the jump conditions manifest themselves as $[p] = \sigma/r_I$ and $[\mu \beta] = 0$.
 
 Let us now consider boundary conditions.  Suppose our domain is simply an annulus (with no interface) with inner and outer radii $r_a$ and $r_b$, respectively; and let the velocities at the inner and outer boundaries be given by $\frac{u_a}{r_a} \mx{-y \\ x}$ and $\frac{u_b}{r_b} \mx{-y \\ x}$, respectively.  This gives the following system for $\alpha$ and $\beta$:
@@ -95,6 +96,24 @@ $$ \alpha^+ = \frac{r^+ u^+_0 - r^I u^I_0}{(r^+)^2 - (r^I)^2} \q \beta^+ = \frac
 $$ \mu^+ \beta^+ = \mu^- \beta^- $$
 from which one solves for $u^I_0$:
 $$ u^I_0 = \frac{(r^I/r^+) w^+ u^+_0 + (r^I/r^-) w^- u^-_0}{w^+ + w^-} \q w^+ = \mu^+ \left( (r^-)^{-2} - (r^I)^{-2} \right) \q w^- = \mu^- \left( (r^I)^{-2} - (r^+)^{-2} \right) $$
+
+\section{Radial Flow}
+
+We now turn to a purely radial flow, where the velocity takes the form $\uu = \gamma \mx{x \\ y}$ and $\gamma = \gamma(r)$ is again a scalar function of $r = \sqrt{x^2 + y^2}$.  This gives
+\begin{align}
+\nabla \uu & = \frac{1}{r} \mx{x^2 \gamma' + r \gamma & xy \gamma' \\ xy \gamma' & y^2 \gamma' + r \gamma} \\
+\ta & = \frac{2\mu}{r} \mx{x^2 \gamma' + r \gamma & xy \gamma' \\ xy \gamma' & y^2 \gamma' + r \gamma} \\
+\nabla \cdot \ta & = \frac{2\mu}{r} \left( r \gamma'' + 3 \gamma' \right) \mx{x \\ y} \\
+\left( \nabla \uu \right) \uu & = \gamma \left( r \gamma' + \gamma \right) \mx{x \\ y}
+\end{align}
+The divergence-free condition, $\nabla \cdot \uu = 0$, gives that $r \gamma' + \gamma \equiv 0$, hence $\gamma(r) = \alpha r^{-2}$ for some constant $\alpha$, and from this we find that $\nabla \cdot \ta \equiv 0$.
+
+Rotational symmetry again lets us assume $p$ to be a function only of $r$, reducing the Navier-Stokes PDE to ($\gg = 0$ and $\uu_t = 0$)
+$$ \left( \gamma \left( r \gamma' + \gamma \right) + \frac{p_r}{\rho r} \right) \mx{x \\ y} = 0. $$
+Using $\gamma(r) = \alpha r^{-2}$, we find that $p(r) = -\frac{1}{2} \alpha^2 \rho r^{-2}$ plus an additive constant.
+
+The jump condition reduces to
+$$ \left[ r p + 2 \alpha \mu \right] = \sigma. $$
 
 \end{document}
 
