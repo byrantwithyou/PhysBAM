@@ -67,7 +67,34 @@ $$ \mu^+ \frac{v_R - v^0}{w} + \mu^- \frac{v_L - v^0}{w} = 0 \q v^0 = \frac{\mu^
 
 \section{Circular Couette Flow}
 
+Circular Couette Flow describes the circular steady state shearing flow around an annulus, which we center at the origin.  We again assume no-slip forced boundary conditions along the boundary of the annulus.  We assume perfectly circular flow, so that $u \cdot \hat{r} = 0$, where $\hat{r}$ denotes the unit vector in the radial (away from the origin) direction; and so that the flow is rotationally invariant.  Thus, $\uu$ takes the form $\gamma \mx{-y \\ x}$, where $\gamma = \gamma \left( \sqrt{x^2 + y^2} \right) = \gamma(r)$ is a scalar function depending only on the distance from the origin (one can easily check that any such $\uu$ satisfies the divergence-free condition $\nabla \cdot \uu = 0$).  This gives (after some algebra)
+\begin{align}
+\nabla \uu & = \frac{1}{r} \mx{-xy\gamma' & -y^2\gamma'-r\gamma \\ x^2\gamma'+r\gamma & xy\gamma'}, \\
+\ta & = \frac{\mu \gamma'}{r} \mx{-2xy & x^2-y^2 \\ x^2-y^2 & 2xy}, \\
+\nabla \cdot \ta & = \frac{\mu}{r} \left( r \gamma'' + 3 \gamma' \right) \mx{-y \\ x}.
+\end{align}
+Rotational symmetry further dictates that $p = p(r)$ depends only on $r$ as well, and hence $\nabla p = \frac{p_r}{r} \mx{x \\ y}$ (where $p_r$ denotes the $r$-derivative of $p$).  Assuming zero gravity ($\gg = 0$) together with the steady-state assumption ($\uu_t = 0$) reduces the Navier-Stokes PDE to
+$$ \left( \frac{p_r}{\rho r} - \gamma^2 \right) \mx{x \\ y} = \frac{\mu}{\rho r} \left( r \gamma'' + 3 \gamma' \right) \mx{-y \\ x}. $$
+Since the LHS and RHS are orthogonal vectors, each must be identically zero, hence
+$$ p_r = \rho r \gamma^2 \q r \gamma'' + 3 \gamma' = 0. $$
+The latter ODE in $\gamma$ easily solves to $\gamma(r) = \alpha + \beta r^{-2}$ for some constants $\alpha$ and $\beta$, which then gives
+$$ p(r) = \frac{\rho}{2} \left( \alpha^2 r^2 + 4 \alpha \beta \log r - \beta^2 r^{-2} \right). $$
 
+Let us now consider the jump conditions on $\uu$ and $p$ for an interface $\Gamma$ corresponding to a circle of radius $r_I$ centered at the origin.  Thus, $\nn$ and $\tt$ are simply $\mx{x \\ y}$ and $\mx{-y \\ x}$, respectively, along $\Gamma$, and the curvature of $\Gamma$ is a constant $1/r_I$.  Some more algebra yields
+$$ \left[ \mx{\nn & \tt}^T \left( p\II - \tau \right) \nn \right] = \mx{[p] \\ r_I [\mu \gamma']}, $$
+and hence the jump conditions manifest themselves as $[p] = \sigma/r_I$ and $[\mu \beta] = 0$.
+
+Let us now consider boundary conditions.  Suppose our domain is simply an annulus (with no interface) with inner and outer radii $r_a$ and $r_b$, respectively; and let the velocities at the inner and outer boundaries be given by $\frac{u_a}{r_a} \mx{-y \\ x}$ and $\frac{u_b}{r_b} \mx{-y \\ x}$, respectively.  This gives the following system for $\alpha$ and $\beta$:
+$$ r_a^2 \alpha + \beta = r_a u_a \q r_b^2 \alpha + \beta = r_b u_b $$
+which solves to
+$$ \alpha = \frac{r_b u_b - r_a u_a}{r_b^2 - r_a^2} \q \beta = \frac{r_a^{-1} u_a - r_b^{-1} u_b}{r_a^{-2} - r_b^{-2}}. $$
+
+Let us now reintroduce a circular interface at radius $r^I$, and suppose the velocity on the interface is given by $\frac{u^I_0}{r^I} \mx{-y \\ x}$.  Putting the boundary conditions and jump conditions together yields
+$$ \alpha^- = \frac{r^I u^I_0 - r^- u^-_0}{(r^I)^2 - (r^-)^2} \q \beta^- = \frac{(r^-)^{-1} u^-_0 - (r^I)^{-1} u^I_0}{(r^-)^{-2} - (r^I)^{-2}} $$
+$$ \alpha^+ = \frac{r^+ u^+_0 - r^I u^I_0}{(r^+)^2 - (r^I)^2} \q \beta^+ = \frac{(r^I)^{-1} u^I_0 - (r^+)^{-1} u^+_0}{(r^I)^{-2} - (r^+)^{-2}} $$
+$$ \mu^+ \beta^+ = \mu^- \beta^- $$
+from which one solves for $u^I_0$:
+$$ u^I_0 = \frac{(r^I/r^+) w^+ u^+_0 + (r^I/r^-) w^- u^-_0}{w^+ + w^-} \q w^+ = \mu^+ \left( (r^-)^{-2} - (r^I)^{-2} \right) \q w^- = \mu^- \left( (r^I)^{-2} - (r^+)^{-2} \right) $$
 
 \end{document}
 
