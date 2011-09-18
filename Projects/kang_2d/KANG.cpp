@@ -423,8 +423,8 @@ Circular_Couette_Flow_Test()
     fluids_parameters.gravity=(T)0*m/(s*s);
     fluids_parameters.density=(T)1*kg/(m*m);
     fluids_parameters.outside_density=(T)2*kg/(m*m);
-    fluids_parameters.viscosity=(T)1*kg/s;
-    fluids_parameters.outside_viscosity=(T)2*kg/s;
+    fluids_parameters.viscosity=(T)2*kg/s;
+    fluids_parameters.outside_viscosity=(T)1*kg/s;
     fluids_parameters.surface_tension=1;
     fluids_parameters.use_particle_levelset=true;
     u_n0=-1*m/s;
@@ -699,17 +699,30 @@ Set_Boundary_Conditions_Callback(ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX
         case 7:{
             T mu_n=fluids_parameters.viscosity;
             T mu_p=fluids_parameters.outside_viscosity;
-            T w_n=mu_n*r_n*(r_p*r_p-r_I*r_I),w_p=mu_p*r_p*(r_I*r_I-r_n*r_n);
-            T u_I0=r_I*(w_n*u_n0+w_p*u_p0)/(w_n*r_n+w_p*r_p);
+            T rho_n=fluids_parameters.density;
+            T rho_p=fluids_parameters.outside_density;
+            T sigma=fluids_parameters.surface_tension;
+            T w_n=mu_n*((T)1/(r_I*r_I)-(T)1/(r_p*r_p));
+            T w_p=mu_p*((T)1/(r_n*r_n)-(T)1/(r_I*r_I));
+            T u_I0=((r_I/r_p)*w_p*u_p0+(r_I/r_n)*w_n*u_n0)/(w_p+w_n);
             T a_n=(r_I*u_I0-r_n*u_n0)/(r_I*r_I-r_n*r_n);
             T a_p=(r_p*u_p0-r_I*u_I0)/(r_p*r_p-r_I*r_I);
-            T b_n=r_I*r_n*(r_I*u_n0-r_n*u_I0)/(r_I*r_I-r_n*r_n);
-            T b_p=r_p*r_I*(r_p*u_I0-r_I*u_p0)/(r_p*r_p-r_I*r_I);
-            LOG::cout<<"*** |u| = 0 @ r = "<<std::sqrt(-b_n/a_n)<<std::endl;
-            LOG::cout<<"*** |u| = 0 @ r = "<<std::sqrt(-b_p/a_p)<<std::endl;
+            T b_n=(u_n0/r_n-u_I0/r_I)/((T)1/(r_n*r_n)-(T)1/(r_I*r_I));
+            T b_p=(u_I0/r_I-u_p0/r_p)/((T)1/(r_I*r_I)-(T)1/(r_p*r_p));
+            if(a_n!=0 && (a_n<0)!=(b_n<0)) LOG::cout<<"*** |u^-| = 0 @ r = "<<std::sqrt(-b_n/a_n)<<std::endl;
+            if(a_p!=0 && (a_p<0)!=(b_p<0)) LOG::cout<<"*** |u^+| = 0 @ r = "<<std::sqrt(-b_p/a_p)<<std::endl;
+            T p_n=(rho_n/2)*(a_n*a_n*r_I*r_I+4*a_n*b_n*std::log(r_I)-b_n*b_n/(r_I*r_I));
+            T p_p=(rho_p/2)*(a_p*a_p*r_I*r_I+4*a_p*b_p*std::log(r_I)-b_p*b_p/(r_I*r_I));
+            T p_offset=sigma/r_I-(p_p-p_n);
             for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
                 T r=it.Location().Magnitude();
-                psi_D(it.index)=r<=r_n || r_p<=r;}
+                if(r_n<r && r<r_p) continue;
+                psi_D(it.index)=true;
+                if(r!=0)
+                    psi_D_value(it.index)=
+                        r<r_I?
+                        (rho_n/2)*(a_n*a_n*r*r+4*a_n*b_n*std::log(r)-b_n*b_n/(r*r)):
+                        (rho_p/2)*(a_p*a_p*r*r+4*a_p*b_p*std::log(r)-b_p*b_p/(r*r))+p_offset;}
             for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,1,GRID<TV>::WHOLE_REGION);it.Valid();it.Next()){
                 TV_INT cell1=it.First_Cell_Index(),cell2=it.Second_Cell_Index();
                 if(!psi_D(cell1) && !psi_D(cell2)) continue;
@@ -721,19 +734,30 @@ Set_Boundary_Conditions_Callback(ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX
                     psi_N_value(it.Full_Index())=(u/r)*TV(-x.y,x.x)[it.Axis()];}}
             break;}
         case 8:{
+            T mu_n=fluids_parameters.viscosity;
+            T mu_p=fluids_parameters.outside_viscosity;
+            T rho_n=fluids_parameters.density;
+            T rho_p=fluids_parameters.outside_density;
+            T sigma=fluids_parameters.surface_tension;
             T a=r_n*u_n0;
             T u_I0=a/r_I;
             LOG::cout<<"*** |u| = "<<u_I0<<" @ r_I = "<<r_I<<std::endl;
             LOG::cout<<"*** |u| = "<<u_p0<<" @ r_p = "<<r_p<<std::endl;
+            T p_n=-a*a*rho_n/(2*r_I*r_I);
+            T p_p=-a*a*rho_p/(2*r_I*r_I);
+            T p_offset=(sigma-2*a*(mu_p-mu_n))/r_I-(p_p-p_n);
             for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
                 T r=it.Location().Magnitude();
-                psi_D(it.index)=r<=r_n || r_p<=r;}
+                if(r_n<r && r<r_p) continue;
+                psi_D(it.index)=true;
+                if(r!=0)
+                    psi_D_value(it.index)=r<r_I?-a*a*rho_n/(2*r*r):-a*a*rho_p/(2*r*r)+p_offset;}
             for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,1,GRID<TV>::WHOLE_REGION);it.Valid();it.Next()){
                 TV_INT cell1=it.First_Cell_Index(),cell2=it.Second_Cell_Index();
                 if(!psi_D(cell1) && !psi_D(cell2)) continue;
-                psi_N(it.Full_Index())=true;
                 TV x=it.Location();
                 T r=x.Magnitude();
+                psi_N(it.Full_Index())=true;
                 if(r!=0)
                     psi_N_value(it.Full_Index())=(a/(r*r))*x[it.Axis()];}
             break;}
