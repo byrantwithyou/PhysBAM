@@ -257,9 +257,16 @@ Initialize_Phi()
 template<class T> void KANG<T>::
 Preprocess_Substep(const T dt,const T time)
 {
-    if(test_number==2){
-        Test_Analytic_Velocity(time);
-        Test_Analytic_Pressure(time);}
+    ARRAY<T,FACE_INDEX<TV::m> >& u=fluid_collection.incompressible_fluid_collection.face_velocities;
+    switch(test_number){
+        case 2:
+            Test_Analytic_Velocity(time);
+            Test_Analytic_Pressure(time);
+            break;
+        case 7:case 8:
+            Set_Analytic_Velocity(time,u);
+            break;
+        default:;}
 }
 //#####################################################################
 // Function Preprocess_Frame
@@ -623,7 +630,7 @@ Postprocess_Frame(const int frame)
 {
 }
 //#####################################################################
-// Function Set_External_Velocities
+// Function Postprocess_Substep
 //#####################################################################
 template<class T> void KANG<T>::
 Postprocess_Substep(const T dt,const T time)
@@ -660,6 +667,56 @@ Debug_Particle_Set_Attribute(ATTRIBUTE_ID id,const ATTR& attr)
     GEOMETRY_PARTICLES<TV>* particles=(GEOMETRY_PARTICLES<TV>*)KANG<T>::Store_Debug_Particles();
     ARRAY_VIEW<ATTR>* attribute=particles->array_collection->template Get_Array<ATTR>(id);
     attribute->Last()=attr;
+}
+//#####################################################################
+// Function Set_Analytic_Velocity
+//#####################################################################
+template<class T> void KANG<T>::
+Set_Analytic_Velocity(const T time,ARRAY<T,FACE_INDEX<TV::dimension> >& u) const
+{
+    const GRID<TV>& grid=*fluids_parameters.grid;
+    switch(test_number){
+        case 4:
+            break;
+        case 5:
+            break;
+        case 6:
+            break;
+        case 7:{
+            T mu_n=fluids_parameters.viscosity;
+            T mu_p=fluids_parameters.outside_viscosity;
+            //T rho_n=fluids_parameters.density;
+            //T rho_p=fluids_parameters.outside_density;
+            //T sigma=fluids_parameters.surface_tension;
+            T w_n=mu_n*((T)1/(r_I*r_I)-(T)1/(r_p*r_p));
+            T w_p=mu_p*((T)1/(r_n*r_n)-(T)1/(r_I*r_I));
+            T u_I0=((r_I/r_p)*w_p*u_p0+(r_I/r_n)*w_n*u_n0)/(w_p+w_n);
+            T a_n=(r_I*u_I0-r_n*u_n0)/(r_I*r_I-r_n*r_n);
+            T a_p=(r_p*u_p0-r_I*u_I0)/(r_p*r_p-r_I*r_I);
+            T b_n=(u_n0/r_n-u_I0/r_I)/((T)1/(r_n*r_n)-(T)1/(r_I*r_I));
+            T b_p=(u_I0/r_I-u_p0/r_p)/((T)1/(r_I*r_I)-(T)1/(r_p*r_p));
+            for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,0,GRID<TV>::WHOLE_REGION);it.Valid();it.Next()){
+                TV x=it.Location();
+                T r=x.Magnitude();
+                if(r!=0){
+                    T c=r<r_I?a_n*r+b_n/r:a_p*r+b_p/r;
+                    u(it.Full_Index())=(c/r)*TV(-x.y,x.x)[it.Axis()];}}
+            break;}
+        case 8:{
+            //T mu_n=fluids_parameters.viscosity;
+            //T mu_p=fluids_parameters.outside_viscosity;
+            //T rho_n=fluids_parameters.density;
+            //T rho_p=fluids_parameters.outside_density;
+            //T sigma=fluids_parameters.surface_tension;
+            T a=r_n*u_n0;
+            //T u_I0=a/r_I;
+            for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,0,GRID<TV>::WHOLE_REGION);it.Valid();it.Next()){
+                TV x=it.Location();
+                T r=x.Magnitude();
+                if(r!=0)
+                    u(it.Full_Index())=(a/(r*r))*x[it.Axis()];}
+            break;}
+        default:;}
 }
 //#####################################################################
 // Function Set_Boundary_Conditions_Callback
