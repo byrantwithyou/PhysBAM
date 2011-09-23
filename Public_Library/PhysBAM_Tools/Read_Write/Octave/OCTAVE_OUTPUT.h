@@ -52,7 +52,7 @@ public:
     {Write(name,ARRAY_VIEW<const T2>(Value(v.Size()),v.Get_Array_Pointer()),0);}
 
     void Write_Entry(T x);
-    template<class T2> void Write_Entry(const T2& x);
+    void Write_Entry(int x);
     template<class T2,int d> void Write_Entry(const VECTOR<T2,d>& x);
     template<class T2,class T_ARRAY> void Write(const char* name,const ARRAY_BASE<T2,T_ARRAY>& v,int helper=0);
     template<class T2,class T_VECTOR> void Write(const char* name,const VECTOR_BASE<T2,T_VECTOR>& v);
