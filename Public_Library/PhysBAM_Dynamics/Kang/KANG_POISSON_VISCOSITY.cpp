@@ -144,11 +144,12 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt) const
     T beta_n=1/fluids_parameters.density,beta_p=1/fluids_parameters.outside_density;
     TV one_over_dX_2=sqr(grid.one_over_dX);
     T mn=FLT_MAX,mx=-mn;
-    GRAD_HELPER<T> null_helper = {0,0,0};
+    GRAD_HELPER<T> null_helper={0,0,0};
 
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
         TV_INT cell1=it.First_Cell_Index(),cell2=it.Second_Cell_Index();
-        bool psi_n=psi_N(it.Full_Index());
+        //bool psi_n=psi_N(it.Full_Index());
+        bool psi_n=false; // disable any Neumann bc's
         int index1=cell_index(cell1),index2=cell_index(cell2);
 
         if(!index1 && !index2){
@@ -178,8 +179,8 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt) const
 
         T A=beta_hat*one_over_dX_2(it.Axis()); // positive for diagonal, neg for off
 
-        if(!index1) rhs1+=A*psi_D_value(cell1);
-        if(!index2) rhs1-=A*psi_D_value(cell2);
+        if(!index1) rhs1+=dt*A*psi_D_value(cell1);
+        if(!index2) rhs1-=dt*A*psi_D_value(cell2);
 
         if(index1) helper.data.Append(TRIPLE<int,int,T>(index1,index1,A));
         if(index1 && index2) helper.data.Append(TRIPLE<int,int,T>(index1,index2,-A));
@@ -187,7 +188,7 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt) const
         if(index2) helper.data.Append(TRIPLE<int,int,T>(index2,index2,A));
 
         T beta_G=beta_hat*grid.one_over_dX(it.Axis()); // positive for 2, neg for 1
-        GRAD_HELPER<T> gh = {index1,index2,beta_G};
+        GRAD_HELPER<T> gh={index1,index2,beta_G};
 
         grad_helper.Append(gh);
         face_velocities(it.Full_Index())-=beta_G*pj;
@@ -223,7 +224,7 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt) const
     if(print_matrix) OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("x-%i.txt",solve_id).c_str()).Write("x",p.v);
 
     INTERPOLATED_COLOR_MAP<T> color_map;
-    color_map.Initialize_Colors(-.3,.3,false,true,false);
+    color_map.Initialize_Colors((T)-.3,(T).3,false,true,false);
 
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
         int ci=cell_index(it.index);

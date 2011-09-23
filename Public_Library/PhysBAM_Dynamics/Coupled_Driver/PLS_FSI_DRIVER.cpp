@@ -47,6 +47,7 @@
 #include <PhysBAM_Dynamics/Parallel_Computation/MPI_SOLID_FLUID.h>
 #include <PhysBAM_Dynamics/Parallel_Computation/MPI_UNIFORM_PARTICLES.h>
 #include <PhysBAM_Dynamics/Particles/PARTICLE_LEVELSET_REMOVED_PARTICLES.h>
+#define DISABLE_LEVELSET_ADVECTION
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
@@ -375,7 +376,7 @@ Extrapolate_Velocity_Across_Interface(T time,T dt)
         extrapolate.Extrapolate();}
 }
 //#####################################################################
-// Function Advance_To_Target_Time
+// Function Advance_Particles_With_PLS
 //#####################################################################
 template<class TV> void PLS_FSI_DRIVER<TV>::
 Advance_Particles_With_PLS(T dt)
@@ -433,18 +434,22 @@ Advect_Fluid(const T dt,const int substep)
     // important to compute ghost velocity values for particles near domain boundaries
     ARRAY<T,FACE_INDEX<TV::m> > face_velocities_ghost;
     ARRAY<T,FACE_INDEX<TV::m> >& face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
-    face_velocities_ghost.Resize(incompressible->grid,example.fluids_parameters.number_of_ghost_cells,false);
-    incompressible->boundary->Fill_Ghost_Cells_Face(grid,face_velocities,face_velocities_ghost,time+dt,example.fluids_parameters.number_of_ghost_cells);
+    face_velocities_ghost.Resize(incompressible->grid,fluids_parameters.number_of_ghost_cells,false);
+    incompressible->boundary->Fill_Ghost_Cells_Face(grid,face_velocities,face_velocities_ghost,time+dt,fluids_parameters.number_of_ghost_cells);
 
     fluids_parameters.phi_boundary_water.Use_Extrapolation_Mode(false);
     example.Adjust_Phi_With_Objects(time);
     LOG::Time("advecting levelset");
+#ifndef DISABLE_LEVELSET_ADVECTION
     particle_levelset_evolution->Advance_Levelset(dt);
+#endif // #ifndef DISABLE_LEVELSET_ADVECTION
     fluids_parameters.phi_boundary_water.Use_Extrapolation_Mode(true);
     example.Extrapolate_Phi_Into_Objects(time+dt);
     Write_Substep("after levelset advection",0,1);
     LOG::Time("advecting particles");
+#ifndef DISABLE_LEVELSET_ADVECTION
     particle_levelset_evolution->Advance_Particles(face_velocities_ghost,dt,false);
+#endif // #ifndef DISABLE_LEVELSET_ADVECTION
     Write_Substep("after particle advection",0,1);
 
     example.Scalar_Advection_Callback(dt,time);
@@ -469,7 +474,7 @@ Advect_Fluid(const T dt,const int substep)
     LOG::Time("updating velocity (explicit part)");
     Write_Substep("before advection",substep,1);
 
-    int extrapolation_ghost_cells=2*example.fluids_parameters.number_of_ghost_cells+2;
+    int extrapolation_ghost_cells=2*fluids_parameters.number_of_ghost_cells+2;
     T extrapolation_bandwidth=(T)(extrapolation_ghost_cells-1);
     T_ARRAYS_SCALAR exchanged_phi_ghost(grid.Domain_Indices(extrapolation_ghost_cells));
     particle_levelset_evolution->particle_levelset.levelset.boundary->Fill_Ghost_Cells(grid,particle_levelset_evolution->phi,exchanged_phi_ghost,0,time+dt,extrapolation_ghost_cells);
@@ -484,9 +489,9 @@ Advect_Fluid(const T dt,const int substep)
             if(!example.two_phase)
                 incompressible->Extrapolate_Velocity_Across_Interface(example.fluid_collection.incompressible_fluid_collection.face_velocities,exchanged_phi_ghost,
                     fluids_parameters.enforce_divergence_free_extrapolation,extrapolation_bandwidth,0,TV(),&collision_bodies_affecting_fluid.face_neighbors_visible);
-            incompressible->Advance_One_Time_Step_Convection(dt,rk_time,face_velocities,face_velocities,example.fluids_parameters.number_of_ghost_cells);
+            incompressible->Advance_One_Time_Step_Convection(dt,rk_time,face_velocities,face_velocities,fluids_parameters.number_of_ghost_cells);
             rk_time=rk.Main();}}
-    else incompressible->Advance_One_Time_Step_Convection(dt,time,face_velocities_ghost,face_velocities,example.fluids_parameters.number_of_ghost_cells);
+    else incompressible->Advance_One_Time_Step_Convection(dt,time,face_velocities_ghost,face_velocities,fluids_parameters.number_of_ghost_cells);
     Write_Substep("after advection",substep,1);
 
     if(fluids_parameters.use_body_force) fluids_parameters.callbacks->Get_Body_Force(fluids_parameters.incompressible->force,dt,time);

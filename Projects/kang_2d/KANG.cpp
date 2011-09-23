@@ -87,7 +87,7 @@ Parse_Options()
     solids_parameters.rigid_body_collision_parameters.enforce_rigid_rigid_contact_in_cg=false;
     fluids_parameters.fluid_affects_solid=fluids_parameters.solid_affects_fluid=true;
     fluids_parameters.incompressible_iterations=parse_args->Get_Integer_Value("-cg_iterations");
-    fluids_parameters.incompressible_tolerance=parse_args->Get_Double_Value("-solve_tolerance");
+    fluids_parameters.incompressible_tolerance=(T)parse_args->Get_Double_Value("-solve_tolerance");
 
     solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
     solids_parameters.use_trapezoidal_rule_for_velocities=false;
@@ -257,16 +257,9 @@ Initialize_Phi()
 template<class T> void KANG<T>::
 Preprocess_Substep(const T dt,const T time)
 {
-    ARRAY<T,FACE_INDEX<TV::m> >& u=fluid_collection.incompressible_fluid_collection.face_velocities;
-    switch(test_number){
-        case 2:
-            Test_Analytic_Velocity(time);
-            Test_Analytic_Pressure(time);
-            break;
-        case 7:case 8:
-            Set_Analytic_Velocity(time,u);
-            break;
-        default:;}
+    if(test_number==2){
+        Test_Analytic_Velocity(time);
+        Test_Analytic_Pressure(time);}
 }
 //#####################################################################
 // Function Preprocess_Frame
@@ -297,6 +290,13 @@ Initialize_Velocities()
         fluid_collection.incompressible_fluid_collection.viscosity.Resize(fluids_parameters.grid->Domain_Indices(1));
         fluid_collection.incompressible_fluid_collection.viscosity.Fill(fluids_parameters.viscosity);
         fluids_parameters.implicit_viscosity=false;}
+
+    ARRAY<T,FACE_INDEX<TV::m> >& u=fluid_collection.incompressible_fluid_collection.face_velocities;
+    switch(test_number){
+        case 7:case 8:
+            Set_Analytic_Velocity(0,u);
+            break;
+        default:;}
 }
 //#####################################################################
 // Function Set_Dirichlet_Boundary_Conditions
@@ -429,12 +429,12 @@ Circular_Couette_Flow_Test()
 {
     fluids_parameters.gravity=(T)0*m/(s*s);
     fluids_parameters.density=(T)1*kg/(m*m);
-    fluids_parameters.outside_density=(T)2*kg/(m*m);
-    fluids_parameters.viscosity=(T)2*kg/s;
+    fluids_parameters.outside_density=(T)1*kg/(m*m);
+    fluids_parameters.viscosity=(T)1*kg/s;
     fluids_parameters.outside_viscosity=(T)1*kg/s;
-    fluids_parameters.surface_tension=1;
+    fluids_parameters.surface_tension=0;
     fluids_parameters.use_particle_levelset=true;
-    u_n0=-1*m/s;
+    u_n0=1*m/s;
     u_p0=1*m/s;
 }
 //#####################################################################
@@ -448,7 +448,7 @@ Radial_Flow_Test()
     fluids_parameters.outside_density=(T)1*kg/(m*m);
     fluids_parameters.viscosity=(T)1*kg/s;
     fluids_parameters.outside_viscosity=(T)1*kg/s;
-    fluids_parameters.surface_tension=1;
+    fluids_parameters.surface_tension=0;
     fluids_parameters.use_particle_levelset=true;
     u_n0=1*m/s;
     u_p0=(r_n/r_p)*u_n0;
