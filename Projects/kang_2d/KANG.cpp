@@ -291,12 +291,14 @@ Initialize_Velocities()
         fluid_collection.incompressible_fluid_collection.viscosity.Fill(fluids_parameters.viscosity);
         fluids_parameters.implicit_viscosity=false;}
 
+#if 0
     ARRAY<T,FACE_INDEX<TV::m> >& u=fluid_collection.incompressible_fluid_collection.face_velocities;
     switch(test_number){
         case 7:case 8:
             Set_Analytic_Velocity(0,u);
             break;
         default:;}
+#endif // #if 0|1
 }
 //#####################################################################
 // Function Set_Dirichlet_Boundary_Conditions
@@ -429,12 +431,12 @@ Circular_Couette_Flow_Test()
 {
     fluids_parameters.gravity=(T)0*m/(s*s);
     fluids_parameters.density=(T)1*kg/(m*m);
-    fluids_parameters.outside_density=(T)1*kg/(m*m);
+    fluids_parameters.outside_density=(T)2*kg/(m*m);
     fluids_parameters.viscosity=(T)1*kg/s;
-    fluids_parameters.outside_viscosity=(T)1*kg/s;
-    fluids_parameters.surface_tension=0;
+    fluids_parameters.outside_viscosity=(T)2*kg/s;
+    fluids_parameters.surface_tension=1;
     fluids_parameters.use_particle_levelset=true;
-    u_n0=1*m/s;
+    u_n0=-1*m/s;
     u_p0=1*m/s;
 }
 //#####################################################################
@@ -445,10 +447,10 @@ Radial_Flow_Test()
 {
     fluids_parameters.gravity=(T)0*m/(s*s);
     fluids_parameters.density=(T)1*kg/(m*m);
-    fluids_parameters.outside_density=(T)1*kg/(m*m);
+    fluids_parameters.outside_density=(T)2*kg/(m*m);
     fluids_parameters.viscosity=(T)1*kg/s;
-    fluids_parameters.outside_viscosity=(T)1*kg/s;
-    fluids_parameters.surface_tension=0;
+    fluids_parameters.outside_viscosity=(T)2*kg/s;
+    fluids_parameters.surface_tension=1;
     fluids_parameters.use_particle_levelset=true;
     u_n0=1*m/s;
     u_p0=(r_n/r_p)*u_n0;
@@ -775,6 +777,7 @@ Set_Boundary_Conditions_Callback(ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX
                 T r=it.Location().Magnitude();
                 if(r_n<r && r<r_p) continue;
                 psi_D(it.index)=true;
+                if(r<r_n-2*grid.dX.Magnitude()||r_p+2*grid.dX.Magnitude()<r) continue;
                 if(r!=0)
                     psi_D_value(it.index)=
                         r<r_I?
@@ -783,9 +786,10 @@ Set_Boundary_Conditions_Callback(ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX
             for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,1,GRID<TV>::WHOLE_REGION);it.Valid();it.Next()){
                 TV_INT cell1=it.First_Cell_Index(),cell2=it.Second_Cell_Index();
                 if(!psi_D(cell1) && !psi_D(cell2)) continue;
-                psi_N(it.Full_Index())=true;
                 TV x=it.Location();
                 T r=x.Magnitude();
+                if(r<r_n-2*grid.dX.Magnitude()||r_p+2*grid.dX.Magnitude()<r) continue;
+                psi_N(it.Full_Index())=true;
                 if(r!=0){
                     T u=r<r_I?a_n*r+b_n/r:a_p*r+b_p/r;
                     psi_N_value(it.Full_Index())=(u/r)*TV(-x.y,x.x)[it.Axis()];}}
@@ -807,6 +811,7 @@ Set_Boundary_Conditions_Callback(ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX
                 T r=it.Location().Magnitude();
                 if(r_n<r && r<r_p) continue;
                 psi_D(it.index)=true;
+                if(r<r_n-2*grid.dX.Magnitude()||r_p+2*grid.dX.Magnitude()<r) continue;
                 if(r!=0)
                     psi_D_value(it.index)=r<r_I?-a*a*rho_n/(2*r*r):-a*a*rho_p/(2*r*r)+p_offset;}
             for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,1,GRID<TV>::WHOLE_REGION);it.Valid();it.Next()){
@@ -814,6 +819,7 @@ Set_Boundary_Conditions_Callback(ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX
                 if(!psi_D(cell1) && !psi_D(cell2)) continue;
                 TV x=it.Location();
                 T r=x.Magnitude();
+                if(r<r_n-2*grid.dX.Magnitude()||r_p+2*grid.dX.Magnitude()<r) continue;
                 psi_N(it.Full_Index())=true;
                 if(r!=0)
                     psi_N_value(it.Full_Index())=(a/(r*r))*x[it.Axis()];}
