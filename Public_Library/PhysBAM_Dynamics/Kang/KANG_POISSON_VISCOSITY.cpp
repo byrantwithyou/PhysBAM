@@ -148,8 +148,8 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt) const
 
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
         TV_INT cell1=it.First_Cell_Index(),cell2=it.Second_Cell_Index();
-        //bool psi_n=psi_N(it.Full_Index());
-        bool psi_n=false; // disable any Neumann bc's
+        bool psi_n=psi_N(it.Full_Index());
+        //bool psi_n=false; // disable any Neumann bc's
         int index1=cell_index(cell1),index2=cell_index(cell2);
 
         if(!index1 && !index2){

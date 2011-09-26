@@ -47,7 +47,7 @@
 #include <PhysBAM_Dynamics/Parallel_Computation/MPI_SOLID_FLUID.h>
 #include <PhysBAM_Dynamics/Parallel_Computation/MPI_UNIFORM_PARTICLES.h>
 #include <PhysBAM_Dynamics/Particles/PARTICLE_LEVELSET_REMOVED_PARTICLES.h>
-#define DISABLE_LEVELSET_ADVECTION
+//#define DISABLE_LEVELSET_ADVECTION
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
