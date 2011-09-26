@@ -1,5 +1,5 @@
 import os
-CXX='distcc g++'
+CXX='g++'
 
 USE_COMPRESSION=0
 USE_FFMPEG=1
