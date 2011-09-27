@@ -1,0 +1,26 @@
+# SConscript
+
+Import('env Automatic_Program')
+env.Append(CXXFLAGS=['-pthread','-IProjects/multigrid_poisson_3d_optimized_kernels/Thread_Queueing'])
+env.Append(LINKFLAGS=['-pthread'])
+Automatic_Program(env,"multigrid_poisson_3d_optimized",["MULTIGRID_POISSON.cpp","main.cpp","MULTIGRID_POISSON_REFINEMENT.cpp",
+                                                        "../multigrid_poisson_3d_optimized_kernels/Relaxation_And_Residual_With_Zero_Initial_Guess/Relaxation_And_Residual_With_Zero_Initial_Guess_Helper.cpp",
+                                                        "../multigrid_poisson_3d_optimized_kernels/Restriction/Restriction_Helper.cpp",
+                                                        "../multigrid_poisson_3d_optimized_kernels/Relaxation_Boundary/Relaxation_Boundary_Helper.cpp",
+                                                        "../multigrid_poisson_3d_optimized_kernels/Residual_Boundary/Residual_Boundary_Helper.cpp",
+                                                        "../multigrid_poisson_3d_optimized_kernels/Prolongation/Prolongation_Helper.cpp",
+                                                        "../multigrid_poisson_3d_optimized_kernels/Thread_Queueing/PTHREAD_QUEUE.cpp",
+                                                        "../multigrid_poisson_3d_optimized_kernels/Relaxation_Interior/Relaxation_Interior_Helper.cpp",
+                                                        "../multigrid_poisson_3d_optimized_kernels/Multiply_And_Compute_Sum_And_Extrema/Multiply_And_Compute_Sum_And_Extrema_Helper.cpp",
+                                                        "../multigrid_poisson_3d_optimized_kernels/Multiplication_And_Dot_Product/Multiplication_And_Dot_Product_Helper.cpp",
+                                                        "../multigrid_poisson_3d_optimized_kernels/Saxpy/Saxpy_Helper.cpp",
+                                                        "../multigrid_poisson_3d_optimized_kernels/Relaxation_And_Dot_Product_Interior/Relaxation_And_Dot_Product_Interior_Helper.cpp",
+                                                        "../multigrid_poisson_3d_optimized_kernels/Reduce_Maxabs/Reduce_Maxabs_Helper.cpp",
+                                                        "../multigrid_poisson_3d_optimized_kernels/Scalar_Multiply_And_Accumulate_And_Compute_Sum_And_Extrema/Scalar_Multiply_And_Accumulate_And_Compute_Sum_And_Extrema_Helper.cpp",
+                                                        "../multigrid_poisson_3d_optimized_kernels/Combined_Saxpy/Combined_Saxpy_Helper.cpp",
+                                                        "../multigrid_poisson_3d_optimized_kernels/Initialize_Interior_Bitmaps_And_Diagonal_Entries/Initialize_Interior_Bitmaps_And_Diagonal_Entries_Helper.cpp",
+                                                        "../multigrid_poisson_3d_optimized_kernels/Boundary_Initialization/Boundary_Initialization_Helper.cpp",
+                                                        "../multigrid_poisson_3d_optimized_kernels/Block_Enumeration/Block_Enumeration_Helper.cpp",
+							"../multigrid_poisson_3d_optimized_kernels/Block_Counting/Block_Counting_Helper.cpp",
+							"../multigrid_poisson_3d_optimized_kernels/Coarsened_Discretization/Coarsened_Discretization_Helper.cpp"])
+
