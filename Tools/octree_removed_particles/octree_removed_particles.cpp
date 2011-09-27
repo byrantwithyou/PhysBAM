@@ -6,7 +6,7 @@
 #include <PhysBAM_Tools/Vectors/VECTOR_3D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Dynamics/Particles/PARTICLE_LEVELSET_REMOVED_PARTICLES.h>
-#include <PhysBAM_Rendering/PhysBAM_Rendering/Rendering_Objects/RENDERING_IMPLICIT_SURFACE.h>
+#include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_IMPLICIT_SURFACE.h>
 #include <fstream>
 #include <iostream>
 #include <string>

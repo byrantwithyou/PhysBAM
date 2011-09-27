@@ -9,7 +9,7 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE.h>
 #include <PhysBAM_Dynamics/Particles/PARTICLE_LEVELSET_REMOVED_PARTICLES.h>
-#include <PhysBAM_Rendering/PhysBAM_Rendering/Rendering_Objects/RENDERING_IMPLICIT_SURFACE.h>
+#include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_IMPLICIT_SURFACE.h>
 #include "../../Public_Library/Deformable_Objects/DEFORMABLE_OBJECT_LIST_3D.h"
 #include "../../Public_Library/Rigid_Bodies/RIGID_BODY_LIST_3D.h"
 #include "PARTICLE_BLENDER.h"
