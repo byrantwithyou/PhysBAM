@@ -87,7 +87,7 @@ Parse_Options()
     solids_parameters.rigid_body_collision_parameters.enforce_rigid_rigid_contact_in_cg=false;
     fluids_parameters.fluid_affects_solid=fluids_parameters.solid_affects_fluid=true;
     fluids_parameters.incompressible_iterations=parse_args->Get_Integer_Value("-cg_iterations");
-    fluids_parameters.incompressible_tolerance=parse_args->Get_Double_Value("-solve_tolerance");
+    fluids_parameters.incompressible_tolerance=(T)parse_args->Get_Double_Value("-solve_tolerance");
 
     solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
     solids_parameters.use_trapezoidal_rule_for_velocities=false;
@@ -127,36 +127,55 @@ Parse_Options()
     fluids_parameters.write_particles=true;
     fluids_parameters.use_removed_positive_particles=true;fluids_parameters.use_removed_negative_particles=true;
 
+    GRID<TV>& grid=*fluids_parameters.grid;
+    VECTOR<VECTOR<bool,2>,TV::dimension>& domain_walls=fluids_parameters.domain_walls;
     switch(test_number){
         case 1:
-            fluids_parameters.grid->Initialize(resolution+1,resolution+1,0*m,(T).04*m,0*m,(T).04*m);
-            fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[1][2]=false;
-            fluids_parameters.domain_walls[2][1]=false;fluids_parameters.domain_walls[2][2]=false;
+            grid.Initialize(resolution+1,resolution+1,0*m,(T).04*m,0*m,(T).04*m);
+            domain_walls[1][1]=false;domain_walls[1][2]=false;
+            domain_walls[2][1]=false;domain_walls[2][2]=false;
             break;
         case 2:
-            fluids_parameters.grid->Initialize(resolution+1,resolution+1,0*m,1*m,0*m,1*m);
-            fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[1][2]=false;
-            fluids_parameters.domain_walls[2][1]=false;fluids_parameters.domain_walls[2][2]=false;
+            grid.Initialize(resolution+1,resolution+1,0*m,1*m,0*m,1*m);
+            domain_walls[1][1]=false;domain_walls[1][2]=false;
+            domain_walls[2][1]=false;domain_walls[2][2]=false;
             break;
         case 3:
-            fluids_parameters.grid->Initialize(resolution+1,resolution*2+1,0*m,(T)1*m,0*m,(T)2*m);
-            fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;
-            fluids_parameters.domain_walls[2][1]=true;fluids_parameters.domain_walls[2][2]=true;
+            grid.Initialize(resolution+1,resolution*2+1,0*m,(T)1*m,0*m,(T)2*m);
+            domain_walls[1][1]=true;domain_walls[1][2]=true;
+            domain_walls[2][1]=true;domain_walls[2][2]=true;
             break;
         case 4:
-            fluids_parameters.grid->Initialize(resolution+1,resolution+1,-m,m,-m,m);
-            fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[1][2]=true;
-            fluids_parameters.domain_walls[2][1]=true;fluids_parameters.domain_walls[2][2]=true;
+            grid.Initialize(resolution+1,resolution+1,-m,m,-m,m);
+            domain_walls[1][1]=false;domain_walls[1][2]=true;
+            domain_walls[2][1]=true;domain_walls[2][2]=true;
             break;
         case 5:
-            fluids_parameters.grid->Initialize(resolution+1,resolution+1,-m,m,-m,m);
-            fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;
-            fluids_parameters.domain_walls[2][1]=false;fluids_parameters.domain_walls[2][2]=false;
+            grid.Initialize(resolution+1,resolution+1,-m,m,-m,m);
+            domain_walls[1][1]=true;domain_walls[1][2]=true;
+            domain_walls[2][1]=false;domain_walls[2][2]=false;
             break;
         case 6:
-            fluids_parameters.grid->Initialize(resolution+1,resolution+1,-m,m,-m,m);
-            fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;
-            fluids_parameters.domain_walls[2][1]=false;fluids_parameters.domain_walls[2][2]=false;
+            grid.Initialize(resolution+1,resolution+1,-m,m,-m,m);
+            domain_walls[1][1]=true;domain_walls[1][2]=true;
+            domain_walls[2][1]=false;domain_walls[2][2]=false;
+            break;
+        case 7:
+            grid.Initialize(resolution+1,resolution+1,-m,m,-m,m);
+            r_n = (T)0.2*m;
+            r_I = (T)0.6*m;
+            r_p = (T)1.0*m;
+            break;
+        case 8:
+            grid.Initialize(resolution+1,resolution+1,-m,m,-m,m);
+            r_n = (T)0.2*m;
+            r_I = (T)0.6*m;
+            r_p = (T)1.0*m;
+            break;
+        case 9:
+            grid.Initialize(resolution+1,3*resolution/2+1,-(T)0.01*m,+(T)0.01*m,-(T)0.01*m,(T)0.02*m);
+            domain_walls[1][1]=true;domain_walls[1][2]=true;
+            domain_walls[2][1]=true;domain_walls[2][2]=true;
             break;
         default:
             LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
@@ -193,27 +212,44 @@ Initialize_Advection()
 template<class T> void KANG<T>::
 Initialize_Phi()
 {
+    const GRID<TV>& grid=*fluids_parameters.grid;
     ARRAY<T,VECTOR<int,2> >& phi=fluids_parameters.particle_levelset_evolution->phi;
-    if(test_number==1 || test_number==4){
-        SPHERE<TV> object(TV((T).02*m,(T).02*m),(T).01*m);
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(*fluids_parameters.grid);it.Valid();it.Next()){
-            TV X=it.Location();
-            if(make_ellipse) X*=TV((T)1.1,(T).9);
-            phi(it.index)=object.Signed_Distance(X);}}
-    else if(test_number==2){
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(*fluids_parameters.grid);it.Valid();it.Next()){
-            TV dX=it.Location()-TV((T)(.5*m),(T)(.5*m));
-            T distance=dX.Magnitude();
-            T angle=atan2(dX.y,dX.x);
-            T radius=circle_radius+circle_perturbation*cos(oscillation_mode*angle);
-            phi(it.index)=distance-radius;}}
-    else if(test_number==3){
-        SPHERE<TV> object(TV((T).5*m,(T).5*m),(T).2*m);
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(*fluids_parameters.grid);it.Valid();it.Next())
-            phi(it.index)=-object.Signed_Distance(it.Location());}
-    else if(test_number==5 || test_number==6){
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(*fluids_parameters.grid);it.Valid();it.Next())
-            phi(it.index)=it.Location().x;}
+    switch(test_number){
+        case 1:case 4:{
+            SPHERE<TV> object(TV((T).02*m,(T).02*m),(T).01*m);
+            for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+                TV X=it.Location();
+                if(make_ellipse) X*=TV((T)1.1,(T).9);
+                phi(it.index)=object.Signed_Distance(X);}
+            break;}
+        case 2:{
+            for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+                TV dX=it.Location()-TV((T)(.5*m),(T)(.5*m));
+                T distance=dX.Magnitude();
+                T angle=atan2(dX.y,dX.x);
+                T radius=circle_radius+circle_perturbation*cos(oscillation_mode*angle);
+                phi(it.index)=distance-radius;}
+            break;}
+        case 3:{
+            SPHERE<TV> object(TV((T).5*m,(T).5*m),(T).2*m);
+            for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
+                phi(it.index)=-object.Signed_Distance(it.Location());
+            break;}
+        case 5:case 6:{
+            for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
+                phi(it.index)=it.Location().x;
+            break;}
+        case 7:case 8:{
+            SPHERE<TV> object(TV((T)0.0*m,(T)0.0*m),r_I*m);
+            for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
+                phi(it.index)=object.Signed_Distance(it.Location());
+            break;}
+        case 9:{
+            SPHERE<TV> object(TV((T)0.0*m,(T)0.0*m),(T)1/300*m);
+            for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
+                phi(it.index)=object.Signed_Distance(it.Location());
+            break;}
+        default:;}
 }
 //#####################################################################
 // Function Preprocess_Substep
@@ -231,7 +267,8 @@ Preprocess_Substep(const T dt,const T time)
 template<class T> void KANG<T>::
 Preprocess_Frame(const int frame)
 {
-    if(0 && test_number==6 && frame==1){
+#if 0
+    if(test_number==6 && frame==1){
         ARRAY<T,FACE_INDEX<TV::m> >& u=fluid_collection.incompressible_fluid_collection.face_velocities;
         T mu0=fluids_parameters.viscosity;
         T mu1=fluids_parameters.outside_viscosity;
@@ -241,6 +278,7 @@ Preprocess_Frame(const int frame)
             TV x=it.Location();
             if(x.x>0) u(it.Full_Index())=(uright-v0)/(1+dx/2)*x.x+v0;
             else u(it.Full_Index())=(-uleft+v0)/(1+dx/2)*x.x+v0;}}
+#endif
 }
 //#####################################################################
 // Function Initialize_Velocities
@@ -252,6 +290,15 @@ Initialize_Velocities()
         fluid_collection.incompressible_fluid_collection.viscosity.Resize(fluids_parameters.grid->Domain_Indices(1));
         fluid_collection.incompressible_fluid_collection.viscosity.Fill(fluids_parameters.viscosity);
         fluids_parameters.implicit_viscosity=false;}
+
+#if 0
+    ARRAY<T,FACE_INDEX<TV::m> >& u=fluid_collection.incompressible_fluid_collection.face_velocities;
+    switch(test_number){
+        case 7:case 8:
+            Set_Analytic_Velocity(0,u);
+            break;
+        default:;}
+#endif // #if 0|1
 }
 //#####################################################################
 // Function Set_Dirichlet_Boundary_Conditions
@@ -284,6 +331,9 @@ Initialize_Bodies()
         case 4: Poisson_Test();break;
         case 5: Poiseuille_Flow_Test();break;
         case 6: Couette_Flow_Test();break;
+        case 7: Circular_Couette_Flow_Test();break;
+        case 8: Radial_Flow_Test();break;
+        case 9: Kang_Example_1();break;
         default: LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}
 
     if(fluids_parameters.viscosity) fluids_parameters.implicit_viscosity=false;
@@ -372,6 +422,55 @@ Couette_Flow_Test()
     fluids_parameters.use_particle_levelset=true;
     uleft=-1*m/s;
     uright=1*m/s;
+}
+//#####################################################################
+// Function Circular_Couette_Flow_Test
+//#####################################################################
+template<class T> void KANG<T>::
+Circular_Couette_Flow_Test()
+{
+    fluids_parameters.gravity=(T)0*m/(s*s);
+    fluids_parameters.density=(T)1*kg/(m*m);
+    fluids_parameters.outside_density=(T)2*kg/(m*m);
+    fluids_parameters.viscosity=(T)1*kg/s;
+    fluids_parameters.outside_viscosity=(T)2*kg/s;
+    fluids_parameters.surface_tension=1;
+    fluids_parameters.use_particle_levelset=true;
+    u_n0=-1*m/s;
+    u_p0=1*m/s;
+}
+//#####################################################################
+// Function Radial_Flow_Test
+//#####################################################################
+template<class T> void KANG<T>::
+Radial_Flow_Test()
+{
+    fluids_parameters.gravity=(T)0*m/(s*s);
+    fluids_parameters.density=(T)1*kg/(m*m);
+    fluids_parameters.outside_density=(T)2*kg/(m*m);
+    fluids_parameters.viscosity=(T)1*kg/s;
+    fluids_parameters.outside_viscosity=(T)2*kg/s;
+    fluids_parameters.surface_tension=1;
+    fluids_parameters.use_particle_levelset=true;
+    u_n0=1*m/s;
+    u_p0=(r_n/r_p)*u_n0;
+}
+//#####################################################################
+// Function Kang_Example_1
+//#####################################################################
+template<class T> void KANG<T>::
+Kang_Example_1()
+{
+    fluids_parameters.gravity=(T)9.8*m/(s*s);
+    //fluids_parameters.density=(T)1.226*kg/(m*m);
+    fluids_parameters.density=(T)1000*kg/(m*m);
+    fluids_parameters.outside_density=(T)1000*kg/(m*m);
+    //fluids_parameters.viscosity=(T)1.78-5*kg/s;
+    fluids_parameters.viscosity=(T)1.137e-3*kg/s;
+    fluids_parameters.outside_viscosity=(T)1.137e-3*kg/s;
+    fluids_parameters.surface_tension=(T)0.0728*kg/(s*s);
+    //fluids_parameters.surface_tension=(T)0*kg/(s/s);
+    fluids_parameters.use_particle_levelset=true;
 }
 //#####################################################################
 // Function Oscillating_Circle
@@ -533,7 +632,7 @@ Postprocess_Frame(const int frame)
 {
 }
 //#####################################################################
-// Function Set_External_Velocities
+// Function Postprocess_Substep
 //#####################################################################
 template<class T> void KANG<T>::
 Postprocess_Substep(const T dt,const T time)
@@ -554,7 +653,11 @@ Postprocess_Substep(const T dt,const T time)
         LOG::cout<<"Vel at [.75,.5]: "<<interp.Clamped_To_Array(fluid_collection.incompressible_fluid_collection.face_velocities,p)<<std::endl;
         LOG::cout<<"Analytic Vel at [.75,.5]: "<<-omega*circle_perturbation*pow(T(.25)/circle_radius,oscillation_mode-1)*sin(omega*time)*TV(1,0)<<std::endl;
     }
-    if(test_number==5 || test_number==6) Initialize_Phi();
+    switch(test_number){
+        case 5:case 6:case 7:case 8:
+            Initialize_Phi();
+            break;
+        default:;}
 }
 //#####################################################################
 // Function Debug_Particle_Set_Attribute
@@ -568,35 +671,168 @@ Debug_Particle_Set_Attribute(ATTRIBUTE_ID id,const ATTR& attr)
     attribute->Last()=attr;
 }
 //#####################################################################
+// Function Set_Analytic_Velocity
+//#####################################################################
+template<class T> void KANG<T>::
+Set_Analytic_Velocity(const T time,ARRAY<T,FACE_INDEX<TV::dimension> >& u) const
+{
+    const GRID<TV>& grid=*fluids_parameters.grid;
+    switch(test_number){
+        case 4:
+            break;
+        case 5:
+            break;
+        case 6:
+            break;
+        case 7:{
+            T mu_n=fluids_parameters.viscosity;
+            T mu_p=fluids_parameters.outside_viscosity;
+            //T rho_n=fluids_parameters.density;
+            //T rho_p=fluids_parameters.outside_density;
+            //T sigma=fluids_parameters.surface_tension;
+            T w_n=mu_n*((T)1/(r_I*r_I)-(T)1/(r_p*r_p));
+            T w_p=mu_p*((T)1/(r_n*r_n)-(T)1/(r_I*r_I));
+            T u_I0=((r_I/r_p)*w_p*u_p0+(r_I/r_n)*w_n*u_n0)/(w_p+w_n);
+            T a_n=(r_I*u_I0-r_n*u_n0)/(r_I*r_I-r_n*r_n);
+            T a_p=(r_p*u_p0-r_I*u_I0)/(r_p*r_p-r_I*r_I);
+            T b_n=(u_n0/r_n-u_I0/r_I)/((T)1/(r_n*r_n)-(T)1/(r_I*r_I));
+            T b_p=(u_I0/r_I-u_p0/r_p)/((T)1/(r_I*r_I)-(T)1/(r_p*r_p));
+            for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,0,GRID<TV>::WHOLE_REGION);it.Valid();it.Next()){
+                TV x=it.Location();
+                T r=x.Magnitude();
+                if(r!=0){
+                    T c=r<r_I?a_n*r+b_n/r:a_p*r+b_p/r;
+                    u(it.Full_Index())=(c/r)*TV(-x.y,x.x)[it.Axis()];}}
+            break;}
+        case 8:{
+            //T mu_n=fluids_parameters.viscosity;
+            //T mu_p=fluids_parameters.outside_viscosity;
+            //T rho_n=fluids_parameters.density;
+            //T rho_p=fluids_parameters.outside_density;
+            //T sigma=fluids_parameters.surface_tension;
+            T a=r_n*u_n0;
+            //T u_I0=a/r_I;
+            for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,0,GRID<TV>::WHOLE_REGION);it.Valid();it.Next()){
+                TV x=it.Location();
+                T r=x.Magnitude();
+                if(r!=0)
+                    u(it.Full_Index())=(a/(r*r))*x[it.Axis()];}
+            break;}
+        default:;}
+}
+//#####################################################################
 // Function Set_Boundary_Conditions_Callback
 //#####################################################################
 template<class T> void KANG<T>::
 Set_Boundary_Conditions_Callback(ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX<TV::dimension> >& psi_N,ARRAY<T,TV_INT>& psi_D_value,
     ARRAY<T,FACE_INDEX<TV::dimension> >& psi_N_value) const
 {
-    if(test_number==4){
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(*fluids_parameters.grid,3,GRID<TV>::GHOST_REGION);it.Valid();it.Next()){
-            TV x=it.Location();
-            psi_D_value(it.index)=sqr(x.x)-sqr(x.y);}
-        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION);it.Valid();it.Next()){
-            Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));
-            TV x=it.Location();
-            psi_N_value(it.Full_Index())=it.Axis()==1?2*x.x:-2*x.y;}}
-    if(test_number==5){
-        for(int s=1;s<=2;s++)
-            for(UNIFORM_GRID_ITERATOR_FACE<TV> it(*fluids_parameters.grid,1,GRID<TV>::GHOST_REGION,s);it.Valid();it.Next()){
+    const GRID<TV>& grid=*fluids_parameters.grid;
+    switch(test_number){
+        case 4:
+            for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,3,GRID<TV>::GHOST_REGION);it.Valid();it.Next()){
+                TV x=it.Location();
+                psi_D_value(it.index)=sqr(x.x)-sqr(x.y);}
+            for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,0,GRID<TV>::BOUNDARY_REGION);it.Valid();it.Next()){
+                Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));
+                TV x=it.Location();
+                psi_N_value(it.Full_Index())=it.Axis()==1?2*x.x:-2*x.y;}
+            break;
+        case 5:
+            for(int s=1;s<=2;s++)
+                for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,1,GRID<TV>::GHOST_REGION,s);it.Valid();it.Next()){
+                    Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));
+                    psi_N(it.Full_Index())=true;
+                    psi_N_value(it.Full_Index())=0;}
+            break;
+        case 6:
+            for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,1,GRID<TV>::GHOST_REGION,1);it.Valid();it.Next()){
                 Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));
                 psi_N(it.Full_Index())=true;
-                psi_N_value(it.Full_Index())=0;}}
-    if(test_number==6){
-        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(*fluids_parameters.grid,1,GRID<TV>::GHOST_REGION,1);it.Valid();it.Next()){
-            Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));
-            psi_N(it.Full_Index())=true;
-            psi_N_value(it.Full_Index())=uleft;}
-        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(*fluids_parameters.grid,1,GRID<TV>::GHOST_REGION,2);it.Valid();it.Next()){
-            Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));
-            psi_N(it.Full_Index())=true;
-            psi_N_value(it.Full_Index())=uright;}}
+                psi_N_value(it.Full_Index())=uleft;}
+            for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,1,GRID<TV>::GHOST_REGION,2);it.Valid();it.Next()){
+                Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));
+                psi_N(it.Full_Index())=true;
+                psi_N_value(it.Full_Index())=uright;}
+            break;
+        case 7:{
+            T mu_n=fluids_parameters.viscosity;
+            T mu_p=fluids_parameters.outside_viscosity;
+            T rho_n=fluids_parameters.density;
+            T rho_p=fluids_parameters.outside_density;
+            T sigma=fluids_parameters.surface_tension;
+            T w_n=mu_n*((T)1/(r_I*r_I)-(T)1/(r_p*r_p));
+            T w_p=mu_p*((T)1/(r_n*r_n)-(T)1/(r_I*r_I));
+            T u_I0=((r_I/r_p)*w_p*u_p0+(r_I/r_n)*w_n*u_n0)/(w_p+w_n);
+            T a_n=(r_I*u_I0-r_n*u_n0)/(r_I*r_I-r_n*r_n);
+            T a_p=(r_p*u_p0-r_I*u_I0)/(r_p*r_p-r_I*r_I);
+            T b_n=(u_n0/r_n-u_I0/r_I)/((T)1/(r_n*r_n)-(T)1/(r_I*r_I));
+            T b_p=(u_I0/r_I-u_p0/r_p)/((T)1/(r_I*r_I)-(T)1/(r_p*r_p));
+            if(a_n!=0 && (a_n<0)!=(b_n<0)) LOG::cout<<"*** |u^-| = 0 @ r = "<<std::sqrt(-b_n/a_n)<<std::endl;
+            if(a_p!=0 && (a_p<0)!=(b_p<0)) LOG::cout<<"*** |u^+| = 0 @ r = "<<std::sqrt(-b_p/a_p)<<std::endl;
+            T p_n=(rho_n/2)*(a_n*a_n*r_I*r_I+4*a_n*b_n*std::log(r_I)-b_n*b_n/(r_I*r_I));
+            T p_p=(rho_p/2)*(a_p*a_p*r_I*r_I+4*a_p*b_p*std::log(r_I)-b_p*b_p/(r_I*r_I));
+            T p_offset=sigma/r_I-(p_p-p_n);
+            for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+                T r=it.Location().Magnitude();
+                if(r_n<r && r<r_p) continue;
+                psi_D(it.index)=true;
+                if(r<r_n-2*grid.dX.Magnitude()||r_p+2*grid.dX.Magnitude()<r) continue;
+                if(r!=0)
+                    psi_D_value(it.index)=
+                        r<r_I?
+                        (rho_n/2)*(a_n*a_n*r*r+4*a_n*b_n*std::log(r)-b_n*b_n/(r*r)):
+                        (rho_p/2)*(a_p*a_p*r*r+4*a_p*b_p*std::log(r)-b_p*b_p/(r*r))+p_offset;}
+            for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,1,GRID<TV>::WHOLE_REGION);it.Valid();it.Next()){
+                TV_INT cell1=it.First_Cell_Index(),cell2=it.Second_Cell_Index();
+                if(!psi_D(cell1) && !psi_D(cell2)) continue;
+                TV x=it.Location();
+                T r=x.Magnitude();
+                if(r<r_n-2*grid.dX.Magnitude()||r_p+2*grid.dX.Magnitude()<r) continue;
+                psi_N(it.Full_Index())=true;
+                if(r!=0){
+                    T u=r<r_I?a_n*r+b_n/r:a_p*r+b_p/r;
+                    psi_N_value(it.Full_Index())=(u/r)*TV(-x.y,x.x)[it.Axis()];}}
+            break;}
+        case 8:{
+            T mu_n=fluids_parameters.viscosity;
+            T mu_p=fluids_parameters.outside_viscosity;
+            T rho_n=fluids_parameters.density;
+            T rho_p=fluids_parameters.outside_density;
+            T sigma=fluids_parameters.surface_tension;
+            T a=r_n*u_n0;
+            T u_I0=a/r_I;
+            LOG::cout<<"*** |u| = "<<u_I0<<" @ r_I = "<<r_I<<std::endl;
+            LOG::cout<<"*** |u| = "<<u_p0<<" @ r_p = "<<r_p<<std::endl;
+            T p_n=-a*a*rho_n/(2*r_I*r_I);
+            T p_p=-a*a*rho_p/(2*r_I*r_I);
+            T p_offset=(sigma-2*a*(mu_p-mu_n))/r_I-(p_p-p_n);
+            for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+                T r=it.Location().Magnitude();
+                if(r_n<r && r<r_p) continue;
+                psi_D(it.index)=true;
+                if(r<r_n-2*grid.dX.Magnitude()||r_p+2*grid.dX.Magnitude()<r) continue;
+                if(r!=0)
+                    psi_D_value(it.index)=r<r_I?-a*a*rho_n/(2*r*r):-a*a*rho_p/(2*r*r)+p_offset;}
+            for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,1,GRID<TV>::WHOLE_REGION);it.Valid();it.Next()){
+                TV_INT cell1=it.First_Cell_Index(),cell2=it.Second_Cell_Index();
+                if(!psi_D(cell1) && !psi_D(cell2)) continue;
+                TV x=it.Location();
+                T r=x.Magnitude();
+                if(r<r_n-2*grid.dX.Magnitude()||r_p+2*grid.dX.Magnitude()<r) continue;
+                psi_N(it.Full_Index())=true;
+                if(r!=0)
+                    psi_N_value(it.Full_Index())=(a/(r*r))*x[it.Axis()];}
+            break;}
+        case 9:
+            //assert(!psi_D(TV_INT::All_Ones_Vector()));
+            //psi_D(TV_INT::All_Ones_Vector())=true;
+            for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,1,GRID<TV>::GHOST_REGION);it.Valid();it.Next()){
+                Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));
+                psi_N(it.Full_Index())=true;
+                psi_N_value(it.Full_Index())=0;}
+            break;
+        default:;}
 }
 template class KANG<float>;
 template void PhysBAM::Add_Debug_Particle<VECTOR<float,1> >(VECTOR<float,1> const&,VECTOR<float,3> const&);

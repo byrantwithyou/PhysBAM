@@ -144,11 +144,12 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt) const
     T beta_n=1/fluids_parameters.density,beta_p=1/fluids_parameters.outside_density;
     TV one_over_dX_2=sqr(grid.one_over_dX);
     T mn=FLT_MAX,mx=-mn;
-    GRAD_HELPER<T> null_helper = {0,0,0};
+    GRAD_HELPER<T> null_helper={0,0,0};
 
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
         TV_INT cell1=it.First_Cell_Index(),cell2=it.Second_Cell_Index();
         bool psi_n=psi_N(it.Full_Index());
+        //bool psi_n=false; // disable any Neumann bc's
         int index1=cell_index(cell1),index2=cell_index(cell2);
 
         if(!index1 && !index2){
@@ -178,8 +179,8 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt) const
 
         T A=beta_hat*one_over_dX_2(it.Axis()); // positive for diagonal, neg for off
 
-        if(!index1) rhs1+=A*psi_D_value(cell1);
-        if(!index2) rhs1-=A*psi_D_value(cell2);
+        if(!index1) rhs1+=dt*A*psi_D_value(cell1);
+        if(!index2) rhs1-=dt*A*psi_D_value(cell2);
 
         if(index1) helper.data.Append(TRIPLE<int,int,T>(index1,index1,A));
         if(index1 && index2) helper.data.Append(TRIPLE<int,int,T>(index1,index2,-A));
@@ -187,7 +188,7 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt) const
         if(index2) helper.data.Append(TRIPLE<int,int,T>(index2,index2,A));
 
         T beta_G=beta_hat*grid.one_over_dX(it.Axis()); // positive for 2, neg for 1
-        GRAD_HELPER<T> gh = {index1,index2,beta_G};
+        GRAD_HELPER<T> gh={index1,index2,beta_G};
 
         grad_helper.Append(gh);
         face_velocities(it.Full_Index())-=beta_G*pj;
@@ -195,7 +196,7 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt) const
         if(index1) rhs.v(index1)-=rhs1; // Setting up negative of standard system
         if(index2) rhs.v(index2)+=rhs1;}
 
-    LOG::cout<<"pressure range: "<<mn<<"  "<<mx<<std::endl;
+    LOG::cout<<"pressure jump range: "<<mn<<"  "<<mx<<std::endl;
     SPARSE_MATRIX_FLAT_NXN<T> matrix;
     helper.Compact();
     helper.Set_Matrix(num_cells,matrix);
@@ -216,18 +217,21 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt) const
     CONJUGATE_RESIDUAL<T> cr;
     CONJUGATE_GRADIENT<T> cg;
     SYMMQMR<T> qm;
-    KRYLOV_SOLVER<T>* solver=&cg;
+    //KRYLOV_SOLVER<T>* solver=&cg;
+    KRYLOV_SOLVER<T>* solver=&cr;
     solver->restart_iterations=fluids_parameters.cg_restart_iterations;
     solver->Solve(system,p,rhs,q,s,r,k,z,fluids_parameters.incompressible_tolerance,0,fluids_parameters.incompressible_iterations);
     if(print_matrix) OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("x-%i.txt",solve_id).c_str()).Write("x",p.v);
 
     INTERPOLATED_COLOR_MAP<T> color_map;
-    color_map.Initialize_Colors(-.3,.3,false,true,false);
+    color_map.Initialize_Colors((T)-.3,(T).3,false,true,false);
 
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
         int ci=cell_index(it.index);
+        if(ci==0) continue;
         T val=p.v(ci);
-        Add_Debug_Particle(it.Location(), color_map(val));}
+        static_cast<void>(val);
+        /*Add_Debug_Particle(it.Location(), color_map(val));*/}
 
     int i=1;
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next(),i++){
@@ -289,12 +293,18 @@ Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,int axis,T dt,bool 
         TV_INT dual_cell1=it.First_Cell_Index(),dual_cell2=it.Second_Cell_Index();
         FACE_INDEX<TV::m> face1(axis,dual_cell1),face2(axis,dual_cell2);
         int index1=dual_cell_index(dual_cell1),index2=dual_cell_index(dual_cell2);
-        if(!index1 && !index2){Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));continue;}
-        if(it.Axis()==axis){if(psi_D(dual_cell1)){Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));continue;}}
+        if(!index1 && !index2){/*Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));*/continue;}
+        if(it.Axis()==axis){if(psi_D(dual_cell1)){/*Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));*/continue;}}
         else{
-            if(!index1 && !psi_N(face1)){Add_Debug_Particle(it.Location(),VECTOR<T,3>(0,1,1));Add_Debug_Particle(grid.Axis_X_Face(face1),VECTOR<T,3>(1,0,1));continue;}
-            if(!index2 && !psi_N(face2)){Add_Debug_Particle(it.Location(),VECTOR<T,3>(0,1,1));Add_Debug_Particle(grid.Axis_X_Face(face2),VECTOR<T,3>(1,0,1));continue;}}
-        if(!index1 || !index2){Add_Debug_Particle(it.Location(),VECTOR<T,3>(0,0,1));}
+            if(!index1 && !psi_N(face1)){
+                /*Add_Debug_Particle(it.Location(),VECTOR<T,3>(0,1,1));*/
+                /*Add_Debug_Particle(grid.Axis_X_Face(face1),VECTOR<T,3>(1,0,1));*/
+                continue;}
+            if(!index2 && !psi_N(face2)){
+                /*Add_Debug_Particle(it.Location(),VECTOR<T,3>(0,1,1));*/
+                /*Add_Debug_Particle(grid.Axis_X_Face(face2),VECTOR<T,3>(1,0,1));*/
+                continue;}}
+        if(!index1 || !index2){/*Add_Debug_Particle(it.Location(),VECTOR<T,3>(0,0,1));*/}
 
         T phi1=Face_Phi(face1),phi2=Face_Phi(face2);
         T mu_hat,mu1=(phi1<0)?mu_n:mu_p,muj=0;
@@ -361,7 +371,7 @@ Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,int axis,T dt,bool 
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,0,GRID<TV>::WHOLE_REGION,0,axis);it.Valid();it.Next()){
         if(int index=dual_cell_index(it.index)){
             face_velocities(it.Full_Index())=u.v(index);
-            Add_Debug_Particle(it.Location(),color_map(u.v(index)));}}
+            /*Add_Debug_Particle(it.Location(),color_map(u.v(index)));*/}}
 }
 template class KANG_POISSON_VISCOSITY<VECTOR<float,1> >;
 template class KANG_POISSON_VISCOSITY<VECTOR<float,2> >;

@@ -69,7 +69,7 @@ struct INDEX_IS_DIRICHLET;
 
 template< class T, int D >
 int Build_And_Solve_Neumann_System(
-    const typename EXAMPLE_PARAMS<T,D>::NEUMANN_PARAMS& problem,
+    typename EXAMPLE_PARAMS<T,D>::NEUMANN_PARAMS const & problem,
     const MAIN_PARAMS<T,D>& main_params,
     typename RAND_MT19937_UNIFORM_REAL<T>::type& rand,
     const ARRAY_VIEW<const T> phi_of_fine_index)
@@ -298,7 +298,7 @@ public:
 
 #define EXPLICIT_INSTANTIATION( T, D ) \
 template int Build_And_Solve_Neumann_System<T,D>( \
-    const EXAMPLE_PARAMS<T,D>::NEUMANN_PARAMS& problem, \
+    EXAMPLE_PARAMS<T,D>::NEUMANN_PARAMS const & problem, \
     const MAIN_PARAMS<T,D>& main_params, \
     RAND_MT19937_UNIFORM_REAL<T>::type& rand, \
     const ARRAY_VIEW<const T> phi_of_fine_index);

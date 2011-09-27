@@ -7,6 +7,8 @@
 #ifndef PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_PETSC_SCOPED_DESTROY_HPP
 #define PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_PETSC_SCOPED_DESTROY_HPP
 
+#ifdef PHYSBAM_USE_PETSC
+
 #include <boost/preprocessor/cat.hpp>
 
 #ifdef __COUNTER__
@@ -40,6 +42,8 @@
         Cond, \
         BOOST_PP_CAT( _petsc_, BOOST_PP_CAT( Type, BOOST_PP_CAT( _destroy_, __LINE__ ) ) ) \
     )
+
+#endif // #ifdef PHYSBAM_USE_PETSC
 
 #endif // #ifdef __COUNTER__
 

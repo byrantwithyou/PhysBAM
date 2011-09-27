@@ -53,6 +53,7 @@
 #include "Init_ZTAZ_Embedding.h"
 #include "INTERFACE_CONSTRAINT_SYSTEM.h"
 #include "INTERFACE_INDEX_TRANSFORM.h"
+#include "MAC_Grad.h"
 #include "Select_Indys.h"
 #include "SET_NEUMANN_GRID_BC_VISITOR.h"
 #include "SYSTEM_SUM.h"

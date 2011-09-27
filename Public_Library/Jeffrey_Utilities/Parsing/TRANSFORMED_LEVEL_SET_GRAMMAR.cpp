@@ -4,6 +4,10 @@
 // license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 
+#include <boost/version.hpp>
+
+#if BOOST_VERSION >= 104700
+
 #include <string>
 
 #include <boost/spirit/home/qi/char/char_class.hpp>
@@ -28,3 +32,5 @@ EXPLICIT_INSTANTIATION( double, 3 )
 #undef EXPLICIT_INSTANTIATION
 
 } // namespace PhysBAM
+
+#endif // #if BOOST_VERSION

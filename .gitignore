@@ -14,3 +14,8 @@ Release
 .emacs_project_config
 *.o
 Test_[0-9]*
+
+*.bbl
+*.blg
+*.dvi
+*.ps

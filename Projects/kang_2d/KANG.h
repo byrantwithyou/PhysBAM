@@ -8,7 +8,11 @@
 //   2. Oscillating deformed circle
 //   3. Two-phase rising bubble test
 //   4. Poisson Test
-//   5. Viscosity Test
+//   5. Poiseuille Flow Test
+//   6. Couette Flow Test
+//   7. Circular Couette Flow Test
+//   8. Radial Flow Test
+//   9. Kang Example 1
 //#####################################################################
 #ifndef __KANG__
 #define __KANG__
@@ -98,7 +102,11 @@ public:
     bool make_ellipse;
     T omega;
     T laplace_number,surface_tension;
+
     T uleft,uright;
+
+    // for tests 7 and 8
+    T r_n,r_I,r_p,u_n0,u_p0;
 
     KANG(const STREAM_TYPE stream_type);
     virtual ~KANG();
@@ -150,29 +158,33 @@ public:
     void Poisson_Test();
     void Poiseuille_Flow_Test();
     void Couette_Flow_Test();
+    void Circular_Couette_Flow_Test();
+    void Radial_Flow_Test();
+    void Kang_Example_1();
     void Oscillating_Circle();
     void Test_Analytic_Velocity(T time);
     void Test_Analytic_Pressure(T time);
-    void Solid_Circle();
-    void Sync_Particle_To_Level_Set(int p);
-    void Sync_Front_Tracked_Particles_To_Level_Set();
-    void Divide_Segment(int e);
-    void Swap_Particles(int p,int r);
-    void Swap_Segments(int e,int f);
-    void Remove_Particle(int p);
-    T Compute_New_Mass(int p);
-    void Copy_Front_Tracked_Velocity_From_Fluid();
+    //void Solid_Circle();
+    //void Sync_Particle_To_Level_Set(int p);
+    //void Sync_Front_Tracked_Particles_To_Level_Set();
+    //void Divide_Segment(int e);
+    //void Swap_Particles(int p,int r);
+    //void Swap_Segments(int e,int f);
+    //void Remove_Particle(int p);
+    //T Compute_New_Mass(int p);
+    //void Copy_Front_Tracked_Velocity_From_Fluid();
     void Limit_Dt(T& dt,const T time) PHYSBAM_OVERRIDE;
     void Limit_Solids_Dt(T& dt,const T time) PHYSBAM_OVERRIDE;
     void Write_Output_Files(const int frame) const;
-    void Initialize_Surface_Particles(int number);
-    void Rebuild_Surface();
+    //void Initialize_Surface_Particles(int number);
+    //void Rebuild_Surface();
     void Advance_One_Time_Step_Begin_Callback(const T dt,const T time) PHYSBAM_OVERRIDE;
     void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE;
     static GEOMETRY_PARTICLES<TV>*  Store_Debug_Particles(GEOMETRY_PARTICLES<TV>* particle=0);
-    void FSI_Analytic_Test();
-    void Sine_Wave();
-    void Initialize_Sine_Phi();
+    //void FSI_Analytic_Test();
+    //void Sine_Wave();
+    //void Initialize_Sine_Phi();
+    void Set_Analytic_Velocity(const T time,ARRAY<T,FACE_INDEX<TV::dimension> >& u) const;
     void Set_Boundary_Conditions_Callback(ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX<TV::dimension> >& psi_N,ARRAY<T,TV_INT>& psi_D_value,
         ARRAY<T,FACE_INDEX<TV::dimension> >& psi_N_value) const PHYSBAM_OVERRIDE;
 //#####################################################################

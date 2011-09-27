@@ -757,6 +757,18 @@
 			</File>
 		</Filter>
 		<Filter
+			Name="Kang"
+			>
+			<File
+				RelativePath="..\..\Kang\KANG_POISSON_VISCOSITY.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\Kang\KANG_POISSON_VISCOSITY.h"
+				>
+			</File>
+		</Filter>
+		<Filter
 			Name="Level_Sets"
 			>
 			<File

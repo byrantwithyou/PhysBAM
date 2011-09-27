@@ -10,38 +10,38 @@ import re
 
 default_cxx='g++'
 
-### options and base environment
-options=Options('SConstruct.options')
-options.AddOptions(('CXX','C++ compiler',default_cxx),
-                   EnumOption('ARCH','Architecture (e.g. pentium4, opteron, nocona, powerpc)','',allowed_values=('pentium3','pentium4','opteron','nocona','powerpc','test','wine','')),
-                   EnumOption('TYPE','Type of build (e.g. release, debug, profile)','release',allowed_values=('release','debug','profile','optdebug')),
-                   ('DEFAULT_ARCH','Architecture that doesn\'t need a suffix',''),
-                   ('cache','Cache directory to use',''),
-                   BoolOption('shared','Build shared libraries',1),
-                   BoolOption('wrapper','Build wrapper executable file',1),
-                   BoolOption('shared_objects','Build shareable objects when without shared libraries',1),
-                   BoolOption('autodetect','Automatically detect existence of libraries',0),
-                   BoolOption('USE_RENDERING','Use Rendering',0),
-                   BoolOption('compile_without_read_write_support','Do not compile read_write support into the library',0),
-                   BoolOption('compile_without_double_support','Do not compile double support into the library',0),
-                   BoolOption('compile_without_dyadic_support','Do not compile dyadic support into the library',0),
-                   BoolOption('compile_with_bintree_support','Force compilation of bintree support',0),
-                   BoolOption('compile_without_rle_support','Do not compile rle support into the library',0),
-                   BoolOption('compile_id_types_as_int','Treat ID types as int to avoid possible performance consequences',0),
-                   BoolOption('fast_math','compile with -ffast-math',0),
-                   BoolOption('install_programs','install programs into source directories',1),
-                   BoolOption('compile_headers','compile headers without .cpp files',1),
-                   BoolOption('install_headers','install Public_Library headers into $INSTALL_DIR/include/physbam',1),
-                   BoolOption('warnings_are_errors','turn any warning into an error',1),
-                   BoolOption('use_rpath','use rpaths for dynamic libraries',1),
-                   BoolOption('single_so','generate only one global shared library',0),
-                   ('CXXFLAGS_EXTRA','',[]),
-                   ('LINKFLAGS_EXTRA','',[]),
-                   ('CPPPATH_EXTRA','',[]),
-                   ('LIBPATH_EXTRA','',[]),
-                   ('RPATH_EXTRA','',[]),
-                   ('LIBS_EXTRA','',[]),
-                   ('INSTALL_PATH','Path to install libraries, binaries, and scripts',''))
+### variables and base environment
+variables=Variables('SConstruct.options')
+variables.AddVariables(('CXX','C++ compiler',default_cxx),
+                       EnumVariable('ARCH','Architecture (e.g. pentium4, opteron, nocona, powerpc)','',allowed_values=('pentium3','pentium4','opteron','nocona','powerpc','test','wine','')),
+                       EnumVariable('TYPE','Type of build (e.g. release, debug, profile)','release',allowed_values=('release','debug','profile','optdebug')),
+                       ('DEFAULT_ARCH','Architecture that doesn\'t need a suffix',''),
+                       ('cache','Cache directory to use',''),
+                       BoolVariable('shared','Build shared libraries',1),
+                       BoolVariable('wrapper','Build wrapper executable file',1),
+                       BoolVariable('shared_objects','Build shareable objects when without shared libraries',1),
+                       BoolVariable('autodetect','Automatically detect existence of libraries',0),
+                       BoolVariable('USE_RENDERING','Use Rendering',0),
+                       BoolVariable('compile_without_read_write_support','Do not compile read_write support into the library',0),
+                       BoolVariable('compile_without_double_support','Do not compile double support into the library',0),
+                       BoolVariable('compile_without_dyadic_support','Do not compile dyadic support into the library',0),
+                       BoolVariable('compile_with_bintree_support','Force compilation of bintree support',0),
+                       BoolVariable('compile_without_rle_support','Do not compile rle support into the library',0),
+                       BoolVariable('compile_id_types_as_int','Treat ID types as int to avoid possible performance consequences',0),
+                       BoolVariable('fast_math','compile with -ffast-math',0),
+                       BoolVariable('install_programs','install programs into source directories',1),
+                       BoolVariable('compile_headers','compile headers without .cpp files',1),
+                       BoolVariable('install_headers','install Public_Library headers into $INSTALL_DIR/include/physbam',1),
+                       BoolVariable('warnings_are_errors','turn any warning into an error',1),
+                       BoolVariable('use_rpath','use rpaths for dynamic libraries',1),
+                       BoolVariable('single_so','generate only one global shared library',0),
+                       ('CXXFLAGS_EXTRA','',[]),
+                       ('LINKFLAGS_EXTRA','',[]),
+                       ('CPPPATH_EXTRA','',[]),
+                       ('LIBPATH_EXTRA','',[]),
+                       ('RPATH_EXTRA','',[]),
+                       ('LIBS_EXTRA','',[]),
+                       ('INSTALL_PATH','Path to install libraries, binaries, and scripts',''))
 
 ### external libraries
 arch=os.popen("uname -m").read()[:-1]
@@ -73,21 +73,21 @@ for name,lib in external_libraries.items():
     defaults={'default':0,'cvs':0,'flags':'','linkflags':'','cpppath':[],'libpath':[],'filter':''}
     for f in defaults.keys(): lib.setdefault(f,defaults[f])
     lib['filter']=re.compile(lib['filter'])
-    options.AddOptions(BoolOption('USE_'+name.upper(),'Use '+name,lib['default']),
-                       (name+'_include','Include directory for '+name,0),
-                       (name+'_libpath','Library directory for '+name,0),
-                       (name+'_rpath','Extra rpath directory for '+name,0),
-                       (name+'_libs','Libraries for'+name,0),
-                       (name+'_linkflags','Linker flags for '+name,0))
+    variables.AddVariables(BoolVariable('USE_'+name.upper(),'Use '+name,lib['default']),
+                           (name+'_include','Include directory for '+name,0),
+                           (name+'_libpath','Library directory for '+name,0),
+                           (name+'_rpath','Extra rpath directory for '+name,0),
+                           (name+'_libs','Libraries for'+name,0),
+                           (name+'_linkflags','Linker flags for '+name,0))
 
-### parse options
+### parse variables
 if os.environ.has_key('PLATFORM') and os.environ['PLATFORM']=="wine":
-    env=Environment(options=options,tools=["msvc","mslink","mslib"],platform="win32cross",CC="clwrap",CXX="clwrap",LINK="linkwrap",AR="libwrap")
+    env=Environment(variables=variables,tools=["msvc","mslink","mslib"],platform="win32cross",CC="clwrap",CXX="clwrap",LINK="linkwrap",AR="libwrap")
     env["CXX"]="clwrap" # TODO: this /is/ necessary but why, maybe the default above?
 else:
-    env=Environment(options=options)
+    env=Environment(variables=variables)
 env.Replace(ENV=os.environ) # do this here to allow SConstruct.options to change environment
-Help(options.GenerateHelpText(env))
+Help(variables.GenerateHelpText(env))
 
 ### improve performance
 if 'Decider' in dir(env): # if Decider exists, use it to avoid deprecation warnings
