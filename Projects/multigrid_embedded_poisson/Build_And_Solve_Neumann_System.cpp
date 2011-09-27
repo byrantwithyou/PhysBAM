@@ -13,6 +13,11 @@
 
 #include <boost/preprocessor/seq/enum.hpp>
 
+#include <PhysBAM_Tools/Arrays/ARRAY.h>
+#include <PhysBAM_Tools/Arrays/ARRAY_NEGATION.h>
+#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
+#include <PhysBAM_Tools/Arrays_Computations/ARRAY_MIN_MAX.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/Algorithm/Any_If.h>
 #include <Jeffrey_Utilities/ARRAY_OPS.h>
 #include <Jeffrey_Utilities/BASIC_TIMER.h>
@@ -29,12 +34,8 @@
 #include <Jeffrey_Utilities/Multi_Index/FINE_MULTI_INDEX_FUNCTION.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOUND.h>
 #include <Jeffrey_Utilities/VECTOR_OPS.h>
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_MIN_MAX.h>
-#include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Arrays/ARRAY_NEGATION.h>
-#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
+#include <Jeffrey_Utilities/SOLVER_PARAMS.h>
 #include "Build_Neumann_System.h"
 #include "DOMAIN_EMBEDDING_CUBE_SUBSYS.h"
 #include "DOMAIN_REGULAR_CROSS_SUBSYS.h"
@@ -42,13 +43,12 @@
 #include "Evaluate_Error.h"
 #include "Params/EXAMPLE_PARAMS.h"
 #include "Params/MAIN_PARAMS.h"
-#include "Params/SOLVER_PARAMS.h"
 #include "RAND_MT19937_UNIFORM_REAL.h"
 
 #ifdef PHYSBAM_USE_PETSC
-#include <petsc.h>
 #include <Jeffrey_Utilities/Petsc/CALL_AND_CHKERRQ.h>
 #include <Jeffrey_Utilities/Petsc/Petsc_Solve_SPD_System_With_ICC_PCG.h>
+#include <petsc.h>
 #endif // #ifdef PHYSBAM_USE_PETSC
 
 #include "Build_And_Solve_Neumann_System.h"

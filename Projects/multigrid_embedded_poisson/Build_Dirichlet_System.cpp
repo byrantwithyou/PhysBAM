@@ -8,6 +8,10 @@
 
 #include <boost/preprocessor/seq/enum.hpp>
 
+#include <PhysBAM_Tools/Arrays/ARRAY.h>
+#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
+#include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/ARRAY_OPS.h>
 #include <Jeffrey_Utilities/BASIC_TIMER.h>
 #include <Jeffrey_Utilities/DIRECT_INIT_CTOR.h>
@@ -25,17 +29,13 @@
 #include <Jeffrey_Utilities/Grid/CELL_VALUE_VIA_AVERAGE_VERTEX_VALUE.h>
 #include <Jeffrey_Utilities/IDENTITY_TYPE.h>
 #include <Jeffrey_Utilities/Multi_Index/FINE_MULTI_INDEX_FUNCTION.h>
-#include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOX.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOUND.h>
+#include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOX.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_X_FUNCTION.h>
 #include <Jeffrey_Utilities/Multi_Index/Visit_Multi_Index_Box_Boundary.h>
 #include <Jeffrey_Utilities/ONSTREAM.h>
 #include <Jeffrey_Utilities/VECTOR_OPS.h>
 #include <Jeffrey_Utilities/VISITOR_SEQUENCE.h>
-#include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
-#include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 #include "BETA_GRAD_U_DOT_N.h"
 #include "Build_Domain_Regular_Subsys.h"

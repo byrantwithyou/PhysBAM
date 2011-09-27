@@ -9,6 +9,10 @@
 
 #include <iosfwd>
 
+#include <PhysBAM_Tools/Arrays/ARRAY.h>
+#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
+#include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/Functional/ARRAY_WRAPPER_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/BOUND_FAST_MEM_FN.h>
 #include <Jeffrey_Utilities/Functional/COMPOSE_FUNCTION.h>
@@ -17,10 +21,6 @@
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOUND.h>
 #include <Jeffrey_Utilities/ONSTREAM.h>
 #include <Jeffrey_Utilities/Stencils/INDEX_TRANSFORM_STENCIL_PROXY.h>
-#include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
-#include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 #include "Build_Embedding_Subsys.h"
 #include "EMBEDDING_UNSTRUCTURED_SUBSYS.h"

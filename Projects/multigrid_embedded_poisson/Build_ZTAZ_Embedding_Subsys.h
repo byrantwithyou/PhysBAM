@@ -13,12 +13,12 @@
 #include <boost/mpl/assert.hpp>
 #include <boost/type_traits/is_same.hpp>
 
+#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
+#include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <Jeffrey_Utilities/BOUNDED_LIST.h>
 #include <Jeffrey_Utilities/RESULT_OF.h>
 #include <Jeffrey_Utilities/Stencils/INDEX_VALUE.h>
 #include <Jeffrey_Utilities/Stencils/SCALED_STENCIL_PROXY.h>
-#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
-#include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 
 namespace PhysBAM
 {

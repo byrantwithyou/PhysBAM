@@ -15,6 +15,12 @@
 #include <boost/preprocessor/seq/enum.hpp>
 #include <boost/ref.hpp>
 
+#include <PhysBAM_Tools/Arrays/ARRAY.h>
+#include <PhysBAM_Tools/Arrays/ARRAY_DIFFERENCE.h>
+#include <PhysBAM_Tools/Arrays/ARRAY_NEGATION.h>
+#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
+#include <PhysBAM_Tools/Arrays_Computations/ARRAY_MIN_MAX.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/Algorithm/For_Each.h>
 #include <Jeffrey_Utilities/ARRAY_OPS.h>
 #include <Jeffrey_Utilities/BASIC_TIMER.h>
@@ -39,12 +45,6 @@
 #include <Jeffrey_Utilities/Stencils/INDEX_TRANSFORM_STENCIL_PROXY.h>
 #include <Jeffrey_Utilities/Stencils/ZERO_STENCIL_PROXY.h>
 #include <Jeffrey_Utilities/VECTOR_OPS.h>
-#include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Arrays/ARRAY_DIFFERENCE.h>
-#include <PhysBAM_Tools/Arrays/ARRAY_NEGATION.h>
-#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_MIN_MAX.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 #include "AGGREGATE_CONSTRAINT_SYSTEM.h"
 #include "Aggregate_Constraints.h"
@@ -63,9 +63,9 @@
 #include "SYSTEM_SUM.h"
 
 #ifdef PHYSBAM_USE_PETSC
-#include <petsc.h>
 #include <Jeffrey_Utilities/Petsc/CALL_AND_CHKERRQ.h>
 #include <Jeffrey_Utilities/Petsc/Petsc_Solve_SPD_System_With_ICC_PCG.h>
+#include <petsc.h>
 #endif // #ifdef PHYSBAM_USE_PETSC
 
 #include "Build_And_Solve_Interface_System.h"

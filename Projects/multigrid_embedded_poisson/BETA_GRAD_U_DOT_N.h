@@ -10,8 +10,8 @@
 #include <boost/type_traits/remove_reference.hpp>
 #include <boost/utility/result_of.hpp>
 
-#include <Jeffrey_Utilities/DIRECT_INIT_CTOR.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <Jeffrey_Utilities/DIRECT_INIT_CTOR.h>
 
 namespace PhysBAM
 {

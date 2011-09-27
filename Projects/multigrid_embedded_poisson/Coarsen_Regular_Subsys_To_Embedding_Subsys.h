@@ -13,6 +13,7 @@
 
 #include <boost/foreach.hpp>
 
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOUND.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_CUBE.h>
 #include <Jeffrey_Utilities/Stencils/Beta_Dv_Over_Dx_Dx.h>
@@ -21,7 +22,6 @@
 #include <Jeffrey_Utilities/Stencils/GEOMETRIC_PROLONGATION_STENCIL_PROXY_FUNCTION.h>
 #include <Jeffrey_Utilities/Stencils/GEOMETRIC_RESTRICTION_STENCIL_PROXY.h>
 #include <Jeffrey_Utilities/Stencils/Multiply_Stencils.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 //#include "LOCAL_CROSS_SUBSYS.h"
 

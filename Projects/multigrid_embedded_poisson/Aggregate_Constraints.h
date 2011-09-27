@@ -13,10 +13,10 @@
 #include <boost/mpl/assert.hpp>
 #include <boost/type_traits/is_same.hpp>
 
+#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 #include <Jeffrey_Utilities/IDENTITY_TYPE.h>
 #include <Jeffrey_Utilities/RESULT_OF.h>
 #include <Jeffrey_Utilities/Stencils/INDEX_VALUE.h>
-#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 
 namespace PhysBAM
 {

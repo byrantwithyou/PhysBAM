@@ -11,6 +11,8 @@
 
 #include <iosfwd>
 
+#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/BASIC_TIMER.h>
 #include <Jeffrey_Utilities/Functional/APPLY_ASSIGN_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/ARRAY_WRAPPER_FUNCTION.h>
@@ -24,8 +26,6 @@
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOUND.h>
 #include <Jeffrey_Utilities/ONSTREAM.h>
 #include <Jeffrey_Utilities/VECTOR_OPS.h>
-#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 #include "Build_Domain_Regular_Subsys_Rhs.h"
 #include "DOMAIN_REGULAR_CROSS_SUBSYS.h"
