@@ -12,13 +12,13 @@
 #include <boost/mpl/assert.hpp>
 #include <boost/type_traits/is_same.hpp>
 
-#include <Jeffrey_Utilities/Stencils/STENCIL_PROXY_CONCEPT.h>
-#include <Jeffrey_Utilities/Stencils/UNSTRUCTURED_STENCIL.h>
-#include <Jeffrey_Utilities/Stencils/UNSTRUCTURED_STENCIL_PROXY.h>
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <Jeffrey_Utilities/Stencils/STENCIL_PROXY_CONCEPT.h>
+#include <Jeffrey_Utilities/Stencils/UNSTRUCTURED_STENCIL.h>
+#include <Jeffrey_Utilities/Stencils/UNSTRUCTURED_STENCIL_PROXY.h>
 
 namespace PhysBAM
 {

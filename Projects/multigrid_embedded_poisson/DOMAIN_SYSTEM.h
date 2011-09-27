@@ -20,9 +20,9 @@
 #include <boost/type_traits/is_same.hpp>
 #include <boost/type_traits/remove_reference.hpp>
 
+#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 #include <Jeffrey_Utilities/ADD_REFERENCE_ADD_CONST.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOUND.h>
-#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 
 #include "SYSTEM_SUM.h"
 

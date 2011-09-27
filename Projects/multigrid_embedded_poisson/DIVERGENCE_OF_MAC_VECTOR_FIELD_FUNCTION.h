@@ -7,10 +7,10 @@
 #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_DIVERGENCE_OF_MAC_VECTOR_FIELD_FUNCTION_HPP
 #define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_DIVERGENCE_OF_MAC_VECTOR_FIELD_FUNCTION_HPP
 
-#include <Jeffrey_Utilities/DIRECT_INIT_CTOR.h>
-#include <Jeffrey_Utilities/Divergence_Of_MAC_Vector_Field.h>
-#include <Jeffrey_Utilities/IDENTITY_TYPE.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <Jeffrey_Utilities/DIRECT_INIT_CTOR.h>
+#include <Jeffrey_Utilities/IDENTITY_TYPE.h>
+#include <Jeffrey_Utilities/Divergence_Of_MAC_Vector_Field.h>
 
 namespace PhysBAM
 {

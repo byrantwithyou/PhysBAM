@@ -15,10 +15,10 @@
 #include <boost/mpl/assert.hpp>
 #include <boost/type_traits/is_same.hpp>
 
-#include <Jeffrey_Utilities/RESULT_OF.h>
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
+#include <Jeffrey_Utilities/RESULT_OF.h>
 
 namespace PhysBAM
 {

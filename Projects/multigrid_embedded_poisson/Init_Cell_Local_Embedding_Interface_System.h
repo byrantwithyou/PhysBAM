@@ -7,6 +7,7 @@
 #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_INIT_CELL_LOCAL_EMBEDDING_INTERFACE_SYSTEM_HPP
 #define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_INIT_CELL_LOCAL_EMBEDDING_INTERFACE_SYSTEM_HPP
 
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/DIRECT_INIT_CTOR.h>
 #include <Jeffrey_Utilities/Functional/ARRAY_WRAPPER_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/COMPOSE_FUNCTION.h>
@@ -24,7 +25,6 @@
 #include <Jeffrey_Utilities/Stencils/CUBE_STENCIL.h>
 #include <Jeffrey_Utilities/Stencils/CUBE_STENCIL_PROXY.h>
 #include <Jeffrey_Utilities/VISITOR_SEQUENCE.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 #include "Evaluate_Cell_Local_Integrations.h"
 #include "Init_Cell_Local_Embedding_Domain_System.h"

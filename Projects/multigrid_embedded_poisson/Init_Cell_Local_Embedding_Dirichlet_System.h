@@ -7,6 +7,7 @@
 #ifndef PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_INIT_CELL_LOCAL_EMBEDDING_DIRICHLET_SYSTEM_HPP
 #define PHYSBAM_PROJECTS_MULTIGRID_EMBEDDED_POISSON_INIT_CELL_LOCAL_EMBEDDING_DIRICHLET_SYSTEM_HPP
 
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/DIRECT_INIT_CTOR.h>
 #include <Jeffrey_Utilities/Functional/Pre_Compose_Translate.h>
 #include <Jeffrey_Utilities/Geometry/INTEGRATE_FUNCTION_OVER_BOUNDARY_POLYTOPE_VISITOR.h>
@@ -18,7 +19,6 @@
 #include <Jeffrey_Utilities/Multi_Index/STATIC_MULTI_INDEX_CUBE.h>
 #include <Jeffrey_Utilities/Stencils/CUBE_STENCIL.h>
 #include <Jeffrey_Utilities/Stencils/CUBE_STENCIL_PROXY.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 #include "Evaluate_Cell_Local_Integrations.h"
 #include "Init_Cell_Local_Embedding_Domain_System.h"
