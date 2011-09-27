@@ -8,8 +8,8 @@
 #include <cmath>
 
 #include <algorithm>
-#include <ostream>
 #include <limits>
+#include <ostream>
 #include <vector>
 
 #include <petsc.h>
@@ -18,6 +18,8 @@
 #include <petscpc.h>
 #include <petscvec.h>
 
+#include <PhysBAM_Tools/Arrays/ARRAY.h>
+#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 #include <Jeffrey_Utilities/Algorithm/Fill.h>
 #include <Jeffrey_Utilities/Algorithm/Find_All_If.h>
 #include <Jeffrey_Utilities/Algorithm/For_Each.h>
@@ -35,8 +37,6 @@
 #include <Jeffrey_Utilities/Stencils/SKIP_ZERO_VALUE_STENCIL_PROXY.h>
 #include <Jeffrey_Utilities/Stencils/UNSTRUCTURED_STENCIL.h>
 #include <Jeffrey_Utilities/Stencils/UNSTRUCTURED_STENCIL_PROXY.h>
-#include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 
 #include <Jeffrey_Utilities/Petsc/Petsc_Solve_SPD_System_With_ICC_PCG.h>
 

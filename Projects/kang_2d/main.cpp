@@ -12,7 +12,6 @@
 #include <PhysBAM_Dynamics/Coupled_Driver/PLS_FSI_EXAMPLE.h>
 #include <PhysBAM_Dynamics/Parallel_Computation/MPI_SOLID_FLUID.h>
 #include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_DRIVER_UNIFORM.h>
-//#include "Standard_Tests/STANDARD_TESTS.h"
 #include "KANG.h"
 using namespace PhysBAM;
 
