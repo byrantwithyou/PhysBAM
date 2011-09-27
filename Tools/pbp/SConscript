@@ -1,5 +1,0 @@
-# SConscript
-
-Import('env Automatic_Program')
-env=env.Copy(USE_OPENGL=1,USE_FFMPEG=1,USE_FLTK=1,USE_OPENEXR=0,USE_BOOSTREGEX=1)
-Automatic_Program(env,"pbp",["main.cpp","USER_INTERFACE.cpp","VIDEO.cpp"])
