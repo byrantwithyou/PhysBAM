@@ -25,7 +25,7 @@
 #include <boost/spirit/home/support/argument.hpp>
 #include <boost/spirit/home/support/context.hpp>
 
-#include "../Params/SOLVER_PARAMS.h"
+#include "../Params/POISSON_SOLVER_PARAMS.h"
 
 #include "Parse_String_Solver.h"
 

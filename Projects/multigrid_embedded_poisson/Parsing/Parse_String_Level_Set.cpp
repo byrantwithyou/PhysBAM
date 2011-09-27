@@ -10,8 +10,8 @@
 #include <boost/spirit/home/qi/char/char_class.hpp>
 #include <boost/spirit/home/qi/parse.hpp>
 
-#include <Jeffrey_Utilities/Parsing/TRANSFORMED_LEVEL_SET_GRAMMAR.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <Jeffrey_Utilities/Parsing/TRANSFORMED_LEVEL_SET_GRAMMAR.h>
 
 #include "Parse_String_Level_Set.h"
 

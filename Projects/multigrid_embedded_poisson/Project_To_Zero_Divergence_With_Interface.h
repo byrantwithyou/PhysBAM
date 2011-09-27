@@ -15,8 +15,11 @@
 #include <boost/mpl/vector/vector10.hpp>
 #include <boost/ref.hpp>
 
+#include <PhysBAM_Tools/Arrays/ARRAY.h>
+#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
+#include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/ARRAY_OPS.h>
-#include <Jeffrey_Utilities/DIVERGENCE_OF_MAC_VECTOR_FIELD_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/ARRAY_WRAPPER_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/BOUND_FAST_MEM_FN.h>
 #include <Jeffrey_Utilities/Functional/COMPOSE_FUNCTION.h>
@@ -37,13 +40,10 @@
 #include <Jeffrey_Utilities/SOLVER_PARAMS.h>
 #include <Jeffrey_Utilities/Stencils/ZERO_STENCIL_PROXY.h>
 #include <Jeffrey_Utilities/VISITOR_SEQUENCE.h>
-#include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
-#include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <Jeffrey_Utilities/DIVERGENCE_OF_MAC_VECTOR_FIELD_FUNCTION.h>
 
-#include "Aggregate_Constraints.h"
 #include "AGGREGATE_CONSTRAINT_SYSTEM.h"
+#include "Aggregate_Constraints.h"
 #include "Build_Interface_Embedding_Subsys.h"
 #include "Build_Interface_Regular_Subsys.h"
 #include "Build_ZTAZ_Embedding_Subsys.h"
@@ -59,9 +59,9 @@
 #include "SYSTEM_SUM.h"
 
 #ifdef PHYSBAM_USE_PETSC
-#include <petsc.h>
 #include <Jeffrey_Utilities/Petsc/CALL_AND_CHKERRQ.h>
 #include <Jeffrey_Utilities/Petsc/Petsc_Solve_SPD_System_With_ICC_PCG.h>
+#include <petsc.h>
 #endif // #ifdef PHYSBAM_USE_PETSC
 
 namespace PhysBAM

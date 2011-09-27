@@ -10,12 +10,12 @@
 #include <boost/random/variate_generator.hpp>
 #include <boost/variant/apply_visitor.hpp>
 
-#include <Jeffrey_Utilities/ARRAY_OPS.h>
-#include <Jeffrey_Utilities/BASIC_TIMER.h>
-#include <Jeffrey_Utilities/VECTOR_OPS.h>
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <Jeffrey_Utilities/ARRAY_OPS.h>
+#include <Jeffrey_Utilities/BASIC_TIMER.h>
+#include <Jeffrey_Utilities/VECTOR_OPS.h>
 
 #include "Params/EXAMPLE_PARAMS.h"
 #include "Params/MAIN_PARAMS.h"
@@ -29,9 +29,9 @@
 #include "RAND_MT19937_UNIFORM_REAL.h"
 
 #ifdef PHYSBAM_USE_PETSC
-#include <petsc.h>
 #include <Jeffrey_Utilities/Petsc/CALL_AND_CHKERRQ.h>
 #include <Jeffrey_Utilities/Petsc/SCOPED_FINALIZE.h>
+#include <petsc.h>
 #endif // #ifdef PHYSBAM_USE_PETSC
 
 namespace PhysBAM

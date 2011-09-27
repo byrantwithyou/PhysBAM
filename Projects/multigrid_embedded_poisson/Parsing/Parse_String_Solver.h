@@ -9,7 +9,7 @@
 
 #include <string>
 
-#include "../Params/SOLVER_PARAMS.h"
+#include "../Params/POISSON_SOLVER_PARAMS.h"
 
 namespace PhysBAM
 {

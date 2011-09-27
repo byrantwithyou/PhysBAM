@@ -11,6 +11,7 @@
 
 #include <boost/foreach.hpp>
 
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/DIRECT_INIT_CTOR.h>
 #include <Jeffrey_Utilities/Functional/CONSTANT_FUNCTION.h>
 #include <Jeffrey_Utilities/IDENTITY_TYPE.h>
@@ -20,7 +21,6 @@
 #include <Jeffrey_Utilities/RESULT_OF.h>
 #include <Jeffrey_Utilities/SOLVER_PARAMS.h>
 #include <Jeffrey_Utilities/VECTOR_OPS.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 #include "../multigrid_embedded_poisson/Project_To_Zero_Divergence_With_Interface.h"
 

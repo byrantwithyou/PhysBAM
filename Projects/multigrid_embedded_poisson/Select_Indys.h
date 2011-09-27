@@ -16,15 +16,15 @@
 #include <boost/mpl/assert.hpp>
 #include <boost/type_traits/is_convertible.hpp>
 
-#include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOUND.h>
-#include <Jeffrey_Utilities/Multi_Index/Multi_Index_Box_Intersect.h>
-#include <Jeffrey_Utilities/RESULT_OF.h>
-#include <Jeffrey_Utilities/Stencils/INDEX_VALUE.h>
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 #include <PhysBAM_Tools/Arrays_Computations/ARRAY_COPY.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOUND.h>
+#include <Jeffrey_Utilities/Multi_Index/Multi_Index_Box_Intersect.h>
+#include <Jeffrey_Utilities/RESULT_OF.h>
+#include <Jeffrey_Utilities/Stencils/INDEX_VALUE.h>
 
 namespace PhysBAM
 {
