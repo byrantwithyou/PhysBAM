@@ -7,9 +7,9 @@
 #ifndef __TYPE_UTILITIES__
 #define __TYPE_UTILITIES__
 
+#include <PhysBAM_Tools/Utilities/STATIC_ASSERT.h>
 #include <cstdio>
 #include <cstdlib>
-#include <PhysBAM_Tools/Utilities/STATIC_ASSERT.h>
 
 namespace PhysBAM{
 #define PHYSBAM_TYPE_TRAIT_DECLARE_CV_QUALIFIERS(trait_name,type_name,truth_value) \
