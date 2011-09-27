@@ -21,8 +21,8 @@
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FLOOD_FILL_1D.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Tools/Utilities/STATIC_ASSERT.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Conservation_Law_Solvers/CONSERVATION_CALLBACKS.h>
 namespace PhysBAM{
 

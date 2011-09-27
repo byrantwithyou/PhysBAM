@@ -5,7 +5,6 @@
 // Class CONSERVATION  
 //##################################################################### 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Fluids/PhysBAM_Compressible/Euler_Equations/EULER.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_UTILITIES.h>
@@ -15,6 +14,7 @@
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Conservation_Law_Solvers/CONSERVATION.h>
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Conservation_Law_Solvers/EIGENSYSTEM.h>
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Euler_Equations/BOUNDARY_OBJECT_REFLECTION.h>
+#include <PhysBAM_Fluids/PhysBAM_Compressible/Euler_Equations/EULER.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor

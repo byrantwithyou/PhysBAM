@@ -17,6 +17,8 @@
 #include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_BODY_CONTACT_GRAPH.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_BODY_SKIP_COLLISION_CHECK.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGIDS_COLLISION_CALLBACKS.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions_Computations/BOX_BOX_CONTACT_PAIR.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions_Computations/BOX_PLANE_CONTACT_PAIR.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Collisions_Computations/CONTACT_PRECONDITIONER.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Collisions_Computations/LEVELSET_CONTACT_PAIR.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Collisions_Computations/PARTICLES_IN_IMPLICIT_OBJECT.h>
@@ -25,8 +27,6 @@
 #include <PhysBAM_Solids/PhysBAM_Rigids/Collisions_Computations/SOLVE_CONTACT.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Collisions_Computations/SPHERE_PLANE_CONTACT_PAIR.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Collisions_Computations/SPHERE_SPHERE_CONTACT_PAIR.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions_Computations/BOX_BOX_CONTACT_PAIR.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions_Computations/BOX_PLANE_CONTACT_PAIR.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Parallel_Computation/MPI_RIGIDS.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>

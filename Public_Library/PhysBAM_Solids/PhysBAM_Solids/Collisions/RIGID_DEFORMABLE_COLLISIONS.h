@@ -15,8 +15,8 @@
 #include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY.h>
 #include <PhysBAM_Geometry/Topology/TOPOLOGY_POLICY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Joints/JOINT_ID.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_POLICY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_FORWARD.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_POLICY.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Collisions/SOLIDS_COLLISIONS_FORWARD.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
 namespace PhysBAM{

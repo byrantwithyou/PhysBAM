@@ -12,8 +12,8 @@
 #include <PhysBAM_Tools/Data_Structures/PAIR.h>
 #include <PhysBAM_Tools/Grids_Uniform/FACE_INDEX.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
-#include <PhysBAM_Dynamics/Coupled_Evolution/VISCOUS_FORCE_ID.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/SYSTEM_MATRIX_HELPER.h>
+#include <PhysBAM_Dynamics/Coupled_Evolution/VISCOUS_FORCE_ID.h>
 
 namespace PhysBAM{
 template<class TV> class COLLISION_AWARE_INDEX_MAP;

@@ -8,8 +8,8 @@
 #define __SOLIDS_FLUIDS_DRIVER_UNIFORM__    
 
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_DRIVER.h>
 #include <PhysBAM_Tools/Ordinary_Differential_Equations/RUNGEKUTTA.h>
+#include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_DRIVER.h>
 #include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 #include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_PARAMETERS.h>
 namespace PhysBAM{

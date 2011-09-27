@@ -17,8 +17,8 @@
 #include <GL/glu.h>
 #include <GL/glut.h>
 #else
-#include <GLES/gl.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/glues.h>
+#include <GLES/gl.h>
 #endif
 #else
 #include <GLUT/glut.h>
@@ -30,8 +30,8 @@
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/PLANE.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_POLICY.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_EPS_OUTPUT.h>
+#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_POLICY.h>
 namespace PhysBAM{
 
 #define WANT_OPENGL_EPS_OUTPUT // Uncomment this if you want support for dumping eps.
