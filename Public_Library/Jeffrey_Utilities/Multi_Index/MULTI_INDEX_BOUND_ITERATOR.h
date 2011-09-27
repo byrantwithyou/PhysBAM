@@ -11,11 +11,11 @@
 
 #include <iterator>
 
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/BEGIN_END_TAG.h>
 #include <Jeffrey_Utilities/ITERATOR_FACADE.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOUND.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_FWD.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 #define PHYSBAM_MULTI_INDEX_BOUND_ITERATOR_USE_LINEAR_INDEX
 

@@ -21,12 +21,12 @@
 #include <boost/type_traits/is_convertible.hpp>
 #include <boost/utility/enable_if.hpp>
 
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/BEGIN_END_TAG.h>
 #include <Jeffrey_Utilities/HAS_ISC_VALUE.h>
 #include <Jeffrey_Utilities/Math/STATIC_POW.h>
 #include <Jeffrey_Utilities/Multi_Index/STATIC_MULTI_INDEX_CUBE_ITERATOR.h>
 #include <Jeffrey_Utilities/REMOVE_QUALIFIERS.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 namespace PhysBAM
 {

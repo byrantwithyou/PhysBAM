@@ -9,13 +9,13 @@
 
 #include <boost/foreach.hpp>
 
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/DIRECT_INIT_CTOR.h>
 #include <Jeffrey_Utilities/Multi_Index/Multi_Index_Box_Intersect.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_CUBE.h>
 #include <Jeffrey_Utilities/REMOVE_QUALIFIERS.h>
 #include <Jeffrey_Utilities/RESULT_OF.h>
 #include <Jeffrey_Utilities/VECTOR_OPS.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 namespace PhysBAM
 {

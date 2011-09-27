@@ -13,10 +13,10 @@
 
 #include <petsc.h>
 
-#include <Jeffrey_Utilities/ONSTREAM.h>
-#include <Jeffrey_Utilities/GENERIC_SYSTEM_REFERENCE.h>
-#include <Jeffrey_Utilities/SOLVER_PARAMS.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
+#include <Jeffrey_Utilities/GENERIC_SYSTEM_REFERENCE.h>
+#include <Jeffrey_Utilities/ONSTREAM.h>
+#include <Jeffrey_Utilities/SOLVER_PARAMS.h>
 
 namespace PhysBAM
 {

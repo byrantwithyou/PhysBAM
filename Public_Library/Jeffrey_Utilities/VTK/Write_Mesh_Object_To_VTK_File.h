@@ -13,12 +13,12 @@
 #include <boost/exception/exception.hpp>
 #include <boost/throw_exception.hpp>
 
-#include <Jeffrey_Utilities/VTK/Write_Segmented_Curve_2d_To_VTK_File.h>
-#include <Jeffrey_Utilities/VTK/Write_Triangulated_Surface_To_VTK_File.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Topology/TOPOLOGY_POLICY.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/MESH_OBJECT.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_GEOMETRY_FORWARD.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <Jeffrey_Utilities/VTK/Write_Segmented_Curve_2d_To_VTK_File.h>
+#include <Jeffrey_Utilities/VTK/Write_Triangulated_Surface_To_VTK_File.h>
 
 namespace PhysBAM
 {

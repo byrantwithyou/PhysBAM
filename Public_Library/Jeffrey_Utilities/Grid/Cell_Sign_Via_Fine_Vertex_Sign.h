@@ -11,8 +11,8 @@
 
 #include <boost/foreach.hpp>
 
-#include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_CUBE.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_CUBE.h>
 
 namespace PhysBAM
 {

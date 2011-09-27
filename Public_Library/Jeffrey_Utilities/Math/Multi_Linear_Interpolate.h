@@ -10,11 +10,11 @@
 
 #include <boost/foreach.hpp>
 
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/Math/STATIC_POW.h>
 #include <Jeffrey_Utilities/Multi_Index/STATIC_MULTI_INDEX_CUBE.h>
 #include <Jeffrey_Utilities/REMOVE_QUALIFIERS.h>
 #include <Jeffrey_Utilities/RESULT_OF.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 namespace PhysBAM
 {

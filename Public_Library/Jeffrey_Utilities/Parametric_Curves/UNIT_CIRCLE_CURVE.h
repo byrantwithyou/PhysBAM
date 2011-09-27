@@ -13,8 +13,8 @@
 
 #include <boost/math/constants/constants.hpp>
 
-#include <Jeffrey_Utilities/REMOVE_QUALIFIERS.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <Jeffrey_Utilities/REMOVE_QUALIFIERS.h>
 
 namespace PhysBAM
 {

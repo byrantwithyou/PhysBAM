@@ -15,9 +15,9 @@
 
 #include <iterator>
 
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/BEGIN_END_TAG.h>
 #include <Jeffrey_Utilities/ITERATOR_FACADE.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 namespace PhysBAM
 {

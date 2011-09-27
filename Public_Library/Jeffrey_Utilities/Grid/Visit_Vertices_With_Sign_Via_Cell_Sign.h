@@ -8,11 +8,11 @@
 #ifndef PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_GRID_VISIT_VERTICES_WITH_SIGN_VIA_CELL_SIGN_HPP
 #define PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_GRID_VISIT_VERTICES_WITH_SIGN_VIA_CELL_SIGN_HPP
 
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/Algorithm/For_Each.h>
 #include <Jeffrey_Utilities/DIRECT_INIT_CTOR.h>
 #include <Jeffrey_Utilities/Grid/Vertex_Sign_Via_Cell_Sign.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOUND.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 namespace PhysBAM
 {

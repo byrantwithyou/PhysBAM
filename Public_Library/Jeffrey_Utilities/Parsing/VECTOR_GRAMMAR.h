@@ -25,8 +25,8 @@
 #include <boost/spirit/home/support/argument.hpp>
 #include <boost/spirit/home/support/context.hpp>
 
-#include <Jeffrey_Utilities/Parsing/RATIONAL_REAL_PARSER.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <Jeffrey_Utilities/Parsing/RATIONAL_REAL_PARSER.h>
 
 namespace PhysBAM
 {

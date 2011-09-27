@@ -23,14 +23,14 @@
 #include <boost/spirit/home/support/unused.hpp>
 #include <boost/throw_exception.hpp>
 
-#include <Jeffrey_Utilities/VTK/Write_Mesh_Object_To_VTK_File.h>
+#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/Utilities/TYPED_STREAM.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_MESH_OBJECT.h>
 #include <PhysBAM_Geometry/Topology/TOPOLOGY_POLICY.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/MESH_OBJECT.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_GEOMETRY_FORWARD.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/TYPED_STREAM.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <Jeffrey_Utilities/VTK/Write_Mesh_Object_To_VTK_File.h>
 
 namespace PhysBAM
 {

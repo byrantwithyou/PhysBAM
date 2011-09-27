@@ -13,6 +13,7 @@
 #include <boost/type_traits/remove_const.hpp>
 #include <boost/utility/enable_if.hpp>
 
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/BEGIN_END_TAG.h>
 #include <Jeffrey_Utilities/DIRECT_INIT_CTOR.h>
 #include <Jeffrey_Utilities/IDENTITY_TYPE.h>
@@ -21,7 +22,6 @@
 #include <Jeffrey_Utilities/Stencils/INDEX_VALUE.h>
 #include <Jeffrey_Utilities/Stencils/STENCIL_PROXY_CONCEPT.h>
 #include <Jeffrey_Utilities/Stencils/STENCIL_PROXY_ITERATOR.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 namespace PhysBAM
 {

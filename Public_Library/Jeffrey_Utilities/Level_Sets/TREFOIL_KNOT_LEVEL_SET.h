@@ -9,10 +9,10 @@
 
 #include <cassert>
 
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/Level_Sets/Min_Dist_To_Parametric_Curve.h>
 #include <Jeffrey_Utilities/Math/Equal_Relative_Tolerance.h>
 #include <Jeffrey_Utilities/Parametric_Curves/TREFOIL_KNOT_CURVE.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 namespace PhysBAM
 {

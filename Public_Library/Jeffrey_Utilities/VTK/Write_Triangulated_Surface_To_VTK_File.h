@@ -10,11 +10,11 @@
 #include <fstream>
 #include <string>
 
-#include <Jeffrey_Utilities/typeid_name.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Topology/TOPOLOGY_POLICY.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/MESH_OBJECT.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_GEOMETRY_FORWARD.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <Jeffrey_Utilities/typeid_name.h>
 
 namespace PhysBAM
 {

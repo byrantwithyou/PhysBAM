@@ -10,8 +10,8 @@
 
 #include <boost/foreach.hpp>
 
-#include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOX.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOX.h>
 
 namespace PhysBAM
 {

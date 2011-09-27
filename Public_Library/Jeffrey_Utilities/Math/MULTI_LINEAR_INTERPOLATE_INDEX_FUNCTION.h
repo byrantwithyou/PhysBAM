@@ -8,10 +8,10 @@
 #ifndef PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_MATH_MULTI_LINEAR_INTERPOLATE_INDEX_FUNCTION_HPP
 #define PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_MATH_MULTI_LINEAR_INTERPOLATE_INDEX_FUNCTION_HPP
 
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/Math/Multi_Linear_Interpolate.h>
 #include <Jeffrey_Utilities/REMOVE_QUALIFIERS.h>
 #include <Jeffrey_Utilities/RESULT_OF.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 namespace PhysBAM
 {

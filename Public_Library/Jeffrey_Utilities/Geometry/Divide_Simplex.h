@@ -7,10 +7,10 @@
 #ifndef PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_GEOMETRY_DIVIDE_SIMPLEX_HPP
 #define PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_GEOMETRY_DIVIDE_SIMPLEX_HPP
 
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/BOUNDED_LIST.h>
 #include <Jeffrey_Utilities/Geometry/Normal.h>
 #include <Jeffrey_Utilities/Geometry/SUB_CUBE_POLYTOPE.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 namespace PhysBAM
 {

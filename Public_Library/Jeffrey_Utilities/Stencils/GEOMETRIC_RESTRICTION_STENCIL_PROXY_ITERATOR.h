@@ -9,11 +9,11 @@
 
 #include <boost/iterator/iterator_traits.hpp>
 
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/BEGIN_END_TAG.h>
 #include <Jeffrey_Utilities/ITERATOR_ADAPTOR.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_CUBE_ITERATOR.h>
 #include <Jeffrey_Utilities/Stencils/INDEX_VALUE.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 namespace PhysBAM
 {

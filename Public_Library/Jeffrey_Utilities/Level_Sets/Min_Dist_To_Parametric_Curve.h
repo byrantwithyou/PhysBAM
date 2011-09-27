@@ -16,9 +16,9 @@
 #include <boost/math/tools/minima.hpp>
 #include <boost/mpl/assert.hpp>
 
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/Functional/Post_Compose_Magnitude_Squared.h>
 #include <Jeffrey_Utilities/Functional/Post_Compose_Translate.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 namespace PhysBAM
 {

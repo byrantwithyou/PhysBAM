@@ -17,13 +17,13 @@
 #include <boost/mpl/assert.hpp>
 #include <boost/type_traits/is_same.hpp>
 
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/LOOP.h>
 #include <Jeffrey_Utilities/Math/STATIC_MIN.h>
 #include <Jeffrey_Utilities/Math/STATIC_POW.h>
 #include <Jeffrey_Utilities/Multi_Index/STATIC_MULTI_INDEX_CUBE.h>
 #include <Jeffrey_Utilities/Stencils/STENCIL_FWD.h>
 #include <Jeffrey_Utilities/Stencils/STENCIL_PROXY_CONCEPT.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 namespace PhysBAM
 {

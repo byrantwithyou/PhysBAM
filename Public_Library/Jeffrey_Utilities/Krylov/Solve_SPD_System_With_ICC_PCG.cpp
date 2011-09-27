@@ -12,6 +12,13 @@
 #include <limits>
 #include <ostream>
 
+#include <PhysBAM_Tools/Arrays/ARRAY.h>
+#include <PhysBAM_Tools/Arrays/ARRAY_NEGATION.h>
+#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
+#include <PhysBAM_Tools/Arrays_Computations/MAGNITUDE.h>
+#include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
+#include <PhysBAM_Tools/Krylov_Solvers/PCG_SPARSE.h>
+#include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
 #include <Jeffrey_Utilities/Algorithm/Find_All_If.h>
 #include <Jeffrey_Utilities/ARRAY_OPS.h>
 #include <Jeffrey_Utilities/As_Sparse_Matrix_Flat_NXN.h>
@@ -29,13 +36,6 @@
 #include <Jeffrey_Utilities/Krylov/MAXIMUM_MAGNITUDE_CONVERGENCE_NORM.h>
 #include <Jeffrey_Utilities/SOLVER_PARAMS.h>
 #include <Jeffrey_Utilities/VISITOR_SEQUENCE.h>
-#include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Arrays/ARRAY_NEGATION.h>
-#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
-#include <PhysBAM_Tools/Arrays_Computations/MAGNITUDE.h>
-#include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
-#include <PhysBAM_Tools/Krylov_Solvers/PCG_SPARSE.h>
-#include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
 
 #include <Jeffrey_Utilities/Krylov/Solve_SPD_System_With_ICC_PCG.h>
 

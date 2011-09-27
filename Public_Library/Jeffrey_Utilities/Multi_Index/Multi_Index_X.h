@@ -9,9 +9,9 @@
 
 #include <boost/config.hpp>
 
-#include <Jeffrey_Utilities/VECTOR_OPS.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <Jeffrey_Utilities/VECTOR_OPS.h>
 
 namespace PhysBAM
 {

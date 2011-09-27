@@ -9,11 +9,11 @@
 
 #include <cassert>
 
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <PhysBAM_Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_GEOMETRY_FORWARD.h>
 #include <Jeffrey_Utilities/BOUNDED_LIST.h>
 #include <Jeffrey_Utilities/Geometry/Area_Weighted_Normal.h>
 #include <Jeffrey_Utilities/RESULT_OF.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_GEOMETRY_FORWARD.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 namespace PhysBAM
 {

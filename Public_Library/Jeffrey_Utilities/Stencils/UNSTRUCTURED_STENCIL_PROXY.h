@@ -16,11 +16,11 @@
 #include <boost/type_traits/remove_const.hpp>
 #include <boost/utility/enable_if.hpp>
 
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/DIRECT_INIT_CTOR.h>
 #include <Jeffrey_Utilities/PROPAGATE_CONST.h>
 #include <Jeffrey_Utilities/Stencils/INDEX_VALUE.h>
 #include <Jeffrey_Utilities/Stencils/STENCIL_PROXY_CONCEPT.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 namespace PhysBAM
 {

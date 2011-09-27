@@ -13,11 +13,11 @@
 #include <algorithm>
 #include <vector>
 
-#include <Jeffrey_Utilities/PROPAGATE_CONST.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
 #include <PhysBAM_Tools/Arrays_Computations/ARRAY_COPY.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_FORWARD.h>
+#include <Jeffrey_Utilities/PROPAGATE_CONST.h>
 
 namespace PhysBAM
 {

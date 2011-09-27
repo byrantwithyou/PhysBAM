@@ -7,11 +7,11 @@
 #ifndef PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_GENERIC_SYSTEM_REFERENCE_HPP
 #define PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_GENERIC_SYSTEM_REFERENCE_HPP
 
-#include <Jeffrey_Utilities/Stencils/UNSTRUCTURED_STENCIL.h>
-#include <Jeffrey_Utilities/Stencils/UNSTRUCTURED_STENCIL_PROXY.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_FORWARD.h>
+#include <Jeffrey_Utilities/Stencils/UNSTRUCTURED_STENCIL.h>
+#include <Jeffrey_Utilities/Stencils/UNSTRUCTURED_STENCIL_PROXY.h>
 
 namespace PhysBAM
 {

@@ -10,11 +10,11 @@
 
 #include <boost/cast.hpp>
 
-#include <Jeffrey_Utilities/ARRAY_OPS.h>
-#include <Jeffrey_Utilities/DIRECT_INIT_CTOR.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>
 #include <PhysBAM_Tools/Utilities/PHYSBAM_OVERRIDE.h>
+#include <Jeffrey_Utilities/ARRAY_OPS.h>
+#include <Jeffrey_Utilities/DIRECT_INIT_CTOR.h>
 
 namespace PhysBAM
 {

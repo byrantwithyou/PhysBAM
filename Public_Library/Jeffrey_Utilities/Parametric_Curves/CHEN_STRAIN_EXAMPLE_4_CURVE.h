@@ -14,8 +14,8 @@
 
 #include <boost/math/constants/constants.hpp>
 
-#include <Jeffrey_Utilities/DIRECT_INIT_CTOR.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <Jeffrey_Utilities/DIRECT_INIT_CTOR.h>
 
 namespace PhysBAM
 {

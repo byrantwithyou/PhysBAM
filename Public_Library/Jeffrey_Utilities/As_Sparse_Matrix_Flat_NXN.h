@@ -14,6 +14,8 @@
 
 #include <boost/foreach.hpp>
 
+#include <PhysBAM_Tools/Arrays/ARRAY.h>
+#include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
 #include <Jeffrey_Utilities/Algorithm/Fill.h>
 #include <Jeffrey_Utilities/Algorithm/Find_All_If.h>
 #include <Jeffrey_Utilities/Algorithm/For_Each.h>
@@ -21,8 +23,6 @@
 #include <Jeffrey_Utilities/Stencils/INDEX_VALUE.h>
 #include <Jeffrey_Utilities/Stencils/UNSTRUCTURED_STENCIL.h>
 #include <Jeffrey_Utilities/Stencils/UNSTRUCTURED_STENCIL_PROXY.h>
-#include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
 
 namespace PhysBAM
 {

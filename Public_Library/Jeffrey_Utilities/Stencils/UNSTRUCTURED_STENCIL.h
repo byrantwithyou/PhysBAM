@@ -17,12 +17,12 @@
 #include <boost/mpl/if.hpp>
 #include <boost/type_traits/is_same.hpp>
 
+#include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <Jeffrey_Utilities/BOUNDED_LIST.h>
 #include <Jeffrey_Utilities/LOOP.h>
 #include <Jeffrey_Utilities/Stencils/INDEX_VALUE.h>
 #include <Jeffrey_Utilities/Stencils/STENCIL_FWD.h>
 #include <Jeffrey_Utilities/Stencils/STENCIL_PROXY_CONCEPT.h>
-#include <PhysBAM_Tools/Arrays/ARRAY.h>
 
 namespace PhysBAM
 {
