@@ -7,6 +7,8 @@
 #ifndef PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_PETSC_SCOPED_FINALIZE_HPP
 #define PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_PETSC_SCOPED_FINALIZE_HPP
 
+#ifdef PHYSBAM_USE_PETSC
+
 #include <boost/preprocessor/cat.hpp>
 
 #ifdef __COUNTER__
@@ -35,5 +37,7 @@
         bool b; \
         ~ BOOST_PP_CAT( RAIIName, _t ) () { if(b) PetscFinalize(); } \
     } RAIIName = { Cond }; static_cast<void>( RAIIName )
+
+#endif // #ifdef PHYSBAM_USE_PETSC
 
 #endif // #ifndef PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_PETSC_SCOPED_FINALIZE_HPP
