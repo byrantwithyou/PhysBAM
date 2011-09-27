@@ -53,6 +53,7 @@ external_libraries={
     'boostregex': {'libs':['boost_regex']},
     'zlib':       {'libs':['z'],'cvs':1},
     'ffmpeg':     {'default':0,'flags':['USE_FFMPEG'],'libs':['libavformat','libavcodec','libavutil'],'filter':'VIDEO'},
+    'petsc':     {'default':1,'flags':['USE_PETSC'],'libs':['libpetsc'],'filter':'PETSC'},
     'libjpeg':    {'default':1,'flags':['USE_LIBJPEG'],'libs':['jpeg'],'filter':'(MOV_FILE)|(JPG_FILE)'},
     'libpng':     {'default':1,'flags':['USE_LIBPNG'],'libs':['png'],'filter':'PNG_FILE'},
     'OpenEXR':    {'default':0,'flags':['USE_OPENEXR'],'cpppath':[openexr_dir+'/include/OpenEXR'],'libpath':[openexr_dir+'/lib'],
@@ -215,7 +216,7 @@ if env['compile_without_double_support']: env.Append(CPPDEFINES=['COMPILE_WITHOU
 if env['compile_without_dyadic_support']: env.Append(CPPDEFINES=['COMPILE_WITHOUT_DYADIC_SUPPORT'])
 if env['compile_with_bintree_support']: env.Append(CPPDEFINES=['COMPILE_WITH_BINTREE_SUPPORT'])
 if env['compile_without_rle_support']: env.Append(CPPDEFINES=['COMPILE_WITHOUT_RLE_SUPPORT'])
-if env['TYPE']=='release' or env['compile_id_types_as_int']: env.Append(CPPDEFINES=['COMPILE_ID_TYPES_AS_INT'])
+if env['compile_id_types_as_int']: env.Append(CPPDEFINES=['COMPILE_ID_TYPES_AS_INT'])
 
 ### teach scons about icecream environment variables
 if env['CXX'].find('ice')!=-1:
@@ -389,7 +390,7 @@ def Name_From_Library(env,library):
     else:
         assert(len(library)==1)
         name=os.path.splitext(os.path.basename(library[0].path))[0]
-        # assert(name.startswith('lib'),name)
+        #assert(name.startswith('lib'),name)
         return name[3:]
 
 # Generate a wrapper on Posix 
