@@ -223,7 +223,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(rigid_body_collection.rigid_geometry_collection);
 
-    fluids_parameters.euler_solid_fluid_coupling_utilties->solid_state=EULER<T_GRID>::Get_Euler_State_From_rho_velocity_And_internal_energy(rho_initial,TV(u_vel_initial,v_vel_initial),
+    fluids_parameters.euler_solid_fluid_coupling_utilities->solid_state=EULER<T_GRID>::Get_Euler_State_From_rho_velocity_And_internal_energy(rho_initial,TV(u_vel_initial,v_vel_initial),
         fluids_parameters.euler->eos->e_From_p_And_rho(p_initial,rho_initial));
 }
 //#####################################################################

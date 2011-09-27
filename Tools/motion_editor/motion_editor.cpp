@@ -19,8 +19,8 @@
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_TRANSLATION.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_BASIC.h>
+#include <PhysBAM_Rendering/PhysBAM_OpenGL_Dynamics/OpenGL_Dynamics_Components/OPENGL_COMPONENT_BODY_MOTION_SEQUENCE.h>
 #include <PhysBAM_Dynamics/Motion/LINEAR_BLEND_SKINNING.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Dynamics_Components/OPENGL_COMPONENT_BODY_MOTION_SEQUENCE.h>
 using namespace PhysBAM;
 
 #define ROTATE 1
@@ -64,7 +64,7 @@ public:
     int Detect_Rigid_Intersection(int x,int y)
     {
         RAY<TV> ray=opengl_world.Ray_Through_Normalized_Image_Coordinate(opengl_world.Convert_Mouse_Coordinates(x,y));
-        for(int id(1);id<=rigid_body_collection->rigid_body_particle.array_collection->Size();id++) if(rigid_body_collection->Rigid_Body(id).Simplex_Intersection(ray)) return id;
+        for(int id(1);id<=rigid_body_collection->rigid_body_particle.array_collection->Size();id++) if(rigid_body_collection->Rigid_Body(id).Simplex_Intersection(ray,0)) return id;
         return int(0);
     }
 

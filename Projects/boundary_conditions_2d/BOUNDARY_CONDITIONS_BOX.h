@@ -16,7 +16,7 @@ struct BOUNDARY_CONDITIONS_BOX:public BOUNDARY_CONDITIONS<TV>
     int type[4];
     TV corners[5];
     T boundary_gap;
-    POLYGON<T> poly;
+    POLYGON<TV> poly;
     mutable ARRAY<T,FACE_INDEX<TV::m> >* saved_u;
 
     BOUNDARY_CONDITIONS_BOX(GRID<TV>& grid_input,T offset,T angle,std::string& bc_types);

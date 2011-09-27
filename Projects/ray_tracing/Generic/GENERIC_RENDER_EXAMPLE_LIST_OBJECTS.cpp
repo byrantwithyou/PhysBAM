@@ -59,7 +59,7 @@ Apply_Triangulated_Surface_Parameters(RENDERING_TRIANGULATED_SURFACE<T>& renderi
         DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>* collisions=new DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>(triangulated_surface);
         triangulated_surface.Update_Triangle_List();
         triangulated_surface.Initialize_Hierarchy();
-        collisions->roughness=minimum_surface_roughness;
+        collisions->collision_thickness=minimum_surface_roughness;
         body_list->Append(collisions);
         collisions->Save_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_OLD_STATE,(T)0);
         collisions->Save_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_NEW_STATE,(T)1);

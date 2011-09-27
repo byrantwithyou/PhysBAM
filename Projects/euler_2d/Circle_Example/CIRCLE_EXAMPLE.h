@@ -398,7 +398,7 @@ void Initialize_Euler_State() PHYSBAM_OVERRIDE
         U(cell_index)(1)=rho;U(cell_index)(2)=rho*u_vel;U(cell_index)(3)=rho*v_vel;U(cell_index)(4)=rho*(fluids_parameters.euler->eos->e_From_p_And_rho(p,rho)+(sqr(u_vel)+sqr(v_vel))*((T).5));}
 
     // initialize solid_state
-    VECTOR<T,T_GRID::dimension+2>& solid_state=fluids_parameters.euler_solid_fluid_coupling_utilties->solid_state;
+    VECTOR<T,T_GRID::dimension+2>& solid_state=fluids_parameters.euler_solid_fluid_coupling_utilities->solid_state;
     T rho=state_outside(1),p=state_outside(4),u_vel=(T)0.,v_vel=(T)0.;
     solid_state(1)=rho;solid_state(2)=rho*u_vel;solid_state(3)=rho*v_vel;solid_state(4)=rho*(fluids_parameters.euler->eos->e_From_p_And_rho(p,rho)+(sqr(u_vel)+sqr(v_vel))*((T).5));
 }

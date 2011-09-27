@@ -476,7 +476,7 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
         for(int i=1;i<=sample_points.m;i++){
             TV X=sample_points(i),V;
             for(int d=1;d<=V.m;d++)
-            V(d)=interp.Clamped_To_Array(fluids_parameters.grid->Get_Axis_X_Face_Grid(d),face_velocities.Component(d),X);
+            V(d)=interp.Clamped_To_Array(fluids_parameters.grid->Get_Face_Grid(d),face_velocities.Component(d),X);
             LOG::cout<<"velocity at "<<X<<" : "<<V<<std::endl;}}
     if(test_number==43){
         ARRAY<T,FACE_INDEX<2> > face_velocities_copy(fluid_collection.incompressible_fluid_collection.face_velocities);
