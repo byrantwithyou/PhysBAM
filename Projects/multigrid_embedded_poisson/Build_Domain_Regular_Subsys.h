@@ -85,10 +85,10 @@ Build_Domain_Regular_Subsys(
         sign_of_cell_index,
         Make_Visit_If_Sign_Predicate_Grid_Visitor(
             Make_Equal_Function(-1),
-            PHYSBAM_BOUND_FAST_MEM_FN_TEMPLATE(
-                regular_subsys,
-                (&DOMAIN_REGULAR_CROSS_SUBSYS<T,D>::Init_Stencils)
-            )
+            BOUND_FAST_MEM_FN<
+                void (DOMAIN_REGULAR_CROSS_SUBSYS<T,D>::*)( int ),
+                &DOMAIN_REGULAR_CROSS_SUBSYS<T,D>::Init_Stencils
+            >(regular_subsys)
         )
     );
     lout << timer.Elapsed() << " s" << std::endl;
