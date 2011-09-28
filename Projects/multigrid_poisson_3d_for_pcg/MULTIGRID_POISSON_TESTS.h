@@ -22,6 +22,9 @@
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include "MG_PRECONDITIONED_CONJUGATE_GRADIENT.h"
 #include "MULTIGRID_POISSON_SOLVER.h"
+#include <boost/format.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/scoped_ptr.hpp>
 namespace PhysBAM{
 
 template<class T,int d>
@@ -29,17 +32,16 @@ class MULTIGRID_POISSON_TESTS
 {
     typedef VECTOR<T,d> TV;
     typedef VECTOR<int,d> T_INDEX;
-    typedef typename GRID_POLICY<TV>::UNIFORM_GRID T_GRID;
-    typedef typename POLICY_UNIFORM<TV>::ARRAYS_SCALAR T_VARIABLE;
+    typedef VECTOR<int,d> TV_INT;
 
 public:
     int test_number;
     std::string output_dir;
     int frames;
     bool write_substeps;
-    T_VARIABLE x;
-    T_VARIABLE b;
-    T_VARIABLE tmp;
+    ARRAY<T,TV_INT> x;
+    ARRAY<T,TV_INT> b;
+    ARRAY<T,TV_INT> tmp;
     boost::scoped_ptr<MULTIGRID_POISSON_SOLVER<T,d> > multigrid_poisson_solver;
 
     MULTIGRID_POISSON_TESTS(int test_number_input,int number_of_threads,int resolution=256)
@@ -78,9 +80,10 @@ public:
 	output_dir=str(boost::format("Test_%d_Resolution_%d")%test_number%resolution);
 
 	FILE_UTILITIES::Create_Directory(output_dir);
+	FILE_UTILITIES::Create_Directory(output_dir+"/common");
 
 	LOG::Initialize_Logging();
-	LOG::Instance()->Copy_Log_To_File(output_dir+"/log.txt",false);
+	LOG::Instance()->Copy_Log_To_File(output_dir+"/common/log.txt",false);
 	LOG::cout<<"Running test number "<<test_number<<" at resolution "<<resolution<<" with "<<levels<<" levels"<<std::endl;
 	multigrid_poisson_solver.reset(new MULTIGRID_POISSON_SOLVER<T,d>(size,(T)1/resolution,levels,number_of_threads));
 
@@ -99,7 +102,7 @@ public:
 
 	// initialize right hand side
 	MULTIGRID_POISSON<T,d>& multigrid_poisson=multigrid_poisson_solver->Discretization();
-	b.Resize(multigrid_poisson.grid,0,false,false);
+	b.Resize(multigrid_poisson.grid.Domain_Indices(),false,false);
 	switch(test_number){
 	    case 1:
 	    case 2:
@@ -133,8 +136,8 @@ public:
 	}
 
 	// Initialize initial guess
-	x.Resize(multigrid_poisson.grid,0,false,false);
-	tmp.Resize(multigrid_poisson.grid,0,false,false);
+	x.Resize(multigrid_poisson.grid.Domain_Indices(),false,false);
+	tmp.Resize(multigrid_poisson.grid.Domain_Indices(),false,false);
 	switch(test_number){
 	    case 1:
 	    case 2:
@@ -177,7 +180,7 @@ public:
 	    // this is really slow. get substep data by actually restarting and solving with i iterations
 	    if(write_substeps){
 		Write_Substep(0,frame);
-		T_VARIABLE x_save(x);
+		ARRAY<T,TV_INT> x_save(x);
 		for(int i=1;i<=100;i++){
 		    x=x_save;
 		    multigrid_poisson_solver->Discretization().b=b;
@@ -205,8 +208,8 @@ public:
 	MULTIGRID_POISSON<T,d>& multigrid_poisson=multigrid_poisson_solver->Discretization();
 	std::string f=boost::lexical_cast<std::string>(frame);
 
-	FILE_UTILITIES::Write_To_File<float>(output_dir+"/grid",multigrid_poisson.grid);
-	T_VARIABLE x_as_density(x);
+	FILE_UTILITIES::Write_To_File<float>(output_dir+"/common/grid",multigrid_poisson.grid);
+	ARRAY<T,TV_INT> x_as_density(x);
 	T x_min=std::numeric_limits<T>::max();
 	T x_max=-x_min;
 	for(BOX_ITERATOR<d> iterator(multigrid_poisson.unpadded_domain);iterator.Valid();iterator.Next()){
@@ -221,8 +224,9 @@ public:
 	if(x_range)
 	    x_as_density/=x_range;
 
-	FILE_UTILITIES::Write_To_File<float>(output_dir+"/density."+f,x_as_density);
-	FILE_UTILITIES::Write_To_Text_File(output_dir+"/last_frame",frame);
+	FILE_UTILITIES::Create_Directory(output_dir+"/"+f);
+	FILE_UTILITIES::Write_To_File<float>(output_dir+"/"+f+"/density",x_as_density);
+	FILE_UTILITIES::Write_To_Text_File(output_dir+"/common/last_frame",frame);
     }
 
     void Write_Substep(int substep,int frame)
@@ -234,8 +238,8 @@ public:
 
 	FILE_UTILITIES::Create_Directory(output_dir+"/Frame_"+f+"_x");	
 	FILE_UTILITIES::Create_Directory(output_dir+"/Frame_"+f+"_residual");
-	T_VARIABLE x_as_density(x);
-	T_VARIABLE r_as_density(b);
+	ARRAY<T,TV_INT> x_as_density(x);
+	ARRAY<T,TV_INT> r_as_density(b);
 	T x_min=std::numeric_limits<T>::max();
 	T x_max=-x_min;
 	T r_max=x_max;

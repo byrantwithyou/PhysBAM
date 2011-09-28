@@ -7,13 +7,13 @@
 #ifndef __MULTIGRID_POISSON__
 #define __MULTIGRID_POISSON__
 
+#include <PhysBAM_Tools/Grids_Uniform/GRID.h>
+#include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+//#include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_2D.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_3D.h>
-#include <Arrays/ARRAYS_2D.h>
-#include <Arrays/ARRAYS_3D.h>
-#include <Grids/POLICY_UNIFORM.h>
 
 namespace PhysBAM{
 
@@ -22,30 +22,25 @@ class MULTIGRID_POISSON:public NONCOPYABLE
 {
     typedef VECTOR<T,d> TV;
     typedef VECTOR<int,d> T_INDEX;
-    typedef typename GRID_POLICY<TV>::UNIFORM_GRID T_GRID;
+    typedef VECTOR<int,d> TV_INT;
 public:
     typedef enum {INTERIOR_CELL_TYPE=1,DIRICHLET_CELL_TYPE=2,NEUMANN_CELL_TYPE=3} CELL_TYPE;
 private:
-    typedef typename POLICY_UNIFORM<VECTOR<CELL_TYPE,d> >::ARRAYS_SCALAR T_CELL_TYPE_FIELD;
-    typedef typename POLICY_UNIFORM<VECTOR<unsigned char,d> >::ARRAYS_SCALAR T_CELL_TYPE_AS_UNSIGNED_CHAR;
-    typedef typename POLICY_UNIFORM<TV>::ARRAYS_SCALAR T_VARIABLE;
-    typedef typename POLICY_UNIFORM<VECTOR<bool,d> >::ARRAYS_SCALAR T_FLAG;
-    typedef typename POLICY_UNIFORM<VECTOR<unsigned char,d> >::ARRAYS_SCALAR T_BITMASK;
 
 public:
 
     const T h;
     const T_INDEX n;
-    const T_GRID grid;
-    const T_GRID coarse_grid;
+    const GRID<TV> grid;
+    const GRID<TV> coarse_grid;
 
-    T_CELL_TYPE_AS_UNSIGNED_CHAR cell_type;
-    T_VARIABLE u;
-    T_VARIABLE b;
+    ARRAY<unsigned char,TV_INT> cell_type;
+    ARRAY<T,TV_INT> u;
+    ARRAY<T,TV_INT> b;
 
-    T_VARIABLE delta;
-    LIST_ARRAY<T> one_over_diagonal_part; //defined only on boundary_indices
-    T_VARIABLE diagonal_entries;
+    ARRAY<T,TV_INT> delta;
+    ARRAY<T> one_over_diagonal_part; //defined only on boundary_indices
+    ARRAY<T,TV_INT> diagonal_entries;
 
     int total_red_boundary_blocks,total_black_boundary_blocks;
 
@@ -62,26 +57,26 @@ public:
 
     ARRAY<int> extended_boundary_indices;
 #else
-    LIST_ARRAY<int> boundary_block_start;
-    LIST_ARRAY<int> boundary_block_end;
-    LIST_ARRAY<T_INDEX> boundary_indices;
+    ARRAY<int> boundary_block_start;
+    ARRAY<int> boundary_block_end;
+    ARRAY<T_INDEX> boundary_indices;
 
-    LIST_ARRAY<T_INDEX> extended_boundary_indices;
+    ARRAY<T_INDEX> extended_boundary_indices;
 
 #endif
 
     // for serial iterators
-    BOX<T_INDEX> padded_domain;
-    BOX<T_INDEX> unpadded_domain;
-    BOX<T_INDEX> padded_coarse_domain;
-    BOX<T_INDEX> unpadded_coarse_domain;
+    RANGE<T_INDEX> padded_domain;
+    RANGE<T_INDEX> unpadded_domain;
+    RANGE<T_INDEX> padded_coarse_domain;
+    RANGE<T_INDEX> unpadded_coarse_domain;
 
     enum WORKAROUND1 {boundary_block_size=4};
     enum WORKAROUND2 {boundary_block_padding=0};
 
     // bitmasks defined over 2x2x2 blocks 
-    T_BITMASK index_has_full_diagonal_coarse_bitmask;
-    T_BITMASK index_is_interior_coarse_bitmask;
+    ARRAY<unsigned char,TV_INT> index_has_full_diagonal_coarse_bitmask;
+    ARRAY<unsigned char,TV_INT> index_is_interior_coarse_bitmask;
 
 
 //#####################################################################
@@ -90,9 +85,9 @@ public:
     void Initialize();
     void Reinitialize();
     T Apply_System_Matrix(const T_INDEX& index);
-    T Apply_System_Matrix(const T_INDEX& index,const T_VARIABLE& u_input) const;
-    void Subtract_Multiple_Of_System_Matrix_And_Compute_Sum_And_Extrema(const T_VARIABLE& x,T_VARIABLE& y,double& sum,T& rmin,T& rmax) const;
-    T Multiply_With_System_Matrix_And_Compute_Dot_Product(const T_VARIABLE&x,T_VARIABLE& y) const;
+    T Apply_System_Matrix(const T_INDEX& index,const ARRAY<T,TV_INT>& u_input) const;
+    void Subtract_Multiple_Of_System_Matrix_And_Compute_Sum_And_Extrema(const ARRAY<T,TV_INT>& x,ARRAY<T,TV_INT>& y,double& sum,T& rmin,T& rmax) const;
+    T Multiply_With_System_Matrix_And_Compute_Dot_Product(const ARRAY<T,TV_INT>&x,ARRAY<T,TV_INT>& y) const;
 
 private:
     void Initialize_Boundary_Region();
@@ -114,9 +109,9 @@ public:
     void Initialize_Square_Domain();
     void Initialize_Square_Minus_Circle_Domain();
     void Initialize_Test_Domain();
-    void Initialize_Test_Right_Hand_Side(T_VARIABLE& b_input);
+    void Initialize_Test_Right_Hand_Side(ARRAY<T,TV_INT>& b_input);
     void Initialize_Test_Right_Hand_Side();
-    void Initialize_Test_Initial_Guess(T_VARIABLE& u_input);
+    void Initialize_Test_Initial_Guess(ARRAY<T,TV_INT>& u_input);
     void Initialize_Test_Initial_Guess();
 //#####################################################################
 };

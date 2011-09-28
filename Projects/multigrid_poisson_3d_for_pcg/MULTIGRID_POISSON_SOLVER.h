@@ -14,8 +14,8 @@ template<class T,int d>
 class MULTIGRID_POISSON_SOLVER
 {
     typedef VECTOR<int,d> T_INDEX;
-    typedef typename GRID_POLICY<VECTOR<T,d> >::UNIFORM_GRID T_GRID;
-    typedef typename T_GRID::NODE_ITERATOR T_NODE_ITERATOR;
+    typedef VECTOR<int,d> TV_INT;
+    typedef VECTOR<T,d> TV;
     typedef typename MULTIGRID_POISSON<T,d>::CELL_TYPE T_CELL_TYPE;
 
 public:
@@ -75,7 +75,7 @@ public:
     T& B(const T_INDEX& index)
     {return discretizations(1)->b(index);}
 
-    const T_GRID& Grid()
+    const GRID<TV>& Grid()
     {return discretizations(1)->grid;}
 
     MULTIGRID_POISSON<T,d>& Discretization() const

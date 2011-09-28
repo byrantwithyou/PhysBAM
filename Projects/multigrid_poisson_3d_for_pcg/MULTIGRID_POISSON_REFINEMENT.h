@@ -7,17 +7,14 @@
 #ifndef __MULTIGRID_POISSON_REFINEMENT__
 #define __MULTIGRID_POISSON_REFINEMENT__
 
+#include <PhysBAM_Tools/Grids_Uniform/GRID.h>
+#include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_2D.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_3D.h>
 #include "BOX_ITERATOR.h"
 #include "MULTIGRID_POISSON.h"
-#include <Arrays/ARRAYS_2D.h>
-#include <Arrays/ARRAYS_3D.h>
-#include <Grids/GRID_2D.h>
-#include <Grids/GRID_3D.h>
-#include <Grids/POLICY_UNIFORM.h>
 
 #ifndef MGPCG_UNOPTIMIZED
 #include "../multigrid_poisson_3d_optimized_kernels/Coarsened_Discretization/Coarsened_Discretization_Helper.h"
@@ -31,9 +28,7 @@ class MULTIGRID_POISSON_REFINEMENT
 {
     typedef VECTOR<T,d> TV;
     typedef VECTOR<int,d> T_INDEX;
-    typedef typename GRID_POLICY<TV>::UNIFORM_GRID T_GRID;
-    typedef typename POLICY_UNIFORM<TV>::ARRAYS_SCALAR T_VARIABLE;
-    typedef typename POLICY_UNIFORM<VECTOR<bool,d> >::ARRAYS_SCALAR T_FLAG;
+    typedef VECTOR<int,d> TV_INT;
 
 public:
 
@@ -57,7 +52,7 @@ public:
 	    min_fine_index=T_INDEX::Componentwise_Max(min_fine_index,fine_discretization.padded_domain.min_corner);
 	    max_fine_index=T_INDEX::Componentwise_Min(max_fine_index,fine_discretization.padded_domain.max_corner);
 	    coarse_discretization.cell_type(coarse_index)=MULTIGRID_POISSON<T,d>::NEUMANN_CELL_TYPE;
-	    for(BOX_ITERATOR<d> fine_iterator(BOX<T_INDEX>(min_fine_index,max_fine_index));fine_iterator.Valid();fine_iterator.Next()){
+	    for(BOX_ITERATOR<d> fine_iterator(RANGE<T_INDEX>(min_fine_index,max_fine_index));fine_iterator.Valid();fine_iterator.Next()){
 		const T_INDEX& fine_index=fine_iterator.Index();
 		if(fine_discretization.cell_type(fine_index)==MULTIGRID_POISSON<T,d>::DIRICHLET_CELL_TYPE)
 		    coarse_discretization.cell_type(coarse_index)=MULTIGRID_POISSON<T,d>::DIRICHLET_CELL_TYPE;
@@ -73,7 +68,7 @@ public:
 	    const T_INDEX& coarse_index=coarse_iterator.Index();
 	    const T_INDEX base_fine_index=(coarse_index-1)*2;
 	    coarse_discretization.cell_type(coarse_index)=MULTIGRID_POISSON<T,d>::NEUMANN_CELL_TYPE;
-	    for(BOX_ITERATOR<d> fine_iterator(BOX<T_INDEX>(base_fine_index,base_fine_index+1));fine_iterator.Valid();fine_iterator.Next()){
+	    for(BOX_ITERATOR<d> fine_iterator(RANGE<T_INDEX>(base_fine_index,base_fine_index+1));fine_iterator.Valid();fine_iterator.Next()){
 		const T_INDEX& fine_index=fine_iterator.Index();
 		if(fine_discretization.cell_type(fine_index)==MULTIGRID_POISSON<T,d>::DIRICHLET_CELL_TYPE)
 		    coarse_discretization.cell_type(coarse_index)=MULTIGRID_POISSON<T,d>::DIRICHLET_CELL_TYPE;

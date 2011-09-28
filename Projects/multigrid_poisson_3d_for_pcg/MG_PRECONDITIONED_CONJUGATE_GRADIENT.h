@@ -10,6 +10,8 @@
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <cfloat>
 #include <limits>
+#include "MULTIGRID_POISSON.h"
+#include "MULTIGRID_POISSON_SOLVER.h"
 
 #ifndef MGPCG_UNOPTIMIZED
 #include "../multigrid_poisson_3d_optimized_kernels/Combined_Saxpy/Combined_Saxpy_Helper.h"
@@ -24,9 +26,7 @@ class MULTIGRID_SYSTEM
 {
     typedef VECTOR<T,d> TV;
     typedef VECTOR<int,d> T_INDEX;
-    typedef typename GRID_POLICY<TV>::UNIFORM_GRID T_GRID;
-    typedef typename T_GRID::NODE_ITERATOR T_NODE_ITERATOR;
-    typedef typename POLICY_UNIFORM<TV>::ARRAYS_SCALAR T_VARIABLE;
+    typedef VECTOR<int,d> TV_INT;
     
     MULTIGRID_POISSON_SOLVER<T,d>& multigrid_poisson_solver;
     MULTIGRID_POISSON<T,d>& multigrid_poisson;
@@ -35,19 +35,19 @@ public:
 	:multigrid_poisson_solver(multigrid_poisson_solver_input),multigrid_poisson(multigrid_poisson_solver_input.Discretization())
     {}
 
-    void Subtract_Multiple_Of_System_Matrix_And_Compute_Sum_And_Extrema(const T_VARIABLE& x,T_VARIABLE& result,double& sum,T& rmin,T& rmax) const
+    void Subtract_Multiple_Of_System_Matrix_And_Compute_Sum_And_Extrema(const ARRAY<T,TV_INT>& x,ARRAY<T,TV_INT>& result,double& sum,T& rmin,T& rmax) const
     {
 	LOG::SCOPE scope("[MULTIGRID_SYSTEM] Subtract_Multiple_Of_System_Matrix_And_Compute_Sum_And_Extrema");
 	multigrid_poisson.Subtract_Multiple_Of_System_Matrix_And_Compute_Sum_And_Extrema(x,result,sum,rmin,rmax);
     }
 
-    void Multiply_And_Compute_Dot_Product(const T_VARIABLE& x, T_VARIABLE& result, T& dot_product)
+    void Multiply_And_Compute_Dot_Product(const ARRAY<T,TV_INT>& x, ARRAY<T,TV_INT>& result, T& dot_product)
     {
 	LOG::SCOPE scope("[MULTIGRID_SYSTEM] Multiply_And_Compute_Dot_Product");
  	dot_product=multigrid_poisson.Multiply_With_System_Matrix_And_Compute_Dot_Product(x,result);
     }
 
-    void Saxpy(const T c1, const T_VARIABLE& v1,T_VARIABLE& result)
+    void Saxpy(const T c1, const ARRAY<T,TV_INT>& v1,ARRAY<T,TV_INT>& result)
     {
 	LOG::SCOPE scope("[MULTIGRID_SYSTEM] Saxpy ");
 #ifndef MGPCG_UNOPTIMIZED
@@ -61,7 +61,7 @@ public:
 #endif
     }
     
-    void Combined_Saxpy(T_VARIABLE& x,T_VARIABLE& p,const T_VARIABLE& z,const T alpha,const T beta)
+    void Combined_Saxpy(ARRAY<T,TV_INT>& x,ARRAY<T,TV_INT>& p,const ARRAY<T,TV_INT>& z,const T alpha,const T beta)
     {
 	LOG::SCOPE scope("[MULTIGRID_SYSTEM] Combined_Saxpy ");
 #ifndef MGPCG_UNOPTIMIZED
@@ -76,7 +76,7 @@ public:
 #endif
     }
     
-    void Scalar_Multiply_And_Accumulate_And_Compute_Sum_And_Extrema(const T c1, const T_VARIABLE& v1, T_VARIABLE& result,double &sum,T& minimum,T& maximum)
+    void Scalar_Multiply_And_Accumulate_And_Compute_Sum_And_Extrema(const T c1, const ARRAY<T,TV_INT>& v1, ARRAY<T,TV_INT>& result,double &sum,T& minimum,T& maximum)
     {
 	LOG::SCOPE scope("[MULTIGRID_SYSTEM] Scalar_Multiply_And_Accumulate_And_Compute_Sum_And_Extrema ");
 #ifndef MGPCG_UNOPTIMIZED
@@ -99,7 +99,7 @@ public:
 #endif
     }
     
-    T Convergence_Norm(const T_VARIABLE& x) const
+    T Convergence_Norm(const ARRAY<T,TV_INT>& x) const
     {
 	LOG::SCOPE scope("[MULTIGRID_SYSTEM] Convergence_Norm");
 #ifndef MGPCG_UNOPTIMIZED
@@ -117,7 +117,7 @@ public:
     }
 
     // removes component of x in nullspace of A (used to project residual for stopping conditions)
-    double One_Over_Interior_Count(T_VARIABLE& x) const
+    double One_Over_Interior_Count(ARRAY<T,TV_INT>& x) const
     {
 	LOG::SCOPE scope ("[MULTIGRID_SYSTEM] Interior_Count");
 	double count=0;
@@ -129,7 +129,7 @@ public:
         if(has_dirichlet) return 0;else return ((double)1)/count;
     }
 
-    const T_VARIABLE& Precondition_And_Compute_Dot_Product(const T_VARIABLE& r,T_VARIABLE& z,T& dot_product,const T nullspace_component) const
+    const ARRAY<T,TV_INT>& Precondition_And_Compute_Dot_Product(const ARRAY<T,TV_INT>& r,ARRAY<T,TV_INT>& z,T& dot_product,const T nullspace_component) const
     {
  	LOG::SCOPE scope("[MULTIGRID_SYSTEM] Precondition_And_Compute_Dot_Product");
  	dot_product=multigrid_poisson_solver.V_Cycle(nullspace_component);
@@ -143,7 +143,7 @@ public:
 template<class T,int d>
 class MG_PRECONDITIONED_CONJUGATE_GRADIENT
 {
-    typedef typename POLICY_UNIFORM<VECTOR<T,d> >::ARRAYS_SCALAR VECTOR_T;
+    typedef VECTOR<int,d> TV_INT;
 public:
     bool print_diagnostics,print_residuals;
     int* iterations_used;
@@ -159,7 +159,7 @@ public:
     ~MG_PRECONDITIONED_CONJUGATE_GRADIENT()
     {}
 
-    bool Solve(MULTIGRID_SYSTEM<T,d>& system,VECTOR_T& x,VECTOR_T& r,VECTOR_T& z,VECTOR_T& p,const T tolerance,const int min_iterations,const int max_iterations) PHYSBAM_OVERRIDE
+    bool Solve(MULTIGRID_SYSTEM<T,d>& system,ARRAY<T,TV_INT>& x,ARRAY<T,TV_INT>& r,ARRAY<T,TV_INT>& z,ARRAY<T,TV_INT>& p,const T tolerance,const int min_iterations,const int max_iterations) PHYSBAM_OVERRIDE
     {
         T rho=0,rho_new=0,p_dot_z=0,nullspace_component=0,rmax=0,rmin=0;
         double sum=0,one_over_interior_count=0;
@@ -176,9 +176,9 @@ public:
         if(convergence_norm<=tolerance){
             if(print_diagnostics) LOG::Stat("cg iterations",0);return true;}
 
-	VECTOR_T::Exchange_Arrays(z,p);
+	ARRAY<T,TV_INT>::Exchange_Arrays(z,p);
 	system.Precondition_And_Compute_Dot_Product(r,p,rho,nullspace_component);
-	VECTOR_T::Exchange_Arrays(z,p);
+	ARRAY<T,TV_INT>::Exchange_Arrays(z,p);
 
         int iterations;for(iterations=1;;iterations++){
             LOG::SCOPE scope("PCG iteration","PCG iteration %d",iterations);

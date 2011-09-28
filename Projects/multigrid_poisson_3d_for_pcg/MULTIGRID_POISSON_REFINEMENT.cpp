@@ -23,7 +23,7 @@ Transfer_Residual_To_Coarse_Grid()
     Restriction_Helper<T> restriction_helper(fine.n(1),fine.n(2),fine.n(3),&fine.delta(1,1,1),&coarse.b(1,1,1),&coarse.cell_type(1,1,1));
     restriction_helper.Run_Parallel(fine.number_of_threads);
 #else
-    BOX<T_INDEX> restriction_indices(-T_INDEX::All_Ones_Vector(),2*T_INDEX::All_Ones_Vector());
+    RANGE<T_INDEX> restriction_indices(-T_INDEX::All_Ones_Vector(),2*T_INDEX::All_Ones_Vector());
     T_VARIABLE restriction_stencil(restriction_indices);
     for(BOX_ITERATOR<d> iterator(restriction_indices);iterator.Valid();iterator.Next()){
 	const T_INDEX& offset_index=iterator.Index();
@@ -67,7 +67,7 @@ Transfer_Correction_To_Fine_Grid()
     Prolongation_Helper<T> prolongation(fine.n(1),fine.n(2),fine.n(3),&fine.u(1,1,1),&coarse.u(1,1,1),&fine.index_is_interior_coarse_bitmask(1,1,1));
     prolongation.Run_Parallel(fine.number_of_threads);
 #else
-    BOX<T_INDEX> prolongation_indices(-T_INDEX::All_Ones_Vector(),T_INDEX::All_Ones_Vector());
+    RANGE<T_INDEX> prolongation_indices(-T_INDEX::All_Ones_Vector(),T_INDEX::All_Ones_Vector());
     T_VARIABLE prolongation_stencil(prolongation_indices);
     for(BOX_ITERATOR<d> iterator(prolongation_indices);iterator.Valid();iterator.Next()){
 	const T_INDEX& offset_index=iterator.Index();
@@ -89,7 +89,7 @@ Transfer_Correction_To_Fine_Grid()
 	const T_INDEX& coarse_index=coarse_iterator.Index();
 	T_INDEX base_fine_index=(coarse_index-1)*2;
 	unsigned char mask=0x01;
-	for(BOX_ITERATOR<d> fine_offset_iterator(BOX<T_INDEX>(T_INDEX(),T_INDEX::All_Ones_Vector()));fine_offset_iterator.Valid();fine_offset_iterator.Next()){
+	for(BOX_ITERATOR<d> fine_offset_iterator(RANGE<T_INDEX>(T_INDEX(),T_INDEX::All_Ones_Vector()));fine_offset_iterator.Valid();fine_offset_iterator.Next()){
 	    const T_INDEX& fine_offset=fine_offset_iterator.Index();
 	    if(!(fine.index_is_interior_coarse_bitmask(coarse_index) & mask)){
 		fine.u(base_fine_index+fine_offset)=0;
@@ -97,7 +97,7 @@ Transfer_Correction_To_Fine_Grid()
 		continue;
 	    }
 	    
-	    for(BOX_ITERATOR<d> coarse_offset_iterator(BOX<T_INDEX>(fine_offset-1,fine_offset));coarse_offset_iterator.Valid();coarse_offset_iterator.Next()){
+	    for(BOX_ITERATOR<d> coarse_offset_iterator(RANGE<T_INDEX>(fine_offset-1,fine_offset));coarse_offset_iterator.Valid();coarse_offset_iterator.Next()){
 		const T_INDEX& coarse_offset=coarse_offset_iterator.Index();
 		
 		fine.u(base_fine_index+fine_offset)+=prolongation_stencil(coarse_offset)*coarse.u(coarse_index+coarse_offset);

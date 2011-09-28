@@ -287,7 +287,7 @@ int main(int argc,char* argv[])
 	typedef T_GRID::NODE_ITERATOR T_NODE_ITERATOR;
 	typedef POLICY_UNIFORM<VECTOR<MULTIGRID_POISSON<T,d>::CELL_TYPE,d> >::ARRAYS_SCALAR T_CELL_TYPE_FIELD;
 	typedef POLICY_UNIFORM<T_INDEX>::ARRAYS_SCALAR T_INT_ARRAY;
-	T_GRID grid(size+2,BOX<TV>(-TV::All_Ones_Vector()*.5*h,size*h+TV::All_Ones_Vector()*.5*h));
+	T_GRID grid(size+2,RANGE<TV>(-TV::All_Ones_Vector()*.5*h,size*h+TV::All_Ones_Vector()*.5*h));
 	T_CELL_TYPE_FIELD cell_type(grid);
 	PCG_SPARSE<T> icpcg;
 	VECTOR_ND<T> b_icpcg;

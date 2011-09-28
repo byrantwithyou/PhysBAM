@@ -31,18 +31,17 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T,int d> MULTIGRID_POISSON<T,d>::
 MULTIGRID_POISSON(const T_INDEX& n_input,const T h_input,const int& number_of_threads_input)
-    :h(h_input),n(n_input),grid(n+2,BOX<TV>(-TV::All_Ones_Vector()*.5*h,TV(n)*h+TV::All_Ones_Vector()*.5*h)),
-    coarse_grid(n/2+2,BOX<TV>(-TV::All_Ones_Vector()*h,TV(n)*h+TV::All_Ones_Vector()*h)),
+    :h(h_input),n(n_input),grid(n+2,RANGE<TV>(-TV::All_Ones_Vector()*.5*h,TV(n)*h+TV::All_Ones_Vector()*.5*h)),
+    coarse_grid(n/2+2,RANGE<TV>(-TV::All_Ones_Vector()*h,TV(n)*h+TV::All_Ones_Vector()*h)),
     colors(2),number_of_threads(number_of_threads_input)
     ,padded_domain(T_INDEX::All_Ones_Vector(),n_input+2),unpadded_domain(2*T_INDEX::All_Ones_Vector(),n_input+1)
     ,padded_coarse_domain(T_INDEX::All_Ones_Vector(),n_input/2+2),unpadded_coarse_domain(2*T_INDEX::All_Ones_Vector(),n_input/2+1)
     
 {
-    cell_type.Resize(grid,0,false,false);
-    u.Resize(grid,0,true,false);
-    b.Resize(grid,0,true,false);
-    delta.Resize(grid,0,true,false);
-
+    cell_type.Resize(grid.Domain_Indices(),false,false);
+    u.Resize(grid.Domain_Indices(),true,false);
+    b.Resize(grid.Domain_Indices(),true,false);
+    delta.Resize(grid.Domain_Indices(),true,false);
 }
 //#####################################################################
 // Function Initialize 
@@ -51,9 +50,9 @@ template<class T,int d> void MULTIGRID_POISSON<T,d>::
 Initialize()
 {
     // Initialize state variables
-    index_has_full_diagonal_coarse_bitmask.Resize(coarse_grid,0,false,false);
-    index_is_interior_coarse_bitmask.Resize(coarse_grid,0,false,false);
-    diagonal_entries.Resize(grid,0,false,false);
+    index_has_full_diagonal_coarse_bitmask.Resize(coarse_grid.Domain_Indices(),false,false);
+    index_is_interior_coarse_bitmask.Resize(coarse_grid.Domain_Indices(),false,false);
+     diagonal_entries.Resize(grid.Domain_Indices(),false,false);
 
     Initialize_Interior_Bitmaps_And_Diagonal_Entries();
 
@@ -94,8 +93,8 @@ Initialize_Boundary_Region(){
 
 #ifndef MGPCG_UNOPTIMIZED
     LOG::Time("Allocate temporaries");
-    T_BITMASK index_is_boundary(grid);
-    T_BITMASK index_is_extended_boundary(grid);
+    ARRAY<unsigned char,TV_INT> index_is_boundary(grid.Domain_Indices());
+    ARRAY<unsigned char,TV_INT> index_is_extended_boundary(grid.Domain_Indices());
     for(int v=1;v<=d;v++) PHYSBAM_ASSERT(n(v)%boundary_block_size==0);
     ARRAY<int> boundary_nodes_in_block(n(1)*n(2)*n(3)/(boundary_block_size*boundary_block_size*boundary_block_size),false);
     ARRAY<int> extended_boundary_nodes_in_block(n(1)*n(2)*n(3)/(boundary_block_size*boundary_block_size*boundary_block_size),false);
@@ -156,7 +155,7 @@ Initialize_Boundary_Region(){
 	// if any are not interior, mark all fine cells with coarse cell 
 	// in prolongation stencil as boundary
         if(index_is_interior_coarse_bitmask(coarse_index)!=full_interior_coarse_cell)
-            for(BOX_ITERATOR<d> fine_iterator(BOX<T_INDEX>(base_fine_index-1,base_fine_index+2));fine_iterator.Valid();fine_iterator.Next()){
+            for(BOX_ITERATOR<d> fine_iterator(RANGE<T_INDEX>(base_fine_index-1,base_fine_index+2));fine_iterator.Valid();fine_iterator.Next()){
 		const T_INDEX& fine_index=fine_iterator.Index();
 		if(cell_type(fine_index)==INTERIOR_CELL_TYPE)
 		    index_is_boundary(fine_index)=true;}
@@ -183,15 +182,15 @@ Initialize_Boundary_Region(){
     }
     LOG::Time("Block Counting");
     for(int v=1;v<=d;v++) PHYSBAM_ASSERT(n(v)%boundary_block_size==0);
-    ARRAY<LIST_ARRAY<T_INDEX> > boundary_block_base_index; 
+    ARRAY<ARRAY<T_INDEX> > boundary_block_base_index; 
     boundary_block_base_index.Resize(2);
-    LIST_ARRAY<T_INDEX> extended_boundary_block_base_index;
+    ARRAY<T_INDEX> extended_boundary_block_base_index;
 
     // find all blocks with boundary and extended boundary nodes.
     // store index of the first node in each block.
     for(BOX_ITERATOR<d,boundary_block_size> domain_iterator(unpadded_domain);domain_iterator.Valid();domain_iterator.Next()){
 	const T_INDEX& base_index=domain_iterator.Index();
-	BOX<T_INDEX> box=BOX<T_INDEX>(base_index-boundary_block_padding,base_index+boundary_block_size-1+boundary_block_padding);
+	RANGE<T_INDEX> box=RANGE<T_INDEX>(base_index-boundary_block_padding,base_index+boundary_block_size-1+boundary_block_padding);
 
 	bool contains_boundary=false;
 	bool contains_extended_boundary=false;
@@ -233,7 +232,7 @@ Initialize_Boundary_Region(){
             const T_INDEX& offset=boundary_block_base_index(c)(b);
  	    boundary_block_start.Append(boundary_indices.m+1); // first boundary_index of the block (1-indexed)
 
-	    for(BOX_ITERATOR<d> iterator(BOX<T_INDEX>(offset,offset+T_INDEX::All_Ones_Vector()*(boundary_block_size-1)));
+	    for(BOX_ITERATOR<d> iterator(RANGE<T_INDEX>(offset,offset+T_INDEX::All_Ones_Vector()*(boundary_block_size-1)));
 		iterator.Valid();iterator.Next()){
 		const T_INDEX& index=iterator.Index();
 		if(index_is_boundary(index)){
@@ -250,7 +249,7 @@ Initialize_Boundary_Region(){
     for(int b=1;b<=extended_boundary_block_base_index.m;b++){
 	const T_INDEX& offset=extended_boundary_block_base_index(b);
 	
-	for(BOX_ITERATOR<d> iterator(BOX<T_INDEX>(offset,offset+T_INDEX::All_Ones_Vector()*(boundary_block_size-1)));
+	for(BOX_ITERATOR<d> iterator(RANGE<T_INDEX>(offset,offset+T_INDEX::All_Ones_Vector()*(boundary_block_size-1)));
 	    iterator.Valid();iterator.Next()){
 	    const T_INDEX& index=iterator.Index();
 	    if(index_is_extended_boundary(index))
@@ -335,7 +334,7 @@ Initialize_Interior_Bitmaps_And_Diagonal_Entries(){
 	index_has_full_diagonal_coarse_bitmask(coarse_index)=0;
 	
 	unsigned char mask=0x01;
-	for(BOX_ITERATOR<d> fine_iterator(BOX<T_INDEX>(base_fine_index,base_fine_index+1));fine_iterator.Valid();fine_iterator.Next()){
+	for(BOX_ITERATOR<d> fine_iterator(RANGE<T_INDEX>(base_fine_index,base_fine_index+1));fine_iterator.Valid();fine_iterator.Next()){
 	    const T_INDEX& fine_index=fine_iterator.Index();
 	    int active_neighbors=0;
 	    if(cell_type(fine_index)==INTERIOR_CELL_TYPE){
@@ -422,7 +421,7 @@ Apply_System_Matrix(const T_INDEX& index)
     return Apply_System_Matrix(index,u);
 }
 template<class T,int d> T MULTIGRID_POISSON<T,d>::
-Apply_System_Matrix(const T_INDEX& index,const T_VARIABLE& u_input) const
+Apply_System_Matrix(const T_INDEX& index,const ARRAY<T,TV_INT>& u_input) const
 {
     if(!diagonal_entries(index))
 	return (T)0;
@@ -442,7 +441,7 @@ Apply_System_Matrix(const T_INDEX& index,const T_VARIABLE& u_input) const
 // Function Multiply_With_System_Matrix
 //#####################################################################
 template<class T,int d> void MULTIGRID_POISSON<T,d>::
-Subtract_Multiple_Of_System_Matrix_And_Compute_Sum_And_Extrema(const T_VARIABLE& x,T_VARIABLE& y,double& sum,T& rmin,T& rmax) const
+Subtract_Multiple_Of_System_Matrix_And_Compute_Sum_And_Extrema(const ARRAY<T,TV_INT>& x,ARRAY<T,TV_INT>& y,double& sum,T& rmin,T& rmax) const
 {
 #ifndef MGPCG_UNOPTIMIZED
     Multiply_And_Compute_Sum_And_Extrema_Helper<T> multiplication_helper(n(1),n(2),n(3),&x(1,1,1),&y(1,1,1),&diagonal_entries(1,1,1),sum,rmin,rmax,(T)1/(h*h));
@@ -479,7 +478,7 @@ Subtract_Multiple_Of_System_Matrix_And_Compute_Sum_And_Extrema(const T_VARIABLE&
 // Function Multiply_With_System_Matrix_And_Compute_Dot_Product
 //#####################################################################
 template<class T,int d> T MULTIGRID_POISSON<T,d>::
-Multiply_With_System_Matrix_And_Compute_Dot_Product(const T_VARIABLE& x,T_VARIABLE& y) const
+Multiply_With_System_Matrix_And_Compute_Dot_Product(const ARRAY<T,TV_INT>& x,ARRAY<T,TV_INT>& y) const
 {
 
 #ifndef MGPCG_UNOPTIMIZED
@@ -550,13 +549,13 @@ Interior_Relaxation(const int loops,const bool compute_dot_product)
 	// compute deltas on first coarse x-slice
 	T_INDEX xmin_ymax_zmax=unpadded_coarse_domain.max_corner;
 	xmin_ymax_zmax(1)=unpadded_coarse_domain.min_corner(1);
-	for(BOX_ITERATOR<d> coarse_iterator(BOX<T_INDEX>(unpadded_coarse_domain.min_corner,xmin_ymax_zmax));
+	for(BOX_ITERATOR<d> coarse_iterator(RANGE<T_INDEX>(unpadded_coarse_domain.min_corner,xmin_ymax_zmax));
 	    coarse_iterator.Valid();coarse_iterator.Next()){
 	    
 	    const T_INDEX& coarse_index=coarse_iterator.Index();
 	    const T_INDEX base_fine_index=(coarse_index-1)*2;
 	    
-	    for(BOX_ITERATOR<d> fine_iterator(BOX<T_INDEX>(base_fine_index,base_fine_index+1));fine_iterator.Valid();fine_iterator.Next()){
+	    for(BOX_ITERATOR<d> fine_iterator(RANGE<T_INDEX>(base_fine_index,base_fine_index+1));fine_iterator.Valid();fine_iterator.Next()){
 		
 		const T_INDEX& fine_index=fine_iterator.Index();
 		delta(fine_index)=-b(fine_index);
@@ -573,7 +572,7 @@ Interior_Relaxation(const int loops,const bool compute_dot_product)
 	// apply deltas, lagging by 1 x-slice
 	// since write bitmask is based on coarse cells, 
 	// we'll iterate over coarse domain
-	for(BOX_ITERATOR<d> coarse_iterator(BOX<T_INDEX>(unpadded_coarse_domain.min_corner+T_INDEX::Axis_Vector(1),unpadded_coarse_domain.max_corner));
+	for(BOX_ITERATOR<d> coarse_iterator(RANGE<T_INDEX>(unpadded_coarse_domain.min_corner+T_INDEX::Axis_Vector(1),unpadded_coarse_domain.max_corner));
 	    coarse_iterator.Valid();coarse_iterator.Next()){
 	    const T_INDEX& coarse_index=coarse_iterator.Index();
 	    T_INDEX shifted_coarse_index=coarse_index;
@@ -581,7 +580,7 @@ Interior_Relaxation(const int loops,const bool compute_dot_product)
 	    const T_INDEX base_fine_index=(coarse_index-1)*2;
 	    
 	    unsigned char mask=0x01;
-	    for(BOX_ITERATOR<d> fine_iterator(BOX<T_INDEX>(base_fine_index,base_fine_index+1));fine_iterator.Valid();fine_iterator.Next()){
+	    for(BOX_ITERATOR<d> fine_iterator(RANGE<T_INDEX>(base_fine_index,base_fine_index+1));fine_iterator.Valid();fine_iterator.Next()){
 		
 		const T_INDEX& fine_index=fine_iterator.Index();		    
 		T_INDEX shifted_fine_index=fine_index;
@@ -609,13 +608,13 @@ Interior_Relaxation(const int loops,const bool compute_dot_product)
 	// apply deltas to last coarse x-slice
 	T_INDEX xmax_ymin_zmin=unpadded_coarse_domain.min_corner;
 	xmax_ymin_zmin(1)=unpadded_coarse_domain.max_corner(1);
-	for(BOX_ITERATOR<d> coarse_iterator(BOX<T_INDEX>(xmax_ymin_zmin,unpadded_coarse_domain.max_corner));
+	for(BOX_ITERATOR<d> coarse_iterator(RANGE<T_INDEX>(xmax_ymin_zmin,unpadded_coarse_domain.max_corner));
 	    coarse_iterator.Valid();coarse_iterator.Next()){
 	    const T_INDEX& coarse_index=coarse_iterator.Index();
 	    const T_INDEX base_fine_index=(coarse_index-1)*2;
 	    
 	    unsigned char mask=0x01;
-	    for(BOX_ITERATOR<d> fine_iterator(BOX<T_INDEX>(base_fine_index,base_fine_index+1));fine_iterator.Valid();fine_iterator.Next()){
+	    for(BOX_ITERATOR<d> fine_iterator(RANGE<T_INDEX>(base_fine_index,base_fine_index+1));fine_iterator.Valid();fine_iterator.Next()){
 
 		const T_INDEX& fine_index=fine_iterator.Index();
 		if(index_has_full_diagonal_coarse_bitmask(coarse_index) & mask){
@@ -675,7 +674,7 @@ Relax_And_Compute_Residuals(const int interior_relaxations,const int boundary_po
         const T_INDEX base_fine_index=(coarse_index-1)*2;
 	
 	unsigned char mask=0x01;
-	for(BOX_ITERATOR<d> fine_iterator(BOX<T_INDEX>(base_fine_index,base_fine_index+1));fine_iterator.Valid();fine_iterator.Next()){
+	for(BOX_ITERATOR<d> fine_iterator(RANGE<T_INDEX>(base_fine_index,base_fine_index+1));fine_iterator.Valid();fine_iterator.Next()){
 	    const T_INDEX& fine_index=fine_iterator.Index();
 
 	    // subtract nullspace component from right hand side (interior indices only)
@@ -711,7 +710,7 @@ Relax_And_Compute_Residuals(const int interior_relaxations,const int boundary_po
 	    const T_INDEX base_fine_index=(coarse_index-1)*2;
 	
 	    unsigned char mask=0x01;
-	    for(BOX_ITERATOR<d> fine_iterator(BOX<T_INDEX>(base_fine_index,base_fine_index+1));fine_iterator.Valid();fine_iterator.Next()){
+	    for(BOX_ITERATOR<d> fine_iterator(RANGE<T_INDEX>(base_fine_index,base_fine_index+1));fine_iterator.Valid();fine_iterator.Next()){
 		const T_INDEX& fine_index=fine_iterator.Index();
 
 	    	delta(fine_index)=0;
@@ -814,7 +813,7 @@ Initialize_Test_Domain()
 	cell_type(iterator.Index())=NEUMANN_CELL_TYPE;
 }
 template<class T,int d> void MULTIGRID_POISSON<T,d>::
-Initialize_Test_Right_Hand_Side(T_VARIABLE& b_input)
+Initialize_Test_Right_Hand_Side(ARRAY<T,TV_INT>& b_input)
 {
 #if 0
     // Use a discrete delta as right hand side
@@ -839,7 +838,7 @@ Initialize_Test_Right_Hand_Side()
     Initialize_Test_Right_Hand_Side(b);
 }
 template<class T,int d> void MULTIGRID_POISSON<T,d>::
-Initialize_Test_Initial_Guess(T_VARIABLE& u_input)
+Initialize_Test_Initial_Guess(ARRAY<T,TV_INT>& u_input)
 {
     #if 0
     // Randomize initial guess

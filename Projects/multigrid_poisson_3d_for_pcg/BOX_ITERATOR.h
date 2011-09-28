@@ -15,13 +15,12 @@ template<int d>
 class BOX_ITERATOR<d,1>
 {
     typedef VECTOR<int,d> TV_INT;
-    typedef BOX<TV_INT> T_BOX;
 
-    const T_BOX& box;
+    const RANGE<TV_INT>& box;
     TV_INT index;
 
 public:
-    BOX_ITERATOR(const T_BOX& box_input)
+    BOX_ITERATOR(const RANGE<TV_INT>& box_input)
         :box(box_input)
     {
         Reset();
@@ -45,13 +44,12 @@ class BOX_ITERATOR
 {
     STATIC_ASSERT((stride!=1));
     typedef VECTOR<int,d> TV_INT;
-    typedef BOX<TV_INT> T_BOX;
 
-    const T_BOX& box;
+    const RANGE<TV_INT>& box;
     TV_INT index;
 
 public:
-    BOX_ITERATOR(const T_BOX& box_input)
+    BOX_ITERATOR(const RANGE<TV_INT>& box_input)
         :box(box_input)
     {
         Reset();
@@ -74,17 +72,16 @@ template<int d>
 class BOUNDARY_ITERATOR
 {
     typedef VECTOR<int,d> TV_INT;
-    typedef BOX<TV_INT> T_BOX;
     
-    const T_BOX& box;
+    const RANGE<TV_INT>& box;
     TV_INT index;
-    T_BOX regions[2*d];
+    RANGE<TV_INT> regions[2*d];
 
     int current_region;
     int side; // side=1: xmin, side=2 xmax, side=3:ymin, side=4:ymax
     bool valid;
 public:
-    BOUNDARY_ITERATOR(const T_BOX& box_input,int side=0)
+    BOUNDARY_ITERATOR(const RANGE<TV_INT>& box_input,int side=0)
 	:box(box_input),side(side)
     {
 	assert(side<=2*d);
@@ -93,10 +90,10 @@ public:
 	for(int v=1;v<=d;v++){
 	    min_corner(v)=box.min_corner(v);
 	    max_corner(v)=box.min_corner(v);
-	    regions[(v-1)*2]=T_BOX(min_corner,max_corner);
+	    regions[(v-1)*2]=RANGE<TV_INT>(min_corner,max_corner);
 	    min_corner(v)=box.max_corner(v);
 	    max_corner(v)=box.max_corner(v);
-	    regions[(v-1)*2+1]=T_BOX(min_corner,max_corner);
+	    regions[(v-1)*2+1]=RANGE<TV_INT>(min_corner,max_corner);
 	    min_corner(v)=box.min_corner(v);
 	}
 	if(side)
