@@ -91,11 +91,9 @@ public:
     double Run()
     {u_dot_b_partial_results=new double[1];
     Compute_Delta_X_Range(1,x_size,0);
-    if(u[343]>0) u[343]+=0;
     Apply_Delta_X_Range(1,coarse_x_size,0);
     double u_dot_b=u_dot_b_partial_results[0];
     delete[] u_dot_b_partial_results;u_dot_b_partial_results=0;
-    if(u_dot_b>=0) u_dot_b+=0;
     return u_dot_b;}
     
     // For debugging purposes only
