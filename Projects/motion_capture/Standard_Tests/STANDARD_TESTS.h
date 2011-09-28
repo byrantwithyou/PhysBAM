@@ -197,12 +197,12 @@ void Setup_Spatially_Varying_Wind(const int frame)
     FILE_UTILITIES::Read_From_File(stream_type,input_directory+"/mac_velocities."+f,face_velocities);
     v_array.Resize(face_velocities.Component(1).Domain_Indices(),false,false);
     p_array.Resize(face_velocities.Component(1).Domain_Indices(),false,false);
-    FILE_UTILITIES::Read_From_File(stream_type,input_directory+"/pressure."+f,p_array);
-    FILE_UTILITIES::Read_From_File(stream_type,input_directory+"/density."+f,d_array);
+    FILE_UTILITIES::Read_From_File(stream_type,input_directory+"/"+f+"/pressure",p_array);
+    FILE_UTILITIES::Read_From_File(stream_type,input_directory+"/"+f+"/density.",d_array);
     if(frame==0){
-        FILE_UTILITIES::Read_From_File(stream_type,input_directory+"/grid",grid);
+        FILE_UTILITIES::Read_From_File(stream_type,input_directory+"/common/grid",grid);
         grid.Initialize(face_velocities.Component(1).counts.x,face_velocities.Component(1).counts.y,face_velocities.Component(1).counts.z,-5.0,5.0,0.0,10.0,-5.0,5.0);
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/grid",grid);}
+        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/grid",grid);}
     for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         v_array(cell_index)=TV((face_velocities(1,cell_index)+face_velocities(1,TV_INT(cell_index.x+1,cell_index.y,cell_index.z)))/(T)2,
             (face_velocities(1,cell_index)+face_velocities(1,TV_INT(cell_index.x,cell_index.y+1,cell_index.z)))/(T)2,
@@ -253,9 +253,9 @@ void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE
     BASE::Write_Output_Files(frame);
     std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
     LOG::cout<<"Writing "<<output_directory+"/mac_velocities."+f<<std::endl;
-    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/density."+f,d_array);
-    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/mac_velocities."+f,face_velocities);
-    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/pressure."+f,p_array);
+    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/density.",d_array);
+    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/mac_velocities",face_velocities);
+    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/pressure",p_array);
     controller->Write(stream_type,output_directory,frame);
 }
 //#####################################################################

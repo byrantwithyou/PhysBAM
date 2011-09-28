@@ -2,6 +2,7 @@
 // Copyright 2009-2010, Eftychios Sifakis.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <PhysBAM_Tools/Log/LOG.h>
 #include "../Instantiation_Helpers.h"
 #include "PTHREAD_QUEUE.h"
 #include "Relaxation_And_Dot_Product_Interior_Helper.h"
@@ -68,6 +69,7 @@ Run_Parallel(const int number_of_partitions)
     double u_dot_b=0;
     for(int i=0;i<number_of_partitions;i++) u_dot_b+=u_dot_b_partial_results[i];
     delete[] u_dot_b_partial_results;u_dot_b_partial_results=0;
+    if(u_dot_b>0) u_dot_b+=0;
     return u_dot_b;
 }
 //#####################################################################
@@ -104,6 +106,7 @@ Compute_Delta_X_Range(const int xmin,const int xmax,const int partition_number)
 template<class T,int y_size,int z_size> void Relaxation_And_Dot_Product_Interior_Size_Specific_Helper<T,y_size,z_size>::
 Apply_Delta_X_Range(const int xmin,const int xmax,const int partition_number)
 {    
+    if(u[343]>0) u[343]+=0;
     const T two_thirds=2./3.;
     const T minus_one_ninth=-1./9.;
     double local_u_dot_b=0;
@@ -120,39 +123,55 @@ Apply_Delta_X_Range(const int xmin,const int xmax,const int partition_number)
             int coarse_index=i*coarse_x_shift+j*coarse_y_shift+k*coarse_z_shift;
             
             if(bit_writemask[coarse_index] & 0x01){
+    if(local_u_dot_b>0) local_u_dot_b+=0;
+    if(delta[index]>0) local_u_dot_b+=0;
+    if(b[index]>0) local_u_dot_b+=0;
+    if(u[index]>0) local_u_dot_b+=0;
                 u[index]+=two_thirds*delta[index];
                 u[index]+=minus_one_ninth*b[index];}
 	    local_u_dot_b+=u[index]*b[index];
+            LOG::cout<<index<<std::endl;
+    if(b[index]>0) local_u_dot_b+=0;
+    if(u[index]>0) local_u_dot_b+=0;
+    if(local_u_dot_b>0) local_u_dot_b+=0;
             if(bit_writemask[coarse_index] & 0x02){
                 u[index+z_shift]+=two_thirds*delta[index+z_shift];
                 u[index+z_shift]+=minus_one_ninth*b[index+z_shift];}
 	    local_u_dot_b+=u[index+z_shift]*b[index+z_shift];
+    if(local_u_dot_b>0) local_u_dot_b+=0;
             if(bit_writemask[coarse_index] & 0x04){
                 u[index+y_shift]+=two_thirds*delta[index+y_shift];
                 u[index+y_shift]+=minus_one_ninth*b[index+y_shift];}
 	    local_u_dot_b+=u[index+y_shift]*b[index+y_shift];
+    if(local_u_dot_b>0) local_u_dot_b+=0;
             if(bit_writemask[coarse_index] & 0x08){
                 u[index+y_shift+z_shift]+=two_thirds*delta[index+y_shift+z_shift];
                 u[index+y_shift+z_shift]+=minus_one_ninth*b[index+y_shift+z_shift];}
 	    local_u_dot_b+=u[index+y_shift+z_shift]*b[index+y_shift+z_shift];
+    if(local_u_dot_b>0) local_u_dot_b+=0;
             if(bit_writemask[coarse_index] & 0x10){
                 u[index+x_shift]+=two_thirds*delta[index+x_shift];
                 u[index+x_shift]+=minus_one_ninth*b[index+x_shift];}
 	    local_u_dot_b+=u[index+x_shift]*b[index+x_shift];
+    if(local_u_dot_b>0) local_u_dot_b+=0;
             if(bit_writemask[coarse_index] & 0x20){
                 u[index+x_shift+z_shift]+=two_thirds*delta[index+x_shift+z_shift];
                 u[index+x_shift+z_shift]+=minus_one_ninth*b[index+x_shift+z_shift];}
 	    local_u_dot_b+=u[index+x_shift+z_shift]*b[index+x_shift+z_shift];
+    if(local_u_dot_b>0) local_u_dot_b+=0;
             if(bit_writemask[coarse_index] & 0x40){
                 u[index+x_shift+y_shift]+=two_thirds*delta[index+x_shift+y_shift];
                 u[index+x_shift+y_shift]+=minus_one_ninth*b[index+x_shift+y_shift];}
 	    local_u_dot_b+=u[index+x_shift+y_shift]*b[index+x_shift+y_shift];
+    if(local_u_dot_b>0) local_u_dot_b+=0;
             if(bit_writemask[coarse_index] & 0x80){
                 u[index+x_shift+y_shift+z_shift]+=two_thirds*delta[index+x_shift+y_shift+z_shift];
                 u[index+x_shift+y_shift+z_shift]+=minus_one_ninth*b[index+x_shift+y_shift+z_shift];}
 	    local_u_dot_b+=u[index+x_shift+y_shift+z_shift]*b[index+x_shift+y_shift+z_shift];
+    if(local_u_dot_b>0) local_u_dot_b+=0;
         }
 
+    if(local_u_dot_b>0) local_u_dot_b+=0;
     u_dot_b_partial_results[partition_number]=local_u_dot_b;
 }
 //#####################################################################

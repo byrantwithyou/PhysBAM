@@ -559,4 +559,5 @@ public:
 //#####################################################################
 };
 }
+#include <PhysBAM_Tools/Read_Write/Grids_Uniform/READ_WRITE_GRID.h>
 #endif

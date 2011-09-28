@@ -116,11 +116,11 @@ void Write_Data_File(const GRID<TV>& grid,const ARRAY<T,VECTOR<int,3> >& u,const
         std::ofstream output;
         if(!FILE_UTILITIES::Directory_Exists(output_directory.c_str())) FILE_UTILITIES::Create_Directory(output_directory.c_str());
         if(frame == start_frame){
-            sprintf(filename,"%s/grid",output_directory.c_str());output.open(filename,std::ios::binary);grid.Write(output);output.close();}
-        sprintf(filename,"%s/density.%d",output_directory.c_str(),frame);output.open(filename,std::ios::binary);density.Write(output);output.close();
-        sprintf(filename,"%s/temperature.%d",output_directory.c_str(),frame);output.open(filename,std::ios::binary);temperature.Write(output);output.close();
-        sprintf(filename,"%s/velocities.%d",output_directory.c_str(),frame);output.open(filename,std::ios::binary);u.Write(output);v.Write(output);output.close();
-        sprintf(filename,"%s/last_frame",output_directory.c_str());output.open(filename,std::ios::out|std::ios::trunc);output<<frame<<std::endl;output.close();}
+            sprintf(filename,"%s/common/grid",output_directory.c_str());output.open(filename,std::ios::binary);grid.Write(output);output.close();}
+        sprintf(filename,"%s/%d/density",output_directory.c_str(),frame);output.open(filename,std::ios::binary);density.Write(output);output.close();
+        sprintf(filename,"%s/%d/temperature",output_directory.c_str(),frame);output.open(filename,std::ios::binary);temperature.Write(output);output.close();
+        sprintf(filename,"%s/%d/velocities",output_directory.c_str(),frame);output.open(filename,std::ios::binary);u.Write(output);v.Write(output);output.close();
+        sprintf(filename,"%s/common/last_frame",output_directory.c_str());output.open(filename,std::ios::out|std::ios::trunc);output<<frame<<std::endl;output.close();}
 
 }
 //#####################################################################

@@ -7,11 +7,10 @@
 #ifndef __STENCIL__
 #define __STENCIL__
 
+#include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Data_Structures/PAIR.h>
 #include <PhysBAM_Tools/Math_Tools/Hash.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_2D.h>
-#include <Arrays/LIST_ARRAY.h>
-#include <Grids/POLICY_UNIFORM.h>
 #include <limits.h>
 #define SUPPORT_FORMATTED_STENCIL_OUTPUT
 
@@ -25,22 +24,21 @@ namespace PhysBAM{
 
 template<class T,int d> class STENCIL;
 template<class T,int d> class STENCIL_ITERATOR;
-template<class T,int d> inline typename POLICY_UNIFORM<VECTOR<T,d> >::ARRAYS_SCALAR&
-operator+=(typename POLICY_UNIFORM<VECTOR<T,d> >::ARRAYS_SCALAR& array,const STENCIL<T,d>& stencil);
-template<class T,int d> inline typename POLICY_UNIFORM<VECTOR<T,d> >::ARRAYS_SCALAR&
-Accumulation(typename POLICY_UNIFORM<VECTOR<T,d> >::ARRAYS_SCALAR& array,const STENCIL<T,d>& stencil,const VECTOR<int,d>& shift,const T scale);
-template<class T,int d> inline typename POLICY_UNIFORM<VECTOR<T,d> >::ARRAYS_SCALAR&
-Accumulation_Cropped(typename POLICY_UNIFORM<VECTOR<T,d> >::ARRAYS_SCALAR& array,const STENCIL<T,d>& stencil,const VECTOR<int,d>& shift,const T scale);
+template<class T,int d> inline ARRAY<T,VECTOR<int,d> >& operator+=(ARRAY<T,VECTOR<int,d> >& array,const STENCIL<T,d>& stencil);
+template<class T,int d> inline ARRAY<T,VECTOR<int,d> >&
+Accumulation(ARRAY<T,VECTOR<int,d> >& array,const STENCIL<T,d>& stencil,const VECTOR<int,d>& shift,const T scale);
+template<class T,int d> inline ARRAY<T,VECTOR<int,d> >&
+Accumulation_Cropped(ARRAY<T,VECTOR<int,d> >& array,const STENCIL<T,d>& stencil,const VECTOR<int,d>& shift,const T scale);
 template<class T,int d> inline std::ostream& operator<<(std::ostream& output,const STENCIL<T,d>& stencil);
 
 template<class T,int d>
 class STENCIL
 {
     typedef T ELEMENT;
-    typedef typename POLICY_UNIFORM<VECTOR<T,d> >::ARRAYS_SCALAR T_ARRAYS;
+    typedef ARRAY<T,VECTOR<int,d> > T_ARRAYS;
 
 public:
-    LIST_ARRAY<PAIR<VECTOR<int,d>,T> > entries;
+    ARRAY<PAIR<VECTOR<int,d>,T> > entries;
 private:
 
     friend class STENCIL_ITERATOR<T,d>;
@@ -95,7 +93,7 @@ public:
     T operator*(const T_ARRAYS& array) const
     {T result=0;for(int i=1;i<=entries.m;i++) result+=array(entries(i).x)*entries(i).y;return result;}
 
-    T operator*(const LIST_ARRAY<T>& array) const
+    T operator*(const ARRAY<T>& array) const
     {STATIC_ASSERT(d==1);
     T result=0;for(int i=1;i<=entries.m;i++) result+=array(entries(i).x(1))*entries(i).y;return result;}
 
@@ -179,15 +177,15 @@ public:
 //#####################################################################
 };
 template<class T,int d,int d2> inline T 
-Contraction(const VECTOR<STENCIL<T,d>,d2>& v1,const VECTOR<typename POLICY_UNIFORM<VECTOR<T,d> >::ARRAYS_SCALAR,d2>& v2,const VECTOR<int,d>& shift)
+Contraction(const VECTOR<STENCIL<T,d>,d2>& v1,const VECTOR<ARRAY<T,VECTOR<int,d> >,d2>& v2,const VECTOR<int,d>& shift)
 {T result=0;for(int i=1;i<=d2;i++) result+=v1(i).Contraction(v2(i),shift);return result;}
 
 template<class T,int d,int d2> inline T 
-Contraction_Cropped(const VECTOR<STENCIL<T,d>,d2>& v1,const VECTOR<typename POLICY_UNIFORM<VECTOR<T,d> >::ARRAYS_SCALAR,d2>& v2,const VECTOR<int,d>& shift)
+Contraction_Cropped(const VECTOR<STENCIL<T,d>,d2>& v1,const VECTOR<ARRAY<T,VECTOR<int,d> >,d2>& v2,const VECTOR<int,d>& shift)
 {T result=0;for(int i=1;i<=d2;i++) result+=v1(i).Contraction_Cropped(v2(i),shift);return result;}
 
 template<class T,int d,int d2> inline T 
-Dot_Product(const VECTOR<STENCIL<T,d>,d2>& v1,const VECTOR<typename POLICY_UNIFORM<VECTOR<T,d> >::ARRAYS_SCALAR,d2>& v2)
+Dot_Product(const VECTOR<STENCIL<T,d>,d2>& v1,const VECTOR<ARRAY<T,VECTOR<int,d> >,d2>& v2)
 {T result=0;for(int i=1;i<=d2;i++) result+=v1(i)*v2(i);return result;}
 
 template<class T,int d,int d2> inline T 
@@ -198,32 +196,32 @@ template<class T,int d,int d2> inline VECTOR<STENCIL<T,d>,d2>
 operator*(const VECTOR<STENCIL<T,d>,d2>& v,const T a)
 {VECTOR<STENCIL<T,d>,d2> result;for(int i=1;i<=d2;i++) result(i)=v(i)*a;return result;}
 
-template<class T,int d> inline typename POLICY_UNIFORM<VECTOR<T,d> >::ARRAYS_SCALAR&
-operator+=(typename POLICY_UNIFORM<VECTOR<T,d> >::ARRAYS_SCALAR& array,const STENCIL<T,d>& stencil)
+template<class T,int d> inline ARRAY<T,VECTOR<int,d> >&
+operator+=(ARRAY<T,VECTOR<int,d> >& array,const STENCIL<T,d>& stencil)
 {for(int i=1;i<=stencil.entries.m;i++) array(stencil.entries(i).x)+=stencil.entries(i).y;return array;}
 
-template<class T,int d,int d2> inline VECTOR<typename POLICY_UNIFORM<VECTOR<T,d> >::ARRAYS_SCALAR,d2>&
-operator+=(VECTOR<typename POLICY_UNIFORM<VECTOR<T,d> >::ARRAYS_SCALAR,d2>& v1,const VECTOR<STENCIL<T,d>,d2>& v2)
+template<class T,int d,int d2> inline VECTOR<ARRAY<T,VECTOR<int,d> >,d2>&
+operator+=(VECTOR<ARRAY<T,VECTOR<int,d> >,d2>& v1,const VECTOR<STENCIL<T,d>,d2>& v2)
 {for(int i=1;i<=d2;i++) v1(i)+=v2(i);return v1;}
 
-template<class T,int d> inline typename POLICY_UNIFORM<VECTOR<T,d> >::ARRAYS_SCALAR&
-Accumulation_Cropped(typename POLICY_UNIFORM<VECTOR<T,d> >::ARRAYS_SCALAR& array,const STENCIL<T,d>& stencil,const VECTOR<int,d>& shift,const T scale)
+template<class T,int d> inline ARRAY<T,VECTOR<int,d> >&
+Accumulation_Cropped(ARRAY<T,VECTOR<int,d> >& array,const STENCIL<T,d>& stencil,const VECTOR<int,d>& shift,const T scale)
 {for(int i=1;i<=stencil.entries.m;i++) if(array.Domain_Indices().Lazy_Inside(stencil.entries(i).x+shift)) array(stencil.entries(i).x+shift)+=stencil.entries(i).y*scale;return array;}
 
-template<class T,int d,class ExistsFunctor> inline typename POLICY_UNIFORM<VECTOR<T,d> >::ARRAYS_SCALAR&
-Accumulation_Cropped(typename POLICY_UNIFORM<VECTOR<T,d> >::ARRAYS_SCALAR& array,const STENCIL<T,d>& stencil,const VECTOR<int,d>& shift,const T scale,ExistsFunctor exists)
+template<class T,int d,class ExistsFunctor> inline ARRAY<T,VECTOR<int,d> >&
+Accumulation_Cropped(ARRAY<T,VECTOR<int,d> >& array,const STENCIL<T,d>& stencil,const VECTOR<int,d>& shift,const T scale,ExistsFunctor exists)
 {for(int i=1;i<=stencil.entries.m;i++) if(exists(stencil.entries(i).x+shift)) array(stencil.entries(i).x+shift)+=stencil.entries(i).y*scale;return array;}
 
-template<class T,int d,int d2> inline VECTOR<typename POLICY_UNIFORM<VECTOR<T,d> >::ARRAYS_SCALAR,d2>&
-Accumulation_Cropped(VECTOR<typename POLICY_UNIFORM<VECTOR<T,d> >::ARRAYS_SCALAR,d2>& v1,const VECTOR<STENCIL<T,d>,d2>& v2,const VECTOR<int,d>& shift,const T scale)
+template<class T,int d,int d2> inline VECTOR<ARRAY<T,VECTOR<int,d> >,d2>&
+Accumulation_Cropped(VECTOR<ARRAY<T,VECTOR<int,d> >,d2>& v1,const VECTOR<STENCIL<T,d>,d2>& v2,const VECTOR<int,d>& shift,const T scale)
 {for(int i=1;i<=d2;i++) Accumulation_Cropped(v1(i),v2(i),shift,scale);return v1;}
 
-template<class T,int d> inline typename POLICY_UNIFORM<VECTOR<T,d> >::ARRAYS_SCALAR&
-Accumulation(typename POLICY_UNIFORM<VECTOR<T,d> >::ARRAYS_SCALAR& array,const STENCIL<T,d>& stencil,const VECTOR<int,d>& shift,const T scale)
+template<class T,int d> inline ARRAY<T,VECTOR<int,d> >&
+Accumulation(ARRAY<T,VECTOR<int,d> >& array,const STENCIL<T,d>& stencil,const VECTOR<int,d>& shift,const T scale)
 {for(int i=1;i<=stencil.entries.m;i++) array(stencil.entries(i).x+shift)+=stencil.entries(i).y*scale;return array;}
 
-template<class T,int d,int d2> inline VECTOR<typename POLICY_UNIFORM<VECTOR<T,d> >::ARRAYS_SCALAR,d2>&
-Accumulation(VECTOR<typename POLICY_UNIFORM<VECTOR<T,d> >::ARRAYS_SCALAR,d2>& v1,const VECTOR<STENCIL<T,d>,d2>& v2,const VECTOR<int,d>& shift,const T scale)
+template<class T,int d,int d2> inline VECTOR<ARRAY<T,VECTOR<int,d> >,d2>&
+Accumulation(VECTOR<ARRAY<T,VECTOR<int,d> >,d2>& v1,const VECTOR<STENCIL<T,d>,d2>& v2,const VECTOR<int,d>& shift,const T scale)
 {for(int i=1;i<=d2;i++) Accumulation(v1(i),v2(i),shift,scale);return v1;}
 
 template<class T,int d,int d2> inline T
@@ -259,7 +257,7 @@ template<class T> void
 Print_Stencil(std::ostream& output,const STENCIL<T,3>& stencil)
 {if(!stencil.Size()){output<<"<empty stencil>"<<std::endl;return;}
 HASHTABLE<int,STENCIL<T,2> > slices;
-BOX<VECTOR<int,3> > box(INT_MAX,INT_MIN,INT_MAX,INT_MIN,INT_MAX,INT_MIN);
+RANGE<VECTOR<int,3> > box(INT_MAX,INT_MIN,INT_MAX,INT_MIN,INT_MAX,INT_MIN);
 for(STENCIL_ITERATOR<const T,3> iterator(stencil);iterator.Valid();iterator.Next()){
     const VECTOR<int,3>& index=iterator.Key();
     box.Enlarge_To_Include_Point(index);

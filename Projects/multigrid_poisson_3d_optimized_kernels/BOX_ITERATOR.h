@@ -17,13 +17,12 @@ template<int d>
 class BOX_ITERATOR<d,1>
 {
     typedef VECTOR<int,d> TV_INT;
-    typedef BOX<TV_INT> T_BOX;
 
-    const T_BOX& box;
+    const RANGE<TV_INT>& box;
     TV_INT index;
 
 public:
-    BOX_ITERATOR(const T_BOX& box_input)
+    BOX_ITERATOR(const RANGE<TV_INT>& box_input)
         :box(box_input)
     {
         Reset();
@@ -47,13 +46,12 @@ class BOX_ITERATOR
 {
     STATIC_ASSERT((stride!=1));
     typedef VECTOR<int,d> TV_INT;
-    typedef BOX<TV_INT> T_BOX;
 
-    const T_BOX& box;
+    const RANGE<TV_INT>& box;
     TV_INT index;
 
 public:
-    BOX_ITERATOR(const T_BOX& box_input)
+    BOX_ITERATOR(const RANGE<TV_INT>& box_input)
         :box(box_input)
     {
         Reset();

@@ -35,15 +35,15 @@ public:
 
     static void Print_Operation(std::ostream& output,const T_STENCIL& stencil)
     {
-        HASHTABLE<T,LIST_ARRAY<T_INDEX> > hash;
+        HASHTABLE<T,ARRAY<T_INDEX> > hash;
         for(T_CONST_STENCIL_ITERATOR iterator(stencil);iterator.Valid();iterator.Next())
-            hash.Get_Or_Insert(iterator.Data(),LIST_ARRAY<T_INDEX>()).Append(iterator.Key());
+            hash.Get_Or_Insert(iterator.Data(),ARRAY<T_INDEX>()).Append(iterator.Key());
         bool on_first_coefficient=true;
-        for(HASHTABLE_ITERATOR<T,LIST_ARRAY<T_INDEX> > iterator(hash);iterator.Valid();iterator.Next()){
+        for(HASHTABLE_ITERATOR<T,ARRAY<T_INDEX> > iterator(hash);iterator.Valid();iterator.Next()){
             output<<"    result";
             if(!on_first_coefficient) output<<"+";else on_first_coefficient=false;
             output<<"=(T)"<<iterator.Key()<<"*(";
-            const LIST_ARRAY<T_INDEX>& indices=iterator.Data();
+            const ARRAY<T_INDEX>& indices=iterator.Data();
             for(int i=1;i<=indices.m;i++){
                 output<<std::endl<<"        ";
                 if(i>1) output<<"+input[index"; else output<<"input[index";

@@ -12,7 +12,7 @@ class Scalar_Multiply_And_Accumulate_And_Compute_Sum_And_Extrema_Size_Specific_H
 protected:
     T* const result;
     const T* const u1;
-    const T& c1;
+    const T c1;
     double &sum;
     T& minimum;
     T& maximum;
