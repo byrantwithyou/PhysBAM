@@ -21,3 +21,4 @@ Test_[0-9]*
 *.ps
 *~
 a.out
+Public_Data
