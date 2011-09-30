@@ -22,3 +22,8 @@ Test_[0-9]*
 *~
 a.out
 Public_Data
+tmp-gdb-cmd-args.txt
+Projects/Water/water
+Projects/Smoke/smoke
+Projects/Smoke/smoke_debug
+output
