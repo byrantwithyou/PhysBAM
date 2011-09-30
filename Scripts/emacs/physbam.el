@@ -51,7 +51,7 @@
         ("gcc-4.1.1-64" .  ("/usr/local/compilers/gcc-4.1.1-x86_64-x86_64/bin/gcc" 
                             "/usr/local/compilers/gcc-4.1.1-x86_64-x86_64/bin/g++" 
                             "/usr/local/compilers/icecream/gcc-4.1.1-x86_64-x86_64.tar.bz2,i686:/usr/local/compilers/icecream/gcc-4.1.1-i686-x86_64.tar.bz2"))
-        ("g++" .  ("/usr/bin/gcc" "/usr/bin/g++" "none"))
+        ("gcc" .  ("gcc" "g++" "none"))
         ("icc" .  ("icc" "icc" "none"))))
 
 ;#####################################################################
@@ -663,8 +663,8 @@
 ; Read project settings
 ;(physbam-read-project-settings)
 ; NOTE ALL FUNCTIONS THAT MODIFY STATUS AND SAVE SHOULD BE BELOW ABOVE READ PROJECT SETTINGS
-(physbam-set-compiler (if (or (string= (getenv "PLATFORM") "opteron") (string= (getenv "PLATFORM") "nocona"))  "gcc-4.0.1-64" "gcc-4.0.1"))
-(physbam-set-compiler "g++")
+(physbam-set-compiler (if (or (string= (getenv "PLATFORM") "opteron") (string= (getenv "PLATFORM") "nocona"))  "gcc" "gcc"))
+(physbam-set-compiler "gcc")
 (physbam-setup-compile-command nil)
 (setq truncate-partial-width-windows nil)
 (setq compilation-scroll-output t) ; scroll to end by default
