@@ -1,10 +1,15 @@
 #ifndef __DATA_EXCHANGE_DEFORMABLE_BODY_SIMULATION__
 #define __DATA_EXCHANGE_DEFORMABLE_BODY_SIMULATION__
 
-#include <boost/serialization/base_object.hpp>
-#include <boost/serialization/assume_abstract.hpp>
+#include "force.h"
 #include "simulation_object.h"
-#include "forces.h"
+#include <boost/serialization/assume_abstract.hpp>
+#include <boost/serialization/base_object.hpp>
+#include "deformable_body.h"
+#include "gravity_force.h"
+#include "ground_plane.h"
+#include "scripted_geometry.h"
+#include "volumetric_force.h"
 
 namespace data_exchange{
 struct deformable_body_simulation
@@ -47,22 +52,6 @@ private:
         ar.register_type(static_cast<volumetric_force*>(NULL));
         ar.register_type(static_cast<gravity_force*>(NULL));
         ar & simulation_forces;
-    }
-};
-
-struct deformable_body_output_frame
-{
-    std::vector<vf3> position;
-    std::vector<vf3> velocity;
-
-    deformable_body_output_frame() {}
-
-private:
-    friend class boost::serialization::access;
-    template<class Archive>
-    void serialize(Archive & ar, const unsigned int version)
-    {
-        ar & position & velocity;
     }
 };
 }

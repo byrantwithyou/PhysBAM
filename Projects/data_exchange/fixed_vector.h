@@ -1,5 +1,5 @@
-#ifndef __DATA_EXCHANGE_PRIMITIVES__
-#define __DATA_EXCHANGE_PRIMITIVES__
+#ifndef __DATA_EXCHANGE_FIXED_VECTOR__
+#define __DATA_EXCHANGE_FIXED_VECTOR__
 
 #include <vector>
 #include <boost/serialization/vector.hpp>
@@ -31,8 +31,14 @@ private:
     }
 };
 
+typedef fixed_vector<float,1> vf1;
+typedef fixed_vector<float,2> vf2;
 typedef fixed_vector<float,3> vf3;
+typedef fixed_vector<float,4> vf4;
+typedef fixed_vector<int,1> vi1;
+typedef fixed_vector<int,2> vi2;
 typedef fixed_vector<int,3> vi3;
+typedef fixed_vector<int,4> vi4;
 }
 
 namespace boost {
