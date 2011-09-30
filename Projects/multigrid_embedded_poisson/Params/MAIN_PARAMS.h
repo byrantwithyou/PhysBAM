@@ -12,7 +12,7 @@
 #include "GRID_PARAMS.h"
 #include "LEVEL_SET_PARAMS.h"
 #include "OUTPUT_PARAMS.h"
-#include "SOLVER_PARAMS.h"
+#include "POISSON_SOLVER_PARAMS.h"
 
 namespace PhysBAM
 {

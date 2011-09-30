@@ -46,8 +46,8 @@ if 'BOOST_ROOT' in os.environ:
             'petsc'
         ] )
         sources.extend( [
-            '../Petsc/Print_KSP_Info.cpp',
-            '../Petsc/Solve_SPD_System_With_ICC_PCG.cpp'
+            'Petsc/Print_KSP_Info.cpp',
+            'Petsc/Solve_SPD_System_With_ICC_PCG.cpp'
         ] )
 
     Automatic_Program( env, 'multigrid_embedded_poisson', sources )

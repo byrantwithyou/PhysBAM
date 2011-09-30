@@ -33,7 +33,7 @@
 #include <Jeffrey_Utilities/Petsc/CALL_AND_CHKERRQ.h>
 #include <Jeffrey_Utilities/Petsc/Print_KSP_Info.h>
 #include <Jeffrey_Utilities/Petsc/SCOPED_DESTROY.h>
-#include <Jeffrey_Utilities/SOLVER_PARAMS.h>
+#include <Jeffrey_Utilities/POISSON_SOLVER_PARAMS.h>
 #include <Jeffrey_Utilities/Stencils/SKIP_ZERO_VALUE_STENCIL_PROXY.h>
 #include <Jeffrey_Utilities/Stencils/UNSTRUCTURED_STENCIL.h>
 #include <Jeffrey_Utilities/Stencils/UNSTRUCTURED_STENCIL_PROXY.h>
