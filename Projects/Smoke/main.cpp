@@ -32,6 +32,8 @@ template<class TV> void Execute_Main_Program(STREAM_TYPE& stream_type,PARSE_ARGS
     
     SMOKE_DRIVER<TV> driver(*example);
     driver.Execute_Main_Program();
+    delete example->mpi_grid;
+    delete example;
 }
 
 int main(int argc,char *argv[])
@@ -58,5 +60,6 @@ int main(int argc,char *argv[])
     else{
         Execute_Main_Program<VECTOR<T,2> >(stream_type,parse_args,mpi_world);}
 
+    LOG::Finish_Logging();
     return 0;
 }

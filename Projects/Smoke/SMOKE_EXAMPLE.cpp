@@ -26,7 +26,8 @@ SMOKE_EXAMPLE(const STREAM_TYPE stream_type_input,int number_of_threads)
 template<class TV> SMOKE_EXAMPLE<TV>::
 ~SMOKE_EXAMPLE()
 {
-    if(mpi_grid) delete boundary;
+    if(mpi_grid || thread_queue) delete boundary;
+    delete thread_queue;
 }
 //#####################################################################
 // CFL 
