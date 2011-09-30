@@ -64,10 +64,10 @@ external_libraries={
     'fltk':       {'flags':['USE_FLTK'],'cpppath':['/usr/X11R6/include'],'libs':['fltk','Xft'],'libpath':['/usr/X11R6/lib','/usr/X11R6/lib64']},
     'boostpython':{'flags':['USE_BOOSTPYTHON'],'cpppath':['/usr/include/python2.4'],'libs':['boost_python','python2.4'],'filter':''},
     'numpy':      {'flags':['USE_NUMPY'],'cpppath':[],'libs':[],'filter':''},
-    'lam':        {'flags':['USE_MPI'],'libs':['lammpio','lammpi++','mpi','lam','util','dl'],'linkflags':' -pthread','filter':'Parallel_Computation'},
-    'openmpi':    {'flags':['USE_MPI'],'libs':['mpi_cxx','open-rte','mpi','open-pal','util','dl','nsl'],'linkflags':' -pthread','filter':'Parallel_Computation'},
-    'mpich':      {'flags':['USE_MPI'],'libs':['lammpio','lammpi++','mpi','lam','util','dl'],'linkflags':' -pthread','filter':'Parallel_Computation'},
-    'pthreads':    {'flags':['USE_PTHREADS'],'libs':[],'linkflags':' -pthread','filter':'(Parallel_Computation)|(Rendering)'},
+    'lam':        {'flags':['USE_MPI'],'libs':['lammpio','lammpi++','mpi','lam','util','dl'],'linkflags':' -pthread','filter':''},
+    'openmpi':    {'flags':['USE_MPI'],'libs':['mpi_cxx','open-rte','mpi','open-pal','util','dl','nsl'],'linkflags':' -pthread','filter':''},
+    'mpich':      {'flags':['USE_MPI'],'libs':['lammpio','lammpi++','mpi','lam','util','dl'],'linkflags':' -pthread','filter':''},
+    'pthreads':    {'flags':['USE_PTHREADS'],'libs':[],'linkflags':' -pthread','filter':''},
     'renderman':  {'default':0,'flags':['USE_RENDERMAN'],'cpppath':[],'libs':[],'filter':'renderman'}}
 for name,lib in external_libraries.items():
     defaults={'default':0,'cvs':0,'flags':'','linkflags':'','cpppath':[],'libpath':[],'filter':''}
