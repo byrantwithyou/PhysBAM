@@ -19,3 +19,5 @@ Test_[0-9]*
 *.blg
 *.dvi
 *.ps
+*~
+a.out
