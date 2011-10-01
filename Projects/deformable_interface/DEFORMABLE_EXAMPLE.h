@@ -41,7 +41,43 @@
 namespace PhysBAM{
 
 template<class T,int d>
-VECTOR<T,d> To_Pb(const data_exchange::fixed_vector<T,d>& v) {return reinterpret_cast<const VECTOR<T,d>&>(v);}
+VECTOR<T,d> To_Pb(const data_exchange::fixed_vector<T,d>& v)
+{
+    VECTOR<T,d> x;
+    for(size_t i=0; i<d; i++) x(i+1)=v.data[i];
+    return x;
+}
+
+template<class TV>
+void To_Pb(ARRAY_VIEW<TV> view,const std::vector<data_exchange::vf3>& v)
+{
+    for(size_t i=0; i<v.size(); i++) view(i+1)=To_Pb(v[i]);
+}
+
+template<class TV>
+void To_Pb(ARRAY<TV>& array,const std::vector<data_exchange::vf3>& v)
+{
+    array.Resize(v.size());
+    To_Pb(array, v);
+}
+
+void Triangle_Mesh_From_Data_Exchange(TRIANGLE_MESH& mesh, const data_exchange::polygon_mesh& poly, ARRAY<int>* parent_index)
+{
+    for(size_t i=0, k=0; i<poly.polygon_counts.size(); i++){
+        int n=poly.polygon_counts[i];
+        for(int j=2; j<n; j++){
+            mesh.elements.Append(VECTOR<int,3>(poly.polygons[k], poly.polygons[k+j-1], poly.polygons[k+j]));
+            if(parent_index) parent_index->Append(i);}
+        k+=n;}
+}
+
+template<class TV>
+void Triangulated_Surface_From_Data_Exchange(TRIANGULATED_SURFACE<TV>& surface, const data_exchange::polygon_mesh& poly, const std::vector<data_exchange::vf3>& pos, ARRAY<int>* parent_index)
+{
+    Triangle_Mesh_From_Data_Exchange(surface.mesh, poly, parent_index);
+    surface.particles.array_collection->Add_Elements(pos.size());
+    To_Pb(surface.particles.X, pos);
+}
 
 template<class T_input>
 class DEFORMABLE_EXAMPLE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,3> > >
@@ -178,8 +214,32 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     for(size_t i=0; i<dbs.simulation_objects.size(); i++){
         if(data_exchange::deformable_body* body=dynamic_cast<data_exchange::deformable_body*>(dbs.simulation_objects[i])){
+            boost::scoped_ptr<TRIANGULATED_SURFACE<T> > surface(TRIANGULATED_SURFACE<T>::Create());
+            ARRAY<int> parent_index;
+            Triangulated_Surface_From_Data_Exchange(*surface,body->mesh,body->position,&parent_index);
+            surface->Update_Bounding_Box();
+            surface->bounding_box;
+            GRID<TV> grid;
+            T density=body->mass?body->mass/surface->Volumetric_Volume():1000;
+            TETRAHEDRALIZED_VOLUME<T>& tet_volume=tests.Create_Mattress(grid,true,0,density);
+
+//template<class TV> void DEFORMABLES_STANDARD_TESTS<TV>::
+//Embed_Particles_In_Tetrahedralized_Volume(BINDING_LIST<VECTOR<T,3> >& binding_list,const POINT_CLOUD_SUBSET<VECTOR<T,3>,PARTICLES<VECTOR<T,3> > >& particles_to_embed,
+//    TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,const T thickness_over_two)
+
+
+
+
+
             //db->position.push_back(vf3(1,1,1));
             //db->mesh.insert_polygon(vi4(7,6,2,3));
+
+
+
+
+
+
+
             (void)body;
             body_index_to_rigid_index.Append(0);}
         else if(data_exchange::ground_plane* body=dynamic_cast<data_exchange::ground_plane*>(dbs.simulation_objects[i])){
