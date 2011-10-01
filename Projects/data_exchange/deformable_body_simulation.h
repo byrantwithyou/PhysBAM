@@ -36,8 +36,8 @@ struct deformable_body_simulation
 
     virtual ~deformable_body_simulation()
     {
-        for(int i=0; i<simulation_objects.size(); i++) delete simulation_objects[i];
-        for(int i=0; i<simulation_forces.size(); i++) delete simulation_forces[i];
+        for(size_t i=0; i<simulation_objects.size(); i++) delete simulation_objects[i];
+        for(size_t i=0; i<simulation_forces.size(); i++) delete simulation_forces[i];
     }
 
 private:

@@ -1,6 +1,7 @@
 #ifndef __DATA_EXCHANGE_FORCE__
 #define __DATA_EXCHANGE_FORCE__
 
+#include <vector>
 #include <boost/serialization/base_object.hpp>
 #include <boost/serialization/assume_abstract.hpp>
 
