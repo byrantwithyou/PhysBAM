@@ -64,6 +64,9 @@ public:
     void Initialize_CFL(ARRAY_VIEW<DEFORMABLE_FREQUENCY_DATA> frequency) PHYSBAM_OVERRIDE
     {}
 
+    void Own_Influenced_Particles()
+    {need_destroy_influenced_particles=true;}
+
 protected:
     template<class T_ARRAY>
     T_ARRAY Get_Particle_List(const T_ARRAY& array)
