@@ -40,14 +40,16 @@ int main() {
     dbs.simulation_objects.push_back(sc);
 
     volumetric_force* vf = new volumetric_force;
+    vf->bodies_affected.push_back(1);
     dbs.simulation_forces.push_back(vf);
 
     gravity_force* gf = new gravity_force;
+    gf->bodies_affected.push_back(1);
     dbs.simulation_forces.push_back(gf);
 
     {
         std::ofstream ofs("filename");
-        boost::archive::text_oarchive oa(ofs);
+        boost::archive::binary_oarchive oa(ofs);
         oa << dbs;
     }
 
@@ -55,13 +57,13 @@ int main() {
 
     {
         std::ifstream ifs("filename");
-        boost::archive::text_iarchive ia(ifs);
+        boost::archive::binary_iarchive ia(ifs);
         ia >> dbs2;
     }
 
     {
         std::ofstream ofs2("filename2");
-        boost::archive::text_oarchive oa2(ofs2);
+        boost::archive::binary_oarchive oa2(ofs2);
         oa2 << dbs2;
     }
 
