@@ -157,4 +157,5 @@ private:
 //#####################################################################
 };
 }
+#include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_TRIANGULATED_SURFACE.h>
 #endif
