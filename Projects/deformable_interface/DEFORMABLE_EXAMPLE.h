@@ -1,5 +1,5 @@
 //#####################################################################
-// Copyright 2007-2008, Craig Schroeder, Tamar Shinar.
+// Copyright 2011, Craig Schroeder.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 // Class DEFORMABLE_EXAMPLE
@@ -25,6 +25,7 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Forces/DEFORMABLE_GRAVITY.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/FINITE_VOLUME.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
@@ -94,6 +95,7 @@ public:
     RANDOM_NUMBERS<T> random_numbers;
     bool fully_implicit;
     std::string scene_file;
+    std::string filename_base;
     bool read_text;
 
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
@@ -157,7 +159,6 @@ void Register_Options() PHYSBAM_OVERRIDE
 void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
-    output_directory=STRING_UTILITIES::string_sprintf("output",test_number);
     fully_implicit=parse_args->Is_Value_Set("-fully_implicit");
     scene_file=parse_args->Get_String_Value("-scene");
     read_text=parse_args->Is_Value_Set("-read_text");
@@ -198,8 +199,6 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 //    solids_parameters.collisions_small_number=(T)1e-5;
 //    solids_parameters.self_collision_friction_coefficient=(T)0;
 
-////////////////
-
     data_exchange::deformable_body_simulation dbs;
     std::ifstream ifs(scene_file.c_str());
     if(read_text){
@@ -210,82 +209,44 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         ia >> dbs;}
 
     ARRAY<int> body_index_to_structure_index;
+    ARRAY<int> body_index_to_encosing_structure_index;
     ARRAY<int> body_index_to_rigid_index;
 
     for(size_t i=0; i<dbs.simulation_objects.size(); i++){
         if(data_exchange::deformable_body* body=dynamic_cast<data_exchange::deformable_body*>(dbs.simulation_objects[i])){
-            boost::scoped_ptr<TRIANGULATED_SURFACE<T> > surface(TRIANGULATED_SURFACE<T>::Create());
+            TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
             ARRAY<int> parent_index;
             Triangulated_Surface_From_Data_Exchange(*surface,body->mesh,body->position,&parent_index);
-            surface->Update_Bounding_Box();
-            surface->bounding_box;
-            GRID<TV> grid;
             T density=body->mass?body->mass/surface->Volumetric_Volume():1000;
-            TETRAHEDRALIZED_VOLUME<T>& tet_volume=tests.Create_Mattress(grid,true,0,density);
 
-//template<class TV> void DEFORMABLES_STANDARD_TESTS<TV>::
-//Embed_Particles_In_Tetrahedralized_Volume(BINDING_LIST<VECTOR<T,3> >& binding_list,const POINT_CLOUD_SUBSET<VECTOR<T,3>,PARTICLES<VECTOR<T,3> > >& particles_to_embed,
-//    TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,const T thickness_over_two)
+            ARRAY<int> particle_map;
+            TETRAHEDRALIZED_VOLUME<T>* tet_volume=0;
+            TRIANGULATED_SURFACE<T>* tri_surface=0;
+            tests.Create_Regular_Embedded_Surface(binding_list,*surface,density,512,(T)1e-5,&particle_map,&tri_surface,&tet_volume);
 
-
-
-
-
-            //db->position.push_back(vf3(1,1,1));
-            //db->mesh.insert_polygon(vi4(7,6,2,3));
-
-
-
-
-
-
-
-            (void)body;
-            body_index_to_rigid_index.Append(0);}
+            int enclosing_structure=deformable_body_collection.deformable_geometry.Add_Structure(tet_volume);
+            int structure=deformable_body_collection.deformable_geometry.Add_Structure(tri_surface);
+            body_index_to_rigid_index.Append(0);
+            body_index_to_structure_index.Append(structure);
+            body_index_to_encosing_structure_index.Append(enclosing_structure);}
         else if(data_exchange::ground_plane* body=dynamic_cast<data_exchange::ground_plane*>(dbs.simulation_objects[i])){
-            //gp->position = vf3(0,-1,0);
-            //gp->normal = vf3(0,1,0);
             RIGID_BODY<TV>& ground=tests.Add_Ground();
             ground.X()=To_Pb(body->position);
             ground.Rotation()=ROTATION<TV>::From_Rotated_Vector(TV(0,1,0),To_Pb(body->normal));
             body_index_to_rigid_index.Append(ground.particle_index);
-            body_index_to_structure_index.Append(0);}
+            body_index_to_structure_index.Append(0);
+            body_index_to_encosing_structure_index.Append(0);}
         else if(data_exchange::scripted_geometry* body=dynamic_cast<data_exchange::scripted_geometry*>(dbs.simulation_objects[i])){
-            //sc->mesh=db->mesh;
-            //sc->position=db->position;
-            (void)body;
-            body_index_to_structure_index.Append(0);}}
+            TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
+            Triangulated_Surface_From_Data_Exchange(*surface,body->mesh,body->position,0);
+            RIGID_BODY<TV>& rigid_body=*tests.Create_Rigid_Body_From_Triangulated_Surface(*surface,solid_body_collection.rigid_body_collection,1);
+            body_index_to_rigid_index.Append(rigid_body.particle_index);
+            body_index_to_structure_index.Append(0);
+            body_index_to_encosing_structure_index.Append(0);}}
 
-    for(size_t i=0; i<dbs.simulation_forces.size(); i++){
-        if(data_exchange::gravity_force* force=dynamic_cast<data_exchange::gravity_force*>(dbs.simulation_forces[i])){
-            (void)force;
-        }
-        else if(data_exchange::volumetric_force* force=dynamic_cast<data_exchange::volumetric_force*>(dbs.simulation_forces[i])) {
-            (void)force;
-        }}
-
-
-
-
-
-    last_frame=360;
-
-    bool automatically_add_to_collision_structures=true;
-    // deformable bodies
-
-    TETRAHEDRALIZED_VOLUME<T>& object=tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,true,1000);
-    object.mesh.Initialize_Segment_Mesh();
-    SEGMENTED_CURVE<TV>* segmented_curve=SEGMENTED_CURVE<TV>::Create(deformable_body_collection.particles);
-    segmented_curve->mesh.elements=object.mesh.segment_mesh->elements;
-    deformable_body_collection.deformable_geometry.Add_Structure(segmented_curve);
-    tests.Add_Ground();
-
-    // add structures and rigid bodies to collisions
-    if(automatically_add_to_collision_structures) deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
-    solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
-    solid_body_collection.deformable_body_collection.particles.mass*=100;
-
-////////////////
+    PHYSBAM_ASSERT(body_index_to_rigid_index.m==(int)dbs.simulation_objects.size());
+    PHYSBAM_ASSERT(body_index_to_structure_index.m==(int)dbs.simulation_objects.size());
+    PHYSBAM_ASSERT(body_index_to_encosing_structure_index.m==(int)dbs.simulation_objects.size());
 
     // correct number nodes
     for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
@@ -296,30 +257,54 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     particles.Compute_Auxiliary_Attributes(soft_bindings);
     soft_bindings.Set_Mass_From_Effective_Mass();
 
-    T stiffness=(T)1e5;
-    T damping=(T).01;
-    for(int i=1;TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(i);i++){
-        solid_body_collection.Add_Force(Create_Finite_Volume(*tetrahedralized_volume,new NEO_HOOKEAN<T,3>(stiffness,(T).45,damping,(T).25),true,(T).1));}
+    for(size_t i=0;i<dbs.simulation_forces.size();i++){
+        if(data_exchange::gravity_force* force=dynamic_cast<data_exchange::gravity_force*>(dbs.simulation_forces[i])){
+            PHYSBAM_ASSERT(force->bodies_affected.size());
+            ARRAY<int>* influenced_particles=new ARRAY<int>(particles.X.m);
+            HASHTABLE<int> hash_particles;
+            for(size_t i=0;i<force->bodies_affected.size();i++){
+                int body=force->bodies_affected[i];
+                int structure=body_index_to_encosing_structure_index(body);
+                PHYSBAM_ASSERT(structure);
+                if(TETRAHEDRALIZED_VOLUME<T>* volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.deformable_geometry.structures(structure)))
+                    hash_particles.Set_All(volume->mesh.elements.Flattened());
+                else PHYSBAM_FATAL_ERROR();}
+            hash_particles.Get_Keys(*influenced_particles);
+            DEFORMABLE_GRAVITY<TV>* gravity=new DEFORMABLE_GRAVITY<TV>(particles,influenced_particles,force->magnitude,To_Pb(force->direction));
+            gravity->Own_Influenced_Particles();
+            deformable_body_collection.Add_Force(gravity);}
+        else if(data_exchange::volumetric_force* force=dynamic_cast<data_exchange::volumetric_force*>(dbs.simulation_forces[i])){
+            PHYSBAM_ASSERT(force->bodies_affected.size());
+            for(size_t i=0;i<force->bodies_affected.size();i++){
+                int body=force->bodies_affected[i];
+                int structure=body_index_to_encosing_structure_index(body);
+                PHYSBAM_ASSERT(structure);
+                if(TETRAHEDRALIZED_VOLUME<T>* volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.deformable_geometry.structures(structure))){
+                    solid_body_collection.Add_Force(Create_Finite_Volume(*volume,new NEO_HOOKEAN<T,3>(force->stiffness,force->poissons_ratio,force->damping),false));}
+                else PHYSBAM_FATAL_ERROR();}}}
 
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) if(!dynamic_cast<SEGMENTED_CURVE<TV>*>(deformable_body_collection.deformable_geometry.structures(i))){
+    last_frame=dbs.number_frames;
+    this->frame_rate=1/dbs.dt;
+    output_directory=dbs.output_directory;
+    filename_base=dbs.filename_base;
+
+    // add structures and rigid bodies to collisions
+    deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
+    solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
+
+////////////////
+
+    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++){
         deformable_body_collection.collisions.collision_structures.Append(deformable_body_collection.deformable_geometry.structures(i));
-        if(solids_parameters.triangle_collision_parameters.perform_self_collision && (!dynamic_cast<FREE_PARTICLES<TV>*>(deformable_body_collection.deformable_geometry.structures(i))))
+        if(solids_parameters.triangle_collision_parameters.perform_self_collision && !dynamic_cast<FREE_PARTICLES<TV>*>(deformable_body_collection.deformable_geometry.structures(i)))
             solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append(deformable_body_collection.deformable_geometry.structures(i));}
-
-    // correct mass
-    //binding_list.Distribute_Mass_To_Parents();
-    binding_list.Clear_Hard_Bound_Particles(particles.mass);
-    particles.Compute_Auxiliary_Attributes(soft_bindings);
-    soft_bindings.Set_Mass_From_Effective_Mass();
-
-    // add forces
-    tests.Add_Gravity();
 
     // disable strain rate CFL for all forces
     for(int i=1;i<=solid_body_collection.rigid_body_collection.rigids_forces.m;i++) solid_body_collection.rigid_body_collection.rigids_forces(i)->limit_time_step_by_strain_rate=false;
     for(int i=1;i<=deformable_body_collection.deformables_forces.m;i++) deformable_body_collection.deformables_forces(i)->limit_time_step_by_strain_rate=false;
     for(int i=1;i<=solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->limit_time_step_by_strain_rate=false;
 
+    // Set fully_implicit flag
     for(int i=1;i<=solid_body_collection.rigid_body_collection.rigids_forces.m;i++) solid_body_collection.rigid_body_collection.rigids_forces(i)->use_implicit_velocity_independent_forces=fully_implicit;
     for(int i=1;i<=deformable_body_collection.deformables_forces.m;i++) deformable_body_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=fully_implicit;
     for(int i=1;i<=solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->use_implicit_velocity_independent_forces=fully_implicit;
