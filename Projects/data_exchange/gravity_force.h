@@ -10,6 +10,7 @@ struct gravity_force : public force
 {
     float magnitude;
     vf3 direction;
+    std::vector<int> bodies_affected;
 
     gravity_force(): magnitude(9.8f), direction(0,-1,0) {}
 
@@ -19,7 +20,7 @@ private:
     void serialize(Archive & ar, const unsigned int version)
     {
         ar & boost::serialization::base_object<force>(*this);
-        ar & magnitude & direction;
+        ar & magnitude & direction & bodies_affected;
     }
 };
 }

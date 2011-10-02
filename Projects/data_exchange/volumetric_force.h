@@ -11,6 +11,7 @@ struct volumetric_force : public force
     float stiffness;
     float poissons_ratio;
     float damping;
+    std::vector<int> bodies_affected;
 
     volumetric_force(): stiffness(1e3f), poissons_ratio(.45f), damping(1.f) {}
     virtual ~volumetric_force() {}
@@ -21,7 +22,7 @@ private:
     void serialize(Archive & ar, const unsigned int version)
     {
         ar & boost::serialization::base_object<force>(*this);
-        ar & stiffness & poissons_ratio & damping;
+        ar & stiffness & poissons_ratio & damping & bodies_affected;
     }
 };
 }
