@@ -39,7 +39,7 @@ template<class TV>
 class DEFORMABLES_STANDARD_TESTS
 {
 protected:
-    typedef typename TV::SCALAR T;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef typename TOPOLOGY_BASED_GEOMETRY_POLICY<TV>::TRIANGULATED_OBJECT T_TRIANGULATED_OBJECT;
     typedef typename TOPOLOGY_BASED_GEOMETRY_POLICY<TV>::SEGMENTED_CURVE T_SEGMENTED_CURVE;
 public:
@@ -98,6 +98,11 @@ public:
     void Embed_Particles_In_Tetrahedralized_Volume(BINDING_LIST<VECTOR<T,3> >& binding_list,const POINT_CLOUD_SUBSET<VECTOR<T,3>,PARTICLES<VECTOR<T,3> > >& particles_to_embed,
         TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,const T thickness_over_two);
     void Mark_Hard_Bindings_With_Free_Particles();
+    void Find_Intersected_Segments_Triangles(SEGMENTED_CURVE<TV>& segments,TRIANGULATED_SURFACE<T>& surface,ARRAY<bool>* segments_intersected,ARRAY<bool>* triangles_intersected,T thickness_over_two);
+    void Embed_Surface_In_Tetrahedralized_Volume(BINDING_LIST<VECTOR<T,3> >& binding_list,TRIANGULATED_SURFACE<T>& surface,TETRAHEDRALIZED_VOLUME<T>& volume,const T thickness_over_two,
+        ARRAY<int>* surface_particle_map,ARRAY<int>* volume_particle_map,bool prune_volume,TRIANGULATED_SURFACE<T>** new_surface,TETRAHEDRALIZED_VOLUME<T>** new_volume);
+    void Create_Regular_Embedded_Surface(BINDING_LIST<VECTOR<T,3> >& binding_list,TRIANGULATED_SURFACE<T>& surface,T density,int approx_volume,const T thickness_over_two,
+        ARRAY<int>* surface_particle_map,TRIANGULATED_SURFACE<T>** new_surface,TETRAHEDRALIZED_VOLUME<T>** new_volume);
 //#####################################################################
 };
 }
