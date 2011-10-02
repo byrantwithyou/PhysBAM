@@ -5,7 +5,6 @@
 #include <boost/serialization/assume_abstract.hpp>
 
 namespace data_exchange{
-
 struct simulation_object
 {
     virtual ~simulation_object() {}
@@ -18,6 +17,19 @@ private:
 };
 
 BOOST_SERIALIZATION_ASSUME_ABSTRACT(simulation_object)
+
+struct simulation_object_output
+{
+    virtual ~simulation_object_output() {}
+private:
+    friend class boost::serialization::access;
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int version)
+    {
+    }
+};
+
+BOOST_SERIALIZATION_ASSUME_ABSTRACT(simulation_object_output)
 }
 
 #endif

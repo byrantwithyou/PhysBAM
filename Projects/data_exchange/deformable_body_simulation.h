@@ -34,7 +34,7 @@ struct deformable_body_simulation
        output_directory("output"), filename_base("frame_data")
     {}
 
-    virtual ~deformable_body_simulation()
+    ~deformable_body_simulation()
     {
         for(size_t i=0; i<simulation_objects.size(); i++) delete simulation_objects[i];
         for(size_t i=0; i<simulation_forces.size(); i++) delete simulation_forces[i];
@@ -52,6 +52,25 @@ private:
         ar.register_type(static_cast<volumetric_force*>(NULL));
         ar.register_type(static_cast<gravity_force*>(NULL));
         ar & simulation_forces;
+    }
+};
+
+struct deformable_body_simulation_output
+{
+    std::vector<simulation_object_output*> simulation_data;
+
+    ~deformable_body_simulation_output()
+    {
+        for(size_t i=0; i<simulation_data.size(); i++) delete simulation_data[i];
+    }
+
+private:
+    friend class boost::serialization::access;
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int version)
+    {
+        ar.register_type(static_cast<deformable_body_output*>(NULL));
+        ar & simulation_data;
     }
 };
 }

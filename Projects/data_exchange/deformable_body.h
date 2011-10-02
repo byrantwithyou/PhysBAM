@@ -26,6 +26,23 @@ private:
         ar & mesh & position & velocity & mass;
     }
 };
+
+struct deformable_body_output : public simulation_object_output
+{
+    std::vector<vf3> position;
+    std::vector<vf3> velocity;
+
+    deformable_body_output() {}
+
+private:
+    friend class boost::serialization::access;
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int version)
+    {
+        ar & boost::serialization::base_object<simulation_object_output>(*this);
+        ar & position & velocity;
+    }
+};
 }
 
 #endif

@@ -54,18 +54,18 @@ int main() {
     scripted_geometry* sc = new scripted_geometry;
     sc->mesh=db->mesh;
     sc->position=db->position;
-    for(int i=0; i<sc->position.size(); i++) sc->position[i].data[0] += 2;
+    for(int i=0; i<sc->position.size(); i++) sc->position[i].data[0] += 3;
     dbs.simulation_objects.push_back(sc);
 
     volumetric_force* vf = new volumetric_force;
+    vf->bodies_affected.push_back(0);
     vf->bodies_affected.push_back(1);
-    vf->bodies_affected.push_back(2);
     vf->stiffness=1e2;
     dbs.simulation_forces.push_back(vf);
 
     gravity_force* gf = new gravity_force;
+    gf->bodies_affected.push_back(0);
     gf->bodies_affected.push_back(1);
-    gf->bodies_affected.push_back(2);
     dbs.simulation_forces.push_back(gf);
 
     {
