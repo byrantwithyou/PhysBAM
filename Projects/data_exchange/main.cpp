@@ -28,6 +28,24 @@ int main() {
     db->mesh.insert_polygon(vi4(4,6,7,5));
     dbs.simulation_objects.push_back(db);
 
+    db = new deformable_body;
+    db->position.clear();
+    db->position.push_back(vf3(1,4,0));
+    db->position.push_back(vf3(-1,4,0));
+    db->position.push_back(vf3(0,5,0));
+    db->position.push_back(vf3(0,3,0));
+    db->position.push_back(vf3(0,4,1));
+    db->position.push_back(vf3(0,4,-1));
+    db->mesh.insert_polygon(vi3(0,2,4));
+    db->mesh.insert_polygon(vi3(4,2,1));
+    db->mesh.insert_polygon(vi3(0,5,2));
+    db->mesh.insert_polygon(vi3(4,3,0));
+    db->mesh.insert_polygon(vi3(1,3,4));
+    db->mesh.insert_polygon(vi3(5,0,3));
+    db->mesh.insert_polygon(vi3(2,5,1));
+    db->mesh.insert_polygon(vi3(1,5,3));
+    dbs.simulation_objects.push_back(db);
+
     ground_plane* gp = new ground_plane;
     gp->position = vf3(0,-1,0);
     gp->normal = vf3(0,1,0);
@@ -41,10 +59,13 @@ int main() {
 
     volumetric_force* vf = new volumetric_force;
     vf->bodies_affected.push_back(1);
+    vf->bodies_affected.push_back(2);
+    vf->stiffness=1e2;
     dbs.simulation_forces.push_back(vf);
 
     gravity_force* gf = new gravity_force;
     gf->bodies_affected.push_back(1);
+    gf->bodies_affected.push_back(2);
     dbs.simulation_forces.push_back(gf);
 
     {

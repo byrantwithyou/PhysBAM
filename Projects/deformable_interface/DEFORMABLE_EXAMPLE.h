@@ -102,7 +102,7 @@ public:
 
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
     using BASE::solids_parameters;using BASE::fluids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::output_directory;using BASE::restart;
-    using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::test_number;using BASE::parse_args;
+    using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::test_number;using BASE::parse_args;using BASE::stream_type;
 
     DEFORMABLE_EXAMPLE(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),fully_implicit(false),scene_file("scene"),read_text(false)
@@ -219,6 +219,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
             ARRAY<int> parent_index;
             Triangulated_Surface_From_Data_Exchange(*surface,body->mesh,body->position,&parent_index);
+
+            FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/geometry.%d.tri",output_directory.c_str(),i),*surface);
             T density=body->mass?body->mass/surface->Volumetric_Volume():1000;
 
             ARRAY<int> particle_map;
@@ -242,6 +244,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             PARTICLES<TV>& particles=*new PARTICLES<TV>;
             TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create(particles);
             Triangulated_Surface_From_Data_Exchange(*surface,body->mesh,body->position,0);
+            FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/geometry.%d.tri",output_directory.c_str(),i),*surface);
             LEVELSET_IMPLICIT_OBJECT<TV>* implicit_object=tests.Initialize_Implicit_Surface(*surface);
             RIGID_BODY<TV>& rigid_body=*tests.Create_Rigid_Body_From_Triangulated_Surface(*surface,solid_body_collection.rigid_body_collection,1);
             rigid_body.Add_Structure(*implicit_object);
