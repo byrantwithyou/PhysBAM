@@ -168,9 +168,9 @@ Create_Rigid_Body_From_Triangulated_Surface(TRIANGULATED_SURFACE<T>& triangulate
     PHYSBAM_ASSERT(density>0);
     RIGID_BODY<TV>* rigid_body=new RIGID_BODY<TV>(rigid_body_collection,true);
     MASS_PROPERTIES<TV> mass_properties(triangulated_surface,true);
-    mass_properties.Set_Density(density);rigid_body->Mass().mass=mass_properties.Mass();
+    mass_properties.Set_Density(density);rigid_body->Mass()=mass_properties.Mass();
     FRAME<TV> frame_local;
-    mass_properties.Transform_To_Object_Frame(frame_local,rigid_body->Mass().inertia_tensor,dynamic_cast<PARTICLES<TV>&>(triangulated_surface.particles));
+    mass_properties.Transform_To_Object_Frame(frame_local,rigid_body->Inertia_Tensor(),dynamic_cast<PARTICLES<TV>&>(triangulated_surface.particles));
     rigid_body->Set_Frame(frame_local);
     rigid_body->Add_Structure(triangulated_surface);
     return rigid_body;
@@ -243,9 +243,13 @@ INSTANTIATION_HELPER2(float);
 template SOLIDS_STANDARD_TESTS<VECTOR<float,2> >::SOLIDS_STANDARD_TESTS(EXAMPLE<VECTOR<float,2> >&,SOLID_BODY_COLLECTION<VECTOR<float,2> >&);
 template void SOLIDS_STANDARD_TESTS<VECTOR<float,2> >::Add_Gravity();
 template void SOLIDS_STANDARD_TESTS<VECTOR<float,2> >::Bind_Unbound_Particles_In_Rigid_Body<ARRAY<int,int> >(RIGID_BODY<VECTOR<float,2> >&,ARRAY<int,int> const&);
+template RIGID_BODY<VECTOR<float,3> >* SOLIDS_STANDARD_TESTS<VECTOR<float,3> >::Create_Rigid_Body_From_Triangulated_Surface(TRIANGULATED_SURFACE<float>&,
+    RIGID_BODY_COLLECTION<VECTOR<float,3> >&,float);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 INSTANTIATION_HELPER2(double);
 template SOLIDS_STANDARD_TESTS<VECTOR<double,2> >::SOLIDS_STANDARD_TESTS(EXAMPLE<VECTOR<double,2> >&,SOLID_BODY_COLLECTION<VECTOR<double,2> >&);
 template void SOLIDS_STANDARD_TESTS<VECTOR<double,2> >::Add_Gravity();
 template void SOLIDS_STANDARD_TESTS<VECTOR<double,2> >::Bind_Unbound_Particles_In_Rigid_Body<ARRAY<int,int> >(RIGID_BODY<VECTOR<double,2> >&,ARRAY<int,int> const&);
+template RIGID_BODY<VECTOR<double,3> >* SOLIDS_STANDARD_TESTS<VECTOR<double,3> >::Create_Rigid_Body_From_Triangulated_Surface(TRIANGULATED_SURFACE<double>&,
+    RIGID_BODY_COLLECTION<VECTOR<double,3> >&,double);
 #endif
