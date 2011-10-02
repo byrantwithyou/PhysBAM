@@ -13,6 +13,7 @@
 #include <PhysBAM_Geometry/Collision_Detection/COLLISION_GEOMETRY_SPATIAL_PARTITION.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
+#include <PhysBAM_Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE.h>
@@ -67,7 +68,7 @@ void Triangle_Mesh_From_Data_Exchange(TRIANGLE_MESH& mesh, const data_exchange::
     for(size_t i=0, k=0; i<poly.polygon_counts.size(); i++){
         int n=poly.polygon_counts[i];
         for(int j=2; j<n; j++){
-            mesh.elements.Append(VECTOR<int,3>(poly.polygons[k], poly.polygons[k+j-1], poly.polygons[k+j]));
+            mesh.elements.Append(VECTOR<int,3>(poly.polygons[k]+1, poly.polygons[k+j-1]+1, poly.polygons[k+j]+1));
             if(parent_index) parent_index->Append(i);}
         k+=n;}
 }
@@ -78,6 +79,7 @@ void Triangulated_Surface_From_Data_Exchange(TRIANGULATED_SURFACE<TV>& surface, 
     Triangle_Mesh_From_Data_Exchange(surface.mesh, poly, parent_index);
     surface.particles.array_collection->Add_Elements(pos.size());
     To_Pb(surface.particles.X, pos);
+    surface.Update_Number_Nodes();
 }
 
 template<class T_input>
@@ -222,7 +224,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             ARRAY<int> particle_map;
             TETRAHEDRALIZED_VOLUME<T>* tet_volume=0;
             TRIANGULATED_SURFACE<T>* tri_surface=0;
-            tests.Create_Regular_Embedded_Surface(binding_list,*surface,density,512,(T)1e-5,&particle_map,&tri_surface,&tet_volume);
+            tests.Create_Regular_Embedded_Surface(binding_list,*surface,density,125,(T)1e-5,&particle_map,&tri_surface,&tet_volume);
 
             int enclosing_structure=deformable_body_collection.deformable_geometry.Add_Structure(tet_volume);
             int structure=deformable_body_collection.deformable_geometry.Add_Structure(tri_surface);
@@ -237,9 +239,14 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             body_index_to_structure_index.Append(0);
             body_index_to_encosing_structure_index.Append(0);}
         else if(data_exchange::scripted_geometry* body=dynamic_cast<data_exchange::scripted_geometry*>(dbs.simulation_objects[i])){
-            TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
+            PARTICLES<TV>& particles=*new PARTICLES<TV>;
+            TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create(particles);
             Triangulated_Surface_From_Data_Exchange(*surface,body->mesh,body->position,0);
+            LEVELSET_IMPLICIT_OBJECT<TV>* implicit_object=tests.Initialize_Implicit_Surface(*surface);
             RIGID_BODY<TV>& rigid_body=*tests.Create_Rigid_Body_From_Triangulated_Surface(*surface,solid_body_collection.rigid_body_collection,1);
+            rigid_body.Add_Structure(*implicit_object);
+            rigid_body.is_static=true;
+            solid_body_collection.rigid_body_collection.Add_Rigid_Body_And_Geometry(&rigid_body);
             body_index_to_rigid_index.Append(rigid_body.particle_index);
             body_index_to_structure_index.Append(0);
             body_index_to_encosing_structure_index.Append(0);}}
