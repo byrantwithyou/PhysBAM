@@ -278,23 +278,35 @@ Substitute_Soft_Bindings_For_Nodes(T_OBJECT& object,SOFT_BINDINGS<TV>& soft_bind
 // Function Read_Or_Initialize_Implicit_Surface
 //#####################################################################
 template<class TV> LEVELSET_IMPLICIT_OBJECT<TV>* DEFORMABLES_STANDARD_TESTS<TV>::
-Read_Or_Initialize_Implicit_Surface(const std::string& levelset_filename,TRIANGULATED_SURFACE<T>& undeformed_triangulated_surface) const
+Initialize_Implicit_Surface(TRIANGULATED_SURFACE<T>& undeformed_triangulated_surface) const
 {
     // undeformed levelset
     LEVELSET_IMPLICIT_OBJECT<TV>& undeformed_levelset=*LEVELSET_IMPLICIT_OBJECT<TV>::Create();
-    if(FILE_UTILITIES::File_Exists(levelset_filename)) FILE_UTILITIES::Read_From_File(example.stream_type,levelset_filename,undeformed_levelset);
-    else{
-        undeformed_triangulated_surface.Update_Bounding_Box();RANGE<TV>& box=*undeformed_triangulated_surface.bounding_box;
-        GRID<TV>& grid=undeformed_levelset.levelset.grid;ARRAY<T,VECTOR<int,3> >& phi=undeformed_levelset.levelset.phi;
-        grid=GRID<TV>::Create_Grid_Given_Cell_Size(box,(T)1e-2*box.Edge_Lengths().Max(),false,5);
-        phi.Resize(grid.Domain_Indices());
-        LEVELSET_MAKER_UNIFORM<T> levelset_maker;
-        levelset_maker.Verbose_Mode();
-        levelset_maker.Set_Surface_Padding_For_Flood_Fill((T)1e-3);
-        levelset_maker.Use_Fast_Marching_Method(true,0);
-        levelset_maker.Compute_Level_Set(undeformed_triangulated_surface,grid,phi);
-        FILE_UTILITIES::Create_Directory(example.output_directory);FILE_UTILITIES::Write_To_File(example.stream_type,levelset_filename,undeformed_levelset);}
+    undeformed_triangulated_surface.Update_Bounding_Box();RANGE<TV>& box=*undeformed_triangulated_surface.bounding_box;
+    GRID<TV>& grid=undeformed_levelset.levelset.grid;ARRAY<T,VECTOR<int,3> >& phi=undeformed_levelset.levelset.phi;
+    grid=GRID<TV>::Create_Grid_Given_Cell_Size(box,(T)1e-2*box.Edge_Lengths().Max(),false,5);
+    phi.Resize(grid.Domain_Indices());
+    LEVELSET_MAKER_UNIFORM<T> levelset_maker;
+    levelset_maker.Verbose_Mode();
+    levelset_maker.Set_Surface_Padding_For_Flood_Fill((T)1e-3);
+    levelset_maker.Use_Fast_Marching_Method(true,0);
+    levelset_maker.Compute_Level_Set(undeformed_triangulated_surface,grid,phi);
     undeformed_levelset.Update_Box();
+    return &undeformed_levelset;
+}
+//#####################################################################
+// Function Read_Or_Initialize_Implicit_Surface
+//#####################################################################
+template<class TV> LEVELSET_IMPLICIT_OBJECT<TV>* DEFORMABLES_STANDARD_TESTS<TV>::
+Read_Or_Initialize_Implicit_Surface(const std::string& levelset_filename,TRIANGULATED_SURFACE<T>& undeformed_triangulated_surface) const
+{
+    if(FILE_UTILITIES::File_Exists(levelset_filename)){
+        LEVELSET_IMPLICIT_OBJECT<TV>& undeformed_levelset=*LEVELSET_IMPLICIT_OBJECT<TV>::Create();
+        FILE_UTILITIES::Read_From_File(example.stream_type,levelset_filename,undeformed_levelset);
+        return &undeformed_levelset;}
+    LEVELSET_IMPLICIT_OBJECT<TV>& undeformed_levelset=*Initialize_Implicit_Surface(undeformed_triangulated_surface);
+    FILE_UTILITIES::Create_Directory(example.output_directory);
+    FILE_UTILITIES::Write_To_File(example.stream_type,levelset_filename,undeformed_levelset);
     return &undeformed_levelset;
 }
 //#####################################################################
@@ -426,7 +438,7 @@ Find_Intersected_Segments_Triangles(SEGMENTED_CURVE<TV>& segments,TRIANGULATED_S
         box.Enlarge_To_Include_Point(segment.x2);
         surface.hierarchy->Intersection_List(box,candidates,thickness_over_two);
         for(int j=1;j<=candidates.m;j++)
-            if(INTERSECTION::Intersects(segment,surface.Get_Element(i),thickness_over_two)){
+            if(INTERSECTION::Intersects(segment,surface.Get_Element(candidates(j)),thickness_over_two)){
                 if(segments_intersected) (*segments_intersected)(i)=true;
                 if(triangles_intersected) (*triangles_intersected)(candidates(j))=true;}}
     if(!hierarchy_initialized){delete surface.hierarchy;surface.hierarchy=0;}
@@ -442,7 +454,13 @@ Embed_Surface_In_Tetrahedralized_Volume(BINDING_LIST<VECTOR<T,3> >& binding_list
     if(!volume.hierarchy) volume.Initialize_Hierarchy();
     if(!volume.mesh.triangle_mesh) volume.mesh.Initialize_Triangle_Mesh();
     if(!volume.mesh.segment_mesh) volume.mesh.Initialize_Segment_Mesh();
+    if(!volume.mesh.adjacent_elements) volume.mesh.Initialize_Adjacent_Elements();
     if(!surface.mesh.segment_mesh) surface.mesh.Initialize_Segment_Mesh();
+    if(!surface.bounding_box) surface.Update_Bounding_Box();
+    if(!surface.hierarchy) surface.Initialize_Hierarchy();
+    if(!surface.mesh.adjacent_elements) surface.mesh.Initialize_Adjacent_Elements();
+    if(!surface.triangle_list) surface.Update_Triangle_List();
+
     ARRAY<int> candidates,point_to_tet(surface.particles.X.m);
     ARRAY<TV> weights(surface.particles.X.m);
     for(int p=1;p<=surface.particles.X.m;p++){
@@ -506,6 +524,7 @@ Embed_Surface_In_Tetrahedralized_Volume(BINDING_LIST<VECTOR<T,3> >& binding_list
         volume.Discard_Valence_Zero_Particles_And_Renumber(particle_map);
         if(volume_particle_map) volume_particle_map->Exchange(particle_map);}
 
+    volume.Update_Number_Nodes();
     ARRAY<int> particle_indices;
     TETRAHEDRALIZED_VOLUME<T>& new_v=Copy_And_Add_Structure(volume,&particle_indices);
     if(new_volume) *new_volume=&new_v;
@@ -535,7 +554,11 @@ Create_Regular_Embedded_Surface(BINDING_LIST<VECTOR<T,3> >& binding_list,TRIANGU
     box.Scale_About_Center(cells*dx/box.Edge_Lengths());
     GRID<TV> grid(TV_INT(cells)+1,box);
 
-    TETRAHEDRALIZED_VOLUME<T>& volume=Create_Mattress(grid,true,0,density);
+    PARTICLES<TV>& particles=*new PARTICLES<TV>;
+    TETRAHEDRALIZED_VOLUME<T>& volume=*TETRAHEDRALIZED_VOLUME<T>::Create(particles);
+    volume.Initialize_Cube_Mesh_And_Particles(grid);
+    particles.Store_Velocity();
+    Set_Mass_Of_Particles(volume,density,true);
     Embed_Surface_In_Tetrahedralized_Volume(binding_list,surface,volume,thickness_over_two,surface_particle_map,0,true,new_surface,new_volume);
 }
 //#####################################################################

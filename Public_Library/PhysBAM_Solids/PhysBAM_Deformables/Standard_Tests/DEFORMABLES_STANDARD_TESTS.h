@@ -87,6 +87,7 @@ public:
     template<class T_OBJECT> void
     Substitute_Soft_Bindings_For_Nodes(T_OBJECT& object,SOFT_BINDINGS<TV>& soft_bindings,HASHTABLE<int,int>* persistent_soft_bindings=0,const bool embedded_only=false,
         const bool use_impulses_for_collisions=true);
+    LEVELSET_IMPLICIT_OBJECT<TV>* Initialize_Implicit_Surface(TRIANGULATED_SURFACE<T>& undeformed_triangulated_surface) const;
     LEVELSET_IMPLICIT_OBJECT<TV>* Read_Or_Initialize_Implicit_Surface(const std::string& levelset_filename,TRIANGULATED_SURFACE<T>& undeformed_triangulated_surface) const;
     void Initialize_Tetrahedron_Collisions(const int id_number,TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,TRIANGLE_COLLISION_PARAMETERS<TV>& triangle_collision_parameters,
         TRIANGULATED_SURFACE<T>* triangulated_surface=0);
