@@ -106,6 +106,8 @@ public:
     void Interior_Edges_With_Boundary_Nodes(ARRAY<VECTOR<int,2> >* deletion_list);
     void Inverted_Tetrahedrons(ARRAY<int>& inverted_tetrahedrons) const;
     int Inside(const TV& location,const T thickness_over_two=0) const;
+    int Find(const TV& location,const T thickness_over_two,ARRAY<int>& scratch) const;
+    int Find(const TV& location,const T thickness_over_two=0) const;
     void Discard_Tetrahedrons_Outside_Implicit_Surface(IMPLICIT_OBJECT<TV>& implicit_surface);
     void Discard_Tetrahedrons_Outside_Implicit_Surface_Aggressive(IMPLICIT_OBJECT<TV>& implicit_surface);
     void Discard_Tetrahedrons_Outside_Implicit_Surface_Aggressive(IMPLICIT_OBJECT<TV>& implicit_surface,const ARRAY<RANGE<TV> >& bounding_boxes);
