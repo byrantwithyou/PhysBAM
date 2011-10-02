@@ -48,24 +48,10 @@ public:
     bool enforce_poststabilization_in_cg;
     bool use_backward_euler_position_update;
 
-    bool enforce_energy_conservation;
-    int energy_correction_iterations;
-
     bool use_pull_in;
     int pull_in_iterations;
     bool no_contact_friction;
     bool use_projections_in_position_update;
-    bool set_velocity_from_positions;
-    int set_velocity_from_positions_iterations;
-    T set_velocity_from_positions_tolerance;
-    T set_velocity_from_positions_use_orig_force;
-    T set_velocity_from_positions_reset_alphas;
-    T set_velocity_from_positions_move_RE_to_KE_elastic;
-    T set_velocity_from_positions_move_RE_to_KE_damping;
-    T set_velocity_from_positions_damping;
-    bool set_velocity_from_positions_physbam;
-    bool set_velocity_from_positions_conserve_exactly;
-    T set_velocity_from_positions_percent_energy_recovered;
 
     bool allow_altitude_spring_change_between_updates;
 

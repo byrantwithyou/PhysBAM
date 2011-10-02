@@ -41,7 +41,7 @@ template<class TV> SOLIDS_EVOLUTION_CALLBACKS<TV> SOLIDS_EVOLUTION<TV>::solids_e
 template<class TV> SOLIDS_EVOLUTION<TV>::
 SOLIDS_EVOLUTION(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input)
     :solid_body_collection(solid_body_collection_input),solids_parameters(solids_parameters_input),rigid_body_collisions(0),rigid_deformable_collisions(0),time(0),
-    solids_evolution_callbacks(&solids_evolution_callbacks_default),energy_damped(0),energy_lost_to_bodies(0),momentum_lost_to_bodies(TV()),
+    solids_evolution_callbacks(&solids_evolution_callbacks_default),
     kinematic_evolution(solid_body_collection.rigid_body_collection,solids_parameters.rigid_body_evolution_parameters.rigid_geometry_evolution_parameters.use_kinematic_keyframes)
 {}
 //#####################################################################
@@ -157,14 +157,6 @@ Initialize_Deformable_Objects(const T frame_rate,const bool restart)
 template<class TV> bool SOLIDS_EVOLUTION<TV>::
 Adjust_Velocity_For_Self_Repulsion_And_Self_Collisions(const T dt,const T time,int& repulsions_found,int& collisions_found,const bool exit_early)
 {
-    T precollisionsrepulsions_PE=0,precollisionsrepulsions_KE=0;
-    if(solids_parameters.set_velocity_from_positions_physbam){
-        for(int i=1;i<=solid_body_collection.deformable_body_collection.deformables_forces.m;i++)
-            precollisionsrepulsions_PE+=solid_body_collection.deformable_body_collection.deformables_forces(i)->Potential_Energy(time);
-        for(int p=1;p<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();p++)
-            precollisionsrepulsions_KE+=(T).5*solid_body_collection.deformable_body_collection.particles.mass(p)*
-                TV::Dot_Product(solid_body_collection.deformable_body_collection.particles.V(p),solid_body_collection.deformable_body_collection.particles.V(p));}
-
     PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY<TV>& geometry=solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry;
     ARRAY<bool>& modified=geometry.modified_full;ARRAY<TV>& X_self_collision_free=geometry.X_self_collision_free;
@@ -214,18 +206,6 @@ Adjust_Velocity_For_Self_Repulsion_And_Self_Collisions(const T dt,const T time,i
     // propagate any changes from soft bound particles to parents
     solid_body_collection.Adjust_Mesh_For_Self_Collision(time);
 
-    if(solids_parameters.set_velocity_from_positions_physbam){
-        T postcollisionsrepulsions_PE=0;
-        for(int i=1;i<=solid_body_collection.deformable_body_collection.deformables_forces.m;i++)
-            postcollisionsrepulsions_PE+=solid_body_collection.deformable_body_collection.deformables_forces(i)->Potential_Energy(time);
-        T postcollisionsrepulsions_KE=0;
-        for(int p=1;p<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();p++)
-            postcollisionsrepulsions_KE+=(T).5*solid_body_collection.deformable_body_collection.particles.mass(p)*
-                TV::Dot_Product(solid_body_collection.deformable_body_collection.particles.V(p),solid_body_collection.deformable_body_collection.particles.V(p));
-        energy_lost_to_bodies+=(postcollisionsrepulsions_KE-precollisionsrepulsions_KE)+(postcollisionsrepulsions_PE-precollisionsrepulsions_PE);
-        if(solids_parameters.set_velocity_from_positions_conserve_exactly)
-            energy_damped+=-(postcollisionsrepulsions_KE-precollisionsrepulsions_KE)+(postcollisionsrepulsions_PE-precollisionsrepulsions_PE);}
-        
     return true;
 }
 //#####################################################################

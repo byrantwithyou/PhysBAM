@@ -23,12 +23,8 @@ SOLIDS_PARAMETERS()
     deformable_object_collision_parameters(*new DEFORMABLE_OBJECT_COLLISION_PARAMETERS<TV>),write_deformable_body(true),verbose(true),verbose_dt(false),cfl((T)10),min_dt((T)0),
     fracture(false),write_static_variables_every_frame(false),newton_tolerance((T)1e-3),newton_iterations(1),use_partially_converged_result(true),
     write_from_every_process(true),enforce_repulsions_in_cg(true),use_post_cg_constraints(true),use_rigid_deformable_contact(false),rigid_cluster_fracture_frequency(INT_MAX),
-    use_trapezoidal_rule_for_velocities(true),enforce_poststabilization_in_cg(true),use_backward_euler_position_update(false),
-    enforce_energy_conservation(false),energy_correction_iterations(20),use_pull_in(false),pull_in_iterations(3),no_contact_friction(false),use_projections_in_position_update(false),
-    set_velocity_from_positions(false),set_velocity_from_positions_iterations(100),set_velocity_from_positions_tolerance((T)1e-6),set_velocity_from_positions_use_orig_force(true),
-    set_velocity_from_positions_reset_alphas(false),set_velocity_from_positions_move_RE_to_KE_elastic(false),set_velocity_from_positions_move_RE_to_KE_damping(false),
-    set_velocity_from_positions_damping(true),set_velocity_from_positions_physbam(false),set_velocity_from_positions_conserve_exactly(false),
-    set_velocity_from_positions_percent_energy_recovered((T)1),allow_altitude_spring_change_between_updates(true)
+    use_trapezoidal_rule_for_velocities(true),enforce_poststabilization_in_cg(true),use_backward_euler_position_update(false),use_pull_in(false),pull_in_iterations(3),
+    no_contact_friction(false),use_projections_in_position_update(false),allow_altitude_spring_change_between_updates(true)
 {
 }
 //#####################################################################

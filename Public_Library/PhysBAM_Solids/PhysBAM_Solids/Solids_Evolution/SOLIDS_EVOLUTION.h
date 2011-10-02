@@ -39,9 +39,6 @@ protected:
     ARRAY<TV> F_full,R_full,B_full,S_full,AR_full;
     ARRAY<TWIST<TV> > rigid_F_full,rigid_R_full,rigid_S_full,rigid_B_full,rigid_AR_full;
 
-    T energy_damped;
-    T energy_lost_to_bodies;
-    TV momentum_lost_to_bodies;
 public:
     ARRAY<RIGID_BODY_MASS<TV,true> > world_space_rigid_mass;
     ARRAY<RIGID_BODY_MASS<TV,true> > world_space_rigid_mass_inverse;

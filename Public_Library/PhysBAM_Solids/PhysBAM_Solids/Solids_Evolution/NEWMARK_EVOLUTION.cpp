@@ -95,7 +95,7 @@ Prepare_Backward_Euler_System(BACKWARD_EULER_SYSTEM<TV>& system,const T dt,const
     solid_body_collection.example_forces_and_velocities->Add_External_Forces(B_full,current_velocity_time+dt);
     solid_body_collection.example_forces_and_velocities->Add_External_Forces(rigid_B_full,current_velocity_time+dt);
     if(mpi_solids) mpi_solids->Exchange_Force_Boundary_Data_Global(particles.V);
-    if(!solids_parameters.set_velocity_from_positions) solid_body_collection.Add_Velocity_Independent_Forces(B_full,rigid_B_full,current_velocity_time+dt); // this is a nop for binding forces
+    solid_body_collection.Add_Velocity_Independent_Forces(B_full,rigid_B_full,current_velocity_time+dt); // this is a nop for binding forces
     if(mpi_solids) mpi_solids->Exchange_Binding_Boundary_Data_Global(B_full);
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Force_To_Parents(B_full,rigid_B_full);
     solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings.Distribute_Force_To_Parents(rigid_B_full);
@@ -122,105 +122,13 @@ Prepare_Backward_Euler_System(BACKWARD_EULER_SYSTEM<TV>& system,const T dt,const
     for(int i=1;i<=solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m;i++){int p=solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles(i);
         rigid_B_full(p)=rigid_body_particles.twist(p)+world_space_rigid_mass_inverse(p)*rigid_B_full(p)*dt;}
 
-    if(solids_parameters.set_velocity_from_positions_physbam){
-        if(!velocity_update){
-            // Compute deltaPE due to just the elastic forces
-            V_postelasticforces.Resize(solid_body_collection.deformable_body_collection.particles.array_collection->Size());
-            for(int i=1;i<=solid_body_collection.deformable_body_collection.dynamic_particles.m;i++){
-                int p=solid_body_collection.deformable_body_collection.dynamic_particles(i);
-                particles.V(p)=B_full(p);
-                V_postelasticforces(p)=particles.V(p);}
-            Euler_Step_Position(dt*2,time);
-            postelasticforces_PE=0;
-            for(int i=1;i<=solid_body_collection.deformable_body_collection.deformables_forces.m;i++)
-                postelasticforces_PE+=solid_body_collection.deformable_body_collection.deformables_forces(i)->Potential_Energy(time);
-            // Store just delta PE from elastic
-            for(int f=1;f<=solid_body_collection.deformable_body_collection.deformables_forces.m;f++){
-                DEFORMABLES_FORCES<TV>& force=*solid_body_collection.deformable_body_collection.deformables_forces(f);
-                force.Store_Delta_PE(time);}
-            Restore_Position(X_save,rigid_X_save,rigid_rotation_save);
-            Restore_Velocity();}
-        else{
-            // Compute deltaKE due to just the elastic forces
-            T deltaKE_elastic=0;
-            for(int i=1;i<=solid_body_collection.deformable_body_collection.dynamic_particles.m;i++){
-                int p=solid_body_collection.deformable_body_collection.dynamic_particles(i);
-                deltaKE_elastic+=((T).5*solid_body_collection.deformable_body_collection.particles.mass(p)*TV::Dot_Product(B_full(p),B_full(p))-
-                    (T).5*solid_body_collection.deformable_body_collection.particles.mass(p)*TV::Dot_Product(particles.V(p),particles.V(p)));}
-            T deltaPE_elastic=0;
-            for(int i=1;i<=solid_body_collection.deformable_body_collection.deformables_forces.m;i++)
-                deltaPE_elastic+=solid_body_collection.deformable_body_collection.deformables_forces(i)->Get_Total_Delta_PE();
-            energy_damped+=-(deltaKE_elastic+deltaPE_elastic);
-            
-            T A=0,B=0,C=0;
-            ARRAY<TV> forces(solid_body_collection.deformable_body_collection.particles.array_collection->Size());
-            if(energy_damped > 0) {
-                for(int i=1;i<=solid_body_collection.deformable_body_collection.dynamic_particles.m;i++){
-                    int p=solid_body_collection.deformable_body_collection.dynamic_particles(i);
-                    forces(p)=TV();
-                    for(int f=1;f<=solid_body_collection.deformable_body_collection.deformables_forces.m;f++){
-                        DEFORMABLES_FORCES<TV>& force=*solid_body_collection.deformable_body_collection.deformables_forces(f);
-                        ARRAY<int>& incident_force_elements=*force.Incident_Force_Elements(p);
-                        for(int ife=1;ife<=incident_force_elements.m;ife++)
-                            forces(p)+=dt*solid_body_collection.deformable_body_collection.particles.one_over_mass(p)*force.Get_Force(incident_force_elements(ife),p,true);}
-                    B+=solid_body_collection.deformable_body_collection.particles.mass(p)*TV::Dot_Product(B_full(p),forces(p));
-                    A+=(T).5*solid_body_collection.deformable_body_collection.particles.mass(p)*TV::Dot_Product(forces(p),forces(p));}}
-            else {
-                for(int i=1;i<=solid_body_collection.deformable_body_collection.dynamic_particles.m;i++){
-                    int p=solid_body_collection.deformable_body_collection.dynamic_particles(i);
-                    forces(p)=TV();
-                    for(int f=1;f<=solid_body_collection.deformable_body_collection.deformables_forces.m;f++){
-                        DEFORMABLES_FORCES<TV>& force=*solid_body_collection.deformable_body_collection.deformables_forces(f);
-                        force.Get_Damping_Force(p,forces(p),dt,false);}
-                    B+=solid_body_collection.deformable_body_collection.particles.mass(p)*TV::Dot_Product(B_full(p),forces(p));
-                    A+=(T).5*solid_body_collection.deformable_body_collection.particles.mass(p)*TV::Dot_Product(forces(p),forces(p));}}
-            C=-energy_damped;
-            T epsilon;
-            T discriminant=B*B-4*A*C;
-            if(discriminant<0) discriminant=0;
-            if(A==0) epsilon=0;
-            else if(B>0) epsilon=(-B+sqrt(discriminant))/(2*A);
-            else epsilon=(-B-sqrt(discriminant))/(2*A);
-            
-            for(int i=1;i<=solid_body_collection.deformable_body_collection.dynamic_particles.m;i++){
-                int p=solid_body_collection.deformable_body_collection.dynamic_particles(i);
-                TV dv=epsilon*forces(p);
-                energy_damped-=(T).5*solid_body_collection.deformable_body_collection.particles.mass(p)*(2*TV::Dot_Product(B_full(p),dv)+TV::Dot_Product(dv,dv));
-                B_full(p)+=solids_parameters.set_velocity_from_positions_percent_energy_recovered*dv;}
-
-            // Save post elastic forces KE
-            V_postelasticforces.Resize(solid_body_collection.deformable_body_collection.particles.array_collection->Size());
-            postelasticforces_KE=0;
-            for(int i=1;i<=solid_body_collection.deformable_body_collection.dynamic_particles.m;i++){
-                int p=solid_body_collection.deformable_body_collection.dynamic_particles(i);
-                postelasticforces_KE+=(T).5*solid_body_collection.deformable_body_collection.particles.mass(p)*TV::Dot_Product(B_full(p),B_full(p));
-                V_postelasticforces(p)=B_full(p);}}}
-
     V_all=B_all;
     rigid_body_collection.Update_Angular_Momentum();
     Diagnostics(dt,current_position_time,0,0,604,"Before boundary conditions");
     system.Set_Global_Boundary_Conditions(V_all,X_save,rigid_X_save,rigid_rotation_save,rigid_velocity_save,rigid_angular_momentum_save,V_save,
         solids_parameters.implicit_solve_parameters.test_system,solids_parameters.implicit_solve_parameters.print_matrix);
     if(velocity_update && !solids_parameters.use_post_cg_constraints){
-        T prerepulsions_KE=0;
-        if(solids_parameters.set_velocity_from_positions_physbam){
-            for(int p=1;p<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();p++)
-                prerepulsions_KE+=(T).5*solid_body_collection.deformable_body_collection.particles.mass(p)*
-                    TV::Dot_Product(solid_body_collection.deformable_body_collection.particles.V(p),solid_body_collection.deformable_body_collection.particles.V(p));}
-        Apply_Constraints(dt,current_velocity_time);
-        if(solids_parameters.set_velocity_from_positions_physbam){
-            T postrepulsions_KE=0;
-            for(int p=1;p<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();p++)
-                postrepulsions_KE+=(T).5*solid_body_collection.deformable_body_collection.particles.mass(p)*
-                    TV::Dot_Product(solid_body_collection.deformable_body_collection.particles.V(p),solid_body_collection.deformable_body_collection.particles.V(p));
-            energy_lost_to_bodies+=(postrepulsions_KE-prerepulsions_KE);
-            if(solids_parameters.set_velocity_from_positions_conserve_exactly) energy_damped+=-(postrepulsions_KE-prerepulsions_KE);
-            V_postelasticforces.Resize(solid_body_collection.deformable_body_collection.particles.array_collection->Size());
-            postelasticforces_KE=0;
-            for(int i=1;i<=solid_body_collection.deformable_body_collection.dynamic_particles.m;i++){
-                int p=solid_body_collection.deformable_body_collection.dynamic_particles(i);
-                postelasticforces_KE+=(T).5*solid_body_collection.deformable_body_collection.particles.mass(p)*TV::Dot_Product(particles.V(p),particles.V(p));
-                V_postelasticforces(p)=particles.V(p);}}}
+        Apply_Constraints(dt,current_velocity_time);}
 
     // TODO: This is completely broken for trapezoid and likely for BE as well.
     if(solid_body_collection.rigid_body_collection.articulated_rigid_body.Has_Actuators() && solid_body_collection.rigid_body_collection.articulated_rigid_body.constrain_pd_directions){
@@ -330,9 +238,6 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
     if(velocity_update && solids_parameters.use_post_cg_constraints) system.Force(V,F);
 
     Finish_Backward_Euler_Step(system,dt,current_position_time,velocity_update);
-    
-    if(solids_parameters.enforce_energy_conservation)
-        solid_body_collection.Compute_Previously_Applied_Forces();
 }
 //#####################################################################
 // Function Average_And_Exchange_Position
@@ -431,16 +336,13 @@ Make_Incompressible(const T dt,const bool correct_volume)
 template<class TV> void NEWMARK_EVOLUTION<TV>::
 Advance_One_Time_Step_Position(const T dt,const T time, const bool solids)
 {
-    PHYSBAM_ASSERT(solids_parameters.use_post_cg_constraints || !solids_parameters.rigid_body_collision_parameters.enforce_rigid_rigid_contact_in_cg || solids_parameters.set_velocity_from_positions_physbam);
+    PHYSBAM_ASSERT(solids_parameters.use_post_cg_constraints || !solids_parameters.rigid_body_collision_parameters.enforce_rigid_rigid_contact_in_cg);
     PHYSBAM_DEBUG_WRITE_SUBSTEP(STRING_UTILITIES::string_sprintf("Advance_One_Time_Step_Position Start dt=%f time=%f",dt,time),2,2);
     MPI_SOLIDS<TV>* mpi_solids=solid_body_collection.deformable_body_collection.mpi_solids;
     EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities=*solid_body_collection.example_forces_and_velocities;
     ARTICULATED_RIGID_BODY<TV>& articulated_rigid_body=solid_body_collection.rigid_body_collection.articulated_rigid_body; // Needn't be a pointer
     const bool advance_rigid_bodies=true; //solid_body_collection.rigid_body_collection.simulated_rigid_body_particles.m!=0;  TODO: Fix this.
     const T v_dt=solids_parameters.use_backward_euler_position_update?dt:dt/2;
-
-    if(solids_parameters.enforce_energy_conservation || solids_parameters.set_velocity_from_positions_physbam)
-        solid_body_collection.Save_Potential_Energy(time);
 
     if((solids_parameters.triangle_collision_parameters.perform_self_collision && (solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.m || solids_parameters.triangle_collision_parameters.initialize_collisions_without_objects))
        && (!repulsions && solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions))
@@ -465,45 +367,11 @@ Advance_One_Time_Step_Position(const T dt,const T time, const bool solids)
     // get momentum difference for v^n -> v^{n+1/2} udpate
     if(articulated_rigid_body.Has_Actuators()) example_forces_and_velocities.Set_PD_Targets(dt,time);
 
-    if(solids_parameters.set_velocity_from_positions){
-        Set_Velocity_From_Positions_Position_Update(dt,time);
-        Compute_Momentum_Differences();}
-    else{
+    {
         if(asynchronous_evolution && asynchronous_evolution->Take_Full_Backward_Euler_Step_For_Position_Update()){
             Backward_Euler_Step_Velocity_Helper(dt,time,time,false);
             asynchronous_evolution->Position_Velocity_Update(dt,time);}
         else Backward_Euler_Step_Velocity_Helper(v_dt,time,time,false); // update V implicitly to time+dt/2
-
-        if(solids_parameters.set_velocity_from_positions_physbam){
-            Euler_Step_Position(dt,time);
-            T postelasticanddampingforces_PE=0;
-            for(int i=1;i<=solid_body_collection.deformable_body_collection.deformables_forces.m;i++)
-                postelasticanddampingforces_PE+=solid_body_collection.deformable_body_collection.deformables_forces(i)->Potential_Energy(time);
-            Restore_Position(X_save,rigid_X_save,rigid_rotation_save);
-            // Get damping (no projection) force
-            ARRAY<TV> damping_force(solid_body_collection.deformable_body_collection.particles.array_collection->Size());
-            for(int p=1;p<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();p++){
-                for(int f=1;f<=solid_body_collection.deformable_body_collection.deformables_forces.m;f++){
-                    DEFORMABLES_FORCES<TV>& force=*solid_body_collection.deformable_body_collection.deformables_forces(f);
-                    force.Get_Damping_Force(p,damping_force(p),v_dt,true);}}
-            ARRAY<TV> temp_velocities(solid_body_collection.deformable_body_collection.particles.array_collection->Size());
-            for(int p=1;p<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();p++){
-                temp_velocities(p)=solid_body_collection.deformable_body_collection.particles.V(p);
-                solid_body_collection.deformable_body_collection.particles.V(p)=V_postelasticforces(p)+damping_force(p);}
-            Euler_Step_Position(dt,time);
-            T postelasticanddampingnoprojectionforces_PE=0;
-            for(int i=1;i<=solid_body_collection.deformable_body_collection.deformables_forces.m;i++)
-                postelasticanddampingnoprojectionforces_PE+=solid_body_collection.deformable_body_collection.deformables_forces(i)->Potential_Energy(time);
-            Restore_Position(X_save,rigid_X_save,rigid_rotation_save);
-            for(int p=1;p<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();p++)
-                solid_body_collection.deformable_body_collection.particles.V(p)=temp_velocities(p);
-            T energy_lost_to_damping=postelasticanddampingnoprojectionforces_PE-postelasticforces_PE;
-            T energy_lost_to_damping_and_projection=postelasticanddampingforces_PE-postelasticforces_PE;
-            T energy_lost_to_projection=energy_lost_to_damping_and_projection-energy_lost_to_damping;
-            energy_lost_to_bodies+=energy_lost_to_projection;
-            if(solids_parameters.set_velocity_from_positions_conserve_exactly) energy_damped+=-energy_lost_to_projection;
-            // Add the damping amount to energy damped to be added in next time around
-            energy_damped+=-energy_lost_to_damping;}
 
         solid_body_collection.Store_Velocities();
         Diagnostics(dt,time,1,0,5,"backward Euler");
@@ -514,27 +382,11 @@ Advance_One_Time_Step_Position(const T dt,const T time, const bool solids)
             Diagnostics(dt,time,1,0,6,"apply projections in position update");}
         
         if(solids_parameters.verbose) Print_Maximum_Velocities(time);
-        Diagnostics(dt,time,1,0,7,"position step enforce energy conservation");
         if(!solids) return; // early exit for fluids only in parallel
         
         Make_Incompressible(dt,true); // adjust velocity to fix volume
         solids_evolution_callbacks->Filter_Velocities(dt,time+dt,false); // use time+dt since these velocities are used to step to time+dt
-        if(repulsions){
-            T prerepulsions_PE=0;
-            if(solids_parameters.set_velocity_from_positions_physbam){
-                Euler_Step_Position(dt,time);
-                for(int i=1;i<=solid_body_collection.deformable_body_collection.deformables_forces.m;i++)
-                    prerepulsions_PE+=solid_body_collection.deformable_body_collection.deformables_forces(i)->Potential_Energy(time);
-                Restore_Position(X_save,rigid_X_save,rigid_rotation_save);}
-            repulsions->Adjust_Velocity_For_Self_Repulsion_Using_History(dt,true,false);
-            if(solids_parameters.set_velocity_from_positions_physbam){
-                Euler_Step_Position(dt,time);
-                T postrepulsions_PE=0;
-                for(int i=1;i<=solid_body_collection.deformable_body_collection.deformables_forces.m;i++)
-                    postrepulsions_PE+=solid_body_collection.deformable_body_collection.deformables_forces(i)->Potential_Energy(time);
-                Restore_Position(X_save,rigid_X_save,rigid_rotation_save);
-                energy_lost_to_bodies+=(postrepulsions_PE-prerepulsions_PE);
-                if(solids_parameters.set_velocity_from_positions_conserve_exactly) energy_damped+=-(postrepulsions_PE-prerepulsions_PE);}}
+        if(repulsions) repulsions->Adjust_Velocity_For_Self_Repulsion_Using_History(dt,true,false);
         Compute_Momentum_Differences();
 
         // add collision impulses to time n velocities and save
@@ -592,207 +444,7 @@ Advance_One_Time_Step_Position(const T dt,const T time, const bool solids)
     Restore_Velocity();
     Diagnostics(dt,time,0,2,22,"restore velocity");
 
-    // Compute change in momentum and energy due to collisions
-    T postcollisions_KE=0;
-    TV postcollisions_momentum;
-    for(int p=1;p<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();p++){
-        postcollisions_KE+=(T).5*solid_body_collection.deformable_body_collection.particles.mass(p)*
-            TV::Dot_Product(solid_body_collection.deformable_body_collection.particles.V(p),solid_body_collection.deformable_body_collection.particles.V(p));
-        postcollisions_momentum+=solid_body_collection.deformable_body_collection.particles.mass(p)*solid_body_collection.deformable_body_collection.particles.V(p);}
-    energy_lost_to_bodies+=postcollisions_KE-precollisions_KE;
-    if(solids_parameters.set_velocity_from_positions_conserve_exactly) energy_damped+=-(postcollisions_KE-precollisions_KE);
-    momentum_lost_to_bodies+=postcollisions_momentum-precollisions_momentum;
-    T postcollisions_PE=0;
-    for(int i=1;i<=solid_body_collection.deformable_body_collection.deformables_forces.m;i++)
-        postcollisions_PE+=solid_body_collection.deformable_body_collection.deformables_forces(i)->Potential_Energy(time);
-    energy_lost_to_bodies+=postcollisions_PE-precollisions_PE;
-    if(solids_parameters.set_velocity_from_positions_conserve_exactly) energy_damped+=-(postcollisions_PE-precollisions_PE);
-    if((postcollisions_KE-precollisions_KE+postcollisions_PE-precollisions_PE)>0){
-        T A=0,B=0,C=0;
-        ARRAY<TV> damping_forces(solid_body_collection.deformable_body_collection.particles.array_collection->Size());
-        for(int p=1;p<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();p++){
-            damping_forces(p)=TV();
-            for(int f=1;f<=solid_body_collection.deformable_body_collection.deformables_forces.m;f++){
-                DEFORMABLES_FORCES<TV>& force=*solid_body_collection.deformable_body_collection.deformables_forces(f);
-                force.Get_Damping_Force(p,damping_forces(p),dt,false);}
-            B+=solid_body_collection.deformable_body_collection.particles.mass(p)*TV::Dot_Product(solid_body_collection.deformable_body_collection.particles.V(p),damping_forces(p));
-            A+=(T).5*solid_body_collection.deformable_body_collection.particles.mass(p)*TV::Dot_Product(damping_forces(p),damping_forces(p));}
-        C=(postcollisions_KE-precollisions_KE+postcollisions_PE-precollisions_PE);
-        T epsilon;
-        T discriminant=B*B-4*A*C;
-        if(discriminant<0) discriminant=0;
-        if(B>0) epsilon=(-B+sqrt(discriminant))/(2*A);
-        else epsilon=(-B-sqrt(discriminant))/(2*A);
-        
-        for(int p=1;p<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();p++)
-        solid_body_collection.deformable_body_collection.particles.V(p)+=epsilon*damping_forces(p);
-
-/*        T A=0,B=0,C=0;
-        ARRAY<TV> elastic_forces(solid_body_collection.deformable_body_collection.particles.array_collection->Size());
-        for(int p=1;p<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();p++){
-            elastic_forces(p)=TV();
-            for(int f=1;f<=solid_body_collection.deformable_body_collection.deformables_forces.m;f++){
-                DEFORMABLES_FORCES<TV>& force=*solid_body_collection.deformable_body_collection.deformables_forces(f);
-                ARRAY<int>& incident_force_elements=*force.Incident_Force_Elements(p);
-                for(int ife=1;ife<=incident_force_elements.m;ife++)
-                    elastic_forces(p)+=dt*solid_body_collection.deformable_body_collection.particles.one_over_mass(p)*force.Get_Force(incident_force_elements(ife),p,false);}
-            B+=solid_body_collection.deformable_body_collection.particles.mass(p)*TV::Dot_Product(solid_body_collection.deformable_body_collection.particles.V(p),elastic_forces(p));
-            A+=(T).5*solid_body_collection.deformable_body_collection.particles.mass(p)*TV::Dot_Product(elastic_forces(p),elastic_forces(p));}
-        C=(postcollisions_KE-precollisions_KE+postcollisions_PE-precollisions_PE);
-        T epsilon;
-        T discriminant=B*B-4*A*C;
-        if(discriminant<0) discriminant=0;
-        if(B>0) epsilon=(-B+sqrt(discriminant))/(2*A);
-        else epsilon=(-B-sqrt(discriminant))/(2*A);
-        
-        for(int p=1;p<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();p++){
-        solid_body_collection.deformable_body_collection.particles.V(p)+=epsilon*elastic_forces(p);}*/}
-    T postpostcollisions_KE=0;
-    TV postpostcollisions_momentum;
-    for(int p=1;p<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();p++){
-        postpostcollisions_KE+=(T).5*solid_body_collection.deformable_body_collection.particles.mass(p)*
-            TV::Dot_Product(solid_body_collection.deformable_body_collection.particles.V(p),solid_body_collection.deformable_body_collection.particles.V(p));
-        postpostcollisions_momentum+=solid_body_collection.deformable_body_collection.particles.mass(p)*solid_body_collection.deformable_body_collection.particles.V(p);}
-    energy_lost_to_bodies+=postpostcollisions_KE-postcollisions_KE;
-    if(solids_parameters.set_velocity_from_positions_conserve_exactly) energy_damped+=-(postpostcollisions_KE-postcollisions_KE);
-
     PHYSBAM_DEBUG_WRITE_SUBSTEP(STRING_UTILITIES::string_sprintf("Advance_One_Time_Step_Position End dt=%f time=%f",dt,time),2,2);
-}
-//#####################################################################
-// Function Set_Velocity_From_Positions_Position_Update
-//#####################################################################
-template<class TV> void NEWMARK_EVOLUTION<TV>::
-Set_Velocity_From_Positions_Position_Update(const T dt,const T time)
-{
-    PHYSBAM_FATAL_ERROR("Should set_velocity_from_positions_reset_alphas really be implicitly converted to bool?");
-    //solid_body_collection.deformable_body_collection.Setup_Set_Velocity_From_Positions(time,true,solids_parameters.set_velocity_from_positions_reset_alphas);
-    
-    ARRAY<ARRAY<T> > convergence_norms(solid_body_collection.deformable_body_collection.deformables_forces.m);
-    int iter;
-    for(iter=1;iter<=solids_parameters.set_velocity_from_positions_iterations;iter++){
-        T convergence_norm=0;
-        for(int f=1;f<=solid_body_collection.deformable_body_collection.deformables_forces.m;f++)
-            convergence_norm=max(convergence_norm,ARRAYS_COMPUTATIONS::Maxabs(convergence_norms(f)));
-        if(iter>1 && convergence_norm<solids_parameters.set_velocity_from_positions_tolerance) break;
-        
-        // Iterate over all forces
-        ARRAY<ARRAY<VECTOR<T,3> > > force_quadratic_coefficients(solid_body_collection.deformable_body_collection.deformables_forces.m);
-        ARRAY<ARRAY<ARRAY<T> > > v_n_hat(solid_body_collection.deformable_body_collection.deformables_forces.m);
-        for(int f=1;f<=solid_body_collection.deformable_body_collection.deformables_forces.m;f++){
-            DEFORMABLES_FORCES<TV>& force=*solid_body_collection.deformable_body_collection.deformables_forces(f);
-            force_quadratic_coefficients(f).Resize(force.Get_Element_Count());
-            v_n_hat(f).Resize(force.Get_Element_Count());
-            FORCE_ELEMENTS& force_elements=*force.Get_Force_Elements();
-            for(typename FORCE_ELEMENTS::ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){
-                int s=iterator.Data();
-                // Update the alpha for this force
-                // Get a list of the nodes involved in this force
-                T a=0;T b=0;T c=0;
-                T A=0,B=0,C=0;
-                ARRAY<int>& nodes=*force.Incident_Nodes(s);
-                // Get combined mass
-                T combined_one_over_mass=force.Get_Combined_One_Over_Mass(s);
-                
-                force.Compute_Quadratic_Contribution_For_Force(A,a,c,dt,s,combined_one_over_mass,false);
-                // Iterate over the nodes
-                v_n_hat(f)(s).Resize(nodes.m);
-                for(int n=1;n<=nodes.m;n++){
-                    int node=nodes(n);
-                    TV direction=force.Get_Direction(s);
-                    // Compute modified inital velocity
-                    T v_n_correction=0;
-                    for(int f_incident=1;f_incident<=solid_body_collection.deformable_body_collection.deformables_forces.m;f_incident++){
-                        DEFORMABLES_FORCES<TV>& force_incident=*solid_body_collection.deformable_body_collection.deformables_forces(f_incident);
-                        ARRAY<int>& incident_force_elements=*force_incident.Incident_Force_Elements(node);
-                        for(int ife=1;ife<=incident_force_elements.m;ife++){
-                            if(f_incident==f && incident_force_elements(ife)==s) continue;
-                            v_n_correction+=dt*solid_body_collection.deformable_body_collection.particles.one_over_mass(node)*
-                                TV::Dot_Product(force_incident.Get_Force(incident_force_elements(ife),node,false),direction);}}
-                    force.Compute_Quadratic_Contribution_For_Node(B,C,b,dt,node,s,combined_one_over_mass,v_n_correction,false);
-                    v_n_hat(f)(s)(n)=TV::Dot_Product(solid_body_collection.deformable_body_collection.particles.V(node),direction)+(T).5*v_n_correction;}
-                force.Compute_Quadratic_Contribution_For_Residual(B,C,a,b,c,dt,time,s,false);
-                force_quadratic_coefficients(f)(s)=VECTOR<T,3>(A,B,C);}}
-            
-        // Solve for each force, and get an alpha
-        for(int f=1;f<=solid_body_collection.deformable_body_collection.deformables_forces.m;f++){
-            DEFORMABLES_FORCES<TV>& force=*solid_body_collection.deformable_body_collection.deformables_forces(f);
-            FORCE_ELEMENTS& force_elements=*force.Get_Force_Elements();
-            for(typename FORCE_ELEMENTS::ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){
-                int s=iterator.Data();
-                
-                T A=force_quadratic_coefficients(f)(s)(1);
-                T B=force_quadratic_coefficients(f)(s)(2);
-                T C=force_quadratic_coefficients(f)(s)(3);
-                
-                if((A==(T)0) && (B==(T)0) && (C==(T)0)){
-                    force.Set_Force(s,0);
-                    continue;}
-
-                T discriminant=B*B-4*A*C;
-                if(discriminant<0){
-//                    LOG::cout << "No solutions: negative discriminant position update" << std::endl;
-//                    LOG::cout << "Negative discriminant in position update: " << discriminant << std::endl;
-                    force.Set_Force(s,-B/(2*A));}
-                else{
-                    T alpha1=(-B+sqrt(discriminant))/(2*A);
-                    T alpha2=(-B-sqrt(discriminant))/(2*A);
-
-                    PHYSBAM_FATAL_ERROR("Should set_velocity_from_positions_use_orig_force really be implicitly converted to bool?");
-                    static_cast<void>(alpha1);
-                    static_cast<void>(alpha2);
-                    //force.Choose_Solution(solids_parameters.set_velocity_from_positions_use_orig_force,s,(T).5*dt,alpha1,alpha2,v_n_hat(f)(s));
-                }}}
-        
-        // Iterate over all forces
-        for(int f=1;f<=solid_body_collection.deformable_body_collection.deformables_forces.m;f++){
-            DEFORMABLES_FORCES<TV>& force=*solid_body_collection.deformable_body_collection.deformables_forces(f);
-            FORCE_ELEMENTS& force_elements=*force.Get_Force_Elements();
-            convergence_norms(f).Resize(force.Get_Element_Count());
-            for(typename FORCE_ELEMENTS::ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){
-                int s=iterator.Data();
-                // Update the alpha for this force
-                // Get a list of the nodes involved in this force
-                T a=0;T b=0;T c=0;
-                T A=0,B=0,C=0;
-                ARRAY<int>& nodes=*force.Incident_Nodes(s);
-                // Get combined mass
-                T combined_one_over_mass=force.Get_Combined_One_Over_Mass(s);
-                
-                force.Compute_Quadratic_Contribution_For_Force(A,a,c,dt,s,combined_one_over_mass,false);
-                // Iterate over the nodes
-                for(int n=1;n<=nodes.m;n++){
-                    int node=nodes(n);
-                    TV direction=force.Get_Direction(s);
-                    // Compute modified inital velocity
-                    T v_n_correction=0;
-                    for(int f_incident=1;f_incident<=solid_body_collection.deformable_body_collection.deformables_forces.m;f_incident++){
-                        DEFORMABLES_FORCES<TV>& force_incident=*solid_body_collection.deformable_body_collection.deformables_forces(f_incident);
-                        ARRAY<int>& incident_force_elements=*force_incident.Incident_Force_Elements(node);
-                        for(int ife=1;ife<=incident_force_elements.m;ife++){
-                            if(f_incident==f && incident_force_elements(ife)==s) continue;
-                            v_n_correction+=dt*solid_body_collection.deformable_body_collection.particles.one_over_mass(node)*
-                                TV::Dot_Product(force_incident.Get_Force(incident_force_elements(ife),node,false),direction);}}
-                    force.Compute_Quadratic_Contribution_For_Node(B,C,b,dt,node,s,combined_one_over_mass,v_n_correction,false);}
-                force.Compute_Quadratic_Contribution_For_Residual(B,C,a,b,c,dt,time,s,false);
-                T new_alpha=force.Get_Force(s);
-                convergence_norms(f)(s)=A*new_alpha*new_alpha+B*new_alpha+C;}}}
-    // Update positions based on velocities
-    for(int p=1;p<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();p++){
-        TV vtemp=solid_body_collection.deformable_body_collection.particles.V(p);
-        if(!solid_body_collection.deformable_body_collection.particles.one_over_mass(p)) continue;
-        for(int f=1;f<=solid_body_collection.deformable_body_collection.deformables_forces.m;f++){
-            DEFORMABLES_FORCES<TV>& force=*solid_body_collection.deformable_body_collection.deformables_forces(f);
-            ARRAY<int>& incident_force_elements=*force.Incident_Force_Elements(p);
-            for(int ife=1;ife<=incident_force_elements.m;ife++){
-                vtemp+=(T).5*dt*solid_body_collection.deformable_body_collection.particles.one_over_mass(p)*force.Get_Force(incident_force_elements(ife),p,false);}}
-        solid_body_collection.deformable_body_collection.particles.V(p)=vtemp;
-        solid_body_collection.deformable_body_collection.particles.X(p)=solid_body_collection.deformable_body_collection.particles.X(p)+vtemp*dt;}
-    // Store just delta PE from evolution
-    for(int f=1;f<=solid_body_collection.deformable_body_collection.deformables_forces.m;f++){
-        DEFORMABLES_FORCES<TV>& force=*solid_body_collection.deformable_body_collection.deformables_forces(f);
-        force.Store_Delta_PE(time);}
-    
-    Diagnostics(dt,time,0,2,24,"set velocity from positions: position update");
 }
 //#####################################################################
 // Function Apply_Projections_In_Position_Update
@@ -913,10 +565,6 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
     ARTICULATED_RIGID_BODY<TV>& articulated_rigid_body=solid_body_collection.rigid_body_collection.articulated_rigid_body;
     const bool advance_rigid_bodies=true; //solid_body_collection.rigid_body_collection.simulated_rigid_body_particles.m!=0;  TODO: Fix this.
 
-    if(solids_parameters.set_velocity_from_positions){
-        Set_Velocity_From_Positions_Velocity_Update(dt,time);
-        return;}
-        
     if(solids){
         if(advance_rigid_bodies){
             articulated_rigid_body.Apply_Poststabilization(solids_parameters.implicit_solve_parameters.test_system,solids_parameters.implicit_solve_parameters.print_matrix);
@@ -955,57 +603,15 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
         if(articulated_rigid_body.Has_Actuators()) example_forces_and_velocities.Set_PD_Targets(dt,time);
         Backward_Euler_Step_Velocity(dt,time); // TODO: Tamar & Craig, do you need post stab?
         Diagnostics(dt,time,2,2,29,"backward Euler");
-        solids_evolution_callbacks->Filter_Velocities(dt,time+dt,true);
+        solids_evolution_callbacks->Filter_Velocities(dt,time+dt,true);}
 
-        if(solids_parameters.set_velocity_from_positions_physbam){
-            T postelasticanddamping_KE=0;
-            for(int p=1;p<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();p++){
-                postelasticanddamping_KE+=(T).5*solid_body_collection.deformable_body_collection.particles.mass(p)*
-                    TV::Dot_Product(solid_body_collection.deformable_body_collection.particles.V(p),solid_body_collection.deformable_body_collection.particles.V(p));}
-            // Compute damping force
-            T postelasticanddampingnoprojection_KE=0;
-            ARRAY<TV> damping_force(solid_body_collection.deformable_body_collection.particles.array_collection->Size());
-            for(int p=1;p<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();p++){
-                for(int f=1;f<=solid_body_collection.deformable_body_collection.deformables_forces.m;f++){
-                    DEFORMABLES_FORCES<TV>& force=*solid_body_collection.deformable_body_collection.deformables_forces(f);
-                    force.Get_Damping_Force(p,damping_force(p),dt,true);}}
-            for(int p=1;p<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();p++){
-                V_postelasticforces(p)+=damping_force(p);
-                postelasticanddampingnoprojection_KE+=(T).5*solid_body_collection.deformable_body_collection.particles.mass(p)*
-                    TV::Dot_Product(V_postelasticforces(p),V_postelasticforces(p));}
-            // Given the total change in energy, subtract off that due to damping gives you the projection amount
-            // Add this to the amount lost to the body (same with momentum)
-            T energy_lost_to_damping=postelasticanddampingnoprojection_KE-postelasticforces_KE;
-            T energy_lost_to_damping_and_projection=postelasticanddamping_KE-postelasticforces_KE;
-            T energy_lost_to_projection=energy_lost_to_damping_and_projection-energy_lost_to_damping;
-            energy_lost_to_bodies+=energy_lost_to_projection;
-            if(solids_parameters.set_velocity_from_positions_conserve_exactly) energy_damped+=-energy_lost_to_projection;
-            // Add the damping amount to energy damped to be added in next time around
-            energy_damped+=-energy_lost_to_damping;}}
-
-    if(solids_parameters.enforce_energy_conservation){
-        solid_body_collection.Add_Energy_Correction_Force(V_save,rigid_velocity_save,solids_parameters.energy_correction_iterations,time+dt,dt);
-        solid_body_collection.Compute_Energy_Error(V_save,rigid_velocity_save,time+dt,dt);}
-        
     if(solids){
         PHYSBAM_DEBUG_WRITE_SUBSTEP(STRING_UTILITIES::string_sprintf("after removing joints.  after trapezoidal velocities dt=%f time=%f",dt,time),2,2);
 
         if(!solids_parameters.no_contact_friction){
             if(solids_parameters.use_post_cg_constraints) Apply_Constraints(dt,time);
             else if(repulsions){
-                T prerepulsions_KE=0;
-                if(solids_parameters.set_velocity_from_positions_physbam){
-                    for(int p=1;p<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();p++)
-                        prerepulsions_KE+=(T).5*solid_body_collection.deformable_body_collection.particles.mass(p)*
-                            TV::Dot_Product(solid_body_collection.deformable_body_collection.particles.V(p),solid_body_collection.deformable_body_collection.particles.V(p));}
                 repulsions->Adjust_Velocity_For_Self_Repulsion_Using_History(dt,false,true);
-                if(solids_parameters.set_velocity_from_positions_physbam){
-                    T postrepulsions_KE=0;
-                    for(int p=1;p<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();p++)
-                        postrepulsions_KE+=(T).5*solid_body_collection.deformable_body_collection.particles.mass(p)*
-                            TV::Dot_Product(solid_body_collection.deformable_body_collection.particles.V(p),solid_body_collection.deformable_body_collection.particles.V(p));
-                    energy_lost_to_bodies+=(postrepulsions_KE-prerepulsions_KE);
-                    if(solids_parameters.set_velocity_from_positions_conserve_exactly) energy_damped+=-(postrepulsions_KE-prerepulsions_KE);}
                 Diagnostics(dt,time,2,2,40,"self repulsions");}}
         solid_body_collection.deformable_body_collection.collisions.Reset_Object_Collisions();
         if(advance_rigid_bodies && solids_parameters.rigid_body_evolution_parameters.clamp_rigid_body_velocities){
@@ -1016,276 +622,6 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
     example_forces_and_velocities.Advance_One_Time_Step_End_Callback(dt,time);
 
     PHYSBAM_DEBUG_WRITE_SUBSTEP(STRING_UTILITIES::string_sprintf("Advance_One_Time_Step_Velocity End dt=%f time=%f",dt,time),2,2);
-}
-//#####################################################################
-// Function Set_Velocity_From_Positions_Velocity_Update
-//#####################################################################
-template<class TV> void NEWMARK_EVOLUTION<TV>::
-Set_Velocity_From_Positions_Velocity_Update(const T dt,const T time)
-{
-    solid_body_collection.deformable_body_collection.Setup_Set_Velocity_From_Positions(time,false,false);
-    
-    ARRAY<ARRAY<T> > convergence_norms(solid_body_collection.deformable_body_collection.deformables_forces.m);
-    int iter;
-    for(iter=1;iter<=solids_parameters.set_velocity_from_positions_iterations;iter++){
-        T convergence_norm=0;
-        for(int f=1;f<=solid_body_collection.deformable_body_collection.deformables_forces.m;f++)
-            convergence_norm=max(convergence_norm,ARRAYS_COMPUTATIONS::Maxabs(convergence_norms(f)));
-        if(iter>1 && convergence_norm<solids_parameters.set_velocity_from_positions_tolerance) break;
-        
-        // Iterate over all forces
-        ARRAY<ARRAY<VECTOR<T,3> > > force_quadratic_coefficients(solid_body_collection.deformable_body_collection.deformables_forces.m);
-        ARRAY<ARRAY<ARRAY<T> > > v_n_hat(solid_body_collection.deformable_body_collection.deformables_forces.m);
-        for(int f=1;f<=solid_body_collection.deformable_body_collection.deformables_forces.m;f++){
-            DEFORMABLES_FORCES<TV>& force=*solid_body_collection.deformable_body_collection.deformables_forces(f);
-            force_quadratic_coefficients(f).Resize(force.Get_Element_Count());
-            v_n_hat(f).Resize(force.Get_Element_Count());
-            FORCE_ELEMENTS& force_elements=*force.Get_Force_Elements();
-            for(typename FORCE_ELEMENTS::ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){
-                int s=iterator.Data();
-                // Update the alpha for this force
-                // Get a list of the nodes involved in this force
-                T a=0;T b=0;T c=0;
-                T A=0,B=0,C=0;
-                ARRAY<int>& nodes=*force.Incident_Nodes(s);
-                // Get combined mass
-                T combined_one_over_mass=force.Get_Combined_One_Over_Mass(s);
-                
-                force.Compute_Quadratic_Contribution_For_Force(A,a,c,dt,s,combined_one_over_mass,true);
-                // Iterate over the nodes
-                v_n_hat(f)(s).Resize(nodes.m);
-                for(int n=1;n<=nodes.m;n++){
-                    int node=nodes(n);
-                    TV direction=force.Get_Direction(s);
-                    // Compute modified inital velocity
-                    T v_n_correction=0;
-                    for(int f_incident=1;f_incident<=solid_body_collection.deformable_body_collection.deformables_forces.m;f_incident++){
-                        DEFORMABLES_FORCES<TV>& force_incident=*solid_body_collection.deformable_body_collection.deformables_forces(f_incident);
-                        ARRAY<int>& incident_force_elements=*force_incident.Incident_Force_Elements(node);
-                        for(int ife=1;ife<=incident_force_elements.m;ife++){
-                            if(f_incident==f && incident_force_elements(ife)==s) continue;
-                            v_n_correction+=dt*solid_body_collection.deformable_body_collection.particles.one_over_mass(node)*
-                                TV::Dot_Product(force_incident.Get_Force(incident_force_elements(ife),node,false),direction);}}
-                    force.Compute_Quadratic_Contribution_For_Node(B,C,b,dt,node,s,combined_one_over_mass,v_n_correction,true);
-                    v_n_hat(f)(s)(n)=TV::Dot_Product(solid_body_collection.deformable_body_collection.particles.V(node),direction)+v_n_correction;}
-                force.Compute_Quadratic_Contribution_For_Residual(B,C,a,b,c,dt,time,s,true);
-                force_quadratic_coefficients(f)(s)=VECTOR<T,3>(A,B,C);}}
-        
-        // Solve for each force, and get an alpha
-        for(int f=1;f<=solid_body_collection.deformable_body_collection.deformables_forces.m;f++){
-            DEFORMABLES_FORCES<TV>& force=*solid_body_collection.deformable_body_collection.deformables_forces(f);
-            FORCE_ELEMENTS& force_elements=*force.Get_Force_Elements();
-            for(typename FORCE_ELEMENTS::ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){
-                int s=iterator.Data();
-                
-                T A=force_quadratic_coefficients(f)(s)(1);
-                T B=force_quadratic_coefficients(f)(s)(2);
-                T C=force_quadratic_coefficients(f)(s)(3);
-                
-                if((A==(T)0) && (B==(T)0) && (C==(T)0)){
-                    force.Set_Force(s,0);
-                    continue;}
-                
-                T discriminant=B*B-4*A*C;
-                if(discriminant<0){
-//                    LOG::cout << "No solutions: negative discriminant position update" << std::endl;
-//                    LOG::cout << "Negative discriminant in position update: " << discriminant << std::endl;
-                    force.Set_Force(s,-B/(2*A));}
-                else{
-                    T alpha1=(-B+sqrt(discriminant))/(2*A);
-                    T alpha2=(-B-sqrt(discriminant))/(2*A);
-
-                    PHYSBAM_FATAL_ERROR("Should set_velocity_from_positions_use_orig_force really be implicitly converted to bool?");
-                    static_cast<void>(alpha1);
-                    static_cast<void>(alpha2);
-                    //force.Choose_Solution(solids_parameters.set_velocity_from_positions_use_orig_force,s,dt,alpha1,alpha2,v_n_hat(f)(s));
-                }}}
-        
-        // Iterate over all forces
-        for(int f=1;f<=solid_body_collection.deformable_body_collection.deformables_forces.m;f++){
-            DEFORMABLES_FORCES<TV>& force=*solid_body_collection.deformable_body_collection.deformables_forces(f);
-            FORCE_ELEMENTS& force_elements=*force.Get_Force_Elements();
-            convergence_norms(f).Resize(force.Get_Element_Count());
-            for(typename FORCE_ELEMENTS::ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){
-                int s=iterator.Data();
-                // Update the alpha for this force
-                // Get a list of the nodes involved in this force
-                T a=0;T b=0;T c=0;
-                T A=0,B=0,C=0;
-                ARRAY<int>& nodes=*force.Incident_Nodes(s);
-                // Get combined mass
-                T combined_one_over_mass=force.Get_Combined_One_Over_Mass(s);
-                
-                force.Compute_Quadratic_Contribution_For_Force(A,a,c,dt,s,combined_one_over_mass,true);
-                // Iterate over the nodes
-                for(int n=1;n<=nodes.m;n++){
-                    int node=nodes(n);
-                    TV direction=force.Get_Direction(s);
-                    // Compute modified inital velocity
-                    T v_n_correction=0;
-                    for(int f_incident=1;f_incident<=solid_body_collection.deformable_body_collection.deformables_forces.m;f_incident++){
-                        DEFORMABLES_FORCES<TV>& force_incident=*solid_body_collection.deformable_body_collection.deformables_forces(f_incident);
-                        ARRAY<int>& incident_force_elements=*force_incident.Incident_Force_Elements(node);
-                        for(int ife=1;ife<=incident_force_elements.m;ife++){
-                            if(f_incident==f && incident_force_elements(ife)==s) continue;
-                            v_n_correction+=dt*solid_body_collection.deformable_body_collection.particles.one_over_mass(node)*
-                                TV::Dot_Product(force_incident.Get_Force(incident_force_elements(ife),node,false),direction);}}
-                    force.Compute_Quadratic_Contribution_For_Node(B,C,b,dt,node,s,combined_one_over_mass,v_n_correction,true);}
-                force.Compute_Quadratic_Contribution_For_Residual(B,C,a,b,c,dt,time,s,true);
-                T new_alpha=force.Get_Force(s);
-                convergence_norms(f)(s)=A*new_alpha*new_alpha+B*new_alpha+C;}}}
-    // Update velocities
-    for(int p=1;p<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();p++){
-        TV vtemp=solid_body_collection.deformable_body_collection.particles.V(p);
-        if(!solid_body_collection.deformable_body_collection.particles.one_over_mass(p)) continue;
-        for(int f=1;f<=solid_body_collection.deformable_body_collection.deformables_forces.m;f++){
-            DEFORMABLES_FORCES<TV>& force=*solid_body_collection.deformable_body_collection.deformables_forces(f);
-            ARRAY<int>& incident_force_elements=*force.Incident_Force_Elements(p);
-            for(int ife=1;ife<=incident_force_elements.m;ife++)
-                vtemp+=dt*solid_body_collection.deformable_body_collection.particles.one_over_mass(p)*force.Get_Force(incident_force_elements(ife),p,false);}
-        solid_body_collection.deformable_body_collection.particles.V(p)=vtemp;}
-    
-    // Update residuals
-    for(int f=1;f<=solid_body_collection.deformable_body_collection.deformables_forces.m;f++){
-        DEFORMABLES_FORCES<TV>& force=*solid_body_collection.deformable_body_collection.deformables_forces(f);
-        FORCE_ELEMENTS& force_elements=*force.Get_Force_Elements();
-        for(typename FORCE_ELEMENTS::ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){
-            int s=iterator.Data();
-            force.Update_Residual_Energy(s,convergence_norms(f)(s),time);}}
-
-    if(solid_body_collection.print_energy){
-        TV total_momentum=TV();
-        for(int p=1;p<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();p++)
-            total_momentum+=solid_body_collection.deformable_body_collection.particles.mass(p)*solid_body_collection.deformable_body_collection.particles.V(p);
-        LOG::cout << "Total momentum = " << total_momentum << std::endl;}
-    
-    if(solids_parameters.set_velocity_from_positions_move_RE_to_KE_damping){
-        T total_residual_energy=0;
-        for(int f=1;f<=solid_body_collection.deformable_body_collection.deformables_forces.m;f++){
-            DEFORMABLES_FORCES<TV>& force=*solid_body_collection.deformable_body_collection.deformables_forces(f);
-            total_residual_energy+=force.Residual_Energy(time);}
-        T A=0,B=0,C=0;
-        ARRAY<TV> damping_forces(solid_body_collection.deformable_body_collection.particles.array_collection->Size());
-        for(int p=1;p<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();p++){
-            damping_forces(p)=TV();
-            for(int f=1;f<=solid_body_collection.deformable_body_collection.deformables_forces.m;f++){
-                DEFORMABLES_FORCES<TV>& force=*solid_body_collection.deformable_body_collection.deformables_forces(f);
-                force.Get_Damping_Force(p,damping_forces(p),dt,false);}
-            B+=solid_body_collection.deformable_body_collection.particles.mass(p)*TV::Dot_Product(solid_body_collection.deformable_body_collection.particles.V(p),damping_forces(p));
-            A+=(T).5*solid_body_collection.deformable_body_collection.particles.mass(p)*TV::Dot_Product(damping_forces(p),damping_forces(p));}
-        C=total_residual_energy-energy_damped;
-        T epsilon;
-        T discriminant=B*B-4*A*C;
-        if(B>0) epsilon=(-B+sqrt(discriminant))/(2*A);
-        else epsilon=(-B-sqrt(discriminant))/(2*A);
-        
-        for(int p=1;p<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();p++)
-            solid_body_collection.deformable_body_collection.particles.V(p)+=epsilon*damping_forces(p);
-        
-        for(int f=1;f<=solid_body_collection.deformable_body_collection.deformables_forces.m;f++){
-            DEFORMABLES_FORCES<TV>& force=*solid_body_collection.deformable_body_collection.deformables_forces(f);
-            FORCE_ELEMENTS& force_elements=*force.Get_Force_Elements();
-            for(typename FORCE_ELEMENTS::ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){
-                int s=iterator.Data();
-                force.Update_Residual_Energy(s,0,time);}}}
-    else if(solids_parameters.set_velocity_from_positions_move_RE_to_KE_elastic){
-        T total_residual_energy=0;
-        for(int f=1;f<=solid_body_collection.deformable_body_collection.deformables_forces.m;f++){
-            DEFORMABLES_FORCES<TV>& force=*solid_body_collection.deformable_body_collection.deformables_forces(f);
-            total_residual_energy+=force.Residual_Energy(time);}
-        
-        T total_kinetic_energy=0;
-        for(int p=1;p<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();p++)
-            total_kinetic_energy+=(T).5*solid_body_collection.deformable_body_collection.particles.mass(p)*
-                TV::Dot_Product(solid_body_collection.deformable_body_collection.particles.V(p),solid_body_collection.deformable_body_collection.particles.V(p));
-        
-        T A=0,B=0,C=0;
-        ARRAY<TV> damping_forces(solid_body_collection.deformable_body_collection.particles.array_collection->Size());
-        for(int p=1;p<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();p++){
-            damping_forces(p)=TV();
-            for(int f=1;f<=solid_body_collection.deformable_body_collection.deformables_forces.m;f++){
-                DEFORMABLES_FORCES<TV>& force=*solid_body_collection.deformable_body_collection.deformables_forces(f);
-                ARRAY<int>& incident_force_elements=*force.Incident_Force_Elements(p);
-                for(int ife=1;ife<=incident_force_elements.m;ife++)
-                    damping_forces(p)+=dt*solid_body_collection.deformable_body_collection.particles.one_over_mass(p)*force.Get_Force(incident_force_elements(ife),p,false);}
-            B+=solid_body_collection.deformable_body_collection.particles.mass(p)*TV::Dot_Product(solid_body_collection.deformable_body_collection.particles.V(p),damping_forces(p));
-            A+=(T).5*solid_body_collection.deformable_body_collection.particles.mass(p)*TV::Dot_Product(damping_forces(p),damping_forces(p));}
-        C=total_residual_energy-energy_damped;
-        T epsilon;
-        T discriminant=B*B-4*A*C;
-        if(discriminant<0) discriminant=0;
-        if(B>0) epsilon=(-B+sqrt(discriminant))/(2*A);
-        else epsilon=(-B-sqrt(discriminant))/(2*A);
-        
-        T new_total_kinetic_energy=0;
-        for(int p=1;p<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();p++){
-            solid_body_collection.deformable_body_collection.particles.V(p)+=epsilon*damping_forces(p);
-            new_total_kinetic_energy+=(T).5*solid_body_collection.deformable_body_collection.particles.mass(p)*
-                TV::Dot_Product(solid_body_collection.deformable_body_collection.particles.V(p),solid_body_collection.deformable_body_collection.particles.V(p));}
-        T residual_to_save=(new_total_kinetic_energy-total_kinetic_energy+total_residual_energy-energy_damped)/(total_residual_energy);
-        
-        for(int f=1;f<=solid_body_collection.deformable_body_collection.deformables_forces.m;f++){
-            DEFORMABLES_FORCES<TV>& force=*solid_body_collection.deformable_body_collection.deformables_forces(f);
-            FORCE_ELEMENTS& force_elements=*force.Get_Force_Elements();
-            for(typename FORCE_ELEMENTS::ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){
-                int s=iterator.Data();
-                force.Update_Residual_Energy(s,residual_to_save*force.Get_Residual_Energy(s),time);}}}
-
-    if(solids_parameters.set_velocity_from_positions_damping){
-        // PhysBAM damping
-        T total_kinetic_energy_before_damping=0;
-        TV total_momentum_before_damping=TV();
-        for(int p=1;p<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();p++){
-            total_kinetic_energy_before_damping+=(T).5*solid_body_collection.deformable_body_collection.particles.mass(p)*
-                TV::Dot_Product(solid_body_collection.deformable_body_collection.particles.V(p),solid_body_collection.deformable_body_collection.particles.V(p));
-            total_momentum_before_damping+=solid_body_collection.deformable_body_collection.particles.mass(p)*solid_body_collection.deformable_body_collection.particles.V(p);}
-
-        ARRAY<TV> pre_damping_velocities(solid_body_collection.deformable_body_collection.particles.array_collection->Size());
-        for(int p=1;p<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();p++){
-            pre_damping_velocities(p)=solid_body_collection.deformable_body_collection.particles.V(p);}
-
-        for(int f=1;f<=solid_body_collection.deformable_body_collection.deformables_forces.m;f++)
-            solid_body_collection.deformable_body_collection.deformables_forces(f)->Save_And_Reset_Elastic_Coefficient();
-            
-        // CG solve for damping
-        Backward_Euler_Step_Velocity_Helper(dt,time,time,false);
-
-        for(int f=1;f<=solid_body_collection.deformable_body_collection.deformables_forces.m;f++)
-            solid_body_collection.deformable_body_collection.deformables_forces(f)->Restore_Elastic_Coefficient();
-
-        T total_kinetic_energy_after_damping=0;
-        TV total_momentum_after_damping=TV();
-        for(int p=1;p<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();p++){
-            total_kinetic_energy_after_damping+=(T).5*solid_body_collection.deformable_body_collection.particles.mass(p)*
-                TV::Dot_Product(solid_body_collection.deformable_body_collection.particles.V(p),solid_body_collection.deformable_body_collection.particles.V(p));
-            total_momentum_after_damping+=solid_body_collection.deformable_body_collection.particles.mass(p)*solid_body_collection.deformable_body_collection.particles.V(p);}
-
-        // Compute damping force
-        T total_kinetic_energy_no_projection=0;
-        ARRAY<TV> damping_force(solid_body_collection.deformable_body_collection.particles.array_collection->Size());
-        for(int p=1;p<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();p++){
-            for(int f=1;f<=solid_body_collection.deformable_body_collection.deformables_forces.m;f++){
-                DEFORMABLES_FORCES<TV>& force=*solid_body_collection.deformable_body_collection.deformables_forces(f);
-                force.Get_Damping_Force(p,damping_force(p),dt,true);}}
-        for(int p=1;p<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();p++){
-            pre_damping_velocities(p)+=damping_force(p);
-            total_kinetic_energy_no_projection+=(T).5*solid_body_collection.deformable_body_collection.particles.mass(p)*
-                TV::Dot_Product(pre_damping_velocities(p),pre_damping_velocities(p));}
-        // Given the total change in energy, subtract off that due to damping gives you the projection amount
-        // Add this to the amount lost to the body (same with momentum)
-        T energy_lost_to_damping=total_kinetic_energy_no_projection-total_kinetic_energy_before_damping;
-        T energy_lost_to_damping_and_projection=total_kinetic_energy_after_damping-total_kinetic_energy_before_damping;
-        T energy_lost_to_projection=energy_lost_to_damping_and_projection-energy_lost_to_damping;
-        energy_lost_to_bodies+=energy_lost_to_projection;
-        momentum_lost_to_bodies+=total_momentum_before_damping-total_momentum_after_damping;
-        // Add the damping amount to energy damped to be added in next time around
-        energy_damped=-energy_lost_to_damping;}
-    
-    if(solid_body_collection.print_energy){
-        TV total_momentum=TV();
-        for(int p=1;p<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();p++)
-            total_momentum+=solid_body_collection.deformable_body_collection.particles.mass(p)*solid_body_collection.deformable_body_collection.particles.V(p);
-        LOG::cout << "Total momentum = " << total_momentum << std::endl;}
 }
 //#####################################################################
 // Function Apply_Constraints
@@ -1547,6 +883,9 @@ Initialize_Rigid_Bodies(const T frame_rate, const bool restart)
     if(solids_parameters.rigid_body_collision_parameters.rigid_collisions_print_interpenetration_statistics) rigid_body_collisions->Print_Interpenetration_Statistics();
     else if(!rigid_body_collisions->Check_For_Any_Interpenetration()) LOG::cout<<"No initial interpenetration"<<std::endl;
 }
+//#####################################################################
+// Function Use_CFL
+//#####################################################################
 template<class TV> bool NEWMARK_EVOLUTION<TV>::
 Use_CFL() const
 {

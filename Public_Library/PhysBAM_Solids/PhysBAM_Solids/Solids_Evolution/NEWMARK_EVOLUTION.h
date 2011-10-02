@@ -30,7 +30,6 @@ protected:
     using BASE::F_full;using BASE::R_full;using BASE::S_full;using BASE::B_full;using BASE::rigid_F_full;using BASE::rigid_R_full;using BASE::rigid_S_full;
     using BASE::rigid_B_full;using BASE::rigid_AR_full;using BASE::AR_full;using BASE::Save_Position;using BASE::Restore_Position;
     using BASE::rigid_deformable_collisions;using BASE::world_space_rigid_mass;using BASE::world_space_rigid_mass_inverse;using BASE::time;
-    using BASE::energy_damped;using BASE::energy_lost_to_bodies;using BASE::momentum_lost_to_bodies;
 public:
     using BASE::solid_body_collection;using BASE::Euler_Step_Position;
     using BASE::Clamp_Velocities;using BASE::solids_evolution_callbacks;using BASE::rigid_body_collisions;using BASE::Initialize_World_Space_Masses;
@@ -90,8 +89,6 @@ protected:
     void Restore_Velocity() const;
     void Exchange_Velocity();
     void Apply_Projections_In_Position_Update(const T dt,const T time);
-    void Set_Velocity_From_Positions_Position_Update(const T dt,const T time);
-    void Set_Velocity_From_Positions_Velocity_Update(const T dt,const T time);
 //#####################################################################
 };
 }
