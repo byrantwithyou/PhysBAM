@@ -174,6 +174,7 @@ template<class T> void Set_Inversion_Based_On_Implicit_Surface(FINITE_VOLUME<VEC
 template<class TV,int d> void FINITE_VOLUME<TV,d>::
 Update_Position_Based_State(const T time,const bool is_position_update)
 {
+//    if(this->use_implicit_velocity_independent_forces) Save_Stress_Derivative();
     if(anisotropic_model && !V) PHYSBAM_FATAL_ERROR();
     int elements=strain_measure.Dm_inverse.m;
     U.Resize(elements,false,false);De_inverse_hat.Resize(elements,false,false);Fe_hat.Resize(elements,false,false);
@@ -498,6 +499,32 @@ Potential_Energy(const T time) const
         for(FORCE_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
             potential_energy-=Be_scales(t)*isotropic_model->Energy_Density(Fe_hat(t),t);}
     return potential_energy;
+}
+//#####################################################################
+// Function Add_Implicit_Velocity_Independent_Forces
+//#####################################################################
+template<class TV,int d> void FINITE_VOLUME<TV,d>::
+Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> VV,ARRAY_VIEW<TV> F,const T time) const
+{
+    if(node_stiffness && edge_stiffness){
+        for(FORCE_ITERATOR iterator(force_particles);iterator.Valid();iterator.Next()){int p=iterator.Data();
+            F(p)+=(*node_stiffness)(p)*VV(p);}
+        for(FORCE_ITERATOR iterator(*force_segments);iterator.Valid();iterator.Next()){int e=iterator.Data();
+            int m,n;strain_measure.mesh.segment_mesh->elements(e).Get(m,n);
+            F(m)+=(*edge_stiffness)(e)*VV(n);F(n)+=(*edge_stiffness)(e).Transpose_Times(VV(m));}}
+    else if(anisotropic_model){
+        if(!dPi_dFe && !dP_dFe) PHYSBAM_FATAL_ERROR();
+        for(FORCE_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+            T_MATRIX dDs=strain_measure.Ds(VV,t),dG;
+            if(dP_dFe) dG=U(t)*anisotropic_model->dP_From_dF(U(t).Transpose_Times(dDs)*De_inverse_hat(t),Fe_hat(t),(*V)(t),(*dP_dFe)(t),Be_scales(t),t).Times_Transpose(De_inverse_hat(t));
+            else dG=U(t)*anisotropic_model->dP_From_dF(U(t).Transpose_Times(dDs)*De_inverse_hat(t),Fe_hat(t),(*V)(t),(*dPi_dFe)(t),Be_scales(t),t).Times_Transpose(De_inverse_hat(t));
+            strain_measure.Distribute_Force(F,t,dG);}}
+    else{
+        if(!dPi_dFe) PHYSBAM_FATAL_ERROR();
+        for(FORCE_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
+            T_MATRIX dDs=strain_measure.Ds(VV,t);
+            T_MATRIX dG=U(t)*isotropic_model->dP_From_dF(U(t).Transpose_Times(dDs)*De_inverse_hat(t),(*dPi_dFe)(t),Be_scales(t),t).Times_Transpose(De_inverse_hat(t));
+            strain_measure.Distribute_Force(F,t,dG);}}
 }
 //#####################################################################
 template class FINITE_VOLUME<VECTOR<float,2>,2>;

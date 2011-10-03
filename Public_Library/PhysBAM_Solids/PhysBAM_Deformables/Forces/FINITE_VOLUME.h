@@ -99,6 +99,7 @@ public:
     void Add_Semi_Implicit_Impulse(const int element,const T dt,T* time_plus_dt);
     void Add_Semi_Implicit_Impulses(const T dt,ARRAY<T>* time_plus_dt);
     T Potential_Energy(const T time) const PHYSBAM_OVERRIDE;
+    void Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE;
 //#####################################################################
 };
 
