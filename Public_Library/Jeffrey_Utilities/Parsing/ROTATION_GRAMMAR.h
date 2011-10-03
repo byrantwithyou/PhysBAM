@@ -4,6 +4,7 @@
 // license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 //#####################################################################
+#if 0
 #ifndef PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_PARSING_ROTATION_GRAMMAR_HPP
 #define PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_PARSING_ROTATION_GRAMMAR_HPP
 
@@ -162,3 +163,4 @@ struct ROTATION_GRAMMAR< T, 3, T_ITERATOR, T_SKIPPER >
 } // namespace PhysBAM
 
 #endif // #ifndef PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_PARSING_ROTATION_GRAMMAR_HPP
+#endif

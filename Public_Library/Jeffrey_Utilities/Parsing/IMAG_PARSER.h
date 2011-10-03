@@ -6,7 +6,7 @@
 //#####################################################################
 #ifndef PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_PARSING_IMAG_PARSER_HPP
 #define PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_PARSING_IMAG_PARSER_HPP
-
+#if 0
 #include <boost/mpl/assert.hpp>
 #include <boost/spirit/home/qi/char/char.hpp>
 #include <boost/spirit/home/qi/domain.hpp>
@@ -97,3 +97,4 @@ Make_Imag_Parser(const Subject& subject, const char i)
 } // namespace PhysBAM
 
 #endif // #ifndef PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_PARSING_IMAG_PARSER_HPP
+#endif

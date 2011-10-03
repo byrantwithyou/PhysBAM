@@ -6,6 +6,7 @@
 // RATIONAL_REAL<T> is similar to boost::spirit::qi::real_parser<T>, except it
 // can additionally parse quotients, such as "1/3".
 //#####################################################################
+#if 0
 #ifndef PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_PARSING_RATIONAL_REAL_PARSER_HPP
 #define PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_PARSING_RATIONAL_REAL_PARSER_HPP
 
@@ -214,3 +215,4 @@ struct make_primitive<
 } } // namespace spirit / namespace boost
 
 #endif // #ifndef PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_PARSING_RATIONAL_REAL_PARSER_HPP
+#endif

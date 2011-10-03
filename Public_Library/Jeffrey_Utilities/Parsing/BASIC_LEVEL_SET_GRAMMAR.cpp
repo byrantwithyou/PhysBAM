@@ -3,7 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the
 // license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-
+#if 0
 #include <string>
 
 #include <boost/spirit/home/qi/char/char_class.hpp>
@@ -28,3 +28,4 @@ EXPLICIT_INSTANTIATION( double, 3 )
 #undef EXPLICIT_INSTANTIATION
 
 } // namespace PhysBAM
+#endif

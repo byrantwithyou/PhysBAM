@@ -1,3 +1,4 @@
+#if 0
 //#####################################################################
 // Copyright 2011, Jeffrey Hellrung.
 // This file is part of PhysBAM whose distribution is governed by the
@@ -78,3 +79,4 @@ struct VECTOR_GRAMMAR< T, D, T_ITERATOR, T_SKIPPER >
 };
 
 #endif // #ifndef BOOST_PP_IS_ITERATING
+#endif

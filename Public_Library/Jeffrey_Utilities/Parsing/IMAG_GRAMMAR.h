@@ -6,7 +6,7 @@
 //#####################################################################
 #ifndef PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_PARSING_IMAG_GRAMMAR_HPP
 #define PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_PARSING_IMAG_GRAMMAR_HPP
-
+#if 0
 #include <boost/spirit/home/qi/char/char.hpp>
 #include <boost/spirit/home/qi/nonterminal/grammar.hpp>
 #include <boost/spirit/home/qi/nonterminal/rule.hpp>
@@ -45,3 +45,4 @@ struct IMAG_GRAMMAR
 } // namespace PhysBAM
 
 #endif // #ifndef PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_PARSING_IMAG_GRAMMAR_HPP
+#endif

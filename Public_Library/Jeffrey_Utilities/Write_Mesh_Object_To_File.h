@@ -3,7 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the
 // license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-
+#if 0
 #ifndef PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_WRITE_MESH_OBJECT_TO_FILE_HPP
 #define PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_WRITE_MESH_OBJECT_TO_FILE_HPP
 
@@ -140,3 +140,4 @@ Filename_Has_VTK_Extension(const std::string& filename)
 } // namespace PhysBAM
 
 #endif // #ifndef PHYSBAM_PUBLIC_LIBRARY_JEFFREY_UTILITIES_WRITE_MESH_OBJECT_TO_FILE_HPP
+#endif
