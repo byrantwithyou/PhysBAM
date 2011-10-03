@@ -8,15 +8,12 @@
 namespace data_exchange{
 struct force
 {
-    std::vector<int> affected_bodies;
-
     virtual ~force(){}
 private:
     friend class boost::serialization::access;
     template<class Archive>
     void serialize(Archive & ar, const unsigned int version)
     {
-        ar & affected_bodies;
     }
 };
 
