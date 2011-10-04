@@ -174,7 +174,7 @@ template<class T> void Set_Inversion_Based_On_Implicit_Surface(FINITE_VOLUME<VEC
 template<class TV,int d> void FINITE_VOLUME<TV,d>::
 Update_Position_Based_State(const T time,const bool is_position_update)
 {
-//    if(this->use_implicit_velocity_independent_forces) Save_Stress_Derivative();
+    if(this->use_implicit_velocity_independent_forces) Save_Stress_Derivative();
     if(anisotropic_model && !V) PHYSBAM_FATAL_ERROR();
     int elements=strain_measure.Dm_inverse.m;
     U.Resize(elements,false,false);De_inverse_hat.Resize(elements,false,false);Fe_hat.Resize(elements,false,false);
