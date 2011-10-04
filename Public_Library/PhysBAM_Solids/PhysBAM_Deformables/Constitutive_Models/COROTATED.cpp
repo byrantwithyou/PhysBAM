@@ -135,6 +135,56 @@ Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC
 {
     typedef VECTOR<T,3> TV3;
     DIAGONAL_MATRIX<T,3> Fm1=F-1,F2=F*F,CF=F.Cofactor_Matrix();
+    TV3 dE_ds=(T)2*constant_mu*Fm1.To_Vector()+constant_lambda*Fm1.Trace();
+    MATRIX<T,3> dE_dsds;for(int i=1;i<=d;i++) for(int j=1;j<=d;j++) dE_dsds(i,j)=constant_lambda;dE_dsds+=2*constant_mu;
+//    LOG::cout<<F<<std::endl;
+    T t1 = F.x22 * F.x22;
+    T t2 = t1 * F.x22;
+    T t3 = t2 * dE_ds.y;
+    T t4 = dE_ds.z * F.x33;
+    T t5 = t1 * t4;
+    T t7 = F.x11 * dE_ds.x * t1;
+    T t9 = F.x11 * F.x11;
+    T t11 = F.x22 * dE_ds.y * t9;
+    T t12 = t9 * F.x11;
+//    T t13 = t12 * dE_ds.x;
+    T t16 = sqr(t9 - t1);
+    T t17 = 1 / t16;
+    T t21 = F.x22 * F.x11;
+    T t26 = t17 * (-t1 * dE_ds.y * F.x11 - t4 * t21 + t12 * dE_ds.y + t2 * dE_ds.x);
+    T t28 = F.x33 * F.x33;
+    T t29 = t28 * F.x22 * dE_ds.y;
+    T t30 = t28 * F.x33;
+//    T t31 = t30 * dE_ds.z;
+    T t33 = F.x11 * dE_ds.x * t28;
+    T t35 = t9 * t4;
+    T t39 = sqr(t9 - t28);
+    T t40 = 1 / t39;
+    T t42 = dE_ds.y * F.x33;
+    T t48 = t40 * (-2 * t42 * t21 + t12 * dE_ds.z + t30 * dE_ds.x);
+    T t54 = sqr(-t28 + t1);
+    T t55 = 1 / t54;
+    T t64 = t55 * (-t2 * dE_ds.z - t30 * dE_ds.y + F.x33 * F.x22 * dE_ds.x * F.x11 + t1 * t42);
+    dPi_dF.x1111 = dE_dsds(1,1);
+    //dPi_dF.x1212 = t17 * (t3 + t5 - 2 * t7 - t11 + t13);
+    //dPi_dF.x1313 = t40 * (t29 + t31 - 2 * t33 - 2 * t35 + t13 + t11);
+    dPi_dF.x2112 = -t26;
+    dPi_dF.x2121 = -t17 * (-t35 + t7 + t11 - t3);
+    dPi_dF.x2211 = dE_dsds(2,1);
+    dPi_dF.x2222 = dE_dsds(2,2);
+    //dPi_dF.x2323 = t55 * (t31 - 2 * t5 - t29 + t7 + t3);
+    dPi_dF.x3113 = -t48;
+    dPi_dF.x3131 = -t40 * (-t11 + t33 + t35 - t29);
+    dPi_dF.x3223 = t64;
+    dPi_dF.x3232 = t55 * (-t29 + t3 - t5 + t33);
+    dPi_dF.x3311 = dE_dsds(3,1);
+    dPi_dF.x3322 = dE_dsds(3,2);
+    dPi_dF.x3333 = dE_dsds(3,3);
+
+
+#if 0
+    typedef VECTOR<T,3> TV3;
+    DIAGONAL_MATRIX<T,3> Fm1=F-1,F2=F*F,CF=F.Cofactor_Matrix();
     TV3 FV=F.To_Vector(),FV2=F2.To_Vector(),CFV=CF.To_Vector();
     TV3 dE_ds=(T)2*constant_mu*Fm1.To_Vector()+constant_lambda*Fm1.Trace();
     MATRIX<T,3> dE_dsds;for(int i=1;i<=d;i++) for(int j=1;j<=d;j++) dE_dsds(i,j)=constant_lambda;dE_dsds+=2*constant_mu;
@@ -167,6 +217,7 @@ Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC
     dPi_dF.x2112=b(1,2);
     dPi_dF.x3113=b(1,3);
     dPi_dF.x3223=b(2,3);
+#endif
 }
 //#####################################################################
 // Function Energy_Density
