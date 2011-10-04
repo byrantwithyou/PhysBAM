@@ -278,13 +278,13 @@ Substitute_Soft_Bindings_For_Nodes(T_OBJECT& object,SOFT_BINDINGS<TV>& soft_bind
 // Function Read_Or_Initialize_Implicit_Surface
 //#####################################################################
 template<class TV> LEVELSET_IMPLICIT_OBJECT<TV>* DEFORMABLES_STANDARD_TESTS<TV>::
-Initialize_Implicit_Surface(TRIANGULATED_SURFACE<T>& undeformed_triangulated_surface) const
+Initialize_Implicit_Surface(TRIANGULATED_SURFACE<T>& undeformed_triangulated_surface,int max_res) const
 {
     // undeformed levelset
     LEVELSET_IMPLICIT_OBJECT<TV>& undeformed_levelset=*LEVELSET_IMPLICIT_OBJECT<TV>::Create();
     undeformed_triangulated_surface.Update_Bounding_Box();RANGE<TV>& box=*undeformed_triangulated_surface.bounding_box;
     GRID<TV>& grid=undeformed_levelset.levelset.grid;ARRAY<T,VECTOR<int,3> >& phi=undeformed_levelset.levelset.phi;
-    grid=GRID<TV>::Create_Grid_Given_Cell_Size(box,(T)1e-2*box.Edge_Lengths().Max(),false,5);
+    grid=GRID<TV>::Create_Grid_Given_Cell_Size(box,box.Edge_Lengths().Max()/max_res,false,5);
     phi.Resize(grid.Domain_Indices());
     LEVELSET_MAKER_UNIFORM<T> levelset_maker;
     levelset_maker.Verbose_Mode();
@@ -304,7 +304,7 @@ Read_Or_Initialize_Implicit_Surface(const std::string& levelset_filename,TRIANGU
         LEVELSET_IMPLICIT_OBJECT<TV>& undeformed_levelset=*LEVELSET_IMPLICIT_OBJECT<TV>::Create();
         FILE_UTILITIES::Read_From_File(example.stream_type,levelset_filename,undeformed_levelset);
         return &undeformed_levelset;}
-    LEVELSET_IMPLICIT_OBJECT<TV>& undeformed_levelset=*Initialize_Implicit_Surface(undeformed_triangulated_surface);
+    LEVELSET_IMPLICIT_OBJECT<TV>& undeformed_levelset=*Initialize_Implicit_Surface(undeformed_triangulated_surface,100);
     FILE_UTILITIES::Create_Directory(example.output_directory);
     FILE_UTILITIES::Write_To_File(example.stream_type,levelset_filename,undeformed_levelset);
     return &undeformed_levelset;
