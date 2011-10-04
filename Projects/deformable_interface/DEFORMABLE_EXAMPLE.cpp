@@ -189,8 +189,8 @@ Add_Deformable_Body(const data_exchange::deformable_body& body,int body_index)
     TRIANGULATED_SURFACE<T>* tri_surface=0;
     tests.Create_Regular_Embedded_Surface(binding_list,*surface,density,125,(T)1e-5,&simulation_object_data(body_index+1)->particle_map,&tri_surface,&tet_volume);
 
-    int enclosing_structure=deformable_body_collection.deformable_geometry.Add_Structure(tet_volume);
-    int structure=deformable_body_collection.deformable_geometry.Add_Structure(tri_surface);
+    int structure=deformable_body_collection.deformable_geometry.structures.m;
+    int enclosing_structure=structure-1;
     simulation_object_data(body_index+1)->structure_index=structure;
     simulation_object_data(body_index+1)->encosing_structure_index=enclosing_structure;
 }
