@@ -481,7 +481,7 @@ template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::
 Test_Energy(const T time)
 {
     RANDOM_NUMBERS<T> random;
-    T e=(T)1e-6;
+    T e=(T)1e-5;
     ARRAY<TV> dX(particles.X.m);
     random.Fill_Uniform(dX,-e,e);
     ARRAY<TV> X2a(particles.X+dX);
@@ -509,7 +509,7 @@ template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::
 Test_Force_Derivatives(const T time)
 {
     RANDOM_NUMBERS<T> random;
-    T e=(T)1e-6;
+    T e=(T)1e-5;
     ARRAY<TV> dX(particles.X.m);
     random.Fill_Uniform(dX,-e,e);
     ARRAY<TV> X2a(particles.X+dX);
