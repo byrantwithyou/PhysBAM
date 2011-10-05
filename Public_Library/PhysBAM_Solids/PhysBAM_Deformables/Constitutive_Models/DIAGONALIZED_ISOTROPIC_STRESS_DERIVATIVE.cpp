@@ -55,6 +55,25 @@ Enforce_Definiteness(const T eigenvalue_clamp_percentage,const T epsilon)
     A3=SYMMETRIC_MATRIX<T,2>::Conjugate(V3,D3);x3131=A3.x11;x3113=A3.x21;
     A4=SYMMETRIC_MATRIX<T,2>::Conjugate(V4,D4);x3232=A4.x11;x3223=A4.x21;
 }
+template<class T> void DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>::
+Compute_From_Singular_Value_Derivatives(const DIAGONAL_MATRIX<T,3>& F,const VECTOR<T,3>& dE_ds,const SYMMETRIC_MATRIX<T,3>& dE_dsds)
+{
+    T ss1=sqr(F.x11),ss2=sqr(F.x22),ss3=sqr(F.x33);
+    T s12=1/(ss1-ss2),s13=1/(ss1-ss3),s23=1/(ss2-ss3);
+    
+    x1111=dE_dsds.x11;
+    x2211=dE_dsds.x21;
+    x2222=dE_dsds.x22;
+    x3311=dE_dsds.x31;
+    x3322=dE_dsds.x32;
+    x3333=dE_dsds.x33;
+    x2112=(-dE_ds.y*F.x11+dE_ds.x*F.x22)*s12;
+    x2121=(-dE_ds.y*F.x22+dE_ds.x*F.x11)*s12;
+    x3113=(-dE_ds.z*F.x11+dE_ds.x*F.x33)*s13;
+    x3131=(-dE_ds.z*F.x33+dE_ds.x*F.x11)*s13;
+    x3223=(-dE_ds.z*F.x22+dE_ds.y*F.x33)*s23;
+    x3232=(-dE_ds.z*F.x33+dE_ds.y*F.x22)*s23;
+}
 //#####################################################################
 template class DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<float,2>;
 template class DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<float,3>;

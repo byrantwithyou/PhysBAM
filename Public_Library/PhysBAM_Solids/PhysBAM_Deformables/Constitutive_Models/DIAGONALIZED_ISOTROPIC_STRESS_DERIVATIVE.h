@@ -45,6 +45,7 @@ public:
 
 //#####################################################################
     void Enforce_Definiteness(const T eigenvalue_clamp_percentage=(T)0,const T epsilon=(T)1e-4);
+    void Compute_From_Singular_Value_Derivatives(const DIAGONAL_MATRIX<T,3>& F,const VECTOR<T,3>& dE_ds,const SYMMETRIC_MATRIX<T,3>& dE_dsds); // Not robust
 //#####################################################################
 };
 }

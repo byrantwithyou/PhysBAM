@@ -133,27 +133,20 @@ template<class T> MATRIX<T,2> dI_dsigma_Helper(const DIAGONAL_MATRIX<T,2>& F)
 template<class T,int d> void COROTATED<T,d>::
 Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dPi_dF,const int tetrahedron) const
 {
-    typedef VECTOR<T,3> TV3;
-    DIAGONAL_MATRIX<T,3> Fm1=F-1,F2=F*F,CF=F.Cofactor_Matrix();
-    TV3 dE_ds=(T)2*constant_mu*Fm1.To_Vector()+constant_lambda*Fm1.Trace();
-    MATRIX<T,3> dE_dsds;for(int i=1;i<=d;i++) for(int j=1;j<=d;j++) dE_dsds(i,j)=constant_lambda;dE_dsds+=2*constant_mu;
-
-    T s1=F(1,1);
-    T s2=F(2,2);
-    T s3=F(3,3);
-    
-    dPi_dF.x1111 = dE_dsds(1,1);
-    dPi_dF.x2211 = dE_dsds(2,1);
-    dPi_dF.x2222 = dE_dsds(2,2);
-    dPi_dF.x3311 = dE_dsds(3,1);
-    dPi_dF.x3322 = dE_dsds(3,2);
-    dPi_dF.x3333 = dE_dsds(3,3);
-    dPi_dF.x2112=(-dE_ds.y * s1 + dE_ds.x * s2) / (s1 * s1 - s2 * s2);
-    dPi_dF.x2121=(-dE_ds.y * s2 + dE_ds.x * s1) / (s1 * s1 - s2 * s2);
-    dPi_dF.x3113=(-dE_ds.z * s1 + dE_ds.x * s3) / (s1 * s1 - s3 * s3);
-    dPi_dF.x3131=(-dE_ds.z * s3 + dE_ds.x * s1) / (s1 * s1 - s3 * s3);
-    dPi_dF.x3223=(-dE_ds.z * s2 + dE_ds.y * s3) / (-s3 * s3 + s2 * s2);
-    dPi_dF.x3232=(-dE_ds.z * s3 + dE_ds.y * s2) / (-s3 * s3 + s2 * s2);
+    T mu=constant_mu,la=constant_lambda,mu2la=2*mu+la,la3mu2=3*la+2*mu;
+    T i12=(la3mu2-la*F.x33)/(F.x11+F.x22),i13=(la3mu2-la*F.x22)/(F.x11+F.x33),i23=(la3mu2-la*F.x11)/(F.x22+F.x33);
+    dPi_dF.x1111=mu2la;
+    dPi_dF.x2222=mu2la;
+    dPi_dF.x3333=mu2la;
+    dPi_dF.x2211=la;
+    dPi_dF.x3311=la;
+    dPi_dF.x3322=la;
+    dPi_dF.x2112=i12-la;
+    dPi_dF.x3113=i13-la;
+    dPi_dF.x3223=i23-la;
+    dPi_dF.x2121=mu2la-i12;
+    dPi_dF.x3131=mu2la-i13;
+    dPi_dF.x3232=mu2la-i23;
 }
 //#####################################################################
 // Function Energy_Density
