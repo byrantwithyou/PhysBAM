@@ -1,3 +1,27 @@
+#include <PhysBAM_Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
+#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
+#include <PhysBAM_Geometry/Collision_Detection/COLLISION_GEOMETRY_SPATIAL_PARTITION.h>
+#include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
+#include <PhysBAM_Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
+#include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
+#include <PhysBAM_Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
+#include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
+#include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/BINDING_LIST.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/SOFT_BINDINGS.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISIONS.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/COROTATED.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Forces/DEFORMABLE_GRAVITY.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Forces/FINITE_VOLUME.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
+#include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
+#include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
 #include "DATA_EXCHANGE_CONVERSION.h"
 #include "DEFORMABLE_EXAMPLE.h"
 #include <boost/archive/binary_iarchive.hpp>
@@ -56,7 +80,6 @@ Initialize_Bodies() PHYSBAM_OVERRIDE
     BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
 
-    random_numbers.Set_Seed(1234);
     fluids_parameters.simulate=false;
     solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
     solids_parameters.cfl=1;
@@ -215,7 +238,7 @@ Add_Rigid_Body(const data_exchange::scripted_geometry& body,int body_index)
     TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create(particles);
     Triangulated_Surface_From_Data_Exchange(*surface,body.mesh,body.position,0);
     FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/geometry.%d.tri",output_directory.c_str(),body_index+1),*surface);
-    LEVELSET_IMPLICIT_OBJECT<TV>* implicit_object=tests.Initialize_Implicit_Surface(*surface);
+    LEVELSET_IMPLICIT_OBJECT<TV>* implicit_object=tests.Initialize_Implicit_Surface(*surface,20);
     RIGID_BODY<TV>& rigid_body=*tests.Create_Rigid_Body_From_Triangulated_Surface(*surface,solid_body_collection.rigid_body_collection,1);
     rigid_body.Add_Structure(*implicit_object);
     rigid_body.is_static=true;
@@ -258,7 +281,7 @@ Add_Force(const data_exchange::volumetric_force& force,int force_index)
         int structure=simulation_object_data(body+1)->encosing_structure_index;
         PHYSBAM_ASSERT(structure);
         if(TETRAHEDRALIZED_VOLUME<T>* volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.deformable_geometry.structures(structure))){
-            solid_body_collection.Add_Force(Create_Finite_Volume(*volume,new NEO_HOOKEAN<T,3>(force.stiffness,force.poissons_ratio,force.damping),false));}
+            solid_body_collection.Add_Force(Create_Finite_Volume(*volume,new COROTATED<T,3>(force.stiffness,force.poissons_ratio,force.damping),false));}
         else PHYSBAM_FATAL_ERROR();}
 }
 template class DEFORMABLE_EXAMPLE<float>;
