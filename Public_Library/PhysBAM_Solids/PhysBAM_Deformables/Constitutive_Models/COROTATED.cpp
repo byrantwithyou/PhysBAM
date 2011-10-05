@@ -93,39 +93,15 @@ P_From_Strain_Rate_Second_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<const T>
 template<class T,int d> void COROTATED<T,d>::
 Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& dP_dF,const int triangle) const
 {
-#if 0
-    DIAGONAL_MATRIX<T,2> F_inverse=F.Clamp_Min(failure_threshold).Inverse();
-    T mu_minus_lambda_logJ=constant_mu+constant_lambda*log(F_inverse.Determinant());
-    SYMMETRIC_MATRIX<T,2> F_inverse_outer=SYMMETRIC_MATRIX<T,2>::Outer_Product(F_inverse.To_Vector());
-    dP_dF.x1111=constant_mu+(constant_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x11;//alpha+beta+gamma
-    dP_dF.x2222=constant_mu+(constant_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x22;
-    dP_dF.x2211=constant_lambda*F_inverse_outer.x21;//gamma
-    dP_dF.x2121=constant_mu;//alpha
-    dP_dF.x2112=mu_minus_lambda_logJ*F_inverse_outer.x21;//beta
+    T mu=constant_mu,la=constant_lambda,mu2la=2*mu+la,la2mu2=2*la+2*mu;
+    T d12=F.x11+F.x22;if(fabs(d12)<panic_threshold) d12=d12<0?-panic_threshold:panic_threshold;
+    T i12=la2mu2/d12;
+    dP_dF.x1111=mu2la;
+    dP_dF.x2112=i12-la;
+    dP_dF.x2121=mu2la-i12;
+    dP_dF.x2211=la;
+    dP_dF.x2222=mu2la;
     if(enforce_definiteness) dP_dF.Enforce_Definiteness();
-#endif
-}
-//#####################################################################
-// Function dI_dsigma_Helper
-//#####################################################################
-namespace{
-template<class T> MATRIX<T,3> dI_dsigma_Helper(const DIAGONAL_MATRIX<T,3>& F)
-{
-    typedef VECTOR<T,3> TV;
-    TV FV=F.To_Vector();
-    TV row1=(T)2*FV;
-    TV row2=(T)4*FV*FV*FV;
-    TV row3=(T)2*FV.Product()*F.Cofactor_Matrix().To_Vector();
-    return MATRIX<T,3>(row1,row2,row3).Transposed();
-}
-template<class T> MATRIX<T,2> dI_dsigma_Helper(const DIAGONAL_MATRIX<T,2>& F)
-{
-    typedef VECTOR<T,2> TV;
-    TV FV=F.To_Vector();
-    TV row1=(T)2*FV;
-    TV row2=(T)2*FV.Product()*F.Cofactor_Matrix().To_Vector();
-    return MATRIX<T,2>(row1,row2).Transposed();
-}
 }
 //#####################################################################
 // Function Isotropic_Stress_Derivative
@@ -134,7 +110,10 @@ template<class T,int d> void COROTATED<T,d>::
 Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dPi_dF,const int tetrahedron) const
 {
     T mu=constant_mu,la=constant_lambda,mu2la=2*mu+la,la3mu2=3*la+2*mu;
-    T i12=(la3mu2-la*F.x33)/(F.x11+F.x22),i13=(la3mu2-la*F.x22)/(F.x11+F.x33),i23=(la3mu2-la*F.x11)/(F.x22+F.x33);
+    T d12=F.x11+F.x22;if(fabs(d12)<panic_threshold) d12=d12<0?-panic_threshold:panic_threshold;
+    T d13=F.x11+F.x33;if(fabs(d13)<panic_threshold) d13=d13<0?-panic_threshold:panic_threshold;
+    T d23=F.x22+F.x33;if(fabs(d23)<panic_threshold) d23=d23<0?-panic_threshold:panic_threshold;
+    T i12=(la3mu2-la*F.x33)/d12,i13=(la3mu2-la*F.x22)/d13,i23=(la3mu2-la*F.x11)/d23;
     dPi_dF.x1111=mu2la;
     dPi_dF.x2222=mu2la;
     dPi_dF.x3333=mu2la;
@@ -147,6 +126,7 @@ Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC
     dPi_dF.x2121=mu2la-i12;
     dPi_dF.x3131=mu2la-i13;
     dPi_dF.x3232=mu2la-i23;
+    if(enforce_definiteness) dPi_dF.Enforce_Definiteness();
 }
 //#####################################################################
 // Function Energy_Density
