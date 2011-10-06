@@ -8,6 +8,7 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/BINDING_LIST.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/LINEAR_BINDING.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/SOFT_BINDINGS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISIONS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
@@ -83,7 +84,7 @@ Initialize_Bodies() PHYSBAM_OVERRIDE
     fluids_parameters.simulate=false;
     solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
     solids_parameters.cfl=1;
-    solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+    solids_parameters.triangle_collision_parameters.perform_self_collision=true;
     solids_parameters.triangle_collision_parameters.output_interaction_pairs=true;
     solids_parameters.rigid_body_collision_parameters.use_push_out=true;
     solids_parameters.use_rigid_deformable_contact=true;
@@ -93,7 +94,6 @@ Initialize_Bodies() PHYSBAM_OVERRIDE
     solids_parameters.verbose_dt=true;
     solids_parameters.triangle_collision_parameters.total_collision_loops=1;
     solids_parameters.implicit_solve_parameters.cg_projection_iterations=20;
-    solids_parameters.triangle_collision_parameters.perform_self_collision=false;
     solids_parameters.enforce_repulsions_in_cg=false;
     solids_parameters.enforce_poststabilization_in_cg=true;
     solids_parameters.triangle_collision_parameters.collisions_nonrigid_collision_attempts=30;
@@ -122,6 +122,15 @@ Initialize_Bodies() PHYSBAM_OVERRIDE
         else if(data_exchange::scripted_geometry* body=dynamic_cast<data_exchange::scripted_geometry*>(dbs.simulation_objects[i]))
             Add_Rigid_Body(*body,i);}
 
+    for(int i=1;i<=soft_bindings.use_impulses_for_collisions.m;i++)
+        if(soft_bindings.use_impulses_for_collisions(i))
+            soft_bindings.bindings_using_impulses_for_collisions.Append(i);
+
+    binding_list.Clamp_Particles_To_Embedded_Positions();
+    binding_list.Clamp_Particles_To_Embedded_Velocities();
+    soft_bindings.Clamp_Particles_To_Embedded_Positions(true);
+    soft_bindings.Clamp_Particles_To_Embedded_Velocities(true);
+
     // correct number nodes
     for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
@@ -143,12 +152,11 @@ Initialize_Bodies() PHYSBAM_OVERRIDE
     filename_base=dbs.filename_base;
 
     // add structures and rigid bodies to collisions
-    deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
-    solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
 
     for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++){
-        deformable_body_collection.collisions.collision_structures.Append(deformable_body_collection.deformable_geometry.structures(i));
-        if(solids_parameters.triangle_collision_parameters.perform_self_collision && !dynamic_cast<FREE_PARTICLES<TV>*>(deformable_body_collection.deformable_geometry.structures(i)))
+        if(dynamic_cast<FREE_PARTICLES<TV>*>(deformable_body_collection.deformable_geometry.structures(i))){
+            deformable_body_collection.collisions.collision_structures.Append(deformable_body_collection.deformable_geometry.structures(i));}
+        if(solids_parameters.triangle_collision_parameters.perform_self_collision && dynamic_cast<TRIANGULATED_SURFACE<T>*>(deformable_body_collection.deformable_geometry.structures(i)))
             solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append(deformable_body_collection.deformable_geometry.structures(i));}
 
     // disable strain rate CFL for all forces
@@ -200,8 +208,10 @@ template<class T> void DEFORMABLE_EXAMPLE<T>::
 Add_Deformable_Body(const data_exchange::deformable_body& body,int body_index)
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
+    PARTICLES<TV>& particles=deformable_body_collection.particles;
     BINDING_LIST<TV>& binding_list=deformable_body_collection.binding_list;
     TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
+    SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
     ARRAY<int> parent_index;
     Triangulated_Surface_From_Data_Exchange(*surface,body.mesh,body.position,&parent_index);
 
@@ -210,12 +220,15 @@ Add_Deformable_Body(const data_exchange::deformable_body& body,int body_index)
 
     TETRAHEDRALIZED_VOLUME<T>* tet_volume=0;
     TRIANGULATED_SURFACE<T>* tri_surface=0;
-    tests.Create_Regular_Embedded_Surface(binding_list,*surface,density,125,(T)1e-5,&simulation_object_data(body_index+1)->particle_map,&tri_surface,&tet_volume);
+    ARRAY<int>& particle_map=simulation_object_data(body_index+1)->particle_map;
+    tests.Create_Regular_Embedded_Surface(binding_list,soft_bindings,*surface,density,1000,(T)1e-5,particle_map,&tri_surface,&tet_volume,true);
 
     int structure=deformable_body_collection.deformable_geometry.structures.m;
-    int enclosing_structure=structure-1;
+    int enclosing_structure=structure-2;
     simulation_object_data(body_index+1)->structure_index=structure;
     simulation_object_data(body_index+1)->encosing_structure_index=enclosing_structure;
+
+    tests.Substitute_Soft_Bindings_For_Embedded_Nodes(*tri_surface,soft_bindings);
 }
 //#####################################################################
 // Function Add_Rigid_Body
