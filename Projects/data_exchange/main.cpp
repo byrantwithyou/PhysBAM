@@ -78,7 +78,8 @@ int main() {
     volumetric_force* vf = new volumetric_force;
     vf->bodies_affected.push_back(0);
     vf->bodies_affected.push_back(1);
-    vf->stiffness=1e2;
+    vf->stiffness=1e3;
+    vf->damping=.01;
     dbs.simulation_forces.push_back(vf);
 
     // This forces makes the bodies fall.  It is applied to both deformable
