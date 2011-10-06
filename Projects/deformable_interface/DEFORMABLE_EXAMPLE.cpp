@@ -208,7 +208,6 @@ template<class T> void DEFORMABLE_EXAMPLE<T>::
 Add_Deformable_Body(const data_exchange::deformable_body& body,int body_index)
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
     BINDING_LIST<TV>& binding_list=deformable_body_collection.binding_list;
     TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
@@ -251,8 +250,8 @@ Add_Rigid_Body(const data_exchange::scripted_geometry& body,int body_index)
     TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create(particles);
     Triangulated_Surface_From_Data_Exchange(*surface,body.mesh,body.position,0);
     FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/geometry.%d.tri",output_directory.c_str(),body_index+1),*surface);
-    LEVELSET_IMPLICIT_OBJECT<TV>* implicit_object=tests.Initialize_Implicit_Surface(*surface,20);
     RIGID_BODY<TV>& rigid_body=*tests.Create_Rigid_Body_From_Triangulated_Surface(*surface,solid_body_collection.rigid_body_collection,1);
+    LEVELSET_IMPLICIT_OBJECT<TV>* implicit_object=tests.Initialize_Implicit_Surface(*surface,20);
     rigid_body.Add_Structure(*implicit_object);
     rigid_body.is_static=true;
     solid_body_collection.rigid_body_collection.Add_Rigid_Body_And_Geometry(&rigid_body);
