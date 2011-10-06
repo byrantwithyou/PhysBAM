@@ -7,6 +7,7 @@
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/SEGMENTED_CURVE_2D_SIGNED_DISTANCE.h>
 #include <PhysBAM_Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
+#include <PhysBAM_Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/BINDING_LIST.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
@@ -176,6 +177,16 @@ Create_Rigid_Body_From_Triangulated_Surface(TRIANGULATED_SURFACE<T>& triangulate
     return rigid_body;
 }
 //#####################################################################
+// Function Create_From_Triangulated_Surface
+//#####################################################################
+template<class TV> RIGID_BODY<TV>* SOLIDS_STANDARD_TESTS<TV>::
+Create_Rigid_Body_From_Triangulated_Surface(TRIANGULATED_SURFACE<T>& triangulated_surface,RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const T density,int levelset_resolution)
+{
+    RIGID_BODY<TV>* rigid_body=Create_Rigid_Body_From_Triangulated_Surface(triangulated_surface,rigid_body_collection,density);
+    rigid_body->Add_Structure(*Initialize_Implicit_Surface(triangulated_surface,20));
+    return rigid_body;
+}
+//#####################################################################
 // Function Create_From_Triangulated_Area
 //#####################################################################
 template<class TV> RIGID_BODY<TV>* SOLIDS_STANDARD_TESTS<TV>::
@@ -245,6 +256,8 @@ template void SOLIDS_STANDARD_TESTS<VECTOR<float,2> >::Add_Gravity();
 template void SOLIDS_STANDARD_TESTS<VECTOR<float,2> >::Bind_Unbound_Particles_In_Rigid_Body<ARRAY<int,int> >(RIGID_BODY<VECTOR<float,2> >&,ARRAY<int,int> const&);
 template RIGID_BODY<VECTOR<float,3> >* SOLIDS_STANDARD_TESTS<VECTOR<float,3> >::Create_Rigid_Body_From_Triangulated_Surface(TRIANGULATED_SURFACE<float>&,
     RIGID_BODY_COLLECTION<VECTOR<float,3> >&,float);
+template RIGID_BODY<VECTOR<float,3> >* SOLIDS_STANDARD_TESTS<VECTOR<float,3> >::Create_Rigid_Body_From_Triangulated_Surface(TRIANGULATED_SURFACE<float>&,
+    RIGID_BODY_COLLECTION<VECTOR<float,3> >&,float,int);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 INSTANTIATION_HELPER2(double);
 template SOLIDS_STANDARD_TESTS<VECTOR<double,2> >::SOLIDS_STANDARD_TESTS(EXAMPLE<VECTOR<double,2> >&,SOLID_BODY_COLLECTION<VECTOR<double,2> >&);
@@ -252,4 +265,6 @@ template void SOLIDS_STANDARD_TESTS<VECTOR<double,2> >::Add_Gravity();
 template void SOLIDS_STANDARD_TESTS<VECTOR<double,2> >::Bind_Unbound_Particles_In_Rigid_Body<ARRAY<int,int> >(RIGID_BODY<VECTOR<double,2> >&,ARRAY<int,int> const&);
 template RIGID_BODY<VECTOR<double,3> >* SOLIDS_STANDARD_TESTS<VECTOR<double,3> >::Create_Rigid_Body_From_Triangulated_Surface(TRIANGULATED_SURFACE<double>&,
     RIGID_BODY_COLLECTION<VECTOR<double,3> >&,double);
+template RIGID_BODY<VECTOR<double,3> >* SOLIDS_STANDARD_TESTS<VECTOR<double,3> >::Create_Rigid_Body_From_Triangulated_Surface(TRIANGULATED_SURFACE<double>&,
+    RIGID_BODY_COLLECTION<VECTOR<double,3> >&,double,int);
 #endif

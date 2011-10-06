@@ -62,6 +62,7 @@ public:
         RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const T density,const T cell_size,const int subdivision_loops=0,const bool perform_manifold_check=false,
         const bool (*create_levelset_test)(TETRAHEDRALIZED_VOLUME<T>&)=0,const bool use_implicit_surface_maker=true,const int levels_of_octree=0);
     RIGID_BODY<TV>* Create_Rigid_Body_From_Triangulated_Surface(TRIANGULATED_SURFACE<T>& triangulated_surface,RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const T density);
+    RIGID_BODY<TV>* Create_Rigid_Body_From_Triangulated_Surface(TRIANGULATED_SURFACE<T>& triangulated_surface,RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const T density,int levelset_resolution);
     static RIGID_BODY<TV>* Create_Rigid_Body_From_Triangulated_Area(TRIANGULATED_AREA<T>& triangulated_area,RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const T density,
         const T cell_size,const bool move_body_to_center_of_mass=false,const bool move_only_mesh_particles=false);
 //#####################################################################
