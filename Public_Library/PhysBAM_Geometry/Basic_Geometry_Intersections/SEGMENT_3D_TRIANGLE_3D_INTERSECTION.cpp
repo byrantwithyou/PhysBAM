@@ -27,7 +27,7 @@ template<class T> bool Intersects(const SEGMENT_3D<T>& segment,const TRIANGLE_3D
 {
     RAY<VECTOR<T,3> > ray(segment.x1,segment.x2-segment.x1);ray.semi_infinite=false;
     T magnitude=(segment.x2-segment.x1).Magnitude();ray.t_max=magnitude;
-    if(!INTERSECTION::Intersects(ray,triangle,thickness_over_two)){a=ray.t_max/magnitude;weights=triangle.Barycentric_Coordinates(ray.Point(ray.t_max));return true;}
+    if(INTERSECTION::Intersects(ray,triangle,thickness_over_two)){a=ray.t_max/magnitude;weights=triangle.Barycentric_Coordinates(ray.Point(ray.t_max));return true;}
     return false;
 }
 //#####################################################################
