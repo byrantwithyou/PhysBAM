@@ -3,4 +3,5 @@
 Import('env Automatic_Program')
 env=env.Copy(USE_BOOST_SERIALIZATION=1)
 Automatic_Program(env,"deformable_interface",["main.cpp","DEFORMABLE_EXAMPLE.cpp"])
+Automatic_Program(env,"dump_geometry",["dump_geometry.cpp"])
 
