@@ -96,14 +96,16 @@ public:
     void PD_Curl(const T scale,const TV shift,const ROTATION<TV> orient,const T k_p,const int number_of_joints,const bool parent_static=true,const T friction=.5);
     TRIANGULATED_SURFACE<T>& Create_Cloth_Panel(const int number_side_panels,const T side_length,const T aspect_ratio,const RIGID_GEOMETRY_STATE<TV>* initial_state,
         TRIANGULATED_SURFACE_CLIPPING_HELPER<T> *clipping_function,ARRAY<int>* particle_indices);
-    void Embed_Particles_In_Tetrahedralized_Volume(BINDING_LIST<VECTOR<T,3> >& binding_list,const POINT_CLOUD_SUBSET<VECTOR<T,3>,PARTICLES<VECTOR<T,3> > >& particles_to_embed,
-        TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,const T thickness_over_two);
+    void Embed_Particles_In_Tetrahedralized_Volume(BINDING_LIST<VECTOR<T,3> >& binding_list,const POINT_CLOUD_SUBSET<VECTOR<T,3>,
+        PARTICLES<VECTOR<T,3> > >& particles_to_embed,TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,const T thickness_over_two);
     void Mark_Hard_Bindings_With_Free_Particles();
-    void Find_Intersected_Segments_Triangles(SEGMENTED_CURVE<TV>& segments,TRIANGULATED_SURFACE<T>& surface,ARRAY<bool>* segments_intersected,ARRAY<bool>* triangles_intersected,T thickness_over_two);
-    void Embed_Surface_In_Tetrahedralized_Volume(BINDING_LIST<VECTOR<T,3> >& binding_list,TRIANGULATED_SURFACE<T>& surface,TETRAHEDRALIZED_VOLUME<T>& volume,const T thickness_over_two,
-        ARRAY<int>* surface_particle_map,ARRAY<int>* volume_particle_map,bool prune_volume,TRIANGULATED_SURFACE<T>** new_surface,TETRAHEDRALIZED_VOLUME<T>** new_volume);
-    void Create_Regular_Embedded_Surface(BINDING_LIST<VECTOR<T,3> >& binding_list,TRIANGULATED_SURFACE<T>& surface,T density,int approx_volume,const T thickness_over_two,
-        ARRAY<int>* surface_particle_map,TRIANGULATED_SURFACE<T>** new_surface,TETRAHEDRALIZED_VOLUME<T>** new_volume);
+    void Find_Intersected_Segments_Triangles(SEGMENTED_CURVE<TV>& segments,TRIANGULATED_SURFACE<T>& surface,ARRAY<bool>* segments_intersected,ARRAY<bool>* triangles_intersected,
+        T thickness_over_two,ARRAY<T>* segment_weights,ARRAY<VECTOR<T,3> >* triangle_weights);
+    void Embed_Surface_In_Tetrahedralized_Volume(BINDING_LIST<TV>& binding_list,SOFT_BINDINGS<TV>& soft_bindings,TRIANGULATED_SURFACE<T>& surface,
+        TETRAHEDRALIZED_VOLUME<T>& volume,const T thickness_over_two,ARRAY<int>& surface_particle_map,ARRAY<int>& volume_particle_map,
+        TRIANGULATED_SURFACE<T>** new_surface,TETRAHEDRALIZED_VOLUME<T>** new_volume,bool bind_edges);
+    void Create_Regular_Embedded_Surface(BINDING_LIST<TV>& binding_list,SOFT_BINDINGS<TV>& soft_bindings,TRIANGULATED_SURFACE<T>& surface,T density,int approx_volume,
+        const T thickness_over_two,ARRAY<int>& surface_particle_map,TRIANGULATED_SURFACE<T>** new_surface,TETRAHEDRALIZED_VOLUME<T>** new_volume,bool bind_edges);
 //#####################################################################
 };
 }

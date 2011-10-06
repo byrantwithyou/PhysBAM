@@ -426,29 +426,35 @@ Embed_Particles_In_Tetrahedralized_Volume(BINDING_LIST<VECTOR<T,3> >& binding_li
 // Function Find_Intersected_Segments_Triangles
 //#####################################################################
 template<class TV> void DEFORMABLES_STANDARD_TESTS<TV>::
-Find_Intersected_Segments_Triangles(SEGMENTED_CURVE<TV>& segments,TRIANGULATED_SURFACE<T>& surface,ARRAY<bool>* segments_intersected,ARRAY<bool>* triangles_intersected,T thickness_over_two)
+Find_Intersected_Segments_Triangles(SEGMENTED_CURVE<TV>& segments,TRIANGULATED_SURFACE<T>& surface,ARRAY<bool>* segments_intersected,ARRAY<bool>* triangles_intersected,T thickness_over_two,ARRAY<T>* segment_weights,ARRAY<VECTOR<T,3> >* triangle_weights)
 {
     bool hierarchy_initialized=surface.hierarchy!=0;if(!hierarchy_initialized) surface.Initialize_Hierarchy();
     ARRAY<int> candidates;
     if(segments_intersected){segments_intersected->Remove_All();segments_intersected->Resize(segments.mesh.elements.m);}
     if(triangles_intersected){triangles_intersected->Remove_All();triangles_intersected->Resize(surface.mesh.elements.m);}
+    if(segment_weights){segment_weights->Remove_All();segment_weights->Resize(segments.mesh.elements.m);}
+    if(triangle_weights){triangle_weights->Remove_All();triangle_weights->Resize(surface.mesh.elements.m);}
+    T segment_weight=0;
+    VECTOR<T,3> triangle_weight;
     for(int i=1;i<=segments.mesh.elements.m;i++){
         SEGMENT_3D<T> segment(segments.particles.X.Subset(segments.mesh.elements(i)));
         RANGE<TV> box(segment.x1);
         box.Enlarge_To_Include_Point(segment.x2);
         surface.hierarchy->Intersection_List(box,candidates,thickness_over_two);
         for(int j=1;j<=candidates.m;j++)
-            if(INTERSECTION::Intersects(segment,surface.Get_Element(candidates(j)),thickness_over_two)){
+            if(INTERSECTION::Intersects(segment,surface.Get_Element(candidates(j)),segment_weight,triangle_weight,thickness_over_two)){
                 if(segments_intersected) (*segments_intersected)(i)=true;
-                if(triangles_intersected) (*triangles_intersected)(candidates(j))=true;}}
+                if(triangles_intersected) (*triangles_intersected)(candidates(j))=true;
+                if(segment_weights) (*segment_weights)(i)=segment_weight;
+                if(triangle_weights) (*triangle_weights)(candidates(j))=triangle_weight;}}
     if(!hierarchy_initialized){delete surface.hierarchy;surface.hierarchy=0;}
 }
 //#####################################################################
 // Function Embed_Surface_In_Tetrahedralized_Volume
 //#####################################################################
 template<class TV> void DEFORMABLES_STANDARD_TESTS<TV>::
-Embed_Surface_In_Tetrahedralized_Volume(BINDING_LIST<VECTOR<T,3> >& binding_list,TRIANGULATED_SURFACE<T>& surface,TETRAHEDRALIZED_VOLUME<T>& volume,const T thickness_over_two,
-    ARRAY<int>* surface_particle_map,ARRAY<int>* volume_particle_map,bool prune_volume,TRIANGULATED_SURFACE<T>** new_surface,TETRAHEDRALIZED_VOLUME<T>** new_volume)
+Embed_Surface_In_Tetrahedralized_Volume(BINDING_LIST<TV>& binding_list,SOFT_BINDINGS<TV>& soft_bindings,TRIANGULATED_SURFACE<T>& surface,TETRAHEDRALIZED_VOLUME<T>& volume,const T thickness_over_two,
+    ARRAY<int>& surface_particle_map,ARRAY<int>& volume_particle_map,TRIANGULATED_SURFACE<T>** new_surface,TETRAHEDRALIZED_VOLUME<T>** new_volume,bool bind_edges)
 {
     if(!volume.tetrahedron_list) volume.Update_Tetrahedron_List();
     if(!volume.hierarchy) volume.Initialize_Hierarchy();
@@ -467,70 +473,84 @@ Embed_Surface_In_Tetrahedralized_Volume(BINDING_LIST<VECTOR<T,3> >& binding_list
         point_to_tet(p)=volume.Find(surface.particles.X(p),thickness_over_two,candidates);
         weights(p)=(*volume.tetrahedron_list)(point_to_tet(p)).First_Three_Barycentric_Coordinates(surface.particles.X(p));}
 
-    if(prune_volume){
-        ARRAY<int> tet_color(volume.mesh.elements.m); // 0=unknown, 1=boundary, 2=inside, 3=outside
-        for(int i=1;i<=point_to_tet.m;i++) tet_color(point_to_tet(i))=1;
+    HASHTABLE<VECTOR<int,2> > marked_segments;
+    SEGMENTED_CURVE<TV> volume_segments(*volume.mesh.segment_mesh,volume.particles);
+    ARRAY<bool> segment_intersected(volume_segments.mesh.elements.m);
+    ARRAY<T> binding_weights;
+    Find_Intersected_Segments_Triangles(volume_segments,surface,&segment_intersected,0,thickness_over_two,bind_edges?&binding_weights:0,0);
+    for(int i=1;i<=segment_intersected.m;i++) if(segment_intersected(i)) marked_segments.Set(volume_segments.mesh.elements(i).Sorted());
 
-        SEGMENTED_CURVE<TV> volume_segments(*volume.mesh.segment_mesh,volume.particles);
-        ARRAY<bool> segment_intersected(volume_segments.mesh.elements.m);
-        Find_Intersected_Segments_Triangles(volume_segments,surface,&segment_intersected,0,thickness_over_two);
-        HASHTABLE<VECTOR<int,2> > marked_segments;
-        for(int i=1;i<=segment_intersected.m;i++) if(segment_intersected(i)) marked_segments.Set(volume_segments.mesh.elements(i).Sorted());
+    ARRAY<PAIR<VECTOR<int,2>,T> > edge_bindings;
+    if(bind_edges){
+        for(int i=1;i<=segment_intersected.m;i++)
+            if(segment_intersected(i))
+                edge_bindings.Append(PAIR<VECTOR<int,2>,T>(volume.mesh.segment_mesh->elements(i),binding_weights(i)));}
 
-        TRIANGULATED_SURFACE<T> volume_triangles(*volume.mesh.triangle_mesh,volume.particles);
-        SEGMENTED_CURVE<TV> surface_segments(*surface.mesh.segment_mesh,surface.particles);
-        ARRAY<bool> triangle_intersected(volume_triangles.mesh.elements.m);
-        Find_Intersected_Segments_Triangles(surface_segments,volume_triangles,0,&triangle_intersected,thickness_over_two);
-        HASHTABLE<VECTOR<int,3> > marked_triangles;
-        for(int i=1;i<=triangle_intersected.m;i++) if(triangle_intersected(i)) marked_triangles.Set(volume_triangles.mesh.elements(i).Sorted());
+    ARRAY<int> tet_color(volume.mesh.elements.m); // 0=unknown, 1=boundary, 2=inside, 3=outside
+    for(int i=1;i<=point_to_tet.m;i++) tet_color(point_to_tet(i))=1;
 
-        for(int i=1;i<=volume.mesh.elements.m;i++){
-            int a,b,c,d;volume.mesh.elements(i).Get(a,b,c,d);
-            if(marked_triangles.Contains(VECTOR<int,3>(a,b,c).Sorted())){tet_color(i)=1;continue;}
-            if(marked_triangles.Contains(VECTOR<int,3>(a,b,d).Sorted())){tet_color(i)=1;continue;}
-            if(marked_triangles.Contains(VECTOR<int,3>(a,c,d).Sorted())){tet_color(i)=1;continue;}
-            if(marked_triangles.Contains(VECTOR<int,3>(b,c,d).Sorted())){tet_color(i)=1;continue;}
-            if(marked_segments.Contains(VECTOR<int,2>(a,b).Sorted())){tet_color(i)=1;continue;}
-            if(marked_segments.Contains(VECTOR<int,2>(a,c).Sorted())){tet_color(i)=1;continue;}
-            if(marked_segments.Contains(VECTOR<int,2>(a,d).Sorted())){tet_color(i)=1;continue;}
-            if(marked_segments.Contains(VECTOR<int,2>(b,c).Sorted())){tet_color(i)=1;continue;}
-            if(marked_segments.Contains(VECTOR<int,2>(b,d).Sorted())){tet_color(i)=1;continue;}
-            if(marked_segments.Contains(VECTOR<int,2>(c,d).Sorted())){tet_color(i)=1;continue;}}
+    TRIANGULATED_SURFACE<T> volume_triangles(*volume.mesh.triangle_mesh,volume.particles);
+    SEGMENTED_CURVE<TV> surface_segments(*surface.mesh.segment_mesh,surface.particles);
+    ARRAY<bool> triangle_intersected(volume_triangles.mesh.elements.m);
+    Find_Intersected_Segments_Triangles(surface_segments,volume_triangles,0,&triangle_intersected,thickness_over_two,0,0);
+    HASHTABLE<VECTOR<int,3> > marked_triangles;
+    for(int i=1;i<=triangle_intersected.m;i++) if(triangle_intersected(i)) marked_triangles.Set(volume_triangles.mesh.elements(i).Sorted());
+    
+    for(int i=1;i<=volume.mesh.elements.m;i++){
+        int a,b,c,d;volume.mesh.elements(i).Get(a,b,c,d);
+        if(marked_triangles.Contains(VECTOR<int,3>(a,b,c).Sorted())){tet_color(i)=1;continue;}
+        if(marked_triangles.Contains(VECTOR<int,3>(a,b,d).Sorted())){tet_color(i)=1;continue;}
+        if(marked_triangles.Contains(VECTOR<int,3>(a,c,d).Sorted())){tet_color(i)=1;continue;}
+        if(marked_triangles.Contains(VECTOR<int,3>(b,c,d).Sorted())){tet_color(i)=1;continue;}
+        if(marked_segments.Contains(VECTOR<int,2>(a,b).Sorted())){tet_color(i)=1;continue;}
+        if(marked_segments.Contains(VECTOR<int,2>(a,c).Sorted())){tet_color(i)=1;continue;}
+        if(marked_segments.Contains(VECTOR<int,2>(a,d).Sorted())){tet_color(i)=1;continue;}
+        if(marked_segments.Contains(VECTOR<int,2>(b,c).Sorted())){tet_color(i)=1;continue;}
+        if(marked_segments.Contains(VECTOR<int,2>(b,d).Sorted())){tet_color(i)=1;continue;}
+        if(marked_segments.Contains(VECTOR<int,2>(c,d).Sorted())){tet_color(i)=1;continue;}}
 
-        ARRAY<int> todo;
-        for(int i=1;i<=volume.mesh.elements.m;i++){
-            if(tet_color(i)) continue;
-            int color=TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Outside(surface,volume.particles.X(volume.mesh.elements(i)(1)),thickness_over_two)?3:2;
-            tet_color(i)=color;
-            todo.Append(i);
-            while(todo.m){
-                int j=todo.Pop();
-                ARRAY<int>& list=(*volume.mesh.adjacent_elements)(j);
-                for(int k=1;k<=list.m;k++){
-                    int e=list(k);
-                    if(!tet_color(e)){
-                        tet_color(e)=color;
-                        todo.Append(e);}}}}
+    ARRAY<int> todo;
+    for(int i=1;i<=volume.mesh.elements.m;i++){
+        if(tet_color(i)) continue;
+        int color=TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Outside(surface,volume.particles.X(volume.mesh.elements(i)(1)),thickness_over_two)?3:2;
+        tet_color(i)=color;
+        todo.Append(i);
+        while(todo.m){
+            int j=todo.Pop();
+            ARRAY<int>& list=(*volume.mesh.adjacent_elements)(j);
+            for(int k=1;k<=list.m;k++){
+                int e=list(k);
+                if(!tet_color(e)){
+                    tet_color(e)=color;
+                    todo.Append(e);}}}}
 
-        ARRAY<int> tet_map(volume.mesh.elements.m);
-        int k=0;
-        for(int i=1;i<=volume.mesh.elements.m;i++){
-            if(tet_color(i)!=3){
-                volume.mesh.elements(++k)=volume.mesh.elements(i);
-                tet_map(i)=k;}}
-        volume.mesh.elements.Resize(k);
-        for(int i=1;i<=point_to_tet.m;i++) point_to_tet(i)=tet_map(point_to_tet(i));
-        ARRAY<int> particle_map;
-        volume.Discard_Valence_Zero_Particles_And_Renumber(particle_map);
-        if(volume_particle_map) volume_particle_map->Exchange(particle_map);}
+    ARRAY<int> tet_map(volume.mesh.elements.m);
+    int k=0;
+    for(int i=1;i<=volume.mesh.elements.m;i++){
+        if(tet_color(i)!=3){
+            volume.mesh.elements(++k)=volume.mesh.elements(i);
+            tet_map(i)=k;}}
+    volume.mesh.elements.Resize(k);
+    for(int i=1;i<=point_to_tet.m;i++) point_to_tet(i)=tet_map(point_to_tet(i));
+    volume.Discard_Valence_Zero_Particles_And_Renumber(volume_particle_map);
 
     volume.Update_Number_Nodes();
     ARRAY<int> particle_indices;
     TETRAHEDRALIZED_VOLUME<T>& new_v=Copy_And_Add_Structure(volume,&particle_indices);
     if(new_volume) *new_volume=&new_v;
-    if(volume_particle_map){
-        if(!prune_volume) volume_particle_map->Exchange(particle_indices);
-        else for(int i=1;i<=volume_particle_map->m;i++) (*volume_particle_map)(i)=particle_indices((*volume_particle_map)(i));}
+    for(int i=1;i<=volume_particle_map.m;i++) volume_particle_map(i)=particle_indices(volume_particle_map(i));
+
+    if(bind_edges){
+        FREE_PARTICLES<TV>* free_particles=new FREE_PARTICLES<TV>;
+        for(int i=1;i<=edge_bindings.m;i++){
+            int hb=binding_list.particles.array_collection->Add_Element();
+            int sb=binding_list.particles.array_collection->Add_Element();
+            VECTOR<int,2> pa(volume_particle_map.Subset(edge_bindings(i).x));
+            VECTOR<T,2> we(1-edge_bindings(i).y,edge_bindings(i).y);
+            binding_list.Add_Binding(new LINEAR_BINDING<TV,2>(binding_list.particles,hb,pa,we));
+            soft_bindings.Add_Binding(VECTOR<int,2>(sb,hb),true);
+            free_particles->nodes.Append(sb);}
+        deformable_body_collection.deformable_geometry.Add_Structure(free_particles);}
 
     particle_indices.Remove_All();
     TRIANGULATED_SURFACE<T>& new_s=Copy_And_Add_Structure(surface,&particle_indices);
@@ -538,14 +558,13 @@ Embed_Surface_In_Tetrahedralized_Volume(BINDING_LIST<VECTOR<T,3> >& binding_list
     for(int i=1;i<=point_to_tet.m;i++){
         VECTOR<int,4> vertices=new_v.mesh.elements(point_to_tet(i));
         binding_list.Add_Binding(new LINEAR_BINDING<VECTOR<T,3>,4>(binding_list.particles,particle_indices(i),vertices,weights(i)));}
-    if(surface_particle_map) surface_particle_map->Exchange(particle_indices);
 }
 //#####################################################################
 // Function Create_Embedded_Surface
 //#####################################################################
 template<class TV> void DEFORMABLES_STANDARD_TESTS<TV>::
-Create_Regular_Embedded_Surface(BINDING_LIST<VECTOR<T,3> >& binding_list,TRIANGULATED_SURFACE<T>& surface,T density,int approx_volume,const T thickness_over_two,ARRAY<int>* surface_particle_map,
-    TRIANGULATED_SURFACE<T>** new_surface,TETRAHEDRALIZED_VOLUME<T>** new_volume)
+Create_Regular_Embedded_Surface(BINDING_LIST<TV>& binding_list,SOFT_BINDINGS<TV>& soft_bindings,TRIANGULATED_SURFACE<T>& surface,T density,int approx_volume,const T thickness_over_two,ARRAY<int>& surface_particle_map,
+    TRIANGULATED_SURFACE<T>** new_surface,TETRAHEDRALIZED_VOLUME<T>** new_volume,bool bind_edges)
 {
     surface.Update_Bounding_Box();
     RANGE<TV> box(*surface.bounding_box);
@@ -559,7 +578,8 @@ Create_Regular_Embedded_Surface(BINDING_LIST<VECTOR<T,3> >& binding_list,TRIANGU
     volume.Initialize_Cube_Mesh_And_Particles(grid);
     particles.Store_Velocity();
     Set_Mass_Of_Particles(volume,density,true);
-    Embed_Surface_In_Tetrahedralized_Volume(binding_list,surface,volume,thickness_over_two,surface_particle_map,0,true,new_surface,new_volume);
+    ARRAY<int> volume_map;
+    Embed_Surface_In_Tetrahedralized_Volume(binding_list,soft_bindings,surface,volume,thickness_over_two,surface_particle_map,volume_map,new_surface,new_volume,bind_edges);
 }
 //#####################################################################
 // Function Mark_Hard_Bindings_With_Free_Particles
@@ -619,14 +639,16 @@ template void DEFORMABLES_STANDARD_TESTS<VECTOR<float,3> >::Mark_Hard_Bindings_W
 template SEGMENTED_CURVE_2D<float>& DEFORMABLES_STANDARD_TESTS<VECTOR<float,2> >::Copy_And_Add_Structure<SEGMENTED_CURVE_2D<float> >(SEGMENTED_CURVE_2D<float>&,ARRAY<int,int>*);
 template void DEFORMABLES_STANDARD_TESTS<VECTOR<float,3> >::Set_Mass_Of_Particles<TRIANGULATED_SURFACE<float> >(TRIANGULATED_SURFACE<float> const&,float,bool);
 template void DEFORMABLES_STANDARD_TESTS<VECTOR<float,1> >::Set_Mass_Of_Particles<SEGMENTED_CURVE<VECTOR<float,1> > >(SEGMENTED_CURVE<VECTOR<float,1> > const&,float,bool);
-template void DEFORMABLES_STANDARD_TESTS<VECTOR<float,3> >::Create_Regular_Embedded_Surface(BINDING_LIST<VECTOR<float,3> >&,TRIANGULATED_SURFACE<float>&,float,int,float,ARRAY<int,int>*,
-    TRIANGULATED_SURFACE<float>**,TETRAHEDRALIZED_VOLUME<float>**);
+template void DEFORMABLES_STANDARD_TESTS<VECTOR<float,3> >::Create_Regular_Embedded_Surface(BINDING_LIST<VECTOR<float,3> >&,SOFT_BINDINGS<VECTOR<float,3> >&,
+    TRIANGULATED_SURFACE<float>&,float,int,float,ARRAY<int,int>&,TRIANGULATED_SURFACE<float>**,TETRAHEDRALIZED_VOLUME<float>**,bool);
+template LEVELSET_IMPLICIT_OBJECT<VECTOR<float,3> >* DEFORMABLES_STANDARD_TESTS<VECTOR<float,3> >::Initialize_Implicit_Surface(TRIANGULATED_SURFACE<float>&,int) const;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 INSTANTIATION_HELPER(double);
 template void DEFORMABLES_STANDARD_TESTS<VECTOR<double,3> >::Mark_Hard_Bindings_With_Free_Particles();
 template SEGMENTED_CURVE_2D<double>& DEFORMABLES_STANDARD_TESTS<VECTOR<double,2> >::Copy_And_Add_Structure<SEGMENTED_CURVE_2D<double> >(SEGMENTED_CURVE_2D<double>&,ARRAY<int,int>*);
 template void DEFORMABLES_STANDARD_TESTS<VECTOR<double,3> >::Set_Mass_Of_Particles<TRIANGULATED_SURFACE<double> >(TRIANGULATED_SURFACE<double> const&,double,bool);
 template void DEFORMABLES_STANDARD_TESTS<VECTOR<double,1> >::Set_Mass_Of_Particles<SEGMENTED_CURVE<VECTOR<double,1> > >(SEGMENTED_CURVE<VECTOR<double,1> > const&,double,bool);
-template void DEFORMABLES_STANDARD_TESTS<VECTOR<double,3> >::Create_Regular_Embedded_Surface(BINDING_LIST<VECTOR<double,3> >&,TRIANGULATED_SURFACE<double>&,double,int,double,ARRAY<int,int>*,
-    TRIANGULATED_SURFACE<double>**,TETRAHEDRALIZED_VOLUME<double>**);
+template void DEFORMABLES_STANDARD_TESTS<VECTOR<double,3> >::Create_Regular_Embedded_Surface(BINDING_LIST<VECTOR<double,3> >&,SOFT_BINDINGS<VECTOR<double,3> >&,
+    TRIANGULATED_SURFACE<double>&,double,int,double,ARRAY<int,int>&,TRIANGULATED_SURFACE<double>**,TETRAHEDRALIZED_VOLUME<double>**,bool);
+template LEVELSET_IMPLICIT_OBJECT<VECTOR<double,3> >* DEFORMABLES_STANDARD_TESTS<VECTOR<double,3> >::Initialize_Implicit_Surface(TRIANGULATED_SURFACE<double>&,int) const;
 #endif
