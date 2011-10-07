@@ -39,10 +39,6 @@
 
 namespace PhysBAM{
 namespace DEBUG_UTILITIES{
-class DEBUG_GLOBAL_VARIABLES{
-    public:
-        static int int_variable;
-};
 void Debug_Breakpoint();
 void Warn_If_Not_Overridden(const char* function,const char* file,unsigned int line,const std::type_info& type);
 void Warning(const std::string& message,const char* function,const char* file,unsigned int line);

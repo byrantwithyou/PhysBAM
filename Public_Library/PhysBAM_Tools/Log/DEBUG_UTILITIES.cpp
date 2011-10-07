@@ -19,7 +19,6 @@
 
 namespace PhysBAM{
 namespace DEBUG_UTILITIES{
-int DEBUG_GLOBAL_VARIABLES::int_variable=0;
 #if defined(__linux__) || defined(__CYGWIN__) || defined(__APPLE__)
 //#####################################################################
 // Function Debug_Breakpoint Linux
