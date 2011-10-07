@@ -278,7 +278,6 @@ void Register_Options()
     parse_args->Add_Option_Argument("-combined_collisions","use combined collisions and contact");
     parse_args->Add_Option_Argument("-combined_repulsions","apply repulsions in gauss jacobi collisions and contact");
     parse_args->Add_Option_Argument("-test_combined_system","perform test system for combined collisions");
-    parse_args->Add_Option_Argument("-pull_in","use pull in");
     parse_args->Add_Option_Argument("-extra_cg","use extra projected cg for position update");
     parse_args->Add_Option_Argument("-no_friction","no friction");
     parse_args->Add_Integer_Argument("-projection_iterations",1,"number of iterations used for projection in cg");
@@ -323,7 +322,6 @@ void Parse_Options()
     use_forces_for_drift=parse_args->Get_Option_Value("-binding_springs");
     solids_parameters.rigid_body_collision_parameters.use_combined_collisions=parse_args->Is_Value_Set("-combined_collisions");
     solids_parameters.triangle_collision_parameters.use_combined_collisions=parse_args->Is_Value_Set("-combined_repulsions");
-    solids_parameters.use_pull_in=parse_args->Is_Value_Set("-pull_in");
     solids_parameters.rigid_body_collision_parameters.test_combined_system=parse_args->Is_Value_Set("-test_combined_system");
 
     print_matrix=parse_args->Is_Value_Set("-print_matrix");
@@ -347,7 +345,6 @@ void Parse_Options()
     fully_implicit=parse_args->Is_Value_Set("-fully_implicit");
     solids_parameters.implicit_solve_parameters.use_half_fully_implicit=parse_args->Is_Value_Set("-half_fully_implicit");
     if(parse_args->Is_Value_Set("-project_nullspace")) solids_parameters.implicit_solve_parameters.project_nullspace_frequency=1;
-    solids_parameters.enforce_energy_conservation=parse_args->Get_Option_Value("-fix_energy");
     use_axial=parse_args->Get_Option_Value("-use_axial");
     solids_parameters.use_projections_in_position_update=parse_args->Get_Option_Value("-extra_cg");
     solids_parameters.implicit_solve_parameters.cg_projection_iterations=parse_args->Get_Integer_Value("-projection_iterations");
