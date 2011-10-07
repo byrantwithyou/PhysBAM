@@ -25,9 +25,7 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/LINEAR_BINDING.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/SOFT_BINDINGS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/COMBINED_COLLISIONS_EDGE_EDGE.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/COMBINED_COLLISIONS_EDGE_EDGE_PULL_IN.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/COMBINED_COLLISIONS_POINT_FACE.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/COMBINED_COLLISIONS_POINT_FACE_PULL_IN.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISION_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISIONS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TETRAHEDRON_COLLISION_BODY.h>
@@ -52,7 +50,6 @@
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Body_Clusters/RIGID_BODY_CLUSTER_BINDINGS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Collisions/COMBINED_COLLISIONS_COUPLED.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Collisions/COMBINED_COLLISIONS_COUPLED_PULL_IN.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Collisions/RIGID_DEFORMABLE_COLLISIONS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
@@ -1213,28 +1210,6 @@ Pull_In_Rigid_Deformable_Collision_Pair(RIGID_BODY<TV>& rigid_body,const int par
         target_normal_relative_velocity=clamp(target_normal_relative_velocity,-normal_applied_position_change-current_relative_normal_velocity,(T)0);
         Apply_Rigid_Deformable_Collision_Impulse(rigid_body,particle_index,particles.X(particle_index),continued_motion_direction,-target_normal_relative_velocity*continued_motion_direction,0,0,false,impulse,true,apply_impulse);}
     return impulse;
-}
-//#####################################################################
-// Function Process_Pull_In
-//#####################################################################
-template<class TV> void RIGID_DEFORMABLE_COLLISIONS<TV>::
-Process_Pull_In(const T dt,const T time)
-{
-    PHYSBAM_DEBUG_WRITE_SUBSTEP(STRING_UTILITIES::string_sprintf("Before pull-in"),2,2);
-    COMBINED_COLLISIONS_COUPLED_IMPULSE<TV> combined_collisions_coupled_impulse(solid_body_collection,rigid_body_collisions,false);
-    COMBINED_COLLISIONS_COUPLED_PULL_IN<TV> combined_collisions_coupled_pull_in(*this,dt);
-    TRIANGLE_COLLISIONS<TV>& triangle_collisions=solid_body_collection.deformable_body_collection.triangle_collisions;
-    TRIANGLE_REPULSIONS<TV>& triangle_repulsions=solid_body_collection.deformable_body_collection.triangle_repulsions;
-    COMBINED_COLLISIONS_POINT_FACE_PULL_IN<TV> combined_collisions_point_face_pull_in(triangle_collisions,triangle_repulsions,dt,true);
-    COMBINED_COLLISIONS_EDGE_EDGE_PULL_IN<TV> combined_collisions_edge_edge_pull_in(triangle_collisions,triangle_repulsions,dt,false);
-    COMBINED_COLLISIONS<TV> combined_collisions(&combined_collisions_coupled_impulse);
-    combined_collisions.Add_Collider(&combined_collisions_coupled_pull_in);
-    if(solids_parameters.triangle_collision_parameters.use_combined_collisions){
-        combined_collisions.Add_Collider(&combined_collisions_point_face_pull_in);
-        combined_collisions.Add_Collider(&combined_collisions_edge_edge_pull_in);}
-    combined_collisions.Iterate_Projections(dt,time,2);
-
-    PHYSBAM_DEBUG_WRITE_SUBSTEP(STRING_UTILITIES::string_sprintf("After pull-in"),2,2);
 }
 //#####################################################################
 // Function Process_Push_Out

@@ -66,7 +66,7 @@ struct EDGE_EDGE_REPULSION_PAIR<VECTOR<T,2> >
     VECTOR<int,2> nodes; // vertex nodes
     TV collision_free_normal;
     T distance;
-    static VECTOR<T,2> weights;
+    static const VECTOR<T,2> weights;
     TV normal;
 
     static T Total_Repulsion_Thickness(ARRAY_VIEW<const T> repulsion_thickness,const VECTOR<int,2>& nodes)

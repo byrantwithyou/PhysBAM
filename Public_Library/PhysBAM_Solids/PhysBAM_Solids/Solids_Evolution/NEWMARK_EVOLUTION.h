@@ -64,7 +64,6 @@ public:
 //#####################################################################
     bool Use_CFL() const PHYSBAM_OVERRIDE;
     void Advance_One_Time_Step_Position(const T dt,const T time,const bool solids) PHYSBAM_OVERRIDE;
-    void Finish_Position_Time_Step(const T dt,const T time,const bool solids) PHYSBAM_OVERRIDE;
     void Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids) PHYSBAM_OVERRIDE;
     virtual void Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,const T current_position_time,const bool velocity_update);
     void Apply_Constraints(const T dt,const T time);

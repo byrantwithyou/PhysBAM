@@ -21,8 +21,6 @@
 #include <PhysBAM_Geometry/Spatial_Acceleration/SEGMENT_HIERARCHY.h>
 #include <PhysBAM_Geometry/Spatial_Acceleration/TRIANGLE_HIERARCHY.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/COMBINED_COLLISIONS_DEFORMABLE_IMPULSE.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/COMBINED_COLLISIONS_EDGE_EDGE_PULL_IN.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/COMBINED_COLLISIONS_POINT_FACE_PULL_IN.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/STRUCTURE_INTERACTION_GEOMETRY.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_COLLISIONS.h>
@@ -38,7 +36,7 @@ namespace PhysBAM{
 //#####################################################################
 template<class TV> TRIANGLE_COLLISIONS<TV>::
 TRIANGLE_COLLISIONS(TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY<TV>& geometry,const ARRAY<T>& repulsion_thickness)
-    :geometry(geometry),repulsion_thickness(repulsion_thickness),final_repulsion_youngs_modulus((T)30),final_repulsion_limiter_fraction((T).1),mpi_solids(0),use_gauss_jacobi(false),use_pull_in(false)
+    :geometry(geometry),repulsion_thickness(repulsion_thickness),final_repulsion_youngs_modulus((T)30),final_repulsion_limiter_fraction((T).1),mpi_solids(0),use_gauss_jacobi(false)
 {
     // set parameters 
     Set_Collision_Thickness();Set_Restitution_Coefficient();Set_Gauss_Jacobi();
@@ -137,8 +135,6 @@ Adjust_Velocity_For_Self_Collisions(const T dt,const T time,const bool exit_earl
     ARRAY<TV> V_save;
     ARRAY<TV> X_save;
     // input velocities are average V.  Also want original velocities?  Delta may be sufficient.
-    if(use_pull_in){
-        V_save=full_particles.V;X_save=X;}
 
     int attempts=0;bool rigid=false;
     while(!attempts || (!exit_early && collisions_in_attempt)){

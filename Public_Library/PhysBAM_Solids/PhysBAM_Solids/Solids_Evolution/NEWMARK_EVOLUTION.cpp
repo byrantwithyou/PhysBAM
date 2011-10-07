@@ -367,34 +367,30 @@ Advance_One_Time_Step_Position(const T dt,const T time, const bool solids)
     // get momentum difference for v^n -> v^{n+1/2} udpate
     if(articulated_rigid_body.Has_Actuators()) example_forces_and_velocities.Set_PD_Targets(dt,time);
 
-    {
-        if(asynchronous_evolution && asynchronous_evolution->Take_Full_Backward_Euler_Step_For_Position_Update()){
-            Backward_Euler_Step_Velocity_Helper(dt,time,time,false);
-            asynchronous_evolution->Position_Velocity_Update(dt,time);}
-        else Backward_Euler_Step_Velocity_Helper(v_dt,time,time,false); // update V implicitly to time+dt/2
+    if(asynchronous_evolution && asynchronous_evolution->Take_Full_Backward_Euler_Step_For_Position_Update()){
+        Backward_Euler_Step_Velocity_Helper(dt,time,time,false);
+        asynchronous_evolution->Position_Velocity_Update(dt,time);}
+    else Backward_Euler_Step_Velocity_Helper(v_dt,time,time,false); // update V implicitly to time+dt/2
 
-        solid_body_collection.Store_Velocities();
-        Diagnostics(dt,time,1,0,5,"backward Euler");
+    solid_body_collection.Store_Velocities();
+    Diagnostics(dt,time,1,0,5,"backward Euler");
         
-        if(solids_parameters.use_projections_in_position_update){
-            Restore_Velocity();
-            Apply_Projections_In_Position_Update(dt,time);
-            Diagnostics(dt,time,1,0,6,"apply projections in position update");}
+    if(solids_parameters.use_projections_in_position_update){
+        Restore_Velocity();
+        Apply_Projections_In_Position_Update(dt,time);
+        Diagnostics(dt,time,1,0,6,"apply projections in position update");}
         
-        if(solids_parameters.verbose) Print_Maximum_Velocities(time);
-        if(!solids) return; // early exit for fluids only in parallel
+    if(solids_parameters.verbose) Print_Maximum_Velocities(time);
+    if(!solids) return; // early exit for fluids only in parallel
         
-        Make_Incompressible(dt,true); // adjust velocity to fix volume
-        solids_evolution_callbacks->Filter_Velocities(dt,time+dt,false); // use time+dt since these velocities are used to step to time+dt
-        if(repulsions) repulsions->Adjust_Velocity_For_Self_Repulsion_Using_History(dt,true,false);
-        Compute_Momentum_Differences();
+    Make_Incompressible(dt,true); // adjust velocity to fix volume
+    solids_evolution_callbacks->Filter_Velocities(dt,time+dt,false); // use time+dt since these velocities are used to step to time+dt
+    if(repulsions) repulsions->Adjust_Velocity_For_Self_Repulsion_Using_History(dt,true,false);
+    Compute_Momentum_Differences();
 
-        // add collision impulses to time n velocities and save
-        Euler_Step_Position(dt,time);
-        Diagnostics(dt,time,1,2,10,"Euler step position");
-        if(solids_parameters.use_pull_in){
-            V_original_save=solid_body_collection.deformable_body_collection.particles.V;
-            X_original_save=solid_body_collection.deformable_body_collection.particles.X;}}
+    // add collision impulses to time n velocities and save
+    Euler_Step_Position(dt,time);
+    Diagnostics(dt,time,1,2,10,"Euler step position");
     Exchange_Velocity();
     Diagnostics(dt,time,0,2,11,"restore velocity");
 
@@ -530,27 +526,6 @@ Process_Collisions(const T dt,const T time,const bool advance_rigid_bodies)
         int interactions=solid_body_collection.deformable_body_collection.collisions.Adjust_Nodes_For_Collision_Body_Collisions(solid_body_collection.deformable_body_collection.binding_list,
             solid_body_collection.deformable_body_collection.soft_bindings,X_save,dt,0);
         if(interactions) LOG::Stat("collision body collisions",interactions);}
-}
-//#####################################################################
-// Function Finish_Position_Time_Step
-//#####################################################################
-template<class TV> void NEWMARK_EVOLUTION<TV>::
-Finish_Position_Time_Step(const T dt,const T time,const bool solids)
-{
-    if(solids_parameters.use_pull_in){
-        Save_Velocity();
-        // Get (initial) final positions and velocities
-        solid_body_collection.deformable_body_collection.particles.V=V_original_save;
-        solid_body_collection.deformable_body_collection.particles.X=X_original_save;
-
-        rigid_deformable_collisions->Process_Pull_In(dt,time);
-        Diagnostics(dt,time,1,2,211,"pull in");
-
-        // TODO: is this necessary?
-        solid_body_collection.deformable_body_collection.soft_bindings.Clamp_Particles_To_Embedded_Positions(true);
-        Restore_Velocity();
-        Diagnostics(dt,time,1,2,211,"restore velocity after pull in");
-    }
 }
 //#####################################################################
 // Function Advance_One_Time_Step_Velocity

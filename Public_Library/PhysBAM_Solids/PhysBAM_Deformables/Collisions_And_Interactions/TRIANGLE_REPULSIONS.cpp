@@ -783,7 +783,7 @@ Precompute(const INDIRECT_ARRAY<ARRAY_VIEW<T>,VECTOR<int,4>&> mass,const VECTOR<
     nodes=mass.indices;
 }
 //####################################################################
-template<> VECTOR<float,2> EDGE_EDGE_REPULSION_PAIR<VECTOR<float,2> >::weights=VECTOR<float,2>();
+template<> const VECTOR<float,2> EDGE_EDGE_REPULSION_PAIR<VECTOR<float,2> >::weights=VECTOR<float,2>();
 template class TRIANGLE_REPULSIONS<VECTOR<float,1> >;
 template class TRIANGLE_REPULSIONS<VECTOR<float,2> >;
 template class TRIANGLE_REPULSIONS<VECTOR<float,3> >;
@@ -791,7 +791,7 @@ template void TRIANGLE_REPULSIONS<VECTOR<float,3> >::Set_Collision_Pairs<VECTOR<
     ARRAY<PRECOMPUTE_PROJECT_EDGE_EDGE<VECTOR<float,3> >,int>&,ARRAY<POINT_FACE_REPULSION_PAIR<VECTOR<float,3> >,int>&,
     ARRAY<EDGE_EDGE_REPULSION_PAIR<VECTOR<float,3> >,int>&,float);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-template<> VECTOR<double,2> EDGE_EDGE_REPULSION_PAIR<VECTOR<double,2> >::weights=VECTOR<double,2>();
+template<> const VECTOR<double,2> EDGE_EDGE_REPULSION_PAIR<VECTOR<double,2> >::weights=VECTOR<double,2>();
 template class TRIANGLE_REPULSIONS<VECTOR<double,1> >;
 template class TRIANGLE_REPULSIONS<VECTOR<double,2> >;
 template class TRIANGLE_REPULSIONS<VECTOR<double,3> >;

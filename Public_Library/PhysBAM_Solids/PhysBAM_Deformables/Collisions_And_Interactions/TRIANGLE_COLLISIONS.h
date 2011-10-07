@@ -37,7 +37,6 @@ public:
     // MPI data
     MPI_SOLIDS<TV>* mpi_solids;
     bool use_gauss_jacobi;
-    bool use_pull_in;
 
     struct GAUSS_JACOBI_PF_DATA
     {

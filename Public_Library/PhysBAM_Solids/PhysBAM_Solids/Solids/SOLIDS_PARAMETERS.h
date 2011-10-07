@@ -48,8 +48,6 @@ public:
     bool enforce_poststabilization_in_cg;
     bool use_backward_euler_position_update;
 
-    bool use_pull_in;
-    int pull_in_iterations;
     bool no_contact_friction;
     bool use_projections_in_position_update;
 
