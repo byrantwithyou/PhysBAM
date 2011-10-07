@@ -199,6 +199,24 @@ Add_If_Newly_Present(const RANGE<TV_INT>& old_locations,const RANGE<TV_INT>& new
     for(typename GRID<TV>::CELL_ITERATOR iterator(unused,new_locations);iterator.Valid();iterator.Next()){TV_INT voxel=iterator.Cell_Index();
         if(old_locations.Lazy_Outside(voxel)) Add_To_Cell(voxel,index);}
 }
+//#####################################################################
+// Function Get_Potential_Collisions
+//#####################################################################
+template<class T_COLLISION_GEOMETRY,class T_ARRAY,class ID> void COLLISION_GEOMETRY_SPATIAL_PARTITION<T_COLLISION_GEOMETRY,T_ARRAY,ID>::
+Get_Potential_Collisions(const ID index,const RANGE<TV_INT>& range,ARRAY<ID>& object_indices,bool only_higher_index) const
+{
+    object_indices.Remove_All();
+    already_added.Initialize(collision_bodies.Size());
+    GRID<TV> unused;
+    for(typename GRID<TV>::CELL_ITERATOR iterator(unused,range);iterator.Valid();iterator.Next()){TV_INT voxel=iterator.Cell_Index();
+        ARRAY<ID>* occupancy_list=0;
+        if(hashtable.Get(voxel,occupancy_list)) for(int t=1;t<=occupancy_list->m;t++){
+            ID k=(*occupancy_list)(t);
+            if(k>index || (!only_higher_index && k!=index))
+                if(!already_added.Is_Marked_Current(k)){already_added.Mark(k);object_indices.Append(k);}}}
+    for(int i=1;i<=bodies_not_in_partition.m;i++){ // add bodies that aren't in spatial partition - don't need append unique
+        ID k=bodies_not_in_partition(i);if(k>index || (!only_higher_index && k!=index)) object_indices.Append(k);}
+}
 //##################################################################### 
 template class COLLISION_GEOMETRY_SPATIAL_PARTITION<COLLISION_GEOMETRY<VECTOR<float,1> >,const ARRAY<COLLISION_GEOMETRY<VECTOR<float,1> >*,COLLISION_GEOMETRY_ID>,COLLISION_GEOMETRY_ID>;
 template class COLLISION_GEOMETRY_SPATIAL_PARTITION<COLLISION_GEOMETRY<VECTOR<float,2> >,const ARRAY<COLLISION_GEOMETRY<VECTOR<float,2> >*,COLLISION_GEOMETRY_ID>,COLLISION_GEOMETRY_ID>;

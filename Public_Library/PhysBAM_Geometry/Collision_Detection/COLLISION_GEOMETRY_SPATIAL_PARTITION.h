@@ -13,7 +13,6 @@
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
-#include <PhysBAM_Geometry/Collision_Detection_Computations/GET_POTENTIAL_COLLISIONS.h>
 #include <PhysBAM_Geometry/Collisions/COLLISIONS_GEOMETRY_FORWARD.h>
 #include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY.h>
 #include <climits> // for INT_MAX (for old gcc)
@@ -35,23 +34,30 @@ public:
     T voxel_size,one_over_voxel_size;
     ARRAY<ID> bodies_not_in_partition;
     T collision_body_thickness;
+    mutable OPERATION_HASH<COLLISION_GEOMETRY_ID> already_added;
 
     COLLISION_GEOMETRY_SPATIAL_PARTITION(T_ARRAY& collision_bodies_input,T collision_body_thickness_input=0);
     ~COLLISION_GEOMETRY_SPATIAL_PARTITION();
 
     void Get_Potential_Collisions(const ID index,ARRAY<ID>& object_indices,bool only_higher_index=false) const
-    {POTENTIAL_COLLISIONS::Get_Potential_Collisions<T_COLLISION_GEOMETRY,T_ARRAY,ID>(index,voxel_range(index),hashtable,bodies_not_in_partition,collision_bodies,object_indices,only_higher_index);}
+    {Get_Potential_Collisions(index,voxel_range(index),object_indices,only_higher_index);}
 
     void Get_Potential_Collisions_Using_Current_Position(const ID index,ARRAY<ID>& object_indices,bool only_higher_index=false) const
-    {POTENTIAL_COLLISIONS::Get_Potential_Collisions<T_COLLISION_GEOMETRY,T_ARRAY,ID>(index,Voxel_Range(index),hashtable,bodies_not_in_partition,collision_bodies,object_indices,only_higher_index);}
+    {Get_Potential_Collisions(index,Voxel_Range(index),object_indices,only_higher_index);}
 
     template<class T_RETURN>
     void Get_Potential_Collisions(const TV& location,ARRAY<T_RETURN>& objects) const
-    {POTENTIAL_COLLISIONS::Get_Potential_Collisions<T_COLLISION_GEOMETRY,T_ARRAY,ID>(Voxel(location),hashtable,bodies_not_in_partition,collision_bodies,objects);}
+    {
+        TV_INT voxel=Voxel(location);
+        objects.Remove_All();
+        ARRAY<ID>* occupancy_list=0;
+        if(hashtable.Get(voxel,occupancy_list)) for(int t=1;t<=occupancy_list->m;t++) objects.Append((*occupancy_list)(t));
+        for(int i=1;i<=bodies_not_in_partition.m;i++) objects.Append(bodies_not_in_partition(i));
+    }
 
     template<class T_RETURN>
     void Get_Potential_Collisions(const RANGE<TV>& box,ARRAY<T_RETURN>& objects) const
-    {POTENTIAL_COLLISIONS::Get_Potential_Collisions<T_COLLISION_GEOMETRY,T_ARRAY,ID>(ID(-1),Voxel(box),hashtable,bodies_not_in_partition,collision_bodies,objects,false);}
+    {Get_Potential_Collisions(ID(-1),Voxel(box),objects,false);}
 
     void Set_Collision_Body_Thickness(const T collision_body_thickness_input)
     {collision_body_thickness=collision_body_thickness_input;Reinitialize();}
@@ -92,6 +98,7 @@ public:
     void Add_To_Cell(const TV_INT& voxel,const ID index);
     void Remove_If_Not_Still_Present(const RANGE<TV_INT>& old_locations,const RANGE<TV_INT>& new_locations,const ID index);
     void Add_If_Newly_Present(const RANGE<TV_INT>& old_locations,const RANGE<TV_INT>& new_locations,const ID index);
+    void Get_Potential_Collisions(const ID index,const RANGE<TV_INT>& range,ARRAY<ID>& object_indices,bool only_higher_index) const;
 //#####################################################################
 };
 }
