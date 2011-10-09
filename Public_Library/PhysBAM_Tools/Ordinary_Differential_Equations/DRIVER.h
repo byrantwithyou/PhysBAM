@@ -14,10 +14,9 @@ template<class TV> class EXAMPLE;
 template<class TV>
 class DRIVER
 {
-    typedef typename TV::SCALAR T;
-protected:
-    T time;
 public:
+    typedef typename TV::SCALAR T;
+    T time;
     EXAMPLE<TV>& example;
     int current_frame;
     int output_number;

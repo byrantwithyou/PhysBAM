@@ -26,11 +26,9 @@ class SOLIDS_FLUIDS_DRIVER_UNIFORM:public SOLIDS_FLUIDS_DRIVER<typename T_GRID::
     typedef typename T_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
 
     typedef SOLIDS_FLUIDS_DRIVER<TV> BASE;
-    using BASE::time;
 public:
     using BASE::project_at_frame_boundaries;using BASE::current_frame;using BASE::next_dt;using BASE::next_done;using BASE::Write_Time;using BASE::Write_First_Frame;
-    using BASE::Write_Last_Frame;using BASE::Write_Substep;
-
+    using BASE::Write_Last_Frame;using BASE::Write_Substep;using BASE::time;
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>& example;
     T last_dt;
     T restart_dt;
