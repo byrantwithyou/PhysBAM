@@ -466,6 +466,7 @@ Embed_Surface_In_Tetrahedralized_Volume(BINDING_LIST<TV>& binding_list,SOFT_BIND
     if(!surface.hierarchy) surface.Initialize_Hierarchy();
     if(!surface.mesh.adjacent_elements) surface.mesh.Initialize_Adjacent_Elements();
     if(!surface.triangle_list) surface.Update_Triangle_List();
+    if(!surface.mesh.incident_elements) surface.mesh.Initialize_Incident_Elements();
 
     ARRAY<int> candidates,point_to_tet(surface.particles.X.m);
     ARRAY<TV> weights(surface.particles.X.m);
@@ -538,7 +539,9 @@ Embed_Surface_In_Tetrahedralized_Volume(BINDING_LIST<TV>& binding_list,SOFT_BIND
     ARRAY<int> particle_indices;
     TETRAHEDRALIZED_VOLUME<T>& new_v=Copy_And_Add_Structure(volume,&particle_indices);
     if(new_volume) *new_volume=&new_v;
-    for(int i=1;i<=volume_particle_map.m;i++) volume_particle_map(i)=particle_indices(volume_particle_map(i));
+    for(int i=1;i<=volume_particle_map.m;i++)
+        if(volume_particle_map(i))
+            volume_particle_map(i)=particle_indices(volume_particle_map(i));
 
     if(bind_edges){
         FREE_PARTICLES<TV>* free_particles=new FREE_PARTICLES<TV>;
