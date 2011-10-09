@@ -6,6 +6,6 @@ Import('env Automatic_Program Automatic_Library')
 #Automatic_Program(env,"dump_geometry",["dump_geometry.cpp"])
 
 ### automatic generation of library targets
-Automatic_Library(env,"PhysBAM_Wrapper",[],[],[],["libmain.cpp","DEFORMABLE_EXAMPLE.cpp"],False,True,False,True)
-#Automatic_Program(env,"testx",["main.cpp"])
+#Automatic_Library(env,"PhysBAM_Wrapper",[],[],[],["libmain.cpp","DEFORMABLE_EXAMPLE.cpp"],False,True,False,True)
+Automatic_Program(env,"xx",["main.cpp"])
 
