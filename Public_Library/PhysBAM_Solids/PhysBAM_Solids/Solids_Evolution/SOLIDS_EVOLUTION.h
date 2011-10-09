@@ -57,7 +57,6 @@ public:
     virtual bool Use_CFL() const=0;
     virtual void Euler_Step_Position(const T dt,const T time);
     virtual void Advance_One_Time_Step_Position(const T dt,const T time,const bool solids)=0;
-    virtual void Finish_Position_Time_Step(const T dt,const T time,const bool solids){PHYSBAM_NOT_IMPLEMENTED();};
     virtual void Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)=0;
     virtual void Initialize_Deformable_Objects(const T frame_rate,const bool restart);
     virtual void Initialize_Rigid_Bodies(const T frame_rate, const bool restart)=0;

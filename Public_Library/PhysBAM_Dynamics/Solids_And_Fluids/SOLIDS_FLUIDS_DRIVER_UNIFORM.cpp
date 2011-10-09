@@ -625,7 +625,6 @@ Solid_Position_Update(const T dt,const int substep)
         example.solid_body_collection.rigid_body_collection.Update_Angular_Momentum();
         solids_evolution.Advance_One_Time_Step_Position(dt,time,!solids_fluids_parameters.mpi_solid_fluid || solids_fluids_parameters.mpi_solid_fluid->Solid_Node());
 
-        solids_evolution.Finish_Position_Time_Step(dt,time,!solids_fluids_parameters.mpi_solid_fluid || solids_fluids_parameters.mpi_solid_fluid->Solid_Node());
         if(solids_parameters.triangle_collision_parameters.perform_self_collision && solids_parameters.triangle_collision_parameters.temporary_enable_collisions){
             LOG::SCOPE scope("adjust velocity for self repulsion and self collisions");
             int repulsions,collisions_found;
