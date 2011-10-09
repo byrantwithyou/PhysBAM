@@ -1,8 +1,6 @@
 #ifndef __DATA_EXCHANGE_FIXED_MATRIX__
 #define __DATA_EXCHANGE_FIXED_MATRIX__
 
-#include <vector>
-
 namespace data_exchange{
 template<class T, int m,int n>
 struct fixed_matrix

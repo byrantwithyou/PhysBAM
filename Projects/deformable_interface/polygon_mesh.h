@@ -2,6 +2,7 @@
 #define __DATA_EXCHANGE_POLYGON_MESH__
 
 #include "fixed_vector.h"
+#include <vector>
 namespace data_exchange{
 
 /*

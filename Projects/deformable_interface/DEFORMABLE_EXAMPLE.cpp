@@ -102,8 +102,8 @@ Add_New_Forces()
     soft_bindings.Set_Mass_From_Effective_Mass();
 
     for(int i=1;i<=new_forces_relations.m;i++){
-        PHYSBAM_ASSERT(new_forces_relations(i).x->id==DEFORMABLE_BODY_WRAPPER::fixed_id);
-        Instantiate_Force(new_forces_relations(i).y,*static_cast<DEFORMABLE_BODY_WRAPPER*>(new_forces_relations(i).x));}
+        PHYSBAM_ASSERT(new_forces_relations(i).x->id==DEFORMABLE_BODY_WRAPPER::fixed_id());
+        Instantiate_Force(*new_forces_relations(i).y,*static_cast<DEFORMABLE_BODY_WRAPPER*>(new_forces_relations(i).x));}
     new_forces_relations.Remove_All();
 }
 //#####################################################################
@@ -179,8 +179,8 @@ Add_Rigid_Body(const data_exchange::scripted_geometry& body)
 //#####################################################################
 // Function Instantiate_Force
 //#####################################################################
-template<class T> void DEFORMABLE_EXAMPLE<T>::
-Instantiate_Force(GRAVITY_WRAPPER* wrapper,DEFORMABLE_BODY_WRAPPER& body)
+template<class T> bool DEFORMABLE_EXAMPLE<T>::
+Instantiate_Force(GRAVITY_WRAPPER& wrapper,DEFORMABLE_BODY_WRAPPER& body)
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     PARTICLES<TV>& particles=deformable_body_collection.particles;
@@ -189,59 +189,64 @@ Instantiate_Force(GRAVITY_WRAPPER* wrapper,DEFORMABLE_BODY_WRAPPER& body)
     TETRAHEDRALIZED_VOLUME<T>* volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.deformable_geometry.structures(body.enclosing_structure_index));
     PHYSBAM_ASSERT(volume);
     volume->mesh.elements.Flattened().Get_Unique(*influenced_particles);
-    DEFORMABLE_GRAVITY<TV>* gravity=new DEFORMABLE_GRAVITY<TV>(particles,influenced_particles,wrapper->magnitude,TV(wrapper->direction));
+    DEFORMABLE_GRAVITY<TV>* gravity=new DEFORMABLE_GRAVITY<TV>(particles,influenced_particles,wrapper.magnitude,TV(wrapper.direction));
     gravity->Own_Influenced_Particles();
     deformable_body_collection.Add_Force(gravity);
-    wrapper->force_instances.Append(gravity);
+    wrapper.force_instances.Append(gravity);
 
     gravity->limit_time_step_by_strain_rate=false;
     gravity->use_implicit_velocity_independent_forces=fully_implicit;
+    return true;
 }
 //#####################################################################
 // Function Instantiate_Force
 //#####################################################################
-template<class T> void DEFORMABLE_EXAMPLE<T>::
-Instantiate_Force(VOLUMETRIC_FORCE_WRAPPER* wrapper,DEFORMABLE_BODY_WRAPPER& body)
+template<class T> bool DEFORMABLE_EXAMPLE<T>::
+Instantiate_Force(VOLUMETRIC_FORCE_WRAPPER& wrapper,DEFORMABLE_BODY_WRAPPER& body)
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     TETRAHEDRALIZED_VOLUME<T>* volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.deformable_geometry.structures(body.enclosing_structure_index));
     PHYSBAM_ASSERT(volume);
-    FINITE_VOLUME<TV,3>* finite_volume=Create_Finite_Volume(*volume,new COROTATED<T,3>(wrapper->stiffness,wrapper->poissons_ratio,wrapper->damping),false);
+    FINITE_VOLUME<TV,3>* finite_volume=Create_Finite_Volume(*volume,new COROTATED<T,3>(wrapper.stiffness,wrapper.poissons_ratio,wrapper.damping),false);
     solid_body_collection.Add_Force(finite_volume);
-    wrapper->force_instances.Append(finite_volume);
+    wrapper.force_instances.Append(finite_volume);
 
     finite_volume->limit_time_step_by_strain_rate=false;
     finite_volume->use_implicit_velocity_independent_forces=fully_implicit;
+    return true;
 }
 //#####################################################################
 // Function Instantiate_Force
 //#####################################################################
-template<class T> void DEFORMABLE_EXAMPLE<T>::
-Instantiate_Force(FORCE_WRAPPER* wrapper,DEFORMABLE_BODY_WRAPPER& body)
+template<class T> bool DEFORMABLE_EXAMPLE<T>::
+Instantiate_Force(FORCE_WRAPPER& wrapper,DEFORMABLE_BODY_WRAPPER& body)
 {
-    switch(wrapper->id){
-        case VOLUMETRIC_FORCE_WRAPPER::fixed_id: Instantiate_Force(static_cast<VOLUMETRIC_FORCE_WRAPPER*>(wrapper),body); break;
-        case GRAVITY_WRAPPER::fixed_id: Instantiate_Force(static_cast<GRAVITY_WRAPPER*>(wrapper),body); break;
-        default: PHYSBAM_FATAL_ERROR();}
+    if(wrapper.id==VOLUMETRIC_FORCE_WRAPPER::fixed_id()) return Instantiate_Force(static_cast<VOLUMETRIC_FORCE_WRAPPER&>(wrapper),body);
+    if(wrapper.id==GRAVITY_WRAPPER::fixed_id()) return Instantiate_Force(static_cast<GRAVITY_WRAPPER&>(wrapper),body);
+    return false;
 }
 //#####################################################################
 // Function Add_Force
 //#####################################################################
 template<class T> FORCE_WRAPPER* DEFORMABLE_EXAMPLE<T>::
-Add_Force(const data_exchange::force* f)
+Add_Force(const data_exchange::force& f)
 {
-    if(const data_exchange::gravity_force* g=dynamic_cast<const data_exchange::gravity_force*>(f)){
+    if(f.id==-1) return 0;
+
+    if(f.id==data_exchange::gravity_force::fixed_id()){
+        const data_exchange::gravity_force& g=static_cast<const data_exchange::gravity_force&>(f);
         GRAVITY_WRAPPER* wrap = new GRAVITY_WRAPPER(*this);
         force_wrappers.Append(wrap);
-        wrap->magnitude=g->magnitude;
-        wrap->direction=To_Pb(g->direction);
+        wrap->magnitude=g.magnitude;
+        wrap->direction=To_Pb(g.direction);
         return wrap;}
-    if(const data_exchange::volumetric_force* g=dynamic_cast<const data_exchange::volumetric_force*>(f)){
+    if(f.id==data_exchange::volumetric_force::fixed_id()){
+        const data_exchange::volumetric_force& g=static_cast<const data_exchange::volumetric_force&>(f);
         VOLUMETRIC_FORCE_WRAPPER* wrap = new VOLUMETRIC_FORCE_WRAPPER(*this);
         force_wrappers.Append(wrap);
-        wrap->stiffness=g->stiffness;
-        wrap->poissons_ratio=g->poissons_ratio;
-        wrap->damping=g->damping;
+        wrap->stiffness=g.stiffness;
+        wrap->poissons_ratio=g.poissons_ratio;
+        wrap->damping=g.damping;
         return wrap;}
 
     return 0;
@@ -304,12 +309,19 @@ Add_Simulation_Object(const data_exchange::simulation_object& body)
 {
     added_body=true;
 
-    if(const data_exchange::deformable_body* p=dynamic_cast<const data_exchange::deformable_body*>(&body))
-        return Add_Deformable_Body(*p);
-    if(const data_exchange::ground_plane* p=dynamic_cast<const data_exchange::ground_plane*>(&body))
-        return Add_Rigid_Body(*p);
-    if(const data_exchange::scripted_geometry* p=dynamic_cast<const data_exchange::scripted_geometry*>(&body))
-        return Add_Rigid_Body(*p);
+    LOG::cout<<"A"<<std::endl;
+    if(body.id==-1) return 0;
+    LOG::cout<<"B"<<std::endl;
+
+    if(body.id==data_exchange::deformable_body::fixed_id())
+        return Add_Deformable_Body(static_cast<const data_exchange::deformable_body&>(body));
+
+    if(body.id==data_exchange::ground_plane::fixed_id())
+        return Add_Rigid_Body(static_cast<const data_exchange::ground_plane&>(body));
+
+    if(body.id==data_exchange::scripted_geometry::fixed_id())
+        return Add_Rigid_Body(static_cast<const data_exchange::scripted_geometry&>(body));
+    LOG::cout<<"C"<<std::endl;
 
     return 0;
 }

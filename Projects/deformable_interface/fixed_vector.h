@@ -1,7 +1,6 @@
 #ifndef __DATA_EXCHANGE_FIXED_VECTOR__
 #define __DATA_EXCHANGE_FIXED_VECTOR__
 
-#include <vector>
 #include <boost/static_assert.hpp>
 
 namespace data_exchange{

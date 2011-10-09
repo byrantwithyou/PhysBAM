@@ -10,11 +10,7 @@
 #include <PhysBAM_Solids/PhysBAM_Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
 #include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 #include <fstream>
-#include "deformable_body.h"
-#include "gravity_force.h"
-#include "ground_plane.h"
-#include "scripted_geometry.h"
-#include "volumetric_force.h"
+#include "libmain.h"
 namespace PhysBAM{
 
 template<class T_GRID> class SOLIDS_FLUIDS_DRIVER_UNIFORM;
@@ -32,20 +28,20 @@ struct OBJECT_WRAPPER
 
 struct DEFORMABLE_BODY_WRAPPER: public OBJECT_WRAPPER
 {
-    static const int fixed_id=1;
     int structure_index;
     int free_particles_index;
     int enclosing_structure_index;
     ARRAY<int> particle_map;
 
-    DEFORMABLE_BODY_WRAPPER(DEFORMABLE_EXAMPLE<float>& de_input): OBJECT_WRAPPER(de_input,fixed_id),structure_index(0),enclosing_structure_index(0) {}
+    static int fixed_id(int s = -1){static int i = s; return i;}
+    DEFORMABLE_BODY_WRAPPER(DEFORMABLE_EXAMPLE<float>& de_input): OBJECT_WRAPPER(de_input,fixed_id()),structure_index(0),enclosing_structure_index(0) {}
 };
 
 struct SCRIPTED_GEOMETRY_WRAPPER: public OBJECT_WRAPPER
 {
-    static const int fixed_id=2;
     int rigid_index;
-    SCRIPTED_GEOMETRY_WRAPPER(DEFORMABLE_EXAMPLE<float>& de_input): OBJECT_WRAPPER(de_input,fixed_id),rigid_index(0) {}
+    static int fixed_id(int s = -1){static int i = s; return i;}
+    SCRIPTED_GEOMETRY_WRAPPER(DEFORMABLE_EXAMPLE<float>& de_input): OBJECT_WRAPPER(de_input,fixed_id()),rigid_index(0) {}
 };
 
 struct FORCE_WRAPPER
@@ -58,19 +54,18 @@ struct FORCE_WRAPPER
 
 struct GRAVITY_WRAPPER: public FORCE_WRAPPER
 {
-    static const int fixed_id=1;
     typedef VECTOR<float,3> TV;
     float magnitude;
     VECTOR<float,3> direction;
 
     ARRAY<DEFORMABLE_GRAVITY<TV>*> force_instances;
 
-    GRAVITY_WRAPPER(DEFORMABLE_EXAMPLE<float>& de_input): FORCE_WRAPPER(de_input,fixed_id),magnitude(0) {}
+    static int fixed_id(int s = -1){static int i = s; return i;}
+    GRAVITY_WRAPPER(DEFORMABLE_EXAMPLE<float>& de_input): FORCE_WRAPPER(de_input,fixed_id()),magnitude(0) {}
 };
 
 struct VOLUMETRIC_FORCE_WRAPPER: public FORCE_WRAPPER
 {
-    static const int fixed_id=2;
     typedef VECTOR<float,3> TV;
     float stiffness;
     float poissons_ratio;
@@ -78,8 +73,18 @@ struct VOLUMETRIC_FORCE_WRAPPER: public FORCE_WRAPPER
 
     ARRAY<FINITE_VOLUME<TV,3>*> force_instances;
 
-    VOLUMETRIC_FORCE_WRAPPER(DEFORMABLE_EXAMPLE<float>& de_input): FORCE_WRAPPER(de_input,fixed_id),stiffness(0),poissons_ratio(0),damping(0) {}
+    static int fixed_id(int s = -1){static int i = s; return i;}
+    VOLUMETRIC_FORCE_WRAPPER(DEFORMABLE_EXAMPLE<float>& de_input): FORCE_WRAPPER(de_input,fixed_id()),stiffness(0),poissons_ratio(0),damping(0) {}
 };
+
+inline void Register_Wrapper_Ids()
+{
+    int next_id=1;
+    DEFORMABLE_BODY_WRAPPER::fixed_id(next_id++);
+    SCRIPTED_GEOMETRY_WRAPPER::fixed_id(next_id++);
+    GRAVITY_WRAPPER::fixed_id(next_id++);
+    VOLUMETRIC_FORCE_WRAPPER::fixed_id(next_id++);
+}
 
 template<class T_input>
 class DEFORMABLE_EXAMPLE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,3> > >
@@ -143,10 +148,10 @@ public:
     DEFORMABLE_BODY_WRAPPER* Add_Deformable_Body(const data_exchange::deformable_body& body);
     SCRIPTED_GEOMETRY_WRAPPER* Add_Rigid_Body(const data_exchange::ground_plane& body);
     SCRIPTED_GEOMETRY_WRAPPER* Add_Rigid_Body(const data_exchange::scripted_geometry& body);
-    FORCE_WRAPPER* Add_Force(const data_exchange::force* f);
-    void Instantiate_Force(FORCE_WRAPPER* wrapper,DEFORMABLE_BODY_WRAPPER& body);
-    void Instantiate_Force(GRAVITY_WRAPPER* wrapper,DEFORMABLE_BODY_WRAPPER& body);
-    void Instantiate_Force(VOLUMETRIC_FORCE_WRAPPER* wrapper,DEFORMABLE_BODY_WRAPPER& body);
+    FORCE_WRAPPER* Add_Force(const data_exchange::force& f);
+    bool Instantiate_Force(FORCE_WRAPPER& wrapper,DEFORMABLE_BODY_WRAPPER& body);
+    bool Instantiate_Force(GRAVITY_WRAPPER& wrapper,DEFORMABLE_BODY_WRAPPER& body);
+    bool Instantiate_Force(VOLUMETRIC_FORCE_WRAPPER& wrapper,DEFORMABLE_BODY_WRAPPER& body);
     void Initialize_Simulation();
     void Initialize_After_New_Bodies();
     void Simulate_Frame();

@@ -1,9 +1,4 @@
-#include "deformable_body.h"
-#include "gravity_force.h"
-#include "ground_plane.h"
-#include "scripted_geometry.h"
-#include "simulation_object.h"
-#include "volumetric_force.h"
+#include "libmain.h"
 #include <dlfcn.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,6 +10,7 @@ struct physbam_force;
 int main(int argc,char* argv[])
 {
     using namespace data_exchange;
+    register_ids();
     void* handle = dlopen("libPhysBAM_Wrapper.so", RTLD_LAZY);
     if(!handle){
         const char *p = dlerror();
@@ -32,8 +28,11 @@ int main(int argc,char* argv[])
     printf("%p %p %p %p %p %p\n", create_simulation, destroy_simulation, add_object, add_force, apply_force_to_object, simulate_frame);
 
     physbam_simulation * sim = create_simulation();
+    printf("sim %p\n", sim);
 
     deformable_body db;
+    printf("id %i\n", db.id);
+    printf("id %i\n", deformable_body::fixed_id(1));
     db.position.push_back(vf3(0,0,0));
     db.position.push_back(vf3(0,0,1));
     db.position.push_back(vf3(0,1,0));
@@ -49,8 +48,11 @@ int main(int argc,char* argv[])
     db.mesh.insert_polygon(vi4(3,1,5,7));
     db.mesh.insert_polygon(vi4(4,6,7,5));
     physbam_object* d1 = add_object(sim, &db);
+    printf("d1 %p\n", d1);
 
     db.position.clear();
+    db.mesh.polygons.clear();
+    db.mesh.polygon_counts.clear();
     db.position.push_back(vf3(1,4,0));
     db.position.push_back(vf3(-1,4,0));
     db.position.push_back(vf3(0,5,0));
@@ -66,6 +68,7 @@ int main(int argc,char* argv[])
     db.mesh.insert_polygon(vi3(2,5,1));
     db.mesh.insert_polygon(vi3(1,5,3));
     physbam_object* d2 = add_object(sim, &db);
+    printf("d2 %p\n", d2);
 
     ground_plane gp;
     gp.position = vf3(0,-1,0);
