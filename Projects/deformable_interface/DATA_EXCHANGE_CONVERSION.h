@@ -11,7 +11,7 @@
 #include <PhysBAM_Geometry/Topology/TRIANGLE_MESH.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <vector>
-#include "../data_exchange/deformable_body_simulation.h"
+#include "deformable_body.h"
 using namespace PhysBAM;
 template<class T>
 void To_Pb(T& o, const T& i){o=i;}

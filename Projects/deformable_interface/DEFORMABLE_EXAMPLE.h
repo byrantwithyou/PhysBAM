@@ -10,8 +10,76 @@
 #include <PhysBAM_Solids/PhysBAM_Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
 #include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 #include <fstream>
-#include "../data_exchange/deformable_body_simulation.h"
+#include "deformable_body.h"
+#include "gravity_force.h"
+#include "ground_plane.h"
+#include "scripted_geometry.h"
+#include "volumetric_force.h"
 namespace PhysBAM{
+
+template<class T_GRID> class SOLIDS_FLUIDS_DRIVER_UNIFORM;
+template<class T> class DEFORMABLE_EXAMPLE;
+template<class TV> class DEFORMABLE_GRAVITY;
+template<class TV,int d> class FINITE_VOLUME;
+
+struct OBJECT_WRAPPER
+{
+    int id;
+    DEFORMABLE_EXAMPLE<float>& de;
+
+    OBJECT_WRAPPER(DEFORMABLE_EXAMPLE<float>& de_input,int id_input);
+};
+
+struct DEFORMABLE_BODY_WRAPPER: public OBJECT_WRAPPER
+{
+    static const int fixed_id=1;
+    int structure_index;
+    int free_particles_index;
+    int enclosing_structure_index;
+    ARRAY<int> particle_map;
+
+    DEFORMABLE_BODY_WRAPPER(DEFORMABLE_EXAMPLE<float>& de_input): OBJECT_WRAPPER(de_input,fixed_id),structure_index(0),enclosing_structure_index(0) {}
+};
+
+struct SCRIPTED_GEOMETRY_WRAPPER: public OBJECT_WRAPPER
+{
+    static const int fixed_id=2;
+    int rigid_index;
+    SCRIPTED_GEOMETRY_WRAPPER(DEFORMABLE_EXAMPLE<float>& de_input): OBJECT_WRAPPER(de_input,fixed_id),rigid_index(0) {}
+};
+
+struct FORCE_WRAPPER
+{
+    int id;
+    DEFORMABLE_EXAMPLE<float>& de;
+
+    FORCE_WRAPPER(DEFORMABLE_EXAMPLE<float>& de_input,int id_input=0);
+};
+
+struct GRAVITY_WRAPPER: public FORCE_WRAPPER
+{
+    static const int fixed_id=1;
+    typedef VECTOR<float,3> TV;
+    float magnitude;
+    VECTOR<float,3> direction;
+
+    ARRAY<DEFORMABLE_GRAVITY<TV>*> force_instances;
+
+    GRAVITY_WRAPPER(DEFORMABLE_EXAMPLE<float>& de_input): FORCE_WRAPPER(de_input,fixed_id),magnitude(0) {}
+};
+
+struct VOLUMETRIC_FORCE_WRAPPER: public FORCE_WRAPPER
+{
+    static const int fixed_id=2;
+    typedef VECTOR<float,3> TV;
+    float stiffness;
+    float poissons_ratio;
+    float damping;
+
+    ARRAY<FINITE_VOLUME<TV,3>*> force_instances;
+
+    VOLUMETRIC_FORCE_WRAPPER(DEFORMABLE_EXAMPLE<float>& de_input): FORCE_WRAPPER(de_input,fixed_id),stiffness(0),poissons_ratio(0),damping(0) {}
+};
 
 template<class T_input>
 class DEFORMABLE_EXAMPLE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,3> > >
@@ -21,24 +89,13 @@ class DEFORMABLE_EXAMPLE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_inpu
 public:
     SOLIDS_STANDARD_TESTS<TV> tests;
 
-    T stiffness_multiplier;
-    T damping_multiplier;
     bool fully_implicit;
-    std::string scene_file;
-    std::string filename_base;
-    bool read_text;
-    bool write_text;
+    SOLIDS_FLUIDS_DRIVER_UNIFORM<GRID<TV> >& driver;
 
-    struct SIMULATION_OBJECT_DATA
-    {
-        int structure_index;
-        int encosing_structure_index;
-        int rigid_index;
-        ARRAY<int> particle_map;
-
-        SIMULATION_OBJECT_DATA(): structure_index(0),encosing_structure_index(0),rigid_index(0) {}
-    };
-    ARRAY<SIMULATION_OBJECT_DATA*> simulation_object_data;
+    ARRAY<OBJECT_WRAPPER*> object_wrappers;
+    ARRAY<FORCE_WRAPPER*> force_wrappers;
+    ARRAY<PAIR<OBJECT_WRAPPER*,FORCE_WRAPPER*> > new_forces_relations;
+    bool added_body;
 
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
     using BASE::solids_parameters;using BASE::fluids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::output_directory;using BASE::restart;
@@ -80,16 +137,20 @@ public:
     bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) PHYSBAM_OVERRIDE {return true;}
     void Set_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated) {}
 
-    void Register_Options() PHYSBAM_OVERRIDE;
-    void Parse_Options() PHYSBAM_OVERRIDE;
-    void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
     void Initialize_Bodies() PHYSBAM_OVERRIDE;
     void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE;
-    void Add_Deformable_Body(const data_exchange::deformable_body& body,int body_index);
-    void Add_Rigid_Body(const data_exchange::ground_plane& body,int body_index);
-    void Add_Rigid_Body(const data_exchange::scripted_geometry& body,int body_index);
-    void Add_Force(const data_exchange::gravity_force& force,int force_index);
-    void Add_Force(const data_exchange::volumetric_force& force,int force_index);
+    OBJECT_WRAPPER* Add_Simulation_Object(const data_exchange::simulation_object& body);
+    DEFORMABLE_BODY_WRAPPER* Add_Deformable_Body(const data_exchange::deformable_body& body);
+    SCRIPTED_GEOMETRY_WRAPPER* Add_Rigid_Body(const data_exchange::ground_plane& body);
+    SCRIPTED_GEOMETRY_WRAPPER* Add_Rigid_Body(const data_exchange::scripted_geometry& body);
+    FORCE_WRAPPER* Add_Force(const data_exchange::force* f);
+    void Instantiate_Force(FORCE_WRAPPER* wrapper,DEFORMABLE_BODY_WRAPPER& body);
+    void Instantiate_Force(GRAVITY_WRAPPER* wrapper,DEFORMABLE_BODY_WRAPPER& body);
+    void Instantiate_Force(VOLUMETRIC_FORCE_WRAPPER* wrapper,DEFORMABLE_BODY_WRAPPER& body);
+    void Initialize_Simulation();
+    void Initialize_After_New_Bodies();
+    void Simulate_Frame();
+    void Add_New_Forces();
 //#####################################################################
 };
 }

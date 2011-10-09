@@ -1,28 +1,30 @@
-//#####################################################################
-// Copyright 2007, Craig Schroeder, Tamar Shinar.
-// This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
-//#####################################################################
-#include <PhysBAM_Solids/PhysBAM_Deformables/Parallel_Computation/MPI_SOLIDS.h>
-#include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_DRIVER_UNIFORM.h>
-#include "DEFORMABLE_EXAMPLE.h"
-using namespace PhysBAM;
+#include <dlfcn.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 int main(int argc,char* argv[])
 {
-    typedef float T;
-    typedef float RW;
-    STREAM_TYPE stream_type((RW()));
-    typedef VECTOR<T,3> TV;
+    printf("hello\n");
+    void* handle = dlopen("libInterface.so", RTLD_LAZY);
+//    void* handle = dlopen("libPhysBAM.so", RTLD_LAZY);
+    if(!handle){
+        const char *p = dlerror();
+        printf("error %s", p);
+        exit(1);
+    }
 
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >* example;
+    printf("%p\n", handle);
+    void (*init)() = (void (*)()) dlsym(handle, "init");
+    void (*quit)() = (void (*)()) dlsym(handle, "quit");
+    void (*run)(int argc, char* argv[]) = (void (*)(int argc, char* argv[])) dlsym(handle, "run");
 
-    example=new DEFORMABLE_EXAMPLE<T>(stream_type);
-    example->Parse(argc,argv);
+    printf("%p %p %p\n", init, quit, run);
 
-    SOLIDS_FLUIDS_DRIVER_UNIFORM<GRID<TV> > driver(*example);
-    driver.Execute_Main_Program();
+    init();
 
-    delete example;
+    run(argc, argv);
+
+    quit();
 
     return 0;
 }
