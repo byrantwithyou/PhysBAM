@@ -20,11 +20,18 @@ void set_int(physbam_base * obj, int id, int x);
 int get_int(const physbam_base * obj, int id);
 void set_float(physbam_base * obj, int id, float x);
 float get_float(const physbam_base * obj, int id);
+void set_vf3(physbam_base * obj, int id, data_exchange::vf3 x);
+data_exchange::vf3 get_vf3(const physbam_base * obj, int id);
 int get_array_length(const physbam_base * obj, int id);
-void set_int_array(physbam_base * obj, int id, const int * x, int length, int start = 0);
-void get_int_array(const physbam_base * obj, int id, int * x, int length, int start = 0);
-void set_float_array(physbam_base * obj, int id, const float * x, int length, int start = 0);
-void get_float_array(const physbam_base * obj, int id, float * x, int length, int start = 0);
+int get_int_array_length(const physbam_base * obj, int id);
+void set_int_array(physbam_base * obj, int id, const int * x, int length, int start);
+void get_int_array(const physbam_base * obj, int id, int * x, int length, int start);
+int get_float_array_length(const physbam_base * obj, int id);
+void set_float_array(physbam_base * obj, int id, const float * x, int length, int start);
+void get_float_array(const physbam_base * obj, int id, float * x, int length, int start);
+int get_vf3_array_length(const physbam_base * obj, int id);
+void set_vf3_array(physbam_base * obj, int id, const data_exchange::vf3 * x, int length, int start);
+void get_vf3_array(const physbam_base * obj, int id, data_exchange::vf3 * x, int length, int start);
 }
 
 #endif

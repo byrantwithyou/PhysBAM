@@ -398,4 +398,14 @@ BASE_WRAPPER::BASE_WRAPPER(DEFORMABLE_EXAMPLE<float>& de_input,int id_input)
 BASE_WRAPPER::~BASE_WRAPPER()
 {
 }
+//#####################################################################
+// Function Propagate_Parameters
+//#####################################################################
+void VOLUMETRIC_FORCE_WRAPPER::
+Propagate_Parameters()
+{
+    for(int i=1;i<=force_instances.m;i++)
+        if(COROTATED<float,3>* corotated=dynamic_cast<COROTATED<float,3>*>(force_instances(i)->isotropic_model))
+            corotated->Set_Parameters(stiffness,poissons_ratio,damping);
+}
 template class DEFORMABLE_EXAMPLE<float>;

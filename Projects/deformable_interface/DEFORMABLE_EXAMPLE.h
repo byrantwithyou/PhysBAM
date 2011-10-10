@@ -81,6 +81,8 @@ struct VOLUMETRIC_FORCE_WRAPPER: public FORCE_WRAPPER
     static int fixed_id(int s = -1){static int i = s; return i;}
     VOLUMETRIC_FORCE_WRAPPER(DEFORMABLE_EXAMPLE<float>& de_input);
     virtual ~VOLUMETRIC_FORCE_WRAPPER();
+
+    void Propagate_Parameters();
 };
 
 void register_accessors(int last_id);

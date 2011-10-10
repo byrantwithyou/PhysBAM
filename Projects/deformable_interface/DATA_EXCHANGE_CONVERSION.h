@@ -11,12 +11,13 @@
 #include <PhysBAM_Geometry/Topology/TRIANGLE_MESH.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <vector>
-#include "libmain.h"
+#include "fixed_vector.h"
+#include "polygon_mesh.h"
 using namespace PhysBAM;
 template<class T>
 void To_Pb(T& o, const T& i){o=i;}
 
-void To_Pb(double& o, float i){o=i;}
+inline void To_Pb(double& o, float i){o=i;}
 
 template<class T,class U,int d>
 void To_Pb(VECTOR<T,d>& o,const data_exchange::fixed_vector<U,d>& v)
@@ -45,7 +46,7 @@ void To_Pb(ARRAY<T>& array,const std::vector<U>& v)
     To_Pb(array, v);
 }
 
-void Triangle_Mesh_From_Data_Exchange(TRIANGLE_MESH& mesh, const data_exchange::polygon_mesh& poly, ARRAY<int>* parent_index)
+inline void Triangle_Mesh_From_Data_Exchange(TRIANGLE_MESH& mesh, const data_exchange::polygon_mesh& poly, ARRAY<int>* parent_index)
 {
     for(size_t i=0, k=0; i<poly.polygon_counts.size(); i++){
         int n=poly.polygon_counts[i];
@@ -67,7 +68,7 @@ void Triangulated_Surface_From_Data_Exchange(TRIANGULATED_SURFACE<TV>& surface, 
 template<class T>
 void From_Pb(T& o, const T& i){o=i;}
 
-void From_Pb(float& o, double i){o=i;}
+inline void From_Pb(float& o, double i){o=i;}
 
 template<class T,class U,int d>
 void From_Pb(data_exchange::fixed_vector<U,d>& v, const VECTOR<T,d>& o)
