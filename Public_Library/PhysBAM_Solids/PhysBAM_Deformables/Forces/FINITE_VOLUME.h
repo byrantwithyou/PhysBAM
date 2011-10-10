@@ -48,9 +48,9 @@ public:
     bool use_uniform_density;
     ARRAY<T>* density_list;
     T density;
-protected:
     ISOTROPIC_CONSTITUTIVE_MODEL<T,d>* isotropic_model;
     ANISOTROPIC_CONSTITUTIVE_MODEL<T,d>* anisotropic_model;
+protected:
     IMPLICIT_OBJECT<TV>* implicit_surface;
     ARRAY<SYMMETRIC_MATRIX<T,TV::m> >* node_stiffness;
     ARRAY<MATRIX<T,TV::m> >* edge_stiffness;

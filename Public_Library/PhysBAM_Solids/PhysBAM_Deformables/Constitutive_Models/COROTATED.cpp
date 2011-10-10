@@ -19,13 +19,9 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T,int d> COROTATED<T,d>::
 COROTATED(const T youngs_modulus_input,const T poissons_ratio_input,const T Rayleigh_coefficient,const T failure_threshold_input)
-    :youngs_modulus(youngs_modulus_input),poissons_ratio(poissons_ratio_input),panic_threshold((T)1e-6)
+    :panic_threshold((T)1e-6)
 {
-    assert(poissons_ratio>-1&&poissons_ratio<.5);
-    constant_lambda=youngs_modulus*poissons_ratio/((1+poissons_ratio)*(1-2*poissons_ratio));
-    constant_mu=youngs_modulus/(2*(1+poissons_ratio));
-    constant_alpha=Rayleigh_coefficient*constant_lambda;
-    constant_beta=Rayleigh_coefficient*constant_mu;
+    Set_Parameters(youngs_modulus_input,poissons_ratio_input,Rayleigh_coefficient);
 }
 //#####################################################################
 // Destructor
@@ -33,6 +29,20 @@ COROTATED(const T youngs_modulus_input,const T poissons_ratio_input,const T Rayl
 template<class T,int d> COROTATED<T,d>::
 ~COROTATED()
 {
+}
+//#####################################################################
+// Function Set_Parameters
+//#####################################################################
+template<class T,int d> void COROTATED<T,d>::
+Set_Parameters(const T youngs_modulus_input,const T poissons_ratio_input,const T Rayleigh_coefficient)
+{
+    assert(poissons_ratio>-1&&poissons_ratio<.5);
+    youngs_modulus=youngs_modulus_input;
+    poissons_ratio=poissons_ratio_input;
+    constant_lambda=youngs_modulus*poissons_ratio/((1+poissons_ratio)*(1-2*poissons_ratio));
+    constant_mu=youngs_modulus/(2*(1+poissons_ratio));
+    constant_alpha=Rayleigh_coefficient*constant_lambda;
+    constant_beta=Rayleigh_coefficient*constant_mu;
 }
 //#####################################################################
 // Function P_From_Strain
