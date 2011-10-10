@@ -49,6 +49,12 @@ public:
     void Set_Desired_Particle_Partition_Size(const TV_INT& counts)
     {desired_particle_partition_counts=counts;}
 
+    void Own_Mesh()
+    {need_destroy_mesh=true;}
+
+    void Own_Particles()
+    {need_destroy_particles=true;}
+
 //#####################################################################
     virtual void Clean_Memory();
     static T_DERIVED_OBJECT* Create();
