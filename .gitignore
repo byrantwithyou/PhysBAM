@@ -27,3 +27,6 @@ Projects/Water/water
 Projects/Smoke/smoke
 Projects/Smoke/smoke_debug
 output
+
+*.os
+*.so
