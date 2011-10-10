@@ -33,7 +33,8 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T> DEFORMABLE_EXAMPLE<T>::
 DEFORMABLE_EXAMPLE(const STREAM_TYPE stream_type)
-    :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),fully_implicit(false),driver(*new SOLIDS_FLUIDS_DRIVER_UNIFORM<GRID<TV> >(*this)),added_body(false)
+    :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),fully_implicit(false),driver(*new SOLIDS_FLUIDS_DRIVER_UNIFORM<GRID<TV> >(*this)),added_body(false),
+    want_log(true)
 {
 }
 //#####################################################################
@@ -44,6 +45,7 @@ template<class T> DEFORMABLE_EXAMPLE<T>::
 {
     object_wrappers.Delete_Pointers_And_Clean_Memory();
     force_wrappers.Delete_Pointers_And_Clean_Memory();
+    delete &driver;
 }
 //#####################################################################
 // Function Initialize_Bodies
@@ -133,7 +135,7 @@ Add_Deformable_Body(const data_exchange::deformable_body& body)
 
     TETRAHEDRALIZED_VOLUME<T>* tet_volume=0;
     TRIANGULATED_SURFACE<T>* tri_surface=0;
-    tests.Create_Regular_Embedded_Surface(binding_list,soft_bindings,*surface,density,1000,(T)1e-5,wrap->particle_map,&tri_surface,&tet_volume,true);
+    tests.Create_Regular_Embedded_Surface(binding_list,soft_bindings,*surface,density,64,(T)1e-5,wrap->particle_map,&tri_surface,&tet_volume,true);
 
     wrap->structure_index=deformable_body_collection.deformable_geometry.structures.m;
     wrap->free_particles_index=wrap->structure_index-1;
@@ -169,6 +171,7 @@ Add_Rigid_Body(const data_exchange::scripted_geometry& body)
     SCRIPTED_GEOMETRY_WRAPPER* wrap=new SCRIPTED_GEOMETRY_WRAPPER(*this);
     PARTICLES<TV>& particles=*new PARTICLES<TV>;
     TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create(particles);
+    surface->Own_Particles();
     Triangulated_Surface_From_Data_Exchange(*surface,body.mesh,body.position,0);
     RIGID_BODY<TV>& rigid_body=*tests.Create_Rigid_Body_From_Triangulated_Surface(*surface,solid_body_collection.rigid_body_collection,1,20);
     rigid_body.is_static=true;
@@ -236,14 +239,12 @@ Add_Force(const data_exchange::force& f)
     if(f.id==data_exchange::gravity_force::fixed_id()){
         const data_exchange::gravity_force& g=static_cast<const data_exchange::gravity_force&>(f);
         GRAVITY_WRAPPER* wrap = new GRAVITY_WRAPPER(*this);
-        force_wrappers.Append(wrap);
         wrap->magnitude=g.magnitude;
         wrap->direction=To_Pb(g.direction);
         return wrap;}
     if(f.id==data_exchange::volumetric_force::fixed_id()){
         const data_exchange::volumetric_force& g=static_cast<const data_exchange::volumetric_force&>(f);
         VOLUMETRIC_FORCE_WRAPPER* wrap = new VOLUMETRIC_FORCE_WRAPPER(*this);
-        force_wrappers.Append(wrap);
         wrap->stiffness=g.stiffness;
         wrap->poissons_ratio=g.poissons_ratio;
         wrap->damping=g.damping;
@@ -262,6 +263,8 @@ Initialize_Simulation()
     driver.time=this->Time_At_Frame(driver.current_frame);
     solid_body_collection.deformable_body_collection.mpi_solids=solid_body_collection.deformable_body_collection.mpi_solids;
     solids_evolution->Set_Solids_Evolution_Callbacks(*this);
+    this->need_finish_logging=true;
+    LOG::Initialize_Logging(false,false,1<<30,want_log);
 }
 //#####################################################################
 // Function Initialize_After_New_Bodies
@@ -284,12 +287,10 @@ Initialize_After_New_Bodies()
 template<class T> void DEFORMABLE_EXAMPLE<T>::
 Simulate_Frame()
 {
+    if(new_forces_relations.m) Add_New_Forces();
     if(added_body){
         Initialize_After_New_Bodies();
-        Add_New_Forces();
         added_body=false;}
-    else if(new_forces_relations.m)
-        Add_New_Forces();
 
     driver.current_frame++;
     LOG::SCOPE scope("FRAME","Frame %d",driver.current_frame);
@@ -297,7 +298,7 @@ Simulate_Frame()
     this->solids_evolution->kinematic_evolution.Get_Current_Kinematic_Keyframes(this->Time_At_Frame(driver.current_frame)-driver.time,driver.time);
     driver.Advance_To_Target_Time(this->Time_At_Frame(driver.current_frame));
     driver.Postprocess_Frame(driver.current_frame);
-    if(this->write_output_files && this->write_substeps_level==-1) Write_Output_Files(driver.current_frame);
+    if(this->write_output_files && this->write_substeps_level==-1) driver.Write_Output_Files(driver.current_frame);
     else if(this->write_substeps_level!=-1) driver.Write_Substep(STRING_UTILITIES::string_sprintf("END Frame %d",driver.current_frame),0,this->write_substeps_level);
     LOG::cout<<"TIME = "<<time<<std::endl;
 }
@@ -309,9 +310,7 @@ Add_Simulation_Object(const data_exchange::simulation_object& body)
 {
     added_body=true;
 
-    LOG::cout<<"A"<<std::endl;
     if(body.id==-1) return 0;
-    LOG::cout<<"B"<<std::endl;
 
     if(body.id==data_exchange::deformable_body::fixed_id())
         return Add_Deformable_Body(static_cast<const data_exchange::deformable_body&>(body));
@@ -321,7 +320,6 @@ Add_Simulation_Object(const data_exchange::simulation_object& body)
 
     if(body.id==data_exchange::scripted_geometry::fixed_id())
         return Add_Rigid_Body(static_cast<const data_exchange::scripted_geometry&>(body));
-    LOG::cout<<"C"<<std::endl;
 
     return 0;
 }
@@ -340,5 +338,51 @@ FORCE_WRAPPER::FORCE_WRAPPER(DEFORMABLE_EXAMPLE<float>& de_input,int id_input)
     :id(id_input),de(de_input)
 {
     de.force_wrappers.Append(this);
+}
+//#####################################################################
+// Constructor
+//#####################################################################
+SCRIPTED_GEOMETRY_WRAPPER::SCRIPTED_GEOMETRY_WRAPPER(DEFORMABLE_EXAMPLE<float>& de_input)
+    :OBJECT_WRAPPER(de_input,fixed_id()),rigid_index(0)
+{
+}
+//#####################################################################
+// Constructor
+//#####################################################################
+DEFORMABLE_BODY_WRAPPER::DEFORMABLE_BODY_WRAPPER(DEFORMABLE_EXAMPLE<float>& de_input)
+    :OBJECT_WRAPPER(de_input,fixed_id()),structure_index(0),enclosing_structure_index(0)
+{
+}
+//#####################################################################
+// Constructor
+//#####################################################################
+VOLUMETRIC_FORCE_WRAPPER::VOLUMETRIC_FORCE_WRAPPER(DEFORMABLE_EXAMPLE<float>& de_input)
+    :FORCE_WRAPPER(de_input,fixed_id()),stiffness(0),poissons_ratio(0),damping(0)
+{
+}
+//#####################################################################
+// Destructor
+//#####################################################################
+VOLUMETRIC_FORCE_WRAPPER::~VOLUMETRIC_FORCE_WRAPPER()
+{
+}
+//#####################################################################
+// Constructor
+//#####################################################################
+GRAVITY_WRAPPER::GRAVITY_WRAPPER(DEFORMABLE_EXAMPLE<float>& de_input)
+    :FORCE_WRAPPER(de_input,fixed_id()),magnitude(0)
+{
+}
+//#####################################################################
+// Destructor
+//#####################################################################
+GRAVITY_WRAPPER::~GRAVITY_WRAPPER()
+{
+}
+//#####################################################################
+// Destructor
+//#####################################################################
+FORCE_WRAPPER::~FORCE_WRAPPER()
+{
 }
 template class DEFORMABLE_EXAMPLE<float>;

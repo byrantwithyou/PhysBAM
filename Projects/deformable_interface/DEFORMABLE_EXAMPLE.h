@@ -34,14 +34,14 @@ struct DEFORMABLE_BODY_WRAPPER: public OBJECT_WRAPPER
     ARRAY<int> particle_map;
 
     static int fixed_id(int s = -1){static int i = s; return i;}
-    DEFORMABLE_BODY_WRAPPER(DEFORMABLE_EXAMPLE<float>& de_input): OBJECT_WRAPPER(de_input,fixed_id()),structure_index(0),enclosing_structure_index(0) {}
+    DEFORMABLE_BODY_WRAPPER(DEFORMABLE_EXAMPLE<float>& de_input);
 };
 
 struct SCRIPTED_GEOMETRY_WRAPPER: public OBJECT_WRAPPER
 {
     int rigid_index;
     static int fixed_id(int s = -1){static int i = s; return i;}
-    SCRIPTED_GEOMETRY_WRAPPER(DEFORMABLE_EXAMPLE<float>& de_input): OBJECT_WRAPPER(de_input,fixed_id()),rigid_index(0) {}
+    SCRIPTED_GEOMETRY_WRAPPER(DEFORMABLE_EXAMPLE<float>& de_input);
 };
 
 struct FORCE_WRAPPER
@@ -50,6 +50,7 @@ struct FORCE_WRAPPER
     DEFORMABLE_EXAMPLE<float>& de;
 
     FORCE_WRAPPER(DEFORMABLE_EXAMPLE<float>& de_input,int id_input=0);
+    virtual ~FORCE_WRAPPER();
 };
 
 struct GRAVITY_WRAPPER: public FORCE_WRAPPER
@@ -61,7 +62,8 @@ struct GRAVITY_WRAPPER: public FORCE_WRAPPER
     ARRAY<DEFORMABLE_GRAVITY<TV>*> force_instances;
 
     static int fixed_id(int s = -1){static int i = s; return i;}
-    GRAVITY_WRAPPER(DEFORMABLE_EXAMPLE<float>& de_input): FORCE_WRAPPER(de_input,fixed_id()),magnitude(0) {}
+    GRAVITY_WRAPPER(DEFORMABLE_EXAMPLE<float>& de_input);
+    virtual ~GRAVITY_WRAPPER();
 };
 
 struct VOLUMETRIC_FORCE_WRAPPER: public FORCE_WRAPPER
@@ -74,7 +76,8 @@ struct VOLUMETRIC_FORCE_WRAPPER: public FORCE_WRAPPER
     ARRAY<FINITE_VOLUME<TV,3>*> force_instances;
 
     static int fixed_id(int s = -1){static int i = s; return i;}
-    VOLUMETRIC_FORCE_WRAPPER(DEFORMABLE_EXAMPLE<float>& de_input): FORCE_WRAPPER(de_input,fixed_id()),stiffness(0),poissons_ratio(0),damping(0) {}
+    VOLUMETRIC_FORCE_WRAPPER(DEFORMABLE_EXAMPLE<float>& de_input);
+    virtual ~VOLUMETRIC_FORCE_WRAPPER();
 };
 
 inline void Register_Wrapper_Ids()
@@ -101,6 +104,7 @@ public:
     ARRAY<FORCE_WRAPPER*> force_wrappers;
     ARRAY<PAIR<OBJECT_WRAPPER*,FORCE_WRAPPER*> > new_forces_relations;
     bool added_body;
+    bool want_log;
 
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
     using BASE::solids_parameters;using BASE::fluids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::output_directory;using BASE::restart;

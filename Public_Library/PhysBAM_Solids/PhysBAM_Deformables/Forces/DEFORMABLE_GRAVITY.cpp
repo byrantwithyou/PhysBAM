@@ -15,6 +15,7 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 {
     if(!gravity) return;
     for(ELEMENT_ITERATOR iterator(force_particles);iterator.Valid();iterator.Next()){int p=iterator.Data();F(p)+=gravity*particles.mass(p)*downward_direction;}
+    force_particles.Print();
 }
 //#####################################################################
 // Function Potential_Energy
