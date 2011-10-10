@@ -583,6 +583,7 @@ Create_Regular_Embedded_Surface(BINDING_LIST<TV>& binding_list,SOFT_BINDINGS<TV>
     Set_Mass_Of_Particles(volume,density,true);
     ARRAY<int> volume_map;
     Embed_Surface_In_Tetrahedralized_Volume(binding_list,soft_bindings,surface,volume,thickness_over_two,surface_particle_map,volume_map,new_surface,new_volume,bind_edges);
+    delete &particles;
 }
 //#####################################################################
 // Function Mark_Hard_Bindings_With_Free_Particles
