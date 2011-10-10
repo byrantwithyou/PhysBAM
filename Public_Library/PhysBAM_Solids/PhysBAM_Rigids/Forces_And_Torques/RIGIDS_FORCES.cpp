@@ -74,11 +74,6 @@ Potential_Energy(const T time) const
     PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
     return 0;
 }
-template<class TV> void RIGIDS_FORCES<TV>::
-Store_Velocities()
-{
-    PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
-}
 //#####################################################################
 #define INSTANTIATION_HELPER(T,d) \
     template class RIGIDS_FORCES<VECTOR<T,d> >;

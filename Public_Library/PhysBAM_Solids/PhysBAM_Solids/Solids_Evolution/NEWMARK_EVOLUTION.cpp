@@ -372,7 +372,6 @@ Advance_One_Time_Step_Position(const T dt,const T time, const bool solids)
         asynchronous_evolution->Position_Velocity_Update(dt,time);}
     else Backward_Euler_Step_Velocity_Helper(v_dt,time,time,false); // update V implicitly to time+dt/2
 
-    solid_body_collection.Store_Velocities();
     Diagnostics(dt,time,1,0,5,"backward Euler");
         
     if(solids_parameters.use_projections_in_position_update){

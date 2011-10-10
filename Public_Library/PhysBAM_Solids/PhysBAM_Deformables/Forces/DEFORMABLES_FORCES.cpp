@@ -93,11 +93,6 @@ Add_Connectivity(ARRAY<int>& particle_degree)
 {
     PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
 }
-template<class TV> void DEFORMABLES_FORCES<TV>::
-Store_Velocities()
-{
-    PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
-}
 //#####################################################################
 #define INSTANTIATION_HELPER(T,d) \
     template class DEFORMABLES_FORCES<VECTOR<T,d> >;

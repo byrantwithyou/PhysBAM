@@ -114,7 +114,6 @@ public:
     void Test_Energy(const T time);
     void Test_Force_Derivatives(const T time);
     void Setup_Set_Velocity_From_Positions(const T time,const bool is_position_update,const bool reset_alphas);
-    void Store_Velocities();
     void Read(const STREAM_TYPE,const std::string& prefix,const std::string& static_prefix,const int frame,const int static_frame,const bool include_static_variables,
         const bool read_from_every_process);
     void Write(const STREAM_TYPE,const std::string& prefix,const std::string& static_prefix,const int frame,const int static_frame,const bool include_static_variables,

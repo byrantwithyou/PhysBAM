@@ -420,14 +420,6 @@ Write(const STREAM_TYPE stream_type,const std::string& prefix,const int frame,co
     Write(stream_type,prefix,prefix,frame,static_frame,include_static_variables,write_from_every_process);
 }
 //#####################################################################
-// Function Store_Velocities
-//#####################################################################
-template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::
-Store_Velocities()
-{
-    for(int i=1;i<=deformables_forces.m;i++) deformables_forces(i)->Store_Velocities();
-}
-//#####################################################################
 // Function Test_Energy
 //#####################################################################
 template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::

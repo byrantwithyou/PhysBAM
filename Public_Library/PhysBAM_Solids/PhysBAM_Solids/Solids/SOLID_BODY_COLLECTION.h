@@ -103,7 +103,6 @@ public:
         const bool read_deformable_body,const bool read_from_every_process,ARRAY<int>* needs_init=0,ARRAY<int>* needs_destroy=0);
     void Write(const STREAM_TYPE stream_type,const std::string& prefix,const int frame,const int first_frame,const bool include_static_variables,const bool write_rigid_body,
         const bool write_deformable_body,const bool write_from_every_process,const bool output_interaction_pairs) const;
-    void Store_Velocities();
 //#####################################################################
 };
 }

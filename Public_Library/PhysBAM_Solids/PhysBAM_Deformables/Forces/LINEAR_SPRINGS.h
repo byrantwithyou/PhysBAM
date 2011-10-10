@@ -43,11 +43,7 @@ public:
     bool cache_strain;
     mutable ARRAY<VECTOR<T,2> > strains_of_segment; // VECTOR<T,2>(strain_rate, strain)
 
-    ARRAY<int> energy_correction_sign;
     bool verbose;
-
-    T saved_constant_youngs_modulus;
-    ARRAY<TV> saved_V;
 
 protected:
     struct STATE{
@@ -123,7 +119,6 @@ public:
     T Endpoint_Kinetic_Energy(int s,int b) const;
     T Endpoint_Kinetic_Energy(int s) const;
     typename TV::SCALAR Effective_Impulse_Factor(int s) const;
-    void Store_Velocities();
 //#####################################################################
 };
 

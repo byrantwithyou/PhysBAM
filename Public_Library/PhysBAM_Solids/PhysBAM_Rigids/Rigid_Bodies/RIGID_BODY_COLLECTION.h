@@ -84,7 +84,6 @@ public:
     void Print_Energy(const T time,const int step) const;
     T CFL_Rigid(const RIGID_BODY_EVOLUTION_PARAMETERS<TV>& rigid_body_evolution_parameters,const bool verbose_dt);
     int Add_Force(RIGIDS_FORCES<TV>* force);
-    void Store_Velocities();
 };
 }
 #endif

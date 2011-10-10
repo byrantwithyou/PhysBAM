@@ -45,7 +45,6 @@ private:
     ARRAY<VECTOR<T,4> > optimization_weights;
     FORCE_ELEMENTS force_springs;
 public:
-    ARRAY<int> energy_correction_sign;
     bool verbose;
 
     AXIAL_BENDING_SPRINGS(PARTICLES<TV>& particles_input,TRIANGLE_MESH& triangle_mesh_input);

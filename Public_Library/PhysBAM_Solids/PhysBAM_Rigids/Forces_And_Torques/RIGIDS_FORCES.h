@@ -81,7 +81,6 @@ public:
     virtual T CFL_Strain_Rate() const=0;
     virtual void Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> rigid_frequency)=0;
     virtual T Potential_Energy(const T time) const;
-    virtual void Store_Velocities();
 //#####################################################################
 };
 }

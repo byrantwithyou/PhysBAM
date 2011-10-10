@@ -344,14 +344,6 @@ Add_Force(RIGIDS_FORCES<TV>* force)
     return rigids_forces.m;
 }
 //#####################################################################
-// Function Store_Velocities
-//#####################################################################
-template<class TV> void RIGID_BODY_COLLECTION<TV>::
-Store_Velocities()
-{
-    for(int i=1;i<=rigids_forces.m;i++) rigids_forces(i)->Store_Velocities();
-}
-//#####################################################################
 template class RIGID_BODY_COLLECTION<VECTOR<float,1> >;
 template class RIGID_BODY_COLLECTION<VECTOR<float,2> >;
 template class RIGID_BODY_COLLECTION<VECTOR<float,3> >;

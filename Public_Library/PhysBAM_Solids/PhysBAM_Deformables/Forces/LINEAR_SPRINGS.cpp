@@ -489,15 +489,6 @@ Effective_Impulse_Factor(int s) const
     return (particles.mass(segment_mesh.elements(s)(1))+particles.mass(segment_mesh.elements(s)(1)))*one_over_denom;
 }
 //#####################################################################
-// Function Store_Velocities
-//#####################################################################
-template<class TV> void LINEAR_SPRINGS<TV>::
-Store_Velocities()
-{
-    saved_V.Resize(particles.array_collection->Size());
-    for(int i=1;i<=particles.array_collection->Size();i++) saved_V(i)=particles.V(i);
-}
-//#####################################################################
 // Function Create_Edge_Springs
 //#####################################################################
 template<class TV> LINEAR_SPRINGS<TV>* PhysBAM::
