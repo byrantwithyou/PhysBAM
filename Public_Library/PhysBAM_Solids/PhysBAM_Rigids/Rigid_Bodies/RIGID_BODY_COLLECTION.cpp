@@ -344,38 +344,6 @@ Add_Force(RIGIDS_FORCES<TV>* force)
     return rigids_forces.m;
 }
 //#####################################################################
-// Function Save_Potential_Energy
-//#####################################################################
-template<class TV> void RIGID_BODY_COLLECTION<TV>::
-Save_Potential_Energy(const T time)
-{
-    for(int i=1;i<=rigids_forces.m;i++) rigids_forces(i)->Save_Potential_Energy(time);
-}
-//#####################################################################
-// Function Compute_Energy_Error
-//#####################################################################
-template<class TV> void RIGID_BODY_COLLECTION<TV>::
-Compute_Energy_Error(ARRAY_VIEW<const TWIST<TV> > rigid_velocity_save,const T time,const T dt)
-{
-    for(int i=1;i<=rigids_forces.m;i++) rigids_forces(i)->Compute_Energy_Error(rigid_velocity_save,time,dt);
-}
-//#####################################################################
-// Function Add_Energy_Correction_Force
-//#####################################################################
-template<class TV> void RIGID_BODY_COLLECTION<TV>::
-Add_Energy_Correction_Force(ARRAY_VIEW<const TWIST<TV> > rigid_velocity_save,const T time,const T dt)
-{
-    for(int i=1;i<=rigids_forces.m;i++) rigids_forces(i)->Add_Energy_Correction_Force(rigid_velocity_save,time,dt);
-}
-//#####################################################################
-// Function Compute_Previously_Applied_Forces
-//#####################################################################
-template<class TV> void RIGID_BODY_COLLECTION<TV>::
-Compute_Previously_Applied_Forces()
-{
-    for(int i=1;i<=rigids_forces.m;i++) rigids_forces(i)->Compute_Previously_Applied_Forces();
-}
-//#####################################################################
 // Function Store_Velocities
 //#####################################################################
 template<class TV> void RIGID_BODY_COLLECTION<TV>::

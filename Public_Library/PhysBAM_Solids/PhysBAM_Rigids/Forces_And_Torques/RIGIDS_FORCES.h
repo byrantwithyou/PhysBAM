@@ -81,10 +81,6 @@ public:
     virtual T CFL_Strain_Rate() const=0;
     virtual void Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> rigid_frequency)=0;
     virtual T Potential_Energy(const T time) const;
-    virtual void Save_Potential_Energy(const T time);
-    virtual void Compute_Energy_Error(ARRAY_VIEW<const TWIST<TV> > rigid_velocity_save,const T time,const T dt);
-    virtual void Add_Energy_Correction_Force(ARRAY_VIEW<const TWIST<TV> > rigid_velocity_save,const T time,const T dt);
-    virtual void Compute_Previously_Applied_Forces();
     virtual void Store_Velocities();
 //#####################################################################
 };

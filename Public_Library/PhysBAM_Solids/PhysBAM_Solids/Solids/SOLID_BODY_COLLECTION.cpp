@@ -400,42 +400,6 @@ Add_Force(RIGIDS_FORCES<TV>* force)
     return rigid_body_collection.rigids_forces.m;
 }
 //#####################################################################
-// Function Save_Potential_Energy
-//#####################################################################
-template<class TV> void SOLID_BODY_COLLECTION<TV>::
-Save_Potential_Energy(const T time)
-{
-    rigid_body_collection.Save_Potential_Energy(time);
-    deformable_body_collection.Save_Potential_Energy(time);
-}
-//#####################################################################
-// Function Compute_Energy_Error
-//#####################################################################
-template<class TV> void SOLID_BODY_COLLECTION<TV>::
-Compute_Energy_Error(ARRAY_VIEW<const TV> velocity_save,ARRAY_VIEW<const TWIST<TV> > rigid_velocity_save,const T time,const T dt)
-{
-    rigid_body_collection.Compute_Energy_Error(rigid_velocity_save,time,dt);
-    deformable_body_collection.Compute_Energy_Error(velocity_save,time,dt);
-}
-//#####################################################################
-// Function Add_Energy_Correction_Force
-//#####################################################################
-template<class TV> void SOLID_BODY_COLLECTION<TV>::
-Add_Energy_Correction_Force(ARRAY_VIEW<const TV> velocity_save,ARRAY_VIEW<const TWIST<TV> > rigid_velocity_save,const int energy_correction_iterations,const T time,const T dt)
-{
-    rigid_body_collection.Add_Energy_Correction_Force(rigid_velocity_save,time,dt);
-    deformable_body_collection.Add_Energy_Correction_Force(velocity_save,energy_correction_iterations,time,dt);
-}
-//#####################################################################
-// Function Compute_Previously_Applied_Forces
-//#####################################################################
-template<class TV> void SOLID_BODY_COLLECTION<TV>::
-Compute_Previously_Applied_Forces()
-{
-    rigid_body_collection.Compute_Previously_Applied_Forces();
-    deformable_body_collection.Compute_Previously_Applied_Forces();
-}
-//#####################################################################
 // Function Store_Velocities
 //#####################################################################
 template<class TV> void SOLID_BODY_COLLECTION<TV>::

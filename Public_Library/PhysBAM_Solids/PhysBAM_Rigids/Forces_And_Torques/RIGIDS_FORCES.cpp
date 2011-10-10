@@ -75,26 +75,6 @@ Potential_Energy(const T time) const
     return 0;
 }
 template<class TV> void RIGIDS_FORCES<TV>::
-Save_Potential_Energy(const T time)
-{
-    PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
-}
-template<class TV> void RIGIDS_FORCES<TV>::
-Compute_Energy_Error(ARRAY_VIEW<const TWIST<TV> > rigid_velocity_save,const T time,const T dt)
-{
-    PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
-}
-template<class TV> void RIGIDS_FORCES<TV>::
-Add_Energy_Correction_Force(ARRAY_VIEW<const TWIST<TV> > rigid_velocity_save,const T time,const T dt)
-{
-    PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
-}
-template<class TV> void RIGIDS_FORCES<TV>::
-Compute_Previously_Applied_Forces()
-{
-    PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
-}
-template<class TV> void RIGIDS_FORCES<TV>::
 Store_Velocities()
 {
     PHYSBAM_WARN_IF_NOT_OVERRIDDEN();

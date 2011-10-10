@@ -100,35 +100,7 @@ public:
     virtual T Potential_Energy(const T time) const;
     virtual T Residual_Energy(const T time) const;
     virtual void Add_Force_Data(ARRAY<FORCE_DATA<TV> >& force_data_list,const std::string& force_name="") const;
-    virtual void Save_Potential_Energy(const T time);
-    virtual void Compute_Energy_Error(ARRAY_VIEW<const TV> velocity_save,const T time,const T dt);
-    virtual void Prepare_Energy_Correction_Force();
-    virtual void Compute_Energy_Correction_Force(ARRAY_VIEW<const TV> velocity_save,const int max_particle_degree,const T time,const T dt);
-    virtual void Apply_Energy_Correction(const T time,const T dt);
     virtual void Add_Connectivity(ARRAY<int>& particle_degree);
-    virtual void Compute_Previously_Applied_Forces();
-    virtual void Setup_Set_Velocity_From_Positions(const T time,const bool is_position_update,const bool reset_alphas);
-    virtual int Get_Element_Count();
-    virtual FORCE_ELEMENTS* Get_Force_Elements();
-    virtual ARRAY<int>* Incident_Nodes(const int force_element);
-    virtual TV Get_Direction(const int force_element);
-    virtual T Get_Combined_One_Over_Mass(const int force_element);
-    virtual ARRAY<int>* Incident_Force_Elements(const int particle);
-    virtual void Set_Force(const int force_element,const T force);
-    virtual void Choose_Solution(const bool use_orig_force,const int force_element,const T dt,const T alpha1,const T alpha2,ARRAY<T>& v_n_hats);
-    virtual TV Get_Force(const int force_element,const int particle,const bool use_original_force);
-    virtual T Get_Force(const int force_element);
-    virtual void Get_Damping_Force(const int particle,TV& damping_force,const T dt,const bool use_coefficient);
-    virtual void Update_Residual_Energy(const int force_element,const T residual_energy,const T time);
-    virtual T Get_Residual_Energy(const int force_element);
-    virtual void Compute_Quadratic_Contribution_For_Force(T& A,T& a,T&c,const T dt,const int force_element,const T combined_one_over_mass,const bool ignore_PE_terms);
-    virtual void Compute_Quadratic_Contribution_For_Node(T& B,T& C,T&b,const T dt,const int node,const int force_element,const T combined_one_over_mass,const T v_n_correction,
-        const bool ignore_PE_terms);
-    virtual void Compute_Quadratic_Contribution_For_Residual(T& B,T& C,T& a,T&b,T&c,const T dt,const T time,const int force_element,const bool ignore_PE_terms);
-    virtual void Store_Delta_PE(const T time);
-    virtual T Get_Total_Delta_PE();
-    virtual void Save_And_Reset_Elastic_Coefficient();
-    virtual void Restore_Elastic_Coefficient();
     virtual void Store_Velocities();
 //#####################################################################
 };

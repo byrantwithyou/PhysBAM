@@ -77,30 +77,7 @@ public:
     void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE;
     T Potential_Energy(int p,const T time) const;
     T Potential_Energy(const T time) const PHYSBAM_OVERRIDE;
-    void Save_Potential_Energy(const T time) PHYSBAM_OVERRIDE;
     T Residual_Energy(const T time) const PHYSBAM_OVERRIDE;
-    void Setup_Set_Velocity_From_Positions(const T time,const bool is_position_update,const bool reset_alphas) PHYSBAM_OVERRIDE;
-    int Get_Element_Count() PHYSBAM_OVERRIDE;
-    FORCE_ELEMENTS* Get_Force_Elements() PHYSBAM_OVERRIDE;
-    ARRAY<int>* Incident_Nodes(const int force_element) PHYSBAM_OVERRIDE;
-    TV Get_Direction(const int force_element) PHYSBAM_OVERRIDE;
-    T Get_Combined_One_Over_Mass(const int force_element) PHYSBAM_OVERRIDE;
-    ARRAY<int>* Incident_Force_Elements(const int particle) PHYSBAM_OVERRIDE;
-    void Choose_Solution(const bool use_orig_force,const int force_element,const T dt,const T alpha1,const T alpha2,ARRAY<T>& v_n_hats) PHYSBAM_OVERRIDE;
-    TV Get_Force(const int force_element,const int particle,const bool use_original_force) PHYSBAM_OVERRIDE;
-    T Get_Force(const int force_element) PHYSBAM_OVERRIDE;
-    void Set_Force(const int force_element,const T force) PHYSBAM_OVERRIDE;
-    void Get_Damping_Force(const int particle,TV& damping_force,const T dt,const bool use_coefficient) PHYSBAM_OVERRIDE;
-    void Update_Residual_Energy(const int force_element,const T residual_energy,const T time) PHYSBAM_OVERRIDE;
-    T Get_Residual_Energy(const int force_element) PHYSBAM_OVERRIDE;
-    void Compute_Quadratic_Contribution_For_Force(T& A,T& a,T&c,const T dt,const int force_element,const T combined_one_over_mass,const bool ignore_PE_terms) PHYSBAM_OVERRIDE;
-    void Compute_Quadratic_Contribution_For_Node(T& B,T& C,T&b,const T dt,const int node,const int force_element,const T combined_one_over_mass,const T v_n_correction,
-        const bool ignore_PE_terms) PHYSBAM_OVERRIDE;
-    void Compute_Quadratic_Contribution_For_Residual(T& B,T& C,T& a,T&b,T&c,const T dt,const T time,const int force_element,const bool ignore_PE_terms) PHYSBAM_OVERRIDE;
-    void Store_Delta_PE(const T time) PHYSBAM_OVERRIDE;
-    T Get_Total_Delta_PE() PHYSBAM_OVERRIDE;
-    void Save_And_Reset_Elastic_Coefficient() PHYSBAM_OVERRIDE;
-    void Restore_Elastic_Coefficient() PHYSBAM_OVERRIDE;
     void Update_Position_Based_State(const T time,const bool is_position_update) PHYSBAM_OVERRIDE;
 //#####################################################################
 };

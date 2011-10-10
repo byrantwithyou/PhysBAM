@@ -420,53 +420,6 @@ Write(const STREAM_TYPE stream_type,const std::string& prefix,const int frame,co
     Write(stream_type,prefix,prefix,frame,static_frame,include_static_variables,write_from_every_process);
 }
 //#####################################################################
-// Function Save_Potential_Energy
-//#####################################################################
-template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::
-Save_Potential_Energy(const T time)
-{
-    for(int i=1;i<=deformables_forces.m;i++) deformables_forces(i)->Save_Potential_Energy(time);
-}
-//#####################################################################
-// Function Compute_Energy_Error
-//#####################################################################
-template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::
-Compute_Energy_Error(ARRAY_VIEW<const TV> velocity_save,const T time,const T dt)
-{
-    for(int i=1;i<=deformables_forces.m;i++) deformables_forces(i)->Compute_Energy_Error(velocity_save,time,dt);
-}
-//#####################################################################
-// Function Add_Energy_Correction_Force
-//#####################################################################
-template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::
-Add_Energy_Correction_Force(ARRAY_VIEW<const TV> velocity_save,const int energy_correction_iterations,const T time,const T dt)
-{
-    ARRAY<int> particle_degrees(particles.array_collection->Size());
-    for(int i=1;i<=deformables_forces.m;i++){
-        deformables_forces(i)->Prepare_Energy_Correction_Force();
-        deformables_forces(i)->Add_Connectivity(particle_degrees);}
-    int max_particle_degree=ARRAYS_COMPUTATIONS::Max(particle_degrees);
-    for(int i=1;i<=energy_correction_iterations;i++){
-        for(int i=1;i<=deformables_forces.m;i++) deformables_forces(i)->Compute_Energy_Correction_Force(velocity_save,max_particle_degree,time,dt);
-        for(int i=1;i<=deformables_forces.m;i++) deformables_forces(i)->Apply_Energy_Correction(time,dt);}
-}
-//#####################################################################
-// Function Compute_Previously_Applied_Forces
-//#####################################################################
-template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::
-Compute_Previously_Applied_Forces()
-{
-    for(int i=1;i<=deformables_forces.m;i++) deformables_forces(i)->Compute_Previously_Applied_Forces();
-}
-//#####################################################################
-// Function Initialize_Incident_Elements
-//#####################################################################
-template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::
-Setup_Set_Velocity_From_Positions(const T time,const bool is_position_update,const bool reset_alphas)
-{
-    for(int i=1;i<=deformables_forces.m;i++) deformables_forces(i)->Setup_Set_Velocity_From_Positions(time,is_position_update,reset_alphas);
-}
-//#####################################################################
 // Function Store_Velocities
 //#####################################################################
 template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::

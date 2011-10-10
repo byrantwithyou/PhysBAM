@@ -103,10 +103,6 @@ public:
         const bool read_deformable_body,const bool read_from_every_process,ARRAY<int>* needs_init=0,ARRAY<int>* needs_destroy=0);
     void Write(const STREAM_TYPE stream_type,const std::string& prefix,const int frame,const int first_frame,const bool include_static_variables,const bool write_rigid_body,
         const bool write_deformable_body,const bool write_from_every_process,const bool output_interaction_pairs) const;
-    void Save_Potential_Energy(const T time);
-    void Compute_Energy_Error(ARRAY_VIEW<const TV> velocity_save,ARRAY_VIEW<const TWIST<TV> > rigid_velocity_save,const T time,const T dt);
-    void Add_Energy_Correction_Force(ARRAY_VIEW<const TV> velocity_save,ARRAY_VIEW<const TWIST<TV> > rigid_velocity_save,const int energy_correction_iterations,const T time,const T dt);
-    void Compute_Previously_Applied_Forces();
     void Store_Velocities();
 //#####################################################################
 };

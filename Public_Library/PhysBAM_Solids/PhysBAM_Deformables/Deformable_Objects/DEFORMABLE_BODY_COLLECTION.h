@@ -111,12 +111,8 @@ public:
     void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V_full,ARRAY_VIEW<TV> F_full,const T time) const;
     void Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V_full,ARRAY_VIEW<TV> F_full,const T scale,const T time) const;
 
-    void Save_Potential_Energy(const T time);
-    void Compute_Energy_Error(ARRAY_VIEW<const TV> velocity_save,const T time,const T dt);
-    void Add_Energy_Correction_Force(ARRAY_VIEW<const TV> velocity_save,const int energy_correction_iterations,const T time,const T dt);
     void Test_Energy(const T time);
     void Test_Force_Derivatives(const T time);
-    void Compute_Previously_Applied_Forces();
     void Setup_Set_Velocity_From_Positions(const T time,const bool is_position_update,const bool reset_alphas);
     void Store_Velocities();
     void Read(const STREAM_TYPE,const std::string& prefix,const std::string& static_prefix,const int frame,const int static_frame,const bool include_static_variables,

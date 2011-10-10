@@ -85,16 +85,9 @@ public:
     void Print_Restlength_Statistics() const;
     void Print_Deformation_Statistics() const;
     T Maximum_Compression_Or_Expansion_Fraction(int* index=0) const;
-    void Print_All_Energy_Debts(ARRAY_VIEW<const TWIST<TV> > rigid_velocity_save,const T time,const T dt) const;
     T Potential_Energy(int s,const T time) const;
     T Potential_Energy(const T time) const PHYSBAM_OVERRIDE;
-    void Save_Potential_Energy(const T time);
     T Compute_Total_Energy(const T time) const;
-    void Compute_Previously_Applied_Forces();
-    T Compute_Spring_Work(int s,ARRAY_VIEW<const TWIST<TV> > rigid_velocity_save,const T time,const T dt) const;
-    void Compute_Energy_Error(ARRAY_VIEW<const TWIST<TV> > rigid_velocity_save,const T time,const T dt);
-    void Apply_Energy_Correction_Impulse(const int s,const T force,const T dt);
-    void Add_Energy_Correction_Force(ARRAY_VIEW<const TWIST<TV> > rigid_velocity_save,const T time,const T dt);
     T Effective_Impulse_Factor(int s,int b) const;
     T Effective_Impulse_Factor(int s) const;
     const RIGID_BODY<TV>& Body(int s,int b) const;
