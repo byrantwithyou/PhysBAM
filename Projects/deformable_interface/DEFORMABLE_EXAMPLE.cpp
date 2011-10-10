@@ -327,7 +327,7 @@ Add_Simulation_Object(const data_exchange::simulation_object& body)
 // Constructor
 //#####################################################################
 OBJECT_WRAPPER::OBJECT_WRAPPER(DEFORMABLE_EXAMPLE<float>& de_input,int id_input)
-    :id(id_input),de(de_input)
+    :BASE_WRAPPER(de_input,id_input)
 {
     de.object_wrappers.Append(this);
 }
@@ -335,7 +335,7 @@ OBJECT_WRAPPER::OBJECT_WRAPPER(DEFORMABLE_EXAMPLE<float>& de_input,int id_input)
 // Constructor
 //#####################################################################
 FORCE_WRAPPER::FORCE_WRAPPER(DEFORMABLE_EXAMPLE<float>& de_input,int id_input)
-    :id(id_input),de(de_input)
+    :BASE_WRAPPER(de_input,id_input)
 {
     de.force_wrappers.Append(this);
 }
@@ -383,6 +383,19 @@ GRAVITY_WRAPPER::~GRAVITY_WRAPPER()
 // Destructor
 //#####################################################################
 FORCE_WRAPPER::~FORCE_WRAPPER()
+{
+}
+//#####################################################################
+// Constructor
+//#####################################################################
+BASE_WRAPPER::BASE_WRAPPER(DEFORMABLE_EXAMPLE<float>& de_input,int id_input)
+    :de(de_input),id(id_input)
+{
+}
+//#####################################################################
+// Destructor
+//#####################################################################
+BASE_WRAPPER::~BASE_WRAPPER()
 {
 }
 template class DEFORMABLE_EXAMPLE<float>;

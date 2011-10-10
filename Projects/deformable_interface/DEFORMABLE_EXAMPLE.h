@@ -18,11 +18,17 @@ template<class T> class DEFORMABLE_EXAMPLE;
 template<class TV> class DEFORMABLE_GRAVITY;
 template<class TV,int d> class FINITE_VOLUME;
 
-struct OBJECT_WRAPPER
+struct BASE_WRAPPER
 {
     int id;
     DEFORMABLE_EXAMPLE<float>& de;
 
+    BASE_WRAPPER(DEFORMABLE_EXAMPLE<float>& de_input,int id_input);
+    virtual ~BASE_WRAPPER();
+};
+
+struct OBJECT_WRAPPER: public BASE_WRAPPER
+{
     OBJECT_WRAPPER(DEFORMABLE_EXAMPLE<float>& de_input,int id_input);
 };
 
@@ -44,11 +50,8 @@ struct SCRIPTED_GEOMETRY_WRAPPER: public OBJECT_WRAPPER
     SCRIPTED_GEOMETRY_WRAPPER(DEFORMABLE_EXAMPLE<float>& de_input);
 };
 
-struct FORCE_WRAPPER
+struct FORCE_WRAPPER: public BASE_WRAPPER
 {
-    int id;
-    DEFORMABLE_EXAMPLE<float>& de;
-
     FORCE_WRAPPER(DEFORMABLE_EXAMPLE<float>& de_input,int id_input=0);
     virtual ~FORCE_WRAPPER();
 };
@@ -80,13 +83,15 @@ struct VOLUMETRIC_FORCE_WRAPPER: public FORCE_WRAPPER
     virtual ~VOLUMETRIC_FORCE_WRAPPER();
 };
 
+void register_accessors(int last_id);
 inline void Register_Wrapper_Ids()
 {
-    int next_id=1;
-    DEFORMABLE_BODY_WRAPPER::fixed_id(next_id++);
-    SCRIPTED_GEOMETRY_WRAPPER::fixed_id(next_id++);
-    GRAVITY_WRAPPER::fixed_id(next_id++);
-    VOLUMETRIC_FORCE_WRAPPER::fixed_id(next_id++);
+    int next_id=0;
+    DEFORMABLE_BODY_WRAPPER::fixed_id(++next_id);
+    SCRIPTED_GEOMETRY_WRAPPER::fixed_id(++next_id);
+    GRAVITY_WRAPPER::fixed_id(++next_id);
+    VOLUMETRIC_FORCE_WRAPPER::fixed_id(++next_id);
+    register_accessors(next_id);
 }
 
 template<class T_input>
