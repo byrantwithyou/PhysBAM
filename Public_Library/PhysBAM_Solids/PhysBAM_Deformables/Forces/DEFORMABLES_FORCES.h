@@ -98,7 +98,6 @@ public:
     virtual T CFL_Strain_Rate() const=0;
     virtual void Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> frequency)=0;
     virtual T Potential_Energy(const T time) const;
-    virtual T Residual_Energy(const T time) const;
     virtual void Add_Force_Data(ARRAY<FORCE_DATA<TV> >& force_data_list,const std::string& force_name="") const;
     virtual void Add_Connectivity(ARRAY<int>& particle_degree);
     virtual void Store_Velocities();

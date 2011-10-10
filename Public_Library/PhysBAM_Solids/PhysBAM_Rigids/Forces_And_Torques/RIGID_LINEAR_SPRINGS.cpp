@@ -31,7 +31,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> RIGID_LINEAR_SPRINGS<TV>::
 RIGID_LINEAR_SPRINGS(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input)
-    :BASE(rigid_body_collection_input),use_kinetic_energy_fix(true),relaxation_fraction(1),use_gauss_seidel_in_energy_correction(false),allow_kd_direction_flip(false)
+    :BASE(rigid_body_collection_input)
 {
     Invalidate_CFL();
 }
@@ -91,9 +91,6 @@ Update_Position_Based_State(const T time)
 {
     states.Resize(segment_mesh.elements.m);
     current_lengths.Resize(segment_mesh.elements.m);
-    extra_energy.Resize(youngs_modulus.m);
-    force_correction.Resize(youngs_modulus.m);
-    previously_applied_forces.Resize(youngs_modulus.m);
     
     for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
         TV X1=Attachment_Location(s,1),X2=Attachment_Location(s,2);
@@ -286,7 +283,6 @@ Compute_Total_Energy(const T time) const
     for(int i=1;i<=rigid_body_collection.rigid_body_particle.array_collection->Size();i++){
         total_energy+=rigid_body_collection.Rigid_Body(i).Kinetic_Energy();
     }
-    total_energy+=ARRAYS_COMPUTATIONS::Sum(extra_energy);
     return total_energy;
 }
 //#####################################################################

@@ -21,8 +21,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T> AXIAL_BENDING_SPRINGS<T>::
 AXIAL_BENDING_SPRINGS(PARTICLES<TV>& particles_input,TRIANGLE_MESH& triangle_mesh_input)
-    :DEFORMABLES_FORCES<TV>(particles_input),triangle_mesh(triangle_mesh_input),use_kinetic_energy_fix(true),relaxation_fraction(1),
-    use_gauss_seidel_in_energy_correction(false),allow_kd_direction_flip(false),verbose(false)
+    :DEFORMABLES_FORCES<TV>(particles_input),triangle_mesh(triangle_mesh_input),verbose(false)
 {
     Initialize();
     Set_Stiffness(0);
@@ -127,9 +126,6 @@ Update_Position_Based_State(const T time,const bool is_position_update)
 {
     optimization_current_length.Resize(spring_particles.m,false,false);optimization_direction.Resize(spring_particles.m,false,false);
     optimization_weights.Resize(spring_particles.m,false,false);optimization_coefficient.Resize(spring_particles.m,false,false);
-    extra_energy.Resize(spring_particles.m);
-    force_correction.Resize(spring_particles.m);
-    previously_applied_forces.Resize(spring_particles.m);
 
     for(SPRING_ITERATOR iterator(force_springs);iterator.Valid();iterator.Next()){int s=iterator.Data();
         const VECTOR<int,4>& nodes=spring_particles(s);
@@ -137,13 +133,6 @@ Update_Position_Based_State(const T time,const bool is_position_update)
         Axial_Vector(nodes,optimization_current_length(s),optimization_direction(s),weights,attached_edge_length(s));
         optimization_weights(s).Set(1-weights.x,weights.x,1-weights.y,weights.y);
         optimization_coefficient(s)=damping(s)/restlength(s);}
-
-    residual_PE.Resize(spring_particles.m);
-    if(!incident_elements.m){
-        incident_elements.Resize(particles.array_collection->Size());
-        for(SPRING_ITERATOR iterator(force_springs);iterator.Valid();iterator.Next()){int s=iterator.Data();
-            const VECTOR<int,4>& nodes=spring_particles(s);
-            incident_elements(nodes(1)).Append(s);incident_elements(nodes(2)).Append(s);incident_elements(nodes(3)).Append(s);incident_elements(nodes(4)).Append(s);}}
 }
 //#####################################################################
 // Function Add_Velocity_Independent_Forces

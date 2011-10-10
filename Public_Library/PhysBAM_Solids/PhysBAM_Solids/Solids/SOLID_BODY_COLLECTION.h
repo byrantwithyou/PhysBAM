@@ -96,7 +96,7 @@ public:
     void Force_Differential(ARRAY_VIEW<const TV> dX_full,ARRAY_VIEW<TV> dF_full,const T time) const;
     void Enforce_Definiteness(const bool enforce_definiteness_input=true);
     void Compute_Linear_Momentum(TV& linear_momentum) const;
-    void Compute_Energy(const T time,T& kinetic_energy,T& potential_energy,T& residual_energy) const;
+    void Compute_Energy(const T time,T& kinetic_energy,T& potential_energy) const;
     void Print_Energy(const T time,const int step) const;
     void Adjust_Mesh_For_Self_Collision(const T time);
     void Read(const STREAM_TYPE stream_type,const std::string& prefix,const int frame,const int static_frame,const bool include_static_variables,const bool read_rigid_body,

@@ -343,9 +343,9 @@ Initialize()
     if(example.fluids_parameters.compressible && example.fluids_parameters.compressible_monitor_conservation_error){
         euler->Compute_Total_Conserved_Quantity(false,(T)0,euler->initial_total_conserved_quantity);
 
-        TV solid_momentum;T solid_kinetic_energy,solid_potential_energy,solid_residual_energy;
+        TV solid_momentum;T solid_kinetic_energy,solid_potential_energy;
         example.solid_body_collection.Compute_Linear_Momentum(solid_momentum);
-        example.solid_body_collection.Compute_Energy(time,solid_kinetic_energy,solid_potential_energy,solid_residual_energy);
+        example.solid_body_collection.Compute_Energy(time,solid_kinetic_energy,solid_potential_energy);
 
         for(int i=1;i<=T_GRID::dimension;++i) euler->initial_total_conserved_quantity[i+1]+=solid_momentum[i];
         euler->initial_total_conserved_quantity[T_GRID::dimension+2]+=(solid_kinetic_energy+solid_potential_energy);}
@@ -1284,10 +1284,10 @@ Advance_Fluid_One_Time_Step_Implicit_Part(const bool done,const T dt,const int s
     if(fluids_parameters.compressible){
         if(fluids_parameters.compressible_monitor_conservation_error){
             VECTOR<T,T_GRID::dimension+2> new_total_conserved_quantity;
-            TV solid_momentum;T solid_kinetic_energy,solid_potential_energy,solid_residual_energy;
+            TV solid_momentum;T solid_kinetic_energy,solid_potential_energy;
             euler->Compute_Total_Conserved_Quantity(true,dt,new_total_conserved_quantity);
             example.solid_body_collection.Compute_Linear_Momentum(solid_momentum);
-            example.solid_body_collection.Compute_Energy(time,solid_kinetic_energy,solid_potential_energy,solid_residual_energy);
+            example.solid_body_collection.Compute_Energy(time,solid_kinetic_energy,solid_potential_energy);
 
             for(int i=1;i<=T_GRID::dimension;++i) new_total_conserved_quantity[i+1]+=solid_momentum[i];
             new_total_conserved_quantity[T_GRID::dimension+2]+=(solid_kinetic_energy+solid_potential_energy);

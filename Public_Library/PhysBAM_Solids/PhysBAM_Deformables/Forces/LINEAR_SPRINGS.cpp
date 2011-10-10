@@ -38,8 +38,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> LINEAR_SPRINGS<TV>::
 LINEAR_SPRINGS(PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh_input,const bool implicit)
-    :DEFORMABLES_FORCES<TV>(particles),segment_mesh(segment_mesh_input),use_plasticity(false),cache_strain(false),
-    use_kinetic_energy_fix(true),relaxation_fraction(1),use_gauss_seidel_in_energy_correction(false),allow_kd_direction_flip(false),verbose(false)
+    :DEFORMABLES_FORCES<TV>(particles),segment_mesh(segment_mesh_input),use_plasticity(false),cache_strain(false),verbose(false)
 {
     Set_Stiffness(0);Set_Damping(0);
     use_implicit_velocity_independent_forces=implicit;
@@ -181,10 +180,6 @@ Update_Position_Based_State(const T time,const bool is_position_update)
 {
     states.Resize(segment_mesh.elements.m,false,false);
     current_lengths.Resize(segment_mesh.elements.m,false,false);
-    extra_energy.Resize(segment_mesh.elements.m);
-    force_correction.Resize(segment_mesh.elements.m);
-    previously_applied_forces.Resize(segment_mesh.elements.m);
-    residual_PE.Resize(segment_mesh.elements.m);
     
     ARRAY_VIEW<const TV> X(particles.X);
     if(!damping.m) for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
@@ -430,17 +425,6 @@ Potential_Energy(const T time) const
     for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
         potential_energy+=Potential_Energy(s,time);}
     return potential_energy;
-}
-//#####################################################################
-// Function Residual_Energy
-//#####################################################################
-template<class TV> typename TV::SCALAR LINEAR_SPRINGS<TV>::
-Residual_Energy(const T time) const
-{
-    T residual_energy=0;
-    for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
-        residual_energy+=residual_PE(s);}
-    return residual_energy;
 }
 //#####################################################################
 // Function Add_Force_Data

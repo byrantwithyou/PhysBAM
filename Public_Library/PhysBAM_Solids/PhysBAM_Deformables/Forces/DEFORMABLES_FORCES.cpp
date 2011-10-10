@@ -84,12 +84,6 @@ Potential_Energy(const T time) const
     PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
     return 0;
 }
-template<class TV> typename TV::SCALAR DEFORMABLES_FORCES<TV>::
-Residual_Energy(const T time) const
-{
-    PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
-    return 0;
-}
 template<class TV> void DEFORMABLES_FORCES<TV>::
 Add_Force_Data(ARRAY<FORCE_DATA<TV> >& force_data_list,const std::string& force_name) const
 {

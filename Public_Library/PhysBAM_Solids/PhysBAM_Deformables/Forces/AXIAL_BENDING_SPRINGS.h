@@ -45,25 +45,8 @@ private:
     ARRAY<VECTOR<T,4> > optimization_weights;
     FORCE_ELEMENTS force_springs;
 public:
-    ARRAY<T> energy_correction_forces;
     ARRAY<int> energy_correction_sign;
-    ARRAY<T> extra_energy;
-    ARRAY<T> potential_energy_save;
-    ARRAY<T> force_correction;
-    ARRAY<TV> previously_applied_forces;
-    bool use_kinetic_energy_fix;
-    bool relaxation_fraction;
-    bool use_gauss_seidel_in_energy_correction;
-    bool allow_kd_direction_flip;
     bool verbose;
-
-    ARRAY<T> residual_PE;
-    ARRAY<T> delta_PE;
-    T total_delta_PE;
-    ARRAY<T> force_estimates;
-    ARRAY<ARRAY<int> > incident_nodes;
-    ARRAY<ARRAY<int> > incident_elements;
-    ARRAY<T> saved_youngs_modulus;
 
     AXIAL_BENDING_SPRINGS(PARTICLES<TV>& particles_input,TRIANGLE_MESH& triangle_mesh_input);
 

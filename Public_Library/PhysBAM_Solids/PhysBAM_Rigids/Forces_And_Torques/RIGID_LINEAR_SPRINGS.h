@@ -31,17 +31,8 @@ public:
     ARRAY<T> youngs_modulus; // units of force (i.e. force per unit strain)
     ARRAY<T> restlength,visual_restlength,current_lengths; // visual restlength corresponds to length between particles; restlength may be larger than this to avoid zero/small restlength
     ARRAY<T> damping; // units of force*time (i.e. force per unit strain rate)
-    ARRAY<T> extra_energy;
-    ARRAY<T> potential_energy_save;
-    ARRAY<T> force_correction;
-    ARRAY<TV> previously_applied_forces;
     mutable ARRAY<VECTOR<T,2> > strains_of_segment; // VECTOR<T,2>(strain_rate, strain)
     ARRAY<VECTOR<TV,2> > attachment_radius;
-    bool use_kinetic_energy_fix;
-    bool relaxation_fraction;
-    ARRAY<T> energy_correction_forces;
-    bool use_gauss_seidel_in_energy_correction;
-    bool allow_kd_direction_flip;
 
     struct STATE{
         STATE()

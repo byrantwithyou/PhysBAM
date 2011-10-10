@@ -38,29 +38,11 @@ Potential_Energy(const T time) const
     return potential_energy;
 }
 //#####################################################################
-// Function Residual_Energy
-//#####################################################################
-template<class TV> typename TV::SCALAR DEFORMABLE_GRAVITY<TV>::
-Residual_Energy(const T time) const
-{
-    T residual_energy=0;
-    if(residual_PE.m)
-        for(ELEMENT_ITERATOR iterator(force_particles);iterator.Valid();iterator.Next()){int p=iterator.Data();
-            residual_energy+=residual_PE(p);}
-    return residual_energy;
-}
-//#####################################################################
 // Function Update_Position_Based_State
 //#####################################################################
 template<class TV> void DEFORMABLE_GRAVITY<TV>::
 Update_Position_Based_State(const T time,const bool is_position_update)
 {
-    if(!residual_PE.m) residual_PE.Resize(particles.array_collection->Size());
-
-    if(!incident_elements.m){
-        incident_elements.Resize(particles.array_collection->Size());
-        for(int i=1;i<=force_particles.indices.m;i++)
-            incident_elements(force_particles.indices(i)).Append(force_particles.indices(i));}
 }
 //#####################################################################
 template class DEFORMABLE_GRAVITY<VECTOR<float,1> >;

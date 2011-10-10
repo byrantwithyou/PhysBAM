@@ -178,12 +178,6 @@ Update_Position_Based_State(const T time,const bool is_position_update)
                 SPRING_STATE& state=spring_states_all_springs(t)[h];
                 if(Fill_Spring_State(t,h,node1,node2,node3,node4,state)) used_springs++;}}}
 
-    residual_PE.Resize(mesh.elements.m);
-    if(!total_PE.m){
-        total_PE.Resize(mesh.elements.m);
-        for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
-            total_PE(t)=Potential_Energy(t,time);}}
-
     if(print_number_used) LOG::cout<<"using "<<used_springs<<" of "<<total_elements<<" altitude springs"<<std::endl;
     if(compute_half_forces){
         if(use_shortest_spring_only) for(int i=1;i<=spring_states.m;i++){
@@ -426,17 +420,6 @@ Potential_Energy(const T time) const
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
         potential_energy+=Potential_Energy(t,time);}
     return potential_energy;
-}
-//#####################################################################
-// Function Residual_Energy
-//#####################################################################
-template<class T> T LINEAR_ALTITUDE_SPRINGS_3D<T>::
-Residual_Energy(const T time) const
-{
-    T residual_energy=0;
-    for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
-        residual_energy+=residual_PE(t);}
-    return residual_energy;
 }
 
 template<class T> LINEAR_ALTITUDE_SPRINGS_3D<T>* PhysBAM::

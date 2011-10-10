@@ -43,23 +43,9 @@ public:
     bool cache_strain;
     mutable ARRAY<VECTOR<T,2> > strains_of_segment; // VECTOR<T,2>(strain_rate, strain)
 
-    ARRAY<T> energy_correction_forces;
     ARRAY<int> energy_correction_sign;
-    ARRAY<T> extra_energy;
-    ARRAY<T> potential_energy_save;
-    ARRAY<T> force_correction;
-    ARRAY<TV> previously_applied_forces;
-    bool use_kinetic_energy_fix;
-    bool relaxation_fraction;
-    bool use_gauss_seidel_in_energy_correction;
-    bool allow_kd_direction_flip;
     bool verbose;
 
-    ARRAY<T> residual_PE;
-    ARRAY<T> delta_PE;
-    T total_delta_PE;
-    ARRAY<T> force_estimates;
-    ARRAY<ARRAY<int> > incident_nodes;
     T saved_constant_youngs_modulus;
     ARRAY<TV> saved_V;
 
@@ -130,7 +116,6 @@ public:
     T Maximum_Compression_Or_Expansion_Fraction(int* index=0) const;
     T Potential_Energy(const int s,const T time) const;
     T Potential_Energy(const T time) const PHYSBAM_OVERRIDE;
-    T Residual_Energy(const T time) const PHYSBAM_OVERRIDE;
     void Add_Force_Data(ARRAY<FORCE_DATA<TV> >& force_data_list,const std::string& force_name="") const PHYSBAM_OVERRIDE;
 
     void Add_Connectivity(ARRAY<int>& particle_degree);

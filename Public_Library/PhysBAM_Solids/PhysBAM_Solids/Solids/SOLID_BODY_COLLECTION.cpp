@@ -298,11 +298,10 @@ Compute_Linear_Momentum(TV& linear_momentum) const
 // Function Compute_Energy
 //#####################################################################
 template<class TV> void SOLID_BODY_COLLECTION<TV>::
-Compute_Energy(const T time,T& kinetic_energy,T& potential_energy,T& residual_energy) const
+Compute_Energy(const T time,T& kinetic_energy,T& potential_energy) const
 {
     potential_energy=0;
     kinetic_energy=0;
-    residual_energy=0;
     for(int i=1;i<=solids_forces.m;i++) potential_energy+=solids_forces(i)->Potential_Energy(time);
     for(int i=1;i<=rigid_body_collection.rigids_forces.m;i++) potential_energy+=rigid_body_collection.rigids_forces(i)->Potential_Energy(time);
     for(int i=1;i<=deformable_body_collection.deformables_forces.m;i++) potential_energy+=deformable_body_collection.deformables_forces(i)->Potential_Energy(time);
@@ -310,7 +309,6 @@ Compute_Energy(const T time,T& kinetic_energy,T& potential_energy,T& residual_en
         kinetic_energy+=(T).5*deformable_body_collection.particles.mass(p)*TV::Dot_Product(deformable_body_collection.particles.V(p),deformable_body_collection.particles.V(p));}
     for(int i=1;i<=rigid_body_collection.dynamic_rigid_body_particles.m;i++){int p=rigid_body_collection.dynamic_rigid_body_particles(i);
         kinetic_energy+=rigid_body_collection.Rigid_Body(p).Kinetic_Energy();}
-    for(int i=1;i<=deformable_body_collection.deformables_forces.m;i++) residual_energy+=deformable_body_collection.deformables_forces(i)->Residual_Energy(time);
 }
 //#####################################################################
 // Function Print_Energy
@@ -319,9 +317,9 @@ template<class TV> void SOLID_BODY_COLLECTION<TV>::
 Print_Energy(const T time,const int step) const
 {
     if(print_energy){
-        T potential_energy=0,kinetic_energy=0,residual_energy=0;
-        Compute_Energy(time,kinetic_energy,potential_energy,residual_energy);
-        LOG::cout<<"total energy = "<<(potential_energy+kinetic_energy-residual_energy)<<"    (KE = "<<kinetic_energy<<"   PE = "<<potential_energy<<"   RE = " <<residual_energy<<")  Step "<<step<<std::endl;}
+        T potential_energy=0,kinetic_energy=0;
+        Compute_Energy(time,kinetic_energy,potential_energy);
+        LOG::cout<<"total energy = "<<(potential_energy+kinetic_energy)<<"    (KE = "<<kinetic_energy<<"   PE = "<<potential_energy<<")  Step "<<step<<std::endl;}
 }
 //#####################################################################
 // Function Read

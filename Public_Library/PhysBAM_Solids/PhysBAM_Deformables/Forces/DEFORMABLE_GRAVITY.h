@@ -21,14 +21,6 @@ public:
 
     T gravity;
     TV downward_direction;
-
-    ARRAY<T> residual_PE;
-    ARRAY<T> force_estimates;
-    ARRAY<ARRAY<int> > incident_nodes;
-    ARRAY<ARRAY<int> > incident_elements;
-    ARRAY<T> potential_energy_save;
-    ARRAY<T> delta_PE;
-    T total_delta_PE;
 public:
 
     DEFORMABLE_GRAVITY(PARTICLES<TV>& particles_input,ARRAY<int>* influenced_particles_input,const T gravity_input=9.8,const TV& downward_direction_input=-TV::Axis_Vector(2-(TV::dimension==1)))
@@ -77,7 +69,6 @@ public:
     void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE;
     T Potential_Energy(int p,const T time) const;
     T Potential_Energy(const T time) const PHYSBAM_OVERRIDE;
-    T Residual_Energy(const T time) const PHYSBAM_OVERRIDE;
     void Update_Position_Based_State(const T time,const bool is_position_update) PHYSBAM_OVERRIDE;
 //#####################################################################
 };

@@ -29,15 +29,6 @@ public:
     typedef typename BASE::ELEMENT_ITERATOR ELEMENT_ITERATOR;
     using BASE::parameters;
 
-    ARRAY<T> potential_energy_save;
-    ARRAY<T> delta_PE;
-    T total_delta_PE;
-    ARRAY<T> total_PE;
-    ARRAY<T> residual_PE;
-    ARRAY<T> force_estimates;
-    ARRAY<ARRAY<int> > incident_nodes;
-    ARRAY<VECTOR<T,4> > saved_youngs_modulus;
-
     LINEAR_ALTITUDE_SPRINGS_3D(PARTICLES<TV>& particles,TETRAHEDRON_MESH& tetrahedron_mesh);
     virtual ~LINEAR_ALTITUDE_SPRINGS_3D();
 
@@ -63,7 +54,6 @@ public:
 
     T Potential_Energy(const int t,const T time) const;
     T Potential_Energy(const T time) const PHYSBAM_OVERRIDE;
-    T Residual_Energy(const T time) const PHYSBAM_OVERRIDE;
 //#####################################################################
 };
 

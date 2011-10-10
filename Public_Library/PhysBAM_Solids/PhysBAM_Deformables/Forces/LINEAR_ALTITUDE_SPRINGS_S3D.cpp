@@ -118,12 +118,6 @@ Update_Position_Based_State(const T time,const bool is_position_update)
             if(use_plasticity) Compute_Plasticity(hmin,t,current_length);
             state.direction=direction;state.node=hmin;}}
 
-    residual_PE.Resize(mesh.elements.m);
-    if(!total_PE.m){
-        total_PE.Resize(mesh.elements.m);
-        for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
-            total_PE(t)=Potential_Energy(t,time);}}
-
     if(print_number_used) LOG::cout<<"using "<<used_springs<<" of "<<total_elements<<" altitude springs"<<std::endl;
     if(!mesh.incident_elements) mesh.Initialize_Incident_Elements();
 }
@@ -215,17 +209,6 @@ Potential_Energy(const T time) const
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
         potential_energy+=Potential_Energy(t,time);}
     return potential_energy;
-}
-//#####################################################################
-// Function Residual_Energy
-//#####################################################################
-template<class T> T LINEAR_ALTITUDE_SPRINGS_S3D<T>::
-Residual_Energy(const T time) const
-{
-    T residual_energy=0;
-    for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
-        residual_energy+=residual_PE(t);}
-    return residual_energy;
 }
 //#####################################################################
 template class LINEAR_ALTITUDE_SPRINGS_S3D<float>;
