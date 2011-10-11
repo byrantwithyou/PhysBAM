@@ -287,7 +287,7 @@ Initialize_After_New_Bodies()
 template<class T> void DEFORMABLE_EXAMPLE<T>::
 Simulate_Frame()
 {
-    if(new_forces_relations.m) Add_New_Forces();
+    if(new_forces_relations.m || added_body) Add_New_Forces();
     if(added_body){
         Initialize_After_New_Bodies();
         added_body=false;}
