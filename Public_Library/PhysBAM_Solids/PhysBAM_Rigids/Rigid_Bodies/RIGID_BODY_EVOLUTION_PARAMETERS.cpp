@@ -15,7 +15,7 @@ RIGID_BODY_EVOLUTION_PARAMETERS()
     :simulate_rigid_bodies(false),write_rigid_bodies(true),rigid_body_ether_viscosity(0),max_rigid_body_rotation_per_time_step((T).1*(T)pi),
     max_rigid_body_linear_movement_fraction_per_time_step((T).1),minimum_rigid_body_time_step_fraction(0),maximum_rigid_body_time_step_fraction((T)1.1),clamp_rigid_body_velocities(false),
     max_rigid_body_linear_velocity(0),max_rigid_body_angular_velocity(0),rigid_cfl((T).5),rigid_minimum_dt(0),rigid_maximum_dt(FLT_MAX),
-    correct_evolution_energy(false),residual_push_out_depth(0),correct_contact_energy(false),fix_velocities_in_position_update(false)
+    correct_evolution_energy(false),residual_push_out_depth(0),correct_contact_energy(false)
 {
 }
 //#####################################################################

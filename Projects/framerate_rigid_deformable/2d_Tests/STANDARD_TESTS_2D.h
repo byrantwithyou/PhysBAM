@@ -91,7 +91,6 @@ public:
 
     T stiffness_multiplier;
     T damping_multiplier;
-    bool set_velocity_from_positions;
     bool use_be,use_tr;
     GEOMETRY_PARTICLES<TV> residual_energy_particles;
 
@@ -104,7 +103,7 @@ public:
     using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::parse_args;using BASE::test_number;using BASE::frame_rate;
 
     STANDARD_TESTS_2D(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),set_velocity_from_positions(false),use_be(true),use_tr(false),
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),use_be(true),use_tr(false),
         number_side_panels(40),aspect_ratio((T)1.7),side_length((T)1.0)
     {
     }
@@ -129,7 +128,7 @@ public:
     void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     void Add_External_Impulses_Before(ARRAY_VIEW<TV> V,const T time,const T dt) PHYSBAM_OVERRIDE {}
     void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) PHYSBAM_OVERRIDE {}
-
+    void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
     
 //#####################################################################
 // Function Register_Options
@@ -139,7 +138,6 @@ void Register_Options() PHYSBAM_OVERRIDE
     BASE::Register_Options();
     parse_args->Add_Double_Argument("-stiffen",1,"","stiffness multiplier for various tests");
     parse_args->Add_Double_Argument("-dampen",1,"","damping multiplier for various tests");
-    parse_args->Add_Option_Argument("-setv","set velocity from positions");
     parse_args->Add_Option_Argument("-print_energy","print energy statistics");
     parse_args->Add_Option_Argument("-use_be","use backward Euler");
     parse_args->Add_Option_Argument("-use_tr","use trapezoid rule");
@@ -154,7 +152,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
     output_directory=STRING_UTILITIES::string_sprintf("2d_Tests/Test_%d",test_number);
     stiffness_multiplier=(T)parse_args->Get_Double_Value("-stiffen");
     damping_multiplier=(T)parse_args->Get_Double_Value("-dampen");
-    solids_parameters.set_velocity_from_positions=parse_args->Get_Option_Value("-setv");
     solid_body_collection.print_energy=parse_args->Get_Option_Value("-print_energy");
     if(parse_args->Is_Value_Set("-use_tr")){use_tr=true;use_be=false;}
     if(parse_args->Is_Value_Set("-use_be")){use_tr=false;use_be=true;}
@@ -163,29 +160,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
         output_directory+=STRING_UTILITIES::string_sprintf("_sidepanels=%d",number_side_panels);}
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
-//#####################################################################
-// Function Postprocess_Frame
-//#####################################################################
-void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
-{
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
-    ERROR_COLOR_MAP<T> color(1e-12,1,true,true,true);
-
-    if(ARRAY_VIEW<VECTOR<T,3> >* color_attribute=residual_energy_particles.array_collection->template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR)){
-        if(LINEAR_SPRINGS<TV>* linear_springs=solid_body_collection.deformable_body_collection.template Find_Force<LINEAR_SPRINGS<TV>*>()){
-            for(SEGMENT_ITERATOR iterator(linear_springs->force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();        
-                int p=residual_energy_particles.array_collection->Add_Element();
-                int node1,node2;linear_springs->segment_mesh.elements(s).Get(node1,node2);
-                residual_energy_particles.X(p)=(T).5*(particles.X(node1)+particles.X(node2));
-                (*color_attribute)(p)=color(abs(linear_springs->residual_PE(s)));}}}
-
-    if(residual_energy_particles.array_collection->Size()){
-        FILE_UTILITIES::Create_Directory(STRING_UTILITIES::string_sprintf("%s/%i",output_directory.c_str(),frame));
-        FILE_UTILITIES::Write_To_File(this->stream_type,STRING_UTILITIES::string_sprintf("%s/%i/residual_energy",output_directory.c_str(),frame),residual_energy_particles);
-        residual_energy_particles.array_collection->Delete_All_Elements();}
-    if(frame==1){
-        FILE_UTILITIES::Write_To_File(this->stream_type,STRING_UTILITIES::string_sprintf("%s/%i/residual_energy",output_directory.c_str(),0),residual_energy_particles);}
-}
 //#####################################################################
 // Function Initialize_Bodies
 //#####################################################################

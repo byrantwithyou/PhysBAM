@@ -110,7 +110,6 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Double_Argument("-clothcfl",4.,"Cloth CFL");
     parse_args->Add_Integer_Argument("-side_panels",40,"Cloth side panels");
     parse_args->Add_Option_Argument("-fully_explicit","Explicit damping forces");
-    parse_args->Add_Option_Argument("-setv","set velocity from positions");
     parse_args->Add_Option_Argument("-print_energy","print energy statistics");
 }
 //#####################################################################
@@ -129,7 +128,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
     cloth_cfl=(T)parse_args->Get_Double_Value("-clothcfl");
     number_side_panels=parse_args->Get_Integer_Value("-side_panels");
     fully_explicit=parse_args->Is_Value_Set("-fully_explicit");
-    solids_parameters.set_velocity_from_positions=parse_args->Get_Option_Value("-setv");
     solid_body_collection.print_energy=parse_args->Get_Option_Value("-print_energy");
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}

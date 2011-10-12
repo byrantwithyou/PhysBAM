@@ -502,8 +502,8 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
         kinetic_energy*=.5*volume;
         LOG::cout<<"Total kinetic energy at frame "<<frame<<" is "<<kinetic_energy<<std::endl;
 
-        T potential_energy=0,solid_kinetic_energy=0,solid_residual_energy=0;
-        solid_body_collection.Compute_Energy(frame/frame_rate,solid_kinetic_energy,potential_energy,solid_residual_energy);
+        T potential_energy=0,solid_kinetic_energy=0;
+        solid_body_collection.Compute_Energy(frame/frame_rate,solid_kinetic_energy,potential_energy);
         LOG::cout<<"Total potential energy at frame "<<frame<<" is "<<potential_energy<<std::endl;
 
         ARRAY<T,TV_INT> stream_function(RANGE<TV_INT>(domain_indices.min_corner,domain_indices.max_corner+1));

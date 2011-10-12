@@ -25,10 +25,10 @@ int main(int argc,char* argv[])
     bool (*apply_force_to_object)(physbam_object*, physbam_force*) = (bool (*)(physbam_object*, physbam_force*)) dlsym(handle, "apply_force_to_object");
     bool (*simulate_frame)(physbam_simulation*) = (bool (*)(physbam_simulation*)) dlsym(handle, "simulate_frame");
     int (*get_id)(physbam_base * obj, const char * attribute) = (int (*)(physbam_base * obj, const char * attribute)) dlsym(handle, "get_id");
-    void (*set_int)(physbam_base * obj, int id, int x) = (void (*)(physbam_base * obj, int id, int x)) dlsym(handle, "set_int");
-    int (*get_int)(const physbam_base * obj, int id) = (int (*)(const physbam_base * obj, int id)) dlsym(handle, "get_int");
+//    void (*set_int)(physbam_base * obj, int id, int x) = (void (*)(physbam_base * obj, int id, int x)) dlsym(handle, "set_int");
+//    int (*get_int)(const physbam_base * obj, int id) = (int (*)(const physbam_base * obj, int id)) dlsym(handle, "get_int");
     void (*set_float)(physbam_base * obj, int id, float x) = (void (*)(physbam_base * obj, int id, float x)) dlsym(handle, "set_float");
-    float (*get_float)(const physbam_base * obj, int id) = (float (*)(const physbam_base * obj, int id)) dlsym(handle, "get_float");
+//    float (*get_float)(const physbam_base * obj, int id) = (float (*)(const physbam_base * obj, int id)) dlsym(handle, "get_float");
     
     printf("%p %p %p %p %p %p\n", create_simulation, destroy_simulation, add_object, add_force, apply_force_to_object, simulate_frame);
 

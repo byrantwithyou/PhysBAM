@@ -31,7 +31,6 @@ public:
 
     T stiffness_multiplier;
     T damping_multiplier;
-    bool set_velocity_from_positions;
     bool use_be,use_tr;
     
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
@@ -39,7 +38,7 @@ public:
     using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::parse_args;using BASE::test_number;using BASE::frame_rate;
 
     TOY_PROBLEMS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),set_velocity_from_positions(false),use_be(true),use_tr(false)
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),use_be(true),use_tr(false)
     {
     }
 
@@ -83,7 +82,6 @@ void Register_Options() PHYSBAM_OVERRIDE
     BASE::Register_Options();
     parse_args->Add_Double_Argument("-stiffen",1,"","stiffness multiplier for various tests");
     parse_args->Add_Double_Argument("-dampen",1,"","damping multiplier for various tests");
-    parse_args->Add_Option_Argument("-setv","set velocity from positions");
     parse_args->Add_Option_Argument("-print_energy","print energy statistics");
     parse_args->Add_Option_Argument("-use_be","use backward Euler");
     parse_args->Add_Option_Argument("-use_tr","use trapezoid rule");
@@ -97,7 +95,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
     output_directory=STRING_UTILITIES::string_sprintf("Toy_Problems/Test_%d",test_number);
     stiffness_multiplier=(T)parse_args->Get_Double_Value("-stiffen");
     damping_multiplier=(T)parse_args->Get_Double_Value("-dampen");
-    solids_parameters.set_velocity_from_positions=parse_args->Get_Option_Value("-setv");
     solid_body_collection.print_energy=parse_args->Get_Option_Value("-print_energy");
     if(parse_args->Is_Value_Set("-use_tr")){use_tr=true;use_be=false;}
     if(parse_args->Is_Value_Set("-use_be")){use_tr=false;use_be=true;}

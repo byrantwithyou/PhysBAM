@@ -33,7 +33,6 @@ public:
     bool correct_evolution_energy;
     T residual_push_out_depth;
     bool correct_contact_energy;
-    bool fix_velocities_in_position_update;
 
     RIGID_BODY_EVOLUTION_PARAMETERS();
     virtual ~RIGID_BODY_EVOLUTION_PARAMETERS();
