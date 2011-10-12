@@ -112,9 +112,6 @@ public:
     T arg_kd;
     T arg_ks;
     bool use_be,use_tr;
-    bool use_kinetic_energy_fix;
-    bool use_gs;
-    bool allow_kd_flip;
     bool use_free_particles;
 
 
@@ -126,7 +123,7 @@ public:
         :BASE(stream_type),tests(*this,solid_body_collection),parameter(1),grid_m(10),grid_n(20),
         rigid_body_collection(solid_body_collection.rigid_body_collection),number_of_joints(2),subsamples(8),refinement_distance((T).2),dynamic_subsampling(false),
         temporarily_disable_dynamic_subsampling(false),old_number_particles(0),ring_mass(10000),num_objects_multiplier((T)1),fish_mattress(false),fully_implicit(false),
-        use_be(false),use_tr(false),use_gs(false),allow_kd_flip(false),use_free_particles(false)
+        use_be(false),use_tr(false),use_free_particles(false)
     {
     }
 
@@ -181,11 +178,6 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Integer_Argument("-grid_n",20,"mesh size");
     parse_args->Add_Option_Argument("-use_be","use backward Euler");
     parse_args->Add_Option_Argument("-use_tr","use trapezoid rule");
-    parse_args->Add_Option_Argument("-fix_position_step","clamp velocities in position update");
-    parse_args->Add_Option_Argument("-use_ke_fix","use kinetic energy form of energy fix");
-    parse_args->Add_Double_Argument("-relax",(T)1,"relaxation fraction for energy fix");
-    parse_args->Add_Option_Argument("-use_gs","use gauss seidel");
-    parse_args->Add_Option_Argument("-allow_kd_flip","allow the damping direction to flip");
     parse_args->Add_Option_Argument("-use_free_particles","use free particles to visualize");
 }
 //#####################################################################
@@ -211,8 +203,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
     solid_body_collection.deformable_body_collection.soft_bindings.use_gauss_seidel_for_impulse_based_collisions=true;
     solids_parameters.verbose_dt=true;
     solid_body_collection.print_energy=parse_args->Get_Option_Value("-print_energy");
-    solids_parameters.enforce_energy_conservation=parse_args->Get_Option_Value("-fix_energy");
-    solids_parameters.rigid_body_evolution_parameters.fix_velocities_in_position_update=parse_args->Get_Option_Value("-fix_position_step");
     fully_implicit=parse_args->Is_Value_Set("-fully_implicit");
     solids_parameters.implicit_solve_parameters.use_half_fully_implicit=parse_args->Is_Value_Set("-half_fully_implicit");
     solids_parameters.rigid_body_evolution_parameters.correct_evolution_energy=true;
@@ -229,8 +219,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
 
     if(parse_args->Is_Value_Set("-use_tr")) use_tr=true;
     if(parse_args->Is_Value_Set("-use_be")) use_be=true;
-    if(parse_args->Is_Value_Set("-use_gs")) use_gs=true;
-    if(parse_args->Is_Value_Set("-allow_kd_flip")) allow_kd_flip=true;
     use_free_particles=parse_args->Is_Value_Set("-use_free_particles");
 
     switch(test_number){
@@ -244,14 +232,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 8: last_frame=120;break;
         default: PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Unrecognized test number %d",test_number));}
     output_directory+=STRING_UTILITIES::string_sprintf("_ks_%d_kd_%d",(int)arg_ks,(int)arg_kd);
-    if(solids_parameters.enforce_energy_conservation){
-        output_directory+=STRING_UTILITIES::string_sprintf("_fix_energy_%f",parse_args->Get_Double_Value("-relax"));
-        if(parse_args->Is_Value_Set("-use_ke_fix")){
-            use_kinetic_energy_fix=true;
-            output_directory+="_ke";}
-        else{
-            use_kinetic_energy_fix=false;
-            output_directory+="_work";}}
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 //#####################################################################
@@ -449,10 +429,6 @@ void Rigid_Spring_Cloth()
         body_indices(i,j)=body.particle_index;}
 
     RIGID_LINEAR_SPRINGS<TV>* spring=new RIGID_LINEAR_SPRINGS<TV>(rigid_body_collection);
-    spring->use_kinetic_energy_fix=use_kinetic_energy_fix;
-    spring->use_gauss_seidel_in_energy_correction=use_gs;
-    spring->allow_kd_direction_flip=allow_kd_flip;
-    spring->relaxation_fraction=parse_args->Get_Double_Value("-relax");
     int spring_index=0;
     for(int i=1;i<=grid_m;i++)for(int j=1;j<=grid_n;j++){
         if(i<grid_m){
@@ -484,10 +460,6 @@ void Single_Particle()
     body_c.Set_Frame(FRAME<TV>(TV(3,0,0)));
 
     RIGID_LINEAR_SPRINGS<TV>* spring=new RIGID_LINEAR_SPRINGS<TV>(rigid_body_collection);
-    spring->use_kinetic_energy_fix=use_kinetic_energy_fix;
-    spring->use_gauss_seidel_in_energy_correction=use_gs;
-    spring->allow_kd_direction_flip=allow_kd_flip;
-    spring->relaxation_fraction=parse_args->Get_Double_Value("-relax");
     spring->Add_Spring(body_a.particle_index,body_b.particle_index,TV(),TV());
     spring->Set_Restlength(1,5);
     spring->Set_Stiffness(1,arg_ks);
@@ -515,10 +487,6 @@ void Impulse_Chain()
     solid_body_collection.rigid_body_collection.Rigid_Body(body_indices.Last()).is_static=true;
 
     RIGID_LINEAR_SPRINGS<TV>* spring=new RIGID_LINEAR_SPRINGS<TV>(rigid_body_collection);
-    spring->use_kinetic_energy_fix=use_kinetic_energy_fix;
-    spring->use_gauss_seidel_in_energy_correction=use_gs;
-    spring->allow_kd_direction_flip=allow_kd_flip;
-    spring->relaxation_fraction=parse_args->Get_Double_Value("-relax");
     for(int i=1;i<grid_m;i++){
         spring->Add_Spring(body_indices(i),body_indices(i+1),TV(),TV());
         spring->Set_Restlength(i,2);
@@ -559,8 +527,6 @@ void Spring_Cloth()
     spring->Set_Restlength(restlength);
     spring->Set_Stiffness(arg_ks);
     spring->Set_Overdamping_Fraction(arg_kd);
-    spring->use_kinetic_energy_fix=use_kinetic_energy_fix;
-    spring->relaxation_fraction=parse_args->Get_Double_Value("-relax");
 
     solid_body_collection.Add_Force(spring);
     solids_parameters.use_trapezoidal_rule_for_velocities=false;
@@ -591,8 +557,6 @@ void Particle_Impulse_Chain()
     ARRAY<T> restlength(grid_m-1);
     ARRAYS_COMPUTATIONS::Fill(restlength,(T)2);
     LINEAR_SPRINGS<TV>* spring=new LINEAR_SPRINGS<TV>(particles,segmented_curve->mesh,fully_implicit);
-    spring->use_kinetic_energy_fix=use_kinetic_energy_fix;
-    spring->relaxation_fraction=parse_args->Get_Double_Value("-relax");
     spring->Set_Restlength(restlength);
     spring->Set_Stiffness(arg_ks);
     spring->Set_Overdamping_Fraction(arg_kd);
