@@ -22,3 +22,6 @@ libPhysBAM_Wrapper.so : DEFORMABLE_EXAMPLE.os libmain.os ACCESSORS.os
 test_sim : main.cpp
 	g++ -o test_sim main.cpp -ldl -g
 
+play_log : play_log.cpp
+	g++ -o play_log play_log.cpp -ldl -g
+

@@ -34,4 +34,14 @@ void set_vf3_array(physbam_base * obj, int id, const data_exchange::vf3 * x, int
 void get_vf3_array(const physbam_base * obj, int id, data_exchange::vf3 * x, int length, int start);
 }
 
+enum funcid_type
+{
+    funcid_create_simulation, funcid_destroy_simulation, funcid_add_object, funcid_add_force,
+    funcid_apply_force_to_object, funcid_simulate_frame, funcid_get_id, funcid_set_int,
+    funcid_get_int, funcid_set_float, funcid_get_float, funcid_set_vf3,
+    funcid_get_vf3, funcid_get_int_array_length, funcid_set_int_array, funcid_get_int_array,
+    funcid_get_float_array_length, funcid_set_float_array, funcid_get_float_array,
+    funcid_get_vf3_array_length, funcid_set_vf3_array, funcid_get_vf3_array
+};
+
 #endif
