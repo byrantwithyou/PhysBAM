@@ -147,14 +147,14 @@
 ; PhysBAM Syntax Highlighting
 ;#####################################################################
 
-(setq font-lock-keyword-case-fold-search nil) ; Need to be case sensitive
-(font-lock-add-keywords 'c++-mode  '(("[^[:lower:]]\\([[:upper:]][[:upper:][:digit:]_]*\\)[<> ,]" 1 font-lock-type-face t))) ; match class names
+;; (setq font-lock-keyword-case-fold-search nil) ; Need to be case sensitive
+;; (font-lock-add-keywords 'c++-mode  '(("[^[:lower:]]\\([[:upper:]][[:upper:][:digit:]_]*\\)[<> ,]" 1 font-lock-type-face t))) ; match class names
 
-(make-face 'font-lock-operators-face)
-(font-lock-add-keywords 'c++-mode '(("[;<>:=!]\\|->" . 'font-lock-operators-face)))
+;; (make-face 'font-lock-operators-face)
+;; (font-lock-add-keywords 'c++-mode '(("[;<>:=!]\\|->" . 'font-lock-operators-face)))
 
-(make-face 'font-lock-preprocessor-face)
-(font-lock-add-keywords 'c++-mode '(("\\#[a-zA-Z0-9]*[ ]" . 'font-lock-preprocessor-face)))
+;; (make-face 'font-lock-preprocessor-face)
+;; (font-lock-add-keywords 'c++-mode '(("\\#[a-zA-Z0-9]*[ ]" . 'font-lock-preprocessor-face)))
 
 
 ;#####################################################################
