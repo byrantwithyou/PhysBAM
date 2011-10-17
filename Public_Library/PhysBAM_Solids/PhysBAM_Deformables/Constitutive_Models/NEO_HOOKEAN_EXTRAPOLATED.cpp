@@ -17,15 +17,15 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T,int d> NEO_HOOKEAN_EXTRAPOLATED<T,d>::
-NEO_HOOKEAN_EXTRAPOLATED(const T youngs_modulus_input,const T poissons_ratio_input,const T Rayleigh_coefficient,const T failure_threshold_input)
-    :youngs_modulus(youngs_modulus_input),poissons_ratio(poissons_ratio_input),failure_threshold(failure_threshold_input)
+NEO_HOOKEAN_EXTRAPOLATED(const T youngs_modulus_input,const T poissons_ratio_input,const T Rayleigh_coefficient,const T extrapolation_cutoff_input, const T extra_force_coefficient_input)
+    :youngs_modulus(youngs_modulus_input),poissons_ratio(poissons_ratio_input),extrapolation_cutoff(extrapolation_cutoff_input),extra_force_coefficient(extra_force_coefficient_input)
 {
     assert(poissons_ratio>-1&&poissons_ratio<.5);
     constant_lambda=youngs_modulus*poissons_ratio/((1+poissons_ratio)*(1-2*poissons_ratio));
     constant_mu=youngs_modulus/(2*(1+poissons_ratio));
     constant_alpha=Rayleigh_coefficient*constant_lambda;
     constant_beta=Rayleigh_coefficient*constant_mu;
-    dth_root_failure_threshold=pow<1,d>(failure_threshold);
+    base.Initialize(constant_mu,constant_lambda);
 }
 //#####################################################################
 // Destructor
@@ -35,6 +35,41 @@ template<class T,int d> NEO_HOOKEAN_EXTRAPOLATED<T,d>::
 {
 }
 //#####################################################################
+// Function Energy_Density
+//#####################################################################
+template<class T,int d> T NEO_HOOKEAN_EXTRAPOLATED<T,d>::
+Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int simplex) const
+{
+    if (d==2)
+    {
+        T x = F.x1;
+        T y = F.x2;
+
+        T dx = x - extrapolation_cutoff;
+        T dy = y - extrapolation_cutoff;
+
+        if ((dx >= 0) && (dy >= 0))
+        {
+            T I1=(F*F.Transposed()).Trace(),J=F.Determinant();
+            T log_J=log(J);
+            return constant_mu*((T).5*(I1-TV::m)-log_J)+(T).5*constant_lambda*sqr(log_J);
+        }
+        else if ((dx < 0) && (dy >= 0))
+        {
+            return 
+        }
+        else if ((dx >= 0) && (dy < 0))
+        {
+
+        }
+        else // ((dx < 0) && (dy < 0))
+        {
+
+        }
+    }
+    else PHYSBAM_FUNCTION_IS_NOT_DEFINED();
+}
+//#####################################################################
 // Function P_From_Strain
 //#####################################################################
 // clamp to hyperbola to avoid indefiniteness "automatically"
@@ -42,10 +77,8 @@ template<class T,int d> DIAGONAL_MATRIX<T,d> NEO_HOOKEAN_EXTRAPOLATED<T,d>::
 P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const T scale,const int simplex) const
 {
     T scale_mu=scale*constant_mu,scale_lambda=scale*constant_lambda,J=F.Determinant();
-    if(J>=failure_threshold) return scale_mu*F-(scale_mu-scale_lambda*log(J))*F.Inverse();
-    DIAGONAL_MATRIX<T,d> F_clamp=F,dF=F-F_clamp,F_inverse=F_clamp.Inverse();
-    T scale_mu_minus_lambda_log_J=scale_mu-scale_lambda*log(failure_threshold);
-    return scale_mu*F+scale_mu_minus_lambda_log_J*(sqr(F_inverse)*dF-F_inverse)+scale_lambda*DIAGONAL_MATRIX<T,d>::Inner_Product(F_inverse,dF)*F_inverse;
+    if (J>=failure_threshold) return scale_mu*F-(scale_mu-scale_lambda*log(J))*F.Inverse();
+    return F;
 }
 //#####################################################################
 // Function P_From_Strain_Rate
@@ -125,17 +158,6 @@ Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC
     dPi_dF.x3113=mu_minus_lambda_logJ*F_inverse_outer.x31;
     dPi_dF.x3223=mu_minus_lambda_logJ*F_inverse_outer.x32;
     if(enforce_definiteness) dPi_dF.Enforce_Definiteness();
-}
-//#####################################################################
-// Function Energy_Density
-//#####################################################################
-template<class T,int d> T NEO_HOOKEAN_EXTRAPOLATED<T,d>::
-Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int simplex) const
-{
-    T I1=(F*F.Transposed()).Trace(),J=F.Determinant();
-    if(J<=0) return (T)1e16; // TODO: Do something smarter here.
-    T log_J=log(J);
-    return constant_mu*((T).5*(I1-TV::m)-log_J)+(T).5*constant_lambda*sqr(log_J);
 }
 template class NEO_HOOKEAN_EXTRAPOLATED<float,2>;
 template class NEO_HOOKEAN_EXTRAPOLATED<float,3>;

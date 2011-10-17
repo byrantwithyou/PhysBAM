@@ -8,6 +8,7 @@
 #define __NEO_HOOKEAN_EXTRAPOLATED__
 
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/ISOTROPIC_CONSTITUTIVE_MODEL.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_ENERGY.h>
 namespace PhysBAM{
 
 using ::std::log;
@@ -17,17 +18,26 @@ template<class T,int d>
 class NEO_HOOKEAN_EXTRAPOLATED:public ISOTROPIC_CONSTITUTIVE_MODEL<T,d>
 {
     typedef VECTOR<T,d> TV;
+
 public:
+
     typedef ISOTROPIC_CONSTITUTIVE_MODEL<T,d> BASE;
-    using BASE::enforce_definiteness;using BASE::constant_lambda;using BASE::constant_mu;using BASE::constant_alpha;using BASE::constant_beta;
+    
+    using BASE::enforce_definiteness;
+    using BASE::constant_lambda;
+    using BASE::constant_mu;
+    using BASE::constant_alpha;
+    using BASE::constant_beta;
+
+    NEO_HOOKEAN_ENERGY<T> base;
 
     T youngs_modulus,poissons_ratio;
-    T failure_threshold;
-private:
-    T dth_root_failure_threshold;
+    T extrapolation_cutoff;
+    T extra_force_coefficient;
+
 public:
 
-    NEO_HOOKEAN_EXTRAPOLATED(const T youngs_modulus_input=3e6,const T poissons_ratio_input=.475,const T Rayleigh_coefficient=.05,const T failure_threshold_input=.25);
+    NEO_HOOKEAN_EXTRAPOLATED(const T youngs_modulus_input=3e6,const T poissons_ratio_input=.475,const T Rayleigh_coefficient=.05,const T extrapolation_cutoff=.5,const T extra_force_coefficient=0);
     virtual ~NEO_HOOKEAN_EXTRAPOLATED();
 
 public:
