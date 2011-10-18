@@ -9,7 +9,8 @@
 
 namespace PhysBAM{
 
-class NEO_HOOKEAN_ENERGY<T>
+template<class T>
+class NEO_HOOKEAN_ENERGY
 {
 
 private:
@@ -31,31 +32,31 @@ public:
     inline T E (const T x, const T y) const
     {
         assert(x>0 && y>0);
-        return mu*(0.5*x*x + 0.5*y*y - 1 - log(xy)) + 0.5*lambda*sqr(log(xy)); 
+        return mu*(0.5*x*x + 0.5*y*y - 1 - log(x*y)) + 0.5*lambda*sqr(log(x*y)); 
     }
 
     inline T Ex (const T x, const T y) const
     {
         assert(x>0 && y>0);
-        return mu*(x - 1/x) + lambda*log(xy)/x;
+        return mu*(x - 1/x) + lambda*log(x*y)/x;
     }
 
     inline T Ey (const T x, const T y) const
     {
         assert(x>0 && y>0);
-        return mu*(y - 1/y) + lambda*log(xy)/y;
+        return mu*(y - 1/y) + lambda*log(x*y)/y;
     }
 
     inline T Exx (const T x, const T y) const
     {
         assert(x>0 && y>0);
-        return mu*(1 + 1/(x*x)) + lambda*(1 - log(xy))/(x*x);
+        return mu*(1 + 1/(x*x)) + lambda*(1 - log(x*y))/(x*x);
     }
 
     inline T Eyy (const T x, const T y) const
     {
         assert(x>0 && y>0);
-        return mu*(1 + 1/(y*y)) + lambda*(1 - log(xy))/(y*y);
+        return mu*(1 + 1/(y*y)) + lambda*(1 - log(x*y))/(y*y);
     }
 
     inline T Exy (const T x, const T y) const
