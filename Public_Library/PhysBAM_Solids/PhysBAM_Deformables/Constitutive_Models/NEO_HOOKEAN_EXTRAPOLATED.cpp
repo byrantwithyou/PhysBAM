@@ -40,8 +40,6 @@ template<class T,int d> NEO_HOOKEAN_EXTRAPOLATED<T,d>::
 template<class T,int d> T NEO_HOOKEAN_EXTRAPOLATED<T,d>::
 Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int simplex) const
 {
-<<<<<<< HEAD
-=======
     return Energy_Density_Helper(F,simplex);
 }
 //#####################################################################
@@ -50,7 +48,6 @@ Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int simplex) const
 template<class T,int d> T NEO_HOOKEAN_EXTRAPOLATED<T,d>::
 Energy_Density_Helper(const DIAGONAL_MATRIX<T,2>& F,const int simplex) const
 {
->>>>>>> 7403d042708a713ead4b66e1476e9b06d0759d1b
     T x = F.x11;
     T y = F.x22;
     
@@ -161,7 +158,6 @@ Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,d>& F,DIAGONALIZED_ISOTROPIC
 template<class T,int d> void NEO_HOOKEAN_EXTRAPOLATED<T,d>::
 Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& dP_dF,const int triangle) const
 {
-<<<<<<< HEAD
     T x = F.x11;
     T y = F.x22;
     
@@ -173,7 +169,7 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_IS
     
     if ((dx >= 0) && (dy >= 0))
     {     
-        DIAGONAL_MATRIX<T,2> F_inverse=F..Inverse();
+        DIAGONAL_MATRIX<T,2> F_inverse=F.Inverse();
         T mu_minus_lambda_logJ=constant_mu+constant_lambda*log(F_inverse.Determinant());
         SYMMETRIC_MATRIX<T,2> F_inverse_outer=SYMMETRIC_MATRIX<T,2>::Outer_Product(F_inverse.To_Vector());
         dP_dF.x1111=constant_mu+(constant_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x11;//alpha+beta+gamma
@@ -196,15 +192,6 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_IS
     }
 
     if(enforce_definiteness) dP_dF.Enforce_Definiteness();
-=======
-    DIAGONAL_MATRIX<T,2> F_inverse=F.Inverse();
-    T mu_minus_lambda_logJ=constant_mu+constant_lambda*log(F_inverse.Determinant());
-    SYMMETRIC_MATRIX<T,2> F_inverse_outer=SYMMETRIC_MATRIX<T,2>::Outer_Product(F_inverse.To_Vector());
-    dP_dF.x1111=constant_mu+(constant_lambda+mu_minus_lambda_logJ)*F_inverse.x11;
-    dP_dF.x2222=constant_mu+(constant_lambda+mu_minus_lambda_logJ)*F_inverse.x22;
-    dP_dF.x2211=constant_lambda*F_inverse_outer.x21;
-    dP_dF.x2121=constant_mu;
-    dP_dF.x2112=mu_minus_lambda_logJ*F_inverse_outer.x21;
 }
 //#####################################################################
 // Function Isotropic_Stress_Derivative_Helper
@@ -213,7 +200,6 @@ template<class T,int d> void NEO_HOOKEAN_EXTRAPOLATED<T,d>::
 Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dP_dF,const int triangle) const
 {
     PHYSBAM_FATAL_ERROR();
->>>>>>> 7403d042708a713ead4b66e1476e9b06d0759d1b
 }
 //#####################################################################
 // Function P_From_Strain_Rate
