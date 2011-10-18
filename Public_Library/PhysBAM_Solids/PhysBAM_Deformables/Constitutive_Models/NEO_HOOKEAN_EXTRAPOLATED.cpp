@@ -40,8 +40,8 @@ template<class T,int d> NEO_HOOKEAN_EXTRAPOLATED<T,d>::
 template<class T,int d> T NEO_HOOKEAN_EXTRAPOLATED<T,d>::
 Energy_Density(const DIAGONAL_MATRIX<T,2>& F,const int simplex) const
 {
-    T x = F.x1;
-    T y = F.x2;
+    T x = F.x11;
+    T y = F.x22;
     
     T dx = x - extrapolation_cutoff;
     T dy = y - extrapolation_cutoff;
@@ -75,8 +75,8 @@ Energy_Density(const DIAGONAL_MATRIX<T,2>& F,const int simplex) const
 template<class T,int d> DIAGONAL_MATRIX<T,2> NEO_HOOKEAN_EXTRAPOLATED<T,d>::
 P_From_Strain(const DIAGONAL_MATRIX<T,2>& F,const T scale,const int simplex) const
 {
-    T x = F.x1;
-    T y = F.x2;
+    T x = F.x11;
+    T y = F.x22;
     
     T dx = x - extrapolation_cutoff;
     T dy = y - extrapolation_cutoff;
@@ -117,15 +117,40 @@ P_From_Strain(const DIAGONAL_MATRIX<T,2>& F,const T scale,const int simplex) con
 template<class T,int d> void NEO_HOOKEAN_EXTRAPOLATED<T,d>::
 Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& dP_dF,const int triangle) const
 {
-    DIAGONAL_MATRIX<T,2> F_inverse=F.Inverse();
-    dP_dF.x1111=constant_mu+(constant_lambda+mu_minus_lambda_logJ)*F_inverse.x11;
-    dP_dF.x2222=constant_mu+(constant_lambda+mu_minus_lambda_logJ)*F_inverse.x22;
-    dP_dF.x2211=constant_lambda*F_inverse.x21;
-    dP_dF.x2121=constant_mu;
-    dP_dF.x2112=mu_minus_lambda_logJ*F_inverse.x21;
+    T x = F.x11;
+    T y = F.x22;
     
+    T dx = x - extrapolation_cutoff;
+    T dy = y - extrapolation_cutoff;
     
-    if (enforce_definiteness) dP_dF.Enforce_Definiteness();
+    T &a = extrapolation_cutoff;
+    T &k = extra_force_coefficient;
+    
+    if ((dx >= 0) && (dy >= 0))
+    {     
+        DIAGONAL_MATRIX<T,2> F_inverse=F..Inverse();
+        T mu_minus_lambda_logJ=constant_mu+constant_lambda*log(F_inverse.Determinant());
+        SYMMETRIC_MATRIX<T,2> F_inverse_outer=SYMMETRIC_MATRIX<T,2>::Outer_Product(F_inverse.To_Vector());
+        dP_dF.x1111=constant_mu+(constant_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x11;//alpha+beta+gamma
+        dP_dF.x2222=constant_mu+(constant_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x22;
+        dP_dF.x2211=constant_lambda*F_inverse_outer.x21;//gamma
+        dP_dF.x2121=constant_mu;//alpha
+        dP_dF.x2112=mu_minus_lambda_logJ*F_inverse_outer.x21;//beta
+    }
+    else if ((dx < 0) && (dy >= 0))
+    {
+        
+    }
+    else if ((dx >= 0) && (dy < 0))
+    {
+        
+    }
+    else // ((dx < 0) && (dy < 0))
+    {
+        
+    }
+
+    if(enforce_definiteness) dP_dF.Enforce_Definiteness();
 }
 //#####################################################################
 // Function P_From_Strain_Rate
