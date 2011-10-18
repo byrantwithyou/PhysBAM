@@ -38,16 +38,27 @@ template<class T,int d> NEO_HOOKEAN_EXTRAPOLATED<T,d>::
 // Function Energy_Density
 //#####################################################################
 template<class T,int d> T NEO_HOOKEAN_EXTRAPOLATED<T,d>::
-Energy_Density(const DIAGONAL_MATRIX<T,2>& F,const int simplex) const
+Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int simplex) const
 {
+<<<<<<< HEAD
+=======
+    return Energy_Density_Helper(F,simplex);
+}
+//#####################################################################
+// Function Energy_Density_Helper
+//#####################################################################
+template<class T,int d> T NEO_HOOKEAN_EXTRAPOLATED<T,d>::
+Energy_Density_Helper(const DIAGONAL_MATRIX<T,2>& F,const int simplex) const
+{
+>>>>>>> 7403d042708a713ead4b66e1476e9b06d0759d1b
     T x = F.x11;
     T y = F.x22;
     
     T dx = x - extrapolation_cutoff;
     T dy = y - extrapolation_cutoff;
     
-    T &a = extrapolation_cutoff;
-    T &k = extra_force_coefficient;
+    T a = extrapolation_cutoff;
+    T k = extra_force_coefficient;
     
     if ((dx >= 0) && (dy >= 0))
     {
@@ -69,11 +80,27 @@ Energy_Density(const DIAGONAL_MATRIX<T,2>& F,const int simplex) const
     }
 }
 //#####################################################################
+// Function Energy_Density_Helper
+//#####################################################################
+template<class T,int d> T NEO_HOOKEAN_EXTRAPOLATED<T,d>::
+Energy_Density_Helper(const DIAGONAL_MATRIX<T,3>& F,const int simplex) const
+{
+    PHYSBAM_FATAL_ERROR();
+    return 0;
+}
+//#####################################################################
 // Function P_From_Strain
 //#####################################################################
-// clamp to hyperbola to avoid indefiniteness "automatically"
+template<class T,int d> DIAGONAL_MATRIX<T,d> NEO_HOOKEAN_EXTRAPOLATED<T,d>::
+P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const T scale,const int simplex) const
+{
+    return P_From_Strain_Helper(F,scale,simplex);
+}
+//#####################################################################
+// Function P_From_Strain_Helper
+//#####################################################################
 template<class T,int d> DIAGONAL_MATRIX<T,2> NEO_HOOKEAN_EXTRAPOLATED<T,d>::
-P_From_Strain(const DIAGONAL_MATRIX<T,2>& F,const T scale,const int simplex) const
+P_From_Strain_Helper(const DIAGONAL_MATRIX<T,2>& F,const T scale,const int simplex) const
 {
     T x = F.x11;
     T y = F.x22;
@@ -81,8 +108,8 @@ P_From_Strain(const DIAGONAL_MATRIX<T,2>& F,const T scale,const int simplex) con
     T dx = x - extrapolation_cutoff;
     T dy = y - extrapolation_cutoff;
     
-    T &a = extrapolation_cutoff;
-    T &k = extra_force_coefficient;
+    T a = extrapolation_cutoff;
+    T k = extra_force_coefficient;
     
     if ((dx >= 0) && (dy >= 0))
     {  
@@ -91,32 +118,50 @@ P_From_Strain(const DIAGONAL_MATRIX<T,2>& F,const T scale,const int simplex) con
     }
     else if ((dx < 0) && (dy >= 0))
     {
-        DIAGONAL_MATRIX<T,d> result;
+        DIAGONAL_MATRIX<T,2> result;
         result.x11 = base.Ex(a,y) + 2*k*dx;
         result.x22 = base.Ey(a,y) + base.Exy(a,y)*dx;
         return scale*result;
     }
     else if ((dx >= 0) && (dy < 0))
     {
-        DIAGONAL_MATRIX<T,d> result;
+        DIAGONAL_MATRIX<T,2> result;
         result.x11 = base.Ex(x,a) + base.Exy(x,a)*dy;
         result.x22 = base.Ey(x,a) + 2*k*dy;
         return scale*result;
     }
     else // ((dx < 0) && (dy < 0))
     {
-        DIAGONAL_MATRIX<T,d> result;
+        DIAGONAL_MATRIX<T,2> result;
         result.x11 = base.Ex(a,a) + base.Exy(a,a)*dy + 2*k*dx;
         result.x22 = base.Ey(a,a) + base.Exy(a,a)*dx + 2*k*dy;
         return scale*result;
     }
 }
 //#####################################################################
+// Function P_From_Strain_Helper
+//#####################################################################
+template<class T,int d> DIAGONAL_MATRIX<T,3> NEO_HOOKEAN_EXTRAPOLATED<T,d>::
+P_From_Strain_Helper(const DIAGONAL_MATRIX<T,3>& F,const T scale,const int simplex) const
+{
+    PHYSBAM_FATAL_ERROR();
+    return DIAGONAL_MATRIX<T,3>();
+}
+//#####################################################################
 // Function Isotropic_Stress_Derivative
 //#####################################################################
 template<class T,int d> void NEO_HOOKEAN_EXTRAPOLATED<T,d>::
-Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& dP_dF,const int triangle) const
+Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,d>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d>& dP_dF,const int triangle) const
 {
+    return Isotropic_Stress_Derivative(F,dP_dF,triangle);
+}
+//#####################################################################
+// Function Isotropic_Stress_Derivative_Helper
+//#####################################################################
+template<class T,int d> void NEO_HOOKEAN_EXTRAPOLATED<T,d>::
+Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& dP_dF,const int triangle) const
+{
+<<<<<<< HEAD
     T x = F.x11;
     T y = F.x22;
     
@@ -151,6 +196,24 @@ Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC
     }
 
     if(enforce_definiteness) dP_dF.Enforce_Definiteness();
+=======
+    DIAGONAL_MATRIX<T,2> F_inverse=F.Inverse();
+    T mu_minus_lambda_logJ=constant_mu+constant_lambda*log(F_inverse.Determinant());
+    SYMMETRIC_MATRIX<T,2> F_inverse_outer=SYMMETRIC_MATRIX<T,2>::Outer_Product(F_inverse.To_Vector());
+    dP_dF.x1111=constant_mu+(constant_lambda+mu_minus_lambda_logJ)*F_inverse.x11;
+    dP_dF.x2222=constant_mu+(constant_lambda+mu_minus_lambda_logJ)*F_inverse.x22;
+    dP_dF.x2211=constant_lambda*F_inverse_outer.x21;
+    dP_dF.x2121=constant_mu;
+    dP_dF.x2112=mu_minus_lambda_logJ*F_inverse_outer.x21;
+}
+//#####################################################################
+// Function Isotropic_Stress_Derivative_Helper
+//#####################################################################
+template<class T,int d> void NEO_HOOKEAN_EXTRAPOLATED<T,d>::
+Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dP_dF,const int triangle) const
+{
+    PHYSBAM_FATAL_ERROR();
+>>>>>>> 7403d042708a713ead4b66e1476e9b06d0759d1b
 }
 //#####################################################################
 // Function P_From_Strain_Rate

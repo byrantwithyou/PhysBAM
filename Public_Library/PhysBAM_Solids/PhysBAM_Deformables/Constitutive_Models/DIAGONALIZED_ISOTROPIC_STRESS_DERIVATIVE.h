@@ -25,6 +25,7 @@ public:
         x2112*dF.x[1]+x2121*dF.x[2],x2211*dF.x[0]+x2222*dF.x[3]);}
 
 //#####################################################################
+    void Compute_From_Singular_Value_Derivatives(const DIAGONAL_MATRIX<T,2>& F,const VECTOR<T,2>& dE_ds,const SYMMETRIC_MATRIX<T,2>& dE_dsds); // Not robust
     void Enforce_Definiteness();
 //#####################################################################
 };
