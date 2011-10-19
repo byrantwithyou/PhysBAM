@@ -34,6 +34,7 @@ public:
     T youngs_modulus,poissons_ratio;
     T extrapolation_cutoff;
     T extra_force_coefficient;
+    T panic_threshold;
 
 public:
 

@@ -17,8 +17,10 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T,int d> NEO_HOOKEAN_EXTRAPOLATED<T,d>::
-NEO_HOOKEAN_EXTRAPOLATED(const T youngs_modulus_input,const T poissons_ratio_input,const T Rayleigh_coefficient,const T extrapolation_cutoff_input, const T extra_force_coefficient_input)
-    :youngs_modulus(youngs_modulus_input),poissons_ratio(poissons_ratio_input),extrapolation_cutoff(extrapolation_cutoff_input),extra_force_coefficient(extra_force_coefficient_input)
+NEO_HOOKEAN_EXTRAPOLATED(const T youngs_modulus_input,const T poissons_ratio_input,const T Rayleigh_coefficient,const T extrapolation_cutoff_input, const T extra_force_coefficient_input):
+    youngs_modulus(youngs_modulus_input),poissons_ratio(poissons_ratio_input),
+    extrapolation_cutoff(extrapolation_cutoff_input),extra_force_coefficient(extra_force_coefficient_input),
+    panic_threshold((T)1e-6)
 {
     assert(poissons_ratio>-1&&poissons_ratio<.5);
     constant_lambda=youngs_modulus*poissons_ratio/((1+poissons_ratio)*(1-2*poissons_ratio));
@@ -182,7 +184,7 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_IS
     {
         dP_dF.x1111=2*k;
         dP_dF.x2222=base.Eyy(a,y)+base.Exyy(a,y)*dx;
-        dP_dF.x2211=base.E.xy(a,y);
+        dP_dF.x2211=base.Exy(a,y);
         
         T Ex = base.Ex(a,y)+2*k*dx;
         T Ey = base.Ey(a,y)+base.Exy(a,y)*dx;
@@ -197,9 +199,9 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_IS
     {
         dP_dF.x1111=base.Exx(x,a)+base.Exxy(x,a)*dy;
         dP_dF.x2222=2*k;
-        dP_dF.x2211=base.E.xy(x,a);
+        dP_dF.x2211=base.Exy(x,a);
         
-        T Ex = base.Ex(x,a)+base(x,a)*dy;
+        T Ex = base.Ex(x,a)+base.Exy(x,a)*dy;
         T Ey = base.Ey(x,a)+2*k*dy;
 
         T xpy = x+y; if (fabs(xpy)<panic_threshold) xpy=xpy<0?-panic_threshold:panic_threshold;
@@ -215,9 +217,10 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_IS
         dP_dF.x2211=base.Exy(a,a);
 
         T xpy = x+y; if (fabs(xpy)<panic_threshold) xpy=xpy<0?-panic_threshold:panic_threshold;
+        T cmn = (base.Ex(a,a)-base.Exy(a,a)*a-2*k*a)/xpy;
 
-        dP_dF.x2112=(-base.Ex(a,a)+base.Exy(a,a)*a+2*k*a)/xpy-base.Exy(a,a);
-        dP_dF.x2121=(base.Ex(a,a)-base.Exy(a,a)*a-2*k*a)/xpy+2*k;
+        dP_dF.x2112=-cmn-base.Exy(a,a);
+        dP_dF.x2121=cmn+2*k;
     }
 
     if(enforce_definiteness) dP_dF.Enforce_Definiteness();

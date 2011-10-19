@@ -34,6 +34,7 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/ROTATED_LINEAR.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/FINITE_VOLUME.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/INCOMPRESSIBLE_FINITE_VOLUME.h>
@@ -310,7 +311,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 8:{
             TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
             solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
-            solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,new NEO_HOOKEAN<T,2>((T)1e4,(T).45,(T).01)));
+            solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,new NEO_HOOKEAN_EXTRAPOLATED<T,2>((T)1e4,(T).45,(T).01)));
             break;}
         case 9:{
             TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
