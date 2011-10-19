@@ -183,24 +183,41 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_IS
         dP_dF.x1111=2*k;
         dP_dF.x2222=base.Eyy(a,y)+base.Exyy(a,y)*dx;
         dP_dF.x2211=base.E.xy(a,y);
-        dP_dF.x2121=
-        dP_dF.x2112=
+        
+        T Ex = base.Ex(a,y)+2*k*dx;
+        T Ey = base.Ey(a,y)+base.Exy(a,y)*dx;
+
+        T xpy = x+y; if (fabs(xpy)<panic_threshold) xpy=xpy<0?-panic_threshold:panic_threshold;
+        T xmy = x-y; if (fabs(xmy)<panic_threshold) xmy=xmy<0?-panic_threshold:panic_threshold;
+
+        dP_dF.x2112=(-Ey*x+Ex*y)/(xpy*xmy);
+        dP_dF.x2121=(-Ey*y+Ex*x)/(xpy*xmy);
     }
     else if ((dx >= 0) && (dy < 0))
     {
         dP_dF.x1111=base.Exx(x,a)+base.Exxy(x,a)*dy;
         dP_dF.x2222=2*k;
         dP_dF.x2211=base.E.xy(x,a);
-        dP_dF.x2121=
-        dP_dF.x2112=
+        
+        T Ex = base.Ex(x,a)+base(x,a)*dy;
+        T Ey = base.Ey(x,a)+2*k*dy;
+
+        T xpy = x+y; if (fabs(xpy)<panic_threshold) xpy=xpy<0?-panic_threshold:panic_threshold;
+        T xmy = x-y; if (fabs(xmy)<panic_threshold) xmy=xmy<0?-panic_threshold:panic_threshold;
+
+        dP_dF.x2112=(-Ey*x+Ex*y)/(xpy*xmy);
+        dP_dF.x2121=(-Ey*y+Ex*x)/(xpy*xmy);
     }
     else // ((dx < 0) && (dy < 0))
     {
-        dP_dF.x1111=
-        dP_dF.x2222=
-        dP_dF.x2211=
-        dP_dF.x2121=
-        dP_dF.x2112=
+        dP_dF.x1111=2*k;
+        dP_dF.x2222=2*k;
+        dP_dF.x2211=base.Exy(a,a);
+
+        T xpy = x+y; if (fabs(xpy)<panic_threshold) xpy=xpy<0?-panic_threshold:panic_threshold;
+
+        dP_dF.x2112=(-base.Ex(a,a)+base.Exy(a,a)*a+2*k*a)/xpy-base.Exy(a,a);
+        dP_dF.x2121=(base.Ex(a,a)-base.Exy(a,a)*a-2*k*a)/xpy+2*k;
     }
 
     if(enforce_definiteness) dP_dF.Enforce_Definiteness();
