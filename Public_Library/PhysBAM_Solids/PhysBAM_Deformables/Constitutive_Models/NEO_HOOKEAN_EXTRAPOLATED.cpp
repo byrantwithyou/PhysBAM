@@ -164,8 +164,8 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_IS
     T dx = x - extrapolation_cutoff;
     T dy = y - extrapolation_cutoff;
     
-    T &a = extrapolation_cutoff;
-    T &k = extra_force_coefficient;
+    T a = extrapolation_cutoff;
+    T k = extra_force_coefficient;
     
     if ((dx >= 0) && (dy >= 0))
     {     
@@ -180,15 +180,27 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_IS
     }
     else if ((dx < 0) && (dy >= 0))
     {
-        
+        dP_dF.x1111=2*k;
+        dP_dF.x2222=base.Eyy(a,y)+base.Exyy(a,y)*dx;
+        dP_dF.x2211=base.E.xy(a,y);
+        dP_dF.x2121=
+        dP_dF.x2112=
     }
     else if ((dx >= 0) && (dy < 0))
     {
-        
+        dP_dF.x1111=base.Exx(x,a)+base.Exxy(x,a)*dy;
+        dP_dF.x2222=2*k;
+        dP_dF.x2211=base.E.xy(x,a);
+        dP_dF.x2121=
+        dP_dF.x2112=
     }
     else // ((dx < 0) && (dy < 0))
     {
-        
+        dP_dF.x1111=
+        dP_dF.x2222=
+        dP_dF.x2211=
+        dP_dF.x2121=
+        dP_dF.x2112=
     }
 
     if(enforce_definiteness) dP_dF.Enforce_Definiteness();
