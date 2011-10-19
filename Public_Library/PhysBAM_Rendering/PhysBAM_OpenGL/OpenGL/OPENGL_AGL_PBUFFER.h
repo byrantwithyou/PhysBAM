@@ -7,10 +7,10 @@
 #ifndef __OPENGL_AGL_PBUFFER__
 #define __OPENGL_AGL_PBUFFER__
 
-#ifdef __APPLE__
-#include <AGL/agl.h>
-#define OPENGL_AGL_PBUFFER_SUPPORTED
-#endif
+//#ifdef __APPLE__
+//#include <AGL/agl.h>
+//#define OPENGL_AGL_PBUFFER_SUPPORTED
+//#endif
 
 #ifdef OPENGL_AGL_PBUFFER_SUPPORTED
 namespace PhysBAM{

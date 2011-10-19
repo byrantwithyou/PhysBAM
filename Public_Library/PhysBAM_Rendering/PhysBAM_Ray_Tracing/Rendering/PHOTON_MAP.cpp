@@ -98,7 +98,7 @@ Irradiance_Estimate(const TV& location,const TV& normal,const T max_distance_squ
     TV irradiance;
     ARRAY<PHOTON<T>*> nearby_photons(number_of_photons);
     ARRAY<T> photon_squared_distances(number_of_photons);
-    T one_over_max_distance,actual_max_distance_squared,max_distance_cubed;
+    T one_over_max_distance,actual_max_distance_squared=(T)0,max_distance_cubed;
     Locate_Photons(location,max_distance_squared,nearby_photons,photon_squared_distances,found_samples,actual_max_distance_squared);
     if(ray.debug_ray) ray.debug_ray->Add_Comment(STRING_UTILITIES::string_sprintf("Got %d photons",found_samples));
     if(found_samples<4) return TV();

@@ -571,7 +571,7 @@ Create_Regular_Embedded_Surface(BINDING_LIST<TV>& binding_list,SOFT_BINDINGS<TV>
 {
     surface.Update_Bounding_Box();
     RANGE<TV> box(*surface.bounding_box);
-    T dx=pow(box.Size()/approx_volume,1./3);
+    T dx=pow(box.Size()/approx_volume,(T)1./3);
     TV cells=ceil(box.Edge_Lengths()/dx);
     box.Scale_About_Center(cells*dx/box.Edge_Lengths());
     GRID<TV> grid(TV_INT(cells)+1,box);
