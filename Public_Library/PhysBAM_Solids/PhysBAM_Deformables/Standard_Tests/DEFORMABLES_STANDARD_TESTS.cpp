@@ -555,12 +555,11 @@ Embed_Surface_In_Tetrahedralized_Volume(BINDING_LIST<TV>& binding_list,SOFT_BIND
             free_particles->nodes.Append(sb);}
         deformable_body_collection.deformable_geometry.Add_Structure(free_particles);}
 
-    particle_indices.Remove_All();
-    TRIANGULATED_SURFACE<T>& new_s=Copy_And_Add_Structure(surface,&particle_indices);
+    TRIANGULATED_SURFACE<T>& new_s=Copy_And_Add_Structure(surface,&surface_particle_map);
     if(new_surface) *new_surface=&new_s;
     for(int i=1;i<=point_to_tet.m;i++){
         VECTOR<int,4> vertices=new_v.mesh.elements(point_to_tet(i));
-        binding_list.Add_Binding(new LINEAR_BINDING<VECTOR<T,3>,4>(binding_list.particles,particle_indices(i),vertices,weights(i)));}
+        binding_list.Add_Binding(new LINEAR_BINDING<VECTOR<T,3>,4>(binding_list.particles,surface_particle_map(i),vertices,weights(i)));}
 }
 //#####################################################################
 // Function Create_Embedded_Surface

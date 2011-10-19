@@ -828,8 +828,9 @@ Initialize_Rigid_Bodies(const T frame_rate, const bool restart)
 
     RIGID_BODY_COLLISIONS<TV>::Adjust_Bounding_Boxes(rigid_body_collection);
     // rigid body collisions
-    rigid_body_collisions=new RIGID_BODY_COLLISIONS<TV>(rigid_body_collection,solids_parameters.rigid_body_collision_parameters,rigids_evolution_callbacks,
-        *solid_body_collection.example_forces_and_velocities);
+    if(!rigid_body_collisions)
+        rigid_body_collisions=new RIGID_BODY_COLLISIONS<TV>(rigid_body_collection,solids_parameters.rigid_body_collision_parameters,rigids_evolution_callbacks,
+            *solid_body_collection.example_forces_and_velocities);
     rigid_body_collisions->spatial_partition->Compute_Voxel_Size(solids_parameters.rigid_body_collision_parameters.rigid_collisions_spatial_partition_voxel_size_heuristic,
         solids_parameters.rigid_body_collision_parameters.rigid_collisions_spatial_partition_number_of_cells,solids_parameters.rigid_body_collision_parameters.rigid_collisions_spatial_partition_voxel_size_scale_factor);
     rigid_body_collisions->verbose=solids_parameters.verbose;
@@ -844,7 +845,8 @@ Initialize_Rigid_Bodies(const T frame_rate, const bool restart)
         if(solids_parameters.rigid_body_collision_parameters.rigid_collisions_use_edge_intersection) rigid_body_collisions->intersections.Use_Edge_Intersection();}
 
     // rigid deformable collisions
-    rigid_deformable_collisions=new RIGID_DEFORMABLE_COLLISIONS<TV>(solid_body_collection,*rigid_body_collisions,solids_parameters);
+    if(!rigid_deformable_collisions)
+        rigid_deformable_collisions=new RIGID_DEFORMABLE_COLLISIONS<TV>(solid_body_collection,*rigid_body_collisions,solids_parameters);
 
     // dynamics
     solids_parameters.rigid_body_evolution_parameters.rigid_cfl=solids_parameters.cfl;
