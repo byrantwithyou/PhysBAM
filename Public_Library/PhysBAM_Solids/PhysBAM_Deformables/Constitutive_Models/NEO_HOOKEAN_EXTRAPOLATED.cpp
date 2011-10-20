@@ -152,7 +152,7 @@ P_From_Strain_Helper(const DIAGONAL_MATRIX<T,3>& F,const T scale,const int simpl
 template<class T,int d> void NEO_HOOKEAN_EXTRAPOLATED<T,d>::
 Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,d>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d>& dP_dF,const int triangle) const
 {
-    return Isotropic_Stress_Derivative(F,dP_dF,triangle);
+    return Isotropic_Stress_Derivative_Helper(F,dP_dF,triangle);
 }
 //#####################################################################
 // Function Isotropic_Stress_Derivative_Helper
