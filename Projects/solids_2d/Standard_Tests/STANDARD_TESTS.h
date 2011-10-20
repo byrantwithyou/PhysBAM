@@ -16,6 +16,7 @@
 //  10. Falling particle on segment ramp.
 //  11. String of segments falling on to ground.
 //  12. Curtain and ball
+//  13. Falling mattress, random start
 //#####################################################################
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
@@ -24,6 +25,7 @@
 #include <PhysBAM_Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Parallel_Computation/PARTITION_ID.h>
+#include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
@@ -33,6 +35,7 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISIONS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/COROTATED.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/ROTATED_LINEAR.h>
@@ -72,9 +75,13 @@ public:
     VECTOR<int,2> processes_per_dimension;
 
     ARRAY<int> segment_ramp_particles;
+    bool fully_implicit;
+    bool test_forces;
+    bool use_extended_neohookean;
+    bool use_corotated;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection)
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),fully_implicit(false),test_forces(false),use_extended_neohookean(false),use_corotated(false)
     {
     }
 
@@ -89,7 +96,12 @@ public:
     void Limit_Solids_Dt(T& dt,const T time) PHYSBAM_OVERRIDE {}
     void Update_Fragments() PHYSBAM_OVERRIDE {}
     void Post_Initialization() PHYSBAM_OVERRIDE {}
-    void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE {}
+    void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
+    {
+        if(test_forces){
+            solid_body_collection.deformable_body_collection.Test_Energy(time);
+            solid_body_collection.deformable_body_collection.Test_Force_Derivatives(time);}
+    }
     void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE {}
     void Align_Deformable_Bodies_With_Rigid_Bodies() PHYSBAM_OVERRIDE {}
     void Set_External_Positions(ARRAY_VIEW<TV> X,ARRAY_VIEW<ROTATION<TV> > rotation,const T time) PHYSBAM_OVERRIDE {}
@@ -104,6 +116,10 @@ public:
 void Register_Options() PHYSBAM_OVERRIDE
 {
     BASE::Register_Options();
+    parse_args->Add_Option_Argument("-fully_implicit","use fully implicit forces");
+    parse_args->Add_Option_Argument("-test_forces","use fully implicit forces");
+    parse_args->Add_Option_Argument("-use_ext_neo");
+    parse_args->Add_Option_Argument("-use_corotated");
 }
 //#####################################################################
 // Function Parse_Options
@@ -119,6 +135,10 @@ void Parse_Options() PHYSBAM_OVERRIDE
     processes_per_dimension=VECTOR<int,2>(2,1);
 
     solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+    fully_implicit=parse_args->Is_Value_Set("-fully_implicit");
+    test_forces=parse_args->Is_Value_Set("-test_forces");
+    use_extended_neohookean=parse_args->Is_Value_Set("-use_ext_neo");
+    use_corotated=parse_args->Is_Value_Set("-use_corotated");
 
     switch(test_number){
         case 1:
@@ -149,6 +169,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             last_frame=120;
             break;
         case 8:
+        case 13:
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
             last_frame=120;
             break;
@@ -236,7 +257,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             tests.Create_Segmented_Curve(300,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,4))));
             tests.Add_Ground();
             break;}
-        case 8:{
+        case 8:
+        case 13:{
             tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,4))));
             tests.Add_Ground();
             break;}
@@ -308,10 +330,14 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             solid_body_collection.Add_Force(Create_Edge_Springs(segmented_curve,(T)5e1,(T)1.5));
             solid_body_collection.Add_Force(Create_Bending_Elements(segmented_curve,(T)1e-6,(T).0001));
             break;}
-        case 8:{
+        case 8:
+        case 13:{
             TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
             solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
-            solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,new NEO_HOOKEAN_EXTRAPOLATED<T,2>((T)1e4,(T).45,(T).01)));
+            if(use_extended_neohookean) solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,new NEO_HOOKEAN_EXTRAPOLATED<T,2>((T)1e4,(T).45,(T).01)));
+            else if(use_corotated) solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,new COROTATED<T,2>((T)1e4,(T).45,(T).01)));
+            else solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,new NEO_HOOKEAN<T,2>((T)1e4,(T).45,(T).01)));
+            if(test_number==13){RANDOM_NUMBERS<T> rand;rand.Fill_Uniform(particles.X,-1,1);}
             break;}
         case 9:{
             TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
@@ -338,6 +364,11 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             default:
                 LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}}
     solid_body_collection.Update_Simulated_Particles();
+
+    if(fully_implicit) for(int i=1;i<=solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->use_implicit_velocity_independent_forces=true;
+    if(fully_implicit) for(int i=1;i<=solid_body_collection.rigid_body_collection.rigids_forces.m;i++)
+        solid_body_collection.rigid_body_collection.rigids_forces(i)->use_implicit_velocity_independent_forces=true;
+    if(fully_implicit) for(int i=1;i<=solid_body_collection.deformable_body_collection.deformables_forces.m;i++) solid_body_collection.deformable_body_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=true;
 
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >::Initialize_Bodies();
 }
