@@ -7,14 +7,17 @@
 #ifndef __VOLUME_COLLISIONS__
 #define __VOLUME_COLLISIONS__    
 
+#include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 namespace PhysBAM{
 
 template<class TV>
 class VOLUME_COLLISIONS
 {
+    typedef typename TV::SCALAR T;
 public:
-    SEGMENTED_CURVE<TV> segments;
+    ARRAY<TRIANGULATED_AREA<T>*> triangulated_areas;
 
     struct COMPONENT
     {
@@ -32,9 +35,8 @@ public:
 
     ARRAY<LOOP> loops;
 
-    void Initialize_Components();
-    void Compute_Loops();
-
+    void Compute_Collision_Edges();
+    void Compute_Collision_Edges(TRIANGULATED_AREA<T>& ta,SEGMENTED_CURVE_2D<T>& sc);
 };   
 }
 #endif
