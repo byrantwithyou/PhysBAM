@@ -86,7 +86,7 @@ void Test_Triangle_Intersection(const VECTOR<int,3>& t1,const VECTOR<int,3>& t2,
     T A=Triangle_Intersection_Area(TRIANGLE_2D<T>(X.Subset(t1)),TRIANGLE_2D<T>(X.Subset(t2)),G,H);
     bool B=Topology_Aware_Triangle_Intersection_Test(t1,t2,ARRAY_VIEW<const TV>(X));
 
-    if((A!=0)==B) return;
+    if((fabs(A)>1e-10)==B) return;
 
     printf("%g %i (fail %d)\n", A, B, fail_number);
 
@@ -114,7 +114,7 @@ void Test_Triangle_Intersection()
     X.Append(rn.Get_Uniform_Vector(RANGE<TV>::Unit_Box()));
     X.Append(rn.Get_Uniform_Vector(RANGE<TV>::Unit_Box()));
     VECTOR<int,3> t1(1,2,3);
-    VECTOR<int,3> t2(2,3,4);
+    VECTOR<int,3> t2(3,2,4);
     VECTOR<int,3> t3(3,4,5);
     VECTOR<int,3> t4(4,5,6);
 
