@@ -46,15 +46,18 @@ Topology_Aware_Triangle_Intersection_Test(VECTOR<int,3> a,VECTOR<int,3> b,ARRAY_
     if(!a1 || !a2) return false;
     if(c==2) return (a1>0)!=(a2>0);
 
-    if(a1<0) exchange(a.x,a.y);
-    if(a2<0) exchange(b.x,b.y);
-    if(b2) cyclic_shift(a);
-    else if(b3){cyclic_shift(a);cyclic_shift(a);}
-    if(b.x!=a.x){cyclic_shift(b);if(b.x!=a.x){cyclic_shift(b);}}
+    if(b3) cyclic_shift(b);
+    else if(b2){cyclic_shift(b);cyclic_shift(b);}
+    if(b.x!=a.x){cyclic_shift(a);if(b.x!=a.x){cyclic_shift(a);}}
+    if(a1<0) exchange(a.y,a.z);
+    if(a2<0) exchange(b.y,b.z);
     TV C(X(a.x));
     MATRIX<T,2> M1(X(a.y)-C,X(a.z)-C),M2(X(b.y)-C,X(b.z)-C);
-    MATRIX<T,2> R=M1.Cofactor_Matrix()*M2;
-    return R.Column(1).All_Greater(TV()) || R.Column(2).All_Greater(TV());
+    MATRIX<T,2> R=M1.Inverse()*M2;
+    if(R.Column(1).All_Greater(TV()) || R.Column(2).All_Greater(TV())) return true;
+    MATRIX<T,2> S=M2.Inverse()*M1;
+    if(S.Column(1).All_Greater(TV()) || S.Column(2).All_Greater(TV())) return true;
+	return false;
 }
 template bool Topology_Aware_Triangle_Intersection_Test<VECTOR<float,2> >(VECTOR<int,3>,VECTOR<int,3>,ARRAY_VIEW<VECTOR<float,2> const,int>);
 template float Triangle_Intersection_Area<float,VECTOR<float,2> >(TRIANGLE_2D<float> const&,TRIANGLE_2D<float> const&,VECTOR<VECTOR<float,2>,6>&,VECTOR<VECTOR<MATRIX<float,2,2>,6>,6>&);
