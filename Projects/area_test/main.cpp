@@ -2,6 +2,7 @@
 // Copyright 2011.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRAPEZOID_INTERSECTION.h>
 using namespace PhysBAM;
@@ -55,7 +56,7 @@ bool Test()
     T dA=Va.Dot_Product(Va,(V1+V2)/(T)2);
     T aa=dA/e;
     T bb=(A2-A1)/e;
-    if((!aa != !bb) || fabs((aa-bb)/bb)>1e-6) printf("AG %g %g %g\n", aa, bb, fabs((aa-bb)/bb));
+    if((!aa != !bb) || fabs((aa-bb)/bb)>1e-5) printf("AG %g %g %g\n", aa, bb, fabs((aa-bb)/bb));
 
     MATRIX<T,8> M1,M2;
     for(int i=1;i<=8;i++) for(int j=1;j<=8;j++) M1(i,j)=H1((i+1)/2)((j+1)/2)((i+1)%2+1,(j+1)%2+1);
@@ -65,25 +66,8 @@ bool Test()
     VECTOR<T,8> dG2=V2-V1;
     T cc=dG2.Magnitude()/e;
     T dd=(dG2-dG1).Magnitude()/e;
-    if((!cc != !dd) || dd/cc>1e-6) printf("AH %g %g %g\n", cc, dd, dd/cc);
+    if((!cc != !dd) || dd/cc>1e-5) printf("AH %g %g %g       ", cc, dd, dd/cc),LOG::cout<<dG1<<" "<<dG2<<std::endl;
 
-/*
-    T dG=0;
-    for(int i=1;i<=4;i++) dG+=TV::Dot_Product(da(i),(dA1(i)+dA2(i))/2);
-    T aa=dA/e;
-    T bb=(A2-A1)/e;
-    if((!aa != !bb) || fabs((aa-bb)/bb)>1e-6) printf("AG %g %g %g\n", aa, bb, fabs((aa-bb)/bb));
-*/
-
-/*
-    printf("%g %g  (%g)\n", A, A2, A2-A);
-    fprintf(stderr, "1 0 0 setrgbcolor %g %g moveto %g %g lineto stroke\n", a.x*1000, a.y*1000, b.x*1000, b.y*1000);
-    fprintf(stderr, "0 0 1 setrgbcolor %g %g moveto %g %g lineto stroke\n", c.x*1000, c.y*1000, d.x*1000, d.y*1000);
-    fprintf(stderr, "0 0 0 setrgbcolor %g 0 moveto %g 1000 lineto stroke\n", a.x*1000, a.x*1000);
-    fprintf(stderr, "0 1 0 setrgbcolor %g 0 moveto %g 1000 lineto stroke\n", b.x*1000, b.x*1000);
-    fprintf(stderr, "0 0 0 setrgbcolor %g 0 moveto %g 1000 lineto stroke\n", c.x*1000, c.x*1000);
-    fprintf(stderr, "0 1 0 setrgbcolor %g 0 moveto %g 1000 lineto stroke\n", d.x*1000, d.x*1000);
-*/
     return true;
 }
 
@@ -98,7 +82,7 @@ int main(int argc,char *argv[])
     fprintf(stderr, "%%%%BoundingBox: 0 0 1000 1000\n");
 
 
-    for(int k=0;k<1000;k++){
+    for(int k=0;k<10000;k++){
         Test();
     }
 
