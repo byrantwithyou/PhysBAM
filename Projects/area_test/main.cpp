@@ -2,9 +2,12 @@
 // Copyright 2011.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_2D.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRAPEZOID_INTERSECTION.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_INTERSECTION.h>
 using namespace PhysBAM;
 
 template<class TV>
@@ -71,6 +74,55 @@ bool Test()
     return true;
 }
 
+int fail_number=0;
+
+template<class TV>
+void Test_Triangle_Intersection(const VECTOR<int,3>& t1,const VECTOR<int,3>& t2,const ARRAY<TV>& X)
+{
+    typedef typename TV::SCALAR T;
+    T size=500;
+    VECTOR<TV,6> G;
+    VECTOR<VECTOR<MATRIX<T,2>,6>,6> H;
+    T A=Triangle_Intersection_Area(TRIANGLE_2D<T>(X.Subset(t1)),TRIANGLE_2D<T>(X.Subset(t2)),G,H);
+    bool B=Topology_Aware_Triangle_Intersection_Test(t1,t2,ARRAY_VIEW<const TV>(X));
+
+    if((A!=0)==B) return;
+
+    printf("%g %i (fail %d)\n", A, B, fail_number);
+
+    char buff[100];
+    sprintf(buff, "fail-%d.eps", fail_number++);
+    FILE * F = fopen(buff, "w");
+
+    fprintf(F, "%%!PS-Adobe-3.0 EPSF-3.0\n");
+    fprintf(F, "%%%%BoundingBox: 0 0 500 500\n");
+    fprintf(F, "1 1 1 setrgbcolor newpath 0 0 moveto 500 0 lineto 500 500 lineto 0 500 lineto closepath fill\n");
+    fprintf(F, "1 0 0 setrgbcolor %g %g moveto %g %g lineto %g %g lineto closepath stroke\n", X(t1.x).x*size, X(t1.x).y*size, X(t1.y).x*size, X(t1.y).y*size,X(t1.z).x*size, X(t1.z).y*size);
+    fprintf(F, "0 1 0 setrgbcolor %g %g moveto %g %g lineto %g %g lineto closepath stroke\n", X(t2.x).x*size, X(t2.x).y*size, X(t2.y).x*size, X(t2.y).y*size,X(t2.z).x*size, X(t2.z).y*size);
+
+    fclose(F);
+}
+
+template<class TV>
+void Test_Triangle_Intersection()
+{
+    ARRAY<TV> X;
+    X.Append(rn.Get_Uniform_Vector(RANGE<TV>::Unit_Box()));
+    X.Append(rn.Get_Uniform_Vector(RANGE<TV>::Unit_Box()));
+    X.Append(rn.Get_Uniform_Vector(RANGE<TV>::Unit_Box()));
+    X.Append(rn.Get_Uniform_Vector(RANGE<TV>::Unit_Box()));
+    X.Append(rn.Get_Uniform_Vector(RANGE<TV>::Unit_Box()));
+    X.Append(rn.Get_Uniform_Vector(RANGE<TV>::Unit_Box()));
+    VECTOR<int,3> t1(1,2,3);
+    VECTOR<int,3> t2(2,3,4);
+    VECTOR<int,3> t3(3,4,5);
+    VECTOR<int,3> t4(4,5,6);
+
+    Test_Triangle_Intersection(t1,t2,X);
+    Test_Triangle_Intersection(t1,t3,X);
+    Test_Triangle_Intersection(t1,t4,X);
+}
+
 int main(int argc,char *argv[])
 {
     typedef double T;
@@ -78,13 +130,15 @@ int main(int argc,char *argv[])
     typedef VECTOR<T,2> TV;
 
 
-    fprintf(stderr, "%%!PS-Adobe-3.0 EPSF-3.0\n");
-    fprintf(stderr, "%%%%BoundingBox: 0 0 1000 1000\n");
+//    fprintf(stderr, "%%!PS-Adobe-3.0 EPSF-3.0\n");
+//    fprintf(stderr, "%%%%BoundingBox: 0 0 1000 1000\n");
 
 
-    for(int k=0;k<10000;k++){
-        Test();
-    }
+//    for(int k=0;k<10000;k++){
+//        Test();
+//    }
+
+    Test_Triangle_Intersection<TV>();
 
     return 0;
 }

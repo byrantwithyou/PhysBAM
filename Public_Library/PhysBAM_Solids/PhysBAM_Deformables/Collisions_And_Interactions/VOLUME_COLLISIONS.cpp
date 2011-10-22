@@ -12,21 +12,22 @@ struct VOLUME_COLLISIONS_VISITOR
 {
     typedef typename TV::SCALAR T;
     ARRAY<VECTOR<int,2> > candidate_pairs;
-    const TRIANGULATED_AREA<T>& ta;
-    const SEGMENTED_CURVE<T>& sc;
+    const TRIANGULATED_AREA<T>& ta1;
+    const TRIANGULATED_AREA<T>& ta2;
 
-//    VOLUME_COLLISIONS_VISITOR(const SEGMENTED_CURVE<TV>& segments_input): segments(segments_input) {}
+    VOLUME_COLLISIONS_VISITOR(const TRIANGULATED_AREA<T>& a,const TRIANGULATED_AREA<T>& b): ta1(a),ta2(b) {}
 
     ~VOLUME_COLLISIONS_VISITOR(){}
 
     bool Cull_Self(const int a) const
     {return false;}
 
-    bool Cull(const int s,const int t) const
+    bool Cull(const int a,const int b) const
     {return false;}
 
-    void Store(const int s,const int t)
-    {if(!ta.mesh.elements(t).Contains_All(sc.mesh.elements(s))) candidate_pairs.Append(VECTOR<int,2>(s,t));}
+    void Store(const int a,const int b)
+    {if(Topology_Aware_Triangle_Intersection_Test(ta1.mesh.elements(a),ta2.mesh.elements(b),ta1.particles.X)) candidate_pairs.Append(VECTOR<int,2>(a,b));}
+
 //#####################################################################
 };
 }
