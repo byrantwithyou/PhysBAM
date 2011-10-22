@@ -48,15 +48,32 @@ bool Test()
     VECTOR<VECTOR<MATRIX<T,2>,4>,4> H2;
     T A2 = Trapezoid_Intersection_Area(a(1)+da(1),a(2)+da(2),a(3)+da(3),a(4)+da(4),dA2,H2);
 
-    T dA=0;
-    for(int i=1;i<=4;i++) dA+=TV::Dot_Product(da(i),(dA1(i)+dA2(i))/2);
+    VECTOR<T,8>& Va=(VECTOR<T,8>&)da;
+    VECTOR<T,8>& V1=(VECTOR<T,8>&)dA1;
+    VECTOR<T,8>& V2=(VECTOR<T,8>&)dA2;
+
+    T dA=Va.Dot_Product(Va,(V1+V2)/(T)2);
     T aa=dA/e;
     T bb=(A2-A1)/e;
-    if(aa==0 && bb==00) return true;
+    if((!aa != !bb) || fabs((aa-bb)/bb)>1e-6) printf("AG %g %g %g\n", aa, bb, fabs((aa-bb)/bb));
 
-    if(fabs((aa-bb)/bb)<1e-6) return true;
+    MATRIX<T,8> M1,M2;
+    for(int i=1;i<=8;i++) for(int j=1;j<=8;j++) M1(i,j)=H1((i+1)/2)((j+1)/2)((i+1)%2+1,(j+1)%2+1);
+    for(int i=1;i<=8;i++) for(int j=1;j<=8;j++) M2(i,j)=H2((i+1)/2)((j+1)/2)((i+1)%2+1,(j+1)%2+1);
 
-    printf("%g %g %g\n", aa, bb, fabs((aa-bb)/bb));
+    VECTOR<T,8> dG1=(M1+M2)/(T)2*Va;
+    VECTOR<T,8> dG2=V2-V1;
+    T cc=dG2.Magnitude()/e;
+    T dd=(dG2-dG1).Magnitude()/e;
+    if((!cc != !dd) || dd/cc>1e-6) printf("AH %g %g %g\n", cc, dd, dd/cc);
+
+/*
+    T dG=0;
+    for(int i=1;i<=4;i++) dG+=TV::Dot_Product(da(i),(dA1(i)+dA2(i))/2);
+    T aa=dA/e;
+    T bb=(A2-A1)/e;
+    if((!aa != !bb) || fabs((aa-bb)/bb)>1e-6) printf("AG %g %g %g\n", aa, bb, fabs((aa-bb)/bb));
+*/
 
 /*
     printf("%g %g  (%g)\n", A, A2, A2-A);
