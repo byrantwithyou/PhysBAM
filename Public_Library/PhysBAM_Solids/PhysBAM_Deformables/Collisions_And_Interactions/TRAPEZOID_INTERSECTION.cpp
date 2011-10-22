@@ -177,7 +177,6 @@ Trapezoid_Intersection_Area_Case_1uo(const TV& a,const TV& b,const TV& c,const T
 {
 //    LOG::cout<<__FUNCTION__<<std::endl;
     T yvab=(a.y+b.y)/2,yba=b.y-a.y,yvcd=(c.y+d.y)/2,ydc=d.y-c.y,xba=b.x-a.x,xdc=d.x-c.x,xca=c.x-a.x;(void)yvab;(void)yba;(void)yvcd;(void)ydc;(void)xba;(void)xdc;(void)xca;
-
     T A=(T).5*(xba-xca)*(ydc*xba+2*yvcd*xdc-ydc*xdc-ydc*xca)/xdc;
     G(1)(1)=0;
     G(1)(2)=0;
