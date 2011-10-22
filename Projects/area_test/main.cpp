@@ -138,7 +138,7 @@ int main(int argc,char *argv[])
 //        Test();
 //    }
 
-    Test_Triangle_Intersection<TV>();
+    for(int i=1;i<=100;i++) Test_Triangle_Intersection<TV>();
 
     return 0;
 }
