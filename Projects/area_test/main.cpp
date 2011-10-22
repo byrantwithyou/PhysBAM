@@ -20,44 +20,70 @@ bool Inside_Trapezoid(TV a,TV b,const TV& p)
     return true;
 }
 
-int main(int argc,char *argv[])
+RANDOM_NUMBERS<double> rn;
+
+bool Test()
 {
-    typedef float T;
-    typedef float RW;
-    typedef VECTOR<T,2> TV;
+    typedef double T;
+    typedef VECTOR<double,2> TV;
+    VECTOR<TV,4> a;
+    rn.Fill_Uniform(a(1),0,1);
+    rn.Fill_Uniform(a(2),0,1);
+    rn.Fill_Uniform(a(3),0,1);
+    rn.Fill_Uniform(a(4),0,1);
 
-    RANDOM_NUMBERS<T> random;
+    T e=1e-4;
+    VECTOR<TV,4> da;
+    rn.Fill_Uniform(da(1),-e,e);
+    rn.Fill_Uniform(da(2),-e,e);
+    rn.Fill_Uniform(da(3),-e,e);
+    rn.Fill_Uniform(da(4),-e,e);
 
-    TV a,b,c,d;
-    random.Fill_Uniform(a,0,1);
-    random.Fill_Uniform(b,0,1);
-    random.Fill_Uniform(c,0,1);
-    random.Fill_Uniform(d,0,1);
+    fprintf(stderr, "1 1 1 setrgbcolor newpath 0 0 moveto 1000 0 lineto 1000 1000 lineto 0 1000 lineto closepath fill\n");
+    VECTOR<TV,4> dA1;
+    VECTOR<VECTOR<MATRIX<T,2>,4>,4> H1;
+    T A1 = Trapezoid_Intersection_Area(a(1),a(2),a(3),a(4),dA1,H1);
 
-    VECTOR<TV,4> dA;
-    VECTOR<VECTOR<MATRIX<T,2>,4>,4> H;
+    VECTOR<TV,4> dA2;
+    VECTOR<VECTOR<MATRIX<T,2>,4>,4> H2;
+    T A2 = Trapezoid_Intersection_Area(a(1)+da(1),a(2)+da(2),a(3)+da(3),a(4)+da(4),dA2,H2);
 
-    fprintf(stderr, "%%!PS-Adobe-3.0 EPSF-3.0\n");
-    fprintf(stderr, "%%%%BoundingBox: 0 0 1000 1000\n");
+    T dA=0;
+    for(int i=1;i<=4;i++) dA+=TV::Dot_Product(da(i),(dA1(i)+dA2(i))/2);
+    T aa=dA/e;
+    T bb=(A2-A1)/e;
+    if(aa==0 && bb==00) return true;
+
+    if(fabs((aa-bb)/bb)<1e-6) return true;
+
+    printf("%g %g %g\n", aa, bb, fabs((aa-bb)/bb));
+
+/*
+    printf("%g %g  (%g)\n", A, A2, A2-A);
     fprintf(stderr, "1 0 0 setrgbcolor %g %g moveto %g %g lineto stroke\n", a.x*1000, a.y*1000, b.x*1000, b.y*1000);
     fprintf(stderr, "0 0 1 setrgbcolor %g %g moveto %g %g lineto stroke\n", c.x*1000, c.y*1000, d.x*1000, d.y*1000);
     fprintf(stderr, "0 0 0 setrgbcolor %g 0 moveto %g 1000 lineto stroke\n", a.x*1000, a.x*1000);
     fprintf(stderr, "0 1 0 setrgbcolor %g 0 moveto %g 1000 lineto stroke\n", b.x*1000, b.x*1000);
     fprintf(stderr, "0 0 0 setrgbcolor %g 0 moveto %g 1000 lineto stroke\n", c.x*1000, c.x*1000);
     fprintf(stderr, "0 1 0 setrgbcolor %g 0 moveto %g 1000 lineto stroke\n", d.x*1000, d.x*1000);
+*/
+    return true;
+}
 
-    T A = Trapezoid_Intersection_Area(a,b,c,d,dA,H);
-    printf("%g\n", A);
+int main(int argc,char *argv[])
+{
+    typedef double T;
+    typedef double RW;
+    typedef VECTOR<T,2> TV;
 
-    int I=0,N=1000000;
-    for(int i=1;i<=N;i++){
-        TV p;
-        random.Fill_Uniform(p,0,1);
-        if(Inside_Trapezoid(a,b,p) && Inside_Trapezoid(c,d,p))
-            I++;
+
+    fprintf(stderr, "%%!PS-Adobe-3.0 EPSF-3.0\n");
+    fprintf(stderr, "%%%%BoundingBox: 0 0 1000 1000\n");
+
+
+    for(int k=0;k<1000;k++){
+        Test();
     }
-
-    printf("%g\n", (T)I/N);
 
     return 0;
 }
