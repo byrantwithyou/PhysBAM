@@ -9,33 +9,34 @@ using namespace PhysBAM;
 template<class T,class TV> T PhysBAM::
 Trapezoid_Intersection_Area_Case_1ou(const TV& a,const TV& b,const TV& c,const TV& d,VECTOR<TV,4>& G,VECTOR<VECTOR<MATRIX<T,2>,4>,4>& H)
 {
-//    LOG::cout<<__FUNCTION__<<std::endl;
+    LOG::cout<<__FUNCTION__<<std::endl;
     T yvab=(a.y+b.y)/2,yba=b.y-a.y,yvcd=(c.y+d.y)/2,ydc=d.y-c.y,xba=b.x-a.x,xdc=d.x-c.x,xca=c.x-a.x;(void)yvab;(void)yba;(void)yvcd;(void)ydc;(void)xba;(void)xdc;(void)xca;
+    T xbc=b.x-c.x,xbc_xba=xbc/xba,xca_xba=xca/xba,yba_xba=yba/xba,xca_xba2=xca_xba*xca_xba,xbc_xba2=xbc_xba*xbc_xba;
 
-    T A=(T).5*(xba-xca)*(2*xba*yvab+yba*xca)/xba;
-    G(1)(1)=-(T).5*(xba-xca)*(xba-xca)*yba/xba/xba;
-    G(1)(2)=(T).5*(xba-xca)*(xba-xca)/xba;
-    G(2)(1)=(T).5*(yba*xca*xca+2*yvab*xba*xba)/xba/xba;
-    G(2)(2)=(T).5/xba*(xba*xba-xca*xca);
-    G(3)(1)=(T).5*(-2*xba*yvab+xba*yba-2*yba*xca)/xba;
+    T A=(T).5*(2*xbc*yvab+xca_xba*yba*xbc);
+    G(1)(1)=-(T).5*xbc_xba2*yba;
+    G(1)(2)=(T).5*xbc*xbc_xba;
+    G(2)(1)=(T).5*(yba*xca_xba2+2*yvab);
+    G(2)(2)=(T).5*(xba-xca*xca_xba);
+    G(3)(1)=(T).5*(-2*yvab+yba-2*yba*xca_xba);
     G(3)(2)=0;
     G(4)(1)=0;
     G(4)(2)=0;
-    H(1)(1)(1,1)=-(xba-xca)*(xba-xca)*yba/xba/xba/xba;
-    H(1)(1)(2,1)=H(1)(1)(1,2)=(T).5*(xba-xca)*(xba-xca)/xba/xba;
+    H(1)(1)(1,1)=-xbc_xba2*yba_xba;
+    H(1)(1)(2,1)=H(1)(1)(1,2)=(T).5*xbc_xba2;
     H(1)(1)(2,2)=0;
-    H(2)(1)(1,1)=H(1)(2)(1,1)=-(xba-xca)*yba*xca/xba/xba/xba;
-    H(2)(1)(1,2)=H(1)(2)(2,1)=(T).5/xba/xba*(xba*xba-xca*xca);
-    H(2)(2)(1,1)=-xca*xca*yba/xba/xba/xba;
-    H(2)(1)(2,1)=H(1)(2)(1,2)=-(T).5*(xba-xca)*(xba-xca)/xba/xba;
+    H(2)(1)(1,1)=H(1)(2)(1,1)=-xbc_xba*xca_xba*yba_xba;
+    H(2)(1)(1,2)=H(1)(2)(2,1)=(T).5*(1-xca_xba2);
+    H(2)(2)(1,1)=-xca_xba2*yba_xba;
+    H(2)(1)(2,1)=H(1)(2)(1,2)=-(T).5*xbc_xba2;
     H(2)(1)(2,2)=H(1)(2)(2,2)=0;
-    H(2)(2)(2,1)=H(2)(2)(1,2)=(T).5*(xba*xba+xca*xca)/xba/xba;
+    H(2)(2)(2,1)=H(2)(2)(1,2)=(T).5*(1+xca_xba2);
     H(2)(2)(2,2)=0;
-    H(3)(1)(1,1)=H(1)(3)(1,1)=(xba-xca)*yba/xba/xba;
-    H(3)(1)(1,2)=H(1)(3)(2,1)=-(xba-xca)/xba;
-    H(3)(2)(1,1)=H(2)(3)(1,1)=yba*xca/xba/xba;
-    H(3)(2)(1,2)=H(2)(3)(2,1)=-xca/xba;
-    H(3)(3)(1,1)=-yba/xba;
+    H(3)(1)(1,1)=H(1)(3)(1,1)=xbc_xba*yba_xba;
+    H(3)(1)(1,2)=H(1)(3)(2,1)=-xbc_xba;
+    H(3)(2)(1,1)=H(2)(3)(1,1)=yba_xba*xca_xba;
+    H(3)(2)(1,2)=H(2)(3)(2,1)=-xca_xba;
+    H(3)(3)(1,1)=-yba_xba;
     H(3)(1)(2,1)=H(1)(3)(1,2)=0;
     H(3)(1)(2,2)=H(1)(3)(2,2)=0;
     H(3)(2)(2,1)=H(2)(3)(1,2)=0;
@@ -58,13 +59,14 @@ Trapezoid_Intersection_Area_Case_1ou(const TV& a,const TV& b,const TV& c,const T
     H(4)(4)(2,1)=H(4)(4)(1,2)=0;
     H(4)(4)(2,2)=0;
 
+    LOG::cout<<"A "<<A<<std::endl;
     return A;
 }
 
 template<class T,class TV> T PhysBAM::
 Trapezoid_Intersection_Area_Case_1oo(const TV& a,const TV& b,const TV& c,const TV& d,VECTOR<TV,4>& G,VECTOR<VECTOR<MATRIX<T,2>,4>,4>& H)
 {
-//    LOG::cout<<__FUNCTION__<<std::endl;
+    LOG::cout<<__FUNCTION__<<std::endl;
     T yvab=(a.y+b.y)/2,yba=b.y-a.y,yvcd=(c.y+d.y)/2,ydc=d.y-c.y,xba=b.x-a.x,xdc=d.x-c.x,xca=c.x-a.x;(void)yvab;(void)yba;(void)yvcd;(void)ydc;(void)xba;(void)xdc;(void)xca;
 
     T A=1./8*(xdc*xdc*xba*xba*ydc*ydc-4*xba*xba*yvcd*ydc*xdc*xdc-4*yvab*yba*xba*xba*xdc*xdc+4*xba*xba*xba*xba*ydc*ydc+yba*yba*xba*xba*xdc*xdc+4*yvab*yvab*xba*xba*xdc*xdc+4*ydc*ydc*xdc*xba*xba*xca-4*xdc*xba*xba*xba*ydc*yba-4*yba*xdc*ydc*xba*xca*xca+8*xba*xba*yba*xdc*ydc*xca+8*xba*yvab*yba*xdc*xdc*xca-8*yvcd*xdc*ydc*xba*xba*xca-8*yvab*xdc*xdc*yvcd*xba*xba-4*xdc*xdc*yba*yvcd*xba*xba+4*yvab*xdc*xdc*ydc*xba*xba-4*xba*yba*yba*xdc*xdc*xca+8*xba*xba*xba*xdc*yvcd*ydc+4*xba*xba*yvcd*yvcd*xdc*xdc-4*xdc*xba*xba*xba*ydc*ydc-8*xba*xba*xba*ydc*ydc*xca+4*xba*xba*ydc*ydc*xca*xca+2*yba*xba*xba*xdc*xdc*ydc+4*yba*yba*xdc*xdc*xca*xca)/xdc/xba/(-yba*xdc+ydc*xba);
@@ -114,13 +116,14 @@ Trapezoid_Intersection_Area_Case_1oo(const TV& a,const TV& b,const TV& c,const T
     H(4)(4)(2,1)=H(4)(4)(1,2)=-1./8*xba*(-12*yba*ydc*ydc*xba*xdc*xca*xca+16*yba*yba*xdc*xdc*ydc*xca*xca-8*yvcd*xdc*xdc*xdc*yba*yba*xca+4*ydc*yba*yba*xdc*xdc*xdc*xca+8*yvab*yba*yba*xdc*xdc*xdc*xca-8*yvab*xdc*xdc*xdc*yvcd*xba*yba+4*yvab*xdc*xdc*xdc*ydc*xba*yba-4*yvcd*yba*xba*ydc*xdc*xdc*xdc-4*yvab*yba*xba*xba*xdc*xdc*ydc+4*yvab*yvab*xba*xba*xdc*xdc*ydc+13*yba*yba*xba*xba*xdc*xdc*ydc+4*yvcd*yvcd*yba*xba*xdc*xdc*xdc+ydc*ydc*yba*xba*xdc*xdc*xdc+4*yba*yba*xdc*xdc*xdc*yvcd*xba-2*yba*yba*xdc*xdc*xdc*ydc*xba+4*yvab*xdc*xdc*ydc*ydc*xba*xba-2*xdc*xdc*yba*ydc*ydc*xba*xba-12*ydc*ydc*xba*xba*xba*yba*xdc+4*xba*xba*xba*xba*ydc*ydc*ydc+xba*xba*ydc*ydc*ydc*xdc*xdc-3*xba*yba*yba*yba*xdc*xdc*xdc-28*yba*yba*xdc*xdc*ydc*xba*xca+4*ydc*ydc*yba*xba*xdc*xdc*xca+24*yba*ydc*ydc*xba*xba*xdc*xca+8*yvab*yba*xdc*xdc*ydc*xba*xca-8*yvcd*yba*xba*ydc*xdc*xdc*xca+4*xba*xba*ydc*ydc*ydc*xca*xca-8*ydc*ydc*ydc*xba*xba*xba*xca+4*yba*yba*yba*xdc*xdc*xdc*xca+4*xba*xba*yvcd*yvcd*ydc*xdc*xdc-4*xba*xba*yvcd*ydc*ydc*xdc*xdc+4*xba*yvab*yvab*yba*xdc*xdc*xdc-4*xba*yvab*yba*yba*xdc*xdc*xdc-8*yvab*xdc*xdc*yvcd*xba*xba*ydc+4*xdc*xdc*yba*yvcd*xba*xba*ydc)/(-yba*xdc+ydc*xba)/(-yba*xdc+ydc*xba)/(-yba*xdc+ydc*xba)/xdc/xdc;
     H(4)(4)(2,2)=1./4*xba*(-2*yba*xca-2*xba*yvab+xba*yba+2*yvcd*xba-ydc*xba)*(-2*yba*xca-2*xba*yvab+xba*yba+2*yvcd*xba-ydc*xba)*xdc/(-yba*xdc+ydc*xba)/(-yba*xdc+ydc*xba)/(-yba*xdc+ydc*xba);
 
-return A;
+LOG::cout<<"A "<<A<<std::endl;
+    return A;
 }
 
 template<class T,class TV> T PhysBAM::
 Trapezoid_Intersection_Area_Case_1uu(const TV& a,const TV& b,const TV& c,const TV& d,VECTOR<TV,4>& G,VECTOR<VECTOR<MATRIX<T,2>,4>,4>& H)
 {
-//    LOG::cout<<__FUNCTION__<<std::endl;
+    LOG::cout<<__FUNCTION__<<std::endl;
     T yvab=(a.y+b.y)/2,yba=b.y-a.y,yvcd=(c.y+d.y)/2,ydc=d.y-c.y,xba=b.x-a.x,xdc=d.x-c.x,xca=c.x-a.x;(void)yvab;(void)yba;(void)yvcd;(void)ydc;(void)xba;(void)xdc;(void)xca;
 
     T A=1./8*(-4*yvcd*yvcd*xba*xdc-ydc*ydc*xba*xdc+2*yba*xdc*ydc*xba-4*xba*yvab*yvab*xdc-4*ydc*yvab*xba*xdc-4*yvcd*yba*xba*xdc+8*yba*yvcd*xdc*xca-4*ydc*yba*xdc*xca+4*ydc*yba*xba*xca+8*yvcd*yvab*xba*xdc-4*xba*yvab*yba*xdc-xba*yba*yba*xdc-8*ydc*yvab*xba*xca+4*yvcd*xba*xdc*ydc+8*yvab*xba*xba*ydc-4*yba*xca*xca*ydc)/(-yba*xdc+ydc*xba);
@@ -169,13 +172,14 @@ Trapezoid_Intersection_Area_Case_1uu(const TV& a,const TV& b,const TV& c,const T
     H(4)(4)(2,1)=H(4)(4)(1,2)=1./8*(-2*yba*xca-2*xba*yvab+xba*yba+2*yvcd*xba-ydc*xba)*(-2*yba*xca-2*xba*yvab+xba*yba+2*yvcd*xba-ydc*xba)*(ydc*xba+yba*xdc)/(-yba*xdc+ydc*xba)/(-yba*xdc+ydc*xba)/(-yba*xdc+ydc*xba);
     H(4)(4)(2,2)=-1./4*xba*(-2*yba*xca-2*xba*yvab+xba*yba+2*yvcd*xba-ydc*xba)*(-2*yba*xca-2*xba*yvab+xba*yba+2*yvcd*xba-ydc*xba)*xdc/(-yba*xdc+ydc*xba)/(-yba*xdc+ydc*xba)/(-yba*xdc+ydc*xba);
 
+    LOG::cout<<"A "<<A<<std::endl;
     return A;
 }
 
 template<class T,class TV> T PhysBAM::
 Trapezoid_Intersection_Area_Case_1uo(const TV& a,const TV& b,const TV& c,const TV& d,VECTOR<TV,4>& G,VECTOR<VECTOR<MATRIX<T,2>,4>,4>& H)
 {
-//    LOG::cout<<__FUNCTION__<<std::endl;
+    LOG::cout<<__FUNCTION__<<std::endl;
     T yvab=(a.y+b.y)/2,yba=b.y-a.y,yvcd=(c.y+d.y)/2,ydc=d.y-c.y,xba=b.x-a.x,xdc=d.x-c.x,xca=c.x-a.x;(void)yvab;(void)yba;(void)yvcd;(void)ydc;(void)xba;(void)xdc;(void)xca;
     T A=(T).5*(xba-xca)*(ydc*xba+2*yvcd*xdc-ydc*xdc-ydc*xca)/xdc;
     G(1)(1)=0;
@@ -223,6 +227,7 @@ Trapezoid_Intersection_Area_Case_1uo(const TV& a,const TV& b,const TV& c,const T
     H(4)(4)(2,1)=H(4)(4)(1,2)=-(T).5*(xba-xca)*(xba-xca)/xdc/xdc;
     H(4)(4)(2,2)=0;
 
+    LOG::cout<<"A "<<A<<std::endl;
     return A;
 }
 
@@ -230,7 +235,7 @@ Trapezoid_Intersection_Area_Case_1uo(const TV& a,const TV& b,const TV& c,const T
 template<class T,class TV> T PhysBAM::
 Trapezoid_Intersection_Area_Case_2ou(const TV& a,const TV& b,const TV& c,const TV& d,VECTOR<TV,4>& G,VECTOR<VECTOR<MATRIX<T,2>,4>,4>& H)
 {
-//    LOG::cout<<__FUNCTION__<<std::endl;
+    LOG::cout<<__FUNCTION__<<std::endl;
     T yvab=(a.y+b.y)/2,yba=b.y-a.y,yvcd=(c.y+d.y)/2,ydc=d.y-c.y,xba=b.x-a.x,xdc=d.x-c.x,xca=c.x-a.x;(void)yvab;(void)yba;(void)yvcd;(void)ydc;(void)xba;(void)xdc;(void)xca;
 
     T A=1./8*xdc*(-4*yba*yba*xba*xca+xba*xba*ydc*ydc-8*yvcd*yba*xba*xdc+yba*yba*xba*xba+4*ydc*yba*xba*xca+4*yvab*yvab*xba*xba+4*yba*yba*xca*xca+8*xba*yvab*yba*xca-2*xba*xba*yba*ydc-8*yvab*xba*xba*yvcd+4*yvab*xba*xba*ydc+4*xba*xba*yba*yvcd-4*yvab*yba*xba*xba+4*xba*xba*yvcd*yvcd+4*xba*xba*yvcd*ydc-8*yvcd*yba*xba*xca)/xba/(-yba*xdc+ydc*xba);
@@ -279,6 +284,7 @@ Trapezoid_Intersection_Area_Case_2ou(const TV& a,const TV& b,const TV& c,const T
     H(4)(4)(2,1)=H(4)(4)(1,2)=-1./8*(4*xba*xba*yba*yba*xdc*yvcd+8*xba*yvab*yba*yba*xdc*xca-8*xba*yba*yba*xdc*yvcd*xca-4*yvab*yba*yba*xba*xba*xdc+4*yvab*yvab*yba*xba*xba*xdc+yba*yba*yba*xba*xba*xdc+4*yba*yba*yba*xdc*xca*xca-8*yvab*xba*xba*xdc*yvcd*yba+4*xba*xba*yba*xdc*yvcd*yvcd+13*yba*ydc*ydc*xba*xba*xdc-12*yba*yba*xdc*xdc*ydc*xba-2*yba*yba*xba*xba*xdc*ydc+4*yvcd*yvcd*ydc*xba*xba*xba-4*yvcd*ydc*ydc*xba*xba*xba-4*yba*yvcd*xba*xba*xdc*ydc+4*yba*yba*yba*xdc*xdc*xdc-3*ydc*ydc*ydc*xba*xba*xba+4*yvab*ydc*ydc*xba*xba*xba-2*yba*ydc*ydc*xba*xba*xba-8*yvab*yvcd*xba*xba*xba*ydc+4*yba*yvcd*xba*xba*xba*ydc+4*yvab*yvab*xba*xba*xba*ydc+yba*yba*xba*xba*xba*ydc+4*yvab*xba*xba*yba*xdc*ydc-4*ydc*xba*xba*xba*yvab*yba-4*yba*yba*xba*xba*ydc*xca+4*yba*ydc*ydc*xba*xba*xca+4*yba*yba*ydc*xba*xca*xca+8*yvab*xba*xba*yba*ydc*xca-8*yba*yvcd*xba*xba*ydc*xca+4*yba*yba*ydc*xba*xdc*xca-4*xba*yba*yba*yba*xdc*xca)/(-yba*xdc+ydc*xba)/(-yba*xdc+ydc*xba)/(-yba*xdc+ydc*xba);
     H(4)(4)(2,2)=1./4*xba*(-2*yba*xca-2*xba*yvab+xba*yba+2*yvcd*xba-ydc*xba)*(-2*yba*xca-2*xba*yvab+xba*yba+2*yvcd*xba-ydc*xba)*xdc/(-yba*xdc+ydc*xba)/(-yba*xdc+ydc*xba)/(-yba*xdc+ydc*xba);
 
+    LOG::cout<<"A "<<A<<std::endl;
     return A;
 }
 
@@ -334,13 +340,14 @@ Trapezoid_Intersection_Area_Case_2oo(const TV& a,const TV& b,const TV& c,const T
     H(4)(4)(2,1)=H(4)(4)(1,2)=0;
     H(4)(4)(2,2)=0;
 
+    LOG::cout<<"A "<<A<<std::endl;
     return A;
 }
 
 template<class T,class TV> T PhysBAM::
 Trapezoid_Intersection_Area_Case_2uu(const TV& a,const TV& b,const TV& c,const TV& d,VECTOR<TV,4>& G,VECTOR<VECTOR<MATRIX<T,2>,4>,4>& H)
 {
-//    LOG::cout<<__FUNCTION__<<std::endl;
+    LOG::cout<<__FUNCTION__<<std::endl;
     T yvab=(a.y+b.y)/2,yba=b.y-a.y,yvcd=(c.y+d.y)/2,ydc=d.y-c.y,xba=b.x-a.x,xdc=d.x-c.x,xca=c.x-a.x;(void)yvab;(void)yba;(void)yvcd;(void)ydc;(void)xba;(void)xdc;(void)xca;
 
     T A=yvcd*xdc;
@@ -389,13 +396,14 @@ Trapezoid_Intersection_Area_Case_2uu(const TV& a,const TV& b,const TV& c,const T
     H(4)(4)(2,1)=H(4)(4)(1,2)=(T).5;
     H(4)(4)(2,2)=0;
 
+    LOG::cout<<"A "<<A<<std::endl;
     return A;
 }
 
 template<class T,class TV> T PhysBAM::
 Trapezoid_Intersection_Area_Case_2uo(const TV& a,const TV& b,const TV& c,const TV& d,VECTOR<TV,4>& G,VECTOR<VECTOR<MATRIX<T,2>,4>,4>& H)
 {
-//    LOG::cout<<__FUNCTION__<<std::endl;
+    LOG::cout<<__FUNCTION__<<std::endl;
     T yvab=(a.y+b.y)/2,yba=b.y-a.y,yvcd=(c.y+d.y)/2,ydc=d.y-c.y,xba=b.x-a.x,xdc=d.x-c.x,xca=c.x-a.x;(void)yvab;(void)yba;(void)yvcd;(void)ydc;(void)xba;(void)xdc;(void)xca;
 
     T A=-1./8*xdc*(-4*yba*yba*xba*xca+xba*xba*ydc*ydc-4*yba*xdc*ydc*xba+8*yba*yba*xdc*xca+yba*yba*xba*xba-4*ydc*yba*xba*xca+4*yvab*yvab*xba*xba+4*yba*yba*xca*xca+8*xba*yvab*yba*xca+4*xdc*xdc*yba*yba+8*xba*yvab*yba*xdc-4*xba*yba*yba*xdc+2*xba*xba*yba*ydc-8*yvab*xba*xba*yvcd-4*yvab*xba*xba*ydc+4*xba*xba*yba*yvcd-4*yvab*yba*xba*xba+4*xba*xba*yvcd*yvcd-4*xba*xba*yvcd*ydc-8*yvcd*yba*xba*xca)/xba/(-yba*xdc+ydc*xba);
@@ -444,6 +452,7 @@ Trapezoid_Intersection_Area_Case_2uo(const TV& a,const TV& b,const TV& c,const T
     H(4)(4)(2,1)=H(4)(4)(1,2)=1./8*(-2*yba*xca-2*xba*yvab+xba*yba+2*yvcd*xba-ydc*xba)*(-2*yba*xca-2*xba*yvab+xba*yba+2*yvcd*xba-ydc*xba)*(ydc*xba+yba*xdc)/(-yba*xdc+ydc*xba)/(-yba*xdc+ydc*xba)/(-yba*xdc+ydc*xba);
     H(4)(4)(2,2)=-1./4*xba*(-2*yba*xca-2*xba*yvab+xba*yba+2*yvcd*xba-ydc*xba)*(-2*yba*xca-2*xba*yvab+xba*yba+2*yvcd*xba-ydc*xba)*xdc/(-yba*xdc+ydc*xba)/(-yba*xdc+ydc*xba)/(-yba*xdc+ydc*xba);
 
+    LOG::cout<<"A "<<A<<std::endl;
     return A;
 }
 
@@ -503,7 +512,7 @@ Trapezoid_Intersection_Area(TV a,TV b,TV c,TV d,VECTOR<TV,4>& G,VECTOR<VECTOR<MA
         G(indices(i))=sign*tG(i);
         for(int j=1;j<=4;j++) H(indices(i))(indices(j))=sign*tH(i)(j);}
 
-return A;
+    return A;
 }
 
 template float Trapezoid_Intersection_Area<float,VECTOR<float,2> >(VECTOR<float,2>,VECTOR<float,2>,VECTOR<float,2>,VECTOR<float,2>,VECTOR<VECTOR<float,2>,4>&,VECTOR<VECTOR<MATRIX<float,2,2>,4>,4>&);
