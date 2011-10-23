@@ -8,35 +8,26 @@
 #define __VOLUME_COLLISIONS__    
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
+#include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
+#include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 namespace PhysBAM{
 
-template<class TV>
-class VOLUME_COLLISIONS
+template<class TV> class VOLUME_COLLISIONS;
+
+template<class T>
+class VOLUME_COLLISIONS<VECTOR<T,2> >
 {
-    typedef typename TV::SCALAR T;
+    typedef VECTOR<T,2> TV;
 public:
     ARRAY<TRIANGULATED_AREA<T>*> triangulated_areas;
+    T area;
+    HASHTABLE<int,TV> gradient;
+    HASHTABLE<VECTOR<int,2>,MATRIX<T,2> > hessian;
 
-    struct COMPONENT
-    {
-        ARRAY<int> list;
-        bool closed;
-    };
-
-    ARRAY<COMPONENT> components;
-    ARRAY<int> component_lookup;
-
-    struct LOOP
-    {
-        VECTOR<ARRAY<int>,2> parts;
-    };
-
-    ARRAY<LOOP> loops;
-
-    void Compute_Collision_Edges();
-    void Compute_Collision_Edges(TRIANGULATED_AREA<T>& ta,SEGMENTED_CURVE_2D<T>& sc);
+    void Compute_Collision_Triangles();
+    void Compute_Collision_Triangles(TRIANGULATED_AREA<T>& ta1,TRIANGULATED_AREA<T>& ta2);
 };   
 }
 #endif
