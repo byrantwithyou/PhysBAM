@@ -49,8 +49,11 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> DEFORMABLES_STANDARD_TESTS<TV>::
 DEFORMABLES_STANDARD_TESTS(EXAMPLE<TV>& example_input,DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection_input)
-    :example(example_input),deformable_body_collection(deformable_body_collection_input)
+    :example(example_input),deformable_body_collection(deformable_body_collection_input),debug_particles(*new GEOMETRY_PARTICLES<TV>)
 {
+    debug_particles.array_collection->template Add_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+    debug_particles.Store_Velocity(true);
+    Store_Debug_Particles(&debug_particles);
 }
 //#####################################################################
 // Function Add_Gravity
@@ -598,6 +601,51 @@ Mark_Hard_Bindings_With_Free_Particles()
         free_particles->nodes.Append(deformable_body_collection.binding_list.bindings(i)->particle_index);
 }
 //#####################################################################
+// Function Store_Debug_Particles
+//#####################################################################
+template<class TV> GEOMETRY_PARTICLES<TV>* DEFORMABLES_STANDARD_TESTS<TV>::
+Store_Debug_Particles(GEOMETRY_PARTICLES<TV>* particle)
+{
+    static GEOMETRY_PARTICLES<TV>* stored_particles=0;
+    GEOMETRY_PARTICLES<TV>* tmp=stored_particles;
+    if(particle) stored_particles=particle;
+    return tmp;
+}
+//#####################################################################
+// Function Add_Debug_Particle
+//#####################################################################
+template<class TV> void PhysBAM::
+Add_Debug_Particle(const TV& X, const VECTOR<typename TV::SCALAR,3>& color)
+{
+    typedef typename TV::SCALAR T;
+    GEOMETRY_PARTICLES<TV>* particles=(GEOMETRY_PARTICLES<TV>*)DEFORMABLES_STANDARD_TESTS<TV>::Store_Debug_Particles();
+    ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles->array_collection->template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+    int p=particles->array_collection->Add_Element();
+    particles->X(p)=X;
+    (*color_attribute)(p)=color;
+}
+//#####################################################################
+// Function Debug_Particle_Set_Attribute
+//#####################################################################
+template<class TV,class ATTR> void PhysBAM::
+Debug_Particle_Set_Attribute(ATTRIBUTE_ID id,const ATTR& attr)
+{
+    typedef typename TV::SCALAR T;
+    GEOMETRY_PARTICLES<TV>* particles=(GEOMETRY_PARTICLES<TV>*)DEFORMABLES_STANDARD_TESTS<TV>::Store_Debug_Particles();
+    ARRAY_VIEW<ATTR>* attribute=particles->array_collection->template Get_Array<ATTR>(id);
+    attribute->Last()=attr;
+}
+//#####################################################################
+// Function Write_Debug_Particles
+//#####################################################################
+template<class TV> void DEFORMABLES_STANDARD_TESTS<TV>::
+Write_Debug_Particles(const std::string& output_directory,int frame) const
+{
+    FILE_UTILITIES::Create_Directory(STRING_UTILITIES::string_sprintf("%s/%i",output_directory.c_str(),frame));
+    FILE_UTILITIES::Write_To_File(example.stream_type,STRING_UTILITIES::string_sprintf("%s/%i/debug_particles",output_directory.c_str(),frame),debug_particles);
+    debug_particles.array_collection->Delete_All_Elements();
+}
+//#####################################################################
 #define INSTANTIATION_HELPER_1D(T) \
     template DEFORMABLES_STANDARD_TESTS<VECTOR<T,1> >::DEFORMABLES_STANDARD_TESTS(EXAMPLE<VECTOR<T,1> >&,DEFORMABLE_BODY_COLLECTION<VECTOR<T,1> >&); \
     template TOPOLOGY_BASED_GEOMETRY_POLICY<VECTOR<T,1> >::SEGMENTED_CURVE& DEFORMABLES_STANDARD_TESTS<VECTOR<T,1> >::Create_Segmented_Curve(const GRID<VECTOR<T,1> >&,const RIGID_GEOMETRY_STATE<VECTOR<T,1> >&,const T); \
@@ -645,6 +693,13 @@ template void DEFORMABLES_STANDARD_TESTS<VECTOR<float,1> >::Set_Mass_Of_Particle
 template void DEFORMABLES_STANDARD_TESTS<VECTOR<float,3> >::Create_Regular_Embedded_Surface(BINDING_LIST<VECTOR<float,3> >&,SOFT_BINDINGS<VECTOR<float,3> >&,
     TRIANGULATED_SURFACE<float>&,float,int,float,ARRAY<int,int>&,TRIANGULATED_SURFACE<float>**,TETRAHEDRALIZED_VOLUME<float>**,bool);
 template LEVELSET_IMPLICIT_OBJECT<VECTOR<float,3> >* DEFORMABLES_STANDARD_TESTS<VECTOR<float,3> >::Initialize_Implicit_Surface(TRIANGULATED_SURFACE<float>&,int) const;
+template void Add_Debug_Particle<VECTOR<float,1> >(VECTOR<float,1> const&,VECTOR<float,3> const&);
+template void Add_Debug_Particle<VECTOR<float,2> >(VECTOR<float,2> const&,VECTOR<float,3> const&);
+template void Add_Debug_Particle<VECTOR<float,3> >(VECTOR<float,3> const&,VECTOR<float,3> const&);
+template void Debug_Particle_Set_Attribute<VECTOR<float,1>,VECTOR<float,1> >(ATTRIBUTE_ID,VECTOR<float,1> const&);
+template void Debug_Particle_Set_Attribute<VECTOR<float,2>,VECTOR<float,2> >(ATTRIBUTE_ID,VECTOR<float,2> const&);
+template void Debug_Particle_Set_Attribute<VECTOR<float,3>,VECTOR<float,3> >(ATTRIBUTE_ID,VECTOR<float,3> const&);
+template void DEFORMABLES_STANDARD_TESTS<VECTOR<float,2> >::Write_Debug_Particles(std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,int) const;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 INSTANTIATION_HELPER(double);
 template void DEFORMABLES_STANDARD_TESTS<VECTOR<double,3> >::Mark_Hard_Bindings_With_Free_Particles();
@@ -654,4 +709,11 @@ template void DEFORMABLES_STANDARD_TESTS<VECTOR<double,1> >::Set_Mass_Of_Particl
 template void DEFORMABLES_STANDARD_TESTS<VECTOR<double,3> >::Create_Regular_Embedded_Surface(BINDING_LIST<VECTOR<double,3> >&,SOFT_BINDINGS<VECTOR<double,3> >&,
     TRIANGULATED_SURFACE<double>&,double,int,double,ARRAY<int,int>&,TRIANGULATED_SURFACE<double>**,TETRAHEDRALIZED_VOLUME<double>**,bool);
 template LEVELSET_IMPLICIT_OBJECT<VECTOR<double,3> >* DEFORMABLES_STANDARD_TESTS<VECTOR<double,3> >::Initialize_Implicit_Surface(TRIANGULATED_SURFACE<double>&,int) const;
+template void Add_Debug_Particle<VECTOR<double,1> >(VECTOR<double,1> const&,VECTOR<double,3> const&);
+template void Add_Debug_Particle<VECTOR<double,2> >(VECTOR<double,2> const&,VECTOR<double,3> const&);
+template void Add_Debug_Particle<VECTOR<double,3> >(VECTOR<double,3> const&,VECTOR<double,3> const&);
+template void Debug_Particle_Set_Attribute<VECTOR<double,1>,VECTOR<double,1> >(ATTRIBUTE_ID,VECTOR<double,1> const&);
+template void Debug_Particle_Set_Attribute<VECTOR<double,2>,VECTOR<double,2> >(ATTRIBUTE_ID,VECTOR<double,2> const&);
+template void Debug_Particle_Set_Attribute<VECTOR<double,3>,VECTOR<double,3> >(ATTRIBUTE_ID,VECTOR<double,3> const&);
+template void DEFORMABLES_STANDARD_TESTS<VECTOR<double,2> >::Write_Debug_Particles(std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,int) const;
 #endif

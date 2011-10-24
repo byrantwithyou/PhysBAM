@@ -45,6 +45,7 @@ protected:
 public:
     EXAMPLE<TV>& example;
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection;
+    GEOMETRY_PARTICLES<TV>& debug_particles;
 
     DEFORMABLES_STANDARD_TESTS(EXAMPLE<TV>& example_input,DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection_input);
     virtual ~DEFORMABLES_STANDARD_TESTS(){}
@@ -107,6 +108,10 @@ public:
     void Create_Regular_Embedded_Surface(BINDING_LIST<TV>& binding_list,SOFT_BINDINGS<TV>& soft_bindings,TRIANGULATED_SURFACE<T>& surface,T density,int approx_volume,
         const T thickness_over_two,ARRAY<int>& surface_particle_map,TRIANGULATED_SURFACE<T>** new_surface,TETRAHEDRALIZED_VOLUME<T>** new_volume,bool bind_edges);
 //#####################################################################
+    static GEOMETRY_PARTICLES<TV>* Store_Debug_Particles(GEOMETRY_PARTICLES<TV>* particle=0);
+    void Write_Debug_Particles(const std::string& output_directory,int frame) const;
 };
+template<class TV,class ATTR> void Debug_Particle_Set_Attribute(ATTRIBUTE_ID id,const ATTR& attr);
+template<class TV> void Add_Debug_Particle(const TV& X, const VECTOR<typename TV::SCALAR,3>& color);
 }
 #endif

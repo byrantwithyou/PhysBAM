@@ -26,7 +26,7 @@ class SOLIDS_STANDARD_TESTS:public DEFORMABLES_STANDARD_TESTS<TV>,public RIGIDS_
     typedef typename BASE::T_SEGMENTED_CURVE T_SEGMENTED_CURVE;
     using BASE::example;
 public:
-    using BASE::Create_Mattress;using BASE::Create_Cloth_Panel;
+    using BASE::Create_Mattress;using BASE::Create_Cloth_Panel;using DEFORMABLES_STANDARD_TESTS<TV>::Write_Debug_Particles;
     SOLID_BODY_COLLECTION<TV>& solid_body_collection;
 
     SOLIDS_STANDARD_TESTS(EXAMPLE<TV>& example_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input);
