@@ -128,7 +128,6 @@ Divide_Polygon_Particles_With_New_Segments(ARRAY<VECTOR<int,2> >& all_segments,c
     if(verbose){LOG::cout<<"All particles on simplex "<<cutting_simplex<<" before adding new ";for(int j=1;j<=all_segments.m;j++) LOG::cout<<all_segments(j)<<"; ";LOG::cout<<std::endl;
         LOG::cout<<"     new potential particles are "<<possible_particles_to_add<<std::endl;}
     // choose subset of particles to add to this polygon
-    bool added_any=false;
     for(int k=1;k<=possible_particles_to_add.m;k++){const int possible_particle_to_add=possible_particles_to_add(k);
         for(int i=1;i<=all_segments.m;i++){
             if(all_segments(i).Contains(possible_particle_to_add)) goto NEXT_POSSIBLE_PARTICLES;
@@ -138,7 +137,6 @@ Divide_Polygon_Particles_With_New_Segments(ARRAY<VECTOR<int,2> >& all_segments,c
                 X2=intersection_registry->Get_Simplex_Weights_Of_Intersection(node2,cutting_simplex).x;
             if(verbose) PHYSBAM_DEBUG_PRINT("   trying to split ",flipped,possible_particle_to_add,node1,node2,X,X1,X2);
             if(flipped ? X>X1 && X<X2 : X<X1 && X>X2){
-                added_any=true;
                 all_segments(i)(2)=possible_particle_to_add;all_segments.Append(VECTOR<int,2>(possible_particle_to_add,node2));}}
       NEXT_POSSIBLE_PARTICLES:;
     }

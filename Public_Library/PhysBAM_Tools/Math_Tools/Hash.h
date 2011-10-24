@@ -80,8 +80,7 @@ private:
     {return key.value;}
 
     template<class T>
-    static int Value(const T& key)
-    {return Value(Hash_Reduce(key));}
+    static int Value(const T& key);
 
     unsigned int int_hash(unsigned int key) 
     {STATIC_ASSERT(sizeof(int)==4);
@@ -178,5 +177,6 @@ inline int Hash(const T& key)
     return HASH(Hash_Reduce(key)).value;
 }
 //#####################################################################
+template<class T> int HASH::Value(const T& key){return Value(Hash_Reduce(key));}
 }
 #endif

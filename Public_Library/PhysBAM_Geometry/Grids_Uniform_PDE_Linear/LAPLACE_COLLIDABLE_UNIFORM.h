@@ -39,10 +39,10 @@ public:
     typedef TV VECTOR_T;
     typedef T_GRID GRID_T;
 
-    using BASE::grid;using BASE::psi_N;
+    using BASE::grid;using BASE::psi_N;using BASE::psi_D;using BASE::u;
     using LAPLACE<T>::tolerance;using LAPLACE<T>::number_of_regions;using LAPLACE<T>::solve_neumann_regions;
     using COLLIDABLE_BASE::second_order_cut_cell_method;using COLLIDABLE_BASE::second_order_cut_cell_threshold;
-    using COLLIDABLE_BASE::levelset;using COLLIDABLE_BASE::u_interface;
+    using COLLIDABLE_BASE::levelset;using COLLIDABLE_BASE::u_interface;using BASE::filled_region_colors;
 
     //T_LEVELSET* levelset; // used in second order accurate cut cell method
     //T_FACE_ARRAYS_SCALAR u_interface; // interface boundary condition - 2nd order method

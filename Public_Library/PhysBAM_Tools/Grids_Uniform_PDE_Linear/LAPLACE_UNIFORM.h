@@ -40,7 +40,7 @@ public:
     typedef TV VECTOR_T;
     typedef T_GRID GRID_T;
 
-    using LAPLACE<T>::tolerance;using LAPLACE<T>::number_of_regions;using LAPLACE<T>::solve_neumann_regions;
+    using LAPLACE<T>::tolerance;using LAPLACE<T>::number_of_regions;using LAPLACE<T>::solve_neumann_regions;using LAPLACE<T>::Find_Tolerance;
 
     T_GRID grid;
     T_ARRAYS_SCALAR& u;

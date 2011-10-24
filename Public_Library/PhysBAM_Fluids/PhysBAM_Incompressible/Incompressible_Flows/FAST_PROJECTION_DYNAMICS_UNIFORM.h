@@ -22,7 +22,7 @@ class FAST_PROJECTION_DYNAMICS_UNIFORM:public PROJECTION_DYNAMICS_UNIFORM<T_GRID
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;typedef typename T_GRID::VECTOR_INT TV_INT;
     typedef typename INTERPOLATION_POLICY<T_GRID>::FACE_LOOKUP T_FACE_LOOKUP;typedef typename FIRE_INTERPOLATION_POLICY<T_GRID>::FACE_LOOKUP_FIRE_MULTIPHASE T_FACE_LOOKUP_FIRE_MULTIPHASE;
 public:
-    typedef PROJECTION_DYNAMICS_UNIFORM<T_GRID> BASE;using BASE::p_grid;using BASE::elliptic_solver;
+    typedef PROJECTION_DYNAMICS_UNIFORM<T_GRID> BASE;using BASE::p_grid;using BASE::elliptic_solver;using BASE::Compute_Divergence;using BASE::Apply_Pressure;
     
     SPARSE_MATRIX_FLAT_NXN<T> A;
     VECTOR_ND<T> b;

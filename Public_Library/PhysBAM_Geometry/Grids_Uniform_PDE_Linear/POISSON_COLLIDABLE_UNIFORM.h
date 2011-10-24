@@ -30,9 +30,9 @@ public:
     //typedef LAPLACE_COLLIDABLE_UNIFORM<T_GRID> BASE;
     using POISSON<T>::GFM;using POISSON<T>::number_of_interface_cells;using POISSON<T>::smear_beta;using POISSON<T>::beta_minus;using POISSON<T>::beta_plus;using POISSON<T>::beta_multiphase;
     using POISSON<T>::u_jumps;using POISSON<T>::beta_un_jumps;using POISSON<T>::use_variable_beta;using POISSON<T>::beta_given_on_faces;
-    using POISSON<T>::multiphase;
+    using POISSON<T>::multiphase;using POISSON_UNIFORM<T_GRID>::f;using POISSON_UNIFORM<T_GRID>::u;using POISSON_UNIFORM<T_GRID>::variable_beta;
 
-    using BASE::grid;using BASE::psi_N;using BASE::filled_region_colors;using BASE::beta_face;
+    using BASE::grid;using BASE::psi_N;using BASE::psi_D;using BASE::filled_region_colors;using BASE::beta_face;
     using BASE::Find_Variable_beta;
     
     using COLLIDABLE_BASE::second_order_cut_cell_method;using COLLIDABLE_BASE::second_order_cut_cell_threshold;

@@ -25,7 +25,7 @@ public:
     using BASE::max_iterations;using BASE::poststabilization_iterations;using BASE::use_epsilon_scale;using BASE::line_search_interval_tolerance;using BASE::max_line_search_iterations;
     using BASE::use_pd_actuators;using BASE::use_muscle_actuators;using BASE::actuation_iterations;using BASE::enforce_nonnegative_activations;using BASE::clamp_negative_activations;
     using BASE::activation_optimization_iterations;using BASE::global_post_stabilization;using BASE::verbose;using BASE::use_angular_damping;using BASE::Update_Joint_Frames;
-    using BASE::Parent_Id;using BASE::Child_Id;using BASE::Parent;using BASE::Child;using BASE::Apply_Poststabilization;using BASE::zero_row_tolerance;
+    using BASE::Parent_Id;using BASE::Child_Id;using BASE::Parent;using BASE::Child;using BASE::Apply_Poststabilization;using BASE::zero_row_tolerance;using BASE::Delta_Relative_Twist;
 
 private:
     VECTOR_ND<T> last_muscle_actuations;

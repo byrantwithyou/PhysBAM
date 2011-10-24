@@ -30,7 +30,7 @@ class SPHERICAL:public EULER_1D<T_input>
     typedef typename  GRID_ARRAYS_POLICY<GRID<TV> >::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
 public:
     using EULER_1D<T>::boundary;using EULER_1D<T>::conservation;using EULER_1D<T>::eos;using EULER_1D<T>::grid;using EULER_1D<T>::U;
-    using EULER_1D<T>::cut_out_grid;using EULER_1D<T>::psi_pointer;using EULER_1D<T>::eigensystem_F;
+    using EULER_1D<T>::cut_out_grid;using EULER_1D<T>::psi_pointer;using EULER_1D<T>::eigensystem_F;using EULER_1D<T>::Set_Custom_Equation_Of_State;
 
 private:
     BOUNDARY_EULER_EQUATIONS_SPHERICAL<T> boundary_default;

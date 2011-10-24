@@ -21,6 +21,7 @@ class TETRAHEDRON_HIERARCHY:public BOX_HIERARCHY<VECTOR<T_input,3> >
 public:
     typedef BOX_HIERARCHY<TV> BASE;
     using BASE::leaves;using BASE::root;using BASE::parents;using BASE::children;using BASE::box_hierarchy;using BASE::box_radius;using BASE::Update_Nonleaf_Boxes;
+    using BASE::Thicken_Leaf_Boxes;using BASE::Initialize_Hierarchy_Using_KD_Tree_Helper;
 
     TETRAHEDRON_MESH& tetrahedron_mesh;
     GEOMETRY_PARTICLES<TV>& particles;

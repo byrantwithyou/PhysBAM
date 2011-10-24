@@ -20,7 +20,8 @@ class RENDERING_VOXEL_SHADER:public VOLUMETRIC_SHADER<T>
 {
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
-    using VOLUMETRIC_SHADER<T>::world;using VOLUMETRIC_SHADER<T>::supports_photon_mapping;
+    using VOLUMETRIC_SHADER<T>::world;using VOLUMETRIC_SHADER<T>::supports_photon_mapping;using VOLUMETRIC_SHADER<T>::Inverse_Isotropic_Phase_Direction;
+    using VOLUMETRIC_SHADER<T>::Inverse_Henyey_Greenstein_Phase_Direction;
 
     TV absorption;
     TV absorption_shadow;

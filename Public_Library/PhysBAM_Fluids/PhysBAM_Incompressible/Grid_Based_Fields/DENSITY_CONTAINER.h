@@ -33,7 +33,7 @@ public:
     typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;
     typedef GRID_AND_ARRAY_CONTAINER<T_GRID,T> BASE;
     using BASE::array;using BASE::grid;
-    using BASE::boundary_default;using BASE::boundary;
+    using BASE::boundary_default;using BASE::boundary;using BASE::Set_To_Constant_Value;using BASE::Set_Custom_Advection;
 
     T_ARRAYS_SCALAR& density;
     T ambient_density;

@@ -31,8 +31,8 @@ public:
     ARRAY<INTERVAL<int> > interior_regions;
     MPI_SOLID_FLUID<TV>* mpi_solid_fluid;
     T tolerance_ratio;
-    mutable GENERALIZED_VELOCITY<TV>& temp;
-    mutable GENERALIZED_VELOCITY<TV>& solid_velocity;
+    GENERALIZED_VELOCITY<TV>& temp;
+    GENERALIZED_VELOCITY<TV>& solid_velocity;
     mutable ARRAY<VECTOR_ND<T> > temp_array;
     ARRAY<int>& coupled_deformable_particle_indices;
 

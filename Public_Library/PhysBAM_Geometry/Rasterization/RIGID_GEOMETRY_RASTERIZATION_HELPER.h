@@ -13,6 +13,7 @@
 #include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_1D.h>
 #include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_2D.h>
 #include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_3D.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Computations/RIGID_GEOMETRY_RASTERIZATION_UNIFORM.h>
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
 namespace PhysBAM{
 template<class T_GRID> struct GRID_ARRAYS_POLICY;

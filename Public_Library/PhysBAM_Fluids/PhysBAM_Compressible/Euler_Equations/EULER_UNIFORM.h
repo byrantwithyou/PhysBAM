@@ -44,7 +44,7 @@ protected:
 public:
     using BASE::boundary;using BASE::conservation;using BASE::eos;using BASE::Get_Velocity;using BASE::e;
     using BASE::Set_Max_Time_Step;using BASE::Set_Custom_Conservation;using BASE::Set_CFL_Number;using BASE::open_boundaries;
-    using BASE::use_force;
+    using BASE::use_force;using BASE::Get_Density;
 
     T_GRID grid;
     T_MPI_GRID* mpi_grid;

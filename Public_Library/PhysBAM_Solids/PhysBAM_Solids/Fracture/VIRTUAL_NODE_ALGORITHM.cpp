@@ -31,6 +31,135 @@ Add_Element_If_Necessary(EMBEDDED_OBJECT<TV,d>& embedded_object,const VECTOR<int
     embedded_object.node_in_simplex_is_material(mesh.elements.m)(center_node)=true;
 }
 //#####################################################################
+// Function Unmarked_Neighbor_Node
+//#####################################################################
+template<int d> static inline int
+Unmarked_Neighbor_Node(const SIMPLEX_MESH<d>& mesh,const int center_node,const ARRAY<short>& marked)
+{
+    for(int n=1;n<=(*mesh.neighbor_nodes)(center_node).m;n++){
+        int node=(*mesh.neighbor_nodes)(center_node)(n);
+        if(!marked(node)) return node;}
+    return 0;
+}
+//#####################################################################
+//  Function Mark_Disconnected_Components_In_One_Ring
+//#####################################################################
+template<class TV> static inline bool
+Mark_Disconnected_Components_In_One_Ring_Helper(const EMBEDDED_TRIANGULATED_OBJECT<TV>& embedded_object,const int center_node,ARRAY<short>& marked,const int component)
+{
+    TRIANGLE_MESH& mesh=embedded_object.simplicial_object.mesh;
+    bool changed=false;
+    for(int t=1;t<=(*mesh.incident_elements)(center_node).m;t++){
+        int triangle=(*mesh.incident_elements)(center_node)(t);
+        int a,b;mesh.Other_Two_Nodes(center_node,triangle,a,b);
+        if(marked(a)==component && !marked(b) && embedded_object.Nodes_Are_Materially_Connected_In_Simplex(a,b,triangle)){marked(b)=component;changed=true;}
+        if(marked(b)==component && !marked(a) && embedded_object.Nodes_Are_Materially_Connected_In_Simplex(b,a,triangle)){marked(a)=component;changed=true;}}
+    return changed;
+}
+template<class T> static inline bool
+Mark_Disconnected_Components_In_One_Ring_Helper(const EMBEDDED_TETRAHEDRALIZED_VOLUME<T>& embedded_object,const int center_node,ARRAY<short>& marked,const int component)
+{
+    TETRAHEDRON_MESH& mesh=embedded_object.simplicial_object.mesh;
+    bool changed=false;
+    for(int t=1;t<=(*mesh.incident_elements)(center_node).m;t++){
+        int tetrahedron=(*mesh.incident_elements)(center_node)(t);
+        int a,b,c;mesh.Other_Three_Nodes(center_node,tetrahedron,a,b,c);
+        if(marked(a)==component){
+            if(!marked(b) && embedded_object.Nodes_Are_Materially_Connected_In_Simplex(a,b,tetrahedron)){marked(b)=component;changed=true;}
+            if(!marked(c) && embedded_object.Nodes_Are_Materially_Connected_In_Simplex(a,c,tetrahedron)){marked(c)=component;changed=true;}}
+        if(marked(b)==component){
+            if(!marked(a) && embedded_object.Nodes_Are_Materially_Connected_In_Simplex(b,a,tetrahedron)){marked(a)=component;changed=true;}
+            if(!marked(c) && embedded_object.Nodes_Are_Materially_Connected_In_Simplex(b,c,tetrahedron)){marked(c)=component;changed=true;}}
+        if(marked(c)==component){
+            if(!marked(a) && embedded_object.Nodes_Are_Materially_Connected_In_Simplex(c,a,tetrahedron)){marked(a)=component;changed=true;}
+            if(!marked(b) && embedded_object.Nodes_Are_Materially_Connected_In_Simplex(c,b,tetrahedron)){marked(b)=component;changed=true;}}}
+    return changed;
+}
+template<class TV,int d> int
+Mark_Disconnected_Components_In_One_Ring(const EMBEDDED_OBJECT<TV,d>& embedded_object_input,const int center_node,ARRAY<short>& marked)
+{
+    const typename EMBEDDING_POLICY<TV,d>::EMBEDDED_OBJECT& embedded_object=dynamic_cast<const typename EMBEDDING_POLICY<TV,d>::EMBEDDED_OBJECT&>(embedded_object_input);
+    SIMPLEX_MESH<d>& mesh=embedded_object.simplicial_object.mesh;
+
+    // flood fill only nodes that are material in some element in the 1-ring
+    INDIRECT_ARRAY<ARRAY<short>,ARRAY<int>&> marked_subset=marked.Subset((*mesh.neighbor_nodes)(center_node));
+    ARRAYS_COMPUTATIONS::Fill(marked_subset,(short)-2);
+    for(int i=1;i<=(*mesh.incident_elements)(center_node).m;i++){int t=(*mesh.incident_elements)(center_node)(i);
+        const VECTOR<int,d+1>& element=mesh.elements(t);
+        for(int n=1;n<=element.m;n++) if(embedded_object.node_in_simplex_is_material(t)(n)) marked(element[n])=0;}
+    // mark component connected to the center node with -1
+    for(int n=1;n<=(*mesh.neighbor_nodes)(center_node).m;n++){
+        int node=(*mesh.neighbor_nodes)(center_node)(n);
+        if(!embedded_object.Segment_Is_Broken(center_node,node)) marked(node)=-1;}
+
+    while(Mark_Disconnected_Components_In_One_Ring_Helper(embedded_object,center_node,marked,-1));
+    // mark other components
+    int component=0;
+    while(int first_unmarked=Unmarked_Neighbor_Node(mesh,center_node,marked)){
+        marked(first_unmarked)=++component;
+        while(Mark_Disconnected_Components_In_One_Ring_Helper(embedded_object,center_node,marked,component));}
+    return component;
+}
+//#####################################################################
+//  Function Construct_Virtual_Nodes
+//#####################################################################
+template<class TV,int d> void
+Construct_Virtual_Nodes(EMBEDDED_OBJECT<TV,d>& embedded_object,ARRAY<int>& map_to_old_particles,VIRTUAL_NODES& virtual_nodes)
+{
+    assert(embedded_object.simplicial_object.mesh.number_nodes==embedded_object.particles.array_collection->Size() && embedded_object.embedded_mesh.number_nodes==embedded_object.particles.array_collection->Size()
+        && embedded_object.embedded_particles.subset_index_from_point_cloud_index.m==embedded_object.particles.array_collection->Size());
+    PARTICLES<TV>& particles=dynamic_cast<PARTICLES<TV>&>(embedded_object.particles);
+    SIMPLEX_MESH<d>& mesh=embedded_object.simplicial_object.mesh;
+
+    // construct new virtual nodes
+    ARRAY<short> marked(mesh.number_nodes,false);
+    for(int node=1;node<=mesh.number_nodes;node++){
+        int components=Mark_Disconnected_Components_In_One_Ring(embedded_object,node,marked);
+        // make a virtual_node for each component disconnected from the center node
+        ARRAY<int> virtual_node_index(components);
+        for(int component_index=1;component_index<=components;component_index++) virtual_node_index(component_index)=virtual_nodes.Add_Virtual_Node(node);
+        for(int i=1;i<=(*mesh.neighbor_nodes)(node).m;i++){
+            int neighbor_node=(*mesh.neighbor_nodes)(node)(i);
+            if(marked(neighbor_node)>0) virtual_nodes(virtual_node_index(marked(neighbor_node))).recipients.Append(neighbor_node);}}
+    virtual_nodes.Initialize_Replicas();
+
+    // initialize virtual_node indices and update particles
+    map_to_old_particles=IDENTITY_ARRAY<>(particles.array_collection->Size());
+    for(int p=1;p<=virtual_nodes.replicas.m;p++){if(!virtual_nodes.replicas(p).m) continue;
+        int i=1;
+        {VIRTUAL_NODE& virtual_node=virtual_nodes(virtual_nodes.replicas(p)(i));
+        if(!embedded_object.Node_Near_Material(virtual_node.corresponding_real_node)){i++; // reuse old virtual node
+            virtual_node.index=virtual_node.corresponding_real_node;}}
+        for(;i<=virtual_nodes.replicas(p).m;i++){VIRTUAL_NODE& virtual_node=virtual_nodes(virtual_nodes.replicas(p)(i));
+            virtual_node.index=particles.array_collection->Append(*particles.array_collection,virtual_node.corresponding_real_node); // duplicating particles produces more mass
+            map_to_old_particles.Append(virtual_node.corresponding_real_node);}}
+
+    // Update meshes and embedded particles if virtual nodes were added
+    embedded_object.embedded_particles.subset_index_from_point_cloud_index.Resize(particles.array_collection->Size());
+    embedded_object.simplicial_object.mesh.Set_Number_Nodes(particles.array_collection->Size());
+    embedded_object.embedded_mesh.Set_Number_Nodes(particles.array_collection->Size());
+}
+//#####################################################################
+// Function Add_Embedded_Subelement
+//#####################################################################
+template<class TV,int d> void
+Add_Embedded_Subelement(EMBEDDED_OBJECT<TV,d>& embedded_object,const EMBEDDED_OBJECT<TV,d>& old_embedded_object,const int old_emb_subelement,const int current_element,const int old_element)
+{
+    VECTOR<int,d> old_emb_nodes=VECTOR<int,d>::Map(old_embedded_object.embedded_particles.subset_index_from_point_cloud_index,
+        old_embedded_object.embedded_mesh.elements(old_emb_subelement));
+    VECTOR<int,d+1> current_nodes=embedded_object.simplicial_object.mesh.elements(current_element),
+        old_nodes=old_embedded_object.simplicial_object.mesh.elements(old_element);
+
+    VECTOR<int,d> emb_nodes;
+    for(int i=1;i<=emb_nodes.m;i++){
+        for(int j1=1;j1<=current_nodes.m-1;j1++) for(int j2=j1+1;j2<=current_nodes.m;j2++)
+            if(old_embedded_object.Are_Parents(VECTOR<int,2>(old_nodes[j1],old_nodes[j2]),old_emb_nodes[i])){
+                emb_nodes[i]=embedded_object.Embedded_Particle_On_Segment(current_nodes[j1],current_nodes[j2]);goto NEXT;}
+        NEXT:;}
+
+    embedded_object.Add_Embedded_Subelement_If_Not_Already_There(emb_nodes);
+}
+//#####################################################################
 // Function Rebuild_Embedded_Object
 //#####################################################################
 template<class TV,int d> void
@@ -121,135 +250,6 @@ Rebuild_Embedded_Object(EMBEDDED_OBJECT<TV,d>& embedded_object,ARRAY<int>& map_t
     if(verbose){
         LOG::cout<<"Total Embedded Nodes: "<<embedded_object.embedded_particles.active_indices.m<<std::endl;
         LOG::cout<<"Total Embedded Elements: "<<embedded_object.embedded_mesh.elements.m<<std::endl;}
-}
-//#####################################################################
-//  Function Construct_Virtual_Nodes
-//#####################################################################
-template<class TV,int d> void
-Construct_Virtual_Nodes(EMBEDDED_OBJECT<TV,d>& embedded_object,ARRAY<int>& map_to_old_particles,VIRTUAL_NODES& virtual_nodes)
-{
-    assert(embedded_object.simplicial_object.mesh.number_nodes==embedded_object.particles.array_collection->Size() && embedded_object.embedded_mesh.number_nodes==embedded_object.particles.array_collection->Size()
-        && embedded_object.embedded_particles.subset_index_from_point_cloud_index.m==embedded_object.particles.array_collection->Size());
-    PARTICLES<TV>& particles=dynamic_cast<PARTICLES<TV>&>(embedded_object.particles);
-    SIMPLEX_MESH<d>& mesh=embedded_object.simplicial_object.mesh;
-
-    // construct new virtual nodes
-    ARRAY<short> marked(mesh.number_nodes,false);
-    for(int node=1;node<=mesh.number_nodes;node++){
-        int components=Mark_Disconnected_Components_In_One_Ring(embedded_object,node,marked);
-        // make a virtual_node for each component disconnected from the center node
-        ARRAY<int> virtual_node_index(components);
-        for(int component_index=1;component_index<=components;component_index++) virtual_node_index(component_index)=virtual_nodes.Add_Virtual_Node(node);
-        for(int i=1;i<=(*mesh.neighbor_nodes)(node).m;i++){
-            int neighbor_node=(*mesh.neighbor_nodes)(node)(i);
-            if(marked(neighbor_node)>0) virtual_nodes(virtual_node_index(marked(neighbor_node))).recipients.Append(neighbor_node);}}
-    virtual_nodes.Initialize_Replicas();
-
-    // initialize virtual_node indices and update particles
-    map_to_old_particles=IDENTITY_ARRAY<>(particles.array_collection->Size());
-    for(int p=1;p<=virtual_nodes.replicas.m;p++){if(!virtual_nodes.replicas(p).m) continue;
-        int i=1;
-        {VIRTUAL_NODE& virtual_node=virtual_nodes(virtual_nodes.replicas(p)(i));
-        if(!embedded_object.Node_Near_Material(virtual_node.corresponding_real_node)){i++; // reuse old virtual node
-            virtual_node.index=virtual_node.corresponding_real_node;}}
-        for(;i<=virtual_nodes.replicas(p).m;i++){VIRTUAL_NODE& virtual_node=virtual_nodes(virtual_nodes.replicas(p)(i));
-            virtual_node.index=particles.array_collection->Append(*particles.array_collection,virtual_node.corresponding_real_node); // duplicating particles produces more mass
-            map_to_old_particles.Append(virtual_node.corresponding_real_node);}}
-
-    // Update meshes and embedded particles if virtual nodes were added
-    embedded_object.embedded_particles.subset_index_from_point_cloud_index.Resize(particles.array_collection->Size());
-    embedded_object.simplicial_object.mesh.Set_Number_Nodes(particles.array_collection->Size());
-    embedded_object.embedded_mesh.Set_Number_Nodes(particles.array_collection->Size());
-}
-//#####################################################################
-//  Function Mark_Disconnected_Components_In_One_Ring
-//#####################################################################
-template<class TV> static inline bool
-Mark_Disconnected_Components_In_One_Ring_Helper(const EMBEDDED_TRIANGULATED_OBJECT<TV>& embedded_object,const int center_node,ARRAY<short>& marked,const int component)
-{
-    TRIANGLE_MESH& mesh=embedded_object.simplicial_object.mesh;
-    bool changed=false;
-    for(int t=1;t<=(*mesh.incident_elements)(center_node).m;t++){
-        int triangle=(*mesh.incident_elements)(center_node)(t);
-        int a,b;mesh.Other_Two_Nodes(center_node,triangle,a,b);
-        if(marked(a)==component && !marked(b) && embedded_object.Nodes_Are_Materially_Connected_In_Simplex(a,b,triangle)){marked(b)=component;changed=true;}
-        if(marked(b)==component && !marked(a) && embedded_object.Nodes_Are_Materially_Connected_In_Simplex(b,a,triangle)){marked(a)=component;changed=true;}}
-    return changed;
-}
-template<class T> static inline bool
-Mark_Disconnected_Components_In_One_Ring_Helper(const EMBEDDED_TETRAHEDRALIZED_VOLUME<T>& embedded_object,const int center_node,ARRAY<short>& marked,const int component)
-{
-    TETRAHEDRON_MESH& mesh=embedded_object.simplicial_object.mesh;
-    bool changed=false;
-    for(int t=1;t<=(*mesh.incident_elements)(center_node).m;t++){
-        int tetrahedron=(*mesh.incident_elements)(center_node)(t);
-        int a,b,c;mesh.Other_Three_Nodes(center_node,tetrahedron,a,b,c);
-        if(marked(a)==component){
-            if(!marked(b) && embedded_object.Nodes_Are_Materially_Connected_In_Simplex(a,b,tetrahedron)){marked(b)=component;changed=true;}
-            if(!marked(c) && embedded_object.Nodes_Are_Materially_Connected_In_Simplex(a,c,tetrahedron)){marked(c)=component;changed=true;}}
-        if(marked(b)==component){
-            if(!marked(a) && embedded_object.Nodes_Are_Materially_Connected_In_Simplex(b,a,tetrahedron)){marked(a)=component;changed=true;}
-            if(!marked(c) && embedded_object.Nodes_Are_Materially_Connected_In_Simplex(b,c,tetrahedron)){marked(c)=component;changed=true;}}
-        if(marked(c)==component){
-            if(!marked(a) && embedded_object.Nodes_Are_Materially_Connected_In_Simplex(c,a,tetrahedron)){marked(a)=component;changed=true;}
-            if(!marked(b) && embedded_object.Nodes_Are_Materially_Connected_In_Simplex(c,b,tetrahedron)){marked(b)=component;changed=true;}}}
-    return changed;
-}
-template<class TV,int d> int
-Mark_Disconnected_Components_In_One_Ring(const EMBEDDED_OBJECT<TV,d>& embedded_object_input,const int center_node,ARRAY<short>& marked)
-{
-    const typename EMBEDDING_POLICY<TV,d>::EMBEDDED_OBJECT& embedded_object=dynamic_cast<const typename EMBEDDING_POLICY<TV,d>::EMBEDDED_OBJECT&>(embedded_object_input);
-    SIMPLEX_MESH<d>& mesh=embedded_object.simplicial_object.mesh;
-
-    // flood fill only nodes that are material in some element in the 1-ring
-    INDIRECT_ARRAY<ARRAY<short>,ARRAY<int>&> marked_subset=marked.Subset((*mesh.neighbor_nodes)(center_node));
-    ARRAYS_COMPUTATIONS::Fill(marked_subset,(short)-2);
-    for(int i=1;i<=(*mesh.incident_elements)(center_node).m;i++){int t=(*mesh.incident_elements)(center_node)(i);
-        const VECTOR<int,d+1>& element=mesh.elements(t);
-        for(int n=1;n<=element.m;n++) if(embedded_object.node_in_simplex_is_material(t)(n)) marked(element[n])=0;}
-    // mark component connected to the center node with -1
-    for(int n=1;n<=(*mesh.neighbor_nodes)(center_node).m;n++){
-        int node=(*mesh.neighbor_nodes)(center_node)(n);
-        if(!embedded_object.Segment_Is_Broken(center_node,node)) marked(node)=-1;}
-
-    while(Mark_Disconnected_Components_In_One_Ring_Helper(embedded_object,center_node,marked,-1));
-    // mark other components
-    int component=0;
-    while(int first_unmarked=Unmarked_Neighbor_Node(mesh,center_node,marked)){
-        marked(first_unmarked)=++component;
-        while(Mark_Disconnected_Components_In_One_Ring_Helper(embedded_object,center_node,marked,component));}
-    return component;
-}
-//#####################################################################
-// Function Unmarked_Neighbor_Node
-//#####################################################################
-template<int d> static inline int
-Unmarked_Neighbor_Node(const SIMPLEX_MESH<d>& mesh,const int center_node,const ARRAY<short>& marked)
-{
-    for(int n=1;n<=(*mesh.neighbor_nodes)(center_node).m;n++){
-        int node=(*mesh.neighbor_nodes)(center_node)(n);
-        if(!marked(node)) return node;}
-    return 0;
-}
-//#####################################################################
-// Function Add_Embedded_Subelement
-//#####################################################################
-template<class TV,int d> void
-Add_Embedded_Subelement(EMBEDDED_OBJECT<TV,d>& embedded_object,const EMBEDDED_OBJECT<TV,d>& old_embedded_object,const int old_emb_subelement,const int current_element,const int old_element)
-{
-    VECTOR<int,d> old_emb_nodes=VECTOR<int,d>::Map(old_embedded_object.embedded_particles.subset_index_from_point_cloud_index,
-        old_embedded_object.embedded_mesh.elements(old_emb_subelement));
-    VECTOR<int,d+1> current_nodes=embedded_object.simplicial_object.mesh.elements(current_element),
-        old_nodes=old_embedded_object.simplicial_object.mesh.elements(old_element);
-
-    VECTOR<int,d> emb_nodes;
-    for(int i=1;i<=emb_nodes.m;i++){
-        for(int j1=1;j1<=current_nodes.m-1;j1++) for(int j2=j1+1;j2<=current_nodes.m;j2++)
-            if(old_embedded_object.Are_Parents(VECTOR<int,2>(old_nodes[j1],old_nodes[j2]),old_emb_nodes[i])){
-                emb_nodes[i]=embedded_object.Embedded_Particle_On_Segment(current_nodes[j1],current_nodes[j2]);goto NEXT;}
-        NEXT:;}
-
-    embedded_object.Add_Embedded_Subelement_If_Not_Already_There(emb_nodes);
 }
 //#####################################################################
 template void Rebuild_Embedded_Object(EMBEDDED_OBJECT<VECTOR<float,2>,2>&,ARRAY<int>&,ARRAY<int>&,ARRAY<int>&,const bool);

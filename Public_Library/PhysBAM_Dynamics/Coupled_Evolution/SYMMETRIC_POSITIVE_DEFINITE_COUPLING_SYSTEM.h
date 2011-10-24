@@ -44,7 +44,7 @@ class SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM:public KRYLOV_SYSTEM_BASE<type
     typedef KRYLOV_SYSTEM_BASE<T> BASE;
     typedef typename LEVELSET_POLICY<GRID<TV> >::FAST_LEVELSET_T T_LEVELSET;
 protected:
-    using BASE::use_preconditioner;
+    using BASE::use_preconditioner;using BASE::Test_System;
 
     GENERALIZED_MASS<TV>* solid_mass; // M
     const ARRAY<bool,TV_INT>& outside_fluid;

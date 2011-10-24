@@ -35,6 +35,32 @@ template<class TV,int d_input> CUTTING_GEOMETRY<TV,d_input>::
     delete &cutting.particles;
 }
 //#####################################################################
+// Function Initialize_Face_Mesh
+//#####################################################################
+namespace{
+    void Initialize_Face_Mesh(TETRAHEDRON_MESH& mesh)
+    {
+        mesh.Initialize_Triangle_Mesh();mesh.triangle_mesh->Initialize_Incident_Elements();
+    }
+    void Initialize_Face_Mesh(TRIANGLE_MESH& mesh)
+    {
+        mesh.Initialize_Segment_Mesh();mesh.segment_mesh->Initialize_Incident_Elements();
+    }
+}
+//#####################################################################
+// Function Face_Mesh
+//#####################################################################
+namespace{
+    TRIANGLE_MESH& Face_Mesh(TETRAHEDRON_MESH& mesh)
+    {
+        return *mesh.triangle_mesh;
+    }
+    SEGMENT_MESH& Face_Mesh(TRIANGLE_MESH& mesh)
+    {
+        return *mesh.segment_mesh;
+    }
+}
+//#####################################################################
 // Function Initialize_Cutting_Acceleration_Structures
 //#####################################################################
 namespace{
@@ -346,32 +372,6 @@ Get_Polygon_Edges(const int polygon_element_index,ARRAY<VECTOR<int,2> >& polygon
         const ARRAY<int>& component=polygon_particles(i);
         for(int j=1;j<component.m;j++) polygonal_segments.Append(VECTOR<int,2>(component(j),component(j+1)));
         if(component.m) polygonal_segments.Append(VECTOR<int,2>(component.Last(),component(1)));}
-}
-//#####################################################################
-// Function Initialize_Face_Mesh
-//#####################################################################
-namespace{
-    void Initialize_Face_Mesh(TETRAHEDRON_MESH& mesh)
-    {
-        mesh.Initialize_Triangle_Mesh();mesh.triangle_mesh->Initialize_Incident_Elements();
-    }
-    void Initialize_Face_Mesh(TRIANGLE_MESH& mesh)
-    {
-        mesh.Initialize_Segment_Mesh();mesh.segment_mesh->Initialize_Incident_Elements();
-    }
-}
-//#####################################################################
-// Function Face_Mesh
-//#####################################################################
-namespace{
-    TRIANGLE_MESH& Face_Mesh(TETRAHEDRON_MESH& mesh)
-    {
-        return *mesh.triangle_mesh;
-    }
-    SEGMENT_MESH& Face_Mesh(TRIANGLE_MESH& mesh)
-    {
-        return *mesh.segment_mesh;
-    }
 }
 //#####################################################################
 template class CUTTING_GEOMETRY<VECTOR<float,2>,2>;

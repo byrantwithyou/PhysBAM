@@ -18,6 +18,7 @@ class PRISMATIC_TWIST_JOINT:public ANGLE_JOINT<TV>
     using BASE::J;using BASE::F_pj;typedef typename TV::template REBIND<bool>::TYPE TV_BOOL;
 
 public:
+    using BASE::Constraint_Matrix_Helper;
     TV_BOOL constrain;
     TV prismatic_min,prismatic_max;
 

@@ -27,6 +27,7 @@ class HAMILTON_JACOBI_1D:public HAMILTON_JACOBI,public LEVELSET_1D<T_input>,publ
 public:
     typedef LEVELSET_1D<T> BASE;
     using BASE::grid;using BASE::phi;using BASE::boundary;using BASE::max_time_step;
+    using LEVELSET_ADVECTION_UNIFORM<GRID<VECTOR<T,1> > >::HJ_WENO;using LEVELSET_ADVECTION_UNIFORM<GRID<VECTOR<T,1> > >::HJ_ENO;
 
     HAMILTONIAN_1D<T>& hamiltonian;
     

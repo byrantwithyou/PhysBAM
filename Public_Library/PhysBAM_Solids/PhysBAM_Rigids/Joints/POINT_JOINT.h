@@ -19,7 +19,7 @@ class POINT_JOINT:public JOINT<TV>
     enum{dof=T_SPIN::dimension};
     typedef VECTOR<bool,dof> BOOL_VECTOR;
 public:
-    using JOINT<TV>::J;using JOINT<TV>::J_inverse;using JOINT<TV>::F_pj;
+    using JOINT<TV>::J;using JOINT<TV>::J_inverse;using JOINT<TV>::F_pj;using JOINT<TV>::Constraint_Matrix_Helper;
 
     bool prismatic_component;
     TV prismatic_translation;

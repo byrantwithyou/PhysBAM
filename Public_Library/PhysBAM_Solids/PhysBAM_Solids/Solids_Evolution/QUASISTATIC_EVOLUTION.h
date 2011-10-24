@@ -18,7 +18,7 @@ class QUASISTATIC_EVOLUTION:public SOLIDS_EVOLUTION<TV>
     typedef typename TV::SCALAR T;
 public:
     typedef SOLIDS_EVOLUTION<TV> BASE;
-    using BASE::solid_body_collection;using BASE::solids_parameters;
+    using BASE::solid_body_collection;using BASE::solids_parameters;using BASE::Set_External_Positions;
 private:
     using BASE::F_full;using BASE::R_full;using BASE::S_full;using BASE::B_full;
     using BASE::rigid_F_full;using BASE::rigid_R_full;using BASE::rigid_S_full;using BASE::rigid_B_full;

@@ -23,7 +23,7 @@ class TURBULENCE_2D:public TURBULENCE<T>
 {
     typedef VECTOR<T,2> TV;
 public:
-    using TURBULENCE<T>::time_start;using TURBULENCE<T>::time_end;
+    using TURBULENCE<T>::time_start;using TURBULENCE<T>::time_end;using TURBULENCE<T>::Generate_Random_Turbulence;
     
 private:
     GRID<TV> grid;

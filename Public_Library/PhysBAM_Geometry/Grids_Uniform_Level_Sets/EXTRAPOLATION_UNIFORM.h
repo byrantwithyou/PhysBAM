@@ -33,7 +33,7 @@ class EXTRAPOLATION_UNIFORM:public EXTRAPOLATION<T_GRID,T2>
 public:
     template<class T3> struct REBIND{typedef EXTRAPOLATION_UNIFORM<T_GRID,T3> TYPE;};
     typedef  EXTRAPOLATION<T_GRID,T2> BASE;
-    using BASE::band_width;using BASE::boundary;using BASE::isobaric_fix_width;
+    using BASE::band_width;using BASE::boundary;using BASE::isobaric_fix_width;using BASE::Add_To_Heap;using BASE::Remove_Root_From_Heap;
    
     T_ARRAYS_T2_BASE& u; // variable to be extrapolated
     const T_ARRAYS_BASE& phi;

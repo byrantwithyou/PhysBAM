@@ -26,6 +26,13 @@ MATRIX_VISCOUS_FORCES(const COLLISION_AWARE_INDEX_MAP<TV>& index_map_input)
 {
 }
 //#####################################################################
+// Destructor
+//#####################################################################
+template<class TV> MATRIX_VISCOUS_FORCES<TV>::
+~MATRIX_VISCOUS_FORCES()
+{
+}
+//#####################################################################
 // Function Compute
 //#####################################################################
 template<class TV> void MATRIX_VISCOUS_FORCES<TV>::

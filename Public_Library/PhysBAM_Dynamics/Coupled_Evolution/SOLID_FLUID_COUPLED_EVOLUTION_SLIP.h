@@ -49,7 +49,7 @@ protected:
     typedef PROJECTION_DYNAMICS_UNIFORM<T_GRID> FLUID_BASE;
     using BASE::solid_body_collection;using BASE::solids_parameters;using BASE::F_full;using BASE::rigid_F_full;using BASE::R_full;using BASE::rigid_R_full;using BASE::S_full;
     using BASE::rigid_S_full;using BASE::B_full;using BASE::rigid_B_full;using BASE::repulsions;using BASE::rigids_evolution_callbacks;using BASE::rigid_body_collisions;
-    using FLUID_BASE::p;using FLUID_BASE::poisson;
+    using FLUID_BASE::p;using FLUID_BASE::poisson;using BASE::Prepare_Backward_Euler_System;
 
     COUPLED_SYSTEM_VECTOR<TV> coupled_x,coupled_f,coupled_r,coupled_b,coupled_s,coupled_ar,coupled_z;
 

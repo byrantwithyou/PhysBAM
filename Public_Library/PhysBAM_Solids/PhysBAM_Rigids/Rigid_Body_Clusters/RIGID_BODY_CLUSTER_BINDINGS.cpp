@@ -95,7 +95,7 @@ Add_Binding(const ARRAY<int,RIGID_CLUSTER_CONSTITUENT_ID>& child_particles)
         RIGID_BODY<TV>& body=rigid_body_collection.Rigid_Body(child_particles(i));
         if(body.Has_Infinite_Inertia()){
             if(body.is_static){assert(!has_kinematic);has_static=true;}
-            else if(rigid_body_collection.rigid_body_particle.kinematic(child_particles(i))){assert(!has_kinematic && !has_static);has_kinematic=true;}
+            else if(rigid_body_collection.rigid_body_particle.kinematic(child_particles(i))){PHYSBAM_ASSERT(!has_kinematic && !has_static);has_kinematic=true;}
             cluster.infinite_body=child_particles(i);}
         Append_Binding(child_particles(i),PAIR<int,RIGID_CLUSTER_CONSTITUENT_ID>(parent,i));}
     binding_index(parent).Append(PAIR<int,RIGID_CLUSTER_CONSTITUENT_ID>(parent,RIGID_CLUSTER_CONSTITUENT_ID(0)));

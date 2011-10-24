@@ -24,7 +24,7 @@ template<class T>
 class LAPLACE_TETRAHEDRALIZED_VOLUME:public LAPLACE<T>
 {
 public:
-    using LAPLACE<T>::tolerance;
+    using LAPLACE<T>::tolerance;using LAPLACE<T>::Find_Tolerance;
     
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume;
     ARRAY<T>& u;

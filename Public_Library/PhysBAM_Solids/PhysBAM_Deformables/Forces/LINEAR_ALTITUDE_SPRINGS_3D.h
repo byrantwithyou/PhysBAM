@@ -27,7 +27,7 @@ public:
     using BASE::cache_strain;using BASE::strains_of_spring;using BASE::strains_of_spring_all_springs;
     using BASE::compute_half_forces;
     typedef typename BASE::ELEMENT_ITERATOR ELEMENT_ITERATOR;
-    using BASE::parameters;
+    using BASE::parameters;using BASE::Compute_Plasticity;
 
     LINEAR_ALTITUDE_SPRINGS_3D(PARTICLES<TV>& particles,TETRAHEDRON_MESH& tetrahedron_mesh);
     virtual ~LINEAR_ALTITUDE_SPRINGS_3D();

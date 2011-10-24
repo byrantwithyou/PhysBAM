@@ -172,8 +172,8 @@ template<class T_GRID> bool PARTICLE_LEVELSET<T_GRID>::
 Delete_Particle(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int index)
 {
     assert(!dynamic_cast<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>(&particles));
-    PARTICLE_LEVELSET_PARTICLES<TV> *parent_particles=0,*particles_link=&particles;
-    while(particles_link->next){parent_particles=particles_link;particles_link=particles_link->next;}
+    PARTICLE_LEVELSET_PARTICLES<TV> *particles_link=&particles;
+    while(particles_link->next){particles_link=particles_link->next;}
     particles.array_collection->Copy_Element(*particles_link->array_collection,particles_link->array_collection->Size(),index);
     particles_link->array_collection->Delete_Element(particles_link->array_collection->Size());
     return(particles_link->array_collection->Size()==0);

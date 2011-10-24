@@ -45,7 +45,7 @@ public:
     RIGID_BODY_COLLISION_MANAGER* collision_manager;
     ARRAY<ARRAY<VECTOR<int,2> > > precomputed_contact_pairs_for_level;
     ARRAY<ARRAY<VECTOR<int,2> > > saved_contact_pairs_for_level; // updated contact pairs
-    mutable RIGID_BODY_SKIP_COLLISION_CHECK& skip_collision_check;
+    RIGID_BODY_SKIP_COLLISION_CHECK& skip_collision_check;
 
     int collision_pair_iterations;
     // TODO: Make ARRAYS so that this can be indexed safely.

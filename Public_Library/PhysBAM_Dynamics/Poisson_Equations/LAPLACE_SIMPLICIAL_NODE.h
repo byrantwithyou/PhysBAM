@@ -31,7 +31,7 @@ class LAPLACE_SIMPLICIAL_NODE:public LAPLACE<typename TV::SCALAR>
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::OBJECT T_BOUNDARY_OBJECT;
     typedef typename MESH_POLICY<TV::m-1>::MESH T_BOUNDARY_MESH;
 public:
-    using LAPLACE<T>::tolerance;
+    using LAPLACE<T>::tolerance;using LAPLACE<T>::Find_Tolerance;
 
     POINT_CLOUD_SUBSET<TV,PARTICLES<TV> >& particles;
     T_OBJECT& object;

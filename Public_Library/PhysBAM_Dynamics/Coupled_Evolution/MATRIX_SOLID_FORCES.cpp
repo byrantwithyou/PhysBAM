@@ -29,6 +29,13 @@ MATRIX_SOLID_FORCES(const SOLID_BODY_COLLECTION<TV>& collection)
 {
 }
 //#####################################################################
+// Destructor
+//#####################################################################
+template<class TV> MATRIX_SOLID_FORCES<TV>::
+~MATRIX_SOLID_FORCES()
+{
+}
+//#####################################################################
 // Function Compute
 //#####################################################################
 template<class TV> void MATRIX_SOLID_FORCES<TV>::

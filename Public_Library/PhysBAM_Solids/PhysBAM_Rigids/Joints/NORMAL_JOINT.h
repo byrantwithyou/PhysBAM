@@ -18,6 +18,7 @@ class NORMAL_JOINT:public JOINT<TV>
     typedef JOINT<TV> BASE;using BASE::J;using BASE::J_inverse;using BASE::F_pj;
 
 public:
+    using BASE::Constraint_Matrix_Helper;
     T x_min,x_max;
 
     NORMAL_JOINT()

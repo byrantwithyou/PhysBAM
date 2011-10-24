@@ -37,7 +37,7 @@ private:
 public:
     using BASE::advection;
     using BASE::levelset;
-    using BASE::reinitialization_cfl;using BASE::reinitialization_runge_kutta_order;using BASE::reinitialization_spatial_order;
+    using BASE::reinitialization_cfl;using BASE::reinitialization_runge_kutta_order;using BASE::reinitialization_spatial_order;using BASE::Set_Custom_Advection;
 
     VOF_ADVECTION<TV>* vof_advection;
     ADVECTION_MACCORMACK_UNIFORM<T_GRID,SCALAR,ADVECTION<T_GRID,SCALAR> >* advection_maccormack;

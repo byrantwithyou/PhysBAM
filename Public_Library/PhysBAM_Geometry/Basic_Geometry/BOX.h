@@ -30,7 +30,7 @@ public:
 
     typedef RANGE<TV> BASE;
     using BASE::min_corner;using BASE::max_corner;using BASE::Edge_Lengths;using BASE::Center;using BASE::Size;using BASE::Intersection;
-    using BASE::Lazy_Outside;using BASE::Bounding_Box;using BASE::Inside;
+    using BASE::Lazy_Outside;using BASE::Lazy_Inside;using BASE::Bounding_Box;using BASE::Inside;
 
     BOX()
     {}

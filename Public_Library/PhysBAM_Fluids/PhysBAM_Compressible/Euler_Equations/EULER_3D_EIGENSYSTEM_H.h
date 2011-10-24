@@ -19,7 +19,7 @@ class EULER_3D_EIGENSYSTEM_H:public EULER_EIGENSYSTEM<GRID<VECTOR<T_input,3> > >
     enum WORKAROUND1 {d=TV_DIMENSION::m};
     typedef EULER_EIGENSYSTEM<GRID<VECTOR<T_input,3> > > BASE;
 public:
-    using BASE::eos;
+    using BASE::eos;using BASE::e;
 
     bool only_pressure_flux;
 

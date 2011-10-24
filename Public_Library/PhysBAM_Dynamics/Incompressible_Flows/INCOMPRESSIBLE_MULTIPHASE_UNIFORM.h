@@ -31,7 +31,7 @@ public:
     using BASE::use_explicit_part_of_implicit_viscosity;using BASE::vorticity_confinement;using BASE::max_time_step;using BASE::advection;
     using BASE::Set_Custom_Advection;using BASE::GFM;using BASE::number_of_interface_cells;using BASE::viscosities;using BASE::surface_tensions;
     using BASE::projection;using BASE::grid;using BASE::boundary;using BASE::force;using BASE::variable_vorticity_confinement;using BASE::strain;using BASE::variable_viscosity;
-    using BASE::maximum_implicit_viscosity_iterations;
+    using BASE::maximum_implicit_viscosity_iterations;using BASE::Extrapolate_Velocity_Across_Interface;
 
     T_FACE_ARRAYS_SCALAR viscous_force;
     T_LEVELSET* levelset_for_dirichlet_regions;

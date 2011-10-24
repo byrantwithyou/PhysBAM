@@ -18,7 +18,7 @@ public:
     using BASE::intersection_registry;using BASE::cutting_simplices;using BASE::polygon_mesh;using BASE::current_embedding;using BASE::polygons_per_element;using BASE::current_cutting_polygons;
     using BASE::cutting_polygons_per_cutting_simplex;using BASE::simplices_per_current_embedding_simplex;
     using BASE::verbose;
-    using BASE::Get_Particles_On_Simplices;using BASE::Get_Polygon_Edges;
+    using BASE::Get_Particles_On_Simplices;using BASE::Get_Polygon_Edges;using BASE::Get_Node_Weights_From_Face;using BASE::Register_Cut_Intersection;
 
     CUTTING_GEOMETRY_2D(const bool verbose)
         :CUTTING_GEOMETRY<TV,d_input>(verbose)

@@ -1048,7 +1048,7 @@ Find_Material_Regions()
             // find starting polygon
             bool found_starting_index=false;int starting_index=-1;
             for(int i=1;i<=polygons.m;i++) if(!polygons_used.Contains(polygons(i))){found_starting_index=true;starting_index=i;break;}
-            assert(found_starting_index);int cutting_polygon_index=polygons(starting_index);
+            PHYSBAM_ASSERT(found_starting_index);int cutting_polygon_index=polygons(starting_index);
             STACK<int> polygons_to_examine;polygons_to_examine.Push(cutting_polygon_index);
             // repeat until the list of faces-to-examine is exhausted
             while(!polygons_to_examine.Empty()){

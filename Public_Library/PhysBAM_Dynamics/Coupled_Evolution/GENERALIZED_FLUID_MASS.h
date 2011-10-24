@@ -31,6 +31,7 @@ public:
     VECTOR_ND<T> one_over_fluid_mass_at_faces;
 
     GENERALIZED_FLUID_MASS(const COLLISION_AWARE_INDEX_MAP<TV>& index_map_input,const T_FACE_ARRAYS_SCALAR& beta_input,const ARRAY<T>& constrained_beta_input);
+    virtual ~GENERALIZED_FLUID_MASS();
 
     void Compute();
     void Inverse_Times(const VECTOR_ND<T>& faces_in,VECTOR_ND<T>& faces_out) const;

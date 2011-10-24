@@ -31,7 +31,7 @@ class TEMPERATURE_CONTAINER:public GRID_AND_ARRAY_CONTAINER<T_GRID,typename T_GR
     typedef typename REBIND<typename GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS,bool>::TYPE T_FACE_ARRAYS_BOOL;
 public:
     typedef GRID_AND_ARRAY_CONTAINER<T_GRID,T> BASE;
-    using BASE::grid;using BASE::array;using BASE::boundary_default;using BASE::boundary;
+    using BASE::grid;using BASE::array;using BASE::boundary_default;using BASE::boundary;using BASE::Set_To_Constant_Value;using BASE::Set_Custom_Advection;
 
     T_ARRAYS_SCALAR& temperature;
     T ambient_temperature;

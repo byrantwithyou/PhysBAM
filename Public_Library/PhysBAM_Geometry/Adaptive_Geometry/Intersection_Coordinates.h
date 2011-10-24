@@ -105,6 +105,20 @@ struct INTERSECTION_COORDINATES_HELPER_ADAPTIVE_RESULT<EXACT_TYPE_T,VECTOR<VECTO
     typedef ADAPTIVE_OBJECT<EXACT_TYPE2> TYPE2;
 };
 //#################################################################
+// Convert_And_Ensure_Abs_Tol
+//#################################################################
+template<class T_ADAPTIVE,class T,int N,class U>
+void Convert_And_Ensure_Abs_Tol(const VECTOR<T_ADAPTIVE,N>& adaptive_coordinates,VECTOR<T,N>& simplex_coordinates,U abs_tol)
+{
+    STATIC_ASSERT((IS_ADAPTIVE<T_ADAPTIVE>::value));
+    typedef typename T_ADAPTIVE::FP_TYPE FP_TYPE;
+    for(int i=1;i<=N;++i){
+        FP_TYPE estimate,error;
+        adaptive_coordinates[i].Estimate_And_Error().Get(estimate,error);
+        if(error>abs_tol) estimate=adaptive_coordinates[i].Refined_Estimate();
+        simplex_coordinates[i]=estimate;}
+}
+//#################################################################
 // Intersection_Coordinates_Helper
 //#################################################################
 template<class T_EXACT,class T,class T_ADAPTIVE>
@@ -381,20 +395,6 @@ Intersection_Coordinates(const VECTOR<VECTOR<T,3>,3>& simplex1,const VECTOR<VECT
     Convert_And_Ensure_Abs_Tol(adaptive1_coordinates,simplex1_coordinates,abs_tol);
     Convert_And_Ensure_Abs_Tol(adaptive2_coordinates,simplex2_coordinates,abs_tol);
     Convert_And_Ensure_Abs_Tol(adaptive3_coordinates,simplex3_coordinates,abs_tol);
-}
-//#################################################################
-// Convert_And_Ensure_Abs_Tol
-//#################################################################
-template<class T_ADAPTIVE,class T,int N,class U>
-void Convert_And_Ensure_Abs_Tol(const VECTOR<T_ADAPTIVE,N>& adaptive_coordinates,VECTOR<T,N>& simplex_coordinates,U abs_tol)
-{
-    STATIC_ASSERT((IS_ADAPTIVE<T_ADAPTIVE>::value));
-    typedef typename T_ADAPTIVE::FP_TYPE FP_TYPE;
-    for(int i=1;i<=N;++i){
-        FP_TYPE estimate,error;
-        adaptive_coordinates[i].Estimate_And_Error().Get(estimate,error);
-        if(error>abs_tol) estimate=adaptive_coordinates[i].Refined_Estimate();
-        simplex_coordinates[i]=estimate;}
 }
 //#####################################################################
 }

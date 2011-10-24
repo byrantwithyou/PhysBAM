@@ -21,9 +21,9 @@ using std::abs;
 template<class T> T ITERATIVE_SOLVER<T>::
 Bisection_Root(NONLINEAR_FUNCTION<T(T)>& F,T a,T b)
 {
-    iterations=0;T Fa=F(a),Fb=F(b);assert(Fa*Fb<=0);
+    iterations=0;T Fa=F(a);assert(Fa*F(b)<=0);
     while(b-a>tolerance && iterations++<max_iterations){
-        T m=(T).5*(a+b),Fm=F(m);if(Fa*Fm<=0){b=m;Fb=Fm;}else{a=m;Fa=Fm;}}
+        T m=(T).5*(a+b),Fm=F(m);if(Fa*Fm<=0){b=m;}else{a=m;Fa=Fm;}}
 
     if(iterations==max_iterations){
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
@@ -124,16 +124,16 @@ Bisection_Secant_Root_For_Thin_Shells(NONLINEAR_FUNCTION<T(T)>& F,T a,T b)
 template<class T> T ITERATIVE_SOLVER<T>::
 Bisection_Newton_Root(NONLINEAR_FUNCTION<T(T)>& F,T a,T b)
 {
-    iterations=0;T Fa=F(a),Fb=F(b),x=a,Fx=Fa,Fprime=F.Prime(x);assert(Fa*Fb<=0);
+    iterations=0;T Fa=F(a),x=a,Fx=Fa,Fprime=F.Prime(x);assert(Fa*F(b)<=0);
     while(b-a>tolerance && iterations++<max_iterations){
         if(abs(Fprime)<tolerance){ // bisection method
-            T m=(T).5*(a+b),Fm=F(m);if(Fa*Fm<=0){b=m;Fb=Fm;}else{a=m;Fa=Fm;}
+            T m=(T).5*(a+b),Fm=F(m);if(Fa*Fm<=0){b=m;}else{a=m;Fa=Fm;}
             x=a;Fx=Fa;Fprime=F.Prime(x);} // update newton points
         else{ // newton method
             x-=Fx/Fprime;
-            if(a<x && x<b){Fx=F(x);Fprime=F.Prime(x);T m=x,Fm=Fx;if(Fa*Fm<=0){b=m;Fb=Fm;}else{a=m;Fa=Fm;}} // update bisection points
+            if(a<x && x<b){Fx=F(x);Fprime=F.Prime(x);T m=x,Fm=Fx;if(Fa*Fm<=0){b=m;}else{a=m;Fa=Fm;}} // update bisection points
             else{ // throw out secant root - do bisection instead
-                T m=(T).5*(a+b),Fm=F(m);if(Fa*Fm<=0){b=m;Fb=Fm;}else{a=m;Fa=Fm;}
+                T m=(T).5*(a+b),Fm=F(m);if(Fa*Fm<=0){b=m;}else{a=m;Fa=Fm;}
                 x=a;Fx=Fa;Fprime=F.Prime(x);}}} // update newton points
     if(iterations==max_iterations){
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
@@ -217,12 +217,12 @@ Golden_Parabolic_Minimum(NONLINEAR_FUNCTION<T(T)>& F,T a,T b)
 template<class T> void ITERATIVE_SOLVER<T>::
 Steepest_Decent(NONLINEAR_FUNCTION<T(T,T)>& F,T& x,T& y,const T alpha_max)
 {
-    iterations=0;T Fxy=F(x,y),partial_x=F.Partial_X(x,y),partial_y=F.Partial_Y(x,y);
+    iterations=0;T partial_x=F.Partial_X(x,y),partial_y=F.Partial_Y(x,y);
     while(sqrt(sqr(partial_x)+sqr(partial_y))>tolerance && iterations++<max_iterations){
         PARAMETRIC_LINE<T,T(T,T)> line(F,x,y,-partial_x,-partial_y);
         int iterations_save=iterations;T alpha=Golden_Parabolic_Minimum(line,0,alpha_max);iterations=iterations_save;
         x-=alpha*partial_x;y-=alpha*partial_y;
-        Fxy=F(x,y);partial_x=F.Partial_X(x,y);partial_y=F.Partial_Y(x,y);}
+        partial_x=F.Partial_X(x,y);partial_y=F.Partial_Y(x,y);}
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     if(iterations==max_iterations) LOG::cout<<"Steepest_Decent failed with max iterations"<<std::endl;
 #endif
@@ -233,7 +233,7 @@ Steepest_Decent(NONLINEAR_FUNCTION<T(T,T)>& F,T& x,T& y,const T alpha_max)
 template<class T> void ITERATIVE_SOLVER<T>::
 Conjugate_Gradient(NONLINEAR_FUNCTION<T(T,T)>& F,T& x,T& y,const T alpha_max)
 {
-    iterations=0;T Fxy=F(x,y),partial_x=F.Partial_X(x,y),partial_y=F.Partial_Y(x,y);
+    iterations=0;T partial_x=F.Partial_X(x,y),partial_y=F.Partial_Y(x,y);
     while(sqrt(sqr(partial_x)+sqr(partial_y))>tolerance && iterations<max_iterations){ // do conjugate gradiant n=2 times, then restart with a steepest decent step
         int cg_step=0;
         T partial_x_old=0,partial_y_old=0,s_x=0,s_y=0;
@@ -244,7 +244,7 @@ Conjugate_Gradient(NONLINEAR_FUNCTION<T(T,T)>& F,T& x,T& y,const T alpha_max)
             int iterations_save=iterations;T alpha=Golden_Parabolic_Minimum(line,0,alpha_max);iterations=iterations_save;
             x+=alpha*s_x;y+=alpha*s_y;
             partial_x_old=partial_x;partial_y_old=partial_y;
-            Fxy=F(x,y);partial_x=F.Partial_X(x,y);partial_y=F.Partial_Y(x,y);}}
+            partial_x=F.Partial_X(x,y);partial_y=F.Partial_Y(x,y);}}
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     if(iterations==max_iterations) LOG::cout<<"Conjugate_Gradient failed with max iterations"<<std::endl;
 #endif
@@ -257,7 +257,6 @@ Conjugate_Gradient(NONLINEAR_FUNCTION<T(PARAMETER_SPACE<T>)>& F,PARAMETER_SPACE<
 {
     typedef PARAMETER_SPACE<T> TV;
     iterations=0;
-    T Fx=F(x);
     TV& grad=x.Zero_Clone();
     TV& grad_old=x.Zero_Clone();
     TV& s=x.Zero_Clone();
@@ -266,7 +265,6 @@ Conjugate_Gradient(NONLINEAR_FUNCTION<T(PARAMETER_SPACE<T>)>& F,PARAMETER_SPACE<
     T grad_dot_grad=grad.Dot(grad);
     while(grad_dot_grad>tolerance*tolerance && iterations<max_iterations){ // do conjugate gradiant n=2 times, then restart with a steepest decent step
         int cg_step=0;
-        T grad_dot_grad_old=0;
         s.Zero();
         while(grad_dot_grad>tolerance*tolerance && cg_step++<restart_iterations && iterations++<max_iterations){
             T beta=0;
@@ -286,9 +284,7 @@ Conjugate_Gradient(NONLINEAR_FUNCTION<T(PARAMETER_SPACE<T>)>& F,PARAMETER_SPACE<
             ls.Line_Search_Quadratic_Golden_Section(line,0,10/sqrt(grad_dot_grad),alpha,100,(T)1e-6,(T)1e-10*0);
             x.Op(1,x,alpha,s);
             grad_old.Copy(grad);
-            Fx=F(x);
             F.Gradient(x,grad);
-            grad_dot_grad_old=grad_dot_grad;
             grad_dot_grad=grad.Dot(grad);}}
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     if(iterations==max_iterations) LOG::cout<<"Conjugate_Gradient failed with max iterations"<<std::endl;

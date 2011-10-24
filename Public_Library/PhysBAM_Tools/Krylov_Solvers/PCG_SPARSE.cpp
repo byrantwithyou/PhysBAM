@@ -21,10 +21,9 @@ Solve(SPARSE_MATRIX_FLAT_NXN<T>& A_matrix,VECTOR_ND<T>& x,VECTOR_ND<T>& b,VECTOR
     CONJUGATE_RESIDUAL<T> cr;
     SYMMQMR<T> symmqmr;
     KRYLOV_SOLVER<T>* solver=0;
-    const char* solver_name=0;
-    if(evolution_solver_type==krylov_solver_cg){solver=&cg;solver_name="CG";}
-    else if(evolution_solver_type==krylov_solver_cr){solver=&cr;solver_name="CONJUGATE_RESIDUAL";}
-    else if(evolution_solver_type==krylov_solver_symmqmr){solver=&symmqmr;solver_name="SYMMQMR";}
+    if(evolution_solver_type==krylov_solver_cg){solver=&cg;}
+    else if(evolution_solver_type==krylov_solver_cr){solver=&cr;}
+    else if(evolution_solver_type==krylov_solver_symmqmr){solver=&symmqmr;}
     solver->print_diagnostics=show_results;solver->print_residuals=show_residual;
     solver->restart_iterations=cg_restart_iterations;
     PCG_SPARSE_SYSTEM<T> system(*this,A_matrix);

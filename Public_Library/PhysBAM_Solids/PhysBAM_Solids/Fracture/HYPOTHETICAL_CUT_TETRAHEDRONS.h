@@ -18,7 +18,7 @@ class HYPOTHETICAL_CUT_TETRAHEDRONS:public HYPOTHETICAL_CUT<VECTOR<T_input,3>,3>
     typedef VECTOR<T,3> TV;
 public:
     typedef HYPOTHETICAL_CUT<VECTOR<T,3>,3> BASE;
-    using BASE::embedded_object;using BASE::hypothetical_nodes;using BASE::cut_quality_metric;using BASE::Position;
+    using BASE::embedded_object;using BASE::hypothetical_nodes;using BASE::cut_quality_metric;using BASE::Position;using BASE::Add_Hypothetical_Node;
 
     VECTOR<T,3> fracture_normal;
     int cut_index; // 1--7 1=i 2=j 3=k 4=l 5=ij 6=ik 7=il

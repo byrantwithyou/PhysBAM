@@ -33,6 +33,7 @@ private:
 
 public:
     MATRIX_SOLID_FORCES(const SOLID_BODY_COLLECTION<TV>& solid_body_collection);
+    virtual ~MATRIX_SOLID_FORCES();
 
 //#####################################################################
     void Compute(const T dt_input,const T current_velocity_time_input);

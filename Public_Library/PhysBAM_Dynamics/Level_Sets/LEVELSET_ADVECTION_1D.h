@@ -30,7 +30,7 @@ class LEVELSET_ADVECTION_1D:public LEVELSET_ADVECTION_UNIFORM<GRID<VECTOR<T,1> >
 public:
     using BASE::levelset;
     using BASE::advection;
-    using BASE::reinitialization_cfl;using BASE::reinitialization_runge_kutta_order;using BASE::reinitialization_spatial_order;
+    using BASE::reinitialization_cfl;using BASE::reinitialization_runge_kutta_order;using BASE::reinitialization_spatial_order;using BASE::HJ_WENO;using BASE::HJ_ENO;
 
     LEVELSET_ADVECTION_1D(T_LEVELSET* _levelset):BASE(_levelset){};
     LEVELSET_ADVECTION_1D():BASE(0){};

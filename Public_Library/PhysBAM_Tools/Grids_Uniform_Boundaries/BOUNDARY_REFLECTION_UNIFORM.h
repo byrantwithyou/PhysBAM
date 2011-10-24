@@ -18,7 +18,8 @@ class BOUNDARY_REFLECTION_UNIFORM:public BOUNDARY_UNIFORM<T_GRID,T2>
     typedef typename T_ARRAYS_BASE::template REBIND<T2>::TYPE T_ARRAYS_T2;typedef typename T_GRID::NODE_ITERATOR NODE_ITERATOR;
 public:
     typedef BOUNDARY_UNIFORM<T_GRID,T2> BASE;
-    using BASE::Set_Constant_Extrapolation;using BASE::Constant_Extrapolation;using BASE::Fill_Single_Ghost_Region;
+    using BASE::Set_Constant_Extrapolation;using BASE::Constant_Extrapolation;using BASE::Fill_Single_Ghost_Region;using BASE::Find_Ghost_Regions;
+    using BASE::Boundary;
 
     BOUNDARY_REFLECTION_UNIFORM(const TV_SIDES& constant_extrapolation=TV_SIDES())
     {

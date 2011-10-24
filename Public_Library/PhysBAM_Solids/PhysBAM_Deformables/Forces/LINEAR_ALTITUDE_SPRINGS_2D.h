@@ -25,7 +25,7 @@ public:
     using BASE::particles;using BASE::Invalidate_CFL;
     using BASE::max_strain_per_time_step;using BASE::use_rest_state_for_strain_rate;using BASE::spring_states;
     using BASE::parameters;using BASE::plastic_parameters;using BASE::use_plasticity;using BASE::compute_half_forces;
-    using BASE::mesh;typedef typename BASE::ELEMENT_ITERATOR ELEMENT_ITERATOR;
+    using BASE::mesh;typedef typename BASE::ELEMENT_ITERATOR ELEMENT_ITERATOR;using BASE::Compute_Plasticity;
 
     LINEAR_ALTITUDE_SPRINGS_2D(PARTICLES<TV>& particles,TRIANGLE_MESH& mesh)
         :LINEAR_ALTITUDE_SPRINGS<TV,2>(particles,mesh)

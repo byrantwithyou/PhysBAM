@@ -29,7 +29,7 @@ public:
     using BASE::curvature_motion;using BASE::sigma;using BASE::interpolation;
     using BASE::curvature_interpolation;using BASE::normal_interpolation;using BASE::secondary_interpolation;using BASE::custom_normal_computation;
     using BASE::collision_aware_interpolation_minus;using BASE::thread_queue;
-    using BASE::number_of_ghost_cells;
+    using BASE::number_of_ghost_cells;using BASE::Phi;using BASE::Extended_Phi;
 
     LEVELSET_3D(T_GRID& grid_input,ARRAY<T,VECTOR<int,3> >& phi_input,const int number_of_ghost_cells_input=3);
     ~LEVELSET_3D();

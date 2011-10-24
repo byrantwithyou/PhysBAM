@@ -149,7 +149,9 @@ class IMPLICIT_OBJECT_TRANSFORMED:public IMPLICIT_OBJECT<TV>,public IMPLICIT_OBJ
 public:
     typedef IMPLICIT_OBJECT<TV> BASE;
     typedef IMPLICIT_OBJECT_TRANSFORMED_HELPER<TV,TRANSFORM> BASE_HELPER;
-    using BASE::box;using BASE_HELPER::Name_Helper;
+    using BASE::box;using BASE_HELPER::Name_Helper;using BASE_HELPER::Object_Space_Box;using BASE_HELPER::World_Space_Length;using BASE_HELPER::World_Space_Box;
+    using BASE_HELPER::Scale_Transform;using BASE_HELPER::Object_Space_Point;using BASE_HELPER::World_Space_Unitless_Vector;using BASE_HELPER::Object_Space_Length;
+    using BASE_HELPER::World_Space_Point;using BASE_HELPER::World_Space_Length_Hessian;using BASE_HELPER::World_Space_Vector;using BASE_HELPER::Object_Space_Unitless_Vector;
 
     bool owns_implicit_object;
     IMPLICIT_OBJECT<TV>* object_space_implicit_object;

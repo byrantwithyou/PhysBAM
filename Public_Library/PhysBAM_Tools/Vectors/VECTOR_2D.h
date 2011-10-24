@@ -14,6 +14,7 @@
 #include <PhysBAM_Tools/Math_Tools/exchange_sort.h>
 #include <PhysBAM_Tools/Math_Tools/Inverse.h>
 #include <PhysBAM_Tools/Math_Tools/max.h>
+#include <PhysBAM_Tools/Math_Tools/maxabs.h>
 #include <PhysBAM_Tools/Math_Tools/min.h>
 #include <PhysBAM_Tools/Math_Tools/sqr.h>
 #include <PhysBAM_Tools/Math_Tools/wrap.h>

@@ -18,7 +18,7 @@ class DEFORMABLES_DRIVER:public DRIVER<TV>,public NONCOPYABLE
     typedef typename TV::SCALAR T;
     typedef DRIVER<TV> BASE;
 public:
-    using BASE::output_number;using BASE::time;using BASE::Write_First_Frame;using BASE::Write_Last_Frame;using BASE::Write_Time;using BASE::Read_Time;
+    using BASE::output_number;using BASE::time;using BASE::Write_First_Frame;using BASE::Write_Last_Frame;using BASE::Write_Time;using BASE::Read_Time;using BASE::Write_Substep;
 
     DEFORMABLES_EXAMPLE<TV>& example;
     int current_frame;

@@ -19,6 +19,7 @@ private:
     bool compute_epsilon; 
     T epsilon;
 public:
+    using ADVECTION_SEPARABLE_UNIFORM<T_GRID,T2>::WENO;
 
     ADVECTION_HAMILTON_JACOBI_WENO()
     {

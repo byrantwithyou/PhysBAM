@@ -27,7 +27,8 @@ class HAMILTON_JACOBI_3D:public HAMILTON_JACOBI,public LEVELSET_3D<GRID<VECTOR<T
 public:
     typedef LEVELSET_3D<GRID<TV> > BASE;
     using BASE::grid;using BASE::phi;using BASE::boundary;using BASE::max_time_step;
-    using BASE::curvature;using BASE::curvature_motion;using BASE::sigma;
+    using BASE::curvature;using BASE::curvature_motion;using BASE::sigma;using BASE::Compute_Curvature;
+    using LEVELSET_ADVECTION_UNIFORM<GRID<VECTOR<T,3> > >::HJ_WENO;using LEVELSET_ADVECTION_UNIFORM<GRID<VECTOR<T,3> > >::HJ_ENO;
 
     HAMILTONIAN_3D<T>& hamiltonian;
 

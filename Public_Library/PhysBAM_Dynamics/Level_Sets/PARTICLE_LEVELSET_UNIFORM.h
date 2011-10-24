@@ -51,6 +51,8 @@ public:
     using BASE::velocity_interpolation_collidable_contour_value;using BASE::template_particles;using BASE::template_removed_particles;
     using BASE::levelset;using BASE::negative_particles;using BASE::positive_particles;using BASE::removed_negative_particles;using BASE::removed_positive_particles;
     using BASE::escaped_negative_particles;using BASE::escaped_positive_particles;using BASE::Set_Band_Width;using BASE::cfl_number;using BASE::number_of_ghost_cells;using BASE::particle_pool;
+    using BASE::Adjust_Particle_For_Objects;using BASE::Delete_Particle_And_Clean_Memory;using BASE::Particle_Collision_Distance;using BASE::Allocate_Particles;
+    using BASE::Free_Particle_And_Clear_Pointer;using BASE::Add_Particle;using BASE::Delete_Particles_From_Deletion_List;using BASE::Move_Particle;
 
     MPI_UNIFORM_GRID<T_GRID>* mpi_grid;
 

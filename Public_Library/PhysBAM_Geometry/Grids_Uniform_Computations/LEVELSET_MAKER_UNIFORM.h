@@ -25,6 +25,7 @@ class LEVELSET_MAKER_UNIFORM:public LEVELSET_MAKER<T>
     using BASE::surface_thickness_or_zero;using BASE::surface_padding_for_flood_fill_or_negative;using BASE::initialized_indices;
     using BASE::initialized_indices_octree;using BASE::write_debug_data;using BASE::write_debug_path;using BASE::path_start_node;using BASE::path_end_node;
     using BASE::use_orthogonal_vote;using BASE::positive_boundary_band;using BASE::remove_degenerate_triangles_area_threshold;using BASE::phi_offset;
+    using BASE::Surface_Thickness_Over_Two;using BASE::Surface_Padding_For_Flood_Fill;
   public:
 //#####################################################################
     bool Compute_Level_Set(TRIANGULATED_SURFACE<T>& trianglated_surface,GRID<TV>& grid,ARRAY<T,TV_INT>& phi,ARRAY<TV,TV_INT>* velocity=0);

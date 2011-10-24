@@ -110,3 +110,4 @@ template class LAPLACE_COLLIDABLE_UNIFORM<GRID<VECTOR<double,2> > >;
 template class LAPLACE_COLLIDABLE_UNIFORM<GRID<VECTOR<double,3> > >;
 #endif
 }
+

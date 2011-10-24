@@ -24,7 +24,7 @@ class HYPOTHETICAL_CUT_TRIANGLES:public HYPOTHETICAL_CUT<TV,2>
     typedef HYPOTHETICAL_CUT<TV,2> BASE;
     using BASE::embedded_object;using BASE::cut_quality_metric;using BASE::Position;
 public:
-    using BASE::hypothetical_nodes;
+    using BASE::hypothetical_nodes;using BASE::Add_Hypothetical_Node;
 
 private:
     bool cuts_ij,cuts_ik,cuts_jk;

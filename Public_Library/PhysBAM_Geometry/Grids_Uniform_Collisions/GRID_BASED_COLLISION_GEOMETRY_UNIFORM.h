@@ -38,6 +38,7 @@ public:
     typedef GRID_BASED_COLLISION_GEOMETRY<T_GRID> BASE;
     using BASE::collision_geometry_collection;using BASE::grid;using BASE::collision_thickness;using BASE::objects_in_cell;using BASE::cell_neighbors_visible;
     using BASE::face_neighbors_visible;using BASE::Get_Body_Penetration;using BASE::occupied_blocks;using BASE::swept_occupied_blocks;using BASE::Is_Active;
+    using BASE::Latest_Crossover;using BASE::Any_Simplex_Crossover;using BASE::Intersection_With_Any_Simplicial_Object;
 
     const T_ARRAYS_BOOL* outside_fluid;
     bool use_collision_face_neighbors;

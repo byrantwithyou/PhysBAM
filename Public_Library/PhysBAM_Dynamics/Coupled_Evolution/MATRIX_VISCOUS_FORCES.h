@@ -46,6 +46,7 @@ private:
 
 public:
     MATRIX_VISCOUS_FORCES(const COLLISION_AWARE_INDEX_MAP<TV>& index_map_input);
+    virtual ~MATRIX_VISCOUS_FORCES();
 
 //#####################################################################
     void Compute(const T dt,const ARRAY<bool,FACE_INDEX<d> >& psi_N,T mu);

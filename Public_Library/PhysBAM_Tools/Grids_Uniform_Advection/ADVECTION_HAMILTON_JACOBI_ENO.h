@@ -18,6 +18,7 @@ private:
 
     int order;
 public:
+    using ADVECTION_SEPARABLE_UNIFORM<T_GRID,T2>::ENO;
 
     ADVECTION_HAMILTON_JACOBI_ENO()
     {

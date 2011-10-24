@@ -259,25 +259,6 @@ Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_t
     ARRAYS_COMPUTATIONS::Fill(twist_subset,TWIST<TV>());
     solid_body_collection.example_forces_and_velocities->Zero_Out_Enslaved_Velocity_Nodes(twist,velocity_time,current_position_time);
 }
-//#####################################################################
-// Function Correct_Orientation_For_Kinetic_Energy
-//#####################################################################
-template<class T>
-inline bool Correct_Orientation_For_Kinetic_Energy(RIGID_BODY<VECTOR<T,3> >& rigid_body,const T KE0,int iteration=1)
-{
-    const int max_orientation_correction_iterations=40;
-    if(iteration>max_orientation_correction_iterations) PHYSBAM_FATAL_ERROR("Exceeded maximum number of iterations during solids evolution energy clamping");
-    typedef VECTOR<T,3> TV;const TV &w=rigid_body.Twist().angular,&L=rigid_body.Angular_Momentum();
-    int status=Correct_Orientation_For_Kinetic_Energy_Using_Direction(rigid_body,KE0,TV::Cross_Product(L,w),false);
-    if(status<=0) return true;
-    int component;
-    if((T).5*TV::Dot_Product(w,L)>KE0) component=rigid_body.Inertia_Tensor().To_Vector().Arg_Max();
-    else component=rigid_body.Inertia_Tensor().To_Vector().Arg_Min();
-    TV axis=rigid_body.Rotation().Rotate(TV::Axis_Vector(component));
-    status=Correct_Orientation_For_Kinetic_Energy_Using_Direction(rigid_body,KE0,TV::Cross_Product(axis,L),true);
-    if(status==3) return Correct_Orientation_For_Kinetic_Energy(rigid_body,KE0,iteration+1);
-    return status<=0;
-}
 template<class T>
 inline int Correct_Orientation_For_Kinetic_Energy_Using_Direction(RIGID_BODY<VECTOR<T,3> >& rigid_body,const T KE0,const VECTOR<T,3>& direction,const bool use_extrema)
 {
@@ -305,6 +286,25 @@ inline int Correct_Orientation_For_Kinetic_Energy_Using_Direction(RIGID_BODY<VEC
         rigid_body.Update_Angular_Velocity();
         return 3;}
     return 4;
+}
+//#####################################################################
+// Function Correct_Orientation_For_Kinetic_Energy
+//#####################################################################
+template<class T>
+inline bool Correct_Orientation_For_Kinetic_Energy(RIGID_BODY<VECTOR<T,3> >& rigid_body,const T KE0,int iteration=1)
+{
+    const int max_orientation_correction_iterations=40;
+    if(iteration>max_orientation_correction_iterations) PHYSBAM_FATAL_ERROR("Exceeded maximum number of iterations during solids evolution energy clamping");
+    typedef VECTOR<T,3> TV;const TV &w=rigid_body.Twist().angular,&L=rigid_body.Angular_Momentum();
+    int status=Correct_Orientation_For_Kinetic_Energy_Using_Direction(rigid_body,KE0,TV::Cross_Product(L,w),false);
+    if(status<=0) return true;
+    int component;
+    if((T).5*TV::Dot_Product(w,L)>KE0) component=rigid_body.Inertia_Tensor().To_Vector().Arg_Max();
+    else component=rigid_body.Inertia_Tensor().To_Vector().Arg_Min();
+    TV axis=rigid_body.Rotation().Rotate(TV::Axis_Vector(component));
+    status=Correct_Orientation_For_Kinetic_Energy_Using_Direction(rigid_body,KE0,TV::Cross_Product(axis,L),true);
+    if(status==3) return Correct_Orientation_For_Kinetic_Energy(rigid_body,KE0,iteration+1);
+    return status<=0;
 }
 //#####################################################################
 // Function Update_Rotation_Helper

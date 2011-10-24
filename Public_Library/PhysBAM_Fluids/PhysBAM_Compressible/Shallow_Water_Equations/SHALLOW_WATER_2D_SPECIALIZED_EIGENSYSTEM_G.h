@@ -19,6 +19,7 @@ class SHALLOW_WATER_2D_SPECIALIZED_EIGENSYSTEM_G:public SHALLOW_WATER_2D_SPECIAL
 {
 public:
     using SHALLOW_WATER_2D_SPECIALIZED_EIGENSYSTEM_F<T>::slice_index;using SHALLOW_WATER_2D_SPECIALIZED_EIGENSYSTEM_F<T>::gravity;
+    using SHALLOW_WATER_2D_SPECIALIZED_EIGENSYSTEM_F<T>::eta_ghost;
 
     SHALLOW_WATER_2D_SPECIALIZED_EIGENSYSTEM_G(const T gravity_input,ARRAY<T,VECTOR<int,2> > &eta_ghost_input,const T min_height_input)
         :SHALLOW_WATER_2D_SPECIALIZED_EIGENSYSTEM_F<T>(gravity_input,eta_ghost_input,min_height_input)

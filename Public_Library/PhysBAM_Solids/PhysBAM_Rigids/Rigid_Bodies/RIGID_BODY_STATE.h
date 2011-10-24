@@ -18,7 +18,7 @@ class RIGID_BODY_STATE:public RIGID_GEOMETRY_STATE<TV>
     typedef typename TV::SPIN T_SPIN;
     typedef RIGID_GEOMETRY_STATE<TV> BASE;
 public:
-    using BASE::frame;using BASE::twist;
+    using BASE::frame;using BASE::twist;using BASE::Object_Space_Vector;using BASE::World_Space_Vector;
     T_SPIN angular_momentum;
 
     RIGID_BODY_STATE()

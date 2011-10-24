@@ -26,7 +26,7 @@ public:
     using BASE::cache_strain;using BASE::strains_of_spring;
     typedef typename BASE::ELEMENT_ITERATOR ELEMENT_ITERATOR;
 public:
-    using BASE::parameters;
+    using BASE::parameters;using BASE::Compute_Plasticity;
 
     ARRAY<bool>* triangle_inverted;
 

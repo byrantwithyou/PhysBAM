@@ -22,7 +22,7 @@ class BOUNDARY_REFLECTION_ATTENUATION:public BOUNDARY_REFLECTION_UNIFORM<T_GRID,
 public:
     typedef BOUNDARY_REFLECTION_UNIFORM<T_GRID,T2> BASE;
     using BASE::Set_Constant_Extrapolation;using BASE::Constant_Extrapolation;using BASE::Fill_Single_Ghost_Region;
-    using BASE::fixed_boundary_value;
+    using BASE::fixed_boundary_value;using BASE::Find_Ghost_Regions;using BASE::Boundary;
 
     T linear_attenuation;
 

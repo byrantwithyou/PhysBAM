@@ -19,6 +19,13 @@ GENERALIZED_FLUID_MASS(const COLLISION_AWARE_INDEX_MAP<TV>& index_map_input,cons
 {
 }
 //#####################################################################
+// Destructor
+//#####################################################################
+template<class TV> GENERALIZED_FLUID_MASS<TV>::
+~GENERALIZED_FLUID_MASS()
+{
+}
+//#####################################################################
 // Function Compute
 //#####################################################################
 template<class TV> void GENERALIZED_FLUID_MASS<TV>::

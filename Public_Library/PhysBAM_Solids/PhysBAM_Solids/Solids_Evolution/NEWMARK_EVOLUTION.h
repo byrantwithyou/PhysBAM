@@ -31,7 +31,7 @@ protected:
     using BASE::rigid_B_full;using BASE::rigid_AR_full;using BASE::AR_full;using BASE::Save_Position;using BASE::Restore_Position;
     using BASE::rigid_deformable_collisions;using BASE::world_space_rigid_mass;using BASE::world_space_rigid_mass_inverse;using BASE::time;
 public:
-    using BASE::solid_body_collection;using BASE::Euler_Step_Position;
+    using BASE::solid_body_collection;using BASE::Euler_Step_Position;using BASE::Set_External_Velocities;
     using BASE::Clamp_Velocities;using BASE::solids_evolution_callbacks;using BASE::rigid_body_collisions;using BASE::Initialize_World_Space_Masses;
     using BASE::solids_parameters;using BASE::kinematic_evolution;
 

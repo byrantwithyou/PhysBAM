@@ -31,7 +31,7 @@ public:
     using BASE::use_non_zero_divergence;using BASE::p_grid;using BASE::poisson;using BASE::elliptic_solver;using BASE::laplace;using BASE::p;using BASE::collidable_solver;using BASE::use_divergence_multiplier;using BASE::divergence;
     using BASE::divergence_multiplier;using BASE::poisson_collidable;using BASE::laplace_collidable;
     using BASE::Use_Divergence_Multiplier;using BASE::Use_Non_Zero_Divergence;using BASE::Compute_Divergence;using BASE::density;
-    using PROJECTION_DYNAMICS<T>::flame;using PROJECTION_DYNAMICS<T>::flame_speed_constants;
+    using PROJECTION_DYNAMICS<T>::flame;using PROJECTION_DYNAMICS<T>::flame_speed_constants;using BASE::Enforce_Velocity_Compatibility;
     
     bool use_flame_speed_multiplier;
     T_FACE_ARRAYS_SCALAR flame_speed_multiplier;

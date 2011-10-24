@@ -18,6 +18,7 @@
 #pragma comment(lib,"psapi")
 #elif defined(__linux__) || defined(__APPLE__)
 #include <csignal>
+#include <unistd.h>
 #ifndef USE_OPENGLES
 #include <execinfo.h>
 #endif

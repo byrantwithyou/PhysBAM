@@ -24,7 +24,7 @@ public:
     enum WORKAROUND1 {m=m_input,n=n_input,size=n_input*m_input};
     STATIC_ASSERT((!((m>=2 && m<=3 && n>=2 && n<=3) || (m==4 && n==4) || (m==0 && n==0)))); // 0x0, 1x1, 2x2, 2x3, 3x2, 3x3, and 4x4 are specialized
     typedef T SCALAR;typedef MATRIX_BASE<T,MATRIX<T,m_input,n_input> > BASE;
-    using BASE::Frobenius_Norm_Squared;using BASE::operator*;using BASE::Transpose_Times;using BASE::Times_Transpose;
+    using BASE::Frobenius_Norm_Squared;using BASE::operator*;using BASE::Transpose_Times;using BASE::Times_Transpose;using BASE::PLU_Solve;
 
     T x[m*n+(m*n==0)]; // pointer to the one dimensional data
 

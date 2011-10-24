@@ -16,7 +16,7 @@ class CONSERVATION_ENO_LLF:public CONSERVATION<T_GRID,d>
     typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::SCALAR T;typedef VECTOR<T,d> TV_DIMENSION;
 public:
     typedef CONSERVATION<T_GRID,d> BASE;
-    using BASE::order;using BASE::save_fluxes;using BASE::flux_temp;
+    using BASE::order;using BASE::save_fluxes;using BASE::flux_temp;using BASE::Alpha;
 
     const bool use_global_llf,use_face_velocity_for_fluxes,use_standard_average,use_explicit_eigensystem_for_alphas;
 

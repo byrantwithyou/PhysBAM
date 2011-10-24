@@ -21,8 +21,7 @@ class COMPRESSIBLE_DRIVER:public DRIVER<TV>
     typedef typename T_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
     typedef DRIVER<TV> BASE;
 
-    using BASE::time;
-    using BASE::Write_Substep;
+    using BASE::time;using BASE::Write_Substep;using BASE::Write_Output_Files;
 protected:
     COMPRESSIBLE_EXAMPLE<TV>& example;
 public:

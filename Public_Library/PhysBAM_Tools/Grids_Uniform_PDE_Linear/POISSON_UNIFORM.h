@@ -24,7 +24,7 @@ public:
     using LAPLACE_UNIFORM<T_GRID>::grid;using POISSON<T>::use_variable_beta;using POISSON<T>::beta_given_on_faces;
     using POISSON<T>::use_weighted_divergence;using POISSON<T>::multiphase;
     using LAPLACE_UNIFORM<T_GRID>::psi_N;using LAPLACE_UNIFORM<T_GRID>::periodic_boundary;
-    using LAPLACE_UNIFORM<T_GRID>::filled_region_colors;
+    using LAPLACE_UNIFORM<T_GRID>::filled_region_colors;using LAPLACE_UNIFORM<T_GRID>::f;using LAPLACE_UNIFORM<T_GRID>::u;using LAPLACE_UNIFORM<T_GRID>::psi_D;
     using LAPLACE_UNIFORM<T_GRID>::filled_region_touches_dirichlet;using LAPLACE_UNIFORM<T_GRID>::solve_neumann_regions;
 
     T_FACE_ARRAYS_SCALAR beta_face;

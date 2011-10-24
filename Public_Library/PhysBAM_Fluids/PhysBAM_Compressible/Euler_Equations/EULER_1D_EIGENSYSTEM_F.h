@@ -19,7 +19,7 @@ class EULER_1D_EIGENSYSTEM_F:public EULER_EIGENSYSTEM<GRID<VECTOR<T_input,1> > >
     typedef T_input T;typedef VECTOR<T,3> TV_DIMENSION;
     enum WORKAROUND1 {d=TV_DIMENSION::m};
 public:
-    using EULER_EIGENSYSTEM<GRID<VECTOR<T_input,1> > >::eos;
+    using EULER_EIGENSYSTEM<GRID<VECTOR<T_input,1> > >::eos;using EULER_EIGENSYSTEM<GRID<VECTOR<T_input,1> > >::e;
 
     bool only_pressure_flux;
 

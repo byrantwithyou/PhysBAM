@@ -45,7 +45,7 @@ public:
     using BASE::output_directory;using BASE::first_frame;using BASE::restart;using BASE::Write_Frame_Title;using BASE::solids_parameters;using BASE::stream_type;
     using BASE::solids_fluids_parameters;using BASE::solid_body_collection;using BASE::solids_evolution;
     using BASE::Adjust_Phi_With_Sources;using BASE::minimum_collision_thickness;using FLUIDS_PARAMETERS_CALLBACKS<T_GRID>::Adjust_Density_And_Temperature_With_Sources;
-    using FLUIDS_PARAMETERS_CALLBACKS<T_GRID>::Get_Source_Reseed_Mask;
+    using FLUIDS_PARAMETERS_CALLBACKS<T_GRID>::Get_Source_Reseed_Mask;using FLUIDS_PARAMETERS_CALLBACKS<T_GRID>::Get_Analytic_Velocities;
     using FLUIDS_PARAMETERS_CALLBACKS<T_GRID>::Get_Source_Velocities;using FLUIDS_PARAMETERS_CALLBACKS<T_GRID>::Get_Object_Velocities; // silence -Woverloaded-virtual
 
     FLUIDS_PARAMETERS_UNIFORM<T_GRID> fluids_parameters;

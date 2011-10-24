@@ -27,6 +27,7 @@ public:
     template<class T2> struct REBIND{typedef ARRAY<T2,ID> TYPE;};
     template<int length> struct REBIND_LENGTH:public PhysBAM::REBIND_LENGTH<ARRAY,length>{};
     typedef T ELEMENT;typedef ID INDEX;
+    using ARRAY_BASE<T,ARRAY<T,ID>,ID>::Same_Array;
 private:
     struct UNUSABLE{};
 public:

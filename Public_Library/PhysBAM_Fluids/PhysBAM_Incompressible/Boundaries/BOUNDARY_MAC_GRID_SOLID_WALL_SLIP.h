@@ -22,7 +22,7 @@ class BOUNDARY_MAC_GRID_SOLID_WALL_SLIP:public BOUNDARY_UNIFORM<T_GRID,typename 
     typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE T_ARRAYS_BASE;
 public:
     typedef BOUNDARY_UNIFORM<T_GRID,T> BASE;
-    using BASE::Set_Constant_Extrapolation;using BASE::Constant_Extrapolation;
+    using BASE::Set_Constant_Extrapolation;using BASE::Constant_Extrapolation;using BASE::Fill_Single_Ghost_Region;using BASE::Boundary;using BASE::Find_Ghost_Regions;
 
     const T_ARRAYS_SCALAR* phi;
 

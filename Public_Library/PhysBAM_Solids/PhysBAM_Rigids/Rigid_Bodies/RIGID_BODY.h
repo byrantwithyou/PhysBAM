@@ -28,6 +28,7 @@ public:
     typedef int HAS_TYPED_READ_WRITE;
     using BASE::Rotation;using BASE::X;using BASE::Twist;using BASE::particle_index;using BASE::bounding_box_up_to_date;using BASE::is_static;
     using BASE::simplicial_object;using BASE::implicit_object;using BASE::World_Space_Simplex_Bounding_Box;using BASE::coefficient_of_friction;
+    using BASE::Add_Structure;
 
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
 protected:

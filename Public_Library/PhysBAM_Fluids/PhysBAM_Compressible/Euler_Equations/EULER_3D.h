@@ -29,7 +29,7 @@ class EULER_3D:public EULER<GRID<VECTOR<T_input,3> > >
     typedef T_input T;typedef VECTOR<T,3> TV;typedef VECTOR<T,5> TV_DIMENSION;
     typedef typename GRID_ARRAYS_POLICY<GRID<TV> >::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;typedef typename REBIND<T_FACE_ARRAYS_SCALAR,bool>::TYPE T_FACE_ARRAYS_BOOL;
 protected:
-    using EULER<GRID<TV> >::boundary;using EULER<GRID<TV> >::conservation;using EULER<GRID<TV> >::eos;
+    using EULER<GRID<TV> >::boundary;using EULER<GRID<TV> >::conservation;using EULER<GRID<TV> >::eos;using EULER<GRID<TV> >::e;using EULER<GRID<TV> >::Set_Custom_Equation_Of_State;
 
     GRID<TV>& grid;
     ARRAY<TV_DIMENSION,VECTOR<int,3> >& U;             // mass, momentum, and energy

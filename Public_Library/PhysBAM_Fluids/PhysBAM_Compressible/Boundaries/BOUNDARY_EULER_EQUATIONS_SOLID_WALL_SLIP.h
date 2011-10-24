@@ -25,7 +25,7 @@ class BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP:public BOUNDARY_UNIFORM<T_GRID,VE
     enum {d=TV_DIMENSION::m};
 public:
     typedef BOUNDARY_UNIFORM<T_GRID,TV_DIMENSION> BASE;
-    using BASE::Set_Constant_Extrapolation;using BASE::Constant_Extrapolation; using BASE::Fill_Single_Ghost_Region;
+    using BASE::Set_Constant_Extrapolation;using BASE::Constant_Extrapolation;using BASE::Fill_Single_Ghost_Region;using BASE::Find_Ghost_Regions;using BASE::Boundary;
 
     EULER_UNIFORM<T_GRID>* euler;
     bool attenuate_using_riemann_invariants;

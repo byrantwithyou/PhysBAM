@@ -26,6 +26,8 @@ public:
     typedef PROJECTION_REFINEMENT_UNIFORM<T_GRID> BASE;
     using BASE::fine_mpi_grid;using BASE::collidable_solver;using BASE::elliptic_solver;using BASE::p;using BASE::coarse_mpi_grid;using BASE::solid_wall;using BASE::fine_psi_N;using BASE::poisson;
     using BASE::coarse_grid;using BASE::local_grid;using BASE::fast_local_projection;using BASE::fine_grid;using BASE::coarse_scale;using BASE::domain_boundary;using BASE::face_velocities_save;
+    using BASE::Set_Beta_Face_For_Boundary_Conditions;using BASE::Map_Fine_To_Local_Boundary_For_Cell;using BASE::Map_Fine_To_Local_Interior_For_Cell;
+    using BASE::Map_Fine_To_Local_Boundaries_For_Cell;using BASE::Map_Local_To_Fine_Interior_For_Cell;
     
     BOUNDARY_UNIFORM<GRID<TV>,T> *boundary,*phi_boundary;
 public:

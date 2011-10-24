@@ -15,7 +15,7 @@ class ANGLE_JOINT:public JOINT<TV>
 {
     typedef typename TV::SCALAR T;typedef typename TV::SPIN T_SPIN;
 public:
-    using JOINT<TV>::J;using JOINT<TV>::J_inverse;using JOINT<TV>::F_pj;
+    using JOINT<TV>::J;using JOINT<TV>::J_inverse;using JOINT<TV>::F_pj;using JOINT<TV>::Constraint_Matrix_Helper;
     bool constrain_angle;
     T angle_min,angle_max;
 

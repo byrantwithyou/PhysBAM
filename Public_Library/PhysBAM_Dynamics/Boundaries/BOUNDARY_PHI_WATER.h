@@ -25,7 +25,7 @@ class BOUNDARY_PHI_WATER:public BOUNDARY_POLICY<T_GRID>::BOUNDARY_SCALAR
     typedef typename GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;
 public:
     typedef typename BOUNDARY_POLICY<T_GRID>::BOUNDARY_SCALAR BASE;
-    using BASE::Set_Constant_Extrapolation;using BASE::Constant_Extrapolation;
+    using BASE::Set_Constant_Extrapolation;using BASE::Constant_Extrapolation;using BASE::Find_Ghost_Regions;using BASE::Boundary;
 
     bool use_extrapolation_mode;
     T tolerance;

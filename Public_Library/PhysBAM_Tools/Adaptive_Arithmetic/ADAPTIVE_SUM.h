@@ -11,6 +11,7 @@
 #include <PhysBAM_Tools/Data_Structures/PAIR.h>
 #include <PhysBAM_Tools/Utilities/STATIC_ASSERT.h>
 #include <limits>
+#include <cmath>
 
 namespace PhysBAM{
 namespace ADAPTIVE_DETAIL{

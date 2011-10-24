@@ -22,6 +22,7 @@ struct COMBINED_COLLISIONS_COUPLED_IMPULSE:public COMBINED_COLLISIONS_DEFORMABLE
     typedef typename TV::SCALAR T;
     typedef COMBINED_COLLISIONS_DEFORMABLE_IMPULSE<TV> DBASE;using DBASE::impulse;
     typedef COMBINED_COLLISIONS_RIGID_IMPULSE<TV> RBASE;using RBASE::wrench;
+    using RBASE::Apply_Rigid_Impulse;
 
     COMBINED_COLLISIONS_COUPLED_IMPULSE(SOLID_BODY_COLLECTION<TV>& solid_body_collection_input,RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,bool do_collision);
     virtual ~COMBINED_COLLISIONS_COUPLED_IMPULSE();

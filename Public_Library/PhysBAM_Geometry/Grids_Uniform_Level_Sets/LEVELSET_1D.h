@@ -27,7 +27,7 @@ public:
     using BASE::fmm_initialization_iterative_drift_fraction;
     using BASE::levelset_callbacks;using BASE::small_number;using BASE::boundary;
     using BASE::max_time_step;using BASE::number_of_ghost_cells;
-    using BASE::interpolation;using BASE::curvature_interpolation;using BASE::normal_interpolation;
+    using BASE::interpolation;using BASE::curvature_interpolation;using BASE::normal_interpolation;using BASE::Phi;using BASE::Extended_Phi;
 
     LEVELSET_1D(GRID<TV>& grid_input,ARRAY<T,VECTOR<int,1> >& phi_input,const int number_of_ghost_cells_input=3);
     ~LEVELSET_1D();
