@@ -142,11 +142,11 @@ Reinitialize(bool force)
             int id;
             if(rigid_filename=="cyllink"){
                 T radius=.18,height=body_motion.trajectories(i)(1).length*scale*.18;int resolution_radius=16,resolution_height=4;
-                new RIGID_BODY<TV>(opengl_component_rigid_body_collection.rigid_body_collection,true);
+                rigid_body=new RIGID_BODY<TV>(opengl_component_rigid_body_collection.rigid_body_collection,true);
                 CYLINDER<T> cylinder(TV(-height/2,0,0),TV(height/2,0,0),radius);
-                rigid_body.Add_Structure(*new ANALYTIC_IMPLICIT_OBJECT<CYLINDER<T> >(cylinder));
-                rigid_body.Add_Structure(*TESSELLATION::Generate_Triangles(cylinder,resolution_height,resolution_radius));
-                id=opengl_component_rigid_body_collection.rigid_body_collection.Add_Rigid_Body_And_Geometry(&rigid_body);}
+                rigid_body->Add_Structure(*new ANALYTIC_IMPLICIT_OBJECT<CYLINDER<T> >(cylinder));
+                rigid_body->Add_Structure(*TESSELLATION::Generate_Triangles(cylinder,resolution_height,resolution_radius));
+                id=opengl_component_rigid_body_collection.rigid_body_collection.Add_Rigid_Body_And_Geometry(rigid_body);}
             else id=opengl_component_rigid_body_collection.rigid_body_collection.Add_Rigid_Body(STREAM_TYPE(RW()),rigid_filename,scale*body_motion.trajectories(i)(1).length,true,true,false,true);
             body_motion.ui_position(i).length=(T)1;
             opengl_component_rigid_body_collection.rigid_body_collection.rigid_body_particle.X(id)=TV();
@@ -166,7 +166,7 @@ Reinitialize(bool force)
             ui_scale=body_motion.trajectories(id_to_index.Get(id))(frame+1).length/body_motion.base_position(id_to_index.Get(id)).length;
             for(int i=1;i<=opengl_component_rigid_body_collection.rigid_body_collection.Rigid_Body(id).structures.m;i++){
                 if(rigid_filename=="cyllink"){
-                    &opengl_component_rigid_body_collection.rigid_body_collection.Rigid_Body(id);
+                    RIGID_BODY<TV> *rigid_body=&opengl_component_rigid_body_collection.rigid_body_collection.Rigid_Body(id);
                     if(ANALYTIC_IMPLICIT_OBJECT<CYLINDER<T> >* analytic_object=dynamic_cast<ANALYTIC_IMPLICIT_OBJECT<CYLINDER<T> >*>(rigid_body->structures(i))){
                         //T radius=.18
                         T height=analytic_object->analytic.height*scale;int resolution_radius=16,resolution_height=4;
