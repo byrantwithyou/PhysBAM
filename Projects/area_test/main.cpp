@@ -134,9 +134,9 @@ int main(int argc,char *argv[])
 //    fprintf(stderr, "%%%%BoundingBox: 0 0 1000 1000\n");
 
 
-//    for(int k=0;k<10000;k++){
-//        Test();
-//    }
+    for(int k=0;k<10000;k++){
+        Test();
+    }
 
     for(int i=1;i<=100;i++) Test_Triangle_Intersection<TV>();
 
