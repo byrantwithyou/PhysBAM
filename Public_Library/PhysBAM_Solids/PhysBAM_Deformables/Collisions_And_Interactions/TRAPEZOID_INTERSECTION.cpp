@@ -13,7 +13,7 @@ Trapezoid_Intersection_Area_Case_1ou(const TV& a,const TV& b,const TV& c,const T
     T yvab=(a.y+b.y)/2,yba=b.y-a.y,yvcd=(c.y+d.y)/2,ydc=d.y-c.y,xba=b.x-a.x,xdc=d.x-c.x,xca=c.x-a.x;(void)yvab;(void)yba;(void)yvcd;(void)ydc;(void)xba;(void)xdc;(void)xca;
     T xbc=b.x-c.x,xbc_xba=xbc/xba,xca_xba=xca/xba,yba_xba=yba/xba,xca_xba2=xca_xba*xca_xba,xbc_xba2=xbc_xba*xbc_xba;
 
-    T A=(T).5*(2*xbc*yvab+xca_xba*yba*xbc);
+    T A=(T).5*xbc*(2*yvab+xca_xba*yba);
     G(1)(1)=-(T).5*xbc_xba2*yba;
     G(1)(2)=(T).5*xbc*xbc_xba;
     G(2)(1)=(T).5*(yba*xca_xba2+2*yvab);
@@ -176,6 +176,7 @@ Trapezoid_Intersection_Area_Case_1uu(const TV& a,const TV& b,const TV& c,const T
     return A;
 }
 
+// Case 1 order: a c b d
 template<class T,class TV> T PhysBAM::
 Trapezoid_Intersection_Area_Case_1uo(const TV& a,const TV& b,const TV& c,const TV& d,VECTOR<TV,4>& G,VECTOR<VECTOR<MATRIX<T,2>,4>,4>& H)
 {
@@ -293,6 +294,7 @@ Trapezoid_Intersection_Area_Case_2oo(const TV& a,const TV& b,const TV& c,const T
 {
 //    LOG::cout<<__FUNCTION__<<std::endl;
     T yvab=(a.y+b.y)/2,yba=b.y-a.y,yvcd=(c.y+d.y)/2,ydc=d.y-c.y,xba=b.x-a.x,xdc=d.x-c.x,xca=c.x-a.x;(void)yvab;(void)yba;(void)yvcd;(void)ydc;(void)xba;(void)xdc;(void)xca;
+    T xbc=b.x-c.x,xbd=b.x-d.x;
 
     T A=-(T).5*xdc*(-2*yba*xca-2*xba*yvab+xba*yba-yba*xdc)/xba;
     G(1)(1)=-(T).5*xdc*yba*(-2*xca-xdc+2*xba)/xba/xba;
@@ -313,8 +315,8 @@ Trapezoid_Intersection_Area_Case_2oo(const TV& a,const TV& b,const TV& c,const T
     H(2)(1)(2,2)=H(1)(2)(2,2)=0;
     H(2)(2)(2,1)=H(2)(2)(1,2)=-(T).5*xdc*(2*xca+xdc)/xba/xba;
     H(2)(2)(2,2)=0;
-    H(3)(1)(1,1)=H(1)(3)(1,1)=(xba-xca)*yba/xba/xba;
-    H(3)(1)(1,2)=H(1)(3)(2,1)=-(xba-xca)/xba;
+    H(3)(1)(1,1)=H(1)(3)(1,1)=-xbc*yba/xba/xba;
+    H(3)(1)(1,2)=H(1)(3)(2,1)=xbc/xba;
     H(3)(2)(1,1)=H(2)(3)(1,1)=yba*xca/xba/xba;
     H(3)(2)(1,2)=H(2)(3)(2,1)=-xca/xba;
     H(3)(3)(1,1)=-yba/xba;
@@ -324,8 +326,8 @@ Trapezoid_Intersection_Area_Case_2oo(const TV& a,const TV& b,const TV& c,const T
     H(3)(2)(2,2)=H(2)(3)(2,2)=0;
     H(3)(3)(2,1)=H(3)(3)(1,2)=0;
     H(3)(3)(2,2)=0;
-    H(4)(1)(1,1)=H(1)(4)(1,1)=-yba*(-xdc-xca+xba)/xba/xba;
-    H(4)(1)(1,2)=H(1)(4)(2,1)=(-xdc-xca+xba)/xba;
+    H(4)(1)(1,1)=H(1)(4)(1,1)=-yba*xbd/xba/xba;
+    H(4)(1)(1,2)=H(1)(4)(2,1)=xbd/xba;
     H(4)(2)(1,1)=H(2)(4)(1,1)=-yba*(xdc+xca)/xba/xba;
     H(4)(2)(1,2)=H(2)(4)(2,1)=(xdc+xca)/xba;
     H(4)(3)(1,1)=H(3)(4)(1,1)=0;
