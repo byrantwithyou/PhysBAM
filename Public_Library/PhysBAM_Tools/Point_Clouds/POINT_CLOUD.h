@@ -77,4 +77,5 @@ public:
     {return !(*this==particles);}
 };
 }
+#include <PhysBAM_Tools/Read_Write/Point_Clouds/READ_WRITE_POINT_CLOUD.h>
 #endif
