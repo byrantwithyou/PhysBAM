@@ -258,15 +258,6 @@ Potential_Energy(const T time) const
     return potential_energy;
 }
 //#####################################################################
-// Function Add_Connectivity
-//#####################################################################
-template<class T> void AXIAL_BENDING_SPRINGS<T>::
-Add_Connectivity(ARRAY<int>& particle_degree)
-{
-    for(SPRING_ITERATOR iterator(force_springs);iterator.Valid();iterator.Next()){int s=iterator.Data();
-        for(int i=1;i<=4;i++) particle_degree(spring_particles(s)[i])++;}
-}
-//#####################################################################
 // Function Endpoint_Velocity
 //#####################################################################
 template<class T> T AXIAL_BENDING_SPRINGS<T>::

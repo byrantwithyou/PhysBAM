@@ -85,7 +85,6 @@ public:
 
     T Potential_Energy(int s,const T time) const;
     T Potential_Energy(const T time) const PHYSBAM_OVERRIDE;
-    void Add_Connectivity(ARRAY<int>& particle_degree);
     T Endpoint_Mass(int s,int b) const;
     TV Endpoint_Velocity(int s,int b) const;
     TV Endpoint_Velocity(ARRAY_VIEW<const TV> velocity,int s,int b) const;

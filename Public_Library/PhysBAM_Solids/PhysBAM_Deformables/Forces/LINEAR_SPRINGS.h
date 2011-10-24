@@ -114,7 +114,6 @@ public:
     T Potential_Energy(const T time) const PHYSBAM_OVERRIDE;
     void Add_Force_Data(ARRAY<FORCE_DATA<TV> >& force_data_list,const std::string& force_name="") const PHYSBAM_OVERRIDE;
 
-    void Add_Connectivity(ARRAY<int>& particle_degree);
     TV Endpoint_Velocity(int s,int b) const;
     T Endpoint_Kinetic_Energy(int s,int b) const;
     T Endpoint_Kinetic_Energy(int s) const;

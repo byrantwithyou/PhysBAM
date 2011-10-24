@@ -445,17 +445,6 @@ Add_Force_Data(ARRAY<FORCE_DATA<TV> >& force_data_list,const std::string& force_
         force_data_list.Append(force_data);}
 }
 //#####################################################################
-// Function Add_Connectivity
-//#####################################################################
-template<class TV> void LINEAR_SPRINGS<TV>::
-Add_Connectivity(ARRAY<int>& particle_degree)
-{
-    for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
-        const STATE& state=states(s);
-        particle_degree(state.nodes(1))++;
-        particle_degree(state.nodes(2))++;}
-}
-//#####################################################################
 // Function Endpoint_Velocity
 //#####################################################################
 template<class TV> TV LINEAR_SPRINGS<TV>::
