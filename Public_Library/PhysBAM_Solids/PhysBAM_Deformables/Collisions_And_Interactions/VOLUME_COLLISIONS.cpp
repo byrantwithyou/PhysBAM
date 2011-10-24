@@ -11,7 +11,7 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/VOLUME_COLLISIONS.h>
 #include <algorithm>
 using namespace PhysBAM;
-
+namespace PhysBAM{template<class TV> void Add_Debug_Particle(const TV& X, const VECTOR<typename TV::SCALAR,3>& color);}
 template<class T>
 struct VOLUME_COLLISIONS_VISITOR
 {
@@ -31,8 +31,6 @@ struct VOLUME_COLLISIONS_VISITOR
 
     void Store(const int a,const int b)
     {if(Topology_Aware_Triangle_Intersection_Test(ta1.mesh.elements(a),ta2.mesh.elements(b),(ARRAY_VIEW<const VECTOR<T,2> >)ta1.particles.X)) pairs.Append(VECTOR<int,2>(a,b));}
-
-//#####################################################################
 };
 //#####################################################################
 // Function Compute_Loops
@@ -43,6 +41,7 @@ Compute_Collision_Triangles()
     area=0;
     gradient.Remove_All();
     hessian.Remove_All();
+    for(int i=1;i<=triangulated_areas.m;i++) triangulated_areas(i)->Initialize_Hierarchy();
     for(int i=1;i<=triangulated_areas.m;i++)
         for(int j=i;j<=triangulated_areas.m;j++)
             Compute_Collision_Triangles(*triangulated_areas(i),*triangulated_areas(j));
@@ -53,14 +52,13 @@ Compute_Collision_Triangles()
 template<class T> void VOLUME_COLLISIONS<VECTOR<T,2> >::
 Compute_Collision_Triangles(TRIANGULATED_AREA<T>& ta1,TRIANGULATED_AREA<T>& ta2)
 {
-    if(!ta1.hierarchy) ta1.Initialize_Hierarchy();
-    if(!ta2.hierarchy) ta2.Initialize_Hierarchy();
-
     VOLUME_COLLISIONS_VISITOR<T> visitor(ta1,ta2);
     ta1.hierarchy->Intersection_List(*ta2.hierarchy,visitor,ZERO());
 
     for(int i=1;i<=visitor.pairs.m;i++){
         int a,b;visitor.pairs(i).Get(a,b);
+        Add_Debug_Particle(ta1.Centroid(a),VECTOR<T,3>(1,0,0));
+        Add_Debug_Particle(ta2.Centroid(b),VECTOR<T,3>(0,0,1));
         VECTOR<TV,6> G;
         VECTOR<VECTOR<MATRIX<T,2>,6>,6> H;
         area+=Triangle_Intersection_Area(ta1.Get_Element(a),ta2.Get_Element(b),G,H);
