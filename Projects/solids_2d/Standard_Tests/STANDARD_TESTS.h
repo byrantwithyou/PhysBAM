@@ -18,11 +18,13 @@
 //  12. Curtain and ball
 //  13. Falling mattress, random start
 //  14. Several falling mattresses
+//  14. Crush test
 //#####################################################################
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
 
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
+#include <PhysBAM_Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <PhysBAM_Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Parallel_Computation/PARTITION_ID.h>
@@ -81,6 +83,8 @@ public:
     bool test_forces;
     bool use_extended_neohookean;
     bool use_corotated;
+    int kinematic_id;
+    INTERPOLATION_CURVE<T,FRAME<TV> > curve;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),fully_implicit(false),test_forces(false),use_extended_neohookean(false),use_corotated(false)
@@ -173,6 +177,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 8:
         case 13:
         case 14:
+        case 16:
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
             last_frame=200;
             break;
@@ -298,6 +303,17 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(8,4))));
             tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(12,4))));
             tests.Add_Ground();
+        case 16:{
+            tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,1))));
+            tests.Add_Ground();
+            RIGID_BODY<TV>& ground2=tests.Add_Ground();
+            ground2.X()=TV(0,2);
+            ground2.Rotation()=ROTATION<TV>::From_Angle(pi);
+            ground2.is_static=false;
+            kinematic_id=ground2.particle_index;
+            rigid_body_collection.rigid_body_particle.kinematic(ground2.particle_index)=true;
+            curve.Add_Control_Point(0,FRAME<TV>(TV()));
+            curve.Add_Control_Point(1,FRAME<TV>());
             break;}
         default:
             LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}
@@ -341,6 +357,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             solid_body_collection.Add_Force(Create_Bending_Elements(segmented_curve,(T)1e-6,(T).0001));
             break;}
         case 8:
+        case 16:
         case 13:{
             TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
             solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
@@ -396,6 +413,22 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     if(fully_implicit) for(int i=1;i<=solid_body_collection.deformable_body_collection.deformables_forces.m;i++) solid_body_collection.deformable_body_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=true;
 
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >::Initialize_Bodies();
+}
+//#####################################################################
+// Function Set_Kinematic_Positions
+//#####################################################################
+void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id)
+{
+    if(id==kinematic_id){
+        
+    }
+}
+//#####################################################################
+// Function Set_Kinematic_Velocities
+//#####################################################################
+bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id)
+{
+    return false;
 }
 //#####################################################################
 // Function Set_Particle_Is_Simulated
