@@ -53,7 +53,7 @@ public:
 
     const bool leakproof_solve;
     INTERVAL<int> interior_regions;
-    mutable GENERALIZED_VELOCITY<TV>& solid_velocity;
+    GENERALIZED_VELOCITY<TV>& solid_velocity;
     INTERVAL<int> divergence_indices;
 
     FLUID_SYSTEM_MPI_SLIP(const bool use_preconditioner_input,

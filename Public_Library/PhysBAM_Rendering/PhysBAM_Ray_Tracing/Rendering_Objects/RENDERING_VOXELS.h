@@ -17,8 +17,9 @@ class RENDERING_VOXELS:public RENDERING_OBJECT<T>
 {
     using RENDERING_OBJECT<T>::Inside;
 public:
-    using RENDERING_OBJECT<T>::small_number;using RENDERING_OBJECT<T>::Intersection; // silence -Woverloaded-virtual
-    
+    using RENDERING_OBJECT<T>::small_number;using RENDERING_OBJECT<T>::Intersection;using RENDERING_OBJECT<T>::Object_Space_Ray;using RENDERING_OBJECT<T>::Object_Space_Point;
+    using RENDERING_OBJECT<T>::World_Space_Vector;
+
     BOX<VECTOR<T,3> > box; // box containing the voxelized data
     bool precompute_single_scattering;
 

@@ -58,12 +58,9 @@ public:
     return -1;}
 
     bool Inside_Region_Only(const VECTOR<T,3>& location,int region_check) const
-    {bool is_inside=false;
-      for(int i=1;i<=number_of_regions;i++) {
+    {for(int i=1;i<=number_of_regions;i++) {
         bool inside_region=rendering_levelset_multiple_region_objects(i)->Inside(location);
-        if(i==region_check && inside_region) is_inside=true;
-        if(i!=region_check && inside_region) return false;
-      }
+        if(i!=region_check && inside_region) return false;}
       return true;}
 
     bool Inside(const VECTOR<T,3>& location,RENDERING_OBJECT<T>** intersected_object) const PHYSBAM_OVERRIDE

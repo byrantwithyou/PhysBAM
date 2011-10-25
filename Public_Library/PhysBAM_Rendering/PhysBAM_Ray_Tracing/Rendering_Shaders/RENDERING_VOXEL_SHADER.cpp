@@ -62,7 +62,7 @@ Attenuate_Color(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& object,co
     const RENDERING_VOXELS<T>* voxel_object=(const RENDERING_VOXELS<T>*)&object;
     T start_t,end_t;
     if(!INTERSECTION::Get_Intersection_Range(ray.ray,voxel_object->box,start_t,end_t))return color;
-    T current_t=end_t;T old_t;
+    T current_t=end_t;
     bool last_segment=false;
     const ARRAY<RENDERING_LIGHT<T> *>& lights=world.Lights();
     TV attenuated_color=color;
@@ -115,7 +115,7 @@ Attenuate_Color(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& object,co
                     else{
                         emitted_radiance=blackbody.cie.XYZ_To_RGB(world_xyz_to_display_xyz*(blackbody.Calculate_XYZ(temperature)))*emission_amplification*volumetric_coefficient*current_volumetric_step;}}
                 attenuated_color+=emitted_radiance;}}
-        old_t=current_t;current_t-=current_volumetric_step;}
+        current_t-=current_volumetric_step;}
     return attenuated_color;
 }
 //#####################################################################
@@ -127,7 +127,7 @@ Attenuate_Light(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& object,co
     const RENDERING_VOXELS<T>* voxel_object=(const RENDERING_VOXELS<T>*)&object;
     T start_t,end_t;
     if(!INTERSECTION::Get_Intersection_Range(ray.ray,voxel_object->box,start_t,end_t))return light_color;
-    T current_t=start_t;T old_t;
+    T current_t=start_t;
     bool last_segment=false;
     TV transmittance(1,1,1),emitted_radiance(0,0,0);
     int step_count=0;
@@ -159,7 +159,7 @@ Attenuate_Light(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& object,co
                 TV attenuation_coefficient=-current_volumetric_step*volumetric_coefficient*(absorption_shadow+scattering);
                 TV attenuation(exp(attenuation_coefficient.x),exp(attenuation_coefficient.y),exp(attenuation_coefficient.z));
                 transmittance*=attenuation;}}
-        old_t=current_t;current_t+=current_volumetric_step;}
+        current_t+=current_volumetric_step;}
     //LOG::cout<<"Did "<<step_count<<" steps in volumetric voxels"<<std::endl;
     return transmittance*light_color+emitted_radiance;
 }
