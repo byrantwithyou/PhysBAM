@@ -247,7 +247,7 @@
 
 (defun physbam-grep-public (querystr)
   "grep in Public_Library"
-  (interactive "sGrep $PHYSBAM/Public_Library for:")
+  (interactive "sGrep $PHYSBAM/Public_Library for: ")
   (physbam-grep-cpp-and-headers "Public_Library" querystr))
 
 (defun physbam-grep-projects (querystr)
