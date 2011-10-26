@@ -23,9 +23,9 @@ Triangle_Intersection_Area(const TRIANGLE_2D<T>& a,const TRIANGLE_2D<T>& b,VECTO
             VECTOR<TV,4> tG;
             VECTOR<VECTOR<MATRIX<T,2>,4>,4> tH;
             A+=Trapezoid_Intersection_Area(a.X(i),a.X(in),b.X(j),b.X(jn),tG,tH);
-            VECTOR<int,4> I(i,in,j,in);
-            for(int k=1;k<=4;k++) G(I(k))=tG(k);
-            for(int k=1;k<=4;k++) for(int m=1;m<=4;m++) G(I(k))(I(m))+=tG(k)(m);
+            VECTOR<int,4> I(i,in,j+3,jn+3);
+            for(int k=1;k<=4;k++) G(I(k))+=tG(k);
+            for(int k=1;k<=4;k++) for(int m=1;m<=4;m++) H(I(k))(I(m))+=tH(k)(m);
         }
     }
     return A;
