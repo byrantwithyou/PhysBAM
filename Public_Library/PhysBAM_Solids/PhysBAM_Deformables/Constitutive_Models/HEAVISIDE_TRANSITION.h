@@ -31,16 +31,23 @@ public:
     
     inline T H (const T J) const
     {
-        assert(J>J_min && J<J_max);
+        assert(J>=J_min && J<=J_max);
         T r = (J-J_min)/J_diff;
         return r*r*(-2*r+3);
     }
 
     inline T HJ (const T J) const
     {
-        assert(J>J_min && J<J_max);
+        assert(J>=J_min && J<=J_max);
         T r = (J-J_min)/J_diff;
         return 6*r*(1-r)/J_diff;
+    }
+
+    inline T HJJ (const T J) const
+    {
+        assert(J>=J_min && J<=J_max);
+        T r = (J-J_min)/J_diff;
+        return (-12*r+6)/(J_diff*J_diff);
     }
 };
 }
