@@ -16,7 +16,7 @@ namespace PhysBAM{template<class TV,class ATTR> void Debug_Particle_Set_Attribut
 //#####################################################################
 template<class TV> COLLISION_AREA_PENALTY_FORCE<TV>::
 COLLISION_AREA_PENALTY_FORCE(PARTICLES<TV>& particles)
-    :BASE(particles),volume_collisions(*new VOLUME_COLLISIONS<TV>),force_coefficient(1e4)
+    :BASE(particles),volume_collisions(*new VOLUME_COLLISIONS<TV>),force_coefficient(4e4)
 {
 }
 //#####################################################################
@@ -93,12 +93,11 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
         mx=max(mx,it.Data().Magnitude());
 
     INTERPOLATED_COLOR_MAP<T> color_map;
-    color_map.Initialize_Colors(0,mx,false,false,false);
+    color_map.Initialize_Colors(0,mx,false,true,false);
 
     for(typename HASHTABLE<int,TV>::ITERATOR it(volume_collisions.gradient);it.Valid();it.Next()){
-//        Add_Debug_Particle(this->particles.X(it.Key()),color_map(it.Data().Magnitude()));
-        Add_Debug_Particle(this->particles.X(it.Key()),VECTOR<T,3>(1,0,0));
-        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,it.Data());}
+        Add_Debug_Particle(this->particles.X(it.Key()),color_map(it.Data().Magnitude()));
+        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,-force_coefficient*it.Data());}
 }
 //#####################################################################
 // Function Add_Velocity_Dependent_Forces
