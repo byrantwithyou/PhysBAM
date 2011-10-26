@@ -57,15 +57,13 @@ Compute_Collision_Triangles(TRIANGULATED_AREA<T>& ta1,TRIANGULATED_AREA<T>& ta2)
 
     for(int i=1;i<=visitor.pairs.m;i++){
         int a,b;visitor.pairs(i).Get(a,b);
-        Add_Debug_Particle(ta1.Centroid(a),VECTOR<T,3>(1,0,0));
-        Add_Debug_Particle(ta2.Centroid(b),VECTOR<T,3>(0,0,1));
         VECTOR<TV,6> G;
         VECTOR<VECTOR<MATRIX<T,2>,6>,6> H;
         area+=Triangle_Intersection_Area(ta1.Get_Element(a),ta2.Get_Element(b),G,H);
         VECTOR<int,6> I;
         ta1.mesh.elements(a).Get(I(1),I(2),I(3));
         ta2.mesh.elements(b).Get(I(4),I(5),I(6));
-        for(int k=1;k<=6;k++) gradient.Get_Or_Insert(I(k))=G(k);
+        for(int k=1;k<=6;k++) gradient.Get_Or_Insert(I(k))+=G(k);
         for(int k=1;k<=6;k++) for(int m=1;m<=6;m++) hessian.Get_Or_Insert(VECTOR<int,2>(I(k),I(m)))+=H(k)(m);}
 }
 template class VOLUME_COLLISIONS<VECTOR<float,2> >;
