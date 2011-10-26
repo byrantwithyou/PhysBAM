@@ -17,6 +17,7 @@
 //  11. String of segments falling on to ground.
 //  12. Curtain and ball
 //  13. Falling mattress, random start
+//  14. Several falling mattresses
 //#####################################################################
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
@@ -38,6 +39,7 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/COROTATED.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_COROTATED_BLEND.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/ROTATED_LINEAR.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/FINITE_VOLUME.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/INCOMPRESSIBLE_FINITE_VOLUME.h>
@@ -170,8 +172,9 @@ void Parse_Options() PHYSBAM_OVERRIDE
             break;
         case 8:
         case 13:
+        case 14:
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
-            last_frame=120;
+            last_frame=200;
             break;
         case 9:
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
@@ -289,6 +292,13 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             tests.Copy_And_Add_Structure(segmented_curve);
             tests.Add_Ground();
             break;}
+        case 14:{
+            tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,4))));
+            tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(4,4))));
+            tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(8,4))));
+            tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(12,4))));
+            tests.Add_Ground();
+            break;}
         default:
             LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}
 
@@ -336,8 +346,23 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
             if(use_extended_neohookean) solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,new NEO_HOOKEAN_EXTRAPOLATED<T,2>((T)1e4,(T).45,(T).01)));
             else if(use_corotated) solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,new COROTATED<T,2>((T)1e4,(T).45,(T).01)));
-            else solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,new NEO_HOOKEAN<T,2>((T)1e4,(T).45,(T).01)));
+            else solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,new NEO_HOOKEAN_COROTATED_BLEND<T,2>((T)1e4,(T).45,(T).01)));
             if(test_number==13){RANDOM_NUMBERS<T> rand;rand.Fill_Uniform(particles.X,-1,1);}
+            break;}
+        case 14:{
+            solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
+            
+            TRIANGULATED_AREA<T>& triangulated_area1=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>(1);
+            solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area1,new COROTATED<T,2>((T)2e4,(T).45,(T).01)));
+
+            TRIANGULATED_AREA<T>& triangulated_area2 = solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>(2);
+            solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area2,new NEO_HOOKEAN_COROTATED_BLEND<T,2>((T)2e4,(T).45,(T).01)));
+
+            TRIANGULATED_AREA<T>& triangulated_area3 = solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>(3);
+            solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area3,new NEO_HOOKEAN_EXTRAPOLATED<T,2>((T)2e4,(T).45,(T).01)));
+
+            TRIANGULATED_AREA<T>& triangulated_area4 = solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>(4);
+            solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area4,new NEO_HOOKEAN<T,2>((T)2e4,(T).45,(T).01)));
             break;}
         case 9:{
             TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
