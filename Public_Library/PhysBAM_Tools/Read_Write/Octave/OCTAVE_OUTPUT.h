@@ -19,6 +19,7 @@ template<class T> class KRYLOV_SYSTEM_BASE;
 template<class T> class KRYLOV_VECTOR_BASE;
 template<class T> class SPARSE_MATRIX_FLAT_MXN;
 template<class T> class SPARSE_MATRIX_FLAT_NXN;
+template<class T> class MATRIX_MXN;
 template<class T>
 struct OCTAVE_SPARSE_MATRIX_ENTRY
 {
@@ -66,6 +67,8 @@ public:
     void Write(const char* name,const SPARSE_MATRIX_FLAT_NXN<T>& m);
     void Write_Transpose(const char* name,const SPARSE_MATRIX_FLAT_MXN<T>& m);
     void Write_Transpose(const char* name,const SPARSE_MATRIX_FLAT_NXN<T>& m);
+    void Write(const char* name,const MATRIX_MXN<T>& m);
+    void Write_Transpose(const char* name,const MATRIX_MXN<T>& m);
     void Begin_Sparse_Matrix(const char* name,int m,int n);
     void Add_Sparse_Entry(int r,int c,T x);
     void Append_Sparse_Column(const KRYLOV_VECTOR_BASE<T>& v);

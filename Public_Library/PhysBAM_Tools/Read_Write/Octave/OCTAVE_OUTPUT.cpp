@@ -10,6 +10,7 @@
 #include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX_2X2.h>
 #include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
+#include <PhysBAM_Tools/Matrices/MATRIX_MXN.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
@@ -156,6 +157,30 @@ Write_Transpose(const char* name,const SPARSE_MATRIX_FLAT_NXN<T>& m)
     for(int i=1;i<=m.n;i++){
         int s=m.offsets(i),e=m.offsets(i+1);
         for(int j=s;j<e;j++) out<<(m.A(j).j)<<" "<<i<<" "<<m.A(j).a<<std::endl;}
+}
+//#####################################################################
+// Function Write_Transpose
+//#####################################################################
+template<class T> void OCTAVE_OUTPUT<T>::
+Write(const char* name,const MATRIX_MXN<T>& m)
+{
+    out<<"# name: "<<name<<"\n# type: matrix\n# rows: "<<m.m<<"\n# columns: "<<m.n<<"\n";
+    for(int i=1;i<=m.m;i++){
+        for(int j=1;j<=m.n;j++)
+            out<<m(i,j)<<" ";
+        out<<"\n";}
+}
+//#####################################################################
+// Function Write_Transpose
+//#####################################################################
+template<class T> void OCTAVE_OUTPUT<T>::
+Write_Transpose(const char* name,const MATRIX_MXN<T>& m)
+{
+    out<<"# name: "<<name<<"\n# type: matrix\n# rows: "<<m.m<<"\n# columns: "<<m.n<<"\n";
+    for(int i=1;i<=m.m;i++){
+        for(int j=1;j<=m.n;j++)
+            out<<m(j,i)<<" ";
+        out<<"\n";}
 }
 //#####################################################################
 // Function Begin_Sparse_Matrix
