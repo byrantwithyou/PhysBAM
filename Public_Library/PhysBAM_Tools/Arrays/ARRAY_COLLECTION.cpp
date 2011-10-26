@@ -111,6 +111,7 @@ Copy_Element(const ARRAY_COLLECTION& from_collection,const int from,const int to
 void ARRAY_COLLECTION::
 Copy_All_Elements_Helper(const ARRAY_COLLECTION& from_collection,const int offset)
 {
+    PHYSBAM_ASSERT(this!=&from_collection);
     ATTRIBUTE_INDEX i(1),j(1);
     while(i<=arrays.m && j<=from_collection.arrays.m){
         if(arrays(i)->id<from_collection.arrays(j)->id) arrays(i++)->Clear_Range(offset+1,offset+from_collection.number);
