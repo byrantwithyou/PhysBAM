@@ -18,7 +18,8 @@
 //  12. Curtain and ball
 //  13. Falling mattress, random start
 //  14. Several falling mattresses
-//  14. Crush test
+//  15. Penalty collision test
+//  16. Crush test
 //#####################################################################
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
@@ -43,6 +44,7 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_COROTATED_BLEND.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/ROTATED_LINEAR.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Forces/COLLISION_AREA_PENALTY_FORCE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/FINITE_VOLUME.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/INCOMPRESSIBLE_FINITE_VOLUME.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/LINEAR_SPRINGS.h>
@@ -177,6 +179,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 8:
         case 13:
         case 14:
+        case 15:
         case 16:
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
             last_frame=200;
@@ -303,6 +306,11 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(8,4))));
             tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(12,4))));
             tests.Add_Ground();
+        case 15:{
+            tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,1.2))));
+            tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,2.4))));
+            tests.Add_Ground();
+            break;}
         case 16:{
             tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,1))));
             tests.Add_Ground();
@@ -386,6 +394,25 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
             solid_body_collection.Add_Force(Create_Incompressible_Finite_Volume(triangulated_area));
             solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,new ROTATED_LINEAR<T,2>((T)2e3,(T)0,(T).01)));
+            break;}
+        case 15:{
+            TRIANGULATED_AREA<T>& triangulated_area1=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>(1);
+            TRIANGULATED_AREA<T>& triangulated_area2=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>(2);
+            solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
+
+            if(use_extended_neohookean) solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area1,new NEO_HOOKEAN_EXTRAPOLATED<T,2>((T)1e4,(T).45,(T).01)));
+            else if(use_corotated) solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area1,new COROTATED<T,2>((T)1e4,(T).45,(T).01)));
+            else solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area1,new NEO_HOOKEAN<T,2>((T)1e4,(T).45,(T).01)));
+
+            if(use_extended_neohookean) solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area2,new NEO_HOOKEAN_EXTRAPOLATED<T,2>((T)1e4,(T).45,(T).01)));
+            else if(use_corotated) solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area2,new COROTATED<T,2>((T)1e4,(T).45,(T).01)));
+            else solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area2,new NEO_HOOKEAN<T,2>((T)1e4,(T).45,(T).01)));
+
+            COLLISION_AREA_PENALTY_FORCE<TV>* penalty_force=new COLLISION_AREA_PENALTY_FORCE<TV>(particles);
+            penalty_force->Add_Mesh(triangulated_area1);
+            penalty_force->Add_Mesh(triangulated_area2);
+            solid_body_collection.Add_Force(penalty_force);
+            
             break;}
         default:
             LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}
@@ -481,6 +508,14 @@ void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVE
 {
     int m=mattress_grid.counts.x;
     for(int j=1;j<=mattress_grid.counts.y;j++) X(1+m*(j-1))=X(m+m*(j-1))=TV(0,0);
+}
+//#####################################################################
+// Function Write_Output_Files
+//#####################################################################
+void Write_Output_Files(const int frame) const
+{
+    BASE::Write_Output_Files(frame);
+    tests.Write_Debug_Particles(output_directory,frame);
 }
 //#####################################################################
 };
