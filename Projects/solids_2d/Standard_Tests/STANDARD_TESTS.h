@@ -454,7 +454,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             break;}
         case 17:{
             TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
-            solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,new COROTATED<T,2>((T)1e4,(T).45,(T).01)));
+            solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,new NEO_HOOKEAN_COROTATED_BLEND<T,2>((T)1e4,(T).45,(T).01)));
             RANDOM_NUMBERS<T> rand;
             rand.Fill_Uniform(particles.X,-1,1);
             break;}
