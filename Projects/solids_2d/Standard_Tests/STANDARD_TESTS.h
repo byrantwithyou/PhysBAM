@@ -20,6 +20,10 @@
 //  14. Several falling mattresses
 //  15. Penalty collision test
 //  16. Crush test
+//  17. Matress, no gravity, random start
+//  18. Matress, no gravity, point start
+//  19. Matress, no gravity, line start
+
 //#####################################################################
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
@@ -206,6 +210,9 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 14:
         case 15:
         case 16:
+        case 17:
+        case 18:
+        case 19:
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
             last_frame=200;
             break;
@@ -348,6 +355,11 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             curve.Add_Control_Point(0,FRAME<TV>(TV()));
             curve.Add_Control_Point(1,FRAME<TV>());
             break;}
+        case 17:
+        case 18:
+        case 19:{
+            tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0))));
+            break;}
         default:
             LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}
 
@@ -439,6 +451,22 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             solid_body_collection.Add_Force(penalty_force);
             
             break;}
+        case 17:{
+            TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
+            solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,new COROTATED<T,2>((T)1e4,(T).45,(T).01)));
+            RANDOM_NUMBERS<T> rand;
+            rand.Fill_Uniform(particles.X,-1,1);
+            break;}
+        case 18:{
+            TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
+            solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,new COROTATED<T,2>((T)1e4,(T).45,(T).01)));
+            RANDOM_NUMBERS<T> rand;
+            rand.Fill_Uniform(particles.X,0,0);
+            break;}
+        case 19:{
+            TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
+            solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,new COROTATED<T,2>((T)1e4,(T).45,(T).01)));
+            break;}
         default:
             LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}
 
@@ -468,6 +496,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     if(fully_implicit) for(int i=1;i<=solid_body_collection.deformable_body_collection.deformables_forces.m;i++) solid_body_collection.deformable_body_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=true;
 
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >::Initialize_Bodies();
+    }
 }
 //#####################################################################
 // Function Set_Kinematic_Positions
@@ -475,7 +504,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id)
 {
     if(id==kinematic_id){
-        
+	
     }
 }
 //#####################################################################
