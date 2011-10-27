@@ -142,7 +142,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Double_Argument("-dampen",1,"","damping multiplier for various tests");
     parse_args->Add_Option_Argument("-residuals","print residuals during timestepping");
     parse_args->Add_Option_Argument("-print_energy","print energy statistics");
-    parse_args->Add_Double_Argument("-cgsolids",1e-3,"CG tolerance for backward Euler");
+    parse_args->Add_Double_Argument("-cgsolids",1e-2,"CG tolerance for backward Euler");
     parse_args->Add_Option_Argument("-use_be","use backward euler");
     parse_args->Add_Option_Argument("-print_matrix");
     parse_args->Add_Option_Argument("-project_nullspace","project out nullspace");
