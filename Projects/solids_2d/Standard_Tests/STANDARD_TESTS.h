@@ -497,7 +497,6 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     if(fully_implicit) for(int i=1;i<=solid_body_collection.deformable_body_collection.deformables_forces.m;i++) solid_body_collection.deformable_body_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=true;
 
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >::Initialize_Bodies();
-    }
 }
 //#####################################################################
 // Function Set_Kinematic_Positions
