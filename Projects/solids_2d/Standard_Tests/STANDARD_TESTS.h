@@ -41,8 +41,8 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/COROTATED.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_COROTATED_BLEND.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/ROTATED_LINEAR.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/COLLISION_AREA_PENALTY_FORCE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/FINITE_VOLUME.h>
@@ -54,6 +54,7 @@
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/GRAVITY.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
+#include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/NEWMARK_EVOLUTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/QUASISTATIC_EVOLUTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
 #include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
@@ -87,14 +88,18 @@ public:
     bool use_corotated;
     int kinematic_id;
     INTERPOLATION_CURVE<T,FRAME<TV> > curve;
+    bool print_matrix;
+    int parameter;
+    T stiffness_multiplier;
+    T damping_multiplier;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),fully_implicit(false),test_forces(false),use_extended_neohookean(false),use_corotated(false)
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),fully_implicit(false),test_forces(false),use_extended_neohookean(false),use_corotated(false),
+        print_matrix(false),parameter(0),stiffness_multiplier(1),damping_multiplier(1)
     {
     }
 
     // Unused callbacks
-    void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
     void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
     void Postprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE {}
     void Apply_Constraints(const T dt,const T time) PHYSBAM_OVERRIDE {}
@@ -128,6 +133,17 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Option_Argument("-test_forces","use fully implicit forces");
     parse_args->Add_Option_Argument("-use_ext_neo");
     parse_args->Add_Option_Argument("-use_corotated");
+    parse_args->Add_Integer_Argument("-parameter",0,"parameter used by multiple tests to change the parameters of the test");
+    parse_args->Add_Double_Argument("-stiffen",1,"","stiffness multiplier for various tests");
+    parse_args->Add_Double_Argument("-dampen",1,"","damping multiplier for various tests");
+    parse_args->Add_Option_Argument("-residuals","print residuals during timestepping");
+    parse_args->Add_Option_Argument("-print_energy","print energy statistics");
+    parse_args->Add_Double_Argument("-cgsolids",1e-3,"CG tolerance for backward Euler");
+    parse_args->Add_Option_Argument("-use_be","use backward euler");
+    parse_args->Add_Option_Argument("-print_matrix");
+    parse_args->Add_Option_Argument("-project_nullspace","project out nullspace");
+    parse_args->Add_Integer_Argument("-projection_iterations",1,"number of iterations used for projection in cg");
+    parse_args->Add_Integer_Argument("-solver_iterations",1,"number of iterations used for solids system");
 }
 //#####################################################################
 // Function Parse_Options
@@ -147,6 +163,15 @@ void Parse_Options() PHYSBAM_OVERRIDE
     test_forces=parse_args->Is_Value_Set("-test_forces");
     use_extended_neohookean=parse_args->Is_Value_Set("-use_ext_neo");
     use_corotated=parse_args->Is_Value_Set("-use_corotated");
+    solids_parameters.use_trapezoidal_rule_for_velocities=!parse_args->Get_Option_Value("-use_be");
+    print_matrix=parse_args->Is_Value_Set("-print_matrix");
+    parameter=parse_args->Get_Integer_Value("-parameter");
+    stiffness_multiplier=(T)parse_args->Get_Double_Value("-stiffen");
+    damping_multiplier=(T)parse_args->Get_Double_Value("-dampen");
+    solid_body_collection.print_energy=parse_args->Get_Option_Value("-print_energy");
+    solids_parameters.implicit_solve_parameters.cg_projection_iterations=parse_args->Get_Integer_Value("-projection_iterations");
+    if(parse_args->Is_Value_Set("-project_nullspace")) solids_parameters.implicit_solve_parameters.project_nullspace_frequency=1;
+    solid_body_collection.Print_Residuals(parse_args->Get_Option_Value("-residuals"));
 
     switch(test_number){
         case 1:
@@ -434,6 +459,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}}
     solid_body_collection.Update_Simulated_Particles();
 
+    if(parse_args->Is_Value_Set("-solver_iterations")) solids_parameters.implicit_solve_parameters.cg_iterations=parse_args->Get_Integer_Value("-solver_iterations");
+    if(parse_args->Is_Value_Set("-cgsolids")) solids_parameters.implicit_solve_parameters.cg_tolerance=(T)parse_args->Get_Double_Value("-cgsolids");
+
     if(fully_implicit) for(int i=1;i<=solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->use_implicit_velocity_independent_forces=true;
     if(fully_implicit) for(int i=1;i<=solid_body_collection.rigid_body_collection.rigids_forces.m;i++)
         solid_body_collection.rigid_body_collection.rigids_forces(i)->use_implicit_velocity_independent_forces=true;
@@ -516,6 +544,13 @@ void Write_Output_Files(const int frame) const
 {
     BASE::Write_Output_Files(frame);
     tests.Write_Debug_Particles(output_directory,frame);
+}
+//#####################################################################
+// Function Preprocess_Frame
+//#####################################################################
+void Preprocess_Frame(const int frame)
+{
+    dynamic_cast<NEWMARK_EVOLUTION<TV>&>(*solids_evolution).print_matrix=print_matrix;
 }
 //#####################################################################
 };

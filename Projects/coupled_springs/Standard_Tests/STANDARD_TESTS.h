@@ -166,7 +166,6 @@ void Register_Options() PHYSBAM_OVERRIDE
     BASE::Register_Options();
     parse_args->Add_Integer_Argument("-parameter",1,"parameter used by multiple tests to change the parameters of the test");
     parse_args->Add_Option_Argument("-print_energy","print energy statistics");
-    parse_args->Add_Option_Argument("-fix_energy","fix energy");
     parse_args->Add_Option_Argument("-fully_implicit","use fully implicit forces");
     parse_args->Add_Option_Argument("-fully_explicit","use fully explicit forces");
     parse_args->Add_Option_Argument("-half_fully_implicit","use fully implicit forces for position update");

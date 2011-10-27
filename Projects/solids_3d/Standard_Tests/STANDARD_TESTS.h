@@ -262,7 +262,6 @@ void Register_Options()
     parse_args->Add_Option_Argument("-binding_springs","use binding springs for drift particles");
     parse_args->Add_Option_Argument("-velocity_prune","turn on velocity culling for collision pairs");
     parse_args->Add_Integer_Argument("-totalloops",0,"","set total loops");
-    parse_args->Add_String_Argument("-example","","example name");
     parse_args->Add_Option_Argument("-noattractions","disable attractions on repulsion pair inversions");
     parse_args->Add_Double_Argument("-attractionthreshold",-.3,"","threshold for attractions of inverted repulsion pairs");
     parse_args->Add_Double_Argument("-clothcfl",4.,"Cloth CFL");
@@ -277,8 +276,8 @@ void Register_Options()
     parse_args->Add_Option_Argument("-extra_cg","use extra projected cg for position update");
     parse_args->Add_Option_Argument("-no_friction","no friction");
     parse_args->Add_Integer_Argument("-projection_iterations",1,"number of iterations used for projection in cg");
-    parse_args->Add_Option_Argument("-be_position_update","use backward euler for position update");
     parse_args->Add_Option_Argument("-substitute_springs","instead of finite volume, use springs");
+    parse_args->Add_Integer_Argument("-solver_iterations",1,"number of iterations used for solids system");
 }
 //#####################################################################
 // Function Parse_Options
@@ -341,7 +340,6 @@ void Parse_Options()
     use_axial=parse_args->Get_Option_Value("-use_axial");
     solids_parameters.use_projections_in_position_update=parse_args->Get_Option_Value("-extra_cg");
     solids_parameters.implicit_solve_parameters.cg_projection_iterations=parse_args->Get_Integer_Value("-projection_iterations");
-    solids_parameters.use_backward_euler_position_update=parse_args->Is_Value_Set("-be_position_update");
     substitute_springs=parse_args->Get_Option_Value("-substitute_springs");
 
     switch(test_number){
@@ -648,6 +646,8 @@ void Parse_Options()
     if(parse_args->Get_Option_Value("-no_friction")){
         solids_parameters.no_contact_friction=true;
         solids_parameters.triangle_collision_parameters.self_collision_friction_coefficient=(T)0;}
+
+    if(parse_args->Is_Value_Set("-solver_iterations")) solids_parameters.implicit_solve_parameters.cg_iterations=parse_args->Get_Integer_Value("-solver_iterations");
     
     solids_parameters.triangle_collision_parameters.output_interaction_pairs=parse_args->Get_Option_Value("-printpairs");
     solids_parameters.implicit_solve_parameters.spectral_analysis=parse_args->Get_Option_Value("-spectrum");

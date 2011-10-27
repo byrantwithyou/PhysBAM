@@ -142,7 +142,6 @@ void Register_Options()
     parse_args->Add_Double_Argument("-stiffen",1,"","stiffness multiplier for various tests");
     parse_args->Add_Option_Argument("-noself","disable self-collisions");
     parse_args->Add_Integer_Argument("-side_panels",INT_MAX,"Cloth side panels");
-    parse_args->Add_String_Argument("-example","","example name");
     parse_args->Add_Double_Argument("-clothcfl",4.,"Cloth CFL");
     parse_args->Add_Double_Argument("-hittime",1,"time required for splat");
     parse_args->Add_Option_Argument("-hires","use high resolution objects");
