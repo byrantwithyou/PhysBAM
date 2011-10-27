@@ -142,8 +142,8 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Option_Argument("-use_be","use backward euler");
     parse_args->Add_Option_Argument("-print_matrix");
     parse_args->Add_Option_Argument("-project_nullspace","project out nullspace");
-    parse_args->Add_Integer_Argument("-projection_iterations",1,"number of iterations used for projection in cg");
-    parse_args->Add_Integer_Argument("-solver_iterations",1,"number of iterations used for solids system");
+    parse_args->Add_Integer_Argument("-projection_iterations",5,"number of iterations used for projection in cg");
+    parse_args->Add_Integer_Argument("-solver_iterations",1000,"number of iterations used for solids system");
 }
 //#####################################################################
 // Function Parse_Options
@@ -331,6 +331,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(8,4))));
             tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(12,4))));
             tests.Add_Ground();
+            break;}
         case 15:{
             tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,1.2))));
             tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,2.4))));
