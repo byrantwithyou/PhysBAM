@@ -28,7 +28,7 @@ TRIANGLE_COLLISION_PARAMETERS()
     collisions_disable_repulsions_based_on_proximity_factor((T)1.5),collisions_output_repulsion_results(false),collisions_output_collision_results(true),collisions_output_number_checked(true),
     self_collision_friction_coefficient((T).4),collisions_nonrigid_collision_attempts(3),use_new_triangle_hierarchy(false),
     use_sort_for_new_triangle_hierarchy(false),perform_per_time_step_repulsions(true),perform_per_collision_step_repulsions(false),output_interaction_pairs(false),
-    perform_repulsion_pair_attractions(true),repulsion_pair_attractions_threshold((T)-2),use_gauss_jacobi(false),use_combined_collisions(false)
+    perform_repulsion_pair_attractions(true),repulsion_pair_attractions_threshold((T)-2),use_gauss_jacobi(false)
 {
 }
 //#####################################################################

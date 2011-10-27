@@ -273,11 +273,7 @@ void Register_Options()
     parse_args->Add_Option_Argument("-use_be","use backward euler");
     parse_args->Add_Option_Argument("-print_matrix");
     parse_args->Add_Option_Argument("-project_nullspace","project out nullspace");
-    parse_args->Add_Option_Argument("-fix_energy","fix energy");
     parse_args->Add_Option_Argument("-use_axial","use axial bending springs");
-    parse_args->Add_Option_Argument("-combined_collisions","use combined collisions and contact");
-    parse_args->Add_Option_Argument("-combined_repulsions","apply repulsions in gauss jacobi collisions and contact");
-    parse_args->Add_Option_Argument("-test_combined_system","perform test system for combined collisions");
     parse_args->Add_Option_Argument("-extra_cg","use extra projected cg for position update");
     parse_args->Add_Option_Argument("-no_friction","no friction");
     parse_args->Add_Integer_Argument("-projection_iterations",1,"number of iterations used for projection in cg");
@@ -320,9 +316,6 @@ void Parse_Options()
     axial_bending_damping_multiplier=(T)parse_args->Get_Double_Value("-dampen_axial_bending");
     axial_bending_stiffness_multiplier=(T)parse_args->Get_Double_Value("-stiffen_axial_bending");
     use_forces_for_drift=parse_args->Get_Option_Value("-binding_springs");
-    solids_parameters.rigid_body_collision_parameters.use_combined_collisions=parse_args->Is_Value_Set("-combined_collisions");
-    solids_parameters.triangle_collision_parameters.use_combined_collisions=parse_args->Is_Value_Set("-combined_repulsions");
-    solids_parameters.rigid_body_collision_parameters.test_combined_system=parse_args->Is_Value_Set("-test_combined_system");
 
     print_matrix=parse_args->Is_Value_Set("-print_matrix");
     

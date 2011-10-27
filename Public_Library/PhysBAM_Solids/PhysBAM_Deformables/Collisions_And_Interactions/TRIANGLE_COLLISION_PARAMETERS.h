@@ -49,7 +49,6 @@ public:
     bool perform_repulsion_pair_attractions;
     T repulsion_pair_attractions_threshold;
     bool use_gauss_jacobi;
-    bool use_combined_collisions;
 
     TRIANGLE_COLLISION_PARAMETERS();
     virtual ~TRIANGLE_COLLISION_PARAMETERS();

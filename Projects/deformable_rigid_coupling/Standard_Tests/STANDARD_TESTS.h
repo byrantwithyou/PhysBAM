@@ -202,8 +202,6 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Option_Argument("-print_energy","print energy statistics");
     parse_args->Add_Option_Argument("-fully_implicit","use fully implicit forces");
     parse_args->Add_Option_Argument("-project_nullspace","project out nullspace");
-    parse_args->Add_Option_Argument("-combined_collisions","use combined collisions and contact");
-    parse_args->Add_Option_Argument("-test_combined_system","perform test system for combined collisions");
     parse_args->Add_Option_Argument("-binding_springs","use binding springs for drift particles");
 }
 //#####################################################################
@@ -222,8 +220,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
     solid_body_collection.print_energy=parse_args->Get_Option_Value("-print_energy");
     fully_implicit=parse_args->Is_Value_Set("-fully_implicit");
     if(parse_args->Is_Value_Set("-project_nullspace")) solids_parameters.implicit_solve_parameters.project_nullspace_frequency=1;
-    solids_parameters.rigid_body_collision_parameters.use_combined_collisions=parse_args->Is_Value_Set("-combined_collisions");
-    solids_parameters.rigid_body_collision_parameters.test_combined_system=parse_args->Is_Value_Set("-test_combined_system");
     use_forces_for_drift=parse_args->Get_Option_Value("-binding_springs");
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}

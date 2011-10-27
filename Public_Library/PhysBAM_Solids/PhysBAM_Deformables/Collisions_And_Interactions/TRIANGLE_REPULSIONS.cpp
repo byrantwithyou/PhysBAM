@@ -11,7 +11,6 @@
 #include <PhysBAM_Tools/Log/DEBUG_PRINT.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/Robust_Arithmetic.h>
-#include <PhysBAM_Tools/Ordinary_Differential_Equations/COMBINED_COLLISIONS.h>
 #include <PhysBAM_Tools/Read_Write/Arrays/READ_WRITE_ARRAY.h>
 #include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
 #include <PhysBAM_Geometry/Basic_Geometry/POINT_2D.h>
@@ -22,9 +21,6 @@
 #include <PhysBAM_Geometry/Spatial_Acceleration/TRIANGLE_HIERARCHY.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/BINDING_LIST.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/SOFT_BINDINGS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/COMBINED_COLLISIONS_DEFORMABLE_IMPULSE.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/COMBINED_COLLISIONS_EDGE_EDGE.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/COMBINED_COLLISIONS_POINT_FACE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/STRUCTURE_INTERACTION_GEOMETRY.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS.h>
@@ -83,7 +79,6 @@ Initialize(TRIANGLE_COLLISION_PARAMETERS<TV>& triangle_collision_parameters)
     youngs_modulus=triangle_collision_parameters.repulsions_youngs_modulus;
     spring_limiter_fraction=triangle_collision_parameters.repulsions_limiter_fraction;
     Set_Gauss_Jacobi(triangle_collision_parameters.use_gauss_jacobi);
-    Set_Use_Combined_Collisions(triangle_collision_parameters.use_combined_collisions);
 }
 //#####################################################################
 // Function Clamp_Repulsion_Thickness_With_Meshes
@@ -329,9 +324,6 @@ Apply_Repulsions_To_Velocities(const T dt,T_ARRAY1& point_face_interaction_pairs
 {
     int repulsions=0;
 
-    //if(use_gauss_jacobi) return Use_Combined_Collisions(dt,use_saved_pairs);
-    if(use_combined_collisions) return 0;
-
     if(compute_point_face_friction){
         Adjust_Velocity_For_Point_Face_Repulsion(dt,point_face_interaction_pairs,use_repulsions,true,use_repulsions); // if not using repulsions, only do friction for inelastic component
         repulsions+=point_face_interaction_pairs.Size();
@@ -415,21 +407,6 @@ Apply_Repulsions_To_Velocities(const T dt,T_ARRAY1& point_face_boundary_pairs,T_
             repulsions+=applied_repulsions;
             if(output_repulsion_results) LOG::Stat("total edge edge repulsion",applied_repulsions);}}
     return repulsions;
-}
-//#####################################################################
-// Function Use_Combined_Collisions
-//#####################################################################
-template<class TV> int TRIANGLE_REPULSIONS<TV>::
-Use_Combined_Collisions(const T dt,bool use_saved_pairs)
-{
-    COMBINED_COLLISIONS_DEFORMABLE_IMPULSE<TV> combined_collisions_deformable_impulse(geometry.deformable_body_collection);
-    COMBINED_COLLISIONS_POINT_FACE<TV> combined_collisions_pf(*this,!use_saved_pairs); // true
-    COMBINED_COLLISIONS_EDGE_EDGE<TV> combined_collisions_ee(*this,!use_saved_pairs); // true
-    COMBINED_COLLISIONS<TV> combined_collisions(&combined_collisions_deformable_impulse);
-    combined_collisions.Add_Collider(&combined_collisions_pf);
-    combined_collisions.Add_Collider(&combined_collisions_ee);
-    combined_collisions.Solve(dt,0,1); // 3 iterations
-    return 0;
 }
 //#####################################################################
 // Function Get_Faces_Near_Points

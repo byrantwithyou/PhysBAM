@@ -6,7 +6,6 @@
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <PhysBAM_Tools/Data_Structures/STACK.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
-#include <PhysBAM_Tools/Ordinary_Differential_Equations/COMBINED_COLLISIONS.h>
 #include <PhysBAM_Geometry/Basic_Geometry/BOUNDED_HORIZONTAL_PLANE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include <PhysBAM_Geometry/Collision_Detection/COLLISION_GEOMETRY_SPATIAL_PARTITION.h>
@@ -24,8 +23,6 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_2D.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_3D.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/COMBINED_COLLISIONS_RIGID.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/COMBINED_COLLISIONS_RIGID_IMPULSE.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_BODY_COLLISION_MANAGER.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_BODY_COLLISIONS.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_BODY_CONTACT_GRAPH.h>
@@ -1095,10 +1092,6 @@ template<class TV> void RIGID_BODY_COLLISIONS<TV>::
 Add_Elastic_Collisions(const T dt,const T time)
 {
     skip_collision_check.Reset();pairs_processed_by_collisions.Remove_All();
-    PHYSBAM_ASSERT(!parameters.use_combined_collisions || !mpi_rigids);
-    if(parameters.use_combined_collisions)
-        return Use_Combined_Collisions(dt,time,false,false);
-
     LOG::SCOPE scope("rigid body collisions");
     skip_collision_check.Reset();pairs_processed_by_collisions.Remove_All();
     rigid_body_particle_intersections.Remove_All();
@@ -1140,9 +1133,6 @@ Add_Elastic_Collisions(const T dt,const T time)
 template<class TV> void RIGID_BODY_COLLISIONS<TV>::
 Process_Contact_Using_Graph(const T dt,const T time,ARTICULATED_RIGID_BODY<TV>* articulated_rigid_body,const bool correct_contact_energy,const bool use_saved_pairs)
 {
-    if(parameters.use_combined_collisions)
-        return Use_Combined_Collisions(dt,time,true,use_saved_pairs);
-
     LOG::SCOPE scope("rigid body contact");
 
     SOLVE_CONTACT::Solve(*this,collision_callbacks,rigid_body_collection,parameters,correct_contact_energy,use_saved_pairs,dt,time,mpi_rigids,mpi_rigid_velocity_save,mpi_rigid_angular_momentum_save);
@@ -1345,19 +1335,6 @@ Create_Contact_Joint(const RIGID_BODY<TV>& parent,const RIGID_BODY<TV>& child,co
     joint->Set_Child_To_Joint_Frame(J.Inverse_Times(child.Frame()));
 
     contact_joints.Append(joint->id_number);
-}
-//#####################################################################
-// Function Use_Combined_Collisions
-//#####################################################################
-template<class TV> void RIGID_BODY_COLLISIONS<TV>::
-Use_Combined_Collisions(const T dt,const T time,const bool contact,bool use_saved_pairs)
-{
-    COMBINED_COLLISIONS_RIGID_IMPULSE<TV> combined_collisions_rigid_impulse(rigid_body_collection,*this,!contact);
-    COMBINED_COLLISIONS_RIGID<TV> combined_collisions_rigid(*this,!contact,use_saved_pairs);
-    COMBINED_COLLISIONS<TV> combined_collisions(&combined_collisions_rigid_impulse);
-    combined_collisions.test_system=parameters.test_combined_system;
-    combined_collisions.Add_Collider(&combined_collisions_rigid);
-    combined_collisions.Solve(dt,time,1);
 }
 //#####################################################################
 template class RIGID_BODY_COLLISIONS<VECTOR<float,1> >;

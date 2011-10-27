@@ -9,8 +9,6 @@
 #include <PhysBAM_Tools/Nonlinear_Equations/ITERATIVE_SOLVER.h>
 #include <PhysBAM_Tools/Nonlinear_Equations/LINE_SEARCH.h>
 #include <PhysBAM_Tools/Nonlinear_Equations/NONLINEAR_FUNCTION.h>
-#include <PhysBAM_Tools/Ordinary_Differential_Equations/COMBINED_COLLISIONS_NONLINEAR_FUNCTION.h>
-#include <PhysBAM_Tools/Ordinary_Differential_Equations/COMBINED_COLLISIONS_PARAMETER_SPACE.h>
 #include <cfloat>
 #include <cmath>
 using namespace PhysBAM;

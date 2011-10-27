@@ -46,8 +46,6 @@ public:
     bool enforce_rigid_rigid_contact_in_cg;
     bool perform_collisions;
     bool perform_contact;
-    bool use_combined_collisions;
-    bool test_combined_system;
     bool use_projected_gauss_seidel;
     T contact_proximity;
     T projected_gauss_seidel_tolerance;

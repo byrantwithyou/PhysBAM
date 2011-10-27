@@ -172,7 +172,6 @@ public:
     void Get_Bounding_Box_Collision_Pairs_Of_Body(ARRAY<VECTOR<int,2> >& pairs,int id,const T thickness=0);
     void Get_Bounding_Box_Collision_Pairs(const T dt,const T time,ARRAY<VECTOR<int,2> >& pairs,const bool add_contact_pairs,const bool reinitialize_spatial_partition,const T thickness=0);
     void Euler_Step_Position(const int id,const T dt,const T time);
-    void Use_Combined_Collisions(const T dt,const T time,const bool contact,bool use_saved_pairs);
 
     void Apply_Prestabilization_To_Joint(const T dt,const T time,ARTICULATED_RIGID_BODY<TV>& articulated_rigid_body,const JOINT_ID joint_id,const T epsilon_scale);
     void Set_Level_Temporarily_Static(const int level);

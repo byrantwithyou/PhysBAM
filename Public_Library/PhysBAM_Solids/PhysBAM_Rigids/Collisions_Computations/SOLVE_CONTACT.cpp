@@ -61,10 +61,6 @@ void Solve(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,RIGIDS_COLLISION_CAL
 
         HASHTABLE<VECTOR<std::string,2>,typename ANALYTICS<TV>::UPDATE_ANALYTIC_CONTACT_PAIR_T> analytic_contact_registry;
         if(parameters.use_analytic_collisions){Register_Analytic_Contacts<TV>(analytic_contact_registry);}
-        PHYSBAM_ASSERT(!parameters.use_combined_collisions || !mpi_rigids);
-
-        if(parameters.use_combined_collisions)
-            return rigid_body_collisions.Use_Combined_Collisions(dt,time,true,use_saved_pairs);
 
         ARTICULATED_RIGID_BODY<TV>* articulated_rigid_body=&rigid_body_collisions.rigid_body_collection.articulated_rigid_body;
         rigid_body_collisions.skip_collision_check.Reset();bool need_another_iteration=true;int iteration=0;T epsilon_scale=1;

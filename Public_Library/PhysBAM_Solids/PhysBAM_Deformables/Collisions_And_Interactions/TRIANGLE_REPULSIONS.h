@@ -172,7 +172,6 @@ public:
     ARRAY<VECTOR<T,2*d-2> > ee_target_weights;
     ARRAY<T> ee_old_speeds;
     ARRAY<TV> ee_normals;
-    bool use_combined_collisions;
 
     TRIANGLE_REPULSIONS(TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY<TV>& geometry);
     ~TRIANGLE_REPULSIONS();
@@ -224,9 +223,6 @@ public:
     void Set_Gauss_Jacobi(const bool use_gauss_jacobi_input=false)
     {use_gauss_jacobi=use_gauss_jacobi_input;}
 
-    void Set_Use_Combined_Collisions(const bool use_combined_collisions_input=false)
-    {use_combined_collisions=use_combined_collisions_input;}
-
     static void Project_All_Moving_Constraints(const ARRAY<PRECOMPUTE_PROJECT_POINT_FACE<VECTOR<T,1> > >& point_face_precomputed,
         const ARRAY<PRECOMPUTE_PROJECT_EDGE_EDGE<VECTOR<T,1> > >& edge_edge_precomputed,ARRAY_VIEW<VECTOR<T,1> > field){}
 
@@ -255,7 +251,6 @@ public:
         const bool use_repulsions,bool use_saved_pairs);
     template<class T_ARRAY1,class T_ARRAY2> int Apply_Repulsions_To_Velocities(const T dt,T_ARRAY1& point_face_boundary_pairs,T_ARRAY2& edge_edge_boundary_pairs,
         T_ARRAY1& point_face_internal_pairs,T_ARRAY2& edge_edge_internal_pairs,const bool use_repulsions);
-    int Use_Combined_Collisions(const T dt,bool use_saved_pairs);
     void Output_Interaction_Pairs(const STREAM_TYPE stream_type,const std::string& filename) const;
     static void Project_All_Moving_Constraints(const ARRAY<PRECOMPUTE_PROJECT_POINT_FACE<VECTOR<T,3> > >& point_face_precomputed,
         const ARRAY<PRECOMPUTE_PROJECT_EDGE_EDGE<VECTOR<T,3> > >& edge_edge_precomputed,ARRAY_VIEW<VECTOR<T,3> >& field);

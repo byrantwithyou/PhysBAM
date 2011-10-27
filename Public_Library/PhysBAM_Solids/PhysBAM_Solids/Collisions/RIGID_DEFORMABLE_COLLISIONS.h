@@ -81,7 +81,6 @@ public:
     void Process_Precomputed_Contact_With_Rigid_Bodies();
     void Apply_Rigid_Deformable_Collision_Impulse(RIGID_BODY<TV>& rigid_body,const int particle,const TV& location,const TV& normal,const TV& relative_velocity,const T coefficient_of_restitution,
         const T coefficient_of_friction,const bool clamp_friction_magnitude,TV& impulse,bool allow_pull=false,bool apply_impulse=true);
-    void Use_Combined_Collisions(ARRAY_VIEW<const TV> X_save,const T dt,const T time,const bool contact,bool use_saved_pairs);
 private:
     void Get_Rigid_And_Tetrahedron_Collision_Bodies();
     bool Update_Rigid_Deformable_Collision_Pair(RIGID_BODY<TV>& rigid_body,const int particle_index,const T dt,const T time,ARRAY<TV>& X_save,ARRAY<TV>& V_save,ARRAY<TV>& rigid_X_save,

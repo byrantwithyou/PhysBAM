@@ -10,7 +10,6 @@
 #include <PhysBAM_Tools/Log/DEBUG_SUBSTEPS.h>
 #include <PhysBAM_Tools/Math_Tools/clamp.h>
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
-#include <PhysBAM_Tools/Ordinary_Differential_Equations/COMBINED_COLLISIONS.h>
 #include <PhysBAM_Tools/Vectors/Dot_Product.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include <PhysBAM_Geometry/Collision_Detection/COLLISION_GEOMETRY_SPATIAL_PARTITION.h>
@@ -24,8 +23,6 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/LINEAR_BINDING.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/SOFT_BINDINGS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/COMBINED_COLLISIONS_EDGE_EDGE.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/COMBINED_COLLISIONS_POINT_FACE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISION_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISIONS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TETRAHEDRON_COLLISION_BODY.h>
@@ -34,7 +31,6 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_2D.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_3D.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/COMBINED_COLLISIONS_RIGID.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_BODY_COLLISION_MANAGER.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_BODY_COLLISIONS.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_BODY_CONTACT_GRAPH.h>
@@ -49,7 +45,6 @@
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Body_Clusters/RIGID_BODY_CLUSTER_BINDINGS.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Collisions/COMBINED_COLLISIONS_COUPLED.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Collisions/RIGID_DEFORMABLE_COLLISIONS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
@@ -361,9 +356,6 @@ Add_Elastic_Collisions(const T dt,const T time,ARRAY<ROTATION<TV> >& rigid_rotat
         solid_body_collection.collision_body_list.Update_Spatial_Partition(solids_parameters.deformable_object_collision_parameters.spatial_partition_voxel_size_heuristic,
             solids_parameters.deformable_object_collision_parameters.spatial_partition_number_of_cells,solids_parameters.deformable_object_collision_parameters.spatial_partition_voxel_size_scale_factor);
 
-    if(solids_parameters.rigid_body_collision_parameters.use_combined_collisions)
-        return Use_Combined_Collisions(X_save,dt,time,false,false);
-
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
 
     const bool kinematic_rigid_bodies_only=solid_body_collection.rigid_body_collection.simulated_rigid_body_particles.m==0;
@@ -605,9 +597,6 @@ Process_Contact(const T dt,const T time,ARTICULATED_RIGID_BODY<TV>* articulated_
     RIGID_BODY_SKIP_COLLISION_CHECK& skip_collision_check=rigid_body_collisions.skip_collision_check;
     if(!use_saved_pairs) particles_contacting_rigid_body.Remove_All();
     skip_collision_check.Reset();
-    if(solids_parameters.rigid_body_collision_parameters.use_combined_collisions)
-        return Use_Combined_Collisions(X_save,dt,time,true,use_saved_pairs);
-
     bool do_dr=!use_existing_contact || !solids_parameters.rigid_body_collision_parameters.use_persistant_contact;
 
     // TODO: handle soft bound particles
@@ -1269,26 +1258,6 @@ Process_Push_Out()
     solid_body_collection.deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Velocities(); // TODO: necessary?
     solid_body_collection.deformable_body_collection.soft_bindings.Clamp_Particles_To_Embedded_Positions(true);
     solid_body_collection.deformable_body_collection.soft_bindings.Clamp_Particles_To_Embedded_Velocities(true);
-}
-//#####################################################################
-// Function Use_Combined_Collisions
-//#####################################################################
-template<class TV> void RIGID_DEFORMABLE_COLLISIONS<TV>::
-Use_Combined_Collisions(ARRAY_VIEW<const TV> X_save,const T dt,const T time,const bool contact,bool use_saved_pairs)
-{
-    COMBINED_COLLISIONS_COUPLED_IMPULSE<TV> combined_collisions_coupled_impulse(solid_body_collection,rigid_body_collisions,!contact);
-    COMBINED_COLLISIONS_RIGID<TV> combined_collisions_rigid(rigid_body_collisions,!contact,use_saved_pairs);
-    COMBINED_COLLISIONS_COUPLED<TV> combined_collisions_coupled(*this,X_save,!contact,use_saved_pairs);
-    COMBINED_COLLISIONS_POINT_FACE<TV> combined_collisions_point_face(solid_body_collection.deformable_body_collection.triangle_repulsions,!contact || !use_saved_pairs);
-    COMBINED_COLLISIONS_EDGE_EDGE<TV> combined_collisions_edge_edge(solid_body_collection.deformable_body_collection.triangle_repulsions,!contact || !use_saved_pairs);
-    COMBINED_COLLISIONS<TV> combined_collisions(&combined_collisions_coupled_impulse);
-    combined_collisions.test_system=solids_parameters.rigid_body_collision_parameters.test_combined_system;
-    combined_collisions.Add_Collider(&combined_collisions_rigid);
-    combined_collisions.Add_Collider(&combined_collisions_coupled);
-    if(solids_parameters.triangle_collision_parameters.use_combined_collisions){
-        combined_collisions.Add_Collider(&combined_collisions_point_face);
-        combined_collisions.Add_Collider(&combined_collisions_edge_edge);}
-    combined_collisions.Solve(dt,time,1);
 }
 //#####################################################################
 template class RIGID_DEFORMABLE_COLLISIONS<VECTOR<float,1> >;

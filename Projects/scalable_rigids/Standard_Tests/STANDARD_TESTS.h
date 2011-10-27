@@ -89,8 +89,6 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Integer_Argument("-parameter",0,"parameter used by multiple tests to change the parameters of the test");
     parse_args->Add_Option_Argument("-noanalytic","disable analytic collisions");
     parse_args->Add_Option_Argument("-print_energy","print energy statistics");
-    parse_args->Add_Option_Argument("-combined_collisions","use combined collisions and contact");
-    parse_args->Add_Option_Argument("-test_combined_system","perform test system for combined collisions");
 }
 //#####################################################################
 // Function Parse_Options
@@ -104,8 +102,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
     if(parameter) output_directory+=STRING_UTILITIES::string_sprintf("_param%i",parameter);
     solids_parameters.rigid_body_collision_parameters.use_analytic_collisions=!parse_args->Get_Option_Value("-noanalytic");
     solid_body_collection.rigid_body_collection.print_energy=parse_args->Get_Option_Value("-print_energy");
-    solids_parameters.rigid_body_collision_parameters.use_combined_collisions=parse_args->Is_Value_Set("-combined_collisions");
-    solids_parameters.rigid_body_collision_parameters.test_combined_system=parse_args->Is_Value_Set("-test_combined_system");
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 //#####################################################################
