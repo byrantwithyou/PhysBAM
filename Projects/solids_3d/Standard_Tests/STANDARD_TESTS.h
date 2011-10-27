@@ -275,9 +275,9 @@ void Register_Options()
     parse_args->Add_Option_Argument("-use_axial","use axial bending springs");
     parse_args->Add_Option_Argument("-extra_cg","use extra projected cg for position update");
     parse_args->Add_Option_Argument("-no_friction","no friction");
-    parse_args->Add_Integer_Argument("-projection_iterations",1,"number of iterations used for projection in cg");
+    parse_args->Add_Integer_Argument("-projection_iterations",5,"number of iterations used for projection in cg");
     parse_args->Add_Option_Argument("-substitute_springs","instead of finite volume, use springs");
-    parse_args->Add_Integer_Argument("-solver_iterations",1,"number of iterations used for solids system");
+    parse_args->Add_Integer_Argument("-solver_iterations",1000,"number of iterations used for solids system");
 }
 //#####################################################################
 // Function Parse_Options
