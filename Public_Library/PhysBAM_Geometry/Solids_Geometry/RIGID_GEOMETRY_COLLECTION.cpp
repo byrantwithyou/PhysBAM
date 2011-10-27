@@ -37,22 +37,29 @@ struct ALLOCATE_GEOMETRY_HELPER:public ALLOCATE_HELPER<TV>
 template<class TV> RIGID_GEOMETRY_COLLECTION<TV>::
 RIGID_GEOMETRY_COLLECTION(RIGID_GEOMETRY_PARTICLES<TV>& particles_input,RIGID_GEOMETRY_EXAMPLE_VELOCITIES<TV>* rigid_geometry_example_velocities_input,
     COLLISION_GEOMETRY_COLLECTION<TV>* collision_body_list_input,ALLOCATE_HELPER<TV>* allocate_helper_input)
-    :particles(particles_input),collision_body_list(collision_body_list_input),structure_list(*new STRUCTURE_LIST<TV,int>),always_create_structure(false),structure_hash(*new HASHTABLE<std::string,int>),frame_list_key(0),
-    frame_list_active(0),check_stale(false),last_read_key(-1),last_read_active(-1),allocate_helper(allocate_helper_input),rigid_geometry_example_velocities(rigid_geometry_example_velocities_input),owns_particles(false)
+    :particles(particles_input),collision_body_list(collision_body_list_input),structure_list(*new STRUCTURE_LIST<TV,int>),always_create_structure(false),
+    structure_hash(*new HASHTABLE<std::string,int>),frame_list_key(0),frame_list_active(0),check_stale(false),last_read_key(-1),last_read_active(-1),
+    allocate_helper(allocate_helper_input),rigid_geometry_example_velocities(rigid_geometry_example_velocities_input),owns_particles(false),owns_collision_body_list(false)
 {
     if(!allocate_helper) allocate_helper=new ALLOCATE_GEOMETRY_HELPER<TV>(*this);
-    if(!collision_body_list) collision_body_list=new COLLISION_GEOMETRY_COLLECTION<TV>();
+    if(!collision_body_list){
+        collision_body_list=new COLLISION_GEOMETRY_COLLECTION<TV>();
+        owns_collision_body_list=true;}
 }
 //#####################################################################
 // Constructor
 //#####################################################################
 template<class TV> RIGID_GEOMETRY_COLLECTION<TV>::
-RIGID_GEOMETRY_COLLECTION(RIGID_GEOMETRY_EXAMPLE_VELOCITIES<TV>* rigid_geometry_example_velocities_input,COLLISION_GEOMETRY_COLLECTION<TV>* collision_body_list_input,ALLOCATE_HELPER<TV>* allocate_helper_input)
-    :particles(*new RIGID_GEOMETRY_PARTICLES<TV>()),collision_body_list(collision_body_list_input),structure_list(*new STRUCTURE_LIST<TV,int>),always_create_structure(false),structure_hash(*new HASHTABLE<std::string,int>),
-    frame_list_key(0),frame_list_active(0),check_stale(false),last_read_key(-1),last_read_active(-1),allocate_helper(allocate_helper_input),rigid_geometry_example_velocities(rigid_geometry_example_velocities_input),owns_particles(true)
+RIGID_GEOMETRY_COLLECTION(RIGID_GEOMETRY_EXAMPLE_VELOCITIES<TV>* rigid_geometry_example_velocities_input,COLLISION_GEOMETRY_COLLECTION<TV>* collision_body_list_input,
+    ALLOCATE_HELPER<TV>* allocate_helper_input)
+    :particles(*new RIGID_GEOMETRY_PARTICLES<TV>()),collision_body_list(collision_body_list_input),structure_list(*new STRUCTURE_LIST<TV,int>),always_create_structure(false),
+    structure_hash(*new HASHTABLE<std::string,int>),frame_list_key(0),frame_list_active(0),check_stale(false),last_read_key(-1),last_read_active(-1),
+    allocate_helper(allocate_helper_input),rigid_geometry_example_velocities(rigid_geometry_example_velocities_input),owns_particles(true),owns_collision_body_list(false)
 {
     if(!allocate_helper) allocate_helper=new ALLOCATE_GEOMETRY_HELPER<TV>(*this);
-    if(!collision_body_list) collision_body_list=new COLLISION_GEOMETRY_COLLECTION<TV>();
+    if(!collision_body_list){
+        collision_body_list=new COLLISION_GEOMETRY_COLLECTION<TV>();
+        owns_collision_body_list=true;}
 }
 //#####################################################################
 // Destructor
@@ -62,6 +69,7 @@ template<class TV> RIGID_GEOMETRY_COLLECTION<TV>::
 {
     if(owns_particles) delete &particles;
     delete &structure_hash;delete allocate_helper;delete &structure_list;
+    if(owns_collision_body_list) delete collision_body_list;
 }
 //#####################################################################
 // Function Exists

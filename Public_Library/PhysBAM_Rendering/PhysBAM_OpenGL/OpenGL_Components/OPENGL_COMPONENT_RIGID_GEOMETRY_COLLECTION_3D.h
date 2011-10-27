@@ -49,14 +49,14 @@ protected:
 public:
     RIGID_GEOMETRY_COLLECTION<TV>* rigid_geometry_collection;
     ARRAY<OPENGL_COLOR,int> opengl_colors;
-    ARRAY<OPENGL_TRIANGULATED_SURFACE<T>*,int> opengl_triangulated_surface;
+    ARRAY<OPENGL_TRIANGULATED_SURFACE<T>*> opengl_triangulated_surface;
 protected:
-    ARRAY<OPENGL_TETRAHEDRALIZED_VOLUME<T>*,int> opengl_tetrahedralized_volume;
-    ARRAY<OPENGL_LEVELSET_MULTIVIEW<T,RW>*,int> opengl_levelset;
-    ARRAY<OPENGL_TRIANGULATED_SURFACE<T>*,int> opengl_octree_levelset_surface;
-    ARRAY<OPENGL_AXES<T>*,int> opengl_axes;
-    ARRAY<bool,int> draw_object;
-    ARRAY<bool,int> use_object_bounding_box;
+    ARRAY<OPENGL_TETRAHEDRALIZED_VOLUME<T>*> opengl_tetrahedralized_volume;
+    ARRAY<OPENGL_LEVELSET_MULTIVIEW<T,RW>*> opengl_levelset;
+    ARRAY<OPENGL_TRIANGULATED_SURFACE<T>*> opengl_octree_levelset_surface;
+    ARRAY<OPENGL_AXES<T>*> opengl_axes;
+    ARRAY<bool> draw_object;
+    ARRAY<bool> use_object_bounding_box;
     ARRAY<VECTOR<T,3> > positions;
     ARRAY<VECTOR<T,3> > velocity_vectors;
     ARRAY<VECTOR<T,3> > angular_velocity_vectors;

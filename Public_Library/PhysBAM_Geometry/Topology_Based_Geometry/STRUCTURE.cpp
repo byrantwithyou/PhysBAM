@@ -3,12 +3,11 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Log/LOG.h>
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 #include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
-#endif
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Registry/STRUCTURE_REGISTRY.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/STRUCTURE.h>
+#include <climits>
 using namespace PhysBAM;
 //#####################################################################
 template<class TV> STRUCTURE<TV>& Representative(const std::string& name);

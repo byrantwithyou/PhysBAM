@@ -27,6 +27,9 @@ WATER_STANDARD_TESTS_2D(SOLIDS_FLUIDS_EXAMPLE<TV>& example,FLUIDS_PARAMETERS<T_G
     neumann_boundary_slip_multiplier(0),ballistic_particles_as_percentage_of_target((T).03),particle_targeting_time(1),test_number(0),sphere(0)
 {
 }
+//#####################################################################
+// Function Initialize
+//#####################################################################
 template<class T_GRID> void WATER_STANDARD_TESTS_2D<T_GRID>::
 Initialize(const int test_number_input,const int resolution)
 {

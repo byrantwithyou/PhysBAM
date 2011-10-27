@@ -26,7 +26,7 @@ namespace{
 // Constructor
 //#####################################################################
 BASIC_VISUALIZATION::BASIC_VISUALIZATION() 
-    :opengl_window_title("OpenGL Visualization"),add_axes(true),selection_enabled(true),current_selection(0)
+    :opengl_axes(0),opengl_window_title("OpenGL Visualization"),add_axes(true),selection_enabled(true),current_selection(0)
 {
     the_visualization=this;
 }
@@ -36,6 +36,7 @@ BASIC_VISUALIZATION::BASIC_VISUALIZATION()
 BASIC_VISUALIZATION::~BASIC_VISUALIZATION() 
 {
     for(int i=owned_components.m;i>=1;i--) delete owned_components(i);
+    delete opengl_axes;
 }
 //#####################################################################
 // Function Initialize
@@ -249,8 +250,10 @@ Reset_Objects_In_World()
 {
     opengl_world.Clear_All_Objects();
     // Add components
-    for(int i=1;i<=component_list.m;i++)opengl_world.Add_Object(component_list(i),true,true);
-    if(add_axes) opengl_world.Add_Object(new OPENGL_AXES<float>(),false);
+    for(int i=1;i<=component_list.m;i++) opengl_world.Add_Object(component_list(i),true,true);
+    if(add_axes){
+        if(!opengl_axes) opengl_axes=new OPENGL_AXES<float>();
+        opengl_world.Add_Object(opengl_axes,false);}
 }
 //#####################################################################
 // Function Reset_View

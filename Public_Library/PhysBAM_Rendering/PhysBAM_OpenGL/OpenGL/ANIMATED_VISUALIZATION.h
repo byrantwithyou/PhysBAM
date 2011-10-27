@@ -26,7 +26,8 @@ struct CAPTURE_FRAMES_PROMPT_STATE
 class ANIMATED_VISUALIZATION : public BASIC_VISUALIZATION
 {
 public:
-            ANIMATED_VISUALIZATION();
+    ANIMATED_VISUALIZATION();
+    virtual ~ANIMATED_VISUALIZATION(){}
 
 private:
     void Capture_Frames(const std::string &filename_pattern, int capture_start_frame, int capture_end_frame=INT_MAX, int jpeg_quality=95, bool swap_buffers=true);

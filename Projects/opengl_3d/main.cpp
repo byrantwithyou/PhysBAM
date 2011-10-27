@@ -79,7 +79,7 @@ class VISUALIZATION:public ANIMATED_VISUALIZATION
     typedef VECTOR<T,3> TV;
 public:
     VISUALIZATION();
-    ~VISUALIZATION();
+    virtual ~VISUALIZATION();
 
 protected:
     virtual void Add_Arguments(PARSE_ARGS &parse_args);
@@ -604,9 +604,9 @@ Initialize_Components_And_Key_Bindings()
         slice_manager.Add_Object(sph_cell_weight_component);}
 
     opengl_world.Set_Key_Binding_Category("Pressure");
-    OPENGL_COLOR_MAP<T>* pressure_color_map=OPENGL_COLOR_RAMP<T>::Two_Color_Ramp(101635,1e7,OPENGL_COLOR::Cyan(0,0),OPENGL_COLOR::Cyan(1));
     filename=basedir+"/%d/pressure";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+        OPENGL_COLOR_MAP<T>* pressure_color_map=OPENGL_COLOR_RAMP<T>::Two_Color_Ramp(101635,1e7,OPENGL_COLOR::Cyan(0,0),OPENGL_COLOR::Cyan(1));
         OPENGL_COMPONENT_SCALAR_FIELD_3D<T>* pressure_component=new OPENGL_COMPONENT_SCALAR_FIELD_3D<T>(mac_grid,filename,pressure_color_map);
         Add_Component(pressure_component,"Pressure",'7',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
         opengl_world.Append_Bind_Key('D',pressure_component->Toggle_Color_Map_CB());
@@ -963,17 +963,15 @@ Initialize_Components_And_Key_Bindings()
         Add_Component(sph_particles_component,"SPH particles",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::SELECTABLE);
         if(slice_manager.slice) slice_manager.Add_Object(sph_particles_component);}
 
-    OPENGL_COLOR_MAP<bool>* psi_N_color_map=new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Cyan());
-    OPENGL_COLOR_MAP<bool>* psi_D_color_map=new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Magenta());
     if(has_valid_coarse_grid){
         // TODO: this is legacy output form, probably can be removed now
         OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,bool>* psi_N_component=0;
         if(FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/psi_N_u",start_frame) &&
            FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/psi_N_v",start_frame) &&
            FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/psi_N_w",start_frame))
-            psi_N_component=new OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,bool>(coarse_grid,basedir+"/%d/psi_N_u",basedir+"/%d/psi_N_v",basedir+"/%d/psi_N_w",psi_N_color_map);
+            psi_N_component=new OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,bool>(coarse_grid,basedir+"/%d/psi_N_u",basedir+"/%d/psi_N_v",basedir+"/%d/psi_N_w",new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Cyan()));
         else if(FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/coarse_psi_N",start_frame))
-            psi_N_component=new OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,bool>(coarse_grid,basedir+"/%d/coarse_psi_N",psi_N_color_map);
+            psi_N_component=new OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,bool>(coarse_grid,basedir+"/%d/coarse_psi_N",new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Cyan()));
         if(psi_N_component){
             psi_N_component->opengl_scalar_field.scale=grid.Domain_Indices().max_corner(1)/coarse_grid.Domain_Indices().max_corner(1);
             Add_Component(psi_N_component,"Coarse Psi_N points",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
@@ -985,9 +983,9 @@ Initialize_Components_And_Key_Bindings()
         if(FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/psi_N_u",start_frame) &&
            FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/psi_N_v",start_frame) &&
            FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/psi_N_w",start_frame))
-            psi_N_component=new OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,bool>(grid,basedir+"/%d/psi_N_u",basedir+"/%d/psi_N_v",basedir+"/%d/psi_N_w",psi_N_color_map);
+            psi_N_component=new OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,bool>(grid,basedir+"/%d/psi_N_u",basedir+"/%d/psi_N_v",basedir+"/%d/psi_N_w",new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Cyan()));
         else if(FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/psi_N",start_frame))
-            psi_N_component=new OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,bool>(grid,basedir+"/%d/psi_N",psi_N_color_map);
+            psi_N_component=new OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,bool>(grid,basedir+"/%d/psi_N",new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Cyan()));
         if(psi_N_component){
             Add_Component(psi_N_component,"Psi_N points",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
             opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F1),psi_N_component->Toggle_Draw_CB());
@@ -996,7 +994,7 @@ Initialize_Components_And_Key_Bindings()
 #ifndef COMPILE_WITHOUT_RLE_SUPPORT
     filename=basedir+"/%d/rle_psi_N";
     if(has_valid_rle_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_RLE_FACE_SCALAR_FIELD_3D<T,bool>* rle_psi_N_component=new OPENGL_COMPONENT_RLE_FACE_SCALAR_FIELD_3D<T,bool>(rle_grid_component->opengl_grid.grid,filename,psi_N_color_map,true);
+        OPENGL_COMPONENT_RLE_FACE_SCALAR_FIELD_3D<T,bool>* rle_psi_N_component=new OPENGL_COMPONENT_RLE_FACE_SCALAR_FIELD_3D<T,bool>(rle_grid_component->opengl_grid.grid,filename,new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Cyan()),true);
         Add_Component(rle_psi_N_component,"RLE Psi_N points",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F1),rle_psi_N_component->Toggle_Draw_CB());
         slice_manager.Add_Object(rle_psi_N_component);}
@@ -1005,7 +1003,7 @@ Initialize_Components_And_Key_Bindings()
 #ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
     filename=basedir+"/%d/octree_psi_N";
     if(has_valid_octree_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_OCTREE_FACE_SCALAR_FIELD<T,bool>* octree_psi_N_component=new OPENGL_COMPONENT_OCTREE_FACE_SCALAR_FIELD<T,bool>(octree_grid_component->opengl_grid.grid,filename,psi_N_color_map,true);
+        OPENGL_COMPONENT_OCTREE_FACE_SCALAR_FIELD<T,bool>* octree_psi_N_component=new OPENGL_COMPONENT_OCTREE_FACE_SCALAR_FIELD<T,bool>(octree_grid_component->opengl_grid.grid,filename,new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Cyan()),true);
         Add_Component(octree_psi_N_component,"Octree Psi_N points",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F1),octree_psi_N_component->Toggle_Draw_CB());
         slice_manager.Add_Object(octree_psi_N_component);}
@@ -1013,27 +1011,27 @@ Initialize_Components_And_Key_Bindings()
 
     filename=basedir+"/%d/coarse_psi_D";
     if(has_valid_coarse_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_SCALAR_FIELD_3D<T,bool>* psi_D_component=new OPENGL_COMPONENT_SCALAR_FIELD_3D<T,bool>(coarse_mac_grid,filename,psi_D_color_map,OPENGL_SCALAR_FIELD_3D<T,bool>::DRAW_POINTS);
+        OPENGL_COMPONENT_SCALAR_FIELD_3D<T,bool>* psi_D_component=new OPENGL_COMPONENT_SCALAR_FIELD_3D<T,bool>(coarse_mac_grid,filename,new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Magenta()),OPENGL_SCALAR_FIELD_3D<T,bool>::DRAW_POINTS);
         Add_Component(psi_D_component,"Psi_D points",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F2),psi_D_component->Toggle_Draw_CB());
         slice_manager.Add_Object(psi_D_component);}
     filename=basedir+"/%d/psi_D";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_SCALAR_FIELD_3D<T,bool>* psi_D_component=new OPENGL_COMPONENT_SCALAR_FIELD_3D<T,bool>(mac_grid,filename,psi_D_color_map,OPENGL_SCALAR_FIELD_3D<T,bool>::DRAW_POINTS);
+        OPENGL_COMPONENT_SCALAR_FIELD_3D<T,bool>* psi_D_component=new OPENGL_COMPONENT_SCALAR_FIELD_3D<T,bool>(mac_grid,filename,new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Magenta()),OPENGL_SCALAR_FIELD_3D<T,bool>::DRAW_POINTS);
         Add_Component(psi_D_component,"Psi_D points",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F1),psi_D_component->Toggle_Draw_CB());
         slice_manager.Add_Object(psi_D_component);}
 
     filename=basedir+"/%d/maccormack_cell_mask";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_SCALAR_FIELD_3D<T,bool>* maccormack_cell_mask_component=new OPENGL_COMPONENT_SCALAR_FIELD_3D<T,bool>(mac_grid,filename,psi_D_color_map,OPENGL_SCALAR_FIELD_3D<T,bool>::DRAW_POINTS);
+        OPENGL_COMPONENT_SCALAR_FIELD_3D<T,bool>* maccormack_cell_mask_component=new OPENGL_COMPONENT_SCALAR_FIELD_3D<T,bool>(mac_grid,filename,new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Magenta()),OPENGL_SCALAR_FIELD_3D<T,bool>::DRAW_POINTS);
         Add_Component(maccormack_cell_mask_component,"Maccormack cell mask points",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F9),maccormack_cell_mask_component->Toggle_Draw_CB());
         slice_manager.Add_Object(maccormack_cell_mask_component);}
 
     filename=basedir+"/%d/maccormack_face_mask";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,bool>* maccormack_face_mask_component=new OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,bool>(grid,filename,psi_N_color_map);
+        OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,bool>* maccormack_face_mask_component=new OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,bool>(grid,filename,new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Cyan()));
         Add_Component(maccormack_face_mask_component,"Maccormack face mask points",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F10),maccormack_face_mask_component->Toggle_Draw_CB());
         slice_manager.Add_Object(maccormack_face_mask_component);}
@@ -1041,7 +1039,7 @@ Initialize_Components_And_Key_Bindings()
 #ifndef COMPILE_WITHOUT_RLE_SUPPORT
     filename=basedir+"/%d/rle_psi_D";
     if(has_valid_rle_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_RLE_CELL_SCALAR_FIELD_3D<T,bool>* rle_psi_D_component=new OPENGL_COMPONENT_RLE_CELL_SCALAR_FIELD_3D<T,bool>(rle_grid_component->opengl_grid.grid,filename,psi_D_color_map);
+        OPENGL_COMPONENT_RLE_CELL_SCALAR_FIELD_3D<T,bool>* rle_psi_D_component=new OPENGL_COMPONENT_RLE_CELL_SCALAR_FIELD_3D<T,bool>(rle_grid_component->opengl_grid.grid,filename,new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Magenta()));
         Add_Component(rle_psi_D_component,"RLE Psi_D points",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F1),rle_psi_D_component->Toggle_Draw_CB());
         slice_manager.Add_Object(rle_psi_D_component);}
@@ -1050,15 +1048,15 @@ Initialize_Components_And_Key_Bindings()
 #ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
     filename=basedir+"/%d/octree_psi_D";
     if(has_valid_octree_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_OCTREE_CELL_SCALAR_FIELD<T,bool>* octree_psi_D_component=new OPENGL_COMPONENT_OCTREE_CELL_SCALAR_FIELD<T,bool>(octree_grid_component->opengl_grid.grid,filename,psi_D_color_map);
+        OPENGL_COMPONENT_OCTREE_CELL_SCALAR_FIELD<T,bool>* octree_psi_D_component=new OPENGL_COMPONENT_OCTREE_CELL_SCALAR_FIELD<T,bool>(octree_grid_component->opengl_grid.grid,filename,new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Magenta()));
         Add_Component(octree_psi_D_component,"Octree Psi_D points",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F1),octree_psi_D_component->Toggle_Draw_CB());
         slice_manager.Add_Object(octree_psi_D_component);}
 #endif
 
-    OPENGL_INDEXED_COLOR_MAP* colors_color_map=OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map();colors_color_map->Set_Index_Mode(OPENGL_INDEXED_COLOR_MAP::PERIODIC);
     filename=basedir+"/%d/colors";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+        OPENGL_INDEXED_COLOR_MAP* colors_color_map=OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map();colors_color_map->Set_Index_Mode(OPENGL_INDEXED_COLOR_MAP::PERIODIC);
         OPENGL_COMPONENT_SCALAR_FIELD_3D<T,int>* psi_colors_component=new OPENGL_COMPONENT_SCALAR_FIELD_3D<T,int>(mac_grid,filename,colors_color_map,OPENGL_SCALAR_FIELD_3D<T,int>::DRAW_POINTS);
         Add_Component(psi_colors_component,"Psi colors",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F2),psi_colors_component->Toggle_Draw_CB());
@@ -1067,6 +1065,7 @@ Initialize_Components_And_Key_Bindings()
 #ifndef COMPILE_WITHOUT_RLE_SUPPORT
     filename=basedir+"/%d/rle_colors";
     if(has_valid_rle_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+        OPENGL_INDEXED_COLOR_MAP* colors_color_map=OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map();colors_color_map->Set_Index_Mode(OPENGL_INDEXED_COLOR_MAP::PERIODIC);
         OPENGL_COMPONENT_RLE_CELL_SCALAR_FIELD_3D<T,int>* rle_psi_colors_component=new OPENGL_COMPONENT_RLE_CELL_SCALAR_FIELD_3D<T,int>(rle_grid_component->opengl_grid.grid,filename,colors_color_map);
         Add_Component(rle_psi_colors_component,"RLE Psi colors",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F2),rle_psi_colors_component->Toggle_Draw_CB());
@@ -1076,6 +1075,7 @@ Initialize_Components_And_Key_Bindings()
 #ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
     filename=basedir+"/%d/octree_colors";
     if(has_valid_octree_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+        OPENGL_INDEXED_COLOR_MAP* colors_color_map=OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map();colors_color_map->Set_Index_Mode(OPENGL_INDEXED_COLOR_MAP::PERIODIC);
         OPENGL_COMPONENT_OCTREE_CELL_SCALAR_FIELD<T,int>* octree_psi_colors_component=new OPENGL_COMPONENT_OCTREE_CELL_SCALAR_FIELD<T,int>(octree_grid_component->opengl_grid.grid,filename,colors_color_map);
         Add_Component(octree_psi_colors_component,"Octree Psi colors",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F2),octree_psi_colors_component->Toggle_Draw_CB());
@@ -1291,6 +1291,13 @@ Slice_Has_Changed()
 
 // ==========================================================================
 
+ANIMATED_VISUALIZATION* visualization=0;
+void cleanup_function(void)
+{
+    delete visualization;
+    TIMER::Destroy_Singleton();
+}
+
 int main(int argc,char* argv[])
 {
     Initialize_Particles();
@@ -1301,13 +1308,13 @@ int main(int argc,char* argv[])
     if(PARSE_ARGS::Find_And_Remove("-float",argc,argv)) type_double=false;
     if(PARSE_ARGS::Find_And_Remove("-double",argc,argv)) type_double=true;
 
-    ANIMATED_VISUALIZATION* visualization=0;
     if(!type_double) visualization=new VISUALIZATION<float>();
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
     else visualization=new VISUALIZATION<double>();
 #else
     else{std::cerr<<"Double support not enabled."<<std::endl;exit(1);}
 #endif
+    atexit(cleanup_function);
     visualization->Initialize_And_Run(argc,argv);
     return 0;
 }

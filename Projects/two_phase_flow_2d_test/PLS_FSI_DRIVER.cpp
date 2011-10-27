@@ -112,7 +112,7 @@ Simulate_To_Frame(const int frame_input)
         Postprocess_Frame(++current_frame);
         if(example.write_output_files && example.write_substeps_level==-1) Write_Output_Files(current_frame);
         else if(example.write_substeps_level!=-1) Write_Substep(STRING_UTILITIES::string_sprintf("END Frame %d",current_frame),0,example.write_substeps_level);
-        LOG::cout<<"TIME = "<<time<<std::endl;}
+        LOG::cout<<"TIME = "<<driver.time<<std::endl;}
 }
 //#####################################################################
 // Function Initialize

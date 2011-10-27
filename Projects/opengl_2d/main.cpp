@@ -1052,9 +1052,9 @@ Initialize_Components_And_Key_Bindings()
         Add_Component(psi_component,"Psi points",'\0',BASIC_VISUALIZATION::START_HIDDEN|BASIC_VISUALIZATION::OWNED);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F3),psi_component->Toggle_Draw_CB());}
 
-    OPENGL_INDEXED_COLOR_MAP* colors_color_map=OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map();colors_color_map->Set_Index_Mode(OPENGL_INDEXED_COLOR_MAP::PERIODIC);
     filename=basedir+"/%d/colors";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+        OPENGL_INDEXED_COLOR_MAP* colors_color_map=OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map();colors_color_map->Set_Index_Mode(OPENGL_INDEXED_COLOR_MAP::PERIODIC);
         OPENGL_COMPONENT_SCALAR_FIELD_2D<T,int>* psi_colors_component=new OPENGL_COMPONENT_SCALAR_FIELD_2D<T,int>(mac_grid,filename,colors_color_map,OPENGL_SCALAR_FIELD_2D<T,int>::DRAW_POINTS);
         Add_Component(psi_colors_component,"Psi colors",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F2),psi_colors_component->Toggle_Draw_CB());}
@@ -1062,6 +1062,7 @@ Initialize_Components_And_Key_Bindings()
 #ifndef COMPILE_WITHOUT_RLE_SUPPORT
     filename=basedir+"/%d/rle_colors";
     if(has_valid_rle_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+        OPENGL_INDEXED_COLOR_MAP* colors_color_map=OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map();colors_color_map->Set_Index_Mode(OPENGL_INDEXED_COLOR_MAP::PERIODIC);
         OPENGL_COMPONENT_RLE_CELL_SCALAR_FIELD_2D<T,int>* rle_psi_colors_component=new OPENGL_COMPONENT_RLE_CELL_SCALAR_FIELD_2D<T,int>(rle_grid_component->opengl_grid.grid,filename,colors_color_map);
         rle_psi_colors_component->Set_Draw(false);
         Add_Component(rle_psi_colors_component,"RLE Psi colors",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
@@ -1071,6 +1072,7 @@ Initialize_Components_And_Key_Bindings()
 #ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
     filename=basedir+"/%d/quadtree_colors";
     if(has_valid_quadtree_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+        OPENGL_INDEXED_COLOR_MAP* colors_color_map=OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map();colors_color_map->Set_Index_Mode(OPENGL_INDEXED_COLOR_MAP::PERIODIC);
         OPENGL_COMPONENT_QUADTREE_CELL_SCALAR_FIELD<T,int>* quadtree_psi_colors_component=new OPENGL_COMPONENT_QUADTREE_CELL_SCALAR_FIELD<T,int>(quadtree_grid_component->opengl_grid.grid,filename,colors_color_map);
         quadtree_psi_colors_component->Set_Draw(false);
         Add_Component(quadtree_psi_colors_component,"Quadtree Psi colors",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);

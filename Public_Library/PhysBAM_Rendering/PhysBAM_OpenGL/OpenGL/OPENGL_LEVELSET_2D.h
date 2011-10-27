@@ -47,7 +47,7 @@ public:
     }
 
     ~OPENGL_LEVELSET_2D()
-    {delete opengl_segmented_curve_2d;delete opengl_triangulated_area;}
+    {delete opengl_segmented_curve_2d;delete opengl_triangulated_area;delete solid_color_map;delete gradient_color_map;}
 
 //#####################################################################
     void Set_Inside_And_Outside_Colors(const OPENGL_COLOR& inside_color_input,const OPENGL_COLOR& outside_color_input);

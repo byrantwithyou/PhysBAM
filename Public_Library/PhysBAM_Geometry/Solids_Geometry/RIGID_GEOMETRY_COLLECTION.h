@@ -35,6 +35,7 @@ public:
     RIGID_GEOMETRY_EXAMPLE_VELOCITIES<TV>* rigid_geometry_example_velocities;    
     ARRAY<int> static_rigid_geometry,kinematic_rigid_geometry;
     bool owns_particles;
+    bool owns_collision_body_list;
 
     RIGID_GEOMETRY_COLLECTION(RIGID_GEOMETRY_PARTICLES<TV>& particles_input,RIGID_GEOMETRY_EXAMPLE_VELOCITIES<TV>* rigid_geometry_example_velocities_input,
         COLLISION_GEOMETRY_COLLECTION<TV>* collision_body_list_input=0,ALLOCATE_HELPER<TV>* allocate_helper_input=0);

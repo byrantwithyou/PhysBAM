@@ -27,8 +27,8 @@ class RIGID_BODY_COLLECTION:public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;
 public:
-    RIGID_BODY_PARTICLES<TV> rigid_body_particle;
     RIGID_GEOMETRY_COLLECTION<TV> rigid_geometry_collection;
+    RIGID_BODY_PARTICLES<TV> rigid_body_particle;
     ARTICULATED_RIGID_BODY<TV>& articulated_rigid_body;
     RIGID_BODY_CLUSTER_BINDINGS<TV>& rigid_body_cluster_bindings;
     RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<TV>* rigids_example_forces_and_velocities;

@@ -53,6 +53,7 @@ public:
 
     OPENGL_KEY_BINDING_CATEGORY() {}
     OPENGL_KEY_BINDING_CATEGORY(const std::string &name,int priority) : name(name),priority(priority) {}
+    ~OPENGL_KEY_BINDING_CATEGORY() {}
 };
 
 class OPENGL_WORLD

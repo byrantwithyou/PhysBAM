@@ -169,7 +169,7 @@ Initialize_Glut_Independent()
 void OPENGL_WORLD::
 Clear_All_Objects()
 {
-    object_list.Resize(0);
+    object_list.Remove_All();
 }
 //#####################################################################
 // Function Add_Object
@@ -303,6 +303,7 @@ void OPENGL_WORLD::
 Set_Idle_Callback(OPENGL_CALLBACK* callback,const float delay)
 {
     bool need_prepare=!idle_timer || idle_timer>delay;
+    delete idle_callback;
     idle_callback=callback;
     idle_delay=delay;
     idle_timer=idle_delay;

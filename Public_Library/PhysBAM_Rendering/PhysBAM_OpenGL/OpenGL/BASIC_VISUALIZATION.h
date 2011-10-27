@@ -17,6 +17,7 @@ namespace PhysBAM
 {
 class PARSE_ARGS;
 class OPENGL_COMPONENT;
+template<class T> class OPENGL_AXES;
 
 class BASIC_VISUALIZATION
 {
@@ -72,6 +73,7 @@ public:
     ARRAY<OPENGL_COMPONENT*> component_list;
     ARRAY<OPENGL_COMPONENT*> owned_components;
     HASHTABLE<std::string,OPENGL_COMPONENT*> component_by_name;
+    OPENGL_AXES<float> * opengl_axes;
 
     OPENGL_WORLD            opengl_world;
     int                     width, height;

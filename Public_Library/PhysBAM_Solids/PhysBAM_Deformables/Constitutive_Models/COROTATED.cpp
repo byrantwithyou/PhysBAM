@@ -36,7 +36,7 @@ template<class T,int d> COROTATED<T,d>::
 template<class T,int d> void COROTATED<T,d>::
 Set_Parameters(const T youngs_modulus_input,const T poissons_ratio_input,const T Rayleigh_coefficient)
 {
-    assert(poissons_ratio>-1&&poissons_ratio<.5);
+    assert(poissons_ratio_input>-1&&poissons_ratio_input<.5);
     youngs_modulus=youngs_modulus_input;
     poissons_ratio=poissons_ratio_input;
     constant_lambda=youngs_modulus*poissons_ratio/((1+poissons_ratio)*(1-2*poissons_ratio));

@@ -17,16 +17,23 @@
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL_Solids/OpenGL_Rigids_Components/OPENGL_COMPONENT_MUSCLE_3D.h>
 using namespace PhysBAM;
+//#####################################################################
+// Constructor
+//#####################################################################
 template<class T> OPENGL_COMPONENT_MUSCLE_3D<T>::
 OPENGL_COMPONENT_MUSCLE_3D(OPENGL_COLOR_MAP<T>* muscle_color_map_input)
     :OPENGL_COMPONENT("Muscles"),draw_linear_muscles(true),draw_surface_muscles(true),draw_muscle_internal_particles(false),muscle_color_map(muscle_color_map_input),
     current_selection(0),articulated_rigid_body(0)
 {
 }
+//#####################################################################
+// Destructor
+//#####################################################################
 template<class T> OPENGL_COMPONENT_MUSCLE_3D<T>::
 ~OPENGL_COMPONENT_MUSCLE_3D()
 {
     opengl_triangulated_surface.Delete_Pointers_And_Clean_Memory();
+    delete muscle_color_map;
 }
 //#####################################################################
 // Function Display

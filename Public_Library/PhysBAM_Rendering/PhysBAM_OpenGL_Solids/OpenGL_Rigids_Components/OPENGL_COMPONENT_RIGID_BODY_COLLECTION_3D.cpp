@@ -41,8 +41,8 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T,class RW> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
 OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(const std::string& basedir_input,bool use_display_lists)
-    :OPENGL_COMPONENT_RIGID_GEOMETRY_COLLECTION_3D<T,RW>(basedir_input,use_display_lists,false),
-    rigid_body_collection(*new RIGID_BODY_COLLECTION<TV>(0,0)),articulated_rigid_body(0),current_selection(0),need_destroy_rigid_body_collection(true)
+    :OPENGL_COMPONENT_RIGID_GEOMETRY_COLLECTION_3D<T,RW>(basedir_input,use_display_lists,false),rigid_body_collection(*new RIGID_BODY_COLLECTION<TV>(0,0)),
+    articulated_rigid_body(0),opengl_component_muscle_3d(0),current_selection(0),need_destroy_rigid_body_collection(true)
 {
     rigid_geometry_collection=&rigid_body_collection.rigid_geometry_collection;
     Initialize();
@@ -85,6 +85,7 @@ Initialize()
 //    color_ramp->Add_Color(log((T)1.00001),OPENGL_COLOR::Red());
     color_ramp->Add_Color(log((T)1.001),OPENGL_COLOR::Red());
 
+    delete opengl_component_muscle_3d;
     opengl_component_muscle_3d=new OPENGL_COMPONENT_MUSCLE_3D<T>(color_ramp);
 }
 //#####################################################################
