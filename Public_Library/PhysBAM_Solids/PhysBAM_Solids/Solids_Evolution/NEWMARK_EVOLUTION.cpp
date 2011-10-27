@@ -342,7 +342,6 @@ Advance_One_Time_Step_Position(const T dt,const T time, const bool solids)
     EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities=*solid_body_collection.example_forces_and_velocities;
     ARTICULATED_RIGID_BODY<TV>& articulated_rigid_body=solid_body_collection.rigid_body_collection.articulated_rigid_body; // Needn't be a pointer
     const bool advance_rigid_bodies=true; //solid_body_collection.rigid_body_collection.simulated_rigid_body_particles.m!=0;  TODO: Fix this.
-    const T v_dt=solids_parameters.use_backward_euler_position_update?dt:dt/2;
 
     if((solids_parameters.triangle_collision_parameters.perform_self_collision && (solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.m || solids_parameters.triangle_collision_parameters.initialize_collisions_without_objects))
        && (!repulsions && solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions))
@@ -370,7 +369,7 @@ Advance_One_Time_Step_Position(const T dt,const T time, const bool solids)
     if(asynchronous_evolution && asynchronous_evolution->Take_Full_Backward_Euler_Step_For_Position_Update()){
         Backward_Euler_Step_Velocity_Helper(dt,time,time,false);
         asynchronous_evolution->Position_Velocity_Update(dt,time);}
-    else Backward_Euler_Step_Velocity_Helper(v_dt,time,time,false); // update V implicitly to time+dt/2
+    else Backward_Euler_Step_Velocity_Helper(dt/2,time,time,false); // update V implicitly to time+dt/2
 
     Diagnostics(dt,time,1,0,5,"backward Euler");
         
@@ -416,14 +415,14 @@ Advance_One_Time_Step_Position(const T dt,const T time, const bool solids)
 
     // update positions, apply contact, arb prestabilization and push out
     if(solids_parameters.rigid_body_collision_parameters.perform_contact && advance_rigid_bodies) rigid_body_collisions->Compute_Contact_Graph(dt,time,&articulated_rigid_body);
-    Update_Velocity_Using_Stored_Differences(v_dt,time);
+    Update_Velocity_Using_Stored_Differences(dt/2,time);
     Diagnostics(dt,time,1,0,18,"update velocity using stored differences");
     if(advance_rigid_bodies){
         articulated_rigid_body.Apply_Poststabilization(solids_parameters.implicit_solve_parameters.test_system,solids_parameters.implicit_solve_parameters.print_matrix);
         Diagnostics(dt,time,0,0,185,"poststabilization");
         if(articulated_rigid_body.Has_Actuators() && !articulated_rigid_body.constrain_pd_directions){
             articulated_rigid_body.Compute_Position_Based_State(dt,time);
-            articulated_rigid_body.Solve_Velocities_for_PD(time,v_dt,solids_parameters.implicit_solve_parameters.test_system,solids_parameters.implicit_solve_parameters.print_matrix);}
+            articulated_rigid_body.Solve_Velocities_for_PD(time,dt/2,solids_parameters.implicit_solve_parameters.test_system,solids_parameters.implicit_solve_parameters.print_matrix);}
         Diagnostics(dt,time,1,0,19,"solve velocities for pd");}
 
     Update_Positions_And_Apply_Contact_Forces(dt,time,false);

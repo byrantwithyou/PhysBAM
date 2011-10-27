@@ -23,7 +23,7 @@ SOLIDS_PARAMETERS()
     deformable_object_collision_parameters(*new DEFORMABLE_OBJECT_COLLISION_PARAMETERS<TV>),write_deformable_body(true),verbose(true),verbose_dt(false),cfl((T)10),min_dt((T)0),
     fracture(false),write_static_variables_every_frame(false),newton_tolerance((T)1e-3),newton_iterations(1),use_partially_converged_result(true),
     write_from_every_process(true),enforce_repulsions_in_cg(true),use_post_cg_constraints(true),use_rigid_deformable_contact(false),rigid_cluster_fracture_frequency(INT_MAX),
-    use_trapezoidal_rule_for_velocities(true),enforce_poststabilization_in_cg(true),use_backward_euler_position_update(false),
+    use_trapezoidal_rule_for_velocities(true),enforce_poststabilization_in_cg(true),
     no_contact_friction(false),use_projections_in_position_update(false),allow_altitude_spring_change_between_updates(true)
 {
 }

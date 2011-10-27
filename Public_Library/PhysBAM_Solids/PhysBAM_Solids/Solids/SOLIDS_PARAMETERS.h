@@ -46,7 +46,6 @@ public:
 
     bool use_trapezoidal_rule_for_velocities; // otherwise use backward euler from n->n+1
     bool enforce_poststabilization_in_cg;
-    bool use_backward_euler_position_update;
 
     bool no_contact_friction;
     bool use_projections_in_position_update;
