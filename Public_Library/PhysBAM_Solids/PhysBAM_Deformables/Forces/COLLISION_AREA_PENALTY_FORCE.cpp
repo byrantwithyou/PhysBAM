@@ -16,7 +16,7 @@ namespace PhysBAM{template<class TV,class ATTR> void Debug_Particle_Set_Attribut
 //#####################################################################
 template<class TV> COLLISION_AREA_PENALTY_FORCE<TV>::
 COLLISION_AREA_PENALTY_FORCE(PARTICLES<TV>& particles)
-    :BASE(particles),volume_collisions(*new VOLUME_COLLISIONS<TV>),force_coefficient(4e4)
+    :BASE(particles),volume_collisions(*new VOLUME_COLLISIONS<TV>),force_coefficient(1e6)
 {
 }
 //#####################################################################
@@ -41,7 +41,7 @@ Add_Mesh(TRIANGULATED_AREA<T>& ta)
 template<class TV> typename TV::SCALAR COLLISION_AREA_PENALTY_FORCE<TV>::
 Potential_Energy(const T time) const
 {
-    return force_coefficient*volume_collisions.area;
+    return force_coefficient*sqr(volume_collisions.area);
 }
 //#####################################################################
 // Function Use_Rest_State_For_Strain_Rate
@@ -86,7 +86,7 @@ template<class TV> void COLLISION_AREA_PENALTY_FORCE<TV>::
 Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 {
     for(typename HASHTABLE<int,TV>::ITERATOR it(volume_collisions.gradient);it.Valid();it.Next())
-        F(it.Key())-=force_coefficient*it.Data();
+        F(it.Key())-=2*force_coefficient*volume_collisions.area*it.Data();
 
     T mx=0;
     for(typename HASHTABLE<int,TV>::ITERATOR it(volume_collisions.gradient);it.Valid();it.Next())
@@ -97,7 +97,7 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 
     for(typename HASHTABLE<int,TV>::ITERATOR it(volume_collisions.gradient);it.Valid();it.Next()){
         Add_Debug_Particle(this->particles.X(it.Key()),color_map(it.Data().Magnitude()));
-        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,-force_coefficient*it.Data());}
+        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,-2*force_coefficient*volume_collisions.area*it.Data());}
 }
 //#####################################################################
 // Function Add_Velocity_Dependent_Forces
@@ -154,7 +154,13 @@ template<class TV> void COLLISION_AREA_PENALTY_FORCE<TV>::
 Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
 {
     for(typename HASHTABLE<VECTOR<int,2>,MATRIX<T,2> >::ITERATOR it(volume_collisions.hessian);it.Valid();it.Next())
-        F(it.Key().x)-=force_coefficient*(it.Data()*V(it.Key().y));
+        F(it.Key().x)-=2*force_coefficient*volume_collisions.area*(it.Data()*V(it.Key().y));
+
+    T tot=0;
+    for(typename HASHTABLE<int,TV>::ITERATOR it(volume_collisions.gradient);it.Valid();it.Next())
+        tot+=TV::Dot_Product(it.Data(),V(it.Key()));
+    for(typename HASHTABLE<int,TV>::ITERATOR it(volume_collisions.gradient);it.Valid();it.Next())
+        F(it.Key())-=2*force_coefficient*tot*it.Data();
 }
 //#####################################################################
 // Function Enforce_Definiteness
