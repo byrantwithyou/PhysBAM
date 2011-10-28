@@ -80,7 +80,7 @@ Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,d>& F,DIAGONALIZED_ISOTROPIC
     T J = F.Determinant();
 
     if      (J>=J_max) neo_base.Isotropic_Stress_Derivative(F,dP_dF,triangle); // Neo Hookean
-    else if (J<=J_min) neo_base.Isotropic_Stress_Derivative(F,dP_dF,triangle); // Corotated
+    else if (J<=J_min) cor_base.Isotropic_Stress_Derivative(F,dP_dF,triangle); // Corotated
     else
     {
         T t   = blend.H(F);
