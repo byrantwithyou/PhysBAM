@@ -303,17 +303,17 @@ Trapezoid_Intersection_Area_Case_2oo(const TV& a,const TV& b,const TV& c,const T
     T yvab=(a.y+b.y)/2,yba=b.y-a.y,yvcd=(c.y+d.y)/2,ydc=d.y-c.y,xba=b.x-a.x,xdc=d.x-c.x,xca=c.x-a.x;(void)yvab;(void)yba;(void)yvcd;(void)ydc;(void)xba;(void)xdc;(void)xca;
     T xda=d.x-a.x,xdb=d.x-b.x,xcb=c.x-b.x,xca_xba=xca/xba,xdc_xba=xdc/xba,xdb_xba=xdb/xba,yba_xba=yba/xba,xcb_xba=xcb/xba,xda_xba=xda/xba;
 
-    T A=-(T).5*xdc_xba*(-2*yba*xca-2*xba*yvab+xba*yba-yba*xdc);
-    G(1)(1)=-(T).5*xdc_xba*yba*(-2*xcb_xba-xdc_xba);
-    G(1)(2)=(T).5*xdc_xba*(-2*xcb-xdc);
+    T A=-(T).5*xdc_xba*(-2*xba*yvab-yba*xcb-yba*xda);
+    G(1)(1)=(T).5*xdc_xba*yba*(+2*xcb_xba+xdc_xba);
+    G(1)(2)=-(T).5*xdc_xba*(2*xcb+xdc);
     G(2)(1)=-(T).5*xdc_xba*yba*(2*xca_xba+xdc_xba);
     G(2)(2)=(T).5*xdc_xba*(2*xca+xdc);
     G(3)(1)=(T).5*(-2*yvab+yba-2*yba*xca_xba);
     G(3)(2)=0;
     G(4)(1)=-(T).5*(-2*yvab+yba-2*yba*xda_xba);
     G(4)(2)=0;
-    H(1)(1)(1,1)=-xdc_xba*yba_xba*(-2*xcb_xba-xdc_xba);
-    H(1)(1)(2,1)=H(1)(1)(1,2)=.5*xdc_xba*(-2*xcb_xba-xdc_xba);
+    H(1)(1)(1,1)=xdc_xba*yba_xba*(2*xcb_xba+xdc_xba);
+    H(1)(1)(2,1)=H(1)(1)(1,2)=-.5*xdc_xba*(2*xcb_xba+xdc_xba);
     H(1)(1)(2,2)=0;
     H(2)(1)(1,1)=H(1)(2)(1,1)=-xdc_xba*yba_xba*(xda_xba+xcb_xba);
     H(2)(1)(1,2)=H(1)(2)(2,1)=.5*xdc_xba*(2*xca_xba+xdc_xba);
