@@ -496,6 +496,8 @@ Trapezoid_Intersection_Area_Case_2(const TV& a,const TV& b,const TV& c,const TV&
     bool co=(-a.y*b.x+a.x*b.y+c.y*b.x-c.y*a.x-b.y*c.x+a.y*c.x)>0;
     bool Do=(-a.y*b.x+a.x*b.y+d.y*b.x-d.y*a.x-b.y*d.x+a.y*d.x)>0;
 
+    if(a==c && b==d) return Trapezoid_Intersection_Area_Case_2uu(a,b,c,d,G,H);
+
     if(co){
         if(Do) return Trapezoid_Intersection_Area_Case_2oo(a,b,c,d,G,H);
         else return Trapezoid_Intersection_Area_Case_2ou(a,b,c,d,G,H);}
