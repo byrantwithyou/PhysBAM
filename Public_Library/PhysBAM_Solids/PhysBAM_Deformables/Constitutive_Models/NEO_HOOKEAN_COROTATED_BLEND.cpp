@@ -79,14 +79,6 @@ P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const T scale,const int simplex) con
 template<class T,int d> void NEO_HOOKEAN_COROTATED_BLEND<T,d>::
 Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,d>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d>& dP_dF,const int triangle) const
 {
-    return Isotropic_Stress_Derivative_Helper(F,dP_dF,triangle);
-}
-//#####################################################################
-// Function Isotropic_Stress_Derivative_Helper
-//#####################################################################
-template<class T,int d> void NEO_HOOKEAN_COROTATED_BLEND<T,d>::
-Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& dP_dF,const int triangle) const
-{
     T J = F.Determinant();
 
     if      (J>=J_max) neo_base.Isotropic_Stress_Derivative(F,dP_dF,triangle); // Neo Hookean
@@ -94,25 +86,21 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_IS
     else
     {
         T t   = blend.H(F);
-        DIAGONAL_MATRIX<T,2> Dt  = blend.DH(F);
-        DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2> DDt;
+        DIAGONAL_MATRIX<T,d> Dt  = blend.DH(F);
+        DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d> DDt;
         blend.DDH(F,DDt);
 
         T neo_minus_cor = neo_base.Energy_Density(F,triangle) - cor_base.Energy_Density(F,triangle);
 
-        DIAGONAL_MATRIX<T,2> neo_P = neo_base.P_From_Strain(F,1,triangle);
-        DIAGONAL_MATRIX<T,2> cor_P = cor_base.P_From_Strain(F,1,triangle);
+        DIAGONAL_MATRIX<T,d> neo_P = neo_base.P_From_Strain(F,1,triangle);
+        DIAGONAL_MATRIX<T,d> cor_P = cor_base.P_From_Strain(F,1,triangle);
 
-        DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2> neo_dP_dF;
-        DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2> cor_dP_dF;
+        DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d> neo_dP_dF;
+        DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d> cor_dP_dF;
         neo_base.Isotropic_Stress_Derivative(F,neo_dP_dF,triangle);
         cor_base.Isotropic_Stress_Derivative(F,cor_dP_dF,triangle);
-
-        dP_dF.x1111 = neo_dP_dF.x1111*t + cor_dP_dF.x1111*(1-t) + neo_minus_cor*DDt.x1111 + 2*(neo_P.x11-cor_P.x11)*Dt.x11;
-        dP_dF.x2222 = neo_dP_dF.x2222*t + cor_dP_dF.x2222*(1-t) + neo_minus_cor*DDt.x2222 + 2*(neo_P.x22-cor_P.x22)*Dt.x22;
-        dP_dF.x2211 = neo_dP_dF.x2211*t + cor_dP_dF.x2211*(1-t) + neo_minus_cor*DDt.x2211 + (neo_P.x22-cor_P.x22)*Dt.x11 + (neo_P.x11-cor_P.x11)*Dt.x22;
-        dP_dF.x2112 = neo_dP_dF.x2112*t + cor_dP_dF.x2112*(1-t) + neo_minus_cor*DDt.x2112;
-        dP_dF.x2121 = neo_dP_dF.x2121*t + cor_dP_dF.x2121*(1-t) + neo_minus_cor*DDt.x2121;
+        
+        Isotropic_Stress_Derivative_Transition_Helper(dP_dF,neo_dP_dF,cor_dP_dF,DDt,neo_P,cor_P,Dt,neo_minus_cor,t);
     }
 
     if(enforce_definiteness) dP_dF.Enforce_Definiteness();
@@ -121,7 +109,35 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_IS
 // Function Isotropic_Stress_Derivative_Helper
 //#####################################################################
 template<class T,int d> void NEO_HOOKEAN_COROTATED_BLEND<T,d>::
-Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dP_dF,const int triangle) const
+Isotropic_Stress_Derivative_Transition_Helper(DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& dP_dF,
+    const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& neo_dP_dF,
+    const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& cor_dP_dF,
+    const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& DDt,
+    const DIAGONAL_MATRIX<T,2>& neo_P,
+    const DIAGONAL_MATRIX<T,2>& cor_P,
+    const DIAGONAL_MATRIX<T,2>& Dt,
+    const T neo_minus_cor,
+    const T t) const
+{
+    dP_dF.x1111 = neo_dP_dF.x1111*t + cor_dP_dF.x1111*(1-t) + neo_minus_cor*DDt.x1111 + 2*(neo_P.x11-cor_P.x11)*Dt.x11;
+    dP_dF.x2222 = neo_dP_dF.x2222*t + cor_dP_dF.x2222*(1-t) + neo_minus_cor*DDt.x2222 + 2*(neo_P.x22-cor_P.x22)*Dt.x22;
+    dP_dF.x2211 = neo_dP_dF.x2211*t + cor_dP_dF.x2211*(1-t) + neo_minus_cor*DDt.x2211 + (neo_P.x22-cor_P.x22)*Dt.x11 + (neo_P.x11-cor_P.x11)*Dt.x22;
+    dP_dF.x2112 = neo_dP_dF.x2112*t + cor_dP_dF.x2112*(1-t) + neo_minus_cor*DDt.x2112;
+    dP_dF.x2121 = neo_dP_dF.x2121*t + cor_dP_dF.x2121*(1-t) + neo_minus_cor*DDt.x2121;
+}
+//#####################################################################
+// Function Isotropic_Stress_Derivative_Helper
+//#####################################################################
+template<class T,int d> void NEO_HOOKEAN_COROTATED_BLEND<T,d>::
+Isotropic_Stress_Derivative_Transition_Helper(DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dP_dF,
+    const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& neo_dP_dF,
+    const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& cor_dP_dF,
+    const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& DDt,
+    const DIAGONAL_MATRIX<T,3>& neo_P,
+    const DIAGONAL_MATRIX<T,3>& cor_P,
+    const DIAGONAL_MATRIX<T,3>& Dt,
+    const T neo_minus_cor,
+    const T t) const
 {
     PHYSBAM_FATAL_ERROR();
 }

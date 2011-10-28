@@ -8,6 +8,7 @@
 #define __DIAGONAL_MATRIX_DETERMINANT_HEAVISIDE_TRANSITION__
 
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/HEAVISIDE_TRANSITION.h>
+#include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 
 namespace PhysBAM{
 
