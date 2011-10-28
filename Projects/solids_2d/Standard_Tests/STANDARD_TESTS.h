@@ -90,6 +90,7 @@ public:
     bool test_forces;
     bool use_extended_neohookean;
     bool use_corotated;
+    bool use_corot_blend;
     int kinematic_id;
     INTERPOLATION_CURVE<T,FRAME<TV> > curve;
     bool print_matrix;
@@ -98,7 +99,7 @@ public:
     T damping_multiplier;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),fully_implicit(false),test_forces(false),use_extended_neohookean(false),use_corotated(false),
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),fully_implicit(false),test_forces(false),use_extended_neohookean(false),use_corotated(false),use_corot_blend(false),
         print_matrix(false),parameter(0),stiffness_multiplier(1),damping_multiplier(1)
     {
     }
@@ -137,6 +138,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Option_Argument("-test_forces","use fully implicit forces");
     parse_args->Add_Option_Argument("-use_ext_neo");
     parse_args->Add_Option_Argument("-use_corotated");
+    parse_args->Add_Option_Argument("-use_corot_blend");
     parse_args->Add_Integer_Argument("-parameter",0,"parameter used by multiple tests to change the parameters of the test");
     parse_args->Add_Double_Argument("-stiffen",1,"","stiffness multiplier for various tests");
     parse_args->Add_Double_Argument("-dampen",1,"","damping multiplier for various tests");
@@ -167,6 +169,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     test_forces=parse_args->Is_Value_Set("-test_forces");
     use_extended_neohookean=parse_args->Is_Value_Set("-use_ext_neo");
     use_corotated=parse_args->Is_Value_Set("-use_corotated");
+    use_corot_blend=parse_args->Is_Value_Set("-use_corot_blend");
     solids_parameters.use_trapezoidal_rule_for_velocities=!parse_args->Get_Option_Value("-use_be");
     print_matrix=parse_args->Is_Value_Set("-print_matrix");
     parameter=parse_args->Get_Integer_Value("-parameter");
@@ -391,8 +394,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 5:
         case 6:{
             TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
-            FINITE_VOLUME<TV,2>* fvm=Create_Finite_Volume(triangulated_area,new NEO_HOOKEAN<T,2>((T)1e2,(T).45));
-            solid_body_collection.Add_Force(fvm);
+            Add_Constitutive_Model(triangulated_area,(T)1e2,(T).45,(T).05);
             break;}
         case 7:
         case 10:
@@ -407,9 +409,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 13:{
             TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
             solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
-            if(use_extended_neohookean) solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,new NEO_HOOKEAN_EXTRAPOLATED<T,2>((T)1e4,(T).45,(T).01)));
-            else if(use_corotated) solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,new COROTATED<T,2>((T)1e4,(T).45,(T).01)));
-            else solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,new NEO_HOOKEAN_COROTATED_BLEND<T,2>((T)1e4,(T).45,(T).01)));
+            Add_Constitutive_Model(triangulated_area,(T)1e4,(T).45,(T).01);
             if(test_number==13){RANDOM_NUMBERS<T> rand;rand.Fill_Uniform(particles.X,-1,1);}
             break;}
         case 14:{
@@ -431,42 +431,36 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
             solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
             solid_body_collection.Add_Force(Create_Incompressible_Finite_Volume(triangulated_area));
-            solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,new ROTATED_LINEAR<T,2>((T)2e3,(T)0,(T).01)));
+            Add_Constitutive_Model(triangulated_area,(T)2e3,(T)0,(T).01);
             break;}
         case 15:{
             TRIANGULATED_AREA<T>& triangulated_area1=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>(1);
             TRIANGULATED_AREA<T>& triangulated_area2=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>(2);
             solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
-
-            if(use_extended_neohookean) solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area1,new NEO_HOOKEAN_EXTRAPOLATED<T,2>((T)1e4,(T).45,(T).01)));
-            else if(use_corotated) solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area1,new COROTATED<T,2>((T)1e4,(T).45,(T).01)));
-            else solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area1,new NEO_HOOKEAN<T,2>((T)1e4,(T).45,(T).01)));
-
-            if(use_extended_neohookean) solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area2,new NEO_HOOKEAN_EXTRAPOLATED<T,2>((T)1e4,(T).45,(T).01)));
-            else if(use_corotated) solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area2,new COROTATED<T,2>((T)1e4,(T).45,(T).01)));
-            else solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area2,new NEO_HOOKEAN<T,2>((T)1e4,(T).45,(T).01)));
+            Add_Constitutive_Model(triangulated_area1,(T)1e4,(T).45,(T).01);
+            Add_Constitutive_Model(triangulated_area2,(T)1e4,(T).45,(T).01);
 
             COLLISION_AREA_PENALTY_FORCE<TV>* penalty_force=new COLLISION_AREA_PENALTY_FORCE<TV>(particles);
             penalty_force->Add_Mesh(triangulated_area1);
             penalty_force->Add_Mesh(triangulated_area2);
             solid_body_collection.Add_Force(penalty_force);
-            
             break;}
         case 17:{
             TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
-            solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,new NEO_HOOKEAN_COROTATED_BLEND<T,2>((T)1e4,(T).45,(T).01)));
+            Add_Constitutive_Model(triangulated_area,(T)1e4,(T).45,(T).01);
+
             RANDOM_NUMBERS<T> rand;
             rand.Fill_Uniform(particles.X,-1,1);
             break;}
         case 18:{
             TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
-            solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,new COROTATED<T,2>((T)1e4,(T).45,(T).01)));
+            Add_Constitutive_Model(triangulated_area,(T)1e4,(T).45,(T).01);
             RANDOM_NUMBERS<T> rand;
             rand.Fill_Uniform(particles.X,0,0);
             break;}
         case 19:{
             TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
-            solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,new COROTATED<T,2>((T)1e4,(T).45,(T).01)));
+            Add_Constitutive_Model(triangulated_area,(T)1e4,(T).45,(T).01);
             break;}
         default:
             LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}
@@ -580,6 +574,16 @@ void Write_Output_Files(const int frame) const
 void Preprocess_Frame(const int frame)
 {
     dynamic_cast<NEWMARK_EVOLUTION<TV>&>(*solids_evolution).print_matrix=print_matrix;
+}
+//#####################################################################
+// Function Add_Constitutive_Model
+//#####################################################################
+void Add_Constitutive_Model(TRIANGULATED_AREA<T>& triangulated_area,T stiffness,T poissons_ratio,T damping)
+{
+    if(use_extended_neohookean) solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,new NEO_HOOKEAN_EXTRAPOLATED<T,2>(stiffness,poissons_ratio,damping)));
+    else if(use_corotated) solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,new COROTATED<T,2>(stiffness,poissons_ratio,damping)));
+    else if(use_corot_blend) solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,new NEO_HOOKEAN_COROTATED_BLEND<T,2>(stiffness,poissons_ratio,damping)));
+    else solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,new NEO_HOOKEAN<T,2>(stiffness,poissons_ratio,damping)));
 }
 //#####################################################################
 };
