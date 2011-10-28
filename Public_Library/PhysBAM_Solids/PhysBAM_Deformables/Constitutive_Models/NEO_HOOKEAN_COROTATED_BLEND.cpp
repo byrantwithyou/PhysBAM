@@ -17,9 +17,7 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T,int d> NEO_HOOKEAN_COROTATED_BLEND<T,d>::
-NEO_HOOKEAN_COROTATED_BLEND(const T youngs_modulus,
-                            const T poissons_ratio,
-                            const T Rayleigh_coefficient):
+NEO_HOOKEAN_COROTATED_BLEND(const T youngs_modulus,const T poissons_ratio,const T Rayleigh_coefficient):
     neo_base(youngs_modulus,poissons_ratio,Rayleigh_coefficient),
     cor_base(2*youngs_modulus,poissons_ratio,Rayleigh_coefficient),
     J_min(0.3),J_max(0.9)
@@ -68,7 +66,7 @@ P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const T scale,const int simplex) con
     {
         T t = blend.H(F);
         return scale*(
-            neo_base.P_From_Strain(F,scale,simplex)*t + cor_base.P_From_Strain(F,scale,simplex)*(1-t) +
+            neo_base.P_From_Strain(F,1,simplex)*t + cor_base.P_From_Strain(F,1,simplex)*(1-t) +
             blend.DH(F)*(neo_base.Energy_Density(F,simplex) - cor_base.Energy_Density(F,simplex))
         );
     }

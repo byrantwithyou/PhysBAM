@@ -41,17 +41,13 @@ public:
 
 public:
 
-    NEO_HOOKEAN_COROTATED_BLEND(const T youngs_modulus=3e6,
-                                const T poissons_ratio=.475,
-                                const T Rayleigh_coefficient=.05);
+    NEO_HOOKEAN_COROTATED_BLEND(const T youngs_modulus=3e6,const T poissons_ratio=.475,const T Rayleigh_coefficient=.05);
     virtual ~NEO_HOOKEAN_COROTATED_BLEND();
 
 public:
 
     T Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int simplex) const PHYSBAM_OVERRIDE;
     DIAGONAL_MATRIX<T,d> P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const T scale,const int simplex) const PHYSBAM_OVERRIDE;
-    DIAGONAL_MATRIX<T,2> P_From_Strain_Helper(const DIAGONAL_MATRIX<T,2>& F,const T scale,const int simplex) const;
-    DIAGONAL_MATRIX<T,3> P_From_Strain_Helper(const DIAGONAL_MATRIX<T,3>& F,const T scale,const int simplex) const;
     void Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,d>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d>& dP_dF,const int triangle) const;
     void Isotropic_Stress_Derivative_Transition_Helper(DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& dP_dF,
         const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& neo_dP_dF,
