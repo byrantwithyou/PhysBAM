@@ -15,40 +15,50 @@ class HEAVISIDE_TRANSITION
 
 private:
 
-    T J_min,J_max,J_diff;
+    T x_min,x_max,x_dif;
 
 public:
 
-    HEAVISIDE_TRANSITION () {}
-    virtual ~HEAVISIDE_TRANSITION () {}
+    inline HEAVISIDE_TRANSITION ():
+        x_min(0),x_max(1),x_dif(1){}
 
-    inline void Initialize (const T input_J_min, const T input_J_max)
+    inline HEAVISIDE_TRANSITION (const T input_x_min, const T input_x_max):
+        x_min(input_x_min),x_max(input_x_max),x_dif(input_x_max-input_x_min)
     {
-        J_min  = input_J_min;
-        J_max  = input_J_max;
-        J_diff = J_max-J_min; 
+        assert(input_x_max>input_x_min);
     }
+
+    inline ~HEAVISIDE_TRANSITION () {}
     
-    inline T H (const T J) const
+    inline void Initialize (const T input_x_min, const T input_x_max)
     {
-        assert(J>=J_min && J<=J_max);
-        T r = (J-J_min)/J_diff;
-        return r*r*(-2*r+3);
+        assert(input_x_max>input_x_min);
+        x_min  = input_x_min;
+        x_max  = input_x_max;
+        x_dif = x_max-x_min; 
     }
 
-    inline T HJ (const T J) const
+    inline T H (const T x) const
     {
-        assert(J>=J_min && J<=J_max);
-        T r = (J-J_min)/J_diff;
-        return 6*r*(1-r)/J_diff;
+        assert(x>=x_min && x<=x_max);
+        T r = (x-x_min)/x_dif;
+        return sqr(r)*(-2*r+3);
     }
 
-    inline T HJJ (const T J) const
+    inline T Hx (const T x) const
     {
-        assert(J>=J_min && J<=J_max);
-        T r = (J-J_min)/J_diff;
-        return (-12*r+6)/(J_diff*J_diff);
+        assert(x>=x_min && x<=x_max);
+        T r = (x-x_min)/x_dif;
+        return 6*r*(1-r)/x_dif;
+    }
+
+    inline T Hxx (const T x) const
+    {
+        assert(x>=x_min && x<=x_max);
+        T r = (x-x_min)/x_dif;
+        return (-12*r+6)/sqr(x_dif);
     }
 };
 }
+
 #endif
