@@ -187,8 +187,8 @@ Trapezoid_Intersection_Area_Case_1uo(const TV& a,const TV& b,const TV& c,const T
     trap_cases.Append(4);
 //    LOG::cout<<__FUNCTION__<<std::endl;
     T yvab=(a.y+b.y)/2,yba=b.y-a.y,yvcd=(c.y+d.y)/2,ydc=d.y-c.y,xba=b.x-a.x,xdc=d.x-c.x,xca=c.x-a.x;(void)yvab;(void)yba;(void)yvcd;(void)ydc;(void)xba;(void)xdc;(void)xca;
-    T xbc=b.x-c.x,xda=d.x-a.x,xcb=c.x-b.x,xbc_xdc=xbc/xdc,ydc_xdc=ydc/xdc;(void)xda;
-    T A=(T).5*xbc*(2*yvcd*xdc-ydc*xdc-ydc*xcb)/xdc;
+    T xbc=b.x-c.x,xda=d.x-a.x,xcb=c.x-b.x,xdb=d.x-b.x,xbc_xdc=xbc/xdc,ydc_xdc=ydc/xdc,xdb_xdc=xdb/xdc;(void)xda;(void)xcb;
+    T A=(T).5*xbc*(2*yvcd-ydc*xdb_xdc);
     G(1)(1)=0;
     G(1)(2)=0;
     G(2)(1)=(T).5*(2*yvcd*xdc-ydc*xdc-2*ydc*xca+2*ydc*xba)/xdc;
