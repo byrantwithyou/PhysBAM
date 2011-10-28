@@ -193,7 +193,7 @@ Trapezoid_Intersection_Area_Case_1uo(const TV& a,const TV& b,const TV& c,const T
     G(1)(2)=0;
     G(2)(1)=(T).5*(2*yvcd-ydc-2*ydc*xcb_xdc);
     G(2)(2)=0;
-    G(3)(1)=(T).5*(ydc*xba*xba-2*ydc*xba*xdc-2*ydc*xba*xca-2*yvcd*xdc*xdc+ydc*xdc*xdc+2*ydc*xdc*xca+ydc*xca*xca)/xdc/xdc;
+    G(3)(1)=(T).5*(ydc*(xba*xba-2*xba*xdc+xdc*xdc-2*xba*xca+2*xdc*xca+xca*xca)-2*yvcd*xdc*xdc)/xdc/xdc;
     G(3)(2)=-(T).5*xbc*(xba-2*xdc-xca)/xdc;
     G(4)(1)=-(T).5*xbc*xbc/xdc*ydc_xdc;
     G(4)(2)=(T).5*xbc*xbc_xdc;
