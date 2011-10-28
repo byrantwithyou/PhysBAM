@@ -15,6 +15,7 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRAPEZOID_INTERSECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_INTERSECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/VOLUME_COLLISIONS.h>
+#include <iomanip>
 using namespace PhysBAM;
 
 ARRAY<int> trap_cases;
@@ -71,7 +72,7 @@ bool Test()
     T G=Va.Dot_Product(Va,(V1+V2)/(T)2);
     T aa=G/e;
     T bb=(A2-A1)/e;
-    if((!aa != !bb) || fabs((aa-bb)/bb)>1e-5){printf("ZG %g %g %g   ", aa, bb, fabs((aa-bb)/bb));LOG::cout<<tmp_cases<<"   "<<trap_cases<<std::endl;}
+    if((!aa != !bb) || fabs((aa-bb)/bb)>1e-5) if(tmp_cases==trap_cases){printf("ZG %g %g %g   ", aa, bb, fabs((aa-bb)/bb));LOG::cout<<tmp_cases<<"   "<<trap_cases<<std::endl;}
 
     MATRIX<T,8> M1,M2;
     for(int i=1;i<=8;i++) for(int j=1;j<=8;j++) M1(i,j)=H1((i+1)/2)((j+1)/2)((i+1)%2+1,(j+1)%2+1);
@@ -80,8 +81,9 @@ bool Test()
     VECTOR<T,8> dG1=(M1+M2)/(T)2*Va;
     VECTOR<T,8> dG2=V2-V1;
     T cc=dG2.Magnitude()/e;
-    T dd=(dG2-dG1).Magnitude()/e;
-    if((!cc != !dd) || dd/cc>1e-5){printf("ZH %g %g %g      ", cc, dd, dd/cc);LOG::cout<<tmp_cases<<"   "<<trap_cases<<std::endl;}
+    T dd=dG1.Magnitude()/e;
+    T ee=(dG2-dG1).Magnitude()/e;
+    if((!cc != !dd) || ee/cc>1e-5) if(tmp_cases==trap_cases){printf("ZH %g %g %g      ", cc, dd, ee/cc);LOG::cout<<tmp_cases<<"   "<<trap_cases<<std::endl;}
 
     return true;
 }
@@ -270,6 +272,7 @@ int main(int argc,char *argv[])
     typedef double T;
     typedef double RW;
     typedef VECTOR<T,2> TV;
+    LOG::cout<<std::setprecision(16);
 
     Test_Triangualted_Areas();
 
@@ -279,7 +282,7 @@ int main(int argc,char *argv[])
     for(int k=0;k<100000;k++)
         Tri_Test();
 
-    for(int k=0;k<100000;k++)
+    for(int k=0;k<1000000;k++)
         Test();
 
 //    for(int i=1;i<=100;i++) Test_Triangle_Intersection<TV>();
