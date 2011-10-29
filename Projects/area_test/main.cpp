@@ -12,9 +12,11 @@
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_2D.h>
 #include <PhysBAM_Geometry/Tessellation/SPHERE_TESSELLATION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/SEGMENT_ORIGIN_AREAS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRAPEZOID_INTERSECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_INTERSECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/VOLUME_COLLISIONS.h>
+#include <PhysBAM_Dynamics/Read_Write/EPS_FILE_GEOMETRY.h>
 #include <iomanip>
 using namespace PhysBAM;
 
@@ -267,6 +269,41 @@ void Test_Triangle_Intersection()
     Test_Triangle_Intersection(t1,t4,X);
 }
 
+void Case_Test()
+{
+    typedef double T;
+    typedef VECTOR<double,2> TV;
+
+    TV a,b,c,d;
+    rn.Fill_Uniform(a,-1,1);
+    rn.Fill_Uniform(b,-1,1);
+    rn.Fill_Uniform(c,-1,1);
+    rn.Fill_Uniform(d,-1,1);
+
+    {
+        EPS_FILE_GEOMETRY<T> eps("case.eps");
+        eps.Line_Color(VECTOR<T,3>(.5,.5,.5));
+        eps.Draw_Point(TV());
+        eps.Draw_Point(TV(-1,0));
+        eps.Draw_Point(TV(1,0));
+        eps.Draw_Point(TV(0,1));
+        eps.Draw_Point(TV(0,-1));
+        eps.Line_Color(VECTOR<T,3>(1,0,0));
+        eps.Draw_Line(a,b);
+        eps.Draw_Point(a);
+        eps.Draw_Line(TV(),a/a.Max_Abs());
+        eps.Draw_Line(TV(),b/b.Max_Abs());
+        eps.Line_Color(VECTOR<T,3>(0,1,0));
+        eps.Draw_Line(c,d);
+        eps.Draw_Point(c);
+        eps.Draw_Line(TV(),c/c.Max_Abs());
+        eps.Draw_Line(TV(),d/d.Max_Abs());
+    }
+
+    SEGMENT_ORIGIN_AREAS::DATA<T,4> data;
+    SEGMENT_ORIGIN_AREAS::Area_From_Segments(data,a,b,c,d);
+}
+
 int main(int argc,char *argv[])
 {
     typedef double T;
@@ -274,18 +311,20 @@ int main(int argc,char *argv[])
     typedef VECTOR<T,2> TV;
     LOG::cout<<std::setprecision(16);
 
-    Test_Triangualted_Areas();
+//    Test_Triangualted_Areas();
 
 //    fprintf(stderr, "%%!PS-Adobe-3.0 EPSF-3.0\n");
 //    fprintf(stderr, "%%%%BoundingBox: 0 0 1000 1000\n");
 
-    for(int k=0;k<100000;k++)
-        Tri_Test();
+//    for(int k=0;k<100000;k++)
+//        Tri_Test();
 
-    for(int k=0;k<1000000;k++)
-        Test();
+//    for(int k=0;k<1000000;k++)
+//        Test();
 
 //    for(int i=1;i<=100;i++) Test_Triangle_Intersection<TV>();
+
+    Case_Test();
 
     return 0;
 }
