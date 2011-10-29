@@ -36,7 +36,7 @@ template<class TV> void Intersect_Segments(DATA<TV,4>& data,const TV& A,const TV
 template<class T,class TV> void Area_From_Points(DATA<T,2>& data,const TV& A,const TV& B);
 
 // Compute V(data_m,data_n); add to data
-template<class T,class TV,int m,int n> void Combine_Data(DATA<T,4>& data,const DATA<T,2>& V,const DATA<TV,m>& data_m,const DATA<TV,n>& data_n,const VECTOR<int,m>& index_m,const VECTOR<int,n>& index_n);
+template<class T,class TV,int m,int n> void Combine_Data(DATA<T,4>& data,const DATA<T,2>& V,const DATA<TV,m>& data_m,const DATA<TV,n>& data_n,const int index_m[m],const int index_n[n]);
 
 // Individual cases
 template<class T,class TV> void Case_CCAA(DATA<T,4>& data,const TV& A,const TV& B,const TV& C,const TV& D);
@@ -46,7 +46,7 @@ template<class T,class TV> void Case_BCAC(DATA<T,4>& data,const TV& A,const TV& 
 template<class T,class TV> void Case_BCBC(DATA<T,4>& data,const TV& A,const TV& B,const TV& C,const TV& D);
 template<class T,class TV> void Case_ACAC(DATA<T,4>& data,const TV& A,const TV& B,const TV& C,const TV& D);
 
-template<class T,class TV> void Area_From_Segments(DATA<T,4>& data,const TV& A,const TV& B,const TV& C,const TV& D);
+template<class T,class TV> void Area_From_Segments(DATA<T,4>& data,TV A,TV B,TV C,TV D);
 }
 }
 #endif
