@@ -48,8 +48,8 @@ template<class T,class TV> void Intersect_Segments(DATA<T,2,4>& data,const TV& A
     data.V=A+z*(B-A);
 
     // Gradients of z:
-    TV oAB=(A-B).Orthogonal_Vector(),oCD=(C-D).Orthogonal_Vector(),g=oCD/sqr(ADxCD);
-    TV dzdA=-BDxCD*g,dzdB=-ABxCD*g,dzdC=ADxBD*g,dzdD=-ACxBC*g;
+    TV oAB=(A-B).Orthogonal_Vector(),oCD=(C-D).Orthogonal_Vector(),g=oCD/sqr(ABxCD);
+    TV dzdA=BDxCD*g,dzdB=-ADxCD*g,dzdC=ADxBD*g,dzdD=-ACxBC*g;
     MATRIX<T,2> dVdA=MATRIX<T,2>::Outer_Product(B-A,dzdA)+(1-z),dVdB=MATRIX<T,2>::Outer_Product(B-A,dzdB)+z;
     MATRIX<T,2> dVdC=MATRIX<T,2>::Outer_Product(B-A,dzdC),dVdD=MATRIX<T,2>::Outer_Product(B-A,dzdD);
     data.G[0]=dVdA;
@@ -124,10 +124,10 @@ template<class T,class TV> void Area_From_Segments(DATA<T,1,4>& data,TV A,TV B,T
     else if(case_a==beyond){
         PHYSBAM_ASSERT(case_b==outside && case_d==outside);
         if(case_c==inside){if(TV::Cross_Product(A,B).x<0) sign=-sign;Case_BCAC(tdata,A,B,C,D);}
-        else Case_BCBC(tdata,A,B,C,D);}
+        else{if(TV::Cross_Product(A,B).x<0) sign=-sign;Case_BCBC(tdata,A,B,C,D);}}
     else{
         PHYSBAM_ASSERT(case_b==outside && case_c==inside && case_d==outside);
-        Case_ACAC(tdata,A,B,C,D);}
+        if(TV::Cross_Product(A,B).x<0) sign=-sign;Case_ACAC(tdata,A,B,C,D);}
 
     for(int i=0;i<4;i++) LOG::cout<<index[i]<<" ";LOG::cout<<std::endl;
     LOG::cout<<"sign "<<sign<<std::endl;
@@ -197,11 +197,11 @@ template<class T,class TV> void Case_CCAB(DATA<T,1,4>& data,const TV& A,const TV
     Data_From_Dof(DC,C);
 
     DATA<T,1,2> V;
-    Area_From_Points(V,P.V,Q.V);
-    Combine_Data(data,V,P,Q,vec_abd,vec_abcd);
+    Area_From_Points(V,DC.V,Q.V);
+    Combine_Data(data,V,DC,Q,vec_c,vec_abcd);
 
-    Area_From_Points(V,Q.V,DC.V);
-    Combine_Data(data,V,Q,DC,vec_abcd,vec_c);
+    Area_From_Points(V,Q.V,P.V);
+    Combine_Data(data,V,Q,P,vec_abcd,vec_abd);
 }
 
 template<class T,class TV> void Case_CCBB(DATA<T,1,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
@@ -244,16 +244,12 @@ template<class T,class TV> void Case_BCBC(DATA<T,1,4>& data,const TV& A,const TV
     DATA<T,2,3> P2;
     Intersect_Segment_Point(P2,A,B,C);
 
-    printf("%g %g pointradius 0 360 arc stroke\n", P1.V.x, P1.V.y);
-    printf("%g %g pointradius 0 360 arc stroke\n", Q.V.x, Q.V.y);
-    printf("%g %g pointradius 0 360 arc stroke\n", P2.V.x, P2.V.y);
-
     DATA<T,1,2> V;
-    Area_From_Points(V,P1.V,Q.V);
-    Combine_Data(data,V,P1,Q,vec_cda,vec_abcd);
+    Area_From_Points(V,Q.V,P1.V);
+    Combine_Data(data,V,Q,P1,vec_abcd,vec_cda);
 
-    Area_From_Points(V,Q.V,P2.V);
-    Combine_Data(data,V,Q,P2,vec_abcd,vec_abc);
+    Area_From_Points(V,P2.V,Q.V);
+    Combine_Data(data,V,P2,Q,vec_abc,vec_abcd);
 }
 
 template<class T,class TV> void Case_ACAC(DATA<T,1,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
@@ -269,11 +265,11 @@ template<class T,class TV> void Case_ACAC(DATA<T,1,4>& data,const TV& A,const TV
     Data_From_Dof(DC,C);
 
     DATA<T,1,2> V;
-    Area_From_Points(V,DA.V,Q.V);
-    Combine_Data(data,V,DA,Q,vec_a,vec_abcd);
+    Area_From_Points(V,DC.V,Q.V);
+    Combine_Data(data,V,DC,Q,vec_c,vec_abcd);
 
-    Area_From_Points(V,Q.V,DC.V);
-    Combine_Data(data,V,Q,DC,vec_abcd,vec_c);
+    Area_From_Points(V,Q.V,DA.V);
+    Combine_Data(data,V,Q,DA,vec_abcd,vec_a);
 }
 
 template void Area_From_Segments<float,VECTOR<float,2> >(DATA<float,1,4>&,VECTOR<float,2>,VECTOR<float,2>,VECTOR<float,2>,
