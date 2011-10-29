@@ -1,5 +1,9 @@
+#include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Log/LOG.h>
+#include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/SEGMENT_ORIGIN_AREAS.h>
+
+extern PhysBAM::ARRAY<int> trap_cases;
 namespace PhysBAM{
 namespace SEGMENT_ORIGIN_AREAS{
 
@@ -28,72 +32,74 @@ template<class TV> POINT_CASE Classify_Point(const TV& A,const TV& B,const TV& P
 
 template<class TV> void Intersect_Segment_Point(DATA<TV,3>& data,const TV& A,const TV& B,const TV& P)
 {
-    bool Do_Intersect = false;
-    typename TV::value_type EPS = 1e-10;
-    typename TV::value_type mua,mub;
-    typename TV::value_type denom,numera,numerb;
-    typename TV::value_type denom_square;
+    typedef typename TV::SCALAR T;
+    // A + (B-A) t = u P
+    // [(B-A)xA] / [(B-A)xP] = u
+    // [AxB] / [-(B-A)xP] = u
+    // [AxB] / [(A-B)x(P-B) + AxB] = u
+/*
+    a = (A-B)x(P-B)
+    a = -Px(A-B) + Bx(A-B)
+    a = -(B-A)xP - AxB
+    -(B-A)xP=a+AxB
 
-    denom=(0.0-P.y)*(B.x-A.x)-(0.0-P.x)*(B.y-A.y);
-    numera=(0.0-P.x)*(A.y-P.y)-(0.0-P.y)*(A.x-P.x);
-    numerb=(B.x-A.x)*(A.y-P.y)-(B.y-A.y)*(A.x-P.x);
 
-    // Are the segments coincident?
-    if(std::abs(numera)<EPS && std::abs(numerb)<EPS && std::abs(denom)<EPS){
-        data.V.x=(A.x+B.x)/2.0;
-        data.V.y=(A.y+B.y)/2.0;
-    }
-    // Are the segments parallel?
-    else if(std::abs(denom)<EPS) {
-        data.V=TV();
-    }
-    else{
-        mua=numera/denom;
-        mub=numerb/denom;
-        // Do they really intersect?
-        if(mua<0.0||mua>1.0||mub<0.0||mub>1.0){
-            data.V=TV();
-        }
-        else{
-            Do_Intersect=true;
-            data.V.x=A.x+mua*(B.x-A.x);
-            data.V.y=A.y+mua*(B.y-A.y);
-        }
-    }
-    
-    if(Do_Intersect==false){
-        //
-        // What to do with G and H??
-        //
-    }
-    else{
-        denom_square=denom*denom;
-        data.G[0].x = P.x*(A.y-B.y)*(B.x*P.y-P.x*B.y)/denom_square;
-        data.G[1].x =  -P.x*(A.x-B.x)*(B.x*P.y-P.x*B.y)/denom_square;
-        data.G[2].x = -P.x*(A.y-B.y)*(A.x*P.y-P.x*A.y)/denom_square;
-        data.G[3].x = P.x*(A.x-B.x)*(A.x*P.y-P.x*A.y)/denom_square;
-        data.G[4].x =  P.y*(A.x-B.x)*(A.x*B.y-B.x*A.y)/denom_square;
-        data.G[5].x = -P.x*(A.x-B.x)*(A.x*B.y-B.x*A.y)/denom_square;
+    (B-A) x (P-A)
+    (A-B) x P - (B x A)
 
-        data.G[0].y = P.y*(A.y-B.y)*(B.x*P.y-P.x*B.y)/denom_square;
-        data.G[1].y = -P.y*(A.x-B.x)*(B.x*P.y-P.x*B.y)/denom_square;
-        data.G[2].y = -P.y*(A.y-B.y)*(A.x*P.y-P.x*A.y)/denom_square;
-        data.G[3].y = P.y*(A.x-B.x)*(A.x*P.y-P.x*A.y)/denom_square;
-        data.G[4].y =  P.y*(A.y-B.y)*(A.x*B.y-B.x*A.y)/denom_square;
-        data.G[5].y = -P.x*(A.y-B.y)*(A.x*B.y-B.x*A.y)/denom_square;
-    }
+*/
+    T cross1=TV::Cross_Product(A,B).x,cross2=TV::Cross_Product(A-B,P-B).x,den=1/(cross1+cross2),PxB=TV::Cross_Product(P,B).x,PxA=TV::Cross_Product(P,A).x;
+    data.V=cross1*den*P;
 
+    TV orthAB=(A-B).Orthogonal_Vector();
+    MATRIX<T,2> M=MATRIX<T,2>::Outer_Product(P,sqr(den)*orthAB);
+    MATRIX<T,2> GA=PxB*M;
+    MATRIX<T,2> GB=-PxA*M;
+    MATRIX<T,2> GP=-cross1*M;
+    data.G[0]=GA.Column(1);
+    data.G[1]=GA.Column(2);
+    data.G[2]=GB.Column(1);
+    data.G[3]=GB.Column(2);
+    data.G[4]=GP.Column(1);
+    data.G[5]=GP.Column(2);
     
     
 }
 
 template<class TV> void Intersect_Segments(DATA<TV,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
 {
+    // V = A + z (B - A); compute z
+    T ABxCD=TV::Cross_Product(A-B,C-D),ADxCD=TV::Cross_Product(A-D,C-D),ADxBD=TV::Cross_Product(A-D,B-D),ACxBC=TV::Cross_Product(A-C,B-C),z=ABxCD/ADxCD;
+    data.V=A+z*(B-A);
+
+    // Gradients of z:
+    TV oAB=(A-B).Orthogonal_Vector(),oCD=(C-D).Orthogonal_Vector(),g=oCD/sqr(ADxCD);
+    TV dzdA=(ABxCD-ADxCD)*g,dzdB=-ABxCD*g,dzdC=ADxBD*g,dzdD=-ACxBC*g;
+    MATRIX<T,2> dVdA=MATRIX<T,2>::Outer_Product(B-A,dzdA)+(1-z),dVdB=MATRIX<T,2>::Outer_Product(B-A,dzdB)+z;
+    MATRIX<T,2> dVdC=MATRIX<T,2>::Outer_Product(B-A,dzdC),dVdD=MATRIX<T,2>::Outer_Product(B-A,dzdD);
+    data.G[0]=dVdA.Column(1);
+    data.G[1]=dVdA.Column(2);
+    data.G[2]=dVdB.Column(1);
+    data.G[3]=dVdB.Column(2);
+    data.G[4]=dVdC.Column(1);
+    data.G[5]=dVdC.Column(2);
+    data.G[6]=dVdD.Column(1);
+    data.G[7]=dVdD.Column(2);
+
+    // Hessian components of z:
+    MATRIX<T,2> d2zdAdA=(2*(ABxCD-ADxCD)/(den*sqr(den)))*MATRIX<T,2>::Outer_Product(oCD,oCD);
+    MATRIX<T,2> d2zdBdB=(2*ADxCD/(den*sqr(den)))*MATRIX<T,2>::Outer_Product(oCD,oCD);
+    MATRIX<T,2> d2zdCdC=(-ADxBD/(den*sqr(den)))*(MATRIX<T,2>::Outer_Product(oCD,oAB)+MATRIX<T,2>::Outer_Product(oAB,oCD));
+    MATRIX<T,2> d2zdCdC=(-ACxBC/(den*sqr(den)))*(MATRIX<T,2>::Outer_Product(oCD,oAB)+MATRIX<T,2>::Outer_Product(oAB,oCD));
+
+
+    // Hessian 
+
     bool Do_Intersect = false;
-    typename TV::value_type EPS = 1e-10;
-    typename TV::value_type mua,mub;
-    typename TV::value_type denom,numera,numerb;
-    typename TV::value_type denom_square;
+    typename TV::SCALAR EPS = 1e-10;
+    typename TV::SCALAR mua,mub;
+    typename TV::SCALAR denom,numera,numerb;
+    typename TV::SCALAR denom_square;
 
     denom=(D.y-C.y)*(B.x-A.x)-(D.x-C.x)*(B.y-A.y);
     numera=(D.x-C.x)*(A.y-C.y)-(D.y-C.y)*(A.x-C.x);
@@ -151,14 +157,14 @@ template<class TV> void Intersect_Segments(DATA<TV,4>& data,const TV& A,const TV
 
 template<class T,class TV> void Area_From_Points(DATA<T,2>& data,const TV& A,const TV& B)
 {
-    data.v=Cross_Product(A,B);
-    
-    data.G[0]=B.y; data.G[1]=-B.x; data.G[2]=-A.y; data.G[3]=A.x;
-    
-    data.H[0][0]=0.0;   data.H[0][1]=0.0;   data.H[0][2]=0.0;   data.H[0][3]=1.0;
-    data.H[1][0]=0.0;   data.H[1][1]=0.0;   data.H[1][2]=-1.0;  data.H[1][3]=0.0;
-    data.H[2][0]=0.0;   data.H[2][1]=-1.0;  data.H[2][2]=0.0;   data.H[2][3]=0.0;
-    data.H[3][0]=1.0;   data.H[3][1]=0.0;   data.H[3][2]=0.0;   data.H[3][3]=0.0;
+    data.V=(T).5*TV::Cross_Product(A,B).x;
+    data.G[0]=(T).5*B.y;
+    data.G[1]=-(T).5*B.x;
+    data.G[2]=-(T).5*A.y;
+    data.G[3]=(T).5*A.x;
+    for(int i=0;i<4;i++) for(int j=0;j<4;j++) data.H[i][j]=0;
+    data.H[0][3]=data.H[3][0]=(T).5;
+    data.H[1][2]=data.H[2][1]=-(T).5;
 }
 
 template<class T,class TV> void Area_From_Segments(DATA<T,4>& data,TV A,TV B,TV C,TV D)
@@ -260,6 +266,7 @@ Combine_Data(DATA<T,4>& data,const DATA<T,2>& V,const DATA<TV,m>& data_m,const D
 const int vec_a[1]={0}, vec_c[1]={2}, vec_d[1]={3}, vec_abc[3]={0,1,2}, vec_abd[3]={0,1,3}, vec_cdb[3]={2,3,1}, vec_abcd[4]={0,1,2,3};
 template<class T,class TV> void Case_CCAA(DATA<T,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
 {
+    trap_cases.Append(1);
     DATA<TV,1> DC;
     Data_From_Dof(DC,C);
 
@@ -273,6 +280,7 @@ template<class T,class TV> void Case_CCAA(DATA<T,4>& data,const TV& A,const TV& 
 
 template<class T,class TV> void Case_CCAB(DATA<T,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
 {
+    trap_cases.Append(2);
     DATA<TV,4> Q;
     Intersect_Segments(Q,A,B,C,D);
 
@@ -292,6 +300,7 @@ template<class T,class TV> void Case_CCAB(DATA<T,4>& data,const TV& A,const TV& 
 
 template<class T,class TV> void Case_CCBB(DATA<T,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
 {
+    trap_cases.Append(3);
     DATA<TV,3> P1;
     Intersect_Segment_Point(P1,A,B,C);
 
@@ -305,6 +314,7 @@ template<class T,class TV> void Case_CCBB(DATA<T,4>& data,const TV& A,const TV& 
 
 template<class T,class TV> void Case_BCAC(DATA<T,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
 {
+    trap_cases.Append(4);
     DATA<TV,3> P;
     Intersect_Segment_Point(P,A,B,C);
 
@@ -318,6 +328,7 @@ template<class T,class TV> void Case_BCAC(DATA<T,4>& data,const TV& A,const TV& 
 
 template<class T,class TV> void Case_BCBC(DATA<T,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
 {
+    trap_cases.Append(5);
     DATA<TV,4> Q;
     Intersect_Segments(Q,A,B,C,D);
 
@@ -332,6 +343,7 @@ template<class T,class TV> void Case_BCBC(DATA<T,4>& data,const TV& A,const TV& 
 
 template<class T,class TV> void Case_ACAC(DATA<T,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
 {
+    trap_cases.Append(6);
     DATA<TV,4> Q;
     Intersect_Segments(Q,A,B,C,D);
 
@@ -347,20 +359,6 @@ template<class T,class TV> void Case_ACAC(DATA<T,4>& data,const TV& A,const TV& 
 
     Area_From_Points(V,Q.V,DC.V);
     Combine_Data(data,V,Q,DC,vec_abcd,vec_c);
-}
-
-template<class TV> void Intersect_Segment_Point(DATA<TV,3>& data,const TV& A,const TV& B,const TV& P){Clear(data);puts("Not implemented");throw 0;} // TODO: Fill in
-template<class TV> void Intersect_Segments(DATA<TV,4>& data,const TV& A,const TV& B,const TV& C,const TV& D){Clear(data);puts("Not implemented");throw 0;} // TODO: Fill in
-template<class T,class TV> void Area_From_Points(DATA<T,2>& data,const TV& A,const TV& B)
-{
-    data.V=(T).5*TV::Cross_Product(A,B).x;
-    data.G[0]=(T).5*B.y;
-    data.G[1]=-(T).5*B.x;
-    data.G[2]=-(T).5*A.y;
-    data.G[3]=(T).5*A.x;
-    for(int i=0;i<4;i++) for(int j=0;j<4;j++) data.H[i][j]=0;
-    data.H[0][3]=data.H[3][0]=(T).5;
-    data.H[1][2]=data.H[2][1]=-(T).5;
 }
 
 template void Area_From_Segments<float,VECTOR<float,2> >(DATA<float,4>&,VECTOR<float,2>,VECTOR<float,2>,VECTOR<float,2>,
