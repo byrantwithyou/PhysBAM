@@ -89,6 +89,7 @@ Write_Head()
     Emit(output_box.min_corner);
     Emit(output_box.max_corner);
     (*stream)<<output_box.max_corner.y<<std::endl;
+    (*stream)<<"/pointradius .01 def"<<std::endl;
     (*stream)<<"/untransformed-image {"<<std::endl;
 }
 //#####################################################################
