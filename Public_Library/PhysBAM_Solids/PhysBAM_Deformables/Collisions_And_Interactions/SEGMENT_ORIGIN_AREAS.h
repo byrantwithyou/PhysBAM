@@ -47,9 +47,7 @@ template<class T,class TV> void Case_BCBC(DATA<T,4>& data,const TV& A,const TV& 
 template<class T,class TV> void Case_ACAC(DATA<T,4>& data,const TV& A,const TV& B,const TV& C,const TV& D);
 
 template<class T,class TV> void Area_From_Segments(DATA<T,4>& data,const TV& A,const TV& B,const TV& C,const TV& D);
-
 };
-
 }
 #endif
 

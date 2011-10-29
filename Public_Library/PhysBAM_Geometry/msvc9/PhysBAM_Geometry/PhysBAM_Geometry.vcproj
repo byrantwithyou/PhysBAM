@@ -551,14 +551,6 @@
 		<Filter
 			Name="Collision_Detection_Computations"
 			>
-			<File
-				RelativePath="..\..\Collision_Detection_Computations\GET_POTENTIAL_COLLISIONS.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Collision_Detection_Computations\GET_POTENTIAL_COLLISIONS.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Collisions"

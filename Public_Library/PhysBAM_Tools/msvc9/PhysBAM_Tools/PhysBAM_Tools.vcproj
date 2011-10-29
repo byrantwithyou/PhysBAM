@@ -1730,30 +1730,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\Ordinary_Differential_Equations\COMBINED_COLLISIONS.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Ordinary_Differential_Equations\COMBINED_COLLISIONS.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Ordinary_Differential_Equations\COMBINED_COLLISIONS_NONLINEAR_FUNCTION.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Ordinary_Differential_Equations\COMBINED_COLLISIONS_NONLINEAR_FUNCTION.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Ordinary_Differential_Equations\COMBINED_COLLISIONS_PARAMETER_SPACE.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Ordinary_Differential_Equations\COMBINED_COLLISIONS_PARAMETER_SPACE.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\Ordinary_Differential_Equations\DRIVER.cpp"
 				>
 			</File>

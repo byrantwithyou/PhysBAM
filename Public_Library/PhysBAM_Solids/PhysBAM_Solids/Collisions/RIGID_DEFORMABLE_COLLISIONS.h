@@ -71,7 +71,6 @@ public:
         ARRAY<TV>& rigid_X_save,ARRAY<ROTATION<TV> >& rigid_rotation_save,ARRAY<TV>& rigid_velocity_difference,ARRAY<typename TV::SPIN>& rigid_angular_momentum_difference,ARRAY<TV>& X_save,
         const T collision_body_thickness);
     TV Pull_In_Rigid_Deformable_Collision_Pair(RIGID_BODY<TV>& rigid_body,const int particle_index,const T dt,const TV& original_relative_velocity,const bool check_succeeded_only,const bool apply_impulse);
-    void Process_Pull_In(const T dt,const T time);
     void Process_Push_Out();
     void Initialize_All_Contact_Projections();
     void Set_Collision_Velocities(ARRAY_VIEW<TV> V,ARRAY_VIEW<TWIST<TV> > twist,ARRAY<TV>& X_save,ARRAY<TV>& rigid_X_save,ARRAY_VIEW<const ROTATION<TV> >& rigid_rotation_save,

@@ -219,62 +219,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\..\PhysBAM_Deformables\Collisions_And_Interactions\COMBINED_COLLISIONS_DEFORMABLE_IMPULSE.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\PhysBAM_Deformables\Collisions_And_Interactions\COMBINED_COLLISIONS_DEFORMABLE_IMPULSE.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\PhysBAM_Deformables\Collisions_And_Interactions\COMBINED_COLLISIONS_EDGE_EDGE.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\PhysBAM_Deformables\Collisions_And_Interactions\COMBINED_COLLISIONS_EDGE_EDGE.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\PhysBAM_Deformables\Collisions_And_Interactions\COMBINED_COLLISIONS_EDGE_EDGE_PULL_IN.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\PhysBAM_Deformables\Collisions_And_Interactions\COMBINED_COLLISIONS_EDGE_EDGE_PULL_IN.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\PhysBAM_Deformables\Collisions_And_Interactions\COMBINED_COLLISIONS_POINT_FACE.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\PhysBAM_Deformables\Collisions_And_Interactions\COMBINED_COLLISIONS_POINT_FACE.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\PhysBAM_Deformables\Collisions_And_Interactions\COMBINED_COLLISIONS_POINT_FACE_PULL_IN.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\PhysBAM_Deformables\Collisions_And_Interactions\COMBINED_COLLISIONS_POINT_FACE_PULL_IN.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\PhysBAM_Deformables\Collisions_And_Interactions\COMBINED_COLLISIONS_REPULSION_BASE.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\PhysBAM_Deformables\Collisions_And_Interactions\COMBINED_COLLISIONS_REPULSION_BASE.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\PhysBAM_Deformables\Collisions_And_Interactions\COMBINED_COLLISIONS_REPULSION_PULL_IN_BASE.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\PhysBAM_Deformables\Collisions_And_Interactions\COMBINED_COLLISIONS_REPULSION_PULL_IN_BASE.h"
-					>
-				</File>
-				<File
 					RelativePath="..\..\PhysBAM_Deformables\Collisions_And_Interactions\DEFORMABLE_OBJECT_COLLISION_PARAMETERS.cpp"
 					>
 				</File>
@@ -1163,22 +1107,6 @@
 				Name="Collisions"
 				>
 				<File
-					RelativePath="..\..\PhysBAM_Rigids\Collisions\COMBINED_COLLISIONS_RIGID.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\PhysBAM_Rigids\Collisions\COMBINED_COLLISIONS_RIGID.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\PhysBAM_Rigids\Collisions\COMBINED_COLLISIONS_RIGID_IMPULSE.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\PhysBAM_Rigids\Collisions\COMBINED_COLLISIONS_RIGID_IMPULSE.h"
-					>
-				</File>
-				<File
 					RelativePath="..\..\PhysBAM_Rigids\Collisions\PARTICLE_LEVELSET_VISITOR.cpp"
 					>
 				</File>
@@ -1784,30 +1712,6 @@
 				</File>
 				<File
 					RelativePath="..\..\PhysBAM_Solids\Collisions\BW_COLLISIONS.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\PhysBAM_Solids\Collisions\COMBINED_COLLISIONS_COUPLED.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\PhysBAM_Solids\Collisions\COMBINED_COLLISIONS_COUPLED.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\PhysBAM_Solids\Collisions\COMBINED_COLLISIONS_COUPLED_IMPULSE.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\PhysBAM_Solids\Collisions\COMBINED_COLLISIONS_COUPLED_IMPULSE.h"
-					>
-				</File>
-				<File
-					RelativePath="..\..\PhysBAM_Solids\Collisions\COMBINED_COLLISIONS_COUPLED_PULL_IN.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\..\PhysBAM_Solids\Collisions\COMBINED_COLLISIONS_COUPLED_PULL_IN.h"
 					>
 				</File>
 				<File

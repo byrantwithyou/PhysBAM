@@ -15,7 +15,9 @@
 #include <PhysBAM_Tools/Parallel_Computation/THREADED_UNIFORM_GRID.h>
 #include <PhysBAM_Tools/Point_Clouds/POINT_CLOUD.h>
 #include <PhysBAM_Tools/Read_Write/Grids_Uniform_Arrays/READ_WRITE_ARRAYS.h>
+#ifndef WIN32
 #include <unistd.h>
+#endif
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
