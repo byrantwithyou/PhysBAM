@@ -6,11 +6,11 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRAPEZOID_INTERSECTION.h>
 using namespace PhysBAM;
 // Case 1 order: a c b d; ou = c over, b under
-ARRAY<int> trap_cases;
+//extern ARRAY<int> trap_cases;
 template<class T,class TV> T PhysBAM::
 Trapezoid_Intersection_Area_Case_1ou(const TV& a,const TV& b,const TV& c,const TV& d,VECTOR<TV,4>& G,VECTOR<VECTOR<MATRIX<T,2>,4>,4>& H)
 {
-    trap_cases.Append(1);
+//    trap_cases.Append(1);
 //    LOG::cout<<__FUNCTION__<<std::endl;
     T yvab=(a.y+b.y)/2,yba=b.y-a.y,yvcd=(c.y+d.y)/2,ydc=d.y-c.y,xba=b.x-a.x,xdc=d.x-c.x,xca=c.x-a.x;(void)yvab;(void)yba;(void)yvcd;(void)ydc;(void)xba;(void)xdc;(void)xca;
     T xbc=b.x-c.x,xbc_xba=xbc/xba,xca_xba=xca/xba,yba_xba=yba/xba,xca_xba2=xca_xba*xca_xba,xbc_xba2=xbc_xba*xbc_xba;
@@ -68,7 +68,7 @@ Trapezoid_Intersection_Area_Case_1ou(const TV& a,const TV& b,const TV& c,const T
 template<class T,class TV> T PhysBAM::
 Trapezoid_Intersection_Area_Case_1oo(const TV& a,const TV& b,const TV& c,const TV& d,VECTOR<TV,4>& G,VECTOR<VECTOR<MATRIX<T,2>,4>,4>& H)
 {
-    trap_cases.Append(2);
+//    trap_cases.Append(2);
 //    LOG::cout<<__FUNCTION__<<std::endl;
     T yvab=(a.y+b.y)/2,yba=b.y-a.y,yvcd=(c.y+d.y)/2,ydc=d.y-c.y,xba=b.x-a.x,xdc=d.x-c.x,xca=c.x-a.x;(void)yvab;(void)yba;(void)yvcd;(void)ydc;(void)xba;(void)xdc;(void)xca;
 
@@ -126,7 +126,7 @@ Trapezoid_Intersection_Area_Case_1oo(const TV& a,const TV& b,const TV& c,const T
 template<class T,class TV> T PhysBAM::
 Trapezoid_Intersection_Area_Case_1uu(const TV& a,const TV& b,const TV& c,const TV& d,VECTOR<TV,4>& G,VECTOR<VECTOR<MATRIX<T,2>,4>,4>& H)
 {
-    trap_cases.Append(3);
+//    trap_cases.Append(3);
 //    LOG::cout<<__FUNCTION__<<std::endl;
     T yvab=(a.y+b.y)/2,yba=b.y-a.y,yvcd=(c.y+d.y)/2,ydc=d.y-c.y,xba=b.x-a.x,xdc=d.x-c.x,xca=c.x-a.x;(void)yvab;(void)yba;(void)yvcd;(void)ydc;(void)xba;(void)xdc;(void)xca;
 
@@ -184,7 +184,7 @@ Trapezoid_Intersection_Area_Case_1uu(const TV& a,const TV& b,const TV& c,const T
 template<class T,class TV> T PhysBAM::
 Trapezoid_Intersection_Area_Case_1uo(const TV& a,const TV& b,const TV& c,const TV& d,VECTOR<TV,4>& G,VECTOR<VECTOR<MATRIX<T,2>,4>,4>& H)
 {
-    trap_cases.Append(4);
+//    trap_cases.Append(4);
 //    LOG::cout<<__FUNCTION__<<std::endl;
     T yvab=(a.y+b.y)/2,yba=b.y-a.y,yvcd=(c.y+d.y)/2,ydc=d.y-c.y,xba=b.x-a.x,xdc=d.x-c.x,xca=c.x-a.x;(void)yvab;(void)yba;(void)yvcd;(void)ydc;(void)xba;(void)xdc;(void)xca;
     T xbc=b.x-c.x,xda=d.x-a.x,xcb=c.x-b.x,xdb=d.x-b.x,xbc_xdc=xbc/xdc,ydc_xdc=ydc/xdc,xdb_xdc=xdb/xdc,xcb_xdc=xcb/xdc;(void)xda;(void)xcb;
@@ -242,7 +242,7 @@ Trapezoid_Intersection_Area_Case_1uo(const TV& a,const TV& b,const TV& c,const T
 template<class T,class TV> T PhysBAM::
 Trapezoid_Intersection_Area_Case_2ou(const TV& a,const TV& b,const TV& c,const TV& d,VECTOR<TV,4>& G,VECTOR<VECTOR<MATRIX<T,2>,4>,4>& H)
 {
-    trap_cases.Append(5);
+//    trap_cases.Append(5);
 //    LOG::cout<<__FUNCTION__<<std::endl;
     T yvab=(a.y+b.y)/2,yba=b.y-a.y,yvcd=(c.y+d.y)/2,ydc=d.y-c.y,xba=b.x-a.x,xdc=d.x-c.x,xca=c.x-a.x;(void)yvab;(void)yba;(void)yvcd;(void)ydc;(void)xba;(void)xdc;(void)xca;
 
@@ -299,7 +299,7 @@ Trapezoid_Intersection_Area_Case_2ou(const TV& a,const TV& b,const TV& c,const T
 template<class T,class TV> T PhysBAM::
 Trapezoid_Intersection_Area_Case_2oo(const TV& a,const TV& b,const TV& c,const TV& d,VECTOR<TV,4>& G,VECTOR<VECTOR<MATRIX<T,2>,4>,4>& H)
 {
-    trap_cases.Append(6);
+//    trap_cases.Append(6);
 ////    LOG::cout<<__FUNCTION__<<std::endl;
     T yvab=(a.y+b.y)/2,yba=b.y-a.y,yvcd=(c.y+d.y)/2,ydc=d.y-c.y,xba=b.x-a.x,xdc=d.x-c.x,xca=c.x-a.x;(void)yvab;(void)yba;(void)yvcd;(void)ydc;(void)xba;(void)xdc;(void)xca;
     T xda=d.x-a.x,xdb=d.x-b.x,xcb=c.x-b.x,xca_xba=xca/xba,xdc_xba=xdc/xba,xdb_xba=xdb/xba,yba_xba=yba/xba,xcb_xba=xcb/xba,xda_xba=xda/xba;
@@ -357,7 +357,7 @@ Trapezoid_Intersection_Area_Case_2oo(const TV& a,const TV& b,const TV& c,const T
 template<class T,class TV> T PhysBAM::
 Trapezoid_Intersection_Area_Case_2uu(const TV& a,const TV& b,const TV& c,const TV& d,VECTOR<TV,4>& G,VECTOR<VECTOR<MATRIX<T,2>,4>,4>& H)
 {
-    trap_cases.Append(7);
+//    trap_cases.Append(7);
 //    LOG::cout<<__FUNCTION__<<std::endl;
     T yvab=(a.y+b.y)/2,yba=b.y-a.y,yvcd=(c.y+d.y)/2,ydc=d.y-c.y,xba=b.x-a.x,xdc=d.x-c.x,xca=c.x-a.x;(void)yvab;(void)yba;(void)yvcd;(void)ydc;(void)xba;(void)xdc;(void)xca;
 
@@ -414,7 +414,7 @@ Trapezoid_Intersection_Area_Case_2uu(const TV& a,const TV& b,const TV& c,const T
 template<class T,class TV> T PhysBAM::
 Trapezoid_Intersection_Area_Case_2uo(const TV& a,const TV& b,const TV& c,const TV& d,VECTOR<TV,4>& G,VECTOR<VECTOR<MATRIX<T,2>,4>,4>& H)
 {
-    trap_cases.Append(8);
+//    trap_cases.Append(8);
 //    LOG::cout<<__FUNCTION__<<std::endl;
     T yvab=(a.y+b.y)/2,yba=b.y-a.y,yvcd=(c.y+d.y)/2,ydc=d.y-c.y,xba=b.x-a.x,xdc=d.x-c.x,xca=c.x-a.x;(void)yvab;(void)yba;(void)yvcd;(void)ydc;(void)xba;(void)xdc;(void)xca;
 
