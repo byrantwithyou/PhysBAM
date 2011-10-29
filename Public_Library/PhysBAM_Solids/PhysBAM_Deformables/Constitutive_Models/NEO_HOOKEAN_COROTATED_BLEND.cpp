@@ -17,33 +17,17 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T,int d> NEO_HOOKEAN_COROTATED_BLEND<T,d>::
-NEO_HOOKEAN_COROTATED_BLEND(const T neo_youngs_modulus_input,
-                         const T neo_poissons_ratio_input,
-                         const T neo_Rayleigh_coefficient):
-    neo_youngs_modulus(neo_youngs_modulus_input),neo_poissons_ratio(neo_poissons_ratio_input),
-    panic_threshold((T)1e-6)
+NEO_HOOKEAN_COROTATED_BLEND(const T youngs_modulus,const T poissons_ratio,const T Rayleigh_coefficient):
+    neo_base(youngs_modulus,poissons_ratio,Rayleigh_coefficient),
+    cor_base(2*youngs_modulus,poissons_ratio,Rayleigh_coefficient),
+    J_min(0.3),J_max(0.9)
 {
-    assert(neo_poissons_ratio>-1&&neo_poissons_ratio<.5);
+    constant_lambda = youngs_modulus*poissons_ratio/((1+poissons_ratio)*(1-2*poissons_ratio));
+    constant_mu     = youngs_modulus/(2*(1+poissons_ratio));
+    constant_alpha  = Rayleigh_coefficient*constant_lambda;
+    constant_beta   = Rayleigh_coefficient*constant_mu;    
     
-    constant_lambda = neo_youngs_modulus*neo_poissons_ratio/((1+neo_poissons_ratio)*(1-2*neo_poissons_ratio));
-    constant_mu     = neo_youngs_modulus/(2*(1+neo_poissons_ratio));
-    constant_alpha  = neo_Rayleigh_coefficient*constant_lambda;
-    constant_beta   = neo_Rayleigh_coefficient*constant_mu;
-
-    neo_mu     = constant_mu;
-    neo_lambda = constant_lambda;
-
-    /*** note ***/ // TODO: Should choose the constants here based on the input parameters 
-
-        cor_mu     = constant_mu*2;
-        cor_lambda = constant_lambda*2;
-
-        J_min = 0.3;
-        J_max = 0.9;
-
-    /*** end note ***/
-
-    heaviside.Initialize(J_min,J_max);
+    blend.Initialize(J_min,J_max);
 }
 //#####################################################################
 // Destructor
@@ -58,49 +42,15 @@ template<class T,int d> NEO_HOOKEAN_COROTATED_BLEND<T,d>::
 template<class T,int d> T NEO_HOOKEAN_COROTATED_BLEND<T,d>::
 Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int simplex) const
 {
-    return Energy_Density_Helper(F,simplex);
-}
-//#####################################################################
-// Function Energy_Density_Helper
-//#####################################################################
-template<class T,int d> T NEO_HOOKEAN_COROTATED_BLEND<T,d>::
-Energy_Density_Helper(const DIAGONAL_MATRIX<T,2>& F,const int simplex) const
-{
-    T J=F.Determinant();
+    T J = F.Determinant();
 
-    if (J>=J_max) // Neo Hookean
+    if      (J>=J_max) return neo_base.Energy_Density(F,simplex); // Neo Hookean
+    else if (J<=J_min) return cor_base.Energy_Density(F,simplex); // Corotated
+    else
     {
-        T I1=(F*F.Transposed()).Trace();
-        T log_J=log(J);
-        return neo_mu*((T).5*(I1-TV::m)-log_J)+(T).5*neo_lambda*sqr(log_J);
+        T t = blend.H(F);
+        return t*neo_base.Energy_Density(F,simplex) + (1-t)*cor_base.Energy_Density(F,simplex);
     }
-    else if (J<=J_min) // Corotated
-    {
-        DIAGONAL_MATRIX<T,2> Fm1=F-1;
-        return cor_mu*(Fm1*Fm1).Trace()+(T).5*cor_lambda*sqr(Fm1.Trace());
-    }
-    else // Transition Region J_min < J < J_max
-    {
-        T I1=(F*F.Transposed()).Trace();
-        T log_J=log(J);
-        T neo_energy = neo_mu*((T).5*(I1-TV::m)-log_J)+(T).5*neo_lambda*sqr(log_J);
-        
-        DIAGONAL_MATRIX<T,2> Fm1=F-1;
-        T cor_energy = cor_mu*(Fm1*Fm1).Trace()+(T).5*cor_lambda*sqr(Fm1.Trace());
-        
-        T t = heaviside.H(J);
-
-        return t*neo_energy + (1-t)*cor_energy;
-    }
-}
-//#####################################################################
-// Function Energy_Density_Helper
-//#####################################################################
-template<class T,int d> T NEO_HOOKEAN_COROTATED_BLEND<T,d>::
-Energy_Density_Helper(const DIAGONAL_MATRIX<T,3>& F,const int simplex) const
-{
-    PHYSBAM_FATAL_ERROR();
-    return 0;
 }
 //#####################################################################
 // Function P_From_Strain
@@ -108,53 +58,18 @@ Energy_Density_Helper(const DIAGONAL_MATRIX<T,3>& F,const int simplex) const
 template<class T,int d> DIAGONAL_MATRIX<T,d> NEO_HOOKEAN_COROTATED_BLEND<T,d>::
 P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const T scale,const int simplex) const
 {
-    return P_From_Strain_Helper(F,scale,simplex);
-}
-//#####################################################################
-// Function P_From_Strain_Helper
-//#####################################################################
-template<class T,int d> DIAGONAL_MATRIX<T,2> NEO_HOOKEAN_COROTATED_BLEND<T,d>::
-P_From_Strain_Helper(const DIAGONAL_MATRIX<T,2>& F,const T scale,const int simplex) const
-{
-    T J=F.Determinant();
+    T J = F.Determinant();
 
-    if (J>=J_max) // Neo Hookean
-    {  
-        return scale*(neo_mu*F-(neo_mu-neo_lambda*log(J))*F.Inverse());
-    }
-    else if (J<=J_min) // Corotated
+    if      (J>=J_max) return neo_base.P_From_Strain(F,scale,simplex); // Neo Hookean
+    else if (J<=J_min) return cor_base.P_From_Strain(F,scale,simplex); // Corotated
+    else
     {
-        DIAGONAL_MATRIX<T,2> Fm1=F-1;
-        return scale*(2*cor_mu*Fm1+cor_lambda*Fm1.Trace());
+        T t = blend.H(F);
+        return scale*(
+            neo_base.P_From_Strain(F,1,simplex)*t + cor_base.P_From_Strain(F,1,simplex)*(1-t) +
+            blend.DH(F)*(neo_base.Energy_Density(F,simplex) - cor_base.Energy_Density(F,simplex))
+        );
     }
-    else // Transition Region J_min < J < J_max
-    {
-        T I1=(F*F.Transposed()).Trace();
-        T log_J=log(J);
-        T neo_energy = neo_mu*((T).5*(I1-TV::m)-log_J)+(T).5*neo_lambda*sqr(log_J);
-        DIAGONAL_MATRIX<T,2> grad_neo_energy = neo_mu*F-(neo_mu-neo_lambda*log_J)*F.Inverse();
-
-        DIAGONAL_MATRIX<T,2> Fm1=F-1;
-        T cor_energy = cor_mu*(Fm1*Fm1).Trace()+(T).5*cor_lambda*sqr(Fm1.Trace());
-        DIAGONAL_MATRIX<T,2> grad_cor_energy = 2*cor_mu*Fm1+cor_lambda*Fm1.Trace();
-        
-        T t = heaviside.H(J);
-        T tJ = heaviside.HJ(J);
-        DIAGONAL_MATRIX<T,2> grad_t;
-        grad_t.x11 = tJ*F.x22;
-        grad_t.x22 = tJ*F.x11;
-
-        return scale*(grad_neo_energy*t + grad_cor_energy*(1-t) + grad_t*(neo_energy-cor_energy));
-    }
-}
-//#####################################################################
-// Function P_From_Strain_Helper
-//#####################################################################
-template<class T,int d> DIAGONAL_MATRIX<T,3> NEO_HOOKEAN_COROTATED_BLEND<T,d>::
-P_From_Strain_Helper(const DIAGONAL_MATRIX<T,3>& F,const T scale,const int simplex) const
-{
-    PHYSBAM_FATAL_ERROR();
-    return DIAGONAL_MATRIX<T,3>();
 }
 //#####################################################################
 // Function Isotropic_Stress_Derivative
@@ -162,84 +77,28 @@ P_From_Strain_Helper(const DIAGONAL_MATRIX<T,3>& F,const T scale,const int simpl
 template<class T,int d> void NEO_HOOKEAN_COROTATED_BLEND<T,d>::
 Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,d>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d>& dP_dF,const int triangle) const
 {
-    return Isotropic_Stress_Derivative_Helper(F,dP_dF,triangle);
-}
-//#####################################################################
-// Function Isotropic_Stress_Derivative_Helper
-//#####################################################################
-template<class T,int d> void NEO_HOOKEAN_COROTATED_BLEND<T,d>::
-Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& dP_dF,const int triangle) const
-{
-    T J=F.Determinant();
+    T J = F.Determinant();
 
-    if (J>=J_max) // Neo Hookean
-    {     
-        DIAGONAL_MATRIX<T,2> F_inverse=F.Inverse();
-        T neo_mu_minus_lambda_logJ=neo_mu+neo_lambda*log(F_inverse.Determinant());
-        SYMMETRIC_MATRIX<T,2> F_inverse_outer=SYMMETRIC_MATRIX<T,2>::Outer_Product(F_inverse.To_Vector());
-        dP_dF.x1111=neo_mu+(neo_lambda+neo_mu_minus_lambda_logJ)*F_inverse_outer.x11;//alpha+beta+gamma
-        dP_dF.x2222=neo_mu+(neo_lambda+neo_mu_minus_lambda_logJ)*F_inverse_outer.x22;
-        dP_dF.x2211=neo_lambda*F_inverse_outer.x21;//gamma
-        dP_dF.x2121=neo_mu;//alpha
-        dP_dF.x2112=neo_mu_minus_lambda_logJ*F_inverse_outer.x21;//beta
-    }
-    else if (J<=J_min) // Corotated
+    if      (J>=J_max) neo_base.Isotropic_Stress_Derivative(F,dP_dF,triangle); // Neo Hookean
+    else if (J<=J_min) cor_base.Isotropic_Stress_Derivative(F,dP_dF,triangle); // Corotated
+    else
     {
-        T cor_mu2la=2*cor_mu+cor_lambda,cor_la2mu2=2*cor_lambda+2*cor_mu;
-        T d12=F.x11+F.x22;if(fabs(d12)<panic_threshold) d12=d12<0?-panic_threshold:panic_threshold;
-        T cor_i12=cor_la2mu2/d12;
-        dP_dF.x1111=cor_mu2la;
-        dP_dF.x2112=cor_i12-cor_lambda;
-        dP_dF.x2121=cor_mu2la-cor_i12;
-        dP_dF.x2211=cor_lambda;
-        dP_dF.x2222=cor_mu2la;
-    }
-    else // Transition Region J_min < J < J_max
-    {
-        T I1=(F*F.Transposed()).Trace();
-        T log_J=log(J);
-        T neo = neo_mu*((T).5*(I1-TV::m)-log_J)+(T).5*neo_lambda*sqr(log_J);
-        DIAGONAL_MATRIX<T,2> grad_neo = neo_mu*F-(neo_mu-neo_lambda*log_J)*F.Inverse();
+        T t   = blend.H(F);
+        DIAGONAL_MATRIX<T,d> Dt  = blend.DH(F);
+        DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d> DDt;
+        blend.DDH(F,DDt);
 
-        DIAGONAL_MATRIX<T,2> Fm1=F-1;
-        T cor = cor_mu*(Fm1*Fm1).Trace()+(T).5*cor_lambda*sqr(Fm1.Trace());
-        DIAGONAL_MATRIX<T,2> grad_cor = 2*cor_mu*Fm1+cor_lambda*Fm1.Trace();
+        T neo_minus_cor = neo_base.Energy_Density(F,triangle) - cor_base.Energy_Density(F,triangle);
+
+        DIAGONAL_MATRIX<T,d> neo_P = neo_base.P_From_Strain(F,1,triangle);
+        DIAGONAL_MATRIX<T,d> cor_P = cor_base.P_From_Strain(F,1,triangle);
+
+        DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d> neo_dP_dF;
+        DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d> cor_dP_dF;
+        neo_base.Isotropic_Stress_Derivative(F,neo_dP_dF,triangle);
+        cor_base.Isotropic_Stress_Derivative(F,cor_dP_dF,triangle);
         
-        DIAGONAL_MATRIX<T,2> F_inverse=F.Inverse();
-        T neo_mu_minus_lambda_logJ=neo_mu+neo_lambda*log(F_inverse.Determinant());
-        SYMMETRIC_MATRIX<T,2> F_inverse_outer=SYMMETRIC_MATRIX<T,2>::Outer_Product(F_inverse.To_Vector());
-        T neo_x1111=neo_mu+(neo_lambda+neo_mu_minus_lambda_logJ)*F_inverse_outer.x11;
-        T neo_x2222=neo_mu+(neo_lambda+neo_mu_minus_lambda_logJ)*F_inverse_outer.x22;
-        T neo_x2211=neo_lambda*F_inverse_outer.x21;
-
-        T cor_mu2la=2*cor_mu+cor_lambda,cor_la2mu2=2*cor_lambda+2*cor_mu;
-        T d12=F.x11+F.x22;
-        T cor_i12=cor_la2mu2/d12;
-        T cor_x1111=cor_mu2la;
-        T cor_x2222=cor_mu2la;
-        T cor_x2211=cor_lambda;
-
-        T t = heaviside.H(J);
-        
-        T tJ = heaviside.HJ(J);
-        T t_x11 = tJ*F.x22;
-        T t_x22 = tJ*F.x11;
-        
-        T tJJ = heaviside.HJJ(J);
-        T t_x1111 = tJJ*sqr(F.x22);
-        T t_x2222 = tJJ*sqr(F.x11);
-        T t_x2211 = tJJ*F.x11*F.x22 + tJ;
-        
-        dP_dF.x1111 = neo_x1111*t+cor_x1111*(1-t) + 2*(grad_neo.x11-grad_cor.x11)*t_x11 + (neo-cor)*t_x1111;
-        dP_dF.x2222 = neo_x2222*t+cor_x2222*(1-t) + 2*(grad_neo.x22-grad_cor.x22)*t_x22 + (neo-cor)*t_x2222;
-        dP_dF.x2211 = neo_x2211*t+cor_x2211*(1-t) + (grad_neo.x22-grad_cor.x22)*t_x11 + (grad_neo.x11-grad_cor.x11)*t_x22 + (neo-cor)*t_x2211;
-
-        // Models' derivatives part
-        dP_dF.x2112 = neo_mu_minus_lambda_logJ*F_inverse_outer.x21*t + cor_i12-cor_lambda*(1-t);
-        dP_dF.x2121 = neo_mu*t + cor_mu2la-cor_i12*(1-t);
-
-        // Heaviside derivatives part
-        dP_dF.x2112 += -(neo-cor)*tJ;
+        Isotropic_Stress_Derivative_Transition_Helper(dP_dF,neo_dP_dF,cor_dP_dF,DDt,neo_P,cor_P,Dt,neo_minus_cor,t);
     }
 
     if(enforce_definiteness) dP_dF.Enforce_Definiteness();
@@ -248,7 +107,35 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_IS
 // Function Isotropic_Stress_Derivative_Helper
 //#####################################################################
 template<class T,int d> void NEO_HOOKEAN_COROTATED_BLEND<T,d>::
-Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dP_dF,const int triangle) const
+Isotropic_Stress_Derivative_Transition_Helper(DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& dP_dF,
+    const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& neo_dP_dF,
+    const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& cor_dP_dF,
+    const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& DDt,
+    const DIAGONAL_MATRIX<T,2>& neo_P,
+    const DIAGONAL_MATRIX<T,2>& cor_P,
+    const DIAGONAL_MATRIX<T,2>& Dt,
+    const T neo_minus_cor,
+    const T t) const
+{
+    dP_dF.x1111 = neo_dP_dF.x1111*t + cor_dP_dF.x1111*(1-t) + neo_minus_cor*DDt.x1111 + 2*(neo_P.x11-cor_P.x11)*Dt.x11;
+    dP_dF.x2222 = neo_dP_dF.x2222*t + cor_dP_dF.x2222*(1-t) + neo_minus_cor*DDt.x2222 + 2*(neo_P.x22-cor_P.x22)*Dt.x22;
+    dP_dF.x2211 = neo_dP_dF.x2211*t + cor_dP_dF.x2211*(1-t) + neo_minus_cor*DDt.x2211 + (neo_P.x22-cor_P.x22)*Dt.x11 + (neo_P.x11-cor_P.x11)*Dt.x22;
+    dP_dF.x2112 = neo_dP_dF.x2112*t + cor_dP_dF.x2112*(1-t) + neo_minus_cor*DDt.x2112;
+    dP_dF.x2121 = neo_dP_dF.x2121*t + cor_dP_dF.x2121*(1-t) + neo_minus_cor*DDt.x2121;
+}
+//#####################################################################
+// Function Isotropic_Stress_Derivative_Helper
+//#####################################################################
+template<class T,int d> void NEO_HOOKEAN_COROTATED_BLEND<T,d>::
+Isotropic_Stress_Derivative_Transition_Helper(DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dP_dF,
+    const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& neo_dP_dF,
+    const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& cor_dP_dF,
+    const DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& DDt,
+    const DIAGONAL_MATRIX<T,3>& neo_P,
+    const DIAGONAL_MATRIX<T,3>& cor_P,
+    const DIAGONAL_MATRIX<T,3>& Dt,
+    const T neo_minus_cor,
+    const T t) const
 {
     PHYSBAM_FATAL_ERROR();
 }
