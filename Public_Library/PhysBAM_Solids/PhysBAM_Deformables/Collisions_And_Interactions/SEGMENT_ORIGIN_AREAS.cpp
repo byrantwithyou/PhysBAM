@@ -11,14 +11,14 @@ template<class T,int m,int n> void Clear(DATA<T,m,n>& data)
 {
     data.V=VECTOR<T,m>();
     for(int i=0;i<n;i++) data.G[i]=MATRIX<T,m,2>();
-    for(int i=0;i<n;i++) for(int j=0;j<n;j++) for(int k=0;k<m;k++) data.H[m][i][j]=MATRIX<T,2>();
+    for(int i=0;i<n;i++) for(int j=0;j<n;j++) for(int k=0;k<m;k++) data.H[k][i][j]=MATRIX<T,2>();
 }
 
 template<class T,class TV> void Data_From_Dof(DATA<T,2,1>& data,const TV& A)
 {
     data.V=A;
     data.G[0]=MATRIX<T,2>::Identity_Matrix();
-    for(int i=0;i<2;i++) for(int j=0;j<2;j++) data.H[0][i][j]=MATRIX<T,2>();
+    for(int i=0;i<2;i++) data.H[i][0][0]=MATRIX<T,2>();
 }
 
 template<class TV> POINT_CASE Classify_Point(const TV& A,const TV& B,const TV& P)
@@ -26,7 +26,6 @@ template<class TV> POINT_CASE Classify_Point(const TV& A,const TV& B,const TV& P
     if(TV::Cross_Product(A,P).x<0) return outside;
     if(TV::Cross_Product(P,B).x<0) return outside;
     if(TV::Cross_Product(A-P,B-P).x<0) return beyond;
-    puts("INSIDE");
     return inside;
 }
 
@@ -133,8 +132,8 @@ template<class T,class TV> void Intersect_Segments(DATA<T,2,4>& data,const TV& A
 template<class T,class TV> void Area_From_Points(DATA<T,1,2>& data,const TV& A,const TV& B)
 {
     data.V=(T).5*TV::Cross_Product(A,B);
-    data.G[0]=MATRIX<T,1,2>::Cross_Product_Matrix(B);
-    data.G[1]=MATRIX<T,1,2>::Cross_Product_Matrix(-A);
+    data.G[0]=MATRIX<T,1,2>::Cross_Product_Matrix(-(T).5*B);
+    data.G[1]=MATRIX<T,1,2>::Cross_Product_Matrix((T).5*A);
     MATRIX<T,2> M(0,-(T).5,(T).5,0);
     data.H[0][0][0]=data.H[0][1][1]=MATRIX<T,2>();
     data.H[0][0][1]=M;
