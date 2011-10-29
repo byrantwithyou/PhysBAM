@@ -44,7 +44,7 @@ template<class T,class TV> void Intersect_Segment_Point(DATA<T,2,3>& data,const 
 template<class T,class TV> void Intersect_Segments(DATA<T,2,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
 {
     // V = A + z (B - A); compute z
-    T ABxCD=TV::Cross_Product(A-B,C-D).x,ADxCD=TV::Cross_Product(A-D,C-D).x,BDxCD=ADxCD-ABxCD,ADxBD=TV::Cross_Product(A-D,B-D).x,ACxBC=TV::Cross_Product(A-C,B-C).x,z=ABxCD/ADxCD;
+    T ABxCD=TV::Cross_Product(A-B,C-D).x,ADxCD=TV::Cross_Product(A-D,C-D).x,BDxCD=ADxCD-ABxCD,ADxBD=TV::Cross_Product(A-D,B-D).x,ACxBC=TV::Cross_Product(A-C,B-C).x,z=ADxCD/ABxCD;
     data.V=A+z*(B-A);
 
     // Gradients of z:
@@ -140,7 +140,7 @@ template<class T,class TV> void Area_From_Segments(DATA<T,1,4>& data,TV A,TV B,T
 template<class T,int m,int n> void Combine_Data(DATA<T,1,4>& data,const DATA<T,1,2>& V,const DATA<T,2,m>& data_m,const DATA<T,2,n>& data_n,const int index_m[m],
     const int index_n[n])
 {
-    data.V=V.V;
+    data.V+=V.V;
     for(int j=0;j<m;j++) data.G[index_m[j]]+=V.G[0]*data_m.G[j];
     for(int j=0;j<n;j++) data.G[index_n[j]]+=V.G[1]*data_n.G[j];
 
@@ -238,13 +238,22 @@ template<class T,class TV> void Case_BCBC(DATA<T,1,4>& data,const TV& A,const TV
     DATA<T,2,4> Q;
     Intersect_Segments(Q,A,B,C,D);
 
-    DATA<T,2,3> P;
-    Intersect_Segment_Point(P,C,D,B);
+    DATA<T,2,3> P1;
+    Intersect_Segment_Point(P1,C,D,A);
+
+    DATA<T,2,3> P2;
+    Intersect_Segment_Point(P2,A,B,C);
+
+    printf("%g %g pointradius 0 360 arc stroke\n", P1.V.x, P1.V.y);
+    printf("%g %g pointradius 0 360 arc stroke\n", Q.V.x, Q.V.y);
+    printf("%g %g pointradius 0 360 arc stroke\n", P2.V.x, P2.V.y);
 
     DATA<T,1,2> V;
-    Area_From_Points(V,Q.V,P.V);
+    Area_From_Points(V,P1.V,Q.V);
+    Combine_Data(data,V,P1,Q,vec_cda,vec_abcd);
 
-    Combine_Data(data,V,Q,P,vec_abcd,vec_cdb);
+    Area_From_Points(V,Q.V,P2.V);
+    Combine_Data(data,V,Q,P2,vec_abcd,vec_abc);
 }
 
 template<class T,class TV> void Case_ACAC(DATA<T,1,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
