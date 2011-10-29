@@ -6,7 +6,7 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRAPEZOID_INTERSECTION.h>
 using namespace PhysBAM;
 // Case 1 order: a c b d; ou = c over, b under
-extern ARRAY<int> trap_cases;
+ARRAY<int> trap_cases;
 template<class T,class TV> T PhysBAM::
 Trapezoid_Intersection_Area_Case_1ou(const TV& a,const TV& b,const TV& c,const TV& d,VECTOR<TV,4>& G,VECTOR<VECTOR<MATRIX<T,2>,4>,4>& H)
 {

@@ -6,7 +6,7 @@ template<class T,int n> void Clear(DATA<T,n>& data)
 {
     data.V=T();
     for(int i=0;i<2*n;i++) data.G[i]=T();
-    for(int i=0;i<2*n;i++) for(j=0;j<2*n;j++) data.H[i][j]=T();
+    for(int i=0;i<2*n;i++) for(int j=0;j<2*n;j++) data.H[i][j]=T();
 }
 
 template<class TV> void Data_From_Dof(DATA<TV,1>& data,const TV& a)
@@ -14,16 +14,16 @@ template<class TV> void Data_From_Dof(DATA<TV,1>& data,const TV& a)
     data.V=a;
     data.G[0]=TV(1,0);
     data.G[1]=TV(0,1);
-    for(int i=0;i<2;i++) for(j=0;j<2;j++) data.H[i][j]=TV();
+    for(int i=0;i<2;i++) for(int j=0;j<2;j++) data.H[i][j]=TV();
 }
 
 template<class TV> void Intersect_Segment_Point(DATA<TV,3>& data,const TV& A,const TV& B,const TV& P)
 {
     bool Do_Intersect = false;
-    TV::value_type EPS = 1e-10;
-    TV::value_type mua,mub;
-    TV::value_type denom,numera,numerb;
-    TV::value_type denom_square;
+    typename TV::value_type EPS = 1e-10;
+    typename TV::value_type mua,mub;
+    typename TV::value_type denom,numera,numerb;
+    typename TV::value_type denom_square;
 
     denom=(0.0-P.y)*(B.x-A.x)-(0.0-P.x)*(B.y-A.y);
     numera=(0.0-P.x)*(A.y-P.y)-(0.0-P.y)*(A.x-P.x);
@@ -81,10 +81,10 @@ template<class TV> void Intersect_Segment_Point(DATA<TV,3>& data,const TV& A,con
 template<class TV> void Intersect_Segments(DATA<TV,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
 {
     bool Do_Intersect = false;
-    TV::value_type EPS = 1e-10;
-    TV::value_type mua,mub;
-    TV::value_type denom,numera,numerb;
-    TV::value_type denom_square;
+    typename TV::value_type EPS = 1e-10;
+    typename TV::value_type mua,mub;
+    typename TV::value_type denom,numera,numerb;
+    typename TV::value_type denom_square;
 
     denom=(D.y-C.y)*(B.x-A.x)-(D.x-C.x)*(B.y-A.y);
     numera=(D.x-C.x)*(A.y-C.y)-(D.y-C.y)*(A.x-C.x);
