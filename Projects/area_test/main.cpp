@@ -300,21 +300,28 @@ void Case_Test()
         eps.Draw_Line(TV(),d/d.Max_Abs());
     }
 
-    SEGMENT_ORIGIN_AREAS::DATA<T,4> data;
+    trap_cases.Remove_All();
+    SEGMENT_ORIGIN_AREAS::DATA<T,1,4> data;
     SEGMENT_ORIGIN_AREAS::Area_From_Segments(data,a,b,c,d);
 
     VECTOR<TV,6> G1;
     VECTOR<VECTOR<MATRIX<T,2>,6>,6> H1;
     T A1 = Triangle_Intersection_Area(TRIANGLE_2D<T>(TV(),a,b),TRIANGLE_2D<T>(TV(),c,d),G1,H1);
 
-    VECTOR<T,12>& V=(VECTOR<T,12>&)G1;
-    MATRIX<T,12> M;
-    for(int i=1;i<=12;i++) for(int j=1;j<=12;j++) M(i,j)=H1((i+1)/2)((j+1)/2)((i+1)%2+1,(j+1)%2+1);
-    LOG::cout<<"AREAS:  "<<data.V<<"   "<<A1<<std::endl;
-    LOG::cout<<V<<std::endl;
-    LOG::cout<<"[ ";for(int i=0;i<8;i++) LOG::cout<<data.G[i]<<" ";LOG::cout<<"]"<<std::endl;;
-    LOG::cout<<M<<std::endl;
-    LOG::cout<<"[ ";for(int i=0;i<8;i++){for(int j=0;j<8;j++) LOG::cout<<data.H[i][j]<<" ";if(i<7) LOG::cout<<"; ";}LOG::cout<<"]"<<std::endl;
+    int ii[13]={0,1,1,1,2,3,4,5,5,5,6,7,8};
+    VECTOR<T,12>& V12=(VECTOR<T,12>&)G1;
+    VECTOR<T,8> V;
+    for(int i=1;i<=12;i++) V(ii[i])=V12(i);
+    MATRIX<T,8> M;
+    for(int i=1;i<=12;i++) for(int j=1;j<=12;j++) M(ii[i],ii[j])=H1((i+1)/2)((j+1)/2)((i+1)%2+1,(j+1)%2+1);
+    VECTOR<T,8>& W=(VECTOR<T,8>&)data.G;
+    MATRIX<T,8> N;for(int i=0;i<4;i++) for(int j=0;j<4;j++) N.Set_Submatrix(2*i+1,2*j+1,data.H[0][i][j]);
+
+    printf("ERRORS: (case %i)  %.4f (%.4f)  %.4f (%.4f)  %.4f (%.4f)\n", (trap_cases.m?trap_cases(1):0), fabs(data.V.x-A1), fabs(A1), (W-V).Magnitude(), V.Magnitude(),
+        (M-N).Frobenius_Norm(),M.Frobenius_Norm());
+    LOG::cout<<"Areas:  "<<data.V<<"   "<<A1<<std::endl;
+    LOG::cout<<"Gradients: "<<W<<"    "<<V<<std::endl;
+    LOG::cout<<"Hessians: "<<N<<"    "<<M<<std::endl;
 }
 
 int main(int argc,char *argv[])
@@ -337,7 +344,7 @@ int main(int argc,char *argv[])
 
 //    for(int i=1;i<=100;i++) Test_Triangle_Intersection<TV>();
 
-    for(int i=0;i<100;i++)
+    for(int i=0;i<1;i++)
     {
         try{Case_Test();}catch(...){}
     }
