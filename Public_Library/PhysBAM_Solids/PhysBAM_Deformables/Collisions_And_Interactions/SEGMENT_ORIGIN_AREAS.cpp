@@ -36,23 +36,20 @@ template<class T,class TV> void Intersect_Segment_Point(DATA<T,2,3>& data,const 
 
     TV orthAB=(A-B).Orthogonal_Vector();
     MATRIX<T,2> M=MATRIX<T,2>::Outer_Product(P,sqr(den)*orthAB);
-    MATRIX<T,2> GA=PxB*M;
-    MATRIX<T,2> GB=-PxA*M;
-    MATRIX<T,2> GP=-cross1*M;
-    data.G[0]=GA;
-    data.G[1]=GB;
-    data.G[2]=GP;
+    data.G[0]=PxB*M;
+    data.G[1]=-PxA*M;
+    data.G[2]=-cross1*M+cross1*den;
 }
 
 template<class T,class TV> void Intersect_Segments(DATA<T,2,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
 {
     // V = A + z (B - A); compute z
-    T ABxCD=TV::Cross_Product(A-B,C-D).x,ADxCD=TV::Cross_Product(A-D,C-D).x,ADxBD=TV::Cross_Product(A-D,B-D).x,ACxBC=TV::Cross_Product(A-C,B-C).x,z=ABxCD/ADxCD;
+    T ABxCD=TV::Cross_Product(A-B,C-D).x,ADxCD=TV::Cross_Product(A-D,C-D).x,BDxCD=ADxCD-ABxCD,ADxBD=TV::Cross_Product(A-D,B-D).x,ACxBC=TV::Cross_Product(A-C,B-C).x,z=ABxCD/ADxCD;
     data.V=A+z*(B-A);
 
     // Gradients of z:
     TV oAB=(A-B).Orthogonal_Vector(),oCD=(C-D).Orthogonal_Vector(),g=oCD/sqr(ADxCD);
-    TV dzdA=(ABxCD-ADxCD)*g,dzdB=-ABxCD*g,dzdC=ADxBD*g,dzdD=-ACxBC*g;
+    TV dzdA=-BDxCD*g,dzdB=-ABxCD*g,dzdC=ADxBD*g,dzdD=-ACxBC*g;
     MATRIX<T,2> dVdA=MATRIX<T,2>::Outer_Product(B-A,dzdA)+(1-z),dVdB=MATRIX<T,2>::Outer_Product(B-A,dzdB)+z;
     MATRIX<T,2> dVdC=MATRIX<T,2>::Outer_Product(B-A,dzdC),dVdD=MATRIX<T,2>::Outer_Product(B-A,dzdD);
     data.G[0]=dVdA;
@@ -61,72 +58,28 @@ template<class T,class TV> void Intersect_Segments(DATA<T,2,4>& data,const TV& A
     data.G[3]=dVdD;
 
     // Hessian components of z:
-    MATRIX<T,2> d2zdAdA=(2*(ABxCD-ADxCD)/(ADxCD*sqr(ADxCD)))*MATRIX<T,2>::Outer_Product(oCD,oCD);
-    MATRIX<T,2> d2zdBdB=(2*ADxCD/(ADxCD*sqr(ADxCD)))*MATRIX<T,2>::Outer_Product(oCD,oCD);
-    MATRIX<T,2> d2zdCdC=(-ADxBD/(ADxCD*sqr(ADxCD)))*(MATRIX<T,2>::Outer_Product(oCD,oAB)+MATRIX<T,2>::Outer_Product(oAB,oCD));
-    MATRIX<T,2> d2zdDdD=(-ACxBC/(ADxCD*sqr(ADxCD)))*(MATRIX<T,2>::Outer_Product(oCD,oAB)+MATRIX<T,2>::Outer_Product(oAB,oCD));
+    MATRIX<T,2> oABAB=MATRIX<T,2>::Outer_Product(oAB,oAB/(ADxCD*sqr(ADxCD)));
+    MATRIX<T,2> oABCD=MATRIX<T,2>::Outer_Product(oAB,oCD/(ADxCD*sqr(ADxCD)));
+    MATRIX<T,2> oCDCD=MATRIX<T,2>::Outer_Product(oCD,oCD/(ADxCD*sqr(ADxCD)));
+    MATRIX<T,2> d2zdAdA=-2*BDxCD*oCDCD;
+    MATRIX<T,2> d2zdBdB=2*ADxCD*oCDCD;
+    MATRIX<T,2> d2zdCdC=-ADxBD*(oABCD.Transposed()+oABCD);
+    MATRIX<T,2> d2zdDdD=-ACxBC*(oABCD.Transposed()+oABCD);
+
+    // MATRIX<T,2> d2zdAdB=-2*(ADxCD+BDxCD)*oCDCD;
+    // MATRIX<T,2> d2zdAdC=ADxBD*oCDCD-BDxCD*oABCD;
+    // MATRIX<T,2> d2zdAdD=-ACxBC*oCDCD-CDxBD*oABCD;
+    // MATRIX<T,2> d2zdBdC=-ADxBD*oCDCD+ADxCD*oABCD;
+    // MATRIX<T,2> d2zdBdD=ACxBC*oCDCD-ADxCD*oABCD;
+    // MATRIX<T,2> d2zCBdD=ACxBC*oABCD.Transposed()+ADxBD*oABCD;
+
+    data.H[0][0][0]=MATRIX<T,2>();
+    data.H[1][0][0]=MATRIX<T,2>();
+
+    data.H[0][0][1]=MATRIX<T,2>();
+    data.H[1][0][1]=MATRIX<T,2>();
 
 
-    // Hessian 
-
-    bool Do_Intersect = false;
-    typename TV::SCALAR EPS = 1e-10;
-    typename TV::SCALAR mua,mub;
-    typename TV::SCALAR denom,numera,numerb;
-    typename TV::SCALAR denom_square;
-
-    denom=(D.y-C.y)*(B.x-A.x)-(D.x-C.x)*(B.y-A.y);
-    numera=(D.x-C.x)*(A.y-C.y)-(D.y-C.y)*(A.x-C.x);
-    numerb=(B.x-A.x)*(A.y-C.y)-(B.y-A.y)*(A.x-C.x);
-
-    // Are the segments coincident?
-    if(std::abs(numera)<EPS && std::abs(numerb)<EPS && std::abs(denom)<EPS){
-        data.V.x=(A.x+B.x)/2.0;
-        data.V.y=(A.y+B.y)/2.0;
-    }
-    // Are the segments parallel?
-    else if(std::abs(denom)<EPS) {
-        data.V=TV();
-    }
-    else{
-        mua=numera/denom;
-        mub=numerb/denom;
-        // Do they really intersect?
-        if(mua<0.0||mua>1.0||mub<0.0||mub>1.0){
-            data.V=TV();
-        }
-        else{
-            Do_Intersect=true;
-            data.V.x=A.x+mua*(B.x-A.x);
-            data.V.y=A.y+mua*(B.y-A.y);
-        }
-    }
-    
-    if(Do_Intersect==false){
-        //
-        // What to do with G and H??
-        //
-    }
-    else{
-        denom_square=denom*denom;
-/*        data.G[0].x = (A.y-B.y)*(C.x-D.x)*(B.y*D.x-C.y*D.x+B.x*C.y-C.x*B.y-B.x*D.y+C.x*D.y)/denom_square;
-        data.G[1].x = -(A.x-B.x)*(C.x-D.x)*(B.y*D.x-C.y*D.x+B.x*C.y-C.x*B.y-B.x*D.y+C.x*D.y)/denom_square;
-        data.G[2].x = -(A.y-B.y)*(C.x-D.x)*(A.y*D.x-C.y*D.x+A.x*C.y-C.x*A.y-A.x*D.y+C.x*D.y)/denom_square;
-        data.G[3].x = (A.x-B.x)*(C.x-D.x)*(A.y*D.x-C.y*D.x+A.x*C.y-C.x*A.y-A.x*D.y+C.x*D.y)/denom_square;
-        data.G[4].x = (A.x-B.x)*(C.y-D.y)*(A.y*D.x-B.y*D.x+A.x*B.y-B.x*A.y-A.x*D.y+B.x*D.y)/denom_square;
-        data.G[5].x = -(A.x-B.x)*(C.x-D.x)*(A.y*D.x-B.y*D.x+A.x*B.y-B.x*A.y-A.x*D.y+B.x*D.y)/denom_square;
-        data.G[6].x = -(A.x-B.x)*(C.y-D.y)*(A.x*B.y-B.x*A.y-A.x*C.y+C.x*A.y+B.x*C.y-C.x*B.y)/denom_square;
-        data.G[7].x = (A.x-B.x)*(C.x-D.x)*(A.x*B.y-B.x*A.y-A.x*C.y+C.x*A.y+B.x*C.y-C.x*B.y)/denom_square;
-        
-        data.G[0].y = (A.y-B.y)*(C.y-D.y)*(B.y*D.x-C.y*D.x+B.x*C.y-C.x*B.y-B.x*D.y+C.x*D.y)/denom_square;
-        data.G[1].y = -(A.x-B.x)*(C.y-D.y)*(B.y*D.x-C.y*D.x+B.x*C.y-C.x*B.y-B.x*D.y+C.x*D.y)/denom_square;
-        data.G[2].y = -(A.y-B.y)*(C.y-D.y)*(A.y*D.x-C.y*D.x+A.x*C.y-C.x*A.y-A.x*D.y+C.x*D.y)/denom_square;
-        data.G[3].y = (A.x-B.x)*(C.y-D.y)*(A.y*D.x-C.y*D.x+A.x*C.y-C.x*A.y-A.x*D.y+C.x*D.y)/denom_square;
-        data.G[4].y = (A.y-B.y)*(C.y-D.y)*(A.y*D.x-B.y*D.x+A.x*B.y-B.x*A.y-A.x*D.y+B.x*D.y)/denom_square;
-        data.G[5].y = -(A.y-B.y)*(C.x-D.x)*(A.y*D.x-B.y*D.x+A.x*B.y-B.x*A.y-A.x*D.y+B.x*D.y)/denom_square;
-        data.G[6].y = -(A.y-B.y)*(C.y-D.y)*(A.x*B.y-B.x*A.y-A.x*C.y+C.x*A.y+B.x*C.y-C.x*B.y)/denom_square;
-        data.G[7].y = (A.y-B.y)*(C.x-D.x)*(A.x*B.y-B.x*A.y-A.x*C.y+C.x*A.y+B.x*C.y-C.x*B.y)/denom_square;
-*/    }
 }
 
 template<class T,class TV> void Area_From_Points(DATA<T,1,2>& data,const TV& A,const TV& B)
@@ -170,11 +123,14 @@ template<class T,class TV> void Area_From_Segments(DATA<T,1,4>& data,TV A,TV B,T
         else Case_CCAA(tdata,A,B,C,D);}
     else if(case_a==beyond){
         PHYSBAM_ASSERT(case_b==outside && case_d==outside);
-        if(case_c==inside) Case_BCAC(tdata,A,B,C,D);
+        if(case_c==inside){if(TV::Cross_Product(A,B).x<0) sign=-sign;Case_BCAC(tdata,A,B,C,D);}
         else Case_BCBC(tdata,A,B,C,D);}
     else{
         PHYSBAM_ASSERT(case_b==outside && case_c==inside && case_d==outside);
         Case_ACAC(tdata,A,B,C,D);}
+
+    for(int i=0;i<4;i++) LOG::cout<<index[i]<<" ";LOG::cout<<std::endl;
+    LOG::cout<<"sign "<<sign<<std::endl;
 
     data.V=sign*tdata.V;
     for(int i=0;i<4;i++) data.G[index[i]]=sign*tdata.G[i];
@@ -213,7 +169,7 @@ template<class T,int m,int n> void Combine_Data(DATA<T,1,4>& data,const DATA<T,1
             data.H[0][index_n[s]][index_m[j]]+=x.Transposed();}
 }
 
-const int vec_a[1]={0}, vec_c[1]={2}, vec_d[1]={3}, vec_abc[3]={0,1,2}, vec_abd[3]={0,1,3}, vec_cdb[3]={2,3,1}, vec_abcd[4]={0,1,2,3};
+const int vec_a[1]={0}, vec_c[1]={2}, vec_d[1]={3}, vec_abc[3]={0,1,2}, vec_abd[3]={0,1,3}, vec_cda[3]={2,3,0}, vec_cdb[3]={2,3,1}, vec_abcd[4]={0,1,2,3};
 template<class T,class TV> void Case_CCAA(DATA<T,1,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
 {
     trap_cases.Append(1);
@@ -266,14 +222,14 @@ template<class T,class TV> void Case_BCAC(DATA<T,1,4>& data,const TV& A,const TV
 {
     trap_cases.Append(4);
     DATA<T,2,3> P;
-    Intersect_Segment_Point(P,A,B,C);
+    Intersect_Segment_Point(P,C,D,A);
 
-    DATA<T,2,1> DA;
-    Data_From_Dof(DA,A);
+    DATA<T,2,1> DC;
+    Data_From_Dof(DC,C);
 
     DATA<T,1,2> V;
-    Area_From_Points(V,DA.V,P.V);
-    Combine_Data(data,V,DA,P,vec_a,vec_abc);
+    Area_From_Points(V,DC.V,P.V);
+    Combine_Data(data,V,DC,P,vec_c,vec_cda);
 }
 
 template<class T,class TV> void Case_BCBC(DATA<T,1,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
