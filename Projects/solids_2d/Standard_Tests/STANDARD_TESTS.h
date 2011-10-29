@@ -343,8 +343,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             tests.Add_Ground();
             break;}
         case 15:{
-            tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,1.2))));
-            tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,2.4))));
+            for(int i=1;i<=parameter;i++) tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,1.2*i))));
             tests.Add_Ground();
             break;}
         case 16:{
@@ -434,15 +433,12 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             Add_Constitutive_Model(triangulated_area,(T)2e3,(T)0,(T).01);
             break;}
         case 15:{
-            TRIANGULATED_AREA<T>& triangulated_area1=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>(1);
-            TRIANGULATED_AREA<T>& triangulated_area2=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>(2);
             solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
-            Add_Constitutive_Model(triangulated_area1,(T)1e4,(T).45,(T).01);
-            Add_Constitutive_Model(triangulated_area2,(T)1e4,(T).45,(T).01);
-
             COLLISION_AREA_PENALTY_FORCE<TV>* penalty_force=new COLLISION_AREA_PENALTY_FORCE<TV>(particles);
-            penalty_force->Add_Mesh(triangulated_area1);
-            penalty_force->Add_Mesh(triangulated_area2);
+            for(int i=1;i<=parameter;i++){
+                TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>(i);
+                penalty_force->Add_Mesh(triangulated_area);
+                Add_Constitutive_Model(triangulated_area,(T)1e4,(T).45,(T).01);}
             solid_body_collection.Add_Force(penalty_force);
             break;}
         case 17:{
@@ -580,10 +576,12 @@ void Preprocess_Frame(const int frame)
 //#####################################################################
 void Add_Constitutive_Model(TRIANGULATED_AREA<T>& triangulated_area,T stiffness,T poissons_ratio,T damping)
 {
-    if(use_extended_neohookean) solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,new NEO_HOOKEAN_EXTRAPOLATED<T,2>(stiffness,poissons_ratio,damping)));
-    else if(use_corotated) solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,new COROTATED<T,2>(stiffness,poissons_ratio,damping)));
-    else if(use_corot_blend) solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,new NEO_HOOKEAN_COROTATED_BLEND<T,2>(stiffness,poissons_ratio,damping)));
-    else solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,new NEO_HOOKEAN<T,2>(stiffness,poissons_ratio,damping)));
+    ISOTROPIC_CONSTITUTIVE_MODEL<T,2>* icm=0;
+    if(use_extended_neohookean) icm=new NEO_HOOKEAN_EXTRAPOLATED<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
+    else if(use_corotated) icm=new COROTATED<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
+    else if(use_corot_blend) icm=new NEO_HOOKEAN_COROTATED_BLEND<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
+    else icm=new NEO_HOOKEAN<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
+    solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,icm));
 }
 //#####################################################################
 };
