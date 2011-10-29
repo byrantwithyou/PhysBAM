@@ -163,7 +163,7 @@ template<class T,class TV> void Area_From_Points(DATA<T,2>& data,const TV& A,con
 
 template<class T,class TV> void Area_From_Segments(DATA<T,4>& data,TV A,TV B,TV C,TV D)
 {
-    int index[4]={1,2,3,4};
+    int index[4]={0,1,2,3};
     T sign=1;
     T OAB=TV::Cross_Product(A,B).x;
     T OCD=TV::Cross_Product(C,D).x;
@@ -182,6 +182,7 @@ template<class T,class TV> void Area_From_Segments(DATA<T,4>& data,TV A,TV B,TV 
         exchange(A,C);exchange(B,D);exchange(index[0],index[2]);exchange(index[1],index[3]);}
 
     DATA<T,4> tdata;
+    Clear(tdata);
     if(case_a==outside){
         if(case_b==outside && case_c==outside && case_d==outside) return;
         PHYSBAM_ASSERT(case_b==outside && case_c!=outside && case_d!=outside);
@@ -197,8 +198,8 @@ template<class T,class TV> void Area_From_Segments(DATA<T,4>& data,TV A,TV B,TV 
         Case_ACAC(tdata,A,B,C,D);}
 
     data.V=sign*tdata.V;
-    for(int i=0;i<4;i++) for(int j=0;j<2;j++) data.G[2*index[i]+j]=sign*data.G[2*i+j];
-    for(int i=0;i<4;i++) for(int k=0;k<4;k++) for(int j=0;j<2;j++) for(int m=0;m<2;m++) data.H[2*index[i]+j][2*index[k]+m]=sign*data.H[2*i+j][2*k+m];
+    for(int i=0;i<4;i++) for(int j=0;j<2;j++) data.G[2*index[i]+j]=sign*tdata.G[2*i+j];
+    for(int i=0;i<4;i++) for(int k=0;k<4;k++) for(int j=0;j<2;j++) for(int m=0;m<2;m++) data.H[2*index[i]+j][2*index[k]+m]=sign*tdata.H[2*i+j][2*k+m];
 }
 
 template<class T,class TV,int m,int n> void
@@ -217,33 +218,43 @@ Combine_Data(DATA<T,4>& data,const DATA<T,2>& V,const DATA<TV,m>& data_m,const D
 
     for(int j=0;j<m;j++)
         for(int k=0;k<2;k++)
-            for(int s=0;j<m;j++)
-                for(int t=0;k<2;k++)
-                    for(int i=0;i<2;i++)
-                        for(int r=0;i<2;i++)
-                            data.H[2*index_m[j]+k][2*index_m[s]+t]+=V.H[i][r]*data_m.G[2*j+k](i+1)*data_m.G[2*s+t](r+1);
-
-    for(int j=0;j<m;j++)
-        for(int k=0;k<2;k++)
-            for(int s=0;j<m;j++)
-                for(int t=0;k<2;k++)
+            for(int s=0;s<m;s++)
+                for(int t=0;t<2;t++)
                     for(int i=0;i<2;i++)
                         data.H[2*index_m[j]+k][2*index_m[s]+t]+=V.G[i]*data_m.H[2*j+k][2*s+t](i+1);
 
     for(int j=0;j<n;j++)
         for(int k=0;k<2;k++)
-            for(int s=0;j<n;j++)
-                for(int t=0;k<2;k++)
+            for(int s=0;s<n;s++)
+                for(int t=0;t<2;t++)
                     for(int i=0;i<2;i++)
-                        for(int r=0;i<2;i++)
-                            data.H[2*index_n[j]+k][2*index_n[s]+t]+=V.H[i+2][r+2]*data_n.G[2*j+k](i+1)*data_n.G[2*s+t](r+1);
+                        data.H[2*index_n[j]+k][2*index_n[s]+t]+=V.G[i+2]*data_n.H[2*j+k][2*s+t](i+1);
+
+    for(int j=0;j<m;j++)
+        for(int k=0;k<2;k++)
+            for(int s=0;s<m;s++)
+                for(int t=0;t<2;t++)
+                    for(int i=0;i<2;i++)
+                        for(int r=0;r<2;r++)
+                            data.H[2*index_m[j]+k][2*index_m[s]+t]+=V.H[i][r]*data_m.G[2*j+k](i+1)*data_m.G[2*s+t](r+1);
 
     for(int j=0;j<n;j++)
         for(int k=0;k<2;k++)
-            for(int s=0;j<n;j++)
-                for(int t=0;k<2;k++)
+            for(int s=0;s<n;s++)
+                for(int t=0;t<2;t++)
                     for(int i=0;i<2;i++)
-                        data.H[2*index_n[j]+k][2*index_n[s]+t]+=V.G[i+2]*data_n.H[2*j+k][2*s+t](i+1);
+                        for(int r=0;r<2;r++)
+                            data.H[2*index_n[j]+k][2*index_n[s]+t]+=V.H[i+2][r+2]*data_n.G[2*j+k](i+1)*data_n.G[2*s+t](r+1);
+
+    for(int j=0;j<m;j++)
+        for(int k=0;k<2;k++)
+            for(int s=0;s<n;s++)
+                for(int t=0;t<2;t++)
+                    for(int i=0;i<2;i++)
+                        for(int r=0;r<2;r++){
+                            T x=V.H[i][r+2]*data_m.G[2*j+k](i+1)*data_n.G[2*s+t](r+1);
+                            data.H[2*index_m[j]+k][2*index_n[s]+t]+=x;
+                            data.H[2*index_n[s]+t][2*index_m[j]+k]+=x;}
 }
 
 const int vec_a[1]={0}, vec_c[1]={2}, vec_d[1]={3}, vec_abc[3]={0,1,2}, vec_abd[3]={0,1,3}, vec_cdb[3]={2,3,1}, vec_abcd[4]={0,1,2,3};
@@ -338,9 +349,19 @@ template<class T,class TV> void Case_ACAC(DATA<T,4>& data,const TV& A,const TV& 
     Combine_Data(data,V,Q,DC,vec_abcd,vec_c);
 }
 
-template<class TV> void Intersect_Segment_Point(DATA<TV,3>& data,const TV& A,const TV& B,const TV& P){Clear(data);} // TODO: Fill in
-template<class TV> void Intersect_Segments(DATA<TV,4>& data,const TV& A,const TV& B,const TV& C,const TV& D){Clear(data);} // TODO: Fill in
-template<class T,class TV> void Area_From_Points(DATA<T,2>& data,const TV& A,const TV& B){Clear(data);} // TODO: Fill in
+template<class TV> void Intersect_Segment_Point(DATA<TV,3>& data,const TV& A,const TV& B,const TV& P){Clear(data);puts("Not implemented");throw 0;} // TODO: Fill in
+template<class TV> void Intersect_Segments(DATA<TV,4>& data,const TV& A,const TV& B,const TV& C,const TV& D){Clear(data);puts("Not implemented");throw 0;} // TODO: Fill in
+template<class T,class TV> void Area_From_Points(DATA<T,2>& data,const TV& A,const TV& B)
+{
+    data.V=(T).5*TV::Cross_Product(A,B).x;
+    data.G[0]=(T).5*B.y;
+    data.G[1]=-(T).5*B.x;
+    data.G[2]=-(T).5*A.y;
+    data.G[3]=(T).5*A.x;
+    for(int i=0;i<4;i++) for(int j=0;j<4;j++) data.H[i][j]=0;
+    data.H[0][3]=data.H[3][0]=(T).5;
+    data.H[1][2]=data.H[2][1]=-(T).5;
+}
 
 template void Area_From_Segments<float,VECTOR<float,2> >(DATA<float,4>&,VECTOR<float,2>,VECTOR<float,2>,VECTOR<float,2>,
     VECTOR<float,2>);
