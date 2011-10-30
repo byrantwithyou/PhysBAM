@@ -7,20 +7,19 @@
 #ifndef __DIAGONAL_MATRIX_DETERMINANT_HEAVISIDE_TRANSITION__
 #define __DIAGONAL_MATRIX_DETERMINANT_HEAVISIDE_TRANSITION__
 
-#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/HEAVISIDE_TRANSITION.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 
 namespace PhysBAM{
 
 template<class T,int d> class DIAGONAL_MATRIX;
 template<class T,int d> class DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE;
-template<class T,int d>
+template<class T,int d, class TRANSITION_T>
 class DIAGONAL_MATRIX_DETERMINANT_HEAVISIDE_TRANSITION
 {
 
 private:
 
-    HEAVISIDE_TRANSITION<T> base;
+    TRANSITION_T base;
 
     inline void DDH_Helper (const DIAGONAL_MATRIX<T,2>& S,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& d2HdS2) const
     {

@@ -9,6 +9,8 @@
 
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/ISOTROPIC_CONSTITUTIVE_MODEL.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/DIAGONAL_MATRIX_DETERMINANT_HEAVISIDE_TRANSITION.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/CUBIC_HEAVISIDE_TRANSITION.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/QUINTIC_HEAVISIDE_TRANSITION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/COROTATED.h>
 
@@ -32,7 +34,7 @@ public:
     using BASE::constant_alpha;
     using BASE::constant_beta;
 
-    DIAGONAL_MATRIX_DETERMINANT_HEAVISIDE_TRANSITION<T,d> blend;
+    DIAGONAL_MATRIX_DETERMINANT_HEAVISIDE_TRANSITION <T,d,QUINTIC_HEAVISIDE_TRANSITION<T> > blend;
 
     NEO_HOOKEAN<T,d> neo_base;
     COROTATED<T,d> cor_base;

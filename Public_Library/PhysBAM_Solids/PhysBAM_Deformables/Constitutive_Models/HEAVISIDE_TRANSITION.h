@@ -16,6 +16,10 @@ class HEAVISIDE_TRANSITION
 private:
 
     T x_min,x_max,x_dif;
+    
+    virtual T H_base   (const T r) const = 0;
+    virtual T Hr_base  (const T r) const = 0;
+    virtual T Hrr_base (const T r) const = 0;
 
 public:
 
@@ -42,21 +46,21 @@ public:
     {
         assert(x>=x_min && x<=x_max);
         T r = (x-x_min)/x_dif;
-        return sqr(r)*(-2*r+3);
+        return this->H_base(r);
     }
 
     inline T Hx (const T x) const
     {
         assert(x>=x_min && x<=x_max);
         T r = (x-x_min)/x_dif;
-        return 6*r*(1-r)/x_dif;
+        return this->Hr_base(r)/x_dif;
     }
 
     inline T Hxx (const T x) const
     {
         assert(x>=x_min && x<=x_max);
         T r = (x-x_min)/x_dif;
-        return (-12*r+6)/sqr(x_dif);
+        return this->Hrr_base(r)/sqr(x_dif);
     }
 };
 }

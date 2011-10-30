@@ -18,8 +18,8 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T,int d> NEO_HOOKEAN_COROTATED_BLEND<T,d>::
 NEO_HOOKEAN_COROTATED_BLEND(const T youngs_modulus,const T poissons_ratio,const T Rayleigh_coefficient):
-    neo_base(0*youngs_modulus,poissons_ratio,Rayleigh_coefficient),
-    cor_base(0*youngs_modulus,poissons_ratio,Rayleigh_coefficient),
+    neo_base(youngs_modulus,poissons_ratio,Rayleigh_coefficient),
+    cor_base(2*youngs_modulus,poissons_ratio,Rayleigh_coefficient),
     J_min(0.55),J_max(0.9)
 {
     constant_lambda = youngs_modulus*poissons_ratio/((1+poissons_ratio)*(1-2*poissons_ratio));
