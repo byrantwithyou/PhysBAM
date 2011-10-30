@@ -344,7 +344,7 @@ int main(int argc,char *argv[])
 
 //    for(int i=1;i<=100;i++) Test_Triangle_Intersection<TV>();
 
-    for(int i=0;i<1;i++)
+    for(int i=0;i<10000;i++)
     {
         try{Case_Test();}catch(...){}
     }
