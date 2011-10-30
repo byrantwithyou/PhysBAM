@@ -67,54 +67,14 @@ template<class T,class TV> void Intersect_Segment_Point(DATA<T,2,3>& data,const 
 
 template<class T,class TV> void Intersect_Segments(DATA<T,2,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
 {
-    // V = A + z (B - A); compute z
-    T ABxCD=TV::Cross_Product(A-B,C-D).x,ADxCD=TV::Cross_Product(A-D,C-D).x,BDxCD=ADxCD-ABxCD,ADxBD=TV::Cross_Product(A-D,B-D).x,ACxBC=TV::Cross_Product(A-C,B-C).x,z=ADxCD/ABxCD;
-    data.V=A+z*(B-A);
+    DATA<T,2,3> tdata;
+    Intersect_Segment_Point(tdata,A-D,B-D,C-D);
+    data.V=tdata.V+D;
+    data.G[3]=MATRIX<T,2>::Identity_Matrix();
+    for(int i=0;i<3;i++){data.G[i]=tdata.G[i];data.G[3]-=tdata.G[i];}
 
-    // Gradients of z:
-    TV oAB=(A-B).Orthogonal_Vector(),oCD=(C-D).Orthogonal_Vector(),g=oCD/sqr(ABxCD);
-    TV dzdA=BDxCD*g,dzdB=-ADxCD*g,dzdC=ADxBD*g,dzdD=-ACxBC*g;
-    MATRIX<T,2> dVdA=MATRIX<T,2>::Outer_Product(B-A,dzdA)+(1-z),dVdB=MATRIX<T,2>::Outer_Product(B-A,dzdB)+z;
-    MATRIX<T,2> dVdC=MATRIX<T,2>::Outer_Product(B-A,dzdC),dVdD=MATRIX<T,2>::Outer_Product(B-A,dzdD);
-    data.G[0]=dVdA;
-    data.G[1]=dVdB;
-    data.G[2]=dVdC;
-    data.G[3]=dVdD;
-
-    // Hessian components of z:
-    MATRIX<T,2> oABAB=MATRIX<T,2>::Outer_Product(oAB,oAB/(ADxCD*sqr(ADxCD)));
-    MATRIX<T,2> oABCD=MATRIX<T,2>::Outer_Product(oAB,oCD/(ADxCD*sqr(ADxCD)));
-    MATRIX<T,2> oCDCD=MATRIX<T,2>::Outer_Product(oCD,oCD/(ADxCD*sqr(ADxCD)));
-    MATRIX<T,2> d2zdAdA=-2*BDxCD*oCDCD;
-    MATRIX<T,2> d2zdBdB=2*ADxCD*oCDCD;
-    MATRIX<T,2> d2zdCdC=-ADxBD*(oABCD.Transposed()+oABCD);
-    MATRIX<T,2> d2zdDdD=-ACxBC*(oABCD.Transposed()+oABCD);
-
-    // MATRIX<T,2> d2zdAdB=-2*(ADxCD+BDxCD)*oCDCD;
-    // MATRIX<T,2> d2zdAdC=ADxBD*oCDCD-BDxCD*oABCD;
-    // MATRIX<T,2> d2zdAdD=-ACxBC*oCDCD-CDxBD*oABCD;
-    // MATRIX<T,2> d2zdBdC=-ADxBD*oCDCD+ADxCD*oABCD;
-    // MATRIX<T,2> d2zdBdD=ACxBC*oCDCD-ADxCD*oABCD;
-    // MATRIX<T,2> d2zCBdD=ACxBC*oABCD.Transposed()+ADxBD*oABCD;
-
-    data.H[0][0][0]=MATRIX<T,2>();
-    data.H[1][0][0]=MATRIX<T,2>();
-
-    data.H[0][0][1]=MATRIX<T,2>();
-    data.H[1][0][1]=MATRIX<T,2>();
-
-
-    //T H[2][8][8];
-
-    // T a1=A.x,a2=A.y;
-    // T b1=B.x,b2=B.y;
-    // T c1=C.x,c2=C.y;
-    // T d1=D.x,d2=D.y;
-
-
-
-    ;
-    //for(int s=0;s<2;s++) for(int i=0;i<4;i++) for(int j=0;j<4;j++) for(int m=0;m<2;m++) for(int n=0;n<2;n++) data.H[s][i][j](m+1,n+1)=H[s][2*i+m][2*j+n];
+    for(int s=0;s<2;s++) for(int i=0;i<4;i++){data.H[s][i][3]=data.H[s][3][i]=MATRIX<T,2>();}
+    for(int s=0;s<2;s++) for(int i=0;i<3;i++) for(int j=0;j<3;j++){data.H[s][i][j]=tdata.H[s][i][j];data.H[s][i][3]-=tdata.H[s][i][j];data.H[s][3][j]-=tdata.H[s][i][j];data.H[s][3][3]+=tdata.H[s][i][j];}
 }
 
 template<class T,class TV> void Area_From_Points(DATA<T,1,2>& data,const TV& A,const TV& B)
