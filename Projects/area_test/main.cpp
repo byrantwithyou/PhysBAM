@@ -336,8 +336,8 @@ int main(int argc,char *argv[])
 //    fprintf(stderr, "%%!PS-Adobe-3.0 EPSF-3.0\n");
 //    fprintf(stderr, "%%%%BoundingBox: 0 0 1000 1000\n");
 
-//    for(int k=0;k<100000;k++)
-//        Tri_Test();
+    for(int k=0;k<100000;k++)
+        Tri_Test();
 
 //    for(int k=0;k<1000000;k++)
 //        Test();
