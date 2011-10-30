@@ -31,14 +31,38 @@ template<class TV> POINT_CASE Classify_Point(const TV& A,const TV& B,const TV& P
 
 template<class T,class TV> void Intersect_Segment_Point(DATA<T,2,3>& data,const TV& A,const TV& B,const TV& P)
 {
-    T cross1=TV::Cross_Product(A,B).x,cross2=TV::Cross_Product(A-B,P-B).x,den=1/(cross1+cross2),PxB=TV::Cross_Product(P,B).x,PxA=TV::Cross_Product(P,A).x;
-    data.V=cross1*den*P;
+    T AxB=TV::Cross_Product(A,B).x,cross2=TV::Cross_Product(A-B,P-B).x,PxB=TV::Cross_Product(P,B).x,PxA=TV::Cross_Product(P,A).x;
+    T den=1/(AxB+cross2),sden=sqr(den),cden=den*sden;
+    data.V=AxB*den*P;
 
-    TV orthAB=(A-B).Orthogonal_Vector();
-    MATRIX<T,2> M=MATRIX<T,2>::Outer_Product(P,sqr(den)*orthAB);
+    TV orthAB=(A-B).Orthogonal_Vector(),orthP=P.Orthogonal_Vector();
+    MATRIX<T,2> M=MATRIX<T,2>::Outer_Product(P,sden*orthAB);
     data.G[0]=PxB*M;
     data.G[1]=-PxA*M;
-    data.G[2]=-cross1*M+cross1*den;
+    data.G[2]=-AxB*M+AxB*den;
+
+    MATRIX<T,2> H00=(MATRIX<T,2>::Outer_Product(orthAB,orthP)+MATRIX<T,2>::Outer_Product(orthP,orthAB))*PxB*cden;
+    data.H[0][0][0]=H00*P.x;
+    data.H[1][0][0]=H00*P.y;
+    MATRIX<T,2> H11=(MATRIX<T,2>::Outer_Product(orthAB,orthP)+MATRIX<T,2>::Outer_Product(orthP,orthAB))*PxA*cden;
+    data.H[0][1][1]=H11*P.x;
+    data.H[1][1][1]=H11*P.y;
+    MATRIX<T,2> H22=(MATRIX<T,2>::Outer_Product(orthAB,orthP)+MATRIX<T,2>::Outer_Product(orthP,orthAB))*AxB*cden;
+    data.H[0][2][2]=H22*(A.x-B.x);
+    data.H[1][2][2]=H22*(A.y-B.y);
+    MATRIX<T,2> H01=(-PxA*MATRIX<T,2>::Outer_Product(orthAB,orthP)-PxB*MATRIX<T,2>::Outer_Product(orthP,orthAB))*cden;
+    data.H[0][0][1]=H01*P.x;
+    data.H[1][0][1]=H01*P.y;
+    data.H[0][0][2]=((B.x*(PxA-PxB)-2*(A.x-B.x)*PxB)*MATRIX<T,2>::Outer_Product(orthAB,orthP))*cden;
+    data.H[1][0][2]=((B.y*(PxA-PxB)-2*(A.y-B.y)*PxB)*MATRIX<T,2>::Outer_Product(orthAB,orthP))*cden;
+    data.H[0][1][2]=((A.x*(PxA-PxB)+2*P.x*AxB)*MATRIX<T,2>::Outer_Product(orthAB,orthP))*cden;
+    data.H[1][1][2]=((A.y*(PxA-PxB)+2*P.y*AxB)*MATRIX<T,2>::Outer_Product(orthAB,orthP))*cden;
+    data.H[0][1][0]=data.H[0][0][1].Transposed();
+    data.H[1][1][0]=data.H[1][0][1].Transposed();
+    data.H[0][2][0]=data.H[0][0][2].Transposed();
+    data.H[1][2][0]=data.H[1][0][2].Transposed();
+    data.H[0][2][1]=data.H[0][1][2].Transposed();
+    data.H[1][2][1]=data.H[1][1][2].Transposed();
 }
 
 template<class T,class TV> void Intersect_Segments(DATA<T,2,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
@@ -80,6 +104,17 @@ template<class T,class TV> void Intersect_Segments(DATA<T,2,4>& data,const TV& A
     data.H[1][0][1]=MATRIX<T,2>();
 
 
+    //T H[2][8][8];
+
+    // T a1=A.x,a2=A.y;
+    // T b1=B.x,b2=B.y;
+    // T c1=C.x,c2=C.y;
+    // T d1=D.x,d2=D.y;
+
+
+
+    ;
+    //for(int s=0;s<2;s++) for(int i=0;i<4;i++) for(int j=0;j<4;j++) for(int m=0;m<2;m++) for(int n=0;n<2;n++) data.H[s][i][j](m+1,n+1)=H[s][2*i+m][2*j+n];
 }
 
 template<class T,class TV> void Area_From_Points(DATA<T,1,2>& data,const TV& A,const TV& B)
