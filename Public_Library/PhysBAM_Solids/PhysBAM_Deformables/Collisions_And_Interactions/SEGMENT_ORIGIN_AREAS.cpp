@@ -124,9 +124,6 @@ template<class T,class TV> void Area_From_Segments(DATA<T,1,4>& data,TV A,TV B,T
         PHYSBAM_ASSERT(case_b==outside && case_c==inside && case_d==outside);
         if(TV::Cross_Product(A,B).x<0) sign=-sign;Case_ACAC(tdata,A,B,C,D);}
 
-    for(int i=0;i<4;i++) LOG::cout<<index[i]<<" ";LOG::cout<<std::endl;
-    LOG::cout<<"sign "<<sign<<std::endl;
-
     data.V=sign*tdata.V;
     for(int i=0;i<4;i++) data.G[index[i]]=sign*tdata.G[i];
     for(int i=0;i<4;i++) for(int k=0;k<4;k++) data.H[0][index[i]][index[k]]=sign*tdata.H[0][i][k];
