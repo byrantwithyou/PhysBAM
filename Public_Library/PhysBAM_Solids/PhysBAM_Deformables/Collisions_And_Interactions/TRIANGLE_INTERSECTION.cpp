@@ -5,8 +5,8 @@
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
 #include <PhysBAM_Tools/Math_Tools/cyclic_shift.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/SEGMENT_ORIGIN_AREAS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/SIMPLEX_INTERACTIONS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRAPEZOID_INTERSECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_INTERSECTION.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -20,12 +20,13 @@ Triangle_Intersection_Area(const TRIANGLE_2D<T>& a,const TRIANGLE_2D<T>& b,VECTO
         int in=i%3+1;
         for(int j=1;j<=3;j++){
             int jn=j%3+1;
-            VECTOR<TV,4> tG;
-            VECTOR<VECTOR<MATRIX<T,2>,4>,4> tH;
-            A+=Trapezoid_Intersection_Area(a.X(i),a.X(in),b.X(j),b.X(jn),tG,tH);
+            SEGMENT_ORIGIN_AREAS::DATA<T,1,4> data;
+            Area_From_Segments(data,a.X(i),a.X(in),b.X(j),b.X(jn));
+            A+=data.V.x;
+
             VECTOR<int,4> I(i,in,j+3,jn+3);
-            for(int k=1;k<=4;k++) G(I(k))+=tG(k);
-            for(int k=1;k<=4;k++) for(int m=1;m<=4;m++) H(I(k))(I(m))+=tH(k)(m);
+            for(int k=1;k<=4;k++) G(I(k))+=(const TV&)data.G[k-1];
+            for(int k=1;k<=4;k++) for(int m=1;m<=4;m++) H(I(k))(I(m))+=data.H[0][k-1][m-1];
         }
     }
     return A;
