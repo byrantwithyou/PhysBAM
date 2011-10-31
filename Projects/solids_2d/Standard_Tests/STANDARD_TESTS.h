@@ -28,6 +28,8 @@
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
 
+#include <fstream>
+
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <PhysBAM_Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
@@ -75,6 +77,8 @@ public:
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions;using BASE::solids_evolution; // silence -Woverloaded-virtual
     using BASE::parse_args;using BASE::test_number;
 
+    std::ofstream svout;
+
     SOLIDS_STANDARD_TESTS<TV> tests;
 
     ARRAY<TV> deformable_body_rest_positions;
@@ -91,6 +95,7 @@ public:
     bool use_extended_neohookean;
     bool use_corotated;
     bool use_corot_blend;
+    bool dump_sv;
     int kinematic_id;
     INTERPOLATION_CURVE<T,FRAME<TV> > curve;
     bool print_matrix;
@@ -99,13 +104,13 @@ public:
     T damping_multiplier;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),fully_implicit(false),test_forces(false),use_extended_neohookean(false),use_corotated(false),use_corot_blend(false),
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),fully_implicit(false),test_forces(false),use_extended_neohookean(false),use_corotated(false),use_corot_blend(false),dump_sv(false),
         print_matrix(false),parameter(0),stiffness_multiplier(1),damping_multiplier(1)
     {
     }
 
     // Unused callbacks
-    void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
+    void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE {if(dump_sv)svout.close();}
     void Postprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE {}
     void Apply_Constraints(const T dt,const T time) PHYSBAM_OVERRIDE {}
     void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) PHYSBAM_OVERRIDE {}
@@ -120,7 +125,19 @@ public:
             solid_body_collection.deformable_body_collection.Test_Energy(time);
             solid_body_collection.deformable_body_collection.Test_Force_Derivatives(time);}
     }
-    void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE {}
+    void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
+    {
+        if (dump_sv)
+        {
+            FINITE_VOLUME<TV,2>& force_field = solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,2>&>();
+            ARRAY<DIAGONAL_MATRIX<T,2> >& sv = force_field.Fe_hat;
+            
+            for (int i=1; i<=sv.m; i++)
+            {
+                svout << sv(i).x11 << " " << sv(i).x22 << std::endl;
+            }
+        }
+    }
     void Align_Deformable_Bodies_With_Rigid_Bodies() PHYSBAM_OVERRIDE {}
     void Set_External_Positions(ARRAY_VIEW<TV> X,ARRAY_VIEW<ROTATION<TV> > rotation,const T time) PHYSBAM_OVERRIDE {}
     void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
@@ -139,6 +156,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Option_Argument("-use_ext_neo");
     parse_args->Add_Option_Argument("-use_corotated");
     parse_args->Add_Option_Argument("-use_corot_blend");
+    parse_args->Add_Option_Argument("-dump_sv");
     parse_args->Add_Integer_Argument("-parameter",0,"parameter used by multiple tests to change the parameters of the test");
     parse_args->Add_Double_Argument("-stiffen",1,"","stiffness multiplier for various tests");
     parse_args->Add_Double_Argument("-dampen",1,"","damping multiplier for various tests");
@@ -170,6 +188,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     use_extended_neohookean=parse_args->Is_Value_Set("-use_ext_neo");
     use_corotated=parse_args->Is_Value_Set("-use_corotated");
     use_corot_blend=parse_args->Is_Value_Set("-use_corot_blend");
+    dump_sv=parse_args->Is_Value_Set("-dump_sv");
     solids_parameters.use_trapezoidal_rule_for_velocities=!parse_args->Get_Option_Value("-use_be");
     print_matrix=parse_args->Is_Value_Set("-print_matrix");
     parameter=parse_args->Get_Integer_Value("-parameter");
@@ -570,6 +589,12 @@ void Write_Output_Files(const int frame) const
 void Preprocess_Frame(const int frame)
 {
     dynamic_cast<NEWMARK_EVOLUTION<TV>&>(*solids_evolution).print_matrix=print_matrix;
+    
+    if (dump_sv)
+    {
+        std::string output_file = STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d/SV_%d",test_number,frame);
+        svout.open(output_file.c_str());
+    }
 }
 //#####################################################################
 // Function Add_Constitutive_Model
