@@ -3,7 +3,7 @@
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/SEGMENT_ORIGIN_AREAS.h>
 
-extern PhysBAM::ARRAY<int> trap_cases;
+//extern PhysBAM::ARRAY<int> trap_cases;
 namespace PhysBAM{
 namespace SEGMENT_ORIGIN_AREAS{
 
@@ -93,36 +93,61 @@ template<class T,class TV> void Area_From_Segments(DATA<T,1,4>& data,TV A,TV B,T
     int index[4]={0,1,2,3};
     T sign=1;
     T OAB=TV::Cross_Product(A,B).x;
-    T OCD=TV::Cross_Product(C,D).x;
-
     if(OAB<0){exchange(A,B);exchange(index[0],index[1]);sign=-sign;}
+    T OCD=TV::Cross_Product(C,D).x;
     if(OCD<0){exchange(C,D);exchange(index[2],index[3]);sign=-sign;}
-
-    POINT_CASE case_a=Classify_Point(C,D,A);
-    POINT_CASE case_b=Classify_Point(C,D,B);
-    POINT_CASE case_c=Classify_Point(A,B,C);
-    POINT_CASE case_d=Classify_Point(A,B,D);
-    if(case_b<case_a){exchange(case_b,case_a);exchange(A,B);exchange(index[0],index[1]);sign=-sign;}
-    if(case_d<case_c){exchange(case_c,case_d);exchange(C,D);exchange(index[2],index[3]);sign=-sign;}
-    if(case_a<case_c || (case_a==case_c && case_b<case_d)){
-        exchange(case_a,case_c);exchange(case_b,case_d);
-        exchange(A,C);exchange(B,D);exchange(index[0],index[2]);exchange(index[1],index[3]);}
+    T OAC=TV::Cross_Product(A,C).x;
+    if(OAC<0){exchange(A,C);exchange(B,D);exchange(index[0],index[2]);exchange(index[1],index[3]);}
 
     DATA<T,1,4> tdata;
     Clear(tdata);
-    if(case_a==outside){
-        if(case_b==outside && case_c==outside && case_d==outside) return;
-        PHYSBAM_ASSERT(case_b==outside && case_c!=outside && case_d!=outside);
-        if(case_c==beyond) Case_CCBB(tdata,A,B,C,D);
-        else if(case_d==beyond) Case_CCAB(tdata,A,B,C,D);
-        else Case_CCAA(tdata,A,B,C,D);}
-    else if(case_a==beyond){
-        PHYSBAM_ASSERT(case_b==outside && case_d==outside);
-        if(case_c==inside){if(TV::Cross_Product(A,B).x<0) sign=-sign;Case_BCAC(tdata,A,B,C,D);}
-        else{if(TV::Cross_Product(A,B).x<0) sign=-sign;Case_BCBC(tdata,A,B,C,D);}}
+
+    if(TV::Cross_Product(B,D).x>0){
+        if(TV::Cross_Product(C,B).x>0){
+            if(TV::Cross_Product(C-B,D-B).x>0){
+                if(TV::Cross_Product(A-C,B-C).x>0){ // CAAC
+                    exchange(A,B);exchange(index[0],index[1]);sign=-sign;
+                    if(TV::Cross_Product(A,B).x<0) sign=-sign;
+                    Case_ACAC(tdata,A,B,C,D);}
+                else{ // CABC
+                    exchange(A,B);
+                    exchange(index[0],index[1]);sign=-sign;
+                    exchange(A,C);exchange(B,D);
+                    exchange(index[0],index[2]);exchange(index[1],index[3]);
+                    if(TV::Cross_Product(A,B).x<0) sign=-sign;
+                    Case_BCAC(tdata,A,B,C,D);}}
+            else{
+                if(TV::Cross_Product(A-C,B-C).x>0){ // CBAC
+                    exchange(A,B);
+                    exchange(index[0],index[1]);sign=-sign;
+                    if(TV::Cross_Product(A,B).x<0) sign=-sign;
+                    Case_BCAC(tdata,A,B,C,D);}
+                else{ // CBBC
+                    exchange(A,B);
+                    exchange(index[0],index[1]);sign=-sign;
+                    if(TV::Cross_Product(A,B).x<0) sign=-sign;
+                    Case_BCBC(tdata,A,B,C,D);}}}
+        else return;} // CCCC
     else{
-        PHYSBAM_ASSERT(case_b==outside && case_c==inside && case_d==outside);
-        if(TV::Cross_Product(A,B).x<0) sign=-sign;Case_ACAC(tdata,A,B,C,D);}
+        if(TV::Cross_Product(C,B).x>0){
+            if(TV::Cross_Product(A-C,B-C).x>0){
+                if(TV::Cross_Product(A,D).x>0){
+                    if(TV::Cross_Product(A-D,B-D).x>0) Case_CCAA(tdata,A,B,C,D); // CCAA
+                    else Case_CCAB(tdata,A,B,C,D);} // CCAB
+                else{PHYSBAM_FATAL_ERROR();}} // CCAC
+            else{
+                if(TV::Cross_Product(A,D).x>0){
+                    if(TV::Cross_Product(A-D,B-D).x>0){ // CCBA
+                        exchange(C,D);
+                        exchange(index[2],index[3]);sign=-sign;
+                        Case_CCAB(tdata,A,B,C,D);}
+                    else Case_CCBB(tdata,A,B,C,D);} // CCBB
+                else{PHYSBAM_FATAL_ERROR();}}} // CCBC
+        else{
+            if(TV::Cross_Product(A,D).x>0){
+                    if(TV::Cross_Product(A-D,B-D).x>0){PHYSBAM_FATAL_ERROR();} // CCCA
+                    else{PHYSBAM_FATAL_ERROR();}} // CCCB
+            else return;}} // CCCC
 
     data.V=sign*tdata.V;
     for(int i=0;i<4;i++) data.G[index[i]]=sign*tdata.G[i];
@@ -164,7 +189,7 @@ template<class T,int m,int n> void Combine_Data(DATA<T,1,4>& data,const DATA<T,1
 const int vec_a[1]={0}, vec_c[1]={2}, vec_d[1]={3}, vec_abc[3]={0,1,2}, vec_abd[3]={0,1,3}, vec_cda[3]={2,3,0}, vec_cdb[3]={2,3,1}, vec_abcd[4]={0,1,2,3};
 template<class T,class TV> void Case_CCAA(DATA<T,1,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
 {
-    trap_cases.Append(1);
+//    trap_cases.Append(1);
     DATA<T,2,1> DC;
     Data_From_Dof(DC,C);
 
@@ -178,7 +203,7 @@ template<class T,class TV> void Case_CCAA(DATA<T,1,4>& data,const TV& A,const TV
 
 template<class T,class TV> void Case_CCAB(DATA<T,1,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
 {
-    trap_cases.Append(2);
+//    trap_cases.Append(2);
     DATA<T,2,4> Q;
     Intersect_Segments(Q,A,B,C,D);
 
@@ -198,7 +223,7 @@ template<class T,class TV> void Case_CCAB(DATA<T,1,4>& data,const TV& A,const TV
 
 template<class T,class TV> void Case_CCBB(DATA<T,1,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
 {
-    trap_cases.Append(3);
+//    trap_cases.Append(3);
     DATA<T,2,3> P1;
     Intersect_Segment_Point(P1,A,B,C);
 
@@ -212,7 +237,7 @@ template<class T,class TV> void Case_CCBB(DATA<T,1,4>& data,const TV& A,const TV
 
 template<class T,class TV> void Case_BCAC(DATA<T,1,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
 {
-    trap_cases.Append(4);
+//    trap_cases.Append(4);
     DATA<T,2,3> P;
     Intersect_Segment_Point(P,C,D,A);
 
@@ -226,7 +251,7 @@ template<class T,class TV> void Case_BCAC(DATA<T,1,4>& data,const TV& A,const TV
 
 template<class T,class TV> void Case_BCBC(DATA<T,1,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
 {
-    trap_cases.Append(5);
+//    trap_cases.Append(5);
     DATA<T,2,4> Q;
     Intersect_Segments(Q,A,B,C,D);
 
@@ -246,7 +271,7 @@ template<class T,class TV> void Case_BCBC(DATA<T,1,4>& data,const TV& A,const TV
 
 template<class T,class TV> void Case_ACAC(DATA<T,1,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
 {
-    trap_cases.Append(6);
+//    trap_cases.Append(6);
     DATA<T,2,4> Q;
     Intersect_Segments(Q,A,B,C,D);
 
