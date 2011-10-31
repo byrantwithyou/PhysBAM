@@ -181,8 +181,8 @@ template<class T,class TV> void Area_From_Segments(DATA<T,1,4>& data,TV A,TV B,T
                 if(TV::Cross_Product(A,B).x<0) sign=-sign;
                 Case_BCBC(tdata,A,B,C,D);}}}
     else{
-        if(TV::Cross_Product(A-C,B-C).x>0){
-            if(TV::Cross_Product(A-D,B-D).x>0) Case_CCAA(tdata,A,B,C,D); // CCAA
+        if(TV::Cross_Product(A-C,B-C).x>=0){
+            if(TV::Cross_Product(A-D,B-D).x>=0) Case_CCAA(tdata,A,B,C,D); // CCAA
             else Case_CCAB(tdata,A,B,C,D);} // CCAB
         else{
             if(TV::Cross_Product(A-D,B-D).x>0){ // CCBA
