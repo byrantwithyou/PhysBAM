@@ -25,9 +25,6 @@ template<class T,class TV> void Data_From_Dof(DATA<T,2,1>& data,const TV& A)
 template<class T,class TV> void Intersect_Segment_Point(DATA<T,2,3>& data,const TV& A,const TV& B,const TV& P)
 {
     T AxB=TV::Cross_Product(A,B).x,PxB=TV::Cross_Product(P,B).x,PxA=TV::Cross_Product(P,A).x;
-    // if(fabs(PxB-PxA)<1e-5){
-    //     LOG::cout<<"SMALL DENOMINATOR: "<<fabs(PxB-PxA)<<std::endl;
-    //     PROCESS_UTILITIES::Backtrace();}
     T den=1/(PxB-PxA),sden=sqr(den),cden=den*sden;
     data.V=AxB*den*P;
 
