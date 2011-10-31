@@ -22,6 +22,7 @@ class SMOKE_TESTS:public INCOMPRESSIBLE_ADAPTIVE_EXAMPLE<TV>
     typedef typename TV::template REBIND<int>::TYPE TV_INT;
     typedef INCOMPRESSIBLE_ADAPTIVE_EXAMPLE<TV> BASE;
     using BASE::mac_grid;using BASE::face_velocities;using BASE::write_substeps_level;using BASE::incompressible;using BASE::projection;using BASE::output_directory;
+    using BASE::density;using BASE::temperature;
 
     bool use_collisions;
     int binary_refinement_levels;

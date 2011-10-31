@@ -72,7 +72,9 @@ class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,3>
     typedef typename TV::SPIN T_SPIN;
 
     typedef typename RIGID_BODY_CLUSTER_BINDINGS<TV>::CLUSTER T_CLUSTER;
+    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
 public:
+    using BASE::Add_Volumetric_Body_To_Fluid_Simulation;
     SOLIDS_FLUIDS_DRIVER<TV>* driver;
     SOLIDS_STANDARD_TESTS<TV> tests;
     ARRAY<int>* referenced_rigid_particles;
@@ -98,7 +100,6 @@ public:
     GRID<TV> grid;
     std::string input_directory;
 
-    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
     using BASE::solids_parameters;using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::data_directory;using BASE::last_frame;using BASE::output_directory;using BASE::restart;
     using BASE::frame_rate;using BASE::stream_type;using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::test_number;using BASE::parse_args;
 

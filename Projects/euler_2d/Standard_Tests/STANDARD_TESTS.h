@@ -48,7 +48,7 @@ public:
     typedef VECTOR<T,2*T_GRID::dimension> T_FACE_VECTOR;typedef VECTOR<TV,2*T_GRID::dimension> TV_FACE_VECTOR;
 
     using BASE::initial_time;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::fluids_parameters;using BASE::solids_parameters;
-    using BASE::solids_fluids_parameters;
+    using BASE::solids_fluids_parameters;using BASE::Add_To_Fluid_Simulation;
     using BASE::stream_type;using BASE::data_directory;using BASE::solid_body_collection;using BASE::parse_args;using BASE::test_number;using BASE::resolution;
 
     SOLIDS_STANDARD_TESTS<TV> tests;

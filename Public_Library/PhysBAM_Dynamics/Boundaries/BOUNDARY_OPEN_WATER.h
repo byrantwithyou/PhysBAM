@@ -23,7 +23,7 @@ class BOUNDARY_OPEN_WATER:public BOUNDARY_UNIFORM<T_GRID,typename T_GRID::SCALAR
     typedef typename T_GRID::NODE_ITERATOR NODE_ITERATOR;
 public:
     typedef BOUNDARY_UNIFORM<T_GRID,T> BASE;
-    using BASE::Constant_Extrapolation;
+    using BASE::Constant_Extrapolation;using BASE::Fill_Single_Ghost_Region;using BASE::Find_Ghost_Regions;
 
     ARRAY<bool> open_boundary;
     T attenuate_inflow;

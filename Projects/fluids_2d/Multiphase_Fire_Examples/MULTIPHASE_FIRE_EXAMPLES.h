@@ -33,6 +33,7 @@ public:
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::first_frame;using BASE::data_directory;
     using BASE::last_frame;using BASE::frame_rate;using BASE::write_output_files;using BASE::Get_Source_Velocities;using BASE::resolution;
     using BASE::output_directory;using BASE::restart;using BASE::restart_frame;using BASE::solid_body_collection;using BASE::parse_args;using BASE::test_number;
+    using BASE::Adjust_Phi_With_Source;
 
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
     bool use_object;

@@ -33,7 +33,8 @@ public:
     using RENDERING_OBJECT<T>::bssrdf_tree;using RENDERING_OBJECT<T>::bssrdf_shader;
 #endif
     using RENDERING_OBJECT<T>::flip_normal;using RENDERING_OBJECT<T>::World_Space_Bounding_Box;using RENDERING_OBJECT<T>::name;using RENDERING_OBJECT<T>::two_sided;
-    using RENDERING_OBJECT<T>::Inside;using RENDERING_OBJECT<T>::Intersection; // silence -Woverloaded-virtual
+    using RENDERING_OBJECT<T>::Inside;using RENDERING_OBJECT<T>::Intersection;using RENDERING_OBJECT<T>::Object_Space_Ray;using RENDERING_OBJECT<T>::Object_Space_Point;
+    using RENDERING_OBJECT<T>::Object_Space_Vector;using RENDERING_OBJECT<T>::World_Space_Vector;using RENDERING_OBJECT<T>::World_Space_Point;
     
     TRIANGULATED_SURFACE<T>& triangulated_surface;
     mutable TRIANGULATED_SURFACE<T>* base_triangulated_surface;

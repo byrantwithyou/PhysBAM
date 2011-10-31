@@ -43,8 +43,9 @@ class SMOKE_TESTS:public INCOMPRESSIBLE_EXAMPLE<TV>
     LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,T> interpolation;
 
 public:
-    using BASE::mac_grid; using BASE::incompressible;using BASE::projection;using BASE::output_directory;using BASE::incompressible;using BASE::mpi_grid;using BASE::domain_boundary;using BASE::face_velocities;
-    using BASE::last_frame;using BASE::write_substeps_level;using BASE::rigid_geometry_collection;using BASE::boundary_scalar;using BASE::density;using BASE::boundary;using BASE::restart;
+    using BASE::mac_grid; using BASE::incompressible;using BASE::projection;using BASE::output_directory;using BASE::incompressible;using BASE::mpi_grid;using BASE::domain_boundary;
+    using BASE::face_velocities;using BASE::last_frame;using BASE::write_substeps_level;using BASE::rigid_geometry_collection;using BASE::boundary_scalar;using BASE::density;
+    using BASE::boundary;using BASE::restart;using BASE::temperature;
 
     SMOKE_TESTS(const STREAM_TYPE stream_type_input,const PARSE_ARGS& parse_args)
         :INCOMPRESSIBLE_EXAMPLE<TV>(stream_type_input),stream_type(stream_type_input),use_collisions(false),use_conservative_advection(false)

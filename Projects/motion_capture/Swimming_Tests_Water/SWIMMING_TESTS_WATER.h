@@ -51,7 +51,8 @@ public:
     using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;
     using BASE::stream_type;using BASE::data_directory;using BASE::solid_body_collection;using BASE::parse_args;using BASE::test_number;using BASE::resolution;
     using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions; // silence -Woverloaded-virtual
-    using BASE::Initialize_Solid_Fluid_Coupling_Before_Grid_Initialization;using BASE::mpi_world;
+    using BASE::Initialize_Solid_Fluid_Coupling_Before_Grid_Initialization;using BASE::mpi_world;using BASE::Add_Thin_Shell_To_Fluid_Simulation;
+    using BASE::Add_Volumetric_Body_To_Fluid_Simulation;using BASE::Add_To_Fluid_Simulation;
 
     WATER_STANDARD_TESTS_3D<T_GRID > water_tests;
     SOLIDS_STANDARD_TESTS<TV> solids_tests;

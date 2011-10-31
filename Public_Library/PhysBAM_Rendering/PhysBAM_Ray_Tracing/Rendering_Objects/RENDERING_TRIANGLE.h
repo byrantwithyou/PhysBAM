@@ -17,7 +17,7 @@ class RENDERING_TRIANGLE:public RENDERING_PLANE<T>
 {
     typedef VECTOR<T,3> TV;
 public:
-    using RENDERING_OBJECT<T>::small_number;
+    using RENDERING_OBJECT<T>::small_number;using RENDERING_OBJECT<T>::Object_Space_Ray;
     using RENDERING_OBJECT<T>::Intersection; // silence -Woverloaded-virtual
 
     TRIANGLE_3D<T> triangle;

@@ -213,7 +213,6 @@ void PD_Example()
     last_frame=480;
     JOINT<TV>*joint=0;
     RIGID_BODY<TV>*parent_body=NULL,*child_body=NULL;
-    int pid=0,cid=0;
     T cheight=(T)0;
     T k_p=(T)1000;
 
@@ -242,8 +241,8 @@ void PD_Example()
         joint->Set_Joint_To_Child_Frame(FRAME<TV>(TV(-(T).625,0)));
 
         // Swap indices
-        parent_body=child_body;pid=cid;
-        child_body=NULL;cid=0;
+        parent_body=child_body;
+        child_body=NULL;
         joint=NULL;}
     
     arb->Use_PD_Actuators();

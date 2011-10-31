@@ -82,7 +82,7 @@ public:
     using BASE::initial_time;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::restart;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::solids_fluids_parameters;
     using BASE::solid_body_collection; using BASE::data_directory;using BASE::parse_args;using BASE::test_number;using BASE::resolution;
-    using BASE::solids_evolution; using BASE::stream_type;
+    using BASE::solids_evolution; using BASE::stream_type;using BASE::Add_To_Fluid_Simulation;
 
     enum SHOCK_TYPE {SPHERICAL,VERTICAL};
 

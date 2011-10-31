@@ -45,7 +45,7 @@ public:
     typedef VECTOR<T,T_GRID::dimension+2> TV_DIMENSION;
     typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;
     using BASE::initial_time;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::fluids_parameters;using BASE::solids_parameters;
-    using BASE::solid_body_collection;using BASE::parse_args;using BASE::test_number;using BASE::resolution;
+    using BASE::solid_body_collection;using BASE::parse_args;using BASE::test_number;using BASE::resolution;using BASE::Add_To_Fluid_Simulation;
 
     SOLIDS_STANDARD_TESTS<TV> tests;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;

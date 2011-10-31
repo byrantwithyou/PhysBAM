@@ -688,7 +688,7 @@ void Single_Hair()
     TRIANGULATED_SURFACE<T>& triangles=*TRIANGULATED_SURFACE<T>::Create(particles);
     TETRAHEDRALIZED_VOLUME<T>& volume=*TETRAHEDRALIZED_VOLUME<T>::Create(particles);
 
-    int i=2,e0,r0,e1,r1=0,e2,r2=0,r3,foo,dummy;
+    int i=2,e0,r0,e1,r1=0,r2=0,r3;
     int last_particle=particles.array_collection->Add_Element();
     particles.X(last_particle)=points(1);
     ARRAY<ARRAY<int> > previous;
@@ -728,7 +728,6 @@ void Single_Hair()
                 bending_edges.mesh.elements.Append(Vi2(last_particle,r0));
                 if(i-2>=0 && previous(i-2).m==2){
                     r3=previous(i-2)(1);
-                    foo=previous(i-2)(2);
                     torsion_edges.mesh.elements.Append(Vi2(r3,r0));
                     volume.mesh.elements.Append(Vi4(r3,r2,r1,r0));}
                 triangles.mesh.elements.Append(Vi3(r1,e0,r0));
@@ -754,13 +753,10 @@ void Single_Hair()
             if(i-2>=0){
                 if(previous(i-2).m==2){
                     r3=previous(i-2)(1);
-                    dummy=previous(i-2)(2);
                     torsion_edges.mesh.elements.Append(Vi2(r3,r0));
                     volume.mesh.elements.Append(Vi4(r3,r2,r1,r0));}
                 else if(previous(i-2).m==3){
                     r3=previous(i-2)(1);
-                    e2=previous(i-2)(2);
-                    dummy=previous(i-2)(3);
                     torsion_edges.mesh.elements.Append(Vi2(r3,r0));
                     volume.mesh.elements.Append(Vi4(r3,r2,r1,r0));}}}
         else if(previous(i-1).m==3){

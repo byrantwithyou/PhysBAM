@@ -32,7 +32,7 @@ public:
     VECTOR<T,3> Attenuate_Color(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& object,const VECTOR<T,3>& color) PHYSBAM_OVERRIDE
     {T start_t,end_t;
     if(!object.Get_Intersection_Range(ray.ray,start_t,end_t))return color;
-    T current_t=end_t;T old_t;
+    T current_t=end_t;
     bool last_segment=false;
     const ARRAY<RENDERING_LIGHT<T> *>& lights=world.Lights();
     VECTOR<T,3> attenuated_color=color;
@@ -59,7 +59,7 @@ public:
             accumulated_radiance_samples/=(T)sample_array.m;
             attenuated_color+=current_volumetric_step*accumulated_radiance_samples*scattering;}
         // step next
-        old_t=current_t;current_t-=current_volumetric_step;}
+        current_t-=current_volumetric_step;}
     return attenuated_color;}
 
     VECTOR<T,3> Attenuate_Light(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& object,const RENDERING_LIGHT<T>& light,const VECTOR<T,3>& light_color) PHYSBAM_OVERRIDE

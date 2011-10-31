@@ -90,6 +90,7 @@ public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
     using BASE::solids_parameters;using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::data_directory;using BASE::last_frame;using BASE::output_directory;using BASE::restart;
     using BASE::frame_rate;using BASE::stream_type;using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::test_number;using BASE::resolution;using BASE::parse_args;
+    using BASE::Add_To_Fluid_Simulation;using BASE::Add_Volumetric_Body_To_Fluid_Simulation;
 
     STANDARD_TESTS_WATER(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.SMOKE),source_velocity_magnitude(0),tests(*this,solid_body_collection),

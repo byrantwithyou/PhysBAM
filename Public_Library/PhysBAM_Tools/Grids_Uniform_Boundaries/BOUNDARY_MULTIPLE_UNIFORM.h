@@ -18,10 +18,12 @@ class BOUNDARY_MULTIPLE_UNIFORM:public BOUNDARY_UNIFORM<T_GRID,T2>
     typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE T_ARRAYS_BASE;
     typedef typename T_ARRAYS_BASE::template REBIND<T2>::TYPE T_ARRAYS_DIMENSION_T2;
     typedef VECTOR<BOUNDARY_UNIFORM<T_GRID,T2>*,2*T_GRID::dimension> T_BOUNDARY_FACE_VECTOR;
+    typedef BOUNDARY_UNIFORM<T_GRID,T2> BASE;
 
     T_BOUNDARY_FACE_VECTOR boundaries;
 
 public:
+    using BASE::Find_Ghost_Regions;
     BOUNDARY_MULTIPLE_UNIFORM(const T_BOUNDARY_FACE_VECTOR& boundaries_input)
         :boundaries(boundaries_input) {}
 

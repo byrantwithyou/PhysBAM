@@ -19,13 +19,17 @@ namespace PhysBAM{
 template<class T_GRID,class T2>
 class BOUNDARY_LINEAR_EXTRAPOLATION:public BOUNDARY_UNIFORM<T_GRID,T2>
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
+    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef BOUNDARY_UNIFORM<T_GRID,T2> BASE;
     typedef typename T_GRID::VECTOR_INT TV_INT;
     typedef typename T_GRID::NODE_ITERATOR NODE_ITERATOR;
     typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE T_ARRAYS_BASE;typedef typename T_ARRAYS_BASE::template REBIND<T2>::TYPE T_ARRAYS_T2;
 public:
+    using BASE::Find_Ghost_Regions;using BASE::Boundary;
 
     BOUNDARY_LINEAR_EXTRAPOLATION()
+    {}
+
+    virtual ~BOUNDARY_LINEAR_EXTRAPOLATION()
     {}
 
 //#####################################################################

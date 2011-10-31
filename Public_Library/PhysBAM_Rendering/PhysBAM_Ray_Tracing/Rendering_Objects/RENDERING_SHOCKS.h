@@ -24,7 +24,8 @@ class RENDERING_SHOCKS:public RENDERING_VOXELS<T>
     typedef VECTOR<T,3> TV;
     typedef typename GRID_ARRAYS_POLICY<GRID<TV> >::ARRAYS_SCALAR T_ARRAYS_SCALAR;
 public:
-    using RENDERING_VOXELS<T>::box;using RENDERING_VOXELS<T>::Intersection; // silence -Woverloaded-virtual
+    using RENDERING_VOXELS<T>::box;using RENDERING_VOXELS<T>::Intersection;using RENDERING_VOXELS<T>::World_Space_Vector;using RENDERING_VOXELS<T>::Object_Space_Vector;
+    using RENDERING_VOXELS<T>::Object_Space_Ray;using RENDERING_VOXELS<T>::Object_Space_Point;
 
     const GRID<TV>& grid;
     const T_ARRAYS_SCALAR& density;

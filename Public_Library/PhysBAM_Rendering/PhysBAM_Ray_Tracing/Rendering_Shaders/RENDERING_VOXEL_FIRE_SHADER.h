@@ -84,7 +84,7 @@ public:
     {const RENDERING_VOXELS<T>* voxel_object=(const RENDERING_VOXELS<T>*)&object;
     T start_t,end_t;
     if(!INTERSECTION::Get_Intersection_Range(ray.ray,voxel_object->box,start_t,end_t))return color;
-    T current_t=end_t;T old_t;
+    T current_t=end_t;
     bool last_segment=false;
     VECTOR<T,3> attenuated_color=color;
     int step_count=0;
@@ -107,7 +107,7 @@ public:
         VECTOR<T,3> attenuation_coefficient=-current_volumetric_step*density*(absorption+scattering);
         VECTOR<T,3> attenuation(exp(attenuation_coefficient.x),exp(attenuation_coefficient.y),exp(attenuation_coefficient.z));
         attenuated_color=attenuated_color*attenuation+density*absorption*emitted_radiance*current_volumetric_step;
-        old_t=current_t;current_t-=current_volumetric_step;}
+        current_t-=current_volumetric_step;}
     return attenuated_color;}
 
     VECTOR<T,3> Attenuate_Light(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& object,const RENDERING_LIGHT<T>& light,const VECTOR<T,3>& light_color) PHYSBAM_OVERRIDE

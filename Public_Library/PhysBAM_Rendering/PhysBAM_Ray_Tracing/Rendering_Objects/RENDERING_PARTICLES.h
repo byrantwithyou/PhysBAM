@@ -19,8 +19,8 @@ class RENDERING_PARTICLES:public RENDERING_OBJECT<T>
 {
     typedef VECTOR<T,3> TV;
 public:
-    using RENDERING_OBJECT<T>::small_number;using RENDERING_OBJECT<T>::transform;
-    using RENDERING_OBJECT<T>::Inside;using RENDERING_OBJECT<T>::Intersection; // silence -Woverloaded-virtual
+    using RENDERING_OBJECT<T>::small_number;using RENDERING_OBJECT<T>::transform;using RENDERING_OBJECT<T>::Object_Space_Point;
+    using RENDERING_OBJECT<T>::Object_Space_Ray;using RENDERING_OBJECT<T>::Inside;using RENDERING_OBJECT<T>::Intersection;
 private:
     ARRAY<POINT_CLOUD<TV>*,VECTOR<int,3> > particles_array;
     const GRID<TV>& grid;

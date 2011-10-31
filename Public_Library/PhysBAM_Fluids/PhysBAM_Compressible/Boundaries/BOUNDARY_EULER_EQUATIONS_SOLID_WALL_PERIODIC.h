@@ -30,7 +30,7 @@ class BOUNDARY_EULER_EQUATIONS_SOLID_WALL_PERIODIC:public BOUNDARY_UNIFORM<T_GRI
 public:
     typedef BOUNDARY_UNIFORM<T_GRID,T2> BASE;
     using BASE::Turn_Off_Constant_Extrapolation;using BASE::Set_Constant_Extrapolation;using BASE::Constant_Extrapolation;
-    using BASE::constant_extrapolation;
+    using BASE::constant_extrapolation;using BASE::Find_Ghost_Regions;using BASE::Fill_Single_Ghost_Region;
 
     VECTOR<bool,3> periodic,repeats_at_last_node;
 

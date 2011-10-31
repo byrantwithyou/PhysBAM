@@ -14,9 +14,7 @@ class STRAWMAN_DRIVER : public DRIVER<TV>
 {
     typedef DRIVER<TV> BASE;
     typedef typename TV::SCALAR T;
-    using BASE::time;
-    using BASE::current_frame;
-    using BASE::output_number;
+    using BASE::time;using BASE::current_frame;using BASE::output_number;using BASE::Write_Output_Files;
 
     STRAWMAN_EXAMPLE<TV>& example;
   public:

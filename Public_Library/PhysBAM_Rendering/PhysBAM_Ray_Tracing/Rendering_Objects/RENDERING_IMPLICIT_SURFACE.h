@@ -20,8 +20,9 @@ class RENDERING_IMPLICIT_SURFACE:public RENDERING_OBJECT<T>
 {
     typedef VECTOR<T,3> TV;
 public:
-    using RENDERING_OBJECT<T>::small_number;using RENDERING_OBJECT<T>::inverse_transform;
-    using RENDERING_OBJECT<T>::Inside;using RENDERING_OBJECT<T>::Intersection; // silence -Woverloaded-virtual
+    using RENDERING_OBJECT<T>::small_number;using RENDERING_OBJECT<T>::inverse_transform;using RENDERING_OBJECT<T>::Object_Space_Ray;
+    using RENDERING_OBJECT<T>::Inside;using RENDERING_OBJECT<T>::Intersection;using RENDERING_OBJECT<T>::Object_Space_Point;
+    using RENDERING_OBJECT<T>::World_Space_Vector;
 
     IMPLICIT_OBJECT<TV>* implicit_surface;
 

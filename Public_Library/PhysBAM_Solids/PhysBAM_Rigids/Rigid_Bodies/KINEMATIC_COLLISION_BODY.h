@@ -25,7 +25,7 @@ public:
 
     typedef RIGID_BODY<TV> BASE;
 
-    using BASE::implicit_object;using BASE::particle_index;
+    using BASE::implicit_object;using BASE::particle_index;using BASE::Object_Space_Point;using BASE::Add_Structure;
 
     T_GRID* velocity_grid;
     T_ARRAYS_TV* velocity_field; // a field defined on velocity_grid, in object space
