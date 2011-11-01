@@ -90,6 +90,7 @@ template<class T,class TV> void Area_From_Points(DATA<T,1,2>& data,const TV& A,c
 
 template<class T,class TV> void Area_From_Segments(DATA<T,1,4>& data,TV A,TV B,TV C,TV D)
 {
+    if(A==B && C==D) return;
     int index[4]={0,1,2,3};
     T sign=1;
 
@@ -138,7 +139,7 @@ template<class T,class TV> void Area_From_Segments(DATA<T,1,4>& data,TV A,TV B,T
         exchange(sbd,sbc);
         scd=-scd;}
 
-    if(sac<0){
+    if(A==B || sac<0 || (sac==0 && sbd<0)){
         exchange(A,C);
         exchange(B,D);
         exchange(index[0],index[2]);
@@ -153,39 +154,49 @@ template<class T,class TV> void Area_From_Segments(DATA<T,1,4>& data,TV A,TV B,T
     DATA<T,1,4> tdata;
     Clear(tdata);
 
+    if(C==D){
+        if(sbc>0 || sbd>0 || sac<0 || sad<0) return;
+        if(TV::Cross_Product(A-C,B-C).x>=0) Case_CCAA(tdata,A,B,C,D); // CCAA
+        else Case_CCBB(tdata,A,B,C,D); // CCBB
+
+        data.V=sign*tdata.V;
+        for(int i=0;i<4;i++) data.G[index[i]]=sign*tdata.G[i];
+        for(int i=0;i<4;i++) for(int k=0;k<4;k++) data.H[0][index[i]][index[k]]=sign*tdata.H[0][i][k];}
+
     // NOTE: (DxA) (CxB) + (CxD) (AxB) + (AxC) (DxB) = 0
 
+
     if(sbc>=0) return; // CCCC
-    if(sbd>0){
-        if(TV::Cross_Product(C-B,D-B).x>0){
-            if(TV::Cross_Product(A-C,B-C).x>0){ // CAAC
+    if(TV::Cross_Product(A-C,B-C).x>=0){
+        if(sbd>=0){
+            if(TV::Cross_Product(C-B,D-B).x>0){ // CAAC
                 exchange(A,B);exchange(index[0],index[1]);sign=-sign;
                 if(TV::Cross_Product(A,B).x<0) sign=-sign;
                 Case_ACAC(tdata,A,B,C,D);}
-            else{ // CABC
+            else{ // CBAC
+                exchange(A,B);
+                exchange(index[0],index[1]);sign=-sign;
+                if(TV::Cross_Product(A,B).x<0) sign=-sign;
+                Case_BCAC(tdata,A,B,C,D);}}
+        else{
+            if(TV::Cross_Product(A-D,B-D).x>=0) Case_CCAA(tdata,A,B,C,D); // CCAA
+            else Case_CCAB(tdata,A,B,C,D);}} // CCAB
+    else{
+        if(sbd>0){
+            if(TV::Cross_Product(C-B,D-B).x>=0){ // CABC
                 exchange(A,B);
                 exchange(index[0],index[1]);sign=-sign;
                 exchange(A,C);exchange(B,D);
                 exchange(index[0],index[2]);exchange(index[1],index[3]);
-                if(TV::Cross_Product(A,B).x<0) sign=-sign;
-                Case_BCAC(tdata,A,B,C,D);}}
-        else{
-            if(TV::Cross_Product(A-C,B-C).x>0){ // CBAC
-                exchange(A,B);
-                exchange(index[0],index[1]);sign=-sign;
                 if(TV::Cross_Product(A,B).x<0) sign=-sign;
                 Case_BCAC(tdata,A,B,C,D);}
             else{ // CBBC
                 exchange(A,B);
                 exchange(index[0],index[1]);sign=-sign;
                 if(TV::Cross_Product(A,B).x<0) sign=-sign;
-                Case_BCBC(tdata,A,B,C,D);}}}
-    else{
-        if(TV::Cross_Product(A-C,B-C).x>=0){
-            if(TV::Cross_Product(A-D,B-D).x>=0) Case_CCAA(tdata,A,B,C,D); // CCAA
-            else Case_CCAB(tdata,A,B,C,D);} // CCAB
+                Case_BCBC(tdata,A,B,C,D);}}
         else{
-            if(TV::Cross_Product(A-D,B-D).x>0){ // CCBA
+            if(TV::Cross_Product(A-D,B-D).x>=0){ // CCBA
                 exchange(C,D);
                 exchange(index[2],index[3]);sign=-sign;
                 Case_CCAB(tdata,A,B,C,D);}
