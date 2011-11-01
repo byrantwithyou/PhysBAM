@@ -30,3 +30,29 @@ output
 
 *.os
 *.so
+#	Projects/Advection/advection_debug
+#	Projects/Levelset/water_debug
+#	Projects/Projection/projection_debug
+#	Projects/Water/water_debug
+#	Projects/asynchronous/asynchronous_debug
+#	Projects/boundary_conditions_2d/boundary_conditions_2d_debug
+#	Projects/boundary_conditions_2d/extrapolation_test1_debug
+#	Projects/boundary_conditions_2d/extrapolation_test3_debug
+#	Projects/boundary_conditions_2d/extrapolation_test_debug
+#	Projects/boundary_conditions_2d/test_bed_debug
+#	Projects/compressible_thin_shells_1d/compressible_thin_shells_1d_debug
+#	Projects/compressible_thin_shells_2d/compressible_thin_shells_2d_debug
+#	Projects/compressible_thin_shells_2d/to_gnuplot_debug
+#	Projects/coupled_springs/coupled_springs_debug
+#	Projects/destruction/destruction_debug
+#	Projects/euler_fsi_1d/euler_fsi_1d_debug
+#	Projects/framerate_rigid_deformable/framerate_rigid_deformable_debug
+#	Projects/fully_conservative/fully_conservative_debug
+#	Projects/kang_2d/kang_2d_debug
+#	Projects/motion_capture_2d/motion_capture_2d_debug
+#	Projects/multigrid_poisson_3d_optimized_kernels/multigrid_poisson_3d_optimized_kernels_debug
+#	Projects/one_phase_incompressible/one_phase_incompressible_debug
+#	Projects/pls/pls_debug
+#	Projects/refinement/refinement_debug
+#	Projects/refinement_pls/refinement_pls_debug
+#	Projects/scalable_rigids/scalable_rigids_debug
