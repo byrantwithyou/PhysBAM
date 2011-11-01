@@ -21,14 +21,6 @@ template<class T,class TV> void Data_From_Dof(DATA<T,2,1>& data,const TV& A)
     for(int i=0;i<2;i++) data.H[i][0][0]=MATRIX<T,2>();
 }
 
-template<class TV> POINT_CASE Classify_Point(const TV& A,const TV& B,const TV& P)
-{
-    if(TV::Cross_Product(A,P).x<0) return outside;
-    if(TV::Cross_Product(P,B).x<0) return outside;
-    if(TV::Cross_Product(A-P,B-P).x<0) return beyond;
-    return inside;
-}
-
 template<class T,class TV> void Intersect_Segment_Point(DATA<T,2,3>& data,const TV& A,const TV& B,const TV& P)
 {
     T AxB=TV::Cross_Product(A,B).x,PxB=TV::Cross_Product(P,B).x,PxA=TV::Cross_Product(P,A).x;
@@ -41,22 +33,20 @@ template<class T,class TV> void Intersect_Segment_Point(DATA<T,2,3>& data,const 
     data.G[1]=-PxA*M;
     data.G[2]=-AxB*M+AxB*den;
 
-    MATRIX<T,2> H00=(MATRIX<T,2>::Outer_Product(orthAB,orthP)+MATRIX<T,2>::Outer_Product(orthP,orthAB))*PxB*cden;
+    MATRIX<T,2> ABP=MATRIX<T,2>::Outer_Product(orthAB,orthP*cden),PAB=MATRIX<T,2>::Outer_Product(orthP*cden,orthAB),PAB_ABP=ABP+PAB;
+    MATRIX<T,2> H00=PAB_ABP*PxB,H11=PAB_ABP*PxA,H22=PAB_ABP*AxB,H01=-PxA*ABP-PxB*PAB;
     data.H[0][0][0]=H00*P.x;
     data.H[1][0][0]=H00*P.y;
-    MATRIX<T,2> H11=(MATRIX<T,2>::Outer_Product(orthAB,orthP)+MATRIX<T,2>::Outer_Product(orthP,orthAB))*PxA*cden;
     data.H[0][1][1]=H11*P.x;
     data.H[1][1][1]=H11*P.y;
-    MATRIX<T,2> H22=(MATRIX<T,2>::Outer_Product(orthAB,orthP)+MATRIX<T,2>::Outer_Product(orthP,orthAB))*AxB*cden;
     data.H[0][2][2]=H22*(A.x-B.x);
     data.H[1][2][2]=H22*(A.y-B.y);
-    MATRIX<T,2> H01=(-PxA*MATRIX<T,2>::Outer_Product(orthAB,orthP)-PxB*MATRIX<T,2>::Outer_Product(orthP,orthAB))*cden;
     data.H[0][0][1]=H01*P.x;
     data.H[1][0][1]=H01*P.y;
-    data.H[0][0][2]=((B.x*(PxA-PxB)-2*(A.x-B.x)*PxB)*MATRIX<T,2>::Outer_Product(orthAB,orthP))*cden;
-    data.H[1][0][2]=((B.y*(PxA-PxB)-2*(A.y-B.y)*PxB)*MATRIX<T,2>::Outer_Product(orthAB,orthP))*cden;
-    data.H[0][1][2]=((A.x*(PxA-PxB)+2*P.x*AxB)*MATRIX<T,2>::Outer_Product(orthAB,orthP))*cden;
-    data.H[1][1][2]=((A.y*(PxA-PxB)+2*P.y*AxB)*MATRIX<T,2>::Outer_Product(orthAB,orthP))*cden;
+    data.H[0][0][2]=((B.x*(PxA-PxB)-2*(A.x-B.x)*PxB)*ABP);
+    data.H[1][0][2]=((B.y*(PxA-PxB)-2*(A.y-B.y)*PxB)*ABP);
+    data.H[0][1][2]=((A.x*(PxA-PxB)+2*P.x*AxB)*ABP);
+    data.H[1][1][2]=((A.y*(PxA-PxB)+2*P.y*AxB)*ABP);
     data.H[0][1][0]=data.H[0][0][1].Transposed();
     data.H[1][1][0]=data.H[1][0][1].Transposed();
     data.H[0][2][0]=data.H[0][0][2].Transposed();

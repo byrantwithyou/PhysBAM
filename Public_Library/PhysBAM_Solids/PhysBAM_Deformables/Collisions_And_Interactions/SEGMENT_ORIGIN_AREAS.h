@@ -12,8 +12,6 @@
 namespace PhysBAM{
 namespace SEGMENT_ORIGIN_AREAS
 {
-enum POINT_CASE {inside, beyond, outside};
-template<class TV> POINT_CASE Classify_Point(const TV& A,const TV& B,const TV& P);
 
 template<class T,int m,int n>
 struct DATA
