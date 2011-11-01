@@ -1,6 +1,7 @@
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
+#include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/SEGMENT_ORIGIN_AREAS.h>
 
 //extern PhysBAM::ARRAY<int> trap_cases;
@@ -24,6 +25,9 @@ template<class T,class TV> void Data_From_Dof(DATA<T,2,1>& data,const TV& A)
 template<class T,class TV> void Intersect_Segment_Point(DATA<T,2,3>& data,const TV& A,const TV& B,const TV& P)
 {
     T AxB=TV::Cross_Product(A,B).x,PxB=TV::Cross_Product(P,B).x,PxA=TV::Cross_Product(P,A).x;
+    // if(fabs(PxB-PxA)<1e-5){
+    //     LOG::cout<<"SMALL DENOMINATOR: "<<fabs(PxB-PxA)<<std::endl;
+    //     PROCESS_UTILITIES::Backtrace();}
     T den=1/(PxB-PxA),sden=sqr(den),cden=den*sden;
     data.V=AxB*den*P;
 
@@ -32,6 +36,9 @@ template<class T,class TV> void Intersect_Segment_Point(DATA<T,2,3>& data,const 
     data.G[0]=PxB*M;
     data.G[1]=-PxA*M;
     data.G[2]=-AxB*M+AxB*den;
+
+//    if(fabs(PxB-PxA)<1e-5){
+//        LOG::cout<<"GRAD: "<<data.G[0]<<"  "<<data.G[1]<<"  "<<data.G[2]<<std::endl;}
 
     MATRIX<T,2> ABP=MATRIX<T,2>::Outer_Product(orthAB,orthP*cden),PAB=MATRIX<T,2>::Outer_Product(orthP*cden,orthAB),PAB_ABP=ABP+PAB;
     MATRIX<T,2> H00=PAB_ABP*PxB,H11=PAB_ABP*PxA,H22=PAB_ABP*AxB,H01=-PxA*ABP-PxB*PAB;
@@ -82,7 +89,7 @@ template<class T,class TV> void Area_From_Segments(DATA<T,1,4>& data,TV A,TV B,T
 {
     if(A==B && C==D) return;
     int index[4]={0,1,2,3};
-    T sign=1;
+    T sign=1,tol=(T)1e-10;
 
     // Enforce consistency with: AD BC + AB CD - AC BD = 0
     T AB=TV::Cross_Product(A,B).x;
@@ -91,12 +98,12 @@ template<class T,class TV> void Area_From_Segments(DATA<T,1,4>& data,TV A,TV B,T
     T BD=TV::Cross_Product(B,D).x;
     T AD=TV::Cross_Product(A,D).x;
     T BC=TV::Cross_Product(B,C).x;
-    int sab=AB<0?-1:AB>0;
-    int scd=CD<0?-1:CD>0;
-    int sac=AC<0?-1:AC>0;
-    int sbd=BD<0?-1:BD>0;
-    int sad=AD<0?-1:AD>0;
-    int sbc=BC<0?-1:BC>0;
+    int sab=AB<-tol?-1:AB>tol;
+    int scd=CD<-tol?-1:CD>tol;
+    int sac=AC<-tol?-1:AC>tol;
+    int sbd=BD<-tol?-1:BD>tol;
+    int sad=AD<-tol?-1:AD>tol;
+    int sbc=BC<-tol?-1:BC>tol;
     bool bins[3]={false,false,false};
     bins[sad*sbc+1]=true;
     bins[sab*scd+1]=true;
@@ -146,7 +153,7 @@ template<class T,class TV> void Area_From_Segments(DATA<T,1,4>& data,TV A,TV B,T
 
     if(C==D){
         if(sbc>0 || sbd>0 || sac<0 || sad<0) return;
-        if(TV::Cross_Product(A-C,B-C).x>=0) Case_CCAA(tdata,A,B,C,D); // CCAA
+        if(TV::Cross_Product(A-C,B-C).x>-tol) Case_CCAA(tdata,A,B,C,D); // CCAA
         else Case_CCBB(tdata,A,B,C,D); // CCBB
 
         data.V=sign*tdata.V;
@@ -157,9 +164,9 @@ template<class T,class TV> void Area_From_Segments(DATA<T,1,4>& data,TV A,TV B,T
 
 
     if(sbc>=0) return; // CCCC
-    if(TV::Cross_Product(A-C,B-C).x>=0){
+    if(TV::Cross_Product(A-C,B-C).x>-tol){
         if(sbd>=0){
-            if(TV::Cross_Product(C-B,D-B).x>0){ // CAAC
+            if(TV::Cross_Product(C-B,D-B).x>tol){ // CAAC
                 exchange(A,B);exchange(index[0],index[1]);sign=-sign;
                 if(TV::Cross_Product(A,B).x<0) sign=-sign;
                 Case_ACAC(tdata,A,B,C,D);}
@@ -169,11 +176,11 @@ template<class T,class TV> void Area_From_Segments(DATA<T,1,4>& data,TV A,TV B,T
                 if(TV::Cross_Product(A,B).x<0) sign=-sign;
                 Case_BCAC(tdata,A,B,C,D);}}
         else{
-            if(TV::Cross_Product(A-D,B-D).x>=0) Case_CCAA(tdata,A,B,C,D); // CCAA
+            if(TV::Cross_Product(A-D,B-D).x>-tol) Case_CCAA(tdata,A,B,C,D); // CCAA
             else Case_CCAB(tdata,A,B,C,D);}} // CCAB
     else{
         if(sbd>0){
-            if(TV::Cross_Product(C-B,D-B).x>=0){ // CABC
+            if(TV::Cross_Product(C-B,D-B).x>-tol){ // CABC
                 exchange(A,B);
                 exchange(index[0],index[1]);sign=-sign;
                 exchange(A,C);exchange(B,D);
@@ -186,7 +193,7 @@ template<class T,class TV> void Area_From_Segments(DATA<T,1,4>& data,TV A,TV B,T
                 if(TV::Cross_Product(A,B).x<0) sign=-sign;
                 Case_BCBC(tdata,A,B,C,D);}}
         else{
-            if(TV::Cross_Product(A-D,B-D).x>=0){ // CCBA
+            if(TV::Cross_Product(A-D,B-D).x>-tol){ // CCBA
                 exchange(C,D);
                 exchange(index[2],index[3]);sign=-sign;
                 Case_CCAB(tdata,A,B,C,D);}
