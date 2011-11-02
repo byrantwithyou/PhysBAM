@@ -367,15 +367,19 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             break;}
         case 16:{
             tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,1))));
-            tests.Add_Ground();
-            RIGID_BODY<TV>& ground2=tests.Add_Ground();
-            ground2.X()=TV(0,2);
-            ground2.Rotation()=ROTATION<TV>::From_Angle(pi);
-            ground2.is_static=false;
-            kinematic_id=ground2.particle_index;
-            rigid_body_collection.rigid_body_particle.kinematic(ground2.particle_index)=true;
-            curve.Add_Control_Point(0,FRAME<TV>(TV()));
-            curve.Add_Control_Point(1,FRAME<TV>());
+            RIGID_BODY<TV>& box1=tests.Add_Rigid_Body("square",10,(T)0);
+            RIGID_BODY<TV>& box2=tests.Add_Rigid_Body("square",10,(T)0);
+            box1.X()=TV(0,-10);
+            box2.X()=TV(0,12);
+            box1.is_static=true;
+            box2.is_static=false;
+            kinematic_id=box2.particle_index;
+            rigid_body_collection.rigid_body_particle.kinematic(box2.particle_index)=true;
+            curve.Add_Control_Point(0,FRAME<TV>(TV(0,12)));
+            curve.Add_Control_Point(5,FRAME<TV>(TV(0,10)));
+            curve.Add_Control_Point(6,FRAME<TV>(TV(0,10)));
+            curve.Add_Control_Point(11,FRAME<TV>(TV(0,12)));
+            last_frame=250;
             break;}
         case 17:
         case 18:
@@ -512,15 +516,14 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 //#####################################################################
 void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id)
 {
-    if(id==kinematic_id){
-	
-    }
+    if(id==kinematic_id) frame=curve.Value(time);
 }
 //#####################################################################
 // Function Set_Kinematic_Velocities
 //#####################################################################
 bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id)
 {
+    if(id==kinematic_id) twist=curve.Derivative(time);
     return false;
 }
 //#####################################################################
