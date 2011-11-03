@@ -545,7 +545,7 @@
                                 physbam-project-type
                                 (cond ((string= physbam-compile-mode "distcc") (format "CXX=\"distcc %s\" -j %d" physbam-compiler physbam-compile-count))
                                       ((string= physbam-compile-mode "icecream") (format "CXX=\"/opt/icecream/bin/g++\" -j %d" physbam-compile-count))
-                                      (physbam-compiler (format "CXX=%s -j %d" physbam-compiler physbam-compile-count))
+                                      (physbam-compiler (format "-j %d" physbam-compile-count))
                                       (t (format "-j %d" physbam-compile-count)))))
       (setq compile-command (format "make -k TYPE=%s %s"
                                 physbam-project-type
