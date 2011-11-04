@@ -36,16 +36,17 @@ template<class T,class TV> void Intersect_Triangle_Segment(DATA<T,3,5>& data,con
 // Intersect OAB with PQ
 template<class T,class TV> void Intersect_Segment_Segment(DATA<T,3,4>& data,const TV& A,const TV& B,const TV& P,const TV& Q);
 
-// Area of OABC
-template<class T,class TV> void Area_From_Points(DATA<T,1,3>& data,const TV& A,const TV& B,const TV& C);
+// Volume of OABC
+template<class T,class TV> void Volume_From_Points(DATA<T,1,3>& data,const TV& A,const TV& B,const TV& C);
 
 // Compute V(data_m,data_n); add to data
-template<class T,int m,int n,int p> void Combine_Data(DATA<T,1,6>& data,const DATA<T,1,3>& V,const DATA<T,3,m>& data_m,const DATA<T,3,n>& data_n,const DATA<T,3,n>& data_p,
+template<class T,int m,int n,int p> void Combine_Data(DATA<T,1,6>& data,const DATA<T,1,3>& V,const DATA<T,3,m>& data_m,const DATA<T,3,n>& data_n,const DATA<T,3,p>& data_p,
     const int index_m[m],const int index_n[n],const int index_p[p]);
 
 // Individual cases
 // TODO: List the cases
 template<class T,class TV> void Case_CCCAAA(DATA<T,1,6>& data,const TV& A,const TV& B,const TV& C,const TV& D,const TV& E,const TV& F);
+template<class T,class TV> void Case_CCCBBB(DATA<T,1,6>& data,const TV& A,const TV& B,const TV& C,const TV& D,const TV& E,const TV& F);
 
 template<class T,class TV> void Volume_From_Triangles(DATA<T,1,6>& data,TV A,TV B,TV C,TV D,TV E,TV F);
 }

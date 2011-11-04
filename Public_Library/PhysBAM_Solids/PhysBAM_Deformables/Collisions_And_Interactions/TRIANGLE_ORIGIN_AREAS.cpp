@@ -26,21 +26,23 @@ template<class TV> POINT_CASE Classify_Point(const TV& A,const TV& B,const TV& C
 {
     if(TV::Triple_Product(A,B,P)<=0) return outside;
     if(TV::Triple_Product(A,P,C)<=0) return outside;
-    if(TV::Triple_Product(A,B,P)<=0) return outside;
+    if(TV::Triple_Product(P,B,C)<=0) return outside;
     if(TV::Triple_Product(A-P,B-P,C-P)<=0) return beyond;
     return inside;
 }
 
-template<class T,class TV> void Area_From_Points(DATA<T,1,3>& data,const TV& A,const TV& B,const TV& C)
+template<class T,class TV> void Volume_From_Points(DATA<T,1,3>& data,const TV& A,const TV& B,const TV& C)
 {
-    data.V=(T)(1./6)*TV::Triple_Product(A,B,C);
+    data.V.x=(T)(1./6)*TV::Triple_Product(A,B,C);
     // TODO: Gradient and Hessian
 }
 
 
 template<class T,class TV> void Intersect_Triangle_Point(DATA<T,3,4>& data,const TV& A,const TV& B,const TV& C,const TV& P)
 {
-    // TODO: Implement
+    TV n=TV::Cross_Product(B-A,C-A);
+    data.V=TV::Dot_Product(n,A)/TV::Dot_Product(n,P)*P;
+    // TODO: Gradient and Hessian
 }
 
 template<class T,class TV> void Intersect_Triangle_Segment(DATA<T,3,5>& data,const TV& A,const TV& B,const TV& C,const TV& P,const TV& Q)
@@ -85,7 +87,7 @@ template<class T,class TV> void Volume_From_Triangles(DATA<T,1,6>& data,TV A,TV 
     T ODEF=TV::Triple_Product(D,E,F);
 
     if(OABC<0){exchange(A,B);exchange(index[0],index[1]);sign=-sign;}
-    if(ODEF<0){exchange(C,D);exchange(index[3],index[4]);sign=-sign;}
+    if(ODEF<0){exchange(D,E);exchange(index[3],index[4]);sign=-sign;}
 
     POINT_CASE case_a=Classify_Point(D,E,F,A);
     POINT_CASE case_b=Classify_Point(D,E,F,B);
@@ -107,7 +109,8 @@ template<class T,class TV> void Volume_From_Triangles(DATA<T,1,6>& data,TV A,TV 
     DATA<T,1,6> tdata;
     Clear(tdata);
 
-    printf("%c %c %c  %c %c %c\n", "ABC"[case_a], "ABC"[case_b], "ABC"[case_c], "ABC"[case_d], "ABC"[case_e], "ABC"[case_f]);
+    if(case_a==outside && case_b==outside && case_c==outside && case_d==beyond && case_e==beyond && case_f==beyond) Case_CCCBBB(tdata,A,B,C,D,E,F);
+    else printf("X: %c %c %c  %c %c %c\n", "ABC"[case_a], "ABC"[case_b], "ABC"[case_c], "ABC"[case_d], "ABC"[case_e], "ABC"[case_f]);
 
     // TODO: Enumerate cases
 
@@ -116,7 +119,7 @@ template<class T,class TV> void Volume_From_Triangles(DATA<T,1,6>& data,TV A,TV 
     for(int i=0;i<6;i++) for(int k=0;k<6;k++) data.H[0][index[i]][index[k]]=sign*tdata.H[0][i][k];
 }
 
-template<class T,int m,int n,int p> void Combine_Data(DATA<T,1,6>& data,const DATA<T,1,3>& V,const DATA<T,3,m>& data_m,const DATA<T,3,n>& data_n,const DATA<T,3,n>& data_p,
+template<class T,int m,int n,int p> void Combine_Data(DATA<T,1,6>& data,const DATA<T,1,3>& V,const DATA<T,3,m>& data_m,const DATA<T,3,n>& data_n,const DATA<T,3,p>& data_p,
     const int index_m[m],const int index_n[n],const int index_p[p])
 {
     data.V+=V.V;
@@ -169,9 +172,63 @@ template<class T,int m,int n,int p> void Combine_Data(DATA<T,1,6>& data,const DA
             data.H[0][index_n[s]][index_p[j]]+=x.Transposed();}
 }
 
+const int vec_a[1]={0}, vec_abcd[4]={0,1,2,3}, vec_abce[4]={0,1,2,4}, vec_abcf[4]={0,1,2,5};
 template<class T,class TV> void Case_CCCAAA(DATA<T,1,6>& data,const TV& A,const TV& B,const TV& C,const TV& D,const TV& E,const TV& F)
 {
     // TODO: Fill in
+}
+
+template<class T,class TV> void Case_CCCBBB(DATA<T,1,6>& data,const TV& A,const TV& B,const TV& C,const TV& D,const TV& E,const TV& F)
+{
+    LOG::cout<<__FUNCTION__<<std::endl;
+    DATA<T,3,4> P1,P2,P3;
+    Intersect_Triangle_Point(P1,A,B,C,D);
+    Intersect_Triangle_Point(P2,A,B,C,E);
+    Intersect_Triangle_Point(P3,A,B,C,F);
+    DATA<T,1,3> V;
+    Volume_From_Points(V,P1.V,P2.V,P3.V);
+    Combine_Data(data,V,P1,P2,P3,vec_abcd,vec_abce,vec_abcf);
+
+    static int cnt=0;cnt++;
+    for(int i=1;i<=3;i++){
+        char file[100];
+        sprintf(file, "dump-%c-%i.eps", 'x'+i-1, cnt);
+        EPS_FILE_GEOMETRY<T> epsx(file);
+        epsx.Line_Color(VECTOR<T,3>(.5,.5,.5));
+        epsx.Draw_Point(VECTOR<T,2>(0,0));
+        epsx.Draw_Point(VECTOR<T,2>(1,1));
+        epsx.Draw_Point(VECTOR<T,2>(-1,-1));
+        epsx.Line_Color(VECTOR<T,3>(1,0,0));
+        epsx.Draw_Line(A.Remove_Index(i),B.Remove_Index(i));
+        epsx.Draw_Line(B.Remove_Index(i),C.Remove_Index(i));
+        epsx.Draw_Line(C.Remove_Index(i),A.Remove_Index(i));
+        epsx.Line_Color(VECTOR<T,3>(0,1,0));
+        epsx.Draw_Line(D.Remove_Index(i),E.Remove_Index(i));
+        epsx.Draw_Line(E.Remove_Index(i),F.Remove_Index(i));
+        epsx.Draw_Line(F.Remove_Index(i),D.Remove_Index(i));
+        
+        epsx.Line_Color(VECTOR<T,3>(1,0,0));
+        epsx.Draw_Point(A.Remove_Index(i));
+        epsx.Draw_Point(D.Remove_Index(i));
+
+        epsx.Line_Color(VECTOR<T,3>(0,1,0));
+        epsx.Draw_Point(B.Remove_Index(i));
+        epsx.Draw_Point(E.Remove_Index(i));
+
+        epsx.Line_Color(VECTOR<T,3>(0,0,1));
+        epsx.Draw_Point(C.Remove_Index(i));
+        epsx.Draw_Point(F.Remove_Index(i));
+
+        epsx.Line_Color(VECTOR<T,3>(0,1,1));
+        epsx.Draw_Point(P1.V.Remove_Index(i));
+        epsx.Draw_Point(P2.V.Remove_Index(i));
+        epsx.Draw_Point(P3.V.Remove_Index(i));
+
+        epsx.Draw_Line(D.Remove_Index(i),VECTOR<T,2>());
+        epsx.Draw_Line(E.Remove_Index(i),VECTOR<T,2>());
+        epsx.Draw_Line(F.Remove_Index(i),VECTOR<T,2>());
+
+}
 }
 
 template void Volume_From_Triangles<float,VECTOR<float,3> >(DATA<float,1,6>&,VECTOR<float,3>,VECTOR<float,3>,VECTOR<float,3>,VECTOR<float,3>,VECTOR<float,3>,VECTOR<float,3>);
