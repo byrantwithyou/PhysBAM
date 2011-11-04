@@ -23,7 +23,7 @@ typedef VECTOR<double,3> TV;
 RANDOM_NUMBERS<double> rn;
 int N=200;
 
-T Approximate_Area(TV A,TV B,TV C,TV D,TV E,TV F)
+T Approximate_Volume(TV A,TV B,TV C,TV D,TV E,TV F)
 {
     int in=0;
     int sign=1;
@@ -55,9 +55,9 @@ void Case_Test()
 
     
     if(!data.V.x) return;
-    T approx=Approximate_Area(a,b,c,d,e,f);
+    T approx=Approximate_Volume(a,b,c,d,e,f);
 
-//    T approx=Approximate_Area(TV(1,0,0),TV(0,1,0),TV(0,0,1),TV(1,0,0),TV(0,0,1),TV(0,1,0));
+//    T approx=Approximate_Volume(TV(1,0,0),TV(0,1,0),TV(0,0,1),TV(1,0,0),TV(0,0,1),TV(0,1,0));
 
     printf("VOLUMES: %9.6f %9.6f (%.6f)\n", data.V.x, approx, fabs(data.V.x-approx));
 }
