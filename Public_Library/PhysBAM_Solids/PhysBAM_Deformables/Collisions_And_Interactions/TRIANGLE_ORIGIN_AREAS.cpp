@@ -33,12 +33,13 @@ template<class TV> POINT_CASE Classify_Point(const TV& A,const TV& B,const TV& C
 
 template<class T,class TV> void Volume_From_Points(VOL_DATA<T,3>& data,const TV& A,const TV& B,const TV& C)
 {
-    data.V.x=(T)(1./6)*TV::Triple_Product(A,B,C);
+    data.V=(T)(1./6)*TV::Triple_Product(A,B,C);
     // TODO: Gradient and Hessian
 }
 
 template<class T,class TV> void Intersect_Triangle_Point(PT_DATA<T>& data,const TV& A,const TV& B,const TV& C,const TV& P)
 {
+    data.n=4;
     TV n=TV::Cross_Product(B-A,C-A);
     data.V=TV::Dot_Product(n,A)/TV::Dot_Product(n,P)*P;
     // TODO: Gradient and Hessian
@@ -46,8 +47,9 @@ template<class T,class TV> void Intersect_Triangle_Point(PT_DATA<T>& data,const 
 
 template<class T,class TV> void Intersect_Triangle_Segment(PT_DATA<T>& data,const TV& A,const TV& B,const TV& C,const TV& P,const TV& Q)
 {
+    data.n=5;
     PT_DATA<T> tdata;
-    Intersect_Segment_Point(tdata,A-Q,B-Q,C-Q,P-Q);
+    Intersect_Triangle_Point(tdata,A-Q,B-Q,C-Q,P-Q);
     data.V=tdata.V+Q;
     data.G[4]=MATRIX<T,3>::Identity_Matrix();
     for(int i=0;i<4;i++){data.G[i]=tdata.G[i];data.G[4]-=tdata.G[i];}
@@ -62,8 +64,9 @@ template<class T,class TV> void Intersect_Triangle_Segment(PT_DATA<T>& data,cons
 
 template<class T,class TV> void Intersect_Segment_Segment(PT_DATA<T>& data,const TV& A,const TV& B,const TV& P,const TV& Q)
 {
+    data.n=4;
     PT_DATA<T> tdata;
-    Intersect_Segment_Point(tdata,-Q,A-Q,B-Q,P-Q);
+    Intersect_Triangle_Point(tdata,-Q,A-Q,B-Q,P-Q);
     data.V=tdata.V+Q;
     data.G[4]=MATRIX<T,3>::Identity_Matrix();
     for(int i=0;i<4;i++){
@@ -123,21 +126,21 @@ template<class T,class TV> void Intersect_Segment_Segment(PT_DATA<T>& data,const
 template<class T> void Combine_Data(VOL_DATA<T,6>& data,const VOL_DATA<T,3>& V,const PT_DATA<T>& data_m,const PT_DATA<T>& data_n,const PT_DATA<T>& data_p)
 {
     data.V+=V.V;
-    PT_DATA<T> pd[3] = {&data_m, &data_n, &data_p};
+    const PT_DATA<T>* pd[3] = {&data_m, &data_n, &data_p};
 
-    for(int z=0;z<3;z++) for(int j=0;j<pd[z].n;j++) data.G[pd[z].index[j]]+=V.G[0]*pd[z].G[j];
+    for(int z=0;z<3;z++) for(int j=0;j<pd[z]->n;j++) data.G[pd[z]->index[j]]+=V.G[0]*pd[z]->G[j];
 
     for(int z=0;z<3;z++)
-        for(int j=0;j<pd[z].n;j++)
-            for(int s=0;s<pd[z].n;s++)
+        for(int j=0;j<pd[z]->n;j++)
+            for(int s=0;s<pd[z]->n;s++)
                 for(int i=0;i<3;i++)
-                    data.H[pd[z].index[j]][pd[z].index[s]]+=V.G[z](1,i+1)*pd[z].H[i][j][s];
+                    data.H[pd[z]->index[j]][pd[z]->index[s]]+=V.G[z](i+1)*pd[z]->H[i][j][s];
 
     for(int y=0;y<3;y++)
         for(int z=0;z<3;z++)
-            for(int j=0;j<pd[y].n;j++)
-                for(int s=0;s<pd[z].n;s++)
-                    data.H[pd[y].index[j]][pd[z].index[s]]+=pd[y].G[j].Transpose_Times(V.H[y][z]*pd[z].G[s]);
+            for(int j=0;j<pd[y]->n;j++)
+                for(int s=0;s<pd[z]->n;s++)
+                    data.H[pd[y]->index[j]][pd[z]->index[s]]+=pd[y]->G[j].Transpose_Times(V.H[y][z]*pd[z]->G[s]);
 }
 
 // const int vec_d[1]={0}, vec_e[1]={0}, vec_f[1]={0}, vec_abcd[4]={0,1,2,3}, vec_abce[4]={0,1,2,4}, vec_abcf[4]={0,1,2,5};
@@ -203,23 +206,80 @@ template<class T,class TV> void Intersect_Segment_Segment_Helper(PT_DATA<T>& dat
     Intersect_Segment_Segment(data, pts[i[0]], pts[i[1]], pts[i[2]], pts[i[3]]);
 }
 
-template<class T,class TV> int Init_Data_From_Planes(void (*funcs[256])(PT_DATA<T>& data, int* ind, const TV* pts), int indices[256][5])
+template<class T,class TV> void Init_Data_From_Planes(void (*funcs[256])(PT_DATA<T>& data, int* ind, const TV* pts), int indices[256][5])
 {
     for(int i=0;i<3;i++){
-        int k=64+7-(1<<i);
-        funcs[k]=&Data_From_Dof_Helper;
-        indices[k][0]=i;
-    }
-    return 0;
+        int k=7-(1<<i);
+        funcs[k|64]=&Data_From_Dof_Helper;
+        indices[k|64][0]=i;
+        funcs[k*8|128]=&Data_From_Dof_Helper;
+        indices[k*8|128][0]=i+3;}
+
+    for(int i=0;i<3;i++){
+        int k=7-(1<<i);
+        funcs[k|128]=&Intersect_Triangle_Point_Helper;
+        indices[k|128][0]=3;
+        indices[k|128][1]=4;
+        indices[k|128][2]=5;
+        indices[k|128][3]=i;
+        funcs[k*8|64]=&Intersect_Triangle_Point_Helper;
+        indices[k*8|64][0]=1;
+        indices[k*8|64][1]=2;
+        indices[k*8|64][2]=3;
+        indices[k*8|64][3]=i+3;}
+
+    for(int i=0;i<3;i++){
+        int k=1<<i;
+        funcs[k|192]=&Intersect_Triangle_Segment_Helper;
+        indices[k|192][0]=3;
+        indices[k|192][1]=4;
+        indices[k|192][2]=5;
+        indices[k|192][3]=(i+1)%3;
+        indices[k|192][4]=(i+2)%3;
+        funcs[k*8|192]=&Intersect_Triangle_Segment_Helper;
+        indices[k*8|192][0]=0;
+        indices[k*8|192][1]=1;
+        indices[k*8|192][2]=2;
+        indices[k*8|192][3]=(i+1)%3+3;
+        indices[k*8|192][4]=(i+2)%3+3;}
+
+    for(int i=0;i<3;i++)
+        for(int j=0;j<3;j++){
+            int k=(1<<i)|(1<<j);
+            funcs[k|128]=&Intersect_Segment_Segment_Helper;
+            indices[k|128][0]=(i+1)%3;
+            indices[k|128][1]=(i+2)%3;
+            indices[k|128][2]=(j+1)%3;
+            indices[k|128][3]=(j+2)%3;
+            funcs[k|64]=&Intersect_Segment_Segment_Helper;
+            indices[k|64][0]=(j+1)%3;
+            indices[k|64][1]=(j+2)%3;
+            indices[k|64][2]=(i+1)%3;
+            indices[k|64][3]=(i+2)%3;}
 }
 
 template<class T,class TV> void Volume_From_Tetrahedron(VOL_DATA<T,6>& data,TV pts[6],int va,int vb,int vc)
 {
     static void (*funcs[256])(PT_DATA<T>& data, int* ind, const TV* pts);
     static int indices[256][5];
-    static int filled = Init_Data_From_Planes(funcs,indices);
-    (void) filled;
-    // TODO
+    static bool initialized=false;
+    if(!initialized){initialized=true;Init_Data_From_Planes(funcs,indices);}
+
+    PT_DATA<T> pd1,pd2,pd3;
+    funcs[va](pd1,indices[va],pts);
+    funcs[vb](pd2,indices[vb],pts);
+    funcs[vc](pd3,indices[vc],pts);
+
+    VOL_DATA<T,3> vd;
+    Volume_From_Points(vd,pd1.V,pd2.V,pd3.V);
+
+    Combine_Data(data,vd,pd1,pd2,pd3);
+}
+
+template<class T,class TV> void Volume_From_Triangles(VOL_DATA<T,6>& data,TV A,TV B,TV C,TV D,TV E,TV F)
+{
+    TV pts[6] = {A,B,C,D,E,F};
+    Volume_From_Triangles_Cut(data,pts);
 }
 
 template<class T,class TV> void Volume_From_Triangles_Cut(VOL_DATA<T,6>& data,TV pts[6])
@@ -279,10 +339,9 @@ template<class T,class TV> void Volume_From_Triangles_Cut(VOL_DATA<T,6>& data,TV
     Volume_From_Tetrahedron(data,pts,verta|128,list[n-1].planes|128,vertb|128);
 }
 
-//template void Volume_From_Triangles<float,VECTOR<float,3> >(DATA<float,1,6>&,VECTOR<float,3>,VECTOR<float,3>,VECTOR<float,3>,VECTOR<float,3>,VECTOR<float,3>,VECTOR<float,3>);
-template void Volume_From_Triangles_Cut<float,VECTOR<float,3> >(VOL_DATA<float,6>& data,VECTOR<float,3> pts[6]);
+template void Volume_From_Triangles<float,VECTOR<float,3> >(VOL_DATA<float,6>&,VECTOR<float,3>,VECTOR<float,3>,VECTOR<float,3>,VECTOR<float,3>,VECTOR<float,3>,VECTOR<float,3>);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-//template void Volume_From_Triangles<double,VECTOR<double,3> >(DATA<double,1,6>&,VECTOR<double,3>,VECTOR<double,3>,VECTOR<double,3>,VECTOR<double,3>,VECTOR<double,3>,VECTOR<double,3>);
+template void Volume_From_Triangles<double,VECTOR<double,3> >(VOL_DATA<double,6>&,VECTOR<double,3>,VECTOR<double,3>,VECTOR<double,3>,VECTOR<double,3>,VECTOR<double,3>,VECTOR<double,3>);
 #endif
 }
 }

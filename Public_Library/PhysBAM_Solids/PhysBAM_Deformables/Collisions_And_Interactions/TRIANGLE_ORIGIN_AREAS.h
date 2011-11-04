@@ -58,7 +58,6 @@ template<class T> void Combine_Data(VOL_DATA<T,6>& data,const VOL_DATA<T,3>& V,c
 //template<class T,class TV> void Case_CCCBBB(VOL_DATA<T>,const TV& A,const TV& B,const TV& C,const TV& D,const TV& E,const TV& F);
 
 template<class T,class TV> void Volume_From_Triangles(VOL_DATA<T,6>& data,TV A,TV B,TV C,TV D,TV E,TV F);
-template<class T,class TV> void Volume_From_Triangles_Cut(VOL_DATA<T,6>& data,TV A,TV B,TV C,TV D,TV E,TV F);
 }
 }
 #endif
