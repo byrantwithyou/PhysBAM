@@ -346,6 +346,7 @@ void Parse_Options()
         case 1:
         case 2:
         case 3:
+        case 49:
             solids_parameters.triangle_collision_parameters.perform_self_collision=false;
         case 4:
             solids_parameters.cfl=(T)5;
@@ -673,6 +674,10 @@ void Get_Initial_Data()
     switch(test_number){
         case 1:{
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,true,density);
+            tests.Add_Ground();
+            break;}
+        case 49:{
+            tests.Create_Mattress(GRID<TV>(10,10,10,(T)-1,(T)1,(T)-1,(T)1,(T)-1,(T)1),true,0,density);
             tests.Add_Ground();
             break;}
         case 2:{
@@ -1272,6 +1277,11 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));
             break;}
+        case 49:{
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));
+            break;}
         case 3:
         case 4:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<EMBEDDED_MATERIAL_SURFACE<TV,3>&>().embedded_object.simplicial_object;
@@ -1563,6 +1573,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     if(solid_body_collection.deformable_body_collection.mpi_solids){
         switch(test_number){
             case 1:
+            case 49:
             case 24:{
                 VECTOR<int,3> processes_per_dimension(2,1,1);
                 solid_body_collection.deformable_body_collection.mpi_solids->Simple_Partition(solid_body_collection.deformable_body_collection,solid_body_collection.rigid_body_collection.rigid_geometry_collection,particles.X,processes_per_dimension);
