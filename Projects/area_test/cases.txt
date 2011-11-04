@@ -1,0 +1,82 @@
+Swap to ensure: AB>0
+Swap to ensure: CD>0
+Swap to ensure: AC>0
+
+A: AD CA CDA
+B: BD CB CDB
+C: AC CB ABC
+D: AD DB ABD
+
+1. BD>0:
+2.   CB>0:
+3.     CDB>0:
+4.       ABC>0: CAAC
+4.       ABC<0: CABC
+3.     CDB<0:
+4.       ABC>0: CBAC
+4.       ABC<0: CBBC
+2.   CB<0: CCCC
+1. BD<0:
+2.   CB>0:
+3.     ABC>0:
+4.       AD>0:
+5.         ABD>0: CCAA
+5.         ABD<0: CCAB
+4.       AD<0: CCAC
+3.     ABC<0:
+4.       AD>0:
+5.         ABD>0: CCBA
+5.         ABD<0: CCBB
+4.       AD<0: CCBC
+2.   CB<0:
+3.     AD>0:
+4.       ABD>0: CCCA
+4.       ABD<0: CCCB
+3.     AD<0: CCCC
+
+Consistent with AB CD AC:
+
+1. BC>=0: CCCC
+1. BC<0:
+2.   BD>0:
+3.     CDB>0:
+4.       ABC>0: CAAC
+4.       ABC<0: CABC
+3.     CDB<0:
+4.       ABC>0: CBAC
+4.       ABC<0: CBBC
+2.   BD<=0:
+3.     ABC>=0:
+4.       ABD>=0: CCAA
+4.       ABD<0: CCAB
+3.     ABC<0:
+4.       ABD>0: CCBA
+4.       ABD<=0: CCBB
+
+CCAA: ok
+CCAB: (A-B)x(C-D), (A-B)xD
+CCBB: (A-B)xC, (A-B)xD
+BCAC: Ax(C-D)
+BCBC: (A-B)x(C-D), Ax(C-D), (A-B)xC
+ACAC: (A-B)x(C-D)
+
+
+ac=0 and bd=0
+
+1. BC>=0: CCCC
+1. BC<0:
+2.   BD>0:
+3.     CDB>0:
+4.       ABC>0: CAAC
+4.       ABC<0: CABC
+3.     CDB<0:
+4.       ABC>0: CBAC
+4.       ABC<0: CBBC
+2.   BD<=0:
+3.     ABC>=0:
+4.       ABD>=0: CCAA
+4.       ABD<0: CCAB
+3.     ABC<0:
+4.       ABD>0: CCBA
+4.       ABD<=0: CCBB
+
