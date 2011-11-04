@@ -50,16 +50,16 @@ void Case_Test()
     rn.Fill_Uniform(e,-1,1);
     rn.Fill_Uniform(f,-1,1);
 
-    TRIANGLE_ORIGIN_AREAS::DATA<T,1,6> data;
+    TRIANGLE_ORIGIN_AREAS::VOL_DATA<T,6> data;
     TRIANGLE_ORIGIN_AREAS::Volume_From_Triangles(data,a,b,c,d,e,f);
 
     
-    if(!data.V.x) return;
+    if(!data.V) return;
     T approx=Approximate_Volume(a,b,c,d,e,f);
 
 //    T approx=Approximate_Volume(TV(1,0,0),TV(0,1,0),TV(0,0,1),TV(1,0,0),TV(0,0,1),TV(0,1,0));
 
-    printf("VOLUMES: %9.6f %9.6f (%.6f)\n", data.V.x, approx, fabs(data.V.x-approx));
+    printf("VOLUMES: %9.6f %9.6f (%.6f)\n", data.V, approx, fabs(data.V-approx));
 }
 
 int main(int argc,char *argv[])
