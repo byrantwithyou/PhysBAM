@@ -1,3 +1,126 @@
+1. BC>=0: CCCC -- x
+1. BC<0:
+2.   BD>0:
+3.     CDB>0:
+4.       ABC>0: CAAC -- (ABC=BCD=0) (AB=0) (CD=0)
+4.       ABC<0: CABC -- (BC=AC=0) (AB=0)
+3.     CDB<0:
+4.       ABC>0: CBAC -- (BC=BD=0) (CD=0)
+4.       ABC<0: CBBC -- (ABC=BCD=0) (AB=0) (CD=0) (BD=AD=0) (BC=BD=0)
+2.   BD<=0:
+3.     ABC>=0:
+4.       ABD>=0: CCAA -- x
+4.       ABD<0: CCAB -- (AB=0) (CD=0) (BD=AD=0) (ABC=ABD=0)
+3.     ABC<0:
+4.       ABD>0: CCBA -- (AB=0) (CD=0) (BC=AC=0) (ABC=ABD=0)
+4.       ABD<=0: CCBB -- (AB=0) (BD=AD=0) (BC=AC=0)
+
+AB > 0 || (AB = 0 && ...)
+CD > 0 || (CD = 0 && ...)
+AC > 0 || (AC = 0 && (BD > 0 || (BD == 0 && ...)))
+
+
+
+1. BC>0: CCCC -- x
+1. BC<0:
+2.   BD>0: (AB=CD=0) (AB=BC=BD=0)
+3.     CDB>0: (AB=0)
+4.       ABC>0: CAAC -- (ABC=BCD=0) (AB=0) (CD=0)
+4.       ABC<=0: CABC -- (BC=AC=0) (AB=0)
+3.     CDB<=0: (CD=0) (BC=BD=0)
+4.       ABC>=0: CBAC -- (BC=BD=0) (CD=0)
+4.       ABC<0: CBBC -- (ABC=BCD=0) (AB=0) (CD=0) (BD=AD=0) (BC=BD=0)
+2.   BD<=0:
+3.     ABC>0: x
+4.       ABD>=0: CCAA -- x
+4.       ABD<0: CCAB -- (AB=0) (CD=0) (BD=AD=0) (ABC=ABD=0)
+3.     ABC<0: (AB=0) (BC=AC=0)
+4.       ABD>0: CCBA -- (AB=0) (CD=0) (BC=AC=0) (ABC=ABD=0)
+4.       ABD<=0: CCBB -- (AB=0) (BD=AD=0) (BC=AC=0)
+
+1. BC>=0: CCCC -- x
+1. BC<0:
+2.   BD>0: (AB=CD=0) (AB=BC=BD=0)
+3.     CDB>0: (AB=0)
+4.       ABC>0: CAAC -- (ABC=BCD=0) (AB=0) (CD=0)
+4.       ABC<=0: CABC -- (BC=AC=0) (AB=0)
+3.     CDB<=0: (CD=0) (BC=BD=0)
+4.       ABC>=0: CBAC -- (BC=BD=0) (CD=0)
+4.       ABC<0: CBBC -- (ABC=BCD=0) (AB=0) (CD=0) (BD=AD=0) (BC=BD=0)
+2.   BD<=0:
+3.     ABC>0: x
+4.       ABD>=0: CCAA -- x
+4.       ABD<0: CCAB -- (AB=0) (CD=0) (BD=AD=0) (ABC=ABD=0)
+3.     ABC<0: (AB=0) (BC=AC=0)
+4.       ABD>0: CCBA -- (AB=0) (CD=0) (BC=AC=0) (ABC=ABD=0)
+4.       ABD<=0: CCBB -- (AB=0) (BD=AD=0) (BC=AC=0)
+
+
+()
+
+1. BC>=0: CCCC -- x
+1. BC<0:
+2.   BD>0: (AB=CD=0)
+3.     CDB>0: (AB=0)
+4.       ABC>0: CAAC -- (ABC=BCD=0) (AB=0) (CD=0)
+4.       ABC<=0: CABC -- (AB=0)
+3.     CDB<=0: (CD=0)
+4.       ABC>=0: CBAC -- (CD=0)
+4.       ABC<0: CBBC -- (ABC=BCD=0) (AB=0) (CD=0) (BD=AD=0)
+2.   BD<=0:
+3.     ABC>0: x
+4.       ABD>=0: CCAA -- x
+4.       ABD<0: CCAB -- (AB=0) (CD=0) (BD=AD=0) (ABC=ABD=0)
+3.     ABC<0: (AB=0)
+4.       ABD>0: CCBA -- (AB=0) (CD=0) (ABC=ABD=0)
+4.       ABD<=0: CCBB -- (AB=0) (BD=AD=0)
+
+
+1. BC>=0: CCCC -- x
+1. BC<0:
+2.   ABC>=0:
+CAAC ABC>0 CDB>0 BD>0 (ABC=BCD=0) (AB=0) (CD=0)
+CBAC ABC>0 CDB<0 BD>0 (CD=0)
+CCAA BD<0 ABC>0 ABD>0 x
+CCAB BD<0 ABC>0 ABD<0 (AB=0) (CD=0) (BD=AD=0) (ABC=ABD=0)
+2.   ABC<0:
+CABC ABC<0 CDB>0 BD>0 (AB=0)
+CBBC ABC<0 CDB<0 BD>0 (ABC=BCD=0) (AB=0) (CD=0) (BD=AD=0)
+CCBA BD<0 ABC<0 ABD>0 (AB=0) (CD=0) (ABC=ABD=0)
+CCBB BD<0 ABC<0 ABD<0 (AB=0) (BD=AD=0)
+
+
+
+A=B and C=D: CCCC
+
+if A=B: swap(A,B) swap(C,D)
+
+if C=D:
+  if not (CB>0 or DB>0) or not (AC>0 or AD>0): CCCC
+  else:
+    ABC>0 or ABD>0: CCAA
+    else: CCBB
+
+BC or BD
+
+
+1. BC>=0: CCCC
+1. BC<0:
+2.   ABC>=0:
+3.     BD>=0:
+4.       CDB>0: CAAC
+4.       CDB<=0: CBAC
+3      BD<0:
+4.       ABD>=0: CCAA
+4.       ABD<0: CCAB
+2.   ABC<0:
+3.     BD>0:
+4.       CDB>=0: CABC
+4.       CDB<0: CBBC
+3.     BD<=0:
+4.       ABD>=0: CCBA
+4.       ABD<0: CCBB
+
 Swap to ensure: AB>0
 Swap to ensure: CD>0
 Swap to ensure: AC>0
@@ -79,4 +202,3 @@ ac=0 and bd=0
 3.     ABC<0:
 4.       ABD>0: CCBA
 4.       ABD<=0: CCBB
-
