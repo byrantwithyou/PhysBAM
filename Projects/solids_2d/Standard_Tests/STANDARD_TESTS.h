@@ -25,6 +25,8 @@
 //  19. Matress, no gravity, line start
 //  20. Skinny mattress falling on box
 //  21. Stretched skinny mattress with colliding ball
+//  22. Squeezing between to small boxes
+//  23. Higspeed collision with ground
 
 //#####################################################################
 #ifndef __STANDARD_TESTS__
@@ -185,6 +187,9 @@ void Parse_Options() PHYSBAM_OVERRIDE
 	case 20: case 21:
 	    mattress_grid=GRID<TV>(40,8,(T)-2,(T)2,(T)-.4,(T).4);
 	break;
+	case 22: case 23:
+	    mattress_grid=GRID<TV>(20,20,(T)-.9,(T).9,(T)-.9,(T).9);
+	break;
     	default:
             mattress_grid=GRID<TV>(20,10,(T)-1,(T)1,(T)-.5,(T).5);
     }
@@ -241,12 +246,17 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 14:
         case 15:
         case 16:
+        case 22:
 	case 21:
         case 17:
         case 18:
         case 19:
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
             last_frame=200;
+            break;
+        case 23: 
+            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
+            last_frame=500;
             break;
         case 9:
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
@@ -345,6 +355,10 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,4))));
             tests.Add_Ground();
             break;}
+        case 23:{
+            tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,200))));
+            tests.Add_Ground();
+            break;}
         case 9:{
             tests.Create_Mattress(mattress_grid,false,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T).5))));
             tests.Add_Ground();
@@ -397,6 +411,22 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             curve.Add_Control_Point(5,FRAME<TV>(TV(0,10)));
             curve.Add_Control_Point(6,FRAME<TV>(TV(0,10)));
             curve.Add_Control_Point(11,FRAME<TV>(TV(0,12)));
+            last_frame=250;
+            break;}
+        case 22: {
+            tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0))));
+            RIGID_BODY<TV>& box1=tests.Add_Rigid_Body("square",1,(T)0);
+            RIGID_BODY<TV>& box2=tests.Add_Rigid_Body("square",1,(T)0);
+            box1.X()=TV(0,-2);
+            box2.X()=TV(0,2);
+            box1.is_static=true;
+            box2.is_static=false;
+            kinematic_id=box2.particle_index;
+            rigid_body_collection.rigid_body_particle.kinematic(box2.particle_index)=true;
+            curve.Add_Control_Point(0,FRAME<TV>(TV(0,2)));
+            curve.Add_Control_Point(5,FRAME<TV>(TV(0,0)));
+            curve.Add_Control_Point(6,FRAME<TV>(TV(0,0)));
+            curve.Add_Control_Point(11,FRAME<TV>(TV(0,2)));
             last_frame=250;
             break;}
         case 17:
@@ -468,11 +498,16 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             break;}
         case 8: 
         case 16:
+        case 23:
         case 13:{
             TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
             solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
             Add_Constitutive_Model(triangulated_area,(T)1e4,(T).45,(T).01);
             if(test_number==13){RANDOM_NUMBERS<T> rand;rand.Fill_Uniform(particles.X,-1,1);}
+            break;}
+        case 22:{
+            TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
+            Add_Constitutive_Model(triangulated_area,(T)1e4,(T).45,(T).01);
             break;}
         case 14:{
             solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
@@ -524,13 +559,11 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 20:{
             TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>(1);
             Add_Constitutive_Model(triangulated_area,(T)1e5,(T).45,(T).01);
-            if(test_number==13){RANDOM_NUMBERS<T> rand;rand.Fill_Uniform(particles.X,-1,1);}
             break;}
         case 21:{
             TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>(1);
             solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
             Add_Constitutive_Model(triangulated_area,(T)1e4,(T).45,(T).01);
-            if(test_number==13){RANDOM_NUMBERS<T> rand;rand.Fill_Uniform(particles.X,-1,1);}
             break;}
 
         default:
