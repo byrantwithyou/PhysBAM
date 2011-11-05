@@ -340,6 +340,7 @@ void Plot_Original(const TV& a,const TV& b,const TV& c, const TV& d,const TV& e,
     TV D=MATRIX<T,3>(b-a,c-a,d).Solve_Linear_System(-a);
     TV E=MATRIX<T,3>(b-a,c-a,e).Solve_Linear_System(-a);
     TV F=MATRIX<T,3>(b-a,c-a,f).Solve_Linear_System(-a);
+    printf("original proj %g %g %g\n", -D.z, -E.z, -F.z);
 
     eps.Line_Color(VECTOR<T,3>(.5,.5,.5));
     eps.Draw_Point(VECTOR<T,2>(1.1,1.1));
@@ -409,8 +410,8 @@ template<class T,class TV> void Volume_From_Triangles_Cut(VOL_DATA<T,6>& data,TV
 
     bool has[2]={false,false};
     for(int i=0;i<n;i++){
-        printf("%i ",list[i].planes);
         list[i].inside=TV::Dot_Product(N,list[i].pt-pts[3])<0;
+        printf("%i%c ",list[i].planes, list[i].inside?'-':'+');
         has[list[i].inside]=true;}
     puts("");
 
@@ -428,8 +429,8 @@ template<class T,class TV> void Volume_From_Triangles_Cut(VOL_DATA<T,6>& data,TV
         for(int i=1;i<f;i++) Volume_From_Tetrahedron(tdata,pts,verta|64,list[i-1].planes|64,list[i].planes|64);
         Volume_From_Tetrahedron(tdata,pts,verta|64,list[f-1].planes|64,vertb|64);
 
-        for(int i=f+1;i<n;i++) Volume_From_Tetrahedron(tdata,pts,verta|128,list[i-1].planes|128,list[i].planes|128);
-        Volume_From_Tetrahedron(tdata,pts,verta|128,list[n-1].planes|128,vertb|128);}
+        for(int i=f+1;i<n;i++) Volume_From_Tetrahedron(tdata,pts,vertb|128,list[i-1].planes|128,list[i].planes|128);
+        Volume_From_Tetrahedron(tdata,pts,vertb|128,list[n-1].planes|128,verta|128);}
 
     data.V=sign*tdata.V;
     for(int i=0;i<6;i++) data.G[index[i]]=sign*tdata.G[i];
