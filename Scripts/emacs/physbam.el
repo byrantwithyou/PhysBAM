@@ -428,10 +428,12 @@
 (defun physbam-project-name (directory)
   (car (last (split-string directory "/" t))))
 
+(getenv "DEFAULT_ARCH")
+
 ; Returns executable name in form <proj>_<release/debug>_<PLATFORM>  
 (defun physbam-executable-name (base-executable use-release-always)
   (concat base-executable
-          (if (or (string= (getenv "PLATFORM") nil) (string= (getenv "PLATFORM") "pentium4")) "" (concat "_" (getenv "PLATFORM")))
+;          (if (or (string= (getenv "PLATFORM") nil) (string= (getenv "PLATFORM") "pentium4")) "" (concat "_" (getenv "PLATFORM")))
           (if (or use-release-always (string= physbam-project-type "release")) "" (concat "_" physbam-project-type))))
 
 ; runs a simulation
@@ -545,7 +547,7 @@
                                 physbam-project-type
                                 (cond ((string= physbam-compile-mode "distcc") (format "CXX=\"distcc %s\" -j %d" physbam-compiler physbam-compile-count))
                                       ((string= physbam-compile-mode "icecream") (format "CXX=\"/opt/icecream/bin/g++\" -j %d" physbam-compile-count))
-                                      (physbam-compiler (format "CXX=%s -j %d" physbam-compiler physbam-compile-count))
+                                      (physbam-compiler (format "-j %d" physbam-compile-count))
                                       (t (format "-j %d" physbam-compile-count)))))
       (setq compile-command (format "make -k TYPE=%s %s"
                                 physbam-project-type
