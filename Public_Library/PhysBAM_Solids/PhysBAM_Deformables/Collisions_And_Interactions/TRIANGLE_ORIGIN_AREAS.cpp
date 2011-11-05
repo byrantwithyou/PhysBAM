@@ -221,8 +221,6 @@ template<class T,class TV> void Init_Data_From_Planes(void (*funcs[256])(PT_DATA
 {
     for(int i=0;i<3;i++){
         int k=7-(1<<i);
-        printf("A %i\n", k|64);
-        printf("A %i\n", k*8|128);
         funcs[k|64]=&Data_From_Dof_Helper;
         indices[k|64][0]=i;
         funcs[k*8|128]=&Data_From_Dof_Helper;
@@ -230,8 +228,6 @@ template<class T,class TV> void Init_Data_From_Planes(void (*funcs[256])(PT_DATA
 
     for(int i=0;i<3;i++){
         int k=7-(1<<i);
-        printf("B %i\n", k|128);
-        printf("B %i\n", k*8|64);
         funcs[k|128]=&Intersect_Triangle_Point_Helper;
         indices[k|128][0]=3;
         indices[k|128][1]=4;
@@ -245,8 +241,6 @@ template<class T,class TV> void Init_Data_From_Planes(void (*funcs[256])(PT_DATA
 
     for(int i=0;i<3;i++){
         int k=1<<i;
-        printf("C %i\n", k|192);
-        printf("C %i\n", k*8|192);
         funcs[k|192]=&Intersect_Triangle_Segment_Helper;
         indices[k|192][0]=3;
         indices[k|192][1]=4;
@@ -263,8 +257,6 @@ template<class T,class TV> void Init_Data_From_Planes(void (*funcs[256])(PT_DATA
     for(int i=0;i<3;i++)
         for(int j=0;j<3;j++){
             int k=(1<<i)|(1<<(j+3));
-            printf("D %i\n", k|128);
-            printf("D %i\n", k|64);
             funcs[k|128]=&Intersect_Segment_Segment_Helper;
             indices[k|128][0]=(i+1)%3;
             indices[k|128][1]=(i+2)%3;
@@ -325,9 +317,8 @@ void Plot_Configuration(const TV& a,const TV& b,const TV& c, LIST<TV>* list, int
     for(int i=0;i<n;i++) pts[i]=MATRIX<T,3>(b-a,c-a,list[i].pt).Solve_Linear_System(-a).Remove_Index(3);
 
     eps.Line_Color(VECTOR<T,3>(.5,.5,.5));
-    eps.Draw_Point(VECTOR<T,2>(0,0));
-    eps.Draw_Point(VECTOR<T,2>(1,1));
-    eps.Draw_Point(VECTOR<T,2>(-1,-1));
+    eps.Draw_Point(VECTOR<T,2>(1.1,1.1));
+    eps.Draw_Point(VECTOR<T,2>(-.1,-.1));
     eps.Line_Color(VECTOR<T,3>(1,0,0));
     eps.Draw_Line(VECTOR<T,2>(0,0),VECTOR<T,2>(1,0));
     eps.Draw_Line(VECTOR<T,2>(1,0),VECTOR<T,2>(0,1));
@@ -350,9 +341,8 @@ void Plot_Original(const TV& a,const TV& b,const TV& c, const TV& d,const TV& e,
     TV F=MATRIX<T,3>(b-a,c-a,f).Solve_Linear_System(-a);
 
     eps.Line_Color(VECTOR<T,3>(.5,.5,.5));
-    eps.Draw_Point(VECTOR<T,2>(0,0));
-    eps.Draw_Point(VECTOR<T,2>(1,1));
-    eps.Draw_Point(VECTOR<T,2>(-1,-1));
+    eps.Draw_Point(VECTOR<T,2>(1.1,1.1));
+    eps.Draw_Point(VECTOR<T,2>(-.1,-.1));
     eps.Line_Color(VECTOR<T,3>(1,0,0));
     eps.Draw_Line(VECTOR<T,2>(0,0),VECTOR<T,2>(1,0));
     eps.Draw_Line(VECTOR<T,2>(1,0),VECTOR<T,2>(0,1));
@@ -377,13 +367,16 @@ void Plot_Original(const TV& a,const TV& b,const TV& c, const TV& d,const TV& e,
 
 template<class T,class TV> void Volume_From_Triangles_Cut(VOL_DATA<T,6>& data,TV pts[6])
 {
+    int index[6]={0,1,2,3,4,5};
+    T sign=1;
+    if(TV::Triple_Product(pts[0],pts[1],pts[2])<0){exchange(pts[1],pts[2]);exchange(index[1],index[2]);sign=-sign;}
+    if(TV::Triple_Product(pts[3],pts[4],pts[5])<0){exchange(pts[4],pts[5]);exchange(index[4],index[5]);sign=-sign;}
     int n=3;
     LIST<TV> alist[50], *list=alist;
     for(int i=0;i<n;i++){list[i].planes=7&~(1<<i);list[i].pt=pts[i];}
-    Clear(data);
-    int sign=1;
-    if(TV::Triple_Product(pts[0],pts[1],pts[2])<0){exchange(pts[1],pts[2]);sign=-sign;}
-    if(TV::Triple_Product(pts[3],pts[4],pts[5])<0){exchange(pts[4],pts[5]);sign=-sign;}
+    VOL_DATA<T,6> tdata;
+    Clear(tdata);
+    Plot_Original(pts[0],pts[1],pts[2],pts[3],pts[4],pts[5]);
 
     // TODO: Robustness to in out in out.
     for(int p=3;p<6;p++){
@@ -421,26 +414,25 @@ template<class T,class TV> void Volume_From_Triangles_Cut(VOL_DATA<T,6>& data,TV
 
     printf("has %i %i\n", has[0], has[1]);
 
-    if(!has[0]){
-        for(int f=2;f<n;f++) Volume_From_Tetrahedron(data,pts,list[0].planes|64,list[f-1].planes|64,list[f].planes|64);
-        if(sign==-1) Negate(data);
-        return;}
-    if(!has[1]){
-        for(int f=2;f<n;f++) Volume_From_Tetrahedron(data,pts,list[0].planes|128,list[f-1].planes|128,list[f].planes|128);
-        if(sign==-1) Negate(data);
-        return;}
+    if(!has[0]) for(int f=2;f<n;f++) Volume_From_Tetrahedron(tdata,pts,list[0].planes|64,list[f-1].planes|64,list[f].planes|64);
+    else if(!has[1]) for(int f=2;f<n;f++) Volume_From_Tetrahedron(tdata,pts,list[0].planes|128,list[f-1].planes|128,list[f].planes|128);
+    else{
+        while(list[n-1].inside || !list[0].inside){list[n]=list[0];list++;}
+        int f=1;
+        while(list[f].inside) f++;
+        int verta=(list[n-1].planes&list[0].planes)|192,vertb=(list[f-1].planes&list[f].planes)|192;
 
-    while(list[n-1].inside || !list[0].inside){list[n]=list[0];list++;}
-    int f=1;
-    while(list[f].inside) f++;
-    int verta=(list[n-1].planes&list[0].planes)|192,vertb=(list[f-1].planes&list[f].planes)|192;
+        for(int i=1;i<f;i++) Volume_From_Tetrahedron(tdata,pts,verta|64,list[i-1].planes|64,list[i].planes|64);
+        Volume_From_Tetrahedron(tdata,pts,verta|64,list[f-1].planes|64,vertb|64);
 
-    for(int i=1;i<f;i++) Volume_From_Tetrahedron(data,pts,verta|64,list[i-1].planes|64,list[i].planes|64);
-    Volume_From_Tetrahedron(data,pts,verta|64,list[f-1].planes|64,vertb|64);
+        for(int i=f+1;i<n;i++) Volume_From_Tetrahedron(tdata,pts,verta|128,list[i-1].planes|128,list[i].planes|128);
+        Volume_From_Tetrahedron(tdata,pts,verta|128,list[n-1].planes|128,vertb|128);}
 
-    for(int i=f+1;i<n;i++) Volume_From_Tetrahedron(data,pts,verta|128,list[i-1].planes|128,list[i].planes|128);
-    Volume_From_Tetrahedron(data,pts,verta|128,list[n-1].planes|128,vertb|128);
-    if(sign==-1) Negate(data);
+    data.V=sign*tdata.V;
+    for(int i=0;i<6;i++) data.G[index[i]]=sign*tdata.G[i];
+    for(int i=0;i<6;i++) for(int k=0;k<6;k++) data.H[index[i]][index[k]]=sign*tdata.H[i][k];
+    for(int i=0;i<6;i++) printf("%i ",index[i]);
+    puts("");
 }
 
 template void Volume_From_Triangles<float,VECTOR<float,3> >(VOL_DATA<float,6>&,VECTOR<float,3>,VECTOR<float,3>,VECTOR<float,3>,VECTOR<float,3>,VECTOR<float,3>,VECTOR<float,3>);
