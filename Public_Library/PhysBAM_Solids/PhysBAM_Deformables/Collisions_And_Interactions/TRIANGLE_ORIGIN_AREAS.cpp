@@ -24,6 +24,7 @@ template<class T,int n> void Negate(VOL_DATA<T,n>& data)
 
 template<class T,class TV> void Data_From_Dof(PT_DATA<T>& data,const TV& A)
 {
+    data.n=1;
     data.V=A;
     data.G[0]=MATRIX<T,3>::Identity_Matrix();
     for(int i=0;i<2;i++) data.H[i][0][0]=MATRIX<T,3>();
@@ -375,7 +376,6 @@ template<class T,class TV> void Volume_From_Triangles_Cut(VOL_DATA<T,6>& data,TV
     LIST<TV> alist[50], *list=alist;
     for(int i=0;i<n;i++){list[i].planes=7&~(1<<i);list[i].pt=pts[i];}
     VOL_DATA<T,6> tdata;
-    Clear(tdata);
     Plot_Original(pts[0],pts[1],pts[2],pts[3],pts[4],pts[5]);
 
     // TODO: Robustness to in out in out.
@@ -389,7 +389,9 @@ template<class T,class TV> void Volume_From_Triangles_Cut(VOL_DATA<T,6>& data,TV
             has[list[i].inside]=true;}
         puts("");
         printf("HAS %i %i\n", has[0], has[1]);
-        if(!has[1]) return;
+        if(!has[1]){
+            Clear(data);
+            return;}
         if(!has[0]) continue;
         while(list[n-1].inside || !list[0].inside){list[n]=list[0];list++;}
         int f=1;
@@ -414,6 +416,7 @@ template<class T,class TV> void Volume_From_Triangles_Cut(VOL_DATA<T,6>& data,TV
 
     printf("has %i %i\n", has[0], has[1]);
 
+    Clear(tdata);
     if(!has[0]) for(int f=2;f<n;f++) Volume_From_Tetrahedron(tdata,pts,list[0].planes|64,list[f-1].planes|64,list[f].planes|64);
     else if(!has[1]) for(int f=2;f<n;f++) Volume_From_Tetrahedron(tdata,pts,list[0].planes|128,list[f-1].planes|128,list[f].planes|128);
     else{
