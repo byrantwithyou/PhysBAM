@@ -15,6 +15,13 @@ template<class T,int n> void Clear(VOL_DATA<T,n>& data)
     for(int i=0;i<n;i++) for(int j=0;j<n;j++) data.H[i][j]=MATRIX<T,3>();
 }
 
+template<class T,int n> void Negate(VOL_DATA<T,n>& data)
+{
+    data.V=-data.V;
+    for(int i=0;i<n;i++) data.G[i]=-data.G[i];
+    for(int i=0;i<n;i++) for(int j=0;j<n;j++) data.H[i][j]=-data.H[i][j];
+}
+
 template<class T,class TV> void Data_From_Dof(PT_DATA<T>& data,const TV& A)
 {
     data.V=A;
@@ -179,30 +186,34 @@ template<class TV> TV Point_From_Planes(int planes,TV pts[6])
         TV Q=pts[opp_pairs[a][1]],D=pts[opp_pairs[a][0]]-Q;
         return Q-TV::Dot_Product(n,Q)/TV::Dot_Product(n,D)*D;}
     TV n=TV::Cross_Product(pts[1]-pts[0],pts[2]-pts[0]);
-    return TV::Dot_Product(n,pts[0])/TV::Dot_Product(n,pts[opp_pt[b]])*pts[opp_pt[b]];
+    return TV::Dot_Product(n,pts[0])/TV::Dot_Product(n,pts[opp_pt[b]+3])*pts[opp_pt[b]+3];
 }
 
 template<class T,class TV> void Data_From_Dof_Helper(PT_DATA<T>& data, int* i, const TV* pts)
 {
     data.index[0]=i[0];
+    printf("case (%i)\n", i[0]);
     Data_From_Dof(data, pts[i[0]]);
 }
 
 template<class T,class TV> void Intersect_Triangle_Point_Helper(PT_DATA<T>& data, int* i, const TV* pts)
 {
     for(int j=0;j<4;j++) data.index[j]=i[j];
+    printf("case (%i %i %i : %i)\n", i[0], i[1], i[2], i[3]);
     Intersect_Triangle_Point(data, pts[i[0]], pts[i[1]], pts[i[2]], pts[i[3]]);
 }
 
 template<class T,class TV> void Intersect_Triangle_Segment_Helper(PT_DATA<T>& data, int* i, const TV* pts)
 {
     for(int j=0;j<5;j++) data.index[j]=i[j];
+    printf("case (%i %i %i : %i %i)\n", i[0], i[1], i[2], i[3], i[4]);
     Intersect_Triangle_Segment(data, pts[i[0]], pts[i[1]], pts[i[2]], pts[i[3]], pts[i[4]]);
 }
 
 template<class T,class TV> void Intersect_Segment_Segment_Helper(PT_DATA<T>& data, int* i, const TV* pts)
 {
     for(int j=0;j<4;j++) data.index[j]=i[j];
+    printf("case (%i %i : %i %i)\n", i[0], i[1], i[2], i[3]);
     Intersect_Segment_Segment(data, pts[i[0]], pts[i[1]], pts[i[2]], pts[i[3]]);
 }
 
@@ -210,6 +221,8 @@ template<class T,class TV> void Init_Data_From_Planes(void (*funcs[256])(PT_DATA
 {
     for(int i=0;i<3;i++){
         int k=7-(1<<i);
+        printf("A %i\n", k|64);
+        printf("A %i\n", k*8|128);
         funcs[k|64]=&Data_From_Dof_Helper;
         indices[k|64][0]=i;
         funcs[k*8|128]=&Data_From_Dof_Helper;
@@ -217,19 +230,23 @@ template<class T,class TV> void Init_Data_From_Planes(void (*funcs[256])(PT_DATA
 
     for(int i=0;i<3;i++){
         int k=7-(1<<i);
+        printf("B %i\n", k|128);
+        printf("B %i\n", k*8|64);
         funcs[k|128]=&Intersect_Triangle_Point_Helper;
         indices[k|128][0]=3;
         indices[k|128][1]=4;
         indices[k|128][2]=5;
         indices[k|128][3]=i;
         funcs[k*8|64]=&Intersect_Triangle_Point_Helper;
-        indices[k*8|64][0]=1;
-        indices[k*8|64][1]=2;
-        indices[k*8|64][2]=3;
+        indices[k*8|64][0]=0;
+        indices[k*8|64][1]=1;
+        indices[k*8|64][2]=2;
         indices[k*8|64][3]=i+3;}
 
     for(int i=0;i<3;i++){
         int k=1<<i;
+        printf("C %i\n", k|192);
+        printf("C %i\n", k*8|192);
         funcs[k|192]=&Intersect_Triangle_Segment_Helper;
         indices[k|192][0]=3;
         indices[k|192][1]=4;
@@ -245,15 +262,17 @@ template<class T,class TV> void Init_Data_From_Planes(void (*funcs[256])(PT_DATA
 
     for(int i=0;i<3;i++)
         for(int j=0;j<3;j++){
-            int k=(1<<i)|(1<<j);
+            int k=(1<<i)|(1<<(j+3));
+            printf("D %i\n", k|128);
+            printf("D %i\n", k|64);
             funcs[k|128]=&Intersect_Segment_Segment_Helper;
             indices[k|128][0]=(i+1)%3;
             indices[k|128][1]=(i+2)%3;
-            indices[k|128][2]=(j+1)%3;
-            indices[k|128][3]=(j+2)%3;
+            indices[k|128][2]=(j+1)%3+3;
+            indices[k|128][3]=(j+2)%3+3;
             funcs[k|64]=&Intersect_Segment_Segment_Helper;
-            indices[k|64][0]=(j+1)%3;
-            indices[k|64][1]=(j+2)%3;
+            indices[k|64][0]=(j+1)%3+3;
+            indices[k|64][1]=(j+2)%3+3;
             indices[k|64][2]=(i+1)%3;
             indices[k|64][3]=(i+2)%3;}
 }
@@ -265,6 +284,7 @@ template<class T,class TV> void Volume_From_Tetrahedron(VOL_DATA<T,6>& data,TV p
     static bool initialized=false;
     if(!initialized){initialized=true;Init_Data_From_Planes(funcs,indices);}
 
+    printf("tet %i %i %i\n", va, vb, vc);
     PT_DATA<T> pd1,pd2,pd3;
     funcs[va](pd1,indices[va],pts);
     funcs[vb](pd2,indices[vb],pts);
@@ -282,49 +302,132 @@ template<class T,class TV> void Volume_From_Triangles(VOL_DATA<T,6>& data,TV A,T
     Volume_From_Triangles_Cut(data,pts);
 }
 
-template<class T,class TV> void Volume_From_Triangles_Cut(VOL_DATA<T,6>& data,TV pts[6])
-{
+namespace{
+    template<class TV>
     struct LIST
     {
         int planes;
         TV pt;
         bool inside;
     };
+}
+
+static int cnt=0;
+
+template<class TV>
+void Plot_Configuration(const TV& a,const TV& b,const TV& c, LIST<TV>* list, int n)
+{
+    typedef typename TV::SCALAR T;
+    char file[100];
+    sprintf(file, "dump-p-%i.eps", cnt++);
+    EPS_FILE_GEOMETRY<T> eps(file);
+    VECTOR<T,2> pts[10];
+    for(int i=0;i<n;i++) pts[i]=MATRIX<T,3>(b-a,c-a,list[i].pt).Solve_Linear_System(-a).Remove_Index(3);
+
+    eps.Line_Color(VECTOR<T,3>(.5,.5,.5));
+    eps.Draw_Point(VECTOR<T,2>(0,0));
+    eps.Draw_Point(VECTOR<T,2>(1,1));
+    eps.Draw_Point(VECTOR<T,2>(-1,-1));
+    eps.Line_Color(VECTOR<T,3>(1,0,0));
+    eps.Draw_Line(VECTOR<T,2>(0,0),VECTOR<T,2>(1,0));
+    eps.Draw_Line(VECTOR<T,2>(1,0),VECTOR<T,2>(0,1));
+    eps.Draw_Line(VECTOR<T,2>(0,1),VECTOR<T,2>(0,0));
+    eps.Line_Color(VECTOR<T,3>(0,1,0));
+    for(int i=1;i<n;i++) eps.Draw_Line(pts[i-1],pts[i]);
+    eps.Draw_Line(pts[n-1],pts[0]);
+    for(int i=0;i<n;i++) eps.Draw_Point(pts[i]);
+}
+
+template<class TV>
+void Plot_Original(const TV& a,const TV& b,const TV& c, const TV& d,const TV& e,const TV& f)
+{
+    typedef typename TV::SCALAR T;
+    char file[100];
+    sprintf(file, "dump-t-%i.eps", cnt);
+    EPS_FILE_GEOMETRY<T> eps(file);
+    TV D=MATRIX<T,3>(b-a,c-a,d).Solve_Linear_System(-a);
+    TV E=MATRIX<T,3>(b-a,c-a,e).Solve_Linear_System(-a);
+    TV F=MATRIX<T,3>(b-a,c-a,f).Solve_Linear_System(-a);
+
+    eps.Line_Color(VECTOR<T,3>(.5,.5,.5));
+    eps.Draw_Point(VECTOR<T,2>(0,0));
+    eps.Draw_Point(VECTOR<T,2>(1,1));
+    eps.Draw_Point(VECTOR<T,2>(-1,-1));
+    eps.Line_Color(VECTOR<T,3>(1,0,0));
+    eps.Draw_Line(VECTOR<T,2>(0,0),VECTOR<T,2>(1,0));
+    eps.Draw_Line(VECTOR<T,2>(1,0),VECTOR<T,2>(0,1));
+    eps.Draw_Line(VECTOR<T,2>(0,1),VECTOR<T,2>(0,0));
+    eps.Line_Color(VECTOR<T,3>(0,1,0));
+    eps.Draw_Line(D.Remove_Index(3),E.Remove_Index(3));
+    eps.Draw_Line(E.Remove_Index(3),F.Remove_Index(3));
+    eps.Draw_Line(F.Remove_Index(3),D.Remove_Index(3));
+
+    eps.Line_Color(VECTOR<T,3>(1,0,0));
+    eps.Draw_Point(VECTOR<T,2>(0,0));
+    eps.Draw_Point(D.Remove_Index(3));
+
+    eps.Line_Color(VECTOR<T,3>(0,1,0));
+    eps.Draw_Point(VECTOR<T,2>(1,0));
+    eps.Draw_Point(E.Remove_Index(3));
+
+    eps.Line_Color(VECTOR<T,3>(0,0,1));
+    eps.Draw_Point(VECTOR<T,2>(0,1));
+    eps.Draw_Point(F.Remove_Index(3));
+}
+
+template<class T,class TV> void Volume_From_Triangles_Cut(VOL_DATA<T,6>& data,TV pts[6])
+{
     int n=3;
-    LIST alist[50], *list=alist;
+    LIST<TV> alist[50], *list=alist;
     for(int i=0;i<n;i++){list[i].planes=7&~(1<<i);list[i].pt=pts[i];}
+    Clear(data);
+    int sign=1;
+    if(TV::Triple_Product(pts[0],pts[1],pts[2])<0){exchange(pts[1],pts[2]);sign=-sign;}
+    if(TV::Triple_Product(pts[3],pts[4],pts[5])<0){exchange(pts[4],pts[5]);sign=-sign;}
 
     // TODO: Robustness to in out in out.
     for(int p=3;p<6;p++){
+        Plot_Configuration(pts[0],pts[1],pts[2],list,n);
         TV N=TV::Cross_Product(pts[(p+1)%3+3],pts[(p+2)%3+3]);
         bool has[2]={false,false};
         for(int i=0;i<n;i++){
             list[i].inside=TV::Dot_Product(N,list[i].pt)>0;
+            printf("%i%c ",list[i].planes, list[i].inside?'-':'+');
             has[list[i].inside]=true;}
+        puts("");
+        printf("HAS %i %i\n", has[0], has[1]);
         if(!has[1]) return;
         if(!has[0]) continue;
         while(list[n-1].inside || !list[0].inside){list[n]=list[0];list++;}
         int f=1;
         while(list[f].inside) f++;
         int verta=(list[n-1].planes&list[0].planes)|(1<<p),vertb=(list[f-1].planes&list[f].planes)|(1<<p);
-        list[f].planes=verta;
-        list[f+1].planes=vertb;
+        list[f].planes=vertb;
+        list[f+1].planes=verta;
         list[f].pt=Point_From_Planes(list[f].planes,pts);
         list[f+1].pt=Point_From_Planes(list[f+1].planes,pts);
         n=f+2;}
+
+    Plot_Configuration(pts[0],pts[1],pts[2],list,n);
 
     TV N=TV::Cross_Product(pts[4]-pts[3],pts[5]-pts[3]);
 
     bool has[2]={false,false};
     for(int i=0;i<n;i++){
-        list[i].inside=TV::Dot_Product(N,list[i].pt-pts[3])>0;
+        printf("%i ",list[i].planes);
+        list[i].inside=TV::Dot_Product(N,list[i].pt-pts[3])<0;
         has[list[i].inside]=true;}
+    puts("");
+
+    printf("has %i %i\n", has[0], has[1]);
 
     if(!has[0]){
         for(int f=2;f<n;f++) Volume_From_Tetrahedron(data,pts,list[0].planes|64,list[f-1].planes|64,list[f].planes|64);
+        if(sign==-1) Negate(data);
         return;}
     if(!has[1]){
         for(int f=2;f<n;f++) Volume_From_Tetrahedron(data,pts,list[0].planes|128,list[f-1].planes|128,list[f].planes|128);
+        if(sign==-1) Negate(data);
         return;}
 
     while(list[n-1].inside || !list[0].inside){list[n]=list[0];list++;}
@@ -337,6 +440,7 @@ template<class T,class TV> void Volume_From_Triangles_Cut(VOL_DATA<T,6>& data,TV
 
     for(int i=f+1;i<n;i++) Volume_From_Tetrahedron(data,pts,verta|128,list[i-1].planes|128,list[i].planes|128);
     Volume_From_Tetrahedron(data,pts,verta|128,list[n-1].planes|128,vertb|128);
+    if(sign==-1) Negate(data);
 }
 
 template void Volume_From_Triangles<float,VECTOR<float,3> >(VOL_DATA<float,6>&,VECTOR<float,3>,VECTOR<float,3>,VECTOR<float,3>,VECTOR<float,3>,VECTOR<float,3>,VECTOR<float,3>);

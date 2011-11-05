@@ -428,10 +428,12 @@
 (defun physbam-project-name (directory)
   (car (last (split-string directory "/" t))))
 
+(getenv "DEFAULT_ARCH")
+
 ; Returns executable name in form <proj>_<release/debug>_<PLATFORM>  
 (defun physbam-executable-name (base-executable use-release-always)
   (concat base-executable
-          (if (or (string= (getenv "PLATFORM") nil) (string= (getenv "PLATFORM") "pentium4")) "" (concat "_" (getenv "PLATFORM")))
+;          (if (or (string= (getenv "PLATFORM") nil) (string= (getenv "PLATFORM") "pentium4")) "" (concat "_" (getenv "PLATFORM")))
           (if (or use-release-always (string= physbam-project-type "release")) "" (concat "_" physbam-project-type))))
 
 ; runs a simulation

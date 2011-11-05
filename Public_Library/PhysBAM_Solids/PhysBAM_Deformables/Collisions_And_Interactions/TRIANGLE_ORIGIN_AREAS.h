@@ -35,6 +35,8 @@ struct PT_DATA
 
 template<class T,int n> void Clear(VOL_DATA<T,n>& data);
 
+template<class T,int n> void Negate(VOL_DATA<T,n>& data);
+
 template<class T,class TV> void Data_From_Dof(PT_DATA<T>& data,const TV& A);
 
 // Intersect ABC with OP
