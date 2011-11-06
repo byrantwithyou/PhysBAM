@@ -48,6 +48,23 @@ template<class T,class TV> void Intersect_Triangle_Point(PT_DATA<T>& data,const 
     data.G[0]=BCP/(nP*nP)*onP;
     data.G[1]=CAP/(nP*nP)*onP;
     data.G[2]=ABP/(nP*nP)*onP;
+    data.G[3]=-ABC/(nP*nP)*(onP-nP);
+
+    // T a1=A.x;
+    // T a2=A.y;
+    // T a3=A.z;
+    // T b1=B.x;
+    // T b2=B.y;
+    // T b3=B.z;
+    // T c1=C.x;
+    // T c2=C.y;
+    // T c3=C.z;
+    // T d1=P.x;
+    // T d2=P.y;
+    // T d3=P.z;
+    // double cg[12][3];
+    //for(int i=0;i<4;i++) for(int j=0;j<3;j++) for(int k=0;k<3;k++) printf("g %f\n", data.G[i](j+1,k+1)-cg[i*3+j][k]);
+
     MATRIX<T,3> H00=-BCP/(nP*nP*nP)*(onU+onU.Transposed());
     data.H[0][0][0]=P.x*H00;
     data.H[1][0][0]=P.y*H00;
