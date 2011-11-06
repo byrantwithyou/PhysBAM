@@ -21,7 +21,7 @@ typedef double T;
 typedef VECTOR<double,3> TV;
 
 RANDOM_NUMBERS<double> rn;
-int N=200;
+int N=10000000;
 
 T Approximate_Volume(TV A,TV B,TV C,TV D,TV E,TV F)
 {
@@ -30,20 +30,17 @@ T Approximate_Volume(TV A,TV B,TV C,TV D,TV E,TV F)
     if(TV::Triple_Product(A,B,C)<0) exchange(A,B),sign=-sign;
     if(TV::Triple_Product(D,E,F)<0) exchange(D,E),sign=-sign;
 
-    for(int x=0;x<N;x++)
-        for(int y=0;y<N;y++)
-            for(int z=0;z<N;z++)
-            {
-                TV p=TV(x,y,z)/N*2-1;
-                rn.Fill_Uniform(p,-1,1);
-                if(TETRAHEDRON<T>::Barycentric_Inside(p,TV(),A,B,C) && TETRAHEDRON<T>::Barycentric_Inside(p,TV(),D,E,F)) in++;
-            }
-    return (T)sign*in/N/N/N*8;
+    for(int z=0;z<N;z++)
+    {
+        TV p;
+        rn.Fill_Uniform(p,-1,1);
+        if(TETRAHEDRON<T>::Barycentric_Inside(p,TV(),A,B,C) && TETRAHEDRON<T>::Barycentric_Inside(p,TV(),D,E,F)) in++;
+    }
+    return (T)sign*in/N*8;
 }
 
 void Case_Test()
 {
-#if 1
     TV a,b,c,d,e,f;
     rn.Fill_Uniform(a,-1,1);
     rn.Fill_Uniform(b,-1,1);
@@ -51,17 +48,16 @@ void Case_Test()
     rn.Fill_Uniform(d,-1,1);
     rn.Fill_Uniform(e,-1,1);
     rn.Fill_Uniform(f,-1,1);
-#else
-    TV a(-1,-.5,.95);
-    TV b(1,-.5,.95);
-    TV c(0,1,.95);
-    TV d(1,.5,1);
-    TV e(-1,.5,1);
-    TV f(0,-1,1);
-#endif
 
+    printf("a=TV(%g,%g,%g);\n",a.x,a.y,a.z);
+    printf("b=TV(%g,%g,%g);\n",b.x,b.y,b.z);
+    printf("c=TV(%g,%g,%g);\n",c.x,c.y,c.z);
+    printf("d=TV(%g,%g,%g);\n",d.x,d.y,d.z);
+    printf("e=TV(%g,%g,%g);\n",e.x,e.y,e.z);
+    printf("f=TV(%g,%g,%g);\n",f.x,f.y,f.z);
 
     static int cnt=0;cnt++;
+    if(0)
     for(int i=1;i<=3;i++){
         char file[100];
         sprintf(file, "dump-%c-%i.eps", 'x'+i-1, cnt);
@@ -100,6 +96,26 @@ void Case_Test()
     printf("VOLUMES: %9.6f %9.6f (%.6f)\n", data.V, approx, fabs(data.V-approx));
 }
 
+void Derivative_Test()
+{
+    T e=1e-5;
+    VECTOR<TV,6> a,da;
+    for(int i=1;i<=6;i++) rn.Fill_Uniform(a(i),-1,1);
+    for(int i=1;i<=6;i++) rn.Fill_Uniform(da(i),-e,e);
+
+    for(int i=1;i<=6;i++) printf("a(%i)=TV(%g,%g,%g);\n",i,a(i).x,a(i).y,a(i).z);
+
+    TRIANGLE_ORIGIN_AREAS::VOL_DATA<T,6> data0,data1;
+    TRIANGLE_ORIGIN_AREAS::Volume_From_Triangles(data0,a(1),a(2),a(3),a(4),a(5),a(6));
+    TRIANGLE_ORIGIN_AREAS::Volume_From_Triangles(data1,a(1)+da(1),a(2)+da(2),a(3)+da(3),a(4)+da(4),a(5)+da(5),a(6)+da(6));
+
+    T dV=(data1.V-data0.V)/e;
+    T G=0;
+    for(int i=1;i<=6;i++) G+=TV::Dot_Product(da(i),data0.G[i-1]+data1.G[i-1])/2;
+    G/=e;
+    printf("GRAD %9.6f %9.6f (%.6f)\n", dV, G, fabs(dV-G));
+}
+
 int main(int argc,char *argv[])
 {
     typedef double T;
@@ -107,11 +123,14 @@ int main(int argc,char *argv[])
     typedef VECTOR<T,3> TV;
     LOG::cout<<std::setprecision(16);
 
+    if(0)
     for(int i=0;i<500;i++)
     {
         try{Case_Test();}catch(...){}
-        break;
+//        break;
     }
+
+    Derivative_Test();
 
     return 0;
 }
