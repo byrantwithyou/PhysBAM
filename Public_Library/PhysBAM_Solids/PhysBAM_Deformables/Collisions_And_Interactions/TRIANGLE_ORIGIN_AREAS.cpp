@@ -50,21 +50,6 @@ template<class T,class TV> void Intersect_Triangle_Point(PT_DATA<T>& data,const 
     data.G[2]=ABP/(nP*nP)*oPn;
     data.G[3]=-ABC/(nP*nP)*(oPn-nP);
 
-    // T a1=A.x;
-    // T a2=A.y;
-    // T a3=A.z;
-    // T b1=B.x;
-    // T b2=B.y;
-    // T b3=B.z;
-    // T c1=C.x;
-    // T c2=C.y;
-    // T c3=C.z;
-    // T d1=P.x;
-    // T d2=P.y;
-    // T d3=P.z;
-    // double cg[12][3];
-    //for(int i=0;i<4;i++) for(int j=0;j<3;j++) for(int k=0;k<3;k++) printf("g %f\n", data.G[i](j+1,k+1)-cg[i*3+j][k]);
-
     MATRIX<T,3> H00=-BCP/(nP*nP*nP)*(onU+onU.Transposed());
     data.H[0][0][0]=P.x*H00;
     data.H[1][0][0]=P.y*H00;
@@ -77,26 +62,26 @@ template<class T,class TV> void Intersect_Triangle_Point(PT_DATA<T>& data,const 
     data.H[0][2][2]=P.x*H22;
     data.H[1][2][2]=P.y*H22;
     data.H[2][2][2]=P.z*H22;
-    MATRIX<T,3> H01=BCP*onW.Transposed()+BCP*onU.Transposed()-CAP*onU;
+    MATRIX<T,3> H01=BCP/(nP*nP*nP)*onW.Transposed()+BCP/(nP*nP*nP)*onU.Transposed()-CAP/(nP*nP*nP)*onU;
     data.H[0][0][1]=P.x*H01;
     data.H[1][0][1]=P.y*H01;
     data.H[2][0][1]=P.z*H01;
-    MATRIX<T,3> H12=CAP*onU.Transposed()+CAP*onV.Transposed()-ABP*onV;
+    MATRIX<T,3> H12=CAP/(nP*nP*nP)*onU.Transposed()+CAP/(nP*nP*nP)*onV.Transposed()-ABP/(nP*nP*nP)*onV;
     data.H[0][1][2]=P.x*H12;
     data.H[1][1][2]=P.y*H12;
     data.H[2][1][2]=P.z*H12;
-    MATRIX<T,3> H20=ABP*onV.Transposed()+ABP*onW.Transposed()-BCP*onW;
-    data.H[0][2][0]=P.x*H20.Transposed();
-    data.H[1][2][0]=P.y*H20.Transposed();
-    data.H[2][2][0]=P.z*H20.Transposed();
-    MATRIX<T,3> H33=(T)2*onn;
-    for(int i=0;i<3;i++) data.H[i][3][3]=P(i+1)*H33-nP*(MATRIX<T,3>::Outer_Product(TV::Axis_Vector(i+1),n)+MATRIX<T,3>::Outer_Product(n,TV::Axis_Vector(i+1)));
-    MATRIX<T,3> H03=ABC*onU-BCP*onn;
-    for(int i=0;i<3;i++) data.H[i][0][3]=P(i+1)*H03+MATRIX<T,3>::Outer_Product(TV::Axis_Vector(i+1),n)*nP*BCP;
-    MATRIX<T,3> H13=ABC*onV-CAP*onn;
-    for(int i=0;i<3;i++) data.H[i][1][3]=P(i+1)*H13+MATRIX<T,3>::Outer_Product(TV::Axis_Vector(i+1),n)*nP*CAP;
-    MATRIX<T,3> H23=ABC*onW-ABP*onn;
-    for(int i=0;i<3;i++) data.H[i][2][3]=P(i+1)*H23+MATRIX<T,3>::Outer_Product(TV::Axis_Vector(i+1),n)*nP*ABP;
+    MATRIX<T,3> H20=ABP/(nP*nP*nP)*onV.Transposed()+ABP/(nP*nP*nP)*onW.Transposed()-BCP/(nP*nP*nP)*onW;
+    data.H[0][0][2]=P.x*H20.Transposed();
+    data.H[1][0][2]=P.y*H20.Transposed();
+    data.H[2][0][2]=P.z*H20.Transposed();
+    MATRIX<T,3> H33=(T)2/(nP*nP*nP)*ABC*onn;
+    for(int i=0;i<3;i++) data.H[i][3][3]=P(i+1)*H33-nP*ABC/(nP*nP*nP)*(MATRIX<T,3>::Outer_Product(TV::Axis_Vector(i+1),n)+MATRIX<T,3>::Outer_Product(n,TV::Axis_Vector(i+1)));
+    MATRIX<T,3> H03=ABC/(nP*nP*nP)*onU-BCP/(nP*nP*nP)*onn;
+    for(int i=0;i<3;i++) data.H[i][0][3]=P(i+1)*H03+MATRIX<T,3>::Outer_Product(n,TV::Axis_Vector(i+1))*nP*BCP/(nP*nP*nP);
+    MATRIX<T,3> H13=ABC/(nP*nP*nP)*onV-CAP/(nP*nP*nP)*onn;
+    for(int i=0;i<3;i++) data.H[i][1][3]=P(i+1)*H13+MATRIX<T,3>::Outer_Product(n,TV::Axis_Vector(i+1))*nP*CAP/(nP*nP*nP);
+    MATRIX<T,3> H23=ABC/(nP*nP*nP)*onW-ABP/(nP*nP*nP)*onn;
+    for(int i=0;i<3;i++) data.H[i][2][3]=P(i+1)*H23+MATRIX<T,3>::Outer_Product(n,TV::Axis_Vector(i+1))*nP*ABP/(nP*nP*nP);
     for(int s=0;s<3;s++) for(int i=0;i<4;i++) for(int j=i+1;j<4;j++) data.H[s][j][i]=data.H[s][i][j].Transposed();
 }
 
