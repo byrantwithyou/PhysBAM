@@ -42,15 +42,61 @@ template<class TV> POINT_CASE Classify_Point(const TV& A,const TV& B,const TV& C
 template<class T,class TV> void Volume_From_Points(VOL_DATA<T,3>& data,const TV& A,const TV& B,const TV& C)
 {
     data.V=(T)(1./6)*TV::Triple_Product(A,B,C);
-    // TODO: Gradient and Hessian
+    data.G[0]=(T)(1./6)*TV::Cross_Product(B,C);
+    data.G[1]=(T)(1./6)*TV::Cross_Product(C,A);
+    data.G[2]=(T)(1./6)*TV::Cross_Product(A,B);
+    for(int i=0;i<3;i++) data.H[i][i]=MATRIX<T,3>();
+    data.H[0][1]=-MATRIX<T,3>::Cross_Product_Matrix(C);
+    data.H[0][2]=MATRIX<T,3>::Cross_Product_Matrix(B);
+    data.H[1][2]=-MATRIX<T,3>::Cross_Product_Matrix(A);
+    for(int i=0;i<3;i++) for(int j=i+1;j<3;j++) data.H[j][i]=data.H[i][j].Transposed();
 }
 
 template<class T,class TV> void Intersect_Triangle_Point(PT_DATA<T>& data,const TV& A,const TV& B,const TV& C,const TV& P)
 {
     data.n=4;
-    TV n=TV::Cross_Product(B-A,C-A);
-    data.V=TV::Dot_Product(n,A)/TV::Dot_Product(n,P)*P;
-    // TODO: Gradient and Hessian
+    TV n=TV::Cross_Product(B-A,C-A),U=TV::Cross_Product(B-C,P),V=TV::Cross_Product(C-A,P),W=TV::Cross_Product(A-B,P);
+    T nP=TV::Dot_Product(n,P),nA=TV::Dot_Product(n,A),ABC=TV::Dot_Product(TV::Cross_Product(A,B),C);
+    T BCP=TV::Dot_Product(TV::Cross_Product(B,C),P),CAP=TV::Dot_Product(TV::Cross_Product(C,A),P),ABP=TV::Dot_Product(TV::Cross_Product(A,B),P);
+    data.V=(nA/nP)*P;
+    MATRIX<T,3> onP=MATRIX<T,3>::Outer_Product(n,P),onU=MATRIX<T,3>::Outer_Product(n,U),onV=MATRIX<T,3>::Outer_Product(n,V),onW=MATRIX<T,3>::Outer_Product(n,W);
+    MATRIX<T,3> onn=MATRIX<T,3>::Outer_Product(n,n);
+    data.G[0]=BCP/(nP*nP)*onP;
+    data.G[1]=CAP/(nP*nP)*onP;
+    data.G[2]=ABP/(nP*nP)*onP;
+    MATRIX<T,3> H00=-BCP/(nP*nP*nP)*(onU+onU.Transposed());
+    data.H[0][0][0]=P.x*H00;
+    data.H[1][0][0]=P.y*H00;
+    data.H[2][0][0]=P.z*H00;
+    MATRIX<T,3> H11=-CAP/(nP*nP*nP)*(onV+onV.Transposed());
+    data.H[0][1][1]=P.x*H11;
+    data.H[1][1][1]=P.y*H11;
+    data.H[2][1][1]=P.z*H11;
+    MATRIX<T,3> H22=-ABP/(nP*nP*nP)*(onW+onW.Transposed());
+    data.H[0][2][2]=P.x*H22;
+    data.H[1][2][2]=P.y*H22;
+    data.H[2][2][2]=P.z*H22;
+    MATRIX<T,3> H01=BCP*onW.Transposed()+BCP*onU.Transposed()-CAP*onU;
+    data.H[0][0][1]=P.x*H01;
+    data.H[1][0][1]=P.y*H01;
+    data.H[2][0][1]=P.z*H01;
+    MATRIX<T,3> H12=CAP*onU.Transposed()+CAP*onV.Transposed()-ABP*onV;
+    data.H[0][1][2]=P.x*H12;
+    data.H[1][1][2]=P.y*H12;
+    data.H[2][1][2]=P.z*H12;
+    MATRIX<T,3> H20=ABP*onV.Transposed()+ABP*onW.Transposed()-BCP*onW;
+    data.H[0][2][0]=P.x*H20.Transposed();
+    data.H[1][2][0]=P.y*H20.Transposed();
+    data.H[2][2][0]=P.z*H20.Transposed();
+    MATRIX<T,3> H33=(T)2*onn;
+    for(int i=0;i<3;i++) data.H[i][3][3]=P(i+1)*H33-nP*(MATRIX<T,3>::Outer_Product(TV::Axis_Vector(i+1),n)+MATRIX<T,3>::Outer_Product(n,TV::Axis_Vector(i+1)));
+    MATRIX<T,3> H03=ABC*onU-BCP*onn;
+    for(int i=0;i<3;i++) data.H[i][0][3]=P(i+1)*H03+MATRIX<T,3>::Outer_Product(TV::Axis_Vector(i+1),n)*nP*BCP;
+    MATRIX<T,3> H13=ABC*onV-CAP*onn;
+    for(int i=0;i<3;i++) data.H[i][1][3]=P(i+1)*H13+MATRIX<T,3>::Outer_Product(TV::Axis_Vector(i+1),n)*nP*CAP;
+    MATRIX<T,3> H23=ABC*onW-ABP*onn;
+    for(int i=0;i<3;i++) data.H[i][2][3]=P(i+1)*H23+MATRIX<T,3>::Outer_Product(TV::Axis_Vector(i+1),n)*nP*ABP;
+    for(int s=0;s<3;s++) for(int i=0;i<4;i++) for(int j=i+1;j<4;j++) data.H[s][j][i]=data.H[s][i][j].Transposed();
 }
 
 template<class T,class TV> void Intersect_Triangle_Segment(PT_DATA<T>& data,const TV& A,const TV& B,const TV& C,const TV& P,const TV& Q)
@@ -340,7 +386,7 @@ void Plot_Original(const TV& a,const TV& b,const TV& c, const TV& d,const TV& e,
     TV D=MATRIX<T,3>(b-a,c-a,d).Solve_Linear_System(-a);
     TV E=MATRIX<T,3>(b-a,c-a,e).Solve_Linear_System(-a);
     TV F=MATRIX<T,3>(b-a,c-a,f).Solve_Linear_System(-a);
-    printf("original proj %g %g %g\n", -D.z, -E.z, -F.z);
+    // printf("original proj %g %g %g\n", -D.z, -E.z, -F.z);
 
     eps.Line_Color(VECTOR<T,3>(.5,.5,.5));
     eps.Draw_Point(VECTOR<T,2>(1.1,1.1));
@@ -377,19 +423,19 @@ template<class T,class TV> void Volume_From_Triangles_Cut(VOL_DATA<T,6>& data,TV
     LIST<TV> alist[50], *list=alist;
     for(int i=0;i<n;i++){list[i].planes=7&~(1<<i);list[i].pt=pts[i];}
     VOL_DATA<T,6> tdata;
-    Plot_Original(pts[0],pts[1],pts[2],pts[3],pts[4],pts[5]);
+//    Plot_Original(pts[0],pts[1],pts[2],pts[3],pts[4],pts[5]);
 
     // TODO: Robustness to in out in out.
     for(int p=3;p<6;p++){
-        Plot_Configuration(pts[0],pts[1],pts[2],list,n);
+//        Plot_Configuration(pts[0],pts[1],pts[2],list,n);
         TV N=TV::Cross_Product(pts[(p+1)%3+3],pts[(p+2)%3+3]);
         bool has[2]={false,false};
         for(int i=0;i<n;i++){
             list[i].inside=TV::Dot_Product(N,list[i].pt)>0;
-            printf("%i%c ",list[i].planes, list[i].inside?'-':'+');
+            // printf("%i%c ",list[i].planes, list[i].inside?'-':'+');
             has[list[i].inside]=true;}
-        puts("");
-        printf("HAS %i %i\n", has[0], has[1]);
+        // puts("");
+        // printf("HAS %i %i\n", has[0], has[1]);
         if(!has[1]){
             Clear(data);
             return;}
@@ -404,18 +450,18 @@ template<class T,class TV> void Volume_From_Triangles_Cut(VOL_DATA<T,6>& data,TV
         list[f+1].pt=Point_From_Planes(list[f+1].planes,pts);
         n=f+2;}
 
-    Plot_Configuration(pts[0],pts[1],pts[2],list,n);
+//    Plot_Configuration(pts[0],pts[1],pts[2],list,n);
 
     TV N=TV::Cross_Product(pts[4]-pts[3],pts[5]-pts[3]);
 
     bool has[2]={false,false};
     for(int i=0;i<n;i++){
         list[i].inside=TV::Dot_Product(N,list[i].pt-pts[3])<0;
-        printf("%i%c ",list[i].planes, list[i].inside?'-':'+');
+//        printf("%i%c ",list[i].planes, list[i].inside?'-':'+');
         has[list[i].inside]=true;}
-    puts("");
+//    puts("");
 
-    printf("has %i %i\n", has[0], has[1]);
+//    printf("has %i %i\n", has[0], has[1]);
 
     Clear(tdata);
     if(!has[0]) for(int f=2;f<n;f++) Volume_From_Tetrahedron(tdata,pts,list[0].planes|64,list[f-1].planes|64,list[f].planes|64);
@@ -435,8 +481,8 @@ template<class T,class TV> void Volume_From_Triangles_Cut(VOL_DATA<T,6>& data,TV
     data.V=sign*tdata.V;
     for(int i=0;i<6;i++) data.G[index[i]]=sign*tdata.G[i];
     for(int i=0;i<6;i++) for(int k=0;k<6;k++) data.H[index[i]][index[k]]=sign*tdata.H[i][k];
-    for(int i=0;i<6;i++) printf("%i ",index[i]);
-    puts("");
+//    for(int i=0;i<6;i++) printf("%i ",index[i]);
+//    puts("");
 }
 
 template void Volume_From_Triangles<float,VECTOR<float,3> >(VOL_DATA<float,6>&,VECTOR<float,3>,VECTOR<float,3>,VECTOR<float,3>,VECTOR<float,3>,VECTOR<float,3>,VECTOR<float,3>);
