@@ -98,7 +98,7 @@ void Case_Test()
 
 void Derivative_Test()
 {
-    T e=1e-5;
+    T e=1e-8;
     VECTOR<TV,6> a,da;
     for(int i=1;i<=6;i++) rn.Fill_Uniform(a(i),-1,1);
     for(int i=1;i<=6;i++) rn.Fill_Uniform(da(i),-e,e);
@@ -114,6 +114,20 @@ void Derivative_Test()
     for(int i=1;i<=6;i++) G+=TV::Dot_Product(da(i),data0.G[i-1]+data1.G[i-1])/2;
     G/=e;
     printf("GRAD %9.6f %9.6f (%.6f)\n", dV, G, fabs(dV-G));
+
+    T H0=0,H1=0,H2=0;
+    for(int i=0;i<6;i++){
+        TV Hx;
+        for(int j=0;j<6;j++) Hx+=(data0.H[i][j]+data1.H[i][j])*da(j+1)/(2*e);
+        TV G=(data1.G[i]-data0.G[i])/e;
+        H0+=G.Magnitude_Squared();
+        H1+=Hx.Magnitude_Squared();
+        H2+=(G-Hx).Magnitude_Squared();}
+    H0=sqrt(H0);
+    H1=sqrt(H1);
+    H2=sqrt(H2);
+
+    printf("HESS %9.6f %9.6f (%.6f)\n", H0, H1, H2);
 }
 
 int main(int argc,char *argv[])
@@ -124,13 +138,13 @@ int main(int argc,char *argv[])
     LOG::cout<<std::setprecision(16);
 
     if(0)
-    for(int i=0;i<500;i++)
+//    for(int i=0;i<500;i++)
     {
         try{Case_Test();}catch(...){}
 //        break;
     }
 
-    Derivative_Test();
+    for(int i=0;i<100;i++) Derivative_Test();
 
     return 0;
 }
