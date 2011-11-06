@@ -43,12 +43,12 @@ template<class T,class TV> void Intersect_Triangle_Point(PT_DATA<T>& data,const 
     T nP=TV::Dot_Product(n,P),nA=TV::Dot_Product(n,A),ABC=TV::Dot_Product(TV::Cross_Product(A,B),C);
     T BCP=TV::Dot_Product(TV::Cross_Product(B,C),P),CAP=TV::Dot_Product(TV::Cross_Product(C,A),P),ABP=TV::Dot_Product(TV::Cross_Product(A,B),P);
     data.V=(nA/nP)*P;
-    MATRIX<T,3> onP=MATRIX<T,3>::Outer_Product(n,P),onU=MATRIX<T,3>::Outer_Product(n,U),onV=MATRIX<T,3>::Outer_Product(n,V),onW=MATRIX<T,3>::Outer_Product(n,W);
+    MATRIX<T,3> oPn=MATRIX<T,3>::Outer_Product(P,n),onU=MATRIX<T,3>::Outer_Product(n,U),onV=MATRIX<T,3>::Outer_Product(n,V),onW=MATRIX<T,3>::Outer_Product(n,W);
     MATRIX<T,3> onn=MATRIX<T,3>::Outer_Product(n,n);
-    data.G[0]=BCP/(nP*nP)*onP;
-    data.G[1]=CAP/(nP*nP)*onP;
-    data.G[2]=ABP/(nP*nP)*onP;
-    data.G[3]=-ABC/(nP*nP)*(onP-nP);
+    data.G[0]=BCP/(nP*nP)*oPn;
+    data.G[1]=CAP/(nP*nP)*oPn;
+    data.G[2]=ABP/(nP*nP)*oPn;
+    data.G[3]=-ABC/(nP*nP)*(oPn-nP);
 
     // T a1=A.x;
     // T a2=A.y;
