@@ -27,7 +27,7 @@ template<class T,class TV> void Data_From_Dof(PT_DATA<T>& data,const TV& A)
     data.n=1;
     data.V=A;
     data.G[0]=MATRIX<T,3>::Identity_Matrix();
-    for(int i=0;i<2;i++) data.H[i][0][0]=MATRIX<T,3>();
+    for(int i=0;i<3;i++) data.H[i][0][0]=MATRIX<T,3>();
 }
 
 template<class TV> POINT_CASE Classify_Point(const TV& A,const TV& B,const TV& C,const TV& P)
@@ -46,9 +46,9 @@ template<class T,class TV> void Volume_From_Points(VOL_DATA<T,3>& data,const TV&
     data.G[1]=(T)(1./6)*TV::Cross_Product(C,A);
     data.G[2]=(T)(1./6)*TV::Cross_Product(A,B);
     for(int i=0;i<3;i++) data.H[i][i]=MATRIX<T,3>();
-    data.H[0][1]=-MATRIX<T,3>::Cross_Product_Matrix(C);
-    data.H[0][2]=MATRIX<T,3>::Cross_Product_Matrix(B);
-    data.H[1][2]=-MATRIX<T,3>::Cross_Product_Matrix(A);
+    data.H[0][1]=-(T)(1./6)*MATRIX<T,3>::Cross_Product_Matrix(C);
+    data.H[0][2]=(T)(1./6)*MATRIX<T,3>::Cross_Product_Matrix(B);
+    data.H[1][2]=-(T)(1./6)*MATRIX<T,3>::Cross_Product_Matrix(A);
     for(int i=0;i<3;i++) for(int j=i+1;j<3;j++) data.H[j][i]=data.H[i][j].Transposed();
 }
 
