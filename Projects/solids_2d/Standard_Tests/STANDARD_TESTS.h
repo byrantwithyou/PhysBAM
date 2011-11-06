@@ -187,7 +187,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     last_frame=1000;
 
     switch(test_number){
-	case 20: case 21:
+	case 20: case 21: case 26:
 	    mattress_grid=GRID<TV>(40,8,(T)-2,(T)2,(T)-.4,(T).4);
 	break;
 	case 22: case 23: case 24: case 25:
@@ -236,10 +236,12 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 6:
         case 24:
         case 25:
+        case 26:
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=900;
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
             attachment_velocity=TV((T).1,0);
+            last_frame=1500;
             break;
         case 7:
             solids_parameters.cfl=(T).5;
@@ -307,6 +309,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 4:
         case 24:
         case 25:
+        case 26:
             tests.Create_Mattress(mattress_grid,true);
             break;
         case 2:
@@ -492,6 +495,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 4:
         case 24:
         case 25:
+        case 26:
         case 5:
         case 6:{
             TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
@@ -584,6 +588,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             case 1:
             case 24: 
             case 25: 
+            case 26: 
             case 4: 
                 break;
             case 3:
@@ -667,6 +672,17 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
         V(m)=velocity_br;
         V(m*(n-1)+1)=velocity_tl;
         V(m*n)=velocity_tr;}
+    if(test_number==26){
+        int m=mattress_grid.counts.x;
+	int n=mattress_grid.counts.y;
+        T velocity=.2;
+        T final_time=50;
+        TV velocity_top=velocity_time<final_time?TV((T)0,-velocity):TV();
+        TV velocity_bot=velocity_time<final_time?TV((T)0,-velocity):TV();
+        TV velocity_rig=velocity_time<final_time?TV(velocity,(T)0):TV();
+        TV velocity_lef=velocity_time<final_time?TV(-velocity,(T)0):TV();
+        for(int j=1;j<=n;j++){V(1+m*(j-1))=velocity_lef;V(m+m*(j-1))=velocity_rig;}
+        for(int i=2*m/5+1;i<=3*m/5+1;i++){V(i)=velocity_bot;V(m*(n-1)+i)=velocity_top;}}
     if(test_number==10) for(int p=1;p<=segment_ramp_particles.m;p++) V(p)=TV();
 }
 //#####################################################################
@@ -690,6 +706,11 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
         V(m)=TV();
         V(m*(n-1)+1)=TV();
         V(m*n)=TV();}
+    if(test_number==26){
+        int m=mattress_grid.counts.x;
+	int n=mattress_grid.counts.y;
+        for(int j=1;j<=n;j++){V(1+m*(j-1))=TV();V(m+m*(j-1))=TV();}
+        for(int i=2*m/5+1;i<=3*m/5+1;i++){V(i)=TV();V(m*(n-1)+i)=TV();}}
     if(test_number==10) for(int p=1;p<=segment_ramp_particles.m;p++) V(p)=TV();
 }
 //#####################################################################
