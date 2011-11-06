@@ -27,7 +27,9 @@
 //  21. Stretched skinny mattress with colliding ball
 //  22. Squeezing between to small boxes
 //  23. Highspeed collision with ground
-//  24. Big stretch
+//  24. Big 4 sides stretch
+//  25. Big 4 corners stretch
+//  26. Big stretch/bend
 
 //#####################################################################
 #ifndef __STANDARD_TESTS__
@@ -188,7 +190,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
 	case 20: case 21:
 	    mattress_grid=GRID<TV>(40,8,(T)-2,(T)2,(T)-.4,(T).4);
 	break;
-	case 22: case 23: case 24:
+	case 22: case 23: case 24: case 25:
 	    mattress_grid=GRID<TV>(20,20,(T)-.9,(T).9,(T)-.9,(T).9);
 	break;
     	default:
@@ -232,16 +234,12 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 4:
         case 5:
         case 6:
+        case 24:
+        case 25:
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=900;
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
             attachment_velocity=TV((T).1,0);
-            break;
-        case 24:
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
-            solids_parameters.implicit_solve_parameters.cg_iterations=900;
-            solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
-            attachment_velocity=TV((T).1,(T).1);
             break;
         case 7:
             solids_parameters.cfl=(T).5;
@@ -308,6 +306,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             break;
         case 4:
         case 24:
+        case 25:
             tests.Create_Mattress(mattress_grid,true);
             break;
         case 2:
@@ -492,6 +491,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             break;}
         case 4:
         case 24:
+        case 25:
         case 5:
         case 6:{
             TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
@@ -583,6 +583,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         switch(test_number){
             case 1:
             case 24: 
+            case 25: 
             case 4: 
                 break;
             case 3:
@@ -653,6 +654,19 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
         TV velocity_lef=velocity_time<final_time?TV(-velocity,(T)0):TV();
         for(int j=n/3+1;j<=2*n/3+1;j++){V(1+m*(j-1))=velocity_lef;V(m+m*(j-1))=velocity_rig;}
         for(int i=m/3+1;i<=2*m/3+1;i++){V(i)=velocity_bot;V(m*(n-1)+i)=velocity_top;}}
+    if(test_number==25){
+        int m=mattress_grid.counts.x;
+	int n=mattress_grid.counts.y;
+        T velocity=.2;
+        T final_time=50;
+        TV velocity_tr=velocity_time<final_time?TV(velocity,velocity):TV();
+        TV velocity_tl=velocity_time<final_time?TV(-velocity,velocity):TV();
+        TV velocity_br=velocity_time<final_time?TV(velocity,-velocity):TV();
+        TV velocity_bl=velocity_time<final_time?TV(-velocity,-velocity):TV();
+        V(1)=velocity_bl;
+        V(m)=velocity_br;
+        V(m*(n-1)+1)=velocity_tl;
+        V(m*n)=velocity_tr;}
     if(test_number==10) for(int p=1;p<=segment_ramp_particles.m;p++) V(p)=TV();
 }
 //#####################################################################
@@ -669,6 +683,13 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
 	int n=mattress_grid.counts.y;
         for(int j=n/3+1;j<=2*n/3+1;j++){V(1+m*(j-1))=V(m+m*(j-1))=TV();}
         for(int i=m/3+1;i<=2*m/3+1;i++){V(i)=V(m*(n-1)+i)=TV();}}
+    if(test_number==25){
+        int m=mattress_grid.counts.x;
+	int n=mattress_grid.counts.y;
+        V(1)=TV();
+        V(m)=TV();
+        V(m*(n-1)+1)=TV();
+        V(m*n)=TV();}
     if(test_number==10) for(int p=1;p<=segment_ramp_particles.m;p++) V(p)=TV();
 }
 //#####################################################################
