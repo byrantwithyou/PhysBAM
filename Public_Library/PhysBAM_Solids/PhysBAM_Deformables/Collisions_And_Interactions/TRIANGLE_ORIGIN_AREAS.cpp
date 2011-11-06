@@ -124,7 +124,7 @@ template<class T> void Combine_Data(VOL_DATA<T,6>& data,const VOL_DATA<T,3>& V,c
     data.V+=V.V;
     const PT_DATA<T>* pd[3] = {&data_m, &data_n, &data_p};
 
-    for(int z=0;z<3;z++) for(int j=0;j<pd[z]->n;j++) data.G[pd[z]->index[j]]+=V.G[0]*pd[z]->G[j];
+    for(int z=0;z<3;z++) for(int j=0;j<pd[z]->n;j++) data.G[pd[z]->index[j]]+=V.G[z]*pd[z]->G[j];
 
     for(int z=0;z<3;z++)
         for(int j=0;j<pd[z]->n;j++)
