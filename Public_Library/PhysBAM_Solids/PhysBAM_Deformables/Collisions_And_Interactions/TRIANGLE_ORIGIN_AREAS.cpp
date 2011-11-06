@@ -123,7 +123,7 @@ template<class T,class TV> void Intersect_Segment_Segment(PT_DATA<T>& data,const
     PT_DATA<T> tdata;
     Intersect_Triangle_Point(tdata,-Q,A-Q,B-Q,P-Q);
     data.V=tdata.V+Q;
-    data.G[4]=MATRIX<T,3>::Identity_Matrix();
+    data.G[3]=MATRIX<T,3>::Identity_Matrix();
     for(int i=0;i<4;i++){
         if(i) data.G[i-1]=tdata.G[i];
         data.G[3]-=tdata.G[i];}
