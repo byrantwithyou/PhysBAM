@@ -15,28 +15,12 @@ template<class T,int n> void Clear(VOL_DATA<T,n>& data)
     for(int i=0;i<n;i++) for(int j=0;j<n;j++) data.H[i][j]=MATRIX<T,3>();
 }
 
-template<class T,int n> void Negate(VOL_DATA<T,n>& data)
-{
-    data.V=-data.V;
-    for(int i=0;i<n;i++) data.G[i]=-data.G[i];
-    for(int i=0;i<n;i++) for(int j=0;j<n;j++) data.H[i][j]=-data.H[i][j];
-}
-
 template<class T,class TV> void Data_From_Dof(PT_DATA<T>& data,const TV& A)
 {
     data.n=1;
     data.V=A;
     data.G[0]=MATRIX<T,3>::Identity_Matrix();
     for(int i=0;i<3;i++) data.H[i][0][0]=MATRIX<T,3>();
-}
-
-template<class TV> POINT_CASE Classify_Point(const TV& A,const TV& B,const TV& C,const TV& P)
-{
-    if(TV::Triple_Product(A,B,P)<=0) return outside;
-    if(TV::Triple_Product(A,P,C)<=0) return outside;
-    if(TV::Triple_Product(P,B,C)<=0) return outside;
-    if(TV::Triple_Product(A-P,B-P,C-P)<=0) return beyond;
-    return inside;
 }
 
 template<class T,class TV> void Volume_From_Points(VOL_DATA<T,3>& data,const TV& A,const TV& B,const TV& C)
@@ -135,48 +119,6 @@ template<class T,class TV> void Intersect_Segment_Segment(PT_DATA<T>& data,const
         data.H[s][3][3]+=tdata.H[s][i][j];}
 }
 
-// template<class T,class TV> void Volume_From_Points(PT_DATA<T>& data,const TV& A,const TV& B,const TV& C)
-// {
-//     int index[6]={0,1,2,3,4,5};
-//     T sign=1;
-//     T OABC=TV::Triple_Product(A,B,C);
-//     T ODEF=TV::Triple_Product(D,E,F);
-
-//     if(OABC<0){exchange(A,B);exchange(index[0],index[1]);sign=-sign;}
-//     if(ODEF<0){exchange(D,E);exchange(index[3],index[4]);sign=-sign;}
-
-//     POINT_CASE case_a=Classify_Point(D,E,F,A);
-//     POINT_CASE case_b=Classify_Point(D,E,F,B);
-//     POINT_CASE case_c=Classify_Point(D,E,F,C);
-//     POINT_CASE case_d=Classify_Point(A,B,C,D);
-//     POINT_CASE case_e=Classify_Point(A,B,C,E);
-//     POINT_CASE case_f=Classify_Point(A,B,C,F);
-//     if(case_b<case_a){exchange(case_b,case_a);exchange(A,B);exchange(index[0],index[1]);sign=-sign;}
-//     if(case_c<case_a){exchange(case_c,case_a);exchange(A,C);exchange(index[0],index[2]);sign=-sign;}
-//     if(case_c<case_b){exchange(case_c,case_b);exchange(B,C);exchange(index[1],index[2]);sign=-sign;}
-//     if(case_e<case_d){exchange(case_e,case_d);exchange(D,E);exchange(index[3],index[4]);sign=-sign;}
-//     if(case_f<case_d){exchange(case_f,case_d);exchange(D,F);exchange(index[3],index[5]);sign=-sign;}
-//     if(case_f<case_e){exchange(case_f,case_e);exchange(E,F);exchange(index[4],index[5]);sign=-sign;}
-//     if(case_a<case_d || (case_a==case_d && (case_b<case_e || (case_b==case_e && case_c<case_f)))){
-//         exchange(case_a,case_d);exchange(case_b,case_e);exchange(case_c,case_f);
-//         exchange(A,D);exchange(B,E);exchange(C,F);
-//         exchange(index[0],index[3]);exchange(index[1],index[4]);exchange(index[2],index[5]);}
-
-//     DATA<T,1,6> tdata;
-//     Clear(tdata);
-
-//     if(case_a==outside && case_b==outside && case_c==outside && case_d==outside && case_e==outside && case_f==outside) return;
-//     if(case_a==outside && case_b==outside && case_c==outside && case_d==beyond && case_e==beyond && case_f==beyond) Case_CCCBBB(tdata,A,B,C,D,E,F);
-//     if(case_a==outside && case_b==outside && case_c==outside && case_d==inside && case_e==inside && case_f==inside) Case_CCCAAA(tdata,A,B,C,D,E,F);
-//     else printf("X: %c %c %c  %c %c %c\n", "ABC"[case_a], "ABC"[case_b], "ABC"[case_c], "ABC"[case_d], "ABC"[case_e], "ABC"[case_f]);
-
-//     // TODO: Enumerate cases
-
-//     data.V=sign*tdata.V;
-//     for(int i=0;i<6;i++) data.G[index[i]]=sign*tdata.G[i];
-//     for(int i=0;i<6;i++) for(int k=0;k<6;k++) data.H[0][index[i]][index[k]]=sign*tdata.H[0][i][k];
-// }
-
 template<class T> void Combine_Data(VOL_DATA<T,6>& data,const VOL_DATA<T,3>& V,const PT_DATA<T>& data_m,const PT_DATA<T>& data_n,const PT_DATA<T>& data_p)
 {
     data.V+=V.V;
@@ -196,31 +138,6 @@ template<class T> void Combine_Data(VOL_DATA<T,6>& data,const VOL_DATA<T,3>& V,c
                 for(int s=0;s<pd[z]->n;s++)
                     data.H[pd[y]->index[j]][pd[z]->index[s]]+=pd[y]->G[j].Transpose_Times(V.H[y][z]*pd[z]->G[s]);
 }
-
-// const int vec_d[1]={0}, vec_e[1]={0}, vec_f[1]={0}, vec_abcd[4]={0,1,2,3}, vec_abce[4]={0,1,2,4}, vec_abcf[4]={0,1,2,5};
-// template<class T,class TV> void Case_CCCAAA(DATA<T,1,6>& data,const TV& A,const TV& B,const TV& C,const TV& D,const TV& E,const TV& F)
-// {
-//     LOG::cout<<__FUNCTION__<<std::endl;
-//     DATA<T,3,1> DD,DE,DF;
-//     Data_From_Dof(DD,D);
-//     Data_From_Dof(DE,E);
-//     Data_From_Dof(DF,F);
-//     DATA<T,1,3> V;
-//     Volume_From_Points(V,DD.V,DE.V,DF.V);
-//     Combine_Data(data,V,DD,DE,DF,vec_d,vec_e,vec_f);
-// }
-
-// template<class T,class TV> void Case_CCCBBB(DATA<T,1,6>& data,const TV& A,const TV& B,const TV& C,const TV& D,const TV& E,const TV& F)
-// {
-//     LOG::cout<<__FUNCTION__<<std::endl;
-//     DATA<T,3,4> P1,P2,P3;
-//     Intersect_Triangle_Point(P1,A,B,C,D);
-//     Intersect_Triangle_Point(P2,A,B,C,E);
-//     Intersect_Triangle_Point(P3,A,B,C,F);
-//     DATA<T,1,3> V;
-//     Volume_From_Points(V,P1.V,P2.V,P3.V);
-//     Combine_Data(data,V,P1,P2,P3,vec_abcd,vec_abce,vec_abcf);
-// }
 
 int opp_pairs[5][2] = {{0,0},{1,2},{2,0},{0,0},{0,1}};
 int opp_pt[7] = {0,0,0,2,0,1,0};
@@ -351,68 +268,6 @@ namespace{
     };
 }
 
-static int cnt=0;
-
-template<class TV>
-void Plot_Configuration(const TV& a,const TV& b,const TV& c, LIST<TV>* list, int n)
-{
-    typedef typename TV::SCALAR T;
-    char file[100];
-    sprintf(file, "dump-p-%i.eps", cnt++);
-    EPS_FILE_GEOMETRY<T> eps(file);
-    VECTOR<T,2> pts[10];
-    for(int i=0;i<n;i++) pts[i]=MATRIX<T,3>(b-a,c-a,list[i].pt).Solve_Linear_System(-a).Remove_Index(3);
-
-    eps.Line_Color(VECTOR<T,3>(.5,.5,.5));
-    eps.Draw_Point(VECTOR<T,2>(1.1,1.1));
-    eps.Draw_Point(VECTOR<T,2>(-.1,-.1));
-    eps.Line_Color(VECTOR<T,3>(1,0,0));
-    eps.Draw_Line(VECTOR<T,2>(0,0),VECTOR<T,2>(1,0));
-    eps.Draw_Line(VECTOR<T,2>(1,0),VECTOR<T,2>(0,1));
-    eps.Draw_Line(VECTOR<T,2>(0,1),VECTOR<T,2>(0,0));
-    eps.Line_Color(VECTOR<T,3>(0,1,0));
-    for(int i=1;i<n;i++) eps.Draw_Line(pts[i-1],pts[i]);
-    eps.Draw_Line(pts[n-1],pts[0]);
-    for(int i=0;i<n;i++) eps.Draw_Point(pts[i]);
-}
-
-template<class TV>
-void Plot_Original(const TV& a,const TV& b,const TV& c, const TV& d,const TV& e,const TV& f)
-{
-    typedef typename TV::SCALAR T;
-    char file[100];
-    sprintf(file, "dump-t-%i.eps", cnt);
-    EPS_FILE_GEOMETRY<T> eps(file);
-    TV D=MATRIX<T,3>(b-a,c-a,d).Solve_Linear_System(-a);
-    TV E=MATRIX<T,3>(b-a,c-a,e).Solve_Linear_System(-a);
-    TV F=MATRIX<T,3>(b-a,c-a,f).Solve_Linear_System(-a);
-    // printf("original proj %g %g %g\n", -D.z, -E.z, -F.z);
-
-    eps.Line_Color(VECTOR<T,3>(.5,.5,.5));
-    eps.Draw_Point(VECTOR<T,2>(1.1,1.1));
-    eps.Draw_Point(VECTOR<T,2>(-.1,-.1));
-    eps.Line_Color(VECTOR<T,3>(1,0,0));
-    eps.Draw_Line(VECTOR<T,2>(0,0),VECTOR<T,2>(1,0));
-    eps.Draw_Line(VECTOR<T,2>(1,0),VECTOR<T,2>(0,1));
-    eps.Draw_Line(VECTOR<T,2>(0,1),VECTOR<T,2>(0,0));
-    eps.Line_Color(VECTOR<T,3>(0,1,0));
-    eps.Draw_Line(D.Remove_Index(3),E.Remove_Index(3));
-    eps.Draw_Line(E.Remove_Index(3),F.Remove_Index(3));
-    eps.Draw_Line(F.Remove_Index(3),D.Remove_Index(3));
-
-    eps.Line_Color(VECTOR<T,3>(1,0,0));
-    eps.Draw_Point(VECTOR<T,2>(0,0));
-    eps.Draw_Point(D.Remove_Index(3));
-
-    eps.Line_Color(VECTOR<T,3>(0,1,0));
-    eps.Draw_Point(VECTOR<T,2>(1,0));
-    eps.Draw_Point(E.Remove_Index(3));
-
-    eps.Line_Color(VECTOR<T,3>(0,0,1));
-    eps.Draw_Point(VECTOR<T,2>(0,1));
-    eps.Draw_Point(F.Remove_Index(3));
-}
-
 template<class T,class TV> void Volume_From_Triangles_Cut(VOL_DATA<T,6>& data,TV pts[6])
 {
     int index[6]={0,1,2,3,4,5};
@@ -423,19 +278,14 @@ template<class T,class TV> void Volume_From_Triangles_Cut(VOL_DATA<T,6>& data,TV
     LIST<TV> alist[50], *list=alist;
     for(int i=0;i<n;i++){list[i].planes=7&~(1<<i);list[i].pt=pts[i];}
     VOL_DATA<T,6> tdata;
-//    Plot_Original(pts[0],pts[1],pts[2],pts[3],pts[4],pts[5]);
 
     // TODO: Robustness to in out in out.
     for(int p=3;p<6;p++){
-//        Plot_Configuration(pts[0],pts[1],pts[2],list,n);
         TV N=TV::Cross_Product(pts[(p+1)%3+3],pts[(p+2)%3+3]);
         bool has[2]={false,false};
         for(int i=0;i<n;i++){
             list[i].inside=TV::Dot_Product(N,list[i].pt)>0;
-            // printf("%i%c ",list[i].planes, list[i].inside?'-':'+');
             has[list[i].inside]=true;}
-        // puts("");
-        // printf("HAS %i %i\n", has[0], has[1]);
         if(!has[1]){
             Clear(data);
             return;}
@@ -450,18 +300,12 @@ template<class T,class TV> void Volume_From_Triangles_Cut(VOL_DATA<T,6>& data,TV
         list[f+1].pt=Point_From_Planes(list[f+1].planes,pts);
         n=f+2;}
 
-//    Plot_Configuration(pts[0],pts[1],pts[2],list,n);
-
     TV N=TV::Cross_Product(pts[4]-pts[3],pts[5]-pts[3]);
 
     bool has[2]={false,false};
     for(int i=0;i<n;i++){
         list[i].inside=TV::Dot_Product(N,list[i].pt-pts[3])<0;
-//        printf("%i%c ",list[i].planes, list[i].inside?'-':'+');
         has[list[i].inside]=true;}
-//    puts("");
-
-//    printf("has %i %i\n", has[0], has[1]);
 
     Clear(tdata);
     if(!has[0]) for(int f=2;f<n;f++) Volume_From_Tetrahedron(tdata,pts,list[0].planes|64,list[f-1].planes|64,list[f].planes|64);
@@ -481,8 +325,6 @@ template<class T,class TV> void Volume_From_Triangles_Cut(VOL_DATA<T,6>& data,TV
     data.V=sign*tdata.V;
     for(int i=0;i<6;i++) data.G[index[i]]=sign*tdata.G[i];
     for(int i=0;i<6;i++) for(int k=0;k<6;k++) data.H[index[i]][index[k]]=sign*tdata.H[i][k];
-//    for(int i=0;i<6;i++) printf("%i ",index[i]);
-//    puts("");
 }
 
 template void Volume_From_Triangles<float,VECTOR<float,3> >(VOL_DATA<float,6>&,VECTOR<float,3>,VECTOR<float,3>,VECTOR<float,3>,VECTOR<float,3>,VECTOR<float,3>,VECTOR<float,3>);

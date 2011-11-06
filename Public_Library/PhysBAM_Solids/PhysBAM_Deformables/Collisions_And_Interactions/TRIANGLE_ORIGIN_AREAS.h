@@ -12,8 +12,6 @@
 namespace PhysBAM{
 namespace TRIANGLE_ORIGIN_AREAS
 {
-enum POINT_CASE {inside, beyond, outside};
-template<class TV> POINT_CASE Classify_Point(const TV& A,const TV& B,const TV& C,const TV& P);
 
 template<class T,int n>
 struct VOL_DATA
@@ -34,8 +32,6 @@ struct PT_DATA
 };
 
 template<class T,int n> void Clear(VOL_DATA<T,n>& data);
-
-template<class T,int n> void Negate(VOL_DATA<T,n>& data);
 
 template<class T,class TV> void Data_From_Dof(PT_DATA<T>& data,const TV& A);
 
