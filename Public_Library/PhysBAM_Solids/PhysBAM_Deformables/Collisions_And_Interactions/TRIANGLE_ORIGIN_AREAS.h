@@ -31,32 +31,7 @@ struct PT_DATA
     MATRIX<T,3> H[3][5][5];
 };
 
-template<class T,int n> void Clear(VOL_DATA<T,n>& data);
-
-template<class T,class TV> void Data_From_Dof(PT_DATA<T>& data,const TV& A);
-
-// Intersect ABC with OP
-template<class T,class TV> void Intersect_Triangle_Point(PT_DATA<T>& data,const TV& A,const TV& B,const TV& C,const TV& P);
-
-// Intersect ABC with PQ
-template<class T,class TV> void Intersect_Triangle_Segment(PT_DATA<T>& data,const TV& A,const TV& B,const TV& C,const TV& P,const TV& Q);
-
-// Intersect OAB with PQ
-template<class T,class TV> void Intersect_Segment_Segment(PT_DATA<T>& data,const TV& A,const TV& B,const TV& P,const TV& Q);
-
-// Volume of OABC
-template<class T,class TV> void Volume_From_Points(VOL_DATA<T,3>& data,const TV& A,const TV& B,const TV& C);
-
-// Compute V(data_m,data_n); add to data
-template<class T> void Combine_Data(VOL_DATA<T,6>& data,const VOL_DATA<T,3>& V,const PT_DATA<T>& data_m,const PT_DATA<T>& data_n,const PT_DATA<T>& data_p);
-
-// Individual cases
-// TODO: List the cases
-//template<class T,class TV> void Case_CCCAAA(VOL_DATA<T>,const TV& A,const TV& B,const TV& C,const TV& D,const TV& E,const TV& F);
-//template<class T,class TV> void Case_CCCBBB(VOL_DATA<T>,const TV& A,const TV& B,const TV& C,const TV& D,const TV& E,const TV& F);
-
 template<class T,class TV> void Volume_From_Triangles(VOL_DATA<T,6>& data,TV A,TV B,TV C,TV D,TV E,TV F);
-template<class T,class TV> void Volume_From_Tetrahedron(VOL_DATA<T,6>& data,TV pts[6],int va,int vb,int vc);
 }
 }
 #endif
