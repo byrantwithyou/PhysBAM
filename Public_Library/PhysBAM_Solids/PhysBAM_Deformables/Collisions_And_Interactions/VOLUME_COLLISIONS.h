@@ -11,23 +11,21 @@
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
+#include <PhysBAM_Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
 namespace PhysBAM{
 
-template<class TV> class VOLUME_COLLISIONS;
-
-template<class T>
-class VOLUME_COLLISIONS<VECTOR<T,2> >
+template<class TV>
+class VOLUME_COLLISIONS
 {
-    typedef VECTOR<T,2> TV;
+    typedef typename TV::SCALAR T;typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m>::OBJECT T_OBJECT;
 public:
-    ARRAY<TRIANGULATED_AREA<T>*> triangulated_areas;
+    ARRAY<T_OBJECT*> objects;
     T area;
     HASHTABLE<int,TV> gradient;
-    HASHTABLE<VECTOR<int,2>,MATRIX<T,2> > hessian;
+    HASHTABLE<VECTOR<int,2>,MATRIX<T,TV::m> > hessian;
 
     void Compute_Collision_Triangles();
-    void Compute_Collision_Triangles(TRIANGULATED_AREA<T>& ta1,TRIANGULATED_AREA<T>& ta2);
+    void Compute_Collision_Triangles(T_OBJECT& obj1,T_OBJECT& obj2);
 };   
 }
 #endif

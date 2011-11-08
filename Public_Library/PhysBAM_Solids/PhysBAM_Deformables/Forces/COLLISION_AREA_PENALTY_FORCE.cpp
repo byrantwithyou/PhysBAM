@@ -31,9 +31,9 @@ template<class TV> COLLISION_AREA_PENALTY_FORCE<TV>::
 // Function Add_Mesh
 //#####################################################################
 template<class TV> void COLLISION_AREA_PENALTY_FORCE<TV>::
-Add_Mesh(TRIANGULATED_AREA<T>& ta)
+Add_Mesh(T_OBJECT& ta)
 {
-    volume_collisions.triangulated_areas.Append(&ta);
+    volume_collisions.objects.Append(&ta);
 }
 //#####################################################################
 // Function Potential_Energy
@@ -153,7 +153,7 @@ Add_Force_Differential(ARRAY_VIEW<const TV> dX,ARRAY_VIEW<TV> dF,const T time) c
 template<class TV> void COLLISION_AREA_PENALTY_FORCE<TV>::
 Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
 {
-    for(typename HASHTABLE<VECTOR<int,2>,MATRIX<T,2> >::ITERATOR it(volume_collisions.hessian);it.Valid();it.Next())
+    for(typename HASHTABLE<VECTOR<int,2>,MATRIX<T,TV::m> >::ITERATOR it(volume_collisions.hessian);it.Valid();it.Next())
         F(it.Key().x)-=2*force_coefficient*volume_collisions.area*(it.Data()*V(it.Key().y));
 
     T tot=0;
@@ -192,6 +192,8 @@ Add_Force_Data(ARRAY<FORCE_DATA<TV> >& force_data_list,const std::string& force_
 {
 }
 template class COLLISION_AREA_PENALTY_FORCE<VECTOR<float,2> >;
+template class COLLISION_AREA_PENALTY_FORCE<VECTOR<float,3> >;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class COLLISION_AREA_PENALTY_FORCE<VECTOR<double,2> >;
+template class COLLISION_AREA_PENALTY_FORCE<VECTOR<double,3> >;
 #endif

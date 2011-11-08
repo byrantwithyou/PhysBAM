@@ -130,6 +130,7 @@ template<class T> inline HASH Hash_Reduce(const VECTOR<T,1>& key){return HASH(Ha
 template<class T> inline HASH Hash_Reduce(const VECTOR<T,2>& key){return HASH(key.x,key.y);}
 template<class T> inline HASH Hash_Reduce(const VECTOR<T,3>& key){return HASH(key.x,key.y,key.z);}
 template<class T> inline HASH Hash_Reduce(const VECTOR<T,4>& key){return HASH(key[1],key[2],key[3],key[4]);}
+template<class T,int n> inline HASH Hash_Reduce(const VECTOR<T,n>& key){return HASH(key);}
 template<class T1,class T2> inline HASH Hash_Reduce(const PAIR<T1,T2>& key){return HASH(key.x,key.y);}
 template<class T1,class T2,class T3> inline HASH Hash_Reduce(const TRIPLE<T1,T2,T3>& key){return HASH(key.x,key.y,key.z);}
 

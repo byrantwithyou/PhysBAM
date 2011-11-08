@@ -5,15 +5,18 @@
 #include <PhysBAM_Dynamics/Read_Write/EPS_FILE_GEOMETRY.h>
 
 //extern PhysBAM::ARRAY<int> trap_cases;
-namespace PhysBAM{
-namespace TRIANGLE_ORIGIN_AREAS{
+using namespace PhysBAM;
+using namespace ORIGIN_AREAS;
 
-template<class T,int n> void Clear(VOL_DATA<T,n>& data)
+template<class T>
+struct PT_DATA
 {
-    data.V=T();
-    for(int i=0;i<n;i++) data.G[i]=VECTOR<T,3>();
-    for(int i=0;i<n;i++) for(int j=0;j<n;j++) data.H[i][j]=MATRIX<T,3>();
-}
+    int n;
+    int index[5];
+    VECTOR<T,3> V;
+    MATRIX<T,3> G[5];
+    MATRIX<T,3> H[3][5][5];
+};
 
 template<class T,class TV> void Data_From_Dof(PT_DATA<T>& data,const TV& A)
 {
@@ -23,7 +26,7 @@ template<class T,class TV> void Data_From_Dof(PT_DATA<T>& data,const TV& A)
     for(int i=0;i<3;i++) data.H[i][0][0]=MATRIX<T,3>();
 }
 
-template<class T,class TV> void Volume_From_Points(VOL_DATA<T,3>& data,const TV& A,const TV& B,const TV& C)
+template<class T,class TV> void Volume_From_Points(VOL_DATA<T,3,3>& data,const TV& A,const TV& B,const TV& C)
 {
     data.V=(T)(1./6)*TV::Triple_Product(A,B,C);
     data.G[0]=(T)(1./6)*TV::Cross_Product(B,C);
@@ -103,7 +106,7 @@ template<class T,class TV> void Intersect_Segment_Segment(PT_DATA<T>& data,const
         data.H[s][3][3]+=tdata.H[s][i][j];}
 }
 
-template<class T> void Combine_Data(VOL_DATA<T,6>& data,const VOL_DATA<T,3>& V,const PT_DATA<T> pd[3])
+template<class T> void Combine_Data(VOL_DATA<T,3,6>& data,const VOL_DATA<T,3,3>& V,const PT_DATA<T> pd[3])
 {
     data.V+=V.V;
 
@@ -217,7 +220,7 @@ template<class T,class TV> void Init_Data_From_Planes(void (*funcs[256])(PT_DATA
             indices[k|64][3]=(i+2)%3;}
 }
 
-template<class T,class TV> void Volume_From_Tetrahedron(VOL_DATA<T,6>& data,TV pts[6],int va,int vb,int vc)
+template<class T,class TV> void Volume_From_Tetrahedron(VOL_DATA<T,3,6>& data,TV pts[6],int va,int vb,int vc)
 {
     static void (*funcs[256])(PT_DATA<T>& data, int* ind, const TV* pts);
     static int indices[256][5];
@@ -230,19 +233,13 @@ template<class T,class TV> void Volume_From_Tetrahedron(VOL_DATA<T,6>& data,TV p
     funcs[vb](pd[1],indices[vb],pts);
     funcs[vc](pd[2],indices[vc],pts);
 
-    VOL_DATA<T,3> vd;
+    VOL_DATA<T,3,3> vd;
     Volume_From_Points(vd,pd[0].V,pd[1].V,pd[2].V);
 
     Combine_Data(data,vd,pd);
 }
 
-template<class T,class TV> void Volume_From_Triangles(VOL_DATA<T,6>& data,TV A,TV B,TV C,TV D,TV E,TV F)
-{
-    TV pts[6] = {A,B,C,D,E,F};
-    Volume_From_Triangles_Cut(data,pts);
-}
-
-template<class T,class TV> void Volume_From_Triangles_Cut(VOL_DATA<T,6>& data,TV pts[6])
+template<class T,class TV> void PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(VOL_DATA<T,3,6>& data,TV pts[6])
 {
     struct LIST
     {
@@ -257,7 +254,7 @@ template<class T,class TV> void Volume_From_Triangles_Cut(VOL_DATA<T,6>& data,TV
     int n=3;
     LIST alist[50], *list=alist;
     for(int i=0;i<n;i++){list[i].planes=7&~(1<<i);list[i].pt=pts[i];}
-    VOL_DATA<T,6> tdata;
+    VOL_DATA<T,3,6> tdata;
 
     // TODO: Robustness to in out in out.
     for(int p=3;p<6;p++){
@@ -307,9 +304,7 @@ template<class T,class TV> void Volume_From_Triangles_Cut(VOL_DATA<T,6>& data,TV
     for(int i=0;i<6;i++) for(int k=0;k<6;k++) data.H[index[i]][index[k]]=sign*tdata.H[i][k];
 }
 
-template void Volume_From_Triangles<float,VECTOR<float,3> >(VOL_DATA<float,6>&,VECTOR<float,3>,VECTOR<float,3>,VECTOR<float,3>,VECTOR<float,3>,VECTOR<float,3>,VECTOR<float,3>);
+template void PhysBAM::ORIGIN_AREAS::Volume_From_Simplices<float,VECTOR<float,3> >(VOL_DATA<float,3,6>&,VECTOR<float,3>[6]);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-template void Volume_From_Triangles<double,VECTOR<double,3> >(VOL_DATA<double,6>&,VECTOR<double,3>,VECTOR<double,3>,VECTOR<double,3>,VECTOR<double,3>,VECTOR<double,3>,VECTOR<double,3>);
+template void PhysBAM::ORIGIN_AREAS::Volume_From_Simplices<double,VECTOR<double,3> >(VOL_DATA<double,3,6>&,VECTOR<double,3>[6]);
 #endif
-}
-}

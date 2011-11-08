@@ -41,10 +41,10 @@ Triangle_Intersection_Area(const TRIANGLE_2D<T>& a,const TRIANGLE_2D<T>& b,VECTO
     return A;
 }
 //#####################################################################
-// Function Topology_Aware_Triangle_Intersection_Test
+// Function Topology_Aware_Intersection_Test
 //#####################################################################
 template<class TV> bool PhysBAM::
-Topology_Aware_Triangle_Intersection_Test(VECTOR<int,3> a,VECTOR<int,3> b,ARRAY_VIEW<const TV> X)
+Topology_Aware_Intersection_Test(VECTOR<int,3> a,VECTOR<int,3> b,ARRAY_VIEW<const TV> X)
 {
     typedef typename TV::SCALAR T;
     bool b1=a.Contains(b(1)),b2=a.Contains(b(2)),b3=a.Contains(b(3));
@@ -69,9 +69,20 @@ Topology_Aware_Triangle_Intersection_Test(VECTOR<int,3> a,VECTOR<int,3> b,ARRAY_
     if(S.Column(1).All_Greater(TV()) || S.Column(2).All_Greater(TV())) return true;
 	return false;
 }
-template bool Topology_Aware_Triangle_Intersection_Test<VECTOR<float,2> >(VECTOR<int,3>,VECTOR<int,3>,ARRAY_VIEW<VECTOR<float,2> const,int>);
+//#####################################################################
+// Function Topology_Aware_Intersection_Test
+//#####################################################################
+template<class TV> bool PhysBAM::
+Topology_Aware_Intersection_Test(VECTOR<int,4> a,VECTOR<int,4> b,ARRAY_VIEW<const TV> X)
+{
+    typedef typename TV::SCALAR T;
+    PHYSBAM_FATAL_ERROR();
+}
+template bool Topology_Aware_Intersection_Test<VECTOR<float,2> >(VECTOR<int,3>,VECTOR<int,3>,ARRAY_VIEW<VECTOR<float,2> const,int>);
+template bool Topology_Aware_Intersection_Test<VECTOR<float,3> >(VECTOR<int,4>,VECTOR<int,4>,ARRAY_VIEW<VECTOR<float,3> const,int>);
 template float Triangle_Intersection_Area<float,VECTOR<float,2> >(TRIANGLE_2D<float> const&,TRIANGLE_2D<float> const&,VECTOR<VECTOR<float,2>,6>&,VECTOR<VECTOR<MATRIX<float,2,2>,6>,6>&);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-template bool Topology_Aware_Triangle_Intersection_Test<VECTOR<double,2> >(VECTOR<int,3>,VECTOR<int,3>,ARRAY_VIEW<VECTOR<double,2> const,int>);
+template bool Topology_Aware_Intersection_Test<VECTOR<double,2> >(VECTOR<int,3>,VECTOR<int,3>,ARRAY_VIEW<VECTOR<double,2> const,int>);
+template bool Topology_Aware_Intersection_Test<VECTOR<double,3> >(VECTOR<int,4>,VECTOR<int,4>,ARRAY_VIEW<VECTOR<double,3> const,int>);
 template double Triangle_Intersection_Area<double,VECTOR<double,2> >(TRIANGLE_2D<double> const&,TRIANGLE_2D<double> const&,VECTOR<VECTOR<double,2>,6>&,VECTOR<VECTOR<MATRIX<double,2,2>,6>,6>&);
 #endif

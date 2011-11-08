@@ -15,7 +15,7 @@ template<class T> class TRIANGULATED_AREA;
 template<class TV>
 class COLLISION_AREA_PENALTY_FORCE:public DEFORMABLES_FORCES<TV>
 {
-    typedef typename TV::SCALAR T;
+    typedef typename TV::SCALAR T;typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m>::OBJECT T_OBJECT;
 public:
     typedef DEFORMABLES_FORCES<TV> BASE;
     typedef typename BASE::FREQUENCY_DATA FREQUENCY_DATA;
@@ -28,7 +28,7 @@ public:
     virtual ~COLLISION_AREA_PENALTY_FORCE();
 
 //#####################################################################
-    void Add_Mesh(TRIANGULATED_AREA<T>& ta);
+    void Add_Mesh(T_OBJECT& ta);
     virtual void Use_Rest_State_For_Strain_Rate(const bool use_rest_state_for_strain_rate_input=true);
     virtual void Limit_Time_Step_By_Strain_Rate(const bool limit_time_step_by_strain_rate_input=true,const T max_strain_per_time_step_input=.1);
     virtual void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const;

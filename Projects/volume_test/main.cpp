@@ -87,8 +87,9 @@ void Case_Test()
         eps.Draw_Point(c.Remove_Index(i));
         eps.Draw_Point(f.Remove_Index(i));}
 
-    TRIANGLE_ORIGIN_AREAS::VOL_DATA<T,6> data;
-    TRIANGLE_ORIGIN_AREAS::Volume_From_Triangles(data,a,b,c,d,e,f);
+    ORIGIN_AREAS::VOL_DATA<T,3,6> data;
+    TV pts[6]={a,b,c,d,e,f};
+    ORIGIN_AREAS::Volume_From_Simplices(data,pts);
 
 //    if(!data.V) return;
     T approx=Approximate_Volume(a,b,c,d,e,f);
@@ -99,15 +100,17 @@ void Case_Test()
 void Derivative_Test()
 {
     T e=1e-8;
-    VECTOR<TV,6> a,da;
-    for(int i=1;i<=6;i++) rn.Fill_Uniform(a(i),-1,1);
-    for(int i=1;i<=6;i++) rn.Fill_Uniform(da(i),-e,e);
+    VECTOR<TV,6> a,da,ada;
+    for(int i=1;i<=6;i++){
+        rn.Fill_Uniform(a(i),-1,1);
+        rn.Fill_Uniform(da(i),-e,e);
+        ada(i)=a(i)+da(i);}
 
     for(int i=1;i<=6;i++) printf("a(%i)=TV(%g,%g,%g);\n",i,a(i).x,a(i).y,a(i).z);
 
-    TRIANGLE_ORIGIN_AREAS::VOL_DATA<T,6> data0,data1;
-    TRIANGLE_ORIGIN_AREAS::Volume_From_Triangles(data0,a(1),a(2),a(3),a(4),a(5),a(6));
-    TRIANGLE_ORIGIN_AREAS::Volume_From_Triangles(data1,a(1)+da(1),a(2)+da(2),a(3)+da(3),a(4)+da(4),a(5)+da(5),a(6)+da(6));
+    ORIGIN_AREAS::VOL_DATA<T,3,6> data0,data1;
+    ORIGIN_AREAS::Volume_From_Simplices(data0,&a(1));
+    ORIGIN_AREAS::Volume_From_Simplices(data1,&ada(1));
 
     T dV=(data1.V-data0.V)/e;
     T G=0;

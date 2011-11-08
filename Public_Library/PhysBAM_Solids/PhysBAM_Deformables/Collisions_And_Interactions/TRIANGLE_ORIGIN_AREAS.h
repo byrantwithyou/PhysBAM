@@ -9,29 +9,11 @@
 
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/SEGMENT_ORIGIN_AREAS.h>
 namespace PhysBAM{
-namespace TRIANGLE_ORIGIN_AREAS
+namespace ORIGIN_AREAS
 {
-
-template<class T,int n>
-struct VOL_DATA
-{
-    T V;
-    VECTOR<T,3> G[n];
-    MATRIX<T,3> H[n][n];
-};
-
-template<class T>
-struct PT_DATA
-{
-    int n;
-    int index[5];
-    VECTOR<T,3> V;
-    MATRIX<T,3> G[5];
-    MATRIX<T,3> H[3][5][5];
-};
-
-template<class T,class TV> void Volume_From_Triangles(VOL_DATA<T,6>& data,TV A,TV B,TV C,TV D,TV E,TV F);
+template<class T,class TV> void Volume_From_Simplices(VOL_DATA<T,3,6>& data,TV A[6]);
 }
 }
 #endif
