@@ -5,6 +5,7 @@
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
 #include <PhysBAM_Tools/Math_Tools/cyclic_shift.h>
+#include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/SEGMENT_ORIGIN_AREAS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/SIMPLEX_INTERACTIONS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRAPEZOID_INTERSECTION.h>
@@ -76,7 +77,16 @@ template<class TV> bool PhysBAM::
 Topology_Aware_Intersection_Test(VECTOR<int,4> a,VECTOR<int,4> b,ARRAY_VIEW<const TV> X)
 {
     typedef typename TV::SCALAR T;
-    PHYSBAM_FATAL_ERROR();
+    bool b1=a.Contains(b(1)),b2=a.Contains(b(2)),b3=a.Contains(b(3)),b4=a.Contains(b(4));
+    int c=b1+b2+b3+b4;
+    if(c==0) return SIMPLEX_INTERACTIONS<T>::Intersection(VECTOR<TV,4>(X.Subset(a)),VECTOR<TV,4>(X.Subset(b)));
+    if(c>3) return false;
+
+    T a1=TETRAHEDRON<T>::Signed_Volume(X(a(1)),X(a(2)),X(a(3)),X(a(4))),a2=TETRAHEDRON<T>::Signed_Volume(X(b(1)),X(b(2)),X(b(3)),X(b(4)));
+    if(!a1 || !a2) return false;
+    if(c==3) return (a1>0)!=(a2>0);
+
+    return true;
 }
 template bool Topology_Aware_Intersection_Test<VECTOR<float,2> >(VECTOR<int,3>,VECTOR<int,3>,ARRAY_VIEW<VECTOR<float,2> const,int>);
 template bool Topology_Aware_Intersection_Test<VECTOR<float,3> >(VECTOR<int,4>,VECTOR<int,4>,ARRAY_VIEW<VECTOR<float,3> const,int>);

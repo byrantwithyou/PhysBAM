@@ -63,6 +63,7 @@ int compute_collision_triangles_order[2][4][3]=
 template<class TV> void VOLUME_COLLISIONS<TV>::
 Compute_Collision_Triangles(T_OBJECT& obj1,T_OBJECT& obj2)
 {
+    // TODO: Check this for 3D
     VOLUME_COLLISIONS_VISITOR<TV> visitor(obj1,obj2);
     obj1.hierarchy->Intersection_List(*obj2.hierarchy,visitor,ZERO());
 
