@@ -57,13 +57,34 @@ int compute_collision_triangles_order[2][4][3]=
     {{2,3},{3,1},{1,2}},
     {{1,2,3},{2,3,4},{3,4,1},{4,1,2}}
 };
+static int Sort_Pair(VECTOR<int,4>& I)
+{
+    int sign=1;
+    if(I(1)<I(2)){exchange(I(1),I(2));sign=-sign;}
+    if(I(3)<I(4)){exchange(I(3),I(4));sign=-sign;}
+    if(I(1)<I(3)) for(int k=1;k<=2;k++) exchange(I(k),I(k+2));
+    return sign;
+}
+static int Sort_Pair(VECTOR<int,6>& I)
+{
+    int sign=1;
+    if(I(1)<I(2)){exchange(I(1),I(2));sign=-sign;}
+    if(I(1)<I(3)){exchange(I(1),I(3));sign=-sign;}
+    if(I(2)<I(3)){exchange(I(2),I(3));sign=-sign;}
+
+    if(I(4)<I(5)){exchange(I(4),I(5));sign=-sign;}
+    if(I(4)<I(6)){exchange(I(4),I(6));sign=-sign;}
+    if(I(5)<I(6)){exchange(I(5),I(6));sign=-sign;}
+
+    if(I(1)<I(4)) for(int k=1;k<=3;k++) exchange(I(k),I(k+3));
+    return sign;
+}
 //#####################################################################
 // Function Compute_Loops
 //#####################################################################
 template<class TV> void VOLUME_COLLISIONS<TV>::
 Compute_Collision_Triangles(T_OBJECT& obj1,T_OBJECT& obj2)
 {
-    // TODO: Check this for 3D
     VOLUME_COLLISIONS_VISITOR<TV> visitor(obj1,obj2);
     obj1.hierarchy->Intersection_List(*obj2.hierarchy,visitor,ZERO());
 
@@ -78,10 +99,7 @@ Compute_Collision_Triangles(T_OBJECT& obj1,T_OBJECT& obj2)
                 for(int k=1;k<=TV::m;k++){
                     I(k)=obj1.mesh.elements(a)(compute_collision_triangles_order[TV::m-2][i-1][k-1]);
                     I(k+TV::m)=obj2.mesh.elements(b)(compute_collision_triangles_order[TV::m-2][j-1][k-1]);}
-                int sign=1;
-                if(I(1)<I(2)){exchange(I(1),I(2));sign=-sign;}
-                if(I(TV::m+1)<I(TV::m+2)){exchange(I(TV::m+1),I(TV::m+2));sign=-sign;}
-                if(I(1)<I(TV::m+1)) for(int k=1;k<=TV::m;k++) exchange(I(k),I(TV::m+k));
+                int sign=Sort_Pair(I);
                 to_process.Get_Or_Insert(I)+=sign;}}}
 
     for(typename HASHTABLE<VECTOR<int,TV::m*2>,int>::ITERATOR it(to_process);it.Valid();it.Next()){

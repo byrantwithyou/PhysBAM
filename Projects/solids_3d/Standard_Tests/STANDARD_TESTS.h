@@ -52,6 +52,8 @@
 //  46. Cloth on sphere
 //  47. Cloth curtain with simple bending elements
 //  48. Rigid sphere falling on curtain suspended by ends
+//  49. Falling cube
+//  50. Two spheres fall on ground
 //#####################################################################
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
@@ -79,6 +81,7 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/SPLINE_MODEL.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/AXIAL_BENDING_SPRINGS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/BINDING_SPRINGS.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Forces/COLLISION_AREA_PENALTY_FORCE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/FINITE_VOLUME.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/INCOMPRESSIBLE_FINITE_VOLUME.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/LINEAR_ALTITUDE_SPRINGS_S3D.h>
@@ -182,10 +185,12 @@ public:
     bool print_matrix;
     bool use_axial;
     bool substitute_springs;
+    bool test_forces;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),number_side_panels(40),aspect_ratio((T)1.7),side_length((T)1.0),
-        constrained_particle(0),suspended_particle(0),drifting_particle(0),fully_implicit(false),print_matrix(false),use_axial(false),substitute_springs(false)
+        constrained_particle(0),suspended_particle(0),drifting_particle(0),fully_implicit(false),print_matrix(false),use_axial(false),substitute_springs(false),
+        test_forces(false)
     {
     }
 
@@ -208,7 +213,12 @@ public:
     void Align_Deformable_Bodies_With_Rigid_Bodies() PHYSBAM_OVERRIDE {}
     void Preprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE {}
     void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE {}
-    void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE {}
+    void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
+    {
+        if(test_forces){
+            solid_body_collection.deformable_body_collection.Test_Energy(time);
+            solid_body_collection.deformable_body_collection.Test_Force_Derivatives(time);}
+    }
     void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE {}
     void Self_Collisions_Begin_Callback(const T time,const int substep) PHYSBAM_OVERRIDE {}
     void Filter_Velocities(const T dt,const T time,const bool velocity_update) PHYSBAM_OVERRIDE {}
@@ -278,6 +288,7 @@ void Register_Options()
     parse_args->Add_Integer_Argument("-projection_iterations",5,"number of iterations used for projection in cg");
     parse_args->Add_Option_Argument("-substitute_springs","instead of finite volume, use springs");
     parse_args->Add_Integer_Argument("-solver_iterations",1000,"number of iterations used for solids system");
+    parse_args->Add_Option_Argument("-test_forces","use fully implicit forces");
 }
 //#####################################################################
 // Function Parse_Options
@@ -315,6 +326,7 @@ void Parse_Options()
     axial_bending_damping_multiplier=(T)parse_args->Get_Double_Value("-dampen_axial_bending");
     axial_bending_stiffness_multiplier=(T)parse_args->Get_Double_Value("-stiffen_axial_bending");
     use_forces_for_drift=parse_args->Get_Option_Value("-binding_springs");
+    test_forces=parse_args->Is_Value_Set("-test_forces");
 
     print_matrix=parse_args->Is_Value_Set("-print_matrix");
     
@@ -347,6 +359,7 @@ void Parse_Options()
         case 2:
         case 3:
         case 49:
+        case 50:
             solids_parameters.triangle_collision_parameters.perform_self_collision=false;
         case 4:
             solids_parameters.cfl=(T)5;
@@ -674,10 +687,6 @@ void Get_Initial_Data()
     switch(test_number){
         case 1:{
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,true,density);
-            tests.Add_Ground();
-            break;}
-        case 49:{
-            tests.Create_Mattress(GRID<TV>(10,10,10,(T)-1,(T)1,(T)-1,(T)1,(T)-1,(T)1),true,0,density);
             tests.Add_Ground();
             break;}
         case 2:{
@@ -1232,6 +1241,15 @@ void Get_Initial_Data()
             tmp_sphere.X()=TV(0,(T).25,0);
             tmp_sphere.is_static=true;
             break;}
+        case 49:{
+            tests.Create_Mattress(GRID<TV>(10,10,10,(T)-1,(T)1,(T)-1,(T)1,(T)-1,(T)1),true,0,density);
+            tests.Add_Ground();
+            break;}
+        case 50:{
+            for(int i=1;i<=parameter;i++)
+                tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)2.1*i,0))),true,true,density);
+            tests.Add_Ground();
+            break;}
         default:
             LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
 
@@ -1273,11 +1291,6 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 1:
         case 2:
         case 15:{
-            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
-            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
-            solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));
-            break;}
-        case 49:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));
@@ -1567,6 +1580,20 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             T bending_stiffness=bending_stiffness_multiplier*2/(1+sqrt((T)2)),bending_damping=bending_damping_multiplier*8;
             solid_body_collection.Add_Force(Create_Bending_Springs(triangulated_surface,bending_stiffness,bending_damping));
             break;}
+        case 49:{
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));
+            break;}
+        case 50:{
+            COLLISION_AREA_PENALTY_FORCE<TV>* penalty_force=new COLLISION_AREA_PENALTY_FORCE<TV>(particles);
+            for(int i=1;i<=parameter;i++){
+                TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(i);
+                solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+                solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));
+                penalty_force->Add_Mesh(tetrahedralized_volume);}
+            solid_body_collection.Add_Force(penalty_force);
+            break;}
         default:
             LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}
 
@@ -1574,6 +1601,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         switch(test_number){
             case 1:
             case 49:
+            case 50:
             case 24:{
                 VECTOR<int,3> processes_per_dimension(2,1,1);
                 solid_body_collection.deformable_body_collection.mpi_solids->Simple_Partition(solid_body_collection.deformable_body_collection,solid_body_collection.rigid_body_collection.rigid_geometry_collection,particles.X,processes_per_dimension);
