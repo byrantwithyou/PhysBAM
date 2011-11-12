@@ -25,8 +25,8 @@ template<class TV> class RANGE;
 //#####################################################################
 class HASH
 {
-    static const int missing_element_hash=32138912;
 public:
+    static const int missing_element_hash=32138912;
 
     int value;
 
@@ -72,7 +72,6 @@ public:
         value=array.Size()==1?int_hash(hash):hash;
     }
 
-private:
     static int Value(const int key)
     {return key;}
 
@@ -82,7 +81,7 @@ private:
     template<class T>
     static int Value(const T& key);
 
-    unsigned int int_hash(unsigned int key) 
+    static unsigned int int_hash(unsigned int key) 
     {STATIC_ASSERT(sizeof(int)==4);
     key += ~(key << 15);
     key ^=  (key >> 10);
@@ -92,7 +91,7 @@ private:
     key ^=  (key >> 16);
     return key;}
 
-    unsigned int triple_int_hash(unsigned int a,unsigned int b,unsigned int c)
+    static unsigned int triple_int_hash(unsigned int a,unsigned int b,unsigned int c)
     {STATIC_ASSERT(sizeof(int)==4);
     a-=b;a-=c;a^=(c>>13);
     b-=c;b-=a;b^=(a<<8);
@@ -130,7 +129,12 @@ template<class T> inline HASH Hash_Reduce(const VECTOR<T,1>& key){return HASH(Ha
 template<class T> inline HASH Hash_Reduce(const VECTOR<T,2>& key){return HASH(key.x,key.y);}
 template<class T> inline HASH Hash_Reduce(const VECTOR<T,3>& key){return HASH(key.x,key.y,key.z);}
 template<class T> inline HASH Hash_Reduce(const VECTOR<T,4>& key){return HASH(key[1],key[2],key[3],key[4]);}
-template<class T,int n> inline HASH Hash_Reduce(const VECTOR<T,n>& key){return HASH(key);}
+template<class T,int n> inline HASH Hash_Reduce(const VECTOR<T,n>& key)
+{
+    int i=1;int hash=key.Size()%2==0?HASH::missing_element_hash:Value(key(i++));
+    for(;i<=n-1;i+=2) hash=HASH::triple_int_hash(hash,key(i),key(i+1));
+    return HASH(hash);
+}
 template<class T1,class T2> inline HASH Hash_Reduce(const PAIR<T1,T2>& key){return HASH(key.x,key.y);}
 template<class T1,class T2,class T3> inline HASH Hash_Reduce(const TRIPLE<T1,T2,T3>& key){return HASH(key.x,key.y,key.z);}
 
