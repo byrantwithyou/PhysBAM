@@ -39,7 +39,7 @@ public:
 
 public:
 
-    NEO_HOOKEAN_EXTRAPOLATED_REFINED(const T youngs_modulus_input=3e6,const T poissons_ratio_input=.475,const T Rayleigh_coefficient=.05,const T extrapolation_cutoff=.3,const T corner_cutoff = .7,const T extra_force_coefficient=5e5);
+    NEO_HOOKEAN_EXTRAPOLATED_REFINED(const T youngs_modulus_input=3e6,const T poissons_ratio_input=.475,const T Rayleigh_coefficient=.05,const T extrapolation_cutoff=.4,const T corner_cutoff = .6,const T extra_force_coefficient=1e5);
     virtual ~NEO_HOOKEAN_EXTRAPOLATED_REFINED();
 
 public:
