@@ -214,8 +214,8 @@ template<class T,int m,int n> void Combine_Data(VOL_DATA<T,2,4>& data,const VOL_
     const int index_n[n])
 {
     data.V+=V.V;
-    for(int j=0;j<m;j++) data.G[index_m[j]]+=V.G[0]*data_m.G[j];
-    for(int j=0;j<n;j++) data.G[index_n[j]]+=V.G[1]*data_n.G[j];
+    for(int j=0;j<m;j++) data.G[index_m[j]]+=data_m.G[j].Transpose_Times(V.G[0]);
+    for(int j=0;j<n;j++) data.G[index_n[j]]+=data_n.G[j].Transpose_Times(V.G[1]);
 
     for(int j=0;j<m;j++)
         for(int s=0;s<m;s++)

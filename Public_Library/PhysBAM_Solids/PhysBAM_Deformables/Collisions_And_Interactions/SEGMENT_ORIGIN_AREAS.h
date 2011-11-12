@@ -19,6 +19,8 @@ struct VOL_DATA
     T V;
     VECTOR<T,m> G[n];
     MATRIX<T,m> H[n][n];
+
+    VOL_DATA(){V=0;}
 };
 
 template<class T,int m,int n> void Clear(VOL_DATA<T,m,n>& data);
