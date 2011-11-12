@@ -161,7 +161,7 @@ void Test_Triangualted_Areas()
     ta2=0;
 
     VOLUME_COLLISIONS<TV> vc;
-    vc.triangulated_areas.Append(ta1);
+    vc.objects.Append(ta1);
 
     trap_cases.Remove_All();
     vc.Compute_Collision_Triangles();
@@ -301,8 +301,9 @@ void Case_Test()
     }
 
     trap_cases.Remove_All();
-    SEGMENT_ORIGIN_AREAS::DATA<T,1,4> data;
-    SEGMENT_ORIGIN_AREAS::Area_From_Segments(data,a,b,c,d);
+    ORIGIN_AREAS::VOL_DATA<T,2,4> data;
+    TV ar[4]={a,b,c,d};
+    ORIGIN_AREAS::Volume_From_Simplices(data,ar);
 
     VECTOR<TV,6> G1;
     VECTOR<VECTOR<MATRIX<T,2>,6>,6> H1;
@@ -315,9 +316,9 @@ void Case_Test()
     MATRIX<T,8> M;
     for(int i=1;i<=12;i++) for(int j=1;j<=12;j++) M(ii[i],ii[j])=H1((i+1)/2)((j+1)/2)((i+1)%2+1,(j+1)%2+1);
     VECTOR<T,8>& W=(VECTOR<T,8>&)data.G;
-    MATRIX<T,8> N;for(int i=0;i<4;i++) for(int j=0;j<4;j++) N.Set_Submatrix(2*i+1,2*j+1,data.H[0][i][j]);
+    MATRIX<T,8> N;for(int i=0;i<4;i++) for(int j=0;j<4;j++) N.Set_Submatrix(2*i+1,2*j+1,data.H[i][j]);
 
-    printf("ERRORS: (case %i)  %.4f (%.4f)  %.4f (%.4f)  %.4f (%.4f)\n", (trap_cases.m?trap_cases(1):0), fabs(data.V.x-A1), fabs(A1), (W-V).Magnitude(), V.Magnitude(),
+    printf("ERRORS: (case %i)  %.4f (%.4f)  %.4f (%.4f)  %.4f (%.4f)\n", (trap_cases.m?trap_cases(1):0), fabs(data.V-A1), fabs(A1), (W-V).Magnitude(), V.Magnitude(),
         (M-N).Frobenius_Norm(),M.Frobenius_Norm());
     LOG::cout<<"Areas:  "<<data.V<<"   "<<A1<<std::endl;
     LOG::cout<<"Gradients: "<<W<<"    "<<V<<std::endl;
