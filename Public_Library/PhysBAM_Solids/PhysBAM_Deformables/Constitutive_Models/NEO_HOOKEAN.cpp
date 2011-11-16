@@ -132,7 +132,7 @@ Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC
 template<class T,int d> void NEO_HOOKEAN<T,d>::
 Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dPi_dF,const int tetrahedron) const
 {
-    DIAGONAL_MATRIX<T,3> F_inverse=F.Clamp_Min(failure_threshold).Inverse();
+    DIAGONAL_MATRIX<T,3> F_inverse=(F.Determinant()>=failure_threshold?F:Clamp_To_Hyperbola(F)).Inverse();
     T mu_minus_lambda_logJ=constant_mu+constant_lambda*log(F_inverse.Determinant());
     SYMMETRIC_MATRIX<T,3> F_inverse_outer=SYMMETRIC_MATRIX<T,3>::Outer_Product(F_inverse.To_Vector());
     dPi_dF.x1111=constant_mu+(constant_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x11;
