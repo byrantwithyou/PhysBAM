@@ -32,7 +32,7 @@ public:
                              const OPENGL_COLOR& vertex_color_input=OPENGL_COLOR::Red(),
                              const OPENGL_COLOR& segment_color_input=OPENGL_COLOR::Green(),
                              const OPENGL_COLOR& triangle_color_input=OPENGL_COLOR::Blue(),
-                             const OPENGL_COLOR& triangle_inverted_color_input=OPENGL_COLOR::Violet(0.5),
+                             const OPENGL_COLOR& triangle_inverted_color_input=OPENGL_COLOR::Violet(0.75),
                              ARRAY<OPENGL_COLOR>* color_map_input=0);
 
     void Display(const int in_color=1) const PHYSBAM_OVERRIDE;
