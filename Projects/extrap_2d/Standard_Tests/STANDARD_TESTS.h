@@ -1,5 +1,5 @@
 //#####################################################################
-// Copyright 2006-2007, Geoffrey Irving, Andrew Selle, Tamar Shinar, Eftychios Sifakis, Jonathan Su.
+// Copyright 2011.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 // Class STANDARD_TESTS
@@ -43,6 +43,8 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED_REFINED.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/ROTATED_LINEAR.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/FINITE_VOLUME.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/GRAVITY.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
@@ -60,22 +62,15 @@ class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,2>
 public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::solid_body_collection;
-    using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions;using BASE::solids_evolution; // silence -Woverloaded-virtual
+    using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions;using BASE::solids_evolution;
     using BASE::parse_args;using BASE::test_number;
 
     std::ofstream svout;
 
     SOLIDS_STANDARD_TESTS<TV> tests;
 
-    ARRAY<TV> deformable_body_rest_positions;
-
-    // test 1,2,3,4,5,6
     GRID<TV> mattress_grid;
     TV attachment_velocity;
-
-    VECTOR<int,2> processes_per_dimension;
-
-    ARRAY<int> segment_ramp_particles;
     bool semi_implicit;
     bool test_forces;
     bool use_extended_neohookean;
@@ -132,6 +127,7 @@ public:
     void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     void Add_External_Impulses_Before(ARRAY_VIEW<TV> V,const T time,const T dt) PHYSBAM_OVERRIDE {}
     void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) PHYSBAM_OVERRIDE {}
+    void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
 
 //#####################################################################
 // Function Register_Options
@@ -151,7 +147,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Double_Argument("-dampen",1,"","damping multiplier for various tests");
     parse_args->Add_Option_Argument("-residuals","print residuals during timestepping");
     parse_args->Add_Option_Argument("-print_energy","print energy statistics");
-    parse_args->Add_Double_Argument("-cgsolids",1e-2,"CG tolerance for backward Euler");
+    parse_args->Add_Double_Argument("-cgsolids",1e-3,"CG tolerance for backward Euler");
     parse_args->Add_Option_Argument("-use_be","use backward euler");
     parse_args->Add_Option_Argument("-print_matrix");
     parse_args->Add_Option_Argument("-project_nullspace","project out nullspace");
@@ -179,8 +175,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
             mattress_grid=GRID<TV>(20,10,(T)-1,(T)1,(T)-.5,(T).5);
     }
     
-    processes_per_dimension=VECTOR<int,2>(2,1);
-
     solids_parameters.triangle_collision_parameters.perform_self_collision=false;
     semi_implicit=parse_args->Is_Value_Set("-semi_implicit");
     test_forces=parse_args->Is_Value_Set("-test_forces");
@@ -207,7 +201,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=900;
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
-            attachment_velocity=TV((T).1,0);
             last_frame=1500;
             break;
         case 8: 
@@ -412,7 +405,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}
 
     if(solid_body_collection.deformable_body_collection.mpi_solids)
-        solid_body_collection.deformable_body_collection.mpi_solids->Simple_Partition(solid_body_collection.deformable_body_collection,solid_body_collection.rigid_body_collection.rigid_geometry_collection,particles.X,processes_per_dimension);
+        solid_body_collection.deformable_body_collection.mpi_solids->Simple_Partition(solid_body_collection.deformable_body_collection,solid_body_collection.rigid_body_collection.rigid_geometry_collection,particles.X,VECTOR<int,2>(2,1));
     solid_body_collection.Update_Simulated_Particles();
 
     if(parse_args->Is_Value_Set("-solver_iterations")) solids_parameters.implicit_solve_parameters.cg_iterations=parse_args->Get_Integer_Value("-solver_iterations");
@@ -530,18 +523,6 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
         int m=mattress_grid.counts.x;
 	int n=mattress_grid.counts.y;
         for(int j=1;j<=n;j++){V(1+m*(j-1))=TV();V(m+m*(j-1))=TV();}}
-}
-//#####################################################################
-// Function Set_External_Positions
-//#####################################################################
-void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE
-{
-    if(test_number!=1 && test_number!=2 && test_number!=3) return;
-    ARRAY<TV>& X_save=deformable_body_rest_positions;
-    int m=mattress_grid.counts.x;
-    for(int j=1;j<=mattress_grid.counts.y;j++){
-        X(1+m*(j-1))=X_save(1+m*(j-1))-time*attachment_velocity;
-        X(m+m*(j-1))=X_save(m+m*(j-1))+time*attachment_velocity;}
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Position_Nodes
