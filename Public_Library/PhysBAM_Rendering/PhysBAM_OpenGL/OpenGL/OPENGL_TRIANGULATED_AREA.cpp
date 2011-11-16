@@ -17,8 +17,8 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T> OPENGL_TRIANGULATED_AREA<T>::
 OPENGL_TRIANGULATED_AREA(TRIANGULATED_AREA<T>& triangulated_area_input,const bool draw_vertices_input,const OPENGL_COLOR& vertex_color_input,
-    const OPENGL_COLOR& segment_color_input,const OPENGL_COLOR& triangle_color_input,ARRAY<OPENGL_COLOR>* color_map_input)
-    :triangulated_area(triangulated_area_input),vertex_color(vertex_color_input),segment_color(segment_color_input),triangle_color(triangle_color_input),
+    const OPENGL_COLOR& segment_color_input,const OPENGL_COLOR& triangle_color_input,const OPENGL_COLOR& triangle_inverted_color_input,ARRAY<OPENGL_COLOR>* color_map_input)
+    :triangulated_area(triangulated_area_input),vertex_color(vertex_color_input),segment_color(segment_color_input),triangle_color(triangle_color_input),triangle_inverted_color(triangle_inverted_color_input),
     velocity_color(OPENGL_COLOR::Yellow()),current_selection(0),color_map(color_map_input),draw_vertices(draw_vertices_input),draw_velocities(false),velocity_scale(0.025)
 {}
 //#####################################################################
@@ -53,7 +53,6 @@ Display(const int in_color) const
         glEnable(GL_POLYGON_OFFSET_FILL);glEnable(GL_POLYGON_OFFSET_LINE);
         glPolygonOffset(0,2);
 #endif
-        triangle_color.Send_To_GL_Pipeline();
         Draw_Triangles();
 #ifndef USE_OPENGLES
         glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
@@ -282,11 +281,16 @@ template<class T> void OPENGL_TRIANGULATED_AREA<T>::
 Draw_Triangles(const bool use_color_map) const
 {
     ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
+    ARRAY<typename OPENGL_POLICY<T>::T_GL> inverted_vertices;
     for(int i=1;i<=triangulated_area.mesh.elements.m;i++){
         if(color_map && use_color_map) (*color_map)(i).Send_To_GL_Pipeline();
         int node1,node2,node3;triangulated_area.mesh.elements(i).Get(node1,node2,node3);
-        OpenGL_Triangle(triangulated_area.particles.X(node1),triangulated_area.particles.X(node2),triangulated_area.particles.X(node3),vertices);}
+        OpenGL_Triangle(triangulated_area.particles.X(node1),triangulated_area.particles.X(node2),triangulated_area.particles.X(node3),vertices);
+        OpenGL_Triangle(triangulated_area.particles.X(node2),triangulated_area.particles.X(node1),triangulated_area.particles.X(node3),inverted_vertices);}
+    if (use_color_map) triangle_color.Send_To_GL_Pipeline();
     OpenGL_Draw_Arrays(GL_TRIANGLES,2,vertices);
+    if (use_color_map) triangle_inverted_color.Send_To_GL_Pipeline();
+    OpenGL_Draw_Arrays(GL_TRIANGLES,2,inverted_vertices);
 }
 //#####################################################################
 // Function Draw_Triangles_For_Selection
