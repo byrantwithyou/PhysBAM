@@ -86,6 +86,7 @@ public:
     static OPENGL_COLOR Green(float g=1,float alpha=1) {return OPENGL_COLOR(0,g,0,alpha);}
     static OPENGL_COLOR Ground_Tan(float g=1,float alpha=1) {return OPENGL_COLOR(g*1,g*.775,g*.5431,alpha);}
     static OPENGL_COLOR Blue(float b=1,float alpha=1) {return OPENGL_COLOR(0,0,b,alpha);}
+    static OPENGL_COLOR Violet(float v=1,float alpha=1) {return OPENGL_COLOR(v,0,v,alpha);}
     static OPENGL_COLOR Yellow(float y=1,float alpha=1) {return OPENGL_COLOR(y,y,0,alpha);}
     static OPENGL_COLOR Cyan(float c=1,float alpha=1) {return OPENGL_COLOR(0,c,c,alpha);}
     static OPENGL_COLOR Magenta(float m=1,float alpha=1) {return OPENGL_COLOR(m,0,m,alpha);}
