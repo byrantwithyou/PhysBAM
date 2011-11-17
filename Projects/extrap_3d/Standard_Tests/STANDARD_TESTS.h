@@ -26,6 +26,7 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_COROTATED_BLEND.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED_REFINED.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED_HYPERBOLA.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/ROTATED_LINEAR.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/FINITE_VOLUME.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
@@ -54,6 +55,7 @@ public:
     bool test_forces;
     bool use_extended_neohookean;
     bool use_extended_neohookean_refined;
+    bool use_extended_neohookean_hyperbola;
     bool use_corotated;
     bool use_corot_blend;
     bool dump_sv;
@@ -112,6 +114,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Option_Argument("-test_forces","use fully implicit forces");
     parse_args->Add_Option_Argument("-use_ext_neo");
     parse_args->Add_Option_Argument("-use_ext_neo_ref");
+    parse_args->Add_Option_Argument("-use_ext_neo_hyper");
     parse_args->Add_Option_Argument("-use_corotated");
     parse_args->Add_Option_Argument("-use_corot_blend");
     parse_args->Add_Option_Argument("-dump_sv");
@@ -153,6 +156,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     test_forces=parse_args->Is_Value_Set("-test_forces");
     use_extended_neohookean=parse_args->Is_Value_Set("-use_ext_neo");
     use_extended_neohookean_refined=parse_args->Is_Value_Set("-use_ext_neo_ref");
+    use_extended_neohookean_refined=parse_args->Is_Value_Set("-use_ext_neo_hyper");
     use_corotated=parse_args->Is_Value_Set("-use_corotated");
     use_corot_blend=parse_args->Is_Value_Set("-use_corot_blend");
     dump_sv=parse_args->Is_Value_Set("-dump_sv");
@@ -278,6 +282,7 @@ void Add_Constitutive_Model(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,T 
     ISOTROPIC_CONSTITUTIVE_MODEL<T,3>* icm=0;
     if(use_extended_neohookean) icm=new NEO_HOOKEAN_EXTRAPOLATED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.4,20*stiffness*stiffness_multiplier);
     else if(use_extended_neohookean_refined) icm=new NEO_HOOKEAN_EXTRAPOLATED_REFINED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.4,.6,20*stiffness*stiffness_multiplier);
+    if(use_extended_neohookean_hyperbola) icm=new NEO_HOOKEAN_EXTRAPOLATED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.1);
     else if(use_corotated) icm=new COROTATED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
     else if(use_corot_blend) icm=new NEO_HOOKEAN_COROTATED_BLEND<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
     else icm=new NEO_HOOKEAN<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
