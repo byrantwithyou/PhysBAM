@@ -97,6 +97,7 @@ public:
 
     void Toggle_Active_Value();
     void Toggle_Draw_Interior();
+    void Toggle_Differentiate_Inverted();
     void Toggle_Draw_Subsets();
     void Toggle_Use_Active_List();
     void Toggle_Selection_Mode();
@@ -118,6 +119,7 @@ public:
 
     DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_3D,Toggle_Active_Value,"Toggle viewing of elements");
     DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_3D,Toggle_Draw_Interior,"Toggle view of interior elements for tetraheralized volumes");
+    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_3D,Toggle_Differentiate_Inverted,"Toggle use of different color for inverted tetrahera");
     DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_3D,Toggle_Draw_Subsets,"Toggle drawing of subset tets and particles for tetraheralized volumes");
     DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_3D,Toggle_Hide_Unselected,"Toggle drawing of the selected regions");
     DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_3D,Toggle_Use_Active_List,"Toggle drawing subset of the deformable objects in the list");

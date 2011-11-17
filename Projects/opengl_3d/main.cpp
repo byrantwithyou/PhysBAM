@@ -355,6 +355,7 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key('w',deformable_objects_component->Toggle_Selection_Mode_CB());
         opengl_world.Append_Bind_Key('h',deformable_objects_component->Toggle_Hide_Unselected_CB());
         opengl_world.Append_Bind_Key('b',deformable_objects_component->Toggle_Draw_Interior_CB());
+        opengl_world.Append_Bind_Key('I',deformable_objects_component->Toggle_Differentiate_Inverted_CB());
         opengl_world.Append_Bind_Key('t',deformable_objects_component->Toggle_Draw_Subsets_CB());
         opengl_world.Append_Bind_Key('e',deformable_objects_component->Cycle_Display_Mode_CB());
         opengl_world.Append_Bind_Key('i',deformable_objects_component->Cycle_Interaction_Pair_Display_Mode_CB());

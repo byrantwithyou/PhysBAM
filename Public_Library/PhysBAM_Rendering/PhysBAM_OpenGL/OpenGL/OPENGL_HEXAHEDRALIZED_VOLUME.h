@@ -19,6 +19,8 @@ class OPENGL_HEXAHEDRALIZED_VOLUME:public OPENGL_OBJECT
 {
 public:
     OPENGL_MATERIAL material;
+    OPENGL_MATERIAL inverted_material;
+    bool use_inverted_material;
     HEXAHEDRON_MESH* hexahedron_mesh;
     const GEOMETRY_PARTICLES<VECTOR<T,3> >* particles;
     int current_hexahedron;
@@ -28,23 +30,19 @@ public:
     ARRAY<VECTOR<T,3> > vectors_at_hex_centers;
     T vector_size;
 
-    OPENGL_HEXAHEDRALIZED_VOLUME(const OPENGL_MATERIAL& material_input)
-        :material(material_input),current_hexahedron(1),boundary_only(true),draw_subsets(false),vector_size((T).005)
-    {
-        Initialize();
-    }
-
-    OPENGL_HEXAHEDRALIZED_VOLUME(HEXAHEDRON_MESH* hexahedron_mesh_input,const GEOMETRY_PARTICLES<VECTOR<T,3> >* particles_input,const OPENGL_MATERIAL& material_input)
-        :material(material_input),hexahedron_mesh(hexahedron_mesh_input),particles(particles_input),current_hexahedron(1),boundary_only(true),draw_subsets(false),vector_size((T).005)
-    {
-        Initialize();
-    }
+    OPENGL_HEXAHEDRALIZED_VOLUME(const OPENGL_MATERIAL& material_input,const OPENGL_MATERIAL& inverted_material_input);
+    OPENGL_HEXAHEDRALIZED_VOLUME(HEXAHEDRON_MESH* hexahedron_mesh_input,const GEOMETRY_PARTICLES<VECTOR<T,3> >* particles_input,const OPENGL_MATERIAL& material_input,
+        const OPENGL_MATERIAL& inverted_material_input);
+    virtual ~OPENGL_HEXAHEDRALIZED_VOLUME();
 
     void Initialize()
     {if(!hexahedron_mesh->boundary_mesh) hexahedron_mesh->Initialize_Boundary_Mesh();}
 
     bool Toggle_Boundary_Only()
     {boundary_only=!boundary_only;return boundary_only;}
+
+    bool Toggle_Differentiate_Inverted()
+    {use_inverted_material=!use_inverted_material;return use_inverted_material;}
 
 //#####################################################################
     void Display(const int in_color=1) const PHYSBAM_OVERRIDE;

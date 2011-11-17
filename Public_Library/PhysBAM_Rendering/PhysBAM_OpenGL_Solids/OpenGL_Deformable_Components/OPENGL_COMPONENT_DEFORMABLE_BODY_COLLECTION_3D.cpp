@@ -111,7 +111,7 @@ Reinitialize(bool force,bool read_geometry)
                     OPENGL_MATERIAL::Matte(OPENGL_COLOR::Magenta(.5f)));
                 embedding->embedded_object.simplicial_object.mesh.Initialize_Neighbor_Nodes();
                 tetrahedralized_volume_objects(i)=new OPENGL_TETRAHEDRALIZED_VOLUME<T>(&embedding->embedded_object.simplicial_object.mesh,
-                    &deformable_body_collection.particles,OPENGL_MATERIAL::Matte(OPENGL_COLOR::Red()));}
+                    &deformable_body_collection.particles,OPENGL_MATERIAL::Matte(OPENGL_COLOR::Red()),OPENGL_MATERIAL::Matte(OPENGL_COLOR::Green()));}
             else if(EMBEDDING<TV>* embedding=dynamic_cast<EMBEDDING<TV>*>(structure)){
                 if(first_time) LOG::cout<<"object "<<i<<": embedding\n";
                 boundary_surface_objects(i)=new OPENGL_TRIANGULATED_SURFACE<T>(embedding->material_surface,false);

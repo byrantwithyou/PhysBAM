@@ -21,6 +21,8 @@ class OPENGL_TETRAHEDRALIZED_VOLUME:public OPENGL_OBJECT
     typedef VECTOR<T,3> TV;
 public:
     OPENGL_MATERIAL material;
+    OPENGL_MATERIAL inverted_material;
+    bool use_inverted_material;
     TETRAHEDRON_MESH* mesh;
     GEOMETRY_PARTICLES<VECTOR<T,3> >* particles;
     int current_tetrahedron;
@@ -43,23 +45,10 @@ protected:
     OPENGL_SELECTION* current_selection;
 public:
 
-    OPENGL_TETRAHEDRALIZED_VOLUME(const OPENGL_MATERIAL& material_input)
-        :material(material_input),mesh(0),particles(0),current_tetrahedron(1),current_node(1),current_boundary_triangle(1),boundary_only(true),
-        draw_subsets(false),cutaway_mode(0),cutaway_fraction((T).5),color_map(0),smooth_normals(false),vertex_normals(0),current_selection(0)
-    {
-        Initialize();
-    }
-
-    OPENGL_TETRAHEDRALIZED_VOLUME(TETRAHEDRON_MESH* mesh_input,GEOMETRY_PARTICLES<VECTOR<T,3> >* particles_input,const OPENGL_MATERIAL& material_input,bool initialize=true,
-        ARRAY<OPENGL_COLOR>* color_map_input=0)
-        :material(material_input),mesh(mesh_input),particles(particles_input),current_tetrahedron(1),current_node(1),current_boundary_triangle(1),boundary_only(true),
-        draw_subsets(false),cutaway_mode(0),cutaway_fraction((T).5),color_map(color_map_input),smooth_normals(false),vertex_normals(0),current_selection(0)
-    {
-        if(initialize)Initialize();
-    }
-
-    ~OPENGL_TETRAHEDRALIZED_VOLUME()
-    {delete vertex_normals;}
+    OPENGL_TETRAHEDRALIZED_VOLUME(const OPENGL_MATERIAL& material_input,const OPENGL_MATERIAL& inverted_material_input);
+    OPENGL_TETRAHEDRALIZED_VOLUME(TETRAHEDRON_MESH* mesh_input,GEOMETRY_PARTICLES<VECTOR<T,3> >* particles_input,const OPENGL_MATERIAL& material_input,
+        const OPENGL_MATERIAL& inverted_material_input,bool initialize=true,ARRAY<OPENGL_COLOR>* color_map_input=0);
+    ~OPENGL_TETRAHEDRALIZED_VOLUME();
 
     void Initialize()
     {if(!mesh->boundary_mesh) mesh->Initialize_Boundary_Mesh(); // Neighboring nodes is no longer initialized here to conserve memory.
@@ -101,6 +90,9 @@ public:
 
     void Increase_Cutaway_Fraction()
     {cutaway_fraction+=(T).05;if(cutaway_fraction>1)cutaway_fraction-=1;if(cutaway_mode)Update_Cutaway_Plane();}
+
+    bool Toggle_Differentiate_Inverted()
+    {use_inverted_material=!use_inverted_material;return use_inverted_material;}
 
 //#####################################################################
     void Draw_Boundary_Triangles(const TETRAHEDRON_MESH& tetrahedron_mesh) const;

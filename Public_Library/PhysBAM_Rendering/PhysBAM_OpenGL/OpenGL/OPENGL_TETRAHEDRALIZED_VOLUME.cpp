@@ -33,6 +33,37 @@ static VECTOR<int,4> Spring_Nodes(unsigned char pair_id,const VECTOR<int,4>& n)
 }
 }
 //#####################################################################
+// Constructor
+//#####################################################################
+template<class T> OPENGL_TETRAHEDRALIZED_VOLUME<T>::
+OPENGL_TETRAHEDRALIZED_VOLUME(const OPENGL_MATERIAL& material_input,const OPENGL_MATERIAL& inverted_material_input)
+    :material(material_input),inverted_material(inverted_material_input),use_inverted_material(false),mesh(0),particles(0),current_tetrahedron(1),current_node(1),
+    current_boundary_triangle(1),boundary_only(true),draw_subsets(false),cutaway_mode(0),cutaway_fraction((T).5),color_map(0),smooth_normals(false),
+    vertex_normals(0),current_selection(0)
+{
+    Initialize();
+}
+//#####################################################################
+// Constructor
+//#####################################################################
+template<class T> OPENGL_TETRAHEDRALIZED_VOLUME<T>::
+OPENGL_TETRAHEDRALIZED_VOLUME(TETRAHEDRON_MESH* mesh_input,GEOMETRY_PARTICLES<VECTOR<T,3> >* particles_input,const OPENGL_MATERIAL& material_input,
+    const OPENGL_MATERIAL& inverted_material_input,bool initialize,ARRAY<OPENGL_COLOR>* color_map_input)
+    :material(material_input),inverted_material(inverted_material_input),mesh(mesh_input),particles(particles_input),current_tetrahedron(1),current_node(1),
+    current_boundary_triangle(1),boundary_only(true),draw_subsets(false),cutaway_mode(0),cutaway_fraction((T).5),color_map(color_map_input),smooth_normals(false),
+    vertex_normals(0),current_selection(0)
+{
+    if(initialize)Initialize();
+}
+//#####################################################################
+// Destructor
+//#####################################################################
+template<class T> OPENGL_TETRAHEDRALIZED_VOLUME<T>::
+~OPENGL_TETRAHEDRALIZED_VOLUME()
+{
+    delete vertex_normals;
+}
+//#####################################################################
 // Function Display_In_Color
 //#####################################################################
 template<class T> void OPENGL_TETRAHEDRALIZED_VOLUME<T>::
@@ -99,6 +130,9 @@ Display(const int in_color) const
                     OpenGL_Draw_Arrays(GL_LINES,3,vertices);
                     glPopAttrib();}}}}
     glPopMatrix();
+
+    glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,0);
+    glEnable(GL_CULL_FACE);
 }
 //#####################################################################
 // Function Find_Shortest_Spring
@@ -372,7 +406,13 @@ Draw_In_Color_From_Color_Map() const
 template<class T> void OPENGL_TETRAHEDRALIZED_VOLUME<T>::
 Draw_Boundary_Triangles(const TETRAHEDRON_MESH& tetrahedron_mesh) const
 {
-    material.Send_To_GL_Pipeline();
+    if(use_inverted_material){
+        glDisable(GL_CULL_FACE);
+        glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, 1);
+        material.Send_To_GL_Pipeline(GL_FRONT);
+        inverted_material.Send_To_GL_Pipeline(GL_BACK);}
+    else material.Send_To_GL_Pipeline();
+
     ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> normals;
     if(smooth_normals)
         for(int t=1;t<=tetrahedron_mesh.boundary_mesh->elements.m;t++){
@@ -387,6 +427,10 @@ Draw_Boundary_Triangles(const TETRAHEDRON_MESH& tetrahedron_mesh) const
             for(int plane_vertices=1;plane_vertices<=3;plane_vertices++) OpenGL_Normal(TRIANGLE_3D<T>::Normal(xi,xj,xk),normals);
             OpenGL_Triangle(xi,xj,xk,vertices);}
     OpenGL_Draw_Arrays_With_Normals(GL_TRIANGLES,3,vertices,normals);
+
+    if(use_inverted_material){
+        glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,0);
+        glEnable(GL_CULL_FACE);}
 }
 //#####################################################################
 // Function Highlight_Current_Boundary_Triangle
@@ -640,6 +684,9 @@ Bounding_Box() const
     const OPENGL_TETRAHEDRALIZED_VOLUME<T>& volume=dynamic_cast<OPENGL_TETRAHEDRALIZED_VOLUME<T>&>(*object);
     return object->World_Space_Box(RANGE<VECTOR<float,3> >(VECTOR<float,3>(volume.particles->X(index))));
 }
+//#####################################################################
+// Function Bounding_Box
+//#####################################################################
 template<class T> RANGE<VECTOR<float,3> > OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_TETRAHEDRON<T>::
 Bounding_Box() const
 {

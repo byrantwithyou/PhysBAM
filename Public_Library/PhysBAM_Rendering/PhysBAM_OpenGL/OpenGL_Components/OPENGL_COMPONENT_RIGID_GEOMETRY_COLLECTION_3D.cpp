@@ -283,7 +283,7 @@ Create_Geometry(const int id)
     if(tetrahedralized_volume && !opengl_tetrahedralized_volume(id)){
         tetrahedralized_volume->mesh.Initialize_Triangle_Mesh();
         opengl_tetrahedralized_volume(id)=new OPENGL_TETRAHEDRALIZED_VOLUME<T>(&tetrahedralized_volume->mesh,&tetrahedralized_volume->particles,
-            OPENGL_MATERIAL::Metal(OPENGL_COLOR::Magenta(1,1)),true);
+            OPENGL_MATERIAL::Metal(OPENGL_COLOR::Magenta(1,1)),OPENGL_MATERIAL::Metal(OPENGL_COLOR::Yellow(1,1)),true);
         opengl_tetrahedralized_volume(id)->Enslave_Transform_To(*opengl_axes(id));}
 
     // add implicit object

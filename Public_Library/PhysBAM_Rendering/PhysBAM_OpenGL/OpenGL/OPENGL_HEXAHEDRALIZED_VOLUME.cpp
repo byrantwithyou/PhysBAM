@@ -10,6 +10,33 @@
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_SHAPES.h>
 using namespace PhysBAM;
 //#####################################################################
+// Constructor
+//#####################################################################
+template<class T> OPENGL_HEXAHEDRALIZED_VOLUME<T>::
+OPENGL_HEXAHEDRALIZED_VOLUME(const OPENGL_MATERIAL& material_input,const OPENGL_MATERIAL& inverted_material_input)
+    :material(material_input),inverted_material(inverted_material_input),current_hexahedron(1),boundary_only(true),draw_subsets(false),vector_size((T).005)
+{
+    Initialize();
+}
+//#####################################################################
+// Constructor
+//#####################################################################
+template<class T> OPENGL_HEXAHEDRALIZED_VOLUME<T>::
+OPENGL_HEXAHEDRALIZED_VOLUME(HEXAHEDRON_MESH* hexahedron_mesh_input,const GEOMETRY_PARTICLES<VECTOR<T,3> >* particles_input,const OPENGL_MATERIAL& material_input,
+    const OPENGL_MATERIAL& inverted_material_input)
+    :material(material_input),inverted_material(inverted_material_input),hexahedron_mesh(hexahedron_mesh_input),particles(particles_input),current_hexahedron(1),
+    boundary_only(true),draw_subsets(false),vector_size((T).005)
+{
+    Initialize();
+}
+//#####################################################################
+// Destructor
+//#####################################################################
+template<class T> OPENGL_HEXAHEDRALIZED_VOLUME<T>::
+~OPENGL_HEXAHEDRALIZED_VOLUME()
+{
+}
+//#####################################################################
 // Function Display
 //#####################################################################
 template<class T> void OPENGL_HEXAHEDRALIZED_VOLUME<T>::
@@ -78,7 +105,12 @@ template<class T> void OPENGL_HEXAHEDRALIZED_VOLUME<T>::
 Draw_Boundary_Triangles(const HEXAHEDRON_MESH& hexahedron_mesh) const
 {   
     TRIANGLE_MESH& mesh=*hexahedron_mesh.boundary_mesh;
-    material.Send_To_GL_Pipeline();
+    if(use_inverted_material){
+        glDisable(GL_CULL_FACE);
+        glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, 1);
+        material.Send_To_GL_Pipeline(GL_FRONT);
+        inverted_material.Send_To_GL_Pipeline(GL_BACK);}
+    else material.Send_To_GL_Pipeline();
     ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
     ARRAY<GLfloat> normals;
     for(int t=1;t<=mesh.elements.m;t++){
@@ -87,6 +119,9 @@ Draw_Boundary_Triangles(const HEXAHEDRON_MESH& hexahedron_mesh) const
         for(int plane_vertices=1;plane_vertices<=3;plane_vertices++) OpenGL_Normal(TRIANGLE_3D<T>::Normal(xi,xj,xk),normals);
         OpenGL_Triangle(xi,xj,xk,vertices);}
     OpenGL_Draw_Arrays_With_Normals(GL_TRIANGLES,3,vertices,normals);
+    if(use_inverted_material){
+        glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,0);
+        glEnable(GL_CULL_FACE);}
 }
 //#####################################################################
 // Function Bounding_Box

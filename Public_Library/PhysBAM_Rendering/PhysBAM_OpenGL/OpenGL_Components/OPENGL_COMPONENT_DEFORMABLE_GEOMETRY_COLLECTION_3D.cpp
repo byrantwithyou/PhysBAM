@@ -129,11 +129,11 @@ Reinitialize(bool force,bool read_geometry)
             else if(TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(structure)){
                 if(first_time) LOG::cout<<"object "<<i<<": tetrahedralized_volume, range = "<<ARRAYS_COMPUTATIONS::Min(tetrahedralized_volume->mesh.elements.Flattened())<<" "<<ARRAYS_COMPUTATIONS::Max(tetrahedralized_volume->mesh.elements.Flattened())<<"\n";
                 tetrahedralized_volume_objects(i)=new OPENGL_TETRAHEDRALIZED_VOLUME<T>(&tetrahedralized_volume->mesh,&(deformable_geometry->particles),
-                    OPENGL_MATERIAL::Metal(OPENGL_COLOR::Red(.7f)));}
+                    OPENGL_MATERIAL::Metal(OPENGL_COLOR::Red(.7f)),OPENGL_MATERIAL::Metal(OPENGL_COLOR::Green(.7f)));}
             else if(HEXAHEDRALIZED_VOLUME<T>* hexahedralized_volume=dynamic_cast<HEXAHEDRALIZED_VOLUME<T>*>(structure)){
                 if(first_time) LOG::cout<<"object "<<i<<": hexahedralized_volume\n";
                 hexahedralized_volume_objects(i)=new OPENGL_HEXAHEDRALIZED_VOLUME<T>(&hexahedralized_volume->mesh,&(deformable_geometry->particles),
-                    OPENGL_MATERIAL::Matte(OPENGL_COLOR::Red()));}
+                    OPENGL_MATERIAL::Matte(OPENGL_COLOR::Red()),OPENGL_MATERIAL::Matte(OPENGL_COLOR::Green()));}
             else if(FREE_PARTICLES<TV>* fp=dynamic_cast<FREE_PARTICLES<TV>*>(structure)){
                 free_particles_indirect_arrays(i)=new INDIRECT_ARRAY<ARRAY_VIEW<TV> >(deformable_geometry->particles.X,fp->nodes);
                 free_particles_objects(i)=new OPENGL_FREE_PARTICLES<TV>(*deformable_geometry,*free_particles_indirect_arrays(i),color_map->Lookup(color_map_index--));}
@@ -615,6 +615,15 @@ Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION* old_selection,b
 {
     if(old_selection && old_selection->object==this && invalidate_deformable_objects_selection_each_frame) delete_selection=true;
     return 0;
+}
+//#####################################################################
+// Function Toggle_Differentiate_Inverted
+//#####################################################################
+template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_3D<T,RW>::
+Toggle_Differentiate_Inverted()
+{
+    for(int i=1;i<=tetrahedralized_volume_objects.m;i++) if(tetrahedralized_volume_objects(i) && active_list(i)) tetrahedralized_volume_objects(i)->Toggle_Differentiate_Inverted();
+    for(int i=1;i<=hexahedralized_volume_objects.m;i++) if(hexahedralized_volume_objects(i) && active_list(i)) hexahedralized_volume_objects(i)->Toggle_Differentiate_Inverted();
 }
 //#####################################################################
 template class OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_3D<float,float>;
