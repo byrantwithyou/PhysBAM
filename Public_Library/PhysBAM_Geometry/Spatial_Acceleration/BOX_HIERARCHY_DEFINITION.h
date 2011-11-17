@@ -3,7 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Geometry/Spatial_Acceleration/BOX_HIERARCHY.h>
-using namespace PhysBAM;
+namespace PhysBAM{
 //#####################################################################
 // Function Intersection_List
 //#####################################################################
@@ -79,4 +79,4 @@ Intersection_List(T_VISITOR& visitor) const
     stack.Exchange(traversal_stack); // release stack ownership
 }
 //#####################################################################
-
+}

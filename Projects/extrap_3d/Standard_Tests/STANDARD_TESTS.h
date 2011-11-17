@@ -9,6 +9,7 @@
 //    3. Maggot free falling to the ground
 //    4. Large armadillo caving in on itself
 //    5. Deformable ball falling on a rigid ball
+//    6. Precursor to a smash test
 //    8. Falling mattress
 //   17. Matress, no gravity, random start
 //   18. Matress, no gravity, point start
@@ -120,8 +121,8 @@ public:
     // void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
     void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
-    bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) PHYSBAM_OVERRIDE {return true;}
-    void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) PHYSBAM_OVERRIDE {}
+  //  bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) PHYSBAM_OVERRIDE {return true;}
+   // void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) PHYSBAM_OVERRIDE {}
 
 //#####################################################################
 // Function Register_Options
@@ -217,6 +218,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             last_frame=1000;
             break;
         case 5:
+        case 6:
             frame_rate=60;
             last_frame=(int)(3*frame_rate);
             solids_parameters.cfl=(T)5.9;
@@ -252,6 +254,7 @@ void Get_Initial_Data()
     PARTICLES<TV>& particles=deformable_body_collection.particles;
     BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
+    RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
 
     T density=TV::dimension==1?1:TV::dimension==2?100:1000;
     switch(test_number){
@@ -287,14 +290,30 @@ void Get_Initial_Data()
             tests.Create_Mattress(mattress_grid,true,0);
             break;}
         case 5:{
-            //tests.Create_Cloth_Panel(number_side_panels,side_length,aspect_ratio,RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T).7,0))));
             RIGID_BODY<TV>& tmp_sphere=tests.Add_Rigid_Body("sphere",(T)1.0,(T).5);
+            //RIGID_BODY<TV>& tmp_sphere=tests.Add_Analytic_Box(TV(1,1,1));
             tmp_sphere.X()=TV(0,(T).25,0);
             tmp_sphere.is_static=true;
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(.3,(T)6,0))),true,true,density,.5);
             tests.Add_Ground();            
             break;}
-    
+        case 6:{
+            //RIGID_BODY<TV>& tmp_sphere=tests.Add_Rigid_Body("sphere",(T)1.0,(T).5);
+            RIGID_BODY<TV>& bottom_box=tests.Add_Analytic_Box(TV(1,1,1));
+            RIGID_BODY<TV>& top_box=tests.Add_Analytic_Box(TV(1,1,1));
+            bottom_box.X()=TV(0,(T)0,0);
+            top_box.X()=TV(0,(T)2,0);
+            bottom_box.is_static=true;
+            top_box.is_static=false;
+            kinematic_id=top_box.particle_index;
+            rigid_body_collection.rigid_body_particle.kinematic(top_box.particle_index)=true;
+            curve.Add_Control_Point(0,FRAME<TV>(TV(0,(T)2,0)));
+            curve.Add_Control_Point(1,FRAME<TV>(TV(0,(T)1,0)));
+            curve.Add_Control_Point(2,FRAME<TV>(TV(0,(T)1,0)));
+            curve.Add_Control_Point(3,FRAME<TV>(TV(0,(T)2,0)));
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)1,0))),true,true,density,.4);
+            tests.Add_Ground();     
+            break;}
         default:
             LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
 
@@ -318,7 +337,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     PARTICLES<TV>& particles=deformable_body_collection.particles;
-
+    
     Get_Initial_Data();
 
     switch(test_number){
@@ -326,7 +345,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 2:
         case 3:
         case 8:
-        case 5:{
+        case 5:
+        case 6:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             Add_Constitutive_Model(tetrahedralized_volume,(T)1e5,(T).45,(T).01);
@@ -370,6 +390,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         solid_body_collection.rigid_body_collection.rigids_forces(i)->use_implicit_velocity_independent_forces=true;
     if(!semi_implicit) for(int i=1;i<=deformable_body_collection.deformables_forces.m;i++) deformable_body_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=true;
 }
+
 //#####################################################################
 // Function Set_External_Velocities
 //#####################################################################
@@ -472,6 +493,21 @@ void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 {
     dynamic_cast<NEWMARK_EVOLUTION<TV>&>(*solids_evolution).print_matrix=print_matrix;
 }
+//#####################################################################
+// Function Set_Kinematic_Positions
+//#####################################################################
+void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id)
+{
+    if(id==kinematic_id) frame=curve.Value(time);
+}
+//#####################################################################
+// Function Set_Kinematic_Velocities
+//#####################################################################
+bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id)
+{
+    if(id==kinematic_id) twist=curve.Derivative(time);
+    return false;
+}  
 //#####################################################################
 // Function Preprocess_Substep
 //#####################################################################
