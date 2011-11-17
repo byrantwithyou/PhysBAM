@@ -210,8 +210,10 @@ template<class T,class TV> void PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(VOL
     for(int i=0;i<4;i++) for(int k=0;k<4;k++) data.H[index[i]][index[k]]=sign*tdata.H[i][k];
 }
 
-template<class T,int m,int n> void Combine_Data(VOL_DATA<T,2,4>& data,const VOL_DATA<T,2,2>& V,const DATA<T,2,m>& data_m,const DATA<T,2,n>& data_n,const int index_m[m],
-    const int index_n[n])
+//template<class T,int m,int n> void Combine_Data(VOL_DATA<T,2,4>& data,const VOL_DATA<T,2,2>& V,const DATA<T,2,m>& data_m,const DATA<T,2,n>& data_n,const int index_m[m],
+//    const int index_n[n])
+template<class T,int m,int n> void Combine_Data(VOL_DATA<T,2,4>& data,const VOL_DATA<T,2,2>& V,const DATA<T,2,m>& data_m,const DATA<T,2,n>& data_n,const int* index_m,
+    const int* index_n)
 {
     data.V+=V.V;
     for(int j=0;j<m;j++) data.G[index_m[j]]+=data_m.G[j].Transpose_Times(V.G[0]);
