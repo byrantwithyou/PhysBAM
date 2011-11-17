@@ -12,6 +12,7 @@
 //    8. Falling mattress
 //   17. Matress, no gravity, random start
 //   18. Matress, no gravity, point start
+//   24. Big 6 sides stretch
 //   25. Big 8 corners stretch
 //#####################################################################
 #ifndef __STANDARD_TESTS__
@@ -156,7 +157,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     frame_rate=24;
 
     switch(test_number){
-        case 17: case 18: case 25:
+        case 17: case 18: case 24: case 25:
             mattress_grid=GRID<TV>(10,10,10,(T)-1,(T)1,(T)-1,(T)1,(T)-1,(T)1);
             break;
     	default:
@@ -197,6 +198,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.triangle_collision_parameters.perform_self_collision=false;
             solids_parameters.cfl=(T)5;
             break;
+        case 24:
         case 25:
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=900;
@@ -269,6 +271,7 @@ void Get_Initial_Data()
             break;}
         case 17:
         case 18:
+        case 24:
         case 25:{
             tests.Create_Mattress(mattress_grid,true,0);
             break;}
@@ -334,6 +337,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             RANDOM_NUMBERS<T> rand;
             rand.Fill_Uniform(particles.X,-0,0);
             break;}         
+        case 24:
         case 25:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             Add_Constitutive_Model(tetrahedralized_volume,(T)1e5,(T).45,(T).01);
@@ -371,7 +375,17 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
         V((mn-1)*n*m+1)=         velocity_time<final_time?TV(-velocity,-velocity,velocity):TV();
         V((mn-1)*n*m+m)=         velocity_time<final_time?TV( velocity,-velocity,velocity):TV();
         V((mn-1)*n*m+m*(n-1)+1)= velocity_time<final_time?TV(-velocity, velocity,velocity):TV();
-        V(mn*n*m)=               velocity_time<final_time?TV( velocity, velocity,velocity):TV();}
+        V(mn*n*m)=               velocity_time<final_time?TV( velocity, velocity,velocity):TV();
+    }
+    else if(test_number==24){
+        int m=mattress_grid.counts.x;
+	int n=mattress_grid.counts.y;
+	int mn=mattress_grid.counts.z;
+        T velocity=.2;
+        T final_time=50;
+        TV velocity_z = velocity_time<final_time?TV(0,0,velocity):TV();
+        for(int i=m/3+1;i<=2*m/3+1;i++)for(int j=n/3+1;j<=2*n/3+1;j++){V(i+m*(j-1))=-velocity_z;V(i+m*(j-1)+(mn-1)*m*n)=velocity_z;}
+    }
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes
@@ -389,7 +403,14 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
         V((mn-1)*n*m+1)=TV();
         V((mn-1)*n*m+m)=TV();
         V((mn-1)*n*m+m*(n-1)+1)=TV();
-        V(mn*n*m)=TV();}
+        V(mn*n*m)=TV();
+    }
+    else if(test_number==24){
+        int m=mattress_grid.counts.x;
+	int n=mattress_grid.counts.y;
+	int mn=mattress_grid.counts.z;
+        for(int i=m/3+1;i<=2*m/3+1;i++)for(int j=n/3+1;j<=2*n/3+1;j++){V(i+m*(j-1))=TV();V(i+m*(j-1)+(mn-1)*m*n)=TV();}
+    }
 }
 //#####################################################################
 // Function Read_Output_Files_Solids
