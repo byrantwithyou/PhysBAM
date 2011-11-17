@@ -7,6 +7,7 @@
 //   1. Sphere free falling to the ground
 //   2. Torus free falling to the ground
 //   3. Maggot free falling to the ground
+//   8. Falling mattress
 //#####################################################################
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
@@ -50,7 +51,8 @@ public:
     using BASE::stream_type;using BASE::solids_evolution;using BASE::parse_args;using BASE::test_number;using BASE::data_directory;
 
     SOLIDS_STANDARD_TESTS<TV> tests;
-
+    
+    GRID<TV> mattress_grid;
     bool semi_implicit;
     bool test_forces;
     bool use_extended_neohookean;
@@ -138,10 +140,13 @@ void Parse_Options() PHYSBAM_OVERRIDE
     output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d",test_number);
     frame_rate=24;
 
-    print_matrix=parse_args->Is_Value_Set("-print_matrix");
-    
-    parameter=parse_args->Get_Integer_Value("-parameter");
+    switch(test_number){
+    	default:
+            mattress_grid=GRID<TV>(20,10,20,(T)-1,(T)1,(T)-.5,(T).5,(T)-1,(T)1);
+    }
 
+    print_matrix=parse_args->Is_Value_Set("-print_matrix");
+    parameter=parse_args->Get_Integer_Value("-parameter");
     solids_parameters.use_trapezoidal_rule_for_velocities=!parse_args->Get_Option_Value("-use_be");
     solids_parameters.use_rigid_deformable_contact=false;
     solid_body_collection.deformable_body_collection.soft_bindings.use_gauss_seidel_for_impulse_based_collisions=true;
@@ -166,6 +171,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 1:
         case 2:
         case 3:
+        case 8:
             solids_parameters.triangle_collision_parameters.perform_self_collision=false;
             solids_parameters.cfl=(T)5;
             break;
@@ -204,6 +210,11 @@ void Get_Initial_Data()
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/maggot_8K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,true,density);
             tests.Add_Ground();
             break;}
+        case 8:{
+            RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,4,0)));
+            tests.Create_Mattress(mattress_grid,true,&initial_state);
+            tests.Add_Ground();
+            break;}
         default:
             LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
 
@@ -233,7 +244,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     switch(test_number){
         case 1:
         case 2:
-        case 3:{
+        case 3:
+        case 8:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             Add_Constitutive_Model(tetrahedralized_volume,(T)2e5,(T).45,(T).01);
