@@ -4,10 +4,11 @@
 //#####################################################################
 // Class STANDARD_TESTS
 //#####################################################################
-//   1. Sphere free falling to the ground
-//   2. Torus free falling to the ground
-//   3. Maggot free falling to the ground
-//   8. Falling mattress
+//    1. Sphere free falling to the ground
+//    2. Torus free falling to the ground
+//    3. Maggot free falling to the ground
+//    8. Falling mattress
+//   17. Matress, no gravity, random start
 //#####################################################################
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
@@ -141,6 +142,9 @@ void Parse_Options() PHYSBAM_OVERRIDE
     frame_rate=24;
 
     switch(test_number){
+        case 17:
+            mattress_grid=GRID<TV>(10,10,10,(T)-1,(T)1,(T)-1,(T)1,(T)-1,(T)1);
+            break;
     	default:
             mattress_grid=GRID<TV>(20,10,20,(T)-1,(T)1,(T)-.5,(T).5,(T)-1,(T)1);
     }
@@ -172,6 +176,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 2:
         case 3:
         case 8:
+        case 17:
             solids_parameters.triangle_collision_parameters.perform_self_collision=false;
             solids_parameters.cfl=(T)5;
             break;
@@ -215,6 +220,9 @@ void Get_Initial_Data()
             tests.Create_Mattress(mattress_grid,true,&initial_state);
             tests.Add_Ground();
             break;}
+        case 17:{
+            tests.Create_Mattress(mattress_grid,true,0);
+            break;}
         default:
             LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
 
@@ -248,7 +256,13 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 8:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
-            Add_Constitutive_Model(tetrahedralized_volume,(T)2e5,(T).45,(T).01);
+            Add_Constitutive_Model(tetrahedralized_volume,(T)1e5,(T).45,(T).01);
+            break;}
+        case 17:{
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+            Add_Constitutive_Model(tetrahedralized_volume,(T)1e5,(T).45,(T).01);
+            RANDOM_NUMBERS<T> rand;
+            rand.Fill_Uniform(particles.X,-1,1);
             break;}
         default:
             LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}
