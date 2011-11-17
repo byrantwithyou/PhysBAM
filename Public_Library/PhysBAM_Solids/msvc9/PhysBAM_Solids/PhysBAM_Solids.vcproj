@@ -279,6 +279,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\PhysBAM_Deformables\Collisions_And_Interactions\SEGMENT_ORIGIN_AREAS.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\PhysBAM_Deformables\Collisions_And_Interactions\SEGMENT_ORIGIN_AREAS.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\PhysBAM_Deformables\Collisions_And_Interactions\SIMPLEX_INTERACTIONS.cpp"
 					>
 				</File>
@@ -300,6 +308,14 @@
 				</File>
 				<File
 					RelativePath="..\..\PhysBAM_Deformables\Collisions_And_Interactions\TETRAHEDRON_COLLISION_BODY.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\PhysBAM_Deformables\Collisions_And_Interactions\TRAPEZOID_INTERSECTION.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\PhysBAM_Deformables\Collisions_And_Interactions\TRAPEZOID_INTERSECTION.h"
 					>
 				</File>
 				<File
@@ -335,6 +351,22 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\PhysBAM_Deformables\Collisions_And_Interactions\TRIANGLE_INTERSECTION.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\PhysBAM_Deformables\Collisions_And_Interactions\TRIANGLE_INTERSECTION.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\PhysBAM_Deformables\Collisions_And_Interactions\TRIANGLE_ORIGIN_AREAS.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\PhysBAM_Deformables\Collisions_And_Interactions\TRIANGLE_ORIGIN_AREAS.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\PhysBAM_Deformables\Collisions_And_Interactions\TRIANGLE_REPULSIONS.cpp"
 					>
 				</File>
@@ -364,6 +396,14 @@
 				</File>
 				<File
 					RelativePath="..\..\PhysBAM_Deformables\Collisions_And_Interactions\TRIANGLE_REPULSIONS_POINT_FACE_VISITOR.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\PhysBAM_Deformables\Collisions_And_Interactions\VOLUME_COLLISIONS.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\PhysBAM_Deformables\Collisions_And_Interactions\VOLUME_COLLISIONS.h"
 					>
 				</File>
 			</Filter>
@@ -588,6 +628,14 @@
 				</File>
 				<File
 					RelativePath="..\..\PhysBAM_Deformables\Forces\BW_STRETCH_FORCES.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\PhysBAM_Deformables\Forces\COLLISION_AREA_PENALTY_FORCE.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\PhysBAM_Deformables\Forces\COLLISION_AREA_PENALTY_FORCE.h"
 					>
 				</File>
 				<File
