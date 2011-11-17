@@ -179,6 +179,9 @@ void Parse_Options() PHYSBAM_OVERRIDE
     solids_parameters.triangle_collision_parameters.use_gauss_jacobi=true;
     solids_parameters.triangle_collision_parameters.repulsions_limiter_fraction=1;
     solids_parameters.triangle_collision_parameters.collisions_final_repulsion_limiter_fraction=.1;
+    solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+    solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=false;
+    solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=false;
     stiffness_multiplier=(T)parse_args->Get_Double_Value("-stiffen");
     damping_multiplier=(T)parse_args->Get_Double_Value("-dampen");
     test_forces=parse_args->Is_Value_Set("-test_forces");
@@ -201,7 +204,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 8:
         case 17:
         case 18:
-            solids_parameters.triangle_collision_parameters.perform_self_collision=false;
             solids_parameters.cfl=(T)5;
             break;
         case 24:
@@ -220,7 +222,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.cfl=(T)5.9;
             solids_parameters.implicit_solve_parameters.cg_iterations=300;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
-            solids_parameters.triangle_collision_parameters.perform_self_collision=false;
             break;
         case 48:
             frame_rate=24;
@@ -232,7 +233,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
             number_side_panels=2;
             solids_parameters.cfl=(T)1;
             solids_parameters.implicit_solve_parameters.throw_exception_on_backward_euler_failure=false;
-            solids_parameters.triangle_collision_parameters.perform_self_collision=false;
             break;    
         default:
             LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
