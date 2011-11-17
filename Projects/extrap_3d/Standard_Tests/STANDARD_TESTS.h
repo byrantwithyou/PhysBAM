@@ -7,6 +7,8 @@
 //    1. Sphere free falling to the ground
 //    2. Torus free falling to the ground
 //    3. Maggot free falling to the ground
+//    4. Large armadillo caving in on itself
+//    5. Deformable ball falling on a rigid ball
 //    8. Falling mattress
 //   17. Matress, no gravity, random start
 //#####################################################################
@@ -14,6 +16,8 @@
 #define __STANDARD_TESTS__
 
 #include <PhysBAM_Tools/Interpolation/INTERPOLATION_CURVE.h>
+#include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <PhysBAM_Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
@@ -69,6 +73,11 @@ public:
     int parameter;
     T stiffness_multiplier;
     T damping_multiplier;
+    
+    // Came from Test 48
+    int number_side_panels;
+    T aspect_ratio,side_length;
+    T bending_stiffness_multiplier,bending_damping_multiplier,planar_damping_multiplier,axial_bending_stiffness_multiplier,axial_bending_damping_multiplier;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),semi_implicit(false),test_forces(false),use_extended_neohookean(false),
@@ -179,11 +188,32 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 1:
         case 2:
         case 3:
+        case 4:
         case 8:
         case 17:
             solids_parameters.triangle_collision_parameters.perform_self_collision=false;
             solids_parameters.cfl=(T)5;
             break;
+        case 5:
+            frame_rate=60;
+            last_frame=(int)(3*frame_rate);
+            solids_parameters.cfl=(T)5.9;
+            solids_parameters.implicit_solve_parameters.cg_iterations=300;
+            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
+            solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+            break;
+        case 48:
+            frame_rate=24;
+            solids_parameters.implicit_solve_parameters.cg_iterations=600;
+            solids_parameters.implicit_solve_parameters.cg_tolerance=(T).01;
+            last_frame=200;//(int)(200*frame_rate);
+            aspect_ratio=1;
+            side_length=(T)1;
+            number_side_panels=2;
+            solids_parameters.cfl=(T)1;
+            solids_parameters.implicit_solve_parameters.throw_exception_on_backward_euler_failure=false;
+            solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+            break;    
         default:
             LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
 
@@ -219,6 +249,10 @@ void Get_Initial_Data()
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/maggot_8K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,true,density);
             tests.Add_Ground();
             break;}
+        case 4:{
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_20K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)80,0))),true,true,density);
+            tests.Add_Ground();
+            break;}
         case 8:{
             RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,4,0)));
             tests.Create_Mattress(mattress_grid,true,&initial_state);
@@ -227,6 +261,15 @@ void Get_Initial_Data()
         case 17:{
             tests.Create_Mattress(mattress_grid,true,0);
             break;}
+        case 5:{
+            //tests.Create_Cloth_Panel(number_side_panels,side_length,aspect_ratio,RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T).7,0))));
+            RIGID_BODY<TV>& tmp_sphere=tests.Add_Rigid_Body("sphere",(T)1.0,(T).5);
+            tmp_sphere.X()=TV(0,(T).25,0);
+            tmp_sphere.is_static=true;
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(.3,(T)6,0))),true,true,density,.5);
+            tests.Add_Ground();            
+            break;}
+    
         default:
             LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
 
@@ -257,17 +300,23 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 1:
         case 2:
         case 3:
-        case 8:{
+        case 8:
+        case 5:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             Add_Constitutive_Model(tetrahedralized_volume,(T)1e5,(T).45,(T).01);
+            break;}
+        case 4:{
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            Add_Constitutive_Model(tetrahedralized_volume,(T)1e6,(T).45,(T).01);
             break;}
         case 17:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             Add_Constitutive_Model(tetrahedralized_volume,(T)1e5,(T).45,(T).01);
             RANDOM_NUMBERS<T> rand;
             rand.Fill_Uniform(particles.X,-1,1);
-            break;}
+            break;}         
         default:
             LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}
 
