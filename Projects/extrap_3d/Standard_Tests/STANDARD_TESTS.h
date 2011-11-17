@@ -12,6 +12,7 @@
 //    8. Falling mattress
 //   17. Matress, no gravity, random start
 //   18. Matress, no gravity, point start
+//   25. Big 8 corners stretch
 //#####################################################################
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
@@ -111,8 +112,8 @@ public:
     void Set_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated) PHYSBAM_OVERRIDE {}
     void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
     void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE {}
-    void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
-    void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
+    // void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
+    // void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
     void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
     bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) PHYSBAM_OVERRIDE {return true;}
@@ -155,7 +156,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     frame_rate=24;
 
     switch(test_number){
-        case 17: case 18:
+        case 17: case 18: case 25:
             mattress_grid=GRID<TV>(10,10,10,(T)-1,(T)1,(T)-1,(T)1,(T)-1,(T)1);
             break;
     	default:
@@ -195,6 +196,12 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 18:
             solids_parameters.triangle_collision_parameters.perform_self_collision=false;
             solids_parameters.cfl=(T)5;
+            break;
+        case 25:
+            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
+            solids_parameters.implicit_solve_parameters.cg_iterations=900;
+            solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
+            last_frame=500;
             break;
         case 5:
             frame_rate=60;
@@ -261,7 +268,8 @@ void Get_Initial_Data()
             tests.Add_Ground();
             break;}
         case 17:
-        case 18:{
+        case 18:
+        case 25:{
             tests.Create_Mattress(mattress_grid,true,0);
             break;}
         case 5:{
@@ -324,7 +332,11 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             Add_Constitutive_Model(tetrahedralized_volume,(T)1e5,(T).45,(T).01);
             RANDOM_NUMBERS<T> rand;
-            rand.Fill_Uniform(particles.X,0,0);
+            rand.Fill_Uniform(particles.X,-0,0);
+            break;}         
+        case 25:{
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+            Add_Constitutive_Model(tetrahedralized_volume,(T)1e5,(T).45,(T).01);
             break;}         
         default:
             LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}
@@ -340,6 +352,44 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     if(!semi_implicit) for(int i=1;i<=solid_body_collection.rigid_body_collection.rigids_forces.m;i++)
         solid_body_collection.rigid_body_collection.rigids_forces(i)->use_implicit_velocity_independent_forces=true;
     if(!semi_implicit) for(int i=1;i<=deformable_body_collection.deformables_forces.m;i++) deformable_body_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=true;
+}
+//#####################################################################
+// Function Set_External_Velocities
+//#####################################################################
+void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE
+{
+    if(test_number==25){
+        int m=mattress_grid.counts.x;
+	int n=mattress_grid.counts.y;
+	int mn=mattress_grid.counts.z;
+        T velocity=.2;
+        T final_time=50;
+        V(1)=         velocity_time<final_time?TV(-velocity,-velocity,-velocity):TV();
+        V(m)=         velocity_time<final_time?TV( velocity,-velocity,-velocity):TV();
+        V(m*(n-1)+1)= velocity_time<final_time?TV(-velocity, velocity,-velocity):TV();
+        V(m*n)=       velocity_time<final_time?TV( velocity, velocity,-velocity):TV();
+        V((mn-1)*n*m+1)=         velocity_time<final_time?TV(-velocity,-velocity,velocity):TV();
+        V((mn-1)*n*m+m)=         velocity_time<final_time?TV( velocity,-velocity,velocity):TV();
+        V((mn-1)*n*m+m*(n-1)+1)= velocity_time<final_time?TV(-velocity, velocity,velocity):TV();
+        V(mn*n*m)=               velocity_time<final_time?TV( velocity, velocity,velocity):TV();}
+}
+//#####################################################################
+// Function Zero_Out_Enslaved_Velocity_Nodes
+//#####################################################################
+void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE
+{
+    if(test_number==25){
+        int m=mattress_grid.counts.x;
+	int n=mattress_grid.counts.y;
+	int mn=mattress_grid.counts.z;
+        V(1)=TV();
+        V(m)=TV();
+        V(m*(n-1)+1)=TV();
+        V(m*n)=TV();
+        V((mn-1)*n*m+1)=TV();
+        V((mn-1)*n*m+m)=TV();
+        V((mn-1)*n*m+m*(n-1)+1)=TV();
+        V(mn*n*m)=TV();}
 }
 //#####################################################################
 // Function Read_Output_Files_Solids
