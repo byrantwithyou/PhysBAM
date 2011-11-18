@@ -10,6 +10,7 @@
 //    4. Large armadillo caving in on itself
 //    5. Deformable ball falling on a rigid ball
 //    6. Precursor to a smash test
+//    7. Plane test - ball
 //    8. Falling mattress
 //   16. Smash test - large boxes
 //   17. Matress, no gravity, random start
@@ -206,6 +207,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 2:
         case 3:
         case 4:
+        case 7:
         case 8:
         case 16:
         case 17:
@@ -263,7 +265,7 @@ void Get_Initial_Data()
 
     T density=TV::dimension==1?1:TV::dimension==2?100:1000;
     switch(test_number){
-        case 1:{
+        case 1: case 7:{
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,true,density);
             tests.Add_Ground();
             break;}
@@ -375,6 +377,12 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             Add_Constitutive_Model(tetrahedralized_volume,(T)1e5,(T).45,(T).01);
+            break;}
+        case 7:{
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            Add_Constitutive_Model(tetrahedralized_volume,(T)1e5,(T).45,(T).01);
+            for(int i=1; i<=deformable_body_collection.particles.X.m; i++) deformable_body_collection.particles.X(i).y=3;
             break;}
         case 4:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
