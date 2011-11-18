@@ -425,6 +425,7 @@ Write(const STREAM_TYPE stream_type,const std::string& prefix,const int frame,co
 template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::
 Test_Energy(const T time)
 {
+    PHYSBAM_ASSERT(sizeof(T)==sizeof(double));
     RANDOM_NUMBERS<T> random;
     T e=(T)1e-5;
     ARRAY<TV> dX(particles.X.m);
@@ -453,6 +454,7 @@ Test_Energy(const T time)
 template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::
 Test_Force_Derivatives(const T time)
 {
+    PHYSBAM_ASSERT(sizeof(T)==sizeof(double));
     RANDOM_NUMBERS<T> random;
     T e=(T)1e-5;
     ARRAY<TV> dX(particles.X.m);
