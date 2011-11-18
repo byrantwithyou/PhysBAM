@@ -11,6 +11,7 @@
 //    5. Deformable ball falling on a rigid ball
 //    6. Precursor to a smash test
 //    8. Falling mattress
+//   16. Smash test - large boxes
 //   17. Matress, no gravity, random start
 //   18. Matress, no gravity, point start
 //   24. Big 6 sides stretch
@@ -167,6 +168,9 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 26:
             mattress_grid=GRID<TV>(40,5,5,(T)-4,(T)4,(T)-.5,(T).5,(T)-.5,(T).5);
             break;
+        case 16:
+            mattress_grid=GRID<TV>(11,6,11,(T)-1,(T)1,(T)-.5,(T).5,(T)-1,(T)1);
+            break;
     	default:
             mattress_grid=GRID<TV>(20,10,20,(T)-1,(T)1,(T)-.5,(T).5,(T)-1,(T)1);
     }
@@ -203,6 +207,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 3:
         case 4:
         case 8:
+        case 16:
         case 17:
         case 18:
             solids_parameters.cfl=(T)5;
@@ -281,6 +286,25 @@ void Get_Initial_Data()
             tests.Create_Mattress(mattress_grid,true,&initial_state);
             tests.Add_Ground();
             break;}
+        case 16: {
+            RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,0,0)));
+            tests.Create_Mattress(mattress_grid,true,&initial_state);
+            //RIGID_BODY<TV>& box1=tests.Add_Rigid_Body("square",10,(T)0);
+            //RIGID_BODY<TV>& box2=tests.Add_Rigid_Body("square",10,(T)0);
+            RIGID_BODY<TV>& box1=tests.Add_Analytic_Box(TV(20,20,20));
+            RIGID_BODY<TV>& box2=tests.Add_Analytic_Box(TV(20,20,20));
+            box1.X()=TV(0,-11,0);
+            box2.X()=TV(0,11,0);
+            box1.is_static=true;
+            box2.is_static=false;
+            kinematic_id=box2.particle_index;
+            rigid_body_collection.rigid_body_particle.kinematic(box2.particle_index)=true;
+            curve.Add_Control_Point(0,FRAME<TV>(TV(0,11,0)));
+            curve.Add_Control_Point(5,FRAME<TV>(TV(0,8,0)));
+            curve.Add_Control_Point(6,FRAME<TV>(TV(0,8,0)));
+            curve.Add_Control_Point(11,FRAME<TV>(TV(0,11,0)));
+            last_frame=250;
+            break;}
         case 17:
         case 18:
         case 24:
@@ -345,6 +369,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 2:
         case 3:
         case 8:
+        case 16:    
         case 5:
         case 6:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();

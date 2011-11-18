@@ -92,7 +92,6 @@ Add_Rigid_Body(const std::string& name,const T scaling_factor,const T friction,c
     if(!always_read_object){
         IMPLICIT_OBJECT<TV>* implicit=0;
         if(name=="sphere") implicit=::Add_Analytic_Sphere(TV(),scaling_factor);
-        //if(name=="box") implicit=::Add_Analytic_Box(TV(),scaling_factor);
         if(name=="skinnycyllink") implicit=::Add_Analytic_Cylinder(TV(),scaling_factor);
         if(name=="Rings_Test/ring_revolve") implicit=Add_Analytic_Ring(TV(),scaling_factor);
         if(name=="ground") implicit=Add_Analytic_Ground(TV(),scaling_factor);
