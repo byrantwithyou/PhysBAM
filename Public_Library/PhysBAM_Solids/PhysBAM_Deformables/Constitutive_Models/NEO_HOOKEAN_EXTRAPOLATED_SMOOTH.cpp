@@ -86,8 +86,53 @@ Energy_Density_Helper(const DIAGONAL_MATRIX<T,2>& F,const int simplex) const
 template<class T,int d> T NEO_HOOKEAN_EXTRAPOLATED_SMOOTH<T,d>::
 Energy_Density_Helper(const DIAGONAL_MATRIX<T,3>& F,const int simplex) const
 {
-    PHYSBAM_FATAL_ERROR();
-    return 0;
+    T x = F.x11;
+    T y = F.x22;
+    T z = F.x22;
+    
+    T dx = x - extrapolation_cutoff;
+    T dy = y - extrapolation_cutoff;
+    T dz = z - extrapolation_cutoff;
+
+    T mu = constant_mu;
+    T la = constant_lambda;
+    
+    T a = extrapolation_cutoff;
+     
+    if ((dx >= 0) && (dy >= 0) && (dz >= 0)) // R
+    {
+        T I1=(F*F.Transposed()).Trace(),J=F.Determinant();
+        T log_J=log(J);
+        return constant_mu*((T).5*(I1-TV::m)-log_J)+(T).5*constant_lambda*sqr(log_J);
+    }
+    else if ((dx < 0) && (dy >= 0) && (dz >= 0)) // Rx
+    {
+        return 1/2*(mu*y^2*a^2+mu*z^2*a^2-2*mu*ln(a*y*z)*a^2+la*ln(a*y*z)^2*a^2-4*a*mu*x+4*a*x*la*ln(a*y*z)-3*a^2*la*ln(a*y*z)+x^2*mu*a^2+mu*x^2+x^2*la-x^2*la*ln(a*y*z)-2*x*a*la+a^2*la)/a^2;
+    }
+    else if ((dx >= 0) && (dy < 0) && (dz >= 0)) // Ry
+    {
+        return 1/2*(x^2*mu*a^2+mu*z^2*a^2-2*mu*ln(x*a*z)*a^2+la*ln(x*a*z)^2*a^2-4*y*mu*a+4*a*y*la*ln(x*a*z)-3*a^2*la*ln(x*a*z)+mu*y^2*a^2+mu*y^2+y^2*la-y^2*la*ln(x*a*z)-2*y*a*la+a^2*la)/a^2;
+    }
+    else if ((dx >= 0) && (dy >= 0) && (dz < 0)) // Rz
+    {
+        return 1/2*(x^2*mu*a^2+mu*y^2*a^2-2*mu*ln(x*y*a)*a^2+la*ln(x*y*a)^2*a^2-4*z*mu*a+4*a*z*la*ln(x*y*a)-3*a^2*la*ln(x*y*a)+mu*z^2*a^2+mu*z^2+z^2*la-z^2*la*ln(x*y*a)-2*z*a*la+a^2*la)/a^2;
+    }
+    else if ((dx < 0) && (dy < 0) && (dz >= 0)) // Rxy
+    {
+        return 1/4*(8*a^3*y*la*ln(z*a^2)-2*a^2*y^2*la*ln(z*a^2)+8*x*a^3*la*ln(z*a^2)+16*x*y*a^2*la-2*x^2*a^2*la*ln(z*a^2)+2*mu*y^2*a^2-8*x*mu*a^3+2*x^2*mu*a^2+6*mu*a^4-4*y^2*x*a*la+5*y^2*a^2*la+y^2*x^2*la-8*mu*y*a^3-4*x^2*y*a*la+5*x^2*a^2*la+13*a^4*la+2*a^4*mu*z^2-4*a^4*mu*ln(z*a^2)+2*a^4*la*ln(z*a^2)^2-12*a^4*la*ln(z*a^2)+2*a^4*mu*y^2-16*a^3*y*la-16*x*a^3*la+2*x^2*mu*a^4)/a^4;
+    }
+    else if ((dx < 0) && (dy >= 0) && (dz < 0)) // Rxz
+    {
+        return 1/4*(2*mu*z^2*a^2-8*x*mu*a^3+2*x^2*mu*a^2+6*mu*a^4-4*z^2*x*a*la+5*z^2*a^2*la+z^2*x^2*la+5*x^2*a^2*la-8*mu*z*a^3-4*x^2*z*a*la+13*a^4*la+2*a^4*mu*z^2+2*a^4*mu*y^2-16*x*a^3*la+2*x^2*mu*a^4-16*z*a^3*la+16*z*x*a^2*la-4*a^4*mu*ln(y*a^2)+2*a^4*la*ln(y*a^2)^2-12*a^4*la*ln(y*a^2)+8*a^3*z*la*ln(y*a^2)-2*a^2*z^2*la*ln(y*a^2)+8*x*a^3*la*ln(y*a^2)-2*x^2*a^2*la*ln(y*a^2))/a^4;
+    }
+    else if ((dx >= 0) && (dy < 0) && (dz < 0)) // Rzy
+    {
+        return 1/4*(2*mu*y^2*a^2+2*mu*z^2*a^2+6*mu*a^4+5*y^2*a^2*la+5*z^2*a^2*la-8*mu*y*a^3-4*z^2*y*a*la+z^2*y^2*la-8*mu*z*a^3-4*y^2*z*a*la+13*a^4*la+2*a^4*mu*z^2+2*a^4*mu*y^2-16*a^3*y*la+2*x^2*mu*a^4-16*z*a^3*la+16*z*y*a^2*la-4*a^4*mu*ln(x*a^2)+2*a^4*la*ln(x*a^2)^2-12*a^4*la*ln(x*a^2)+8*a^3*y*la*ln(x*a^2)-2*a^2*y^2*la*ln(x*a^2)+8*z*a^3*la*ln(x*a^2)-2*z^2*a^2*la*ln(x*a^2))/a^4;
+    }
+    else // Rxyz
+    {
+        return 1/4*(16*x*y*a^2*la+2*mu*y^2*a^2+2*mu*z^2*a^2-8*x*mu*a^3+2*x^2*mu*a^2+12*mu*a^4-4*y^2*x*a*la-4*z^2*x*a*la+8*y^2*a^2*la+y^2*x^2*la+8*z^2*a^2*la+z^2*x^2*la-8*mu*y*a^3-4*x^2*y*a*la-4*z^2*y*a*la+8*x^2*a^2*la+z^2*y^2*la-8*mu*z*a^3-4*x^2*z*a*la-4*y^2*z*a*la+33*a^4*la+2*a^4*mu*z^2+2*a^4*mu*y^2-28*a^3*y*la-28*x*a^3*la+2*x^2*mu*a^4-28*z*a^3*la+16*z*y*a^2*la+16*z*x*a^2*la-4*a^4*mu*ln(a^3)+2*a^4*la*ln(a^3)^2-18*a^4*la*ln(a^3)+8*a^3*y*la*ln(a^3)-2*a^2*y^2*la*ln(a^3)+8*z*a^3*la*ln(a^3)-2*z^2*a^2*la*ln(a^3)+8*x*a^3*la*ln(a^3)-2*x^2*a^2*la*ln(a^3))/a^4;
+    }
 }
 //#####################################################################
 // Function P_From_Strain
@@ -147,8 +192,80 @@ P_From_Strain_Helper(const DIAGONAL_MATRIX<T,2>& F,const T scale,const int simpl
 template<class T,int d> DIAGONAL_MATRIX<T,3> NEO_HOOKEAN_EXTRAPOLATED_SMOOTH<T,d>::
 P_From_Strain_Helper(const DIAGONAL_MATRIX<T,3>& F,const T scale,const int simplex) const
 {
-    PHYSBAM_FATAL_ERROR();
-    return DIAGONAL_MATRIX<T,3>();
+    T x = F.x11;
+    T y = F.x22;
+    T z = F.x22;
+    
+    T dx = x - extrapolation_cutoff;
+    T dy = y - extrapolation_cutoff;
+    T dz = z - extrapolation_cutoff;
+
+    T mu = constant_mu;
+    T la = constant_lambda;
+    
+    T a = extrapolation_cutoff;
+     
+    if ((dx >= 0) && (dy >= 0) && (dz >= 0)) // R
+    {
+        T scale_mu=scale*constant_mu,scale_lambda=scale*constant_lambda,J=F.Determinant();
+        return scale_mu*F-(scale_mu-scale_lambda*log(J))*F.Inverse();
+    }
+    else if ((dx < 0) && (dy >= 0) && (dz >= 0)) // Rx
+    {
+        DIAGONAL_MATRIX<T,3> result;
+        result.x11=(-2*mu*a+2*a*la*ln(a*y*z)+x*mu*a^2+mu*x+x*la-x*la*ln(a*y*z)-a*la)/a^2;
+        result.x22=1/2*(2*mu*y^2*a^2-2*mu*a^2+2*a^2*la*ln(a*y*z)+4*x*a*la-3*a^2*la-x^2*la)/y/a^2;
+        result.x33=1/2*(2*mu*z^2*a^2-2*mu*a^2+2*a^2*la*ln(a*y*z)+4*x*a*la-3*a^2*la-x^2*la)/z/a^2;
+        return scale*result;
+    }
+    else if ((dx >= 0) && (dy < 0) && (dz >= 0)) // Ry
+    {
+        DIAGONAL_MATRIX<T,3> result;
+        result.x11=1/2*(2*x^2*mu*a^2-2*mu*a^2+2*a^2*la*ln(x*a*z)+4*y*a*la-3*a^2*la-y^2*la)/x/a^2;
+        result.x22=(-2*mu*a+2*a*la*ln(x*a*z)+mu*y*a^2+mu*y+y*la-y*la*ln(x*a*z)-a*la)/a^2;
+        result.x33=1/2*(2*mu*z^2*a^2-2*mu*a^2+2*a^2*la*ln(x*a*z)+4*y*a*la-3*a^2*la-y^2*la)/z/a^2;
+        return scale*result;
+    }
+    else if ((dx >= 0) && (dy >= 0) && (dz < 0)) // Rz
+    {
+        DIAGONAL_MATRIX<T,3> result;
+        result.x11=1/2*(2*x^2*mu*a^2-2*mu*a^2+2*a^2*la*ln(x*y*a)+4*z*a*la-3*a^2*la-z^2*la)/x/a^2;
+        result.x22=1/2*(2*mu*y^2*a^2-2*mu*a^2+2*a^2*la*ln(x*y*a)+4*z*a*la-3*a^2*la-z^2*la)/y/a^2;
+        result.x33=(-2*mu*a+2*a*la*ln(x*y*a)+mu*z*a^2+mu*z+z*la-z*la*ln(x*y*a)-a*la)/a^2;
+        return scale*result;
+    }
+    else if ((dx < 0) && (dy < 0) && (dz >= 0)) // Rxy
+    {
+        DIAGONAL_MATRIX<T,3> result;
+        result.x11=1/2*(4*a^3*la*ln(z*a^2)+8*y*a^2*la-2*x*a^2*la*ln(z*a^2)-4*mu*a^3+2*x*mu*a^2-2*y^2*a*la+y^2*x*la-4*x*y*a*la+5*x*a^2*la-8*a^3*la+2*x*mu*a^4)/a^4;
+        result.x22=1/2*(4*a^3*la*ln(z*a^2)-2*a^2*y*la*ln(z*a^2)+8*x*a^2*la+2*mu*y*a^2-4*x*y*a*la+5*y*a^2*la+x^2*y*la-4*mu*a^3-2*x^2*a*la+2*a^4*mu*y-8*a^3*la)/a^4;
+        result.x33=1/2/a^2*(4*y*a*la-y^2*la+4*x*a*la-x^2*la+2*mu*z^2*a^2-2*mu*a^2+2*a^2*la*ln(z*a^2)-6*a^2*la)/z;
+        return scale*result;
+    }
+    else if ((dx < 0) && (dy >= 0) && (dz < 0)) // Rxz
+    {
+        DIAGONAL_MATRIX<T,3> result;
+        result.x11=1/2*(-4*mu*a^3+2*x*mu*a^2-2*z^2*a*la+z^2*x*la+5*x*a^2*la-4*x*z*a*la-8*a^3*la+2*x*mu*a^4+8*z*a^2*la+4*a^3*la*ln(y*a^2)-2*x*a^2*la*ln(y*a^2))/a^4;
+        result.x22=1/2/a^2*(2*mu*y^2*a^2-2*mu*a^2+2*a^2*la*ln(y*a^2)-6*a^2*la+4*z*a*la-z^2*la+4*x*a*la-x^2*la)/y;
+        result.x33=1/2*(2*mu*z*a^2-4*x*z*a*la+5*z*a^2*la+x^2*z*la-4*mu*a^3-2*x^2*a*la+2*a^4*mu*z-8*a^3*la+8*x*a^2*la+4*a^3*la*ln(y*a^2)-2*a^2*z*la*ln(y*a^2))/a^4;
+        return scale*result;
+    }
+    else if ((dx >= 0) && (dy < 0) && (dz < 0)) // Rzy
+    {
+        DIAGONAL_MATRIX<T,3> result;
+        result.x11=1/2/a^2*(2*x^2*mu*a^2-2*mu*a^2+2*a^2*la*ln(x*a^2)-6*a^2*la+4*y*a*la-y^2*la+4*z*a*la-z^2*la)/x;
+        result.x22=1/2*(2*mu*y*a^2+5*y*a^2*la-4*mu*a^3-2*z^2*a*la+z^2*y*la-4*z*y*a*la+2*a^4*mu*y-8*a^3*la+8*z*a^2*la+4*a^3*la*ln(x*a^2)-2*a^2*y*la*ln(x*a^2))/a^4;
+        result.x33=1/2*(2*mu*z*a^2+5*z*a^2*la-4*z*y*a*la+y^2*z*la-4*mu*a^3-2*y^2*a*la+2*a^4*mu*z-8*a^3*la+8*y*a^2*la+4*a^3*la*ln(x*a^2)-2*z*a^2*la*ln(x*a^2))/a^4;
+        return scale*result;
+    }
+    else // Rxyz
+    {
+        DIAGONAL_MATRIX<T,3> result;
+        result.x11=1/2*(8*y*a^2*la-4*mu*a^3+2*x*mu*a^2-2*y^2*a*la-2*z^2*a*la+y^2*x*la+z^2*x*la-4*x*y*a*la+8*x*a^2*la-4*x*z*a*la-14*a^3*la+2*x*mu*a^4+8*z*a^2*la+4*a^3*la*ln(a^3)-2*x*a^2*la*ln(a^3))/a^4;
+        result.x22=1/2*(8*x*a^2*la+2*mu*y*a^2-4*x*y*a*la+8*y*a^2*la+x^2*y*la-4*mu*a^3-2*x^2*a*la-2*z^2*a*la+z^2*y*la-4*z*y*a*la+2*a^4*mu*y-14*a^3*la+8*z*a^2*la+4*a^3*la*ln(a^3)-2*a^2*y*la*ln(a^3))/a^4;
+        result.x33=1/2*(2*mu*z*a^2-4*x*z*a*la+8*z*a^2*la+x^2*z*la-4*z*y*a*la+y^2*z*la-4*mu*a^3-2*x^2*a*la-2*y^2*a*la+2*a^4*mu*z-14*a^3*la+8*y*a^2*la+8*x*a^2*la+4*a^3*la*ln(a^3)-2*z*a^2*la*ln(a^3))/a^4;
+        return scale*result;
+    }
 }
 //#####################################################################
 // Function Isotropic_Stress_Derivative
@@ -231,7 +348,51 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_IS
 template<class T,int d> void NEO_HOOKEAN_EXTRAPOLATED_SMOOTH<T,d>::
 Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dP_dF,const int triangle) const
 {
-    PHYSBAM_FATAL_ERROR();
+        T x = F.x11;
+    T y = F.x22;
+    T z = F.x22;
+    
+    T dx = x - extrapolation_cutoff;
+    T dy = y - extrapolation_cutoff;
+    T dz = z - extrapolation_cutoff;
+
+    T mu = constant_mu;
+    T la = constant_lambda;
+    
+    T a = extrapolation_cutoff;
+     
+    if ((dx >= 0) && (dy >= 0) && (dz >= 0)) // R
+    {
+
+    }
+    else if ((dx < 0) && (dy >= 0) && (dz >= 0)) // Rx
+    {
+
+    }
+    else if ((dx >= 0) && (dy < 0) && (dz >= 0)) // Ry
+    {
+
+    }
+    else if ((dx >= 0) && (dy >= 0) && (dz < 0)) // Rz
+    {
+
+    }
+    else if ((dx < 0) && (dy < 0) && (dz >= 0)) // Rxy
+    {
+
+    }
+    else if ((dx < 0) && (dy >= 0) && (dz < 0)) // Rxz
+    {
+
+    }
+    else if ((dx >= 0) && (dy < 0) && (dz < 0)) // Rzy
+    {
+
+    }
+    else // Rxyz
+    {
+
+    }
 }
 //#####################################################################
 // Function P_From_Strain_Rate
