@@ -82,15 +82,11 @@ public:
     int parameter;
     T stiffness_multiplier;
     T damping_multiplier;
+    bool use_constant_ife;
     
-    // Came from Test 48
-    int number_side_panels;
-    T aspect_ratio,side_length;
-    T bending_stiffness_multiplier,bending_damping_multiplier,planar_damping_multiplier,axial_bending_stiffness_multiplier,axial_bending_damping_multiplier;
-
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),semi_implicit(false),test_forces(false),use_extended_neohookean(false),
-        use_extended_neohookean_refined(false),use_corotated(false),use_corot_blend(false),dump_sv(false),print_matrix(false)
+        use_extended_neohookean_refined(false),use_corotated(false),use_corot_blend(false),dump_sv(false),print_matrix(false),use_constant_ife(false)
     {
     }
 
@@ -151,6 +147,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Option_Argument("-project_nullspace","project out nullspace");
     parse_args->Add_Integer_Argument("-projection_iterations",5,"number of iterations used for projection in cg");
     parse_args->Add_Integer_Argument("-solver_iterations",1000,"number of iterations used for solids system");
+    parse_args->Add_Option_Argument("-use_constant_ife","use constant extrapolation on inverting finite element fix");
 }
 //#####################################################################
 // Function Parse_Options
@@ -197,6 +194,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     use_corotated=parse_args->Is_Value_Set("-use_corotated");
     use_corot_blend=parse_args->Is_Value_Set("-use_corot_blend");
     dump_sv=parse_args->Is_Value_Set("-dump_sv");
+    use_constant_ife=parse_args->Get_Option_Value("-use_constant_ife");
     
     semi_implicit=parse_args->Is_Value_Set("-semi_implicit");
     if(parse_args->Is_Value_Set("-project_nullspace")) solids_parameters.implicit_solve_parameters.project_nullspace_frequency=1;
@@ -237,9 +235,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.implicit_solve_parameters.cg_iterations=600;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T).01;
             last_frame=200;//(int)(200*frame_rate);
-            aspect_ratio=1;
-            side_length=(T)1;
-            number_side_panels=2;
             solids_parameters.cfl=(T)1;
             solids_parameters.implicit_solve_parameters.throw_exception_on_backward_euler_failure=false;
             break;    
@@ -561,7 +556,10 @@ void Add_Constitutive_Model(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,T 
     if(use_extended_neohookean_hyperbola) icm=new NEO_HOOKEAN_EXTRAPOLATED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.1);
     else if(use_corotated) icm=new COROTATED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
     else if(use_corot_blend) icm=new NEO_HOOKEAN_COROTATED_BLEND<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
-    else icm=new NEO_HOOKEAN<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
+    else{
+        NEO_HOOKEAN<T,3>* nh=new NEO_HOOKEAN<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
+        icm=nh;
+        nh->use_constant_ife=use_constant_ife;}
     solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,icm));
 }
 //#####################################################################

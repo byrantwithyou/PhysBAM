@@ -18,7 +18,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T,int d> NEO_HOOKEAN<T,d>::
 NEO_HOOKEAN(const T youngs_modulus_input,const T poissons_ratio_input,const T Rayleigh_coefficient,const T failure_threshold_input)
-    :youngs_modulus(youngs_modulus_input),poissons_ratio(poissons_ratio_input),failure_threshold(failure_threshold_input)
+    :youngs_modulus(youngs_modulus_input),poissons_ratio(poissons_ratio_input),failure_threshold(failure_threshold_input),use_constant_ife(false)
 {
     assert(poissons_ratio>-1&&poissons_ratio<.5);
     constant_lambda=youngs_modulus*poissons_ratio/((1+poissons_ratio)*(1-2*poissons_ratio));
@@ -64,7 +64,8 @@ P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const T scale,const int simplex) con
 {
     T scale_mu=scale*constant_mu,scale_lambda=scale*constant_lambda,J=F.Determinant();
     if(J>=failure_threshold) return scale_mu*F-(scale_mu-scale_lambda*log(J))*F.Inverse();
-    DIAGONAL_MATRIX<T,d> F_clamp=Clamp_To_Hyperbola(F),dF=F-F_clamp,F_inverse=F_clamp.Inverse();
+    DIAGONAL_MATRIX<T,d> F_clamp=Clamp_To_Hyperbola(F),dF,F_inverse=F_clamp.Inverse();
+    if(!use_constant_ife) dF=F-F_clamp;
     T scale_mu_minus_lambda_log_J=scale_mu-scale_lambda*log(failure_threshold);
     return scale_mu*F+scale_mu_minus_lambda_log_J*(sqr(F_inverse)*dF-F_inverse)+scale_lambda*DIAGONAL_MATRIX<T,d>::Inner_Product(F_inverse,dF)*F_inverse;
 }

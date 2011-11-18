@@ -23,6 +23,7 @@ public:
 
     T youngs_modulus,poissons_ratio;
     T failure_threshold;
+    bool use_constant_ife;
 private:
     T dth_root_failure_threshold;
 public:
