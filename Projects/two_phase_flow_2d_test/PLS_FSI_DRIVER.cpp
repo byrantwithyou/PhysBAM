@@ -49,12 +49,12 @@
 #include "PLS_FSI_EXAMPLE.h"
 
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_POLICY_UNIFORM.h>
+#include "Chorin_Project.h"
 #include <Jeffrey_Utilities/Functional/ARRAY_WRAPPER_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/BOUND_FAST_MEM_FN.h>
 #include <Jeffrey_Utilities/Functional/CONSTANT_FUNCTION.h>
 #include <Jeffrey_Utilities/Math/MULTI_LINEAR_INTERPOLATE_INDEX_FUNCTION.h>
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOUND.h>
-#include "Chorin_Project.h"
 
 namespace PhysBAM{
 

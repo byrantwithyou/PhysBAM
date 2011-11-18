@@ -7,12 +7,12 @@
 #ifndef __NEO_HOOKEAN_COROTATED_BLEND__
 #define __NEO_HOOKEAN_COROTATED_BLEND__
 
-#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/ISOTROPIC_CONSTITUTIVE_MODEL.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/DIAGONAL_MATRIX_DETERMINANT_HEAVISIDE_TRANSITION.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/CUBIC_HEAVISIDE_TRANSITION.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/QUINTIC_HEAVISIDE_TRANSITION.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/COROTATED.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/CUBIC_HEAVISIDE_TRANSITION.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/DIAGONAL_MATRIX_DETERMINANT_HEAVISIDE_TRANSITION.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/ISOTROPIC_CONSTITUTIVE_MODEL.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/QUINTIC_HEAVISIDE_TRANSITION.h>
 
 namespace PhysBAM{
 

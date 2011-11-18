@@ -35,7 +35,6 @@
 #include <Jeffrey_Utilities/Multi_Index/MULTI_INDEX_BOUND.h>
 #include <Jeffrey_Utilities/VECTOR_OPS.h>
 
-#include <Jeffrey_Utilities/SOLVER_PARAMS.h>
 #include "Build_Neumann_System.h"
 #include "DOMAIN_EMBEDDING_CUBE_SUBSYS.h"
 #include "DOMAIN_REGULAR_CROSS_SUBSYS.h"
@@ -44,6 +43,7 @@
 #include "Params/EXAMPLE_PARAMS.h"
 #include "Params/MAIN_PARAMS.h"
 #include "RAND_MT19937_UNIFORM_REAL.h"
+#include <Jeffrey_Utilities/SOLVER_PARAMS.h>
 
 #ifdef PHYSBAM_USE_PETSC
 #include <Jeffrey_Utilities/Petsc/CALL_AND_CHKERRQ.h>

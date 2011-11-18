@@ -10,8 +10,8 @@
 #include <PhysBAM_Tools/Adaptive_Arithmetic/EXACT_ARITHMETIC_POLICY.h>
 #include <PhysBAM_Tools/Data_Structures/PAIR.h>
 #include <PhysBAM_Tools/Utilities/STATIC_ASSERT.h>
-#include <limits>
 #include <cmath>
+#include <limits>
 
 namespace PhysBAM{
 namespace ADAPTIVE_DETAIL{

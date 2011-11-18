@@ -9,8 +9,8 @@
 
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/DIRECT_INIT_CTOR.h>
-#include <Jeffrey_Utilities/IDENTITY_TYPE.h>
 #include <Jeffrey_Utilities/Divergence_Of_MAC_Vector_Field.h>
+#include <Jeffrey_Utilities/IDENTITY_TYPE.h>
 
 namespace PhysBAM
 {

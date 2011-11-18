@@ -20,6 +20,7 @@
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/ARRAY_OPS.h>
+#include <Jeffrey_Utilities/DIVERGENCE_OF_MAC_VECTOR_FIELD_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/ARRAY_WRAPPER_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/BOUND_FAST_MEM_FN.h>
 #include <Jeffrey_Utilities/Functional/COMPOSE_FUNCTION.h>
@@ -40,7 +41,6 @@
 #include <Jeffrey_Utilities/SOLVER_PARAMS.h>
 #include <Jeffrey_Utilities/Stencils/ZERO_STENCIL_PROXY.h>
 #include <Jeffrey_Utilities/VISITOR_SEQUENCE.h>
-#include <Jeffrey_Utilities/DIVERGENCE_OF_MAC_VECTOR_FIELD_FUNCTION.h>
 
 #include "AGGREGATE_CONSTRAINT_SYSTEM.h"
 #include "Aggregate_Constraints.h"
