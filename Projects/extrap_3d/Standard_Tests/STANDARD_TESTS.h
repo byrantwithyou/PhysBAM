@@ -9,10 +9,10 @@
 //    3. Maggot free falling to the ground
 //    4. Large armadillo caving in on itself
 //    5. Deformable ball falling on a rigid ball
-//    6. Precursor to a smash test
+//    6. Smash test - small boxes, large sphere
 //    7. Plane test - ball
 //    8. Falling mattress
-//   16. Smash test - large boxes
+//   16. Smash test - large boxes, small mattress
 //   17. Matress, no gravity, random start
 //   18. Matress, no gravity, point start
 //   24. Big 6 sides stretch
