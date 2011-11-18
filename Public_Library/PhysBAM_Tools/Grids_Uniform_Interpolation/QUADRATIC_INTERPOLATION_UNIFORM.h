@@ -60,7 +60,7 @@ public:
     weights.Append(PAIR<TV_INT,T>(TV_INT(index.x),1-w+alpha));weights.Append(PAIR<TV_INT,T>(TV_INT(index.x+1),w+alpha));
     for(int i=1;i<=weights.m;i++) weights(i).y=max((T)0.,min((T)1.,weights(i).y));
     T error=phi-(1-w+alpha)*u(index.x)-(w+alpha)*u(index.x+1);
-    if(abs(error)>1e-5) std::cout<<"Error is "<<error<<" and weights are "<<weights<<std::endl;
+    if(abs(error)>1e-5) LOG::cout<<"Error is "<<error<<" and weights are "<<weights<<std::endl;
     return weights;}*/
 
     //Linear Programming
@@ -70,7 +70,7 @@ public:
     weights.Append(PAIR<TV_INT,T>(TV_INT(index.x),1-w+alpha));weights.Append(PAIR<TV_INT,T>(TV_INT(index.x+1),w+alpha));
     for(int i=1;i<=weights.m;i++) weights(i).y=max((T)0.,min((T)1.,weights(i).y));
     T error=phi-(1-w+alpha)*u(index.x)-(w+alpha)*u(index.x+1);
-    if(abs(error)>1e-5) std::cout<<"Error is "<eights(const GRID<TV>& grid,const ARRAYS_ND_BASE<VECTOR<T2,1> >& u,const VECTOR<T,1>& X,const VECTOR<int,1>& index) const
+    if(abs(error)>1e-5) LOG::cout<<"Error is "<eights(const GRID<TV>& grid,const ARRAYS_ND_BASE<VECTOR<T2,1> >& u,const VECTOR<T,1>& X,const VECTOR<int,1>& index) const
     {ARRAY<PAIR<TV_INT,T> > weights;T2 phi=From_Base_Node(grid,u,X,index);T w=(X.x-grid.X(index.x).x)*grid.one_over_dX.x;
     T leftDxx=(u(index.x+1)-2*u(index.x)+u(index.x-1)),rightDxx=(u(index.x+2)-2*u(index.x+1)+u(index.x));
     MATRIX_MXN<T> A(2,4);A(1,1)=1;A(2,1)=0;A(2,2)=1;A(2,3)=1;A(2,4)=1;VECTOR_ND<T> x(4);VECTOR_ND<T> b(2);b(2)=1;

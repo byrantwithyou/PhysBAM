@@ -5,6 +5,7 @@
 // Class DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE
 //#####################################################################
 #include <PhysBAM_Tools/Arrays_Computations/SORT.h>
+#include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX_2X2.h>
 #include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_2X2.h>
@@ -19,7 +20,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T> void DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>::
 Enforce_Definiteness()
-{   std::cout << "WARNING: Definiteness Enforcement called!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+{   LOG::cout << "WARNING: Definiteness Enforcement called!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
     SYMMETRIC_MATRIX<T,2> A1(x1111,x2211,x2222);DIAGONAL_MATRIX<T,2> D1;MATRIX<T,2> V1;
     A1.Solve_Eigenproblem(D1,V1);D1=D1.Clamp_Min(0);A1=SYMMETRIC_MATRIX<T,2>::Conjugate(V1,D1);
     x1111=A1.x11;x2211=A1.x21;x2222=A1.x22;

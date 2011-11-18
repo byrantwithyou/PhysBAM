@@ -73,7 +73,7 @@ Create_Submatrix(const INTERVAL<int>& rows)
         for(int old_index=offsets(i+shift);old_index<offsets(i+shift+1);old_index++)if(rows.Lazy_Inside(A(old_index).j)){
             submatrix->A(next_index).j=A(old_index).j-shift;submatrix->A(next_index).a=A(old_index).a;next_index++;}}
     submatrix->offsets(submatrix->n+1)=next_index;
-    //std::cout<<"Offsets "<<submatrix->offsets<<std::endl;
+    //LOG::cout<<"Offsets "<<submatrix->offsets<<std::endl;
     return submatrix;
 }
 //#####################################################################
