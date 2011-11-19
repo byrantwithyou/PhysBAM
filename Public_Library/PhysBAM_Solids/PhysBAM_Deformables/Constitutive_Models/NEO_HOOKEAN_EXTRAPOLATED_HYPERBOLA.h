@@ -35,10 +35,11 @@ public:
     T extrapolation_cutoff;
     T extra_force_coefficient;
     T panic_threshold;
+    //T a,a1,a2,a3,a11,a12,a13,a22,a23,a33;//,s1o,s2o,s3o;
 
 public:
 
-    NEO_HOOKEAN_EXTRAPOLATED_HYPERBOLA(const T youngs_modulus_input=3e6,const T poissons_ratio_input=.475,const T Rayleigh_coefficient=.05,const T extrapolation_cutoff=.1);
+    NEO_HOOKEAN_EXTRAPOLATED_HYPERBOLA(const T youngs_modulus_input=3e6,const T poissons_ratio_input=.475,const T Rayleigh_coefficient=.05,const T extrapolation_cutoff=.1, const T extra_force_coefficient = 10.0);
     virtual ~NEO_HOOKEAN_EXTRAPOLATED_HYPERBOLA();
 
 public:
@@ -52,6 +53,7 @@ public:
     void Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,d>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d>& dP_dF,const int triangle) const;
     void Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& dP_dF,const int triangle) const;
     void Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dP_dF,const int triangle) const;
+    //void Calculate_A(const T s1, const T s2, const T s3);
 
     MATRIX<T,d> P_From_Strain_Rate(const DIAGONAL_MATRIX<T,d>& F,const MATRIX<T,d>& F_dot,const T scale,const int simplex) const PHYSBAM_OVERRIDE;
     int P_From_Strain_Rate_Forces_Size() const PHYSBAM_OVERRIDE;

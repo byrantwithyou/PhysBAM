@@ -14,5 +14,5 @@ while(<>)
         $max=$1 if $1>$max;
     }
 }
-printf "solves: $num    average iterations: %.2f  max iterations: $max\n", $total/$num;
+printf "solves: $num    average iterations/solve: %.2f  max iterations/solve: $max\n", $total/$num;
 
