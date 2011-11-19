@@ -88,7 +88,7 @@ Energy_Density_Helper(const DIAGONAL_MATRIX<T,3>& F,const int simplex) const
 {
     T x = F.x11;
     T y = F.x22;
-    T z = F.x22;
+    T z = F.x33;
     
     T dx = x - extrapolation_cutoff;
     T dy = y - extrapolation_cutoff;
@@ -194,7 +194,7 @@ P_From_Strain_Helper(const DIAGONAL_MATRIX<T,3>& F,const T scale,const int simpl
 {
     T x = F.x11;
     T y = F.x22;
-    T z = F.x22;
+    T z = F.x33;
     
     T dx = x - extrapolation_cutoff;
     T dy = y - extrapolation_cutoff;
@@ -350,7 +350,7 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_IS
 {
     T x = F.x11;
     T y = F.x22;
-    T z = F.x22;
+    T z = F.x33;
     
     T dx = x - extrapolation_cutoff;
     T dy = y - extrapolation_cutoff;
