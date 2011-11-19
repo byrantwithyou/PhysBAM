@@ -73,6 +73,7 @@ public:
     bool use_extended_neohookean;
     bool use_extended_neohookean_refined;
     bool use_extended_neohookean_hyperbola;
+    bool use_extended_neohookean_smooth;
     bool use_corotated;
     bool use_corot_blend;
     bool dump_sv;
@@ -86,7 +87,8 @@ public:
     
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),semi_implicit(false),test_forces(false),use_extended_neohookean(false),
-        use_extended_neohookean_refined(false),use_corotated(false),use_corot_blend(false),dump_sv(false),print_matrix(false),use_constant_ife(false)
+        use_extended_neohookean_refined(false),use_extended_neohookean_hyperbola(false),use_extended_neohookean_smooth(false),use_corotated(false),use_corot_blend(false),
+        dump_sv(false),print_matrix(false),use_constant_ife(false)
     {
     }
 
@@ -133,6 +135,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Option_Argument("-use_ext_neo");
     parse_args->Add_Option_Argument("-use_ext_neo_ref");
     parse_args->Add_Option_Argument("-use_ext_neo_hyper");
+    parse_args->Add_Option_Argument("-use_ext_neo_smooth");
     parse_args->Add_Option_Argument("-use_corotated");
     parse_args->Add_Option_Argument("-use_corot_blend");
     parse_args->Add_Option_Argument("-dump_sv");
@@ -191,6 +194,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     use_extended_neohookean=parse_args->Is_Value_Set("-use_ext_neo");
     use_extended_neohookean_refined=parse_args->Is_Value_Set("-use_ext_neo_ref");
     use_extended_neohookean_refined=parse_args->Is_Value_Set("-use_ext_neo_hyper");
+    use_extended_neohookean_refined=parse_args->Is_Value_Set("-use_ext_neo_smooth");
     use_corotated=parse_args->Is_Value_Set("-use_corotated");
     use_corot_blend=parse_args->Is_Value_Set("-use_corot_blend");
     dump_sv=parse_args->Is_Value_Set("-dump_sv");
@@ -554,6 +558,7 @@ void Add_Constitutive_Model(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,T 
     if(use_extended_neohookean) icm=new NEO_HOOKEAN_EXTRAPOLATED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.4,20*stiffness*stiffness_multiplier);
     else if(use_extended_neohookean_refined) icm=new NEO_HOOKEAN_EXTRAPOLATED_REFINED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.4,.6,20*stiffness*stiffness_multiplier);
     if(use_extended_neohookean_hyperbola) icm=new NEO_HOOKEAN_EXTRAPOLATED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.1);
+    if(use_extended_neohookean_smooth) icm=new NEO_HOOKEAN_EXTRAPOLATED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.2);
     else if(use_corotated) icm=new COROTATED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
     else if(use_corot_blend) icm=new NEO_HOOKEAN_COROTATED_BLEND<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
     else{
