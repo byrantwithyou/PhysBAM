@@ -348,7 +348,7 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_IS
 template<class T,int d> void NEO_HOOKEAN_EXTRAPOLATED_SMOOTH<T,d>::
 Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dP_dF,const int triangle) const
 {
-        T x = F.x11;
+    T x = F.x11;
     T y = F.x22;
     T z = F.x22;
     
@@ -363,36 +363,128 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_IS
      
     if ((dx >= 0) && (dy >= 0) && (dz >= 0)) // R
     {
-
+        DIAGONAL_MATRIX<T,3> F_inverse=F.Inverse();
+        T mu_minus_lambda_logJ=constant_mu+constant_lambda*log(F_inverse.Determinant());
+        SYMMETRIC_MATRIX<T,3> F_inverse_outer=SYMMETRIC_MATRIX<T,3>::Outer_Product(F_inverse.To_Vector());
+        dPi_dF.x1111=constant_mu+(constant_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x11;
+        dPi_dF.x2222=constant_mu+(constant_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x22;
+        dPi_dF.x3333=constant_mu+(constant_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x33;
+        dPi_dF.x2211=constant_lambda*F_inverse_outer.x21;
+        dPi_dF.x3311=constant_lambda*F_inverse_outer.x31;
+        dPi_dF.x3322=constant_lambda*F_inverse_outer.x32;
+        dPi_dF.x2121=constant_mu;
+        dPi_dF.x3131=constant_mu;
+        dPi_dF.x3232=constant_mu;
+        dPi_dF.x2112=mu_minus_lambda_logJ*F_inverse_outer.x21;
+        dPi_dF.x3113=mu_minus_lambda_logJ*F_inverse_outer.x31;
+        dPi_dF.x3223=mu_minus_lambda_logJ*F_inverse_outer.x32;
     }
     else if ((dx < 0) && (dy >= 0) && (dz >= 0)) // Rx
     {
-
+        dPi_dF.x1111=-(-mu*a^2-mu-la+la*ln(a*y*z))/a^2;
+        dPi_dF.x2222=-1/2*(-2*mu*y^2*a^2-2*mu*a^2-5*a^2*la+2*a^2*la*ln(a*y*z)+4*x*a*la-x^2*la)/y^2/a^2;
+        dPi_dF.x3333=-1/2*(-2*mu*z^2*a^2-2*mu*a^2-5*a^2*la+2*a^2*la*ln(a*y*z)+4*x*a*la-x^2*la)/z^2/a^2;
+        dPi_dF.x2211=la*(2*a-x)/y/a^2;
+        dPi_dF.x3311=la*(2*a-x)/z/a^2;
+        dPi_dF.x3322=la/y/z;
+        dPi_dF.x2121=-1/2*(2*mu*y^2*a^2-2*mu*a^2+2*a^2*la*ln(a*y*z)+6*x*a*la-3*a^2*la-3*x^2*la+4*a*mu*x-4*a*x*la*ln(a*y*z)-2*x^2*mu*a^2-2*mu*x^2+2*x^2*la*ln(a*y*z))/a^2/(x^2-y^2);
+        dPi_dF.x3232=mu;
+        dPi_dF.x2112=-1/2*(-2*x*mu*a^2+2*x*a^2*la*ln(a*y*z)+4*x^2*a*la-3*x*a^2*la-x^3*la+4*y^2*mu*a-4*y^2*a*la*ln(a*y*z)-2*y^2*mu*x-2*y^2*x*la+2*y^2*x*la*ln(a*y*z)+2*y^2*a*la)/y/a^2/(x^2-y^2);
+        dPi_dF.x3113=-1/2*(-2*x*mu*a^2+2*x*a^2*la*ln(a*y*z)+4*x^2*a*la-3*x*a^2*la-x^3*la+4*z^2*mu*a-4*z^2*a*la*ln(a*y*z)-2*z^2*mu*x-2*z^2*x*la+2*z^2*x*la*ln(a*y*z)+2*z^2*a*la)/z/a^2/(x^2-z^2);
+        dPi_dF.x3223=-1/2*(-2*mu*a^2+4*x*a*la-3*a^2*la-x^2*la+2*a^2*la*ln(a*y*z))/z/a^2/y;
+        dPi_dF.x3131=-1/2*(2*mu*z^2*a^2-2*mu*a^2+2*a^2*la*ln(a*y*z)+6*x*a*la-3*a^2*la-3*x^2*la+4*a*mu*x-4*a*x*la*ln(a*y*z)-2*x^2*mu*a^2-2*mu*x^2+2*x^2*la*ln(a*y*z))/a^2/(x^2-z^2);
     }
     else if ((dx >= 0) && (dy < 0) && (dz >= 0)) // Ry
     {
-
+        dPi_dF.x1111=-1/2*(-2*x^2*mu*a^2-2*mu*a^2-5*a^2*la+2*a^2*la*ln(x*a*z)+4*y*a*la-y^2*la)/x^2/a^2;
+        dPi_dF.x2222=-(-mu*a^2-mu-la+la*ln(x*a*z))/a^2;
+        dPi_dF.x3333=-1/2*(-2*mu*z^2*a^2-2*mu*a^2-5*a^2*la+2*a^2*la*ln(x*a*z)+4*y*a*la-y^2*la)/z^2/a^2;
+        dPi_dF.x2211=la*(2*a-y)/x/a^2;
+        dPi_dF.x3311=la/x/z;
+        dPi_dF.x3322=la*(2*a-y)/z/a^2;
+        dPi_dF.x2121=1/2*(4*y*mu*a-4*a*y*la*ln(x*a*z)-2*mu*y^2*a^2-2*mu*y^2-3*y^2*la+2*y^2*la*ln(x*a*z)+6*y*a*la+2*x^2*mu*a^2-2*mu*a^2+2*a^2*la*ln(x*a*z)-3*a^2*la)/a^2/(x^2-y^2);
+        dPi_dF.x3232=-1/2*(2*mu*z^2*a^2-2*mu*a^2+2*a^2*la*ln(x*a*z)+6*y*a*la-3*a^2*la-3*y^2*la+4*y*mu*a-4*a*y*la*ln(x*a*z)-2*mu*y^2*a^2-2*mu*y^2+2*y^2*la*ln(x*a*z))/a^2/(y^2-z^2);
+        dPi_dF.x2112=1/2*(4*x^2*mu*a-4*x^2*a*la*ln(x*a*z)-2*x^2*mu*y-2*x^2*y*la+2*x^2*y*la*ln(x*a*z)+2*x^2*a*la-2*mu*y*a^2+2*y*a^2*la*ln(x*a*z)+4*y^2*a*la-3*y*a^2*la-y^3*la)/x/a^2/(x^2-y^2);
+        dPi_dF.x3113=-1/2*(-2*mu*a^2+4*y*a*la-3*a^2*la-y^2*la+2*a^2*la*ln(x*a*z))/z/a^2/x;
+        dPi_dF.x3223=-1/2*(-2*mu*y*a^2+2*y*a^2*la*ln(x*a*z)+4*y^2*a*la-3*y*a^2*la-y^3*la+4*z^2*mu*a-4*z^2*a*la*ln(x*a*z)-2*z^2*mu*y-2*z^2*y*la+2*z^2*y*la*ln(x*a*z)+2*z^2*a*la)/z/a^2/(y^2-z^2);
+        dPi_dF.x3131=mu;
     }
     else if ((dx >= 0) && (dy >= 0) && (dz < 0)) // Rz
     {
-
+        dPi_dF.x1111=-1/2*(-2*x^2*mu*a^2-2*mu*a^2-5*a^2*la+2*a^2*la*ln(x*y*a)+4*z*a*la-z^2*la)/x^2/a^2;
+        dPi_dF.x2222=-1/2*(-2*mu*y^2*a^2-2*mu*a^2-5*a^2*la+2*a^2*la*ln(x*y*a)+4*z*a*la-z^2*la)/y^2/a^2;
+        dPi_dF.x3333=-(-mu*a^2-mu-la+la*ln(x*y*a))/a^2;
+        dPi_dF.x2211=la/y/x;
+        dPi_dF.x3311=la*(2*a-z)/x/a^2;
+        dPi_dF.x3322=la*(2*a-z)/y/a^2;
+        dPi_dF.x2121=mu;
+        dPi_dF.x3232=1/2*(4*z*mu*a-4*a*z*la*ln(x*y*a)-2*mu*z^2*a^2-2*mu*z^2-3*z^2*la+2*z^2*la*ln(x*y*a)+6*z*a*la+2*mu*y^2*a^2-2*mu*a^2+2*a^2*la*ln(x*y*a)-3*a^2*la)/a^2/(y^2-z^2);
+        dPi_dF.x2112=-1/2*(-2*mu*a^2+4*z*a*la-3*a^2*la-z^2*la+2*a^2*la*ln(x*y*a))/y/a^2/x;
+        dPi_dF.x3113=1/2*(4*x^2*mu*a-4*x^2*a*la*ln(x*y*a)-2*x^2*mu*z-2*x^2*z*la+2*x^2*z*la*ln(x*y*a)+2*x^2*a*la-2*mu*z*a^2+2*z*a^2*la*ln(x*y*a)+4*z^2*a*la-3*z*a^2*la-z^3*la)/x/a^2/(x^2-z^2);
+        dPi_dF.x3223=1/2*(4*y^2*mu*a-4*y^2*a*la*ln(x*y*a)-2*y^2*mu*z-2*y^2*z*la+2*y^2*z*la*ln(x*y*a)+2*y^2*a*la-2*mu*z*a^2+2*z*a^2*la*ln(x*y*a)+4*z^2*a*la-3*z*a^2*la-z^3*la)/y/a^2/(y^2-z^2);
+        dPi_dF.x3131=1/2*(4*z*mu*a-4*a*z*la*ln(x*y*a)-2*mu*z^2*a^2-2*mu*z^2-3*z^2*la+2*z^2*la*ln(x*y*a)+6*z*a*la+2*x^2*mu*a^2-2*mu*a^2+2*a^2*la*ln(x*y*a)-3*a^2*la)/a^2/(x^2-z^2);
     }
     else if ((dx < 0) && (dy < 0) && (dz >= 0)) // Rxy
     {
-
+        dPi_dF.x1111=-1/2*(-5*a^2*la+2*a^2*la*ln(z*a^2)-2*mu*a^4-2*mu*a^2-y^2*la+4*y*a*la)/a^4;
+        dPi_dF.x2222=-1/2*(2*a^2*la*ln(z*a^2)-2*mu*a^2+4*x*a*la-5*a^2*la-x^2*la-2*mu*a^4)/a^4;
+        dPi_dF.x3333=-1/2/a^2*(4*y*a*la-y^2*la+4*x*a*la-x^2*la-2*mu*z^2*a^2-2*mu*a^2-8*a^2*la+2*a^2*la*ln(z*a^2))/z^2;
+        dPi_dF.x2211=la*(4*a^2-2*a*y+x*y-2*x*a)/a^4;
+        dPi_dF.x3311=la*(2*a-x)/z/a^2;
+        dPi_dF.x3322=la*(2*a-y)/z/a^2;
+        dPi_dF.x2121=1/2*(-2*y*x*la+2*a*mu*x+5*x*a*la-2*x*a*la*ln(z*a^2)+2*x*mu*a^3-8*a^2*la+4*a^2*la*ln(z*a^2)-4*mu*a^2+2*y*mu*a+5*y*a*la-2*a*y*la*ln(z*a^2)+2*mu*y*a^3)/(x+y)/a^3;
+        dPi_dF.x3232=-1/2*(12*a^3*y*la-6*y^2*a^2*la+4*x*a^3*la-x^2*a^2*la+2*a^4*mu*z^2-2*mu*a^4+2*a^4*la*ln(z*a^2)-6*a^4*la-4*a^3*y*la*ln(z*a^2)+2*a^2*y^2*la*ln(z*a^2)-8*x*y*a^2*la-2*mu*y^2*a^2+4*y^2*x*a*la-y^2*x^2*la+4*mu*y*a^3+2*x^2*y*a*la-2*a^4*mu*y^2)/a^4/(y^2-z^2);
+        dPi_dF.x2112=-1/2*(x^2*y*la-2*x^2*a*la+8*x*a^2*la-6*x*y*a*la+y^2*x*la+4*a^3*la*ln(z*a^2)-8*a^3*la-4*mu*a^3-2*y^2*a*la+8*y*a^2*la)/(x+y)/a^4;
+        dPi_dF.x3113=-1/2*(4*x*a^3*y*la-x*a^2*y^2*la+4*x^2*a^3*la-x^3*a^2*la-2*x*mu*a^4+2*x*a^4*la*ln(z*a^2)-6*x*a^4*la-4*z^2*a^3*la*ln(z*a^2)-8*z^2*y*a^2*la+2*z^2*x*a^2*la*ln(z*a^2)+4*z^2*mu*a^3-2*x*mu*z^2*a^2+2*z^2*y^2*a*la-z^2*y^2*x*la+4*z^2*x*y*a*la-5*z^2*x*a^2*la+8*z^2*a^3*la)/z/a^4/(x^2-z^2);
+        dPi_dF.x3223=-1/2*(4*y^2*a^3*la-y^3*a^2*la+4*x*a^3*y*la-y*a^2*x^2*la-2*a^4*mu*y+2*y*a^4*la*ln(z*a^2)-6*y*a^4*la-4*z^2*a^3*la*ln(z*a^2)+2*z^2*a^2*y*la*ln(z*a^2)-8*z^2*x*a^2*la-2*y*mu*z^2*a^2+4*z^2*x*y*a*la-5*z^2*y*a^2*la-z^2*x^2*y*la+4*z^2*mu*a^3+2*z^2*x^2*a*la+8*z^2*a^3*la)/z/a^4/(y^2-z^2);
+        dPi_dF.x3131=-1/2*(4*a^3*y*la-y^2*a^2*la+12*x*a^3*la-6*x^2*a^2*la+2*a^4*mu*z^2-2*mu*a^4+2*a^4*la*ln(z*a^2)-6*a^4*la-4*x*a^3*la*ln(z*a^2)-8*x*y*a^2*la+2*x^2*a^2*la*ln(z*a^2)+4*x*mu*a^3-2*x^2*mu*a^2+2*y^2*x*a*la-y^2*x^2*la+4*x^2*y*a*la-2*x^2*mu*a^4)/a^4/(x^2-z^2);
     }
     else if ((dx < 0) && (dy >= 0) && (dz < 0)) // Rxz
     {
-
+        dPi_dF.x1111=-1/2*(-5*a^2*la+2*a^2*la*ln(y*a^2)-2*mu*a^4-2*mu*a^2-z^2*la+4*z*a*la)/a^4;
+        dPi_dF.x2222=-1/2/a^2*(-2*mu*y^2*a^2-2*mu*a^2-8*a^2*la+2*a^2*la*ln(y*a^2)+4*z*a*la-z^2*la+4*x*a*la-x^2*la)/y^2;
+        dPi_dF.x3333=-1/2*(-2*mu*a^2+4*x*a*la-5*a^2*la-x^2*la-2*mu*a^4+2*a^2*la*ln(y*a^2))/a^4;
+        dPi_dF.x2211=la*(2*a-x)/y/a^2;
+        dPi_dF.x3311=la*(-2*a*z+x*z-2*x*a+4*a^2)/a^4;
+        dPi_dF.x3322=la*(2*a-z)/y/a^2;
+        dPi_dF.x2121=-1/2*(2*a^4*mu*y^2-2*mu*a^4+2*a^4*la*ln(y*a^2)-6*a^4*la+4*z*a^3*la-z^2*a^2*la+12*x*a^3*la-6*x^2*a^2*la+4*x*mu*a^3-2*x^2*mu*a^2+2*z^2*x*a*la-z^2*x^2*la+4*x^2*z*a*la-2*x^2*mu*a^4-8*z*x*a^2*la-4*x*a^3*la*ln(y*a^2)+2*x^2*a^2*la*ln(y*a^2))/a^4/(x^2-y^2);
+        dPi_dF.x3232=1/2*(-2*mu*z^2*a^2+4*z^2*x*a*la-6*z^2*a^2*la-z^2*x^2*la+4*mu*z*a^3+2*x^2*z*a*la-2*a^4*mu*z^2+12*z*a^3*la-8*z*x*a^2*la-4*a^3*z*la*ln(y*a^2)+2*a^2*z^2*la*ln(y*a^2)+2*a^4*mu*y^2-2*mu*a^4+2*a^4*la*ln(y*a^2)-6*a^4*la+4*x*a^3*la-x^2*a^2*la)/a^4/(y^2-z^2);
+        dPi_dF.x2112=-1/2*(-2*x*mu*a^4+2*x*a^4*la*ln(y*a^2)-6*x*a^4*la+4*x*a^3*z*la-z^2*x*a^2*la+4*x^2*a^3*la-x^3*a^2*la+4*a^3*mu*y^2-2*x*mu*y^2*a^2+2*z^2*y^2*a*la-z^2*y^2*x*la-5*x*a^2*y^2*la+4*y^2*x*z*a*la+8*y^2*a^3*la-8*y^2*z*a^2*la-4*y^2*a^3*la*ln(y*a^2)+2*y^2*x*a^2*la*ln(y*a^2))/y/a^4/(x^2-y^2);
+        dPi_dF.x3113=-1/2*(-2*x^2*a*la+x^2*z*la+8*x*a^2*la-6*x*z*a*la+z^2*x*la-4*mu*a^3+4*a^3*la*ln(y*a^2)-2*z^2*a*la-8*a^3*la+8*z*a^2*la)/(x+z)/a^4;
+        dPi_dF.x3223=1/2*(-2*y^2*mu*z*a^2+4*y^2*x*z*a*la-5*y^2*z*a^2*la-x^2*y^2*z*la+4*a^3*mu*y^2+2*x^2*y^2*a*la+8*y^2*a^3*la-8*x*a^2*y^2*la-4*y^2*a^3*la*ln(y*a^2)+2*y^2*a^2*z*la*ln(y*a^2)-2*a^4*mu*z+2*z*a^4*la*ln(y*a^2)-6*z*a^4*la+4*z^2*a^3*la-z^3*a^2*la+4*x*a^3*z*la-x^2*z*a^2*la)/y/a^4/(y^2-z^2);
+        dPi_dF.x3131=1/2*(5*x*a*la-2*z*x*la+2*x*mu*a^3+2*a*mu*x-2*x*a*la*ln(y*a^2)-8*a^2*la-4*mu*a^2+4*a^2*la*ln(y*a^2)+5*z*a*la+2*mu*z*a^3+2*z*mu*a-2*a*z*la*ln(y*a^2))/(x+z)/a^3;
     }
     else if ((dx >= 0) && (dy < 0) && (dz < 0)) // Rzy
     {
-
+        dPi_dF.x1111=-1/2/a^2*(-2*x^2*mu*a^2-2*mu*a^2-8*a^2*la+2*a^2*la*ln(x*a^2)+4*y*a*la-y^2*la+4*z*a*la-z^2*la)/x^2;
+        dPi_dF.x2222=-1/2*(-2*mu*a^2-5*a^2*la-z^2*la+4*z*a*la-2*mu*a^4+2*a^2*la*ln(x*a^2))/a^4;
+        dPi_dF.x3333=-1/2*(-5*a^2*la+2*a^2*la*ln(x*a^2)-2*mu*a^4-2*mu*a^2-y^2*la+4*y*a*la)/a^4;
+        dPi_dF.x2211=la*(2*a-y)/x/a^2;
+        dPi_dF.x3311=la*(2*a-z)/x/a^2;
+        dPi_dF.x3322=la*(-2*a*z+y*z-2*a*y+4*a^2)/a^4;
+        dPi_dF.x2121=1/2*(-2*mu*y^2*a^2-6*y^2*a^2*la+4*mu*y*a^3+2*z^2*y*a*la-z^2*y^2*la+4*y^2*z*a*la-2*a^4*mu*y^2+12*a^3*y*la-8*z*y*a^2*la-4*a^3*y*la*ln(x*a^2)+2*a^2*y^2*la*ln(x*a^2)+2*x^2*mu*a^4-2*mu*a^4+2*a^4*la*ln(x*a^2)-6*a^4*la+4*z*a^3*la-z^2*a^2*la)/a^4/(x^2-y^2);
+        dPi_dF.x3232=1/2*(-2*z*y*la+2*mu*y*a^3+2*y*mu*a+5*y*a*la-2*a*y*la*ln(x*a^2)-8*a^2*la+4*a^2*la*ln(x*a^2)-4*mu*a^2+2*mu*z*a^3+2*z*mu*a+5*z*a*la-2*z*a*la*ln(x*a^2))/(y+z)/a^3;
+        dPi_dF.x2112=1/2*(-2*x^2*mu*y*a^2-5*y*a^2*x^2*la+4*x^2*mu*a^3+2*z^2*x^2*a*la-z^2*x^2*y*la+4*x^2*z*y*a*la+8*x^2*a^3*la-8*x^2*z*a^2*la-4*x^2*a^3*la*ln(x*a^2)+2*x^2*a^2*y*la*ln(x*a^2)-2*a^4*mu*y+2*y*a^4*la*ln(x*a^2)-6*y*a^4*la+4*y^2*a^3*la-y^3*a^2*la+4*y*a^3*z*la-z^2*y*a^2*la)/x/a^4/(x^2-y^2);
+        dPi_dF.x3113=1/2*(-2*x^2*mu*z*a^2-5*x^2*z*a^2*la+4*x^2*z*y*a*la-x^2*y^2*z*la+4*x^2*mu*a^3+2*x^2*y^2*a*la+8*x^2*a^3*la-8*y*a^2*x^2*la-4*x^2*a^3*la*ln(x*a^2)+2*x^2*z*a^2*la*ln(x*a^2)-2*a^4*mu*z+2*z*a^4*la*ln(x*a^2)-6*z*a^4*la+4*y*a^3*z*la-y^2*z*a^2*la+4*z^2*a^3*la-z^3*a^2*la)/x/a^4/(x^2-z^2);
+        dPi_dF.x3223=-1/2*(-2*y^2*a*la+y^2*z*la+8*y*a^2*la-6*z*y*a*la+z^2*y*la-4*mu*a^3+4*a^3*la*ln(x*a^2)-2*z^2*a*la-8*a^3*la+8*z*a^2*la)/(y+z)/a^4;
+        dPi_dF.x3131=1/2*(-2*mu*z^2*a^2-6*z^2*a^2*la+4*z^2*y*a*la-z^2*y^2*la+4*mu*z*a^3+2*y^2*z*a*la-2*a^4*mu*z^2+12*z*a^3*la-8*z*y*a^2*la-4*z*a^3*la*ln(x*a^2)+2*z^2*a^2*la*ln(x*a^2)+2*x^2*mu*a^4-2*mu*a^4+2*a^4*la*ln(x*a^2)-6*a^4*la+4*a^3*y*la-y^2*a^2*la)/a^4/(x^2-z^2);
     }
     else // Rxyz
     {
-
+        dPi_dF.x1111=-1/2*(-8*a^2*la+2*a^2*la*ln(a^3)-2*mu*a^4-2*mu*a^2-y^2*la+4*z*a*la-z^2*la+4*y*a*la)/a^4;
+        dPi_dF.x2222=-1/2*(-2*mu*a^2+4*x*a*la-8*a^2*la-x^2*la-z^2*la+4*z*a*la-2*mu*a^4+2*a^2*la*ln(a^3))/a^4;
+        dPi_dF.x3333=-1/2*(-2*mu*a^2+4*x*a*la-8*a^2*la-x^2*la+4*y*a*la-y^2*la-2*mu*a^4+2*a^2*la*ln(a^3))/a^4;
+        dPi_dF.x2211=la*(4*a^2-2*a*y+x*y-2*x*a)/a^4;
+        dPi_dF.x3311=la*(-2*a*z+x*z-2*x*a+4*a^2)/a^4;
+        dPi_dF.x3322=la*(-2*a*z+y*z-2*a*y+4*a^2)/a^4
+            dPi_dF.x2121=1/2*(2*x*mu*a^2+2*x*mu*a^4+z^2*x*la-4*x*z*a*la-2*x*y*a*la+8*x*a^2*la-2*x*a^2*la*ln(a^3)-14*a^3*la-2*z^2*a*la+8*z*a^2*la+4*a^3*la*ln(a^3)-4*mu*a^3+2*mu*y*a^2+2*a^4*mu*y+z^2*y*la-4*z*y*a*la+8*y*a^2*la-2*a^2*y*la*ln(a^3))/(x+y)/a^4;
+        dPi_dF.x3232=1/2*(2*mu*y*a^2-2*z*y*a*la-4*x*y*a*la+2*a^4*mu*y-2*a^2*y*la*ln(a^3)+8*y*a^2*la+x^2*y*la+8*x*a^2*la-14*a^3*la-4*mu*a^3+4*a^3*la*ln(a^3)-2*x^2*a*la+2*mu*z*a^2-4*x*z*a*la+2*a^4*mu*z-2*z*a^2*la*ln(a^3)+8*z*a^2*la+x^2*z*la)/(y+z)/a^4;
+            dPi_dF.x2112=-1/2*(x^2*y*la-2*x^2*a*la+8*x*a^2*la-6*x*y*a*la+y^2*x*la-14*a^3*la-2*z^2*a*la+8*z*a^2*la-2*y^2*a*la+4*a^3*la*ln(a^3)-4*mu*a^3+8*y*a^2*la)/(x+y)/a^4;
+        dPi_dF.x3113=-1/2*(-2*x^2*a*la+x^2*z*la+8*x*a^2*la-6*x*z*a*la+z^2*x*la-14*a^3*la-2*z^2*a*la+8*z*a^2*la-2*y^2*a*la+4*a^3*la*ln(a^3)-4*mu*a^3+8*y*a^2*la)/(x+z)/a^4;
+        dPi_dF.x3223=-1/2*(-2*y^2*a*la+y^2*z*la+8*y*a^2*la-6*z*y*a*la+z^2*y*la-2*z^2*a*la+8*x*a^2*la-14*a^3*la-4*mu*a^3+4*a^3*la*ln(a^3)-2*x^2*a*la+8*z*a^2*la)/(y+z)/a^4;
+            dPi_dF.x3131=1/2*(-2*x*z*a*la+2*x*mu*a^4+y^2*x*la+2*x*mu*a^2-4*x*y*a*la+8*x*a^2*la-2*x*a^2*la*ln(a^3)-4*mu*a^3-14*a^3*la-2*y^2*a*la+8*y*a^2*la+4*a^3*la*ln(a^3)+2*a^4*mu*z+y^2*z*la+2*mu*z*a^2-4*z*y*a*la+8*z*a^2*la-2*z*a^2*la*ln(a^3))/(x+z)/a^4;
     }
+    if(enforce_definiteness) dPi_dF.Enforce_Definiteness();
 }
 //#####################################################################
 // Function P_From_Strain_Rate
