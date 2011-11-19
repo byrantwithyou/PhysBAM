@@ -16,7 +16,7 @@ using namespace PhysBAM;
 
 int main(int argc,char* argv[])
 {
-    typedef float T;
+    typedef double T;
     typedef float RW;
     typedef VECTOR<T,3> TV;
     RW rw=RW();STREAM_TYPE stream_type(rw); // gcc 3.3.2 workaround
