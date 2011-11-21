@@ -84,7 +84,7 @@ public:
     inline T E (const T x, const T y, const T z) const
     {
         assert(x>0 && y>0 && z>0);
-        log_J = log(x*y*z);
+        T log_J = log(x*y*z);
         return mu*(0.5*(sqr(x) + sqr(y) + sqr(z) - 3) - log_J) + 0.5*lambda*sqr(log_J); 
     }
 };

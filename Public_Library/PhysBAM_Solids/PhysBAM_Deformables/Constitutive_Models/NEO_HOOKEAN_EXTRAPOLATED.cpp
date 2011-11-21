@@ -91,6 +91,9 @@ Energy_Density_Helper(const DIAGONAL_MATRIX<T,3>& F,const int simplex) const
     T dx = x - extrapolation_cutoff;
     T dy = y - extrapolation_cutoff;
     T dz = z - extrapolation_cutoff;
+
+    T mu = constant_mu;
+    T la = constant_lambda;   
     
     T a = extrapolation_cutoff;
     T k = extra_force_coefficient;
@@ -103,31 +106,31 @@ Energy_Density_Helper(const DIAGONAL_MATRIX<T,3>& F,const int simplex) const
     }
     else if ((dx < 0) && (dy >= 0) && (dz >= 0)) // Rx
     {
-        return 1/2*(-mu*a^3+mu*a*y^2+mu*a*z^2-mu*a-2*mu*a*ln(a*y*z)+la*ln(a*y*z)^2*a+2*mu*a^2*x-2*mu*x+2*la*ln(a*y*z)*x-2*la*ln(a*y*z)*a+2*k*a*x^2-4*k*a^2*x+2*k*a^3)/a;
+        return 0.5*(-mu*cube(a)+mu*a*sqr(y)+mu*a*sqr(z)-mu*a-2*mu*a*log(a*y*z)+la*sqr(log(a*y*z))*a+2*mu*sqr(a)*x-2*mu*x+2*la*log(a*y*z)*x-2*la*log(a*y*z)*a+2*k*a*sqr(x)-4*k*sqr(a)*x+2*k*cube(a))/a;
     }
     else if ((dx >= 0) && (dy < 0) && (dz >= 0)) // Ry
     {
-        return 1/2*(mu*a*x^2-mu*a^3+mu*a*z^2-mu*a-2*mu*a*ln(x*a*z)+la*ln(x*a*z)^2*a+2*y*mu*a^2-2*mu*y+2*la*ln(x*a*z)*y-2*la*ln(x*a*z)*a+2*y^2*k*a-4*y*k*a^2+2*k*a^3)/a;
+        return 0.5*(mu*a*sqr(x)-mu*cube(a)+mu*a*sqr(z)-mu*a-2*mu*a*log(x*a*z)+la*sqr(log(x*a*z))*a+2*y*mu*sqr(a)-2*mu*y+2*la*log(x*a*z)*y-2*la*log(x*a*z)*a+2*sqr(y)*k*a-4*y*k*sqr(a)+2*k*cube(a))/a;
     }
     else if ((dx >= 0) && (dy >= 0) && (dz < 0)) // Rz
     {
-        return 1/2*(mu*a*x^2+mu*a*y^2-mu*a^3-mu*a-2*mu*a*ln(x*y*a)+la*ln(x*y*a)^2*a+2*z*mu*a^2-2*mu*z+2*la*ln(x*y*a)*z-2*la*ln(x*y*a)*a+2*z^2*k*a-4*z*k*a^2+2*k*a^3)/a;
+        return 0.5*(mu*a*sqr(x)+mu*a*sqr(y)-mu*cube(a)-mu*a-2*mu*a*log(x*y*a)+la*sqr(log(x*y*a))*a+2*z*mu*sqr(a)-2*mu*z+2*la*log(x*y*a)*z-2*la*log(x*y*a)*a+2*sqr(z)*k*a-4*z*k*sqr(a)+2*k*cube(a))/a;
     }
     else if ((dx < 0) && (dy < 0) && (dz >= 0)) // Rxy
     {
-        return 1/2*(mu*a^2-2*x*mu*a-2*x*la*a+2*y^2*k*a^2-2*mu*a*y+z^2*mu*a^2+2*x^2*k*a^2-2*y*la*a+2*a*la*ln(a^2*z)*x+2*a*la*ln(a^2*z)*y+la*ln(a^2*z)^2*a^2-2*mu*a^2*ln(a^2*z)+2*mu*a^3*x-4*la*ln(a^2*z)*a^2+2*y*mu*a^3+2*la*x*y-4*k*a^3*x-4*k*a^3*y-2*mu*a^4+2*la*a^2+4*k*a^4)/a^2;
+        return 0.5*(mu*sqr(a)-2*x*mu*a-2*x*la*a+2*sqr(y)*k*sqr(a)-2*mu*a*y+sqr(z)*mu*sqr(a)+2*sqr(x)*k*sqr(a)-2*y*la*a+2*a*la*log(sqr(a)*z)*x+2*a*la*log(sqr(a)*z)*y+la*sqr(log(sqr(a)*z))*sqr(a)-2*mu*sqr(a)*log(sqr(a)*z)+2*mu*cube(a)*x-4*la*log(sqr(a)*z)*sqr(a)+2*y*mu*cube(a)+2*la*x*y-4*k*cube(a)*x-4*k*cube(a)*y-2*mu*(a*a*a*a)+2*la*sqr(a)+4*k*(a*a*a*a))/sqr(a);
     }
     else if ((dx < 0) && (dy >= 0) && (dz < 0)) // Rzx
     {
-        return 1/2*(mu*a^2-2*x*mu*a-2*x*la*a+y^2*mu*a^2+2*z^2*k*a^2-2*mu*a*z+2*x^2*k*a^2-2*z*la*a+2*mu*a^3*x-4*k*a^3*x-2*mu*a^4+2*la*a^2+4*k*a^4+2*z*mu*a^3-4*z*k*a^3+2*z*la*x+la*ln(a^2*y)^2*a^2-2*mu*a^2*ln(a^2*y)-4*la*ln(a^2*y)*a^2+2*a*la*ln(a^2*y)*z+2*a*la*ln(a^2*y)*x)/a^2;
+        return 0.5*(mu*sqr(a)-2*x*mu*a-2*x*la*a+sqr(y)*mu*sqr(a)+2*sqr(z)*k*sqr(a)-2*mu*a*z+2*sqr(x)*k*sqr(a)-2*z*la*a+2*mu*cube(a)*x-4*k*cube(a)*x-2*mu*(a*a*a*a)+2*la*sqr(a)+4*k*(a*a*a*a)+2*z*mu*cube(a)-4*z*k*cube(a)+2*z*la*x+la*sqr(log(sqr(a)*y))*sqr(a)-2*mu*sqr(a)*log(sqr(a)*y)-4*la*log(sqr(a)*y)*sqr(a)+2*a*la*log(sqr(a)*y)*z+2*a*la*log(sqr(a)*y)*x)/sqr(a);
     }
     else if ((dx >= 0) && (dy < 0) && (dz < 0)) // Ryz
     {
-        return 1/2*(mu*a^2+2*y^2*k*a^2-2*mu*a*y+2*z^2*k*a^2-2*mu*a*z+x^2*mu*a^2-2*y*la*a-2*z*la*a+2*y*mu*a^3-4*k*a^3*y-2*mu*a^4+2*la*a^2+4*k*a^4+2*z*mu*a^3+2*z*la*y-4*z*k*a^3+2*a*la*ln(x*a^2)*y+2*a*la*ln(x*a^2)*z+la*ln(x*a^2)^2*a^2-2*mu*a^2*ln(x*a^2)-4*la*ln(x*a^2)*a^2)/a^2;
+        return 0.5*(mu*sqr(a)+2*sqr(y)*k*sqr(a)-2*mu*a*y+2*sqr(z)*k*sqr(a)-2*mu*a*z+sqr(x)*mu*sqr(a)-2*y*la*a-2*z*la*a+2*y*mu*cube(a)-4*k*cube(a)*y-2*mu*(a*a*a*a)+2*la*sqr(a)+4*k*(a*a*a*a)+2*z*mu*cube(a)+2*z*la*y-4*z*k*cube(a)+2*a*la*log(x*sqr(a))*y+2*a*la*log(x*sqr(a))*z+la*sqr(log(x*sqr(a)))*sqr(a)-2*mu*sqr(a)*log(x*sqr(a))-4*la*log(x*sqr(a))*sqr(a))/sqr(a);
     }
     else // Rxyz
     {
-        return 1/2*(3*mu*a^2-2*x*mu*a-4*x*la*a+2*y^2*k*a^2-2*mu*a*y+2*z^2*k*a^2-2*mu*a*z+2*x^2*k*a^2-4*y*la*a-4*z*la*a+2*mu*a^3*x+2*y*mu*a^3+2*la*x*y-4*k*a^3*x-4*k*a^3*y-3*mu*a^4+6*la*a^2+6*k*a^4+2*z*mu*a^3+2*z*la*y-4*z*k*a^3+2*z*la*x+2*a*la*ln(a^3)*x+2*a*la*ln(a^3)*y+2*a*la*ln(a^3)*z+la*ln(a^3)^2*a^2-2*mu*a^2*ln(a^3)-6*la*ln(a^3)*a^2)/a^2;
+        return 0.5*(3*mu*sqr(a)-2*x*mu*a-4*x*la*a+2*sqr(y)*k*sqr(a)-2*mu*a*y+2*sqr(z)*k*sqr(a)-2*mu*a*z+2*sqr(x)*k*sqr(a)-4*y*la*a-4*z*la*a+2*mu*cube(a)*x+2*y*mu*cube(a)+2*la*x*y-4*k*cube(a)*x-4*k*cube(a)*y-3*mu*(a*a*a*a)+6*la*sqr(a)+6*k*(a*a*a*a)+2*z*mu*cube(a)+2*z*la*y-4*z*k*cube(a)+2*z*la*x+2*a*la*log(cube(a))*x+2*a*la*log(cube(a))*y+2*a*la*log(cube(a))*z+la*sqr(log(cube(a)))*sqr(a)-2*mu*sqr(a)*log(cube(a))-6*la*log(cube(a))*sqr(a))/sqr(a);
     }
 }
 //#####################################################################
@@ -208,57 +211,57 @@ P_From_Strain_Helper(const DIAGONAL_MATRIX<T,3>& F,const T scale,const int simpl
     else if ((dx < 0) && (dy >= 0) && (dz >= 0)) // Rx
     {
         DIAGONAL_MATRIX<T,3> result;
-        result.x11=(mu*a^2-mu+la*ln(a*y*z)+2*k*a*x-2*k*a^2)/a;
-        result.x22=(mu*a*y^2-mu*a+la*ln(a*y*z)*a+la*x-la*a)/a/y;
-        result.x33=(mu*a*z^2-mu*a+la*ln(a*y*z)*a+la*x-la*a)/a/z;
+        result.x11=(mu*sqr(a)-mu+la*log(a*y*z)+2*k*a*x-2*k*sqr(a))/a;
+        result.x22=(mu*a*sqr(y)-mu*a+la*log(a*y*z)*a+la*x-la*a)/a/y;
+        result.x33=(mu*a*sqr(z)-mu*a+la*log(a*y*z)*a+la*x-la*a)/a/z;
         return scale*result;
     }
     else if ((dx >= 0) && (dy < 0) && (dz >= 0)) // Ry
     {
         DIAGONAL_MATRIX<T,3> result;
-        result.x11=(mu*a*x^2-mu*a+la*ln(x*a*z)*a+la*y-la*a)/x/a;
-        result.x22=(mu*a^2-mu+la*ln(x*a*z)+2*k*a*y-2*k*a^2)/a;
-        result.x33=(mu*a*z^2-mu*a+la*ln(x*a*z)*a+la*y-la*a)/a/z;
+        result.x11=(mu*a*sqr(x)-mu*a+la*log(x*a*z)*a+la*y-la*a)/x/a;
+        result.x22=(mu*sqr(a)-mu+la*log(x*a*z)+2*k*a*y-2*k*sqr(a))/a;
+        result.x33=(mu*a*sqr(z)-mu*a+la*log(x*a*z)*a+la*y-la*a)/a/z;
         return scale*result;
     }
     else if ((dx >= 0) && (dy >= 0) && (dz < 0)) // Rz
     {
         DIAGONAL_MATRIX<T,3> result;
-        result.x11=(mu*a*x^2-mu*a+la*ln(x*y*a)*a+la*z-la*a)/x/a;
-        result.x22=(mu*a*y^2-mu*a+la*ln(x*y*a)*a+la*z-la*a)/a/y;
-        result.x33=(mu*a^2-mu+la*ln(x*y*a)+2*k*a*z-2*k*a^2)/a;
+        result.x11=(mu*a*sqr(x)-mu*a+la*log(x*y*a)*a+la*z-la*a)/x/a;
+        result.x22=(mu*a*sqr(y)-mu*a+la*log(x*y*a)*a+la*z-la*a)/a/y;
+        result.x33=(mu*sqr(a)-mu+la*log(x*y*a)+2*k*a*z-2*k*sqr(a))/a;
         return scale*result;
     }
     else if ((dx < 0) && (dy < 0) && (dz >= 0)) // Rxy
     {
         DIAGONAL_MATRIX<T,3> result;
-        result.x11=(mu*a^3-mu*a+la*ln(a^2*z)*a+la*y-la*a+2*k*a^2*x-2*k*a^3)/a^2;
-        result.x22=(mu*a^3-mu*a+la*ln(a^2*z)*a+la*x-la*a+2*y*k*a^2-2*k*a^3)/a^2;
-        result.x33=(mu*a*z^2-mu*a+la*ln(a^2*z)*a+la*x-2*la*a+la*y)/a/z;
+        result.x11=(mu*cube(a)-mu*a+la*log(sqr(a)*z)*a+la*y-la*a+2*k*sqr(a)*x-2*k*cube(a))/sqr(a);
+        result.x22=(mu*cube(a)-mu*a+la*log(sqr(a)*z)*a+la*x-la*a+2*y*k*sqr(a)-2*k*cube(a))/sqr(a);
+        result.x33=(mu*a*sqr(z)-mu*a+la*log(sqr(a)*z)*a+la*x-2*la*a+la*y)/a/z;
         return scale*result;
     }
     else if ((dx < 0) && (dy >= 0) && (dz < 0)) // Rzx
     {
         DIAGONAL_MATRIX<T,3> result;
-        result.x11=(mu*a^3-mu*a+la*ln(a^2*y)*a+la*z-la*a+2*k*a^2*x-2*k*a^3)/a^2;
-        result.x22=(mu*a*y^2-mu*a+la*ln(a^2*y)*a+la*z-2*la*a+la*x)/a/y;
-        result.x33=(mu*a^3-mu*a+la*ln(a^2*y)*a+la*x-la*a+2*z*k*a^2-2*k*a^3)/a^2;
+        result.x11=(mu*cube(a)-mu*a+la*log(sqr(a)*y)*a+la*z-la*a+2*k*sqr(a)*x-2*k*cube(a))/sqr(a);
+        result.x22=(mu*a*sqr(y)-mu*a+la*log(sqr(a)*y)*a+la*z-2*la*a+la*x)/a/y;
+        result.x33=(mu*cube(a)-mu*a+la*log(sqr(a)*y)*a+la*x-la*a+2*z*k*sqr(a)-2*k*cube(a))/sqr(a);
         return scale*result;
     }
     else if ((dx >= 0) && (dy < 0) && (dz < 0)) // Ryz
     {
         DIAGONAL_MATRIX<T,3> result;
-        result.x11=(mu*a*x^2-mu*a+la*ln(x*a^2)*a+la*y-2*la*a+la*z)/x/a;
-        result.x22=(mu*a^3-mu*a+la*ln(x*a^2)*a+la*z-la*a+2*y*k*a^2-2*k*a^3)/a^2;
-        result.x33=(mu*a^3-mu*a+la*ln(x*a^2)*a+la*y-la*a+2*z*k*a^2-2*k*a^3)/a^2;
+        result.x11=(mu*a*sqr(x)-mu*a+la*log(x*sqr(a))*a+la*y-2*la*a+la*z)/x/a;
+        result.x22=(mu*cube(a)-mu*a+la*log(x*sqr(a))*a+la*z-la*a+2*y*k*sqr(a)-2*k*cube(a))/sqr(a);
+        result.x33=(mu*cube(a)-mu*a+la*log(x*sqr(a))*a+la*y-la*a+2*z*k*sqr(a)-2*k*cube(a))/sqr(a);
         return scale*result;
     }
     else // Rxyz
     {
         DIAGONAL_MATRIX<T,3> result;
-        result.x11=(mu*a^3-mu*a+la*ln(a^3)*a+la*y-2*la*a+la*z+2*k*a^2*x-2*k*a^3)/a^2;
-        result.x22=(mu*a^3-mu*a+la*ln(a^3)*a+la*x-2*la*a+la*z+2*y*k*a^2-2*k*a^3)/a^2;
-        result.x33=(mu*a^3-mu*a+la*ln(a^3)*a+la*y-2*la*a+la*x+2*z*k*a^2-2*k*a^3)/a^2;
+        result.x11=(mu*cube(a)-mu*a+la*log(cube(a))*a+la*y-2*la*a+la*z+2*k*sqr(a)*x-2*k*cube(a))/sqr(a);
+        result.x22=(mu*cube(a)-mu*a+la*log(cube(a))*a+la*x-2*la*a+la*z+2*y*k*sqr(a)-2*k*cube(a))/sqr(a);
+        result.x33=(mu*cube(a)-mu*a+la*log(cube(a))*a+la*y-2*la*a+la*x+2*z*k*sqr(a)-2*k*cube(a))/sqr(a);
         return scale*result;
     }
 }
@@ -389,107 +392,107 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_IS
     else if ((dx < 0) && (dy >= 0) && (dz >= 0)) // Rx
     {
         dP_dF.x1111=2*k;
-        dP_dF.x2222=-(-mu*a*y^2-mu*a-2*la*a+la*ln(a*y*z)*a+la*x)/y^2/a;
-        dP_dF.x3333=-(-mu*a*z^2-mu*a-2*la*a+la*ln(a*y*z)*a+la*x)/z^2/a;
+        dP_dF.x2222=-(-mu*a*sqr(y)-mu*a-2*la*a+la*log(a*y*z)*a+la*x)/sqr(y)/a;
+        dP_dF.x3333=-(-mu*a*sqr(z)-mu*a-2*la*a+la*log(a*y*z)*a+la*x)/sqr(z)/a;
         dP_dF.x2211=la/y/a;
         dP_dF.x3311=la/z/a;
         dP_dF.x3322=la/z/y;
-        dP_dF.x2121=-(mu*a*y^2-mu*a+la*ln(a*y*z)*a+la*x-la*a-mu*a^2*x+mu*x-la*ln(a*y*z)*x-2*k*a*x^2+2*k*a^2*x)/a/(x^2-y^2);
+        dP_dF.x2121=-(mu*a*sqr(y)-mu*a+la*log(a*y*z)*a+la*x-la*a-mu*sqr(a)*x+mu*x-la*log(a*y*z)*x-2*k*a*sqr(x)+2*k*sqr(a)*x)/a/(sqr(x)-sqr(y));
         dP_dF.x3232=mu;
-        dP_dF.x2112=-(x*mu*a*y^2-x*mu*a+x*la*ln(a*y*z)*a+x^2*la-x*la*a-y^2*mu*a^2+mu*y^2-y^2*la*ln(a*y*z)-2*y^2*k*a*x+2*y^2*k*a^2)/a/y/(x^2-y^2);
-        dP_dF.x3113=-(x*mu*a*z^2-x*mu*a+x*la*ln(a*y*z)*a+x^2*la-x*la*a-z^2*mu*a^2+mu*z^2-z^2*la*ln(a*y*z)-2*z^2*k*a*x+2*z^2*k*a^2)/a/z/(x^2-z^2);
-        dP_dF.x3223=-(-mu*a+la*ln(a*y*z)*a+la*x-la*a)/a/y/z;
-        dP_dF.x3131=-(mu*a*z^2-mu*a+la*ln(a*y*z)*a+la*x-la*a-mu*a^2*x+mu*x-la*ln(a*y*z)*x-2*k*a*x^2+2*k*a^2*x)/a/(x^2-z^2);
+        dP_dF.x2112=-(x*mu*a*sqr(y)-x*mu*a+x*la*log(a*y*z)*a+sqr(x)*la-x*la*a-sqr(y)*mu*sqr(a)+mu*sqr(y)-sqr(y)*la*log(a*y*z)-2*sqr(y)*k*a*x+2*sqr(y)*k*sqr(a))/a/y/(sqr(x)-sqr(y));
+        dP_dF.x3113=-(x*mu*a*sqr(z)-x*mu*a+x*la*log(a*y*z)*a+sqr(x)*la-x*la*a-sqr(z)*mu*sqr(a)+mu*sqr(z)-sqr(z)*la*log(a*y*z)-2*sqr(z)*k*a*x+2*sqr(z)*k*sqr(a))/a/z/(sqr(x)-sqr(z));
+        dP_dF.x3223=-(-mu*a+la*log(a*y*z)*a+la*x-la*a)/a/y/z;
+        dP_dF.x3131=-(mu*a*sqr(z)-mu*a+la*log(a*y*z)*a+la*x-la*a-mu*sqr(a)*x+mu*x-la*log(a*y*z)*x-2*k*a*sqr(x)+2*k*sqr(a)*x)/a/(sqr(x)-sqr(z));
     }
     else if ((dx >= 0) && (dy < 0) && (dz >= 0)) // Ry
     {
-        dP_dF.x1111=-(-mu*a*x^2-mu*a-2*la*a+la*ln(x*a*z)*a+la*y)/a/x^2;
+        dP_dF.x1111=-(-mu*a*sqr(x)-mu*a-2*la*a+la*log(x*a*z)*a+la*y)/a/sqr(x);
         dP_dF.x2222=2*k;
-        dP_dF.x3333=-(-mu*a*z^2-mu*a-2*la*a+la*ln(x*a*z)*a+la*y)/z^2/a;
+        dP_dF.x3333=-(-mu*a*sqr(z)-mu*a-2*la*a+la*log(x*a*z)*a+la*y)/sqr(z)/a;
         dP_dF.x2211=la/x/a;
         dP_dF.x3311=la/x/z;
         dP_dF.x3322=la/z/a;
-        dP_dF.x2121=(-y*mu*a^2+mu*y-la*ln(x*a*z)*y-2*y^2*k*a+2*y*k*a^2+mu*a*x^2-mu*a+la*ln(x*a*z)*a+la*y-la*a)/a/(x^2-y^2);
-        dP_dF.x3232=-(mu*a*z^2-mu*a+la*ln(x*a*z)*a+la*y-la*a-y*mu*a^2+mu*y-la*ln(x*a*z)*y-2*y^2*k*a+2*y*k*a^2)/a/(y^2-z^2);
-        dP_dF.x2112=(-x^2*mu*a^2+mu*x^2-x^2*la*ln(x*a*z)-2*x^2*k*a*y+2*x^2*k*a^2+y*mu*a*x^2-mu*a*y+y*la*ln(x*a*z)*a+y^2*la-y*la*a)/x/a/(x^2-y^2);
-        dP_dF.x3113=-(-mu*a+la*ln(x*a*z)*a+la*y-la*a)/x/a/z;
-        dP_dF.x3223=-(y*mu*a*z^2-mu*a*y+y*la*ln(x*a*z)*a+y^2*la-y*la*a-z^2*mu*a^2+mu*z^2-z^2*la*ln(x*a*z)-2*z^2*k*a*y+2*z^2*k*a^2)/a/z/(y^2-z^2);
+        dP_dF.x2121=(-y*mu*sqr(a)+mu*y-la*log(x*a*z)*y-2*sqr(y)*k*a+2*y*k*sqr(a)+mu*a*sqr(x)-mu*a+la*log(x*a*z)*a+la*y-la*a)/a/(sqr(x)-sqr(y));
+        dP_dF.x3232=-(mu*a*sqr(z)-mu*a+la*log(x*a*z)*a+la*y-la*a-y*mu*sqr(a)+mu*y-la*log(x*a*z)*y-2*sqr(y)*k*a+2*y*k*sqr(a))/a/(sqr(y)-sqr(z));
+        dP_dF.x2112=(-sqr(x)*mu*sqr(a)+mu*sqr(x)-sqr(x)*la*log(x*a*z)-2*sqr(x)*k*a*y+2*sqr(x)*k*sqr(a)+y*mu*a*sqr(x)-mu*a*y+y*la*log(x*a*z)*a+sqr(y)*la-y*la*a)/x/a/(sqr(x)-sqr(y));
+        dP_dF.x3113=-(-mu*a+la*log(x*a*z)*a+la*y-la*a)/x/a/z;
+        dP_dF.x3223=-(y*mu*a*sqr(z)-mu*a*y+y*la*log(x*a*z)*a+sqr(y)*la-y*la*a-sqr(z)*mu*sqr(a)+mu*sqr(z)-sqr(z)*la*log(x*a*z)-2*sqr(z)*k*a*y+2*sqr(z)*k*sqr(a))/a/z/(sqr(y)-sqr(z));
         dP_dF.x3131=mu;
     }
     else if ((dx >= 0) && (dy >= 0) && (dz < 0)) // Rz
     {
-        dP_dF.x1111=-(-mu*a*x^2-mu*a-2*la*a+la*ln(x*y*a)*a+la*z)/a/x^2;
-        dP_dF.x2222=-(-mu*a*y^2-mu*a-2*la*a+la*ln(x*y*a)*a+la*z)/y^2/a;
+        dP_dF.x1111=-(-mu*a*sqr(x)-mu*a-2*la*a+la*log(x*y*a)*a+la*z)/a/sqr(x);
+        dP_dF.x2222=-(-mu*a*sqr(y)-mu*a-2*la*a+la*log(x*y*a)*a+la*z)/sqr(y)/a;
         dP_dF.x3333=2*k;
         dP_dF.x2211=la/y/x;
         dP_dF.x3311=la/x/a;
         dP_dF.x3322=la/y/a;
         dP_dF.x2121=mu;
-        dP_dF.x3232=(-z*mu*a^2+mu*z-la*ln(x*y*a)*z-2*z^2*k*a+2*z*k*a^2+mu*a*y^2-mu*a+la*ln(x*y*a)*a+la*z-la*a)/a/(y^2-z^2);
-        dP_dF.x2112=-(-mu*a+la*ln(x*y*a)*a+la*z-la*a)/x/y/a;
-        dP_dF.x3113=(-x^2*mu*a^2+mu*x^2-x^2*la*ln(x*y*a)-2*x^2*k*a*z+2*x^2*k*a^2+z*mu*a*x^2-mu*a*z+z*la*ln(x*y*a)*a+z^2*la-z*la*a)/x/a/(x^2-z^2);
-        dP_dF.x3223=(-y^2*mu*a^2+mu*y^2-y^2*la*ln(x*y*a)-2*y^2*k*a*z+2*y^2*k*a^2+z*mu*a*y^2-mu*a*z+z*la*ln(x*y*a)*a+z^2*la-z*la*a)/a/y/(y^2-z^2);
-        dP_dF.x3131=(-z*mu*a^2+mu*z-la*ln(x*y*a)*z-2*z^2*k*a+2*z*k*a^2+mu*a*x^2-mu*a+la*ln(x*y*a)*a+la*z-la*a)/a/(x^2-z^2);
+        dP_dF.x3232=(-z*mu*sqr(a)+mu*z-la*log(x*y*a)*z-2*sqr(z)*k*a+2*z*k*sqr(a)+mu*a*sqr(y)-mu*a+la*log(x*y*a)*a+la*z-la*a)/a/(sqr(y)-sqr(z));
+        dP_dF.x2112=-(-mu*a+la*log(x*y*a)*a+la*z-la*a)/x/y/a;
+        dP_dF.x3113=(-sqr(x)*mu*sqr(a)+mu*sqr(x)-sqr(x)*la*log(x*y*a)-2*sqr(x)*k*a*z+2*sqr(x)*k*sqr(a)+z*mu*a*sqr(x)-mu*a*z+z*la*log(x*y*a)*a+sqr(z)*la-z*la*a)/x/a/(sqr(x)-sqr(z));
+        dP_dF.x3223=(-sqr(y)*mu*sqr(a)+mu*sqr(y)-sqr(y)*la*log(x*y*a)-2*sqr(y)*k*a*z+2*sqr(y)*k*sqr(a)+z*mu*a*sqr(y)-mu*a*z+z*la*log(x*y*a)*a+sqr(z)*la-z*la*a)/a/y/(sqr(y)-sqr(z));
+        dP_dF.x3131=(-z*mu*sqr(a)+mu*z-la*log(x*y*a)*z-2*sqr(z)*k*a+2*z*k*sqr(a)+mu*a*sqr(x)-mu*a+la*log(x*y*a)*a+la*z-la*a)/a/(sqr(x)-sqr(z));
     }
     else if ((dx < 0) && (dy < 0) && (dz >= 0)) // Rxy
     {
         dP_dF.x1111=2*k;
         dP_dF.x2222=2*k;
-        dP_dF.x3333=-(-mu*a*z^2-mu*a-3*la*a+la*ln(a^2*z)*a+la*x+la*y)/z^2/a;
-        dP_dF.x2211=la/a^2;
+        dP_dF.x3333=-(-mu*a*sqr(z)-mu*a-3*la*a+la*log(sqr(a)*z)*a+la*x+la*y)/sqr(z)/a;
+        dP_dF.x2211=la/sqr(a);
         dP_dF.x3311=la/z/a;
         dP_dF.x3322=la/z/a;
-        dP_dF.x2121=(2*k*a*x+mu*a^2-mu+la*ln(a^2*z)-la-2*k*a^2+2*k*a*y)/(x+y)/a;
-        dP_dF.x3232=-(z^2*mu*a^2-mu*a^2+la*ln(a^2*z)*a^2+x*la*a-2*la*a^2+2*y*la*a-y*mu*a^3+mu*a*y-a*la*ln(a^2*z)*y-la*x*y-2*y^2*k*a^2+2*k*a^3*y)/a^2/(y^2-z^2);
-        dP_dF.x2112=-(la*x+mu*a^3-mu*a-la*a-2*k*a^3+la*ln(a^2*z)*a+la*y)/(x+y)/a^2;
-        dP_dF.x3113=-(x*a^2*mu*z^2-mu*a^2*x+x*a^2*la*ln(a^2*z)+x^2*la*a-2*x*a^2*la+x*a*la*y-z^2*mu*a^3+mu*a*z^2-z^2*la*ln(a^2*z)*a-z^2*la*y+z^2*la*a-2*z^2*k*a^2*x+2*z^2*k*a^3)/a^2/z/(x^2-z^2);
-        dP_dF.x3223=-(a^2*y*mu*z^2-y*mu*a^2+a^2*y*la*ln(a^2*z)+x*a*la*y-2*a^2*y*la+y^2*la*a-z^2*mu*a^3+mu*a*z^2-z^2*la*ln(a^2*z)*a-z^2*la*x+z^2*la*a-2*z^2*y*k*a^2+2*z^2*k*a^3)/a^2/z/(y^2-z^2);
-        dP_dF.x3131=-(z^2*mu*a^2-mu*a^2+la*ln(a^2*z)*a^2+2*x*la*a-2*la*a^2+y*la*a-mu*a^3*x+x*mu*a-a*la*ln(a^2*z)*x-la*x*y-2*x^2*k*a^2+2*k*a^3*x)/a^2/(x^2-z^2);
+        dP_dF.x2121=(2*k*a*x+mu*sqr(a)-mu+la*log(sqr(a)*z)-la-2*k*sqr(a)+2*k*a*y)/(x+y)/a;
+        dP_dF.x3232=-(sqr(z)*mu*sqr(a)-mu*sqr(a)+la*log(sqr(a)*z)*sqr(a)+x*la*a-2*la*sqr(a)+2*y*la*a-y*mu*cube(a)+mu*a*y-a*la*log(sqr(a)*z)*y-la*x*y-2*sqr(y)*k*sqr(a)+2*k*cube(a)*y)/sqr(a)/(sqr(y)-sqr(z));
+        dP_dF.x2112=-(la*x+mu*cube(a)-mu*a-la*a-2*k*cube(a)+la*log(sqr(a)*z)*a+la*y)/(x+y)/sqr(a);
+        dP_dF.x3113=-(x*sqr(a)*mu*sqr(z)-mu*sqr(a)*x+x*sqr(a)*la*log(sqr(a)*z)+sqr(x)*la*a-2*x*sqr(a)*la+x*a*la*y-sqr(z)*mu*cube(a)+mu*a*sqr(z)-sqr(z)*la*log(sqr(a)*z)*a-sqr(z)*la*y+sqr(z)*la*a-2*sqr(z)*k*sqr(a)*x+2*sqr(z)*k*cube(a))/sqr(a)/z/(sqr(x)-sqr(z));
+        dP_dF.x3223=-(sqr(a)*y*mu*sqr(z)-y*mu*sqr(a)+sqr(a)*y*la*log(sqr(a)*z)+x*a*la*y-2*sqr(a)*y*la+sqr(y)*la*a-sqr(z)*mu*cube(a)+mu*a*sqr(z)-sqr(z)*la*log(sqr(a)*z)*a-sqr(z)*la*x+sqr(z)*la*a-2*sqr(z)*y*k*sqr(a)+2*sqr(z)*k*cube(a))/sqr(a)/z/(sqr(y)-sqr(z));
+        dP_dF.x3131=-(sqr(z)*mu*sqr(a)-mu*sqr(a)+la*log(sqr(a)*z)*sqr(a)+2*x*la*a-2*la*sqr(a)+y*la*a-mu*cube(a)*x+x*mu*a-a*la*log(sqr(a)*z)*x-la*x*y-2*sqr(x)*k*sqr(a)+2*k*cube(a)*x)/sqr(a)/(sqr(x)-sqr(z));
     }
     else if ((dx < 0) && (dy >= 0) && (dz < 0)) // Rzx
     {
         dP_dF.x1111=2*k;
-        dP_dF.x2222=-(-mu*a*y^2-mu*a-3*la*a+la*ln(a^2*y)*a+la*z+la*x)/y^2/a;
+        dP_dF.x2222=-(-mu*a*sqr(y)-mu*a-3*la*a+la*log(sqr(a)*y)*a+la*z+la*x)/sqr(y)/a;
         dP_dF.x3333=2*k;
         dP_dF.x2211=la/y/a;
-        dP_dF.x3311=la/a^2;
+        dP_dF.x3311=la/sqr(a);
         dP_dF.x3322=la/y/a;
-        dP_dF.x2121=-(y^2*mu*a^2-mu*a^2+la*ln(a^2*y)*a^2+z*la*a-2*la*a^2+2*x*la*a-mu*a^3*x+x*mu*a-a*la*ln(a^2*y)*x-z*la*x-2*x^2*k*a^2+2*k*a^3*x)/a^2/(x^2-y^2);
-        dP_dF.x3232=(-z*mu*a^3+mu*a*z-a*la*ln(a^2*y)*z-z*la*x+2*z*la*a-2*z^2*k*a^2+2*z*k*a^3+y^2*mu*a^2-mu*a^2+la*ln(a^2*y)*a^2-2*la*a^2+x*la*a)/a^2/(y^2-z^2);
-        dP_dF.x2112=-(x*a^2*mu*y^2-mu*a^2*x+x*a^2*la*ln(a^2*y)+x*a*la*z-2*x*a^2*la+x^2*la*a-y^2*mu*a^3+mu*a*y^2-y^2*la*ln(a^2*y)*a-y^2*la*z+y^2*la*a-2*y^2*k*a^2*x+2*y^2*k*a^3)/a^2/y/(x^2-y^2);
-        dP_dF.x3113=-(la*x+mu*a^3-mu*a-la*a-2*k*a^3+la*ln(a^2*y)*a+la*z)/(x+z)/a^2;
-        dP_dF.x3223=(-y^2*mu*a^3+mu*a*y^2-y^2*la*ln(a^2*y)*a-y^2*la*x+y^2*la*a-2*y^2*z*k*a^2+2*y^2*k*a^3+a^2*z*mu*y^2-z*mu*a^2+a^2*z*la*ln(a^2*y)+z^2*la*a-2*a^2*z*la+x*a*la*z)/a^2/y/(y^2-z^2);
-        dP_dF.x3131=(2*k*a*x+mu*a^2-mu+la*ln(a^2*y)-la-2*k*a^2+2*k*a*z)/(x+z)/a;
+        dP_dF.x2121=-(sqr(y)*mu*sqr(a)-mu*sqr(a)+la*log(sqr(a)*y)*sqr(a)+z*la*a-2*la*sqr(a)+2*x*la*a-mu*cube(a)*x+x*mu*a-a*la*log(sqr(a)*y)*x-z*la*x-2*sqr(x)*k*sqr(a)+2*k*cube(a)*x)/sqr(a)/(sqr(x)-sqr(y));
+        dP_dF.x3232=(-z*mu*cube(a)+mu*a*z-a*la*log(sqr(a)*y)*z-z*la*x+2*z*la*a-2*sqr(z)*k*sqr(a)+2*z*k*cube(a)+sqr(y)*mu*sqr(a)-mu*sqr(a)+la*log(sqr(a)*y)*sqr(a)-2*la*sqr(a)+x*la*a)/sqr(a)/(sqr(y)-sqr(z));
+        dP_dF.x2112=-(x*sqr(a)*mu*sqr(y)-mu*sqr(a)*x+x*sqr(a)*la*log(sqr(a)*y)+x*a*la*z-2*x*sqr(a)*la+sqr(x)*la*a-sqr(y)*mu*cube(a)+mu*a*sqr(y)-sqr(y)*la*log(sqr(a)*y)*a-sqr(y)*la*z+sqr(y)*la*a-2*sqr(y)*k*sqr(a)*x+2*sqr(y)*k*cube(a))/sqr(a)/y/(sqr(x)-sqr(y));
+        dP_dF.x3113=-(la*x+mu*cube(a)-mu*a-la*a-2*k*cube(a)+la*log(sqr(a)*y)*a+la*z)/(x+z)/sqr(a);
+        dP_dF.x3223=(-sqr(y)*mu*cube(a)+mu*a*sqr(y)-sqr(y)*la*log(sqr(a)*y)*a-sqr(y)*la*x+sqr(y)*la*a-2*sqr(y)*z*k*sqr(a)+2*sqr(y)*k*cube(a)+sqr(a)*z*mu*sqr(y)-z*mu*sqr(a)+sqr(a)*z*la*log(sqr(a)*y)+sqr(z)*la*a-2*sqr(a)*z*la+x*a*la*z)/sqr(a)/y/(sqr(y)-sqr(z));
+        dP_dF.x3131=(2*k*a*x+mu*sqr(a)-mu+la*log(sqr(a)*y)-la-2*k*sqr(a)+2*k*a*z)/(x+z)/a;
     }
     else if ((dx >= 0) && (dy < 0) && (dz < 0)) // Ryz
     {
-        dP_dF.x1111=-(-mu*a*x^2-mu*a-3*la*a+la*ln(x*a^2)*a+la*y+la*z)/a/x^2;
+        dP_dF.x1111=-(-mu*a*sqr(x)-mu*a-3*la*a+la*log(x*sqr(a))*a+la*y+la*z)/a/sqr(x);
         dP_dF.x2222=2*k;
         dP_dF.x3333=2*k;
         dP_dF.x2211=la/x/a;
         dP_dF.x3311=la/x/a;
-        dP_dF.x3322=la/a^2;
-        dP_dF.x2121=(-y*mu*a^3+mu*a*y-a*la*ln(x*a^2)*y-z*la*y+2*y*la*a-2*y^2*k*a^2+2*k*a^3*y+x^2*mu*a^2-mu*a^2+la*ln(x*a^2)*a^2-2*la*a^2+z*la*a)/a^2/(x^2-y^2);
-        dP_dF.x3232=(2*k*a*y+mu*a^2-mu+la*ln(x*a^2)-la-2*k*a^2+2*k*a*z)/(y+z)/a;
-        dP_dF.x2112=(-x^2*mu*a^3+mu*a*x^2-x^2*la*ln(x*a^2)*a-x^2*la*z+x^2*la*a-2*x^2*y*k*a^2+2*x^2*k*a^3+a^2*y*mu*x^2-y*mu*a^2+a^2*y*la*ln(x*a^2)+y^2*la*a-2*a^2*y*la+a*y*la*z)/x/a^2/(x^2-y^2);
-        dP_dF.x3113=(-x^2*mu*a^3+mu*a*x^2-x^2*la*ln(x*a^2)*a-x^2*la*y+x^2*la*a-2*x^2*z*k*a^2+2*x^2*k*a^3+a^2*z*mu*x^2-z*mu*a^2+a^2*z*la*ln(x*a^2)+a*y*la*z-2*a^2*z*la+z^2*la*a)/x/a^2/(x^2-z^2);
-        dP_dF.x3223=-(la*y+mu*a^3-mu*a-la*a-2*k*a^3+la*ln(x*a^2)*a+la*z)/(y+z)/a^2;
-        dP_dF.x3131=(-z*mu*a^3+mu*a*z-a*la*ln(x*a^2)*z-z*la*y+2*z*la*a-2*z^2*k*a^2+2*z*k*a^3+x^2*mu*a^2-mu*a^2+la*ln(x*a^2)*a^2+y*la*a-2*la*a^2)/a^2/(x^2-z^2);
+        dP_dF.x3322=la/sqr(a);
+        dP_dF.x2121=(-y*mu*cube(a)+mu*a*y-a*la*log(x*sqr(a))*y-z*la*y+2*y*la*a-2*sqr(y)*k*sqr(a)+2*k*cube(a)*y+sqr(x)*mu*sqr(a)-mu*sqr(a)+la*log(x*sqr(a))*sqr(a)-2*la*sqr(a)+z*la*a)/sqr(a)/(sqr(x)-sqr(y));
+        dP_dF.x3232=(2*k*a*y+mu*sqr(a)-mu+la*log(x*sqr(a))-la-2*k*sqr(a)+2*k*a*z)/(y+z)/a;
+        dP_dF.x2112=(-sqr(x)*mu*cube(a)+mu*a*sqr(x)-sqr(x)*la*log(x*sqr(a))*a-sqr(x)*la*z+sqr(x)*la*a-2*sqr(x)*y*k*sqr(a)+2*sqr(x)*k*cube(a)+sqr(a)*y*mu*sqr(x)-y*mu*sqr(a)+sqr(a)*y*la*log(x*sqr(a))+sqr(y)*la*a-2*sqr(a)*y*la+a*y*la*z)/x/sqr(a)/(sqr(x)-sqr(y));
+        dP_dF.x3113=(-sqr(x)*mu*cube(a)+mu*a*sqr(x)-sqr(x)*la*log(x*sqr(a))*a-sqr(x)*la*y+sqr(x)*la*a-2*sqr(x)*z*k*sqr(a)+2*sqr(x)*k*cube(a)+sqr(a)*z*mu*sqr(x)-z*mu*sqr(a)+sqr(a)*z*la*log(x*sqr(a))+a*y*la*z-2*sqr(a)*z*la+sqr(z)*la*a)/x/sqr(a)/(sqr(x)-sqr(z));
+        dP_dF.x3223=-(la*y+mu*cube(a)-mu*a-la*a-2*k*cube(a)+la*log(x*sqr(a))*a+la*z)/(y+z)/sqr(a);
+        dP_dF.x3131=(-z*mu*cube(a)+mu*a*z-a*la*log(x*sqr(a))*z-z*la*y+2*z*la*a-2*sqr(z)*k*sqr(a)+2*z*k*cube(a)+sqr(x)*mu*sqr(a)-mu*sqr(a)+la*log(x*sqr(a))*sqr(a)+y*la*a-2*la*sqr(a))/sqr(a)/(sqr(x)-sqr(z));
     }
     else // Rxyz
     {
         dP_dF.x1111=2*k;
         dP_dF.x2222=2*k;
         dP_dF.x3333=2*k;
-        dP_dF.x2211=la/a^2;
-        dP_dF.x3311=la/a^2;
-        dP_dF.x3322=la/a^2;
-        dP_dF.x2121=(2*k*a^2*x-mu*a+la*ln(a^3)*a+la*z-2*k*a^3-2*la*a+mu*a^3+2*y*k*a^2)/(x+y)/a^2;
-        dP_dF.x3232=(2*y*k*a^2-mu*a+la*ln(a^3)*a+la*x-2*k*a^3-2*la*a+mu*a^3+2*z*k*a^2)/(y+z)/a^2;
-        dP_dF.x2112=-(la*x-mu*a+la*ln(a^3)*a+la*z-2*k*a^3-2*la*a+mu*a^3+la*y)/(x+y)/a^2;
-        dP_dF.x3113=-(la*x-mu*a+la*ln(a^3)*a+la*z-2*k*a^3-2*la*a+mu*a^3+la*y)/(x+z)/a^2;
-        dP_dF.x3223=-(la*x-mu*a+la*ln(a^3)*a+la*z-2*k*a^3-2*la*a+mu*a^3+la*y)/(y+z)/a^2;
-        dP_dF.x3131=(2*k*a^2*x-mu*a+la*ln(a^3)*a+mu*a^3-2*k*a^3+la*y-2*la*a+2*z*k*a^2)/(x+z)/a^2;
+        dP_dF.x2211=la/sqr(a);
+        dP_dF.x3311=la/sqr(a);
+        dP_dF.x3322=la/sqr(a);
+        dP_dF.x2121=(2*k*sqr(a)*x-mu*a+la*log(cube(a))*a+la*z-2*k*cube(a)-2*la*a+mu*cube(a)+2*y*k*sqr(a))/(x+y)/sqr(a);
+        dP_dF.x3232=(2*y*k*sqr(a)-mu*a+la*log(cube(a))*a+la*x-2*k*cube(a)-2*la*a+mu*cube(a)+2*z*k*sqr(a))/(y+z)/sqr(a);
+        dP_dF.x2112=-(la*x-mu*a+la*log(cube(a))*a+la*z-2*k*cube(a)-2*la*a+mu*cube(a)+la*y)/(x+y)/sqr(a);
+        dP_dF.x3113=-(la*x-mu*a+la*log(cube(a))*a+la*z-2*k*cube(a)-2*la*a+mu*cube(a)+la*y)/(x+z)/sqr(a);
+        dP_dF.x3223=-(la*x-mu*a+la*log(cube(a))*a+la*z-2*k*cube(a)-2*la*a+mu*cube(a)+la*y)/(y+z)/sqr(a);
+        dP_dF.x3131=(2*k*sqr(a)*x-mu*a+la*log(cube(a))*a+mu*cube(a)-2*k*cube(a)+la*y-2*la*a+2*z*k*sqr(a))/(x+z)/sqr(a);
     }
     if(enforce_definiteness) dP_dF.Enforce_Definiteness();
 }
