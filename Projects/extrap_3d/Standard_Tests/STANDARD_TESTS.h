@@ -19,6 +19,7 @@
 //   25. Big 8 corners stretch
 //   26. Big stretch/bend
 //   27. Force inversion
+//   28. Taffy test
 //#####################################################################
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
@@ -150,7 +151,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Option_Argument("-print_matrix");
     parse_args->Add_Option_Argument("-project_nullspace","project out nullspace");
     parse_args->Add_Integer_Argument("-projection_iterations",5,"number of iterations used for projection in cg");
-    parse_args->Add_Integer_Argument("-solver_iterations",1000,"number of iterations used for solids system");
+    parse_args->Add_Integer_Argument("-solver_iterations",100000,"number of iterations used for solids system");
     parse_args->Add_Option_Argument("-use_constant_ife","use constant extrapolation on inverting finite element fix");
 }
 //#####################################################################

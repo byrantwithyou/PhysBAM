@@ -19,10 +19,12 @@
 //  25. Big 4 corners stretch
 //  26. Big stretch/bend
 //  27. Force inversion
+//  28. Taffy test
 //#####################################################################
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
 
+#include <PhysBAM_Tools/Math_Tools/constants.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <PhysBAM_Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <PhysBAM_Tools/Log/LOG.h>
@@ -84,8 +86,8 @@ public:
     bool use_corot_blend;
     bool use_corot_quartic;
     bool dump_sv;
-    int kinematic_id;
-    INTERPOLATION_CURVE<T,FRAME<TV> > curve;
+    int kinematic_id,kinematic_id2;
+    INTERPOLATION_CURVE<T,FRAME<TV> > curve,curve2;
     bool print_matrix;
     int parameter;
     T stiffness_multiplier;
@@ -177,7 +179,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     last_frame=1000;
 
     switch(test_number){
-	case 20: case 21: case 26:
+    case 20: case 21: case 26: 
 	    mattress_grid=GRID<TV>(40,8,(T)-2,(T)2,(T)-.4,(T).4);
 	break;
 	case 22: case 23: case 24: case 25: case 27:
@@ -185,6 +187,9 @@ void Parse_Options() PHYSBAM_OVERRIDE
 	break;
     	default:
             mattress_grid=GRID<TV>(20,10,(T)-1,(T)1,(T)-.5,(T).5);
+    case 28: 
+            mattress_grid=GRID<TV>(80,16,(T)-2,(T)2,(T)-.4,(T).4);
+        break;
     }
     
     solids_parameters.triangle_collision_parameters.perform_self_collision=false;
@@ -235,13 +240,13 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
             last_frame=500;
             break;
-	case 20:
+        case 20: case 28:
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=900;
             solids_parameters.deformable_object_collision_parameters.collide_with_interior=true;
             //solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
             attachment_velocity=TV((T).8,0);
-	    last_frame=400;
+	    last_frame=480;
             break;	    
         default:
             LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
@@ -338,6 +343,24 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             box1.X()=TV(0,-6);
             box1.is_static=true;
 	    break;}
+        case 28:{
+            tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0))));
+            RIGID_BODY<TV>& box1=tests.Add_Rigid_Body("circle",.4,(T)0);
+            RIGID_BODY<TV>& box2=tests.Add_Rigid_Body("circle",.4,(T)0);
+            box1.X()=TV(0,-5);
+            box2.X()=TV(0,5);
+            box1.is_static=false;
+            box2.is_static=false;
+            kinematic_id=box1.particle_index;
+            kinematic_id2=box2.particle_index;
+            rigid_body_collection.rigid_body_particle.kinematic(box1.particle_index)=true;
+            rigid_body_collection.rigid_body_particle.kinematic(box2.particle_index)=true;
+            for (int ind=0; ind <=20; ind++){
+                curve.Add_Control_Point(ind,FRAME<TV>(TV(-5*sin(2.0*pi*ind/5.0),-5*cos(2.0*pi*ind/5.0))));
+                curve2.Add_Control_Point(ind,FRAME<TV>(TV(5*sin(2.0*pi*ind/5.0),5*cos(2.0*pi*ind/5.0))));
+            }
+
+            break;}            
         default:
             LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}
 
@@ -416,7 +439,10 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
             Add_Constitutive_Model(triangulated_area,(T)1e4,(T).45,(T).01);
             break;}
-
+        case 28:{
+            TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>(1);
+            Add_Constitutive_Model(triangulated_area,(T)1e5,(T).45,(T).01);
+            break;}
         default:
             LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}
 
@@ -440,6 +466,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id)
 {
     if(id==kinematic_id) frame=curve.Value(time);
+    if(id==kinematic_id2) frame=curve2.Value(time);
 }
 //#####################################################################
 // Function Set_Kinematic_Velocities
@@ -447,6 +474,7 @@ void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id)
 bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id)
 {
     if(id==kinematic_id) twist=curve.Derivative(time);
+    if(id==kinematic_id2) twist=curve2.Derivative(time);
     return false;
 }
 //#####################################################################
@@ -508,6 +536,11 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
         TV velocity_rig=velocity_time<final_time?TV(-velocity,(T)0):TV();
         TV velocity_lef=velocity_time<final_time?TV(velocity,(T)0):TV();
         for(int j=1;j<=n;j++){V(1+m*(j-1))=velocity_lef;V(m+m*(j-1))=velocity_rig;}}
+    if(test_number==28){
+        int m=mattress_grid.counts.x;
+        int n=mattress_grid.counts.y;
+        TV velocity=velocity_time<5.0?attachment_velocity:TV();
+        for(int j=1;j<=n;j++){V(1+m*(j-1))=-velocity;V(m+m*(j-1))=velocity;}}
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes
@@ -539,6 +572,10 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
         int m=mattress_grid.counts.x;
 	int n=mattress_grid.counts.y;
         for(int j=1;j<=n;j++){V(1+m*(j-1))=TV();V(m+m*(j-1))=TV();}}
+    if(test_number==28){
+        int m=mattress_grid.counts.x;
+        int n=mattress_grid.counts.y;
+        for(int j=1;j<=n;j++) V(1+m*(j-1))=V(m+m*(j-1))=TV();}
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Position_Nodes
