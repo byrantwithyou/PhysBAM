@@ -150,7 +150,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Option_Argument("-print_matrix");
     parse_args->Add_Option_Argument("-project_nullspace","project out nullspace");
     parse_args->Add_Integer_Argument("-projection_iterations",5,"number of iterations used for projection in cg");
-    parse_args->Add_Integer_Argument("-solver_iterations",1000,"number of iterations used for solids system");
+    parse_args->Add_Integer_Argument("-solver_iterations",100000,"number of iterations used for solids system");
     parse_args->Add_Option_Argument("-use_constant_ife","use constant extrapolation on inverting finite element fix");
 }
 //#####################################################################
@@ -216,6 +216,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 17:
         case 18:
             solids_parameters.cfl=(T)5;
+            solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             break;
         case 24:
         case 25:
@@ -223,7 +224,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 27:
             attachment_velocity = 0.2;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
-            solids_parameters.implicit_solve_parameters.cg_iterations=900;
+            solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
             last_frame=1000;
             break;
@@ -232,12 +233,12 @@ void Parse_Options() PHYSBAM_OVERRIDE
             frame_rate=60;
             last_frame=(int)(3*frame_rate);
             solids_parameters.cfl=(T)5.9;
-            solids_parameters.implicit_solve_parameters.cg_iterations=300;
+            solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             break;
         case 48:
             frame_rate=24;
-            solids_parameters.implicit_solve_parameters.cg_iterations=600;
+            solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T).01;
             last_frame=200;//(int)(200*frame_rate);
             solids_parameters.cfl=(T)1;
