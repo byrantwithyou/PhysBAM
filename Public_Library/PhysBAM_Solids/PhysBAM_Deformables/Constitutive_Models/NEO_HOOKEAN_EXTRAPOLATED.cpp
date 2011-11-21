@@ -392,107 +392,108 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_IS
     else if ((dx < 0) && (dy >= 0) && (dz >= 0)) // Rx
     {
         dP_dF.x1111=2*k;
-        dP_dF.x2222=-(-mu*a*sqr(y)-mu*a-2*la*a+la*log(a*y*z)*a+la*x)/sqr(y)/a;
-        dP_dF.x3333=-(-mu*a*sqr(z)-mu*a-2*la*a+la*log(a*y*z)*a+la*x)/sqr(z)/a;
         dP_dF.x2211=la/y/a;
+        dP_dF.x2222=-(-mu*a*sqr(y)-mu*a-2*la*a+la*log(a*y*z)*a+la*x)/sqr(y)/a;
         dP_dF.x3311=la/z/a;
         dP_dF.x3322=la/z/y;
-        dP_dF.x2121=-(mu*a*sqr(y)-mu*a+la*log(a*y*z)*a+la*x-la*a-mu*sqr(a)*x+mu*x-la*log(a*y*z)*x-2*k*a*sqr(x)+2*k*sqr(a)*x)/a/(sqr(x)-sqr(y));
-        dP_dF.x3232=mu;
+        dP_dF.x3333=-(-mu*a*sqr(z)-mu*a-2*la*a+la*log(a*y*z)*a+la*x)/sqr(z)/a;
         dP_dF.x2112=-(x*mu*a*sqr(y)-x*mu*a+x*la*log(a*y*z)*a+sqr(x)*la-x*la*a-sqr(y)*mu*sqr(a)+mu*sqr(y)-sqr(y)*la*log(a*y*z)-2*sqr(y)*k*a*x+2*sqr(y)*k*sqr(a))/a/y/(sqr(x)-sqr(y));
+        dP_dF.x2121=-(mu*a*sqr(y)-mu*a+la*log(a*y*z)*a+la*x-la*a-mu*sqr(a)*x+mu*x-la*log(a*y*z)*x-2*k*a*sqr(x)+2*k*sqr(a)*x)/a/(sqr(x)-sqr(y));
         dP_dF.x3113=-(x*mu*a*sqr(z)-x*mu*a+x*la*log(a*y*z)*a+sqr(x)*la-x*la*a-sqr(z)*mu*sqr(a)+mu*sqr(z)-sqr(z)*la*log(a*y*z)-2*sqr(z)*k*a*x+2*sqr(z)*k*sqr(a))/a/z/(sqr(x)-sqr(z));
-        dP_dF.x3223=-(-mu*a+la*log(a*y*z)*a+la*x-la*a)/a/y/z;
         dP_dF.x3131=-(mu*a*sqr(z)-mu*a+la*log(a*y*z)*a+la*x-la*a-mu*sqr(a)*x+mu*x-la*log(a*y*z)*x-2*k*a*sqr(x)+2*k*sqr(a)*x)/a/(sqr(x)-sqr(z));
+        dP_dF.x3223=-(-mu*a+la*log(a*y*z)*a+la*x-la*a)/a/y/z;
+        dP_dF.x3232=mu;
     }
     else if ((dx >= 0) && (dy < 0) && (dz >= 0)) // Ry
     {
         dP_dF.x1111=-(-mu*a*sqr(x)-mu*a-2*la*a+la*log(x*a*z)*a+la*y)/a/sqr(x);
-        dP_dF.x2222=2*k;
-        dP_dF.x3333=-(-mu*a*sqr(z)-mu*a-2*la*a+la*log(x*a*z)*a+la*y)/sqr(z)/a;
         dP_dF.x2211=la/x/a;
+        dP_dF.x2222=2*k;
         dP_dF.x3311=la/x/z;
         dP_dF.x3322=la/z/a;
-        dP_dF.x2121=(-y*mu*sqr(a)+mu*y-la*log(x*a*z)*y-2*sqr(y)*k*a+2*y*k*sqr(a)+mu*a*sqr(x)-mu*a+la*log(x*a*z)*a+la*y-la*a)/a/(sqr(x)-sqr(y));
-        dP_dF.x3232=-(mu*a*sqr(z)-mu*a+la*log(x*a*z)*a+la*y-la*a-y*mu*sqr(a)+mu*y-la*log(x*a*z)*y-2*sqr(y)*k*a+2*y*k*sqr(a))/a/(sqr(y)-sqr(z));
+        dP_dF.x3333=-(-mu*a*sqr(z)-mu*a-2*la*a+la*log(x*a*z)*a+la*y)/sqr(z)/a;
         dP_dF.x2112=(-sqr(x)*mu*sqr(a)+mu*sqr(x)-sqr(x)*la*log(x*a*z)-2*sqr(x)*k*a*y+2*sqr(x)*k*sqr(a)+y*mu*a*sqr(x)-mu*a*y+y*la*log(x*a*z)*a+sqr(y)*la-y*la*a)/x/a/(sqr(x)-sqr(y));
+        dP_dF.x2121=(-y*mu*sqr(a)+mu*y-la*log(x*a*z)*y-2*sqr(y)*k*a+2*y*k*sqr(a)+mu*a*sqr(x)-mu*a+la*log(x*a*z)*a+la*y-la*a)/a/(sqr(x)-sqr(y));
         dP_dF.x3113=-(-mu*a+la*log(x*a*z)*a+la*y-la*a)/x/a/z;
-        dP_dF.x3223=-(y*mu*a*sqr(z)-mu*a*y+y*la*log(x*a*z)*a+sqr(y)*la-y*la*a-sqr(z)*mu*sqr(a)+mu*sqr(z)-sqr(z)*la*log(x*a*z)-2*sqr(z)*k*a*y+2*sqr(z)*k*sqr(a))/a/z/(sqr(y)-sqr(z));
         dP_dF.x3131=mu;
+        dP_dF.x3223=-(y*mu*a*sqr(z)-mu*a*y+y*la*log(x*a*z)*a+sqr(y)*la-y*la*a-sqr(z)*mu*sqr(a)+mu*sqr(z)-sqr(z)*la*log(x*a*z)-2*sqr(z)*k*a*y+2*sqr(z)*k*sqr(a))/a/z/(sqr(y)-sqr(z));
+        dP_dF.x3232=-(mu*a*sqr(z)-mu*a+la*log(x*a*z)*a+la*y-la*a-y*mu*sqr(a)+mu*y-la*log(x*a*z)*y-2*sqr(y)*k*a+2*y*k*sqr(a))/a/(sqr(y)-sqr(z));
     }
     else if ((dx >= 0) && (dy >= 0) && (dz < 0)) // Rz
     {
         dP_dF.x1111=-(-mu*a*sqr(x)-mu*a-2*la*a+la*log(x*y*a)*a+la*z)/a/sqr(x);
-        dP_dF.x2222=-(-mu*a*sqr(y)-mu*a-2*la*a+la*log(x*y*a)*a+la*z)/sqr(y)/a;
-        dP_dF.x3333=2*k;
         dP_dF.x2211=la/y/x;
+        dP_dF.x2222=-(-mu*a*sqr(y)-mu*a-2*la*a+la*log(x*y*a)*a+la*z)/sqr(y)/a;
         dP_dF.x3311=la/x/a;
         dP_dF.x3322=la/y/a;
-        dP_dF.x2121=mu;
-        dP_dF.x3232=(-z*mu*sqr(a)+mu*z-la*log(x*y*a)*z-2*sqr(z)*k*a+2*z*k*sqr(a)+mu*a*sqr(y)-mu*a+la*log(x*y*a)*a+la*z-la*a)/a/(sqr(y)-sqr(z));
+        dP_dF.x3333=2*k;
         dP_dF.x2112=-(-mu*a+la*log(x*y*a)*a+la*z-la*a)/x/y/a;
+        dP_dF.x2121=mu;
         dP_dF.x3113=(-sqr(x)*mu*sqr(a)+mu*sqr(x)-sqr(x)*la*log(x*y*a)-2*sqr(x)*k*a*z+2*sqr(x)*k*sqr(a)+z*mu*a*sqr(x)-mu*a*z+z*la*log(x*y*a)*a+sqr(z)*la-z*la*a)/x/a/(sqr(x)-sqr(z));
-        dP_dF.x3223=(-sqr(y)*mu*sqr(a)+mu*sqr(y)-sqr(y)*la*log(x*y*a)-2*sqr(y)*k*a*z+2*sqr(y)*k*sqr(a)+z*mu*a*sqr(y)-mu*a*z+z*la*log(x*y*a)*a+sqr(z)*la-z*la*a)/a/y/(sqr(y)-sqr(z));
         dP_dF.x3131=(-z*mu*sqr(a)+mu*z-la*log(x*y*a)*z-2*sqr(z)*k*a+2*z*k*sqr(a)+mu*a*sqr(x)-mu*a+la*log(x*y*a)*a+la*z-la*a)/a/(sqr(x)-sqr(z));
+        dP_dF.x3223=(-sqr(y)*mu*sqr(a)+mu*sqr(y)-sqr(y)*la*log(x*y*a)-2*sqr(y)*k*a*z+2*sqr(y)*k*sqr(a)+z*mu*a*sqr(y)-mu*a*z+z*la*log(x*y*a)*a+sqr(z)*la-z*la*a)/a/y/(sqr(y)-sqr(z));
+        dP_dF.x3232=(-z*mu*sqr(a)+mu*z-la*log(x*y*a)*z-2*sqr(z)*k*a+2*z*k*sqr(a)+mu*a*sqr(y)-mu*a+la*log(x*y*a)*a+la*z-la*a)/a/(sqr(y)-sqr(z));
+        
     }
     else if ((dx < 0) && (dy < 0) && (dz >= 0)) // Rxy
     {
         dP_dF.x1111=2*k;
-        dP_dF.x2222=2*k;
-        dP_dF.x3333=-(-mu*a*sqr(z)-mu*a-3*la*a+la*log(sqr(a)*z)*a+la*x+la*y)/sqr(z)/a;
         dP_dF.x2211=la/sqr(a);
+        dP_dF.x2222=2*k;
         dP_dF.x3311=la/z/a;
         dP_dF.x3322=la/z/a;
-        dP_dF.x2121=(2*k*a*x+mu*sqr(a)-mu+la*log(sqr(a)*z)-la-2*k*sqr(a)+2*k*a*y)/(x+y)/a;
-        dP_dF.x3232=-(sqr(z)*mu*sqr(a)-mu*sqr(a)+la*log(sqr(a)*z)*sqr(a)+x*la*a-2*la*sqr(a)+2*y*la*a-y*mu*cube(a)+mu*a*y-a*la*log(sqr(a)*z)*y-la*x*y-2*sqr(y)*k*sqr(a)+2*k*cube(a)*y)/sqr(a)/(sqr(y)-sqr(z));
+        dP_dF.x3333=-(-mu*a*sqr(z)-mu*a-3*la*a+la*log(sqr(a)*z)*a+la*x+la*y)/sqr(z)/a;
         dP_dF.x2112=-(la*x+mu*cube(a)-mu*a-la*a-2*k*cube(a)+la*log(sqr(a)*z)*a+la*y)/(x+y)/sqr(a);
+        dP_dF.x2121=(2*k*a*x+mu*sqr(a)-mu+la*log(sqr(a)*z)-la-2*k*sqr(a)+2*k*a*y)/(x+y)/a;
         dP_dF.x3113=-(x*sqr(a)*mu*sqr(z)-mu*sqr(a)*x+x*sqr(a)*la*log(sqr(a)*z)+sqr(x)*la*a-2*x*sqr(a)*la+x*a*la*y-sqr(z)*mu*cube(a)+mu*a*sqr(z)-sqr(z)*la*log(sqr(a)*z)*a-sqr(z)*la*y+sqr(z)*la*a-2*sqr(z)*k*sqr(a)*x+2*sqr(z)*k*cube(a))/sqr(a)/z/(sqr(x)-sqr(z));
-        dP_dF.x3223=-(sqr(a)*y*mu*sqr(z)-y*mu*sqr(a)+sqr(a)*y*la*log(sqr(a)*z)+x*a*la*y-2*sqr(a)*y*la+sqr(y)*la*a-sqr(z)*mu*cube(a)+mu*a*sqr(z)-sqr(z)*la*log(sqr(a)*z)*a-sqr(z)*la*x+sqr(z)*la*a-2*sqr(z)*y*k*sqr(a)+2*sqr(z)*k*cube(a))/sqr(a)/z/(sqr(y)-sqr(z));
         dP_dF.x3131=-(sqr(z)*mu*sqr(a)-mu*sqr(a)+la*log(sqr(a)*z)*sqr(a)+2*x*la*a-2*la*sqr(a)+y*la*a-mu*cube(a)*x+x*mu*a-a*la*log(sqr(a)*z)*x-la*x*y-2*sqr(x)*k*sqr(a)+2*k*cube(a)*x)/sqr(a)/(sqr(x)-sqr(z));
+        dP_dF.x3223=-(sqr(a)*y*mu*sqr(z)-y*mu*sqr(a)+sqr(a)*y*la*log(sqr(a)*z)+x*a*la*y-2*sqr(a)*y*la+sqr(y)*la*a-sqr(z)*mu*cube(a)+mu*a*sqr(z)-sqr(z)*la*log(sqr(a)*z)*a-sqr(z)*la*x+sqr(z)*la*a-2*sqr(z)*y*k*sqr(a)+2*sqr(z)*k*cube(a))/sqr(a)/z/(sqr(y)-sqr(z));
+        dP_dF.x3232=-(sqr(z)*mu*sqr(a)-mu*sqr(a)+la*log(sqr(a)*z)*sqr(a)+x*la*a-2*la*sqr(a)+2*y*la*a-y*mu*cube(a)+mu*a*y-a*la*log(sqr(a)*z)*y-la*x*y-2*sqr(y)*k*sqr(a)+2*k*cube(a)*y)/sqr(a)/(sqr(y)-sqr(z));
     }
     else if ((dx < 0) && (dy >= 0) && (dz < 0)) // Rzx
     {
         dP_dF.x1111=2*k;
-        dP_dF.x2222=-(-mu*a*sqr(y)-mu*a-3*la*a+la*log(sqr(a)*y)*a+la*z+la*x)/sqr(y)/a;
-        dP_dF.x3333=2*k;
         dP_dF.x2211=la/y/a;
+        dP_dF.x2222=-(-mu*a*sqr(y)-mu*a-3*la*a+la*log(sqr(a)*y)*a+la*z+la*x)/sqr(y)/a;
         dP_dF.x3311=la/sqr(a);
         dP_dF.x3322=la/y/a;
-        dP_dF.x2121=-(sqr(y)*mu*sqr(a)-mu*sqr(a)+la*log(sqr(a)*y)*sqr(a)+z*la*a-2*la*sqr(a)+2*x*la*a-mu*cube(a)*x+x*mu*a-a*la*log(sqr(a)*y)*x-z*la*x-2*sqr(x)*k*sqr(a)+2*k*cube(a)*x)/sqr(a)/(sqr(x)-sqr(y));
-        dP_dF.x3232=(-z*mu*cube(a)+mu*a*z-a*la*log(sqr(a)*y)*z-z*la*x+2*z*la*a-2*sqr(z)*k*sqr(a)+2*z*k*cube(a)+sqr(y)*mu*sqr(a)-mu*sqr(a)+la*log(sqr(a)*y)*sqr(a)-2*la*sqr(a)+x*la*a)/sqr(a)/(sqr(y)-sqr(z));
+        dP_dF.x3333=2*k;
         dP_dF.x2112=-(x*sqr(a)*mu*sqr(y)-mu*sqr(a)*x+x*sqr(a)*la*log(sqr(a)*y)+x*a*la*z-2*x*sqr(a)*la+sqr(x)*la*a-sqr(y)*mu*cube(a)+mu*a*sqr(y)-sqr(y)*la*log(sqr(a)*y)*a-sqr(y)*la*z+sqr(y)*la*a-2*sqr(y)*k*sqr(a)*x+2*sqr(y)*k*cube(a))/sqr(a)/y/(sqr(x)-sqr(y));
+        dP_dF.x2121=-(sqr(y)*mu*sqr(a)-mu*sqr(a)+la*log(sqr(a)*y)*sqr(a)+z*la*a-2*la*sqr(a)+2*x*la*a-mu*cube(a)*x+x*mu*a-a*la*log(sqr(a)*y)*x-z*la*x-2*sqr(x)*k*sqr(a)+2*k*cube(a)*x)/sqr(a)/(sqr(x)-sqr(y));
         dP_dF.x3113=-(la*x+mu*cube(a)-mu*a-la*a-2*k*cube(a)+la*log(sqr(a)*y)*a+la*z)/(x+z)/sqr(a);
-        dP_dF.x3223=(-sqr(y)*mu*cube(a)+mu*a*sqr(y)-sqr(y)*la*log(sqr(a)*y)*a-sqr(y)*la*x+sqr(y)*la*a-2*sqr(y)*z*k*sqr(a)+2*sqr(y)*k*cube(a)+sqr(a)*z*mu*sqr(y)-z*mu*sqr(a)+sqr(a)*z*la*log(sqr(a)*y)+sqr(z)*la*a-2*sqr(a)*z*la+x*a*la*z)/sqr(a)/y/(sqr(y)-sqr(z));
         dP_dF.x3131=(2*k*a*x+mu*sqr(a)-mu+la*log(sqr(a)*y)-la-2*k*sqr(a)+2*k*a*z)/(x+z)/a;
+        dP_dF.x3223=(-sqr(y)*mu*cube(a)+mu*a*sqr(y)-sqr(y)*la*log(sqr(a)*y)*a-sqr(y)*la*x+sqr(y)*la*a-2*sqr(y)*z*k*sqr(a)+2*sqr(y)*k*cube(a)+sqr(a)*z*mu*sqr(y)-z*mu*sqr(a)+sqr(a)*z*la*log(sqr(a)*y)+sqr(z)*la*a-2*sqr(a)*z*la+x*a*la*z)/sqr(a)/y/(sqr(y)-sqr(z));
+        dP_dF.x3232=(-z*mu*cube(a)+mu*a*z-a*la*log(sqr(a)*y)*z-z*la*x+2*z*la*a-2*sqr(z)*k*sqr(a)+2*z*k*cube(a)+sqr(y)*mu*sqr(a)-mu*sqr(a)+la*log(sqr(a)*y)*sqr(a)-2*la*sqr(a)+x*la*a)/sqr(a)/(sqr(y)-sqr(z));
     }
     else if ((dx >= 0) && (dy < 0) && (dz < 0)) // Ryz
     {
         dP_dF.x1111=-(-mu*a*sqr(x)-mu*a-3*la*a+la*log(x*sqr(a))*a+la*y+la*z)/a/sqr(x);
-        dP_dF.x2222=2*k;
-        dP_dF.x3333=2*k;
         dP_dF.x2211=la/x/a;
+        dP_dF.x2222=2*k;
         dP_dF.x3311=la/x/a;
         dP_dF.x3322=la/sqr(a);
-        dP_dF.x2121=(-y*mu*cube(a)+mu*a*y-a*la*log(x*sqr(a))*y-z*la*y+2*y*la*a-2*sqr(y)*k*sqr(a)+2*k*cube(a)*y+sqr(x)*mu*sqr(a)-mu*sqr(a)+la*log(x*sqr(a))*sqr(a)-2*la*sqr(a)+z*la*a)/sqr(a)/(sqr(x)-sqr(y));
-        dP_dF.x3232=(2*k*a*y+mu*sqr(a)-mu+la*log(x*sqr(a))-la-2*k*sqr(a)+2*k*a*z)/(y+z)/a;
+        dP_dF.x3333=2*k;
         dP_dF.x2112=(-sqr(x)*mu*cube(a)+mu*a*sqr(x)-sqr(x)*la*log(x*sqr(a))*a-sqr(x)*la*z+sqr(x)*la*a-2*sqr(x)*y*k*sqr(a)+2*sqr(x)*k*cube(a)+sqr(a)*y*mu*sqr(x)-y*mu*sqr(a)+sqr(a)*y*la*log(x*sqr(a))+sqr(y)*la*a-2*sqr(a)*y*la+a*y*la*z)/x/sqr(a)/(sqr(x)-sqr(y));
+        dP_dF.x2121=(-y*mu*cube(a)+mu*a*y-a*la*log(x*sqr(a))*y-z*la*y+2*y*la*a-2*sqr(y)*k*sqr(a)+2*k*cube(a)*y+sqr(x)*mu*sqr(a)-mu*sqr(a)+la*log(x*sqr(a))*sqr(a)-2*la*sqr(a)+z*la*a)/sqr(a)/(sqr(x)-sqr(y));
         dP_dF.x3113=(-sqr(x)*mu*cube(a)+mu*a*sqr(x)-sqr(x)*la*log(x*sqr(a))*a-sqr(x)*la*y+sqr(x)*la*a-2*sqr(x)*z*k*sqr(a)+2*sqr(x)*k*cube(a)+sqr(a)*z*mu*sqr(x)-z*mu*sqr(a)+sqr(a)*z*la*log(x*sqr(a))+a*y*la*z-2*sqr(a)*z*la+sqr(z)*la*a)/x/sqr(a)/(sqr(x)-sqr(z));
-        dP_dF.x3223=-(la*y+mu*cube(a)-mu*a-la*a-2*k*cube(a)+la*log(x*sqr(a))*a+la*z)/(y+z)/sqr(a);
         dP_dF.x3131=(-z*mu*cube(a)+mu*a*z-a*la*log(x*sqr(a))*z-z*la*y+2*z*la*a-2*sqr(z)*k*sqr(a)+2*z*k*cube(a)+sqr(x)*mu*sqr(a)-mu*sqr(a)+la*log(x*sqr(a))*sqr(a)+y*la*a-2*la*sqr(a))/sqr(a)/(sqr(x)-sqr(z));
+        dP_dF.x3223=-(la*y+mu*cube(a)-mu*a-la*a-2*k*cube(a)+la*log(x*sqr(a))*a+la*z)/(y+z)/sqr(a);
+        dP_dF.x3232=(2*k*a*y+mu*sqr(a)-mu+la*log(x*sqr(a))-la-2*k*sqr(a)+2*k*a*z)/(y+z)/a;
     }
     else // Rxyz
     {
         dP_dF.x1111=2*k;
-        dP_dF.x2222=2*k;
-        dP_dF.x3333=2*k;
         dP_dF.x2211=la/sqr(a);
+        dP_dF.x2222=2*k;
         dP_dF.x3311=la/sqr(a);
         dP_dF.x3322=la/sqr(a);
-        dP_dF.x2121=(2*k*sqr(a)*x-mu*a+la*log(cube(a))*a+la*z-2*k*cube(a)-2*la*a+mu*cube(a)+2*y*k*sqr(a))/(x+y)/sqr(a);
-        dP_dF.x3232=(2*y*k*sqr(a)-mu*a+la*log(cube(a))*a+la*x-2*k*cube(a)-2*la*a+mu*cube(a)+2*z*k*sqr(a))/(y+z)/sqr(a);
+        dP_dF.x3333=2*k;
         dP_dF.x2112=-(la*x-mu*a+la*log(cube(a))*a+la*z-2*k*cube(a)-2*la*a+mu*cube(a)+la*y)/(x+y)/sqr(a);
+        dP_dF.x2121=(2*k*sqr(a)*x-mu*a+la*log(cube(a))*a+la*z-2*k*cube(a)-2*la*a+mu*cube(a)+2*y*k*sqr(a))/(x+y)/sqr(a);
         dP_dF.x3113=-(la*x-mu*a+la*log(cube(a))*a+la*z-2*k*cube(a)-2*la*a+mu*cube(a)+la*y)/(x+z)/sqr(a);
-        dP_dF.x3223=-(la*x-mu*a+la*log(cube(a))*a+la*z-2*k*cube(a)-2*la*a+mu*cube(a)+la*y)/(y+z)/sqr(a);
         dP_dF.x3131=(2*k*sqr(a)*x-mu*a+la*log(cube(a))*a+mu*cube(a)-2*k*cube(a)+la*y-2*la*a+2*z*k*sqr(a))/(x+z)/sqr(a);
+        dP_dF.x3223=-(la*x-mu*a+la*log(cube(a))*a+la*z-2*k*cube(a)-2*la*a+mu*cube(a)+la*y)/(y+z)/sqr(a);
+        dP_dF.x3232=(2*y*k*sqr(a)-mu*a+la*log(cube(a))*a+la*x-2*k*cube(a)-2*la*a+mu*cube(a)+2*z*k*sqr(a))/(y+z)/sqr(a);
     }
     if(enforce_definiteness) dP_dF.Enforce_Definiteness();
 }
