@@ -79,8 +79,8 @@ public:
     bool use_corotated;
     bool use_corot_blend;
     bool dump_sv;
-    int kinematic_id;
-    INTERPOLATION_CURVE<T,FRAME<TV> > curve;
+    int kinematic_id,kinematic_id2;
+    INTERPOLATION_CURVE<T,FRAME<TV> > curve,curve2;
     bool print_matrix;
     int parameter;
     T stiffness_multiplier;
@@ -151,7 +151,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Option_Argument("-print_matrix");
     parse_args->Add_Option_Argument("-project_nullspace","project out nullspace");
     parse_args->Add_Integer_Argument("-projection_iterations",5,"number of iterations used for projection in cg");
-    parse_args->Add_Integer_Argument("-solver_iterations",100000,"number of iterations used for solids system");
+    parse_args->Add_Integer_Argument("-solver_iterations",1000,"number of iterations used for solids system");
     parse_args->Add_Option_Argument("-use_constant_ife","use constant extrapolation on inverting finite element fix");
 }
 //#####################################################################
@@ -170,6 +170,9 @@ void Parse_Options() PHYSBAM_OVERRIDE
             break;
         case 26:
             mattress_grid=GRID<TV>(40,5,5,(T)-4,(T)4,(T)-.5,(T).5,(T)-.5,(T).5);
+            break;
+        case 28:
+            mattress_grid=GRID<TV>(80,10,10,(T)-4,(T)4,(T)-.5,(T).5,(T)-.5,(T).5);
             break;
         case 16:
             mattress_grid=GRID<TV>(11,6,11,(T)-1,(T)1,(T)-.5,(T).5,(T)-1,(T)1);
@@ -223,6 +226,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 25:
         case 26:
         case 27:
+        case 28:
             attachment_velocity = 0.2;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
@@ -293,8 +297,6 @@ void Get_Initial_Data()
         case 16: {
             RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,0,0)));
             tests.Create_Mattress(mattress_grid,true,&initial_state);
-            //RIGID_BODY<TV>& box1=tests.Add_Rigid_Body("square",10,(T)0);
-            //RIGID_BODY<TV>& box2=tests.Add_Rigid_Body("square",10,(T)0);
             RIGID_BODY<TV>& box1=tests.Add_Analytic_Box(TV(20,20,20));
             RIGID_BODY<TV>& box2=tests.Add_Analytic_Box(TV(20,20,20));
             box1.X()=TV(0,-11,0);
@@ -316,6 +318,31 @@ void Get_Initial_Data()
         case 26:
         case 27:{
             tests.Create_Mattress(mattress_grid,true,0);
+            break;}
+        case 28: {
+            RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,0,0)));
+            tests.Create_Mattress(mattress_grid,true,&initial_state);
+            RIGID_BODY<TV>& cylinder1=tests.Add_Rigid_Body("cylinder",(T)1.0,(T).5);
+            cylinder1.Rotation()=ROTATION<TV>((T)pi/3.0,TV(1,1,1));
+            cylinder1.X()=TV(0,11,0);
+            RIGID_BODY<TV>& cylinder2=tests.Add_Rigid_Body("cylinder",(T)0.8,(T).5);
+            cylinder2.Rotation()=ROTATION<TV>((T)pi/4.0,TV(0,1,1));
+            cylinder2.X()=TV(0,-11,0);
+            cylinder1.is_static=false;
+            cylinder2.is_static=false;
+            kinematic_id= cylinder1.particle_index;
+            rigid_body_collection.rigid_body_particle.kinematic(cylinder1.particle_index)=true;
+            kinematic_id2=cylinder2.particle_index;
+            rigid_body_collection.rigid_body_particle.kinematic(cylinder2.particle_index)=true;
+            curve.Add_Control_Point(0,FRAME<TV>(TV(0,11,0)));
+            curve.Add_Control_Point(5,FRAME<TV>(TV(0,8,0)));
+            curve.Add_Control_Point(6,FRAME<TV>(TV(0,8,0)));
+            curve.Add_Control_Point(11,FRAME<TV>(TV(0,11,0)));
+            curve2.Add_Control_Point(0,FRAME<TV>(TV(0,-11,0)));
+            curve2.Add_Control_Point(5,FRAME<TV>(TV(0,-8,0)));
+            curve2.Add_Control_Point(6,FRAME<TV>(TV(0,-8,0)));
+            curve2.Add_Control_Point(11,FRAME<TV>(TV(0,-11,0)));
+            last_frame=250;
             break;}
         case 5:{
             RIGID_BODY<TV>& tmp_sphere=tests.Add_Rigid_Body("sphere",(T)1.0,(T).5);
@@ -406,7 +433,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 24:
         case 25:
         case 26:
-        case 27:{
+        case 27:
+        case 28:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             Add_Constitutive_Model(tetrahedralized_volume,(T)1e5,(T).45,(T).01);
             break;}         
@@ -472,6 +500,14 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
         TV velocity_x = velocity_time<final_time?TV(attachment_velocity,0,0):TV();
         for(int ij=1;ij<=mn;ij++)for(int j=1;j<=n;j++){V(1+m*(j-1)+m*n*(ij-1))=velocity_x;V(m+m*(j-1)+m*n*(ij-1))=-velocity_x;}
     }
+    if(test_number==28){
+        int m=mattress_grid.counts.x;
+        int n=mattress_grid.counts.y;
+        int mn=mattress_grid.counts.z;
+        TV velocity_x = velocity_time<final_time?TV(attachment_velocity,0,0):TV();
+        TV velocity_y = velocity_time<final_time?TV(0,attachment_velocity,0):TV();
+        for(int ij=1;ij<=mn;ij++)for(int j=1;j<=n;j++){V(1+m*(j-1)+m*n*(ij-1))=-velocity_x;V(m+m*(j-1)+m*n*(ij-1))=velocity_x;}
+    }
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes
@@ -512,6 +548,12 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
 	int mn=mattress_grid.counts.z;
         for(int ij=1;ij<=mn;ij++)for(int j=1;j<=n;j++){V(1+m*(j-1)+m*n*(ij-1))=TV();V(m+m*(j-1)+m*n*(ij-1))=TV();}
     }
+    if(test_number==26){
+        int m=mattress_grid.counts.x;
+        int n=mattress_grid.counts.y;
+        int mn=mattress_grid.counts.z;
+        for(int ij=1;ij<=mn;ij++)for(int j=1;j<=n;j++){V(1+m*(j-1)+m*n*(ij-1))=TV();V(m+m*(j-1)+m*n*(ij-1))=TV();}
+    }
 }
 //#####################################################################
 // Function Read_Output_Files_Solids
@@ -534,6 +576,7 @@ void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id)
 {
     if(id==kinematic_id) frame=curve.Value(time);
+    if(id==kinematic_id2) frame=curve2.Value(time);
 }
 //#####################################################################
 // Function Set_Kinematic_Velocities
@@ -541,6 +584,7 @@ void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id)
 bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id)
 {
     if(id==kinematic_id) twist=curve.Derivative(time);
+    if(id==kinematic_id2) twist=curve2.Derivative(time);
     return false;
 }  
 //#####################################################################

@@ -344,6 +344,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             box1.is_static=true;
 	    break;}
         case 28:{
+            
             tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0))));
             RIGID_BODY<TV>& box1=tests.Add_Rigid_Body("circle",.4,(T)0);
             RIGID_BODY<TV>& box2=tests.Add_Rigid_Body("circle",.4,(T)0);
@@ -356,8 +357,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             rigid_body_collection.rigid_body_particle.kinematic(box1.particle_index)=true;
             rigid_body_collection.rigid_body_particle.kinematic(box2.particle_index)=true;
             for (int ind=0; ind <=20; ind++){
-                curve.Add_Control_Point(ind,FRAME<TV>(TV(-5*sin(2.0*pi*ind/5.0),-5*cos(2.0*pi*ind/5.0))));
-                curve2.Add_Control_Point(ind,FRAME<TV>(TV(5*sin(2.0*pi*ind/5.0),5*cos(2.0*pi*ind/5.0))));
+                curve.Add_Control_Point(ind+4,FRAME<TV>(TV(-5*sin(2.0*pi*ind/5.0),-5*cos(2.0*pi*ind/5.0))));
+                curve2.Add_Control_Point(ind+4,FRAME<TV>(TV(5*sin(2.0*pi*ind/5.0),5*cos(2.0*pi*ind/5.0))));
             }
 
             break;}            
