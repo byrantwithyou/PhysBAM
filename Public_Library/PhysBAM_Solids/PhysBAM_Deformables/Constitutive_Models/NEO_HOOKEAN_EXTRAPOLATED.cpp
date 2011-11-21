@@ -84,8 +84,51 @@ Energy_Density_Helper(const DIAGONAL_MATRIX<T,2>& F,const int simplex) const
 template<class T,int d> T NEO_HOOKEAN_EXTRAPOLATED<T,d>::
 Energy_Density_Helper(const DIAGONAL_MATRIX<T,3>& F,const int simplex) const
 {
-    PHYSBAM_FATAL_ERROR();
-    return 0;
+    T x = F.x11;
+    T y = F.x22;
+    T z = F.x33;
+    
+    T dx = x - extrapolation_cutoff;
+    T dy = y - extrapolation_cutoff;
+    T dz = z - extrapolation_cutoff;
+    
+    T a = extrapolation_cutoff;
+    T k = extra_force_coefficient;
+    
+    if ((dx >= 0) && (dy >= 0) && (dz >= 0)) // R
+    {
+        T I1=(F*F.Transposed()).Trace(),J=F.Determinant();
+        T log_J=log(J);
+        return constant_mu*((T).5*(I1-TV::m)-log_J)+(T).5*constant_lambda*sqr(log_J);
+    }
+    else if ((dx < 0) && (dy >= 0) && (dz >= 0)) // Rx
+    {
+        return 1/2*(-mu*a^3+mu*a*y^2+mu*a*z^2-mu*a-2*mu*a*ln(a*y*z)+la*ln(a*y*z)^2*a+2*mu*a^2*x-2*mu*x+2*la*ln(a*y*z)*x-2*la*ln(a*y*z)*a+2*k*a*x^2-4*k*a^2*x+2*k*a^3)/a;
+    }
+    else if ((dx >= 0) && (dy < 0) && (dz >= 0)) // Ry
+    {
+        return 1/2*(mu*a*x^2-mu*a^3+mu*a*z^2-mu*a-2*mu*a*ln(x*a*z)+la*ln(x*a*z)^2*a+2*y*mu*a^2-2*mu*y+2*la*ln(x*a*z)*y-2*la*ln(x*a*z)*a+2*y^2*k*a-4*y*k*a^2+2*k*a^3)/a;
+    }
+    else if ((dx >= 0) && (dy >= 0) && (dz < 0)) // Rz
+    {
+        return 1/2*(mu*a*x^2+mu*a*y^2-mu*a^3-mu*a-2*mu*a*ln(x*y*a)+la*ln(x*y*a)^2*a+2*z*mu*a^2-2*mu*z+2*la*ln(x*y*a)*z-2*la*ln(x*y*a)*a+2*z^2*k*a-4*z*k*a^2+2*k*a^3)/a;
+    }
+    else if ((dx < 0) && (dy < 0) && (dz >= 0)) // Rxy
+    {
+        return 1/2*(mu*a^2-2*x*mu*a-2*x*la*a+2*y^2*k*a^2-2*mu*a*y+z^2*mu*a^2+2*x^2*k*a^2-2*y*la*a+2*a*la*ln(a^2*z)*x+2*a*la*ln(a^2*z)*y+la*ln(a^2*z)^2*a^2-2*mu*a^2*ln(a^2*z)+2*mu*a^3*x-4*la*ln(a^2*z)*a^2+2*y*mu*a^3+2*la*x*y-4*k*a^3*x-4*k*a^3*y-2*mu*a^4+2*la*a^2+4*k*a^4)/a^2;
+    }
+    else if ((dx < 0) && (dy >= 0) && (dz < 0)) // Rzx
+    {
+        return 1/2*(mu*a^2-2*x*mu*a-2*x*la*a+y^2*mu*a^2+2*z^2*k*a^2-2*mu*a*z+2*x^2*k*a^2-2*z*la*a+2*mu*a^3*x-4*k*a^3*x-2*mu*a^4+2*la*a^2+4*k*a^4+2*z*mu*a^3-4*z*k*a^3+2*z*la*x+la*ln(a^2*y)^2*a^2-2*mu*a^2*ln(a^2*y)-4*la*ln(a^2*y)*a^2+2*a*la*ln(a^2*y)*z+2*a*la*ln(a^2*y)*x)/a^2;
+    }
+    else if ((dx >= 0) && (dy < 0) && (dz < 0)) // Ryz
+    {
+        return 1/2*(mu*a^2+2*y^2*k*a^2-2*mu*a*y+2*z^2*k*a^2-2*mu*a*z+x^2*mu*a^2-2*y*la*a-2*z*la*a+2*y*mu*a^3-4*k*a^3*y-2*mu*a^4+2*la*a^2+4*k*a^4+2*z*mu*a^3+2*z*la*y-4*z*k*a^3+2*a*la*ln(x*a^2)*y+2*a*la*ln(x*a^2)*z+la*ln(x*a^2)^2*a^2-2*mu*a^2*ln(x*a^2)-4*la*ln(x*a^2)*a^2)/a^2;
+    }
+    else // Rxyz
+    {
+        return 1/2*(3*mu*a^2-2*x*mu*a-4*x*la*a+2*y^2*k*a^2-2*mu*a*y+2*z^2*k*a^2-2*mu*a*z+2*x^2*k*a^2-4*y*la*a-4*z*la*a+2*mu*a^3*x+2*y*mu*a^3+2*la*x*y-4*k*a^3*x-4*k*a^3*y-3*mu*a^4+6*la*a^2+6*k*a^4+2*z*mu*a^3+2*z*la*y-4*z*k*a^3+2*z*la*x+2*a*la*ln(a^3)*x+2*a*la*ln(a^3)*y+2*a*la*ln(a^3)*z+la*ln(a^3)^2*a^2-2*mu*a^2*ln(a^3)-6*la*ln(a^3)*a^2)/a^2;
+    }
 }
 //#####################################################################
 // Function P_From_Strain
@@ -143,8 +186,81 @@ P_From_Strain_Helper(const DIAGONAL_MATRIX<T,2>& F,const T scale,const int simpl
 template<class T,int d> DIAGONAL_MATRIX<T,3> NEO_HOOKEAN_EXTRAPOLATED<T,d>::
 P_From_Strain_Helper(const DIAGONAL_MATRIX<T,3>& F,const T scale,const int simplex) const
 {
-    PHYSBAM_FATAL_ERROR();
-    return DIAGONAL_MATRIX<T,3>();
+    T x = F.x11;
+    T y = F.x22;
+    T z = F.x33;
+    
+    T dx = x - extrapolation_cutoff;
+    T dy = y - extrapolation_cutoff;
+    T dz = z - extrapolation_cutoff;
+
+    T mu = constant_mu;
+    T la = constant_lambda;
+    
+    T a = extrapolation_cutoff;
+    T k = extra_force_coefficient;
+     
+    if ((dx >= 0) && (dy >= 0) && (dz >= 0)) // R
+    {
+        T scale_mu=scale*constant_mu,scale_lambda=scale*constant_lambda,J=F.Determinant();
+        return scale_mu*F-(scale_mu-scale_lambda*log(J))*F.Inverse();
+    }
+    else if ((dx < 0) && (dy >= 0) && (dz >= 0)) // Rx
+    {
+        DIAGONAL_MATRIX<T,3> result;
+        result.x11=(mu*a^2-mu+la*ln(a*y*z)+2*k*a*x-2*k*a^2)/a;
+        result.x22=(mu*a*y^2-mu*a+la*ln(a*y*z)*a+la*x-la*a)/a/y;
+        result.x33=(mu*a*z^2-mu*a+la*ln(a*y*z)*a+la*x-la*a)/a/z;
+        return scale*result;
+    }
+    else if ((dx >= 0) && (dy < 0) && (dz >= 0)) // Ry
+    {
+        DIAGONAL_MATRIX<T,3> result;
+        result.x11=(mu*a*x^2-mu*a+la*ln(x*a*z)*a+la*y-la*a)/x/a;
+        result.x22=(mu*a^2-mu+la*ln(x*a*z)+2*k*a*y-2*k*a^2)/a;
+        result.x33=(mu*a*z^2-mu*a+la*ln(x*a*z)*a+la*y-la*a)/a/z;
+        return scale*result;
+    }
+    else if ((dx >= 0) && (dy >= 0) && (dz < 0)) // Rz
+    {
+        DIAGONAL_MATRIX<T,3> result;
+        result.x11=(mu*a*x^2-mu*a+la*ln(x*y*a)*a+la*z-la*a)/x/a;
+        result.x22=(mu*a*y^2-mu*a+la*ln(x*y*a)*a+la*z-la*a)/a/y;
+        result.x33=(mu*a^2-mu+la*ln(x*y*a)+2*k*a*z-2*k*a^2)/a;
+        return scale*result;
+    }
+    else if ((dx < 0) && (dy < 0) && (dz >= 0)) // Rxy
+    {
+        DIAGONAL_MATRIX<T,3> result;
+        result.x11=(mu*a^3-mu*a+la*ln(a^2*z)*a+la*y-la*a+2*k*a^2*x-2*k*a^3)/a^2;
+        result.x22=(mu*a^3-mu*a+la*ln(a^2*z)*a+la*x-la*a+2*y*k*a^2-2*k*a^3)/a^2;
+        result.x33=(mu*a*z^2-mu*a+la*ln(a^2*z)*a+la*x-2*la*a+la*y)/a/z;
+        return scale*result;
+    }
+    else if ((dx < 0) && (dy >= 0) && (dz < 0)) // Rzx
+    {
+        DIAGONAL_MATRIX<T,3> result;
+        result.x11=(mu*a^3-mu*a+la*ln(a^2*y)*a+la*z-la*a+2*k*a^2*x-2*k*a^3)/a^2;
+        result.x22=(mu*a*y^2-mu*a+la*ln(a^2*y)*a+la*z-2*la*a+la*x)/a/y;
+        result.x33=(mu*a^3-mu*a+la*ln(a^2*y)*a+la*x-la*a+2*z*k*a^2-2*k*a^3)/a^2;
+        return scale*result;
+    }
+    else if ((dx >= 0) && (dy < 0) && (dz < 0)) // Ryz
+    {
+        DIAGONAL_MATRIX<T,3> result;
+        result.x11=(mu*a*x^2-mu*a+la*ln(x*a^2)*a+la*y-2*la*a+la*z)/x/a;
+        result.x22=(mu*a^3-mu*a+la*ln(x*a^2)*a+la*z-la*a+2*y*k*a^2-2*k*a^3)/a^2;
+        result.x33=(mu*a^3-mu*a+la*ln(x*a^2)*a+la*y-la*a+2*z*k*a^2-2*k*a^3)/a^2;
+        return scale*result;
+    }
+    else // Rxyz
+    {
+        DIAGONAL_MATRIX<T,3> result;
+        result.x11=(mu*a^3-mu*a+la*ln(a^3)*a+la*y-2*la*a+la*z+2*k*a^2*x-2*k*a^3)/a^2;
+        result.x22=(mu*a^3-mu*a+la*ln(a^3)*a+la*x-2*la*a+la*z+2*y*k*a^2-2*k*a^3)/a^2;
+        result.x33=(mu*a^3-mu*a+la*ln(a^3)*a+la*y-2*la*a+la*x+2*z*k*a^2-2*k*a^3)/a^2;
+        return scale*result;
+    }
 }
 //#####################################################################
 // Function Isotropic_Stress_Derivative
@@ -231,7 +347,151 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_IS
 template<class T,int d> void NEO_HOOKEAN_EXTRAPOLATED<T,d>::
 Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dP_dF,const int triangle) const
 {
-    PHYSBAM_FATAL_ERROR();
+    T x = F.x11;
+    T y = F.x22;
+    T z = F.x33;
+    
+    T dx = x - extrapolation_cutoff;
+    T dy = y - extrapolation_cutoff;
+    T dz = z - extrapolation_cutoff;
+
+    T mu = constant_mu;
+    T la = constant_lambda;
+    
+    T a = extrapolation_cutoff;
+    T k = extra_force_coefficient;
+
+    T xpy = x+y; if (fabs(xpy)<panic_threshold) xpy=xpy<0?-panic_threshold:panic_threshold;
+    T xmy = x-y; if (fabs(xmy)<panic_threshold) xmy=xmy<0?-panic_threshold:panic_threshold;
+    T xpz = x+z; if (fabs(xpz)<panic_threshold) xpz=xpz<0?-panic_threshold:panic_threshold;
+    T xmz = x-z; if (fabs(xmz)<panic_threshold) xmz=xmz<0?-panic_threshold:panic_threshold;
+    T ypz = y+z; if (fabs(ypz)<panic_threshold) ypz=ypz<0?-panic_threshold:panic_threshold;
+    T ymz = y-z; if (fabs(ymz)<panic_threshold) ymz=ymz<0?-panic_threshold:panic_threshold;
+
+    if ((dx >= 0) && (dy >= 0) && (dz >= 0)) // R
+    {
+        DIAGONAL_MATRIX<T,3> F_inverse=F.Inverse();
+        T mu_minus_lambda_logJ=constant_mu+constant_lambda*log(F_inverse.Determinant());
+        SYMMETRIC_MATRIX<T,3> F_inverse_outer=SYMMETRIC_MATRIX<T,3>::Outer_Product(F_inverse.To_Vector());
+        dP_dF.x1111=constant_mu+(constant_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x11;
+        dP_dF.x2222=constant_mu+(constant_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x22;
+        dP_dF.x3333=constant_mu+(constant_lambda+mu_minus_lambda_logJ)*F_inverse_outer.x33;
+        dP_dF.x2211=constant_lambda*F_inverse_outer.x21;
+        dP_dF.x3311=constant_lambda*F_inverse_outer.x31;
+        dP_dF.x3322=constant_lambda*F_inverse_outer.x32;
+        dP_dF.x2121=constant_mu;
+        dP_dF.x3131=constant_mu;
+        dP_dF.x3232=constant_mu;
+        dP_dF.x2112=mu_minus_lambda_logJ*F_inverse_outer.x21;
+        dP_dF.x3113=mu_minus_lambda_logJ*F_inverse_outer.x31;
+        dP_dF.x3223=mu_minus_lambda_logJ*F_inverse_outer.x32;
+    }
+    else if ((dx < 0) && (dy >= 0) && (dz >= 0)) // Rx
+    {
+        dP_dF.x1111=2*k;
+        dP_dF.x2222=-(-mu*a*y^2-mu*a-2*la*a+la*ln(a*y*z)*a+la*x)/y^2/a;
+        dP_dF.x3333=-(-mu*a*z^2-mu*a-2*la*a+la*ln(a*y*z)*a+la*x)/z^2/a;
+        dP_dF.x2211=la/y/a;
+        dP_dF.x3311=la/z/a;
+        dP_dF.x3322=la/z/y;
+        dP_dF.x2121=-(mu*a*y^2-mu*a+la*ln(a*y*z)*a+la*x-la*a-mu*a^2*x+mu*x-la*ln(a*y*z)*x-2*k*a*x^2+2*k*a^2*x)/a/(x^2-y^2);
+        dP_dF.x3232=mu;
+        dP_dF.x2112=-(x*mu*a*y^2-x*mu*a+x*la*ln(a*y*z)*a+x^2*la-x*la*a-y^2*mu*a^2+mu*y^2-y^2*la*ln(a*y*z)-2*y^2*k*a*x+2*y^2*k*a^2)/a/y/(x^2-y^2);
+        dP_dF.x3113=-(x*mu*a*z^2-x*mu*a+x*la*ln(a*y*z)*a+x^2*la-x*la*a-z^2*mu*a^2+mu*z^2-z^2*la*ln(a*y*z)-2*z^2*k*a*x+2*z^2*k*a^2)/a/z/(x^2-z^2);
+        dP_dF.x3223=-(-mu*a+la*ln(a*y*z)*a+la*x-la*a)/a/y/z;
+        dP_dF.x3131=-(mu*a*z^2-mu*a+la*ln(a*y*z)*a+la*x-la*a-mu*a^2*x+mu*x-la*ln(a*y*z)*x-2*k*a*x^2+2*k*a^2*x)/a/(x^2-z^2);
+    }
+    else if ((dx >= 0) && (dy < 0) && (dz >= 0)) // Ry
+    {
+        dP_dF.x1111=-(-mu*a*x^2-mu*a-2*la*a+la*ln(x*a*z)*a+la*y)/a/x^2;
+        dP_dF.x2222=2*k;
+        dP_dF.x3333=-(-mu*a*z^2-mu*a-2*la*a+la*ln(x*a*z)*a+la*y)/z^2/a;
+        dP_dF.x2211=la/x/a;
+        dP_dF.x3311=la/x/z;
+        dP_dF.x3322=la/z/a;
+        dP_dF.x2121=(-y*mu*a^2+mu*y-la*ln(x*a*z)*y-2*y^2*k*a+2*y*k*a^2+mu*a*x^2-mu*a+la*ln(x*a*z)*a+la*y-la*a)/a/(x^2-y^2);
+        dP_dF.x3232=-(mu*a*z^2-mu*a+la*ln(x*a*z)*a+la*y-la*a-y*mu*a^2+mu*y-la*ln(x*a*z)*y-2*y^2*k*a+2*y*k*a^2)/a/(y^2-z^2);
+        dP_dF.x2112=(-x^2*mu*a^2+mu*x^2-x^2*la*ln(x*a*z)-2*x^2*k*a*y+2*x^2*k*a^2+y*mu*a*x^2-mu*a*y+y*la*ln(x*a*z)*a+y^2*la-y*la*a)/x/a/(x^2-y^2);
+        dP_dF.x3113=-(-mu*a+la*ln(x*a*z)*a+la*y-la*a)/x/a/z;
+        dP_dF.x3223=-(y*mu*a*z^2-mu*a*y+y*la*ln(x*a*z)*a+y^2*la-y*la*a-z^2*mu*a^2+mu*z^2-z^2*la*ln(x*a*z)-2*z^2*k*a*y+2*z^2*k*a^2)/a/z/(y^2-z^2);
+        dP_dF.x3131=mu;
+    }
+    else if ((dx >= 0) && (dy >= 0) && (dz < 0)) // Rz
+    {
+        dP_dF.x1111=-(-mu*a*x^2-mu*a-2*la*a+la*ln(x*y*a)*a+la*z)/a/x^2;
+        dP_dF.x2222=-(-mu*a*y^2-mu*a-2*la*a+la*ln(x*y*a)*a+la*z)/y^2/a;
+        dP_dF.x3333=2*k;
+        dP_dF.x2211=la/y/x;
+        dP_dF.x3311=la/x/a;
+        dP_dF.x3322=la/y/a;
+        dP_dF.x2121=mu;
+        dP_dF.x3232=(-z*mu*a^2+mu*z-la*ln(x*y*a)*z-2*z^2*k*a+2*z*k*a^2+mu*a*y^2-mu*a+la*ln(x*y*a)*a+la*z-la*a)/a/(y^2-z^2);
+        dP_dF.x2112=-(-mu*a+la*ln(x*y*a)*a+la*z-la*a)/x/y/a;
+        dP_dF.x3113=(-x^2*mu*a^2+mu*x^2-x^2*la*ln(x*y*a)-2*x^2*k*a*z+2*x^2*k*a^2+z*mu*a*x^2-mu*a*z+z*la*ln(x*y*a)*a+z^2*la-z*la*a)/x/a/(x^2-z^2);
+        dP_dF.x3223=(-y^2*mu*a^2+mu*y^2-y^2*la*ln(x*y*a)-2*y^2*k*a*z+2*y^2*k*a^2+z*mu*a*y^2-mu*a*z+z*la*ln(x*y*a)*a+z^2*la-z*la*a)/a/y/(y^2-z^2);
+        dP_dF.x3131=(-z*mu*a^2+mu*z-la*ln(x*y*a)*z-2*z^2*k*a+2*z*k*a^2+mu*a*x^2-mu*a+la*ln(x*y*a)*a+la*z-la*a)/a/(x^2-z^2);
+    }
+    else if ((dx < 0) && (dy < 0) && (dz >= 0)) // Rxy
+    {
+        dP_dF.x1111=2*k;
+        dP_dF.x2222=2*k;
+        dP_dF.x3333=-(-mu*a*z^2-mu*a-3*la*a+la*ln(a^2*z)*a+la*x+la*y)/z^2/a;
+        dP_dF.x2211=la/a^2;
+        dP_dF.x3311=la/z/a;
+        dP_dF.x3322=la/z/a;
+        dP_dF.x2121=(2*k*a*x+mu*a^2-mu+la*ln(a^2*z)-la-2*k*a^2+2*k*a*y)/(x+y)/a;
+        dP_dF.x3232=-(z^2*mu*a^2-mu*a^2+la*ln(a^2*z)*a^2+x*la*a-2*la*a^2+2*y*la*a-y*mu*a^3+mu*a*y-a*la*ln(a^2*z)*y-la*x*y-2*y^2*k*a^2+2*k*a^3*y)/a^2/(y^2-z^2);
+        dP_dF.x2112=-(la*x+mu*a^3-mu*a-la*a-2*k*a^3+la*ln(a^2*z)*a+la*y)/(x+y)/a^2;
+        dP_dF.x3113=-(x*a^2*mu*z^2-mu*a^2*x+x*a^2*la*ln(a^2*z)+x^2*la*a-2*x*a^2*la+x*a*la*y-z^2*mu*a^3+mu*a*z^2-z^2*la*ln(a^2*z)*a-z^2*la*y+z^2*la*a-2*z^2*k*a^2*x+2*z^2*k*a^3)/a^2/z/(x^2-z^2);
+        dP_dF.x3223=-(a^2*y*mu*z^2-y*mu*a^2+a^2*y*la*ln(a^2*z)+x*a*la*y-2*a^2*y*la+y^2*la*a-z^2*mu*a^3+mu*a*z^2-z^2*la*ln(a^2*z)*a-z^2*la*x+z^2*la*a-2*z^2*y*k*a^2+2*z^2*k*a^3)/a^2/z/(y^2-z^2);
+        dP_dF.x3131=-(z^2*mu*a^2-mu*a^2+la*ln(a^2*z)*a^2+2*x*la*a-2*la*a^2+y*la*a-mu*a^3*x+x*mu*a-a*la*ln(a^2*z)*x-la*x*y-2*x^2*k*a^2+2*k*a^3*x)/a^2/(x^2-z^2);
+    }
+    else if ((dx < 0) && (dy >= 0) && (dz < 0)) // Rzx
+    {
+        dP_dF.x1111=2*k;
+        dP_dF.x2222=-(-mu*a*y^2-mu*a-3*la*a+la*ln(a^2*y)*a+la*z+la*x)/y^2/a;
+        dP_dF.x3333=2*k;
+        dP_dF.x2211=la/y/a;
+        dP_dF.x3311=la/a^2;
+        dP_dF.x3322=la/y/a;
+        dP_dF.x2121=-(y^2*mu*a^2-mu*a^2+la*ln(a^2*y)*a^2+z*la*a-2*la*a^2+2*x*la*a-mu*a^3*x+x*mu*a-a*la*ln(a^2*y)*x-z*la*x-2*x^2*k*a^2+2*k*a^3*x)/a^2/(x^2-y^2);
+        dP_dF.x3232=(-z*mu*a^3+mu*a*z-a*la*ln(a^2*y)*z-z*la*x+2*z*la*a-2*z^2*k*a^2+2*z*k*a^3+y^2*mu*a^2-mu*a^2+la*ln(a^2*y)*a^2-2*la*a^2+x*la*a)/a^2/(y^2-z^2);
+        dP_dF.x2112=-(x*a^2*mu*y^2-mu*a^2*x+x*a^2*la*ln(a^2*y)+x*a*la*z-2*x*a^2*la+x^2*la*a-y^2*mu*a^3+mu*a*y^2-y^2*la*ln(a^2*y)*a-y^2*la*z+y^2*la*a-2*y^2*k*a^2*x+2*y^2*k*a^3)/a^2/y/(x^2-y^2);
+        dP_dF.x3113=-(la*x+mu*a^3-mu*a-la*a-2*k*a^3+la*ln(a^2*y)*a+la*z)/(x+z)/a^2;
+        dP_dF.x3223=(-y^2*mu*a^3+mu*a*y^2-y^2*la*ln(a^2*y)*a-y^2*la*x+y^2*la*a-2*y^2*z*k*a^2+2*y^2*k*a^3+a^2*z*mu*y^2-z*mu*a^2+a^2*z*la*ln(a^2*y)+z^2*la*a-2*a^2*z*la+x*a*la*z)/a^2/y/(y^2-z^2);
+        dP_dF.x3131=(2*k*a*x+mu*a^2-mu+la*ln(a^2*y)-la-2*k*a^2+2*k*a*z)/(x+z)/a;
+    }
+    else if ((dx >= 0) && (dy < 0) && (dz < 0)) // Ryz
+    {
+        dP_dF.x1111=-(-mu*a*x^2-mu*a-3*la*a+la*ln(x*a^2)*a+la*y+la*z)/a/x^2;
+        dP_dF.x2222=2*k;
+        dP_dF.x3333=2*k;
+        dP_dF.x2211=la/x/a;
+        dP_dF.x3311=la/x/a;
+        dP_dF.x3322=la/a^2;
+        dP_dF.x2121=(-y*mu*a^3+mu*a*y-a*la*ln(x*a^2)*y-z*la*y+2*y*la*a-2*y^2*k*a^2+2*k*a^3*y+x^2*mu*a^2-mu*a^2+la*ln(x*a^2)*a^2-2*la*a^2+z*la*a)/a^2/(x^2-y^2);
+        dP_dF.x3232=(2*k*a*y+mu*a^2-mu+la*ln(x*a^2)-la-2*k*a^2+2*k*a*z)/(y+z)/a;
+        dP_dF.x2112=(-x^2*mu*a^3+mu*a*x^2-x^2*la*ln(x*a^2)*a-x^2*la*z+x^2*la*a-2*x^2*y*k*a^2+2*x^2*k*a^3+a^2*y*mu*x^2-y*mu*a^2+a^2*y*la*ln(x*a^2)+y^2*la*a-2*a^2*y*la+a*y*la*z)/x/a^2/(x^2-y^2);
+        dP_dF.x3113=(-x^2*mu*a^3+mu*a*x^2-x^2*la*ln(x*a^2)*a-x^2*la*y+x^2*la*a-2*x^2*z*k*a^2+2*x^2*k*a^3+a^2*z*mu*x^2-z*mu*a^2+a^2*z*la*ln(x*a^2)+a*y*la*z-2*a^2*z*la+z^2*la*a)/x/a^2/(x^2-z^2);
+        dP_dF.x3223=-(la*y+mu*a^3-mu*a-la*a-2*k*a^3+la*ln(x*a^2)*a+la*z)/(y+z)/a^2;
+        dP_dF.x3131=(-z*mu*a^3+mu*a*z-a*la*ln(x*a^2)*z-z*la*y+2*z*la*a-2*z^2*k*a^2+2*z*k*a^3+x^2*mu*a^2-mu*a^2+la*ln(x*a^2)*a^2+y*la*a-2*la*a^2)/a^2/(x^2-z^2);
+    }
+    else // Rxyz
+    {
+        dP_dF.x1111=2*k;
+        dP_dF.x2222=2*k;
+        dP_dF.x3333=2*k;
+        dP_dF.x2211=la/a^2;
+        dP_dF.x3311=la/a^2;
+        dP_dF.x3322=la/a^2;
+        dP_dF.x2121=(2*k*a^2*x-mu*a+la*ln(a^3)*a+la*z-2*k*a^3-2*la*a+mu*a^3+2*y*k*a^2)/(x+y)/a^2;
+        dP_dF.x3232=(2*y*k*a^2-mu*a+la*ln(a^3)*a+la*x-2*k*a^3-2*la*a+mu*a^3+2*z*k*a^2)/(y+z)/a^2;
+        dP_dF.x2112=-(la*x-mu*a+la*ln(a^3)*a+la*z-2*k*a^3-2*la*a+mu*a^3+la*y)/(x+y)/a^2;
+        dP_dF.x3113=-(la*x-mu*a+la*ln(a^3)*a+la*z-2*k*a^3-2*la*a+mu*a^3+la*y)/(x+z)/a^2;
+        dP_dF.x3223=-(la*x-mu*a+la*ln(a^3)*a+la*z-2*k*a^3-2*la*a+mu*a^3+la*y)/(y+z)/a^2;
+        dP_dF.x3131=(2*k*a^2*x-mu*a+la*ln(a^3)*a+mu*a^3-2*k*a^3+la*y-2*la*a+2*z*k*a^2)/(x+z)/a^2;
+    }
+    if(enforce_definiteness) dP_dF.Enforce_Definiteness();
 }
 //#####################################################################
 // Function P_From_Strain_Rate
