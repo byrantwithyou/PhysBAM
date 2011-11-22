@@ -216,7 +216,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 1:
         case 2:
         case 3:
-        case 4: case 29:
+        case 4:
         case 7:
         case 8:
         case 9:
@@ -242,7 +242,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             //solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
             last_frame=1000;      
-        case 30:
+        case 29: case 30:
             solids_parameters.cfl=(T)5;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             frame_rate=60;
@@ -302,6 +302,7 @@ void Get_Initial_Data()
         case 4: case 29:{
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_4K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)80,0))),true,true,density);
             tests.Add_Ground();
+            last_frame=1000;
             break;}
         case 8:{
             RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,4,0)));
@@ -637,12 +638,13 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 void Update_Time_Varying_Material_Properties(const T time)
 {   if(test_number==29 && time > .1){
-        T critical=(T)4.0;
-        //DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
+        T critical=(T)10.0;
+        DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
         //TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
-    FINITE_VOLUME<TV,3>& fv = solid_body_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
+    FINITE_VOLUME<TV,3>& fv = deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
+           // FINITE_VOLUME<TV,2>& force_field = solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,2>&>();
     CONSTITUTIVE_MODEL<T,3>& icm = fv.constitutive_model;
-        if(time<critical) icm.constant_mu = (T)1e1;
+        if(time<critical) icm.constant_mu = (T)1e0;
         else icm.constant_mu = (T)1e7;
     }
 }
