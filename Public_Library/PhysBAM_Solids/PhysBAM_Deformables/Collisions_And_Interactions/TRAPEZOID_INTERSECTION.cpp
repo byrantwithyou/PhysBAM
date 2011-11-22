@@ -529,7 +529,7 @@ Trapezoid_Intersection_Area(TV a,TV b,TV c,TV d,VECTOR<TV,4>& G,VECTOR<VECTOR<MA
     return A;
 }
 
-template float Trapezoid_Intersection_Area<float,VECTOR<float,2> >(VECTOR<float,2>,VECTOR<float,2>,VECTOR<float,2>,VECTOR<float,2>,VECTOR<VECTOR<float,2>,4>&,VECTOR<VECTOR<MATRIX<float,2,2>,4>,4>&);
+template float PhysBAM::Trapezoid_Intersection_Area<float,VECTOR<float,2> >(VECTOR<float,2>,VECTOR<float,2>,VECTOR<float,2>,VECTOR<float,2>,VECTOR<VECTOR<float,2>,4>&,VECTOR<VECTOR<MATRIX<float,2,2>,4>,4>&);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-template double Trapezoid_Intersection_Area<double,VECTOR<double,2> >(VECTOR<double,2>,VECTOR<double,2>,VECTOR<double,2>,VECTOR<double,2>,VECTOR<VECTOR<double,2>,4>&,VECTOR<VECTOR<MATRIX<double,2,2>,4>,4>&);
+template double PhysBAM::Trapezoid_Intersection_Area<double,VECTOR<double,2> >(VECTOR<double,2>,VECTOR<double,2>,VECTOR<double,2>,VECTOR<double,2>,VECTOR<VECTOR<double,2>,4>&,VECTOR<VECTOR<MATRIX<double,2,2>,4>,4>&);
 #endif
