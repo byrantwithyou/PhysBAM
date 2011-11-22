@@ -241,7 +241,12 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             //solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
-            last_frame=1000;            
+            last_frame=1000;      
+        case 30:
+            solids_parameters.cfl=(T)5;
+            solids_parameters.implicit_solve_parameters.cg_iterations=100000;
+            frame_rate=60;
+            break;
         case 5:
         case 6:
             frame_rate=60;
@@ -360,7 +365,14 @@ void Get_Initial_Data()
             }
             last_frame=1000;
             break;}
-        
+        case 30: {
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)-90,(T)6,(T)11))),true,true,density, 1.0);
+            RIGID_BODY<TV>& box1=tests.Add_Analytic_Box(TV(3,20,20));
+            box1.X()=TV(10,10,10);
+            box1.is_static=true;
+            tests.Add_Ground();
+            last_frame=250;
+            break;}        
         case 5:{
             RIGID_BODY<TV>& tmp_sphere=tests.Add_Rigid_Body("sphere",(T)1.0,(T).5);
             //RIGID_BODY<TV>& tmp_sphere=tests.Add_Analytic_Box(TV(1,1,1));
@@ -454,6 +466,12 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 28:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             Add_Constitutive_Model(tetrahedralized_volume,(T)1e5,(T).45,(T).01);
+            break;} 
+        case 30:{
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+            Add_Constitutive_Model(tetrahedralized_volume,(T)1e6,(T).45,(T).01);
+            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            for(int i=1; i<=deformable_body_collection.particles.X.m; i++){ deformable_body_collection.particles.V(i).x=(T)100;deformable_body_collection.particles.V(i).y=9.8;deformable_body_collection.particles.V(i).z=0;}
             break;} 
         case 9:{break;}
         default:
