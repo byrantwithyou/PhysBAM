@@ -21,7 +21,8 @@
 //   26. Big stretch/bend
 //   27. Force inversion
 //   28. Taffy test
-//   29. Projectile smashing into a wall
+//   29. Armadillo collapsing and rebounding
+//   30. Projectile hitting a wall
 //#####################################################################
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
@@ -120,7 +121,7 @@ public:
     void Filter_Velocities(const T dt,const T time,const bool velocity_update) PHYSBAM_OVERRIDE {}
     void Set_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated) PHYSBAM_OVERRIDE {}
     void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
-    void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE {}
+    //void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE {}
     // void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     // void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
@@ -215,7 +216,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 1:
         case 2:
         case 3:
-        case 4:
+        case 4: case 29:
         case 7:
         case 8:
         case 9:
@@ -293,8 +294,8 @@ void Get_Initial_Data()
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/maggot_8K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,true,density);
             tests.Add_Ground();
             break;}
-        case 4:{
-            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/body_150.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)80,0))),true,true,density);
+        case 4: case 29:{
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_4K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)80,0))),true,true,density);
             tests.Add_Ground();
             break;}
         case 8:{
@@ -429,7 +430,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             Add_Constitutive_Model(tetrahedralized_volume,(T)1e5,(T).45,(T).01);
             for(int i=1; i<=deformable_body_collection.particles.X.m; i++) deformable_body_collection.particles.X(i).y=3;
             break;}
-        case 4:{
+        case 4: case 29:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             Add_Constitutive_Model(tetrahedralized_volume,(T)1e6,(T).45,(T).01);
@@ -612,6 +613,20 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
     if(test_forces){
         solid_body_collection.deformable_body_collection.Test_Energy(time);
         solid_body_collection.deformable_body_collection.Test_Force_Derivatives(time);}
+}
+//#####################################################################
+// Function Update_Time_Varying_Material_Properties
+//#####################################################################
+void Update_Time_Varying_Material_Properties(const T time)
+{   if(test_number==29 && time > .1){
+        T critical=(T)4.0;
+        //DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
+        //TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+    FINITE_VOLUME<TV,3>& fv = solid_body_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
+    CONSTITUTIVE_MODEL<T,3>& icm = fv.constitutive_model;
+        if(time<critical) icm.constant_mu = (T)1e1;
+        else icm.constant_mu = (T)1e7;
+    }
 }
 //#####################################################################
 // Function Add_Constitutive_Model
