@@ -137,7 +137,21 @@ Isotropic_Stress_Derivative_Transition_Helper(DIAGONALIZED_ISOTROPIC_STRESS_DERI
     const T neo_minus_cor,
     const T t) const
 {
-    PHYSBAM_FATAL_ERROR();
+    dP_dF.x1111 = neo_dP_dF.x1111*t + cor_dP_dF.x1111*(1-t) + neo_minus_cor*DDt.x1111 + 2*(neo_P.x11-cor_P.x11)*Dt.x11;
+    dP_dF.x2222 = neo_dP_dF.x2222*t + cor_dP_dF.x2222*(1-t) + neo_minus_cor*DDt.x2222 + 2*(neo_P.x22-cor_P.x22)*Dt.x22;
+    dP_dF.x3333 = neo_dP_dF.x3333*t + cor_dP_dF.x3333*(1-t) + neo_minus_cor*DDt.x3333 + 2*(neo_P.x33-cor_P.x33)*Dt.x33;
+
+    dP_dF.x2211 = neo_dP_dF.x2211*t + cor_dP_dF.x2211*(1-t) + neo_minus_cor*DDt.x2211 + (neo_P.x22-cor_P.x22)*Dt.x11 + (neo_P.x11-cor_P.x11)*Dt.x22;
+    dP_dF.x3322 = neo_dP_dF.x3322*t + cor_dP_dF.x3322*(1-t) + neo_minus_cor*DDt.x3322 + (neo_P.x33-cor_P.x33)*Dt.x22 + (neo_P.x22-cor_P.x22)*Dt.x33;
+    dP_dF.x3311 = neo_dP_dF.x3311*t + cor_dP_dF.x3311*(1-t) + neo_minus_cor*DDt.x3311 + (neo_P.x33-cor_P.x33)*Dt.x11 + (neo_P.x11-cor_P.x11)*Dt.x33;
+
+    dP_dF.x2112 = neo_dP_dF.x2112*t + cor_dP_dF.x2112*(1-t) + neo_minus_cor*DDt.x2112;
+    dP_dF.x3113 = neo_dP_dF.x3113*t + cor_dP_dF.x3113*(1-t) + neo_minus_cor*DDt.x3113;
+    dP_dF.x3223 = neo_dP_dF.x3223*t + cor_dP_dF.x3223*(1-t) + neo_minus_cor*DDt.x3223;
+
+    dP_dF.x2121 = neo_dP_dF.x2121*t + cor_dP_dF.x2121*(1-t) + neo_minus_cor*DDt.x2121;
+    dP_dF.x3131 = neo_dP_dF.x3131*t + cor_dP_dF.x3131*(1-t) + neo_minus_cor*DDt.x3131;
+    dP_dF.x3232 = neo_dP_dF.x3232*t + cor_dP_dF.x3232*(1-t) + neo_minus_cor*DDt.x3232;
 }
 //#####################################################################
 // Function P_From_Strain_Rate

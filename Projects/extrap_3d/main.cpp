@@ -20,8 +20,11 @@ int main(int argc,char* argv[])
     typedef float RW;
     typedef VECTOR<T,3> TV;
     RW rw=RW();STREAM_TYPE stream_type(rw); // gcc 3.3.2 workaround
+    
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >* example;
+    
 
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >* example=new STANDARD_TESTS<T>(stream_type);
+    example=new STANDARD_TESTS<T>(stream_type);
 
     example->want_mpi_world=true;
     example->Parse(argc,argv);
