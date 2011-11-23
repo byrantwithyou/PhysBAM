@@ -198,7 +198,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     use_extended_neohookean=parse_args->Is_Value_Set("-use_ext_neo");
     use_extended_neohookean_refined=parse_args->Is_Value_Set("-use_ext_neo_ref"); //
     use_extended_neohookean_hyperbola=parse_args->Is_Value_Set("-use_ext_neo_hyper");    
-    use_extended_neohookean_hyperbola=parse_args->Is_Value_Set("-use_ext_neo_smooth");    
+    use_extended_neohookean_smooth=parse_args->Is_Value_Set("-use_ext_neo_smooth");    
     use_corotated=parse_args->Is_Value_Set("-use_corotated");
     use_corot_blend=parse_args->Is_Value_Set("-use_corot_blend");
     use_corot_quartic=parse_args->Is_Value_Set("-use_corot_quartic");

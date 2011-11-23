@@ -57,6 +57,7 @@
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/NEWMARK_EVOLUTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
 #include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
+#include <fstream>
 namespace PhysBAM{
 
 template<class T_input>
@@ -69,6 +70,7 @@ public:
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::solid_body_collection;
     using BASE::stream_type;using BASE::solids_evolution;using BASE::parse_args;using BASE::test_number;using BASE::data_directory;
 
+    std::ofstream svout;
     SOLIDS_STANDARD_TESTS<TV> tests;
     
     GRID<TV> mattress_grid;
@@ -116,11 +118,11 @@ public:
     void Align_Deformable_Bodies_With_Rigid_Bodies() PHYSBAM_OVERRIDE {}
     void Preprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE {}
     void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE {}
-    void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE {}
+    //void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE {}
     void Self_Collisions_Begin_Callback(const T time,const int substep) PHYSBAM_OVERRIDE {}
     void Filter_Velocities(const T dt,const T time,const bool velocity_update) PHYSBAM_OVERRIDE {}
     void Set_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated) PHYSBAM_OVERRIDE {}
-    void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
+    void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE {if(dump_sv)svout.close();} //modified 22 Nov 2011
     //void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE {}
     // void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     // void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
@@ -601,13 +603,6 @@ void Read_Output_Files_Solids(const int frame) PHYSBAM_OVERRIDE
     solid_body_collection.Update_Simulated_Particles();
 }
 //#####################################################################
-// Function Preprocess_Frame
-//#####################################################################
-void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
-{
-    dynamic_cast<NEWMARK_EVOLUTION<TV>&>(*solids_evolution).print_matrix=print_matrix;
-}
-//#####################################################################
 // Function Set_Kinematic_Positions
 //#####################################################################
 void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id)
@@ -648,6 +643,35 @@ void Update_Time_Varying_Material_Properties(const T time)
         else icm.constant_mu = (T)1e7;
     }
 }
+//#####################################################################
+// Function Postprocess_Substep
+//#####################################################################    
+void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
+{
+    if (dump_sv)
+    {
+        FINITE_VOLUME<TV,3>& force_field = solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
+        ARRAY<DIAGONAL_MATRIX<T,3> >& sv = force_field.Fe_hat;
+        
+        for (int i=1; i<=sv.m; i++)
+        {
+            svout << sv(i).x11 << " " << sv(i).x22 << " " << sv(i).x33 << std::endl;
+        }
+    }
+} 
+//#####################################################################
+// Function Preprocess_Frame
+//#####################################################################
+void Preprocess_Frame(const int frame)
+{
+    dynamic_cast<NEWMARK_EVOLUTION<TV>&>(*solids_evolution).print_matrix=print_matrix;
+    
+    if (dump_sv)
+    {
+        std::string output_file = STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d/SV_%d",test_number,frame);
+        svout.open(output_file.c_str());
+    }
+}    
 //#####################################################################
 // Function Add_Constitutive_Model
 //#####################################################################
