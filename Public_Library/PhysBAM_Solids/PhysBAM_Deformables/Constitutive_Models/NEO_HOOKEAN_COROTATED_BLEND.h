@@ -34,7 +34,7 @@ public:
     using BASE::constant_alpha;
     using BASE::constant_beta;
 
-    DIAGONAL_MATRIX_DETERMINANT_HEAVISIDE_TRANSITION <T,d,QUINTIC_HEAVISIDE_TRANSITION<T> > blend;
+    DIAGONAL_MATRIX_DETERMINANT_HEAVISIDE_TRANSITION <T,d,CUBIC_HEAVISIDE_TRANSITION<T> > blend;
 
     NEO_HOOKEAN<T,d> neo_base;
     COROTATED<T,d> cor_base;

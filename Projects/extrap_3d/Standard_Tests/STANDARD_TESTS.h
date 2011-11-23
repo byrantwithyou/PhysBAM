@@ -13,6 +13,8 @@
 //    7. Plane test - ball
 //    8. Falling mattress
 //    9. Testing rigid objects stuff
+//   10. Increasing gravity
+//   11. Increasing gravity (individual)
 //   16. Smash test - large boxes, small mattress
 //   17. Matress, no gravity, random start
 //   18. Matress, no gravity, point start
@@ -168,7 +170,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     frame_rate=24;
 
     switch(test_number){
-        case 17: case 18: case 24: case 25: case 27:
+        case 17: case 18: case 24: case 25: case 27: case 10: case 11:
             mattress_grid=GRID<TV>(10,10,10,(T)-1,(T)1,(T)-1,(T)1,(T)-1,(T)1);
             break;
         case 26:
@@ -220,6 +222,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 7:
         case 8:
         case 9:
+        case 10:
+        case 11:
         case 16:
         case 17:
         case 18:
@@ -319,6 +323,19 @@ void Get_Initial_Data()
             box2.is_static=false;
             break;
         }
+        case 10:{
+            last_frame=1200;
+            for(int i=1;i<=7;i++){
+                RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(4*i,1,0)));
+                tests.Create_Mattress(mattress_grid,true,&initial_state);}
+            tests.Add_Ground();
+            break;}
+        case 11:{
+            last_frame=1200;
+            RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,1,0)));
+            tests.Create_Mattress(mattress_grid,true,&initial_state);
+            tests.Add_Ground();
+            break;}
         case 16: {
             RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,0,0)));
             tests.Create_Mattress(mattress_grid,true,&initial_state);
@@ -430,7 +447,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 2:
         case 3:
         case 8:
-        case 16:    
+        case 16:
         case 5:
         case 6:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
@@ -447,6 +464,20 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             Add_Constitutive_Model(tetrahedralized_volume,(T)1e6,(T).45,(T).01);
+            break;}
+        case 10:{
+            bool* bools[7]={&use_corotated,0,&use_constant_ife,&use_corot_blend,&use_extended_neohookean,&use_extended_neohookean_smooth,&use_extended_neohookean_hyperbola};
+            for(int i=1;i<=7;i++){
+                if(bools[i-1]) *bools[i-1]=true;
+                TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(i);
+                Add_Constitutive_Model(tetrahedralized_volume,(T)1e5,(T).45,(T).01);
+                if(bools[i-1]) *bools[i-1]=false;}
+            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            break;}
+        case 11:{
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+            Add_Constitutive_Model(tetrahedralized_volume,(T)5e4,(T).45,(T).01);
+            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             break;}
         case 17:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
@@ -632,6 +663,7 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
     if(test_forces){
         solid_body_collection.deformable_body_collection.Test_Energy(time);
         solid_body_collection.deformable_body_collection.Test_Force_Derivatives(time);}
+    if(test_number==10 || test_number==11) solid_body_collection.template Find_Force<GRAVITY<TV>&>().gravity=10*time;
 }
 //#####################################################################
 // Function Update_Time_Varying_Material_Properties
