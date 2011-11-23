@@ -6,6 +6,7 @@
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/exchange.h>
+#include <cmath>
 using namespace PhysBAM;
 using ::std::sin;
 //#####################################################################

@@ -49,7 +49,7 @@ public:
     virtual ~EXAMPLE();
     
 //#####################################################################
-    T Time_At_Frame(const int frame) const;
+    virtual T Time_At_Frame(const int frame) const;
     static void Clamp_Time_Step_With_Target_Time(const T time,const T target_time,T& dt,bool& done,const T min_dt=0,bool* min_dt_failed=0);
     void Set_Write_Substeps_Level(const int level);
     void Write_Frame_Title(const int frame) const;

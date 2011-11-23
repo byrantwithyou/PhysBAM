@@ -191,7 +191,7 @@ public:
     {Ensure_Enough_Space(m+1);m++;for(ID i=m;i>index;i--) (*this)(i)=(*this)(i-1);(*this)(index)=element;}
 
     T Pop()
-    {Remove_End();return base_pointer[m];}
+    {Remove_End();return base_pointer[Value(m)];}
 
     ARRAY_VIEW<const T> Pop_Elements(const int count) // return value should be copied immediately, not kept around
     {static const bool has_trivial_destructor=HAS_TRIVIAL_DESTRUCTOR<T>::value;
