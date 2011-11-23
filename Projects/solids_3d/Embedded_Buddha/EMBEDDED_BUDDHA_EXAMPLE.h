@@ -43,7 +43,7 @@ public:
         perform_self_collision=true;
     }
 
-    ~EMBEDDED_BUDDHA_EXAMPLE()
+    virtual ~EMBEDDED_BUDDHA_EXAMPLE()
     {}
 
 //#####################################################################

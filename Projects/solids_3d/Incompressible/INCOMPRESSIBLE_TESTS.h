@@ -113,7 +113,7 @@ public:
     {
     }
 
-    ~INCOMPRESSIBLE_TESTS()
+    virtual ~INCOMPRESSIBLE_TESTS()
     {}
 
     // Unused callbacks

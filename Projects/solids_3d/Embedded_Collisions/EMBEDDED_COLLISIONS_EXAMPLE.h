@@ -45,7 +45,7 @@ public:
     {
     }
 
-    ~EMBEDDED_COLLISIONS_EXAMPLE()
+    virtual ~EMBEDDED_COLLISIONS_EXAMPLE()
     {}
 
     // Unused callbacks

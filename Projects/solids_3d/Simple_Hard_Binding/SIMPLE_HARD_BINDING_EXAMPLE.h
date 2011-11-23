@@ -57,7 +57,7 @@ public:
     {
     }
 
-    ~SIMPLE_HARD_BINDING_EXAMPLE()
+    virtual ~SIMPLE_HARD_BINDING_EXAMPLE()
     {delete surface;delete redgreen;}
 
     // Unused callbacks

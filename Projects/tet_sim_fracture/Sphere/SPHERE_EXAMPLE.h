@@ -40,7 +40,7 @@ public:
         strcpy(output_directory,"Sphere/output");
     }
 
-    ~SPHERE_EXAMPLE()
+    virtual ~SPHERE_EXAMPLE()
     {}
 
 //#####################################################################

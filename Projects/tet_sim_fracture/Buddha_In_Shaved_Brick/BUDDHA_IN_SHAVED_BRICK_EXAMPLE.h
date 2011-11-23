@@ -71,7 +71,7 @@ public:
         solids_parameters.use_constant_mass=false;
     }
 
-    ~BUDDHA_IN_SHAVED_BRICK_EXAMPLE()
+    virtual ~BUDDHA_IN_SHAVED_BRICK_EXAMPLE()
     {}
 
 

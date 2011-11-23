@@ -69,7 +69,7 @@ public:
         Initialize_Levelset();
     }
 
-    ~DUMBBELL_EXAMPLE()
+    virtual ~DUMBBELL_EXAMPLE()
     {}
 
 

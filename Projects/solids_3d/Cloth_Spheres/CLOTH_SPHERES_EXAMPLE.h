@@ -41,7 +41,7 @@ public:
     {
     }
 
-    ~CLOTH_SPHERES_EXAMPLE()
+    virtual ~CLOTH_SPHERES_EXAMPLE()
     {}
 
     // Unused callbacks

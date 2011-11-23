@@ -46,7 +46,7 @@ public:
         gravity=(T)9.8;
     }
 
-    ~ARMADILLO_DROP_HEAD_EXAMPLE()
+    virtual ~ARMADILLO_DROP_HEAD_EXAMPLE()
     {}
 
 //#####################################################################

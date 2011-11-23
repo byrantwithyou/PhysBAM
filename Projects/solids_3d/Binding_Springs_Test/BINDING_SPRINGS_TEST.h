@@ -43,7 +43,7 @@ public:
     {
     }
 
-    ~BINDING_SPRINGS_TEST()
+    virtual ~BINDING_SPRINGS_TEST()
     {}
 
     // Unused callbacks

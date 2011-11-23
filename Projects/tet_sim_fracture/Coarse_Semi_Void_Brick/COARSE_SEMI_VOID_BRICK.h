@@ -69,7 +69,7 @@ public:
         solids_parameters.use_constant_mass=false;
     }
 
-    ~COARSE_SEMI_VOID_BRICK_EXAMPLE()
+    virtual ~COARSE_SEMI_VOID_BRICK_EXAMPLE()
     {}
 
 

@@ -64,7 +64,7 @@ public:
         perform_self_collision=false;
     }
 
-    ~COARSE_SPHERE_EXAMPLE()
+    virtual ~COARSE_SPHERE_EXAMPLE()
     {}
 
 

@@ -37,7 +37,7 @@ public:
     {
     }
 
-    ~HAIR_TESTS() 
+    virtual ~HAIR_TESTS() 
     {
         volume_output_file.close();
     }
