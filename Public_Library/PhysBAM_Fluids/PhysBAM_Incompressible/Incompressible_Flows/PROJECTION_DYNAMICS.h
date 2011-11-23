@@ -4,8 +4,8 @@
 //#####################################################################
 // Class PROJECTION_DYNAMICS
 //#####################################################################
-#ifndef __PROJECTION_DYNAMICS
-#define __PROJECTION_DYNAMICS
+#ifndef __PROJECTION_DYNAMICS__
+#define __PROJECTION_DYNAMICS__
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Data_Structures/TRIPLE.h>

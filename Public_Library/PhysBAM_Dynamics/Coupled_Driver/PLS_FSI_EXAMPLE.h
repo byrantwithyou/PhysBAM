@@ -71,7 +71,7 @@ public:
     T m,s,kg;
 
     PLS_FSI_EXAMPLE(const STREAM_TYPE stream_type,const int number_of_regions);
-    ~PLS_FSI_EXAMPLE();
+    virtual ~PLS_FSI_EXAMPLE();
 
     void Get_Levelset_Velocity(const GRID<TV>& grid,T_LEVELSET& levelset,ARRAY<T,FACE_INDEX<TV::m> >& V_levelset,const T time) const PHYSBAM_OVERRIDE
     {V_levelset=fluid_collection.incompressible_fluid_collection.face_velocities;}

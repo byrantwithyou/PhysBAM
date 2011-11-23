@@ -45,7 +45,7 @@ public:
         :object(volume_object_input.Get_Boundary_Object()),volume_object(&volume_object_input),particles(dynamic_cast<GEOMETRY_PARTICLES<TV>&>(object.particles))
     {}
 
-    ~DEFORMABLE_OBJECT_FLUID_COLLISIONS()
+    virtual ~DEFORMABLE_OBJECT_FLUID_COLLISIONS()
     {for(int i=1;i<=saved_states.m;i++) delete saved_states(i).x;}
 
     TV Pointwise_Node_Pseudo_Velocity(const int node_id,const int state1,const int state2)

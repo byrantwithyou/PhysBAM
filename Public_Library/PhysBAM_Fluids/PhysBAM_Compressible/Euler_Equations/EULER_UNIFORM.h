@@ -74,7 +74,7 @@ public:
     bool need_to_remove_added_internal_energy,need_to_remove_added_internal_energy_save;
 
     EULER_UNIFORM(const T_GRID& grid_input);
-    ~EULER_UNIFORM();
+    virtual ~EULER_UNIFORM();
 
     T Get_Temperature(const TV_INT& cell)
     {

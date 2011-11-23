@@ -15,6 +15,7 @@
 #include <PhysBAM_Geometry/Basic_Geometry/CYLINDER.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY.h>
+#include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_BINARY_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_UNIFORM.h>
@@ -45,7 +46,8 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T_GRID> SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>::
 SOLIDS_FLUIDS_EXAMPLE_UNIFORM(const STREAM_TYPE stream_type,const int number_of_regions,const typename FLUIDS_PARAMETERS<T_GRID>::TYPE type,const int array_collection_type)
-    :SOLIDS_FLUIDS_EXAMPLE<TV>(stream_type,array_collection_type),fluids_parameters(number_of_regions,type),fluid_collection(*fluids_parameters.grid),resolution(0)
+    :SOLIDS_FLUIDS_EXAMPLE<TV>(stream_type,array_collection_type),fluids_parameters(number_of_regions,type),fluid_collection(*fluids_parameters.grid),resolution(0),
+    debug_particles(*new DEBUG_PARTICLES<TV>)
 {}
 //#####################################################################
 // Destructor
@@ -54,6 +56,7 @@ template<class T_GRID> SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>::
 ~SOLIDS_FLUIDS_EXAMPLE_UNIFORM()
 {
     if(dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>*>(solids_evolution)) fluids_parameters.projection=0;
+    delete &debug_particles;
 }
 //#####################################################################
 // Function Register_Options
@@ -539,6 +542,7 @@ Write_Output_Files(const int frame) const
     FILE_UTILITIES::Create_Directory(output_directory+"/"+f);
     FILE_UTILITIES::Create_Directory(output_directory+"/common");
     Write_Frame_Title(frame);
+    debug_particles.Write_Debug_Particles(stream_type,output_directory,frame);
     solid_body_collection.Write(stream_type,output_directory,frame,first_frame,solids_parameters.write_static_variables_every_frame,
         solids_parameters.rigid_body_evolution_parameters.write_rigid_bodies,solids_parameters.write_deformable_body,solids_parameters.write_from_every_process,
         solids_parameters.triangle_collision_parameters.output_interaction_pairs);

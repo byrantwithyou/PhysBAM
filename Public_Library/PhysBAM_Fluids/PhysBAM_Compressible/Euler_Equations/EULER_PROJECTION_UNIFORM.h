@@ -65,7 +65,7 @@ private:
 public:
 
     EULER_PROJECTION_UNIFORM(EULER_UNIFORM<T_GRID>* euler_input);
-    ~EULER_PROJECTION_UNIFORM();
+    virtual ~EULER_PROJECTION_UNIFORM();
 
     void Save_State(T_FACE_ARRAYS_SCALAR& face_velocities_s)
     {T_FACE_ARRAYS_SCALAR::Copy(face_velocities,face_velocities_s);}

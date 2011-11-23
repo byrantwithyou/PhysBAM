@@ -46,7 +46,7 @@ public:
     
     WATER_STANDARD_TESTS_MULTIPHASE(SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>& example,FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters_input,FLUID_COLLECTION<TV>& fluid_collection_input,
         RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input);
-    ~WATER_STANDARD_TESTS_MULTIPHASE();
+    virtual ~WATER_STANDARD_TESTS_MULTIPHASE();
 
 //#####################################################################
     void Initialize(const int test_number_input,const int resolution,const int restart_frame);
