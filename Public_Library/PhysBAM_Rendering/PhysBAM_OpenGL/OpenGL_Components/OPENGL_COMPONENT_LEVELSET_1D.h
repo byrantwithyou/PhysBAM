@@ -25,7 +25,7 @@ public:
 
 //##################################################################### 
     OPENGL_COMPONENT_LEVELSET_1D(GRID<TV> &grid,const std::string& levelset_filename_input,OPENGL_COLOR point_color,OPENGL_COLOR line_color);
-    ~OPENGL_COMPONENT_LEVELSET_1D();
+    virtual ~OPENGL_COMPONENT_LEVELSET_1D();
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
     void Set_Frame(int frame_input) PHYSBAM_OVERRIDE;
     void Set_Draw(bool draw_input=true) PHYSBAM_OVERRIDE;

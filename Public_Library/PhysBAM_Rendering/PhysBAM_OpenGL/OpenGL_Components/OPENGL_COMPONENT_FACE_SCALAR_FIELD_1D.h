@@ -25,7 +25,7 @@ private:
 
 public:
     OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D(const GRID<TV> &grid_input,const std::string &values_filename_input,OPENGL_COLOR point_color,OPENGL_COLOR line_color);
-    ~OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D();
+    virtual ~OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D();
 
     bool Is_Up_To_Date(int frame) const PHYSBAM_OVERRIDE
     {return valid && frame_loaded==frame;}

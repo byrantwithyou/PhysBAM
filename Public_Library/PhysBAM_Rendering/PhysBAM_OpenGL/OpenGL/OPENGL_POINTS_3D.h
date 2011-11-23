@@ -30,7 +30,7 @@ public:
     ARRAY<bool>* draw_mask;
 
     OPENGL_POINTS_3D(T_ARRAY& points_input,const OPENGL_COLOR& color_input=OPENGL_COLOR::White(),const T point_size=5);
-    ~OPENGL_POINTS_3D();
+    virtual ~OPENGL_POINTS_3D();
 
     template<class T_PARTICLES> void Set_Points_From_Particles(const T_PARTICLES& particles,const bool keep_colors=true,const bool use_ids=true,const bool use_draw_mask=false)
     {points.Resize(particles.array_collection->Size());

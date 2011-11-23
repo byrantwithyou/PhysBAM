@@ -66,7 +66,7 @@ protected:
 public:
     OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D(const std::string& basedir);
     OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const std::string& basedir);
-    ~OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D();
+    virtual ~OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D();
     
     void Display(const int in_color=1) const PHYSBAM_OVERRIDE;
 

@@ -19,7 +19,7 @@ class OPENGL_COMPONENT_TRIANGULATED_SURFACE : public OPENGL_COMPONENT
 {
 public:
     OPENGL_COMPONENT_TRIANGULATED_SURFACE(const std::string &filename, bool use_display_list = true);
-    ~OPENGL_COMPONENT_TRIANGULATED_SURFACE();
+    virtual ~OPENGL_COMPONENT_TRIANGULATED_SURFACE();
     
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
     void Set_Frame(int frame_input) PHYSBAM_OVERRIDE;

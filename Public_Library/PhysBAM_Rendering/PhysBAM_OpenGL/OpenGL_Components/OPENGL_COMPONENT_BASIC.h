@@ -25,7 +25,7 @@ public:
         Use_Clip_Planes(false);
     }
 
-    ~OPENGL_COMPONENT_BASIC()
+    virtual ~OPENGL_COMPONENT_BASIC()
     {
         if(own_object) delete &object;
     }

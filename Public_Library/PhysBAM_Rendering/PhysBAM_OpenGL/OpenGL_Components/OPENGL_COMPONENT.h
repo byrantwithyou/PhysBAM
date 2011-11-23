@@ -25,7 +25,7 @@
 namespace PhysBAM
 {
 
-class OPENGL_COMPONENT : public OPENGL_OBJECT
+class OPENGL_COMPONENT:public OPENGL_OBJECT
 {
 public:
     OPENGL_COMPONENT(const std::string &name = "");

@@ -37,7 +37,7 @@ public:
     T_FACE_ARRAYS_BOOL *active_faces;
 
     OPENGL_MAC_VELOCITY_FIELD_2D(GRID<TV> &grid,ARRAY<T,FACE_INDEX<2> > &face_velocities_input,T_ARRAYS_BOOL *active_cells_input=0,T_FACE_ARRAYS_BOOL *active_faces_input=0);
-    ~OPENGL_MAC_VELOCITY_FIELD_2D();
+    virtual ~OPENGL_MAC_VELOCITY_FIELD_2D();
 
     void Update();  // Call when grid/u/v change
     void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION* selection) const PHYSBAM_OVERRIDE;

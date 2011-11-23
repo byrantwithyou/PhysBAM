@@ -27,7 +27,7 @@ class OPENGL_COMPONENT_SEGMENT_ADHESION:public OPENGL_COMPONENT
 public:
     OPENGL_COMPONENT_SEGMENT_ADHESION(const std::string& filename,const OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>& opengl_component_deformable_body,
         const OPENGL_COLOR& material_input=OPENGL_COLOR::Yellow());
-    ~OPENGL_COMPONENT_SEGMENT_ADHESION();
+    virtual ~OPENGL_COMPONENT_SEGMENT_ADHESION();
 
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
     void Set_Frame(int frame_input) PHYSBAM_OVERRIDE;

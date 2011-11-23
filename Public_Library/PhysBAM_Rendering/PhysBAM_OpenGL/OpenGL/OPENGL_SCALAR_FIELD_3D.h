@@ -31,7 +31,7 @@ public:
     int current_color_map;
 
     OPENGL_SCALAR_FIELD_3D(const GRID<TV> &grid_input,ARRAY<T2,VECTOR<int,3> > &values_input,OPENGL_COLOR_MAP<T2> *color_map_input,DRAW_MODE draw_mode_input=DRAW_TEXTURE);
-    ~OPENGL_SCALAR_FIELD_3D();
+    virtual ~OPENGL_SCALAR_FIELD_3D();
     void Initialize_Color_Maps(OPENGL_COLOR_MAP<T2>* color_map);
 
     void Set_Scale_Range(const T2 range_min,const T2 range_max);

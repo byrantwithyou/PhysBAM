@@ -30,7 +30,7 @@ public:
         is_animation=FILE_UTILITIES::Is_Animated(field_filename);Reinitialize();
     }
 
-    ~OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_2D()
+    virtual ~OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_2D()
     {}
 
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE

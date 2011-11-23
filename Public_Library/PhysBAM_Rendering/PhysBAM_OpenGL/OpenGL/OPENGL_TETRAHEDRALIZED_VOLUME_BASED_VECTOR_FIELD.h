@@ -26,7 +26,7 @@ public:
     ARRAY<VECTOR<T,3> >& V;
 
     OPENGL_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,ARRAY<VECTOR<T,3> >& V);
-    ~OPENGL_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD();
+    virtual ~OPENGL_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD();
 
     void Update();  // Call when tetrahedralized volume/V change
 

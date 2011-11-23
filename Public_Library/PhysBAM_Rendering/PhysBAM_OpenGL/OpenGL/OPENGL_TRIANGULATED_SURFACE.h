@@ -27,7 +27,7 @@ public:
                                 const OPENGL_MATERIAL& material_input=OPENGL_MATERIAL::Plastic(OPENGL_COLOR::Cyan()));
     OPENGL_TRIANGULATED_SURFACE(TRIANGULATED_SURFACE<T>& surface_input,bool smooth_normals_input,
                                 const OPENGL_MATERIAL& front_material_input,const OPENGL_MATERIAL& back_material_input);
-    ~OPENGL_TRIANGULATED_SURFACE();
+    virtual ~OPENGL_TRIANGULATED_SURFACE();
 
     void Display(const int in_color=1) const PHYSBAM_OVERRIDE;
     virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;

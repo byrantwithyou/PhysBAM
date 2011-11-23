@@ -27,7 +27,7 @@ class OPENGL_COMPONENT_BODY_MOTION_SEQUENCE:public OPENGL_COMPONENT
     typedef VECTOR<T,3> TV;
 public:
     OPENGL_COMPONENT_BODY_MOTION_SEQUENCE(const std::string& filename_input,const bool frame_dependent_data_input,const std::string& rigid_body_input,const T scale_input=1);
-    ~OPENGL_COMPONENT_BODY_MOTION_SEQUENCE();
+    virtual ~OPENGL_COMPONENT_BODY_MOTION_SEQUENCE();
 
     void Save_Frame();
     int Get_Frame();

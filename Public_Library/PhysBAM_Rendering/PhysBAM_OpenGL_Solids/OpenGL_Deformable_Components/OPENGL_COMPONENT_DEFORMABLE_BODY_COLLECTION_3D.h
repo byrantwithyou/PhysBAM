@@ -51,7 +51,7 @@ public:
     OPENGL_COLOR_RAMP<T>* color_map_forces;
 
     OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D(const std::string& prefix,const int start_frame);
-    ~OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D();
+    virtual ~OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D();
     
     virtual void Set_Display_Modes_For_Geometry_Collection(bool& display_triangulated_surface_objects,
             bool& display_tetrahedralized_volume_objects,bool& display_hexahedralized_volume_objects,bool& display_free_particles_objects) const PHYSBAM_OVERRIDE;

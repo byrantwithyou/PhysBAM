@@ -36,7 +36,7 @@ private:
 public:
     OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D(const std::string& basedir);
     OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const std::string& basedir);
-    ~OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D();
+    virtual ~OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D();
     
 //#####################################################################
     virtual void Reinitialize(const bool force=false,const bool read_geometry=true) PHYSBAM_OVERRIDE; // Needs to be called after some state changes

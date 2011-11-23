@@ -33,7 +33,7 @@ public:
 
 //#####################################################################
     OPENGL_COMPONENT_REFINEMENT_GRID_2D(const GRID<TV> &grid,const std::string& filename_input);
-    ~OPENGL_COMPONENT_REFINEMENT_GRID_2D();
+    virtual ~OPENGL_COMPONENT_REFINEMENT_GRID_2D();
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
     void Set_Frame(int frame_input) PHYSBAM_OVERRIDE;
     void Set_Draw(bool draw_input=true) PHYSBAM_OVERRIDE;

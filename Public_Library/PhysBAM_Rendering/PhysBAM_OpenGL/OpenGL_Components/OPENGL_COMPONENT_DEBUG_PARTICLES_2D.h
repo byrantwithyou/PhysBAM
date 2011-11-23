@@ -23,7 +23,7 @@ class OPENGL_COMPONENT_DEBUG_PARTICLES_2D:public OPENGL_COMPONENT
     typedef VECTOR<T,2> TV;
 public:
     OPENGL_COMPONENT_DEBUG_PARTICLES_2D(const std::string &filename);
-    ~OPENGL_COMPONENT_DEBUG_PARTICLES_2D();
+    virtual ~OPENGL_COMPONENT_DEBUG_PARTICLES_2D();
 
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
 

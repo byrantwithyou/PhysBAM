@@ -46,7 +46,7 @@ private:
 public:
     OPENGL_COMPONENT_RIGID_BODIES_1D(const std::string& basedir);
     OPENGL_COMPONENT_RIGID_BODIES_1D(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const std::string& basedir);
-    ~OPENGL_COMPONENT_RIGID_BODIES_1D();
+    virtual ~OPENGL_COMPONENT_RIGID_BODIES_1D();
     
 //#####################################################################
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;

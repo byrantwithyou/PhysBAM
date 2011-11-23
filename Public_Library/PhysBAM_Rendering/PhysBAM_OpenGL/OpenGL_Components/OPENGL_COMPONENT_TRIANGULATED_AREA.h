@@ -20,7 +20,7 @@ class OPENGL_COMPONENT_TRIANGULATED_AREA : public OPENGL_COMPONENT
 public:
     OPENGL_COMPONENT_TRIANGULATED_AREA(const std::string &filename);
     OPENGL_COMPONENT_TRIANGULATED_AREA(const std::string &filename,const std::string &color_map_filename);
-    ~OPENGL_COMPONENT_TRIANGULATED_AREA();
+    virtual ~OPENGL_COMPONENT_TRIANGULATED_AREA();
     
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
     void Set_Frame(int frame_input) PHYSBAM_OVERRIDE;

@@ -29,7 +29,7 @@ public:
                                     const std::string& xz_filename_input="",
                                     const std::string& uv_filename_input="",
                                     int m_start_input = 0, int m_end_input = 0, int n_start_input = 0, int n_end_input = 0);
-    ~OPENGL_COMPONENT_HEIGHTFIELD_2D();
+    virtual ~OPENGL_COMPONENT_HEIGHTFIELD_2D();
 
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
 

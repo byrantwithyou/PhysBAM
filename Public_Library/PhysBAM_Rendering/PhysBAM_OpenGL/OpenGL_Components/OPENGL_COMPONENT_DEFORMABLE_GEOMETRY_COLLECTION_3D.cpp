@@ -57,6 +57,12 @@ template<class T,class RW> OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_3D<T,
         delete &(deformable_geometry->particles);
         delete deformable_geometry;}
     delete color_map_relative_velocity;
+    segmented_curve_objects.Delete_Pointers_And_Clean_Memory();
+    triangulated_surface_objects.Delete_Pointers_And_Clean_Memory();
+    tetrahedralized_volume_objects.Delete_Pointers_And_Clean_Memory();
+    hexahedralized_volume_objects.Delete_Pointers_And_Clean_Memory();
+    free_particles_objects.Delete_Pointers_And_Clean_Memory();
+    free_particles_indirect_arrays.Delete_Pointers_And_Clean_Memory();
 }
 //#####################################################################
 // Function Initialize

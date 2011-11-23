@@ -29,7 +29,7 @@ public:
     int max_vectors_3d;
 
     OPENGL_GRID_BASED_VECTOR_FIELD_3D(GRID<TV>& grid,ARRAY<VECTOR<T,3> ,VECTOR<int,3> >& V);
-    ~OPENGL_GRID_BASED_VECTOR_FIELD_3D();
+    virtual ~OPENGL_GRID_BASED_VECTOR_FIELD_3D();
 
     void Update();  // Call when grid/V change
 

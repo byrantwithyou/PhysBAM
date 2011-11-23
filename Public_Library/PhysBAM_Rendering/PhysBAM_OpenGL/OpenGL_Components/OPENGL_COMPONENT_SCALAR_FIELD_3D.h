@@ -23,7 +23,7 @@ public:
     OPENGL_COMPONENT_SCALAR_FIELD_3D(const GRID<TV> &grid_input,const std::string &scalar_field_filename_input,OPENGL_COLOR_MAP<T2>* color_map_input);
     OPENGL_COMPONENT_SCALAR_FIELD_3D(const GRID<TV> &grid_input,const std::string &scalar_field_filename_input,OPENGL_COLOR_MAP<T2>* color_map_input,
                                      typename OPENGL_SCALAR_FIELD_3D<T,T2>::DRAW_MODE draw_mode_input);
-    ~OPENGL_COMPONENT_SCALAR_FIELD_3D();
+    virtual ~OPENGL_COMPONENT_SCALAR_FIELD_3D();
 
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
     bool Is_Up_To_Date(int frame) const PHYSBAM_OVERRIDE { return valid && frame_loaded == frame; }

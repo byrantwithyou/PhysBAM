@@ -27,7 +27,7 @@ public:
     OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D(const GRID<TV> &grid_input,const std::string &values_filename_input,OPENGL_COLOR_MAP<T2>* color_map_input);
     OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D(const GRID<TV> &grid_input,const std::string &x_face_values_filename_input,
                                           const std::string &y_face_values_filename_input,const std::string &z_face_values_filename_input,OPENGL_COLOR_MAP<T2>* color_map_input);
-    ~OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D();
+    virtual ~OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D();
 
     virtual void Set_Slice(OPENGL_SLICE *slice_input) PHYSBAM_OVERRIDE
     {slice=slice_input;opengl_scalar_field.Set_Slice(slice_input);}

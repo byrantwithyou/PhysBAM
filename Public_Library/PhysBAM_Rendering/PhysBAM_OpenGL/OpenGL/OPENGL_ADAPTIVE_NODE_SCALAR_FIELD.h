@@ -30,7 +30,7 @@ public:
         grid(grid_input),value(value_input),color_map(color_map_input),point_size(5),smooth_shading(false)
     {}
 
-    ~OPENGL_ADAPTIVE_NODE_SCALAR_FIELD()
+    virtual ~OPENGL_ADAPTIVE_NODE_SCALAR_FIELD()
     {delete color_map;}
 
     void Set_Smooth_Shading(const bool smooth_shading_input=true)

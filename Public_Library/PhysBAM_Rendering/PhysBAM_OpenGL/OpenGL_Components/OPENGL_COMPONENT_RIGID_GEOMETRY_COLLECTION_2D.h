@@ -63,7 +63,7 @@ protected:
 public:
     OPENGL_COMPONENT_RIGID_GEOMETRY_COLLECTION_2D(RIGID_GEOMETRY_PARTICLES<TV>* particles_input,const std::string& basedir);
     OPENGL_COMPONENT_RIGID_GEOMETRY_COLLECTION_2D(RIGID_GEOMETRY_COLLECTION<TV>& rigid_geometry_collection,const std::string& basedir);
-    ~OPENGL_COMPONENT_RIGID_GEOMETRY_COLLECTION_2D();
+    virtual ~OPENGL_COMPONENT_RIGID_GEOMETRY_COLLECTION_2D();
     
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
     void Set_Frame(int frame_input) PHYSBAM_OVERRIDE;

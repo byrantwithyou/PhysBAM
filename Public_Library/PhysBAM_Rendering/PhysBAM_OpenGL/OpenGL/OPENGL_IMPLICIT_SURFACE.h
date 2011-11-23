@@ -40,7 +40,7 @@ public:
 
     OPENGL_IMPLICIT_SURFACE(IMPLICIT_OBJECT<TV>& surface_input,const OPENGL_MATERIAL& material_input=OPENGL_MATERIAL::Plastic(OPENGL_COLOR(.6f,.5f,1.f)));
     OPENGL_IMPLICIT_SURFACE(IMPLICIT_OBJECT<TV>& surface_input,const OPENGL_MATERIAL &front_material_input,const OPENGL_MATERIAL& back_material_input);
-    ~OPENGL_IMPLICIT_SURFACE();
+    virtual ~OPENGL_IMPLICIT_SURFACE();
 
     virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE
     {return surface.box;}

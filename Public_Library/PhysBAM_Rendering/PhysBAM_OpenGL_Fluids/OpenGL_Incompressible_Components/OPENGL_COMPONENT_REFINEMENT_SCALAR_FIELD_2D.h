@@ -22,7 +22,7 @@ class OPENGL_COMPONENT_REFINEMENT_SCALAR_FIELD_2D : public OPENGL_COMPONENT
 public:
     OPENGL_COMPONENT_REFINEMENT_SCALAR_FIELD_2D(GRID<TV> &grid_input,const std::string &sub_grids_filename_input,const std::string &scalar_field_filename_input,OPENGL_COLOR_MAP<T2>* color_map_input);
     OPENGL_COMPONENT_REFINEMENT_SCALAR_FIELD_2D(GRID<TV> &grid_input,const std::string &sub_grids_filename_input,const std::string &scalar_field_filename_input,OPENGL_COLOR_MAP<T2>* color_map_input,typename OPENGL_SCALAR_FIELD_2D<T,T2>::DRAW_MODE draw_mode_input);
-    ~OPENGL_COMPONENT_REFINEMENT_SCALAR_FIELD_2D();
+    virtual ~OPENGL_COMPONENT_REFINEMENT_SCALAR_FIELD_2D();
 
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
     bool Is_Up_To_Date(int frame) const PHYSBAM_OVERRIDE { return valid && frame_loaded == frame; }

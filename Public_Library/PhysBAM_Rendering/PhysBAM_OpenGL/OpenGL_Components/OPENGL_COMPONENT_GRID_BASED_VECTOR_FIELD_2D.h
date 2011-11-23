@@ -20,7 +20,7 @@ class OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D : public OPENGL_COMPONENT
     typedef VECTOR<T,2> TV;
 public:
     OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D(const GRID<TV> &grid,const std::string &vector_field_filename_input);
-    ~OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D();
+    virtual ~OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D();
 
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
     bool Is_Up_To_Date(int frame) const PHYSBAM_OVERRIDE { return valid && frame_loaded == frame; }

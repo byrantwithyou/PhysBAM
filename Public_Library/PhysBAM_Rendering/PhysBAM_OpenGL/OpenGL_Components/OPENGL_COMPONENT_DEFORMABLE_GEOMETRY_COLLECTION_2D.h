@@ -45,7 +45,7 @@ public:
     OPENGL_INDEXED_COLOR_MAP *color_map;
 
     OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_2D(const std::string& prefix,const int start_frame);
-    ~OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_2D();
+    virtual ~OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_2D();
     
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
     void Set_Frame(int frame_input) PHYSBAM_OVERRIDE;

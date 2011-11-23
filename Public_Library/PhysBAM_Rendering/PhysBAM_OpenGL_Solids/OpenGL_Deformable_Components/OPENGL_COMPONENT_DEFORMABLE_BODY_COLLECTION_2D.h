@@ -47,7 +47,7 @@ public:
 #endif
 
     OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D(const std::string& prefix,const int start_frame);
-    ~OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D();
+    virtual ~OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D();
     
     virtual void Display(const int in_color=1) const PHYSBAM_OVERRIDE;
     virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;

@@ -65,7 +65,7 @@ public:
         Reset();
     }
 
-    ~OPENGL_LEVELSET_MULTIVIEW()
+    virtual ~OPENGL_LEVELSET_MULTIVIEW()
     {Reset();}
 
 //#####################################################################

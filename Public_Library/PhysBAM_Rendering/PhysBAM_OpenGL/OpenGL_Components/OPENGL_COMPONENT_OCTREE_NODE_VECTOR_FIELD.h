@@ -25,7 +25,7 @@ private:
     bool valid;
 public:
     OPENGL_COMPONENT_OCTREE_NODE_VECTOR_FIELD(OCTREE_GRID<T> &grid,const std::string &vector_field_filename_input);
-    ~OPENGL_COMPONENT_OCTREE_NODE_VECTOR_FIELD();
+    virtual ~OPENGL_COMPONENT_OCTREE_NODE_VECTOR_FIELD();
 
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
     bool Is_Up_To_Date(int frame) const PHYSBAM_OVERRIDE { return valid && frame_loaded == frame; }

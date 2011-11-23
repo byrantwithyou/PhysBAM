@@ -42,7 +42,7 @@ public:
                               const std::string& flux_filename_input,
                               const T domain_xmin_input=0,
                               const T domain_xmax_input=1);
-    ~OPENGL_COMPONENT_CURVE_2D();
+    virtual ~OPENGL_COMPONENT_CURVE_2D();
 
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
 

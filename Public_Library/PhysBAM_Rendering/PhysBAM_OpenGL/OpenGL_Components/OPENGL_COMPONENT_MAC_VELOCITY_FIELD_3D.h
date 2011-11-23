@@ -21,7 +21,7 @@ class OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D : public OPENGL_COMPONENT
     typedef VECTOR<T,3> TV;typedef typename GRID<TV>::CELL_ITERATOR CELL_ITERATOR;typedef typename GRID<TV>::VECTOR_INT TV_INT;
 public:
     OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D(const GRID<TV> &grid,const std::string &velocity_filename_input);
-    ~OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D();
+    virtual ~OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D();
 
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
     bool Is_Up_To_Date(int frame) const PHYSBAM_OVERRIDE { return valid && frame_loaded == frame; }

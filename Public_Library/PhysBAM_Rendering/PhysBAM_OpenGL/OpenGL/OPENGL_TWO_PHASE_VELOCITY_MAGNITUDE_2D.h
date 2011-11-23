@@ -28,7 +28,7 @@ public:
     OPENGL_VECTOR_FIELD_3D<T> plus;
 
     OPENGL_TWO_PHASE_VELOCITY_MAGNITUDE_2D(GRID<TV>& grid,ARRAY<VECTOR<T,2> ,VECTOR<int,2> >& V_minus,ARRAY<VECTOR<T,2> ,VECTOR<int,2> >& V_plus,LEVELSET_2D<GRID<TV> >& levelset);
-    ~OPENGL_TWO_PHASE_VELOCITY_MAGNITUDE_2D();
+    virtual ~OPENGL_TWO_PHASE_VELOCITY_MAGNITUDE_2D();
 
 //#####################################################################
     void Update();  // Call when grid/V change

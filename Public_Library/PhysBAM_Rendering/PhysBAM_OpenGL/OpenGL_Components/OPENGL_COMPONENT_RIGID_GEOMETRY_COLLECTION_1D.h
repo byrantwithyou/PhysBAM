@@ -47,7 +47,7 @@ protected:
 
 public:
     OPENGL_COMPONENT_RIGID_GEOMETRY_COLLECTION_1D(const std::string& basedir_input,const bool initialize_geometry);
-    ~OPENGL_COMPONENT_RIGID_GEOMETRY_COLLECTION_1D();
+    virtual ~OPENGL_COMPONENT_RIGID_GEOMETRY_COLLECTION_1D();
     
 //#####################################################################
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;

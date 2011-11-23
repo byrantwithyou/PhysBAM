@@ -25,7 +25,7 @@ private:
 
 public:
     OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD(TRIANGULATED_AREA<T>& triangulated_area,const std::string &vector_field_filename_input);
-    ~OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD();
+    virtual ~OPENGL_COMPONENT_TRIANGULATED_AREA_BASED_VECTOR_FIELD();
 
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
     bool Is_Up_To_Date(int frame) const PHYSBAM_OVERRIDE { return valid && frame_loaded == frame; }

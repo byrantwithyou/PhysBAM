@@ -28,7 +28,7 @@ private:
 //#####################################################################
 public:
     OPENGL_FACE_SCALAR_FIELD_3D(const GRID<TV> &grid_input,ARRAY<T2,FACE_INDEX<3> > &face_values_input,OPENGL_COLOR_MAP<T2> *color_map_input);
-    ~OPENGL_FACE_SCALAR_FIELD_3D();
+    virtual ~OPENGL_FACE_SCALAR_FIELD_3D();
     void Display(const int in_color=1) const PHYSBAM_OVERRIDE;
     virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
     void Slice_Has_Changed() PHYSBAM_OVERRIDE;    

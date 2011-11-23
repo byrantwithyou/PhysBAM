@@ -18,7 +18,7 @@ class OPENGL_COMPONENT_LEVELSET_2D:public OPENGL_COMPONENT
     typedef typename GRID_ARRAYS_POLICY<GRID<TV> >::ARRAYS_SCALAR T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_ARRAYS_BOOL;
 public:
     OPENGL_COMPONENT_LEVELSET_2D(const std::string& levelset_filename_input,const std::string filename_set_input="");
-    ~OPENGL_COMPONENT_LEVELSET_2D();
+    virtual ~OPENGL_COMPONENT_LEVELSET_2D();
 
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
 

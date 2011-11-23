@@ -20,7 +20,7 @@ class OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D : public OPENGL_COMPONENT
     typedef VECTOR<T,3> TV;
 public:
     OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D(const GRID<TV> &grid,const std::string &vector_field_filename);
-    ~OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D();
+    virtual ~OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D();
 
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
     bool Is_Up_To_Date(int frame) const PHYSBAM_OVERRIDE { return valid && frame_loaded == frame; }

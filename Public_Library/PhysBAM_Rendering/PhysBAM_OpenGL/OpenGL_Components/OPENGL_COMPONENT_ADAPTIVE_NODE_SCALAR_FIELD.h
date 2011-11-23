@@ -26,7 +26,7 @@ private:
     bool valid;
 public:
     OPENGL_COMPONENT_ADAPTIVE_NODE_SCALAR_FIELD(T_GRID& grid,const std::string& scalar_field_filename_input,OPENGL_COLOR_MAP<T>* color_map);
-    ~OPENGL_COMPONENT_ADAPTIVE_NODE_SCALAR_FIELD();
+    virtual ~OPENGL_COMPONENT_ADAPTIVE_NODE_SCALAR_FIELD();
 
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
     bool Is_Up_To_Date(int frame) const PHYSBAM_OVERRIDE { return valid && frame_loaded == frame; }

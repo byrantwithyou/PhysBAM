@@ -26,7 +26,7 @@ class OPENGL_COMPONENT_MOTION_SEQUENCE:public OPENGL_COMPONENT
 public:
     OPENGL_COMPONENT_MOTION_SEQUENCE(const std::string& filename,const bool frame_dependent_data_input,const std::string& segments_filename,const T frame_rate,
         const OPENGL_COLOR& material_input=OPENGL_COLOR::Cyan());
-    ~OPENGL_COMPONENT_MOTION_SEQUENCE();
+    virtual ~OPENGL_COMPONENT_MOTION_SEQUENCE();
 
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
     void Set_Frame(int frame_input) PHYSBAM_OVERRIDE;

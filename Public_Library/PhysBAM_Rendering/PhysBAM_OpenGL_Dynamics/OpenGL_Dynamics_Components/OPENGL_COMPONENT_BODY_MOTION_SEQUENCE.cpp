@@ -45,7 +45,7 @@ template<class T,class RW> bool OPENGL_COMPONENT_BODY_MOTION_SEQUENCE<T,RW>::
 Valid_Frame(int frame_input) const
 {
     if(frame_dependent_data) return FILE_UTILITIES::Frame_File_Exists(filename,frame);
-    else return body_motion.time_grid.domain.Lazy_Inside(VECTOR<T,1>(frame_input*one_over_frame_rate));
+    return body_motion.time_grid.domain.Lazy_Inside(VECTOR<T,1>(frame_input*one_over_frame_rate));
 }
 //#####################################################################
 // Function Prev_Frame

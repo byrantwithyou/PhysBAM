@@ -56,6 +56,11 @@ template<class T,class RW> OPENGL_COMPONENT_RIGID_GEOMETRY_COLLECTION_3D<T,RW>::
         delete &(rigid_geometry_collection->particles);
         delete rigid_geometry_collection;}
     delete front_color_map;delete back_color_map;
+    opengl_triangulated_surface.Delete_Pointers_And_Clean_Memory();
+    opengl_tetrahedralized_volume.Delete_Pointers_And_Clean_Memory();
+    opengl_levelset.Delete_Pointers_And_Clean_Memory();
+    opengl_octree_levelset_surface.Delete_Pointers_And_Clean_Memory();
+    opengl_axes.Delete_Pointers_And_Clean_Memory();
 }
 //#####################################################################
 // Function Initialize
@@ -111,9 +116,19 @@ Read_Hints(const std::string& filename)
         opengl_triangulated_surface(i)->Set_Front_Material(opengl_hints(i).material);
         use_object_bounding_box(i)=opengl_hints(i).include_bounding_box;}
 }
+//#####################################################################
+// Function Resize_Structures
+//#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_RIGID_GEOMETRY_COLLECTION_3D<T,RW>::
 Resize_Structures(const int size)
 {
+    for(int i=size+1;i<=opengl_triangulated_surface.m;i++){
+        delete opengl_triangulated_surface(i);
+        delete opengl_tetrahedralized_volume(i);
+        delete opengl_levelset(i);
+        delete opengl_octree_levelset_surface(i);
+        delete opengl_axes(i);}
+
     opengl_triangulated_surface.Resize(size);
     opengl_tetrahedralized_volume.Resize(size);
     opengl_levelset.Resize(size);

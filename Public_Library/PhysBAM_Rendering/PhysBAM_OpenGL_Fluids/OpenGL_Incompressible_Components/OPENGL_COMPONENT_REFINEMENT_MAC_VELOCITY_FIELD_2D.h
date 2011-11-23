@@ -40,7 +40,7 @@ private:
 public:
     OPENGL_COMPONENT_REFINEMENT_MAC_VELOCITY_FIELD_2D(const GRID<TV> &grid,const std::string &velocity_filename_input,const std::string &sub_grids_filename_input);
     void Initialize();
-    ~OPENGL_COMPONENT_REFINEMENT_MAC_VELOCITY_FIELD_2D();
+    virtual ~OPENGL_COMPONENT_REFINEMENT_MAC_VELOCITY_FIELD_2D();
 
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
     bool Is_Up_To_Date(int frame) const PHYSBAM_OVERRIDE { return valid && frame_loaded == frame; }

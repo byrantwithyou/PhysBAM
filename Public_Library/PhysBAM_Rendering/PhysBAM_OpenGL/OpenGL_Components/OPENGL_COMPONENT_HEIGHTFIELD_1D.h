@@ -27,7 +27,7 @@ public:
                                     const std::string& x_filename_input="",
                                     const std::string& ground_filename_input="",
                                     const std::string& u_filename_input="");
-    ~OPENGL_COMPONENT_HEIGHTFIELD_1D();
+    virtual ~OPENGL_COMPONENT_HEIGHTFIELD_1D();
 
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
 

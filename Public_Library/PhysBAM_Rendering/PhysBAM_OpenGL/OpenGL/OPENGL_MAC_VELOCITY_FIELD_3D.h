@@ -38,7 +38,7 @@ public:
     ARRAY_VIEW<T,VECTOR<int,3> > &u, &v, &w;
 
     OPENGL_MAC_VELOCITY_FIELD_3D(GRID<TV> &grid);
-    ~OPENGL_MAC_VELOCITY_FIELD_3D();
+    virtual ~OPENGL_MAC_VELOCITY_FIELD_3D();
 
     void Update();  // Call when grid/u/v/w change
     void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION* selection) const PHYSBAM_OVERRIDE;

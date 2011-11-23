@@ -28,7 +28,7 @@ public:
     OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D(const GRID<TV> &grid_input,const std::string &values_filename_input,OPENGL_COLOR_MAP<T2>* color_map_input);
     OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D(const GRID<TV> &grid_input,const std::string &x_face_values_filename_input,const std::string &y_face_values_filename_input,
         OPENGL_COLOR_MAP<T2>* color_map_input);
-    ~OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D();
+    virtual ~OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D();
 
     bool Is_Up_To_Date(int frame) const PHYSBAM_OVERRIDE
     {return valid && frame_loaded==frame;}

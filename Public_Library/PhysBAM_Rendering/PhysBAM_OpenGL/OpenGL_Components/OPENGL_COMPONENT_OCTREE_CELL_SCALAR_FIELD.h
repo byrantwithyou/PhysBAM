@@ -28,7 +28,7 @@ private:
     bool draw_surface;
 public:
     OPENGL_COMPONENT_OCTREE_CELL_SCALAR_FIELD(OCTREE_GRID<T> &grid,const std::string &scalar_field_filename_input,OPENGL_COLOR_MAP<T2>* color_map);
-    ~OPENGL_COMPONENT_OCTREE_CELL_SCALAR_FIELD();
+    virtual ~OPENGL_COMPONENT_OCTREE_CELL_SCALAR_FIELD();
 
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
     bool Is_Up_To_Date(int frame) const PHYSBAM_OVERRIDE { return valid && frame_loaded == frame; }

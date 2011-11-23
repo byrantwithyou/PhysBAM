@@ -24,7 +24,7 @@ private:
 public:
 
     OPENGL_COMPONENT_RLE_FACE_SCALAR_FIELD_2D(RLE_GRID_2D<T>& grid,const std::string& scalar_field_filename_input,OPENGL_COLOR_MAP<T2>* color_map,bool draw_points);
-    ~OPENGL_COMPONENT_RLE_FACE_SCALAR_FIELD_2D();
+    virtual ~OPENGL_COMPONENT_RLE_FACE_SCALAR_FIELD_2D();
 
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
     bool Is_Up_To_Date(int frame) const PHYSBAM_OVERRIDE {return valid && frame_loaded==frame;}

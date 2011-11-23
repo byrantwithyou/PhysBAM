@@ -30,7 +30,7 @@ public:
         :color(color_input),current_selection(0),display_list_id(-1),reinitialize_display_list(true)
     {display_list_id=glGenLists(1);}
 
-    ~OPENGL_OCTREE_GRID()
+    virtual ~OPENGL_OCTREE_GRID()
     {glDeleteLists(display_list_id,1);}
 
     void Display(const int in_color=1) const PHYSBAM_OVERRIDE;

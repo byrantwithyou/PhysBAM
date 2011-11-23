@@ -22,7 +22,7 @@ class OPENGL_COMPONENT_PARTICLES_3D : public OPENGL_COMPONENT
 {
 public:
     OPENGL_COMPONENT_PARTICLES_3D(const std::string &filename, const std::string &filename_set_input="", bool use_ids_input = true, bool particles_stored_per_cell_input = false, bool particles_stored_per_cell_adaptive_input=false);
-    ~OPENGL_COMPONENT_PARTICLES_3D();
+    virtual ~OPENGL_COMPONENT_PARTICLES_3D();
 
     bool Valid_Frame(int frame_input) const PHYSBAM_OVERRIDE;
 
