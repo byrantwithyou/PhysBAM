@@ -34,7 +34,7 @@ public:
     bool use_rigid_deformable_evolution_old;
 
     BRIDGE_EXAMPLE(const STREAM_TYPE stream_type);
-    ~BRIDGE_EXAMPLE();
+    virtual ~BRIDGE_EXAMPLE();
 
     // Unused callbacks
     void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}

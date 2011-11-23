@@ -60,7 +60,7 @@ public:
         gear_radius=(T).7;
     }
 
-    ~TANK_EXAMPLE()
+    virtual ~TANK_EXAMPLE()
     {
         delete arb;
     }

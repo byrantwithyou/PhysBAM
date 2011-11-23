@@ -87,7 +87,7 @@ public:
         use_muscle_control=parameter_list.Get_Parameter("use_muscle_control",false);
     }
 
-    ~VISIBLE_HUMAN_MUSCLE_EXAMPLE()
+    virtual ~VISIBLE_HUMAN_MUSCLE_EXAMPLE()
     {}
 
     // unused callbacks

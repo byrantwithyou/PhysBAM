@@ -68,7 +68,7 @@ public:
         write_last_frame=true;
     }
 
-    ~CURL_EXAMPLE()
+    virtual ~CURL_EXAMPLE()
     {
         delete arb;
     }

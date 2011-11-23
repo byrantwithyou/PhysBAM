@@ -32,7 +32,7 @@ public:
     int parent_id;
 
     MAGNETS_EXAMPLE(const STREAM_TYPE stream_type);
-    ~MAGNETS_EXAMPLE();
+    virtual ~MAGNETS_EXAMPLE();
 
     // Unused callbacks
     void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}

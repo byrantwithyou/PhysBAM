@@ -46,7 +46,7 @@ public:
         increment=0;
     }
 
-    ~MESH_EXAMPLE()
+    virtual ~MESH_EXAMPLE()
     {
         delete arb;
     }

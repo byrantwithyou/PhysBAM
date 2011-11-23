@@ -56,7 +56,7 @@ public:
         std::cout<<"Frame rate: "<<frame_rate<<std::endl;
     }
     
-    ~CHAINS_EXAMPLE()
+    virtual ~CHAINS_EXAMPLE()
     {
         delete &arb;
     }

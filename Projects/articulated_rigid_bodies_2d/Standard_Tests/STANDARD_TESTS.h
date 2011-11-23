@@ -60,7 +60,7 @@ public:
         solids_parameters.use_rigid_deformable_contact=false;
     }
 
-    ~STANDARD_TESTS()
+    virtual ~STANDARD_TESTS()
     {
         delete arb;
     }
