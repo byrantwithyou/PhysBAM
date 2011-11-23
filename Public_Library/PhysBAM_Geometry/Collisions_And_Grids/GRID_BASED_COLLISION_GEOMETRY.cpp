@@ -50,6 +50,14 @@ Add_Bodies(RIGID_GEOMETRY_COLLECTION<TV>& rigid_geometry_collection)
         collision_geometry_collection.Add_Body(new RIGID_COLLISION_GEOMETRY<TV>(rigid_geometry_collection.Rigid_Geometry(i)),i,true);
 }
 //##################################################################### 
+// Function Add_Bodies
+//##################################################################### 
+template<class T_GRID> void GRID_BASED_COLLISION_GEOMETRY<T_GRID>::
+Add_Body(RIGID_GEOMETRY<TV>& rigid_geometry)
+{
+    collision_geometry_collection.Add_Body(new RIGID_COLLISION_GEOMETRY<TV>(rigid_geometry),rigid_geometry.particle_index,true);
+}
+//##################################################################### 
 // Function Rasterize_Objects
 //##################################################################### 
 template<class T_GRID> void GRID_BASED_COLLISION_GEOMETRY<T_GRID>::

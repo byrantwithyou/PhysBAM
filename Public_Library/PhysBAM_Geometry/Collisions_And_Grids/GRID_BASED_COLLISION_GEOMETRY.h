@@ -79,6 +79,7 @@ public:
 
 //#####################################################################
     void Add_Bodies(RIGID_GEOMETRY_COLLECTION<TV>& rigid_geometry_collection);
+    void Add_Body(RIGID_GEOMETRY<TV>& rigid_geometry);
     virtual void Rasterize_Objects();
     bool Earliest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,T_WEIGHTS& weights,COLLISION_GEOMETRY_ID& body_id,int& simplex_id,
         const ARRAY<COLLISION_GEOMETRY_ID>* objects=0) const;

@@ -40,7 +40,7 @@ private:
 public:
 
     DYADIC_IMPLICIT_OBJECT(T_GRID& grid_input,ARRAY<T>& phi_input,ARRAY<T>* phi_nodes_input=0);
-    ~DYADIC_IMPLICIT_OBJECT();
+    virtual ~DYADIC_IMPLICIT_OBJECT();
 
     void Compute_Cell_Minimum_And_Maximum(const bool recompute_if_exists)
     {levelset.grid.Fully_Refined_Block();}

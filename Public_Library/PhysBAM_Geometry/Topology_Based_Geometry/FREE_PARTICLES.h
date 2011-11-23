@@ -19,7 +19,7 @@ public:
     ARRAY<int> nodes;
 
     FREE_PARTICLES();
-    ~FREE_PARTICLES();
+    virtual ~FREE_PARTICLES();
 
     virtual std::string Name() const PHYSBAM_OVERRIDE {return Static_Name();}
     static std::string Static_Name()

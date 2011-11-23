@@ -44,7 +44,7 @@ public:
     bool use_collision_face_neighbors;
 
     GRID_BASED_COLLISION_GEOMETRY_UNIFORM(T_GRID& grid_input);
-    ~GRID_BASED_COLLISION_GEOMETRY_UNIFORM();
+    virtual ~GRID_BASED_COLLISION_GEOMETRY_UNIFORM();
 
     bool Occupied_Cell_Center(const TV_INT& cell_index) const
     {return occupied_blocks(cell_index);} // this will check the occupied block that is left,bottom,front of the current cell.
