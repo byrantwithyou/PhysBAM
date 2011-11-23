@@ -27,7 +27,7 @@ class SOLIDS_STANDARD_TESTS:public DEFORMABLES_STANDARD_TESTS<TV>,public RIGIDS_
     using BASE::example;
 public:
     using BASE::Create_Mattress;using BASE::Create_Cloth_Panel;using BASE::Substitute_Soft_Bindings_For_Nodes;
-    using BASE::Write_Debug_Particles;using BASE::Initialize_Implicit_Surface;using RIGIDS_STANDARD_TESTS<TV>::Add_Rigid_Body;
+    using BASE::Initialize_Implicit_Surface;using RIGIDS_STANDARD_TESTS<TV>::Add_Rigid_Body;
     SOLID_BODY_COLLECTION<TV>& solid_body_collection;
 
     SOLIDS_STANDARD_TESTS(EXAMPLE<TV>& example_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input);

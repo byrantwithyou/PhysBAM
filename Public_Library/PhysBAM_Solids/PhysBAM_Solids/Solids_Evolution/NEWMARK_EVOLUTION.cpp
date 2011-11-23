@@ -170,6 +170,11 @@ Finish_Backward_Euler_Step(KRYLOV_SYSTEM_BASE<T>& system,const T dt,const T curr
                 particles.V(p)=B_full(p)+dt*particles.one_over_mass(p)*F_full(p);}
             for(int i=1;i<=solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m;i++){int p=solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles(i);
                 rigid_body_particles.twist(p)=rigid_B_full(p)+world_space_rigid_mass_inverse(p)*rigid_F_full(p)*dt;}
+
+            // No friction for these, so reproject them.
+            solid_body_collection.rigid_body_collection.articulated_rigid_body.Poststabilization_Projection(rigid_body_particles.twist,true);
+            Zero_Out_Enslaved_Velocity_Nodes(particles.V,current_position_time,current_position_time);
+            Zero_Out_Enslaved_Velocity_Nodes(rigid_body_particles.twist,current_position_time,current_position_time);
             
             if(solid_body_collection.rigid_body_collection.articulated_rigid_body.Has_Actuators() && solid_body_collection.rigid_body_collection.articulated_rigid_body.constrain_pd_directions){
                 solid_body_collection.rigid_body_collection.articulated_rigid_body.Poststabilization_Projection(rigid_body_particles.twist,true);
@@ -229,6 +234,8 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("M-%i.txt",solve_id).c_str()).Write("M",system,S,R);
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("P-%i.txt",solve_id).c_str()).Write_Projection("P",system,S);
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("b-%i.txt",solve_id).c_str()).Write("b",B);}
+
+    system.Project(V);
     if(!solver->Solve(system,V,B,F,S,R,AR,solids_parameters.implicit_solve_parameters.cg_tolerance,1,solids_parameters.implicit_solve_parameters.cg_iterations) && solids_parameters.implicit_solve_parameters.throw_exception_on_backward_euler_failure)
         throw std::runtime_error("Backward Euler Failed");
     if(print_matrix) OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("x-%i.txt",solve_id).c_str()).Write("x",V);

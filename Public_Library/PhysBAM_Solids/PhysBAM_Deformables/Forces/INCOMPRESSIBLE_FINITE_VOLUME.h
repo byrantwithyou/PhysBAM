@@ -99,7 +99,7 @@ private:
 public:
 
     INCOMPRESSIBLE_FINITE_VOLUME(STRAIN_MEASURE<TV,d>& strain_measure);
-    ~INCOMPRESSIBLE_FINITE_VOLUME();
+    virtual ~INCOMPRESSIBLE_FINITE_VOLUME();
 
     void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE {}
     void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE {}

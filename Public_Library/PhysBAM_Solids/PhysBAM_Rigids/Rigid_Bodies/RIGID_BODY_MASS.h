@@ -26,6 +26,7 @@ class RIGID_BODY_MASS
     typedef typename TV::SCALAR T;
     typedef typename IF<world_space,typename RIGID_BODY_POLICY<TV>::WORLD_SPACE_INERTIA_TENSOR,typename RIGID_BODY_POLICY<TV>::INERTIA_TENSOR>::TYPE T_INERTIA_TENSOR;
 public:
+    typedef T SCALAR;
     T mass;
     T_INERTIA_TENSOR inertia_tensor;
 
