@@ -49,7 +49,7 @@ public:
     {
     }
 
-    ~SHEETING()
+    virtual ~SHEETING()
     {}
 
     // Unused callbacks

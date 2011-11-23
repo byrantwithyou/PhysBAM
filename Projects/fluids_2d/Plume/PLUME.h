@@ -53,7 +53,7 @@ public:
         fluids_parameters.use_maccormack_semi_lagrangian_advection=true;
     }
 
-    ~PLUME()
+    virtual ~PLUME()
     {}
 
     // Unused callbacks

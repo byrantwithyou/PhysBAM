@@ -106,7 +106,7 @@ public:
             deep_water.Initialize();}
     }
     
-    ~FLUID_CONTROL()
+    virtual ~FLUID_CONTROL()
     {}
     
     // Unused callbacks

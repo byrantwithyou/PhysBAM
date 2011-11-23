@@ -31,7 +31,7 @@ public:
     {
     }
 
-    ~REFINEMENT()
+    virtual ~REFINEMENT()
     {}
 
     // Unused callbacks

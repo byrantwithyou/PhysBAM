@@ -38,7 +38,7 @@ public:
     {
     }
 
-    ~STANDARD_TESTS_SPH()
+    virtual ~STANDARD_TESTS_SPH()
     {}
 
     // Unused callbacks

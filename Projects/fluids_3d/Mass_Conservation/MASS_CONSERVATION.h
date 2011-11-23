@@ -62,7 +62,7 @@ public:
     {
     }
 
-    ~MASS_CONSERVATION()
+    virtual ~MASS_CONSERVATION()
     {}
 
     // Unused callbacks

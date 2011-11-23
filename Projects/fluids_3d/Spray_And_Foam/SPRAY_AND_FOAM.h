@@ -74,7 +74,7 @@ public:
     {
     }
 
-    ~SPRAY_AND_FOAM()
+    virtual ~SPRAY_AND_FOAM()
     {}
 
 

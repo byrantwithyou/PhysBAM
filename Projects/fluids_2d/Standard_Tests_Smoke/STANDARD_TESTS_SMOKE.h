@@ -31,7 +31,7 @@ public:
     {
     }
 
-    ~STANDARD_TESTS_SMOKE()
+    virtual ~STANDARD_TESTS_SMOKE()
     {}
 
     // Unused callbacks
@@ -54,7 +54,7 @@ void Register_Options() PHYSBAM_OVERRIDE
 void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
-    tests.Initialize(test_number,resolution,(T)parse_args->Get_Double_Value("-angle_fraction"));
+    tests.Initialize(test_number,resolution,0);
     *fluids_parameters.grid=tests.grid;
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}

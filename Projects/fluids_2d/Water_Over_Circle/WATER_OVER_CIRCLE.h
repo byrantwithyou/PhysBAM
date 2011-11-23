@@ -40,7 +40,7 @@ public:
         write_matlab_file=false;
     }
 
-    ~WATER_OVER_CIRCLE() {}
+    virtual ~WATER_OVER_CIRCLE() {}
 
 //#####################################################################
 // Function Initialize_Phi
