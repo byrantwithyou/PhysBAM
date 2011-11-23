@@ -24,7 +24,7 @@ Transfer_Residual_To_Coarse_Grid()
     restriction_helper.Run_Parallel(fine.number_of_threads);
 #else
     RANGE<T_INDEX> restriction_indices(-T_INDEX::All_Ones_Vector(),2*T_INDEX::All_Ones_Vector());
-    T_VARIABLE restriction_stencil(restriction_indices);
+    ARRAY<T,T_INDEX> restriction_stencil(restriction_indices);
     for(BOX_ITERATOR<d> iterator(restriction_indices);iterator.Valid();iterator.Next()){
 	const T_INDEX& offset_index=iterator.Index();
  	T scale=(T)1/(1<<(d-2));
@@ -68,7 +68,7 @@ Transfer_Correction_To_Fine_Grid()
     prolongation.Run_Parallel(fine.number_of_threads);
 #else
     RANGE<T_INDEX> prolongation_indices(-T_INDEX::All_Ones_Vector(),T_INDEX::All_Ones_Vector());
-    T_VARIABLE prolongation_stencil(prolongation_indices);
+    ARRAY<T,T_INDEX> prolongation_stencil(prolongation_indices);
     for(BOX_ITERATOR<d> iterator(prolongation_indices);iterator.Valid();iterator.Next()){
 	const T_INDEX& offset_index=iterator.Index();
 	T scale=(T)1;

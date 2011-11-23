@@ -128,8 +128,8 @@ Initialize_Boundary_Region(){
 
     LOG::Time("Allocate Temporaries");    
     for(int v=1;v<=d;v++) PHYSBAM_ASSERT(n(v)%2==0);
-    T_FLAG index_is_boundary(grid);
-    T_FLAG index_is_extended_boundary(grid);
+    ARRAY<bool,TV_INT> index_is_boundary(grid.Domain_Indices());
+    ARRAY<bool,TV_INT> index_is_extended_boundary(grid.Domain_Indices());
 
     index_is_boundary.Fill(0);
     index_is_extended_boundary.Fill(0);
@@ -224,8 +224,7 @@ Initialize_Boundary_Region(){
     
     // NOTE: boundary_block_start in 
     // optimized and unoptimized code will be off by 1
-    block=1;
-    int indices=0;
+//    block=1;
     LOG::Time("Block Enumeration");
     for(int c=1;c<=2;c++){
 	for(int b=1;b<=boundary_block_base_index(c).m;b++){ // for each block with boundary indices

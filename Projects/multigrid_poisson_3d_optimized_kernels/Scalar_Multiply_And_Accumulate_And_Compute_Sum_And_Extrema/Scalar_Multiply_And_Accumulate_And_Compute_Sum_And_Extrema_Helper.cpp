@@ -4,7 +4,7 @@
 //#####################################################################
 #include <limits>
 #include "../Instantiation_Helpers.h"
-#include "PTHREAD_QUEUE.h"
+#include "../Thread_Queueing/PTHREAD_QUEUE.h"
 #include "Scalar_Multiply_And_Accumulate_And_Compute_Sum_And_Extrema_Helper.h"
 using namespace PhysBAM;
 extern PTHREAD_QUEUE* pthread_queue;

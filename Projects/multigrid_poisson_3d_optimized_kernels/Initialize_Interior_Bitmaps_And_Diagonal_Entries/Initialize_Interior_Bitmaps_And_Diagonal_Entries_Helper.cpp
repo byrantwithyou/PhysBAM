@@ -4,7 +4,7 @@
 //#####################################################################
 #include "../Instantiation_Helpers.h"
 #include "Initialize_Interior_Bitmaps_And_Diagonal_Entries_Helper.h"
-#include "PTHREAD_QUEUE.h"
+#include "../Thread_Queueing/PTHREAD_QUEUE.h"
 using namespace PhysBAM;
 extern PTHREAD_QUEUE* pthread_queue;
 //#####################################################################

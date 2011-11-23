@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.
 //#####################################################################
 
+#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <PhysBAM_Tools/Krylov_Solvers/PCG_SPARSE.h>
 #include <PhysBAM_Tools/Log/LOG.h>
@@ -11,7 +12,6 @@
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_ND.h>
-#include <Grids/UNIFORM_GRID_ITERATOR_NODE_3D.h>
 
 #include "../multigrid_poisson_3d_optimized_kernels/Thread_Queueing/PTHREAD_QUEUE.h"
 #include "MG_PRECONDITIONED_CONJUGATE_GRADIENT.h"
@@ -175,9 +175,9 @@ int main(int argc,char* argv[])
 #if 1 // no visualization
 
 	{
-	    typedef POLICY_UNIFORM<TV>::ARRAYS_SCALAR T_VARIABLE;
-	    T_VARIABLE x(multigrid_poisson.grid);
-	    T_VARIABLE p(multigrid_poisson.grid);
+	    typedef ARRAY<T,VECTOR<int,d> > T_VARIABLE;
+	    T_VARIABLE x(multigrid_poisson.grid.Domain_Indices());
+	    T_VARIABLE p(multigrid_poisson.grid.Domain_Indices());
 	    
 	    MULTIGRID_SYSTEM<T,d> multigrid_system(multigrid_poisson_solver);
 	    MG_PRECONDITIONED_CONJUGATE_GRADIENT<T,d> cg;
