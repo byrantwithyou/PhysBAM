@@ -32,7 +32,7 @@ public:
         solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
     }
 
-    ~RIGID_PARTICLE_EXAMPLE()
+    virtual ~RIGID_PARTICLE_EXAMPLE()
     {}
 
     // Unused callbacks

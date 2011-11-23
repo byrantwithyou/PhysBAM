@@ -763,7 +763,6 @@ void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVE
 void Write_Output_Files(const int frame) const
 {
     BASE::Write_Output_Files(frame);
-    tests.Write_Debug_Particles(output_directory,frame);
 }
 //#####################################################################
 // Function Preprocess_Frame

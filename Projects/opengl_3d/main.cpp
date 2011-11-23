@@ -34,6 +34,7 @@
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_UNIFORM_SLICE.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_WORLD.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_BASIC.h>
+#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_DEBUG_PARTICLES_3D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_DIAGNOSTICS.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D.h>
@@ -352,7 +353,7 @@ Initialize_Components_And_Key_Bindings()
         Add_Component(deformable_objects_component,"Deformable Objects",'8',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::SELECTABLE);
         opengl_world.Append_Bind_Key('9',deformable_objects_component->Toggle_Active_Value_CB());
         opengl_world.Append_Bind_Key('(',deformable_objects_component->Show_Only_First_CB());
-        opengl_world.Append_Bind_Key('w',deformable_objects_component->Toggle_Selection_Mode_CB());
+        opengl_world.Append_Bind_Key('W',deformable_objects_component->Toggle_Selection_Mode_CB());
         opengl_world.Append_Bind_Key('h',deformable_objects_component->Toggle_Hide_Unselected_CB());
         opengl_world.Append_Bind_Key('b',deformable_objects_component->Toggle_Draw_Interior_CB());
         opengl_world.Append_Bind_Key('I',deformable_objects_component->Toggle_Differentiate_Inverted_CB());
@@ -556,6 +557,15 @@ Initialize_Components_And_Key_Bindings()
         internal_energy_component->opengl_scalar_field.Update();
         Add_Component(internal_energy_component,"Internal Energy",'E',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
         slice_manager.Add_Object(internal_energy_component);}
+
+    filename=basedir+"/%d/debug_particles";
+    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
+        OPENGL_COMPONENT_DEBUG_PARTICLES_3D<T>* component=new OPENGL_COMPONENT_DEBUG_PARTICLES_3D<T>(filename);
+        Add_Component(component,"Debug particles",'w',BASIC_VISUALIZATION::START_HIDDEN|BASIC_VISUALIZATION::SELECTABLE|BASIC_VISUALIZATION::OWNED);
+        opengl_world.Append_Bind_Key('W',component->Toggle_Draw_Velocities_CB());
+        opengl_world.Append_Bind_Key('=',component->Increase_Vector_Size_CB());
+        opengl_world.Append_Bind_Key('-',component->Decrease_Vector_Size_CB());
+        if(slice_manager.slice) slice_manager.Add_Object(component);}
 
 #ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
     filename=basedir+"/%d/octree_density";
@@ -1182,6 +1192,7 @@ Initialize_Components_And_Key_Bindings()
     opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F5),Draw_All_Objects_CB());
 
     // initialize selection priority (highest on top)
+    Selection_Priority(OPENGL_SELECTION::DEBUG_PARTICLES_3D)=110;
     Selection_Priority(OPENGL_SELECTION::POINTS_3D)=100;
     Selection_Priority(OPENGL_SELECTION::COMPONENT_PARTICLES_3D)=100;
     Selection_Priority(OPENGL_SELECTION::ARTICULATED_RIGID_BODIES_JOINT_3D)=95;

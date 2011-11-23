@@ -41,7 +41,7 @@ public:
         solids_parameters.use_constant_mass=true;
     }
 
-    ~EMBEDDED_CIRCLE_EXAMPLE()
+    virtual ~EMBEDDED_CIRCLE_EXAMPLE()
     {}
 
 //#####################################################################

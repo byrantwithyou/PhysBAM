@@ -53,7 +53,7 @@ public:
         solids_parameters.triangle_collision_parameters.perform_self_collision=false;
     }
 
-    ~STANDARD_TESTS()
+    virtual ~STANDARD_TESTS()
     {}
 
     // Unused callbacks
