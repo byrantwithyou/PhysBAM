@@ -72,7 +72,7 @@ public:
         Initialize_Levelset();
     }
 
-    ~HALF_BUDDHA_IN_BRICK_EXAMPLE()
+    virtual ~HALF_BUDDHA_IN_BRICK_EXAMPLE()
     {}
 
 
