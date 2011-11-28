@@ -320,22 +320,12 @@ void Get_Initial_Data()
             tests.Add_Ground();
             break;}
         case 32:{
-            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume1=tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_thin_1K.tet",
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_thin_1K.tet",
                 RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,true,density);
-            tests.Initialize_Tetrahedron_Collisions(1,tetrahedralized_volume1,solids_parameters.triangle_collision_parameters);
 
-            TV center2(TV(0,0.5,0));
-            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume2=tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_thin_1K.tet",
-                RIGID_BODY_STATE<TV>(FRAME<TV>(center2)),true,true,density);
-            tests.Initialize_Tetrahedron_Collisions(1,tetrahedralized_volume2,solids_parameters.triangle_collision_parameters);
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_thin_1K.tet",
+                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0.5,0),ROTATION<TV>(T(pi/2),TV(0,1,0)))),true,true,density);
 
-            ROTATION<TV> initial_orientation2(T(pi/2),TV(0,1,0));
-            
-            std::cout << "Particles XXX " << particles.X.m << std::endl;
-            for(int i=particles.X.m/2+1;i<=particles.X.m;i++){
-                particles.X(i)=center2 + initial_orientation2.Rotate(particles.X(i)-center2);
-            }
-            
             RIGID_BODY<TV>& cylinder1=tests.Add_Analytic_Cylinder(10,0.5);
             cylinder1.X()=TV(0,3.9,0);
             cylinder1.Rotation()=ROTATION<TV>((T)pi/2.0,TV(0,0,1));
@@ -577,6 +567,11 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     if(solid_body_collection.deformable_body_collection.mpi_solids){
         VECTOR<int,3> processes_per_dimension(2,1,1);
         deformable_body_collection.mpi_solids->Simple_Partition(deformable_body_collection,solid_body_collection.rigid_body_collection.rigid_geometry_collection,particles.X,processes_per_dimension);}
+
+    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++){
+        deformable_body_collection.collisions.collision_structures.Append(deformable_body_collection.deformable_geometry.structures(i));
+        if(solids_parameters.triangle_collision_parameters.perform_self_collision)
+            solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append(deformable_body_collection.deformable_geometry.structures(i));}
 
     if(parse_args->Is_Value_Set("-solver_iterations")) solids_parameters.implicit_solve_parameters.cg_iterations=parse_args->Get_Integer_Value("-solver_iterations");
     if(parse_args->Is_Value_Set("-cgsolids")) solids_parameters.implicit_solve_parameters.cg_tolerance=(T)parse_args->Get_Double_Value("-cgsolids");
