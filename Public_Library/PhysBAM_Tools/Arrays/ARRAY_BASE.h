@@ -14,7 +14,7 @@
 #include <PhysBAM_Tools/Arrays/ARRAY_PRODUCT.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_SUM.h>
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_ARITHMETIC.h>
+#include <PhysBAM_Tools/Arrays_Computations/SUMMATIONS.h>
 #include <PhysBAM_Tools/Data_Structures/ELEMENT_ID.h>
 #include <PhysBAM_Tools/Utilities/STATIC_ASSERT.h>
 #include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
@@ -161,31 +161,31 @@ public:
 
     template<class T_ARRAY1>
     T_ARRAY& operator+=(const ARRAY_BASE<T,T_ARRAY1,ID>& v)
-    {return ARRAYS_COMPUTATIONS::Plus_Equals(*this,v);}
+    {T_ARRAY& self=Derived();ID m=self.Size();const T_ARRAY1& v_=v.Derived();assert(m==v_.Size());for(ID i(1);i<=m;i++) self(i)+=v_(i);return self;}
 
     T_ARRAY& operator+=(const T& a)
-    {return ARRAYS_COMPUTATIONS::Plus_Equals(*this,a);}
+    {T_ARRAY& self=Derived();ID m=self.Size();for(ID i(1);i<=m;i++) self(i)+=a;return self;}
 
     template<class T_ARRAY1>
     T_ARRAY& operator-=(const ARRAY_BASE<T,T_ARRAY1,ID>& v)
-    {return ARRAYS_COMPUTATIONS::Minus_Equals(*this,v);}
+    {T_ARRAY& self=Derived();ID m=self.Size();const T_ARRAY1& v_=v.Derived();assert(m==v_.Size());for(ID i(1);i<=m;i++) self(i)-=v_(i);return self;}
 
     T_ARRAY& operator-=(const T& a)
-    {return ARRAYS_COMPUTATIONS::Minus_Equals(*this,a);}
+    {T_ARRAY& self=Derived();ID m=self.Size();for(ID i(1);i<=m;i++) self(i)-=a;return self;}
 
     template<class T2,class T_ARRAY_T2>
     T_ARRAY& operator*=(const ARRAY_BASE<T2,T_ARRAY_T2,ID>& v)
-    {return ARRAYS_COMPUTATIONS::Times_Equals(*this,v);}
+    {T_ARRAY& self=Derived();ID m=self.Size();const T_ARRAY_T2& v_=v.Derived();assert(m==v_.Size());for(ID i(1);i<=m;i++) self(i)*=v_(i);return self;}
 
     T_ARRAY& operator*=(const SCALAR& a)
-    {return ARRAYS_COMPUTATIONS::Times_Equals(*this,a);}
+    {T_ARRAY& self=Derived();ID m=self.Size();for(ID i(1);i<=m;i++) self(i)*=a;return self;}
 
     template<class T2,class T_ARRAY_T2>
     T_ARRAY& operator/=(const ARRAY_BASE<T2,T_ARRAY_T2,ID>& v)
-    {return ARRAYS_COMPUTATIONS::Divide_Equals(*this,v);}
+    {T_ARRAY& self=Derived();ID m=self.Size();const T_ARRAY_T2& v_=v.Derived();assert(m==v_.Size());for(ID i(1);i<=m;i++){assert(v_(i));self(i)/=v_(i);}return self;}
 
     T_ARRAY& operator/=(const SCALAR& a)
-    {return ARRAYS_COMPUTATIONS::Divide_Equals(*this,a);}
+    {return *this*=Inverse(a);}
 
     T& Last()
     {T_ARRAY& self=Derived();return self(self.Size());}
@@ -195,6 +195,22 @@ public:
 
     ID Size() const
     {return Derived().Size();}
+
+    template<class T_ARRAY2> SCALAR
+    Inner_Product(const ARRAY_BASE<SCALAR,T_ARRAY2,ID>& m,const ARRAY_BASE<T,T_ARRAY,ID>& a2) const
+    {assert(Size()==a2.Size());return ARRAYS_COMPUTATIONS::Sum((m*(*this*a2)));}
+
+    template<class T2,class T_ARRAY2> typename DISABLE_IF<IS_SCALAR<T2>::value,SCALAR>::TYPE
+    Inner_Product(const ARRAY_BASE<T2,T_ARRAY2,ID>& m,const ARRAY_BASE<T,T_ARRAY,ID>& a2) const
+    {assert(Size()==a2.Size());typename T_ARRAY2::SCALAR result(0);ID size=Size();for(ID i(1);i<=size;i++) result+=m(i).Inner_Product((*this)(i),a2(i));return result;}
+
+    template<class T_ARRAY2> double
+    Inner_Product_Double_Precision(const ARRAY_BASE<SCALAR,T_ARRAY2,ID>& m,const ARRAY_BASE<T,T_ARRAY,ID>& a2) const
+    {assert(Size()==a2.Size());return ARRAYS_COMPUTATIONS::Sum((m*(*this*a2))).Sum();}
+
+    template<class T2,class T_ARRAY2> typename DISABLE_IF<IS_SCALAR<T2>::value,double>::TYPE
+    Inner_Product_Double_Precision(const ARRAY_BASE<T2,T_ARRAY2,ID>& m,const ARRAY_BASE<T,T_ARRAY,ID>& a2) const
+    {assert(Size()==a2.Size());double result(0);ID size=Size();for(ID i(1);i<=size;i++) result+=m(i).Inner_Product((*this)(i),a2(i));return result;}
 
     ID Find(const T& element) const
     {const T_ARRAY& self=Derived();ID m=self.Size();

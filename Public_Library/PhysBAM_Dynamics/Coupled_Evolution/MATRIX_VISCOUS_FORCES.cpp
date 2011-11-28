@@ -5,7 +5,6 @@
 // Class MATRIX_VISCOUS_FORCES
 //##################################################################### 
 #include <PhysBAM_Tools/Arrays_Computations/DOT_PRODUCT.h>
-#include <PhysBAM_Tools/Arrays_Computations/INNER_PRODUCT.h>
 #include <PhysBAM_Tools/Arrays_Computations/SUMMATIONS.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>

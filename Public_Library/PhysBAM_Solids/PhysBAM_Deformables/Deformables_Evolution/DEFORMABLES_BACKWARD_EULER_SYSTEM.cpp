@@ -4,7 +4,6 @@
 //#####################################################################
 // Class DEFORMABLES_BACKWARD_EULER_SYSTEM
 //#####################################################################
-#include <PhysBAM_Tools/Arrays_Computations/INNER_PRODUCT.h>
 #include <PhysBAM_Tools/Arrays_Computations/MAGNITUDE.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
@@ -98,7 +97,7 @@ template<class TV> double DEFORMABLES_BACKWARD_EULER_SYSTEM<TV>::
 Inner_Product(const KRYLOV_VECTOR_BASE<T>& BV1,const KRYLOV_VECTOR_BASE<T>& BV2) const
 {
     const VECTOR_T& V1=debug_cast<const VECTOR_T&>(BV1),&V2=debug_cast<const VECTOR_T&>(BV2);
-    double inner_product=ARRAYS_COMPUTATIONS::Inner_Product_Double_Precision(projection_data.mass.mass,V1.V,V2.V);
+    double inner_product=V1.V.Inner_Product_Double_Precision(projection_data.mass.mass,V2.V);
     if(mpi_solids) inner_product=mpi_solids->Reduce_Add(inner_product);
     return inner_product;
 }

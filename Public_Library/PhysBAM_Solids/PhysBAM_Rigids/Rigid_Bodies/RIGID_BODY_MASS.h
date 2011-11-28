@@ -70,7 +70,7 @@ public:
     {STATIC_ASSERT(world_space);return TWIST<TV>(mass*v.linear,inertia_tensor*v.angular);}
 
     T Inner_Product(const TWIST<TV>& v1,const TWIST<TV>& v2) const
-    {STATIC_ASSERT(world_space);return mass*Dot_Product(v1.linear,v2.linear)+Dot_Product(v1.angular,inertia_tensor*v2.angular);}
+    {STATIC_ASSERT(world_space);return mass*TV::Dot_Product(v1.linear,v2.linear)+TV::SPIN::Dot_Product(v1.angular,inertia_tensor*v2.angular);}
 
     MATRIX<T,0> World_Space_Inertia_Tensor(const ROTATION<VECTOR<T,1> > orientation) const
     {STATIC_ASSERT((AND<NOT<world_space>::value,TV::m==1>::value));return MATRIX<T,0>();}

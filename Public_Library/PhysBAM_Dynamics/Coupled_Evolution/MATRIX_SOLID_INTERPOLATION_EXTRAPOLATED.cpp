@@ -6,7 +6,6 @@
 //##################################################################### 
 #include <PhysBAM_Tools/Arrays/CONSTANT_ARRAY.h>
 #include <PhysBAM_Tools/Arrays_Computations/DOT_PRODUCT.h>
-#include <PhysBAM_Tools/Arrays_Computations/INNER_PRODUCT.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Tools/Read_Write/Octave/OCTAVE_OUTPUT.h>
 #include <PhysBAM_Geometry/Basic_Geometry/BASIC_SIMPLEX_POLICY.h>

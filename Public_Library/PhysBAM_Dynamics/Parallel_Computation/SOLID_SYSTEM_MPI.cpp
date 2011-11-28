@@ -6,7 +6,6 @@
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/IDENTITY_ARRAY.h>
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-#include <PhysBAM_Tools/Arrays_Computations/INNER_PRODUCT.h>
 #include <PhysBAM_Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Tools/Log/LOG.h>
@@ -95,10 +94,10 @@ template<class TV> double SOLID_SYSTEM_MPI<TV>::
 Inner_Product(const KRYLOV_VECTOR_BASE<T>& BV1,const KRYLOV_VECTOR_BASE<T>& BV2) const
 {
     const VECTOR_T& V1=debug_cast<const VECTOR_T&>(BV1),&V2=debug_cast<const VECTOR_T&>(BV2);
-    double inner_product=ARRAYS_COMPUTATIONS::Inner_Product_Double_Precision(modified_mass,V1.V,V2.V);
+    double inner_product=V1.V.Inner_Product_Double_Precision(modified_mass,V2.V);
     for(int i=1;i<=V1.rigid_V.Size();i++){
-        inner_product+=Dot_Product(V1.rigid_V(i).linear,modified_world_space_rigid_mass(i)*V2.rigid_V(i).linear);
-        inner_product+=Dot_Product(V1.rigid_V(i).angular,modified_world_space_rigid_inertia_tensor(i)*V2.rigid_V(i).angular);}
+        inner_product+=TV::Dot_Product(V1.rigid_V(i).linear,modified_world_space_rigid_mass(i)*V2.rigid_V(i).linear);
+        inner_product+=TV::SPIN::Dot_Product(V1.rigid_V(i).angular,modified_world_space_rigid_inertia_tensor(i)*V2.rigid_V(i).angular);}
     return inner_product;
 }
 #ifdef USE_MPI

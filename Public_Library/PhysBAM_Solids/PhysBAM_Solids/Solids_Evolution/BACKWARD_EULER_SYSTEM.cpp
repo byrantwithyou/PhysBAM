@@ -4,7 +4,6 @@
 //#####################################################################
 // Class BACKWARD_EULER_SYSTEM
 //#####################################################################
-#include <PhysBAM_Tools/Arrays_Computations/INNER_PRODUCT.h>
 #include <PhysBAM_Tools/Arrays_Computations/MAGNITUDE.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
@@ -142,8 +141,8 @@ template<class TV> double BACKWARD_EULER_SYSTEM<TV>::
 Inner_Product(const KRYLOV_VECTOR_BASE<T>& BV1,const KRYLOV_VECTOR_BASE<T>& BV2) const
 {
     const VECTOR_T& V1=debug_cast<const VECTOR_T&>(BV1),&V2=debug_cast<const VECTOR_T&>(BV2);
-    double inner_product=ARRAYS_COMPUTATIONS::Inner_Product_Double_Precision(projection_data.mass.mass,V1.V,V2.V)+
-        ARRAYS_COMPUTATIONS::Inner_Product_Double_Precision(projection_data.mass.world_space_rigid_mass,V1.rigid_V,V2.rigid_V);
+    double inner_product=V1.V.Inner_Product_Double_Precision(projection_data.mass.mass,V2.V)+
+        V1.rigid_V.Inner_Product_Double_Precision(projection_data.mass.world_space_rigid_mass,V2.rigid_V);
     if(mpi_solids) inner_product=mpi_solids->Reduce_Add(inner_product);
     return inner_product;
 }
@@ -159,7 +158,7 @@ Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& BR) const
         const TWIST<TV>& twist=R.rigid_V(p);
         const RIGID_BODY_MASS<TV,true> &rigid_mass=projection_data.mass.world_space_rigid_mass(p),&rigid_mass_inverse=projection_data.mass.world_space_rigid_mass_inverse(p);
         convergence_norm_squared=max(convergence_norm_squared,
-            twist.linear.Magnitude_Squared()+rigid_mass_inverse.mass*Dot_Product(twist.angular,rigid_mass.inertia_tensor*twist.angular));}
+            twist.linear.Magnitude_Squared()+rigid_mass_inverse.mass*TV::SPIN::Dot_Product(twist.angular,rigid_mass.inertia_tensor*twist.angular));}
     T convergence_norm=sqrt(convergence_norm_squared);
     if(mpi_solids) convergence_norm=mpi_solids->Reduce_Max(convergence_norm);
     return convergence_norm;

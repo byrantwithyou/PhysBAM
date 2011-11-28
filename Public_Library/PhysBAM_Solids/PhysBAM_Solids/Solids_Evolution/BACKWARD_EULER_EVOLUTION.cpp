@@ -7,7 +7,6 @@
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
 #include <PhysBAM_Tools/Arrays_Computations/ARRAY_COPY.h>
-#include <PhysBAM_Tools/Arrays_Computations/INNER_PRODUCT.h>
 #include <PhysBAM_Tools/Arrays_Computations/MAGNITUDE.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <PhysBAM_Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
@@ -64,7 +63,7 @@ public:
 
     double Inner_Product(const KRYLOV_VECTOR_BASE<T>& bdV1,const KRYLOV_VECTOR_BASE<T>& bdV2) const PHYSBAM_OVERRIDE
     {const KRYLOV_VECTOR_T& dV1=debug_cast<const KRYLOV_VECTOR_T&>(bdV1),&dV2=debug_cast<const KRYLOV_VECTOR_T&>(bdV2);
-    return ARRAYS_COMPUTATIONS::Inner_Product_Double_Precision(mass,dV1.v,dV2.v);}
+    return dV1.v.Inner_Product_Double_Precision(mass,dV2.v);}
 
     T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& bdV) const PHYSBAM_OVERRIDE
     {const KRYLOV_VECTOR_T& dV=debug_cast<const KRYLOV_VECTOR_T&>(bdV);return ARRAYS_COMPUTATIONS::Maximum_Magnitude(dV.v);}

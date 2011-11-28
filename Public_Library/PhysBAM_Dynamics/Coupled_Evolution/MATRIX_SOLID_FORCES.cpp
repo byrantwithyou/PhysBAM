@@ -6,7 +6,6 @@
 //##################################################################### 
 #include <PhysBAM_Tools/Arrays/CONSTANT_ARRAY.h>
 #include <PhysBAM_Tools/Arrays_Computations/DOT_PRODUCT.h>
-#include <PhysBAM_Tools/Arrays_Computations/INNER_PRODUCT.h>
 #include <PhysBAM_Tools/Arrays_Computations/SUMMATIONS.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Tools/Read_Write/Octave/OCTAVE_OUTPUT.h>
@@ -162,22 +161,22 @@ Test_Matrix() const
     solid_body_collection.Add_Velocity_Dependent_Forces(V2,twist2,V5,twist5,0);
 
     CONSTANT_ARRAY<RIGID_BODY_MASS<TV,true> > rigid_mass(twist.m,RIGID_BODY_MASS<TV,true>(1,typename RIGID_BODY_POLICY<TV>::INERTIA_TENSOR()+1));
-    T inner_solids=ARRAYS_COMPUTATIONS::Dot_Product(V,V2)+ARRAYS_COMPUTATIONS::Inner_Product(rigid_mass,twist,twist2);
+    T inner_solids=ARRAYS_COMPUTATIONS::Dot_Product(V,V2)+twist.Inner_Product(rigid_mass,twist2);
     T inner_aggregate=ARRAYS_COMPUTATIONS::Dot_Product(aggregate,aggregate2);
     LOG::cout<<"MATRIX_SOLID_FORCES Symmetry Test: "<<inner_solids<<"  vs  "<<inner_aggregate<<"  relative  "<<abs(inner_solids-inner_aggregate)/maxabs((T)1e-30,inner_solids,inner_aggregate)<<std::endl;
 
-    T inner1=ARRAYS_COMPUTATIONS::Dot_Product(V,V)+ARRAYS_COMPUTATIONS::Inner_Product(rigid_mass,twist,twist);
-    T inner3=ARRAYS_COMPUTATIONS::Dot_Product(V3,V3)+ARRAYS_COMPUTATIONS::Inner_Product(rigid_mass,twist3,twist3);
-    T inner4=ARRAYS_COMPUTATIONS::Dot_Product(V4,V4)+ARRAYS_COMPUTATIONS::Inner_Product(rigid_mass,twist4,twist4);
-    T inner_def=ARRAYS_COMPUTATIONS::Dot_Product(V,V4)+ARRAYS_COMPUTATIONS::Inner_Product(rigid_mass,twist,twist4);
+    T inner1=ARRAYS_COMPUTATIONS::Dot_Product(V,V)+twist.Inner_Product(rigid_mass,twist);
+    T inner3=ARRAYS_COMPUTATIONS::Dot_Product(V3,V3)+twist3.Inner_Product(rigid_mass,twist3);
+    T inner4=ARRAYS_COMPUTATIONS::Dot_Product(V4,V4)+twist4.Inner_Product(rigid_mass,twist4);
+    T inner_def=ARRAYS_COMPUTATIONS::Dot_Product(V,V4)+twist.Inner_Product(rigid_mass,twist4);
     V3+=V4;
     twist3+=twist4;
-    T innerD=ARRAYS_COMPUTATIONS::Dot_Product(V3,V3)+ARRAYS_COMPUTATIONS::Inner_Product(rigid_mass,twist3,twist3);
+    T innerD=ARRAYS_COMPUTATIONS::Dot_Product(V3,V3)+twist3.Inner_Product(rigid_mass,twist3);
     LOG::cout<<"MATRIX_SOLID_FORCES C vs D test: "<<inner3<<"  vs  "<<inner4<<"   diff "<<innerD<<"   orig "<<inner1<<"  relative  "<<abs(innerD)/maxabs((T)1e-30,inner3,inner4)<<std::endl;
     LOG::cout<<"MATRIX_SOLID_FORCES D definiteness (should be negative): "<<inner_def<<std::endl;
 
-    T solids_inner1=ARRAYS_COMPUTATIONS::Dot_Product(V,V5)+ARRAYS_COMPUTATIONS::Inner_Product(rigid_mass,twist,twist5);
-    T solids_inner2=ARRAYS_COMPUTATIONS::Dot_Product(V2,V4)+ARRAYS_COMPUTATIONS::Inner_Product(rigid_mass,twist2,twist4);
+    T solids_inner1=ARRAYS_COMPUTATIONS::Dot_Product(V,V5)+twist.Inner_Product(rigid_mass,twist5);
+    T solids_inner2=ARRAYS_COMPUTATIONS::Dot_Product(V2,V4)+twist2.Inner_Product(rigid_mass,twist4);
     LOG::cout<<"MATRIX_SOLID_FORCES D Symmetry Test: "<<solids_inner1<<"  vs  "<<solids_inner2<<"  relative  "<<abs(solids_inner1-solids_inner2)/maxabs((T)1e-30,solids_inner1,solids_inner2)<<std::endl;
 }
 //#####################################################################
