@@ -235,6 +235,12 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.cfl=(T)5;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             break;
+        case 32:
+            solids_parameters.cfl=(T)5;
+            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
+            solids_parameters.implicit_solve_parameters.cg_iterations=100000;
+            last_frame = 500;
+            break;
         case 24:
         case 25:
         case 26:
@@ -259,7 +265,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 31:
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
-            last_frame=1000;
+            last_frame=500;
             frame_rate=30;
             break;
         case 5:
@@ -309,6 +315,29 @@ void Get_Initial_Data()
                 RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,true,density);
             tests.Initialize_Tetrahedron_Collisions(1,tetrahedralized_volume,solids_parameters.triangle_collision_parameters);
             tests.Add_Ground();
+            break;}
+        case 32:{
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume1=tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_thin_1K.tet",
+                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,true,density);
+            tests.Initialize_Tetrahedron_Collisions(1,tetrahedralized_volume1,solids_parameters.triangle_collision_parameters);
+
+            TV center2(TV(0,0.5,0));
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume2=tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_thin_1K.tet",
+                RIGID_BODY_STATE<TV>(FRAME<TV>(center2)),true,true,density);
+            tests.Initialize_Tetrahedron_Collisions(1,tetrahedralized_volume2,solids_parameters.triangle_collision_parameters);
+
+            ROTATION<TV> initial_orientation2(T(pi/2),TV(0,1,0));
+            
+            std::cout << "Particles XXX " << particles.X.m << std::endl;
+            for(int i=particles.X.m/2+1;i<=particles.X.m;i++){
+                particles.X(i)=center2 + initial_orientation2.Rotate(particles.X(i)-center2);
+            }
+            
+            RIGID_BODY<TV>& cylinder1=tests.Add_Analytic_Cylinder(10,0.5);
+            cylinder1.X()=TV(0,3.9,0);
+            cylinder1.Rotation()=ROTATION<TV>((T)pi/2.0,TV(0,0,1));
+            cylinder1.is_static=true;
+            // tests.Add_Ground();
             break;}
         case 3:{
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/maggot_8K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,true,density);
@@ -474,6 +503,13 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             Add_Constitutive_Model(tetrahedralized_volume,(T)1e5,(T).45,(T).01);
+            break;}
+        case 32:{
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(1);
+            Add_Constitutive_Model(tetrahedralized_volume,(T)1e6,(T).45,(T).01);
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume1=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(2);
+            Add_Constitutive_Model(tetrahedralized_volume1,(T)1e6,(T).45,(T).01);
+            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             break;}
         case 7:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
