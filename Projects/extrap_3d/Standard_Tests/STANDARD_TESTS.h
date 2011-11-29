@@ -93,6 +93,7 @@ public:
     T stiffness_multiplier;
     T damping_multiplier;
     bool use_constant_ife;
+    bool forces_are_removed;
     
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),semi_implicit(false),test_forces(false),use_extended_neohookean(false),
@@ -251,7 +252,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 29: case 30:
             solids_parameters.cfl=(T)5;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
-            frame_rate=60;
+            frame_rate=40;
             break;
         case 5:
         case 6:
@@ -462,10 +463,16 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             Add_Constitutive_Model(tetrahedralized_volume,(T)1e5,(T).45,(T).01);
             for(int i=1; i<=deformable_body_collection.particles.X.m; i++) deformable_body_collection.particles.X(i).y=3;
             break;}
-        case 4: case 29:{
+        case 4: {
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             Add_Constitutive_Model(tetrahedralized_volume,(T)1e6,(T).45,(T).01);
+            break;}
+        case 29:{
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            Add_Constitutive_Model(tetrahedralized_volume,(T)0,(T)0,(T).01);
+            forces_are_removed=true;
             break;}
         case 10:{
             bool* bools[7]={&use_corotated,0,&use_constant_ife,&use_corot_blend,&use_extended_neohookean,&use_extended_neohookean_smooth,&use_extended_neohookean_hyperbola};
@@ -665,14 +672,14 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 void Update_Time_Varying_Material_Properties(const T time)
 {   if(test_number==29 && time > .1){
-        T critical=(T)10.0;
-        DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-        //TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
-    FINITE_VOLUME<TV,3>& fv = deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
-           // FINITE_VOLUME<TV,2>& force_field = solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,2>&>();
-    CONSTITUTIVE_MODEL<T,3>& icm = fv.constitutive_model;
-        if(time<critical) icm.constant_mu = (T)1e0;
-        else icm.constant_mu = (T)1e7;
+        T critical=(T)7.0;
+        if(time>critical && forces_are_removed==true) {
+            DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
+            FINITE_VOLUME<TV,3>& fv = deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
+            CONSTITUTIVE_MODEL<T,3>& icm = fv.constitutive_model;
+            icm.Update_Lame_Constants((T)1e3,(T).45,(T).01);
+            forces_are_removed=false;
+        }    
     }
 }
 //#####################################################################

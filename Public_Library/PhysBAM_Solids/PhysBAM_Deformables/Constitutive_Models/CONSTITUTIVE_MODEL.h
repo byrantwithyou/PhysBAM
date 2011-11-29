@@ -1,5 +1,5 @@
 //#####################################################################
-// Copyright 2003-2007, Ron Fedkiw, Geoffrey Irving, Igor Neverov, Andrew Selle, Eftychios Sifakis, Joseph Teran.
+// Copyright 2003-2007, Ron Fedkiw, Geoffrey Irving, Igor Neverov, Andrew Selle, Eftychios Sifakis, Russell Howes, Joseph Teran.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 // Class CONSTITUTIVE_MODEL
@@ -45,6 +45,7 @@ public:
     virtual int P_From_Strain_Rate_Forces_Size() const;
     virtual void P_From_Strain_Rate_First_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<T> aggregate,const MATRIX<T,d>& F_dot,const T scale,const int simplex) const;
     virtual MATRIX<T,d> P_From_Strain_Rate_Second_Half(const DIAGONAL_MATRIX<T,d>& F,const ARRAY_VIEW<const T> aggregate,const T scale,const int simplex) const;
+    virtual void Update_Lame_Constants(const T youngs_modulus, const T poissons_ratio,const T Rayleigh_coefficient);
 //#####################################################################
 };
 }
