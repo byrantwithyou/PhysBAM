@@ -46,6 +46,14 @@ P_From_Strain_Rate_Second_Half(const DIAGONAL_MATRIX<T,d>& F,const ARRAY_VIEW<co
 {
     PHYSBAM_FUNCTION_IS_NOT_DEFINED();
 }
+template<class T,int d> void CONSTITUTIVE_MODEL<T,d>::
+Update_Lame_Constants(const T youngs_modulus, const T poissons_ratio,const T Rayleigh_coefficient)
+{
+    constant_lambda=youngs_modulus*poissons_ratio/((1+poissons_ratio)*(1-2*poissons_ratio));
+    constant_mu=youngs_modulus/(2*(1+poissons_ratio));
+    constant_alpha=Rayleigh_coefficient*constant_lambda;
+    constant_beta=Rayleigh_coefficient*constant_mu;
+}
 template class CONSTITUTIVE_MODEL<float,2>;
 template class CONSTITUTIVE_MODEL<float,3>;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
