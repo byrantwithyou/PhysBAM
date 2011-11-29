@@ -25,6 +25,9 @@
 //   28. Taffy test
 //   29. Armadillo collapsing and rebounding
 //   30. Projectile hitting a wall
+//   31. Armadillo impact with sphere
+//   32. Twisting chain
+//   33. Armadillo through gears
 //#####################################################################
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
@@ -233,6 +236,15 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.cfl=(T)5;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             break;
+        case 32:
+            solids_parameters.cfl=(T)5;
+            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
+            solids_parameters.implicit_solve_parameters.cg_iterations=100000;
+            solids_parameters.triangle_collision_parameters.perform_self_collision=true;
+            solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=true;
+            solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=true;
+            last_frame = 500;
+            break;
         case 24:
         case 25:
         case 26:
@@ -253,6 +265,12 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.cfl=(T)5;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             frame_rate=40;
+            break;
+        case 31:
+            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
+            solids_parameters.implicit_solve_parameters.cg_iterations=100000;
+            last_frame=500;
+            frame_rate=30;
             break;
         case 5:
         case 6:
@@ -301,6 +319,19 @@ void Get_Initial_Data()
                 RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,true,density);
             tests.Initialize_Tetrahedron_Collisions(1,tetrahedralized_volume,solids_parameters.triangle_collision_parameters);
             tests.Add_Ground();
+            break;}
+        case 32:{
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_thin_1K.tet",
+                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,true,density);
+
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_thin_1K.tet",
+                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0.5,0),ROTATION<TV>(T(pi/2),TV(0,1,0)))),true,true,density);
+
+            RIGID_BODY<TV>& cylinder1=tests.Add_Analytic_Cylinder(10,0.5);
+            cylinder1.X()=TV(0,3.9,0);
+            cylinder1.Rotation()=ROTATION<TV>((T)pi/2.0,TV(0,0,1));
+            cylinder1.is_static=true;
+            // tests.Add_Ground();
             break;}
         case 3:{
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/maggot_8K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,true,density);
@@ -394,6 +425,16 @@ void Get_Initial_Data()
             tests.Add_Ground();
             last_frame=250;
             break;}        
+        case 31: {
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_20K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T)7.4,(T)0))),true,true,density,.1);
+            RIGID_BODY<TV>& sphere=tests.Add_Rigid_Body("sphere",(T)2.5,(T)2.5);
+            sphere.is_static=false;
+            tests.Add_Ground();            
+            kinematic_id=sphere.particle_index;
+            rigid_body_collection.rigid_body_particle.kinematic(sphere.particle_index)=true;
+            curve.Add_Control_Point(0,FRAME<TV>(TV(0,10,-20)));
+            curve.Add_Control_Point(20,FRAME<TV>(TV(0,10,250)));
+            break;}
         case 5:{
             RIGID_BODY<TV>& tmp_sphere=tests.Add_Rigid_Body("sphere",(T)1.0,(T).5);
             //RIGID_BODY<TV>& tmp_sphere=tests.Add_Analytic_Box(TV(1,1,1));
@@ -457,6 +498,13 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             Add_Constitutive_Model(tetrahedralized_volume,(T)1e5,(T).45,(T).01);
             break;}
+        case 32:{
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(1);
+            Add_Constitutive_Model(tetrahedralized_volume,(T)1e6,(T).45,(T).01);
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume1=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(2);
+            Add_Constitutive_Model(tetrahedralized_volume1,(T)1e6,(T).45,(T).01);
+            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            break;}
         case 7:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
@@ -508,6 +556,11 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             Add_Constitutive_Model(tetrahedralized_volume,(T)1e5,(T).45,(T).01);
             break;} 
+        case 31:{
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+            // solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            Add_Constitutive_Model(tetrahedralized_volume,(T)7.5e4,(T).45,(T).01);
+            break;} 
         case 30:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             Add_Constitutive_Model(tetrahedralized_volume,(T)1e6,(T).45,(T).01);
@@ -521,6 +574,11 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     if(solid_body_collection.deformable_body_collection.mpi_solids){
         VECTOR<int,3> processes_per_dimension(2,1,1);
         deformable_body_collection.mpi_solids->Simple_Partition(deformable_body_collection,solid_body_collection.rigid_body_collection.rigid_geometry_collection,particles.X,processes_per_dimension);}
+
+    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++){
+        deformable_body_collection.collisions.collision_structures.Append(deformable_body_collection.deformable_geometry.structures(i));
+        if(solids_parameters.triangle_collision_parameters.perform_self_collision)
+            solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append(deformable_body_collection.deformable_geometry.structures(i));}
 
     if(parse_args->Is_Value_Set("-solver_iterations")) solids_parameters.implicit_solve_parameters.cg_iterations=parse_args->Get_Integer_Value("-solver_iterations");
     if(parse_args->Is_Value_Set("-cgsolids")) solids_parameters.implicit_solve_parameters.cg_tolerance=(T)parse_args->Get_Double_Value("-cgsolids");
