@@ -243,7 +243,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.triangle_collision_parameters.perform_self_collision=true;
             solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=true;
             solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=true;
-            last_frame = 2000;
+            last_frame = 4000;
             break;
         case 24:
         case 25:
@@ -321,42 +321,38 @@ void Get_Initial_Data()
             tests.Add_Ground();
             break;}
         case 32:{
-            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_thin_16K.tet",
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_thin_24K.tet",
                 RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0,0),ROTATION<TV>(T(pi/2),TV(1,0,0)))),true,true,density);
-            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_thin_16K.tet",
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_thin_24K.tet",
                 RIGID_BODY_STATE<TV>(FRAME<TV>(TV(-2.8,0,0))),true,true,density);
-            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_thin_16K.tet",
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_thin_24K.tet",
                 RIGID_BODY_STATE<TV>(FRAME<TV>(TV(2.8,0,0))),true,true,density);
-            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_thin_16K.tet",
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_thin_24K.tet",
                 RIGID_BODY_STATE<TV>(FRAME<TV>(TV(-5.6,0,0),ROTATION<TV>(T(pi/2),TV(1,0,0)))),true,true,density);
-            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_thin_16K.tet",
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_thin_24K.tet",
                 RIGID_BODY_STATE<TV>(FRAME<TV>(TV(5.6,0,0),ROTATION<TV>(T(pi/2),TV(1,0,0)))),true,true,density);
-            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_thin_16K.tet",
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_thin_24K.tet",
                 RIGID_BODY_STATE<TV>(FRAME<TV>(TV(-8.4,0,0))),true,true,density);
-            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_thin_16K.tet",
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_thin_24K.tet",
                 RIGID_BODY_STATE<TV>(FRAME<TV>(TV(8.4,0,0))),true,true,density);
 
-            RIGID_BODY<TV>& cylinder1=tests.Add_Analytic_Cylinder(8,0.6);
-            cylinder1.X()=TV(9.2,0,0);
-            cylinder1.Rotation()=ROTATION<TV>((T)pi/2.0,TV(0,0,1));
-            cylinder1.is_static=false;
+            RIGID_BODY<TV>& torus1=tests.Add_Analytic_Torus((T).5,(T)2,32,64);
+            torus1.is_static=false;
 
-            RIGID_BODY<TV>& cylinder2=tests.Add_Analytic_Cylinder(8,0.6);
-            cylinder2.X()=TV(-9.2,0,0);
-            cylinder2.Rotation()=ROTATION<TV>((T)pi/2.0,TV(0,0,1));
-            cylinder2.is_static=false;
+            RIGID_BODY<TV>& torus2=tests.Add_Analytic_Torus((T).5,(T)2,32,64);
+            torus2.is_static=false;
 
-            kinematic_id=cylinder1.particle_index;
-            rigid_body_collection.rigid_body_particle.kinematic(cylinder1.particle_index)=true;
-            kinematic_id2=cylinder2.particle_index;
-            rigid_body_collection.rigid_body_particle.kinematic(cylinder2.particle_index)=true;
+            kinematic_id=torus1.particle_index;
+            rigid_body_collection.rigid_body_particle.kinematic(torus1.particle_index)=true;
+            kinematic_id2=torus2.particle_index;
+            rigid_body_collection.rigid_body_particle.kinematic(torus2.particle_index)=true;
             
-            curve.Add_Control_Point(0,FRAME<TV>(TV(9.2,0,0)));
-            curve.Add_Control_Point(2,FRAME<TV>(TV(12,0,0)));
-            for (int i=1; i<32; i++) curve.Add_Control_Point(2+i*2,FRAME<TV>(TV(12,0,0),ROTATION<TV>((T)pi/2.0*i,TV(1,0,0))));
-            curve2.Add_Control_Point(0,FRAME<TV>(TV(-9.2,0,0)));
-            curve2.Add_Control_Point(2,FRAME<TV>(TV(-12,0,0)));
-            for (int i=1; i<32; i++) curve2.Add_Control_Point(2+i*2,FRAME<TV>(TV(-12,0,0),ROTATION<TV>((T)-pi/2.0*i,TV(1,0,0))));
+            curve.Add_Control_Point(0,FRAME<TV>(TV(11.2,0,0),ROTATION<TV>((T)pi/2.0,TV(1,0,0))));
+            curve.Add_Control_Point(2,FRAME<TV>(TV(14.5,0,0),ROTATION<TV>((T)pi/2.0,TV(1,0,0))));
+            for (int i=1; i<64; i++) curve.Add_Control_Point(2+i*2,FRAME<TV>(TV(14.5,0,0),ROTATION<TV>((T)pi/2.0*i+pi/2,TV(1,0,0))));
+            curve2.Add_Control_Point(0,FRAME<TV>(TV(-11.2,0,0),ROTATION<TV>((T)-pi/2.0,TV(1,0,0))));
+            curve2.Add_Control_Point(2,FRAME<TV>(TV(-14.5,0,0),ROTATION<TV>((T)-pi/2.0,TV(1,0,0))));
+            for (int i=1; i<64; i++) curve2.Add_Control_Point(2+i*2,FRAME<TV>(TV(-14.5,0,0),ROTATION<TV>((T)-pi/2.0*i-pi/2,TV(1,0,0))));
             break;}
         case 3:{
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/maggot_8K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,true,density);
