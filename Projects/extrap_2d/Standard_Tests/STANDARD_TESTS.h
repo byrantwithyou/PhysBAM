@@ -218,7 +218,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 24:
         case 25:
         case 26:
-        case 27:
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=900;
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
@@ -247,7 +246,13 @@ void Parse_Options() PHYSBAM_OVERRIDE
             //solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
             attachment_velocity=TV((T).8,0);
 	    last_frame=480;
-            break;	    
+            break;	 
+        case 27:
+            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
+            solids_parameters.implicit_solve_parameters.cg_iterations=900;
+            solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
+            last_frame=3000;
+            break;            
         default:
             LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
 

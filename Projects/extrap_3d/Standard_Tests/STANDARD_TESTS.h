@@ -338,9 +338,10 @@ void Get_Initial_Data()
             tests.Add_Ground();
             break;}
         case 4: case 29:{
-            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_4K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)80,0))),true,true,density);
+//            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,true,density);
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_4K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)6,0))),true,true,density,.085);
             tests.Add_Ground();
-            last_frame=1000;
+            last_frame=2000;
             break;}
         case 8:{
             RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,4,0)));
@@ -735,7 +736,7 @@ void Update_Time_Varying_Material_Properties(const T time)
             DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
             FINITE_VOLUME<TV,3>& fv = deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
             CONSTITUTIVE_MODEL<T,3>& icm = fv.constitutive_model;
-            icm.Update_Lame_Constants((T)1e3,(T).45,(T).01);
+            icm.Update_Lame_Constants((T)1e9,(T).45,(T).01);
             forces_are_removed=false;
         }    
     }
