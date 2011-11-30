@@ -28,6 +28,7 @@
 //   31. Armadillo impact with sphere
 //   32  Twisting chain
 //   33. Armadillo through gears
+//   34. Roll-over
 //#####################################################################
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
@@ -179,6 +180,9 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 17: case 18: case 24: case 25: case 27: case 10: case 11:
             mattress_grid=GRID<TV>(10,10,10,(T)-1,(T)1,(T)-1,(T)1,(T)-1,(T)1);
             break;
+        case 34:
+            mattress_grid=GRID<TV>(13,13,13,(T)-2,(T)2,(T)-2,(T)2,(T)-2,(T)2);
+            break;
         case 26:
             mattress_grid=GRID<TV>(40,5,5,(T)-4,(T)4,(T)-.5,(T).5,(T)-.5,(T).5);
             break;
@@ -244,6 +248,12 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=true;
             solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=true;
             last_frame = 4000;
+            break;
+        case 34:
+            solids_parameters.cfl=(T)5;
+            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
+            solids_parameters.implicit_solve_parameters.cg_iterations=100000;
+            last_frame = 400;
             break;
         case 24:
         case 25:
@@ -353,6 +363,22 @@ void Get_Initial_Data()
             curve2.Add_Control_Point(0,FRAME<TV>(TV(-11.2,0,0),ROTATION<TV>((T)-pi/2.0,TV(1,0,0))));
             curve2.Add_Control_Point(2,FRAME<TV>(TV(-14.5,0,0),ROTATION<TV>((T)-pi/2.0,TV(1,0,0))));
             for (int i=1; i<64; i++) curve2.Add_Control_Point(2+i*2,FRAME<TV>(TV(-14.5,0,0),ROTATION<TV>((T)-pi/2.0*i-pi/2,TV(1,0,0))));
+            break;}
+        case 34:{
+            T radius = 8.0;
+            T velocity = 7;
+
+            RIGID_BODY<TV>& cylinder=tests.Add_Analytic_Cylinder((T)32,radius,64);
+            cylinder.is_static=false;
+            cylinder.coefficient_of_friction = 1e8;
+            kinematic_id=cylinder.particle_index;
+            rigid_body_collection.rigid_body_particle.kinematic(cylinder.particle_index)=true;
+            for (int i=0; i<128; i++) curve.Add_Control_Point(i,FRAME<TV>(TV(-25+i*velocity,radius*1.05,0),ROTATION<TV>(-i*velocity/radius,TV(0,0,1))));
+
+            RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,2,0)));
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,3,0))),true,true,density,3);
+            // tests.Create_Mattress(mattress_grid,true,&initial_state);
+            tests.Add_Ground(1e8);
             break;}
         case 3:{
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/maggot_8K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,true,density);
@@ -537,7 +563,14 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             Add_Constitutive_Model(tetrahedralized_volume6,youngs_modulus,poissons_ratio,damping);
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume7=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(7);
             Add_Constitutive_Model(tetrahedralized_volume7,youngs_modulus,poissons_ratio,damping);
-            // solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            break;}
+        case 34:{
+            T youngs_modulus = 1e5;
+            T poissons_ratio = .4;
+            T damping = 0.1;
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume1=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(1);
+            Add_Constitutive_Model(tetrahedralized_volume1,youngs_modulus,poissons_ratio,damping);
+            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             break;}
         case 7:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
