@@ -25,9 +25,9 @@
 //   28. Taffy test
 //   29. Armadillo collapsing and rebounding
 //   30. Projectile hitting a wall
-//   31. Armadillo impact with sphere
+//   31. Impact with sphere
 //   32  Twisting chain
-//   33. Armadillo through gears
+//   33. Through gears
 //   34. Roll-over
 //#####################################################################
 #ifndef __STANDARD_TESTS__
@@ -249,6 +249,14 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=true;
             last_frame = 4000;
             break;
+        case 33:
+            solids_parameters.cfl=(T)10;
+            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
+            solids_parameters.implicit_solve_parameters.cg_iterations=100000;
+            solids_parameters.triangle_collision_parameters.perform_self_collision=true;
+            frame_rate=120;
+            last_frame=10*120;
+            break;
         case 34:
             solids_parameters.cfl=(T)5;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
@@ -329,6 +337,17 @@ void Get_Initial_Data()
                 RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,true,density);
             tests.Initialize_Tetrahedron_Collisions(1,tetrahedralized_volume,solids_parameters.triangle_collision_parameters);
             tests.Add_Ground();
+            break;}
+        case 33:{
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/maggot_1K.tet",
+                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0,0),ROTATION<TV>(T(pi/2),TV(1,0,0)))),true,true,density);
+            
+            RIGID_BODY<TV>& gear1=tests.Add_Rigid_Body(data_directory+"/Rigid_Bodies/gear",10,10);
+            // RIGID_BODY<TV>& gear2=tests.Add_Rigid_Body(data_directory+"/Rigid_Bodies/gear",.375,1);
+            if (&gear1==0);
+
+            tests.Add_Ground();
+
             break;}
         case 32:{
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_thin_24K.tet",
@@ -563,6 +582,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             Add_Constitutive_Model(tetrahedralized_volume6,youngs_modulus,poissons_ratio,damping);
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume7=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(7);
             Add_Constitutive_Model(tetrahedralized_volume7,youngs_modulus,poissons_ratio,damping);
+            break;}
+        case 33:{
+
             break;}
         case 34:{
             T youngs_modulus = 1e5;
