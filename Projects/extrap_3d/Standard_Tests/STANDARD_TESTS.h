@@ -90,8 +90,8 @@ public:
     bool use_corotated;
     bool use_corot_blend;
     bool dump_sv;
-    int kinematic_id,kinematic_id2;
-    INTERPOLATION_CURVE<T,FRAME<TV> > curve,curve2;
+    int kinematic_id,kinematic_id2,kinematic_id3;
+    INTERPOLATION_CURVE<T,FRAME<TV> > curve,curve2,curve3;
     bool print_matrix;
     int parameter;
     T stiffness_multiplier;
@@ -256,6 +256,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.triangle_collision_parameters.perform_self_collision=true;
             frame_rate=120;
             last_frame=10*120;
+            last_frame=1000;
             break;
         case 34:
             solids_parameters.cfl=(T)5;
@@ -339,15 +340,36 @@ void Get_Initial_Data()
             tests.Add_Ground();
             break;}
         case 33:{
-            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/maggot_1K.tet",
-                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0,0),ROTATION<TV>(T(pi/2),TV(1,0,0)))),true,true,density);
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_110K.tet",
+                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,2.2,0),ROTATION<TV>(T(pi/2),TV(0,0,0)))),true,true,density,0.008);
             
-            RIGID_BODY<TV>& gear1=tests.Add_Rigid_Body(data_directory+"/Rigid_Bodies/gear",10,10);
-            // RIGID_BODY<TV>& gear2=tests.Add_Rigid_Body(data_directory+"/Rigid_Bodies/gear",.375,1);
-            if (&gear1==0);
+            
+            RIGID_BODY<TV>& gear1=tests.Add_Rigid_Body("gear",.375,1);
+            RIGID_BODY<TV>& gear2=tests.Add_Rigid_Body("gear",.375,1);
+            RIGID_BODY<TV>& cylinder=tests.Add_Analytic_Cylinder(1.5,.15,24);
+
+            gear1.coefficient_of_friction = 1;
+            gear2.coefficient_of_friction = 1;
+            cylinder.coefficient_of_friction = 0;
+
+            kinematic_id=gear1.particle_index;
+            rigid_body_collection.rigid_body_particle.kinematic(gear1.particle_index)=true;
+            kinematic_id2=gear2.particle_index;
+            rigid_body_collection.rigid_body_particle.kinematic(gear2.particle_index)=true;
+            kinematic_id3=cylinder.particle_index;
+            rigid_body_collection.rigid_body_particle.kinematic(cylinder.particle_index)=true;
+            
+            T angular_velocity = 1;
+
+            curve3.Add_Control_Point(0,FRAME<TV>(TV(0,2.75,0),ROTATION<TV>(0,TV(0,0,1))));
+            curve3.Add_Control_Point(0.5,FRAME<TV>(TV(0,2.75,0),ROTATION<TV>(0,TV(0,0,1))));
+            curve3.Add_Control_Point(2,FRAME<TV>(TV(0,2,0),ROTATION<TV>(0,TV(0,0,1))));
+
+            for (int i=0; i<60; i++){
+                curve.Add_Control_Point(i/angular_velocity,FRAME<TV>(TV(-(T).4,1.5,-.75),ROTATION<TV>(-i,TV(0,0,1))));
+                curve2.Add_Control_Point(i/angular_velocity,FRAME<TV>(TV((T).4,1.5,-.75),ROTATION<TV>(i,TV(0,0,1))));}
 
             tests.Add_Ground();
-
             break;}
         case 32:{
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_thin_24K.tet",
@@ -584,7 +606,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             Add_Constitutive_Model(tetrahedralized_volume7,youngs_modulus,poissons_ratio,damping);
             break;}
         case 33:{
-
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+            Add_Constitutive_Model(tetrahedralized_volume,1e5,0.4,0.05);
+            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             break;}
         case 34:{
             T youngs_modulus = 1e5;
@@ -794,6 +818,7 @@ void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id)
 {
     if(id==kinematic_id) frame=curve.Value(time);
     if(id==kinematic_id2) frame=curve2.Value(time);
+    if(id==kinematic_id3) frame=curve3.Value(time);
 }
 //#####################################################################
 // Function Set_Kinematic_Velocities
@@ -802,6 +827,7 @@ bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id)
 {
     if(id==kinematic_id) twist=curve.Derivative(time);
     if(id==kinematic_id2) twist=curve2.Derivative(time);
+    if(id==kinematic_id3) twist=curve3.Derivative(time);
     return false;
 }  
 //#####################################################################
