@@ -29,6 +29,7 @@
 //   32  Twisting chain
 //   33. Through gears
 //   34. Roll-over
+//   35. Dancing jello (first attempt)
 //#####################################################################
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
@@ -82,7 +83,7 @@ public:
     std::ofstream svout;
     SOLIDS_STANDARD_TESTS<TV> tests;
     
-    GRID<TV> mattress_grid;
+    GRID<TV> mattress_grid,mattress_grid2,mattress_grid3,mattress_grid1;
     T attachment_velocity;
     bool semi_implicit;
     bool test_forces;
@@ -196,6 +197,11 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 16:
             mattress_grid=GRID<TV>(11,6,11,(T)-1,(T)1,(T)-.5,(T).5,(T)-1,(T)1);
             break;
+        case 35:
+            mattress_grid1=GRID<TV>(10,10,10,(T)-1.0,(T)1.0,(T)-1.0,(T)1.0,(T)-1.0,(T)1.0);
+            mattress_grid2=GRID<TV>(12,12,12,(T)-1.2,(T)1.2,(T)-1.2,(T)1.2,(T)-1.2,(T)1.2);
+            mattress_grid3=GRID<TV>(15,15,15,(T)-1.5,(T)1.5,(T)-1.5,(T)1.5,(T)-1.5,(T)1.5);
+            break;
     	default:
             mattress_grid=GRID<TV>(20,10,20,(T)-1,(T)1,(T)-.5,(T).5,(T)-1,(T)1);
     }
@@ -268,6 +274,15 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             last_frame = 400;
+            break;
+        case 35:
+            solids_parameters.cfl=(T)5;
+            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
+            solids_parameters.implicit_solve_parameters.cg_iterations=100000;
+            solids_parameters.triangle_collision_parameters.perform_self_collision=true;
+           // solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=true;
+           // solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=true;
+            last_frame = 1000;
             break;
         case 24:
         case 25:
@@ -426,6 +441,19 @@ void Get_Initial_Data()
             // tests.Create_Mattress(mattress_grid,true,&initial_state);
             tests.Add_Ground(1e8);
             break;}
+        case 35:{
+             RIGID_BODY_STATE<TV> initial_state1(FRAME<TV>(TV(8,7,.5),ROTATION<TV>(T(pi/3),TV(1,0,1)))); 
+             RIGID_BODY_STATE<TV> initial_state2(FRAME<TV>(TV(8,1.4,0),ROTATION<TV>(T(pi/6),TV(0,1,0)))); 
+            RIGID_BODY_STATE<TV> initial_state3(FRAME<TV>(TV(0,6,0),ROTATION<TV>(T(pi/4),TV(1,1,1)))); 
+            RIGID_BODY_STATE<TV> initial_state4(FRAME<TV>(TV(0,1.7,0),ROTATION<TV>(T(0),TV(1,1,1)))); 
+            
+            tests.Create_Mattress(mattress_grid1,true,&initial_state1);
+            tests.Create_Mattress(mattress_grid2,true,&initial_state2);
+            tests.Create_Mattress(mattress_grid2,true,&initial_state3);
+            tests.Create_Mattress(mattress_grid3,true,&initial_state4);
+            tests.Add_Ground();
+            break;
+        }
         case 3:{
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/maggot_8K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,true,density);
             tests.Add_Ground();
@@ -584,7 +612,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 1:
         case 2:
         case 3:
-        case 8:
+        case 8: 
         case 16:
         case 5:
         case 6:{
@@ -622,6 +650,20 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             T damping = 0.1;
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume1=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(1);
             Add_Constitutive_Model(tetrahedralized_volume1,youngs_modulus,poissons_ratio,damping);
+            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            break;}
+        case 35:{
+            T youngs_modulus = 1e5;
+            T poissons_ratio = .45;
+            T damping = 0.01;
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume1=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(1);
+            Add_Constitutive_Model(tetrahedralized_volume1,youngs_modulus,poissons_ratio,damping);
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume2=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(2);
+            Add_Constitutive_Model(tetrahedralized_volume2,youngs_modulus,poissons_ratio,damping);
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume3=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(3);
+            Add_Constitutive_Model(tetrahedralized_volume3,youngs_modulus,poissons_ratio,damping);
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume4=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(4);
+            Add_Constitutive_Model(tetrahedralized_volume4,youngs_modulus,poissons_ratio,damping);
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             break;}
         case 7:{
@@ -851,12 +893,16 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 void Update_Time_Varying_Material_Properties(const T time)
 {   if(test_number==29 && time > .1){
-        T critical=(T)7.0;
-        if(time>critical && forces_are_removed==true) {
+        T critical=(T)5.0;
+        T critical2=(T)9.0;
+        T start_young=1e4; T end_young=1e7;
+        if(time>critical && time<critical2) {
+            
             DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
             FINITE_VOLUME<TV,3>& fv = deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
             CONSTITUTIVE_MODEL<T,3>& icm = fv.constitutive_model;
-            icm.Update_Lame_Constants((T)1e9,(T).45,(T).01);
+            T young = start_young + (time-critical)/(critical2-critical)*(end_young-start_young);
+            icm.Update_Lame_Constants(young,(T).45,(T).01);
             forces_are_removed=false;
         }    
     }
