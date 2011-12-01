@@ -203,6 +203,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Option_Argument("-fully_implicit","use fully implicit forces");
     parse_args->Add_Option_Argument("-project_nullspace","project out nullspace");
     parse_args->Add_Option_Argument("-binding_springs","use binding springs for drift particles");
+    parse_args->Add_Option_Argument("-test_system");
 }
 //#####################################################################
 // Function Parse_Options
@@ -221,6 +222,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     fully_implicit=parse_args->Is_Value_Set("-fully_implicit");
     if(parse_args->Is_Value_Set("-project_nullspace")) solids_parameters.implicit_solve_parameters.project_nullspace_frequency=1;
     use_forces_for_drift=parse_args->Get_Option_Value("-binding_springs");
+    solids_parameters.implicit_solve_parameters.test_system=parse_args->Is_Value_Set("-test_system");
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 //#####################################################################
