@@ -37,6 +37,7 @@
 #include <PhysBAM_Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
@@ -57,6 +58,8 @@
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
+#include <PhysBAM_Solids/PhysBAM_Solids/Bindings/RIGID_BODY_BINDING.h>
+#include <PhysBAM_Solids/PhysBAM_Solids/Collisions/RIGID_DEFORMABLE_COLLISIONS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/GRAVITY.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
@@ -165,6 +168,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Integer_Argument("-projection_iterations",5,"number of iterations used for projection in cg");
     parse_args->Add_Integer_Argument("-solver_iterations",1000,"number of iterations used for solids system");
     parse_args->Add_Option_Argument("-use_constant_ife","use constant extrapolation on inverting finite element fix");
+    parse_args->Add_Option_Argument("-test_system");
 }
 //#####################################################################
 // Function Parse_Options
@@ -219,6 +223,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     use_corot_blend=parse_args->Is_Value_Set("-use_corot_blend");
     dump_sv=parse_args->Is_Value_Set("-dump_sv");
     use_constant_ife=parse_args->Get_Option_Value("-use_constant_ife");
+    solids_parameters.implicit_solve_parameters.test_system=parse_args->Is_Value_Set("-test_system");
     
     semi_implicit=parse_args->Is_Value_Set("-semi_implicit");
     if(parse_args->Is_Value_Set("-project_nullspace")) solids_parameters.implicit_solve_parameters.project_nullspace_frequency=1;
@@ -873,6 +878,25 @@ void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
     }
 } 
 //#####################################################################
+// Function Bind_Intersecting_Particles
+//#####################################################################
+void Bind_Intersecting_Particles()
+{
+    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
+    BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
+    bool added_binding=false;
+    for(int i=1;i<=rigid_body_collection.static_and_kinematic_rigid_bodies.m;i++){int b=rigid_body_collection.static_and_kinematic_rigid_bodies(i);
+        RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(b);
+        for(int p=1;p<=particles.X.m;p++){
+            if(!binding_list.Binding(p) && rigid_body.Implicit_Geometry_Lazy_Inside(particles.X(p),1e-3)){
+                added_binding=true;
+                LOG::cout<<"adding binding: "<<b<<"  "<<p<<std::endl;
+                binding_list.Add_Binding(new RIGID_BODY_BINDING<TV>(particles,p,rigid_body_collection,b,rigid_body.Object_Space_Point(particles.X(p))));}}}
+
+    if(added_binding) solid_body_collection.Update_Simulated_Particles();
+}
+//#####################################################################
 // Function Preprocess_Frame
 //#####################################################################
 void Preprocess_Frame(const int frame)
@@ -884,6 +908,8 @@ void Preprocess_Frame(const int frame)
         std::string output_file = STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d/SV_%d",test_number,frame);
         svout.open(output_file.c_str());
     }
+
+    if(test_number==32 && frame==1100) Bind_Intersecting_Particles();
 }    
 //#####################################################################
 // Function Add_Constitutive_Model
