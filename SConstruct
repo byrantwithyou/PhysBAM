@@ -51,7 +51,7 @@ openexr_dir="/usr/local/compilers/libs/%s/OpenEXR"%arch
 external_libraries={
     'boost':      {'default':1,'libs':[''],'cvs':1},
     'boostregex': {'libs':['boost_regex']},
-    'zlib':       {'libs':['z'],'cvs':1},
+    'zlib':       {'default':1,'libs':['z'],'cvs':1},
     'ffmpeg':     {'default':0,'flags':['USE_FFMPEG'],'libs':['libavformat','libavcodec','libavutil'],'filter':'VIDEO'},
     'petsc':     {'default':1,'flags':['USE_PETSC'],'libs':['libpetsc'],'filter':'PETSC'},
     'boost_serialization':     {'default':0,'flags':['USE_BOOST_SERIALIZATION'],'libs':['libboost_serialization'],'filter':''},
