@@ -247,6 +247,9 @@ template<class T,int m,int n> void Combine_Data(VOL_DATA<T,2,4>& data,const VOL_
 const int vec_a[1]={0}, vec_c[1]={2}, vec_d[1]={3}, vec_abc[3]={0,1,2}, vec_abd[3]={0,1,3}, vec_cda[3]={2,3,0}, vec_cdb[3]={2,3,1}, vec_abcd[4]={0,1,2,3};
 template<class T,class TV> void Case_CCAA(VOL_DATA<T,2,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
 {
+    // A         B
+    //    C   D
+    //      O
 //    trap_cases.Append(1);
     DATA<T,2,1> DC;
     Data_From_Dof(DC,C);
@@ -261,6 +264,10 @@ template<class T,class TV> void Case_CCAA(VOL_DATA<T,2,4>& data,const TV& A,cons
 
 template<class T,class TV> void Case_CCAB(VOL_DATA<T,2,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
 {
+    //           D
+    // A      Q P    B
+    //     C
+    //        O
 //    trap_cases.Append(2);
     DATA<T,2,4> Q;
     Intersect_Segments(Q,A,B,C,D);
@@ -281,6 +288,9 @@ template<class T,class TV> void Case_CCAB(VOL_DATA<T,2,4>& data,const TV& A,cons
 
 template<class T,class TV> void Case_CCBB(VOL_DATA<T,2,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
 {
+    //  C   D
+    // A P P B
+    //    O
 //    trap_cases.Append(3);
     DATA<T,2,3> P1;
     Intersect_Segment_Point(P1,A,B,C);
@@ -295,6 +305,9 @@ template<class T,class TV> void Case_CCBB(VOL_DATA<T,2,4>& data,const TV& A,cons
 
 template<class T,class TV> void Case_BCAC(VOL_DATA<T,2,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
 {
+    // B     A
+    //    C P   D
+    //     O
 //    trap_cases.Append(4);
     DATA<T,2,3> P;
     Intersect_Segment_Point(P,C,D,A);
@@ -309,6 +322,10 @@ template<class T,class TV> void Case_BCAC(VOL_DATA<T,2,4>& data,const TV& A,cons
 
 template<class T,class TV> void Case_BCBC(VOL_DATA<T,2,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
 {
+    //           A
+    //  C     Q P    D
+    //     P
+    //  B     O
 //    trap_cases.Append(5);
     DATA<T,2,4> Q;
     Intersect_Segments(Q,A,B,C,D);
@@ -329,6 +346,11 @@ template<class T,class TV> void Case_BCBC(VOL_DATA<T,2,4>& data,const TV& A,cons
 
 template<class T,class TV> void Case_ACAC(VOL_DATA<T,2,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
 {
+    //              D
+    //
+    // B      Q  A
+    //     C
+    //        O
 //    trap_cases.Append(6);
     DATA<T,2,4> Q;
     Intersect_Segments(Q,A,B,C,D);
