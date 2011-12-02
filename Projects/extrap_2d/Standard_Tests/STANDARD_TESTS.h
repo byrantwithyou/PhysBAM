@@ -19,6 +19,7 @@
 //  25. Big 4 corners stretch
 //  26. Big stretch/bend
 //  27. Force inversion
+//  270. Inverted configuration
 //  28. Taffy test
 //#####################################################################
 #ifndef __STANDARD_TESTS__
@@ -137,7 +138,7 @@ public:
     void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     void Add_External_Impulses_Before(ARRAY_VIEW<TV> V,const T time,const T dt) PHYSBAM_OVERRIDE {}
     void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) PHYSBAM_OVERRIDE {}
-    void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
+    //void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
 
 //#####################################################################
 // Function Register_Options
@@ -247,7 +248,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             attachment_velocity=TV((T).8,0);
 	    last_frame=480;
             break;	 
-        case 27:
+        case 27: case 270:
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=900;
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
@@ -271,7 +272,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 24:
         case 25:
         case 26:
-        case 27:
+        case 27: case 270:
             tests.Create_Mattress(mattress_grid,true);
             break;
         case 8: 
@@ -387,7 +388,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 24:
         case 25:
         case 26:
-        case 27:{
+        case 27: case 270:{
             TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
             Add_Constitutive_Model(triangulated_area,(T)1e2,(T).45,(T).05);
             break;}
@@ -582,6 +583,12 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
         int m=mattress_grid.counts.x;
         int n=mattress_grid.counts.y;
         for(int j=1;j<=n;j++) V(1+m*(j-1))=V(m+m*(j-1))=TV();}
+}
+void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {
+    if(test_number==270){
+        int m=mattress_grid.counts.x;
+        int n=mattress_grid.counts.y;        
+    }
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Position_Nodes

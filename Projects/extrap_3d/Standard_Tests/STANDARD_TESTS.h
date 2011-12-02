@@ -30,6 +30,7 @@
 //   33. Through gears
 //   34. Roll-over
 //   35. Dancing jello (first attempt)
+//   36. Spinning jello
 //#####################################################################
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
@@ -201,7 +202,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 16:
             mattress_grid=GRID<TV>(11,6,11,(T)-1,(T)1,(T)-.5,(T).5,(T)-1,(T)1);
             break;
-        case 35:
+        case 35: case 36:
             mattress_grid1=GRID<TV>(10,10,10,(T)-1.0,(T)1.0,(T)-1.0,(T)1.0,(T)-1.0,(T)1.0);
             mattress_grid2=GRID<TV>(12,12,12,(T)-1.2,(T)1.2,(T)-1.2,(T)1.2,(T)-1.2,(T)1.2);
             mattress_grid3=GRID<TV>(15,15,15,(T)-1.5,(T)1.5,(T)-1.5,(T)1.5,(T)-1.5,(T)1.5);
@@ -280,7 +281,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             last_frame = 400;
             break;
-        case 35:
+        case 35: case 36:
             solids_parameters.cfl=(T)5;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
@@ -448,14 +449,27 @@ void Get_Initial_Data()
             break;}
         case 35:{
              RIGID_BODY_STATE<TV> initial_state1(FRAME<TV>(TV(8,7,.5),ROTATION<TV>(T(pi/3),TV(1,0,1)))); 
-             RIGID_BODY_STATE<TV> initial_state2(FRAME<TV>(TV(8,1.4,0),ROTATION<TV>(T(pi/6),TV(0,1,0)))); 
-            RIGID_BODY_STATE<TV> initial_state3(FRAME<TV>(TV(0,6,0),ROTATION<TV>(T(pi/4),TV(1,1,1)))); 
-            RIGID_BODY_STATE<TV> initial_state4(FRAME<TV>(TV(0,1.7,0),ROTATION<TV>(T(0),TV(1,1,1)))); 
+             RIGID_BODY_STATE<TV> initial_state2(FRAME<TV>(TV(8,1.2,0),ROTATION<TV>(T(pi/6),TV(0,1,0)))); 
+            RIGID_BODY_STATE<TV> initial_state3(FRAME<TV>(TV(-.1,6,0),ROTATION<TV>(T(pi/4),TV(1,1,1)))); 
+            RIGID_BODY_STATE<TV> initial_state4(FRAME<TV>(TV(0,1.5,0),ROTATION<TV>(T(0),TV(1,1,1)))); 
             
             tests.Create_Mattress(mattress_grid1,true,&initial_state1);
             tests.Create_Mattress(mattress_grid2,true,&initial_state2);
             tests.Create_Mattress(mattress_grid2,true,&initial_state3);
             tests.Create_Mattress(mattress_grid3,true,&initial_state4);
+            tests.Add_Ground();
+            break;
+        }
+        case 36:{
+            RIGID_BODY_STATE<TV> initial_state1(FRAME<TV>(TV(0,8,0),ROTATION<TV>(T(0),TV(1,0,1)))); 
+            //RIGID_BODY_STATE<TV> initial_state2(FRAME<TV>(TV(8,1.2,0),ROTATION<TV>(T(pi/6),TV(0,1,0)))); 
+            //RIGID_BODY_STATE<TV> initial_state3(FRAME<TV>(TV(-.1,6,0),ROTATION<TV>(T(pi/4),TV(1,1,1)))); 
+            //RIGID_BODY_STATE<TV> initial_state4(FRAME<TV>(TV(0,1.5,0),ROTATION<TV>(T(0),TV(1,1,1)))); 
+            
+            tests.Create_Mattress(mattress_grid1,true,&initial_state1);
+            //tests.Create_Mattress(mattress_grid2,true,&initial_state2);
+            //tests.Create_Mattress(mattress_grid2,true,&initial_state3);
+            //tests.Create_Mattress(mattress_grid3,true,&initial_state4);
             tests.Add_Ground();
             break;
         }
@@ -658,7 +672,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             break;}
         case 35:{
-            T youngs_modulus = 1e5;
+            T youngs_modulus = 2e5;
             T poissons_ratio = .45;
             T damping = 0.01;
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume1=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(1);
@@ -671,6 +685,12 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             Add_Constitutive_Model(tetrahedralized_volume4,youngs_modulus,poissons_ratio,damping);
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             break;}
+        case 36:{
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+            Add_Constitutive_Model(tetrahedralized_volume,(T)1e6,(T).45,(T).01);
+            //solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            for(int i=1; i<=deformable_body_collection.particles.X.m/2; i++){ deformable_body_collection.particles.V(i).x=(T)1;deformable_body_collection.particles.V(i).y=0;deformable_body_collection.particles.V(i).z=0;}
+            break;} 
         case 7:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
