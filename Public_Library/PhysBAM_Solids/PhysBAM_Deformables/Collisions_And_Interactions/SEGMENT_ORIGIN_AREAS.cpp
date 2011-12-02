@@ -247,7 +247,7 @@ template<class T,int m,int n> void Combine_Data(VOL_DATA<T,2,4>& data,const VOL_
 const int vec_a[1]={0}, vec_c[1]={2}, vec_d[1]={3}, vec_abc[3]={0,1,2}, vec_abd[3]={0,1,3}, vec_cda[3]={2,3,0}, vec_cdb[3]={2,3,1}, vec_abcd[4]={0,1,2,3};
 template<class T,class TV> void Case_CCAA(VOL_DATA<T,2,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
 {
-    // A         B
+    // B         A
     //    C   D
     //      O
 //    trap_cases.Append(1);
@@ -265,7 +265,7 @@ template<class T,class TV> void Case_CCAA(VOL_DATA<T,2,4>& data,const TV& A,cons
 template<class T,class TV> void Case_CCAB(VOL_DATA<T,2,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
 {
     //           D
-    // A      Q P    B
+    // B      Q P    A
     //     C
     //        O
 //    trap_cases.Append(2);
@@ -289,7 +289,7 @@ template<class T,class TV> void Case_CCAB(VOL_DATA<T,2,4>& data,const TV& A,cons
 template<class T,class TV> void Case_CCBB(VOL_DATA<T,2,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
 {
     //  C   D
-    // A P P B
+    // B P P A
     //    O
 //    trap_cases.Append(3);
     DATA<T,2,3> P1;
@@ -348,7 +348,7 @@ template<class T,class TV> void Case_ACAC(VOL_DATA<T,2,4>& data,const TV& A,cons
 {
     //              D
     //
-    // B      Q  A
+    // B      Q A
     //     C
     //        O
 //    trap_cases.Append(6);
