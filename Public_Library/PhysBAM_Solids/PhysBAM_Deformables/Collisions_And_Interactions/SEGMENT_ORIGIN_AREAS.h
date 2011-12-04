@@ -24,7 +24,7 @@ struct VOL_DATA
 };
 
 template<class T,int m,int n> void Clear(VOL_DATA<T,m,n>& data);
-template<class T,class TV> void Volume_From_Simplices(VOL_DATA<T,2,4>& data,TV A[4]);
+template<class T,class TV> void Volume_From_Simplices(VOL_DATA<T,2,4>& data,TV const (&LA)[4]);
 }
 }
 #endif
