@@ -103,15 +103,16 @@ Compute_Collision_Triangles(T_OBJECT& obj1,T_OBJECT& obj2)
                 to_process.Get_Or_Insert(I)+=sign;}}}
 
     for(typename HASHTABLE<VECTOR<int,TV::m*2>,int>::ITERATOR it(to_process);it.Valid();it.Next()){
-        T sign=it.Data();
+        T sign=static_cast<T>(it.Data());
         if(sign==0) continue;
         VECTOR<int,TV::m*2> I=it.Key();
         ORIGIN_AREAS::VOL_DATA<T,TV::m,TV::m*2> data;
-        VECTOR<TV,TV::m*2> PTS(X.Subset(I));
-        Volume_From_Simplices(data,&PTS(1));
+        TV PTS[TV::m*2];
+        for(int k=1;k<=TV::m*2;k++) PTS[k-1]=X(I(k));
+        Volume_From_Simplices(data,PTS); // gotta love ADL!
         area+=sign*data.V;
-        for(int k=1;k<=4;k++) gradient.Get_Or_Insert(I(k))+=sign*data.G[k-1];
-        for(int k=1;k<=4;k++) for(int m=1;m<=4;m++) hessian.Get_Or_Insert(VECTOR<int,2>(I(k),I(m)))+=sign*data.H[k-1][m-1];}
+        for(int k=1;k<=TV::m*2;k++) gradient.Get_Or_Insert(I(k))+=sign*data.G[k-1];
+        for(int k=1;k<=TV::m*2;k++) for(int m=1;m<=TV::m*2;m++) hessian.Get_Or_Insert(VECTOR<int,2>(I(k),I(m)))+=sign*data.H[k-1][m-1];}
 }
 template class VOLUME_COLLISIONS<VECTOR<float,2> >;
 template class VOLUME_COLLISIONS<VECTOR<float,3> >;
