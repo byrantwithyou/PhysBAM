@@ -350,11 +350,10 @@ template<class T,class TV> void Case_CCAB(VOL_DATA<T,2,4>& data,const TV& A,cons
     DATA<T,2,1> DC;
     Data_From_Dof(DC,C);
 
-#if 1
+#if 0
     VOL_DATA<T,2,2> V;
     Area_From_Points(V,DC.V,Q.V);
     Combine_Data(data,V,DC,Q,vec_c,vec_abcd);
-
     Area_From_Points(V,Q.V,P.V);
     Combine_Data(data,V,Q,P,vec_abcd,vec_abd);
 #else // #if 0|1
@@ -415,12 +414,17 @@ template<class T,class TV> void Case_BCBC(VOL_DATA<T,2,4>& data,const TV& A,cons
     DATA<T,2,3> P2;
     Intersect_Segment_Point(P2,A,B,C);
 
+#if 0
     VOL_DATA<T,2,2> V;
     Area_From_Points(V,Q.V,P1.V);
     Combine_Data(data,V,Q,P1,vec_abcd,vec_cda);
-
     Area_From_Points(V,P2.V,Q.V);
     Combine_Data(data,V,P2,Q,vec_abc,vec_abcd);
+#else // #if 0|1
+    VOL_DATA<T,2,3> V;
+    Area_From_Points(V,P2.V,Q.V,P1.V);
+    Combine_Data(data,V,P2,Q,P1,vec_abc,vec_abcd,vec_cda);
+#endif // #if 0|1
 }
 
 template<class T,class TV> void Case_ACAC(VOL_DATA<T,2,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
@@ -439,12 +443,17 @@ template<class T,class TV> void Case_ACAC(VOL_DATA<T,2,4>& data,const TV& A,cons
     DATA<T,2,1> DC;
     Data_From_Dof(DC,C);
 
+#if 0
     VOL_DATA<T,2,2> V;
     Area_From_Points(V,DC.V,Q.V);
     Combine_Data(data,V,DC,Q,vec_c,vec_abcd);
-
     Area_From_Points(V,Q.V,DA.V);
     Combine_Data(data,V,Q,DA,vec_abcd,vec_a);
+#else // #if 0|1
+    VOL_DATA<T,2,3> V;
+    Area_From_Points(V,DC.V,Q.V,DA.V);
+    Combine_Data(data,V,DC,Q,DA,vec_c,vec_abcd,vec_a);
+#endif // #if 0|1
 }
 
 template void PhysBAM::ORIGIN_AREAS::Volume_From_Simplices<float,VECTOR<float,2> >(VOL_DATA<float,2,4>&,VECTOR<float,2> const (&)[4]);
