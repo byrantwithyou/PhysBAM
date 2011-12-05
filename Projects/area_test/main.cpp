@@ -17,6 +17,8 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_INTERSECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/VOLUME_COLLISIONS.h>
 #include <PhysBAM_Dynamics/Read_Write/EPS_FILE_GEOMETRY.h>
+#include <cassert>
+#include <cmath>
 #include <iomanip>
 using namespace PhysBAM;
 
@@ -325,12 +327,177 @@ void Case_Test()
     LOG::cout<<"Hessians: "<<N<<"    "<<M<<std::endl;
 }
 
+template<class T>
+void Volume_From_Simplices_Test_Gradient(
+    const PhysBAM::ORIGIN_AREAS::VOL_DATA<T,2,4>& vol_data,
+    PhysBAM::VECTOR<T,2> (&X)[4])
+{
+    const T tol=static_cast<T>(1)/(1024*1024);
+    const T dx=static_cast<T>(1)/1024;
+    PhysBAM::ORIGIN_AREAS::VOL_DATA<T,2,4> vol_data_dx0;
+    PhysBAM::ORIGIN_AREAS::VOL_DATA<T,2,4> vol_data_dx1;
+    for(int i=0;i!=4;++i){
+        for(int d=1;d<=2;++d){
+            X[i](d)+=dx;
+            PhysBAM::ORIGIN_AREAS::Clear(vol_data_dx1);
+            PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data_dx1,X);
+            X[i](d)-=dx;
+            X[i](d)-=dx;
+            PhysBAM::ORIGIN_AREAS::Clear(vol_data_dx0);
+            PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data_dx0,X);
+            X[i](d)+=dx;
+            const T Gida=vol_data.G[i](d);
+            const T Gidb=(vol_data_dx1.V-vol_data_dx0.V)/(2*dx);
+            assert(std::abs(Gida-Gidb)<=tol);
+        }
+    }
+}
+
+template<class T>
+void Volume_From_Simplices_Test_Hessian(
+    const PhysBAM::ORIGIN_AREAS::VOL_DATA<T,2,4>& vol_data,
+    PhysBAM::VECTOR<T,2> (&X)[4])
+{
+    const T tol=static_cast<T>(1)/(1024*1024);
+    const T dx=static_cast<T>(1)/1024;
+    PhysBAM::ORIGIN_AREAS::VOL_DATA<T,2,4> vol_data_dx00;
+    PhysBAM::ORIGIN_AREAS::VOL_DATA<T,2,4> vol_data_dx01;
+    PhysBAM::ORIGIN_AREAS::VOL_DATA<T,2,4> vol_data_dx10;
+    PhysBAM::ORIGIN_AREAS::VOL_DATA<T,2,4> vol_data_dx11;
+    for(int i=0;i!=4;++i){
+        for(int j=0;j!=4;++j){
+            for(int d=1;d<=2;++d){
+                for(int e=1;e<=2;++e){
+                    const T Hijdea=vol_data.H[i][j](d,e);
+                    T Hijdeb;
+                    if(i==j&&d==e){
+                        X[i](d)+=dx;
+                        PhysBAM::ORIGIN_AREAS::Clear(vol_data_dx11);
+                        PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data_dx11,X);
+                        X[i](d)-=dx;
+                        X[i](d)-=dx;
+                        PhysBAM::ORIGIN_AREAS::Clear(vol_data_dx00);
+                        PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data_dx00,X);
+                        X[i](d)+=dx;
+                        Hijdeb=((vol_data_dx11.V-vol_data.V)-(vol_data.V-vol_data_dx00.V))/(dx*dx);
+                    }
+                    else{
+                        X[i](d)+=dx;
+                        X[j](e)+=dx;
+                        PhysBAM::ORIGIN_AREAS::Clear(vol_data_dx11);
+                        PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data_dx11,X);
+                        X[j](e)-=dx;
+                        X[j](e)-=dx;
+                        PhysBAM::ORIGIN_AREAS::Clear(vol_data_dx10);
+                        PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data_dx10,X);
+                        X[j](e)+=dx;
+                        X[i](d)-=dx;
+                        X[i](d)-=dx;
+                        X[j](e)+=dx;
+                        PhysBAM::ORIGIN_AREAS::Clear(vol_data_dx01);
+                        PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data_dx01,X);
+                        X[j](e)-=dx;
+                        X[j](e)-=dx;
+                        PhysBAM::ORIGIN_AREAS::Clear(vol_data_dx00);
+                        PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data_dx00,X);
+                        X[j](e)+=dx;
+                        X[i](d)+=dx;
+                        Hijdeb=((vol_data_dx11.V-vol_data_dx10.V)-(vol_data_dx01.V-vol_data_dx00.V))/(4*dx*dx);
+                    }
+                    assert(std::abs(Hijdea-Hijdeb)<=tol);
+                }
+            }
+        }
+    }
+}
+
+template<class T>
+void Volume_From_Simplices_Test()
+{
+    typedef PhysBAM::VECTOR<T,2> TV;
+    PhysBAM::ORIGIN_AREAS::VOL_DATA<T,2,4> vol_data;
+    TV X[4];
+
+    // Case "CCAA"
+    // A X   X   X B
+    //     D   C
+    //       O
+    PhysBAM::ORIGIN_AREAS::Clear(vol_data);
+    X[0]=TV(-3,+2);X[1]=TV(+3,+2);X[2]=TV(+1,+1);X[3]=TV(-1,+1);
+    PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data,X);
+    assert(vol_data.V==static_cast<T>(-1));
+    Volume_From_Simplices_Test_Gradient(vol_data,X);
+    Volume_From_Simplices_Test_Hessian(vol_data,X);
+
+    // Case "CCAB"
+    // D
+    //   X
+    // A P Q   X B
+    //       C
+    //     O
+    PhysBAM::ORIGIN_AREAS::Clear(vol_data);
+    X[0]=TV(-2,+2);X[1]=TV(+3,+2);X[2]=TV(+1,+1);X[3]=TV(-2,+4);
+    PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data,X);
+    assert(vol_data.V==static_cast<T>(-2));
+    Volume_From_Simplices_Test_Gradient(vol_data,X);
+    Volume_From_Simplices_Test_Hessian(vol_data,X);
+
+    // Case "CCBB"
+    //   D       C
+    // A   P   P   B
+    //       O
+    PhysBAM::ORIGIN_AREAS::Clear(vol_data);
+    X[0]=TV(-3,+1);X[1]=TV(+3,+1);X[2]=TV(+2,+2);X[3]=TV(-2,+2);
+    PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data,X);
+    assert(vol_data.V==static_cast<T>(-1));
+    Volume_From_Simplices_Test_Gradient(vol_data,X);
+    Volume_From_Simplices_Test_Hessian(vol_data,X);
+
+    // Case "BCAC"
+    //   A         B
+    // D   P   C
+    //       O
+    PhysBAM::ORIGIN_AREAS::Clear(vol_data);
+    X[0]=TV(-2,+2);X[1]=TV(+3,+2);X[2]=TV(+1,+1);X[3]=TV(-3,+1);
+    PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data,X);
+    assert(vol_data.V==static_cast<T>(-1));
+    Volume_From_Simplices_Test_Gradient(vol_data,X);
+    Volume_From_Simplices_Test_Hessian(vol_data,X);
+
+    // Case "BCBC"
+    // A
+    //   X
+    // D P Q   C
+    //       P
+    //     O   B
+    PhysBAM::ORIGIN_AREAS::Clear(vol_data);
+    X[0]=TV(-2,+4);X[1]=TV(+2, 0);X[2]=TV(+2,+2);X[3]=TV(-2,+2);
+    PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data,X);
+    assert(vol_data.V==static_cast<T>(-2));
+    Volume_From_Simplices_Test_Gradient(vol_data,X);
+    Volume_From_Simplices_Test_Hessian(vol_data,X);
+
+    // Case "ACAC"
+    // D
+    //   A  Q  X  X  X  X  B
+    //            C
+    //      O
+    PhysBAM::ORIGIN_AREAS::Clear(vol_data);
+    X[0]=TV(-1,+2);X[1]=TV(+5,+2);X[2]=TV(+2,+1);X[3]=TV(-2,+3);
+    PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data,X);
+    assert(vol_data.V==static_cast<T>(-3));
+    Volume_From_Simplices_Test_Gradient(vol_data,X);
+    Volume_From_Simplices_Test_Hessian(vol_data,X);
+}
+
 int main(int argc,char *argv[])
 {
     typedef double T;
     typedef double RW;
     typedef VECTOR<T,2> TV;
     LOG::cout<<std::setprecision(16);
+
+#if 0
 
 //    Test_Triangualted_Areas();
 
@@ -349,6 +516,12 @@ int main(int argc,char *argv[])
     {
         try{Case_Test();}catch(...){}
     }
+
+#else // #if 0|1
+
+    Volume_From_Simplices_Test<T>();
+
+#endif // #if 0|1
 
     return 0;
 }
