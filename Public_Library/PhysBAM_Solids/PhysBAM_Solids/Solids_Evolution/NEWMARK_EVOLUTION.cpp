@@ -399,17 +399,6 @@ Advance_One_Time_Step_Position(const T dt,const T time, const bool solids)
     Exchange_Velocity();
     Diagnostics(dt,time,0,2,11,"restore velocity");
 
-    T precollisions_KE=0;
-    TV precollisions_momentum;
-    for(int p=1;p<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();p++){
-        precollisions_KE+=(T).5*solid_body_collection.deformable_body_collection.particles.mass(p)*
-            TV::Dot_Product(solid_body_collection.deformable_body_collection.particles.V(p),solid_body_collection.deformable_body_collection.particles.V(p));
-        precollisions_momentum+=solid_body_collection.deformable_body_collection.particles.mass(p)*solid_body_collection.deformable_body_collection.particles.V(p);}
-
-    T precollisions_PE=0;
-    for(int i=1;i<=solid_body_collection.deformable_body_collection.deformables_forces.m;i++) 
-        precollisions_PE+=solid_body_collection.deformable_body_collection.deformables_forces(i)->Potential_Energy(time);
-
     Process_Collisions(dt,time,advance_rigid_bodies);
     Diagnostics(dt,time,0,2,12,"add elastic collisions");
 
