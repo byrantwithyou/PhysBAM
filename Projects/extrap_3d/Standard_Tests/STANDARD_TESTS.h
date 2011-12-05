@@ -726,7 +726,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             for(int i=1; i<=deformable_body_collection.particles.X.m/2; i++){ deformable_body_collection.particles.V(i).x=(T)1;deformable_body_collection.particles.V(i).y=0;deformable_body_collection.particles.V(i).z=0;}
             break;} 
         case 37:{
-            T youngs_modulus = 2.5e5;
+            T youngs_modulus = 2.25e5;
             T poissons_ratio = .4;
             T damping = 0;
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume1=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(1);
