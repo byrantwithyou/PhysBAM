@@ -318,9 +318,9 @@ void Combine_Data(
 const int vec_a[1]={0}, vec_c[1]={2}, vec_d[1]={3}, vec_abc[3]={0,1,2}, vec_abd[3]={0,1,3}, vec_cda[3]={2,3,0}, vec_cdb[3]={2,3,1}, vec_abcd[4]={0,1,2,3};
 template<class T,class TV> void Case_CCAA(VOL_DATA<T,2,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
 {
-    // A         B
-    //    D   C
-    //      O
+    // A X   X   X B
+    //     D   C
+    //       O
 //    trap_cases.Append(1);
     DATA<T,2,1> DC;
     Data_From_Dof(DC,C);
@@ -335,10 +335,11 @@ template<class T,class TV> void Case_CCAA(VOL_DATA<T,2,4>& data,const TV& A,cons
 
 template<class T,class TV> void Case_CCAB(VOL_DATA<T,2,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
 {
-    //     D
-    // A    P Q      B
-    //           C
-    //        O
+    // D
+    //   X
+    // A P Q   X B
+    //       C
+    //     O
 //    trap_cases.Append(2);
     DATA<T,2,4> Q;
     Intersect_Segments(Q,A,B,C,D);
@@ -349,7 +350,7 @@ template<class T,class TV> void Case_CCAB(VOL_DATA<T,2,4>& data,const TV& A,cons
     DATA<T,2,1> DC;
     Data_From_Dof(DC,C);
 
-#if 0
+#if 1
     VOL_DATA<T,2,2> V;
     Area_From_Points(V,DC.V,Q.V);
     Combine_Data(data,V,DC,Q,vec_c,vec_abcd);
@@ -365,9 +366,9 @@ template<class T,class TV> void Case_CCAB(VOL_DATA<T,2,4>& data,const TV& A,cons
 
 template<class T,class TV> void Case_CCBB(VOL_DATA<T,2,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
 {
-    //  D   C
-    // A P P B
-    //    O
+    //   D       C
+    // A   P   P   B
+    //       O
 //    trap_cases.Append(3);
     DATA<T,2,3> P1;
     Intersect_Segment_Point(P1,A,B,C);
@@ -382,9 +383,9 @@ template<class T,class TV> void Case_CCBB(VOL_DATA<T,2,4>& data,const TV& A,cons
 
 template<class T,class TV> void Case_BCAC(VOL_DATA<T,2,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
 {
-    //    A     B
-    // D   P C
-    //      O
+    //   A         B
+    // D   P   C
+    //       O
 //    trap_cases.Append(4);
     DATA<T,2,3> P;
     Intersect_Segment_Point(P,C,D,A);
@@ -399,10 +400,11 @@ template<class T,class TV> void Case_BCAC(VOL_DATA<T,2,4>& data,const TV& A,cons
 
 template<class T,class TV> void Case_BCBC(VOL_DATA<T,2,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
 {
-    //     A
-    //  D   P Q      C
-    //           P
-    //        O      B
+    // A
+    //   X
+    // D P Q   C
+    //       P
+    //     O   B
 //    trap_cases.Append(5);
     DATA<T,2,4> Q;
     Intersect_Segments(Q,A,B,C,D);
@@ -424,10 +426,9 @@ template<class T,class TV> void Case_BCBC(VOL_DATA<T,2,4>& data,const TV& A,cons
 template<class T,class TV> void Case_ACAC(VOL_DATA<T,2,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
 {
     // D
-    //
-    //     A Q      B
-    //          C
-    //       O
+    //   A  Q  X  X  X  X  B
+    //            C
+    //      O
 //    trap_cases.Append(6);
     DATA<T,2,4> Q;
     Intersect_Segments(Q,A,B,C,D);
