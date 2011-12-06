@@ -62,7 +62,8 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED_SMOOTH.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/SVK_EXTRAPOLATED.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/ROTATED_LINEAR.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/ROTATED_LINEAR.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/MOONEY_RIVLIN_3D2.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/MOONEY_RIVLIN_3D_EXTRAPOLATED.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/FINITE_VOLUME.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
@@ -101,6 +102,7 @@ public:
     bool use_extended_neohookean_smooth;
     bool use_extended_svk;
     bool use_corotated;
+    bool use_mooney_rivlin,use_extended_mooney_rivlin;
     bool use_corot_blend;
     bool dump_sv;
     int kinematic_id,kinematic_id2,kinematic_id3;
@@ -164,6 +166,8 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Option_Argument("-use_ext_neo_hyper");
     parse_args->Add_Option_Argument("-use_ext_neo_smooth");
     parse_args->Add_Option_Argument("-use_ext_svk");
+    parse_args->Add_Option_Argument("-use_ext_mooney");
+    parse_args->Add_Option_Argument("-use_mooney");
     parse_args->Add_Option_Argument("-use_corotated");
     parse_args->Add_Option_Argument("-use_corot_blend");
     parse_args->Add_Option_Argument("-dump_sv");
@@ -237,6 +241,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
     use_extended_neohookean=parse_args->Is_Value_Set("-use_ext_neo");
     use_extended_neohookean_refined=parse_args->Is_Value_Set("-use_ext_neo_ref");
     use_extended_neohookean_hyperbola=parse_args->Is_Value_Set("-use_ext_neo_hyper");
+    use_extended_mooney_rivlin=parse_args->Is_Value_Set("-use_ext_mooney");
+    use_mooney_rivlin=parse_args->Is_Value_Set("-use_mooney");
     use_extended_neohookean_smooth=parse_args->Is_Value_Set("-use_ext_neo_smooth");
     use_extended_svk=parse_args->Is_Value_Set("-use_ext_svk");
     use_corotated=parse_args->Is_Value_Set("-use_corotated");
@@ -318,7 +324,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
-            last_frame=1000;
+            last_frame=2000;
             break;
         case 28:
             attachment_velocity = 0.4;
@@ -907,6 +913,7 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
         for(int i=3*m/7+1;i<=4*m/7+1;i++)for(int ij=1;ij<=mn;ij++)for(int j=1;j<=n;j++){V(i+m*(j-1)+m*n*(ij-1))=-velocity_y;V(i+m*(j-1)+m*n*(ij-1))=-velocity_y;}
     }
     if(test_number==27){
+        final_time=70;
         int m=mattress_grid.counts.x;
 	int n=mattress_grid.counts.y;
 	int mn=mattress_grid.counts.z;
@@ -1010,15 +1017,15 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 void Update_Time_Varying_Material_Properties(const T time)
 {   if(test_number==29 && time > .1){
-        T critical=(T)5.0;
-        T critical2=(T)9.0;
-        T start_young=1e4; T end_young=1e7;
+        T critical=(T)3.0;
+        T critical2=(T)3.5;
+        T start_young=(T)4; T end_young=(T)5;
         if(time>critical && time<critical2) {
             
             DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
             FINITE_VOLUME<TV,3>& fv = deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
             CONSTITUTIVE_MODEL<T,3>& icm = fv.constitutive_model;
-            T young = start_young + (time-critical)/(critical2-critical)*(end_young-start_young);
+            T young = pow(10.0,start_young + (time-critical)/(critical2-critical)*(end_young-start_young));
             icm.Update_Lame_Constants(young,(T).45,(T).01);
             forces_are_removed=false;
         }    
@@ -1080,9 +1087,12 @@ void Preprocess_Frame(const int frame)
 void Add_Constitutive_Model(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,T stiffness,T poissons_ratio,T damping, T cutoff = 0.4, T efc = 20)
 {
     ISOTROPIC_CONSTITUTIVE_MODEL<T,3>* icm=0;
+
     if(use_extended_neohookean) icm=new NEO_HOOKEAN_EXTRAPOLATED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc*stiffness*stiffness_multiplier);
     else if(use_extended_svk) icm=new SVK_EXTRAPOLATED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc*stiffness*stiffness_multiplier);
     else if(use_extended_neohookean_refined) icm=new NEO_HOOKEAN_EXTRAPOLATED_REFINED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,.6,efc*stiffness*stiffness_multiplier);
+    else if(use_extended_mooney_rivlin) icm=new MOONEY_RIVLIN_3D_EXTRAPOLATED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.4,20*stiffness*stiffness_multiplier);
+    else if(use_mooney_rivlin) icm=new MOONEY_RIVLIN_3D2<T>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.4,20*stiffness*stiffness_multiplier);
     else if(use_extended_neohookean_hyperbola) icm=new NEO_HOOKEAN_EXTRAPOLATED_HYPERBOLA<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.1);
     else if(use_extended_neohookean_smooth) icm=new NEO_HOOKEAN_EXTRAPOLATED_SMOOTH<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.1);
     else if(use_corotated) icm=new COROTATED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
