@@ -338,9 +338,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             break;}
         case 4:{
             last_frame=(int)(2*frame_rate);
-            body=&tests.Add_Rigid_Body("box",(T)10,(T)0);body->X().z=11;
+            body=&tests.Add_Rigid_Body("box",(T)1,(T)0);body->X().z=11;
             rigid_body_collection.rigid_body_particle.kinematic(body->particle_index)=true;
-            body=&tests.Add_Rigid_Body("box",(T)10,(T)0);body->X().z=-11;
+            body=&tests.Add_Rigid_Body("box",(T)1,(T)0);body->X().z=-11;
             rigid_body_collection.rigid_body_particle.kinematic(body->particle_index)=true;
             tests.Create_Tetrahedralized_Volume(sphere_filename,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0,0))),true,false,1000);
             curve.Add_Control_Point((T)0,TV(0,0,(T)3));

@@ -24,19 +24,20 @@ Triangle_Intersection_Area(const TRIANGLE_2D<T>& a,const TRIANGLE_2D<T>& b,VECTO
             int jn=j%3+1;
             VECTOR<int,4> I(i,in,j+3,jn+3);
 #if 0
-            SEGMENT_ORIGIN_AREAS::DATA<T,1,4> data;
-            Area_From_Segments(data,a.X(i),a.X(in),b.X(j),b.X(jn));
-            A+=data.V.x;
+            ORIGIN_AREAS::VOL_DATA<T,2,4> data;
+            TV const X[]={a.X(i),a.X(in),b.X(j),b.X(jn)};
+            ORIGIN_AREAS::Volume_From_Simplices(data,X);
+            A+=data.V;
 
             for(int k=1;k<=4;k++) G(I(k))+=(const TV&)data.G[k-1];
-            for(int k=1;k<=4;k++) for(int m=1;m<=4;m++) H(I(k))(I(m))+=data.H[0][k-1][m-1];
-#else
+            for(int k=1;k<=4;k++) for(int m=1;m<=4;m++) H(I(k))(I(m))+=data.H[k-1][m-1];
+#else // #if 0|1
             VECTOR<TV,4> tG;
             VECTOR<VECTOR<MATRIX<T,2>,4>,4> tH;
             A+=Trapezoid_Intersection_Area(a.X(i),a.X(in),b.X(j),b.X(jn),tG,tH);
             for(int k=1;k<=4;k++) G(I(k))+=tG(k);
             for(int k=1;k<=4;k++) for(int m=1;m<=4;m++) H(I(k))(I(m))+=tH(k)(m);
-#endif
+#endif // #if 0|1
         }
     }
     return A;
