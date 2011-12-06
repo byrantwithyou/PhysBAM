@@ -1,5 +1,5 @@
 //#####################################################################
-// Copyright 2003-2005, Ron Fedkiw, Geoffrey Irving, Igor Neverov, Eftychios Sifakis.
+// Copyright 2003-2011, Ron Fedkiw, Geoffrey Irving, Igor Neverov, Russell Howes, Eftychios Sifakis.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 // Class ST_VENANT_KIRCHHOFF
@@ -32,18 +32,22 @@ public:
         if(d==2) failure_threshold=sqrt((constant_mu+constant_lambda)/(3*constant_mu+3*constant_lambda));
         else failure_threshold=sqrt((constant_mu+(T)1.5*constant_lambda)/(3*constant_mu+(T)4.5*constant_lambda));
     }
-
+   
+    T Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int simplex) const PHYSBAM_OVERRIDE
+    {DIAGONAL_MATRIX<T,d> F_threshold=F.Clamp_Min(failure_threshold),strain=(F_threshold*F_threshold-1)*(T).5,strain_squared=strain*strain;
+        return (T).5*constant_lambda*strain.Trace()*strain.Trace()+constant_mu*strain_squared.Trace();
+    }
     DIAGONAL_MATRIX<T,d> P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const T scale,const int simplex) const PHYSBAM_OVERRIDE
-    {DIAGONAL_MATRIX<T,d> F_threshold=F.Max(failure_threshold),twice_strain=F_threshold*F_threshold-1;
+    {DIAGONAL_MATRIX<T,d> F_threshold=F.Clamp_Min(failure_threshold),twice_strain=F_threshold*F_threshold-1;
     return F_threshold*(scale*constant_mu*twice_strain+(T).5*scale*constant_lambda*twice_strain.Trace());}
     
     MATRIX<T,d> P_From_Strain_Rate(const DIAGONAL_MATRIX<T,d>& F,const MATRIX<T,d>& F_dot,const T scale,const int simplex) const PHYSBAM_OVERRIDE
-    {DIAGONAL_MATRIX<T,d> F_threshold=F.Max(failure_threshold);
+    {DIAGONAL_MATRIX<T,d> F_threshold=F.Clamp_Min(failure_threshold);
     SYMMETRIC_MATRIX<T,d> strain_rate=(F_threshold*F_dot).Symmetric_Part();
     return F_threshold*(2*scale*constant_beta*strain_rate+scale*constant_alpha*strain_rate.Trace());}
 
     void Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& dP_dF,const int triangle) const PHYSBAM_OVERRIDE
-    {DIAGONAL_MATRIX<T,2> F_threshold=F.Max(failure_threshold);
+    {DIAGONAL_MATRIX<T,2> F_threshold=F.Clamp_Min(failure_threshold);
     T lambda_tr_G_minus_mu=(T).5*constant_lambda*(F_threshold*F_threshold-1).Trace()-constant_mu,three_mu_plus_lambda=3*constant_mu+constant_lambda;
     SYMMETRIC_MATRIX<T,2> F_outer=SYMMETRIC_MATRIX<T,2>::Outer_Product(VECTOR<T,2>(F_threshold.x11,F_threshold.x22));
     dP_dF.x1111=lambda_tr_G_minus_mu+three_mu_plus_lambda*F_outer.x11;//alpha+beta+gamma
@@ -54,7 +58,7 @@ public:
     if(enforce_definiteness) dP_dF.Fix_Indefinite_Blocks();}
 
     void Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dPi_dF,const int tetrahedron) const PHYSBAM_OVERRIDE
-    {DIAGONAL_MATRIX<T,3> F_threshold=F.Max(failure_threshold);
+    {DIAGONAL_MATRIX<T,3> F_threshold=F.Clamp_Min(failure_threshold);
     T lambda_tr_G_minus_mu=(T).5*constant_lambda*(F_threshold*F_threshold-1).Trace()-constant_mu,three_mu_plus_lambda=3*constant_mu+constant_lambda;
     SYMMETRIC_MATRIX<T,3> F_outer=SYMMETRIC_MATRIX<T,3>::Outer_Product(VECTOR<T,3>(F_threshold.x11,F_threshold.x22,F_threshold.x33));
     //alpha+beta+gamma
