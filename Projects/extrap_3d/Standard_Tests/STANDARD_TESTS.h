@@ -56,6 +56,7 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED_HYPERBOLA.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED_REFINED.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED_SMOOTH.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/ST_VENANT_KIRCHHOFF.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/SVK_EXTRAPOLATED.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/ROTATED_LINEAR.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/MOONEY_RIVLIN_3D2.h>
@@ -96,7 +97,7 @@ public:
     bool use_extended_neohookean_refined;
     bool use_extended_neohookean_hyperbola;
     bool use_extended_neohookean_smooth;
-    bool use_extended_svk;
+    bool use_extended_svk, use_svk;
     bool use_corotated;
     bool use_mooney_rivlin,use_extended_mooney_rivlin;
     bool use_corot_blend;
@@ -157,6 +158,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     BASE::Register_Options();
     parse_args->Add_Option_Argument("-semi_implicit","use semi implicit forces");
     parse_args->Add_Option_Argument("-test_forces","use fully implicit forces");
+    parse_args->Add_Option_Argument("-use_svk");
     parse_args->Add_Option_Argument("-use_ext_neo");
     parse_args->Add_Option_Argument("-use_ext_neo_ref");
     parse_args->Add_Option_Argument("-use_ext_neo_hyper");
@@ -240,6 +242,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     use_extended_mooney_rivlin=parse_args->Is_Value_Set("-use_ext_mooney");
     use_mooney_rivlin=parse_args->Is_Value_Set("-use_mooney");
     use_extended_neohookean_smooth=parse_args->Is_Value_Set("-use_ext_neo_smooth");
+    use_svk=parse_args->Is_Value_Set("-use_svk");
     use_extended_svk=parse_args->Is_Value_Set("-use_ext_svk");
     use_corotated=parse_args->Is_Value_Set("-use_corotated");
     use_corot_blend=parse_args->Is_Value_Set("-use_corot_blend");
@@ -1052,6 +1055,7 @@ void Add_Constitutive_Model(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,T 
     ISOTROPIC_CONSTITUTIVE_MODEL<T,3>* icm=0;
 
     if(use_extended_neohookean) icm=new NEO_HOOKEAN_EXTRAPOLATED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc*stiffness*stiffness_multiplier);
+    else if(use_svk) icm=new ST_VENANT_KIRCHHOFF<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
     else if(use_extended_svk) icm=new SVK_EXTRAPOLATED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc*stiffness*stiffness_multiplier);
     else if(use_extended_neohookean_refined) icm=new NEO_HOOKEAN_EXTRAPOLATED_REFINED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,.6,efc*stiffness*stiffness_multiplier);
     else if(use_extended_mooney_rivlin) icm=new MOONEY_RIVLIN_3D_EXTRAPOLATED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.4,20*stiffness*stiffness_multiplier);
