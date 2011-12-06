@@ -539,7 +539,7 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
         int m=mattress_grid.counts.x;
 	int n=mattress_grid.counts.y;
         T velocity=.1;
-        T final_time=50;
+        T final_time=40;
         TV velocity_rig=velocity_time<final_time?TV(-velocity,(T)0):TV();
         TV velocity_lef=velocity_time<final_time?TV(velocity,(T)0):TV();
         for(int j=1;j<=n;j++){V(1+m*(j-1))=velocity_lef;V(m+m*(j-1))=velocity_rig;}}
@@ -585,10 +585,10 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
         for(int j=1;j<=n;j++) V(1+m*(j-1))=V(m+m*(j-1))=TV();}
 }
 void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {
-    if(test_number==270){
+    /*if(test_number==270){
         int m=mattress_grid.counts.x;
         int n=mattress_grid.counts.y;        
-    }
+    }*/
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Position_Nodes
@@ -634,7 +634,10 @@ void Add_Constitutive_Model(TRIANGULATED_AREA<T>& triangulated_area,T stiffness,
     else{
         NEO_HOOKEAN<T,2>* nh=new NEO_HOOKEAN<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
         icm=nh;
+
         nh->use_constant_ife=use_constant_ife;}
+    //std::cout << "Lambda= " << icm->constant_lambda << std::cout;
+    //std::cout << "Mu    = " << icm->constant_mu << std::cout;
     solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,icm));
 }
 //#####################################################################
