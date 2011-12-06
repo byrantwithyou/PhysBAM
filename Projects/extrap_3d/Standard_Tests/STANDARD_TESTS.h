@@ -805,7 +805,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 31:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
-            Add_Constitutive_Model(tetrahedralized_volume,(T)7.5e4,(T).45,(T).01);
+            Add_Constitutive_Model(tetrahedralized_volume,(T)5e5,(T).45,(T).01);
             solid_body_collection.template Find_Force<GRAVITY<TV>&>().gravity=0.5;
             break;} 
         case 30:{
