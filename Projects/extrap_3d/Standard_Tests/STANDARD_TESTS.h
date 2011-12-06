@@ -31,7 +31,11 @@
 //   34. Roll-over
 //   35. Dancing jello (first attempt)
 //   36. Spinning jello
-//   37. High res dancing jello for rendering
+//   37. Two jellos falling and colliding (first high res video)
+//   38. Many jollos falling on the ground
+//   39. One jello falling on a stationary one
+//   40. Two jellos running on each other
+//   41. Bunch of jellos rolling towards camera
 //#####################################################################
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
@@ -208,7 +212,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             mattress_grid2=GRID<TV>(12,12,12,(T)-1.2,(T)1.2,(T)-1.2,(T)1.2,(T)-1.2,(T)1.2);
             mattress_grid3=GRID<TV>(15,15,15,(T)-1.5,(T)1.5,(T)-1.5,(T)1.5,(T)-1.5,(T)1.5);
             break;
-        case 37:
+        case 37: case 38: case 39: case 40: case 41:
             mattress_grid=GRID<TV>(40,40,40,(T)-1.0,(T)1.0,(T)-1.0,(T)1.0,(T)-1.0,(T)1.0);
             break;
     	default:
@@ -295,6 +299,10 @@ void Parse_Options() PHYSBAM_OVERRIDE
             last_frame = 1000;
             break;
         case 37:
+        case 38:
+        case 39:
+        case 40:
+        case 41:
             solids_parameters.cfl=(T)5;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
@@ -496,9 +504,19 @@ void Get_Initial_Data()
             tests.Add_Ground();
             break;
         }
-        case 37:{
+        case 37:
+        {
             RIGID_BODY_STATE<TV> initial_state1(FRAME<TV>(TV(1.7,5.2,1.6),ROTATION<TV>(T(pi/4),TV(1.3,0.3,0.7)))); 
             RIGID_BODY_STATE<TV> initial_state2(FRAME<TV>(TV(0,2.2,0),ROTATION<TV>(T(pi/7),TV(0.5,2,0.3))));
+            tests.Create_Mattress(mattress_grid,true,&initial_state1);
+            tests.Create_Mattress(mattress_grid,true,&initial_state2);
+            tests.Add_Ground(1);
+            break;
+        }
+        case 39:
+        {
+            RIGID_BODY_STATE<TV> initial_state1(FRAME<TV>(TV(1,8,1.5),ROTATION<TV>(T(pi/4),TV(1.3,0.3,0.7)))); 
+            RIGID_BODY_STATE<TV> initial_state2(FRAME<TV>(TV(0,1,0)));
             tests.Create_Mattress(mattress_grid,true,&initial_state1);
             tests.Create_Mattress(mattress_grid,true,&initial_state2);
             tests.Add_Ground(1);
@@ -743,6 +761,25 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             {
                 particles.V(i+m*(j-1)+m*n*(ij-1)) = TV(-2*sin(j/(T)n),-cos(2*ij/(T)mn)*2,-2*sin(3*i/(T)m));
                 particles.V(i+m*(j-1)+m*n*(ij-1)+m*n*mn) = TV(1*sin(2*ij/(T)mn),0.5*cos(3*i/(T)m)*2,1*sin(j/(T)n));
+            }
+            break;}
+        case 39:{
+            T youngs_modulus = 2.25e5;
+            T poissons_ratio = .4;
+            T damping = 0;
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume1=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(1);
+            Add_Constitutive_Model(tetrahedralized_volume1,youngs_modulus,poissons_ratio,damping,0.4,50);
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume2=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(2);
+            Add_Constitutive_Model(tetrahedralized_volume2,youngs_modulus,poissons_ratio,damping,0.4,50);
+            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            int m=mattress_grid.counts.x;
+            int n=mattress_grid.counts.y;
+            int mn=mattress_grid.counts.z;
+            for(int i=1;i<=m;i++)
+            for(int j=1;j<=n;j++)
+            for(int ij=1;ij<=mn;ij++)
+            {
+                particles.V(i+m*(j-1)+m*n*(ij-1)) = TV(-2*sin(j/(T)n),-cos(2*ij/(T)mn)*2,-2*sin(3*i/(T)m));
             }
             break;}
         case 7:{
