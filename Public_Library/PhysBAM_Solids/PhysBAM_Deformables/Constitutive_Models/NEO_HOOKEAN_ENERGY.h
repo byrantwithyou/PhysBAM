@@ -34,7 +34,7 @@ public:
     inline T E (const T x, const T y) const
     {
         assert(x>0 && y>0);
-        return mu*(0.5*x*x + 0.5*y*y - 1 - log(x*y)) + 0.5*lambda*sqr(log(x*y)); 
+        return mu*((T)0.5*x*x + (T)0.5*y*y - 1 - log(x*y)) + (T)0.5*lambda*sqr(log(x*y)); 
     }
 
     inline T Ex (const T x, const T y) const

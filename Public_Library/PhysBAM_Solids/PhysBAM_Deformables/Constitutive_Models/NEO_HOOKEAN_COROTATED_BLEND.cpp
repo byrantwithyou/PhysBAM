@@ -20,7 +20,7 @@ template<class T,int d> NEO_HOOKEAN_COROTATED_BLEND<T,d>::
 NEO_HOOKEAN_COROTATED_BLEND(const T youngs_modulus,const T poissons_ratio,const T Rayleigh_coefficient):
     neo_base(youngs_modulus,poissons_ratio,Rayleigh_coefficient),
     cor_base(2*youngs_modulus,poissons_ratio,Rayleigh_coefficient),
-    J_min(0.3),J_max(0.7)
+    J_min((T)0.3),J_max((T)0.7)
 {
     constant_lambda = youngs_modulus*poissons_ratio/((1+poissons_ratio)*(1-2*poissons_ratio));
     constant_mu     = youngs_modulus/(2*(1+poissons_ratio));

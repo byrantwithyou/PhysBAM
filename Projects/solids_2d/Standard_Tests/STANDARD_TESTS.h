@@ -128,7 +128,7 @@ public:
     void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > wrench,const T time) PHYSBAM_OVERRIDE {}
     void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE {}
     void Limit_Solids_Dt(T& dt,const T time) PHYSBAM_OVERRIDE {}
-    void Update_Fragments() PHYSBAM_OVERRIDE {}
+    //void Update_Fragments() PHYSBAM_OVERRIDE {}
     void Post_Initialization() PHYSBAM_OVERRIDE {}
     void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
     {
@@ -414,7 +414,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             tests.Add_Ground();
             break;}
         case 15:{
-            for(int i=1;i<=parameter;i++) tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,1.2*i))));
+            for(int i=1;i<=parameter;i++) tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)1.2*i))));
             tests.Add_Ground();
             break;}
         case 16: {
@@ -457,7 +457,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 	case 20:{
             tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,4))));
             //RIGID_BODY<TV>& box1=tests.Add_Rigid_Body("circle",4,(T)0);
-            RIGID_BODY<TV>& box2=tests.Add_Rigid_Body("square",.2,(T)0);
+            RIGID_BODY<TV>& box2=tests.Add_Rigid_Body("square",(T).2,(T)0);
             //box1.X()=TV(0,-10);
             box2.X()=TV(0,12);
             //box1.is_static=true;
@@ -642,7 +642,7 @@ bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id)
 //#####################################################################
 // Function Set_Particle_Is_Simulated
 //#####################################################################
-void Set_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated) PHYSBAM_OVERRIDE
+void Set_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated)
 {
     if(test_number==10){
         // make free particles simulated
@@ -663,7 +663,7 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
     if(test_number==24){
         int m=mattress_grid.counts.x;
 	int n=mattress_grid.counts.y;
-        T velocity=.2;
+        T velocity=(T).2;
         T final_time=50;
         TV velocity_top=velocity_time<final_time?TV((T)0,velocity):TV();
         TV velocity_bot=velocity_time<final_time?TV((T)0,-velocity):TV();
@@ -674,7 +674,7 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
     if(test_number==25){
         int m=mattress_grid.counts.x;
 	int n=mattress_grid.counts.y;
-        T velocity=.2;
+        T velocity=(T).2;
         T final_time=50;
         TV velocity_tr=velocity_time<final_time?TV(velocity,velocity):TV();
         TV velocity_tl=velocity_time<final_time?TV(-velocity,velocity):TV();
@@ -687,7 +687,7 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
     if(test_number==26){
         int m=mattress_grid.counts.x;
 	int n=mattress_grid.counts.y;
-        T velocity=.2;
+        T velocity=(T).2;
         T final_time=50;
         TV velocity_top=velocity_time<final_time?TV((T)0,-velocity):TV();
         TV velocity_bot=velocity_time<final_time?TV((T)0,-velocity):TV();
@@ -698,7 +698,7 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
     if(test_number==27){
         int m=mattress_grid.counts.x;
 	int n=mattress_grid.counts.y;
-        T velocity=.1;
+        T velocity=(T).1;
         T final_time=50;
         TV velocity_rig=velocity_time<final_time?TV(-velocity,(T)0):TV();
         TV velocity_lef=velocity_time<final_time?TV(velocity,(T)0):TV();
@@ -783,8 +783,8 @@ void Preprocess_Frame(const int frame)
 void Add_Constitutive_Model(TRIANGULATED_AREA<T>& triangulated_area,T stiffness,T poissons_ratio,T damping)
 {
     ISOTROPIC_CONSTITUTIVE_MODEL<T,2>* icm=0;
-    if(use_extended_neohookean) icm=new NEO_HOOKEAN_EXTRAPOLATED<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.4,20*stiffness*stiffness_multiplier);
-    else if(use_extended_neohookean_refined) icm=new NEO_HOOKEAN_EXTRAPOLATED_REFINED<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.4,.6,20*stiffness*stiffness_multiplier);
+    if(use_extended_neohookean) icm=new NEO_HOOKEAN_EXTRAPOLATED<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,(T).4,20*stiffness*stiffness_multiplier);
+    else if(use_extended_neohookean_refined) icm=new NEO_HOOKEAN_EXTRAPOLATED_REFINED<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,(T).4,(T).6,20*stiffness*stiffness_multiplier);
     else if(use_corotated) icm=new COROTATED<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
     else if(use_corot_blend) icm=new NEO_HOOKEAN_COROTATED_BLEND<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
     else if(use_extended_neohookean_hyperbola) icm=new NEO_HOOKEAN_EXTRAPOLATED_HYPERBOLA<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);

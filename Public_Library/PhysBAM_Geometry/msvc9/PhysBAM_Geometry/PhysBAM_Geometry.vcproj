@@ -712,6 +712,14 @@
 			Name="Geometry_Particles"
 			>
 			<File
+				RelativePath="..\..\Geometry_Particles\DEBUG_PARTICLES.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\Geometry_Particles\DEBUG_PARTICLES.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\Geometry_Particles\GEOMETRY_PARTICLES.cpp"
 				>
 			</File>
