@@ -106,31 +106,31 @@ Energy_Density_Helper(const DIAGONAL_MATRIX<T,3>& F,const int simplex) const
     }
     else if ((dx < 0) && (dy >= 0) && (dz >= 0)) // Rx
     {
-        return 0.5*(-mu*cube(a)+mu*a*sqr(y)+mu*a*sqr(z)-mu*a-2*mu*a*log(a*y*z)+la*sqr(log(a*y*z))*a+2*mu*sqr(a)*x-2*mu*x+2*la*log(a*y*z)*x-2*la*log(a*y*z)*a+2*k*a*sqr(x)-4*k*sqr(a)*x+2*k*cube(a))/a;
+        return (T)0.5*(-mu*cube(a)+mu*a*sqr(y)+mu*a*sqr(z)-mu*a-2*mu*a*log(a*y*z)+la*sqr(log(a*y*z))*a+2*mu*sqr(a)*x-2*mu*x+2*la*log(a*y*z)*x-2*la*log(a*y*z)*a+2*k*a*sqr(x)-4*k*sqr(a)*x+2*k*cube(a))/a;
     }
     else if ((dx >= 0) && (dy < 0) && (dz >= 0)) // Ry
     {
-        return 0.5*(mu*a*sqr(x)-mu*cube(a)+mu*a*sqr(z)-mu*a-2*mu*a*log(x*a*z)+la*sqr(log(x*a*z))*a+2*y*mu*sqr(a)-2*mu*y+2*la*log(x*a*z)*y-2*la*log(x*a*z)*a+2*sqr(y)*k*a-4*y*k*sqr(a)+2*k*cube(a))/a;
+        return (T)0.5*(mu*a*sqr(x)-mu*cube(a)+mu*a*sqr(z)-mu*a-2*mu*a*log(x*a*z)+la*sqr(log(x*a*z))*a+2*y*mu*sqr(a)-2*mu*y+2*la*log(x*a*z)*y-2*la*log(x*a*z)*a+2*sqr(y)*k*a-4*y*k*sqr(a)+2*k*cube(a))/a;
     }
     else if ((dx >= 0) && (dy >= 0) && (dz < 0)) // Rz
     {
-        return 0.5*(mu*a*sqr(x)+mu*a*sqr(y)-mu*cube(a)-mu*a-2*mu*a*log(x*y*a)+la*sqr(log(x*y*a))*a+2*z*mu*sqr(a)-2*mu*z+2*la*log(x*y*a)*z-2*la*log(x*y*a)*a+2*sqr(z)*k*a-4*z*k*sqr(a)+2*k*cube(a))/a;
+        return (T)0.5*(mu*a*sqr(x)+mu*a*sqr(y)-mu*cube(a)-mu*a-2*mu*a*log(x*y*a)+la*sqr(log(x*y*a))*a+2*z*mu*sqr(a)-2*mu*z+2*la*log(x*y*a)*z-2*la*log(x*y*a)*a+2*sqr(z)*k*a-4*z*k*sqr(a)+2*k*cube(a))/a;
     }
     else if ((dx < 0) && (dy < 0) && (dz >= 0)) // Rxy
     {
-        return 0.5*(mu*sqr(a)-2*x*mu*a-2*x*la*a+2*sqr(y)*k*sqr(a)-2*mu*a*y+sqr(z)*mu*sqr(a)+2*sqr(x)*k*sqr(a)-2*y*la*a+2*a*la*log(sqr(a)*z)*x+2*a*la*log(sqr(a)*z)*y+la*sqr(log(sqr(a)*z))*sqr(a)-2*mu*sqr(a)*log(sqr(a)*z)+2*mu*cube(a)*x-4*la*log(sqr(a)*z)*sqr(a)+2*y*mu*cube(a)+2*la*x*y-4*k*cube(a)*x-4*k*cube(a)*y-2*mu*(a*a*a*a)+2*la*sqr(a)+4*k*(a*a*a*a))/sqr(a);
+        return (T)0.5*(mu*sqr(a)-2*x*mu*a-2*x*la*a+2*sqr(y)*k*sqr(a)-2*mu*a*y+sqr(z)*mu*sqr(a)+2*sqr(x)*k*sqr(a)-2*y*la*a+2*a*la*log(sqr(a)*z)*x+2*a*la*log(sqr(a)*z)*y+la*sqr(log(sqr(a)*z))*sqr(a)-2*mu*sqr(a)*log(sqr(a)*z)+2*mu*cube(a)*x-4*la*log(sqr(a)*z)*sqr(a)+2*y*mu*cube(a)+2*la*x*y-4*k*cube(a)*x-4*k*cube(a)*y-2*mu*(a*a*a*a)+2*la*sqr(a)+4*k*(a*a*a*a))/sqr(a);
     }
     else if ((dx < 0) && (dy >= 0) && (dz < 0)) // Rzx
     {
-        return 0.5*(mu*sqr(a)-2*x*mu*a-2*x*la*a+sqr(y)*mu*sqr(a)+2*sqr(z)*k*sqr(a)-2*mu*a*z+2*sqr(x)*k*sqr(a)-2*z*la*a+2*mu*cube(a)*x-4*k*cube(a)*x-2*mu*(a*a*a*a)+2*la*sqr(a)+4*k*(a*a*a*a)+2*z*mu*cube(a)-4*z*k*cube(a)+2*z*la*x+la*sqr(log(sqr(a)*y))*sqr(a)-2*mu*sqr(a)*log(sqr(a)*y)-4*la*log(sqr(a)*y)*sqr(a)+2*a*la*log(sqr(a)*y)*z+2*a*la*log(sqr(a)*y)*x)/sqr(a);
+        return (T)0.5*(mu*sqr(a)-2*x*mu*a-2*x*la*a+sqr(y)*mu*sqr(a)+2*sqr(z)*k*sqr(a)-2*mu*a*z+2*sqr(x)*k*sqr(a)-2*z*la*a+2*mu*cube(a)*x-4*k*cube(a)*x-2*mu*(a*a*a*a)+2*la*sqr(a)+4*k*(a*a*a*a)+2*z*mu*cube(a)-4*z*k*cube(a)+2*z*la*x+la*sqr(log(sqr(a)*y))*sqr(a)-2*mu*sqr(a)*log(sqr(a)*y)-4*la*log(sqr(a)*y)*sqr(a)+2*a*la*log(sqr(a)*y)*z+2*a*la*log(sqr(a)*y)*x)/sqr(a);
     }
     else if ((dx >= 0) && (dy < 0) && (dz < 0)) // Ryz
     {
-        return 0.5*(mu*sqr(a)+2*sqr(y)*k*sqr(a)-2*mu*a*y+2*sqr(z)*k*sqr(a)-2*mu*a*z+sqr(x)*mu*sqr(a)-2*y*la*a-2*z*la*a+2*y*mu*cube(a)-4*k*cube(a)*y-2*mu*(a*a*a*a)+2*la*sqr(a)+4*k*(a*a*a*a)+2*z*mu*cube(a)+2*z*la*y-4*z*k*cube(a)+2*a*la*log(x*sqr(a))*y+2*a*la*log(x*sqr(a))*z+la*sqr(log(x*sqr(a)))*sqr(a)-2*mu*sqr(a)*log(x*sqr(a))-4*la*log(x*sqr(a))*sqr(a))/sqr(a);
+        return (T)0.5*(mu*sqr(a)+2*sqr(y)*k*sqr(a)-2*mu*a*y+2*sqr(z)*k*sqr(a)-2*mu*a*z+sqr(x)*mu*sqr(a)-2*y*la*a-2*z*la*a+2*y*mu*cube(a)-4*k*cube(a)*y-2*mu*(a*a*a*a)+2*la*sqr(a)+4*k*(a*a*a*a)+2*z*mu*cube(a)+2*z*la*y-4*z*k*cube(a)+2*a*la*log(x*sqr(a))*y+2*a*la*log(x*sqr(a))*z+la*sqr(log(x*sqr(a)))*sqr(a)-2*mu*sqr(a)*log(x*sqr(a))-4*la*log(x*sqr(a))*sqr(a))/sqr(a);
     }
     else // Rxyz
     {
-        return 0.5*(3*mu*sqr(a)-2*x*mu*a-4*x*la*a+2*sqr(y)*k*sqr(a)-2*mu*a*y+2*sqr(z)*k*sqr(a)-2*mu*a*z+2*sqr(x)*k*sqr(a)-4*y*la*a-4*z*la*a+2*mu*cube(a)*x+2*y*mu*cube(a)+2*la*x*y-4*k*cube(a)*x-4*k*cube(a)*y-3*mu*(a*a*a*a)+6*la*sqr(a)+6*k*(a*a*a*a)+2*z*mu*cube(a)+2*z*la*y-4*z*k*cube(a)+2*z*la*x+2*a*la*log(cube(a))*x+2*a*la*log(cube(a))*y+2*a*la*log(cube(a))*z+la*sqr(log(cube(a)))*sqr(a)-2*mu*sqr(a)*log(cube(a))-6*la*log(cube(a))*sqr(a))/sqr(a);
+        return (T)0.5*(3*mu*sqr(a)-2*x*mu*a-4*x*la*a+2*sqr(y)*k*sqr(a)-2*mu*a*y+2*sqr(z)*k*sqr(a)-2*mu*a*z+2*sqr(x)*k*sqr(a)-4*y*la*a-4*z*la*a+2*mu*cube(a)*x+2*y*mu*cube(a)+2*la*x*y-4*k*cube(a)*x-4*k*cube(a)*y-3*mu*(a*a*a*a)+6*la*sqr(a)+6*k*(a*a*a*a)+2*z*mu*cube(a)+2*z*la*y-4*z*k*cube(a)+2*z*la*x+2*a*la*log(cube(a))*x+2*a*la*log(cube(a))*y+2*a*la*log(cube(a))*z+la*sqr(log(cube(a)))*sqr(a)-2*mu*sqr(a)*log(cube(a))-6*la*log(cube(a))*sqr(a))/sqr(a);
     }
 }
 //#####################################################################
