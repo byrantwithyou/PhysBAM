@@ -213,6 +213,19 @@ Add_Analytic_Cylinder(const T height,const T radius,int resolution_radius,int re
     return rigid_body;
 }
 //#####################################################################
+// Function Add_Analytic_Shell
+//#####################################################################
+template<class TV> RIGID_BODY<TV>& RIGIDS_STANDARD_TESTS<TV>::
+Add_Analytic_Shell(const T height,const T outer_radius,const T inner_radius,int resolution)
+{
+    RIGID_BODY<TV>& rigid_body=*new RIGID_BODY<TV>(rigid_body_collection,true);
+    RING<T> ring(TV(0,0,-height/2),TV(0,0,height/2),outer_radius,inner_radius);
+    rigid_body.Add_Structure(*new ANALYTIC_IMPLICIT_OBJECT<RING<T> >(ring));
+    rigid_body.Add_Structure(*TESSELLATION::Generate_Triangles(ring,resolution));
+    rigid_body_collection.Add_Rigid_Body_And_Geometry(&rigid_body);
+    return rigid_body;
+}
+//#####################################################################
 // Function Add_Analytic_Sphere
 //#####################################################################
 template<class TV> RIGID_BODY<TV>& RIGIDS_STANDARD_TESTS<TV>::
