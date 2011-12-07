@@ -219,7 +219,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             mattress_grid3=GRID<TV>(15,15,15,(T)-1.5,(T)1.5,(T)-1.5,(T)1.5,(T)-1.5,(T)1.5);
             break;
         case 37: case 38: case 39: case 40: case 41:
-            mattress_grid=GRID<TV>(40,40,40,(T)-1.0,(T)1.0,(T)-1.0,(T)1.0,(T)-1.0,(T)1.0);
+            mattress_grid=GRID<TV>(20,20,20,(T)-1.0,(T)1.0,(T)-1.0,(T)1.0,(T)-1.0,(T)1.0);
             break;
     	default:
             mattress_grid=GRID<TV>(20,10,20,(T)-1,(T)1,(T)-.5,(T).5,(T)-1,(T)1);
@@ -317,8 +317,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             solids_parameters.triangle_collision_parameters.perform_self_collision=true;
-            frame_rate=60;
-            last_frame=700;
+            frame_rate=120;
+            last_frame=1000;
             break;
         case 24:
         case 25:
@@ -783,9 +783,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             }
             break;}
         case 39:{
-            T youngs_modulus = 2.25e5;
+            T youngs_modulus = 5e5;
             T poissons_ratio = .4;
-            T damping = 0;
+            T damping = 0.005;
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume1=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(1);
             Add_Constitutive_Model(tetrahedralized_volume1,youngs_modulus,poissons_ratio,damping,0.4,50);
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume2=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(2);
@@ -802,9 +802,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             }
             break;}
         case 40:{
-            T youngs_modulus = 2.25e5;
+            T youngs_modulus = 5e5;
             T poissons_ratio = .4;
-            T damping = 0;
+            T damping = 0.005;
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume1=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(1);
             Add_Constitutive_Model(tetrahedralized_volume1,youngs_modulus,poissons_ratio,damping,0.4,50);
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume2=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(2);
