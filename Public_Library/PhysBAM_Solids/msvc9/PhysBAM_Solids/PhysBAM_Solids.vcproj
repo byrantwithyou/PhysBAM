@@ -431,6 +431,22 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\PhysBAM_Deformables\Constitutive_Models\COROTATED.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\PhysBAM_Deformables\Constitutive_Models\COROTATED.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\PhysBAM_Deformables\Constitutive_Models\COROTATED_QUARTIC.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\PhysBAM_Deformables\Constitutive_Models\COROTATED_QUARTIC.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\PhysBAM_Deformables\Constitutive_Models\DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE.cpp"
 					>
 				</File>
@@ -468,6 +484,46 @@
 				</File>
 				<File
 					RelativePath="..\..\PhysBAM_Deformables\Constitutive_Models\NEO_HOOKEAN.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\PhysBAM_Deformables\Constitutive_Models\NEO_HOOKEAN_COROTATED_BLEND.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\PhysBAM_Deformables\Constitutive_Models\NEO_HOOKEAN_COROTATED_BLEND.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\PhysBAM_Deformables\Constitutive_Models\NEO_HOOKEAN_EXTRAPOLATED.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\PhysBAM_Deformables\Constitutive_Models\NEO_HOOKEAN_EXTRAPOLATED.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\PhysBAM_Deformables\Constitutive_Models\NEO_HOOKEAN_EXTRAPOLATED_HYPERBOLA.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\PhysBAM_Deformables\Constitutive_Models\NEO_HOOKEAN_EXTRAPOLATED_HYPERBOLA.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\PhysBAM_Deformables\Constitutive_Models\NEO_HOOKEAN_EXTRAPOLATED_REFINED.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\PhysBAM_Deformables\Constitutive_Models\NEO_HOOKEAN_EXTRAPOLATED_REFINED.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\PhysBAM_Deformables\Constitutive_Models\NEO_HOOKEAN_EXTRAPOLATED_SMOOTH.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\PhysBAM_Deformables\Constitutive_Models\NEO_HOOKEAN_EXTRAPOLATED_SMOOTH.h"
 					>
 				</File>
 				<File
