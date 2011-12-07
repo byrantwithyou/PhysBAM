@@ -37,6 +37,7 @@
 //   40. Two jellos running on each other
 //   41. Bunch of jellos rolling towards camera
 //   42. Bunch of jellos rolling towards camera (Reloaded)
+//   43. Through smooth gears
 //   50. Fish through a torus
 //#####################################################################
 #ifndef __STANDARD_TESTS__
@@ -331,6 +332,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             last_frame = 4000;
             break;
         case 33:
+        case 43:
             solids_parameters.cfl=(T)10;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
@@ -742,6 +744,41 @@ void Get_Initial_Data()
             tests.Add_Ground(1);
             break;
         }
+        case 43:{
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_110K.tet",
+                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,2.2,0),ROTATION<TV>(T(pi/2),TV(0,0,0)))),true,true,density,0.008);
+            
+            
+            RIGID_BODY<TV>& gear1=tests.Add_Analytic_Smooth_Gear(TV(1,.4,.1),20,8);
+            gear1.Rotation()=ROTATION<TV>(pi/2,TV(0,0,1));
+            RIGID_BODY<TV>& gear2=tests.Add_Analytic_Smooth_Gear(TV(1,.4,.1),20,8);
+            gear2.Rotation()=ROTATION<TV>(pi/2,TV(0,0,1));
+            gear2.X().z+=3;
+            RIGID_BODY<TV>& cylinder=tests.Add_Analytic_Cylinder(1.5,.15,24);
+
+            gear1.coefficient_of_friction = 1;
+            gear2.coefficient_of_friction = 1;
+            cylinder.coefficient_of_friction = 0;
+
+            kinematic_id=gear1.particle_index;
+            rigid_body_collection.rigid_body_particle.kinematic(gear1.particle_index)=true;
+            kinematic_id2=gear2.particle_index;
+            rigid_body_collection.rigid_body_particle.kinematic(gear2.particle_index)=true;
+            kinematic_id3=cylinder.particle_index;
+            rigid_body_collection.rigid_body_particle.kinematic(cylinder.particle_index)=true;
+            
+            T angular_velocity = 1;
+
+            curve3.Add_Control_Point(0,FRAME<TV>(TV(0,2.75,0),ROTATION<TV>(0,TV(0,0,1))));
+            curve3.Add_Control_Point(0.5,FRAME<TV>(TV(0,2.75,0),ROTATION<TV>(0,TV(0,0,1))));
+            curve3.Add_Control_Point(2,FRAME<TV>(TV(0,2,0),ROTATION<TV>(0,TV(0,0,1))));
+
+            for (int i=0; i<60; i++){
+                curve.Add_Control_Point(i/angular_velocity,FRAME<TV>(TV(-(T).4,1.5,-.75),ROTATION<TV>(-i,TV(0,0,1))));
+                curve2.Add_Control_Point(i/angular_velocity,FRAME<TV>(TV((T).4,1.5,-.75),ROTATION<TV>(i,TV(0,0,1))));}
+
+            tests.Add_Ground();
+            break;}
         default:
             LOG::cerr<<"Initial Data: Unrecognized test number "<<test_number<<std::endl;exit(1);}
 

@@ -44,6 +44,9 @@ DEFORMABLE_GEOMETRY_COLLECTION<TV>& Load_Deformable_Geometry_Collection(const st
 
 void Apply_Options(TRIANGULATED_SURFACE<T>* ts, const HASHTABLE<std::string,std::string>& options)
 {
+    if(options.Contains("preserve_creases")){
+        ts->avoid_normal_interpolation_across_sharp_edges=true;}
+
     if(const std::string* value=options.Get_Pointer("subdivide")){
         int n=atoi(value->c_str());
         if(!n) n=1;
@@ -53,9 +56,6 @@ void Apply_Options(TRIANGULATED_SURFACE<T>* ts, const HASHTABLE<std::string,std:
     if(const std::string* value=options.Get_Pointer("scale")){
         T s=atof(value->c_str());
         if(s!=1) ts->Rescale(s);}
-
-    if(options.Contains("preserve_creases")){
-        ts->avoid_normal_interpolation_across_sharp_edges=true;}
 }
 
 void Emit_Vector(std::ofstream& fout,const TV& v, const char* str="")
