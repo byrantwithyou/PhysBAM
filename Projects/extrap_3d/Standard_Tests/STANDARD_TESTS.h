@@ -536,7 +536,6 @@ void Get_Initial_Data()
             tests.Add_Ground();
             break;}
         case 4: case 29:{
-//            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,true,density);
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_4K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)6,0))),true,true,density,.085);
             tests.Add_Ground();
             last_frame=2000;
