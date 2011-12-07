@@ -22,15 +22,12 @@ template<class T> void Boundary_Points(ARRAY<VECTOR<T,2> >& pts,const SMOOTH_GEA
     typedef VECTOR<T,2> TV;
     TV dc=gear.Co-gear.Ci;
     T hai=atan2(dc.y,dc.x),hao=hai-gear.den/2;
-    printf("angles %g %g %g\n", hai, hao, gear.den/2);
     T cs=cos(gear.den),sn=sin(gear.den);
     MATRIX<T,2> R(cs,sn,-sn,cs);
     int i=0,m=(int)ceil(n*hai/(hai+hao));
     T ds=2*(hai+hao)/n;
     for(;i<m;i++){T a=i*ds-hai;pts.Append(gear.Ci+gear.s*TV(cos(a),sin(a)));}
     for(;i<n;i++){T a=pi+gear.den/2-(i*ds-2*hai-hao);pts.Append(gear.Co+gear.s*TV(cos(a),sin(a)));}
-    printf("boundary points %i %i\n", m, n);
-    for(int i=1;i<=pts.m;i++) Add_Debug_Particle(pts(i),VECTOR<T,3>(1,0,0));
     for(int j=1;j<=(gear.n-1)*n;j++) pts.Append(R*pts(j));
 }
 
