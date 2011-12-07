@@ -285,51 +285,13 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.cfl=(T)5;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             break;
-        case 32:
-            // solids_parameters.cfl=(T)5;
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
+        case 5:
+        case 6:
+            frame_rate=24;
+            last_frame=(int)(3*frame_rate);
+            solids_parameters.cfl=(T)5.9;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
-            solids_parameters.triangle_collision_parameters.perform_self_collision=true;
-            solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=true;
-            solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=true;
-            last_frame = 4000;
-            break;
-        case 33:
-            solids_parameters.cfl=(T)10;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
-            solids_parameters.implicit_solve_parameters.cg_iterations=100000;
-            solids_parameters.triangle_collision_parameters.perform_self_collision=true;
-            frame_rate=120;
-            last_frame=10*120;
-            last_frame=1000;
-            break;
-        case 34:
-            solids_parameters.cfl=(T)5;
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
-            solids_parameters.implicit_solve_parameters.cg_iterations=100000;
-            last_frame = 400;
-            break;
-        case 35: case 36:
-            solids_parameters.cfl=(T)5;
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
-            solids_parameters.implicit_solve_parameters.cg_iterations=100000;
-            solids_parameters.triangle_collision_parameters.perform_self_collision=true;
-           // solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=true;
-           // solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=true;
-            last_frame = 1000;
-            break;
-        case 37:
-        case 38:
-        case 39:
-        case 40:
-        case 41:
-        case 42:
-            solids_parameters.cfl=(T)5;
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
-            solids_parameters.implicit_solve_parameters.cg_iterations=100000;
-            solids_parameters.triangle_collision_parameters.perform_self_collision=true;
-            frame_rate=120;
-            last_frame=1000;
             break;
         case 24:
         case 25:
@@ -359,13 +321,51 @@ void Parse_Options() PHYSBAM_OVERRIDE
             last_frame=2000;
             frame_rate=120;
             break;
-        case 5:
-        case 6:
-            frame_rate=24;
-            last_frame=(int)(3*frame_rate);
-            solids_parameters.cfl=(T)5.9;
-            solids_parameters.implicit_solve_parameters.cg_iterations=100000;
+        case 32:
+            // solids_parameters.cfl=(T)5;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
+            solids_parameters.implicit_solve_parameters.cg_iterations=100000;
+            solids_parameters.triangle_collision_parameters.perform_self_collision=true;
+            solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=true;
+            solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=true;
+            last_frame = 4000;
+            break;
+        case 33:
+            solids_parameters.cfl=(T)10;
+            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
+            solids_parameters.implicit_solve_parameters.cg_iterations=100000;
+            solids_parameters.triangle_collision_parameters.perform_self_collision=true;
+            frame_rate=120;
+            last_frame=10*120;
+            last_frame=1000;
+            break;
+        case 34:
+            solids_parameters.cfl=(T)5;
+            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
+            solids_parameters.implicit_solve_parameters.cg_iterations=100000;
+            last_frame = 400;
+            break;
+        case 35: case 36:
+            solids_parameters.cfl=(T)5;
+            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
+            solids_parameters.implicit_solve_parameters.cg_iterations=100000;
+            solids_parameters.triangle_collision_parameters.perform_self_collision=true;
+            // solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=true;
+            // solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=true;
+            last_frame = 1000;
+            break;
+        case 37:
+        case 38:
+        case 39:
+        case 40:
+        case 41:
+        case 42:
+            solids_parameters.cfl=(T)5;
+            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
+            solids_parameters.implicit_solve_parameters.cg_iterations=100000;
+            solids_parameters.triangle_collision_parameters.perform_self_collision=true;
+            frame_rate=120;
+            last_frame=1000;
             break;
         case 48:
             frame_rate=24;
@@ -679,19 +679,6 @@ void Get_Initial_Data()
             tests.Add_Ground(1);
             break;
         }
-        case 42:
-        {
-            int number_of_jellos = 13;
-
-            for (int i=1; i<=number_of_jellos; i++)
-            {
-                jello_centers.Append(TV(5.3*sin(277*i),8+4*cos(123*i),5.3*cos(297*i)));
-                RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(jello_centers(i),ROTATION<TV>(10*sin(178*i),TV(sin(145*i),cos(345*i),cos(478*i)))));
-                tests.Create_Mattress(mattress_grid,true,&initial_state);
-            }
-            tests.Add_Ground(1);
-            break;
-        }
         case 39:
         {
             RIGID_BODY_STATE<TV> initial_state1(FRAME<TV>(TV(1,8,1.5),ROTATION<TV>(T(pi/4),TV(1.3,0.3,0.7)))); 
@@ -710,6 +697,20 @@ void Get_Initial_Data()
             tests.Add_Ground(1);
             break;
         }
+        case 42:
+        {
+            int number_of_jellos = 13;
+
+            for (int i=1; i<=number_of_jellos; i++)
+            {
+                jello_centers.Append(TV(5.3*sin(277*i),8+4*cos(123*i),5.3*cos(297*i)));
+                RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(jello_centers(i),ROTATION<TV>(10*sin(178*i),TV(sin(145*i),cos(345*i),cos(478*i)))));
+                tests.Create_Mattress(mattress_grid,true,&initial_state);
+            }
+            tests.Add_Ground(1);
+            break;
+        }
+
         case 50:
         {
             RIGID_BODY<TV>& torus1=tests.Add_Analytic_Torus((T)1.4,(T)1.6,32,64);
@@ -938,6 +939,50 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             }
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             break;}
+        case 39:{
+            T youngs_modulus = 4e5;
+            T poissons_ratio = .4;
+            T damping = 0.001;
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume1=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(1);
+            Add_Constitutive_Model(tetrahedralized_volume1,youngs_modulus,poissons_ratio,damping,0.4,50);
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume2=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(2);
+            Add_Constitutive_Model(tetrahedralized_volume2,youngs_modulus,poissons_ratio,damping,0.4,50);
+            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            int m=mattress_grid.counts.x;
+            int n=mattress_grid.counts.y;
+            int mn=mattress_grid.counts.z;
+            for(int i=1;i<=m;i++)
+                for(int j=1;j<=n;j++)
+                    for(int ij=1;ij<=mn;ij++)
+                    {
+                        particles.V(i+m*(j-1)+m*n*(ij-1)) = TV(-2*sin(j/(T)n),-cos(2*ij/(T)mn)*2,-2*sin(3*i/(T)m));
+                    }
+            break;}
+        case 40:{
+            T youngs_modulus = 4e5;
+            T poissons_ratio = .4;
+            T damping = 0.001;
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume1=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(1);
+            Add_Constitutive_Model(tetrahedralized_volume1,youngs_modulus,poissons_ratio,damping,0.4,50);
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume2=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(2);
+            Add_Constitutive_Model(tetrahedralized_volume2,youngs_modulus,poissons_ratio,damping,0.4,50);
+            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            int m=mattress_grid.counts.x;
+            int n=mattress_grid.counts.y;
+            int mn=mattress_grid.counts.z;
+            for(int i=1;i<=m;i++)
+                for(int j=1;j<=n;j++)
+                    for(int ij=1;ij<=mn;ij++)
+                    {
+                        particles.V(i+m*(j-1)+m*n*(ij-1)) = TV(-2*sin(j/(T)n)+20,-cos(2*ij/(T)mn)*2-5,-2*sin(3*i/(T)m));
+                        particles.V(i+m*(j-1)+m*n*(ij-1)+m*n*mn) = TV(1*sin(2*ij/(T)mn)-20,0.5*cos(3*i/(T)m)*2-5,1*sin(j/(T)n));
+                    }
+            for (int i=1; i<=m*n*mn; i++)
+            {
+                particles.V(i) += TV(particles.X(i).y-2.4,-(particles.X(i).x+30),0)*10;
+                particles.V(i+m*n*mn) += TV(-(particles.X(i).y-2.5),(particles.X(i).x+30),0)*10;
+            }
+            break;}
         case 42:{
             T youngs_modulus = 4e5;
             T poissons_ratio = .4;
@@ -962,50 +1007,6 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 }
             }
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
-            break;}
-        case 39:{
-            T youngs_modulus = 4e5;
-            T poissons_ratio = .4;
-            T damping = 0.001;
-            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume1=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(1);
-            Add_Constitutive_Model(tetrahedralized_volume1,youngs_modulus,poissons_ratio,damping,0.4,50);
-            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume2=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(2);
-            Add_Constitutive_Model(tetrahedralized_volume2,youngs_modulus,poissons_ratio,damping,0.4,50);
-            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
-            int m=mattress_grid.counts.x;
-            int n=mattress_grid.counts.y;
-            int mn=mattress_grid.counts.z;
-            for(int i=1;i<=m;i++)
-            for(int j=1;j<=n;j++)
-            for(int ij=1;ij<=mn;ij++)
-            {
-                particles.V(i+m*(j-1)+m*n*(ij-1)) = TV(-2*sin(j/(T)n),-cos(2*ij/(T)mn)*2,-2*sin(3*i/(T)m));
-            }
-            break;}
-        case 40:{
-            T youngs_modulus = 4e5;
-            T poissons_ratio = .4;
-            T damping = 0.001;
-            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume1=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(1);
-            Add_Constitutive_Model(tetrahedralized_volume1,youngs_modulus,poissons_ratio,damping,0.4,50);
-            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume2=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(2);
-            Add_Constitutive_Model(tetrahedralized_volume2,youngs_modulus,poissons_ratio,damping,0.4,50);
-            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
-            int m=mattress_grid.counts.x;
-            int n=mattress_grid.counts.y;
-            int mn=mattress_grid.counts.z;
-            for(int i=1;i<=m;i++)
-            for(int j=1;j<=n;j++)
-            for(int ij=1;ij<=mn;ij++)
-            {
-                particles.V(i+m*(j-1)+m*n*(ij-1)) = TV(-2*sin(j/(T)n)+20,-cos(2*ij/(T)mn)*2-5,-2*sin(3*i/(T)m));
-                particles.V(i+m*(j-1)+m*n*(ij-1)+m*n*mn) = TV(1*sin(2*ij/(T)mn)-20,0.5*cos(3*i/(T)m)*2-5,1*sin(j/(T)n));
-            }
-            for (int i=1; i<=m*n*mn; i++)
-            {
-                particles.V(i) += TV(particles.X(i).y-2.4,-(particles.X(i).x+30),0)*10;
-                particles.V(i+m*n*mn) += TV(-(particles.X(i).y-2.5),(particles.X(i).x+30),0)*10;
-            }
             break;}
         case 50:{
             T youngs_modulus = 1e5;
