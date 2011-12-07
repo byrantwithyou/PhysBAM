@@ -344,8 +344,9 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 31:
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
-            last_frame=1500;
-            frame_rate=60;
+            solids_parameters.triangle_collision_parameters.perform_self_collision=true;
+            last_frame=2000;
+            frame_rate=120;
             break;
         case 5:
         case 6:
@@ -635,14 +636,15 @@ void Get_Initial_Data()
             last_frame=250;
             break;}        
         case 31: {
-            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/buddha.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T)4.95,(T)0))),true,true,density,5);
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/bunny.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T)2.34,(T)0),ROTATION<TV>((T)pi,TV(0,1,0)))),true,true,density,5);
             RIGID_BODY<TV>& sphere=tests.Add_Analytic_Sphere(1.2,density,5);
             sphere.is_static=false;
+            sphere.coefficient_of_friction=0;
             tests.Add_Ground();            
             kinematic_id=sphere.particle_index;
             rigid_body_collection.rigid_body_particle.kinematic(sphere.particle_index)=true;
-            curve.Add_Control_Point(0,FRAME<TV>(TV(0,4.8,-50)));
-            curve.Add_Control_Point(40,FRAME<TV>(TV(0,4.8,350)));
+            curve.Add_Control_Point(0,FRAME<TV>(TV(0,1.8,-50)));
+            curve.Add_Control_Point(100,FRAME<TV>(TV(0,1.8,950)));
             break;}
         case 5:{
             RIGID_BODY<TV>& tmp_sphere=tests.Add_Rigid_Body("sphere",(T)1.0,(T).5);
