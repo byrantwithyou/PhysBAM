@@ -33,6 +33,7 @@ public:
     RIGID_BODY<TV>& Add_Analytic_Box(const VECTOR<T,3>& scaling_factor);
     RIGID_BODY<TV>& Add_Analytic_Torus(const T inner_radius,const T outer_radius,int inner_resolution=8,int outer_resolution=16);
     RIGID_BODY<TV>& Add_Analytic_Cylinder(const T height,const T radius,int resolution_radius=16,int resolution_height=4);
+    RIGID_BODY<TV>& Add_Analytic_Shell(const T height,const T outer_radius,const T inner_radius,int resolution=40);
     RIGID_BODY<TV>& Add_Analytic_Sphere(const T radius,const T density,int levels=4);
     void Make_Lathe_Chain(const FRAME<TV>& frame,const T scale=1,const T friction=(T).6,const T cor=(T).3);
     void Set_Joint_Frames(JOINT_ID id,const TV& location);

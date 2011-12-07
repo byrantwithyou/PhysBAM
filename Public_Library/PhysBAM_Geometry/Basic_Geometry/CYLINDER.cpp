@@ -14,7 +14,7 @@ template<class T> VECTOR<T,3> CYLINDER<T>::
 Normal(const TV& location,const int aggregate) const 
 {
     assert(aggregate >= 1 && aggregate <= 3);
-    if(aggregate == 1) return (location-plane1.x1).Projected_Orthogonal_To_Unit_Direction(plane1.normal).Normalized(); // cylinder
+    if(aggregate == 1) return (location-plane1.x1).Projected_Orthogonal_To_Unit_Direction(plane1.normal).Normalized(); // CYLINDER
     else if(aggregate == 2) return plane1.Normal();
     else return plane2.Normal();
 }
@@ -71,7 +71,7 @@ Surface(const TV& location) const
     TV v=location-plane1.x1;T axial_distance=-TV::Dot_Product(v,plane1.normal);
     TV radial_direction=v+axial_distance*plane1.normal;T radial_distance=radial_direction.Normalize();
     T radial_distance_minus_radius=radial_distance-radius;
-    if(radial_distance_minus_radius>0 || (radial_distance_minus_radius>-axial_distance && radial_distance_minus_radius>axial_distance-height)) // closest point is on infinite cylinder
+    if(radial_distance_minus_radius>0 || (radial_distance_minus_radius>-axial_distance && radial_distance_minus_radius>axial_distance-height)) // closest point is on infinite CYLINDER
         return plane1.x1-clamp(axial_distance,(T)0,height)*plane1.normal+radius*radial_direction;
     if(axial_distance < height-axial_distance) return location+axial_distance*plane1.normal; // closest point is on plane1
     else return location-(height-axial_distance)*plane1.normal; // closest point is on plane2
