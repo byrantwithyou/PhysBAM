@@ -528,13 +528,13 @@ void Get_Initial_Data()
             break;}        
         case 31: {
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/bunny.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T)2.34,(T)0),ROTATION<TV>((T)pi,TV(0,1,0)))),true,true,density,5);
-            RIGID_BODY<TV>& sphere=tests.Add_Analytic_Sphere(1,density,5);
+            RIGID_BODY<TV>& sphere=tests.Add_Analytic_Sphere(1.1,density,5);
             sphere.is_static=false;
             tests.Add_Ground();            
             kinematic_id=sphere.particle_index;
             rigid_body_collection.rigid_body_particle.kinematic(sphere.particle_index)=true;
-            curve.Add_Control_Point(0,FRAME<TV>(TV(0,1.5,-75)));
-            curve.Add_Control_Point(100,FRAME<TV>(TV(0,1.5,1425)));
+            curve.Add_Control_Point(0,FRAME<TV>(TV(0,1.5,-50)));
+            curve.Add_Control_Point(100,FRAME<TV>(TV(0,1.5,950)));
             break;}
 
         case 32:{
@@ -842,7 +842,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 31:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
-            Add_Constitutive_Model(tetrahedralized_volume,(T)5e5,(T).45,(T).01);
+            Add_Constitutive_Model(tetrahedralized_volume,(T)5e4,(T).45,(T).01);
             solid_body_collection.template Find_Force<GRAVITY<TV>&>().gravity=0.5;
             break;} 
         case 32:{
