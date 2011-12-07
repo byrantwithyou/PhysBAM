@@ -173,7 +173,7 @@ Finish_Backward_Euler_Step(KRYLOV_SYSTEM_BASE<T>& system,const T dt,const T curr
 
             // No friction for these, so reproject them.
             solid_body_collection.rigid_body_collection.articulated_rigid_body.Poststabilization_Projection(rigid_body_particles.twist,true);
-            Zero_Out_Enslaved_Velocity_Nodes(particles.V,current_position_time,current_position_time);
+            solid_body_collection.example_forces_and_velocities->Zero_Out_Enslaved_Velocity_Nodes(particles.V,current_position_time,current_position_time);
             Zero_Out_Enslaved_Velocity_Nodes(rigid_body_particles.twist,current_position_time,current_position_time);
             
             if(solid_body_collection.rigid_body_collection.articulated_rigid_body.Has_Actuators() && solid_body_collection.rigid_body_collection.articulated_rigid_body.constrain_pd_directions){
