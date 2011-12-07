@@ -257,6 +257,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     semi_implicit=parse_args->Is_Value_Set("-semi_implicit");
     if(parse_args->Is_Value_Set("-project_nullspace")) solids_parameters.implicit_solve_parameters.project_nullspace_frequency=1;
     solids_parameters.implicit_solve_parameters.cg_projection_iterations=parse_args->Get_Integer_Value("-projection_iterations");
+    solids_parameters.deformable_object_collision_parameters.collide_with_interior=true;
 
     switch(test_number){
         case 1:
@@ -1058,7 +1059,6 @@ void Update_Time_Varying_Material_Properties(const T time)
         T critical2=(T)3.5;
         T start_young=(T)4; T end_young=(T)5;
         if(time>critical && time<critical2) {
-            
             DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
             FINITE_VOLUME<TV,3>& fv = deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
             CONSTITUTIVE_MODEL<T,3>& icm = fv.constitutive_model;
