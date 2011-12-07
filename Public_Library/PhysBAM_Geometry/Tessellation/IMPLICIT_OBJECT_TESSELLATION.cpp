@@ -12,6 +12,7 @@
 #include <PhysBAM_Geometry/Basic_Geometry/ORIENTED_BOX.h>
 #include <PhysBAM_Geometry/Basic_Geometry/PLANE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/RING.h>
+#include <PhysBAM_Geometry/Basic_Geometry/SMOOTH_GEAR.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TORUS.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/DUALCONTOUR_3D.h>
@@ -26,6 +27,7 @@
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
 #include <PhysBAM_Geometry/Tessellation/BOUNDED_HORIZONTAL_PLANE_TESSELLATION.h>
 #include <PhysBAM_Geometry/Tessellation/CYLINDER_TESSELLATION.h>
+#include <PhysBAM_Geometry/Tessellation/GEAR_TESSELLATION.h>
 #include <PhysBAM_Geometry/Tessellation/IMPLICIT_OBJECT_TESSELLATION.h>
 #include <PhysBAM_Geometry/Tessellation/ORIENTED_BOX_TESSELLATION.h>
 #include <PhysBAM_Geometry/Tessellation/PLANE_TESSELLATION.h>
@@ -128,6 +130,7 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(IMPLICIT_OBJECT<VE
     else if(const ANALYTIC_IMPLICIT_OBJECT<PLANE<T> >* implicit=dynamic_cast<const ANALYTIC_IMPLICIT_OBJECT<PLANE<T> >*>(&implicit_input)) return Generate_Triangles(implicit->analytic);
     else if(const ANALYTIC_IMPLICIT_OBJECT<RING<T> >* implicit=dynamic_cast<const ANALYTIC_IMPLICIT_OBJECT<RING<T> >*>(&implicit_input)) return Generate_Triangles(implicit->analytic);
     else if(const ANALYTIC_IMPLICIT_OBJECT<SPHERE<TV> >* implicit=dynamic_cast<const ANALYTIC_IMPLICIT_OBJECT<SPHERE<TV> >*>(&implicit_input)) return Generate_Triangles(implicit->analytic);
+    else if(const ANALYTIC_IMPLICIT_OBJECT<SMOOTH_GEAR<TV> >* implicit=dynamic_cast<const ANALYTIC_IMPLICIT_OBJECT<SMOOTH_GEAR<TV> >*>(&implicit_input)) return Generate_Triangles(implicit->analytic);
     else if(const ANALYTIC_IMPLICIT_OBJECT<BOUNDED_HORIZONTAL_PLANE<TV> >* implicit=dynamic_cast<const ANALYTIC_IMPLICIT_OBJECT<BOUNDED_HORIZONTAL_PLANE<TV> >*>(&implicit_input)) return Generate_Triangles(implicit->analytic);
     else if(const ANALYTIC_IMPLICIT_OBJECT<ORIENTED_BOX<TV> >* implicit=dynamic_cast<const ANALYTIC_IMPLICIT_OBJECT<ORIENTED_BOX<TV> >*>(&implicit_input)) return Generate_Triangles(implicit->analytic);
     else if(const ANALYTIC_IMPLICIT_OBJECT<BOX<TV> >* implicit=dynamic_cast<const ANALYTIC_IMPLICIT_OBJECT<BOX<TV> >*>(&implicit_input)) return Generate_Triangles(implicit->analytic);

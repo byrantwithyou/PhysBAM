@@ -5,6 +5,7 @@
 // Class READ_WRITE_ANALYTIC_IMPLICIT_OBJECT
 //#####################################################################
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
+#include <PhysBAM_Geometry/Basic_Geometry/SMOOTH_GEAR.h>
 #include <PhysBAM_Geometry/Read_Write/Implicit_Objects/READ_WRITE_ANALYTIC_IMPLICIT_OBJECT.h>
 namespace PhysBAM{
 
@@ -18,6 +19,7 @@ void Register_Read_Write_Analytic_Implicit_Object()
     Read_Write<STRUCTURE<VECTOR<T,2> >,RW>::Register_Read_Write<ANALYTIC_IMPLICIT_OBJECT<LINE_2D<T> > >(); \
     Read_Write<STRUCTURE<VECTOR<T,2> >,RW>::Register_Read_Write<ANALYTIC_IMPLICIT_OBJECT<ORIENTED_BOX<VECTOR<T,2> > > >(); \
     Read_Write<STRUCTURE<VECTOR<T,2> >,RW>::Register_Read_Write<ANALYTIC_IMPLICIT_OBJECT<SPHERE<VECTOR<T,2> > > >(); \
+    Read_Write<STRUCTURE<VECTOR<T,2> >,RW>::Register_Read_Write<ANALYTIC_IMPLICIT_OBJECT<SMOOTH_GEAR<VECTOR<T,2> > > >(); \
     Read_Write<STRUCTURE<VECTOR<T,3> >,RW>::Register_Read_Write<ANALYTIC_IMPLICIT_OBJECT<BOX<VECTOR<T,3> > > >(); \
     Read_Write<STRUCTURE<VECTOR<T,3> >,RW>::Register_Read_Write<ANALYTIC_IMPLICIT_OBJECT<ORIENTED_BOX<VECTOR<T,3> > > >(); \
     Read_Write<STRUCTURE<VECTOR<T,3> >,RW>::Register_Read_Write<ANALYTIC_IMPLICIT_OBJECT<PLANE<T> > >(); \
@@ -25,6 +27,7 @@ void Register_Read_Write_Analytic_Implicit_Object()
     Read_Write<STRUCTURE<VECTOR<T,3> >,RW>::Register_Read_Write<ANALYTIC_IMPLICIT_OBJECT<CYLINDER<T> > >(); \
     Read_Write<STRUCTURE<VECTOR<T,3> >,RW>::Register_Read_Write<ANALYTIC_IMPLICIT_OBJECT<RING<T> > >(); \
     Read_Write<STRUCTURE<VECTOR<T,3> >,RW>::Register_Read_Write<ANALYTIC_IMPLICIT_OBJECT<SPHERE<VECTOR<T,3> > > >(); \
+    Read_Write<STRUCTURE<VECTOR<T,3> >,RW>::Register_Read_Write<ANALYTIC_IMPLICIT_OBJECT<SMOOTH_GEAR<VECTOR<T,3> > > >(); \
     Read_Write<STRUCTURE<VECTOR<T,3> >,RW>::Register_Read_Write<ANALYTIC_IMPLICIT_OBJECT<TORUS<T> > >();
 
 #ifdef COMPILE_WITHOUT_DOUBLE_SUPPORT

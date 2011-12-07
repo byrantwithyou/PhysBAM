@@ -8,6 +8,7 @@
 #include <PhysBAM_Geometry/Basic_Geometry/BOUNDED_HORIZONTAL_PLANE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/CYLINDER.h>
 #include <PhysBAM_Geometry/Basic_Geometry/RING.h>
+#include <PhysBAM_Geometry/Basic_Geometry/SMOOTH_GEAR.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TORUS.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY.h>
@@ -15,6 +16,7 @@
 #include <PhysBAM_Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Tessellation/CYLINDER_TESSELLATION.h>
+#include <PhysBAM_Geometry/Tessellation/GEAR_TESSELLATION.h>
 #include <PhysBAM_Geometry/Tessellation/IMPLICIT_OBJECT_TESSELLATION.h>
 #include <PhysBAM_Geometry/Tessellation/RANGE_TESSELLATION.h>
 #include <PhysBAM_Geometry/Tessellation/SPHERE_TESSELLATION.h>
@@ -71,6 +73,19 @@ static IMPLICIT_OBJECT<VECTOR<T,3> >* Add_Analytic_Ring(const VECTOR<T,3>&,const
 {
     T half_height=(T).5*scaling_factor;
     return new ANALYTIC_IMPLICIT_OBJECT<RING<T> >(RING<T>(VECTOR<T,3>(0,-half_height,0),VECTOR<T,3>(0,half_height,0),(T)3*scaling_factor,(T)2*scaling_factor));
+}
+//#####################################################################
+// Function Add_Analytic_Smooth_Gear
+//#####################################################################
+template<class T>
+static IMPLICIT_OBJECT<VECTOR<T,2> >* Add_Analytic_Smooth_Gear(T r,T s,int n)
+{
+    return new ANALYTIC_IMPLICIT_OBJECT<SMOOTH_GEAR<VECTOR<T,2> > >(SMOOTH_GEAR<VECTOR<T,2> >(r,s,n));
+}
+template<class T>
+static IMPLICIT_OBJECT<VECTOR<T,3> >* Add_Analytic_Smooth_Gear(T r,T s,T w,int n)
+{
+    return new ANALYTIC_IMPLICIT_OBJECT<SMOOTH_GEAR<VECTOR<T,3> > >(SMOOTH_GEAR<VECTOR<T,3> >(r,s,n,w));
 }
 //#####################################################################
 // Function Add_Analytic_Ground
@@ -226,6 +241,19 @@ Add_Analytic_Shell(const T height,const T outer_radius,const T inner_radius,int 
     return rigid_body;
 }
 //#####################################################################
+// Function Add_Analytic_Smooth_Gear
+//#####################################################################
+template<class TV> RIGID_BODY<TV>& RIGIDS_STANDARD_TESTS<TV>::
+Add_Analytic_Smooth_Gear(const TV& dimensions,int cogs,int levels)
+{
+    RIGID_BODY<TV>& rigid_body=*new RIGID_BODY<TV>(rigid_body_collection,true);
+    SMOOTH_GEAR<TV> gear(dimensions,cogs);
+    rigid_body.Add_Structure(*new ANALYTIC_IMPLICIT_OBJECT<SMOOTH_GEAR<TV> >(gear));
+    rigid_body.Add_Structure(*TESSELLATION::Generate_Triangles(gear,levels));
+    rigid_body_collection.Add_Rigid_Body_And_Geometry(&rigid_body);
+    return rigid_body;
+}
+//#####################################################################
 // Function Add_Analytic_Sphere
 //#####################################################################
 template<class TV> RIGID_BODY<TV>& RIGIDS_STANDARD_TESTS<TV>::
@@ -314,10 +342,13 @@ INSTANTIATION_HELPER(float);
 template JOINT_ID RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Connect_With_Point_Joint(RIGID_BODY<VECTOR<float,3> >&,RIGID_BODY<VECTOR<float,3> >&,VECTOR<float,3> const&);
 template RIGID_BODY<VECTOR<float,2> >& RIGIDS_STANDARD_TESTS<VECTOR<float,2> >::Add_Analytic_Sphere(float,float,int);
 template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Analytic_Sphere(float,float,int);
+template RIGID_BODY<VECTOR<float,2> >& RIGIDS_STANDARD_TESTS<VECTOR<float,2> >::Add_Analytic_Smooth_Gear(VECTOR<float,2> const&,int,int);
+template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Analytic_Smooth_Gear(VECTOR<float,3> const&,int,int);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 INSTANTIATION_HELPER(double);
 template JOINT_ID RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Connect_With_Point_Joint(RIGID_BODY<VECTOR<double,3> >&,RIGID_BODY<VECTOR<double,3> >&,VECTOR<double,3> const&);
 template RIGID_BODY<VECTOR<double,2> >& RIGIDS_STANDARD_TESTS<VECTOR<double,2> >::Add_Analytic_Sphere(double,double,int);
 template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Analytic_Sphere(double,double,int);
+template RIGID_BODY<VECTOR<double,2> >& RIGIDS_STANDARD_TESTS<VECTOR<double,2> >::Add_Analytic_Smooth_Gear(VECTOR<double,2> const&,int,int);
+template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Analytic_Smooth_Gear(VECTOR<double,3> const&,int,int);
 #endif
-
