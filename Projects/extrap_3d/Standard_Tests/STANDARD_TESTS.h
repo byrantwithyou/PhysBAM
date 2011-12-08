@@ -225,11 +225,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
             mattress_grid2=GRID<TV>(12,12,12,(T)-1.2,(T)1.2,(T)-1.2,(T)1.2,(T)-1.2,(T)1.2);
             mattress_grid3=GRID<TV>(15,15,15,(T)-1.5,(T)1.5,(T)-1.5,(T)1.5,(T)-1.5,(T)1.5);
             break;
-        case 37: case 39: case 40:
-            mattress_grid=GRID<TV>(30,30,30,(T)-1.0,(T)1.0,(T)-1.0,(T)1.0,(T)-1.0,(T)1.0);
-            break;
-        case 38: case 41: case 42:
-            mattress_grid=GRID<TV>(20,20,20,(T)-1.0,(T)1.0,(T)-1.0,(T)1.0,(T)-1.0,(T)1.0);
+        case 37: case 39: case 40: case 38: case 41: case 42:
+            mattress_grid=GRID<TV>(40,40,40,(T)-1.0,(T)1.0,(T)-1.0,(T)1.0,(T)-1.0,(T)1.0);
             break;
     	default:
             mattress_grid=GRID<TV>(20,10,20,(T)-1,(T)1,(T)-.5,(T).5,(T)-1,(T)1);
@@ -665,7 +662,7 @@ void Get_Initial_Data()
             RIGID_BODY_STATE<TV> initial_state2(FRAME<TV>(TV(0,2.2,0),ROTATION<TV>(T(pi/7),TV(0.5,2,0.3))));
             tests.Create_Mattress(mattress_grid,true,&initial_state1);
             tests.Create_Mattress(mattress_grid,true,&initial_state2);
-            tests.Add_Ground(1);
+            tests.Add_Ground();
             break;
         }
         case 38:
@@ -678,7 +675,7 @@ void Get_Initial_Data()
                 RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(jello_centers(i),ROTATION<TV>(10*sin(178*i),TV(sin(145*i),cos(345*i),cos(478*i)))));
                 tests.Create_Mattress(mattress_grid,true,&initial_state);
             }
-            tests.Add_Ground(1);
+            tests.Add_Ground();
             break;
         }
         case 39:
@@ -687,7 +684,7 @@ void Get_Initial_Data()
             RIGID_BODY_STATE<TV> initial_state2(FRAME<TV>(TV(0,1,0)));
             tests.Create_Mattress(mattress_grid,true,&initial_state1);
             tests.Create_Mattress(mattress_grid,true,&initial_state2);
-            tests.Add_Ground(1);
+            tests.Add_Ground();
             break;
         }
         case 40:
@@ -696,20 +693,22 @@ void Get_Initial_Data()
             RIGID_BODY_STATE<TV> initial_state2(FRAME<TV>(TV(30,2.5,0.5),ROTATION<TV>(T(pi/5),TV(0.7,1,0.1))));
             tests.Create_Mattress(mattress_grid,true,&initial_state1);
             tests.Create_Mattress(mattress_grid,true,&initial_state2);
-            tests.Add_Ground(1);
+            tests.Add_Ground();
             break;
         }
         case 42:
         {
-            int number_of_jellos = 13;
-
-            for (int i=1; i<=number_of_jellos; i++)
+            int count = 0;
+            for (int i=1; i<=3; i++)
+            for (int j=1; j<=3; j++)
+            for (int k=1; k<=3; k++)
             {
-                jello_centers.Append(TV(5.3*sin(277*i),8+4*cos(123*i),5.3*cos(297*i)));
-                RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(jello_centers(i),ROTATION<TV>(10*sin(178*i),TV(sin(145*i),cos(345*i),cos(478*i)))));
+                count++;
+                jello_centers.Append(TV(-100+i*5,j*5+3,k*5+sin(75*count)));
+                RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(jello_centers(count),ROTATION<TV>(10*sin(178*count),TV(sin(145*count),cos(345*count),cos(478*count)))));
                 tests.Create_Mattress(mattress_grid,true,&initial_state);
             }
-            tests.Add_Ground(1);
+            tests.Add_Ground(0.1);
             break;
         }
 
@@ -1039,12 +1038,13 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 for(int j=1;j<=n;j++)
                 for(int ij=1;ij<=mn;ij++)
                 {
-                    particles.V(i+m*(j-1)+m*n*(ij-1)+(k-1)*m*n*mn) = TV(-3*sin(sin(127*k)*j/(T)n)+15+sin(371*k),-5*cos(sin(384*k)*4*ij/(T)mn)*2+(2+4*sin(380*k)),-0.5*sin(3*i*sin(457*k)/(T)m));
+                    particles.V(i+m*(j-1)+m*n*(ij-1)+(k-1)*m*n*mn) = TV(-2*sin(sin(127*k)*j/(T)n)+17+4*sin(181*k),-3*cos(sin(384*k)*4*ij/(T)mn)*2+(2+4*sin(461*k)),1.5*sin(3*i*sin(457*k)/(T)m));
                 }
                 for (int i=1; i<=m*n*mn; i++)
                 {
                     int index = i+(k-1)*m*n*mn;
-                    particles.V(index) += TV(particles.X(index).y-jello_centers(k).y,-(particles.X(index).x-jello_centers(k).x),0)*(7.5+sin(453*k));
+                    particles.V(index) += TV(particles.X(index).y-jello_centers(k).y,-(particles.X(index).x-jello_centers(k).x),0)*(6+2*sin(453*k));
+                    particles.V(index) += TV(0,particles.X(index).z-jello_centers(k).z,-(particles.X(index).y-jello_centers(k).y))*(cos(413*k));
                 }
             }
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
