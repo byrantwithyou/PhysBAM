@@ -110,6 +110,7 @@ public:
     bool use_mooney_rivlin,use_extended_mooney_rivlin;
     bool use_corot_blend;
     bool dump_sv;
+    bool override_collisions,override_no_collisions;
     int kinematic_id,kinematic_id2,kinematic_id3;
     INTERPOLATION_CURVE<T,FRAME<TV> > curve,curve2,curve3;
     bool print_matrix;
@@ -194,6 +195,8 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Integer_Argument("-solver_iterations",1000,"number of iterations used for solids system");
     parse_args->Add_Option_Argument("-use_constant_ife","use constant extrapolation on inverting finite element fix");
     parse_args->Add_Option_Argument("-test_system");
+    parse_args->Add_Option_Argument("-collisions","Does not yet work in all sims, see code for details");
+    parse_args->Add_Option_Argument("-no_collisions","Does not yet work in all sims, see code for details");
 }
 //#####################################################################
 // Function Parse_Options
@@ -262,6 +265,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
     dump_sv=parse_args->Is_Value_Set("-dump_sv");
     use_constant_ife=parse_args->Get_Option_Value("-use_constant_ife");
     solids_parameters.implicit_solve_parameters.test_system=parse_args->Is_Value_Set("-test_system");
+    override_collisions=parse_args->Is_Value_Set("-collisions");
+    override_no_collisions=parse_args->Is_Value_Set("-no_collisions")&&(!override_collisions);
     
     semi_implicit=parse_args->Is_Value_Set("-semi_implicit");
     if(parse_args->Is_Value_Set("-project_nullspace")) solids_parameters.implicit_solve_parameters.project_nullspace_frequency=1;
@@ -311,6 +316,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 29: case 30:
             solids_parameters.cfl=(T)5;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
+            solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=override_collisions;
             frame_rate=24;
             break;
         case 31:
@@ -377,9 +383,9 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.implicit_solve_parameters.throw_exception_on_backward_euler_failure=false;
             break;
         case 50:
-            solids_parameters.triangle_collision_parameters.perform_self_collision=true;
-            solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=true;
-            solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=true;
+            solids_parameters.triangle_collision_parameters.perform_self_collision=override_collisions;
+            //solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=true;
+            //solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=true;
             solids_parameters.cfl=(T)5;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             break;
