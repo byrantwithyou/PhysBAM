@@ -523,7 +523,7 @@ void Get_Initial_Data()
             RIGID_BODY<TV>& box1=tests.Add_Analytic_Box(TV(3,20,20));
             box1.X()=TV(10,10,10);
             box1.is_static=true;
-            tests.Add_Ground();
+            tests.Add_Ground(0);
             last_frame=250;
             break;}        
         case 31: {
@@ -533,8 +533,8 @@ void Get_Initial_Data()
             tests.Add_Ground();            
             kinematic_id=sphere.particle_index;
             rigid_body_collection.rigid_body_particle.kinematic(sphere.particle_index)=true;
-            curve.Add_Control_Point(0,FRAME<TV>(TV(0,1.5,-50)));
-            curve.Add_Control_Point(100,FRAME<TV>(TV(0,1.5,950)));
+            curve.Add_Control_Point(0,FRAME<TV>(TV(0.5,1.5,-50)));
+            curve.Add_Control_Point(100,FRAME<TV>(TV(0.5,1.5,950)));
             break;}
 
         case 32:{
