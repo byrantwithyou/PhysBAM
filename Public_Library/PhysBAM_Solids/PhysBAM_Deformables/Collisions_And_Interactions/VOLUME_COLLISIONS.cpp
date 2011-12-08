@@ -87,16 +87,17 @@ Compute_Collision_Triangles(T_OBJECT& obj1,T_OBJECT& obj2)
 {
     VOLUME_COLLISIONS_VISITOR<TV> visitor(obj1,obj2);
     obj1.hierarchy->Intersection_List(*obj2.hierarchy,visitor,ZERO());
+    if(visitor.pairs.m==0) return;
 
-    //HASHTABLE<int> visited_particles1;
-    //HASHTABLE<int> visited_particles2;
+    HASHTABLE<int> visited_particles1;
+    HASHTABLE<int> visited_particles2;
     HASHTABLE<VECTOR<int,TV::m*2>,int> to_process;
     ARRAY_VIEW<TV> X(obj1.particles.X);
 
     for(int m=1;m<=visitor.pairs.m;m++){
         int a,b;visitor.pairs(m).Get(a,b);
-        //visited_particles1.Set_All(obj1.mesh.elements(a));
-        //visited_particles2.Set_All(obj2.mesh.elements(b));
+        visited_particles1.Set_All(obj1.mesh.elements(a));
+        visited_particles2.Set_All(obj2.mesh.elements(b));
         for(int i=1;i<=TV::m+1;i++){
             for(int j=1;j<=TV::m+1;j++){
                 VECTOR<int,TV::m*2> I;
@@ -106,12 +107,12 @@ Compute_Collision_Triangles(T_OBJECT& obj1,T_OBJECT& obj2)
                 int sign=Sort_Pair(I);
                 to_process.Get_Or_Insert(I)+=sign;}}}
 
-    //TV x0;
-    //for(HASHTABLE<int>::ITERATOR it(visited_particles1);it.Valid();it.Next())
-    //    x0+=obj1.particles.X(it.Key());
-    //for(HASHTABLE<int>::ITERATOR it(visited_particles2);it.Valid();it.Next())
-    //    x0+=obj2.particles.X(it.Key());
-    //x0/=static_cast<T>(visited_particles1.Size()+visited_particles2.Size());
+    TV x0;
+    for(HASHTABLE<int>::ITERATOR it(visited_particles1);it.Valid();it.Next())
+        x0+=obj1.particles.X(it.Key());
+    for(HASHTABLE<int>::ITERATOR it(visited_particles2);it.Valid();it.Next())
+        x0+=obj2.particles.X(it.Key());
+    x0/=static_cast<T>(visited_particles1.Size()+visited_particles2.Size());
 
     for(typename HASHTABLE<VECTOR<int,TV::m*2>,int>::ITERATOR it(to_process);it.Valid();it.Next()){
         T sign=static_cast<T>(it.Data());
@@ -119,8 +120,8 @@ Compute_Collision_Triangles(T_OBJECT& obj1,T_OBJECT& obj2)
         VECTOR<int,TV::m*2> I=it.Key();
         ORIGIN_AREAS::VOL_DATA<T,TV::m,TV::m*2> data;
         TV PTS[TV::m*2];
-        for(int k=1;k<=TV::m*2;k++) PTS[k-1]=X(I(k));
-        //for(int k=1;k<=TV::m*2;k++) PTS[k-1]=X(I(k))-x0;
+        //for(int k=1;k<=TV::m*2;k++) PTS[k-1]=X(I(k));
+        for(int k=1;k<=TV::m*2;k++) PTS[k-1]=X(I(k))-x0;
         Volume_From_Simplices(data,PTS); // gotta love ADL!
         area+=sign*data.V;
         for(int k=1;k<=TV::m*2;k++) gradient.Get_Or_Insert(I(k))+=sign*data.G[k-1];

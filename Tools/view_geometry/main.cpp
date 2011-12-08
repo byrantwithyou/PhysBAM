@@ -200,7 +200,7 @@ template<class T> void Add_Hex_File(const std::string& filename,OPENGL_WORLD& wo
     try{
         HEXAHEDRALIZED_VOLUME<T>* hex_vol;
         FILE_UTILITIES::Create_From_File<T>(filename,hex_vol);
-        OPENGL_HEXAHEDRALIZED_VOLUME<T>* ohv=new OPENGL_HEXAHEDRALIZED_VOLUME<T>(&hex_vol->mesh,&hex_vol->particles,OPENGL_MATERIAL::Matte(OPENGL_COLOR(float(.7),float(1),float(.8))));
+        OPENGL_HEXAHEDRALIZED_VOLUME<T>* ohv=new OPENGL_HEXAHEDRALIZED_VOLUME<T>(&hex_vol->mesh,&hex_vol->particles,OPENGL_MATERIAL::Matte(OPENGL_COLOR(float(.7),float(1),float(.8))),OPENGL_MATERIAL::Matte(OPENGL_COLOR(float(.7),float(8),float(.1))));
         //world.Bind_Key('0'+number,new OPENGL_CALLBACK_TOGGLE_TWO_SIDED(*ohv));
         world.Add_Object(ohv,true,true);}
     catch(FILESYSTEM_ERROR&){}
@@ -326,7 +326,7 @@ template<class T> void Add_Tet_File(const std::string& filename,OPENGL_WORLD& wo
         LOG::cout<<"filename = "<<filename<<std::endl;
         if(print_statistics) Read_Write<TETRAHEDRALIZED_VOLUME<T>,T>::Print_Statistics(LOG::cout,*tetrahedralized_volume);}
         OPENGL_TETRAHEDRALIZED_VOLUME<T>* tets=new OPENGL_TETRAHEDRALIZED_VOLUME<T>(&(tetrahedralized_volume->mesh),&(tetrahedralized_volume->particles),
-            OPENGL_MATERIAL::Plastic(OPENGL_COLOR(float(.9),float(.1),float(.1))));
+            OPENGL_MATERIAL::Plastic(OPENGL_COLOR(float(.9),float(.1),float(.1))),OPENGL_MATERIAL::Plastic(OPENGL_COLOR(float(.1),float(.9),float(.1))));
         world.Bind_Key('c',new OPENGL_CALLBACK_CROSS_SECTION<T>(*tets));
         world.Add_Object(tets,true,true);}
     catch(FILESYSTEM_ERROR&){}

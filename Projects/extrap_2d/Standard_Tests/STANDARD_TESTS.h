@@ -21,15 +21,17 @@
 //  27. Force inversion
 //  270. Inverted configuration
 //  28. Taffy test
+//  29. Gear Test
 //#####################################################################
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
 
-#include <PhysBAM_Tools/Math_Tools/constants.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <PhysBAM_Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <PhysBAM_Tools/Log/LOG.h>
+#include <PhysBAM_Tools/Math_Tools/constants.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <PhysBAM_Geometry/Basic_Geometry/SMOOTH_GEAR.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
@@ -59,6 +61,8 @@
 #include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 #include <fstream>
 namespace PhysBAM{
+template<class TV> void Add_Debug_Particle(const TV& X, const VECTOR<typename TV::SCALAR,3>& color);
+template<class TV,class ATTR> void Debug_Particle_Set_Attribute(ATTRIBUTE_ID id,const ATTR& attr);
 
 template<class T_input>
 class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,2> > >
@@ -233,6 +237,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 17:
         case 18:
         case 19:
+        case 29:
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
             last_frame=200;
             break;
@@ -350,7 +355,6 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             box1.is_static=true;
 	    break;}
         case 28:{
-            
             tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0))));
             RIGID_BODY<TV>& box1=tests.Add_Rigid_Body("circle",.4,(T)0);
             RIGID_BODY<TV>& box2=tests.Add_Rigid_Body("circle",.4,(T)0);
@@ -366,8 +370,10 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 curve.Add_Control_Point(ind+4,FRAME<TV>(TV(-5*sin(2.0*pi*ind/5.0),-5*cos(2.0*pi*ind/5.0))));
                 curve2.Add_Control_Point(ind+4,FRAME<TV>(TV(5*sin(2.0*pi*ind/5.0),5*cos(2.0*pi*ind/5.0))));
             }
-
             break;}            
+        case 29: last_frame=1;
+            tests.Add_Analytic_Smooth_Gear(TV(1,.1),20,16);
+            break;
         default:
             LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}
 
@@ -450,6 +456,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>(1);
             Add_Constitutive_Model(triangulated_area,(T)1e5,(T).45,(T).01);
             break;}
+        case 29: break;
         default:
             LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}
 
@@ -616,6 +623,27 @@ void Preprocess_Frame(const int frame)
     {
         std::string output_file = STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d/SV_%d",test_number,frame);
         svout.open(output_file.c_str());
+    }
+    if(test_number==29)
+    {
+        RANDOM_NUMBERS<T> random;
+        SMOOTH_GEAR<TV> gear(1,.1,16);
+        
+        if(0)
+        for(int i=1;i<=100000;i++)
+        {
+            TV X;
+            random.Fill_Uniform(X,-2,2);
+//            X.Normalize();
+            // T sd=gear.Signed_Distance(X);
+            TV Y=gear.Surface(X);
+            TV N=gear.Normal(X);
+            // VECTOR<T,3> col;
+            // random.Fill_Uniform(col,0,1);
+            Add_Debug_Particle(X, VECTOR<T,3>(gear.Inside(X,.05),gear.Outside(X,.05),gear.Boundary(X,.05)));
+//            Add_Debug_Particle(Y, VECTOR<T,3>(1,0,0));
+//            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,N);
+        }
     }
 }
 //#####################################################################

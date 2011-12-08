@@ -12,6 +12,7 @@
 #include <PhysBAM_Geometry/Basic_Geometry/PLANE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/POINT_SIMPLEX_1D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/RING.h>
+#include <PhysBAM_Geometry/Basic_Geometry/SMOOTH_GEAR.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TORUS.h>
 #include <PhysBAM_Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
@@ -30,6 +31,7 @@ bool Register_Analytic_Implicit_Object(){
     STRUCTURE_REGISTRY<VECTOR<float,2> >::Register<ANALYTIC_IMPLICIT_OBJECT<LINE_2D<float> > >();
     STRUCTURE_REGISTRY<VECTOR<float,2> >::Register<ANALYTIC_IMPLICIT_OBJECT<ORIENTED_BOX<VECTOR<float,2> > > >();
     STRUCTURE_REGISTRY<VECTOR<float,2> >::Register<ANALYTIC_IMPLICIT_OBJECT<SPHERE<VECTOR<float,2> > > >();
+    STRUCTURE_REGISTRY<VECTOR<float,2> >::Register<ANALYTIC_IMPLICIT_OBJECT<SMOOTH_GEAR<VECTOR<float,2> > > >();
     STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<ANALYTIC_IMPLICIT_OBJECT<BOX<VECTOR<float,3> > > >();
     STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<ANALYTIC_IMPLICIT_OBJECT<ORIENTED_BOX<VECTOR<float,3> > > >();
     STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<ANALYTIC_IMPLICIT_OBJECT<PLANE<float> > >();
@@ -37,6 +39,7 @@ bool Register_Analytic_Implicit_Object(){
     STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<ANALYTIC_IMPLICIT_OBJECT<CYLINDER<float> > >();
     STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<ANALYTIC_IMPLICIT_OBJECT<RING<float> > >();
     STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<ANALYTIC_IMPLICIT_OBJECT<SPHERE<VECTOR<float,3> > > >();
+    STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<ANALYTIC_IMPLICIT_OBJECT<SMOOTH_GEAR<VECTOR<float,3> > > >();
     STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<ANALYTIC_IMPLICIT_OBJECT<TORUS<float> > >();
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
     STRUCTURE_REGISTRY<VECTOR<double,1> >::Register<ANALYTIC_IMPLICIT_OBJECT<BOX<VECTOR<double,1> > > >();
@@ -46,6 +49,7 @@ bool Register_Analytic_Implicit_Object(){
     STRUCTURE_REGISTRY<VECTOR<double,2> >::Register<ANALYTIC_IMPLICIT_OBJECT<LINE_2D<double> > >();
     STRUCTURE_REGISTRY<VECTOR<double,2> >::Register<ANALYTIC_IMPLICIT_OBJECT<ORIENTED_BOX<VECTOR<double,2> > > >();
     STRUCTURE_REGISTRY<VECTOR<double,2> >::Register<ANALYTIC_IMPLICIT_OBJECT<SPHERE<VECTOR<double,2> > > >();
+    STRUCTURE_REGISTRY<VECTOR<double,2> >::Register<ANALYTIC_IMPLICIT_OBJECT<SMOOTH_GEAR<VECTOR<double,2> > > >();
     STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<ANALYTIC_IMPLICIT_OBJECT<BOX<VECTOR<double,3> > > >();
     STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<ANALYTIC_IMPLICIT_OBJECT<ORIENTED_BOX<VECTOR<double,3> > > >();
     STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<ANALYTIC_IMPLICIT_OBJECT<PLANE<double> > >();
@@ -53,6 +57,7 @@ bool Register_Analytic_Implicit_Object(){
     STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<ANALYTIC_IMPLICIT_OBJECT<CYLINDER<double> > >();
     STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<ANALYTIC_IMPLICIT_OBJECT<RING<double> > >();
     STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<ANALYTIC_IMPLICIT_OBJECT<SPHERE<VECTOR<double,3> > > >();
+    STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<ANALYTIC_IMPLICIT_OBJECT<SMOOTH_GEAR<VECTOR<double,3> > > >();
     STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<ANALYTIC_IMPLICIT_OBJECT<TORUS<double> > >();
 #endif
     return true;
