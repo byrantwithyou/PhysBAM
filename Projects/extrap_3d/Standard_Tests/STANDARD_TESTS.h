@@ -1307,7 +1307,7 @@ void Update_Time_Varying_Material_Properties(const T time)
 {   if(test_number==29 && time > .1){
         T critical=(T)3.0;
         T critical2=(T)4.0;
-        T start_young=(T)0; T end_young=(T)2;
+        T start_young=(T)0; T end_young=(T)5;
         if(time>critical && time<critical2) {
             DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
             FINITE_VOLUME<TV,3>& fv = deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
