@@ -336,7 +336,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.cfl=(T)10;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
-            solids_parameters.triangle_collision_parameters.perform_self_collision=true;
+            solids_parameters.triangle_collision_parameters.perform_self_collision=false;
             frame_rate=120;
             last_frame=10*120;
             last_frame=1000;
@@ -745,37 +745,39 @@ void Get_Initial_Data()
             break;
         }
         case 43:{
-            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_110K.tet",
-                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,2.2,0),ROTATION<TV>(T(pi/2),TV(0,0,0)))),true,true,density,0.008);
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/fish_42K.tet",
+                                                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,10,0),ROTATION<TV>(T(0),TV(0,1,0)))),true,true,density);
+//            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_4K.tet",
+//                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,2.2,0),ROTATION<TV>(T(pi/2),TV(0,0,0)))),true,true,density,0.008);
             
-            
-            RIGID_BODY<TV>& gear1=tests.Add_Analytic_Smooth_Gear(TV(1,.4,.1),20,8);
-            gear1.Rotation()=ROTATION<TV>(pi/2,TV(0,0,1));
-            RIGID_BODY<TV>& gear2=tests.Add_Analytic_Smooth_Gear(TV(1,.4,.1),20,8);
-            gear2.Rotation()=ROTATION<TV>(pi/2,TV(0,0,1));
-            gear2.X().z+=3;
-            RIGID_BODY<TV>& cylinder=tests.Add_Analytic_Cylinder(1.5,.15,24);
+            int cogs=40;
+            T radius=.8;
+            T sep=radius+.003;
+            T cog_rad=.035;
+            RIGID_BODY<TV>& gear1=tests.Add_Analytic_Smooth_Gear(TV(radius,cog_rad,1),cogs,8);
+            RIGID_BODY<TV>& gear2=tests.Add_Analytic_Smooth_Gear(TV(radius,cog_rad,1),cogs,8);
+//            RIGID_BODY<TV>& cylinder=tests.Add_Analytic_Cylinder(1.5,.15,24);
 
-            gear1.coefficient_of_friction = 1;
-            gear2.coefficient_of_friction = 1;
-            cylinder.coefficient_of_friction = 0;
+            gear1.coefficient_of_friction = 2;
+            gear2.coefficient_of_friction = 2;
+//            cylinder.coefficient_of_friction = 0;
 
             kinematic_id=gear1.particle_index;
             rigid_body_collection.rigid_body_particle.kinematic(gear1.particle_index)=true;
             kinematic_id2=gear2.particle_index;
             rigid_body_collection.rigid_body_particle.kinematic(gear2.particle_index)=true;
-            kinematic_id3=cylinder.particle_index;
-            rigid_body_collection.rigid_body_particle.kinematic(cylinder.particle_index)=true;
+            // kinematic_id3=cylinder.particle_index;
+            // rigid_body_collection.rigid_body_particle.kinematic(cylinder.particle_index)=true;
             
             T angular_velocity = 1;
 
-            curve3.Add_Control_Point(0,FRAME<TV>(TV(0,2.75,0),ROTATION<TV>(0,TV(0,0,1))));
-            curve3.Add_Control_Point(0.5,FRAME<TV>(TV(0,2.75,0),ROTATION<TV>(0,TV(0,0,1))));
-            curve3.Add_Control_Point(2,FRAME<TV>(TV(0,2,0),ROTATION<TV>(0,TV(0,0,1))));
+            // curve3.Add_Control_Point(0,FRAME<TV>(TV(0,2.75,0),ROTATION<TV>(0,TV(0,0,1))));
+            // curve3.Add_Control_Point(0.5,FRAME<TV>(TV(0,2.75,0),ROTATION<TV>(0,TV(0,0,1))));
+            // curve3.Add_Control_Point(2,FRAME<TV>(TV(0,2,0),ROTATION<TV>(0,TV(0,0,1))));
 
             for (int i=0; i<60; i++){
-                curve.Add_Control_Point(i/angular_velocity,FRAME<TV>(TV(-(T).4,1.5,-.75),ROTATION<TV>(-i,TV(0,0,1))));
-                curve2.Add_Control_Point(i/angular_velocity,FRAME<TV>(TV((T).4,1.5,-.75),ROTATION<TV>(i,TV(0,0,1))));}
+                curve.Add_Control_Point(i/angular_velocity,FRAME<TV>(TV(-sep,1.5,0),ROTATION<TV>(-i,TV(0,0,1))*ROTATION<TV>(pi/(2*cogs),TV(0,0,1))));
+                curve2.Add_Control_Point(i/angular_velocity,FRAME<TV>(TV(sep,1.5,0),ROTATION<TV>(i,TV(0,0,1))*ROTATION<TV>(pi/(2*cogs),TV(0,0,1))));}
 
             tests.Add_Ground();
             break;}
@@ -904,6 +906,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             solid_body_collection.template Find_Force<GRAVITY<TV>&>().gravity=g;
             break;}
+        case 43:
         case 33:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             Add_Constitutive_Model(tetrahedralized_volume,1e5,0.4,0.05);

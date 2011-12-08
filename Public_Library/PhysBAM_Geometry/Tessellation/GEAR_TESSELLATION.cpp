@@ -43,7 +43,7 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(const SMOOTH_GEAR<
         particles.X(i)=pts(i).Append(-gear.w);
         particles.X(i+pts.m)=pts(i).Append(gear.w);}
     particles.X(2*pts.m+1)=TV(0,0,-gear.w);
-    particles.X(2*pts.m+1+2)=TV(0,0,gear.w);
+    particles.X(2*pts.m+2)=TV(0,0,gear.w);
     for(int i=1;i<pts.m;i++){
         surface->mesh.elements.Append(E(i,i+1,2*pts.m+1));
         surface->mesh.elements.Append(E(pts.m+i+1,pts.m+i,2*pts.m+2));
@@ -53,6 +53,7 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(const SMOOTH_GEAR<
     surface->mesh.elements.Append(E(2*pts.m,pts.m+1,2*pts.m+2));
     surface->mesh.elements.Append(E(1,pts.m,2*pts.m));
     surface->mesh.elements.Append(E(2*pts.m,pts.m,pts.m+1));
+    surface->Update_Number_Nodes();
     return surface;
 }
 template<class T> TRIANGULATED_AREA<T>* Generate_Triangles(const SMOOTH_GEAR<VECTOR<T,2> >& gear,int n)
