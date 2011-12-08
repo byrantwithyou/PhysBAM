@@ -38,7 +38,7 @@
 //   41. Bunch of jellos rolling towards camera
 //   42. Bunch of jellos rolling towards camera (Reloaded)
 //   43. Through smooth gears
-//   44. Fish through a torus
+//   44. 2 jellos collision
 //   50. Fish through a torus
 //#####################################################################
 #ifndef __STANDARD_TESTS__
@@ -524,7 +524,7 @@ void Get_Initial_Data()
             RIGID_BODY<TV>& box1=tests.Add_Analytic_Box(TV(3,20,20));
             box1.X()=TV(10,10,10);
             box1.is_static=true;
-            tests.Add_Ground(0);
+            tests.Add_Ground();
             last_frame=250;
             break;}        
         case 31: {
@@ -534,8 +534,8 @@ void Get_Initial_Data()
             tests.Add_Ground();            
             kinematic_id=sphere.particle_index;
             rigid_body_collection.rigid_body_particle.kinematic(sphere.particle_index)=true;
-            curve.Add_Control_Point(0,FRAME<TV>(TV(0.5,1.5,-50)));
-            curve.Add_Control_Point(100,FRAME<TV>(TV(0.5,1.5,950)));
+            curve.Add_Control_Point(0,FRAME<TV>(TV(0,1.5,-50)));
+            curve.Add_Control_Point(100,FRAME<TV>(TV(0,1.5,950)));
             break;}
 
         case 32:{
@@ -691,8 +691,10 @@ void Get_Initial_Data()
         }
         case 40:
         {
-            RIGID_BODY_STATE<TV> initial_state1(FRAME<TV>(TV(-30,2.4,2.8),ROTATION<TV>(T(pi/4),TV(1.3,1.5,0.7)))); 
-            RIGID_BODY_STATE<TV> initial_state2(FRAME<TV>(TV(30,2.5,0.5),ROTATION<TV>(T(pi/5),TV(0.7,1,0.1))));
+            jello_centers.Append(TV(-13,3.2,0.7)); 
+            jello_centers.Append(TV(13,2.9,-0.7));
+            RIGID_BODY_STATE<TV> initial_state1(FRAME<TV>(jello_centers(1),ROTATION<TV>(T(pi/0.13),TV(1.3,1.5,0.7)))); 
+            RIGID_BODY_STATE<TV> initial_state2(FRAME<TV>(jello_centers(2),ROTATION<TV>(T(pi/0.076),TV(0.7,1,0.1))));
             tests.Create_Mattress(mattress_grid,true,&initial_state1);
             tests.Create_Mattress(mattress_grid,true,&initial_state2);
             tests.Add_Ground();
@@ -1027,13 +1029,17 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 for(int j=1;j<=n;j++)
                     for(int ij=1;ij<=mn;ij++)
                     {
-                        particles.V(i+m*(j-1)+m*n*(ij-1)) = TV(-2*sin(j/(T)n)+20,-cos(2*ij/(T)mn)*2-5,-2*sin(3*i/(T)m));
-                        particles.V(i+m*(j-1)+m*n*(ij-1)+m*n*mn) = TV(1*sin(2*ij/(T)mn)-20,0.5*cos(3*i/(T)m)*2-5,1*sin(j/(T)n));
+                        particles.V(i+m*(j-1)+m*n*(ij-1)) = TV(-2*cos(3*ij/(T)mn)+21,-cos(2*i/(T)m)*2+1.5,-2*sin(2*j/(T)n));
+                        particles.V(i+m*(j-1)+m*n*(ij-1)+m*n*mn) = TV(1*sin(3*j/(T)n)-20,0.5*cos(3*ij/(T)mn)*2+2.3,1*sin(i/(T)m));
                     }
             for (int i=1; i<=m*n*mn; i++)
             {
-                particles.V(i) += TV(particles.X(i).y-2.4,-(particles.X(i).x+30),0)*10;
-                particles.V(i+m*n*mn) += TV(-(particles.X(i).y-2.5),(particles.X(i).x+30),0)*10;
+                int index = i;
+                particles.V(index) += TV(particles.X(index).y-jello_centers(1).y,-(particles.X(index).x-jello_centers(1).x),0)*7.7;
+                particles.V(index) += TV(0,particles.X(index).z-jello_centers(1).z,-(particles.X(index).y-jello_centers(1).y))*(-1.3);
+                index+=m*n*mn;
+                particles.V(index) += TV(particles.X(index).y-jello_centers(2).y,-(particles.X(index).x-jello_centers(2).x),0)*(-12.1);
+                particles.V(index) += TV(0,particles.X(index).z-jello_centers(2).z,-(particles.X(index).y-jello_centers(2).y))*2.3;
             }
             break;}
         case 44:{
