@@ -25,7 +25,7 @@ class ARTICULATION_VISUALIZATION : public ANIMATED_VISUALIZATION
 {
 public:
     ARTICULATION_VISUALIZATION();
-    ~ARTICULATION_VISUALIZATION();
+    virtual ~ARTICULATION_VISUALIZATION();
 
     // selection call (bad abstraction, but ok for now)
     void Handle_Object_Selected(OPENGL_COMPONENT_MUSCLE_3D<T>*m,int viapt);

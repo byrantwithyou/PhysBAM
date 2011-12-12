@@ -298,8 +298,8 @@ public:
         std::istringstream sstream(OPENGL_WORLD::Singleton()->prompt_response);
         sstream>>iterations;}
     for(int i=1;i<=iterations;i++){
-        if(expanded) levelset_advection.Euler_Step_Subset(V,min_x,max_x,min_y,max_y,min_z,max_z,step);
-        else for(int i=1;i<=selection.m;i++) levelset_advection.Euler_Step_Cell(V,selection(i).y.x,selection(i).y.y,selection(i).y.z,step);}
+        if(expanded) levelset_advection.Euler_Step_Subset(V,min_x,max_x,min_y,max_y,min_z,max_z,step,0,3);
+        else for(int i=1;i<=selection.m;i++) levelset_advection.Euler_Step_Cell(V,selection(i).y.x,selection(i).y.y,selection(i).y.z,step,0,3);}
     Update_Current_Levelset();}
     DEFINE_CALLBACK_CREATOR(ATTACHMENT_VISUALIZATION,Smooth_Selection_Response);
 
