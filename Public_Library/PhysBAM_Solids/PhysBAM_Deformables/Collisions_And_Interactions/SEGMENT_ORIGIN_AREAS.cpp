@@ -4,6 +4,8 @@
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/SEGMENT_ORIGIN_AREAS.h>
 
+#include <boost/numeric/interval.hpp>
+
 //extern PhysBAM::ARRAY<int> trap_cases;
 using namespace PhysBAM;
 using namespace ORIGIN_AREAS;
@@ -32,8 +34,8 @@ template<class T,class TV> void Data_From_Dof(DATA<T,2,1>& data,const TV& A)
 
 template<class T,class TV> void Intersect_Segment_Point(DATA<T,2,3>& data,const TV& A,const TV& B,const TV& P)
 {
-    T AxB=TV::Cross_Product(A,B).x,PxB=TV::Cross_Product(P,B).x,PxA=TV::Cross_Product(P,A).x;
-    T den=1/(PxB-PxA),sden=sqr(den),cden=den*sden;
+    T AxB=TV::Cross_Product(A,B).x,PxB=TV::Cross_Product(P,B).x,PxA=TV::Cross_Product(P,A).x,PxBmA=TV::Cross_Product(P,B-A).x;
+    T den=1/PxBmA,sden=sqr(den),cden=den*sden;
     data.V=AxB*den*P;
 
     TV orthAB=(A-B).Orthogonal_Vector(),orthP=P.Orthogonal_Vector();
@@ -55,10 +57,10 @@ template<class T,class TV> void Intersect_Segment_Point(DATA<T,2,3>& data,const 
     data.H[1][2][2]=H22*(A.y-B.y);
     data.H[0][0][1]=H01*P.x;
     data.H[1][0][1]=H01*P.y;
-    data.H[0][0][2]=((B.x*(PxA-PxB)-2*(A.x-B.x)*PxB)*ABP);
-    data.H[1][0][2]=((B.y*(PxA-PxB)-2*(A.y-B.y)*PxB)*ABP);
-    data.H[0][1][2]=((A.x*(PxA-PxB)+2*P.x*AxB)*ABP);
-    data.H[1][1][2]=((A.y*(PxA-PxB)+2*P.y*AxB)*ABP);
+    data.H[0][0][2]=(-B.x*PxBmA-2*(A.x-B.x)*PxB)*ABP;
+    data.H[1][0][2]=(-B.y*PxBmA-2*(A.y-B.y)*PxB)*ABP;
+    data.H[0][1][2]=(-A.x*PxBmA+2*P.x*AxB)*ABP;
+    data.H[1][1][2]=(-A.y*PxBmA+2*P.y*AxB)*ABP;
     data.H[0][1][0]=data.H[0][0][1].Transposed();
     data.H[1][1][0]=data.H[1][0][1].Transposed();
     data.H[0][2][0]=data.H[0][0][2].Transposed();
@@ -94,7 +96,7 @@ template<class T,class TV> void Area_From_Points(VOL_DATA<T,2,3>& data,const TV&
 {
     data.V=(T).5*TV::Cross_Product(B,C-A).x;
     data.G[0]=-(T).5*B.Orthogonal_Vector();
-    data.G[1]=(T).5*(A.Orthogonal_Vector()-C.Orthogonal_Vector());
+    data.G[1]=(T).5*(A-C).Orthogonal_Vector();
     data.G[2]=(T).5*B.Orthogonal_Vector();
     const MATRIX<T,2> M(0,-(T).5,(T).5,0);
     data.H[0][0]=data.H[0][2]=data.H[1][1]=data.H[2][0]=data.H[2][2]=MATRIX<T,2>();
@@ -316,7 +318,7 @@ void Combine_Data(
 }
 
 const int vec_a[1]={0}, vec_c[1]={2}, vec_d[1]={3}, vec_abc[3]={0,1,2}, vec_abd[3]={0,1,3}, vec_cda[3]={2,3,0}, vec_cdb[3]={2,3,1}, vec_abcd[4]={0,1,2,3};
-template<class T,class TV> void Case_CCAA(VOL_DATA<T,2,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
+template<class T,class TV> void Case_CCAA(VOL_DATA<T,2,4>& data,const TV& /*A*/,const TV& /*B*/,const TV& C,const TV& D)
 {
     // A X   X   X B
     //     D   C
@@ -331,6 +333,21 @@ template<class T,class TV> void Case_CCAA(VOL_DATA<T,2,4>& data,const TV& A,cons
     VOL_DATA<T,2,2> V;
     Area_From_Points(V,DC.V,DD.V);
     Combine_Data(data,V,DC,DD,vec_c,vec_d);
+
+#if 0
+    typedef boost::numeric::interval<T> TI;
+    typedef VECTOR<TI,2> TVI;
+    VOL_DATA<TI,2,4> dataI;
+    Clear(dataI);
+    TVI CI(C),DI(D);
+    DATA<TI,2,1> DCI;
+    Data_From_Dof(DCI,CI);
+    DATA<TI,2,1> DDI;
+    Data_From_Dof(DDI,DI);
+    VOL_DATA<TI,2,2> VI;
+    Area_From_Points(VI,DCI.V,DDI.V);
+    Combine_Data(dataI,VI,DCI,DDI,vec_c,vec_d);
+#endif // #if 0|1
 }
 
 template<class T,class TV> void Case_CCAB(VOL_DATA<T,2,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
