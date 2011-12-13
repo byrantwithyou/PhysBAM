@@ -41,6 +41,7 @@
 //   44. 2 jellos collision
 //   50. Fish through a torus
 //   51. Fish through a tube
+//   52. Jello's falling one by one on each other
 //#####################################################################
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
@@ -231,7 +232,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             mattress_grid2=GRID<TV>(40,40,40,(T)-1.2,(T)1.2,(T)-1.2,(T)1.2,(T)-1.2,(T)1.2);
             mattress_grid3=GRID<TV>(40,40,40,(T)-1.5,(T)1.5,(T)-1.5,(T)1.5,(T)-1.5,(T)1.5);
             break;
-        case 37: case 39: case 40: case 38: case 42: case 44:
+        case 37: case 39: case 40: case 38: case 42: case 44: case 52:
             mattress_grid=GRID<TV>(40,40,40,(T)-1.0,(T)1.0,(T)-1.0,(T)1.0,(T)-1.0,(T)1.0);
             break;
     	default:
@@ -381,6 +382,15 @@ void Parse_Options() PHYSBAM_OVERRIDE
             if (override_no_collisions) solids_parameters.triangle_collision_parameters.perform_self_collision=false;
             frame_rate=120;
             last_frame=1000;
+            break;
+        case 52:
+            solids_parameters.cfl=(T)5;
+            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
+            solids_parameters.implicit_solve_parameters.cg_iterations=100000;
+            solids_parameters.triangle_collision_parameters.perform_self_collision=true;
+            if (override_no_collisions) solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+            frame_rate=120;
+            last_frame=2000;
             break;
         case 48:
             frame_rate=24;
@@ -748,7 +758,20 @@ void Get_Initial_Data()
                 RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(jello_centers(count),ROTATION<TV>(10*sin(178*count),TV(sin(145*count),cos(345*count),cos(478*count)))));
                 tests.Create_Mattress(mattress_grid,true,&initial_state);
             }
-            tests.Add_Ground(0.1);
+            tests.Add_Ground();
+            break;
+        }
+        case 52:
+        {
+            int count = 0;
+            for (int i=1; i<=13; i++)
+            {
+                count++;
+                jello_centers.Append(TV(-500+i*5,-1000,0));
+                RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(jello_centers(count),ROTATION<TV>(0,TV(0,0,0))));
+                tests.Create_Mattress(mattress_grid,true,&initial_state);
+            }
+            tests.Add_Ground();
             break;
         }
         case 44:
@@ -1140,6 +1163,17 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             }
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             break;}
+        case 52:{
+            T youngs_modulus = 4e5;
+            T poissons_ratio = .4;
+            T damping = 0.001;
+            for (int k=1; k<=jello_centers.m; k++)
+            {
+                TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(k);
+                Add_Constitutive_Model(tetrahedralized_volume,youngs_modulus,poissons_ratio,damping,0.4,50);
+            }
+            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            break;}
         case 44:{
             T youngs_modulus = 4e5;
             T poissons_ratio = .4;
@@ -1459,6 +1493,37 @@ void Preprocess_Frame(const int frame)
     }
 
     if(test_number==32 && frame==1100) Bind_Intersecting_Particles();
+
+    if(test_number==52)
+    {
+        PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+
+        int m=mattress_grid.counts.x;
+        int n=mattress_grid.counts.y;
+        int mn=mattress_grid.counts.z;
+     
+        for (int k=1; k<=jello_centers.m; k++) if (frame==(k-1)*100+1)
+        {
+            TV center = TV();
+            for (int i=1; i<=m*n*mn; i++)
+            {
+                int index = i+(k-1)*m*n*mn;
+                center += particles.X(index);
+            }
+            center /= m*n*mn;
+            for (int i=1; i<=m*n*mn; i++)
+            {
+                int index = i+(k-1)*m*n*mn;
+                particles.X(index) += TV(0,15,0)-center;
+            }
+            for(int i=1;i<=m;i++)
+            for(int j=1;j<=n;j++)
+            for(int ij=1;ij<=mn;ij++)
+            {
+                particles.V(i+m*(j-1)+m*n*(ij-1)+(k-1)*m*n*mn) = TV(-sin(sin(127*k)*j/(T)n),-cos(sin(384*k)*4*ij/(T)mn),sin(3*i*sin(457*k)/(T)m));
+            }
+        }
+    } 
 }
 //#####################################################################
 // Function Add_External_Forces
