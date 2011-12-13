@@ -313,11 +313,17 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             //solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
             last_frame=1000;      
-        case 29: case 30:
+        case 29:
             solids_parameters.cfl=(T)5;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=override_collisions;
             frame_rate=24;
+            break;
+        case 30:
+            solids_parameters.cfl=(T)5;
+            solids_parameters.implicit_solve_parameters.cg_iterations=100000;
+            solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=true;
+            frame_rate=150;
             break;
         case 31:
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
@@ -535,11 +541,11 @@ void Get_Initial_Data()
             break;}
         case 30: {
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)-90,(T)6,(T)11))),true,true,density, 1.0);
-            RIGID_BODY<TV>& box1=tests.Add_Analytic_Box(TV(3,20,20));
-            box1.X()=TV(10,10,10);
+            RIGID_BODY<TV>& box1=tests.Add_Analytic_Box(TV(20,20,20));
+            box1.X()=TV(19,10,10);
             box1.is_static=true;
-            tests.Add_Ground();
-            last_frame=250;
+            tests.Add_Ground(1.0);
+            last_frame=480;
             break;}        
         case 31: {
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/bunny.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T)2.34,(T)0),ROTATION<TV>((T)pi,TV(0,1,0)))),true,true,density,5);
@@ -910,9 +916,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             
         case 30:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
-            Add_Constitutive_Model(tetrahedralized_volume,(T)1e6,(T).45,(T).01);
+            Add_Constitutive_Model(tetrahedralized_volume,(T)1e6,(T).40,(T).01);
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
-            for(int i=1; i<=deformable_body_collection.particles.X.m; i++){ deformable_body_collection.particles.V(i).x=(T)100;deformable_body_collection.particles.V(i).y=9.8;deformable_body_collection.particles.V(i).z=0;}
+            for(int i=1; i<=deformable_body_collection.particles.X.m; i++){ deformable_body_collection.particles.V(i).x=(T)60;deformable_body_collection.particles.V(i).y=0;deformable_body_collection.particles.V(i).z=0;}
             break;} 
         case 31:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
