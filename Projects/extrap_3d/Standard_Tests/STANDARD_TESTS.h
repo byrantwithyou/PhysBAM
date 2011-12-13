@@ -40,6 +40,7 @@
 //   43. Through smooth gears
 //   44. 2 jellos collision
 //   50. Fish through a torus
+//   51. Fish through a tube
 //#####################################################################
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
@@ -391,6 +392,13 @@ void Parse_Options() PHYSBAM_OVERRIDE
             break;
         case 50:
             solids_parameters.triangle_collision_parameters.perform_self_collision=override_collisions;
+            //solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=true;
+            //solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=true;
+            solids_parameters.cfl=(T)5;
+            solids_parameters.implicit_solve_parameters.cg_iterations=100000;
+            break;
+        case 51:
+            solids_parameters.triangle_collision_parameters.perform_self_collision=true;
             //solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=true;
             //solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=true;
             solids_parameters.cfl=(T)5;
@@ -785,6 +793,32 @@ void Get_Initial_Data()
             tests.Add_Ground(1);
             break;
         }
+        case 51:
+        {
+            TV start(10,10,0);
+            T outer=(T)1,inner=(T).5,length=10;
+            RIGID_BODY<TV>& torus1=tests.Add_Analytic_Torus((outer-inner)/2,(outer+inner)/2,32,64);
+            torus1.is_static=true;
+            torus1.coefficient_of_friction = 0.05;
+            torus1.X()=start;
+            torus1.Rotation()=ROTATION<TV>((T)pi/2.0,TV(0,1,0));
+            last_frame=240;
+            RIGID_BODY<TV>& torus2=tests.Add_Analytic_Torus((outer-inner)/2,(outer+inner)/2,32,64);
+            torus2.is_static=true;
+            torus2.coefficient_of_friction = 0.05;
+            torus2.X()=start+TV(length,0,0);
+            torus2.Rotation()=ROTATION<TV>((T)pi/2.0,TV(0,1,0));
+            last_frame=240;
+            RIGID_BODY<TV>& shell=tests.Add_Analytic_Shell(length,outer,inner,64);
+            shell.is_static=true;
+            shell.coefficient_of_friction = 0.05;
+            shell.X()=start+TV(length/2,0,0);
+            shell.Rotation()=ROTATION<TV>((T)pi/2.0,TV(0,1,0));
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/fish_42K.tet",
+                                                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,10,0),ROTATION<TV>(T(pi),TV(0,1,0)))),true,true,density);
+            tests.Add_Ground(1);
+            break;
+        }
         case 43:{
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/fish_42K.tet",
                                                 RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,10,0),ROTATION<TV>(T(0),TV(0,1,0)))),true,true,density);
@@ -1168,6 +1202,19 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
            // solid_body_collection.template Find_Force<GRAVITY<TV>&>().gravity=g;            
             
             break;}
+        case 51:{
+            T youngs_modulus = 1e5;
+            T poissons_ratio = .45;
+            T damping = 0.01;
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume1=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(1);
+            Add_Constitutive_Model(tetrahedralized_volume1,youngs_modulus,poissons_ratio,damping);
+            int n=particles.array_collection->Size();
+            externally_forced = new bool[n+1];
+            for(int i=1; i <=n; i++)
+            {
+                externally_forced[i]=(particles.X(i).x>=1.5);//1.5-0, 0 is the center of the fish
+            }
+            break;}
 
         default:
             LOG::cerr<<"Missing bodies implementation for test number "<<test_number<<std::endl;exit(1);}
@@ -1419,7 +1466,7 @@ void Preprocess_Frame(const int frame)
 void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) PHYSBAM_OVERRIDE 
 {
     T height,force_multiplier;
-    if(test_number==50){
+    if(test_number==50 || test_number==51){
         PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
         int n=particles.array_collection->Size();
 
