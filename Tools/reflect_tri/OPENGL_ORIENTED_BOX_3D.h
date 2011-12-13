@@ -17,7 +17,7 @@ public:
 
     OPENGL_ORIENTED_BOX_3D(ORIENTED_BOX_3D<T> *box_input):box(box_input)
     {}
-    ~OPENGL_ORIENTED_BOX_3D()
+    virtual ~OPENGL_ORIENTED_BOX_3D()
     {}
 
     virtual void Display(const int in_color=1) const;
