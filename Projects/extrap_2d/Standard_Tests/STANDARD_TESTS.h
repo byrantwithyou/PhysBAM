@@ -22,6 +22,7 @@
 //  270. Inverted configuration
 //  28. Taffy test
 //  29. Gear Test
+//  30. Horizontal stretch
 //#####################################################################
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
@@ -187,7 +188,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     case 20: case 21: case 26: 
 	    mattress_grid=GRID<TV>(40,8,(T)-2,(T)2,(T)-.4,(T).4);
 	break;
-	case 22: case 23: case 24: case 25: case 27:
+        case 22: case 23: case 24: case 25: case 27: case 30:
 	    mattress_grid=GRID<TV>(20,20,(T)-.9,(T).9,(T)-.9,(T).9);
 	break;
     	default:
@@ -253,7 +254,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             attachment_velocity=TV((T).8,0);
 	    last_frame=480;
             break;	 
-        case 27: case 270:
+        case 27: case 270: case 30:
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=900;
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
@@ -277,7 +278,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 24:
         case 25:
         case 26:
-        case 27: case 270:
+        case 27: case 270: case 30:
             tests.Create_Mattress(mattress_grid,true);
             break;
         case 8: 
@@ -394,7 +395,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 24:
         case 25:
         case 26:
-        case 27: case 270:{
+        case 27: case 270: case 30:{
             TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
             Add_Constitutive_Model(triangulated_area,(T)1e2,(T).45,(T).05);
             break;}
@@ -549,6 +550,14 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
         T final_time=40;
         TV velocity_rig=velocity_time<final_time?TV(-velocity,(T)0):TV();
         TV velocity_lef=velocity_time<final_time?TV(velocity,(T)0):TV();
+        for(int j=1;j<=n;j++){V(1+m*(j-1))=velocity_lef;V(m+m*(j-1))=velocity_rig;}}
+    if(test_number==30){
+        int m=mattress_grid.counts.x;
+        int n=mattress_grid.counts.y;
+        T velocity=.1;
+        T final_time=80;
+        TV velocity_rig=velocity_time<final_time?TV(velocity,(T)0):TV();
+        TV velocity_lef=velocity_time<final_time?TV(-velocity,(T)0):TV();
         for(int j=1;j<=n;j++){V(1+m*(j-1))=velocity_lef;V(m+m*(j-1))=velocity_rig;}}
     if(test_number==28){
         int m=mattress_grid.counts.x;

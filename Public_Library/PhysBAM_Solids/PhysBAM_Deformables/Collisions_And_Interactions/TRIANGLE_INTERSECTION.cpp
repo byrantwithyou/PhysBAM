@@ -23,7 +23,7 @@ Triangle_Intersection_Area(const TRIANGLE_2D<T>& a,const TRIANGLE_2D<T>& b,VECTO
         for(int j=1;j<=3;j++){
             int jn=j%3+1;
             VECTOR<int,4> I(i,in,j+3,jn+3);
-#if 0
+#if 1
             ORIGIN_AREAS::VOL_DATA<T,2,4> data;
             TV const X[]={a.X(i),a.X(in),b.X(j),b.X(jn)};
             ORIGIN_AREAS::Volume_From_Simplices(data,X);

@@ -39,7 +39,7 @@ struct VOLUME_COLLISIONS_VISITOR
     {if(Topology_Aware_Intersection_Test(ta1.mesh.elements(a),ta2.mesh.elements(b),(ARRAY_VIEW<const TV>)ta1.particles.X)) pairs.Append(VECTOR<int,2>(a,b));}
 };
 //#####################################################################
-// Function Compute_Loops
+// Function Compute_Collision_Triangles
 //#####################################################################
 template<class TV> void VOLUME_COLLISIONS<TV>::
 Compute_Collision_Triangles()
@@ -80,7 +80,7 @@ static int Sort_Pair(VECTOR<int,6>& I)
     return sign;
 }
 //#####################################################################
-// Function Compute_Loops
+// Function Compute_Collision_Triangles
 //#####################################################################
 template<class TV> void VOLUME_COLLISIONS<TV>::
 Compute_Collision_Triangles(T_OBJECT& obj1,T_OBJECT& obj2)
