@@ -19,6 +19,7 @@
 #include <PhysBAM_Geometry/Tessellation/GEAR_TESSELLATION.h>
 #include <PhysBAM_Geometry/Tessellation/IMPLICIT_OBJECT_TESSELLATION.h>
 #include <PhysBAM_Geometry/Tessellation/RANGE_TESSELLATION.h>
+#include <PhysBAM_Geometry/Tessellation/RING_TESSELLATION.h>
 #include <PhysBAM_Geometry/Tessellation/SPHERE_TESSELLATION.h>
 #include <PhysBAM_Geometry/Tessellation/TORUS_TESSELLATION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
@@ -344,6 +345,7 @@ template RIGID_BODY<VECTOR<float,2> >& RIGIDS_STANDARD_TESTS<VECTOR<float,2> >::
 template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Analytic_Sphere(float,float,int);
 template RIGID_BODY<VECTOR<float,2> >& RIGIDS_STANDARD_TESTS<VECTOR<float,2> >::Add_Analytic_Smooth_Gear(VECTOR<float,2> const&,int,int);
 template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Analytic_Smooth_Gear(VECTOR<float,3> const&,int,int);
+template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Analytic_Shell(float,float,float,int);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 INSTANTIATION_HELPER(double);
 template JOINT_ID RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Connect_With_Point_Joint(RIGID_BODY<VECTOR<double,3> >&,RIGID_BODY<VECTOR<double,3> >&,VECTOR<double,3> const&);
@@ -351,4 +353,5 @@ template RIGID_BODY<VECTOR<double,2> >& RIGIDS_STANDARD_TESTS<VECTOR<double,2> >
 template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Analytic_Sphere(double,double,int);
 template RIGID_BODY<VECTOR<double,2> >& RIGIDS_STANDARD_TESTS<VECTOR<double,2> >::Add_Analytic_Smooth_Gear(VECTOR<double,2> const&,int,int);
 template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Analytic_Smooth_Gear(VECTOR<double,3> const&,int,int);
+template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Analytic_Shell(double,double,double,int);
 #endif

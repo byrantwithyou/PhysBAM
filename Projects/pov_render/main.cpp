@@ -4,6 +4,7 @@
 //#####################################################################
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
+#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
 #include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/HEXAHEDRALIZED_VOLUME.h>
@@ -58,14 +59,27 @@ void Apply_Options(TRIANGULATED_SURFACE<T>* ts, const HASHTABLE<std::string,std:
         if(s!=1) ts->Rescale(s);}
 }
 
-void Emit_Vector(std::ofstream& fout,const TV& v, const char* str="")
+template<class T,int d>
+void Emit_Vector(std::ofstream& fout,const VECTOR<T,d>& v, const char* str="")
 {
-    fout<<"< "<<v.x<<" , "<<v.y<<" , "<<v.z<<" > "<<str;
+    fout<<"< "<<v(1);
+    for(int i=2;i<=d;i++) fout<<" , "<<v(i);
+    fout<<" > "<<str;
 }
 
-void Emit_Smooth_Surface(std::ofstream& fout,TRIANGULATED_SURFACE<T>* ts)
+void Emit_Smooth_Surface(std::ofstream& fout,TRIANGULATED_SURFACE<T>* ts, const HASHTABLE<std::string,std::string>& options)
 {
     ts->Update_Vertex_Normals();
+
+    ARRAY<VECTOR<T,2> > coords;
+    ARRAY<VECTOR<int,3> > map;
+    if(const std::string* texture_map_file=options.Get_Pointer("texture_map"))
+    {
+        int ignore;
+        FILE_UTILITIES::Read_From_File(STREAM_TYPE((RW)0),texture_map_file->c_str(),coords,ignore,map);
+        LOG::cout<<"Texture mapping file data:  "<<texture_map_file<<"  "<<coords.m<<"  "<<ignore<<"  "<<map.m<<"  "<<ts->mesh.elements.m<<std::endl;
+    }
+
     for(int i=1;i<=ts->mesh.elements.m;i++){
         fout<<"smooth_triangle { ";
         VECTOR<TV,3> X(ts->particles.X.Subset(ts->mesh.elements(i)));
@@ -78,7 +92,19 @@ void Emit_Smooth_Surface(std::ofstream& fout,TRIANGULATED_SURFACE<T>* ts)
         Emit_Vector(fout,X(2),",");
         Emit_Vector(fout,N(2),",");
         Emit_Vector(fout,X(3),",");
-        Emit_Vector(fout,N(3),"}\n");}
+        Emit_Vector(fout,N(3),"");
+
+        if(coords.m)
+        {
+            fout<<"uv_vectors ";
+            int uv1,uv2,uv3;map(i).Get(uv1,uv2,uv3);
+            Emit_Vector(fout, coords(uv1), " , ");
+            Emit_Vector(fout, coords(uv2), " , ");
+            Emit_Vector(fout, coords(uv3), "");
+        }
+
+        fout<<"}\n";
+    }
 }
 
 void Emit_Rigid_Body(std::ofstream& fout,const HASHTABLE<std::string,std::string>& options,int frame)
@@ -90,7 +116,20 @@ void Emit_Rigid_Body(std::ofstream& fout,const HASHTABLE<std::string,std::string
     for(int i=1;i<=ts->particles.X.m;i++) ts->particles.X(i)=rigid_body.Frame()*ts->particles.X(i);
 
     Apply_Options(ts,options);
-    Emit_Smooth_Surface(fout,ts);
+    Emit_Smooth_Surface(fout,ts,options);
+}
+
+void Emit_Rigid_Body_Frame(std::ofstream& fout,const HASHTABLE<std::string,std::string>& options,int frame)
+{
+    RIGID_BODY_COLLECTION<TV>& collection=Load_Rigid_Body_Collection(options.Get("location"),frame);
+    RIGID_BODY<TV>& rigid_body=collection.Rigid_Body(atoi(options.Get("index").c_str()));
+    MATRIX<T,3> rot=rigid_body.Rotation().Rotation_Matrix();
+    TV X=rigid_body.X();
+    fout<<"matrix < ";
+    for(int i=1;i<=3;i++)
+        for(int j=1;j<=3;j++)
+            fout<<rot(j,i)<<" , ";
+    fout<<X.x<<" , "<<X.y<<" , "<<X.z<<" >\n";
 }
 
 void Emit_Deformable_Body(std::ofstream& fout,const HASHTABLE<std::string,std::string>& options,int frame)
@@ -113,7 +152,7 @@ void Emit_Deformable_Body(std::ofstream& fout,const HASHTABLE<std::string,std::s
     else PHYSBAM_FATAL_ERROR(std::string("Unhandled object type: ")+typeid(*structure).name());
 
     Apply_Options(ts,options);
-    Emit_Smooth_Surface(fout,ts);
+    Emit_Smooth_Surface(fout,ts,options);
 }
 
 bool Parse_Pair(const char*& str,std::string& key,std::string& value)
@@ -141,6 +180,26 @@ bool Parse_Pair(const char*& str,std::string& key,std::string& value)
     str=end+1;
     str+=strspn(str, " \t");
     return true;
+}
+
+void Emit_Camera(std::ofstream& fout,const HASHTABLE<std::string,std::string>& options)
+{
+    TV loc, at, up;
+    T angle;
+    std::string file=options.Get("location"), line;
+    std::ifstream fin(file.c_str());
+    while(getline(fin, line))
+    {
+        if(sscanf(line.c_str(), " Location = [ %lg %lg %lg ] \n", &loc.x, &loc.y, &loc.z)==3){}
+        else if(sscanf(line.c_str(), " Pseudo_Up = [ %lg %lg %lg ] \n", &up.x, &up.y, &up.z)==3){}
+        else if(sscanf(line.c_str(), " Look_At = [ %lg %lg %lg ] \n", &at.x, &at.y, &at.z)==3){}
+        else if(sscanf(line.c_str(), " Field_Of_View = %lg \n", &angle)==3){}
+    }
+    fout<<"camera { location ";
+    Emit_Vector(fout, loc, " look_at ");
+    Emit_Vector(fout, at, " up ");
+    Emit_Vector(fout, up, " angle ");
+    fout<<angle<<" }"<<std::endl;
 }
 
 int main(int argc, char *argv[]) 
@@ -187,7 +246,11 @@ int main(int argc, char *argv[])
             Emit_Rigid_Body(fout,options,frame_number);
         else if(type=="deformable_body")
             Emit_Deformable_Body(fout,options,frame_number);
-        else PHYSBAM_FATAL_ERROR("unexpected replacement type: "+type);
+        else if(type=="camera")
+            Emit_Camera(fout,options);
+        else if(type=="rigid_body_frame")
+            Emit_Rigid_Body_Frame(fout,options,frame_number);
+        else PHYSBAM_FATAL_ERROR("unexpected replacement type: '"+type+"'.");
     }
 
 
