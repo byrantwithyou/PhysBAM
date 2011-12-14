@@ -236,7 +236,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             mattress_grid=GRID<TV>(40,40,40,(T)-1.0,(T)1.0,(T)-1.0,(T)1.0,(T)-1.0,(T)1.0);
             break;
         case 42: case 52:
-            mattress_grid=GRID<TV>(5,5,5,(T)-1.0,(T)1.0,(T)-1.0,(T)1.0,(T)-1.0,(T)1.0);
+            mattress_grid=GRID<TV>(10,10,10,(T)-1.0,(T)1.0,(T)-1.0,(T)1.0,(T)-1.0,(T)1.0);
             break;
     	default:
             mattress_grid=GRID<TV>(20,10,20,(T)-1,(T)1,(T)-.5,(T).5,(T)-1,(T)1);
@@ -767,25 +767,45 @@ void Get_Initial_Data()
         case 52:
         {
             int count = 0;
-            for (int i=1; i<=20; i++)
+            for (int i=1; i<=10; i++)
             {
                 count++;
                 jello_centers.Append(TV(-500+i*5,-1000,0));
                 RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(jello_centers(count),ROTATION<TV>(0,TV(0,0,0))));
                 tests.Create_Mattress(mattress_grid,true,&initial_state);
             }
-            RIGID_BODY<TV>& box1=tests.Add_Analytic_Box(TV(7,12,7));
-            RIGID_BODY<TV>& box2=tests.Add_Analytic_Box(TV(7,12,7));
-            RIGID_BODY<TV>& box3=tests.Add_Analytic_Box(TV(7,12,7));
-            RIGID_BODY<TV>& box4=tests.Add_Analytic_Box(TV(7,12,7));
-            box1.X()=TV(7,6,0);
-            box2.X()=TV(-7,6,0);
-            box3.X()=TV(0,6,7);
-            box4.X()=TV(0,6,-7);
+            RIGID_BODY<TV>& box1=tests.Add_Analytic_Box(TV(7,7,7));
+            RIGID_BODY<TV>& box2=tests.Add_Analytic_Box(TV(7,7,7));
+            RIGID_BODY<TV>& box3=tests.Add_Analytic_Box(TV(7,7,7));
+            RIGID_BODY<TV>& box4=tests.Add_Analytic_Box(TV(7,7,7));
+            RIGID_BODY<TV>& box5=tests.Add_Analytic_Box(TV(7,7,7));
+            RIGID_BODY<TV>& box6=tests.Add_Analytic_Box(TV(7,7,7));
+            RIGID_BODY<TV>& box7=tests.Add_Analytic_Box(TV(7,7,7));
+            RIGID_BODY<TV>& box8=tests.Add_Analytic_Box(TV(7,7,7));
+
+            box1.X()=TV(7,3.5,0);
+            box2.X()=TV(-7,3.5,0);
+            box3.X()=TV(0,3.5,7);
+            box4.X()=TV(0,3.5,-7);
+            
+            box5.X()=TV(7/sqrt(2),3.5,7/sqrt(2));
+            box6.X()=TV(-7/sqrt(2),3.5,7/sqrt(2));
+            box7.X()=TV(-7/sqrt(2),3.5,-7/sqrt(2));
+            box8.X()=TV(7/sqrt(2),3.5,-7/sqrt(2));
+
+            box5.Rotation() = ROTATION<TV>((T)pi/4.0,TV(0,1,0));
+            box6.Rotation() = ROTATION<TV>((T)pi/4.0,TV(0,1,0));
+            box7.Rotation() = ROTATION<TV>((T)pi/4.0,TV(0,1,0));
+            box8.Rotation() = ROTATION<TV>((T)pi/4.0,TV(0,1,0));
+
             box1.is_static=true;
             box2.is_static=true;
             box3.is_static=true;
             box4.is_static=true;
+            box5.is_static=true;
+            box6.is_static=true;
+            box7.is_static=true;
+            box8.is_static=true;
             tests.Add_Ground();
             break;
         }
@@ -1177,7 +1197,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             break;}
         case 52:{
-            T youngs_modulus = 3e5;
+            T youngs_modulus = 1e5;
             T poissons_ratio = .4;
             T damping = 0.001;
             for (int k=1; k<=jello_centers.m; k++)
