@@ -39,6 +39,8 @@
 //   42. Bunch of jellos rolling towards camera (Reloaded)
 //   43. Through smooth gears
 //   44. 2 jellos collision
+//   47. Fish past a magnet?
+//   49. Hand through a tube
 //   50. Fish through a torus
 //   51. Fish through a tube
 //   52. Jello's falling one by one on each other
@@ -117,8 +119,10 @@ public:
     INTERPOLATION_CURVE<T,FRAME<TV> > curve,curve2,curve3;
     bool print_matrix;
     int parameter;
+    int fishes;
     T stiffness_multiplier;
     T damping_multiplier;
+    T boxsize;
     bool use_constant_ife;
     bool forces_are_removed;
     bool* externally_forced;
@@ -321,7 +325,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 29:
             solids_parameters.cfl=(T)5;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
-            solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=override_collisions;
+            solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=true;
             frame_rate=24;
             break;
         case 30:
@@ -395,6 +399,24 @@ void Parse_Options() PHYSBAM_OVERRIDE
             frame_rate=120;
             last_frame=3000;
             break;
+        case 47:
+            frame_rate=24;
+            last_frame=480;
+            solids_parameters.triangle_collision_parameters.perform_self_collision=true;
+            //solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=true;
+            //solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=true;
+            solids_parameters.cfl=(T)5;
+            solids_parameters.implicit_solve_parameters.cg_iterations=100000;
+            break;
+        case 49:
+            frame_rate=24;
+            last_frame=480;
+            solids_parameters.triangle_collision_parameters.perform_self_collision=true;
+            //solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=true;
+            //solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=true;
+            solids_parameters.cfl=(T)5;
+            solids_parameters.implicit_solve_parameters.cg_iterations=100000;
+            break;
         case 48:
             frame_rate=24;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
@@ -404,7 +426,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.implicit_solve_parameters.throw_exception_on_backward_euler_failure=false;
             break;
         case 50:
-            solids_parameters.triangle_collision_parameters.perform_self_collision=override_collisions;
+            solids_parameters.triangle_collision_parameters.perform_self_collision=true;
             //solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=true;
             //solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=true;
             solids_parameters.cfl=(T)5;
@@ -851,6 +873,62 @@ void Get_Initial_Data()
             tests.Add_Ground(1);
             break;
         }
+        case 47:
+        {
+            fishes=5;
+            for (int i=0; i<fishes; i++)
+            {
+              //  jello_centers.Append(TV(-500+i*5,-1000,0));
+                tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/fish_42K.tet",
+                                                    RIGID_BODY_STATE<TV>(FRAME<TV>(TV(-10*i,10,0),ROTATION<TV>(T(pi),TV(0,1,0)))),true,true,density);
+
+            }
+            boxsize=(T)2;
+            RIGID_BODY<TV>& box1=tests.Add_Analytic_Box(TV(3*boxsize,boxsize,boxsize));
+            RIGID_BODY<TV>& box2=tests.Add_Analytic_Box(TV(3*boxsize,boxsize,boxsize));
+            RIGID_BODY<TV>& box3=tests.Add_Analytic_Box(TV(boxsize,boxsize,boxsize));
+            RIGID_BODY<TV>& box4=tests.Add_Analytic_Box(TV(boxsize,boxsize,boxsize));
+
+            
+            box1.X()=TV(0,.5*boxsize,boxsize);
+            box2.X()=TV(0,.5*boxsize,-boxsize);
+            box3.X()=TV(-boxsize,.5*boxsize,0);
+            box4.X()=TV(boxsize,.5*boxsize,0);
+            
+            
+            box1.is_static=true;
+            box2.is_static=true;
+            box3.is_static=true;
+            box4.is_static=true;
+            tests.Add_Ground();
+            break;
+        }
+        case 49:
+        {
+            TV start(10,10,0);
+            T outer=(T)1,inner=(T).5,length=10;
+            RIGID_BODY<TV>& torus1=tests.Add_Analytic_Torus((outer-inner)/2,(outer+inner)/2,32,64);
+            torus1.is_static=true;
+            torus1.coefficient_of_friction = 0.05;
+            torus1.X()=start;
+            torus1.Rotation()=ROTATION<TV>((T)pi/2.0,TV(0,1,0));
+            last_frame=240;
+            RIGID_BODY<TV>& torus2=tests.Add_Analytic_Torus((outer-inner)/2,(outer+inner)/2,32,64);
+            torus2.is_static=true;
+            torus2.coefficient_of_friction = 0.05;
+            torus2.X()=start+TV(length,0,0);
+            torus2.Rotation()=ROTATION<TV>((T)pi/2.0,TV(0,1,0));
+            last_frame=240;
+            RIGID_BODY<TV>& shell=tests.Add_Analytic_Shell(length,outer,inner,64);
+            shell.is_static=true;
+            shell.coefficient_of_friction = 0.05;
+            shell.X()=start+TV(length/2,0,0);
+            shell.Rotation()=ROTATION<TV>((T)pi/2.0,TV(0,1,0));
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/hand_30k.tet",
+                                                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,10,0),ROTATION<TV>(T(pi),TV(0,1,0)))),true,true,density);
+            tests.Add_Ground(1);
+            break;
+        }
         case 51:
         {
             TV start(10,10,0);
@@ -988,7 +1066,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 29:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
-            Add_Constitutive_Model(tetrahedralized_volume,(T)0,(T)0,(T).01);
+            Add_Constitutive_Model(tetrahedralized_volume,(T)0,(T)0,(T).01,(T).4,(T).00);
             forces_are_removed=true;
             break;}
             
@@ -1453,7 +1531,7 @@ void Update_Time_Varying_Material_Properties(const T time)
 {   if(test_number==29 && time > .1){
         T critical=(T)3.0;
         T critical2=(T)4.0;
-        T start_young=(T)0; T end_young=(T)6;
+        T start_young=(T)0; T end_young=(T)5;
         if(time>critical && time<critical2) {
             DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
             FINITE_VOLUME<TV,3>& fv = deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();

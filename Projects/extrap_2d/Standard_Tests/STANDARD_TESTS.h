@@ -595,6 +595,10 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
         int m=mattress_grid.counts.x;
 	int n=mattress_grid.counts.y;
         for(int j=1;j<=n;j++){V(1+m*(j-1))=TV();V(m+m*(j-1))=TV();}}
+    if(test_number==30){
+        int m=mattress_grid.counts.x;
+        int n=mattress_grid.counts.y;
+        for(int j=1;j<=n;j++){V(1+m*(j-1))=TV();V(m+m*(j-1))=TV();}}
     if(test_number==28){
         int m=mattress_grid.counts.x;
         int n=mattress_grid.counts.y;
