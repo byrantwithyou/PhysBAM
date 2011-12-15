@@ -238,10 +238,10 @@ void Parse_Options() PHYSBAM_OVERRIDE
             mattress_grid3=GRID<TV>(40,40,40,(T)-1.5,(T)1.5,(T)-1.5,(T)1.5,(T)-1.5,(T)1.5);
             break;
         case 37: case 39: case 40: case 38: case 44:
-            mattress_grid=GRID<TV>(40,40,40,(T)-1.0,(T)1.0,(T)-1.0,(T)1.0,(T)-1.0,(T)1.0);
+            mattress_grid=GRID<TV>(40,40,40,(T)-0.01,(T)0.01,(T)-0.01,(T)0.01,(T)-0.01,(T)0.01);
             break;
         case 42: case 52:
-            mattress_grid=GRID<TV>(10,10,10,(T)-1.0,(T)1.0,(T)-1.0,(T)1.0,(T)-1.0,(T)1.0);
+            mattress_grid=GRID<TV>(10,10,10,(T)-0.01,(T)0.01,(T)-0.01,(T)0.01,(T)-0.01,(T)0.01);
             break;
     	default:
             mattress_grid=GRID<TV>(20,10,20,(T)-1,(T)1,(T)-.5,(T).5,(T)-1,(T)1);
@@ -383,12 +383,12 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 41:
         case 42:
         case 44:
-            solids_parameters.cfl=(T)5;
+            solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness = 1e-4;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             solids_parameters.triangle_collision_parameters.perform_self_collision=true;
             if (override_no_collisions) solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-            frame_rate=120;
+            frame_rate=960;
             last_frame=1000;
             break;
         case 52:
@@ -754,8 +754,8 @@ void Get_Initial_Data()
         }
         case 40:
         {
-            jello_centers.Append(TV(-13,3.2,0.7)); 
-            jello_centers.Append(TV(13,2.9,-0.7));
+            jello_centers.Append(TV(-0.266,0.017,0.013)); 
+            jello_centers.Append(TV(0.266,0.0260,-0.013));
             RIGID_BODY_STATE<TV> initial_state1(FRAME<TV>(jello_centers(1),ROTATION<TV>(T(pi/0.13),TV(1.3,1.5,0.7)))); 
             RIGID_BODY_STATE<TV> initial_state2(FRAME<TV>(jello_centers(2),ROTATION<TV>(T(pi/0.076),TV(0.7,1,0.1))));
             tests.Create_Mattress(mattress_grid,true,&initial_state1);
@@ -959,33 +959,20 @@ void Get_Initial_Data()
         case 43:{
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/fish_42K.tet",
                                                 RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,10,0),ROTATION<TV>(T(0),TV(0,1,0)))),true,true,density);
-//            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_4K.tet",
-//                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,2.2,0),ROTATION<TV>(T(pi/2),TV(0,0,0)))),true,true,density,0.008);
-            
             int cogs=40;
             T radius=.8;
             T sep=radius+.003;
             T cog_rad=.035;
             RIGID_BODY<TV>& gear1=tests.Add_Analytic_Smooth_Gear(TV(radius,cog_rad,1),cogs,8);
             RIGID_BODY<TV>& gear2=tests.Add_Analytic_Smooth_Gear(TV(radius,cog_rad,1),cogs,8);
-//            RIGID_BODY<TV>& cylinder=tests.Add_Analytic_Cylinder(1.5,.15,24);
-
             gear1.coefficient_of_friction = 2;
             gear2.coefficient_of_friction = 2;
-//            cylinder.coefficient_of_friction = 0;
-
             kinematic_id=gear1.particle_index;
             rigid_body_collection.rigid_body_particle.kinematic(gear1.particle_index)=true;
             kinematic_id2=gear2.particle_index;
             rigid_body_collection.rigid_body_particle.kinematic(gear2.particle_index)=true;
-            // kinematic_id3=cylinder.particle_index;
-            // rigid_body_collection.rigid_body_particle.kinematic(cylinder.particle_index)=true;
             
             T angular_velocity = 1;
-
-            // curve3.Add_Control_Point(0,FRAME<TV>(TV(0,2.75,0),ROTATION<TV>(0,TV(0,0,1))));
-            // curve3.Add_Control_Point(0.5,FRAME<TV>(TV(0,2.75,0),ROTATION<TV>(0,TV(0,0,1))));
-            // curve3.Add_Control_Point(2,FRAME<TV>(TV(0,2,0),ROTATION<TV>(0,TV(0,0,1))));
 
             for (int i=0; i<60; i++){
                 curve.Add_Control_Point(i/angular_velocity,FRAME<TV>(TV(-sep,1.5,0),ROTATION<TV>(-i,TV(0,0,1))*ROTATION<TV>(pi/(2*cogs),TV(0,0,1))));
@@ -1211,7 +1198,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                     }
             break;}
         case 40:{
-            T youngs_modulus = 4e5;
+            T youngs_modulus = 1e4;
             T poissons_ratio = .4;
             T damping = 0.001;
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume1=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(1);
@@ -1226,17 +1213,17 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 for(int j=1;j<=n;j++)
                     for(int ij=1;ij<=mn;ij++)
                     {
-                        particles.V(i+m*(j-1)+m*n*(ij-1)) = TV(-2*cos(3*ij/(T)mn)+21,-cos(2*i/(T)m)*2+1.5,-2*sin(2*j/(T)n));
-                        particles.V(i+m*(j-1)+m*n*(ij-1)+m*n*mn) = TV(1*sin(3*j/(T)n)-20,0.5*cos(3*ij/(T)mn)*2+2.3,1*sin(i/(T)m));
+                        particles.V(i+m*(j-1)+m*n*(ij-1)) = TV(0.32*cos(6*ij/(T)mn)+2.15,-0.28*cos(4*i/(T)m)+0.55,-0.31*sin(4*j/(T)n));
+                        particles.V(i+m*(j-1)+m*n*(ij-1)+m*n*mn) = TV(0.27*sin(6*j/(T)n)-2.17,0.32*cos(6*ij/(T)mn)+0.53,0.25*sin(4*i/(T)m));
                     }
             for (int i=1; i<=m*n*mn; i++)
             {
                 int index = i;
-                particles.V(index) += TV(particles.X(index).y-jello_centers(1).y,-(particles.X(index).x-jello_centers(1).x),0)*7.7;
-                particles.V(index) += TV(0,particles.X(index).z-jello_centers(1).z,-(particles.X(index).y-jello_centers(1).y))*(-1.3);
+                particles.V(index) += TV(particles.X(index).y-jello_centers(1).y,-(particles.X(index).x-jello_centers(1).x),0)*51;
+                particles.V(index) += TV(0,particles.X(index).z-jello_centers(1).z,-(particles.X(index).y-jello_centers(1).y))*(-13);
                 index+=m*n*mn;
-                particles.V(index) += TV(particles.X(index).y-jello_centers(2).y,-(particles.X(index).x-jello_centers(2).x),0)*(-12.1);
-                particles.V(index) += TV(0,particles.X(index).z-jello_centers(2).z,-(particles.X(index).y-jello_centers(2).y))*2.3;
+                particles.V(index) += TV(particles.X(index).y-jello_centers(2).y,-(particles.X(index).x-jello_centers(2).x),0)*(-39);
+                particles.V(index) += TV(0,particles.X(index).z-jello_centers(2).z,-(particles.X(index).y-jello_centers(2).y))*23;
             }
             break;}
         case 41:{
