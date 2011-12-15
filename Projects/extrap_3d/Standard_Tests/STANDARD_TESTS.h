@@ -744,7 +744,7 @@ void Get_Initial_Data()
         }
         case 39:
         {
-            RIGID_BODY_STATE<TV> initial_state1(FRAME<TV>(TV(1,8,1.5),ROTATION<TV>(T(pi/4),TV(1.3,0.3,0.7)))); 
+            RIGID_BODY_STATE<TV> initial_state1(FRAME<TV>(TV(9,13,9.5),ROTATION<TV>(T(pi/0.103),TV(1.35,0.785,1.675)))); 
             RIGID_BODY_STATE<TV> initial_state2(FRAME<TV>(TV(0,1,0)));
             tests.Create_Mattress(mattress_grid,true,&initial_state1);
             tests.Create_Mattress(mattress_grid,true,&initial_state2);
@@ -1205,7 +1205,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 for(int j=1;j<=n;j++)
                     for(int ij=1;ij<=mn;ij++)
                     {
-                        particles.V(i+m*(j-1)+m*n*(ij-1)) = TV(-2*sin(j/(T)n),-cos(2*ij/(T)mn)*2,-2*sin(3*i/(T)m));
+                        particles.V(i+m*(j-1)+m*n*(ij-1)) = TV(-6*sin(j/(T)n)-3,-cos(2*ij/(T)mn)*6,-6*sin(3*i/(T)m)-3);
                     }
             break;}
         case 40:{
