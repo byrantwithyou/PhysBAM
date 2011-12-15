@@ -45,6 +45,7 @@
 //   50. Fish through a torus
 //   51. Fish through a tube
 //   52. Jello's falling one by one on each other
+//   53. Constrained tet
 //#####################################################################
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
@@ -309,7 +310,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 24:
         case 25:
         case 26:
-        case 27: case 23:
+        case 27: case 23: case 53:
             attachment_velocity = 0.2;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
@@ -753,7 +754,7 @@ void Get_Initial_Data()
         }
         case 40:
         {
-            jello_centers.Append(TV(-0.266,0.017,0.013));
+            jello_centers.Append(TV(-0.266,0.017,0.013)); 
             jello_centers.Append(TV(0.266,0.0260,-0.013));
             RIGID_BODY_STATE<TV> initial_state1(FRAME<TV>(jello_centers(1),ROTATION<TV>(T(pi/0.13),TV(1.3,1.5,0.7))));
             RIGID_BODY_STATE<TV> initial_state2(FRAME<TV>(jello_centers(2),ROTATION<TV>(T(pi/0.076),TV(0.7,1,0.1))));
@@ -1079,7 +1080,10 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 31:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             Add_Constitutive_Model(tetrahedralized_volume,(T)2e5,(T).45,(T).01);
-            break;}
+            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            solid_body_collection.template Find_Force<GRAVITY<TV>&>().gravity=0.5;
+            Add_Constitutive_Model(tetrahedralized_volume,(T)2e5,(T).45,(T).01);
+            break;} 
         case 32:{
             T youngs_modulus = 7e5;
             T poissons_ratio = .4;

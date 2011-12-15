@@ -23,6 +23,7 @@
 //  28. Taffy test
 //  29. Gear Test
 //  30. Horizontal stretch
+//  31. Triangle stretch
 //#####################################################################
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
@@ -183,20 +184,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
     output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d",test_number);
     last_frame=1000;
-
-    switch(test_number){
-    case 20: case 21: case 26: 
-	    mattress_grid=GRID<TV>(40,8,(T)-2,(T)2,(T)-.4,(T).4);
-	break;
-        case 22: case 23: case 24: case 25: case 27: case 30:
-	    mattress_grid=GRID<TV>(20,20,(T)-.9,(T).9,(T)-.9,(T).9);
-	break;
-    	default:
-            mattress_grid=GRID<TV>(20,10,(T)-1,(T)1,(T)-.5,(T).5);
-    case 28: 
-            mattress_grid=GRID<TV>(80,16,(T)-2,(T)2,(T)-.4,(T).4);
-        break;
-    }
+    parameter=parse_args->Get_Integer_Value("-parameter");
     
     solids_parameters.triangle_collision_parameters.perform_self_collision=false;
     semi_implicit=parse_args->Is_Value_Set("-semi_implicit");
@@ -211,7 +199,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
     dump_sv=parse_args->Is_Value_Set("-dump_sv");
     solids_parameters.use_trapezoidal_rule_for_velocities=!parse_args->Get_Option_Value("-use_be");
     print_matrix=parse_args->Is_Value_Set("-print_matrix");
-    parameter=parse_args->Get_Integer_Value("-parameter");
     stiffness_multiplier=(T)parse_args->Get_Double_Value("-stiffen");
     damping_multiplier=(T)parse_args->Get_Double_Value("-dampen");
     solid_body_collection.print_energy=parse_args->Get_Option_Value("-print_energy");
@@ -219,6 +206,20 @@ void Parse_Options() PHYSBAM_OVERRIDE
     if(parse_args->Is_Value_Set("-project_nullspace")) solids_parameters.implicit_solve_parameters.project_nullspace_frequency=1;
     solid_body_collection.Print_Residuals(parse_args->Get_Option_Value("-residuals"));
     use_constant_ife=parse_args->Get_Option_Value("-use_constant_ife");
+
+    switch(test_number){
+    case 20: case 21: case 26: 
+	    mattress_grid=GRID<TV>(40,8,(T)-2,(T)2,(T)-.4,(T).4);
+	break;
+        case 22: case 23: case 24: case 25: case 27: case 30:
+	    mattress_grid=GRID<TV>(parameter,parameter,(T)-.9,(T).9,(T)-.9,(T).9);
+	break;
+    	default:
+            mattress_grid=GRID<TV>(20,10,(T)-1,(T)1,(T)-.5,(T).5);
+    case 28: 
+            mattress_grid=GRID<TV>(80,16,(T)-2,(T)2,(T)-.4,(T).4);
+        break;
+    }
 
     switch(test_number){
         case 24:
@@ -254,7 +255,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             attachment_velocity=TV((T).8,0);
 	    last_frame=480;
             break;	 
-        case 27: case 270: case 30:
+        case 27: case 270: case 30: case 31:
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=900;
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
@@ -375,6 +376,20 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 29: last_frame=1;
             tests.Add_Analytic_Smooth_Gear(TV(1,.1),20,16);
             break;
+        case 31:{
+            TRIANGULATED_AREA<T>* ta=TRIANGULATED_AREA<T>::Create(particles);
+            int a=particles.array_collection->Add_Element();
+            int b=particles.array_collection->Add_Element();
+            int c=particles.array_collection->Add_Element();
+            particles.X(a)=TV(1,0);
+            particles.X(b)=TV(0,.5);
+            particles.X(c)=TV(0,-.5);
+            particles.mass(a)=1;
+            particles.mass(b)=1;
+            particles.mass(c)=1;
+            ta->mesh.elements.Append(VECTOR<int,3>(a,b,c));
+            solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(ta);
+            break;}
         default:
             LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}
 
@@ -395,7 +410,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 24:
         case 25:
         case 26:
-        case 27: case 270: case 30:{
+        case 27: case 270: case 30: case 31:{
             TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
             Add_Constitutive_Model(triangulated_area,(T)1e2,(T).45,(T).05);
             break;}
@@ -564,6 +579,7 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
         int n=mattress_grid.counts.y;
         TV velocity=velocity_time<5.0?attachment_velocity:TV();
         for(int j=1;j<=n;j++){V(1+m*(j-1))=-velocity;V(m+m*(j-1))=velocity;}}
+    if(test_number==31){V(1)=TV(1,0);V(2).x=0;V(3).x=0;}
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes
@@ -603,6 +619,7 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
         int m=mattress_grid.counts.x;
         int n=mattress_grid.counts.y;
         for(int j=1;j<=n;j++) V(1+m*(j-1))=V(m+m*(j-1))=TV();}
+    if(test_number==31){V(1)=TV();V(2).x=0;V(3).x=0;}
 }
 void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {
     /*if(test_number==270){
