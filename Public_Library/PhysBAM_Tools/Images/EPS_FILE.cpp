@@ -6,7 +6,8 @@ template<class T> EPS_FILE<T>::
 // Constructor
 //#####################################################################
 EPS_FILE(const std::string& filename,const RANGE<TV>& box)
-    :stream(FILE_UTILITIES::Safe_Open_Output(filename,false,false)),bounding_box(RANGE<TV>::Empty_Box()),output_box(box)
+    :stream(FILE_UTILITIES::Safe_Open_Output(filename,false,false)),bounding_box(RANGE<TV>::Empty_Box()),output_box(box),fixed_bounding_box(false),
+    head_offset(0)
 {
     Write_Head();
 }
@@ -49,7 +50,7 @@ Emit(const TV &pt)
 template<class T> void EPS_FILE<T>::
 Bound(const TV& pt)
 {
-    bounding_box.Enlarge_To_Include_Point(pt);
+    if(!fixed_bounding_box) bounding_box.Enlarge_To_Include_Point(pt);
 }
 //#####################################################################
 // Function Bound
@@ -88,9 +89,10 @@ Write_Head()
     (*stream)<<"%%BoundingBox: ";
     Emit(output_box.min_corner);
     Emit(output_box.max_corner);
-    (*stream)<<output_box.max_corner.y<<std::endl;
-    (*stream)<<"/pointradius .01 def"<<std::endl;
-    (*stream)<<"/untransformed-image {"<<std::endl;
+    (*stream)<<std::endl;
+    head_offset=stream->tellp();
+    (*stream)<<"                                                                                                    "<<std::endl;
+    Set_Point_Size((T)0.01);
 }
 //#####################################################################
 // Function Write_Tail
@@ -101,12 +103,11 @@ Write_Tail()
     T scale;
     TV shift;
     Compute_Transform(scale,shift);
-    (*stream)<<"} def"<<std::endl;
+    stream->seekp(head_offset,std::ios::beg);
     Emit(shift);
     (*stream)<<"translate"<<std::endl;
-    (*stream)<<scale<<" dup dup scale /transform-scale exch def"<<std::endl;
-    (*stream)<<"1 transform-scale div dup setlinewidth /line-width exch def"<<std::endl;
-    (*stream)<<"untransformed-image"<<std::endl;
+    (*stream)<<scale<<" "<<scale<<" scale"<<std::endl;
+    (*stream)<<1/scale<<" setlinewidth"<<std::endl;
 }
 //#####################################################################
 // Function Compute_Transform
@@ -122,13 +123,21 @@ Compute_Transform(T& scale,TV& shift)
         shift=output_box.min_corner-bounding_box.min_corner*scale;}
 }
 //#####################################################################
+// Function Set_Point_Size
+//#####################################################################
+template<class T> void EPS_FILE<T>::
+Set_Point_Size(T size)
+{
+    (*stream)<<"/pointradius "<<size<<" def"<<std::endl;
+}
+//#####################################################################
 // Function Draw_Point
 //#####################################################################
 template<class T> void EPS_FILE<T>::
 Draw_Point(const TV &pt)
 {
     Emit(pt);
-    (*stream)<<"pointradius 0 360 arc stroke"<<std::endl;
+    (*stream)<<"newpath pointradius 0 360 arc closepath fill stroke"<<std::endl;
     Bound(pt);
 }
 //#####################################################################

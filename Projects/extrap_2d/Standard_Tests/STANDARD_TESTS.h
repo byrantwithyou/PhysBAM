@@ -24,10 +24,12 @@
 //  29. Gear Test
 //  30. Horizontal stretch
 //  31. Triangle stretch
+//  32. Triangle stretch (II)
 //#####################################################################
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
 
+#include <PhysBAM_Tools/Images/PPM_FILE.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <PhysBAM_Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <PhysBAM_Tools/Log/LOG.h>
@@ -45,6 +47,7 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/COROTATED.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/COROTATED_QUARTIC.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_COROTATED_BLEND.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED.h>
@@ -60,6 +63,7 @@
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/NEWMARK_EVOLUTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
+#include <PhysBAM_Dynamics/Read_Write/EPS_FILE_GEOMETRY.h>
 #include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 #include <fstream>
 namespace PhysBAM{
@@ -100,17 +104,30 @@ public:
     T stiffness_multiplier;
     T damping_multiplier;
     bool use_constant_ife;
+    T stretch;
+    T primary_contour;
+    T sigma_range;
+    int image_size;
+    T poissons_ratio;
+    bool scatter_plot;
+    bool use_contrails;
+    ARRAY<ARRAY<TV> > contrail;
+    ARRAY<VECTOR<T,3> > contrail_colors;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),semi_implicit(false),test_forces(false),use_extended_neohookean(false),
         use_extended_neohookean_refined(false),use_extended_neohookean_hyperbola(false),use_extended_neohookean_smooth(false),use_corotated(false),
         use_corot_blend(false),use_corot_quartic(false),dump_sv(false),
-        print_matrix(false),parameter(0),stiffness_multiplier(1),damping_multiplier(1),use_constant_ife(false)
+        print_matrix(false),parameter(0),stiffness_multiplier(1),damping_multiplier(1),use_constant_ife(false),stretch(1),poissons_ratio((T).45)
     {
     }
 
     // Unused callbacks
-    void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE {if(dump_sv)svout.close();}
+    void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
+    {
+        if(dump_sv) svout.close();
+        if(scatter_plot) Dump_Scatter_Plot(frame);
+    }
     void Postprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE {}
     void Apply_Constraints(const T dt,const T time) PHYSBAM_OVERRIDE {}
     void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) PHYSBAM_OVERRIDE {}
@@ -137,6 +154,7 @@ public:
                 svout << sv(i).x11 << " " << sv(i).x22 << std::endl;
             }
         }
+        if(scatter_plot) Update_Scatter_Plot();
     }
     void Align_Deformable_Bodies_With_Rigid_Bodies() PHYSBAM_OVERRIDE {}
     void Set_External_Positions(ARRAY_VIEW<TV> X,ARRAY_VIEW<ROTATION<TV> > rotation,const T time) PHYSBAM_OVERRIDE {}
@@ -174,6 +192,13 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Integer_Argument("-projection_iterations",5,"number of iterations used for projection in cg");
     parse_args->Add_Integer_Argument("-solver_iterations",1000,"number of iterations used for solids system");
     parse_args->Add_Option_Argument("-use_constant_ife","use constant extrapolation on inverting finite element fix");
+    parse_args->Add_Double_Argument("-stretch",1,"stretch");
+    parse_args->Add_Option_Argument("-plot_contour","plot primary contour");
+    parse_args->Add_Integer_Argument("-image_size",500,"image size for plots");
+    parse_args->Add_Double_Argument("-sigma_range",5,"sigma range for plots");
+    parse_args->Add_Double_Argument("-poissons_ratio",.45,"poisson's ratio");
+    parse_args->Add_Option_Argument("-scatter_plot","Create contrail plot with singular values");
+    parse_args->Add_Option_Argument("-use_contrails","Show contrails in plot");
 }
 //#####################################################################
 // Function Parse_Options
@@ -206,6 +231,13 @@ void Parse_Options() PHYSBAM_OVERRIDE
     if(parse_args->Is_Value_Set("-project_nullspace")) solids_parameters.implicit_solve_parameters.project_nullspace_frequency=1;
     solid_body_collection.Print_Residuals(parse_args->Get_Option_Value("-residuals"));
     use_constant_ife=parse_args->Get_Option_Value("-use_constant_ife");
+    stretch=(T)parse_args->Get_Double_Value("-stretch");
+    primary_contour=parse_args->Get_Option_Value("-plot_contour");
+    sigma_range=(T)parse_args->Get_Double_Value("-sigma_range");
+    image_size=parse_args->Get_Integer_Value("-image_size");
+    poissons_ratio=(T)parse_args->Get_Double_Value("-poissons_ratio");
+    scatter_plot=parse_args->Get_Option_Value("-scatter_plot");
+    use_contrails=parse_args->Get_Option_Value("-use_contrails");
 
     switch(test_number){
     case 20: case 21: case 26: 
@@ -214,11 +246,12 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 22: case 23: case 24: case 25: case 27: case 30:
 	    mattress_grid=GRID<TV>(parameter,parameter,(T)-.9,(T).9,(T)-.9,(T).9);
 	break;
+        case 28: 
+            mattress_grid=GRID<TV>(80,16,(T)-2,(T)2,(T)-.4,(T).4);
+            break;
     	default:
             mattress_grid=GRID<TV>(20,10,(T)-1,(T)1,(T)-.5,(T).5);
-    case 28: 
-            mattress_grid=GRID<TV>(80,16,(T)-2,(T)2,(T)-.4,(T).4);
-        break;
+            break;
     }
 
     switch(test_number){
@@ -255,7 +288,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             attachment_velocity=TV((T).8,0);
 	    last_frame=480;
             break;	 
-        case 27: case 270: case 30: case 31:
+        case 27: case 270: case 30: case 31: case 32:
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=900;
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
@@ -390,6 +423,20 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             ta->mesh.elements.Append(VECTOR<int,3>(a,b,c));
             solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(ta);
             break;}
+        case 32:{
+            TRIANGULATED_AREA<T>* ta=TRIANGULATED_AREA<T>::Create(particles);
+            int a=particles.array_collection->Add_Element();
+            int b=particles.array_collection->Add_Element();
+            int c=particles.array_collection->Add_Element();
+            particles.X(a)=TV(1,0);
+            particles.X(b)=TV(0,1);
+            particles.X(c)=TV(0,0);
+            particles.mass(a)=1;
+            particles.mass(b)=1;
+            particles.mass(c)=1;
+            ta->mesh.elements.Append(VECTOR<int,3>(a,b,c));
+            solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(ta);
+            break;}
         default:
             LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}
 
@@ -410,9 +457,10 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 24:
         case 25:
         case 26:
-        case 27: case 270: case 30: case 31:{
+        case 27: case 270: case 30: case 31: case 32:{
             TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
-            Add_Constitutive_Model(triangulated_area,(T)1e2,(T).45,(T).05);
+            Add_Constitutive_Model(triangulated_area,(T)1e2,poissons_ratio,(T).05);
+            if(test_number==32) particles.X(1).x=stretch;
             break;}
         case 8: 
         case 16:
@@ -420,57 +468,57 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 13:{
             TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
             solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
-            Add_Constitutive_Model(triangulated_area,(T)1e4,(T).45,(T).01);
+            Add_Constitutive_Model(triangulated_area,(T)1e4,poissons_ratio,(T).01);
             if(test_number==13){RANDOM_NUMBERS<T> rand;rand.Fill_Uniform(particles.X,-1,1);}
             break;}
         case 22:{
             TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
-            Add_Constitutive_Model(triangulated_area,(T)1e4,(T).45,(T).01);
+            Add_Constitutive_Model(triangulated_area,(T)1e4,poissons_ratio,(T).01);
             break;}
         case 14:{
             solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
             
             TRIANGULATED_AREA<T>& triangulated_area1=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>(1);
-            solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area1,new COROTATED_QUARTIC<T,2>((T)2e4,(T).45,(T).01)));
+            solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area1,new COROTATED_QUARTIC<T,2>((T)2e4,poissons_ratio,(T).01)));
 
             TRIANGULATED_AREA<T>& triangulated_area2 = solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>(2);
-            solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area2,new NEO_HOOKEAN_COROTATED_BLEND<T,2>((T)2e4,(T).45,(T).01)));
+            solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area2,new NEO_HOOKEAN_COROTATED_BLEND<T,2>((T)2e4,poissons_ratio,(T).01)));
 
             TRIANGULATED_AREA<T>& triangulated_area3 = solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>(3);
-            solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area3,new NEO_HOOKEAN_EXTRAPOLATED<T,2>((T)2e4,(T).45,(T).01)));
+            solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area3,new NEO_HOOKEAN_EXTRAPOLATED<T,2>((T)2e4,poissons_ratio,(T).01)));
 
             TRIANGULATED_AREA<T>& triangulated_area4 = solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>(4);
-            solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area4,new NEO_HOOKEAN<T,2>((T)2e4,(T).45,(T).01)));
+            solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area4,new NEO_HOOKEAN<T,2>((T)2e4,poissons_ratio,(T).01)));
             break;}
         case 17:{
             TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
-            Add_Constitutive_Model(triangulated_area,(T)1e4,(T).45,(T).01);
+            Add_Constitutive_Model(triangulated_area,(T)1e4,poissons_ratio,(T).01);
 
             RANDOM_NUMBERS<T> rand;
             rand.Fill_Uniform(particles.X,-1,1);
             break;}
         case 18:{
             TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
-            Add_Constitutive_Model(triangulated_area,(T)1e4,(T).45,(T).01);
+            Add_Constitutive_Model(triangulated_area,(T)1e4,poissons_ratio,(T).01);
             RANDOM_NUMBERS<T> rand;
             rand.Fill_Uniform(particles.X,0,0);
             break;}
         case 19:{
             TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
-            Add_Constitutive_Model(triangulated_area,(T)1e4,(T).45,(T).01);
+            Add_Constitutive_Model(triangulated_area,(T)1e4,poissons_ratio,(T).01);
             break;}
         case 20:{
             TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>(1);
-            Add_Constitutive_Model(triangulated_area,(T)1e5,(T).45,(T).01);
+            Add_Constitutive_Model(triangulated_area,(T)1e5,poissons_ratio,(T).01);
             break;}
         case 21:{
             TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>(1);
             solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
-            Add_Constitutive_Model(triangulated_area,(T)1e4,(T).45,(T).01);
+            Add_Constitutive_Model(triangulated_area,(T)1e4,poissons_ratio,(T).01);
             break;}
         case 28:{
             TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>(1);
-            Add_Constitutive_Model(triangulated_area,(T)1e5,(T).45,(T).01);
+            Add_Constitutive_Model(triangulated_area,(T)1e5,poissons_ratio,(T).01);
             break;}
         case 29: break;
         default:
@@ -487,6 +535,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     if(!semi_implicit) for(int i=1;i<=solid_body_collection.rigid_body_collection.rigids_forces.m;i++)
         solid_body_collection.rigid_body_collection.rigids_forces(i)->use_implicit_velocity_independent_forces=true;
     if(!semi_implicit) for(int i=1;i<=solid_body_collection.deformable_body_collection.deformables_forces.m;i++) solid_body_collection.deformable_body_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=true;
+
+    if(scatter_plot) Init_Scatter_Plot();
 
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >::Initialize_Bodies();
 }
@@ -580,6 +630,7 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
         TV velocity=velocity_time<5.0?attachment_velocity:TV();
         for(int j=1;j<=n;j++){V(1+m*(j-1))=-velocity;V(m+m*(j-1))=velocity;}}
     if(test_number==31){V(1)=TV(1,0);V(2).x=0;V(3).x=0;}
+    if(test_number==32){V(1)=V(3)=TV(0,0);V(3).x=0;}
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes
@@ -620,6 +671,7 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
         int n=mattress_grid.counts.y;
         for(int j=1;j<=n;j++) V(1+m*(j-1))=V(m+m*(j-1))=TV();}
     if(test_number==31){V(1)=TV();V(2).x=0;V(3).x=0;}
+    if(test_number==32){V(1)=V(3)=TV();V(3).x=0;}
 }
 void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {
     /*if(test_number==270){
@@ -697,8 +749,84 @@ void Add_Constitutive_Model(TRIANGULATED_AREA<T>& triangulated_area,T stiffness,
     //std::cout << "Lambda= " << icm->constant_lambda << std::cout;
     //std::cout << "Mu    = " << icm->constant_mu << std::cout;
     solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,icm));
+
+    if(primary_contour) Primary_Contour(*icm);
+}
+//#####################################################################
+// Function Primary_Contour
+//#####################################################################
+void Primary_Contour(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>& icm)
+{
+    ARRAY<VECTOR<T,3>,VECTOR<int,2> > img(1,image_size,1,image_size);
+    for(int i=1;i<=image_size;i++)
+        for(int j=1;j<=image_size;j++){
+            T x=(2*i-image_size)*sigma_range/image_size+1e-5;
+            T y=(2*j-image_size)*sigma_range/image_size;
+            TV g=icm.P_From_Strain(DIAGONAL_MATRIX<T,2>(x,y),1,1).To_Vector();
+            DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2> disd;
+            icm.Isotropic_Stress_Derivative(DIAGONAL_MATRIX<T,2>(x,y),disd,1);
+            SYMMETRIC_MATRIX<T,2> H(disd.x1111,disd.x2211,disd.x2222);
+            DIAGONAL_MATRIX<T,2> ev;
+            MATRIX<T,2> eigenvectors;
+            H.Fast_Solve_Eigenproblem(ev,eigenvectors);
+            TV evec=fabs(ev.x11)>fabs(ev.x22)?eigenvectors.Column(1):eigenvectors.Column(2);
+            if(evec.Sum()<0) evec=-evec;
+            T val=TV::Dot_Product(evec,g);
+            img(VECTOR<int,2>(i,j))=VECTOR<T,3>(val<0,val>=0,0);
+        }
+
+    for(int i=1;i<=image_size;i++) img(VECTOR<int,2>(i,image_size/2))=img(VECTOR<int,2>(image_size/2,i))=VECTOR<T,3>(0,0,1);
+
+    PPM_FILE<T>::Write("primary_contour.ppm", img);
+}
+//#####################################################################
+// Function Init_Scatter_Plot
+//#####################################################################
+void Init_Scatter_Plot()
+{
+    int s=0;
+    for(int f=1;FINITE_VOLUME<TV,2>* force=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,2>*>(f);f++){
+        force->Update_Position_Based_State(0,true);
+        s+=force->Fe_hat.m;}
+
+    contrail.Resize(s);
+    contrail_colors.Resize(s);
+    RANDOM_NUMBERS<T> rand;
+    rand.Fill_Uniform(contrail_colors,0,1);
+}
+//#####################################################################
+// Function Update_Scatter_Plot
+//#####################################################################
+void Update_Scatter_Plot()
+{
+    for(int f=1,k=1;FINITE_VOLUME<TV,2>* force=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,2>*>(f);f++){
+        for(int i=1;i<=force->Fe_hat.m;i++){
+            if(!use_contrails) contrail(k).Remove_All();
+            contrail(k++).Append(force->Fe_hat(i).To_Vector());}}
+}
+//#####################################################################
+// Function Dump_Scatter_Plot
+//#####################################################################
+void Dump_Scatter_Plot(int frame)
+{
+    RANGE<TV> box(-image_size,image_size,-image_size,image_size);
+    char buff[1000];
+    sprintf(buff, "svd-plot-%04d.eps", frame);
+    EPS_FILE_GEOMETRY<T> eps(buff,box);
+    eps.Set_Point_Size(4*sigma_range/image_size);
+    eps.fixed_bounding_box=true;
+    eps.bounding_box=RANGE<TV>(-sigma_range,sigma_range,-sigma_range,sigma_range);
+    for(int i=1;i<=contrail.m;i++){
+        eps.Line_Color(contrail_colors(i));
+        for(int j=2;j<=contrail(i).m;j++)
+            eps.Draw_Line(contrail(i)(j-1),contrail(i)(j));
+        eps.Draw_Point(contrail(i).Last());}
+    eps.Line_Color(VECTOR<T,3>());
+    eps.Draw_Line(TV(0,-image_size),TV(0,image_size));
+    eps.Draw_Line(TV(-image_size,0),TV(image_size,0));
 }
 //#####################################################################
 };
 }
+
 #endif

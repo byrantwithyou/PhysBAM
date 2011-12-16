@@ -45,7 +45,9 @@
 //   50. Fish through a torus
 //   51. Fish through a tube
 //   52. Jello's falling one by one on each other
-//   53. Constrained tet
+//   53. Stretch tet
+//   54. Stretch tet (II)
+//   55. Constrained tet
 //#####################################################################
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
@@ -130,6 +132,7 @@ public:
     bool forces_are_removed;
     ARRAY<bool> externally_forced;
     ARRAY<TV> jello_centers;
+    T stretch;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),semi_implicit(false),test_forces(false),use_extended_neohookean(false),
@@ -204,6 +207,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Option_Argument("-test_system");
     parse_args->Add_Option_Argument("-collisions","Does not yet work in all sims, see code for details");
     parse_args->Add_Option_Argument("-no_collisions","Does not yet work in all sims, see code for details");
+    parse_args->Add_Double_Argument("-stretch",1,"stretch");
 }
 //#####################################################################
 // Function Parse_Options
@@ -261,6 +265,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=false;
     stiffness_multiplier=(T)parse_args->Get_Double_Value("-stiffen");
     damping_multiplier=(T)parse_args->Get_Double_Value("-dampen");
+    stretch=(T)parse_args->Get_Double_Value("-stretch");
     test_forces=parse_args->Is_Value_Set("-test_forces");
     use_extended_neohookean=parse_args->Is_Value_Set("-use_ext_neo");
     use_extended_neohookean_refined=parse_args->Is_Value_Set("-use_ext_neo_ref");
@@ -310,7 +315,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 24:
         case 25:
         case 26:
-        case 27: case 23: case 53:
+        case 27: case 23: case 53: case 54: case 55:
             attachment_velocity = 0.2;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
@@ -979,6 +984,40 @@ void Get_Initial_Data()
 
             tests.Add_Ground();
             break;}
+        case 53:{
+            TETRAHEDRALIZED_VOLUME<T>* tv=TETRAHEDRALIZED_VOLUME<T>::Create(particles);
+            int a=particles.array_collection->Add_Element();
+            int b=particles.array_collection->Add_Element();
+            int c=particles.array_collection->Add_Element();
+            int d=particles.array_collection->Add_Element();
+            particles.X(a)=TV(1,0,0);
+            particles.X(b)=TV(0,-1,0);
+            particles.X(c)=TV(0,.5,.5);
+            particles.X(d)=TV(0,.5,-.5);
+            particles.mass(a)=1;
+            particles.mass(b)=1;
+            particles.mass(c)=1;
+            particles.mass(d)=1;
+            tv->mesh.elements.Append(VECTOR<int,4>(a,b,c,d));
+            solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(tv);
+            break;}
+        case 54: case 55:{
+            TETRAHEDRALIZED_VOLUME<T>* tv=TETRAHEDRALIZED_VOLUME<T>::Create(particles);
+            int a=particles.array_collection->Add_Element();
+            int b=particles.array_collection->Add_Element();
+            int c=particles.array_collection->Add_Element();
+            int d=particles.array_collection->Add_Element();
+            particles.X(a)=TV(1,0,0);
+            particles.X(b)=TV(0,0,0);
+            particles.X(c)=TV(0,0,1);
+            particles.X(d)=TV(0,1,0);
+            particles.mass(a)=1;
+            particles.mass(b)=1;
+            particles.mass(c)=1;
+            particles.mass(d)=1;
+            tv->mesh.elements.Append(VECTOR<int,4>(a,b,c,d));
+            solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(tv);
+            break;}
         default:
             LOG::cerr<<"Initial Data: Unrecognized test number "<<test_number<<std::endl;exit(1);}
 
@@ -1349,7 +1388,16 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 externally_forced(i)=(particles.X(i).x>=1.5);//1.5-0, 0 is the center of the fish
             }
             break;}
-
+        case 55:
+        case 54:
+        case 53:{
+            T youngs_modulus = 1e5;
+            T poissons_ratio = .45;
+            T damping = 0.01;
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume1=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(1);
+            Add_Constitutive_Model(tetrahedralized_volume1,youngs_modulus,poissons_ratio,damping);
+            if(test_number==55) particles.X(1).x=stretch;
+            break;}
         default:
             LOG::cerr<<"Missing bodies implementation for test number "<<test_number<<std::endl;exit(1);}
 
@@ -1434,6 +1482,9 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
         TV velocity_y = velocity_time<final_time?TV(0,attachment_velocity,0):TV();
         for(int ij=1;ij<=mn;ij++)for(int j=1;j<=n;j++){V(1+m*(j-1)+m*n*(ij-1))=-velocity_x;V(m+m*(j-1)+m*n*(ij-1))=velocity_x;}
     }
+    if(test_number==53){V(1)=TV(1,0,0);V(2).x=0;V(3).x=0;V(4).x=0;}
+    if(test_number==54){V(1)=TV(1,0,0);V(2)=TV();V(3).x=0;V(4).x=0;}
+    if(test_number==55){V(2)=V(1)=TV();V(3).x=0;V(4).x=0;}
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes
@@ -1495,6 +1546,8 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
         }
 
     }*/
+    if(test_number==53){V(1)=TV();V(2).x=0;V(3).x=0;V(4).x=0;}
+    if(test_number==54 || test_number==55){V(1)=V(2)=TV();V(3).x=0;V(4).x=0;}
 }
 //#####################################################################
 // Function Read_Output_Files_Solids

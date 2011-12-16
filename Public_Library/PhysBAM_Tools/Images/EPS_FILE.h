@@ -24,6 +24,9 @@ protected:
 public:
     RANGE<TV> bounding_box;
     RANGE<TV> output_box;
+    bool fixed_bounding_box;
+    T default_point_size;
+    int head_offset;
 
     EPS_FILE(const std::string& filename,const RANGE<TV>& box=RANGE<TV>(TV(),TV(500,500)));
     ~EPS_FILE();
@@ -41,6 +44,7 @@ public:
     void Draw_Point(const TV &pt);
     void Draw_Line(const TV &a,const TV &b);
     void Draw_Object(const RANGE<TV>& box);
+    void Set_Point_Size(T size);
 //#####################################################################
 };
 }
