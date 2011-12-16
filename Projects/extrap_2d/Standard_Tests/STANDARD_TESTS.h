@@ -819,7 +819,9 @@ void Dump_Scatter_Plot(int frame)
     for(int i=1;i<=contrail.m;i++){
         eps.Line_Color(contrail_colors(i));
         for(int j=2;j<=contrail(i).m;j++)
-            eps.Draw_Line(contrail(i)(j-1),contrail(i)(j));
+            eps.Draw_Line(contrail(i)(j-1),contrail(i)(j));}
+    for(int i=1;i<=contrail.m;i++){
+        eps.Line_Color(contrail_colors(i));
         eps.Draw_Point(contrail(i).Last());}
     eps.Line_Color(VECTOR<T,3>());
     eps.Draw_Line(TV(0,-image_size),TV(0,image_size));

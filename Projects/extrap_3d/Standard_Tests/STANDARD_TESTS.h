@@ -133,6 +133,8 @@ public:
     ARRAY<bool> externally_forced;
     ARRAY<TV> jello_centers;
     T stretch;
+    T hole;
+    bool nobind;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),semi_implicit(false),test_forces(false),use_extended_neohookean(false),
@@ -208,6 +210,8 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Option_Argument("-collisions","Does not yet work in all sims, see code for details");
     parse_args->Add_Option_Argument("-no_collisions","Does not yet work in all sims, see code for details");
     parse_args->Add_Double_Argument("-stretch",1,"stretch");
+    parse_args->Add_Double_Argument("-hole",.5,"hole");
+    parse_args->Add_Option_Argument("-nobind");
 }
 //#####################################################################
 // Function Parse_Options
@@ -282,11 +286,13 @@ void Parse_Options() PHYSBAM_OVERRIDE
     solids_parameters.implicit_solve_parameters.test_system=parse_args->Is_Value_Set("-test_system");
     override_collisions=parse_args->Is_Value_Set("-collisions");
     override_no_collisions=parse_args->Is_Value_Set("-no_collisions")&&(!override_collisions);
+    hole=(T)parse_args->Get_Double_Value("-hole");
 
     semi_implicit=parse_args->Is_Value_Set("-semi_implicit");
     if(parse_args->Is_Value_Set("-project_nullspace")) solids_parameters.implicit_solve_parameters.project_nullspace_frequency=1;
     solids_parameters.implicit_solve_parameters.cg_projection_iterations=parse_args->Get_Integer_Value("-projection_iterations");
     solids_parameters.deformable_object_collision_parameters.collide_with_interior=true;
+    nobind=parse_args->Is_Value_Set("-nobind");
 
     switch(test_number){
         case 1:
@@ -938,7 +944,7 @@ void Get_Initial_Data()
         case 51:
         {
             TV start(10,10,0);
-            T outer=(T)1,inner=(T).5,length=10;
+            T outer=(T)2.5,inner=hole,length=10;
             RIGID_BODY<TV>& torus1=tests.Add_Analytic_Torus((outer-inner)/2,(outer+inner)/2,32,64);
             torus1.is_static=true;
             torus1.coefficient_of_friction = 0.05;
@@ -1351,11 +1357,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
            // T g=0.8;
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume1=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(1);
             Add_Constitutive_Model(tetrahedralized_volume1,youngs_modulus,poissons_ratio,damping);
-            externally_forced.Resize(particles.array_collection->Size());
-            for(int i=1;i<=externally_forced.m;i++)
-            {
-                externally_forced(i)=(particles.X(i).x>=1.5);//1.5-0, 0 is the center of the fish
-            }
+            for(int i=1;i<=particles.X.m;i++)
+                if(particles.X(i).x>=1.5)
+                    externally_forced.Append(i);
             /*for (int i=1; i<=m*n*mn; i++)
             {
                 particles.V(i) += TV(particles.X(i).y-2.4,-(particles.X(i).x+30),0)*10;
@@ -1382,11 +1386,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             T damping = 0.01;
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume1=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(1);
             Add_Constitutive_Model(tetrahedralized_volume1,youngs_modulus,poissons_ratio,damping);
-            externally_forced.Resize(particles.array_collection->Size());
-            for(int i=1;i<=externally_forced.m;i++)
-            {
-                externally_forced(i)=(particles.X(i).x>=1.5);//1.5-0, 0 is the center of the fish
-            }
+            for(int i=1;i<=particles.X.m;i++)
+                if(particles.X(i).x>=1.5)
+                    externally_forced.Append(i);
             break;}
         case 55:
         case 54:
@@ -1632,6 +1634,7 @@ void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 void Bind_Intersecting_Particles()
 {
+    if(nobind) return;
     PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
     BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
@@ -1694,7 +1697,7 @@ void Preprocess_Frame(const int frame)
             }
         }
     }
-    if(test_number==32 && this->restart && first_time)
+    if(test_number==32 && this->restart && first_time && !nobind)
     {
         first_time=0;
         int bind1[]={33187,33237,33289,33476,33609,33617,33621,33628,33632,33633,33635,33638,33639,33643,33644,33649,33798,33799,33817,33819,33832,35723,35724,
@@ -1735,9 +1738,9 @@ void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) PHYSBAM_OVERRIDE
                 T height=particles.X(i).x;
                 T force_multiplier=sqr(max((T)1,time-(T)1));
                 if(height < 14+time){
-                    F(i)=TV(1.0*force_multiplier*(14+time-height),0,0);
+                    F(externally_forced(i))=TV(1.0*force_multiplier*(14+time-height),0,0);
                 }
-                else {F(i)=TV();}
+                else {F(externally_forced(i))=TV();}
             }
         }
     }
