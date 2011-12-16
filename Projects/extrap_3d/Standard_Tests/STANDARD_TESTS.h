@@ -1735,6 +1735,7 @@ void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) PHYSBAM_OVERRIDE
         {
             T height=particles.X(i).x;
             T force_multiplier=sqr(max((T)1,time-(T)1));
+            if(height>8.8 && height<21) force_multiplier*=2;
             if(height < 14+time){
                 F(externally_forced(i))=TV(1.0*force_multiplier*(14+time-height),0,0);
             }
