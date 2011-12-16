@@ -130,7 +130,7 @@ public:
     T boxsize;
     bool use_constant_ife;
     bool forces_are_removed;
-    ARRAY<bool> externally_forced;
+    ARRAY<int> externally_forced;
     ARRAY<TV> jello_centers;
     T stretch;
     T hole;
@@ -166,7 +166,6 @@ public:
     void Self_Collisions_Begin_Callback(const T time,const int substep) PHYSBAM_OVERRIDE {}
     void Filter_Velocities(const T dt,const T time,const bool velocity_update) PHYSBAM_OVERRIDE {}
     void Set_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated) PHYSBAM_OVERRIDE {}
-    void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE {if(dump_sv)svout.close();} //modified 22 Nov 2011
     //void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE {}
     // void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     // void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
@@ -1734,13 +1733,10 @@ void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) PHYSBAM_OVERRIDE
         PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
         for(int i=1; i <=externally_forced.m; i++)
         {
-            if(externally_forced(i)){
-                T height=particles.X(i).x;
-                T force_multiplier=sqr(max((T)1,time-(T)1));
-                if(height < 14+time){
-                    F(externally_forced(i))=TV(1.0*force_multiplier*(14+time-height),0,0);
-                }
-                else {F(externally_forced(i))=TV();}
+            T height=particles.X(i).x;
+            T force_multiplier=sqr(max((T)1,time-(T)1));
+            if(height < 14+time){
+                F(externally_forced(i))=TV(1.0*force_multiplier*(14+time-height),0,0);
             }
         }
     }
@@ -1769,6 +1765,18 @@ void Add_Constitutive_Model(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,T 
     solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,icm));
 }
 //#####################################################################
+// Function Postprocess_Frame
+//#####################################################################
+void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
+{
+    if(dump_sv) svout.close();
+    if(externally_forced.m)
+    {
+        PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+        for(int i=1; i <=externally_forced.m; i++)
+            Add_Debug_Particle(particles.X(externally_forced(i)),TV(0,0,1));
+    }
+}
 };
 }
 #endif
