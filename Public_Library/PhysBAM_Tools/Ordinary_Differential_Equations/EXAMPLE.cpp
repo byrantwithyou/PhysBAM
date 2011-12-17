@@ -17,7 +17,7 @@ template<class TV> EXAMPLE<TV>::
 EXAMPLE(const STREAM_TYPE stream_type_input)
     :stream_type(stream_type_input),initial_time(0),first_frame(0),last_frame(120),frame_rate(24),frame_title(""),write_substeps_level(-1),write_first_frame(true),write_last_frame(true),write_time(true),
     output_directory("output"),data_directory("../../Public_Data"),auto_restart(false),restart(false),restart_frame(0),write_output_files(true),write_frame_title(true),
-    abort_when_dt_below(0),parse_args(0),mpi_world(0),want_mpi_world(false),need_finish_logging(false),test_number(0),fixed_dt((T)0),substeps_delay_frame(-1),substeps_delay_level(-1)
+    abort_when_dt_below(0),parse_args(0),mpi_world(0),want_mpi_world(false),need_finish_logging(false),test_number(0),fixed_dt(0),max_dt(0),substeps_delay_frame(-1),substeps_delay_level(-1)
 {
 }
 //#####################################################################
@@ -104,6 +104,7 @@ Register_Options()
     parse_args->Add_Integer_Argument("-v",1<<30,"level","verbosity level");
     parse_args->Add_Option_Argument("-nolog","disable log.txt");
     parse_args->Add_Double_Argument("-dt",0,"fix the time step size to this value.");
+    parse_args->Add_Double_Argument("-max_dt",0,"fix the time step size to be no larger than this value.");
     if(mpi_world) parse_args->Add_Option_Argument("-all_verbose","all mpi processes write to stdout (not just the first)");
 }
 //#####################################################################
@@ -139,6 +140,7 @@ Override_Options()
     if(parse_args->Is_Value_Set("-framerate")) frame_rate=(T)parse_args->Get_Double_Value("-framerate");
     if(parse_args->Is_Value_Set("-query_output")){LOG::cout<<output_directory;exit(0);}
     if(parse_args->Is_Value_Set("-dt")) fixed_dt=(T)parse_args->Get_Double_Value("-dt");
+    if(parse_args->Is_Value_Set("-max_dt")) max_dt=(T)parse_args->Get_Double_Value("-max_dt");
 
     if(!parse_args->Is_Value_Set("-nolog")){
         if(!restart && !auto_restart) FILE_UTILITIES::Create_Directory(output_directory);
