@@ -93,6 +93,7 @@ Advance_To_Target_Time(const T target_time)
                 solids_dt=min(solids_dt,example.rigid_body_collection.CFL_Rigid(rigids_parameters.rigid_body_evolution_parameters,rigids_parameters.verbose_dt));
             rigids_evolution_callbacks->Limit_Solids_Dt(solids_dt,time);}
         else solids_dt=example.fixed_dt;
+        if(example.max_dt && solids_dt>example.max_dt) solids_dt=example.max_dt;
 
         T dt=solids_dt;
         if(example.mpi_rigids) example.mpi_rigids->Synchronize_Dt(dt);

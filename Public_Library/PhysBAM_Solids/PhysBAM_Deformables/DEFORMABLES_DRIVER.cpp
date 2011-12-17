@@ -72,6 +72,7 @@ Advance_To_Target_Time(const T target_time)
             solids_dt=example.deformable_body_collection.mpi_solids->Reduce_Min_Global(solids_dt);
 
         if(example.fixed_dt) solids_dt=example.fixed_dt;
+        if(example.max_dt && solids_dt>example.max_dt) solids_dt=example.max_dt;
         T dt=solids_dt;
         EXAMPLE<TV>::Clamp_Time_Step_With_Target_Time(time,target_time,dt,done,deformables_parameters.min_dt);
 

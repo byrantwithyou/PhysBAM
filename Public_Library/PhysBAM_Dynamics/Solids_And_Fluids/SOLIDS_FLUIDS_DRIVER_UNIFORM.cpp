@@ -1402,6 +1402,7 @@ Compute_Dt(const T time,const T target_time,bool& done)
         fluids_dt=solids_fluids_parameters.mpi_solid_fluid->Reduce_Min(fluids_dt);}
 
     if(example.fixed_dt){fluids_dt=example.fixed_dt;solids_dt=example.fixed_dt;}
+    if(example.max_dt){fluids_dt=min(fluids_dt,example.max_dt);solids_dt=min(solids_dt,example.max_dt);}
     T dt=min(fluids_dt,solids_dt);
     if(Simulate_Fluids())
         LOG::cout<<"fluids_dt = "<<fluids_dt<<", solids_dt = "<<solids_dt<<" dt="<<dt<<std::endl;

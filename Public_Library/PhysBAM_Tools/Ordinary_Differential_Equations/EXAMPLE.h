@@ -42,6 +42,7 @@ public:
     bool need_finish_logging;
     int test_number;
     T fixed_dt;
+    T max_dt;
     int substeps_delay_frame;
     int substeps_delay_level;
 

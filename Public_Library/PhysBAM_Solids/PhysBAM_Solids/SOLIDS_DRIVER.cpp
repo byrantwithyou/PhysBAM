@@ -192,6 +192,7 @@ Compute_Dt(const T time,const T target_time,bool& done)
         if(example.solid_body_collection.deformable_body_collection.mpi_solids)
             solids_dt=example.solid_body_collection.deformable_body_collection.mpi_solids->Reduce_Min_Global(solids_dt);}
     else solids_dt=example.fixed_dt;
+    if(example.max_dt && solids_dt>example.max_dt) solids_dt=example.max_dt;
 
     LOG::cout<<"dt = solids_dt = "<<solids_dt<<std::endl;
     if(example.abort_when_dt_below && solids_dt<example.abort_when_dt_below) PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("dt too small (%g < %g)",solids_dt,example.abort_when_dt_below));
