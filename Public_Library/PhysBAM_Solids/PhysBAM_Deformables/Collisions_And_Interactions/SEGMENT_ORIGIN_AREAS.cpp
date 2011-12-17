@@ -25,6 +25,72 @@ template<class T,int m,int n> void PhysBAM::ORIGIN_AREAS::Clear(VOL_DATA<T,m,n>&
     for(int i=0;i<n;i++) for(int j=0;j<n;j++) data.H[i][j]=MATRIX<T,m>();
 }
 
+#if 0
+template<class T,class TV> void Triangle_Area(
+    VOL_DATA<T,2,4>& data,
+    const TV& A,const TV& B,const TV& C,const TV& D)
+{
+    // Computes the area [B,C,P], along with 1st and 2nd derivatives, where P is
+    // the intersection between segment A-B and segment C-D.
+    const T ABC=TV::Cross_Product(A-C,B-C);
+    const T ADB=TV::Cross_Product(A-B,D-B);
+    const T ADC=TV::Cross_Product(A-C,D-C);
+    const T BCD=TV::Cross_Product(B-D,C-D);
+    const T ADBC=TV::Cross_Product(A-B,D-C);
+    const TV AB_L=(A-B).Orthogonal_Vector();
+    const TV AC_L=(A-C).Orthogonal_Vector();
+    const TV AD_L=(A-D).Orthogonal_Vector();
+    const TV BC_L=(B-C).Orthogonal_Vector();
+    const TV BD_L=(B-D).Orthogonal_Vector();
+    const TV CD_L=(C-D).Orthogonal_Vector();
+    typedef MATRIX<T,2> TM;
+    const TM J=TM(0,-1,+1,0)/2;
+    const TM ABxAB=TM::Outer_Product(AB_L,AB_L);
+    const TM ABxAC=TM::Outer_Product(AB_L,AC_L);
+    const TM ABxAD=TM::Outer_Product(AB_L,AD_L);
+    const TM ABxBC=TM::Outer_Product(AB_L,BC_L);
+    const TM ABxBD=TM::Outer_Product(AB_L,BD_L);
+    const TM ABxCD=TM::Outer_Product(AB_L,CD_L);
+    const TM ACxAB=ABxAC.Transposed();
+    const TM ACxBC=TM::Outer_Product(AC_L,BC_L);
+    const TM ACxBD=TM::Outer_Product(AC_L,BD_L);
+    const TM ACxCD=TM::Outer_Product(AC_L,CD_L);
+    const TM ADxAB=ABxAD.Transposed();
+    const TM ADxCD=TM::Outer_Product(AD_L,CD_L);
+    const TM BCxAB=ABxBC.Transposed();
+    const TM BCxBC=TM::Outer_Product(BC_L,BC_L);
+    const TM BCxBD=TM::Outer_Product(BC_L,BD_L);
+    const TM BDxAB=ABxBD.Transposed();
+    const TM BCxCD=TM::Outer_Product(BC_L,CD_L);
+    const TM BDxCD=TM::Outer_Product(BD_L,CD_L);
+    const TM CDxAB=ABxCD.Transposed();
+    const TM CDxAC=ACxCD.Transposed();
+    const TM CDxAD=ADxCD.Transposed();
+    const TM CDxBC=BCxCD.Transposed();
+    const TM CDxBD=BDxCD.Transposed();
+    const TM CDxCD=TM::Outer_Product(CD_L,CD_L);
+    const T ADBC2=ADBC*ADBC;
+    data.V=ABC*BCD/(2*ADBC);
+    data.G[0]=-(BCD/(2*ADBC))*(BC_L+(ABC/ADBC)*CD_L);
+    data.G[1]=(1/(2*ADBC))*(BCD*AC_L-(ABC*ADC/ADBC)*CD_L);
+    data.G[2]=(1/(2*ADBC))*(ABC*BD_L-(ADB*BCD/ADBC)*AB_L);
+    data.G[3]=-(ABC/(2*ADBC))*(BC_L+(BCD/ADBC)*AB_L);
+    data.H[0][0]=+(BCD/ADBC2)*((ABC/ADBC)*CDxCD+(BCxCD+CDxBC)/2);
+    data.H[1][1]=-(ADC/ADBC2)*((ABC/ADBC)*CDxCD+(ACxCD+CDxAC)/2);
+    data.H[2][2]=-(ADB/ADBC2)*((BCD/ADBC)*ABxAB+(ABxBD+BDxAB)/2);
+    data.H[3][3]=+(ABC/ADBC2)*((BCD/ADBC)*ABxAB+(ABxBC+BCxAB)/2);
+    data.H[0][1]=-(BCD/ADBC)*J+(1/(4*ADBC2))*(ADC*(BCxCD+BDxCD)-BCD*(CDxAC+CDxAD)+((ABC-ADB)*(ADC-BCD)/ADBC)*CDxCD);
+    data.H[2][3]=-(ABC/ADBC)*J+(1/(4*ADBC2))*(ADB*(ABxAC+ABxBC)-ABC*(ADxAB+BDxAB)+((ABC-ADB)*(ADC-BCD)/ADBC)*ABxAB);
+    data.H[1][2]=-(1-ADB*ADC/ADBC2)*J+(1/(4*ADBC2))*(2*ADBC*ACxBD+ABC*(CDxAD+CDxBD)+BCD*(ACxAB+ADxAB)+(4*ADB*ADC/ADBC-(ADB+ADC))*CDxAB);
+    data.H[0][2]=(ADB*BCD/ADBC2)*((1/ADBC)*CDxAB-J)-(1/(2*ADBC2))*(ADBC*BCxBD+ABC*CDxBD+BCD*BDxAB);
+    data.H[0][3]=(ABC*BCD/ADBC2)*((1/ADBC)*CDxAB+J)+(1/(2*ADBC2))*(ADBC*BCxBC+ABC*CDxBC+BCD*BCxAB);
+    data.H[1][3]=(ABC*ADC/ADBC2)*((1/ADBC)*CDxAB+J)-(1/(2*ADBC2))*(ADBC*ACxBC+ABC*CDxAC+BCD*ACxAB);
+    for(int i=1;i!=4;++i)
+        for(int j=0;j!=i;++j)
+            data.H[i][j]=data.H[j][i].Transposed();
+}
+#endif
+
 template<class T,class TV> void Data_From_Dof(DATA<T,2,1>& data,const TV& A)
 {
     data.V=A;
