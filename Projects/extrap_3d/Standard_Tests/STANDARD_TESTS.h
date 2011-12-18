@@ -136,6 +136,7 @@ public:
     T stretch;
     T hole;
     bool nobind;
+    ARRAY<TV> fish_V;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),semi_implicit(false),test_forces(false),use_extended_neohookean(false),
@@ -1665,7 +1666,7 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
         for (int i=1; i<=number_of_constrained_particles; i++)
             solid_body_collection.deformable_body_collection.collisions.check_collision(constrained_particles(i))=false;
     }
-
+    if(test_number==51) fish_V=solid_body_collection.deformable_body_collection.
 }
 //#####################################################################
 // Function Update_Time_Varying_Material_Properties
@@ -1809,20 +1810,24 @@ void Preprocess_Frame(const int frame)
 //#####################################################################
 void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) PHYSBAM_OVERRIDE
 {
+    T v0=4,v1=6;
     if(test_number==50 || test_number==51){
         PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
         ARRAY<bool> use(particles.X.m);
         use.Subset(externally_forced).Fill(true);
-        for(int i=1; i <=particles.X.m; i++)
+        for(int p=1; p<=particles.X.m; p++)
         {
-            int p=externally_forced(i);
             T height=particles.X(p).x;
-            if(!use.m && height<10) continue;
+            if(!use(p) && height<10) continue;
             T force_multiplier=sqr(max((T)1,time-(T)1));
             if(height>8.8) force_multiplier*=2;
-            if(height>22) continue;
+//            if(height>22) continue;
             if(height>14+time) continue;
+            T vm=fish_V(p).Magnitude();
+            if(vm>v1) continue;
+            if(vm>v0) force_multiplier*=(vm-v0)/(v1-v0);
             F(p)+=TV(1.0*force_multiplier*(14+time-height),0,0);
+//            Add_Debug_Particle(particles.X(p),TV(0,0,1));
         }
     }
 }
@@ -1855,13 +1860,6 @@ void Add_Constitutive_Model(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,T 
 void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 {
     if(dump_sv) svout.close();
-    if(externally_forced.m)
-    {
-        PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
-        for(int i=1; i <=externally_forced.m; i++){
-            if(particles.X(externally_forced(i)).x>21) continue;
-            Add_Debug_Particle(particles.X(externally_forced(i)),TV(0,0,1));}
-    }
 }
 };
 }
