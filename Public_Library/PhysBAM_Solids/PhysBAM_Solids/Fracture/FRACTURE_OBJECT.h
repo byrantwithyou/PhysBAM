@@ -72,10 +72,10 @@ public:
     virtual ~FRACTURE_OBJECT();
 
     void Set_Fracture_Bias_Magnitude(const T fracture_bias_magnitude_input=0)
-    {fracture_bias_magnitude.Resize(reference_mesh.elements.m,false);ARRAYS_COMPUTATIONS::Fill(fracture_bias_magnitude,fracture_bias_magnitude_input);}
+    {fracture_bias_magnitude.Resize(reference_mesh.elements.m,false);fracture_bias_magnitude.Fill(fracture_bias_magnitude_input);}
 
     void Set_Fracture_Bias_Stress_Scaling(const T stress_scale_input=1)
-    {fracture_bias_stress_scaling.Resize(reference_mesh.elements.m,false);ARRAYS_COMPUTATIONS::Fill(fracture_bias_stress_scaling,stress_scale_input);}
+    {fracture_bias_stress_scaling.Resize(reference_mesh.elements.m,false);fracture_bias_stress_scaling.Fill(stress_scale_input);}
 
     void Set_Fracture_Bias_Propagation(const T fracture_bias_propagation_input=0)
     {fracture_bias_propagation=fracture_bias_propagation_input;}

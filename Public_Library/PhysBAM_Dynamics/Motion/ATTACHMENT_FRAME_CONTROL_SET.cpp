@@ -14,7 +14,7 @@ ATTACHMENT_FRAME_CONTROL_SET(ARRAY<TV>& X_input,ARRAY<ARRAY<int> >& attached_nod
     jaw_constraint_penalty_coefficient((T)1000),max_opening_angle((T).19)
 {
     Save_Controls();
-    ARRAYS_COMPUTATIONS::Fill(coefficient_active,true);
+    coefficient_active.Fill(true);
     X_save=X;
 }
 //#####################################################################
@@ -113,8 +113,8 @@ Force_Derivative(ARRAY<TV>& dFdl,ARRAY<TWIST<TV> >& dFrdl,const int control_id) 
     ARRAY<TV> dXdl(X.m);
     for(int i=1;i<=attached_nodes(jaw_attachment_index).m;i++)
         dXdl(attached_nodes(jaw_attachment_index)(i))=cranium_transform.affine_transform*(affine_differential*X(attached_nodes(jaw_attachment_index)(i))+translation_differential);
-    ARRAYS_COMPUTATIONS::Fill(dFdl,TV());
-    ARRAYS_COMPUTATIONS::Fill(dFrdl,TWIST<TV>());
+    dFdl.Fill(TV());
+    dFrdl.Fill(TWIST<TV>());
     muscle_force->Add_Velocity_Independent_Forces(dFdl,dFrdl,0);
 }
 //#####################################################################

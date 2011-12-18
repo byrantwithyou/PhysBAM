@@ -151,7 +151,7 @@ Advance_Substep(const T dt,const T time)
     B_full.Resize(particles.array_collection->Size(),false,false);
     rigid_B_full.Resize(rigid_body_particles.array_collection->Size(),false,false);
     GENERALIZED_VELOCITY<TV> B(B_full,rigid_B_full,solid_body_collection);
-    ARRAYS_COMPUTATIONS::Fill(B_full,TV());ARRAYS_COMPUTATIONS::Fill(rigid_B_full,TWIST<TV>());
+    B_full.Fill(TV());rigid_B_full.Fill(TWIST<TV>());
     // Update Position Based State
     solid_body_collection.Update_Position_Based_State(time,true);
     // Add implicit velocity dependent forces

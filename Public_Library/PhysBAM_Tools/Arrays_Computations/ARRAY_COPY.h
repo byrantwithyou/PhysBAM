@@ -14,10 +14,6 @@ template<class T,class T_ARRAY,class ID>  class ARRAY_BASE;
 
 namespace ARRAYS_COMPUTATIONS
 {
-    template<class T,class T_ARRAY,class ID>
-    void Fill(ARRAY_BASE<T,T_ARRAY,ID>& a,const T& constant)
-    {T_ARRAY& self=a.Derived();ID m=self.Size();for(ID i(1);i<=m;i++) self(i)=constant;}
-
     template<class T,class T2,class T_ARRAY1,class T_ARRAY2,class ID>
     void Copy_With_Offset(const ARRAY_BASE<T,T_ARRAY1,ID>& old_copy,ARRAY_BASE<T2,T_ARRAY2,ID>& new_copy,const ID offset)
     {STATIC_ASSERT(CAN_ASSIGN<T,T2>::value);

@@ -3,7 +3,6 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #if !COMPILE_WITHOUT_DYADIC_SUPPORT || COMPILE_WITH_BINTREE_SUPPORT
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_MIN_MAX.h>
 #include <PhysBAM_Tools/Grids_Dyadic/DYADIC_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/ORIENTED_BOX.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_BINTREE_FACE_SCALAR_FIELD.h>
@@ -57,7 +56,7 @@ Display(const int in_color) const
 template<class T,class T2> RANGE<VECTOR<float,3> > OPENGL_BINTREE_FACE_SCALAR_FIELD<T,T2>::
 Bounding_Box() const
 {
-    return RANGE<VECTOR<float,3> >(grid.uniform_grid.domain.min_corner.x,grid.uniform_grid.domain.max_corner.x,ARRAYS_COMPUTATIONS::Min(value),ARRAYS_COMPUTATIONS::Max(value),0,0);
+    return RANGE<VECTOR<float,3> >(grid.uniform_grid.domain.min_corner.x,grid.uniform_grid.domain.max_corner.x,value.Min(),value.Max(),0,0);
 }
 //#####################################################################
 // Print_Selection_Info

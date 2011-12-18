@@ -20,7 +20,7 @@ public:
     GRAPH(const int number_of_nodes)
     {
         edges.Resize(number_of_nodes);
-        valid_nodes.Resize(number_of_nodes,false);ARRAYS_COMPUTATIONS::Fill(valid_nodes,true);
+        valid_nodes.Resize(number_of_nodes,false);valid_nodes.Fill(true);
     }
 
     void Add_Directed_Edge(const int from,const int to)

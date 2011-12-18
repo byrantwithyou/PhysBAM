@@ -34,8 +34,8 @@ template<class T_GRID> void GRID_BASED_COLLISION_GEOMETRY_DYADIC<T_GRID>::
 Initialize_Grids()
 {
     VECTOR<bool,T_GRID::dimension> all_true;all_true.Fill(true);
-    cell_neighbors_visible.Resize(grid.number_of_cells,false,false);ARRAYS_COMPUTATIONS::Fill(cell_neighbors_visible,all_true);
-    face_neighbors_visible.Resize(grid.number_of_faces,false,false);ARRAYS_COMPUTATIONS::Fill(face_neighbors_visible,all_true);
+    cell_neighbors_visible.Resize(grid.number_of_cells,false,false);cell_neighbors_visible.Fill(all_true);
+    face_neighbors_visible.Resize(grid.number_of_faces,false,false);face_neighbors_visible.Fill(all_true);
 }
 //##################################################################### 
 // Function Compute_Occupied_Blocks
@@ -44,7 +44,7 @@ template<class T_GRID> void GRID_BASED_COLLISION_GEOMETRY_DYADIC<T_GRID>::
 Compute_Occupied_Blocks(const bool with_body_motion,const T extra_thickness,const T body_thickness_factor)
 {
     ARRAY<bool>& occupied=with_body_motion?swept_occupied_blocks:occupied_blocks;
-    occupied.Resize(grid.Block_Indices(grid.number_of_ghost_cells),false,false);ARRAYS_COMPUTATIONS::Fill(occupied,false);
+    occupied.Resize(grid.Block_Indices(grid.number_of_ghost_cells),false,false);occupied.Fill(false);
     for(COLLISION_GEOMETRY_ID i(1);i<=collision_geometry_collection.bodies.m;i++)
         if(collision_geometry_collection.bodies(i) && collision_geometry_collection.bodies(i)->active)
             RASTERIZATION::Compute_Occupied_Blocks(*collision_geometry_collection.bodies(i),grid,occupied,with_body_motion,extra_thickness,body_thickness_factor);
@@ -56,8 +56,8 @@ template<class T_GRID> void GRID_BASED_COLLISION_GEOMETRY_DYADIC<T_GRID>::
 Compute_Grid_Visibility()
 {
     VECTOR<bool,T_GRID::dimension> all_true;all_true.Fill(true);
-    cell_neighbors_visible.Resize(grid.number_of_cells,false,false);ARRAYS_COMPUTATIONS::Fill(cell_neighbors_visible,all_true);
-    face_neighbors_visible.Resize(grid.number_of_faces,false,false);ARRAYS_COMPUTATIONS::Fill(face_neighbors_visible,all_true);
+    cell_neighbors_visible.Resize(grid.number_of_cells,false,false);cell_neighbors_visible.Fill(all_true);
+    face_neighbors_visible.Resize(grid.number_of_faces,false,false);face_neighbors_visible.Fill(all_true);
     if(!collision_geometry_collection.bodies.m) return;
 
     // cell neighbors

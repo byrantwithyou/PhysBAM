@@ -8,7 +8,6 @@
 #define __PARTICLES__
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_MIN_MAX.h>
 #include <PhysBAM_Tools/Clone/CLONEABLE.h>
 #include <PhysBAM_Tools/Point_Clouds/POINT_CLOUD.h>
 #include <PhysBAM_Tools/Point_Clouds_Computations/CENTER.h>
@@ -42,10 +41,10 @@ public:
     {store_mass=store;if(store) array_collection->Add_Array(ATTRIBUTE_ID_MASS,&mass);else array_collection->Remove_Array(ATTRIBUTE_ID_MASS);}
 
     T Min_Mass() const 
-    {return mass.Size()?ARRAYS_COMPUTATIONS::Min(mass):FLT_MAX;}
+    {return mass.Size()?mass.Min():FLT_MAX;}
 
     T Max_Mass() const 
-    {return mass.Size()?ARRAYS_COMPUTATIONS::Max(mass):0;}
+    {return mass.Size()?mass.Max():0;}
 
     void Euler_Step_Position(const T dt)
     {POINT_CLOUDS_COMPUTATIONS::Euler_Step(X,V,dt);}

@@ -255,8 +255,7 @@ Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T 
 template<class TV> void SOLIDS_EVOLUTION<TV>::
 Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time)
 {
-    INDIRECT_ARRAY<ARRAY_VIEW<TWIST<TV> >,ARRAY<int>&> twist_subset=twist.Subset(solid_body_collection.rigid_body_collection.static_and_kinematic_rigid_bodies);
-    ARRAYS_COMPUTATIONS::Fill(twist_subset,TWIST<TV>());
+    twist.Subset(solid_body_collection.rigid_body_collection.static_and_kinematic_rigid_bodies).Fill(TWIST<TV>());
     solid_body_collection.example_forces_and_velocities->Zero_Out_Enslaved_Velocity_Nodes(twist,velocity_time,current_position_time);
 }
 template<class T>

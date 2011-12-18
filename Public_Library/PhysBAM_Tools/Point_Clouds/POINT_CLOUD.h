@@ -11,7 +11,6 @@
 #include <PhysBAM_Tools/Arrays/ARRAY_COLLECTION.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 #include <PhysBAM_Tools/Arrays_Computations/RANGE_COMPUTATIONS.h>
-#include <PhysBAM_Tools/Arrays_Computations/SUMMATIONS.h>
 #include <PhysBAM_Tools/Clone/CLONEABLE.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Data_Structures/PAIR.h>
@@ -65,7 +64,7 @@ public:
     {return ARRAYS_COMPUTATIONS::Compute_Range(X.array);}
 
     TV Centroid()
-    {return ARRAYS_COMPUTATIONS::Average(X.array);};
+    {return X.array.Average();};
 
     void Clone_Helper(const POINT_CLOUD<TV>& particles)
     {array_collection->Initialize(*particles.array_collection);}

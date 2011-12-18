@@ -287,7 +287,7 @@ Transfer_Phi(const T_GRID& new_grid)
 {
     ARRAY<T> new_phi(new_grid.number_of_cells);
     if(valid_mask_current.m){
-        ARRAY<bool> new_valid_mask(new_grid.number_of_cells,false);ARRAYS_COMPUTATIONS::Fill(new_valid_mask,true);
+        ARRAY<bool> new_valid_mask(new_grid.number_of_cells,false);new_valid_mask.Fill(true);
         for(RLE_GRID_TRANSFER_ITERATOR<T_GRID,CELL_ITERATOR> cells(grid,new_grid,grid.number_of_ghost_cells);cells;cells++){
             Transfer_Cells(cells,phi,new_phi);
             if(cells.source.Short() && cells.destination.Short()) new_valid_mask(cells.destination.Cell())=valid_mask_current(cells.source.Cell());}

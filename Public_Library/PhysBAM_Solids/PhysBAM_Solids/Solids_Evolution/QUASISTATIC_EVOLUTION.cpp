@@ -94,8 +94,7 @@ One_Newton_Step_Toward_Steady_State(const T time,ARRAY<TV>& dX_full)
         R(R_full,dynamic_particles),F(F_full,dynamic_particles),
         S(S_full,dynamic_particles),*null=0;
 
-    INDIRECT_ARRAY<ARRAY<TV>,ARRAY<int>&> B_subset=B_full.Subset(solid_body_collection.deformable_body_collection.dynamic_particles);
-    ARRAYS_COMPUTATIONS::Fill(B_subset,TV());
+    B_full.Subset(solid_body_collection.deformable_body_collection.dynamic_particles).Fill(TV());
     if(!balance_external_forces_only) solid_body_collection.Add_Velocity_Independent_Forces(B_full,rigid_B_full,time);
     solid_body_collection.example_forces_and_velocities->Add_External_Forces(B_full,time);
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Force_To_Parents(B_full);
@@ -133,7 +132,7 @@ Advance_One_Time_Step_Position(const T dt,const T time,const bool solids)
     dX_full.Resize(particles.array_collection->Size(),false,false);R_full.Resize(particles.array_collection->Size(),false,false);
     for(iteration=0;iteration<solids_parameters.newton_iterations;iteration++){
         INDIRECT_ARRAY<ARRAY<TV>,ARRAY<int>&> dX_subset=dX_full.Subset(simulated_particles);
-        ARRAYS_COMPUTATIONS::Fill(dX_subset,TV()); // initial guess is zero
+        dX_subset.Fill(TV()); // initial guess is zero
         One_Newton_Step_Toward_Steady_State(time+dt,dX_full);
         particles.X.Subset(dynamic_particles)+=dX_subset;
         if(mpi_solids) mpi_solids->Exchange_Binding_Boundary_Data(particles.X);
@@ -141,7 +140,7 @@ Advance_One_Time_Step_Position(const T dt,const T time,const bool solids)
         if(mpi_solids) mpi_solids->Exchange_Force_Boundary_Data(particles.X);
         solid_body_collection.Update_Position_Based_State(time+dt,true);solid_body_collection.deformable_body_collection.Update_Collision_Penalty_Forces_And_Derivatives();
         INDIRECT_ARRAY<ARRAY<TV>,ARRAY<int>&> R_subset=R_full.Subset(simulated_particles);
-        ARRAYS_COMPUTATIONS::Fill(R_subset,TV());
+        R_subset.Fill(TV());
         solid_body_collection.Add_Velocity_Independent_Forces(R_full,rigid_R_full,time+dt);
         example_forces_and_velocities.Add_External_Forces(R_full,time+dt);
         binding_list.Distribute_Force_To_Parents(R_full);

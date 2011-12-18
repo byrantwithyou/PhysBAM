@@ -55,9 +55,8 @@ Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& V) const
 template<class TV> void BW_BACKWARD_EULER_SYSTEM<TV>::
 Force(const VECTOR_T& V,VECTOR_T& F) const
 {
-    INDIRECT_ARRAY<ARRAY_VIEW<TV>,ARRAY<int>&> V_subset=F.V.array.Subset(solid_body_collection.deformable_body_collection.simulated_particles);
-    INDIRECT_ARRAY<ARRAY_VIEW<TWIST<TV> >,ARRAY<int>&> rigid_V_subset=F.rigid_V.array.Subset(solid_body_collection.rigid_body_collection.simulated_rigid_body_particles);
-    ARRAYS_COMPUTATIONS::Fill(V_subset,TV());ARRAYS_COMPUTATIONS::Fill(rigid_V_subset,TWIST<TV>());
+    F.V.array.Subset(solid_body_collection.deformable_body_collection.simulated_particles).Fill(TV());
+    F.rigid_V.array.Subset(solid_body_collection.rigid_body_collection.simulated_rigid_body_particles).Fill(TWIST<TV>());
     solid_body_collection.Implicit_Velocity_Independent_Forces(V.V.array,V.rigid_V.array,F.V.array,F.rigid_V.array,dt,time);
     solid_body_collection.Add_Velocity_Dependent_Forces(V.V.array,V.rigid_V.array,F.V.array,F.rigid_V.array,time);
 }

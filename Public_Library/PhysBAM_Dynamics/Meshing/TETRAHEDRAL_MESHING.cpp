@@ -301,7 +301,7 @@ Compute_Boundary_Mesh_Normals()
 {
     TETRAHEDRON_MESH& mesh=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>().mesh;
     PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
-    ARRAYS_COMPUTATIONS::Fill(boundary_mesh_normals,TV());PLANE<T> p;
+    boundary_mesh_normals.Fill(TV());PLANE<T> p;
     for(int t=1;t<=mesh.boundary_mesh->elements.m;t++){
         int i,j,k;mesh.boundary_mesh->elements(t).Get(i,j,k);
         p.Specify_Three_Points(particles.X(i),particles.X(j),particles.X(k));
@@ -416,12 +416,12 @@ void Discard_Valence_Zero_Particles_And_Renumber(PARTICLES<TV>& particles,T_MESH
     // mark which nodes are used
     ARRAY<bool> node_is_used(mesh1.number_nodes);
     for(int t=1;t<=mesh1.elements.m;t++){
-        INDIRECT_ARRAY<ARRAY<bool>,typename T_MESH1::ELEMENT_TYPE&> node_is_used_subset=node_is_used.Subset(mesh1.elements(t));ARRAYS_COMPUTATIONS::Fill(node_is_used_subset,true);}
+        node_is_used.Subset(mesh1.elements(t)).Fill(true);}
     for(int t=1;t<=mesh2.elements.m;t++){
-        INDIRECT_ARRAY<ARRAY<bool>,typename T_MESH2::ELEMENT_TYPE&> node_is_used_subset=node_is_used.Subset(mesh2.elements(t));ARRAYS_COMPUTATIONS::Fill(node_is_used_subset,true);}
+        node_is_used.Subset(mesh2.elements(t)).Fill(true);}
 
     // make condensation mapping
-    condensation_mapping.Resize(mesh1.number_nodes,false,false);ARRAYS_COMPUTATIONS::Fill(condensation_mapping,0);
+    condensation_mapping.Resize(mesh1.number_nodes,false,false);condensation_mapping.Fill(0);
     for(int t=1,counter=0;t<=mesh1.number_nodes;t++) if(node_is_used(t)) condensation_mapping(t)=++counter;
 
     // make new triangle mesh
@@ -502,8 +502,7 @@ Create_Initial_Mesh(const T bcc_lattice_cell_size,const bool use_adaptive_refine
             minimal_mesh.Initialize_Boundary_Mesh_With_T_Junctions(minimal_boundary_mesh,t_junctions,t_junction_parents);
             ARRAY<bool> node_is_uncoarsenable(mesh.number_nodes);
             for(int t=1;t<=minimal_boundary_mesh.elements.m;t++){
-                INDIRECT_ARRAY<ARRAY<bool>,TRIANGLE_MESH::ELEMENT_TYPE&> node_is_uncoarsenable_subset=node_is_uncoarsenable.Subset(minimal_boundary_mesh.elements(t));
-                ARRAYS_COMPUTATIONS::Fill(node_is_uncoarsenable_subset,true);}
+                node_is_uncoarsenable.Subset(minimal_boundary_mesh.elements(t)).Fill(true);}
             redgreen.Coarsen_Complete_Refinements_Of_Subset(final_mesh,keep_tet_flag,t_junctions,t_junction_parents,allow_coarsening_to_non_graded_mesh,&node_is_uncoarsenable);}
         else{assert(!allow_coarsening_to_non_graded_mesh); // In the absence of discarding coarsening would just produce the unrefined BCC lattice
             redgreen.Coarsen_Green_Refinements(final_mesh,t_junctions,t_junction_parents);}
@@ -625,7 +624,7 @@ Discard_To_Get_Nice_Topology(RED_GREEN_TETRAHEDRA<T>& redgreen,ARRAY<bool>& keep
 {
     TETRAHEDRON_MESH& mesh=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>().mesh;
     PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
-    keep_tet_flag.Resize(mesh.elements.m,false,false);ARRAYS_COMPUTATIONS::Fill(keep_tet_flag,false);
+    keep_tet_flag.Resize(mesh.elements.m,false,false);keep_tet_flag.Fill(false);
     Envelope_Interior_Nodes(keep_tet_flag);
 
     TRIANGLE_MESH boundary_mesh;mesh.Initialize_Boundary_Mesh_Of_Subset(boundary_mesh,keep_tet_flag);
@@ -671,7 +670,7 @@ Discard_To_Get_Nice_Topology(RED_GREEN_TETRAHEDRA<T>& redgreen,ARRAY<bool>& keep
 
     while(number_bad_elements){ // continue to envelope while there may be bad things
         mesh.Initialize_Boundary_Mesh_Of_Subset(boundary_mesh,keep_tet_flag);
-        ARRAYS_COMPUTATIONS::Fill(node_on_boundary,false);node_on_boundary.Resize(mesh.number_nodes);
+        node_on_boundary.Fill(false);node_on_boundary.Resize(mesh.number_nodes);
         for(int t=1;t<=boundary_mesh.elements.m;t++){
             int i,j,k;boundary_mesh.elements(t).Get(i,j,k);node_on_boundary(i)=true;node_on_boundary(j)=true;node_on_boundary(k)=true;}
         boundary_nodes.Resize(0);int i;for(i=1;i<=node_on_boundary.m;i++) if(node_on_boundary(i)) boundary_nodes.Append(i);
@@ -712,7 +711,7 @@ Envelope_Interior_Nodes(ARRAY<bool>& keep_tet_flag)
     TETRAHEDRON_MESH& mesh=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>().mesh;
     PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
 
-    keep_tet_flag.Resize(mesh.elements.m);ARRAYS_COMPUTATIONS::Fill(keep_tet_flag,false);
+    keep_tet_flag.Resize(mesh.elements.m);keep_tet_flag.Fill(false);
     mesh.Initialize_Incident_Elements();mesh.Initialize_Neighbor_Nodes();
     for(int i=1;i<=mesh.number_nodes;i++){
         T phi=implicit_surface->Extended_Phi(particles.X(i));

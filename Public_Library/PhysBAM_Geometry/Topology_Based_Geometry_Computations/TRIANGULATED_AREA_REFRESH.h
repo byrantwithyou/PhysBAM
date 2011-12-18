@@ -103,7 +103,7 @@ void Compute_Nodal_Areas(TRIANGULATED_AREA<T>& ta,bool save_triangle_areas)
     if(save_triangle_areas){
         if(!ta.triangle_areas) ta.triangle_areas=new ARRAY<T>;
         ta.triangle_areas->Resize(ta.mesh.elements.m);}
-    ARRAYS_COMPUTATIONS::Fill(*ta.nodal_areas,(T)0);
+    ta.nodal_areas->Fill(0);
     for(int t=1;t<=ta.mesh.elements.m;t++){
         int i,j,k;ta.mesh.elements(t).Get(i,j,k);
         T area=TRIANGLE_2D<T>::Signed_Area(ta.particles.X(i),ta.particles.X(j),ta.particles.X(k));

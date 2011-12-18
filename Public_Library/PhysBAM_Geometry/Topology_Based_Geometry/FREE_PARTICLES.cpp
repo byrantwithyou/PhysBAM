@@ -49,8 +49,7 @@ Create()
 template<class TV> void FREE_PARTICLES<TV>::
 Mark_Nodes_Referenced(ARRAY<int>& marks,const int mark) const
 {
-    INDIRECT_ARRAY<ARRAY<int>,ARRAY<int>&> subset=marks.Subset(nodes);
-    ARRAYS_COMPUTATIONS::Fill(subset,mark);
+    marks.Subset(nodes).Fill(mark);
 }
 //#####################################################################
 template class FREE_PARTICLES<VECTOR<float,1> >;

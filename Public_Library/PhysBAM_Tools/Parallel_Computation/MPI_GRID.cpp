@@ -131,7 +131,7 @@ template<class T_GRID> MPI_GRID<T_GRID>::
 template<class T_GRID> void MPI_GRID<T_GRID>::
 Initialize_Communicator(const bool manual,MPI::Group* group)
 {
-    process_ranks.Resize(process_grid.Domain_Indices(1));ARRAYS_COMPUTATIONS::Fill(process_ranks.array,MPI::PROC_NULL);
+    process_ranks.Resize(process_grid.Domain_Indices(1));process_ranks.array.Fill(MPI::PROC_NULL);
     TV_INT extents=process_grid.Domain_Indices().Maximum_Corner();
     comm=new MPI::Intracomm;
     if(!manual){ // setup cartesian communicator with the standard mpi function

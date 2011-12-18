@@ -181,10 +181,10 @@ Update_Position_Based_State(const T time,const bool is_position_update)
     if(dPi_dFe) dPi_dFe->Resize(elements,false,false);if(dP_dFe) dP_dFe->Resize(elements,false,false);if(V) V->Resize(elements,false,false);
     if(node_stiffness){
         node_stiffness->Resize(strain_measure.mesh_object.particles.array_collection->Size(),false,false);
-        ARRAYS_COMPUTATIONS::Fill(*node_stiffness,SYMMETRIC_MATRIX<T,TV::m>());}
+        node_stiffness->Fill(SYMMETRIC_MATRIX<T,TV::m>());}
     if(edge_stiffness){
         edge_stiffness->Resize(strain_measure.mesh.segment_mesh->elements.m,false,false);
-        ARRAYS_COMPUTATIONS::Fill(*edge_stiffness,MATRIX<T,TV::m>());}
+        edge_stiffness->Fill(MATRIX<T,TV::m>());}
     MATRIX<T,d> V_local;
     if(!plasticity_model){
         MATRIX<MATRIX<T,TV::m>,d+1,d+1> dfdx;

@@ -23,7 +23,7 @@ Reset()
     accumulated_impulse=TWIST<TV>();
     if(accumulated_node_impulses){
         accumulated_node_impulses->Resize(simplicial_object->particles.array_collection->Size(),false,false);
-        ARRAYS_COMPUTATIONS::Fill(*accumulated_node_impulses,TV());}
+        accumulated_node_impulses->Fill(TV());}
 }
 //#####################################################################
 // Function Initialize_Simplicial_Object

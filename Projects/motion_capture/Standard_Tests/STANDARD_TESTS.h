@@ -238,7 +238,7 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
             else joint.joint_function->Set_k_p(1500);}
         if(old_min ^ controller->minimize){
             LOG::cout<<"Switching, so filling dF_array_multipliers with PAIR(0,1)"<<std::endl;
-            ARRAYS_COMPUTATIONS::Fill(controller->dF_array_multipliers,PAIR<T,T>((T)0,(T)1));}}
+            controller->dF_array_multipliers.Fill(PAIR<T,T>((T)0,(T)1));}}
 }
 //#####################################################################
 // Function Preprocess_Solids_Substep

@@ -59,7 +59,7 @@ Dilate_Horizontal(const ARRAY<RLE_RUN>* columns,ARRAY<RLE_RUN>* new_columns,cons
     ARRAY<ARRAY<RLE_RUN> > even_unions(extra_cells);
     ARRAY<RLE_RUN> new_pair;new_pair.Preallocate(10);
     Column_Union(columns[stride*m_start],columns[stride*(m_start+1)],new_pair,minimum_long_run_length);
-    ARRAYS_COMPUTATIONS::Fill(even_unions,new_pair);
+    even_unions.Fill(new_pair);
     for(int i=m_start+1;;){
         if(i-extra_cells>=m_start){ // complete left union
             ARRAY<RLE_RUN>& left=new_columns[stride*(i-extra_cells)];

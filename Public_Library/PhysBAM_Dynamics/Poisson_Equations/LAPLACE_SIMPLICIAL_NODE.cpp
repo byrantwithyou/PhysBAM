@@ -51,9 +51,9 @@ Initialize_Object()
     if(!mesh.segment_mesh) mesh.Initialize_Segment_Mesh();
     bool element_edges_defined=mesh.element_edges!=0;if(!element_edges_defined) mesh.Initialize_Element_Edges();
     psi_D.Resize(particles.array_collection->Size());
-    diagonal.Resize(particles.array_collection->Size(),false,false);ARRAYS_COMPUTATIONS::Fill(diagonal,(T)0);
+    diagonal.Resize(particles.array_collection->Size(),false,false);diagonal.Fill((T)0);
     INDIRECT_ARRAY<ARRAY<T> > diagonal_full(diagonal,particles.subset_index_from_point_cloud_index);
-    offdiagonal.Resize(mesh.segment_mesh->elements.m,false);ARRAYS_COMPUTATIONS::Fill(offdiagonal,(T)0);
+    offdiagonal.Resize(mesh.segment_mesh->elements.m,false);offdiagonal.Fill((T)0);
     for(int t=1;t<=mesh.elements.m;t++){
         VECTOR<int,d+1>& nodes=mesh.elements(t);
         VECTOR<int,d==2?3:6>& edges=(*mesh.element_edges)(t);

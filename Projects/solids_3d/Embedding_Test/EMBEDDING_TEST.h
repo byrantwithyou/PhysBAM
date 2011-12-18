@@ -9,7 +9,6 @@
 //#####################################################################
 #ifndef __EMBEDDING_TEST__
 #define __EMBEDDING_TEST__
-#include <PhysBAM_Tools/Arrays_Computations/SUMMATIONS.h>
 #include <PhysBAM_Tools/Log/DEBUG_PRINT.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_TRIANGULATED_SURFACE.h>
@@ -79,8 +78,8 @@ void Get_Initial_Data()
         VECTOR<int,3> tri_parts(particles.array_collection->Add_Element(),particles.array_collection->Add_Element(),particles.array_collection->Add_Element());
         VECTOR<int,3> etri_parts=tri_parts;
         VECTOR<int,4> tet_parts(particles.array_collection->Add_Element(),particles.array_collection->Add_Element(),particles.array_collection->Add_Element(),particles.array_collection->Add_Element());
-        INDIRECT_ARRAY<ARRAY_VIEW<T>,VECTOR<int,3>&> tri_subset=particles.mass.Subset(tri_parts);ARRAYS_COMPUTATIONS::Fill(tri_subset,(T)1./3);
-        INDIRECT_ARRAY<ARRAY_VIEW<T>,VECTOR<int,4>&> tet_subset=particles.mass.Subset(tet_parts);ARRAYS_COMPUTATIONS::Fill(tet_subset,(T)1./4);
+        particles.mass.Subset(tri_parts).Fill((T)1./3);
+        particles.mass.Subset(tet_parts).Fill((T)1./4);
         particles.X(tri_parts[1])=TV((T)-0.668156,(T)1.666096,(T)1.202544);
         particles.X(tri_parts[2])=TV((T)0.104949,(T)0.717676,(T)0.022739);
         particles.X(tri_parts[3])=TV((T)0.306855,(T)0.963611,(T)1.181754);
@@ -165,8 +164,8 @@ void Get_Initial_Data()
         SEGMENTED_CURVE<TV>& curve=*SEGMENTED_CURVE<TV>::Create(particles);
         VECTOR<int,3> tri_parts(particles.array_collection->Add_Element(),particles.array_collection->Add_Element(),particles.array_collection->Add_Element());
         VECTOR<int,4> tet_parts(particles.array_collection->Add_Element(),particles.array_collection->Add_Element(),particles.array_collection->Add_Element(),particles.array_collection->Add_Element());
-        INDIRECT_ARRAY<ARRAY_VIEW<T>,VECTOR<int,3>&> tri_subset=particles.mass.Subset(tri_parts);ARRAYS_COMPUTATIONS::Fill(tri_subset,(T)1./3);
-        INDIRECT_ARRAY<ARRAY_VIEW<T>,VECTOR<int,4>&> tet_subset=particles.mass.Subset(tet_parts);ARRAYS_COMPUTATIONS::Fill(tet_subset,(T)1./4);
+        particles.mass.Subset(tri_parts).Fill((T)1./3);
+        particles.mass.Subset(tet_parts).Fill((T)1./4);
         particles.X(tri_parts[1])=TV((T)-0.668156,(T)1.666096,(T)1.202544);
         particles.X(tri_parts[2])=TV((T)0.104949,(T)0.717676,(T)0.022739);
         particles.X(tri_parts[3])=TV((T)0.306855,(T)0.963611,(T)1.181754);
@@ -201,8 +200,8 @@ void Get_Initial_Data()
         VECTOR<int,3> tri_parts(particles.array_collection->Add_Element(),particles.array_collection->Add_Element(),particles.array_collection->Add_Element());
         VECTOR<int,3> etri_parts=tri_parts;
         VECTOR<int,4> tet_parts(particles.array_collection->Add_Element(),particles.array_collection->Add_Element(),particles.array_collection->Add_Element(),particles.array_collection->Add_Element());
-        INDIRECT_ARRAY<ARRAY_VIEW<T>,VECTOR<int,3>&> tri_subset=particles.mass.Subset(tri_parts);ARRAYS_COMPUTATIONS::Fill(tri_subset,(T)1./3);
-        INDIRECT_ARRAY<ARRAY_VIEW<T>,VECTOR<int,4>&> tet_subset=particles.mass.Subset(tet_parts);ARRAYS_COMPUTATIONS::Fill(tet_subset,(T)1./4);
+        particles.mass.Subset(tri_parts).Fill((T)1./3);
+        particles.mass.Subset(tet_parts).Fill((T)1./4);
         particles.X(tri_parts[1])=TV((T)-0.668156,(T)1.666096,(T)1.202544);
         particles.X(tri_parts[2])=TV((T)0.104949,(T)0.717676,(T)0.022739);
         particles.X(tri_parts[3])=TV((T)0.306855,(T)0.963611,(T)1.181754);
@@ -251,7 +250,7 @@ void Get_Initial_Data()
     soft_bindings.Set_Mass_From_Effective_Mass();
     PHYSBAM_DEBUG_PRINT("soft",particles.mass);
 
-    LOG::cout<<"total mass "<<ARRAYS_COMPUTATIONS::Sum(particles.mass)<<std::endl;
+    LOG::cout<<"total mass "<<particles.mass.Sum()<<std::endl;
 
 }
 //#####################################################################
@@ -281,14 +280,14 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         if(false && target_position){
             SEGMENTED_CURVE<TV>& segmented_curve=deformable_body_collection.deformable_geometry.template Find_Structure<SEGMENTED_CURVE<TV>&>();
             LINEAR_SPRINGS<TV>* spring_force=Create_Edge_Springs(segmented_curve,100/(1+sqrt((T)2)),(T)1);
-            ARRAY<T> restlengths(segmented_curve.mesh.elements.m);ARRAYS_COMPUTATIONS::Fill(restlengths,(T).5);
+            ARRAY<T> restlengths(segmented_curve.mesh.elements.m);restlengths.Fill((T).5);
             //spring_force->Set_Restlength(restlengths);
             spring_force->Clamp_Restlength((T).1);
             spring_force->Set_Overdamping_Fraction(3);
             solid_body_collection.Add_Force(spring_force);}
         soft_bindings.Initialize_Binding_Mesh();
         soft_bindings.binding_mesh->elements.Append(VECTOR<int,2>(8,9));
-        ARRAYS_COMPUTATIONS::Fill(soft_bindings.use_impulses_for_collisions,false);
+        soft_bindings.use_impulses_for_collisions.Fill(false);
         if(use_zero_length_springs) solid_body_collection.Add_Force(Create_Edge_Binding_Springs(particles,*soft_bindings.binding_mesh,(T)1e2,(T)1));
         else{
             LINEAR_SPRINGS<TV>* springs=Create_Edge_Springs(particles,*soft_bindings.binding_mesh,(T)1e1,(T)1);
@@ -301,7 +300,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)1e6,(T).45,(T).01,(T).25),true,(T).1));
         soft_bindings.Initialize_Binding_Mesh();
         if(use_zero_length_springs){
-            ARRAYS_COMPUTATIONS::Fill(soft_bindings.use_impulses_for_collisions,false);
+            soft_bindings.use_impulses_for_collisions.Fill(false);
             LOG::cout<<"stiffness "<<stiffness<<std::endl;
             //solid_body_collection.Add_Force(Create_Edge_Binding_Springs(*soft_bindings.binding_mesh,particles,stiffness,(T)3));}
             LINEAR_SPRINGS<TV>* spring_force=Create_Edge_Springs(particles,*soft_bindings.binding_mesh,stiffness,(T)3);

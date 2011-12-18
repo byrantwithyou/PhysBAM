@@ -42,7 +42,7 @@ void Compute_Cut_Geometries(const GRID<VECTOR<T,1> >& grid,const int num_ghost_c
             RAY<TV> r_to_l_ray(cell_volume.max_corner,cell_volume.min_corner-cell_volume.max_corner,true);r_to_l_ray.t_max=r_to_l_ray.direction.Normalize();r_to_l_ray.semi_infinite=false;
             if(collision_bodies_affecting_fluid.Intersection_With_Any_Simplicial_Object(l_to_r_ray,body_id,&collision_objects)){
                 int poly_index=cut_cells(index)->geometry.Append(POLYGON<TV>(RANGE<TV>(cell_volume.min_corner, l_to_r_ray.Point(l_to_r_ray.t_max))));
-                TV centroid=ARRAYS_COMPUTATIONS::Average(cut_cells(index)->geometry(poly_index).X);
+                TV centroid=cut_cells(index)->geometry(poly_index).X.Average();
 
                 cut_cells(index)->visibility.Resize(poly_index);
                 if(!Is_Occluded_Cell_Center<T,1>(centroid,grid.Center(index),collision_bodies_affecting_fluid.objects_in_cell,collision_bodies_affecting_fluid.collision_geometry_collection,index)){
@@ -59,7 +59,7 @@ void Compute_Cut_Geometries(const GRID<VECTOR<T,1> >& grid,const int num_ghost_c
                     cut_cells(index)->visibility(poly_index).Append(neighbor_cell_index);}
             if(collision_bodies_affecting_fluid.Intersection_With_Any_Simplicial_Object(r_to_l_ray,body_id,&collision_objects)){
                 int poly_index=cut_cells(index)->geometry.Append(POLYGON<TV>(RANGE<TV>(r_to_l_ray.Point(r_to_l_ray.t_max),cell_volume.max_corner)));
-                TV centroid=ARRAYS_COMPUTATIONS::Average(cut_cells(index)->geometry(poly_index).X);
+                TV centroid=cut_cells(index)->geometry(poly_index).X.Average();
 
                 cut_cells(index)->visibility.Resize(poly_index);
                 if(!Is_Occluded_Cell_Center<T,1>(centroid,grid.Center(index),collision_bodies_affecting_fluid.objects_in_cell,collision_bodies_affecting_fluid.collision_geometry_collection,index)){

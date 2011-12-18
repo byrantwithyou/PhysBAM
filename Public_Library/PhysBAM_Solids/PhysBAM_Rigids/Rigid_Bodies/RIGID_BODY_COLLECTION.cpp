@@ -213,7 +213,7 @@ Update_Simulated_Particles()
 
     ARRAY<bool> particle_is_simulated(rigid_particles_number);
     INDIRECT_ARRAY<ARRAY<bool>,ARRAY<int>&> simulated_subset=particle_is_simulated.Subset(rigid_body_particle.array_collection->deletion_list);
-    ARRAYS_COMPUTATIONS::Fill(simulated_subset,false);
+    simulated_subset.Fill(false);
     for(int i=1;i<=rigid_particles_number;i++)
         if(Is_Active(i) && Rigid_Body(i).Is_Simulated()) // TODO: Can't everything be defaulted to true?
             particle_is_simulated(i)=true;
@@ -237,8 +237,7 @@ Update_Simulated_Particles()
         if(rigid_body_particle.kinematic(p)){kinematic_rigid_bodies.Append(p);static_and_kinematic_rigid_bodies.Append(p);}}
 
     ARRAY<bool> rigid_particle_is_simulated(rigid_particles_number);
-    INDIRECT_ARRAY<ARRAY<bool>,ARRAY<int>&> simulated_particle_subset=rigid_particle_is_simulated.Subset(simulated_rigid_body_particles);
-    ARRAYS_COMPUTATIONS::Fill(simulated_particle_subset,true);
+    rigid_particle_is_simulated.Subset(simulated_rigid_body_particles).Fill(true);
     for(int i=1;i<=rigids_forces.m;i++) rigids_forces(i)->Update_Mpi(rigid_particle_is_simulated);
 }
 //#####################################################################
@@ -267,8 +266,7 @@ template<class TV> void RIGID_BODY_COLLECTION<TV>::
 Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V_full,ARRAY_VIEW<TWIST<TV> > rigid_F_full,const T scale,const T time) const
 {
     assert(rigid_F_full.Size()==rigid_body_particle.array_collection->Size());
-    INDIRECT_ARRAY<ARRAY_VIEW<TWIST<TV> > > rigid_F_subset(rigid_F_full.Subset(dynamic_rigid_body_particles));
-    ARRAYS_COMPUTATIONS::Fill(rigid_F_subset,TWIST<TV>()); // note we zero here because we will scale the forces below
+    rigid_F_full.Subset(dynamic_rigid_body_particles).Fill(TWIST<TV>()); // note we zero here because we will scale the forces below
     bool added=false;
     for(int k=1;k<=rigids_forces.m;k++) if(rigids_forces(k)->use_implicit_velocity_independent_forces){
         rigids_forces(k)->Add_Implicit_Velocity_Independent_Forces(rigid_V_full,rigid_F_full,time);added=true;}

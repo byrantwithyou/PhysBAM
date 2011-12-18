@@ -27,7 +27,7 @@ Close_Surface(TRIANGULATED_SURFACE<T>& ts,const bool merge_coincident_vertices,c
 
     // for each node on boundary, get minimum length of boundary segments adjacent to it - also keep track of longest boundary segment
     ARRAY<T> minimum_incident_boundary_segment_length(ts.mesh.boundary_mesh->number_nodes,false);
-    ARRAYS_COMPUTATIONS::Fill(minimum_incident_boundary_segment_length,(T)FLT_MAX);
+    minimum_incident_boundary_segment_length.Fill(FLT_MAX);
     T maximum_boundary_segment_length=0;
     for(int i=1;i<=ts.mesh.boundary_mesh->elements.m;i++){
         int node1,node2;ts.mesh.boundary_mesh->elements(i).Get(node1,node2);

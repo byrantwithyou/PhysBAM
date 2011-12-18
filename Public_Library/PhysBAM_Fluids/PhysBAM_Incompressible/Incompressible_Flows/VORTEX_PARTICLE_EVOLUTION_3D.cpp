@@ -2,7 +2,6 @@
 // Copyright 2004-2005, Ron Fedkiw, Frank Losasso, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_MIN_MAX.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
@@ -64,7 +63,7 @@ Compute_Body_Force(const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,ARRAY<VECTO
         
         if(mpi_grid){
             T max_radius = (T)0;
-            if(vorticity_particles.array_collection->Size()>=1) max_radius=ARRAYS_COMPUTATIONS::Max(vorticity_particles.radius);
+            if(vorticity_particles.array_collection->Size()>=1) max_radius=vorticity_particles.radius.Max();
             Exchange_Boundary_Particles_Flat(*mpi_grid,missing_vorticity_particles,max_radius);}
 
         T small_number=(T)1e-4*grid.min_dX;

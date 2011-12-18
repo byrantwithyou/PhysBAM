@@ -45,7 +45,7 @@ public:
 
     void Solve(const T time,const bool solution_regions_already_computed=false)
     {if(!solution_regions_already_computed) Find_Solution_Regions();
-    ARRAYS_COMPUTATIONS::Fill(filled_region_touches_dirichlet,true); // don't need to worry about Neumann regions in heat flow
+    filled_region_touches_dirichlet.Fill(true); // don't need to worry about Neumann regions in heat flow
     T_LAPLACE::Solve(time,true);}
 
     void Find_A_Part_Two(RANGE<VECTOR<int,TV::dimension> >& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array,ARRAY<VECTOR_ND<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index)

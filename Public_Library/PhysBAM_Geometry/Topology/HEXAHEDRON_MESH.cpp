@@ -246,6 +246,6 @@ Set_Number_Nodes(const int number_nodes_input)
 void HEXAHEDRON_MESH::
 Mark_Nodes_Referenced(ARRAY<int>& marks,const int mark) const
 {
-    for(int e=1;e<=elements.m;e++){INDIRECT_ARRAY<ARRAY<int>,VECTOR<int,8>&> subset=marks.Subset(elements(e));ARRAYS_COMPUTATIONS::Fill(subset,mark);}
+    for(int e=1;e<=elements.m;e++) marks.Subset(elements(e)).Fill(mark);
 }
 //#####################################################################

@@ -137,7 +137,7 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
     Rewind_Particle_Velocities(); // Need because Velocity_Independent_Forces can (e.g. wind) depend on the time 'n' velocities
 
     F_temp.Resize(F.Size());
-    ARRAYS_COMPUTATIONS::Fill(F_temp,TV());
+    F_temp.Fill(TV());
     base_force->Add_Velocity_Independent_Forces(F_temp,time);
     F+=velocity_independent_force_scale*F_temp;
 
@@ -152,7 +152,7 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
 {
     Rewind_Particle_Positions();
 
-    ARRAYS_COMPUTATIONS::Fill(F_temp,TV());
+    F_temp.Fill(TV());
     base_force->Add_Velocity_Dependent_Forces(V,F_temp,time);
     F+=velocity_dependent_force_scale*F_temp;
 
@@ -166,7 +166,7 @@ Add_Force_Differential(ARRAY_VIEW<const TV> dX,ARRAY_VIEW<TV> dF,const T time) c
 {
     Rewind_Particle_Positions();
 
-    F_temp.Resize(dF.Size());ARRAYS_COMPUTATIONS::Fill(F_temp,TV());
+    F_temp.Resize(dF.Size());F_temp.Fill(TV());
     base_force->Add_Force_Differential(dX,F_temp,time);
     dF+=velocity_independent_force_scale*F_temp;
 
@@ -180,7 +180,7 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F
 {
     Rewind_Particle_Positions();
 
-    ARRAYS_COMPUTATIONS::Fill(F_temp,TV());
+    F_temp.Fill(TV());
     base_force->Add_Implicit_Velocity_Independent_Forces(V,F_temp,time);
     F+=implicit_velocity_independent_force_scale*F_temp;
 

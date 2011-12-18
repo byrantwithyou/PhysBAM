@@ -26,7 +26,7 @@ public:
     PLASTICITY_MODEL(const int elements)
     {
         Fp_inverse.Exact_Resize(elements);
-        ARRAYS_COMPUTATIONS::Fill(Fp_inverse,SYMMETRIC_MATRIX<T,d>::Identity_Matrix());
+        Fp_inverse.Fill(SYMMETRIC_MATRIX<T,d>::Identity_Matrix());
     }
     
     virtual ~PLASTICITY_MODEL()

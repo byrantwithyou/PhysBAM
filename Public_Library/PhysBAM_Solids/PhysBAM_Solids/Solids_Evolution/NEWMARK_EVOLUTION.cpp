@@ -90,8 +90,7 @@ Prepare_Backward_Euler_System(BACKWARD_EULER_SYSTEM<TV>& system,const T dt,const
     GENERALIZED_VELOCITY<TV> F_all(F_full,rigid_F_full,solid_body_collection);
     GENERALIZED_VELOCITY<TV> V_all(particles.V,rigid_body_particles.twist,solid_body_collection);
 
-    INDIRECT_ARRAY<ARRAY<TV>,ARRAY<int>&> B_subset=B_full.Subset(solid_body_collection.deformable_body_collection.simulated_particles);
-    ARRAYS_COMPUTATIONS::Fill(B_subset,TV());ARRAYS_COMPUTATIONS::Fill(rigid_B_full,TWIST<TV>());
+    B_full.Subset(solid_body_collection.deformable_body_collection.simulated_particles).Fill(TV());rigid_B_full.Fill(TWIST<TV>());
     solid_body_collection.example_forces_and_velocities->Add_External_Forces(B_full,current_velocity_time+dt);
     solid_body_collection.example_forces_and_velocities->Add_External_Forces(rigid_B_full,current_velocity_time+dt);
     if(mpi_solids) mpi_solids->Exchange_Force_Boundary_Data_Global(particles.V);

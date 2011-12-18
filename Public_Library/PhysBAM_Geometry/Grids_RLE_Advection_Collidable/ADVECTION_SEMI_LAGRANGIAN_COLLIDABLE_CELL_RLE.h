@@ -51,7 +51,7 @@ public:
         const T_FACE_LOOKUP& face_velocities,T_BOUNDARY_T2& boundary,const T dt,const T time,
         const ARRAY<T2>* Z_min_ghost,const ARRAY<T2>* Z_max_ghost,ARRAY<T2>* Z_min,ARRAY<T2>* Z_max)
     {assert(!Z_min && !Z_max);
-    ARRAYS_COMPUTATIONS::Fill(cell_valid_points_next,true);
+    cell_valid_points_next.Fill(true);
     for(CELL_ITERATOR iterator(grid,0);iterator;iterator++)if(iterator.Short()){int cell=iterator.Cell();
         T_BLOCK cell_block(grid,iterator.I()); 
         if(!cell_block || !body_list.Swept_Occupied_Block(cell_block)){

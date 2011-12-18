@@ -13,7 +13,6 @@
 #ifndef __SWIMMING_TESTS__
 #define __SWIMMING_TESTS__
 
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_MIN_MAX.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <PhysBAM_Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <PhysBAM_Tools/Log/DEBUG_PRINT.h>
@@ -929,7 +928,7 @@ void Update_Subsamples()
 
     // the minimum distance of each particle to a collision object
     particle_distances.Resize(old_number_particles);
-    INDIRECT_ARRAY<ARRAY<T>,ARRAY<int>&> subset=particle_distances.Subset(surface_particles);ARRAYS_COMPUTATIONS::Fill(subset,FLT_MAX);
+    particle_distances.Subset(surface_particles).Fill(FLT_MAX);
 
     for(int i=1;i<=surface_particles.m;i++){int p=surface_particles(i);
         for(COLLISION_GEOMETRY_ID body(1);body<=collision_body_list.Size();body++)
@@ -938,7 +937,7 @@ void Update_Subsamples()
     // iterate over surface elements
     for(int t=1;t<=surface_elements.m;t++){
         const VECTOR<int,3>& triangle=surface_elements(t);
-        T triangle_distance=ARRAYS_COMPUTATIONS::Min(particle_distances.Subset(triangle));
+        T triangle_distance=particle_distances.Subset(triangle).Min();
         if(triangle_distance<refinement_distance) Persist_Subsamples(t,new_binding_list,new_soft_bindings);
         else Delete_Subsamples(t);}
 

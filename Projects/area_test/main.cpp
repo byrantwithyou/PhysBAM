@@ -348,7 +348,7 @@ void Volume_From_Simplices_Test_Gradient(
             X[i](d)+=dx;
             const T Gida=vol_data.G[i](d);
             const T Gidb=(vol_data_dx1.V-vol_data_dx0.V)/(2*dx);
-            assert(std::abs(Gida-Gidb)<=tol);
+            PHYSBAM_ASSERT(std::abs(Gida-Gidb)<=tol);
         }
     }
 }
@@ -404,7 +404,7 @@ void Volume_From_Simplices_Test_Hessian(
                         X[i](d)+=dx;
                         Hijdeb=((vol_data_dx11.V-vol_data_dx10.V)-(vol_data_dx01.V-vol_data_dx00.V))/(4*dx*dx);
                     }
-                    assert(std::abs(Hijdea-Hijdeb)<=tol);
+                    PHYSBAM_ASSERT(std::abs(Hijdea-Hijdeb)<=tol);
                 }
             }
         }

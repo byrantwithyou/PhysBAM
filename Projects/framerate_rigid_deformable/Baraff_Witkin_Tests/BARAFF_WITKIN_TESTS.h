@@ -224,7 +224,7 @@ void Triangle_Permutations()
     
     TRIANGULATED_SURFACE<T>& surface=*TRIANGULATED_SURFACE<T>::Create(particles);solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(&surface);
     particles.array_collection->Add_Elements(6);
-    ARRAYS_COMPUTATIONS::Fill(particles.mass,(T)1);
+    particles.mass.Fill((T)1);
     particles.X(1)=TV(0,0,0);particles.X(2)=TV(1,0,0);particles.X(3)=TV(0,0,1);
     particles.X(4)=TV(0,0,0);particles.X(5)=TV(1,0,0);particles.X(6)=TV(0,0,1);
     surface.mesh.elements.Append(VECTOR<int,3>(1,2,3));
@@ -244,7 +244,7 @@ void Single_Triangle()
     
     TRIANGULATED_SURFACE<T>& surface=*TRIANGULATED_SURFACE<T>::Create(particles);solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(&surface);
     particles.array_collection->Add_Elements(3);
-    ARRAYS_COMPUTATIONS::Fill(particles.mass,(T)1);
+    particles.mass.Fill((T)1);
     T theta=0;
     switch(parameter){
         case 0:theta=0;break;
@@ -267,7 +267,7 @@ void Shear_Test()
     
     TRIANGULATED_SURFACE<T>& surface=*TRIANGULATED_SURFACE<T>::Create(particles);solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(&surface);
     particles.array_collection->Add_Elements(3);
-    ARRAYS_COMPUTATIONS::Fill(particles.mass,(T)1);
+    particles.mass.Fill((T)1);
     particles.X(1)=TV(0,0,0);particles.X(2)=TV(1,0,0);particles.X(3)=TV(0,0,1);
     surface.mesh.elements.Append(VECTOR<int,3>(1,2,3));
 }
@@ -285,7 +285,7 @@ void Bending_Test()
     
     TRIANGULATED_SURFACE<T>& surface=*TRIANGULATED_SURFACE<T>::Create(particles);solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(&surface);
     particles.array_collection->Add_Elements(4);
-    ARRAYS_COMPUTATIONS::Fill(particles.mass,(T)1);
+    particles.mass.Fill((T)1);
     T theta=pi/32;
     particles.X(1)=TV(0,0,0);particles.X(2)=TV(1,0,0);particles.X(3)=TV(0,0,1);particles.X(4)=TV(.5*(1+cos(theta)),sqrt(2)*.5*sin(theta),.5*(1+cos(theta)));
     surface.mesh.elements.Append(VECTOR<int,3>(1,2,3));

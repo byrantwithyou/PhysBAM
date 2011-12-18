@@ -5,7 +5,6 @@
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
 #include <PhysBAM_Tools/Arrays_Computations/SORT.h>
-#include <PhysBAM_Tools/Arrays_Computations/SUMMATIONS.h>
 #include <PhysBAM_Tools/Data_Structures/DATA_STRUCTURES_FORWARD.h>
 #include <PhysBAM_Tools/Data_Structures/ELEMENT_ID.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE_ITERATOR.h>
@@ -385,7 +384,7 @@ Prune_And_Exchange_Impulses(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,ARR
     int tag=Get_Unique_Tag();
 
     // Figure out what impulse_accumulators this node needs to send
-    ARRAYS_COMPUTATIONS::Fill(need_to_reevolve,false);
+    need_to_reevolve.Fill(false);
     ARRAY<int> accumulators_to_send;
     for(int i=1;i<=rigid_body_collection.rigid_body_particle.array_collection->Size();i++){
         int p=rigid_body_collection.rigid_body_particle.id(i);

@@ -4,7 +4,6 @@
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
 #include <PhysBAM_Tools/Arrays_Computations/SORT.h>
-#include <PhysBAM_Tools/Arrays_Computations/SUMMATIONS.h>
 #include <PhysBAM_Tools/Data_Structures/DATA_STRUCTURES_FORWARD.h>
 #include <PhysBAM_Tools/Data_Structures/ELEMENT_ID.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE_ITERATOR.h>
@@ -233,7 +232,7 @@ Broadcast_Collision_Modified_Data(ARRAY_VIEW<bool> modified,ARRAY_VIEW<bool> rec
         comm->Bcast(buffer.Get_Array_Pointer(),buffer.m,MPI::PACKED,0);
         MPI_UTILITIES::Unpack(recently_modified_indices,buffer,position,*comm);
         INDIRECT_ARRAY<ARRAY_VIEW<bool> > modified_subset(modified,recently_modified_indices);INDIRECT_ARRAY<ARRAY_VIEW<bool> > recently_modified_subset(recently_modified,recently_modified_indices);
-        ARRAYS_COMPUTATIONS::Fill(modified_subset,true);ARRAYS_COMPUTATIONS::Fill(recently_modified_subset,true);
+        modified_subset.Fill(true);recently_modified_subset.Fill(true);
         INDIRECT_ARRAY<ARRAY_VIEW<TV> > X_modified(X,recently_modified_indices),V_modified(V,recently_modified_indices);
         MPI_UTILITIES::Unpack(X_modified,V_modified,buffer,position,*comm);}
     else{
@@ -258,7 +257,7 @@ Gather_Collision_Modified_Data(ARRAY_VIEW<bool> modified,ARRAY_VIEW<bool> recent
             comm->Recv(buffer.Get_Array_Pointer(),buffer.m,MPI::PACKED,probe_status.Get_source(),probe_status.Get_tag());
             MPI_UTILITIES::Unpack(recently_modified_indices,buffer,position,*comm);
             INDIRECT_ARRAY<ARRAY_VIEW<bool> > modified_subset(modified,recently_modified_indices);INDIRECT_ARRAY<ARRAY_VIEW<bool> > recently_modified_subset(recently_modified,recently_modified_indices);
-            ARRAYS_COMPUTATIONS::Fill(modified_subset,true);ARRAYS_COMPUTATIONS::Fill(recently_modified_subset,true);
+            modified_subset.Fill(true);recently_modified_subset.Fill(true);
             INDIRECT_ARRAY<ARRAY_VIEW<TV> > X_modified(X,recently_modified_indices),V_modified(V,recently_modified_indices);
             MPI_UTILITIES::Unpack(X_modified,V_modified,buffer,position,*comm);}}
     else{
@@ -502,7 +501,7 @@ template<class TV> template<class T_DATA> T_DATA MPI_SOLIDS<TV>::
 Debug_Reduce_Array_Sum(ARRAY_VIEW<const T_DATA> local_values) const // sends all values to one processor and adds them up in order (very slow)
 {
     const int root=0;
-    if(number_of_ranks==1) return ARRAYS_COMPUTATIONS::Sum(local_values);
+    if(number_of_ranks==1) return local_values.Sum();
     MPI::Datatype type=MPI_UTILITIES::Datatype<T_DATA>();
     int local_count=local_values.Size();
     if(comm->Get_rank()!=root){ // slave
@@ -523,7 +522,7 @@ Debug_Reduce_Array_Sum(ARRAY_VIEW<const T_DATA> local_values) const // sends all
         comm->Gatherv(local_values.Get_Array_Pointer(),local_count,type,
             global_values.Get_Array_Pointer(),counts.Get_Array_Pointer(),displacements.Get_Array_Pointer(),type,root);
         LOG::cout<<"global values hash = "<<Hash(global_values)<<std::endl;
-        T_DATA sum=ARRAYS_COMPUTATIONS::Sum(global_values);
+        T_DATA sum=global_values.Sum();
         comm->Bcast(&sum,1,type,root);
         return sum;}
 }
@@ -571,7 +570,7 @@ KD_Tree_Partition(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection_inp
     partition_id_from_particle_index.Resize(deformable_body_collection_input.particles.array_collection->Size()+rigid_geometry_collection_input.particles.array_collection->Size());
     for(PARTITION_ID i(1);i<=particles_of_partition.Size();i++){
         INDIRECT_ARRAY<ARRAY<PARTITION_ID> > partition_subset(partition_id_from_particle_index,particles_of_partition(i));
-        if(partition_id_from_particle_index.Size()) ARRAYS_COMPUTATIONS::Fill(partition_subset,i);}
+        if(partition_id_from_particle_index.Size()) partition_subset.Fill(i);}
 }
 //#####################################################################
 // Function KD_Tree_Partition_Subset
@@ -594,7 +593,7 @@ KD_Tree_Partition_Subset(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collect
     partition_id_from_particle_index.Resize(deformable_body_collection_input.particles.array_collection->Size()+rigid_geometry_collection_input.particles.array_collection->Size());
     for(PARTITION_ID i(1);i<=particles_of_partition.Size();i++){
         INDIRECT_ARRAY<ARRAY<PARTITION_ID> > partition_subset(partition_id_from_particle_index,particles_of_partition(i));
-        ARRAYS_COMPUTATIONS::Fill(partition_subset,i);}
+        partition_subset.Fill(i);}
 }
 //#####################################################################
 // Function Distribute_Repulsion_Pairs
@@ -632,7 +631,7 @@ template<class TV,class T_ARRAY_PAIR> void Distribute_Repulsion_Pairs_Helper(con
                 if(!particle_to_component(root)){particle_to_component(root)=components.Append(ARRAY<int>());component_processors.Append(0);}
                 int component_id=particle_to_component(root);
                 INDIRECT_ARRAY<ARRAY<int>,VECTOR<int,T_PAIR::count>&> particle_subset(particle_to_component,pair.nodes);
-                ARRAYS_COMPUTATIONS::Fill(particle_subset,component_id);
+                particle_subset.Fill(component_id);
                 components(component_id).Append(i);
                 component_processors(component_id)|=processor_mask;}}
         // choose processors to dump on and make list of boundary pairs processed on each processor

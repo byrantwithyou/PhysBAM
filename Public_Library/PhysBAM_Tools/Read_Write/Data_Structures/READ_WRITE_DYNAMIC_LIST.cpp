@@ -26,7 +26,7 @@ Read(DYNAMIC_LIST_CORE& object,const std::string& prefix,ARRAY<int>& needs_init)
         else{new_array.Append((void*)(0));needs_init.Append(active_ids(i));}}
     for(int i=1;i<=object.array.Size();i++)if(!element_copied(i)) object.Delete_And_Clear(object.array(i));
     object.index_to_id_map.Resize(active_ids.Size());
-    ARRAYS_COMPUTATIONS::Fill(object.id_to_index_map,0);
+    object.id_to_index_map.Fill(0);
     for(int i=1;i<=new_array.Size();i++){
         object.pointer_to_id_map.Set(new_array(i),active_ids(i));
         object.index_to_id_map(i)=active_ids(i);

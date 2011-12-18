@@ -102,14 +102,14 @@ public:
         tetrahedron_list.Append(VECTOR<int,3>(i,l2+j,l1+k));tetrahedron_list.Append(VECTOR<int,3>(i,l1+j,k+l2));}}
         
     void Vertex_Neighbors(const VECTOR<int,3>& vertex,const int level,ARRAY<VECTOR<int,3> >& vertex_list) const
-    {vertex_list.Resize(14);ARRAYS_COMPUTATIONS::Fill(vertex_list,vertex);int l2=level<<1,l4=level<<2;
+    {vertex_list.Resize(14);vertex_list.Fill(vertex);int l2=level<<1,l4=level<<2;
     vertex_list(1).x+=l4;vertex_list(2).y+=l4;vertex_list(3).z+=l4;vertex_list(4).x-=l4;vertex_list(5).y-=l4;vertex_list(6).z-=l4;
     vertex_list( 7)+=VECTOR<int,3>( l2, l2, l2);vertex_list( 8)+=VECTOR<int,3>( l2, l2,-l2);vertex_list( 9)+=VECTOR<int,3>( l2,-l2, l2);
     vertex_list(10)+=VECTOR<int,3>( l2,-l2,-l2);vertex_list(11)+=VECTOR<int,3>(-l2, l2, l2);vertex_list(12)+=VECTOR<int,3>(-l2, l2,-l2);
     vertex_list(13)+=VECTOR<int,3>(-l2,-l2, l2);vertex_list(14)+=VECTOR<int,3>(-l2,-l2,-l2);}
     
     void Incident_Tetrahedrons(const VECTOR<int,3>& vertex,const int level,ARRAY<VECTOR<int,3> >& tetrahedron_list) const
-    {ARRAY<VECTOR<int,3> >& tl=tetrahedron_list;tl.Resize(24);ARRAYS_COMPUTATIONS::Fill(tl,vertex);int t=1;
+    {ARRAY<VECTOR<int,3> >& tl=tetrahedron_list;tl.Resize(24);tl.Fill(vertex);int t=1;
     int l1=level,l2=l1<<1;
     tl( 1).x+=l2;tl( 1).y+=l1;tl( 2).x+=l2;tl( 2).y-=l1;tl( 3).x+=l2;tl( 3).z+=l1;tl( 4).x+=l2;tl( 4).z-=l1;
     tl( 5).x-=l2;tl( 5).y+=l1;tl( 6).x-=l2;tl( 6).y-=l1;tl( 7).x-=l2;tl( 7).z+=l1;tl( 8).x-=l2;tl( 8).z-=l1;
@@ -126,13 +126,13 @@ public:
     {int l1=Edge_Level(edge),l2=l1<<1;Assert_Valid_Edge(edge,l1);
     int xp=edge.x&l2,yp=edge.y&l2,zp=edge.z&l2,t=1;
     if(edge.x&l1){
-        tetrahedron_list.Resize(6);ARRAYS_COMPUTATIONS::Fill(tetrahedron_list,edge);
+        tetrahedron_list.Resize(6);tetrahedron_list.Fill(edge);
         int dx=l1-xp,dy=l1-yp,dz=l1-zp;
         tetrahedron_list(1).x+=dx;tetrahedron_list(1).y-=dy;tetrahedron_list(2).x+=dx;tetrahedron_list(2).z-=dz;
         tetrahedron_list(3).y+=dy;tetrahedron_list(3).x-=dx;tetrahedron_list(4).y+=dy;tetrahedron_list(4).z-=dz;
         tetrahedron_list(5).z+=dz;tetrahedron_list(5).x-=dx;tetrahedron_list(6).z+=dz;tetrahedron_list(6).y-=dy;}
     else{
-        tetrahedron_list.Resize(4);ARRAYS_COMPUTATIONS::Fill(tetrahedron_list,edge);
+        tetrahedron_list.Resize(4);tetrahedron_list.Fill(edge);
         if(yp^zp){tetrahedron_list(t++).x+=l1;tetrahedron_list(t++).x-=l1;}
         if(xp^zp){tetrahedron_list(t++).y+=l1;tetrahedron_list(t++).y-=l1;}
         if(xp^yp){tetrahedron_list(t++).z+=l1;tetrahedron_list(t++).z-=l1;}
@@ -188,7 +188,7 @@ public:
         v3=t+VECTOR<int,3>(0,s2,-s);v4=t+VECTOR<int,3>(0,-s2,-s);}}
 
     void Tetrahedron_Children(const VECTOR<int,3>& t,ARRAY<VECTOR<int,3> >& child_list) const
-    {ARRAY<VECTOR<int,3> >&cl=child_list;cl.Resize(8);ARRAYS_COMPUTATIONS::Fill(cl,t);
+    {ARRAY<VECTOR<int,3> >&cl=child_list;cl.Resize(8);cl.Fill(t);
     int l2=Tetrahedron_Level(t),l4=l2<<1,l1=l2>>1;
     if(t.x&l2){
         int s=(l2-((t.x^t.y)&l4))>>1;

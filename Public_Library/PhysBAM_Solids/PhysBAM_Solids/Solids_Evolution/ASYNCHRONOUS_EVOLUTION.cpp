@@ -375,10 +375,10 @@ Get_Active_Forces_Contributions(const T dt,const T time,ARRAY<TV>& force_on_part
     rigid_F_full.Resize(solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size(),true,false);
     B_full.Resize(solid_body_collection.deformable_body_collection.particles.array_collection->Size(),true,false);
     F_full.Resize(solid_body_collection.deformable_body_collection.particles.array_collection->Size(),true,false);
-    ARRAYS_COMPUTATIONS::Fill(rigid_B_full,TWIST<TV>());
-    ARRAYS_COMPUTATIONS::Fill(rigid_F_full,TWIST<TV>());
-    ARRAYS_COMPUTATIONS::Fill(B_full,TV());
-    ARRAYS_COMPUTATIONS::Fill(F_full,TV());
+    rigid_B_full.Fill(TWIST<TV>());
+    rigid_F_full.Fill(TWIST<TV>());
+    B_full.Fill(TV());
+    F_full.Fill(TV());
 
     solid_body_collection.Add_Velocity_Independent_Forces(B_full,rigid_B_full,time+dt);
 
@@ -461,7 +461,7 @@ Apply_Accumulated_Finescale_Impulse_To_Mixed_Particles()
 {
     for(int i=1;i<=both_forces_particles_indices.m;i++){int p=both_forces_particles_indices(i);
         solid_body_collection.deformable_body_collection.particles.V(p)+=accumulated_finescale_impulse_on_mixed_particles(i);}
-    ARRAYS_COMPUTATIONS::Fill(accumulated_finescale_impulse_on_mixed_particles,TV());
+    accumulated_finescale_impulse_on_mixed_particles.Fill(TV());
 }
 //#####################################################################
 // Function Set_Force_Active_Particles
@@ -495,8 +495,7 @@ template<class TV> void ASYNCHRONOUS_EVOLUTION<TV>::
 Set_Asynchronous_Particles(const ARRAY<int>& async_list)
 {
     ARRAY<bool> fine_list(solid_body_collection.deformable_body_collection.particles.array_collection->Size());
-    INDIRECT_ARRAY<ARRAY<bool>,ARRAY<int>&> fine_subset=fine_list.Subset(async_list);
-    ARRAYS_COMPUTATIONS::Fill(fine_subset,true);
+    fine_list.Subset(async_list).Fill(true);
     coarsescale_forces_particles_map.Remove_All();
     for(int i=1;i<=scaled_coarsescale_forces_indices.m;i++) Set_Force_Active_Particles(solid_body_collection.deformable_body_collection.deformables_forces(scaled_coarsescale_forces_indices(i)),fine_list,false);
     for(int i=1;i<=finescale_forces_indices.m;i++) Set_Force_Active_Particles(solid_body_collection.deformable_body_collection.deformables_forces(finescale_forces_indices(i)),fine_list,true);

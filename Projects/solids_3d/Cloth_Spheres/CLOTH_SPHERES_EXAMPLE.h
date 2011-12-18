@@ -151,7 +151,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     soft_bindings.Initialize_Binding_Mesh();
     BINDING_SPRINGS<TV>& binding_springs=*Create_Edge_Binding_Springs(particles,*soft_bindings.binding_mesh,(T)1e3,(T)1);
     solid_body_collection.Add_Force(&binding_springs);
-    binding_stiffness.Resize(soft_bindings.bindings.m);ARRAYS_COMPUTATIONS::Fill(binding_stiffness,(T)5e2);
+    binding_stiffness.Resize(soft_bindings.bindings.m);binding_stiffness.Fill((T)5e2);
     binding_springs.Set_Stiffness(binding_stiffness);
     binding_springs.Set_Overdamping_Fraction((T)1);
 

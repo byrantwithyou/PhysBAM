@@ -209,7 +209,7 @@ Dump_Curvatures() const
         if(K>mx) mx=K;
         if(K<mn) mn=K;}
     if(n) LOG::cout<<"cstats "<<mn<<"   "<<mx<<std::endl;
-    if(coefficients.m) LOG::cout<<"length estimates  "<<ARRAYS_COMPUTATIONS::Max(coefficients)/ARRAYS_COMPUTATIONS::Min(coefficients)<<std::endl;
+    if(coefficients.m) LOG::cout<<"length estimates  "<<coefficients.Max()/coefficients.Min()<<std::endl;
 }
 template class SURFACE_TENSION_FORCE<VECTOR<float,2> >;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT

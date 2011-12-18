@@ -4,7 +4,6 @@
 //#####################################################################
 // Class RIGID_DEFORMABLE_COLLISIONS
 //#####################################################################
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_MIN_MAX.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <PhysBAM_Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <PhysBAM_Tools/Log/DEBUG_SUBSTEPS.h>

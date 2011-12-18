@@ -74,19 +74,19 @@ public:
     {print_number_ignored=print_number_ignored_input;}
 
     void Set_Stiffness(const T bending_stiffness_input)
-    {ARRAYS_COMPUTATIONS::Fill(bending_stiffness,bending_stiffness_input);}
+    {bending_stiffness.Fill(bending_stiffness_input);}
 
     void Set_Stiffness(ARRAY_VIEW<const T> bending_stiffness_input)
     {bending_stiffness=bending_stiffness_input;}
 
     void Set_Sine_Half_Rest_Angle(const T sine_half_rest_angle_input)
-    {ARRAYS_COMPUTATIONS::Fill(sine_half_rest_angle,sine_half_rest_angle_input);}
+    {sine_half_rest_angle.Fill(sine_half_rest_angle_input);}
 
     void Set_Sine_Half_Rest_Angle(ARRAY_VIEW<const T> sine_half_rest_angle_input)
     {sine_half_rest_angle=sine_half_rest_angle_input;}
 
     void Set_Damping(const T damping_input)
-    {ARRAYS_COMPUTATIONS::Fill(damping,damping_input);}
+    {damping.Fill(damping_input);}
 
     void Set_Damping(ARRAY_VIEW<const T> damping_input)
     {damping=damping_input;}
@@ -95,7 +95,7 @@ public:
     void Enable_Plasticity(const T_FIELD& plastic_yield_input,const T_FIELD& plastic_hardening_input)
     {if(!plastic_yield) plastic_yield=new ARRAY<T>;plastic_yield->Resize(bending_quadruples.m,false,false);
     if(!plastic_hardening) plastic_hardening=new ARRAY<T>;plastic_hardening->Resize(bending_quadruples.m,false,false);
-    ARRAYS_COMPUTATIONS::Fill(*plastic_yield,plastic_yield_input);ARRAYS_COMPUTATIONS::Fill(*plastic_hardening,plastic_hardening_input);
+    plastic_yield->Fill(plastic_yield_input);plastic_hardening->Fill(plastic_hardening_input);
     if(!sine_half_elastic_angle) sine_half_elastic_angle=new ARRAY<T>;*sine_half_elastic_angle=sine_half_rest_angle;}
 
     void Set_Area_Cutoff_From_Triangulated_Surface(TRIANGULATED_SURFACE<T>& triangulated_surface,const T cutoff_ratio=(T)1)

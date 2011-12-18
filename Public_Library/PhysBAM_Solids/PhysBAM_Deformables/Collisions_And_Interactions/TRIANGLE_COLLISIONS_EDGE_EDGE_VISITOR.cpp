@@ -4,7 +4,6 @@
 //#####################################################################
 // Class TRIANGLE_COLLISIONS_EDGE_EDGE_VISITOR
 //##################################################################### 
-#include <PhysBAM_Tools/Arrays_Computations/SUMMATIONS.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Geometry/Spatial_Acceleration/BOX_HIERARCHY_DEFINITION.h>
@@ -59,10 +58,10 @@ template<class TV> void TRIANGLE_COLLISIONS_EDGE_EDGE_VISITOR<TV>::
 Store_Helper_Helper(const int segment1,const int segment2)
 {
     const VECTOR<int,2> &segment1_nodes=edges1(segment1),&segment2_nodes=edges2(segment2);
-    TV dX_average=(ARRAYS_COMPUTATIONS::Average(X.Subset(segment1_nodes)) // TODO: optimize scalar multiplications
-                   -ARRAYS_COMPUTATIONS::Average(X_self_collision_free.Subset(segment1_nodes))
-                   +ARRAYS_COMPUTATIONS::Average(X.Subset(segment2_nodes))
-                   -ARRAYS_COMPUTATIONS::Average(X_self_collision_free.Subset(segment2_nodes)));
+    TV dX_average=(X.Subset(segment1_nodes).Average() // TODO: optimize scalar multiplications
+                   -X_self_collision_free.Subset(segment1_nodes).Average()
+                   +X.Subset(segment2_nodes).Average()
+                   -X_self_collision_free.Subset(segment2_nodes).Average());
     dX_average*=(T).5; // TODO: This is separated because of compiler bugs
     RANGE<TV> box1=RANGE<TV>::Bounding_Box(X_self_collision_free.Subset(segment1_nodes))+dX_average;box1.Enlarge_Nonempty_Box_To_Include_Points(X.Subset(segment1_nodes));
     RANGE<TV> box2=RANGE<TV>::Bounding_Box(X_self_collision_free.Subset(segment2_nodes))+dX_average;box2.Enlarge_Nonempty_Box_To_Include_Points(X.Subset(segment2_nodes));

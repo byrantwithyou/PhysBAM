@@ -4,7 +4,6 @@
 //#####################################################################
 // Class VOF_ADVECTION
 //#####################################################################
-#include <PhysBAM_Tools/Arrays_Computations/SUMMATIONS.h>
 #include <PhysBAM_Tools/Math_Tools/pow.h>
 #include <PhysBAM_Tools/Math_Tools/sign.h>
 #include <PhysBAM_Geometry/Basic_Geometry/LINE_2D.h>
@@ -193,7 +192,7 @@ Create_Preimage_Particles_From_Old_Postimage_Simplices(const TV_INT& cell_index,
                 T_ELEMENT simplex=simplices_in_cell(t);simplices_in_cell.Remove_Index_Lazy(t);
                 if(node==0) T_SIMPLEX::Cut_With_Hyperplane(simplex_particles,cutting_surface,simplex,junk_simplices,simplices_in_cell);
                 else T_SIMPLEX::Cut_With_Hyperplane(simplex_particles,cutting_surface,simplex,simplices_in_cell,junk_simplices);}}
-        for(int j=1;j<=simplices_in_cell.m;j++) simplex_centers.Append(ARRAYS_COMPUTATIONS::Average(simplex_particles.Subset(simplices_in_cell(j))));}
+        for(int j=1;j<=simplices_in_cell.m;j++) simplex_centers.Append(simplex_particles.Subset(simplices_in_cell(j)).Average());}
 
     if(!simplex_centers.m){
         if(!cell_to_postimage_particle_map(cell_index)) PHYSBAM_FATAL_ERROR();
@@ -221,7 +220,7 @@ Create_Geometry()
         if(particle_levelset.removed_negative_particles(block)){
             PARTICLE_LEVELSET_PARTICLES<TV>& cell_particles=*particle_levelset.removed_negative_particles(block);
             ARRAY_VIEW<T>* material_volume=cell_particles.array_collection->template Get_Array<T>(ATTRIBUTE_ID_MATERIAL_VOLUME);
-            ARRAYS_COMPUTATIONS::Fill(*material_volume,(T)0);}}
+            material_volume->Fill((T)0);}}
     T phi_meshing_threshold=-10*grid.Maximum_Edge_Length(); // TODO: change this.  for now, no fixed cells
 
     old_phis.Exchange(phis);
@@ -364,7 +363,7 @@ Create_Geometry()
             // compute simplex negative material and label used nodes
             int number_of_simplices=simplices_in_cell.m;
             simplex_preimage_volume.Resize(number_of_simplices);lower_dimensional_preimage_volume.Resize(number_of_simplices);
-            lower_dimensional_preimage.Resize(number_of_simplices);ARRAYS_COMPUTATIONS::Fill(lower_dimensional_preimage,false);
+            lower_dimensional_preimage.Resize(number_of_simplices);lower_dimensional_preimage.Fill(false);
             for(int i=material_particles.m+1;i<=object.particles.array_collection->Size();i++) material_particles.Append(false);
             for(int i=1;i<=simplices_in_cell.m;i++){
                 const T_ELEMENT& simplex=object.mesh.elements(simplices_in_cell(i));
@@ -373,9 +372,9 @@ Create_Geometry()
                 if(simplex_preimage_volume(i)<=0){lower_dimensional_preimage(i)=true;lower_dimensional_preimage_volume(i)=T_SIMPLEX::Half_Boundary_Measure(object.particles.X.Subset(simplex));}}
 
             simplex_preimage_material_volume.Resize(object.mesh.elements.m);
-            const T total_preimage_volume=ARRAYS_COMPUTATIONS::Sum(simplex_preimage_volume)+negative_particle_volume;
+            const T total_preimage_volume=simplex_preimage_volume.Sum()+negative_particle_volume;
             if(total_preimage_volume<=0){
-                const T total_lower_dimensional_preimage_volume=ARRAYS_COMPUTATIONS::Sum(lower_dimensional_preimage_volume);
+                const T total_lower_dimensional_preimage_volume=lower_dimensional_preimage_volume.Sum();
                 // TODO: need to modify particles here too, just in case we have any (although that's unlikely)
                 if(!total_lower_dimensional_preimage_volume){ // divide it up evenly...not that it's likely to matter in this case
                     T average_simplex_volume=number_of_simplices?volume_of_material(cell_index)/number_of_simplices:0;
@@ -565,7 +564,7 @@ Advect_Material_Preimages(const T_FACE_LOOKUP& face_velocities,const T dt,const 
         for(int j=1;j<=T_FACE_ELEMENT::dimension;j++) if(fixed_particle_list(face[j])) fixed_nodes++;
         TV face_normal;
         TV_INT opposing_cell;
-        TV old_center=ARRAYS_COMPUTATIONS::Average(old_particle_X.Subset(face)),new_center=ARRAYS_COMPUTATIONS::Average(particle_X.Subset(face));
+        TV old_center=old_particle_X.Subset(face).Average(),new_center=particle_X.Subset(face).Average();
         TV initial_levelset_center_velocity=Velocity(face_velocities_initial,old_center,start_time,use_analytic_velocities);
         TV final_levelset_center_velocity=Velocity(face_velocities_final,new_center,start_time+dt,use_analytic_velocities);
         if(fixed_nodes==T_FACE_ELEMENT::dimension && Find_Fixed_Cell_On_Point(new_center,opposing_cell,face_normal,maximum_refinement_fraction)){
@@ -830,7 +829,7 @@ Refine_Or_Coarsen_Geometry()
     level_material_volume.Resize(preimage.meshes.m);
     for(int level=1;level<=level_material_volume.m;level++) level_material_volume(level).Resize((*preimage.meshes(level)).elements.m);
     
-    ARRAYS_COMPUTATIONS::Fill(simplex_preimage_material_volume,(T)0);
+    simplex_preimage_material_volume.Fill((T)0);
     for(int level=1;level<=level_material_volume.m;level++) for(int i=1;i<=level_material_volume(level).m;i++) if(level_material_volume(level)(i)){
         if(preimage.Leaf(level,i)) simplex_preimage_material_volume((*preimage.leaf_number(level))(i))=level_material_volume(level)(i);
         else{

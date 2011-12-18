@@ -29,7 +29,7 @@ public:
     void Reset()
     {skip_counter=1;
     for(int i=1;i<=pair_last_checked.m;i++) pair_last_checked(i).Remove_All();
-    ARRAYS_COMPUTATIONS::Fill(rigid_body_last_moved,(unsigned int)1);}
+    rigid_body_last_moved.Fill(1);}
 
     void Initialize(const int number_of_rigid_bodies,const bool reset)
     {if(reset){

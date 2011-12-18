@@ -40,7 +40,7 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& bx,KRYLOV_VECTOR_BASE<T>& bresult) const
     const KRYLOV_VECTOR_T& x=debug_cast<const KRYLOV_VECTOR_T&>(bx);KRYLOV_VECTOR_T& result=debug_cast<KRYLOV_VECTOR_T&>(bresult);
     // get x values from solid
     Get_Generalized_Velocity_From_Solid(solid_velocity); // MPI
-    ARRAYS_COMPUTATIONS::Fill(temp.V,TV());ARRAYS_COMPUTATIONS::Fill(temp.rigid_V,TWIST<TV>());
+    temp.V.Fill(TV());temp.rigid_V.Fill(TWIST<TV>());
     for(int i=1;i<=A_array.m;i++){
         const SPARSE_MATRIX_FLAT_NXN<T>& A=A_array(i);
         const SPARSE_MATRIX_FLAT_MXN<T>& J_deformable=J_deformable_array(i);

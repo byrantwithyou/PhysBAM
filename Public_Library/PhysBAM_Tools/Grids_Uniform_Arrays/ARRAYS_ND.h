@@ -44,7 +44,7 @@ public:
         assert(counts.Min()>=0);int size=counts.Product();
         {ARRAY_VIEW<T> new_array(size,new T[size]);new_array.Exchange(array);} // allocate a new array
         Calculate_Acceleration_Constants();
-        if(initialize_using_default_constructor) ARRAYS_COMPUTATIONS::Fill(array,T()); // initialize array using default constructor
+        if(initialize_using_default_constructor) array.Fill(T()); // initialize array using default constructor
     }
 
     ARRAY(const int m_start_input,const int m_end_input,const int n_start_input,const int n_end_input,const int mn_start_input,const int mn_end_input,
@@ -54,7 +54,7 @@ public:
         assert(counts.Min()>=0);int size=counts.Product();
         {ARRAY_VIEW<T> new_array(size,new T[size]);new_array.Exchange(array);} // allocate a new array
         Calculate_Acceleration_Constants();
-        if(initialize_using_default_constructor) ARRAYS_COMPUTATIONS::Fill(array,T()); // initialize array using default constructor
+        if(initialize_using_default_constructor) array.Fill(T()); // initialize array using default constructor
     }
 
     ARRAY(const int m_start_input,const int m_end_input,const int n_start_input,const int n_end_input,const bool initialize_using_default_constructor=true)
@@ -63,7 +63,7 @@ public:
         assert(counts.Min()>=0);int size=counts.Product();
         {ARRAY_VIEW<T> new_array(size,new T[size]);new_array.Exchange(array);} // allocate a new array
         Calculate_Acceleration_Constants();
-        if(initialize_using_default_constructor) ARRAYS_COMPUTATIONS::Fill(array,T()); // initialize array using default constructor
+        if(initialize_using_default_constructor) array.Fill(T()); // initialize array using default constructor
     }
 
     ARRAY(const int m_start_input,const int m_end_input,const bool initialize_using_default_constructor=true)
@@ -72,7 +72,7 @@ public:
         assert(counts.Min()>=0);int size=counts.Product();
         {ARRAY_VIEW<T> new_array(size,new T[size]);new_array.Exchange(array);} // allocate a new array
         Calculate_Acceleration_Constants();
-        if(initialize_using_default_constructor) ARRAYS_COMPUTATIONS::Fill(array,T()); // initialize array using default constructor
+        if(initialize_using_default_constructor) array.Fill(T()); // initialize array using default constructor
     }
 
     ARRAY(const ARRAY& old_array,const bool initialize_with_old_array=true)
@@ -152,7 +152,7 @@ public:
     assert(counts_new.Min()>=0);
     int size_new=counts_new.Product();
     ARRAY_VIEW<T> array_new(size_new,new T[size_new]);
-    if(initialize_new_elements) ARRAYS_COMPUTATIONS::Fill(array_new,initialization_value);
+    if(initialize_new_elements) array_new.Fill(initialization_value);
     if(copy_existing_elements) Resize_Helper(box,array_new,counts_new);
     domain=box;counts=counts_new;
     delete[] array.Get_Array_Pointer();array.Exchange(array_new);Calculate_Acceleration_Constants();}

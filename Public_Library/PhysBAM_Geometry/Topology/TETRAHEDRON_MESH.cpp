@@ -565,7 +565,7 @@ Identify_Face_Connected_Components(ARRAY<int>& label)
 {
     STACK<int> flood_fill_stack;flood_fill_stack.Preallocate(elements.m);
     bool adjacent_elements_defined=adjacent_elements!=0;if(!adjacent_elements_defined)Initialize_Adjacent_Elements();
-    label.Resize(elements.m,false,false);ARRAYS_COMPUTATIONS::Fill(label,0);
+    label.Resize(elements.m,false,false);label.Fill(0);
     int id=0;for(int t=1;t<=elements.m;t++) if(!label(t)){
         id++;label(t)=id;flood_fill_stack.Push(t);
         while(!flood_fill_stack.Empty()){
@@ -584,7 +584,7 @@ Identify_Edge_Connected_Components(ARRAY<int>& label)
 {
     STACK<int> flood_fill_stack;flood_fill_stack.Preallocate(elements.m);
     bool neighbor_nodes_defined=neighbor_nodes!=0;if(!neighbor_nodes_defined)Initialize_Neighbor_Nodes();
-    label.Resize(number_nodes,false,false);ARRAYS_COMPUTATIONS::Fill(label,0);
+    label.Resize(number_nodes,false,false);label.Fill(0);
     int id=0;for(int p=1;p<=number_nodes;p++) if(!label(p)){
         id++;label(p)=id;flood_fill_stack.Push(p);
         while(!flood_fill_stack.Empty()){

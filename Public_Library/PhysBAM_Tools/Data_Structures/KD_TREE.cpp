@@ -7,7 +7,6 @@
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
 #include <PhysBAM_Tools/Arrays/PROJECTED_ARRAY.h>
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_MIN_MAX.h>
 #include <PhysBAM_Tools/Arrays_Computations/HEAPIFY.h>
 #include <PhysBAM_Tools/Data_Structures/KD_TREE.h>
 #include <PhysBAM_Tools/Data_Structures/KD_TREE_NODE.h>
@@ -82,7 +81,7 @@ Create_Left_Balanced_KD_Tree_With_Grouping(ARRAY_VIEW<const TV> points_to_balanc
     RANGE<TV> box=RANGE<TV>::Bounding_Box(points_to_balance);
     PHYSBAM_ASSERT(!store_values_on_internal_nodes);
     Balance_Sub_KD_Tree_Using_Leaf_Nodes_With_Grouping(root_node,1,points_to_balance.Size(),points_to_balance,permutation_array,box,point_group,current_group_index,max_points_in_group);
-    int number_of_groups=ARRAYS_COMPUTATIONS::Max(point_group);
+    int number_of_groups=point_group.Max();
     ARRAY<int> group_size(number_of_groups);for(int i=1;i<=point_group.m;i++) group_size(point_group(i))++;
     points_in_group.Resize(number_of_groups);for(int i=1;i<=points_in_group.m;i++) points_in_group(i).Resize(group_size(i));
     for(int i=1;i<=points_to_balance.Size();i++) points_in_group(point_group(i))(group_size(point_group(i))--)=i;
@@ -209,7 +208,7 @@ Locate_Nearest_Neighbors(const TV& location,const T max_distance_squared,ARRAY<i
     T temp_max_distance=max_distance_squared;
     Locate_Nearest_Neighbors_Helper(root_node,location,temp_max_distance,number_points_found,points_found,distance_squared_of_points_found,original_points);
     if(number_points_found<=points_found.m) // otherwise max_distance_squared_of_found_points is computed in Locate_Nearest_Neighbors_Helper
-        max_distance_squared_of_found_points=ARRAYS_COMPUTATIONS::Max(distance_squared_of_points_found.Prefix(number_points_found));
+        max_distance_squared_of_found_points=distance_squared_of_points_found.Prefix(number_points_found).Max();
     else max_distance_squared_of_found_points=temp_max_distance;
     number_points_found=min(points_found.m,number_points_found);
 }
@@ -259,7 +258,7 @@ Locate_Nearest_Neighbors_Helper(const KD_TREE_NODE<T>* cell,const TV& location,T
         if(number_of_points_found<points_found.m){
             number_of_points_found++;
             points_found(number_of_points_found)=cell->node_index;distance_squared_of_points_found(number_of_points_found)=distance_squared_to_query_location;
-            if(number_of_points_found==points_found.m) max_distance_squared=ARRAYS_COMPUTATIONS::Max(distance_squared_of_points_found);}
+            if(number_of_points_found==points_found.m) max_distance_squared=distance_squared_of_points_found.Max();}
         else{
             if(number_of_points_found==points_found.m){ARRAYS_COMPUTATIONS::Heapify(distance_squared_of_points_found,points_found);number_of_points_found++;}
             // can't use heapify here, because we need to break at the position we place the new point

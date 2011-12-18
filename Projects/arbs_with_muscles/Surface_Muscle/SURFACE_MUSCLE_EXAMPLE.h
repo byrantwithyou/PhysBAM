@@ -196,7 +196,7 @@ void Preprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE
     LOG::cout<<"PREPROCESS_SOLIDS_SUBSTEP ---------------------------"<<std::endl;
     PARTICLES<TV> particles=solid_body_collection.deformable_body_collection.particles;
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
-    ARRAY<bool> marked(particles.array_collection->Size());ARRAYS_COMPUTATIONS::Fill(marked,false);
+    ARRAY<bool> marked(particles.array_collection->Size());marked.Fill(false);
 
     FACE_3D<T>& face_constitutive_model=dynamic_cast<FACE_3D<T>&>(finite_volume->constitutive_model);
 

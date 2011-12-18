@@ -49,15 +49,15 @@ public:
         tendon_pass_c2(T(0)),tendon_pass_starlam(T(1)),tendon_bulk(T(50000)),failure_threshold(failure_threshold_input),tetrahedralized_volume(tetrahedralized_volume_input)
     {
         constant_alpha=alpha_input;constant_beta=beta_input;
-        inp_activation.Resize(number_of_motor_units);ARRAYS_COMPUTATIONS::Fill(inp_activation,inp_activation_input);
+        inp_activation.Resize(number_of_motor_units);inp_activation.Fill(inp_activation_input);
         if(number_of_motor_units==1)
-        {motor_units.Resize(tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.m);ARRAYS_COMPUTATIONS::Fill(motor_units,1);}
+        {motor_units.Resize(tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.m);motor_units.Fill(1);}
         muscle_pass_c3=inp_pass_c1*inp_pass_c2*exp(inp_pass_c2*(inp_pass_starlam-1));
         muscle_pass_c4=inp_pass_c1*(exp(inp_pass_c2*(inp_pass_starlam-1))-1)-muscle_pass_c3*inp_pass_starlam;
         tendon_pass_c3=tendon_pass_c1*tendon_pass_c2*exp(tendon_pass_c2*(tendon_pass_starlam-1));
         tendon_pass_c4=tendon_pass_c1*(exp(tendon_pass_c2*(tendon_pass_starlam-1))-1)-tendon_pass_c3*tendon_pass_starlam;
-        material_numbers.Resize(tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.m);ARRAYS_COMPUTATIONS::Fill(material_numbers,0);
-        fiber_field.Resize(tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.m);ARRAYS_COMPUTATIONS::Fill(fiber_field,TV(1,0,0));
+        material_numbers.Resize(tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.m);material_numbers.Fill(0);
+        fiber_field.Resize(tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.m);fiber_field.Fill(TV(1,0,0));
     }
 
     static MUSCLE_3D<T>* Create(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,const T failure_threshold)
@@ -67,7 +67,7 @@ public:
     {fiber_field=fibers.m;
     material_numbers.Resize(fibers.m);for(int t=1;t<=tendon.m;t++) if(tendon(t)) material_numbers(t)=1;else material_numbers(t)=0;
     if(motor_units_input.m) motor_units=motor_units_input;
-    else{motor_units.Resize(fibers.m);ARRAYS_COMPUTATIONS::Fill(motor_units,1);}}
+    else{motor_units.Resize(fibers.m);motor_units.Fill(1);}}
 
     void Correct_Fiber_Field_For_QR(STRAIN_MEASURE<TV,3>& strain_measure)
     {for(int t=1;t<=fiber_field.m;t++)fiber_field(t)=strain_measure.F(t).Transposed()*fiber_field(t);}

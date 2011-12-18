@@ -1060,7 +1060,7 @@ void Activate_Secondary_Simulation()
 
         // Add bindings
         T binding_stiffness=(T)1e4*soft_bindings_multiplier;
-        ARRAYS_COMPUTATIONS::Fill(solid_body_collection.deformable_body_collection.soft_bindings.use_impulses_for_collisions,false);
+        solid_body_collection.deformable_body_collection.soft_bindings.use_impulses_for_collisions.Fill(false);
         solid_body_collection.deformable_body_collection.soft_bindings.Initialize_Binding_Mesh();
         solid_body_collection.Add_Force(Create_Edge_Binding_Springs(deformable_body_collection.particles,*solid_body_collection.deformable_body_collection.soft_bindings.binding_mesh,binding_stiffness,(T).01));
 
@@ -1105,7 +1105,7 @@ int Particle_Index_From_Coordinates(const int i,const int j,const int m)
 void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE 
 {
     if(asynchronous_evolution) asynchronous_evolution->Set_External_Velocities(V,velocity_time,current_position_time);
-    INDIRECT_ARRAY<ARRAY_VIEW<TV>,ARRAY<int>&> subset=V.Subset(constrained_point);ARRAYS_COMPUTATIONS::Fill(subset,TV());
+    V.Subset(constrained_point).Fill(TV());
     if(animated_particle) V(animated_particle)=animation_curve.Derivative(velocity_time);
     if(test_number==8){
         if(velocity_time<test_8_constrained_off){
@@ -1156,7 +1156,7 @@ void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE
 void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE
 {
     if(asynchronous_evolution) asynchronous_evolution->Zero_Out_Enslaved_Velocity_Nodes(V,velocity_time,current_position_time);
-    INDIRECT_ARRAY<ARRAY_VIEW<TV>,ARRAY<int>&> subset=V.Subset(constrained_point);ARRAYS_COMPUTATIONS::Fill(subset,TV());
+    V.Subset(constrained_point).Fill(TV());
     if(animated_particle) V(animated_particle)=TV();
     if(test_number==8){
         if(velocity_time<test_8_constrained_off){

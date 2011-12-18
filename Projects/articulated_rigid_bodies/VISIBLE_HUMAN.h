@@ -372,7 +372,7 @@ void Make_Bones(const ARRAY<bool>& bone_filter=ARRAY<bool>())
 
     if(use_fused_tibia_and_patella){
         LOG::cout<<"Using fused tibia and patella"<<std::endl;
-        if(!the_filter.m){the_filter.Resize(num_bones);ARRAYS_COMPUTATIONS::Fill(the_filter,true);}
+        if(!the_filter.m){the_filter.Resize(num_bones);the_filter.Fill(true);}
         the_filter(BONE_R_PATELLA)=the_filter(BONE_L_PATELLA)=false;
         bone_files[BONE_R_TIBIA-1]="tibia_and_patella_right";
         bone_files[BONE_L_TIBIA-1]="tibia_and_patella_left";}

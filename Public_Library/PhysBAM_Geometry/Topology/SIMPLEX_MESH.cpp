@@ -328,7 +328,7 @@ Add_Dependencies(SEGMENT_MESH& dependency_mesh) const
 template<int d> template<class T> void SIMPLEX_MESH<d>::
 Mark_Nodes_Referenced(ARRAY<T>& marks,const T& mark) const
 {
-    for(int e=1;e<=elements.m;e++){INDIRECT_ARRAY<ARRAY<T>,VECTOR<int,d+1>&> subset=marks.Subset(elements(e));ARRAYS_COMPUTATIONS::Fill(subset,mark);}
+    for(int e=1;e<=elements.m;e++) marks.Subset(elements(e)).Fill(mark);
 }
 //#####################################################################
 // Function Simplices_On_Subsimplex

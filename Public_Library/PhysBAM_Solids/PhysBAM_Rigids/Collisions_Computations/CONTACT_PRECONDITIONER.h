@@ -290,7 +290,7 @@ public:
 
     void Update_Coarse_Problem(ARRAY<TWIST<TV> >& fine_velocities,ARRAY<SOLVE_CONTACT::CONTACT<TV> >& fine_contacts)
     {
-        ARRAYS_COMPUTATIONS::Fill<T>(lambda_normal,0);
+        lambda_normal.Fill(0);
         //lambda_tangent.Fill(VECTOR<T,d-1>((T)0));
         for(int i=1;i<=fine_contacts.m;i++)
         {

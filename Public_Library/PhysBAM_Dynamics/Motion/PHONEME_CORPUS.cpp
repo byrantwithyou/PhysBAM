@@ -201,7 +201,7 @@ Get_Optimal_Scalings(PHONEME_ARRANGEMENT<T>& phoneme_arrangement,const ARRAY<T>&
     // Scaling search
     // go through and get squared error sum
     ARRAY<T> optimal_scalings(phoneme_arrangement.list.m);
-    ARRAYS_COMPUTATIONS::Fill(optimal_scalings,(T)1);
+    optimal_scalings.Fill((T)1);
     T result=Phoneme_Metric_Helper_Scaled(phoneme_arrangement,optimal_scalings,weights);
     T tolerance=(T)1e-4;
     T change=tolerance+1;

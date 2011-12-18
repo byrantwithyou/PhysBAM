@@ -182,7 +182,7 @@ public:
 
     void Remove_All()
     {PROJECTED_ARRAY<ARRAY<HASHTABLE_ENTRY_TEMPLATE<TK,T>,int>,T_FIELD_PROJECTOR> projected_array=table.template Project<HASHTABLE_ENTRY_STATE,&HASHTABLE_ENTRY_TEMPLATE<TK,T>::state>();
-        ARRAYS_COMPUTATIONS::Fill(projected_array,ENTRY_FREE);number_of_entries=0;}
+        projected_array.Fill(ENTRY_FREE);number_of_entries=0;}
     //{table.template Project<HASHTABLE_ENTRY_STATE,&HASHTABLE_ENTRY_TEMPLATE<TK,T>::state>().Fill(ENTRY_FREE);number_of_entries=0;}
 
     void Exchange(const TK& x,const TK& y) // Exchange values at entries x and y; valid if x or y (or both) are not present; efficient for array values

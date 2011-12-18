@@ -366,9 +366,9 @@ Set_Mass_Of_Particles(const T_OBJECT& object,const T density,const bool use_cons
     ARRAY<int> nodes;object.mesh.elements.Flattened().Get_Unique(nodes);
     if(use_constant_mass&&nodes.m){
         T mass_per_node=density*object.Total_Size()/nodes.m;
-        INDIRECT_ARRAY<ARRAY_VIEW<T>,ARRAY<int>&> mass_subset=particles.mass.Subset(nodes);ARRAYS_COMPUTATIONS::Fill(mass_subset,mass_per_node);}
+        particles.mass.Subset(nodes).Fill(mass_per_node);}
     else{
-        INDIRECT_ARRAY<ARRAY_VIEW<T>,ARRAY<int>&> mass_subset=particles.mass.Subset(nodes);ARRAYS_COMPUTATIONS::Fill(mass_subset,(T)0);
+        particles.mass.Subset(nodes).Fill((T)0);
         int nodes_per_element=object.mesh.elements(1).m;
         T density_scaled=density/(T)nodes_per_element;
         for(int t=1;t<=object.mesh.elements.m;t++){
@@ -389,7 +389,7 @@ Create_Cloth_Panel(const int number_side_panels,const T side_length,const T aspe
     particles.Store_Mass();
     int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;
     mesh.Initialize_Herring_Bone_Mesh(m,n);particles.array_collection->Add_Elements(mesh.number_nodes);
-    T mass_node=aspect_ratio*sqr(side_length)/(m*n);ARRAYS_COMPUTATIONS::Fill(particles.mass,mass_node); // TODO: make this consistent with the density attribute
+    T mass_node=aspect_ratio*sqr(side_length)/(m*n);particles.mass.Fill(mass_node); // TODO: make this consistent with the density attribute
     T dx=aspect_ratio*side_length/(m-1),dy=side_length/(n-1);
     for(int i=1;i<=m;i++) for(int j=1;j<=n;j++) particles.X(i+m*(j-1))=TV((i-1)*dx,(T).5,(j-1)*dy);
     if(initial_state) Set_Initial_Particle_Configuration(particles,*initial_state,true);

@@ -28,7 +28,6 @@
 #ifndef __INCOMPRESSIBLE_TESTS__
 #define __INCOMPRESSIBLE_TESTS__
 
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_MIN_MAX.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <PhysBAM_Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <PhysBAM_Tools/Math_Tools/integer_log.h>
@@ -688,7 +687,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         if(use_tet_collisions && solid_body_collection.deformable_body_collection.mpi_solids){LOG::cout<<"use_tet_collisions and MPI are incompatible"<<std::endl;PHYSBAM_FATAL_ERROR();}
         if(use_soft_bindings+use_tet_collisions+use_volumetric_self_collisions>1) PHYSBAM_FATAL_ERROR();
         if(use_soft_bindings){
-            ARRAYS_COMPUTATIONS::Fill(soft_bindings.use_impulses_for_collisions,false);
+            soft_bindings.use_impulses_for_collisions.Fill(false);
             soft_bindings.Initialize_Binding_Mesh();
             LOG::Stat("binding stiffness",binding_stiffness);
             solid_body_collection.Add_Force(Create_Edge_Binding_Springs(particles,*soft_bindings.binding_mesh,binding_stiffness,(T)1));}
@@ -812,7 +811,7 @@ void Postprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE
             T ratio=distance/critical_distance;
             stiffness(a)=ratio>1?base_stiffness/ratio:base_stiffness;}
         binding_springs->Set_Overdamping_Fraction((T)1);
-        LOG::cout<<"clamping binding stiffness: base = "<<base_stiffness<<", min = "<<ARRAYS_COMPUTATIONS::Min(stiffness)<<std::endl;}
+        LOG::cout<<"clamping binding stiffness: base = "<<base_stiffness<<", min = "<<stiffness.Min()<<std::endl;}
 }
 //#####################################################################
 // Function Set_Kinematic_Velocities

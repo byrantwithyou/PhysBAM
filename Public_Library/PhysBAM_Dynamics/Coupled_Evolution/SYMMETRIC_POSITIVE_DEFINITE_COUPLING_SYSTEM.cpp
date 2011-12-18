@@ -548,7 +548,7 @@ Massless_Scatter(const VECTOR_ND<T>& fluid_velocity,const GENERALIZED_VELOCITY<T
     fluid_to_solid_interpolation->Times(fluid_velocity,temporary_solids_velocity);
     temporary_solids_velocity*=sqrt(dt);
     solid_forces->Times(temporary_solids_velocity,F.force_coefficients);
-    ARRAYS_COMPUTATIONS::Fill(F.lambda,(T)0);
+    F.lambda.Fill(0);
 }
 //#####################################################################
 // Function Apply_Massless_Structure_Force_To_Fluid
@@ -559,8 +559,8 @@ Apply_Massless_Structure_Force_To_Fluid(VECTOR_ND<T>& fluid_velocity,T time) con
     if(!fluid_to_solid_interpolation) return;
     GENERALIZED_VELOCITY<TV> temporary_solids_velocity(temporary_velocities,temporary_twists,solid_system->solid_body_collection);
     VECTOR_ND<T> temp(temporary_faces.n);
-    ARRAYS_COMPUTATIONS::Fill(temporary_solids_velocity.V.array,TV());
-    ARRAYS_COMPUTATIONS::Fill(temporary_solids_velocity.rigid_V.array,TWIST<TV>());
+    temporary_solids_velocity.V.array.Fill(TV());
+    temporary_solids_velocity.rigid_V.array.Fill(TWIST<TV>());
     solid_forces->solid_body_collection.Add_Velocity_Independent_Forces(temporary_solids_velocity.V.array,temporary_solids_velocity.rigid_V.array,time);
     if(print_each_matrix) OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("f-%i.txt",solve_id).c_str()).Write("f",temporary_solids_velocity);
     fluid_to_solid_interpolation->Transpose_Times(temporary_solids_velocity,temp);
@@ -794,7 +794,7 @@ Compute_Lambda_Diagonal_Preconditioner()
 {
     if(!fluid_node) return;
     lambda_diagonal_preconditioner.Resize(solid_interpolation->Number_Of_Constraints());
-    ARRAYS_COMPUTATIONS::Fill(lambda_diagonal_preconditioner,(T)0);
+    lambda_diagonal_preconditioner.Fill(0);
     solid_interpolation->Add_Diagonal(lambda_diagonal_preconditioner,*solid_mass);
     fluid_interpolation->Add_Diagonal(lambda_diagonal_preconditioner,*fluid_mass);
     for(COUPLING_CONSTRAINT_ID i(1);i<=lambda_diagonal_preconditioner.m;i++)
