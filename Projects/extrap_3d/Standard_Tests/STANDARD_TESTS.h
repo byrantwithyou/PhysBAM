@@ -131,6 +131,7 @@ public:
     bool use_constant_ife;
     bool forces_are_removed;
     ARRAY<int> externally_forced;
+    ARRAY<int> constrained_particles;
     ARRAY<TV> jello_centers;
     T stretch;
     T hole;
@@ -346,11 +347,12 @@ void Parse_Options() PHYSBAM_OVERRIDE
             frame_rate=150;
             break;
         case 31:
+            solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness = 1e-4;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             solids_parameters.triangle_collision_parameters.perform_self_collision=true;
-            last_frame=1000;
-            frame_rate=120;
+            last_frame=5000;
+            frame_rate=240;
             break;
         case 32:
             // solids_parameters.cfl=(T)5;
@@ -604,14 +606,22 @@ void Get_Initial_Data()
             last_frame=480;
             break;}
         case 31: {
-            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_110K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T)7.4,(T)0))),true,true,density,.1);
-            RIGID_BODY<TV>& sphere=tests.Add_Analytic_Sphere(2.5,density,5);
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_110K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T)0.373,(T)0))),true,true,density,.005);
+            RIGID_BODY<TV>& sphere=tests.Add_Analytic_Sphere(0.125,density,5);
             sphere.is_static=false;
             tests.Add_Ground();
             kinematic_id=sphere.particle_index;
             rigid_body_collection.rigid_body_particle.kinematic(sphere.particle_index)=true;
-            curve.Add_Control_Point(0,FRAME<TV>(TV(0,10,-50)));
-            curve.Add_Control_Point(20,FRAME<TV>(TV(0,10,250)));
+            curve.Add_Control_Point(0,FRAME<TV>(TV(0,0.5,-10)));
+            curve.Add_Control_Point(20,FRAME<TV>(TV(0,0.5,90)));
+
+            RIGID_BODY<TV>& box1=tests.Add_Analytic_Sphere(0.065,density,5);
+            box1.X() = TV(0.27,0.645,-0.12);
+            RIGID_BODY<TV>& box2=tests.Add_Analytic_Sphere(0.065,density,5);
+            box2.X() = TV(-0.275,0.605,-0.18);
+            RIGID_BODY<TV>& box3=tests.Add_Analytic_Box(TV(0.5,0.06,0.5));
+            box3.X() = TV(-0.024,0.03,0.1);
+            
             break;}
 
         case 32:{
@@ -1145,10 +1155,27 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             break;}
         case 31:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
-            Add_Constitutive_Model(tetrahedralized_volume,(T)2e5,(T).45,(T).01);
-            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
-            solid_body_collection.template Find_Force<GRAVITY<TV>&>().gravity=0.5;
-            Add_Constitutive_Model(tetrahedralized_volume,(T)2e5,(T).45,(T).01);
+            Add_Constitutive_Model(tetrahedralized_volume,(T)1e4,(T).4,(T).001);
+
+            // RIGID_BODY<TV>& box1=tests.Add_Analytic_Sphere(0.065,density,5);
+            // box1.X() = TV(0.27,0.645,-0.12);
+            // RIGID_BODY<TV>& box2=tests.Add_Analytic_Sphere(0.065,density,5);
+            // box2.X() = TV(-0.275,0.605,-0.18);
+            // RIGID_BODY<TV>& box3=tests.Add_Analytic_Box(TV(0.5,0.06,0.5));
+            // box3.X() = TV(-0.024,0.03,0.1);
+
+            for (int i=1; i<=particles.X.m; i++)
+            {
+                T y   = particles.X(i).y;
+                TV v1 = particles.X(i) - TV(0.27,0.645,-0.12);
+                TV v2 = particles.X(i) - TV(-0.275,0.605,-0.18);
+                
+                if ((y<=0.06) || (sqr(v1.x) + sqr(v1.y) + sqr(v1.z) <= sqr(0.065)) || (sqr(v2.x) + sqr(v2.y) + sqr(v2.z) <= sqr(0.065)))
+                {
+                    constrained_particles.Append(i);
+                }
+            }
+
             break;} 
         case 32:{
             T youngs_modulus = 7e5;
@@ -1508,6 +1535,12 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
     if(test_number==53){V(1)=TV(1,0,0);V(2).x=0;V(3).x=0;V(4).x=0;}
     if(test_number==54){V(1)=TV(1,0,0);V(2)=TV();V(3).x=0;V(4).x=0;}
     if(test_number==55){V(2)=V(1)=TV();V(3).x=0;V(4).x=0;}
+    if(test_number==31)
+    {
+        int number_of_constrained_particles = constrained_particles.m;
+        for (int i=1; i<=number_of_constrained_particles; i++)
+            V(constrained_particles(i))=TV();
+    }
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes
@@ -1571,6 +1604,12 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
     }*/
     if(test_number==53){V(1)=TV();V(2).x=0;V(3).x=0;V(4).x=0;}
     if(test_number==54 || test_number==55){V(1)=V(2)=TV();V(3).x=0;V(4).x=0;}
+    if(test_number==31)
+    {
+        int number_of_constrained_particles = constrained_particles.m;
+        for (int i=1; i<=number_of_constrained_particles; i++)
+            V(constrained_particles(i))=TV();
+    }
 }
 //#####################################################################
 // Function Read_Output_Files_Solids
@@ -1620,6 +1659,13 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
             if(fvm.Fe_hat(t).x11<3)
                 for (int i=1; i<=4; i++) solid_body_collection.deformable_body_collection.collisions.check_collision(tet_volume.mesh.elements(t)(i))=true;
     }
+    if(test_number==31)
+    {
+        int number_of_constrained_particles = constrained_particles.m;
+        for (int i=1; i<=number_of_constrained_particles; i++)
+            solid_body_collection.deformable_body_collection.collisions.check_collision(constrained_particles(i))=false;
+    }
+
 }
 //#####################################################################
 // Function Update_Time_Varying_Material_Properties
