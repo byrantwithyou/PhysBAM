@@ -1811,14 +1811,18 @@ void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) PHYSBAM_OVERRIDE
 {
     if(test_number==50 || test_number==51){
         PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
-        for(int i=1; i <=externally_forced.m; i++)
+        ARRAY<bool> use(particles.X.m);
+        use.Subset(externally_forced).Fill(true);
+        for(int i=1; i <=particles.X.m; i++)
         {
-            T height=particles.X(i).x;
+            int p=externally_forced(i);
+            T height=particles.X(p).x;
+            if(!use.m && height<10) continue;
             T force_multiplier=sqr(max((T)1,time-(T)1));
-            if(height>8.8 && height<21) force_multiplier*=2;
-            if(height < 14+time){
-                F(externally_forced(i))=TV(1.0*force_multiplier*(14+time-height),0,0);
-            }
+            if(height>8.8) force_multiplier*=2;
+            if(height>22) continue;
+            if(height>14+time) continue;
+            F(p)+=TV(1.0*force_multiplier*(14+time-height),0,0);
         }
     }
 }
@@ -1854,8 +1858,9 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
     if(externally_forced.m)
     {
         PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
-        for(int i=1; i <=externally_forced.m; i++)
-            Add_Debug_Particle(particles.X(externally_forced(i)),TV(0,0,1));
+        for(int i=1; i <=externally_forced.m; i++){
+            if(particles.X(externally_forced(i)).x>21) continue;
+            Add_Debug_Particle(particles.X(externally_forced(i)),TV(0,0,1));}
     }
 }
 };
