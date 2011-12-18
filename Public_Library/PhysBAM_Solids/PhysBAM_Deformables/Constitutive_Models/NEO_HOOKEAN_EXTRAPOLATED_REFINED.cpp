@@ -37,6 +37,19 @@ template<class T,int d> NEO_HOOKEAN_EXTRAPOLATED_REFINED<T,d>::
 {
 }
 //#####################################################################
+// Update Lame Constants
+//#####################################################################
+template<class T,int d> void NEO_HOOKEAN_EXTRAPOLATED_REFINED<T,d>::
+Update_Lame_Constants(const T youngs_modulus_input, const T poissons_ratio_input,const T Rayleigh_coefficient_input)
+{
+    constant_lambda=youngs_modulus_input*poissons_ratio_input/((1+poissons_ratio_input)*(1-2*poissons_ratio_input));
+    constant_mu=youngs_modulus_input/(2*(1+poissons_ratio_input));
+    constant_alpha=Rayleigh_coefficient_input*constant_lambda;
+    constant_beta=Rayleigh_coefficient_input*constant_mu;
+    youngs_modulus=youngs_modulus_input; poissons_ratio=poissons_ratio_input;
+    
+}
+//#####################################################################
 // Function Energy_Density
 //#####################################################################
 template<class T,int d> T NEO_HOOKEAN_EXTRAPOLATED_REFINED<T,d>::
@@ -55,7 +68,7 @@ Energy_Density_Helper(const DIAGONAL_MATRIX<T,2>& F,const int simplex) const
     
     T a = extrapolation_cutoff;
     T r = corner_cutoff;
-    T k = extra_force_coefficient;
+    T k = extra_force_coefficient*youngs_modulus;
 
     if ((x>=a) && (y>=a) && (x+y>=r+2*a)) // main region
     {    
@@ -127,7 +140,7 @@ P_From_Strain_Helper(const DIAGONAL_MATRIX<T,2>& F,const T scale,const int simpl
     
     T a = extrapolation_cutoff;
     T r = corner_cutoff;
-    T k = extra_force_coefficient;
+    T k = extra_force_coefficient*youngs_modulus;
 
     T mu = constant_mu;
     T la = constant_lambda;
@@ -208,7 +221,7 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_IS
     
     T a = extrapolation_cutoff;
     T r = corner_cutoff;
-    T k = extra_force_coefficient;
+    T k = extra_force_coefficient*youngs_modulus;
 
     T mu = constant_mu;
     T la = constant_lambda;

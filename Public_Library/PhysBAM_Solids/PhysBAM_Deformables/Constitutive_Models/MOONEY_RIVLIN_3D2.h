@@ -27,12 +27,10 @@ public:
     T mu_10,mu_01,kappa;
     T failure_threshold;
     T youngs_modulus,poissons_ratio;
-    T extrapolation_cutoff;
-    T extra_force_coefficient;
+
     
-    MOONEY_RIVLIN_3D2(const T youngs_modulus_input,const T poissons_ratio_input,const T Rayleigh_coefficient,const T extrapolation_cutoff_input, const T extra_force_coefficient_input):
-    youngs_modulus(youngs_modulus_input),poissons_ratio(poissons_ratio_input),
-    extrapolation_cutoff(extrapolation_cutoff_input),extra_force_coefficient(extra_force_coefficient_input)
+    MOONEY_RIVLIN_3D2(const T youngs_modulus_input,const T poissons_ratio_input,const T Rayleigh_coefficient):
+    youngs_modulus(youngs_modulus_input),poissons_ratio(poissons_ratio_input)
     {
         failure_threshold = (T).25;
         assert(poissons_ratio>-1&&poissons_ratio<.5);

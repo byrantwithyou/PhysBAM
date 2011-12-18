@@ -45,7 +45,7 @@ public:
     virtual int P_From_Strain_Rate_Forces_Size() const;
     virtual void P_From_Strain_Rate_First_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<T> aggregate,const MATRIX<T,d>& F_dot,const T scale,const int simplex) const;
     virtual MATRIX<T,d> P_From_Strain_Rate_Second_Half(const DIAGONAL_MATRIX<T,d>& F,const ARRAY_VIEW<const T> aggregate,const T scale,const int simplex) const;
-    virtual void Update_Lame_Constants(const T youngs_modulus, const T poissons_ratio,const T Rayleigh_coefficient);
+    virtual void Update_Lame_Constants(const T youngs_modulus_input, const T poissons_ratio_input,const T Rayleigh_coefficient_input);
 //#####################################################################
 };
 }
