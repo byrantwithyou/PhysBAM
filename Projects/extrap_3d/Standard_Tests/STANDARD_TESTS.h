@@ -44,7 +44,7 @@
 //   49. Hand through a tube
 //   50. Fish through a torus
 //   51. Fish through a tube
-//   52. Jello's falling one by one on each other
+//   52 Jello's falling one by one on each other
 //   53. Stretch tet
 //   54. Stretch tet (II)
 //   55. Constrained tet
@@ -248,7 +248,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             mattress_grid=GRID<TV>(40,40,40,(T)-0.01,(T)0.01,(T)-0.01,(T)0.01,(T)-0.01,(T)0.01);
             break;
         case 42: case 52:
-            mattress_grid=GRID<TV>(10,10,10,(T)-0.01,(T)0.01,(T)-0.01,(T)0.01,(T)-0.01,(T)0.01);
+            mattress_grid=GRID<TV>(20,20,20,(T)-0.01,(T)0.01,(T)-0.01,(T)0.01,(T)-0.01,(T)0.01);
             break;
     	default:
             mattress_grid=GRID<TV>(20,10,20,(T)-1,(T)1,(T)-.5,(T).5,(T)-1,(T)1);
@@ -402,13 +402,13 @@ void Parse_Options() PHYSBAM_OVERRIDE
             last_frame=1000;
             break;
         case 52:
-            solids_parameters.cfl=(T)5;
+            solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness = 1e-4;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             solids_parameters.triangle_collision_parameters.perform_self_collision=true;
             if (override_no_collisions) solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-            frame_rate=120;
-            last_frame=3000;
+            frame_rate=360;
+            last_frame=4000;
             break;
         case 47:
             frame_rate=24;
@@ -802,32 +802,57 @@ void Get_Initial_Data()
         }
         case 52:
         {
+            /*RIGID_BODY<TV>& shell=tests.Add_Analytic_Shell(0.07,0.035,0.08,128);
+            shell.coefficient_of_friction = 0.3;
+            shell.X()=TV(0,0.035,0);
+            shell.Rotation()=ROTATION<TV>((T)pi/2.0,TV(1,0,0));
+            shell.is_static=true;*/
+
             int count = 0;
-            for (int i=1; i<=10; i++)
+            for (int i=1; i<=27; i++)
             {
                 count++;
                 jello_centers.Append(TV(-500+i*5,-1000,0));
-                RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(jello_centers(count),ROTATION<TV>(0,TV(0,0,0))));
+                RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(jello_centers(count),ROTATION<TV>(10*sin(178*i),TV(sin(145*i),cos(345*i),cos(478*i)))));
                 tests.Create_Mattress(mattress_grid,true,&initial_state);
             }
-            RIGID_BODY<TV>& box1=tests.Add_Analytic_Box(TV(7,7,7));
-            RIGID_BODY<TV>& box2=tests.Add_Analytic_Box(TV(7,7,7));
-            RIGID_BODY<TV>& box3=tests.Add_Analytic_Box(TV(7,7,7));
-            RIGID_BODY<TV>& box4=tests.Add_Analytic_Box(TV(7,7,7));
-            RIGID_BODY<TV>& box5=tests.Add_Analytic_Box(TV(7,7,7));
-            RIGID_BODY<TV>& box6=tests.Add_Analytic_Box(TV(7,7,7));
-            RIGID_BODY<TV>& box7=tests.Add_Analytic_Box(TV(7,7,7));
-            RIGID_BODY<TV>& box8=tests.Add_Analytic_Box(TV(7,7,7));
-
-            box1.X()=TV(7,3.5,0);
-            box2.X()=TV(-7,3.5,0);
-            box3.X()=TV(0,3.5,7);
-            box4.X()=TV(0,3.5,-7);
             
-            box5.X()=TV(7/sqrt(2),3.5,7/sqrt(2));
-            box6.X()=TV(-7/sqrt(2),3.5,7/sqrt(2));
-            box7.X()=TV(-7/sqrt(2),3.5,-7/sqrt(2));
-            box8.X()=TV(7/sqrt(2),3.5,-7/sqrt(2));
+            int number_of_boxes = 128;
+            T height = 0.08;
+            T width = 0.02;
+            T radius = 0.035;
+
+            ARRAY<RIGID_BODY<TV>*> boxes;
+            
+            for (int i=1; i<=number_of_boxes; i++)
+            {
+                T phi = 2*pi*(i-1)/number_of_boxes;
+
+                boxes.Append(&tests.Add_Analytic_Box(TV(width,height,width)));
+                boxes(i)->X() = TV((radius+width/2)*sin(phi),height/2,(radius+width/2)*cos(phi));
+                boxes(i)->Rotation() = ROTATION<TV>((T)phi,TV(0,1,0));
+                boxes(i)->is_static = true;
+                boxes(i)->coefficient_of_friction = 0.3;
+            }
+
+            /*RIGID_BODY<TV>& box1=tests.Add_Analytic_Box(TV(0.07,0.07,0.07));
+            RIGID_BODY<TV>& box2=tests.Add_Analytic_Box(TV(0.07,0.07,0.07));
+            RIGID_BODY<TV>& box3=tests.Add_Analytic_Box(TV(0.07,0.07,0.07));
+            RIGID_BODY<TV>& box4=tests.Add_Analytic_Box(TV(0.07,0.07,0.07));
+            RIGID_BODY<TV>& box5=tests.Add_Analytic_Box(TV(0.07,0.07,0.07));
+            RIGID_BODY<TV>& box6=tests.Add_Analytic_Box(TV(0.07,0.07,0.07));
+            RIGID_BODY<TV>& box7=tests.Add_Analytic_Box(TV(0.07,0.07,0.07));
+            RIGID_BODY<TV>& box8=tests.Add_Analytic_Box(TV(0.07,0.07,0.07));
+
+            box1.X()=TV(0.07,0.035,0);
+            box2.X()=TV(-0.07,0.035,0);
+            box3.X()=TV(0,0.035,0.07);
+            box4.X()=TV(0,0.035,-0.07);
+            
+            box5.X()=TV(0.07/sqrt(2),0.035,0.07/sqrt(2));
+            box6.X()=TV(-0.07/sqrt(2),0.035,0.07/sqrt(2));
+            box7.X()=TV(-0.07/sqrt(2),0.035,-0.07/sqrt(2));
+            box8.X()=TV(0.07/sqrt(2),0.035,-0.07/sqrt(2));
 
             box5.Rotation() = ROTATION<TV>((T)pi/4.0,TV(0,1,0));
             box6.Rotation() = ROTATION<TV>((T)pi/4.0,TV(0,1,0));
@@ -841,7 +866,8 @@ void Get_Initial_Data()
             box5.is_static=true;
             box6.is_static=true;
             box7.is_static=true;
-            box8.is_static=true;
+            box8.is_static=true;*/
+
             tests.Add_Ground();
             break;
         }
@@ -1313,7 +1339,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             break;}
         case 52:{
-            T youngs_modulus = 1e5;
+            T youngs_modulus = 1e4;
             T poissons_ratio = .4;
             T damping = 0.001;
             for (int k=1; k<=jello_centers.m; k++)
@@ -1677,7 +1703,7 @@ void Preprocess_Frame(const int frame)
         int n=mattress_grid.counts.y;
         int mn=mattress_grid.counts.z;
      
-        for (int k=1; k<=jello_centers.m; k++) if (frame==(k-1)*100+1)
+        for (int k=1; k<=jello_centers.m; k++) if (frame==(k-1)*90+1)
         {
             TV center = TV();
             for (int i=1; i<=m*n*mn; i++)
@@ -1689,13 +1715,13 @@ void Preprocess_Frame(const int frame)
             for (int i=1; i<=m*n*mn; i++)
             {
                 int index = i+(k-1)*m*n*mn;
-                particles.X(index) += TV(0,16,0)-center;
+                particles.X(index) += TV(0,0.2,0)-center;
             }
             for(int i=1;i<=m;i++)
             for(int j=1;j<=n;j++)
             for(int ij=1;ij<=mn;ij++)
             {
-                particles.V(i+m*(j-1)+m*n*(ij-1)+(k-1)*m*n*mn) = TV(-sin(sin(127*k)*j/(T)n),-cos(sin(384*k)*4*ij/(T)mn),sin(3*i*sin(457*k)/(T)m));
+                particles.V(i+m*(j-1)+m*n*(ij-1)+(k-1)*m*n*mn) = 0.1*TV(-sin(sin(187*k)*5*i/(T)m),-cos(cos(217*k)*6*j/(T)n),sin(5*ij*sin(471*k)/(T)mn));
             }
         }
     }
