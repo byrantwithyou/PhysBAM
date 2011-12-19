@@ -1708,7 +1708,7 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
         for (int i=1; i<=number_of_constrained_particles; i++)
             solid_body_collection.deformable_body_collection.collisions.check_collision(constrained_particles(i))=false;
     }
-    //if(test_number==51) fish_V=solid_body_collection.deformable_body_collection.
+    if(test_number==51) fish_V=solid_body_collection.deformable_body_collection.particles.V;
 }
 //#####################################################################
 // Function Update_Time_Varying_Material_Properties
@@ -1740,6 +1740,7 @@ void Update_Time_Varying_Material_Properties(const T time)
 //#####################################################################
 void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
 {
+    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     if (dump_sv)
     {
         FINITE_VOLUME<TV,3>& force_field = solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
@@ -1750,6 +1751,7 @@ void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
             svout << sv(i).x11 << " " << sv(i).x22 << " " << sv(i).x33 << std::endl;
         }
     }
+    if(test_number==51) for(int i=1;i<=particles.X.m;i++) if(particles.V(i).x>6) particles.V(i).x=6;
 }
 //#####################################################################
 // Function Bind_Intersecting_Particles
