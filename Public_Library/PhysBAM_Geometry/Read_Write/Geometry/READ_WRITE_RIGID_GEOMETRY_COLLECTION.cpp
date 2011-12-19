@@ -18,7 +18,7 @@ Read(const STREAM_TYPE stream_type,const std::string& directory,const int frame,
 {
     Read_Write<STRUCTURE_LIST<TV,int>,RW>::Read(directory,"rigid_body_structure_",frame,object.structure_list);
     ARRAY<RIGID_GEOMETRY<TV>*> bodies(object.particles.rigid_geometry);
-    ARRAYS_COMPUTATIONS::Fill(object.particles.rigid_geometry,(RIGID_GEOMETRY<TV>*)0);
+    object.particles.rigid_geometry.Fill(0);
     FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/rigid_geometry_particles",directory.c_str(),frame),object.particles);
     while(object.particles.rigid_geometry.m<bodies.m) delete bodies.Pop();
     object.particles.rigid_geometry.Prefix(bodies.m)=bodies;
@@ -59,7 +59,7 @@ Read(const STREAM_TYPE stream_type,const std::string& directory,const int frame,
             LOG::cerr<<"Did not find rigid body names."<<std::endl;
             object.rigid_body_names.Clean_Memory();}}
 
-    ARRAY<bool> exists(last_id);INDIRECT_ARRAY<ARRAY<bool>,ARRAY<int>&> subset=exists.Subset(active_ids);ARRAYS_COMPUTATIONS::Fill(subset,true);
+    ARRAY<bool> exists(last_id);exists.Subset(active_ids).Fill(true);
     for(int i=1;i<=exists.m;i++) if(!exists(i) && object.Is_Active(i)) object.Deactivate_Geometry(i);
     if(active_ids.m>0){
         for(int i=1;i<=active_ids.m;i++){int p=active_ids(i);

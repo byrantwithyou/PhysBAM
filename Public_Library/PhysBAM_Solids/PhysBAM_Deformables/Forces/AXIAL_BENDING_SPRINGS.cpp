@@ -3,7 +3,6 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-#include <PhysBAM_Tools/Arrays_Computations/SUMMATIONS.h>
 #include <PhysBAM_Tools/Data_Structures/SPARSE_UNION_FIND.h>
 #include <PhysBAM_Tools/Math_Tools/cyclic_shift.h>
 #include <PhysBAM_Tools/Math_Tools/Robust_Arithmetic.h>
@@ -25,8 +24,8 @@ AXIAL_BENDING_SPRINGS(PARTICLES<TV>& particles_input,TRIANGLE_MESH& triangle_mes
 {
     Initialize();
     Set_Stiffness(0);
-    ARRAYS_COMPUTATIONS::Fill(restlength,(T)0);
-    ARRAYS_COMPUTATIONS::Fill(visual_restlength,(T)0);
+    restlength.Fill((T)0);
+    visual_restlength.Fill((T)0);
     Set_Damping(0);
 }
 //#####################################################################
@@ -94,7 +93,7 @@ Set_Overdamping_Fraction(const T overdamping_fraction) // 1 is critically damped
 {
     Invalidate_CFL();
     for(int s=1;s<=spring_particles.m;s++){
-        T harmonic_mass=Pseudo_Divide((T)4,ARRAYS_COMPUTATIONS::Sum(particles.one_over_effective_mass.Subset(spring_particles(s))));
+        T harmonic_mass=Pseudo_Divide((T)4,particles.one_over_effective_mass.Subset(spring_particles(s)).Sum());
         damping(s)=overdamping_fraction*2*sqrt(youngs_modulus(s)*restlength(s)*harmonic_mass);}
 }
 //#####################################################################
@@ -105,7 +104,7 @@ Set_Overdamping_Fraction(ARRAY_VIEW<const T> overdamping_fraction) // 1 is criti
 {
     Invalidate_CFL();
     for(int s=1;s<=spring_particles.m;s++){
-        T harmonic_mass=Pseudo_Divide((T)4,ARRAYS_COMPUTATIONS::Sum(particles.one_over_effective_mass.Subset(spring_particles(s))));
+        T harmonic_mass=Pseudo_Divide((T)4,particles.one_over_effective_mass.Subset(spring_particles(s)).Sum());
         damping(s)=overdamping_fraction(s)*2*sqrt(youngs_modulus(s)*restlength(s)*harmonic_mass);}
 }
 //#####################################################################
@@ -180,7 +179,7 @@ Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> frequency)
     T one_over_cfl_number=1/cfl_number,one_over_cfl_number_squared=sqr(one_over_cfl_number);
     for(SPRING_ITERATOR iterator(force_springs);iterator.Valid();iterator.Next()){int s=iterator.Data();
         const VECTOR<int,4>& nodes=spring_particles(s);
-        T one_over_mass_times_restlength=(T).25/restlength(s)*ARRAYS_COMPUTATIONS::Sum(particles.one_over_effective_mass.Subset(nodes));
+        T one_over_mass_times_restlength=(T).25/restlength(s)*particles.one_over_effective_mass.Subset(nodes).Sum();
         T elastic_hertz_squared=4*youngs_modulus(s)*one_over_mass_times_restlength*one_over_cfl_number_squared;
         T damping_hertz=2*damping(s)*one_over_mass_times_restlength*one_over_cfl_number;
         for(int k=1;k<=4;k++){frequency(nodes[k]).elastic_squared+=elastic_hertz_squared;frequency(nodes[k]).damping+=damping_hertz;}}
@@ -215,7 +214,7 @@ template<class T> void AXIAL_BENDING_SPRINGS<T>::
 Set_Stiffness_Based_On_Reduced_Mass(const T scaling_coefficient)
 {
     for(int s=1;s<=spring_particles.m;s++){
-        T harmonic_mass=Pseudo_Divide((T)4,ARRAYS_COMPUTATIONS::Sum(particles.one_over_effective_mass.Subset(spring_particles(s))));
+        T harmonic_mass=Pseudo_Divide((T)4,particles.one_over_effective_mass.Subset(spring_particles(s)).Sum());
         youngs_modulus(s)=scaling_coefficient*harmonic_mass/restlength(s);}
 }
 //#####################################################################

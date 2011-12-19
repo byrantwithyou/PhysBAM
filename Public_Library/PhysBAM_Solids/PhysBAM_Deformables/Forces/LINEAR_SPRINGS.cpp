@@ -7,7 +7,6 @@
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
 #include <PhysBAM_Tools/Arrays_Computations/MAGNITUDE.h>
 #include <PhysBAM_Tools/Arrays_Computations/SORT.h>
-#include <PhysBAM_Tools/Arrays_Computations/SUMMATIONS.h>
 #include <PhysBAM_Tools/Data_Structures/PAIR.h>
 #include <PhysBAM_Tools/Data_Structures/SPARSE_UNION_FIND.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
@@ -84,8 +83,8 @@ template<class TV> template<class T_FIELD> void LINEAR_SPRINGS<TV>::
 Enable_Plasticity(const T_FIELD& plastic_yield_strain_input,const T_FIELD& plastic_hardening_input,const T plasticity_clamp_ratio_input)
 {
     use_plasticity=true;plasticity_clamp_ratio=plasticity_clamp_ratio_input;
-    plastic_yield_strain.Resize(segment_mesh.elements.m,false,false);ARRAYS_COMPUTATIONS::Fill(plastic_yield_strain,plastic_yield_strain_input);
-    plastic_hardening.Resize(segment_mesh.elements.m,false,false);ARRAYS_COMPUTATIONS::Fill(plastic_hardening,plastic_hardening_input);
+    plastic_yield_strain.Resize(segment_mesh.elements.m,false,false);plastic_yield_strain.Fill(plastic_yield_strain_input);
+    plastic_hardening.Resize(segment_mesh.elements.m,false,false);plastic_hardening.Fill(plastic_hardening_input);
     plastic_visual_restlength=visual_restlength;
 }
 //#####################################################################
@@ -352,7 +351,7 @@ CFL_Strain_Rate() const
 template<class TV> typename TV::SCALAR LINEAR_SPRINGS<TV>::
 Average_Restlength() const
 {
-    return ARRAYS_COMPUTATIONS::Average(restlength);
+    return restlength.Average();
 }
 //#####################################################################
 // Function Print_Restlength_Statistics

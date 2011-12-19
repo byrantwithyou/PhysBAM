@@ -63,7 +63,7 @@ Compute_Curvature(const T time)
 {
     ARRAY<T> phi_ghost(grid.number_of_cells);boundary->Fill_Ghost_Cells_Cell(grid,phi,phi_ghost,time);
     ARRAY<T> phi_nodes_ghost(grid.number_of_nodes);LINEAR_INTERPOLATION_DYADIC_HELPER<OCTREE_GRID<T> >::Interpolate_From_Cells_To_Nodes(grid,phi_ghost,phi_nodes_ghost);
-    if(!curvature) curvature=new ARRAY<T>(grid.number_of_cells);else{curvature->Resize(grid.number_of_cells);ARRAYS_COMPUTATIONS::Fill(*curvature,0);}
+    if(!curvature) curvature=new ARRAY<T>(grid.number_of_cells);else{curvature->Resize(grid.number_of_cells);curvature->Fill(0);}
 
     for(DYADIC_GRID_ITERATOR_CELL<OCTREE_GRID<T> > iterator(grid,2);iterator.Valid();iterator.Next()){
         TV location=iterator.Location();

@@ -136,6 +136,7 @@ public:
     T stretch;
     T hole;
     bool nobind;
+    ARRAY<TV> fish_V;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),semi_implicit(false),test_forces(false),use_extended_neohookean(false),
@@ -489,10 +490,10 @@ void Get_Initial_Data()
             tests.Add_Ground();
             break;}
         case 4: case 29:{
-            //            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_110K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)6,0))),true,true,density,.085);
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_110K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T)0.373,(T)0))),true,true,density,.005);
 //            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/bunny.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)2.3,0))),true,true,density,5.0);
 //            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,true,density);
-            tests.Create_Mattress(GRID<TV>(TV_INT(13,13,13),RANGE<TV>(TV(-1,1,-1),TV(1,3,1))),true,0);
+           // tests.Create_Mattress(GRID<TV>(TV_INT(13,13,13),RANGE<TV>(TV(-1,1,-1),TV(1,3,1))),true,0);
             
             tests.Add_Ground();
             last_frame=2000;
@@ -1143,7 +1144,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 29:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
-            Add_Constitutive_Model(tetrahedralized_volume,(T)0,(T)0,(T).01,(T).4,(T).00);
+            Add_Constitutive_Model(tetrahedralized_volume,(T)0e2,(T).45,(T).01);
             forces_are_removed=true;
             break;}
 
@@ -1665,18 +1666,25 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
         for (int i=1; i<=number_of_constrained_particles; i++)
             solid_body_collection.deformable_body_collection.collisions.check_collision(constrained_particles(i))=false;
     }
-
+    if(test_number==51) fish_V=solid_body_collection.deformable_body_collection.
 }
 //#####################################################################
 // Function Update_Time_Varying_Material_Properties
 //#####################################################################
 void Update_Time_Varying_Material_Properties(const T time)
 {   if(test_number==29 && time > .1){
-        T critical=(T)3.0;
-        T critical2=(T)4.0;
-        T start_young=(T)0; T end_young=(T)5;
+        T critical=(T)1.5;
+        T critical2=(T)1.8;
+        T start_young=(T)0; T end_young=(T)6;
+                DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
+    if(time<critical) forces_are_removed=true;
+    if (forces_are_removed){ LOG::cout << "Hey look " << time << std::endl;}
+    if(time>critical && forces_are_removed){
+        int n=deformable_body_collection.particles.array_collection->Size(); LOG::cout << "Hey look at me " << n << std::endl;
+        for (int i=1; i <= n; i++){deformable_body_collection.particles.X(i).y = 10.0;}
+                    forces_are_removed=false;
+    }
         if(time>critical && time<critical2) {
-            DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
             FINITE_VOLUME<TV,3>& fv = deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
             CONSTITUTIVE_MODEL<T,3>& icm = fv.constitutive_model;
             T young = pow(10.0,start_young + (time-critical)/(critical2-critical)*(end_young-start_young));
@@ -1802,16 +1810,24 @@ void Preprocess_Frame(const int frame)
 //#####################################################################
 void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) PHYSBAM_OVERRIDE
 {
+    T v0=4,v1=6;
     if(test_number==50 || test_number==51){
         PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
-        for(int i=1; i <=externally_forced.m; i++)
+        ARRAY<bool> use(particles.X.m);
+        use.Subset(externally_forced).Fill(true);
+        for(int p=1; p<=particles.X.m; p++)
         {
-            T height=particles.X(i).x;
+            T height=particles.X(p).x;
+            if(!use(p) && height<10) continue;
             T force_multiplier=sqr(max((T)1,time-(T)1));
-            if(height>8.8 && height<21) force_multiplier*=2;
-            if(height < 14+time){
-                F(externally_forced(i))=TV(1.0*force_multiplier*(14+time-height),0,0);
-            }
+            if(height>8.8) force_multiplier*=2;
+//            if(height>22) continue;
+            if(height>14+time) continue;
+            T vm=fish_V(p).Magnitude();
+            if(vm>v1) continue;
+            if(vm>v0) force_multiplier*=(vm-v0)/(v1-v0);
+            F(p)+=TV(1.0*force_multiplier*(14+time-height),0,0);
+//            Add_Debug_Particle(particles.X(p),TV(0,0,1));
         }
     }
 }
@@ -1822,12 +1838,12 @@ void Add_Constitutive_Model(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,T 
 {
     ISOTROPIC_CONSTITUTIVE_MODEL<T,3>* icm=0;
 
-    if(use_extended_neohookean) icm=new NEO_HOOKEAN_EXTRAPOLATED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc*stiffness*stiffness_multiplier);
+    if(use_extended_neohookean) icm=new NEO_HOOKEAN_EXTRAPOLATED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc);
     else if(use_svk) icm=new ST_VENANT_KIRCHHOFF<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
-    else if(use_extended_svk) icm=new SVK_EXTRAPOLATED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc*stiffness*stiffness_multiplier);
-    else if(use_extended_neohookean_refined) icm=new NEO_HOOKEAN_EXTRAPOLATED_REFINED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,.6,efc*stiffness*stiffness_multiplier);
-    else if(use_extended_mooney_rivlin) icm=new MOONEY_RIVLIN_3D_EXTRAPOLATED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.4,20*stiffness*stiffness_multiplier);
-    else if(use_mooney_rivlin) icm=new MOONEY_RIVLIN_3D2<T>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.4,20*stiffness*stiffness_multiplier);
+    else if(use_extended_svk) icm=new SVK_EXTRAPOLATED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc);
+    else if(use_extended_neohookean_refined) icm=new NEO_HOOKEAN_EXTRAPOLATED_REFINED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,.6,efc);
+    else if(use_extended_mooney_rivlin) icm=new MOONEY_RIVLIN_3D_EXTRAPOLATED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.4,efc);
+    else if(use_mooney_rivlin) icm=new MOONEY_RIVLIN_3D2<T>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
     else if(use_extended_neohookean_hyperbola) icm=new NEO_HOOKEAN_EXTRAPOLATED_HYPERBOLA<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.1);
     else if(use_extended_neohookean_smooth) icm=new NEO_HOOKEAN_EXTRAPOLATED_SMOOTH<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.1);
     else if(use_corotated) icm=new COROTATED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
@@ -1844,12 +1860,6 @@ void Add_Constitutive_Model(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,T 
 void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 {
     if(dump_sv) svout.close();
-    if(externally_forced.m)
-    {
-        PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
-        for(int i=1; i <=externally_forced.m; i++)
-            Add_Debug_Particle(particles.X(externally_forced(i)),TV(0,0,1));
-    }
 }
 };
 }

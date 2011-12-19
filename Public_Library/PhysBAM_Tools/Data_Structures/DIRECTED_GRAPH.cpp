@@ -86,7 +86,7 @@ int DIRECTED_GRAPH_CORE::
 Strongly_Connected_Components(ARRAY<int>& component_id) // returns total number of components
 {
     component_id.Resize(parents.m);
-    ARRAYS_COMPUTATIONS::Fill(component_id,0);ARRAY<int> finish_time;ARRAY<int> node_index;Topological_Sort(finish_time,node_index);
+    component_id.Fill(0);ARRAY<int> finish_time;ARRAY<int> node_index;Topological_Sort(finish_time,node_index);
     int total_components=0;ARRAY<int> component;component.Preallocate(Value(parents.Size()));ARRAY<short,int> visit_tag(parents.m); // use parents.m for DIRECTED_GRAPH_CORE<int>
     for(int time=parents.m;time>=1;time--) if(!visit_tag(node_index(time))){
         total_components++;component.Remove_All();Visit_Transpose(node_index(time),visit_tag,component);

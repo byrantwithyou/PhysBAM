@@ -7,7 +7,6 @@
 #ifndef __TRIANGLE_REPULSIONS__
 #define __TRIANGLE_REPULSIONS__
 
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_MIN_MAX.h>
 #include <PhysBAM_Tools/Parallel_Computation/PARTITION_ID.h>
 #include <PhysBAM_Geometry/Basic_Geometry/BASIC_SIMPLEX_POLICY.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/DEFORMABLES_COLLISIONS_FORWARD.h>
@@ -32,7 +31,7 @@ struct POINT_FACE_REPULSION_PAIR
     TV normal;
 
     static T Total_Repulsion_Thickness(ARRAY_VIEW<const T> repulsion_thickness,const VECTOR<int,d+1>& nodes)
-    {return max(repulsion_thickness(nodes[1]),ARRAYS_COMPUTATIONS::Min(repulsion_thickness.Subset(nodes.Remove_Index(1))));}
+    {return max(repulsion_thickness(nodes[1]),repulsion_thickness.Subset(nodes.Remove_Index(1)).Min());}
 
     T Total_Repulsion_Thickness(ARRAY_VIEW<const T> repulsion_thickness) const
     {return Total_Repulsion_Thickness(repulsion_thickness,nodes);}
@@ -178,7 +177,7 @@ public:
 
     // Note that if repulsion thickness is not constant, repulsion will be discontinuous since we pick the min repulsion among repelling elements.
     void Set_Repulsion_Thickness(const T thickness=(T)1e-3)
-    {repulsion_thickness.Resize(geometry.deformable_body_collection.particles.array_collection->Size(),false,false);ARRAYS_COMPUTATIONS::Fill(repulsion_thickness,thickness);}
+    {repulsion_thickness.Resize(geometry.deformable_body_collection.particles.array_collection->Size(),false,false);repulsion_thickness.Fill(thickness);}
 
     void Set_Repulsion_Thickness(ARRAY_VIEW<const T> thickness)
     {repulsion_thickness.Resize(geometry.deformable_body_collection.particles.array_collection->Size(),false,false);ARRAY<T>::Copy(thickness,repulsion_thickness);}

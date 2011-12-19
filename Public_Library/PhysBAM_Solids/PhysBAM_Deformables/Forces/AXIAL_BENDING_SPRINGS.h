@@ -52,7 +52,7 @@ public:
     virtual ~AXIAL_BENDING_SPRINGS();
 
     void Set_Stiffness(const T youngs_modulus_input)
-    {ARRAYS_COMPUTATIONS::Fill(youngs_modulus,youngs_modulus_input);Invalidate_CFL();}
+    {youngs_modulus.Fill(youngs_modulus_input);Invalidate_CFL();}
 
     void Set_Stiffness(ARRAY_VIEW<const T> youngs_modulus_input)
     {ARRAY<T>::Copy(youngs_modulus_input,youngs_modulus);Invalidate_CFL();}
@@ -61,7 +61,7 @@ public:
     {for(int i=1;i<=restlength.m;i++) restlength(i)=max(visual_restlength(i),clamped_restlength);}
 
     void Set_Damping(const T damping_input)
-    {ARRAYS_COMPUTATIONS::Fill(damping,damping_input);Invalidate_CFL();}
+    {damping.Fill(damping_input);Invalidate_CFL();}
 
     void Set_Damping(ARRAY_VIEW<const T> damping_input)
     {ARRAY<T>::Copy(damping_input,damping);Invalidate_CFL();}

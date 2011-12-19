@@ -55,8 +55,7 @@ Initialize_Object_Collisions(const bool collide_with_interior,const T collision_
             Add_Collision_Mesh(triangulated_surface->mesh,true);
         else if(SEGMENTED_CURVE<TV>* segmented_curve=dynamic_cast<SEGMENTED_CURVE<TV>*>(collision_structures(c))){
             SEGMENT_MESH& mesh=segmented_curve->mesh;for(int s=1;s<=mesh.elements.m;s++){
-                INDIRECT_ARRAY<ARRAY<bool>,SEGMENT_MESH::ELEMENT_TYPE&> subset=check_collision.Subset(mesh.elements(s));
-                ARRAYS_COMPUTATIONS::Fill(subset,true);}}
+                check_collision.Subset(mesh.elements(s)).Fill(true);}}
         else if(TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(collision_structures(c)))
             Add_Collision_Mesh(tetrahedralized_volume->mesh,collide_with_interior);
         else if(HEXAHEDRALIZED_VOLUME<T>* hexahedralized_volume=dynamic_cast<HEXAHEDRALIZED_VOLUME<T>*>(collision_structures(c)))
@@ -65,11 +64,9 @@ Initialize_Object_Collisions(const bool collide_with_interior,const T collision_
             if(collide_with_interior && !dynamic_cast<EMBEDDED_MATERIAL_SURFACE<VECTOR<T,3>,2>*>(embedding)) PHYSBAM_FATAL_ERROR();
             else Add_Collision_Mesh(embedding->material_surface_mesh,true);
         else if(FREE_PARTICLES<TV>* free_particles=dynamic_cast<FREE_PARTICLES<TV>*>(collision_structures(c))){
-            INDIRECT_ARRAY<ARRAY<bool>,ARRAY<int>&> subset=check_collision.Subset(free_particles->nodes);
-            ARRAYS_COMPUTATIONS::Fill(subset,true);}
+            check_collision.Subset(free_particles->nodes).Fill(true);}
         else PHYSBAM_NOT_IMPLEMENTED(STRING_UTILITIES::string_sprintf("Collisions with %s",typeid(*collision_structures(c)).name()));}
-    INDIRECT_ARRAY<ARRAY<bool>,ARRAY<int>&> ignored_subset=check_collision.Subset(ignored_nodes);
-    ARRAYS_COMPUTATIONS::Fill(ignored_subset,false);
+    check_collision.Subset(ignored_nodes).Fill(false);
 }
 //#####################################################################
 // Function Use_Structure_Skip_Collision_Body
@@ -209,7 +206,7 @@ Reset_Object_Collisions() // The unusual signature is not great
         typedef FIELD_PROJECTOR<COLLISION_PARTICLE_STATE<TV>,bool,&COLLISION_PARTICLE_STATE<TV>::enforce> T_FIELD_PROJECTOR;
         INDIRECT_ARRAY<ARRAY<COLLISION_PARTICLE_STATE<TV> >,ARRAY<int>&> subset=particle_states.Subset(deformable_body_collection.simulated_particles);
         PROJECTED_ARRAY<ARRAY_TYPE,T_FIELD_PROJECTOR> projected_array=subset.template Project<bool,&COLLISION_PARTICLE_STATE<TV>::enforce>();
-        ARRAYS_COMPUTATIONS::Fill(projected_array,false);}
+        projected_array.Fill(false);}
 }
 //#####################################################################
 // Function Add_Collision_Mesh
@@ -218,8 +215,7 @@ template<class TV> template<class T_MESH> void DEFORMABLE_OBJECT_COLLISIONS<TV>:
 Add_Collision_Mesh(T_MESH& mesh,const bool collide_with_interior)
 {
     if(collide_with_interior) for(int t=1;t<=mesh.elements.m;t++){
-        INDIRECT_ARRAY<ARRAY<bool>,typename T_MESH::ELEMENT_TYPE&> subset=check_collision.Subset(mesh.elements(t));
-        ARRAYS_COMPUTATIONS::Fill(subset,true);}
+        check_collision.Subset(mesh.elements(t)).Fill(true);}
     else{bool boundary_nodes_defined=mesh.boundary_nodes!=0;if(!boundary_nodes_defined) mesh.Initialize_Boundary_Nodes();
         const ARRAY<int>* boundary_nodes=mesh.boundary_nodes;
         for(int p=1;p<=boundary_nodes->m;++p) check_collision((*boundary_nodes)(p))=true;
@@ -231,7 +227,7 @@ Add_Collision_Mesh(T_MESH& mesh,const bool collide_with_interior)
 template<class TV> void DEFORMABLE_OBJECT_COLLISIONS<TV>::
 Update_Simulated_Particles()
 {
-    particle_to_structure.Resize(particles.array_collection->Size(),false,false);ARRAYS_COMPUTATIONS::Fill(particle_to_structure,0);
+    particle_to_structure.Resize(particles.array_collection->Size(),false,false);particle_to_structure.Fill(0);
     for(int s=1;s<=deformable_object_structures.m;s++) deformable_object_structures(s)->Mark_Nodes_Referenced(particle_to_structure,s);
 }
 //#####################################################################

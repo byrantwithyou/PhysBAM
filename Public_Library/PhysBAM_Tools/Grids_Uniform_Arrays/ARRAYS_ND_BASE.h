@@ -10,8 +10,6 @@
 #include <PhysBAM_Tools/Arrays/ARRAY_BASE.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 #include <PhysBAM_Tools/Arrays_Computations/ARRAY_COPY.h>
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_MIN_MAX.h>
-#include <PhysBAM_Tools/Arrays_Computations/SUMMATIONS.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/UNIFORM_ARRAY_ITERATOR.h>
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 #include <PhysBAM_Tools/Log/LOG.h>
@@ -159,7 +157,7 @@ public:
     {(*this)(p)=*(const T*)(&buffer(position+1));position+=sizeof(T);}
 
     void Fill(const T& constant)
-    {ARRAYS_COMPUTATIONS::Fill(array,constant);}
+    {array.Fill(constant);}
 
     static void Copy(const ARRAYS_ND_BASE& old_copy,ARRAYS_ND_BASE& new_copy)
     {assert(old_copy.Domain_Indices()==new_copy.Domain_Indices());
@@ -189,31 +187,31 @@ public:
     {array.Clamp_Below(value);}
 
     T Average() const
-    {return ARRAYS_COMPUTATIONS::Average(array);}
+    {return array.Average();}
 
     T Max() const
-    {return ARRAYS_COMPUTATIONS::Max(array);}
+    {return array.Max();}
 
     T Maxabs() const
-    {return ARRAYS_COMPUTATIONS::Maxabs(array);}
+    {return array.Maxabs();}
 
     T Maxmag() const
-    {return ARRAYS_COMPUTATIONS::Maxmag(array);}
+    {return array.Maxmag();}
 
     T Min() const
-    {return ARRAYS_COMPUTATIONS::Min(array);}
+    {return array.Min();}
 
     T Minmag() const
-    {return ARRAYS_COMPUTATIONS::Minmag(array);}
+    {return array.Minmag();}
 
     T Sum() const
-    {return ARRAYS_COMPUTATIONS::Sum(array);}
+    {return array.Sum();}
 
     T Sumabs() const
-    {return ARRAYS_COMPUTATIONS::Sumabs(array);}
+    {return array.Sumabs();}
 
     T Componentwise_Maxabs() const
-    {return ARRAYS_COMPUTATIONS::Componentwise_Maxabs(array);}
+    {return array.Componentwise_Maxabs();}
 
     static T Dot_Product(const ARRAYS_ND_BASE& a1,const ARRAYS_ND_BASE& a2)
     {assert(Equal_Dimensions(a1,a2));

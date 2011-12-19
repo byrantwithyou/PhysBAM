@@ -2,7 +2,6 @@
 // Copyright 2004-2009, Geoffrey Irving, Sergey Koltakov, Nipun Kwatra, Michael Lentine, Craig Schroeder, Andrew Selle, Tamar Shinar, Eftychios Sifakis, Jonathan Su.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_MIN_MAX.h>
 #include <PhysBAM_Tools/Read_Write/Arrays/READ_WRITE_ARRAY.h>
 #include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
@@ -125,7 +124,7 @@ Reinitialize(bool force,bool read_geometry)
                 segmented_curve_objects(i)=new OPENGL_SEGMENTED_CURVE_3D<T>(*segmented_curve,OPENGL_COLOR((T).5,(T).25,0));
                 segmented_curve_objects(i)->use_solid_color=false;}
             else if(TRIANGULATED_SURFACE<T>* triangulated_surface=dynamic_cast<TRIANGULATED_SURFACE<T>*>(structure)){
-                if(first_time) LOG::cout<<"object "<<i<<": triangulated surface, range = "<<ARRAYS_COMPUTATIONS::Min(triangulated_surface->mesh.elements.Flattened())<<" "<<ARRAYS_COMPUTATIONS::Max(triangulated_surface->mesh.elements.Flattened())<<"\n";
+                if(first_time) LOG::cout<<"object "<<i<<": triangulated surface, range = "<<triangulated_surface->mesh.elements.Flattened().Min()<<" "<<triangulated_surface->mesh.elements.Flattened().Max()<<"\n";
                 triangulated_surface->mesh.Initialize_Segment_Mesh();
                 ARRAY<OPENGL_COLOR> front_colors,back_colors;
                 front_colors.Append(OPENGL_COLOR::Yellow());back_colors.Append(OPENGL_COLOR::Magenta());
@@ -133,7 +132,7 @@ Reinitialize(bool force,bool read_geometry)
                 triangulated_surface_objects(i)=new OPENGL_TRIANGULATED_SURFACE<T>(*triangulated_surface,false,
                     OPENGL_MATERIAL::Metal(front_colors((i-1)%front_colors.Size()+1)),OPENGL_MATERIAL::Metal(back_colors((i-1)%back_colors.Size()+1)));}
             else if(TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(structure)){
-                if(first_time) LOG::cout<<"object "<<i<<": tetrahedralized_volume, range = "<<ARRAYS_COMPUTATIONS::Min(tetrahedralized_volume->mesh.elements.Flattened())<<" "<<ARRAYS_COMPUTATIONS::Max(tetrahedralized_volume->mesh.elements.Flattened())<<"\n";
+                if(first_time) LOG::cout<<"object "<<i<<": tetrahedralized_volume, range = "<<tetrahedralized_volume->mesh.elements.Flattened().Min()<<" "<<tetrahedralized_volume->mesh.elements.Flattened().Max()<<"\n";
                 tetrahedralized_volume_objects(i)=new OPENGL_TETRAHEDRALIZED_VOLUME<T>(&tetrahedralized_volume->mesh,&(deformable_geometry->particles),
                     OPENGL_MATERIAL::Metal(OPENGL_COLOR::Red(.7f)),OPENGL_MATERIAL::Metal(OPENGL_COLOR::Green(.7f)));}
             else if(HEXAHEDRALIZED_VOLUME<T>* hexahedralized_volume=dynamic_cast<HEXAHEDRALIZED_VOLUME<T>*>(structure)){
@@ -197,7 +196,7 @@ template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_
 Set_Draw(bool draw_input)
 {
     OPENGL_COMPONENT::Set_Draw(draw_input);
-    if(draw_input) ARRAYS_COMPUTATIONS::Fill(active_list,true);
+    if(draw_input) active_list.Fill(true);
     Reinitialize();
 }
 //#####################################################################
@@ -314,7 +313,7 @@ Cycle_Cutaway_Mode()
 template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_3D<T,RW>::
 Show_Only_First()
 {
-    ARRAYS_COMPUTATIONS::Fill(active_list,false);
+    active_list.Fill(false);
     active_list(1)=true;
 }
 //#####################################################################
@@ -426,8 +425,8 @@ template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_
 Toggle_Use_Active_List()
 {
     if(active_list.m<1) return;
-    use_active_list=!use_active_list;if(!use_active_list) ARRAYS_COMPUTATIONS::Fill(active_list,true);
-    else{ARRAYS_COMPUTATIONS::Fill(active_list,false);incremented_active_object=1;active_list(incremented_active_object)=true;}
+    use_active_list=!use_active_list;if(!use_active_list) active_list.Fill(true);
+    else{active_list.Fill(false);incremented_active_object=1;active_list(incremented_active_object)=true;}
 }
 //#####################################################################
 // Function Select_Segment

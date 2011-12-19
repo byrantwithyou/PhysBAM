@@ -4,7 +4,6 @@
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
 #include <PhysBAM_Tools/Arrays_Computations/ARRAY_COPY.h>
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_MIN_MAX.h>
 #include <PhysBAM_Tools/Data_Structures/FLOOD_FILL_GRAPH.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FLOOD_FILL_3D.h>
@@ -142,7 +141,7 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
             //if(write_debug_data){FILE_UTILITIES::Write_To_File<T>("colors.debug",colors);}
             ARRAY<int> region_size(number_of_colors);
             for(int i=1;i<=grid.counts.x;i++) for(int j=1;j<=grid.counts.y;j++) for(int k=1;k<=grid.counts.z;k++) if(colors(i,j,k)>0) region_size(colors(i,j,k))++;
-            int max_region_size=ARRAYS_COMPUTATIONS::Max(region_size);
+            int max_region_size=region_size.Max();
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
             if(verbose) LOG::cout<<"Keeping only largest inside region (max region size = "<<max_region_size<<")... "<<std::flush;
 #endif
@@ -180,7 +179,7 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
             if(verbose && color_touches_boundary.Number_True()>1) LOG::cerr<<"Warning: Got "<<color_touches_boundary.Number_True()<<" colors touching boundary"<<std::endl;
             for(int i=1;i<=number_of_colors;i++) color_is_inside(i)=!color_touches_boundary(i);}
         else{
-            ARRAY<T> color_maximum_distance(number_of_colors,false);ARRAYS_COMPUTATIONS::Fill(color_maximum_distance,(T)-1);
+            ARRAY<T> color_maximum_distance(number_of_colors,false);color_maximum_distance.Fill(-1);
             ARRAY<TV_INT> color_representatives(number_of_colors);
             for(int i=1;i<=grid.counts.x;i++)for(int j=1;j<=grid.counts.y;j++)for(int k=1;k<=grid.counts.z;k++)if(closest_triangle_index(i,j,k) && color_maximum_distance(colors(i,j,k))<phi(i,j,k)){
                 color_maximum_distance(colors(i,j,k))=phi(i,j,k);color_representatives(colors(i,j,k))=TV_INT(i,j,k);}
@@ -191,7 +190,7 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
         if(keep_only_largest_inside_region){
             ARRAY<int> region_size(number_of_colors);
             for(int i=1;i<=grid.counts.x;i++) for(int j=1;j<=grid.counts.y;j++) for(int k=1;k<=grid.counts.z;k++) if(colors(i,j,k)>0 && color_is_inside(colors(i,j,k))) region_size(colors(i,j,k))++;
-            int max_region_size=ARRAYS_COMPUTATIONS::Max(region_size);
+            int max_region_size=region_size.Max();
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
             if(verbose) LOG::cout<<"Keeping only largest inside region (max region size = "<<max_region_size<<")... "<<std::flush;
 #endif

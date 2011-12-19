@@ -500,7 +500,7 @@ Compute_Contact_Graph(const T dt,const T time,ARTICULATED_RIGID_BODY<TV>* articu
         HASHTABLE<PAIR<int,int> > stack_static_bodies;
         for(int i=1;i<=contact_stack.m;i++){
             INDIRECT_ARRAY<ARRAY<int>,ARRAY<int>&> contact_subset=body_stack.Subset(contact_stack(i));
-            ARRAYS_COMPUTATIONS::Fill(contact_subset,i);
+            contact_subset.Fill(i);
             for(int j=1;j<=contact_stack(i).m;j++) if(rigid_body_collection.Rigid_Body(contact_stack(i)(j)).Has_Infinite_Inertia()) stack_static_bodies.Set(PAIR<int,int>(i,contact_stack(i)(j)));}
         for(COLLISION_GEOMETRY_ID i(1);i<=rigid_body_collection.rigid_geometry_collection.collision_body_list->bodies.Size();i++){
             int rigid_body_id=rigid_body_collection.rigid_geometry_collection.collision_body_list->collision_geometry_id_to_geometry_id.Get(i);
@@ -873,7 +873,7 @@ Compute_Contact_Frequency()
     for(int i(1);i<=adj.m;i++) for(int j=1;j<=contact_graph.directed_graph.Parents(i).m;j++){
         adj(i).Append(contact_graph.directed_graph.Parents(i)(j));adj(contact_graph.directed_graph.Parents(i)(j)).Append(i);}
 
-    ARRAY<int,int> depths(adj.m);ARRAYS_COMPUTATIONS::Fill(depths,-1);
+    ARRAY<int,int> depths(adj.m);depths.Fill(-1);
     for(int i(1);i<=adj.m;i++) if(depths(i)==-1) Get_Rigid_Body_Depth(i,depths);
 
     pairs_scale.Remove_All();

@@ -2,7 +2,6 @@
 // Copyright 2004-2007, Kevin Der, Craig Schroeder, Andrew Selle, Tamar Shinar, Eftychios Sifakis, Rachel Weinstein.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Arrays_Computations/SUMMATIONS.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_3X3.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_MXN.h>
 #include <PhysBAM_Tools/Optimization/LINEAR_PROGRAMMING.h>
@@ -58,8 +57,8 @@ Compute_Position_Based_State(const T dt,const T time)
     ARRAY<ARRAY<PAIR<int,bool> >,int> joints_on_rigid_body(rigid_body_collection.rigid_body_particle.array_collection->Size()); // stores joint id and whether it's parent for joint.
     ARRAY<TV> joint_location(joint_mesh.joints.m);
     ARRAY<MATRIX_MXN<T> > joint_constraint_matrix(joint_mesh.joints.m),joint_muscle_control_matrix(joint_mesh.joints.m);
-    joint_constrained_dimensions.Resize(joint_mesh.joints.m);ARRAYS_COMPUTATIONS::Fill(joint_constrained_dimensions,0);
-    joint_muscle_control_dimensions.Resize(joint_mesh.joints.m);ARRAYS_COMPUTATIONS::Fill(joint_muscle_control_dimensions,0);
+    joint_constrained_dimensions.Resize(joint_mesh.joints.m);joint_constrained_dimensions.Fill(0);
+    joint_muscle_control_dimensions.Resize(joint_mesh.joints.m);joint_muscle_control_dimensions.Fill(0);
     joint_angular_constraint_matrix.Resize(joint_mesh.joints.m); // angular directions constrained by joint or PD
     joint_angular_muscle_control_matrix.Resize(joint_mesh.joints.m); // angular directions which are unconstrained (free for muscle to try to control)
 
@@ -96,14 +95,14 @@ Compute_Position_Based_State(const T dt,const T time)
 
     joint_offset_in_post_stabilization_matrix.Resize(joint_mesh.joints.m);
     for(int i=1;i<=joint_mesh.joints.m;i++) joint_offset_in_post_stabilization_matrix(i)=(i==1)?1:joint_offset_in_post_stabilization_matrix(i-1)+joint_constrained_dimensions(i-1);
-    int total_constrained_dimensions=ARRAYS_COMPUTATIONS::Sum(joint_constrained_dimensions);
+    int total_constrained_dimensions=joint_constrained_dimensions.Sum();
     global_post_stabilization_matrix_11=MATRIX_MXN<T>(total_constrained_dimensions,total_constrained_dimensions);
     LOG::cout<<"*** Total constrained dimensions "<<total_constrained_dimensions<<std::endl;
 
     if(use_muscle_actuators){
         joint_offset_in_muscle_control_matrix.Resize(joint_mesh.joints.m);
         for(int i=1;i<=joint_mesh.joints.m;i++) joint_offset_in_muscle_control_matrix(i)=(i==1)?1:joint_offset_in_muscle_control_matrix(i-1)+joint_muscle_control_dimensions(i-1);
-        int total_muscle_control_dimensions=ARRAYS_COMPUTATIONS::Sum(joint_muscle_control_dimensions);assert(total_muscle_control_dimensions);
+        int total_muscle_control_dimensions=joint_muscle_control_dimensions.Sum();assert(total_muscle_control_dimensions);
         global_post_stabilization_matrix_12=MATRIX_MXN<T>(total_constrained_dimensions,muscle_list->muscles.m);
         global_post_stabilization_matrix_21=MATRIX_MXN<T>(total_muscle_control_dimensions,total_constrained_dimensions);
         global_post_stabilization_matrix_22=MATRIX_MXN<T>(total_muscle_control_dimensions,muscle_list->muscles.m);

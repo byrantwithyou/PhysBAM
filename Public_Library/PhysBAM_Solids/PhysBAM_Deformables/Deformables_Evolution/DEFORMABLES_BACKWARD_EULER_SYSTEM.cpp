@@ -44,7 +44,7 @@ Force(const VECTOR_T& V,VECTOR_T& F) const
     if(mpi_solids) mpi_solids->Exchange_Binding_Boundary_Data(V.V.array);
 
     INDIRECT_ARRAY<ARRAY_VIEW<TV>,ARRAY<int>&> V_subset=F.V.array.Subset(deformable_body_collection.simulated_particles);
-    ARRAYS_COMPUTATIONS::Fill(V_subset,TV());
+    V_subset.Fill(TV());
 
     deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Velocities(V.V.array);
     if(mpi_solids) mpi_solids->Exchange_Force_Boundary_Data(V.V.array);

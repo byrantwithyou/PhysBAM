@@ -7,7 +7,6 @@
 #ifndef __GENERIC_EXAMPLE__
 #define __GENERIC_EXAMPLE__
 
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_MIN_MAX.h>
 #include <PhysBAM_Tools/Parsing/PARAMETER_LIST.h>
 #include <PhysBAM_Geometry/Basic_Geometry/CYLINDER.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
@@ -227,16 +226,16 @@ public:
                 variable_max_edge_length_tetsurf_field->field*=parameter_list.Get_Parameter("variable_max_edge_length_scale",(T)1);
                 variable_max_edge_length_tetsurf_field->field+=parameter_list.Get_Parameter("variable_max_edge_length_offset",(T)0);
                 variable_max_edge_length_tetsurf_field->default_value=(T)FLT_MAX;
-                LOG::cout<<"variable max edge length field = ["<<ARRAYS_COMPUTATIONS::Min(variable_max_edge_length_tetsurf_field->field)
-                         <<", "<<ARRAYS_COMPUTATIONS::Max(variable_max_edge_length_tetsurf_field->field)
+                LOG::cout<<"variable max edge length field = ["<<variable_max_edge_length_tetsurf_field->field.Min()
+                         <<", "<<variable_max_edge_length_tetsurf_field->field.Max()
                          <<"], subdivide tetrahedra near boundary only: "<<subdivide_tets_near_boundary_only<<std::endl;}
             else{
                 variable_max_edge_length_tet_field=new TETRAHEDRALIZED_VOLUME_FIELD<T>(stream_type,variable_max_edge_length_file);
                 variable_max_edge_length_tet_field->field*=parameter_list.Get_Parameter("variable_max_edge_length_scale",(T)1);
                 variable_max_edge_length_tet_field->field+=parameter_list.Get_Parameter("variable_max_edge_length_offset",(T)0);
                 variable_max_edge_length_tet_field->default_value=(T)FLT_MAX;
-                LOG::cout<<"variable max edge length field = ["<<ARRAYS_COMPUTATIONS::Min(variable_max_edge_length_tet_field->field)
-                         <<", "<<ARRAYS_COMPUTATIONS::Max(variable_max_edge_length_tet_field->field)
+                LOG::cout<<"variable max edge length field = ["<<variable_max_edge_length_tet_field->field.Min()
+                         <<", "<<variable_max_edge_length_tet_field->field.Max()
                          <<"], subdivide tetrahedra near boundary only: "<<subdivide_tets_near_boundary_only<<std::endl;}}
         parameter_list.End_Parse();
     }

@@ -430,7 +430,7 @@ Identify_Escaped_Particles(const BLOCK_DYADIC<T_GRID>& block,PARTICLE_LEVELSET_P
 {
     assert(!particles.next);
     bool near_objects=levelset.collision_body_list->Occupied_Block(block);if(near_objects) levelset.Enable_Collision_Aware_Interpolation(sign);
-    escaped.Resize(particles.array_collection->Size());ARRAYS_COMPUTATIONS::Fill(escaped,false);T one_over_radius_multiplier=-sign/outside_particle_distance_multiplier;
+    escaped.Resize(particles.array_collection->Size());escaped.Fill(false);T one_over_radius_multiplier=-sign/outside_particle_distance_multiplier;
     for(int k=1;k<=particles.array_collection->Size();k++) if(one_over_radius_multiplier*levelset.Phi(block,particles.X(k))>particles.radius(k)) escaped(k)=true;
     if(near_objects) levelset.Disable_Collision_Aware_Interpolation();
 }

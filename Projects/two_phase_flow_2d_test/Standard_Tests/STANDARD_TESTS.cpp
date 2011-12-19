@@ -358,13 +358,13 @@ Kang_Circle(bool use_surface)
         SPHERE<TV> object(TV((T).02*m,(T).02*m),(T).01*m);
         front_tracked_structure=&solids_tests.Copy_And_Add_Structure(*TESSELLATION::Tessellate_Boundary(object,solid_refinement));
         solid_body_collection.deformable_body_collection.particles.array_collection->Add_Elements(20*resolution);
-        particle_segments.Resize(ARRAYS_COMPUTATIONS::Max(front_tracked_structure->mesh.elements.Flattened()));
+        particle_segments.Resize(front_tracked_structure->mesh.elements.Flattened().Max());
         for(int i=1;i<=front_tracked_structure->mesh.elements.m;i++){
             particle_segments(front_tracked_structure->mesh.elements(i).x).y=i;
             particle_segments(front_tracked_structure->mesh.elements(i).y).x=i;}
         if(make_ellipse) for(int i=1;i<=particle_segments.m;i++) front_tracked_structure->particles.X(i)/=TV((T)1.1,(T).9);
         saved_tracked_particles_X=front_tracked_structure->particles.X.Prefix(particle_segments.m);
-        ARRAYS_COMPUTATIONS::Fill(particles.mass,2*(T)pi*object.radius*fluids_parameters.grid->dX.Max()*fluids_parameters.density/particles.mass.m/100);
+        particles.mass.Fill(2*(T)pi*object.radius*fluids_parameters.grid->dX.Max()*fluids_parameters.density/particles.mass.m/100);
 
         if(1){
             deformable_collisions=new DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>(*front_tracked_structure);//.Get_Boundary_Object());
@@ -408,7 +408,7 @@ Oscillating_Circle(bool use_surface)
             T angle=atan2(X.y,X.x);
             T scale=circle_radius+circle_perturbation*cos(oscillation_mode*angle);
             X=TV(.5,.5)+X*scale;}
-        ARRAYS_COMPUTATIONS::Fill(solid_body_collection.deformable_body_collection.particles.mass,(T)1);
+        solid_body_collection.deformable_body_collection.particles.mass.Fill((T)1);
         solid_body_collection.Add_Force(stf);
         stf->apply_explicit_forces=true;
         stf->apply_implicit_forces=implicit_solid;
@@ -424,9 +424,9 @@ Oscillating_Circle(bool use_surface)
             T angle=(T)(i*2*pi/front_tracked_structure->particles.X.m);
             T radius=circle_radius+circle_perturbation*cos(oscillation_mode*angle);
             front_tracked_structure->particles.X(i)=TV((T).5*m+radius*cos(angle),(T).5*m+radius*sin(angle));}
-        ARRAYS_COMPUTATIONS::Fill(solid_body_collection.deformable_body_collection.particles.mass,(T)1);
+        solid_body_collection.deformable_body_collection.particles.mass.Fill((T)1);
         solid_body_collection.deformable_body_collection.particles.array_collection->Add_Elements(20*resolution);
-        particle_segments.Resize(ARRAYS_COMPUTATIONS::Max(front_tracked_structure->mesh.elements.Flattened()));
+        particle_segments.Resize(front_tracked_structure->mesh.elements.Flattened().Max());
         for(int i=1;i<=front_tracked_structure->mesh.elements.m;i++){
             particle_segments(front_tracked_structure->mesh.elements(i).x).y=i;
             particle_segments(front_tracked_structure->mesh.elements(i).y).x=i;}

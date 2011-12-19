@@ -2,7 +2,6 @@
 // Copyright 2005-2006, Geoffrey Irving, Jerry Talton.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_MIN_MAX.h>
 #include <PhysBAM_Tools/Data_Structures/KD_TREE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Math_Tools/cube.h>
@@ -22,7 +21,7 @@ Setup_Processing()
 {
     particle_blender=new REMOVED_PARTICLES_BLENDER_3D<T>(blending_parameter);
     particle_tree.Create_Left_Balanced_KD_Tree(particles.X);
-    tolerance=relative_tolerance*scale*ARRAYS_COMPUTATIONS::Min(particles.radius);
+    tolerance=relative_tolerance*scale*particles.radius.Min();
     particle_domain=RANGE<TV>(particles.X(1));
     ARRAY<RANGE<TV> > particle_boxes(particles.array_collection->Size());
     for(int p=1;p<=particles.array_collection->Size();p++){

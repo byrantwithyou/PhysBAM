@@ -925,7 +925,7 @@ void Get_Initial_Data()
             particles.X(new_tri_node3)=TV((T).45*side_length,(T)1.2,(T)4.5);
             surface.mesh.elements.Append(VECTOR<int,3>(new_tri_node1,new_tri_node2,new_tri_node3));}
             // set ramps to inifinite mass
-            INDIRECT_ARRAY<ARRAY_VIEW<T>,ARRAY<int>&> mass_subset=particles.mass.Subset(cloth_ramp_particles);ARRAYS_COMPUTATIONS::Fill(mass_subset,(T)FLT_MAX); 
+            particles.mass.Subset(cloth_ramp_particles).Fill((T)FLT_MAX);
             tests.Add_Ground();
             break;}
         case 26:{
@@ -1301,7 +1301,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,tetrahedralized_volume.mesh,0));
             solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));
             if(use_forces_for_drift){
-                ARRAYS_COMPUTATIONS::Fill(soft_bindings.use_impulses_for_collisions,false);
+                soft_bindings.use_impulses_for_collisions.Fill(false);
                 soft_bindings.Initialize_Binding_Mesh();
                 solid_body_collection.Add_Force(Create_Edge_Binding_Springs(deformable_body_collection.particles,*soft_bindings.binding_mesh,(T)1e6,(T)1));}
             break;}
@@ -1443,7 +1443,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             //TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>&>();
             //solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_surface,new NEO_HOOKEAN_2D<T>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));
             LINEAR_SPRINGS<TV>* spring_force=Create_Edge_Springs(deformable_body_collection.particles,binding_segment_mesh);
-            ARRAYS_COMPUTATIONS::Fill(spring_force->visual_restlength,(T)0);spring_force->Clamp_Restlength(1);
+            spring_force->visual_restlength.Fill((T)0);spring_force->Clamp_Restlength(1);
             solid_body_collection.Add_Force(spring_force);
             break;}
         case 21:{
@@ -1564,7 +1564,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,triangulated_surface.mesh,0));
             solid_body_collection.Add_Force(Create_Edge_Springs(triangulated_surface,(T)1000,(T)2)); // were *2 and *10
             LINEAR_SPRINGS<TV>* stick_springs=Create_Edge_Springs(segmented_curve,(T)1000,(T)2);
-            ARRAYS_COMPUTATIONS::Fill(stick_springs->visual_restlength,(T)0.01);stick_springs->Clamp_Restlength((T).01);
+            stick_springs->visual_restlength.Fill((T)0.01);stick_springs->Clamp_Restlength((T).01);
             solid_body_collection.Add_Force(stick_springs);}
             break;
         case 44:{
@@ -1741,13 +1741,13 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
         int i,j;int m=(int)(aspect_ratio*number_side_panels)+1;
         i=1;j=1;V(i+m*(j-1))=TV();i=m;j=1;V(i+m*(j-1))=TV();
         i=1;j=number_side_panels;V(i+m*(j-1))=TV();i=m;j=number_side_panels;V(i+m*(j-1))=TV();
-        INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,2>&> V1_subset=V.Subset(constrained_particles(1));ARRAYS_COMPUTATIONS::Fill(V1_subset,TV());
-        INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,2>&> V2_subset=V.Subset(constrained_particles(2));ARRAYS_COMPUTATIONS::Fill(V2_subset,TV());}
+        V.Subset(constrained_particles(1)).Fill(TV());
+        V.Subset(constrained_particles(2)).Fill(TV());}
     else if(test_number==22){
         FREE_PARTICLES<TV>& free_particles=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<FREE_PARTICLES<TV>&>();
-        INDIRECT_ARRAY<ARRAY_VIEW<TV>,ARRAY<int>&> V_subset=V.Subset(free_particles.nodes);ARRAYS_COMPUTATIONS::Fill(V_subset,TV());}
+        V.Subset(free_particles.nodes).Fill(TV());}
     else if(test_number==25){
-        INDIRECT_ARRAY<ARRAY_VIEW<TV>,ARRAY<int>&> V_subset=V.Subset(cloth_ramp_particles);ARRAYS_COMPUTATIONS::Fill(V_subset,TV());}
+        V.Subset(cloth_ramp_particles).Fill(TV());}
     else if(test_number==30){
         if(velocity_time < test_30_constrained_off){
             INTERPOLATION_CURVE<T,T> x;
@@ -1797,13 +1797,13 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
         int i,j;int m=(int)(aspect_ratio*number_side_panels)+1;
         i=1;j=1;V(i+m*(j-1))=TV();i=m;j=1;V(i+m*(j-1))=TV();
         i=1;j=number_side_panels;V(i+m*(j-1))=TV();i=m;j=number_side_panels;V(i+m*(j-1))=TV();
-        INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,2>&> V1_subset=V.Subset(constrained_particles(1));ARRAYS_COMPUTATIONS::Fill(V1_subset,TV());
-        INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,2>&> V2_subset=V.Subset(constrained_particles(2));ARRAYS_COMPUTATIONS::Fill(V2_subset,TV());}
+        V.Subset(constrained_particles(1)).Fill(TV());
+        V.Subset(constrained_particles(2)).Fill(TV());}
     else if(test_number==22){
         FREE_PARTICLES<TV>& free_particles=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<FREE_PARTICLES<TV>&>();
-        INDIRECT_ARRAY<ARRAY_VIEW<TV>,ARRAY<int>&> V_subset=V.Subset(free_particles.nodes);ARRAYS_COMPUTATIONS::Fill(V_subset,TV());}
+        V.Subset(free_particles.nodes).Fill(TV());}
     else if(test_number==25){
-        INDIRECT_ARRAY<ARRAY_VIEW<TV>,ARRAY<int>&> V_subset=V.Subset(cloth_ramp_particles);ARRAYS_COMPUTATIONS::Fill(V_subset,TV());}
+        V.Subset(cloth_ramp_particles).Fill(TV());}
     else if(test_number==30){
         if(velocity_time < test_30_constrained_off){
             int j;int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;j=(int)(.8*n);

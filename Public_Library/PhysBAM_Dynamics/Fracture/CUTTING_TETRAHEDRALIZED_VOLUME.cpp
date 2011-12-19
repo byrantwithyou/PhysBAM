@@ -1182,7 +1182,7 @@ template<class T> void CUTTING_TETRAHEDRALIZED_VOLUME<T>::
 Duplicate_And_Merge_Elements()
 {
     // new structures
-    union_vertices=UNION_FIND<>(num_new_particles);ARRAYS_COMPUTATIONS::Fill(union_vertices.parents,0);
+    union_vertices=UNION_FIND<>(num_new_particles);union_vertices.parents.Fill(0);
     PARTICLES<TV>& new_particles=dynamic_cast<PARTICLES<TV>&>(next_tetrahedralized_volume->particles);
     new_particle_indices.Resize(num_new_particles,true,false);
     // original embedding structures
@@ -1224,7 +1224,7 @@ Duplicate_And_Merge_Elements()
     int dup_particle_count=0;for(int i=1;i<=union_vertices.parents.m;i++) if(union_vertices.Is_Root(i)) dup_particle_count++;
     new_particles.array_collection->Preallocate(new_particles.array_collection->Size()+dup_particle_count);
     previous_particle_index_per_new_particle_index.Resize(new_particles.array_collection->Size()+dup_particle_count,false,false);
-    ARRAYS_COMPUTATIONS::Fill(previous_particle_index_per_new_particle_index,0);
+    previous_particle_index_per_new_particle_index.Fill(0);
     current_particle_id_per_collapsed_new_particle.Remove_All();
     current_particle_id_per_collapsed_new_particle.Preallocate(dup_particle_count);
     old_particle_per_new_collapsed_particle.Remove_All();
@@ -1590,8 +1590,8 @@ Build_New_Intersection_Registry(POLYGON_MESH& new_polygon_mesh,ARRAY<CUTTING_POL
     ARRAY<int> all_tet_nodes;tet_elements.Flattened().Get_Unique(all_tet_nodes);
     if(verbose) LOG::cout<<"All new tet nodes: "<<all_tet_nodes<<std::endl;
     ARRAY<bool> tet_particle_flags(next_tetrahedralized_volume->particles.array_collection->Size());
-    ARRAYS_COMPUTATIONS::Fill(tet_particle_flags,false);
-    INDIRECT_ARRAY<ARRAY<bool>,ARRAY<int>&> subset=tet_particle_flags.Subset(all_tet_nodes);ARRAYS_COMPUTATIONS::Fill(subset,true);
+    tet_particle_flags.Fill(false);
+    tet_particle_flags.Subset(all_tet_nodes).Fill(true);
     // build intersections
     for(int cp=1;cp<=new_cutting_polygons.m;cp++){const CUTTING_POLYGON& cutting_polygon=new_cutting_polygons(cp);
         int new_child_simplex=cutting_polygon.simplex_owner;int old_child_simplex;

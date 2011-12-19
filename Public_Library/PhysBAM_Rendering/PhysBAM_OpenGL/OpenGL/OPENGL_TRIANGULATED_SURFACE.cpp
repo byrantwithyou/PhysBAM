@@ -139,7 +139,7 @@ Initialize_Vertex_Normals()
 {
     if(!vertex_normals) vertex_normals=new ARRAY<VECTOR<T,3> >;
     vertex_normals->Resize(surface.particles.array_collection->Size());
-    ARRAYS_COMPUTATIONS::Fill(*vertex_normals,VECTOR<T,3>());
+    vertex_normals->Fill(VECTOR<T,3>());
     for(int t=1;t<=surface.mesh.elements.m;t++){
         int i,j,k;surface.mesh.elements(t).Get(i,j,k);
         VECTOR<T,3> normal=TRIANGLE_3D<T>::Normal(surface.particles.X(i),surface.particles.X(j),surface.particles.X(k));

@@ -56,7 +56,7 @@ Construct_Indices(const int ghost_cells)
             Register_Cell_Index(iterator.Second_Cell_Index(),ghost_cells);}}
 
     real_cell_indices_reverse_map.Resize(indexed_cells.m);
-    ARRAYS_COMPUTATIONS::Fill(real_cell_indices_reverse_map,-1);
+    real_cell_indices_reverse_map.Fill(-1);
     for(int i=1;i<=real_cell_indices.m;++i) real_cell_indices_reverse_map(real_cell_indices(i))=i;
     for(int axis=1;axis<=d;axis++){
         if(boundary_condition_collection.periodic_boundary[axis]){

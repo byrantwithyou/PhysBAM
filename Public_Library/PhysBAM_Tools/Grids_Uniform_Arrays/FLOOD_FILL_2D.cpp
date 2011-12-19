@@ -72,7 +72,7 @@ Identify_Colors_Touching_Boundary(const int number_of_colors,const ARRAYS_ND_BAS
     const ARRAYS_ND_BASE<VECTOR<bool,2> >& edge_is_blocked_y,ARRAY<bool>& color_touches_boundary)
 {
     color_touches_boundary.Resize(number_of_colors);
-    ARRAYS_COMPUTATIONS::Fill(color_touches_boundary,false);
+    color_touches_boundary.Fill(false);
     for(int j=colors.domain.min_corner.y;j<=colors.domain.max_corner.y;j++){ // left and right faces
         int left_color=colors(colors.domain.min_corner.x,j),right_color=colors(colors.domain.max_corner.x,j);
         if(left_color>0) color_touches_boundary(left_color)=true;
@@ -87,7 +87,7 @@ Identify_Colors_Touching_Color(const int color,const int number_of_colors,const 
     const ARRAYS_ND_BASE<VECTOR<bool,2> >& edge_is_blocked_y,ARRAY<bool>& color_touches_color)
 {
     color_touches_color.Resize(number_of_colors);
-    ARRAYS_COMPUTATIONS::Fill(color_touches_color,false);
+    color_touches_color.Fill(false);
     for(int i=colors.domain.min_corner.x;i<=colors.domain.max_corner.x;i++) for(int j=colors.domain.min_corner.y;j<=colors.domain.max_corner.y;j++) if(colors(i,j)==color){
         if(i>colors.domain.min_corner.x&&!edge_is_blocked_x(i,j)&&colors(i-1,j)>0) color_touches_color(colors(i-1,j))=true;
         if(i<colors.domain.max_corner.x&&!edge_is_blocked_x(i+1,j)&&colors(i+1,j)>0) color_touches_color(colors(i+1,j))=true;

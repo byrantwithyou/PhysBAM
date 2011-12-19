@@ -7,7 +7,6 @@
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
 #include <PhysBAM_Tools/Arrays_Computations/ARRAY_COPY.h>
 #include <PhysBAM_Tools/Arrays_Computations/SORT.h>
-#include <PhysBAM_Tools/Arrays_Computations/SUMMATIONS.h>
 #include <PhysBAM_Tools/Data_Structures/SPARSE_UNION_FIND.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/Robust_Arithmetic.h>
@@ -199,7 +198,7 @@ CFL_Strain_Rate() const
 template<class TV> typename TV::SCALAR RIGID_LINEAR_SPRINGS<TV>::
 Average_Restlength() const
 {
-    return ARRAYS_COMPUTATIONS::Average(restlength);
+    return restlength.Average();
 }
 //#####################################################################
 // Function Print_Restlength_Statistics

@@ -38,7 +38,7 @@ Compute_Position_Based_State(const T dt,const T time)
         muscle_list->Initialize_Muscle_Attachments_On_Rigid_Body();
         // Only looks for muscles connecting parent-child across joint
         muscles_crossing_joints.Resize(joint_mesh.joints.m);
-        muscle_activations.Resize(muscle_list->muscles.m);ARRAYS_COMPUTATIONS::Fill(muscle_activations,(T)0);
+        muscle_activations.Resize(muscle_list->muscles.m);muscle_activations.Fill((T)0);
         for(int i=1;i<=joint_mesh.joints.m;i++){
             JOINT<TV>& joint=*joint_mesh.joints(i);
             int parent_id=Parent_Id(joint.id_number),child_id=Child_Id(joint.id_number);

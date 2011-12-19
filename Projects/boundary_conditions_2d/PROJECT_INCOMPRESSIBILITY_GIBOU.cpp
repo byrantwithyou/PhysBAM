@@ -1,6 +1,5 @@
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
 #include <PhysBAM_Tools/Arrays_Computations/MAGNITUDE.h>
-#include <PhysBAM_Tools/Arrays_Computations/SUMMATIONS.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
@@ -232,7 +231,7 @@ void Project_Incompressibility_Gibou(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> 
     VECTOR_ND<T> tmp(x.v);
     LOG::cout<<"P-1 "<<(tmp-=x.v.Average()).L1_Norm()/x.v.n<<std::endl;
     for(int i=1;i<=index_to_cell.m;i++) p(index_to_cell(i))=x.v(i);
-    if(neumann_pocket) p.Subset(ai.cell_samples)-=ARRAYS_COMPUTATIONS::Average(p.Subset(ai.cell_samples));
+    if(neumann_pocket) p.Subset(ai.cell_samples)-=p.Subset(ai.cell_samples).Average();
 //    ai.Print("PRESSURE",p);
 
     for(int i=1;i<=index_to_cell.m;i++) Add_Debug_Particle(grid.X(index_to_cell(i)),color(p(index_to_cell(i))));

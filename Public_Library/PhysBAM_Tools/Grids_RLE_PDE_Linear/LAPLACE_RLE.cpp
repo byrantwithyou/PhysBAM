@@ -30,7 +30,7 @@ Solve(const T time,const bool solution_regions_already_computed,const ARRAY<T>* 
     for(int color=1;color<=number_of_regions;color++)if(filled_region_touches_dirichlet(color)||solve_neumann_regions){
         matrix_index_to_cell_index_array(color).Resize(filled_region_cell_count(color));
         row_lengths_array(color).Resize(filled_region_cell_count(color));}
-    ARRAYS_COMPUTATIONS::Fill(filled_region_cell_count,0); // reusing this array in order to make the indirection arrays
+    filled_region_cell_count.Fill(0); // reusing this array in order to make the indirection arrays
     if(!mpi_grid) for(int c=1;c<=grid.number_of_cells;c++){
         int color=filled_region_colors(c);if(color<1) continue;
         cell_index_to_matrix_index(c)=++filled_region_cell_count(color);
@@ -250,7 +250,7 @@ Find_Solution_Regions()
         if(!psi_N(f)) graph.Add_Undirected_Edge(c2-1,c2);
         if(face.cell2.Long() && !psi_N(f+1)) graph.Add_Undirected_Edge(c2,c2+1);}
     // set domain boundary cells and cells with objects to uncolorable (by setting all of the cells to -1, we end up ignoring invalid indices too)
-    filled_region_colors.Resize(grid.number_of_cells,false,false);ARRAYS_COMPUTATIONS::Fill(filled_region_colors,-1);
+    filled_region_colors.Resize(grid.number_of_cells,false,false);filled_region_colors.Fill(-1);
     for(int c=1;c<=grid.number_of_cells;c++)if(graph.edges(c).m && !psi_D(c)) filled_region_colors(c)=0;
     filled_region_touches_dirichlet.Remove_All();
     // do the fill

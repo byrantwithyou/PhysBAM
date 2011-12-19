@@ -3,7 +3,6 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-#include <PhysBAM_Tools/Arrays_Computations/SUMMATIONS.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/LINEAR_INSIDE_CONSTANT_OUTSIDE_INTERPOLATION_UNIFORM.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <PhysBAM_Geometry/Topology/SEGMENT_MESH.h>
@@ -66,7 +65,7 @@ Update_Position_Based_State(const T time)
         optimization.Resize(simplicial_object.mesh.elements.m,false,false);
         if(deformable_simplicial_object) for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
             const TV_INT& nodes=simplicial_object.mesh.elements(t);
-            optimization(t).center=ARRAYS_COMPUTATIONS::Sum(particles.X.Subset(nodes))/TV::m;optimization(t).inward_normal=T_SIMPLEX::Normal(particles.X.Subset(nodes));
+            optimization(t).center=particles.X.Subset(nodes).Sum()/TV::m;optimization(t).inward_normal=T_SIMPLEX::Normal(particles.X.Subset(nodes));
             optimization(t).area_over_m=T_SIMPLEX::Size(particles.X.Subset(nodes))/TV::m;
             if(use_spatially_varying_wind) optimization(t).wind_velocity=Spatially_Varying_Wind_Velocity(optimization(t).center);}
         else for(int t=1;t<=rigid_body->simplicial_object->mesh.elements.m;t++){
@@ -117,7 +116,7 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,
         if(deformable_simplicial_object) for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
             const TV_INT& nodes=deformable_simplicial_object->mesh.elements(t);
             TV wind_velocity=use_constant_wind?constant_wind:optimization(t).wind_velocity;
-            TV relative_velocity=wind_velocity-ARRAYS_COMPUTATIONS::Sum(particles.V.Subset(nodes))/TV::m;
+            TV relative_velocity=wind_velocity-particles.V.Subset(nodes).Sum()/TV::m;
             TV triangle_force=Add_Velocity_Independent_Forces_Helper(relative_velocity,t);
             F(nodes(1))+=triangle_force;F(nodes(2))+=triangle_force;F(nodes(3))+=triangle_force;}
         else{
@@ -150,7 +149,7 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<const TWIST<TV> 
         if(deformable_simplicial_object) for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
             const TV_INT& nodes=deformable_simplicial_object->mesh.elements(t);
             // wind drag pressure - per unit area
-            TV negative_V=-ARRAYS_COMPUTATIONS::Sum(V.Subset(nodes))/TV::m;
+            TV negative_V=-V.Subset(nodes).Sum()/TV::m;
             TV triangle_force=wind_viscosity*(negative_V-TV::Dot_Product(negative_V,optimization(t).inward_normal)*optimization(t).inward_normal);
             // total force
             triangle_force*=optimization(t).area_over_m; // one third of the triangle force is distriduted to each node

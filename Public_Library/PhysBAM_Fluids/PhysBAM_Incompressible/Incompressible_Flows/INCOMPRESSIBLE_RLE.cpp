@@ -164,7 +164,7 @@ template<class T_GRID> void INCOMPRESSIBLE_RLE<T_GRID>::
 Transfer_Velocity(const T_GRID& new_grid)
 {
     ARRAY<T> new_V(new_grid.number_of_faces);
-    ARRAY<bool> new_valid_mask(new_grid.number_of_faces,false);ARRAYS_COMPUTATIONS::Fill(new_valid_mask,true);
+    ARRAY<bool> new_valid_mask(new_grid.number_of_faces,false);new_valid_mask.Fill(true);
     T_GRID::template Horizontal_Face_Loop<Transfer_Horizontal_Velocity>(grid,new_grid,V,new_V,valid_mask,new_valid_mask);
     Transfer_Vertical_Velocity(grid,new_grid,V,new_V,valid_mask,new_valid_mask);
     ARRAY<T>::Exchange_Arrays(V,new_V);ARRAY<bool>::Exchange_Arrays(valid_mask,new_valid_mask);

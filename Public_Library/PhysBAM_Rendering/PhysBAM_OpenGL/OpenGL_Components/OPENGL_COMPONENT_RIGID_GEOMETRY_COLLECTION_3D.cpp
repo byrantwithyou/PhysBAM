@@ -166,7 +166,7 @@ Reinitialize(const bool force,const bool read_geometry)
 
         std::string rigid_body_colors_file=STRING_UTILITIES::string_sprintf("%s/%d/rigid_body_colors",basedir.c_str(),frame);
         if(FILE_UTILITIES::File_Exists(rigid_body_colors_file)) FILE_UTILITIES::Read_From_File<T>(rigid_body_colors_file,opengl_colors);
-        else{opengl_colors.Resize(max_number_of_bodies);ARRAYS_COMPUTATIONS::Fill(opengl_colors,OPENGL_COLOR::Cyan());}
+        else{opengl_colors.Resize(max_number_of_bodies);opengl_colors.Fill(OPENGL_COLOR::Cyan());}
         Resize_Structures(max_number_of_bodies);
 
         // Initialize bodies which have become active
@@ -243,7 +243,7 @@ Initialize_One_Body(const int body_id,const bool force)
 
         int max_number_of_bodies=max(opengl_triangulated_surface.Size(),rigid_geometry_collection->particles.array_collection->Size());
         // only enlarge array as we read in more geometry to memory
-        opengl_colors.Resize(max_number_of_bodies);ARRAYS_COMPUTATIONS::Fill(opengl_colors,OPENGL_COLOR::Cyan());
+        opengl_colors.Resize(max_number_of_bodies);opengl_colors.Fill(OPENGL_COLOR::Cyan());
         opengl_triangulated_surface.Resize(max_number_of_bodies);
         opengl_tetrahedralized_volume.Resize(max_number_of_bodies);
         opengl_levelset.Resize(max_number_of_bodies);
@@ -469,7 +469,7 @@ template<class T,class RW> void OPENGL_COMPONENT_RIGID_GEOMETRY_COLLECTION_3D<T,
 Set_Draw(bool draw_input)
 {
     OPENGL_COMPONENT::Set_Draw(draw_input);
-    if(draw_input) ARRAYS_COMPUTATIONS::Fill(draw_object,true);
+    if(draw_input) draw_object.Fill(true);
 }
 //#####################################################################
 // Function Draw_All_Objects

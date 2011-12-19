@@ -7,7 +7,6 @@
 #ifndef __PAINTED_GRAIN_BOUNDARIES__
 #define __PAINTED_GRAIN_BOUNDARIES__
 
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_MIN_MAX.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <PhysBAM_Tools/Log/LOG.h>
@@ -53,7 +52,7 @@ public:
         node_smallest_distance.Resize(number_of_positions);node_region.Resize(number_of_positions);
         fracture_callbacks->Node_Regions(positions,node_region,frame);
             
-        int max_node_region=ARRAYS_COMPUTATIONS::Max(node_region);
+        int max_node_region=node_region.Max();
         ARRAY<int> regions_selected(max_node_region);
         for(int node=1;node<=number_of_positions;node++){
             node_smallest_distance(node) = 1; // this should be fixed

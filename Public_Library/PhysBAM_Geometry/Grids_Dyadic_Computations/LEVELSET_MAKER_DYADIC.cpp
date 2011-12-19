@@ -84,7 +84,7 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,OCTREE_GRID<T>& 
 
     if(compute_velocity) velocity->Resize(grid.number_of_cells);
 
-    phi.Resize(grid.number_of_cells,false);phi_nodes->Resize(grid.number_of_nodes,false);ARRAYS_COMPUTATIONS::Fill(phi,(T)FLT_MAX);
+    phi.Resize(grid.number_of_cells,false);phi_nodes->Resize(grid.number_of_nodes,false);phi.Fill(FLT_MAX);
  
     bool need_flood_fill=compute_signed_distance_function || compute_heaviside_function;
     if(need_flood_fill && verbose) LOG::Time("Building graph for flood fill");
@@ -105,7 +105,7 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,OCTREE_GRID<T>& 
         triangle_intersection_list.Remove_All();}
     RANGE<VECTOR<T,3> > domain=grid.uniform_grid.domain;domain.Change_Size((T)1e-5);
     
-    ARRAYS_COMPUTATIONS::Fill(graph.valid_nodes,false);
+    graph.valid_nodes.Fill(false);
     for(DYADIC_GRID_ITERATOR_CELL<OCTREE_GRID<T> > iterator(grid,3);iterator.Valid();iterator.Next()) if(domain.Lazy_Inside(iterator.Location())) graph.valid_nodes(iterator.Cell_Index())=true;
 
     bool store_closest_triangle_index=need_flood_fill && !only_boundary_region_is_outside;
@@ -145,7 +145,7 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,OCTREE_GRID<T>& 
 
     if((compute_signed_distance_function || compute_unsigned_distance_function) && use_fmm && fmm_stopping_distance)
         for(int i=1;i<=grid.number_of_cells;i++) phi(i)=min(phi(i),fmm_stopping_distance);
-    else if(compute_heaviside_function) ARRAYS_COMPUTATIONS::Fill(phi,grid.Minimum_Edge_Length());
+    else if(compute_heaviside_function) phi.Fill(grid.Minimum_Edge_Length());
 
     if(use_orthogonal_vote) PHYSBAM_NOT_IMPLEMENTED(); // not supported for now
     else if(need_flood_fill){ // Need flood fill to determine sign (inside/outside)
@@ -157,12 +157,12 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,OCTREE_GRID<T>& 
 #endif
         if(number_of_colors==1){ // there is only one color. check if the whole domain is inside or outside then return
             if(triangulated_surface.Inside(grid.uniform_grid.domain.min_corner)) 
-                ARRAYS_COMPUTATIONS::Fill(phi,(T)-FLT_MAX);else ARRAYS_COMPUTATIONS::Fill(phi,(T)FLT_MAX);
+                phi.Fill(-FLT_MAX);else phi.Fill(FLT_MAX);
             return false;}
         
         if(verbose) LOG::Time("Classifying colors");
         ARRAY<bool,VECTOR<int,1> > color_is_inside(1,number_of_colors);
-        ARRAY<T> color_maximum_distance(number_of_colors,false);ARRAYS_COMPUTATIONS::Fill(color_maximum_distance,(T)-1);
+        ARRAY<T> color_maximum_distance(number_of_colors,false);color_maximum_distance.Fill(-1);
         ARRAY<OCTREE_CELL<T>*> color_representatives(number_of_colors);
         for(DYADIC_GRID_ITERATOR_CELL<OCTREE_GRID<T> > iterator(grid,3);iterator.Valid();iterator.Next()){int cell_index=iterator.Cell_Index();
             if(graph.valid_nodes(cell_index) && closest_triangle_index(cell_index) && color_maximum_distance(colors(cell_index))<phi(cell_index)){

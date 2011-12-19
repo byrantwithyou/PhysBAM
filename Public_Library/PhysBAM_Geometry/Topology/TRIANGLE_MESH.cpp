@@ -288,7 +288,7 @@ Initialize_Node_On_Boundary()
             bool another_element_on_face=false;
             for(int j=1;j<=incident_elements_to_face1.m&&!another_element_on_face;++j)
                 another_element_on_face=(incident_elements_to_face1(j)!=e&&Nodes_In_Simplex(face,incident_elements_to_face1(j)));
-            if(!another_element_on_face){INDIRECT_ARRAY<ARRAY<bool>,VECTOR<int,dimension>&> subset=node_on_boundary->Subset(face);ARRAYS_COMPUTATIONS::Fill(subset,true);}}}
+            if(!another_element_on_face){node_on_boundary->Subset(face).Fill(true);}}}
     if(!incident_elements_defined){delete incident_elements;incident_elements=0;}
 }
 //#####################################################################
@@ -445,7 +445,7 @@ void TRIANGLE_MESH::
 Identify_Connected_Components(ARRAY<int>& label)
 {
     bool adjacent_elements_defined=adjacent_elements!=0;if(!adjacent_elements_defined)Initialize_Adjacent_Elements();
-    label.Resize(elements.m);ARRAYS_COMPUTATIONS::Fill(label,0);
+    label.Resize(elements.m);label.Fill(0);
     int id=0;for(int i=1;i<=label.m;i++) if(!label(i)) Label_Connected_Component_With_ID(label,i,++id);
     if(!adjacent_elements_defined){delete adjacent_elements;adjacent_elements=0;}
 }

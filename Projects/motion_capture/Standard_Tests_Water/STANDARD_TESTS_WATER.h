@@ -393,14 +393,14 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
         controller->real_dx=(mod_time<=(T)2)?(T)2.5*(T)pi/180:(T)5*(T)pi/180;
         if(old_min ^ controller->minimize){
             LOG::cout<<"Switching, so filling dF_array_multipliers with PAIR(0,1)"<<std::endl;
-            ARRAYS_COMPUTATIONS::Fill(controller->dF_array_multipliers,PAIR<T,T>((T)0,(T)1));}}
+            controller->dF_array_multipliers.Fill(PAIR<T,T>((T)0,(T)1));}}
     if(test_number==8 && !controller->hypothetical_step){
         bool old_min=controller->minimize;
         T mod_time=min((T)8,(T)max((T)0,(T)(time+2-10*floor((time+2)/10))));
         controller->minimize=!(mod_time<4);
         if(old_min ^ controller->minimize){
             LOG::cout<<"Switching, so filling dF_array_multipliers with PAIR(0,1)"<<std::endl;
-            ARRAYS_COMPUTATIONS::Fill(controller->dF_array_multipliers,PAIR<T,T>((T)0,(T)1));}}
+            controller->dF_array_multipliers.Fill(PAIR<T,T>((T)0,(T)1));}}
     if(test_number==7 && controller && !controller->hypothetical_step){
         T cycle_time=4*time;
         controller->drag_direction=octosquid_body->Rotation().Rotate(TV(0,-1,0));
@@ -412,7 +412,7 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
             else joint.joint_function->Set_k_p(1500);}
         if(old_min ^ controller->minimize){
             LOG::cout<<"Switching, so filling dF_array_multipliers with PAIR(0,1)"<<std::endl;
-            ARRAYS_COMPUTATIONS::Fill(controller->dF_array_multipliers,PAIR<T,T>((T)0,(T)1));}}
+            controller->dF_array_multipliers.Fill(PAIR<T,T>((T)0,(T)1));}}
 }
 //#####################################################################
 // Function Swap

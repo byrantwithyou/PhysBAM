@@ -44,7 +44,7 @@ Interpolate_From_Cells_To_Faces(const T_GRID& grid,const ARRAY<T2>& cell_based,c
 template<class T_GRID> template<class T2> void LINEAR_INTERPOLATION_DYADIC_HELPER<T_GRID>::
 Interpolate_From_Cells_To_Nodes(const T_GRID& grid,const ARRAY<T2>& cell_based,ARRAY<T2>& node_based)
 {
-    ARRAYS_COMPUTATIONS::Fill(node_based,T2());
+    node_based.Fill(T2());
     ARRAY<T> weight(grid.number_of_nodes);
     for(DYADIC_GRID_ITERATOR_CELL<T_GRID> iterator(grid,grid.number_of_ghost_cells);iterator.Valid();iterator.Next()){T_CELL* cell=iterator.Cell_Pointer();
         T cell_weight=1/cell->DX().x;
@@ -62,7 +62,7 @@ template<class T_GRID> void LINEAR_INTERPOLATION_DYADIC_HELPER<T_GRID>::
 Interpolate_From_Faces_To_Nodes(const T_GRID& grid,const ARRAY<T>& face_based,ARRAY<TV>& node_based)
 {
     ARRAY<VECTOR<T,T_GRID::dimension> > weight(grid.number_of_nodes);
-    ARRAYS_COMPUTATIONS::Fill(node_based,TV());
+    node_based.Fill(TV());
     for(DYADIC_GRID_ITERATOR_FACE<T_GRID> iterator(grid,grid.Map_All_Faces());iterator.Valid();iterator.Next()){
         T face_weight=1/iterator.Face_DX();
         T weight_times_value=face_weight*face_based(iterator.Face_Index());
@@ -79,7 +79,7 @@ template<class T_GRID> void LINEAR_INTERPOLATION_DYADIC_HELPER<T_GRID>::
 Interpolate_From_Faces_To_Nodes(const T_GRID& grid,const ARRAY<T>& face_based,ARRAY<T>& node_based)
 {
     ARRAY<T> weight(grid.number_of_nodes);
-    ARRAYS_COMPUTATIONS::Fill(node_based,T());
+    node_based.Fill(T());
     for(DYADIC_GRID_ITERATOR_FACE<T_GRID> iterator(grid,grid.Map_All_Faces());iterator.Valid();iterator.Next()){
         T face_weight=1/iterator.Face_DX();
         T weight_times_value=face_weight*face_based(iterator.Face_Index());

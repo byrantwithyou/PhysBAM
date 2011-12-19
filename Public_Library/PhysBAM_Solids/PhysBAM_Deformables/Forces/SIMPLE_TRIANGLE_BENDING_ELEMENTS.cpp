@@ -124,11 +124,11 @@ Set_Constants_From_Particles(const T material_stiffness,const T material_damping
         fictitious_edge_length(q)=(particles.X(i)-particles.X(k)).Magnitude()+(particles.X(i)-particles.X(j)).Magnitude()+(particles.X(k)-particles.X(l)).Magnitude()+(particles.X(j)-particles.X(l)).Magnitude();
     }
     restlength.Resize(damping.m);visual_restlength.Resize(damping.m);
-    ARRAYS_COMPUTATIONS::Fill(restlength,(T)1);
-    ARRAYS_COMPUTATIONS::Fill(visual_restlength,(T)0);
+    restlength.Fill((T)1);
+    visual_restlength.Fill((T)0);
     youngs_modulus.Resize(damping.m);base_youngs_modulus.Resize(damping.m);
-    ARRAYS_COMPUTATIONS::Fill(youngs_modulus,material_stiffness);
-    ARRAYS_COMPUTATIONS::Fill(base_youngs_modulus,material_stiffness);
+    youngs_modulus.Fill(material_stiffness);
+    base_youngs_modulus.Fill(material_stiffness);
 }
 //#####################################################################
 // Function Update_Position_Based_State

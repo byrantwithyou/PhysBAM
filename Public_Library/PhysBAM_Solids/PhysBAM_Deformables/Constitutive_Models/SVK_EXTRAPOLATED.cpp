@@ -37,6 +37,19 @@ template<class T,int d> SVK_EXTRAPOLATED<T,d>::
 {
 }
 //#####################################################################
+// Update Lame Constants
+//#####################################################################
+template<class T,int d> void SVK_EXTRAPOLATED<T,d>::
+Update_Lame_Constants(const T youngs_modulus_input, const T poissons_ratio_input,const T Rayleigh_coefficient_input)
+{
+    constant_lambda=youngs_modulus_input*poissons_ratio_input/((1+poissons_ratio_input)*(1-2*poissons_ratio_input));
+    constant_mu=youngs_modulus_input/(2*(1+poissons_ratio_input));
+    constant_alpha=Rayleigh_coefficient_input*constant_lambda;
+    constant_beta=Rayleigh_coefficient_input*constant_mu;
+    youngs_modulus=youngs_modulus_input; poissons_ratio=poissons_ratio_input;
+    
+}
+//#####################################################################
 // Function Energy_Density
 //#####################################################################
 template<class T,int d> T SVK_EXTRAPOLATED<T,d>::
@@ -71,7 +84,7 @@ Energy_Density_Helper(const DIAGONAL_MATRIX<T,3>& F,const int simplex) const
     T la = constant_lambda;   
     
     T a = extrapolation_cutoff;
-    T k = extra_force_coefficient;
+    T k = extra_force_coefficient*youngs_modulus;
     
     if ((dx >= 0) && (dy >= 0) && (dz >= 0)) // R
     {
@@ -141,7 +154,7 @@ P_From_Strain_Helper(const DIAGONAL_MATRIX<T,3>& F,const T scale,const int simpl
     T la = constant_lambda;
     
     T a = extrapolation_cutoff;
-    T k = extra_force_coefficient;
+    T k = extra_force_coefficient*youngs_modulus;
      
     if ((dx >= 0) && (dy >= 0) && (dz >= 0)) // R
     {
@@ -242,7 +255,7 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_IS
     T la = constant_lambda;
     
     T a = extrapolation_cutoff;
-    T k = extra_force_coefficient;
+    T k = extra_force_coefficient*youngs_modulus;
 
     T xpy = x+y; if (fabs(xpy)<panic_threshold) xpy=xpy<0?-panic_threshold:panic_threshold;
     T xmy = x-y; if (fabs(xmy)<panic_threshold) xmy=xmy<0?-panic_threshold:panic_threshold;

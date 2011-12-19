@@ -141,7 +141,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             solid_body_collection.Add_Force(spring_force);
             if(test_number==2 || test_number==3)
                 solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
-            ARRAY<T> restlengths(spring_force->segment_mesh.elements.m);ARRAYS_COMPUTATIONS::Fill(restlengths,(T).75);
+            ARRAY<T> restlengths(spring_force->segment_mesh.elements.m);restlengths.Fill((T).75);
             spring_force->Set_Restlength(restlengths);
             break;}
         default: PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Unrecognized test number %d",test_number));}

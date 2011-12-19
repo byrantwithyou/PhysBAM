@@ -211,8 +211,7 @@ Update_Simulated_Particles(DEFORMABLES_EXAMPLE_FORCES_AND_VELOCITIES<TV>& exampl
     int particles_number=particles.array_collection->Size();
 
     ARRAY<bool> particle_is_simulated(particles_number);for(int i=1;i<=particles_number;i++) particle_is_simulated(i)=true;
-    INDIRECT_ARRAY<ARRAY<bool>,ARRAY<int>&> subset=particle_is_simulated.Subset(particles.array_collection->deletion_list);
-    ARRAYS_COMPUTATIONS::Fill(subset,false);
+    particle_is_simulated.Subset(particles.array_collection->deletion_list).Fill(false);
     example_forces_and_velocities.Set_Deformable_Particle_Is_Simulated(particle_is_simulated);
 
     simulated_particles.Remove_All();
@@ -254,7 +253,7 @@ Update_Simulated_Particles(DEFORMABLES_EXAMPLE_FORCES_AND_VELOCITIES<TV>& exampl
 
     ARRAY<bool> particle_is_simulated_actual(particles_number);
     INDIRECT_ARRAY<ARRAY<bool>,ARRAY<int>&> simulated_subset=particle_is_simulated_actual.Subset(simulated_particles);
-    ARRAYS_COMPUTATIONS::Fill(simulated_subset,true);
+    simulated_subset.Fill(true);
     for(int i=1;i<=deformables_forces.m;i++) deformables_forces(i)->Update_Mpi(particle_is_simulated_actual,mpi_solids);
 
     if(mpi_solids){
@@ -292,7 +291,7 @@ Update_CFL()
     if(!cfl_valid){
         frequency.Resize(particles.array_collection->Size(),false,false);
         INDIRECT_ARRAY<ARRAY<T_FREQUENCY_DEFORMABLE>,ARRAY<int>&> frequency_subset=frequency.Subset(simulated_particles);
-        ARRAYS_COMPUTATIONS::Fill(frequency_subset,T_FREQUENCY_DEFORMABLE());
+        frequency_subset.Fill(T_FREQUENCY_DEFORMABLE());
 
         for(int i=1;i<=deformables_forces.m;i++){deformables_forces(i)->Initialize_CFL(frequency);deformables_forces(i)->Validate_CFL();}
         cfl_elastic=FLT_MAX;cfl_damping=FLT_MAX;
@@ -387,7 +386,7 @@ Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V_full,ARRAY_VIEW<TV> 
 {
     assert(V_full.Size()==particles.array_collection->Size() && F_full.Size()==particles.array_collection->Size());
     INDIRECT_ARRAY<ARRAY_VIEW<TV>,ARRAY<int>&> F_subset=F_full.Subset(dynamic_particles);
-    ARRAYS_COMPUTATIONS::Fill(F_subset,TV()); // note we zero here because we will scale the forces below
+    F_subset.Fill(TV()); // note we zero here because we will scale the forces below
     bool added=false;
     for(int k=1;k<=deformables_forces.m;k++) if(deformables_forces(k)->use_implicit_velocity_independent_forces){
         deformables_forces(k)->Add_Implicit_Velocity_Independent_Forces(V_full,F_full,time);added=true;}

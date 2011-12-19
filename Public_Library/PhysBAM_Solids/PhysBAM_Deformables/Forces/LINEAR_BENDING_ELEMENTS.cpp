@@ -5,7 +5,6 @@
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 #include <PhysBAM_Tools/Arrays/CONSTANT_ARRAY.h>
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_MIN_MAX.h>
 #include <PhysBAM_Tools/Data_Structures/SPARSE_UNION_FIND.h>
 #include <PhysBAM_Tools/Log/DEBUG_PRINT.h>
 #include <PhysBAM_Tools/Log/LOG.h>
@@ -115,7 +114,7 @@ Compute_Stiffness_Matrix(ARRAY_VIEW<const TV> X)
 {
     Compute_Stiffness_Matrix_Helper(mesh,X,stiffness_matrix_diagonal,stiffness_matrix_upper);
 
-    LOG::cout<<"max diagonal element = "<<ARRAYS_COMPUTATIONS::Max(stiffness_matrix_diagonal)<<std::endl;
+    LOG::cout<<"max diagonal element = "<<stiffness_matrix_diagonal.Max()<<std::endl;
 
     // verify that all edges occur in a triple/quadruple
     SEGMENT_MESH& segment_mesh=mesh.Get_Segment_Mesh();

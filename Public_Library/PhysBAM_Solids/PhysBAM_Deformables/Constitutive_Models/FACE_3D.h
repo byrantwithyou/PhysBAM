@@ -52,15 +52,15 @@ public:
         fiber_cutoff=(T)1.4;
         T cutoff_scaled=fiber_p2*(fiber_cutoff-1);
         if(peak_isometric_stress) {assert(peak_isometric_stress->m==muscle_activations.m);fiber_max_stress=*peak_isometric_stress;} 
-        else {fiber_max_stress.Resize(muscle_activations.m);ARRAYS_COMPUTATIONS::Fill(fiber_max_stress,(T)3e5);}
+        else {fiber_max_stress.Resize(muscle_activations.m);fiber_max_stress.Fill((T)3e5);}
         fiber_p3=fiber_p1*fiber_p2*(exp(cutoff_scaled)-1);
         fiber_p4=fiber_p1*(exp(cutoff_scaled)*(1-fiber_p2*fiber_cutoff)+fiber_p2-1);
     }
 
     void Initialize_Inhomogeneous_Material_Properties(const int number_of_tetrahedrons)
-    {tet_mu_10=new ARRAY<T>(number_of_tetrahedrons);ARRAYS_COMPUTATIONS::Fill(*tet_mu_10,constant_mu_10);
-    tet_mu_01=new ARRAY<T>(number_of_tetrahedrons);ARRAYS_COMPUTATIONS::Fill(*tet_mu_01,constant_mu_01);
-    tet_kappa=new ARRAY<T>(number_of_tetrahedrons);ARRAYS_COMPUTATIONS::Fill(*tet_kappa,constant_kappa);}
+    {tet_mu_10=new ARRAY<T>(number_of_tetrahedrons);tet_mu_10->Fill(constant_mu_10);
+    tet_mu_01=new ARRAY<T>(number_of_tetrahedrons);tet_mu_01->Fill(constant_mu_01);
+    tet_kappa=new ARRAY<T>(number_of_tetrahedrons);tet_kappa->Fill(constant_kappa);}
 
     void Set_Material_Properties_Of_Subset(const ARRAY<int>& tetrahedron_list,const T mu_10,const T mu_01,const T kappa)
     {assert(tet_mu_10&&tet_mu_01&&tet_kappa);

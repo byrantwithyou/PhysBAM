@@ -82,8 +82,7 @@ Mark_Disconnected_Components_In_One_Ring(const EMBEDDED_OBJECT<TV,d>& embedded_o
     SIMPLEX_MESH<d>& mesh=embedded_object.simplicial_object.mesh;
 
     // flood fill only nodes that are material in some element in the 1-ring
-    INDIRECT_ARRAY<ARRAY<short>,ARRAY<int>&> marked_subset=marked.Subset((*mesh.neighbor_nodes)(center_node));
-    ARRAYS_COMPUTATIONS::Fill(marked_subset,(short)-2);
+    marked.Subset((*mesh.neighbor_nodes)(center_node)).Fill(-2);
     for(int i=1;i<=(*mesh.incident_elements)(center_node).m;i++){int t=(*mesh.incident_elements)(center_node)(i);
         const VECTOR<int,d+1>& element=mesh.elements(t);
         for(int n=1;n<=element.m;n++) if(embedded_object.node_in_simplex_is_material(t)(n)) marked(element[n])=0;}

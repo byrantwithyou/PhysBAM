@@ -66,8 +66,8 @@ Set_Constants_From_Particles(const T material_stiffness,const T material_damping
         TV n1=(particles.X(j)-particles.X(i)).Rotate_Clockwise_90(),n2=(particles.X(k)-particles.X(j)).Rotate_Clockwise_90();
         length_scale(q)=(T).5*(n1.Normalize()+n2.Normalize());
         sine_half_rest_angle(q)=Sine_Half_Angle_Between(n1,n2);}
-    ARRAYS_COMPUTATIONS::Fill(stiffness,material_stiffness);
-    ARRAYS_COMPUTATIONS::Fill(damping,material_damping);
+    stiffness.Fill(material_stiffness);
+    damping.Fill(material_damping);
 }
 //#####################################################################
 // Function Update_Position_Based_State

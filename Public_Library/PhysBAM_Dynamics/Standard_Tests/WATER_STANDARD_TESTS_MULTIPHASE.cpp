@@ -43,7 +43,7 @@ Initialize(const int test_number_input,const int resolution,const int restart_fr
 
     if(test_number<10){
         fluids_parameters_input.densities(1)=1000;fluids_parameters_input.densities(2)=1;
-        source_region.Resize(sources.m);ARRAYS_COMPUTATIONS::Fill(source_region,1);
+        source_region.Resize(sources.m);source_region.Fill(1);
         fluids_parameters_input.pseudo_dirichlet_regions(2)=true;
         fluids_parameters_input.second_order_cut_cell_method=false;}
     else if(test_number==11){

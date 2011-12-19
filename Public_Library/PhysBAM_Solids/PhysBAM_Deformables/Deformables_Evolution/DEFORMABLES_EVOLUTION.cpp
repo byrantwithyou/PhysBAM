@@ -76,7 +76,7 @@ Prepare_Backward_Euler_System(DEFORMABLES_BACKWARD_EULER_SYSTEM<TV>& system,cons
     DEFORMABLES_VELOCITY<TV> V_all(particles.V,rigid_geometry_particles.twist,deformable_body_collection,rigid_geometry_collection);
 
     INDIRECT_ARRAY<ARRAY<TV>,ARRAY<int>&> B_subset=B_full.Subset(deformable_body_collection.simulated_particles);
-    ARRAYS_COMPUTATIONS::Fill(B_subset,TV());
+    B_subset.Fill(TV());
     deformable_body_collection.deformables_example_forces_and_velocities->Add_External_Forces(B_full,current_velocity_time+dt);
     if(mpi_solids) mpi_solids->Exchange_Force_Boundary_Data_Global(particles.V);
     deformable_body_collection.Add_Velocity_Independent_Forces(B_full,current_velocity_time+dt); // this is a nop for binding forces

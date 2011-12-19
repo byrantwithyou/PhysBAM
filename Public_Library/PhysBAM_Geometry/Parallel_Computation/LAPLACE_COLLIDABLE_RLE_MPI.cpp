@@ -84,7 +84,7 @@ Find_Boundary_Indices_In_Region(const int side,const T_BOX_HORIZONTAL_INT& regio
         if(c!=last_cell && counts.Valid_Index(color)){last_cell=c;counts(color)++;if(cell.Long()) counts(color)++;}}
     // fill boundary indices
     for(int color=1;color<=partitions.m;color++)partitions(color).boundary_indices(side).Resize(counts(color));
-    ARRAYS_COMPUTATIONS::Fill(counts,0);last_cell=0;
+    counts.Fill(0);last_cell=0;
     for(T_FACE face(local_grid,face_region);face;face++)if(!psi_N(face.Face())){
         CELL_ITERATOR& cell=cell_side?face.cell2:face.cell1;
         int c=cell.Cell(),color=filled_region_colors(cell.Cell());

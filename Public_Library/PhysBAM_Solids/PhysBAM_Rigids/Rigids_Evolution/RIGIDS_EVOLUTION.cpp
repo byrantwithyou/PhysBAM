@@ -72,7 +72,7 @@ Prepare_Backward_Euler_System(RIGIDS_BACKWARD_EULER_SYSTEM<TV>& system,const T d
     RIGIDS_VELOCITY<TV> F_all(rigid_F_full,rigid_body_collection);
     RIGIDS_VELOCITY<TV> V_all(rigid_body_particles.twist,rigid_body_collection);
 
-    ARRAYS_COMPUTATIONS::Fill(rigid_B_full,TWIST<TV>());
+    rigid_B_full.Fill(TWIST<TV>());
     rigid_body_collection.rigids_example_forces_and_velocities->Add_External_Forces(rigid_B_full,current_velocity_time+dt);
     rigid_body_collection.Add_Velocity_Independent_Forces(rigid_B_full,current_velocity_time+dt); // this is a nop for binding forces
     rigid_body_collection.rigid_body_cluster_bindings.Distribute_Force_To_Parents(rigid_B_full);
@@ -630,7 +630,7 @@ template<class TV> void RIGIDS_EVOLUTION<TV>::
 Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time)
 {
     INDIRECT_ARRAY<ARRAY_VIEW<TWIST<TV> >,ARRAY<int>&> twist_subset=twist.Subset(rigid_body_collection.static_and_kinematic_rigid_bodies);
-    ARRAYS_COMPUTATIONS::Fill(twist_subset,TWIST<TV>());
+    twist_subset.Fill(TWIST<TV>());
     rigid_body_collection.rigids_example_forces_and_velocities->Zero_Out_Enslaved_Velocity_Nodes(twist,velocity_time,current_position_time);
 }
 template<class T>

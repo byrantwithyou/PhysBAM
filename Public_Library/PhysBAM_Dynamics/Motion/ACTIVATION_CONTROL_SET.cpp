@@ -82,8 +82,8 @@ Force_Derivative(ARRAY<TV>& dFdl,ARRAY<TWIST<TV> >& dFrdl,const int control_id) 
     assert(muscle_force);
     assert(Control_Active(control_id));
     single_activation_used_for_force_derivative=control_id;
-    ARRAYS_COMPUTATIONS::Fill(dFdl,TV());
-    ARRAYS_COMPUTATIONS::Fill(dFrdl,TWIST<TV>());
+    dFdl.Fill(TV());
+    dFrdl.Fill(TWIST<TV>());
     muscle_force->Add_Velocity_Independent_Forces(dFdl,dFrdl,0);
     single_activation_used_for_force_derivative=0;
 }

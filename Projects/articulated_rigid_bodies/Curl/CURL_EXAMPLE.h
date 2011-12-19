@@ -547,7 +547,7 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
 */  }
     PHYSBAM_FATAL_ERROR("pd is now done in the framework");
     if(traditional_pd){
-        precomputed_pd_torques.Resize(solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size());ARRAYS_COMPUTATIONS::Fill(precomputed_pd_torques,TV());
+        precomputed_pd_torques.Resize(solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size());precomputed_pd_torques.Fill(TV());
         for(int i=1;i<=arb->joint_mesh.joints.m;i++) if(arb->joint_mesh.joints(i)->joint_function){
             JOINT<TV>* joint=arb->joint_mesh.joints(i);JOINT_FUNCTION<TV>* jfunc=joint->joint_function;
             RIGID_BODY<TV>* parent=arb->Parent(joint->id_number),*child=arb->Child(joint->id_number);

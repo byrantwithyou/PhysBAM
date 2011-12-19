@@ -95,8 +95,7 @@ One_Newton_Step_Backward_Euler(const T dt,const T time,ARRAY_VIEW<const TV> V_sa
         S(S_full,solid_body_collection.deformable_body_collection.dynamic_particles),V(particles.V,solid_body_collection.deformable_body_collection.dynamic_particles),B(B_full,solid_body_collection.deformable_body_collection.dynamic_particles),*null=0;
     INDIRECT_ARRAY<ARRAY_VIEW<T> > one_over_mass(particles.one_over_mass,solid_body_collection.deformable_body_collection.dynamic_particles);
 
-    INDIRECT_ARRAY<ARRAY<TV>,ARRAY<int>&> F_subset=F_full.Subset(solid_body_collection.deformable_body_collection.dynamic_particles);
-    ARRAYS_COMPUTATIONS::Fill(F_subset,TV());
+    F_full.Subset(solid_body_collection.deformable_body_collection.dynamic_particles).Fill(TV());
     solid_body_collection.deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Velocities();
     solid_body_collection.Add_All_Forces(F_full,rigid_F_full,time);example_forces_and_velocities.Add_External_Forces(F_full,time);
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Force_To_Parents(F_full);
@@ -132,8 +131,7 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids) // TOD
     T supnorm=0;int iteration;
     dV_full.Resize(particles.array_collection->Size(),false,false);R_full.Resize(particles.array_collection->Size(),false,false);
     for(iteration=0;iteration<solids_parameters.newton_iterations;iteration++){
-        INDIRECT_ARRAY<ARRAY<TV>,ARRAY<int>&> dV_subset=dV_full.Subset(solid_body_collection.deformable_body_collection.dynamic_particles);
-        ARRAYS_COMPUTATIONS::Fill(dV_subset,TV());
+        dV_full.Subset(solid_body_collection.deformable_body_collection.dynamic_particles).Fill(TV());
         One_Newton_Step_Backward_Euler(dt,time+dt,V_save,dV_full);
         INDIRECT_ARRAY<ARRAY_VIEW<TV> > X(particles.X,solid_body_collection.deformable_body_collection.dynamic_particles),V(particles.V,solid_body_collection.deformable_body_collection.dynamic_particles),
             dV(dV_full,solid_body_collection.deformable_body_collection.dynamic_particles),R(R_full,solid_body_collection.deformable_body_collection.dynamic_particles);
@@ -142,8 +140,7 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids) // TOD
         binding_list.Clamp_Particles_To_Embedded_Positions();
         solid_body_collection.Update_Position_Based_State(time+dt,false);
         // compute residual
-        INDIRECT_ARRAY<ARRAY<TV>,ARRAY<int>&> R_subset=R_full.Subset(solid_body_collection.deformable_body_collection.dynamic_particles);
-        ARRAYS_COMPUTATIONS::Fill(R_subset,TV());
+        R_full.Subset(solid_body_collection.deformable_body_collection.dynamic_particles).Fill(TV());
         solid_body_collection.Add_All_Forces(R_full,rigid_R_full,time+dt);example_forces_and_velocities.Add_External_Forces(R_full,time+dt);
         binding_list.Distribute_Force_To_Parents(R_full);
         INDIRECT_ARRAY<ARRAY_VIEW<T> > one_over_mass(particles.one_over_mass,solid_body_collection.deformable_body_collection.dynamic_particles);

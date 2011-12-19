@@ -47,7 +47,7 @@ template<class TV> MATRIX_SOLID_INTERPOLATION_BASE<TV>::
 template<class TV> void MATRIX_SOLID_INTERPOLATION_BASE<TV>::
 Times(const GENERALIZED_VELOCITY<TV>& solids,ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints) const
 {
-    ARRAYS_COMPUTATIONS::Fill(constraints,T());
+    constraints.Fill(T());
     Times_Add(solids,constraints);
 }
 //#####################################################################

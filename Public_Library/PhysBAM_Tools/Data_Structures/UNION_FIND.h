@@ -33,7 +33,7 @@ public:
     {return parents.Size();}
 
     void Clear_Connectivity()
-    {ARRAYS_COMPUTATIONS::Fill(parents,ID());ARRAYS_COMPUTATIONS::Fill(ranks,0);}
+    {parents.Fill(ID());ranks.Fill(0);}
 
     ID Add_Entry()
     {parents.Append(ID());ranks.Append(0);return Size();}

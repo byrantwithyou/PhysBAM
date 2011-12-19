@@ -11,7 +11,6 @@
 #include <PhysBAM_Tools/Parallel_Computation/FLOOD_FILL_MPI.h>
 #ifdef USE_MPI
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
-#include <PhysBAM_Tools/Arrays_Computations/SUMMATIONS.h>
 #include <PhysBAM_Tools/Data_Structures/UNION_FIND.h>
 #ifndef COMPILE_WITHOUT_RLE_SUPPORT
 #include <PhysBAM_Tools/Grids_RLE/RLE_GRID_ITERATOR_FACE_HORIZONTAL.h>
@@ -90,8 +89,8 @@ Synchronize_Colors()
     // send numbers of global colors to everyone
     ARRAY<int> global_color_counts(mpi_grid.number_of_processes);
     mpi_grid.comm->Allgather(&global_color_count,1,MPI_UTILITIES::Datatype<int>(),&global_color_counts(1),1,MPI_UTILITIES::Datatype<int>());
-    int total_global_colors=ARRAYS_COMPUTATIONS::Sum(global_color_counts);
-    int global_color_offset=ARRAYS_COMPUTATIONS::Sum(global_color_counts.Prefix(mpi_grid.rank));
+    int total_global_colors=global_color_counts.Sum();
+    int global_color_offset=global_color_counts.Prefix(mpi_grid.rank).Sum();
     LOG::cout<<"initial colors: "<<number_of_regions<<" total, "<<global_color_count<<" out of "<<total_global_colors<<" global"<<std::endl;
     if(!total_global_colors){color_ranks.Clean_Memory();return 0;}
 
@@ -185,8 +184,8 @@ Synchronize_Colors_Threaded()
     // send numbers of global colors to everyone
     ARRAY<int> global_color_counts(mpi_grid.threaded_grid->number_of_processes);
     mpi_grid.threaded_grid->Allgather(global_color_counts);
-    int total_global_colors=ARRAYS_COMPUTATIONS::Sum(global_color_counts);
-    int global_color_offset=ARRAYS_COMPUTATIONS::Sum(global_color_counts.Prefix(mpi_grid.threaded_grid->rank));
+    int total_global_colors=global_color_counts.Sum();
+    int global_color_offset=global_color_counts.Prefix(mpi_grid.threaded_grid->rank).Sum();
     LOG::cout<<"initial colors: "<<number_of_regions<<" total, "<<global_color_count<<" out of "<<total_global_colors<<" global"<<std::endl;
     if(!total_global_colors){color_ranks.Clean_Memory();return 0;}
 

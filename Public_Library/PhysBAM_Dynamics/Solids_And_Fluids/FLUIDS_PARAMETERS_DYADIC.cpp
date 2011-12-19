@@ -234,7 +234,7 @@ template<class T_GRID> void FLUIDS_PARAMETERS_DYADIC<T_GRID>::
 Get_Body_Force(ARRAY<TV>& force,const T dt,const T time)
 {
     if(smoke){
-        ARRAYS_COMPUTATIONS::Fill(force,TV());
+        force.Fill(TV());
         for(int i=1;i<=grid->number_of_nodes;i++){ // y-direction forces only
             T rho_atm=rho_bottom+(rho_top-rho_bottom)*(grid->uniform_grid.Axis_X(i,2)-grid->uniform_grid.domain.min_corner.y)/(grid->uniform_grid.domain.max_corner.y-grid->uniform_grid.domain.min_corner.y);
             if(density_container.density(i)>density_buoyancy_threshold){
@@ -242,7 +242,7 @@ Get_Body_Force(ARRAY<TV>& force,const T dt,const T time)
                 if(density_difference>0||temperature_difference>0)
                     force(i).y=temperature_buoyancy_constant*temperature_difference-density_buoyancy_constant*density_difference;}}}
     else if(fire){
-        ARRAYS_COMPUTATIONS::Fill(force,TV());
+        force.Fill(TV());
         for(int i=1;i<=grid->number_of_nodes;i++){ // y-direction forces only
             if(particle_levelset_evolution.particle_levelset.levelset.phi(i)<0) force(i).y=temperature_buoyancy_constant*(temperature_fuel-temperature_container.ambient_temperature); // fuel
             else force(i).y=temperature_buoyancy_constant*(temperature_container.temperature(i)-temperature_container.ambient_temperature);}} // products 
@@ -255,8 +255,8 @@ Get_Neumann_And_Dirichlet_Boundary_Conditions(const T dt,const T time)
 {
     LAPLACE_COLLIDABLE_DYADIC<T_GRID>& elliptic_solver=*incompressible.projection.elliptic_solver;
     POISSON_COLLIDABLE_DYADIC<T_GRID>* poisson=incompressible.projection.poisson;
-    ARRAYS_COMPUTATIONS::Fill(elliptic_solver.psi_N,false);ARRAYS_COMPUTATIONS::Fill(elliptic_solver.psi_D,false);
-    if(poisson) ARRAYS_COMPUTATIONS::Fill(poisson->beta_face,(T)1/density);
+    elliptic_solver.psi_N.Fill(false);elliptic_solver.psi_D.Fill(false);
+    if(poisson) poisson->beta_face.Fill((T)1/density);
     Set_Domain_Boundary_Conditions(time);
     callbacks->Get_Source_Velocities(time);
     callbacks->Get_Object_Velocities(incompressible.projection,incompressible.projection.face_velocities,dt,time);

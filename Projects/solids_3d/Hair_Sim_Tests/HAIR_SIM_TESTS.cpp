@@ -311,8 +311,8 @@ Initialize_Bodies()
     if(use_collisions_mass_modify || use_progressive_collision_thickness){
         LOG::cout<<"computing distances..."<<std::endl;
         distance_to_root.Resize(particles.array_collection->Size());
-        ARRAYS_COMPUTATIONS::Fill(distance_to_root,0);
-        INDIRECT_ARRAY<ARRAY<int>,ARRAY<int>&> subset=distance_to_root.Subset(fixed_nodes);ARRAYS_COMPUTATIONS::Fill(subset,1);
+        distance_to_root.Fill(0);
+        distance_to_root.Subset(fixed_nodes).Fill(1);
         edges.mesh.Initialize_Neighbor_Nodes();
         while(1){
             int marked=0;

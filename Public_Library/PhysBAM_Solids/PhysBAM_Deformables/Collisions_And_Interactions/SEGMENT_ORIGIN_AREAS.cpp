@@ -651,7 +651,9 @@ template<class T,class TV> void Case_ACAC(VOL_DATA<T,2,4>& data,const TV& A,cons
 
 template void PhysBAM::ORIGIN_AREAS::Volume_From_Simplices<float,VECTOR<float,2> >(VOL_DATA<float,2,4>&,VECTOR<float,2> const (&)[4]);
 template void PhysBAM::ORIGIN_AREAS::Clear<float,3,6>(VOL_DATA<float,3,6>&);
+template void PhysBAM::ORIGIN_AREAS::Clear<float,2,4>(VOL_DATA<float,2,4>&);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template void PhysBAM::ORIGIN_AREAS::Volume_From_Simplices<double,VECTOR<double,2> >(VOL_DATA<double,2,4>&,VECTOR<double,2> const (&)[4]);
 template void PhysBAM::ORIGIN_AREAS::Clear<double,3,6>(VOL_DATA<double,3,6>&);
+template void PhysBAM::ORIGIN_AREAS::Clear<double,2,4>(VOL_DATA<double,2,4>&);
 #endif

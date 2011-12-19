@@ -93,7 +93,7 @@ Set_Damping(const T constant_damping_input)
     springs_damping.Resize(intervals.domain.min_corner.x,intervals.domain.max_corner.x,false,false);
     for(int i=springs_damping.domain.min_corner.x;i<=springs_damping.domain.max_corner.x;i++){
         springs_damping(i).Resize(segment_mesh.elements.m,false,false);
-        ARRAYS_COMPUTATIONS::Fill(springs_damping(i),constant_damping_input);}
+        springs_damping(i).Fill(constant_damping_input);}
 }
 //#####################################################################
 // Function Set_Damping

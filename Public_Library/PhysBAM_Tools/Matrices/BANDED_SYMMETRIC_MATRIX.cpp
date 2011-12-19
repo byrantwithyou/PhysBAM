@@ -4,7 +4,6 @@
 //#####################################################################
 // Class BANDED_SYMMETRIC_MATRIX
 //#####################################################################
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_MIN_MAX.h>
 #include <PhysBAM_Tools/Arrays_Computations/SORT.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/INTERVAL.h>
@@ -126,7 +125,7 @@ Print_Spectral_Information() const
         LOG::cout<<"eigenvalue range = null, condition = null"<<std::endl;
         return;}
     ARRAY<T> D;Eigenvalues(D);
-    T lambda_min=ARRAYS_COMPUTATIONS::Min(D),lambda_max=ARRAYS_COMPUTATIONS::Max(D);
+    T lambda_min=D.Min(),lambda_max=D.Max();
     T condition=lambda_min*lambda_max>0?Robust_Divide(maxabs(lambda_min,lambda_max),minabs(lambda_min,lambda_max)):0;
     LOG::cout<<"eigenvalue range = "<<lambda_min<<" "<<lambda_max<<", condition = "<<condition<<std::endl;
     Sort(D);LOG::cout<<"eigenvalues = "<<D;

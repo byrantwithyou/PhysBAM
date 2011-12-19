@@ -5,7 +5,6 @@
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 #include <PhysBAM_Tools/Arrays/IDENTITY_ARRAY.h>
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_MIN_MAX.h>
 #include <PhysBAM_Tools/Parsing/PARAMETER_LIST.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/DUALCONTOUR_3D.h>
@@ -209,7 +208,7 @@ List_Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
                 LOG::cout<<"Split object into "<<component_done.Size()<<" components"<<std::endl;
                 delete volume;}
             else PHYSBAM_NOT_IMPLEMENTED("Split_Object for non-tetrahedralized volumes");}
-        if(ARRAYS_COMPUTATIONS::Min(integer_list)<1 || ARRAYS_COMPUTATIONS::Max(integer_list)>deformable_body_collection.structures.m){
+        if(integer_list.Min()<1 || integer_list.Max()>deformable_body_collection.structures.m){
             LOG::cerr<<"Range out of bound for object "<<name<<std::endl;PHYSBAM_FATAL_ERROR();}
         for(int index=1;index<=integer_list.m;index++){
             int i=integer_list(index);

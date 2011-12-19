@@ -179,8 +179,8 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
         }
         LOG::cout<<"Deformable solid momentum before explicit forces: "<<dimensionwise_solid_momentum<<std::endl;*/
 
-        INDIRECT_ARRAY<ARRAY_VIEW<TV>,ARRAY<int>&> BV_subset=B.V.array.Subset(solid_body_collection.deformable_body_collection.dynamic_particles);ARRAYS_COMPUTATIONS::Fill(BV_subset,TV());
-        ARRAYS_COMPUTATIONS::Fill(B.rigid_V.array,TWIST<TV>());
+        B.V.array.Subset(solid_body_collection.deformable_body_collection.dynamic_particles).Fill(TV());
+        B.rigid_V.array.Fill(TWIST<TV>());
         solid_body_collection.example_forces_and_velocities->Add_External_Forces(B.V.array,current_velocity_time+dt);
         solid_body_collection.example_forces_and_velocities->Add_External_Forces(B.rigid_V.array,current_velocity_time+dt);
         solid_body_collection.Add_Velocity_Independent_Forces(B.V.array,B.rigid_V.array,current_velocity_time+dt); // this is a nop for binding forces
@@ -306,7 +306,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
             const GRID<TV>& grid=Get_Grid();
             J_deformable*=-grid.Cell_Size();J_rigid*=-grid.Cell_Size();
             if(solids_fluids_parameters.mpi_solid_fluid){  // in MPI, fluid nodes don't need these...
-                ARRAYS_COMPUTATIONS::Fill(B.V,TV());ARRAYS_COMPUTATIONS::Fill(B.rigid_V,TWIST<TV>());}}
+                B.V.Fill(TV());B.rigid_V.Fill(TWIST<TV>());}}
         if(solids) for(int i=1;i<=solid_body_collection.rigid_body_collection.simulated_rigid_body_particles.m;i++){  // Update angular momentum for modified center of mass
             // TODO(kwatra): do we need to this for compressible case, as there is no mass lumping there?
             RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(solid_body_collection.rigid_body_collection.simulated_rigid_body_particles(i));
@@ -349,7 +349,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
         if(fluids){
             RANGE<TV> grid_domain=fluids_parameters.grid->domain;
             grid_domain.Change_Size(fluids_parameters.grid->dX*(T).5);
-            ARRAY<int> boundary_particles(particles.array_collection->Size());ARRAYS_COMPUTATIONS::Fill(boundary_particles,0);
+            ARRAY<int> boundary_particles(particles.array_collection->Size());boundary_particles.Fill(0);
             GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
             for(COLLISION_GEOMETRY_ID i(1);i<=collision_bodies_affecting_fluid.collision_geometry_collection.bodies.m;i++)
                 if(collision_bodies_affecting_fluid.collision_geometry_collection.Is_Active(i)){
@@ -360,8 +360,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
                             RANGE<TV> simplex_bounding_box(particles.X(deformable->object.mesh.elements(simplex)(1)));
                             for(int node=2;node<=deformable->object.mesh.dimension;node++) simplex_bounding_box.Enlarge_To_Include_Point(particles.X(deformable->object.mesh.elements(simplex)(node)));
                             if(grid_domain.Lazy_Intersection(simplex_bounding_box)){
-                                INDIRECT_ARRAY<ARRAY<int>,VECTOR<int,TV::m>&> subset=boundary_particles.Subset(deformable->object.mesh.elements(simplex)); // TODO(jontg): Check this
-                                ARRAYS_COMPUTATIONS::Fill(subset,1);}}}
+                                boundary_particles.Subset(deformable->object.mesh.elements(simplex)).Fill(1);}}} // TODO(jontg): Check this
             for(int i=1;i<=boundary_particles.m;i++) if(boundary_particles(i)) coupled_deformable_particle_indices.Append(i);
             solids_fluids_parameters.mpi_solid_fluid->Exchange_Coupled_Deformable_Particle_List(&coupled_deformable_particle_indices,0);
             fluid_system_mpi=new FLUID_SYSTEM_MPI<TV>(J_deformable,J_rigid,A_array,interior_regions,
@@ -541,8 +540,8 @@ Transfer_Momentum_And_Set_Boundary_Conditions(const T time,GENERALIZED_VELOCITY<
     ARRAY<T> deformable_simplex_forces;
     ARRAY<T> rigid_simplex_jet_velocities;
     T_FACE_ARRAYS_BOOL modified_face(grid);modified_face.Fill(false);
-    T_FACE_ARRAYS_SCALAR modified_face_weight(grid);modified_face_weight.Fill((T)0);
-    T_FACE_ARRAYS_SCALAR modified_face_velocities(grid);modified_face_velocities.Fill((T)0);
+    T_FACE_ARRAYS_SCALAR modified_face_weight(grid);modified_face_weight.Fill(0);
+    T_FACE_ARRAYS_SCALAR modified_face_velocities(grid);modified_face_velocities.Fill(0);
     // TODO: rewind velocities if we modify them here, otherwise may be doing extra contribution
     TV orientation;
     if(solids_evolution_callbacks->Get_Solid_Source_Velocities(deformable_simplices,deformable_simplex_forces,rigid_simplices,rigid_simplex_jet_velocities,orientation,time)){
@@ -833,7 +832,7 @@ Compute_Coupling_Terms_Deformable(const T_ARRAYS_INT& cell_index_to_matrix_index
 
     J_deformable.Resize(colors);
 
-    nodal_fluid_mass.Resize(solid_body_collection.deformable_body_collection.dynamic_particles.m);ARRAYS_COMPUTATIONS::Fill(nodal_fluid_mass,T_DIAGONAL_MATRIX());
+    nodal_fluid_mass.Resize(solid_body_collection.deformable_body_collection.dynamic_particles.m);nodal_fluid_mass.Fill(T_DIAGONAL_MATRIX());
     if(!solids_fluids_parameters.mpi_solid_fluid || solids_fluids_parameters.mpi_solid_fluid->Fluid_Node()){
         POISSON_COLLIDABLE_UNIFORM<GRID<TV> >* poisson=Get_Poisson();
         const GRID<TV>& grid=Get_Grid();
@@ -862,9 +861,9 @@ Compute_Coupling_Terms_Deformable(const T_ARRAYS_INT& cell_index_to_matrix_index
             J_deformable(i).n=interior_regions(i).Size()+1;
             J_deformable(i).Set_Row_Lengths(row_counts(i));
             PROJECTED_ARRAY<ARRAY<SPARSE_MATRIX_ENTRY<T> >,T_PROJECTED_INDEX> J_deformableiAj=J_deformable(i).A.template Project<int,&SPARSE_MATRIX_ENTRY<T>::j>();
-            ARRAYS_COMPUTATIONS::Fill(J_deformableiAj,0);
+            J_deformableiAj.Fill(0);
             PROJECTED_ARRAY<ARRAY<SPARSE_MATRIX_ENTRY<T> >,T_PROJECTED_VALUE> J_deformableiAa=J_deformable(i).A.template Project<T,&SPARSE_MATRIX_ENTRY<T>::a>();
-            ARRAYS_COMPUTATIONS::Fill(J_deformableiAa,(T)0);}}
+            J_deformableiAa.Fill(0);}}
 
     if(!fluids_parameters.compressible && solids_fluids_parameters.mpi_solid_fluid){ // TODO see if we can change this to a single direction send
         ARRAY<T> serial_nodal_fluid_mass(nodal_fluid_mass.m*TV::m),global_nodal_fluid_mass(nodal_fluid_mass.m*TV::m);
@@ -912,8 +911,8 @@ Compute_Coupling_Terms_Rigid(const T_ARRAYS_INT& cell_index_to_matrix_index,cons
     if(fluids_parameters.fluid_affects_solid){
         rigid_body_particles_to_dynamic_rigid_body_particles_map.Subset(solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles)=IDENTITY_ARRAY<int>(solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m);
         for(int i=1;i<=colors;i++) row_counts(i).Resize(solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m*rows_per_rigid_body); // TODO: fix
-        rigid_body_fluid_mass.Resize(solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m);ARRAYS_COMPUTATIONS::Fill(rigid_body_fluid_mass,T_DIAGONAL_MATRIX());
-        rigid_body_updated_center_of_mass.Resize(solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m);ARRAYS_COMPUTATIONS::Fill(rigid_body_updated_center_of_mass,TV());
+        rigid_body_fluid_mass.Resize(solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m);rigid_body_fluid_mass.Fill(T_DIAGONAL_MATRIX());
+        rigid_body_updated_center_of_mass.Resize(solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m);rigid_body_updated_center_of_mass.Fill(TV());
         J_rigid.Resize(colors);}
 
     if(!solids_fluids_parameters.mpi_solid_fluid || solids_fluids_parameters.mpi_solid_fluid->Fluid_Node()){
@@ -963,11 +962,11 @@ Compute_Coupling_Terms_Rigid(const T_ARRAYS_INT& cell_index_to_matrix_index,cons
 
         for(int i=1;i<=J_rigid_kinematic.m;i++){
             J_rigid_kinematic(i).n=interior_regions(i).Size()+1;J_rigid_kinematic(i).Set_Row_Lengths(kinematic_row_counts(i));
-            PROJECTED_ARRAY<ARRAY<SPARSE_MATRIX_ENTRY<T> >,T_PROJECTED_INDEX> J_rigidiAj=J_rigid_kinematic(i).A.template Project<int,&SPARSE_MATRIX_ENTRY<T>::j>();ARRAYS_COMPUTATIONS::Fill(J_rigidiAj,0);}
+            PROJECTED_ARRAY<ARRAY<SPARSE_MATRIX_ENTRY<T> >,T_PROJECTED_INDEX> J_rigidiAj=J_rigid_kinematic(i).A.template Project<int,&SPARSE_MATRIX_ENTRY<T>::j>();J_rigidiAj.Fill(0);}
         for(int i=1;i<=J_rigid.m;i++){
             J_rigid(i).n=interior_regions(i).Size()+1;J_rigid(i).Set_Row_Lengths(row_counts(i));
             PROJECTED_ARRAY<ARRAY<SPARSE_MATRIX_ENTRY<T> >,T_PROJECTED_VALUE> J_rigidiAa=J_rigid(i).A.template Project<T,&SPARSE_MATRIX_ENTRY<T>::a>();
-            ARRAYS_COMPUTATIONS::Fill(J_rigidiAa,(T)0);}}
+            J_rigidiAa.Fill(0);}}
 
     if(!fluids_parameters.compressible && solids_fluids_parameters.mpi_solid_fluid){ // TODO see if we can change this to a single direction send
         ARRAY<T> serial_rigid_body_updated_center_of_mass(rigid_body_updated_center_of_mass.m*TV::m),global_rigid_body_updated_center_of_mass(rigid_body_updated_center_of_mass.m*TV::m);
@@ -991,7 +990,7 @@ Compute_Coupling_Terms_Rigid(const T_ARRAYS_INT& cell_index_to_matrix_index,cons
             if(fluids_parameters.compressible) rigid_body_updated_center_of_mass(i)=rigid_body.X();
             else rigid_body_updated_center_of_mass(i)=(rigid_body_fluid_mass(i)+rigid_body.Mass()).Solve_Linear_System(
                     rigid_body_updated_center_of_mass(i)+rigid_body.X()*rigid_body.Mass());}
-        ARRAYS_COMPUTATIONS::Fill(rigid_body_fluid_inertia,T_INERTIA_TENSOR());}
+        rigid_body_fluid_inertia.Fill(T_INERTIA_TENSOR());}
 
     // populate the entries of J_rigid
     if(!solids_fluids_parameters.mpi_solid_fluid || solids_fluids_parameters.mpi_solid_fluid->Fluid_Node()){

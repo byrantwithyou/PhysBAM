@@ -181,7 +181,7 @@ TETRAHEDRALIZED_VOLUME<T>& Create_Deformable_Mattress()
     
     // 3 duplicate hard bound surface (soft bound surface)
     tests.Substitute_Soft_Bindings_For_Embedded_Nodes(embedding.material_surface,solid_body_collection.deformable_body_collection.soft_bindings);
-    ARRAYS_COMPUTATIONS::Fill(solid_body_collection.deformable_body_collection.soft_bindings.use_impulses_for_collisions,false);
+    solid_body_collection.deformable_body_collection.soft_bindings.use_impulses_for_collisions.Fill(false);
 
     return mattress;
 }

@@ -189,7 +189,7 @@ void Stability_Test()
     PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     particles.array_collection->Add_Elements(2);
-    ARRAYS_COMPUTATIONS::Fill(particles.mass,(T)1);
+    particles.mass.Fill((T)1);
     particles.X(1)=TV(-2,0,0);
     particles.X(2)=TV(2,0,0);
 
@@ -208,7 +208,7 @@ void Segments()
     PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     particles.array_collection->Add_Elements(6);
-    ARRAYS_COMPUTATIONS::Fill(particles.mass,(T)1);
+    particles.mass.Fill((T)1);
     particles.X(1)=TV(-3,2,0);
     particles.X(2)=TV(-2,1,0);
     particles.X(3)=TV(-1,0,0);

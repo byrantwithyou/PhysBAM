@@ -2,7 +2,6 @@
 // Copyright 2004-2008, Ron Fedkiw, Geoffrey Irving, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Arrays_Computations/SUMMATIONS.h>
 #include <PhysBAM_Tools/Math_Tools/Robust_Arithmetic.h>
 #include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
@@ -40,7 +39,7 @@ template<class TV> TV PARTICLES<TV>::
 Center_Of_Mass() const
 {
     if(this->store_mass) return POINT_CLOUDS_COMPUTATIONS::Weighted_Center(this->X,this->mass);
-    return this->array_collection->Size()?ARRAYS_COMPUTATIONS::Sum(this->X)/(T)this->array_collection->Size():TV(); // default to treating mass as one
+    return this->array_collection->Size()?this->X.Sum()/(T)this->array_collection->Size():TV(); // default to treating mass as one
 }
 //#####################################################################
 // Function Compute_Auxiliary_Attributes

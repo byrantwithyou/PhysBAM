@@ -107,8 +107,7 @@ Update_Binding_List_From_Embedding(DEFORMABLE_BODY_COLLECTION<TV>& deformable_bo
     for(int p=1;p<=embedded_particles.active_indices.m;p++) binding_list.Add_Binding(new LINEAR_BINDING<TV,2>(dynamic_cast<PARTICLES<TV>&>(particles),embedded_particles.active_indices(p),
         parent_particles(p),VECTOR<T,2>((T)1-interpolation_fraction(p),interpolation_fraction(p))));
     ARRAY<bool> used(deformable_body_collection.particles.array_collection->Size());
-    INDIRECT_ARRAY<ARRAY<bool>,ARRAY_VIEW<int>&> subset=used.Subset(material_surface_mesh.elements.Flattened());
-    ARRAYS_COMPUTATIONS::Fill(subset,true);
+    used.Subset(material_surface_mesh.elements.Flattened()).Fill(true);
     int j=0;
     for(int p=1;p<=embedded_particles.active_indices.m;p++){
         if(used(embedded_particles.active_indices(p))){

@@ -60,7 +60,7 @@ template<class T> void MPI_CHARBEL<T>::
 Setup_AEROF_PhysBAM_Mapping(TETRAHEDRALIZED_VOLUME<T>& tet_volume,ARRAY<ARRAY<int> >& tets_to_send,ARRAY<int>& local_to_global_map,
                 const int& global_particle_count,const RANGE<TV>& domain)
 {
-    global_to_local_aerof_map.Resize(global_particle_count);ARRAYS_COMPUTATIONS::Fill(global_to_local_aerof_map,0);
+    global_to_local_aerof_map.Resize(global_particle_count);global_to_local_aerof_map.Fill(0);
     for(int i=1;i<=local_to_global_map.m;i++) global_to_local_aerof_map(local_to_global_map(i))=i;
 
     int tag=Get_Unique_Tag();
@@ -85,7 +85,7 @@ Setup_AEROF_PhysBAM_Mapping(TETRAHEDRALIZED_VOLUME<T>& tet_volume,ARRAY<ARRAY<in
     MPI_UTILITIES::Wait_All(requests);
 
     interior_particles_to_recv.Resize(number_of_processes);ghost_particles_to_recv.Resize(number_of_processes);
-    global_to_local_physbam_map.Resize(global_particle_count);ARRAYS_COMPUTATIONS::Fill(global_to_local_physbam_map,0);
+    global_to_local_physbam_map.Resize(global_particle_count);global_to_local_physbam_map.Fill(0);
     local_tet_volume->particles.array_collection->Delete_All_Elements();
     for(int i=1;i<=number_of_processes;i++){
         ARRAY<int> indices;int position=0;

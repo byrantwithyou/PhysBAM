@@ -14,8 +14,12 @@
 #include <PhysBAM_Tools/Arrays/ARRAY_PRODUCT.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_SUM.h>
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
-#include <PhysBAM_Tools/Arrays_Computations/SUMMATIONS.h>
 #include <PhysBAM_Tools/Data_Structures/ELEMENT_ID.h>
+#include <PhysBAM_Tools/Math_Tools/max.h>
+#include <PhysBAM_Tools/Math_Tools/maxabs.h>
+#include <PhysBAM_Tools/Math_Tools/maxmag.h>
+#include <PhysBAM_Tools/Math_Tools/min.h>
+#include <PhysBAM_Tools/Math_Tools/minmag.h>
 #include <PhysBAM_Tools/Utilities/STATIC_ASSERT.h>
 #include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/SCALAR_POLICY.h>
@@ -198,7 +202,7 @@ public:
 
     template<class T_ARRAY2> SCALAR
     Inner_Product(const ARRAY_BASE<SCALAR,T_ARRAY2,ID>& m,const ARRAY_BASE<T,T_ARRAY,ID>& a2) const
-    {assert(Size()==a2.Size());return ARRAYS_COMPUTATIONS::Sum((m*(*this*a2)));}
+    {assert(Size()==a2.Size());return (m*(*this*a2)).Sum();}
 
     template<class T2,class T_ARRAY2> typename DISABLE_IF<IS_SCALAR<T2>::value,SCALAR>::TYPE
     Inner_Product(const ARRAY_BASE<T2,T_ARRAY2,ID>& m,const ARRAY_BASE<T,T_ARRAY,ID>& a2) const
@@ -206,11 +210,52 @@ public:
 
     template<class T_ARRAY2> double
     Inner_Product_Double_Precision(const ARRAY_BASE<SCALAR,T_ARRAY2,ID>& m,const ARRAY_BASE<T,T_ARRAY,ID>& a2) const
-    {assert(Size()==a2.Size());return ARRAYS_COMPUTATIONS::Sum((m*(*this*a2))).Sum();}
+    {assert(Size()==a2.Size());return (m*(*this*a2)).Sum().Sum();}
 
     template<class T2,class T_ARRAY2> typename DISABLE_IF<IS_SCALAR<T2>::value,double>::TYPE
     Inner_Product_Double_Precision(const ARRAY_BASE<T2,T_ARRAY2,ID>& m,const ARRAY_BASE<T,T_ARRAY,ID>& a2) const
     {assert(Size()==a2.Size());double result(0);ID size=Size();for(ID i(1);i<=size;i++) result+=m(i).Inner_Product((*this)(i),a2(i));return result;}
+
+    T Max() const
+    {const T_ARRAY& self=Derived();T result=self(ID(1));ID m=self.Size();for(ID i(2);i<=m;i++) result=PhysBAM::max(result,self(i));return result;}
+
+    T Maxabs() const
+    {const T_ARRAY& self=Derived();T result=T();;ID m=self.Size();for(ID i(1);i<=m;i++) result=PhysBAM::max(result,abs(self(i)));return result;}
+
+    T Maxmag() const
+    {const T_ARRAY& self=Derived();T result=T();ID m=self.Size();for(ID i(1);i<=m;i++) result=PhysBAM::maxmag(result,self(i));return result;}
+
+    ID Argmax() const
+    {const T_ARRAY& self=Derived();ID result(1),m=self.Size();for(ID i(2);i<=m;i++) if(self(i)>self(result)) result=i;return result;}
+
+    T Min() const
+    {const T_ARRAY& self=Derived();T result=self(ID(1));ID m=self.Size();for(ID i(2);i<=m;i++) result=PhysBAM::min(result,self(i));return result;}
+
+    T Minmag() const
+    {const T_ARRAY& self=Derived();T result=self(ID(1));ID m=self.Size();for(ID i(2);i<=m;i++) result=PhysBAM::minmag(result,self(i));return result;}
+
+    ID Argmin() const
+    {const T_ARRAY& self=Derived();ID result(1),m=self.Size();for(ID i(2);i<=m;i++) if(self(i)<self(result)) result=i;return result;}
+
+    T Componentwise_Maxabs() const
+    {const T_ARRAY& self=Derived();T result=T();ID m=self.Size();for(ID i(1);i<=m;i++) result=T::Componentwise_Max(result,abs(self(i)));return result;}
+
+    T Sum() const
+    {const T_ARRAY& self=Derived();T result=T();ID m=self.Size();for(ID i(1);i<=m;i++) result+=self(i);return result;}
+
+    double Sum_Double_Precision() const
+    {const T_ARRAY& self=Derived();double result=0;ID m=self.Size();for(ID i(1);i<=m;i++) result+=self(i);return result;}
+
+    T Sumabs() const
+    {const T_ARRAY& self=Derived();T result=T();ID m=self.Size();for(ID i(1);i<=m;i++) result+=abs(self(i));return result;}
+    
+    T Average() const
+    {const T_ARRAY& self=Derived();return self.Size()?Sum()/typename ARRAY_BASE<T,T_ARRAY,ID>::SCALAR(self.Size()):T();}
+    
+    template<class T_ARRAY1>
+    ELEMENT Weighted_Sum(const T_ARRAY1& weights) const
+    {STATIC_ASSERT_SAME(typename T_ARRAY1::ELEMENT,SCALAR);assert(weights.Size()==Size());
+    ELEMENT result((ELEMENT()));INDEX m=Size();for(INDEX i(1);i<=m;i++) result+=weights(i)*(*this)(i);return result;}
 
     ID Find(const T& element) const
     {const T_ARRAY& self=Derived();ID m=self.Size();
@@ -249,6 +294,9 @@ public:
 
     void Coalesce()
     {Sort(*this);T_ARRAY& self=Derived();int j=0;if(self.Size()>0) j=1;for(int i=2;i<=self.Size();i++){if(!(self(j)<self(i))) self(j).Merge(self(i));else self(++j)=self(i);}self.Resize(j);}
+
+    void Fill(T value)
+    {T_ARRAY& self=Derived();ID m=self.Size();for(ID i(1);i<=m;i++) self(i)=value;}
 
     template<class T_ARRAY1,class T_ARRAY2>
     static void Copy(const T_ARRAY1& old_copy,T_ARRAY2& new_copy)

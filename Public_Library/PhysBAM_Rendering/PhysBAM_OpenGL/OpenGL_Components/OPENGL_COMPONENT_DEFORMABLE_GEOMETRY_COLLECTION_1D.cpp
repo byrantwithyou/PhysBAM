@@ -2,7 +2,6 @@
 // Copyright 2009, Nipun Kwatra
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_MIN_MAX.h>
 #include <PhysBAM_Tools/Read_Write/Arrays/READ_WRITE_ARRAY.h>
 #include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
@@ -111,7 +110,7 @@ template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_
 Set_Draw(bool draw_input)
 {
     OPENGL_COMPONENT::Set_Draw(draw_input);
-    if(draw_input) ARRAYS_COMPUTATIONS::Fill(active_list,true);
+    if(draw_input) active_list.Fill(true);
     Reinitialize();
 }
 //#####################################################################
@@ -163,7 +162,7 @@ Cycle_Display_Mode()
 template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_1D<T,RW>::
 Show_Only_First()
 {
-    ARRAYS_COMPUTATIONS::Fill(active_list,false);
+    active_list.Fill(false);
     active_list(1)=true;
 }
 //#####################################################################
@@ -208,8 +207,8 @@ template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_
 Toggle_Use_Active_List()
 {
     if(active_list.m<1) return;
-    use_active_list=!use_active_list;if(!use_active_list) ARRAYS_COMPUTATIONS::Fill(active_list,true);
-    else{ARRAYS_COMPUTATIONS::Fill(active_list,false);incremented_active_object=1;active_list(incremented_active_object)=true;}
+    use_active_list=!use_active_list;if(!use_active_list) active_list.Fill(true);
+    else{active_list.Fill(false);incremented_active_object=1;active_list(incremented_active_object)=true;}
 }
 //#####################################################################
 // Function Select_Segment

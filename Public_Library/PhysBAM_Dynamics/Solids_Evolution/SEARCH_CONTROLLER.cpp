@@ -1075,7 +1075,7 @@ Update_Position_Based_State(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,con
             if(!dt_hyp) dt_hyp=dt;
             T target_time=driver->Time()+dt_hyp;
             if(!current_angle.Size()) current_angle.Resize(joint_mesh.Size());
-            if(!dF_array_multipliers.Size()){dF_array_multipliers.Resize(T_SPIN::dimension*Value(joint_mesh.Size()));ARRAYS_COMPUTATIONS::Fill(dF_array_multipliers,PAIR<T,T>((T)0,(T)1));}
+            if(!dF_array_multipliers.Size()){dF_array_multipliers.Resize(T_SPIN::dimension*Value(joint_mesh.Size()));dF_array_multipliers.Fill(PAIR<T,T>((T)0,(T)1));}
 
             negative_gradient.Resize(T_SPIN::dimension*Value(joint_mesh.Size()));
             if(solve_minimization) real_dx=Steepest_Descent(face_velocities,dt,target_time);
