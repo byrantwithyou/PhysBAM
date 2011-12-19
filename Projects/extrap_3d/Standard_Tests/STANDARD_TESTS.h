@@ -346,6 +346,11 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.cfl=(T)5;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=true;
+            if (with_hand || with_bunny){
+            {
+                solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=true;
+                solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=true;
+            }
             frame_rate=120;
             last_frame=600;
             break;
