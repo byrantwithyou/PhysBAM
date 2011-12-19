@@ -130,6 +130,7 @@ public:
     T stiffness_multiplier;
     T damping_multiplier;
     T boxsize;
+    T rebound_time,rebound_stiffness;
     bool use_constant_ife;
     bool forces_are_removed;
     ARRAY<int> externally_forced;
@@ -216,6 +217,8 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Option_Argument("-no_collisions","Does not yet work in all sims, see code for details");
     parse_args->Add_Double_Argument("-stretch",1,"stretch");
     parse_args->Add_Double_Argument("-hole",.5,"hole");
+    parse_args->Add_Double_Argument("-rebound_time",.2,"number of seconds to rebound in test 29");
+    parse_args->Add_Double_Argument("-rebound_stiffness",5,"log10 of youngs modulus of final stiffness");
     parse_args->Add_Option_Argument("-nobind");
 }
 //#####################################################################
@@ -292,6 +295,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
     override_collisions=parse_args->Is_Value_Set("-collisions");
     override_no_collisions=parse_args->Is_Value_Set("-no_collisions")&&(!override_collisions);
     hole=(T)parse_args->Get_Double_Value("-hole");
+    rebound_stiffness=(T)parse_args->Get_Double_Value("-rebound_stiffness");
+    rebound_time=(T)parse_args->Get_Double_Value("-rebound_time");
     with_bunny=parse_args->Is_Value_Set("-with_bunny");
     with_hand=parse_args->Is_Value_Set("-with_hand");
     
@@ -346,11 +351,12 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.cfl=(T)5;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=true;
-            if (with_hand || with_bunny)
-            {
-                solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=true;
-                solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=true;
-            }
+            //if (with_hand || with_bunny)
+           // {
+                //solids_parameters.triangle_collision_parameters.perform_self_collision=true;
+                solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=override_collisions;
+                solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=override_collisions;
+            //}
             frame_rate=120;
             last_frame=600;
             break;
@@ -1747,12 +1753,12 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 void Update_Time_Varying_Material_Properties(const T time)
 {   if(test_number==29 && time > .1){
-        T critical=(T)1.5;
-        T critical2=(T)1.8;
-        T start_young=(T)0; T end_young=(T)5;
+        T critical=(T)1.0;
+        T critical2=(T)1.0+rebound_time;
+        T start_young=(T)0; T end_young=(T)rebound_stiffness;
                 DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     if(time<critical) forces_are_removed=true;
-    if (forces_are_removed){ LOG::cout << "Hey look " << time << std::endl;}
+    //if (forces_are_removed){ LOG::cout << "Hey look " << time << std::endl;}
     if(time>critical && forces_are_removed){
         int n=deformable_body_collection.particles.array_collection->Size(); LOG::cout << "Hey look at me " << n << std::endl;
         for (int i=1; i <= n; i++){deformable_body_collection.particles.X(i).y = 10.0;}
