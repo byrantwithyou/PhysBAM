@@ -48,6 +48,7 @@
 //   53. Stretch tet
 //   54. Stretch tet (II)
 //   55. Constrained tet
+//   56. Size comparison - several shapes
 //#####################################################################
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
@@ -119,6 +120,7 @@ public:
     bool use_mooney_rivlin,use_extended_mooney_rivlin;
     bool use_corot_blend;
     bool dump_sv;
+    bool with_bunny,with_hand;
     bool override_collisions,override_no_collisions;
     int kinematic_id,kinematic_id2,kinematic_id3;
     INTERPOLATION_CURVE<T,FRAME<TV> > curve,curve2,curve3;
@@ -193,7 +195,9 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Option_Argument("-use_mooney");
     parse_args->Add_Option_Argument("-use_corotated");
     parse_args->Add_Option_Argument("-use_corot_blend");
-     parse_args->Add_Option_Argument("-dump_sv");
+    parse_args->Add_Option_Argument("-with_bunny");
+    parse_args->Add_Option_Argument("-with_hand");
+    parse_args->Add_Option_Argument("-dump_sv");
     parse_args->Add_Integer_Argument("-parameter",0,"parameter used by multiple tests to change the parameters of the test");
     parse_args->Add_Double_Argument("-stiffen",1,"","stiffness multiplier for various tests");
     parse_args->Add_Double_Argument("-dampen",1,"","damping multiplier for various tests");
@@ -287,7 +291,9 @@ void Parse_Options() PHYSBAM_OVERRIDE
     override_collisions=parse_args->Is_Value_Set("-collisions");
     override_no_collisions=parse_args->Is_Value_Set("-no_collisions")&&(!override_collisions);
     hole=(T)parse_args->Get_Double_Value("-hole");
-
+    with_bunny=parse_args->Is_Value_Set("-with_bunny");
+    with_hand=parse_args->Is_Value_Set("-with_hand");
+    
     semi_implicit=parse_args->Is_Value_Set("-semi_implicit");
     if(parse_args->Is_Value_Set("-project_nullspace")) solids_parameters.implicit_solve_parameters.project_nullspace_frequency=1;
     solids_parameters.implicit_solve_parameters.cg_projection_iterations=parse_args->Get_Integer_Value("-projection_iterations");
@@ -307,6 +313,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 16:
         case 17:
         case 18:
+        case 56:
             solids_parameters.cfl=(T)5;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             break;
@@ -338,7 +345,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.cfl=(T)5;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=true;
-            frame_rate=24;
+            frame_rate=120;
+            last_frame=600;
             break;
         case 30:
             solids_parameters.cfl=(T)5;
@@ -489,13 +497,21 @@ void Get_Initial_Data()
             tests.Add_Ground();
             break;}
         case 4: case 29:{
-            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_110K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T)0.373,(T)0))),true,true,density,.005);
-//            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/bunny.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)2.3,0))),true,true,density,5.0);
+            //tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_110K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T)0.373,(T)0))),true,true,density,.005);
+            
+if (with_hand)
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/hand_30K.tet",
+                                                RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T).4,(T)0),ROTATION<TV>(-T(pi/2),TV(1,0,0)))),true,true,density,1.0);
+            else if(with_bunny)
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/bunny.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T).4,(T)0))),true,true,density,1.0);
+            else
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_110K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T).4,(T)0),ROTATION<TV>(T(pi),TV(0,1,0)))),true,true,density,.005);
+            //            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/bunny.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)2.3,0))),true,true,density,5.0);
 //            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,true,density);
            // tests.Create_Mattress(GRID<TV>(TV_INT(13,13,13),RANGE<TV>(TV(-1,1,-1),TV(1,3,1))),true,0);
             
             tests.Add_Ground();
-            last_frame=2000;
+
             break;}
         case 5:{
             RIGID_BODY<TV>& tmp_sphere=tests.Add_Rigid_Body("sphere",(T)1.0,(T).5);
@@ -1055,6 +1071,17 @@ void Get_Initial_Data()
             tv->mesh.elements.Append(VECTOR<int,4>(a,b,c,d));
             solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(tv);
             break;}
+        case 56:{
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)5,0))),true,true,density,.5);
+            tests.Add_Ground();
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/fish_42K.tet",
+                                                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(5,5,0),ROTATION<TV>(T(pi),TV(0,1,0)))),true,true,density,.2);
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_110K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(10,5,0),ROTATION<TV>(T(pi),TV(0,1,0)))),true,true,density,.005);
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/hand_30K.tet",
+                                                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(15,5,0),ROTATION<TV>(-T(pi/2),TV(1,0,0)))),true,true,density,1.0);
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/bunny.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(20,(T)5,0))),true,true,density,1.0);
+            break;
+        }
         default:
             LOG::cerr<<"Initial Data: Unrecognized test number "<<test_number<<std::endl;exit(1);}
 
@@ -1104,7 +1131,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             Add_Constitutive_Model(tetrahedralized_volume,(T)1e5,(T).45,(T).01);
             for(int i=1; i<=deformable_body_collection.particles.X.m; i++) deformable_body_collection.particles.X(i).y=3;
             break;}
-        case 9:{break;}
+        case 9: case 56:{break;}
         case 10:{
             bool* bools[7]={&use_corotated,0,&use_constant_ife,&use_corot_blend,&use_extended_neohookean,&use_extended_neohookean_smooth,&use_extended_neohookean_hyperbola};
             for(int i=1;i<=7;i++){
@@ -1674,7 +1701,7 @@ void Update_Time_Varying_Material_Properties(const T time)
 {   if(test_number==29 && time > .1){
         T critical=(T)1.5;
         T critical2=(T)1.8;
-        T start_young=(T)0; T end_young=(T)6;
+        T start_young=(T)0; T end_young=(T)5;
                 DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     if(time<critical) forces_are_removed=true;
     if (forces_are_removed){ LOG::cout << "Hey look " << time << std::endl;}
