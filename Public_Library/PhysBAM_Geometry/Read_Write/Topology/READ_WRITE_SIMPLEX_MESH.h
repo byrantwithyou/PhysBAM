@@ -8,7 +8,6 @@
 #ifndef __READ_WRITE_SIMPLEX_MESH__
 #define __READ_WRITE_SIMPLEX_MESH__
 
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_MIN_MAX.h>
 #include <PhysBAM_Tools/Read_Write/Arrays/READ_WRITE_ARRAY.h>
 #include <PhysBAM_Tools/Read_Write/Utilities/READ_WRITE.h>
 #include <PhysBAM_Geometry/Topology/SIMPLEX_MESH.h>

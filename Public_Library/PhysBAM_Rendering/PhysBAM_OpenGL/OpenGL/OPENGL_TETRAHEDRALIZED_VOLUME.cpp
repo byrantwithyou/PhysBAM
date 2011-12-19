@@ -3,7 +3,6 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_MIN_MAX.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_4X4.h>
 #include <PhysBAM_Tools/Read_Write/Point_Clouds/READ_WRITE_POINT_CLOUD.h>
 #include <PhysBAM_Tools/Read_Write/Vectors/READ_WRITE_VECTOR.h>
@@ -354,7 +353,7 @@ template<class T> void OPENGL_TETRAHEDRALIZED_VOLUME<T>::
 Draw_In_Color_From_Spectrum() const
 {
     if(spectrum.m!=mesh->elements.m) PHYSBAM_FATAL_ERROR("Spectrum has incorrect size");
-    T spectrum_max=ARRAYS_COMPUTATIONS::Max(spectrum),spectrum_min=ARRAYS_COMPUTATIONS::Min(spectrum);
+    T spectrum_max=spectrum.Max(),spectrum_min=spectrum.Min();
     for(int t=1;t<=mesh->elements.m;t++){
         int i,j,k,l;mesh->elements(t).Get(i,j,k,l);
         VECTOR<T,3> xi=particles->X(i),xj=particles->X(j),xk=particles->X(k),xl=particles->X(l);

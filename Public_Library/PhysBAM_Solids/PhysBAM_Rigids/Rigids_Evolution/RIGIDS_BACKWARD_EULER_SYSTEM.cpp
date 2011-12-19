@@ -46,7 +46,7 @@ template<class TV> void RIGIDS_BACKWARD_EULER_SYSTEM<TV>::
 Force(const VECTOR_T& V,VECTOR_T& F) const
 {
     INDIRECT_ARRAY<ARRAY_VIEW<TWIST<TV> >,ARRAY<int>&> rigid_V_subset=F.rigid_V.array.Subset(rigid_body_collection.simulated_rigid_body_particles);
-    ARRAYS_COMPUTATIONS::Fill(rigid_V_subset,TWIST<TV>());
+    rigid_V_subset.Fill(TWIST<TV>());
     rigid_body_collection.rigid_body_cluster_bindings.Clamp_Particles_To_Embedded_Velocities(V.rigid_V.array);
     rigid_body_collection.Implicit_Velocity_Independent_Forces(V.rigid_V.array,F.rigid_V.array,dt,current_velocity_time+dt);
     rigid_body_collection.Add_Velocity_Dependent_Forces(V.rigid_V.array,F.rigid_V.array,current_velocity_time+dt);

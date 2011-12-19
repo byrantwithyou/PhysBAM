@@ -174,13 +174,13 @@ Get_Cells_Intersecting_Box(const RANGE<VECTOR<T,1> >& box,ARRAY<BINTREE_CELL<T>*
 template<class T> void BINTREE_GRID<T>::
 Compact_Array_Indices(ARRAY<int>* cell_mapping_array,ARRAY<int>* node_mapping_array,ARRAY<int>* face_mapping_array)
 {
-    if(cell_mapping_array){cell_mapping_array->Resize(number_of_cells,false);ARRAYS_COMPUTATIONS::Fill(*cell_mapping_array,0);number_of_cells=0;
+    if(cell_mapping_array){cell_mapping_array->Resize(number_of_cells,false);cell_mapping_array->Fill(0);number_of_cells=0;
         for(int i=1-number_of_ghost_cells;i<=uniform_grid.numbers_of_cells.x+number_of_ghost_cells;i++)
             cells(i)->Create_Cell_Compaction_Mapping(*cell_mapping_array,number_of_cells);}
-    if(face_mapping_array){face_mapping_array->Resize(number_of_faces,false);ARRAYS_COMPUTATIONS::Fill(*face_mapping_array,0);number_of_faces=0;
+    if(face_mapping_array){face_mapping_array->Resize(number_of_faces,false);face_mapping_array->Fill(0);number_of_faces=0;
         for(int i=1-number_of_ghost_cells;i<=uniform_grid.numbers_of_cells.x+number_of_ghost_cells;i+=2)
                 cells(i)->owner->Create_Face_Compaction_Mapping_Helper(*face_mapping_array,number_of_faces);}
-    if(node_mapping_array){node_mapping_array->Resize(number_of_nodes,false);ARRAYS_COMPUTATIONS::Fill(*node_mapping_array,0);number_of_nodes=0;
+    if(node_mapping_array){node_mapping_array->Resize(number_of_nodes,false);node_mapping_array->Fill(0);number_of_nodes=0;
         for(int i=1-number_of_ghost_cells;i<=uniform_grid.numbers_of_cells.x+number_of_ghost_cells;i+=2)
                 cells(i)->owner->Create_Node_Compaction_Mapping_Helper(*node_mapping_array,number_of_nodes);}
 }
@@ -377,7 +377,7 @@ template<class T> static void Calculate_Cell_Pointer_From_Index_Array_Helper(BIN
 template<class T> void BINTREE_GRID<T>::
 Calculate_Cell_Pointer_From_Index_Array(ARRAY<BINTREE_CELL<T>*>& cell_pointer_from_index) const
 {
-    cell_pointer_from_index.Resize(number_of_cells,false,false);ARRAYS_COMPUTATIONS::Fill(cell_pointer_from_index,(BINTREE_CELL<T>*)0);
+    cell_pointer_from_index.Resize(number_of_cells,false,false);cell_pointer_from_index.Fill((BINTREE_CELL<T>*)0);
     for(int i=1-number_of_ghost_cells;i<=uniform_grid.numbers_of_cells.x+number_of_ghost_cells;i++)
         Calculate_Cell_Pointer_From_Index_Array_Helper(cells(i),cell_pointer_from_index);
 }
@@ -401,7 +401,7 @@ Calculate_Neighbors_Array(ARRAY<VECTOR<BINTREE_CELL<T>*,2> >& neighbors) const
 {
     neighbors.Resize(number_of_cells,false,false);
     ARRAY_VIEW<BINTREE_CELL<T>*> neighbor_view=neighbors.Flattened();
-    ARRAYS_COMPUTATIONS::Fill(neighbor_view,(BINTREE_CELL<T>*)0);
+    neighbor_view.Fill(0);
     MAP_BINTREE_MESH<T>::Map_Faces(uniform_grid,cells,number_of_ghost_cells,&neighbors,Calculate_Neighbors_Array_Helper);
 }
 //#####################################################################
@@ -417,7 +417,7 @@ template<class T> void BINTREE_GRID<T>::
 Calculate_Node_Neighbors_Array(ARRAY<VECTOR<int,2> >& node_neighbors)const
 {
     node_neighbors.Resize(number_of_nodes,false,false);
-    ARRAY_VIEW<int> neighbor_view=node_neighbors.Flattened();ARRAYS_COMPUTATIONS::Fill(neighbor_view,0);
+    ARRAY_VIEW<int> neighbor_view=node_neighbors.Flattened();neighbor_view.Fill(0);
     MAP_BINTREE_MESH<T>::Map_Cells(uniform_grid,cells,number_of_ghost_cells,&node_neighbors,Calculate_Node_Neighbors_Array_Helper);
 }
 //#####################################################################
@@ -426,7 +426,7 @@ Calculate_Node_Neighbors_Array(ARRAY<VECTOR<int,2> >& node_neighbors)const
 template<class T> void BINTREE_GRID<T>::
 Calculate_Fully_Refined_Block_Array(ARRAY<bool>& fully_refined_block) const
 {
-    fully_refined_block.Resize(number_of_cells,false,false);ARRAYS_COMPUTATIONS::Fill(fully_refined_block,false);Neighbors();
+    fully_refined_block.Resize(number_of_cells,false,false);fully_refined_block.Fill(false);Neighbors();
     for(DYADIC_GRID_ITERATOR_CELL<BINTREE_GRID<T> > iterator(*this,number_of_ghost_cells);iterator.Valid();iterator.Next()){
         BINTREE_CELL<T>* cell_pointer=iterator.Cell_Pointer();
         if(cell_pointer->Depth_Of_This_Cell()!=maximum_depth)continue;

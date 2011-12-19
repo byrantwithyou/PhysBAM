@@ -43,7 +43,7 @@ public:
     return region_boundaries.m;}
 
     void Identify_Colors_Touching_Boundary(const int number_of_colors,const ARRAYS_ND_BASE<TV_INT>& colors,const ARRAYS_ND_BASE<VECTOR<bool,1> >& edge_is_blocked_x,ARRAY<bool>& color_touches_boundary)
-    {color_touches_boundary.Resize(number_of_colors);ARRAYS_COMPUTATIONS::Fill(color_touches_boundary,false);
+    {color_touches_boundary.Resize(number_of_colors);color_touches_boundary.Fill(false);
     int left_color=colors(colors.domain.min_corner.x),right_color=colors(colors.domain.max_corner.x);
     if(left_color>0)color_touches_boundary(left_color)=true;
     if(right_color>0)color_touches_boundary(right_color)=true;}    

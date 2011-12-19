@@ -4,7 +4,6 @@
 //#####################################################################
 // Class SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES
 //#####################################################################
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_MIN_MAX.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Log/DEBUG_SUBSTEPS.h>

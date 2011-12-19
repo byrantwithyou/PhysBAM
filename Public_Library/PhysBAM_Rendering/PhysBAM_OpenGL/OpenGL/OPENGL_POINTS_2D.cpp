@@ -125,7 +125,7 @@ Set_Point_Colors(const ARRAY<int> &indices,const OPENGL_COLOR &point_color)
 template<class T,class T_ARRAY> void OPENGL_POINTS_2D<T,T_ARRAY>::
 Reset_Point_Colors()
 {
-    if(point_colors) ARRAYS_COMPUTATIONS::Fill(*point_colors,color);
+    if(point_colors) point_colors->Fill(color);
 }    
 //#####################################################################
 // Function Store_Point_Colors
@@ -136,10 +136,10 @@ Store_Point_Colors(bool store_point_colors)
     if(store_point_colors){
         if(!point_colors){
             point_colors=new ARRAY<OPENGL_COLOR>(points.Size(),false);
-            ARRAYS_COMPUTATIONS::Fill(*point_colors,color);}
+            point_colors->Fill(color);}
         else if(point_colors->m!=points.Size()){
             point_colors->Resize(points.Size());
-            ARRAYS_COMPUTATIONS::Fill(*point_colors,color);}}
+            point_colors->Fill(color);}}
     else{delete point_colors;point_colors=0;}
 }
 //#####################################################################
@@ -162,10 +162,10 @@ Store_Point_Radii(bool store_point_radii)
     if(store_point_radii){
         if(!point_radii){
             point_radii=new ARRAY<T>(points.Size(),false);
-            ARRAYS_COMPUTATIONS::Fill(*point_radii,(T)0);}
+            point_radii->Fill((T)0);}
         else if(point_radii->m!=points.Size()){
             point_radii->Resize(points.Size());
-            ARRAYS_COMPUTATIONS::Fill(*point_radii,(T)0);}}
+            point_radii->Fill((T)0);}}
     else{delete point_radii;point_radii=0;}
 }
 //#####################################################################

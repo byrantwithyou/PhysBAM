@@ -126,7 +126,7 @@ Initialize_Datatypes()
     for(int s=1;s<=(*partition).number_of_sides;s++) if((*partition).neighbor_ranks(s)!=MPI::PROC_NULL){
         if((*partition).boundary_indices(s).m){
             ARRAY<int>& displacements=(*partition).boundary_indices(s);
-            ARRAY<int> block_lengths(displacements.m,false);ARRAYS_COMPUTATIONS::Fill(block_lengths,1);
+            ARRAY<int> block_lengths(displacements.m,false);block_lengths.Fill(1);
             boundary_datatypes(s)=MPI_UTILITIES::Datatype<T>().Create_indexed(displacements.m,&block_lengths(1),&displacements(1)); // TODO: collapse consecutive elements into blocks
             boundary_datatypes(s).Commit();}
         int ghost_indices_length=(*partition).ghost_indices(s).Size()+1;

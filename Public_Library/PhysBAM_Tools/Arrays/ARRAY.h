@@ -109,9 +109,6 @@ public:
     void Compact()
     {if(m<buffer_size) Exact_Resize(m);}
 
-    void Fill(T value)
-    {ARRAYS_COMPUTATIONS::Fill(*this,value);}
-
 private:
     void Resize_Helper(const ID buffer_new,const bool initialize_new_elements=true,const bool copy_existing_elements=true)
     {if(buffer_size==buffer_new) return;assert(m<=buffer_size);

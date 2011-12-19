@@ -74,7 +74,7 @@ void Select_Indys(
         return;
 
     static const int INVALID_INDY_INDEX = 0;
-    ARRAYS_COMPUTATIONS::Fill(indy_index_of_constraint_index,INVALID_INDY_INDEX);
+    indy_index_of_constraint_index.Fill(INVALID_INDY_INDEX);
 
     // Compute the weight of each indyable.
     HASHTABLE< int, SCALAR_TYPE > weight_of_index(3 * n_constraint);

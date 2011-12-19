@@ -48,7 +48,7 @@ template<class TV> MATRIX_FLUID_INTERPOLATION_BASE<TV>::
 template<class TV> void MATRIX_FLUID_INTERPOLATION_BASE<TV>::
 Times(const VECTOR_ND<T>& faces,ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints) const
 {
-    ARRAYS_COMPUTATIONS::Fill(constraints,T());
+    constraints.Fill(T());
     Times_Add(faces,constraints);
 }
 //#####################################################################

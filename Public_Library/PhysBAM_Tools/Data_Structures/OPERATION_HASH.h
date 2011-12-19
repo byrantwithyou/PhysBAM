@@ -24,7 +24,7 @@ public:
 
     void Initialize(const ID m)
     {if(m==operations.Size()){Next_Operation();return;}
-    operations.Resize(m,false,false);ARRAYS_COMPUTATIONS::Fill(operations,(unsigned int)0);current_operation=1;}
+    operations.Resize(m,false,false);operations.Fill((unsigned int)0);current_operation=1;}
     
     void Mark(const ID i)
     {operations(i)=current_operation;}
@@ -36,7 +36,7 @@ public:
     {return operations(i)==current_operation;}
     
     void Next_Operation()
-    {current_operation++;if(current_operation==0){current_operation=1;ARRAYS_COMPUTATIONS::Fill(operations,(unsigned int)0);}} // reset everything if overflow
+    {current_operation++;if(current_operation==0){current_operation=1;operations.Fill((unsigned int)0);}} // reset everything if overflow
 
     void Remove_Duplicates(ARRAY<ID>& list)
     {Next_Operation();

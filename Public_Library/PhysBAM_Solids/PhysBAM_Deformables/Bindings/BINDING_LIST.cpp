@@ -90,8 +90,7 @@ template<class TV> void BINDING_LIST<TV>::
 Compute_Particle_Closure_Based_On_Embedding(ARRAY<int>& particle_set) const
 {
     ARRAY<bool> particle_is_present(particles.array_collection->Size());
-    INDIRECT_ARRAY<ARRAY<bool>,ARRAY<int>&> subset=particle_is_present.Subset(particle_set);
-    ARRAYS_COMPUTATIONS::Fill(subset,true);
+    particle_is_present.Subset(particle_set).Fill(true);
     for(int b=1;b<=bindings.m;b++){BINDING<TV>& binding=*bindings(b);
         if(!particle_is_present.Subset(binding.Parents()).Contains(false) && !particle_is_present(binding.particle_index)) particle_set.Append(binding.particle_index);}
 }

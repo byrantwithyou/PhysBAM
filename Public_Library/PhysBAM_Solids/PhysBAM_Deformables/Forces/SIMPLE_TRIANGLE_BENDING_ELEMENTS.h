@@ -52,13 +52,13 @@ public:
     {print_number_ignored=print_number_ignored_input;}
 
     void Set_Stiffness(const T bending_stiffness_input)
-    {ARRAYS_COMPUTATIONS::Fill(bending_stiffness,bending_stiffness_input);}
+    {bending_stiffness.Fill(bending_stiffness_input);}
 
     void Set_Stiffness(ARRAY_VIEW<const T> bending_stiffness_input)
     {bending_stiffness=bending_stiffness_input;}
 
     void Set_Damping(const T damping_input)
-    {ARRAYS_COMPUTATIONS::Fill(damping,damping_input);}
+    {damping.Fill(damping_input);}
 
     void Set_Damping(ARRAY_VIEW<const T> damping_input)
     {damping=damping_input;}

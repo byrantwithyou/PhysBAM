@@ -5,7 +5,6 @@
 // Class READ_WRITE_MESH_OBJECT
 //#####################################################################
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_MIN_MAX.h>
 #include <PhysBAM_Tools/Read_Write/Arrays/READ_WRITE_ARRAY.h>
 #include <PhysBAM_Tools/Read_Write/Point_Clouds/READ_WRITE_POINT_CLOUD.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
@@ -59,7 +58,7 @@ Read_Helper(std::istream& input,STRUCTURE<TV>& structure_object)
     object.particles.array_collection->Resize(size);
     Read_Binary_Array<RW>(input,object.particles.X.Get_Array_Pointer(),size);
     if(object.mesh.elements.m){
-        int min_index=ARRAYS_COMPUTATIONS::Min(object.mesh.elements.Flattened()),max_index=ARRAYS_COMPUTATIONS::Max(object.mesh.elements.Flattened());
+        int min_index=object.mesh.elements.Flattened().Min(),max_index=object.mesh.elements.Flattened().Max();
         if(min_index<1) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Invalid vertex index %d",min_index));
         if(max_index>object.particles.array_collection->Size()) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Read invalid vertex index %d (particles.array_collection->Size() = %d)",max_index,object.particles.array_collection->Size())); 
         object.Update_Number_Nodes();}

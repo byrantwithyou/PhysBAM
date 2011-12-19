@@ -5,7 +5,6 @@
 // Class TRIANGLE_REPULSIONS
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-#include <PhysBAM_Tools/Arrays_Computations/SUMMATIONS.h>
 #include <PhysBAM_Tools/Data_Structures/OPERATION_HASH.h>
 #include <PhysBAM_Tools/Data_Structures/SPARSE_UNION_FIND.h>
 #include <PhysBAM_Tools/Log/DEBUG_PRINT.h>
@@ -199,7 +198,7 @@ Adjust_Velocity_For_Self_Repulsion(const T dt,bool use_saved_pairs)
         POINT_FACE_REPULSION_PAIR<TV>& pair=point_face_pairs(pair_index);
         T_FACE face(X_self_collision_free.Subset(pair.nodes.Remove_Index(1)));
         face.Point_Face_Interaction_Data(X_self_collision_free(pair.nodes[1]),pair.distance,pair.normal,pair.weights,perform_attractions);
-        INDIRECT_ARRAY<ARRAY<bool>,VECTOR<int,TV::m+1>&> modified_subset=modified_full.Subset(pair.nodes);ARRAYS_COMPUTATIONS::Fill(modified_subset,true);}
+        modified_full.Subset(pair.nodes).Fill(true);}
 
     // TODO: do we need update binding here?
     // TODO: MPI check fragments in super fragment for whether this fragment is in the processor?
@@ -210,7 +209,7 @@ Adjust_Velocity_For_Self_Repulsion(const T dt,bool use_saved_pairs)
         // Note: don't call this, all it does is mess up the normal and has already been called when the pairs are created
         //Edge_Edge_Interaction_Data_Helper(X_self_collision_free,pair,V.Subset(pair.nodes),geometry.small_number);
         INDIRECT_ARRAY<ARRAY<bool>,VECTOR<int,2*TV::m-2>&> modified_subset=modified_full.Subset(pair.nodes);
-        ARRAYS_COMPUTATIONS::Fill(modified_subset,true);}
+        modified_subset.Fill(true);}
 
     int repulsions=Apply_Repulsions_To_Velocities(dt,point_face_pairs,edge_edge_pairs,true,use_saved_pairs);
     LOG::Stat("adjusting velocity for repulsions",repulsions);
@@ -525,9 +524,9 @@ Adjust_Velocity_For_Point_Face_Repulsion(const T dt,const T_ARRAY& pairs,const b
     ARRAY_VIEW<const T> one_over_effective_mass(particles.one_over_effective_mass);
     while(++attempts<=total_attempts){
         impulse_velocities.Resize(particles.array_collection->Size());impulse_velocities=V;
-        pf_target_impulses.Resize(pairs.Size());ARRAYS_COMPUTATIONS::Fill(pf_target_impulses,TV());
-        pf_normals.Resize(pairs.Size());ARRAYS_COMPUTATIONS::Fill(pf_normals,TV());
-        pf_old_speeds.Resize(pairs.Size());ARRAYS_COMPUTATIONS::Fill(pf_old_speeds,T());
+        pf_target_impulses.Resize(pairs.Size());pf_target_impulses.Fill(TV());
+        pf_normals.Resize(pairs.Size());pf_normals.Fill(TV());
+        pf_old_speeds.Resize(pairs.Size());pf_old_speeds.Fill(T());
         LOG::cout<<"Repulsion application step "<<attempts<<std::endl;
 
         for(int pair_index=1;pair_index<=pairs.Size();pair_index++){
@@ -535,8 +534,7 @@ Adjust_Velocity_For_Point_Face_Repulsion(const T dt,const T_ARRAY& pairs,const b
             int p=pair.nodes[1];VECTOR<int,d> face_nodes=pair.nodes.Remove_Index(1);
             if(pair.distance<0) inverted_pairs++;
 
-            INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,d>&> V_subset=V.Subset(face_nodes);
-            TV relative_velocity=V(p)-ARRAYS_COMPUTATIONS::Weighted_Sum(pair.weights,V_subset);
+            TV relative_velocity=V(p)-V.Subset(face_nodes).Weighted_Sum(pair.weights);
             TV direction;T scalar_impulse=Repulsion_Impulse(direction,dt,pair,relative_velocity,elastic_repulsion,friction);
             
             if(scalar_impulse){
@@ -608,9 +606,9 @@ Adjust_Velocity_For_Edge_Edge_Repulsion_Helper(const T dt,const T_ARRAY& pairs,c
     ARRAY_VIEW<const T> one_over_effective_mass(particles.one_over_effective_mass);
     while(++attempts<=total_attempts){
         impulse_velocities.Resize(particles.array_collection->Size());impulse_velocities=V;
-        ee_target_impulses.Resize(pairs.Size());ARRAYS_COMPUTATIONS::Fill(ee_target_impulses,TV());
-        ee_normals.Resize(pairs.Size());ARRAYS_COMPUTATIONS::Fill(ee_normals,TV());
-        ee_old_speeds.Resize(pairs.Size());ARRAYS_COMPUTATIONS::Fill(ee_old_speeds,T());
+        ee_target_impulses.Resize(pairs.Size());ee_target_impulses.Fill(TV());
+        ee_normals.Resize(pairs.Size());ee_normals.Fill(TV());
+        ee_old_speeds.Resize(pairs.Size());ee_old_speeds.Fill(T());
 
         for(int pair_index=1;pair_index<=pairs.Size();pair_index++){
             const EDGE_EDGE_REPULSION_PAIR<TV>& pair=pairs(pair_index);
@@ -694,7 +692,7 @@ Scale_And_Apply_Point_Face_Impulses(const T_ARRAY& pairs)
         const VECTOR<int,d+1>& nodes=pair.nodes;
         // Compute actual new relative_speed
         int p=nodes[1];VECTOR<int,d> face_nodes=nodes.Remove_Index(1);
-        T relative_speed=TV::Dot_Product(impulse_velocities(p)-ARRAYS_COMPUTATIONS::Weighted_Sum(pair.weights,impulse_velocities.Subset(face_nodes)),pf_normals(i));
+        T relative_speed=TV::Dot_Product(impulse_velocities(p)-impulse_velocities.Subset(face_nodes).Weighted_Sum(pair.weights),pf_normals(i));
         if(relative_speed*pf_old_speeds(i)<0){
             T new_scale=-(relative_speed-pf_old_speeds(i))/pf_old_speeds(i);
             pf_target_impulses(i)/=new_scale;}} // TODO: should we be doing this, or storing a maximum scale factor at each node?

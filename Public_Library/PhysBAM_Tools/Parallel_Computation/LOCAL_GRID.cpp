@@ -44,9 +44,9 @@ Initialize()
     PHYSBAM_ASSERT((grid.Node(local_offset)-global_grid.Node(global_offset)).Magnitude()<(T).01*grid.Minimum_Edge_Length(),"mismatch between global and local grids");
     // pretend there are neighbors on all sides for use in Find_Boundary_Regions
     mpi_grid.side_neighbor_ranks.Resize(T_GRID::number_of_neighbors_per_cell);
-    ARRAYS_COMPUTATIONS::Fill(mpi_grid.side_neighbor_ranks,1);
+    mpi_grid.side_neighbor_ranks.Fill(1);
     mpi_grid.all_neighbor_ranks.Resize(T_GRID::number_of_one_ring_neighbors_per_cell);
-    ARRAYS_COMPUTATIONS::Fill(mpi_grid.all_neighbor_ranks,1);
+    mpi_grid.all_neighbor_ranks.Fill(1);
     ARRAY<RANGE<TV_INT> > regions;
     mpi_grid.Find_Boundary_Regions(regions,RANGE<TV_INT>::Zero_Box(),true,RANGE<VECTOR<int,1> >(-5,-5),true);
     RANGE<TV_INT> global_region=global_grid.Domain_Indices();

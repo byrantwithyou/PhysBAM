@@ -69,7 +69,7 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
 {
     const KRYLOV_VECTOR_T& V=debug_cast<const KRYLOV_VECTOR_T&>(BV);KRYLOV_VECTOR_T& F=debug_cast<KRYLOV_VECTOR_T&>(BF);
     // get x values from solid
-    ARRAYS_COMPUTATIONS::Fill(solid_velocity.V,TV());ARRAYS_COMPUTATIONS::Fill(solid_velocity.rigid_V,TWIST<TV>());
+    solid_velocity.V.Fill(TV());solid_velocity.rigid_V.Fill(TWIST<TV>());
     C_f_transpose.Times(V.v,fluid_velocities_size_vector);
     fluid_velocities_size_vector*=M_inverse;
     C_f.Times(fluid_velocities_size_vector,F.v);

@@ -84,7 +84,7 @@ void FLOOD_FILL_3D::
 Identify_Colors_Touching_Boundary(const int number_of_colors,const ARRAYS_ND_BASE<TV_INT>& colors,const ARRAYS_ND_BASE<VECTOR<bool,3> >& edge_is_blocked_x,
     const ARRAYS_ND_BASE<VECTOR<bool,3> >& edge_is_blocked_y,const ARRAYS_ND_BASE<VECTOR<bool,3> >& edge_is_blocked_z,ARRAY<bool>& color_touches_boundary)
 {
-    color_touches_boundary.Resize(number_of_colors);ARRAYS_COMPUTATIONS::Fill(color_touches_boundary,false);
+    color_touches_boundary.Resize(number_of_colors);color_touches_boundary.Fill(false);
     for(int j=colors.domain.min_corner.y;j<=colors.domain.max_corner.y;j++) for(int k=colors.domain.min_corner.z;k<=colors.domain.max_corner.z;k++){ // left and right faces
         int left_color=colors(colors.domain.min_corner.x ,j,k),right_color=colors(colors.domain.max_corner.x,j,k);
         if(left_color>0) color_touches_boundary(left_color)=true;
@@ -103,7 +103,7 @@ Identify_Colors_Touching_Color(const int color,const int number_of_colors,const 
     const ARRAYS_ND_BASE<VECTOR<bool,3> >& edge_is_blocked_y,const ARRAYS_ND_BASE<VECTOR<bool,3> >& edge_is_blocked_z,ARRAY<bool>& color_touches_color)
 {
     color_touches_color.Resize(number_of_colors);
-    ARRAYS_COMPUTATIONS::Fill(color_touches_color,false);
+    color_touches_color.Fill(false);
     for(int i=colors.domain.min_corner.x ;i<=colors.domain.max_corner.x;i++) for(int j=colors.domain.min_corner.y;j<=colors.domain.max_corner.y;j++)
         for(int k=colors.domain.min_corner.z;k<=colors.domain.max_corner.z;k++) if(colors(i,j,k)==color){
             if(i>colors.domain.min_corner.x &&!edge_is_blocked_x(i,j,k)&&colors(i-1,j,k)>0) color_touches_color(colors(i-1,j,k))=true;

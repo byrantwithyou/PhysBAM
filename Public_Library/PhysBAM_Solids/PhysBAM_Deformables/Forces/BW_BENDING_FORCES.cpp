@@ -49,7 +49,7 @@ BW_BENDING_FORCES(PARTICLES<TV>& particles,TRIANGLE_MESH& triangle_mesh_input,co
 
     states.Resize(number_quadruples,false,false);
     bending_states.Resize(number_quadruples,false,false);
-    ARRAY<bool> particle_is_simulated(particles.array_collection->Size());ARRAYS_COMPUTATIONS::Fill(particle_is_simulated,true);
+    ARRAY<bool> particle_is_simulated(particles.array_collection->Size());particle_is_simulated.Fill(true);
     Update_Mpi(particle_is_simulated,0);
     for(CONSTRAINT_ITERATOR iterator(force_simplices);iterator.Valid();iterator.Next()){int q=iterator.Data();
         int x2,x1,x0,x3;constraint_particles(q).Get(x2,x1,x0,x3);

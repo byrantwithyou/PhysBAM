@@ -192,7 +192,7 @@ template<class TV>
 void Random_Scene_Generator(const std::string& filename,const int number_objects,const int random_seed,RANDOM_PLACEMENT<TV>& random_placement,
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection,RIGIDS_STANDARD_TESTS<TV>& tests)
 {
-    ARRAY<std::string> filenames(number_objects);ARRAYS_COMPUTATIONS::Fill(filenames,filename);
+    ARRAY<std::string> filenames(number_objects);filenames.Fill(filename);
     Random_Scene_Generator(filenames,random_seed,random_placement,rigid_body_collection,tests);
 }
 

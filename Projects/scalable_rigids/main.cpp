@@ -61,7 +61,7 @@ SPARSE_MATRIX_FLAT_MXN<T> Build_Smoothed_Aggregation_Interpolation(const SPARSE_
     ARRAY<ARRAY<int> > aggregates;
 
     ARRAY<int> parent_set(n);
-    ARRAYS_COMPUTATIONS::Fill(parent_set,-1);
+    parent_set.Fill(-1);
     for(int i=1;i<=n;i++)
     {
         T row_magnitude=0;
@@ -94,7 +94,7 @@ SPARSE_MATRIX_FLAT_MXN<T> Build_Smoothed_Aggregation_Interpolation(const SPARSE_
 
     SPARSE_MATRIX_FLAT_MXN<T> aggregator;
     ARRAY<int> aggregator_row_counts(n);
-    ARRAYS_COMPUTATIONS::Fill(aggregator_row_counts,1);
+    aggregator_row_counts.Fill(1);
     aggregator.Set_Row_Lengths(aggregator_row_counts);
     aggregator.n=n_aggregates;
 

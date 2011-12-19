@@ -82,7 +82,7 @@ Initialize_Rest_State_To_Equilateral(const T side_length)
 {
     Dm_inverse.Resize(mesh.elements.m,false,false);
     UPPER_TRIANGULAR_MATRIX<T,d> Dm=side_length*Equilateral_Dm(VECTOR<T,d>());
-    ARRAYS_COMPUTATIONS::Fill(Dm_inverse,Dm.Inverse());
+    Dm_inverse.Fill(Dm.Inverse());
 }
 //#####################################################################
 // Function Print_Altitude_Statistics

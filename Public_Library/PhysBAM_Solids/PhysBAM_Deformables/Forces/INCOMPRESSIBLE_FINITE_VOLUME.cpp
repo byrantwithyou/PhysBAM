@@ -112,7 +112,7 @@ Update_Position_Based_State(const T time,const bool is_position_update)
 
     volumes_full.Resize(particles.array_collection->Size(),false,false);
     INDIRECT_ARRAY<ARRAY<T>,ARRAY_VIEW<int>&> volumes_subset=volumes_full.Subset(strain_measure.mesh.elements.Flattened());
-    ARRAYS_COMPUTATIONS::Fill(volumes_subset,(T)0);
+    volumes_subset.Fill((T)0);
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
         volumes_full.Subset(strain_measure.mesh.elements(t))+=element_volumes(t);}
 
@@ -130,7 +130,7 @@ Update_Position_Based_State(const T time,const bool is_position_update)
             rest_volumes_full(p)=volumes_full(p);}}
 
         // TODO(jontg): Make it work bleh.
-    //if(!mpi_solids) LOG::cout<<"boundary volume: "<<ARRAYS_COMPUTATIONS::Sum(rest_volumes_full.Subset(*strain_measure.mesh.boundary_nodes))<<std::endl;
+    //if(!mpi_solids) LOG::cout<<"boundary volume: "<<rest_volumes_full.Subset(*strain_measure.mesh.boundary_nodes).Sum()<<std::endl;
 
     Update_Preconditioner();
 }
@@ -213,12 +213,12 @@ Make_Incompressible(const T dt,const bool correct_volume)
         if(TV::m!=d) PHYSBAM_FATAL_ERROR();
         gradient_full.Resize(particles.array_collection->Size(),false,false);
         INDIRECT_ARRAY<ARRAY<TV>,ARRAY<int>&> gradient_subset=gradient_full.Subset(force_dynamic_particles_list);
-        ARRAYS_COMPUTATIONS::Fill(gradient_subset,TV());
+        gradient_subset.Fill(TV());
         T_BOUNDARY_MESH& boundary_mesh=*strain_measure.mesh.boundary_mesh;
         for(ELEMENT_ITERATOR iterator(force_boundary_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
             VECTOR<int,d>& element=boundary_mesh.elements(t);
             INDIRECT_ARRAY<ARRAY<T>,VECTOR<int,d>&> boundary_pressures_subset=boundary_pressures.Subset(element);
-            T p_sum=ARRAYS_COMPUTATIONS::Sum(boundary_pressures_subset);
+            T p_sum=boundary_pressures_subset.Sum();
             for(int i=1;i<=d;i++) gradient_full(element[i])-=(p_sum+boundary_pressures(element[i]))*boundary_normals(t);}
         for(ELEMENT_ITERATOR iterator(force_dynamic_particles);iterator.Valid();iterator.Next()){int p=iterator.Data();
             particles.V(p)+=particles.one_over_mass(p)*gradient_full(p);}}
@@ -241,7 +241,7 @@ Make_Incompressible(const T dt,const bool correct_volume)
         cg_s(cg_s_full,force_dynamic_particles_list),cg_r(cg_r_full,force_dynamic_particles_list);
     cg_t_full.Resize(particles.array_collection->Size(),false,false);
     KRYLOV_VECTOR_T cg_t(cg_t_full,force_dynamic_particles_list);
-    ARRAYS_COMPUTATIONS::Fill(pressure.v,(T)0);
+    pressure.v.Fill((T)0);
 
     {CONJUGATE_RESIDUAL<T> cr;
     INDIRECT_ARRAY<ARRAY<T> > diagonal_preconditioner(diagonal_preconditioner_full,force_dynamic_particles_list);
@@ -276,8 +276,8 @@ Test_System()
     INDIRECT_ARRAY<ARRAY_VIEW<TV> > X(particles.X,fragment_dynamic_particles),V(particles.V,fragment_dynamic_particles);
     INDIRECT_ARRAY<ARRAY<TV> > gradient(gradient_full,fragment_dynamic_particles);
     ARRAY<T> old_volumes(volumes);
-    INDIRECT_ARRAY<ARRAY_VIEW<TV>,ARRAY<int>&> V_subset=particles.V.Subset(fragment_particles);ARRAYS_COMPUTATIONS::Fill(V_subset,TV());
-    INDIRECT_ARRAY<ARRAY<T>,ARRAY<int>&> pressure_subset=pressure_full.Subset(fragment_particles);ARRAYS_COMPUTATIONS::Fill(pressure_subset,T());
+    particles.V.Subset(fragment_particles).Fill(TV());
+    pressure_full.Subset(fragment_particles).Fill(T());
 
     T dt=(T)1e-3;
     POISSON_SYSTEM<TV,d> system(*this);
@@ -341,11 +341,11 @@ Gradient(ARRAY_VIEW<const T> p,ARRAY<TV>& gradient) const
     ARRAY_VIEW<T> modifiable_p(p.Const_Cast());
     if(mpi_solids) mpi_solids->Exchange_Force_Boundary_Data(modifiable_p);
     gradient.Resize(particles.array_collection->Size(),false,false);
-    INDIRECT_ARRAY<ARRAY<TV>,ARRAY<int>&> gradient_subset=gradient.Subset(force_dynamic_particles_list);ARRAYS_COMPUTATIONS::Fill(gradient_subset,TV());
+    gradient.Subset(force_dynamic_particles_list).Fill(TV());
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
         VECTOR<int,d+1>& element=strain_measure.mesh.elements(t);
         INDIRECT_ARRAY<ARRAY_VIEW<const T>,VECTOR<int,d+1>&> p_subset=p.Subset(element);
-        strain_measure.Distribute_Force(gradient,element,Bs_per_node(t)*-ARRAYS_COMPUTATIONS::Sum(p_subset));}
+        strain_measure.Distribute_Force(gradient,element,Bs_per_node(t)*-p_subset.Sum());}
 }
 //#####################################################################
 // Function Negative_Divergence
@@ -356,7 +356,7 @@ Negative_Divergence(ARRAY_VIEW<const TV> V,ARRAY<T>& divergence) const
     if(mpi_solids) mpi_solids->Exchange_Force_Boundary_Data(V.Const_Cast());
     divergence.Resize(particles.array_collection->Size(),false,false);
     INDIRECT_ARRAY<ARRAY<T>,ARRAY<int>&> divergence_subset=divergence.Subset(force_dynamic_particles_list);
-    ARRAYS_COMPUTATIONS::Fill(divergence_subset,T());
+    divergence_subset.Fill(T());
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
         VECTOR<int,d+1>& element=strain_measure.mesh.elements(t);
         T divergence_per_node=T_MATRIX::Inner_Product(Bs_per_node(t),strain_measure.Ds(V,t));
@@ -373,7 +373,7 @@ Diagonal_Elements(ARRAY<T>& D) const
     for(ELEMENT_ITERATOR iterator(force_dynamic_particles);iterator.Valid();iterator.Next()){int p=iterator.Data();
         D(p)=T();
         INDIRECT_ARRAY<ARRAY<TV>,ARRAY<int>&> forces_subset=forces.Subset(node_regions(p));
-        ARRAYS_COMPUTATIONS::Fill(forces_subset,TV());
+        forces_subset.Fill(TV());
         for(int j=1;j<=incident_elements(p).m;j++){int t=incident_elements(p)(j);
             strain_measure.Distribute_Force(forces,strain_measure.mesh.elements(t),-Bs_per_node(t));}
         forces.Subset(node_regions(p))*=particles.one_over_mass.Subset(node_regions(p));
@@ -436,13 +436,13 @@ Set_Neumann_Boundary_Conditions(const ARRAY<COLLISION_PARTICLE_STATE<TV> >* part
 
     neumann_boundary_count.Resize(particles.array_collection->Size());
     // TODO: Unnecessarily expensive
-    ARRAYS_COMPUTATIONS::Fill(neumann_boundary_count,0);
+    neumann_boundary_count.Fill(0);
     // TODO: Assuming we are created new simplifies this a little.
     projection_data.point_face_pairs.Remove_All();
     projection_data.edge_edge_pairs.Remove_All();
     projection_data.neumann_boundary_nodes.Remove_All();
     // TODO: Unnecessarily expensive
-    projection_data.neumann_boundary_normals.Resize(particles.array_collection->Size());ARRAYS_COMPUTATIONS::Fill(projection_data.neumann_boundary_normals,TV());
+    projection_data.neumann_boundary_normals.Resize(particles.array_collection->Size());projection_data.neumann_boundary_normals.Fill(TV());
 
     if(particle_states && use_rigid_clamp_projection)
         for(ELEMENT_ITERATOR inner_iterator(force_dynamic_particles);inner_iterator.Valid();inner_iterator.Next()){int p=inner_iterator.Data();
@@ -501,10 +501,10 @@ Check_Improvement()
     const INDIRECT_ARRAY<const ARRAY<T> > volumes(volumes_full.Subset(force_dynamic_particles_list));
     const INDIRECT_ARRAY<const ARRAY<T> > saved_volumes(saved_volumes_full.Subset(force_dynamic_particles_list));
     const INDIRECT_ARRAY<const ARRAY<T> > rest_volumes(rest_volumes_full.Subset(force_dynamic_particles_list));
-    T new_total_volume=ARRAYS_COMPUTATIONS::Sum(volumes);
+    T new_total_volume=volumes.Sum();
     if(mpi_solids) new_total_volume=mpi_solids->Reduce_Add_Global(new_total_volume);
     new_total_volume_accumulated+=new_total_volume;
-    T old_total_volume=ARRAYS_COMPUTATIONS::Sum(saved_volumes);
+    T old_total_volume=saved_volumes.Sum();
     if(mpi_solids) old_total_volume=mpi_solids->Reduce_Add_Global(old_total_volume);
     old_total_volume_accumulated+=old_total_volume;
     if(volumes.Size()!=rest_volumes.Size() || volumes.Size()!=saved_volumes.Size()){LOG::cout<<"Volume arrays have different sizes!"<<std::endl;PHYSBAM_FATAL_ERROR();}

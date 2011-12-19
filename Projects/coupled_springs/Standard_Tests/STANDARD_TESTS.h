@@ -17,7 +17,6 @@
 #define __STANDARD_TESTS__
 
 #include <PhysBAM_Tools/Arrays_Computations/ARRAY_COPY.h>
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_MIN_MAX.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <PhysBAM_Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <PhysBAM_Tools/Log/DEBUG_PRINT.h>
@@ -518,10 +517,10 @@ void Spring_Cloth()
         if(j<grid_n) segmented_curve->mesh.elements.Append(VECTOR<int,2>((i-1)*grid_n+j,(i-1)*grid_n+j+1));}
 
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
-    ARRAYS_COMPUTATIONS::Fill(particles.mass,(T)1);
+    particles.mass.Fill((T)1);
     particles.Compute_Auxiliary_Attributes(soft_bindings);
     ARRAY<T> restlength(grid_m*(grid_n-1)+(grid_m-1)*grid_n);
-    ARRAYS_COMPUTATIONS::Fill(restlength,(T)5);
+    restlength.Fill((T)5);
     LINEAR_SPRINGS<TV>* spring=new LINEAR_SPRINGS<TV>(particles,segmented_curve->mesh,fully_implicit);
     spring->Set_Restlength(restlength);
     spring->Set_Stiffness(arg_ks);
@@ -547,14 +546,14 @@ void Particle_Impulse_Chain()
         particles.X(i)=TV(2*i-2,0,0);
         if(i<grid_m) segmented_curve->mesh.elements.Append(VECTOR<int,2>(i,i+1));}
 
-    ARRAYS_COMPUTATIONS::Fill(particles.mass,(T)1);
+    particles.mass.Fill((T)1);
     particles.mass(1)=FLT_MAX;
     particles.mass(grid_m)=FLT_MAX;
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
     particles.Compute_Auxiliary_Attributes(soft_bindings);soft_bindings.Set_Mass_From_Effective_Mass();
 
     ARRAY<T> restlength(grid_m-1);
-    ARRAYS_COMPUTATIONS::Fill(restlength,(T)2);
+    restlength.Fill((T)2);
     LINEAR_SPRINGS<TV>* spring=new LINEAR_SPRINGS<TV>(particles,segmented_curve->mesh,fully_implicit);
     spring->Set_Restlength(restlength);
     spring->Set_Stiffness(arg_ks);

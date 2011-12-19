@@ -11,7 +11,7 @@ Read(std::istream& input,SIMPLEX_MESH<d>& object)
     object.Clean_Memory();
     int backward_compatible;Read_Binary<RW>(input,object.number_nodes,backward_compatible,object.elements);
     if(object.elements.m){
-        int min_index=ARRAYS_COMPUTATIONS::Min(object.elements.Flattened()),max_index=ARRAYS_COMPUTATIONS::Min(object.elements.Flattened());
+        int min_index=object.elements.Flattened().Min(),max_index=object.elements.Flattened().Min();
         if(object.number_nodes<0) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Invalid negative number_nodes = %d",object.number_nodes));
         if(min_index<1) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Invalid vertex index %d",min_index));
         if(max_index>object.number_nodes) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Invalid vertex index %d (number_nodes = %d)",min_index,object.number_nodes));}

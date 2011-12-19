@@ -372,7 +372,7 @@ void Balloon()
     ARRAY<int> deletion_list; // List of deleted triangles
     ARRAY<bool> is_constrained;
     is_constrained.Resize(triangulated_surface.particles.array_collection->Size());
-    ARRAYS_COMPUTATIONS::Fill(is_constrained,false);
+    is_constrained.Fill(false);
 
     for(int i=1;i<=triangulated_surface.mesh.elements.m;++i){
         const TRIANGLE_3D<T>& triangle=triangulated_surface.Get_Element(i);

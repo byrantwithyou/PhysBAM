@@ -47,7 +47,7 @@ Initialize_Sample_Locations_From_Vertices(const TRIANGULATED_SURFACE<T>& triangu
 {
     const bool half_samples=false;
     if(half_samples){
-        ARRAY<int> points;ARRAY<bool> done(triangulated_surface.mesh.elements.m,false);ARRAYS_COMPUTATIONS::Fill(done,false);
+        ARRAY<int> points;ARRAY<bool> done(triangulated_surface.mesh.elements.m,false);done.Fill(false);
         TRIANGLE_MESH& mesh=triangulated_surface.mesh;GEOMETRY_PARTICLES<VECTOR<T,3> >& particles=triangulated_surface.particles;
         mesh.Initialize_Incident_Elements();
         for(int i=1;i<=triangulated_surface.particles.array_collection->Size();i++){

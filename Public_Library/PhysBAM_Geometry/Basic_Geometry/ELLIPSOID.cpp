@@ -3,7 +3,6 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Arrays_Computations/SUMMATIONS.h>
 #include <PhysBAM_Tools/Math_Tools/max.h>
 #include <PhysBAM_Tools/Math_Tools/min.h>
 #include <PhysBAM_Geometry/Basic_Geometry/ELLIPSOID.h>
@@ -70,7 +69,7 @@ Approximate_Signed_Distance(const TV& location) const
 template<class T> template<class T_ARRAY_TV> ELLIPSOID<T> ELLIPSOID<T>::
 Covariance_Ellipsoid(const T_ARRAY_TV& points)
 {
-    TV average=ARRAYS_COMPUTATIONS::Average(points);
+    TV average=points.Average();
     SYMMETRIC_MATRIX<T,3> covariance;DIAGONAL_MATRIX<T,3> eigenvalues;MATRIX<T,3> eigenvectors;
     for(int p=1;p<=points.m;p++){
         TV variance=points(p)-average;

@@ -6,7 +6,6 @@
 //##################################################################### 
 #include <PhysBAM_Tools/Arrays/CONSTANT_ARRAY.h>
 #include <PhysBAM_Tools/Arrays_Computations/DOT_PRODUCT.h>
-#include <PhysBAM_Tools/Arrays_Computations/SUMMATIONS.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Tools/Read_Write/Octave/OCTAVE_OUTPUT.h>
 #include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
@@ -43,12 +42,12 @@ Compute(const T dt_input,const T current_velocity_time_input)
     dt=dt_input;
     current_velocity_time=current_velocity_time_input;
 
-    force_dof_counts.Resize(solid_body_collection.deformable_body_collection.deformables_forces.m);ARRAYS_COMPUTATIONS::Fill(force_dof_counts,0);
+    force_dof_counts.Resize(solid_body_collection.deformable_body_collection.deformables_forces.m);force_dof_counts.Fill(0);
     for(int k=1;k<=solid_body_collection.deformable_body_collection.deformables_forces.m;k++) if(solid_body_collection.deformable_body_collection.deformables_forces(k)->use_velocity_dependent_forces){
         PHYSBAM_ASSERT(solid_body_collection.deformable_body_collection.deformables_forces(k)->compute_half_forces);
         force_dof_counts(k)=solid_body_collection.deformable_body_collection.deformables_forces(k)->Velocity_Dependent_Forces_Size();}
 
-    total_force_dof=FORCE_AGGREGATE_ID(ARRAYS_COMPUTATIONS::Sum(force_dof_counts));
+    total_force_dof=FORCE_AGGREGATE_ID(force_dof_counts.Sum());
 }
 //#####################################################################
 // Function Times_Add
@@ -71,7 +70,7 @@ Times_Add(const GENERALIZED_VELOCITY<TV>& solid_velocities,ARRAY<T,FORCE_AGGREGA
 template<class TV> void MATRIX_SOLID_FORCES<TV>::
 Times(const GENERALIZED_VELOCITY<TV>& solid_velocities,ARRAY<T,FORCE_AGGREGATE_ID>& force_coefficients) const
 {
-    ARRAYS_COMPUTATIONS::Fill(force_coefficients,T());
+    force_coefficients.Fill(T());
     Times_Add(solid_velocities,force_coefficients);
 }
 //#####################################################################
@@ -89,9 +88,9 @@ template<class TV> void MATRIX_SOLID_FORCES<TV>::
 Transpose_Times(const ARRAY<T,FORCE_AGGREGATE_ID>& force_coefficients,GENERALIZED_VELOCITY<TV>& solid_velocities) const
 {
     // TODO: Careful to zero out enough of the solids state.
-    ARRAYS_COMPUTATIONS::Fill(solid_velocities.V,TV());
-    ARRAYS_COMPUTATIONS::Fill(solid_velocities.rigid_V,TWIST<TV>());
-    ARRAYS_COMPUTATIONS::Fill(solid_velocities.kinematic_and_static_rigid_V,TWIST<TV>());
+    solid_velocities.V.Fill(TV());
+    solid_velocities.rigid_V.Fill(TWIST<TV>());
+    solid_velocities.kinematic_and_static_rigid_V.Fill(TWIST<TV>());
     Transpose_Times_Add(force_coefficients,solid_velocities);
     //if(mpi_solids) mpi_solids->Exchange_Binding_Boundary_Data(F.V.array);
     //solid_body_collection.binding_list.Distribute_Force_To_Parents(F.V.array,F.rigid_V.array);

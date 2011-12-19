@@ -368,21 +368,21 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 //#####################################################################
 void Set_Deformable_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated) PHYSBAM_OVERRIDE
 {
-    INDIRECT_ARRAY<ARRAY<bool>,ARRAY<int>&> subset=particle_is_simulated.Subset(bound_particles);ARRAYS_COMPUTATIONS::Fill(subset,false);
+    particle_is_simulated.Subset(bound_particles).Fill(false);
 }
 //#####################################################################
 // Function Set_External_Velocities
 //#####################################################################
 void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE 
 {
-    INDIRECT_ARRAY<ARRAY_VIEW<TV>,ARRAY<int>&> subset=V.Subset(bound_particles);ARRAYS_COMPUTATIONS::Fill(subset,TV());
+    V.Subset(bound_particles).Fill(TV());
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes
 //#####################################################################
 void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE 
 {
-    INDIRECT_ARRAY<ARRAY_VIEW<TV>,ARRAY<int>&> subset=V.Subset(bound_particles);ARRAYS_COMPUTATIONS::Fill(subset,TV());
+    V.Subset(bound_particles).Fill(TV());
 }
 //#####################################################################
 // Function Postprocess_Substep

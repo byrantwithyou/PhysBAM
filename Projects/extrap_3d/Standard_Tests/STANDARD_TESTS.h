@@ -138,6 +138,7 @@ public:
     T stretch;
     T hole;
     bool nobind;
+    ARRAY<TV> fish_V;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),semi_implicit(false),test_forces(false),use_extended_neohookean(false),
@@ -631,12 +632,42 @@ if (with_hand)
             curve.Add_Control_Point(0,FRAME<TV>(TV(0,0.5,-10)));
             curve.Add_Control_Point(20,FRAME<TV>(TV(0,0.5,90)));
 
-            RIGID_BODY<TV>& box1=tests.Add_Analytic_Sphere(0.065,density,5);
-            box1.X() = TV(0.27,0.645,-0.12);
-            RIGID_BODY<TV>& box2=tests.Add_Analytic_Sphere(0.065,density,5);
-            box2.X() = TV(-0.275,0.605,-0.18);
-            RIGID_BODY<TV>& box3=tests.Add_Analytic_Box(TV(0.5,0.06,0.5));
-            box3.X() = TV(-0.024,0.03,0.1);
+            RIGID_BODY<TV>& ball1=tests.Add_Analytic_Sphere(0.065,density,6);
+            ball1.X() = TV(0.27,0.645,-0.12);
+            RIGID_BODY<TV>& ball2=tests.Add_Analytic_Sphere(0.065,density,6);
+            ball2.X() = TV(-0.275,0.605,-0.18);
+            RIGID_BODY<TV>& box1=tests.Add_Analytic_Box(TV(0.4,0.06,0.4));
+            box1.X() = TV(-0.024,0.03,0.1);
+            RIGID_BODY<TV>& cylinder1=tests.Add_Analytic_Cylinder(0.4,0.06,196);
+            cylinder1.X() = TV(-0.024,0,0.1)+TV(0.2,0,0);
+            RIGID_BODY<TV>& cylinder2=tests.Add_Analytic_Cylinder(0.4,0.06,196);
+            cylinder2.X() = TV(-0.024,0,0.1)+TV(-0.2,0,0);
+            RIGID_BODY<TV>& cylinder3=tests.Add_Analytic_Cylinder(0.4,0.06,196);
+            cylinder3.X() = TV(-0.024,0,0.1)+TV(0,0,0.2);
+            cylinder3.Rotation() = ROTATION<TV>((T)pi/2,TV(0,1,0));
+            RIGID_BODY<TV>& cylinder4=tests.Add_Analytic_Cylinder(0.4,0.06,196);
+            cylinder4.X() = TV(-0.024,0,0.1)+TV(0,0,-0.2);
+            cylinder4.Rotation() = ROTATION<TV>((T)pi/2,TV(0,1,0));
+            RIGID_BODY<TV>& sphere1=tests.Add_Analytic_Sphere(0.06,density,6);
+            sphere1.X() = TV(-0.024,0,0.1)+TV(0.2,0,0.2);
+            RIGID_BODY<TV>& sphere2=tests.Add_Analytic_Sphere(0.06,density,6);
+            sphere2.X() = TV(-0.024,0,0.1)+TV(0.2,0,-0.2);
+            RIGID_BODY<TV>& sphere3=tests.Add_Analytic_Sphere(0.06,density,6);
+            sphere3.X() = TV(-0.024,0,0.1)+TV(-0.2,0,0.2);
+            RIGID_BODY<TV>& sphere4=tests.Add_Analytic_Sphere(0.06,density,6);
+            sphere4.X() = TV(-0.024,0,0.1)+TV(-0.2,0,-0.2);
+
+            ball1.is_static = true;
+            ball2.is_static = true;
+            box1.is_static = true;
+            cylinder1.is_static = true;
+            cylinder2.is_static = true;
+            cylinder3.is_static = true;
+            cylinder4.is_static = true;
+            sphere1.is_static = true;
+            sphere2.is_static = true;
+            sphere3.is_static = true;
+            sphere4.is_static = true;
             
             break;}
 
@@ -777,7 +808,7 @@ if (with_hand)
         }
         case 39:
         {
-            RIGID_BODY_STATE<TV> initial_state1(FRAME<TV>(TV(0.075,0.3,0.095),ROTATION<TV>(T(pi/0.103),TV(1.35,0.785,1.675))));
+            RIGID_BODY_STATE<TV> initial_state1(FRAME<TV>(TV(0.07,0.3,0.09),ROTATION<TV>(T(pi/0.103),TV(1.35,0.785,1.675))));
             RIGID_BODY_STATE<TV> initial_state2(FRAME<TV>(TV(0,0.01,0)));
             tests.Create_Mattress(mattress_grid,true,&initial_state1);
             tests.Create_Mattress(mattress_grid,true,&initial_state2);
@@ -786,8 +817,8 @@ if (with_hand)
         }
         case 40:
         {
-            jello_centers.Append(TV(-0.266,0.017,0.013)); 
-            jello_centers.Append(TV(0.266,0.0260,-0.013));
+            jello_centers.Append(TV(-0.266,0.022,0.013)); 
+            jello_centers.Append(TV(0.266, 0.029,-0.013));
             RIGID_BODY_STATE<TV> initial_state1(FRAME<TV>(jello_centers(1),ROTATION<TV>(T(pi/0.13),TV(1.3,1.5,0.7))));
             RIGID_BODY_STATE<TV> initial_state2(FRAME<TV>(jello_centers(2),ROTATION<TV>(T(pi/0.076),TV(0.7,1,0.1))));
             tests.Create_Mattress(mattress_grid,true,&initial_state1);
@@ -1688,11 +1719,23 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
     }
     if(test_number==31)
     {
+        TETRAHEDRALIZED_VOLUME<T>& tet_volume = solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+        FINITE_VOLUME<TV,3>& fvm = solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
+
+        int number_of_vertices = solid_body_collection.deformable_body_collection.collisions.check_collision.m;
+        for (int i=1; i<=number_of_vertices; i++) solid_body_collection.deformable_body_collection.collisions.check_collision(i)=true;
+
+        for(int t=1;t<=fvm.Fe_hat.m;t++)
+            if(fvm.Fe_hat(t).x11>=3)
+                for (int i=1; i<=4; i++)
+                    if (solid_body_collection.deformable_body_collection.particles.X(tet_volume.mesh.elements(t)(i)).y <= 0.06)
+                        solid_body_collection.deformable_body_collection.collisions.check_collision(tet_volume.mesh.elements(t)(i))=false;
+
         int number_of_constrained_particles = constrained_particles.m;
         for (int i=1; i<=number_of_constrained_particles; i++)
             solid_body_collection.deformable_body_collection.collisions.check_collision(constrained_particles(i))=false;
     }
-
+    if(test_number==51) fish_V=solid_body_collection.deformable_body_collection.particles.V;
 }
 //#####################################################################
 // Function Update_Time_Varying_Material_Properties
@@ -1724,6 +1767,7 @@ void Update_Time_Varying_Material_Properties(const T time)
 //#####################################################################
 void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
 {
+    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     if (dump_sv)
     {
         FINITE_VOLUME<TV,3>& force_field = solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
@@ -1734,6 +1778,7 @@ void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
             svout << sv(i).x11 << " " << sv(i).x22 << " " << sv(i).x33 << std::endl;
         }
     }
+    if(test_number==51) for(int i=1;i<=particles.X.m;i++) if(particles.V(i).x>6) particles.V(i).x=6;
 }
 //#####################################################################
 // Function Bind_Intersecting_Particles
@@ -1836,16 +1881,24 @@ void Preprocess_Frame(const int frame)
 //#####################################################################
 void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) PHYSBAM_OVERRIDE
 {
+    T v0=4,v1=6;
     if(test_number==50 || test_number==51){
         PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
-        for(int i=1; i <=externally_forced.m; i++)
+        ARRAY<bool> use(particles.X.m);
+        use.Subset(externally_forced).Fill(true);
+        for(int p=1; p<=particles.X.m; p++)
         {
-            T height=particles.X(i).x;
+            T height=particles.X(p).x;
+            if(!use(p) && height<10) continue;
             T force_multiplier=sqr(max((T)1,time-(T)1));
-            if(height>8.8 && height<21) force_multiplier*=2;
-            if(height < 14+time){
-                F(externally_forced(i))=TV(1.0*force_multiplier*(14+time-height),0,0);
-            }
+            if(height>8.8) force_multiplier*=2;
+//            if(height>22) continue;
+            if(height>14+time) continue;
+            T vm=fish_V(p).Magnitude();
+            if(vm>v1) continue;
+            if(vm>v0) force_multiplier*=(vm-v0)/(v1-v0);
+            F(p)+=TV(1.0*force_multiplier*(14+time-height),0,0);
+//            Add_Debug_Particle(particles.X(p),TV(0,0,1));
         }
     }
 }
@@ -1878,12 +1931,6 @@ void Add_Constitutive_Model(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,T 
 void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 {
     if(dump_sv) svout.close();
-    if(externally_forced.m)
-    {
-        PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
-        for(int i=1; i <=externally_forced.m; i++)
-            Add_Debug_Particle(particles.X(externally_forced(i)),TV(0,0,1));
-    }
 }
 };
 }

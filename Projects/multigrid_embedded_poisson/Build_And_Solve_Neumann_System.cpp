@@ -16,7 +16,6 @@
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_NEGATION.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_MIN_MAX.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <Jeffrey_Utilities/Algorithm/Any_If.h>
 #include <Jeffrey_Utilities/ARRAY_OPS.h>

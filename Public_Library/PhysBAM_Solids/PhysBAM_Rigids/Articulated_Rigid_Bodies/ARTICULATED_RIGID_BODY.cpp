@@ -636,7 +636,7 @@ Apply_Poststabilization_With_CG(T dt,bool correct_position,bool test_system,bool
     solver->Solve(system,x,rhs,q,s,r,k,z,(T)1e-3,0,1000);
     if(print_matrix) OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("x-%i.txt",solve_id).c_str()).Write("x",x);
 
-    ARRAYS_COMPUTATIONS::Fill(system.intermediate_twists,TWIST<TV>());
+    system.intermediate_twists.Fill(TWIST<TV>());
     system.Gather(x.v,system.intermediate_twists);
     system.Inverse_Mass(system.intermediate_twists);
     rigid_body_collection.rigid_body_particle.twist+=system.intermediate_twists;

@@ -54,7 +54,7 @@ Find_A(SPARSE_MATRIX_FLAT_NXN<T>& A)
     for(int t=1;t<=mesh.elements.m;t++){
         int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
         center(t)=(T).25*(particles.X(i)+particles.X(j)+particles.X(k)+particles.X(l));}
-    ARRAY<int> row_lengths(mesh.elements.m,false);ARRAYS_COMPUTATIONS::Fill(row_lengths,1);
+    ARRAY<int> row_lengths(mesh.elements.m,false);row_lengths.Fill(1);
     for(int f=1;f<=face_tetrahedrons.m;f++){
         int t1,t2;face_tetrahedrons(f).Get(t1,t2);if(!t1||!t2) continue;
         row_lengths(t1)++;row_lengths(t2)++;}

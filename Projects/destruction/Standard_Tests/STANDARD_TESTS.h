@@ -21,7 +21,6 @@
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
 
-#include <PhysBAM_Tools/Arrays_Computations/SUMMATIONS.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <PhysBAM_Tools/Log/DEBUG_PRINT.h>
@@ -952,7 +951,7 @@ void Create_Pyramid_Pattern(BOX<TV> boundary,const int min_resolution,const int 
         GRID<TV>& grid=*new GRID<TV>(TV_INT(rint(boundary.Edge_Lengths()/dx))+1,boundary,false);
         ARRAY<T,VECTOR<int,3> >& phi=*new ARRAY<T,VECTOR<int,3> >(grid.Domain_Indices());
         TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
-        TV pt_inside=ARRAYS_COMPUTATIONS::Average(pts.Subset(corners(m)));
+        TV pt_inside=pts.Subset(corners(m)).Average();
         phi.Fill(-FLT_MAX);
         for(int i=1;i<=4;i++){
             TRIANGLE_3D<T> tri(pts(corners(m)(i)),pts(corners(m)(i%4+1)),center);

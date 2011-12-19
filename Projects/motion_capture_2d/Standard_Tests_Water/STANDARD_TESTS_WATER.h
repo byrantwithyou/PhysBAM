@@ -452,7 +452,7 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
         controller->minimize=!(mod_time<(T)2);
         if(old_min ^ controller->minimize){
             LOG::cout<<"Switching, so filling dF_array_multipliers with PAIR(0,1)"<<std::endl;
-            ARRAYS_COMPUTATIONS::Fill(controller->dF_array_multipliers,PAIR<T,T>((T)0,(T)1));}}
+            controller->dF_array_multipliers.Fill(PAIR<T,T>((T)0,(T)1));}}
     if(test_number==6 && controller && !controller->hypothetical_step){
         controller->drag_direction=octosquid_body->Rotation().Rotate(TV(0,-1));
         bool old_min=controller->minimize;
@@ -463,7 +463,7 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
         //controller->minimize=((((int)time)%4==0)?false:true);
         if(old_min ^ controller->minimize){
             LOG::cout<<"Switching, so filling dF_array_multipliers with PAIR(0,1)"<<std::endl;
-            ARRAYS_COMPUTATIONS::Fill(controller->dF_array_multipliers,PAIR<T,T>((T)0,(T)1));}}
+            controller->dF_array_multipliers.Fill(PAIR<T,T>((T)0,(T)1));}}
 }
 //#####################################################################
 // Function Initialize_Bodies

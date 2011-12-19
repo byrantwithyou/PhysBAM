@@ -374,7 +374,7 @@ void Spring_Mesh()
         if(i<grid_m) segmented_curve->mesh.elements.Append(VECTOR<int,2>((i-1)*grid_n+j,i*grid_n+j));
         if(j<grid_n) segmented_curve->mesh.elements.Append(VECTOR<int,2>((i-1)*grid_n+j,(i-1)*grid_n+j+1));}
 
-    ARRAYS_COMPUTATIONS::Fill(particles.mass,(T)1);
+    particles.mass.Fill((T)1);
 }
 //#####################################################################
 // Function Hanging_Cloth_Test
@@ -387,7 +387,7 @@ void Hanging_Cloth_Test()
 
     TRIANGLE_MESH mesh;
     mesh.Initialize_Herring_Bone_Mesh(m,n);particles.array_collection->Add_Elements(mesh.number_nodes);
-    T mass_node=aspect_ratio*sqr(side_length)/(m*n);ARRAYS_COMPUTATIONS::Fill(particles.mass,mass_node);
+    T mass_node=aspect_ratio*sqr(side_length)/(m*n);particles.mass.Fill(mass_node);
     int i,j;
     i=1;j=n;particles.mass(i+m*(j-1))=FLT_MAX;i=m;j=n;particles.mass(i+m*(j-1))=FLT_MAX;
     T dx=side_length/(m-1),dy=aspect_ratio*side_length/(n-1);
@@ -411,7 +411,7 @@ LINEAR_SPRINGS<TV>* Create_Spring_Forces(T restlength=(T)0)
     LINEAR_SPRINGS<TV>* spring_force=Create_Edge_Springs(segmented_curve,linear_stiffness,linear_damping);
     solid_body_collection.Add_Force(spring_force);
     if(restlength){
-        ARRAY<T> restlengths(spring_force->segment_mesh.elements.m);ARRAYS_COMPUTATIONS::Fill(restlengths,restlength);
+        ARRAY<T> restlengths(spring_force->segment_mesh.elements.m);restlengths.Fill(restlength);
         spring_force->Set_Restlength(restlengths);}
     return spring_force;
 }

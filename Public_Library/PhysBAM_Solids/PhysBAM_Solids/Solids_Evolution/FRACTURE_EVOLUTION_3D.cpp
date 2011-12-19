@@ -574,7 +574,7 @@ Run_Quasistatics_And_Fracture(const T time,const int max_number_of_fracture_iter
         VECTOR<int,3> largest_nodes(max_node1,max_node2,max_node3);
         dynamic_cast<RIGID_FRACTURE_QUASISTATICS_FORCES<T>&>(*solids_parameters.solid_body_collection.example_forces_and_velocities).Initialize(rigid_body_fracture_object,largest_nodes);
         PARTICLES<TV>& particles=solids_parameters.solid_body_collection.deformable_body_collection.particles;
-        ARRAY<TV>& average_dX=rigid_body_fracture_object.average_dX;ARRAYS_COMPUTATIONS::Fill(average_dX,TV());average_dX.Resize(particles.array_collection->Size());
+        ARRAY<TV>& average_dX=rigid_body_fracture_object.average_dX;average_dX.Fill(TV());average_dX.Resize(particles.array_collection->Size());
         // TODO: should transform impulses to world space?
         QUASISTATIC_EVOLUTION<TV> quasistatic_evolution(solids_parameters);quasistatic_evolution.balance_external_forces_only=true;
         quasistatic_evolution.One_Newton_Step_Toward_Steady_State(time,average_dX);

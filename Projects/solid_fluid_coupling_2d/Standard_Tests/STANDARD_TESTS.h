@@ -793,7 +793,7 @@ void Balloon()
     ARRAY<int> deletion_list; // List of deleted segments
     ARRAY<bool> is_constrained;
     is_constrained.Resize(segmented_curve.particles.array_collection->Size());
-    ARRAYS_COMPUTATIONS::Fill(is_constrained,false);
+    is_constrained.Fill(false);
 
     for(int i=1;i<=segmented_curve.mesh.elements.m;++i){
         const SEGMENT_2D<T>& segment=segmented_curve.Get_Element(i);
@@ -1369,7 +1369,7 @@ void Refine_Circle()
     PHYSBAM_ASSERT(circle_refinement);
     TRIANGULATED_AREA<T>& triangulated_area=solids_tests.Copy_And_Add_Structure(*TESSELLATION::Generate_Triangles(SPHERE<TV>(TV(),(T).25),circle_refinement));
     PHYSBAM_ASSERT(triangulated_area.mesh.Orientations_Consistent());
-    ARRAYS_COMPUTATIONS::Fill(particles.mass,(T)100/particles.mass.m);
+    particles.mass.Fill((T)100/particles.mass.m);
 
     // add structures and rigid bodies to collisions
     deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);

@@ -91,7 +91,7 @@ THREADED_UNIFORM_GRID(ARRAY<THREAD_PACKAGE>& buffers_input,const int tid_input,c
     Split_Grid(processes_per_dimension);
 
     // setup topology
-    process_ranks.Resize(process_grid.Domain_Indices(1));ARRAYS_COMPUTATIONS::Fill(process_ranks.array,-1);
+    process_ranks.Resize(process_grid.Domain_Indices(1));process_ranks.array.Fill(-1);
     TV_INT extents=process_grid.Domain_Indices().Maximum_Corner();
     // sort axes in decreasing order of how much we have to communicate along them
     ARRAY<int> axes(T_GRID::dimension);ARRAY<T> axis_lengths(T_GRID::dimension);

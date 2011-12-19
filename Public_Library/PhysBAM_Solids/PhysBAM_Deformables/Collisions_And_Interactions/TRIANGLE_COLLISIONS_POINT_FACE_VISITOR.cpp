@@ -5,7 +5,6 @@
 // Class TRIANGLE_COLLISIONS_POINT_FACE_VISITOR
 //##################################################################### 
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-#include <PhysBAM_Tools/Arrays_Computations/SUMMATIONS.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Geometry/Spatial_Acceleration/BOX_HIERARCHY_DEFINITION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/STRUCTURE_INTERACTION_GEOMETRY.h>
@@ -42,7 +41,7 @@ Store(const int point_index,const int face_index)
 {
     const VECTOR<int,d>& face_nodes=faces(face_index);int p=particle_active_indices(point_index);
     if(face_nodes.Contains(p)) return;
-    TV dX_average=(T).5*(X(p)-X_self_collision_free(p)+ARRAYS_COMPUTATIONS::Average(X.Subset(face_nodes))-ARRAYS_COMPUTATIONS::Average(X_self_collision_free.Subset(face_nodes)));
+    TV dX_average=(T).5*(X(p)-X_self_collision_free(p)+X.Subset(face_nodes).Average()-X_self_collision_free.Subset(face_nodes).Average());
     RANGE<TV> box1=RANGE<TV>::Bounding_Box(X_self_collision_free(p)+dX_average,X(p));
     RANGE<TV> box2=RANGE<TV>::Bounding_Box(X_self_collision_free.Subset(face_nodes))+dX_average;box2.Enlarge_Nonempty_Box_To_Include_Points(X.Subset(face_nodes));
     if(!box1.Intersection(box2,collision_thickness)) return;

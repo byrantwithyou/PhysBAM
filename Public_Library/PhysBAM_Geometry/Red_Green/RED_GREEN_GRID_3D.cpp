@@ -72,10 +72,10 @@ Calculate_Node_Locations(ARRAY<VECTOR<T,3> >& node_locations) const
 template<class T> void RED_GREEN_GRID_3D<T>::
 Compact_Array_Indices(ARRAY<int>* cell_mapping_array,ARRAY<int>* node_mapping_array)
 {
-    if(cell_mapping_array){cell_mapping_array->Resize(number_of_cells,false,false);ARRAYS_COMPUTATIONS::Fill(*cell_mapping_array,0);number_of_cells=0;
+    if(cell_mapping_array){cell_mapping_array->Resize(number_of_cells,false,false);cell_mapping_array->Fill(0);number_of_cells=0;
         for(int i=1;i<=uniform_grid.counts.x;i++) for(int j=1;j<=uniform_grid.counts.y;j++) for(int ij=1;ij<=uniform_grid.counts.z;ij++) if(elements(i,j,ij))
             elements(i,j,ij)->Create_Cell_Compaction_Mapping(*cell_mapping_array,number_of_cells);}
-    if(node_mapping_array){node_mapping_array->Resize(number_of_nodes,false,false);ARRAYS_COMPUTATIONS::Fill(*node_mapping_array,0);number_of_nodes=0;
+    if(node_mapping_array){node_mapping_array->Resize(number_of_nodes,false,false);node_mapping_array->Fill(0);number_of_nodes=0;
         for(int i=1;i<=uniform_grid.counts.y;i++) for(int j=1;j<=uniform_grid.counts.y;j++) for(int ij=1;ij<=uniform_grid.counts.z;ij++) if(elements(i,j,ij))
             elements(i,j,ij)->owner->Create_Node_Compaction_Mapping_Helper(*node_mapping_array,number_of_nodes);}
 }

@@ -58,7 +58,7 @@ public:
     {separation_parameter=separation_parameter_input;}
 
     void Set_Collision_Body_List(COLLISION_GEOMETRY_COLLECTION<TV>& collision_body_list_input)
-    {collision_body_list=&collision_body_list_input;skip_collision_body.Resize(collision_body_list->collision_bodies.m);ARRAYS_COMPUTATIONS::Fill(skip_collision_body,false);}
+    {collision_body_list=&collision_body_list_input;skip_collision_body.Resize(collision_body_list->collision_bodies.m);skip_collision_body.Fill(false);}
 
     template<class T_MESH>
     void Set_Boundary_Only_Collisions(T_MESH& mesh)

@@ -195,15 +195,15 @@ Refine_Cell(const int max_depth,QUADTREE_CELL<T>* cell,const TV& location,ARRAY<
 template<class T> void QUADTREE_GRID<T>::
 Compact_Array_Indices(ARRAY<int>* cell_mapping_array,ARRAY<int>* node_mapping_array,ARRAY<int>* face_mapping_array)
 {
-    if(cell_mapping_array){cell_mapping_array->Resize(number_of_cells,false);ARRAYS_COMPUTATIONS::Fill(*cell_mapping_array,0);number_of_cells=0;
+    if(cell_mapping_array){cell_mapping_array->Resize(number_of_cells,false);cell_mapping_array->Fill(0);number_of_cells=0;
         for(int i=1-number_of_ghost_cells;i<=uniform_grid.numbers_of_cells.x+number_of_ghost_cells;i++)
             for(int j=1-number_of_ghost_cells;j<=uniform_grid.numbers_of_cells.y+number_of_ghost_cells;j++)
                 cells(i,j)->Create_Cell_Compaction_Mapping(*cell_mapping_array,number_of_cells);}
-    if(face_mapping_array){face_mapping_array->Resize(number_of_faces,false);ARRAYS_COMPUTATIONS::Fill(*face_mapping_array,0);number_of_faces=0;
+    if(face_mapping_array){face_mapping_array->Resize(number_of_faces,false);face_mapping_array->Fill(0);number_of_faces=0;
         for(int i=1-number_of_ghost_cells;i<=uniform_grid.numbers_of_cells.x+number_of_ghost_cells;i+=2)
             for(int j=1-number_of_ghost_cells;j<=uniform_grid.numbers_of_cells.y+number_of_ghost_cells;j+=2)
                 cells(i,j)->owner->Create_Face_Compaction_Mapping_Helper(*face_mapping_array,number_of_faces);}
-    if(node_mapping_array){node_mapping_array->Resize(number_of_nodes,false);ARRAYS_COMPUTATIONS::Fill(*node_mapping_array,0);number_of_nodes=0;
+    if(node_mapping_array){node_mapping_array->Resize(number_of_nodes,false);node_mapping_array->Fill(0);number_of_nodes=0;
         for(int i=1-number_of_ghost_cells;i<=uniform_grid.numbers_of_cells.x+number_of_ghost_cells;i+=2)
             for(int j=1-number_of_ghost_cells;j<=uniform_grid.numbers_of_cells.y+number_of_ghost_cells;j+=2)
                 cells(i,j)->owner->Create_Node_Compaction_Mapping_Helper(*node_mapping_array,number_of_nodes);}
@@ -403,7 +403,7 @@ template<class T> static void Calculate_Cell_Pointer_From_Index_Array_Helper(QUA
 template<class T> void QUADTREE_GRID<T>::
 Calculate_Cell_Pointer_From_Index_Array(ARRAY<QUADTREE_CELL<T>*>& cell_pointer_from_index) const 
 {
-    cell_pointer_from_index.Resize(number_of_cells,false,false);ARRAYS_COMPUTATIONS::Fill(cell_pointer_from_index,0);
+    cell_pointer_from_index.Resize(number_of_cells,false,false);cell_pointer_from_index.Fill(0);
     for(int i=1-number_of_ghost_cells;i<=uniform_grid.numbers_of_cells.x+number_of_ghost_cells;i++)
         for(int j=1-number_of_ghost_cells;j<=uniform_grid.numbers_of_cells.y+number_of_ghost_cells;j++)
             Calculate_Cell_Pointer_From_Index_Array_Helper(cells(i,j),cell_pointer_from_index);
@@ -426,7 +426,7 @@ template<class T> static void Calculate_Neighbors_Array_Helper(void* data,const 
 template<class T> void QUADTREE_GRID<T>::
 Calculate_Neighbors_Array(ARRAY<VECTOR<QUADTREE_CELL<T>*,4> >& neighbors)const
 {
-    neighbors.Resize(number_of_cells,false,false);ARRAYS_COMPUTATIONS::Fill(neighbors.Flattened(),0);
+    neighbors.Resize(number_of_cells,false,false);neighbors.Flattened().Fill(0);
     MAP_QUADTREE_MESH<T>::Map_Faces(uniform_grid,cells,number_of_ghost_cells,&neighbors,Calculate_Neighbors_Array_Helper);
 }
 //#####################################################################
@@ -447,7 +447,7 @@ template<class T> static void Calculate_Node_Neighbors_Array_Helper(void* data,c
 template<class T> void QUADTREE_GRID<T>::
 Calculate_Node_Neighbors_Array(ARRAY<VECTOR<int,4> >& node_neighbors)const
 {
-    node_neighbors.Resize(number_of_nodes,false,false);ARRAYS_COMPUTATIONS::Fill(node_neighbors.Flattened(),0);
+    node_neighbors.Resize(number_of_nodes,false,false);node_neighbors.Flattened().Fill(0);
     MAP_QUADTREE_MESH<T>::Map_Faces(uniform_grid,cells,number_of_ghost_cells,&node_neighbors,Calculate_Node_Neighbors_Array_Helper);
 }
 //#####################################################################
@@ -456,7 +456,7 @@ Calculate_Node_Neighbors_Array(ARRAY<VECTOR<int,4> >& node_neighbors)const
 template<class T> void QUADTREE_GRID<T>::
 Calculate_Fully_Refined_Block_Array(ARRAY<bool>& fully_refined_block) const
 {
-    fully_refined_block.Resize(number_of_cells,false,false);ARRAYS_COMPUTATIONS::Fill(fully_refined_block,false);Neighbors();
+    fully_refined_block.Resize(number_of_cells,false,false);fully_refined_block.Fill(false);Neighbors();
     QUADTREE_CELL<T>* cells[number_of_children_per_cell];int lookup[][2]={{0,0},{2,0},{4,0},{4,1}};
     for(DYADIC_GRID_ITERATOR_CELL<QUADTREE_GRID<T> > iterator(*this,3);iterator.Valid();iterator.Next()){
         if(iterator.Cell_Pointer()->Depth_Of_This_Cell()!=maximum_depth)continue;

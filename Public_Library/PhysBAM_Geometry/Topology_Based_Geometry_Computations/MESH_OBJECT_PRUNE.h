@@ -25,10 +25,10 @@ void Discard_Valence_Zero_Particles_And_Renumber(MESH_OBJECT<TV,T_MESH>& mo,ARRA
     ARRAY<bool> node_is_used(mo.mesh.number_nodes);
     for(int t=1;t<=mo.mesh.elements.m;t++){
         INDIRECT_ARRAY<ARRAY<bool>,typename T_MESH::ELEMENT_TYPE&> subset=node_is_used.Subset(mo.mesh.elements(t));
-        ARRAYS_COMPUTATIONS::Fill(subset,true);}
+        subset.Fill(true);}
     
     // make condensation mapping
-    condensation_mapping.Resize(mo.mesh.number_nodes,false,false);ARRAYS_COMPUTATIONS::Fill(condensation_mapping,0);
+    condensation_mapping.Resize(mo.mesh.number_nodes,false,false);condensation_mapping.Fill(0);
     int counter=0;
     for(int t=1;t<=mo.mesh.number_nodes;t++) if(node_is_used(t)) condensation_mapping(t)=++counter;
     

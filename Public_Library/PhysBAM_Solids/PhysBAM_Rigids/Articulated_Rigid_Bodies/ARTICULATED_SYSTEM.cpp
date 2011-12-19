@@ -107,8 +107,8 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const
 {
     ARRAY<TWIST<TV>,JOINT_ID>& twist=debug_cast<ARTICULATED_VECTOR<TV>&>(result).v;
     const ARRAY<TWIST<TV>,JOINT_ID>& wrench=debug_cast<const ARTICULATED_VECTOR<TV>&>(x).v;
-    ARRAYS_COMPUTATIONS::Fill(intermediate_twists,TWIST<TV>());
-    ARRAYS_COMPUTATIONS::Fill(twist,TWIST<TV>());
+    intermediate_twists.Fill(TWIST<TV>());
+    twist.Fill(TWIST<TV>());
 
     Gather(wrench,intermediate_twists);
     Inverse_Mass(intermediate_twists);
@@ -127,7 +127,7 @@ template<class TV> void ARTICULATED_SYSTEM<TV>::
 Kinetic_Energy() const
 {
     if(!internal_x) return;
-    ARRAYS_COMPUTATIONS::Fill(intermediate_twists,TWIST<TV>());
+    intermediate_twists.Fill(TWIST<TV>());
     Gather(internal_x->v,intermediate_twists);
     Inverse_Mass(intermediate_twists);
     intermediate_twists+=articulated_rigid_body.rigid_body_collection.rigid_body_particle.twist;

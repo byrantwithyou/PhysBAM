@@ -73,12 +73,10 @@ Update_Simulated_Particles()
     int rigid_particles_number=rigid_body_collection.rigid_body_particle.array_collection->Size();
 
     ARRAY<bool> particle_is_simulated(particles_number);
-    INDIRECT_ARRAY<ARRAY<bool>,ARRAY<int>&> simulated_particles=particle_is_simulated.Subset(deformable_body_collection.simulated_particles);
-    ARRAYS_COMPUTATIONS::Fill(simulated_particles,true);
+    particle_is_simulated.Subset(deformable_body_collection.simulated_particles).Fill(true);
 
     ARRAY<bool> rigid_particle_is_simulated(rigid_particles_number);
-    INDIRECT_ARRAY<ARRAY<bool>,ARRAY<int>&> simulated_rigid_body_particles=rigid_particle_is_simulated.Subset(rigid_body_collection.simulated_rigid_body_particles);
-    ARRAYS_COMPUTATIONS::Fill(simulated_rigid_body_particles,true);
+    rigid_particle_is_simulated.Subset(rigid_body_collection.simulated_rigid_body_particles).Fill(true);
     for(int i=1;i<=solids_forces.m;i++) solids_forces(i)->Update_Mpi(particle_is_simulated,rigid_particle_is_simulated,deformable_body_collection.mpi_solids);
 }
 //#####################################################################
@@ -136,8 +134,7 @@ Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V_full,ARRAY_VIEW<cons
     const T time) const
 {
     assert(V_full.Size()==deformable_body_collection.particles.array_collection->Size() && F_full.Size()==deformable_body_collection.particles.array_collection->Size());
-    INDIRECT_ARRAY<ARRAY_VIEW<TV>,ARRAY<int>&> F_subset=F_full.Subset(deformable_body_collection.dynamic_particles);
-    ARRAYS_COMPUTATIONS::Fill(F_subset,TV()); // note we zero here because we will scale the forces below
+    F_full.Subset(deformable_body_collection.dynamic_particles).Fill(TV()); // note we zero here because we will scale the forces below
     bool added_d=false,added_r=false;
     for(int k=1;k<=solids_forces.m;k++) if(solids_forces(k)->use_implicit_velocity_independent_forces){
         solids_forces(k)->Add_Implicit_Velocity_Independent_Forces(V_full,rigid_V_full,F_full,rigid_F_full,time);added_r=added_d=true;}
@@ -155,8 +152,7 @@ template<class TV> void SOLID_BODY_COLLECTION<TV>::
 Force_Differential(ARRAY_VIEW<const TV> dX_full,ARRAY_VIEW<TV> dF_full,const T time) const
 {
     assert(dX_full.Size()==deformable_body_collection.particles.array_collection->Size() && dF_full.Size()==deformable_body_collection.particles.array_collection->Size());
-    INDIRECT_ARRAY<ARRAY_VIEW<TV>,ARRAY<int>&> dF_subset=dF_full.Subset(deformable_body_collection.simulated_particles);
-    ARRAYS_COMPUTATIONS::Fill(dF_subset,TV());
+    dF_full.Subset(deformable_body_collection.simulated_particles).Fill(TV());
     for(int k=1;k<=deformable_body_collection.deformables_forces.m;k++)
         if(deformable_body_collection.deformables_forces(k)->use_force_differential) deformable_body_collection.deformables_forces(k)->Add_Force_Differential(dX_full,dF_full,time);
 }
@@ -183,12 +179,10 @@ Update_CFL()
     else cfl_valid=false;
     if(!cfl_valid){
         frequency.Resize(deformable_body_collection.particles.array_collection->Size(),false,false);
-        INDIRECT_ARRAY<ARRAY<T_FREQUENCY_DEFORMABLE>,ARRAY<int>&> frequency_subset=frequency.Subset(deformable_body_collection.simulated_particles);
-        ARRAYS_COMPUTATIONS::Fill(frequency_subset,T_FREQUENCY_DEFORMABLE());
+        frequency.Subset(deformable_body_collection.simulated_particles).Fill(T_FREQUENCY_DEFORMABLE());
 
         rigid_frequency.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size(),false,false);
-        INDIRECT_ARRAY<ARRAY<T_FREQUENCY_RIGID>,ARRAY<int>&> rigid_frequency_subset=rigid_frequency.Subset(rigid_body_collection.simulated_rigid_body_particles);
-        ARRAYS_COMPUTATIONS::Fill(rigid_frequency_subset,T_FREQUENCY_RIGID());
+        rigid_frequency.Subset(rigid_body_collection.simulated_rigid_body_particles).Fill(T_FREQUENCY_RIGID());
 
         for(int i=1;i<=solids_forces.m;i++){solids_forces(i)->Initialize_CFL(frequency,rigid_frequency);solids_forces(i)->Validate_CFL();}
         for(int i=1;i<=rigid_body_collection.rigids_forces.m;i++){rigid_body_collection.rigids_forces(i)->Initialize_CFL(rigid_frequency);rigid_body_collection.rigids_forces(i)->Validate_CFL();}

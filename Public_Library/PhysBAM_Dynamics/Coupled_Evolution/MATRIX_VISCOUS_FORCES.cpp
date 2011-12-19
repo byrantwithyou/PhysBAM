@@ -5,7 +5,6 @@
 // Class MATRIX_VISCOUS_FORCES
 //##################################################################### 
 #include <PhysBAM_Tools/Arrays_Computations/DOT_PRODUCT.h>
-#include <PhysBAM_Tools/Arrays_Computations/SUMMATIONS.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
@@ -76,7 +75,7 @@ Times_Add(const VECTOR_ND<T>& velocities,ARRAY<T,VISCOUS_FORCE_ID>& viscous_forc
 template<class TV> void MATRIX_VISCOUS_FORCES<TV>::
 Times(const VECTOR_ND<T>& velocities,ARRAY<T,VISCOUS_FORCE_ID>& viscous_force_coefficients) const
 {
-    ARRAYS_COMPUTATIONS::Fill(viscous_force_coefficients,T());
+    viscous_force_coefficients.Fill(T());
     Times_Add(velocities,viscous_force_coefficients);
 }
 //#####################################################################
@@ -95,7 +94,6 @@ Transpose_Times_Add(const ARRAY<T,VISCOUS_FORCE_ID>& viscous_force_coefficients,
 template<class TV> void MATRIX_VISCOUS_FORCES<TV>::
 Transpose_Times(const ARRAY<T,VISCOUS_FORCE_ID>& viscous_force_coefficients,VECTOR_ND<T>& velocities) const
 {
-    //ARRAYS_COMPUTATIONS::Fill(velocities,T());
     velocities.Fill(T());
     Transpose_Times_Add(viscous_force_coefficients,velocities);
 }

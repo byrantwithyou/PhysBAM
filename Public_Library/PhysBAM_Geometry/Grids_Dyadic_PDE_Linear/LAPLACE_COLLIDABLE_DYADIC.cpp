@@ -34,7 +34,7 @@ Solve(const T time,const bool solution_regions_already_computed)
     for(int color=1;color<=number_of_regions;color++) if(filled_region_touches_dirichlet(color)||solve_neumann_regions){
         matrix_index_to_cell_index_array(color).Resize(filled_region_cell_count(color));
         A_array(color).Set_Size(filled_region_cell_count(color));b_array(color).Resize(filled_region_cell_count(color));}
-    ARRAYS_COMPUTATIONS::Fill(filled_region_cell_count,0); // reusing this array in order to make the indirection arrays
+    filled_region_cell_count.Fill(0); // reusing this array in order to make the indirection arrays
     for(int i=1;i<=grid.number_of_cells;i++){
         int color=filled_region_colors(i);
         if(color>0&&(filled_region_touches_dirichlet(color)||solve_neumann_regions)){

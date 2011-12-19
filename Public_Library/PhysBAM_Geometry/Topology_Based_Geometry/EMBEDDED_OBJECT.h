@@ -118,7 +118,7 @@ public:
     void Initialize_Node_In_Simplex_Is_Material()
     {if(node_in_simplex_is_material.m==simplicial_object.mesh.elements.m) return; // don't overwrite existing values if they exist
     node_in_simplex_is_material.Resize(simplicial_object.mesh.elements.m,false,false);
-    ARRAY_VIEW<bool> view=node_in_simplex_is_material.Flattened();ARRAYS_COMPUTATIONS::Fill(view,true);}
+    ARRAY_VIEW<bool> view=node_in_simplex_is_material.Flattened();view.Fill(true);}
 
     bool Node_In_Simplex_Is_Material(const int node,const int element) const
     {int index=simplicial_object.mesh.elements(element).Find(node);assert(index);

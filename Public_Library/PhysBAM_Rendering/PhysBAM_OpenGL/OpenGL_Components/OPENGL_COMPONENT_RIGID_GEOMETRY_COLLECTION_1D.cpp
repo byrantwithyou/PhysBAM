@@ -81,8 +81,8 @@ Reinitialize(const bool force,const bool read_geometry)
         // only enlarge array as we read in more geometry to memory
         opengl_point_simplices.Resize(max_number_of_bodies);
         opengl_axes.Resize(max_number_of_bodies);
-        draw_object.Resize(max_number_of_bodies);ARRAYS_COMPUTATIONS::Fill(draw_object,true);
-        use_object_bounding_box.Resize(max_number_of_bodies);ARRAYS_COMPUTATIONS::Fill(use_object_bounding_box,true);
+        draw_object.Resize(max_number_of_bodies);draw_object.Fill(true);
+        use_object_bounding_box.Resize(max_number_of_bodies);use_object_bounding_box.Fill(true);
 
         // Initialize bodies which have become active
         if(has_init_destroy_information) for(int i=1;i<=needs_init.m;i++){

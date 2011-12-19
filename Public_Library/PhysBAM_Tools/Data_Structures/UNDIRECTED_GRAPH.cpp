@@ -84,7 +84,7 @@ Breadth_First_Directed_Graph(const int root_node,DIRECTED_GRAPH_CORE& directed_g
 int UNDIRECTED_GRAPH_CORE::
 Connected_Components(ARRAY<int,int>& component_id) // returns total number of components
 {
-    component_id.Resize(adjacent_edges.Size(),false,false);ARRAYS_COMPUTATIONS::Fill(component_id,0);
+    component_id.Resize(adjacent_edges.Size(),false,false);component_id.Fill(0);
     int component=0;
     for(int seed(1);seed<=component_id.Size();seed++) if(!component_id(seed)){
         STACK<int> stack;stack.Push(seed);

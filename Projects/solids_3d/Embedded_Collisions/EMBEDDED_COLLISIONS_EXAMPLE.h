@@ -169,13 +169,13 @@ void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
     while(1){
         triangulated_surface.mesh.elements.Flattened().Get_Unique(surface_particles);
         ARRAY<T> particle_distances(particles.array_collection->Size());
-        INDIRECT_ARRAY<ARRAY<T>,ARRAY<int>&> subset=particle_distances.Subset(surface_particles);ARRAYS_COMPUTATIONS::Fill(subset,(T)FLT_MAX);
+        particle_distances.Subset(surface_particles).Fill((T)FLT_MAX);
         for(int i=1;i<=surface_particles.m;i++){int p=surface_particles(i);
             for(COLLISION_GEOMETRY_ID body(1);body<=collision_body_list.bodies.m;body++)
                 particle_distances(p)=PhysBAM::min(particle_distances(p),collision_body_list.bodies(body)->Implicit_Geometry_Extended_Value(particles.X(p)));}
         ARRAY<int> triangles_to_refine;
         for(int t=1;t<=triangulated_surface.mesh.elements.m;t++){
-            T triangle_distance=ARRAYS_COMPUTATIONS::Min(particle_distances.Subset(triangulated_surface.mesh.elements(t)));
+            T triangle_distance=particle_distances.Subset(triangulated_surface.mesh.elements(t)).Min();
             T triangle_size=TRIANGLE_3D<T>(particles.X.Subset(triangulated_surface.mesh.elements(t))).Maximum_Edge_Length();
             int level=redgreen->leaf_levels_and_indices(t)(1);
             if(level<maximum_number_of_boundary_refinements && triangle_distance<triangle_size*refinement_ratio && redgreen) triangles_to_refine.Append(t);}

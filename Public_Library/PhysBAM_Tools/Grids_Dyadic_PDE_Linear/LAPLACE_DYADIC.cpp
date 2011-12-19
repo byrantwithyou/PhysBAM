@@ -161,7 +161,7 @@ Find_Solution_Regions()
 {
     FLOOD_FILL flood_fill;filled_region_colors.Resize(grid.number_of_cells);
     // set domain boundary cells and cells with objects to uncolorable (by setting all of the cells to -1, we end up ignoring invalid indices too)
-    ARRAYS_COMPUTATIONS::Fill(filled_region_colors,-1);
+    filled_region_colors.Fill(-1);
     MAP_MESH::Map_Cells(grid.uniform_grid,grid.cells,0,this,Mark_Interior_Cells<T_GRID>);
     filled_region_touches_dirichlet.Remove_All();
     // do the fill

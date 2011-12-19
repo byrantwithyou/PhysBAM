@@ -7,7 +7,6 @@
 #ifndef __SIMPLE_HARD_BINDING_EXAMPLE__
 #define __SIMPLE_HARD_BINDING_EXAMPLE__
 
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_MIN_MAX.h>
 #include <PhysBAM_Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
@@ -332,15 +331,15 @@ void Preprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE
     ARRAY<ARRAY<T>,COLLISION_GEOMETRY_ID> particle_distances(collision_body_list.Size());
     for(COLLISION_GEOMETRY_ID i(1);i<=particle_distances.Size();i++){
         particle_distances(i).Resize(particles.array_collection->Size());
-        INDIRECT_ARRAY<ARRAY<T>,ARRAY<int>&> subset=particle_distances(i).Subset(surface_particles);ARRAYS_COMPUTATIONS::Fill(subset,(T)FLT_MAX);}
+        INDIRECT_ARRAY<ARRAY<T>,ARRAY<int>&> subset=particle_distances(i).Subset(surface_particles);subset.Fill((T)FLT_MAX);}
     for(int i=1;i<=surface_particles.m;i++){int p=surface_particles(i);
         for(COLLISION_GEOMETRY_ID body(1);body<=collision_body_list.Size();body++)
             particle_distances(body)(p)=PhysBAM::min(particle_distances(body)(p),collision_body_list(body).Implicit_Geometry_Extended_Value(particles.X(p)));}
 
     // iterate over surface elements
     for(int t=1;t<=surface_elements.m;t++){
-        T triangle_distance1=ARRAYS_COMPUTATIONS::Min(particle_distances(COLLISION_GEOMETRY_ID(1)).Subset(surface_elements(t)));
-        T triangle_distance2=ARRAYS_COMPUTATIONS::Min(particle_distances(COLLISION_GEOMETRY_ID(2)).Subset(surface_elements(t)));
+        T triangle_distance1=particle_distances(COLLISION_GEOMETRY_ID(1)).Subset(surface_elements(t)).Min();
+        T triangle_distance2=particle_distances(COLLISION_GEOMETRY_ID(2)).Subset(surface_elements(t)).Min();
         if(triangle_distance1<refinement_distance(1)||triangle_distance2<refinement_distance(2)) // triangle should be subsampled
             if(triangle_free_particles(t).m) Persist_Subsamples(t,new_binding_list,new_soft_bindings);
             else Add_Subsamples(t,new_binding_list,new_soft_bindings);

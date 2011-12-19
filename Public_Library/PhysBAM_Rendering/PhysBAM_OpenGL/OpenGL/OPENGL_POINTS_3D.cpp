@@ -109,7 +109,7 @@ Set_Point_Colors(const ARRAY<int> &indices, const OPENGL_COLOR &point_color)
 template<class T,class T_ARRAY> void OPENGL_POINTS_3D<T,T_ARRAY>::
 Reset_Point_Colors()
 {
-    if(point_colors) ARRAYS_COMPUTATIONS::Fill(*point_colors,color);
+    if(point_colors) point_colors->Fill(color);
 }    
 //#####################################################################
 // Function Store_Point_Colors
@@ -118,8 +118,8 @@ template<class T,class T_ARRAY> void OPENGL_POINTS_3D<T,T_ARRAY>::
 Store_Point_Colors(const bool store_point_colors)
 {
     if(store_point_colors){
-        if(!point_colors){point_colors=new ARRAY<OPENGL_COLOR>(points.Size(),false);ARRAYS_COMPUTATIONS::Fill(*point_colors,color);}
-        else if(point_colors->m!=points.Size()){point_colors->Resize(points.Size());ARRAYS_COMPUTATIONS::Fill(*point_colors,color);}}
+        if(!point_colors){point_colors=new ARRAY<OPENGL_COLOR>(points.Size(),false);point_colors->Fill(color);}
+        else if(point_colors->m!=points.Size()){point_colors->Resize(points.Size());point_colors->Fill(color);}}
     else{delete point_colors;point_colors=0;}
 }
 //#####################################################################

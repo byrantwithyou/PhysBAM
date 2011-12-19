@@ -31,7 +31,7 @@ template<class T> void RED_GREEN_TETRAHEDRA<T>::
 Refine_Simplex_List(const ARRAY<int>& tetrahedron_list)
 {
     object.particles.array_collection->Preallocate(object.particles.array_collection->Size()+6*tetrahedron_list.m);
-    for(int level=1;level<=index_in_stack.m;level++) ARRAYS_COMPUTATIONS::Fill(*index_in_stack(level),0);
+    for(int level=1;level<=index_in_stack.m;level++) index_in_stack(level)->Fill(0);
     for(int i=1;i<=tetrahedron_list.m;i++){
         int level=leaf_levels_and_indices(tetrahedron_list(i))(1),tet=leaf_levels_and_indices(tetrahedron_list(i))(2);
         if(Red(level,tet)){
@@ -51,7 +51,7 @@ template<class T> void RED_GREEN_TETRAHEDRA<T>::
 Subdivide_Segment_List(const ARRAY<VECTOR<int,2> >& segment_list)
 {
     object.particles.array_collection->Preallocate(object.particles.array_collection->Size()+4*segment_list.m);
-    for(int i=1;i<=index_in_stack.m;i++) ARRAYS_COMPUTATIONS::Fill(*index_in_stack(i),0);
+    for(int i=1;i<=index_in_stack.m;i++) index_in_stack(i)->Fill(0);
     for(int i=1;i<=segment_list.m;i++){
         int node1,node2;segment_list(i).Get(node1,node2);
         int s,level,tet;
@@ -555,7 +555,7 @@ Coarsen_Complete_Refinements_Of_Subset(TETRAHEDRON_MESH& final_mesh,ARRAY<bool>&
     // Coarsen refinement steps for which all children are present in the subset
     TETRAHEDRON_MESH& mesh=object.mesh;
     ARRAY<ARRAY<bool> > tetrahedron_kept(meshes.m);
-    for(int level=1;level<=meshes.m;level++){tetrahedron_kept(level).Resize(meshes(level)->elements.m);ARRAYS_COMPUTATIONS::Fill(tetrahedron_kept(level),true);}
+    for(int level=1;level<=meshes.m;level++){tetrahedron_kept(level).Resize(meshes(level)->elements.m);tetrahedron_kept(level).Fill(true);}
     for(int t=1;t<=mesh.elements.m;t++) if(!subset(t)){
         int tet,level;leaf_levels_and_indices(t).Get(level,tet);
         tetrahedron_kept(level)(tet)=false;Unmark_Parents(tetrahedron_kept,level,tet);}

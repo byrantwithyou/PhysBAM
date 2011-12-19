@@ -5,7 +5,6 @@
 // Class TRIANGLE_COLLISIONS  
 //##################################################################### 
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_MIN_MAX.h>
 #include <PhysBAM_Tools/Data_Structures/OPERATION_HASH.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Tools/Log/LOG.h>
@@ -101,7 +100,7 @@ Update_Swept_Hierachies_And_Compute_Pairs(ARRAY_VIEW<TV> X,ARRAY_VIEW<TV> X_self
                 structure.point_modified(kk)=recently_modified(p);
                 if(structure.point_modified(kk)) hierarchy.box_hierarchy(kk)=RANGE<TV>::Bounding_Box(X(p),X_self_collision_free(p));}
             hierarchy.Update_Modified_Nonleaf_Boxes(structure.point_modified);}}
-    ARRAYS_COMPUTATIONS::Fill(recently_modified,false);
+    recently_modified.Fill(false);
 
     // Compute pairs
     point_face_pairs_internal.Remove_All();edge_edge_pairs_internal.Remove_All();
@@ -130,7 +129,7 @@ Adjust_Velocity_For_Self_Collisions(const T dt,const T time,const bool exit_earl
         point_face_collisions=0,edge_edge_collisions=0;
     ARRAY<ARRAY<int> > rigid_lists;ARRAY<int> list_index(full_particles.array_collection->Size()); // index of the rigid list a local node belongs to
 
-    recently_modified_full.Resize(full_particles.array_collection->Size(),false,false);ARRAYS_COMPUTATIONS::Fill(recently_modified_full,true);
+    recently_modified_full.Resize(full_particles.array_collection->Size(),false,false);recently_modified_full.Fill(true);
     ARRAY<TV> V_save;
     ARRAY<TV> X_save;
     // input velocities are average V.  Also want original velocities?  Delta may be sufficient.
@@ -158,14 +157,14 @@ Adjust_Velocity_For_Self_Collisions(const T dt,const T time,const bool exit_earl
 
         // Make a copy of the particles
         impulse_velocities.Resize(full_particles.array_collection->Size());for(int i=1;i<=full_particles.array_collection->Size();i++) impulse_velocities(i)=full_particles.V(i);
-        pf_target_impulses.Resize(point_face_pairs_internal.Size());ARRAYS_COMPUTATIONS::Fill(pf_target_impulses,TV());
-        ee_target_impulses.Resize(edge_edge_pairs_internal.Size());ARRAYS_COMPUTATIONS::Fill(ee_target_impulses,TV());
-        pf_target_weights.Resize(point_face_pairs_internal.Size());ARRAYS_COMPUTATIONS::Fill(pf_target_weights,VECTOR<T,d+1>());
-        ee_target_weights.Resize(edge_edge_pairs_internal.Size());ARRAYS_COMPUTATIONS::Fill(ee_target_weights,VECTOR<T,2*d-2>());
-        pf_normals.Resize(point_face_pairs_internal.Size());ARRAYS_COMPUTATIONS::Fill(pf_normals,TV());
-        ee_normals.Resize(edge_edge_pairs_internal.Size());ARRAYS_COMPUTATIONS::Fill(ee_normals,TV());
-        pf_old_speeds.Resize(point_face_pairs_internal.Size());ARRAYS_COMPUTATIONS::Fill(pf_old_speeds,T());
-        ee_old_speeds.Resize(edge_edge_pairs_internal.Size());ARRAYS_COMPUTATIONS::Fill(ee_old_speeds,T());
+        pf_target_impulses.Resize(point_face_pairs_internal.Size());pf_target_impulses.Fill(TV());
+        ee_target_impulses.Resize(edge_edge_pairs_internal.Size());ee_target_impulses.Fill(TV());
+        pf_target_weights.Resize(point_face_pairs_internal.Size());pf_target_weights.Fill(VECTOR<T,d+1>());
+        ee_target_weights.Resize(edge_edge_pairs_internal.Size());ee_target_weights.Fill(VECTOR<T,2*d-2>());
+        pf_normals.Resize(point_face_pairs_internal.Size());pf_normals.Fill(TV());
+        ee_normals.Resize(edge_edge_pairs_internal.Size());ee_normals.Fill(TV());
+        pf_old_speeds.Resize(point_face_pairs_internal.Size());pf_old_speeds.Fill(T());
+        ee_old_speeds.Resize(edge_edge_pairs_internal.Size());ee_old_speeds.Fill(T());
         
         // point face first for stability
         point_face_collisions=0;edge_edge_collisions=0;collisions_in_attempt=0;
@@ -201,10 +200,10 @@ Adjust_Velocity_For_Self_Collisions(const T dt,const T time,const bool exit_earl
         if(use_gauss_jacobi){
             Scale_And_Apply_Impulses();
 
-            ARRAYS_COMPUTATIONS::Fill(pf_target_impulses,TV());ARRAYS_COMPUTATIONS::Fill(ee_target_impulses,TV());
-            ARRAYS_COMPUTATIONS::Fill(pf_target_weights,VECTOR<T,d+1>());ARRAYS_COMPUTATIONS::Fill(ee_target_weights,VECTOR<T,2*d-2>());
-            ARRAYS_COMPUTATIONS::Fill(pf_normals,TV());ARRAYS_COMPUTATIONS::Fill(ee_normals,TV());
-            ARRAYS_COMPUTATIONS::Fill(pf_old_speeds,T());ARRAYS_COMPUTATIONS::Fill(ee_old_speeds,T());
+            pf_target_impulses.Fill(TV());ee_target_impulses.Fill(TV());
+            pf_target_weights.Fill(VECTOR<T,d+1>());ee_target_weights.Fill(VECTOR<T,2*d-2>());
+            pf_normals.Fill(TV());ee_normals.Fill(TV());
+            pf_old_speeds.Fill(T());ee_old_speeds.Fill(T());
             Adjust_Velocity_For_Point_Face_Collision(dt,rigid,rigid_lists,list_index,point_face_pairs_internal,attempt_ratio,true,exit_early);
             Adjust_Velocity_For_Edge_Edge_Collision(dt,rigid,rigid_lists,list_index,edge_edge_pairs_internal,attempt_ratio,true,exit_early);
             
@@ -339,8 +338,8 @@ Adjust_Velocity_For_Point_Face_Collision(const T dt,const bool rigid,ARRAY<ARRAY
         else collided=Point_Face_Collision(pf_data,nodes,dt,POINT_FACE_REPULSION_PAIR<TV>::Total_Repulsion_Thickness(repulsion_thickness,nodes),collision_time,attempt_ratio,exit_early||rigid);
         if(collided){
             collisions++;
-            INDIRECT_ARRAY<ARRAY<bool>,VECTOR<int,d+1>&> modified_subset=modified_full.Subset(nodes);ARRAYS_COMPUTATIONS::Fill(modified_subset,true);
-            INDIRECT_ARRAY<ARRAY<bool>,VECTOR<int,d+1>&> recently_modified_subset=recently_modified_full.Subset(nodes);ARRAYS_COMPUTATIONS::Fill(recently_modified_subset,true);
+            modified_full.Subset(nodes).Fill(true);
+            recently_modified_full.Subset(nodes).Fill(true);
             if(exit_early){if(output_collision_results) LOG::cout<<"exiting collision checking early - point face collision"<<std::endl;return collisions;}
             if(rigid) Add_To_Rigid_Lists(rigid_lists,list_index,nodes);}}
     if(output_collision_results && !final_repulsion_only){
@@ -539,8 +538,8 @@ Adjust_Velocity_For_Edge_Edge_Collision(const T dt,const bool rigid,ARRAY<ARRAY<
             collided=Edge_Edge_Final_Repulsion(ee_data,nodes,dt,collision_time,attempt_ratio,(exit_early||rigid));
         else collided=Edge_Edge_Collision(ee_data,nodes,dt,collision_time,attempt_ratio,(exit_early||rigid));
         if(collided){collisions++;
-            INDIRECT_ARRAY<ARRAY<bool>,VECTOR<int,2*d-2>&> modified_subset=modified_full.Subset(nodes);ARRAYS_COMPUTATIONS::Fill(modified_subset,true);
-            INDIRECT_ARRAY<ARRAY<bool>,VECTOR<int,2*d-2>&> recently_modified_subset=recently_modified_full.Subset(nodes);ARRAYS_COMPUTATIONS::Fill(recently_modified_subset,true);
+            modified_full.Subset(nodes).Fill(true);
+            recently_modified_full.Subset(nodes).Fill(true);
             if(exit_early){if(output_collision_results) LOG::cout<<"exiting collision checking early - edge collision"<<std::endl;return collisions;}
             if(rigid) Add_To_Rigid_Lists(rigid_lists,list_index,nodes);}}
     if(output_collision_results && !final_repulsion_only){
@@ -757,7 +756,7 @@ Stop_Nodes_Before_Self_Collision(const T dt)
     ARRAY_VIEW<TV> X(geometry.deformable_body_collection.particles.X),V(geometry.deformable_body_collection.particles.V);
     ARRAY<bool>& modified_full=geometry.modified_full;
     
-    modified_full.Resize(geometry.deformable_body_collection.particles.array_collection->Size(),false,false);ARRAYS_COMPUTATIONS::Fill(modified_full,false);
+    modified_full.Resize(geometry.deformable_body_collection.particles.array_collection->Size(),false,false);modified_full.Fill(false);
     while(!attempts || point_face_collisions || edge_edge_collisions){
         LOG::SCOPE scope("Stop Attempt","Stop Attempt");
         if(++attempts > 3) full_stop=true;point_face_collisions=0;edge_edge_collisions=0;
@@ -819,11 +818,11 @@ Stop_Nodes_Before_Self_Collision(const T dt)
                 point_face_collisions++;T scale=collision_time/dt;
                 if(full_stop || scale < (T).01){scale=0;
                     INDIRECT_ARRAY<ARRAY<bool>,VECTOR<int,d+1>&> already_stopped_subset=already_stopped_full.Subset(nodes);
-                    ARRAYS_COMPUTATIONS::Fill(already_stopped_subset,true);}
+                    already_stopped_subset.Fill(true);}
                 else scale*=(T).95;
                 V.Subset(nodes)*=scale;
                 INDIRECT_ARRAY<ARRAY<bool>,VECTOR<int,d+1>&> modified_subset=modified_full.Subset(nodes);
-                ARRAYS_COMPUTATIONS::Fill(modified_subset,true);}}
+                modified_subset.Fill(true);}}
 
         for(int pair_index=1;pair_index<=edge_edge_pairs_internal.m;pair_index++){
             const VECTOR<int,2*d-2>& nodes=edge_edge_pairs_internal(pair_index);
@@ -834,11 +833,11 @@ Stop_Nodes_Before_Self_Collision(const T dt)
                 edge_edge_collisions++;T scale=collision_time/dt;
                 if(full_stop || scale < (T).1){scale=0;
                     INDIRECT_ARRAY<ARRAY<bool>,VECTOR<int,2*d-2>&> already_stopped_subset=already_stopped_full.Subset(nodes);
-                    ARRAYS_COMPUTATIONS::Fill(already_stopped_subset,true);}
+                    already_stopped_subset.Fill(true);}
                 else scale*=(T).9;
                 V.Subset(nodes)*=scale;
                 INDIRECT_ARRAY<ARRAY<bool>,VECTOR<int,2*d-2>&> modified_subset=modified_full.Subset(nodes);
-                ARRAYS_COMPUTATIONS::Fill(modified_subset,true);}}
+                modified_subset.Fill(true);}}
         LOG::Stat("point triangle collisions",point_face_collisions);
         LOG::Stat("edge edge collisions",edge_edge_collisions);}
     if(point_face_collisions || edge_edge_collisions) LOG::Stat("attempts at stopping nodes",attempts);

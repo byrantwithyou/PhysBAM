@@ -237,7 +237,7 @@ void Get_Initial_Data()
     ARRAY<int> binding_attachments(embedding_parents.m);
     FREE_PARTICLES<TV>& free_particles=*FREE_PARTICLES<TV>::Create(particles);
     for(int i=1;i<=input_attached_nodes.m;i++){
-        INDIRECT_ARRAY<ARRAY<int>,ARRAY<int>&> subset=binding_attachments.Subset(input_attached_nodes(i));ARRAYS_COMPUTATIONS::Fill(subset,i);}
+        binding_attachments.Subset(input_attached_nodes(i)).Fill(i);}
     attached_nodes.Resize(input_attached_nodes.m);
     for(int b=1;b<=soft_bindings.bindings.m;b++){
         int particle_index,parent_index;soft_bindings.bindings(b).Get(particle_index,parent_index);
