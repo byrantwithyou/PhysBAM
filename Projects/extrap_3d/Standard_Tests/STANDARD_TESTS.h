@@ -616,12 +616,42 @@ void Get_Initial_Data()
             curve.Add_Control_Point(0,FRAME<TV>(TV(0,0.5,-10)));
             curve.Add_Control_Point(20,FRAME<TV>(TV(0,0.5,90)));
 
-            RIGID_BODY<TV>& box1=tests.Add_Analytic_Sphere(0.065,density,5);
-            box1.X() = TV(0.27,0.645,-0.12);
-            RIGID_BODY<TV>& box2=tests.Add_Analytic_Sphere(0.065,density,5);
-            box2.X() = TV(-0.275,0.605,-0.18);
-            RIGID_BODY<TV>& box3=tests.Add_Analytic_Box(TV(0.5,0.06,0.5));
-            box3.X() = TV(-0.024,0.03,0.1);
+            RIGID_BODY<TV>& ball1=tests.Add_Analytic_Sphere(0.065,density,6);
+            ball1.X() = TV(0.27,0.645,-0.12);
+            RIGID_BODY<TV>& ball2=tests.Add_Analytic_Sphere(0.065,density,6);
+            ball2.X() = TV(-0.275,0.605,-0.18);
+            RIGID_BODY<TV>& box1=tests.Add_Analytic_Box(TV(0.4,0.06,0.4));
+            box1.X() = TV(-0.024,0.03,0.1);
+            RIGID_BODY<TV>& cylinder1=tests.Add_Analytic_Cylinder(0.4,0.06,196);
+            cylinder1.X() = TV(-0.024,0,0.1)+TV(0.2,0,0);
+            RIGID_BODY<TV>& cylinder2=tests.Add_Analytic_Cylinder(0.4,0.06,196);
+            cylinder2.X() = TV(-0.024,0,0.1)+TV(-0.2,0,0);
+            RIGID_BODY<TV>& cylinder3=tests.Add_Analytic_Cylinder(0.4,0.06,196);
+            cylinder3.X() = TV(-0.024,0,0.1)+TV(0,0,0.2);
+            cylinder3.Rotation() = ROTATION<TV>((T)pi/2,TV(0,1,0));
+            RIGID_BODY<TV>& cylinder4=tests.Add_Analytic_Cylinder(0.4,0.06,196);
+            cylinder4.X() = TV(-0.024,0,0.1)+TV(0,0,-0.2);
+            cylinder4.Rotation() = ROTATION<TV>((T)pi/2,TV(0,1,0));
+            RIGID_BODY<TV>& sphere1=tests.Add_Analytic_Sphere(0.06,density,6);
+            sphere1.X() = TV(-0.024,0,0.1)+TV(0.2,0,0.2);
+            RIGID_BODY<TV>& sphere2=tests.Add_Analytic_Sphere(0.06,density,6);
+            sphere2.X() = TV(-0.024,0,0.1)+TV(0.2,0,-0.2);
+            RIGID_BODY<TV>& sphere3=tests.Add_Analytic_Sphere(0.06,density,6);
+            sphere3.X() = TV(-0.024,0,0.1)+TV(-0.2,0,0.2);
+            RIGID_BODY<TV>& sphere4=tests.Add_Analytic_Sphere(0.06,density,6);
+            sphere4.X() = TV(-0.024,0,0.1)+TV(-0.2,0,-0.2);
+
+            ball1.is_static = true;
+            ball2.is_static = true;
+            box1.is_static = true;
+            cylinder1.is_static = true;
+            cylinder2.is_static = true;
+            cylinder3.is_static = true;
+            cylinder4.is_static = true;
+            sphere1.is_static = true;
+            sphere2.is_static = true;
+            sphere3.is_static = true;
+            sphere4.is_static = true;
             
             break;}
 
@@ -1662,6 +1692,18 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
     }
     if(test_number==31)
     {
+        TETRAHEDRALIZED_VOLUME<T>& tet_volume = solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+        FINITE_VOLUME<TV,3>& fvm = solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
+
+        int number_of_vertices = solid_body_collection.deformable_body_collection.collisions.check_collision.m;
+        for (int i=1; i<=number_of_vertices; i++) solid_body_collection.deformable_body_collection.collisions.check_collision(i)=true;
+
+        for(int t=1;t<=fvm.Fe_hat.m;t++)
+            if(fvm.Fe_hat(t).x11>=3)
+                for (int i=1; i<=4; i++)
+                    if (solid_body_collection.deformable_body_collection.particles.X(tet_volume.mesh.elements(t)(i)).y <= 0.06)
+                        solid_body_collection.deformable_body_collection.collisions.check_collision(tet_volume.mesh.elements(t)(i))=false;
+
         int number_of_constrained_particles = constrained_particles.m;
         for (int i=1; i<=number_of_constrained_particles; i++)
             solid_body_collection.deformable_body_collection.collisions.check_collision(constrained_particles(i))=false;
