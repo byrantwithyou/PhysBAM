@@ -1666,7 +1666,7 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
         for (int i=1; i<=number_of_constrained_particles; i++)
             solid_body_collection.deformable_body_collection.collisions.check_collision(constrained_particles(i))=false;
     }
-    if(test_number==51) fish_V=solid_body_collection.deformable_body_collection.
+    //if(test_number==51) fish_V=solid_body_collection.deformable_body_collection.
 }
 //#####################################################################
 // Function Update_Time_Varying_Material_Properties
