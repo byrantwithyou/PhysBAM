@@ -761,7 +761,7 @@ void Get_Initial_Data()
         }
         case 39:
         {
-            RIGID_BODY_STATE<TV> initial_state1(FRAME<TV>(TV(0.075,0.3,0.095),ROTATION<TV>(T(pi/0.103),TV(1.35,0.785,1.675))));
+            RIGID_BODY_STATE<TV> initial_state1(FRAME<TV>(TV(0.07,0.3,0.09),ROTATION<TV>(T(pi/0.103),TV(1.35,0.785,1.675))));
             RIGID_BODY_STATE<TV> initial_state2(FRAME<TV>(TV(0,0.01,0)));
             tests.Create_Mattress(mattress_grid,true,&initial_state1);
             tests.Create_Mattress(mattress_grid,true,&initial_state2);
@@ -770,8 +770,8 @@ void Get_Initial_Data()
         }
         case 40:
         {
-            jello_centers.Append(TV(-0.266,0.017,0.013)); 
-            jello_centers.Append(TV(0.266,0.0260,-0.013));
+            jello_centers.Append(TV(-0.266,0.022,0.013)); 
+            jello_centers.Append(TV(0.266, 0.029,-0.013));
             RIGID_BODY_STATE<TV> initial_state1(FRAME<TV>(jello_centers(1),ROTATION<TV>(T(pi/0.13),TV(1.3,1.5,0.7))));
             RIGID_BODY_STATE<TV> initial_state2(FRAME<TV>(jello_centers(2),ROTATION<TV>(T(pi/0.076),TV(0.7,1,0.1))));
             tests.Create_Mattress(mattress_grid,true,&initial_state1);
