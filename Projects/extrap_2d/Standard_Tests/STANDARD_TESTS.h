@@ -113,6 +113,7 @@ public:
     bool use_contrails;
     ARRAY<ARRAY<TV> > contrail;
     ARRAY<VECTOR<T,3> > contrail_colors;
+    ARRAY<VECTOR<TV,2> > contour_segments;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),semi_implicit(false),test_forces(false),use_extended_neohookean(false),
@@ -751,6 +752,7 @@ void Add_Constitutive_Model(TRIANGULATED_AREA<T>& triangulated_area,T stiffness,
     solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,icm));
 
     if(primary_contour) Primary_Contour(*icm);
+    if(scatter_plot) Add_Primary_Contour_Segments(*icm);
 }
 //#####################################################################
 // Function Primary_Contour
@@ -824,8 +826,76 @@ void Dump_Scatter_Plot(int frame)
         eps.Line_Color(contrail_colors(i));
         eps.Draw_Point(contrail(i).Last());}
     eps.Line_Color(VECTOR<T,3>());
+
+    for(int i=1;i<=contour_segments.m;i++)
+        eps.Draw_Line(contour_segments(i).x,contour_segments(i).y);
+
     eps.Draw_Line(TV(0,-image_size),TV(0,image_size));
     eps.Draw_Line(TV(-image_size,0),TV(image_size,0));
+}
+//#####################################################################
+// Function Add_Primary_Contour_Segment
+//#####################################################################
+T Contour_Crossing(const TV& g0,const TV& v0,const TV& g1,const TV& v1)
+{
+    T a=TV::Dot_Product(g0,v0);
+    T b=TV::Dot_Product(g1,v1);
+    if(!a) return 0;
+    if(!b) return 1;
+    if(TV::Dot_Product(v0,v1)<0) b=-b;
+    if((a>0) == (b>0)) return -1;
+//    LOG::cout<<"CROSS "<<a<<"  "<<b<<"  "<<g0<<"  "<<g1<<"  "<<v0<<"  "<<v1<<std::endl;
+    return a/(a-b);
+}
+//#####################################################################
+// Function Add_Primary_Contour_Segments
+//#####################################################################
+void Add_Primary_Contour_Segments(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>& icm)
+{
+    ARRAY<TV,VECTOR<int,2> > evec(1,image_size,1,image_size);
+    ARRAY<TV,VECTOR<int,2> > grad(1,image_size,1,image_size);
+    for(int i=1;i<=image_size;i++)
+        for(int j=1;j<=image_size;j++){
+            T x=(2*i-image_size)*sigma_range/image_size+1e-5;
+            T y=(2*j-image_size)*sigma_range/image_size;
+            TV g=icm.P_From_Strain(DIAGONAL_MATRIX<T,2>(x,y),1,1).To_Vector();
+            DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2> disd;
+            icm.Isotropic_Stress_Derivative(DIAGONAL_MATRIX<T,2>(x,y),disd,1);
+            SYMMETRIC_MATRIX<T,2> H(disd.x1111,disd.x2211,disd.x2222);
+            DIAGONAL_MATRIX<T,2> ev;
+            MATRIX<T,2> eigenvectors;
+            H.Fast_Solve_Eigenproblem(ev,eigenvectors);
+            evec(VECTOR<int,2>(i,j))=fabs(ev.x11)>fabs(ev.x22)?eigenvectors.Column(1):eigenvectors.Column(2);
+            grad(VECTOR<int,2>(i,j))=g;}
+
+    for(int i=1;i<image_size;i++)
+        for(int j=1;j<image_size;j++){
+            TV g00=grad(VECTOR<int,2>(i,j)),g01=grad(VECTOR<int,2>(i,j+1)),g10=grad(VECTOR<int,2>(i+1,j)),g11=grad(VECTOR<int,2>(i+1,j+1));
+            TV v00=evec(VECTOR<int,2>(i,j)),v01=evec(VECTOR<int,2>(i,j+1)),v10=evec(VECTOR<int,2>(i+1,j)),v11=evec(VECTOR<int,2>(i+1,j+1));
+            T cx0=Contour_Crossing(g00,v00,g10,v10);
+            T cx1=Contour_Crossing(g01,v01,g11,v11);
+            T c0x=Contour_Crossing(g00,v00,g01,v01);
+            T c1x=Contour_Crossing(g10,v10,g11,v11);
+            int n=(cx0>=0)+(cx1>=0)+(c0x>=0)+(c1x>=0);
+            if(n<2) continue;
+            TV X00((2*i-image_size)*sigma_range/image_size+1e-5,(2*j-image_size)*sigma_range/image_size);
+            TV X01((2*i-image_size)*sigma_range/image_size+1e-5,(2*(j+1)-image_size)*sigma_range/image_size);
+            TV X10((2*(i+1)-image_size)*sigma_range/image_size+1e-5,(2*j-image_size)*sigma_range/image_size);
+            TV X11((2*(i+1)-image_size)*sigma_range/image_size+1e-5,(2*(j+1)-image_size)*sigma_range/image_size);
+            TV Yx0=X00+(X10-X00)*cx0,Yx1=X01+(X11-X01)*cx1,Y0x=X00+(X01-X00)*c0x,Y1x=X10+(X11-X10)*c1x;
+            if(cx0>=0 && cx1>=0){
+                contour_segments.Append(VECTOR<TV,2>(Yx0,Yx1));
+                if(n==3 && c0x>=0) contour_segments.Append(VECTOR<TV,2>(Y0x,(Yx0+Yx1)/2));
+                if(n==3 && c1x>=0) contour_segments.Append(VECTOR<TV,2>(Y1x,(Yx0+Yx1)/2));}
+            if(c0x>=0 && c1x>=0){
+                contour_segments.Append(VECTOR<TV,2>(Y0x,Y1x));
+                if(n==3 && cx0>=0) contour_segments.Append(VECTOR<TV,2>(Yx0,(Y0x+Y1x)/2));
+                if(n==3 && cx1>=0) contour_segments.Append(VECTOR<TV,2>(Yx1,(Y0x+Y1x)/2));}
+            if(n>2) continue;
+            if(c0x>=0 && cx0>=0) contour_segments.Append(VECTOR<TV,2>(Y0x,Yx0));
+            if(c0x>=0 && cx1>=0) contour_segments.Append(VECTOR<TV,2>(Y0x,Yx1));
+            if(c1x>=0 && cx0>=0) contour_segments.Append(VECTOR<TV,2>(Y1x,Yx0));
+            if(c1x>=0 && cx1>=0) contour_segments.Append(VECTOR<TV,2>(Y1x,Yx1));}
 }
 //#####################################################################
 };
