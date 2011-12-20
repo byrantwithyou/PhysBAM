@@ -148,7 +148,7 @@ bool Tri_Test()
     return true;
 }
 
-void Test_Triangualted_Areas()
+void Test_Triangulated_Areas()
 {
     typedef double T;
     typedef VECTOR<double,2> TV;
@@ -425,7 +425,7 @@ void Volume_From_Simplices_Test()
     PhysBAM::ORIGIN_AREAS::Clear(vol_data);
     X[0]=TV(-3,+2);X[1]=TV(+3,+2);X[2]=TV(+1,+1);X[3]=TV(-1,+1);
     PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data,X);
-    assert(vol_data.V==static_cast<T>(-1));
+    PHYSBAM_ASSERT(vol_data.V==static_cast<T>(-1));
     Volume_From_Simplices_Test_Gradient(vol_data,X);
     Volume_From_Simplices_Test_Hessian(vol_data,X);
 
@@ -438,7 +438,7 @@ void Volume_From_Simplices_Test()
     PhysBAM::ORIGIN_AREAS::Clear(vol_data);
     X[0]=TV(-2,+2);X[1]=TV(+3,+2);X[2]=TV(+1,+1);X[3]=TV(-2,+4);
     PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data,X);
-    assert(vol_data.V==static_cast<T>(-2));
+    PHYSBAM_ASSERT(vol_data.V==static_cast<T>(-2));
     Volume_From_Simplices_Test_Gradient(vol_data,X);
     Volume_From_Simplices_Test_Hessian(vol_data,X);
 
@@ -449,7 +449,7 @@ void Volume_From_Simplices_Test()
     PhysBAM::ORIGIN_AREAS::Clear(vol_data);
     X[0]=TV(-3,+1);X[1]=TV(+3,+1);X[2]=TV(+2,+2);X[3]=TV(-2,+2);
     PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data,X);
-    assert(vol_data.V==static_cast<T>(-1));
+    PHYSBAM_ASSERT(vol_data.V==static_cast<T>(-1));
     Volume_From_Simplices_Test_Gradient(vol_data,X);
     Volume_From_Simplices_Test_Hessian(vol_data,X);
 
@@ -460,7 +460,7 @@ void Volume_From_Simplices_Test()
     PhysBAM::ORIGIN_AREAS::Clear(vol_data);
     X[0]=TV(-2,+2);X[1]=TV(+3,+2);X[2]=TV(+1,+1);X[3]=TV(-3,+1);
     PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data,X);
-    assert(vol_data.V==static_cast<T>(-1));
+    PHYSBAM_ASSERT(vol_data.V==static_cast<T>(-1));
     Volume_From_Simplices_Test_Gradient(vol_data,X);
     Volume_From_Simplices_Test_Hessian(vol_data,X);
 
@@ -473,7 +473,7 @@ void Volume_From_Simplices_Test()
     PhysBAM::ORIGIN_AREAS::Clear(vol_data);
     X[0]=TV(-2,+4);X[1]=TV(+2, 0);X[2]=TV(+2,+2);X[3]=TV(-2,+2);
     PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data,X);
-    assert(vol_data.V==static_cast<T>(-2));
+    PHYSBAM_ASSERT(vol_data.V==static_cast<T>(-2));
     Volume_From_Simplices_Test_Gradient(vol_data,X);
     Volume_From_Simplices_Test_Hessian(vol_data,X);
 
@@ -485,7 +485,7 @@ void Volume_From_Simplices_Test()
     PhysBAM::ORIGIN_AREAS::Clear(vol_data);
     X[0]=TV(-1,+2);X[1]=TV(+5,+2);X[2]=TV(+2,+1);X[3]=TV(-2,+3);
     PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data,X);
-    assert(vol_data.V==static_cast<T>(-3));
+    PHYSBAM_ASSERT(vol_data.V==static_cast<T>(-3));
     Volume_From_Simplices_Test_Gradient(vol_data,X);
     Volume_From_Simplices_Test_Hessian(vol_data,X);
 }
@@ -499,7 +499,7 @@ int main(int argc,char *argv[])
 
 #if 0
 
-//    Test_Triangualted_Areas();
+//    Test_Triangulated_Areas();
 
 //    fprintf(stderr, "%%!PS-Adobe-3.0 EPSF-3.0\n");
 //    fprintf(stderr, "%%%%BoundingBox: 0 0 1000 1000\n");
