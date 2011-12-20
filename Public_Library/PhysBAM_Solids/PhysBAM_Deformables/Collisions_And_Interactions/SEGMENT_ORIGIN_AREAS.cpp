@@ -424,11 +424,22 @@ template<class T,class TV> void Case_CCAA(VOL_DATA<T,2,4>& data,const TV& /*A*/,
     //     D   C
     //       O
 //    trap_cases.Append(1);
+#if 0
+    DATA<T,2,1> DC;
+    Data_From_Dof(DC,C);
+    DATA<T,2,1> DD;
+    Data_From_Dof(DD,D);
+
+    VOL_DATA<T,2,2> V;
+    Area_From_Points(V,DC.V,DD.V);
+    Combine_Data(data,V,DC,DD,vec_c,vec_d);
+#else // #if 0|1
     static const int cd[]={2,3};
     static const int _01[]={0,1};
     {VOL_DATA<T,2,3> V;
     Triangle_Area(V,C,D,TV());
     Add_Data(data,V,cd,_01);}
+#endif // #if 0|1
 }
 
 template<class T,class TV> void Case_CCAB(VOL_DATA<T,2,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
@@ -439,6 +450,18 @@ template<class T,class TV> void Case_CCAB(VOL_DATA<T,2,4>& data,const TV& A,cons
     //       C
     //     O
 //    trap_cases.Append(2);
+#if 0
+    DATA<T,2,4> Q;
+    Intersect_Segments(Q,A,B,C,D);
+    DATA<T,2,3> P;
+    Intersect_Segment_Point(P,A,B,D);
+    DATA<T,2,1> DC;
+    Data_From_Dof(DC,C);
+
+    VOL_DATA<T,2,3> V;
+    Area_From_Points(V,DC.V,Q.V,P.V);
+    Combine_Data(data,V,DC,Q,P,vec_c,vec_abcd,vec_abd);
+#else // #if 0|1
     static const int cd[]={2,3};
     static const int adb[]={0,3,1};
     static const int dab[]={3,0,1};
@@ -459,6 +482,7 @@ template<class T,class TV> void Case_CCAB(VOL_DATA<T,2,4>& data,const TV& A,cons
     {VOL_DATA<T,2,3> V;
     Triangle_Area(V,C,D,TV());
     Add_Data(data,V,cd,_01);}
+#endif // #if 0|1
 }
 
 template<class T,class TV> void Case_CCBB(VOL_DATA<T,2,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
@@ -467,21 +491,32 @@ template<class T,class TV> void Case_CCBB(VOL_DATA<T,2,4>& data,const TV& A,cons
     // A   P   P   B
     //       O
 //    trap_cases.Append(3);
+#if 1
+    DATA<T,2,3> P1;
+    Intersect_Segment_Point(P1,A,B,C);
+    DATA<T,2,3> P2;
+    Intersect_Segment_Point(P2,A,B,D);
+
+    VOL_DATA<T,2,2> V;
+    Area_From_Points(V,P1.V,P2.V);
+    Combine_Data(data,V,P1,P2,vec_abc,vec_abd);
+#else // #if 0|1
     static const int ba[]={1,0};
     static const int bad[]={1,0,3};
     static const int cba[]={2,1,0};
     static const int _01[]={0,1};
     static const int _012[]={0,1,2};
     static const int _123[]={1,2,3};
-    {VOL_DATA<T,2,3> V;
-    Triangle_Area(V,B,A,TV());
-    Add_Data(data,V,ba,_01);}
     {VOL_DATA<T,2,4> V;
     Triangle_Area(V,B,A,D,TV());
     Add_Data(data,V,bad,_012);}
     {VOL_DATA<T,2,4> V;
     Triangle_Area(V,TV(),C,B,A);
     Add_Data(data,V,cba,_123);}
+    {VOL_DATA<T,2,3> V;
+    Triangle_Area(V,B,A,TV());
+    Add_Data(data,V,ba,_01);}
+#endif // #if 0|1
 }
 
 template<class T,class TV> void Case_BCAC(VOL_DATA<T,2,4>& data,const TV& A,const TV& /*B*/,const TV& C,const TV& D)
@@ -490,11 +525,22 @@ template<class T,class TV> void Case_BCAC(VOL_DATA<T,2,4>& data,const TV& A,cons
     // D   P   C
     //       O
 //    trap_cases.Append(4);
+#if 0
+    DATA<T,2,3> P;
+    Intersect_Segment_Point(P,C,D,A);
+    DATA<T,2,1> DC;
+    Data_From_Dof(DC,C);
+
+    VOL_DATA<T,2,2> V;
+    Area_From_Points(V,DC.V,P.V);
+    Combine_Data(data,V,DC,P,vec_c,vec_cda);
+#else // #if 0|1
     static const int acd[]={0,2,3};
     static const int _023[]={0,2,3};
     {VOL_DATA<T,2,4> V;
     Triangle_Area(V,A,TV(),C,D);
     Add_Data(data,V,acd,_023);}
+#endif // #if 0|1
 }
 
 template<class T,class TV> void Case_BCBC(VOL_DATA<T,2,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
@@ -505,6 +551,18 @@ template<class T,class TV> void Case_BCBC(VOL_DATA<T,2,4>& data,const TV& A,cons
     //       P
     //     O   B
 //    trap_cases.Append(5);
+#if 0
+    DATA<T,2,4> Q;
+    Intersect_Segments(Q,A,B,C,D);
+    DATA<T,2,3> P1;
+    Intersect_Segment_Point(P1,C,D,A);
+    DATA<T,2,3> P2;
+    Intersect_Segment_Point(P2,A,B,C);
+
+    VOL_DATA<T,2,3> V;
+    Area_From_Points(V,P2.V,Q.V,P1.V);
+    Combine_Data(data,V,P2,Q,P1,vec_abc,vec_abcd,vec_cda);
+#else // #if 0|1
     static const int ca[]={2,0};
     static const int bac[]={1,0,2};
     static const int acd[]={0,2,3};
@@ -525,6 +583,7 @@ template<class T,class TV> void Case_BCBC(VOL_DATA<T,2,4>& data,const TV& A,cons
     {VOL_DATA<T,2,3> V;
     Triangle_Area(V,C,A,TV());
     Add_Data(data,V,ca,_01);}
+#endif // #if 0|1
 }
 
 template<class T,class TV> void Case_ACAC(VOL_DATA<T,2,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
@@ -534,6 +593,18 @@ template<class T,class TV> void Case_ACAC(VOL_DATA<T,2,4>& data,const TV& A,cons
     //            C
     //      O
 //    trap_cases.Append(6);
+#if 0
+    DATA<T,2,4> Q;
+    Intersect_Segments(Q,A,B,C,D);
+    DATA<T,2,1> DA;
+    Data_From_Dof(DA,A);
+    DATA<T,2,1> DC;
+    Data_From_Dof(DC,C);
+
+    VOL_DATA<T,2,3> V;
+    Area_From_Points(V,DC.V,Q.V,DA.V);
+    Combine_Data(data,V,DC,Q,DA,vec_c,vec_abcd,vec_a);
+#else // #if 0|1
     static const int ca[]={2,0};
     static const int bacd[]={1,0,2,3};
     static const int _01[]={0,1};
@@ -544,6 +615,7 @@ template<class T,class TV> void Case_ACAC(VOL_DATA<T,2,4>& data,const TV& A,cons
     {VOL_DATA<T,2,4> V;
     Triangle_Area(V,B,A,C,D);
     Add_Data(data,V,bacd,_0123);}
+#endif // #if 0|1
 }
 
 template void PhysBAM::ORIGIN_AREAS::Clear<float,3,6>(VOL_DATA<float,3,6>&);
