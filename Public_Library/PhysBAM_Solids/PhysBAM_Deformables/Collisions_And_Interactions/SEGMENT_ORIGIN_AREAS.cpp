@@ -25,18 +25,42 @@ template<class T,int m,int n> void PhysBAM::ORIGIN_AREAS::Clear(VOL_DATA<T,m,n>&
     for(int i=0;i<n;i++) for(int j=0;j<n;j++) data.H[i][j]=MATRIX<T,m>();
 }
 
-#if 0
+template<class T,class TV> void Triangle_Area(
+    VOL_DATA<T,2,3>& data,
+    const TV& A,const TV& B,const TV& C)
+{
+    // Computes the area [A,B,C], along with the 1st and 2nd derivatives.
+    const TV AC_L=(A-C).Orthogonal_Vector();
+    const TV AB_L=(A-B).Orthogonal_Vector();
+    const TV BC_L=(B-C).Orthogonal_Vector();
+    typedef MATRIX<T,2> TM;
+    const TM J=TM(0,+1,-1,0)/2;
+    data.V=TV::Cross_Product(A-C,B-C).x/2;
+    data.G[0]=-BC_L/2;
+    data.G[1]= AC_L/2;
+    data.G[2]=-AB_L/2;
+    data.H[0][0]=TM();
+    data.H[1][1]=TM();
+    data.H[2][2]=TM();
+    data.H[0][1]=-J;
+    data.H[0][2]= J;
+    data.H[1][0]= J;
+    data.H[1][2]=-J;
+    data.H[2][0]=-J;
+    data.H[2][1]= J;
+}
+
 template<class T,class TV> void Triangle_Area(
     VOL_DATA<T,2,4>& data,
     const TV& A,const TV& B,const TV& C,const TV& D)
 {
     // Computes the area [B,C,P], along with 1st and 2nd derivatives, where P is
     // the intersection between segment A-B and segment C-D.
-    const T ABC=TV::Cross_Product(A-C,B-C);
-    const T ADB=TV::Cross_Product(A-B,D-B);
-    const T ADC=TV::Cross_Product(A-C,D-C);
-    const T BCD=TV::Cross_Product(B-D,C-D);
-    const T ADBC=TV::Cross_Product(A-B,D-C);
+    const T ABC=TV::Cross_Product(A-C,B-C).x;
+    const T ADB=TV::Cross_Product(A-B,D-B).x;
+    const T ADC=TV::Cross_Product(A-C,D-C).x;
+    const T BCD=TV::Cross_Product(B-D,C-D).x;
+    const T ADBC=TV::Cross_Product(A-B,D-C).x;
     const TV AB_L=(A-B).Orthogonal_Vector();
     const TV AC_L=(A-C).Orthogonal_Vector();
     const TV AD_L=(A-D).Orthogonal_Vector();
@@ -44,7 +68,7 @@ template<class T,class TV> void Triangle_Area(
     const TV BD_L=(B-D).Orthogonal_Vector();
     const TV CD_L=(C-D).Orthogonal_Vector();
     typedef MATRIX<T,2> TM;
-    const TM J=TM(0,-1,+1,0)/2;
+    const TM J=TM(0,+1,-1,0)/2;
     const TM ABxAB=TM::Outer_Product(AB_L,AB_L);
     const TM ABxAC=TM::Outer_Product(AB_L,AC_L);
     const TM ABxAD=TM::Outer_Product(AB_L,AD_L);
@@ -82,14 +106,13 @@ template<class T,class TV> void Triangle_Area(
     data.H[0][1]=-(BCD/ADBC)*J+(1/(4*ADBC2))*(ADC*(BCxCD+BDxCD)-BCD*(CDxAC+CDxAD)+((ABC-ADB)*(ADC-BCD)/ADBC)*CDxCD);
     data.H[2][3]=-(ABC/ADBC)*J+(1/(4*ADBC2))*(ADB*(ABxAC+ABxBC)-ABC*(ADxAB+BDxAB)+((ABC-ADB)*(ADC-BCD)/ADBC)*ABxAB);
     data.H[1][2]=-(1-ADB*ADC/ADBC2)*J+(1/(4*ADBC2))*(2*ADBC*ACxBD+ABC*(CDxAD+CDxBD)+BCD*(ACxAB+ADxAB)+(4*ADB*ADC/ADBC-(ADB+ADC))*CDxAB);
-    data.H[0][2]=(ADB*BCD/ADBC2)*((1/ADBC)*CDxAB-J)-(1/(2*ADBC2))*(ADBC*BCxBD+ABC*CDxBD+BCD*BDxAB);
+    data.H[0][2]=(ADB*BCD/ADBC2)*((1/ADBC)*CDxAB+J)-(1/(2*ADBC2))*(ADBC*BCxBD+ABC*CDxBD+BCD*BDxAB);
     data.H[0][3]=(ABC*BCD/ADBC2)*((1/ADBC)*CDxAB+J)+(1/(2*ADBC2))*(ADBC*BCxBC+ABC*CDxBC+BCD*BCxAB);
     data.H[1][3]=(ABC*ADC/ADBC2)*((1/ADBC)*CDxAB+J)-(1/(2*ADBC2))*(ADBC*ACxBC+ABC*CDxAC+BCD*ACxAB);
     for(int i=1;i!=4;++i)
         for(int j=0;j!=i;++j)
             data.H[i][j]=data.H[j][i].Transposed();
 }
-#endif
 
 template<class T,class TV> void Data_From_Dof(DATA<T,2,1>& data,const TV& A)
 {
@@ -383,25 +406,16 @@ void Combine_Data(
             data.H[index3[i3]][index2[i2]]+=x.Transposed();}
 }
 
-#if 0
-template<class TI>
-void Check_Gradient(VOL_DATA<TI,2,4> const& dataI)
+template<class T,int m,int n>
+void Add_Data(VOL_DATA<T,2,4>& data,const VOL_DATA<T,2,m>& V,int const (&datai)[n],int const (&Vi)[n])
 {
-    typedef typename TI::base_type T;
-    T const abs_tol=1024*std::numeric_limits<T>::epsilon();
-    T const rel_tol=static_cast<T>(1)/1024;
-    for(int i=0;i!=4;++i){
-        for(int d=1;d<=2;++d){
-            T const x=std::abs(boost::numeric::median(dataI.G[i][d]));
-            T const e=boost::numeric::width(dataI.G[i][d])/2;
-            if(e>abs_tol&&e>rel_tol*x){
-                LOG::cout<<"x+/-e = "<<x<<"+/-"<<e<<std::endl;
-                PHYSBAM_FATAL_ERROR();
-            }
-        }
+    data.V+=V.V;
+    for(int i=0;i!=n;++i){
+        data.G[datai[i]]+=V.G[Vi[i]];
+        for(int j=0;j!=n;++j)
+            data.H[datai[i]][datai[j]]+=V.H[Vi[i]][Vi[j]];
     }
 }
-#endif // #if 0|1
 
 const int vec_a[1]={0}, vec_c[1]={2}, vec_d[1]={3}, vec_abc[3]={0,1,2}, vec_abd[3]={0,1,3}, vec_cda[3]={2,3,0}, vec_cdb[3]={2,3,1}, vec_abcd[4]={0,1,2,3};
 template<class T,class TV> void Case_CCAA(VOL_DATA<T,2,4>& data,const TV& /*A*/,const TV& /*B*/,const TV& C,const TV& D)
@@ -410,32 +424,11 @@ template<class T,class TV> void Case_CCAA(VOL_DATA<T,2,4>& data,const TV& /*A*/,
     //     D   C
     //       O
 //    trap_cases.Append(1);
-    DATA<T,2,1> DC;
-    Data_From_Dof(DC,C);
-    DATA<T,2,1> DD;
-    Data_From_Dof(DD,D);
-
-    VOL_DATA<T,2,2> V;
-    Area_From_Points(V,DC.V,DD.V);
-    Combine_Data(data,V,DC,DD,vec_c,vec_d);
-
-#if 0
-    typedef boost::numeric::interval<T> TI;
-    typedef VECTOR<TI,2> TVI;
-    VOL_DATA<TI,2,4> dataI;
-    Clear(dataI);
-    TVI CI(C),DI(D);
-
-    DATA<TI,2,1> DCI;
-    Data_From_Dof(DCI,CI);
-    DATA<TI,2,1> DDI;
-    Data_From_Dof(DDI,DI);
-
-    VOL_DATA<TI,2,2> VI;
-    Area_From_Points(VI,DCI.V,DDI.V);
-    Combine_Data(dataI,VI,DCI,DDI,vec_c,vec_d);
-    Check_Gradient(dataI);
-#endif // #if 0|1
+    static const int cd[]={2,3};
+    static const int _01[]={0,1};
+    {VOL_DATA<T,2,3> V;
+    Triangle_Area(V,C,D,TV());
+    Add_Data(data,V,cd,_01);}
 }
 
 template<class T,class TV> void Case_CCAB(VOL_DATA<T,2,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
@@ -446,44 +439,26 @@ template<class T,class TV> void Case_CCAB(VOL_DATA<T,2,4>& data,const TV& A,cons
     //       C
     //     O
 //    trap_cases.Append(2);
-    DATA<T,2,4> Q;
-    Intersect_Segments(Q,A,B,C,D);
-    DATA<T,2,3> P;
-    Intersect_Segment_Point(P,A,B,D);
-    DATA<T,2,1> DC;
-    Data_From_Dof(DC,C);
-
-#if 0
-    VOL_DATA<T,2,2> V;
-    Area_From_Points(V,DC.V,Q.V);
-    Combine_Data(data,V,DC,Q,vec_c,vec_abcd);
-    Area_From_Points(V,Q.V,P.V);
-    Combine_Data(data,V,Q,P,vec_abcd,vec_abd);
-#else // #if 0|1
-    VOL_DATA<T,2,3> V;
-    Area_From_Points(V,DC.V,Q.V,P.V);
-    Combine_Data(data,V,DC,Q,P,vec_c,vec_abcd,vec_abd);
-#endif // #if 0|1
-
-#if 0
-    typedef boost::numeric::interval<T> TI;
-    typedef VECTOR<TI,2> TVI;
-    VOL_DATA<TI,2,4> dataI;
-    Clear(dataI);
-    TVI AI(A),BI(B),CI(C),DI(D);
-
-    DATA<TI,2,4> QI;
-    Intersect_Segments(QI,AI,BI,CI,DI);
-    DATA<TI,2,3> PI;
-    Intersect_Segment_Point(PI,AI,BI,DI);
-    DATA<TI,2,1> DCI;
-    Data_From_Dof(DCI,CI);
-
-    VOL_DATA<TI,2,3> VI;
-    Area_From_Points(VI,DCI.V,QI.V,PI.V);
-    Combine_Data(dataI,VI,DCI,QI,PI,vec_c,vec_abcd,vec_abd);
-    Check_Gradient(dataI);
-#endif // #if 0|1
+    static const int cd[]={2,3};
+    static const int adb[]={0,3,1};
+    static const int dab[]={3,0,1};
+    static const int abdc[]={0,1,3,2};
+    static const int _01[]={0,1};
+    static const int _012[]={0,1,2};
+    static const int _123[]={1,2,3};
+    static const int _0123[]={0,1,2,3};
+    {VOL_DATA<T,2,3> V;
+    Triangle_Area(V,A,D,B);
+    Add_Data(data,V,adb,_012);}
+    {VOL_DATA<T,2,4> V;
+    Triangle_Area(V,TV(),D,A,B);
+    Add_Data(data,V,dab,_123);}
+    {VOL_DATA<T,2,4> V;
+    Triangle_Area(V,A,B,D,C);
+    Add_Data(data,V,abdc,_0123);}
+    {VOL_DATA<T,2,3> V;
+    Triangle_Area(V,C,D,TV());
+    Add_Data(data,V,cd,_01);}
 }
 
 template<class T,class TV> void Case_CCBB(VOL_DATA<T,2,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
@@ -492,32 +467,21 @@ template<class T,class TV> void Case_CCBB(VOL_DATA<T,2,4>& data,const TV& A,cons
     // A   P   P   B
     //       O
 //    trap_cases.Append(3);
-    DATA<T,2,3> P1;
-    Intersect_Segment_Point(P1,A,B,C);
-    DATA<T,2,3> P2;
-    Intersect_Segment_Point(P2,A,B,D);
-
-    VOL_DATA<T,2,2> V;
-    Area_From_Points(V,P1.V,P2.V);
-    Combine_Data(data,V,P1,P2,vec_abc,vec_abd);
-
-#if 0
-    typedef boost::numeric::interval<T> TI;
-    typedef VECTOR<TI,2> TVI;
-    VOL_DATA<TI,2,4> dataI;
-    Clear(dataI);
-    TVI AI(A),BI(B),CI(C),DI(D);
-
-    DATA<TI,2,3> P1I;
-    Intersect_Segment_Point(P1I,AI,BI,CI);
-    DATA<TI,2,3> P2I;
-    Intersect_Segment_Point(P2I,AI,BI,DI);
-
-    VOL_DATA<TI,2,2> VI;
-    Area_From_Points(VI,P1I.V,P2I.V);
-    Combine_Data(dataI,VI,P1I,P2I,vec_abc,vec_abd);
-    Check_Gradient(dataI);
-#endif // #if 0|1
+    static const int ba[]={1,0};
+    static const int bad[]={1,0,3};
+    static const int cba[]={2,1,0};
+    static const int _01[]={0,1};
+    static const int _012[]={0,1,2};
+    static const int _123[]={1,2,3};
+    {VOL_DATA<T,2,3> V;
+    Triangle_Area(V,B,A,TV());
+    Add_Data(data,V,ba,_01);}
+    {VOL_DATA<T,2,4> V;
+    Triangle_Area(V,B,A,D,TV());
+    Add_Data(data,V,bad,_012);}
+    {VOL_DATA<T,2,4> V;
+    Triangle_Area(V,TV(),C,B,A);
+    Add_Data(data,V,cba,_123);}
 }
 
 template<class T,class TV> void Case_BCAC(VOL_DATA<T,2,4>& data,const TV& A,const TV& /*B*/,const TV& C,const TV& D)
@@ -526,32 +490,11 @@ template<class T,class TV> void Case_BCAC(VOL_DATA<T,2,4>& data,const TV& A,cons
     // D   P   C
     //       O
 //    trap_cases.Append(4);
-    DATA<T,2,3> P;
-    Intersect_Segment_Point(P,C,D,A);
-    DATA<T,2,1> DC;
-    Data_From_Dof(DC,C);
-
-    VOL_DATA<T,2,2> V;
-    Area_From_Points(V,DC.V,P.V);
-    Combine_Data(data,V,DC,P,vec_c,vec_cda);
-
-#if 0
-    typedef boost::numeric::interval<T> TI;
-    typedef VECTOR<TI,2> TVI;
-    VOL_DATA<TI,2,4> dataI;
-    Clear(dataI);
-    TVI AI(A),CI(C),DI(D);
-
-    DATA<TI,2,3> PI;
-    Intersect_Segment_Point(PI,CI,DI,AI);
-    DATA<TI,2,1> DCI;
-    Data_From_Dof(DCI,CI);
-
-    VOL_DATA<TI,2,2> VI;
-    Area_From_Points(VI,DCI.V,PI.V);
-    Combine_Data(dataI,VI,DCI,PI,vec_c,vec_cda);
-    Check_Gradient(dataI);
-#endif // #if 0|1
+    static const int acd[]={0,2,3};
+    static const int _023[]={0,2,3};
+    {VOL_DATA<T,2,4> V;
+    Triangle_Area(V,A,TV(),C,D);
+    Add_Data(data,V,acd,_023);}
 }
 
 template<class T,class TV> void Case_BCBC(VOL_DATA<T,2,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
@@ -562,44 +505,26 @@ template<class T,class TV> void Case_BCBC(VOL_DATA<T,2,4>& data,const TV& A,cons
     //       P
     //     O   B
 //    trap_cases.Append(5);
-    DATA<T,2,4> Q;
-    Intersect_Segments(Q,A,B,C,D);
-    DATA<T,2,3> P1;
-    Intersect_Segment_Point(P1,C,D,A);
-    DATA<T,2,3> P2;
-    Intersect_Segment_Point(P2,A,B,C);
-
-#if 0
-    VOL_DATA<T,2,2> V;
-    Area_From_Points(V,Q.V,P1.V);
-    Combine_Data(data,V,Q,P1,vec_abcd,vec_cda);
-    Area_From_Points(V,P2.V,Q.V);
-    Combine_Data(data,V,P2,Q,vec_abc,vec_abcd);
-#else // #if 0|1
-    VOL_DATA<T,2,3> V;
-    Area_From_Points(V,P2.V,Q.V,P1.V);
-    Combine_Data(data,V,P2,Q,P1,vec_abc,vec_abcd,vec_cda);
-#endif // #if 0|1
-
-#if 0
-    typedef boost::numeric::interval<T> TI;
-    typedef VECTOR<TI,2> TVI;
-    VOL_DATA<TI,2,4> dataI;
-    Clear(dataI);
-    TVI AI(A),BI(B),CI(C),DI(D);
-
-    DATA<TI,2,4> QI;
-    Intersect_Segments(QI,AI,BI,CI,DI);
-    DATA<TI,2,3> P1I;
-    Intersect_Segment_Point(P1I,CI,DI,AI);
-    DATA<TI,2,3> P2I;
-    Intersect_Segment_Point(P2I,AI,BI,CI);
-
-    VOL_DATA<TI,2,3> VI;
-    Area_From_Points(VI,P2I.V,QI.V,P1I.V);
-    Combine_Data(dataI,VI,P2I,QI,P1I,vec_abc,vec_abcd,vec_cda);
-    Check_Gradient(dataI);
-#endif // #if 0|1
+    static const int ca[]={2,0};
+    static const int bac[]={1,0,2};
+    static const int acd[]={0,2,3};
+    static const int dcab[]={3,2,0,1};
+    static const int _01[]={0,1};
+    static const int _012[]={0,1,2};
+    static const int _123[]={1,2,3};
+    static const int _0123[]={0,1,2,3};
+    {VOL_DATA<T,2,4> V;
+    Triangle_Area(V,B,A,C,TV());
+    Add_Data(data,V,bac,_012);}
+    {VOL_DATA<T,2,4> V;
+    Triangle_Area(V,TV(),A,C,D);
+    Add_Data(data,V,acd,_123);}
+    {VOL_DATA<T,2,4> V;
+    Triangle_Area(V,D,C,A,B);
+    Add_Data(data,V,dcab,_0123);}
+    {VOL_DATA<T,2,3> V;
+    Triangle_Area(V,C,A,TV());
+    Add_Data(data,V,ca,_01);}
 }
 
 template<class T,class TV> void Case_ACAC(VOL_DATA<T,2,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
@@ -609,51 +534,23 @@ template<class T,class TV> void Case_ACAC(VOL_DATA<T,2,4>& data,const TV& A,cons
     //            C
     //      O
 //    trap_cases.Append(6);
-    DATA<T,2,4> Q;
-    Intersect_Segments(Q,A,B,C,D);
-    DATA<T,2,1> DA;
-    Data_From_Dof(DA,A);
-    DATA<T,2,1> DC;
-    Data_From_Dof(DC,C);
-
-#if 0
-    VOL_DATA<T,2,2> V;
-    Area_From_Points(V,DC.V,Q.V);
-    Combine_Data(data,V,DC,Q,vec_c,vec_abcd);
-    Area_From_Points(V,Q.V,DA.V);
-    Combine_Data(data,V,Q,DA,vec_abcd,vec_a);
-#else // #if 0|1
-    VOL_DATA<T,2,3> V;
-    Area_From_Points(V,DC.V,Q.V,DA.V);
-    Combine_Data(data,V,DC,Q,DA,vec_c,vec_abcd,vec_a);
-#endif // #if 0|1
-
-#if 0
-    typedef boost::numeric::interval<T> TI;
-    typedef VECTOR<TI,2> TVI;
-    VOL_DATA<TI,2,4> dataI;
-    Clear(dataI);
-    TVI AI(A),BI(B),CI(C),DI(D);
-
-    DATA<TI,2,4> QI;
-    Intersect_Segments(QI,AI,BI,CI,DI);
-    DATA<TI,2,1> DAI;
-    Data_From_Dof(DAI,AI);
-    DATA<TI,2,1> DCI;
-    Data_From_Dof(DCI,CI);
-
-    VOL_DATA<TI,2,3> VI;
-    Area_From_Points(VI,DCI.V,QI.V,DAI.V);
-    Combine_Data(dataI,VI,DCI,QI,DAI,vec_c,vec_abcd,vec_a);
-    Check_Gradient(dataI);
-#endif // #if 0|1
+    static const int ca[]={2,0};
+    static const int bacd[]={1,0,2,3};
+    static const int _01[]={0,1};
+    static const int _0123[]={0,1,2,3};
+    {VOL_DATA<T,2,3> V;
+    Triangle_Area(V,C,A,TV());
+    Add_Data(data,V,ca,_01);}
+    {VOL_DATA<T,2,4> V;
+    Triangle_Area(V,B,A,C,D);
+    Add_Data(data,V,bacd,_0123);}
 }
 
-template void PhysBAM::ORIGIN_AREAS::Volume_From_Simplices<float,VECTOR<float,2> >(VOL_DATA<float,2,4>&,VECTOR<float,2> const (&)[4]);
 template void PhysBAM::ORIGIN_AREAS::Clear<float,3,6>(VOL_DATA<float,3,6>&);
 template void PhysBAM::ORIGIN_AREAS::Clear<float,2,4>(VOL_DATA<float,2,4>&);
+template void PhysBAM::ORIGIN_AREAS::Volume_From_Simplices<float,VECTOR<float,2> >(VOL_DATA<float,2,4>&,VECTOR<float,2> const (&)[4]);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-template void PhysBAM::ORIGIN_AREAS::Volume_From_Simplices<double,VECTOR<double,2> >(VOL_DATA<double,2,4>&,VECTOR<double,2> const (&)[4]);
 template void PhysBAM::ORIGIN_AREAS::Clear<double,3,6>(VOL_DATA<double,3,6>&);
 template void PhysBAM::ORIGIN_AREAS::Clear<double,2,4>(VOL_DATA<double,2,4>&);
+template void PhysBAM::ORIGIN_AREAS::Volume_From_Simplices<double,VECTOR<double,2> >(VOL_DATA<double,2,4>&,VECTOR<double,2> const (&)[4]);
 #endif
