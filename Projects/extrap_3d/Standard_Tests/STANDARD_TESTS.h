@@ -241,6 +241,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
 
     switch(test_number){
         case 17: case 18: case 24: case 25: case 27: case 10: case 11: case 23: case 57:
+            if(!parameter) parameter=10;
             mattress_grid=GRID<TV>(parameter+1,parameter+1,parameter+1,(T)-1,(T)1,(T)-1,(T)1,(T)-1,(T)1);
             break;
         case 34:
