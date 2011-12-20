@@ -149,11 +149,12 @@ public:
     ARRAY<TV> fish_V;
     T input_cutoff;
     T input_efc;
+    T input_poissons_ratio;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),semi_implicit(false),test_forces(false),use_extended_neohookean(false),
         use_extended_neohookean_refined(false),use_extended_neohookean_hyperbola(false),use_extended_neohookean_smooth(false),use_extended_svk(false),
-        use_corotated(false),use_corot_blend(false),dump_sv(false),print_matrix(false),use_constant_ife(false),input_cutoff(0),input_efc(0)
+        use_corotated(false),use_corot_blend(false),dump_sv(false),print_matrix(false),use_constant_ife(false),input_cutoff(0),input_efc(0),input_poissons_ratio(-1)
     {
     }
 
@@ -233,6 +234,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Option_Argument("-nobind");
     parse_args->Add_Double_Argument("-cutoff",.4,"cutoff");
     parse_args->Add_Double_Argument("-efc",20,"efc");
+    parse_args->Add_Double_Argument("-poissons_ratio",-1,"poissons_ratio");
     parse_args->Add_Integer_Argument("-jello_size",20,"resolution of each jello cube");
     parse_args->Add_Integer_Argument("-number_of_jellos",12,"number of falling jello cubes in test 41");
 }
@@ -327,6 +329,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     nobind=parse_args->Is_Value_Set("-nobind");
     if(parse_args->Is_Value_Set("-cutoff")) input_cutoff=(T)parse_args->Get_Double_Value("-cutoff");
     if(parse_args->Is_Value_Set("-efc")) input_efc=(T)parse_args->Get_Double_Value("-efc");
+    if(parse_args->Is_Value_Set("-poissons_ratio")) input_poissons_ratio=(T)parse_args->Get_Double_Value("-poissons_ratio");
 
     switch(test_number){
         case 1:
@@ -2122,6 +2125,7 @@ void Add_Constitutive_Model(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,T 
     ISOTROPIC_CONSTITUTIVE_MODEL<T,3>* icm=0;
     if(input_efc) efc=input_efc;
     if(input_cutoff) cutoff=input_cutoff;
+    if(input_poissons_ratio!=-1) poissons_ratio=input_poissons_ratio;
 
     if(use_extended_neohookean) icm=new NEO_HOOKEAN_EXTRAPOLATED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc);
     if(use_extended_neohookean2) icm=new NEO_HOOKEAN_EXTRAPOLATED2<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc);
