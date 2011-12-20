@@ -976,7 +976,7 @@ void Get_Initial_Data()
                     random.Fill_Uniform(new_center,-bound,bound);
                    // new_center = TV(random.Get_Uniform_Number(-bound,bound),random.Get_Uniform_Number((T).5*bound,(T)1*bound),random.Get_Uniform_Number(-bound,bound));
                     stuck=false;
-                    //new_center.z = new_center.z + 1.5+bound;
+                    new_center.y = (T).5*(new_center.y + 1.5*bound);
                     for (int j=1; j<i&&(!stuck); j++){
                         if((new_center-jello_centers(j)).Magnitude()<=(T)4*max_jello_size*max_jello_size) stuck=true;
                        // if ((new_center.x-jello_centers(j).x)*(new_center.x-jello_centers(j).x)+(new_center.y-jello_centers(j).y)*(new_center.y-jello_centers(j).y)+(new_center.z-jello_centers(j).z)*(new_center.z-jello_centers(j).z)<=(T)4*max_jello_size*max_jello_size) stuck=true;
