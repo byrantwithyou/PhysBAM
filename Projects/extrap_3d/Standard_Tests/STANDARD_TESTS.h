@@ -131,7 +131,7 @@ public:
     INTERPOLATION_CURVE<T,FRAME<TV> > curve,curve2,curve3,curve4,curve5;
     bool print_matrix;
     int parameter;
-    int fishes,jello_size;
+    int fishes,jello_size,number_of_jellos;
     T stiffness_multiplier;
     T damping_multiplier;
     T boxsize;
@@ -233,6 +233,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Double_Argument("-cutoff",.4,"cutoff");
     parse_args->Add_Double_Argument("-efc",20,"efc");
     parse_args->Add_Integer_Argument("-jello_size",20,"resolution of each jello cube");
+    parse_args->Add_Integer_Argument("-number_of_jellos",12,"number of falling jello cubes in test 41");
 }
 //#####################################################################
 // Function Parse_Options
@@ -316,7 +317,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     with_bunny=parse_args->Is_Value_Set("-with_bunny");
     with_hand=parse_args->Is_Value_Set("-with_hand");
     with_big_arm=parse_args->Is_Value_Set("-with_big_arm");
-
+    number_of_jellos=parse_args->Get_Integer_Value("-number_of_jellos");
     
     semi_implicit=parse_args->Is_Value_Set("-semi_implicit");
     if(parse_args->Is_Value_Set("-project_nullspace")) solids_parameters.implicit_solve_parameters.project_nullspace_frequency=1;
@@ -540,15 +541,15 @@ void Get_Initial_Data()
         case 4: case 29:{
             //tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_110K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T)0.373,(T)0))),true,true,density,.005);
             
-if (with_hand)
-            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/hand_30k.tet",
+            if (with_hand)
+                tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/hand_30k.tet",
                                                 RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T).4,(T)0),ROTATION<TV>(-T(pi/2),TV(1,0,0)))),true,true,density,1.0);
             else if(with_bunny)
-            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/bunny.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T).4,(T)0))),true,true,density,1.0);
+                tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/bunny.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T).4,(T)0))),true,true,density,1.0);
             else if(with_big_arm)
                 tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_380K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T).4,(T)0),ROTATION<TV>(T(pi),TV(0,1,0)))),true,true,density,.005);
             else
-            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_110K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T).4,(T)0),ROTATION<TV>(T(pi),TV(0,1,0)))),true,true,density,.005);
+                tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_110K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T).4,(T)0),ROTATION<TV>(T(pi),TV(0,1,0)))),true,true,density,.005);
             //            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/bunny.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)2.3,0))),true,true,density,5.0);
 //            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,true,density);
            // tests.Create_Mattress(GRID<TV>(TV_INT(13,13,13),RANGE<TV>(TV(-1,1,-1),TV(1,3,1))),true,0);
@@ -908,7 +909,7 @@ if (with_hand)
         }
         case 38:
         {
-            int number_of_jellos = 13;
+            number_of_jellos = 13;
 
             for (int i=1; i<=number_of_jellos; i++)
             {
@@ -959,7 +960,7 @@ if (with_hand)
             break;
         }*/
         {
-            int number_of_jellos = 12;
+
             RANDOM_NUMBERS<T> random;
             T max_jello_size = .03;
             T bound = .3;
@@ -1559,14 +1560,11 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             T poissons_ratio = .4;
             T damping = 0.001;
 
-            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume1=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(1);
-            Add_Constitutive_Model(tetrahedralized_volume1,youngs_modulus,poissons_ratio,damping,0.4,50);
-            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume2=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(2);
-            Add_Constitutive_Model(tetrahedralized_volume2,youngs_modulus,poissons_ratio,damping,0.4,50);
-            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume3=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(3);
-            Add_Constitutive_Model(tetrahedralized_volume3,youngs_modulus,poissons_ratio,damping,0.4,50);
-            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume4=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(4);
-            Add_Constitutive_Model(tetrahedralized_volume4,youngs_modulus,poissons_ratio,damping,0.4,50);
+            for (int k=1; k<=number_of_jellos; k++)
+            {
+                TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(k);
+                Add_Constitutive_Model(tetrahedralized_volume,youngs_modulus,poissons_ratio,damping,0.4,50);
+            }
             
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             break;
@@ -2005,7 +2003,7 @@ void Update_Time_Varying_Material_Properties(const T time)
     if(time>critical3){
         FINITE_VOLUME<TV,3>& fv = deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
         CONSTITUTIVE_MODEL<T,3>& icm = fv.constitutive_model;
-        T young = pow(10.0,end_young-(T)1);
+        T young = pow(10.0,end_young-(T)1.5);
         icm.Update_Lame_Constants(young,(T).45,(T).01);
         forces_are_removed=false;        
         
