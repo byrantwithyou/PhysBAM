@@ -48,6 +48,7 @@
 //   53. Stretch tet
 //   54. Stretch tet (II)
 //   55. Constrained tet
+//   56. Two-direction stretch
 //#####################################################################
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
@@ -132,16 +133,19 @@ public:
     bool forces_are_removed;
     ARRAY<int> externally_forced;
     ARRAY<int> constrained_particles;
+    ARRAY<TV> constrained_velocities;
     ARRAY<TV> jello_centers;
     T stretch;
     T hole;
     bool nobind;
     ARRAY<TV> fish_V;
+    T input_cutoff;
+    T input_efc;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),semi_implicit(false),test_forces(false),use_extended_neohookean(false),
         use_extended_neohookean_refined(false),use_extended_neohookean_hyperbola(false),use_extended_neohookean_smooth(false),use_extended_svk(false),
-        use_corotated(false),use_corot_blend(false),dump_sv(false),print_matrix(false),use_constant_ife(false)
+        use_corotated(false),use_corot_blend(false),dump_sv(false),print_matrix(false),use_constant_ife(false),input_cutoff(0),input_efc(0)
     {
     }
 
@@ -213,6 +217,8 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Double_Argument("-stretch",1,"stretch");
     parse_args->Add_Double_Argument("-hole",.5,"hole");
     parse_args->Add_Option_Argument("-nobind");
+    parse_args->Add_Double_Argument("-cutoff",.4,"cutoff");
+    parse_args->Add_Double_Argument("-efc",20,"efc");
 }
 //#####################################################################
 // Function Parse_Options
@@ -223,10 +229,11 @@ void Parse_Options() PHYSBAM_OVERRIDE
     LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
     output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d",test_number);
     frame_rate=24;
+    parameter=parse_args->Get_Integer_Value("-parameter");
 
     switch(test_number){
-        case 17: case 18: case 24: case 25: case 27: case 10: case 11: case 23:
-            mattress_grid=GRID<TV>(10,10,10,(T)-1,(T)1,(T)-1,(T)1,(T)-1,(T)1);
+        case 17: case 18: case 24: case 25: case 27: case 10: case 11: case 23: case 56:
+            mattress_grid=GRID<TV>(parameter+1,parameter+1,parameter+1,(T)-1,(T)1,(T)-1,(T)1,(T)-1,(T)1);
             break;
         case 34:
             mattress_grid=GRID<TV>(13,13,13,(T)-2,(T)2,(T)-2,(T)2,(T)-2,(T)2);
@@ -257,7 +264,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
     }
 
     print_matrix=parse_args->Is_Value_Set("-print_matrix");
-    parameter=parse_args->Get_Integer_Value("-parameter");
     solids_parameters.use_trapezoidal_rule_for_velocities=!parse_args->Get_Option_Value("-use_be");
     solids_parameters.use_rigid_deformable_contact=false;
     solid_body_collection.deformable_body_collection.soft_bindings.use_gauss_seidel_for_impulse_based_collisions=true;
@@ -294,6 +300,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
     solids_parameters.implicit_solve_parameters.cg_projection_iterations=parse_args->Get_Integer_Value("-projection_iterations");
     solids_parameters.deformable_object_collision_parameters.collide_with_interior=true;
     nobind=parse_args->Is_Value_Set("-nobind");
+    if(parse_args->Is_Value_Set("-cutoff")) input_cutoff=(T)parse_args->Get_Double_Value("-cutoff");
+    if(parse_args->Is_Value_Set("-efc")) input_efc=(T)parse_args->Get_Double_Value("-efc");
 
     switch(test_number){
         case 1:
@@ -322,7 +330,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 24:
         case 25:
         case 26:
-        case 27: case 23: case 53: case 54: case 55:
+        case 27: case 23: case 53: case 54: case 55: case 56:
             attachment_velocity = 0.2;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
@@ -572,7 +580,7 @@ void Get_Initial_Data()
         case 18:
         case 24:
         case 25:
-        case 26: case 23:
+        case 26: case 23: case 56:
         case 27:{
             tests.Create_Mattress(mattress_grid,true,0);
             break;}
@@ -692,12 +700,12 @@ void Get_Initial_Data()
             curve.Add_Control_Point(0,FRAME<TV>(TV(x_start,0,0),ROTATION<TV>((T)0,TV(1,0,0))));
             curve.Add_Control_Point(t_stop,FRAME<TV>(TV(x_stop,0,0),ROTATION<TV>((T)0,TV(1,0,0))));
 
-            for (int i=0; i<64; i++) curve.Add_Control_Point(t_rot+i*2,FRAME<TV>(TV(x_stop,0,0),ROTATION<TV>((T)pi/2.0*i,TV(1,0,0))));
+            for (int i=0; i<47; i++) curve.Add_Control_Point(t_rot+i*2,FRAME<TV>(TV(x_stop,0,0),ROTATION<TV>((T)pi/2.0*i,TV(1,0,0))));
 
             curve2.Add_Control_Point(0,FRAME<TV>(TV(-x_start,0,0),ROTATION<TV>((T)0,TV(1,0,0))));
             curve2.Add_Control_Point(t_stop,FRAME<TV>(TV(-x_stop,0,0),ROTATION<TV>((T)0,TV(1,0,0))));
 
-            for (int i=0; i<64; i++) curve2.Add_Control_Point(t_rot+i*2,FRAME<TV>(TV(-x_stop,0,0),ROTATION<TV>((T)-pi/2.0*i,TV(1,0,0))));
+            for (int i=0; i<47; i++) curve2.Add_Control_Point(t_rot+i*2,FRAME<TV>(TV(-x_stop,0,0),ROTATION<TV>((T)-pi/2.0*i,TV(1,0,0))));
 
             break;}
         case 33:{
@@ -1167,9 +1175,18 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 25:
         case 26:
         case 27:
+        case 56:
         case 28:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             Add_Constitutive_Model(tetrahedralized_volume,(T)1e5,(T).45,(T).01);
+            if(test_number==56){
+                int m=mattress_grid.counts.x;
+                int n=mattress_grid.counts.y;
+                int p=mattress_grid.counts.z;
+                for(int i=1;i<=m;i++) for(int j=1;j<=n;j++){constrained_particles.Append(i+m*(j-1));constrained_particles.Append(i+m*(j-1)+(p-1)*m*n);}
+                for(int i=1;i<=m;i++) for(int k=1;k<=p;k++){constrained_particles.Append(i+m*n*(k-1));constrained_particles.Append(i+m*(n-1)+m*n*(k-1));}
+                constrained_velocities=particles.X.Subset(constrained_particles)*attachment_velocity;
+                constrained_velocities.template Project<T,&TV::x>().Fill(0);}
             break;}
         case 29:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
@@ -1572,6 +1589,7 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
         for (int i=1; i<=number_of_constrained_particles; i++)
             V(constrained_particles(i))=TV();
     }
+    if(test_number==56) V.Subset(constrained_particles)=constrained_velocities;
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes
@@ -1641,6 +1659,14 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
         for (int i=1; i<=number_of_constrained_particles; i++)
             V(constrained_particles(i))=TV();
     }
+    if(test_number==24){
+        int m=mattress_grid.counts.x;
+	int n=mattress_grid.counts.y;
+	int mn=mattress_grid.counts.z;
+        for(int i=m/3+1;i<=2*m/3+1;i++)for(int j=n/3+1;j<=2*n/3+1;j++){V(i+m*(j-1))=TV();V(i+m*(j-1)+(mn-1)*m*n)=TV();}
+        for(int i=m/3+1;i<=2*m/3+1;i++)for(int ij=mn/3+1;ij<=2*mn/3+1;ij++){V(i+m*n*(ij-1))=TV();V(i+m*(n-1)+m*n*(ij-1))=TV();}
+    }
+    if(test_number==56) V.Subset(constrained_particles).Fill(TV());
 }
 //#####################################################################
 // Function Read_Output_Files_Solids
@@ -1881,6 +1907,8 @@ void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) PHYSBAM_OVERRIDE
 void Add_Constitutive_Model(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,T stiffness,T poissons_ratio,T damping, T cutoff = 0.4, T efc = 20)
 {
     ISOTROPIC_CONSTITUTIVE_MODEL<T,3>* icm=0;
+    if(input_efc) efc=input_efc;
+    if(input_cutoff) cutoff=input_cutoff;
 
     if(use_extended_neohookean) icm=new NEO_HOOKEAN_EXTRAPOLATED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc);
     else if(use_svk) icm=new ST_VENANT_KIRCHHOFF<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
