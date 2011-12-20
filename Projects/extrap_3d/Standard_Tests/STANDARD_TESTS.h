@@ -434,7 +434,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 38:
         case 39:
         case 40:
-        case 41:
+        case 42:
         case 44:
             solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness = 1e-4;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
@@ -444,7 +444,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             frame_rate=960;
             last_frame=1000;
             break;
-        case 42:
+        case 41:
             solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness = 1e-4;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
@@ -791,9 +791,9 @@ void Get_Initial_Data()
 
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/hand_30k.tet",
                                                 RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3*scale,0),ROTATION<TV>(T(pi/2),TV(0,1,0))*ROTATION<TV>(T(pi/2),TV(1,0,0)))),true,true,density,.35);
-            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/fish_42K.tet",
-                                                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,4.5*scale,-1.2*scale),ROTATION<TV>((T)pi*0.525,TV(1,0,0))*ROTATION<TV>(0*(T)pi/2,TV(0,1,0)))),true,true,density,0.06);            
-            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/bunny.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)4.7*scale,-3.0*scale))),true,true,density,.25);
+           // tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/fish_42K.tet",
+             //                                   RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,4.5*scale,-1.2*scale),ROTATION<TV>((T)pi*0.525,TV(1,0,0))*ROTATION<TV>(0*(T)pi/2,TV(0,1,0)))),true,true,density,0.06);            
+           // tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/bunny.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)4.7*scale,-3.0*scale))),true,true,density,.25);
             
             RIGID_BODY<TV>& gear1=tests.Add_Rigid_Body("gear",.375*scale,1.0*scale);
             RIGID_BODY<TV>& gear2=tests.Add_Rigid_Body("gear",.375*scale,1.0*scale);
@@ -961,7 +961,7 @@ void Get_Initial_Data()
             break;
         }*/
         {
-
+            //Todo: At some point, use Oriented_Box to do a tighter collision check. C-Re, C-e, R where R is the rotation matrix and e is the edge
             RANDOM_NUMBERS<T> random;
             T max_jello_size = .03;
             T bound = .3;
@@ -973,16 +973,17 @@ void Get_Initial_Data()
             //break;} 
             for (int i=1; i<=number_of_jellos; i++){
                 do {
-                   // random.Fill_Uniform(new_center,-bound,bound);
-                    new_center = TV(random.Get_Uniform_Number(-bound,bound),random.Get_Uniform_Number((T)0,(T)2*bound),random.Get_Uniform_Number(-bound,bound));
+                    random.Fill_Uniform(new_center,-bound,bound);
+                   // new_center = TV(random.Get_Uniform_Number(-bound,bound),random.Get_Uniform_Number((T).5*bound,(T)1*bound),random.Get_Uniform_Number(-bound,bound));
                     stuck=false;
                     //new_center.z = new_center.z + 1.5+bound;
                     for (int j=1; j<i&&(!stuck); j++){
-                        if ((new_center.x-jello_centers(j).x)*(new_center.x-jello_centers(j).x)+(new_center.y-jello_centers(j).y)*(new_center.y-jello_centers(j).y)+(new_center.z-jello_centers(j).z)*(new_center.z-jello_centers(j).z)<=(T)4*max_jello_size*max_jello_size) stuck=true;
+                        if((new_center-jello_centers(j)).Magnitude()<=(T)4*max_jello_size*max_jello_size) stuck=true;
+                       // if ((new_center.x-jello_centers(j).x)*(new_center.x-jello_centers(j).x)+(new_center.y-jello_centers(j).y)*(new_center.y-jello_centers(j).y)+(new_center.z-jello_centers(j).z)*(new_center.z-jello_centers(j).z)<=(T)4*max_jello_size*max_jello_size) stuck=true;
                 }}while(stuck);
                 jello_centers.Append(new_center);
-//                random.Fill_Uniform(new_center,-bound,bound);
-                     new_center = TV(random.Get_Uniform_Number(-bound,bound),random.Get_Uniform_Number(-bound,bound),random.Get_Uniform_Number(-bound,bound));
+                random.Fill_Uniform(new_center,-bound,bound);
+//                     new_center = TV(random.Get_Uniform_Number(-bound,bound),random.Get_Uniform_Number(-bound,bound),random.Get_Uniform_Number(-bound,bound));
                 new_rotate = random.Get_Uniform_Number(-(T)pi,(T)pi);
                 RIGID_BODY_STATE<TV> initial_state1(FRAME<TV>(jello_centers(i),ROTATION<TV>(new_rotate,new_center)));
                 if (i % 4 ==0) {tests.Create_Mattress(mattress_grid3,true,&initial_state1);}
@@ -990,7 +991,7 @@ void Get_Initial_Data()
                 else {tests.Create_Mattress(mattress_grid1,true,&initial_state1);}
             }
             RIGID_BODY<TV>& inclined_floor=tests.Add_Ground(0.1);
-            inclined_floor.Rotation()=ROTATION<TV>((T)pi/10,TV(1,0,0));
+            inclined_floor.Rotation()=ROTATION<TV>((T)pi/(T)25,TV(1,0,0));
             break;
         }
         case 42:
@@ -1557,7 +1558,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             }
             break;}
         case 41:{
-            T youngs_modulus = 4e5;
+            T youngs_modulus = 1e4;
             T poissons_ratio = .4;
             T damping = 0.001;
 
