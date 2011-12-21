@@ -126,7 +126,7 @@ public:
     bool use_mooney_rivlin,use_extended_mooney_rivlin;
     bool use_corot_blend;
     bool dump_sv;
-    bool with_bunny,with_hand,with_big_arm;
+    bool with_bunny,with_hand,with_big_arm,gears_of_pain;
     bool override_collisions,override_no_collisions;
     int kinematic_id,kinematic_id2,kinematic_id3,kinematic_id4,kinematic_id5;
     INTERPOLATION_CURVE<T,FRAME<TV> > curve,curve2,curve3,curve4,curve5;
@@ -241,6 +241,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Integer_Argument("-number_of_jellos",12,"number of falling jello cubes in test 41");
     parse_args->Add_Integer_Argument("-degrees_incline",5,"degrees of incline");
     parse_args->Add_Double_Argument("-friction",.3,"amount of friction");
+    parse_args->Add_Option_Argument("-gears_of_pain");
 }
 //#####################################################################
 // Function Parse_Options
@@ -327,6 +328,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     with_big_arm=parse_args->Is_Value_Set("-with_big_arm");
     number_of_jellos=parse_args->Get_Integer_Value("-number_of_jellos");
     degrees_incline=parse_args->Get_Integer_Value("-degrees_incline");
+    gears_of_pain=parse_args->Is_Value_Set("-gears_of_pain");
     
     semi_implicit=parse_args->Is_Value_Set("-semi_implicit");
     if(parse_args->Is_Value_Set("-project_nullspace")) solids_parameters.implicit_solve_parameters.project_nullspace_frequency=1;
@@ -800,10 +802,10 @@ void Get_Initial_Data()
 
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/hand_30k.tet",
                                                 RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3*scale,0),ROTATION<TV>(T(pi/2),TV(0,1,0))*ROTATION<TV>(T(pi/2),TV(1,0,0)))),true,true,density,.35);
-            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/fish_42K.tet",
-                                                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,4.5*scale,-1.2*scale),ROTATION<TV>((T)pi*0.525,TV(1,0,0))*ROTATION<TV>(0*(T)pi/2,TV(0,1,0)))),true,true,density,0.06);            
-            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/bunny.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)4.7*scale,-3.0*scale))),true,true,density,.25);
-            
+           // tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/fish_42K.tet",
+                                           //     RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,4.5*scale,-1.2*scale),ROTATION<TV>((T)pi*0.525,TV(1,0,0))*ROTATION<TV>(0*(T)pi/2,TV(0,1,0)))),true,true,density,0.06);            
+            //tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/bunny.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)4.7*scale,-3.0*scale))),true,true,density,.25);
+           
             RIGID_BODY<TV>& gear1=tests.Add_Rigid_Body("gear",.375*scale,1.0*scale);
             RIGID_BODY<TV>& gear2=tests.Add_Rigid_Body("gear",.375*scale,1.0*scale);
             
@@ -815,19 +817,20 @@ void Get_Initial_Data()
             kinematic_id2=gear2.particle_index;
             rigid_body_collection.rigid_body_particle.kinematic(gear2.particle_index)=true;
             
-            T angular_velocity = 1;
+            T angular_velocity = 1; T gear_dx;
+            if (gears_of_pain) gear_dx=(T).377; else gear_dx=(T).4;
             
             for (int i=0; i<60; i++){
-                curve.Add_Control_Point(i/angular_velocity,FRAME<TV>(TV(-(T).4*scale,1.5*scale,-.75*scale),ROTATION<TV>(-i,TV(0,0,1))));
-                curve2.Add_Control_Point(i/angular_velocity,FRAME<TV>(TV((T).4*scale,1.5*scale,-.75*scale),ROTATION<TV>(i,TV(0,0,1))));}
+                curve.Add_Control_Point(i/angular_velocity,FRAME<TV>(TV(-gear_dx*scale,1.5*scale,-.75*scale),ROTATION<TV>(-i,TV(0,0,1)))); //.4 is default, gears barely touch at .375
+                curve2.Add_Control_Point(i/angular_velocity,FRAME<TV>(TV(gear_dx*scale,1.5*scale,-.75*scale),ROTATION<TV>(i,TV(0,0,1))));}
 
             RIGID_BODY<TV>& box0=tests.Add_Analytic_Box(TV(2.0*scale,.1*scale,2.0*scale));
-            RIGID_BODY<TV>& box1=tests.Add_Analytic_Box(TV(2.0*scale,2.0*scale,.1*scale));
+            //RIGID_BODY<TV>& box1=tests.Add_Analytic_Box(TV(2.0*scale,2.0*scale,.1*scale));
             RIGID_BODY<TV>& box2=tests.Add_Analytic_Box(TV(2.0*scale,2.0*scale,.1*scale));
             RIGID_BODY<TV>& box3=tests.Add_Analytic_Box(TV(2.0*scale,.1*scale,2.0*scale));
             RIGID_BODY<TV>& cylinder=tests.Add_Analytic_Cylinder(1.5*scale,.06*scale);
             box0.X()=TV(0,4.0*scale,-3.0*scale);
-            box1.X()=TV(0,1.2*scale,1.0*scale);
+            //box1.X()=TV(0,1.2*scale,1.0*scale);
             //box1.Rotation()=ROTATION<TV>((T)pi/4.0,TV(1,0,0));
             box2.X()=TV(0,1.2*scale,-1.0*scale);
             //box2.Rotation()=ROTATION<TV>(-(T)pi/4.0,TV(1,0,0));
@@ -835,7 +838,7 @@ void Get_Initial_Data()
 
             box3.Rotation()=ROTATION<TV>((T)pi/4.0,TV(1,0,0));
             box0.is_static=false; //Will move later
-            box1.is_static=true;
+           // box1.is_static=true;
             box2.is_static=true;
             box3.is_static=false;
             
@@ -1444,10 +1447,10 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 58:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume1=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(1);
             Add_Constitutive_Model(tetrahedralized_volume1,1e4,0.4,0.005);
-            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume2=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(2);
-            Add_Constitutive_Model(tetrahedralized_volume2,1e4,0.4,0.005);
+            /*TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume2=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(2);
+            Add_Constitutive_Model(tetrahedralized_volume2,5e4,0.4,0.005);
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume3=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(3);
-            Add_Constitutive_Model(tetrahedralized_volume3,1e4,0.4,0.005);
+            Add_Constitutive_Model(tetrahedralized_volume3,1e4,0.4,0.005);*/
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             break;}
         case 34:{
