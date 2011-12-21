@@ -125,7 +125,7 @@ public:
     bool use_corotated;
     bool use_mooney_rivlin,use_extended_mooney_rivlin;
     bool use_corot_blend;
-    bool dump_sv;
+    bool dump_sv,out_min_volume;
     bool with_bunny,with_hand,with_big_arm;
     bool override_collisions,override_no_collisions;
     int kinematic_id,kinematic_id2,kinematic_id3,kinematic_id4,kinematic_id5;
@@ -152,9 +152,9 @@ public:
     T input_poissons_ratio;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),semi_implicit(false),test_forces(false),use_extended_neohookean(false),
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),semi_implicit(false),test_forces(false),use_extended_neohookean(false),use_extended_neohookean2(false),
         use_extended_neohookean_refined(false),use_extended_neohookean_hyperbola(false),use_extended_neohookean_smooth(false),use_extended_svk(false),
-        use_corotated(false),use_corot_blend(false),dump_sv(false),print_matrix(false),use_constant_ife(false),input_cutoff(0),input_efc(0),input_poissons_ratio(-1)
+        use_corotated(false),use_corot_blend(false),dump_sv(false),out_min_volume(false),print_matrix(false),use_constant_ife(false),input_cutoff(0),input_efc(0),input_poissons_ratio(-1)
     {
     }
 
@@ -212,6 +212,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Option_Argument("-with_hand");
     parse_args->Add_Option_Argument("-with_big_arm");
     parse_args->Add_Option_Argument("-dump_sv");
+    parse_args->Add_Option_Argument("-out_min_volume");
     parse_args->Add_Integer_Argument("-parameter",0,"parameter used by multiple tests to change the parameters of the test");
     parse_args->Add_Double_Argument("-stiffen",1,"","stiffness multiplier for various tests");
     parse_args->Add_Double_Argument("-dampen",1,"","damping multiplier for various tests");
@@ -310,6 +311,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     use_corotated=parse_args->Is_Value_Set("-use_corotated");
     use_corot_blend=parse_args->Is_Value_Set("-use_corot_blend");
     dump_sv=parse_args->Is_Value_Set("-dump_sv");
+    out_min_volume=parse_args->Is_Value_Set("-out_min_volume");
     use_constant_ife=parse_args->Get_Option_Value("-use_constant_ife");
     solids_parameters.implicit_solve_parameters.test_system=parse_args->Is_Value_Set("-test_system");
     override_collisions=parse_args->Is_Value_Set("-collisions");
@@ -1990,8 +1992,21 @@ void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
 
         for (int i=1; i<=sv.m; i++)
         {
+
             svout << sv(i).x11 << " " << sv(i).x22 << " " << sv(i).x33 << std::endl;
         }
+    }
+    if (out_min_volume)
+    {
+        FINITE_VOLUME<TV,3>& force_field = solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
+        ARRAY<DIAGONAL_MATRIX<T,3> >& sv = force_field.Fe_hat;
+        T Jmin = (T)1; T s1=0; T s2=0; T s3=0;
+        for (int i=1; i<=sv.m; i++)
+        {
+            if (sv(i).x11*sv(i).x22*sv(i).x33<Jmin){ s1=sv(i).x11; s2=sv(i).x22; s3=sv(i).x33; Jmin=s1*s2*s3;}
+
+        }
+            LOG::cout << "Smallest tet volume " << Jmin << ", singular values " << s1 << " " << s2 << " " << s3 << std::endl;
     }
     if(test_number==51) for(int i=1;i<=particles.X.m;i++) if(particles.V(i).x>6) particles.V(i).x=6;
 }
