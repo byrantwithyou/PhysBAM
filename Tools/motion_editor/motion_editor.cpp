@@ -169,7 +169,8 @@ public:
             Add_Component(opengl_triangulated_surface_component,"tri surface",',',BASIC_VISUALIZATION::OWNED);}
         else if(mesh_filename.find_last_of(".tet")!=std::string::npos){ 
             FILE_UTILITIES::Read_From_File<T>(mesh_filename,human_volume);
-            opengl_tetrahedralized_volume=new OPENGL_TETRAHEDRALIZED_VOLUME<T>(&human_volume.mesh,&human_volume.particles,OPENGL_MATERIAL::Metal(OPENGL_COLOR::Magenta(1,1)),true);
+            opengl_tetrahedralized_volume=new OPENGL_TETRAHEDRALIZED_VOLUME<T>(&human_volume.mesh,&human_volume.particles,OPENGL_MATERIAL::Metal(OPENGL_COLOR::Magenta(1,1)),
+                OPENGL_MATERIAL::Metal(OPENGL_COLOR::Yellow(1,1)),true);
             opengl_tetrahedralized_volume_component=new OPENGL_COMPONENT_BASIC<OPENGL_TETRAHEDRALIZED_VOLUME<T> >(*opengl_tetrahedralized_volume);
             Add_Component(opengl_tetrahedralized_volume_component,"tet volume",',',BASIC_VISUALIZATION::OWNED);}
         
