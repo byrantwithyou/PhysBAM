@@ -51,6 +51,7 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_COROTATED_BLEND.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED2.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED_HYPERBOLA.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED_REFINED.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED_SMOOTH.h>
@@ -90,6 +91,7 @@ public:
     bool semi_implicit;
     bool test_forces;
     bool use_extended_neohookean;
+    bool use_extended_neohookean2;
     bool use_extended_neohookean_refined;
     bool use_extended_neohookean_hyperbola;
     bool use_extended_neohookean_smooth;
@@ -174,6 +176,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Option_Argument("-semi_implicit","use semi implicit forces");
     parse_args->Add_Option_Argument("-test_forces","use fully implicit forces");
     parse_args->Add_Option_Argument("-use_ext_neo");
+    parse_args->Add_Option_Argument("-use_ext_neo2");
     parse_args->Add_Option_Argument("-use_ext_neo_ref");
     parse_args->Add_Option_Argument("-use_ext_neo_hyper");
     parse_args->Add_Option_Argument("-use_ext_neo_smooth");
@@ -216,6 +219,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     semi_implicit=parse_args->Is_Value_Set("-semi_implicit");
     test_forces=parse_args->Is_Value_Set("-test_forces");
     use_extended_neohookean=parse_args->Is_Value_Set("-use_ext_neo");
+    use_extended_neohookean2=parse_args->Is_Value_Set("-use_ext_neo2");
     use_extended_neohookean_refined=parse_args->Is_Value_Set("-use_ext_neo_ref"); //
     use_extended_neohookean_hyperbola=parse_args->Is_Value_Set("-use_ext_neo_hyper");    
     use_extended_neohookean_smooth=parse_args->Is_Value_Set("-use_ext_neo_smooth");    
@@ -735,8 +739,9 @@ void Preprocess_Frame(const int frame)
 void Add_Constitutive_Model(TRIANGULATED_AREA<T>& triangulated_area,T stiffness,T poissons_ratio,T damping)
 {
     ISOTROPIC_CONSTITUTIVE_MODEL<T,2>* icm=0;
-    if(use_extended_neohookean) icm=new NEO_HOOKEAN_EXTRAPOLATED<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.4,20*stiffness*stiffness_multiplier);
-    else if(use_extended_neohookean_refined) icm=new NEO_HOOKEAN_EXTRAPOLATED_REFINED<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.4,.6,20*stiffness*stiffness_multiplier);
+    if(use_extended_neohookean) icm=new NEO_HOOKEAN_EXTRAPOLATED<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.4,20);
+    else if(use_extended_neohookean2) icm=new NEO_HOOKEAN_EXTRAPOLATED2<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.4,20);
+    else if(use_extended_neohookean_refined) icm=new NEO_HOOKEAN_EXTRAPOLATED_REFINED<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.4,.6,20);
     else if(use_extended_neohookean_hyperbola) icm=new NEO_HOOKEAN_EXTRAPOLATED_HYPERBOLA<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
     else if(use_extended_neohookean_smooth) icm=new NEO_HOOKEAN_EXTRAPOLATED_SMOOTH<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
     else if(use_corotated) icm=new COROTATED<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
@@ -777,7 +782,7 @@ void Primary_Contour(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>& icm)
             img(VECTOR<int,2>(i,j))=VECTOR<T,3>(val<0,val>=0,0);
         }
 
-    for(int i=1;i<=image_size;i++) img(VECTOR<int,2>(i,image_size/2))=img(VECTOR<int,2>(image_size/2,i))=VECTOR<T,3>(0,0,1);
+    for(int i=1;i<=image_size;i++){if(i%10>0 && i%10<5) img(VECTOR<int,2>(i,image_size/2))=img(VECTOR<int,2>(image_size/2,i))=VECTOR<T,3>(0,0,1);}
 
     PPM_FILE<T>::Write("primary_contour.ppm", img);
 }

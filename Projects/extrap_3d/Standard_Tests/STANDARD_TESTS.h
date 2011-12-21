@@ -131,7 +131,7 @@ public:
     int kinematic_id,kinematic_id2,kinematic_id3,kinematic_id4,kinematic_id5;
     INTERPOLATION_CURVE<T,FRAME<TV> > curve,curve2,curve3,curve4,curve5;
     bool print_matrix;
-    int parameter;
+    int parameter,degrees_incline;
     int fishes,jello_size,number_of_jellos;
     T stiffness_multiplier;
     T damping_multiplier;
@@ -150,6 +150,8 @@ public:
     T input_cutoff;
     T input_efc;
     T input_poissons_ratio;
+    T input_friction;
+    
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),semi_implicit(false),test_forces(false),use_extended_neohookean(false),use_extended_neohookean2(false),
@@ -237,6 +239,8 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Double_Argument("-poissons_ratio",-1,"poissons_ratio");
     parse_args->Add_Integer_Argument("-jello_size",20,"resolution of each jello cube");
     parse_args->Add_Integer_Argument("-number_of_jellos",12,"number of falling jello cubes in test 41");
+    parse_args->Add_Integer_Argument("-degrees_incline",5,"degrees of incline");
+    parse_args->Add_Double_Argument("-friction",.3,"amount of friction");
 }
 //#####################################################################
 // Function Parse_Options
@@ -297,6 +301,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     stiffness_multiplier=(T)parse_args->Get_Double_Value("-stiffen");
     damping_multiplier=(T)parse_args->Get_Double_Value("-dampen");
     stretch=(T)parse_args->Get_Double_Value("-stretch");
+    input_friction=(T)parse_args->Get_Double_Value("-friction");
     test_forces=parse_args->Is_Value_Set("-test_forces");
     use_extended_neohookean=parse_args->Is_Value_Set("-use_ext_neo");
     use_extended_neohookean2=parse_args->Is_Value_Set("-use_ext_neo2");
@@ -321,6 +326,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     with_hand=parse_args->Is_Value_Set("-with_hand");
     with_big_arm=parse_args->Is_Value_Set("-with_big_arm");
     number_of_jellos=parse_args->Get_Integer_Value("-number_of_jellos");
+    degrees_incline=parse_args->Get_Integer_Value("-degrees_incline");
     
     semi_implicit=parse_args->Is_Value_Set("-semi_implicit");
     if(parse_args->Is_Value_Set("-project_nullspace")) solids_parameters.implicit_solve_parameters.project_nullspace_frequency=1;
@@ -993,8 +999,8 @@ void Get_Initial_Data()
                 else if (i % 4 ==1) {tests.Create_Mattress(mattress_grid2,true,&initial_state1);}
                 else {tests.Create_Mattress(mattress_grid1,true,&initial_state1);}
             }
-            RIGID_BODY<TV>& inclined_floor=tests.Add_Ground(0.5);
-            inclined_floor.Rotation()=ROTATION<TV>((T)pi/(T)18,TV(1,0,0));
+            RIGID_BODY<TV>& inclined_floor=tests.Add_Ground(input_friction);
+            inclined_floor.Rotation()=ROTATION<TV>((T)pi*degrees_incline/(T)180,TV(1,0,0));
             break;
         }
         case 42:
@@ -1561,7 +1567,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             }
             break;}
         case 41:{
-            T youngs_modulus = 1e4;
+            T youngs_modulus = 1e3;
             T poissons_ratio = .4;
             T damping = 0.001;
 
@@ -1979,7 +1985,7 @@ void Update_Time_Varying_Material_Properties(const T time)
         CONSTITUTIVE_MODEL<T,3>& icm = fv.constitutive_model;
         T young = pow(10.0,end_young-(T)1.5);
         icm.Update_Lame_Constants(young,pois,(T).01);
-        
+        solids_parameters.triangle_collision_parameters.perform_self_collision=override_collisions;        
     }
     }
 }

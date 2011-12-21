@@ -178,7 +178,7 @@ P_From_Strain_Helper(const DIAGONAL_MATRIX<T,2>& F,const T scale,const int simpl
     else if ((dx < 0) && (dy >= 0))
     {//[ -(la*(a - s2)^2*(2*a - 2*s1))/a, -(la*(a - s1)^2*(2*a - 2*s2))/a, 0, 0]
         DIAGONAL_MATRIX<T,2> result;
-        result.x11 = base.Ex(a,y);
+        result.x11 = base.Ex(a,y) + 2*k*dx;
         result.x22 = base.Ey(a,y) + base.Exy(a,y)*dx;
         return scale*result;
     }
