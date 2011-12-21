@@ -106,7 +106,7 @@ void Compute_Initial_Clustering()
     // Initial labeling
     LOG::Time("Initial labeling");
     ARRAY<int> centers,distances;centers.Append(active_nodes(random_numbers.Get_Uniform_Integer(1,active_nodes.m)));
-    while(centers.m<partitions){Flood_Fill_Mesh(centers,node_labels,distances);centers.Append(ARRAYS_COMPUTATIONS::Argmax(distances));}
+    while(centers.m<partitions){Flood_Fill_Mesh(centers,node_labels,distances);centers.Append(distances.Argmax());}
     int functional=Flood_Fill_Mesh(centers,node_labels,distances);
     for(int partition=1;partition<=partitions;partition++) LOG::cout<<"partition "<<partition<<" has "<<node_labels.Count_Matches(partition)<<" particles"<<std::endl;
     LOG::cout<<node_labels.Count_Matches(0)<<" particles do not belong to any partition"<<std::endl;
@@ -146,7 +146,7 @@ void Update_Boundary_Node(ARRAY<int>& boundary_nodes,ARRAY<int>& boundary_node_i
 void Optimize_Clustering()
 {
     LOG::SCOPE scope("Optimization");
-    FILE_UTILITIES::Read_From_File<T>(output_directory+"/initial_node_labels",node_labels);partitions=ARRAYS_COMPUTATIONS::Max(node_labels);
+    FILE_UTILITIES::Read_From_File<T>(output_directory+"/initial_node_labels",node_labels);partitions=node_labels.Max();
     ARRAY<int> cluster_sizes(partitions);for(int partition=1;partition<=partitions;partition++) cluster_sizes(partition)=node_labels.Count_Matches(partition);
     int cluster_size_functional=0;
     for(int i=1;i<partitions;i++) for(int j=i+1;j<=partitions;j++) cluster_size_functional+=sqr(cluster_sizes(i)-cluster_sizes(j));
