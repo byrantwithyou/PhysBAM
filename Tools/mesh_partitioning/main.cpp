@@ -3,7 +3,6 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_MIN_MAX.h>
 #include <PhysBAM_Tools/Arrays_Computations/SORT.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Data_Structures/QUEUE.h>
@@ -107,7 +106,7 @@ void Compute_Initial_Clustering()
     // Initial labeling
     LOG::Time("Initial labeling");
     ARRAY<int> centers,distances;centers.Append(active_nodes(random_numbers.Get_Uniform_Integer(1,active_nodes.m)));
-    while(centers.m<partitions){Flood_Fill_Mesh(centers,node_labels,distances);centers.Append(ARRAYS_COMPUTATIONS::Argmax(distances));}
+    while(centers.m<partitions){Flood_Fill_Mesh(centers,node_labels,distances);centers.Append(distances.Argmax());}
     int functional=Flood_Fill_Mesh(centers,node_labels,distances);
     for(int partition=1;partition<=partitions;partition++) LOG::cout<<"partition "<<partition<<" has "<<node_labels.Count_Matches(partition)<<" particles"<<std::endl;
     LOG::cout<<node_labels.Count_Matches(0)<<" particles do not belong to any partition"<<std::endl;
@@ -147,7 +146,7 @@ void Update_Boundary_Node(ARRAY<int>& boundary_nodes,ARRAY<int>& boundary_node_i
 void Optimize_Clustering()
 {
     LOG::SCOPE scope("Optimization");
-    FILE_UTILITIES::Read_From_File<T>(output_directory+"/initial_node_labels",node_labels);partitions=ARRAYS_COMPUTATIONS::Max(node_labels);
+    FILE_UTILITIES::Read_From_File<T>(output_directory+"/initial_node_labels",node_labels);partitions=node_labels.Max();
     ARRAY<int> cluster_sizes(partitions);for(int partition=1;partition<=partitions;partition++) cluster_sizes(partition)=node_labels.Count_Matches(partition);
     int cluster_size_functional=0;
     for(int i=1;i<partitions;i++) for(int j=i+1;j<=partitions;j++) cluster_size_functional+=sqr(cluster_sizes(i)-cluster_sizes(j));
@@ -169,7 +168,7 @@ void Optimize_Clustering()
     LOG::cout<<"annealing epochs     : "<<epochs<<std::endl;
     LOG::cout<<"iterations per epoch : "<<iterations<<std::endl;
     LOG::cout<<"cross-edge factor    : "<<cross_edge_factor<<std::endl;
-    LOG::cout<<"class variance       : "<<ARRAYS_COMPUTATIONS::Min(cluster_sizes)<<" - "<<ARRAYS_COMPUTATIONS::Max(cluster_sizes)<<std::endl;
+    LOG::cout<<"class variance       : "<<cluster_sizes.Min()<<" - "<<cluster_sizes.Max()<<std::endl;
     LOG::cout<<"cross-edges          : "<<cross_edges<<std::endl;
     LOG::cout<<"boundary nodes       : "<<boundary_nodes.m<<std::endl;
     LOG::cout<<"Total functional     : "<<total_functional<<std::endl;}
@@ -202,7 +201,7 @@ void Optimize_Clustering()
             LOG::cout<<"partitions           : "<<partitions<<std::endl;
             LOG::cout<<"temperature          : "<<temperature<<std::endl;
             LOG::cout<<"epoch                : "<<epoch<<std::endl;
-            LOG::cout<<"class variance       : "<<ARRAYS_COMPUTATIONS::Min(cluster_sizes)<<" - "<<ARRAYS_COMPUTATIONS::Max(cluster_sizes)<<std::endl;
+            LOG::cout<<"class variance       : "<<cluster_sizes.Min()<<" - "<<cluster_sizes.Max()<<std::endl;
             LOG::cout<<"cross-edges          : "<<cross_edges<<std::endl;
             LOG::cout<<"boundary nodes       : "<<boundary_nodes.m-removed_boundary_nodes.m<<std::endl;
             LOG::cout<<"total functional     : "<<total_functional<<std::endl;}}
