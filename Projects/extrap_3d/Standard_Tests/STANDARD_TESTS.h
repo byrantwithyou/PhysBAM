@@ -1975,7 +1975,6 @@ void Update_Time_Varying_Material_Properties(const T time)
         T young = pow(10.0,end_young-(T)1.5);
         icm.Update_Lame_Constants(young,(T).45,(T).01);
         forces_are_removed=false;        
-        
     }
     }
 }
@@ -2009,6 +2008,12 @@ void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
             LOG::cout << "Smallest tet volume " << Jmin << ", singular values " << s1 << " " << s2 << " " << s3 << std::endl;
     }
     if(test_number==51) for(int i=1;i<=particles.X.m;i++) if(particles.V(i).x>6) particles.V(i).x=6;
+    T min_volume=FLT_MAX;
+    for(int v=1;TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(v);v++){
+        for(int i=1;i<=tetrahedralized_volume->mesh.elements.m;i++){
+            T vol=tetrahedralized_volume->Signed_Size(i);
+            if(vol<min_volume) min_volume=vol;}}
+    LOG::cout<<"Minimum tet volume: "<<min_volume<<std::endl;
 }
 //#####################################################################
 // Function Bind_Intersecting_Particles
