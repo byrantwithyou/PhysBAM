@@ -80,15 +80,15 @@ Energy_Density_Helper(const DIAGONAL_MATRIX<T,2>& F,const int simplex) const
     }
     else if ((dx < 0) && (dy >= 0))
     {
-        return base.E(a,y) + base.Ex(a,y)*dx + k*dx*dx + constant_lambda/a*dx*dx*dy*dy;
+        return base.E(a,y) + base.Ex(a,y)*dx + k*dx*dx;
     }
     else if ((dx >= 0) && (dy < 0))
     {
-        return base.E(x,a) + base.Ey(x,a)*dy + k*dy*dy + constant_lambda/a*dx*dx*dy*dy;
+        return base.E(x,a) + base.Ey(x,a)*dy + k*dy*dy;
     }
     else // ((dx < 0) && (dy < 0))
     {
-        return base.E(a,a) + base.Ex(a,a)*dx + base.Ey(a,a)*dy + base.Exy(a,a)*dx*dy + k*dx*dx + k*dy*dy + constant_lambda/a*dx*dx*dy*dy;
+        return base.E(a,a) + base.Ex(a,a)*dx + base.Ey(a,a)*dy + base.Exy(a,a)*dx*dy + k*dx*dx + k*dy*dy;
     }
 }
 //#####################################################################
@@ -178,22 +178,22 @@ P_From_Strain_Helper(const DIAGONAL_MATRIX<T,2>& F,const T scale,const int simpl
     else if ((dx < 0) && (dy >= 0))
     {//[ -(la*(a - s2)^2*(2*a - 2*s1))/a, -(la*(a - s1)^2*(2*a - 2*s2))/a, 0, 0]
         DIAGONAL_MATRIX<T,2> result;
-        result.x11 = base.Ex(a,y) + 2*k*dx-constant_lambda*(a-y)*(a-y)*(T)2*(a-x)/a;
-        result.x22 = base.Ey(a,y) + base.Exy(a,y)*dx - constant_lambda*(a-x)*(a-x)*(T)2*(a-y)/a;
+        result.x11 = base.Ex(a,y);
+        result.x22 = base.Ey(a,y) + base.Exy(a,y)*dx;
         return scale*result;
     }
     else if ((dx >= 0) && (dy < 0))
     {
         DIAGONAL_MATRIX<T,2> result;
-        result.x11 = base.Ex(x,a) + base.Exy(x,a)*dy -constant_lambda*(a-y)*(a-y)*(T)2*(a-x)/a;
-        result.x22 = base.Ey(x,a) + 2*k*dy - constant_lambda*(a-x)*(a-x)*(T)2*(a-y)/a;
+        result.x11 = base.Ex(x,a) + base.Exy(x,a)*d;
+        result.x22 = base.Ey(x,a) + 2*k*dy;
         return scale*result;
     }
     else // ((dx < 0) && (dy < 0))
     {
         DIAGONAL_MATRIX<T,2> result;
-        result.x11 = base.Ex(a,a) + base.Exy(a,a)*dy + 2*k*dx -constant_lambda*(a-y)*(a-y)*(T)2*(a-x)/a;
-        result.x22 = base.Ey(a,a) + base.Exy(a,a)*dx + 2*k*dy - constant_lambda*(a-x)*(a-x)*(T)2*(a-y)/a;
+        result.x11 = base.Ex(a,a) + base.Exy(a,a)*dy + 2*k*dx;
+        result.x22 = base.Ey(a,a) + base.Exy(a,a)*dx + 2*k*dy;
         return scale*result;
     }
 }
@@ -318,9 +318,9 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_IS
        [ (4*la*(a - s1)*(a - s2))/a,        (2*la*(a - s1)^2)/a,*/
         
         /*   -(2*la*(a - s1)*(a - s2))/(s1 + s2), -(2*la*(a - s1)*(a - s2)*(s1 - a + s2))/(a*(s1 + s2))]*/
-        dP_dF.x1111=2*k + (T)2*constant_lambda*(a-y)*(a-y)/a;
-        dP_dF.x2222=base.Eyy(a,y)+base.Exyy(a,y)*dx + (T)2*constant_lambda*(a-x)*(a-x)/a;
-        dP_dF.x2211=base.Exy(a,y) + (4*constant_lambda*(a - x)*(a -y))/a;
+        dP_dF.x1111=2*k;
+        dP_dF.x2222=base.Eyy(a,y)+base.Exyy(a,y)*dx;
+        dP_dF.x2211=base.Exy(a,y);
         
         T Ex = base.Ex(a,y)+2*k*dx;
         T Ey = base.Ey(a,y)+base.Exy(a,y)*dx;
@@ -328,14 +328,14 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_IS
         T xpy = x+y; if (fabs(xpy)<panic_threshold) xpy=xpy<0?-panic_threshold:panic_threshold;
         T xmy = x-y; if (fabs(xmy)<panic_threshold) xmy=xmy<0?-panic_threshold:panic_threshold;
 
-        dP_dF.x2112=(-Ey*x+Ex*y)/(xpy*xmy) -((T)2*constant_lambda*(a - x)*(a - y)*(x - a + y))/(a*(x + y));
-        dP_dF.x2121=(-Ey*y+Ex*x)/(xpy*xmy)  -((T)2*constant_lambda*(a - x)*(a - y))/(x + y); 
+        dP_dF.x2112=(-Ey*x+Ex*y)/(xpy*xmy);
+        dP_dF.x2121=(-Ey*y+Ex*x)/(xpy*xmy); 
     }
     else if ((dx >= 0) && (dy < 0))
     {
-        dP_dF.x1111=base.Exx(x,a)+base.Exxy(x,a)*dy+ (T)2*constant_lambda*(a-y)*(a-y)/a;
-        dP_dF.x2222=2*k+ (T)2*constant_lambda*(a-x)*(a-x)/a;
-        dP_dF.x2211=base.Exy(x,a)+ (4*constant_lambda*(a - x)*(a -y))/a;
+        dP_dF.x1111=base.Exx(x,a)+base.Exxy(x,a)*dy;
+        dP_dF.x2222=2*k;
+        dP_dF.x2211=base.Exy(x,a);
         
         T Ex = base.Ex(x,a)+base.Exy(x,a)*dy;
         T Ey = base.Ey(x,a)+2*k*dy;
@@ -343,20 +343,20 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_IS
         T xpy = x+y; if (fabs(xpy)<panic_threshold) xpy=xpy<0?-panic_threshold:panic_threshold;
         T xmy = x-y; if (fabs(xmy)<panic_threshold) xmy=xmy<0?-panic_threshold:panic_threshold;
 
-        dP_dF.x2112=(-Ey*x+Ex*y)/(xpy*xmy) -((T)2*constant_lambda*(a - x)*(a - y)*(x - a + y))/(a*(x + y));
-        dP_dF.x2121=(-Ey*y+Ex*x)/(xpy*xmy)  -((T)2*constant_lambda*(a - x)*(a - y))/(x + y); 
+        dP_dF.x2112=(-Ey*x+Ex*y)/(xpy*xmy);
+        dP_dF.x2121=(-Ey*y+Ex*x)/(xpy*xmy); 
     }
     else // ((dx < 0) && (dy < 0))
     {
-        dP_dF.x1111=2*k+ (T)2*constant_lambda*(a-y)*(a-y)/a;
-        dP_dF.x2222=2*k+ (T)2*constant_lambda*(a-x)*(a-x)/a;
-        dP_dF.x2211=base.Exy(a,a)+ (4*constant_lambda*(a - x)*(a -y))/a;
+        dP_dF.x1111=2*k;
+        dP_dF.x2222=2*k;
+        dP_dF.x2211=base.Exy(a,a);
 
         T xpy = x+y; if (fabs(xpy)<panic_threshold) xpy=xpy<0?-panic_threshold:panic_threshold;
         T cmn = (base.Ex(a,a)-base.Exy(a,a)*a-2*k*a)/xpy;
 
-        dP_dF.x2112=-cmn-base.Exy(a,a) -((T)2*constant_lambda*(a - x)*(a - y)*(x - a + y))/(a*(x + y));
-        dP_dF.x2121=cmn+2*k-((T)2*constant_lambda*(a - x)*(a - y))/(x + y); 
+        dP_dF.x2112=-cmn-base.Exy(a,a);
+        dP_dF.x2121=cmn+2*k; 
     }
 
     if(enforce_definiteness) dP_dF.Enforce_Definiteness();

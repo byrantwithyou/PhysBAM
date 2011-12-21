@@ -815,17 +815,17 @@ void Get_Initial_Data()
                 curve.Add_Control_Point(i/angular_velocity,FRAME<TV>(TV(-(T).4*scale,1.5*scale,-.75*scale),ROTATION<TV>(-i,TV(0,0,1))));
                 curve2.Add_Control_Point(i/angular_velocity,FRAME<TV>(TV((T).4*scale,1.5*scale,-.75*scale),ROTATION<TV>(i,TV(0,0,1))));}
 
-            RIGID_BODY<TV>& box0=tests.Add_Analytic_Box(TV(1.0*scale,.1*scale,2.0*scale));
+            RIGID_BODY<TV>& box0=tests.Add_Analytic_Box(TV(2.0*scale,.1*scale,2.0*scale));
             RIGID_BODY<TV>& box1=tests.Add_Analytic_Box(TV(2.0*scale,2.0*scale,.1*scale));
             RIGID_BODY<TV>& box2=tests.Add_Analytic_Box(TV(2.0*scale,2.0*scale,.1*scale));
-            RIGID_BODY<TV>& box3=tests.Add_Analytic_Box(TV(1.0*scale,.1*scale,2.0*scale));
+            RIGID_BODY<TV>& box3=tests.Add_Analytic_Box(TV(2.0*scale,.1*scale,2.0*scale));
             RIGID_BODY<TV>& cylinder=tests.Add_Analytic_Cylinder(1.5*scale,.06*scale);
             box0.X()=TV(0,4.0*scale,-3.0*scale);
             box1.X()=TV(0,1.2*scale,1.0*scale);
             //box1.Rotation()=ROTATION<TV>((T)pi/4.0,TV(1,0,0));
             box2.X()=TV(0,1.2*scale,-1.0*scale);
             //box2.Rotation()=ROTATION<TV>(-(T)pi/4.0,TV(1,0,0));
-            box3.X()=TV(0,3.0*scale,-1.2*scale);
+            box3.X()=TV(0,3.0*scale,-1.4*scale);
 
             box3.Rotation()=ROTATION<TV>((T)pi/4.0,TV(1,0,0));
             box0.is_static=false; //Will move later
@@ -836,9 +836,9 @@ void Get_Initial_Data()
             box3.coefficient_of_friction = .0;
             kinematic_id3=box3.particle_index;
             rigid_body_collection.rigid_body_particle.kinematic(box3.particle_index)=true; 
-            curve3.Add_Control_Point(0,FRAME<TV>(TV(0,3.0*scale,-1.2*scale),ROTATION<TV>((T)pi/4.0,TV(1,0,0))));
-            curve3.Add_Control_Point(1,FRAME<TV>(TV(0,3.0*scale,-1.2*scale),ROTATION<TV>((T)pi/4.0,TV(1,0,0))));
-            curve3.Add_Control_Point(2,FRAME<TV>(TV(0,3.0*scale,-3.2*scale),ROTATION<TV>((T)pi/4.0,TV(1,0,0))));
+            curve3.Add_Control_Point(0,FRAME<TV>(TV(0,3.0*scale,-1.4*scale),ROTATION<TV>((T)pi/4.0,TV(1,0,0))));
+            curve3.Add_Control_Point(1,FRAME<TV>(TV(0,3.0*scale,-1.4*scale),ROTATION<TV>((T)pi/4.0,TV(1,0,0))));
+            curve3.Add_Control_Point(2,FRAME<TV>(TV(0,3.0*scale,-3.4*scale),ROTATION<TV>((T)pi/4.0,TV(1,0,0))));
 
             box0.coefficient_of_friction = .05;
             kinematic_id5=box0.particle_index;
@@ -993,8 +993,8 @@ void Get_Initial_Data()
                 else if (i % 4 ==1) {tests.Create_Mattress(mattress_grid2,true,&initial_state1);}
                 else {tests.Create_Mattress(mattress_grid1,true,&initial_state1);}
             }
-            RIGID_BODY<TV>& inclined_floor=tests.Add_Ground(0.1);
-            inclined_floor.Rotation()=ROTATION<TV>((T)pi/(T)25,TV(1,0,0));
+            RIGID_BODY<TV>& inclined_floor=tests.Add_Ground(0.5);
+            inclined_floor.Rotation()=ROTATION<TV>((T)pi/(T)18,TV(1,0,0));
             break;
         }
         case 42:
