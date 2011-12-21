@@ -3,7 +3,6 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_MIN_MAX.h>
 #include <PhysBAM_Tools/Arrays_Computations/SORT.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Data_Structures/QUEUE.h>
@@ -169,7 +168,7 @@ void Optimize_Clustering()
     LOG::cout<<"annealing epochs     : "<<epochs<<std::endl;
     LOG::cout<<"iterations per epoch : "<<iterations<<std::endl;
     LOG::cout<<"cross-edge factor    : "<<cross_edge_factor<<std::endl;
-    LOG::cout<<"class variance       : "<<ARRAYS_COMPUTATIONS::Min(cluster_sizes)<<" - "<<ARRAYS_COMPUTATIONS::Max(cluster_sizes)<<std::endl;
+    LOG::cout<<"class variance       : "<<cluster_sizes.Min()<<" - "<<cluster_sizes.Max()<<std::endl;
     LOG::cout<<"cross-edges          : "<<cross_edges<<std::endl;
     LOG::cout<<"boundary nodes       : "<<boundary_nodes.m<<std::endl;
     LOG::cout<<"Total functional     : "<<total_functional<<std::endl;}
@@ -202,7 +201,7 @@ void Optimize_Clustering()
             LOG::cout<<"partitions           : "<<partitions<<std::endl;
             LOG::cout<<"temperature          : "<<temperature<<std::endl;
             LOG::cout<<"epoch                : "<<epoch<<std::endl;
-            LOG::cout<<"class variance       : "<<ARRAYS_COMPUTATIONS::Min(cluster_sizes)<<" - "<<ARRAYS_COMPUTATIONS::Max(cluster_sizes)<<std::endl;
+            LOG::cout<<"class variance       : "<<cluster_sizes.Min()<<" - "<<cluster_sizes.Max()<<std::endl;
             LOG::cout<<"cross-edges          : "<<cross_edges<<std::endl;
             LOG::cout<<"boundary nodes       : "<<boundary_nodes.m-removed_boundary_nodes.m<<std::endl;
             LOG::cout<<"total functional     : "<<total_functional<<std::endl;}}
