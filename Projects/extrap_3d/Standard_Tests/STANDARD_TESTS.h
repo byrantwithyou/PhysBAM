@@ -2029,7 +2029,7 @@ void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
             if(vol<min_volume) min_volume=vol;}}
     LOG::cout<<"Minimum tet volume: "<<min_volume<<std::endl;
     if(test_number==29)
-        LOG::cout << "Self collisions enabled = " << solids_parameters.triangle_collision_parameters.perform_self_collision << std::endl;
+        LOG::cout << "Self collisions enabled = " << solids_parameters.triangle_collision_parameters.perform_self_collision << " " << time << std::endl;
     LOG::cout<<"Minimum tet volume: "<<min_volume<<std::endl;
     
 }
