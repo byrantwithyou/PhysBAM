@@ -149,14 +149,14 @@ public:
     ARRAY<TV> fish_V;
     T input_cutoff;
     T input_efc;
-    T input_poissons_ratio;
+    T input_poissons_ratio,input_youngs_modulus;
     T input_friction;
     
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),semi_implicit(false),test_forces(false),use_extended_neohookean(false),use_extended_neohookean2(false),
         use_extended_neohookean_refined(false),use_extended_neohookean_hyperbola(false),use_extended_neohookean_smooth(false),use_extended_svk(false),
-        use_corotated(false),use_corot_blend(false),dump_sv(false),print_matrix(false),use_constant_ife(false),input_cutoff(0),input_efc(0),input_poissons_ratio(-1)
+        use_corotated(false),use_corot_blend(false),dump_sv(false),print_matrix(false),use_constant_ife(false),input_cutoff(0),input_efc(0),input_poissons_ratio(-1),input_youngs_modulus(0)
     {
     }
 
@@ -237,6 +237,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Double_Argument("-cutoff",.4,"cutoff");
     parse_args->Add_Double_Argument("-efc",20,"efc");
     parse_args->Add_Double_Argument("-poissons_ratio",-1,"poissons_ratio");
+    parse_args->Add_Double_Argument("-youngs_modulus",0,"youngs modulus, only for test 41 so far");
     parse_args->Add_Integer_Argument("-jello_size",20,"resolution of each jello cube");
     parse_args->Add_Integer_Argument("-number_of_jellos",12,"number of falling jello cubes in test 41");
     parse_args->Add_Integer_Argument("-degrees_incline",5,"degrees of incline");
@@ -338,7 +339,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
     if(parse_args->Is_Value_Set("-cutoff")) input_cutoff=(T)parse_args->Get_Double_Value("-cutoff");
     if(parse_args->Is_Value_Set("-efc")) input_efc=(T)parse_args->Get_Double_Value("-efc");
     if(parse_args->Is_Value_Set("-poissons_ratio")) input_poissons_ratio=(T)parse_args->Get_Double_Value("-poissons_ratio");
-
+    if(parse_args->Is_Value_Set("-youngs_modulus")) input_youngs_modulus=(T)parse_args->Get_Double_Value("-youngs_modulus");
+    
     switch(test_number){
         case 1:
         case 2:
@@ -802,9 +804,10 @@ void Get_Initial_Data()
 
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/hand_30k.tet",
                                                 RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3*scale,0),ROTATION<TV>(T(pi/2),TV(0,1,0))*ROTATION<TV>(T(pi/2),TV(1,0,0)))),true,true,density,.35);
-           // tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/fish_42K.tet",
-                                           //     RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,4.5*scale,-1.2*scale),ROTATION<TV>((T)pi*0.525,TV(1,0,0))*ROTATION<TV>(0*(T)pi/2,TV(0,1,0)))),true,true,density,0.06);            
-            //tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/bunny.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)4.7*scale,-3.0*scale))),true,true,density,.25);
+            if(!gears_of_pain){ tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/fish_42K.tet",
+                                                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,4.5*scale,-1.2*scale),ROTATION<TV>((T)pi*0.525,TV(1,0,0))*ROTATION<TV>(0*(T)pi/2,TV(0,1,0)))),true,true,density,0.06);            
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/bunny.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)4.7*scale,-3.0*scale))),true,true,density,.25);
+            }
            
             RIGID_BODY<TV>& gear1=tests.Add_Rigid_Body("gear",.375*scale,1.0*scale);
             RIGID_BODY<TV>& gear2=tests.Add_Rigid_Body("gear",.375*scale,1.0*scale);
@@ -825,20 +828,25 @@ void Get_Initial_Data()
                 curve2.Add_Control_Point(i/angular_velocity,FRAME<TV>(TV(gear_dx*scale,1.5*scale,-.75*scale),ROTATION<TV>(i,TV(0,0,1))));}
 
             RIGID_BODY<TV>& box0=tests.Add_Analytic_Box(TV(2.0*scale,.1*scale,2.0*scale));
-            //RIGID_BODY<TV>& box1=tests.Add_Analytic_Box(TV(2.0*scale,2.0*scale,.1*scale));
+            
             RIGID_BODY<TV>& box2=tests.Add_Analytic_Box(TV(2.0*scale,2.0*scale,.1*scale));
             RIGID_BODY<TV>& box3=tests.Add_Analytic_Box(TV(2.0*scale,.1*scale,2.0*scale));
             RIGID_BODY<TV>& cylinder=tests.Add_Analytic_Cylinder(1.5*scale,.06*scale);
             box0.X()=TV(0,4.0*scale,-3.0*scale);
-            //box1.X()=TV(0,1.2*scale,1.0*scale);
-            //box1.Rotation()=ROTATION<TV>((T)pi/4.0,TV(1,0,0));
+
+            if(!gears_of_pain){
+                RIGID_BODY<TV>& box1=tests.Add_Analytic_Box(TV(2.0*scale,2.0*scale,.1*scale));
+                box1.X()=TV(0,1.2*scale,1.0*scale);
+                //box1.Rotation()=ROTATION<TV>((T)pi/4.0,TV(1,0,0));
+                box1.is_static=true;
+            }
+            
             box2.X()=TV(0,1.2*scale,-1.0*scale);
             //box2.Rotation()=ROTATION<TV>(-(T)pi/4.0,TV(1,0,0));
             box3.X()=TV(0,3.0*scale,-1.4*scale);
 
             box3.Rotation()=ROTATION<TV>((T)pi/4.0,TV(1,0,0));
             box0.is_static=false; //Will move later
-           // box1.is_static=true;
             box2.is_static=true;
             box3.is_static=false;
             
@@ -1447,10 +1455,12 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 58:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume1=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(1);
             Add_Constitutive_Model(tetrahedralized_volume1,1e4,0.4,0.005);
-            /*TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume2=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(2);
-            Add_Constitutive_Model(tetrahedralized_volume2,5e4,0.4,0.005);
-            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume3=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(3);
-            Add_Constitutive_Model(tetrahedralized_volume3,1e4,0.4,0.005);*/
+            if(!gears_of_pain){
+                TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume2=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(2);
+                Add_Constitutive_Model(tetrahedralized_volume2,5e4,0.4,0.005);
+                TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume3=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(3);
+                Add_Constitutive_Model(tetrahedralized_volume3,1e4,0.4,0.005);}
+             
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             break;}
         case 34:{
@@ -1929,7 +1939,7 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
         solid_body_collection.deformable_body_collection.collisions.check_collision.Fill(true);
         for(int f=1;FINITE_VOLUME<TV,3>* fvm = solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>*>(f);f++)
             for(int t=1;t<=fvm->Fe_hat.m;t++)
-                if(fvm->Fe_hat(t).x11>=3)
+                if(fvm->Fe_hat(t).x11>=300)
                     solid_body_collection.deformable_body_collection.collisions.check_collision.Subset(fvm->strain_measure.mesh_object.mesh.elements(t)).Fill(false);
     }
     if(test_number==31)
@@ -2018,7 +2028,9 @@ void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
             T vol=tetrahedralized_volume->Signed_Size(i);
             if(vol<min_volume) min_volume=vol;}}
     LOG::cout<<"Minimum tet volume: "<<min_volume<<std::endl;
-
+    if(test_number==29)
+        LOG::cout << "Self collisions enabled = " << solids_parameters.triangle_collision_parameters.perform_self_collision << std::endl;
+    LOG::cout<<"Minimum tet volume: "<<min_volume<<std::endl;
     
 }
 //#####################################################################
@@ -2152,9 +2164,10 @@ void Add_Constitutive_Model(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,T 
     if(input_efc) efc=input_efc;
     if(input_cutoff) cutoff=input_cutoff;
     if(input_poissons_ratio!=-1) poissons_ratio=input_poissons_ratio;
-
+    if(input_youngs_modulus!=0) stiffness=input_youngs_modulus;
+    
     if(use_extended_neohookean) icm=new NEO_HOOKEAN_EXTRAPOLATED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc);
-    if(use_extended_neohookean2) icm=new NEO_HOOKEAN_EXTRAPOLATED2<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc);
+    else if(use_extended_neohookean2) icm=new NEO_HOOKEAN_EXTRAPOLATED2<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc);
     else if(use_svk) icm=new ST_VENANT_KIRCHHOFF<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
     else if(use_extended_svk) icm=new SVK_EXTRAPOLATED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc);
     else if(use_extended_neohookean_refined) icm=new NEO_HOOKEAN_EXTRAPOLATED_REFINED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,.6,efc);
