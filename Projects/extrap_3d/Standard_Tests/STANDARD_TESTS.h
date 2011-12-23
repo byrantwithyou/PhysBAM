@@ -276,8 +276,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 35: case 36: case 41:
             mattress_grid=GRID<TV>(jello_size,jello_size,jello_size,(T)-0.01,(T)0.01,(T)-0.01,(T)0.01,(T)-0.01,(T)0.01);
             mattress_grid1=GRID<TV>(jello_size,jello_size,jello_size,(T)-0.01,(T)0.01,(T)-0.01,(T)0.01,(T)-0.01,(T)0.01);
-            mattress_grid2=GRID<TV>(jello_size,jello_size,jello_size,(T)-0.012,(T)0.012,(T)-0.012,(T)0.012,(T)-0.012,(T)0.012);
-            mattress_grid3=GRID<TV>(jello_size,jello_size,jello_size,(T)-0.015,(T)0.015,(T)-0.015,(T)0.015,(T)-0.015,(T)0.015);
+            mattress_grid2=GRID<TV>(jello_size,jello_size,jello_size,(T)-0.018,(T)0.018,(T)-0.018,(T)0.018,(T)-0.018,(T)0.018);
+            mattress_grid3=GRID<TV>(jello_size,jello_size,jello_size,(T)-0.0125,(T)0.0125,(T)-0.0125,(T)0.0125,(T)-0.0125,(T)0.0125);
             break;
         case 37: case 39: case 40: case 38: case 44:
             mattress_grid=GRID<TV>(40,40,40,(T)-0.01,(T)0.01,(T)-0.01,(T)0.01,(T)-0.01,(T)0.01);
@@ -962,29 +962,12 @@ void Get_Initial_Data()
             break;
         }
         case 41:
-      /*  {
 
-            jello_centers.Append(TV(-0.054,0.042,0.013)); 
-            jello_centers.Append(TV(0.031, 0.029,-0.013));
-            jello_centers.Append(TV(-0.074,0.037,-0.043)); 
-            jello_centers.Append(TV(0.052, 0.059,0.036));
-            RIGID_BODY_STATE<TV> initial_state1(FRAME<TV>(jello_centers(1),ROTATION<TV>(-T(pi/0.11),TV(1.3,-1.5,0.7))));
-            RIGID_BODY_STATE<TV> initial_state2(FRAME<TV>(jello_centers(2),ROTATION<TV>(T(pi/0.076),TV(0.7,1,0.1))));
-            RIGID_BODY_STATE<TV> initial_state3(FRAME<TV>(jello_centers(3),ROTATION<TV>(T(pi/0.13),TV(-1.3,1.5,0.7))));
-            RIGID_BODY_STATE<TV> initial_state4(FRAME<TV>(jello_centers(4),ROTATION<TV>(-T(pi/0.046),TV(0.7,.1,-0.2))));
-            tests.Create_Mattress(mattress_grid1,true,&initial_state1);
-            tests.Create_Mattress(mattress_grid2,true,&initial_state2);
-            tests.Create_Mattress(mattress_grid1,true,&initial_state3);
-            tests.Create_Mattress(mattress_grid3,true,&initial_state4);
-            RIGID_BODY<TV>& inclined_floor=tests.Add_Ground(0.1);
-            inclined_floor.Rotation()=ROTATION<TV>((T)pi/10,TV(1,0,0));
-            break;
-        }*/
         {
             //Todo: At some point, use Oriented_Box to do a tighter collision check. C-Re, C-e, R where R is the rotation matrix and e is the edge
             RANDOM_NUMBERS<T> random;
-            T max_jello_size = .03;
-            T bound = .3;
+            T max_jello_size = .036;//maximum edge length
+            T bound = .2;
             TV new_center; T new_rotate;
             bool stuck=false;
             RIGID_BODY_STATE<TV> initial_state;
@@ -996,9 +979,10 @@ void Get_Initial_Data()
                     random.Fill_Uniform(new_center,-bound,bound);
                    // new_center = TV(random.Get_Uniform_Number(-bound,bound),random.Get_Uniform_Number((T).5*bound,(T)1*bound),random.Get_Uniform_Number(-bound,bound));
                     stuck=false;
-                    new_center.y = (T).5*(new_center.y + 1.5*bound);
+                    new_center.y = (T).5*(new_center.y + 2.0*bound+.5*new_center.z);
                     for (int j=1; j<i&&(!stuck); j++){
-                        if((new_center-jello_centers(j)).Magnitude()<=(T)4*max_jello_size*max_jello_size) stuck=true;
+                        //LOG::cout << i << " " << j << " " << new_center << " " << jello_centers(j) << " " << (new_center-jello_centers(j)).Magnitude() << " " << (T)8*max_jello_size*max_jello_size << std::endl;
+                        if((new_center-jello_centers(j)).Magnitude()<=(T)4*max_jello_size) stuck=true;
                        // if ((new_center.x-jello_centers(j).x)*(new_center.x-jello_centers(j).x)+(new_center.y-jello_centers(j).y)*(new_center.y-jello_centers(j).y)+(new_center.z-jello_centers(j).z)*(new_center.z-jello_centers(j).z)<=(T)4*max_jello_size*max_jello_size) stuck=true;
                 }}while(stuck);
                 jello_centers.Append(new_center);
@@ -1006,8 +990,8 @@ void Get_Initial_Data()
 //                     new_center = TV(random.Get_Uniform_Number(-bound,bound),random.Get_Uniform_Number(-bound,bound),random.Get_Uniform_Number(-bound,bound));
                 new_rotate = random.Get_Uniform_Number(-(T)pi,(T)pi);
                 RIGID_BODY_STATE<TV> initial_state1(FRAME<TV>(jello_centers(i),ROTATION<TV>(new_rotate,new_center)));
-                if (i % 4 ==0) {tests.Create_Mattress(mattress_grid3,true,&initial_state1);}
-                else if (i % 4 ==1) {tests.Create_Mattress(mattress_grid2,true,&initial_state1);}
+                if (i % 5 ==3) {tests.Create_Mattress(mattress_grid3,true,&initial_state1);}
+                else if (i % 5 ==4) {tests.Create_Mattress(mattress_grid2,true,&initial_state1);}
                 else {tests.Create_Mattress(mattress_grid1,true,&initial_state1);}
             }
             RIGID_BODY<TV>& inclined_floor=tests.Add_Ground(input_friction);
