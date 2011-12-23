@@ -167,15 +167,15 @@ bool Parse_Pair(const char*& str,std::string& key,std::string& value)
         str+=strspn(str, " \t");
         return true;
     }
-    char ec=' ';
+    char ec[]=" \t\n";
     if(*str=='\'' || *str=='"')
     {
-        ec=*str;
+        ec[0]=*str;
+        ec[1]=0;
         str++;
     }
 
-    const char* end=strchr(str, ec);
-    PHYSBAM_ASSERT(end);
+    const char* end=str+strcspn(str, ec);
     value=std::string(str, end-str);
     str=end+1;
     str+=strspn(str, " \t");
