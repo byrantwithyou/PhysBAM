@@ -40,21 +40,6 @@ public:
     DIAGONAL_MATRIX<T,d> P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const T scale,const int simplex) const PHYSBAM_OVERRIDE;
     T Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int simplex) const PHYSBAM_OVERRIDE;
 
-/*
-    // alternate version using standard indefiniteness fix
-    DIAGONAL_MATRIX<T,d> P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const T scale,const int simplex) const PHYSBAM_OVERRIDE
-    {T scale_mu=scale*constant_mu,scale_lambda=scale*constant_lambda;
-    DIAGONAL_MATRIX<T,d> F_threshold=F.Clamp_Min(failure_threshold),F_inverse=F_threshold.Inverse();
-    T J=F_threshold.Determinant();
-    T scale_mu_minus_lambda_log_J=scale_mu-scale_lambda*log(J);
-    DIAGONAL_MATRIX<T,d> P_threshold=scale_mu*F_threshold-scale_mu_minus_lambda_log_J*F_inverse;
-    if(F_threshold==F) return P_threshold;
-    // otherwise, compute dP_dF, apply indefiniteness fix, and extrapolate
-    if(J>0) scale_mu_minus_lambda_log_J=scale_mu;
-    SYMMETRIC_MATRIX<T,d> dP_dF=scale_mu+scale_mu_minus_lambda_log_J*sqr(F_inverse)+scale_lambda*SYMMETRIC_MATRIX<T,d>::Outer_Product(F_inverse.To_Vector());
-    //return P_threshold+DIAGONAL_MATRIX<T,d>(dP_dF.Positive_Definite_Part()*(F-F_threshold).To_Vector());}
-*/
-
     MATRIX<T,d> P_From_Strain_Rate(const DIAGONAL_MATRIX<T,d>& F,const MATRIX<T,d>& F_dot,const T scale,const int simplex) const PHYSBAM_OVERRIDE;
     void Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& dP_dF,const int triangle) const;
     void Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dPi_dF,const int tetrahedron) const;
