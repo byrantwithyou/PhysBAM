@@ -22,11 +22,7 @@ GENERAL_EXTRAPOLATED(const T youngs_modulus_input,const T poissons_ratio_input,c
     extrapolation_cutoff(extrapolation_cutoff_input),extra_force_coefficient(extra_force_coefficient_input),
     panic_threshold((T)1e-6)
 {
-    assert(poissons_ratio>-1&&poissons_ratio<.5);
-    constant_lambda=youngs_modulus*poissons_ratio/((1+poissons_ratio)*(1-2*poissons_ratio));
-    constant_mu=youngs_modulus/(2*(1+poissons_ratio));
-    constant_alpha=Rayleigh_coefficient*constant_lambda;
-    constant_beta=Rayleigh_coefficient*constant_mu;
+    Update_Lame_Constants(youngs_modulus_input,poissons_ratio_input,Rayleigh_coefficient);
     base.Initialize(constant_mu,constant_lambda);
 }
 //#####################################################################
@@ -42,6 +38,7 @@ template<class T,int d> GENERAL_EXTRAPOLATED<T,d>::
 template<class T,int d> void GENERAL_EXTRAPOLATED<T,d>::
 Update_Lame_Constants(const T youngs_modulus_input, const T poissons_ratio_input,const T Rayleigh_coefficient_input)
 {
+    assert(poissons_ratio>-1&&poissons_ratio<.5);
     constant_lambda=youngs_modulus_input*poissons_ratio_input/((1+poissons_ratio_input)*(1-2*poissons_ratio_input));
     constant_mu=youngs_modulus_input/(2*(1+poissons_ratio_input));
     constant_alpha=Rayleigh_coefficient_input*constant_lambda;
@@ -68,23 +65,11 @@ Energy_Density_Helper(const DIAGONAL_MATRIX<T,2>& F,const int simplex) const
     T dx = F.x11 - extrapolation_cutoff;
     T dy = F.x22 - extrapolation_cutoff;
     T k = extra_force_coefficient*youngs_modulus;
-    
-    if ((dx >= 0) && (dy >= 0))
-    {
-        return base.E(x,y,simplex);
-    }
-    else if ((dx < 0) && (dy >= 0))
-    {
-        return base.E(x,y,simplex) + base.Ex(x,y,simplex)*dx + k*dx*dx;
-    }
-    else if ((dx >= 0) && (dy < 0))
-    {
-        return base.E(x,y,simplex) + base.Ey(x,y,simplex)*dy + k*dy*dy;
-    }
-    else // ((dx < 0) && (dy < 0))
-    {
-        return base.E(x,y,simplex) + base.Ex(x,y,simplex)*(dx+dy) + base.Exy(x,y,simplex)*dx*dy + k*dx*dx + k*dy*dy;
-    }
+    T E=base.E(x,y,simplex);
+    if(dx < 0) E+=base.Ex(x,y,simplex)*dx + k*dx*dx;
+    if(dy < 0) E+=base.Ey(x,y,simplex)*dy + k*dy*dy;
+    if((dx < 0) && (dy < 0)) E+=base.Exy(x,y,simplex)*dx*dy;
+    return E;
 }
 //#####################################################################
 // Function Energy_Density_Helper
@@ -100,41 +85,15 @@ Energy_Density_Helper(const DIAGONAL_MATRIX<T,3>& F,const int simplex) const
     T dy = F.x22 - extrapolation_cutoff;
     T dz = F.x33 - extrapolation_cutoff;
     T k = extra_force_coefficient*youngs_modulus;
-
-    
-    if ((dx >= 0) && (dy >= 0) && (dz >= 0)) // R
-    {
-        return base.E(x,y,z,simplex);
-    }
-    else if ((dx < 0) && (dy >= 0) && (dz >= 0)) // Rx
-    {
-        return base.E(x,y,z,simplex) + base.Ex(x,y,z,simplex)*dx + k*dx*dx;
-    }
-    else if ((dx >= 0) && (dy < 0) && (dz >= 0)) // Ry
-    {
-        return base.E(x,y,z,simplex) + base.Ey(x,y,z,simplex)*dy + k*dy*dy;
-    }
-    else if ((dx >= 0) && (dy >= 0) && (dz < 0)) // Rz
-    {
-        return base.E(x,y,z,simplex) + base.Ez(x,y,z,simplex)*dz + k*dz*dz;
-    }
-    else if ((dx < 0) && (dy < 0) && (dz >= 0)) // Rxy
-    {
-        return base.E(x,y,z,simplex) + base.Ex(x,y,z,simplex)*dx + base.Ey(x,y,z,simplex)*dy + base.Exy(x,y,z,simplex)*dx*dy + k*dx*dx + k*dy*dy;
-    }
-    else if ((dx < 0) && (dy >= 0) && (dz < 0)) // Rzx
-    {
-        return base.E(x,y,z,simplex) + base.Ex(x,y,z,simplex)*dx + base.Ez(x,y,z,simplex)*dz + base.Exz(x,y,z,simplex)*dx*dz + k*dx*dx + k*dz*dz;
-    }
-    else if ((dx >= 0) && (dy < 0) && (dz < 0)) // Ryz
-    {
-        return base.E(x,y,z,simplex) + base.Ey(x,y,z,simplex)*dy + base.Ez(x,y,z,simplex)*dz + base.Eyz(x,y,z,simplex)*dy*dz + k*dy*dy + k*dz*dz;
-    }
-    else // Rxyz
-    {
-        return base.E(x,y,z,simplex) + base.Ex(x,y,z,simplex)*dx + base.Ey(x,y,z,simplex)*dy + base.Ez(x,y,z,simplex)*dz + base.Exy(x,y,z,simplex)*dx*dy
-            + base.Exz(x,y,z,simplex)*dx*dz + base.Eyz(x,y,z,simplex)*dy*dz + base.Exyz(x,y,z,simplex)*dx*dy*dz + k*dx*dx + k*dy*dy + k*dz*dz;
-    }
+    T E=base.E(x,y,z,simplex);
+    if(dx < 0) E+=base.Ex(x,y,z,simplex)*dx + k*dx*dx;
+    if(dy < 0) E+=base.Ey(x,y,z,simplex)*dy + k*dy*dy;
+    if(dz < 0) E+=base.Ez(x,y,z,simplex)*dz + k*dz*dz;
+    if((dx < 0) && (dy < 0)) E+=base.Exy(x,y,z,simplex)*dx*dy;
+    if((dx < 0) && (dz < 0)) E+=base.Exz(x,y,z,simplex)*dx*dz;
+    if((dy < 0) && (dz < 0)) E+=base.Eyz(x,y,z,simplex)*dy*dz;
+    if((dx < 0) && (dy < 0) && (dz < 0)) E+=base.Exyz(x,y,z,simplex)*dx*dy*dz;
+    return E;
 }
 //#####################################################################
 // Function P_From_Strain
