@@ -458,6 +458,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             last_frame=1000;
             break;
         case 41:
+            solids_parameters.cfl=(T)5;
             solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness = 1e-4;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
@@ -467,7 +468,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             last_frame=2000;
             break;
         case 52:
-            solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness = 1e-4;
+            solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness = 2e-4;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             solids_parameters.triangle_collision_parameters.perform_self_collision=true;
@@ -1015,38 +1016,38 @@ void Get_Initial_Data()
         }
         case 52:
         {
-            /*RIGID_BODY<TV>& shell=tests.Add_Analytic_Shell(0.07,0.035,0.08,128);
+            RIGID_BODY<TV>& shell=tests.Add_Analytic_Shell(0.08,0.045,0.036,128);
             shell.coefficient_of_friction = 0.3;
-            shell.X()=TV(0,0.035,0);
+            shell.X()=TV(0,0.04,0);
             shell.Rotation()=ROTATION<TV>((T)pi/2.0,TV(1,0,0));
-            shell.is_static=true;*/
+            shell.is_static=true;
 
             int count = 0;
             for (int i=1; i<=27; i++)
             {
                 count++;
-                jello_centers.Append(TV(-500+i*5,-1000,0));
+                jello_centers.Append(TV(i*0.05,50,0));
                 RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(jello_centers(count),ROTATION<TV>(10*sin(178*i),TV(sin(145*i),cos(345*i),cos(478*i)))));
                 tests.Create_Mattress(mattress_grid,true,&initial_state);
             }
             
-            int number_of_boxes = 128;
-            T height = 0.08;
-            T width = 0.02;
-            T radius = 0.035;
+            // int number_of_boxes = 128;
+            // T height = 0.08;
+            // T width = 0.02;
+            // T radius = 0.035;
 
-            ARRAY<RIGID_BODY<TV>*> boxes;
+            // ARRAY<RIGID_BODY<TV>*> boxes;
             
-            for (int i=1; i<=number_of_boxes; i++)
-            {
-                T phi = 2*pi*(i-1)/number_of_boxes;
+            // for (int i=1; i<=number_of_boxes; i++)
+            // {
+                // T phi = 2*pi*(i-1)/number_of_boxes;
 
-                boxes.Append(&tests.Add_Analytic_Box(TV(width,height,width)));
-                boxes(i)->X() = TV((radius+width/2)*sin(phi),height/2,(radius+width/2)*cos(phi));
-                boxes(i)->Rotation() = ROTATION<TV>((T)phi,TV(0,1,0));
-                boxes(i)->is_static = true;
-                boxes(i)->coefficient_of_friction = 0.3;
-            }
+                // boxes.Append(&tests.Add_Analytic_Box(TV(width,height,width)));
+                // boxes(i)->X() = TV((radius+width/2)*sin(phi),height/2,(radius+width/2)*cos(phi));
+                // boxes(i)->Rotation() = ROTATION<TV>((T)phi,TV(0,1,0));
+                // boxes(i)->is_static = true;
+                // boxes(i)->coefficient_of_friction = 0.3;
+            // }
 
             /*RIGID_BODY<TV>& box1=tests.Add_Analytic_Box(TV(0.07,0.07,0.07));
             RIGID_BODY<TV>& box2=tests.Add_Analytic_Box(TV(0.07,0.07,0.07));
@@ -2064,7 +2065,7 @@ void Preprocess_Frame(const int frame)
         int n=mattress_grid.counts.y;
         int mn=mattress_grid.counts.z;
      
-        for (int k=1; k<=jello_centers.m; k++) if (frame==(k-1)*90+1)
+        for (int k=1; k<=jello_centers.m; k++) if (frame==(k-1)*60+1)
         {
             TV center = TV();
             for (int i=1; i<=m*n*mn; i++)
@@ -2084,6 +2085,28 @@ void Preprocess_Frame(const int frame)
             {
                 particles.V(i+m*(j-1)+m*n*(ij-1)+(k-1)*m*n*mn) = 0.1*TV(-sin(sin(187*k)*5*i/(T)m),-cos(cos(217*k)*6*j/(T)n),sin(5*ij*sin(471*k)/(T)mn));
             }
+
+            for (int k_other=k+1; k_other<=jello_centers.m; k_other++)
+            {
+                TV center = TV();
+                for (int i=1; i<=m*n*mn; i++)
+                {
+                    int index = i+(k_other-1)*m*n*mn;
+                    center += particles.X(index);
+                }
+                center /= m*n*mn;
+                for (int i=1; i<=m*n*mn; i++)
+                {
+                    int index = i+(k_other-1)*m*n*mn;
+                    particles.X(index).y += 50-center.y;
+                }
+                for(int i=1;i<=m;i++)
+                for(int j=1;j<=n;j++)
+                for(int ij=1;ij<=mn;ij++)
+                {
+                    particles.V(i+m*(j-1)+m*n*(ij-1)+(k_other-1)*m*n*mn) = TV();
+                }
+            }        
         }
     }
     if(test_number==32 && this->restart && first_time && !nobind)
