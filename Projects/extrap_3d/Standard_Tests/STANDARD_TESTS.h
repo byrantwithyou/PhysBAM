@@ -72,6 +72,8 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/COROTATED.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/GEN_NEO_HOOKEAN_ENERGY.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/GENERAL_EXTRAPOLATED.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/MOONEY_RIVLIN_3D_EXTRAPOLATED.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/MOONEY_RIVLIN_3D2.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN.h>
@@ -81,6 +83,7 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED_REFINED.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED_SMOOTH.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED2.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_J_INTERP_ENERGY.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/ROTATED_LINEAR.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/ST_VENANT_KIRCHHOFF.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/SVK_EXTRAPOLATED.h>
@@ -118,6 +121,8 @@ public:
     bool test_forces;
     bool use_extended_neohookean;
     bool use_extended_neohookean2;
+    bool use_extended_neohookean3;
+    bool use_int_j_neo;
     bool use_extended_neohookean_refined;
     bool use_extended_neohookean_hyperbola;
     bool use_extended_neohookean_smooth;
@@ -151,12 +156,13 @@ public:
     T input_efc;
     T input_poissons_ratio,input_youngs_modulus;
     T input_friction;
-    
+    T J_min,J_max,la_min;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),semi_implicit(false),test_forces(false),use_extended_neohookean(false),use_extended_neohookean2(false),
         use_extended_neohookean_refined(false),use_extended_neohookean_hyperbola(false),use_extended_neohookean_smooth(false),use_extended_svk(false),
-        use_corotated(false),use_corot_blend(false),dump_sv(false),print_matrix(false),use_constant_ife(false),input_cutoff(0),input_efc(0),input_poissons_ratio(-1),input_youngs_modulus(0)
+        use_corotated(false),use_corot_blend(false),dump_sv(false),print_matrix(false),use_constant_ife(false),input_cutoff(0),input_efc(0),input_poissons_ratio(-1),input_youngs_modulus(0),
+        J_min(0),J_max((T).1),la_min(0)
     {
     }
 
@@ -202,6 +208,8 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Option_Argument("-use_svk");
     parse_args->Add_Option_Argument("-use_ext_neo");
     parse_args->Add_Option_Argument("-use_ext_neo2");
+    parse_args->Add_Option_Argument("-use_ext_neo3");
+    parse_args->Add_Option_Argument("-use_int_j_neo");
     parse_args->Add_Option_Argument("-use_ext_neo_ref");
     parse_args->Add_Option_Argument("-use_ext_neo_hyper");
     parse_args->Add_Option_Argument("-use_ext_neo_smooth");
@@ -243,6 +251,9 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Integer_Argument("-degrees_incline",5,"degrees of incline");
     parse_args->Add_Double_Argument("-friction",.3,"amount of friction");
     parse_args->Add_Option_Argument("-gears_of_pain");
+    parse_args->Add_Double_Argument("-ja",.6,"J to stop interpolating");
+    parse_args->Add_Double_Argument("-jb",.4,"J to start interpolating");
+    parse_args->Add_Double_Argument("-lb",-.1,"final poisson's ratio");
 }
 //#####################################################################
 // Function Parse_Options
@@ -307,6 +318,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
     test_forces=parse_args->Is_Value_Set("-test_forces");
     use_extended_neohookean=parse_args->Is_Value_Set("-use_ext_neo");
     use_extended_neohookean2=parse_args->Is_Value_Set("-use_ext_neo2");
+    use_extended_neohookean3=parse_args->Is_Value_Set("-use_ext_neo3");
+    use_int_j_neo=parse_args->Is_Value_Set("-use_int_j_neo");
     use_extended_neohookean_refined=parse_args->Is_Value_Set("-use_ext_neo_ref");
     use_extended_neohookean_hyperbola=parse_args->Is_Value_Set("-use_ext_neo_hyper");
     use_extended_mooney_rivlin=parse_args->Is_Value_Set("-use_ext_mooney");
@@ -330,6 +343,9 @@ void Parse_Options() PHYSBAM_OVERRIDE
     number_of_jellos=parse_args->Get_Integer_Value("-number_of_jellos");
     degrees_incline=parse_args->Get_Integer_Value("-degrees_incline");
     gears_of_pain=parse_args->Is_Value_Set("-gears_of_pain");
+    J_min=(T)parse_args->Get_Double_Value("-ja");
+    J_max=(T)parse_args->Get_Double_Value("-jb");
+    la_min=(T)parse_args->Get_Double_Value("-lb");
     
     semi_implicit=parse_args->Is_Value_Set("-semi_implicit");
     if(parse_args->Is_Value_Set("-project_nullspace")) solids_parameters.implicit_solve_parameters.project_nullspace_frequency=1;
@@ -2245,6 +2261,9 @@ void Add_Constitutive_Model(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,T 
     
     if(use_extended_neohookean) icm=new NEO_HOOKEAN_EXTRAPOLATED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc);
     else if(use_extended_neohookean2) icm=new NEO_HOOKEAN_EXTRAPOLATED2<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc);
+    else if(use_extended_neohookean3) icm=new GENERAL_EXTRAPOLATED<T,3>(*new GEN_NEO_HOOKEAN_ENERGY<T>,stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.4,20);
+    else if(use_int_j_neo) icm=new GENERAL_EXTRAPOLATED<T,3>(*new NEO_J_INTERP_ENERGY<T>(J_min,J_max,la_min*stiffness*stiffness_multiplier),
+        stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.4,20);
     else if(use_svk) icm=new ST_VENANT_KIRCHHOFF<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
     else if(use_extended_svk) icm=new SVK_EXTRAPOLATED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc);
     else if(use_extended_neohookean_refined) icm=new NEO_HOOKEAN_EXTRAPOLATED_REFINED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,.6,efc);
