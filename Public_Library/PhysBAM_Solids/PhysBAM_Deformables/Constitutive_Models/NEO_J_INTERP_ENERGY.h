@@ -45,28 +45,28 @@ public:
     {
         if(J>J_max) return lambda;
         if(J<J_min) return la_min;
-        return f((J-J_min)/(J_max-J_min))*(la_min-lambda)+lambda;
+        return f((J-J_min)/(J_max-J_min))*(lambda-la_min)+la_min;
     }
 
     T dLa(T J) const
     {
         if(J>J_max) return 0;
         if(J<J_min) return 0;
-        return df((J-J_min)/(J_max-J_min))*(la_min-lambda)/(J_max-J_min);
+        return df((J-J_min)/(J_max-J_min))*(lambda-la_min)/(J_max-J_min);
     }
 
     T ddLa(T J) const
     {
         if(J>J_max) return 0;
         if(J<J_min) return 0;
-        return ddf((J-J_min)/(J_max-J_min))*(la_min-lambda)/sqr(J_max-J_min);
+        return ddf((J-J_min)/(J_max-J_min))*(lambda-la_min)/sqr(J_max-J_min);
     }
 
     T dddLa(T J) const
     {
         if(J>J_max) return 0;
         if(J<J_min) return 0;
-        return dddf((J-J_min)/(J_max-J_min))*(la_min-lambda)/cube(J_max-J_min);
+        return dddf((J-J_min)/(J_max-J_min))*(lambda-la_min)/cube(J_max-J_min);
     }
 
     T E(T x, T y, int simplex) const
