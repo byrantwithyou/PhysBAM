@@ -836,12 +836,12 @@ void Get_Initial_Data()
 
             if(!gears_of_pain){
                 RIGID_BODY<TV>& box1=tests.Add_Analytic_Box(TV(2.0*scale,2.0*scale,.1*scale));
-                box1.X()=TV(0,1.2*scale,1.0*scale);
+                box1.X()=TV(0,1.2*scale,0.801*scale);
                 //box1.Rotation()=ROTATION<TV>((T)pi/4.0,TV(1,0,0));
                 box1.is_static=true;
             }
             
-            box2.X()=TV(0,1.2*scale,-1.0*scale);
+            box2.X()=TV(0,1.2*scale,-0.801*scale);
             //box2.Rotation()=ROTATION<TV>(-(T)pi/4.0,TV(1,0,0));
             box3.X()=TV(0,3.0*scale,-1.4*scale);
 
@@ -979,10 +979,10 @@ void Get_Initial_Data()
                     random.Fill_Uniform(new_center,-bound,bound);
                    // new_center = TV(random.Get_Uniform_Number(-bound,bound),random.Get_Uniform_Number((T).5*bound,(T)1*bound),random.Get_Uniform_Number(-bound,bound));
                     stuck=false;
-                    new_center.y = (T).5*(new_center.y + 2.0*bound+.5*new_center.z);
+                    new_center.y = (T).5*(new_center.y + 3.5*bound+1.5*new_center.z);
                     for (int j=1; j<i&&(!stuck); j++){
                         //LOG::cout << i << " " << j << " " << new_center << " " << jello_centers(j) << " " << (new_center-jello_centers(j)).Magnitude() << " " << (T)8*max_jello_size*max_jello_size << std::endl;
-                        if((new_center-jello_centers(j)).Magnitude()<=(T)4*max_jello_size) stuck=true;
+                        if((new_center-jello_centers(j)).Magnitude()<=(T)2*max_jello_size) stuck=true;
                        // if ((new_center.x-jello_centers(j).x)*(new_center.x-jello_centers(j).x)+(new_center.y-jello_centers(j).y)*(new_center.y-jello_centers(j).y)+(new_center.z-jello_centers(j).z)*(new_center.z-jello_centers(j).z)<=(T)4*max_jello_size*max_jello_size) stuck=true;
                 }}while(stuck);
                 jello_centers.Append(new_center);
