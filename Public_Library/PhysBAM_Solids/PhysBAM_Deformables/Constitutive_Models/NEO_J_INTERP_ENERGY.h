@@ -96,7 +96,7 @@ public:
     T Exxy(T x, T y, int simplex) const
     {
         T J=x*y,L=log(J);
-        return (T)0.5*dddLa(J)*sqr(J)*sqr(L)+ddLa(J)*y*sqr(L)+(T)0.5*6*ddLa(J)*y*L+dLa(J)*L/x+3*dLa(J)/x-La(J)/(J*x);
+        return (T)0.5*dddLa(J)*J*y*sqr(L)+ddLa(J)*y*sqr(L)+3*ddLa(J)*y*L+dLa(J)*L/x+3*dLa(J)/x-La(J)/(J*x);
     }
 
     T Ex_Ey_x_y(T x, T y, int simplex) const
