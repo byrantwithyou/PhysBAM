@@ -9,107 +9,36 @@
 
 namespace PhysBAM{
 
-template<class TV>
+template<class T>
 class GENERAL_ENERGY
 {
 public:
-    typedef typename TV::SCALAR T;
-    T mu;
-    T lambda;
 
     GENERAL_ENERGY () {}
-    ~GENERAL_ENERGY () {}
+    virtual ~GENERAL_ENERGY () {}
 
-    void Initialize(const T input_mu, const T input_lambda)
-    {
-        mu = input_mu;
-        lambda = input_lambda;
-    }
+    virtual void Initialize(const T input_mu, const T input_lambda)=0;
 
-    T E(T x, T y, int simplex) const
-    {
-        T L=log(x*y);
-        return mu*((T)0.5*x*x + (T)0.5*y*y - 1 - L) + (T)0.5*lambda*sqr(L); 
-    }
+    virtual T E(T x, T y, int simplex) const=0;
+    virtual T Ex(T x, T y, int simplex) const=0;
+    virtual T Exx(T x, T y, int simplex) const=0;
+    virtual T Exy(T x, T y, int simplex) const=0;
+    virtual T Exxy(T x, T y, int simplex) const=0;
+    virtual T Ex_Ey_x_y(T x, T y, int simplex) const=0; // (Ex-Ey)/(x-y)
 
-    T Ex(T x, T y, int simplex) const
-    {
-        return mu*(x - 1/x) + lambda*log(x*y)/x;
-    }
-
-    T Exx(T x, T y, int simplex) const
-    {
-        return mu*(1 + 1/(x*x)) + lambda*(1 - log(x*y))/(x*x);
-    }
-
-    T Exy(T x, T y, int simplex) const
-    {
-        return lambda/(x*y);
-    }
-
-    T Exxy(T x, T y, int simplex) const
-    {
-        return -lambda/(x*x*y);
-    }
-
-    T Ex_Ey_x_y(T x, T y, int simplex) const
-    {
-        return mu+(mu-lambda*log(x*y))/(x*y);
-    }
+    virtual T E(T x, T y, T z, int simplex) const=0;
+    virtual T Ex(T x, T y, T z, int simplex) const=0;
+    virtual T Exx(T x, T y, T z, int simplex) const=0;
+    virtual T Exy(T x, T y, T z, int simplex) const=0;
+    virtual T Exxy(T x, T y, T z, int simplex) const=0;
+    virtual T Exyz(T x, T y, T z, int simplex) const=0;
+    virtual T Exxyz(T x, T y, T z, int simplex) const=0;
+    virtual T Ex_Ey_x_y(T x, T y, T z, int simplex) const=0; // (Ex-Ey)/(x-y)
+    virtual T Exz_Eyz_x_y(T x, T y, T z, int simplex) const=0; // (Exz-Eyz)/(x-y)
 
     T Ey(T x, T y, int simplex) const {return Ex(y,x,simplex);}
     T Eyy(T x, T y, int simplex) const {return Exx(y,x,simplex);}
     T Exyy(T x, T y, int simplex) const {return Exxy(y,x,simplex);}
-
-// TODO: Fix these.
-    T E(T x, T y, T z, int simplex) const
-    {
-        T L=log(x*y*z);
-        return mu*((T)0.5*x*x + (T)0.5*y*y + (T)0.5*z*z - (T)1.5 - L) + (T)0.5*lambda*sqr(L);
-    }
-
-    T Ex(T x, T y, T z, int simplex) const
-    {
-        T L=log(x*y*z);
-        return mu*(x - 1/x) + lambda*L/x;
-    }
-
-    T Exx(T x, T y, T z, int simplex) const
-    {
-        T L=log(x*y*z);
-        return mu + (mu - lambda*L + lambda)/sqr(x);
-    }
-
-    T Exy(T x, T y, T z, int simplex) const
-    {
-        return lambda/(x*y);
-    }
-
-    T Exxy(T x, T y, T z, int simplex) const
-    {
-        return -lambda/(x*x*y);
-    }
-
-    T Exyz(T x, T y, T z, int simplex) const
-    {
-        return 0;
-    }
-
-    T Exxyz(T x, T y, T z, int simplex) const
-    {
-        return 0;
-    }
-
-    T Ex_Ey_x_y(T x, T y, T z, int simplex) const
-    {
-        T L=log(x*y*z);
-        return mu+(mu-lambda*L)/(x*y);
-    }
-
-    T Exz_Eyz_x_y(T x, T y, T z, int simplex) const
-    {
-        return -lambda/(x*y*z);
-    }
 
     T Ey(T x, T y, T z, int simplex) const {return Ex(y,x,z,simplex);}
     T Ez(T x, T y, T z, int simplex) const {return Ex(z,y,x,simplex);}

@@ -29,19 +29,16 @@ public:
     using BASE::constant_alpha;
     using BASE::constant_beta;
 
-    GENERAL_ENERGY<TV> base;
+    GENERAL_ENERGY<T>& base;
 
     T youngs_modulus,poissons_ratio;
     T extrapolation_cutoff;
     T extra_force_coefficient;
     T panic_threshold;
 
-public:
-
-    GENERAL_EXTRAPOLATED(const T youngs_modulus_input=3e6,const T poissons_ratio_input=.475,const T Rayleigh_coefficient=.05,const T extrapolation_cutoff=.3,const T extra_force_coefficient=5e5);
+    GENERAL_EXTRAPOLATED(GENERAL_ENERGY<T>& ge_input,const T youngs_modulus_input=3e6,const T poissons_ratio_input=.475,const T Rayleigh_coefficient=.05,
+        const T extrapolation_cutoff=.3,const T extra_force_coefficient=5e5);
     virtual ~GENERAL_EXTRAPOLATED();
-
-public:
 
     void Update_Lame_Constants(const T youngs_modulus_input, const T poissons_ratio_input,const T Rayleigh_coefficient_input) PHYSBAM_OVERRIDE;
     T Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int simplex) const PHYSBAM_OVERRIDE;

@@ -17,8 +17,9 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T,int d> GENERAL_EXTRAPOLATED<T,d>::
-GENERAL_EXTRAPOLATED(const T youngs_modulus_input,const T poissons_ratio_input,const T Rayleigh_coefficient,const T extrapolation_cutoff_input, const T extra_force_coefficient_input):
-    youngs_modulus(youngs_modulus_input),poissons_ratio(poissons_ratio_input),
+GENERAL_EXTRAPOLATED(GENERAL_ENERGY<T>& ge_input,const T youngs_modulus_input,const T poissons_ratio_input,const T Rayleigh_coefficient,const T extrapolation_cutoff_input,
+    const T extra_force_coefficient_input)
+    :base(ge_input),youngs_modulus(youngs_modulus_input),poissons_ratio(poissons_ratio_input),
     extrapolation_cutoff(extrapolation_cutoff_input),extra_force_coefficient(extra_force_coefficient_input),
     panic_threshold((T)1e-6)
 {
@@ -31,6 +32,7 @@ GENERAL_EXTRAPOLATED(const T youngs_modulus_input,const T poissons_ratio_input,c
 template<class T,int d> GENERAL_EXTRAPOLATED<T,d>::
 ~GENERAL_EXTRAPOLATED()
 {
+    delete &base;
 }
 //#####################################################################
 // Update Lame Constants
