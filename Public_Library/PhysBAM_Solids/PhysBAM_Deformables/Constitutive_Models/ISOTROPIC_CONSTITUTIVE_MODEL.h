@@ -24,6 +24,7 @@ public:
     virtual DIAGONAL_MATRIX<T,d> P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const T scale,const int simplex) const=0;
     virtual void Update_State_Dependent_Auxiliary_Variables(const DIAGONAL_MATRIX<T,d>& F,const int simplex);
     virtual T Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int simplex) const;
+    void Test(const DIAGONAL_MATRIX<T,d>& F,const int simplex) const;
 //#####################################################################
 };
 }
