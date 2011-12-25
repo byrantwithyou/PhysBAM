@@ -393,7 +393,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
                 solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=override_collisions;
             //}
             frame_rate=120;
-            last_frame=600;
+            last_frame=420;
             break;
         case 30:
             solids_parameters.cfl=(T)5;
@@ -970,17 +970,19 @@ void Get_Initial_Data()
             T max_jello_size = .036;//maximum edge length
             T bound = .2;
             TV new_center; T new_rotate;
+            T board_height = .6;
             bool stuck=false;
             RIGID_BODY_STATE<TV> initial_state;
             
-            random.Set_Seed(123);
+            random.Set_Seed(12345);
             //break;} 
             for (int i=1; i<=number_of_jellos; i++){
                 do {
                     random.Fill_Uniform(new_center,-bound,bound);
                    // new_center = TV(random.Get_Uniform_Number(-bound,bound),random.Get_Uniform_Number((T).5*bound,(T)1*bound),random.Get_Uniform_Number(-bound,bound));
                     stuck=false;
-                    new_center.y = (T).5*(new_center.y + 3.5*bound+1.5*new_center.z);
+                    if (new_center.z < -.5*bound) new_center.y = (T).5*(new_center.y + 2.0*bound+3.0*(new_center.z+bound));
+                    else new_center.y = .3*(new_center.y+bound) + .5*max_jello_size + board_height;
                     for (int j=1; j<i&&(!stuck); j++){
                         //LOG::cout << i << " " << j << " " << new_center << " " << jello_centers(j) << " " << (new_center-jello_centers(j)).Magnitude() << " " << (T)8*max_jello_size*max_jello_size << std::endl;
                         if((new_center-jello_centers(j)).Magnitude()<=(T)2*max_jello_size) stuck=true;
@@ -991,12 +993,79 @@ void Get_Initial_Data()
 //                     new_center = TV(random.Get_Uniform_Number(-bound,bound),random.Get_Uniform_Number(-bound,bound),random.Get_Uniform_Number(-bound,bound));
                 new_rotate = random.Get_Uniform_Number(-(T)pi,(T)pi);
                 RIGID_BODY_STATE<TV> initial_state1(FRAME<TV>(jello_centers(i),ROTATION<TV>(new_rotate,new_center)));
-                if (i % 5 ==3) {tests.Create_Mattress(mattress_grid3,true,&initial_state1);}
-                else if (i % 5 ==4) {tests.Create_Mattress(mattress_grid2,true,&initial_state1);}
+                if (i % 5 ==0) {tests.Create_Mattress(mattress_grid3,true,&initial_state1);}
+                else if (i % 5 ==1) {tests.Create_Mattress(mattress_grid2,true,&initial_state1);}
                 else {tests.Create_Mattress(mattress_grid1,true,&initial_state1);}
             }
             RIGID_BODY<TV>& inclined_floor=tests.Add_Ground(input_friction);
             inclined_floor.Rotation()=ROTATION<TV>((T)pi*degrees_incline/(T)180,TV(1,0,0));
+            
+            
+            RIGID_BODY<TV>& box1=tests.Add_Analytic_Box(TV(2.2*bound,.05*bound,.5*bound));            
+            RIGID_BODY<TV>& box2=tests.Add_Analytic_Box(TV(2.2*bound,.05*bound,.3*bound));            
+            RIGID_BODY<TV>& box3=tests.Add_Analytic_Box(TV(2.2*bound,.05*bound,.3*bound));            
+            RIGID_BODY<TV>& box4=tests.Add_Analytic_Box(TV(2.2*bound,.05*bound,.3*bound));            
+            RIGID_BODY<TV>& box5=tests.Add_Analytic_Box(TV(2.2*bound,.05*bound,.5*bound));            
+            box1.X()=TV((T)0,board_height,-.4*bound);
+            box2.X()=TV((T)0*bound,board_height,0.0*bound);
+            box3.X()=TV((T)0*bound,board_height,0.3*bound);
+            box4.X()=TV((T)0*bound,board_height,0.6*bound);
+            box5.X()=TV((T)0*bound,board_height,1.0*bound);
+//            curve.Add_Control_Point(0,FRAME<TV>(box1.X(),ROTATION<TV>(0*(T)pi/2.0,TV(0,0,1))));
+  //          curve.Add_Control_Point(.2,FRAME<TV>(box1.X(),ROTATION<TV>(0*(T)pi/2.0,TV(0,0,1))));
+    //        curve.Add_Control_Point(.25,FRAME<TV>(box1.X(),ROTATION<TV>(-(T)pi/2.0,TV(0,0,1))));
+            curve.Add_Control_Point(0,FRAME<TV>(box1.X()));
+            curve.Add_Control_Point(.2,FRAME<TV>(box1.X()));
+            curve.Add_Control_Point(.21,FRAME<TV>(box1.X()-TV(0,.2*board_height,0)));
+            curve.Add_Control_Point(.23,FRAME<TV>(box1.X()-TV(-2.5*bound,.2*board_height,0)));
+            curve2.Add_Control_Point(0,FRAME<TV>(box2.X()));
+            curve2.Add_Control_Point(.2,FRAME<TV>(box2.X()));
+            curve2.Add_Control_Point(.21,FRAME<TV>(box2.X()-TV(0,.2*board_height,0)));
+            curve2.Add_Control_Point(.23,FRAME<TV>(box2.X()-TV(-2.5*bound,.2*board_height,0)));
+            curve3.Add_Control_Point(0,FRAME<TV>(box3.X()));
+            curve3.Add_Control_Point(.2,FRAME<TV>(box3.X()));
+            curve3.Add_Control_Point(.21,FRAME<TV>(box3.X()-TV(0,.2*board_height,0)));
+            curve3.Add_Control_Point(.23,FRAME<TV>(box3.X()-TV(-2.5*bound,.2*board_height,0)));
+            curve4.Add_Control_Point(0,FRAME<TV>(box4.X()));
+            curve4.Add_Control_Point(.2,FRAME<TV>(box4.X()));
+            curve4.Add_Control_Point(.21,FRAME<TV>(box4.X()-TV(0,.2*board_height,0)));
+            curve4.Add_Control_Point(.23,FRAME<TV>(box4.X()-TV(-2.5*bound,.2*board_height,0)));
+            curve5.Add_Control_Point(0,FRAME<TV>(box5.X()));
+            curve5.Add_Control_Point(.2,FRAME<TV>(box5.X()));
+            curve5.Add_Control_Point(.21,FRAME<TV>(box5.X()-TV(0,.2*board_height,0)));
+            curve5.Add_Control_Point(.23,FRAME<TV>(box5.X()-TV(-2.5*bound,.2*board_height,0)));
+    /*        curve2.Add_Control_Point(0,FRAME<TV>(box2.X(),ROTATION<TV>(0*(T)pi/2.0,TV(0,0,1))));
+            curve2.Add_Control_Point(.3,FRAME<TV>(box2.X(),ROTATION<TV>(0*(T)pi/2.0,TV(0,0,1))));
+            curve2.Add_Control_Point(.35,FRAME<TV>(box2.X(),ROTATION<TV>(-(T)pi/2.0,TV(0,0,1))));
+            curve3.Add_Control_Point(.0,FRAME<TV>(box3.X(),ROTATION<TV>(0*(T)pi/2.0,TV(0,0,1))));
+            curve3.Add_Control_Point(.4,FRAME<TV>(box3.X(),ROTATION<TV>(0*(T)pi/2.0,TV(0,0,1))));
+            curve3.Add_Control_Point(.45,FRAME<TV>(box3.X(),ROTATION<TV>(-(T)pi/2.0,TV(0,0,1))));
+            curve4.Add_Control_Point(.0,FRAME<TV>(box4.X(),ROTATION<TV>(0*(T)pi/2.0,TV(0,0,1))));
+            curve4.Add_Control_Point(.5,FRAME<TV>(box4.X(),ROTATION<TV>(0*(T)pi/2.0,TV(0,0,1))));
+            curve4.Add_Control_Point(.55,FRAME<TV>(box4.X(),ROTATION<TV>(-(T)pi/2.0,TV(0,0,1))));
+            curve5.Add_Control_Point(.0,FRAME<TV>(box5.X(),ROTATION<TV>(0*(T)pi/2.0,TV(0,0,1))));
+            curve5.Add_Control_Point(.6,FRAME<TV>(box5.X(),ROTATION<TV>(0*(T)pi/2.0,TV(0,0,1))));
+            curve5.Add_Control_Point(.65,FRAME<TV>(box5.X(),ROTATION<TV>(-(T)pi/2.0,TV(0,0,1))));*/
+            
+               //         curve3.Add_Control_Point(0,FRAME<TV>(TV(0,3.0*scale,-1.4*scale),ROTATION<TV>((T)pi/4.0,TV(1,0,0))));
+            box1.is_static=false;
+            kinematic_id=box1.particle_index;
+            box2.is_static=false;
+            kinematic_id2=box2.particle_index;
+            box3.is_static=false;
+            kinematic_id3=box3.particle_index;
+            box4.is_static=false;
+            kinematic_id4=box4.particle_index;
+            box5.is_static=false;
+            kinematic_id5=box5.particle_index;
+            rigid_body_collection.rigid_body_particle.kinematic(box1.particle_index)=true;
+            rigid_body_collection.rigid_body_particle.kinematic(box2.particle_index)=true;
+            rigid_body_collection.rigid_body_particle.kinematic(box3.particle_index)=true;
+            rigid_body_collection.rigid_body_particle.kinematic(box4.particle_index)=true;
+            rigid_body_collection.rigid_body_particle.kinematic(box5.particle_index)=true;
+            
+             
+            
             break;
         }
         case 42:
