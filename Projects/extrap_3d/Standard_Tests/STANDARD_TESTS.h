@@ -157,12 +157,13 @@ public:
     T input_poissons_ratio,input_youngs_modulus;
     T input_friction;
     T J_min,J_max,la_min;
+    bool test_model_only;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),semi_implicit(false),test_forces(false),use_extended_neohookean(false),use_extended_neohookean2(false),
         use_extended_neohookean_refined(false),use_extended_neohookean_hyperbola(false),use_extended_neohookean_smooth(false),use_extended_svk(false),
         use_corotated(false),use_corot_blend(false),dump_sv(false),print_matrix(false),use_constant_ife(false),input_cutoff(0),input_efc(0),input_poissons_ratio(-1),input_youngs_modulus(0),
-        J_min(0),J_max((T).1),la_min(0)
+        J_min(0),J_max((T).1),la_min(0),test_model_only(false)
     {
     }
 
@@ -254,6 +255,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Double_Argument("-ja",.6,"J to stop interpolating");
     parse_args->Add_Double_Argument("-jb",.4,"J to start interpolating");
     parse_args->Add_Double_Argument("-lb",-.1,"final poisson's ratio");
+    parse_args->Add_Option_Argument("-test_model_only");
 }
 //#####################################################################
 // Function Parse_Options
@@ -346,6 +348,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     J_min=(T)parse_args->Get_Double_Value("-ja");
     J_max=(T)parse_args->Get_Double_Value("-jb");
     la_min=(T)parse_args->Get_Double_Value("-lb");
+    test_model_only=parse_args->Get_Option_Value("-test_model_only");
     
     semi_implicit=parse_args->Is_Value_Set("-semi_implicit");
     if(parse_args->Is_Value_Set("-project_nullspace")) solids_parameters.implicit_solve_parameters.project_nullspace_frequency=1;
@@ -2278,6 +2281,22 @@ void Add_Constitutive_Model(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,T 
         icm=nh;
         nh->use_constant_ife=use_constant_ife;}
     solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,icm));
+    if(test_model_only) Test_Model(*icm);
+}
+//#####################################################################
+// Function Test_Model
+//#####################################################################
+void Test_Model(ISOTROPIC_CONSTITUTIVE_MODEL<T,3>& icm)
+{
+    RANDOM_NUMBERS<T> random;
+    for(int i=1;i<=20;i++){
+        TV f;
+        random.Fill_Uniform(f,0,2);
+        f=f.Sorted().Reversed();
+        if(random.Get_Uniform_Integer(0,1)==1) f(3)=-f(3);
+        LOG::cout<<f<<std::endl;
+        icm.Test(DIAGONAL_MATRIX<T,3>(f),1);}
+    exit(0);
 }
 //#####################################################################
 // Function Postprocess_Frame
