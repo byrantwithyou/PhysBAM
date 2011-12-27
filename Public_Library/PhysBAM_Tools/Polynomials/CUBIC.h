@@ -38,6 +38,8 @@ public:
     void Compute_Relative_Extrema_Bounding_Sign_Changes_In_Interval(const T& xmin,const T& xmax);
     void Compute_Intervals(const T& a,const T& b,int& intervals,INTERVAL<T>& interval1,INTERVAL<T>& interval2,INTERVAL<T>& interval3);
     void Compute_Intervals(int& intervals,INTERVAL<T>& interval1,INTERVAL<T>& interval2,INTERVAL<T>& interval3);
+    void Insert_Root_In_Extrema_Interval(const T xmin,const T xmax);
+    void Insert_Root(const T r);
 //#####################################################################
 };   
 }

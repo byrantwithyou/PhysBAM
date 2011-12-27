@@ -88,7 +88,7 @@ public:
     T Exxx(T x, T y, T z, int simplex) const
     {
         T L=log(x*y*z);
-        return (2*mu - 3*lambda*L + 2*lambda)/cube(x);
+        return (-2*mu + 2*lambda*L - 3*lambda)/cube(x);
     }
 
     T Exxy(T x, T y, T z, int simplex) const

@@ -97,29 +97,49 @@ Compute_Roots()
 // Function Compute_Roots_In_Interval
 //#####################################################################
 template<class T> void CUBIC<T>::
+Insert_Root(const T r)
+{
+    if(roots==0){roots=1;root1=r;}
+    else if(roots==1){roots=2;root2=r;}
+    else{roots=3;root3=r;}
+}
+//#####################################################################
+// Function Compute_Roots_In_Interval
+//#####################################################################
+template<class T> void CUBIC<T>::
+Insert_Root_In_Extrema_Interval(const T xmin,const T xmax)
+{
+    T y0=Value(xmin),y1=Value(xmax);
+    if(!y0) Insert_Root(xmin);
+    else if(!y1) Insert_Root(xmax);
+    else if((y0>0)!=(y1>0)){
+        ITERATIVE_SOLVER<T> iterative_solver;
+        iterative_solver.tolerance=error_tolerance;
+        Insert_Root(iterative_solver.Bisection_Secant_Root(*this,xmin,xmax));}
+}
+//#####################################################################
+// Function Compute_Roots_In_Interval
+//#####################################################################
+template<class T> void CUBIC<T>::
 Compute_Roots_In_Interval(const T xmin,const T xmax)
 {
-    if(c3 == 0){
-        QUADRATIC<T> quadratic(c2,c1,c0);quadratic.Compute_Roots_In_Interval(xmin,xmax);roots=quadratic.roots;root1=quadratic.root1;root2=quadratic.root2;return;}
-    else{ // c3 != 0 - cubic
-        Compute_Relative_Extrema_Bounding_Sign_Changes_In_Interval(xmin,xmax);
-        ITERATIVE_SOLVER<T> iterative_solver;iterative_solver.tolerance=error_tolerance; // use this classes error tolerance
-        if(number_of_extrema == 0){
-            if((*this)(xmin)*(*this)(xmax) > 0){roots=0;return;}
-            else{roots=1;root1=iterative_solver.Bisection_Secant_Root(*this,xmin,xmax);return;}}
-        else if(number_of_extrema == 1){roots=2;
-            root1=iterative_solver.Bisection_Secant_Root(*this,xmin,extrema1);
-            root2=iterative_solver.Bisection_Secant_Root(*this,extrema1,xmax);  
-            if(root1 == root2) roots=1;
-            return;}
-        else{
-            roots=3;
-            root1=iterative_solver.Bisection_Secant_Root(*this,xmin,extrema1);
-            root2=iterative_solver.Bisection_Secant_Root(*this,extrema1,extrema2);   
-            root3=iterative_solver.Bisection_Secant_Root(*this,extrema2,xmax); 
-            if(root2 == root3) roots=2;
-            if(root1 == root2){root2=root3;roots--;}
-            return;}}
+    if(c3==0){
+        QUADRATIC<T> quadratic(c2,c1,c0);
+        quadratic.Compute_Roots_In_Interval(xmin,xmax);
+        roots=quadratic.roots;
+        root1=quadratic.root1;
+        root2=quadratic.root2;
+        return;}
+
+    INTERVAL<T> i1,i2,i3;
+    int intervals;
+    Compute_Intervals(xmin,xmax,intervals,i1,i2,i3);
+    if(intervals==0){roots=0;return;}
+    Insert_Root_In_Extrema_Interval(i1.min_corner,i1.max_corner);
+    if(intervals==1) return;
+    Insert_Root_In_Extrema_Interval(i2.min_corner,i2.max_corner);
+    if(intervals==2) return;
+    Insert_Root_In_Extrema_Interval(i3.min_corner,i3.max_corner);
 }
 //#####################################################################
 // Function Compute_Relative_Extrema

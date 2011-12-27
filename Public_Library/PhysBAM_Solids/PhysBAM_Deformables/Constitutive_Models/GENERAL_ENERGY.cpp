@@ -58,7 +58,7 @@ Test3d(const char* sf, const char* var, const GENERAL_ENERGY<T>& ge,T (GENERAL_E
     T dg0=(ge.*df)(x,y,z,simplex);
     T dg1=(ge.*df)(x+dx,y+dy,z+dz,simplex);
     T av=(dg0+dg1)/2;
-    T dif=(g1-g0)/(dx+dy);
+    T dif=(g1-g0)/(dx+dy+dz);
     char buff[1000];
     sprintf(buff, "%6s%s %8.5f %8.5f (%8.5f)\n", sf, var, av, dif, (av-dif));
     LOG::cout<<buff;
