@@ -295,11 +295,11 @@ Compute_ddE(const GENERAL_ENERGY<T>& base,T k,const TV& f,const int simplex)
         for(int j=1; j<=d; j++){t(i,j)+=dm(j);t(j,i)+=dm(j);}
         ddu(i)=fm1(i)*ddm+t.Symmetric_Part();}
     for(int i=1; i<=d; i++){
-        ddg(i)=SYMMETRIC_MATRIX<T,d>::Transpose_Times_With_Symmetric_Result(TT(i),dQ);
-        for(int j=1; j<=d; j++) ddg(i)+=H(i,j)*Q(j);}
+        ddg(i)=SYMMETRIC_MATRIX<T,d>::Conjugate_With_Transpose(dQ,TT(i));
+        for(int j=1; j<=d; j++) ddg(i)+=H(i,j)*ddQ(j);}
     ddh=((T)1-dQ).Transpose_Times(du*2).Symmetric_Part();
     for(int i=1; i<=d; i++) ddh+=(f(i)-Q(i))*ddu(i)-ddQ(i)*u(i);
-    ddE=ddphi+TV::Dot_Product(g,u)*h+MATRIX<T,d>::Outer_Product(dh*2,dg.Transpose_Times(u)).Symmetric_Part();
+    ddE=ddphi+TV::Dot_Product(g,u)*ddh+MATRIX<T,d>::Outer_Product(dh*2,dg.Transpose_Times(u)).Symmetric_Part();
     ddE+=MATRIX<T,d>::Outer_Product(dh*2,du.Transpose_Times(g)).Symmetric_Part();
     ddE+=2*h*dg.Transpose_Times(du).Symmetric_Part()+k*SYMMETRIC_MATRIX<T,d>::Outer_Product(dh)+k*h*ddh;
     for(int i=1; i<=d; i++) ddE+=h*g(i)*ddu(i)+h*ddg(i)*u(i);

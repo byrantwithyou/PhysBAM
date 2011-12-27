@@ -41,8 +41,10 @@ Test(T x, T y, int simplex) const
     TEST2D(Ex,x);
     TEST2D(Ex,y);
     TEST2D(Ey,y);
+    TEST2D(Exx,x);
     TEST2D(Exx,y);
     TEST2D(Exy,y);
+    TEST2D(Eyy,y);
 }
 //#####################################################################
 // Function Test23
@@ -82,13 +84,16 @@ Test(T x, T y, T z, int simplex) const
     TEST3D(Ex,z);
     TEST3D(Ey,z);
     TEST3D(Ez,z);
+    TEST3D(Exx,x);
     TEST3D(Exx,y);
     TEST3D(Exy,y);
     TEST3D(Exx,z);
     TEST3D(Exy,z);
+    TEST3D(Eyy,y);
     TEST3D(Eyy,z);
     TEST3D(Exz,z);
     TEST3D(Eyz,z);
+    TEST3D(Ezz,z);
     TEST3D(Exxy,z);
     TEST3D(Exyy,z);
     TEST3D(Exyz,z);
