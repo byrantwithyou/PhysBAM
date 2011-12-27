@@ -38,7 +38,7 @@ public:
         TV dm,dh,dphi,dE,dz,dxi,ds;
         SYMMETRIC_MATRIX<T,d> ddm,ddh,ddphi,ddE,ddz,ddxi,dds,H;
 
-        void Compute_E(const GENERAL_ENERGY<T>& base,T k,T extrapolation_cutoff,const TV& f,const int simplex);
+        bool Compute_E(const GENERAL_ENERGY<T>& base,T k,T extrapolation_cutoff,const TV& f,const int simplex);
         void Compute_dE(const GENERAL_ENERGY<T>& base,T k,const TV& f,const int simplex);
         void Compute_ddE(const GENERAL_ENERGY<T>& base,T k,const TV& f,const int simplex);
     };
