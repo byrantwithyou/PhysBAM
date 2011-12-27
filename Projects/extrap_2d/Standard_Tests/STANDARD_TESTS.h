@@ -126,13 +126,14 @@ public:
     T input_cutoff;
     T input_efc;
     T input_poissons_ratio,input_youngs_modulus;
+    bool test_model_only;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),semi_implicit(false),test_forces(false),use_extended_neohookean(false),
         use_extended_neohookean_refined(false),use_extended_neohookean_hyperbola(false),use_extended_neohookean_smooth(false),use_corotated(false),
         use_corot_blend(false),use_corot_quartic(false),dump_sv(false),
         print_matrix(false),parameter(20),stiffness_multiplier(1),damping_multiplier(1),use_constant_ife(false),stretch(1),poissons_ratio((T).45),input_cutoff(0),input_efc(0),
-        input_poissons_ratio(-1),input_youngs_modulus(0)
+        input_poissons_ratio(-1),input_youngs_modulus(0),test_model_only(false)
     {
     }
 
@@ -221,6 +222,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Double_Argument("-efc",20,"efc");
     parse_args->Add_Double_Argument("-poissons_ratio",-1,"poissons_ratio");
     parse_args->Add_Double_Argument("-youngs_modulus",0,"youngs modulus, only for test 41 so far");
+    parse_args->Add_Option_Argument("-test_model_only");
 }
 //#####################################################################
 // Function Parse_Options
@@ -268,6 +270,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     if(parse_args->Is_Value_Set("-efc")) input_efc=(T)parse_args->Get_Double_Value("-efc");
     if(parse_args->Is_Value_Set("-poissons_ratio")) input_poissons_ratio=(T)parse_args->Get_Double_Value("-poissons_ratio");
     if(parse_args->Is_Value_Set("-youngs_modulus")) input_youngs_modulus=(T)parse_args->Get_Double_Value("-youngs_modulus");
+    test_model_only=parse_args->Get_Option_Value("-test_model_only");
 
     switch(test_number){
     case 20: case 21: case 26: 
@@ -791,6 +794,22 @@ void Add_Constitutive_Model(TRIANGULATED_AREA<T>& triangulated_area,T stiffness,
 
     if(primary_contour) Primary_Contour(*icm);
     if(scatter_plot) Add_Primary_Contour_Segments(*icm);
+    if(test_model_only) Test_Model(*icm);
+}
+//#####################################################################
+// Function Test_Model
+//#####################################################################
+void Test_Model(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>& icm)
+{
+    RANDOM_NUMBERS<T> random;
+    for(int i=1;i<=20;i++){
+        TV f;
+        random.Fill_Uniform(f,0,2);
+        f=f.Sorted().Reversed();
+        if(random.Get_Uniform_Integer(0,1)==1) f(2)=-f(2);
+        LOG::cout<<f<<std::endl;
+        icm.Test(DIAGONAL_MATRIX<T,2>(f),1);}
+    exit(0);
 }
 //#####################################################################
 // Function Primary_Contour

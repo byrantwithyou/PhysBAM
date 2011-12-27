@@ -2,6 +2,7 @@
 // Copyright 2011, Craig Schroeder, Alexey Stomakhin.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/cube.h>
 #include <PhysBAM_Tools/Math_Tools/pow.h>
 #include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX_2X2.h>
@@ -58,7 +59,7 @@ Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int simplex) const
     T J=F.To_Vector().Product();
     if(J>=extrapolation_cutoff) return base.E(F.To_Vector(),simplex);
     HELPER helper;
-    helper.Compute_E(base,extra_force_coefficient*youngs_modulus,F.To_Vector(),simplex);
+    helper.Compute_E(base,extra_force_coefficient*youngs_modulus,extrapolation_cutoff,F.To_Vector(),simplex);
     return helper.E;
 }
 //#####################################################################
@@ -70,7 +71,7 @@ P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const T scale,const int simplex) con
     T J=F.To_Vector().Product();
     if(J>=extrapolation_cutoff) return scale*DIAGONAL_MATRIX<T,d>(base.dE(F.To_Vector(),simplex));
     HELPER helper;
-    helper.Compute_E(base,extra_force_coefficient*youngs_modulus,F.To_Vector(),simplex);
+    helper.Compute_E(base,extra_force_coefficient*youngs_modulus,extrapolation_cutoff,F.To_Vector(),simplex);
     helper.Compute_dE(base,extra_force_coefficient*youngs_modulus,F.To_Vector(),simplex);
     return scale*DIAGONAL_MATRIX<T,d>(helper.dE);
 }
@@ -90,9 +91,9 @@ Isotropic_Stress_Derivative_Helper(const RC_EXTRAPOLATED<T,2>& re,const DIAGONAL
         T S=re.P_From_Strain(F,1,simplex).Trace()/xpy, D=re.base.Ex_Ey_x_y(x,y,simplex);
         dP_dF.x2112 = (D-S)/2;
         dP_dF.x2121 = (D+S)/2;
-    }
+        return;}
     typename RC_EXTRAPOLATED<T,2>::HELPER helper;
-    helper.Compute_E(re.base,re.extra_force_coefficient*re.youngs_modulus,F.To_Vector(),simplex);
+    helper.Compute_E(re.base,re.extra_force_coefficient*re.youngs_modulus,re.extrapolation_cutoff,F.To_Vector(),simplex);
     helper.Compute_dE(re.base,re.extra_force_coefficient*re.youngs_modulus,F.To_Vector(),simplex);
     helper.Compute_ddE(re.base,re.extra_force_coefficient*re.youngs_modulus,F.To_Vector(),simplex);
 
@@ -133,9 +134,9 @@ Isotropic_Stress_Derivative_Helper(const RC_EXTRAPOLATED<T,3>& re,const DIAGONAL
         T S23=(P.y+P.z)/ypz, D23=re.base.Ey_Ez_y_z(x,y,z,simplex);
         dP_dF.x3223 = (D23-S23)/2;
         dP_dF.x3232 = (D23+S23)/2;
-    }
+        return;}
     typename RC_EXTRAPOLATED<T,3>::HELPER helper;
-    helper.Compute_E(re.base,re.extra_force_coefficient*re.youngs_modulus,F.To_Vector(),simplex);
+    helper.Compute_E(re.base,re.extra_force_coefficient*re.youngs_modulus,re.extrapolation_cutoff,F.To_Vector(),simplex);
     helper.Compute_dE(re.base,re.extra_force_coefficient*re.youngs_modulus,F.To_Vector(),simplex);
     helper.Compute_ddE(re.base,re.extra_force_coefficient*re.youngs_modulus,F.To_Vector(),simplex);
 
@@ -211,10 +212,10 @@ P_From_Strain_Rate_Second_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<const T>
 // Function Compute_s
 //#####################################################################
 template<class T> static T
-Compute_s(const VECTOR<T,2>& f,const int simplex)
+Compute_s(const VECTOR<T,2>& f,const int simplex,T extrapolation_cutoff)
 {
     VECTOR<T,2> fm1=f-1;
-    QUADRATIC<T> quadratic(fm1.Product(),fm1.Sum(),1);
+    QUADRATIC<T> quadratic(fm1.Product(),fm1.Sum(),1-extrapolation_cutoff);
     quadratic.Compute_Roots_In_Interval(0,1);
     PHYSBAM_ASSERT(quadratic.roots==1);
     return quadratic.root1;
@@ -223,10 +224,10 @@ Compute_s(const VECTOR<T,2>& f,const int simplex)
 // Function Compute_s
 //#####################################################################
 template<class T> static T
-Compute_s(const VECTOR<T,3>& f,const int simplex)
+Compute_s(const VECTOR<T,3>& f,const int simplex,T extrapolation_cutoff)
 {
     VECTOR<T,3> fm1=f-1;
-    CUBIC<T> cubic(fm1.Product(),DIAGONAL_MATRIX<T,3>(fm1).Cofactor_Matrix().Trace(),fm1.Sum(),1);
+    CUBIC<T> cubic(fm1.Product(),DIAGONAL_MATRIX<T,3>(fm1).Cofactor_Matrix().Trace(),fm1.Sum(),1-extrapolation_cutoff);
     cubic.Compute_Roots_In_Interval(0,1);
     PHYSBAM_ASSERT(cubic.roots==1);
     return cubic.root1;
@@ -235,10 +236,10 @@ Compute_s(const VECTOR<T,3>& f,const int simplex)
 // Function Compute_E
 //#####################################################################
 template<class T,int d> void RC_EXTRAPOLATED<T,d>::HELPER::
-Compute_E(const GENERAL_ENERGY<T>& base,T k,const TV& f,const int simplex)
+Compute_E(const GENERAL_ENERGY<T>& base,T k,T extrapolation_cutoff,const TV& f,const int simplex)
 {
     TV fm1=f-1;
-    s=Compute_s(f,simplex);
+    s=Compute_s(f,simplex,extrapolation_cutoff);
     Q=fm1*s+1;
     z=(fm1/Q).Sum();
     xi=1/z;
@@ -285,7 +286,7 @@ Compute_ddE(const GENERAL_ENERGY<T>& base,T k,const TV& f,const int simplex)
     ddz-=(DIAGONAL_MATRIX<T,d>((T)2/sqr(Q))*dQ).Symmetric_Part();
     for(int i=1; i<=d; i++) ddz-=fm1(i)/sqr(Q(i))*ddQ(i);
     ddxi=2*cube(xi)*SYMMETRIC_MATRIX<T,d>::Outer_Product(dz)-sqr(xi)*ddz;
-    base.dddE(f,simplex,&TT(1));
+    base.dddE(Q,simplex,&TT(1));
     ddphi=SYMMETRIC_MATRIX<T,d>::Transpose_Times_With_Symmetric_Result(dg,dQ);
     for(int i=1;i<=d;i++) ddphi+=g(i)*ddQ(i);
     ddm=3*m2*m3*SYMMETRIC_MATRIX<T,d>::Outer_Product(fm1)-m3;
