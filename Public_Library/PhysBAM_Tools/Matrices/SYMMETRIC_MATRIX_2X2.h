@@ -44,6 +44,9 @@ public:
         :x11(y11),x21(y21),x22(y22)
     {}
 
+    void From_Matrix(const MATRIX<T,2>& matrix_input)
+    {x11=matrix_input(1,1);x21=matrix_input(2,1);x22=matrix_input(2,2);}
+
     int Rows() const
     {return 2;}
 
