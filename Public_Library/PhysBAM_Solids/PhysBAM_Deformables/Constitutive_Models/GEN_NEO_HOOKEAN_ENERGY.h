@@ -47,6 +47,11 @@ public:
         return lambda/(x*y);
     }
 
+    T Exxx(T x, T y, int simplex) const
+    {
+        return -(2*mu + lambda*(3 - 2*log(x*y)))/(x*x*x);
+    }
+
     T Exxy(T x, T y, int simplex) const
     {
         return -lambda/(x*x*y);
@@ -78,6 +83,12 @@ public:
     T Exy(T x, T y, T z, int simplex) const
     {
         return lambda/(x*y);
+    }
+
+    T Exxx(T x, T y, T z, int simplex) const
+    {
+        T L=log(x*y*z);
+        return (2*mu - 3*lambda*L + 2*lambda)/cube(x);
     }
 
     T Exxy(T x, T y, T z, int simplex) const
