@@ -58,6 +58,7 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED_SMOOTH.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED2.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_J_INTERP_ENERGY.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/RC_EXTRAPOLATED.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/ROTATED_LINEAR.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/FINITE_VOLUME.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
@@ -97,6 +98,7 @@ public:
     bool use_extended_neohookean2;
     bool use_extended_neohookean3;
     bool use_int_j_neo;
+    bool use_rc_ext;
     bool use_extended_neohookean_refined;
     bool use_extended_neohookean_hyperbola;
     bool use_extended_neohookean_smooth;
@@ -121,12 +123,17 @@ public:
     ARRAY<ARRAY<TV> > contrail;
     ARRAY<VECTOR<T,3> > contrail_colors;
     ARRAY<VECTOR<TV,2> > contour_segments;
+    T input_cutoff;
+    T input_efc;
+    T input_poissons_ratio,input_youngs_modulus;
+    bool test_model_only;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),semi_implicit(false),test_forces(false),use_extended_neohookean(false),
         use_extended_neohookean_refined(false),use_extended_neohookean_hyperbola(false),use_extended_neohookean_smooth(false),use_corotated(false),
         use_corot_blend(false),use_corot_quartic(false),dump_sv(false),
-        print_matrix(false),parameter(20),stiffness_multiplier(1),damping_multiplier(1),use_constant_ife(false),stretch(1),poissons_ratio((T).45)
+        print_matrix(false),parameter(20),stiffness_multiplier(1),damping_multiplier(1),use_constant_ife(false),stretch(1),poissons_ratio((T).45),input_cutoff(0),input_efc(0),
+        input_poissons_ratio(-1),input_youngs_modulus(0),test_model_only(false)
     {
     }
 
@@ -184,6 +191,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Option_Argument("-use_ext_neo2");
     parse_args->Add_Option_Argument("-use_ext_neo3");
     parse_args->Add_Option_Argument("-use_int_j_neo");
+    parse_args->Add_Option_Argument("-use_rc_ext");
     parse_args->Add_Option_Argument("-use_ext_neo_ref");
     parse_args->Add_Option_Argument("-use_ext_neo_hyper");
     parse_args->Add_Option_Argument("-use_ext_neo_smooth");
@@ -210,6 +218,11 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Double_Argument("-poissons_ratio",.45,"poisson's ratio");
     parse_args->Add_Option_Argument("-scatter_plot","Create contrail plot with singular values");
     parse_args->Add_Option_Argument("-use_contrails","Show contrails in plot");
+    parse_args->Add_Double_Argument("-cutoff",.4,"cutoff");
+    parse_args->Add_Double_Argument("-efc",20,"efc");
+    parse_args->Add_Double_Argument("-poissons_ratio",-1,"poissons_ratio");
+    parse_args->Add_Double_Argument("-youngs_modulus",0,"youngs modulus, only for test 41 so far");
+    parse_args->Add_Option_Argument("-test_model_only");
 }
 //#####################################################################
 // Function Parse_Options
@@ -229,6 +242,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     use_extended_neohookean2=parse_args->Is_Value_Set("-use_ext_neo2");
     use_extended_neohookean3=parse_args->Is_Value_Set("-use_ext_neo3");
     use_int_j_neo=parse_args->Is_Value_Set("-use_int_j_neo");
+    use_rc_ext=parse_args->Is_Value_Set("-use_rc_ext");
     use_extended_neohookean_refined=parse_args->Is_Value_Set("-use_ext_neo_ref"); //
     use_extended_neohookean_hyperbola=parse_args->Is_Value_Set("-use_ext_neo_hyper");    
     use_extended_neohookean_smooth=parse_args->Is_Value_Set("-use_ext_neo_smooth");    
@@ -252,6 +266,11 @@ void Parse_Options() PHYSBAM_OVERRIDE
     poissons_ratio=(T)parse_args->Get_Double_Value("-poissons_ratio");
     scatter_plot=parse_args->Get_Option_Value("-scatter_plot");
     use_contrails=parse_args->Get_Option_Value("-use_contrails");
+    if(parse_args->Is_Value_Set("-cutoff")) input_cutoff=(T)parse_args->Get_Double_Value("-cutoff");
+    if(parse_args->Is_Value_Set("-efc")) input_efc=(T)parse_args->Get_Double_Value("-efc");
+    if(parse_args->Is_Value_Set("-poissons_ratio")) input_poissons_ratio=(T)parse_args->Get_Double_Value("-poissons_ratio");
+    if(parse_args->Is_Value_Set("-youngs_modulus")) input_youngs_modulus=(T)parse_args->Get_Double_Value("-youngs_modulus");
+    test_model_only=parse_args->Get_Option_Value("-test_model_only");
 
     switch(test_number){
     case 20: case 21: case 26: 
@@ -745,13 +764,19 @@ void Preprocess_Frame(const int frame)
 //#####################################################################
 // Function Add_Constitutive_Model
 //#####################################################################
-void Add_Constitutive_Model(TRIANGULATED_AREA<T>& triangulated_area,T stiffness,T poissons_ratio,T damping)
+void Add_Constitutive_Model(TRIANGULATED_AREA<T>& triangulated_area,T stiffness,T poissons_ratio,T damping, T cutoff = 0.4, T efc = 20)
 {
+    if(input_efc) efc=input_efc;
+    if(input_cutoff) cutoff=input_cutoff;
+    if(input_poissons_ratio!=-1) poissons_ratio=input_poissons_ratio;
+    if(input_youngs_modulus!=0) stiffness=input_youngs_modulus;
+
     ISOTROPIC_CONSTITUTIVE_MODEL<T,2>* icm=0;
     if(use_extended_neohookean) icm=new NEO_HOOKEAN_EXTRAPOLATED<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.4,20);
     else if(use_extended_neohookean2) icm=new NEO_HOOKEAN_EXTRAPOLATED2<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.4,20);
     else if(use_extended_neohookean3) icm=new GENERAL_EXTRAPOLATED<T,2>(*new GEN_NEO_HOOKEAN_ENERGY<T>,stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.4,20);
     else if(use_int_j_neo) icm=new GENERAL_EXTRAPOLATED<T,2>(*new NEO_J_INTERP_ENERGY<T>,stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.4,20);
+    else if(use_rc_ext) icm=new RC_EXTRAPOLATED<T,2>(*new GEN_NEO_HOOKEAN_ENERGY<T>,stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,20);
     else if(use_extended_neohookean_refined) icm=new NEO_HOOKEAN_EXTRAPOLATED_REFINED<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.4,.6,20);
     else if(use_extended_neohookean_hyperbola) icm=new NEO_HOOKEAN_EXTRAPOLATED_HYPERBOLA<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
     else if(use_extended_neohookean_smooth) icm=new NEO_HOOKEAN_EXTRAPOLATED_SMOOTH<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
@@ -769,6 +794,22 @@ void Add_Constitutive_Model(TRIANGULATED_AREA<T>& triangulated_area,T stiffness,
 
     if(primary_contour) Primary_Contour(*icm);
     if(scatter_plot) Add_Primary_Contour_Segments(*icm);
+    if(test_model_only) Test_Model(*icm);
+}
+//#####################################################################
+// Function Test_Model
+//#####################################################################
+void Test_Model(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>& icm)
+{
+    RANDOM_NUMBERS<T> random;
+    for(int i=1;i<=20;i++){
+        TV f;
+        random.Fill_Uniform(f,0,2);
+        f=f.Sorted().Reversed();
+        if(random.Get_Uniform_Integer(0,1)==1) f(2)=-f(2);
+        LOG::cout<<f<<std::endl;
+        icm.Test(DIAGONAL_MATRIX<T,2>(f),1);}
+    exit(0);
 }
 //#####################################################################
 // Function Primary_Contour

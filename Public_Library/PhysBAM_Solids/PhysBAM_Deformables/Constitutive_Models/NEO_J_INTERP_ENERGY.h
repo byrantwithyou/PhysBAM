@@ -93,6 +93,11 @@ public:
         return (T)0.5*ddLa(J)*J*sqr(L)+(T)0.5*dLa(J)*sqr(L)+2*dLa(J)*L+La(J)/J;
     }
 
+    T Exxx(T x, T y, int simplex) const
+    {
+        PHYSBAM_FATAL_ERROR();
+    }
+
     T Exxy(T x, T y, int simplex) const
     {
         T J=x*y,L=log(J);
@@ -126,6 +131,11 @@ public:
     T Exy(T x, T y, T z, int simplex) const
     {
         return lambda/(x*y);
+    }
+
+    T Exxx(T x, T y, T z, int simplex) const
+    {
+        PHYSBAM_FATAL_ERROR();
     }
 
     T Exxy(T x, T y, T z, int simplex) const
