@@ -104,6 +104,21 @@ public:
         return (T)0.5*dddLa(J)*J*y*sqr(L)+ddLa(J)*y*sqr(L)+3*ddLa(J)*y*L+dLa(J)*L/x+3*dLa(J)/x-La(J)/(J*x);
     }
 
+    T Exxxx(T x, T y, int simplex) const
+    {
+        PHYSBAM_FATAL_ERROR();
+    }
+
+    T Exxxy(T x, T y, int simplex) const
+    {
+        PHYSBAM_FATAL_ERROR();
+    }
+
+    T Exxyy(T x, T y, int simplex) const
+    {
+        PHYSBAM_FATAL_ERROR();
+    }
+
     T Ex_Ey_x_y(T x, T y, int simplex) const
     {
         T J=x*y,L=log(J);
@@ -151,6 +166,21 @@ public:
     T Exxyz(T x, T y, T z, int simplex) const
     {
         return 0;
+    }
+
+    T Exxxx(T x, T y, T z, int simplex) const
+    {
+        PHYSBAM_FATAL_ERROR();
+    }
+
+    T Exxxy(T x, T y, T z, int simplex) const
+    {
+        PHYSBAM_FATAL_ERROR();
+    }
+
+    T Exxyy(T x, T y, T z, int simplex) const
+    {
+        PHYSBAM_FATAL_ERROR();
     }
 
     T Ex_Ey_x_y(T x, T y, T z, int simplex) const

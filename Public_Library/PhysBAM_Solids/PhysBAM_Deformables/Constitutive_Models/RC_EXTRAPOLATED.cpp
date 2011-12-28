@@ -13,6 +13,8 @@
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
 #include <PhysBAM_Tools/Polynomials/CUBIC.h>
 #include <PhysBAM_Tools/Polynomials/QUADRATIC.h>
+#include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+#include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/RC_EXTRAPOLATED.h>
 using namespace PhysBAM;
@@ -75,7 +77,11 @@ P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const T scale,const int simplex) con
         bool b=helper.Compute_E(base,extra_force_coefficient*youngs_modulus,extrapolation_cutoff,F.To_Vector(),simplex);
         if(b){
             helper.Compute_dE(base,extra_force_coefficient*youngs_modulus,F.To_Vector(),simplex);
+//            Add_Debug_Particle(F.To_Vector(),VECTOR<T,3>(1,0,0));
+//            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,-helper.dE/youngs_modulus);
             return scale*DIAGONAL_MATRIX<T,d>(helper.dE);}}
+//    Add_Debug_Particle(F.To_Vector(),VECTOR<T,3>(0,1,0));
+//    Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,-base.dE(F.To_Vector(),simplex)/youngs_modulus);
     return scale*DIAGONAL_MATRIX<T,d>(base.dE(F.To_Vector(),simplex));
 }
 //#####################################################################

@@ -28,6 +28,9 @@ public:
     virtual T Exy(T x, T y, int simplex) const=0;
     virtual T Exxx(T x, T y, int simplex) const=0;
     virtual T Exxy(T x, T y, int simplex) const=0;
+    virtual T Exxxx(T x, T y, int simplex) const=0;
+    virtual T Exxxy(T x, T y, int simplex) const=0;
+    virtual T Exxyy(T x, T y, int simplex) const=0;
     virtual T Ex_Ey_x_y(T x, T y, int simplex) const=0; // (Ex-Ey)/(x-y)
 
     virtual T E(T x, T y, T z, int simplex) const=0;
@@ -37,7 +40,11 @@ public:
     virtual T Exxx(T x, T y, T z, int simplex) const=0;
     virtual T Exxy(T x, T y, T z, int simplex) const=0;
     virtual T Exyz(T x, T y, T z, int simplex) const=0;
+    virtual T Exxxx(T x, T y, T z, int simplex) const=0;
+    virtual T Exxxy(T x, T y, T z, int simplex) const=0;
+    virtual T Exxyy(T x, T y, T z, int simplex) const=0;
     virtual T Exxyz(T x, T y, T z, int simplex) const=0;
+
     virtual T Ex_Ey_x_y(T x, T y, T z, int simplex) const=0; // (Ex-Ey)/(x-y)
     virtual T Exz_Eyz_x_y(T x, T y, T z, int simplex) const=0; // (Exz-Eyz)/(x-y)
 
@@ -45,6 +52,8 @@ public:
     T Eyy(T x, T y, int simplex) const {return Exx(y,x,simplex);}
     T Exyy(T x, T y, int simplex) const {return Exxy(y,x,simplex);}
     T Eyyy(T x, T y, int simplex) const {return Exxx(y,x,simplex);}
+    T Exyyy(T x, T y, int simplex) const {return Exxxy(y,x,simplex);}
+    T Eyyyy(T x, T y, int simplex) const {return Exxxx(y,x,simplex);}
 
     T Ey(T x, T y, T z, int simplex) const {return Ex(y,x,z,simplex);}
     T Ez(T x, T y, T z, int simplex) const {return Ex(z,y,x,simplex);}
@@ -68,6 +77,15 @@ public:
     T Eyyz(T x, T y, T z, int simplex) const {return Exxy(y,z,x,simplex);}
     T Eyzz(T x, T y, T z, int simplex) const {return Exxy(z,y,x,simplex);}
 
+    T Eyyyy(T x, T y, T z, int simplex) const {return Exxxx(y,x,z,simplex);}
+    T Ezzzz(T x, T y, T z, int simplex) const {return Exxxx(z,y,x,simplex);}
+    T Exyyy(T x, T y, T z, int simplex) const {return Exxxy(y,x,z,simplex);}
+    T Exxxz(T x, T y, T z, int simplex) const {return Exxxy(x,z,y,simplex);}
+    T Exzzz(T x, T y, T z, int simplex) const {return Exxxy(z,x,y,simplex);}
+    T Eyyyz(T x, T y, T z, int simplex) const {return Exxxy(y,z,x,simplex);}
+    T Eyzzz(T x, T y, T z, int simplex) const {return Exxxy(z,y,x,simplex);}
+    T Exxzz(T x, T y, T z, int simplex) const {return Exxyy(x,z,y,simplex);}
+    T Eyyzz(T x, T y, T z, int simplex) const {return Exxyy(y,z,x,simplex);}
     T Exyyz(T x, T y, T z, int simplex) const {return Exxyz(y,x,z,simplex);}
     T Exyzz(T x, T y, T z, int simplex) const {return Exxyz(z,y,x,simplex);}
 
@@ -109,6 +127,34 @@ public:
         sm[1].x32=sm[2].x22=Eyyz(f.x,f.y,f.z,simplex);
         sm[1].x33=sm[2].x32=Eyzz(f.x,f.y,f.z,simplex);
         sm[2].x33=Ezzz(f.x,f.y,f.z,simplex);
+    }
+
+    void ddddE(const VECTOR<T,2>& f, int simplex,SYMMETRIC_MATRIX<T,2>* sm) const
+    {
+        sm[0+2*0].x11=Exxxx(f.x,f.y,simplex);
+        sm[0+2*0].x21=sm[1+2*0].x11=sm[0+2*1].x11=Exxxy(f.x,f.y,simplex);
+        sm[1+2*1].x11=sm[0+2*1].x21=sm[1+2*0].x21=sm[0+2*0].x22=Exxyy(f.x,f.y,simplex);
+        sm[1+2*1].x21=sm[1+2*0].x22=sm[0+2*1].x22=Exyyy(f.x,f.y,simplex);
+        sm[1+2*1].x22=Eyyyy(f.x,f.y,simplex);
+    }
+
+    void ddddE(const VECTOR<T,3>& f, int simplex,SYMMETRIC_MATRIX<T,3>* sm) const
+    {
+        sm[0+3*0].x11=Exxxx(f.x,f.y,f.z,simplex);
+        sm[1+3*0].x11=sm[0+3*0].x21=sm[0+3*1].x11=Exxxy(f.x,f.y,f.z,simplex);
+        sm[2+3*0].x11=sm[0+3*2].x11=sm[0+3*0].x31=Exxxz(f.x,f.y,f.z,simplex);
+        sm[0+3*1].x21=sm[1+3*0].x21=sm[0+3*0].x22=sm[1+3*1].x11=Exxyy(f.x,f.y,f.z,simplex);
+        sm[1+3*2].x11=sm[2+3*0].x21=sm[0+3*2].x21=sm[1+3*0].x31=sm[0+3*0].x32=sm[0+3*1].x31=sm[2+3*1].x11=Exxyz(f.x,f.y,f.z,simplex);
+        sm[0+3*0].x33=sm[0+3*2].x31=sm[2+3*0].x31=sm[2+3*2].x11=Exxzz(f.x,f.y,f.z,simplex);
+        sm[0+3*1].x22=sm[1+3*0].x22=sm[1+3*1].x21=Exyyy(f.x,f.y,f.z,simplex);
+        sm[0+3*1].x32=sm[0+3*2].x22=sm[1+3*0].x32=sm[1+3*1].x31=sm[1+3*2].x21=sm[2+3*0].x22=sm[2+3*1].x21=Exyyz(f.x,f.y,f.z,simplex);
+        sm[0+3*1].x33=sm[0+3*2].x32=sm[1+3*0].x33=sm[1+3*2].x31=sm[2+3*0].x32=sm[2+3*1].x31=sm[2+3*2].x21=Exyzz(f.x,f.y,f.z,simplex);
+        sm[0+3*2].x33=sm[2+3*0].x33=sm[2+3*2].x31=Exzzz(f.x,f.y,f.z,simplex);
+        sm[1+3*1].x22=Eyyyy(f.x,f.y,f.z,simplex);
+        sm[1+3*1].x32=sm[1+3*2].x22=sm[2+3*1].x22=Eyyyz(f.x,f.y,f.z,simplex);
+        sm[1+3*1].x33=sm[1+3*2].x32=sm[2+3*1].x32=sm[2+3*2].x22=Eyyzz(f.x,f.y,f.z,simplex);
+        sm[1+3*2].x33=sm[2+3*1].x33=sm[2+3*2].x32=Eyzzz(f.x,f.y,f.z,simplex);
+        sm[2+3*2].x33=Ezzzz(f.x,f.y,f.z,simplex);
     }
 };
 }
