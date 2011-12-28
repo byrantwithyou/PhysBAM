@@ -85,6 +85,7 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED2.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_J_INTERP_ENERGY.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/RC_EXTRAPOLATED.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/RC2_EXTRAPOLATED.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/ROTATED_LINEAR.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/ST_VENANT_KIRCHHOFF.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/SVK_EXTRAPOLATED.h>
@@ -125,6 +126,7 @@ public:
     bool use_extended_neohookean3;
     bool use_int_j_neo;
     bool use_rc_ext;
+    bool use_rc2_ext;
     bool use_extended_neohookean_refined;
     bool use_extended_neohookean_hyperbola;
     bool use_extended_neohookean_smooth;
@@ -214,6 +216,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Option_Argument("-use_ext_neo3");
     parse_args->Add_Option_Argument("-use_int_j_neo");
     parse_args->Add_Option_Argument("-use_rc_ext");
+    parse_args->Add_Option_Argument("-use_rc2_ext");
     parse_args->Add_Option_Argument("-use_ext_neo_ref");
     parse_args->Add_Option_Argument("-use_ext_neo_hyper");
     parse_args->Add_Option_Argument("-use_ext_neo_smooth");
@@ -326,6 +329,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     use_extended_neohookean3=parse_args->Is_Value_Set("-use_ext_neo3");
     use_int_j_neo=parse_args->Is_Value_Set("-use_int_j_neo");
     use_rc_ext=parse_args->Is_Value_Set("-use_rc_ext");
+    use_rc2_ext=parse_args->Is_Value_Set("-use_rc2_ext");
     use_extended_neohookean_refined=parse_args->Is_Value_Set("-use_ext_neo_ref");
     use_extended_neohookean_hyperbola=parse_args->Is_Value_Set("-use_ext_neo_hyper");
     use_extended_mooney_rivlin=parse_args->Is_Value_Set("-use_ext_mooney");
@@ -2336,10 +2340,11 @@ void Add_Constitutive_Model(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,T 
     
     if(use_extended_neohookean) icm=new NEO_HOOKEAN_EXTRAPOLATED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc);
     else if(use_extended_neohookean2) icm=new NEO_HOOKEAN_EXTRAPOLATED2<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc);
-    else if(use_extended_neohookean3) icm=new GENERAL_EXTRAPOLATED<T,3>(*new GEN_NEO_HOOKEAN_ENERGY<T>,stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,20);
+    else if(use_extended_neohookean3) icm=new GENERAL_EXTRAPOLATED<T,3>(*new GEN_NEO_HOOKEAN_ENERGY<T>,stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc);
     else if(use_int_j_neo) icm=new GENERAL_EXTRAPOLATED<T,3>(*new NEO_J_INTERP_ENERGY<T>(J_min,J_max,la_min*stiffness*stiffness_multiplier),
-        stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,20);
-    else if(use_rc_ext) icm=new RC_EXTRAPOLATED<T,3>(*new GEN_NEO_HOOKEAN_ENERGY<T>,stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,20);
+        stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc);
+    else if(use_rc_ext) icm=new RC_EXTRAPOLATED<T,3>(*new GEN_NEO_HOOKEAN_ENERGY<T>,stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc);
+    else if(use_rc2_ext) icm=new RC2_EXTRAPOLATED<T,3>(*new GEN_NEO_HOOKEAN_ENERGY<T>,stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc);
     else if(use_svk) icm=new ST_VENANT_KIRCHHOFF<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
     else if(use_extended_svk) icm=new SVK_EXTRAPOLATED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc);
     else if(use_extended_neohookean_refined) icm=new NEO_HOOKEAN_EXTRAPOLATED_REFINED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,.6,efc);
@@ -2356,6 +2361,36 @@ void Add_Constitutive_Model(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,T 
     solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,icm));
     if(test_model_only) Test_Model(*icm);
 }
+template<class RC>
+void Test_Model_Helper(ISOTROPIC_CONSTITUTIVE_MODEL<T,3>* icm, TV &f, TV &df, T e)
+{
+    RC* rc=dynamic_cast<RC*>(icm);
+    if(!rc) return;
+    if(f.Min()>0) rc->base.Test(f.x,f.y,f.z,0);
+    int simplex=0;
+    if(f.Product()>rc->extrapolation_cutoff) return;
+    typename RC::HELPER h0;
+    if(!h0.Compute_E(rc->base,rc->extra_force_coefficient*rc->youngs_modulus,rc->extrapolation_cutoff,f,simplex)) return;
+    h0.Compute_dE(rc->base,rc->extra_force_coefficient*rc->youngs_modulus,f,simplex);
+    h0.Compute_ddE(rc->base,rc->extra_force_coefficient*rc->youngs_modulus,f,simplex);
+    typename RC::HELPER h1;
+    if(!h1.Compute_E(rc->base,rc->extra_force_coefficient*rc->youngs_modulus,rc->extrapolation_cutoff,f+df,simplex)) return;
+    h1.Compute_dE(rc->base,rc->extra_force_coefficient*rc->youngs_modulus,f+df,simplex);
+    h1.Compute_ddE(rc->base,rc->extra_force_coefficient*rc->youngs_modulus,f+df,simplex);
+    char buff[1000];
+#define XX(k) {TV av=(h1.dd##k+h0.dd##k)*df/2/e;TV dif=(h1.d##k-h0.d##k)/e;const char*va=#k;sprintf(buff, "============ test ============ %s %8.5f %8.5f (%8.5f)\n", va, av.Magnitude(), dif.Magnitude(), (av-dif).Magnitude());LOG::cout<<buff;}
+    XX(m);
+    XX(h);
+    XX(phi);
+    XX(E);
+    XX(z);
+    XX(xi);
+    XX(s);
+#define YY(k) {for(int i=1;i<=TV::m;i++){TV av=(h1.dd##k(i)+h0.dd##k(i))*df/2/e;TV dif=(h1.d##k.Transposed().Column(i)-h0.d##k.Transposed().Column(i))/e;const char*va=#k;sprintf(buff, "============ test ============ %s %8.5f %8.5f (%8.5f)\n", va, av.Magnitude(), dif.Magnitude(), (av-dif).Magnitude());LOG::cout<<buff;}}
+    YY(Q);
+    YY(u);
+    YY(g);
+ }
 //#####################################################################
 // Function Test_Model
 //#####################################################################
@@ -2365,10 +2400,16 @@ void Test_Model(ISOTROPIC_CONSTITUTIVE_MODEL<T,3>& icm)
     for(int i=1;i<=20;i++){
         TV f;
         random.Fill_Uniform(f,0,2);
+        T e=1e-5;
+        TV df;
+        random.Fill_Uniform(df,-e,e);
         f=f.Sorted().Reversed();
-        if(random.Get_Uniform_Integer(0,1)==1) f(3)=-f(3);
+        if(random.Get_Uniform_Integer(0,1)==1) f(2)=-f(2);
         LOG::cout<<f<<std::endl;
-        icm.Test(DIAGONAL_MATRIX<T,3>(f),1);}
+        icm.Test(DIAGONAL_MATRIX<T,3>(f),1);
+        Test_Model_Helper<RC_EXTRAPOLATED<T,3> >(&icm,f,df,e);
+        Test_Model_Helper<RC2_EXTRAPOLATED<T,3> >(&icm,f,df,e);
+    }
     exit(0);
 }
 //#####################################################################

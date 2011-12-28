@@ -25,11 +25,13 @@
 //  30. Horizontal stretch
 //  31. Triangle stretch
 //  32. Triangle stretch (II)
+//  33. Tangle plot
 //#####################################################################
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
 
 #include <PhysBAM_Tools/Images/PPM_FILE.h>
+#include <PhysBAM_Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <PhysBAM_Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <PhysBAM_Tools/Log/LOG.h>
@@ -39,6 +41,7 @@
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
+#include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/LINEAR_BINDING.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/SOFT_BINDINGS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISION_PARAMETERS.h>
@@ -79,7 +82,7 @@ template<class T_input>
 class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,2> > >
 {
     typedef T_input T;
-    typedef VECTOR<T,2> TV;
+    typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;using BASE::solid_body_collection;
@@ -127,6 +130,7 @@ public:
     T input_efc;
     T input_poissons_ratio,input_youngs_modulus;
     bool test_model_only;
+    bool plot_energy_density;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),semi_implicit(false),test_forces(false),use_extended_neohookean(false),
@@ -223,6 +227,8 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Double_Argument("-poissons_ratio",-1,"poissons_ratio");
     parse_args->Add_Double_Argument("-youngs_modulus",0,"youngs modulus, only for test 41 so far");
     parse_args->Add_Option_Argument("-test_model_only");
+    parse_args->Add_Option_Argument("-plot_energy_density");
+    parse_args->Add_Option_Argument("-test_system");
 }
 //#####################################################################
 // Function Parse_Options
@@ -271,6 +277,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
     if(parse_args->Is_Value_Set("-poissons_ratio")) input_poissons_ratio=(T)parse_args->Get_Double_Value("-poissons_ratio");
     if(parse_args->Is_Value_Set("-youngs_modulus")) input_youngs_modulus=(T)parse_args->Get_Double_Value("-youngs_modulus");
     test_model_only=parse_args->Get_Option_Value("-test_model_only");
+    plot_energy_density=parse_args->Get_Option_Value("-plot_energy_density");
+    solids_parameters.implicit_solve_parameters.test_system=parse_args->Is_Value_Set("-test_system");
 
     switch(test_number){
     case 20: case 21: case 26: 
@@ -321,11 +329,12 @@ void Parse_Options() PHYSBAM_OVERRIDE
             attachment_velocity=TV((T).8,0);
 	    last_frame=480;
             break;	 
-        case 27: case 270: case 30: case 31: case 32:
+        case 27: case 270: case 30: case 31: case 32: case 33:
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=900;
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
             last_frame=3000;
+            if(test_number==33) last_frame=1;
             break;            
         default:
             LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
@@ -470,6 +479,16 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             ta->mesh.elements.Append(VECTOR<int,3>(a,b,c));
             solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(ta);
             break;}
+        case 33:{
+            TRIANGULATED_AREA<T>* ta=TRIANGULATED_AREA<T>::Create(particles);
+            ta->particles.array_collection->Add_Elements(7);
+            for(int i=1;i<=7;i++) ta->particles.X(i)=TV((T).5*(i-4),(T).5*sqrt(3)*(i%2));
+            for(int i=1;i<=5;i++) ta->mesh.elements.Append(VECTOR<int,3>(i,i+1,i+2));
+            ta->Update_Number_Nodes();
+            ta->mesh.Make_Orientations_Consistent();
+            solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(ta);
+            particles.mass.Fill(1);
+            break;}
         default:
             LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}
 
@@ -490,7 +509,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 24:
         case 25:
         case 26:
-        case 27: case 270: case 30: case 31: case 32:{
+        case 27: case 270: case 30: case 31: case 32: case 33:{
             TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
             Add_Constitutive_Model(triangulated_area,(T)1e2,poissons_ratio,(T).05);
             if(test_number==32) particles.X(1).x=stretch;
@@ -760,6 +779,7 @@ void Preprocess_Frame(const int frame)
 //            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,N);
         }
     }
+    if(test_number==33) Plot_Energy_Landscape();
 }
 //#####################################################################
 // Function Add_Constitutive_Model
@@ -772,13 +792,13 @@ void Add_Constitutive_Model(TRIANGULATED_AREA<T>& triangulated_area,T stiffness,
     if(input_youngs_modulus!=0) stiffness=input_youngs_modulus;
 
     ISOTROPIC_CONSTITUTIVE_MODEL<T,2>* icm=0;
-    if(use_extended_neohookean) icm=new NEO_HOOKEAN_EXTRAPOLATED<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.4,20);
-    else if(use_extended_neohookean2) icm=new NEO_HOOKEAN_EXTRAPOLATED2<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.4,20);
-    else if(use_extended_neohookean3) icm=new GENERAL_EXTRAPOLATED<T,2>(*new GEN_NEO_HOOKEAN_ENERGY<T>,stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.4,20);
-    else if(use_int_j_neo) icm=new GENERAL_EXTRAPOLATED<T,2>(*new NEO_J_INTERP_ENERGY<T>,stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.4,20);
-    else if(use_rc_ext) icm=new RC_EXTRAPOLATED<T,2>(*new GEN_NEO_HOOKEAN_ENERGY<T>,stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,20);
-    else if(use_extended_neohookean_refined) icm=new NEO_HOOKEAN_EXTRAPOLATED_REFINED<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.4,.6,20);
-    else if(use_extended_neohookean_hyperbola) icm=new NEO_HOOKEAN_EXTRAPOLATED_HYPERBOLA<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
+    if(use_extended_neohookean) icm=new NEO_HOOKEAN_EXTRAPOLATED<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc);
+    else if(use_extended_neohookean2) icm=new NEO_HOOKEAN_EXTRAPOLATED2<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc);
+    else if(use_extended_neohookean3) icm=new GENERAL_EXTRAPOLATED<T,2>(*new GEN_NEO_HOOKEAN_ENERGY<T>,stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc);
+    else if(use_int_j_neo) icm=new GENERAL_EXTRAPOLATED<T,2>(*new NEO_J_INTERP_ENERGY<T>,stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc);
+    else if(use_rc_ext) icm=new RC_EXTRAPOLATED<T,2>(*new GEN_NEO_HOOKEAN_ENERGY<T>,stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc);
+    else if(use_extended_neohookean_refined) icm=new NEO_HOOKEAN_EXTRAPOLATED_REFINED<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,.6,efc);
+    else if(use_extended_neohookean_hyperbola) icm=new NEO_HOOKEAN_EXTRAPOLATED_HYPERBOLA<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff);
     else if(use_extended_neohookean_smooth) icm=new NEO_HOOKEAN_EXTRAPOLATED_SMOOTH<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
     else if(use_corotated) icm=new COROTATED<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
     else if(use_corot_blend) icm=new NEO_HOOKEAN_COROTATED_BLEND<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
@@ -792,6 +812,7 @@ void Add_Constitutive_Model(TRIANGULATED_AREA<T>& triangulated_area,T stiffness,
     //std::cout << "Mu    = " << icm->constant_mu << std::cout;
     solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,icm));
 
+    if(plot_energy_density) Plot_Energy_Density(icm,stiffness);
     if(primary_contour) Primary_Contour(*icm);
     if(scatter_plot) Add_Primary_Contour_Segments(*icm);
     if(test_model_only) Test_Model(*icm);
@@ -805,10 +826,41 @@ void Test_Model(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>& icm)
     for(int i=1;i<=20;i++){
         TV f;
         random.Fill_Uniform(f,0,2);
+        T e=1e-5;
+        TV df;
+        random.Fill_Uniform(df,-e,e);
         f=f.Sorted().Reversed();
         if(random.Get_Uniform_Integer(0,1)==1) f(2)=-f(2);
         LOG::cout<<f<<std::endl;
-        icm.Test(DIAGONAL_MATRIX<T,2>(f),1);}
+        icm.Test(DIAGONAL_MATRIX<T,2>(f),1);
+        if(RC_EXTRAPOLATED<T,2>* rc=dynamic_cast<RC_EXTRAPOLATED<T,2>*>(&icm))
+        {
+            if(f.x>0 && f.y>0) rc->base.Test(f.x,f.y,0);
+            int simplex=0;
+            if(f.Product()>rc->extrapolation_cutoff) continue;
+            typename RC_EXTRAPOLATED<T,2>::HELPER h0;
+            if(!h0.Compute_E(rc->base,rc->extra_force_coefficient*rc->youngs_modulus,rc->extrapolation_cutoff,f,simplex)) continue;
+            h0.Compute_dE(rc->base,rc->extra_force_coefficient*rc->youngs_modulus,f,simplex);
+            h0.Compute_ddE(rc->base,rc->extra_force_coefficient*rc->youngs_modulus,f,simplex);
+            typename RC_EXTRAPOLATED<T,2>::HELPER h1;
+            if(!h1.Compute_E(rc->base,rc->extra_force_coefficient*rc->youngs_modulus,rc->extrapolation_cutoff,f+df,simplex)) continue;
+            h1.Compute_dE(rc->base,rc->extra_force_coefficient*rc->youngs_modulus,f+df,simplex);
+            h1.Compute_ddE(rc->base,rc->extra_force_coefficient*rc->youngs_modulus,f+df,simplex);
+            char buff[1000];
+#define XX(k) {TV av=(h1.dd##k+h0.dd##k)*df/2/e;TV dif=(h1.d##k-h0.d##k)/e;const char*va=#k;sprintf(buff, "============ test ============ %s %8.5f %8.5f (%8.5f)\n", va, av.Magnitude(), dif.Magnitude(), (av-dif).Magnitude());LOG::cout<<buff;}
+            XX(m);
+            XX(h);
+            XX(phi);
+            XX(E);
+            XX(z);
+            XX(xi);
+            XX(s);
+#define YY(k) {for(int i=1;i<=TV::m;i++){TV av=(h1.dd##k(i)+h0.dd##k(i))*df/2/e;TV dif=(h1.d##k.Transposed().Column(i)-h0.d##k.Transposed().Column(i))/e;const char*va=#k;sprintf(buff, "============ test ============ %s %8.5f %8.5f (%8.5f)\n", va, av.Magnitude(), dif.Magnitude(), (av-dif).Magnitude());LOG::cout<<buff;}}
+            YY(Q);
+            YY(u);
+            YY(g);
+        }
+    }
     exit(0);
 }
 //#####################################################################
@@ -953,6 +1005,60 @@ void Add_Primary_Contour_Segments(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>& icm)
             if(c0x>=0 && cx1>=0) contour_segments.Append(VECTOR<TV,2>(Y0x,Yx1));
             if(c1x>=0 && cx0>=0) contour_segments.Append(VECTOR<TV,2>(Y1x,Yx0));
             if(c1x>=0 && cx1>=0) contour_segments.Append(VECTOR<TV,2>(Y1x,Yx1));}
+}
+//#####################################################################
+// Function Plot_Energy_Landscape
+//#####################################################################
+void Plot_Energy_Density(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>* icm,T stiffness)
+{
+    TRIANGULATED_AREA<T>& ta=tests.Create_Mattress(GRID<TV>(2+image_size+1,2+image_size+1,-sigma_range,sigma_range,-sigma_range,sigma_range),true,RIGID_BODY_STATE<TV>());
+    TRIANGULATED_SURFACE<T> ts(ta.mesh,*new PARTICLES<VECTOR<T,3> >);
+    ts.particles.array_collection->Add_Elements(ta.particles.X.m);
+    for(int i=1;i<=ta.particles.X.m;i++){
+        TV X=ta.particles.X(i);
+        X.x+=1.1e-4;
+        X.y+=2.3e-4;
+        TV Z=X;
+        if((fabs(Z.x)>fabs(Z.y)?Z.x:Z.y)<0) Z=-Z;
+        VECTOR<T,3> Y(X.x,X.y,icm->P_From_Strain(DIAGONAL_MATRIX<T,2>(Z),1,0).x11/stiffness);
+        ts.particles.X(i)=Y;}
+    FILE_UTILITIES::Write_To_File(this->stream_type,"surface.tri",ts);
+}
+//#####################################################################
+// Function Plot_Energy_Landscape
+//#####################################################################
+void Plot_Energy_Landscape()
+{
+    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    ARRAY<TV> F(particles.X.m);
+    ARRAY<TWIST<TV> > TW;
+    ARRAY<TV> X;
+    ARRAY<TV> N;
+    ARRAY<T> E;
+    ARRAY<TV> TX(particles.X);
+    for(int i=-image_size/2;i<=image_size/2;i++)
+        for(int j=-image_size/2;j<=image_size/2;j++){
+            F.Fill(TV());
+            T x=2*sigma_range*i/image_size+1.1e-5;
+            T y=2*sigma_range*j/image_size+1.2e-5;
+            particles.X(3)=TV(-x,y);
+            particles.X(5)=TV(x,y);
+            solid_body_collection.Update_Position_Based_State(0,false);
+            T ke,pe;
+            solid_body_collection.Compute_Energy(0,ke,pe);
+            solid_body_collection.Add_Velocity_Independent_Forces(F,TW,0);
+            E.Append(ke+pe);
+            X.Append(particles.X(5));
+            N.Append(F(5).Normalized());
+        }
+
+    INTERPOLATED_COLOR_MAP<T> mp;
+    mp.Initialize_Colors(E.Min(),E.Max(),false,true,false);
+
+    for(int i=1;i<=X.m;i++){
+        Add_Debug_Particle(X(i),mp(E(i)));
+        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,N(i));}
+    particles.X=TX;
 }
 //#####################################################################
 };
