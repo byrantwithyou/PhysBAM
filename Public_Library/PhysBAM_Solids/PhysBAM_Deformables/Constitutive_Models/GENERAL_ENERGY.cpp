@@ -45,6 +45,11 @@ Test(T x, T y, int simplex) const
     TEST2D(Exx,y);
     TEST2D(Exy,y);
     TEST2D(Eyy,y);
+    TEST2D(Exxx,x);
+    TEST2D(Exxx,y);
+    TEST2D(Exxy,y);
+    TEST2D(Exyy,y);
+    TEST2D(Eyyy,y);
 }
 //#####################################################################
 // Function Test23
@@ -94,9 +99,21 @@ Test(T x, T y, T z, int simplex) const
     TEST3D(Exz,z);
     TEST3D(Eyz,z);
     TEST3D(Ezz,z);
+    TEST3D(Exxx,x);
+    TEST3D(Exxx,y);
+    TEST3D(Exxy,y);
+    TEST3D(Exyy,y);
+    TEST3D(Eyyy,y);
+    TEST3D(Exxx,z);
     TEST3D(Exxy,z);
     TEST3D(Exyy,z);
+    TEST3D(Exxz,z);
     TEST3D(Exyz,z);
+    TEST3D(Eyyy,z);
+    TEST3D(Eyyz,z);
+    TEST3D(Exzz,z);
+    TEST3D(Eyzz,z);
+    TEST3D(Ezzz,z);
 }
 template class GENERAL_ENERGY<float>;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT

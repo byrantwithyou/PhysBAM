@@ -62,6 +62,7 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED2.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_J_INTERP_ENERGY.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/RC_EXTRAPOLATED.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/RC2_EXTRAPOLATED.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/ROTATED_LINEAR.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/FINITE_VOLUME.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
@@ -102,6 +103,7 @@ public:
     bool use_extended_neohookean3;
     bool use_int_j_neo;
     bool use_rc_ext;
+    bool use_rc2_ext;
     bool use_extended_neohookean_refined;
     bool use_extended_neohookean_hyperbola;
     bool use_extended_neohookean_smooth;
@@ -196,6 +198,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Option_Argument("-use_ext_neo3");
     parse_args->Add_Option_Argument("-use_int_j_neo");
     parse_args->Add_Option_Argument("-use_rc_ext");
+    parse_args->Add_Option_Argument("-use_rc2_ext");
     parse_args->Add_Option_Argument("-use_ext_neo_ref");
     parse_args->Add_Option_Argument("-use_ext_neo_hyper");
     parse_args->Add_Option_Argument("-use_ext_neo_smooth");
@@ -249,6 +252,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     use_extended_neohookean3=parse_args->Is_Value_Set("-use_ext_neo3");
     use_int_j_neo=parse_args->Is_Value_Set("-use_int_j_neo");
     use_rc_ext=parse_args->Is_Value_Set("-use_rc_ext");
+    use_rc2_ext=parse_args->Is_Value_Set("-use_rc2_ext");
     use_extended_neohookean_refined=parse_args->Is_Value_Set("-use_ext_neo_ref"); //
     use_extended_neohookean_hyperbola=parse_args->Is_Value_Set("-use_ext_neo_hyper");    
     use_extended_neohookean_smooth=parse_args->Is_Value_Set("-use_ext_neo_smooth");    
@@ -683,6 +687,7 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
         for(int j=1;j<=n;j++){V(1+m*(j-1))=-velocity;V(m+m*(j-1))=velocity;}}
     if(test_number==31){V(1)=TV(1,0);V(2).x=0;V(3).x=0;}
     if(test_number==32){V(1)=V(3)=TV(0,0);V(3).x=0;}
+    if(test_number==33){V(1)=V(2)=V(4)=V(6)=V(7)=TV();}
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes
@@ -724,6 +729,7 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
         for(int j=1;j<=n;j++) V(1+m*(j-1))=V(m+m*(j-1))=TV();}
     if(test_number==31){V(1)=TV();V(2).x=0;V(3).x=0;}
     if(test_number==32){V(1)=V(3)=TV();V(3).x=0;}
+    if(test_number==33){V(1)=V(2)=V(4)=V(6)=V(7)=TV();}
 }
 void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {
     /*if(test_number==270){
@@ -780,6 +786,13 @@ void Preprocess_Frame(const int frame)
         }
     }
     if(test_number==33) Plot_Energy_Landscape();
+    if(test_number==33 && frame==2)
+    {
+        PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+        particles.X(5)=TV(-.08,-.16);
+        particles.X(3)=particles.X(5);
+        particles.X(3).x*=-1;
+    }
 }
 //#####################################################################
 // Function Add_Constitutive_Model
@@ -797,6 +810,7 @@ void Add_Constitutive_Model(TRIANGULATED_AREA<T>& triangulated_area,T stiffness,
     else if(use_extended_neohookean3) icm=new GENERAL_EXTRAPOLATED<T,2>(*new GEN_NEO_HOOKEAN_ENERGY<T>,stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc);
     else if(use_int_j_neo) icm=new GENERAL_EXTRAPOLATED<T,2>(*new NEO_J_INTERP_ENERGY<T>,stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc);
     else if(use_rc_ext) icm=new RC_EXTRAPOLATED<T,2>(*new GEN_NEO_HOOKEAN_ENERGY<T>,stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc);
+    else if(use_rc2_ext) icm=new RC2_EXTRAPOLATED<T,2>(*new GEN_NEO_HOOKEAN_ENERGY<T>,stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc);
     else if(use_extended_neohookean_refined) icm=new NEO_HOOKEAN_EXTRAPOLATED_REFINED<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,.6,efc);
     else if(use_extended_neohookean_hyperbola) icm=new NEO_HOOKEAN_EXTRAPOLATED_HYPERBOLA<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff);
     else if(use_extended_neohookean_smooth) icm=new NEO_HOOKEAN_EXTRAPOLATED_SMOOTH<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
@@ -818,6 +832,73 @@ void Add_Constitutive_Model(TRIANGULATED_AREA<T>& triangulated_area,T stiffness,
     if(test_model_only) Test_Model(*icm);
 }
 //#####################################################################
+// Function Test_Model_Helper
+//#####################################################################
+void Test_Model_Helper(const char* str,T a0, T a1, TV da0, TV da1, TV df, T e)
+{
+    T av=TV::Dot_Product(da1+da0,df)/2/e;
+    T dif=(a1-a0)/e;
+    char buff[1000];
+    sprintf(buff, "============ test ============ %s %8.5f %8.5f (%8.5f)\n", str, av, dif, fabs(av-dif));
+    LOG::cout<<buff;
+}
+//#####################################################################
+// Function Test_Model_Helper
+//#####################################################################
+void Test_Model_Helper(const char* str,TV a0, TV a1, const MATRIX<T,2>& da0, const MATRIX<T,2>& da1, TV df, T e)
+{
+    TV av=(da1+da0)*df/2/e;
+    TV dif=(a1-a0)/e;
+    char buff[1000];
+    sprintf(buff, "============ test ============ %s %8.5f %8.5f (%8.5f)\n", str, av.Magnitude(), dif.Magnitude(), (av-dif).Magnitude());
+    LOG::cout<<buff;
+}
+//#####################################################################
+// Function Test_Model_Helper
+//#####################################################################
+void Test_Model_Helper(const char* str,const MATRIX<T,2>& a0, const MATRIX<T,2>& a1, const VECTOR<SYMMETRIC_MATRIX<T,2>,2>& da0, const VECTOR<SYMMETRIC_MATRIX<T,2>,2>& da1, TV df, T e)
+{
+    for(int i=1;i<=TV::m;i++){
+        TV av=(da1(i)+da0(i))*df/2/e;
+        TV dif=(a1.Transposed().Column(i)-a0.Transposed().Column(i))/e;
+        char buff[1000];
+        sprintf(buff, "============ test ============ %s %8.5f %8.5f (%8.5f)\n", str, av.Magnitude(), dif.Magnitude(), (av-dif).Magnitude());
+        LOG::cout<<buff;}
+}
+//#####################################################################
+// Function Test_Model_Helper
+//#####################################################################
+template<class RC> void 
+Test_Model_Helper(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>* icm, TV &f, TV &df, T e)
+{
+    RC* rc=dynamic_cast<RC*>(icm);
+    if(!rc) return;
+    if(f.Min()>0) rc->base.Test(f.x,f.y,0);
+    int simplex=0;
+    if(f.Product()>rc->extrapolation_cutoff) return;
+    typename RC::HELPER h0;
+    if(!h0.Compute_E(rc->base,rc->extra_force_coefficient*rc->youngs_modulus,rc->extrapolation_cutoff,f,simplex)) return;
+    h0.Compute_dE(rc->base,rc->extra_force_coefficient*rc->youngs_modulus,f,simplex);
+    h0.Compute_ddE(rc->base,rc->extra_force_coefficient*rc->youngs_modulus,f,simplex);
+    typename RC::HELPER h1;
+    if(!h1.Compute_E(rc->base,rc->extra_force_coefficient*rc->youngs_modulus,rc->extrapolation_cutoff,f+df,simplex)) return;
+    h1.Compute_dE(rc->base,rc->extra_force_coefficient*rc->youngs_modulus,f+df,simplex);
+    h1.Compute_ddE(rc->base,rc->extra_force_coefficient*rc->youngs_modulus,f+df,simplex);
+#define XX(k) Test_Model_Helper(#k,h0.k, h1.k, h0.d##k, h1.d##k, df, e);Test_Model_Helper(#k,h0.d##k, h1.d##k, h0.dd##k, h1.dd##k, df, e);
+//{TV av=(h1.d##k+h0.d##k)*df/2/e;TV dif=(h1.##k-h0.##k)/e;const char*va=#k;sprintf(buff, "============ test ============ %s %8.5f %8.5f (%8.5f)\n", va, av.Magnitude(), dif.Magnitude(), (av-dif).Magnitude());LOG::cout<<buff;}
+    XX(m);
+    XX(h);
+    XX(phi);
+    XX(E);
+    XX(z);
+    XX(xi);
+    XX(s);
+//#define YY(k) {for(int i=1;i<=TV::m;i++){TV av=(h1.dd##k(i)+h0.dd##k(i))*df/2/e;TV dif=(h1.d##k.Transposed().Column(i)-h0.d##k.Transposed().Column(i))/e;const char*va=#k;sprintf(buff, "============ test ============ %s %8.5f %8.5f (%8.5f)\n", va, av.Magnitude(), dif.Magnitude(), (av-dif).Magnitude());LOG::cout<<buff;}}
+    XX(Q);
+    XX(u);
+    XX(g);
+ }
+//#####################################################################
 // Function Test_Model
 //#####################################################################
 void Test_Model(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>& icm)
@@ -833,33 +914,8 @@ void Test_Model(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>& icm)
         if(random.Get_Uniform_Integer(0,1)==1) f(2)=-f(2);
         LOG::cout<<f<<std::endl;
         icm.Test(DIAGONAL_MATRIX<T,2>(f),1);
-        if(RC_EXTRAPOLATED<T,2>* rc=dynamic_cast<RC_EXTRAPOLATED<T,2>*>(&icm))
-        {
-            if(f.x>0 && f.y>0) rc->base.Test(f.x,f.y,0);
-            int simplex=0;
-            if(f.Product()>rc->extrapolation_cutoff) continue;
-            typename RC_EXTRAPOLATED<T,2>::HELPER h0;
-            if(!h0.Compute_E(rc->base,rc->extra_force_coefficient*rc->youngs_modulus,rc->extrapolation_cutoff,f,simplex)) continue;
-            h0.Compute_dE(rc->base,rc->extra_force_coefficient*rc->youngs_modulus,f,simplex);
-            h0.Compute_ddE(rc->base,rc->extra_force_coefficient*rc->youngs_modulus,f,simplex);
-            typename RC_EXTRAPOLATED<T,2>::HELPER h1;
-            if(!h1.Compute_E(rc->base,rc->extra_force_coefficient*rc->youngs_modulus,rc->extrapolation_cutoff,f+df,simplex)) continue;
-            h1.Compute_dE(rc->base,rc->extra_force_coefficient*rc->youngs_modulus,f+df,simplex);
-            h1.Compute_ddE(rc->base,rc->extra_force_coefficient*rc->youngs_modulus,f+df,simplex);
-            char buff[1000];
-#define XX(k) {TV av=(h1.dd##k+h0.dd##k)*df/2/e;TV dif=(h1.d##k-h0.d##k)/e;const char*va=#k;sprintf(buff, "============ test ============ %s %8.5f %8.5f (%8.5f)\n", va, av.Magnitude(), dif.Magnitude(), (av-dif).Magnitude());LOG::cout<<buff;}
-            XX(m);
-            XX(h);
-            XX(phi);
-            XX(E);
-            XX(z);
-            XX(xi);
-            XX(s);
-#define YY(k) {for(int i=1;i<=TV::m;i++){TV av=(h1.dd##k(i)+h0.dd##k(i))*df/2/e;TV dif=(h1.d##k.Transposed().Column(i)-h0.d##k.Transposed().Column(i))/e;const char*va=#k;sprintf(buff, "============ test ============ %s %8.5f %8.5f (%8.5f)\n", va, av.Magnitude(), dif.Magnitude(), (av-dif).Magnitude());LOG::cout<<buff;}}
-            YY(Q);
-            YY(u);
-            YY(g);
-        }
+        Test_Model_Helper<RC_EXTRAPOLATED<T,2> >(&icm,f,df,e);
+        Test_Model_Helper<RC2_EXTRAPOLATED<T,2> >(&icm,f,df,e);
     }
     exit(0);
 }
