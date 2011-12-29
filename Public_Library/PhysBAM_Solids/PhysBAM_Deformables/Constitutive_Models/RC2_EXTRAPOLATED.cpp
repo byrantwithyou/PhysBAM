@@ -261,8 +261,8 @@ Compute_E(const GENERAL_ENERGY<T>& base,T k,T extrapolation_cutoff,const TV& f,c
     g=base.dE(Q,simplex);
     h=TV::Dot_Product(f-Q,u);
     H=base.ddE(Q,simplex);
-    TV Hu=H*u;
-    T uHu=TV::Dot_Product(u,Hu);
+    Hu=H*u;
+    uHu=TV::Dot_Product(u,Hu);
     E=phi+h*TV::Dot_Product(g,u)+(T).5*k*sqr(h)+0.5*sqr(h)*uHu;
     return true;
 }
@@ -283,7 +283,7 @@ Compute_dE(const GENERAL_ENERGY<T>& base,T k,const TV& f,const int simplex)
     dg=H*dQ;
     dh=((T)1-dQ).Transpose_Times(u)+du.Transpose_Times(f-Q);
     dE=dphi+dh*TV::Dot_Product(g,u)+h*dg.Transpose_Times(u)+h*du.Transpose_Times(g)+k*h*dh;
-    TV Hu = H*u;
+
     dE+=uHu*h*dh;
     base.dddE(Q,simplex,&TT(1));
     for (int i=1; i<=d; i++) Tu+=u(i)*TT(i);
@@ -334,7 +334,7 @@ Compute_ddE(const GENERAL_ENERGY<T>& base,T k,const TV& f,const int simplex)
     base.ddddE(Q,simplex,&A(1)(1));
     for (int i=1; i<=d; i++) for (int j=1; j<=d; j++) ddE+=(T)0.5*h2*u(i)*u(j)*SYMMETRIC_MATRIX<T,d>::Conjugate_With_Transpose(dQ,A(i)(j));
     for (int i=1; i<=d; i++) ddE+=(T)0.5*h2*uTu(i)*ddQ(i);
-    ddE+=dQ.Transpose_Times(Tu*du).Symmetric_Part()*2;
+    ddE+=h2*dQ.Transpose_Times(Tu*du).Symmetric_Part()*2;
     for (int i=1; i<=d; i++) ddE+=h2*Hu(i)*ddu(i);
     ddE+=h2*SYMMETRIC_MATRIX<T,d>::Conjugate_With_Transpose(du,H);
 }

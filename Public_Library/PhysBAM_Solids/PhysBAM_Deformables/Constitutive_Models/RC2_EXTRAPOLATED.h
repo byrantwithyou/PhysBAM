@@ -33,13 +33,12 @@ public:
     {
         T uHu;
         TV Q,u,g,Hu,duHu,uTu;
-        MATRIX<T,d> dQ,du,dg,Tu;
+        MATRIX<T,d> dQ,du,dg;
         VECTOR<SYMMETRIC_MATRIX<T,d>,d> ddQ,ddu,ddg,TT;
-        VECTOR<VECTOR<SYMMETRIC_MATRIX<T,d>,d>,d> /*dddQ,*//*dddu,*//*dddg,*/A;
+        VECTOR<VECTOR<SYMMETRIC_MATRIX<T,d>,d>,d> A;
         T m,h,phi,E,z,xi,s;
         TV dm,dh,dphi,dE,dz,dxi,ds;
-        SYMMETRIC_MATRIX<T,d> ddm,ddh,ddphi,ddE,ddz,ddxi,dds,H;
-        //VECTOR<SYMMETRIC_MATRIX<T,d>,d> dddm,dddh,dddz,dddxi,ddds;
+        SYMMETRIC_MATRIX<T,d> ddm,ddh,ddphi,ddE,ddz,ddxi,dds,H,Tu;
 
         bool Compute_E(const GENERAL_ENERGY<T>& base,T k,T extrapolation_cutoff,const TV& f,const int simplex);
         void Compute_dE(const GENERAL_ENERGY<T>& base,T k,const TV& f,const int simplex);
