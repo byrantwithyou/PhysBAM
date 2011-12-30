@@ -166,7 +166,7 @@ public:
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),semi_implicit(false),test_forces(false),use_extended_neohookean(false),use_extended_neohookean2(false),
         use_extended_neohookean_refined(false),use_extended_neohookean_hyperbola(false),use_extended_neohookean_smooth(false),use_extended_svk(false),
-        use_corotated(false),use_corot_blend(false),dump_sv(false),print_matrix(false),use_constant_ife(false),input_cutoff(0),input_efc(0),input_poissons_ratio(-1),input_youngs_modulus(0),
+        use_corotated(false),use_corot_blend(false),dump_sv(false),print_matrix(false),use_constant_ife(false),input_cutoff(FLT_MAX),input_efc(FLT_MAX),input_poissons_ratio(-1),input_youngs_modulus(0),
         J_min(0),J_max((T).1),la_min(0),test_model_only(false)
     {
     }
@@ -2333,8 +2333,8 @@ void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) PHYSBAM_OVERRIDE
 void Add_Constitutive_Model(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,T stiffness,T poissons_ratio,T damping, T cutoff = 0.4, T efc = 20)
 {
     ISOTROPIC_CONSTITUTIVE_MODEL<T,3>* icm=0;
-    if(input_efc) efc=input_efc;
-    if(input_cutoff) cutoff=input_cutoff;
+    if(input_efc!=FLT_MAX) efc=input_efc;
+    if(input_cutoff!=FLT_MAX) cutoff=input_cutoff;
     if(input_poissons_ratio!=-1) poissons_ratio=input_poissons_ratio;
     if(input_youngs_modulus!=0) stiffness=input_youngs_modulus;
     

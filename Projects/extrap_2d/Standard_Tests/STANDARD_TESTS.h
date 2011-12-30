@@ -138,7 +138,7 @@ public:
         :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),semi_implicit(false),test_forces(false),use_extended_neohookean(false),
         use_extended_neohookean_refined(false),use_extended_neohookean_hyperbola(false),use_extended_neohookean_smooth(false),use_corotated(false),
         use_corot_blend(false),use_corot_quartic(false),dump_sv(false),
-        print_matrix(false),parameter(20),stiffness_multiplier(1),damping_multiplier(1),use_constant_ife(false),stretch(1),poissons_ratio((T).45),input_cutoff(0),input_efc(0),
+        print_matrix(false),parameter(20),stiffness_multiplier(1),damping_multiplier(1),use_constant_ife(false),stretch(1),poissons_ratio((T).45),input_cutoff(FLT_MAX),input_efc(FLT_MAX),
         input_poissons_ratio(-1),input_youngs_modulus(0),test_model_only(false)
     {
     }
@@ -799,8 +799,8 @@ void Preprocess_Frame(const int frame)
 //#####################################################################
 void Add_Constitutive_Model(TRIANGULATED_AREA<T>& triangulated_area,T stiffness,T poissons_ratio,T damping, T cutoff = 0.4, T efc = 20)
 {
-    if(input_efc) efc=input_efc;
-    if(input_cutoff) cutoff=input_cutoff;
+    if(input_efc!=FLT_MAX) efc=input_efc;
+    if(input_cutoff!=FLT_MAX) cutoff=input_cutoff;
     if(input_poissons_ratio!=-1) poissons_ratio=input_poissons_ratio;
     if(input_youngs_modulus!=0) stiffness=input_youngs_modulus;
 
