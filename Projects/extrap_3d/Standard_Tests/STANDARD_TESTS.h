@@ -2107,7 +2107,7 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
 void Update_Time_Varying_Material_Properties(const T time)
 {   if(test_number==29 && time > .01){
     
-    if(solids_parameters.triangle_collision_parameters.perform_self_collision) solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+    if(solids_parameters.triangle_collision_parameters.perform_self_collision && time >=1.3) solids_parameters.triangle_collision_parameters.perform_self_collision=false;
 
     T critical=(T)1.0;
         T critical2=(T)1.0+rebound_time;
