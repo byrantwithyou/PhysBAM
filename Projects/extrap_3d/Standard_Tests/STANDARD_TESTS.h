@@ -41,7 +41,7 @@
 //   43. Through smooth gears
 //   44. 2 jellos collision
 //   47. Fish past a magnet?
-//   49. Hand through a tube?
+//   49. See-saw?
 //   50. Fish through a torus
 //   51. Fish through a tube
 //   52  Jello's falling one by one on each other
@@ -51,7 +51,6 @@
 //   56. Size comparison - several shapes
 //   57. Two-direction stretch
 //   58. Various objects through gears
-//   59. New taffy test
 //#####################################################################
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
@@ -90,6 +89,11 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/ST_VENANT_KIRCHHOFF.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/SVK_EXTRAPOLATED.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/FINITE_VOLUME.h>
+/*#include <PhysBAM_Solids/PhysBAM_Rigids/Joints/JOINT.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Joints/ANGLE_JOINT.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Joints/JOINT_MESH.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Joints/POINT_JOINT.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Joints/RIGID_JOINT.h>*/
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
@@ -141,7 +145,7 @@ public:
     INTERPOLATION_CURVE<T,FRAME<TV> > curve,curve2,curve3,curve4,curve5,curve6,curve7,curve8;
     bool print_matrix;
     int parameter,degrees_incline;
-    int fishes,jello_size,number_of_jellos;
+    int fishes,jello_size,number_of_jellos,seed_input;
     T stiffness_multiplier;
     T damping_multiplier;
     T boxsize;
@@ -239,6 +243,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Option_Argument("-print_matrix");
     parse_args->Add_Option_Argument("-project_nullspace","project out nullspace");
     parse_args->Add_Integer_Argument("-projection_iterations",5,"number of iterations used for projection in cg");
+    parse_args->Add_Integer_Argument("-seed",1234,"random seed to use");
     parse_args->Add_Integer_Argument("-solver_iterations",1000,"number of iterations used for solids system");
     parse_args->Add_Option_Argument("-use_constant_ife","use constant extrapolation on inverting finite element fix");
     parse_args->Add_Option_Argument("-test_system");
@@ -274,6 +279,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     frame_rate=24;
     parameter=parse_args->Get_Integer_Value("-parameter");
     jello_size=parse_args->Get_Integer_Value("-jello_size");
+    seed_input=parse_args->Get_Integer_Value("-seed");   
     
     switch(test_number){
         case 17: case 18: case 24: case 25: case 27: case 10: case 11: case 23: case 57:
@@ -372,7 +378,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 1:
         case 2:
         case 3:
-        case 4:
+       // case 4:
         case 7:
         case 8:
         case 9:
@@ -409,13 +415,14 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             //solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
             last_frame=1000;
-        case 29:
+        case 29: case 4:
             solids_parameters.cfl=(T)5;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=true;
             //if (with_hand || with_bunny)
            // {
-                solids_parameters.triangle_collision_parameters.perform_self_collision=true;//This gets turned off later then back on
+            solids_parameters.triangle_collision_parameters.perform_self_collision=override_collisions;//This gets turned off later then back on
+            std::cout << "rame collisions are " << override_collisions << std::endl;
             self_collision_flipped=false;
                 solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=override_collisions;
                 solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=override_collisions;
@@ -1002,7 +1009,7 @@ void Get_Initial_Data()
             bool stuck=false;
             RIGID_BODY_STATE<TV> initial_state;
             
-            random.Set_Seed(1234);
+            random.Set_Seed(seed_input);
             //break;} 
             for (int i=1; i<=number_of_jellos; i++){
                 do {
@@ -1294,24 +1301,28 @@ void Get_Initial_Data()
             TV start(10,10,0);
             T outer=(T)1,inner=(T).5,length=10;
             RIGID_BODY<TV>& torus1=tests.Add_Analytic_Torus((outer-inner)/2,(outer+inner)/2,32,64);
-            torus1.is_static=true;
+            //torus1.is_static=true;
             torus1.coefficient_of_friction = 0.05;
             torus1.X()=start;
             torus1.Rotation()=ROTATION<TV>((T)pi/2.0,TV(0,1,0));
             last_frame=240;
             RIGID_BODY<TV>& torus2=tests.Add_Analytic_Torus((outer-inner)/2,(outer+inner)/2,32,64);
-            torus2.is_static=true;
+            //torus2.is_static=true;
             torus2.coefficient_of_friction = 0.05;
             torus2.X()=start+TV(length,0,0);
             torus2.Rotation()=ROTATION<TV>((T)pi/2.0,TV(0,1,0));
-            last_frame=240;
+           // Add_Joint(1,2,new POINT_JOINT<TV>,FRAME<TV>(TV(15,10,0))); // ropes
+
+            /*last_frame=240;
             RIGID_BODY<TV>& shell=tests.Add_Analytic_Shell(length,outer,inner,64);
             shell.is_static=true;
             shell.coefficient_of_friction = 0.05;
             shell.X()=start+TV(length/2,0,0);
             shell.Rotation()=ROTATION<TV>((T)pi/2.0,TV(0,1,0));
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/hand_30k.tet",
-                                                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,10,0),ROTATION<TV>(T(pi),TV(0,1,0)))),true,true,density);
+                                                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,10,0),ROTATION<TV>(T(pi),TV(0,1,0)))),true,true,density);*/
+            
+            //Add_Rigid_Body("plank",(T).125,(T).5,0,FRAME<TV>(TV(0,3,0)),"seesaw");
             tests.Add_Ground(1);
             break;
         }
@@ -2129,8 +2140,8 @@ void Update_Time_Varying_Material_Properties(const T time)
         icm.Update_Lame_Constants(pow(10.0,end_young),pois,(T).01); 
         forces_are_removed=false;
     }
-    if(solids_parameters.triangle_collision_parameters.perform_self_collision) std::cout << "rame Hooray!" << std::endl;
-    if(solids_parameters.triangle_collision_parameters.perform_self_collision) std::cout << "rame oo-rah!" << std::endl;
+    //if(solids_parameters.triangle_collision_parameters.perform_self_collision) std::cout << "rame Hooray!" << std::endl;
+    //if(solids_parameters.triangle_collision_parameters.perform_self_collision) std::cout << "rame oo-rah!" << std::endl;
     if(time>critical3 && self_collision_flipped==false){
         self_collision_flipped=true;
         //std::cout << "3rd critical time reached frame Frame" << std::endl;
@@ -2138,7 +2149,7 @@ void Update_Time_Varying_Material_Properties(const T time)
         CONSTITUTIVE_MODEL<T,3>& icm = fv.constitutive_model;
         T young = pow(10.0,end_young-(T)1.5);
         icm.Update_Lame_Constants(young,pois,(T).01);
-        solids_parameters.triangle_collision_parameters.perform_self_collision=true;        
+        solids_parameters.triangle_collision_parameters.perform_self_collision=override_collisions;        
        // solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append(deformable_body_collection.deformable_geometry.structures(1));
         if(solids_parameters.triangle_collision_parameters.perform_self_collision) std::cout << "rame oh,rad!" << std::endl;
     }
