@@ -2374,8 +2374,46 @@ void Add_Constitutive_Model(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,T 
     solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,icm));
     if(test_model_only) Test_Model(*icm);
 }
-template<class RC>
-void Test_Model_Helper(ISOTROPIC_CONSTITUTIVE_MODEL<T,3>* icm, TV &f, TV &df, T e)
+
+//#####################################################################
+// Function Test_Model_Helper
+//#####################################################################
+void Test_Model_Helper(const char* str,T a0, T a1, TV da0, TV da1, TV df, T e)
+{
+    T av=TV::Dot_Product(da1+da0,df)/2/e;
+    T dif=(a1-a0)/e;
+    char buff[1000];
+    sprintf(buff, "============ test ============ %s %8.5f %8.5f (%8.5f)\n", str, av, dif, fabs(av-dif));
+    LOG::cout<<buff;
+}
+//#####################################################################
+// Function Test_Model_Helper
+//#####################################################################
+void Test_Model_Helper(const char* str,TV a0, TV a1, const MATRIX<T,3>& da0, const MATRIX<T,3>& da1, TV df, T e)
+{
+    TV av=(da1+da0)*df/2/e;
+    TV dif=(a1-a0)/e;
+    char buff[1000];
+    sprintf(buff, "============ test ============ %s %8.5f %8.5f (%8.5f)\n", str, av.Magnitude(), dif.Magnitude(), (av-dif).Magnitude());
+    LOG::cout<<buff;
+}
+//#####################################################################
+// Function Test_Model_Helper
+//#####################################################################
+void Test_Model_Helper(const char* str,const MATRIX<T,3>& a0, const MATRIX<T,3>& a1, const VECTOR<SYMMETRIC_MATRIX<T,3>,3>& da0, const VECTOR<SYMMETRIC_MATRIX<T,3>,3>& da1, TV df, T e)
+{
+    for(int i=1;i<=TV::m;i++){
+        TV av=(da1(i)+da0(i))*df/2/e;
+        TV dif=(a1.Transposed().Column(i)-a0.Transposed().Column(i))/e;
+        char buff[1000];
+        sprintf(buff, "============ test ============ %s %8.5f %8.5f (%8.5f)\n", str, av.Magnitude(), dif.Magnitude(), (av-dif).Magnitude());
+        LOG::cout<<buff;}
+}
+//#####################################################################
+// Function Test_Model_Helper
+//#####################################################################
+template<class RC> void 
+Test_Model_Helper(ISOTROPIC_CONSTITUTIVE_MODEL<T,3>* icm, TV &f, TV &df, T e)
 {
     RC* rc=dynamic_cast<RC*>(icm);
     if(!rc) return;
@@ -2390,8 +2428,7 @@ void Test_Model_Helper(ISOTROPIC_CONSTITUTIVE_MODEL<T,3>* icm, TV &f, TV &df, T 
     if(!h1.Compute_E(rc->base,rc->extra_force_coefficient*rc->youngs_modulus,rc->extrapolation_cutoff,f+df,simplex)) return;
     h1.Compute_dE(rc->base,rc->extra_force_coefficient*rc->youngs_modulus,f+df,simplex);
     h1.Compute_ddE(rc->base,rc->extra_force_coefficient*rc->youngs_modulus,f+df,simplex);
-    char buff[1000];
-#define XX(k) {TV av=(h1.dd##k+h0.dd##k)*df/2/e;TV dif=(h1.d##k-h0.d##k)/e;const char*va=#k;sprintf(buff, "============ test ============ %s %8.5f %8.5f (%8.5f)\n", va, av.Magnitude(), dif.Magnitude(), (av-dif).Magnitude());LOG::cout<<buff;}
+#define XX(k) Test_Model_Helper(#k,h0.k, h1.k, h0.d##k, h1.d##k, df, e);Test_Model_Helper(#k,h0.d##k, h1.d##k, h0.dd##k, h1.dd##k, df, e);
     XX(m);
     XX(h);
     XX(phi);
@@ -2399,10 +2436,9 @@ void Test_Model_Helper(ISOTROPIC_CONSTITUTIVE_MODEL<T,3>* icm, TV &f, TV &df, T 
     XX(z);
     XX(xi);
     XX(s);
-#define YY(k) {for(int i=1;i<=TV::m;i++){TV av=(h1.dd##k(i)+h0.dd##k(i))*df/2/e;TV dif=(h1.d##k.Transposed().Column(i)-h0.d##k.Transposed().Column(i))/e;const char*va=#k;sprintf(buff, "============ test ============ %s %8.5f %8.5f (%8.5f)\n", va, av.Magnitude(), dif.Magnitude(), (av-dif).Magnitude());LOG::cout<<buff;}}
-    YY(Q);
-    YY(u);
-    YY(g);
+    XX(Q);
+    XX(u);
+    XX(g);
  }
 //#####################################################################
 // Function Test_Model
