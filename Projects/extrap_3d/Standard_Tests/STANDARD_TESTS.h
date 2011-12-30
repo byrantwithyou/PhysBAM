@@ -499,8 +499,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             solids_parameters.triangle_collision_parameters.perform_self_collision=true;
             if (override_no_collisions) solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-            frame_rate=240;
-            last_frame=2000;
+            frame_rate=600;
+            last_frame=1500;
             break;
         case 52:
             solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness = 2e-4;
