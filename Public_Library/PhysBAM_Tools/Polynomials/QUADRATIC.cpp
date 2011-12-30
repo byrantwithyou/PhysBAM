@@ -59,9 +59,7 @@ template<class T> void QUADRATIC<T>::
 Compute_Roots_In_Interval(const T xmin,const T xmax)
 {
     Compute_Roots();
-    if(roots==1){
-        if(root1<xmin || root1>xmax) roots=0;
-        else{roots=2;root2=root1;}}
+    if(roots==1){if(root1<xmin || root1>xmax) roots=0;}
     else if(roots==2){
         if(root2<xmin || root2>xmax) roots--;
         if(root1<xmin || root1>xmax){
