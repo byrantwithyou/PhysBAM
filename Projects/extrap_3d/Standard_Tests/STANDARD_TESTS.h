@@ -2081,6 +2081,7 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
         std::cout << "rame!" <<      solids_parameters.triangle_collision_parameters.perform_self_collision << std::endl;   
         //solids_parameters.triangle_collision_parameters.perform_self_collision=self_collision_flipped;
         if (time <= 1.3) solids_parameters.triangle_collision_parameters.perform_self_collision = false;
+        std::cout << "rame!" <<      solids_parameters.triangle_collision_parameters.perform_self_collision << std::endl; 
     }
     if(test_number==31)
     {
@@ -2152,7 +2153,7 @@ void Update_Time_Varying_Material_Properties(const T time)
         icm.Update_Lame_Constants(young,pois,(T).01);
         solids_parameters.triangle_collision_parameters.perform_self_collision=override_collisions;        
        // solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append(deformable_body_collection.deformable_geometry.structures(1));
-        if(solids_parameters.triangle_collision_parameters.perform_self_collision) std::cout << "rame oh,rad!" << std::endl;
+        if(solids_parameters.triangle_collision_parameters.perform_self_collision) std::cout << "rame oh,rad!" << std::endl; else std::cout <<" rame oh, sad!" << std::endl;
     }
     }
 }
