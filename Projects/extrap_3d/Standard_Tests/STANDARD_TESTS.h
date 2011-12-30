@@ -2150,7 +2150,7 @@ void Update_Time_Varying_Material_Properties(const T time)
         T young = pow(10.0,end_young-(T)1.5);
         icm.Update_Lame_Constants(young,pois,(T).01);
         solids_parameters.triangle_collision_parameters.perform_self_collision=override_collisions;        
-       // solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append(deformable_body_collection.deformable_geometry.structures(1));
+        solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append(deformable_body_collection.deformable_geometry.structures(1));
         if(solids_parameters.triangle_collision_parameters.perform_self_collision) std::cout << "rame oh,rad!" << std::endl;
     }
     }
