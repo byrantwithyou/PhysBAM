@@ -70,6 +70,7 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/FINITE_VOLUME.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
+#include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/ETHER_DRAG.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/GRAVITY.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
@@ -142,13 +143,14 @@ public:
     bool energy_profile_plot;
     T energy_profile_plot_min,energy_profile_plot_range;
     T plot_scale;
+    T ether_drag;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),semi_implicit(false),test_forces(false),use_extended_neohookean(false),
         use_extended_neohookean_refined(false),use_extended_neohookean_hyperbola(false),use_extended_neohookean_smooth(false),use_corotated(false),
         use_corot_blend(false),use_corot_quartic(false),dump_sv(false),
         print_matrix(false),parameter(20),stiffness_multiplier(1),damping_multiplier(1),use_constant_ife(false),stretch(1),poissons_ratio((T).45),input_cutoff(FLT_MAX),input_efc(FLT_MAX),
-        input_poissons_ratio(-1),input_youngs_modulus(0),test_model_only(false),energy_mesh(0),energy_profile_plot(false),plot_scale(1)
+        input_poissons_ratio(-1),input_youngs_modulus(0),test_model_only(false),energy_mesh(0),energy_profile_plot(false),plot_scale(1),ether_drag(0)
     {
     }
 
@@ -248,6 +250,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Option_Argument("-plot_energy_density");
     parse_args->Add_Option_Argument("-test_system");
     parse_args->Add_Double_Argument("-plot_scale",1,"Scale height of energy plot");
+    parse_args->Add_Double_Argument("-ether_drag",0,"Ether drag");
 }
 //#####################################################################
 // Function Parse_Options
@@ -301,6 +304,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     plot_energy_density=parse_args->Get_Option_Value("-plot_energy_density");
     solids_parameters.implicit_solve_parameters.test_system=parse_args->Is_Value_Set("-test_system");
     plot_scale=(T)parse_args->Get_Double_Value("-plot_scale");
+    ether_drag=(T)parse_args->Get_Double_Value("-ether_drag");
 
     switch(test_number){
     case 20: case 21: case 26: 
@@ -514,15 +518,15 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 100:{
             TRIANGULATED_AREA<T>* ta=TRIANGULATED_AREA<T>::Create(particles);
             particles.array_collection->Add_Elements(9);
-            particles.X(1)=TV(1,0);
-            particles.X(2)=TV(0,1);
-            particles.X(3)=TV(0,0);
-            particles.X(4)=TV(1,0);
-            particles.X(5)=TV(0,1);
-            particles.X(6)=TV(0,0);
-            particles.X(7)=TV(1,0);
-            particles.X(8)=TV(0,1);
-            particles.X(9)=TV(0,0);
+            particles.X(1)=TV(-.5,0);
+            particles.X(2)=TV(.5,0);
+            particles.X(3)=TV(0,sqrt(3)/2);
+            particles.X(4)=TV(-.5,0);
+            particles.X(5)=TV(.5,0);
+            particles.X(6)=TV(0,sqrt(3)/2);
+            particles.X(7)=TV(-.5,0);
+            particles.X(8)=TV(.5,0);
+            particles.X(9)=TV(0,sqrt(3)/2);
             particles.mass.Fill(1);
             ta->mesh.elements.Append(VECTOR<int,3>(1,2,3));
             ta->mesh.elements.Append(VECTOR<int,3>(4,5,6));
@@ -633,6 +637,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 29: break;
         default:
             LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}
+
+    if(ether_drag) solid_body_collection.Add_Force(new ETHER_DRAG<GRID<TV> >(particles,rigid_body_collection,true,true,ether_drag,0));
 
     if(solid_body_collection.deformable_body_collection.mpi_solids)
         solid_body_collection.deformable_body_collection.mpi_solids->Simple_Partition(solid_body_collection.deformable_body_collection,solid_body_collection.rigid_body_collection.rigid_geometry_collection,particles.X,VECTOR<int,2>(2,1));
