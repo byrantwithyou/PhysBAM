@@ -35,6 +35,7 @@ Compute_Position_Based_State(const T dt,const T time)
 {
     for(int i=1;i<=joint_mesh.joints.m;i++) if(joint_mesh.joints(i)->joint_function) joint_mesh.joints(i)->joint_function->Compute_Desired_PD_Velocity(dt,time);
     if(use_muscle_actuators){
+        if(!muscle_list) muscle_list=new MUSCLE_LIST<TV>(rigid_body_collection);
         muscle_list->Initialize_Muscle_Attachments_On_Rigid_Body();
         // Only looks for muscles connecting parent-child across joint
         muscles_crossing_joints.Resize(joint_mesh.joints.m);

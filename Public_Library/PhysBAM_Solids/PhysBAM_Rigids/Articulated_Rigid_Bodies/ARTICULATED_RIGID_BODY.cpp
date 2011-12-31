@@ -38,7 +38,7 @@ namespace PhysBAM{
 //#####################################################################
 template<class TV> ARTICULATED_RIGID_BODY_BASE<TV>::
 ARTICULATED_RIGID_BODY_BASE(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input)
-    :breadth_first_directed_graph(0),rigid_body_collection(rigid_body_collection_input),joint_mesh(*new JOINT_MESH<TV>),muscle_list(new MUSCLE_LIST<TV>(rigid_body_collection)),iterative_tolerance((T)1e-5),
+    :breadth_first_directed_graph(0),rigid_body_collection(rigid_body_collection_input),joint_mesh(*new JOINT_MESH<TV>),muscle_list(0),iterative_tolerance((T)1e-5),
     poststabilization_iterations(5),max_iterations(1000),poststabilization_projection_iterations(4),use_epsilon_scale(true),contact_level_iterations(5),shock_propagation_level_iterations(5),
     actuation_iterations(50),line_search_interval_tolerance((T)1e-6),max_line_search_iterations(100),use_shock_propagation(true),do_final_pass(true),use_pd_actuators(false),
     use_muscle_actuators(false),enforce_nonnegative_activations(true),clamp_negative_activations(true),activation_optimization_iterations(50),global_post_stabilization(false),
@@ -103,7 +103,7 @@ Remove_All()
     muscle_activations.Remove_All();
     angular_momenta_save.Remove_All();
     linear_velocities_save.Remove_All();
-    muscle_list->Clean_Memory();
+    if(muscle_list) muscle_list->Clean_Memory();
     joint_mesh.Remove_All();
     if(breadth_first_directed_graph) breadth_first_directed_graph->Reset();
 }
@@ -502,7 +502,10 @@ Read(const STREAM_TYPE stream_type,const std::string& directory,const int frame)
         TYPED_ISTREAM typed_input(*input,stream_type);
         joint_mesh.Read(typed_input,directory,frame);
         last_read=local_frame;delete input;}
-    muscle_list->Read(stream_type,directory,frame);
+    std::string muscle_filename=STRING_UTILITIES::string_sprintf("%s/%d/muscle_list",directory.c_str(),frame);
+    if(FILE_UTILITIES::File_Exists(muscle_filename)){
+        if(!muscle_list) muscle_list=new MUSCLE_LIST<TV>(rigid_body_collection);
+        muscle_list->Read(stream_type,directory,frame);}
     std::string muscle_activations_filename=STRING_UTILITIES::string_sprintf("%s/%d/muscle_activations",directory.c_str(),frame);
     if(FILE_UTILITIES::File_Exists(muscle_activations_filename)) FILE_UTILITIES::Read_From_File(stream_type,muscle_activations_filename,muscle_activations);
 }
@@ -521,7 +524,7 @@ Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame
         TYPED_OSTREAM typed_output(*output,stream_type);
         joint_mesh.Write(typed_output,directory,frame);
         delete output;}
-    muscle_list->Write(stream_type,directory,frame);Output_Articulation_Points(stream_type,directory,frame);
+    if(muscle_list) muscle_list->Write(stream_type,directory,frame);Output_Articulation_Points(stream_type,directory,frame);
     if(muscle_activations.m>0) FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/muscle_activations",directory.c_str(),frame),muscle_activations);
 }
 //#####################################################################

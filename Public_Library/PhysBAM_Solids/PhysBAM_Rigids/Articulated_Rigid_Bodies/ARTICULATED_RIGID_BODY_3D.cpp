@@ -147,6 +147,7 @@ Compute_Position_Based_State(const T dt,const T time)
                         joint_muscle_control_matrix(joint_index_2).Transpose_Times(C.Transpose_Times(joint_constraint_matrix(joint_index_1))));}}}
 
     if(use_muscle_actuators){
+        if(!muscle_list) new MUSCLE_LIST<TV>(rigid_body_collection);
         muscle_list->Initialize_Muscle_Attachments_On_Rigid_Body();
         for(int i=1;i<=joint_mesh.joints.m;i++) if(joint_mesh.joints(i)->global_post_stabilization){
             int parent_id=Parent_Id(joint_mesh.joints(i)->id_number),child_id=Child_Id(joint_mesh.joints(i)->id_number);

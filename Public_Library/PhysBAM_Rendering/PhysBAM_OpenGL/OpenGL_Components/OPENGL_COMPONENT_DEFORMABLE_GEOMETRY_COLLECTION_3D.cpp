@@ -124,7 +124,9 @@ Reinitialize(bool force,bool read_geometry)
                 segmented_curve_objects(i)=new OPENGL_SEGMENTED_CURVE_3D<T>(*segmented_curve,OPENGL_COLOR((T).5,(T).25,0));
                 segmented_curve_objects(i)->use_solid_color=false;}
             else if(TRIANGULATED_SURFACE<T>* triangulated_surface=dynamic_cast<TRIANGULATED_SURFACE<T>*>(structure)){
-                if(first_time) LOG::cout<<"object "<<i<<": triangulated surface, range = "<<triangulated_surface->mesh.elements.Flattened().Min()<<" "<<triangulated_surface->mesh.elements.Flattened().Max()<<"\n";
+                if(first_time && triangulated_surface->mesh.elements.m)
+                    LOG::cout<<"object "<<i<<": triangulated surface, range = "<<triangulated_surface->mesh.elements.Flattened().Min()<<" "<<triangulated_surface->mesh.elements.Flattened().Max()<<"\n";
+                else LOG::cout<<"object "<<i<<": triangulated surface, empty\n";
                 triangulated_surface->mesh.Initialize_Segment_Mesh();
                 ARRAY<OPENGL_COLOR> front_colors,back_colors;
                 front_colors.Append(OPENGL_COLOR::Yellow());back_colors.Append(OPENGL_COLOR::Magenta());
@@ -132,7 +134,9 @@ Reinitialize(bool force,bool read_geometry)
                 triangulated_surface_objects(i)=new OPENGL_TRIANGULATED_SURFACE<T>(*triangulated_surface,false,
                     OPENGL_MATERIAL::Metal(front_colors((i-1)%front_colors.Size()+1)),OPENGL_MATERIAL::Metal(back_colors((i-1)%back_colors.Size()+1)));}
             else if(TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(structure)){
-                if(first_time) LOG::cout<<"object "<<i<<": tetrahedralized_volume, range = "<<tetrahedralized_volume->mesh.elements.Flattened().Min()<<" "<<tetrahedralized_volume->mesh.elements.Flattened().Max()<<"\n";
+                if(first_time && tetrahedralized_volume->mesh.elements.m)
+                    LOG::cout<<"object "<<i<<": tetrahedralized_volume, range = "<<tetrahedralized_volume->mesh.elements.Flattened().Min()<<" "<<tetrahedralized_volume->mesh.elements.Flattened().Max()<<"\n";
+                else LOG::cout<<"object "<<i<<": tetrahedralized_volume, empty\n";
                 tetrahedralized_volume_objects(i)=new OPENGL_TETRAHEDRALIZED_VOLUME<T>(&tetrahedralized_volume->mesh,&(deformable_geometry->particles),
                     OPENGL_MATERIAL::Metal(OPENGL_COLOR::Red(.7f)),OPENGL_MATERIAL::Metal(OPENGL_COLOR::Green(.7f)));}
             else if(HEXAHEDRALIZED_VOLUME<T>* hexahedralized_volume=dynamic_cast<HEXAHEDRALIZED_VOLUME<T>*>(structure)){

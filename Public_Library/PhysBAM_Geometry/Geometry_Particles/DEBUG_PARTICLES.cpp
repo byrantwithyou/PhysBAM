@@ -41,7 +41,6 @@ Store_Debug_Particles(GEOMETRY_PARTICLES<TV>* particle)
 template<class TV> void DEBUG_PARTICLES<TV>::
 Write_Debug_Particles(STREAM_TYPE stream_type,const std::string& output_directory,int frame) const
 {
-    if(frame>0 && !debug_particles.X.m) return;
     FILE_UTILITIES::Create_Directory(STRING_UTILITIES::string_sprintf("%s/%i",output_directory.c_str(),frame));
     FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%i/debug_particles",output_directory.c_str(),frame),debug_particles);
     debug_particles.array_collection->Delete_All_Elements();

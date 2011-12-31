@@ -269,9 +269,6 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_IS
 template<class T,int d> void MOONEY_RIVLIN_3D_EXTRAPOLATED<T,d>::
 Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dP_dF,const int triangle) const
 {
- //   T x = F.x11;
-   // T y = F.x22;
-   // T z = F.x33;
     
     T s1 = F.x11;
     T s2 = F.x22;
@@ -280,21 +277,11 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_IS
     T dx = s1 - extrapolation_cutoff;
     T dy = s2 - extrapolation_cutoff;
     T dz = s3 - extrapolation_cutoff;
-
-//    T mu = constant_mu;
- //   T la = constant_lambda;
     
     T a = extrapolation_cutoff;
     T k = extra_force_coefficient*youngs_modulus;
     T kap = kappa;
     T m10 = mu_10; T m01=mu_01;
-    
-/*    T xpy = x+y; if (fabs(xpy)<panic_threshold) xpy=xpy<0?-panic_threshold:panic_threshold;
-    T xmy = x-y; if (fabs(xmy)<panic_threshold) xmy=xmy<0?-panic_threshold:panic_threshold;
-    T xpz = x+z; if (fabs(xpz)<panic_threshold) xpz=xpz<0?-panic_threshold:panic_threshold;
-    T xmz = x-z; if (fabs(xmz)<panic_threshold) xmz=xmz<0?-panic_threshold:panic_threshold;
-    T ypz = y+z; if (fabs(ypz)<panic_threshold) ypz=ypz<0?-panic_threshold:panic_threshold;
-    T ymz = y-z; if (fabs(ymz)<panic_threshold) ymz=ymz<0?-panic_threshold:panic_threshold;*/
     
     T s1ms3 = s1-s3; if(fabs(s1ms3)<panic_threshold) {s1=s1+1*panic_threshold; s3=s3+3*panic_threshold; s1ms3=s1-s3;}
     T s2ms3 = s2-s3; if(fabs(s2ms3)<panic_threshold) {s2=s2+2*panic_threshold; s3=s3+3*panic_threshold; s2ms3=s2-s3;}
@@ -305,9 +292,6 @@ Isotropic_Stress_Derivative_Helper(const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_IS
 
     if ((dx >= 0) && (dy >= 0) && (dz >= 0)) // R
     {
-      //  DIAGONAL_MATRIX<T,3> F_inverse=F.Inverse();
-      //  T mu_minus_lambda_logJ=constant_mu+constant_lambda*log(F_inverse.Determinant());
-        //SYMMETRIC_MATRIX<T,3> F_inverse_outer=SYMMETRIC_MATRIX<T,3>::Outer_Product(F_inverse.To_Vector());
 
         dP_dF.x1111 = (1.0/(s1*s1*s1)*(kap*s1*s2*pow(s1*s2*s3,1.0/3.0)*9.0-kap*s1*s2*log(s1*s2*s3)*pow(s1*s2*s3,1.0/3.0)*9.0)*1.0/pow(s1*s2*s3,1.0/3.0)*(1.0/9.0))/s2+(1.0/(s1*s1*s1)*s3*(m01*(s1*s1)*-2.0+m01*(s2*s2)*2.8E1+m10*pow(s1*s2*s3,2.0/3.0)*1.0E1)*1.0/pow(s1*s2*s3,1.0/3.0)*(1.0/9.0))/s2+(1.0/(s1*s1*s1)*(m01*(s1*s1)*(s2*s2)*-2.0+m10*(s1*s1)*pow(s1*s2*s3,2.0/3.0)*4.0+m10*(s2*s2)*pow(s1*s2*s3,2.0/3.0)*1.0E1)*1.0/pow(s1*s2*s3,1.0/3.0)*(1.0/9.0))/(s2*s3);
         dP_dF.x2222 = kap*1.0/(s2*s2)-kap*1.0/(s2*s2)*log(s1*s2*s3)+m01*(s1*s1*s1*s1)*(s3*s3*s3*s3)*1.0/pow(s1*s2*s3,1.0E1/3.0)*(2.8E1/9.0)+m10*(s1*s1)*(s3*s3*s3*s3)*1.0/pow(s1*s2*s3,8.0/3.0)*(1.0E1/9.0)+m10*(s1*s1*s1*s1)*(s3*s3)*1.0/pow(s1*s2*s3,8.0/3.0)*(1.0E1/9.0)-m01*(s1*s1)*(s2*s2)*(s3*s3*s3*s3)*1.0/pow(s1*s2*s3,1.0E1/3.0)*(2.0/9.0)-m01*(s1*s1*s1*s1)*(s2*s2)*(s3*s3)*1.0/pow(s1*s2*s3,1.0E1/3.0)*(2.0/9.0)+m10*(s1*s1)*(s2*s2)*(s3*s3)*1.0/pow(s1*s2*s3,8.0/3.0)*(4.0/9.0);

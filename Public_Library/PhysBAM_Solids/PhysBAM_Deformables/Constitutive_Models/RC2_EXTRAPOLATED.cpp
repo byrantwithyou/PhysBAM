@@ -263,7 +263,7 @@ Compute_E(const GENERAL_ENERGY<T>& base,T k,T extrapolation_cutoff,const TV& f,c
     H=base.ddE(Q,simplex);
     Hu=H*u;
     uHu=TV::Dot_Product(u,Hu);
-    E=phi+h*TV::Dot_Product(g,u)+(T).5*k*sqr(h)+0.5*sqr(h)*uHu;
+    E=phi+h*TV::Dot_Product(g,u)+(T)(1.0/3.0)*k*cube(h)+(T)0.5*sqr(h)*uHu;
     return true;
 }
 //#####################################################################
@@ -282,7 +282,7 @@ Compute_dE(const GENERAL_ENERGY<T>& base,T k,const TV& f,const int simplex)
     du=MATRIX<T,d>::Outer_Product(fm1,dm)+m;
     dg=H*dQ;
     dh=((T)1-dQ).Transpose_Times(u)+du.Transpose_Times(f-Q);
-    dE=dphi+dh*TV::Dot_Product(g,u)+h*dg.Transpose_Times(u)+h*du.Transpose_Times(g)+k*h*dh;
+    dE=dphi+dh*TV::Dot_Product(g,u)+h*dg.Transpose_Times(u)+h*du.Transpose_Times(g)+k*sqr(h)*dh;
 
     dE+=uHu*h*dh;
     base.dddE(Q,simplex,&TT(1));
@@ -323,7 +323,7 @@ Compute_ddE(const GENERAL_ENERGY<T>& base,T k,const TV& f,const int simplex)
     for(int i=1; i<=d; i++) ddh+=(f(i)-Q(i))*ddu(i)-ddQ(i)*u(i);
     ddE=ddphi+TV::Dot_Product(g,u)*ddh+MATRIX<T,d>::Outer_Product(dh*2,dg.Transpose_Times(u)).Symmetric_Part();
     ddE+=MATRIX<T,d>::Outer_Product(dh*2,du.Transpose_Times(g)).Symmetric_Part();
-    ddE+=2*h*dg.Transpose_Times(du).Symmetric_Part()+k*SYMMETRIC_MATRIX<T,d>::Outer_Product(dh)+k*h*ddh;
+    ddE+=2*h*dg.Transpose_Times(du).Symmetric_Part()+k*2*h*SYMMETRIC_MATRIX<T,d>::Outer_Product(dh)+k*sqr(h)*ddh;
     for(int i=1; i<=d; i++) ddE+=h*g(i)*ddu(i)+h*ddg(i)*u(i);
 
     ddE+=uHu*SYMMETRIC_MATRIX<T,d>::Outer_Product(dh);

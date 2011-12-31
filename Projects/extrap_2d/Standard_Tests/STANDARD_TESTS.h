@@ -26,6 +26,7 @@
 //  31. Triangle stretch
 //  32. Triangle stretch (II)
 //  33. Tangle plot
+//  100. Primary contour field
 //#####################################################################
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
@@ -39,6 +40,8 @@
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SMOOTH_GEAR.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
+#include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+#include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_STRUCTURE.h>
 #include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
@@ -133,13 +136,19 @@ public:
     T input_poissons_ratio,input_youngs_modulus;
     bool test_model_only;
     bool plot_energy_density;
+    GEOMETRY_PARTICLES<VECTOR<T,3> > energy_particles;
+    TRIANGULATED_SURFACE<T>* energy_mesh;
+    std::string dual_directory;
+    bool energy_profile_plot;
+    T energy_profile_plot_min,energy_profile_plot_range;
+    T plot_scale;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),semi_implicit(false),test_forces(false),use_extended_neohookean(false),
         use_extended_neohookean_refined(false),use_extended_neohookean_hyperbola(false),use_extended_neohookean_smooth(false),use_corotated(false),
         use_corot_blend(false),use_corot_quartic(false),dump_sv(false),
         print_matrix(false),parameter(20),stiffness_multiplier(1),damping_multiplier(1),use_constant_ife(false),stretch(1),poissons_ratio((T).45),input_cutoff(FLT_MAX),input_efc(FLT_MAX),
-        input_poissons_ratio(-1),input_youngs_modulus(0),test_model_only(false)
+        input_poissons_ratio(-1),input_youngs_modulus(0),test_model_only(false),energy_mesh(0),energy_profile_plot(false),plot_scale(1)
     {
     }
 
@@ -148,6 +157,7 @@ public:
     {
         if(dump_sv) svout.close();
         if(scatter_plot) Dump_Scatter_Plot(frame);
+        if(energy_profile_plot) Energy_Profile_Plot(frame);
     }
     void Postprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE {}
     void Apply_Constraints(const T dt,const T time) PHYSBAM_OVERRIDE {}
@@ -176,7 +186,11 @@ public:
             }
         }
         if(scatter_plot) Update_Scatter_Plot();
+        if(energy_profile_plot){
+            FINITE_VOLUME<TV,2>& force_field=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,2>&>();
+            for(int i=1; i<=force_field.Fe_hat.m; i++) Add_Debug_Particle(force_field.Fe_hat(i).To_Vector(),VECTOR<T,3>(1,1,0));}
     }
+
     void Align_Deformable_Bodies_With_Rigid_Bodies() PHYSBAM_OVERRIDE {}
     void Set_External_Positions(ARRAY_VIEW<TV> X,ARRAY_VIEW<ROTATION<TV> > rotation,const T time) PHYSBAM_OVERRIDE {}
     void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
@@ -220,6 +234,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Option_Argument("-use_constant_ife","use constant extrapolation on inverting finite element fix");
     parse_args->Add_Double_Argument("-stretch",1,"stretch");
     parse_args->Add_Option_Argument("-plot_contour","plot primary contour");
+    parse_args->Add_Option_Argument("-energy_profile_plot","plot energy profiles");
     parse_args->Add_Integer_Argument("-image_size",500,"image size for plots");
     parse_args->Add_Double_Argument("-sigma_range",5,"sigma range for plots");
     parse_args->Add_Double_Argument("-poissons_ratio",.45,"poisson's ratio");
@@ -232,6 +247,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Option_Argument("-test_model_only");
     parse_args->Add_Option_Argument("-plot_energy_density");
     parse_args->Add_Option_Argument("-test_system");
+    parse_args->Add_Double_Argument("-plot_scale",1,"Scale height of energy plot");
 }
 //#####################################################################
 // Function Parse_Options
@@ -280,22 +296,24 @@ void Parse_Options() PHYSBAM_OVERRIDE
     if(parse_args->Is_Value_Set("-efc")) input_efc=(T)parse_args->Get_Double_Value("-efc");
     if(parse_args->Is_Value_Set("-poissons_ratio")) input_poissons_ratio=(T)parse_args->Get_Double_Value("-poissons_ratio");
     if(parse_args->Is_Value_Set("-youngs_modulus")) input_youngs_modulus=(T)parse_args->Get_Double_Value("-youngs_modulus");
+    energy_profile_plot=parse_args->Get_Option_Value("-energy_profile_plot");
     test_model_only=parse_args->Get_Option_Value("-test_model_only");
     plot_energy_density=parse_args->Get_Option_Value("-plot_energy_density");
     solids_parameters.implicit_solve_parameters.test_system=parse_args->Is_Value_Set("-test_system");
+    plot_scale=(T)parse_args->Get_Double_Value("-plot_scale");
 
     switch(test_number){
     case 20: case 21: case 26: 
 	    mattress_grid=GRID<TV>(40,8,(T)-2,(T)2,(T)-.4,(T).4);
 	break;
         case 22: case 23: case 24: case 25: case 27: case 30:
-	    mattress_grid=GRID<TV>(parameter,parameter,(T)-.9,(T).9,(T)-.9,(T).9);
+	    mattress_grid=GRID<TV>(parameter?parameter+1:11,parameter?parameter+1:11,(T)-.9,(T).9,(T)-.9,(T).9);
 	break;
         case 28: 
             mattress_grid=GRID<TV>(80,16,(T)-2,(T)2,(T)-.4,(T).4);
             break;
     	default:
-            mattress_grid=GRID<TV>(20,10,(T)-1,(T)1,(T)-.5,(T).5);
+            mattress_grid=GRID<TV>(parameter?parameter+1:11,parameter?parameter+1:11,(T)-1,(T)1,(T)-1,(T)1);
             break;
     }
 
@@ -333,7 +351,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             attachment_velocity=TV((T).8,0);
 	    last_frame=480;
             break;	 
-        case 27: case 270: case 30: case 31: case 32: case 33:
+        case 27: case 270: case 30: case 31: case 32: case 33: case 100:
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=900;
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
@@ -493,6 +511,28 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(ta);
             particles.mass.Fill(1);
             break;}
+        case 100:{
+            TRIANGULATED_AREA<T>* ta=TRIANGULATED_AREA<T>::Create(particles);
+            particles.array_collection->Add_Elements(9);
+            particles.X(1)=TV(1,0);
+            particles.X(2)=TV(0,1);
+            particles.X(3)=TV(0,0);
+            particles.X(4)=TV(1,0);
+            particles.X(5)=TV(0,1);
+            particles.X(6)=TV(0,0);
+            particles.X(7)=TV(1,0);
+            particles.X(8)=TV(0,1);
+            particles.X(9)=TV(0,0);
+            particles.mass.Fill(1);
+            ta->mesh.elements.Append(VECTOR<int,3>(1,2,3));
+            ta->mesh.elements.Append(VECTOR<int,3>(4,5,6));
+            ta->mesh.elements.Append(VECTOR<int,3>(7,8,9));
+            solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(ta);
+            contrail_colors.Append(VECTOR<T,3>(1,0,0));
+            contrail_colors.Append(VECTOR<T,3>(0,1,0));
+            contrail_colors.Append(VECTOR<T,3>(0,0,1));
+            contrail.Resize(contrail_colors.m);
+            break;}
         default:
             LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}
 
@@ -517,8 +557,22 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
             Add_Constitutive_Model(triangulated_area,(T)1e2,poissons_ratio,(T).05);
             if(test_number==32) particles.X(1).x=stretch;
+            if(test_number==100)
             break;}
-        case 8: 
+        case 100:{
+            for(int i=1;TRIANGULATED_AREA<T>* triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>*>(i);i++)
+                Add_Constitutive_Model(*triangulated_area,(T)1e2,poissons_ratio,(T).05);
+            particles.X(1)=TV(4.2,1.2);
+            particles.X(2)=TV(3.6,1.5);
+            particles.X(3)=TV(3.6,1.2);
+            particles.X(4)=TV(4.3,-1.8);
+            particles.X(5)=TV(3.2,1.2);
+            particles.X(6)=TV(3.2,-1.8);
+            particles.X(7)=TV(5.2,-3);
+            particles.X(8)=TV(3.2,-2.8);
+            particles.X(9)=TV(3.2,-3);
+            break;}
+        case 8:
         case 16:
         case 23:
         case 13:{
@@ -786,6 +840,7 @@ void Preprocess_Frame(const int frame)
         }
     }
     if(test_number==33) Plot_Energy_Landscape();
+    if(test_number==100) Plot_Contour_Landscape();
     if(test_number==33 && frame==2)
     {
         PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
@@ -818,7 +873,7 @@ void Add_Constitutive_Model(TRIANGULATED_AREA<T>& triangulated_area,T stiffness,
     else if(use_corot_blend) icm=new NEO_HOOKEAN_COROTATED_BLEND<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
     else if(use_corot_quartic) icm=new COROTATED_QUARTIC<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
     else{
-        NEO_HOOKEAN<T,2>* nh=new NEO_HOOKEAN<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
+        NEO_HOOKEAN<T,2>* nh=new NEO_HOOKEAN<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff);
         icm=nh;
 
         nh->use_constant_ife=use_constant_ife;}
@@ -828,7 +883,7 @@ void Add_Constitutive_Model(TRIANGULATED_AREA<T>& triangulated_area,T stiffness,
 
     if(plot_energy_density) Plot_Energy_Density(icm,stiffness);
     if(primary_contour) Primary_Contour(*icm);
-    if(scatter_plot) Add_Primary_Contour_Segments(*icm);
+    if(scatter_plot || test_number==100) Add_Primary_Contour_Segments(*icm);
     if(test_model_only) Test_Model(*icm);
 }
 //#####################################################################
@@ -1063,7 +1118,7 @@ void Add_Primary_Contour_Segments(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>& icm)
             if(c1x>=0 && cx1>=0) contour_segments.Append(VECTOR<TV,2>(Y1x,Yx1));}
 }
 //#####################################################################
-// Function Plot_Energy_Landscape
+// Function Plot_Energy_Density
 //#####################################################################
 void Plot_Energy_Density(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>* icm,T stiffness)
 {
@@ -1115,6 +1170,98 @@ void Plot_Energy_Landscape()
         Add_Debug_Particle(X(i),mp(E(i)));
         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,N(i));}
     particles.X=TX;
+}
+//#####################################################################
+// Function Plot_Contour_Landscape
+//#####################################################################
+void Plot_Contour_Landscape()
+{
+    FINITE_VOLUME<TV,2>& fv=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,2>&>();
+    ISOTROPIC_CONSTITUTIVE_MODEL<T,2>* icm=fv.isotropic_model;
+    bool is_neo=dynamic_cast<NEO_HOOKEAN<T,2>*>(icm);
+    for(int i=-image_size/2;i<=image_size/2;i++)
+        for(int j=-image_size/2;j<=image_size/2;j++){
+            if(is_neo && (i<=0 || j<=0)) continue;
+            TV X(2*sigma_range*i/image_size+1.1e-5,2*sigma_range*j/image_size+1.2e-5);
+            DIAGONAL_MATRIX<T,2> F(X),P=icm->P_From_Strain(F,1,0)*plot_scale;
+            Add_Debug_Particle(X,VECTOR<T,3>(.5,.5,.5));
+            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,-P.To_Vector().Normalized());}
+
+    for(int i=1;i<=fv.Fe_hat.m;i++){
+        contrail(i).Append(fv.Fe_hat(i).To_Vector());
+        for(int j=1;j<=contrail(i).m;j++)
+            Add_Debug_Particle(contrail(i)(j),contrail_colors(i));}
+
+    for(int i=1;i<=contour_segments.m;i++){
+        if(is_neo && (contour_segments(i).x.Max()<.2 || contour_segments(i).y.Max()<.2)) continue;
+        Add_Debug_Particle(contour_segments(i).x,VECTOR<T,3>(1,1,0));
+        Add_Debug_Particle(contour_segments(i).y,VECTOR<T,3>(1,1,0));}
+}
+//#####################################################################
+// Function Energy_Profile_Plot
+//#####################################################################
+void Energy_Profile_Plot(int frame)
+{
+    if(!dual_directory.length()) dual_directory=output_directory+"/dual_output";
+
+    if(this->write_first_frame && frame==this->first_frame) FILE_UTILITIES::Write_To_Text_File(dual_directory+"/common/first_frame",frame,"\n");
+
+    ISOTROPIC_CONSTITUTIVE_MODEL<T,2>* icm = solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,2>&>().isotropic_model;
+    if(!energy_mesh){
+        energy_particles.Store_Velocity(true);
+        TRIANGULATED_AREA<T> ta(*new TRIANGLE_MESH,*new GEOMETRY_PARTICLES<TV>);
+        ta.Initialize_Square_Mesh_And_Particles(GRID<TV>(2+image_size+1,2+image_size+1,-sigma_range,sigma_range,-sigma_range,sigma_range),false);
+
+        energy_mesh=new TRIANGULATED_SURFACE<T>(ta.mesh,*new PARTICLES<VECTOR<T,3> >);
+        energy_mesh->particles.array_collection->Add_Elements(ta.particles.X.m);
+        for(int i=1;i<=ta.particles.X.m;i++){
+            TV X=ta.particles.X(i);
+            X.x+=1.1e-4;
+            X.y+=2.3e-4;
+            TV Z=X;
+            if((fabs(Z.x)>fabs(Z.y)?Z.x:Z.y)<0) Z=-Z;
+            VECTOR<T,3> Y(X.x,X.y,icm->Energy_Density(DIAGONAL_MATRIX<T,2>(Z),0));
+            energy_mesh->particles.X(i)=Y;}
+
+        PROJECTED_ARRAY<ARRAY_VIEW<VECTOR<T,3>,int>,FIELD_PROJECTOR<VECTOR<T,3>,T,&VECTOR<T,3>::z> > pa=energy_mesh->particles.X.template Project<T,&VECTOR<T,3>::z>();
+        pa-=energy_profile_plot_min=pa.Min();
+        energy_profile_plot_range=pa.Max();
+        pa*=plot_scale;}
+
+    FILE_UTILITIES::Create_Directory(dual_directory);
+    std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
+    FILE_UTILITIES::Create_Directory(dual_directory+"/"+f);
+    FILE_UTILITIES::Create_Directory(dual_directory+"/common");
+
+    LOG::cout<<this->debug_particles.debug_particles.X.m<<std::endl;
+    energy_particles.array_collection->Add_Elements(this->debug_particles.debug_particles.X.m);
+    LOG::cout<<energy_particles.X.m<<std::endl;
+    for(int i=1;i<=energy_particles.X.m;i++){
+        TV X=this->debug_particles.debug_particles.X(i);
+        DIAGONAL_MATRIX<T,2> F(X),P=icm->P_From_Strain(F,1,0)*plot_scale;
+        energy_particles.X(i)=X.Append((icm->Energy_Density(F,0)-energy_profile_plot_min)*plot_scale+1e-2);
+        energy_particles.V(i)=-P.To_Vector().Append(P.To_Vector().Magnitude_Squared()).Normalized();}
+
+    FILE_UTILITIES::Create_Directory(STRING_UTILITIES::string_sprintf("%s/%i",dual_directory.c_str(),frame));
+    FILE_UTILITIES::Write_To_File(this->stream_type,STRING_UTILITIES::string_sprintf("%s/%i/debug_particles",dual_directory.c_str(),frame),energy_particles);
+    energy_particles.array_collection->Delete_All_Elements();
+
+    FILE_UTILITIES::Write_To_File(this->stream_type,dual_directory+"/"+FILE_UTILITIES::Number_To_String(frame)+"/deformable_object_particles",energy_mesh->particles);
+    if(frame==1 || (this->restart && frame==this->first_frame)){
+        FILE_UTILITIES::Create_Directory(STRING_UTILITIES::string_sprintf("%s/%i",dual_directory.c_str(),0));
+        FILE_UTILITIES::Write_To_File(this->stream_type,STRING_UTILITIES::string_sprintf("%s/%i/debug_particles",dual_directory.c_str(),0),energy_particles);
+        FILE_UTILITIES::Write_To_File(this->stream_type,dual_directory+"/0/deformable_object_particles",energy_mesh->particles);
+        std::string f="common";
+        std::ostream* output_raw=FILE_UTILITIES::Safe_Open_Output(dual_directory+"/"+f+"/deformable_object_structures");
+        TYPED_OSTREAM output(*output_raw,this->stream_type);
+        Write_Binary(output,1);
+        if(!this->stream_type.use_doubles) Read_Write<STRUCTURE<VECTOR<T,3> >,float>::Write_Structure(*output_raw,*energy_mesh);
+#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
+        else Read_Write<STRUCTURE<VECTOR<T,3> >,double>::Write_Structure(*output_raw,*energy_mesh);
+#endif
+        delete output_raw;}
+
+    FILE_UTILITIES::Write_To_Text_File(dual_directory+"/common/last_frame",frame,"\n");
 }
 //#####################################################################
 };
