@@ -89,16 +89,11 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/ST_VENANT_KIRCHHOFF.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/SVK_EXTRAPOLATED.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/FINITE_VOLUME.h>
-/*#include <PhysBAM_Solids/PhysBAM_Rigids/Joints/JOINT.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Joints/ANGLE_JOINT.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Joints/JOINT_MESH.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Joints/POINT_JOINT.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Joints/RIGID_JOINT.h>*/
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Bindings/RIGID_BODY_BINDING.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Collisions/RIGID_DEFORMABLE_COLLISIONS.h>
+#include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/ETHER_DRAG.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/GRAVITY.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
@@ -166,12 +161,13 @@ public:
     T input_friction;
     T J_min,J_max,la_min;
     bool test_model_only;
+    T ether_drag;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),semi_implicit(false),test_forces(false),use_extended_neohookean(false),use_extended_neohookean2(false),
         use_extended_neohookean_refined(false),use_extended_neohookean_hyperbola(false),use_extended_neohookean_smooth(false),use_extended_svk(false),
         use_corotated(false),use_corot_blend(false),dump_sv(false),print_matrix(false),use_constant_ife(false),input_cutoff(FLT_MAX),input_efc(FLT_MAX),input_poissons_ratio(-1),input_youngs_modulus(0),
-        J_min(0),J_max((T).1),la_min(0),test_model_only(false)
+        J_min(0),J_max((T).1),la_min(0),test_model_only(false),ether_drag(0)
     {
     }
 
@@ -267,6 +263,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Double_Argument("-jb",.4,"J to start interpolating");
     parse_args->Add_Double_Argument("-lb",-.1,"final poisson's ratio");
     parse_args->Add_Option_Argument("-test_model_only");
+    parse_args->Add_Double_Argument("-ether_drag",0,"Ether drag");
 }
 //#####################################################################
 // Function Parse_Options
@@ -363,6 +360,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     J_max=(T)parse_args->Get_Double_Value("-jb");
     la_min=(T)parse_args->Get_Double_Value("-lb");
     test_model_only=parse_args->Get_Option_Value("-test_model_only");
+    ether_drag=(T)parse_args->Get_Double_Value("-ether_drag");
     
     semi_implicit=parse_args->Is_Value_Set("-semi_implicit");
     if(parse_args->Is_Value_Set("-project_nullspace")) solids_parameters.implicit_solve_parameters.project_nullspace_frequency=1;
@@ -1840,6 +1838,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             break;}
         default:
             LOG::cerr<<"Missing bodies implementation for test number "<<test_number<<std::endl;exit(1);}
+
+    if(ether_drag) solid_body_collection.Add_Force(new ETHER_DRAG<GRID<TV> >(particles,solid_body_collection.rigid_body_collection,true,true,ether_drag,0));
 
     if(solid_body_collection.deformable_body_collection.mpi_solids){
         VECTOR<int,3> processes_per_dimension(2,1,1);
