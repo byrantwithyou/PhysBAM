@@ -8,6 +8,7 @@
 #include <PhysBAM_Geometry/Basic_Geometry/BOUNDED_HORIZONTAL_PLANE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/CYLINDER.h>
 #include <PhysBAM_Geometry/Basic_Geometry/RING.h>
+#include <PhysBAM_Geometry/Basic_Geometry/BOWL.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SMOOTH_GEAR.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TORUS.h>
@@ -20,6 +21,7 @@
 #include <PhysBAM_Geometry/Tessellation/IMPLICIT_OBJECT_TESSELLATION.h>
 #include <PhysBAM_Geometry/Tessellation/RANGE_TESSELLATION.h>
 #include <PhysBAM_Geometry/Tessellation/RING_TESSELLATION.h>
+#include <PhysBAM_Geometry/Tessellation/BOWL_TESSELLATION.h>
 #include <PhysBAM_Geometry/Tessellation/SPHERE_TESSELLATION.h>
 #include <PhysBAM_Geometry/Tessellation/TORUS_TESSELLATION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
@@ -238,6 +240,21 @@ Add_Analytic_Shell(const T height,const T outer_radius,const T inner_radius,int 
     RING<T> ring(TV(0,0,-height/2),TV(0,0,height/2),outer_radius,inner_radius);
     rigid_body.Add_Structure(*new ANALYTIC_IMPLICIT_OBJECT<RING<T> >(ring));
     rigid_body.Add_Structure(*TESSELLATION::Generate_Triangles(ring,resolution));
+    rigid_body_collection.Add_Rigid_Body_And_Geometry(&rigid_body);
+    return rigid_body;
+}
+//#####################################################################
+// Function Add_Analytic_Bowl
+//#####################################################################
+template<class TV> RIGID_BODY<TV>& RIGIDS_STANDARD_TESTS<TV>::
+Add_Analytic_Bowl(const T height,const T outer_radius,const T inner_radius,int resolution)
+{
+    RIGID_BODY<TV>& rigid_body=*new RIGID_BODY<TV>(rigid_body_collection,true);
+
+    BOWL<T> bowl(TV(0,0,0),height,outer_radius,inner_radius);
+    rigid_body.Add_Structure(*new ANALYTIC_IMPLICIT_OBJECT<BOWL<T> >(bowl));
+    rigid_body.Add_Structure(*TESSELLATION::Generate_Triangles(bowl,resolution));
+
     rigid_body_collection.Add_Rigid_Body_And_Geometry(&rigid_body);
     return rigid_body;
 }
