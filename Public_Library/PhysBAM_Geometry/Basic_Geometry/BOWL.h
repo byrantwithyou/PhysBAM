@@ -39,7 +39,7 @@ public:
         TV radial;           // from cylindric coordinates 
         VECTOR<T,2> dX;      // position on vertical slice *relative* to the concentric quarter-circles center
         T dr;
-        T signed_distance;
+        T signed_distance,c1,c2;
     };
 
 //#####################################################################
