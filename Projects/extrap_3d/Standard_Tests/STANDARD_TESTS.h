@@ -1157,7 +1157,7 @@ void Get_Initial_Data()
             T rounded_innterior_radius=0.02;
             T vertical_straight_length=0.08;
             T thickness=0.01;
-            T coefficient_of_friction=0.1;
+            T coefficient_of_friction=0.3;
             RIGID_BODY<TV>& rounding=tests.Add_Analytic_Bowl(flat_bottom_radius,rounded_innterior_radius,thickness,128,32);
             rounding.coefficient_of_friction = coefficient_of_friction;
             rounding.Rotation()=ROTATION<TV>((T)pi,TV(1,0,0));
@@ -1171,12 +1171,13 @@ void Get_Initial_Data()
             walls.is_static=true;
 
             RIGID_BODY<TV>& bottom=tests.Add_Analytic_Cylinder(thickness,flat_bottom_radius+rounded_innterior_radius+thickness,128);
+            bottom.coefficient_of_friction = coefficient_of_friction;
             bottom.Rotation()=ROTATION<TV>((T)pi/2,TV(1,0,0));
             bottom.X()=TV(0,thickness/2,0);
             bottom.is_static=true;
 
             int count = 0;
-            for (int i=1; i<=10; i++)
+            for (int i=1; i<=25; i++)
             {
                 count++;
                 jello_centers.Append(TV(i*0.05,50,0));
