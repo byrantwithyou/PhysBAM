@@ -247,13 +247,13 @@ Add_Analytic_Shell(const T height,const T outer_radius,const T inner_radius,int 
 // Function Add_Analytic_Bowl
 //#####################################################################
 template<class TV> RIGID_BODY<TV>& RIGIDS_STANDARD_TESTS<TV>::
-Add_Analytic_Bowl(const T height,const T outer_radius,const T inner_radius,int resolution)
+Add_Analytic_Bowl(const T hole_radius,const T depth,const T thickness,int res_radial, int res_vertical)
 {
     RIGID_BODY<TV>& rigid_body=*new RIGID_BODY<TV>(rigid_body_collection,true);
 
-    BOWL<T> bowl(TV(0,0,0),height,outer_radius,inner_radius);
+    BOWL<T> bowl(hole_radius,depth,thickness);
     rigid_body.Add_Structure(*new ANALYTIC_IMPLICIT_OBJECT<BOWL<T> >(bowl));
-    rigid_body.Add_Structure(*TESSELLATION::Generate_Triangles(bowl,resolution));
+    rigid_body.Add_Structure(*TESSELLATION::Generate_Triangles(bowl,res_radial,res_vertical));
 
     rigid_body_collection.Add_Rigid_Body_And_Geometry(&rigid_body);
     return rigid_body;
@@ -363,6 +363,7 @@ template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::
 template RIGID_BODY<VECTOR<float,2> >& RIGIDS_STANDARD_TESTS<VECTOR<float,2> >::Add_Analytic_Smooth_Gear(VECTOR<float,2> const&,int,int);
 template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Analytic_Smooth_Gear(VECTOR<float,3> const&,int,int);
 template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Analytic_Shell(float,float,float,int);
+template RIGID_BODY<VECTOR<float,3> >& RIGIDS_STANDARD_TESTS<VECTOR<float,3> >::Add_Analytic_Bowl(float,float,float,int,int);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 INSTANTIATION_HELPER(double);
 template JOINT_ID RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Connect_With_Point_Joint(RIGID_BODY<VECTOR<double,3> >&,RIGID_BODY<VECTOR<double,3> >&,VECTOR<double,3> const&);
@@ -371,4 +372,5 @@ template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >
 template RIGID_BODY<VECTOR<double,2> >& RIGIDS_STANDARD_TESTS<VECTOR<double,2> >::Add_Analytic_Smooth_Gear(VECTOR<double,2> const&,int,int);
 template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Analytic_Smooth_Gear(VECTOR<double,3> const&,int,int);
 template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Analytic_Shell(double,double,double,int);
+template RIGID_BODY<VECTOR<double,3> >& RIGIDS_STANDARD_TESTS<VECTOR<double,3> >::Add_Analytic_Bowl(double,double,double,int,int);
 #endif

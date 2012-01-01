@@ -15,32 +15,32 @@ namespace TESSELLATION{
 //#####################################################################
 // Function Generate_Triangles
 //#####################################################################
-template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(const BOWL<T>& bowl,const int n)
+template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(const BOWL<T>& bowl,const int n_radial,const int n_vertical)
 {
     typedef VECTOR<T,3> TV;
     TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
-    surface->mesh.Initialize_Torus_Mesh(4,n);
-    GEOMETRY_PARTICLES<TV>& particles=surface->particles;particles.array_collection->Add_Elements(4*n);
+    surface->mesh.Initialize_Torus_Mesh(2*(n_vertical+1),n_radial);
+    GEOMETRY_PARTICLES<TV>& particles=surface->particles;particles.array_collection->Add_Elements(2*(n_vertical+1)*n_radial);
     MATRIX<T,3,2> radial_basis;
-    radial_basis.Column(1)=TV(0,1,0);
-    radial_basis.Column(2)=TV(0,0,1);
-    for(int i=1,p=0;i<=n;++i){
-        TV radial=radial_basis*COMPLEX<T>::Unit_Polar(T(2*pi/n)*i).Vector();
-        for (int j=0; j<=n; j++){
-            TV spherical=radial_basis*COMPLEX<T>::Unit_Polar(T(0.5*pi/n)*j).Vector();
-            particles.X(++p)=bowl.outer_radius*radial*spherical.y;
-            particles.X(p).x=-bowl.outer_radius*spherical.z;}
-        for (int j=n; j>=0; j--){
-            TV spherical=radial_basis*COMPLEX<T>::Unit_Polar(T(0.5*pi/n)*j).Vector();
-            particles.X(++p)=bowl.inner_radius*radial*spherical.y;
-            particles.X(p).x=-bowl.inner_radius*spherical.z;}
+    radial_basis.Column(1)=TV(0,0,1);
+    radial_basis.Column(2)=TV(1,0,0);
+    for(int i=1,p=0;i<=n_radial;++i){
+        TV radial=radial_basis*COMPLEX<T>::Unit_Polar(T(2*pi/n_radial)*i).Vector();
+        for (int j=n_vertical; j>=0; j--){
+            TV spherical=radial_basis*COMPLEX<T>::Unit_Polar(T(0.5*pi/n_vertical)*j).Vector();
+            particles.X(++p)=radial*(bowl.hole_radius+spherical.z*bowl.height);
+            particles.X(p).y=bowl.height*spherical.x;}
+        for (int j=0; j<=n_vertical; j++){
+            TV spherical=radial_basis*COMPLEX<T>::Unit_Polar(T(0.5*pi/n_vertical)*j).Vector();
+            particles.X(++p)=radial*(bowl.hole_radius+spherical.z*bowl.depth);
+            particles.X(p).y=bowl.depth*spherical.x;}
     }
     return surface;
 }
 //#####################################################################
-template TRIANGULATED_SURFACE<float>* Generate_Triangles(const BOWL<float>&,const int);
+template TRIANGULATED_SURFACE<float>* Generate_Triangles(const BOWL<float>&,const int,const int);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-template TRIANGULATED_SURFACE<double>* Generate_Triangles(const BOWL<double>&,const int);
+template TRIANGULATED_SURFACE<double>* Generate_Triangles(const BOWL<double>&,const int,const int);
 #endif
 }
 }

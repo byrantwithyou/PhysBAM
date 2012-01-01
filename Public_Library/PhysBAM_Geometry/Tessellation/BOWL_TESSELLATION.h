@@ -13,7 +13,7 @@ template<class T> class TRIANGULATED_SURFACE;
 
 namespace TESSELLATION{
 //#####################################################################
-    template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(const BOWL<T>& ring,const int n=40);
+    template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(const BOWL<T>& ring,const int n_radial=32,const int n_vertical=8);
 //#####################################################################
 }
 }

@@ -1153,14 +1153,30 @@ void Get_Initial_Data()
         }
         case 52:
         {
-            RIGID_BODY<TV>& shell=tests.Add_Analytic_Shell(0.08,0.045,0.036,128);
-            shell.coefficient_of_friction = 0.3;
-            shell.X()=TV(0,0.04,0);
-            shell.Rotation()=ROTATION<TV>((T)pi/2.0,TV(1,0,0));
-            shell.is_static=true;
+            T flat_bottom_radius=0.02;
+            T rounded_innterior_radius=0.02;
+            T vertical_straight_length=0.08;
+            T thickness=0.01;
+            T coefficient_of_friction=0.1;
+            RIGID_BODY<TV>& rounding=tests.Add_Analytic_Bowl(flat_bottom_radius,rounded_innterior_radius,thickness,128,32);
+            rounding.coefficient_of_friction = coefficient_of_friction;
+            rounding.Rotation()=ROTATION<TV>((T)pi,TV(1,0,0));
+            rounding.X()=TV(0,rounded_innterior_radius+thickness,0);
+            rounding.is_static=true;
+
+            RIGID_BODY<TV>& walls=tests.Add_Analytic_Shell(vertical_straight_length,flat_bottom_radius+rounded_innterior_radius+thickness,flat_bottom_radius+rounded_innterior_radius,128);
+            walls.coefficient_of_friction = coefficient_of_friction;
+            walls.Rotation()=ROTATION<TV>((T)pi/2,TV(1,0,0));
+            walls.X()=TV(0,vertical_straight_length/2,0);
+            walls.is_static=true;
+
+            RIGID_BODY<TV>& bottom=tests.Add_Analytic_Cylinder(thickness,flat_bottom_radius+rounded_innterior_radius+thickness,128);
+            bottom.Rotation()=ROTATION<TV>((T)pi/2,TV(1,0,0));
+            bottom.X()=TV(0,thickness/2,0);
+            bottom.is_static=true;
 
             int count = 0;
-            for (int i=1; i<=27; i++)
+            for (int i=1; i<=10; i++)
             {
                 count++;
                 jello_centers.Append(TV(i*0.05,50,0));

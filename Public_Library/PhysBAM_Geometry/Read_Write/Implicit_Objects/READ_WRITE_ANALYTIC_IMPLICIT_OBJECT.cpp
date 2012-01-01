@@ -26,6 +26,7 @@ void Register_Read_Write_Analytic_Implicit_Object()
     Read_Write<STRUCTURE<VECTOR<T,3> >,RW>::Register_Read_Write<ANALYTIC_IMPLICIT_OBJECT<BOUNDED_HORIZONTAL_PLANE<VECTOR<T,3> > > >(); \
     Read_Write<STRUCTURE<VECTOR<T,3> >,RW>::Register_Read_Write<ANALYTIC_IMPLICIT_OBJECT<CYLINDER<T> > >(); \
     Read_Write<STRUCTURE<VECTOR<T,3> >,RW>::Register_Read_Write<ANALYTIC_IMPLICIT_OBJECT<RING<T> > >(); \
+    Read_Write<STRUCTURE<VECTOR<T,3> >,RW>::Register_Read_Write<ANALYTIC_IMPLICIT_OBJECT<BOWL<T> > >(); \
     Read_Write<STRUCTURE<VECTOR<T,3> >,RW>::Register_Read_Write<ANALYTIC_IMPLICIT_OBJECT<SPHERE<VECTOR<T,3> > > >(); \
     Read_Write<STRUCTURE<VECTOR<T,3> >,RW>::Register_Read_Write<ANALYTIC_IMPLICIT_OBJECT<SMOOTH_GEAR<VECTOR<T,3> > > >(); \
     Read_Write<STRUCTURE<VECTOR<T,3> >,RW>::Register_Read_Write<ANALYTIC_IMPLICIT_OBJECT<TORUS<T> > >();

@@ -17,6 +17,7 @@
 #include <PhysBAM_Geometry/Basic_Geometry/PLANE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/POINT_SIMPLEX_1D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/RING.h>
+#include <PhysBAM_Geometry/Basic_Geometry/BOWL.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TORUS.h>
 #include <PhysBAM_Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
@@ -28,6 +29,7 @@
 #include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_PLANE.h>
 #include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_POINT_SIMPLEX_1D.h>
 #include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_RING.h>
+#include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_BOWL.h>
 #include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_SMOOTH_GEAR.h>
 #include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_SPHERE.h>
 #include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_TORUS.h>
