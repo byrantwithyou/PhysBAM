@@ -238,7 +238,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Option_Argument("-plot_contour","plot primary contour");
     parse_args->Add_Option_Argument("-energy_profile_plot","plot energy profiles");
     parse_args->Add_Integer_Argument("-image_size",500,"image size for plots");
-    parse_args->Add_Double_Argument("-sigma_range",5,"sigma range for plots");
+    parse_args->Add_Double_Argument("-sigma_range",3,"sigma range for plots");
     parse_args->Add_Double_Argument("-poissons_ratio",.45,"poisson's ratio");
     parse_args->Add_Option_Argument("-scatter_plot","Create contrail plot with singular values");
     parse_args->Add_Option_Argument("-use_contrails","Show contrails in plot");
@@ -566,15 +566,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 100:{
             for(int i=1;TRIANGULATED_AREA<T>* triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>*>(i);i++)
                 Add_Constitutive_Model(*triangulated_area,(T)1e2,poissons_ratio,(T).05);
-            particles.X(1)=TV(4.2,1.2);
-            particles.X(2)=TV(3.6,1.5);
-            particles.X(3)=TV(3.6,1.2);
-            particles.X(4)=TV(4.3,-1.8);
-            particles.X(5)=TV(3.2,1.2);
-            particles.X(6)=TV(3.2,-1.8);
-            particles.X(7)=TV(5.2,-3);
-            particles.X(8)=TV(3.2,-2.8);
-            particles.X(9)=TV(3.2,-3);
+            Place_Triangle(1,2.6,1.8,1.5,.2,TV(4.1,1.5));
+            Place_Triangle(2,1.3,.15,.2,-.3,TV(4.1,0));
+            Place_Triangle(3,2.7,.9,1.8,.4,TV(4.1,-1.5));
             break;}
         case 8:
         case 16:
@@ -655,6 +649,16 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     if(scatter_plot) Init_Scatter_Plot();
 
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >::Initialize_Bodies();
+}
+//#####################################################################
+// Function Place_Triangle
+//#####################################################################
+void Place_Triangle(int tri,T s1,T s2,T a,T b,TV shift)
+{
+    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    ROTATION<TV> rot(ROTATION<TV>::From_Angle(a)),rot2(ROTATION<TV>::From_Angle(b+a));
+    TV com(0,sqrt(3)/6);
+    for(int i=1;i<=3;i++) particles.X(3*(tri-1)+i)=rot2.Rotate(TV(s1,s2)*rot.Inverse_Rotate(particles.X(3*(tri-1)+i)-com))+shift;
 }
 //#####################################################################
 // Function Set_Kinematic_Positions
@@ -1185,8 +1189,9 @@ void Plot_Contour_Landscape()
     FINITE_VOLUME<TV,2>& fv=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,2>&>();
     ISOTROPIC_CONSTITUTIVE_MODEL<T,2>* icm=fv.isotropic_model;
     bool is_neo=dynamic_cast<NEO_HOOKEAN<T,2>*>(icm);
-    for(int i=-image_size/2;i<=image_size/2;i++)
-        for(int j=-image_size/2;j<=image_size/2;j++){
+    T min=-image_size/2,max=image_size/2;
+    for(int i=min;i<=max;i++)
+        for(int j=min;j<=max;j++){
             if(is_neo && (i<=0 || j<=0)) continue;
             TV X(2*sigma_range*i/image_size+1.1e-5,2*sigma_range*j/image_size+1.2e-5);
             DIAGONAL_MATRIX<T,2> F(X),P=icm->P_From_Strain(F,1,0)*plot_scale;
@@ -1199,7 +1204,7 @@ void Plot_Contour_Landscape()
             Add_Debug_Particle(contrail(i)(j),contrail_colors(i));}
 
     for(int i=1;i<=contour_segments.m;i++){
-        if(is_neo && (contour_segments(i).x.Max()<.2 || contour_segments(i).y.Max()<.2)) continue;
+        if(is_neo && (contour_segments(i).x.Min()<.2 || contour_segments(i).y.Min()<.2)) continue;
         Add_Debug_Particle(contour_segments(i).x,VECTOR<T,3>(1,1,0));
         Add_Debug_Particle(contour_segments(i).y,VECTOR<T,3>(1,1,0));}
 }
