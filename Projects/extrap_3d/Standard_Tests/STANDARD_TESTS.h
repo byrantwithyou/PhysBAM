@@ -51,6 +51,7 @@
 //   56. Size comparison - several shapes
 //   57. Two-direction stretch
 //   58. Various objects through gears
+//   59. Random armadillo
 //#####################################################################
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
@@ -442,6 +443,15 @@ void Parse_Options() PHYSBAM_OVERRIDE
             last_frame=5000;
             frame_rate=240;
             break;
+        case 59:
+            solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness = 1e-4;
+            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
+            solids_parameters.implicit_solve_parameters.cg_iterations=100000;
+            solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+            solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
+            last_frame=3000;
+            frame_rate=240;
+            break;
         case 32:
             // solids_parameters.cfl=(T)5;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
@@ -760,6 +770,9 @@ void Get_Initial_Data()
             sphere3.is_static = true;
             sphere4.is_static = true;
             
+            break;}
+        case 59: {
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_20K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T)0.373,(T)0))),true,true,density,.005);
             break;}
 
         case 32:{
@@ -1566,6 +1579,38 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             }
 
             break;} 
+        case 59:{
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+            Add_Constitutive_Model(tetrahedralized_volume,(T)1e4,(T).3,(T).001);
+            
+            ARRAY<TV> random_particles(particles.X.m);
+            RANDOM_NUMBERS<T> rand;
+            rand.Fill_Uniform(random_particles,-0.3,.3);
+
+            // RIGID_BODY<TV>& box1=tests.Add_Analytic_Sphere(0.065,density,5);
+            // box1.X() = TV(0.27,0.645,-0.12);
+            // RIGID_BODY<TV>& box2=tests.Add_Analytic_Sphere(0.065,density,5);
+            // box2.X() = TV(-0.275,0.605,-0.18);
+            // RIGID_BODY<TV>& box3=tests.Add_Analytic_Box(TV(0.5,0.06,0.5));
+            // box3.X() = TV(-0.024,0.03,0.1);
+
+            for (int i=1; i<=particles.X.m; i++)
+            {
+                T y   = particles.X(i).y;
+                TV v1 = particles.X(i) - TV(0.27,0.645,-0.12);
+                TV v2 = particles.X(i) - TV(-0.275,0.605,-0.18);
+                
+                if ((y<=0.06) || (sqr(v1.x) + sqr(v1.y) + sqr(v1.z) <= sqr(0.065)) || (sqr(v2.x) + sqr(v2.y) + sqr(v2.z) <= sqr(0.065)))
+                {
+                    constrained_particles.Append(i);
+                }
+                else
+                {
+                    particles.X(i)=random_particles(i)+TV(0,0.3,0)+TV(-0.024,0.06,0.1);
+                }
+            }
+
+            break;} 
         case 32:{
             T youngs_modulus = 7e5;
             T poissons_ratio = .4;
@@ -1942,7 +1987,7 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
     if(test_number==53){V(1)=TV(1,0,0);V(2).x=0;V(3).x=0;V(4).x=0;}
     if(test_number==54){V(1)=TV(1,0,0);V(2)=TV();V(3).x=0;V(4).x=0;}
     if(test_number==55){V(2)=V(1)=TV();V(3).x=0;V(4).x=0;}
-    if(test_number==31)
+    if(test_number==31||test_number==59)
     {
         int number_of_constrained_particles = constrained_particles.m;
         for (int i=1; i<=number_of_constrained_particles; i++)
@@ -2012,7 +2057,7 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
     }*/
     if(test_number==53){V(1)=TV();V(2).x=0;V(3).x=0;V(4).x=0;}
     if(test_number==54 || test_number==55){V(1)=V(2)=TV();V(3).x=0;V(4).x=0;}
-    if(test_number==31)
+    if(test_number==31||test_number==59)
     {
         int number_of_constrained_particles = constrained_particles.m;
         for (int i=1; i<=number_of_constrained_particles; i++)
@@ -2102,17 +2147,17 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
     }
     if(test_number==31)
     {
-        TETRAHEDRALIZED_VOLUME<T>& tet_volume = solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
-        FINITE_VOLUME<TV,3>& fvm = solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
+        // TETRAHEDRALIZED_VOLUME<T>& tet_volume = solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+        // FINITE_VOLUME<TV,3>& fvm = solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
 
-        int number_of_vertices = solid_body_collection.deformable_body_collection.collisions.check_collision.m;
-        for (int i=1; i<=number_of_vertices; i++) solid_body_collection.deformable_body_collection.collisions.check_collision(i)=true;
+        // int number_of_vertices = solid_body_collection.deformable_body_collection.collisions.check_collision.m;
+        // for (int i=1; i<=number_of_vertices; i++) solid_body_collection.deformable_body_collection.collisions.check_collision(i)=true;
 
-        for(int t=1;t<=fvm.Fe_hat.m;t++)
-            if(fvm.Fe_hat(t).x11>=3)
-                for (int i=1; i<=4; i++)
-                    if (solid_body_collection.deformable_body_collection.particles.X(tet_volume.mesh.elements(t)(i)).y <= 0.06)
-                        solid_body_collection.deformable_body_collection.collisions.check_collision(tet_volume.mesh.elements(t)(i))=false;
+        // for(int t=1;t<=fvm.Fe_hat.m;t++)
+            // if(fvm.Fe_hat(t).x11>=3)
+                // for (int i=1; i<=4; i++)
+                    // if (solid_body_collection.deformable_body_collection.particles.X(tet_volume.mesh.elements(t)(i)).y <= 0.06)
+                        // solid_body_collection.deformable_body_collection.collisions.check_collision(tet_volume.mesh.elements(t)(i))=false;
 
         int number_of_constrained_particles = constrained_particles.m;
         for (int i=1; i<=number_of_constrained_particles; i++)
