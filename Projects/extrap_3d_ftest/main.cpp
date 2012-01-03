@@ -14,10 +14,16 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_COROTATED_BLEND.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/GEN_NEO_HOOKEAN_ENERGY.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/GENERAL_EXTRAPOLATED.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_J_INTERP_ENERGY.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/RC_EXTRAPOLATED.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/RC2_EXTRAPOLATED.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED2.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED_HYPERBOLA.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED_REFINED.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED_SMOOTH.h>
+
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/ROTATED_LINEAR.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/FINITE_VOLUME.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE.h>
@@ -47,15 +53,19 @@ int main(int argc,char* argv[])
     T poissons_ratio = .45;
     T damping = .01;
     T energy,sv1,sv2,sv3;
+    T efc,cutoff;
     
    // if(PARSE_ARGS::Find_And_Remove("-incomp",argc,argv)) example=new INCOMPRESSIBLE_TESTS<T>(stream_type);
    // else if(PARSE_ARGS::Find_And_Remove("-hair_sim_tests",argc,argv)) example=new HAIR_SIM_TESTS<T>(stream_type);
     
     parse_args.Add_Option_Argument("-dump_sv");
     parse_args.Add_Double_Argument("-youngs_modulus",1e6,"parameter used by multiple tests to change the parameters of the test");
+    parse_args.Add_Double_Argument("-efc",(T)20,"extrapolated force coefficient used for some tests");
     parse_args.Add_Double_Argument("-poissons_ratio",.45,"","stiffness multiplier for various tests");
+    parse_args.Add_Double_Argument("-cutoff",.4,"","cutoff value for various tests");
     parse_args.Add_Vector_3D_Argument("-sv", VECTOR<double,3>((T)1.0,(T)1.0,(T)1.0),"Dre","Tara");
     
+    parse_args.Add_Option_Argument("-use_rc2_ext");
     parse_args.Add_Option_Argument("-use_ext_neo");
     parse_args.Add_Option_Argument("-use_ext_neo2");
     parse_args.Add_Option_Argument("-use_ext_neo_ref");
@@ -70,17 +80,20 @@ int main(int argc,char* argv[])
     
     stiffness=(T)parse_args.Get_Double_Value("-youngs_modulus");
     poissons_ratio=(T)parse_args.Get_Double_Value("-poissons_ratio");
+    efc=(T)parse_args.Get_Double_Value("-efc");
+    cutoff=(T)parse_args.Get_Double_Value("-cutoff");
     VECTOR<double,3> singular_vals = parse_args.Get_Vector_3D_Value("-sv"); sv1=singular_vals(1); sv2=singular_vals(2); sv3=singular_vals(3);
     
     ISOTROPIC_CONSTITUTIVE_MODEL<T,3>* icm=0;
-    if(parse_args.Is_Value_Set("-use_ext_neo")) icm=new NEO_HOOKEAN_EXTRAPOLATED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.4,20);
-    else if(parse_args.Is_Value_Set("-use_ext_neo2")) icm=new NEO_HOOKEAN_EXTRAPOLATED2<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.4,20);
-    else if(parse_args.Is_Value_Set("-use_ext_neo_ref")) icm=new NEO_HOOKEAN_EXTRAPOLATED_REFINED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.4,.6,20);
+    if(parse_args.Is_Value_Set("-use_ext_neo")) icm=new NEO_HOOKEAN_EXTRAPOLATED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc);
+    else if(parse_args.Is_Value_Set("-use_ext_neo2")) icm=new NEO_HOOKEAN_EXTRAPOLATED2<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc);
+    else if(parse_args.Is_Value_Set("-use_rc2_ext")) icm=new RC2_EXTRAPOLATED<T,3>(*new GEN_NEO_HOOKEAN_ENERGY<T>,stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc);
+    else if(parse_args.Is_Value_Set("-use_ext_neo_ref")) icm=new NEO_HOOKEAN_EXTRAPOLATED_REFINED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,.6,efc);
     else if(parse_args.Is_Value_Set("-use_ext_neo_hyper")) icm=new NEO_HOOKEAN_EXTRAPOLATED_HYPERBOLA<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.1);
     else if(parse_args.Is_Value_Set("-use_ext_neo_smooth")) icm=new NEO_HOOKEAN_EXTRAPOLATED_SMOOTH<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.1);
     else if(parse_args.Is_Value_Set("-use_corotated")) icm=new COROTATED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
     else if(parse_args.Is_Value_Set("-use_corot_blend")) icm=new NEO_HOOKEAN_COROTATED_BLEND<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
-    else if(parse_args.Is_Value_Set("-use_ext_mooney")) icm=new MOONEY_RIVLIN_3D_EXTRAPOLATED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.4,20*stiffness*stiffness_multiplier);
+    else if(parse_args.Is_Value_Set("-use_ext_mooney")) icm=new MOONEY_RIVLIN_3D_EXTRAPOLATED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc*stiffness*stiffness_multiplier);
 
     else{
         NEO_HOOKEAN<T,3>* nh=new NEO_HOOKEAN<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
