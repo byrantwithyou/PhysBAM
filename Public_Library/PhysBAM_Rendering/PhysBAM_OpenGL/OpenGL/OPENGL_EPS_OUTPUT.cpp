@@ -24,23 +24,35 @@
 #include <OpenGL/glu.h>
 #endif
 using namespace PhysBAM;
+//#####################################################################
+// Constructor
+//#####################################################################
 template<class T> OPENGL_EPS_OUTPUT<T>::
 OPENGL_EPS_OUTPUT(const std::string& filename)
     :stream(*FILE_UTILITIES::Safe_Open_Output(filename,false,false))
 {
     Head();
 }
+//#####################################################################
+// Destructor
+//#####################################################################
 template<class T> OPENGL_EPS_OUTPUT<T>::
 ~OPENGL_EPS_OUTPUT()
 {
     Tail();
     delete &stream;
 }
+//#####################################################################
+// Function Begin
+//#####################################################################
 template<class T> void OPENGL_EPS_OUTPUT<T>::
 Begin(int mode)
 {
     glmode=mode;
 }
+//#####################################################################
+// Function End
+//#####################################################################
 template<class T> void OPENGL_EPS_OUTPUT<T>::
 End()
 {
@@ -58,21 +70,33 @@ End()
     buffer.Remove_All();
 #endif
 }
+//#####################################################################
+// Function Vertex
+//#####################################################################
 template<class T> template<class T2> void OPENGL_EPS_OUTPUT<T>::
 Vertex(const VECTOR<T2,3>& p)
 {
     buffer.Append(VECTOR<T,3>(p));
 }
+//#####################################################################
+// Function Vertex
+//#####################################################################
 template<class T> template<class T2> void OPENGL_EPS_OUTPUT<T>::
 Vertex(const VECTOR<T2,2>& p)
 {
     buffer.Append(VECTOR<T,3>(VECTOR<T,2>(p)));
 }
+//#####################################################################
+// Function Vertex
+//#####################################################################
 template<class T> template<class T2> void OPENGL_EPS_OUTPUT<T>::
 Vertex(const VECTOR<T2,1>& p)
 {
     buffer.Append(VECTOR<T,3>(p.x,0,0));
 }
+//#####################################################################
+// Function Head
+//#####################################################################
 template<class T> void OPENGL_EPS_OUTPUT<T>::
 Head()
 {
@@ -83,28 +107,43 @@ Head()
     Emit("%%BoundingBox: ");
     stream<<view[0]<<" "<<view[1]<<" "<<(view[2]+view[0])<<" "<<(view[3]+view[1])<<"\n";
     Emit("0 setlinewidth\n");
-    Emit("/pointradius .1 def\n");
+    Emit("/pointradius 1 def\n");
 }
+//#####################################################################
+// Function Tail
+//#####################################################################
 template<class T> void OPENGL_EPS_OUTPUT<T>::
 Tail()
 {
 }
+//#####################################################################
+// Function Emit
+//#####################################################################
 template<class T> void OPENGL_EPS_OUTPUT<T>::
 Emit(const char* s)
 {
     stream<<s;
 }
+//#####################################################################
+// Function Emit
+//#####################################################################
 template<class T> void OPENGL_EPS_OUTPUT<T>::
 Emit(const TV& p)
 {
     stream<<p.x<<" "<<p.y<<" ";
 }
+//#####################################################################
+// Function Draw_Point
+//#####################################################################
 template<class T> void OPENGL_EPS_OUTPUT<T>::
 Draw_Point(const TV& p)
 {
     Emit(p);
-    Emit("pointradius 0 360 arc stroke\n");
+    Emit("pointradius 0 360 arc fill stroke\n");
 }
+//#####################################################################
+// Function Draw_Line
+//#####################################################################
 template<class T> void OPENGL_EPS_OUTPUT<T>::
 Draw_Line(const TV& a,const TV& b)
 {
@@ -113,6 +152,9 @@ Draw_Line(const TV& a,const TV& b)
     Emit(b);
     Emit("lineto stroke\n");
 }
+//#####################################################################
+// Function Draw_Polygon
+//#####################################################################
 template<class T> void OPENGL_EPS_OUTPUT<T>::
 Draw_Polygon(int i,int n)
 {
@@ -129,11 +171,17 @@ Draw_Polygon(int i,int n)
     Emit(str);
 #endif
 }
+//#####################################################################
+// Function Set_Color
+//#####################################################################
 template<class T> void OPENGL_EPS_OUTPUT<T>::
 Set_Color(const TV& color)
 {
     stream<<color.x<<" "<<color.y<<" "<<color.z<<" setrgbcolor"<<std::endl;
 }
+//#####################################################################
+// Function Transform_Buffer
+//#####################################################################
 template<class T> void OPENGL_EPS_OUTPUT<T>::
 Transform_Buffer()
 {
@@ -159,15 +207,32 @@ Transform_Buffer()
         buffer(i)=window;}
 #endif
 }
+//#####################################################################
+// Function Draw_Arrays
+//#####################################################################
+template<class T> void OPENGL_EPS_OUTPUT<T>::
+Draw_Arrays(int mode,int dimension,int length,const void* vertices)
+{
+    Begin(mode);
+    float* p=(float*)vertices;
+    if(dimension==1) for(int i=0;i<length;i++) buffer.Append(VECTOR<T,3>(p[i],0,0));
+    else if(dimension==2) for(int i=0;i<2*length;i+=2) buffer.Append(VECTOR<T,3>(p[i],p[i+1],0));
+    else if(dimension==3) for(int i=0;i<3*length;i+=3) buffer.Append(VECTOR<T,3>(p[i],p[i+1],p[i+2]));
+    End();
+}
 template class OPENGL_EPS_OUTPUT<float>;
 template void OPENGL_EPS_OUTPUT<float>::Vertex<float>(VECTOR<float,2> const&);
 template void OPENGL_EPS_OUTPUT<float>::Vertex<float>(VECTOR<float,3> const&);
 template void OPENGL_EPS_OUTPUT<float>::Vertex<double>(VECTOR<double,2> const&);
 template void OPENGL_EPS_OUTPUT<float>::Vertex<double>(VECTOR<double,3> const&);
+template void OPENGL_EPS_OUTPUT<float>::Vertex<float>(VECTOR<float,1> const&);
+template void OPENGL_EPS_OUTPUT<float>::Vertex<double>(VECTOR<double,1> const&);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class OPENGL_EPS_OUTPUT<double>;
 template void OPENGL_EPS_OUTPUT<double>::Vertex<float>(VECTOR<float,2> const&);
 template void OPENGL_EPS_OUTPUT<double>::Vertex<float>(VECTOR<float,3> const&);
 template void OPENGL_EPS_OUTPUT<double>::Vertex<double>(VECTOR<double,2> const&);
 template void OPENGL_EPS_OUTPUT<double>::Vertex<double>(VECTOR<double,3> const&);
+template void OPENGL_EPS_OUTPUT<double>::Vertex<double>(VECTOR<double,1> const&);
+template void OPENGL_EPS_OUTPUT<double>::Vertex<float>(VECTOR<float,1> const&);
 #endif

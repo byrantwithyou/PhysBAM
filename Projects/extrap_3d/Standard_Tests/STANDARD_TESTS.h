@@ -147,7 +147,7 @@ public:
     T boxsize;
     T rebound_time,rebound_stiffness;
     bool use_constant_ife;
-    bool forces_are_removed,self_collision_flipped;
+    bool forces_are_removed,self_collision_flipped,sloped_floor;
     ARRAY<int> externally_forced;
     ARRAY<int> constrained_particles;
     ARRAY<TV> constrained_velocities;
@@ -260,6 +260,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Integer_Argument("-degrees_incline",5,"degrees of incline");
     parse_args->Add_Double_Argument("-friction",.3,"amount of friction");
     parse_args->Add_Option_Argument("-gears_of_pain");
+    parse_args->Add_Option_Argument("-sloped_floor");
     parse_args->Add_Double_Argument("-ja",.6,"J to stop interpolating");
     parse_args->Add_Double_Argument("-jb",.4,"J to start interpolating");
     parse_args->Add_Double_Argument("-lb",-.1,"final poisson's ratio");
@@ -357,6 +358,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     number_of_jellos=parse_args->Get_Integer_Value("-number_of_jellos");
     degrees_incline=parse_args->Get_Integer_Value("-degrees_incline");
     gears_of_pain=parse_args->Is_Value_Set("-gears_of_pain");
+    sloped_floor=parse_args->Is_Value_Set("-sloped_floor");
     J_min=(T)parse_args->Get_Double_Value("-ja");
     J_max=(T)parse_args->Get_Double_Value("-jb");
     la_min=(T)parse_args->Get_Double_Value("-lb");
@@ -1016,7 +1018,7 @@ void Get_Initial_Data()
             T max_jello_size = .036;//maximum edge length
             T bound = .2;
             TV new_center; T new_rotate;
-            T board_height = .6;
+            T board_height = .6-.1*bound;
             bool stuck=false;
             RIGID_BODY_STATE<TV> initial_state;
             
@@ -1027,9 +1029,10 @@ void Get_Initial_Data()
                     random.Fill_Uniform(new_center,-bound,bound);
                    // new_center = TV(random.Get_Uniform_Number(-bound,bound),random.Get_Uniform_Number((T).5*bound,(T)1*bound),random.Get_Uniform_Number(-bound,bound));
                     stuck=false;
+                    new_center.x = .6*(new_center.x);
                     new_center.z = 1.5*(new_center.z+bound)-bound;
                     if (new_center.z < -.5*bound) new_center.y = (T).5*(new_center.y + 2.0*bound+3.0*(new_center.z+bound));
-                    else new_center.y = .3*(new_center.y+bound) + .5*max_jello_size + board_height;
+                    else new_center.y = .3*(new_center.y+bound) + .5*max_jello_size + board_height+.2*bound;
                     for (int j=1; j<i&&(!stuck); j++){
                         //LOG::cout << i << " " << j << " " << new_center << " " << jello_centers(j) << " " << (new_center-jello_centers(j)).Magnitude() << " " << (T)8*max_jello_size*max_jello_size << std::endl;
                         if((new_center-jello_centers(j)).Magnitude()<=(T)2*max_jello_size) stuck=true;
@@ -1044,18 +1047,27 @@ void Get_Initial_Data()
                 else if (i % 5 ==1) {tests.Create_Mattress(mattress_grid2,true,&initial_state1);}
                 else {tests.Create_Mattress(mattress_grid1,true,&initial_state1);}
             }
+            if(sloped_floor){
+            RIGID_BODY<TV>& inclined_floor=tests.Add_Ground(input_friction);
+            inclined_floor.Rotation()=ROTATION<TV>((T)pi*.25*degrees_incline/(T)180,TV(0,0,1))*ROTATION<TV>((T)pi*degrees_incline/(T)180,TV(1,0,0));
+            RIGID_BODY<TV>& inclined_floor2=tests.Add_Ground(input_friction);
+            inclined_floor2.Rotation()=ROTATION<TV>(-(T)pi*.25*degrees_incline/(T)180,TV(0,0,1))*ROTATION<TV>((T)pi*degrees_incline/(T)180,TV(1,0,0));
+            }
+            else
+            {
             RIGID_BODY<TV>& inclined_floor=tests.Add_Ground(input_friction);
             inclined_floor.Rotation()=ROTATION<TV>((T)pi*degrees_incline/(T)180,TV(1,0,0));
+            }
             
             T dy = .3*bound*sin((T)pi*degrees_incline/(T)180);
-            RIGID_BODY<TV>& box1=tests.Add_Analytic_Box(TV(2.2*bound,.05*bound,.5*bound));            
-            RIGID_BODY<TV>& box2=tests.Add_Analytic_Box(TV(2.2*bound,.05*bound,.3*bound));            
-            RIGID_BODY<TV>& box3=tests.Add_Analytic_Box(TV(2.2*bound,.05*bound,.3*bound));            
-            RIGID_BODY<TV>& box4=tests.Add_Analytic_Box(TV(2.2*bound,.05*bound,.3*bound));            
-            RIGID_BODY<TV>& box5=tests.Add_Analytic_Box(TV(2.2*bound,.05*bound,.3*bound));            
-            RIGID_BODY<TV>& box6=tests.Add_Analytic_Box(TV(2.2*bound,.05*bound,.3*bound));            
-            RIGID_BODY<TV>& box7=tests.Add_Analytic_Box(TV(2.2*bound,.05*bound,.3*bound));            
-            RIGID_BODY<TV>& box8=tests.Add_Analytic_Box(TV(2.2*bound,.05*bound,.5*bound));            
+            RIGID_BODY<TV>& box1=tests.Add_Analytic_Box(TV(2.2*bound,.25*bound,.5*bound));            
+            RIGID_BODY<TV>& box2=tests.Add_Analytic_Box(TV(2.2*bound,.25*bound,.3*bound));            
+            RIGID_BODY<TV>& box3=tests.Add_Analytic_Box(TV(2.2*bound,.25*bound,.3*bound));            
+            RIGID_BODY<TV>& box4=tests.Add_Analytic_Box(TV(2.2*bound,.25*bound,.3*bound));            
+            RIGID_BODY<TV>& box5=tests.Add_Analytic_Box(TV(2.2*bound,.25*bound,.3*bound));            
+            RIGID_BODY<TV>& box6=tests.Add_Analytic_Box(TV(2.2*bound,.25*bound,.3*bound));            
+            RIGID_BODY<TV>& box7=tests.Add_Analytic_Box(TV(2.2*bound,.25*bound,.3*bound));            
+            RIGID_BODY<TV>& box8=tests.Add_Analytic_Box(TV(2.2*bound,.25*bound,.5*bound));            
             box1.X()=TV((T)0,board_height,-.4*bound);
             box2.X()=TV((T)0*bound,board_height,0.0*bound);
             box3.X()=TV((T)0*bound,board_height,0.3*bound);
@@ -1064,48 +1076,46 @@ void Get_Initial_Data()
             box6.X()=TV((T)0*bound,board_height,1.2*bound);
             box7.X()=TV((T)0*bound,board_height,1.5*bound);
             box8.X()=TV((T)0*bound,board_height,1.9*bound);
-//            curve.Add_Control_Point(0,FRAME<TV>(box1.X(),ROTATION<TV>(0*(T)pi/2.0,TV(0,0,1))));
-  //          curve.Add_Control_Point(.2,FRAME<TV>(box1.X(),ROTATION<TV>(0*(T)pi/2.0,TV(0,0,1))));
-    //        curve.Add_Control_Point(.25,FRAME<TV>(box1.X(),ROTATION<TV>(-(T)pi/2.0,TV(0,0,1))));
+
             curve.Add_Control_Point(0,FRAME<TV>(box1.X()));
             curve.Add_Control_Point(.2,FRAME<TV>(box1.X()));
-            curve.Add_Control_Point(.21,FRAME<TV>(box1.X()-TV(0,.2*board_height,0)));
-            curve.Add_Control_Point(.23,FRAME<TV>(box1.X()-TV(-2.5*bound,.2*board_height,0)));
+            //curve.Add_Control_Point(.21,FRAME<TV>(box1.X()-TV(0,.2*board_height,0)));
+            //curve.Add_Control_Point(.23,FRAME<TV>(box1.X()-TV(-2.5*bound,.2*board_height,0)));
             curve2.Add_Control_Point(0,FRAME<TV>(box2.X()));
             curve2.Add_Control_Point(.2,FRAME<TV>(box2.X()));
             curve2.Add_Control_Point(.3,FRAME<TV>(box2.X()-TV(0,dy,0)));
-            curve2.Add_Control_Point(.31,FRAME<TV>(box2.X()-TV(0,dy+.2*board_height,0)));
-            curve2.Add_Control_Point(.33,FRAME<TV>(box2.X()-TV(-2.5*bound,dy+.2*board_height,0)));
+            //curve2.Add_Control_Point(.31,FRAME<TV>(box2.X()-TV(0,dy+.2*board_height,0)));
+            //curve2.Add_Control_Point(.33,FRAME<TV>(box2.X()-TV(-2.5*bound,dy+.2*board_height,0)));
             curve3.Add_Control_Point(0,FRAME<TV>(box3.X()));
             curve3.Add_Control_Point(.2,FRAME<TV>(box3.X()));
             curve3.Add_Control_Point(.4,FRAME<TV>(box3.X()-TV(0,2.0*dy,0)));
-            curve3.Add_Control_Point(.41,FRAME<TV>(box3.X()-TV(0,2.0*dy+.2*board_height,0)));
-            curve3.Add_Control_Point(.43,FRAME<TV>(box3.X()-TV(-2.5*bound,2.0*dy+.2*board_height,0)));
+            //curve3.Add_Control_Point(.41,FRAME<TV>(box3.X()-TV(0,2.0*dy+.2*board_height,0)));
+            //curve3.Add_Control_Point(.43,FRAME<TV>(box3.X()-TV(-2.5*bound,2.0*dy+.2*board_height,0)));
             curve4.Add_Control_Point(0,FRAME<TV>(box4.X()));
             curve4.Add_Control_Point(.2,FRAME<TV>(box4.X()));
             curve4.Add_Control_Point(.5,FRAME<TV>(box4.X()-TV(0,3.0*dy,0)));
-            curve4.Add_Control_Point(.51,FRAME<TV>(box4.X()-TV(0,3.0*dy+.2*board_height,0)));
-            curve4.Add_Control_Point(.53,FRAME<TV>(box4.X()-TV(-2.5*bound,3.0*dy+.2*board_height,0)));
+            //curve4.Add_Control_Point(.51,FRAME<TV>(box4.X()-TV(0,3.0*dy+.2*board_height,0)));
+            //curve4.Add_Control_Point(.53,FRAME<TV>(box4.X()-TV(-2.5*bound,3.0*dy+.2*board_height,0)));
             curve5.Add_Control_Point(0,FRAME<TV>(box5.X()));
             curve5.Add_Control_Point(.2,FRAME<TV>(box5.X()));
             curve5.Add_Control_Point(.6,FRAME<TV>(box5.X()-TV(0,4.0*dy,0)));
-            curve5.Add_Control_Point(.61,FRAME<TV>(box5.X()-TV(0,4.0*dy+.2*board_height,0)));
-            curve5.Add_Control_Point(.63,FRAME<TV>(box5.X()-TV(-2.5*bound,4.0*dy+.2*board_height,0)));
+            //curve5.Add_Control_Point(.61,FRAME<TV>(box5.X()-TV(0,4.0*dy+.2*board_height,0)));
+            //curve5.Add_Control_Point(.63,FRAME<TV>(box5.X()-TV(-2.5*bound,4.0*dy+.2*board_height,0)));
             curve6.Add_Control_Point(0,FRAME<TV>(box6.X()));
             curve6.Add_Control_Point(.2,FRAME<TV>(box6.X()));
             curve6.Add_Control_Point(.7,FRAME<TV>(box6.X()-TV(0,5.0*dy,0)));
-            curve6.Add_Control_Point(.71,FRAME<TV>(box6.X()-TV(0,5.0*dy+.2*board_height,0)));
-            curve6.Add_Control_Point(.73,FRAME<TV>(box6.X()-TV(-2.5*bound,5.0*dy+.2*board_height,0)));
+            //curve6.Add_Control_Point(.71,FRAME<TV>(box6.X()-TV(0,5.0*dy+.2*board_height,0)));
+            //curve6.Add_Control_Point(.73,FRAME<TV>(box6.X()-TV(-2.5*bound,5.0*dy+.2*board_height,0)));
             curve7.Add_Control_Point(0,FRAME<TV>(box7.X()));
             curve7.Add_Control_Point(.2,FRAME<TV>(box7.X()));
             curve7.Add_Control_Point(.8,FRAME<TV>(box7.X()-TV(0,6.0*dy,0)));
-            curve7.Add_Control_Point(.81,FRAME<TV>(box7.X()-TV(0,6.0*dy+.2*board_height,0)));
-            curve7.Add_Control_Point(.83,FRAME<TV>(box7.X()-TV(-2.5*bound,6.0*dy+.2*board_height,0)));
+            //curve7.Add_Control_Point(.81,FRAME<TV>(box7.X()-TV(0,6.0*dy+.2*board_height,0)));
+            //curve7.Add_Control_Point(.83,FRAME<TV>(box7.X()-TV(-2.5*bound,6.0*dy+.2*board_height,0)));
             curve8.Add_Control_Point(0,FRAME<TV>(box8.X()));
             curve8.Add_Control_Point(.2,FRAME<TV>(box8.X()));
             curve8.Add_Control_Point(.9,FRAME<TV>(box8.X()-TV(0,7.0*dy,0)));
-            curve8.Add_Control_Point(.91,FRAME<TV>(box8.X()-TV(0,7.0*dy+.2*board_height,0)));
-            curve8.Add_Control_Point(.93,FRAME<TV>(box8.X()-TV(-2.5*bound,7.0*dy+.2*board_height,0)));
+            //curve8.Add_Control_Point(.91,FRAME<TV>(box8.X()-TV(0,7.0*dy+.2*board_height,0)));
+            //curve8.Add_Control_Point(.93,FRAME<TV>(box8.X()-TV(-2.5*bound,7.0*dy+.2*board_height,0)));
     /*        curve2.Add_Control_Point(0,FRAME<TV>(box2.X(),ROTATION<TV>(0*(T)pi/2.0,TV(0,0,1))));
             curve2.Add_Control_Point(.3,FRAME<TV>(box2.X(),ROTATION<TV>(0*(T)pi/2.0,TV(0,0,1))));
             curve2.Add_Control_Point(.35,FRAME<TV>(box2.X(),ROTATION<TV>(-(T)pi/2.0,TV(0,0,1))));
@@ -2085,6 +2095,26 @@ void Read_Output_Files_Solids(const int frame) PHYSBAM_OVERRIDE
 //#####################################################################
 void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id)
 {
+    if(test_number==41)
+    {
+        if(id==kinematic_id) 
+        {if(time >= .2) frame = FRAME<TV>(TV(1,1,0)); else frame=curve.Value(time);}
+        if(id==kinematic_id2) 
+        {if(time >= .3) frame = FRAME<TV>(TV(2,1,0)); else frame=curve2.Value(time);}
+        if(id==kinematic_id3) 
+        {if(time >= .4) frame = FRAME<TV>(TV(3,1,0)); else frame=curve3.Value(time);}
+        if(id==kinematic_id4) 
+        {if(time >= .5) frame = FRAME<TV>(TV(4,1,0)); else frame=curve4.Value(time);}
+        if(id==kinematic_id5) 
+        {if(time >= .6) frame = FRAME<TV>(TV(5,1,0)); else frame=curve5.Value(time);}
+        if(id==kinematic_id6) 
+        {if(time >= .7) frame = FRAME<TV>(TV(6,1,0)); else frame=curve6.Value(time);}
+        if(id==kinematic_id7) 
+        {if(time >= .8) frame = FRAME<TV>(TV(7,1,0)); else frame=curve7.Value(time);}
+        if(id==kinematic_id8) 
+        {if(time >= .9) frame = FRAME<TV>(TV(8,1,0)); else frame=curve8.Value(time);}
+        return;
+    }
     if(id==kinematic_id) frame=curve.Value(time);
     if(id==kinematic_id2) frame=curve2.Value(time);
     if(id==kinematic_id3) frame=curve3.Value(time);
@@ -2142,8 +2172,6 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
     if(test_number==29){    
         std::cout << "rame!" <<      solids_parameters.triangle_collision_parameters.perform_self_collision << std::endl;   
         //solids_parameters.triangle_collision_parameters.perform_self_collision=self_collision_flipped;
-        if (time <= 1.3) solids_parameters.triangle_collision_parameters.perform_self_collision = false;
-        std::cout << "rame!" <<      solids_parameters.triangle_collision_parameters.perform_self_collision << std::endl; 
     }
     if(test_number==31)
     {
@@ -2215,7 +2243,7 @@ void Update_Time_Varying_Material_Properties(const T time)
         icm.Update_Lame_Constants(young,pois,(T).01);
         solids_parameters.triangle_collision_parameters.perform_self_collision=override_collisions;        
        // solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append(deformable_body_collection.deformable_geometry.structures(1));
-        if(solids_parameters.triangle_collision_parameters.perform_self_collision) std::cout << "rame oh,rad!" << std::endl; else std::cout <<" rame oh, sad!" << std::endl;
+        if(solids_parameters.triangle_collision_parameters.perform_self_collision) std::cout << "rame oh,rad!" << std::endl;
     }
     }
 }
