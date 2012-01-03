@@ -1178,7 +1178,7 @@ void Get_Initial_Data()
         {
             T flat_bottom_radius=0.02;
             T rounded_innterior_radius=0.02;
-            T vertical_straight_length=0.15;
+            T vertical_straight_length=0.12;
             T thickness=0.01;
             T coefficient_of_friction=0.3;
             RIGID_BODY<TV>& rounding=tests.Add_Analytic_Bowl(flat_bottom_radius,rounded_innterior_radius,thickness,128,32);
