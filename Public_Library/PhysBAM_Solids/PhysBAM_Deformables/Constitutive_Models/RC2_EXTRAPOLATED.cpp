@@ -59,18 +59,12 @@ Update_Lame_Constants(const T youngs_modulus_input, const T poissons_ratio_input
 template<class T,int d> T RC2_EXTRAPOLATED<T,d>::
 Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int simplex) const
 {
-//    LOG::cout << youngs_modulus << " " << constant_lambda << " " << constant_mu << " " << poissons_ratio <<" " << extra_force_coefficient<< std::endl;
 
     T J=F.To_Vector().Product();
-  //  LOG::cout <<F.x11 << " " <<F.x22<<" "  << J << std::endl;
     if(J<extrapolation_cutoff){
         HELPER helper;
         bool b=helper.Compute_E(base,extra_force_coefficient*youngs_modulus,extrapolation_cutoff,F.To_Vector(),simplex);
-    //    LOG::cout << helper.E<< "HEY" << std::endl;
-        //LOG::cout << extra_force_coefficient<< " " << constant_lambda << " " << extrapolation_cutoff << " " << simplex <<" " << "YOU" << std::endl;
-
         if(b) return helper.E;}
-    //LOG::cout << base.E(F.To_Vector(),simplex) << " " << F.x11 << " " << F.x22 << " " << J <<" " << "HEY" << std::endl;
     return base.E(F.To_Vector(),simplex);
 }
 //#####################################################################
@@ -79,7 +73,6 @@ Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int simplex) const
 template<class T,int d> DIAGONAL_MATRIX<T,d> RC2_EXTRAPOLATED<T,d>::
 P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const T scale,const int simplex) const
 {
-   // LOG::cout << youngs_modulus << " " << constant_lambda << " " << constant_mu << " " << poissons_ratio << " " << time << std::endl;
     T J=F.To_Vector().Product();
     if(J<extrapolation_cutoff){
         HELPER helper;
@@ -91,7 +84,6 @@ P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const T scale,const int simplex) con
             return scale*DIAGONAL_MATRIX<T,d>(helper.dE);}}
 //    Add_Debug_Particle(F.To_Vector(),VECTOR<T,3>(0,1,0));
 //    Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,-base.dE(F.To_Vector(),simplex)/youngs_modulus);
-   // LOG::cout << scale*DIAGONAL_MATRIX<T,d>(base.dE(F.To_Vector(),simplex)) << " " << F.x11 << " " << F.x22 << " " << J << std::endl;
 
     return scale*DIAGONAL_MATRIX<T,d>(base.dE(F.To_Vector(),simplex));
 }

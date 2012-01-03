@@ -2203,7 +2203,7 @@ void Update_Time_Varying_Material_Properties(const T time)
 
     T critical=(T)1.0;
         T critical2=(T)1.0+rebound_time;
-        T critical3=(T)1.0+rebound_time+.4;
+        T critical3=(T)1.0+rebound_time+.3;
 
     //std::cout << "4th frame Frame" << critical3 <<  std::endl;
     T start_young=(T)0; T end_young=(T)rebound_stiffness;
