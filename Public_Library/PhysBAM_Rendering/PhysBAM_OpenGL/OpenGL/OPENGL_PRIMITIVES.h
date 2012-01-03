@@ -56,16 +56,19 @@ extern OPENGL_EPS_OUTPUT<float>* opengl_eps_output;
 #endif
 
 inline void OpenGL_Draw_Arrays_With_Normals(GLenum mode,GLenum type,int dimension,int length,const GLvoid* vertices,const GLvoid* normals)
-{glEnableClientState(GL_VERTEX_ARRAY);glEnableClientState(GL_NORMAL_ARRAY);glVertexPointer(dimension,type,0,vertices);glNormalPointer(GL_FLOAT,0,normals);glDrawArrays(mode,0,length);glDisableClientState(GL_VERTEX_ARRAY);glDisableClientState(GL_NORMAL_ARRAY);}
+{glEnableClientState(GL_VERTEX_ARRAY);glEnableClientState(GL_NORMAL_ARRAY);glVertexPointer(dimension,type,0,vertices);glNormalPointer(GL_FLOAT,0,normals);glDrawArrays(mode,0,length);glDisableClientState(GL_VERTEX_ARRAY);
+glDisableClientState(GL_NORMAL_ARRAY);IF_OPENGL_EPS_OUTPUT(opengl_eps_output->Draw_Arrays(mode,dimension,length,vertices));}
 
 inline void OpenGL_Draw_Arrays_With_Textures(GLenum mode,GLenum type,int dimension,int length,const GLvoid* vertices,const GLvoid* textures)
-{glEnableClientState(GL_VERTEX_ARRAY);glEnableClientState(GL_TEXTURE_COORD_ARRAY);glVertexPointer(dimension,type,0,vertices);glTexCoordPointer(2,GL_FLOAT,0,textures);glDrawArrays(mode,0,length);glDisableClientState(GL_VERTEX_ARRAY);glDisableClientState(GL_TEXTURE_COORD_ARRAY);}
+{glEnableClientState(GL_VERTEX_ARRAY);glEnableClientState(GL_TEXTURE_COORD_ARRAY);glVertexPointer(dimension,type,0,vertices);glTexCoordPointer(2,GL_FLOAT,0,textures);glDrawArrays(mode,0,length);glDisableClientState(GL_VERTEX_ARRAY);
+glDisableClientState(GL_TEXTURE_COORD_ARRAY);IF_OPENGL_EPS_OUTPUT(opengl_eps_output->Draw_Arrays(mode,dimension,length,vertices));}
 
 inline void OpenGL_Draw_Arrays(GLenum mode,GLenum type,int dimension,int length,const GLvoid* vertices,const GLvoid* colors)
-{glEnableClientState(GL_VERTEX_ARRAY);glEnableClientState(GL_COLOR_ARRAY);glVertexPointer(dimension,type,0,vertices);glColorPointer(4,GL_FLOAT,0,colors);glDrawArrays(mode,0,length);glDisableClientState(GL_VERTEX_ARRAY);glDisableClientState(GL_COLOR_ARRAY);}
+{glEnableClientState(GL_VERTEX_ARRAY);glEnableClientState(GL_COLOR_ARRAY);glVertexPointer(dimension,type,0,vertices);glColorPointer(4,GL_FLOAT,0,colors);glDrawArrays(mode,0,length);glDisableClientState(GL_VERTEX_ARRAY);glDisableClientState(GL_COLOR_ARRAY);
+IF_OPENGL_EPS_OUTPUT(opengl_eps_output->Draw_Arrays(mode,dimension,length,vertices));}
 
 inline void OpenGL_Draw_Arrays(GLenum mode,GLenum type,int dimension,int length,const GLvoid* vertices)
-{glEnableClientState(GL_VERTEX_ARRAY);glVertexPointer(dimension,type,0,vertices);glDrawArrays(mode,0,length);glDisableClientState(GL_VERTEX_ARRAY);}
+{glEnableClientState(GL_VERTEX_ARRAY);glVertexPointer(dimension,type,0,vertices);glDrawArrays(mode,0,length);glDisableClientState(GL_VERTEX_ARRAY);IF_OPENGL_EPS_OUTPUT(opengl_eps_output->Draw_Arrays(mode,dimension,length,vertices));}
 
 #ifndef USE_OPENGLES
 inline void OpenGL_Draw_Arrays_With_Normals(GLenum mode,int dimension,const ARRAY<GLdouble>& vertices,const ARRAY<GLfloat>& normals)

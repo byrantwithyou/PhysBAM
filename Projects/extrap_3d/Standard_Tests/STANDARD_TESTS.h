@@ -774,7 +774,7 @@ void Get_Initial_Data()
             
             break;}
         case 59: {
-            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_20K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T)0.373,(T)0))),true,true,density,.005);
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_110K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T)0.373,(T)0))),true,true,density,.005);
             break;}
 
         case 32:{
@@ -1178,7 +1178,7 @@ void Get_Initial_Data()
         {
             T flat_bottom_radius=0.02;
             T rounded_innterior_radius=0.02;
-            T vertical_straight_length=0.08;
+            T vertical_straight_length=0.15;
             T thickness=0.01;
             T coefficient_of_friction=0.3;
             RIGID_BODY<TV>& rounding=tests.Add_Analytic_Bowl(flat_bottom_radius,rounded_innterior_radius,thickness,128,32);
