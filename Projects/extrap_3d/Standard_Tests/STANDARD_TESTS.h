@@ -420,13 +420,13 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.cfl=(T)5;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=true;
-            //if (with_hand || with_bunny)
-           // {
+
+            solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=override_collisions;
+            solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=override_collisions;
             solids_parameters.triangle_collision_parameters.perform_self_collision=override_collisions;//This gets turned off later then back on
-            std::cout << "rame collisions are " << override_collisions << std::endl;
+            //std::cout << "rame collisions are " << override_collisions << std::endl;
             self_collision_flipped=false;
-                solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=override_collisions;
-                solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=override_collisions;
+
             //}
             frame_rate=120;
             last_frame=420;
@@ -469,7 +469,10 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.cfl=(T)10;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
-            solids_parameters.triangle_collision_parameters.perform_self_collision=true;
+            solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=true;
+            solids_parameters.triangle_collision_parameters.perform_self_collision=override_collisions;
+            solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=override_collisions;
+            solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=override_collisions;
             frame_rate=120;
             last_frame=10*120;
             break;
@@ -519,7 +522,12 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.triangle_collision_parameters.perform_self_collision=true;
             solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=true;
             solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=true;
-            if (override_no_collisions) solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+
+            if (override_no_collisions){
+                solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+                solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=false;
+                solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=false;                
+            }
             frame_rate=360;
             last_frame=4000;
             break;
@@ -1654,7 +1662,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             break;}
         case 58:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume1=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(1);
-            Add_Constitutive_Model(tetrahedralized_volume1,1e4,0.4,0.005);
+            Add_Constitutive_Model(tetrahedralized_volume1,5e4,0.4,0.005);
             if(!gears_of_pain){
                 TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume2=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(2);
                 Add_Constitutive_Model(tetrahedralized_volume2,5e4,0.4,0.005);
@@ -2201,7 +2209,13 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
 void Update_Time_Varying_Material_Properties(const T time)
 {   if(test_number==29 && time > .01){
     
-    if(solids_parameters.triangle_collision_parameters.perform_self_collision && time<=1.3) solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+    if(solids_parameters.triangle_collision_parameters.perform_self_collision && time<=1.3){
+        
+        solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=override_collisions;
+        solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=override_collisions;
+        solids_parameters.triangle_collision_parameters.perform_self_collision=override_collisions;//This gets turned off later then back on
+
+    }
 
     T critical=(T)1.0;
         T critical2=(T)1.0+rebound_time;
