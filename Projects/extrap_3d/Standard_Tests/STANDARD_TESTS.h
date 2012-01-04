@@ -422,7 +422,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.cfl=(T)5;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=true;
-            solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness = 1e-4;
+            solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness = 1e-2;
 
             solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=override_collisions;
             solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=override_collisions;
@@ -1470,6 +1470,8 @@ void Get_Initial_Data()
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/hand_30k.tet",
                                                 RIGID_BODY_STATE<TV>(FRAME<TV>(TV(15,5,0),ROTATION<TV>(-T(pi/2),TV(1,0,0)))),true,true,density,1.0);
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/bunny.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(20,(T)5,0))),true,true,density,1.0);
+            RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(25,5,0)));
+            tests.Create_Mattress(mattress_grid,true,&initial_state);
             break;
         }
         default:
