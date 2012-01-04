@@ -517,20 +517,26 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             break;}
         case 100:{
             TRIANGULATED_AREA<T>* ta=TRIANGULATED_AREA<T>::Create(particles);
-            particles.array_collection->Add_Elements(9);
-            particles.X(1)=TV(-.5,0);
-            particles.X(2)=TV(.5,0);
-            particles.X(3)=TV(0,sqrt(3)/2);
-            particles.X(4)=TV(-.5,0);
-            particles.X(5)=TV(.5,0);
-            particles.X(6)=TV(0,sqrt(3)/2);
-            particles.X(7)=TV(-.5,0);
-            particles.X(8)=TV(.5,0);
-            particles.X(9)=TV(0,sqrt(3)/2);
+            particles.array_collection->Add_Elements(parameter?3:9);
+            if(parameter){
+                particles.X(1)=TV(-.5,0)*1.5;
+                particles.X(2)=TV(.5,0)*1.5;
+                particles.X(3)=TV(0,sqrt(3)/2)*1.5;
+                ta->mesh.elements.Append(VECTOR<int,3>(1,2,3));}
+            else{
+                particles.X(1)=TV(-.5,0);
+                particles.X(2)=TV(.5,0);
+                particles.X(3)=TV(0,sqrt(3)/2);
+                particles.X(4)=TV(-.5,0);
+                particles.X(5)=TV(.5,0);
+                particles.X(6)=TV(0,sqrt(3)/2);
+                particles.X(7)=TV(-.5,0);
+                particles.X(8)=TV(.5,0);
+                particles.X(9)=TV(0,sqrt(3)/2);
+                ta->mesh.elements.Append(VECTOR<int,3>(1,2,3));
+                ta->mesh.elements.Append(VECTOR<int,3>(4,5,6));
+                ta->mesh.elements.Append(VECTOR<int,3>(7,8,9));}
             particles.mass.Fill(1);
-            ta->mesh.elements.Append(VECTOR<int,3>(1,2,3));
-            ta->mesh.elements.Append(VECTOR<int,3>(4,5,6));
-            ta->mesh.elements.Append(VECTOR<int,3>(7,8,9));
             solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(ta);
             contrail_colors.Append(VECTOR<T,3>(1,0,0));
             contrail_colors.Append(VECTOR<T,3>(0,1,0));
@@ -566,9 +572,11 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 100:{
             for(int i=1;TRIANGULATED_AREA<T>* triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>*>(i);i++)
                 Add_Constitutive_Model(*triangulated_area,(T)1e2,poissons_ratio,(T).05);
-            Place_Triangle(1,2.6,1.8,1.5,.2,TV(4.1,1.5));
-            Place_Triangle(2,1.3,.15,.2,-.3,TV(4.1,0));
-            Place_Triangle(3,2.7,.9,1.8,.4,TV(4.1,-1.5));
+            if(parameter) Place_Triangle(1,3,.1,.2,1.2,TV(4.1,0));
+            else{
+                Place_Triangle(1,2.6,1.8,1.5,3.34,TV(4.1,2));
+                Place_Triangle(2,1.3,.15,.2,-.3,TV(4.1,0));
+                Place_Triangle(3,2.7,.9,1.8,.4,TV(4.1,-2));}
             break;}
         case 8:
         case 16:
@@ -850,7 +858,7 @@ void Preprocess_Frame(const int frame)
         }
     }
     if(test_number==33) Plot_Energy_Landscape();
-    if(test_number==100) Plot_Contour_Landscape();
+    if(test_number==100) Plot_Contour_Landscape(frame);
     if(test_number==33 && frame==2)
     {
         PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
@@ -893,7 +901,7 @@ void Add_Constitutive_Model(TRIANGULATED_AREA<T>& triangulated_area,T stiffness,
 
     if(plot_energy_density) Plot_Energy_Density(icm,stiffness);
     if(primary_contour) Primary_Contour(*icm);
-    if(scatter_plot || test_number==100) Add_Primary_Contour_Segments(*icm);
+    if(scatter_plot || test_number==100){image_size*=10;Add_Primary_Contour_Segments(*icm);image_size/=10;}
     if(test_model_only) Test_Model(*icm);
 }
 //#####################################################################
@@ -1004,8 +1012,7 @@ void Primary_Contour(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>& icm)
             TV evec=fabs(ev.x11)>fabs(ev.x22)?eigenvectors.Column(1):eigenvectors.Column(2);
             if(evec.Sum()<0) evec=-evec;
             T val=TV::Dot_Product(evec,g);
-            img(VECTOR<int,2>(i,j))=VECTOR<T,3>(val<0,val>=0,0);
-        }
+            img(VECTOR<int,2>(i,j))=VECTOR<T,3>(val<0,val>=0,0);}
 
     for(int i=1;i<=image_size;i++){if(i%10>0 && i%10<5) img(VECTOR<int,2>(i,image_size/2))=img(VECTOR<int,2>(image_size/2,i))=VECTOR<T,3>(0,0,1);}
 
@@ -1074,7 +1081,6 @@ T Contour_Crossing(const TV& g0,const TV& v0,const TV& g1,const TV& v1)
     if(!b) return 1;
     if(TV::Dot_Product(v0,v1)<0) b=-b;
     if((a>0) == (b>0)) return -1;
-//    LOG::cout<<"CROSS "<<a<<"  "<<b<<"  "<<g0<<"  "<<g1<<"  "<<v0<<"  "<<v1<<std::endl;
     return a/(a-b);
 }
 //#####################################################################
@@ -1184,29 +1190,35 @@ void Plot_Energy_Landscape()
 //#####################################################################
 // Function Plot_Contour_Landscape
 //#####################################################################
-void Plot_Contour_Landscape()
+void Plot_Contour_Landscape(int frame)
 {
+    char buff[1000];
+    sprintf(buff, "%s/data", output_directory.c_str());
+    FILE_UTILITIES::Create_Directory(buff);
+    sprintf(buff, "%s/data/%03d.txt", output_directory.c_str(), frame);
+    std::ofstream out(buff);
+
+    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     FINITE_VOLUME<TV,2>& fv=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,2>&>();
     ISOTROPIC_CONSTITUTIVE_MODEL<T,2>* icm=fv.isotropic_model;
     bool is_neo=dynamic_cast<NEO_HOOKEAN<T,2>*>(icm);
     T min=-image_size/2,max=image_size/2;
-    for(int i=min;i<=max;i++)
-        for(int j=min;j<=max;j++){
-            if(is_neo && (i<=0 || j<=0)) continue;
-            TV X(2*sigma_range*i/image_size+1.1e-5,2*sigma_range*j/image_size+1.2e-5);
+    for(int i=min;i<max;i++)
+        for(int j=min;j<max;j++){
+            if(is_neo && (i<0 || j<0)) continue;
+            TV X(2*sigma_range*(i+.5)/image_size+1.1e-5,2*sigma_range*(j+.5)/image_size+1.2e-5);
             DIAGONAL_MATRIX<T,2> F(X),P=icm->P_From_Strain(F,1,0)*plot_scale;
-            Add_Debug_Particle(X,VECTOR<T,3>(.5,.5,.5));
-            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,-P.To_Vector().Normalized());}
+            out<<"p "<<X<<" "<<-P.To_Vector().Normalized()<<std::endl;}
 
     for(int i=1;i<=fv.Fe_hat.m;i++){
         contrail(i).Append(fv.Fe_hat(i).To_Vector());
-        for(int j=1;j<=contrail(i).m;j++)
-            Add_Debug_Particle(contrail(i)(j),contrail_colors(i));}
+        out<<"c "<<contrail(i)<<std::endl;}
 
     for(int i=1;i<=contour_segments.m;i++){
         if(is_neo && (contour_segments(i).x.Min()<.2 || contour_segments(i).y.Min()<.2)) continue;
-        Add_Debug_Particle(contour_segments(i).x,VECTOR<T,3>(1,1,0));
-        Add_Debug_Particle(contour_segments(i).y,VECTOR<T,3>(1,1,0));}
+        out<<"u "<<contour_segments(i)<<std::endl;}
+
+    out<<"t "<<particles.X<<std::endl;
 }
 //#####################################################################
 // Function Energy_Profile_Plot
