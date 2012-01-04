@@ -145,7 +145,7 @@ public:
     T stiffness_multiplier;
     T damping_multiplier;
     T boxsize;
-    T rebound_time,rebound_stiffness;
+    T rebound_time,rebound_stiffness,rebound_drop;
     bool use_constant_ife;
     bool forces_are_removed,self_collision_flipped,sloped_floor;
     ARRAY<int> externally_forced;
@@ -250,6 +250,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Double_Argument("-hole",.5,"hole");
     parse_args->Add_Double_Argument("-rebound_time",.2,"number of seconds to rebound in test 29");
     parse_args->Add_Double_Argument("-rebound_stiffness",5,"log10 of youngs modulus of final stiffness");
+    parse_args->Add_Double_Argument("-rebound_drop",1.5,"log10 of youngs modulus of dropoff of final stiffness");
     parse_args->Add_Option_Argument("-nobind");
     parse_args->Add_Double_Argument("-cutoff",.4,"cutoff");
     parse_args->Add_Double_Argument("-efc",20,"efc");
@@ -352,6 +353,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     hole=(T)parse_args->Get_Double_Value("-hole");
     rebound_stiffness=(T)parse_args->Get_Double_Value("-rebound_stiffness");
     rebound_time=(T)parse_args->Get_Double_Value("-rebound_time");
+    rebound_drop=(T)parse_args->Get_Double_Value("-rebound_drop");
     with_bunny=parse_args->Is_Value_Set("-with_bunny");
     with_hand=parse_args->Is_Value_Set("-with_hand");
     with_big_arm=parse_args->Is_Value_Set("-with_big_arm");
@@ -420,6 +422,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.cfl=(T)5;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=true;
+            solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness = 1e-4;
 
             solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=override_collisions;
             solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=override_collisions;
@@ -467,6 +470,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 43:
         case 58:
             solids_parameters.cfl=(T)10;
+            solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness = 1e-4;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=true;
@@ -1089,7 +1093,7 @@ void Get_Initial_Data()
 
             curve.Add_Control_Point(0,FRAME<TV>(box1.X()));
             curve.Add_Control_Point(.2,FRAME<TV>(box1.X()));
-            //curve.Add_Control_Point(.21,FRAME<TV>(box1.X()-TV(0,.2*board_height,0)));
+            curve.Add_Control_Point(.21,FRAME<TV>(box1.X()-TV(0,.2*board_height,0)));
             //curve.Add_Control_Point(.23,FRAME<TV>(box1.X()-TV(-2.5*bound,.2*board_height,0)));
             curve2.Add_Control_Point(0,FRAME<TV>(box2.X()));
             curve2.Add_Control_Point(.2,FRAME<TV>(box2.X()));
@@ -2255,7 +2259,7 @@ void Update_Time_Varying_Material_Properties(const T time)
         //std::cout << "3rd critical time reached frame Frame" << std::endl;
         FINITE_VOLUME<TV,3>& fv = deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
         CONSTITUTIVE_MODEL<T,3>& icm = fv.constitutive_model;
-        T young = pow(10.0,end_young-(T)1.5);
+        T young = pow(10.0,end_young-rebound_drop);
         icm.Update_Lame_Constants(young,pois,(T).01);
         solids_parameters.triangle_collision_parameters.perform_self_collision=override_collisions;        
        // solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append(deformable_body_collection.deformable_geometry.structures(1));
