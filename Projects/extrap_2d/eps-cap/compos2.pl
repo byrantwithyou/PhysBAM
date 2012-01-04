@@ -26,7 +26,7 @@ sub spt
 }
 
 my $arrows='';
-my $arrow='';
+my $velarrows='';
 my $vertline='';
 my @trails=();
 my @triangles=();
@@ -39,7 +39,7 @@ my $tribot=100;
 my $numtri=0;
 while(<>)
 {
-    if(0 && /p $nd$d$nd$d$nd$d$nd$d\]/)
+    if(/p $nd$d$nd$d$nd$d$nd$d\]/)
     {
         if($1 + $2 > 0)
         {
@@ -75,7 +75,7 @@ while(<>)
         my $c=$p?'coltri0':'invtri';
         push @trails, "$trail\n";
         if($1>3){next;}
-        $svddots.="\\pscircle[fillcolor=$c,linestyle=none,fillstyle=solid]@{[&spt($pts[$#pts])]} {2}\n";
+        $svddots.="\\pscircle[fillcolor=$c,linestyle=none,fillstyle=solid]@{[&spt($pts[$#pts])]} {3}\n";
     }
     if(/u $nd$d$nd$d$nd$d$nd$d\]/)
     {
@@ -89,7 +89,7 @@ while(<>)
         pop @pts;
         for(my $i=0;$i+2<@pts;$i+=3)
         {
-            my $col="coltri".($numtri++%8);
+            my $col="coltri0";#"coltri".($numtri++%8);
             my ($a,$b,$c,$d,$e,$f)=((split ' ',$pts[$i]), (split ' ',$pts[$i+1]), (split ' ',$pts[$i+2]));
             my @r=($b+4.1,$a,$f+4.1,$e,$d+4.1,$c);
             $c-=$a;
@@ -116,6 +116,12 @@ my $contour = join '', map {&spt($_)} sort {$a=~/$d/;my $A=$1;$b=~/$d/;my $B=$1;
 $contour="\\psline[linewidth=5px,linecolor=colcontour]{c-c}$contour\n";
 my $extratrilines="\\psline[linewidth=5px,linecolor=black]{c-c}" . &pt(3.2,$tribot) . &pt(5.0,$tribot) . "\n";
 $extratrilines .= "\\psline[linewidth=5px,linecolor=black]{c-c}" . &pt(3.2,$tritop) . &pt(5.0,$tritop) . "\n";
+$velarrows .= "\\psline[linecolor=arvelocity,fillcolor=arvelocity,arrowinset=0,arrowlength=0.8,fillstyle=solid,linewidth=13px]{->}" . &pt(4.1,$tritop) . &pt(4.1, $tritop+.5) . "\n";
+$velarrows .= "\\psline[linecolor=arvelocity,fillcolor=arvelocity,arrowinset=0,arrowlength=0.8,fillstyle=solid,linewidth=13px]{->}" . &pt(4.7,$tritop) . &pt(4.7, $tritop+.5) . "\n";
+$velarrows .= "\\psline[linecolor=arvelocity,fillcolor=arvelocity,arrowinset=0,arrowlength=0.8,fillstyle=solid,linewidth=13px]{->}" . &pt(3.5,$tritop) . &pt(3.5, $tritop+.5) . "\n";
+$velarrows .= "\\psline[linecolor=arvelocity,fillcolor=arvelocity,arrowinset=0,arrowlength=0.8,fillstyle=solid,linewidth=13px]{->}" . &pt(4.1,$tribot) . &pt(4.1, $tribot-.5) . "\n";
+$velarrows .= "\\psline[linecolor=arvelocity,fillcolor=arvelocity,arrowinset=0,arrowlength=0.8,fillstyle=solid,linewidth=13px]{->}" . &pt(4.7,$tribot) . &pt(4.7, $tribot-.5) . "\n";
+$velarrows .= "\\psline[linecolor=arvelocity,fillcolor=arvelocity,arrowinset=0,arrowlength=0.8,fillstyle=solid,linewidth=13px]{->}" . &pt(3.5,$tribot) . &pt(3.5, $tribot-.5) . "\n";
 
 $"='';
 my $wm1=$w-1;
@@ -163,7 +169,9 @@ $arrow
 @trails
 $arrows
 $svddots
+$velarrows
 $extratrilines
+$arrows
 
 \\end{pspicture}
 \\end{document}
