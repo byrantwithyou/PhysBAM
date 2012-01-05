@@ -422,7 +422,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.cfl=(T)5;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=true;
-            solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness = 1e-2;
+            solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness = 1e-4;
 
             solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=override_collisions;
             solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=override_collisions;
@@ -1093,7 +1093,7 @@ void Get_Initial_Data()
 
             curve.Add_Control_Point(0,FRAME<TV>(box1.X()));
             curve.Add_Control_Point(.2,FRAME<TV>(box1.X()));
-            curve.Add_Control_Point(.21,FRAME<TV>(box1.X()-TV(0,.2*board_height,0)));
+            //curve.Add_Control_Point(.21,FRAME<TV>(box1.X()-TV(0,.2*board_height,0)));
             //curve.Add_Control_Point(.23,FRAME<TV>(box1.X()-TV(-2.5*bound,.2*board_height,0)));
             curve2.Add_Control_Point(0,FRAME<TV>(box2.X()));
             curve2.Add_Control_Point(.2,FRAME<TV>(box2.X()));
