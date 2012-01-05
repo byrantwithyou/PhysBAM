@@ -152,7 +152,7 @@ public:
     ARRAY<int> constrained_particles;
     ARRAY<TV> constrained_velocities;
     ARRAY<TV> jello_centers;
-    T stretch;
+    T stretch,plateau;
     T hole;
     bool nobind;
     ARRAY<TV> fish_V;
@@ -277,6 +277,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
     output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d",test_number);
     frame_rate=24;
+    plateau=(T)0;
     parameter=parse_args->Get_Integer_Value("-parameter");
     jello_size=parse_args->Get_Integer_Value("-jello_size");
     seed_input=parse_args->Get_Integer_Value("-seed");   
@@ -1032,7 +1033,7 @@ void Get_Initial_Data()
             T max_jello_size = .036;//maximum edge length
             T bound = .2;
             TV new_center; T new_rotate;
-            T board_height = .6-.1*bound;
+            T board_height = .6-.1*bound; plateau=board_height;
             bool stuck=false;
             RIGID_BODY_STATE<TV> initial_state;
             
@@ -2114,21 +2115,21 @@ void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id)
     if(test_number==41)
     {
         if(id==kinematic_id) 
-        {if(time >= .2) frame = FRAME<TV>(TV(1,1,0)); else frame=curve.Value(time);}
+        {if(time >= .2) frame = FRAME<TV>(TV(1,plateau,0)); else frame=curve.Value(time);}
         if(id==kinematic_id2) 
-        {if(time >= .3) frame = FRAME<TV>(TV(2,1,0)); else frame=curve2.Value(time);}
+        {if(time >= .3) frame = FRAME<TV>(TV(2,plateau,0)); else frame=curve2.Value(time);}
         if(id==kinematic_id3) 
-        {if(time >= .4) frame = FRAME<TV>(TV(3,1,0)); else frame=curve3.Value(time);}
+        {if(time >= .4) frame = FRAME<TV>(TV(3,plateau,0)); else frame=curve3.Value(time);}
         if(id==kinematic_id4) 
-        {if(time >= .5) frame = FRAME<TV>(TV(4,1,0)); else frame=curve4.Value(time);}
+        {if(time >= .5) frame = FRAME<TV>(TV(4,plateau,0)); else frame=curve4.Value(time);}
         if(id==kinematic_id5) 
-        {if(time >= .6) frame = FRAME<TV>(TV(5,1,0)); else frame=curve5.Value(time);}
+        {if(time >= .6) frame = FRAME<TV>(TV(5,plateau,0)); else frame=curve5.Value(time);}
         if(id==kinematic_id6) 
-        {if(time >= .7) frame = FRAME<TV>(TV(6,1,0)); else frame=curve6.Value(time);}
+        {if(time >= .7) frame = FRAME<TV>(TV(6,plateau,0)); else frame=curve6.Value(time);}
         if(id==kinematic_id7) 
-        {if(time >= .8) frame = FRAME<TV>(TV(7,1,0)); else frame=curve7.Value(time);}
+        {if(time >= .8) frame = FRAME<TV>(TV(7,plateau,0)); else frame=curve7.Value(time);}
         if(id==kinematic_id8) 
-        {if(time >= .9) frame = FRAME<TV>(TV(8,1,0)); else frame=curve8.Value(time);}
+        {if(time >= .9) frame = FRAME<TV>(TV(8,plateau,0)); else frame=curve8.Value(time);}
         return;
     }
     if(id==kinematic_id) frame=curve.Value(time);
