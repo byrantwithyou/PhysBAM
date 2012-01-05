@@ -464,6 +464,17 @@ void Parse_Options() PHYSBAM_OVERRIDE
             last_frame = 4000;
             break;
         case 33:
+            solids_parameters.cfl=(T)10;
+            solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
+            solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness = 1e-4;
+            solids_parameters.implicit_solve_parameters.cg_iterations=100000;
+            solids_parameters.triangle_collision_parameters.perform_self_collision=true;
+            solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=true;
+            solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=true;
+            solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=true;
+            frame_rate=120;
+            last_frame=10*300;
+            break;
         case 43:
         case 58:
             solids_parameters.cfl=(T)10;
@@ -833,27 +844,37 @@ void Get_Initial_Data()
 
             break;}
         case 33:{
-            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/fish_42K.tet",
-                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0.9,0),ROTATION<TV>((T)pi*0.525,TV(1,0,0))*ROTATION<TV>((T)pi/2,TV(0,1,0)))),true,true,density,0.06);
+            
+            T y_translate=0.1;
 
-            T scale = 0.3;
-
-            RIGID_BODY<TV>& gear1=tests.Add_Rigid_Body("gear",.375*scale,1.0*scale);
-            RIGID_BODY<TV>& gear2=tests.Add_Rigid_Body("gear",.375*scale,1.0*scale);
-
-            gear1.coefficient_of_friction = 0.1;
-            gear2.coefficient_of_friction = 0.1;
-
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_110K.tet",
+                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(-0.2,2.5-y_translate,-0.04),ROTATION<TV>(T(-pi/2.*0.9),TV(0,0,1))*ROTATION<TV>(T(pi/2.),TV(0,1,0)))),true,true,density,0.013);
+            
+            RIGID_BODY<TV>& gear1=tests.Add_Rigid_Body("gear",.375,1);
+            RIGID_BODY<TV>& gear2=tests.Add_Rigid_Body("gear",.375,1);
+            // RIGID_BODY<TV>& cylinder=tests.Add_Analytic_Cylinder(1.5,.15,24);
+ 
+            gear1.coefficient_of_friction = 1;
+            gear2.coefficient_of_friction = 1;
+            // cylinder.coefficient_of_friction = 0;
+ 
             kinematic_id=gear1.particle_index;
             rigid_body_collection.rigid_body_particle.kinematic(gear1.particle_index)=true;
             kinematic_id2=gear2.particle_index;
             rigid_body_collection.rigid_body_particle.kinematic(gear2.particle_index)=true;
-
+            // kinematic_id3=cylinder.particle_index;
+            // rigid_body_collection.rigid_body_particle.kinematic(cylinder.particle_index)=true;
+             
             T angular_velocity = 1;
-
+            T scale = 1;
+ 
+            // curve3.Add_Control_Point(0,FRAME<TV>(TV(0,4-y_translate,0),ROTATION<TV>(0,TV(0,0,1))));
+            // curve3.Add_Control_Point(2,FRAME<TV>(TV(0,4-y_translate,0),ROTATION<TV>(0,TV(0,0,1))));
+            // curve3.Add_Control_Point(5,FRAME<TV>(TV(0,2-y_translate,0),ROTATION<TV>(0,TV(0,0,1))));
+ 
             for (int i=0; i<60; i++){
-                curve.Add_Control_Point(i/angular_velocity,FRAME<TV>(TV(-(T).4*scale,1.5*scale,-.75*scale),ROTATION<TV>(-i,TV(0,0,1))));
-                curve2.Add_Control_Point(i/angular_velocity,FRAME<TV>(TV((T).4*scale,1.5*scale,-.75*scale),ROTATION<TV>(i,TV(0,0,1))));}
+                curve.Add_Control_Point(i/angular_velocity,FRAME<TV>(TV(-(T).4*scale,1.5*scale-y_translate,-.75*scale),ROTATION<TV>(-i,TV(0,0,1))));
+                curve2.Add_Control_Point(i/angular_velocity,FRAME<TV>(TV((T).4*scale,1.5*scale-y_translate,-.75*scale),ROTATION<TV>(i,TV(0,0,1))));}
 
             tests.Add_Ground();
             break;}
@@ -1656,9 +1677,10 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 43:
         case 33:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
-            Add_Constitutive_Model(tetrahedralized_volume,1e4,0.4,0.005);
+            Add_Constitutive_Model(tetrahedralized_volume,1e4,0.35,0.005);
 
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            solid_body_collection.template Find_Force<GRAVITY<TV>&>().gravity=0;
             break;}
         case 58:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume1=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(1);
@@ -2170,6 +2192,8 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
         for(int t=1;t<=fvm.Fe_hat.m;t++)
             if(fvm.Fe_hat(t).x11<3)
                 for (int i=1; i<=4; i++) solid_body_collection.deformable_body_collection.collisions.check_collision(tet_volume.mesh.elements(t)(i))=true;
+
+        if (time >=1 ) solid_body_collection.template Find_Force<GRAVITY<TV>&>().gravity=9.8;
     }
     /*if(test_number==58)
     {
