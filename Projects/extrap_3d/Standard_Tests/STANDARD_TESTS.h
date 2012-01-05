@@ -152,7 +152,7 @@ public:
     ARRAY<int> constrained_particles;
     ARRAY<TV> constrained_velocities;
     ARRAY<TV> jello_centers;
-    T stretch;
+    T stretch,plateau;
     T hole;
     bool nobind;
     ARRAY<TV> fish_V;
@@ -277,6 +277,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
     output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d",test_number);
     frame_rate=24;
+    plateau=(T)0;
     parameter=parse_args->Get_Integer_Value("-parameter");
     jello_size=parse_args->Get_Integer_Value("-jello_size");
     seed_input=parse_args->Get_Integer_Value("-seed");   
@@ -422,7 +423,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.cfl=(T)5;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=true;
-            solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness = 1e-2;
+            solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness = 1e-6;
 
             solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=override_collisions;
             solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=override_collisions;
@@ -470,7 +471,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 43:
         case 58:
             solids_parameters.cfl=(T)10;
-            solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness = 1e-4;
+            solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness = 1e-5;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=true;
@@ -837,10 +838,11 @@ void Get_Initial_Data()
 
             break;}
         case 33:{
-            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/fish_42K.tet",
-                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0.9,0),ROTATION<TV>((T)pi*0.525,TV(1,0,0))*ROTATION<TV>((T)pi/2,TV(0,1,0)))),true,true,density,0.06);
+            T scale = 0.75;
+            //tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/fish_42K.tet",
+              //  RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0.9,0),ROTATION<TV>((T)pi*0.525,TV(1,0,0))*ROTATION<TV>((T)pi/2,TV(0,1,0)))),true,true,density,0.06);
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_110K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3.0*scale,0.0*scale),ROTATION<TV>(T(-pi/4),TV(1,0,0))*ROTATION<TV>(T(pi),TV(0,1,0)))),true,true,density,.005);     
 
-            T scale = 0.3;
 
             RIGID_BODY<TV>& gear1=tests.Add_Rigid_Body("gear",.375*scale,1.0*scale);
             RIGID_BODY<TV>& gear2=tests.Add_Rigid_Body("gear",.375*scale,1.0*scale);
@@ -858,18 +860,35 @@ void Get_Initial_Data()
             for (int i=0; i<60; i++){
                 curve.Add_Control_Point(i/angular_velocity,FRAME<TV>(TV(-(T).4*scale,1.5*scale,-.75*scale),ROTATION<TV>(-i,TV(0,0,1))));
                 curve2.Add_Control_Point(i/angular_velocity,FRAME<TV>(TV((T).4*scale,1.5*scale,-.75*scale),ROTATION<TV>(i,TV(0,0,1))));}
+            
+            RIGID_BODY<TV>& box1=tests.Add_Analytic_Box(TV(2.0*scale,2.0*scale,.1*scale));
+            RIGID_BODY<TV>& box2=tests.Add_Analytic_Box(TV(2.0*scale,2.0*scale,.1*scale));
+            box1.X()=TV(0,1.2*scale,0.901*scale);
+            box2.X()=TV(0,1.2*scale,-0.901*scale);
+            box1.is_static=true;            
+            box2.is_static=true;    
+                
+            RIGID_BODY<TV>& cylinder=tests.Add_Analytic_Cylinder(1.5*scale,.06*scale);
+            cylinder.X()=TV(0,5.0*scale,0*scale);
+            cylinder.is_static=false;
+            kinematic_id4=cylinder.particle_index;
+            rigid_body_collection.rigid_body_particle.kinematic(cylinder.particle_index)=true;
+            curve4.Add_Control_Point(0,FRAME<TV>(TV(0,5.0*scale,0*scale)));
+            curve4.Add_Control_Point(11,FRAME<TV>(TV(0,5.0*scale,0*scale)));
+            curve4.Add_Control_Point(12,FRAME<TV>(TV(0,5.0*scale,0*scale)));
+            curve4.Add_Control_Point(13,FRAME<TV>(TV(0,2.0*scale,0*scale)));
 
             tests.Add_Ground();
             break;}
             
         case 58:{
-            T scale = 0.3;
+            T scale = 0.75;
 
-            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/hand_30k.tet",
-                                                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3*scale,0),ROTATION<TV>(T(pi/2),TV(0,1,0))*ROTATION<TV>(T(pi/2),TV(1,0,0)))),true,true,density,.35);
-            if(!gears_of_pain){ tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/fish_42K.tet",
-                                                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,4.5*scale,-1.2*scale),ROTATION<TV>((T)pi*0.525,TV(1,0,0))*ROTATION<TV>(0*(T)pi/2,TV(0,1,0)))),true,true,density,0.06);            
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/hand_30k.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3*scale,0),ROTATION<TV>(T(pi/2),TV(0,1,0))*ROTATION<TV>(T(pi/2),TV(1,0,0)))),true,true,density,.35);
+            if(!gears_of_pain){ //tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/fish_42K.tet",
+                                              //  RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,4.5*scale,-1.2*scale),ROTATION<TV>((T)pi*0.525,TV(1,0,0))*ROTATION<TV>(0*(T)pi/2,TV(0,1,0)))),true,true,density,0.06);            
             //tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/bunny.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)4.7*scale,-3.0*scale))),true,true,density,.25);
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_110K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)4.4*scale,-3.0*scale),ROTATION<TV>(T(-pi/2),TV(1,0,0))*ROTATION<TV>(T(pi),TV(0,1,0)))),true,true,density,.005);                
             }
            
             RIGID_BODY<TV>& gear1=tests.Add_Rigid_Body("gear",.375*scale,1.0*scale);
@@ -917,24 +936,24 @@ void Get_Initial_Data()
             kinematic_id3=box3.particle_index;
             rigid_body_collection.rigid_body_particle.kinematic(box3.particle_index)=true; 
             curve3.Add_Control_Point(0,FRAME<TV>(TV(0,3.0*scale,-1.4*scale),ROTATION<TV>((T)pi/4.0,TV(1,0,0))));
-            curve3.Add_Control_Point(1,FRAME<TV>(TV(0,3.0*scale,-1.4*scale),ROTATION<TV>((T)pi/4.0,TV(1,0,0))));
-            curve3.Add_Control_Point(2,FRAME<TV>(TV(0,3.0*scale,-3.4*scale),ROTATION<TV>((T)pi/4.0,TV(1,0,0))));
+            curve3.Add_Control_Point(.1,FRAME<TV>(TV(0,3.0*scale,-1.4*scale),ROTATION<TV>((T)pi/4.0,TV(1,0,0))));
+            curve3.Add_Control_Point(1.1,FRAME<TV>(TV(0,3.0*scale,-3.4*scale),ROTATION<TV>((T)pi/4.0,TV(1,0,0))));
 
             box0.coefficient_of_friction = .05;
             kinematic_id5=box0.particle_index;
             rigid_body_collection.rigid_body_particle.kinematic(box0.particle_index)=true; 
             curve5.Add_Control_Point(0,FRAME<TV>(TV(0,4.0*scale,-3.0*scale)));
-            curve5.Add_Control_Point(1.0,FRAME<TV>(TV(0,4.0*scale,-3.0*scale),ROTATION<TV>(0*(T)pi/12.0,TV(1,0,0))));
-            curve5.Add_Control_Point(1.1,FRAME<TV>(TV(0,4.0*scale,-3.0*scale),ROTATION<TV>((T)pi/12.0,TV(1,0,0))));
+            curve5.Add_Control_Point(.7,FRAME<TV>(TV(0,4.0*scale,-3.0*scale),ROTATION<TV>(0*(T)pi/12.0,TV(1,0,0))));
+            curve5.Add_Control_Point(.8,FRAME<TV>(TV(0,4.0*scale,-3.0*scale),ROTATION<TV>((T)pi/12.0,TV(1,0,0))));
             
             cylinder.X()=TV(0,5.0*scale,0*scale);
             cylinder.is_static=false;
             kinematic_id4=cylinder.particle_index;
             rigid_body_collection.rigid_body_particle.kinematic(cylinder.particle_index)=true;
             curve4.Add_Control_Point(0,FRAME<TV>(TV(0,5.0*scale,0*scale)));
-            curve4.Add_Control_Point(1,FRAME<TV>(TV(0,5.0*scale,0*scale)));
-            curve4.Add_Control_Point(2,FRAME<TV>(TV(0,5.0*scale,0*scale)));
-            curve4.Add_Control_Point(3,FRAME<TV>(TV(0,2.0*scale,0*scale)));
+            curve4.Add_Control_Point(11,FRAME<TV>(TV(0,5.0*scale,0*scale)));
+            curve4.Add_Control_Point(12,FRAME<TV>(TV(0,5.0*scale,0*scale)));
+            curve4.Add_Control_Point(13,FRAME<TV>(TV(0,2.0*scale,0*scale)));
 
             
             tests.Add_Ground();
@@ -1032,7 +1051,7 @@ void Get_Initial_Data()
             T max_jello_size = .036;//maximum edge length
             T bound = .2;
             TV new_center; T new_rotate;
-            T board_height = .6-.1*bound;
+            T board_height = .6-.1*bound; plateau=board_height;
             bool stuck=false;
             RIGID_BODY_STATE<TV> initial_state;
             
@@ -1093,7 +1112,7 @@ void Get_Initial_Data()
 
             curve.Add_Control_Point(0,FRAME<TV>(box1.X()));
             curve.Add_Control_Point(.2,FRAME<TV>(box1.X()));
-            curve.Add_Control_Point(.21,FRAME<TV>(box1.X()-TV(0,.2*board_height,0)));
+            //curve.Add_Control_Point(.21,FRAME<TV>(box1.X()-TV(0,.2*board_height,0)));
             //curve.Add_Control_Point(.23,FRAME<TV>(box1.X()-TV(-2.5*bound,.2*board_height,0)));
             curve2.Add_Control_Point(0,FRAME<TV>(box2.X()));
             curve2.Add_Control_Point(.2,FRAME<TV>(box2.X()));
@@ -2114,21 +2133,21 @@ void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id)
     if(test_number==41)
     {
         if(id==kinematic_id) 
-        {if(time >= .2) frame = FRAME<TV>(TV(1,1,0)); else frame=curve.Value(time);}
+        {if(time >= .2) frame = FRAME<TV>(TV(1,plateau,0)); else frame=curve.Value(time);}
         if(id==kinematic_id2) 
-        {if(time >= .3) frame = FRAME<TV>(TV(2,1,0)); else frame=curve2.Value(time);}
+        {if(time >= .3) frame = FRAME<TV>(TV(2,plateau,0)); else frame=curve2.Value(time);}
         if(id==kinematic_id3) 
-        {if(time >= .4) frame = FRAME<TV>(TV(3,1,0)); else frame=curve3.Value(time);}
+        {if(time >= .4) frame = FRAME<TV>(TV(3,plateau,0)); else frame=curve3.Value(time);}
         if(id==kinematic_id4) 
-        {if(time >= .5) frame = FRAME<TV>(TV(4,1,0)); else frame=curve4.Value(time);}
+        {if(time >= .5) frame = FRAME<TV>(TV(4,plateau,0)); else frame=curve4.Value(time);}
         if(id==kinematic_id5) 
-        {if(time >= .6) frame = FRAME<TV>(TV(5,1,0)); else frame=curve5.Value(time);}
+        {if(time >= .6) frame = FRAME<TV>(TV(5,plateau,0)); else frame=curve5.Value(time);}
         if(id==kinematic_id6) 
-        {if(time >= .7) frame = FRAME<TV>(TV(6,1,0)); else frame=curve6.Value(time);}
+        {if(time >= .7) frame = FRAME<TV>(TV(6,plateau,0)); else frame=curve6.Value(time);}
         if(id==kinematic_id7) 
-        {if(time >= .8) frame = FRAME<TV>(TV(7,1,0)); else frame=curve7.Value(time);}
+        {if(time >= .8) frame = FRAME<TV>(TV(7,plateau,0)); else frame=curve7.Value(time);}
         if(id==kinematic_id8) 
-        {if(time >= .9) frame = FRAME<TV>(TV(8,1,0)); else frame=curve8.Value(time);}
+        {if(time >= .9) frame = FRAME<TV>(TV(8,plateau,0)); else frame=curve8.Value(time);}
         return;
     }
     if(id==kinematic_id) frame=curve.Value(time);
@@ -2177,14 +2196,14 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
             if(fvm.Fe_hat(t).x11<3)
                 for (int i=1; i<=4; i++) solid_body_collection.deformable_body_collection.collisions.check_collision(tet_volume.mesh.elements(t)(i))=true;
     }
-    /*if(test_number==58)
+    if(test_number==58)
     {
         solid_body_collection.deformable_body_collection.collisions.check_collision.Fill(true);
         for(int f=1;FINITE_VOLUME<TV,3>* fvm = solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>*>(f);f++)
             for(int t=1;t<=fvm->Fe_hat.m;t++)
                 if(fvm->Fe_hat(t).x11>=300)
                     solid_body_collection.deformable_body_collection.collisions.check_collision.Subset(fvm->strain_measure.mesh_object.mesh.elements(t)).Fill(false);
-    }*/
+    }
     if(test_number==29){    
         std::cout << "rame!" <<      solids_parameters.triangle_collision_parameters.perform_self_collision << std::endl;   
         //solids_parameters.triangle_collision_parameters.perform_self_collision=self_collision_flipped;
