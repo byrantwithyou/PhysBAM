@@ -152,7 +152,7 @@ public:
     ARRAY<int> constrained_particles;
     ARRAY<TV> constrained_velocities;
     ARRAY<TV> jello_centers;
-    T stretch,plateau;
+    T stretch,plateau,repulsion_thickness;
     T hole;
     bool nobind;
     ARRAY<TV> fish_V;
@@ -253,6 +253,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Double_Argument("-rebound_drop",1.5,"log10 of youngs modulus of dropoff of final stiffness");
     parse_args->Add_Option_Argument("-nobind");
     parse_args->Add_Double_Argument("-cutoff",.4,"cutoff");
+    parse_args->Add_Double_Argument("-repulsion_thickness",1e-4,"repulsion thickness");
     parse_args->Add_Double_Argument("-efc",20,"efc");
     parse_args->Add_Double_Argument("-poissons_ratio",-1,"poissons_ratio");
     parse_args->Add_Double_Argument("-youngs_modulus",0,"youngs modulus, only for test 41 so far");
@@ -367,6 +368,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     la_min=(T)parse_args->Get_Double_Value("-lb");
     test_model_only=parse_args->Get_Option_Value("-test_model_only");
     ether_drag=(T)parse_args->Get_Double_Value("-ether_drag");
+    repulsion_thickness=(T)parse_args->Get_Double_Value("-repulsion_thickness");
     
     semi_implicit=parse_args->Is_Value_Set("-semi_implicit");
     if(parse_args->Is_Value_Set("-project_nullspace")) solids_parameters.implicit_solve_parameters.project_nullspace_frequency=1;
@@ -423,7 +425,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.cfl=(T)5;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=true;
-            solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness = 1e-6;
+            solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness = 1e-5;
 
             solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=override_collisions;
             solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=override_collisions;
@@ -471,7 +473,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 43:
         case 58:
             solids_parameters.cfl=(T)10;
-            solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness = 1e-5;
+            solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness = repulsion_thickness;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=true;
@@ -518,7 +520,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.triangle_collision_parameters.perform_self_collision=true;
             if (override_no_collisions) solids_parameters.triangle_collision_parameters.perform_self_collision=false;
             frame_rate=600;
-            last_frame=1500;
+            last_frame=1000;
             break;
         case 52:
             solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness = 2e-4;
@@ -943,8 +945,8 @@ void Get_Initial_Data()
             kinematic_id5=box0.particle_index;
             rigid_body_collection.rigid_body_particle.kinematic(box0.particle_index)=true; 
             curve5.Add_Control_Point(0,FRAME<TV>(TV(0,4.0*scale,-3.0*scale)));
-            curve5.Add_Control_Point(.7,FRAME<TV>(TV(0,4.0*scale,-3.0*scale),ROTATION<TV>(0*(T)pi/12.0,TV(1,0,0))));
-            curve5.Add_Control_Point(.8,FRAME<TV>(TV(0,4.0*scale,-3.0*scale),ROTATION<TV>((T)pi/12.0,TV(1,0,0))));
+            curve5.Add_Control_Point(3.5,FRAME<TV>(TV(0,4.0*scale,-3.0*scale),ROTATION<TV>(0*(T)pi/12.0,TV(1,0,0))));
+            curve5.Add_Control_Point(3.6,FRAME<TV>(TV(0,4.0*scale,-3.0*scale),ROTATION<TV>((T)pi/12.0,TV(1,0,0))));
             
             cylinder.X()=TV(0,5.0*scale,0*scale);
             cylinder.is_static=false;
