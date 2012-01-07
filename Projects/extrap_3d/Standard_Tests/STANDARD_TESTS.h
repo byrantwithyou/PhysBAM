@@ -52,6 +52,7 @@
 //   57. Two-direction stretch
 //   58. Various objects through gears
 //   59. Random armadillo
+//  100. Primary contour field
 //#####################################################################
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
@@ -164,6 +165,10 @@ public:
     T J_min,J_max,la_min;
     bool test_model_only;
     T ether_drag;
+    ARRAY<ARRAY<VECTOR<T,2> > > contrail;
+    T sigma_range;
+    int image_size;
+    ARRAY<VECTOR<VECTOR<T,2>,2> > contour_segments;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),semi_implicit(false),test_forces(false),use_extended_neohookean(false),use_extended_neohookean2(false),
@@ -270,6 +275,8 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Double_Argument("-lb",-.1,"final poisson's ratio");
     parse_args->Add_Option_Argument("-test_model_only");
     parse_args->Add_Double_Argument("-ether_drag",0,"Ether drag");
+    parse_args->Add_Integer_Argument("-image_size",500,"image size for plots");
+    parse_args->Add_Double_Argument("-sigma_range",3,"sigma range for plots");
 }
 //#####################################################################
 // Function Parse_Options
@@ -329,6 +336,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     solids_parameters.triangle_collision_parameters.perform_self_collision=false;
     solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=false;
     solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=false;
+    solids_parameters.triangle_collision_parameters.collisions_output_number_checked=false;
     stiffness_multiplier=(T)parse_args->Get_Double_Value("-stiffen");
     damping_multiplier=(T)parse_args->Get_Double_Value("-dampen");
     stretch=(T)parse_args->Get_Double_Value("-stretch");
@@ -372,6 +380,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
     test_model_only=parse_args->Get_Option_Value("-test_model_only");
     ether_drag=(T)parse_args->Get_Double_Value("-ether_drag");
     repulsion_thickness=(T)parse_args->Get_Double_Value("-repulsion_thickness");
+    sigma_range=(T)parse_args->Get_Double_Value("-sigma_range");
+    image_size=parse_args->Get_Integer_Value("-image_size");
     
     semi_implicit=parse_args->Is_Value_Set("-semi_implicit");
     if(parse_args->Is_Value_Set("-project_nullspace")) solids_parameters.implicit_solve_parameters.project_nullspace_frequency=1;
@@ -411,7 +421,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 24:
         case 25:
         case 26:
-        case 27: case 23: case 53: case 54: case 55: case 57:
+        case 27: case 23: case 53: case 54: case 55: case 57: case 100:
             attachment_velocity = 0.2;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
@@ -435,7 +445,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.triangle_collision_parameters.perform_self_collision=override_collisions;//This gets turned off later then back on
             //std::cout << "rame collisions are " << override_collisions << std::endl;
             self_collision_flipped=false;
-
             //}
             frame_rate=120;
             last_frame=420;
@@ -1495,8 +1504,22 @@ void Get_Initial_Data()
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/bunny.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(20,(T)5,0))),true,true,density,1.0);
             RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(25,5,0)));
             tests.Create_Mattress(mattress_grid,true,&initial_state);
-            break;
-        }
+            break;}
+        case 100:{
+            TETRAHEDRALIZED_VOLUME<T>* tv=TETRAHEDRALIZED_VOLUME<T>::Create(particles);
+            particles.array_collection->Add_Elements(4);
+            particles.X(1)=TV(0,1,0);
+/*            particles.X(2)=TV(1/sqrt(3.),0,0);
+            particles.X(3)=TV(-1/sqrt(12),0,.5);
+            particles.X(4)=TV(-1/sqrt(12),0,-.5);*/
+            particles.X(2)=ROTATION<TV>(pi*1./12.,TV(0,1,0)).Rotate(TV(1/sqrt(3.),0,0));
+            particles.X(3)=TV(particles.X(2).z,0,particles.X(2).x);
+            particles.X(4)=TV(-1/sqrt(6.),0,-1/sqrt(6.)+1e-2);
+            tv->mesh.elements.Append(VECTOR<int,4>(1,2,3,4));
+            particles.mass.Fill(1);
+            solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(tv);
+            contrail.Resize(1);
+            break;}
         default:
             LOG::cerr<<"Initial Data: Unrecognized test number "<<test_number<<std::endl;exit(1);}
 
@@ -1907,24 +1930,6 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             for(int i=1;i<=particles.X.m;i++)
                 if(particles.X(i).x>=1.5)
                     externally_forced.Append(i);
-            /*for (int i=1; i<=m*n*mn; i++)
-            {
-                particles.V(i) += TV(particles.X(i).y-2.4,-(particles.X(i).x+30),0)*10;
-            }*/
-            /*TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume2=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(2);
-            Add_Constitutive_Model(tetrahedralized_volume2,youngs_modulus,poissons_ratio,damping);
-            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume3=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(3);
-            Add_Constitutive_Model(tetrahedralized_volume3,youngs_modulus,poissons_ratio,damping);
-            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume4=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(4);
-            Add_Constitutive_Model(tetrahedralized_volume4,youngs_modulus,poissons_ratio,damping);
-            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume5=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(5);
-            Add_Constitutive_Model(tetrahedralized_volume5,youngs_modulus,poissons_ratio,damping);*/
-            /*TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume6=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(6);
-            Add_Constitutive_Model(tetrahedralized_volume6,youngs_modulus,poissons_ratio,damping);*/
-           // TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume7=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(7);
-            //Add_Constitutive_Model(tetrahedralized_volume7,youngs_modulus,poissons_ratio,damping);
-           // solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
-           // solid_body_collection.template Find_Force<GRAVITY<TV>&>().gravity=g;
 
             break;}
         case 51:{
@@ -1946,6 +1951,13 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume1=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(1);
             Add_Constitutive_Model(tetrahedralized_volume1,youngs_modulus,poissons_ratio,damping);
             if(test_number==55) particles.X(1).x=stretch;
+            break;}
+        case 100:{
+            T youngs_modulus = 1e5;
+            T poissons_ratio = .4;
+            T damping = 0.1;
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume1=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+            Add_Constitutive_Model(tetrahedralized_volume1,youngs_modulus,poissons_ratio,damping);
             break;}
         default:
             LOG::cerr<<"Missing bodies implementation for test number "<<test_number<<std::endl;exit(1);}
@@ -1975,6 +1987,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 //#####################################################################
 void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE
 {
+    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     T final_time=50;
     if(test_number==24){
         int m=mattress_grid.counts.x;
@@ -2018,12 +2031,12 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
         for(int ij=1;ij<=mn;ij++)for(int j=1;j<=n;j++){V(1+m*(j-1)+m*n*(ij-1))=velocity_x;V(m+m*(j-1)+m*n*(ij-1))=-velocity_x;}
     }
     if(test_number==23){
-        final_time=70;
+        final_time=35;
         int m=mattress_grid.counts.x;
         int n=mattress_grid.counts.y;
         int mn=mattress_grid.counts.z;
         TV velocity_x = velocity_time<final_time?TV(attachment_velocity,0,0):TV();
-        for(int ij=1;ij<=mn;ij++)for(int j=1;j<=n;j++){V(1+m*(j-1)+m*n*(ij-1))=-velocity_x;V(m+m*(j-1)+m*n*(ij-1))=velocity_x;}
+        for(int ij=1;ij<=mn;ij++)for(int j=1;j<=n;j++){V(1+m*(j-1)+m*n*(ij-1))=-(T)(velocity_time<=25)*velocity_x;V(m+m*(j-1)+m*n*(ij-1))=(T)(velocity_time<=25)*velocity_x;}
     }
     if(test_number==28){
         int m=mattress_grid.counts.x;
@@ -2043,6 +2056,7 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
             V(constrained_particles(i))=TV();
     }
     if(test_number==57) V.Subset(constrained_particles)=constrained_velocities;
+    if(test_number==100){V(1)=TV(0,(particles.X(1).y<5-1e-4)*.5,0);V(2).y=0;V(3).y=0;V(4).y=0;}
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes
@@ -2095,15 +2109,6 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
         int mn=mattress_grid.counts.z;
         for(int ij=1;ij<=mn;ij++)for(int j=1;j<=n;j++){V(1+m*(j-1)+m*n*(ij-1))=TV();V(m+m*(j-1)+m*n*(ij-1))=TV();}
     }
-  /*  if(test_number==50){
-        PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
-        int n=particles.array_collection->Size();
-        for(int i=1; i <=n; i++)
-        {
-            if(externally_forced[i] &&V(i).x<=0){V(i)=TV();}
-        }
-
-    }*/
     if(test_number==53){V(1)=TV();V(2).x=0;V(3).x=0;V(4).x=0;}
     if(test_number==54 || test_number==55){V(1)=V(2)=TV();V(3).x=0;V(4).x=0;}
     if(test_number==31||test_number==59)
@@ -2120,6 +2125,7 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
         for(int i=m/3+1;i<=2*m/3+1;i++)for(int ij=mn/3+1;ij<=2*mn/3+1;ij++){V(i+m*n*(ij-1))=TV();V(i+m*(n-1)+m*n*(ij-1))=TV();}
     }
     if(test_number==57) V.Subset(constrained_particles).Fill(TV());
+    if(test_number==100){V(1)=TV();V(2).y=0;V(3).y=0;V(4).y=0;}
 }
 //#####################################################################
 // Function Read_Output_Files_Solids
@@ -2448,6 +2454,7 @@ void Preprocess_Frame(const int frame)
             binding_list.Add_Binding(new RIGID_BODY_BINDING<TV>(particles,bind2[i],rigid_body_collection,2,torus2.Object_Space_Point(particles.X(bind2[i]))));
         solid_body_collection.Update_Simulated_Particles();
     }
+    if(test_number==100) Plot_Contour_Landscape(frame);
 }
 //#####################################################################
 // Function Add_External_Forces
@@ -2602,6 +2609,112 @@ void Test_Model(ISOTROPIC_CONSTITUTIVE_MODEL<T,3>& icm)
 void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 {
     if(dump_sv) svout.close();
+}
+//#####################################################################
+// Function Contour_Crossing
+//#####################################################################
+T Contour_Crossing(const TV& g0,const TV& v0,const TV& g1,const TV& v1)
+{
+    T a=TV::Dot_Product(g0,v0);
+    T b=TV::Dot_Product(g1,v1);
+    if(!a) return 0;
+    if(!b) return 1;
+    if(TV::Dot_Product(v0,v1)<0) b=-b;
+    if((a>0) == (b>0)) return -1;
+    return a/(a-b);
+}
+//#####################################################################
+// Function Add_Primary_Contour_Segments
+//#####################################################################
+void Add_Primary_Contour_Segments(ISOTROPIC_CONSTITUTIVE_MODEL<T,3>& icm)
+{
+    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    ARRAY<TV,VECTOR<int,2> > evec(1,image_size,1,image_size);
+    ARRAY<TV,VECTOR<int,2> > grad(1,image_size,1,image_size);
+    for(int i=1;i<=image_size;i++)
+        for(int j=1;j<=image_size;j++){
+            T x=(2*i-image_size)*sigma_range/image_size+1e-5;
+            T y=(2*j-image_size)*sigma_range/image_size;
+            TV g=icm.P_From_Strain(DIAGONAL_MATRIX<T,3>(particles.X(1).y,x,y),1,1).To_Vector();
+            DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3> disd;
+            icm.Isotropic_Stress_Derivative(DIAGONAL_MATRIX<T,3>(particles.X(1).y,x,y),disd,1);
+            SYMMETRIC_MATRIX<T,3> H(disd.x1111,disd.x2211,disd.x3311,disd.x2222,disd.x3322,disd.x3333);
+            DIAGONAL_MATRIX<T,3> ev;
+            MATRIX<T,3> eigenvectors;
+            H.Fast_Solve_Eigenproblem(ev,eigenvectors);
+            evec(VECTOR<int,2>(i,j))=eigenvectors.Column(ev.To_Vector().Arg_Abs_Max());
+            grad(VECTOR<int,2>(i,j))=g;}
+
+    for(int i=1;i<image_size;i++)
+        for(int j=1;j<image_size;j++){
+            TV g00=grad(VECTOR<int,2>(i,j)),g01=grad(VECTOR<int,2>(i,j+1)),g10=grad(VECTOR<int,2>(i+1,j)),g11=grad(VECTOR<int,2>(i+1,j+1));
+            TV v00=evec(VECTOR<int,2>(i,j)),v01=evec(VECTOR<int,2>(i,j+1)),v10=evec(VECTOR<int,2>(i+1,j)),v11=evec(VECTOR<int,2>(i+1,j+1));
+            T cx0=Contour_Crossing(g00,v00,g10,v10);
+            T cx1=Contour_Crossing(g01,v01,g11,v11);
+            T c0x=Contour_Crossing(g00,v00,g01,v01);
+            T c1x=Contour_Crossing(g10,v10,g11,v11);
+            int n=(cx0>=0)+(cx1>=0)+(c0x>=0)+(c1x>=0);
+            if(n<2) continue;
+            VECTOR<T,2> X00((2*i-image_size)*sigma_range/image_size+1e-5,(2*j-image_size)*sigma_range/image_size);
+            VECTOR<T,2> X01((2*i-image_size)*sigma_range/image_size+1e-5,(2*(j+1)-image_size)*sigma_range/image_size);
+            VECTOR<T,2> X10((2*(i+1)-image_size)*sigma_range/image_size+1e-5,(2*j-image_size)*sigma_range/image_size);
+            VECTOR<T,2> X11((2*(i+1)-image_size)*sigma_range/image_size+1e-5,(2*(j+1)-image_size)*sigma_range/image_size);
+            if(X00.Product()>2) continue;
+            VECTOR<T,2> Yx0=X00+(X10-X00)*cx0,Yx1=X01+(X11-X01)*cx1,Y0x=X00+(X01-X00)*c0x,Y1x=X10+(X11-X10)*c1x;
+            if(cx0>=0 && cx1>=0){
+                contour_segments.Append(VECTOR<VECTOR<T,2>,2>(Yx0,Yx1));
+                if(n==3 && c0x>=0) contour_segments.Append(VECTOR<VECTOR<T,2>,2>(Y0x,(Yx0+Yx1)/2));
+                if(n==3 && c1x>=0) contour_segments.Append(VECTOR<VECTOR<T,2>,2>(Y1x,(Yx0+Yx1)/2));}
+            if(c0x>=0 && c1x>=0){
+                contour_segments.Append(VECTOR<VECTOR<T,2>,2>(Y0x,Y1x));
+                if(n==3 && cx0>=0) contour_segments.Append(VECTOR<VECTOR<T,2>,2>(Yx0,(Y0x+Y1x)/2));
+                if(n==3 && cx1>=0) contour_segments.Append(VECTOR<VECTOR<T,2>,2>(Yx1,(Y0x+Y1x)/2));}
+            if(n>2) continue;
+            if(c0x>=0 && cx0>=0) contour_segments.Append(VECTOR<VECTOR<T,2>,2>(Y0x,Yx0));
+            if(c0x>=0 && cx1>=0) contour_segments.Append(VECTOR<VECTOR<T,2>,2>(Y0x,Yx1));
+            if(c1x>=0 && cx0>=0) contour_segments.Append(VECTOR<VECTOR<T,2>,2>(Y1x,Yx0));
+            if(c1x>=0 && cx1>=0) contour_segments.Append(VECTOR<VECTOR<T,2>,2>(Y1x,Yx1));}
+}
+//#####################################################################
+// Function Plot_Contour_Landscape
+//#####################################################################
+void Plot_Contour_Landscape(int frame)
+{
+    char buff[1000];
+    sprintf(buff, "%s/data", output_directory.c_str());
+    FILE_UTILITIES::Create_Directory(buff);
+    sprintf(buff, "%s/data/%03d.txt", output_directory.c_str(), frame);
+    std::ofstream out(buff);
+
+    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    FINITE_VOLUME<TV,3>& fv=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
+    ISOTROPIC_CONSTITUTIVE_MODEL<T,3>* icm=fv.isotropic_model;
+    bool is_neo=dynamic_cast<NEO_HOOKEAN<T,3>*>(icm);
+    T min=-image_size/2,max=image_size/2;
+    for(int i=min;i<max;i++)
+        for(int j=min;j<max;j++){
+            if(is_neo && (i<0 || j<0)) continue;
+            VECTOR<T,2> X(2*sigma_range*(i+.5)/image_size+1.1e-5,2*sigma_range*(j+.5)/image_size+1.2e-5);
+            DIAGONAL_MATRIX<T,3> F(X.Insert(particles.X(1).y,1)),P=icm->P_From_Strain(F,1,0);
+            out<<"p "<<X<<" "<<-P.To_Vector().Remove_Index(1).Normalized()<<std::endl;}
+
+    for(int i=1;i<=fv.Fe_hat.m;i++){
+        contrail(i).Append(fv.Fe_hat(i).To_Vector().Remove_Index(1));
+        out<<"c "<<contrail(i)<<std::endl;}
+
+    contour_segments.Remove_All();
+    image_size*=10;
+    Add_Primary_Contour_Segments(*icm);
+    image_size/=10;
+
+    for(int i=1;i<=contour_segments.m;i++){
+        if(is_neo && (contour_segments(i).x.Min()<.2 || contour_segments(i).y.Min()<.2)) continue;
+        out<<"u "<<contour_segments(i)<<std::endl;}
+
+    out<<"t "<<particles.X.Subset(fv.strain_measure.mesh.elements.Flattened())<<std::endl;
+
+    out<<"s "<<particles.X(1).y<<std::endl;
+    out<<"m "<<icm->constant_lambda<<"  "<<icm->constant_mu<<std::endl;
 }
 };
 }
