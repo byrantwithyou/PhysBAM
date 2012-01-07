@@ -52,6 +52,7 @@
 //   57. Two-direction stretch
 //   58. Various objects through gears
 //   59. Random armadillo
+//   77. Squeeze in a box
 //#####################################################################
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
@@ -286,7 +287,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     seed_input=parse_args->Get_Integer_Value("-seed");   
     
     switch(test_number){
-        case 17: case 18: case 24: case 25: case 27: case 10: case 11: case 23: case 57:
+        case 17: case 18: case 24: case 25: case 27: case 10: case 11: case 23: case 57: case 77:
             if(!parameter) parameter=10;
             mattress_grid=GRID<TV>(parameter+1,parameter+1,parameter+1,(T)-1,(T)1,(T)-1,(T)1,(T)-1,(T)1);
             break;
@@ -397,6 +398,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 17:
         case 18:
         case 56:
+        case 77:
             solids_parameters.cfl=(T)5;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             break;
@@ -706,6 +708,43 @@ void Get_Initial_Data()
             curve.Add_Control_Point(6,FRAME<TV>(TV(0,8,0)));
             curve.Add_Control_Point(11,FRAME<TV>(TV(0,11,0)));
             last_frame=250;
+            break;}
+        case 77: {
+            RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,0,0)));
+            tests.Create_Mattress(mattress_grid,true,&initial_state);
+
+            RIGID_BODY<TV>& box_bottom=tests.Add_Analytic_Box(TV(6,2,6));
+            RIGID_BODY<TV>& box_side_1=tests.Add_Analytic_Box(TV(2,6,6));
+            RIGID_BODY<TV>& box_side_2=tests.Add_Analytic_Box(TV(2,6,6));
+            RIGID_BODY<TV>& box_side_3=tests.Add_Analytic_Box(TV(6,6,2));
+            RIGID_BODY<TV>& box_side_4=tests.Add_Analytic_Box(TV(6,6,2));
+            RIGID_BODY<TV>& box_top=tests.Add_Analytic_Box(TV(6,2,6));
+                        
+            box_bottom.X()=TV(0,-2,0);
+            box_side_1.X()=TV(-2,0,0);
+            box_side_2.X()=TV(2,0,0);
+            box_side_3.X()=TV(0,0,-2);
+            box_side_4.X()=TV(0,0,2);
+
+            box_bottom.is_static=true;
+            box_side_1.is_static=true;
+            box_side_2.is_static=true;
+            box_side_3.is_static=true;
+            box_side_4.is_static=true;
+            box_top.is_static=false;
+
+            box_bottom.coefficient_of_friction=0;
+            box_side_1.coefficient_of_friction=0;
+            box_side_2.coefficient_of_friction=0;
+            box_side_3.coefficient_of_friction=0;
+            box_side_4.coefficient_of_friction=0;
+            box_top.coefficient_of_friction=0;
+
+            kinematic_id=box_top.particle_index;
+            rigid_body_collection.rigid_body_particle.kinematic(box_top.particle_index)=true;
+            curve.Add_Control_Point(0,FRAME<TV>(TV(0,2,0)));
+            curve.Add_Control_Point(10,FRAME<TV>(TV(0,0,0)));
+            last_frame=300;
             break;}
         case 17:
         case 18:
@@ -1533,6 +1572,10 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 6:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            Add_Constitutive_Model(tetrahedralized_volume,(T)1e5,(T).45,(T).01);
+            break;}
+        case 77:{
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             Add_Constitutive_Model(tetrahedralized_volume,(T)1e5,(T).45,(T).01);
             break;}
         case 4: {
