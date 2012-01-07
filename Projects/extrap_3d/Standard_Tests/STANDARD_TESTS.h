@@ -949,7 +949,7 @@ void Get_Initial_Data()
             rigid_body_collection.rigid_body_particle.kinematic(box0.particle_index)=true; 
             curve5.Add_Control_Point(0,FRAME<TV>(TV(0,4.0*scale,-0.0*scale)));
             curve5.Add_Control_Point(3.2,FRAME<TV>(TV(0,4.0*scale,-0.0*scale),ROTATION<TV>(0*(T)pi/2.0,TV(1,0,0))));
-            curve5.Add_Control_Point(3.3,FRAME<TV>(TV(0,4.0*scale,-0.0*scale),ROTATION<TV>((T)pi/2.0,TV(1,0,0))));
+            curve5.Add_Control_Point(3.23,FRAME<TV>(TV(0,3.1*scale,-1.0*scale),ROTATION<TV>((T)pi/2.0,TV(1,0,0))));
             
             cylinder.X()=TV(0,5.0*scale,0*scale);
             cylinder.is_static=false;
