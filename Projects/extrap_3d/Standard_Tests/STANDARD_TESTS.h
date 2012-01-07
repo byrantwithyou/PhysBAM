@@ -41,6 +41,7 @@
 //   43. Through smooth gears
 //   44. 2 jellos collision
 //   47. Fish past a magnet?
+//   48. Compress with sphere
 //   49. See-saw?
 //   50. Fish through a torus
 //   51. Fish through a tube
@@ -423,7 +424,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 24:
         case 25:
         case 26:
-        case 27: case 23: case 53: case 54: case 55: case 57: case 100:
+        case 27: case 23: case 53: case 54: case 55: case 57: case 100: case 48:
             attachment_velocity = 0.2;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
@@ -569,14 +570,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
             //solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=true;
             solids_parameters.cfl=(T)5;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
-            break;
-        case 48:
-            frame_rate=24;
-            solids_parameters.implicit_solve_parameters.cg_iterations=100000;
-            solids_parameters.implicit_solve_parameters.cg_tolerance=(T).01;
-            last_frame=200;//(int)(200*frame_rate);
-            solids_parameters.cfl=(T)1;
-            solids_parameters.implicit_solve_parameters.throw_exception_on_backward_euler_failure=false;
             break;
         case 50:
             solids_parameters.triangle_collision_parameters.perform_self_collision=true;
@@ -1498,6 +1491,9 @@ void Get_Initial_Data()
 
             tests.Add_Ground();
             break;}
+        case 48:{
+            tests.Create_Mattress(GRID<TV>(TV_INT()+(parameter?parameter:10)+1,RANGE<TV>::Centered_Box()));
+            break;}
         case 53:{
             TETRAHEDRALIZED_VOLUME<T>* tv=TETRAHEDRALIZED_VOLUME<T>::Create(particles);
             int a=particles.array_collection->Add_Element();
@@ -1987,6 +1983,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             break;}
         case 55:
         case 54:
+        case 48:
         case 53:{
             T youngs_modulus = 1e5;
             T poissons_ratio = .45;
@@ -2354,10 +2351,8 @@ void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
         ARRAY<DIAGONAL_MATRIX<T,3> >& sv = force_field.Fe_hat;
         T Jmin = (T)1; T s1=(T)0; T s2=(T)0; T s3=(T)0;
 
-        for (int i=1; i<=sv.m; i++)
-        {
-            if (Jmin > sv(i).x11*sv(i).x22*sv(i).x33){ s1=sv(i).x11; s2=sv(i).x22; s3=sv(i).x33; Jmin = sv(i).x11*sv(i).x22*sv(i).x33;}
-        }
+        for(int i=1; i<=sv.m; i++){
+            if (Jmin > sv(i).x11*sv(i).x22*sv(i).x33){ s1=sv(i).x11; s2=sv(i).x22; s3=sv(i).x33; Jmin = sv(i).x11*sv(i).x22*sv(i).x33;}}
     LOG::cout<<"Minimum determinant "<<Jmin << " " << s1 << " " << s2 << " " << s3 <<std::endl;
     //}
     if(test_number==51) for(int i=1;i<=particles.X.m;i++) if(particles.V(i).x>6) particles.V(i).x=6;
@@ -2369,16 +2364,18 @@ void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
     LOG::cout<<"Minimum tet volume: "<<min_volume<<std::endl;
     if(test_number==29)
         LOG::cout << "Self collisions enabled = " << solids_parameters.triangle_collision_parameters.perform_self_collision << " " << time << std::endl;
-    if(dump_sv)
-    {
+    if(dump_sv){
         for(int f=1;FINITE_VOLUME<TV,3>* force_field=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>*>(f);f++){
             ARRAY<DIAGONAL_MATRIX<T,3> >& sv = force_field->Fe_hat;
             for(int i=1; i<=sv.m; i++){
                 svout << sv(i).x11 << " " << sv(i).x22 << " " << sv(i).x33 << std::endl;
                 Add_Debug_Particle(sv(i).To_Vector(),TV(1,1,0));
-                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,-force_field->isotropic_model->P_From_Strain(sv(i),1,i).To_Vector());}}
-        
-    }
+                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,-force_field->isotropic_model->P_From_Strain(sv(i),1,i).To_Vector());}}}
+    if(test_number==48){
+        T r=std::max((T)0,hole-time*stretch);
+        for(int i=1;i<=particles.X.m;i++)
+            if(particles.X(i).Magnitude()>r)
+                particles.X(i)*=r/particles.X(i).Magnitude();}
 }
 //#####################################################################
 // Function Bind_Intersecting_Particles
