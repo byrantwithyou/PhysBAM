@@ -265,7 +265,9 @@ Get_Twist(const T& a)
     template VECTOR<T,4> RANDOM_NUMBERS<T>::Get_Uniform_Vector<4>(VECTOR<T,4> const&,VECTOR<T,4> const&);
 
 INSTANTIATION_HELPER(float);
+template void RANDOM_NUMBERS<float,MT19937<float> >::Fill_Uniform<VECTOR<float,8> >(VECTOR_BASE<float,VECTOR<float,8> >&,float,float);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 INSTANTIATION_HELPER(double);
+template void RANDOM_NUMBERS<double,MT19937<double> >::Fill_Uniform<VECTOR<double,8> >(VECTOR_BASE<double,VECTOR<double,8> >&,double,double);
 #endif
 }
