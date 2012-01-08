@@ -171,6 +171,7 @@ public:
     T sigma_range;
     int image_size;
     ARRAY<VECTOR<VECTOR<T,2>,2> > contour_segments;
+    ARRAY<int> stuck_particles;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),semi_implicit(false),test_forces(false),use_extended_neohookean(false),use_extended_neohookean2(false),
@@ -2097,12 +2098,17 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
     }
     if(test_number==57) V.Subset(constrained_particles)=constrained_velocities;
     if(test_number==100){V(1)=TV(0,(particles.X(1).y<5-1e-4)*.5,0);V(2).y=0;V(3).y=0;V(4).y=0;}
+    if(test_number==48){
+        for(int i=1;i<=stuck_particles.m;i++){
+            int p=stuck_particles(i);
+            V(p)=V(p).Projected_Orthogonal_To_Unit_Direction(particles.X(p).Normalized());}}
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes
 //#####################################################################
 void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE
 {
+    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     if(test_number==24){
         int m=mattress_grid.counts.x;
 	int n=mattress_grid.counts.y;
@@ -2166,6 +2172,10 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
     }
     if(test_number==57) V.Subset(constrained_particles).Fill(TV());
     if(test_number==100){V(1)=TV();V(2).y=0;V(3).y=0;V(4).y=0;}
+    if(test_number==48){
+        for(int i=1;i<=stuck_particles.m;i++){
+            int p=stuck_particles(i);
+            V(p)=V(p).Projected_Orthogonal_To_Unit_Direction(particles.X(p).Normalized());}}
 }
 //#####################################################################
 // Function Read_Output_Files_Solids
@@ -2372,10 +2382,13 @@ void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
                 Add_Debug_Particle(sv(i).To_Vector(),TV(1,1,0));
                 Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,-force_field->isotropic_model->P_From_Strain(sv(i),1,i).To_Vector());}}}
     if(test_number==48){
+        stuck_particles.Remove_All();
         T r=std::max((T)0,hole-time*stretch);
+        if(time>1.2*hole/stretch) r=std::min((time-1.2*hole/stretch)*stretch,hole);
         for(int i=1;i<=particles.X.m;i++)
-            if(particles.X(i).Magnitude()>r)
-                particles.X(i)*=r/particles.X(i).Magnitude();}
+            if(particles.X(i).Magnitude()>r){
+                stuck_particles.Append(i);
+                particles.X(i)*=r/particles.X(i).Magnitude();}}
 }
 //#####################################################################
 // Function Bind_Intersecting_Particles
