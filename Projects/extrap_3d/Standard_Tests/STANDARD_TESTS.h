@@ -548,11 +548,18 @@ void Parse_Options() PHYSBAM_OVERRIDE
             break;
         case 41:
             solids_parameters.cfl=(T)5;
-            solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness = 1e-4;
+            solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness = 2e-4;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             solids_parameters.triangle_collision_parameters.perform_self_collision=true;
-            if (override_no_collisions) solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+            solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=true;
+            solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=true;
+            
+            if (override_no_collisions){
+                solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+                solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=false;
+                solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=false;                
+            }
             frame_rate=600;
             last_frame=1000;
             break;
