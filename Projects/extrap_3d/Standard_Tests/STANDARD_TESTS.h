@@ -75,6 +75,7 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/COROTATED.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/COROTATED_FIXED.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/GEN_NEO_HOOKEAN_ENERGY.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/GENERAL_EXTRAPOLATED.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/MOONEY_RIVLIN_3D_EXTRAPOLATED.h>
@@ -135,6 +136,7 @@ public:
     bool use_extended_neohookean_smooth;
     bool use_extended_svk, use_svk;
     bool use_corotated;
+    bool use_corotated_fixed;
     bool use_mooney_rivlin,use_extended_mooney_rivlin;
     bool use_corot_blend;
     bool dump_sv;
@@ -177,7 +179,7 @@ public:
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),semi_implicit(false),test_forces(false),use_extended_neohookean(false),use_extended_neohookean2(false),
         use_extended_neohookean_refined(false),use_extended_neohookean_hyperbola(false),use_extended_neohookean_smooth(false),use_extended_svk(false),
-        use_corotated(false),use_corot_blend(false),dump_sv(false),print_matrix(false),use_constant_ife(false),input_cutoff(FLT_MAX),input_efc(FLT_MAX),input_poissons_ratio(-1),input_youngs_modulus(0),
+        use_corotated(false),use_corotated_fixed(false),use_corot_blend(false),dump_sv(false),print_matrix(false),use_constant_ife(false),input_cutoff(FLT_MAX),input_efc(FLT_MAX),input_poissons_ratio(-1),input_youngs_modulus(0),
         J_min(0),J_max((T).1),la_min(0),test_model_only(false),ether_drag(0)
     {
     }
@@ -235,6 +237,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Option_Argument("-use_ext_mooney");
     parse_args->Add_Option_Argument("-use_mooney");
     parse_args->Add_Option_Argument("-use_corotated");
+    parse_args->Add_Option_Argument("-use_corotated_fixed");
     parse_args->Add_Option_Argument("-use_corot_blend");
     parse_args->Add_Option_Argument("-with_bunny");
     parse_args->Add_Option_Argument("-with_hand");
@@ -361,6 +364,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     use_svk=parse_args->Is_Value_Set("-use_svk");
     use_extended_svk=parse_args->Is_Value_Set("-use_ext_svk");
     use_corotated=parse_args->Is_Value_Set("-use_corotated");
+    use_corotated_fixed=parse_args->Is_Value_Set("-use_corotated_fixed");
     use_corot_blend=parse_args->Is_Value_Set("-use_corot_blend");
     dump_sv=parse_args->Is_Value_Set("-dump_sv");
     use_constant_ife=parse_args->Get_Option_Value("-use_constant_ife");
@@ -2569,6 +2573,7 @@ void Add_Constitutive_Model(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,T 
     else if(use_extended_neohookean_hyperbola) icm=new NEO_HOOKEAN_EXTRAPOLATED_HYPERBOLA<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc);
     else if(use_extended_neohookean_smooth) icm=new NEO_HOOKEAN_EXTRAPOLATED_SMOOTH<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.1);
     else if(use_corotated) icm=new COROTATED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
+    else if(use_corotated_fixed) icm=new COROTATED_FIXED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
     else if(use_corot_blend) icm=new NEO_HOOKEAN_COROTATED_BLEND<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
     else{
         NEO_HOOKEAN<T,3>* nh=new NEO_HOOKEAN<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);

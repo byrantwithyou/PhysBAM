@@ -53,6 +53,7 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/COROTATED.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/COROTATED_FIXED.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/COROTATED_QUARTIC.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/GEN_NEO_HOOKEAN_ENERGY.h>
@@ -113,6 +114,7 @@ public:
     bool use_extended_neohookean_hyperbola;
     bool use_extended_neohookean_smooth;
     bool use_corotated;
+    bool use_corotated_fixed;
     bool use_corot_blend;
     bool use_corot_quartic;
     bool dump_sv;
@@ -148,7 +150,7 @@ public:
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),semi_implicit(false),test_forces(false),use_extended_neohookean(false),
-        use_extended_neohookean_refined(false),use_extended_neohookean_hyperbola(false),use_extended_neohookean_smooth(false),use_corotated(false),
+        use_extended_neohookean_refined(false),use_extended_neohookean_hyperbola(false),use_extended_neohookean_smooth(false),use_corotated(false),use_corotated_fixed(false),
         use_corot_blend(false),use_corot_quartic(false),dump_sv(false),
         print_matrix(false),parameter(20),stiffness_multiplier(1),damping_multiplier(1),use_constant_ife(false),stretch(1),poissons_ratio((T).45),input_cutoff(FLT_MAX),input_efc(FLT_MAX),
         input_poissons_ratio(-1),input_youngs_modulus(0),test_model_only(false),energy_mesh(0),energy_profile_plot(false),plot_scale(1),ether_drag(0)
@@ -220,6 +222,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Option_Argument("-use_ext_neo_hyper");
     parse_args->Add_Option_Argument("-use_ext_neo_smooth");
     parse_args->Add_Option_Argument("-use_corotated");
+    parse_args->Add_Option_Argument("-use_corotated_fixed");
     parse_args->Add_Option_Argument("-use_corot_blend");
     parse_args->Add_Option_Argument("-use_corot_quartic");
     parse_args->Add_Option_Argument("-dump_sv");
@@ -277,6 +280,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     use_extended_neohookean_hyperbola=parse_args->Is_Value_Set("-use_ext_neo_hyper");    
     use_extended_neohookean_smooth=parse_args->Is_Value_Set("-use_ext_neo_smooth");    
     use_corotated=parse_args->Is_Value_Set("-use_corotated");
+    use_corotated_fixed=parse_args->Is_Value_Set("-use_corotated_fixed");
     use_corot_blend=parse_args->Is_Value_Set("-use_corot_blend");
     use_corot_quartic=parse_args->Is_Value_Set("-use_corot_quartic");
     dump_sv=parse_args->Is_Value_Set("-dump_sv");
@@ -871,6 +875,7 @@ void Add_Constitutive_Model(TRIANGULATED_AREA<T>& triangulated_area,T stiffness,
     else if(use_extended_neohookean_hyperbola) icm=new NEO_HOOKEAN_EXTRAPOLATED_HYPERBOLA<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff);
     else if(use_extended_neohookean_smooth) icm=new NEO_HOOKEAN_EXTRAPOLATED_SMOOTH<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
     else if(use_corotated) icm=new COROTATED<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
+    else if(use_corotated_fixed) icm=new COROTATED_FIXED<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
     else if(use_corot_blend) icm=new NEO_HOOKEAN_COROTATED_BLEND<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
     else if(use_corot_quartic) icm=new COROTATED_QUARTIC<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
     else{
@@ -963,7 +968,7 @@ void Test_Model(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>& icm)
     for(int i=1;i<=20;i++){
         TV f;
         random.Fill_Uniform(f,0,2);
-        T e=1e-5;
+        T e=1e-4;
         TV df;
         random.Fill_Uniform(df,-e,e);
         f=f.Sorted().Reversed();
