@@ -495,7 +495,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 33:
             solids_parameters.cfl=(T)10;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
-            solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness = 1e-2;
+            solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness = 3e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
             solids_parameters.triangle_collision_parameters.perform_self_collision=true;
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=true;
