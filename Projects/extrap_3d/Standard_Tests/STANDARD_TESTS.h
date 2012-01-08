@@ -165,6 +165,7 @@ public:
     T input_poissons_ratio,input_youngs_modulus;
     T input_friction;
     T J_min,J_max,la_min;
+    T hand_scale;
     bool test_model_only;
     T ether_drag;
     ARRAY<ARRAY<VECTOR<T,2> > > contrail;
@@ -276,6 +277,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Double_Argument("-ja",.6,"J to stop interpolating");
     parse_args->Add_Double_Argument("-jb",.4,"J to start interpolating");
     parse_args->Add_Double_Argument("-lb",-.1,"final poisson's ratio");
+    parse_args->Add_Double_Argument("-hand_scale",.8,"hand scale on test 58");
     parse_args->Add_Option_Argument("-test_model_only");
     parse_args->Add_Double_Argument("-ether_drag",0,"Ether drag");
     parse_args->Add_Integer_Argument("-image_size",500,"image size for plots");
@@ -380,6 +382,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     J_min=(T)parse_args->Get_Double_Value("-ja");
     J_max=(T)parse_args->Get_Double_Value("-jb");
     la_min=(T)parse_args->Get_Double_Value("-lb");
+    hand_scale=(T)parse_args->Get_Double_Value("-hand_scale");
     test_model_only=parse_args->Get_Option_Value("-test_model_only");
     ether_drag=(T)parse_args->Get_Double_Value("-ether_drag");
     repulsion_thickness=(T)parse_args->Get_Double_Value("-repulsion_thickness");
@@ -931,7 +934,7 @@ void Get_Initial_Data()
         case 58:{
             T scale = 0.75;
 
-            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/hand_30k.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3*scale,0),ROTATION<TV>(T(pi/2),TV(0,1,0))*ROTATION<TV>(T(pi/2),TV(1,0,0)))),true,true,density,.8);
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/hand_30k.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3*scale,0),ROTATION<TV>(T(pi/2),TV(0,1,0))*ROTATION<TV>(T(pi/2),TV(1,0,0)))),true,true,density,hand_scale);
             if(!gears_of_pain){ //tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/fish_42K.tet",
                                               //  RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,4.5*scale,-1.2*scale),ROTATION<TV>((T)pi*0.525,TV(1,0,0))*ROTATION<TV>(0*(T)pi/2,TV(0,1,0)))),true,true,density,0.06);            
             //tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/bunny.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)4.7*scale,-3.0*scale))),true,true,density,.25);
@@ -965,12 +968,12 @@ void Get_Initial_Data()
 
             if(!gears_of_pain){
                 RIGID_BODY<TV>& box1=tests.Add_Analytic_Box(TV(2.0*scale,2.0*scale,.1*scale));
-                box1.X()=TV(0,1.2*scale,0.801*scale);
+                box1.X()=TV(0,1.2*scale,0.831*scale);
                 //box1.Rotation()=ROTATION<TV>((T)pi/4.0,TV(1,0,0));
                 box1.is_static=true;
             }
             
-            box2.X()=TV(0,1.2*scale,-0.801*scale);
+            box2.X()=TV(0,1.2*scale,-0.831*scale);
             //box2.Rotation()=ROTATION<TV>(-(T)pi/4.0,TV(1,0,0));
             box3.X()=TV(0,3.0*scale,-1.4*scale);
 
@@ -990,8 +993,8 @@ void Get_Initial_Data()
             kinematic_id5=box0.particle_index;
             rigid_body_collection.rigid_body_particle.kinematic(box0.particle_index)=true; 
             curve5.Add_Control_Point(0,FRAME<TV>(TV(0,4.0*scale,-0.0*scale)));
-            curve5.Add_Control_Point(3.2,FRAME<TV>(TV(0,4.0*scale,-0.0*scale),ROTATION<TV>(0*(T)pi/2.0,TV(1,0,0))));
-            curve5.Add_Control_Point(3.23,FRAME<TV>(TV(0,3.1*scale,-1.0*scale),ROTATION<TV>((T)pi/2.0,TV(1,0,0))));
+            curve5.Add_Control_Point(1.5+hand_scale,FRAME<TV>(TV(0,4.0*scale,-0.0*scale),ROTATION<TV>(0*(T)pi/2.0,TV(1,0,0))));
+            curve5.Add_Control_Point(1.53+hand_scale,FRAME<TV>(TV(0,3.1*scale,-1.0*scale),ROTATION<TV>((T)pi/2.0,TV(1,0,0))));
             
             cylinder.X()=TV(0,5.0*scale,0*scale);
             cylinder.is_static=false;
@@ -1001,8 +1004,8 @@ void Get_Initial_Data()
             curve4.Add_Control_Point(7.0,FRAME<TV>(TV(0,5.0*scale,0*scale)));
             curve4.Add_Control_Point(8.0,FRAME<TV>(TV(0,2.0*scale,0*scale)));
 
-            
-            tests.Add_Ground();
+            RIGID_BODY<TV>& inclined_floor=tests.Add_Ground(input_friction);            
+            inclined_floor.X()=TV(0,.0*scale,0);
             break;}
 
         case 34:{
