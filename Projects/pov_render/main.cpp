@@ -160,13 +160,14 @@ bool Parse_Pair(const char*& str,std::string& key,std::string& value)
     int a=strcspn(str, " \t=");
     if(a==0) return false;
     key=std::string(str,a);
-    str+=a+1;
-    if(str[-1]!='=')
+    str+=a;
+    if(*str!='=')
     {
         value="";
         str+=strspn(str, " \t");
         return true;
     }
+    str++;
     char ec[]=" \t\n";
     if(*str=='\'' || *str=='"')
     {
@@ -177,7 +178,7 @@ bool Parse_Pair(const char*& str,std::string& key,std::string& value)
 
     const char* end=str+strcspn(str, ec);
     value=std::string(str, end-str);
-    str=end+1;
+    str=end+!*end;
     str+=strspn(str, " \t");
     return true;
 }
