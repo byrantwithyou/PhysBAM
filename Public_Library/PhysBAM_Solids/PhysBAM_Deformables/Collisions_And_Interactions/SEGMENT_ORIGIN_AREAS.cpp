@@ -502,17 +502,17 @@ template<class T,class TV> void Case_CCBB(VOL_DATA<T,2,4>& data,const TV& A,cons
     Combine_Data(data,V,P1,P2,vec_abc,vec_abd);
 #else // #if 0|1
     static const int ba[]={1,0};
-    static const int bad[]={1,0,3};
-    static const int cba[]={2,1,0};
+    static const int abc[]={0,1,2};
+    static const int dab[]={3,0,1};
     static const int _01[]={0,1};
-    static const int _012[]={0,1,2};
-    static const int _123[]={1,2,3};
+    static const int _023[]={0,2,3};
+    static const int _013[]={0,1,3};
     {VOL_DATA<T,2,4> V;
-    Triangle_Area(V,B,A,D,TV());
-    Add_Data(data,V,bad,_012);}
+    Triangle_Area(V,D,TV(),A,B);
+    Add_Data(data,V,dab,_023);}
     {VOL_DATA<T,2,4> V;
-    Triangle_Area(V,TV(),C,B,A);
-    Add_Data(data,V,cba,_123);}
+    Triangle_Area(V,A,B,TV(),C);
+    Add_Data(data,V,abc,_013);}
     {VOL_DATA<T,2,3> V;
     Triangle_Area(V,B,A,TV());
     Add_Data(data,V,ba,_01);}
