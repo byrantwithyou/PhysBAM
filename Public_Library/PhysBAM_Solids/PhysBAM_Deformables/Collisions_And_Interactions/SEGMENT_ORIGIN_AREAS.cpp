@@ -491,7 +491,7 @@ template<class T,class TV> void Case_CCBB(VOL_DATA<T,2,4>& data,const TV& A,cons
     // A   P   P   B
     //       O
 //    trap_cases.Append(3);
-#if 1
+#if 0
     DATA<T,2,3> P1;
     Intersect_Segment_Point(P1,A,B,C);
     DATA<T,2,3> P2;
