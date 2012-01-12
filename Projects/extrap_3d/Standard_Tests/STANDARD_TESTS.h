@@ -198,7 +198,7 @@ public:
     void Add_External_Impulses_Before(ARRAY_VIEW<TV> V,const T time,const T dt) PHYSBAM_OVERRIDE {}
     void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) PHYSBAM_OVERRIDE {}
     void Add_External_Impulse(ARRAY_VIEW<TV> V,const int node,const T time,const T dt) PHYSBAM_OVERRIDE {}
-    void Limit_Solids_Dt(T& dt,const T time) PHYSBAM_OVERRIDE {if(test_number==60 && time<1e-5) dt=std::min(dt,3e-7);}
+    void Limit_Solids_Dt(T& dt,const T time) PHYSBAM_OVERRIDE {if((test_number==60 || test_number==17 || test_number==18) && time<1e-5) dt=std::min(dt,3e-7);}
     void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     void Set_External_Positions(ARRAY_VIEW<TV> X,ARRAY_VIEW<ROTATION<TV> > rotation,const T time) PHYSBAM_OVERRIDE {}
     void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
