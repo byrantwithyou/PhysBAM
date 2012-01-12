@@ -13,7 +13,7 @@
 namespace PhysBAM{
 namespace ORIGIN_AREAS
 {
-template<class T,class TV> void Volume_From_Simplices(VOL_DATA<T,3,6>& data,TV A[6]);
+template<class T,class TV> void Volume_From_Simplices(VOL_DATA<T,3,6>& data,TV const & X0,TV const (&A)[6]);
 }
 }
 #endif

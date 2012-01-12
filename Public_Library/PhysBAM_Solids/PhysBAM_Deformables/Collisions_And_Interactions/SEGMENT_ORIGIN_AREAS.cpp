@@ -193,7 +193,7 @@ template<class T,class TV> void Area_From_Points(VOL_DATA<T,2,3>& data,const TV&
     data.H[1][0]=data.H[2][1]=M.Transposed();
 }
 
-template<class T,class TV> void PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(VOL_DATA<T,2,4>& data,TV const (&LA)[4])
+template<class T,class TV> void PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(VOL_DATA<T,2,4>& data,TV const & X0,TV const (&LA)[4])
 {
     TV A=LA[0],B=LA[1],C=LA[2],D=LA[3];
     if(A==B && C==D) return;
@@ -201,12 +201,12 @@ template<class T,class TV> void PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(VOL
     T sign=1,tol=(T)1e-10;
 
     // Enforce consistency with: AD BC + AB CD - AC BD = 0
-    T AB=TV::Cross_Product(A,B).x;
-    T CD=TV::Cross_Product(C,D).x;
-    T AC=TV::Cross_Product(A,C).x;
-    T BD=TV::Cross_Product(B,D).x;
-    T AD=TV::Cross_Product(A,D).x;
-    T BC=TV::Cross_Product(B,C).x;
+    T AB=TV::Cross_Product(A-X0,B-X0).x;
+    T CD=TV::Cross_Product(C-X0,D-X0).x;
+    T AC=TV::Cross_Product(A-X0,C-X0).x;
+    T BD=TV::Cross_Product(B-X0,D-X0).x;
+    T AD=TV::Cross_Product(A-X0,D-X0).x;
+    T BC=TV::Cross_Product(B-X0,C-X0).x;
     int sab=AB<-tol?-1:AB>tol;
     int scd=CD<-tol?-1:CD>tol;
     int sac=AC<-tol?-1:AC>tol;
@@ -262,31 +262,31 @@ template<class T,class TV> void PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(VOL
 
     if(C==D){
         if(sbc>0 || sbd>0 || sac<0 || sad<0) return;
-        if(TV::Cross_Product(A-C,B-C).x>-tol) Case_CCAA(tdata,A,B,C,D); // CCAA
-        else Case_CCBB(tdata,A,B,C,D); // CCBB
+        if(TV::Cross_Product(A-C,B-C).x>-tol) Case_CCAA(tdata,X0,A,B,C,D); // CCAA
+        else Case_CCBB(tdata,X0,A,B,C,D); // CCBB
 
         data.V=sign*tdata.V;
         for(int i=0;i<4;i++) data.G[index[i]]=sign*tdata.G[i];
         for(int i=0;i<4;i++) for(int k=0;k<4;k++) data.H[index[i]][index[k]]=sign*tdata.H[i][k];}
 
     // NOTE: (DxA) (CxB) + (CxD) (AxB) + (AxC) (DxB) = 0
-
+    // (after subtracing off X0 from each of A,B,C,D)
 
     if(sbc>=0) return; // CCCC
     if(TV::Cross_Product(A-C,B-C).x>-tol){
         if(sbd>=0){
             if(TV::Cross_Product(C-B,D-B).x>tol){ // CAAC
                 exchange(A,B);exchange(index[0],index[1]);sign=-sign;
-                if(TV::Cross_Product(A,B).x<0) sign=-sign;
-                Case_ACAC(tdata,A,B,C,D);}
+                if(TV::Cross_Product(A-X0,B-X0).x<0) sign=-sign;
+                Case_ACAC(tdata,X0,A,B,C,D);}
             else{ // CBAC
                 exchange(A,B);
                 exchange(index[0],index[1]);sign=-sign;
-                if(TV::Cross_Product(A,B).x<0) sign=-sign;
-                Case_BCAC(tdata,A,B,C,D);}}
+                if(TV::Cross_Product(A-X0,B-X0).x<0) sign=-sign;
+                Case_BCAC(tdata,X0,A,B,C,D);}}
         else{
-            if(TV::Cross_Product(A-D,B-D).x>-tol) Case_CCAA(tdata,A,B,C,D); // CCAA
-            else Case_CCAB(tdata,A,B,C,D);}} // CCAB
+            if(TV::Cross_Product(A-D,B-D).x>-tol) Case_CCAA(tdata,X0,A,B,C,D); // CCAA
+            else Case_CCAB(tdata,X0,A,B,C,D);}} // CCAB
     else{
         if(sbd>0){
             if(TV::Cross_Product(C-B,D-B).x>-tol){ // CABC
@@ -294,19 +294,19 @@ template<class T,class TV> void PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(VOL
                 exchange(index[0],index[1]);sign=-sign;
                 exchange(A,C);exchange(B,D);
                 exchange(index[0],index[2]);exchange(index[1],index[3]);
-                if(TV::Cross_Product(A,B).x<0) sign=-sign;
-                Case_BCAC(tdata,A,B,C,D);}
+                if(TV::Cross_Product(A-X0,B-X0).x<0) sign=-sign;
+                Case_BCAC(tdata,X0,A,B,C,D);}
             else{ // CBBC
                 exchange(A,B);
                 exchange(index[0],index[1]);sign=-sign;
-                if(TV::Cross_Product(A,B).x<0) sign=-sign;
-                Case_BCBC(tdata,A,B,C,D);}}
+                if(TV::Cross_Product(A-X0,B-X0).x<0) sign=-sign;
+                Case_BCBC(tdata,X0,A,B,C,D);}}
         else{
             if(TV::Cross_Product(A-D,B-D).x>-tol){ // CCBA
                 exchange(C,D);
                 exchange(index[2],index[3]);sign=-sign;
-                Case_CCAB(tdata,A,B,C,D);}
-            else Case_CCBB(tdata,A,B,C,D);}} // CCBB
+                Case_CCAB(tdata,X0,A,B,C,D);}
+            else Case_CCBB(tdata,X0,A,B,C,D);}} // CCBB
 
     data.V=sign*tdata.V;
     for(int i=0;i<4;i++) data.G[index[i]]=sign*tdata.G[i];
@@ -418,7 +418,7 @@ void Add_Data(VOL_DATA<T,2,4>& data,const VOL_DATA<T,2,m>& V,int const (&datai)[
 }
 
 const int vec_a[1]={0}, vec_c[1]={2}, vec_d[1]={3}, vec_abc[3]={0,1,2}, vec_abd[3]={0,1,3}, vec_cda[3]={2,3,0}, vec_cdb[3]={2,3,1}, vec_abcd[4]={0,1,2,3};
-template<class T,class TV> void Case_CCAA(VOL_DATA<T,2,4>& data,const TV& /*A*/,const TV& /*B*/,const TV& C,const TV& D)
+template<class T,class TV> void Case_CCAA(VOL_DATA<T,2,4>& data,const TV& X0,const TV& /*A*/,const TV& /*B*/,const TV& C,const TV& D)
 {
     // A X   X   X B
     //     D   C
@@ -426,9 +426,9 @@ template<class T,class TV> void Case_CCAA(VOL_DATA<T,2,4>& data,const TV& /*A*/,
 //    trap_cases.Append(1);
 #if 0
     DATA<T,2,1> DC;
-    Data_From_Dof(DC,C);
+    Data_From_Dof(DC,C-X0);
     DATA<T,2,1> DD;
-    Data_From_Dof(DD,D);
+    Data_From_Dof(DD,D-X0);
 
     VOL_DATA<T,2,2> V;
     Area_From_Points(V,DC.V,DD.V);
@@ -437,12 +437,12 @@ template<class T,class TV> void Case_CCAA(VOL_DATA<T,2,4>& data,const TV& /*A*/,
     static const int cd[]={2,3};
     static const int _01[]={0,1};
     {VOL_DATA<T,2,3> V;
-    Triangle_Area(V,C,D,TV());
+    Triangle_Area(V,C,D,X0);
     Add_Data(data,V,cd,_01);}
 #endif // #if 0|1
 }
 
-template<class T,class TV> void Case_CCAB(VOL_DATA<T,2,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
+template<class T,class TV> void Case_CCAB(VOL_DATA<T,2,4>& data,const TV& X0,const TV& A,const TV& B,const TV& C,const TV& D)
 {
     // D
     //   X
@@ -452,11 +452,11 @@ template<class T,class TV> void Case_CCAB(VOL_DATA<T,2,4>& data,const TV& A,cons
 //    trap_cases.Append(2);
 #if 0
     DATA<T,2,4> Q;
-    Intersect_Segments(Q,A,B,C,D);
+    Intersect_Segments(Q,A-X0,B-X0,C-X0,D-X0);
     DATA<T,2,3> P;
-    Intersect_Segment_Point(P,A,B,D);
+    Intersect_Segment_Point(P,A-X0,B-X0,D-X0);
     DATA<T,2,1> DC;
-    Data_From_Dof(DC,C);
+    Data_From_Dof(DC,C-X0);
 
     VOL_DATA<T,2,3> V;
     Area_From_Points(V,DC.V,Q.V,P.V);
@@ -474,18 +474,18 @@ template<class T,class TV> void Case_CCAB(VOL_DATA<T,2,4>& data,const TV& A,cons
     Triangle_Area(V,A,D,B);
     Add_Data(data,V,adb,_012);}
     {VOL_DATA<T,2,4> V;
-    Triangle_Area(V,TV(),D,A,B);
+    Triangle_Area(V,X0,D,A,B);
     Add_Data(data,V,dab,_123);}
     {VOL_DATA<T,2,4> V;
     Triangle_Area(V,A,B,D,C);
     Add_Data(data,V,abdc,_0123);}
     {VOL_DATA<T,2,3> V;
-    Triangle_Area(V,C,D,TV());
+    Triangle_Area(V,C,D,X0);
     Add_Data(data,V,cd,_01);}
 #endif // #if 0|1
 }
 
-template<class T,class TV> void Case_CCBB(VOL_DATA<T,2,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
+template<class T,class TV> void Case_CCBB(VOL_DATA<T,2,4>& data,const TV& X0,const TV& A,const TV& B,const TV& C,const TV& D)
 {
     //   D       C
     // A   P   P   B
@@ -493,9 +493,9 @@ template<class T,class TV> void Case_CCBB(VOL_DATA<T,2,4>& data,const TV& A,cons
 //    trap_cases.Append(3);
 #if 0
     DATA<T,2,3> P1;
-    Intersect_Segment_Point(P1,A,B,C);
+    Intersect_Segment_Point(P1,A-X0,B-X0,C-X0);
     DATA<T,2,3> P2;
-    Intersect_Segment_Point(P2,A,B,D);
+    Intersect_Segment_Point(P2,A-X0,B-X0,D-X0);
 
     VOL_DATA<T,2,2> V;
     Area_From_Points(V,P1.V,P2.V);
@@ -508,18 +508,18 @@ template<class T,class TV> void Case_CCBB(VOL_DATA<T,2,4>& data,const TV& A,cons
     static const int _023[]={0,2,3};
     static const int _013[]={0,1,3};
     {VOL_DATA<T,2,4> V;
-    Triangle_Area(V,D,TV(),A,B);
+    Triangle_Area(V,D,X0,A,B);
     Add_Data(data,V,dab,_023);}
     {VOL_DATA<T,2,4> V;
-    Triangle_Area(V,A,B,TV(),C);
+    Triangle_Area(V,A,B,X0,C);
     Add_Data(data,V,abc,_013);}
     {VOL_DATA<T,2,3> V;
-    Triangle_Area(V,B,A,TV());
+    Triangle_Area(V,B,A,X0);
     Add_Data(data,V,ba,_01);}
 #endif // #if 0|1
 }
 
-template<class T,class TV> void Case_BCAC(VOL_DATA<T,2,4>& data,const TV& A,const TV& /*B*/,const TV& C,const TV& D)
+template<class T,class TV> void Case_BCAC(VOL_DATA<T,2,4>& data,const TV& X0,const TV& A,const TV& /*B*/,const TV& C,const TV& D)
 {
     //   A         B
     // D   P   C
@@ -527,9 +527,9 @@ template<class T,class TV> void Case_BCAC(VOL_DATA<T,2,4>& data,const TV& A,cons
 //    trap_cases.Append(4);
 #if 0
     DATA<T,2,3> P;
-    Intersect_Segment_Point(P,C,D,A);
+    Intersect_Segment_Point(P,C-X0,D-X0,A-X0);
     DATA<T,2,1> DC;
-    Data_From_Dof(DC,C);
+    Data_From_Dof(DC,C-X0);
 
     VOL_DATA<T,2,2> V;
     Area_From_Points(V,DC.V,P.V);
@@ -538,12 +538,12 @@ template<class T,class TV> void Case_BCAC(VOL_DATA<T,2,4>& data,const TV& A,cons
     static const int acd[]={0,2,3};
     static const int _023[]={0,2,3};
     {VOL_DATA<T,2,4> V;
-    Triangle_Area(V,A,TV(),C,D);
+    Triangle_Area(V,A,X0,C,D);
     Add_Data(data,V,acd,_023);}
 #endif // #if 0|1
 }
 
-template<class T,class TV> void Case_BCBC(VOL_DATA<T,2,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
+template<class T,class TV> void Case_BCBC(VOL_DATA<T,2,4>& data,const TV& X0,const TV& A,const TV& B,const TV& C,const TV& D)
 {
     // A
     //   X
@@ -553,11 +553,11 @@ template<class T,class TV> void Case_BCBC(VOL_DATA<T,2,4>& data,const TV& A,cons
 //    trap_cases.Append(5);
 #if 0
     DATA<T,2,4> Q;
-    Intersect_Segments(Q,A,B,C,D);
+    Intersect_Segments(Q,A-X0,B-X0,C-X0,D-X0);
     DATA<T,2,3> P1;
-    Intersect_Segment_Point(P1,C,D,A);
+    Intersect_Segment_Point(P1,C-X0,D-X0,A-X0);
     DATA<T,2,3> P2;
-    Intersect_Segment_Point(P2,A,B,C);
+    Intersect_Segment_Point(P2,A-X0,B-X0,C-X0);
 
     VOL_DATA<T,2,3> V;
     Area_From_Points(V,P2.V,Q.V,P1.V);
@@ -572,21 +572,21 @@ template<class T,class TV> void Case_BCBC(VOL_DATA<T,2,4>& data,const TV& A,cons
     static const int _123[]={1,2,3};
     static const int _0123[]={0,1,2,3};
     {VOL_DATA<T,2,4> V;
-    Triangle_Area(V,B,A,C,TV());
+    Triangle_Area(V,B,A,C,X0);
     Add_Data(data,V,bac,_012);}
     {VOL_DATA<T,2,4> V;
-    Triangle_Area(V,TV(),A,C,D);
+    Triangle_Area(V,X0,A,C,D);
     Add_Data(data,V,acd,_123);}
     {VOL_DATA<T,2,4> V;
     Triangle_Area(V,D,C,A,B);
     Add_Data(data,V,dcab,_0123);}
     {VOL_DATA<T,2,3> V;
-    Triangle_Area(V,C,A,TV());
+    Triangle_Area(V,C,A,X0);
     Add_Data(data,V,ca,_01);}
 #endif // #if 0|1
 }
 
-template<class T,class TV> void Case_ACAC(VOL_DATA<T,2,4>& data,const TV& A,const TV& B,const TV& C,const TV& D)
+template<class T,class TV> void Case_ACAC(VOL_DATA<T,2,4>& data,const TV& X0,const TV& A,const TV& B,const TV& C,const TV& D)
 {
     // D
     //   A  Q  X  X  X  X  B
@@ -595,11 +595,11 @@ template<class T,class TV> void Case_ACAC(VOL_DATA<T,2,4>& data,const TV& A,cons
 //    trap_cases.Append(6);
 #if 0
     DATA<T,2,4> Q;
-    Intersect_Segments(Q,A,B,C,D);
+    Intersect_Segments(Q,A-X0,B-X0,C-X0,D-X0);
     DATA<T,2,1> DA;
-    Data_From_Dof(DA,A);
+    Data_From_Dof(DA,A-X0);
     DATA<T,2,1> DC;
-    Data_From_Dof(DC,C);
+    Data_From_Dof(DC,C-X0);
 
     VOL_DATA<T,2,3> V;
     Area_From_Points(V,DC.V,Q.V,DA.V);
@@ -610,7 +610,7 @@ template<class T,class TV> void Case_ACAC(VOL_DATA<T,2,4>& data,const TV& A,cons
     static const int _01[]={0,1};
     static const int _0123[]={0,1,2,3};
     {VOL_DATA<T,2,3> V;
-    Triangle_Area(V,C,A,TV());
+    Triangle_Area(V,C,A,X0);
     Add_Data(data,V,ca,_01);}
     {VOL_DATA<T,2,4> V;
     Triangle_Area(V,B,A,C,D);
@@ -620,9 +620,9 @@ template<class T,class TV> void Case_ACAC(VOL_DATA<T,2,4>& data,const TV& A,cons
 
 template void PhysBAM::ORIGIN_AREAS::Clear<float,3,6>(VOL_DATA<float,3,6>&);
 template void PhysBAM::ORIGIN_AREAS::Clear<float,2,4>(VOL_DATA<float,2,4>&);
-template void PhysBAM::ORIGIN_AREAS::Volume_From_Simplices<float,VECTOR<float,2> >(VOL_DATA<float,2,4>&,VECTOR<float,2> const (&)[4]);
+template void PhysBAM::ORIGIN_AREAS::Volume_From_Simplices<float,VECTOR<float,2> >(VOL_DATA<float,2,4>&,VECTOR<float,2> const &,VECTOR<float,2> const (&)[4]);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template void PhysBAM::ORIGIN_AREAS::Clear<double,3,6>(VOL_DATA<double,3,6>&);
 template void PhysBAM::ORIGIN_AREAS::Clear<double,2,4>(VOL_DATA<double,2,4>&);
-template void PhysBAM::ORIGIN_AREAS::Volume_From_Simplices<double,VECTOR<double,2> >(VOL_DATA<double,2,4>&,VECTOR<double,2> const (&)[4]);
+template void PhysBAM::ORIGIN_AREAS::Volume_From_Simplices<double,VECTOR<double,2> >(VOL_DATA<double,2,4>&,VECTOR<double,2> const &,VECTOR<double,2> const (&)[4]);
 #endif

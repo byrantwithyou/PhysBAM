@@ -305,7 +305,7 @@ void Case_Test()
     trap_cases.Remove_All();
     ORIGIN_AREAS::VOL_DATA<T,2,4> data;
     TV ar[4]={a,b,c,d};
-    ORIGIN_AREAS::Volume_From_Simplices(data,ar);
+    ORIGIN_AREAS::Volume_From_Simplices(data,TV(),ar);
 
     VECTOR<TV,6> G1;
     VECTOR<VECTOR<MATRIX<T,2>,6>,6> H1;
@@ -332,6 +332,7 @@ void Volume_From_Simplices_Test_Gradient(
     const PhysBAM::ORIGIN_AREAS::VOL_DATA<T,2,4>& vol_data,
     PhysBAM::VECTOR<T,2> (&X)[4])
 {
+    typedef PhysBAM::VECTOR<T,2> TV;
     const T tol=static_cast<T>(1)/(1024*1024);
     const T dx=static_cast<T>(1)/1024;
     PhysBAM::ORIGIN_AREAS::VOL_DATA<T,2,4> vol_data_dx0;
@@ -340,11 +341,11 @@ void Volume_From_Simplices_Test_Gradient(
         for(int d=1;d<=2;++d){
             X[i](d)+=dx;
             PhysBAM::ORIGIN_AREAS::Clear(vol_data_dx1);
-            PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data_dx1,X);
+            PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data_dx1,TV(),X);
             X[i](d)-=dx;
             X[i](d)-=dx;
             PhysBAM::ORIGIN_AREAS::Clear(vol_data_dx0);
-            PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data_dx0,X);
+            PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data_dx0,TV(),X);
             X[i](d)+=dx;
             const T Gida=vol_data.G[i](d);
             const T Gidb=(vol_data_dx1.V-vol_data_dx0.V)/(2*dx);
@@ -358,6 +359,7 @@ void Volume_From_Simplices_Test_Hessian(
     const PhysBAM::ORIGIN_AREAS::VOL_DATA<T,2,4>& vol_data,
     PhysBAM::VECTOR<T,2> (&X)[4])
 {
+    typedef PhysBAM::VECTOR<T,2> TV;
     const T tol=static_cast<T>(1)/(1024*1024);
     const T dx=static_cast<T>(1)/1024;
     PhysBAM::ORIGIN_AREAS::VOL_DATA<T,2,4> vol_data_dx00;
@@ -373,11 +375,11 @@ void Volume_From_Simplices_Test_Hessian(
                     if(i==j&&d==e){
                         X[i](d)+=dx;
                         PhysBAM::ORIGIN_AREAS::Clear(vol_data_dx11);
-                        PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data_dx11,X);
+                        PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data_dx11,TV(),X);
                         X[i](d)-=dx;
                         X[i](d)-=dx;
                         PhysBAM::ORIGIN_AREAS::Clear(vol_data_dx00);
-                        PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data_dx00,X);
+                        PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data_dx00,TV(),X);
                         X[i](d)+=dx;
                         Hijdeb=((vol_data_dx11.V-vol_data.V)-(vol_data.V-vol_data_dx00.V))/(dx*dx);
                     }
@@ -385,21 +387,21 @@ void Volume_From_Simplices_Test_Hessian(
                         X[i](d)+=dx;
                         X[j](e)+=dx;
                         PhysBAM::ORIGIN_AREAS::Clear(vol_data_dx11);
-                        PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data_dx11,X);
+                        PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data_dx11,TV(),X);
                         X[j](e)-=dx;
                         X[j](e)-=dx;
                         PhysBAM::ORIGIN_AREAS::Clear(vol_data_dx10);
-                        PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data_dx10,X);
+                        PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data_dx10,TV(),X);
                         X[j](e)+=dx;
                         X[i](d)-=dx;
                         X[i](d)-=dx;
                         X[j](e)+=dx;
                         PhysBAM::ORIGIN_AREAS::Clear(vol_data_dx01);
-                        PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data_dx01,X);
+                        PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data_dx01,TV(),X);
                         X[j](e)-=dx;
                         X[j](e)-=dx;
                         PhysBAM::ORIGIN_AREAS::Clear(vol_data_dx00);
-                        PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data_dx00,X);
+                        PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data_dx00,TV(),X);
                         X[j](e)+=dx;
                         X[i](d)+=dx;
                         Hijdeb=((vol_data_dx11.V-vol_data_dx10.V)-(vol_data_dx01.V-vol_data_dx00.V))/(4*dx*dx);
@@ -424,7 +426,7 @@ void Volume_From_Simplices_Test()
     //       O
     PhysBAM::ORIGIN_AREAS::Clear(vol_data);
     X[0]=TV(-3,+2);X[1]=TV(+3,+2);X[2]=TV(+1,+1);X[3]=TV(-1,+1);
-    PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data,X);
+    PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data,TV(),X);
     PHYSBAM_ASSERT(vol_data.V==static_cast<T>(-1));
     Volume_From_Simplices_Test_Gradient(vol_data,X);
     Volume_From_Simplices_Test_Hessian(vol_data,X);
@@ -437,7 +439,7 @@ void Volume_From_Simplices_Test()
     //     O
     PhysBAM::ORIGIN_AREAS::Clear(vol_data);
     X[0]=TV(-2,+2);X[1]=TV(+3,+2);X[2]=TV(+1,+1);X[3]=TV(-2,+4);
-    PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data,X);
+    PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data,TV(),X);
     PHYSBAM_ASSERT(vol_data.V==static_cast<T>(-2));
     Volume_From_Simplices_Test_Gradient(vol_data,X);
     Volume_From_Simplices_Test_Hessian(vol_data,X);
@@ -448,7 +450,7 @@ void Volume_From_Simplices_Test()
     //       O
     PhysBAM::ORIGIN_AREAS::Clear(vol_data);
     X[0]=TV(-3,+1);X[1]=TV(+3,+1);X[2]=TV(+2,+2);X[3]=TV(-2,+2);
-    PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data,X);
+    PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data,TV(),X);
     PHYSBAM_ASSERT(vol_data.V==static_cast<T>(-1));
     Volume_From_Simplices_Test_Gradient(vol_data,X);
     Volume_From_Simplices_Test_Hessian(vol_data,X);
@@ -459,7 +461,7 @@ void Volume_From_Simplices_Test()
     //       O
     PhysBAM::ORIGIN_AREAS::Clear(vol_data);
     X[0]=TV(-2,+2);X[1]=TV(+3,+2);X[2]=TV(+1,+1);X[3]=TV(-3,+1);
-    PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data,X);
+    PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data,TV(),X);
     PHYSBAM_ASSERT(vol_data.V==static_cast<T>(-1));
     Volume_From_Simplices_Test_Gradient(vol_data,X);
     Volume_From_Simplices_Test_Hessian(vol_data,X);
@@ -472,7 +474,7 @@ void Volume_From_Simplices_Test()
     //     O   B
     PhysBAM::ORIGIN_AREAS::Clear(vol_data);
     X[0]=TV(-2,+4);X[1]=TV(+2, 0);X[2]=TV(+2,+2);X[3]=TV(-2,+2);
-    PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data,X);
+    PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data,TV(),X);
     PHYSBAM_ASSERT(vol_data.V==static_cast<T>(-2));
     Volume_From_Simplices_Test_Gradient(vol_data,X);
     Volume_From_Simplices_Test_Hessian(vol_data,X);
@@ -484,7 +486,7 @@ void Volume_From_Simplices_Test()
     //      O
     PhysBAM::ORIGIN_AREAS::Clear(vol_data);
     X[0]=TV(-1,+2);X[1]=TV(+5,+2);X[2]=TV(+2,+1);X[3]=TV(-2,+3);
-    PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data,X);
+    PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data,TV(),X);
     PHYSBAM_ASSERT(vol_data.V==static_cast<T>(-3));
     Volume_From_Simplices_Test_Gradient(vol_data,X);
     Volume_From_Simplices_Test_Hessian(vol_data,X);

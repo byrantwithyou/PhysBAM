@@ -120,9 +120,8 @@ Compute_Collision_Triangles(T_OBJECT& obj1,T_OBJECT& obj2)
         VECTOR<int,TV::m*2> I=it.Key();
         ORIGIN_AREAS::VOL_DATA<T,TV::m,TV::m*2> data;
         TV PTS[TV::m*2];
-        //for(int k=1;k<=TV::m*2;k++) PTS[k-1]=X(I(k));
-        for(int k=1;k<=TV::m*2;k++) PTS[k-1]=X(I(k))-x0;
-        Volume_From_Simplices(data,PTS); // gotta love ADL!
+        for(int k=1;k<=TV::m*2;k++) PTS[k-1]=X(I(k));
+        Volume_From_Simplices(data,x0,PTS); // gotta love ADL!
         area+=sign*data.V;
         for(int k=1;k<=TV::m*2;k++) gradient.Get_Or_Insert(I(k))+=sign*data.G[k-1];
         for(int k=1;k<=TV::m*2;k++) for(int m=1;m<=TV::m*2;m++) hessian.Get_Or_Insert(VECTOR<int,2>(I(k),I(m)))+=sign*data.H[k-1][m-1];}
