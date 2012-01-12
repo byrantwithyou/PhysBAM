@@ -364,7 +364,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=900;
             solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
-            last_frame=3000;
+            last_frame=2000;
             if(test_number==33) last_frame=1;
             if(test_number==31) last_frame=250;
             break;            

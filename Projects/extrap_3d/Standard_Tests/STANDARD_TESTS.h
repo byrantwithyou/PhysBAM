@@ -332,8 +332,11 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 42: case 52:
             mattress_grid=GRID<TV>(20,20,20,(T)-0.01,(T)0.01,(T)-0.01,(T)0.01,(T)-0.01,(T)0.01);
             break;
-    	default:
-            mattress_grid=GRID<TV>(20,10,20,(T)-1,(T)1,(T)-.5,(T).5,(T)-1,(T)1);
+    	default:{
+            if(!parameter) parameter=10;            
+        
+            mattress_grid=GRID<TV>(2*parameter,parameter,2*parameter,(T)-1,(T)1,(T)-.5,(T).5,(T)-1,(T)1);
+        }
     }
 
     print_matrix=parse_args->Is_Value_Set("-print_matrix");
@@ -523,7 +526,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=override_collisions;
             solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=override_collisions;
             frame_rate=120;
-            last_frame=10*120;
+            last_frame=1500;
             break;
         case 34:
             solids_parameters.cfl=(T)5;
@@ -621,6 +624,10 @@ void Parse_Options() PHYSBAM_OVERRIDE
             break;
         default:
             LOG::cerr<<"Parsing: Unrecognized test number "<<test_number<<std::endl;exit(1);}
+    
+    //solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=override_collisions;
+    //solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=override_collisions;
+    //solids_parameters.triangle_collision_parameters.perform_self_collision=override_collisions;
 
     solid_body_collection.Print_Residuals(parse_args->Get_Option_Value("-residuals"));
     solid_body_collection.print_energy=parse_args->Get_Option_Value("-print_energy");
@@ -965,7 +972,10 @@ void Get_Initial_Data()
                 //  RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,4.5*scale,-1.2*scale),ROTATION<TV>((T)pi*0.525,TV(1,0,0))*ROTATION<TV>(0*(T)pi/2,TV(0,1,0)))),true,true,density,0.06);            
                 //tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/bunny.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)4.7*scale,-3.0*scale))),true,true,density,.25);
                 tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_110K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)4.6*scale,-0.0*scale),ROTATION<TV>(T(-pi/2),TV(0,0,1))*ROTATION<TV>(T(pi/2),TV(0,1,0)))),true,true,density,.0065);                
+            }else{
+                tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_110K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)4.6*scale,-0.0*scale),ROTATION<TV>(T(-pi/2),TV(0,0,1))*ROTATION<TV>(T(pi/2),TV(0,1,0)))),true,true,density,.005);      
             }
+            
             
             RIGID_BODY<TV>& gear1=tests.Add_Rigid_Body("gear",.375*scale,1.0*scale);
             RIGID_BODY<TV>& gear2=tests.Add_Rigid_Body("gear",.375*scale,1.0*scale);
@@ -1012,7 +1022,7 @@ void Get_Initial_Data()
             
             //  RIGID_BODY<TV>& box2=tests.Add_Analytic_Box(TV(2.0*scale,2.0*scale,.1*scale));
             //  RIGID_BODY<TV>& box3=tests.Add_Analytic_Box(TV(2.0*scale,.1*scale,2.0*scale));
-            RIGID_BODY<TV>& cylinder=tests.Add_Analytic_Cylinder(1.5*scale,.06*scale);
+            RIGID_BODY<TV>& cylinder=tests.Add_Analytic_Cylinder(1.5*scale,.12*scale);
             box0.X()=TV(0,4.0*scale,-0.0*scale);
             
             /*  if(!gears_of_pain){
@@ -1045,13 +1055,15 @@ void Get_Initial_Data()
             curve8.Add_Control_Point(1.5+hand_scale,FRAME<TV>(TV(0,4.0*scale,-0.0*scale),ROTATION<TV>(0*(T)pi/2.0,TV(1,0,0))));
             curve8.Add_Control_Point(1.53+hand_scale,FRAME<TV>(TV(0,3.1*scale,-1.0*scale),ROTATION<TV>((T)pi/2.0,TV(1,0,0))));
             
+            T drop_time;
+            if(gears_of_pain) drop_time=(T)17; else drop_time=(T)17;
             cylinder.X()=TV(0,5.0*scale,0*scale);
             cylinder.is_static=false;
             kinematic_id7=cylinder.particle_index;
             rigid_body_collection.rigid_body_particle.kinematic(cylinder.particle_index)=true;
             curve7.Add_Control_Point(0,FRAME<TV>(TV(0,5.0*scale,0*scale)));
-            curve7.Add_Control_Point(7.0,FRAME<TV>(TV(0,5.0*scale,0*scale)));
-            curve7.Add_Control_Point(8.0,FRAME<TV>(TV(0,2.0*scale,0*scale)));
+            curve7.Add_Control_Point(drop_time,FRAME<TV>(TV(0,5.0*scale,0*scale)));
+            curve7.Add_Control_Point(drop_time+(T)1,FRAME<TV>(TV(0,2.0*scale,0*scale)));
             
             RIGID_BODY<TV>& inclined_floor=tests.Add_Ground(input_friction);            
             inclined_floor.X()=TV(0,.0*scale,0);
