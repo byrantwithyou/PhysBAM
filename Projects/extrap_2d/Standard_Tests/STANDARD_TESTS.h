@@ -526,13 +526,14 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             break;}
         case 100:{
             TRIANGULATED_AREA<T>* ta=TRIANGULATED_AREA<T>::Create(particles);
-            particles.array_collection->Add_Elements(parameter?3:9);
-            if(parameter){
+            if(parameter==1){
+                particles.array_collection->Add_Elements(3);
                 particles.X(1)=TV(-.5,0)*1.5;
                 particles.X(2)=TV(.5,0)*1.5;
                 particles.X(3)=TV(0,sqrt(3)/2)*1.5;
                 ta->mesh.elements.Append(VECTOR<int,3>(1,2,3));}
             else{
+                particles.array_collection->Add_Elements(9);
                 particles.X(1)=TV(-.5,0);
                 particles.X(2)=TV(.5,0);
                 particles.X(3)=TV(0,sqrt(3)/2);
@@ -580,7 +581,11 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 100:{
             for(int i=1;TRIANGULATED_AREA<T>* triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>*>(i);i++)
                 Add_Constitutive_Model(*triangulated_area,(T)1e2,poissons_ratio,(T).05);
-            if(parameter) Place_Triangle(1,3,.1,.2,1.2,TV(4.1,0));
+            if(parameter==1) Place_Triangle(1,3,.1,.2,1.2,TV(4.1,0));
+            else if(parameter==2){
+                Place_Triangle(1,2.6,1.8,1.5,3.34,TV(4.1,2));
+                Place_Triangle(2,3,.1,.2,1.7,TV(4.1,0));
+                Place_Triangle(3,1.3,.15,.2,-.3,TV(4.1,-2));}
             else{
                 Place_Triangle(1,2.6,1.8,1.5,3.34,TV(4.1,2));
                 Place_Triangle(2,1.3,.15,.2,-.3,TV(4.1,0));
