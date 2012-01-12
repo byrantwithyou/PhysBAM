@@ -11,6 +11,7 @@
 #include <PhysBAM_Tools/Matrices/MATRIX_3X3.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
+#include <PhysBAM_Tools/Nonlinear_Equations/ITERATIVE_SOLVER.h>
 #include <PhysBAM_Tools/Polynomials/CUBIC.h>
 #include <PhysBAM_Tools/Polynomials/QUADRATIC.h>
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
@@ -228,10 +229,13 @@ Compute_s(const VECTOR<T,2>& f,const int simplex,T extrapolation_cutoff)
 {
     VECTOR<T,2> fm1=f-1;
     QUADRATIC<T> quadratic(fm1.Product(),fm1.Sum(),1-extrapolation_cutoff);
-    quadratic.Compute_Roots_In_Interval(0,1);
-    if(quadratic.roots==0) return -1;
-    PHYSBAM_ASSERT(quadratic.roots==1);
-    return quadratic.root1;
+    T a=quadratic(0);
+    T b=quadratic(1);
+    PHYSBAM_ASSERT(a>0);
+    if(b==0) return 1;
+    if((a>0)==(b>0)) return -1;
+    ITERATIVE_SOLVER<T> iterative_solver;
+    return iterative_solver.Bisection_Secant_Root(quadratic,0,1);
 }
 //#####################################################################
 // Function Compute_s
@@ -241,10 +245,13 @@ Compute_s(const VECTOR<T,3>& f,const int simplex,T extrapolation_cutoff)
 {
     VECTOR<T,3> fm1=f-1;
     CUBIC<T> cubic(fm1.Product(),DIAGONAL_MATRIX<T,3>(fm1).Cofactor_Matrix().Trace(),fm1.Sum(),1-extrapolation_cutoff);
-    cubic.Compute_Roots_In_Interval(0,1);
-    if(cubic.roots==0) return -1;
-    PHYSBAM_ASSERT(cubic.roots==1);
-    return cubic.root1;
+    T a=cubic(0);
+    T b=cubic(1);
+    PHYSBAM_ASSERT(a>0);
+    if(b==0) return 1;
+    if((a>0)==(b>0)) return -1;
+    ITERATIVE_SOLVER<T> iterative_solver;
+    return iterative_solver.Bisection_Secant_Root(cubic,0,1);
 }
 //#####################################################################
 // Function Compute_E
