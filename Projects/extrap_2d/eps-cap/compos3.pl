@@ -57,8 +57,8 @@ for $i (0..$#ARGV)
             {
                 my $xx=$3*$arlen+$1;
                 my $yy=$4*$arlen+$2;
-                $arrows.="\\psline[linewidth=1px,linecolor=colarrow]{->}@{[&pt($1,$2)]}@{[&pt($xx,$yy)]}\n";
-                $arrows.="\\psline[linewidth=1px,linecolor=colarrowref]{->}@{[&pt(-$1,-$2)]}@{[&pt(-$xx,-$yy)]}\n";
+                $arrows.="\\psline[linewidth=.5px,linecolor=colarrow]{->}@{[&pt($1,$2)]}@{[&pt($xx,$yy)]}\n";
+                $arrows.="\\psline[linewidth=.5px,linecolor=colarrowref]{->}@{[&pt(-$1,-$2)]}@{[&pt(-$xx,-$yy)]}\n";
             }
         }
         if(/c /)
@@ -156,15 +156,15 @@ print <<EOS;
 
 \\usepackage[margin=0cm,papersize={${wm1}px,${hm1}px}]{geometry}
 \\definecolor{bg}{rgb}{1,1,1}
-\\definecolor{coltri1}{rgb}{0,0.9,0}
+\\definecolor{coltri1}{rgb}{1,0,1}
 \\definecolor{coltri2}{rgb}{0,0.25,1}
-\\definecolor{coltri3}{rgb}{0,.9,.9}
+\\definecolor{coltri3}{rgb}{0,.9,0}
 \\definecolor{invtri}{rgb}{1,0,0}
 \\definecolor{backtri}{rgb}{0.90,0.90,0.90}
 \\definecolor{ltbacktri}{rgb}{1,1,1}
 \\definecolor{vertline}{rgb}{0.575,0.575,0.585}
-\\definecolor{colcontour}{rgb}{0.95,0.95,0}
-\\definecolor{colarrow}{rgb}{1,0,1}
+\\definecolor{colcontour}{rgb}{.8,.8,0}
+\\definecolor{colarrow}{rgb}{1,.3,0}
 \\definecolor{colarrowref}{rgb}{0.5,0.5,0.51}
 \\definecolor{coltriline}{rgb}{0.5,0.5,0.51}
 \\definecolor{arvelocity}{rgb}{0,0.65,0}
@@ -185,8 +185,8 @@ $tristretchstr
 $arrow
 $alltri
 $tristretchpts
-$alltrails
 $arrows
+$alltrails
 
 \\psframe[fillstyle=solid,linestyle=none,fillcolor=backtri]@{[&pt(-3,.02)]}@{[&pt(-2.5,.3)]}
 \\psframe[fillstyle=solid,linestyle=none,fillcolor=backtri]@{[&pt(-.4,-3)]}@{[&pt(-.02,-2.7)]}
