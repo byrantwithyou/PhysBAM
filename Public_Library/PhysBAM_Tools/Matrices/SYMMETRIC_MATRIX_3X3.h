@@ -262,6 +262,9 @@ public:
     DIAGONAL_MATRIX<T,3> Diagonal_Part() const
     {return DIAGONAL_MATRIX<T,3>(x11,x22,x33);}
 
+    VECTOR<T,3> Off_Diagonal_Part() const
+    {return VECTOR<T,3>(x32,x31,x21);}
+
     static SYMMETRIC_MATRIX Multiply_With_Symmetric_Result(const MATRIX<T,3>& A,const MATRIX<T,3>& B) // A*B and assume symmetric result, 18 mults, 12 adds
     {return SYMMETRIC_MATRIX(A.x[0]*B.x[0]+A.x[3]*B.x[1]+A.x[6]*B.x[2],A.x[1]*B.x[0]+A.x[4]*B.x[1]+A.x[7]*B.x[2],
                              A.x[2]*B.x[0]+A.x[5]*B.x[1]+A.x[8]*B.x[2],A.x[1]*B.x[3]+A.x[4]*B.x[4]+A.x[7]*B.x[5],

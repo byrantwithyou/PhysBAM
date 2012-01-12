@@ -175,12 +175,14 @@ public:
     int image_size;
     ARRAY<VECTOR<VECTOR<T,2>,2> > contour_segments;
     ARRAY<int> stuck_particles;
+    bool pin_corners;
+    RANDOM_NUMBERS<T> rand;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),semi_implicit(false),test_forces(false),use_extended_neohookean(false),use_extended_neohookean2(false),
         use_extended_neohookean_refined(false),use_extended_neohookean_hyperbola(false),use_extended_neohookean_smooth(false),use_extended_svk(false),
-        use_corotated(false),use_corotated_fixed(false),use_corot_blend(false),dump_sv(false),print_matrix(false),use_constant_ife(false),input_cutoff(FLT_MAX),input_efc(FLT_MAX),input_poissons_ratio(-1),input_youngs_modulus(0),
-        J_min(0),J_max((T).1),la_min(0),test_model_only(false),ether_drag(0)
+        use_corotated(false),use_corotated_fixed(false),use_corot_blend(false),dump_sv(false),print_matrix(false),use_constant_ife(false),input_cutoff(FLT_MAX),input_efc(FLT_MAX),
+        input_poissons_ratio(-1),input_youngs_modulus(0),J_min(0),J_max((T).1),la_min(0),test_model_only(false),ether_drag(0),pin_corners(true)
     {
     }
 
@@ -196,7 +198,7 @@ public:
     void Add_External_Impulses_Before(ARRAY_VIEW<TV> V,const T time,const T dt) PHYSBAM_OVERRIDE {}
     void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) PHYSBAM_OVERRIDE {}
     void Add_External_Impulse(ARRAY_VIEW<TV> V,const int node,const T time,const T dt) PHYSBAM_OVERRIDE {}
-    void Limit_Solids_Dt(T& dt,const T time) PHYSBAM_OVERRIDE {}
+    void Limit_Solids_Dt(T& dt,const T time) PHYSBAM_OVERRIDE {if(test_number==60 && time<1e-5) dt=std::min(dt,3e-7);}
     void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     void Set_External_Positions(ARRAY_VIEW<TV> X,ARRAY_VIEW<ROTATION<TV> > rotation,const T time) PHYSBAM_OVERRIDE {}
     void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
@@ -286,6 +288,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add_Double_Argument("-ether_drag",0,"Ether drag");
     parse_args->Add_Integer_Argument("-image_size",500,"image size for plots");
     parse_args->Add_Double_Argument("-sigma_range",3,"sigma range for plots");
+    parse_args->Add_Option_Argument("-pin_corners");
 }
 //#####################################################################
 // Function Parse_Options
@@ -299,10 +302,9 @@ void Parse_Options() PHYSBAM_OVERRIDE
     plateau=(T)0;
     parameter=parse_args->Get_Integer_Value("-parameter");
     jello_size=parse_args->Get_Integer_Value("-jello_size");
-    seed_input=parse_args->Get_Integer_Value("-seed");   
     
     switch(test_number){
-        case 17: case 18: case 24: case 25: case 27: case 10: case 11: case 23: case 57: case 77:
+        case 17: case 18: case 24: case 25: case 27: case 10: case 11: case 23: case 57: case 77: case 80:
             if(!parameter) parameter=10;
             mattress_grid=GRID<TV>(parameter+1,parameter+1,parameter+1,(T)-1,(T)1,(T)-1,(T)1,(T)-1,(T)1);
             break;
@@ -394,6 +396,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     sigma_range=(T)parse_args->Get_Double_Value("-sigma_range");
     image_size=parse_args->Get_Integer_Value("-image_size");
     stretch_cutoff=parse_args->Get_Double_Value("-stretch_cutoff");
+    pin_corners=parse_args->Get_Option_Value("-pin_corners");
     
     semi_implicit=parse_args->Is_Value_Set("-semi_implicit");
     if(parse_args->Is_Value_Set("-project_nullspace")) solids_parameters.implicit_solve_parameters.project_nullspace_frequency=1;
@@ -404,7 +407,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
     if(parse_args->Is_Value_Set("-efc")) input_efc=(T)parse_args->Get_Double_Value("-efc");
     if(parse_args->Is_Value_Set("-poissons_ratio")) input_poissons_ratio=(T)parse_args->Get_Double_Value("-poissons_ratio");
     if(parse_args->Is_Value_Set("-youngs_modulus")) input_youngs_modulus=(T)parse_args->Get_Double_Value("-youngs_modulus");
-    
+    if(parse_args->Is_Value_Set("-seed")) rand.Set_Seed(parse_args->Get_Integer_Value("-seed"));
+
     switch(test_number){
         case 1:
         case 2:
@@ -412,6 +416,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
        // case 4:
         case 7:
         case 8:
+        case 80:
         case 9:
         case 10:
         case 11:
@@ -477,6 +482,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             frame_rate=240;
             break;
         case 59:
+        case 60:
             solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness = 1e-4;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=100000;
@@ -699,6 +705,11 @@ void Get_Initial_Data()
             tests.Create_Mattress(mattress_grid,true,&initial_state);
             tests.Add_Ground();
             break;}
+        case 80:{
+            RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,4,0)));
+            tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_20K.tet.gz", // adaptive_torus_float.tet
+                                                RIGID_BODY_STATE<TV>(FRAME<TV>(TV(15,5,0),ROTATION<TV>(-T(pi/2),TV(1,0,0)))),true,true,density,1.0);
+            break;}
         case 9:{
             RIGID_BODY<TV>& box1=tests.Add_Rigid_Body("cylinder",(T)1.0,(T).5);
             RIGID_BODY<TV>& box2=tests.Add_Analytic_Cylinder(10,1);
@@ -862,7 +873,7 @@ void Get_Initial_Data()
             sphere4.is_static = true;
             
             break;}
-        case 59: {
+        case 59: case 60: {
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/armadillo_110K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T)0.373,(T)0))),true,true,density,.005);
             break;}
 
@@ -1134,7 +1145,6 @@ void Get_Initial_Data()
 
         {
             //Todo: At some point, use Oriented_Box to do a tighter collision check. C-Re, C-e, R where R is the rotation matrix and e is the edge
-            RANDOM_NUMBERS<T> random;
             T max_jello_size = .036;//maximum edge length
             T bound = .2;
             TV new_center; T new_rotate;
@@ -1142,12 +1152,11 @@ void Get_Initial_Data()
             bool stuck=false;
             RIGID_BODY_STATE<TV> initial_state;
             
-            random.Set_Seed(seed_input);
             //break;} 
             for (int i=1; i<=number_of_jellos; i++){
                 do {
-                    random.Fill_Uniform(new_center,-bound,bound);
-                   // new_center = TV(random.Get_Uniform_Number(-bound,bound),random.Get_Uniform_Number((T).5*bound,(T)1*bound),random.Get_Uniform_Number(-bound,bound));
+                    rand.Fill_Uniform(new_center,-bound,bound);
+                   // new_center = TV(rand.Get_Uniform_Number(-bound,bound),rand.Get_Uniform_Number((T).5*bound,(T)1*bound),rand.Get_Uniform_Number(-bound,bound));
                     stuck=false;
                     new_center.x = .6*(new_center.x);
                     new_center.z = 1.1*(new_center.z+bound)-bound;
@@ -1159,9 +1168,9 @@ void Get_Initial_Data()
                        // if ((new_center.x-jello_centers(j).x)*(new_center.x-jello_centers(j).x)+(new_center.y-jello_centers(j).y)*(new_center.y-jello_centers(j).y)+(new_center.z-jello_centers(j).z)*(new_center.z-jello_centers(j).z)<=(T)4*max_jello_size*max_jello_size) stuck=true;
                 }}while(stuck);
                 jello_centers.Append(new_center);
-                random.Fill_Uniform(new_center,-bound,bound);
-//                     new_center = TV(random.Get_Uniform_Number(-bound,bound),random.Get_Uniform_Number(-bound,bound),random.Get_Uniform_Number(-bound,bound));
-                new_rotate = random.Get_Uniform_Number(-(T)pi,(T)pi);
+                rand.Fill_Uniform(new_center,-bound,bound);
+//                     new_center = TV(rand.Get_Uniform_Number(-bound,bound),rand.Get_Uniform_Number(-bound,bound),rand.Get_Uniform_Number(-bound,bound));
+                new_rotate = rand.Get_Uniform_Number(-(T)pi,(T)pi);
                 RIGID_BODY_STATE<TV> initial_state1(FRAME<TV>(jello_centers(i),ROTATION<TV>(new_rotate,new_center)));
                 if (i % 5 ==0) {tests.Create_Mattress(mattress_grid3,true,&initial_state1);}
                 else if (i % 5 ==1) {tests.Create_Mattress(mattress_grid2,true,&initial_state1);}
@@ -1628,12 +1637,15 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 2:
         case 3:
         case 8:
+        case 80:
         case 16:
         case 5:
         case 6:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
-            solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+            if(test_number!=80) solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             Add_Constitutive_Model(tetrahedralized_volume,(T)1e5,(T).45,(T).01);
+            if(test_number==80) particles.X.template Project<T,&TV::x>()*=-(T).97;
+            if(test_number==80) particles.X.template Project<T,&TV::y>()*=(T).98;
             break;}
         case 77:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
@@ -1668,13 +1680,23 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 17:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             Add_Constitutive_Model(tetrahedralized_volume,(T)1e5,(T).45,(T).01);
-            RANDOM_NUMBERS<T> rand;
+            int s=parameter+1,s2=s*s,s3=s*s2;
+            if(pin_corners){
+                stuck_particles.Append(1);
+                stuck_particles.Append(s);
+                stuck_particles.Append(s2);
+                stuck_particles.Append(s3);
+                stuck_particles.Append(s2-s+1);
+                stuck_particles.Append(s3-s2+1);
+                stuck_particles.Append(s3-s+1);
+                stuck_particles.Append(s3-s2+s);}
+            ARRAY<TV> OX(particles.X.Subset(stuck_particles));
             rand.Fill_Uniform(particles.X,-1,1);
+            particles.X.Subset(stuck_particles)=OX;
             break;}
         case 18:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             Add_Constitutive_Model(tetrahedralized_volume,(T)1e5,(T).45,(T).01);
-            RANDOM_NUMBERS<T> rand;
             rand.Fill_Uniform(particles.X,-0,0);
             break;}
         case 23:
@@ -1736,16 +1758,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             Add_Constitutive_Model(tetrahedralized_volume,(T)1e4,(T).3,(T).001);
             
-            ARRAY<TV> random_particles(particles.X.m);
-            RANDOM_NUMBERS<T> rand;
-            rand.Fill_Uniform(random_particles,-0.3,.3);
-
-            // RIGID_BODY<TV>& box1=tests.Add_Analytic_Sphere(0.065,density,5);
-            // box1.X() = TV(0.27,0.645,-0.12);
-            // RIGID_BODY<TV>& box2=tests.Add_Analytic_Sphere(0.065,density,5);
-            // box2.X() = TV(-0.275,0.605,-0.18);
-            // RIGID_BODY<TV>& box3=tests.Add_Analytic_Box(TV(0.5,0.06,0.5));
-            // box3.X() = TV(-0.024,0.03,0.1);
+            ARRAY<TV> rand_particles(particles.X.m);
+            rand.Fill_Uniform(rand_particles,-0.3,.3);
 
             for (int i=1; i<=particles.X.m; i++)
             {
@@ -1759,10 +1773,15 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 }
                 else
                 {
-                    particles.X(i)=random_particles(i)+TV(0,0.3,0)+TV(-0.024,0.06,0.1);
+                    particles.X(i)=rand_particles(i)+TV(0,0.3,0)+TV(-0.024,0.06,0.1);
                 }
             }
 
+            break;} 
+        case 60:{
+            TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
+            Add_Constitutive_Model(tetrahedralized_volume,(T)1e4,(T).3,(T).001);
+            rand.Fill_Uniform(particles.X,-0.3,.3);
             break;} 
         case 32:{
             T youngs_modulus = 7e5;
@@ -2144,6 +2163,7 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
         for(int i=1;i<=stuck_particles.m;i++){
             int p=stuck_particles(i);
             V(p)=V(p).Projected_Orthogonal_To_Unit_Direction(particles.X(p).Normalized());}}
+    if(test_number==17) V.Subset(stuck_particles).Fill(TV());
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes
@@ -2218,6 +2238,7 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
         for(int i=1;i<=stuck_particles.m;i++){
             int p=stuck_particles(i);
             V(p)=V(p).Projected_Orthogonal_To_Unit_Direction(particles.X(p).Normalized());}}
+    if(test_number==17) V.Subset(stuck_particles).Fill(TV());
 }
 //#####################################################################
 // Function Read_Output_Files_Solids
@@ -2461,10 +2482,6 @@ void Bind_Intersecting_Particles()
 void Preprocess_Frame(const int frame)
 {
     dynamic_cast<NEWMARK_EVOLUTION<TV>&>(*solids_evolution).print_matrix=print_matrix;
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
-    RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
-    BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
-    static int first_time=1;
     if (dump_sv)
     {
         std::string output_file = STRING_UTILITIES::string_sprintf("%s/SV_%d",output_directory.c_str(),frame);
@@ -2524,33 +2541,6 @@ void Preprocess_Frame(const int frame)
                 }
             }        
         }
-    }
-    if(test_number==32 && this->restart && first_time && !nobind)
-    {
-        first_time=0;
-        int bind1[]={33187,33237,33289,33476,33609,33617,33621,33628,33632,33633,33635,33638,33639,33643,33644,33649,33798,33799,33817,33819,33832,35723,35724,
-                     35725,35728,35733,35734,35736,35737,35738,35753,35756,35757,36138,36148,36149,36159,36161,36162,36168,36177,36188,36193,36194,36195,36196,
-                     36197,36198,36199,36201,36202,36203,36204,36205,36206,36207,36209,36210,36211,36212,36213,36214,36221,36232,36233,36235,36237,36238,36241,
-                     36242,36248,36249,36250,36251,36262,36270,36273,36281,36282,36283,36285,36336,36337,36338,36339,36363,36367,36370,36371,36575,36576,36760,
-                     36765,36766,36775,36776,36823,37806,37807,37808,37811,37813,37825,37826,37827,37828,37830,37831,37832,37835,37836,37837,37838,37839,37840,
-                     37841,37846,37854,37867,37868,37869,37870,37871,37872,37874,37875,37877,37878,37879,37881,37882,37883,37884,37916,37918,37919,37920,38220};
-        int bind2[]={27664,27716,27718,27827,27839,27872,27876,27880,27882,27884,27892,27895,27907,27913,28221,28240,28314,29095,29182,29379,29380,29381,29382,
-                     29413,29468,29469,29470,29471,29472,29473,29474,29482,29488,29511,29573,29574,29577,29578,29595,29597,29599,29602,29609,29611,29621,29630,
-                     29633,29634,29636,29637,29645,29646,29648,29714,29715,29717,29718,29719,29720,29724,29725,29727,29728,29731,29732,29742,29743,29744,29745,
-                     29810,29822,29823,29835,29836,29837,29838,31573,31588,31619,31620,31630,31633,31636,31637,31670,31671,31672,31673,31674,31676,31679,31680,
-                     31682,31687,31689,31693,31694,31695,31696,31697,31698,31699,31700,31737,31738,31739,31741,31742,31744,31747,31748,31750,31949,31999,32760,
-                     32761,32762,32763,32764,32766,32767,32768,32770,32771,32772,32773,32795,32796,32797,32798,32799,32815,32816,32817,32818,32819,32823,32824,
-                     32826,32831,32832};
-        for(size_t i=0;i<sizeof(bind1)/sizeof(*bind1);i++) Add_Debug_Particle(particles.X(bind1[i]),TV(1,0,0));
-        for(size_t i=0;i<sizeof(bind2)/sizeof(*bind2);i++) Add_Debug_Particle(particles.X(bind2[i]),TV(0,1,0));
-
-        RIGID_BODY<TV>& torus1=solid_body_collection.rigid_body_collection.Rigid_Body(1);
-        RIGID_BODY<TV>& torus2=solid_body_collection.rigid_body_collection.Rigid_Body(2);
-        for(size_t i=0;i<sizeof(bind1)/sizeof(*bind1);i++)
-            binding_list.Add_Binding(new RIGID_BODY_BINDING<TV>(particles,bind1[i],rigid_body_collection,1,torus1.Object_Space_Point(particles.X(bind1[i]))));
-        for(size_t i=0;i<sizeof(bind2)/sizeof(*bind2);i++)
-            binding_list.Add_Binding(new RIGID_BODY_BINDING<TV>(particles,bind2[i],rigid_body_collection,2,torus2.Object_Space_Point(particles.X(bind2[i]))));
-        solid_body_collection.Update_Simulated_Particles();
     }
     if(test_number==100) Plot_Contour_Landscape(frame);
 }
@@ -2686,15 +2676,14 @@ Test_Model_Helper(ISOTROPIC_CONSTITUTIVE_MODEL<T,3>* icm, TV &f, TV &df, T e)
 //#####################################################################
 void Test_Model(ISOTROPIC_CONSTITUTIVE_MODEL<T,3>& icm)
 {
-    RANDOM_NUMBERS<T> random;
     for(int i=1;i<=20;i++){
         TV f;
-        random.Fill_Uniform(f,0,2);
+        rand.Fill_Uniform(f,0,2);
         T e=1e-5;
         TV df;
-        random.Fill_Uniform(df,-e,e);
+        rand.Fill_Uniform(df,-e,e);
         f=f.Sorted().Reversed();
-        if(random.Get_Uniform_Integer(0,1)==1) f(2)=-f(2);
+        if(rand.Get_Uniform_Integer(0,1)==1) f(2)=-f(2);
         LOG::cout<<f<<std::endl;
         icm.Test(DIAGONAL_MATRIX<T,3>(f),1);
         Test_Model_Helper<RC_EXTRAPOLATED<T,3> >(&icm,f,df,e);

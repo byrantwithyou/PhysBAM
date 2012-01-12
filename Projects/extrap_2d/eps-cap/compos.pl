@@ -161,6 +161,11 @@ $tristretchpts
 @trails
 $arrows
 
+\\psframe[fillstyle=solid,linestyle=none,fillcolor=backtri]@{[&pt(-3,.02)]}@{[&pt(-2.5,.3)]}
+\\psframe[fillstyle=solid,linestyle=none,fillcolor=backtri]@{[&pt(-.4,-3)]}@{[&pt(-.02,-2.7)]}
+\\uput[ur]@{[&pt(-3,0)]} {{\\Huge\$\\sigma_1\$}}
+\\uput[ul]@{[&pt(0,-3)]} {{\\Huge\$\\sigma_2\$}}
+
 \\end{pspicture}
 \\end{document}
 EOS

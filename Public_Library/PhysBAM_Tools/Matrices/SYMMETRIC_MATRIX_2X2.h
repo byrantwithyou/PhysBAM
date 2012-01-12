@@ -238,6 +238,9 @@ public:
     DIAGONAL_MATRIX<T,2> Diagonal_Part() const
     {return DIAGONAL_MATRIX<T,2>(x11,x22);}
 
+    VECTOR<T,1> Off_Diagonal_Part() const
+    {return VECTOR<T,1>(x21);}
+
     void Fast_Solve_Eigenproblem(DIAGONAL_MATRIX<T,2>& eigenvalues,MATRIX<T,2>& eigenvectors) const
     {Solve_Eigenproblem(eigenvalues,eigenvectors);}
 

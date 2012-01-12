@@ -2,7 +2,7 @@
 extrap_2d -framerate 1 -parameter 10 -stiffen 10 -dampen 0 30 -image_size 30 -sigma_range 3 -dt .01 -last_frame 160 -poissons_ratio .45 -cutoff .001 -ether_drag 0.01 -use_corotated -o fig-mattress >&/dev/null
 extrap_2d -framerate 1 -parameter 10 -stiffen 10 -dampen 0 30 -image_size 30 -sigma_range 3 -dt .01 -last_frame 160 -poissons_ratio .45 -cutoff .001 -ether_drag 0.01 -use_rc2_ext -efc 0 -o fig-mattress-neo >&/dev/null
 
-for d in fig-mattress-neo ; do
+for d in fig-mattress-neo fig-mattress ; do
     mkdir -p $d/frames
     for f in `( cd $d/data ; echo *txt )` ; do
         eps-cap/compos2.pl < $d/data/$f > $d.tex
