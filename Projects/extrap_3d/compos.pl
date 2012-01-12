@@ -12,6 +12,9 @@ my $arlen=.135;
 my $d="([0-9.eE+-]+)";
 my $nd="[^0-9.eE+-]+";
 
+$ARGV[0]=~/$d/;
+my $frame=$&+0;
+
 sub pt
 {
     my $x=$_[0] * $s + $sh;
@@ -94,8 +97,7 @@ while(<STDIN>)
     {
         my $a=$1/(2*$2);
         my $x=(1-$a*$sv+3*$a)/(1+2*$a);
-        $ARGV[0]=~/$d/;
-        my $par=($&)&1;
+        my $par=$frame&1;
         if($x<0 && !$par){$x=-$x;}
         $quasidot="\\pscircle[fillcolor=coltri0,linestyle=none,fillstyle=solid]@{[&pt($x,$x)]} {6}\n";
     }
@@ -103,7 +105,8 @@ while(<STDIN>)
 
 my $orig="\\pscircle[fillcolor=colcontour,linestyle=none,fillstyle=solid]@{[&pt(1,1)]} {$originrad}\n";
 my $contour = join '', map {&spt($_)} sort {$a=~/$d/;my $A=$1;$b=~/$d/;my $B=$1;$A<=>$B;} keys %contour;
-$contour="\\psline[linewidth=5px,linecolor=colcontour]{c-c}$contour\n";
+my $contcolor=$frame>=40?'grcolcontour':'colcontour';
+$contour="\\psline[linewidth=5px,linecolor=$contcolor]{c-c}$contour\n";
 my $extratrilines="\\psline[linewidth=5px,linecolor=black]{c-c}" . &pt(3.2,$tribot) . &pt(5.0,$tribot) . "\n";
 $extratrilines .= "\\psline[linewidth=5px,linecolor=black]{c-c}" . &pt(3.2,$tritop) . &pt(5.0,$tritop) . "\n";
 $velarrows .= "\\psline[linecolor=arvelocity,fillcolor=arvelocity,arrowinset=0,arrowlength=0.8,fillstyle=solid,linewidth=13px]{->}" . &pt(4.1,$tritop) . &pt(4.1, $tritop+.5) . "\n";
@@ -136,6 +139,7 @@ print <<EOS;
 \\definecolor{ltbacktri}{rgb}{0.75,0.75,0.765}
 \\definecolor{vertline}{rgb}{0.575,0.575,0.585}
 \\definecolor{colcontour}{rgb}{0.95,0.95,0}
+\\definecolor{grcolcontour}{rgb}{0.5,0.5,0.51}
 \\definecolor{colarrow}{rgb}{1,0,1}
 \\definecolor{colarrowref}{rgb}{0.5,0.5,0.51}
 \\definecolor{coltriline}{rgb}{0.5,0.5,0.51}
@@ -155,6 +159,10 @@ $orig
 $contour
 $quasidot
 $arrows
+\\psframe[fillstyle=solid,linestyle=none,fillcolor=backtri]@{[&pt(-3,.02)]}@{[&pt(-2.5,.3)]}
+\\psframe[fillstyle=solid,linestyle=none,fillcolor=backtri]@{[&pt(-.4,-3)]}@{[&pt(-.02,-2.7)]}
+\\uput[ur]@{[&pt(-3,0)]} {{\\Huge\$\\sigma_1\$}}
+\\uput[ul]@{[&pt(0,-3)]} {{\\Huge\$\\sigma_2\$}}
 
 \\end{pspicture}
 \\end{document}
