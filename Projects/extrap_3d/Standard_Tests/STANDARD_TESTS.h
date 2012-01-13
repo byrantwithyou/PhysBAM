@@ -2554,7 +2554,6 @@ void Preprocess_Frame(const int frame)
             }        
         }
     }
-    if(test_number==100) Plot_Contour_Landscape(frame);
 }
 //#####################################################################
 // Function Add_External_Forces
@@ -2709,6 +2708,7 @@ void Test_Model(ISOTROPIC_CONSTITUTIVE_MODEL<T,3>& icm)
 void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 {
     if(dump_sv) svout.close();
+    if(test_number==100) Plot_Contour_Landscape(frame);
 }
 //#####################################################################
 // Function Contour_Crossing
