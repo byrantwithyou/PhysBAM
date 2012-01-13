@@ -4,6 +4,7 @@
 //#####################################################################
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
+#include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
 #include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
@@ -57,6 +58,14 @@ void Apply_Options(TRIANGULATED_SURFACE<T>* ts, const HASHTABLE<std::string,std:
     if(const std::string* value=options.Get_Pointer("scale")){
         T s=atof(value->c_str());
         if(s!=1) ts->Rescale(s);}
+
+    if(const std::string* value=options.Get_Pointer("jitter")){
+        T e=atof(value->c_str());
+        if(e>0){
+            ARRAY<TV> dX(ts->particles.X.m);
+            RANDOM_NUMBERS<T> random;
+            random.Fill_Uniform(dX,-e,e);
+            ts->particles.X+=dX;}}
 }
 
 template<class T,int d>
