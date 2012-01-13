@@ -105,7 +105,7 @@ while(<STDIN>)
 
 my $orig="\\pscircle[fillcolor=colcontour,linestyle=none,fillstyle=solid]@{[&pt(1,1)]} {$originrad}\n";
 my $contour = join '', map {&spt($_)} sort {$a=~/$d/;my $A=$1;$b=~/$d/;my $B=$1;$A<=>$B;} keys %contour;
-my $contcolor=$frame>=40?'grcolcontour':'colcontour';
+my $contcolor=$frame>100?'grcolcontour':'colcontour';
 $contour="\\psline[linewidth=5px,linecolor=$contcolor]{c-c}$contour\n";
 my $extratrilines="\\psline[linewidth=5px,linecolor=black]{c-c}" . &pt(3.2,$tribot) . &pt(5.0,$tribot) . "\n";
 $extratrilines .= "\\psline[linewidth=5px,linecolor=black]{c-c}" . &pt(3.2,$tritop) . &pt(5.0,$tritop) . "\n";
