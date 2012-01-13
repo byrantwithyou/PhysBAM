@@ -9,8 +9,8 @@ my $s=($h-2*$mg)/(2*$sr);
 my $shx=$mg + $sr * $s;
 my $shy=$shx;
 my $arlen=.135;
-my $dispx=160;
-my $firstdisp=40;
+my $dispx=170;
+my $firstdisp=20;
 
 my $d="([0-9.eE+-]+)";
 my $nd="[^0-9.eE+-]+";

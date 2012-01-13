@@ -6,7 +6,7 @@ function work()
     shift
     name=`echo "$@" | sed 's/\.txt./-/g' | sed 's/txt$/png/'`
     eps-cap/compos3.pl $d/data "$@" > $d.tex
-    latex $d.tex >/dev/null ; dvips $d.dvi ; convert $d.ps $d/frames/$name
+    latex $d.tex >/dev/null ; dvips $d.dvi ; convert $d.ps $d/frames/$name ; ps2pdf $d.ps
 #    rm -f $d.tex $d.dvi $d.ps
 }
 
