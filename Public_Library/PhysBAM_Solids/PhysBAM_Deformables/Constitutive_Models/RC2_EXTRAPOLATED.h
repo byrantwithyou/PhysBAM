@@ -32,24 +32,23 @@ public:
     struct HELPER
     {
         T uHu;
-        TV Q,u,g,Hu,duHu,uTu;
-        MATRIX<T,d> dQ,du,dg;
-        VECTOR<SYMMETRIC_MATRIX<T,d>,d> ddQ,ddu,ddg,TT;
+        TV q,u,g,Hu,duHu,uTu;
+        MATRIX<T,d> dq,du,dg;
+        VECTOR<SYMMETRIC_MATRIX<T,d>,d> ddq,ddu,ddg,TT;
         VECTOR<VECTOR<SYMMETRIC_MATRIX<T,d>,d>,d> A;
         T m,h,phi,E,z,xi,s;
         TV dm,dh,dphi,dE,dz,dxi,ds;
         SYMMETRIC_MATRIX<T,d> ddm,ddh,ddphi,ddE,ddz,ddxi,dds,H,Tu;
 
-        bool Compute_E(const GENERAL_ENERGY<T>& base,T k,T extrapolation_cutoff,const TV& f,const int simplex);
-        void Compute_dE(const GENERAL_ENERGY<T>& base,T k,const TV& f,const int simplex);
-        void Compute_ddE(const GENERAL_ENERGY<T>& base,T k,const TV& f,const int simplex);
+        bool Compute_E(const GENERAL_ENERGY<T>& base,T extrapolation_cutoff,const TV& f,const int simplex);
+        void Compute_dE(const GENERAL_ENERGY<T>& base,const TV& f,const int simplex);
+        void Compute_ddE(const GENERAL_ENERGY<T>& base,const TV& f,const int simplex);
     };
 
     GENERAL_ENERGY<T>& base;
 
     T youngs_modulus,poissons_ratio;
     T extrapolation_cutoff;
-    T extra_force_coefficient;
     T panic_threshold;
 
     RC2_EXTRAPOLATED(GENERAL_ENERGY<T>& ge_input,const T youngs_modulus_input=3e6,const T poissons_ratio_input=.475,const T Rayleigh_coefficient=.05,
@@ -69,6 +68,7 @@ public:
     int P_From_Strain_Rate_Forces_Size() const PHYSBAM_OVERRIDE;
     void P_From_Strain_Rate_First_Half(const DIAGONAL_MATRIX<T,d>& F,ARRAY_VIEW<T> aggregate,const MATRIX<T,d>& F_dot,const T scale,const int simplex) const PHYSBAM_OVERRIDE;
     MATRIX<T,d> P_From_Strain_Rate_Second_Half(const DIAGONAL_MATRIX<T,d>& F,const ARRAY_VIEW<const T> aggregate,const T scale,const int simplex) const PHYSBAM_OVERRIDE;
+    void Test_Model() const;
 };
 }
 #endif

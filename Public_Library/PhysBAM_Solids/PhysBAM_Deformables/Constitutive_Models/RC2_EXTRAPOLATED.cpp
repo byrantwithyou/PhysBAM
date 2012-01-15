@@ -14,6 +14,7 @@
 #include <PhysBAM_Tools/Nonlinear_Equations/ITERATIVE_SOLVER.h>
 #include <PhysBAM_Tools/Polynomials/CUBIC.h>
 #include <PhysBAM_Tools/Polynomials/QUADRATIC.h>
+#include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE.h>
@@ -25,9 +26,7 @@ using namespace PhysBAM;
 template<class T,int d> RC2_EXTRAPOLATED<T,d>::
 RC2_EXTRAPOLATED(GENERAL_ENERGY<T>& ge_input,const T youngs_modulus_input,const T poissons_ratio_input,const T Rayleigh_coefficient,const T extrapolation_cutoff_input,
     const T extra_force_coefficient_input)
-    :base(ge_input),youngs_modulus(youngs_modulus_input),poissons_ratio(poissons_ratio_input),
-    extrapolation_cutoff(extrapolation_cutoff_input),extra_force_coefficient(extra_force_coefficient_input),
-    panic_threshold((T)1e-6)
+    :base(ge_input),youngs_modulus(youngs_modulus_input),poissons_ratio(poissons_ratio_input),extrapolation_cutoff(extrapolation_cutoff_input),panic_threshold((T)1e-6)
 {
     Update_Lame_Constants(youngs_modulus_input,poissons_ratio_input,Rayleigh_coefficient);
     base.Initialize(constant_mu,constant_lambda);
@@ -64,7 +63,7 @@ Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int simplex) const
     T J=F.To_Vector().Product();
     if(J<extrapolation_cutoff){
         HELPER helper;
-        bool b=helper.Compute_E(base,extra_force_coefficient*youngs_modulus,extrapolation_cutoff,F.To_Vector(),simplex);
+        bool b=helper.Compute_E(base,extrapolation_cutoff,F.To_Vector(),simplex);
         if(b) return helper.E;}
     return base.E(F.To_Vector(),simplex);
 }
@@ -77,9 +76,9 @@ P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const T scale,const int simplex) con
     T J=F.To_Vector().Product();
     if(J<extrapolation_cutoff){
         HELPER helper;
-        bool b=helper.Compute_E(base,extra_force_coefficient*youngs_modulus,extrapolation_cutoff,F.To_Vector(),simplex);
+        bool b=helper.Compute_E(base,extrapolation_cutoff,F.To_Vector(),simplex);
         if(b){
-            helper.Compute_dE(base,extra_force_coefficient*youngs_modulus,F.To_Vector(),simplex);
+            helper.Compute_dE(base,F.To_Vector(),simplex);
 //            Add_Debug_Particle(F.To_Vector(),VECTOR<T,3>(1,0,0));
 //            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,-helper.dE/youngs_modulus);
             return scale*DIAGONAL_MATRIX<T,d>(helper.dE);}}
@@ -97,10 +96,10 @@ Isotropic_Stress_Derivative_Helper(const RC2_EXTRAPOLATED<T,2>& re,const DIAGONA
     T J=F.To_Vector().Product();
     if(J<re.extrapolation_cutoff){
         typename RC2_EXTRAPOLATED<T,2>::HELPER helper;
-        bool b=helper.Compute_E(re.base,re.extra_force_coefficient*re.youngs_modulus,re.extrapolation_cutoff,F.To_Vector(),simplex);
+        bool b=helper.Compute_E(re.base,re.extrapolation_cutoff,F.To_Vector(),simplex);
         if(b){
-            helper.Compute_dE(re.base,re.extra_force_coefficient*re.youngs_modulus,F.To_Vector(),simplex);
-            helper.Compute_ddE(re.base,re.extra_force_coefficient*re.youngs_modulus,F.To_Vector(),simplex);
+            helper.Compute_dE(re.base,F.To_Vector(),simplex);
+            helper.Compute_ddE(re.base,F.To_Vector(),simplex);
             dP_dF.x1111=helper.ddE.x11;
             dP_dF.x2211=helper.ddE.x21;
             dP_dF.x2222=helper.ddE.x22;
@@ -128,10 +127,10 @@ Isotropic_Stress_Derivative_Helper(const RC2_EXTRAPOLATED<T,3>& re,const DIAGONA
     T J=F.To_Vector().Product();
     if(J<re.extrapolation_cutoff){
         typename RC2_EXTRAPOLATED<T,3>::HELPER helper;
-        bool b=helper.Compute_E(re.base,re.extra_force_coefficient*re.youngs_modulus,re.extrapolation_cutoff,F.To_Vector(),simplex);
+        bool b=helper.Compute_E(re.base,re.extrapolation_cutoff,F.To_Vector(),simplex);
         if(b){
-            helper.Compute_dE(re.base,re.extra_force_coefficient*re.youngs_modulus,F.To_Vector(),simplex);
-            helper.Compute_ddE(re.base,re.extra_force_coefficient*re.youngs_modulus,F.To_Vector(),simplex);
+            helper.Compute_dE(re.base,F.To_Vector(),simplex);
+            helper.Compute_ddE(re.base,F.To_Vector(),simplex);
             dP_dF.x1111=helper.ddE.x11;
             dP_dF.x2222=helper.ddE.x22;
             dP_dF.x3333=helper.ddE.x33;
@@ -257,48 +256,48 @@ Compute_s(const VECTOR<T,3>& f,const int simplex,T extrapolation_cutoff)
 // Function Compute_E
 //#####################################################################
 template<class T,int d> bool RC2_EXTRAPOLATED<T,d>::HELPER::
-Compute_E(const GENERAL_ENERGY<T>& base,T k,T extrapolation_cutoff,const TV& f,const int simplex)
+Compute_E(const GENERAL_ENERGY<T>& base,T extrapolation_cutoff,const TV& f,const int simplex)
 {
     TV fm1=f-1;
     s=Compute_s(f,simplex,extrapolation_cutoff);
     if(s==-1) return false;
-    Q=fm1*s+1;
-    z=(fm1/Q).Sum();
+    q=fm1*s+1;
+    z=(fm1/q).Sum();
     xi=1/z;
-    phi=base.E(Q,simplex);
+    phi=base.E(q,simplex);
     m=1/fm1.Magnitude();
     u=m*fm1;
-    g=base.dE(Q,simplex);
-    h=TV::Dot_Product(f-Q,u);
-    H=base.ddE(Q,simplex);
+    g=base.dE(q,simplex);
+    h=TV::Dot_Product(f-q,u);
+    H=base.ddE(q,simplex);
     Hu=H*u;
     uHu=TV::Dot_Product(u,Hu);
-    E=phi+h*TV::Dot_Product(g,u)+(T)(1.0/3.0)*k*cube(h)+(T)0.5*sqr(h)*uHu;
+    E=phi+h*TV::Dot_Product(g,u)+(T)0.5*sqr(h)*uHu;
     return true;
 }
 //#####################################################################
 // Function Compute_dE
 //#####################################################################
 template<class T,int d> void RC2_EXTRAPOLATED<T,d>::HELPER::
-Compute_dE(const GENERAL_ENERGY<T>& base,T k,const TV& f,const int simplex)
+Compute_dE(const GENERAL_ENERGY<T>& base,const TV& f,const int simplex)
 {
     TV fm1=f-1;
-    ds=-s*xi/Q;
-    dQ=s+MATRIX<T,d>::Outer_Product(fm1,ds);
-    dz=(T)1/Q-dQ.Transpose_Times(fm1/sqr(Q));
+    ds=-s*xi/q;
+    dq=s+MATRIX<T,d>::Outer_Product(fm1,ds);
+    dz=(T)1/q-dq.Transpose_Times(fm1/sqr(q));
     dxi=-sqr(xi)*dz;
-    dphi=dQ.Transpose_Times(g);
+    dphi=dq.Transpose_Times(g);
     dm=-cube(m)*fm1;
     du=MATRIX<T,d>::Outer_Product(fm1,dm)+m;
-    dg=H*dQ;
-    dh=((T)1-dQ).Transpose_Times(u)+du.Transpose_Times(f-Q);
-    dE=dphi+dh*TV::Dot_Product(g,u)+h*dg.Transpose_Times(u)+h*du.Transpose_Times(g)+k*sqr(h)*dh;
+    dg=H*dq;
+    dh=((T)1-dq).Transpose_Times(u)+du.Transpose_Times(f-q);
+    dE=dphi+dh*TV::Dot_Product(g,u)+h*dg.Transpose_Times(u)+h*du.Transpose_Times(g);
 
     dE+=uHu*h*dh;
-    base.dddE(Q,simplex,&TT(1));
+    base.dddE(q,simplex,&TT(1));
     for (int i=1; i<=d; i++) Tu+=u(i)*TT(i);
     uTu=Tu*u;
-    dE+=(T)0.5*sqr(h)*dQ.Transpose_Times(uTu);
+    dE+=(T)0.5*sqr(h)*dq.Transpose_Times(uTu);
     duHu=du.Transpose_Times(Hu);
     dE+=sqr(h)*duHu;
 }
@@ -306,47 +305,133 @@ Compute_dE(const GENERAL_ENERGY<T>& base,T k,const TV& f,const int simplex)
 // Function Compute_ddE
 //#####################################################################
 template<class T,int d> void RC2_EXTRAPOLATED<T,d>::HELPER::
-Compute_ddE(const GENERAL_ENERGY<T>& base,T k,const TV& f,const int simplex)
+Compute_ddE(const GENERAL_ENERGY<T>& base,const TV& f,const int simplex)
 {
     TV fm1=f-1;
     T m2=sqr(m),m3=m*m2;
-    dds.From_Matrix(-xi*MATRIX<T,d>::Outer_Product((T)1/Q,ds)-MATRIX<T,d>::Outer_Product(s/Q,dxi)+DIAGONAL_MATRIX<T,d>((T)s*xi/sqr(Q))*dQ);
+    dds.From_Matrix(-xi*MATRIX<T,d>::Outer_Product((T)1/q,ds)-MATRIX<T,d>::Outer_Product(s/q,dxi)+DIAGONAL_MATRIX<T,d>((T)s*xi/sqr(q))*dq);
     for(int i=1; i<=d; i++){
         MATRIX<T,d> t;
         for(int j=1; j<=d; j++){t(i,j)+=ds(j);t(j,i)+=ds(j);}
-        ddQ(i)=fm1(i)*dds+t.Symmetric_Part();}
-    ddz+=SYMMETRIC_MATRIX<T,d>::Conjugate_With_Transpose(dQ,DIAGONAL_MATRIX<T,d>((T)2*fm1/cube(Q)));
-    ddz-=(DIAGONAL_MATRIX<T,d>((T)2/sqr(Q))*dQ).Symmetric_Part();
-    for(int i=1; i<=d; i++) ddz-=fm1(i)/sqr(Q(i))*ddQ(i);
+        ddq(i)=fm1(i)*dds+t.Symmetric_Part();}
+    ddz+=SYMMETRIC_MATRIX<T,d>::Conjugate_With_Transpose(dq,DIAGONAL_MATRIX<T,d>((T)2*fm1/cube(q)));
+    ddz-=(DIAGONAL_MATRIX<T,d>((T)2/sqr(q))*dq).Symmetric_Part();
+    for(int i=1; i<=d; i++) ddz-=fm1(i)/sqr(q(i))*ddq(i);
     ddxi=2*cube(xi)*SYMMETRIC_MATRIX<T,d>::Outer_Product(dz)-sqr(xi)*ddz;
-    ddphi=SYMMETRIC_MATRIX<T,d>::Transpose_Times_With_Symmetric_Result(dg,dQ);
-    for(int i=1;i<=d;i++) ddphi+=g(i)*ddQ(i);
+    ddphi=SYMMETRIC_MATRIX<T,d>::Transpose_Times_With_Symmetric_Result(dg,dq);
+    for(int i=1;i<=d;i++) ddphi+=g(i)*ddq(i);
     ddm=3*m2*m3*SYMMETRIC_MATRIX<T,d>::Outer_Product(fm1)-m3;
     for(int i=1; i<=d; i++){
         MATRIX<T,d> t;
         for(int j=1; j<=d; j++){t(i,j)+=dm(j);t(j,i)+=dm(j);}
         ddu(i)=fm1(i)*ddm+t.Symmetric_Part();}
     for(int i=1; i<=d; i++){
-        ddg(i)=SYMMETRIC_MATRIX<T,d>::Conjugate_With_Transpose(dQ,TT(i));
-        for(int j=1; j<=d; j++) ddg(i)+=H(i,j)*ddQ(j);}
-    ddh=((T)1-dQ).Transpose_Times(du*2).Symmetric_Part();
-    for(int i=1; i<=d; i++) ddh+=(f(i)-Q(i))*ddu(i)-ddQ(i)*u(i);
+        ddg(i)=SYMMETRIC_MATRIX<T,d>::Conjugate_With_Transpose(dq,TT(i));
+        for(int j=1; j<=d; j++) ddg(i)+=H(i,j)*ddq(j);}
+    ddh=((T)1-dq).Transpose_Times(du*2).Symmetric_Part();
+    for(int i=1; i<=d; i++) ddh+=(f(i)-q(i))*ddu(i)-ddq(i)*u(i);
     ddE=ddphi+TV::Dot_Product(g,u)*ddh+MATRIX<T,d>::Outer_Product(dh*2,dg.Transpose_Times(u)).Symmetric_Part();
     ddE+=MATRIX<T,d>::Outer_Product(dh*2,du.Transpose_Times(g)).Symmetric_Part();
-    ddE+=2*h*dg.Transpose_Times(du).Symmetric_Part()+k*2*h*SYMMETRIC_MATRIX<T,d>::Outer_Product(dh)+k*sqr(h)*ddh;
+    ddE+=2*h*dg.Transpose_Times(du).Symmetric_Part();
     for(int i=1; i<=d; i++) ddE+=h*g(i)*ddu(i)+h*ddg(i)*u(i);
 
     ddE+=uHu*SYMMETRIC_MATRIX<T,d>::Outer_Product(dh);
     ddE+=uHu*h*ddh;
-    ddE+=MATRIX<T,d>::Outer_Product(2*h*dh,dQ.Transpose_Times(uTu)).Symmetric_Part();
+    ddE+=MATRIX<T,d>::Outer_Product(2*h*dh,dq.Transpose_Times(uTu)).Symmetric_Part();
     ddE+=MATRIX<T,d>::Outer_Product(4*h*dh,duHu).Symmetric_Part();
     T h2=sqr(h);
-    base.ddddE(Q,simplex,&A(1)(1));
-    for (int i=1; i<=d; i++) for (int j=1; j<=d; j++) ddE+=(T)0.5*h2*u(i)*u(j)*SYMMETRIC_MATRIX<T,d>::Conjugate_With_Transpose(dQ,A(i)(j));
-    for (int i=1; i<=d; i++) ddE+=(T)0.5*h2*uTu(i)*ddQ(i);
-    ddE+=h2*dQ.Transpose_Times(Tu*du).Symmetric_Part()*2;
+    base.ddddE(q,simplex,&A(1)(1));
+    for (int i=1; i<=d; i++) for (int j=1; j<=d; j++) ddE+=(T)0.5*h2*u(i)*u(j)*SYMMETRIC_MATRIX<T,d>::Conjugate_With_Transpose(dq,A(i)(j));
+    for (int i=1; i<=d; i++) ddE+=(T)0.5*h2*uTu(i)*ddq(i);
+    ddE+=h2*dq.Transpose_Times(Tu*du).Symmetric_Part()*2;
     for (int i=1; i<=d; i++) ddE+=h2*Hu(i)*ddu(i);
     ddE+=h2*SYMMETRIC_MATRIX<T,d>::Conjugate_With_Transpose(du,H);
+}
+//#####################################################################
+// Function Test_Model_Helper
+//#####################################################################
+template<class T,class TV>
+static void Test_Model_Helper(const char* str,T a0, T a1, TV da0, TV da1, TV df, T e)
+{
+    T av=TV::Dot_Product(da1+da0,df)/2/e;
+    T dif=(a1-a0)/e;
+    char buff[1000];
+    sprintf(buff, "============ test ============ %s %8.5f %8.5f (%8.5f)\n", str, av, dif, fabs(av-dif));
+    LOG::cout<<buff;
+}
+//#####################################################################
+// Function Test_Model_Helper
+//#####################################################################
+template<class T,class TV,int d>
+static void Test_Model_Helper(const char* str,TV a0, TV a1, const MATRIX<T,d>& da0, const MATRIX<T,d>& da1, TV df, T e)
+{
+    TV av=(da1+da0)*df/2/e;
+    TV dif=(a1-a0)/e;
+    char buff[1000];
+    sprintf(buff, "============ test ============ %s %8.5f %8.5f (%8.5f)\n", str, av.Magnitude(), dif.Magnitude(), (av-dif).Magnitude());
+    LOG::cout<<buff;
+}
+//#####################################################################
+// Function Test_Model_Helper
+//#####################################################################
+template<class T,class TV,int d>
+static void Test_Model_Helper(const char* str,TV a0, TV a1, const SYMMETRIC_MATRIX<T,d>& da0, const SYMMETRIC_MATRIX<T,d>& da1, TV df, T e)
+{
+    Test_Model_Helper(str,a0, a1, MATRIX<T,d>(da0), MATRIX<T,d>(da1), df, e);
+}
+//#####################################################################
+// Function Test_Model_Helper
+//#####################################################################
+template<class T,class TV,int d>
+static void Test_Model_Helper(const char* str,const MATRIX<T,d>& a0, const MATRIX<T,d>& a1, const VECTOR<SYMMETRIC_MATRIX<T,d>,d>& da0, const VECTOR<SYMMETRIC_MATRIX<T,d>,d>& da1, TV df, T e)
+{
+    for(int i=1;i<=TV::m;i++){
+        TV av=(da1(i)+da0(i))*df/2/e;
+        TV dif=(a1.Transposed().Column(i)-a0.Transposed().Column(i))/e;
+        char buff[1000];
+        sprintf(buff, "============ test ============ %s %8.5f %8.5f (%8.5f)\n", str, av.Magnitude(), dif.Magnitude(), (av-dif).Magnitude());
+        LOG::cout<<buff;}
+}
+//#####################################################################
+// Function Test_Model
+//#####################################################################
+template<class T,int d> void RC2_EXTRAPOLATED<T,d>::
+Test_Model() const
+{
+    RANDOM_NUMBERS<T> rand;
+    for(int i=1;i<=20;i++){
+        TV f;
+        rand.Fill_Uniform(f,0,2);
+        T e=1e-5;
+        TV df;
+        rand.Fill_Uniform(df,-e,e);
+        f=f.Sorted().Reversed();
+        if(rand.Get_Uniform_Integer(0,1)==1) f(2)=-f(2);
+        LOG::cout<<f<<std::endl;
+//        Test(DIAGONAL_MATRIX<T,3>(f),1);
+
+        int simplex=0;
+        if(f.Product()>extrapolation_cutoff) continue;
+        HELPER h0;
+        if(!h0.Compute_E(base,extrapolation_cutoff,f,simplex)) continue;
+        h0.Compute_dE(base,f,simplex);
+        h0.Compute_ddE(base,f,simplex);
+        HELPER h1;
+        if(!h1.Compute_E(base,extrapolation_cutoff,f+df,simplex)) continue;
+        h1.Compute_dE(base,f+df,simplex);
+        h1.Compute_ddE(base,f+df,simplex);
+#define XX(k) Test_Model_Helper(#k,h0.k, h1.k, h0.d##k, h1.d##k, df, e);Test_Model_Helper(#k,h0.d##k, h1.d##k, h0.dd##k, h1.dd##k, df, e);
+        XX(m);
+        XX(h);
+        XX(phi);
+        XX(E);
+        XX(z);
+        XX(xi);
+        XX(s);
+        XX(q);
+        XX(u);
+        XX(g);
+    }
 }
 template class RC2_EXTRAPOLATED<float,2>;
 template class RC2_EXTRAPOLATED<float,3>;
