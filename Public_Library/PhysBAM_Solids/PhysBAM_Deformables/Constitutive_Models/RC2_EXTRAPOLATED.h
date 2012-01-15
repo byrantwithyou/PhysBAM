@@ -31,14 +31,13 @@ public:
 
     struct HELPER
     {
-        T uHu;
-        TV q,u,g,Hu,duHu,uTu;
+        TV q,u,g,Hu,uTu;
         MATRIX<T,d> dq,du,dg;
         VECTOR<SYMMETRIC_MATRIX<T,d>,d> ddq,ddu,ddg,TT;
         VECTOR<VECTOR<SYMMETRIC_MATRIX<T,d>,d>,d> A;
-        T m,h,phi,E,z,xi,s;
-        TV dm,dh,dphi,dE,dz,dxi,ds;
-        SYMMETRIC_MATRIX<T,d> ddm,ddh,ddphi,ddE,ddz,ddxi,dds,H,Tu;
+        T m,h,phi,E,z,xi,s,b,c;
+        TV dm,dh,dphi,dE,dz,dxi,ds,db,dc;
+        SYMMETRIC_MATRIX<T,d> ddm,ddh,ddphi,ddE,ddz,ddxi,dds,H,Tu,ddb,ddc;
 
         bool Compute_E(const GENERAL_ENERGY<T>& base,T extrapolation_cutoff,const TV& f,const int simplex);
         void Compute_dE(const GENERAL_ENERGY<T>& base,const TV& f,const int simplex);
