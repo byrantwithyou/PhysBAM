@@ -42,6 +42,9 @@ public:
         bool Compute_E(const GENERAL_ENERGY<T>& base,T extrapolation_cutoff,const TV& f,const int simplex);
         void Compute_dE(const GENERAL_ENERGY<T>& base,const TV& f,const int simplex);
         void Compute_ddE(const GENERAL_ENERGY<T>& base,const TV& f,const int simplex);
+        VECTOR<T,TV::SPIN::m> g_it,dE_it,u_it,dm_it,q_it,ds_it,dh_it,db_it,dc_it,dphi_it;
+        MATRIX<T,d,TV::SPIN::m> H_it,dq_it,du_it;
+        VECTOR<SYMMETRIC_MATRIX<T,d>,TV::SPIN::m> TT_it;
     };
 
     GENERAL_ENERGY<T>& base;

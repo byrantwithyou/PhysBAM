@@ -59,7 +59,6 @@ Update_Lame_Constants(const T youngs_modulus_input, const T poissons_ratio_input
 template<class T,int d> T RC2_EXTRAPOLATED<T,d>::
 Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int simplex) const
 {
-
     T J=F.To_Vector().Product();
     if(J<extrapolation_cutoff){
         HELPER helper;
@@ -94,6 +93,8 @@ template<class T> static void
 Isotropic_Stress_Derivative_Helper(const RC2_EXTRAPOLATED<T,2>& re,const DIAGONAL_MATRIX<T,2>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& dP_dF,const int simplex)
 {
     T J=F.To_Vector().Product();
+    T x=F.x11, y=F.x22, xpy=x+y;
+    if(fabs(xpy)<re.panic_threshold) xpy=xpy<0?-re.panic_threshold:re.panic_threshold;
     if(J<re.extrapolation_cutoff){
         typename RC2_EXTRAPOLATED<T,2>::HELPER helper;
         bool b=helper.Compute_E(re.base,re.extrapolation_cutoff,F.To_Vector(),simplex);
@@ -103,20 +104,16 @@ Isotropic_Stress_Derivative_Helper(const RC2_EXTRAPOLATED<T,2>& re,const DIAGONA
             dP_dF.x1111=helper.ddE.x11;
             dP_dF.x2211=helper.ddE.x21;
             dP_dF.x2222=helper.ddE.x22;
-            T ss1=sqr(F.x11),ss2=sqr(F.x22);
-            T s12=ss1-ss2;
-            if(fabs(s12)<re.panic_threshold) s12=s12<0?-re.panic_threshold:re.panic_threshold;
-            dP_dF.x2112=(-helper.dE.y*F.x11+helper.dE.x*F.x22)/s12;
-            dP_dF.x2121=(-helper.dE.y*F.x22+helper.dE.x*F.x11)/s12;
+            T S=helper.dE.Sum()/xpy,D=helper.dE_it.x;
+            dP_dF.x2112=(D-S)/2;
+            dP_dF.x2121=(D+S)/2;
             return;}}
-    T x = F.x11, y = F.x22, xpy = x+y;
-    dP_dF.x1111 = re.base.Exx(x,y,simplex);
-    dP_dF.x2211 = re.base.Exy(x,y,simplex);
-    dP_dF.x2222 = re.base.Eyy(x,y,simplex);
-    if(fabs(xpy)<re.panic_threshold) xpy=xpy<0?-re.panic_threshold:re.panic_threshold;
-    T S=re.P_From_Strain(F,1,simplex).Trace()/xpy, D=re.base.Ex_Ey_x_y(x,y,simplex);
-    dP_dF.x2112 = (D-S)/2;
-    dP_dF.x2121 = (D+S)/2;
+    dP_dF.x1111=re.base.Exx(x,y,simplex);
+    dP_dF.x2211=re.base.Exy(x,y,simplex);
+    dP_dF.x2222=re.base.Eyy(x,y,simplex);
+    T S=re.P_From_Strain(F,1,simplex).Trace()/xpy,D=re.base.Ex_Ey_x_y(x,y,simplex);
+    dP_dF.x2112=(D-S)/2;
+    dP_dF.x2121=(D+S)/2;
 }
 ///#####################################################################
 // Function Isotropic_Stress_Derivative_Helper
@@ -125,6 +122,10 @@ template<class T> static void
 Isotropic_Stress_Derivative_Helper(const RC2_EXTRAPOLATED<T,3>& re,const DIAGONAL_MATRIX<T,3>& F,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& dP_dF,const int simplex)
 {
     T J=F.To_Vector().Product();
+    T x=F.x11,y=F.x22,z=F.x33,xpy=x+y,xpz=x+z,ypz=y+z;
+    if(fabs(xpy)<re.panic_threshold) xpy=xpy<0?-re.panic_threshold:re.panic_threshold;
+    if(fabs(xpz)<re.panic_threshold) xpz=xpz<0?-re.panic_threshold:re.panic_threshold;
+    if(fabs(ypz)<re.panic_threshold) ypz=ypz<0?-re.panic_threshold:re.panic_threshold;
     if(J<re.extrapolation_cutoff){
         typename RC2_EXTRAPOLATED<T,3>::HELPER helper;
         bool b=helper.Compute_E(re.base,re.extrapolation_cutoff,F.To_Vector(),simplex);
@@ -142,33 +143,32 @@ Isotropic_Stress_Derivative_Helper(const RC2_EXTRAPOLATED<T,3>& re,const DIAGONA
             if(fabs(s12)<re.panic_threshold) s12=s12<0?-re.panic_threshold:re.panic_threshold;
             if(fabs(s13)<re.panic_threshold) s13=s13<0?-re.panic_threshold:re.panic_threshold;
             if(fabs(s23)<re.panic_threshold) s23=s23<0?-re.panic_threshold:re.panic_threshold;
-            dP_dF.x2112=(-helper.dE.y*F.x11+helper.dE.x*F.x22)/s12;
-            dP_dF.x2121=(-helper.dE.y*F.x22+helper.dE.x*F.x11)/s12;
-            dP_dF.x3113=(-helper.dE.z*F.x11+helper.dE.x*F.x33)/s13;
-            dP_dF.x3131=(-helper.dE.z*F.x33+helper.dE.x*F.x11)/s13;
-            dP_dF.x3223=(-helper.dE.z*F.x22+helper.dE.y*F.x33)/s23;
-            dP_dF.x3232=(-helper.dE.z*F.x33+helper.dE.y*F.x22)/s23;
+            T S12=(helper.dE.x+helper.dE.y)/xpy,D12=helper.dE_it.z;
+            dP_dF.x2112=(D12-S12)/2;
+            dP_dF.x2121=(D12+S12)/2;
+            T S13=(helper.dE.x+helper.dE.z)/xpz,D13=helper.dE_it.y;
+            dP_dF.x3113=(D13-S13)/2;
+            dP_dF.x3131=(D13+S13)/2;
+            T S23=(helper.dE.y+helper.dE.z)/ypz,D23=helper.dE_it.x;
+            dP_dF.x3223=(D23-S23)/2;
+            dP_dF.x3232=(D23+S23)/2;
             return;}}
-    T x = F.x11, y = F.x22, z = F.x33, xpy = x+y, xpz = x+z, ypz = y+z;
-    dP_dF.x1111 = re.base.Exx(x,y,z,simplex);
-    dP_dF.x2222 = re.base.Eyy(x,y,z,simplex);
-    dP_dF.x3333 = re.base.Ezz(x,y,z,simplex);
-    dP_dF.x2211 = re.base.Exy(x,y,z,simplex);
-    dP_dF.x3311 = re.base.Exz(x,y,z,simplex);
-    dP_dF.x3322 = re.base.Eyz(x,y,z,simplex);
-    if(fabs(xpy)<re.panic_threshold) xpy=xpy<0?-re.panic_threshold:re.panic_threshold;
+    dP_dF.x1111=re.base.Exx(x,y,z,simplex);
+    dP_dF.x2222=re.base.Eyy(x,y,z,simplex);
+    dP_dF.x3333=re.base.Ezz(x,y,z,simplex);
+    dP_dF.x2211=re.base.Exy(x,y,z,simplex);
+    dP_dF.x3311=re.base.Exz(x,y,z,simplex);
+    dP_dF.x3322=re.base.Eyz(x,y,z,simplex);
     VECTOR<T,3> P=re.P_From_Strain(F,1,simplex).To_Vector();
-    T S12=(P.x+P.y)/xpy, D12=re.base.Ex_Ey_x_y(x,y,z,simplex);
-    dP_dF.x2112 = (D12-S12)/2;
-    dP_dF.x2121 = (D12+S12)/2;
-    if(fabs(xpz)<re.panic_threshold) xpz=xpz<0?-re.panic_threshold:re.panic_threshold;
-    T S13=(P.x+P.z)/xpz, D13=re.base.Ex_Ez_x_z(x,y,z,simplex);
-    dP_dF.x3113 = (D13-S13)/2;
-    dP_dF.x3131 = (D13+S13)/2;
-    if(fabs(ypz)<re.panic_threshold) ypz=ypz<0?-re.panic_threshold:re.panic_threshold;
-    T S23=(P.y+P.z)/ypz, D23=re.base.Ey_Ez_y_z(x,y,z,simplex);
-    dP_dF.x3223 = (D23-S23)/2;
-    dP_dF.x3232 = (D23+S23)/2;
+    T S12=(P.x+P.y)/xpy,D12=re.base.Ex_Ey_x_y(x,y,z,simplex);
+    dP_dF.x2112=(D12-S12)/2;
+    dP_dF.x2121=(D12+S12)/2;
+    T S13=(P.x+P.z)/xpz,D13=re.base.Ex_Ez_x_z(x,y,z,simplex);
+    dP_dF.x3113=(D13-S13)/2;
+    dP_dF.x3131=(D13+S13)/2;
+    T S23=(P.y+P.z)/ypz,D23=re.base.Ey_Ez_y_z(x,y,z,simplex);
+    dP_dF.x3223=(D23-S23)/2;
+    dP_dF.x3232=(D23+S23)/2;
 }
 //#####################################################################
 // Function Isotropic_Stress_Derivative
@@ -300,6 +300,43 @@ Compute_dE(const GENERAL_ENERGY<T>& base,const TV& f,const int simplex)
     dE=dphi+dh*(b+h*c)+h*db+(T)0.5*sqr(h)*dc;
 }
 //#####################################################################
+// Function id_it
+//#####################################################################
+template<class T> MATRIX<T,3>
+id_it(const VECTOR<T,3>& f)
+{
+    T a=1/(f.z-f.y),b=1/(f.x-f.z),c=1/(f.y-f.x);
+    return MATRIX<T,3>(0,-a,a,b,0,-b,-c,c,0);
+}
+//#####################################################################
+// Function id_it
+//#####################################################################
+template<class T> MATRIX<T,2,1>
+id_it(const VECTOR<T,2>& f)
+{
+    T a=1/(f.x-f.y);
+    MATRIX<T,2,1> r;
+    r(1,1)=a;
+    r(2,1)=-a;
+    return r;
+}
+//#####################################################################
+// Function id_it
+//#####################################################################
+template<class T> VECTOR<T,3>
+qiqi(const VECTOR<T,3>& q)
+{
+    return (T)1/VECTOR<T,3>(q.z*q.y,q.x*q.z,q.x*q.y);
+}
+//#####################################################################
+// Function id_it
+//#####################################################################
+template<class T> VECTOR<T,1>
+qiqi(const VECTOR<T,2>& q)
+{
+    return VECTOR<T,1>(1/(q.x*q.y));
+}
+//#####################################################################
 // Function Compute_ddE
 //#####################################################################
 template<class T,int d> void RC2_EXTRAPOLATED<T,d>::HELPER::
@@ -335,6 +372,38 @@ Compute_ddE(const GENERAL_ENERGY<T>& base,const TV& f,const int simplex)
     for(int i=1; i<=d; i++) for(int j=1; j<=d; j++) ddc+=u(i)*u(j)*SYMMETRIC_MATRIX<T,d>::Conjugate_With_Transpose(dq,A(i)(j));
     for(int i=1; i<=d; i++) ddc+=uTu(i)*ddq(i)+(T)2*Hu(i)*ddu(i);
     ddE=ddphi+(b+c*h)*ddh+h*ddb+(T).5*sqr(h)*ddc+MATRIX<T,d>::Outer_Product(dh*2,db+h*dc).Symmetric_Part()+c*SYMMETRIC_MATRIX<T,d>::Outer_Product(dh);
+
+    //        VECTOR<T,TV::SPIN::m> g_it,dE_it,u_it,dm_it,q_it,ds_it,dh_it,db_it,dc_it;
+    //    MATRIX<T,d,TV::SPIN::m> H_it,dq_it;
+    //    VECTOR<SYMMETRIC_MATRIX<T,d>,TV::SPIN::m> TT_it;
+
+    base.Compute_it(q,simplex,g_it,H_it,TT_it);
+    g_it*=s; // TODO: this will have to be absorbed somehow.
+    H_it*=s; // TODO: this will have to be absorbed somehow.
+    for(int i=1;i<=TT_it.m;i++) TT_it(i)*=s; // TODO: this will have to be absorbed somehow.
+
+    dE_it=g_it+h*H_it.Transpose_Times(u)+(T).5*sqr(s*h)/m*TV::Dot_Product(uTu,u)*xi*SYMMETRIC_MATRIX<T,d>::Outer_Product((T)1/q).Off_Diagonal_Part();
+    for(int i=1;i<=TV::SPIN::m;i++) dE_it(i)+=(T).5*sqr(h)*s*TV::Dot_Product(TT_it(i)*u,u);
+    u_it.Fill(m);
+    dm_it.Fill(-cube(m));
+    du_it=du_it.Outer_Product(u,dm_it)/m+m*id_it(f);
+    q_it.Fill(s);
+    ds_it=qiqi(q)*sqr(s)*xi;
+    dq_it=id_it(f)*s+dq_it.Outer_Product(u,ds_it)/m;
+    dh_it.Fill(h*sqr(m));
+    dh_it-=ds_it/m;
+    dphi_it=g_it*s+ds_it*b/m;
+    LOG::cout<<g<<"  "<<f<<"  "<<g_it<<std::endl;
+}
+//#####################################################################
+// Function Test_Model_Helper
+//#####################################################################
+template<class T>
+static void Print_Helper(const char* str,T a0, T a1)
+{
+    char buff[1000];
+    sprintf(buff, "============ test ============ %s %8.5f %8.5f (%8.5f)\n", str, a0, a1, fabs(a0-a1));
+    LOG::cout<<buff;
 }
 //#####################################################################
 // Function Test_Model_Helper
@@ -344,8 +413,16 @@ static void Test_Model_Helper(const char* str,T a0, T a1, TV da0, TV da1, TV df,
 {
     T av=TV::Dot_Product(da1+da0,df)/2/e;
     T dif=(a1-a0)/e;
+    Print_Helper(str, av, dif);
+}
+//#####################################################################
+// Function Print_Helper
+//#####################################################################
+template<class T,int d>
+static void Print_Helper(const char* str,const VECTOR<T,d>& a0, const VECTOR<T,d> &a1)
+{
     char buff[1000];
-    sprintf(buff, "============ test ============ %s %8.5f %8.5f (%8.5f)\n", str, av, dif, fabs(av-dif));
+    sprintf(buff, "============ test ============ %s %8.5f %8.5f (%8.5f)\n", str, a0.Magnitude(), a1.Magnitude(), (a0-a1).Magnitude());
     LOG::cout<<buff;
 }
 //#####################################################################
@@ -356,9 +433,7 @@ static void Test_Model_Helper(const char* str,TV a0, TV a1, const MATRIX<T,d>& d
 {
     TV av=(da1+da0)*df/2/e;
     TV dif=(a1-a0)/e;
-    char buff[1000];
-    sprintf(buff, "============ test ============ %s %8.5f %8.5f (%8.5f)\n", str, av.Magnitude(), dif.Magnitude(), (av-dif).Magnitude());
-    LOG::cout<<buff;
+    Print_Helper(str, av, dif);
 }
 //#####################################################################
 // Function Test_Model_Helper
@@ -380,6 +455,42 @@ static void Test_Model_Helper(const char* str,const MATRIX<T,d>& a0, const MATRI
         char buff[1000];
         sprintf(buff, "============ test ============ %s %8.5f %8.5f (%8.5f)\n", str, av.Magnitude(), dif.Magnitude(), (av-dif).Magnitude());
         LOG::cout<<buff;}
+}
+//#####################################################################
+// Function Test_Model_Helper
+//#####################################################################
+template<class T> static void
+Test_it(const char* str, const VECTOR<T,3>& f, const VECTOR<T,3>& w, const VECTOR<T,3>& w_it)
+{
+    Print_Helper(str, (w.y-w.z)/(f.y-f.z), w_it.x);
+    Print_Helper(str, (w.x-w.z)/(f.x-f.z), w_it.y);
+    Print_Helper(str, (w.x-w.y)/(f.x-f.y), w_it.z);
+}
+//#####################################################################
+// Function Test_Model_Helper
+//#####################################################################
+template<class T> static void
+Test_it(const char* str, const VECTOR<T,2>& f, const VECTOR<T,2>& w, const VECTOR<T,1>& w_it)
+{
+    Print_Helper(str, (w.x-w.y)/(f.x-f.y), w_it.x);
+}
+//#####################################################################
+// Function Test_Model_Helper
+//#####################################################################
+template<class T> static void
+Test_it(const char* str, const VECTOR<T,3>& f, const MATRIX<T,3>& w, const MATRIX<T,3>& w_it)
+{
+    Print_Helper(str, (w.Column(2)-w.Column(3))/(f.y-f.z), w_it.Column(1));
+    Print_Helper(str, (w.Column(1)-w.Column(3))/(f.x-f.z), w_it.Column(2));
+    Print_Helper(str, (w.Column(1)-w.Column(2))/(f.x-f.y), w_it.Column(3));
+}
+//#####################################################################
+// Function Test_Model_Helper
+//#####################################################################
+template<class T> static void
+Test_it(const char* str, const VECTOR<T,2>& f, const MATRIX<T,2>& w, MATRIX<T,2,1> w_it)
+{
+    Print_Helper(str, (w.Column(1)-w.Column(2))/(f.x-f.y), w_it.Column(1));
 }
 //#####################################################################
 // Function Test_Model
@@ -422,6 +533,22 @@ Test_Model() const
         XX(g);
         XX(b);
         XX(c);
+
+#define IT(w) Test_it(#w "_it", f, h0.w, h0.w##_it)
+        IT(dm);
+        IT(dh);
+        IT(dE);
+        IT(q);
+        IT(dq);
+        IT(u);
+        IT(du);
+        IT(g);
+        IT(dphi);
+        IT(ds);
+        IT(db);
+        IT(dc);
+//        IT(H);
+//        IT(TT);
     }
 }
 template class RC2_EXTRAPOLATED<float,2>;
