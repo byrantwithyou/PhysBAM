@@ -2697,8 +2697,7 @@ void Test_Model(ISOTROPIC_CONSTITUTIVE_MODEL<T,3>& icm)
         if(rand.Get_Uniform_Integer(0,1)==1) f(2)=-f(2);
         LOG::cout<<f<<std::endl;
         icm.Test(DIAGONAL_MATRIX<T,3>(f),1);
-        Test_Model_Helper<RC_EXTRAPOLATED<T,3> >(&icm,f,df,e);
-    }
+        Test_Model_Helper<RC_EXTRAPOLATED<T,3> >(&icm,f,df,e);}
     if(RC2_EXTRAPOLATED<T,3>* rc2=dynamic_cast<RC2_EXTRAPOLATED<T,3>*>(&icm))
         rc2->Test_Model();
     exit(0);

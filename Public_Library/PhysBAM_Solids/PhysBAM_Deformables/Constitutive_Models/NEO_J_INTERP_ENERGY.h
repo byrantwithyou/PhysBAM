@@ -140,6 +140,16 @@ public:
         PHYSBAM_FATAL_ERROR();
     }
 
+    T Exx_Eyy_x_y(T x, T y, int simplex) const
+    {
+        PHYSBAM_FATAL_ERROR();
+    }
+
+    T Exxx_Eyyy_x_y(T x, T y, int simplex) const
+    {
+        PHYSBAM_FATAL_ERROR();
+    }
+
     T E(T x, T y, T z, int simplex) const
     {
         T L=log(x*y*z);
@@ -233,6 +243,22 @@ public:
     {
         PHYSBAM_FATAL_ERROR();
     }
+
+    T Exx_Eyy_x_y(T x, T y, T z, int simplex) const
+    {
+        PHYSBAM_FATAL_ERROR();
+    }
+
+    T Exxx_Eyyy_x_y(T x, T y, T z, int simplex) const
+    {
+        PHYSBAM_FATAL_ERROR();
+    }
+
+    T Exxz_Eyyz_x_y(T x, T y, T z, int simplex) const
+    {
+        PHYSBAM_FATAL_ERROR();
+    }
+
 };
 }
 #endif
