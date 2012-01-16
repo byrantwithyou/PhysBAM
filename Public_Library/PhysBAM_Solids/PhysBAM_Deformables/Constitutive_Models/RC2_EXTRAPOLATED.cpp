@@ -373,14 +373,11 @@ Compute_ddE(const GENERAL_ENERGY<T>& base,const TV& f,const int simplex)
     for(int i=1; i<=d; i++) ddc+=uTu(i)*ddq(i)+(T)2*Hu(i)*ddu(i);
     ddE=ddphi+(b+c*h)*ddh+h*ddb+(T).5*sqr(h)*ddc+MATRIX<T,d>::Outer_Product(dh*2,db+h*dc).Symmetric_Part()+c*SYMMETRIC_MATRIX<T,d>::Outer_Product(dh);
 
-    //        VECTOR<T,TV::SPIN::m> g_it,dE_it,u_it,dm_it,q_it,ds_it,dh_it,db_it,dc_it;
-    //    MATRIX<T,d,TV::SPIN::m> H_it,dq_it;
-    //    VECTOR<SYMMETRIC_MATRIX<T,d>,TV::SPIN::m> TT_it;
-
     base.Compute_it(q,simplex,g_it,H_it,TT_it);
-    g_it*=s; // TODO: this will have to be absorbed somehow.
-    H_it*=s; // TODO: this will have to be absorbed somehow.
-    for(int i=1;i<=TT_it.m;i++) TT_it(i)*=s; // TODO: this will have to be absorbed somehow.
+    // Correct for the location of f differing from that of q.
+    g_it*=s;
+    H_it*=s;
+    for(int i=1;i<=TT_it.m;i++) TT_it(i)*=s;
 
     dE_it=g_it+h*H_it.Transpose_Times(u)+(T).5*sqr(s*h)/m*TV::Dot_Product(uTu,u)*xi*SYMMETRIC_MATRIX<T,d>::Outer_Product((T)1/q).Off_Diagonal_Part();
     for(int i=1;i<=TV::SPIN::m;i++) dE_it(i)+=(T).5*sqr(h)*s*TV::Dot_Product(TT_it(i)*u,u);
@@ -508,7 +505,7 @@ Test_Model() const
         f=f.Sorted().Reversed();
         if(rand.Get_Uniform_Integer(0,1)==1) f(2)=-f(2);
         LOG::cout<<f<<std::endl;
-//        Test(DIAGONAL_MATRIX<T,3>(f),1);
+        Test(DIAGONAL_MATRIX<T,TV::m>(f),1);
 
         int simplex=0;
         if(f.Product()>extrapolation_cutoff) continue;
