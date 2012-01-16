@@ -178,19 +178,19 @@ public:
         sm[2+3*2].x33=Ezzzz(f.x,f.y,f.z,simplex);
     }
 
-    void Compute_it(const VECTOR<T,2>& f,int simplex,VECTOR<T,1>& g_is,VECTOR<T,0>& H_xit,VECTOR<T,1>& H_iitt,VECTOR<T,0>& T_xxit,VECTOR<T,0>& T_xiitt,VECTOR<T,1>& T_iiittt,VECTOR<T,1>& T_itit) const
+    void Compute_it(const VECTOR<T,2>& f,int simplex,VECTOR<T,1>& g_it,VECTOR<T,0>& H_xit,VECTOR<T,1>& H_iitt,VECTOR<T,0>& T_xxit,VECTOR<T,0>& T_xiitt,VECTOR<T,1>& T_iiittt,VECTOR<T,1>& T_itit) const
     {
-        g_is(1)=Ex_Ey_x_y(f.x,f.y,simplex);
+        g_it(1)=Ex_Ey_x_y(f.x,f.y,simplex);
         H_iitt(1)=Exx_Eyy_x_y(f.x,f.y,simplex);
         T_iiittt(1)=Exxx_Eyyy_x_y(f.x,f.y,simplex);
         T_itit(1)=Exxy_Exyy_x_y(f.x,f.y,simplex);
     }
 
-    void Compute_it(const VECTOR<T,3>& f,int simplex,VECTOR<T,3>& g_is,VECTOR<T,3>& H_xit,VECTOR<T,3>& H_iitt,VECTOR<T,3>& T_xxit,VECTOR<T,3>& T_xiitt,VECTOR<T,3>& T_iiittt,VECTOR<T,3>& T_itit) const
+    void Compute_it(const VECTOR<T,3>& f,int simplex,VECTOR<T,3>& g_it,VECTOR<T,3>& H_xit,VECTOR<T,3>& H_iitt,VECTOR<T,3>& T_xxit,VECTOR<T,3>& T_xiitt,VECTOR<T,3>& T_iiittt,VECTOR<T,3>& T_itit) const
     {
-        g_is(1)=Ey_Ez_y_z(f.x,f.y,f.z,simplex);
-        g_is(2)=Ex_Ez_x_z(f.x,f.y,f.z,simplex);
-        g_is(3)=Ex_Ey_x_y(f.x,f.y,f.z,simplex);
+        g_it(1)=Ey_Ez_y_z(f.x,f.y,f.z,simplex);
+        g_it(2)=Ex_Ez_x_z(f.x,f.y,f.z,simplex);
+        g_it(3)=Ex_Ey_x_y(f.x,f.y,f.z,simplex);
         H_iitt(1)=Eyy_Ezz_y_z(f.x,f.y,f.z,simplex);
         H_iitt(2)=Exx_Ezz_x_z(f.x,f.y,f.z,simplex);
         H_iitt(3)=Exx_Eyy_x_y(f.x,f.y,f.z,simplex);

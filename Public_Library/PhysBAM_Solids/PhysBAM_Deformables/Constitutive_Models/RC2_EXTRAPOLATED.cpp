@@ -384,11 +384,14 @@ Compute_ddE(const GENERAL_ENERGY<T>& base,const TV& f,const int simplex)
     u_it.Fill(m);
     VECTOR<T,TV::SPIN::m> Hu_it,uTu_it;
     for(int i=1;i<=TV::SPIN::m;i++){
-        int a=i%3+1,b=a%3+1;
-        Hu_it(i)=H(a,a)*u_it(i)+H_iitt(i)*u(b)-H(a,b)*u_it(i)+H_xit(i)*u(i);
+        int a=(TV::m==3?i%3+1:i),b=a%3+1;
+        Hu_it(i)=H(a,a)*u_it(i)+H_iitt(i)*u(b)-H(a,b)*u_it(i);
         T u2_it=sqr(m)*(fm1(a)+fm1(b));
-        uTu_it(i)=T_xxit(i)*sqr(u(i))+2*T_itit(i)*u(a)*u(b)+2*u(i)*(TT(i)(a,a)*u_it(i)+T_xiitt(i)*u(b)-TT(i)(a,b)*u_it(i))
-            +T_iiittt(i)*sqr(u(a))+TT(b)(b,b)*u2_it-T_itit(i)*sqr(u(a))-TT(a)(b,b)*u2_it;}
+        uTu_it(i)=2*T_itit(i)*u(a)*u(b)+T_iiittt(i)*sqr(u(a))+TT(b)(b,b)*u2_it-T_itit(i)*sqr(u(a))-TT(a)(b,b)*u2_it;}
+    for(int i=1;i<=(TV::m==3)*TV::m;i++){
+        int a=i%3+1,b=a%3+1;
+        Hu_it(i)+=H_xit(i)*u(i);
+        uTu_it(i)+=T_xxit(i)*sqr(u(i))+2*u(i)*T_xiitt(i)*u(b)+2*u(i)*(TT(i)(a,a)*u_it(i)-TT(i)(a,b)*u_it(i));}
 
     dE_it=g_it+h*Hu_it+(T).5*sqr(s*h)/m*TV::Dot_Product(uTu,u)*xi*SYMMETRIC_MATRIX<T,d>::Outer_Product((T)1/q).Off_Diagonal_Part()+(T).5*sqr(h)*s*uTu_it;
 }
