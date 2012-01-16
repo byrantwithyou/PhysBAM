@@ -373,11 +373,8 @@ Compute_ddE(const GENERAL_ENERGY<T>& base,const TV& f,const int simplex)
     for(int i=1; i<=d; i++) ddc+=uTu(i)*ddq(i)+(T)2*Hu(i)*ddu(i);
     ddE=ddphi+(b+c*h)*ddh+h*ddb+(T).5*sqr(h)*ddc+MATRIX<T,d>::Outer_Product(dh*2,db+h*dc).Symmetric_Part()+c*SYMMETRIC_MATRIX<T,d>::Outer_Product(dh);
 
-    base.Compute_it(q,simplex,g_it,H_it,TT_it);
     base.Compute_it(q,simplex,g_it,H_xit,H_iitt,T_xxit,T_xiitt,T_iiittt,T_itit);
     g_it*=s; // Correct for the location of f differing from that of q.
-    H_it*=s;
-    for(int i=1;i<=TT_it.m;i++) TT_it(i)*=s;
     H_xit*=s;
     H_iitt*=s;
     T_xxit*=s;

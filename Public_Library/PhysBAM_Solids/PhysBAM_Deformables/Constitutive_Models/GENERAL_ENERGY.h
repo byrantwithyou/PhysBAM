@@ -33,8 +33,6 @@ public:
     virtual T Exxxy(T x, T y, int simplex) const=0;
     virtual T Exxyy(T x, T y, int simplex) const=0;
     virtual T Ex_Ey_x_y(T x, T y, int simplex) const=0; // (Ex-Ey)/(x-y)
-    virtual T Exx_Exy_x_y(T x, T y, int simplex) const=0; // (Exx-Exy)/(x-y)
-    virtual T Exxx_Exxy_x_y(T x, T y, int simplex) const=0; // (Exxx-Exxy)/(x-y)
     virtual T Exxy_Exyy_x_y(T x, T y, int simplex) const=0; // (Exxy-Exyy)/(x-y)
     virtual T Exx_Eyy_x_y(T x, T y, int simplex) const=0;
     virtual T Exxx_Eyyy_x_y(T x, T y, int simplex) const=0;
@@ -53,11 +51,8 @@ public:
 
     virtual T Ex_Ey_x_y(T x, T y, T z, int simplex) const=0; // (Ex-Ey)/(x-y)
     virtual T Exz_Eyz_x_y(T x, T y, T z, int simplex) const=0; // (Exz-Eyz)/(x-y)
-    virtual T Exx_Exy_x_y(T x, T y, T z, int simplex) const=0; // (Exx-Exy)/(x-y)
-    virtual T Exxx_Exxy_x_y(T x, T y, T z, int simplex) const=0; // (Exxx-Exxy)/(x-y)
     virtual T Exxy_Exyy_x_y(T x, T y, T z, int simplex) const=0; // (Exxy-Exyy)/(x-y)
     virtual T Exzz_Eyzz_x_y(T x, T y, T z, int simplex) const=0; // (Exzz-Eyzz)/(x-y)
-    virtual T Exxz_Exyz_x_y(T x, T y, T z, int simplex) const=0; // (Exxz-Exyz)/(x-y)
     virtual T Exx_Eyy_x_y(T x, T y, T z, int simplex) const=0;
     virtual T Exxx_Eyyy_x_y(T x, T y, T z, int simplex) const=0;
     virtual T Exxz_Eyyz_x_y(T x, T y, T z, int simplex) const=0;
@@ -68,8 +63,6 @@ public:
     T Eyyy(T x, T y, int simplex) const {return Exxx(y,x,simplex);}
     T Exyyy(T x, T y, int simplex) const {return Exxxy(y,x,simplex);}
     T Eyyyy(T x, T y, int simplex) const {return Exxxx(y,x,simplex);}
-    T Exy_Eyy_x_y(T x, T y, int simplex) const {return Exx_Exy_x_y(y,x,simplex);}
-    T Exyy_Eyyy_x_y(T x, T y, int simplex) const {return Exxx_Exxy_x_y(y,x,simplex);}
 
     T Ey(T x, T y, T z, int simplex) const {return Ex(y,x,z,simplex);}
     T Ez(T x, T y, T z, int simplex) const {return Ex(z,y,x,simplex);}
@@ -83,26 +76,11 @@ public:
     T Ey_Ez_y_z(T x, T y, T z, int simplex) const {return Ex_Ey_x_y(y,z,x,simplex);}
 
     T Exy_Eyz_x_z(T x, T y, T z, int simplex) const {return Exz_Eyz_x_y(x,z,y,simplex);}
-    T Exx_Exz_x_z(T x, T y, T z, int simplex) const {return Exx_Exy_x_y(x,z,y,simplex);}
     T Exy_Exz_y_z(T x, T y, T z, int simplex) const {return Exz_Eyz_x_y(y,z,x,simplex);}
-    T Eyy_Eyz_y_z(T x, T y, T z, int simplex) const {return Exx_Exy_x_y(y,z,x,simplex);}
-    T Exy_Eyy_x_y(T x, T y, T z, int simplex) const {return Exx_Exy_x_y(y,x,z,simplex);}
-    T Eyz_Ezz_y_z(T x, T y, T z, int simplex) const {return Exx_Exy_x_y(z,y,x,simplex);}
-    T Exz_Ezz_x_z(T x, T y, T z, int simplex) const {return Exx_Exy_x_y(z,x,y,simplex);}
 
-    T Exyy_Eyyy_x_y(T x, T y, T z, int simplex) const {return Exxx_Exxy_x_y(y,x,z,simplex);}
-    T Exyz_Eyyz_x_y(T x, T y, T z, int simplex) const {return Exxz_Exyz_x_y(y,x,z,simplex);}
-    T Exxx_Exxz_x_z(T x, T y, T z, int simplex) const {return Exxx_Exxy_x_y(x,z,y,simplex);}
     T Exyy_Eyyz_x_z(T x, T y, T z, int simplex) const {return Exzz_Eyzz_x_y(x,z,y,simplex);}
-    T Exzz_Ezzz_x_z(T x, T y, T z, int simplex) const {return Exxx_Exxy_x_y(z,x,y,simplex);}
-    T Exxy_Exyz_x_z(T x, T y, T z, int simplex) const {return Exxz_Exyz_x_y(x,z,y,simplex);}
     T Exxz_Exzz_x_z(T x, T y, T z, int simplex) const {return Exxy_Exyy_x_y(x,z,y,simplex);}
-    T Exyz_Eyzz_x_z(T x, T y, T z, int simplex) const {return Exxz_Exyz_x_y(z,x,y,simplex);}
     T Exxy_Exxz_y_z(T x, T y, T z, int simplex) const {return Exzz_Eyzz_x_y(z,y,x,simplex);}
-    T Eyyy_Eyyz_y_z(T x, T y, T z, int simplex) const {return Exxx_Exxy_x_y(y,z,x,simplex);}
-    T Eyzz_Ezzz_y_z(T x, T y, T z, int simplex) const {return Exxx_Exxy_x_y(z,y,x,simplex);}
-    T Exyy_Exyz_y_z(T x, T y, T z, int simplex) const {return Exxz_Exyz_x_y(y,z,x,simplex);}
-    T Exyz_Exzz_y_z(T x, T y, T z, int simplex) const {return Exxz_Exyz_x_y(z,y,x,simplex);}
     T Eyyz_Eyzz_y_z(T x, T y, T z, int simplex) const {return Exxy_Exyy_x_y(z,y,x,simplex);}
 
     T Eyyy(T x, T y, T z, int simplex) const {return Exxx(y,x,z,simplex);}
@@ -198,50 +176,6 @@ public:
         sm[1+3*1].x33=sm[1+3*2].x32=sm[2+3*1].x32=sm[2+3*2].x22=Eyyzz(f.x,f.y,f.z,simplex);
         sm[1+3*2].x33=sm[2+3*1].x33=sm[2+3*2].x32=Eyzzz(f.x,f.y,f.z,simplex);
         sm[2+3*2].x33=Ezzzz(f.x,f.y,f.z,simplex);
-    }
-
-    void Compute_it(const VECTOR<T,2>& f,int simplex,VECTOR<T,1>& g_is,MATRIX<T,2,1>& H_is,VECTOR<SYMMETRIC_MATRIX<T,2>,1>& T_is) const
-    {
-        g_is(1)=Ex_Ey_x_y(f.x,f.y,simplex);
-        H_is(1,1)=Exx_Exy_x_y(f.x,f.y,simplex);
-        H_is(2,1)=Exy_Eyy_x_y(f.x,f.y,simplex);
-        T_is(1).x11=Exxx_Exxy_x_y(f.x,f.y,simplex);
-        T_is(1).x21=Exxy_Exyy_x_y(f.x,f.y,simplex);
-        T_is(1).x22=Exyy_Eyyy_x_y(f.x,f.y,simplex);
-    }
-
-    void Compute_it(const VECTOR<T,3>& f,int simplex,VECTOR<T,3>& g_is,MATRIX<T,3>& H_is,VECTOR<SYMMETRIC_MATRIX<T,3>,3>& T_is) const
-    {
-        g_is(1)=Ey_Ez_y_z(f.x,f.y,f.z,simplex);
-        g_is(2)=Ex_Ez_x_z(f.x,f.y,f.z,simplex);
-        g_is(3)=Ex_Ey_x_y(f.x,f.y,f.z,simplex);
-        H_is(1,1)=Exy_Exz_y_z(f.x,f.y,f.z,simplex);
-        H_is(1,2)=Exx_Exz_x_z(f.x,f.y,f.z,simplex);
-        H_is(1,3)=Exx_Exy_x_y(f.x,f.y,f.z,simplex);
-        H_is(2,1)=Eyy_Eyz_y_z(f.x,f.y,f.z,simplex);
-        H_is(2,2)=Exy_Eyz_x_z(f.x,f.y,f.z,simplex);
-        H_is(2,3)=Exy_Eyy_x_y(f.x,f.y,f.z,simplex);
-        H_is(3,1)=Eyz_Ezz_y_z(f.x,f.y,f.z,simplex);
-        H_is(3,2)=Exz_Ezz_x_z(f.x,f.y,f.z,simplex);
-        H_is(3,3)=Exz_Eyz_x_y(f.x,f.y,f.z,simplex);
-        T_is(1).x11=Exxy_Exxz_y_z(f.x,f.y,f.z,simplex);
-        T_is(2).x11=Exxx_Exxz_x_z(f.x,f.y,f.z,simplex);
-        T_is(3).x11=Exxx_Exxy_x_y(f.x,f.y,f.z,simplex);
-        T_is(1).x22=Eyyy_Eyyz_y_z(f.x,f.y,f.z,simplex);
-        T_is(2).x22=Exyy_Eyyz_x_z(f.x,f.y,f.z,simplex);
-        T_is(3).x22=Exyy_Eyyy_x_y(f.x,f.y,f.z,simplex);
-        T_is(1).x33=Eyzz_Ezzz_y_z(f.x,f.y,f.z,simplex);
-        T_is(2).x33=Exzz_Ezzz_x_z(f.x,f.y,f.z,simplex);
-        T_is(3).x33=Exzz_Eyzz_x_y(f.x,f.y,f.z,simplex);
-        T_is(1).x21=Exyy_Exyz_y_z(f.x,f.y,f.z,simplex);
-        T_is(2).x21=Exxy_Exyz_x_z(f.x,f.y,f.z,simplex);
-        T_is(3).x21=Exxy_Exyy_x_y(f.x,f.y,f.z,simplex);
-        T_is(1).x31=Exyz_Exzz_y_z(f.x,f.y,f.z,simplex);
-        T_is(2).x31=Exxz_Exzz_x_z(f.x,f.y,f.z,simplex);
-        T_is(3).x31=Exxz_Exyz_x_y(f.x,f.y,f.z,simplex);
-        T_is(1).x32=Eyyz_Eyzz_y_z(f.x,f.y,f.z,simplex);
-        T_is(2).x32=Exyz_Eyzz_x_z(f.x,f.y,f.z,simplex);
-        T_is(3).x32=Exyz_Eyyz_x_y(f.x,f.y,f.z,simplex);
     }
 
     void Compute_it(const VECTOR<T,2>& f,int simplex,VECTOR<T,1>& g_is,VECTOR<T,0>& H_xit,VECTOR<T,1>& H_iitt,VECTOR<T,0>& T_xxit,VECTOR<T,0>& T_xiitt,VECTOR<T,1>& T_iiittt,VECTOR<T,1>& T_itit) const
