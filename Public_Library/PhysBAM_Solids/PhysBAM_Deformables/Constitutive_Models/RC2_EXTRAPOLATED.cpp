@@ -374,23 +374,12 @@ Compute_ddE(const GENERAL_ENERGY<T>& base,const TV& f,const int simplex)
     ddE=ddphi+(b+c*h)*ddh+h*ddb+(T).5*sqr(h)*ddc+MATRIX<T,d>::Outer_Product(dh*2,db+h*dc).Symmetric_Part()+c*SYMMETRIC_MATRIX<T,d>::Outer_Product(dh);
 
     base.Compute_it(q,simplex,g_it,H_it,TT_it);
-    // Correct for the location of f differing from that of q.
-    g_it*=s;
+    g_it*=s; // Correct for the location of f differing from that of q.
     H_it*=s;
     for(int i=1;i<=TT_it.m;i++) TT_it(i)*=s;
 
     dE_it=g_it+h*H_it.Transpose_Times(u)+(T).5*sqr(s*h)/m*TV::Dot_Product(uTu,u)*xi*SYMMETRIC_MATRIX<T,d>::Outer_Product((T)1/q).Off_Diagonal_Part();
     for(int i=1;i<=TV::SPIN::m;i++) dE_it(i)+=(T).5*sqr(h)*s*TV::Dot_Product(TT_it(i)*u,u);
-    u_it.Fill(m);
-    dm_it.Fill(-cube(m));
-    du_it=du_it.Outer_Product(u,dm_it)/m+m*id_it(f);
-    q_it.Fill(s);
-    ds_it=qiqi(q)*sqr(s)*xi;
-    dq_it=id_it(f)*s+dq_it.Outer_Product(u,ds_it)/m;
-    dh_it.Fill(h*sqr(m));
-    dh_it-=ds_it/m;
-    dphi_it=g_it*s+ds_it*b/m;
-    LOG::cout<<g<<"  "<<f<<"  "<<g_it<<std::endl;
 }
 //#####################################################################
 // Function Test_Model_Helper
@@ -532,20 +521,8 @@ Test_Model() const
         XX(c);
 
 #define IT(w) Test_it(#w "_it", f, h0.w, h0.w##_it)
-        IT(dm);
-        IT(dh);
         IT(dE);
-        IT(q);
-        IT(dq);
-        IT(u);
-        IT(du);
         IT(g);
-        IT(dphi);
-        IT(ds);
-        IT(db);
-        IT(dc);
-//        IT(H);
-//        IT(TT);
     }
 }
 template class RC2_EXTRAPOLATED<float,2>;

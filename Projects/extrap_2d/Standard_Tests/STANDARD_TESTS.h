@@ -981,8 +981,9 @@ void Test_Model(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>& icm)
         LOG::cout<<f<<std::endl;
         icm.Test(DIAGONAL_MATRIX<T,2>(f),1);
         Test_Model_Helper<RC_EXTRAPOLATED<T,2> >(&icm,f,df,e);
-        Test_Model_Helper<RC2_EXTRAPOLATED<T,2> >(&icm,f,df,e);
     }
+    if(RC2_EXTRAPOLATED<T,2>* rc2=dynamic_cast<RC2_EXTRAPOLATED<T,2>*>(&icm))
+        rc2->Test_Model();
     exit(0);
 }
 //#####################################################################
