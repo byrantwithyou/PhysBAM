@@ -2,19 +2,11 @@
 // Copyright 2005-2010, Eran Guendelman, Geoffrey Irving, Michael Lentine, Frank Losasso, Tamar Shinar, Jerry Talton.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-#include <PhysBAM_Tools/Grids_RLE_PDE_Linear/LAPLACE_RLE.h>
-#include <PhysBAM_Tools/Parallel_Computation/MPI_RLE_GRID.h>
-#endif
 #include <PhysBAM_Tools/Grids_Uniform_PDE_Linear/LAPLACE_UNIFORM.h>
 #include <PhysBAM_Tools/Parallel_Computation/LAPLACE_MPI.h>
 #include <PhysBAM_Tools/Parallel_Computation/SPARSE_MATRIX_PARTITION.h>
 #ifdef USE_MPI
 #include <PhysBAM_Tools/Data_Structures/UNION_FIND.h>
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-#include <PhysBAM_Tools/Grids_RLE/RLE_GRID_2D.h>
-#include <PhysBAM_Tools/Grids_RLE/RLE_GRID_3D.h>
-#endif
 #include <PhysBAM_Tools/Parallel_Computation/FLOOD_FILL_MPI.h>
 #include <PhysBAM_Tools/Parallel_Computation/MPI_PACKAGE.h>
 #include <PhysBAM_Tools/Parallel_Computation/MPI_UTILITIES.h>
@@ -173,12 +165,4 @@ template class LAPLACE_MPI<GRID<VECTOR<float,3> > >;
 template class LAPLACE_MPI<GRID<VECTOR<double,1> > >;
 template class LAPLACE_MPI<GRID<VECTOR<double,2> > >;
 template class LAPLACE_MPI<GRID<VECTOR<double,3> > >;
-#endif
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-template class LAPLACE_MPI<RLE_GRID_2D<float> >;
-template class LAPLACE_MPI<RLE_GRID_3D<float> >;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-template class LAPLACE_MPI<RLE_GRID_2D<double> >;
-template class LAPLACE_MPI<RLE_GRID_3D<double> >;
-#endif
 #endif

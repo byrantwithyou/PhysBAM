@@ -2,33 +2,23 @@
 // Copyright 2004-2008, Zhaosheng Bao, Eilene Hao, Jeong-Mo Hong, Geoffrey Irving, Sergey Koltakov, Frank Losasso, Avi Robinson-Mosher, Andrew Selle, Tamar Shinar, Jerry Talton, Michael Turitzin.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Grids_RLE_Interpolation/AVERAGING_RLE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Computations/GRADIENT_UNIFORM.h>
 #include <PhysBAM_Tools/Parsing/PARAMETER_LIST.h>
 #include <PhysBAM_Tools/Read_Write/Grids_Uniform/READ_WRITE_GRID.h>
 #include <PhysBAM_Tools/Read_Write/Grids_Uniform_Arrays/READ_WRITE_ARRAYS.h>
 #include <PhysBAM_Tools/Read_Write/Point_Clouds/READ_WRITE_POINT_CLOUD.h>
-#include <PhysBAM_Geometry/Grids_Dyadic_Collisions/GRID_BASED_COLLISION_GEOMETRY_DYADIC.h>
-#include <PhysBAM_Geometry/Grids_Dyadic_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_DYADIC.h>
-#include <PhysBAM_Geometry/Grids_RLE_Collisions/GRID_BASED_COLLISION_GEOMETRY_RLE.h>
-#include <PhysBAM_Geometry/Grids_RLE_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_RLE.h>
-#include <PhysBAM_Geometry/Grids_RLE_Level_Sets/EXTRAPOLATION_RLE.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Advection_Collidable/ADVECTION_COLLIDABLE_UNIFORM_FORWARD.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM.h>
-#include <PhysBAM_Geometry/Implicit_Objects_RLE/RLE_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/SURFACE_OF_REVOLUTION_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_SEGMENTED_CURVE.h>
 #include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_TRIANGULATED_SURFACE.h>
-#include <PhysBAM_Geometry/Read_Write/Grids_Dyadic_Level_Sets/READ_WRITE_LEVELSET_OCTREE.h>
-#include <PhysBAM_Geometry/Read_Write/Grids_RLE_Level_Sets/READ_WRITE_LEVELSET_RLE.h>
 #include <PhysBAM_Geometry/Read_Write/Grids_Uniform_Level_Sets/READ_WRITE_FAST_LEVELSET.h>
 #include <PhysBAM_Geometry/Read_Write/Grids_Uniform_Level_Sets/READ_WRITE_LEVELSET_3D.h>
 #include <PhysBAM_Geometry/Read_Write/Implicit_Objects_Uniform/READ_WRITE_LEVELSET_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Dynamics/Geometry/REMOVED_PARTICLES_IMPLICIT_OBJECT.h>
-#include <PhysBAM_Dynamics/Level_Sets/OCTREE_REMOVED_PARTICLES_PROCESSING.h>
 #include <PhysBAM_Dynamics/Level_Sets/REMOVED_PARTICLES_PROCESSING.h>
 #include <PhysBAM_Dynamics/Level_Sets/UNIFORM_REMOVED_PARTICLES_PROCESSING.h>
 #include <PhysBAM_Dynamics/Particles/PARTICLE_LEVELSET_REMOVED_PARTICLES.h>
@@ -37,7 +27,6 @@
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_CYLINDER.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_IMPLICIT_SURFACE.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_LEVELSET_MULTIPLE_OBJECT.h>
-#include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_OCTREE_VOXELS.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_PARTICLES.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_PLANE.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_SEGMENTED_CURVE.h>
@@ -48,7 +37,6 @@
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_UNIFORM_VOXELS.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_WALL.h>
 #include "GENERIC_RENDER_EXAMPLE.h"
-#include "RLE_IMPLICIT_SURFACE_TWO_LEVEL.h"
 using namespace PhysBAM;
 //#####################################################################
 // Object
@@ -380,40 +368,6 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         voxels->number_of_smoothing_steps=parameters.Get_Parameter("Number_Of_Smoothing_Steps",(int)3);
         voxels->precompute_single_scattering=precompute;
         object=voxels;}
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    else if(type=="Octree_Voxel_Data"){
-        LOG::cout<<"Octree Voxel Data"<<std::endl;
-        bool precompute=parameters.Get_Parameter("Precompute_Single_Scattering",false);
-        std::string octree_grid_filename=parameters.Get_Parameter("Octree_Grid_Filename",std::string("<unknown>"));
-        std::string density_filename=parameters.Get_Parameter("Density_Filename",std::string("<unknown>"));
-        std::string temperature_filename=parameters.Get_Parameter("Temperature_Filename",std::string("<unknown>"));
-        bool collision_aware=parameters.Get_Parameter("Use_Collision_Aware_Interpolation",false);
-        T volume_step=parameters.Get_Parameter("Volume_Step",(T)0.05);
-        // always read densities but sometimes read temperatures
-        OCTREE_GRID<T>* octree_grid=new OCTREE_GRID<T>;ARRAY<T>* density_data=new ARRAY<T>;
-        FILE_UTILITIES::template Read_From_File<RW>(Animated_Filename(octree_grid_filename,frame),*octree_grid);
-        FILE_UTILITIES::template Read_From_File<RW>(Animated_Filename(density_filename,frame),*density_data);
-        RENDERING_OCTREE_VOXELS<T> *voxels=new RENDERING_OCTREE_VOXELS<T>(*octree_grid,*density_data,volume_step);
-        if(temperature_filename!="<unknown>"){
-            ARRAY<T>* temperature_data=new ARRAY<T>;voxels->data.Append(temperature_data);
-            FILE_UTILITIES::template Read_From_File<RW>(Animated_Filename(temperature_filename,frame),*temperature_data);}
-        if(collision_aware){
-            if(!body_list){LOG::cout<<"Error: Octree_Voxel_Data Use_Collision_Aware_Interpolation set to true, but collision list is null"<<std::endl;exit(1);}
-            LOG::cout<<"Using collidable thin shell interpolation..."<<std::endl;
-            GRID_BASED_COLLISION_GEOMETRY_DYADIC<OCTREE_GRID<T> >* fluid_collision_body_list=new GRID_BASED_COLLISION_GEOMETRY_DYADIC<OCTREE_GRID<T> >(*octree_grid);
-            for(COLLISION_GEOMETRY_ID i(1);i<=body_list->m;i++) if((*body_list)(i)) fluid_collision_body_list->collision_geometry_collection.Add_Body((*body_list)(i),0,false);
-
-            ARRAY<bool>* cell_valid_mask=new ARRAY<bool>(octree_grid->number_of_cells,false);cell_valid_mask->Fill(false);
-            LINEAR_INTERPOLATION_COLLIDABLE_CELL_DYADIC<OCTREE_GRID<T>,T>* linear=
-                new LINEAR_INTERPOLATION_COLLIDABLE_CELL_DYADIC<OCTREE_GRID<T>,T>(*fluid_collision_body_list,cell_valid_mask,T());
-            LINEAR_INTERPOLATION_COLLIDABLE_CELL_DYADIC<OCTREE_GRID<T>,TV>* linear_vector=
-                new LINEAR_INTERPOLATION_COLLIDABLE_CELL_DYADIC<OCTREE_GRID<T>,TV>(*fluid_collision_body_list,cell_valid_mask,TV());
-            fluid_collision_body_list->Rasterize_Objects();
-            voxels->Set_Custom_Source_Interpolation(linear);
-            voxels->Set_Custom_Light_Interpolation(linear_vector);}
-        voxels->precompute_single_scattering=precompute;
-        object=voxels;}
-#endif
     else if(type=="Shock"){
         LOG::cout<<"Shock"<<std::endl;
         std::string grid_filename=parameters.Get_Parameter("Grid_Filename",std::string("<unknown>"));
@@ -594,160 +548,6 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         object->name=parameters.Get_Parameter("Name",std::string("<unknown>"));
         objects.Set(object->name,object);
     }
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    else if(type=="Octree_Levelset"){
-        LOG::cout<<"Octree_Levelset"<<std::endl;
-        ARRAY<T>* phi=new ARRAY<T>;OCTREE_GRID<T>* grid=new OCTREE_GRID<T>;
-        std::string raw_grid_filename=parameters.Get_Parameter("Grid_Filename",std::string("unknown"));
-        std::string raw_phi_filename=parameters.Get_Parameter("Phi_Filename",std::string("unknown"));
-        bool negate=parameters.Get_Parameter("Negate",(bool)false);
-        FILE_UTILITIES::template Read_From_File<RW>(Animated_Filename(raw_grid_filename,frame),*grid);
-        FILE_UTILITIES::template Read_From_File<RW>(Animated_Filename(raw_phi_filename,frame),*phi);
-        if(negate){for(int i=1;i<=grid->number_of_nodes;i++)(*phi)(i)=-(*phi)(i);}
-
-        std::string particle_processing_mode=STRING_UTILITIES::toupper(parameters.Get_Parameter("Particle_Processing_Mode",std::string("NONE")));
-        if(particle_processing_mode!="NONE"){
-            std::string raw_removed_particles_filename=parameters.Get_Parameter("Removed_Negative_Particles_Filename",std::string("unknown"));
-            if(raw_removed_particles_filename!="unknown"){ // merge with removed negative particles
-                LOG::cout<<"Reading removed negative particles"<<std::endl;
-                ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*> particle_array;
-                FILE_UTILITIES::template Read_From_File<RW>(Animated_Filename(raw_removed_particles_filename,frame),particle_array);
-                OCTREE_REMOVED_PARTICLES_PROCESSING<T> particle_processing(*grid,*phi,particle_array);
-                particle_processing.blending_parameter=parameters.Get_Parameter("Particle_Blending_Parameter",(T).8);
-                particle_processing.scale=parameters.Get_Parameter("Particle_Scale",(T).25);
-                particle_processing.octree_maximum_depth=parameters.Get_Parameter("Particle_Octree_Maximum_Depth",(int)2);
-                particle_processing.particle_power=parameters.Get_Parameter("Particle_Power",(T)1);
-                particle_processing.use_velocity_scaling=parameters.Get_Parameter("Particle_Use_Velocity_Scaling",(bool)true);
-                particle_processing.dt=parameters.Get_Parameter("Particle_Dt",(T)1/24);
-                particle_processing.preserve_volume=parameters.Get_Parameter("Particle_Preserve_Volume",(bool)true);
-                bool collision_aware_particle_processing=parameters.Get_Parameter("Collision_Aware_Particle_Processing",(bool)true);
-                if(collision_aware_particle_processing && body_list){
-                    LOG::cout<<"Particle processing will be collision aware"<<std::endl;
-                    GRID_BASED_COLLISION_GEOMETRY_DYADIC<OCTREE_GRID<T> >* fluid_collision_body_list=new GRID_BASED_COLLISION_GEOMETRY_DYADIC<OCTREE_GRID<T> >(*grid);
-                    for(COLLISION_GEOMETRY_ID i(1);i<=body_list->m;i++) if((*body_list)(i)) fluid_collision_body_list->collision_geometry_collection.Add_Body((*body_list)(i),0,false);
-                    particle_processing.Set_Collision_Aware(fluid_collision_body_list);}
-                particle_processing.Refine_And_Create_Particle_Phi();
-                particle_array.Delete_Pointers_And_Clean_Memory();
-
-                ARRAY<T>* combined_phi=new ARRAY<T>;
-                if(particle_processing_mode=="MERGE"){
-                    LOG::cout<<"Merging particles with level set"<<std::endl;
-                    particle_processing.Merge_Phi(*combined_phi);}
-                else if(particle_processing_mode=="UNION"){
-                    LOG::cout<<"Taking union of particles with level set"<<std::endl;
-                    particle_processing.Union_Phi(*combined_phi);}
-                else if(particle_processing_mode=="BLEND"){
-                    T blend_cells=parameters.Get_Parameter("Particle_Blend_Cells",(T)5);
-                    LOG::cout<<"Taking blend of particles with level set (blend_cells="<<blend_cells<<")"<<std::endl;
-                    particle_processing.Blend_Phi(*combined_phi,blend_cells);}
-                else{
-                    LOG::cout<<"Unrecognized particle processing mode: "<<particle_processing_mode<<std::endl;
-                    exit(1);}
-
-                // switch over to new phi
-                delete phi;phi=combined_phi;
-
-                std::string raw_combined_grid_output_filename=parameters.Get_Parameter("Combined_Grid_Output_Filename",std::string("unknown"));
-                if(raw_combined_grid_output_filename!="unknown"){
-                    std::string filename=Animated_Filename(raw_combined_grid_output_filename,frame);
-                    LOG::cout<<"Writing combined grid to "<<filename<<std::endl;
-                    FILE_UTILITIES::template Write_To_File<RW>(filename,*grid);}
-                std::string raw_combined_phi_output_filename=parameters.Get_Parameter("Combined_Phi_Output_Filename",std::string("unknown"));
-                if(raw_combined_phi_output_filename!="unknown"){
-                    std::string filename=Animated_Filename(raw_combined_phi_output_filename,frame);
-                    LOG::cout<<"Writing combined phi to "<<filename<<std::endl;
-                    FILE_UTILITIES::template Write_To_File<RW>(filename,*phi);}
-            }
-        }
-        RENDERING_IMPLICIT_SURFACE<T>* rendering_implicit_surface=new RENDERING_IMPLICIT_SURFACE<T>(*grid,*phi);
-        DYADIC_IMPLICIT_OBJECT<TV>& implicit_surface=dynamic_cast<DYADIC_IMPLICIT_OBJECT<TV>&>(*rendering_implicit_surface->implicit_surface);
-        bool collision_aware=parameters.Get_Parameter("Use_Collision_Aware_Interpolation",false);
-        bool reinitialize=parameters.Get_Parameter("Reinitialize",false);
-        int reinitialization_band=parameters.Get_Parameter("Reinitialization_Band",(int)5);
-        if(reinitialize){
-            LOG::cout<<"Reinitializing levelset"<<std::endl;
-            implicit_surface.levelset.Fast_Marching_Method(0,reinitialization_band*grid->Minimum_Edge_Length());}
-        if(collision_aware){
-            LOG::cout<<"Using collidable thin shell interpolation..."<<std::endl;
-            GRID_BASED_COLLISION_GEOMETRY_DYADIC<OCTREE_GRID<T> >* fluid_collision_body_list=new GRID_BASED_COLLISION_GEOMETRY_DYADIC<OCTREE_GRID<T> >(*grid);
-            for(COLLISION_GEOMETRY_ID i(1);i<=body_list->m;i++) if((*body_list)(i)) fluid_collision_body_list->collision_geometry_collection.Add_Body((*body_list)(i),0,false);
-            ARRAY<bool>* cell_valid_mask=new ARRAY<bool>(grid->number_of_cells,false);cell_valid_mask->Fill(true);
-            LINEAR_INTERPOLATION_COLLIDABLE_CELL_DYADIC<OCTREE_GRID<T>,T>* linear=new LINEAR_INTERPOLATION_COLLIDABLE_CELL_DYADIC<OCTREE_GRID<T>,T>(*fluid_collision_body_list,
-                cell_valid_mask,implicit_surface.levelset.collidable_phi_replacement_value);
-            fluid_collision_body_list->Rasterize_Objects();
-            implicit_surface.Set_Custom_Secondary_Interpolation(*linear);
-            implicit_surface.Use_Secondary_Interpolation(true);
-            assert(rendering_implicit_surface->implicit_surface->use_secondary_interpolation);}
-
-        object=rendering_implicit_surface;}
-#endif
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-    else if(type=="RLE_Levelset"){
-        LOG::cout<<"RLE_Levelset"<<std::endl;
-        std::string raw_grid_filename=parameters.Get_Parameter("Grid_Filename",std::string("<unknown_grid_file>"));
-        std::string raw_phi_filename=parameters.Get_Parameter("Phi_Filename",std::string("<unknown_phi_file>"));
-        RLE_GRID_3D<T>* grid=new RLE_GRID_3D<T>;ARRAY<T>* phi=new ARRAY<T>;
-        FILE_UTILITIES::Read_From_File<RW>(Animated_Filename(raw_grid_filename,frame),*grid);
-        FILE_UTILITIES::Read_From_File<RW>(Animated_Filename(raw_phi_filename,frame),*phi);
-        LOG::cout<<"uniform grid "<<grid->uniform_grid<<", number_of_cells = "<<grid->number_of_cells<<std::endl;
-        RENDERING_IMPLICIT_SURFACE<T>* rendering_implicit_surface;
-        LEVELSET_RLE<RLE_GRID_3D<T> >* levelset;
-        bool use_fine_levelset=parameters.Get_Parameter("Use_Fine_Levelset",false);
-        if(!use_fine_levelset){
-            rendering_implicit_surface=new RENDERING_IMPLICIT_SURFACE<T>(*grid,*phi);
-            levelset=&((RLE_IMPLICIT_OBJECT<TV>*)rendering_implicit_surface->implicit_surface)->levelset;}
-        else{
-            std::string raw_fine_grid_filename=parameters.Get_Parameter("Fine_Grid_Filename",std::string("<unknown_fine_grid_file>"));
-            std::string raw_fine_phi_filename=parameters.Get_Parameter("Fine_Phi_Filename",std::string("<unknown_fine_phi_file>"));
-            RLE_GRID_3D<T>* fine_grid=new RLE_GRID_3D<T>;ARRAY<T>* fine_phi=new ARRAY<T>;
-            FILE_UTILITIES::Read_From_File<RW>(Animated_Filename(raw_fine_grid_filename,frame),*fine_grid);
-            FILE_UTILITIES::Read_From_File<RW>(Animated_Filename(raw_fine_phi_filename,frame),*fine_phi);
-            LOG::cout<<"fine uniform grid "<<fine_grid->uniform_grid<<", number_of_cells = "<<fine_grid->number_of_cells<<std::endl;
-            RLE_IMPLICIT_SURFACE_TWO_LEVEL<T>* rle_implicit_surface_two_level=new RLE_IMPLICIT_SURFACE_TWO_LEVEL<T>(*grid,*phi,*fine_grid,*fine_phi);
-            rendering_implicit_surface=new RENDERING_IMPLICIT_SURFACE<T>(rle_implicit_surface_two_level);
-            levelset=&rle_implicit_surface_two_level->levelset;}
-        bool negate=parameters.Get_Parameter("Negate",(bool)false);
-        if(negate) *phi*=-1;
-        T contour=parameters.Get_Parameter("Contour",(T)0);
-        if(contour) *phi-=contour;
-        bool reinitialize=parameters.Get_Parameter("Reinitialize",false);
-        if(reinitialize){
-            LOG::cout<<"Reinitializing levelset"<<std::endl;
-            levelset->Fast_Marching_Method(0);}
-        bool extrapolate_into_objects=parameters.Get_Parameter("Extrapolate_Into_Objects",false);
-        bool use_collision_body_list_for_extrapolation=parameters.Get_Parameter("Use_Collision_Body_List_For_Extrapolation",false);
-        bool subtract_objects=parameters.Get_Parameter("Subtract_Objects",false);
-        bool collision_aware=parameters.Get_Parameter("Use_Collision_Aware_Interpolation",false);
-        GRID_BASED_COLLISION_GEOMETRY_RLE<RLE_GRID_3D<T> >* fluid_collision_body_list=0;
-        if(use_collision_body_list_for_extrapolation || collision_aware){
-            fluid_collision_body_list=new GRID_BASED_COLLISION_GEOMETRY_RLE<RLE_GRID_3D<T> >(*grid);
-            if(!body_list) PHYSBAM_FATAL_ERROR();
-            for(COLLISION_GEOMETRY_ID i(1);i<=body_list->m;i++) if((*body_list)(i)) fluid_collision_body_list->collision_geometry_collection.Add_Body((*body_list)(i),0,false);}
-        if(extrapolate_into_objects || subtract_objects){
-            ARRAY<T> phi_object;
-            if(!use_collision_body_list_for_extrapolation){
-                std::string raw_phi_object_filename=parameters.Get_Parameter("Phi_Object_Filename",std::string(""));
-                FILE_UTILITIES::Read_From_File<RW>(Animated_Filename(raw_phi_object_filename,frame),phi_object);}
-            else{
-                phi_object.Resize(grid->number_of_cells,false,false);phi_object.Fill(1);
-                if(!body_list) PHYSBAM_FATAL_ERROR();
-                T contour=3*grid->Minimum_Edge_Length();
-                for(COLLISION_GEOMETRY_ID i(1);i<=body_list->m;i++)
-                    for(RLE_GRID_ITERATOR_CELL_3D<T> cell(*grid,grid->number_of_ghost_cells);cell;cell++){int c=cell.Cell();TV X=cell.X();
-                        T phi;if(fluid_collision_body_list->collision_geometry_collection.bodies(i)->Implicit_Geometry_Lazy_Inside_And_Value(X,phi,contour)) phi_object(c)=min(phi_object(c),phi);}}
-            phi_object*=-1; // extrapolate into negative phi_object
-            if(extrapolate_into_objects){
-                LOG::cout<<"extrapolating levelset into object"<<std::endl;
-                EXTRAPOLATION_RLE<RLE_GRID_3D<T>,T> extrapolate(*grid,phi_object);extrapolate.Extrapolate_Cells(*phi,0);}
-            if(subtract_objects) for(int c=1;c<=grid->number_of_cells;c++)(*phi)(c)=max((*phi)(c),phi_object(c));}
-        if(collision_aware){
-            LOG::cout<<"Using collidable thin shell interpolation..."<<std::endl;
-            levelset->valid_mask_current.Resize(grid->number_of_cells,false);levelset->valid_mask_current.Fill(true);
-            levelset->Set_Collision_Body_List(*fluid_collision_body_list,true);
-            fluid_collision_body_list->Rasterize_Objects();
-            rendering_implicit_surface->implicit_surface->Use_Secondary_Interpolation(true);}
-        object=rendering_implicit_surface;}
-#endif
     else if(type=="Removed_Particle_Levelset"){
         LOG::cout<<"Removed_Particle_Levelset"<<std::endl;
         ARRAY<T,VECTOR<int,3> >* phi=new ARRAY<T,VECTOR<int,3> >;GRID<TV>* grid=new GRID<TV>;

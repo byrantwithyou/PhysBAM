@@ -4,17 +4,10 @@
 //#####################################################################
 // Class DENSITY_CONTAINER
 //#####################################################################
-#include <PhysBAM_Tools/Grids_Dyadic/DYADIC_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Dyadic_Boundaries/BOUNDARY_DYADIC.h>
-#include <PhysBAM_Tools/Grids_Dyadic_Interpolation/LINEAR_INTERPOLATION_DYADIC.h>
-#include <PhysBAM_Tools/Grids_Dyadic_Interpolation/LINEAR_INTERPOLATION_DYADIC_HELPER.h>
-#include <PhysBAM_Tools/Grids_RLE_Boundaries/BOUNDARY_RLE.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Geometry/Advection_Collidable/ADVECTION_WRAPPER_COLLIDABLE_CELL.h>
-#include <PhysBAM_Geometry/Grids_Dyadic_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_DYADIC.h>
-#include <PhysBAM_Geometry/Grids_RLE_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_RLE.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Grid_Based_Fields/DENSITY_CONTAINER.h>
 using namespace PhysBAM;
@@ -89,24 +82,8 @@ Euler_Step(const T dt,const T time,const int number_of_ghost_cells)
 template class DENSITY_CONTAINER<GRID<VECTOR<float,1> > >;
 template class DENSITY_CONTAINER<GRID<VECTOR<float,2> > >;
 template class DENSITY_CONTAINER<GRID<VECTOR<float,3> > >;
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-template class DENSITY_CONTAINER<QUADTREE_GRID<float> >;
-template class DENSITY_CONTAINER<OCTREE_GRID<float> >;
-#endif
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-template class DENSITY_CONTAINER<RLE_GRID_2D<float> >;
-template class DENSITY_CONTAINER<RLE_GRID_3D<float> >;
-#endif
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class DENSITY_CONTAINER<GRID<VECTOR<double,1> > >;
 template class DENSITY_CONTAINER<GRID<VECTOR<double,2> > >;
 template class DENSITY_CONTAINER<GRID<VECTOR<double,3> > >;
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-template class DENSITY_CONTAINER<QUADTREE_GRID<double> >;
-template class DENSITY_CONTAINER<OCTREE_GRID<double> >;
-#endif
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-template class DENSITY_CONTAINER<RLE_GRID_2D<double> >;
-template class DENSITY_CONTAINER<RLE_GRID_3D<double> >;
-#endif
 #endif

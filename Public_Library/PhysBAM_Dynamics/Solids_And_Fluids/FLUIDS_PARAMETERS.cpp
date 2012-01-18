@@ -5,17 +5,6 @@
 #include <PhysBAM_Tools/Fourier_Transforms_Calculations/TURBULENCE_1D.h>
 #include <PhysBAM_Tools/Fourier_Transforms_Calculations/TURBULENCE_2D.h>
 #include <PhysBAM_Tools/Fourier_Transforms_Calculations/TURBULENCE_3D.h>
-#include <PhysBAM_Tools/Grids_Dyadic/DYADIC_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Dyadic/DYADIC_GRID_ITERATOR_FACE.h>
-#include <PhysBAM_Tools/Grids_Dyadic/DYADIC_GRID_ITERATOR_NODE.h>
-#include <PhysBAM_Tools/Grids_Dyadic_Advection/ADVECTION_SEMI_LAGRANGIAN_DYADIC.h>
-#include <PhysBAM_Tools/Grids_Dyadic_Interpolation/LINEAR_INTERPOLATION_DYADIC.h>
-#include <PhysBAM_Tools/Grids_Dyadic_Interpolation/LINEAR_INTERPOLATION_DYADIC_HELPER.h>
-#include <PhysBAM_Tools/Grids_RLE/RLE_GRID_2D.h>
-#include <PhysBAM_Tools/Grids_RLE/RLE_GRID_3D.h>
-#include <PhysBAM_Tools/Grids_RLE_Advection/ADVECTION_SEMI_LAGRANGIAN_RLE.h>
-#include <PhysBAM_Tools/Grids_RLE_Boundaries/BOUNDARY_RLE.h>
-#include <PhysBAM_Tools/Grids_RLE_Interpolation/AVERAGING_RLE.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
@@ -27,8 +16,6 @@
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_UTILITIES.h>
-#include <PhysBAM_Geometry/Grids_Dyadic_Collisions/GRID_BASED_COLLISION_GEOMETRY_DYADIC.h>
-#include <PhysBAM_Geometry/Grids_RLE_Collisions/GRID_BASED_COLLISION_GEOMETRY_RLE.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_MAC_GRID_SOLID_WALL_SLIP.h>
 #include <PhysBAM_Dynamics/Boundaries/BOUNDARY_PHI_WATER.h>
@@ -242,24 +229,8 @@ Log_Parameters() const
 template class FLUIDS_PARAMETERS<GRID<VECTOR<float,1> > >;
 template class FLUIDS_PARAMETERS<GRID<VECTOR<float,2> > >;
 template class FLUIDS_PARAMETERS<GRID<VECTOR<float,3> > >;
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-template class FLUIDS_PARAMETERS<QUADTREE_GRID<float> >;
-template class FLUIDS_PARAMETERS<OCTREE_GRID<float> >;
-#endif
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-template class FLUIDS_PARAMETERS<RLE_GRID_2D<float> >;
-template class FLUIDS_PARAMETERS<RLE_GRID_3D<float> >;
-#endif
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class FLUIDS_PARAMETERS<GRID<VECTOR<double,1> > >;
 template class FLUIDS_PARAMETERS<GRID<VECTOR<double,2> > >;
 template class FLUIDS_PARAMETERS<GRID<VECTOR<double,3> > >;
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-template class FLUIDS_PARAMETERS<QUADTREE_GRID<double> >;
-template class FLUIDS_PARAMETERS<OCTREE_GRID<double> >;
-#endif
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-template class FLUIDS_PARAMETERS<RLE_GRID_2D<double> >;
-template class FLUIDS_PARAMETERS<RLE_GRID_3D<double> >;
-#endif
 #endif

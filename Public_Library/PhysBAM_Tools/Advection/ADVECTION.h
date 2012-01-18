@@ -14,7 +14,6 @@
 #define __ADVECTION__
 
 #include <PhysBAM_Tools/Advection/ADVECTION_FORWARD.h>
-#include <PhysBAM_Tools/Grids_Dyadic_Boundaries/BOUNDARY_POLICY_DYADIC.h>
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>

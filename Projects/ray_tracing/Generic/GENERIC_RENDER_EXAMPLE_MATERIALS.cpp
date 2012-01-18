@@ -3,24 +3,17 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt. 
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Grids_Dyadic_Interpolation/LINEAR_INTERPOLATION_OCTREE_HELPER.h>
-#include <PhysBAM_Tools/Grids_RLE_Interpolation/AVERAGING_RLE.h>
 #include <PhysBAM_Tools/Parsing/PARAMETER_LIST.h>
 #include <PhysBAM_Tools/Read_Write/Arrays/READ_WRITE_ARRAY.h>
 #include <PhysBAM_Tools/Read_Write/Grids_Uniform_Arrays/READ_WRITE_ARRAYS.h>
 #include <PhysBAM_Tools/Read_Write/Vectors/READ_WRITE_VECTOR.h>
-#include <PhysBAM_Geometry/Implicit_Objects_RLE/RLE_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
-#include <PhysBAM_Geometry/Read_Write/Grids_RLE_Level_Sets/READ_WRITE_LEVELSET_RLE.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Lights/RENDERING_LIGHT.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_IMPLICIT_SURFACE.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_LEVELSET_MULTIPLE_OBJECT.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Shaders/RENDERING_ABSORPTION_SPECTRUM_SHADER.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Shaders/RENDERING_BLEND_IMPLICIT_SURFACE_SHADER.h>
-#include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Shaders/RENDERING_BLEND_OCTREE_SCALAR_FIELD_ABSORPTION_SHADER.h>
-#include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Shaders/RENDERING_BLEND_OCTREE_SCALAR_FIELD_SHADER.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Shaders/RENDERING_BLEND_TRIANGULATED_SURFACE_SHADER.h>
-#include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Shaders/RENDERING_BSSRDF_SHADER.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Shaders/RENDERING_BUMP_MAP_IMAGE_SHADER.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Shaders/RENDERING_BUMP_MAP_NORMAL_IMAGE_SHADER.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Shaders/RENDERING_CAMERA_ORIENTED_NORMAL_SHADER.h>
@@ -57,7 +50,6 @@
 #include <cstdio>
 #include "GENERIC_RENDER_EXAMPLE.h"
 //#include <Rendering_Shaders/RENDERING_HAIR_SHADER.h>
-//#include <Rendering_Shaders/RENDERING_RLE_RIVER_SHADER.h>
 using namespace PhysBAM;
 //#####################################################################
 // Material - Prepare materials
@@ -205,25 +197,6 @@ Material(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         MATERIAL_SHADER<T>* shader=new RENDERING_CAMERA_ORIENTED_NORMAL_SHADER<T>(*child_shader,world);
         shaders.Set(name,shader);
         LOG::cout<<"Material '"<<name<<"' Camera-oriented normal shader="<<shader_name<<std::endl;}
-    //else if(type=="RLE_River"){
-        //TV ambient=parameters.Get_Parameter("Ambient",TV(0,0,0));
-        //TV diffuse=parameters.Get_Parameter("Diffuse",TV((T)1,(T)1,(T)1));
-        //T reflectance=parameters.Get_Parameter("Reflectance",(T)0.5);
-        //ARRAY<VECTOR<float,3> ,VECTOR<int,2> > image;
-        //std::string ramp_filename=parameters.Get_Parameter("Color_Ramp",std::string("none"));
-        //IMAGE<float>::Read(ramp_filename,image);
-        //ARRAY<TV,VECTOR<int,1> > ramp(1,image.m);for(int i=1;i<=image.m;i++)ramp(i)=TV(image(i,1));
-        //T ymin=parameters.Get_Parameter("Ymin",0);
-        //T ymax=parameters.Get_Parameter("Ymax",1);*/
-        //RENDERING_RLE_RIVER_SHADER<T>* rle_river=new RENDERING_RLE_RIVER_SHADER<T>(ambient,diffuse,reflectance/*,ramp,ymin,ymax*/,world);
-        //rle_river->noise_frequency=parameters.Get_Parameter("Noise_Frequency",(T)1);
-        //rle_river->noise_amplitude=parameters.Get_Parameter("Noise_Amplitude",(T)1);
-        //rle_river->noise_bands=parameters.Get_Parameter("Noise_Bands",3);
-        //rle_river->distance_length=parameters.Get_Parameter("Distance_Length",1);
-        //rle_river->distance_color=parameters.Get_Parameter("Distance_Color",diffuse);
-        //MATERIAL_SHADER<T>* shader=rle_river;
-        //shaders.Set(name,shader);
-        //LOG::cout<<"Material '"<<name<<"' RLE Material"<<std::endl;}
     else if (type=="Kajiya"){
         TV diffuse=parameters.Get_Parameter("Diffuse",TV((T)0.5,(T)0.5,(T)0.5));
         TV specular=parameters.Get_Parameter("Specular",TV((T)1.0,(T)1.0,(T)1.0));
@@ -280,26 +253,6 @@ Material(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         MATERIAL_SHADER<T>* shader=new RENDERING_SHELL_EMISSION_SHADER<T>(shell_thickness,shell_radius_of_curvature,shell_amplification_factor,shell_emission_color,world);
         shaders.Set(name,shader);
         LOG::cout<<"Material '"<<name<<"' Shell emission shader thick="<<shell_thickness<<" radius_of_curvature="<<shell_radius_of_curvature<<" shell_amplification="<<shell_amplification_factor<<" color="<<shell_emission_color<<std::endl;}
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    else if(type=="BSSRDF"){
-        std::string shader_name=parameters.Get_Parameter("Shader",std::string("<unknown>"));
-        std::string ambient_shader_name=parameters.Get_Parameter("Ambient_Shader",std::string("<unknown>"));
-        MATERIAL_SHADER<T>* color_shader=0;MATERIAL_SHADER<T>* ambient_shader=0;
-        if(shader_name!="<unknown>"){
-            color_shader=shaders.Get(shader_name);
-            if(color_shader==0){LOG::cerr<<"Invalid shader "<<shader_name<<" specified in BSSRDF"<<std::endl;exit(1);}}
-        if(ambient_shader_name!="<unknown>"){
-            if(!shaders.Get(ambient_shader_name,ambient_shader)){LOG::cerr<<"Invalid ambient shader "<<ambient_shader_name<<" specified in BSSRDF"<<std::endl;exit(1);}}
-        T index_of_refraction=parameters.Get_Parameter("Index_Of_Refraction",(T)1.3);
-        T error_criterion=parameters.Get_Parameter("Error_Criterion",(T)0.1);
-        int samples_per_octree_cell=parameters.Get_Parameter("Samples_Per_Octree_Cell",(int)8);
-        TV diffuse_mean_free_path=parameters.Get_Parameter("Diffuse_Mean_Free_Path",TV(1/(T)27.224,1/(T)73.178,1/(T)146.479));
-        RENDERING_BSSRDF_SHADER<T>* shader=new RENDERING_BSSRDF_SHADER<T>(index_of_refraction,error_criterion,diffuse_mean_free_path,samples_per_octree_cell,color_shader,ambient_shader,world);
-        std::string cache_filename=parameters.Get_Parameter("Cache",std::string("<unknown>"));
-        if(cache_filename != "<unknown>"){shader->use_irradiance_cache_file=true;shader->irradiance_cache_filename=cache_filename;}
-        shaders.Set(name,shader);
-        LOG::cout<<"Material '"<<name<<"' Color shader="<<shader_name<<std::endl;}
-#endif
     else if(type=="Image_Texture"){
         std::string filename=parameters.Get_Parameter("Filename",std::string("<unknown>"));
         if(filename == "<unknown>" || filename.length()<4){LOG::cerr<<"You have to supply an image file for texture-mapping!"<<std::endl;exit(1);}
@@ -364,15 +317,6 @@ Material(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         std::string raw_grid_filename=parameters.Get_Parameter("Grid_Filename",std::string("<unknown_grid_file>"));
         std::string raw_phi_filename=parameters.Get_Parameter("Phi_Filename",std::string("<unknown_phi_file>"));
         IMPLICIT_OBJECT<TV>* implicit_surface;
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-        if(implicit_surface_type=="RLE"){
-            RLE_GRID_3D<T>* grid=new RLE_GRID_3D<T>;ARRAY<T>* phi=new ARRAY<T>;
-            FILE_UTILITIES::Read_From_File<RW>(Animated_Filename(raw_grid_filename,frame),*grid);
-            FILE_UTILITIES::Read_From_File<RW>(Animated_Filename(raw_phi_filename,frame),*phi);
-            LOG::cout<<"Using rle implicit surface with uniform grid "<<grid->uniform_grid<<", number_of_cells = "<<grid->number_of_cells<<std::endl;
-            implicit_surface=new RLE_IMPLICIT_OBJECT<TV>(*grid,*phi);}
-        else
-#endif
             {LOG::cout<<"Unknown implicit surface type "<<implicit_surface_type<<std::endl;exit(1);}
         BOX<VECTOR<T,1> > value_range(parameters.Get_Parameter("Low_Value",(T)0),parameters.Get_Parameter("High_Value",(T)1));
         BOX<VECTOR<T,1> > weight_range(parameters.Get_Parameter("Min_Weight",(T)0),parameters.Get_Parameter("Max_Weight",(T)1));
@@ -391,52 +335,6 @@ Material(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         T low_value=parameters.Get_Parameter("Low_Value",(T)0),high_value=parameters.Get_Parameter("High_Value",(T)1);
         shaders.Set(name,new RENDERING_BLEND_TRIANGULATED_SURFACE_SHADER<T>(*field,low_value,high_value,*child_shader1,*child_shader2,direct_shading_only,world));
         LOG::cout<<"Material '"<<name<<"' Field="<<field_file<<" Range=["<<low_value<<","<<high_value<<"] Shader1="<<shader1_name<<" Shader2="<<shader2_name<<std::endl;}
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    else if(type=="Octree_Scalar_Field_Blend"){
-        T reflectivity1=parameters.Get_Parameter("Reflectivity1",(T)1.0);
-        T reflectivity2=parameters.Get_Parameter("Reflectivity2",(T)1.0);
-        bool fresnel=parameters.Get_Parameter("Fresnel",true);
-        std::string shift_direction=parameters.Get_Parameter("Shift_Direction",std::string("<unknown>"));
-        std::string raw_field1_file=parameters.Get_Parameter("Field1",std::string("<unknown>"));
-        if(raw_field1_file == "<unknown>"){LOG::cerr<<"You have to supply a field file for blending."<<std::endl;exit(1);}
-        std::string field1_file=Animated_Filename(raw_field1_file,frame);
-        ARRAY<T>* field1=new ARRAY<T>;FILE_UTILITIES::Read_From_File<RW>(field1_file,*field1);
-        std::string raw_field2_file=parameters.Get_Parameter("Field2",std::string("<unknown>"));
-        ARRAY<T>* field2=0;std::string field2_file="none";
-        if(raw_field2_file != "<unknown>"){
-            field2_file=Animated_Filename(raw_field2_file,frame);
-            field2=new ARRAY<T>;FILE_UTILITIES::Read_From_File<RW>(field2_file,*field2);}
-        T blend_band=parameters.Get_Parameter("Blend_Band",(T)0.1);
-        int blend_mode=parameters.Get_Parameter("Blend_Mode",(int)1);
-        RENDERING_BLEND_OCTREE_SCALAR_FIELD_SHADER<T>* shader=new RENDERING_BLEND_OCTREE_SCALAR_FIELD_SHADER<T>(reflectivity1,reflectivity2,fresnel,field1,field2,world);
-        shader->use_abs_value=true;shader->blend_band=blend_band;shader->blend_mode=blend_mode;
-        shaders.Set(name,shader);
-        LOG::cout<<"Material '"<<name<<"' Field1="<<field1_file<<" Field2="<<field2_file<<" Blend_Band="<<blend_band<<std::endl;}
-    else if(type=="Octree_Scalar_Field_Attenuation_Blend"){
-        T absorption_coefficient1=parameters.Get_Parameter("Absorption1",(T)0.5);
-        T absorption_coefficient2=parameters.Get_Parameter("Absorption2",(T)0.5);
-        TV absorption_spectrum1=parameters.Get_Parameter("Spectrum1",TV((T)0.5,(T)0.5,(T)0.5));
-        TV absorption_spectrum2=parameters.Get_Parameter("Spectrum2",TV((T)0.5,(T)0.5,(T)0.5));
-
-        std::string raw_field1_file=parameters.Get_Parameter("Field1",std::string("<unknown>"));
-        if(raw_field1_file == "<unknown>"){LOG::cerr<<"You have to supply a field file for blending."<<std::endl;exit(1);}
-        std::string field1_file=Animated_Filename(raw_field1_file,frame);
-        ARRAY<T>* field1=new ARRAY<T>;FILE_UTILITIES::Read_From_File<RW>(field1_file,*field1);
-        std::string raw_field2_file=parameters.Get_Parameter("Field2",std::string("<unknown>"));
-        ARRAY<T>* field2=0;std::string field2_file="none";
-        if(raw_field2_file != "<unknown>"){
-            field2_file=Animated_Filename(raw_field2_file,frame);
-            field2=new ARRAY<T>;FILE_UTILITIES::Read_From_File<RW>(field2_file,*field2);}
-        T blend_band=parameters.Get_Parameter("Blend_Band",(T)0.1);
-        int blend_mode=parameters.Get_Parameter("Blend_Mode",(int)1);
-        RENDERING_BLEND_OCTREE_SCALAR_FIELD_ABSORPTION_SHADER<T>* shader=new RENDERING_BLEND_OCTREE_SCALAR_FIELD_ABSORPTION_SHADER<T>(
-                                                                              absorption_coefficient1,absorption_coefficient2,
-                                                                              absorption_spectrum1,absorption_spectrum2,
-                                                                              field1,field2,world);
-        shader->use_abs_value=true;shader->blend_band=blend_band;shader->blend_mode=blend_mode;
-        volume_shaders.Set(name,shader);
-        LOG::cout<<"Material '"<<name<<"' Field1="<<field1_file<<" Field2="<<field2_file<<" Blend_Band="<<blend_band<<std::endl;}
-#endif
     else if(type=="Color_Blend"){
         RENDERING_COLOR_BLEND_SHADER<T> *shader=new RENDERING_COLOR_BLEND_SHADER<T>(world);
         shaders.Set(name,shader);

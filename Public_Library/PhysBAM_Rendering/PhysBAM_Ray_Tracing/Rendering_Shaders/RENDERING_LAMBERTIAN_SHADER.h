@@ -68,12 +68,6 @@ public:
         world.number_of_photons_for_estimate,ray,PHOTON_MAP<T>::CAUSTIC_PHOTON_MAP);
     TV same_side_position=intersection_point+same_side_normal*intersection_object.small_number*2;
     TV indirect_irradiance;
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    if(world.global_photon_map.photons.m){//indirect_irradiance=world.irradiance_cache.Compute_Indirect_Light(world,ray,exiting_object,entering_object,intersection_object,same_side_position,same_side_normal);
-        if(world.use_irradiance_cache)indirect_irradiance=world.irradiance_cache.Compute_Indirect_Light(world,ray,exiting_object,entering_object,intersection_object,same_side_position,same_side_normal);
-        else indirect_irradiance=world.global_photon_map.Irradiance_Estimate(same_side_position,same_side_normal,world.max_photon_distance,
-            world.number_of_photons_for_estimate,ray,PHOTON_MAP<T>::GLOBAL_PHOTON_MAP);}
-#endif
     return (caustic_light+indirect_irradiance)*Evaluate_Diffuse_BRDF(ray,exiting_object,entering_object,intersection_object,intersection_point,same_side_normal);}
 
     TV Shade_Surface_Using_Approximate_Full_Illumination(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& exiting_object,const RENDERING_OBJECT<T>& entering_object,

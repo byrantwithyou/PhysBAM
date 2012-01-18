@@ -21,17 +21,11 @@ template<class TV> class LEVELSET_IMPLICIT_OBJECT;
 template<class TV,class TRANSFORM> class IMPLICIT_OBJECT_TRANSFORMED;
 
 template<class TV> class ANALYTIC_IMPLICIT_OBJECT;
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-template<class TV> class DYADIC_IMPLICIT_OBJECT;
-#endif
 template<class TV> class IMPLICIT_OBJECT_COMBINED;
 template<class TV> class IMPLICIT_OBJECT_COMBINED_EULERIAN;
 template<class TV,class TRANSFORM> class IMPLICIT_OBJECT_TRANSFORMED;
 template<class TV> class LEVELSET_IMPLICIT_OBJECT;
 template<class TV> class MULTIBODY_LEVELSET_IMPLICIT_OBJECT;
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-template<class TV> class RLE_IMPLICIT_OBJECT;
-#endif
 
 void Initialize_Read_Write_Structures();
 

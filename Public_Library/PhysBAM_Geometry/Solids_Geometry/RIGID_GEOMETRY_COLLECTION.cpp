@@ -8,18 +8,13 @@
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
+#include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_STRUCTURE.h>
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/STRUCTURE.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/STRUCTURE_LIST.h>
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 #include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
-#endif
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-#include <PhysBAM_Geometry/Implicit_Objects_Dyadic/DYADIC_IMPLICIT_OBJECT.h>
-#endif
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
-#include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_STRUCTURE.h>
 #endif
 namespace PhysBAM{
 template<class TV>
@@ -160,10 +155,6 @@ Wrap_Structure_Helper(STRUCTURE<VECTOR<T,1> >*& structure,const VECTOR<T,1>& cen
 template<class TV> void
 Wrap_Structure_Helper(STRUCTURE<TV>*& structure,const TV& center)
 {   // TODO(jontg): This shouldn't be necessary
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    if(DYADIC_IMPLICIT_OBJECT<TV>* ptr=dynamic_cast<DYADIC_IMPLICIT_OBJECT<TV>*>(structure))
-        structure=new IMPLICIT_OBJECT_TRANSFORMED<TV,typename TV::SCALAR>(ptr,true,center,1);    
-#endif
 }
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 //#####################################################################

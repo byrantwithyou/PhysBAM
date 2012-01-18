@@ -1,5 +1,4 @@
 #include <PhysBAM_Tools/Data_Structures/OPERATION_HASH.h>
-#include <PhysBAM_Tools/Grids_Dyadic/OCTREE_GRID.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Utilities/TIMER.h>
@@ -15,6 +14,7 @@
 #include "../../Public_Library/Rigid_Bodies/RIGID_BODY_LIST_3D.h"
 #include <Collisions_And_Interactions/FLUID_COLLISION_BODY_LIST_DYADIC.h>
 #include <Level_Sets/OCTREE_REMOVED_PARTICLE_PROCESSING.h>
+#include <PhysBAM_Tools/Grids_Dyadic/OCTREE_GRID.h>
 
 using namespace PhysBAM;
 

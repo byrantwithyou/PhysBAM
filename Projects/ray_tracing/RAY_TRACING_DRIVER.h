@@ -53,9 +53,6 @@ Initialize()
     RANGE<VECTOR<int,2> >& clip=example.clipping_region;
     clip.min_corner.x=max(clip.min_corner.x,1);clip.max_corner.x=min(clip.max_corner.x,world.camera.film.grid.counts.x);
     clip.min_corner.y=max(clip.min_corner.y,1);clip.max_corner.y=min(clip.max_corner.y,world.camera.film.grid.counts.y);
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    large_pixel_size=world.use_irradiance_cache?1<<integer_log(clip.max_corner.x-clip.min_corner.x):1;
-#endif
 
     output_filename=example.Get_Output_Filename(example.frame);
     alpha_filename=example.Get_Alpha_Filename(example.frame);

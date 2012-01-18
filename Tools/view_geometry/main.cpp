@@ -3,15 +3,10 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
-#include <PhysBAM_Tools/Grids_Dyadic/DYADIC_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Dyadic_Interpolation/LINEAR_INTERPOLATION_DYADIC_HELPER.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Read_Write/Grids_Uniform/READ_WRITE_GRID.h>
 #include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
 #include <PhysBAM_Geometry/Geometry_Particles/REGISTER_GEOMETRY_READ_WRITE.h>
-#include <PhysBAM_Geometry/Grids_Dyadic_Computations/DUALCONTOUR_OCTREE.h>
-#include <PhysBAM_Geometry/Grids_Dyadic_Level_Sets/LEVELSET_OCTREE.h>
-#include <PhysBAM_Geometry/Implicit_Objects_Dyadic/DYADIC_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_BOX.h>
 #include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_HEXAHEDRALIZED_VOLUME.h>
@@ -20,7 +15,6 @@
 #include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_TRIANGULATED_AREA.h>
 #include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_TRIANGULATED_SURFACE.h>
-#include <PhysBAM_Geometry/Read_Write/Grids_Dyadic_Level_Sets/READ_WRITE_LEVELSET_OCTREE.h>
 #include <PhysBAM_Geometry/Read_Write/Implicit_Objects_Uniform/READ_WRITE_LEVELSET_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/HEXAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
@@ -37,7 +31,6 @@
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_LEVELSET_MULTIVIEW.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_LIGHT.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_MATERIAL.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_OCTREE_NODE_SCALAR_FIELD.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_SEGMENTED_CURVE_2D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_SEGMENTED_CURVE_3D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_TETRAHEDRALIZED_VOLUME.h>
@@ -54,9 +47,6 @@ template<class T> void Add_File(const std::string& filename,OPENGL_WORLD& world,
 template<class T> void Add_Tri2D_File(const std::string& filename,OPENGL_WORLD& world,int number);
 template<class T> void Add_Tri_File(const std::string& filename,OPENGL_WORLD& world,int number);
 template<class T> void Add_Phi_File(const std::string& filename,OPENGL_WORLD& world,int number);
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-template<class T> void Add_Oct_File(const std::string& filename,OPENGL_WORLD& world,int number);
-#endif
 template<class T> void Add_Curve_File(const std::string& filename,OPENGL_WORLD& world,int number);
 template<class T> void Add_Curve2D_File(const std::string& filename,OPENGL_WORLD& world,int number);
 template<class T> void Add_Tet_File(const std::string& filename,OPENGL_WORLD& world,int number);
@@ -168,9 +158,6 @@ template<class T> void Add_File(const std::string& filename,OPENGL_WORLD& world,
         case TRI_FILE: Add_Tri_File<T>(filename,world,number);break;
         case TRI2D_FILE: Add_Tri2D_File<T>(filename,world,number);break;
         case PHI_FILE: Add_Phi_File<T>(filename,world,number);break;
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-        case OCT_FILE: Add_Oct_File<T>(filename,world,number);break;
-#endif
         case CURVE_FILE: Add_Curve_File<T>(filename,world,number);break;
         case CURVE2D_FILE: Add_Curve2D_File<T>(filename,world,number);break;
         case TET_FILE: Add_Tet_File<T>(filename,world,number);break;
@@ -266,26 +253,6 @@ template<class T> void Add_Phi_File(const std::string& filename,OPENGL_WORLD& wo
         world.Add_Object(opengl_surface);}
     catch(FILESYSTEM_ERROR&){}
 }
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-//#################################################################
-// Function Add_Oct_File
-//#################################################################
-template<class T> void Add_Oct_File(const std::string& filename,OPENGL_WORLD& world,int number)
-{
-    try{
-        OCTREE_GRID<T> grid;ARRAY<T> phi,phi_nodes;
-        LEVELSET_OCTREE<T> levelset(grid,phi);
-        FILE_UTILITIES::Read_From_File<T>(filename,levelset);phi_nodes.Resize(grid.number_of_nodes,false);
-        grid.Node_Iterator_Data(); // update node info
-        LINEAR_INTERPOLATION_DYADIC_HELPER<OCTREE_GRID<T> >::Interpolate_From_Cells_To_Nodes(grid,phi,phi_nodes);
-        DUALCONTOUR_OCTREE<T> contour(&levelset);
-        TRIANGULATED_SURFACE<T>* triangulated_surface=contour.Get_Triangulated_Surface();
-        OPENGL_TRIANGULATED_SURFACE<T>* opengl_triangulated_surface=new OPENGL_TRIANGULATED_SURFACE<T>(*triangulated_surface,true,OPENGL_MATERIAL::Matte(OPENGL_COLOR::Cyan()));
-        world.Add_Object(opengl_triangulated_surface); 
-        for(int i=1;i<=opengl_triangulated_surface->vertex_normals->m;i++) (*opengl_triangulated_surface->vertex_normals)(i)=contour.normals(i);}
-    catch(FILESYSTEM_ERROR&){}
-}
-#endif
 //#################################################################
 // Function Add_Curve_File
 //#################################################################

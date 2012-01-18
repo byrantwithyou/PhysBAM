@@ -2,9 +2,6 @@
 // Copyright 2005-2006, Eran Guendelman, Geoffrey Irving, Frank Losasso, Tamar Shinar, Jerry Talton.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-#include <PhysBAM_Geometry/Grids_RLE_PDE_Linear/LAPLACE_COLLIDABLE_RLE.h>
-#endif
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_1D.h>
@@ -18,11 +15,6 @@
 #include <PhysBAM_Tools/Parallel_Computation/MPI_PACKAGE.h>
 #include <PhysBAM_Tools/Parallel_Computation/MPI_UTILITIES.h>
 #include <PhysBAM_Tools/Parallel_Computation/PCG_SPARSE_MPI.h>
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-#include <PhysBAM_Tools/Grids_RLE/RLE_GRID_2D.h>
-#include <PhysBAM_Tools/Grids_RLE/RLE_GRID_3D.h>
-#include <PhysBAM_Tools/Parallel_Computation/MPI_RLE_GRID.h>
-#endif
 #endif
 using namespace PhysBAM;
 
@@ -141,16 +133,8 @@ Use_Parallel_Solve()
 template class LAPLACE_COLLIDABLE_MPI<GRID<VECTOR<float,1> > >;
 template class LAPLACE_COLLIDABLE_MPI<GRID<VECTOR<float,2> > >;
 template class LAPLACE_COLLIDABLE_MPI<GRID<VECTOR<float,3> > >;
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-template class LAPLACE_COLLIDABLE_MPI<RLE_GRID_2D<float> >;
-template class LAPLACE_COLLIDABLE_MPI<RLE_GRID_3D<float> >;
-#endif
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class LAPLACE_COLLIDABLE_MPI<GRID<VECTOR<double,1> > >;
 template class LAPLACE_COLLIDABLE_MPI<GRID<VECTOR<double,2> > >;
 template class LAPLACE_COLLIDABLE_MPI<GRID<VECTOR<double,3> > >;
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-template class LAPLACE_COLLIDABLE_MPI<RLE_GRID_2D<double> >;
-template class LAPLACE_COLLIDABLE_MPI<RLE_GRID_3D<double> >;
-#endif
 #endif

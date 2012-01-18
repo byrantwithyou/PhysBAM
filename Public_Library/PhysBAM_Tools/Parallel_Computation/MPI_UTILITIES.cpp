@@ -6,10 +6,6 @@
 //#####################################################################
 #ifdef USE_MPI
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-#include <PhysBAM_Tools/Grids_RLE/RLE_RUN_2D.h>
-#include <PhysBAM_Tools/Grids_RLE/RLE_RUN_3D.h>
-#endif
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
 #include <PhysBAM_Tools/Parallel_Computation/MPI_UTILITIES.h>
@@ -17,21 +13,6 @@
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 namespace PhysBAM{
 namespace MPI_UTILITIES{
-//#####################################################################
-// Function RLE_Run_Datatype
-//#####################################################################
-template<class T_RUN> MPI::Datatype
-RLE_Run_Datatype()
-{
-    static MPI::Datatype datatype=MPI::DATATYPE_NULL;
-    if(datatype==MPI::DATATYPE_NULL){
-        static T_RUN zero_run;static int lengths[3]={1,1,1};
-        static MPI::Aint displacements[3]={0,(char*)&zero_run.jmin-(char*)&zero_run,sizeof(T_RUN)};
-        static MPI::Datatype old_types[3]={MPI::BYTE,MPI::SHORT,MPI::UB};
-        datatype=MPI::Datatype::Create_struct(3,lengths,displacements,old_types);
-        datatype.Commit();}
-    return datatype;
-}
 //#####################################################################
 // Datatype conversion for SPARSE_MATRIX_ENTRY
 //#####################################################################
@@ -175,11 +156,6 @@ template MPI::Datatype Scalar_Block_Datatype<int,4>();
 template MPI::Datatype Scalar_Block_Datatype<int,5>();
 template MPI::Datatype Scalar_Block_Datatype<int,6>();
 template MPI::Datatype Scalar_Block_Datatype<int,7>();
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-template MPI::Datatype RLE_Run_Datatype<RLE_RUN>();
-template MPI::Datatype RLE_Run_Datatype<RLE_RUN_2D>();
-template MPI::Datatype RLE_Run_Datatype<RLE_RUN_3D>();
-#endif
 INSTANTIATION_HELPER(float)
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 INSTANTIATION_HELPER(double)

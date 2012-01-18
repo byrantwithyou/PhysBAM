@@ -8,9 +8,9 @@
 #define __WATER_MELTING_EXAMPLE_3D__
 
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Level_Sets/LEVELSET_RED_GREEN.h>
 #include <PhysBAM_Dynamics/Particles/SPH_PARTICLES.h>
 #include <Level_Sets/LEVELSET_TETRAHEDRALIZED_VOLUME.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Level_Sets/LEVELSET_RED_GREEN.h>
 #include <Solids_And_Fluids/MELTING_EXAMPLE_3D.h>
 namespace PhysBAM{
 
@@ -60,34 +60,6 @@ void Initialize_Bodies()
 //#####################################################################
 void Seed_Particles_Inside_Object(ARRAY<VECTOR_3D<T> >& object_particles,ARRAY<unsigned short>& object_particles_collision_distance,int object)
 {
-    if(!fluids_parameters.simulate) return;
-    PARTICLE_LEVELSET_3D<GRID<TV> >& particle_levelset=fluids_parameters.particle_levelset_evolution.particle_levelset;
-    RANDOM_NUMBERS random;random.Set_Seed(1234);
-    T number_particles_per_unit_area=particle_levelset.number_particles_per_cell/(fluids_parameters.grid.dx*fluids_parameters.grid.dy*fluids_parameters.grid.dz);
-    LEVELSET_TETRAHEDRALIZED_VOLUME<T>& levelset_tetrahedralized_volume=*melting_parameters.levelsets(object);
-    levelset_tetrahedralized_volume.levelset.Lazy_Update_Overlay_Levelset();LEVELSET_OCTREE<T>& levelset=*levelset_tetrahedralized_volume.levelset.overlay_levelset;
-    ARRAY<OCTREE_CELL<T>*>& cell_pointer_from_index=levelset.grid.Cell_Pointer_From_Index();
-    object_particles.Clean_Memory();
-    
-    for(int i=1;i<=levelset.grid.number_of_cells;i++){
-        OCTREE_CELL<T>* cell=cell_pointer_from_index(i);if(!cell)continue;
-        T cell_dx=cell->DX().x;
-        if(levelset.phi(cell->Node(0))>cell_dx&&levelset.phi(cell->Node(1))>cell_dx&&levelset.phi(cell->Node(2))>cell_dx&&levelset.phi(cell->Node(3)>cell_dx)&&
-           levelset.phi(cell->Node(4))>cell_dx&&levelset.phi(cell->Node(5))>cell_dx&&levelset.phi(cell->Node(6))>cell_dx&&levelset.phi(cell->Node(7)>cell_dx))continue;
-        VECTOR_3D<T> center=cell->Center(),dx=cell->DX(),dx_over_two=(T).5*dx;
-        VECTOR_3D<T> lower_left=center-dx_over_two,upper_right=center+dx_over_two;
-        for(int p=1;p<=dx.x*dx.y*dx.z*number_particles_per_unit_area;p++){
-            VECTOR_3D<T> location=random.Get_Uniform_Vector(lower_left,upper_right);
-            T phi=levelset.Phi(cell,location);
-            if(phi<0){
-                object_particles.Append(location);
-                unsigned short collision_distance=(unsigned short)(USHRT_MAX*random.Get_Uniform_Number((T).1,(T).5));
-                object_particles_collision_distance.Append(collision_distance);}}}
-    std::cout << "Seeded " << object_particles.m << " object particles" << std::endl;
-
-    // remove the particles that we accidentally seeded outside
-    ARRAY<VECTOR_3D<T> > escaped_particles;ARRAY<unsigned short> escaped_particles_collision_distance;
-    Find_Escaped_Particles(object_particles,object_particles_collision_distance,object,escaped_particles,escaped_particles_collision_distance);
 }
 //#####################################################################
 // Function Find_Escaped_Particles

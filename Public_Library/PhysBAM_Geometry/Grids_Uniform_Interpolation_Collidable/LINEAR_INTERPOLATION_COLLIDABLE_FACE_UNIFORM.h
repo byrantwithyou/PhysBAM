@@ -41,13 +41,6 @@ public:
     {u_min.Set_Reference_Point(X);u_max.Set_Reference_Point(X);VECTOR<T,2> result=interpolation.Extrema_From_Block_Face_Component(axis,grid,block,u_min,u_max,X);
     u_min.Clear_Reference_Point();u_max.Clear_Reference_Point();return result;}
 
-protected:
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT // TODO(jontg): Is this in any way actually a necessary function to have?
-    virtual T2 Invalid_Value_Replacement(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X,const BLOCK_DYADIC<T_GRID>& block,const TV& intersection_point,
-        const int body_id,const int aggregate_id,bool& valid,const T ray_t_max=0) const
-    {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-#endif
-
 //#####################################################################
 };
 }

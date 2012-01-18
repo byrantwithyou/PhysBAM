@@ -7,11 +7,11 @@
 #ifndef __MELTING_TABLE__
 #define __MELTING_TABLE__
 
-#include <PhysBAM_Geometry/Red_Green/RED_GREEN_GRID_3D.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TETRAHEDRON_COLLISION_BODY.h>
 #include "../../solids/Embedded_Torus/ANALYTIC_TORUS.h"
 #include "../WATER_MELTING_EXAMPLE_3D.h"
 #include <Geometry/LEVELSET_IMPLICIT_SURFACE.h>
+#include <PhysBAM_Geometry/Red_Green/RED_GREEN_GRID_3D.h>
 namespace PhysBAM{
 
 template<class T,class RW=T>

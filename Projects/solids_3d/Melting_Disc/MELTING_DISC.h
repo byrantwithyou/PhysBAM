@@ -8,8 +8,8 @@
 #define __MELTING_DISC__
 
 #include <PhysBAM_Tools/Matrices/QUATERNION.h>
-#include <PhysBAM_Geometry/Red_Green/RED_GREEN_GRID_2D.h>
 #include <Level_Sets/LEVELSET_TRIANGULATED_OBJECT.h>
+#include <PhysBAM_Geometry/Red_Green/RED_GREEN_GRID_2D.h>
 #include <Solids_And_Fluids/MELTING_EXAMPLE_S3D.h>
 namespace PhysBAM{
 

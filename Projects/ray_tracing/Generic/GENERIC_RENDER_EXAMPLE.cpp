@@ -161,19 +161,6 @@ Options(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
     else film.sampler=film.UNIFORM;
     LOG::cout<<"Quality parameters: "<<(use_four_subpixels?"4 subpixels, ":"")<<(use_jitter?"jittered, ":"")<<samples_per_pixel<<" samples per pixel"<<std::endl;
     use_spatial_partition=parameters.Get_Parameter("Spatial_Partition",(bool)true);
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    if(parameters.Get_Parameter("Use_Photon_Map",(bool)false)){
-        bool use_irradiance_cache=parameters.Get_Parameter("Use_Irradiance_Cache",(bool)true);
-        int global_photons=parameters.Get_Parameter("Global_Photons",(int)0);
-        int caustic_photons=parameters.Get_Parameter("Caustic_Photons",(int)0);
-        int volume_photons=parameters.Get_Parameter("Volume_Photons",(int)0);
-        T max_photon_distance=parameters.Get_Parameter("Max_Photon_Distance",(T)0.15);
-        T max_irradiance_cache_distance=parameters.Get_Parameter("Max_Irradiance_Cache_Distance",(T)0.15);
-        int irradiance_cache_samples=parameters.Get_Parameter("Irradiance_Cache_Samples",(int)20);
-        int number_of_photons_used=parameters.Get_Parameter("Number_Of_Photons_In_Estimate",50);
-        world.Use_Photon_Mapping(global_photons,caustic_photons,volume_photons,max_photon_distance,number_of_photons_used);
-        world.Use_Irradiance_Cache(use_irradiance_cache,max_irradiance_cache_distance,irradiance_cache_samples);}
-#endif
     std::string background_shader=parameters.Get_Parameter("Background_Shader",std::string("<unknown>"));
     if(background_shader!="<unknown>"){
         if(!shaders.Get(background_shader,world.background_shader)){LOG::cerr<<"Invalid shader '"<<background_shader<<"' specified for background"<<std::endl;exit(1);}}

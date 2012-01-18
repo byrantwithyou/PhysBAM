@@ -12,8 +12,6 @@
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Collisions_And_Grids/GRID_BASED_COLLISION_GEOMETRY.h>
-#include <PhysBAM_Geometry/Implicit_Objects_Dyadic/DYADIC_IMPLICIT_OBJECT.h>
-#include <PhysBAM_Geometry/Implicit_Objects_RLE/RLE_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Level_Sets/IMPLICIT_OBJECT_ON_A_RAY.h>
 #include <PhysBAM_Geometry/Level_Sets/IMPLICIT_OBJECT_ON_A_RAY_POLICY.h>
@@ -114,13 +112,9 @@ public:
     {T distance=levelset(location);if(returned_distance) *returned_distance=distance;return location-distance*levelset.Normal(location);}
 
 private:
-    template<class T_TAG> static bool Block_Valid(const T_BLOCK& block,T_TAG) // TODO: can't work for dyadic, since BLOCK_DYADIC asserts validity on construction
+    template<class T_TAG> static bool Block_Valid(const T_BLOCK& block,T_TAG)
     {return true;}
 
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-    static bool Block_Valid(const T_BLOCK& block,RLE_TAG<TV>)
-    {return block;}
-#endif
 public:
 
     TV Pointwise_Object_Velocity(const int aggregate_id,const TV& X) const PHYSBAM_OVERRIDE
@@ -140,26 +134,8 @@ public:
     void Initialize_Grid_Structures(const T_GRID& grid,OBJECTS_IN_CELL<T_GRID,COLLISION_GEOMETRY_ID>& objects_in_cell,const COLLISION_GEOMETRY_ID id) const;
 private:
     typename T_GRID::SCALAR Implicit_Geometry_Extended_Value_Helper(const TV& location,UNIFORM_TAG<TV>) const;
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    typename T_GRID::SCALAR Implicit_Geometry_Extended_Value_Helper(const TV& location,DYADIC_TAG<TV>) const;
-#endif
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-    typename T_GRID::SCALAR Implicit_Geometry_Extended_Value_Helper(const TV& location,RLE_TAG<TV>) const;
-#endif
     void Initialize_Grid_Structures_Helper(OBJECTS_IN_CELL<T_GRID,COLLISION_GEOMETRY_ID>& objects_in_cell,const COLLISION_GEOMETRY_ID id,UNIFORM_TAG<TV>);
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    void Initialize_Grid_Structures_Helper(OBJECTS_IN_CELL<T_GRID,COLLISION_GEOMETRY_ID>& objects_in_cell,const COLLISION_GEOMETRY_ID id,DYADIC_TAG<TV>);
-#endif
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-    void Initialize_Grid_Structures_Helper(OBJECTS_IN_CELL<T_GRID,COLLISION_GEOMETRY_ID>& objects_in_cell,const COLLISION_GEOMETRY_ID id,RLE_TAG<TV>);
-#endif
     void Initialize_Grid_Structures_Subobject(T_FACE_ARRAYS_INT& face_velocities_count,T_FACE_ARRAYS_COLLISION_GEOMETRY_ID& face_operations,const COLLISION_GEOMETRY_ID subobject,UNIFORM_TAG<TV>);
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    void Initialize_Grid_Structures_Subobject(T_FACE_ARRAYS_INT& face_velocities_count,OPERATION_HASH<>& face_operations,const COLLISION_GEOMETRY_ID subobject,DYADIC_TAG<TV>);
-#endif
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-    void Initialize_Grid_Structures_Subobject(T_FACE_ARRAYS_INT& face_velocities_count,OPERATION_HASH<>& face_operations,const COLLISION_GEOMETRY_ID subobject,RLE_TAG<TV>);
-#endif
 //#####################################################################
 };
 }

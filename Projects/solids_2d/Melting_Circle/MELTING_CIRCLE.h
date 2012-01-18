@@ -7,9 +7,9 @@
 #ifndef __MELTING_CIRCLE__
 #define __MELTING_CIRCLE__
 
-#include <PhysBAM_Geometry/Red_Green/RED_GREEN_GRID_3D.h>
 #include <Geometry/EMBEDDED_TRIANGULATED_AREA.h>
 #include <Level_Sets/LEVELSET_TRIANGULATED_OBJECT.h>
+#include <PhysBAM_Geometry/Red_Green/RED_GREEN_GRID_3D.h>
 #include <Solids_And_Fluids/MELTING_EXAMPLE_2D.h>
 namespace PhysBAM{
 

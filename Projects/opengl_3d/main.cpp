@@ -2,7 +2,6 @@
 // Copyright 2003-2009, Zhaosheng Bao, Kevin Der, Ron Fedkiw, Eran Guendelman, Geoffrey Irving, Nipun Kwatra, Cynthia Lau, Michael Lentine, Sergey Levine, Frank Losasso, Nick Rasmussen, Craig Schroeder, Andrew Selle, Tamar Shinar, Eftychios Sifakis, Jonathan Su, Jerry Talton, Joseph Teran, Rachel Weinstein.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Grids_RLE/RLE_GRID_ITERATOR_CELL_3D.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Parsing/PARAMETER_LIST.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
@@ -24,10 +23,6 @@
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_GRID_3D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_INDEXED_COLOR_MAP.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_LEVELSET_COLOR_MAP.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_OCTREE_SLICE.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_RLE_GRID_2D.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_RLE_GRID_3D.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_RLE_SLICE.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_SELECTION.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_SLICE_MANAGER.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_TRIANGULATED_SURFACE.h>
@@ -40,16 +35,8 @@
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_3D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_LEVELSET_3D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_OCTREE_CELL_SCALAR_FIELD.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_OCTREE_FACE_SCALAR_FIELD.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_OCTREE_GRID.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_OCTREE_NODE_SCALAR_FIELD.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_OCTREE_NODE_VECTOR_FIELD.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_PARTICLES_3D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_PSEUDO_DIRICHLET_3D.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_RLE_CELL_SCALAR_FIELD_3D.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_RLE_FACE_SCALAR_FIELD_3D.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_RLE_GRID_3D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_SCALAR_FIELD_3D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_3D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D.h>
@@ -108,14 +95,8 @@ private:
     OPENGL_COMPONENT_PARTICLES_3D<T,PARTICLE_LEVELSET_REMOVED_PARTICLES<TV> >* removed_negative_particles_component;
 
     // TODO: need better grid control 
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-    OPENGL_COMPONENT_RLE_GRID_3D<T>* rle_grid_component;
-#endif
     OPENGL_COMPONENT_BASIC<OPENGL_GRID_3D<T> >* grid_component;
     OPENGL_COMPONENT_BASIC<OPENGL_GRID_3D<T> >* coarse_grid_component;
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    OPENGL_COMPONENT_OCTREE_GRID<T>* octree_grid_component;
-#endif
 
     // Options
     std::string basedir;
@@ -138,14 +119,7 @@ private:
 template<class T,class RW> VISUALIZATION<T,RW>::
 VISUALIZATION()
     :ANIMATED_VISUALIZATION(),positive_particles_component(0),negative_particles_component(0),
-    removed_positive_particles_component(0),removed_negative_particles_component(0)
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-    ,rle_grid_component(0)
-#endif
-    ,grid_component(0),coarse_grid_component(0)
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    ,octree_grid_component(0)
-#endif
+    removed_positive_particles_component(0),removed_negative_particles_component(0),grid_component(0),coarse_grid_component(0)
 {
 }
 
@@ -158,9 +132,6 @@ template<class T,class RW> VISUALIZATION<T,RW>::
     delete removed_negative_particles_component;
     if(grid_component){delete &grid_component->object;delete grid_component;}
     if(coarse_grid_component){delete &coarse_grid_component->object;delete coarse_grid_component;}
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-    delete rle_grid_component;
-#endif
 }
 
 template<class T,class RW> void VISUALIZATION<T,RW>::
@@ -219,42 +190,16 @@ Read_Grid()
 {
     has_valid_grid=false;
     has_valid_coarse_grid=false;
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-    has_valid_rle_grid=false;
-#endif
     has_valid_octree_grid=false;
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-    std::string rle_filename;
-#endif
     std::string octree_filename;
     std::string filename,coarse_filename;
 
     std::string octree_grid_prefix="";
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-    rle_filename=STRING_UTILITIES::string_sprintf("%s/%d/rle_grid",basedir.c_str(),start_frame);
-#endif
     octree_filename=STRING_UTILITIES::string_sprintf("%s/%d/octree_grid",basedir.c_str(),start_frame);
     filename=STRING_UTILITIES::string_sprintf("%s/%d/levelset",basedir.c_str(),start_frame);
     coarse_filename=STRING_UTILITIES::string_sprintf("%s/%d/coarse_levelset",basedir.c_str(),start_frame);
     // For backwards compatibility
     if(!FILE_UTILITIES::File_Exists(filename)) filename=STRING_UTILITIES::string_sprintf("%s/%d/levelset.phi",basedir.c_str(),start_frame);
-
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-    if(FILE_UTILITIES::File_Exists(rle_filename)){
-        std::cout<<"Reading rle grid '"<<rle_filename<<"'"<<std::endl<<std::flush;
-        rle_filename=STRING_UTILITIES::string_sprintf("%s/%d/rle_grid",basedir.c_str());
-        rle_grid_component=new OPENGL_COMPONENT_RLE_GRID_3D<T>(rle_filename);
-        // Add_Component(rle_grid_component); // add later instead of here, but Pre_Frame_Extra will ensure rle grid is read in
-        has_valid_rle_grid=true;}
-#endif
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    if(FILE_UTILITIES::File_Exists(octree_filename)){
-        std::cout<<"Reading octree '"<<octree_filename<<"'"<<std::endl<<std::flush;
-        octree_filename=STRING_UTILITIES::string_sprintf("%s/%d/octree_grid",basedir.c_str());
-        octree_grid_component=new OPENGL_COMPONENT_OCTREE_GRID<T>(octree_filename);
-        //Add_Component(octree_grid_component); // add later instead of here, but Pre_Frame_Extra will ensure octree grid is read in
-        has_valid_octree_grid=true;}
-#endif
 
     if(FILE_UTILITIES::File_Exists(coarse_filename)){
         std::cout<<"Reading coarse_grid from '"<<coarse_filename<<"'..."<<std::endl;
@@ -317,20 +262,6 @@ Initialize_Components_And_Key_Bindings()
         OPENGL_UNIFORM_SLICE* slice=new OPENGL_UNIFORM_SLICE(opengl_world);slice->Initialize(grid);
         slice_manager.slice=slice;
         std::cout<<"Using uniform grid slice"<<std::endl;}
-
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-    if(has_valid_rle_grid){
-        OPENGL_RLE_SLICE* slice=new OPENGL_RLE_SLICE(opengl_world);slice->Initialize(rle_grid_component->opengl_grid.grid);
-        slice_manager.slice=slice;slice_manager.Add_Object(&rle_grid_component->opengl_grid);
-        std::cout<<"Using rle grid slice"<<std::endl;}
-#endif
-
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    if(has_valid_octree_grid){
-        OPENGL_OCTREE_SLICE* slice=new OPENGL_OCTREE_SLICE(opengl_world);slice->Initialize(octree_grid_component->opengl_grid.grid);
-        slice_manager.slice=slice;slice_manager.Add_Object(&octree_grid_component->opengl_grid);
-        std::cout<<"Using octree grid slice"<<std::endl;}
-#endif
 
     if(slice_manager.slice) slice_manager.Set_Slice_Has_Changed_Callback(Slice_Has_Changed_CB());
 
@@ -464,54 +395,6 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key('L',object_levelset_component->Toggle_Slice_Color_Mode_CB());
         opengl_world.Append_Bind_Key('`',object_levelset_component->Toggle_Smooth_Slice_CB());}
 
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-    filename=basedir+"/%d/rle_levelset";
-    if(has_valid_rle_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_RLE_CELL_SCALAR_FIELD_3D<T>* rle_levelset_component=new OPENGL_COMPONENT_RLE_CELL_SCALAR_FIELD_3D<T>(rle_grid_component->opengl_grid.grid,filename,
-            new OPENGL_LEVELSET_COLOR_MAP<T>(OPENGL_COLOR::Blue(),OPENGL_COLOR::Red()));
-        rle_levelset_component->opengl_rle_cell_scalar_field.draw_filled=true;
-        opengl_world.Set_Key_Binding_Category("RLE Levelset");
-        Add_Component(rle_levelset_component,"RLE Levelset",'l',BASIC_VISUALIZATION::OWNED);
-        opengl_world.Append_Bind_Key('L',rle_levelset_component->Draw_Surface_CB());
-        slice_manager.Add_Object(rle_levelset_component);}
-
-    filename=basedir+"/%d/rle_object_levelset";
-    if(has_valid_rle_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_RLE_CELL_SCALAR_FIELD_3D<T>* rle_object_levelset_component=new OPENGL_COMPONENT_RLE_CELL_SCALAR_FIELD_3D<T>(rle_grid_component->opengl_grid.grid,filename,
-            new OPENGL_LEVELSET_COLOR_MAP<T>(OPENGL_COLOR::Blue(),OPENGL_COLOR::Red()));
-        rle_object_levelset_component->opengl_rle_cell_scalar_field.draw_filled=true;
-        rle_object_levelset_component->Set_Draw(false);
-        Add_Component(rle_object_levelset_component,"RLE Object Levelset",'\0',BASIC_VISUALIZATION::OWNED);
-        opengl_world.Set_Key_Binding_Category("RLE Object Levelset");
-        opengl_world.Append_Bind_Key("^l",rle_object_levelset_component->Toggle_Draw_CB());
-        opengl_world.Append_Bind_Key('L',rle_object_levelset_component->Draw_Surface_CB());
-        slice_manager.Add_Object(rle_object_levelset_component);}
-#endif
-
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    filename=basedir+"/%d/octree_levelset";
-    if(has_valid_octree_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_OCTREE_CELL_SCALAR_FIELD<T>* octree_levelset_component=new OPENGL_COMPONENT_OCTREE_CELL_SCALAR_FIELD<T>(octree_grid_component->opengl_grid.grid,filename,
-            new OPENGL_LEVELSET_COLOR_MAP<T>(OPENGL_COLOR::Blue(),OPENGL_COLOR::Red()));
-        opengl_world.Set_Key_Binding_Category("Octree Level Set");
-        Add_Component(octree_levelset_component,"Octree Levelset",'l',BASIC_VISUALIZATION::OWNED);
-        opengl_world.Append_Bind_Key('+',octree_levelset_component->Increase_Point_Size_CB());
-        opengl_world.Append_Bind_Key('_',octree_levelset_component->Decrease_Point_Size_CB());
-        opengl_world.Append_Bind_Key('L',octree_levelset_component->Draw_Surface_CB());
-        slice_manager.Add_Object(octree_levelset_component);}
-
-    filename=basedir+"/%d/octree_levelset_nodes";
-    if(has_valid_octree_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_OCTREE_NODE_SCALAR_FIELD<T>* octree_levelset_nodes_component=new OPENGL_COMPONENT_OCTREE_NODE_SCALAR_FIELD<T>(octree_grid_component->opengl_grid.grid,filename,
-            new OPENGL_LEVELSET_COLOR_MAP<T>(OPENGL_COLOR::Blue(),OPENGL_COLOR::Red()));
-        opengl_world.Set_Key_Binding_Category("Octree Nodal Level Set");
-        Add_Component(octree_levelset_nodes_component,"Nodal Octree Levelset",';',BASIC_VISUALIZATION::OWNED);
-        opengl_world.Append_Bind_Key('+',octree_levelset_nodes_component->Increase_Point_Size_CB());
-        opengl_world.Append_Bind_Key('_',octree_levelset_nodes_component->Decrease_Point_Size_CB());
-        opengl_world.Append_Bind_Key(':',octree_levelset_nodes_component->Draw_Surface_CB());
-        slice_manager.Add_Object(octree_levelset_nodes_component);}
-#endif
-
     opengl_world.Set_Key_Binding_Category("Density");
     filename=basedir+"/%d/density";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
@@ -567,17 +450,6 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key('-',component->Decrease_Vector_Size_CB());
         if(slice_manager.slice) slice_manager.Add_Object(component);}
 
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    filename=basedir+"/%d/octree_density";
-    if(has_valid_octree_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_OCTREE_NODE_SCALAR_FIELD<T>* octree_density_component=new OPENGL_COMPONENT_OCTREE_NODE_SCALAR_FIELD<T>(octree_grid_component->opengl_grid.grid,filename,
-            OPENGL_COLOR_RAMP<T>::Two_Color_Ramp(0,1,OPENGL_COLOR::Gray(0,0),OPENGL_COLOR::Gray(1,1)));
-        Add_Component(octree_density_component,"Octree Density",'d',BASIC_VISUALIZATION::OWNED);
-        opengl_world.Append_Bind_Key('+',octree_density_component->Increase_Point_Size_CB());
-        opengl_world.Append_Bind_Key('_',octree_density_component->Decrease_Point_Size_CB());
-        slice_manager.Add_Object(octree_density_component);}
-#endif
-
     opengl_world.Set_Key_Binding_Category("Temperature");
     filename=basedir+"/%d/temperature";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
@@ -589,22 +461,6 @@ Initialize_Components_And_Key_Bindings()
         Add_Component(temperature_component,"Temperature",'t',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
         opengl_world.Append_Bind_Key('T',temperature_component->Toggle_Color_Map_CB());
         slice_manager.Add_Object(temperature_component);}
-
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    filename=basedir+"/%d/octree_temperature";
-    if(has_valid_octree_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        ARRAY<T> temp0;FILE_UTILITIES::Read_From_File<RW>(FILE_UTILITIES::Get_Frame_Filename(filename,start_frame),temp0);
-        T min_temp=temp0.Min(),max_temp=temp0.Max();
-        std::cout<<"Using octree temperature: [min="<<min_temp<<" max="<<max_temp<<"]"<<std::endl;
-        if(max_temp-min_temp<1e-5){min_temp=283.15;max_temp=3000;std::cout<<"Switching to default temperature range 283.15 to 3000"<<std::endl;}
-        OPENGL_COMPONENT_OCTREE_NODE_SCALAR_FIELD<T>* octree_temperature_component=new OPENGL_COMPONENT_OCTREE_NODE_SCALAR_FIELD<T>(octree_grid_component->opengl_grid.grid,filename,
-            OPENGL_COLOR_RAMP<T>::Two_Color_Ramp(0,1,OPENGL_COLOR::Gray(0,0),OPENGL_COLOR::Red(1,1)));
-        octree_temperature_component->Toggle_Draw();
-        Add_Component(octree_temperature_component,"Octree Temperature",'t',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
-        opengl_world.Append_Bind_Key('+',octree_temperature_component->Increase_Point_Size_CB());
-        opengl_world.Append_Bind_Key('_',octree_temperature_component->Decrease_Point_Size_CB());
-        slice_manager.Add_Object(octree_temperature_component);}
-#endif
 
     opengl_world.Set_Key_Binding_Category("SPH");
     filename=basedir+"/%d/sph_cell_weights";
@@ -631,30 +487,6 @@ Initialize_Components_And_Key_Bindings()
         pressure_gradient_component->opengl_scalar_field.Update();
         Add_Component(pressure_gradient_component,"Pressure Gradient",'1',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
         slice_manager.Add_Object(pressure_gradient_component);}
-
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-    filename=basedir+"/%d/rle_pressure";
-    if(has_valid_rle_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_RLE_CELL_SCALAR_FIELD_3D<T>* rle_pressure_component=new OPENGL_COMPONENT_RLE_CELL_SCALAR_FIELD_3D<T>(rle_grid_component->opengl_grid.grid,filename,pressure_color_map);
-        Add_Component(rle_pressure_component,"RLE Pressure",'7',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
-        slice_manager.Add_Object(rle_pressure_component);}
-#endif
-
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    filename=basedir+"/%d/octree_pressure";
-    if(has_valid_octree_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_OCTREE_CELL_SCALAR_FIELD<T>* octree_pressure_component=new OPENGL_COMPONENT_OCTREE_CELL_SCALAR_FIELD<T>(octree_grid_component->opengl_grid.grid,filename,pressure_color_map);
-        Add_Component(octree_pressure_component,"Octree Pressure",'7',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
-        slice_manager.Add_Object(octree_pressure_component);}
-
-    filename=basedir+"/%d/octree_occupied_cells";
-    if(has_valid_octree_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_OCTREE_CELL_SCALAR_FIELD<T,bool>* octree_occupied_cells=new OPENGL_COMPONENT_OCTREE_CELL_SCALAR_FIELD<T,bool>(octree_grid_component->opengl_grid.grid,filename,
-            new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Green()));
-        Add_Component(octree_occupied_cells,"Octree Occupied Cells",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
-        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F11),octree_occupied_cells->Toggle_Draw_CB());
-        slice_manager.Add_Object(octree_occupied_cells);}
-#endif
 
     opengl_world.Set_Key_Binding_Category("Velocity");
     { // regular and mac velocity TODO: kill node based stuff?
@@ -749,32 +581,6 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key('h',force_component->Toggle_Arrowhead_CB());
         slice_manager.Add_Object(force_component);}
 
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-    opengl_world.Set_Key_Binding_Category("RLE Velocity");
-    filename=basedir+"/%d/rle_face_velocities";
-    if(has_valid_rle_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_RLE_FACE_SCALAR_FIELD_3D<T,T>* rle_face_velocity_component=new OPENGL_COMPONENT_RLE_FACE_SCALAR_FIELD_3D<T,T>(rle_grid_component->opengl_grid.grid,filename,
-            new OPENGL_CONSTANT_COLOR_MAP<T>(OPENGL_COLOR::Green()),false);
-        rle_face_velocity_component->opengl_rle_face_scalar_field.line_size=0.01;
-        Add_Component(rle_face_velocity_component,"RLE Face Velocities",'V',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
-        opengl_world.Append_Bind_Key('C',rle_face_velocity_component->Toggle_Draw_CB());
-        opengl_world.Append_Bind_Key('=',rle_face_velocity_component->Increase_Vector_Size_CB());
-        opengl_world.Append_Bind_Key('-',rle_face_velocity_component->Decrease_Vector_Size_CB());
-        slice_manager.Add_Object(rle_face_velocity_component);}
-#endif
-
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    filename=basedir+"/%d/octree_face_velocities";
-    if(has_valid_octree_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_OCTREE_FACE_SCALAR_FIELD<T,T>* octree_face_velocity_component=new OPENGL_COMPONENT_OCTREE_FACE_SCALAR_FIELD<T,T>(octree_grid_component->opengl_grid.grid,filename,
-            new OPENGL_CONSTANT_COLOR_MAP<T>(OPENGL_COLOR::Magenta()),false);
-        octree_face_velocity_component->opengl_octree_face_scalar_field.line_size=0.01;
-        Add_Component(octree_face_velocity_component,"Octree Face Velocities",'V',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
-        opengl_world.Append_Bind_Key('=',octree_face_velocity_component->Increase_Vector_Size_CB());
-        opengl_world.Append_Bind_Key('-',octree_face_velocity_component->Decrease_Vector_Size_CB());
-        slice_manager.Add_Object(octree_face_velocity_component);}
-#endif
-
     filename=basedir+"/%d/velocities_ghost_fuel";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         if(node_based){
@@ -830,18 +636,6 @@ Initialize_Components_And_Key_Bindings()
         slice_manager.Add_Object(beta_face_component);}
 
     opengl_world.Set_Key_Binding_Category("Pressure Jump");
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    filename=basedir+"/%d/octree_pressure_jumps";
-    if(has_valid_octree_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_OCTREE_NODE_VECTOR_FIELD<T>* octree_pressure_jump_component=new OPENGL_COMPONENT_OCTREE_NODE_VECTOR_FIELD<T>(octree_grid_component->opengl_grid.grid,filename);
-        octree_pressure_jump_component->opengl_octree_node_vector_field.size=0.01;
-        octree_pressure_jump_component->opengl_octree_node_vector_field.vector_color=OPENGL_COLOR::Magenta();
-        Add_Component(octree_pressure_jump_component,"Octree pressure jumps",'&',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
-        opengl_world.Append_Bind_Key('=',octree_pressure_jump_component->Increase_Vector_Size_CB());
-        opengl_world.Append_Bind_Key('-',octree_pressure_jump_component->Decrease_Vector_Size_CB());
-        opengl_world.Append_Bind_Key('h',octree_pressure_jump_component->Toggle_Arrowhead_CB());
-        slice_manager.Add_Object(octree_pressure_jump_component);}
-#endif
 
     filename=basedir+"/%d/pseudo_dirichlet";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
@@ -876,28 +670,9 @@ Initialize_Components_And_Key_Bindings()
         slice_manager.Add_Object(coarse_grid_component);}
 
 
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-    if(rle_grid_component){
-        opengl_world.Set_Key_Binding_Category("Grid");
-        Add_Component(rle_grid_component,"RLE Grid",'6',BASIC_VISUALIZATION::START_HIDDEN|BASIC_VISUALIZATION::SELECTABLE);}
-#endif
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    if(octree_grid_component){
-        opengl_world.Set_Key_Binding_Category("Grid");
-        Add_Component(octree_grid_component,"Octree Grid",'6',BASIC_VISUALIZATION::START_HIDDEN|BASIC_VISUALIZATION::SELECTABLE);}
-#endif
-
     opengl_world.Set_Key_Binding_Category("Particles");
 
     bool particles_stored_per_cell_uniform=false,particles_stored_per_cell_adaptive=false;
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    if((
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-           has_valid_rle_grid ||
-#endif
-           has_valid_octree_grid) && !has_valid_grid) particles_stored_per_cell_adaptive=true;
-    else
-#endif
         if(has_valid_grid) particles_stored_per_cell_uniform=true;
     filename=basedir+"/%d/positive_particles";
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)||FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/positive_particles_1",start_frame)){
@@ -1002,24 +777,6 @@ Initialize_Components_And_Key_Bindings()
             opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F1),psi_N_component->Toggle_Draw_CB());
             slice_manager.Add_Object(psi_N_component);}}
 
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-    filename=basedir+"/%d/rle_psi_N";
-    if(has_valid_rle_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_RLE_FACE_SCALAR_FIELD_3D<T,bool>* rle_psi_N_component=new OPENGL_COMPONENT_RLE_FACE_SCALAR_FIELD_3D<T,bool>(rle_grid_component->opengl_grid.grid,filename,new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Cyan()),true);
-        Add_Component(rle_psi_N_component,"RLE Psi_N points",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
-        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F1),rle_psi_N_component->Toggle_Draw_CB());
-        slice_manager.Add_Object(rle_psi_N_component);}
-#endif
-
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    filename=basedir+"/%d/octree_psi_N";
-    if(has_valid_octree_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_OCTREE_FACE_SCALAR_FIELD<T,bool>* octree_psi_N_component=new OPENGL_COMPONENT_OCTREE_FACE_SCALAR_FIELD<T,bool>(octree_grid_component->opengl_grid.grid,filename,new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Cyan()),true);
-        Add_Component(octree_psi_N_component,"Octree Psi_N points",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
-        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F1),octree_psi_N_component->Toggle_Draw_CB());
-        slice_manager.Add_Object(octree_psi_N_component);}
-#endif
-
     filename=basedir+"/%d/coarse_psi_D";
     if(has_valid_coarse_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_SCALAR_FIELD_3D<T,bool>* psi_D_component=new OPENGL_COMPONENT_SCALAR_FIELD_3D<T,bool>(coarse_mac_grid,filename,new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Magenta()),OPENGL_SCALAR_FIELD_3D<T,bool>::DRAW_POINTS);
@@ -1047,24 +804,6 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F10),maccormack_face_mask_component->Toggle_Draw_CB());
         slice_manager.Add_Object(maccormack_face_mask_component);}
 
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-    filename=basedir+"/%d/rle_psi_D";
-    if(has_valid_rle_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_RLE_CELL_SCALAR_FIELD_3D<T,bool>* rle_psi_D_component=new OPENGL_COMPONENT_RLE_CELL_SCALAR_FIELD_3D<T,bool>(rle_grid_component->opengl_grid.grid,filename,new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Magenta()));
-        Add_Component(rle_psi_D_component,"RLE Psi_D points",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
-        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F1),rle_psi_D_component->Toggle_Draw_CB());
-        slice_manager.Add_Object(rle_psi_D_component);}
-#endif
-
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    filename=basedir+"/%d/octree_psi_D";
-    if(has_valid_octree_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_OCTREE_CELL_SCALAR_FIELD<T,bool>* octree_psi_D_component=new OPENGL_COMPONENT_OCTREE_CELL_SCALAR_FIELD<T,bool>(octree_grid_component->opengl_grid.grid,filename,new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Magenta()));
-        Add_Component(octree_psi_D_component,"Octree Psi_D points",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
-        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F1),octree_psi_D_component->Toggle_Draw_CB());
-        slice_manager.Add_Object(octree_psi_D_component);}
-#endif
-
     filename=basedir+"/%d/colors";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_INDEXED_COLOR_MAP* colors_color_map=OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map();colors_color_map->Set_Index_Mode(OPENGL_INDEXED_COLOR_MAP::PERIODIC);
@@ -1072,26 +811,6 @@ Initialize_Components_And_Key_Bindings()
         Add_Component(psi_colors_component,"Psi colors",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F2),psi_colors_component->Toggle_Draw_CB());
         slice_manager.Add_Object(psi_colors_component);}
-
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-    filename=basedir+"/%d/rle_colors";
-    if(has_valid_rle_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_INDEXED_COLOR_MAP* colors_color_map=OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map();colors_color_map->Set_Index_Mode(OPENGL_INDEXED_COLOR_MAP::PERIODIC);
-        OPENGL_COMPONENT_RLE_CELL_SCALAR_FIELD_3D<T,int>* rle_psi_colors_component=new OPENGL_COMPONENT_RLE_CELL_SCALAR_FIELD_3D<T,int>(rle_grid_component->opengl_grid.grid,filename,colors_color_map);
-        Add_Component(rle_psi_colors_component,"RLE Psi colors",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
-        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F2),rle_psi_colors_component->Toggle_Draw_CB());
-        slice_manager.Add_Object(rle_psi_colors_component);}
-#endif
-
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    filename=basedir+"/%d/octree_colors";
-    if(has_valid_octree_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_INDEXED_COLOR_MAP* colors_color_map=OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map();colors_color_map->Set_Index_Mode(OPENGL_INDEXED_COLOR_MAP::PERIODIC);
-        OPENGL_COMPONENT_OCTREE_CELL_SCALAR_FIELD<T,int>* octree_psi_colors_component=new OPENGL_COMPONENT_OCTREE_CELL_SCALAR_FIELD<T,int>(octree_grid_component->opengl_grid.grid,filename,colors_color_map);
-        Add_Component(octree_psi_colors_component,"Octree Psi colors",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
-        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F2),octree_psi_colors_component->Toggle_Draw_CB());
-        slice_manager.Add_Object(octree_psi_colors_component);}
-#endif
 
 {filename=basedir+"/%d/strain";
     OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_3D<T>* strain_component=0; // TODO: make this not a hack for multiphase
@@ -1109,39 +828,6 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key('+',strain_component->Increase_Size_CB());
         opengl_world.Append_Bind_Key('_',strain_component->Decrease_Size_CB());
         slice_manager.Add_Object(strain_component);}}
-
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    filename=basedir+"/%d/octree_velocities";
-    if(has_valid_octree_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_OCTREE_NODE_VECTOR_FIELD<T>* octree_velocity_component=new OPENGL_COMPONENT_OCTREE_NODE_VECTOR_FIELD<T>(octree_grid_component->opengl_grid.grid,filename);
-        octree_velocity_component->opengl_octree_node_vector_field.vector_color=OPENGL_COLOR::Green();
-        octree_velocity_component->opengl_octree_node_vector_field.size=0.01;
-        Add_Component(octree_velocity_component,"Octree Velocities",'v',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
-        opengl_world.Append_Bind_Key('=',octree_velocity_component->Increase_Vector_Size_CB());
-        opengl_world.Append_Bind_Key('-',octree_velocity_component->Decrease_Vector_Size_CB());
-        opengl_world.Append_Bind_Key('h',octree_velocity_component->Toggle_Arrowhead_CB());
-        slice_manager.Add_Object(octree_velocity_component);}
-
-    filename=basedir+"/%d/octree_velocities_ghost";
-    if(has_valid_octree_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_OCTREE_NODE_VECTOR_FIELD<T>* octree_velocity_minus_component=new OPENGL_COMPONENT_OCTREE_NODE_VECTOR_FIELD<T>(octree_grid_component->opengl_grid.grid,filename);
-        octree_velocity_minus_component->opengl_octree_node_vector_field.vector_color=OPENGL_COLOR::Green();
-        Add_Component(octree_velocity_minus_component,"Octree Minus Velocities",'c',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
-        opengl_world.Append_Bind_Key('=',octree_velocity_minus_component->Increase_Vector_Size_CB());
-        opengl_world.Append_Bind_Key('-',octree_velocity_minus_component->Decrease_Vector_Size_CB());
-        opengl_world.Append_Bind_Key('h',octree_velocity_minus_component->Toggle_Arrowhead_CB());
-        slice_manager.Add_Object(octree_velocity_minus_component);}
-
-    filename=basedir+"/%d/octree_velocities_ghost_fuel";
-    if(has_valid_octree_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_OCTREE_NODE_VECTOR_FIELD<T>* octree_velocity_plus_component=new OPENGL_COMPONENT_OCTREE_NODE_VECTOR_FIELD<T>(octree_grid_component->opengl_grid.grid,filename);
-        octree_velocity_plus_component->opengl_octree_node_vector_field.vector_color=OPENGL_COLOR::Green();
-        Add_Component(octree_velocity_plus_component,"Octree Plus Velocities",'b',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
-        opengl_world.Append_Bind_Key('=',octree_velocity_plus_component->Increase_Vector_Size_CB());
-        opengl_world.Append_Bind_Key('-',octree_velocity_plus_component->Decrease_Vector_Size_CB());
-        opengl_world.Append_Bind_Key('h',octree_velocity_plus_component->Toggle_Arrowhead_CB());
-        slice_manager.Add_Object(octree_velocity_plus_component);}
-#endif
 
     opengl_world.Set_Key_Binding_Category("Motion");
 
@@ -1208,17 +894,7 @@ Initialize_Components_And_Key_Bindings()
     Selection_Priority(OPENGL_SELECTION::SEGMENTED_CURVE_VERTEX_3D)=79;
     Selection_Priority(OPENGL_SELECTION::SEGMENTED_CURVE_SEGMENT_3D)=78;
     Selection_Priority(OPENGL_SELECTION::GRID_NODE_3D)=70;
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    Selection_Priority(OPENGL_SELECTION::OCTREE_NODE)=70;
-    Selection_Priority(OPENGL_SELECTION::OCTREE_FACE)=65;
-#endif
     Selection_Priority(OPENGL_SELECTION::GRID_CELL_3D)=60;
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-    Selection_Priority(OPENGL_SELECTION::RLE_CELL_3D)=60;
-#endif
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    Selection_Priority(OPENGL_SELECTION::OCTREE_CELL)=60;
-#endif
 }
 
 template<class T,class RW> void VISUALIZATION<T,RW>::
@@ -1235,12 +911,6 @@ Update_OpenGL_Strings()
 template<class T,class RW> void VISUALIZATION<T,RW>::
 Pre_Frame_Extra()
 {
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-    if(rle_grid_component) rle_grid_component->Set_Frame(frame);
-#endif
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    if(octree_grid_component) octree_grid_component->Set_Frame(frame);
-#endif
     if(grid_component) grid_component->Set_Frame(frame);
 }
 
@@ -1274,17 +944,11 @@ Command_Prompt_Response()
             int id;
             if(sstream>>id){
                 OPENGL_SELECTION* selection=0;
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-                if(octree_grid_component){selection=octree_grid_component->opengl_grid.Get_Node_Selection(id);}
-#endif
                 if(selection){Set_Current_Selection(selection); Update_OpenGL_Strings();}}}
         else if(command=="c"){
             int id;
             if(sstream>>id){
                 OPENGL_SELECTION* selection=0;
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-                if(octree_grid_component){selection=octree_grid_component->opengl_grid.Get_Cell_Selection(id);}
-#endif
                 if(selection){Set_Current_Selection(selection); Update_OpenGL_Strings();}}}
     }
 }

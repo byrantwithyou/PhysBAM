@@ -4,7 +4,6 @@
 //#####################################################################
 #include <PhysBAM_Tools/Arrays_Computations/SORT.h>
 #include <PhysBAM_Tools/Data_Structures/PAIR.h>
-#include <PhysBAM_Tools/Grids_Dyadic/DYADIC_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
@@ -63,23 +62,6 @@ Write_Output_File(const std::string& file_name,const GRID<VECTOR<T,3> >& grid,co
 //#####################################################################
 // Function Write_Output_File
 //#####################################################################
-#ifdef COMPILE_WITH_BINTREE_SUPPORT
-template<class T> void GNUPLOT_OUTPUT::
-Write_Output_File(const std::string& file_name,const BINTREE_GRID<T>& grid,const ARRAY<T>& output,const int stepnumber)
-{
-    ARRAY<PAIR<T,int> > list_to_sort;
-    for(DYADIC_GRID_ITERATOR_CELL<BINTREE_GRID<T> > iterator(grid,0);iterator.Valid();iterator.Next()){
-        list_to_sort.Append(PAIR<T,int>(iterator.Location().x,iterator.Cell_Index()));}
-    Sort(list_to_sort);
-
-    std::ofstream Matlab_Output;Matlab_Output.open(STRING_UTILITIES::string_sprintf("%s.%d",file_name.c_str(),stepnumber).c_str());
-    for(int i=1;i<=list_to_sort.Size();++i) Matlab_Output<<list_to_sort(i).x<<"\t"<<output(list_to_sort(i).y)<<std::endl;
-    Matlab_Output.close();
-}
-#endif
-//#####################################################################
-// Function Write_Output_File
-//#####################################################################
 template<class T,int d> void GNUPLOT_OUTPUT::
 Write_Output_File(const std::string& file_name,const ARRAY_VIEW<VECTOR<T,d> >& X,const int stepnumber)
 {
@@ -104,9 +86,3 @@ INSTANTIATION_HELPER(float);
 INSTANTIATION_HELPER(double);
 #endif
 
-#ifdef COMPILE_WITH_BINTREE_SUPPORT
-template void GNUPLOT_OUTPUT::Write_Output_File(const std::string&,const BINTREE_GRID<float>&,const ARRAY<float>&,const int);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-template void GNUPLOT_OUTPUT::Write_Output_File(const std::string&,const BINTREE_GRID<double>&,const ARRAY<double>&,const int);
-#endif
-#endif

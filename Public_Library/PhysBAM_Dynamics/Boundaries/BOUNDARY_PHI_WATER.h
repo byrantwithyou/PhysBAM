@@ -9,9 +9,6 @@
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
-#include <PhysBAM_Tools/Grids_Dyadic_Boundaries/BOUNDARY_DYADIC.h>
-#include <PhysBAM_Tools/Grids_Dyadic_Boundaries/BOUNDARY_POLICY_DYADIC.h>
-#include <PhysBAM_Tools/Grids_RLE_Boundaries/BOUNDARY_POLICY_RLE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Dynamics/Boundaries/BOUNDARY_OPEN_CALLBACKS.h>
@@ -64,9 +61,6 @@ public:
 //#####################################################################
     void Fill_Ghost_Cells(const T_GRID& grid,const T_ARRAYS_BASE& u,T_ARRAYS_BASE& u_ghost,const T dt,const T time,const int number_of_ghost_cells); // uniform grids
     void Fill_Single_Ghost_Region_Threaded(RANGE<TV_INT>& region,const T_GRID& grid,T_ARRAYS_BASE& u_ghost,const int side);
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    void Fill_Ghost_Cells_Cell(const T_GRID& grid,const ARRAY<T>& u,ARRAY<T>& u_ghost,const T time); // dyadic grids
-#endif
 //#####################################################################
 };
 }

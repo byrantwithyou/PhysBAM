@@ -8,11 +8,11 @@
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Matrices/FRAME.h>
 #include <PhysBAM_Geometry/Basic_Geometry/BOUNDED_HORIZONTAL_PLANE.h>
+#include <PhysBAM_Geometry/Basic_Geometry/BOWL.h>
 #include <PhysBAM_Geometry/Basic_Geometry/CYLINDER.h>
 #include <PhysBAM_Geometry/Basic_Geometry/ORIENTED_BOX.h>
 #include <PhysBAM_Geometry/Basic_Geometry/PLANE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/RING.h>
-#include <PhysBAM_Geometry/Basic_Geometry/BOWL.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SMOOTH_GEAR.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TORUS.h>
@@ -27,6 +27,7 @@
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/MULTIBODY_LEVELSET_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
 #include <PhysBAM_Geometry/Tessellation/BOUNDED_HORIZONTAL_PLANE_TESSELLATION.h>
+#include <PhysBAM_Geometry/Tessellation/BOWL_TESSELLATION.h>
 #include <PhysBAM_Geometry/Tessellation/CYLINDER_TESSELLATION.h>
 #include <PhysBAM_Geometry/Tessellation/GEAR_TESSELLATION.h>
 #include <PhysBAM_Geometry/Tessellation/IMPLICIT_OBJECT_TESSELLATION.h>
@@ -34,22 +35,11 @@
 #include <PhysBAM_Geometry/Tessellation/PLANE_TESSELLATION.h>
 #include <PhysBAM_Geometry/Tessellation/RANGE_TESSELLATION.h>
 #include <PhysBAM_Geometry/Tessellation/RING_TESSELLATION.h>
-#include <PhysBAM_Geometry/Tessellation/BOWL_TESSELLATION.h>
 #include <PhysBAM_Geometry/Tessellation/SPHERE_TESSELLATION.h>
 #include <PhysBAM_Geometry/Tessellation/TORUS_TESSELLATION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/POINT_SIMPLICES_1D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-#include <PhysBAM_Geometry/Grids_Dyadic_Computations/DUALCONTOUR_OCTREE.h>
-#include <PhysBAM_Geometry/Grids_Dyadic_Level_Sets/LEVELSET_OCTREE.h>
-#include <PhysBAM_Geometry/Implicit_Objects_Dyadic/DYADIC_IMPLICIT_OBJECT.h>
-#endif
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-#include <PhysBAM_Geometry/Grids_RLE_Computations/DUALCONTOUR_RLE_3D.h>
-#include <PhysBAM_Geometry/Grids_RLE_Level_Sets/LEVELSET_RLE.h>
-#include <PhysBAM_Geometry/Implicit_Objects_RLE/RLE_IMPLICIT_OBJECT.h>
-#endif
 
 namespace PhysBAM{
 namespace TESSELLATION{
@@ -73,20 +63,6 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles_Helper(const MULTI
     triangulated_surfaces.Delete_Pointers_And_Clean_Memory();
     return union_object;
 }
-
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles_Helper(const DYADIC_IMPLICIT_OBJECT<VECTOR<T,3> >* implicit)
-{DUALCONTOUR_OCTREE<T> dual_contour(const_cast<LEVELSET_OCTREE<T>*>(&implicit->levelset));return dual_contour.Get_Triangulated_Surface();}
-#endif
-
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles_Helper(const RLE_IMPLICIT_OBJECT<VECTOR<T,3> >* implicit)
-{
-    typedef typename RLE_GRID_POLICY<VECTOR<T,3> >::RLE_GRID T_GRID;
-    return DUALCONTOUR_RLE_3D<T>::Create_Triangulated_Surface_From_Levelset(
-        const_cast<LEVELSET_RLE<T_GRID>&>(implicit->levelset),implicit->levelset.grid.number_of_ghost_cells);
-}
-#endif
 
 template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles_Helper(const IMPLICIT_OBJECT_COMBINED<VECTOR<T,3> >* implicit)
 {
@@ -139,12 +115,6 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(IMPLICIT_OBJECT<VE
     else if(const ANALYTIC_IMPLICIT_OBJECT<BOX<TV> >* implicit=dynamic_cast<const ANALYTIC_IMPLICIT_OBJECT<BOX<TV> >*>(&implicit_input)) return Generate_Triangles(implicit->analytic);
     else if(const ANALYTIC_IMPLICIT_OBJECT<TORUS<T> >* implicit=dynamic_cast<const ANALYTIC_IMPLICIT_OBJECT<TORUS<T> >*>(&implicit_input)) return Generate_Triangles(implicit->analytic);
     else if(const ANALYTIC_IMPLICIT_OBJECT<CYLINDER<T> >* implicit=dynamic_cast<const ANALYTIC_IMPLICIT_OBJECT<CYLINDER<T> >*>(&implicit_input)) return Generate_Triangles(implicit->analytic);
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    else if(const DYADIC_IMPLICIT_OBJECT<TV>* implicit=dynamic_cast<const DYADIC_IMPLICIT_OBJECT<TV>*>(&implicit_input)) return Generate_Triangles_Helper(implicit); 
-#endif
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-    else if(const RLE_IMPLICIT_OBJECT<TV>* implicit=dynamic_cast<const RLE_IMPLICIT_OBJECT<TV>*>(&implicit_input)) return Generate_Triangles_Helper(implicit); 
-#endif
     else{
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         LOG::cout<<"Trying to generate triangles on an object of type:\n\t"<<typeid(implicit_input).name()<<std::endl;

@@ -17,11 +17,9 @@
 #include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_1D.h>
 #include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_2D.h>
 #include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_3D.h>
-#include <PhysBAM_Geometry/Grids_Dyadic_Computations/LEVELSET_DYADIC_SIGNED_DISTANCE.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/LEVELSET_MAKER_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/TRIANGULATED_SURFACE_SIGNED_DISTANCE_UNIFORM.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
-#include <PhysBAM_Geometry/Implicit_Objects_Dyadic/DYADIC_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
 #include <PhysBAM_Geometry/Spatial_Acceleration/SEGMENT_HIERARCHY.h>
@@ -470,21 +468,6 @@ Initialize_From_Tetrahedralized_Volume_And_Triangulated_Surface(TETRAHEDRALIZED_
             levelset->levelset.phi+=shrink_levelset_amount;}
         else SIGNED_DISTANCE::Calculate(*triangulated_surface_condensed,levelset->levelset.grid,levelset->levelset.phi);
         IMPLICIT_OBJECT<TV>* implicit_surface=0;
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-        if(levels_of_octree){
-            int m=levelset->levelset.grid.counts.x>>(levels_of_octree-1),n=levelset->levelset.grid.counts.y>>(levels_of_octree-1),mn=levelset->levelset.grid.counts.z>>(levels_of_octree-1);
-            if(m%2==0)m++;if(n%2==0)n++;if(mn%2==0)mn++;
-            if(m<=1) m=3;if(n<=1) n=3;if(mn<=1) mn=3;
-            if(m>3&&n>3&&mn>3){ //create the levelset only if the body is sufficiently large
-                DYADIC_IMPLICIT_OBJECT<TV>* octree_levelset=DYADIC_IMPLICIT_OBJECT<TV>::Create();
-                VECTOR<T,3> margin=levelset->levelset.grid.domain.Edge_Lengths()-levelset->levelset.grid.dX.Min()*VECTOR<T,3>(levelset->levelset.grid.Domain_Indices().Edge_Lengths());
-                RANGE<TV> box=levelset->levelset.grid.domain+RANGE<TV>(-margin,margin);
-                octree_levelset->levelset.grid.Initialize(GRID<TV>(m,n,mn,box),levels_of_octree,4,true,false);
-                SIGNED_DISTANCE::Calculate(levelset->levelset,octree_levelset->levelset.grid,octree_levelset->levelset.phi);
-                implicit_surface=octree_levelset;}
-            delete levelset;}
-        else
-#endif
             implicit_surface=levelset;
         if(implicit_surface) Add_Structure(*implicit_surface);}
 }

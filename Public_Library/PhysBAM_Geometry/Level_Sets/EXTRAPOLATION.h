@@ -11,12 +11,6 @@
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Math_Tools/constants.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-#include <PhysBAM_Tools/Grids_Dyadic_Boundaries/BOUNDARY_POLICY_DYADIC.h>
-#endif
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-#include <PhysBAM_Tools/Grids_RLE_Boundaries/BOUNDARY_POLICY_RLE.h>
-#endif
 namespace PhysBAM{
 
 template<class T_GRID> struct GRID_ARRAYS_POLICY;

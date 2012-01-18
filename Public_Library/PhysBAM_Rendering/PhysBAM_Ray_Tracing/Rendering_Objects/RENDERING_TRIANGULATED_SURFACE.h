@@ -17,8 +17,6 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry_Intersections/RAY_TRIANGULATED_SURFACE_INTERSECTION.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_OBJECT.h>
-#include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Shaders/RENDERING_BSSRDF_SHADER.h>
-#include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Shaders/SUBSURFACE_SCATTERING_SAMPLED_IRRADIANCE.h>
 namespace PhysBAM{
 
 template<class T> class RENDERING_BSSRDF_SHADER;
@@ -29,9 +27,6 @@ class RENDERING_TRIANGULATED_SURFACE:public RENDERING_OBJECT<T>
     typedef VECTOR<T,3> TV;
 public:
     using RENDERING_OBJECT<T>::small_number;using RENDERING_OBJECT<T>::transform;using RENDERING_OBJECT<T>::material_shader;
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    using RENDERING_OBJECT<T>::bssrdf_tree;using RENDERING_OBJECT<T>::bssrdf_shader;
-#endif
     using RENDERING_OBJECT<T>::flip_normal;using RENDERING_OBJECT<T>::World_Space_Bounding_Box;using RENDERING_OBJECT<T>::name;using RENDERING_OBJECT<T>::two_sided;
     using RENDERING_OBJECT<T>::Inside;using RENDERING_OBJECT<T>::Intersection;using RENDERING_OBJECT<T>::Object_Space_Ray;using RENDERING_OBJECT<T>::Object_Space_Point;
     using RENDERING_OBJECT<T>::Object_Space_Vector;using RENDERING_OBJECT<T>::World_Space_Vector;using RENDERING_OBJECT<T>::World_Space_Point;
@@ -58,9 +53,6 @@ public:
 
     virtual ~RENDERING_TRIANGULATED_SURFACE()
     {
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    delete bssrdf_tree;
-#endif
     delete texture_coordinates;delete triangle_texture_coordinates;delete tangent_vectors;}
 
     bool Intersection(RAY<TV>& ray) const PHYSBAM_OVERRIDE
@@ -169,32 +161,6 @@ public:
     {T x_rescaled=(*texture_coordinates)(i).x*scale,y_rescaled=(*texture_coordinates)(i).y*scale;
     (*texture_coordinates)(i).x=x_rescaled-floor(x_rescaled);
     (*texture_coordinates)(i).y=y_rescaled-floor(y_rescaled);}}
-
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    void Generate_BSSRDF_Tree(RENDER_WORLD<T>& world)  PHYSBAM_OVERRIDE
-    {LOG::SCOPE scope("BSSRDF Irradiance Precomputation","BSSRDF Irradiance Precomputation %s",name.c_str());
-    bssrdf_tree=new SUBSURFACE_SCATTERING_SAMPLED_IRRADIANCE<T>(bssrdf_shader->samples_per_octree_cell,bssrdf_shader->error_criterion);
-    if(!bssrdf_shader->use_irradiance_cache_file || !FILE_UTILITIES::File_Exists(bssrdf_shader->irradiance_cache_filename)){
-        LOG::Time("Initialize irradiance samples");
-        if(sample_locations_file.length())bssrdf_tree->template Initialize_Sample_Locations_From_File<float>(sample_locations_file,triangulated_surface);
-        else bssrdf_tree->Initialize_Sample_Locations_From_Vertices(triangulated_surface);
-        LOG::Time("Compute irradiance");
-        PROGRESS_INDICATOR progress(bssrdf_tree->samples.m);
-        int flip_normal_factor=(flip_normal==true)?-1:1;
-        for(int i=1;i<=bssrdf_tree->samples.m;++i){
-            progress.Progress();
-            bssrdf_tree->samples(i).position=World_Space_Point(bssrdf_tree->samples(i).position);
-            bssrdf_tree->samples(i).normal=World_Space_Vector(bssrdf_tree->samples(i).normal)*(T)(flip_normal_factor);
-            bssrdf_tree->samples(i).transmitted_irradiance=bssrdf_shader->Calculate_Surface_Irradiance(bssrdf_tree->samples(i).position,bssrdf_tree->samples(i).normal,world,*this);
-            bssrdf_tree->samples(i).transmitted_irradiance_product=bssrdf_tree->samples(i).transmitted_irradiance*bssrdf_tree->samples(i).area;}
-        bssrdf_tree->bounding_box=RANGE<TV>::Bounding_Box(bssrdf_tree->samples.template Project<TV,&SUBSURFACE_SCATTERING_IRRADIANCE_SAMPLE<T>::position>());
-        if(bssrdf_shader->use_irradiance_cache_file){
-            LOG::Time("Storing Irradiance Cache File");
-            FILE_UTILITIES::Write_To_File<T>(bssrdf_shader->irradiance_cache_filename,*bssrdf_tree);
-            LOG::Stop_Time();}}
-    else{LOG::Time(STRING_UTILITIES::string_sprintf("Reading Irradiance Cache File %s",bssrdf_shader->irradiance_cache_filename.c_str()));FILE_UTILITIES::Read_From_File<T>(bssrdf_shader->irradiance_cache_filename,*bssrdf_tree);}
-    bssrdf_tree->Build_Octree();}
-#endif
 
     void Initialize_Bump_Map(const std::string& filename)
     {IMAGE<T>::Read(filename,bump_map_pixels);grid.Initialize(bump_map_pixels.counts,RANGE<VECTOR<T,2> >::Unit_Box());} 

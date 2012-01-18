@@ -6,9 +6,9 @@
 //#####################################################################
 #include <PhysBAM_Tools/Ordinary_Differential_Equations/EXAMPLE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/BOUNDED_HORIZONTAL_PLANE.h>
+#include <PhysBAM_Geometry/Basic_Geometry/BOWL.h>
 #include <PhysBAM_Geometry/Basic_Geometry/CYLINDER.h>
 #include <PhysBAM_Geometry/Basic_Geometry/RING.h>
-#include <PhysBAM_Geometry/Basic_Geometry/BOWL.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SMOOTH_GEAR.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TORUS.h>
@@ -16,12 +16,12 @@
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
+#include <PhysBAM_Geometry/Tessellation/BOWL_TESSELLATION.h>
 #include <PhysBAM_Geometry/Tessellation/CYLINDER_TESSELLATION.h>
 #include <PhysBAM_Geometry/Tessellation/GEAR_TESSELLATION.h>
 #include <PhysBAM_Geometry/Tessellation/IMPLICIT_OBJECT_TESSELLATION.h>
 #include <PhysBAM_Geometry/Tessellation/RANGE_TESSELLATION.h>
 #include <PhysBAM_Geometry/Tessellation/RING_TESSELLATION.h>
-#include <PhysBAM_Geometry/Tessellation/BOWL_TESSELLATION.h>
 #include <PhysBAM_Geometry/Tessellation/SPHERE_TESSELLATION.h>
 #include <PhysBAM_Geometry/Tessellation/TORUS_TESSELLATION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>

@@ -3,8 +3,8 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include "../Instantiation_Helpers.h"
-#include "Multiplication_And_Dot_Product_Helper.h"
 #include "../Thread_Queueing/PTHREAD_QUEUE.h"
+#include "Multiplication_And_Dot_Product_Helper.h"
 using namespace PhysBAM;
 extern PTHREAD_QUEUE* pthread_queue;
 //#####################################################################

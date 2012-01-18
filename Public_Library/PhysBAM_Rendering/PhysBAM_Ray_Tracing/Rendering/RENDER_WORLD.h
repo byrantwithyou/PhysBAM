@@ -16,12 +16,8 @@
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering/RGB_COLORS.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_OBJECT.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Shaders/RENDERING_UNIFORM_COLOR_SHADER.h>
-#include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Shaders/SUBSURFACE_SCATTERING_SAMPLED_IRRADIANCE.h>
 namespace PhysBAM{
 
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-template<class T> class IRRADIANCE_CACHE;
-#endif
 template<class T> class RENDERING_LIGHT;
 template<class T> class RENDERING_OBJECT;
 template<class T> class RAY_TRACER_DEBUG_DATA;
@@ -45,9 +41,6 @@ public:
     T ray_contribution_limit;
     bool debug_mode;
     bool use_photon_mapping;
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    bool use_irradiance_cache;
-#endif
     bool use_adaptive_supersampling;
     int adaptive_supersampling_depth_limit;
     T adaptive_supersampling_tolerance;
@@ -55,9 +48,6 @@ public:
     T max_photon_distance;
     int number_of_photons_for_estimate;
     PHOTON_MAP<T> global_photon_map,caustic_photon_map,volume_photon_map;
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    IRRADIANCE_CACHE<T> irradiance_cache;
-#endif
     MATERIAL_SHADER<T>* background_shader;
     RENDERING_UNIFORM_COLOR_SHADER<T>* default_background_shader;
     int threads;
@@ -113,15 +103,9 @@ public:
     void Cast_Photon(RENDERING_RAY<T>& ray,const RENDERING_RAY<T>& parent_ray,const TV& power,const typename PHOTON_MAP<T>::PHOTON_MAP_TYPE type,
         const int diffuse_bounces,const int specular_bounces);
     void Use_Photon_Mapping(const int global_photons,const int caustic_photons,const int volume_photons,const T max_photon_distance,const int number_of_photons_for_estimate);
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    void Use_Irradiance_Cache(const bool use_irradiance_cache_input,const T irradiance_cache_max_distance_input,const int irradiance_cache_samples_input);
-#endif
     void Use_Adaptive_Supersampling(const bool use_adaptive_supersampling_input,const T supersampling_tolerance, const int supersampling_depth_limit);
     void Prepare_For_Forward_Ray_Trace();
     void Shoot_Photons_From_Light_For_Specific_Map(RENDERING_RAY<T>& ray,int light_index,PHOTON_MAP<T>& map,int photon_budget,typename PHOTON_MAP<T>::PHOTON_MAP_TYPE type);
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    void Prepare_BSSRDF_Octree();
-#endif
  private:
     TV Attenuate_Ray(RENDERING_RAY<T>& ray,const TV& color);
     TV Attenuate_Light_Ray(RENDERING_RAY<T>& ray,const RENDERING_LIGHT<T>& light,const TV& color);
@@ -129,5 +113,4 @@ public:
 //#####################################################################
 };
 }
-#include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering/IRRADIANCE_CACHE.h>
 #endif

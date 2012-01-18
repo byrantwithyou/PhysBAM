@@ -10,12 +10,6 @@
 #include <PhysBAM_Tools/Advection/ADVECTION.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_COLLECTION_POLICY_UNIFORM.h>
 #include <PhysBAM_Geometry/Interpolation_Collidable/INTERPOLATION_COLLIDABLE_POLICY.h>
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-#include <PhysBAM_Geometry/Grids_Dyadic_Collisions/GRID_BASED_COLLISION_GEOMETRY_COLLECTION_POLICY_DYADIC.h>
-#endif
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-#include <PhysBAM_Geometry/Grids_RLE_Collisions/GRID_BASED_COLLISION_GEOMETRY_COLLECTION_POLICY_RLE.h>
-#endif
 
 namespace PhysBAM{
 

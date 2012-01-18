@@ -4,39 +4,20 @@
 //#####################################################################
 // Class INCOMPRESSIBLE
 //#####################################################################
-#include <PhysBAM_Tools/Grids_Dyadic/DYADIC_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Dyadic/DYADIC_GRID_ITERATOR_FACE.h>
-#include <PhysBAM_Tools/Grids_Dyadic/DYADIC_GRID_ITERATOR_NODE.h>
-#include <PhysBAM_Tools/Grids_Dyadic_Advection/ADVECTION_SEMI_LAGRANGIAN_DYADIC.h>
-#include <PhysBAM_Tools/Grids_Dyadic_Interpolation/LINEAR_INTERPOLATION_DYADIC.h>
-#include <PhysBAM_Tools/Grids_Dyadic_Interpolation/LINEAR_INTERPOLATION_DYADIC_HELPER.h>
-#include <PhysBAM_Tools/Grids_RLE_Advection/ADVECTION_SEMI_LAGRANGIAN_RLE.h>
-#include <PhysBAM_Tools/Grids_RLE_Interpolation/AVERAGING_RLE.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM_DEFINITION.h>
 #include <PhysBAM_Geometry/Advection_Collidable/ADVECTION_WRAPPER_COLLIDABLE_FACE.h>
-#include <PhysBAM_Geometry/Grids_Dyadic_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_DYADIC.h>
-#include <PhysBAM_Geometry/Grids_RLE_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_RLE.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_SLIP_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Interpolation_Collidable/FACE_LOOKUP_COLLIDABLE_SLIP_UNIFORM.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/INCOMPRESSIBLE.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/INCOMPRESSIBLE_POLICY.h>
-#include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/PROJECTION_DYADIC.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/PROJECTION_DYNAMICS_UNIFORM.h>
-#include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/PROJECTION_RLE.h>
-#include <PhysBAM_Dynamics/Advection_Equations/ADVECTION_WRAPPER_FIRE_DYADIC.h>
-#include <PhysBAM_Dynamics/Advection_Equations/ADVECTION_WRAPPER_FIRE_MULTIPHASE_DYADIC.h>
-#include <PhysBAM_Dynamics/Advection_Equations/ADVECTION_WRAPPER_FIRE_MULTIPHASE_RLE.h>
 #include <PhysBAM_Dynamics/Advection_Equations/ADVECTION_WRAPPER_FIRE_MULTIPHASE_UNIFORM.h>
-#include <PhysBAM_Dynamics/Advection_Equations/ADVECTION_WRAPPER_FIRE_RLE.h>
-#include <PhysBAM_Dynamics/Interpolation/FACE_LOOKUP_FIRE_MULTIPHASE_DYADIC.h>
-#include <PhysBAM_Dynamics/Interpolation/FACE_LOOKUP_FIRE_MULTIPHASE_RLE.h>
 #include <PhysBAM_Dynamics/Interpolation/FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM.h>
-#include <PhysBAM_Dynamics/Interpolation/FACE_LOOKUP_FIRE_RLE.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
@@ -126,14 +107,6 @@ INSTANTIATION_HELPER(float,P(GRID<VECTOR<float,3> >),3);
 template class INCOMPRESSIBLE<GRID<VECTOR<float,1> > >;
 template class INCOMPRESSIBLE<GRID<VECTOR<float,2> > >;
 template class INCOMPRESSIBLE<GRID<VECTOR<float,3> > >;
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-template class INCOMPRESSIBLE<OCTREE_GRID<float> >;
-template class INCOMPRESSIBLE<QUADTREE_GRID<float> >;
-#endif
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-template class INCOMPRESSIBLE<RLE_GRID_2D<float> >;
-template class INCOMPRESSIBLE<RLE_GRID_3D<float> >;
-#endif
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 INSTANTIATION_HELPER(double,P(GRID<VECTOR<double,1> >),2);
 INSTANTIATION_HELPER(double,P(GRID<VECTOR<double,2> >),2);
@@ -141,12 +114,4 @@ INSTANTIATION_HELPER(double,P(GRID<VECTOR<double,3> >),3);
 template class INCOMPRESSIBLE<GRID<VECTOR<double,1> > >;
 template class INCOMPRESSIBLE<GRID<VECTOR<double,2> > >;
 template class INCOMPRESSIBLE<GRID<VECTOR<double,3> > >;
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-template class INCOMPRESSIBLE<OCTREE_GRID<double> >;
-template class INCOMPRESSIBLE<QUADTREE_GRID<double> >;
-#endif
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-template class INCOMPRESSIBLE<RLE_GRID_2D<double> >;
-template class INCOMPRESSIBLE<RLE_GRID_3D<double> >;
-#endif
 #endif

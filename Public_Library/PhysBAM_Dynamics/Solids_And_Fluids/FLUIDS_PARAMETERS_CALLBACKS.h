@@ -15,11 +15,8 @@
 namespace PhysBAM{
 
 template<class T,int d> class VECTOR;
-template<class T> class QUADTREE_CELL;
-template<class T> class OCTREE_CELL;
 template<class TV> class PARTICLE_LEVELSET_PARTICLES;
 template<class TV> class PARTICLE_LEVELSET;
-template<class T_GRID> class PROJECTION_DYADIC;
 template<class T_GRID> class LAPLACE_UNIFORM;
 template<class T_GRID> struct GRID_ARRAYS_POLICY;
 
@@ -48,7 +45,6 @@ public:
     virtual void Get_Source_Velocities_Masked(const T time,const T_FACE_ARRAYS_BOOL& invalid_mask){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
     virtual void Get_Source_Reseed_Mask(T_ARRAYS_BOOL*& cell_centered_mask,const T time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();} // allocate mask and set to true where local reseeding should occur
     virtual void Get_Object_Velocities(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    virtual void Get_Object_Velocities(PROJECTION_DYADIC<T_GRID>& projection,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
     virtual void Get_Object_Velocities(LAPLACE_UNIFORM<T_GRID>* elliptic_solver,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
     virtual void Get_Analytic_Velocities(const T time) const {PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
     virtual void Set_Dirichlet_Boundary_Conditions(const T time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}

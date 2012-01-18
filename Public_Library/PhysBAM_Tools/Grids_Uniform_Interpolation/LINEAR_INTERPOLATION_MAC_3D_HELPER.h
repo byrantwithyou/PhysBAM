@@ -14,8 +14,6 @@
 #include <PhysBAM_Tools/Vectors/VECTOR_2D.h>
 namespace PhysBAM{
 
-template<class T_GRID> class DYADIC_GRID_ITERATOR_FACE;
-
 template<class T_GRID>
 class LINEAR_INTERPOLATION_MAC_3D_HELPER
 {

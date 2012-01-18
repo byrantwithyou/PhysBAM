@@ -12,10 +12,6 @@
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_2D.h>
 namespace PhysBAM{
 
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-template<class T> class RED_GREEN_GRID_2D;
-#endif
-
 template<class T,class RW=T>
 class OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D:public OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_2D<T,RW>
 {
@@ -38,13 +34,7 @@ public:
     DEFORMABLE_BODY_COLLECTION<TV> deformable_body_collection;
     ARRAY<OPENGL_SEGMENTED_CURVE_2D<T>*> embedded_curve_objects;
     bool has_embedded_objects;
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    ARRAY<RED_GREEN_GRID_2D<T>*> grid_list;
-#endif
     ARRAY<ARRAY<T>*> phi_list;
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    ARRAY<OPENGL_ADAPTIVE_NODE_SCALAR_FIELD<RED_GREEN_GRID_2D<T> >*> phi_objects;
-#endif
 
     OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D(const std::string& prefix,const int start_frame);
     virtual ~OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D();

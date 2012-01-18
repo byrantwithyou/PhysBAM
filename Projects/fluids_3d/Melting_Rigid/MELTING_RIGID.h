@@ -9,13 +9,13 @@
 
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Geometry/Basic_Geometry/CYLINDER.h>
-#include <PhysBAM_Geometry/Red_Green/RED_GREEN_GRID_3D.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TETRAHEDRON_COLLISION_BODY.h>
 #include "../../solids/Embedded_Sphere/ANALYTIC_SPHERE.h"
 #include "../../solids/Embedded_Torus/ANALYTIC_TORUS.h"
 #include "../WATER_MELTING_EXAMPLE_3D.h"
 #include <Heat_Flows/HEAT_3D.h>
 #include <Level_Sets/EXTRAPOLATION_3D.h>
+#include <PhysBAM_Geometry/Red_Green/RED_GREEN_GRID_3D.h>
 #include <Rigid_Bodies/RIGID_BODY_LIST.h>
 namespace PhysBAM{
 

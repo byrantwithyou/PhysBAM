@@ -7,8 +7,8 @@
 #ifndef __RC_EXTRAPOLATED__
 #define __RC_EXTRAPOLATED__
 
-#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/ISOTROPIC_CONSTITUTIVE_MODEL.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/GENERAL_ENERGY.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/ISOTROPIC_CONSTITUTIVE_MODEL.h>
 namespace PhysBAM{
 
 using ::std::log;

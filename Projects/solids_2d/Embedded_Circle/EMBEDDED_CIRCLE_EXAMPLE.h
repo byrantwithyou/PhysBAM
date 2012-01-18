@@ -8,11 +8,11 @@
 #define __EMBEDDED_CIRCLE_EXAMPLE__
 
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
-#include <PhysBAM_Geometry/Red_Green/RED_GREEN_GRID_2D.h>
 #include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 #include <Constitutive_Models/DIAGONALIZED_SPLINE_MODEL_2D.h>
 #include <Forces_And_Torques/BODY_FORCES_2D.h>
 #include <Forces_And_Torques/DIAGONALIZED_FINITE_VOLUME_2D.h>
+#include <PhysBAM_Geometry/Red_Green/RED_GREEN_GRID_2D.h>
 namespace PhysBAM{
 
 template<class T,class RW>

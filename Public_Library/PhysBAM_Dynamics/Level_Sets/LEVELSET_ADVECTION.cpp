@@ -2,19 +2,11 @@
 // Copyright 2009, Ronald Fedkiw, Frederic Gibou, Geoffrey Irving, Frank Losasso, Neil Molino, Avi Robinson-Mosher, Tamar Shinar, Elliot English.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Grids_Dyadic_Interpolation/AVERAGING_DYADIC.h>
-#include <PhysBAM_Tools/Grids_Dyadic_Interpolation/INTERPOLATION_POLICY_DYADIC.h>
-#include <PhysBAM_Tools/Grids_Dyadic_Interpolation/LINEAR_INTERPOLATION_DYADIC.h>
-#include <PhysBAM_Tools/Grids_RLE_Interpolation/INTERPOLATION_POLICY_RLE.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_SEPARABLE_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/INTERPOLATION_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Polynomials/CUBIC.h>
 #include <PhysBAM_Geometry/Advection_Collidable/ADVECTION_WRAPPER_COLLIDABLE_CELL.h>
-#include <PhysBAM_Geometry/Grids_Dyadic_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_DYADIC.h>
-#include <PhysBAM_Geometry/Grids_Dyadic_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_DYADIC.h>
-#include <PhysBAM_Geometry/Grids_RLE_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_RLE.h>
-#include <PhysBAM_Geometry/Grids_RLE_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_RLE.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_BINARY_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM.h>
@@ -85,24 +77,8 @@ HJ_ENO(const int order,const int m,const SCALAR dx,const ARRAY<SCALAR,VECTOR<int
 template class LEVELSET_ADVECTION<GRID<VECTOR<float,1> > >;
 template class LEVELSET_ADVECTION<GRID<VECTOR<float,2> > >;
 template class LEVELSET_ADVECTION<GRID<VECTOR<float,3> > >;
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-template class LEVELSET_ADVECTION<OCTREE_GRID<float> >;
-template class LEVELSET_ADVECTION<QUADTREE_GRID<float> >;
-#endif
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-template class LEVELSET_ADVECTION<RLE_GRID_2D<float> >;
-template class LEVELSET_ADVECTION<RLE_GRID_3D<float> >;
-#endif
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class LEVELSET_ADVECTION<GRID<VECTOR<double,1> > >;
 template class LEVELSET_ADVECTION<GRID<VECTOR<double,2> > >;
 template class LEVELSET_ADVECTION<GRID<VECTOR<double,3> > >;
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-template class LEVELSET_ADVECTION<OCTREE_GRID<double> >;
-template class LEVELSET_ADVECTION<QUADTREE_GRID<double> >;
-#endif
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-template class LEVELSET_ADVECTION<RLE_GRID_2D<double> >;
-template class LEVELSET_ADVECTION<RLE_GRID_3D<double> >;
-#endif
 #endif

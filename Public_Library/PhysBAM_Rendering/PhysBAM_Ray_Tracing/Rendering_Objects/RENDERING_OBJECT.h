@@ -17,7 +17,6 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering/RENDERING_RAY.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_OBJECT_ACCELERATION_PRIMITIVE.h>
-#include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Shaders/SUBSURFACE_SCATTERING_SAMPLED_IRRADIANCE.h>
 #include <iostream>
 #include <string>
 namespace PhysBAM{
@@ -44,17 +43,11 @@ public:
     VOLUMETRIC_SHADER<T>* volumetric_shader;
     bool two_sided;
     bool flip_normal;
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    SUBSURFACE_SCATTERING_SAMPLED_IRRADIANCE<T>* bssrdf_tree;
-#endif
     RENDERING_BSSRDF_SHADER<T>* bssrdf_shader;
 
     RENDERING_OBJECT()
         :add_to_spatial_partition(false),index_of_refraction(1),priority(0),support_transparent_overlapping_objects(false),material_shader(0),volumetric_shader(0),two_sided(true),
          flip_normal(false),
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-        bssrdf_tree(0),
-#endif
         bssrdf_shader(0)
     {
         small_number=Default_Small_Number();

@@ -9,9 +9,7 @@
 
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
-#include <PhysBAM_Geometry/Implicit_Objects_Dyadic/DYADIC_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
-#include <PhysBAM_Geometry/Read_Write/Implicit_Objects_Dyadic/READ_WRITE_DYADIC_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Read_Write/Implicit_Objects_Uniform/READ_WRITE_LEVELSET_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <PhysBAM_Dynamics/Meshing/TETRAHEDRAL_MESHING.h>
@@ -49,13 +47,7 @@ protected:
     GRID<TV> levelset_grid; // for levelset_implicit_surface
     ARRAY<T,VECTOR<int,3> > phi3d; // for levelset_implicit_surface
     LEVELSET_IMPLICIT_OBJECT<TV> levelset_implicit_surface;
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    OCTREE_GRID<T> octree_grid; // for octree_implicit_surface
-#endif
     ARRAY<T> phi1d; // for octree_implicit_surface
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    DYADIC_IMPLICIT_OBJECT<TV> octree_implicit_surface;
-#endif
     MULTIPLE_LEVELSET_IMPLICIT_SURFACE<T> multiple_levelset_implicit_surface;
 public:
 
@@ -70,9 +62,6 @@ public:
         time_step((T).25),number_of_force_steps(40),number_of_velocity_steps(360),use_global_quality_criteria_for_early_exit(true),
         replace_green_refinement_with_embedded_t_junctions(false),allow_coarsening_to_non_graded_mesh(false),
         levelset_implicit_surface(levelset_grid,phi3d)
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-        ,octree_grid(),octree_implicit_surface(octree_grid,phi1d)
-#endif
     {
         tetrahedral_meshing.Use_Dynamic_Ether_Viscosity((T).5);
     }
@@ -86,15 +75,6 @@ public:
 virtual void Initialize_Implicit_Surface()
 {
     // read octree or levelset implicit surface from file
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    if(use_octree_implicit_surface){
-        FILE_UTILITIES::Read_From_File(stream_type,implicit_surface_filename,octree_implicit_surface);
-        tetrahedral_meshing.Initialize(&octree_implicit_surface);
-        octree_implicit_surface.levelset.grid.Update_Maximum_Depth();
-        octree_implicit_surface.Update_Minimum_Cell_Size(octree_implicit_surface.levelset.grid.maximum_depth);
-        octree_implicit_surface.levelset.grid.Node_Iterator_Data();}  
-    else
-#endif
         if(use_multiple_levelset_implicit_surface){
         LOG::Time("reading secondary levelset files");
         FILE_UTILITIES::Create_From_File(stream_type,implicit_surface_filename,multiple_levelset_implicit_surface.primary_levelset);

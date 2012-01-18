@@ -1,5 +1,4 @@
 #include <PhysBAM_Tools/Data_Structures/OPERATION_HASH.h>
-#include <PhysBAM_Tools/Grids_Dyadic/OCTREE_GRID.h>
 #include <PhysBAM_Tools/Log/PROGRESS_INDICATOR.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
@@ -14,6 +13,7 @@
 #include "../../Public_Library/Rigid_Bodies/RIGID_BODY_LIST_3D.h"
 #include "PARTICLE_BLENDER.h"
 #include <PhysBAM_Geometry/Level_Sets/IMPLICIT_SURFACE_MAKER.h>
+#include <PhysBAM_Tools/Grids_Dyadic/OCTREE_GRID.h>
 
 using namespace PhysBAM;
 

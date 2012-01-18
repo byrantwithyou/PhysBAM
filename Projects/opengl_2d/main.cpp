@@ -2,7 +2,6 @@
 // Copyright 2003-2009, Zhaosheng Bao, Jon Gretarsson, Eran Guendelman, Geoffrey Irving, Nipun Kwatra, Michael Lentine, Frank Losasso, Nick Rasmussen, Avi Robinson-Mosher, Craig Schroeder, Andrew Selle, Andrew Selle, Tamar Shinar, Jonathan Su, Jerry Talton, Joseph Teran, Rachel Weinstein.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Grids_RLE/RLE_GRID_ITERATOR_CELL_2D.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Read_Write/Grids_Uniform/READ_WRITE_GRID.h>
@@ -19,7 +18,6 @@
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_LEVELSET_COLOR_MAP.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_SEGMENTED_CURVE_2D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_WORLD.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_ADAPTIVE_NODE_SCALAR_FIELD.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_BASIC.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_DEBUG_PARTICLES_2D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D.h>
@@ -27,13 +25,6 @@
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_LEVELSET_2D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_PARTICLES_2D.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_QUADTREE_CELL_SCALAR_FIELD.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_QUADTREE_FACE_SCALAR_FIELD.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_QUADTREE_GRID.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_QUADTREE_NODE_VECTOR_FIELD.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_RLE_CELL_SCALAR_FIELD_2D.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_RLE_FACE_SCALAR_FIELD_2D.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_RLE_GRID_2D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_SCALAR_FIELD_2D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_2D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D.h>
@@ -98,12 +89,6 @@ private:
     OPENGL_COMPONENT_PARTICLES_2D<T,PARTICLE_LEVELSET_REMOVED_PARTICLES<TV> >* removed_positive_particles_component;
     OPENGL_COMPONENT_PARTICLES_2D<T,PARTICLE_LEVELSET_REMOVED_PARTICLES<TV> >* removed_negative_particles_component;
     OPENGL_COMPONENT_BASIC<OPENGL_GRID_2D<T> >* grid_component,*coarse_grid_component;
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    OPENGL_COMPONENT_QUADTREE_GRID<T>* quadtree_grid_component;
-#endif
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-    OPENGL_COMPONENT_RLE_GRID_2D<T>* rle_grid_component;
-#endif
     OPENGL_COMPONENT_REFINEMENT_GRID_2D<T>* sub_grids_component;
     // Options
     std::string basedir;
@@ -111,12 +96,6 @@ private:
     GRID<TV> grid,mac_grid,regular_grid,coarse_grid,coarse_mac_grid,coarse_regular_grid;
     bool has_valid_grid;
     bool has_valid_sub_grids;
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-    bool has_valid_rle_grid;
-#endif
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    bool has_valid_quadtree_grid;
-#endif
     bool has_valid_coarse_grid;
     bool node_based,coarse_node_based;
 
@@ -132,12 +111,6 @@ OPENGL_2D_VISUALIZATION()
     pressure_component(0),coarse_pressure_component(0),positive_particles_component(0),negative_particles_component(0),
     removed_positive_particles_component(0),removed_negative_particles_component(0),
     grid_component(0),coarse_grid_component(0)
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    ,quadtree_grid_component(0)
-#endif
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-    ,rle_grid_component(0)
-#endif
 {
     add_axes=false;
 }
@@ -148,12 +121,6 @@ template<class T,class RW> OPENGL_2D_VISUALIZATION<T,RW>::
 ~OPENGL_2D_VISUALIZATION()
 {
     delete grid_component;
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-    delete rle_grid_component;
-#endif
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    delete quadtree_grid_component;
-#endif
     delete coarse_grid_component;
 }
 //#####################################################################
@@ -217,27 +184,6 @@ Read_Grid()
     // For backwards compatibility
     if(!FILE_UTILITIES::File_Exists(filename)) filename=STRING_UTILITIES::string_sprintf("%s/%d/levelset.phi",basedir.c_str(),start_frame);
     if(!FILE_UTILITIES::File_Exists(filename)) filename=STRING_UTILITIES::string_sprintf("%s/%d/levelset_1",basedir.c_str(),start_frame);
-
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-    has_valid_rle_grid=false;
-    std::string rle_filename=STRING_UTILITIES::string_sprintf("%s/%d/rle_grid",basedir.c_str(),start_frame);
-    if(FILE_UTILITIES::File_Exists(rle_filename)){
-        LOG::cout<<"Reading rle grid '"<<rle_filename<<"'"<<std::endl<<std::flush;
-        rle_filename=STRING_UTILITIES::string_sprintf("%s/rle_grid.%%d",basedir.c_str());
-        rle_grid_component=new OPENGL_COMPONENT_RLE_GRID_2D<T>(rle_filename);
-        // Add_Component(rle_grid_component); // add later instead of here, but Pre_Frame_Extra will ensure rle grid is read in
-        has_valid_rle_grid=true;}
-#endif
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    has_valid_quadtree_grid=false;
-    std::string quadtree_filename=STRING_UTILITIES::string_sprintf("%s/%d/quadtree_grid",basedir.c_str(),start_frame);
-    if(FILE_UTILITIES::File_Exists(quadtree_filename)){
-        LOG::cout<<"Reading quadtree '"<<quadtree_filename<<"'"<<std::endl<<std::flush;
-        quadtree_filename=STRING_UTILITIES::string_sprintf("%s/quadtree_grid.%%d",basedir.c_str());
-        quadtree_grid_component=new OPENGL_COMPONENT_QUADTREE_GRID<T>(quadtree_filename);
-        // Add_Component(quadtree_grid_component); // add later instead of here, but Pre_Frame_Extra will ensure quadtree grid is read in
-        has_valid_quadtree_grid=true;}
-#endif
 
     if(FILE_UTILITIES::File_Exists(basedir+"/common/coarse_grid")){
         coarse_filename=basedir+"/common/coarse_grid";
@@ -314,16 +260,6 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key('D',soot_component->Toggle_Color_Map_CB());
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F8),soot_component->Toggle_Draw_Mode_CB());
         opengl_world.Append_Bind_Key('`',soot_component->Toggle_Smooth_CB());}
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    filename=basedir+"/%d/quadtree_density";
-    if(has_valid_quadtree_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_ADAPTIVE_NODE_SCALAR_FIELD<QUADTREE_GRID<T> >* quadtree_density_component=new OPENGL_COMPONENT_ADAPTIVE_NODE_SCALAR_FIELD<QUADTREE_GRID<T> >(quadtree_grid_component->opengl_grid.grid,filename,
-            OPENGL_COLOR_RAMP<T>::Two_Color_Ramp(0,1,OPENGL_COLOR::Gray(0,0),OPENGL_COLOR::Gray(1,1)));
-        opengl_world.Set_Key_Binding_Category("Density");
-        Add_Component(quadtree_density_component,"Quadtree Density",'d',BASIC_VISUALIZATION::OWNED);
-        opengl_world.Append_Bind_Key('+',quadtree_density_component->Increase_Point_Size_CB());
-        opengl_world.Append_Bind_Key('_',quadtree_density_component->Decrease_Point_Size_CB());}
-#endif
     filename=basedir+"/%d/internal_energy";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_SCALAR_FIELD_2D<T>* internal_energy_component=new OPENGL_COMPONENT_SCALAR_FIELD_2D<T>(grid,filename,
@@ -353,19 +289,6 @@ Initialize_Components_And_Key_Bindings()
         Add_Component(temperature_component,"Temperature",'t',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
         opengl_world.Append_Bind_Key('T',temperature_component->Toggle_Color_Map_CB());
         opengl_world.Append_Bind_Key('`',temperature_component->Toggle_Smooth_CB());}
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    filename=basedir+"/%d/quadtree_temperature";
-    if(has_valid_quadtree_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        ARRAY<T> temp0;FILE_UTILITIES::Read_From_File<RW>(FILE_UTILITIES::Get_Frame_Filename(filename,start_frame),temp0);
-        // TODO: put scaling back into quadtree
-        //T min_temp=temp0.Min(),max_temp=temp0.Max();
-        OPENGL_COMPONENT_ADAPTIVE_NODE_SCALAR_FIELD<QUADTREE_GRID<T> >* quadtree_temperature_component=new OPENGL_COMPONENT_ADAPTIVE_NODE_SCALAR_FIELD<QUADTREE_GRID<T> >(
-            quadtree_grid_component->opengl_grid.grid,filename,OPENGL_COLOR_RAMP<T>::Two_Color_Ramp(0,1,OPENGL_COLOR::Gray(0,0),OPENGL_COLOR::Red(1,1)));
-        opengl_world.Set_Key_Binding_Category("Quadtree Temperature");
-        Add_Component(quadtree_temperature_component,"Quadtree Temperature",'t',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
-        opengl_world.Append_Bind_Key('+',quadtree_temperature_component->Increase_Point_Size_CB());
-        opengl_world.Append_Bind_Key('_',quadtree_temperature_component->Decrease_Point_Size_CB());}
-#endif
 
     // SPH
     filename=basedir+"/%d/sph_cell_weights";
@@ -433,55 +356,10 @@ Initialize_Components_And_Key_Bindings()
         Add_Component(object_levelset_component,"Object Level Set",'9',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
         opengl_world.Append_Bind_Key('(',object_levelset_component->Toggle_Draw_Mode_CB());
         opengl_world.Append_Bind_Key(')',object_levelset_component->Toggle_Color_Mode_CB());}
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-    filename=basedir+"/%d/rle_levelset";
-    if(has_valid_rle_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_RLE_CELL_SCALAR_FIELD_2D<T>* rle_levelset_component=new OPENGL_COMPONENT_RLE_CELL_SCALAR_FIELD_2D<T>(rle_grid_component->opengl_grid.grid,filename,
-            new OPENGL_LEVELSET_COLOR_MAP<T>(OPENGL_COLOR::Blue(),OPENGL_COLOR::Red()));
-        rle_levelset_component->opengl_rle_cell_scalar_field.draw_filled=true;
-        opengl_world.Set_Key_Binding_Category("RLE Level Set");
-        Add_Component(rle_levelset_component,"RLE Level Set",'l',BASIC_VISUALIZATION::OWNED);}
-    filename=basedir+"/%d/rle_object_levelset";
-    if(has_valid_rle_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_RLE_CELL_SCALAR_FIELD_2D<T>* rle_object_levelset_component=new OPENGL_COMPONENT_RLE_CELL_SCALAR_FIELD_2D<T>(rle_grid_component->opengl_grid.grid,filename,
-            new OPENGL_LEVELSET_COLOR_MAP<T>(OPENGL_COLOR::Blue(),OPENGL_COLOR::Red()));
-        rle_object_levelset_component->opengl_rle_cell_scalar_field.draw_filled=true;
-        opengl_world.Set_Key_Binding_Category("RLE Object Level Set");
-        Add_Component(rle_object_levelset_component,"RLE Object Level Set",'9',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);}
-#endif
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    filename=basedir+"/%d/quadtree_levelset";
-    if(has_valid_quadtree_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_QUADTREE_CELL_SCALAR_FIELD<T>* quadtree_levelset_component=new OPENGL_COMPONENT_QUADTREE_CELL_SCALAR_FIELD<T>(quadtree_grid_component->opengl_grid.grid,filename,
-            new OPENGL_LEVELSET_COLOR_MAP<T>(OPENGL_COLOR::Blue(),OPENGL_COLOR::Red()));
-        opengl_world.Set_Key_Binding_Category("Quadtree Level Set");
-        Add_Component(quadtree_levelset_component,"Quadtree Level Set",'l',BASIC_VISUALIZATION::OWNED);
-        opengl_world.Append_Bind_Key('+',quadtree_levelset_component->Increase_Point_Size_CB());
-        opengl_world.Append_Bind_Key('_',quadtree_levelset_component->Decrease_Point_Size_CB());}
-    filename=basedir+"/%d/quadtree_levelset_nodes";
-    if(has_valid_quadtree_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_ADAPTIVE_NODE_SCALAR_FIELD<QUADTREE_GRID<T> >* quadtree_levelset_nodes_component=new OPENGL_COMPONENT_ADAPTIVE_NODE_SCALAR_FIELD<QUADTREE_GRID<T> >(quadtree_grid_component->opengl_grid.grid,filename,
-            new OPENGL_LEVELSET_COLOR_MAP<T>(OPENGL_COLOR::Blue(),OPENGL_COLOR::Red()));
-        opengl_world.Set_Key_Binding_Category("Quadtree Nodal Level Set");
-        Add_Component(quadtree_levelset_nodes_component,"Quadtree Levelset",'L',BASIC_VISUALIZATION::OWNED);
-        opengl_world.Append_Bind_Key('+',quadtree_levelset_nodes_component->Increase_Point_Size_CB());
-        opengl_world.Append_Bind_Key('_',quadtree_levelset_nodes_component->Decrease_Point_Size_CB());}
-#endif
 
     // Particles
     opengl_world.Set_Key_Binding_Category("Particles");
     bool particles_stored_per_cell_uniform=false;
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    bool particles_stored_per_cell_adaptive=false;
-#endif
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    if((
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-           has_valid_rle_grid ||
-#endif
-           has_valid_quadtree_grid) && !has_valid_grid) particles_stored_per_cell_adaptive=true;
-    else
-#endif
     if(has_valid_grid) particles_stored_per_cell_uniform=true;
     filename=basedir+"/%d/positive_particles";
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame) || FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/positive_particles_1",start_frame)){
@@ -673,52 +551,11 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key('-',sub_mac_velocities_component->Decrease_Vector_Size_CB());
         opengl_world.Append_Bind_Key('h',sub_mac_velocities_component->Toggle_Arrowhead_CB());}
 
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-    // rle velocities
-    filename=basedir+"/%d/rle_face_velocities";
-    if(has_valid_rle_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-         OPENGL_COMPONENT_RLE_FACE_SCALAR_FIELD_2D<T,T>* rle_face_velocity_component=new OPENGL_COMPONENT_RLE_FACE_SCALAR_FIELD_2D<T,T>(rle_grid_component->opengl_grid.grid,filename,
-            new OPENGL_CONSTANT_COLOR_MAP<T>(OPENGL_COLOR::Green()),false);
-        rle_face_velocity_component->opengl_rle_face_scalar_field.line_size=.01;
-        Add_Component(rle_face_velocity_component,"RLE Face Velocities",'V',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
-        opengl_world.Append_Bind_Key('C',rle_face_velocity_component->Toggle_Draw_CB());
-        opengl_world.Append_Bind_Key('=',rle_face_velocity_component->Increase_Vector_Size_CB());
-        opengl_world.Append_Bind_Key('-',rle_face_velocity_component->Decrease_Vector_Size_CB());}
-#endif
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    // quadtree velocities
-    filename=basedir+"/%d/quadtree_face_velocities";
-    if(has_valid_quadtree_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_QUADTREE_FACE_SCALAR_FIELD<T,T>* quadtree_face_velocity_component=new OPENGL_COMPONENT_QUADTREE_FACE_SCALAR_FIELD<T,T>(quadtree_grid_component->opengl_grid.grid,filename,
-            new OPENGL_CONSTANT_COLOR_MAP<T>(OPENGL_COLOR::Magenta()),false);
-        quadtree_face_velocity_component->opengl_quadtree_face_scalar_field.line_size=.01;
-        Add_Component(quadtree_face_velocity_component,"Quadtree Face Velocities",'V',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
-        opengl_world.Append_Bind_Key('=',quadtree_face_velocity_component->Increase_Vector_Size_CB());
-        opengl_world.Append_Bind_Key('-',quadtree_face_velocity_component->Decrease_Vector_Size_CB());}
-    filename=basedir+"/%d/quadtree_face_velocities_fuel";
-    if(has_valid_quadtree_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_QUADTREE_FACE_SCALAR_FIELD<T,T>* quadtree_face_velocity_fuel_component=new OPENGL_COMPONENT_QUADTREE_FACE_SCALAR_FIELD<T,T>(quadtree_grid_component->opengl_grid.grid,filename,
-            new OPENGL_CONSTANT_COLOR_MAP<T>(OPENGL_COLOR::Magenta()),false);
-        quadtree_face_velocity_fuel_component->opengl_quadtree_face_scalar_field.line_size=.01;
-        Add_Component(quadtree_face_velocity_fuel_component,"Quadtree Face Velocities Fuel",'B',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
-        opengl_world.Append_Bind_Key('=',quadtree_face_velocity_fuel_component->Increase_Vector_Size_CB());
-        opengl_world.Append_Bind_Key('-',quadtree_face_velocity_fuel_component->Decrease_Vector_Size_CB());}
-#endif
-
     filename=basedir+"/%d/beta_face";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D<T,T>* beta_face_component=new OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D<T,T>(mac_grid,filename,OPENGL_COLOR_RAMP<T>::Two_Color_Ramp(0,.002,OPENGL_COLOR::Gray(1),OPENGL_COLOR::Gray(0)));
         Add_Component(beta_face_component,"Beta Face",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F6),beta_face_component->Toggle_Draw_CB());}
-
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    filename=basedir+"/%d/quadtree_beta_face";
-    if(has_valid_quadtree_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_QUADTREE_FACE_SCALAR_FIELD<T,T>* quadtree_beta_face_component=new OPENGL_COMPONENT_QUADTREE_FACE_SCALAR_FIELD<T,T>(quadtree_grid_component->opengl_grid.grid,filename,
-            new OPENGL_CONSTANT_COLOR_MAP<T>(OPENGL_COLOR::Magenta()),false);
-        quadtree_beta_face_component->opengl_quadtree_face_scalar_field.line_size=.01;
-        Add_Component(quadtree_beta_face_component,"Quadtree Beta Face",'\0',BASIC_VISUALIZATION::OWNED);}
-#endif
 
     filename=basedir+"/%d/mac_velocities_fuel";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
@@ -754,20 +591,6 @@ Initialize_Components_And_Key_Bindings()
             opengl_world.Append_Bind_Key('-',mac_velocity_ghost_minus_component->Decrease_Vector_Size_CB());
             opengl_world.Append_Bind_Key('h',mac_velocity_ghost_minus_component->Toggle_Arrowhead_CB());}}
 
-
-
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    filename=basedir+"/%d/quadtree_velocities_ghost_fuel";
-    if(has_valid_quadtree_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_QUADTREE_NODE_VECTOR_FIELD<T>* quadtree_velocity_minus_component=new OPENGL_COMPONENT_QUADTREE_NODE_VECTOR_FIELD<T>(quadtree_grid_component->opengl_grid.grid,filename);
-        quadtree_velocity_minus_component->opengl_quadtree_node_vector_field.size=.01;
-        quadtree_velocity_minus_component->opengl_quadtree_node_vector_field.vector_color=OPENGL_COLOR::Green();
-        Add_Component(quadtree_velocity_minus_component,"Quadtree ghost fuel velocities",'c',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
-        opengl_world.Append_Bind_Key('h',quadtree_velocity_minus_component->Toggle_Arrowhead_CB());
-        opengl_world.Append_Bind_Key('=',quadtree_velocity_minus_component->Increase_Vector_Size_CB());
-        opengl_world.Append_Bind_Key('-',quadtree_velocity_minus_component->Decrease_Vector_Size_CB());}
-#endif
-
     filename=basedir+"/%d/velocities_ghost";
     OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>* vector_velocity_ghost_plus_component=0;
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
@@ -791,18 +614,6 @@ Initialize_Components_And_Key_Bindings()
             opengl_world.Append_Bind_Key('-',mac_velocity_ghost_plus_component->Decrease_Vector_Size_CB());
             opengl_world.Append_Bind_Key('h',mac_velocity_ghost_plus_component->Toggle_Arrowhead_CB());}}
 
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    filename=basedir+"/%d/quadtree_velocities_ghost";
-    if(has_valid_quadtree_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_QUADTREE_NODE_VECTOR_FIELD<T>* quadtree_velocity_plus_component=new OPENGL_COMPONENT_QUADTREE_NODE_VECTOR_FIELD<T>(quadtree_grid_component->opengl_grid.grid,filename);
-        quadtree_velocity_plus_component->opengl_quadtree_node_vector_field.size=.01;
-        quadtree_velocity_plus_component->opengl_quadtree_node_vector_field.vector_color=OPENGL_COLOR::Green();
-        Add_Component(quadtree_velocity_plus_component,"Quadtree ghost velocities",'b',BASIC_VISUALIZATION::START_HIDDEN|BASIC_VISUALIZATION::OWNED);
-        opengl_world.Append_Bind_Key('h',quadtree_velocity_plus_component->Toggle_Arrowhead_CB());
-        opengl_world.Append_Bind_Key('=',quadtree_velocity_plus_component->Increase_Vector_Size_CB());
-        opengl_world.Append_Bind_Key('-',quadtree_velocity_plus_component->Decrease_Vector_Size_CB());}
-#endif
-
     if(has_valid_grid && vector_velocity_ghost_minus_component && vector_velocity_ghost_plus_component && levelset_component){
         OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D<T>* two_phase_velocity_magnitude_component=new OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D<T>
             (*vector_velocity_ghost_minus_component,*vector_velocity_ghost_plus_component,*levelset_component);
@@ -825,18 +636,6 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key('=',center_velocity_component->Increase_Vector_Size_CB());
         opengl_world.Append_Bind_Key('-',center_velocity_component->Decrease_Vector_Size_CB());
         opengl_world.Append_Bind_Key('h',center_velocity_component->Toggle_Arrowhead_CB());}
-
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    filename=basedir+"/%d/quadtree_velocities";
-    if(has_valid_quadtree_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_QUADTREE_NODE_VECTOR_FIELD<T>* quadtree_velocity_component=new OPENGL_COMPONENT_QUADTREE_NODE_VECTOR_FIELD<T>(quadtree_grid_component->opengl_grid.grid,filename);
-        quadtree_velocity_component->opengl_quadtree_node_vector_field.size=.01;
-        quadtree_velocity_component->opengl_quadtree_node_vector_field.vector_color=OPENGL_COLOR::Green();
-        Add_Component(quadtree_velocity_component,"Quadtree Velocities",'v',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
-        opengl_world.Append_Bind_Key('=',quadtree_velocity_component->Increase_Vector_Size_CB());
-        opengl_world.Append_Bind_Key('-',quadtree_velocity_component->Decrease_Vector_Size_CB());
-        opengl_world.Append_Bind_Key('h',quadtree_velocity_component->Toggle_Arrowhead_CB());}
-#endif
 
     opengl_world.Set_Key_Binding_Category("Pressure");
     // TODO: these ramps are leaking memory
@@ -877,20 +676,6 @@ Initialize_Components_And_Key_Bindings()
         pressure2_component->opengl_scalar_field.Set_Uniform_Contour_Values(-10000,10000,100);
         Add_Component(pressure2_component,"Pressure2",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F7),pressure2_component->Toggle_Draw_CB());}
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-    filename=basedir+"/%d/rle_pressure";
-    if(has_valid_rle_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_RLE_CELL_SCALAR_FIELD_2D<T>* rle_pressure_component=new OPENGL_COMPONENT_RLE_CELL_SCALAR_FIELD_2D<T>(rle_grid_component->opengl_grid.grid,filename,
-            OPENGL_COLOR_RAMP<T>::Matlab_Jet(0,1));
-        Add_Component(rle_pressure_component,"RLE Pressure",'7',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);}
-#endif
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    filename=basedir+"/%d/quadtree_pressure";
-    if(has_valid_quadtree_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_QUADTREE_CELL_SCALAR_FIELD<T>* quadtree_pressure_component=new OPENGL_COMPONENT_QUADTREE_CELL_SCALAR_FIELD<T>(quadtree_grid_component->opengl_grid.grid,filename,
-            OPENGL_COLOR_RAMP<T>::Matlab_Jet(0,1));
-        Add_Component(quadtree_pressure_component,"Quadtree Pressure",'7',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);}
-#endif
 
     opengl_world.Set_Key_Binding_Category("Volume of Material");
     filename=basedir+"/%d/negative_material";
@@ -911,14 +696,6 @@ Initialize_Components_And_Key_Bindings()
         grid_component=new OPENGL_COMPONENT_BASIC<OPENGL_GRID_2D<T> >(*opengl_grid);
         Add_Component(grid_component,"Grid",'6',BASIC_VISUALIZATION::SELECTABLE);
         opengl_world.Append_Bind_Key('^',grid_component->object.Toggle_Draw_Ghost_Values_CB());}
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-    if(rle_grid_component)
-        Add_Component(rle_grid_component,"RLE Grid",'6',BASIC_VISUALIZATION::SELECTABLE);
-#endif
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    if(quadtree_grid_component) 
-        Add_Component(quadtree_grid_component,"Quadtree Grid",'6',BASIC_VISUALIZATION::SELECTABLE);
-#endif
     opengl_world.Set_Key_Binding_Category("Coarse Grid");
     if(has_valid_coarse_grid){
         OPENGL_GRID_2D<T>* opengl_grid=new OPENGL_GRID_2D<T>(*(new GRID<TV>(coarse_grid)),OPENGL_COLOR::Ground_Tan(.5));
@@ -1003,22 +780,6 @@ Initialize_Components_And_Key_Bindings()
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_PARTICLES_2D<T,GEOMETRY_PARTICLES<TV> >* component=new OPENGL_COMPONENT_PARTICLES_2D<T,GEOMETRY_PARTICLES<TV> >(filename,"",false,false);
         Add_Component(component,"Collision Iterators",'I',BASIC_VISUALIZATION::START_HIDDEN|BASIC_VISUALIZATION::OWNED);}
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-    filename=basedir+"/%d/rle_psi_N";
-    if(has_valid_rle_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_RLE_FACE_SCALAR_FIELD_2D<T,bool>* rle_psi_N_component=new OPENGL_COMPONENT_RLE_FACE_SCALAR_FIELD_2D<T,bool>(rle_grid_component->opengl_grid.grid,filename,new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Cyan()),true);
-        rle_psi_N_component->Set_Draw(false);
-        Add_Component(rle_psi_N_component,"RLE Psi_N points",'\0',BASIC_VISUALIZATION::START_HIDDEN|BASIC_VISUALIZATION::OWNED);
-        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F1),rle_psi_N_component->Toggle_Draw_CB());}
-#endif
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    filename=basedir+"/%d/quadtree_psi_N";
-    if(has_valid_quadtree_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_QUADTREE_FACE_SCALAR_FIELD<T,bool>* quadtree_psi_N_component=new OPENGL_COMPONENT_QUADTREE_FACE_SCALAR_FIELD<T,bool>(quadtree_grid_component->opengl_grid.grid,filename,new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Cyan()),true);
-        quadtree_psi_N_component->Set_Draw(false);
-        Add_Component(quadtree_psi_N_component,"Quadtree Psi_N points",'\0',BASIC_VISUALIZATION::START_HIDDEN|BASIC_VISUALIZATION::OWNED);
-        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F1),quadtree_psi_N_component->Toggle_Draw_CB());}
-#endif
     filename=basedir+"/%d/coarse_psi_D";
     if(has_valid_coarse_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_SCALAR_FIELD_2D<T,bool>* psi_D_component=new OPENGL_COMPONENT_SCALAR_FIELD_2D<T,bool>(coarse_mac_grid,filename,new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Magenta()),OPENGL_SCALAR_FIELD_2D<T,bool>::DRAW_POINTS);
@@ -1029,22 +790,6 @@ Initialize_Components_And_Key_Bindings()
         OPENGL_COMPONENT_SCALAR_FIELD_2D<T,bool>* psi_D_component=new OPENGL_COMPONENT_SCALAR_FIELD_2D<T,bool>(mac_grid,filename,new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Magenta()),OPENGL_SCALAR_FIELD_2D<T,bool>::DRAW_POINTS);
         Add_Component(psi_D_component,"Psi_D points",'\0',BASIC_VISUALIZATION::START_HIDDEN|BASIC_VISUALIZATION::OWNED);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F1),psi_D_component->Toggle_Draw_CB());}
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-    filename=basedir+"/%d/rle_psi_D";
-    if(has_valid_rle_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_RLE_CELL_SCALAR_FIELD_2D<T,bool>* rle_psi_D_component=new OPENGL_COMPONENT_RLE_CELL_SCALAR_FIELD_2D<T,bool>(rle_grid_component->opengl_grid.grid,filename,new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Magenta()));
-        rle_psi_D_component->Set_Draw(false);
-        Add_Component(rle_psi_D_component,"RLE Psi_D points",'\0',BASIC_VISUALIZATION::START_HIDDEN|BASIC_VISUALIZATION::OWNED);
-        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F1),rle_psi_D_component->Toggle_Draw_CB());}
-#endif
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    filename=basedir+"/%d/quadtree_psi_D";
-    if(has_valid_quadtree_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_QUADTREE_CELL_SCALAR_FIELD<T,bool>* quadtree_psi_D_component=new OPENGL_COMPONENT_QUADTREE_CELL_SCALAR_FIELD<T,bool>(quadtree_grid_component->opengl_grid.grid,filename,new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Magenta()));
-        quadtree_psi_D_component->Set_Draw(false);
-        Add_Component(quadtree_psi_D_component,"Quadtree Psi_D points",'\0',BASIC_VISUALIZATION::START_HIDDEN|BASIC_VISUALIZATION::OWNED);
-        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F1),quadtree_psi_D_component->Toggle_Draw_CB());}        
-#endif
 
     filename=basedir+"/%d/euler_psi";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
@@ -1059,26 +804,6 @@ Initialize_Components_And_Key_Bindings()
         Add_Component(psi_colors_component,"Psi colors",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F2),psi_colors_component->Toggle_Draw_CB());}
 
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-    filename=basedir+"/%d/rle_colors";
-    if(has_valid_rle_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_INDEXED_COLOR_MAP* colors_color_map=OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map();colors_color_map->Set_Index_Mode(OPENGL_INDEXED_COLOR_MAP::PERIODIC);
-        OPENGL_COMPONENT_RLE_CELL_SCALAR_FIELD_2D<T,int>* rle_psi_colors_component=new OPENGL_COMPONENT_RLE_CELL_SCALAR_FIELD_2D<T,int>(rle_grid_component->opengl_grid.grid,filename,colors_color_map);
-        rle_psi_colors_component->Set_Draw(false);
-        Add_Component(rle_psi_colors_component,"RLE Psi colors",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
-        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F2),rle_psi_colors_component->Toggle_Draw_CB());}
-#endif
-
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    filename=basedir+"/%d/quadtree_colors";
-    if(has_valid_quadtree_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_INDEXED_COLOR_MAP* colors_color_map=OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map();colors_color_map->Set_Index_Mode(OPENGL_INDEXED_COLOR_MAP::PERIODIC);
-        OPENGL_COMPONENT_QUADTREE_CELL_SCALAR_FIELD<T,int>* quadtree_psi_colors_component=new OPENGL_COMPONENT_QUADTREE_CELL_SCALAR_FIELD<T,int>(quadtree_grid_component->opengl_grid.grid,filename,colors_color_map);
-        quadtree_psi_colors_component->Set_Draw(false);
-        Add_Component(quadtree_psi_colors_component,"Quadtree Psi colors",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
-        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F2),quadtree_psi_colors_component->Toggle_Draw_CB());}
-#endif
-
     filename=basedir+"/%d/pressure_jumps";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>* pressure_jump_component=new OPENGL_COMPONENT_GRID_BASED_VECTOR_FIELD_2D<T>(grid,filename);
@@ -1087,17 +812,6 @@ Initialize_Components_And_Key_Bindings()
         Add_Component(pressure_jump_component,"Pressure jumps",'&',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
         opengl_world.Append_Bind_Key('=',pressure_jump_component->Increase_Vector_Size_CB());
         opengl_world.Append_Bind_Key('-',pressure_jump_component->Decrease_Vector_Size_CB());}
-
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    filename=basedir+"/%d/quadtree_pressure_jumps";
-    if(has_valid_quadtree_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_QUADTREE_NODE_VECTOR_FIELD<T>* quadtree_pressure_jump_component=new OPENGL_COMPONENT_QUADTREE_NODE_VECTOR_FIELD<T>(quadtree_grid_component->opengl_grid.grid,filename);
-        quadtree_pressure_jump_component->opengl_quadtree_node_vector_field.size=.01;
-        quadtree_pressure_jump_component->opengl_quadtree_node_vector_field.vector_color=OPENGL_COLOR::Magenta();
-        Add_Component(quadtree_pressure_jump_component,"Quadtree pressure jumps",'&',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
-        opengl_world.Append_Bind_Key('=',quadtree_pressure_jump_component->Increase_Vector_Size_CB());
-        opengl_world.Append_Bind_Key('-',quadtree_pressure_jump_component->Decrease_Vector_Size_CB());}
-#endif
 
     filename=basedir+"/%d/thin_shells_grid_visibility";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
@@ -1141,16 +855,7 @@ Initialize_Components_And_Key_Bindings()
     Selection_Priority(OPENGL_SELECTION::TRIANGULATED_AREA_SEGMENT)=76;
     Selection_Priority(OPENGL_SELECTION::TRIANGULATED_AREA_TRIANGLE)=75;
     Selection_Priority(OPENGL_SELECTION::GRID_NODE_2D)=70;
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    Selection_Priority(OPENGL_SELECTION::QUADTREE_NODE)=70;
-#endif
     Selection_Priority(OPENGL_SELECTION::GRID_CELL_2D)=60;
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-    Selection_Priority(OPENGL_SELECTION::RLE_CELL_2D)=60;
-#endif
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    Selection_Priority(OPENGL_SELECTION::QUADTREE_CELL)=60;
-#endif
 }
 //#####################################################################
 // Add_OpenGL_Initialization
@@ -1167,12 +872,6 @@ Add_OpenGL_Initialization()
 template<class T,class RW> void OPENGL_2D_VISUALIZATION<T,RW>::
 Pre_Frame_Extra()
 {
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-    if(rle_grid_component) rle_grid_component->Set_Frame(frame);
-#endif
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    if(quadtree_grid_component) quadtree_grid_component->Set_Frame(frame);
-#endif
     if(grid_component) grid_component->object.Set_Frame(frame);
 }
 //#####################################################################

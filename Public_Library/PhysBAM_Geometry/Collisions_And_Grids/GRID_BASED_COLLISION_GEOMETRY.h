@@ -15,14 +15,6 @@
 #include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_3D.h>
 #include <PhysBAM_Geometry/Collisions_And_Grids/OBJECTS_IN_CELL.h>
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY_COLLECTION.h>
-#if !COMPILE_WITHOUT_DYADIC_SUPPORT || COMPILE_WITH_BINTREE_SUPPORT
-#include <PhysBAM_Tools/Grids_Dyadic_Arrays/GRID_ARRAYS_POLICY_DYADIC.h>
-#include <PhysBAM_Tools/Grids_Dyadic_Interpolation/LINEAR_INTERPOLATION_DYADIC.h>
-#endif
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-#include <PhysBAM_Tools/Grids_RLE_Arrays/GRID_ARRAYS_POLICY_RLE.h>
-#include <PhysBAM_Tools/Grids_RLE_Interpolation/LINEAR_INTERPOLATION_RLE.h>
-#endif
 namespace PhysBAM{
 
 template <class T_GRID>

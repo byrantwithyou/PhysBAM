@@ -7,8 +7,8 @@
 #include <stdlib.h>
 #include <sys/time.h>
 
-#include "Multiplication_Helper.h"
 #include "../Thread_Queueing/PTHREAD_QUEUE.h"
+#include "Multiplication_Helper.h"
 using namespace PhysBAM;
 extern PhysBAM::PTHREAD_QUEUE* pthread_queue;
 

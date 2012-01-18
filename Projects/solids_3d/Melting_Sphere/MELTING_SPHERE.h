@@ -9,8 +9,8 @@
 
 #include <PhysBAM_Tools/Matrices/QUATERNION.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
-#include <PhysBAM_Geometry/Red_Green/RED_GREEN_GRID_3D.h>
 #include <Level_Sets/LEVELSET_TETRAHEDRALIZED_VOLUME.h>
+#include <PhysBAM_Geometry/Red_Green/RED_GREEN_GRID_3D.h>
 #include <Solids_And_Fluids/MELTING_EXAMPLE_3D.h>
 namespace PhysBAM{
 

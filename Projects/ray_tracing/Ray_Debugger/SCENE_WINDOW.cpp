@@ -68,32 +68,6 @@ template<class T> void SCENE_WINDOW<T>::Initialize_Objects()
     for(int i=1;i<=world.standard_objects.m;i++){RENDERING_OBJECT<T>* object=world.standard_objects(i);object_triangles.Append(object->Generate_Triangles());}
     selected_object=0;
 }
-//#####################################################################
-// Draw_Irradiance_Cache
-//#####################################################################
-template<class T> void Draw_Octree(OCTREE_GRID<T>& octree,OCTREE_CELL<T>* cell)
-{
-    glPushAttrib(GL_LINE_BIT);
-    glLineWidth(1);
-    glDisable(GL_LINE_SMOOTH);
-    glBegin(GL_LINES);
-    ARRAY<VECTOR<T,3> ,VECTOR<int,1> > box_points(0,7);for(int i=0;i<box_points.m;i++)box_points(i)=octree.Node_Location(i,cell);
-    glBegin(GL_LINES);
-    OpenGL_Vertex(box_points(0));OpenGL_Vertex(box_points(1));
-    OpenGL_Vertex(box_points(0));OpenGL_Vertex(box_points(2));
-    OpenGL_Vertex(box_points(0));OpenGL_Vertex(box_points(4));
-    OpenGL_Vertex(box_points(1));OpenGL_Vertex(box_points(3));
-    OpenGL_Vertex(box_points(1));OpenGL_Vertex(box_points(5));
-    OpenGL_Vertex(box_points(2));OpenGL_Vertex(box_points(3));
-    OpenGL_Vertex(box_points(2));OpenGL_Vertex(box_points(6));
-    OpenGL_Vertex(box_points(3));OpenGL_Vertex(box_points(7));
-    OpenGL_Vertex(box_points(4));OpenGL_Vertex(box_points(6));
-    OpenGL_Vertex(box_points(4));OpenGL_Vertex(box_points(5));
-    OpenGL_Vertex(box_points(5));OpenGL_Vertex(box_points(7));
-    OpenGL_Vertex(box_points(6));OpenGL_Vertex(box_points(7));glEnd();
-    if(cell->Has_Children())for(int i=0;i<8;i++)Draw_Octree(octree,cell->Child(i));
-    glPopAttrib();
-}
 template<class T> void SCENE_WINDOW<T>::Draw_Irradiance_Cache()
 {
     if(display_irradiance_cache)Draw_Octree(world.irradiance_cache.octree_grid,world.irradiance_cache.octree_grid.cells(1,1,1));

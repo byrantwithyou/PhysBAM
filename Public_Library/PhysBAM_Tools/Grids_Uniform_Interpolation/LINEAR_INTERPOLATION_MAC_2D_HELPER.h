@@ -13,8 +13,6 @@
 #include <PhysBAM_Tools/Interpolation/LINEAR_INTERPOLATION.h>
 namespace PhysBAM{
 
-template<class T_GRID> class DYADIC_GRID_ITERATOR_FACE;
-
 template<class T_GRID>
 class LINEAR_INTERPOLATION_MAC_2D_HELPER
 {

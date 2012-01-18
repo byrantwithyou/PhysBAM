@@ -18,9 +18,6 @@ namespace PhysBAM{
 
 class PARAMETER_LIST;
 template<class T_GRID> class SOLIDS_FLUIDS_EXAMPLE_UNIFORM;
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-template<class T_GRID> class SOLIDS_FLUIDS_EXAMPLE_DYADIC;
-#endif
 template<class TV> class GRID;
 template<class T> class SEGMENTED_CURVE_2D;
 template<class T> class TRIANGULATED_SURFACE;
@@ -43,12 +40,6 @@ public:
         ARRAY<int>* walls_added=0);
     static void Add_Rigid_Body_Walls(SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T,3> > >& example,const T coefficient_of_restitution=(T).5,const T coefficient_of_friction=(T).5,
         ARRAY<int>* walls_added=0);
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    static void Add_Rigid_Body_Walls(SOLIDS_FLUIDS_EXAMPLE_DYADIC<QUADTREE_GRID<T> >& example,const T coefficient_of_restitution=(T).5,const T coefficient_of_friction=(T).5,
-        ARRAY<int>* walls_added=0);
-    static void Add_Rigid_Body_Walls(SOLIDS_FLUIDS_EXAMPLE_DYADIC<OCTREE_GRID<T> >& example,const T coefficient_of_restitution=(T).5,const T coefficient_of_friction=(T).5,
-        ARRAY<int>* walls_added=0);
-#endif
     static void Set_Deformable_Object_Parameters_2D(const int id,T& density,PARAMETER_LIST& parameter_list);
     static void Set_Deformable_Object_Parameters_3D(const int id,T& edge_stiffness_scaling,T& altitude_stiffness_scaling,T& density,PARAMETER_LIST& parameter_list);
     static void Set_Rigid_Body_Parameters_2D(const int id,T& density,PARAMETER_LIST& parameter_list);
@@ -58,9 +49,6 @@ public:
     static void Set_Mass(TRIANGULATED_SURFACE<T>& triangulated_surface,const T mass,const bool use_constant_mass=false);
     static void Set_Density(TRIANGULATED_SURFACE<T>& triangulated_surface,const T density,const bool use_constant_mass=false);
     template<class T_GRID> static void Set_Parameters_From_Parameter_List(SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>& example,PARAMETER_LIST& parameter_list);
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    template<class T_GRID> static void Set_Parameters_From_Parameter_List(SOLIDS_FLUIDS_EXAMPLE_DYADIC<T_GRID>& example,PARAMETER_LIST& parameter_list);
-#endif
 //#####################################################################
 };
 }

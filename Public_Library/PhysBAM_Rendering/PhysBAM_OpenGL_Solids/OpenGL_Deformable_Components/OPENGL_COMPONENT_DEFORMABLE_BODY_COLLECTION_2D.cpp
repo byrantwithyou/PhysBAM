@@ -6,9 +6,6 @@
 #include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Fracture/TRIANGLES_OF_MATERIAL.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Level_Sets/LEVELSET_RED_GREEN.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Read_Write/Level_Sets/READ_WRITE_LEVELSET_RED_GREEN.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_ADAPTIVE_NODE_SCALAR_FIELD.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_LEVELSET_COLOR_MAP.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_SEGMENTED_CURVE_2D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_TRIANGULATED_AREA.h>
@@ -58,13 +55,7 @@ Reinitialize(bool force)
         triangles_of_material_objects.Delete_Pointers_And_Clean_Memory();triangles_of_material_objects.Resize(m);
         free_particles_objects.Delete_Pointers_And_Clean_Memory();free_particles_objects.Resize(m);
         free_particles_indirect_arrays.Delete_Pointers_And_Clean_Memory();free_particles_indirect_arrays.Resize(m);
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-        grid_list.Delete_Pointers_And_Clean_Memory();grid_list.Resize(m);
-#endif
         phi_list.Delete_Pointers_And_Clean_Memory();phi_list.Resize(m);
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-        phi_objects.Delete_Pointers_And_Clean_Memory();phi_objects.Resize(m);
-#endif
         int color_map_index=15;
         for(int i=1;i<=m;i++){
             STRUCTURE<TV>* structure=deformable_body_collection.deformable_geometry.structures(i);
@@ -88,18 +79,6 @@ Reinitialize(bool force)
                 triangulated_area->mesh.Initialize_Segment_Mesh(); // to enable segment selection
                 triangulated_area_objects(i)=new OPENGL_TRIANGULATED_AREA<T>(*triangulated_area,true);}
             else PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Weird object %d",i));}}
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    for(int i=1;i<=deformable_geometry_collection->structures.m;i++){
-        std::string suffix=STRING_UTILITIES::string_sprintf("_%d",i);
-        std::string frame_prefix=STRING_UTILITIES::string_sprintf("%s/%d",prefix.c_str(),frame);
-        if(FILE_UTILITIES::File_Exists(frame_prefix+"levelset_red_green"+suffix)){
-            if(first_time) LOG::cout<<"adding red green levelset "<<i<<"\n";
-            grid_list(i)=new RED_GREEN_GRID_2D<T>;phi_list(i)=new ARRAY<T>;
-            LEVELSET_RED_GREEN<TV> levelset(*grid_list(i),*phi_list(i));
-            FILE_UTILITIES::Read_From_File<RW>(frame_prefix+"levelset_red_green"+suffix,levelset);
-            static OPENGL_LEVELSET_COLOR_MAP<T> color_map(OPENGL_COLOR::Red(),OPENGL_COLOR::Blue());
-            phi_objects(i)=new OPENGL_ADAPTIVE_NODE_SCALAR_FIELD<RED_GREEN_GRID_2D<T> >(*grid_list(i),*phi_list(i),&color_map);}}
-#endif
     first_time=false;
 }
 //#####################################################################
@@ -116,9 +95,6 @@ Display(const int in_color) const
         case 0:draw_embedded_curves=true;break;}
     for(int i=1;i<=segmented_curve_objects.m;i++){
         glPushName(i);
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-        if(phi_objects(i)){glPushName(4);phi_objects(i)->Display(in_color);glPopName();}
-#endif
         if(draw_embedded_curves && embedded_curve_objects(i)){glPushName(5);embedded_curve_objects(i)->Display(in_color);glPopName();}
         glPopName();}
 }
@@ -129,10 +105,6 @@ template<class T,class RW> RANGE<VECTOR<float,3> > OPENGL_COMPONENT_DEFORMABLE_B
 Bounding_Box() const
 {
     RANGE<VECTOR<float,3> > box=BASE::Bounding_Box();
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    if(draw && valid && deformable_geometry_collection->structures.m>0){
-        for(int i=1;i<=phi_objects.m;i++) if(phi_objects(i)) box.Enlarge_To_Include_Box(phi_objects(i)->Bounding_Box());}
-#endif
     return box;
 }
 //#####################################################################
@@ -185,9 +157,6 @@ Get_Selection(GLuint* buffer,int buffer_size)
         selection=new OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_2D<T>(this);
         selection->body_index=buffer[0];selection->subobject_type=buffer[1];
         switch(selection->subobject_type){
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-            case 4:selection->subobject=phi_objects(buffer[0]);break;
-#endif
             case 5:selection->subobject=embedded_curve_objects(buffer[0]);break;
             default:delete selection;return 0;}
         selection->body_selection=selection->subobject->Get_Selection(&buffer[2],buffer_size-2);
@@ -201,9 +170,6 @@ template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T
 Clear_Highlight()
 {
     BASE::Clear_Highlight();
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    for(int i=1;i<=phi_objects.m;i++)if(phi_objects(i))phi_objects(i)->Clear_Highlight();
-#endif
     for(int i=1;i<=embedded_curve_objects.m;i++)if(embedded_curve_objects(i))embedded_curve_objects(i)->Clear_Highlight();
 }
 //#####################################################################

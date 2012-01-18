@@ -7,12 +7,6 @@
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
 #include <PhysBAM_Geometry/Spatial_Acceleration/TRIANGLE_HIERARCHY.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-#include <PhysBAM_Geometry/Implicit_Objects_Dyadic/DYADIC_IMPLICIT_OBJECT.h>
-#endif
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-#include <PhysBAM_Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
-#endif
 using namespace PhysBAM;
 //#####################################################################
 // Constructor

@@ -25,11 +25,6 @@ namespace PhysBAM{
 
 class SPARSE_MATRIX_PARTITION;
 template<class T> class SPARSE_MATRIX_ENTRY;
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-class RLE_RUN;
-class RLE_RUN_2D;
-class RLE_RUN_3D;
-#endif
 
 namespace MPI_UTILITIES{
 
@@ -51,13 +46,6 @@ template<class T> struct DATATYPE_HELPER<MATRIX<T,1,1> >:public DATATYPE_HELPER<
 template<class T,int d> MPI::Datatype Scalar_Block_Datatype();
 template<class TV> struct DATATYPE_HELPER<TV,typename ENABLE_IF<AND<IS_SCALAR_BLOCK<TV>::value,(sizeof(TV)>sizeof(typename TV::SCALAR))>::value>::TYPE>{static MPI::Datatype Datatype()
 {typedef typename TV::SCALAR T;return Scalar_Block_Datatype<T,sizeof(TV)/sizeof(T)>();}};
-
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-template<class T_RUN> MPI::Datatype RLE_Run_Datatype();
-template<> struct DATATYPE_HELPER<RLE_RUN>{static MPI::Datatype Datatype(){return RLE_Run_Datatype<RLE_RUN>();}};
-template<> struct DATATYPE_HELPER<RLE_RUN_2D>{static MPI::Datatype Datatype(){return RLE_Run_Datatype<RLE_RUN_2D>();}};
-template<> struct DATATYPE_HELPER<RLE_RUN_3D>{static MPI::Datatype Datatype(){return RLE_Run_Datatype<RLE_RUN_3D>();}};
-#endif
 
 template<class T> struct DATATYPE_HELPER<SPARSE_MATRIX_ENTRY<T> >{static MPI::Datatype Datatype();};
 template<class T> struct DATATYPE_HELPER<PAIR<VECTOR<int,2>,VECTOR<T,2> > >{static MPI::Datatype Datatype();};

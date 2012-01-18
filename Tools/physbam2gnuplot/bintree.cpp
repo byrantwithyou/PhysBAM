@@ -3,13 +3,13 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #ifdef COMPILE_WITH_BINTREE_SUPPORT
-#include <PhysBAM_Tools/Grids_Dyadic/BINTREE_GRID.h>
-#include <PhysBAM_Tools/Grids_Dyadic_Arrays/GRID_ARRAYS_POLICY_DYADIC.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Read_Write/Arrays/READ_WRITE_ARRAY.h>
-#include <PhysBAM_Tools/Read_Write/Grids_Dyadic/READ_WRITE_BINTREE_GRID.h>
 #include <PhysBAM_Tools/Read_Write/Matlab/GNUPLOT_OUTPUT.h>
 #include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Grids_Dyadic/BINTREE_GRID.h>
+#include <PhysBAM_Tools/Grids_Dyadic_Arrays/GRID_ARRAYS_POLICY_DYADIC.h>
+#include <PhysBAM_Tools/Read_Write/Grids_Dyadic/READ_WRITE_BINTREE_GRID.h>
 using namespace PhysBAM;
 //#####################################################################
 // Class PHYSBAM_TO_GNUPLOT_CONVERTER 

@@ -11,10 +11,6 @@ namespace PhysBAM{
 
 template<class TV> class GRID;
 
-template<class T_GRID,class T2,class T_NESTED_ADVECTION> class ADVECTION_WRAPPER_FIRE_DYADIC;
-template<class T_GRID,class T2,class T_NESTED_ADVECTION> class ADVECTION_WRAPPER_FIRE_MULTIPHASE_DYADIC;
-template<class T_GRID,class T2,class T_NESTED_ADVECTION> class ADVECTION_WRAPPER_FIRE_MULTIPHASE_RLE;
 template<class T_GRID,class T2,class T_NESTED_ADVECTION> class ADVECTION_WRAPPER_FIRE_MULTIPHASE_UNIFORM;
-template<class T_GRID,class T2,class T_NESTED_ADVECTION> class ADVECTION_WRAPPER_FIRE_RLE;
 }
 #endif

@@ -33,10 +33,6 @@ public:
     void Apply_Boundary_Condition(const GRID<TV>& grid,ARRAY<TV,VECTOR<int,2> >& V,const T time);
     void Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAY<TV,VECTOR<int,3> >& V,ARRAY<TV,VECTOR<int,3> >& V_ghost,const T dt,const T time,const int number_of_ghost_cells=3);
     void Apply_Boundary_Condition(const GRID<TV>& grid,ARRAY<TV,VECTOR<int,3> >& V,const T time);
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    void Apply_Boundary_Condition(const QUADTREE_GRID<T>& grid,ARRAY<TV>& V,const T time);
-    void Apply_Boundary_Condition(const OCTREE_GRID<T>& grid,ARRAY<TV>& V,const T time);
-#endif
 //#####################################################################
 };
 //#####################################################################

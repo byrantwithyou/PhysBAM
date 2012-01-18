@@ -30,10 +30,6 @@ Apply_General_Parameters(RENDERING_OBJECT<T>& rendering_object,PARAMETER_LIST& p
 {
     const T minimum_surface_roughness=(T)1e-5,surface_roughness_factor=4;
     rendering_object.small_number=surface_roughness_factor*minimum_surface_roughness;
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    std::string bssrdf_shader=parameters.Get_Parameter("BSSRDF_Shader",std::string("<unknown>"));
-    if(bssrdf_shader!="<unknown>") rendering_object.bssrdf_shader=dynamic_cast<RENDERING_BSSRDF_SHADER<T>*>(shaders.Get(bssrdf_shader));
-#endif
 }
 //#####################################################################
 // Function Apply_Triangulated_Surface_Parameters

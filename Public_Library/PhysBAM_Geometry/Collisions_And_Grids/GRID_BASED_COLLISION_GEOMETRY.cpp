@@ -4,21 +4,6 @@
 //#####################################################################
 // Class GRID_BASED_COLLISION_GEOMETRY
 //#####################################################################
-#if COMPILE_WITH_BINTREE_SUPPORT
-#include <PhysBAM_Tools/Grids_Dyadic/BINTREE_GRID.h>
-#include <PhysBAM_Geometry/Grids_Dyadic_Computations/RIGID_GEOMETRY_RASTERIZATION_DYADIC.h>
-#elif !COMPILE_WITHOUT_DYADIC_SUPPORT
-#include <PhysBAM_Tools/Grids_Dyadic/OCTREE_GRID.h>
-#include <PhysBAM_Tools/Grids_Dyadic/QUADTREE_GRID.h>
-#include <PhysBAM_Geometry/Grids_Dyadic_Computations/RIGID_GEOMETRY_RASTERIZATION_DYADIC.h>
-#endif
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-#include <PhysBAM_Tools/Grids_RLE/RLE_GRID_2D.h>
-#include <PhysBAM_Tools/Grids_RLE/RLE_GRID_3D.h>
-#include <PhysBAM_Tools/Grids_RLE/RLE_GRID_ITERATOR_BLOCK_2D.h>
-#include <PhysBAM_Tools/Grids_RLE/RLE_GRID_ITERATOR_BLOCK_3D.h>
-#include <PhysBAM_Geometry/Grids_RLE_Computations/RIGID_GEOMETRY_RASTERIZATION_RLE.h>
-#endif
 #include <PhysBAM_Tools/Grids_Uniform/BLOCK_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
@@ -208,31 +193,9 @@ Write_State(TYPED_OSTREAM& output,const int state_index) const
 template class GRID_BASED_COLLISION_GEOMETRY<GRID<VECTOR<float,1> > >;
 template class GRID_BASED_COLLISION_GEOMETRY<GRID<VECTOR<float,2> > >;
 template class GRID_BASED_COLLISION_GEOMETRY<GRID<VECTOR<float,3> > >;
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-template class GRID_BASED_COLLISION_GEOMETRY<OCTREE_GRID<float> >;
-template class GRID_BASED_COLLISION_GEOMETRY<QUADTREE_GRID<float> >;
-#endif
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-template class GRID_BASED_COLLISION_GEOMETRY<RLE_GRID_2D<float> >;
-template class GRID_BASED_COLLISION_GEOMETRY<RLE_GRID_3D<float> >;
-#endif
-#if COMPILE_WITH_BINTREE_SUPPORT
-template class GRID_BASED_COLLISION_GEOMETRY<BINTREE_GRID<float> >;
-#endif
 
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class GRID_BASED_COLLISION_GEOMETRY<GRID<VECTOR<double,1> > >;
 template class GRID_BASED_COLLISION_GEOMETRY<GRID<VECTOR<double,2> > >;
 template class GRID_BASED_COLLISION_GEOMETRY<GRID<VECTOR<double,3> > >;
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-template class GRID_BASED_COLLISION_GEOMETRY<OCTREE_GRID<double> >;
-template class GRID_BASED_COLLISION_GEOMETRY<QUADTREE_GRID<double> >;
-#endif
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-template class GRID_BASED_COLLISION_GEOMETRY<RLE_GRID_2D<double> >;
-template class GRID_BASED_COLLISION_GEOMETRY<RLE_GRID_3D<double> >;
-#endif
-#if COMPILE_WITH_BINTREE_SUPPORT
-template class GRID_BASED_COLLISION_GEOMETRY<BINTREE_GRID<double> >;
-#endif
 #endif

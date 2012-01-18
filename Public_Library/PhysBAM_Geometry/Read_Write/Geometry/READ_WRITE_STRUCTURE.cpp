@@ -59,16 +59,10 @@ void Register_Read_Write_Tetrahedralized_Volume();
 void Register_Read_Write_Triangulated_Area();
 void Register_Read_Write_Triangulated_Surface();
 void Register_Read_Write_Analytic_Implicit_Object();
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-void Register_Read_Write_Dyadic_Implicit_Object();
-#endif
 void Register_Read_Write_Implicit_Object();
 void Register_Read_Write_Implicit_Object_Transformed();
 void Register_Read_Write_Levelset_Implicit_Object();
 void Register_Read_Write_Multibody_Levelset_Implicit_Object();
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-void Register_Read_Write_RLE_Implicit_Object();
-#endif
 void Register_Read_Write_Free_Particles();
 
 void Initialize_Read_Write_Structures()
@@ -87,16 +81,10 @@ void Initialize_Read_Write_Structures()
     Register_Read_Write_Triangulated_Area();
     Register_Read_Write_Triangulated_Surface();
     Register_Read_Write_Analytic_Implicit_Object();
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    Register_Read_Write_Dyadic_Implicit_Object();
-#endif
     //Register_Read_Write_Implicit_Object();
     Register_Read_Write_Implicit_Object_Transformed();
     Register_Read_Write_Levelset_Implicit_Object();
     Register_Read_Write_Multibody_Levelset_Implicit_Object();
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-    Register_Read_Write_RLE_Implicit_Object();
-#endif
     Register_Read_Write_Free_Particles();
 }
 

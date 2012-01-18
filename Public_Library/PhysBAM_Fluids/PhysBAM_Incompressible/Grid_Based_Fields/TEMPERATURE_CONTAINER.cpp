@@ -4,20 +4,11 @@
 //#####################################################################
 // Class TEMPERATURE_CONTAINER
 //#####################################################################
-#include <PhysBAM_Tools/Grids_Dyadic/DYADIC_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Dyadic/OCTREE_GRID.h>
-#include <PhysBAM_Tools/Grids_Dyadic/QUADTREE_GRID.h>
-#include <PhysBAM_Tools/Grids_Dyadic_Boundaries/BOUNDARY_DYADIC.h>
-#include <PhysBAM_Tools/Grids_Dyadic_Interpolation/LINEAR_INTERPOLATION_DYADIC.h>
-#include <PhysBAM_Tools/Grids_Dyadic_Interpolation/LINEAR_INTERPOLATION_DYADIC_HELPER.h>
-#include <PhysBAM_Tools/Grids_RLE_Boundaries/BOUNDARY_RLE.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Tools/Math_Tools/cube.h>
 #include <PhysBAM_Geometry/Advection_Collidable/ADVECTION_WRAPPER_COLLIDABLE_CELL.h>
-#include <PhysBAM_Geometry/Grids_Dyadic_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_DYADIC.h>
-#include <PhysBAM_Geometry/Grids_RLE_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_RLE.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Grid_Based_Fields/TEMPERATURE_CONTAINER.h>
 namespace PhysBAM{
@@ -68,24 +59,6 @@ template<class T,class T_GRID> static void Apply_Cooling_Helper(TEMPERATURE_CONT
     T constant=3*container.cooling_constant*dt/sqr(sqr(container.hot_point-container.ambient_temperature));
     for(int i=1;i<=container.grid.number_of_cells;i++)container.Apply_Individual_Cooling(container.temperature(i),constant);
 }
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-template<> void TEMPERATURE_CONTAINER<OCTREE_GRID<float> >::Apply_Cooling(const float dt,const float time){Apply_Cooling_Helper(*this,dt,time);}
-template<> void TEMPERATURE_CONTAINER<QUADTREE_GRID<float> >::Apply_Cooling(const float dt,const float time){Apply_Cooling_Helper(*this,dt,time);}
-#endif
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-template<> void TEMPERATURE_CONTAINER<RLE_GRID_2D<float> >::Apply_Cooling(const float dt,const float time){Apply_Cooling_Helper(*this,dt,time);}
-template<> void TEMPERATURE_CONTAINER<RLE_GRID_3D<float> >::Apply_Cooling(const float dt,const float time){Apply_Cooling_Helper(*this,dt,time);}
-#endif
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-template<> void TEMPERATURE_CONTAINER<OCTREE_GRID<double> >::Apply_Cooling(const double dt,const double time){Apply_Cooling_Helper(*this,dt,time);}
-template<> void TEMPERATURE_CONTAINER<QUADTREE_GRID<double> >::Apply_Cooling(const double dt,const double time){Apply_Cooling_Helper(*this,dt,time);}
-#endif
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-template<> void TEMPERATURE_CONTAINER<RLE_GRID_2D<double> >::Apply_Cooling(const double dt,const double time){Apply_Cooling_Helper(*this,dt,time);}
-template<> void TEMPERATURE_CONTAINER<RLE_GRID_3D<double> >::Apply_Cooling(const double dt,const double time){Apply_Cooling_Helper(*this,dt,time);}
-#endif
-#endif
 //#####################################################################
 // Function Apply_Individual_Cooling
 //#####################################################################
@@ -110,25 +83,9 @@ Use_Semi_Lagrangian_Collidable_Advection(const T_GRID_BASED_COLLISION_GEOMETRY& 
 template class TEMPERATURE_CONTAINER<GRID<VECTOR<float,1> > >;
 template class TEMPERATURE_CONTAINER<GRID<VECTOR<float,2> > >;
 template class TEMPERATURE_CONTAINER<GRID<VECTOR<float,3> > >;
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-template class TEMPERATURE_CONTAINER<QUADTREE_GRID<float> >;
-template class TEMPERATURE_CONTAINER<OCTREE_GRID<float> >;
-#endif
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-template class TEMPERATURE_CONTAINER<RLE_GRID_2D<float> >;
-template class TEMPERATURE_CONTAINER<RLE_GRID_3D<float> >;
-#endif
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class TEMPERATURE_CONTAINER<GRID<VECTOR<double,1> > >;
 template class TEMPERATURE_CONTAINER<GRID<VECTOR<double,2> > >;
 template class TEMPERATURE_CONTAINER<GRID<VECTOR<double,3> > >;
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-template class TEMPERATURE_CONTAINER<QUADTREE_GRID<double> >;
-template class TEMPERATURE_CONTAINER<OCTREE_GRID<double> >;
-#endif
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-template class TEMPERATURE_CONTAINER<RLE_GRID_2D<double> >;
-template class TEMPERATURE_CONTAINER<RLE_GRID_3D<double> >;
-#endif
 #endif
 }

@@ -4,30 +4,6 @@
 //#####################################################################
 // Class GRID_AND_ARRAY_CONTAINER
 //#####################################################################
-#include <PhysBAM_Tools/Grids_Dyadic/DYADIC_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Dyadic/DYADIC_GRID_ITERATOR_FACE.h>
-#include <PhysBAM_Tools/Grids_Dyadic/DYADIC_GRID_ITERATOR_NODE.h>
-#include <PhysBAM_Tools/Grids_Dyadic/OCTREE_GRID.h>
-#include <PhysBAM_Tools/Grids_Dyadic/QUADTREE_GRID.h>
-#include <PhysBAM_Tools/Grids_Dyadic_Advection/ADVECTION_SEMI_LAGRANGIAN_DYADIC.h>
-#include <PhysBAM_Tools/Grids_Dyadic_Boundaries/BOUNDARY_DYADIC.h>
-#include <PhysBAM_Tools/Grids_Dyadic_Boundaries/BOUNDARY_POLICY_DYADIC.h>
-#include <PhysBAM_Tools/Grids_Dyadic_Interpolation/LINEAR_INTERPOLATION_DYADIC.h>
-#include <PhysBAM_Tools/Grids_Dyadic_Interpolation/LINEAR_INTERPOLATION_DYADIC_HELPER.h>
-#include <PhysBAM_Tools/Grids_RLE/RLE_GRID_2D.h>
-#include <PhysBAM_Tools/Grids_RLE/RLE_GRID_3D.h>
-#include <PhysBAM_Tools/Grids_RLE/RLE_GRID_ITERATOR_BLOCK_2D.h>
-#include <PhysBAM_Tools/Grids_RLE/RLE_GRID_ITERATOR_BLOCK_3D.h>
-#include <PhysBAM_Tools/Grids_RLE/RLE_GRID_ITERATOR_CELL_2D.h>
-#include <PhysBAM_Tools/Grids_RLE/RLE_GRID_ITERATOR_CELL_3D.h>
-#include <PhysBAM_Tools/Grids_RLE/RLE_GRID_ITERATOR_FACE_HORIZONTAL.h>
-#include <PhysBAM_Tools/Grids_RLE/RLE_GRID_ITERATOR_FACE_Y.h>
-#include <PhysBAM_Tools/Grids_RLE_Advection/ADVECTION_SEMI_LAGRANGIAN_RLE.h>
-#include <PhysBAM_Tools/Grids_RLE_Boundaries/BOUNDARY_POLICY_RLE.h>
-#include <PhysBAM_Tools/Grids_RLE_Boundaries/BOUNDARY_RLE.h>
-#include <PhysBAM_Tools/Grids_RLE_Interpolation/AVERAGING_RLE.h>
-#include <PhysBAM_Tools/Grids_RLE_Interpolation/FACE_LOOKUP_RLE.h>
-#include <PhysBAM_Tools/Grids_RLE_Interpolation/LINEAR_INTERPOLATION_RLE.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
@@ -72,24 +48,8 @@ Euler_Step(const T dt,const T time,const int number_of_ghost_cells)
 template class GRID_AND_ARRAY_CONTAINER<GRID<VECTOR<float,1> >,float>;
 template class GRID_AND_ARRAY_CONTAINER<GRID<VECTOR<float,2> >,float>;
 template class GRID_AND_ARRAY_CONTAINER<GRID<VECTOR<float,3> >,float>;
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-template class GRID_AND_ARRAY_CONTAINER<QUADTREE_GRID<float>,float>;
-template class GRID_AND_ARRAY_CONTAINER<OCTREE_GRID<float>,float>;
-#endif
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-template class GRID_AND_ARRAY_CONTAINER<RLE_GRID_2D<float>,float>;
-template class GRID_AND_ARRAY_CONTAINER<RLE_GRID_3D<float>,float>;
-#endif
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class GRID_AND_ARRAY_CONTAINER<GRID<VECTOR<double,1> >,double>;
 template class GRID_AND_ARRAY_CONTAINER<GRID<VECTOR<double,2> >,double>;
 template class GRID_AND_ARRAY_CONTAINER<GRID<VECTOR<double,3> >,double>;
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-template class GRID_AND_ARRAY_CONTAINER<QUADTREE_GRID<double>,double>;
-template class GRID_AND_ARRAY_CONTAINER<OCTREE_GRID<double>,double>;
-#endif
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-template class GRID_AND_ARRAY_CONTAINER<RLE_GRID_2D<double>,double>;
-template class GRID_AND_ARRAY_CONTAINER<RLE_GRID_3D<double>,double>;
-#endif
 #endif

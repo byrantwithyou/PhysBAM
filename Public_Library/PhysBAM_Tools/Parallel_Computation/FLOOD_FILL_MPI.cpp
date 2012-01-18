@@ -2,22 +2,12 @@
 // Copyright 2005-2006, Eran Guendelman, Geoffrey Irving, Andrew Selle, Tamar Shinar, Jerry Talton.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-#include <PhysBAM_Tools/Grids_RLE/RLE_GRID_2D.h>
-#include <PhysBAM_Tools/Grids_RLE/RLE_GRID_3D.h>
-#endif
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Tools/Parallel_Computation/FLOOD_FILL_MPI.h>
 #ifdef USE_MPI
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 #include <PhysBAM_Tools/Data_Structures/UNION_FIND.h>
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-#include <PhysBAM_Tools/Grids_RLE/RLE_GRID_ITERATOR_FACE_HORIZONTAL.h>
-#include <PhysBAM_Tools/Grids_RLE/RLE_GRID_ITERATOR_FACE_Y.h>
-#include <PhysBAM_Tools/Grids_RLE/RLE_GRID_SIMPLE_ITERATOR.h>
-#include <PhysBAM_Tools/Parallel_Computation/MPI_RLE_GRID.h>
-#endif
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
@@ -326,17 +316,6 @@ Translate_Local_Colors_To_Global_Colors(const ARRAY<int,VECTOR<int,1> >& color_m
         int new_color=color_map(colors(cell_index));colors_copy(cell_index)=new_color>0?new_color+global_color_offset:-1;}
 }
 //#####################################################################
-// Function Translate_Local_Colors_To_Global_Colors
-//#####################################################################
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-template<class T_GRID> template<class T_BOX_HORIZONTAL_INT> void FLOOD_FILL_MPI<T_GRID>::
-Translate_Local_Colors_To_Global_Colors(const ARRAY<int,VECTOR<int,1> >& color_map,ARRAY<int>& colors_copy,const T_BOX_HORIZONTAL_INT& region,const int global_color_offset) const
-{
-    for(RLE_GRID_SIMPLE_ITERATOR<T_GRID,CELL_ITERATOR> cell(local_grid,region);cell;cell++){int c=cell.index;
-        int new_color=color_map(colors(c));colors_copy(c)=new_color>0?new_color+global_color_offset:-1;}
-}
-#endif
-//#####################################################################
 // Function Find_Color_Matches
 //#####################################################################
 template<class T_GRID> void FLOOD_FILL_MPI<T_GRID>::
@@ -346,18 +325,6 @@ Find_Color_Matches(const ARRAY<int,VECTOR<int,1> >& color_map,UNION_FIND<>& unio
         int local_color=color_map(colors(cell_index));
         if(local_color>0) union_find.Union(global_color_offset+local_color,colors_copy(cell_index));}}
 }
-//#####################################################################
-// Function Find_Color_Matches
-//#####################################################################
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-template<class T_GRID> template<class T_BOX_HORIZONTAL_INT> void FLOOD_FILL_MPI<T_GRID>::
-Find_Color_Matches(const ARRAY<int,VECTOR<int,1> >& color_map,UNION_FIND<>& union_find,ARRAY<int>& colors_copy,const T_BOX_HORIZONTAL_INT& region,const int global_color_offset) const
-{
-    for(RLE_GRID_SIMPLE_ITERATOR<T_GRID,CELL_ITERATOR> cell(local_grid,region);cell;cell++){int color=colors_copy(cell.index);if(color>0){
-        int local_color=color_map(colors(cell.index));
-        if(local_color>0) union_find.Union(global_color_offset+local_color,color);}}
-}
-#endif
 //#####################################################################
 // Function Remap_Colors
 //#####################################################################
@@ -403,12 +370,4 @@ INSTANTIATION_HELPER(float,P(GRID<VECTOR<float,3> >));
 INSTANTIATION_HELPER(double,P(GRID<VECTOR<double,1> >));
 INSTANTIATION_HELPER(double,P(GRID<VECTOR<double,2> >));
 INSTANTIATION_HELPER(double,P(GRID<VECTOR<double,3> >));
-#endif
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-INSTANTIATION_HELPER(float,RLE_GRID_2D<float>);
-INSTANTIATION_HELPER(float,RLE_GRID_3D<float>);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-INSTANTIATION_HELPER(double,RLE_GRID_2D<double>);
-INSTANTIATION_HELPER(double,RLE_GRID_3D<double>);
-#endif
 #endif

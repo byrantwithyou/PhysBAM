@@ -4,9 +4,6 @@
 //#####################################################################
 // Class WATER_STANDARD_TESTS_3D
 //#####################################################################
-#include <PhysBAM_Tools/Grids_Dyadic/OCTREE_GRID.h>
-#include <PhysBAM_Tools/Grids_Dyadic_Interpolation/LINEAR_INTERPOLATION_DYADIC.h>
-#include <PhysBAM_Tools/Grids_RLE_Interpolation/AVERAGING_RLE.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_4X4.h>
 #include <PhysBAM_Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
@@ -14,8 +11,6 @@
 #include <PhysBAM_Geometry/Basic_Geometry/CYLINDER.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TORUS.h>
-#include <PhysBAM_Geometry/Grids_Dyadic_Collisions/GRID_BASED_COLLISION_GEOMETRY_DYADIC.h>
-#include <PhysBAM_Geometry/Grids_RLE_Collisions/GRID_BASED_COLLISION_GEOMETRY_RLE.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
@@ -246,16 +241,6 @@ void Get_Variable_Viscosity_Helper(GRID<VECTOR<T,3> >& grid,const int test_numbe
         for(typename GRID<VECTOR<T,3> >::CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next())
             variable_viscosity(iterator.Cell_Index())=(iterator.Location().x<.5)?(T)0:(T)1000;}
 }
-template<class T>
-void Get_Variable_Viscosity_Helper(OCTREE_GRID<T>& grid, const int test_number,ARRAY<T,VECTOR<int,3> >& variable_viscosity,const T time)
-{
-    PHYSBAM_NOT_IMPLEMENTED();
-}
-template<class T>
-void Get_Variable_Viscosity_Helper(RLE_GRID_3D<T>& grid,const int test_number,ARRAY<T,VECTOR<int,3> >& variable_viscosity,const T time)
-{
-    PHYSBAM_NOT_IMPLEMENTED();
-}
 template<class T_GRID> void WATER_STANDARD_TESTS_3D<T_GRID>::
 Get_Variable_Viscosity(ARRAY<T,VECTOR<int,3> >& variable_viscosity,const T time) const
 {
@@ -408,16 +393,6 @@ Limit_Dt(T& dt,const T time)
 // Function Initialize_SPH_Particles
 //#####################################################################
 template<class T> void
-Initialize_SPH_Particles_Helper(int test_number,WATER_STANDARD_TESTS_3D<RLE_GRID_3D<T> >& tests,FLUIDS_PARAMETERS<RLE_GRID_3D<T> >& fluids_parameters)
-{
-    PHYSBAM_NOT_IMPLEMENTED();
-}
-template<class T> void
-Initialize_SPH_Particles_Helper(int test_number,WATER_STANDARD_TESTS_3D<OCTREE_GRID<T> >& tests,FLUIDS_PARAMETERS<OCTREE_GRID<T> >& fluids_parameters)
-{
-    PHYSBAM_NOT_IMPLEMENTED();
-}
-template<class T> void
 Initialize_SPH_Particles_Helper(int test_number,WATER_STANDARD_TESTS_3D<GRID<VECTOR<T,3> > >& tests,FLUIDS_PARAMETERS<GRID<VECTOR<T,3> > >& fluids_parameters)
 {
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
@@ -511,18 +486,6 @@ Analytic_Velocity(const T time,const TV& location) const
 }
 //#####################################################################
 template class WATER_STANDARD_TESTS_3D<GRID<VECTOR<float,3> > >;
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-template class WATER_STANDARD_TESTS_3D<OCTREE_GRID<float> >;
-#endif
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-template class WATER_STANDARD_TESTS_3D<RLE_GRID_3D<float> >;
-#endif
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class WATER_STANDARD_TESTS_3D<GRID<VECTOR<double,3> > >;
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-template class WATER_STANDARD_TESTS_3D<OCTREE_GRID<double> >;
-#endif
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-template class WATER_STANDARD_TESTS_3D<RLE_GRID_3D<double> >;
-#endif
 #endif

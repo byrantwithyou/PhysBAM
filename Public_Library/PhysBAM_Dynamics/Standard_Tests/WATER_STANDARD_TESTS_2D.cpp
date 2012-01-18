@@ -4,12 +4,10 @@
 //#####################################################################
 // Class WATER_STANDARD_TESTS_2D
 //#####################################################################
-#include <PhysBAM_Tools/Grids_RLE/RLE_GRID_2D.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Matrices/FRAME.h>
-#include <PhysBAM_Geometry/Grids_RLE_Collisions/GRID_BASED_COLLISION_GEOMETRY_RLE.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_UNIFORM.h>
@@ -427,30 +425,6 @@ Initial_Phi_Object(const TV& X) const
 }
 //#####################################################################
 template class WATER_STANDARD_TESTS_2D<GRID<VECTOR<float,2> > >;
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-template void WATER_STANDARD_TESTS_2D<RLE_GRID_2D<float> >::Get_Variable_Viscosity(ARRAY<float,VECTOR<int,2> >&,float) const;
-template float WATER_STANDARD_TESTS_2D<RLE_GRID_2D<float> >::Initial_Phi(VECTOR<float,2> const&) const;
-template VECTOR<float,2> WATER_STANDARD_TESTS_2D<RLE_GRID_2D<float> >::Initial_Velocity(VECTOR<float,2> const&) const;
-template void WATER_STANDARD_TESTS_2D<RLE_GRID_2D<float> >::Initialize_Advection(bool);
-template void WATER_STANDARD_TESTS_2D<RLE_GRID_2D<float> >::Limit_Dt(float&,float);
-template void WATER_STANDARD_TESTS_2D<RLE_GRID_2D<float> >::Update_Sources(float);
-template WATER_STANDARD_TESTS_2D<RLE_GRID_2D<float> >::WATER_STANDARD_TESTS_2D(SOLIDS_FLUIDS_EXAMPLE<VECTOR<float,2> >&,FLUIDS_PARAMETERS<RLE_GRID_2D<float> >&,
-    RIGID_BODY_COLLECTION<VECTOR<float,2> >&,int,int);
-template WATER_STANDARD_TESTS_2D<RLE_GRID_2D<float> >::~WATER_STANDARD_TESTS_2D();
-template float WATER_STANDARD_TESTS_2D<RLE_GRID_2D<float> >::Initial_Phi_Object(VECTOR<float,2> const&) const;
-#endif
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class WATER_STANDARD_TESTS_2D<GRID<VECTOR<double,2> > >;
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-template void WATER_STANDARD_TESTS_2D<RLE_GRID_2D<double> >::Get_Variable_Viscosity(ARRAY<double,VECTOR<int,2> >&,double) const;
-template double WATER_STANDARD_TESTS_2D<RLE_GRID_2D<double> >::Initial_Phi(VECTOR<double,2> const&) const;
-template VECTOR<double,2> WATER_STANDARD_TESTS_2D<RLE_GRID_2D<double> >::Initial_Velocity(VECTOR<double,2> const&) const;
-template void WATER_STANDARD_TESTS_2D<RLE_GRID_2D<double> >::Initialize_Advection(bool);
-template void WATER_STANDARD_TESTS_2D<RLE_GRID_2D<double> >::Limit_Dt(double&,double);
-template void WATER_STANDARD_TESTS_2D<RLE_GRID_2D<double> >::Update_Sources(double);
-template WATER_STANDARD_TESTS_2D<RLE_GRID_2D<double> >::WATER_STANDARD_TESTS_2D(SOLIDS_FLUIDS_EXAMPLE<VECTOR<double,2> >&,FLUIDS_PARAMETERS<RLE_GRID_2D<double> >&,
-    RIGID_BODY_COLLECTION<VECTOR<double,2> >&,int,int);
-template WATER_STANDARD_TESTS_2D<RLE_GRID_2D<double> >::~WATER_STANDARD_TESTS_2D();
-template double WATER_STANDARD_TESTS_2D<RLE_GRID_2D<double> >::Initial_Phi_Object(VECTOR<double,2> const&) const;
-#endif
 #endif

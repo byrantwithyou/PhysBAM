@@ -2,10 +2,6 @@
 // Copyright 2005, Geoffrey Irving, Frank Losasso, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#if COMPILE_WITH_BINTREE_SUPPORT
-#include <PhysBAM_Tools/Grids_Dyadic/BINTREE_GRID.h>
-#include <PhysBAM_Tools/Grids_Dyadic/BLOCK_DYADIC.h>
-#endif
 #include <PhysBAM_Tools/Grids_Uniform/BLOCK_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_ID.h>
@@ -89,11 +85,4 @@ template class OBJECTS_IN_CELL<GRID<VECTOR<float,3> >,COLLISION_GEOMETRY_ID>;
 template class OBJECTS_IN_CELL<GRID<VECTOR<double,1> >,COLLISION_GEOMETRY_ID>;
 template class OBJECTS_IN_CELL<GRID<VECTOR<double,2> >,COLLISION_GEOMETRY_ID>;
 template class OBJECTS_IN_CELL<GRID<VECTOR<double,3> >,COLLISION_GEOMETRY_ID>;
-#endif
-
-#if COMPILE_WITH_BINTREE_SUPPORT
-template class OBJECTS_IN_CELL<BINTREE_GRID<float>,COLLISION_GEOMETRY_ID>;
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-template class OBJECTS_IN_CELL<BINTREE_GRID<double>,COLLISION_GEOMETRY_ID>;
-#endif
 #endif

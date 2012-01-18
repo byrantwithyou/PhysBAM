@@ -9,8 +9,6 @@
 
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
 #include <PhysBAM_Tools/Data_Structures/ELEMENT_ID.h>
-#include <PhysBAM_Tools/Grids_Dyadic/DYADIC_GRID_POLICY.h>
-#include <PhysBAM_Tools/Grids_RLE/RLE_GRID_POLICY.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Tools/Math_Tools/ONE.h>
@@ -38,12 +36,6 @@ class COLLISION_BODY_HELPER
 {
 private:
     typedef typename TV::SCALAR T;
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    typedef typename DYADIC_GRID_POLICY<TV>::DYADIC_GRID T_DYADIC_GRID;
-#endif
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-    typedef typename RLE_GRID_POLICY<TV>::RLE_GRID T_RLE_GRID;
-#endif
     typedef typename GRID_ARRAYS_POLICY<GRID<TV> >::ARRAYS_SCALAR T_ARRAYS_SCALAR;typedef typename REBIND<T_ARRAYS_SCALAR,bool>::TYPE T_ARRAYS_BOOL;
     typedef typename GRID_ARRAYS_POLICY<GRID<TV> >::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;typedef typename REBIND<T_FACE_ARRAYS_SCALAR,int>::TYPE T_FACE_ARRAYS_INT;
     typedef typename BASIC_SIMPLEX_POLICY<TV,TV::dimension-1>::SIMPLEX T_SIMPLEX;

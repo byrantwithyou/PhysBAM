@@ -22,7 +22,6 @@
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Standard_Tests/THIN_SHELLS_FLUID_COUPLING_UTILITIES.h>
-#include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_DYADIC.h>
 #include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -281,24 +280,6 @@ Add_Rigid_Body_Walls(SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T,3> > >& example
 {
     ::Add_Rigid_Body_Walls(example,(example.fluids_parameters.mpi_grid?example.fluids_parameters.mpi_grid->global_grid:*example.fluids_parameters.grid),coefficient_of_restitution,coefficient_of_friction,walls_added);
 }
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-//#####################################################################
-// Function Add_Rigid_Body_Walls
-//#####################################################################
-template<class T> void THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::
-Add_Rigid_Body_Walls(SOLIDS_FLUIDS_EXAMPLE_DYADIC<QUADTREE_GRID<T> >& example,const T coefficient_of_restitution,const T coefficient_of_friction,ARRAY<int>* walls_added)
-{
-    ::Add_Rigid_Body_Walls(example,example.fluids_parameters.grid->uniform_grid,coefficient_of_restitution,coefficient_of_friction,walls_added);
-}
-//#####################################################################
-// Function Add_Rigid_Body_Walls
-//#####################################################################
-template<class T> void THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::
-Add_Rigid_Body_Walls(SOLIDS_FLUIDS_EXAMPLE_DYADIC<OCTREE_GRID<T> >& example,const T coefficient_of_restitution,const T coefficient_of_friction,ARRAY<int>* walls_added)
-{
-    ::Add_Rigid_Body_Walls(example,example.fluids_parameters.grid->uniform_grid,coefficient_of_restitution,coefficient_of_friction,walls_added);
-}
-#endif
 //#####################################################################
 // Function Set_Deformable_Object_Parameters_2D
 //#####################################################################

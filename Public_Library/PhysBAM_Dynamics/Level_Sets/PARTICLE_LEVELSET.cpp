@@ -5,20 +5,9 @@
 // Class PARTICLE_LEVELSET
 //##################################################################### 
 #include <PhysBAM_Tools/Arrays_Computations/SORT.h>
-#include <PhysBAM_Tools/Grids_Dyadic/OCTREE_GRID.h>
-#include <PhysBAM_Tools/Grids_Dyadic/QUADTREE_GRID.h>
-#include <PhysBAM_Tools/Grids_Dyadic_Interpolation/LINEAR_INTERPOLATION_DYADIC.h>
-#include <PhysBAM_Tools/Grids_RLE_Interpolation/AVERAGING_RLE.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Math_Tools/pow.h>
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
-#include <PhysBAM_Geometry/Grids_Dyadic_Collisions/GRID_BASED_COLLISION_GEOMETRY_DYADIC.h>
-#include <PhysBAM_Geometry/Grids_Dyadic_Level_Sets/LEVELSET_OCTREE.h>
-#include <PhysBAM_Geometry/Grids_Dyadic_Level_Sets/LEVELSET_POLICY_DYADIC.h>
-#include <PhysBAM_Geometry/Grids_Dyadic_Level_Sets/LEVELSET_QUADTREE.h>
-#include <PhysBAM_Geometry/Grids_RLE_Collisions/GRID_BASED_COLLISION_GEOMETRY_RLE.h>
-#include <PhysBAM_Geometry/Grids_RLE_Level_Sets/LEVELSET_POLICY_RLE.h>
-#include <PhysBAM_Geometry/Grids_RLE_Level_Sets/LEVELSET_RLE.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/FAST_LEVELSET.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_1D.h>
@@ -390,24 +379,8 @@ Adjust_Particle_For_Objects(TV& X,TV& V,const T r, const T collision_distance,co
 INSTANTIATION_HELPER(P(GRID<VECTOR<float,1> >));
 INSTANTIATION_HELPER(P(GRID<VECTOR<float,2> >));
 INSTANTIATION_HELPER(P(GRID<VECTOR<float,3> >));
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-INSTANTIATION_HELPER(OCTREE_GRID<float>);
-INSTANTIATION_HELPER(QUADTREE_GRID<float>);
-#endif
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-INSTANTIATION_HELPER(RLE_GRID_2D<float>);
-INSTANTIATION_HELPER(RLE_GRID_3D<float>);
-#endif 
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 INSTANTIATION_HELPER(P(GRID<VECTOR<double,1> >));
 INSTANTIATION_HELPER(P(GRID<VECTOR<double,2> >));
 INSTANTIATION_HELPER(P(GRID<VECTOR<double,3> >));
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-INSTANTIATION_HELPER(OCTREE_GRID<double>);
-INSTANTIATION_HELPER(QUADTREE_GRID<double>);
-#endif
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-INSTANTIATION_HELPER(RLE_GRID_2D<double>);
-INSTANTIATION_HELPER(RLE_GRID_3D<double>);
-#endif 
 #endif 

@@ -15,18 +15,11 @@
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
 #include <PhysBAM_Tools/Parallel_Computation/MPI_PACKAGE.h>
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-#include <PhysBAM_Tools/Parallel_Computation/MPI_RLE_GRID.h>
-#endif
 #include <PhysBAM_Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 #include <PhysBAM_Tools/Read_Write/Grids_Uniform_Arrays/READ_WRITE_ARRAYS.h>
 #endif
 #include <PhysBAM_Tools/Read_Write/Math_Tools/READ_WRITE_RANGE.h>
-#endif
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-#include <PhysBAM_Tools/Grids_RLE/RLE_GRID_2D.h>
-#include <PhysBAM_Tools/Grids_RLE/RLE_GRID_3D.h>
 #endif
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
@@ -1028,19 +1021,10 @@ template<class T_GRID> void MPI_GRID<T_GRID>::Sync_Common_Cell_Weights_To(ARRAY<
     template void MPI_GRID<T_GRID >::Reduce_Add(const ARRAY<T>&,ARRAY<T>&) const; \
     template T MPI_GRID<T_GRID >::Reduce_Add(const T&) const;
 
-#ifndef COMPILE_WITHOUT_RLE_SUPPORT
-#define INSTANTIATION_HELPER_ALL(T) \
-    INSTANTIATION_HELPER_UNIFORM(T,P(GRID<VECTOR<T,1> >),1);         \
-    INSTANTIATION_HELPER_UNIFORM(T,P(GRID<VECTOR<T,2> >),2);         \
-    INSTANTIATION_HELPER_UNIFORM(T,P(GRID<VECTOR<T,3> >),3);         \
-    INSTANTIATION_HELPER(T,P(GRID<VECTOR<T,1> >),RLE_GRID_2D<T>);    \
-    INSTANTIATION_HELPER(T,P(GRID<VECTOR<T,2> >),RLE_GRID_3D<T>)
-#else
 #define INSTANTIATION_HELPER_ALL(T) \
     INSTANTIATION_HELPER_UNIFORM(T,P(GRID<VECTOR<T,1> >),1);         \
     INSTANTIATION_HELPER_UNIFORM(T,P(GRID<VECTOR<T,2> >),2);         \
     INSTANTIATION_HELPER_UNIFORM(T,P(GRID<VECTOR<T,3> >),3);
-#endif
 
 INSTANTIATION_HELPER_ALL(float);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT

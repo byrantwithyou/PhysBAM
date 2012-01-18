@@ -8,9 +8,9 @@
 #define __MELTING_TEST__
 
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
-#include <PhysBAM_Geometry/Red_Green/RED_GREEN_GRID_2D.h>
 #include "../WATER_MELTING_EXAMPLE_2D.h"
 #include <Level_Sets/LEVELSET_TRIANGULATED_OBJECT.h>
+#include <PhysBAM_Geometry/Red_Green/RED_GREEN_GRID_2D.h>
 namespace PhysBAM{
 
 template<class T,class RW=T>

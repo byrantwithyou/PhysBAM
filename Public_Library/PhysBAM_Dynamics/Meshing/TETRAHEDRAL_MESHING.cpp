@@ -12,7 +12,6 @@
 #include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Utilities/INTERRUPTS.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
-#include <PhysBAM_Geometry/Implicit_Objects_Dyadic/DYADIC_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
@@ -573,30 +572,6 @@ Tetrahedron_Refinement_Criteria(const int index) const
     T phi_i=implicit_surface->Extended_Phi(xi),phi_j=implicit_surface->Extended_Phi(xj),phi_k=implicit_surface->Extended_Phi(xk),phi_l=implicit_surface->Extended_Phi(xl);
     if(min(abs(phi_i),abs(phi_j),abs(phi_k),abs(phi_l)) > max_length) return false; // early exit if the surface cannot pass through the tet
 
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    // check sample points near interface for high curvature or interpolation error
-    if(typeid(*implicit_surface)==typeid(DYADIC_IMPLICIT_OBJECT<TV>)){
-        OCTREE_GRID<T>& octree_grid=dynamic_cast<DYADIC_IMPLICIT_OBJECT<TV>*>(implicit_surface)->levelset.grid;
-        TETRAHEDRON<T> tetrahedron(xi,xj,xk,xl);
-        ARRAY<OCTREE_CELL<T>*> intersecting_cells;
-        octree_grid.Get_Cells_Intersecting_Box(tetrahedron.Bounding_Box(),intersecting_cells);
-        bool seen_positive=false,seen_negative=false,seen_big_error=false;
-        for(int i=1;i<=intersecting_cells.m;i++){
-            TV weights,x=tetrahedron.Closest_Point(intersecting_cells(i)->Center(),weights); // sample point
-            T phi=implicit_surface->Extended_Phi(x);
-            if(abs(phi)<minimum_cell_size_in_tetrahedron){ // close to the interface
-                VECTOR<T,2> curvatures=implicit_surface->Principal_Curvatures(x);
-                if(max_length*(abs(curvatures[1])+abs(curvatures[2]))>curvature_subdivision_threshold) return true;}
-            if(phi>=0) seen_positive=true;if(phi<=0) seen_negative=true;
-            if(!seen_big_error){ // figure out linear interpolation of phi through the corners of the tet
-                MATRIX<T,4> A(1,1,1,1,xi.x,xj.x,xk.x,xl.x,xi.y,xj.y,xk.y,xl.y,xi.z,xj.z,xk.z,xl.z);A.Invert();
-                T phi0=A(1,1)*phi_i+A(1,2)*phi_j+A(1,3)*phi_k+A(1,4)*phi_l;
-                TV average_normal(A(2,1)*phi_i+A(2,2)*phi_j+A(2,3)*phi_k+A(2,4)*phi_l,A(3,1)*phi_i+A(3,2)*phi_j+A(3,3)*phi_k+A(3,4)*phi_l,
-                                            A(4,1)*phi_i+A(4,2)*phi_j+A(4,3)*phi_k+A(4,4)*phi_l);
-                if(abs(phi-(phi0+TV::Dot_Product(average_normal,x)))>interpolation_error_subdivision_threshold*max_length) seen_big_error=true;}
-            if((seen_big_error || max_length>maximum_boundary_edge_length) && seen_positive && seen_negative) return true;}}
-    else
-#endif
     {
         int n=(int)ceil(max_length/minimum_cell_size_in_tetrahedron);T one_over_n=(T)1/n;bool seen_positive=false,seen_negative=false,seen_big_error=false;
         for(int p=0;p<=n;p++){T a=p*one_over_n;for(int q=0;q<=n-p;q++){T b=q*one_over_n;for(int r=0;r<=n-p-q;r++){T c=r*one_over_n;

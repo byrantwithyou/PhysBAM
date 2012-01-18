@@ -9,10 +9,8 @@
 #include <PhysBAM_Tools/Read_Write/Matrices_And_Vectors/READ_WRITE_ROTATION.h>
 #include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
 #include <PhysBAM_Geometry/Basic_Geometry/BOUNDED_HORIZONTAL_PLANE.h>
-#include <PhysBAM_Geometry/Grids_Dyadic_Computations/DUALCONTOUR_OCTREE.h>
 #include <PhysBAM_Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
-#include <PhysBAM_Geometry/Implicit_Objects_Dyadic/DYADIC_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_RIGID_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
@@ -319,13 +317,6 @@ Create_Geometry(const int id)
                 opengl_levelset(id)->Generate_Triangulated_Surface();
                 opengl_levelset(id)->Enslave_Transform_To(*opengl_axes(id));
                 opengl_levelset(id)->implicit_object_transform=implicit_object_transformed->transform;}}
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-        else if(DYADIC_IMPLICIT_OBJECT<TV>* dyadic_implicit_object=dynamic_cast<DYADIC_IMPLICIT_OBJECT<TV>*>(object_space_implicit_object)){
-            if(!opengl_octree_levelset_surface(id)){
-                DUALCONTOUR_OCTREE<T> contour(&dyadic_implicit_object->levelset);
-                opengl_octree_levelset_surface(id)=new OPENGL_TRIANGULATED_SURFACE<T>(*contour.Get_Triangulated_Surface());
-                opengl_octree_levelset_surface(id)->Enslave_Transform_To(*opengl_axes(id));}}
-#endif
         else if(!rigid_geometry.simplicial_object && !opengl_triangulated_surface(id)){
             if(typeid(*object_space_implicit_object)==typeid(ANALYTIC_IMPLICIT_OBJECT<BOUNDED_HORIZONTAL_PLANE<TV> >))
                 use_object_bounding_box(id)=false; // don't use the ground bounding box

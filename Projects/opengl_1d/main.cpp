@@ -14,9 +14,6 @@
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_CONSTANT_COLOR_MAP.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_GRID_1D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_BASIC.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_BINTREE_CELL_SCALAR_FIELD.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_BINTREE_FACE_SCALAR_FIELD.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_BINTREE_GRID.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_1D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_LEVELSET_1D.h>
@@ -59,10 +56,6 @@ protected:
 
     GRID<TV> grid,mac_grid,regular_grid;
     OPENGL_COMPONENT_BASIC<OPENGL_GRID_1D<T> >* grid_component;
-#if COMPILE_WITH_BINTREE_SUPPORT
-    bool has_valid_bintree_grid;
-    OPENGL_COMPONENT_BINTREE_GRID<T>* bintree_grid_component;
-#endif
 };
 
 //#####################################################################
@@ -71,9 +64,6 @@ protected:
 template<class T,class RW> OPENGL_1D_VISUALIZATION<T,RW>::
 OPENGL_1D_VISUALIZATION()
     :grid_component(0)
-#if COMPILE_WITH_BINTREE_SUPPORT
-     ,bintree_grid_component(0)
-#endif
 {
     add_axes=false;
 }
@@ -85,9 +75,6 @@ template<class T,class RW> OPENGL_1D_VISUALIZATION<T,RW>::
 {
     delete &grid_component->object;
     delete grid_component;
-#if COMPILE_WITH_BINTREE_SUPPORT
-     delete bintree_grid_component;
-#endif
 }
 //#####################################################################
 // Function Add_Arguments
@@ -151,17 +138,6 @@ Read_Grid()
             regular_grid.Initialize(grid.counts.x+1,grid.Domain(),false);
             node_based=false;}
         LOG::cout<<"regular grid "<<regular_grid<<" mac grid "<<mac_grid<<" node_based "<<node_based<<std::endl;}
-
-#if COMPILE_WITH_BINTREE_SUPPORT
-        std::string bintree_filename=STRING_UTILITIES::string_sprintf("%s/%d/dyadic_grid",basedir.c_str(),start_frame);
-        if(FILE_UTILITIES::File_Exists(bintree_filename)){
-            LOG::cout<<"Reading bintree '"<<bintree_filename<<"'"<<std::endl<<std::flush;
-            bintree_filename=STRING_UTILITIES::string_sprintf("%s/%%d/dyadic_grid",basedir.c_str());
-            bintree_grid_component=new OPENGL_COMPONENT_BINTREE_GRID<T>(bintree_filename);
-            LOG::cout<<"Reading bintree '"<<bintree_filename<<"'"<<std::endl<<std::flush;
-            // Add_Component(bintree_grid_component); // add later instead of here, but Set_Frame_Extra will ensure bintree grid is read in
-            has_valid_bintree_grid=true;}
-#endif
 }
 //#####################################################################
 // Function Initialize_Components
@@ -338,42 +314,6 @@ Initialize_Components_And_Key_Bindings()
         else if(OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D<T,T,RW>* face_scalar_field_component=dynamic_cast<OPENGL_COMPONENT_FACE_SCALAR_FIELD_1D<T,T,RW>*>(component_list(c))){
             opengl_world.Append_Bind_Key('>',face_scalar_field_component->Increase_Scale_CB());
             opengl_world.Append_Bind_Key('<',face_scalar_field_component->Decrease_Scale_CB());}}
-
-#if COMPILE_WITH_BINTREE_SUPPORT
-    if(bintree_grid_component){
-        LOG::cout<<"Adding bintree grid component"<<std::endl;
-        Add_Component(bintree_grid_component,"Bintree Grid",'6',BASIC_VISUALIZATION::SELECTABLE | BASIC_VISUALIZATION::OWNED);}
-
-    filename=basedir+"/%d/dyadic_rho";
-    if(has_valid_bintree_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_BINTREE_CELL_SCALAR_FIELD<T>* bintree_density_component=new OPENGL_COMPONENT_BINTREE_CELL_SCALAR_FIELD<T>(bintree_grid_component->opengl_grid.grid,filename,new OPENGL_CONSTANT_COLOR_MAP<T>(OPENGL_COLOR::Yellow()),false);
-        Add_Component(bintree_density_component,"Bintree Density",'d',BASIC_VISUALIZATION::SELECTABLE | BASIC_VISUALIZATION::OWNED);}
-
-    filename=basedir+"/%d/dyadic_face_velocities";
-    if(has_valid_bintree_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_BINTREE_FACE_SCALAR_FIELD<T>* bintree_velocity_component=new OPENGL_COMPONENT_BINTREE_FACE_SCALAR_FIELD<T>(bintree_grid_component->opengl_grid.grid,filename,new OPENGL_CONSTANT_COLOR_MAP<T>(OPENGL_COLOR::Red()),true);
-        Add_Component(bintree_velocity_component,"Bintree Face Velocities",'V',BASIC_VISUALIZATION::SELECTABLE | BASIC_VISUALIZATION::OWNED);}
-
-    filename=basedir+"/%d/dyadic_velocities";
-    if(has_valid_bintree_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_BINTREE_CELL_SCALAR_FIELD<T>* bintree_velocity_component=new OPENGL_COMPONENT_BINTREE_CELL_SCALAR_FIELD<T>(bintree_grid_component->opengl_grid.grid,filename,new OPENGL_CONSTANT_COLOR_MAP<T>(OPENGL_COLOR::Magenta()),false);
-        Add_Component(bintree_velocity_component,"Bintree Velocities",'v',BASIC_VISUALIZATION::SELECTABLE | BASIC_VISUALIZATION::OWNED);}
-
-    filename=basedir+"/%d/dyadic_psi_N";
-    if(has_valid_bintree_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_BINTREE_FACE_SCALAR_FIELD<T,bool>* bintree_psi_N_component=new OPENGL_COMPONENT_BINTREE_FACE_SCALAR_FIELD<T,bool>(bintree_grid_component->opengl_grid.grid,filename,new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Cyan()),true);
-        bintree_psi_N_component->Set_Draw(false);
-        Add_Component(bintree_psi_N_component,"Bintree Psi_N points",'\0',BASIC_VISUALIZATION::SELECTABLE | BASIC_VISUALIZATION::OWNED);
-        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F1),bintree_psi_N_component->Toggle_Draw_CB());}
-
-    filename=basedir+"/%d/dyadic_psi_D";
-    if(has_valid_bintree_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_BINTREE_CELL_SCALAR_FIELD<T,bool>* bintree_psi_D_component=new OPENGL_COMPONENT_BINTREE_CELL_SCALAR_FIELD<T,bool>(bintree_grid_component->opengl_grid.grid,filename,new OPENGL_CONSTANT_COLOR_MAP<bool>(OPENGL_COLOR::Magenta()),true);
-        bintree_psi_D_component->Set_Draw(false);
-        Add_Component(bintree_psi_D_component,"Bintree Psi_D points",'\0',BASIC_VISUALIZATION::SELECTABLE | BASIC_VISUALIZATION::OWNED);
-        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F2),bintree_psi_D_component->Toggle_Draw_CB());}
-
-#endif
 }
 //#####################################################################
 // Function Set_Frame_Extra
@@ -393,9 +333,6 @@ Set_Frame_Extra()
 template<class T,class RW> void OPENGL_1D_VISUALIZATION<T,RW>::
 Pre_Frame_Extra()
 {
-#if COMPILE_WITH_BINTREE_SUPPORT
-    if(bintree_grid_component) bintree_grid_component->Set_Frame(frame);
-#endif
 }
 //#####################################################################
 // Function Add_OpenGL_Initialization

@@ -23,9 +23,6 @@ template<class T> RENDER_WORLD<T>::
 RENDER_WORLD()
     :ray_depth_limit(20),photon_depth_limit(10),ray_contribution_limit((T).001),debug_mode(false),
     use_photon_mapping(false),
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    use_irradiance_cache(false),
-#endif
     global_photon_map(0),caustic_photon_map(0),volume_photon_map(0),threads(1)
 {
     default_background_shader=new RENDERING_UNIFORM_COLOR_SHADER<T>(RGB_COLORS<T>::Black(),*this);background_shader=default_background_shader;
@@ -394,13 +391,7 @@ Prepare_For_Forward_Ray_Trace()
         caustic_photon_map.Prepare_Photon_Map_For_Rendering();
         volume_photon_map.Prepare_Photon_Map_For_Rendering();
         LOG::Stop_Time();
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-        if(use_irradiance_cache)irradiance_cache.Enable_Cache(global_photon_map.bounding_box,irradiance_cache_max_distance);
-#endif
     }
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-        Prepare_BSSRDF_Octree();
-#endif
 }
 //#####################################################################
 // Shoot_Photons_From_Light_For_Specific_Map
@@ -425,17 +416,6 @@ Use_Photon_Mapping(const int global_photons,const int caustic_photons,const int 
     this->max_photon_distance=max_photon_distance;
     this->number_of_photons_for_estimate=number_of_photons_for_estimate;
 }
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-//#####################################################################
-// Use_Irradiance_Cache
-//#####################################################################
-template<class T> void RENDER_WORLD<T>::
-Use_Irradiance_Cache(const bool use_irradiance_cache_input,const T irradiance_cache_max_distance_input,const int irradiance_cache_samples_input)
-{
-    irradiance_cache.Set_Final_Gather_Samples(irradiance_cache_samples_input); // irradiance cache uses this for final gather
-    use_irradiance_cache=use_irradiance_cache_input;irradiance_cache_max_distance=irradiance_cache_max_distance_input;
-}
-#endif
 //#####################################################################
 // Use_Adaptive_Sampling
 //#####################################################################
@@ -445,16 +425,6 @@ Use_Adaptive_Supersampling(const bool use_adaptive_supersampling_input,const T a
     use_adaptive_supersampling=use_adaptive_supersampling_input;adaptive_supersampling_tolerance=adaptive_supersampling_tolerance_input;
     adaptive_supersampling_depth_limit=adaptive_supersampling_depth_limit_input;
 }
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-//#####################################################################
-// Prepare_BSSRDF_Octree
-//#####################################################################
-template<class T> void RENDER_WORLD<T>::
-Prepare_BSSRDF_Octree()
-{
-    for(int i=1;i<=standard_objects.m;i++) if(standard_objects(i)->bssrdf_shader) standard_objects(i)->Generate_BSSRDF_Tree(*this);
-}
-#endif
 //#####################################################################
 template class RENDER_WORLD<float>;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT

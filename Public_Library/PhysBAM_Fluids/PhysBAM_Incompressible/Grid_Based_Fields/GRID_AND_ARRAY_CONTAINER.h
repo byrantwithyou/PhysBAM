@@ -8,8 +8,6 @@
 #define __GRID_AND_ARRAY_CONTAINER__
 
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
-#include <PhysBAM_Tools/Grids_Dyadic_Advection/ADVECTION_POLICY_DYADIC.h>
-#include <PhysBAM_Tools/Grids_RLE_Advection/ADVECTION_POLICY_RLE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 #include <PhysBAM_Tools/Utilities/PHYSBAM_OVERRIDE.h>

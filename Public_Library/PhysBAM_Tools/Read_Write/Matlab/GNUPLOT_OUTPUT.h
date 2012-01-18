@@ -9,7 +9,6 @@
 #define __GNUPLOT_OUTPUT__
 
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
-#include <PhysBAM_Tools/Grids_Dyadic/BINTREE_GRID.h>
 #include <fstream>
 namespace PhysBAM{
 template<class TV> class GRID;
@@ -24,10 +23,6 @@ public:
     template<class T> void Write_Output_File(const std::string& file_name,const GRID<VECTOR<T,2> >& grid,const ARRAY<T,VECTOR<int,2> >& output,const int stepnumber);
     template<class T> void Write_Output_File(const std::string& file_name,const GRID<VECTOR<T,3> >& grid,const ARRAY<T,VECTOR<int,3> >& output,const int stepnumber);
     template<class T,int d> void Write_Output_File(const std::string& file_name,const ARRAY_VIEW<VECTOR<T,d> >& X,const int stepnumber);
-
-#ifdef COMPILE_WITH_BINTREE_SUPPORT
-    template<class T> void Write_Output_File(const std::string& file_name,const BINTREE_GRID<T>& grid,const ARRAY<T>& output,const int stepnumber);
-#endif
 };
 }
 #endif
