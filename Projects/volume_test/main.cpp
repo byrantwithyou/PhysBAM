@@ -89,7 +89,7 @@ void Case_Test()
 
     ORIGIN_AREAS::VOL_DATA<T,3,6> data;
     TV pts[6]={a,b,c,d,e,f};
-    ORIGIN_AREAS::Volume_From_Simplices(data,pts);
+    ORIGIN_AREAS::Volume_From_Simplices(data,TV(),pts);
 
 //    if(!data.V) return;
     T approx=Approximate_Volume(a,b,c,d,e,f);
@@ -109,8 +109,8 @@ void Derivative_Test()
     for(int i=1;i<=6;i++) printf("a(%i)=TV(%g,%g,%g);\n",i,a(i).x,a(i).y,a(i).z);
 
     ORIGIN_AREAS::VOL_DATA<T,3,6> data0,data1;
-    ORIGIN_AREAS::Volume_From_Simplices(data0,&a(1));
-    ORIGIN_AREAS::Volume_From_Simplices(data1,&ada(1));
+    ORIGIN_AREAS::Volume_From_Simplices(data0,TV(),&a(1));
+    ORIGIN_AREAS::Volume_From_Simplices(data1,TV(),&ada(1));
 
     T dV=(data1.V-data0.V)/e;
     T G=0;
