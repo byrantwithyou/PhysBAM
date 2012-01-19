@@ -96,6 +96,9 @@ Compute_Collision_Triangles(T_OBJECT& obj1,T_OBJECT& obj2)
 
     for(int m=1;m<=visitor.pairs.m;m++){
         int a,b;visitor.pairs(m).Get(a,b);
+        //if(TRIANGLE_2D<T>::Signed_Size(X.Subset(obj1.mesh.elements(a)))
+        //  *TRIANGLE_2D<T>::Signed_Size(X.Subset(obj2.mesh.elements(b)))<=0)
+        //    continue;
         visited_particles1.Set_All(obj1.mesh.elements(a));
         visited_particles2.Set_All(obj2.mesh.elements(b));
         for(int i=1;i<=TV::m+1;i++){
@@ -109,9 +112,9 @@ Compute_Collision_Triangles(T_OBJECT& obj1,T_OBJECT& obj2)
 
     TV x0;
     for(HASHTABLE<int>::ITERATOR it(visited_particles1);it.Valid();it.Next())
-        x0+=obj1.particles.X(it.Key());
+        x0+=X(it.Key());
     for(HASHTABLE<int>::ITERATOR it(visited_particles2);it.Valid();it.Next())
-        x0+=obj2.particles.X(it.Key());
+        x0+=X(it.Key());
     x0/=static_cast<T>(visited_particles1.Size()+visited_particles2.Size());
 
     for(typename HASHTABLE<VECTOR<int,TV::m*2>,int>::ITERATOR it(to_process);it.Valid();it.Next()){
