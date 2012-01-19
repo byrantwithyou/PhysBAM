@@ -93,7 +93,7 @@ public:
 #ifdef USE_PTHREADS
         sum_array(tid)=input;
         pthread_barrier_wait(&barr);
-        T sum=0;for(int i=1;i<=number_of_threads;i++) sum+=sum_array(i);
+        T sum=0;for(int i=0;i<number_of_threads;i++) sum+=sum_array(i);
         return sum;
 #else
         return input;

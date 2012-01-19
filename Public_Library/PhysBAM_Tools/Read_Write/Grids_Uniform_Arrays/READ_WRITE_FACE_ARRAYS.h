@@ -25,7 +25,7 @@ public:
     object.base_pointer=new T[object.buffer_size];
     Read_Binary_Array<RW>(input,object.base_pointer,object.buffer_size);
     T* p_start=object.base_pointer;
-    for(int i=1;i<=d;i++){
+    for(int i=0;i<d;i++){
         RANGE<TV_INT> domain;
         Read_Binary<RW>(input,domain);
         T_ARRAY_VIEW array_new(domain,p_start);
@@ -33,14 +33,14 @@ public:
         p_start+=(domain.Edge_Lengths()+1).Product();}}
 
     static void Write(std::ostream& output,const ARRAY<T,FACE_INDEX<d> >& object)
-    {Write_Binary<RW>(output,object.domain_indices);Write_Binary<RW>(output,object.buffer_size);Write_Binary_Array<RW>(output,object.base_pointer,object.buffer_size);for(int i=1;i<=d;i++) Write_Binary<RW>(output,object.data(i).domain);}
+    {Write_Binary<RW>(output,object.domain_indices);Write_Binary<RW>(output,object.buffer_size);Write_Binary_Array<RW>(output,object.base_pointer,object.buffer_size);for(int i=0;i<d;i++) Write_Binary<RW>(output,object.data(i).domain);}
 };
 
 template<class T> inline std::ostream& operator<<(std::ostream& output_stream,const ARRAY<T,FACE_INDEX<1> >& a)
 {for(int i=a.domain_indices.min_corner.x;i<=a.domain_indices.max_corner.x+1;i++) output_stream<<a.Component(1)(i)<<" ";output_stream<<std::endl;return output_stream;}
 
 template<class T,int d> inline std::ostream& operator<<(std::ostream& output_stream,const ARRAY<T,FACE_INDEX<d> >& a)
-{for(int i=1;i<=d;i++) output_stream<<a.data(i)<<std::endl;return output_stream;}
+{for(int i=0;i<d;i++) output_stream<<a.data(i)<<std::endl;return output_stream;}
 
 }
 #endif

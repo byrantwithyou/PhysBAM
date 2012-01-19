@@ -89,13 +89,13 @@ private:
     LOG::cout<<"Particle Pool: Allocating another "<<allocation_batch_size<<" particles"<<std::endl;
 #endif
     CLONE_ARRAY<T_POINT_CLOUD>* batch=new CLONE_ARRAY<T_POINT_CLOUD>(template_particles,allocation_batch_size);
-    for(int i=1;i<=allocation_batch_size;i++) (*batch)(i).array_collection->Preallocate(number_particles_per_cell);
+    for(int i=0;i<allocation_batch_size;i++) (*batch)(i).array_collection->Preallocate(number_particles_per_cell);
     allocated_batches.Append(batch);
 #ifdef USE_PTHREADS
     pthread_mutex_lock(&stack_lock);
 #endif
     free_pool.Increase_Size(allocation_batch_size);
-    for(int i=1;i<=allocation_batch_size;i++) free_pool.Push(&(*batch)(i));
+    for(int i=0;i<allocation_batch_size;i++) free_pool.Push(&(*batch)(i));
 #ifdef USE_PTHREADS
     pthread_mutex_unlock(&stack_lock);
 #endif

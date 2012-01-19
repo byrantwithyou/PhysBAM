@@ -30,7 +30,7 @@ public:
     }
 
     void Initialize_Fiber_Field_From_Current_State(const STRAIN_MEASURE<TV,3>& strain_measure,const ARRAY<VECTOR<T,3> >& fiber_field_input)
-    {int n=strain_measure.tetrahedron_mesh.tetrahedrons.m;fiber_field.Resize(n);for(int t=1;t<=n;t++) fiber_field(t)=strain_measure.F(t).Transpose_Times(fiber_field_input(t));}
+    {int n=strain_measure.tetrahedron_mesh.tetrahedrons.m;fiber_field.Resize(n);for(int t=0;t<n;t++) fiber_field(t)=strain_measure.F(t).Transpose_Times(fiber_field_input(t));}
 
     inline int Hessian_Index(const int m,const int n) const
     {assert(m>=n);return m+(n-1)*(10-n)/2;}

@@ -34,7 +34,7 @@ public:
         number_of_active_indices=vector.number_of_active_indices;
         indices=new int[number_of_active_indices+1];
         x=new T[number_of_active_indices+1];
-        for(int i=1;i<=number_of_active_indices;i++){indices[i]=vector.indices[i];x[i]=vector.x[i];}
+        for(int i=0;i<number_of_active_indices;i++){indices[i]=vector.indices[i];x[i]=vector.x[i];}
     }
 
     ~SPARSE_VECTOR_ND()
@@ -45,7 +45,7 @@ private:
 public:
 
     const T operator()(const int i) const
-    {assert((unsigned)i<n);for(int j=1;j<=number_of_active_indices;j++) if(indices[j] == i) return x[j];else if(indices[j]>i) break;
+    {assert((unsigned)i<n);for(int j=0;j<number_of_active_indices;j++) if(indices[j] == i) return x[j];else if(indices[j]>i) break;
     return T();}
 
     void Set_Element(const int i,const T& element)
@@ -67,24 +67,24 @@ public:
     Insert_New_Element(i,j,element);}
 
     bool Element_Present(const int i)
-    {assert(i>=1 && i<=n);for(int j=1;j<=number_of_active_indices;j++) if(indices[j] == i) return true;else if(indices[j]>i) return false;
+    {assert(i>=1 && i<=n);for(int j=0;j<number_of_active_indices;j++) if(indices[j] == i) return true;else if(indices[j]>i) return false;
     return false;}
 
     bool Element_Present_And_Location(const int i,int& location)
-    {assert(i>=1 && i<=n);for(int j=1;j<=number_of_active_indices;j++) if(indices[j] == i){location=j;return true;}else if(indices[j]>i) return false;
+    {assert(i>=1 && i<=n);for(int j=0;j<number_of_active_indices;j++) if(indices[j] == i){location=j;return true;}else if(indices[j]>i) return false;
     return false;}
 
     void Clear()
     {delete[] indices;delete[] x;number_of_active_indices=0;indices=new int[number_of_active_indices+1];x=new T[number_of_active_indices+1];}
 
     T Dot_Product(const VECTOR_ND<T>& vector)
-    {T sum=T();for(int i=1;i<=number_of_active_indices;i++) sum+=x[i]*vector(indices[i]);return sum;}
+    {T sum=T();for(int i=0;i<number_of_active_indices;i++) sum+=x[i]*vector(indices[i]);return sum;}
 
     void Negate()
-    {for(int i=1;i<=number_of_active_indices;i++) x[i]=-x[i];}
+    {for(int i=0;i<number_of_active_indices;i++) x[i]=-x[i];}
 
     SPARSE_VECTOR_ND<T>& operator*=(const T a)
-    {for(int i=1;i<=number_of_active_indices;i++)x[i]*=a;return *this;}
+    {for(int i=0;i<number_of_active_indices;i++)x[i]*=a;return *this;}
 
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     void Write_Internal_Arrays(std::ostream& output_stream)

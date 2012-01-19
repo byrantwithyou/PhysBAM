@@ -58,7 +58,7 @@ public:
 
     template<class T2>
     ARRAY& operator*=(const T2 a)
-    {for(int i=1;i<=dimension;i++) data(i)*=a;return *this;}
+    {for(int i=0;i<dimension;i++) data(i)*=a;return *this;}
 
     ARRAY& operator+=(const ARRAY& a)
     {data+=a.data;return *this;}
@@ -80,22 +80,22 @@ public:
     {TV_INT sizes_new;bool early_return=true;
     VECTOR<RANGE<TV_INT>,dimension> domains;
     domain_indices=domain;
-    for(int i=1;i<=dimension;i++){domains(i)=domain;domains(i).max_corner(i)++;sizes_new(i)=(domains(i).Edge_Lengths()+1).Product();if(domains(i)!=data(i).Domain_Indices()) early_return=false;}
+    for(int i=0;i<dimension;i++){domains(i)=domain;domains(i).max_corner(i)++;sizes_new(i)=(domains(i).Edge_Lengths()+1).Product();if(domains(i)!=data(i).Domain_Indices()) early_return=false;}
     if(early_return) return;
     buffer_size=sizes_new.Sum();
     T* p=new T[buffer_size];
     if(initialize_new_elements){T* p_start=p;
-        for(int i=1;i<=dimension;i++){
+        for(int i=0;i<dimension;i++){
             T_ARRAY_VIEW array_new(domains(i),p_start);
             array_new.Fill(initialization_value);
             p_start+=sizes_new(i);}}
     if(copy_existing_elements){T* p_start=p;
-        for(int i=1;i<=dimension;i++){
+        for(int i=0;i<dimension;i++){
             T_ARRAY_VIEW array_new(domains(i),p_start);
             T_ARRAY_VIEW::Limited_Shifted_Get(array_new,data(i),TV_INT());
             p_start+=sizes_new(i);}}
     T* p_start=p;
-    for(int i=1;i<=dimension;i++){
+    for(int i=0;i<dimension;i++){
         T_ARRAY_VIEW array_new(domains(i),p_start);
         T_ARRAY_VIEW::Exchange_Arrays(array_new,data(i));
         p_start+=sizes_new(i);}
@@ -133,40 +133,40 @@ public:
     {assert(1<=axis&&axis<=dimension);return *(&data.x+(axis-1));}
 
     TV Cell_Centered_Average(const TV_INT& cell_index) const
-    {TV average;for(int i=1;i<=dimension;i++) average(i)=(T).5*(data(i)(cell_index)+data(i)(cell_index+TV_INT::Axis_Vector(i)));return average;}
+    {TV average;for(int i=0;i<dimension;i++) average(i)=(T).5*(data(i)(cell_index)+data(i)(cell_index+TV_INT::Axis_Vector(i)));return average;}
 
     void Set_All_Faces(const T& value,const TV_INT& cell_index)
-    {for(int i=1;i<=dimension;i++) data(i)(cell_index)=data(i)(cell_index+TV_INT::Axis_Vector(i))=value;}
+    {for(int i=0;i<dimension;i++) data(i)(cell_index)=data(i)(cell_index+TV_INT::Axis_Vector(i))=value;}
 
     static void Extract_Dimension(const ARRAY& old_array,ARRAY<ELEMENT_OF_T,FACE_INDEX<dimension> >& extracted_array,const TV_INT& dimensions_to_extract)
-    {STATIC_ASSERT(IS_VECTOR<T>::value);for(int i=1;i<=dimension;i++) T_ARRAY_VIEW::Extract_Dimension(old_array.data(i),extracted_array.data(i),dimensions_to_extract(i));}
+    {STATIC_ASSERT(IS_VECTOR<T>::value);for(int i=0;i<dimension;i++) T_ARRAY_VIEW::Extract_Dimension(old_array.data(i),extracted_array.data(i),dimensions_to_extract(i));}
 
     void Fill(const T& constant)
-    {for(int i=1;i<=dimension;i++) data(i).Fill(constant);}
+    {for(int i=0;i<dimension;i++) data(i).Fill(constant);}
 
     static void Copy(const ARRAY& old_copy,ARRAY& new_copy)
-    {for(int i=1;i<=dimension;i++) T_ARRAY_VIEW::Copy(old_copy.data(i),new_copy.data(i));}
+    {for(int i=0;i<dimension;i++) T_ARRAY_VIEW::Copy(old_copy.data(i),new_copy.data(i));}
 
     template<class T2>
     static void Copy(const T2 c,const ARRAY& old,ARRAY& result)
-    {for(int i=1;i<=dimension;i++) T_ARRAY_VIEW::Copy(c,old.data(i),result.data(i));}
+    {for(int i=0;i<dimension;i++) T_ARRAY_VIEW::Copy(c,old.data(i),result.data(i));}
 
     void Fill(const TV& value)
-    {for(int i=1;i<=dimension;i++) data(i).Fill(value.x);}
+    {for(int i=0;i<dimension;i++) data(i).Fill(value.x);}
 
     template<class T2>
     static void Copy(const T2 c1,const ARRAY& v1,const T2 c2,const ARRAY& v2,ARRAY& result)
-    {for(int i=1;i<=dimension;i++) T_ARRAY_VIEW::Copy(c1,v1.data(i),c2,v2.data(i),result.data(i));}
+    {for(int i=0;i<dimension;i++) T_ARRAY_VIEW::Copy(c1,v1.data(i),c2,v2.data(i),result.data(i));}
 
     static void Put(const ARRAY& old_copy,ARRAY& new_copy)
-    {for(int i=1;i<=dimension;i++) T_ARRAY_VIEW::Put(old_copy.data(i),new_copy.data(i));}
+    {for(int i=0;i<dimension;i++) T_ARRAY_VIEW::Put(old_copy.data(i),new_copy.data(i));}
 
     TV Maxabs() const
-    {TV maxabs_vector;for(int i=1;i<=dimension;i++) maxabs_vector(i)=data(i).Maxabs();return maxabs_vector;}
+    {TV maxabs_vector;for(int i=0;i<dimension;i++) maxabs_vector(i)=data(i).Maxabs();return maxabs_vector;}
 
     static void Exchange_Arrays(ARRAY& a,ARRAY& b)
     {exchange(a.domain_indices,b.domain_indices);exchange(a.base_pointer,b.base_pointer);exchange(a.buffer_size,b.buffer_size);
-    for(int i=1;i<=dimension;i++) T_ARRAY_VIEW::Exchange_Arrays(a.data(i),b.data(i));}
+    for(int i=0;i<dimension;i++) T_ARRAY_VIEW::Exchange_Arrays(a.data(i),b.data(i));}
 
     template<class T_INDICES>
     INDIRECT_ARRAY<ARRAY,T_INDICES&> Subset(const T_INDICES& indices)

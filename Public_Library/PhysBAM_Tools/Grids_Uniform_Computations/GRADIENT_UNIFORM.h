@@ -21,7 +21,7 @@ void Compute_Magnitude(const GRID<VECTOR<T,d> >& grid,const int number_of_ghost_
     VECTOR<T,d> one_over_dx=grid.one_over_dX;
     for(CELL_ITERATOR iterator(grid,number_of_ghost_cells-1);iterator.Valid();iterator.Next()){
         VECTOR<int,d> cell_index=iterator.Cell_Index();T sum_of_partials=0;
-        for(int axis=1;axis<=d;axis++){
+        for(int axis=0;axis<d;axis++){
             T partial=(values(iterator.Cell_Neighbor(2*axis))-values(iterator.Cell_Neighbor(2*axis-1)))*(T).5*one_over_dx[axis];
             sum_of_partials+=partial*partial;}
         gradient(cell_index)=sqrt(sum_of_partials);}

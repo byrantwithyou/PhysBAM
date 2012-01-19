@@ -62,7 +62,7 @@ struct LEXICOGRAPHIC_COMPARE
 {
     template<class T_ARRAY> bool operator()(const T_ARRAY& a1,const T_ARRAY& a2) const
     {int m1=a1.Size(),m2=a2.Size(),m=min(m1,m2);
-    for(int i=1;i<=m;i++) if(a1(i)!=a2(i)) return a1(i)<a2(i);
+    for(int i=0;i<m;i++) if(a1(i)!=a2(i)) return a1(i)<a2(i);
     return m1<m2;}
 };
 

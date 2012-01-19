@@ -162,7 +162,7 @@ public:
     {min_corner=TV::Componentwise_Min(min_corner,point);max_corner=TV::Componentwise_Max(max_corner,point);}
 
     void Enlarge_Nonempty_Box_To_Include_Point(const TV& point)
-    {assert(!Empty());for(int i=1;i<=d;i++) if(point(i)<min_corner(i)) min_corner(i)=point(i);else if(point(i)>max_corner(i)) max_corner(i)=point(i);}
+    {assert(!Empty());for(int i=0;i<d;i++) if(point(i)<min_corner(i)) min_corner(i)=point(i);else if(point(i)>max_corner(i)) max_corner(i)=point(i);}
 
     void Enlarge_Nonempty_Box_To_Include_Points(const TV& p1,const TV& p2)
     {Enlarge_Nonempty_Box_To_Include_Point(p1);Enlarge_Nonempty_Box_To_Include_Point(p2);}
@@ -237,7 +237,7 @@ public:
     {STATIC_ASSERT(d==1);return Clamp(TV(location)).x;}
 
     void Enlarge_By_Sign(const TV& v)
-    {for(int i=1;i<=d;i++) if(v(i)>0) max_corner(i)+=v(i);else min_corner(i)+=v(i);}
+    {for(int i=0;i<d;i++) if(v(i)>0) max_corner(i)+=v(i);else min_corner(i)+=v(i);}
 
     TV Point_From_Normalized_Coordinates(const TV& weights) const
     {return min_corner+weights*(max_corner-min_corner);}
@@ -262,7 +262,7 @@ public:
 
     void Project_Points_Onto_Line(const TV& direction,T& line_min,T& line_max) const
     {line_min=line_max=TV::Dot_Product(direction,min_corner);TV e=direction*(max_corner-min_corner);
-    for(int i=1;i<=d;i++) if(e(i)>0) line_max+=e(i);else line_min+=e(i);}
+    for(int i=0;i<d;i++) if(e(i)>0) line_max+=e(i);else line_min+=e(i);}
 
     static RANGE<TV> Bounding_Box(const TV& p1,const TV& p2)
     {RANGE<TV> box(p1);box.Enlarge_Nonempty_Box_To_Include_Point(p2);return box;}

@@ -106,7 +106,7 @@ public:
     template<int n>
     VECTOR(const VECTOR<T,n>& v1,const VECTOR<T,d-n>& v2)
     {
-        for(int i=1;i<=n;i++) (*this)(i)=v1(i);for(int i=n+1;i<=d;i++) (*this)(i)=v2(i-n);
+        for(int i=0;i<n;i++) (*this)(i)=v1(i);for(int i=n+1;i<=d;i++) (*this)(i)=v2(i-n);
     }
 
     template<class T_VECTOR> typename ENABLE_IF<AND<IS_SAME<T,typename T_VECTOR::ELEMENT>::value,INTS_EQUAL<T_VECTOR::m,d>::value>::value,VECTOR&>::TYPE
@@ -266,15 +266,15 @@ public:
     {assert(1<=index && index<=d);VECTOR<T,d-1> r;for(int i=1;i<=d-1;i++) r[i]=(*this)[i+(i>=index)];return r;}
 
     VECTOR<T,d+1> Insert(const T& element,const int index) const
-    {VECTOR<T,d+1> r;r[index]=element;for(int i=1;i<=d;i++) r[i+(i>=index)]=(*this)[i];return r;}
+    {VECTOR<T,d+1> r;r[index]=element;for(int i=0;i<d;i++) r[i+(i>=index)]=(*this)[i];return r;}
 
     VECTOR<T,d+1> Append(const T& element) const
-    {VECTOR<T,d+1> r;for(int i=1;i<=d;i++) r[i]=(*this)[i];r[d+1]=element;return r;}
+    {VECTOR<T,d+1> r;for(int i=0;i<d;i++) r[i]=(*this)[i];r[d+1]=element;return r;}
 
     template<int d2> VECTOR<T,d+d2> Append_Elements(const VECTOR<T,d2>& elements) const
     {VECTOR<T,d+d2> r;
-    for(int i=1;i<=d;i++) r[i]=(*this)[i];
-    for(int i=1;i<=d2;i++) r[i+d]=elements[i];
+    for(int i=0;i<d;i++) r[i]=(*this)[i];
+    for(int i=0;i<d2;i++) r[i+d]=elements[i];
     return r;}
 
     VECTOR<T,4> Sorted() const
@@ -288,7 +288,7 @@ public:
     VECTOR<T,d2-d1+1> r;for(int i=d1;i<=d2;i++) r[i-d1+1]=(*this)[i];return r;}
 
     template<int n> void Split(VECTOR<T,n>& v1,VECTOR<T,d-n>& v2) const
-    {for(int i=1;i<=n;i++) v1(i)=(*this)(i);
+    {for(int i=0;i<n;i++) v1(i)=(*this)(i);
     for(int i=n+1;i<=d;i++) v2(i-n)=(*this)(i);}
 
     T* begin() // for stl

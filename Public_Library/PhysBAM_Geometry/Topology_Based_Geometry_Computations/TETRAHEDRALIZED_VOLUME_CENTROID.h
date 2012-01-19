@@ -24,7 +24,7 @@ VECTOR<T,3> Centroid_Of_Neighbors(const TETRAHEDRALIZED_VOLUME<T>& tv,const int 
     bool neighbor_nodes_defined=tv.mesh.neighbor_nodes!=0;if(!neighbor_nodes_defined) tv.mesh.Initialize_Neighbor_Nodes();
     TV target;
     int number_of_neighbors=(*tv.mesh.neighbor_nodes)(node).m;
-    for(int j=1;j<=number_of_neighbors;j++) target+=tv.particles.X((*tv.mesh.neighbor_nodes)(node)(j));
+    for(int j=0;j<number_of_neighbors;j++) target+=tv.particles.X((*tv.mesh.neighbor_nodes)(node)(j));
     if(number_of_neighbors != 0) target/=(T)number_of_neighbors;
     else target=tv.particles.X(node); // if no neighbors, return the current node location
     if(!neighbor_nodes_defined){delete tv.mesh.neighbor_nodes;tv.mesh.neighbor_nodes=0;}

@@ -34,7 +34,7 @@ void Collidable_Gradient_Magnitude(const typename COLLISION_GEOMETRY_COLLECTION_
     TV one_over_dx=grid.one_over_dX;
     for(CELL_ITERATOR iterator(grid,number_of_ghost_cells-1);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();T sum_of_partials=0;int stencil_width=0;
-        for(int axis=1;axis<=d;axis++){T partial=0;
+        for(int axis=0;axis<d;axis++){T partial=0;
             bool left_cell_visible=!occluded_faces(iterator.Full_First_Face_Index(axis)),right_cell_visible=!occluded_faces(iterator.Full_Second_Face_Index(axis));
             if(left_cell_visible && right_cell_visible)
                 partial=(values(iterator.Cell_Neighbor(2*axis))-values(iterator.Cell_Neighbor(2*axis-1)))*(T).5*one_over_dx[axis];

@@ -66,7 +66,7 @@ public:
     {STATIC_ASSERT((IS_SAME<TV,typename T_ARRAY_TV::ELEMENT>::value));
     int number_point_simplices=mesh.elements.m;
     if(!point_simplex_list) point_simplex_list=new ARRAY<POINT_SIMPLEX_1D<T> >(number_point_simplices);else point_simplex_list->Resize(number_point_simplices);
-    for(int k=1;k<=number_point_simplices;k++){
+    for(int k=0;k<number_point_simplices;k++){
         int node1;mesh.elements(k).Get(node1);
         (*point_simplex_list)(k).x1=X(node1);
         (*point_simplex_list)(k).direction=mesh.directions(node1);}}

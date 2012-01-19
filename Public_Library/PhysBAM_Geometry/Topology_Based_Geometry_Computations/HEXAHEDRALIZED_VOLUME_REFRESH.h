@@ -73,7 +73,7 @@ void Initialize_Cube_Mesh_And_Particles(HEXAHEDRALIZED_VOLUME<T>& hv,const GRID<
     int m=grid.counts.x,n=grid.counts.y,mn=grid.counts.z;
     hv.mesh.Initialize_Cube_Mesh(m,n,mn);
     hv.particles.array_collection->Preallocate(m*n*mn);
-    for(int ij=1;ij<=mn;ij++)for(int j=1;j<=n;j++)for(int i=1;i<=m;i++) hv.particles.X(hv.particles.array_collection->Add_Element())=grid.X(i,j,ij);
+    for(int ij=0;ij<mn;ij++)for(int j=0;j<n;j++)for(int i=0;i<m;i++) hv.particles.X(hv.particles.array_collection->Add_Element())=grid.X(i,j,ij);
 }
 }
 }

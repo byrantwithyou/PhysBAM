@@ -42,10 +42,10 @@ public:
     ARRAY<TV> perturbation(number_of_positions);if(fracture_callbacks) fracture_callbacks->Perturb(positions,perturbation,frame);
     for(int i=1;i<=seed_positions.Size();i++){
         distances(i).Resize(number_of_positions);
-        for(int node=1;node<=number_of_positions;node++){
+        for(int node=0;node<number_of_positions;node++){
             distances(i)(node)=(perturbation(node)+seed_positions(i)-positions(node)).Magnitude();}}
     node_smallest_distance.Resize(number_of_positions);node_region.Resize(number_of_positions);
-    for(int node=1;node<=number_of_positions;node++){
+    for(int node=0;node<number_of_positions;node++){
         int smallest=1;int second_smallest=2;
         for(int i=2;i<=seed_positions.Size();i++){
             if(distances(i)(node)<distances(smallest)(node)){second_smallest=smallest;smallest=i;}

@@ -70,7 +70,7 @@ public:
     return active_indices.m;}
 
     void Add_Elements(const int new_point_cloud)
-    {for(int p=1;p<=new_point_cloud;p++) Add_Element();}
+    {for(int p=0;p<new_point_cloud;p++) Add_Element();}
 
     int Add_Existing_Element_If_Not_Already_There(const int p)
     {assert(subset_index_from_point_cloud_index.m==point_cloud.number);

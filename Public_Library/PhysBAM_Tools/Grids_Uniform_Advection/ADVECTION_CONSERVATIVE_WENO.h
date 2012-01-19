@@ -59,7 +59,7 @@ Advection_Solver(const int m,const T dx,const ARRAY<T2,VECTOR<int,1> >& Z,const 
         flux(i)=.5*(fluxleft+fluxright);}
 
     T one_over_dx=1/dx;
-    for(int i=1;i<=m;i++) u_Zx(i)=(flux(i)-flux(i-1))*one_over_dx;
+    for(int i=0;i<m;i++) u_Zx(i)=(flux(i)-flux(i-1))*one_over_dx;
 }
 //#####################################################################
 }

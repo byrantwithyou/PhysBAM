@@ -66,19 +66,19 @@ public:
 
     void Set_Stiffness(const T youngs_modulus_input)
     {Invalidate_CFL();
-    for(int i=1;i<=spring_parameters.m;i++) for(int s=1;s<=spring_count;s++) spring_parameters(i)(s).youngs_modulus=youngs_modulus_input;}
+    for(int i=1;i<=spring_parameters.m;i++) for(int s=0;s<spring_count;s++) spring_parameters(i)(s).youngs_modulus=youngs_modulus_input;}
 
     void Set_Stiffness(const ARRAY<VECTOR<T,spring_count> >& youngs_modulus_input)
     {Invalidate_CFL();
-    for(int i=1;i<=spring_parameters.m;i++) for(int s=1;s<=spring_count;s++) spring_parameters(i)(s).youngs_modulus=youngs_modulus_input(i)(s);}
+    for(int i=1;i<=spring_parameters.m;i++) for(int s=0;s<spring_count;s++) spring_parameters(i)(s).youngs_modulus=youngs_modulus_input(i)(s);}
 
     void Set_Restlength(const ARRAY<VECTOR<T,spring_count> >& restlength_input)
     {Invalidate_CFL();
-    for(int i=1;i<=spring_parameters.m;i++) for(int s=1;s<=spring_count;s++) spring_parameters(i)(s).restlength=restlength_input(i)(s);}
+    for(int i=1;i<=spring_parameters.m;i++) for(int s=0;s<spring_count;s++) spring_parameters(i)(s).restlength=restlength_input(i)(s);}
 
     virtual void Clamp_Restlength(const T clamped_restlength)
     {Invalidate_CFL();
-    for(int i=1;i<=spring_parameters.m;i++) for(int s=1;s<=spring_count;s++) spring_parameters(i)(s).restlength=max(spring_parameters(i)(s).visual_restlength,clamped_restlength);}
+    for(int i=1;i<=spring_parameters.m;i++) for(int s=0;s<spring_count;s++) spring_parameters(i)(s).restlength=max(spring_parameters(i)(s).visual_restlength,clamped_restlength);}
 
 //#####################################################################
     LINEAR_TET_SPRINGS(PARTICLES<TV>& particles,TETRAHEDRON_MESH& mesh,const bool implicit);

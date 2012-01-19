@@ -50,7 +50,7 @@ public:
 
     void Print_Statistics(const ARRAY<ARRAY<int> >& contact_pairs_for_level,const bool verbose=false)
     {int max_level_size=0,max_level_index=0,max_pairs_in_level=0,max_pairs_in_level_index=0,number_levels=Number_Of_Levels();int total=0;
-    for(int i=1;i<=number_levels;i++) {
+    for(int i=0;i<number_levels;i++) {
         int level_size=directed_graph.Nodes_In_Level(i);total+=level_size;
         if(level_size > max_level_size){max_level_size=level_size;max_level_index=i;}
         if(contact_pairs_for_level(i).m > max_pairs_in_level){max_pairs_in_level=contact_pairs_for_level(i).m;max_pairs_in_level_index=i;}}

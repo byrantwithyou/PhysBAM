@@ -83,7 +83,7 @@ CFL()
     int m=grid.m,n=grid.n;T dx=grid.dx,dy=grid.dy;
     
     ARRAY<T,VECTOR<int,2> > u_minus_c(1,m,1,n),u_plus_c(1,m,1,n),v_minus_c(1,m,1,n),v_plus_c(1,m,1,n);
-    for(int i=1;i<=m;i++) for(int j=1;j<=n;j++){
+    for(int i=0;i<m;i++) for(int j=0;j<n;j++){
         if(!cut_out_grid || (cut_out_grid && (*psi_pointer)(i,j))){
             T u=U(2,i,j)/U(1,i,j),v=U(3,i,j)/U(1,i,j);
             T sound_speed=eos->c(U(1,i,j),e(U(1,i,j),U(2,i,j),U(3,i,j),U(4,i,j)));

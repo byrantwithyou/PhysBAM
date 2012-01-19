@@ -54,18 +54,18 @@ public:
             
         int max_node_region=node_region.Max();
         ARRAY<int> regions_selected(max_node_region);
-        for(int node=1;node<=number_of_positions;node++){
+        for(int node=0;node<number_of_positions;node++){
             node_smallest_distance(node) = 1; // this should be fixed
             regions_selected(node_region(node))=1;}
 
         // Consolidate the regions
         ARRAY<int> region_mapping;
-        for(int region=1;region<=max_node_region;region++) 
+        for(int region=0;region<max_node_region;region++) 
             if(regions_selected(region)) {
                 region_mapping.Append(region);
                 regions_selected(region)=region_mapping.m;}
         total_number_of_regions=region_mapping.m;
-        for(int node=1;node<=number_of_positions;node++) node_region(node)=regions_selected(node_region(node));
+        for(int node=0;node<number_of_positions;node++) node_region(node)=regions_selected(node_region(node));
 
         // refine the node_smallest_distance
         int number_of_edge_divisions=10;
@@ -73,7 +73,7 @@ public:
         
         int number_of_edges=0;
         for(int tet=1;tet<=mesh.elements.m;tet++){
-            for(int v1=1;v1<=d;v1++) for(int v2=v1+1;v2<=d+1;v2++){
+            for(int v1=0;v1<d;v1++) for(int v2=v1+1;v2<=d+1;v2++){
                 int vertex1=mesh.elements(tet)[v1],vertex2=mesh.elements(tet)[v2];
                 if(node_region(vertex1)!=node_region(vertex2)){ // we have a crossover edge
                     VECTOR<int,2> edge=VECTOR<int,2>(vertex1,vertex2).Sorted();
@@ -83,7 +83,7 @@ public:
         for(HASHTABLE_ITERATOR<VECTOR<int,2>,int> iterator(edge_hashtable);iterator.Valid();iterator.Next()){
             int current_index=(iterator.Data()-1)*number_of_edge_divisions;
             VECTOR<int,2> edge_vertices=iterator.Key();
-            for(int division=1;division<=number_of_edge_divisions;division++){
+            for(int division=0;division<number_of_edge_divisions;division++){
                 T t=division*divisor;
                 edge_divisions(current_index+division)=positions(edge_vertices.x)*t+positions(edge_vertices.y)*(1-t);}}
 
@@ -96,7 +96,7 @@ public:
             int region1=node_region(edge_vertices.x),region2=node_region(edge_vertices.y);
             int region1count=0,region2count=0;
             int current_index=(iterator.Data()-1)*number_of_edge_divisions;
-            for(int division=1;division<=number_of_edge_divisions;division++){
+            for(int division=0;division<number_of_edge_divisions;division++){
                 if(regions_selected(edge_division_regions(current_index+division))==region1) region1count++;
                 if(regions_selected(edge_division_regions(current_index+division))==region2) region2count++;}
             T vertex1dist=(T)(region1count+(T)1)/(number_of_edge_divisions+(T)2);
@@ -110,7 +110,7 @@ public:
     void Phi_For_Region_In_Element(const int element,const int region,VECTOR<T,d+1>& phi)
     {
         ARRAY<VECTOR<T,3> > points;
-        for(int v1=1;v1<=d;v1++){// loop through each node
+        for(int v1=0;v1<d;v1++){// loop through each node
             int current_node=mesh.elements(element)[v1];
             for(int v2=v1+1;v2<=d+1;v2++){ // loop through the opposite nodes
                 if(v2!=v1){ 

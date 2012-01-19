@@ -52,7 +52,7 @@ void Initialize_Circle_Mesh_And_Particles(SEGMENTED_CURVE<TV>& sc,const int m,co
     sc.Clean_Memory();
     sc.mesh.Initialize_Straight_Mesh(m,true);
     sc.particles.array_collection->Add_Elements(m);
-    for(int p=1;p<=m;p++){
+    for(int p=0;p<m;p++){
         COMPLEX<T> X=COMPLEX<T>::Polar(radius,(T)2*(T)pi/m*p);
         sc.particles.X(p)=TV(VECTOR<T,2>(X.re,X.im));}
 }

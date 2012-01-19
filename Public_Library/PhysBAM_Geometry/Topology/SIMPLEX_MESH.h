@@ -64,14 +64,14 @@ public:
     {Set_Number_Nodes(number_nodes+new_nodes);}
 
     static int Other_Node(const VECTOR<int,d+1>& simplex_nodes,const VECTOR<int,d>& subsimplex_nodes)
-    {for(int i=1;i<=d;i++) if(!subsimplex_nodes.Contains(simplex_nodes[i])) return simplex_nodes[i];
+    {for(int i=0;i<d;i++) if(!subsimplex_nodes.Contains(simplex_nodes[i])) return simplex_nodes[i];
     assert(!subsimplex_nodes.Contains(simplex_nodes[d+1]));return simplex_nodes[d+1];}
 
     template<class T> static VECTOR<T,d> Node_Weights(const VECTOR<int,d+1>& simplex_nodes,const int node)
     {VECTOR<T,d> weights;int i=simplex_nodes.Find(node);assert(i);if(i<=d) weights(i)=(T)1;return weights;}
 
     template<class T,int d2> static VECTOR<VECTOR<T,d>,d2> Subsimplex_Weights(const VECTOR<int,d+1>& simplex_nodes,const VECTOR<int,d2>& subsimplex_nodes)
-    {VECTOR<VECTOR<T,d>,d2> all_weights;for(int i=1;i<=d2;i++) all_weights(i)=Node_Weights<T>(simplex_nodes,subsimplex_nodes[i]);return all_weights;}
+    {VECTOR<VECTOR<T,d>,d2> all_weights;for(int i=0;i<d2;i++) all_weights(i)=Node_Weights<T>(simplex_nodes,subsimplex_nodes[i]);return all_weights;}
 
     template<class T_CONNECTIVITY> void Add_Connectivity(T_CONNECTIVITY& particle_connectivity) const
     {for(int t=1;t<=elements.m;t++) particle_connectivity.Union(elements(t));}

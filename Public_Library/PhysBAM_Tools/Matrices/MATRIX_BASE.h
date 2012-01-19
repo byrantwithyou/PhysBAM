@@ -233,7 +233,7 @@ public:
     T_MATRIX operator*(const UPPER_TRIANGULAR_MATRIX<T,d>& A) const
     {WARN_IF_NOT_EFFICIENT(T_MATRIX);assert(Columns()==d);
     T_MATRIX M((INITIAL_SIZE)Rows(),(INITIAL_SIZE)d);
-    for(int j=1;j<=d;j++) for(int k=1;k<=j;k++) for(int i=1;i<=Rows();i++) M(i,j)+=(*this)(i,k)*A(k,j);return M;}
+    for(int j=0;j<d;j++) for(int k=0;k<j;k++) for(int i=1;i<=Rows();i++) M(i,j)+=(*this)(i,k)*A(k,j);return M;}
 
     T_MATRIX& operator*=(const T a)
     {WARN_IF_NOT_EFFICIENT(T_MATRIX);for(int j=1;j<=Columns();j++) for(int i=1;i<=Rows();i++) (*this)(i,j)*=a;return Derived();}

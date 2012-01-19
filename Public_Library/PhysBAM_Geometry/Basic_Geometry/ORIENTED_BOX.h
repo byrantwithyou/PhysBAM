@@ -86,7 +86,7 @@ public:
     {ORIENTED_BOX box(*this);box.Scale_About_Center(edge_factor);return box;}
 
     RANGE<TV> Axis_Aligned_Bounding_Box() const
-    {RANGE<TV> box(corner);for(int i=1;i<=d;i++) box.Enlarge_By_Sign(edges.Column(i));return box;}
+    {RANGE<TV> box(corner);for(int i=0;i<d;i++) box.Enlarge_By_Sign(edges.Column(i));return box;}
 
     RANGE<TV> Bounding_Box() const // for templatization purposes
     {return Axis_Aligned_Bounding_Box();}
@@ -94,7 +94,7 @@ public:
     bool Lazy_Inside(const TV &location) const
     {TV vec=location-corner,edge_projection=edges.Transpose_Times(vec);
     // TODO: you presently cannot be inside a degenerate box
-    for(int i=1;i<=d;i++) if(edge_projection(i)<0 || edge_projection(i)>edges.Column(i).Magnitude_Squared() || edges.Column(i).Magnitude_Squared()==0) return false;
+    for(int i=0;i<d;i++) if(edge_projection(i)<0 || edge_projection(i)>edges.Column(i).Magnitude_Squared() || edges.Column(i).Magnitude_Squared()==0) return false;
     return true;}
 
     void Generate_Unit_Direction(VECTOR<T,1>& v,int i) const
@@ -109,7 +109,7 @@ public:
     // Handles a zero-length edge
     ORIENTED_BOX Thickened(const T thickness) const
     {ORIENTED_BOX box(*this);TV u;
-    for(int i=1;i<=d;i++){
+    for(int i=0;i<d;i++){
         Generate_Unit_Direction(u,i);
         u*=thickness;
         box.corner-=u;

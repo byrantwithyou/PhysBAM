@@ -41,25 +41,25 @@ public:
         :n(matrix.n),diagonal_index(0),C(0)
     {
         A.Resize(n,false,false);
-        for(int i=1;i<=n;i++) A(i)=new SPARSE_VECTOR_ND<T>(*matrix.A(i));
+        for(int i=0;i<n;i++) A(i)=new SPARSE_VECTOR_ND<T>(*matrix.A(i));
     }
 
     ~SPARSE_MATRIX_NXN()
-    {for(int i=1;i<=n;i++) delete A(i);delete diagonal_index;delete C;}
+    {for(int i=0;i<n;i++) delete A(i);delete diagonal_index;delete C;}
 
     void Clean_Memory()
     {A.Delete_Pointers_And_Clean_Memory();delete diagonal_index;diagonal_index=0;delete C;C=0;}
 
     SPARSE_MATRIX_NXN& operator=(const SPARSE_MATRIX_NXN& matrix)
-    {for(int i=1;i<=n;i++) delete A(i);delete diagonal_index;delete C;
+    {for(int i=0;i<n;i++) delete A(i);delete diagonal_index;delete C;
     n=matrix.n;diagonal_index=0;C=0;A.Resize(n,false,false);
-    for(int i=1;i<=n;i++) A(i)=new SPARSE_VECTOR_ND<T>(*matrix.A(i));
+    for(int i=0;i<n;i++) A(i)=new SPARSE_VECTOR_ND<T>(*matrix.A(i));
     return *this;}
 
     void Set_Size(const int n_input)
-    {for(int i=1;i<=n;i++) delete A(i);delete diagonal_index;delete C;
+    {for(int i=0;i<n;i++) delete A(i);delete diagonal_index;delete C;
     n=n_input;diagonal_index=0;C=0;A.Resize(n,false,false);
-    for(int i=1;i<=n;i++) A(i)=new SPARSE_VECTOR_ND<T>(n);}
+    for(int i=0;i<n;i++) A(i)=new SPARSE_VECTOR_ND<T>(n);}
 
     const T operator()(const int i,const int j) const
     {assert(i>=1 && i<=n);assert(j>=1 && j<=n);return (*A(i))(j);}
@@ -87,31 +87,31 @@ public:
 
     void Initialize_Diagonal_Index()
     {if(!diagonal_index) diagonal_index=new VECTOR_ND<int>(n);else if(diagonal_index->n!=n)diagonal_index->Resize(n);
-    for(int i=1;i<=n;i++){
+    for(int i=0;i<n;i++){
         SPARSE_VECTOR_ND<T>& row=*A(i);
         for(int j=1;j<=row.number_of_active_indices;j++) if(row.indices[j]==i){(*diagonal_index)(i)=j;continue;}}}
 
     void Multiply(const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const
-    {for(int i=1;i<=n;i++) result(i)=A(i)->Dot_Product(x);}
+    {for(int i=0;i<n;i++) result(i)=A(i)->Dot_Product(x);}
 
     void Negate()
-    {for(int i=1;i<=n;i++) A(i)->Negate();}
+    {for(int i=0;i<n;i++) A(i)->Negate();}
 
     SPARSE_MATRIX_NXN<T>& operator*=(const T a)
-    {for(int i=1;i<=n;i++)(*A(i))*=a;return *this;}
+    {for(int i=0;i<n;i++)(*A(i))*=a;return *this;}
 
     SPARSE_MATRIX_NXN<T>& operator+=(const T a)
-    {for(int i=1;i<=n;i++)Set_Element(i,i,(*this)(i,i)+a);return *this;}
+    {for(int i=0;i<n;i++)Set_Element(i,i,(*this)(i,i)+a);return *this;}
 
     bool Symmetric(const T tolerance=1e-7)
-    {for(int i=1;i<=n;i++){
+    {for(int i=0;i<n;i++){
         SPARSE_VECTOR_ND<T>& row=*A(i);
         for(int j=1;j<=row.number_of_active_indices;j++) if(abs((*this)(row.indices[j],i)-row.x[j])>tolerance) return false;}
     return true;}
 
     bool Positive_Diagonal_And_Nonnegative_Row_Sum(T tolerance=1e-7)
     {bool return_value=true;
-    for(int i=1;i<=n;i++){
+    for(int i=0;i<n;i++){
         SPARSE_VECTOR_ND<T>& row=*A(i);
         if(row(i)<=0){
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
@@ -128,23 +128,23 @@ public:
 
     void Transpose(SPARSE_MATRIX_NXN<T>& A_transpose)
     {assert(A_transpose.n==n);
-    for(int i=1;i<=n;i++){SPARSE_VECTOR_ND<T>* row=A(i);for(int j=1;j<=row->number_of_active_indices;j++) A_transpose.Set_Element(row->indices[j],i,row->x[j]);}}
+    for(int i=0;i<n;i++){SPARSE_VECTOR_ND<T>* row=A(i);for(int j=1;j<=row->number_of_active_indices;j++) A_transpose.Set_Element(row->indices[j],i,row->x[j]);}}
 
     bool Is_Transpose(SPARSE_MATRIX_NXN<T>& A_transpose,T tolerance)
     {assert(A_transpose.n==n);
-    for(int i=1;i<=n;i++) for(int j=1;j<=n;j++) if(abs(A_transpose(i,j)-(*this)(j,i))>tolerance) return false;
+    for(int i=0;i<n;i++) for(int j=0;j<n;j++) if(abs(A_transpose(i,j)-(*this)(j,i))>tolerance) return false;
     return true;}
 
     void Solve_Forward_Substitution(const VECTOR_ND<T>& b,VECTOR_ND<T>& x,const bool diagonal_is_identity=false,const bool diagonal_is_inverted=false)
-    {if(diagonal_is_identity) for(int i=1;i<=n;i++){
+    {if(diagonal_is_identity) for(int i=0;i<n;i++){
         SPARSE_VECTOR_ND<T>& row=*A(i);
         T sum=0;for(int j=1;j<=(*diagonal_index)(i)-1;j++){sum+=row.x[j]*x(row.indices[j]);}
         x(i)=b(i)-sum;}
-    else if(!diagonal_is_inverted) for(int i=1;i<=n;i++){
+    else if(!diagonal_is_inverted) for(int i=0;i<n;i++){
         SPARSE_VECTOR_ND<T>& row=*A(i);
         T sum=0;for(int j=1;j<=(*diagonal_index)(i)-1;j++){sum+=row.x[j]*x(row.indices[j]);}
         x(i)=(b(i)-sum)/row.x[(*diagonal_index)(i)];}
-    else for(int i=1;i<=n;i++){
+    else for(int i=0;i<n;i++){
         SPARSE_VECTOR_ND<T>& row=*A(i);
         T sum=0;for(int j=1;j<=(*diagonal_index)(i)-1;j++){sum+=row.x[j]*x(row.indices[j]);}
         x(i)=(b(i)-sum)*row.x[(*diagonal_index)(i)];}}
@@ -166,7 +166,7 @@ public:
     // actually an LU saving square roots, with an inverted diagonal saving divides
     void Construct_Incomplete_Cholesky_Factorization(const bool modified_version=true,const T modified_coefficient=.97,const T zero_tolerance=1e-8,const T zero_replacement=1e-8)
     {delete C;C=new SPARSE_MATRIX_NXN<T>(*this);C->Initialize_Diagonal_Index();
-    for(int i=1;i<=n;i++){ // for each row
+    for(int i=0;i<n;i++){ // for each row
         SPARSE_VECTOR_ND<T>& row=*C->A(i);int row_diagonal_index=(*C->diagonal_index)(i);T sum=0;
         for(int k_bar=1;k_bar<row_diagonal_index;k_bar++){ // for all the columns before the diagonal element
             int k=row.indices[k_bar];SPARSE_VECTOR_ND<T>& row2=*C->A(k);int row2_diagonal_index=(*C->diagonal_index)(k);
@@ -182,7 +182,7 @@ public:
 
     void Gauss_Seidel_Single_Iteration(VECTOR_ND<T>& x,const VECTOR_ND<T>& b)
     {assert(x.n==b.n && x.n==n);
-    for(int i=1;i<=n;i++){
+    for(int i=0;i<n;i++){
         T rho=0;T diag_entry=0;
         for(int j=1;j<=A(i)->number_of_active_indices;j++){
             int index=A(i)->indices[j];
@@ -193,13 +193,13 @@ public:
     void Gauss_Seidel_Solve(VECTOR_ND<T>& x,const VECTOR_ND<T>& b,const T tolerance=1e-12,const int max_iterations=1000000)
     {assert(x.n==b.n && x.n==n);
     VECTOR_ND<T> last_x(x);
-    for(int k=1;k<=max_iterations;k++){
+    for(int k=0;k<max_iterations;k++){
         Gauss_Seidel_Single_Iteration(x,b);
-        T residual=0;for(int j=1;j<=n;j++){residual+=sqr(last_x(j)-x(j));last_x(j)=x(j);}if(residual<tolerance) return;}}
+        T residual=0;for(int j=0;j<n;j++){residual+=sqr(last_x(j)-x(j));last_x(j)=x(j);}if(residual<tolerance) return;}}
 
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     void Write_Row_Lengths()
-    {for(int i=1;i<=n;i++)LOG::cout<<A(i)->number_of_active_indices<<" ";LOG::cout<<std::endl;}
+    {for(int i=0;i<n;i++)LOG::cout<<A(i)->number_of_active_indices<<" ";LOG::cout<<std::endl;}
 #endif
 
 //#####################################################################

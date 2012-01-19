@@ -98,7 +98,7 @@ public:
     template<int n>
     VECTOR(const VECTOR<T,n>& v1,const VECTOR<T,3-n>& v2)
     {
-        for(int i=1;i<=n;i++) (*this)(i)=v1(i);for(int i=n+1;i<=3;i++) (*this)(i)=v2(i-n);
+        for(int i=0;i<n;i++) (*this)(i)=v1(i);for(int i=n+1;i<=3;i++) (*this)(i)=v2(i-n);
     }
 
     template<class T_VECTOR> typename ENABLE_IF<AND<IS_SAME<T,typename T_VECTOR::ELEMENT>::value,INTS_EQUAL<T_VECTOR::m,3>::value>::value,VECTOR&>::TYPE
@@ -362,7 +362,7 @@ public:
     {return VECTOR<T,4>(x,y,z,element);}
 
     template<int d2> VECTOR<T,3+d2> Append_Elements(const VECTOR<T,d2>& elements) const
-    {VECTOR<T,3+d2> r;r[1]=x;r[2]=y;r[3]=z;for(int i=1;i<=d2;i++) r[i+3]=elements[i];return r;}
+    {VECTOR<T,3+d2> r;r[1]=x;r[2]=y;r[3]=z;for(int i=0;i<d2;i++) r[i+3]=elements[i];return r;}
 
     VECTOR<T,3> Sorted() const
     {VECTOR<T,3> r(*this);exchange_sort(r.x,r.y,r.z);return r;}
@@ -375,7 +375,7 @@ public:
     VECTOR<T,d2-d1+1> r;for(int i=d1;i<=d2;i++) r[i-d1+1]=(*this)[i];return r;}
 
     template<int n> void Split(VECTOR<T,n>& v1,VECTOR<T,3-n>& v2) const
-    {for(int i=1;i<=n;i++) v1(i)=(*this)(i);
+    {for(int i=0;i<n;i++) v1(i)=(*this)(i);
     for(int i=n+1;i<=3;i++) v2(i-n)=(*this)(i);}
 
     template<class T_VECTOR>

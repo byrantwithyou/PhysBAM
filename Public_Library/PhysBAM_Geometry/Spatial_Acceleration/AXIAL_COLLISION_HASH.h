@@ -43,21 +43,21 @@ public:
     // generate ranges
     cluster_ranges.Resize(axis_clusters,false,false);
     int quotient=primitives/axis_clusters,remainder=primitives%axis_clusters;
-    for(int i=1;i<=axis_clusters;i++) cluster_ranges(i)=VECTOR<int,2>((i-1)*quotient+min(i-1,remainder)+1,i*quotient+min(i,remainder));}
+    for(int i=0;i<axis_clusters;i++) cluster_ranges(i)=VECTOR<int,2>((i-1)*quotient+min(i-1,remainder)+1,i*quotient+min(i,remainder));}
 
     void Update_Grid_Hash()
     {ARRAY<int> primitive_indices(primitives,false);
     for(int axis=1;axis<=3;axis++){
-        for(int i=1;i<=primitives;i++) primitive_indices(i)=i;
+        for(int i=0;i<primitives;i++) primitive_indices(i)=i;
         Sort(primitive_indices,Indirect_Comparison(axial_primitive_centroids[axis]));
         ARRAY<RANGE<VECTOR<T,1> > >::Copy(RANGE<VECTOR<T,1> >(FLT_MAX,-FLT_MAX),axial_intervals[axis]);
-        for(int cluster=1;cluster<=axis_clusters;cluster++) for(int i=cluster_ranges(cluster).x;i<=cluster_ranges(cluster).y;i++){
+        for(int cluster=0;cluster<axis_clusters;cluster++) for(int i=cluster_ranges(cluster).x;i<=cluster_ranges(cluster).y;i++){
             int primitive_index=primitive_indices(i);
             axial_intervals[axis](cluster).Enlarge_To_Include_Box(axial_primitive_bounding_boxes[axis](primitive_index));
             primitive_to_axial_clusters(primitive_index)[axis]=cluster;}}
     // Build cartesian product
-    for(int i=1;i<=axis_clusters;i++) for(int j=1;j<=axis_clusters;j++) for(int ij=1;ij<=axis_clusters;ij++) if(cluster_grid_hash(i,j,ij)){delete cluster_grid_hash(i,j,ij);cluster_grid_hash(i,j,ij)=0;}
-    for(int i=1;i<=primitives;i++){
+    for(int i=0;i<axis_clusters;i++) for(int j=0;j<axis_clusters;j++) for(int ij=0;ij<axis_clusters;ij++) if(cluster_grid_hash(i,j,ij)){delete cluster_grid_hash(i,j,ij);cluster_grid_hash(i,j,ij)=0;}
+    for(int i=0;i<primitives;i++){
         VECTOR<int,3>& index=primitive_to_axial_clusters(i);
         if(!cluster_grid_hash(index)) cluster_grid_hash(index)=new ARRAY<int>;
         cluster_grid_hash(index)->Append(i);}}

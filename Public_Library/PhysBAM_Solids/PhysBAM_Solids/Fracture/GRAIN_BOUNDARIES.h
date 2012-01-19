@@ -44,21 +44,21 @@ public:
     {for(int t=1;t<=mesh.elements.m;t++) fracture_object.fracture_bias_direction(t)=random_numbers.template Get_Direction<VECTOR<T,d> >();}
 
     void Smooth_Fracture_Bias_Directions(const int passes)
-    {for(int iteration=1;iteration<=passes;iteration++) for(int t=1;t<=mesh.elements.m;t++){
+    {for(int iteration=0;iteration<passes;iteration++) for(int t=1;t<=mesh.elements.m;t++){
         VECTOR<T,d> average=fracture_object.fracture_bias_direction(t);
         for(int i=1;i<=(*mesh.adjacent_elements)(t).m;i++) average+=fracture_object.fracture_bias_direction((*mesh.adjacent_elements)(t)(i));
         fracture_object.fracture_bias_direction(t)=average.Normalized();}}
 
     void Seed_Regions(const int number_of_regions)
     {regions.Resize(mesh.elements.m);
-    for(int r=1;r<=number_of_regions;r++){
+    for(int r=0;r<number_of_regions;r++){
         int element=seed_element_index?(*seed_element_index)(r):random_numbers.Get_Uniform_Integer(1,mesh.elements.m);
         while(regions(element))element=random_numbers.Get_Uniform_Integer(1,mesh.elements.m);
         regions(element)=r;}}
 
     void Seed_Node_Regions(const int number_of_node_regions)
     {node_regions.Resize(mesh.number_nodes);
-    for(int r=1;r<=number_of_node_regions;r++){
+    for(int r=0;r<number_of_node_regions;r++){
         int node=seed_node_index?(*seed_node_index)(r):random_numbers.Get_Uniform_Integer(1,mesh.number_nodes);
         while(node_regions(node))node=random_numbers.Get_Uniform_Integer(1,mesh.number_nodes);
         node_regions(node)=r;}}
@@ -93,29 +93,29 @@ public:
 
     void Floodfill_Regions(const int number_of_regions)
     {Seed_Regions(number_of_regions);
-    while(Unmarked_Element()) for(int r=1;r<=number_of_regions;r++) Mark_All_Neigbors_Of_Region(r);}
+    while(Unmarked_Element()) for(int r=0;r<number_of_regions;r++) Mark_All_Neigbors_Of_Region(r);}
 
     void Floodfill_Node_Regions(const int number_of_node_regions)
     {Seed_Node_Regions(number_of_node_regions);
-    while(Unmarked_Node()) for(int r=1;r<=number_of_node_regions;r++) Mark_All_Node_Neighbors_Of_Region(r);}
+    while(Unmarked_Node()) for(int r=0;r<number_of_node_regions;r++) Mark_All_Node_Neighbors_Of_Region(r);}
 
     void Fill_Regions_With_Uniform_Vectors(const int number_of_regions)
     {Floodfill_Regions(number_of_regions);
     ARRAY<VECTOR<T,d> > random_vectors(number_of_regions);
-    for(int r=1;r<=number_of_regions;r++) random_vectors(r)=random_numbers.template Get_Direction<VECTOR<T,d> >();
+    for(int r=0;r<number_of_regions;r++) random_vectors(r)=random_numbers.template Get_Direction<VECTOR<T,d> >();
     for(int r=1;r<=regions.m;r++) fracture_object.fracture_bias_direction(r)=random_vectors(regions(r));}
 
     void Fill_Regions_With_Uniform_Spatial_Fracture_Bias_Directions(ARRAY<TV>& spatial_fracture_bias_direction,const int number_of_regions)
     {assert(spatial_fracture_bias_direction.m==mesh.elements.m);
     Floodfill_Regions(number_of_regions);
     ARRAY<TV> random_vectors(number_of_regions);
-    for(int r=1;r<=number_of_regions;r++) random_vectors(r)=random_numbers.template Get_Direction<TV>();
+    for(int r=0;r<number_of_regions;r++) random_vectors(r)=random_numbers.template Get_Direction<TV>();
     for(int r=1;r<=regions.m;r++) spatial_fracture_bias_direction(r)=random_vectors(regions(r));}
 
     void Fill_Node_Regions_With_Uniform_Vectors(const int number_of_node_regions)
     {Floodfill_Node_Regions(number_of_node_regions);
     ARRAY<VECTOR<T,d> > random_vectors(number_of_node_regions);
-    for(int r=1;r<=number_of_node_regions;r++) random_vectors(r)=random_numbers.template Get_Direction<VECTOR<T,d> >();
+    for(int r=0;r<number_of_node_regions;r++) random_vectors(r)=random_numbers.template Get_Direction<VECTOR<T,d> >();
     for(int t=1;t<=mesh.elements.m;t++) 
         if(!Element_Contains_Nodes_From_Different_Regions(t)) fracture_object.fracture_bias_direction(t)=random_vectors(node_regions(mesh.elements(t)(1)));
         else fracture_object.fracture_bias_direction(t)=VECTOR<T,d>();}
@@ -134,7 +134,7 @@ public:
     {int count=0;for(int t=1;t<=mesh.elements.m;t++) if(regions(t)==region) count++;return count;}
 
     void Print_Number_In_Regions(const int number_of_regions)
-    {for(int r=1;r<=number_of_regions;r++) LOG::cout<<"there are "<<Number_In_Region(r)<<" in region "<<r<<std::endl;}
+    {for(int r=0;r<number_of_regions;r++) LOG::cout<<"there are "<<Number_In_Region(r)<<" in region "<<r<<std::endl;}
 
     void Print_Regions()
     {for(int t=1;t<=mesh.elements.m;t++) LOG::cout<<"region("<<t<<")="<<regions(t)<<std::endl;}

@@ -146,15 +146,15 @@ inline void OpenGL_Color(const GLfloat* color,ARRAY<GLfloat>& colors)
 
 template<int d>
 inline void OpenGL_Vertex(const VECTOR<int,d>& v,ARRAY<GLshort>& vertices)
-{for(int i=1;i<=d;i++) vertices.Append(v(i));}
+{for(int i=0;i<d;i++) vertices.Append(v(i));}
 
 template<int d>
 inline void OpenGL_Vertex(const VECTOR<float,d>& v,ARRAY<GLfloat>& vertices)
-{for(int i=1;i<=d;i++) vertices.Append(v(i));}
+{for(int i=0;i<d;i++) vertices.Append(v(i));}
 
 template<int d>
 inline void OpenGL_Normal(const VECTOR<float,d>& n, ARRAY<GLfloat>& normals)
-{for(int i=1;i<=d;i++) normals.Append(n(i));}
+{for(int i=0;i<d;i++) normals.Append(n(i));}
 
 #ifndef USE_OPENGLES
 inline void OpenGL_Vertex(const VECTOR<float,3>& v)
@@ -183,11 +183,11 @@ inline void OpenGL_RasterPos(const VECTOR<float,3>& v)
 
 template<int d>
 inline void OpenGL_Vertex(const VECTOR<double,d>& v,ARRAY<OPENGL_POLICY<double>::T_GL>& vertices)
-{for(int i=1;i<=d;i++) vertices.Append(v(i));}
+{for(int i=0;i<d;i++) vertices.Append(v(i));}
 
 template<int d>
 inline void OpenGL_Normal(const VECTOR<double,d>& n, ARRAY<GLfloat>& normals)
-{for(int i=1;i<=d;i++) normals.Append(n(i));}
+{for(int i=0;i<d;i++) normals.Append(n(i));}
 
 #ifndef USE_OPENGLES
 inline void OpenGL_Vertex(const VECTOR<double,3>& v)

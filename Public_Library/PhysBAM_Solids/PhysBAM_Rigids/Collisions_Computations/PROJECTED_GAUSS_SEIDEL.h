@@ -35,7 +35,7 @@ void Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& a,VECTOR_ND<T>& x,T tolera
     while(maximum_residual>tolerance)
     {
         maximum_residual=0;
-        for(int i=1;i<=n;i++)
+        for(int i=0;i<n;i++)
         {
             T row_sum=0;
             T diagonal=1;
@@ -89,7 +89,7 @@ template<class T,int D>
         lambda(i)=0;
 
     ARRAY<MATRIX<T,D> > A_block_diagonal_inverse(n_block_primal);
-    for(int i=1;i<=n_block_primal;i++)
+    for(int i=0;i<n_block_primal;i++)
     {
         A_block_diagonal(i).Cholesky_Inverse(A_block_diagonal_inverse(i));
         x(i)=A_block_diagonal_inverse(i)*a_block(i);
@@ -98,7 +98,7 @@ template<class T,int D>
     ARRAY<ARRAY<PAIR<int,VECTOR<T,D> > > > AiC=C_block;
 
     ARRAY<T> schur_complement_diagonal(n_dual);
-    for(int i=1;i<=n_dual;i++)
+    for(int i=0;i<n_dual;i++)
     {
         T diagonal=0;
         for(int j=1;j<=C_block(i).m;j++)
@@ -116,7 +116,7 @@ template<class T,int D>
     while(maximum_residual>tolerance)
     {
         maximum_residual=0;
-        for(int i=1;i<=n_dual;i++)
+        for(int i=0;i<n_dual;i++)
         {
             T row_sum=0;
             for(int j=1;j<=C_block(i).m;j++)
@@ -177,7 +177,7 @@ bool Solve(
 
     T maximum_residual=2*tolerance+1;
 
-    /*for(int i=1;i<=n_contacts;i++)
+    /*for(int i=0;i<n_contacts;i++)
     {
         lambda_normal(i)=0;
         if(friction)
@@ -190,7 +190,7 @@ bool Solve(
     while(maximum_residual>tolerance && (!iteration_maximum || iteration<iteration_maximum))
     {
         maximum_residual=0;
-        for(int i=1;i<=n_contacts;i++)
+        for(int i=0;i<n_contacts;i++)
         {
             SOLVE_CONTACT::CONTACT<TV>& contact=contacts(i);
             
@@ -269,7 +269,7 @@ bool Solve(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,ARRAY<SOLVE_CONTACT:
 
     ARRAY<T> lambda_normal(n_contacts);
     ARRAY<VECTOR<T,d-1> > lambda_tangent(n_contacts);
-    for(int i=1;i<=n_contacts;i++)
+    for(int i=0;i<n_contacts;i++)
     {
         lambda_normal(i)=0;
         for(int j=1;j<d;j++)
@@ -278,7 +278,7 @@ bool Solve(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,ARRAY<SOLVE_CONTACT:
     ARRAY<TWIST<TV> > velocities(n_bodies);
     ARRAY<bool> has_infinite_inertia(n_bodies);
     
-    for(int i=1;i<=n_bodies;i++)
+    for(int i=0;i<n_bodies;i++)
     {
         if(rigid_body_collection.Is_Active(i))
         {
@@ -292,7 +292,7 @@ bool Solve(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,ARRAY<SOLVE_CONTACT:
     while(maximum_residual>tolerance && (!iteration_maximum || iteration<iteration_maximum))
     {
         maximum_residual=0;
-        for(int i=1;i<=n_contacts;i++)
+        for(int i=0;i<n_contacts;i++)
         {
             SOLVE_CONTACT::CONTACT<TV>& contact=contacts(i);
             
@@ -359,7 +359,7 @@ bool Solve(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,ARRAY<SOLVE_CONTACT:
     //LOG::cout << "lambda_normal = " << lambda_normal << std::endl;
     //LOG::cout << "lambda_tangent = " << lambda_tangent << std::endl;
 
-    /*for(int i=1;i<=n_contacts;i++)
+    /*for(int i=0;i<n_contacts;i++)
     {
         SOLVE_CONTACT::CONTACT<TV>& contact=contacts(i);
         
@@ -374,7 +374,7 @@ bool Solve(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,ARRAY<SOLVE_CONTACT:
 
     LOG::cout << "pgs iterations " << iteration << " residual " << maximum_residual << std::endl;
 
-    for(int i=1;i<=n_bodies;i++)
+    for(int i=0;i<n_bodies;i++)
     {
         if(rigid_body_collection.Is_Active(i) && !has_infinite_inertia(i))
         {

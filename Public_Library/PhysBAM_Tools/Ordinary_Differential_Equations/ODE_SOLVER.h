@@ -17,21 +17,21 @@ public:
 
     T2 Euler(const NONLINEAR_FUNCTION<T2(T,T2)>& F,const T2 y_not,const T t_not,const T t_final,int n)
     {T2 y=y_not;T h=(t_final-t_not)/n;
-    for(int k=1;k<=n;k++){
+    for(int k=0;k<n;k++){
         T t=t_not+(k-1)*h;
         y+=h*F(t,y);}
     return y;}
 
     T2 Runge_Kutta_2(const NONLINEAR_FUNCTION<T2(T,T2)>& F,const T2 y_not,const T t_not,const T t_final,int n)
     {T2 y=y_not;T h=(t_final-t_not)/n;
-    for(int k=1;k<=n;k++){
+    for(int k=0;k<n;k++){
         T t=t_not+(k-1)*h;T2 k1=F(t,y),k2=F(t+h,y+h*k1);
         y+=h*(k1+k2)/2;}
     return y;}
 
     T2 Runge_Kutta_4(const NONLINEAR_FUNCTION<T2(T,T2)>& F,const T2 y_not,const T t_not,const T t_final,int n)
     {T2 y=y_not;T h=(t_final-t_not)/n;
-    for(int k=1;k<=n;k++){
+    for(int k=0;k<n;k++){
         T t=t_not+(k-1)*h;T2 k1=F(t,y),k2=F(t+h/2,y+h*k1/2),k3=F(t+h/2,y+h*k2/2),k4=F(t+h,y+h*k3);
         y+=h*(k1+(T)2*k2+(T)2*k3+k4)/6;}
     return y;}

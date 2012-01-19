@@ -41,7 +41,7 @@ public:
                     int row_remainder=total_rows%number_of_domains;
                     domains.Resize(number_of_domains);
                     int previous_domain_max=domain.min_corner(axis)-1;
-                    for(int i=1;i<=number_of_domains;i++){
+                    for(int i=0;i<number_of_domains;i++){
                         domains(i)=domain;
                         domains(i).min_corner(axis)=previous_domain_max+1;
                         previous_domain_max+=row_jump;
@@ -140,7 +140,7 @@ public:
         int range_over_processes=(x+1)/processes;
         int remainder=(x+1)%processes;
         boundaries.Resize(processes+1);boundaries(1)=-1;
-        for(int p=1;p<=processes;p++){
+        for(int p=0;p<processes;p++){
             boundaries(p+1)=boundaries(p)+range_over_processes;
             if(p<=remainder)boundaries(p+1)+=1;}
     }

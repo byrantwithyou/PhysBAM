@@ -61,7 +61,7 @@ void Initialize_Cube_Mesh_And_Particles(TETRAHEDRALIZED_VOLUME<T>& tv,const GRID
     tv.particles.array_collection->Delete_All_Elements();
     tv.mesh.Initialize_Cube_Mesh(m,n,mn);
     tv.particles.array_collection->Add_Elements(m*n*mn);
-    for(int k=1;k<=mn;k++) for(int j=1;j<=n;j++) for(int i=1;i<=m;i++) tv.particles.X(++particle)=grid.X(i,j,k);
+    for(int k=0;k<mn;k++) for(int j=0;j<n;j++) for(int i=0;i<m;i++) tv.particles.X(++particle)=grid.X(i,j,k);
 }
 //#####################################################################
 // Function Initialize_Prismatic_Cube_Mesh_And_Particles
@@ -73,7 +73,7 @@ void Initialize_Prismatic_Cube_Mesh_And_Particles(TETRAHEDRALIZED_VOLUME<T>& tv,
     tv.particles.array_collection->Delete_All_Elements();
     tv.mesh.Initialize_Prismatic_Cube_Mesh(m,n,mn);
     tv.particles.array_collection->Add_Elements(m*n*mn);
-    for(int k=1;k<=mn;k++) for(int j=1;j<=n;j++) for(int i=1;i<=m;i++) tv.particles.X(++particle)=grid.X(i,j,k);
+    for(int k=0;k<mn;k++) for(int j=0;j<n;j++) for(int i=0;i<m;i++) tv.particles.X(++particle)=grid.X(i,j,k);
 }
 //#####################################################################
 // Function Initialize_Triangulated_Surface

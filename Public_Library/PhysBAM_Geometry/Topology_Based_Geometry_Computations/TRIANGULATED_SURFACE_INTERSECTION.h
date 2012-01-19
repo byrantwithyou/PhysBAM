@@ -36,7 +36,7 @@ bool Find_First_Segment_Triangle_Intersection(TRIANGULATED_SURFACE<T>& ts,const 
 #endif
         return true;}
     else{
-        for(int loops=1;loops<=max_coarsening_attempts;loops++){
+        for(int loops=0;loops<max_coarsening_attempts;loops++){
             T distance=(1<<loops)*thickness_over_2;
             if(ts.Segment_Triangle_Intersection(test_segment_mesh,X,distance,false)){
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT

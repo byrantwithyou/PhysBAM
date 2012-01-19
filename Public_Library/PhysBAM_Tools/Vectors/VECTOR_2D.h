@@ -376,7 +376,7 @@ public:
     {return VECTOR<T,3>(x,y,element);}
 
     template<int d2> VECTOR<T,2+d2> Append_Elements(const VECTOR<T,d2>& elements) const
-    {VECTOR<T,2+d2> r;r[1]=x;r[2]=y;for(int i=1;i<=d2;i++) r[i+2]=elements[i];return r;}
+    {VECTOR<T,2+d2> r;r[1]=x;r[2]=y;for(int i=0;i<d2;i++) r[i+2]=elements[i];return r;}
 
     VECTOR<T,2> Sorted() const
     {VECTOR<T,2> r(*this);exchange_sort(r.x,r.y);return r;}
@@ -389,7 +389,7 @@ public:
     VECTOR<T,d2-d1+1> r;for(int i=d1;i<=d2;i++) r[i-d1+1]=(*this)[i];return r;}
 
     template<int n> void Split(VECTOR<T,n>& v1,VECTOR<T,2-n>& v2) const
-    {for(int i=1;i<=n;i++) v1(i)=(*this)(i);
+    {for(int i=0;i<n;i++) v1(i)=(*this)(i);
     for(int i=n+1;i<=2;i++) v2(i-n)=(*this)(i);}
 
     template<class T_VECTOR>

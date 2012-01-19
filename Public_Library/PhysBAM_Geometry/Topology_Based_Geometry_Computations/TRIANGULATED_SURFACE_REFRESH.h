@@ -75,9 +75,9 @@ void Initialize_Torus_Mesh_And_Particles(TRIANGULATED_SURFACE<T>& ts,const int m
 {
     typedef VECTOR<T,3> TV;
     T di=T(2*pi)/m,dj=T(2*pi)/n;
-    for(int j=1;j<=n;j++){
+    for(int j=0;j<n;j++){
         T phi=-dj*j,radius=major_radius+minor_radius*cos(phi),z=minor_radius*sin(phi);
-        for(int i=1;i<=m;i++){
+        for(int i=0;i<m;i++){
             int p=ts.particles.array_collection->Add_Element();T theta=di*(i-(T).5*(j&1));
             ts.particles.X(p)=TV(radius*cos(theta),radius*sin(theta),z);}}
     ts.mesh.Initialize_Torus_Mesh(m,n);
@@ -90,7 +90,7 @@ void Initialize_Cylinder_Mesh_And_Particles(TRIANGULATED_SURFACE<T>& ts,const in
 {
     typedef VECTOR<T,3> TV;
     ts.particles.array_collection->Delete_All_Elements();T dtheta=(T)two_pi/n;T dlength=length/(m-1);
-    for(int i=1;i<=m;i++) for(int j=1;j<=n;j++){
+    for(int i=0;i<m;i++) for(int j=0;j<n;j++){
         int p=ts.particles.array_collection->Add_Element();T theta=(j-1)*dtheta;
         ts.particles.X(p)=TV(dlength*(i-1),radius*sin(theta),radius*cos(theta));}
     if(create_caps){int p_1=ts.particles.array_collection->Add_Element();int p_2=ts.particles.array_collection->Add_Element();ts.particles.X(p_1)=TV(0,0,0);ts.particles.X(p_2)=TV(length,0,0);}

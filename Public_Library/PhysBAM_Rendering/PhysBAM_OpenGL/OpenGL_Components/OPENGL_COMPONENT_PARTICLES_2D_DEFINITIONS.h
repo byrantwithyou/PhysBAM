@@ -48,7 +48,7 @@ OPENGL_COMPONENT_PARTICLES_2D(const std::string &filename_input, const std::stri
 template<class T,class T_PARTICLES,class RW> OPENGL_COMPONENT_PARTICLES_2D<T,T_PARTICLES,RW>::
 ~OPENGL_COMPONENT_PARTICLES_2D()
 {
-    for(int i=1;i<=number_of_sets;i++){delete particles_multiple(i);delete &opengl_points_multiple(i)->points;delete opengl_points_multiple(i);}
+    for(int i=0;i<number_of_sets;i++){delete particles_multiple(i);delete &opengl_points_multiple(i)->points;delete opengl_points_multiple(i);}
     delete &opengl_vector_field.vector_field;
 }
 
@@ -82,7 +82,7 @@ Display(const int in_color) const
         if(mode == GL_SELECT){
             if(draw_multiple_particle_sets){
                 glPushName(0);
-                for(int i=1;i<=number_of_sets;i++){
+                for(int i=0;i<number_of_sets;i++){
                     glLoadName(i);
                     opengl_points_multiple(i)->Display(in_color);}
                 glPopName();}
@@ -91,7 +91,7 @@ Display(const int in_color) const
         else
 #endif
         {
-            if(draw_multiple_particle_sets) for(int i=1;i<=number_of_sets;i++) opengl_points_multiple(i)->Display(in_color);
+            if(draw_multiple_particle_sets) for(int i=0;i<number_of_sets;i++) opengl_points_multiple(i)->Display(in_color);
             else opengl_points->Display(in_color);
             if (draw_velocities && have_velocities) opengl_vector_field.Display(in_color);}}
 }
@@ -250,7 +250,7 @@ Reinitialize(bool force)
     if(!draw || !(force || !valid || (is_animation && frame_loaded != frame) || (!is_animation && frame_loaded < 0))) return;
     valid=true;have_velocities=false;
 
-    for(int i=1;i<=number_of_sets;i++){
+    for(int i=0;i<number_of_sets;i++){
         std::string frame_filename;
         if(use_sets) frame_filename=STRING_UTILITIES::string_sprintf(filename_set.c_str(),i,frame);
         else frame_filename=FILE_UTILITIES::Get_Frame_Filename(filename,frame);
@@ -383,7 +383,7 @@ Clear_Id_Selection()
 template<class T,class T_PARTICLES,class RW> void OPENGL_COMPONENT_PARTICLES_2D<T,T_PARTICLES,RW>::
 Apply_Id_Selection()
 {
-    for(int current_set=1;current_set<=number_of_sets;current_set++){
+    for(int current_set=0;current_set<number_of_sets;current_set++){
         opengl_points_multiple(current_set)->Clear_Selection();
         if (use_ids && valid && opengl_points_multiple(current_set)->points.m == particles_multiple(current_set)->array_collection->Size())
         {

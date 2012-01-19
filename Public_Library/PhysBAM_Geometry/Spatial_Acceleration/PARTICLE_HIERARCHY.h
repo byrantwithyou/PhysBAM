@@ -90,9 +90,9 @@ template<class TV,class T_ARRAY> template<class T_ARRAY_TV> void PARTICLE_HIERAR
 Calculate_Bounding_Boxes(ARRAY<RANGE<TV> >& bounding_boxes,const T_ARRAY_TV& X) const
 {
     STATIC_ASSERT((IS_SAME<TV,typename T_ARRAY_TV::ELEMENT>::value));
-    if(particles_per_group) for(int k=1;k<=leaves;k++){
+    if(particles_per_group) for(int k=0;k<leaves;k++){
         if(particles_in_group(k).m) bounding_boxes(k)=RANGE<TV>::Bounding_Box(X.Subset(particles_in_group(k)));}
-    else for(int k=1;k<=leaves;k++) bounding_boxes(k).Reset_Bounds(X(k));
+    else for(int k=0;k<leaves;k++) bounding_boxes(k).Reset_Bounds(X(k));
 }
 //#####################################################################
 }

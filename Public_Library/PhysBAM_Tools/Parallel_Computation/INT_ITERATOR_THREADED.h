@@ -76,7 +76,7 @@ public:
     {
         if(!thread_queue){(my_class.*func)(1);return;}
 #ifdef USE_PTHREADS
-        for(int i=1;i<=end_index;i++){
+        for(int i=0;i<end_index;i++){
             INT_ITERATOR_TASK_0<TYPE>* task=new INT_ITERATOR_TASK_0<TYPE>(my_class,func,i);
             thread_queue->Queue(task);}
         thread_queue->Wait();
@@ -115,7 +115,7 @@ public:
     {
         if(!thread_queue){(my_class.*func)(arg1,1);return;}
 #ifdef USE_PTHREADS
-        for(int i=1;i<=end_index;i++){
+        for(int i=0;i<end_index;i++){
             INT_ITERATOR_TASK_1<TYPE,T1>* task=new INT_ITERATOR_TASK_1<TYPE,T1>(my_class,func,i,arg1);
             thread_queue->Queue(task);}
         thread_queue->Wait();

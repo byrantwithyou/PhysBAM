@@ -85,7 +85,7 @@ public:
     template<int n>
     VECTOR(const VECTOR<T,n>& v1,const VECTOR<T,1-n>& v2)
     {
-        for(int i=1;i<=n;i++) (*this)(i)=v1(i);for(int i=n+1;i<=1;i++) (*this)(i)=v2(i-n);
+        for(int i=0;i<n;i++) (*this)(i)=v1(i);for(int i=n+1;i<=1;i++) (*this)(i)=v2(i-n);
     }
 
     template<class T_VECTOR> typename ENABLE_IF<AND<IS_SAME<T,typename T_VECTOR::ELEMENT>::value,INTS_EQUAL<T_VECTOR::m,1>::value>::value,VECTOR&>::TYPE
@@ -323,7 +323,7 @@ public:
     {return VECTOR<T,2>(x,element);}
 
     template<int d2> VECTOR<T,1+d2> Append_Elements(const VECTOR<T,d2>& elements) const
-    {VECTOR<T,1+d2> r;r[1]=x;for(int i=1;i<=d2;i++) r[i+1]=elements[i];return r;}
+    {VECTOR<T,1+d2> r;r[1]=x;for(int i=0;i<d2;i++) r[i+1]=elements[i];return r;}
 
     VECTOR Reversed() const
     {return *this;}
@@ -333,7 +333,7 @@ public:
     VECTOR<T,d2-d1+1> r;for(int i=d1;i<=d2;i++) r[i-d1+1]=(*this)[i];return r;}
 
     template<int n> void Split(VECTOR<T,n>& v1,VECTOR<T,1-n>& v2) const
-    {for(int i=1;i<=n;i++) v1(i)=(*this)(i);
+    {for(int i=0;i<n;i++) v1(i)=(*this)(i);
     for(int i=n+1;i<=1;i++) v2(i-n)=(*this)(i);}
 
     T* begin() // for stl

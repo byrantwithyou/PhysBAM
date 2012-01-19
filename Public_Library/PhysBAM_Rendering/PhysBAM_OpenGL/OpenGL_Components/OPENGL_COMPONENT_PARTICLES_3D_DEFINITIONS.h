@@ -53,7 +53,7 @@ OPENGL_COMPONENT_PARTICLES_3D(const std::string &filename_input, const std::stri
 template<class T,class T_PARTICLES,class RW> OPENGL_COMPONENT_PARTICLES_3D<T,T_PARTICLES,RW>::
 ~OPENGL_COMPONENT_PARTICLES_3D()
 {
-    for(int i=1;i<=number_of_sets;i++){delete particles_multiple(i);delete &opengl_points_multiple(i)->points;delete opengl_points_multiple(i);}
+    for(int i=0;i<number_of_sets;i++){delete particles_multiple(i);delete &opengl_points_multiple(i)->points;delete opengl_points_multiple(i);}
     //delete &opengl_points->points; TODO: get rid of opengl_points altogether, but this is safe as opengl_points_multiple(1) is always an alias of this.
     delete &opengl_vector_field.vector_field;
 }
@@ -97,14 +97,14 @@ Display(const int in_color) const
     if(mode == GL_SELECT){
         if(draw_multiple_particle_sets){
             glPushName(0);
-            for(int i=1;i<=number_of_sets;i++){
+            for(int i=0;i<number_of_sets;i++){
                 glLoadName(i);
                 opengl_points_multiple(i)->Display(in_color);}
             glPopName();}
         else opengl_points->Display(in_color);
         if (draw_velocities && have_velocities) opengl_vector_field.Display(in_color);}
     else{
-        if(draw_multiple_particle_sets) for(int i=1;i<=number_of_sets;i++)opengl_points_multiple(i)->Display(in_color);
+        if(draw_multiple_particle_sets) for(int i=0;i<number_of_sets;i++)opengl_points_multiple(i)->Display(in_color);
         else opengl_points->Display(in_color);
         if (draw_velocities && have_velocities) opengl_vector_field.Display(in_color);}
 
@@ -256,7 +256,7 @@ Reinitialize(bool force)
     if(!draw || !(force || !valid || (is_animation && frame_loaded != frame) || (!is_animation && frame_loaded < 0))) return;
     valid=true;have_velocities=false;
 
-    for(int i=1;i<=number_of_sets;i++){
+    for(int i=0;i<number_of_sets;i++){
         std::string frame_filename;
         if(use_sets) frame_filename=STRING_UTILITIES::string_sprintf(filename_set.c_str(),i,frame);
         else frame_filename=FILE_UTILITIES::Get_Frame_Filename(filename,frame);

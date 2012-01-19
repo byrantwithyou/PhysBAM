@@ -20,11 +20,11 @@ class Read_Write<HASHTABLE<TK,T>,RW>
 public:
     static void Read(typename IF<IS_SAME<T,void>::value,std::istream&,UNUSABLE>::TYPE input,HASHTABLE<TK,T>& object) // void version
     {int entries;Read_Binary<RW>(input,entries);object.Initialize_New_Table(entries);
-    for(int i=1;i<=entries;i++){TK key;Read_Binary<RW>(input,key);object.Insert(key);}}
+    for(int i=0;i<entries;i++){TK key;Read_Binary<RW>(input,key);object.Insert(key);}}
 
     static void Read(typename IF<IS_SAME<T,void>::value,UNUSABLE,std::istream&>::TYPE input,HASHTABLE<TK,T>& object) // non-void version
     {int entries;Read_Binary<RW>(input,entries);object.Initialize_New_Table(entries);
-    for(int i=1;i<=entries;i++){TK key;T value;Read_Binary<RW>(input,key,value);object.Insert(key,value);}}
+    for(int i=0;i<entries;i++){TK key;T value;Read_Binary<RW>(input,key,value);object.Insert(key,value);}}
 
     static void Write(typename IF<IS_SAME<T,void>::value,std::ostream&,UNUSABLE>::TYPE output,const HASHTABLE<TK,T>& object) // void version
     {Write_Binary<RW>(output,object.number_of_entries);

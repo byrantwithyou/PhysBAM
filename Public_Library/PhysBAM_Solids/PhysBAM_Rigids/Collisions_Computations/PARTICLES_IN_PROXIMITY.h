@@ -206,7 +206,7 @@ PARTICLE_PARTITION<TV> Build_Particle_Partition(ARRAY<TV>& locations,typename TV
 
     RANGE<TV> box;
     box.Reset_Bounds(locations(1));
-    for(int i=1;i<=n;i++)
+    for(int i=0;i<n;i++)
         box.Enlarge_To_Include_Point(locations(i));
     box=box.Thickened((T)(region_threshold/2.0));
     
@@ -217,7 +217,7 @@ PARTICLE_PARTITION<TV> Build_Particle_Partition(ARRAY<TV>& locations,typename TV
     
     PARTICLE_PARTITION<TV> partition(box,counts,GEOMETRY_PARTICLES<TV>(),false);
     
-    for(int i=1;i<=n;i++)
+    for(int i=0;i<n;i++)
         partition.Add_To_Partition(locations(i),i);
 
     return partition;
@@ -237,7 +237,7 @@ void Aggregate_And_Stagger_Convex_Regions(ARRAY<TV>& locations, ARRAY<TV>& norma
     PARTICLE_PARTITION<TV> partition=Build_Particle_Partition(locations,region_threshold);
     UNION_FIND<int> regions_union(n);
 
-    for(int i=1;i<=n;i++)
+    for(int i=0;i<n;i++)
     {
         ARRAY<int> candidates;
         partition.Proximity_List(locations(i),region_threshold,candidates);
@@ -266,14 +266,14 @@ void Aggregate_And_Stagger_Convex_Regions(ARRAY<TV>& locations, ARRAY<TV>& norma
     }
     
     ARRAY<T> regions_min_distance(n);
-    for(int i=1;i<=n;i++)
+    for(int i=0;i<n;i++)
         regions_min_distance(i)=distances(i);
 
-    for(int i=1;i<=n;i++)
+    for(int i=0;i<n;i++)
         if(regions_min_distance(regions_union.Find(i))>distances(i))
             regions_min_distance(regions_union.Find(i))=distances(i);
 
-    for(int i=1;i<=n;i++)
+    for(int i=0;i<n;i++)
         distances(i)=distances(i)-regions_min_distance(regions_union.Find(i));
 }
 //#####################################################################
@@ -324,7 +324,7 @@ ARRAY<int> Eliminate_Redundant_Contact_Points(ARRAY<VECTOR<T,3> >& locations,ARR
     PARTICLE_PARTITION<TV> partition=Build_Particle_Partition(normals,distance_threshold);
     UNION_FIND<int> regions_union(n);
     
-    for(int i=1;i<=n;i++)
+    for(int i=0;i<n;i++)
     {
         if(regions_union.Find(i)==i)
         {
@@ -340,14 +340,14 @@ ARRAY<int> Eliminate_Redundant_Contact_Points(ARRAY<VECTOR<T,3> >& locations,ARR
     ARRAY<ARRAY<int> > regions(n);
 
     ARRAY<TV> regions_normals(n);
-    for(int i=1;i<=n;i++)
+    for(int i=0;i<n;i++)
         regions(regions_union.Find(i)).Append(i);
 
     //LOG::cout << "regions" << std::endl << regions << std::endl;
 
     ARRAY<int> points;
 
-    for(int i=1;i<=n;i++)
+    for(int i=0;i<n;i++)
         if(regions(i).m)
         {
             ARRAY<int>& region=regions(i);

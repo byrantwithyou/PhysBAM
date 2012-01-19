@@ -28,7 +28,7 @@ public:
     RENDERING_LEVELSET_MULTIPLE_OBJECT(GRID<TV>& grid_input,ARRAY<ARRAY<T,VECTOR<int,3> > >& phis_input)        
         :levelset_multiple(grid_input,phis_input),number_of_regions(phis_input.m)
     {rendering_levelset_multiple_region_objects.Resize(phis_input.m);
-    for(int i=1;i<=number_of_regions;i++) rendering_levelset_multiple_region_objects(i)=new RENDERING_LEVELSET_MULTIPLE_REGION_OBJECT<T,T_LEVELSET_MULTIPLE>(levelset_multiple,i);}
+    for(int i=0;i<number_of_regions;i++) rendering_levelset_multiple_region_objects(i)=new RENDERING_LEVELSET_MULTIPLE_REGION_OBJECT<T,T_LEVELSET_MULTIPLE>(levelset_multiple,i);}
 
     virtual ~RENDERING_LEVELSET_MULTIPLE_OBJECT()
     {for(int i=1;i<rendering_levelset_multiple_region_objects.m;i++) delete rendering_levelset_multiple_region_objects(i);}
@@ -58,13 +58,13 @@ public:
     return -1;}
 
     bool Inside_Region_Only(const VECTOR<T,3>& location,int region_check) const
-    {for(int i=1;i<=number_of_regions;i++) {
+    {for(int i=0;i<number_of_regions;i++) {
         bool inside_region=rendering_levelset_multiple_region_objects(i)->Inside(location);
         if(i!=region_check && inside_region) return false;}
       return true;}
 
     bool Inside(const VECTOR<T,3>& location,RENDERING_OBJECT<T>** intersected_object) const PHYSBAM_OVERRIDE
-    {for(int i=1;i<=number_of_regions;i++) if(rendering_levelset_multiple_region_objects(i)->Inside(location)){
+    {for(int i=0;i<number_of_regions;i++) if(rendering_levelset_multiple_region_objects(i)->Inside(location)){
         *intersected_object=(RENDERING_OBJECT<T>*)rendering_levelset_multiple_region_objects(i);return true;}
     return false;}
 

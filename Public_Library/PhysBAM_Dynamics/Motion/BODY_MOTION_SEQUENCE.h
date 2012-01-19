@@ -115,12 +115,12 @@ public:
 
     void Propogate_Lengths(int frame)
     {for(int i=1;i<=this->trajectories.m;i++){
-        for(int j=1;j<=frame;j++) this->trajectories(i)(j).length=this->trajectories(i)(frame+1).length;
+        for(int j=0;j<frame;j++) this->trajectories(i)(j).length=this->trajectories(i)(frame+1).length;
         for(int j=frame+2;j<=this->trajectories(i).counts.x;j++) this->trajectories(i)(j).length=this->trajectories(i)(frame+1).length;}}
 
     void Propogate_Transforms(int frame)
     {for(int i=1;i<=this->trajectories.m;i++){
-        for(int j=1;j<=frame;j++)
+        for(int j=0;j<frame;j++)
             this->trajectories(i)(j).targeted_transform=base_position(i).targeted_transform*this->trajectories(i)(j).targeted_translation*this->trajectories(i)(j).targeted_rotation;
         for(int j=frame+2;j<=this->trajectories(i).counts.x;j++)
             this->trajectories(i)(j).targeted_transform=base_position(i).targeted_transform*this->trajectories(i)(j).targeted_translation*this->trajectories(i)(j).targeted_rotation;}}

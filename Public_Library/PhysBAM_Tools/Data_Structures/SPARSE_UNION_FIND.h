@@ -66,7 +66,7 @@ public:
         T_RANK tmp_rank(0);ranks.Get(root_i,tmp_rank);
         if(max_rank<tmp_rank){max_rank=tmp_rank;root=root_i;max_tie=false;}
         else if(max_rank==tmp_rank && root!=root_i) max_tie=true;}
-    for(int i=1;i<=d;i++) Path_Compress(indices[i],root);
+    for(int i=0;i<d;i++) Path_Compress(indices[i],root);
     if(max_tie) ranks.Get_Or_Insert(root)++;return root;}
 
     void Merge(const SPARSE_UNION_FIND<ID>& union_find)

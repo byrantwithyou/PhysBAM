@@ -43,15 +43,15 @@ Advection_Solver(const int m,const T dx,const ARRAY<T2,VECTOR<int,1> >& Z,const 
     if(order == 3) for(int i=-2;i<=m+1;i++) D3(i)=(D2(i+1)-D2(i))*one_over_three_dx;
 
     T2 flux_left,flux_right; 
-    if(order == 1) for(int i=1;i<=m;i++){
+    if(order == 1) for(int i=0;i<m;i++){
         if(u(i) > 0){flux_left=D1(i-1);flux_right=D1(i);}
         else{flux_left=D1(i);flux_right=D1(i+1);}      
         u_Zx(i)=u(i)*(flux_right-flux_left)*one_over_dx;;}
-    else if(order == 2) for(int i=1;i<=m;i++){
+    else if(order == 2) for(int i=0;i<m;i++){
         if(u(i) > 0){flux_left=ENO(dx,D1(i-1),D2(i-2),D2(i-1));flux_right=ENO(dx,D1(i),D2(i-1),D2(i));}
         else{flux_left=ENO(dx,D1(i),-D2(i),-D2(i-1));flux_right=ENO(dx,D1(i+1),-D2(i+1),-D2(i));}      
         u_Zx(i)=u(i)*(flux_right-flux_left)*one_over_dx;;}
-    else if(order == 3) for(int i=1;i<=m;i++){
+    else if(order == 3) for(int i=0;i<m;i++){
         if(u(i) > 0){flux_left=ENO(dx,D1(i-1),D2(i-2),D2(i-1),D3(i-3),D3(i-2),D3(i-1));flux_right=ENO(dx,D1(i),D2(i-1),D2(i),D3(i-2),D3(i-2),D3(i));}
         else{flux_left=ENO(dx,D1(i),-D2(i),-D2(i-1),D3(i),D3(i-1),D3(i-2));flux_right=ENO(dx,D1(i+1),-D2(i+1),-D2(i),D3(i+1),D3(i),D3(i-1));}              
         u_Zx(i)=u(i)*(flux_right-flux_left)*one_over_dx;}

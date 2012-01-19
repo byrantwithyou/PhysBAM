@@ -22,7 +22,7 @@ void Initialize_Square_Mesh_And_Particles(TRIANGULATED_AREA<T>& ta,const GRID<TV
 {
     int m=grid.counts.x,n=grid.counts.y,particle=0;
     ta.particles.array_collection->Delete_All_Elements();ta.mesh.Initialize_Square_Mesh(m,n,reverse_triangles);ta.particles.array_collection->Add_Elements(m*n);
-    for(int j=1;j<=n;j++) for(int i=1;i<=m;i++) ta.particles.X(++particle)=grid.X(i,j);
+    for(int j=0;j<n;j++) for(int i=0;i<m;i++) ta.particles.X(++particle)=grid.X(i,j);
 }
 //#####################################################################
 // Funcion Initialize_Circle_Mesh_And_Particles
@@ -32,7 +32,7 @@ void Initialize_Circle_Mesh_And_Particles(TRIANGULATED_AREA<T>& ta,const T outer
 {
     int particle=0;ta.particles.array_collection->Delete_All_Elements();
     ta.mesh.Initialize_Circle_Mesh(num_radial,num_tangential);ta.particles.array_collection->Add_Elements(num_radial*num_tangential);
-    for(int j=1;j<=num_radial;j++) for(int i=1;i<=num_tangential;i++){
+    for(int j=0;j<num_radial;j++) for(int i=0;i<num_tangential;i++){
         T r=T(j-1)/T(num_tangential-1)*(outer_radius-inner_radius)+inner_radius,theta=T(i)/T(num_tangential)*(T)2*(T)pi; 
         ta.particles.X(++particle)=VECTOR<T,2>(r*cos(theta),r*sin(theta));}
 }
@@ -44,7 +44,7 @@ void Initialize_Herring_Bone_Mesh_And_Particles(TRIANGULATED_AREA<T>& ta,const G
 {
     int m=grid.counts.x,n=grid.counts.y,particle=0;
     ta.particles.array_collection->Delete_All_Elements();ta.mesh.Initialize_Herring_Bone_Mesh(m,n);ta.particles.array_collection->Add_Elements(m*n);
-    for(int j=1;j<=n;j++) for(int i=1;i<=m;i++) ta.particles.X(++particle)=grid.X(i,j);
+    for(int j=0;j<n;j++) for(int i=0;i<m;i++) ta.particles.X(++particle)=grid.X(i,j);
 }
 //#####################################################################
 // Funcion Initialize_Equilateral_Mesh_And_Particles
@@ -54,7 +54,7 @@ void Initialize_Equilateral_Mesh_And_Particles(TRIANGULATED_AREA<T>& ta,const GR
 {
     int m=grid.counts.x,n=grid.counts.y,particle=0;
     ta.particles.array_collection->Delete_All_Elements();ta.mesh.Initialize_Equilateral_Mesh(m,n);ta.particles.array_collection->Add_Elements(m*n);
-    for(int j=1;j<=n;j++) for(int i=1;i<=m;i++) ta.particles.X(++particle)=VECTOR<T,2>((j%2)?grid.Axis_X_minus_half(i,1):grid.Axis_X(i,1),grid.Axis_X(j,2));
+    for(int j=0;j<n;j++) for(int i=0;i<m;i++) ta.particles.X(++particle)=VECTOR<T,2>((j%2)?grid.Axis_X_minus_half(i,1):grid.Axis_X(i,1),grid.Axis_X(j,2));
 }
 //#####################################################################
 // Function Initialize_Segmented_Curve

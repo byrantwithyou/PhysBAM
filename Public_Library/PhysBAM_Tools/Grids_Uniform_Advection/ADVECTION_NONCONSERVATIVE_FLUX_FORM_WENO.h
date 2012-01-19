@@ -49,7 +49,7 @@ Advection_Solver(const int m,const T dx,const ARRAY<T2,VECTOR<int,1> >& Z,const 
         epsilon=1e-6*sqr(maxabs(D1)); 
         if(epsilon == 0) epsilon=1e-6;} // epsilon=0 implies all v_i=0 and all u_Zx=0
 
-    for(int i=1;i<=m;i++){
+    for(int i=0;i<m;i++){
         if(u(i) > 0){
             T2 flux_left=WENO(D1(i-3),D1(i-2),D1(i-1),D1(i),D1(i+1),epsilon),flux_right=WENO(D1(i-2),D1(i-1),D1(i),D1(i+1),D1(i+2),epsilon);
             u_Zx(i)=u(i)*(flux_right-flux_left)*one_over_dx;}

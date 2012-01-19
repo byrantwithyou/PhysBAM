@@ -54,7 +54,7 @@ public:
     {
         const T_VECTOR& derived=vector.Derived();
         n=derived.Size();x=new T[n];
-        for(int k=1;k<=n;k++) (*this)(k)=derived(k);
+        for(int k=0;k<n;k++) (*this)(k)=derived(k);
     }
 
     template<class T2,class T_VECTOR>
@@ -63,7 +63,7 @@ public:
     {
         const T_VECTOR& derived=vector.Derived();
         n=derived.Size();x=new T[n];
-        for(int k=1;k<=n;k++) (*this)(k)=(T)derived(k);
+        for(int k=0;k<n;k++) (*this)(k)=(T)derived(k);
     }
 
     ~VECTOR_ND()
@@ -81,7 +81,7 @@ public:
     VECTOR_ND& operator=(const VECTOR_BASE<T,T_VECTOR>& vector)
     {const T_VECTOR& derived=vector.Derived();int size=derived.Size();
     if(n!=size){assert(owns_data);n=size;delete[] x;x=new T[n];}
-    for(int k=1;k<=n;k++) (*this)(k)=derived(k);return *this;}
+    for(int k=0;k<n;k++) (*this)(k)=derived(k);return *this;}
 
     int Size() const
     {return n;}

@@ -49,7 +49,7 @@ public:
     {int number_of_regions=0;
     for(int i=1;i<=d+1;i++){
         bool add_region=true;int node=mesh.elements(element)[i];
-        for(int j=1;j<=number_of_regions;j++)if(node_region(node)==regions(j)){add_region=false;break;}
+        for(int j=0;j<number_of_regions;j++)if(node_region(node)==regions(j)){add_region=false;break;}
         if(add_region){number_of_regions++;regions(number_of_regions)=node_region(node);}}
     return number_of_regions;}
 
@@ -63,7 +63,7 @@ public:
     if(fracture_callbacks) weakness=seed_weakness_multipliers_callback(tet_index);
     if(weakness != -1) return weakness;
     weakness=0;
-    for(int i=1;i<=number_of_regions;i++)weakness+=seed_weakness_multipliers(regions[i]);return weakness/number_of_regions;}
+    for(int i=0;i<number_of_regions;i++)weakness+=seed_weakness_multipliers(regions[i]);return weakness/number_of_regions;}
 
     void Initialize_Breakability(const ARRAY<TV>& tet_centers) // might be more efficient to combine with Initialize function above
     {if(!fracture_callbacks) return;

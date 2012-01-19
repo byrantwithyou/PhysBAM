@@ -49,7 +49,7 @@ public:
     {comments.Append(comment_string);}
 
     void Print(std::ostream& output,const int spaces=0)
-    {for(int space=1;space<=spaces;space++)output<<" ";
+    {for(int space=0;space<spaces;space++)output<<" ";
     std::string ray_type_str;
     switch(ray.ray_type){
         case RENDERING_RAY<T>::DUMMY_RAY:ray_type_str="DUMMY";break;
