@@ -147,7 +147,7 @@ template<class T> void RED_GREEN_TETRAHEDRA<T>::
 Refine_If_Necessary(const int level,const int tet)
 {
     // first check if we're already consistent, and don't need to refine at all.
-    ARRAY<int> midpoints(5),subedges(24);Get_Existing_Subindices(level,tet,midpoints,subedges);
+    ARRAY<int> midpoints(6),subedges(24);Get_Existing_Subindices(level,tet,midpoints,subedges);
     int number_midpoints=(midpoints(0)!=0)+(midpoints(1)!=0)+(midpoints(2)!=0)+(midpoints(3)!=0)+(midpoints(4)!=0)+(midpoints(5)!=0);
     if(number_midpoints == 0) return;
     int number_children=0;while(number_children < 8 && (*children(level))(tet)(number_children+1)) number_children++;
@@ -191,7 +191,7 @@ Refine_If_Necessary(const int level,const int tet)
     // Green refinement
     Ensure_Level_Exists(level+1);
     ARRAY<int> free_tet_indices,free_edge_indices;
-    free_tet_indices.Preallocate(7);free_edge_indices.Preallocate(24);
+    free_tet_indices.Preallocate(8);free_edge_indices.Preallocate(24);
     Delete_Children(level,tet,free_tet_indices,free_edge_indices); // get rid of what's here already
     // figure out which green tets and green or interior segments need to be made, and make them
     int i,j,k,l;meshes(level)->elements(tet).Get(i,j,k,l);
@@ -209,15 +209,15 @@ Refine_If_Necessary(const int level,const int tet)
         if(!midpoints(0) && !midpoints(1) && !segment_mesh.Segment(midpoints(2),j)) Add_Segment(free_edge_indices,midpoints(2),j);
         if(!midpoints(3) && !midpoints(5) && !segment_mesh.Segment(midpoints(2),l)) Add_Segment(free_edge_indices,midpoints(2),l);}
     if(midpoints(3)){ // if edge il is split
-        if(!subedges(2)) Add_Segment(free_edge_indices,i,midpoints(3));if(!subedges(00)) Add_Segment(free_edge_indices,l,midpoints(3));
+        if(!subedges(2)) Add_Segment(free_edge_indices,i,midpoints(3));if(!subedges(9)) Add_Segment(free_edge_indices,l,midpoints(3));
         if(!midpoints(0) && !midpoints(4) && !segment_mesh.Segment(midpoints(3),j)) Add_Segment(free_edge_indices,midpoints(3),j);
         if(!midpoints(2) && !midpoints(5) && !segment_mesh.Segment(midpoints(3),k)) Add_Segment(free_edge_indices,midpoints(3),k);}
     if(midpoints(4)){ // if edge jl is split
-        if(!subedges(5)) Add_Segment(free_edge_indices,j,midpoints(4));if(!subedges(01)) Add_Segment(free_edge_indices,l,midpoints(4));
+        if(!subedges(5)) Add_Segment(free_edge_indices,j,midpoints(4));if(!subedges(10)) Add_Segment(free_edge_indices,l,midpoints(4));
         if(!midpoints(0) && !midpoints(3) && !segment_mesh.Segment(midpoints(4),i)) Add_Segment(free_edge_indices,midpoints(4),i);
         if(!midpoints(1) && !midpoints(5) && !segment_mesh.Segment(midpoints(4),k)) Add_Segment(free_edge_indices,midpoints(4),k);}
     if(midpoints(5)){ // if edge kl is split
-        if(!subedges(8)) Add_Segment(free_edge_indices,k,midpoints(5));if(!subedges(02)) Add_Segment(free_edge_indices,l,midpoints(5));
+        if(!subedges(8)) Add_Segment(free_edge_indices,k,midpoints(5));if(!subedges(11)) Add_Segment(free_edge_indices,l,midpoints(5));
         if(!midpoints(2) && !midpoints(3) && !segment_mesh.Segment(midpoints(5),i)) Add_Segment(free_edge_indices,midpoints(5),i);
         if(!midpoints(1) && !midpoints(4) && !segment_mesh.Segment(midpoints(5),j)) Add_Segment(free_edge_indices,midpoints(5),j);}
     // go ahead and create any missing edges along with the tets
@@ -277,9 +277,9 @@ Regularly_Refine_Tet(const int level,const int tet)
     if(Regularly_Refined(level,tet)) return;
     Ensure_Level_Exists(level+1);
     ARRAY<int> free_tet_indices,free_edge_indices;
-    free_tet_indices.Preallocate(7);free_edge_indices.Preallocate(24);
+    free_tet_indices.Preallocate(8);free_edge_indices.Preallocate(24);
     Delete_Children(level,tet,free_tet_indices,free_edge_indices);
-    ARRAY<int> midpoints(5),subedges(24);Get_Existing_Subindices(level,tet,midpoints,subedges);
+    ARRAY<int> midpoints(6),subedges(24);Get_Existing_Subindices(level,tet,midpoints,subedges);
     // there are three pairs of valid midpoints for the interior edge.  if possible, we would like to pick a pair that exists already.
     int first_midpoint_index,second_midpoint_index;
     ARRAY<VECTOR<int,6> >& element_edges=*meshes(level)->element_edges;
