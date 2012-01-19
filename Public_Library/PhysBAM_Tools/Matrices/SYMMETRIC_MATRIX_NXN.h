@@ -46,10 +46,10 @@ public:
     {return Element_Lower(j,i);}
 
     T& Element_Lower(int i,int j)
-    {assert(i<=n && j>=1 && j<=i);return x[((2*n-j)*(j-1)>>1)+i-1];}
+    {assert((unsigned)i<n && (unsigned)j<=i);return x[((2*n-j-1)*j>>1)+i];}
 
     const T& Element_Lower(int i,int j) const
-    {assert(i<=n && j>=1 && j<=i);return x[((2*n-j)*(j-1)>>1)+i-1];}
+    {assert((unsigned)i<n && (unsigned)j<=i);return x[((2*n-j-1)*j>>1)+i];}
 
 //#####################################################################
     static SYMMETRIC_MATRIX_NXN<T> Outer_Product(const VECTOR_ND<T>& u);

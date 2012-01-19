@@ -25,7 +25,7 @@ public:
     {}
 
     T operator()(const T x_input) const PHYSBAM_OVERRIDE
-    {T y=c(degree+1);for(int i=degree;i>=1;i--) y=c(i)+x_input*y;return y;}
+    {T y=c(degree);for(int i=degree-1;i>=0;i--) y=c(i)+x_input*y;return y;}
 
     void Compute_Coefficients(const VECTOR_ND<T>& x,const VECTOR_ND<T>& y)
     {assert(x.n == degree+1 && y.n == degree+1);MATRIX_MXN<T> A(degree+1,degree+1);

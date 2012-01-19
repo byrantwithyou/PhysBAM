@@ -79,19 +79,19 @@ public:
     {return 2;}
 
     T& operator()(const int i,const int j)
-    {assert(i>=1 && i<=2);assert(j>=1 && j<=2);return x[i-1+2*(j-1)];}
+    {assert((unsigned)i<2);assert((unsigned)j<2);return x[i+2*j];}
 
     const T& operator()(const int i,const int j) const
-    {assert(i>=1 && i<=2);assert(j>=1 && j<=2);return x[i-1+2*(j-1)];}
+    {assert((unsigned)i<2);assert((unsigned)j<2);return x[i+2*j];}
 
     bool Valid_Index(const int i,const int j) const
-    {return 1<=i && i<=2 && 1<=j && j<=2;}
+    {return (unsigned)i<2 && (unsigned)j<2;}
 
     VECTOR<T,2>& Column(const int j)
-    {assert((unsigned)j<2);return *(VECTOR<T,2>*)(x+2*(j-1));}
+    {assert((unsigned)j<2);return *(VECTOR<T,2>*)(x+2*j);}
 
     const VECTOR<T,2>& Column(const int j) const
-    {assert((unsigned)j<2);return *(const VECTOR<T,2>*)(x+2*(j-1));}
+    {assert((unsigned)j<2);return *(const VECTOR<T,2>*)(x+2*j);}
 
     bool operator==(const MATRIX& A) const
     {for(int i=0;i<4;i++) if(x[i]!=A.x[i]) return false;return true;}

@@ -59,19 +59,19 @@ public:
     {return n;}
 
     T& operator()(const int i,const int j)
-    {assert(i>=1 && i<=m);assert(j>=1 && j<=n);return x[(j-1)*m+(i-1)];}
+    {assert((unsigned)i<m);assert((unsigned)j<n);return x[j*m+i];}
 
     const T& operator()(const int i,const int j) const
-    {assert(i>=1 && i<=m);assert(j>=1 && j<=n);return x[(j-1)*m+(i-1)];}
+    {assert((unsigned)i<m);assert((unsigned)j<n);return x[j*m+i];}
 
     bool Valid_Index(const int i,const int j) const
-    {return 1<=i && i<=m && 1<=j && j<=n;}
+    {return (unsigned)i<m && (unsigned)j<n;}
 
     VECTOR<T,m>& Column(const int j)
-    {assert((unsigned)j<n);return *(VECTOR<T,m>*)(x+m*(j-1));}
+    {assert((unsigned)j<n);return *(VECTOR<T,m>*)(x+m*j);}
 
     const VECTOR<T,m>& Column(const int j) const
-    {assert((unsigned)j<n);return *(const VECTOR<T,n>*)(x+m*(j-1));}
+    {assert((unsigned)j<n);return *(const VECTOR<T,n>*)(x+m*j);}
 
     bool operator==(const MATRIX& A) const
     {for(int i=0;i<size;i++) if(x[i]!=A.x[i]) return false;return true;}

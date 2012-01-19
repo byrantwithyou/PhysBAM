@@ -40,7 +40,7 @@ public:
     {return array(front);}
 
     const T& operator()(const int i)
-    {assert(i<=Size());int index=front+i-1;if(index>array.m) index=index-array.m;return array(index);}
+    {assert(i<Size());int index=front+i-1;if(index>array.m) index=index-array.m;return array(index);}
 
     int Size() const
     {if(back<front) return back+array.m-front;else return back-front;}

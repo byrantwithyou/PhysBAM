@@ -116,16 +116,16 @@ public:
     {return 3;}
 
     const T& operator[](const int i) const
-    {assert((unsigned)i<3);return *((const T*)(this)+i-1);}
+    {assert((unsigned)i<3);return *((const T*)(this)+i);}
 
     T& operator[](const int i)
-    {assert((unsigned)i<3);return *((T*)(this)+i-1);}
+    {assert((unsigned)i<3);return *((T*)(this)+i);}
 
     const T& operator()(const int i) const
-    {assert((unsigned)i<3);return *((const T*)(this)+i-1);}
+    {assert((unsigned)i<3);return *((const T*)(this)+i);}
 
     T& operator()(const int i)
-    {assert((unsigned)i<3);return *((T*)(this)+i-1);}
+    {assert((unsigned)i<3);return *((T*)(this)+i);}
 
     bool operator==(const VECTOR& v) const
     {return x==v.x && y==v.y && z==v.z;}

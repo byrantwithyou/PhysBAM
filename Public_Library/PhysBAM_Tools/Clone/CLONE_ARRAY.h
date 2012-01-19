@@ -28,10 +28,10 @@ public:
     {return count;}
 
     CLONEABLE_BASE& operator()(const int i)
-    {return *(CLONEABLE_BASE*)(data+sizeof_clone*(i-1));}
+    {return *(CLONEABLE_BASE*)(data+sizeof_clone*i);}
 
     const CLONEABLE_BASE& operator()(const int i) const
-    {return *(const CLONEABLE_BASE*)(data+sizeof_clone*(i-1));}
+    {return *(const CLONEABLE_BASE*)(data+sizeof_clone*i);}
 };
 
 template<class T>

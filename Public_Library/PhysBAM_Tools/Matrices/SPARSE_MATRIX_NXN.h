@@ -62,28 +62,28 @@ public:
     for(int i=0;i<n;i++) A(i)=new SPARSE_VECTOR_ND<T>(n);}
 
     const T operator()(const int i,const int j) const
-    {assert(i>=1 && i<=n);assert(j>=1 && j<=n);return (*A(i))(j);}
+    {assert((unsigned)i<n);assert((unsigned)j<n);return (*A(i))(j);}
 
     void Set_Element(const int i,const int j,const T element)
-    {assert(i>=1 && i<=n);assert(j>=1 && j<=n);
+    {assert((unsigned)i<n);assert((unsigned)j<n);
     A(i)->Set_Element(j,element);}
 
     void Set_Symmetric_Elements(const int i,const int j,const T element)
     {assert(i!=j);Set_Element(i,j,element);Set_Element(j,i,element);}
 
     void Add_Element(const int i,const int j,const T element)
-    {assert(i>=1 && i<=n);assert(j>=1 && j<=n);
+    {assert((unsigned)i<n);assert((unsigned)j<n);
     A(i)->Add_Element(j,element);}
 
     void Add_Symmetric_Elements(const int i,const int j,const T element)
     {assert(i!=j);Add_Element(i,j,element);Add_Element(j,i,element);}
 
     bool Element_Present(const int i,const int j)
-    {assert(i>=1 && i<=n);assert(j>=1 && j<=n);
+    {assert((unsigned)i<n);assert((unsigned)j<n);
     return A(i)->Element_Present(j);}
 
     void Clear_Row(const int i)
-    {assert(i>=1 && i<=n);A(i)->Clear();}
+    {assert((unsigned)i<n);A(i)->Clear();}
 
     void Initialize_Diagonal_Index()
     {if(!diagonal_index) diagonal_index=new VECTOR_ND<int>(n);else if(diagonal_index->n!=n)diagonal_index->Resize(n);

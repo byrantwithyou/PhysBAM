@@ -64,10 +64,10 @@ public:
     {return m;}
 
     T& operator()(const ID i)
-    {assert(ID(1)<=i && i<=m);return base_pointer[Value(i)-1];}
+    {assert((unsigned)i<m);return base_pointer[Value(i)];}
 
     const T& operator()(const ID i) const
-    {assert(ID(1)<=i && i<=m);return base_pointer[Value(i)-1];}
+    {assert((unsigned)i<m);return base_pointer[Value(i)];}
 
     bool Valid_Index(const ID i) const
     {return ID(1)<=i && i<=m;}

@@ -68,7 +68,7 @@ public:
     {return i<j?Element_Upper(i,j):Element_Lower(i,j);}
 
     bool Valid_Index(const int i,const int j) const
-    {return 1<=i && i<=3 && 1<=j && j<=3;}
+    {return (unsigned)i<3 && (unsigned)j<3;}
 
     T& Element_Upper(int i,int j)
     {return Element_Lower(j,i);}
@@ -77,10 +77,10 @@ public:
     {return Element_Lower(j,i);}
 
     T& Element_Lower(int i,int j)
-    {assert(i<=3 && j>=1 && j<=i);return ((T*)this)[((6-j)*(j-1)>>1)+i-1];}
+    {assert((unsigned)i<=3 && (unsigned)j<=i);return ((T*)this)[((5-j)*j>>1)+i];}
 
     const T& Element_Lower(int i,int j) const
-    {assert(i<=3 && j>=1 && j<=i);return ((const T*)this)[((6-j)*(j-1)>>1)+i-1];}
+    {assert((unsigned)i<=3 && (unsigned)j<=i);return ((const T*)this)[((5-j)*j>>1)+i];}
 
     VECTOR<T,3> Column(const int axis) const
     {assert((unsigned)axis<3);return axis==1?VECTOR<T,3>(x11,x21,x31):axis==2?VECTOR<T,3>(x21,x22,x32):VECTOR<T,3>(x31,x32,x33);}

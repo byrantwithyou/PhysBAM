@@ -72,9 +72,9 @@ operator()(const int axis,const TV_INT& face) const
         TV location=face_lookup.body_list.grid.Face(axis,face);
         int side;
         if(location[axis]>=reference_point[axis])
-            side=1;
+            side=0;
         else
-            side=2;
+            side=1;
         T face_velocity=0;
         if(face_lookup.body_list.Face_Velocity(side,axis,face,cells_in_block,T_GRID::number_of_cells_per_block,reference_point,face_velocity)){
             found_valid_point=true;return face_velocity;}

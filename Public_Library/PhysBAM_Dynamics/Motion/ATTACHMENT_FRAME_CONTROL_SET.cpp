@@ -46,7 +46,7 @@ Type() const
 template<class T> T ATTACHMENT_FRAME_CONTROL_SET<T>::
 operator()(const int control_id) const
 {
-    return (control_id<=12)?cranium_transform(control_id):jaw_transform(control_id-12);
+    return (control_id<12)?cranium_transform(control_id):jaw_transform(control_id-12);
 }
 //#####################################################################
 // operator ()
@@ -54,7 +54,7 @@ operator()(const int control_id) const
 template<class T> T& ATTACHMENT_FRAME_CONTROL_SET<T>::
 operator()(const int control_id)
 {
-    return (control_id<=12)?cranium_transform(control_id):jaw_transform(control_id-12);
+    return (control_id<12)?cranium_transform(control_id):jaw_transform(control_id-12);
 }
 //#####################################################################
 // Function Identity
@@ -62,7 +62,7 @@ operator()(const int control_id)
 template<class T> T ATTACHMENT_FRAME_CONTROL_SET<T>::
 Identity(const int control_id) const
 {
-    return (control_id<=12)?cranium_transform.Identity(control_id):jaw_transform.Identity(control_id-12);
+    return (control_id<12)?cranium_transform.Identity(control_id):jaw_transform.Identity(control_id-12);
 }
 //#####################################################################
 // Function Maximal_Controls
@@ -94,7 +94,7 @@ template<class T> bool ATTACHMENT_FRAME_CONTROL_SET<T>::
 Positions_Determined_Kinematically(const int control_id) const
 {
     assert((unsigned)control_id<24);
-    return control_id<=12;
+    return control_id<12;
 }
 //#####################################################################
 // Function Force_Derivative
@@ -102,13 +102,13 @@ Positions_Determined_Kinematically(const int control_id) const
 template<class T> void ATTACHMENT_FRAME_CONTROL_SET<T>::
 Force_Derivative(ARRAY<TV>& dFdl,ARRAY<TWIST<TV> >& dFrdl,const int control_id) const
 {
-    assert(13<=control_id && control_id<=24);
+    assert(12<=control_id && control_id<24);
     assert(muscle_force);
     assert(Control_Active(control_id));
     assert(jaw_attachment_index);
     MATRIX<T,3> affine_differential;
     TV translation_differential;
-    if(control_id<=21) affine_differential.x[control_id-13]=(T)1;
+    if(control_id<21) affine_differential.x[control_id-12]=(T)1;
     else translation_differential[control_id-21]=(T)1;
     ARRAY<TV> dXdl(X.m);
     for(int i=0;i<attached_nodes(jaw_attachment_index).m;i++)

@@ -66,19 +66,19 @@ public:
     {return 1;}
 
     T& operator()(const int i,const int j=1)
-    {assert(i==1 && j==1);return x11;}
+    {assert(i==0 && j==0);return x11;}
 
     const T& operator()(const int i,const int j=1) const
-    {assert(i==1 && j==1);return x11;}
+    {assert(i==0 && j==0);return x11;}
 
     bool Valid_Index(const int i,const int j) const
-    {return i==1 && j==1;}
+    {return i==0 && j==0;}
 
     VECTOR<T,1>& Column(const int j)
-    {assert(j==1);return *(VECTOR<T,1>*)this;}
+    {assert(j==0);return *(VECTOR<T,1>*)this;}
 
     const VECTOR<T,1>& Column(const int j) const
-    {assert(j==1);return *(const VECTOR<T,1>*)this;}
+    {assert(j==0);return *(const VECTOR<T,1>*)this;}
 
     bool operator==(const MATRIX& A) const
     {return x11==A.x11;}

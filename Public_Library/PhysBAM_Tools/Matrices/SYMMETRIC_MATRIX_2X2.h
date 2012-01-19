@@ -63,7 +63,7 @@ public:
     {return i<j?Element_Upper(i,j):Element_Lower(i,j);}
 
     bool Valid_Index(const int i,const int j) const
-    {return 1<=i && i<=2 && 1<=j && j<=2;}
+    {return (unsigned)i<2 && (unsigned)j<2;}
 
     T& Element_Upper(int i,int j)
     {return Element_Lower(j,i);}
@@ -72,10 +72,10 @@ public:
     {return Element_Lower(j,i);}
 
     T& Element_Lower(int i,int j)
-    {assert(i<=2 && j>=1 && j<=i);return ((T*)this)[((4-j)*(j-1)>>1)+i-1];}
+    {assert((unsigned)i<2 && (unsigned)j<=i);return ((T*)this)[((3-j)*j>>1)+i];}
 
     const T& Element_Lower(int i,int j) const
-    {assert(i<=2 && j>=1 && j<=i);return ((const T*)this)[((4-j)*(j-1)>>1)+i-1];}
+    {assert((unsigned)i<2 && (unsigned)j<=i);return ((const T*)this)[((3-j)*j>>1)+i];}
 
     bool operator==(const SYMMETRIC_MATRIX& A) const
     {return x11==A.x11 && x21==A.x21 && x22==A.x22;}
