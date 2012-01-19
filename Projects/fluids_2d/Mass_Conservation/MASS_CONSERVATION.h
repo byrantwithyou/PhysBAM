@@ -274,7 +274,7 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
         fluids_parameters.particle_levelset_evolution->particle_levelset.Update_Particle_Cells(fluids_parameters.particle_levelset_evolution->particle_levelset.negative_particles);
         fluids_parameters.particle_levelset_evolution->particle_levelset.Update_Particle_Cells(fluids_parameters.particle_levelset_evolution->particle_levelset.positive_particles);
         if(fluids_parameters.particle_levelset_evolution->particle_levelset.vof_advection)
-            for(int p=1;p<=fluids_parameters.particle_levelset_evolution->particle_levelset.vof_advection->object.particles.array_collection->Size();p++) // NOTE: this messes up preimage simplices in cell!
+            for(int p=0;p<fluids_parameters.particle_levelset_evolution->particle_levelset.vof_advection->object.particles.array_collection->Size();p++) // NOTE: this messes up preimage simplices in cell!
                 fluids_parameters.particle_levelset_evolution->particle_levelset.vof_advection->object.particles.X(p)+=position_offset;}
 }
 //#####################################################################

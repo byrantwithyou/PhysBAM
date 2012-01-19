@@ -495,7 +495,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 // clean up invalid rotations
                 if(joint->joint_type==JOINT<TV>::TYPE_ANGLE_JOINT || joint->primary_point_of_bend_joint){
                     LOG::cout<<"Cleaning up frame track..."<<std::endl;
-                    for(int i=1;i<=joint->joint_function->track->trajectory.m;i++){
+                    for(int i=0;i<joint->joint_function->track->trajectory.m;i++){
                         FRAME<TV> frame=joint->joint_function->track->trajectory(i);
                         TV euler;frame.r.Euler_Angles(euler.x,euler.y,euler.z);frame.r.From_Euler_Angles(euler.x,0,0);
                         joint->joint_function->track->trajectory(i)=frame;}}}}}

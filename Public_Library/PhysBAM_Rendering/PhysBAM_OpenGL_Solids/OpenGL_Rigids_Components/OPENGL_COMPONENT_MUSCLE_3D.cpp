@@ -207,7 +207,7 @@ Initialize(ARTICULATED_RIGID_BODY<TV>* articulated_rigid_body_input,std::string 
     if(FILE_UTILITIES::File_Exists(muscle_info_file)) Read_Muscle_Internal_Particles(muscle_info_file);
 
     for(int i=0;i<articulated_rigid_body->muscle_list->muscles.m;i++)
-        for(int j=1;j<=articulated_rigid_body->muscle_list->muscles(i)->muscle_segments.m;j++){
+        for(int j=0;j<articulated_rigid_body->muscle_list->muscles(i)->muscle_segments.m;j++){
             MUSCLE_SEGMENT<TV>* segment=articulated_rigid_body->muscle_list->muscles(i)->muscle_segments(j);
             if(segment->segment_type==MUSCLE_SEGMENT<TV>::ANALYTIC_SURFACE_SEGMENT){
                 TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();

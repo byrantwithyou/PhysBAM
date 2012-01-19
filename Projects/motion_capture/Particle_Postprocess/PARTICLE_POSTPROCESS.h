@@ -154,7 +154,7 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 {
     for(CELL_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){TV_INT index=iterator.Cell_Index();
         if(!fluids_parameters.particle_levelset_evolution->particle_levelset.removed_positive_particles(index)) continue;
-        for(int i=1;i<=fluids_parameters.particle_levelset_evolution->particle_levelset.removed_positive_particles(index)->array_collection->number;i++)
+        for(int i=0;i<fluids_parameters.particle_levelset_evolution->particle_levelset.removed_positive_particles(index)->array_collection->number;i++)
             if(surface->Inside(fluids_parameters.particle_levelset_evolution->particle_levelset.removed_positive_particles(index)->X(i)))
                 fluids_parameters.particle_levelset_evolution->particle_levelset.removed_positive_particles(index)->array_collection->Delete_Element(i);}
 }
