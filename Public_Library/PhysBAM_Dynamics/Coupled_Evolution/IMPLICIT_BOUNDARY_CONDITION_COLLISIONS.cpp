@@ -61,7 +61,7 @@ Update_Boundary_Conditions(const GRID<TV>& grid,ARRAY<bool,TV_INT>& psi_D,ARRAY<
                     if(object->Inside(iterator.Location(),collision_thickness_over_two)){
                         psi_D(iterator.Cell_Index())=true;p(iterator.Cell_Index())=p_inside_solid;}}
             else{
-                for(int i=1;i<=object->volume_object->mesh.elements.m;i++){T_SIMPLEX simplex=object->volume_object->Get_Element(i);
+                for(int i=0;i<object->volume_object->mesh.elements.m;i++){T_SIMPLEX simplex=object->volume_object->Get_Element(i);
                     RANGE<TV> box(simplex.Bounding_Box());
                     TV_INT min_index=grid.Clamp_To_Cell(box.Minimum_Corner(),1);
                     TV_INT max_index=grid.Clamp_To_Cell(box.Maximum_Corner(),1);

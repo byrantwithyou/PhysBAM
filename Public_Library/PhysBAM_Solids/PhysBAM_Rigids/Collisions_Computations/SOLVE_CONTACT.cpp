@@ -174,7 +174,7 @@ Update_Analytic_Multibody_Contact(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisio
     bool return_val=false;
     MULTIBODY_LEVELSET_IMPLICIT_OBJECT<TV>* multibody1=dynamic_cast<MULTIBODY_LEVELSET_IMPLICIT_OBJECT<TV>*>(body1.implicit_object->object_space_implicit_object);
     MULTIBODY_LEVELSET_IMPLICIT_OBJECT<TV>* multibody2=dynamic_cast<MULTIBODY_LEVELSET_IMPLICIT_OBJECT<TV>*>(body2.implicit_object->object_space_implicit_object);
-    if(multibody1 && multibody2) for(int i=1;i<=multibody2->levelsets->m;i++) 
+    if(multibody1 && multibody2) for(int i=0;i<multibody2->levelsets->m;i++) 
         return_val|=Update_Analytic_Multibody_Contact(rigid_body_collisions,collision_callbacks,analytic_contact_registry,body1.particle_index,body2.particle_index,*multibody1,*(*multibody2->levelsets)(i),correct_contact_energy,max_iterations,epsilon_scale,dt,time,mpi_one_ghost);
     else if(multibody1) 
         return_val=Update_Analytic_Multibody_Contact(rigid_body_collisions,collision_callbacks,analytic_contact_registry,body1.particle_index,body2.particle_index,*multibody1,*body2.implicit_object->object_space_implicit_object,correct_contact_energy,max_iterations,epsilon_scale,dt,time,mpi_one_ghost);

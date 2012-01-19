@@ -136,7 +136,7 @@ Initialize_Triangulated_Surface()
                     triangulated_surface=TRIANGULATED_SURFACE<T>::Create();
                     levelset->Calculate_Triangulated_Surface_From_Marching_Tetrahedra(*triangulated_surface,true);levelset->Compute_Normals();
                     triangulated_surface->Use_Vertex_Normals();triangulated_surface->vertex_normals=new ARRAY<TV>(triangulated_surface->particles.array_collection->Size());
-                    for(int p=1;p<=triangulated_surface->particles.array_collection->Size();p++)
+                    for(int p=0;p<triangulated_surface->particles.array_collection->Size();p++)
                         (*triangulated_surface->vertex_normals)(p)=levelset->Normal(triangulated_surface->particles.X(p));}
                 if(write_generated_triangulated_surface && triangulated_surface_filename.length() > 0){
                     const int vertex_normals_length=1; // needed for backwards compatibility, since vertex_normals used to be ARRAYS<TV,1>

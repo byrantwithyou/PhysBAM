@@ -1006,7 +1006,7 @@ void Make_Muscles()
 //#####################################################################
 void Initialize_Muscle_Segments()
 {
-    for(int i=1;i<=arb->muscle_list->muscles.m;i++){
+    for(int i=0;i<arb->muscle_list->muscles.m;i++){
         ARRAY<T_MUSCLE_SEGMENT_DATA> *curr_segment_data=0;segment_data_map.Get(arb->muscle_list->muscles(i)->name,curr_segment_data);
         arb->muscle_list->muscles(i)->Initialize(*curr_segment_data);}
 }

@@ -121,7 +121,7 @@ Setup_AEROF_PhysBAM_Mapping(TETRAHEDRALIZED_VOLUME<T>& tet_volume,ARRAY<ARRAY<in
         MPI_UTILITIES::Unpack(interior_particles_to_send(i),ghost_particles_to_send(i),recv_buffers(i),position,*comm);}
     
     physbam_particles.array_collection->Add_Elements(local_tet_volume->particles.array_collection->Size());
-    for(int i=1;i<=local_tet_volume->particles.array_collection->Size();i++) physbam_particles.X(i)=local_tet_volume->particles.X(i);
+    for(int i=0;i<local_tet_volume->particles.array_collection->Size();i++) physbam_particles.X(i)=local_tet_volume->particles.X(i);
 }
 //#####################################################################
 // Function Exchange_Compressible_Data

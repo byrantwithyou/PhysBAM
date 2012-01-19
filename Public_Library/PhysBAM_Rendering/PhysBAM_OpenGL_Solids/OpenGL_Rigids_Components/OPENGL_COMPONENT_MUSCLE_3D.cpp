@@ -50,7 +50,7 @@ Display(const int in_color) const
         OPENGL_COLOR muscle_color(1,0,0);muscle_color.Send_To_GL_Pipeline();
         glLineWidth(mode==GL_SELECT?OPENGL_PREFERENCES::selection_line_width:2);
         glPushName(5);glDisable(GL_LIGHTING);
-        for(int i=1;i<=articulated_rigid_body->muscle_list->muscles.m;i++){
+        for(int i=0;i<articulated_rigid_body->muscle_list->muscles.m;i++){
             T activation=articulated_rigid_body->muscle_activations.Valid_Index(i)?articulated_rigid_body->muscle_activations(i):0;
             muscle_color_map->Lookup((activation<0)?-log(1-activation):log(1+activation)).Send_To_GL_Pipeline();
             MUSCLE<TV>& muscle=*articulated_rigid_body->muscle_list->muscles(i);
@@ -206,7 +206,7 @@ Initialize(ARTICULATED_RIGID_BODY<TV>* articulated_rigid_body_input,std::string 
     std::string muscle_info_file=STRING_UTILITIES::string_sprintf("%s/%d/muscle_info",basedir.c_str(),frame);
     if(FILE_UTILITIES::File_Exists(muscle_info_file)) Read_Muscle_Internal_Particles(muscle_info_file);
 
-    for(int i=1;i<=articulated_rigid_body->muscle_list->muscles.m;i++)
+    for(int i=0;i<articulated_rigid_body->muscle_list->muscles.m;i++)
         for(int j=1;j<=articulated_rigid_body->muscle_list->muscles(i)->muscle_segments.m;j++){
             MUSCLE_SEGMENT<TV>* segment=articulated_rigid_body->muscle_list->muscles(i)->muscle_segments(j);
             if(segment->segment_type==MUSCLE_SEGMENT<TV>::ANALYTIC_SURFACE_SEGMENT){

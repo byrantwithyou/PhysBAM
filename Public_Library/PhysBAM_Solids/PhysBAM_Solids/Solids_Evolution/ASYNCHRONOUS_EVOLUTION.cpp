@@ -476,7 +476,7 @@ Set_Force_Active_Particles(DEFORMABLES_FORCES<TV>* force,const ARRAY<bool>& fine
         fe=&spring->force_segments;
         if(!is_fine) for(int i=0;i<list.m;i++) for(int j=0;j<2;j++) coarsescale_forces_particles_map.Set(spring->segment_mesh.elements(list(i))(j));}
     else if(GRAVITY<TV>* gravity=dynamic_cast<GRAVITY<TV>*>(force)){
-        for(int i=1;i<=gravity->influenced_particles->m;i++) if(fine_list((*gravity->influenced_particles)(i))==is_fine) list.Append((*gravity->influenced_particles)(i));
+        for(int i=0;i<gravity->influenced_particles->m;i++) if(fine_list((*gravity->influenced_particles)(i))==is_fine) list.Append((*gravity->influenced_particles)(i));
         fe=&gravity->force_particles;
         if(!is_fine) coarsescale_forces_particles_map.Set_All(list);}
     else if(LINEAR_ALTITUDE_SPRINGS<TV,3>* spring=dynamic_cast<LINEAR_ALTITUDE_SPRINGS<TV,3>*>(force)){

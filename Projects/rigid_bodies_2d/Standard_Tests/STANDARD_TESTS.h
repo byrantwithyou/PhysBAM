@@ -368,12 +368,12 @@ void Cluster()
     segmented_curve->mesh.elements=rigid_body_cluster->simplicial_object->mesh.elements;
     segmented_curve->particles.array_collection->Add_Elements(rigid_body_cluster->simplicial_object->particles.array_collection->Size());
     segmented_curve->mesh.number_nodes=segmented_curve->particles.array_collection->Size();
-    for(int i=1;i<=segmented_curve->particles.array_collection->Size();i++){
+    for(int i=0;i<segmented_curve->particles.array_collection->Size();i++){
         segmented_curve->particles.X(i)=rigid_body_cluster->simplicial_object->particles.X(i);
         LOG::cout<<"particles.X("<<i<<")"<<" is "<<segmented_curve->particles.X(i)<<std::endl;}
     rigid_body_cluster_test->Add_Structure(*segmented_curve);
     rigid_body_collection.Add_Rigid_Body_And_Geometry(rigid_body_cluster_test);
-    for(int i=1;i<=rigid_body_cluster->simplicial_object->mesh.elements.m;i++){
+    for(int i=0;i<rigid_body_cluster->simplicial_object->mesh.elements.m;i++){
         LOG::cout<<"mesh "<<i<<" -> "<<rigid_body_cluster->simplicial_object->mesh.elements(i)<<std::endl;
     }
     MASS_PROPERTIES<TV> mp(*rigid_body_cluster->simplicial_object,false);mp.Set_Mass(rigid_body_cluster->Mass());

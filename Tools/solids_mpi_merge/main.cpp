@@ -93,7 +93,7 @@ Merge_Rigid_Data(const int frame)
         local_rigid_collections(p)->rigid_geometry_collection.structure_list.Fill_Needs_Write();
         rigid_body_collection.rigid_body_particle.array_collection->Add_Elements(local_rigid_collections(p)->rigid_body_particle.array_collection->Size());
         colors.Resize(local_rigid_collections(p)->rigid_body_particle.array_collection->Size());
-        for(int i=1;i<=local_rigid_collections(p)->rigid_body_particle.array_collection->Size();i++){
+        for(int i=0;i<local_rigid_collections(p)->rigid_body_particle.array_collection->Size();i++){
             if(!local_rigid_collections(p)->rigid_body_particle.rigid_geometry(i)) continue;
             if(!local_rigid_collections(p)->rigid_geometry_collection.Is_Active(i)) continue;
             colors(i)=p;

@@ -245,7 +245,7 @@ Update_Analytic_Multibody_Collision(RIGID_BODY<TV>& body1,RIGID_BODY<TV>& body2,
     bool return_val=false;
     MULTIBODY_LEVELSET_IMPLICIT_OBJECT<TV>* multibody1=dynamic_cast<MULTIBODY_LEVELSET_IMPLICIT_OBJECT<TV>*>(body1.implicit_object->object_space_implicit_object);
     MULTIBODY_LEVELSET_IMPLICIT_OBJECT<TV>* multibody2=dynamic_cast<MULTIBODY_LEVELSET_IMPLICIT_OBJECT<TV>*>(body2.implicit_object->object_space_implicit_object);
-    if(multibody1 && multibody2) for(int i=1;i<=multibody2->levelsets->m;i++) return_val|=Update_Analytic_Multibody_Collision(body1.particle_index,body2.particle_index,*multibody1,*(*multibody2->levelsets)(i),dt,time,mpi_one_ghost);
+    if(multibody1 && multibody2) for(int i=0;i<multibody2->levelsets->m;i++) return_val|=Update_Analytic_Multibody_Collision(body1.particle_index,body2.particle_index,*multibody1,*(*multibody2->levelsets)(i),dt,time,mpi_one_ghost);
     else if(multibody1) return_val=Update_Analytic_Multibody_Collision(body1.particle_index,body2.particle_index,*multibody1,*body2.implicit_object->object_space_implicit_object,dt,time,mpi_one_ghost);
     else return_val=Update_Analytic_Multibody_Collision(body1.particle_index,body2.particle_index,*multibody2,*body1.implicit_object->object_space_implicit_object,dt,time,mpi_one_ghost);
     return return_val;

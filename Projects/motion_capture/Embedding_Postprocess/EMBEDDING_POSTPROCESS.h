@@ -168,8 +168,8 @@ void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE
     if(rbl_current) LOG::cout<<"rbl_current, so using that for position and velocity updates with alpha="<<alpha<<std::endl;
     else LOG::cout<<"NO rbl_current, so cannot use that for position and velocity updates"<<std::endl;
 
-    if(!rbl_current) for(int i=1;i<=rbl_next->particles.array_collection->Size();i++) X(i)=rbl_next->particles.X(i);
-    else for(int i=1;i<=rbl_next->particles.array_collection->Size();i++) X(i)=rbl_current->particles.X(i)*(1-alpha)+rbl_next->particles.X(i)*alpha;
+    if(!rbl_current) for(int i=0;i<rbl_next->particles.array_collection->Size();i++) X(i)=rbl_next->particles.X(i);
+    else for(int i=0;i<rbl_next->particles.array_collection->Size();i++) X(i)=rbl_current->particles.X(i)*(1-alpha)+rbl_next->particles.X(i)*alpha;
 }
 //#####################################################################
 // Function Set_External_Velocities
@@ -184,15 +184,15 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
         if(rbl_current) delete rbl_current;
         rbl_current=rbl_next;rbl_next=Create_Deformable_Body_List(next_frame-rigid_body_start_frame);
         list_frame=next_frame-rigid_body_start_frame;}
-    if(!rbl_current) for(int i=1;i<=rbl_next->particles.array_collection->Size();i++) V(i)=rbl_next->particles.V(i);
-    else for(int i=1;i<=rbl_next->particles.array_collection->Size();i++) V(i)=rbl_current->particles.V(i)*(1-alpha)+rbl_next->particles.V(i)*alpha;
+    if(!rbl_current) for(int i=0;i<rbl_next->particles.array_collection->Size();i++) V(i)=rbl_next->particles.V(i);
+    else for(int i=0;i<rbl_next->particles.array_collection->Size();i++) V(i)=rbl_current->particles.V(i)*(1-alpha)+rbl_next->particles.V(i)*alpha;
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes
 //#####################################################################
 void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE
 {
-    for(int i=1;i<=rbl_next->particles.array_collection->Size();i++) V(i)=TV();
+    for(int i=0;i<rbl_next->particles.array_collection->Size();i++) V(i)=TV();
 }
 //#####################################################################
 // Function Initialize_Bodies

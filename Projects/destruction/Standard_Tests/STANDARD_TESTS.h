@@ -745,7 +745,7 @@ void Create_Pattern(const int test_number)
         TV_INT max_corner_index=grid.Clamped_Index(rigid_body.axis_aligned_bounding_box.max_corner)+TV_INT::All_Ones_Vector();grid.Clamp(max_corner_index);
         BOX<TV> clamped_domain=BOX<TV>(grid.Node(min_corner_index),grid.Node(max_corner_index));
         TV_INT local_counts=max_corner_index-min_corner_index+TV_INT::All_Ones_Vector();
-        for(int p=1;p<=rigid_body.simplicial_object->particles.array_collection->Size();p++)
+        for(int p=0;p<rigid_body.simplicial_object->particles.array_collection->Size();p++)
             rigid_body.simplicial_object->particles.X(p)=rigid_body.World_Space_Point(rigid_body.simplicial_object->particles.X(p))-clamped_domain.Center();
         rigid_body.simplicial_object->Initialize_Hierarchy();
         rigid_body.simplicial_object->Update_Bounding_Box();

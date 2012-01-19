@@ -90,7 +90,7 @@ public:
         for(int i=1;i<tet_indices.m;i++)tet_indices(i)=false;
 
         for(int i=0;i<touching_particle_indices.m;i++)
-            for(int j=1;j<=(tet_vol->mesh->incident_elements(i)).m;j++)tet_indices((tet_vol->mesh->incident_elements(i))(j))=true;
+            for(int j=0;j<(tet_vol->mesh->incident_elements(i)).m;j++)tet_indices((tet_vol->mesh->incident_elements(i))(j))=true;
 
         ARRAY<int> touching_tet_indices;
         for(int i=1;i<tet_indices.m;i++)if(tet_indices(i))touching_tet_indices.Append(i);

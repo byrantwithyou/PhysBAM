@@ -159,15 +159,15 @@ Enforce_Velocity_Compatibility(T_FACE_ARRAYS_SCALAR& face_velocities)
     // sum up the boundary sizes and errors with the other nodes
     if(elliptic_solver->mpi_grid){
         bool found_global_neumann_region=false;
-        for(int color=1;color<=elliptic_solver->laplace_mpi->number_of_global_regions;color++)
+        for(int color=0;color<elliptic_solver->laplace_mpi->number_of_global_regions;color++)
             if(!elliptic_solver->filled_region_touches_dirichlet(color)){found_global_neumann_region=true;break;}
         if(found_global_neumann_region){
             ARRAY<T> global_compatibility_fraction(elliptic_solver->laplace_mpi->number_of_global_regions),global_boundary_size(elliptic_solver->laplace_mpi->number_of_global_regions);
-            for(int i=1;i<=elliptic_solver->laplace_mpi->number_of_global_regions;i++){global_compatibility_fraction(i)=(T)compatibility_fraction(i);global_boundary_size(i)=(T)boundary_size(i);}
+            for(int i=0;i<elliptic_solver->laplace_mpi->number_of_global_regions;i++){global_compatibility_fraction(i)=(T)compatibility_fraction(i);global_boundary_size(i)=(T)boundary_size(i);}
             ARRAY<T> global_compatibility_fraction_result(elliptic_solver->laplace_mpi->number_of_global_regions),global_boundary_size_result(elliptic_solver->laplace_mpi->number_of_global_regions);
             elliptic_solver->mpi_grid->Reduce_Add(global_compatibility_fraction,global_compatibility_fraction_result);
             elliptic_solver->mpi_grid->Reduce_Add(global_boundary_size,global_boundary_size_result);
-            for(int i=1;i<=elliptic_solver->laplace_mpi->number_of_global_regions;i++){compatibility_fraction(i)=global_compatibility_fraction_result(i);boundary_size(i)=global_boundary_size_result(i);}}}
+            for(int i=0;i<elliptic_solver->laplace_mpi->number_of_global_regions;i++){compatibility_fraction(i)=global_compatibility_fraction_result(i);boundary_size(i)=global_boundary_size_result(i);}}}
 
     for(int i=0;i<elliptic_solver->number_of_regions;i++) if(boundary_size(i)) compatibility_fraction(i)*=cell_size/boundary_size(i);
 

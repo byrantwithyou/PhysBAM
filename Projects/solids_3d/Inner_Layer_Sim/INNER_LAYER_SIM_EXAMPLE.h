@@ -164,7 +164,7 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY<VECTOR_3D<T> >& V,const T time) {
 //#####################################################################
 void Snap_To_Levelset(){
     //Push each node to the levelset
-    for(int p=1;p<=my_skin->particles.array_collection->Size();p++) {
+    for(int p=0;p<my_skin->particles.array_collection->Size();p++) {
         VECTOR_3D<T> current_location = my_skin->particles.X(p);T depth;
         bool outside = levelset->Lazy_Outside_Extended_Levelset_And_Value(current_location, depth); 
         bool inside = levelset->Lazy_Inside_Extended_Levelset_And_Value(current_location, depth); 
@@ -334,7 +334,7 @@ void Read_Muscle_Tris_From_Quasistatic_Simm_Data(int frame){
         if(bone_num > 6) {bone_num=6; passive=true;} else {passive=false;}
         FRAME<T> current_frame((*rigid_bodies)(bone_num)->position, (*rigid_bodies)(bone_num)->orientation);
         FRAME<T>first_frame((*rigid_bodies_1)(bone_num)->position, (*rigid_bodies_1)(bone_num)->orientation);
-        for(int p=1;p<=muscle_tris(i)->particles.array_collection->Size();p++) {
+        for(int p=0;p<muscle_tris(i)->particles.array_collection->Size();p++) {
             if(passive) muscle_tris(i)->particles.X(p)=current_frame*first_frame.Inverse()*muscle_tris(i)->particles.X(p);
             else muscle_tris(i)->particles.X(p)=current_frame*muscle_tris(i)->particles.X(p);}}
     for(int i=1; i<=muscle_tris.m; i++) {

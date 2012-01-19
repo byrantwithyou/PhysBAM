@@ -107,13 +107,13 @@ Intersect_With_Rigid_Body(const FRACTURE_REGION<T>& body,const bool use_particle
         TV bo2o_T=object_RS.Solve_Linear_System(body.object_T-object_T);
 
         if(!use_particle_optimization){
-            for(int p=1;p<=triangulated_surface->particles.array_collection->Size();p++){ // clamp our particles
+            for(int p=0;p<triangulated_surface->particles.array_collection->Size();p++){ // clamp our particles
                 TV test_point=o2bl_RS*triangulated_surface->particles.X(p)+o2bl_T;
                 if((body.implicit_object->levelset.Extended_Phi(test_point)/phi_scale-particle_intersection_thickness)<=0 && 
                    region_implicit_object->levelset.grid.domain.Lazy_Inside(extra_levelset_frame.Inverse_Times(triangulated_surface->particles.X(p)))){
                     int added_particle=region_triangulated_surface->particles.array_collection->Add_Element();
                     region_triangulated_surface->particles.X(added_particle)=triangulated_surface->particles.X(p);}}
-            for(int p=1;p<=body.triangulated_surface->particles.array_collection->Size();p++){ // clamp body particles
+            for(int p=0;p<body.triangulated_surface->particles.array_collection->Size();p++){ // clamp body particles
                 TV test_point=bo2l_RS*body.triangulated_surface->particles.X(p)+bo2l_T;
                 if(implicit_object->levelset.Extended_Phi(test_point)-particle_intersection_thickness<=0){
                     TV point_to_add=bo2o_RS*body.triangulated_surface->particles.X(p)+bo2o_T;

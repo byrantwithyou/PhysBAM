@@ -1297,7 +1297,7 @@ TRIANGULATED_SURFACE<T>* Add_Copy_of_Boundary_Object(TETRAHEDRALIZED_VOLUME<T>* 
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     TRIANGULATED_SURFACE<T>* compact_surface_copy=volume->Get_Boundary_Object().Create_Compact_Copy();
     TRIANGULATED_SURFACE<T>* new_surface=&tests.Copy_And_Add_Structure(*compact_surface_copy,0);
-    for(int i=1;i<=volume->triangulated_surface->mesh.elements.m;i++) for(int j=0;j<3;j++){
+    for(int i=0;i<volume->triangulated_surface->mesh.elements.m;i++) for(int j=0;j<3;j++){
         int old_index=volume->triangulated_surface->mesh.elements(i)(j);
         int new_index=new_surface->mesh.elements(i)(j);
         bool new_entry=particle_map.Set(old_index,new_index);
@@ -1446,7 +1446,7 @@ void Asynchronous_Sphere()
             SEGMENTED_CURVE<TV>* complementary_boundary_segmented_curve=SEGMENTED_CURVE<TV>::Create(deformable_body_collection.particles);
             HASHTABLE<VECTOR<int,2> > edge_mesh_element_map;
             for(int i=0;i<boundary_one_ring_segmented_curve->mesh.elements.m;i++) edge_mesh_element_map.Set(boundary_one_ring_segmented_curve->mesh.elements(i));
-            for(int i=1;i<=volume->mesh.segment_mesh->elements.m;i++) if(!edge_mesh_element_map.Contains(volume->mesh.segment_mesh->elements(i)))
+            for(int i=0;i<volume->mesh.segment_mesh->elements.m;i++) if(!edge_mesh_element_map.Contains(volume->mesh.segment_mesh->elements(i)))
                 complementary_boundary_segmented_curve->mesh.elements.Append(volume->mesh.segment_mesh->elements(i));
             complementary_boundary_segmented_curve->Update_Number_Nodes();
             deformable_body_collection.deformable_geometry.Add_Structure(complementary_boundary_segmented_curve);
@@ -2452,7 +2452,7 @@ void Asynchronous_Projected_Sphere()
             SEGMENTED_CURVE<TV>* complementary_boundary_segmented_curve=SEGMENTED_CURVE<TV>::Create(deformable_body_collection.particles);
             HASHTABLE<VECTOR<int,2> > edge_mesh_element_map;
             for(int i=0;i<boundary_one_ring_segmented_curve->mesh.elements.m;i++) edge_mesh_element_map.Set(boundary_one_ring_segmented_curve->mesh.elements(i));
-            for(int i=1;i<=volume->mesh.segment_mesh->elements.m;i++) if(!edge_mesh_element_map.Contains(volume->mesh.segment_mesh->elements(i)))
+            for(int i=0;i<volume->mesh.segment_mesh->elements.m;i++) if(!edge_mesh_element_map.Contains(volume->mesh.segment_mesh->elements(i)))
                 complementary_boundary_segmented_curve->mesh.elements.Append(volume->mesh.segment_mesh->elements(i));
             complementary_boundary_segmented_curve->Update_Number_Nodes();
             deformable_body_collection.deformable_geometry.Add_Structure(complementary_boundary_segmented_curve);

@@ -26,7 +26,7 @@ template<class T,class RW> void Convert(const std::string& input_filename,const 
         "\n");
     (*output)<<header;
 
-    for(int p=1;p<=tetrahedralized_volume->particles.array_collection->Size();p++)
+    for(int p=0;p<tetrahedralized_volume->particles.array_collection->Size();p++)
         (*output)<<STRING_UTILITIES::string_sprintf("v %lg %lg %lg\n",tetrahedralized_volume->particles.X(p)[1],tetrahedralized_volume->particles.X(p)[2],tetrahedralized_volume->particles.X(p)[3]);
 
     for(int e=0;e<tetrahedralized_volume->mesh.elements.m;e++)

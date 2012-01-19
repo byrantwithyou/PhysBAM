@@ -119,7 +119,7 @@ int main(int argc,char *argv[])
     tet_vol.triangulated_surface->triangle_mesh.boundary_mesh->Initialize_Connected_Segments();
     cout<<tet_vol.triangulated_surface->triangle_mesh.boundary_mesh->connected_segments->m<<" connected segments found."<<endl;
     
-    for(int w=1;w<=(*tet_vol.triangulated_surface->triangle_mesh.boundary_mesh->connected_segments).m;w++)
+    for(int w=0;w<(*tet_vol.triangulated_surface->triangle_mesh.boundary_mesh->connected_segments).m;w++)
         cout<<"The boundary segment loop("<<w<<") has "<<(*tet_vol.triangulated_surface->triangle_mesh.boundary_mesh->connected_segments)(w).m<<" segments..."<<endl;
 
     int largest_i=1;
@@ -129,7 +129,7 @@ int main(int argc,char *argv[])
     tet_vol.triangulated_surface->triangle_mesh.boundary_mesh->Initialize_Connected_Segments();
     
     nodes.Clean_Memory();
-    for(int i=1;i<=(*tet_vol.triangulated_surface->triangle_mesh.boundary_mesh->connected_segments)(largest_i).m;i++)for(int j=0;j<2;j++)
+    for(int i=0;i<(*tet_vol.triangulated_surface->triangle_mesh.boundary_mesh->connected_segments)(largest_i).m;i++)for(int j=0;j<2;j++)
         nodes.Append_Unique((*tet_vol.triangulated_surface->triangle_mesh.boundary_mesh->connected_segments)(largest_i)(j,i));
     
     deletion_list.Clean_Memory();

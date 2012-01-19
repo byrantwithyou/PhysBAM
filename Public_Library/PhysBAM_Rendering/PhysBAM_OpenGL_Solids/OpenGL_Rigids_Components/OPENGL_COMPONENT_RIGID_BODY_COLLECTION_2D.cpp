@@ -174,7 +174,7 @@ Display(const int in_color) const
                 OPENGL_COLOR muscle_color(1,0,0);muscle_color.Send_To_GL_Pipeline();
                 glLineWidth(mode==GL_SELECT?OPENGL_PREFERENCES::selection_line_width:5);
                 glPushName(5);glPushName(0);
-                for(int i=1;i<=articulated_rigid_body->muscle_list->muscles.m;i++){
+                for(int i=0;i<articulated_rigid_body->muscle_list->muscles.m;i++){
                     MUSCLE<TV>& muscle=*articulated_rigid_body->muscle_list->muscles(i);
                     glLoadName(i);OpenGL_Begin(GL_LINE_STRIP);
                     OpenGL_Vertex(muscle.attachment_point_1->Embedded_Position());

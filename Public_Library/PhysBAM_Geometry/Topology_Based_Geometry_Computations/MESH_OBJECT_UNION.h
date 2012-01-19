@@ -31,7 +31,7 @@ void Union_Mesh_Objects_Relatively(T_OBJECT *object,const ARRAY<T_OBJECT*>& obje
         int particle_offset=particles.array_collection->Size();
         particles.array_collection->Add_Arrays(*object_list(i)->particles.array_collection);
         particles.array_collection->Append(*object_list(i)->particles.array_collection);
-        for(int p=1;p<=object_list(i)->particles.array_collection->Size();p++){int p2=p+particle_offset;
+        for(int p=0;p<object_list(i)->particles.array_collection->Size();p++){int p2=p+particle_offset;
             particles.X(p2)=relative_frames(i)*particles.X(p2);
             if(particles.store_velocity) particles.V(p2)=relative_frames(i).r.Rotate(particles.V(p2));}
         object->mesh.elements.Append_Elements(object_list(i)->mesh.elements+particle_offset);}

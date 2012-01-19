@@ -115,7 +115,7 @@ int main(int argc,char *argv[])
     tet_vol.triangulated_surface->triangle_mesh.Initialize_Incident_Triangles();
 
     ARRAY<int> nodes;
-    for(int i=1;i<=(*tet_vol.triangulated_surface->triangle_mesh.boundary_mesh->connected_segments)(smallest_i).m;i++)for(int j=0;j<2;j++)
+    for(int i=0;i<(*tet_vol.triangulated_surface->triangle_mesh.boundary_mesh->connected_segments)(smallest_i).m;i++)for(int j=0;j<2;j++)
     nodes.Append_Unique((*tet_vol.triangulated_surface->triangle_mesh.boundary_mesh->connected_segments)(smallest_i)(j,i));
 
     cout<<"Processing nodes..."<<endl;

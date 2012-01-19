@@ -218,13 +218,13 @@ Update_Simulated_Particles(DEFORMABLES_EXAMPLE_FORCES_AND_VELOCITIES<TV>& exampl
     dynamic_particles.Remove_All();
 
     if(mpi_solids){
-        for(int p=1;p<=mpi_solids->particles_of_partition(mpi_solids->Partition()).m;p++){
+        for(int p=0;p<mpi_solids->particles_of_partition(mpi_solids->Partition()).m;p++){
             int particle_index=mpi_solids->particles_of_partition(mpi_solids->Partition())(p);
             if(particle_is_simulated(particle_index)) simulated_particles.Append(particle_index);}
         
         binding_list.Clear_Hard_Bound_Particles(particle_is_simulated); // Prevent hard bound particles from being added to dynamic_particles
         
-        for(int p=1;p<=mpi_solids->particles_of_partition(mpi_solids->Partition()).m;p++){
+        for(int p=0;p<mpi_solids->particles_of_partition(mpi_solids->Partition()).m;p++){
             int particle_index=mpi_solids->particles_of_partition(mpi_solids->Partition())(p);
             if(particle_is_simulated(particle_index)) dynamic_particles.Append(particle_index);}
 

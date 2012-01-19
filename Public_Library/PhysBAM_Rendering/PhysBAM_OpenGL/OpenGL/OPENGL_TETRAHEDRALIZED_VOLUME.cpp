@@ -195,7 +195,7 @@ template<class T> void OPENGL_TETRAHEDRALIZED_VOLUME<T>::
 Highlight_Nodes_Of_Minimum_Valence() const
 {
     bool neighbor_nodes_defined=mesh->neighbor_nodes!=0;if(!neighbor_nodes_defined) mesh->Initialize_Neighbor_Nodes();
-    for(int p=1;p<=particles->array_collection->Size();p++) if((*mesh->neighbor_nodes)(p).m==minimum_valence)
+    for(int p=0;p<particles->array_collection->Size();p++) if((*mesh->neighbor_nodes)(p).m==minimum_valence)
         OPENGL_SHAPES::Draw_Dot(particles->X(p),OPENGL_COLOR(1,1,0),4);
     if(!neighbor_nodes_defined){delete mesh->neighbor_nodes;mesh->neighbor_nodes=0;}
 }
@@ -479,12 +479,12 @@ template<class T> void OPENGL_TETRAHEDRALIZED_VOLUME<T>::
 Initialize_Vertex_Normals()
 {
     delete vertex_normals;vertex_normals=new ARRAY<VECTOR<T,3> >(particles->array_collection->Size());
-    for(int t=1;t<=mesh->boundary_mesh->elements.m;t++){
+    for(int t=0;t<mesh->boundary_mesh->elements.m;t++){
         int i,j,k;mesh->boundary_mesh->elements(t).Get(i,j,k);
         VECTOR<T,3> xi=particles->X(i),xj=particles->X(j),xk=particles->X(k);
         VECTOR<T,3> normal=TRIANGLE_3D<T>::Normal(xi,xj,xk);
         (*vertex_normals)(i)+=normal;(*vertex_normals)(j)+=normal;(*vertex_normals)(k)+=normal;}
-    for(int p=1;p<=particles->array_collection->Size();p++)(*vertex_normals)(p).Normalize();
+    for(int p=0;p<particles->array_collection->Size();p++)(*vertex_normals)(p).Normalize();
 }
 //#####################################################################
 // Function Update_Cutaway_Plane
@@ -497,12 +497,12 @@ Update_Cutaway_Plane()
     BOX<VECTOR<T,3> > box=*tetrahedralized_volume.bounding_box;
     ARRAY<bool> inside(particles->array_collection->Size());T threshold;
     switch(cutaway_mode){
-        case 1:threshold=box.min_corner.x+cutaway_fraction*(box.max_corner.x-box.min_corner.x);for(int p=1;p<=particles->array_collection->Size();p++)inside(p)=particles->X(p).x<threshold;break;
-        case 2:threshold=box.max_corner.x+cutaway_fraction*(box.min_corner.x-box.max_corner.x);for(int p=1;p<=particles->array_collection->Size();p++)inside(p)=particles->X(p).x>threshold;break;
-        case 3:threshold=box.min_corner.y+cutaway_fraction*(box.max_corner.y-box.min_corner.y);for(int p=1;p<=particles->array_collection->Size();p++)inside(p)=particles->X(p).y<threshold;break;
-        case 4:threshold=box.max_corner.y+cutaway_fraction*(box.min_corner.y-box.max_corner.y);for(int p=1;p<=particles->array_collection->Size();p++)inside(p)=particles->X(p).y>threshold;break;
-        case 5:threshold=box.min_corner.z+cutaway_fraction*(box.max_corner.z-box.min_corner.z);for(int p=1;p<=particles->array_collection->Size();p++)inside(p)=particles->X(p).z<threshold;break;
-        case 6:threshold=box.max_corner.z+cutaway_fraction*(box.min_corner.z-box.max_corner.z);for(int p=1;p<=particles->array_collection->Size();p++)inside(p)=particles->X(p).z>threshold;break;}
+        case 1:threshold=box.min_corner.x+cutaway_fraction*(box.max_corner.x-box.min_corner.x);for(int p=0;p<particles->array_collection->Size();p++)inside(p)=particles->X(p).x<threshold;break;
+        case 2:threshold=box.max_corner.x+cutaway_fraction*(box.min_corner.x-box.max_corner.x);for(int p=0;p<particles->array_collection->Size();p++)inside(p)=particles->X(p).x>threshold;break;
+        case 3:threshold=box.min_corner.y+cutaway_fraction*(box.max_corner.y-box.min_corner.y);for(int p=0;p<particles->array_collection->Size();p++)inside(p)=particles->X(p).y<threshold;break;
+        case 4:threshold=box.max_corner.y+cutaway_fraction*(box.min_corner.y-box.max_corner.y);for(int p=0;p<particles->array_collection->Size();p++)inside(p)=particles->X(p).y>threshold;break;
+        case 5:threshold=box.min_corner.z+cutaway_fraction*(box.max_corner.z-box.min_corner.z);for(int p=0;p<particles->array_collection->Size();p++)inside(p)=particles->X(p).z<threshold;break;
+        case 6:threshold=box.max_corner.z+cutaway_fraction*(box.min_corner.z-box.max_corner.z);for(int p=0;p<particles->array_collection->Size();p++)inside(p)=particles->X(p).z>threshold;break;}
     cutaway_mesh.number_nodes=mesh->number_nodes;
     cutaway_mesh.elements.Remove_All();
     for(int t=0;t<mesh->elements.m;t++){
@@ -534,7 +534,7 @@ Display_Subset()
         OpenGL_Triangle(tet.triangle4.x1,tet.triangle4.x2,tet.triangle4.x3,vertices);}
     OpenGL_Draw_Arrays_With_Normals(GL_TRIANGLES,3,vertices,normals);
     vertices.Resize(0);
-    for(int t=1;t<=mesh->boundary_mesh->elements.m;t++){
+    for(int t=0;t<mesh->boundary_mesh->elements.m;t++){
         int i,j,k;mesh->boundary_mesh->elements(t).Get(i,j,k);
         VECTOR<T,3> xi=particles->X(i),xj=particles->X(j),xk=particles->X(k);
         OpenGL_Line(xi,xj,vertices);

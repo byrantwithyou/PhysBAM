@@ -154,7 +154,7 @@ void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
         int index=1;
         for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
             if(!particle_array(cell_index)) continue;
-            for(int i=1;i<=particle_array(cell_index)->array_collection->number;i++) particle_flat(index++)=particle_array(cell_index)->X(i);}
+            for(int i=0;i<particle_array(cell_index)->array_collection->number;i++) particle_flat(index++)=particle_array(cell_index)->X(i);}
         if(frame>0) rigid_body_particles.Resize(index-1);
         particle_flat.Resize(rigid_body_particles.array_collection->Size());
         solid_body_collection.Update_Simulated_Particles();

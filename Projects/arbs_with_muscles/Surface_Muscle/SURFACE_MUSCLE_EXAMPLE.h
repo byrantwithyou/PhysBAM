@@ -140,7 +140,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >::Initialize_Bodies();
 
     // For now create all surface muscle segments
-    for(int i=1;i<=arb->muscle_list->muscles.m;i++){
+    for(int i=0;i<arb->muscle_list->muscles.m;i++){
         ARRAY<T_MUSCLE_SEGMENT_DATA> segment_data;
         for (int j=1;j<=arb->muscle_list->muscles(i)->via_points.m+1;j++) {
             ARRAY<T> parameters;parameters.Append(0.04);parameters.Append(0.05);

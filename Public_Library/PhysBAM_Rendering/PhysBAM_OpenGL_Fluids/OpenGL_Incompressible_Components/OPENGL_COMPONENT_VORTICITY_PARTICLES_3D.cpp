@@ -20,7 +20,7 @@ Reinitialize(bool force)
         have_velocities=true;
         opengl_vector_field.vector_field.Resize(particles->array_collection->Size());
         int idx=1;
-        for(int i=1;i<=particles->array_collection->Size();i++)
+        for(int i=0;i<particles->array_collection->Size();i++)
             opengl_vector_field.vector_field(idx++)=particles->vorticity(i);}
 }
 template class OPENGL_COMPONENT_VORTICITY_PARTICLES_3D<float,float>;

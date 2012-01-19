@@ -88,7 +88,7 @@ private:
     for(int i=particles_array.domain.min_corner.x;i<=particles_array.domain.max_corner.x;i++) for(int j=particles_array.domain.min_corner.y;j<=particles_array.domain.max_corner.y;j++) for(int ij=particles_array.domain.min_corner.z;ij<=particles_array.domain.max_corner.z;ij++){
         POINT_CLOUD<TV>* particles=particles_array(i,j,ij);
         if(particles)
-            for(int p=1;p<=particles->array_collection->Size();p++){
+            for(int p=0;p<particles->array_collection->Size();p++){
                 particle_to_aggregate_id(i,j,ij).Append(index);aggregate_id_to_particle.Append(PAIR<VECTOR<int,3>,int>(VECTOR<int,3>(i,j,ij),p));index++;}}}
 
 //##################################################################### 

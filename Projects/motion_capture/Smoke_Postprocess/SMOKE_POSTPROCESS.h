@@ -224,8 +224,8 @@ void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE
     if(def_current) LOG::cout<<"def_current, so using that for position and velocity updates with alpha="<<alpha<<std::endl;
     else LOG::cout<<"NO def_current, so cannot use that for position and velocity updates"<<std::endl;
 
-    if(!def_current) for(int i=1;i<=def_next->particles.array_collection->Size();i++) X(i)=def_next->particles.X(i);
-    else for(int i=1;i<=def_next->particles.array_collection->Size();i++) X(i)=def_current->particles.X(i)*(1-alpha)+def_next->particles.X(i)*alpha;
+    if(!def_current) for(int i=0;i<def_next->particles.array_collection->Size();i++) X(i)=def_next->particles.X(i);
+    else for(int i=0;i<def_next->particles.array_collection->Size();i++) X(i)=def_current->particles.X(i)*(1-alpha)+def_next->particles.X(i)*alpha;
 }
 //#####################################################################
 // Function Adjust_Density_And_Temperature_With_Sources
@@ -266,8 +266,8 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
         if(def_current) delete def_current;
         def_current=def_next;def_next=Create_Deformable_Body_List(next_frame-rigid_body_start_frame);
         list_frame=next_frame-rigid_body_start_frame;}
-    if(!def_current) for(int i=1;i<=def_next->particles.array_collection->Size();i++) V(i)=def_next->particles.V(i);
-    else for(int i=1;i<=def_next->particles.array_collection->Size();i++) V(i)=def_current->particles.V(i)*(1-alpha)+def_next->particles.V(i)*alpha;
+    if(!def_current) for(int i=0;i<def_next->particles.array_collection->Size();i++) V(i)=def_next->particles.V(i);
+    else for(int i=0;i<def_next->particles.array_collection->Size();i++) V(i)=def_current->particles.V(i)*(1-alpha)+def_next->particles.V(i)*alpha;
 }
 //#####################################################################
 // Function Set_External_Positions
@@ -285,7 +285,7 @@ void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,
 void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE
 {
     if(test_number!=2) return;
-    for(int i=1;i<=def_next->particles.array_collection->Size();i++) V(i)=TV();
+    for(int i=0;i<def_next->particles.array_collection->Size();i++) V(i)=TV();
 }
 //#####################################################################
 // Function Smoke_Test_Number

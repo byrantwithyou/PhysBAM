@@ -406,7 +406,7 @@ Apply_Id_Selection()
     if(use_ids && valid && opengl_points->points.m == particles->array_collection->Size()){
         ARRAY_VIEW<int>* ids=Get_Particles_Id_Array();
         if(!ids) return;
-        for(int i=1;i<=particles->array_collection->Size();i++){
+        for(int i=0;i<particles->array_collection->Size();i++){
             int dummy;if(selected_ids.Find((*ids)(i),dummy)) opengl_points->Select_Point(i);}}
 }
 //#####################################################################

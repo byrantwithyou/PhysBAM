@@ -77,7 +77,7 @@ Copy_Particle_Attributes_From_Array(T_ARRAYS_PARTICLES& particles)
     int particle_index=0;sph_particles.array_collection->Delete_All_Elements();
     for(NODE_ITERATOR iterator(grid,2);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();
         if(particles(block)){sph_particles.array_collection->Add_Elements(particles(block)->array_collection->Size());
-            for(int p=1;p<=particles(block)->array_collection->Size();p++){particle_index++;sph_particles.X(particle_index)=particles(block)->X(p);sph_particles.V(particle_index)=particles(block)->V(p);}}}
+            for(int p=0;p<particles(block)->array_collection->Size();p++){particle_index++;sph_particles.X(particle_index)=particles(block)->X(p);sph_particles.V(particle_index)=particles(block)->V(p);}}}
 }
 //#####################################################################
 // Function Copy_Particle_Attributes_To_Array
@@ -87,7 +87,7 @@ Copy_Particle_Attributes_To_Array(T_ARRAYS_PARTICLES& particles) const
 {
     int particle_index=0;
     for(NODE_ITERATOR iterator(grid,2);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();
-        if(particles(block)) for(int p=1;p<=particles(block)->array_collection->Size();p++){particle_index++;
+        if(particles(block)) for(int p=0;p<particles(block)->array_collection->Size();p++){particle_index++;
             particles(block)->X(p)=sph_particles.X(particle_index);particles(block)->V(p)=sph_particles.V(particle_index);}}
 }
 //#####################################################################
@@ -461,14 +461,14 @@ Modify_Levelset_And_Particles_To_Create_Fluid(const T time,T_FACE_ARRAYS_SCALAR*
         for(NODE_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()){
             TV_INT block=iterator.Node_Index();
             if(positive_particles(block)){
-                for(int p=1;p<=positive_particles(block)->array_collection->Size();p++) 
+                for(int p=0;p<positive_particles(block)->array_collection->Size();p++) 
                     if(particle_levelset_evolution->particle_levelset.levelset.Phi(positive_particles(block)->X(p))<0){
                         positive_particles(block)->array_collection->Add_To_Deletion_List(p);
                         if(!removed_positive_particles(block)) removed_positive_particles(block)=particle_levelset.template_removed_particles.Clone();
                         removed_positive_particles(block)->array_collection->Append(*positive_particles(block)->array_collection,p);}
                 positive_particles(block)->array_collection->Delete_Elements_On_Deletion_List();}
             if(removed_negative_particles(block)){
-                for(int p=1;p<=removed_negative_particles(block)->array_collection->Size();p++)
+                for(int p=0;p<removed_negative_particles(block)->array_collection->Size();p++)
                     if(particle_levelset_evolution->particle_levelset.levelset.Phi(removed_negative_particles(block)->X(p))<0){
                         removed_negative_particles(block)->array_collection->Add_To_Deletion_List(p);
                         if(!negative_particles(block)) negative_particles(block)=particle_levelset.template_particles.Clone();
@@ -497,7 +497,7 @@ Move_Particles_Off_Grid_Boundaries(T_ARRAYS_PARTICLES& particles,const T toleran
         if(fluids_parameters.mpi_grid->Neighbor(axis,axis_side)){
             for(NODE_ITERATOR iterator(grid,0,T_GRID::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
                 TV_INT block=iterator.Node_Index();
-                if(particles(block)) for(int p=1;p<=particles(block)->array_collection->Size();p++)
+                if(particles(block)) for(int p=0;p<particles(block)->array_collection->Size();p++)
                     if(axis_side==1) particles(block)->X(p)[axis]=max(grid.domain.Minimum_Corner()[axis]+tolerance,particles(block)->X(p)[axis]);
                     else particles(block)->X(p)[axis]=min(grid.domain.Maximum_Corner()[axis]-tolerance,particles(block)->X(p)[axis]);}}}
 }

@@ -34,7 +34,7 @@ void Dump_Rigid_Baody_Simplicial_Object_Particles(const STREAM_TYPE& stream_type
     RIGID_GEOMETRY<TV>& rigid_geometry=rigid_geometry_collection.Rigid_Geometry(rigid_body_id);
 
     *output_stream<<"Number of Particles="<<rigid_geometry.simplicial_object->particles.array_collection->Size()<<std::endl;
-    for(int t=1;t<=rigid_geometry.simplicial_object->particles.array_collection->Size();t++){
+    for(int t=0;t<rigid_geometry.simplicial_object->particles.array_collection->Size();t++){
         TV X=rigid_geometry.simplicial_object->particles.X(t);
         *output_stream<<"X("<<t<<")="<<rigid_geometry.Frame()*X<<std::endl;}
 }

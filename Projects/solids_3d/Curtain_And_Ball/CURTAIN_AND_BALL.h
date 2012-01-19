@@ -77,7 +77,7 @@ void Get_Initial_Data()
 
     if(collide_against_sphere_triangulated_surface||collide_against_sphere_particles){
         sphere_particles.Update_Velocity();sphere_particles.Store_Mass();int sphere_index=2;
-        for(int p=1;p<=solids_parameters.rigid_body_parameters.list.rigid_bodies(sphere_index)->triangulated_surface->particles.X.array.m;p++){
+        for(int p=0;p<solids_parameters.rigid_body_parameters.list.rigid_bodies(sphere_index)->triangulated_surface->particles.X.array.m;p++){
             sphere_particles.array_collection->Add_Element();sphere_particles.X(p)=solids_parameters.rigid_body_parameters.list.rigid_bodies(sphere_index)->triangulated_surface->particles.X(p);
             sphere_particles.V(p)=solids_parameters.rigid_body_parameters.list.rigid_bodies(sphere_index)->velocity;
             sphere_particles.mass(p)=(T)1e6;}

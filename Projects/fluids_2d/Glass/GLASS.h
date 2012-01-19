@@ -270,7 +270,7 @@ bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
     for(int s=0;s<sources.m;s++){
         for(NODE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();
             if(!removed_positive_particles(block)) continue;
-            for(int p=1;p<=removed_positive_particles(block)->array_collection->Size();p++)
+            for(int p=0;p<removed_positive_particles(block)->array_collection->Size();p++)
                 if(sources(s).Inside(world_to_source(s).Homogeneous_Times(removed_positive_particles(block)->X(p)),(T)-1e-4)) removed_positive_particles(block)->array_collection->Add_To_Deletion_List(p);
             removed_positive_particles(block)->array_collection->Delete_Elements_On_Deletion_List();}}
     return false;

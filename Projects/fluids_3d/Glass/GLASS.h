@@ -269,7 +269,7 @@ bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
         RANGE<TV_INT> source_nodes(grid.Clamp_To_Cell(sources(s).Bounding_Box().Minimum_Corner()),grid.Clamp_To_Cell(sources(s).Bounding_Box().Maximum_Corner())+TV_INT::All_Ones_Vector());
         for(NODE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();
             if(!removed_positive_particles(block)) continue;
-            for(int p=1;p<=removed_positive_particles(block)->array_collection->Size();p++)
+            for(int p=0;p<removed_positive_particles(block)->array_collection->Size();p++)
                 if(sources(s).Inside(removed_positive_particles(block)->X(p),-(T)1e-4)) removed_positive_particles(block)->array_collection->Add_To_Deletion_List(p);
             removed_positive_particles(block)->array_collection->Delete_Elements_On_Deletion_List();}}
     return false;

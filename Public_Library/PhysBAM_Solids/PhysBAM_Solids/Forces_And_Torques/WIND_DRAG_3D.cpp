@@ -76,7 +76,7 @@ Update_Position_Based_State(const T time)
             optimization(t).center=(T)one_third*(Xi+Xj+Xk);optimization(t).inward_normal=TRIANGLE_3D<T>::Normal_Direction(Xi,Xk,Xj);
             optimization(t).one_third_area=(T)one_sixth*optimization(t).inward_normal.Normalize();
             if(use_spatially_varying_wind) optimization(t).wind_velocity=Spatially_Varying_Wind_Velocity(optimization(t).center);}
-        else for(int t=1;t<=rigid_body->simplicial_object->mesh.elements.m;t++){
+        else for(int t=0;t<rigid_body->simplicial_object->mesh.elements.m;t++){
             T_SIMPLEX world_space_simplex=rigid_body->World_Space_Simplex(t);
             optimization(t).center=world_space_simplex.Center(),optimization(t).inward_normal=-world_space_simplex.Normal();
             optimization(t).one_third_area=world_space_simplex.Size();
@@ -127,7 +127,7 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,
         else{
             if(rigid_body->Has_Infinite_Inertia() || rigid_body->particle_index<0) return;
             TWIST<TV>& wrench=rigid_F(rigid_body->particle_index);
-            for(int t=1;t<=rigid_body->simplicial_object->mesh.elements.m;t++){
+            for(int t=0;t<rigid_body->simplicial_object->mesh.elements.m;t++){
                 TV wind_velocity=use_constant_wind?constant_wind:optimization(t).wind_velocity;
                 TV relative_velocity=wind_velocity-rigid_body->Pointwise_Object_Velocity(optimization(t).center);
                 TV simplex_force=Add_Velocity_Independent_Forces_Helper(relative_velocity,t);
@@ -158,7 +158,7 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<const TWIST<TV> 
         else{
             if(rigid_body->Has_Infinite_Inertia() || rigid_body->particle_index<0) return;
             TWIST<TV>& wrench=rigid_F(rigid_body->particle_index);
-            for(int t=1;t<=rigid_body->simplicial_object->mesh.elements.m;t++){
+            for(int t=0;t<rigid_body->simplicial_object->mesh.elements.m;t++){
                 TV negative_V=-rigid_body->Pointwise_Object_Velocity(optimization(t).center);
                 TV simplex_force=wind_viscosity*(negative_V-TV::Dot_Product(negative_V,optimization(t).inward_normal)*optimization(t).inward_normal);
                 // total force
