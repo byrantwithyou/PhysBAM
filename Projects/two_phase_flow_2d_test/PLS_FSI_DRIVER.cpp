@@ -373,7 +373,7 @@ Extrapolate_Velocity_Across_Interface(T time,T dt)
     particle_levelset_evolution->particle_levelset.levelset.boundary->Fill_Ghost_Cells(grid,particle_levelset_evolution->phi,phi_ghost,0,time+dt,extrapolation_ghost_cells);
     int band_width=extrapolation_ghost_cells-1;
     T delta=band_width*grid.dX.Max();
-    for(int axis=1;axis<=TV::m;axis++){
+    for(int axis=0;axis<TV::m;axis++){
         GRID<TV> face_grid=grid.Get_Face_Grid(axis);
         ARRAY<T,TV_INT> phi_face(face_grid.Domain_Indices(),false);
         ARRAYS_ND_BASE<TV>& face_velocity=example.fluid_collection.incompressible_fluid_collection.face_velocities.Component(axis);

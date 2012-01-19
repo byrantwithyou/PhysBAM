@@ -301,7 +301,7 @@ void Make_Mace(const int length,const T& scale_factor=(T)1,const TV & shift,cons
 
     mace_joints=length+1;
     joints.Resize(length+2);
-    for(int i=1;i<=length+1;i++) joints(i)=new POINT_JOINT<TV>();
+    for(int i=0;i<length+1;i++) joints(i)=new POINT_JOINT<TV>();
     //handle to chain
     joints(1)->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(-(T)0.003,-(T)0.213,(T)0.006)));
     joints(1)->Set_Joint_To_Child_Frame(FRAME<TV>(scale_factor*TV(0,-(T).5,0)));

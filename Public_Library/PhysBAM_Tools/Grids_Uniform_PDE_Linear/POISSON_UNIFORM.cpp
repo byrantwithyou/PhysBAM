@@ -46,7 +46,7 @@ Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array
                 int matrix_index=cell_index_to_matrix_index(cell_index);
                 SPARSE_MATRIX_FLAT_NXN<T>& A=A_array(filled_region_colors(cell_index));VECTOR_ND<T>& b=b_array(filled_region_colors(cell_index));b(matrix_index)=f(cell_index);
                 T diagonal=0;
-                for(int axis=1;axis<=T_GRID::dimension;axis++){TV_INT offset=TV_INT::Axis_Vector(axis);
+                for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT offset=TV_INT::Axis_Vector(axis);
                     if(filled_region_colors.Valid_Index(cell_index-offset)){
                         if(!psi_N.Component(axis)(cell_index)){
                             T element=divergence_face_weights.Component(axis)(cell_index)*beta_face.Component(axis)(cell_index)*one_over_dx2[axis];
@@ -77,7 +77,7 @@ Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array
                 int matrix_index=cell_index_to_matrix_index(cell_index);
                 SPARSE_MATRIX_FLAT_NXN<T>& A=A_array(filled_region_colors(cell_index));VECTOR_ND<T>& b=b_array(filled_region_colors(cell_index));b(matrix_index)=f(cell_index);
                 T diagonal=0;
-                for(int axis=1;axis<=T_GRID::dimension;axis++){TV_INT offset=TV_INT::Axis_Vector(axis);
+                for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT offset=TV_INT::Axis_Vector(axis);
                     if(filled_region_colors.Valid_Index(cell_index-offset)){
                         if(!psi_N.Component(axis)(cell_index)){T element=beta_face.Component(axis)(cell_index)*one_over_dx2[axis];
                             diagonal-=element;

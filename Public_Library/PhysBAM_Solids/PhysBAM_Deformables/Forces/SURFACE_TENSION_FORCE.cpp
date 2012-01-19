@@ -140,7 +140,7 @@ Add_Raw_Velocity_Dependent_Forces_First_Half(ARRAY<TRIPLE<int,int,T> >& data) co
         for(int i=0;i<surface.mesh.elements.m;i++){VECTOR<int,2> k=surface.mesh.elements(i);
             int off_kx=(k.x-1)*TV::m,off_ky=(k.y-1)*TV::m;
             TV sn=sqrt_coefficients(i)*normal(i);
-            for(int j=1;j<=TV::m;j++){
+            for(int j=0;j<TV::m;j++){
                 data.Append(TRIPLE<int,int,T>(i,off_kx+j,sn(j)));
                 data.Append(TRIPLE<int,int,T>(i,off_ky+j,-sn(j)));}}
 }

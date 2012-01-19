@@ -91,7 +91,7 @@ public:
     while(!done){done=true;
         for(int k=0;k<invalid_indices.m;k++){
             T2 sum=T2();int count=0;
-            for(int axis=1;axis<=T_GRID::dimension;axis++){
+            for(int axis=0;axis<T_GRID::dimension;axis++){
                 TV_INT min_cell=invalid_indices(k).x-TV_INT::Axis_Vector(axis),max_cell=invalid_indices(k).x+TV_INT::Axis_Vector(axis);
                 if(cell_neighbors_visible(axis,min_cell) && cell_valid_points_current(min_cell)){sum+=values(min_cell);count++;}
                 if(cell_neighbors_visible(axis,invalid_indices(k).x) && cell_valid_points_current(max_cell)){sum+=values(max_cell);count++;}}
@@ -109,7 +109,7 @@ public:
         done=true;
         for(int k=0;k<invalid_indices.m;k++){
             T2 sum=T2();int count=0;
-            for(int axis=1;axis<=T_GRID::dimension;axis++){
+            for(int axis=0;axis<T_GRID::dimension;axis++){
                 TV_INT min_cell=invalid_indices(k).x-TV_INT::Axis_Vector(axis),max_cell=invalid_indices(k).x+TV_INT::Axis_Vector(axis);
                 if(cell_neighbors_visible(axis,min_cell)){if(cell_valid_points_current(min_cell)){sum+=values(min_cell);count++;}}
                 else{sum+=Compute_Revalidation_Value(grid.X(invalid_indices(k).x),grid.X(min_cell),values(invalid_indices(k).x),default_value);count++;}

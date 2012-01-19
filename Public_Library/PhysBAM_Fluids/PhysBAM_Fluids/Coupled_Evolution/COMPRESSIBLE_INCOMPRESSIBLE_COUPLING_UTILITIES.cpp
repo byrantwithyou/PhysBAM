@@ -52,7 +52,7 @@ Extrapolate_Compressible_State_Into_Incompressible_Region(const T dt,const T tim
         if(phi_ghost_negated(cell_index)>0 && phi_ghost_negated(cell_index)<=bandwidth){
             TV v_ext,v_i,grad_phi,N,v_total;
             v_ext=velocity(cell_index);
-            for(int axis=1;axis<=T_GRID::dimension;axis++){
+            for(int axis=0;axis<T_GRID::dimension;axis++){
                 TV_INT axis_vector=TV_INT::Axis_Vector(axis);
                 v_i(axis)=(incompressible_face_velocities.Component(axis)(iterator.First_Face_Index(axis))+
                     incompressible_face_velocities.Component(axis)(iterator.Second_Face_Index(axis)))*(T).5;

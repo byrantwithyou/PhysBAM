@@ -122,13 +122,13 @@ Enforce_Real_Valued_Symmetry(ARRAY<COMPLEX<T> ,VECTOR<int,3> >& u_hat) const
         u_hat(grid.counts.x-i,0,0)=u_hat(i,0,0).Conjugated(); // reflect y=0 line
         u_hat(grid.counts.x-i,grid.counts.y/2,0)=u_hat(i,grid.counts.y/2,0).Conjugated();} // reflect y=grid.counts.y/2 line
     for(int j=1;j<=grid.counts.y/2-1;j++){u_hat(0,grid.counts.y-j,0)=u_hat(0,j,0).Conjugated();} // reflect x=0 line
-    for(int i=1;i<=grid.counts.x-1;i++) for(int j=1;j<=grid.counts.y/2-1;j++){u_hat(grid.counts.x-i,grid.counts.y-j,0)=u_hat(i,j,0).Conjugated();} // reflect interior area
+    for(int i=0;i<grid.counts.x-1;i++) for(int j=1;j<=grid.counts.y/2-1;j++){u_hat(grid.counts.x-i,grid.counts.y-j,0)=u_hat(i,j,0).Conjugated();} // reflect interior area
     // middle face - i.e. z=grid.counts.z/2
     for(int i=1;i<=grid.counts.x/2-1;i++){
         u_hat(grid.counts.x-i,0,grid.counts.z/2)=u_hat(i,0,grid.counts.z/2).Conjugated(); // reflect y=0 line
         u_hat(grid.counts.x-i,grid.counts.y/2,grid.counts.z/2)=u_hat(i,grid.counts.y/2,grid.counts.z/2).Conjugated();} // reflect y=grid.counts.y/2 line
     for(int j=1;j<=grid.counts.y/2-1;j++){u_hat(0,grid.counts.y-j,grid.counts.z/2)=u_hat(0,j,grid.counts.z/2).Conjugated();} // reflect x=0 line
-    for(int i=1;i<=grid.counts.x-1;i++) for(int j=1;j<=grid.counts.y/2-1;j++){u_hat(grid.counts.x-i,grid.counts.y-j,grid.counts.z/2)=u_hat(i,j,grid.counts.z/2).Conjugated();} // reflect interior area
+    for(int i=0;i<grid.counts.x-1;i++) for(int j=1;j<=grid.counts.y/2-1;j++){u_hat(grid.counts.x-i,grid.counts.y-j,grid.counts.z/2)=u_hat(i,j,grid.counts.z/2).Conjugated();} // reflect interior area
 }
 //#####################################################################
 // Function First_Derivatives

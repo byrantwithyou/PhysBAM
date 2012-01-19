@@ -47,7 +47,7 @@ public:
 
     int Regions_Intersecting_Element(const int element,VECTOR<int,d+1>& regions)
     {int number_of_regions=0;
-    for(int i=1;i<=d+1;i++){
+    for(int i=0;i<d+1;i++){
         bool add_region=true;int node=mesh.elements(element)[i];
         for(int j=0;j<number_of_regions;j++)if(node_region(node)==regions(j)){add_region=false;break;}
         if(add_region){number_of_regions++;regions(number_of_regions)=node_region(node);}}

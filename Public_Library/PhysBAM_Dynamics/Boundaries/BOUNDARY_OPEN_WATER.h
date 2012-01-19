@@ -54,11 +54,11 @@ Fill_Ghost_Cells_Face(const T_GRID& grid,const T_FACE_ARRAYS_SCALAR& u,T_FACE_AR
 {
     assert(grid.Is_MAC_Grid());
     T_FACE_ARRAYS_SCALAR::Put(u,u_ghost); // interior
-    for(int face_axis=1;face_axis<=T_GRID::dimension;face_axis++){
+    for(int face_axis=0;face_axis<T_GRID::dimension;face_axis++){
         T_GRID face_grid=grid.Get_Face_Grid(face_axis);
         T_ARRAYS_BASE& u_ghost_component=u_ghost.Component(face_axis);
         ARRAY<RANGE<TV_INT> > regions;Find_Ghost_Regions(face_grid,regions,number_of_ghost_cells);
-        for(int side=1;side<=T_GRID::number_of_faces_per_cell;side++){
+        for(int side=0;side<T_GRID::number_of_faces_per_cell;side++){
             RANGE<TV_INT>& region=regions(side);
             int axis=(side+1)/2,boundary=side&1?region.Maximum_Corner()[axis]+1:region.Minimum_Corner()[axis]-1;
             if(open_boundary(side)) for(NODE_ITERATOR iterator(face_grid,region);iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index(),boundary_node=node;boundary_node[axis]=boundary; 

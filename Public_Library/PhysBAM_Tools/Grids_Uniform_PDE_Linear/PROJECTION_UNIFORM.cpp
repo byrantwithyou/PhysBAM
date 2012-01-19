@@ -122,7 +122,7 @@ Compute_Divergence_Threaded(RANGE<TV_INT>& domain,const T_FACE_LOOKUP& face_look
     TV one_over_dx=p_grid.one_over_dX;
     for(CELL_ITERATOR iterator(p_grid,domain);iterator.Valid();iterator.Next()){
         const typename T_FACE_LOOKUP::LOOKUP& lookup=face_lookup.Starting_Point_Cell(iterator.Cell_Index());T divergence=0;
-        for(int axis=1;axis<=T_GRID::dimension;axis++)divergence+=(lookup(axis,iterator.Second_Face_Index(axis))-lookup(axis,iterator.First_Face_Index(axis)))*one_over_dx[axis];
+        for(int axis=0;axis<T_GRID::dimension;axis++)divergence+=(lookup(axis,iterator.Second_Face_Index(axis))-lookup(axis,iterator.First_Face_Index(axis)))*one_over_dx[axis];
         solver->f(iterator.Cell_Index())=divergence;}
 
     if(use_non_zero_divergence) for(CELL_ITERATOR iterator(p_grid,domain);iterator.Valid();iterator.Next())

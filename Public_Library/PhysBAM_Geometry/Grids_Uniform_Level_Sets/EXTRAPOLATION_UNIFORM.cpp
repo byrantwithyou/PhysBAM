@@ -61,13 +61,13 @@ Extrapolate(const T time,const bool fill_ghost_cells)
         Update_Close_Point(u_ghost,phi_ghost,done,index);
     
         if(collision_aware_extrapolation){
-            for(int axis=1;axis<=T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
+            for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
                 if(index[axis] != dimension_start[axis] && !done(index-axis_vector) && !close(index-axis_vector) && Neighbor_Visible(axis,index-axis_vector))
                     Add_To_Heap(phi_ghost,heap,heap_length,close,index-axis_vector);
                 if(index[axis] != dimension_end[axis] && !done(index+axis_vector) && !close(index+axis_vector) && Neighbor_Visible(axis,index))
                     Add_To_Heap(phi_ghost,heap,heap_length,close,index+axis_vector);}}
         else{
-            for(int axis=1;axis<=T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
+            for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
                 if(index[axis] != dimension_start[axis] && !done(index-axis_vector) && !close(index-axis_vector))
                     Add_To_Heap(phi_ghost,heap,heap_length,close,index-axis_vector);
                 if(index[axis] != dimension_end[axis] && !done(index+axis_vector) && !close(index+axis_vector))
@@ -91,14 +91,14 @@ Initialize(const T_ARRAYS_BASE& phi,T_ARRAYS_BOOL_BASE& done,T_ARRAYS_BOOL_BASE&
     // find neighbors of done nodes which have positive phi
     if(collision_aware_extrapolation){
         for(NODE_ITERATOR iterator(node_grid,ghost_cells);iterator.Valid();iterator.Next()) if(done(iterator.Node_Index())){TV_INT index=iterator.Node_Index();
-            for(int axis=1;axis<=T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
+            for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
                 if(index[axis] != dimension_start[axis] && !done(index-axis_vector) && !close(index-axis_vector) && phi(index-axis_vector) > 0 && Neighbor_Visible(axis,index-axis_vector))
                     Add_To_Heap(phi,heap,heap_length,close,index-axis_vector);
                 if(index[axis] != dimension_end[axis] && !done(index+axis_vector) && !close(index+axis_vector) && phi(index+axis_vector) > 0 && Neighbor_Visible(axis,index))
                     Add_To_Heap(phi,heap,heap_length,close,index+axis_vector);}}}
     else{
         for(NODE_ITERATOR iterator(node_grid,ghost_cells);iterator.Valid();iterator.Next()) if(done(iterator.Node_Index())){TV_INT index=iterator.Node_Index();
-            for(int axis=1;axis<=T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
+            for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
                 if(index[axis] != dimension_start[axis] && !done(index-axis_vector) && !close(index-axis_vector) && phi(index-axis_vector) > 0)
                     Add_To_Heap(phi,heap,heap_length,close,index-axis_vector);
                 if(index[axis] != dimension_end[axis] && !done(index+axis_vector) && !close(index+axis_vector) && phi(index+axis_vector) > 0)
@@ -118,7 +118,7 @@ Update_Close_Point(T_ARRAYS_T2_BASE& u,const T_ARRAYS_BASE& phi,const T_ARRAYS_B
     int missing_axis=3; // used in number_of_axis==2 case only, so it gives you which axis is missing (==3 for 2d)
 
     // check each principal axis
-    for(int axis=1;axis<=T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis),low=index-axis_vector,high=index+axis_vector;
+    for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis),low=index-axis_vector,high=index+axis_vector;
         bool check_low=done(low),check_high=done(high);
         if(collision_aware_extrapolation){
             if(check_low && !Neighbor_Visible(axis,low)) check_low=false;

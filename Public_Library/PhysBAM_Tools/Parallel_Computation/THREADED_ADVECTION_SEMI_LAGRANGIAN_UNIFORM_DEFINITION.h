@@ -55,7 +55,7 @@ Update_Advection_Equation_Face_Lookup(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z
     const T_FACE_LOOKUP& face_velocities,T_BOUNDARY& boundary,const T dt,const T time,
     const T_FACE_LOOKUP* Z_min_ghost,const T_FACE_LOOKUP* Z_max_ghost,T_FACE_ARRAYS_SCALAR* Z_min,T_FACE_ARRAYS_SCALAR* Z_max)
 {
-    for(int i=1;i<=TV::dimension;i++){
+    for(int i=0;i<TV::dimension;i++){
         RANGE<TV_INT> domain(grid.Domain_Indices());
         int min_value=domain.min_corner(i),max_value=domain.max_corner(i)+1;
         for(int j=min_value;j<=max_value;j+=row_jump){

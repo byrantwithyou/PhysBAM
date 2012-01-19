@@ -407,7 +407,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 38:
         case 39:
             fluids_parameters.grid->Initialize(resolution+1,(int)(1.5*resolution)+1,0,1,0,1.5);
-            for(int axis=1;axis<=TV::dimension;axis++)for(int side=0;side<2;side++) fluids_parameters.domain_walls[axis][side]=false;
+            for(int axis=0;axis<TV::dimension;axis++)for(int side=0;side<2;side++) fluids_parameters.domain_walls[axis][side]=false;
             break;
         case 32:
             fluids_parameters.grid->Initialize(resolution,4*resolution,0,(T).04*scale_length,0,(T).16*scale_length,true);
@@ -434,7 +434,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             break;
         case 43:
             fluids_parameters.grid->Initialize(resolution+1,resolution+1,0,1,0,1);
-            for(int axis=1;axis<=TV::dimension;axis++)for(int side=0;side<2;side++) fluids_parameters.domain_walls[axis][side]=false;
+            for(int axis=0;axis<TV::dimension;axis++)for(int side=0;side<2;side++) fluids_parameters.domain_walls[axis][side]=false;
             break;
         case 44:
             fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[1][2]=false;fluids_parameters.domain_walls[2][1]=true;fluids_parameters.domain_walls[2][2]=true;
@@ -511,8 +511,8 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
         std::ofstream out(STRING_UTILITIES::string_sprintf("%s/%i/stream_function.dat",output_directory.c_str(),frame).c_str());
         TV dX=fluids_parameters.grid->DX();
         // use nodes so the derivatives are central
-        for(int i=1;i<=domain_indices.max_corner.x+1;i++){
-            for(int j=1;j<=domain_indices.max_corner.y+1;j++){
+        for(int i=0;i<domain_indices.max_corner.x+1;i++){
+            for(int j=0;j<domain_indices.max_corner.y+1;j++){
                 int count=0;
                 T estimate=0;
                 if(i>1){ // integrate v_y in the x direction
@@ -740,7 +740,7 @@ typename BOUNDARY_CONDITIONS_CALLBACKS<TV>::RAY_TYPE Get_Boundary_Along_Ray(cons
             type=BOUNDARY_CONDITIONS_CALLBACKS<TV>::noslip;}}
 
     VECTOR<RANGE<TV_INT>,TV::dimension> fi=fluids_parameters.grid->Face_Indices(0);
-    for(int i=1;i<=TV::m;i++){
+    for(int i=0;i<TV::m;i++){
         if(f2.index(i)<=fi(f2.axis).min_corner(i)-(f2.axis!=i)){
             T th=abs(fluids_parameters.grid->domain.min_corner(i)-X1(i))/dx;
             if(type==BOUNDARY_CONDITIONS_CALLBACKS<TV>::unused || th<theta){

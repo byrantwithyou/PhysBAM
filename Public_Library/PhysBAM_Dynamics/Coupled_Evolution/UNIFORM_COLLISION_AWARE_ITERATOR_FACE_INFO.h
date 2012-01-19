@@ -32,7 +32,7 @@ struct COLLISION_FACE_INFO
     bool operator<(const COLLISION_FACE_INFO& cfi) const
     {
         if(axis!=cfi.axis) return axis<cfi.axis;
-        for(int i=1;i<=TV::m;i++) if(index(i)!=cfi.index(i)) return index(i)<cfi.index(i);
+        for(int i=0;i<TV::m;i++) if(index(i)!=cfi.index(i)) return index(i)<cfi.index(i);
         return false;
     }
 };

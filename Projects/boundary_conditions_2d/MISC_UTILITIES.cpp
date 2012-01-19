@@ -108,7 +108,7 @@ void Add_Viscosity(const OBJECTS_COMMON<TV>& obj,const PARAMETERS_COMMON<typenam
     if(use_extrapolation){
         Fill_Ghost_Cells(obj.grid,3,3,u,*obj.bc);
         Dump_Frame<RW>(u,"fill 1");}
-    for(int a=1;a<=TV::m;a++) Apply_Viscosity(obj.grid,u,*obj.bc,param.dt,param.time,param.mu,param.rho,a,param.theta_threshold,param.cg_tolerance,param.print_matrix);
+    for(int a=0;a<TV::m;a++) Apply_Viscosity(obj.grid,u,*obj.bc,param.dt,param.time,param.mu,param.rho,a,param.theta_threshold,param.cg_tolerance,param.print_matrix);
     Dump_Frame<RW>(u,"after viscosity");
     obj.ai.Print("AFTVIS",u);
 }

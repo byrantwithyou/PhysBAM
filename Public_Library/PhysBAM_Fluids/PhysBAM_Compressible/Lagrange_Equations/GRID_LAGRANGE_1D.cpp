@@ -20,7 +20,7 @@ Euler_Step(const ARRAY<T,VECTOR<int,1> >& u,const T dt)
 template<class T> void GRID_LAGRANGE_1D<T>::
 Get_Lengths(ARRAY<T,VECTOR<int,1> >& L)
 {       
-    for(int i=1;i<=m-1;i++) L(i)=abs(x(i+1)-x(i)); 
+    for(int i=0;i<m-1;i++) L(i)=abs(x(i+1)-x(i)); 
 }
 //#####################################################################
 // Function Get_Midpoints
@@ -29,7 +29,7 @@ Get_Lengths(ARRAY<T,VECTOR<int,1> >& L)
 template<class T> void GRID_LAGRANGE_1D<T>::
 Get_Midpoints(ARRAY<T,VECTOR<int,1> >& M)
 {       
-    for(int i=1;i<=m-1;i++) M(i)=(x(i)+x(i+1))/2; 
+    for(int i=0;i<m-1;i++) M(i)=(x(i)+x(i+1))/2; 
 }
 //#####################################################################
 template class GRID_LAGRANGE_1D<float>;

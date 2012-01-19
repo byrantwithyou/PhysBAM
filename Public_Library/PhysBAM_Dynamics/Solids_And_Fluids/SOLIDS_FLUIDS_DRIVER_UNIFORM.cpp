@@ -1295,7 +1295,7 @@ Advance_Fluid_One_Time_Step_Implicit_Part(const bool done,const T dt,const int s
 
             VECTOR<T,T_GRID::dimension+2>& initial_total_conserved_quantity=euler->initial_total_conserved_quantity;
             LOG::cout<<"Conserved variable error at time="<<time<<std::endl;
-            for(int d=1;d<=T_GRID::dimension+2;d++){
+            for(int d=0;d<T_GRID::dimension+2;d++){
                 T total_error=new_total_conserved_quantity(d)-initial_total_conserved_quantity(d);
                 T relative_error=(initial_total_conserved_quantity(d)!=0)?total_error/initial_total_conserved_quantity(d):0;
                 LOG::cout<<"Conserved variable dimension="<<d<<", initial value="<<initial_total_conserved_quantity(d)<<", new value="<<new_total_conserved_quantity(d)<<

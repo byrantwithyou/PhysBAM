@@ -52,13 +52,13 @@ Fast_Marching_Method(T_ARRAYS_SCALAR& phi_ghost,const T stopping_distance,const 
         FAST_MARCHING<T>::Down_Heap(phi_ghost,close_k,heap,heap_length);heap_length--; // remove point from heap
 
         if(levelset.collision_body_list)
-            for(int axis=1;axis<=T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
+            for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
                 if(index[axis] != dimension_start[axis] && !done(index-axis_vector) && Neighbor_Visible(axis,index-axis_vector))
                     Update_Or_Add_Neighbor(phi_ghost,done,close_k,heap,heap_length,index-axis_vector);
                 if(index[axis] != dimension_end[axis] && !done(index+axis_vector) && Neighbor_Visible(axis,index))
                     Update_Or_Add_Neighbor(phi_ghost,done,close_k,heap,heap_length,index+axis_vector);}
         else
-            for(int axis=1;axis<=T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
+            for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
                 if(index[axis] != dimension_start[axis] && !done(index-axis_vector))
                     Update_Or_Add_Neighbor(phi_ghost,done,close_k,heap,heap_length,index-axis_vector);
                 if(index[axis] != dimension_end[axis] && !done(index+axis_vector))
@@ -89,13 +89,13 @@ Fast_Marching_Method_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,c
         FAST_MARCHING<T>::Down_Heap(phi_new,close_k,heap,heap_length);heap_length--; // remove point from heap
 
         if(levelset.collision_body_list)
-            for(int axis=1;axis<=T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
+            for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
                 if(index[axis] != domain.min_corner[axis] && !done(index-axis_vector) && Neighbor_Visible(axis,index-axis_vector))
                     Update_Or_Add_Neighbor(phi_new,done,close_k,heap,heap_length,index-axis_vector);
                 if(index[axis] != domain.max_corner[axis] && !done(index+axis_vector) && Neighbor_Visible(axis,index))
                     Update_Or_Add_Neighbor(phi_new,done,close_k,heap,heap_length,index+axis_vector);}
         else
-            for(int axis=1;axis<=T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
+            for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
                 if(index[axis] != domain.min_corner[axis] && !done(index-axis_vector))
                     Update_Or_Add_Neighbor(phi_new,done,close_k,heap,heap_length,index-axis_vector);
                 if(index[axis] != domain.max_corner[axis] && !done(index+axis_vector))
@@ -125,13 +125,13 @@ Fast_Marching_Method(T_ARRAYS_SCALAR& phi_ghost,T_ARRAYS_BOOL& done,const T stop
         FAST_MARCHING<T>::Down_Heap(phi_ghost,close_k,heap,heap_length);heap_length--; // remove point from heap
 
         if(levelset.collision_body_list)
-            for(int axis=1;axis<=T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
+            for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
                 if(index[axis] != dimension_start[axis] && !done(index-axis_vector) && Neighbor_Visible(axis,index-axis_vector))
                     Update_Or_Add_Neighbor(phi_ghost,done,close_k,heap,heap_length,index-axis_vector);
                 if(index[axis] != dimension_end[axis] && !done(index+axis_vector) && Neighbor_Visible(axis,index))
                     Update_Or_Add_Neighbor(phi_ghost,done,close_k,heap,heap_length,index+axis_vector);}
         else
-            for(int axis=1;axis<=T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
+            for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
                 if(index[axis] != dimension_start[axis] && !done(index-axis_vector))
                     Update_Or_Add_Neighbor(phi_ghost,done,close_k,heap,heap_length,index-axis_vector);
                 if(index[axis] != dimension_end[axis] && !done(index+axis_vector))
@@ -162,10 +162,10 @@ Initialize_Interface(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,T_ARRAYS_B
     if(seed_indices){
         for(int i=1;i<=seed_indices->m;i++)Add_To_Initial(done,close_k,(*seed_indices)(i));
         if(add_seed_indices_for_ghost_cells){
-            for(int axis=1;axis<=TV::dimension;axis++) for(int side=0;side<2;side++){
+            for(int axis=0;axis<TV::dimension;axis++) for(int side=0;side<2;side++){
                 RANGE<TV_INT> ghost_domain=domain;if(side==1) ghost_domain.max_corner(axis)=interior_domain.min_corner(axis)-1;else ghost_domain.min_corner(axis)=interior_domain.max_corner(axis)+1;
                 for(CELL_ITERATOR iterator(cell_grid,ghost_domain);iterator.Valid();iterator.Next()){TV_INT index=iterator.Cell_Index();
-                    for(int i=1;i<=T_GRID::number_of_neighbors_per_cell;i++){TV_INT neighbor_index(iterator.Cell_Neighbor(i));
+                    for(int i=0;i<T_GRID::number_of_neighbors_per_cell;i++){TV_INT neighbor_index(iterator.Cell_Neighbor(i));
                         if(domain.Lazy_Inside(neighbor_index) && LEVELSET_UTILITIES<T>::Interface(phi_ghost(index),phi_ghost(neighbor_index))){
                             if(!done(index))Add_To_Initial(done,close_k,index);
                             if(!done(neighbor_index))Add_To_Initial(done,close_k,neighbor_index);}}}}}}
@@ -173,7 +173,7 @@ Initialize_Interface(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,T_ARRAYS_B
         T_ARRAYS_SCALAR phi_new(domain.Thickened(1),false); // same size as done and close_k for array accelerations
         phi_new.Fill(2*cell_grid.dX.Max()); // ok positive, since minmag is used below
         if(levelset.collision_body_list){
-            for(int axis=1;axis<=TV::dimension;axis++){
+            for(int axis=0;axis<TV::dimension;axis++){
                 domain.min_corner(axis)++;
                 for(FACE_ITERATOR iterator(cell_grid,domain,axis);iterator.Valid();iterator.Next()){TV_INT index1=iterator.First_Cell_Index(),index2=iterator.Second_Cell_Index();
                     if(!Neighbor_Visible(iterator.Axis(),index1)){
@@ -183,7 +183,7 @@ Initialize_Interface(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,T_ARRAYS_B
                         Add_To_Initial(done,close_k,index1);Add_To_Initial(done,close_k,index2);}}
                 domain.min_corner(axis)--;}}
         else{
-            for(int axis=1;axis<=TV::dimension;axis++){
+            for(int axis=0;axis<TV::dimension;axis++){
                 domain.min_corner(axis)++;
                 for(FACE_ITERATOR iterator(cell_grid,domain,axis);iterator.Valid();iterator.Next()){TV_INT index1=iterator.First_Cell_Index(),index2=iterator.Second_Cell_Index();
                     if(LEVELSET_UTILITIES<T>::Interface(phi_ghost(index1),phi_ghost(index2))){
@@ -210,7 +210,7 @@ Initialize_Interface(T_ARRAYS_SCALAR& phi_ghost,T_ARRAYS_BOOL& done,T_ARRAYS_INT
         for(int i=1;i<=seed_indices->m;i++)Add_To_Initial(done,close_k,(*seed_indices)(i));
         if(add_seed_indices_for_ghost_cells){RANGE<TV_INT> ghost_domain=cell_grid.Domain_Indices().Thickened(ghost_cells);
             for(CELL_ITERATOR iterator(cell_grid,ghost_cells,T_GRID::GHOST_REGION);iterator.Valid();iterator.Next()){TV_INT index=iterator.Cell_Index();
-                for(int i=1;i<=T_GRID::number_of_neighbors_per_cell;i++){TV_INT neighbor_index(iterator.Cell_Neighbor(i));
+                for(int i=0;i<T_GRID::number_of_neighbors_per_cell;i++){TV_INT neighbor_index(iterator.Cell_Neighbor(i));
                     if(ghost_domain.Lazy_Inside(neighbor_index) && LEVELSET_UTILITIES<T>::Interface(phi_ghost(index),phi_ghost(neighbor_index))){
                         if(!done(index))Add_To_Initial(done,close_k,index);
                         if(!done(neighbor_index))Add_To_Initial(done,close_k,neighbor_index);}}}}}
@@ -263,7 +263,7 @@ Initialize_Interface_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,T
             bool really_clamp_phi_with_collision_bodies=levelset.clamp_phi_with_collision_bodies&&phi_ghost(index)<=0;
             T abs_phi=abs(phi_ghost(index));
             TV location=iterator.Location();
-            for(int axis=1;axis<=T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis),low=index-axis_vector,high=index+axis_vector;T dx=cell_grid.dX[axis];
+            for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis),low=index-axis_vector,high=index+axis_vector;T dx=cell_grid.dX[axis];
                 bool use_low=false,use_high=false;T value_low=0,value_high=0;
                 if(index[axis]>dimension_start[axis]){
                     if(!Neighbor_Visible(axis,low)){
@@ -309,7 +309,7 @@ Initialize_Interface_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,T
             int number_of_axis=0; // the number of axis that we want to use later
             int missing_axis=3; // used in number_of_axis==2 case only, so it gives you which axis is missing (==3 for 2d)
             TV location=iterator.Location();
-            for(int axis=1;axis<=T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis),low=index-axis_vector,high=index+axis_vector;T dx=cell_grid.dX[axis];
+            for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis),low=index-axis_vector,high=index+axis_vector;T dx=cell_grid.dX[axis];
                 bool use_low=(done(low)&&LEVELSET_UTILITIES<T>::Interface(phi_ghost(index),phi_ghost(low))),use_high=(done(high)&&LEVELSET_UTILITIES<T>::Interface(phi_ghost(index),phi_ghost(high)));
                 if(!use_low){if(use_high)value[number_of_axis]=LEVELSET_UTILITIES<T>::Theta(phi_ghost(index),phi_ghost(high))*dx;else{missing_axis=axis;number_of_axis--;}}
                 else if(!use_high) value[number_of_axis]=LEVELSET_UTILITIES<T>::Theta(phi_ghost(index),phi_ghost(low))*dx;
@@ -344,7 +344,7 @@ Initialize_Interface(T_ARRAYS_SCALAR& phi_ghost,T_ARRAYS_BOOL& done,T_ARRAYS_INT
     for(CELL_ITERATOR iterator(cell_grid,ghost_cells);iterator.Valid();iterator.Next()) if(done(iterator.Cell_Index())) Add_To_Initial(done,close_k,iterator.Cell_Index());
     if(add_seed_indices_for_ghost_cells){RANGE<TV_INT> ghost_domain=cell_grid.Domain_Indices().Thickened(ghost_cells);
         for(CELL_ITERATOR iterator(cell_grid,ghost_cells,T_GRID::GHOST_REGION);iterator.Valid();iterator.Next()){TV_INT index=iterator.Cell_Index();
-            for(int i=1;i<=T_GRID::number_of_neighbors_per_cell;i++){TV_INT neighbor_index(iterator.Cell_Neighbor(i));
+            for(int i=0;i<T_GRID::number_of_neighbors_per_cell;i++){TV_INT neighbor_index(iterator.Cell_Neighbor(i));
                 if(ghost_domain.Lazy_Inside(neighbor_index) && LEVELSET_UTILITIES<T>::Interface(phi_ghost(index),phi_ghost(neighbor_index))){
                     if(!done(index))Add_To_Initial(done,close_k,index);
                     if(!done(neighbor_index))Add_To_Initial(done,close_k,neighbor_index);}}}}
@@ -367,7 +367,7 @@ Update_Close_Point(T_ARRAYS_SCALAR& phi_ghost,const T_ARRAYS_BOOL& done,const TV
     int number_of_axis=0; // the number of axis that we want to use later
 
     // check each principal axis
-    for(int axis=1;axis<=T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis),low=index-axis_vector,high=index+axis_vector;
+    for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis),low=index-axis_vector,high=index+axis_vector;
         bool check_low=done(low),check_high=done(high);
         if(levelset.collision_body_list){
             if(check_low && !Neighbor_Visible(axis,low)) check_low=false;
@@ -391,11 +391,11 @@ Add_To_Initial(T_ARRAYS_BOOL& done,T_ARRAYS_INT& close_k,const TV_INT& index)
     done(index)=true;close_k(index)=0; // add to done, remove from close 
     // add neighbors to close if not done 
     if(levelset.collision_body_list){
-        for(int axis=1;axis<=T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
+        for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
             if(!done(index-axis_vector) && Neighbor_Visible(axis,index-axis_vector)) close_k(index-axis_vector)=1;
             if(!done(index+axis_vector) && Neighbor_Visible(axis,index)) close_k(index+axis_vector)=1;}}
     else{
-        for(int axis=1;axis<=T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
+        for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
             if(!done(index-axis_vector)) close_k(index-axis_vector)=1;
             if(!done(index+axis_vector)) close_k(index+axis_vector)=1;}}
 }

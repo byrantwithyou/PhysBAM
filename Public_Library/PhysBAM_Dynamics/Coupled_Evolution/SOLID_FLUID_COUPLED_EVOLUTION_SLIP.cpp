@@ -571,14 +571,14 @@ Apply_Viscosity(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
         TV KE=TV();
         for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next())
             KE[iterator.Axis()]+=sqr(face_velocities(iterator.Axis(),iterator.Face_Index()));
-        for(int axis=1;axis<=TV::dimension;axis++)
+        for(int axis=0;axis<TV::dimension;axis++)
             LOG::cout<<"axis "<<axis<<": "<<KE[axis]<<std::endl;
         viscosity_helper.Add_Implicit_Forces_Before_Projection(grid,face_velocities,face_velocities,dt,time);
         LOG::cout<<"KE after viscosity: "<<std::endl;
         KE=TV();
         for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next())
             KE[iterator.Axis()]+=sqr(face_velocities(iterator.Axis(),iterator.Face_Index()));
-        for(int axis=1;axis<=TV::dimension;axis++)
+        for(int axis=0;axis<TV::dimension;axis++)
             LOG::cout<<"axis "<<axis<<": "<<KE[axis]<<std::endl;
     }
 }
@@ -590,7 +590,7 @@ Warn_For_Exposed_Dirichlet_Cell(const T_ARRAYS_BOOL& psi_D,const T_FACE_ARRAYS_B
 {
     for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         if(!psi_D(cell_index)) continue;
-        for(int axis=1;axis<=TV::dimension;axis++){
+        for(int axis=0;axis<TV::dimension;axis++){
             TV_INT first_cell_index=iterator.Cell_Neighbor(2*axis-1),second_cell_index=iterator.Cell_Neighbor(2*axis);
             TV_INT first_face_index=iterator.First_Face_Index(axis),second_face_index=iterator.Second_Face_Index(axis);
             if((grid.Inside_Domain(first_cell_index) && !psi_D(first_cell_index) && !psi_N.Component(axis)(first_face_index)) || 

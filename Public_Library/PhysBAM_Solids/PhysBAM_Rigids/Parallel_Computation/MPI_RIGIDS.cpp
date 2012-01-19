@@ -139,7 +139,7 @@ Update_Partitions(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,
         int body_id=particles_of_partition(PARTITION_ID(rank+1))(body);
         if(!local_domain.Lazy_Inside(rigid_body_collection_input.rigid_body_particle.X(body_id))){
             TV_INT partition_coordinate;
-            for(int d=1;d<=TV::dimension;d++)
+            for(int d=0;d<TV::dimension;d++)
                 partition_coordinate(d)=(int)ceil((rigid_body_collection_input.rigid_body_particle.X(body_id)(d)-global_domain.min_corner(d))/domain_size(d));
             bodies_to_send(partition_coordinates_to_rank(partition_coordinate)).Append(body_id);}}
 
@@ -201,7 +201,7 @@ Split_Range(TV_INT& processes_per_dimension,const RANGE<TV>& global_range)
         partition_coordinates_to_rank(iterator.Node_Index())=count;}
     TV_INT coordinates=all_coordinates(rank+1);
     TV start,end;
-    for(int axis=1;axis<=TV::dimension;axis++){
+    for(int axis=0;axis<TV::dimension;axis++){
         start[axis]=boundaries(axis)(coordinates[axis]);
         end[axis]=boundaries(axis)(coordinates[axis]+1);}
     return RANGE<TV>(start+global_range.min_corner,end+global_range.min_corner);

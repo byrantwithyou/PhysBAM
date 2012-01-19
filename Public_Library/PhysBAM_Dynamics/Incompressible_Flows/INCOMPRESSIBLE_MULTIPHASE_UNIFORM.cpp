@@ -81,7 +81,7 @@ Advance_One_Time_Step_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,co
         // extrapolate the velocity across the interface to get better strain boundaries
         T_ARRAYS_SCALAR phi_ghost(grid.Domain_Indices(number_of_ghost_cells));projection.poisson_collidable->levelset_multiple->levelsets(i)->boundary->Fill_Ghost_Cells(grid,projection.poisson_collidable->levelset_multiple->phis(i),phi_ghost,dt,time,number_of_ghost_cells);
         T_FACE_ARRAYS_SCALAR face_velocities_temp=face_velocities_ghost;
-        for(int axis=1;axis<=T_GRID::dimension;axis++){
+        for(int axis=0;axis<T_GRID::dimension;axis++){
             T_GRID face_grid=grid.Get_Face_Grid(axis);T_ARRAYS_SCALAR phi_face(face_grid.Domain_Indices(),false);T_ARRAYS_BASE& face_velocity=face_velocities_temp.Component(axis);
             for(FACE_ITERATOR iterator(grid,0,T_GRID::WHOLE_REGION,0,axis);iterator.Valid();iterator.Next())
                 phi_face(iterator.Face_Index())=(T).5*(phi_ghost(iterator.First_Cell_Index())+phi_ghost(iterator.Second_Cell_Index()));
@@ -91,7 +91,7 @@ Advance_One_Time_Step_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,co
         strains(i)->Update_Strain_Equation_Multiphase(dt,time,projection.densities(i),face_velocities,face_velocities_temp,*projection.poisson_collidable->levelset_multiple,i,number_of_ghost_cells);}
 
     // update gravity
-    if(gravity) for(int axis=1;axis<=T_GRID::dimension;axis++) if(downward_direction[axis]) face_velocities.Component(axis)+=dt*gravity*downward_direction[axis];
+    if(gravity) for(int axis=0;axis<T_GRID::dimension;axis++) if(downward_direction[axis]) face_velocities.Component(axis)+=dt*gravity*downward_direction[axis];
     
     // update body force
     if(use_force) for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) 
@@ -223,7 +223,7 @@ CFL(T_FACE_ARRAYS_SCALAR& face_velocities,const bool inviscid,const bool viscous
                 dt_convection=max(dt_convection,TV::Dot_Product(grid.one_over_dX,abs(V)));}}
         else{
             for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
-                T local_V_norm=0;for(int axis=1;axis<=T_GRID::dimension;axis++){
+                T local_V_norm=0;for(int axis=0;axis<T_GRID::dimension;axis++){
                     TV_INT first_face_index=grid.First_Face_Index_In_Cell(axis,cell),second_face_index=grid.Second_Face_Index_In_Cell(axis,cell);
                     local_V_norm+=grid.one_over_dX[axis]*maxabs(face_velocities(axis,first_face_index),face_velocities(axis,second_face_index));}
                 dt_convection=max(dt_convection,local_V_norm);}}}
@@ -312,7 +312,7 @@ Add_Surface_Tension(T_LEVELSET& levelset,const T time)
 template<class T_GRID> void INCOMPRESSIBLE_MULTIPHASE_UNIFORM<T_GRID>::
 Implicit_Viscous_Update(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
 {
-    for(int axis=1;axis<=T_GRID::dimension;axis++){
+    for(int axis=0;axis<T_GRID::dimension;axis++){
         IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM<T_GRID> implicit_viscosity(projection,variable_viscosity,projection.densities,viscosities,mpi_grid,axis,use_variable_viscosity);
         implicit_viscosity.Viscous_Update(grid,face_velocities,face_velocities,dt,time,maximum_implicit_viscosity_iterations);}
 }
@@ -410,7 +410,7 @@ Discretize_Viscous_Terms(const ARRAY<T,VECTOR<int,3> >& phi,const T dt)
         // find pressure jump condition
         projection.poisson->Set_Jump(); // allocates the memory for projection.poisson->u_jump
         projection.poisson->levelset->Compute_Normals(); // cell center normals
-        for(int i=1;i<=m-1;i++) for(int j=1;j<=n-1;j++) for(int ij=1;ij<=mn-1;ij++){
+        for(int i=0;i<m-1;i++) for(int j=0;j<n-1;j++) for(int ij=0;ij<mn-1;ij++){
             T ux=(T).25*(ux_x_half(i,j,ij)+ux_x_half(i,j+1,ij)+ux_x_half(i,j,ij+1)+ux_x_half(i,j+1,ij+1)),uy=(T).25*(uy_y_half(i,j,ij)+uy_y_half(i+1,j,ij)+uy_y_half(i,j,ij+1)+uy_y_half(i+1,j,ij+1)),uz=(T).25*(uz_z_half(i,j,ij)+uz_z_half(i+1,j,ij)+uz_z_half(i,j+1,ij)+uz_z_half(i+1,j+1,ij)),
               vx=(T).25*(vx_x_half(i,j,ij)+vx_x_half(i,j+1,ij)+vx_x_half(i,j,ij+1)+vx_x_half(i,j+1,ij+1)),vy=(T).25*(vy_y_half(i,j,ij)+vy_y_half(i+1,j,ij)+vy_y_half(i,j,ij+1)+vy_y_half(i+1,j,ij+1)),vz=(T).25*(vz_z_half(i,j,ij)+vz_z_half(i+1,j,ij)+vz_z_half(i,j+1,ij)+vz_z_half(i+1,j+1,ij)),
               wx=(T).25*(wx_x_half(i,j,ij)+wx_x_half(i,j+1,ij)+wx_x_half(i,j,ij+1)+wx_x_half(i,j+1,ij+1)),wy=(T).25*(wy_y_half(i,j,ij)+wy_y_half(i+1,j,ij)+wy_y_half(i,j,ij+1)+wy_y_half(i+1,j,ij+1)),wz=(T).25*(wz_z_half(i,j,ij)+wz_z_half(i+1,j,ij)+wz_z_half(i,j+1,ij)+wz_z_half(i+1,j+1,ij));
@@ -610,7 +610,7 @@ Discretize_Viscous_Terms(const ARRAY<T,VECTOR<int,2> >& phi,const T dt)
         // find pressure jump condition
         projection.poisson->Set_Jump(); // allocates the memory for projection.poisson->u_jump
         projection.poisson->levelset->Compute_Normals(); // cell center normals
-        for(int i=1;i<=m-1;i++) for(int j=1;j<=n-1;j++){
+        for(int i=0;i<m-1;i++) for(int j=0;j<n-1;j++){
             T ux=(T).5*(ux_x_half(i,j)+ux_x_half(i,j+1)),uy=(T).5*(uy_y_half(i,j)+uy_y_half(i+1,j));
             T vx=(T).5*(vx_x_half(i,j)+vx_x_half(i,j+1)),vy=(T).5*(vy_y_half(i,j)+vy_y_half(i+1,j));
             MATRIX<T,2> UX(ux,vx,uy,vy);

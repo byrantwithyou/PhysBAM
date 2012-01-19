@@ -54,7 +54,7 @@ public:
         node_region(node)=smallest;}}
 
     void Phi_For_Region_In_Element(const int element,const int region,VECTOR<T,d+1>& phi)
-    {for(int i=1;i<=d+1;i++){int node=mesh.elements(element)[i];if(node_region(node)==region)phi[i]=-node_smallest_distance(node);else phi[i]=node_smallest_distance(node);}}
+    {for(int i=0;i<d+1;i++){int node=mesh.elements(element)[i];if(node_region(node)==region)phi[i]=-node_smallest_distance(node);else phi[i]=node_smallest_distance(node);}}
 
     int Number_Of_Regions()
     {return seed_positions.m;}

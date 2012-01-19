@@ -227,7 +227,7 @@ template<> int TRIANGLE_REPULSIONS<VECTOR<double,1> >::Adjust_Velocity_For_Self_
 //#####################################################################
 template<class TV> bool Pair_Is_Separating(POINT_FACE_REPULSION_PAIR<TV>& pair,ARRAY_VIEW<const TV> V)
 {
-    TV relative_velocity=V(pair.nodes(1));for(int i=1;i<=TV::dimension;i++) relative_velocity-=V(pair.nodes(i+1))*pair.weights(i);
+    TV relative_velocity=V(pair.nodes(1));for(int i=0;i<TV::dimension;i++) relative_velocity-=V(pair.nodes(i+1))*pair.weights(i);
     return TV::Dot_Product(relative_velocity,pair.normal)>=0;
 }
 template<class T> bool Pair_Is_Separating(EDGE_EDGE_REPULSION_PAIR<VECTOR<T,1> >& pair,ARRAY_VIEW<const VECTOR<T,1> > V)
@@ -512,7 +512,7 @@ Repulsion_Impulse(TV& direction,const T dt,const T_PAIR& pair,const TV& relative
 template<class TV,class T_ARRAY,class T_MASS_ARRAY> inline void Update_Velocity_Helper(const TV& impulse,const TV& weights,INDIRECT_ARRAY<T_MASS_ARRAY,VECTOR<int,TV::m+1>&> one_over_m,INDIRECT_ARRAY<T_ARRAY,VECTOR<int,TV::m+1>&> V)
 {
     V(1)+=one_over_m(1)*impulse;
-    for(int i=1;i<=TV::m;i++) V(i+1)-=weights(i)*one_over_m(i+1)*impulse;
+    for(int i=0;i<TV::m;i++) V(i+1)-=weights(i)*one_over_m(i+1)*impulse;
 }
 template<class TV> template<class T_ARRAY> void TRIANGLE_REPULSIONS<TV>::
 Adjust_Velocity_For_Point_Face_Repulsion(const T dt,const T_ARRAY& pairs,const bool elastic_repulsion,const bool friction,const bool use_repulsions)

@@ -383,7 +383,7 @@ Compute_ddE(const GENERAL_ENERGY<T>& base,const TV& f,const int simplex)
     T_itit*=s;
     u_it.Fill(m);
     VECTOR<T,TV::SPIN::m> Hu_it,uTu_it;
-    for(int i=1;i<=TV::SPIN::m;i++){
+    for(int i=0;i<TV::SPIN::m;i++){
         int a=(TV::m==3?i%3+1:i),b=a%3+1;
         Hu_it(i)=H(a,a)*u_it(i)+H_iitt(i)*u(b)-H(a,b)*u_it(i);
         T u2_it=sqr(m)*(fm1(a)+fm1(b));
@@ -449,7 +449,7 @@ static void Test_Model_Helper(const char* str,TV a0, TV a1, const SYMMETRIC_MATR
 template<class T,class TV,int d>
 static void Test_Model_Helper(const char* str,const MATRIX<T,d>& a0, const MATRIX<T,d>& a1, const VECTOR<SYMMETRIC_MATRIX<T,d>,d>& da0, const VECTOR<SYMMETRIC_MATRIX<T,d>,d>& da1, TV df, T e)
 {
-    for(int i=1;i<=TV::m;i++){
+    for(int i=0;i<TV::m;i++){
         TV av=(da1(i)+da0(i))*df/2/e;
         TV dif=(a1.Transposed().Column(i)-a0.Transposed().Column(i))/e;
         char buff[1000];

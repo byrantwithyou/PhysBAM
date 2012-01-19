@@ -90,7 +90,7 @@ Pack(VECTOR_ND<T> &velocities) const
     PHYSBAM_ASSERT(velocities.Size()==Raw_Size());
     int index=0;
     for(int i=1;i<=V.Size();i++)
-        for(int j=1;j<=TV::dimension;j++)
+        for(int j=0;j<TV::dimension;j++)
             velocities(++index)=V.array(i)(j);
 }
 //#####################################################################
@@ -102,7 +102,7 @@ Unpack(VECTOR_ND<T> &velocities)
     PHYSBAM_ASSERT(velocities.Size()==Raw_Size());
     int index=0;
     for(int i=1;i<=V.Size();i++)
-        for(int j=1;j<=TV::dimension;j++)
+        for(int j=0;j<TV::dimension;j++)
             V.array(i)(j)=velocities(++index);
 }
 //#####################################################################
@@ -114,7 +114,7 @@ Unpack_And_Add(VECTOR_ND<T> &velocities)
     PHYSBAM_ASSERT(velocities.Size()==Raw_Size());
     int index=0;
     for(int i=1;i<=V.Size();i++)
-        for(int j=1;j<=TV::dimension;j++)
+        for(int j=0;j<TV::dimension;j++)
             V.array(i)(j)+=velocities(++index);
 }
 template<class TV> int DEFORMABLES_VELOCITY<TV>::

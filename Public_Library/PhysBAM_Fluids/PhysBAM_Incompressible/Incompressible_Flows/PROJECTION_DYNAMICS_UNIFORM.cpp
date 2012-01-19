@@ -112,7 +112,7 @@ Update_Potential_Energy(T_FACE_ARRAYS_SCALAR& face_velocities,T_ARRAYS_SCALAR& p
 {
     ARRAY<TV,TV_INT> energy_gained(p_grid.Domain_Indices());
     for(typename GRID<TV>::CELL_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()) energy_gained(iterator.Cell_Index())=TV();
-    for(typename GRID<TV>::CELL_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();for(int i=1;i<=TV::dimension;i++){
+    for(typename GRID<TV>::CELL_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();for(int i=0;i<TV::dimension;i++){
         if(elliptic_solver->psi_N(FACE_INDEX<TV::dimension>(i,iterator.First_Face_Index(i))) && elliptic_solver->psi_N(FACE_INDEX<TV::dimension>(i,iterator.Second_Face_Index(i)))) continue;
         if(elliptic_solver->psi_N(FACE_INDEX<TV::dimension>(i,iterator.First_Face_Index(i))))
             energy_gained(cell)(i)+=face_velocities(FACE_INDEX<TV::dimension>(i,iterator.Second_Face_Index(i)))*p(cell)*p_grid.dX(i);
@@ -154,7 +154,7 @@ Update_Potential_Energy(T_FACE_ARRAYS_SCALAR& face_velocities_old,T_FACE_ARRAYS_
         face_velocities(full_index)=(T)((face_velocities_old(full_index)+face_velocities_new(full_index))/2.);}
     Update_Potential_Energy(face_velocities,potential_energy,dt);
     
-    for(CELL_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()) for(int i=1;i<=TV::dimension;i++){
+    for(CELL_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()) for(int i=0;i<TV::dimension;i++){
         if(elliptic_solver->psi_N(FACE_INDEX<TV::dimension>(i,iterator.First_Face_Index(i))) && elliptic_solver->psi_N(FACE_INDEX<TV::dimension>(i,iterator.Second_Face_Index(i)))) continue;
         if(!elliptic_solver->psi_N(FACE_INDEX<TV::dimension>(i,iterator.First_Face_Index(i))) && !elliptic_solver->psi_N(FACE_INDEX<TV::dimension>(i,iterator.Second_Face_Index(i)))) continue;
         if(elliptic_solver->psi_N(FACE_INDEX<TV::dimension>(i,iterator.First_Face_Index(i)))) 
@@ -168,7 +168,7 @@ Update_Potential_Energy(T_FACE_ARRAYS_SCALAR& face_velocities_old,T_FACE_ARRAYS_
     PHYSBAM_ASSERT(abs(allowed_energy_gained-allowed_energy_gained_tmp)<1e-5);
     for(CELL_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
         T divergence_u_hat=0;
-        for(int axis=1;axis<=T_GRID::dimension;axis++)divergence_u_hat+=(face_velocities.Component(axis)(iterator.Second_Face_Index(axis))-face_velocities.Component(axis)(iterator.First_Face_Index(axis)))*one_over_dx[axis];
+        for(int axis=0;axis<T_GRID::dimension;axis++)divergence_u_hat+=(face_velocities.Component(axis)(iterator.Second_Face_Index(axis))-face_velocities.Component(axis)(iterator.First_Face_Index(axis)))*one_over_dx[axis];
         T divergence_cell=divergence.Valid_Index(cell)?divergence(cell):0;
         allowed_energy_gained+=density*(divergence_u_hat-divergence_cell)*p(cell);}
 }
@@ -208,7 +208,7 @@ Compute_Divergence_For_Energy_Correction(const T_FACE_ARRAYS_SCALAR& face_veloci
     TV one_over_dx=p_grid.one_over_dX;
     for(CELL_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()){
         T local_divergence=0;
-        for(int axis=1;axis<=T_GRID::dimension;axis++)local_divergence+=(face_velocities.Component(axis)(iterator.Second_Face_Index(axis))-face_velocities.Component(axis)(iterator.First_Face_Index(axis)))*one_over_dx[axis];
+        for(int axis=0;axis<T_GRID::dimension;axis++)local_divergence+=(face_velocities.Component(axis)(iterator.Second_Face_Index(axis))-face_velocities.Component(axis)(iterator.First_Face_Index(axis)))*one_over_dx[axis];
         divergence(iterator.Cell_Index())=local_divergence;}
 }
 //#####################################################################
@@ -220,7 +220,7 @@ Compute_Divergence(const T_FACE_LOOKUP_FIRE_MULTIPHASE& face_lookup,LAPLACE_UNIF
     TV one_over_dx=p_grid.one_over_dX;
     for(CELL_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()){
         const typename T_FACE_LOOKUP_FIRE_MULTIPHASE::LOOKUP& lookup=face_lookup.Starting_Point_Cell(iterator.Cell_Index());T divergence=0;
-        for(int axis=1;axis<=T_GRID::dimension;axis++)divergence+=(lookup(axis,iterator.Second_Face_Index(axis))-lookup(axis,iterator.First_Face_Index(axis)))*one_over_dx[axis];
+        for(int axis=0;axis<T_GRID::dimension;axis++)divergence+=(lookup(axis,iterator.Second_Face_Index(axis))-lookup(axis,iterator.First_Face_Index(axis)))*one_over_dx[axis];
         solver->f(iterator.Cell_Index())=divergence;}
     
     if(use_non_zero_divergence) for(CELL_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next())

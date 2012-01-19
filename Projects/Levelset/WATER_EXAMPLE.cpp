@@ -23,7 +23,7 @@ WATER_EXAMPLE(const STREAM_TYPE stream_type_input,int number_of_threads)
     thread_queue(number_of_threads>1?new THREAD_QUEUE(number_of_threads):0),projection(mac_grid,false,false,thread_queue),advection_scalar(thread_queue),
     boundary(0),levelset(mac_grid,*new ARRAY<T,TV_INT>())
 {
-    for(int i=1;i<=TV::dimension;i++){domain_boundary(i)(1)=true;domain_boundary(i)(2)=true;}
+    for(int i=0;i<TV::dimension;i++){domain_boundary(i)(1)=true;domain_boundary(i)(2)=true;}
     pthread_mutex_init(&lock,0);    
 }
 //#####################################################################
@@ -67,7 +67,7 @@ template<class TV> void WATER_EXAMPLE<TV>::
 Set_Boundary_Conditions(const T time)
 {
     projection.elliptic_solver->psi_D.Fill(false);projection.elliptic_solver->psi_N.Fill(false);
-    for(int axis=1;axis<=TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
+    for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
         TV_INT interior_cell_offset=axis_side==1?TV_INT():-TV_INT::Axis_Vector(axis);
         TV_INT exterior_cell_offset=axis_side==1?-TV_INT::Axis_Vector(axis):TV_INT();
         TV_INT boundary_face_offset=axis_side==1?TV_INT::Axis_Vector(axis):-TV_INT::Axis_Vector(axis);

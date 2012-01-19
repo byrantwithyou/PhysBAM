@@ -15,7 +15,7 @@ PROJECTION_EXAMPLE(const STREAM_TYPE stream_type_input,int number_of_threads)
     restart(0),write_debug_data(false),output_directory("output"),mac_grid(TV_INT(),RANGE<TV>::Unit_Box(),true),mpi_grid(0),
     thread_queue(number_of_threads>1?new THREAD_QUEUE(number_of_threads):0),projection(mac_grid,false,false,thread_queue),boundary(0)
 {
-    for(int i=1;i<=TV::dimension;i++){domain_boundary(i)(1)=true;domain_boundary(i)(2)=true;}
+    for(int i=0;i<TV::dimension;i++){domain_boundary(i)(1)=true;domain_boundary(i)(2)=true;}
 }
 //#####################################################################
 // ~PROJECTION_EXAMPLE
@@ -32,7 +32,7 @@ template<class TV> void PROJECTION_EXAMPLE<TV>::
 Set_Boundary_Conditions(const T time)
 {
     projection.elliptic_solver->psi_D.Fill(false);projection.elliptic_solver->psi_N.Fill(false);
-    for(int axis=1;axis<=TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
+    for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
         if(domain_boundary(axis)(axis_side)){
             TV_INT interior_cell_offset=axis_side==1?TV_INT():-TV_INT::Axis_Vector(axis);    
             for(typename GRID<TV>::FACE_ITERATOR iterator(mac_grid,1,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Face_Index()+interior_cell_offset;

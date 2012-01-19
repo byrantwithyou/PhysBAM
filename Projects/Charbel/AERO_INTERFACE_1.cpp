@@ -95,13 +95,13 @@ Initialize_MPI(TETRAHEDRALIZED_VOLUME<T>& tet_volume,ARRAY<int>& local_to_global
     TV_INT start_index;TV_INT end_index;
     phi_all_solids.Resize(grid);
     T_ARRAYS_VECTOR gradient_global=gradient;gradient.Resize(grid);
-    for(int axis=1;axis<=T_GRID::dimension;axis++)
+    for(int axis=0;axis<T_GRID::dimension;axis++)
         start_index[axis]=mpi_grid->boundaries(axis)(mpi_grid->coordinates[axis]);
 
     ARRAY<BOX<TV> > local_grids;
     for(int proc=1;proc<=mpi_grid->Number_Of_Processors();proc++){
         TV_INT proc_coordinates=mpi_grid->all_coordinates(proc);
-        for(int axis=1;axis<=T_GRID::dimension;axis++){
+        for(int axis=0;axis<T_GRID::dimension;axis++){
             start_index[axis]=mpi_grid->boundaries(axis)(proc_coordinates[axis]);
             end_index[axis]=mpi_grid->boundaries(axis)(proc_coordinates[axis]+1);}
         local_grids.Append(BOX<TV>(mpi_grid->global_grid.X(start_index),mpi_grid->global_grid.X(end_index)).Thickened(tet_volume.Maximum_Edge_Length(0)));}
@@ -177,7 +177,7 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,COMPRESSIBLE_FLU
         T_ARRAYS_BOOL::Put(done,done_ghost);
         BOUNDARY_UNIFORM<T_GRID,bool> done_boundary;
         VECTOR<bool,2*T_GRID::dimension> valid_wall;
-        for(int axis=1;axis<=T_GRID::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++)
+        for(int axis=0;axis<T_GRID::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++)
             valid_wall(2*axis+axis_side-2)=!mpi_grid->Neighbor(axis,axis_side);
         done_boundary.Set_Constant_Extrapolation(valid_wall(1),valid_wall(2),valid_wall(3),valid_wall(4),valid_wall(5),valid_wall(6));
         BOUNDARY_MPI<T_GRID,bool> mpi_done_boundary(mpi_grid,done_boundary,solid_and_fluid_cell_count_to_extrapolate);
@@ -343,7 +343,7 @@ Compute_Ghost_Cells(TETRAHEDRALIZED_VOLUME<T>& tet_volume_aerof,COMPRESSIBLE_FLU
       T_ARRAYS_BOOL::Put(done,done_ghost);
       BOUNDARY_UNIFORM<T_GRID,bool> done_boundary;
       VECTOR<bool,2*T_GRID::dimension> valid_wall;
-      for(int axis=1;axis<=T_GRID::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++)
+      for(int axis=0;axis<T_GRID::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++)
           valid_wall(2*axis+axis_side-2)=!mpi_grid->Neighbor(axis,axis_side);
       done_boundary.Set_Constant_Extrapolation(valid_wall(1),valid_wall(2),valid_wall(3),valid_wall(4),valid_wall(5),valid_wall(6));
       BOUNDARY_MPI<T_GRID,bool> mpi_done_boundary(mpi_grid,done_boundary,solid_and_fluid_cell_count_to_extrapolate);

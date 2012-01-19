@@ -55,7 +55,7 @@ Update_Strain_Equation_Helper_Cell_Centered(const T dt,const T time,const T dens
     TV one_over_two_DX=(T).5*Inverse(grid.dX);T one_over_dimension=1/T_GRID::dimension;
     for(CELL_ITERATOR iterator(grid,0);iterator.Valid();iterator.Next()){
         TV_INT cell=iterator.Cell_Index();MATRIX<T,TV::dimension> VX;
-        for(int axis=1;axis<=T_GRID::dimension;axis++){TV_INT offset=TV_INT::Axis_Vector(axis);
+        for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT offset=TV_INT::Axis_Vector(axis);
             VX.Column(axis)=one_over_two_DX[axis]*(V(cell+offset)-V(cell-offset));} // TODO: maybe change this to do a better difference for the derivative in the same axis as the face
         e(cell)=SYMMETRIC_MATRIX::Conjugate(MATRIX<T,TV::dimension>::Rotation_Matrix(dt*VX.Antisymmetric_Part_Cross_Product_Vector()),e(cell));
         e(cell)+=dt*VX.Symmetric_Part();
@@ -75,7 +75,7 @@ Update_Strain_Equation_Helper_Cell_Centered(const T dt,const T time,const T dens
     TV dt_elastic_modulus_over_density_over_two_DX=dt*elastic_modulus/density*one_over_two_DX;
     V.Fill(TV());
     for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
-        for(int axis=1;axis<=T_GRID::dimension;axis++){TV_INT offset=TV_INT::Axis_Vector(axis);
+        for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT offset=TV_INT::Axis_Vector(axis);
             V(cell)+=dt_elastic_modulus_over_density_over_two_DX[axis]*(e_ghost(cell+offset).Column(axis)-e_ghost(cell-offset).Column(axis));}}
 }
 //#####################################################################
@@ -86,7 +86,7 @@ Update_Strain_Equation(const T dt,const T time,const T density,T_FACE_ARRAYS_SCA
 {
     if(!cfl_called) PHYSBAM_WARNING("Using strain without calling strain CFL");
     T_ARRAYS_VECTOR V(grid.Domain_Indices(1));
-    for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next())for(int axis=1;axis<=T_GRID::dimension;axis++)
+    for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next())for(int axis=0;axis<T_GRID::dimension;axis++)
         V(iterator.Cell_Index())[axis]=(T).5*(face_velocities_ghost.Component(axis)(iterator.First_Face_Index(axis))+face_velocities_ghost.Component(axis)(iterator.Second_Face_Index(axis)));
     Update_Strain_Equation_Helper_Cell_Centered(dt,time,density,(T)1.5,face_velocities_ghost,V,phi_ghost,number_of_ghost_cells);
     // apply the velocity update to the face velocities
@@ -102,7 +102,7 @@ Update_Strain_Equation_Multiphase(const T dt,const T time,const T density,T_FACE
 {
     if(!cfl_called) PHYSBAM_WARNING("Using strain without calling strain CFL");
     T_ARRAYS_VECTOR V(grid.Domain_Indices(1));
-    for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next())for(int axis=1;axis<=T_GRID::dimension;axis++)
+    for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next())for(int axis=0;axis<T_GRID::dimension;axis++)
         V(iterator.Cell_Index())[axis]=(T).5*(face_velocities_ghost.Component(axis)(iterator.First_Face_Index(axis))+face_velocities_ghost.Component(axis)(iterator.Second_Face_Index(axis)));
     Update_Strain_Equation_Helper_Cell_Centered(dt,time,density,0,face_velocities_ghost,V,levelset.phis(region),number_of_ghost_cells);
     // apply the velocity update to the face velocities

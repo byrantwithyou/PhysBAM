@@ -62,7 +62,7 @@ public:
         const RENDERING_OBJECT<T>& intersection_object,const VECTOR<T,3>& intersection_point,const VECTOR<T,3>& same_side_normal,const VECTOR<T,3>& power,
         const typename PHOTON_MAP<T>::PHOTON_MAP_TYPE type,const int diffuse_bounces,const int specular_bounces) const
     {T r=world.random.Get_Uniform_Number((T)0,total_weight);
-    for(int i=1;i<=shaders.m-1;i++){
+    for(int i=0;i<shaders.m-1;i++){
         if(r<=weights(i)){shaders(i)->Receive_Photon(ray,exiting_object,entering_object,intersection_object,intersection_point,same_side_normal,power,type,diffuse_bounces,specular_bounces);return;}
         else r-=weights(i);}
     shaders(shaders.m)->Receive_Photon(ray,exiting_object,entering_object,intersection_object,intersection_point,same_side_normal,power,type,diffuse_bounces,specular_bounces);}

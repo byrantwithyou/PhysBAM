@@ -180,7 +180,7 @@ Create_Preimage_Particles_From_Old_Postimage_Simplices(const TV_INT& cell_index,
 
         simplex_particles.Remove_All();
         T_ELEMENT local_simplex;
-        for(int j=1;j<=T_ELEMENT::dimension;j++){simplex_particles.Append(old_object_particles.X(simplex[j]));local_simplex[j]=j;}
+        for(int j=0;j<T_ELEMENT::dimension;j++){simplex_particles.Append(old_object_particles.X(simplex[j]));local_simplex[j]=j;}
 
         // dice material simplex
         simplices_in_cell.Remove_All();junk_simplices.Remove_All();simplices_in_cell.Append(local_simplex);
@@ -367,7 +367,7 @@ Create_Geometry()
             for(int i=material_particles.m+1;i<=object.particles.array_collection->Size();i++) material_particles.Append(false);
             for(int i=0;i<simplices_in_cell.m;i++){
                 const T_ELEMENT& simplex=object.mesh.elements(simplices_in_cell(i));
-                for(int j=1;j<=TV::dimension+1;j++) material_particles(simplex[j])=true;
+                for(int j=0;j<TV::dimension+1;j++) material_particles(simplex[j])=true;
                 simplex_preimage_volume(i)=T_SIMPLEX::Signed_Size(object.particles.X.Subset(simplex));
                 if(simplex_preimage_volume(i)<=0){lower_dimensional_preimage(i)=true;lower_dimensional_preimage_volume(i)=T_SIMPLEX::Half_Boundary_Measure(object.particles.X.Subset(simplex));}}
 
@@ -561,7 +561,7 @@ Advect_Material_Preimages(const T_FACE_LOOKUP& face_velocities,const T dt,const 
         const VECTOR<int,2>& face_neighbors=Face_Neighbors(object,f);
         const T_FACE_ELEMENT& face=Face(object,f);
         int fixed_nodes=0;
-        for(int j=1;j<=T_FACE_ELEMENT::dimension;j++) if(fixed_particle_list(face[j])) fixed_nodes++;
+        for(int j=0;j<T_FACE_ELEMENT::dimension;j++) if(fixed_particle_list(face[j])) fixed_nodes++;
         TV face_normal;
         TV_INT opposing_cell;
         TV old_center=old_particle_X.Subset(face).Average(),new_center=particle_X.Subset(face).Average();
@@ -599,7 +599,7 @@ Rasterize_Material_Postimages()
         T_ELEMENT simplex=object.mesh.elements(i);
         simplex_particles.Remove_All();
         T_ELEMENT local_simplex;
-        for(int j=1;j<=T_ELEMENT::dimension;j++){simplex_particles.Append(object.particles.X(simplex[j]));local_simplex[j]=j;}
+        for(int j=0;j<T_ELEMENT::dimension;j++){simplex_particles.Append(object.particles.X(simplex[j]));local_simplex[j]=j;}
         TV minimum_node=simplex_particles(1),maximum_node=simplex_particles(1);
         for(int j=2;j<=T_ELEMENT::dimension;j++){minimum_node=TV::Componentwise_Min(minimum_node,simplex_particles(j));maximum_node=TV::Componentwise_Max(maximum_node,simplex_particles(j));}
         RANGE<TV_INT> grid_cells(grid.Clamp_To_Cell(minimum_node),grid.Clamp_To_Cell(maximum_node)); // TOOD: for parallel, this will need to allow border regions.  Also for outflow walls.
@@ -718,7 +718,7 @@ Make_Approximately_Incompressible(T_FACE_ARRAYS_SCALAR& face_velocities,const T 
         dirichlet_neighbor.Fill(false);
         // Set up boundary conditions based on whether there are any
         for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
-            if(psi_D(cell_index)) for(int axis=1;axis<=TV::dimension;axis++){
+            if(psi_D(cell_index)) for(int axis=0;axis<TV::dimension;axis++){
                 dirichlet_neighbor(cell_index+TV_INT::Axis_Vector(axis))=true;
                 dirichlet_neighbor(cell_index-TV_INT::Axis_Vector(axis))=true;}}
         for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();

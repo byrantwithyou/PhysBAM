@@ -76,7 +76,7 @@ public:
                     Z_min->Component(axis)(face)=extrema.x;Z_max->Component(axis)(face)=extrema.y;}}}}
     T_FACE_ARRAYS_BOOL::Exchange_Arrays(face_velocities_valid_mask,face_velocities_valid_mask_next);
     // ghost values should always be valid
-    for(int axis=1;axis<=T_GRID::dimension;axis++) grid.Get_Face_Grid(axis).Put_Ghost(true,face_velocities_valid_mask.Component(axis),3);}
+    for(int axis=0;axis<T_GRID::dimension;axis++) grid.Get_Face_Grid(axis).Put_Ghost(true,face_velocities_valid_mask.Component(axis),3);}
 
     T Compute_Revalidation_Value(const int axis,const TV& from,const TV& to,const T& current_invalid_value,const T& default_value)
     {TV point;COLLISION_GEOMETRY_ID body_id;int aggregate_id;
@@ -89,7 +89,7 @@ public:
     for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) if(!face_velocities_valid_mask.Component(iterator.Axis())(iterator.Face_Index())) 
         face_invalid_indices[iterator.Axis()].Append(PAIR<T_VECTOR_INT,bool>(iterator.Face_Index(),false));
     
-    for(int arrays_axis=1;arrays_axis<=T_GRID::dimension;arrays_axis++){
+    for(int arrays_axis=0;arrays_axis<T_GRID::dimension;arrays_axis++){
         ARRAY<PAIR<T_VECTOR_INT,bool> >& invalid_indices=face_invalid_indices[arrays_axis];
         T_ARRAYS_BOOL_DIMENSION& neighbors_visible=body_list.face_neighbors_visible.Component(arrays_axis);
         T_ARRAYS_BOOL& valid_points=face_velocities_valid_mask.Component(arrays_axis);T_ARRAYS_BASE& values=face_values.Component(arrays_axis);
@@ -101,7 +101,7 @@ public:
             done=true;
             for(int k=0;k<invalid_indices.m;k++){ 
                 T sum=0;int count=0;
-                for(int axis=1;axis<=T_GRID::dimension;axis++){
+                for(int axis=0;axis<T_GRID::dimension;axis++){
                     T_VECTOR_INT min_face=invalid_indices(k).x-T_VECTOR_INT::Axis_Vector(axis),max_face=invalid_indices(k).x+T_VECTOR_INT::Axis_Vector(axis);
                     if(neighbors_visible(min_face)(axis) && valid_points(min_face)){sum+=values(min_face);count++;}
                     if(neighbors_visible(invalid_indices(k).x)(axis) && valid_points(max_face)){sum+=values(max_face);count++;}}
@@ -114,7 +114,7 @@ public:
             done=true;
             for(int k=0;k<invalid_indices.m;k++){ 
                 T sum=0;int count=0;
-                for(int axis=1;axis<=T_GRID::dimension;axis++){
+                for(int axis=0;axis<T_GRID::dimension;axis++){
                     T_VECTOR_INT min_face=invalid_indices(k).x-T_VECTOR_INT::Axis_Vector(axis),max_face=invalid_indices(k).x+T_VECTOR_INT::Axis_Vector(axis);
                     if(neighbors_visible(min_face)(axis)){if(valid_points(min_face)){sum+=values(min_face);count++;}}
                     else{sum+=Compute_Revalidation_Value(arrays_axis,grid.X(invalid_indices(k).x),grid.X(min_face),values(invalid_indices(k).x),T());count++;}

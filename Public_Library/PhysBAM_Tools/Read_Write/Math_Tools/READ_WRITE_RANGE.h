@@ -18,10 +18,10 @@ class Read_Write<RANGE<TV>,RW>
 {
 public:
     static void Read(std::istream& input,RANGE<TV>& object)
-    {for(int i=1;i<=TV::dimension;i++) Read_Binary<RW>(input,object.min_corner(i),object.max_corner(i));}
+    {for(int i=0;i<TV::dimension;i++) Read_Binary<RW>(input,object.min_corner(i),object.max_corner(i));}
 
     static void Write(std::ostream& output,const RANGE<TV>& object)
-    {for(int i=1;i<=TV::dimension;i++) Write_Binary<RW>(output,object.min_corner(i),object.max_corner(i));}
+    {for(int i=0;i<TV::dimension;i++) Write_Binary<RW>(output,object.min_corner(i),object.max_corner(i));}
 };
 template<class TV>
 inline std::ostream& operator<<(std::ostream& output,const RANGE<TV>& box)

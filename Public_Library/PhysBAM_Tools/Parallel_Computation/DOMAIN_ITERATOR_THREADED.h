@@ -60,12 +60,12 @@ public:
                 for(typename GRID<TV>::NODE_ITERATOR iterator(process_grid);iterator.Valid();iterator.Next()){
                     TV_INT coordinates=iterator.Node_Index();
                     TV_INT start,end;
-                    for(int axis=1;axis<=TV::dimension;axis++){
+                    for(int axis=0;axis<TV::dimension;axis++){
                         start[axis]=boundaries(axis)(coordinates[axis])+1;
                         end[axis]=boundaries(axis)(coordinates[axis]+1);}
                     domains(++count).min_corner=start+domain.min_corner-TV_INT::Constant_Vector(overlap_rows);
                     domains(count).max_corner=end+domain.min_corner+TV_INT::Constant_Vector(overlap_rows);
-                    for(int axis=1;axis<=TV::dimension;axis++){
+                    for(int axis=0;axis<TV::dimension;axis++){
                         domains(count).min_corner(axis)=max(domains(count).min_corner(axis),domain.min_corner(axis));
                         domains(count).max_corner(axis)=min(domains(count).max_corner(axis),domain.max_corner(axis));}}}
             else PHYSBAM_FATAL_ERROR();}

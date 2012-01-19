@@ -369,7 +369,7 @@ void Sphere_Pillar()
         RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body(STRING_UTILITIES::string_sprintf("Fractured_Pillar/fragment.%02d",i),1,(T).5);(void)rigid_body;
         rigid_body.Update_Bounding_Box();T_ORIENTED_BOX oriented_box=rigid_body.Oriented_Bounding_Box();
         T min_side_length=FLT_MAX;TV saved_frame=rigid_body.X();
-        for(int dim=1;dim<=TV::m;dim++) min_side_length=min(min_side_length,oriented_box.edges.Column(dim).Magnitude());
+        for(int dim=0;dim<TV::m;dim++) min_side_length=min(min_side_length,oriented_box.edges.Column(dim).Magnitude());
         rigid_body_collection.rigid_body_particle.Remove_Body(rigid_body.particle_index);
         RIGID_BODY<TV>& sphere=tests.Add_Rigid_Body("sphere",min_side_length/(T)2.5,(T).5,true,use_nonanalytic_levelsets);sphere.X()=saved_frame;
         if(sphere.Mass()<(T)1e-5) rigid_body_collection.rigid_body_particle.Remove_Body(sphere.particle_index);}

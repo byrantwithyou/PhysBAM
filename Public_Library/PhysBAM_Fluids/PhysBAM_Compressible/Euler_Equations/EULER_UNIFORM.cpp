@@ -37,7 +37,7 @@ EULER_UNIFORM(const T_GRID& grid_input) :grid(grid_input),mpi_grid(0),U_ghost(U_
     accumulated_boundary_flux(),ghost_cells_valid(false),ghost_cells_valid_ring(0),need_to_remove_added_internal_energy(false)
 {
     assert(!(use_sound_speed_for_cfl && use_sound_speed_based_dt_multiple_for_cfl));
-    for(int i=1;i<=T_GRID::dimension;i++){pressure_flux_dimension_indices(i)=1+i;eigensystems[i]=0;eigensystems_default[i]=0;eigensystems_pressureonly[i]=0;}
+    for(int i=0;i<T_GRID::dimension;i++){pressure_flux_dimension_indices(i)=1+i;eigensystems[i]=0;eigensystems_default[i]=0;eigensystems_pressureonly[i]=0;}
 }
 //#####################################################################
 // Destructor
@@ -45,7 +45,7 @@ EULER_UNIFORM(const T_GRID& grid_input) :grid(grid_input),mpi_grid(0),U_ghost(U_
 template<class T_GRID> EULER_UNIFORM<T_GRID>::
 ~EULER_UNIFORM()
 {
-    for(int i=1;i<=T_GRID::dimension;i++){
+    for(int i=0;i<T_GRID::dimension;i++){
         delete eigensystems[i];
         delete eigensystems_default[i];
         delete eigensystems_pressureonly[i];}
@@ -66,7 +66,7 @@ Set_Up_Cut_Out_Grid(T_ARRAYS_BOOL& psi_input)
 template<class T_GRID> void EULER_UNIFORM<T_GRID>::
 Set_Custom_Equation_Of_State(EOS<T>& eos_input)
 {
-    for(int i=1;i<=T_GRID::dimension;i++){
+    for(int i=0;i<T_GRID::dimension;i++){
         (dynamic_cast<EULER_EIGENSYSTEM<T_GRID>*>(eigensystems[i]))->Set_Custom_Equation_Of_State(eos_input);
         (dynamic_cast<EULER_EIGENSYSTEM<T_GRID>*>(eigensystems_default[i]))->Set_Custom_Equation_Of_State(eos_input);
         (dynamic_cast<EULER_EIGENSYSTEM<T_GRID>*>(eigensystems_pressureonly[i]))->Set_Custom_Equation_Of_State(eos_input);}
@@ -221,12 +221,12 @@ Advance_One_Time_Step_Forces(const T dt,const T time)
 {
     // update gravity
     if(gravity) for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
-        for(int axis=1;axis<=T_GRID::dimension;axis++){
+        for(int axis=0;axis<T_GRID::dimension;axis++){
             if(downward_direction[axis]) U(cell_index)(axis+1)+=dt*U(cell_index)(1)*gravity*downward_direction[axis];}}
 
     // update body force
     if(use_force) for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
-        for(int axis=1;axis<=T_GRID::dimension;axis++) U(cell_index)(axis+1)+=dt*U(cell_index)(1)*force.Component(axis)(cell_index);}
+        for(int axis=0;axis<T_GRID::dimension;axis++) U(cell_index)(axis+1)+=dt*U(cell_index)(1)*force.Component(axis)(cell_index);}
 
     //TODO: Is this necessary?
     boundary->Apply_Boundary_Condition(grid,U,time+dt);
@@ -267,7 +267,7 @@ Advance_One_Time_Step_Explicit_Part(const T dt,const T time,const int rk_substep
 
         // Store time n momentum
         for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
-            for(int axis=1;axis<=T_GRID::dimension;axis++) momentum_n(cell_index)(axis)=U_ghost(cell_index)(axis+1);}}
+            for(int axis=0;axis<T_GRID::dimension;axis++) momentum_n(cell_index)(axis)=U_ghost(cell_index)(axis+1);}}
 
     if(compute_pressure_fluxes && !timesplit){
         conservation->Update_Conservation_Law(grid,U,U_ghost,psi,dt,eigensystems,eigensystems_default,euler_projection.elliptic_solver->psi_N,euler_projection.face_velocities,thinshell,
@@ -390,7 +390,7 @@ CFL_Using_Sound_Speed() const
             velocity_minus_c(cell_index)=velocity_cell-sound_speed*TV::All_Ones_Vector();velocity_plus_c(cell_index)=velocity_cell+sound_speed*TV::All_Ones_Vector();}}
 
     TV max_velocity_minus_c=velocity_minus_c.Componentwise_Maxabs();TV max_velocity_plus_c=velocity_plus_c.Componentwise_Maxabs();
-    T dt_convect=0;for(int axis=1;axis<=T_GRID::dimension;axis++) dt_convect+=max(max_velocity_minus_c(axis),max_velocity_plus_c(axis))/grid.dX[axis];
+    T dt_convect=0;for(int axis=0;axis<T_GRID::dimension;axis++) dt_convect+=max(max_velocity_minus_c(axis),max_velocity_plus_c(axis))/grid.dX[axis];
     dt_convect=max(dt_convect,1/max_time_step);
     LOG::cout<<"max sound speed="<<max_sound_speed<<std::endl;
     LOG::cout<<"max velocity="<<velocity.Componentwise_Maxabs()<<std::endl;
@@ -418,12 +418,12 @@ CFL(const T time) const
         T_ARRAYS_VECTOR grad_p_approx(grid.Domain_Indices());ARRAYS_UTILITIES<T_GRID,T>::Compute_Gradient_At_Cells_From_Face_Data(grid,grad_p_approx,p_approx_face);
 
         for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){const TV_INT cell_index=iterator.Cell_Index();
-            if(psi(cell_index)) for(int axis=1;axis<=T_GRID::dimension;axis++){
+            if(psi(cell_index)) for(int axis=0;axis<T_GRID::dimension;axis++){
                 max_lambdas[axis]=max(max_lambdas[axis],eigensystems[axis]->Maximum_Magnitude_Eigenvalue(U(cell_index)));
                 max_grad_p[axis]=maxabs(max_grad_p[axis],grad_p_approx(cell_index)[axis]);
                 max_grad_p_over_rho[axis]=maxabs(max_grad_p_over_rho[axis],grad_p_approx(cell_index)[axis]/U(cell_index)(1));}}
 
-        T dt_convect=0;for(int axis=1;axis<=T_GRID::dimension;axis++){
+        T dt_convect=0;for(int axis=0;axis<T_GRID::dimension;axis++){
             T max_u_over_dx=max_lambdas[axis]*one_over_dx[axis];
             dt_convect+=max_u_over_dx+sqrt(max_u_over_dx*max_u_over_dx+((T)4*max_grad_p_over_rho[axis])*one_over_dx[axis]);}
         dt_convect=(T).5*dt_convect;
@@ -434,9 +434,9 @@ CFL(const T time) const
         sum_ratios+=ratio_new_dt_to_old_dt;count_ratios++;
         LOG::cout<<"dt after CFL="<<1/one_over_dt<<std::endl;
         LOG::cout<<"Ratio of new dt to old dt="<<ratio_new_dt_to_old_dt<<", average ratio till now="<<(sum_ratios/(T)count_ratios)<<std::endl;
-        LOG::cout<<"max_lambdas= ";for(int axis=1;axis<=T_GRID::dimension;axis++) LOG::cout<<max_lambdas[axis]<<", ";LOG::cout<<std::endl;
-        LOG::cout<<"max_grad_p_over_rho= ";for(int axis=1;axis<=T_GRID::dimension;axis++) LOG::cout<<max_grad_p_over_rho[axis]<<", ";LOG::cout<<std::endl;
-        LOG::cout<<"max_grad_p= ";for(int axis=1;axis<=T_GRID::dimension;axis++) LOG::cout<<max_grad_p[axis]<<", ";LOG::cout<<std::endl;
+        LOG::cout<<"max_lambdas= ";for(int axis=0;axis<T_GRID::dimension;axis++) LOG::cout<<max_lambdas[axis]<<", ";LOG::cout<<std::endl;
+        LOG::cout<<"max_grad_p_over_rho= ";for(int axis=0;axis<T_GRID::dimension;axis++) LOG::cout<<max_grad_p_over_rho[axis]<<", ";LOG::cout<<std::endl;
+        LOG::cout<<"max_grad_p= ";for(int axis=0;axis<T_GRID::dimension;axis++) LOG::cout<<max_grad_p[axis]<<", ";LOG::cout<<std::endl;
 
         // Try going to a higher cfl number on time step computed using sound speed
         if(use_sound_speed_based_dt_multiple_for_cfl && (ratio_new_dt_to_old_dt>multiplication_factor_for_sound_speed_based_dt)){

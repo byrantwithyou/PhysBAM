@@ -61,7 +61,7 @@ int main(int argc,char** argv)
         if(num_sides==3){*input>>s1>>s2>>s3;triangles.Set(p,s1+1,s2+1,s3+1);}
         else{
             *input>>s1>>s2>>s3;triangles.Set(p,s1+1,s2+1,s3+1);
-            for(int s=1;s<=num_sides-3;s++){s2=s3;*input>>s3;triangles.Append(s2+1,s3+1,s1+1);}}}
+            for(int s=0;s<num_sides-3;s++){s2=s3;*input>>s3;triangles.Append(s2+1,s3+1,s1+1);}}}
     std::cout<<"num_polygons: "<<triangles.m<<std::endl;
     TRIANGULATED_SURFACE<float>* triangulated_surface=new TRIANGULATED_SURFACE<float>(*new TRIANGLE_MESH(triangles),*new SOLIDS_PARTICLES<float,VECTOR_3D<float> >);
     triangulated_surface->particles.Add_Particles(num_vertices);for(int i=0;i<num_vertices;i++)triangulated_surface->particles.X(i)=vertices(i);

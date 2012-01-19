@@ -236,7 +236,7 @@ World_Space_Simplex_Bounding_Box(const int id) const
 {
     const VECTOR<int,TV::dimension>& elements=simplicial_object->mesh.elements(id);
     VECTOR<TV,TV::dimension> pts;
-    for(int i=1;i<=TV::dimension;i++) pts(i)=World_Space_Point(simplicial_object->particles.X(elements(i)));
+    for(int i=0;i<TV::dimension;i++) pts(i)=World_Space_Point(simplicial_object->particles.X(elements(i)));
     return RANGE<TV>::Bounding_Box(pts);
 }
 //#####################################################################
@@ -251,7 +251,7 @@ World_Space_Simplex(const int id) const
 {
     const VECTOR<int,TV::dimension>& elements=simplicial_object->mesh.elements(id);
     VECTOR<TV,TV::dimension> pts;
-    for(int i=1;i<=TV::dimension;i++) pts(i)=World_Space_Point(simplicial_object->particles.X(elements(i)));
+    for(int i=0;i<TV::dimension;i++) pts(i)=World_Space_Point(simplicial_object->particles.X(elements(i)));
     return typename BASIC_SIMPLEX_POLICY<TV,TV::dimension-1>::SIMPLEX(pts);
 }
 //#####################################################################
@@ -262,7 +262,7 @@ World_Space_Simplex_Bounding_Box(const int id,const FRAME<TV>& frame) const
 {
     const VECTOR<int,TV::dimension>& elements=simplicial_object->mesh.elements(id);
     VECTOR<TV,TV::dimension> pts;
-    for(int i=1;i<=TV::dimension;i++) pts(i)=frame*simplicial_object->particles.X(elements(i));
+    for(int i=0;i<TV::dimension;i++) pts(i)=frame*simplicial_object->particles.X(elements(i));
     return RANGE<TV>::Bounding_Box(pts);
 }
 template<class TV> void RIGID_GEOMETRY<TV>::

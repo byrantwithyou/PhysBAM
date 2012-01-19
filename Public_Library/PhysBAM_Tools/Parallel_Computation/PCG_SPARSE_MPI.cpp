@@ -289,7 +289,7 @@ Find_Ghost_Regions(SPARSE_MATRIX_FLAT_NXN<T>& A,const ARRAY<VECTOR<int,2> >& pro
             MPI_UTILITIES::Pack(columns_to_receive(node_rank),send_buffers(node_rank),position,comm);
             requests.Append(comm.Isend(&(send_buffers(node_rank)(1)),position,MPI::PACKED,node_rank-1,tag));}}
     // Receive a list from each of the other procs, and store this list
-    for(int node_rank=1;node_rank<=columns_to_receive.m-1;node_rank++){
+    for(int node_rank=0;node_rank<columns_to_receive.m-1;node_rank++){
         MPI::Status status;
         comm.Probe(MPI::ANY_SOURCE,tag,status);
         int source=status.Get_source();

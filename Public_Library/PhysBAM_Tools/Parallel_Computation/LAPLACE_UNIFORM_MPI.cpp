@@ -92,7 +92,7 @@ Find_Matrix_Indices_Threaded(ARRAY<RANGE<TV_INT> >& domains,ARRAY<ARRAY<INTERVAL
         for(int color=0;color<interior_indices.m;color++) interior_indices(color)(i).max_corner=filled_region_cell_count(color);}
     for(int color=0;color<filled_region_ranks.m;color++) partitions(color).interior_indices.max_corner=filled_region_cell_count(color);
     //boundary mpi cells
-    for(int axis=1;axis<=TV::dimension;axis++) for(int side=0;side<2;side++){int s=(axis-1)*2+side;
+    for(int axis=0;axis<TV::dimension;axis++) for(int side=0;side<2;side++){int s=(axis-1)*2+side;
         for(int color=0;color<filled_region_ranks.m;color++) partitions(color).ghost_indices(s).min_corner=filled_region_cell_count(color)+1;
         RANGE<TV_INT> exterior_domain(local_grid.Domain_Indices(1));
         for(int axis2=axis+1;axis2<=TV::dimension;axis2++){exterior_domain.min_corner(axis2)++;exterior_domain.max_corner(axis2)--;}
@@ -100,8 +100,8 @@ Find_Matrix_Indices_Threaded(ARRAY<RANGE<TV_INT> >& domains,ARRAY<ARRAY<INTERVAL
         else exterior_domain.min_corner(axis)=exterior_domain.max_corner(axis);
         for(int i=0;i<domains.m;i++){
             RANGE<TV_INT> interior_domain(domains(i));
-            interior_domain.max_corner-=TV_INT::All_Ones_Vector();for(int axis=1;axis<=TV_INT::dimension;axis++) if(interior_domain.max_corner(axis)==local_grid.Domain_Indices().max_corner(axis)) interior_domain.max_corner(axis)++;
-            interior_domain.min_corner+=TV_INT::All_Ones_Vector();for(int axis=1;axis<=TV_INT::dimension;axis++) if(interior_domain.min_corner(axis)==local_grid.Domain_Indices().min_corner(axis)) interior_domain.min_corner(axis)--;
+            interior_domain.max_corner-=TV_INT::All_Ones_Vector();for(int axis=0;axis<TV_INT::dimension;axis++) if(interior_domain.max_corner(axis)==local_grid.Domain_Indices().max_corner(axis)) interior_domain.max_corner(axis)++;
+            interior_domain.min_corner+=TV_INT::All_Ones_Vector();for(int axis=0;axis<TV_INT::dimension;axis++) if(interior_domain.min_corner(axis)==local_grid.Domain_Indices().min_corner(axis)) interior_domain.min_corner(axis)--;
             for(int color=0;color<interior_indices.m;color++) ghost_indices(color)(i)(s).min_corner=filled_region_cell_count(color)+1;
             laplace->Compute_Matrix_Indices(RANGE<TV_INT>::Intersect(exterior_domain,interior_domain),filled_region_cell_count,matrix_index_to_cell_index_array,cell_index_to_matrix_index);
             for(int color=0;color<interior_indices.m;color++) ghost_indices(color)(i)(s).max_corner=filled_region_cell_count(color);}

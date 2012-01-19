@@ -175,7 +175,7 @@ void Set_Dirichlet_Boundary_Conditions(const T time) PHYSBAM_OVERRIDE
     T_FACE_ARRAYS_SCALAR& face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
 
     RANGE<TV_INT> right_grid_cells=RANGE<TV_INT>(TV_INT(fluids_parameters.grid->counts.x-2,1,1),fluids_parameters.grid->Numbers_Of_Cells());
-    for(int axis=1;axis<=T_GRID::dimension;axis++){
+    for(int axis=0;axis<T_GRID::dimension;axis++){
         RANGE<TV_INT> right_grid_faces=right_grid_cells+RANGE<TV_INT>(TV_INT(),TV_INT::Axis_Vector(axis));
         for(FACE_ITERATOR iterator(*fluids_parameters.grid,right_grid_faces,axis);iterator.Valid();iterator.Next()){TV_INT face=iterator.Face_Index();
             psi_N.Component(axis)(face)=true;face_velocities.Component(axis)(face)=axis==1?(T)-1:(T)0;}}

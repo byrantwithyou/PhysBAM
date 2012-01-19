@@ -148,7 +148,7 @@ Set_Up_For_Projection(T_FACE_ARRAYS_SCALAR& face_velocities,const T time)
             if(distance_squared<radius_plus_half_dx_squared && particles_in_cell.Valid_Index(cell)){
                 if(!particles_in_cell(cell).m)particles_in_cell(cell).Preallocate(15);
                 particles_in_cell(cell).Append(p);}}
-        for(int axis=1;axis<=T_GRID::dimension;axis++)
+        for(int axis=0;axis<T_GRID::dimension;axis++)
             for(FACE_ITERATOR iterator(grid,particle_cells+RANGE<TV_INT>(TV_INT(),TV_INT::Axis_Vector(axis)),axis);iterator.Valid();iterator.Next()){
                 TV_INT face=iterator.Face_Index();
                 TV X_minus_Xp=grid.Face(axis,face)-sph_particles.X(p);T distance_squared=X_minus_Xp.Magnitude_Squared();
@@ -195,7 +195,7 @@ Set_Up_For_Projection(T_FACE_ARRAYS_SCALAR& face_velocities,const T time)
     projection.divergence_multiplier.Fill(0);projection.divergence.Fill(0);
     T_ARRAYS_BOOL cells_valid(grid.Domain_Indices(1));cells_valid.Fill(true); 
     for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
-        if(projection.elliptic_solver->psi_D(cell)) for(int axis=1;axis<=T_GRID::dimension;axis++) for(int k=0;k<=1;k++){
+        if(projection.elliptic_solver->psi_D(cell)) for(int axis=0;axis<T_GRID::dimension;axis++) for(int k=0;k<=1;k++){
             TV_INT face(cell);face[axis]+=k;if(!face_weight(axis,face)) cells_valid(cell)=false;}}
     for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
         if(cells_valid(cell) && cell_weight(cell)>ballistic_particles_per_cell) projection.elliptic_solver->psi_D(cell)=false;
@@ -209,7 +209,7 @@ Set_Up_For_Projection(T_FACE_ARRAYS_SCALAR& face_velocities,const T time)
     for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
         int axis=iterator.Axis();TV_INT face=iterator.Face_Index();
         if(projection.elliptic_solver->psi_N(axis,face)) face_velocities(axis,face)=preset_velocities(axis,face);}
-    for(int axis=1;axis<=T_GRID::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
+    for(int axis=0;axis<T_GRID::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
         if(!fluids_parameters.mpi_grid || !fluids_parameters.mpi_grid->Neighbor(axis,axis_side)){
             TV_INT interior_cell_offset=axis_side==1?TV_INT():-TV_INT::Axis_Vector(axis);
             for(FACE_ITERATOR iterator(grid,1,T_GRID::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Face_Index()+interior_cell_offset;
@@ -272,7 +272,7 @@ Postprocess_Particles(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T t
     for(int p=1;p<=sph_particles.array_collection->Size();p++){
         T delta_slip=grid_to_particle_slip_multiplier*max((T)0,interpolation.Clamped_To_Array_Cell(grid,cell_weight,sph_particles.X(p))-ballistic_particles_per_cell);
         delta_slip=min((T)1,delta_slip/target_minus_ballistic_particles_per_cell);
-        for(int axis=1;axis<=T_GRID::dimension;axis++) if(delta_weight(p)[axis]){
+        for(int axis=0;axis<T_GRID::dimension;axis++) if(delta_weight(p)[axis]){
         sph_particles.V(p)[axis]+=delta_slip*delta_velocity(p)[axis]/delta_weight(p)[axis];}}
 
     if(flip_ratio!=1){
@@ -282,7 +282,7 @@ Postprocess_Particles(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T t
         incompressible.boundary->Fill_Ghost_Cells_Face(grid,face_velocities,face_velocities_ghost,time,ghost_cells);
         for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face=iterator.Face_Index();
             if(incompressible.projection.elliptic_solver->psi_N(axis,face)){int valid_neighbors=0;T face_velocity=0;
-                for(int i=1;i<=T_GRID::number_of_one_ring_neighbors_per_cell;i++){
+                for(int i=0;i<T_GRID::number_of_one_ring_neighbors_per_cell;i++){
                     TV_INT face_neighbor=T_GRID::One_Ring_Neighbor(face,i); // TODO: Check that this is correct for one-way coupling
                     if(face_weight(axis,face_neighbor)&&!incompressible.projection.elliptic_solver->psi_N(axis,face_neighbor)){
                         valid_neighbors++;face_velocity+=face_velocities_ghost(axis,face_neighbor);}}
@@ -347,7 +347,7 @@ Rasterize_Velocities_To_Grid(T_FACE_ARRAYS_SCALAR& velocities,T_ARRAYS_SCALAR& c
             int p=particles_in_cell(cell)(k);
             TV X_minus_Xp=X-sph_particles.X(p);T distance_squared=X_minus_Xp.Magnitude_Squared();
             T weight=(1-distance_squared*one_over_radius_squared)*one_over_total_particle_cell_weight(p); 
-            int weight_multiplier=1;if(adjust_cell_weights_on_neumann_boundaries) for(int axis=1;axis<=T_GRID::dimension;axis++){ // TODO: Make this more accurate
+            int weight_multiplier=1;if(adjust_cell_weights_on_neumann_boundaries) for(int axis=0;axis<T_GRID::dimension;axis++){ // TODO: Make this more accurate
                 TV_INT face1=grid.First_Face_Index_In_Cell(axis,cell),face2=grid.Second_Face_Index_In_Cell(axis,cell);
                 if(incompressible.projection.elliptic_solver->psi_N(axis,face1)) if(sph_particles.X(p)(axis)>X(axis)+.5*grid.dX(axis)) weight_multiplier++;
                 if(incompressible.projection.elliptic_solver->psi_N(axis,face2)) if(sph_particles.X(p)(axis)<X(axis)-.5*grid.dX(axis)) weight_multiplier++;}
@@ -493,7 +493,7 @@ template<class T_GRID> template<class T_ARRAYS_PARTICLES> void SPH_EVOLUTION_UNI
 Move_Particles_Off_Grid_Boundaries(T_ARRAYS_PARTICLES& particles,const T tolerance) const
 {
     assert(fluids_parameters.mpi_grid);
-    for(int axis=1;axis<=T_GRID::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
+    for(int axis=0;axis<T_GRID::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
         if(fluids_parameters.mpi_grid->Neighbor(axis,axis_side)){
             for(NODE_ITERATOR iterator(grid,0,T_GRID::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
                 TV_INT block=iterator.Node_Index();

@@ -34,7 +34,7 @@ WATER_EXAMPLE(const STREAM_TYPE stream_type_input,int number_of_threads,int refi
 {
     Initialize_Particles();Initialize_Read_Write_General_Structures();
     incompressible.Set_Custom_Advection(advection_scalar);
-    for(int i=1;i<=TV::dimension;i++){domain_boundary(i)(1)=true;domain_boundary(i)(2)=true;}
+    for(int i=0;i<TV::dimension;i++){domain_boundary(i)(1)=true;domain_boundary(i)(2)=true;}
     domain_boundary(2)(2)=false;
 }
 //#####################################################################
@@ -75,7 +75,7 @@ template<class TV> void WATER_EXAMPLE<TV>::
 Set_Boundary_Conditions(const T time)
 {
     projection.elliptic_solver->psi_D.Fill(false);projection.elliptic_solver->psi_N.Fill(false);
-    for(int axis=1;axis<=TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
+    for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
         TV_INT interior_cell_offset=axis_side==1?TV_INT():-TV_INT::Axis_Vector(axis);
         TV_INT exterior_cell_offset=axis_side==1?-TV_INT::Axis_Vector(axis):TV_INT();
         TV_INT boundary_face_offset=axis_side==1?TV_INT::Axis_Vector(axis):-TV_INT::Axis_Vector(axis);
@@ -120,7 +120,7 @@ Adjust_Phi_With_Objects(const T time)
             TV_INT index=iterator.Cell_Index();TV location=mac_grid.X(index);
             if(particle_levelset_evolution.phi(index)<0 && rigid_geometry_collection.Rigid_Geometry(id).Implicit_Geometry_Extended_Value(location)<0){
                 TV V_fluid;
-                for(int i=1;i<=TV::dimension;i++) V_fluid(i)=(face_velocities(FACE_INDEX<TV::dimension>(i,iterator.First_Face_Index(i)))+face_velocities(FACE_INDEX<TV::dimension>(i,iterator.Second_Face_Index(i))))/2.;
+                for(int i=0;i<TV::dimension;i++) V_fluid(i)=(face_velocities(FACE_INDEX<TV::dimension>(i,iterator.First_Face_Index(i)))+face_velocities(FACE_INDEX<TV::dimension>(i,iterator.Second_Face_Index(i))))/2.;
                 TV V_object=rigid_geometry_collection.Rigid_Geometry(id).Pointwise_Object_Velocity(location); // velocity object should be spatially varying
                 TV V_relative=V_fluid-V_object;
                 TV normal=rigid_geometry_collection.Rigid_Geometry(id).Implicit_Geometry_Normal(location);

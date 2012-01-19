@@ -61,7 +61,7 @@ Compute_Delta_Flux_For_Clamping_Variable(const T_GRID& grid,const int number_of_
     for(CELL_ITERATOR iterator(grid,number_of_ghost_cells);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         T outgoing_flux=0;overshoot_percentages(cell_index)=0;
         for(int i=1;i<=T_GRID::dimension*2;i++) clamp_flux(i)=false;
-        for(int axis=1;axis<=T_GRID::dimension;axis++){TV_INT first_face_index=iterator.First_Face_Index(axis),second_face_index=iterator.Second_Face_Index(axis);
+        for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT first_face_index=iterator.First_Face_Index(axis),second_face_index=iterator.Second_Face_Index(axis);
             if(flux.Component(axis)(first_face_index)(clamped_variable_index)<0){clamp_flux(2*axis-1)=true;
                 outgoing_flux-=dt*flux.Component(axis)(first_face_index)(clamped_variable_index)*one_over_dx[axis];}
             if(flux.Component(axis)(second_face_index)(clamped_variable_index)>0){clamp_flux(2*axis)=true;
@@ -76,7 +76,7 @@ Compute_Delta_Flux_For_Clamping_Variable(const T_GRID& grid,const int number_of_
                 T overshoot=clamped_value-clamped_variable_value;
                 overshoot_percentages(cell_index)=overshoot/outgoing_flux;}}
         if(overshoot_percentages(cell_index))
-            for(int axis=1;axis<=T_GRID::dimension;axis++){TV_INT first_face_index=iterator.First_Face_Index(axis),second_face_index=iterator.Second_Face_Index(axis);
+            for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT first_face_index=iterator.First_Face_Index(axis),second_face_index=iterator.Second_Face_Index(axis);
                 if(clamp_flux(2*axis-1)){
                     if(!psi_N.Component(axis)(first_face_index))
                         delta_flux.Component(axis)(first_face_index)(clamped_variable_index)=(-overshoot_percentages(cell_index))*flux.Component(axis)(first_face_index)(clamped_variable_index);
@@ -101,7 +101,7 @@ Compute_Flux_Without_Clamping(const T_GRID& grid,const T_ARRAYS_DIMENSION_SCALAR
     TV dx=grid.dX;
     FLOOD_FILL_1D find_connected_components;
 
-    for(int axis=1;axis<=T_GRID::dimension;axis++){
+    for(int axis=0;axis<T_GRID::dimension;axis++){
         U_start=U_domain_indices.min_corner(axis);U_end=U_domain_indices.max_corner(axis);
         U_ghost_start=U_ghost_domain_indices.min_corner(axis);U_ghost_end=U_ghost_domain_indices.max_corner(axis);
         ARRAY<TV_DIMENSION,VECTOR<int,1> > U_1d_axis(U_ghost_start,U_ghost_end),flux_axis_1d(U_start,U_end);
@@ -114,7 +114,7 @@ Compute_Flux_Without_Clamping(const T_GRID& grid,const T_ARRAYS_DIMENSION_SCALAR
         T_GRID_LOWER_DIM lower_dimension_grid=grid.Remove_Dimension(axis);
         for(CELL_ITERATOR_LOWER_DIM iterator(lower_dimension_grid);iterator.Valid();iterator.Next()){TV_INT_LOWER_DIM cell_index=iterator.Cell_Index();
             VECTOR<int,3> slice_index;TV_INT cell_index_full_dimension=cell_index.Insert(0,axis);
-            for(int axis_slice=1;axis_slice<=T_GRID::dimension;axis_slice++){
+            for(int axis_slice=0;axis_slice<T_GRID::dimension;axis_slice++){
                 slice_index[axis_slice]=cell_index_full_dimension[axis_slice];}
 
             for(int i=U_start;i<=U_end;i++){
@@ -214,7 +214,7 @@ Update_Conservation_Law(T_GRID& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS
 
         T momentum_dt=dt;
         T clamp_e_cell=clamp_e*EULER<T_GRID>::e(U,cell_index);
-        for(int axis=1;axis<=TV::dimension;axis++){
+        for(int axis=0;axis<TV::dimension;axis++){
             T tmp_dt=dt;
             T momentum_flux_sqr=rhs(cell_index)(axis+1)*rhs(cell_index)(axis+1);
             T a=2*rhs(cell_index)(1)*rhs(cell_index)(d)-momentum_flux_sqr-2*clamp_e_cell*rhs(cell_index)(1)*rhs(cell_index)(1);
@@ -230,7 +230,7 @@ Update_Conservation_Law(T_GRID& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS
                 else tmp_dt=dt;}
             momentum_dt=min(momentum_dt,tmp_dt);}
         e_dt(cell_index)=dt;
-        for(int axis=1;axis<=TV::dimension;axis++) e_dt(cell_index)=min(e_dt(cell_index),momentum_dt);}
+        for(int axis=0;axis<TV::dimension;axis++) e_dt(cell_index)=min(e_dt(cell_index),momentum_dt);}
 
     min_dt=min(rho_dt.Min(),e_dt.Min());
     LOG::cout<<"dt: "<<dt<<" Min dt: "<<min_dt<<std::endl;

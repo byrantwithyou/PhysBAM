@@ -459,10 +459,10 @@ Print_Each_Matrix(int n) const
          oo.Begin_Sparse_Matrix("Mi",temporary_solids_velocity.Raw_Size(),temporary_solids_velocity.Raw_Size());
 
          for(int i=1;i<=solid_mass->one_over_mass.Size();i++)
-             for(int j=1;j<=TV::m;j++)
+             for(int j=0;j<TV::m;j++)
                  oo.Append_Sparse_Diagonal_Block(solid_mass->one_over_mass(i));
          for(int i=1;i<=solid_mass->world_space_rigid_mass_inverse.Size();i++){
-             for(int j=1;j<=TV::m;j++)
+             for(int j=0;j<TV::m;j++)
                  oo.Append_Sparse_Diagonal_Block(solid_mass->world_space_rigid_mass_inverse(i).mass);
              oo.Append_Sparse_Diagonal_Block(solid_mass->world_space_rigid_mass_inverse(i).inertia_tensor);}
 
@@ -860,8 +860,8 @@ Compute_Inverse_Mass_Matrix(SPARSE_MATRIX_FLAT_MXN<T>& inverse_mass)
         for(int i=1;i<=solid_mass->world_space_rigid_mass_inverse.Size();i++){
             for(int j=1;j<=TV::m;j++,k++)
                 matrix_helper.data.Append(TRIPLE<int,int,T>(k,k,solid_mass->world_space_rigid_mass_inverse(i).mass));
-            for(int j=1;j<=TV::SPIN::m;j++)
-                for(int n=1;n<=TV::SPIN::m;n++)
+            for(int j=0;j<TV::SPIN::m;j++)
+                for(int n=0;n<TV::SPIN::m;n++)
                     matrix_helper.data.Append(TRIPLE<int,int,T>(k+j-1,k+n-1,solid_mass->world_space_rigid_mass_inverse(i).inertia_tensor(j,n)));
             k+=TV::SPIN::m;}
         matrix_helper.Shift(size_fluids,size_fluids);
@@ -990,7 +990,7 @@ Mark_Valid_Faces(ARRAY<bool,FACE_INDEX<TV::m> >& valid) const
 {
     const ARRAY<int>& offsets=fluid_gradient->gradient.offsets;
     valid.Fill(false);
-    for(int i=1;i<=index_map.indexed_faces.m-1;i++){
+    for(int i=0;i<index_map.indexed_faces.m-1;i++){
         if(offsets(i)<offsets(i+1)){
             valid(index_map.indexed_faces(i))=true;
             /*Add_Debug_Particle(index_map.grid.Axis_X_Face(index_map.indexed_faces(i)),VECTOR<typename TV::SCALAR,3>(0,1,0));*/}}

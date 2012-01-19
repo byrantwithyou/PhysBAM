@@ -67,7 +67,7 @@ public:
 
 private:
     bool Out_Of_Range(const TV& location) const
-    {for(int i=1;i<=TV::m;i++) if(location(i)*one_over_voxel_size<=INT_MIN/2||location(i)*one_over_voxel_size>=INT_MAX/2) return true; return false;}
+    {for(int i=0;i<TV::m;i++) if(location(i)*one_over_voxel_size<=INT_MIN/2||location(i)*one_over_voxel_size>=INT_MAX/2) return true; return false;}
 
     RANGE<TV_INT> Voxel_Range(const ID index) const
     {return Voxel(collision_bodies(index)->Axis_Aligned_Bounding_Box().Thickened(collision_body_thickness));}

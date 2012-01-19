@@ -102,7 +102,7 @@ Adjust_Bounding_Boxes(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const T f
                             rigid_body->simplicial_object==rigid_body_collection.Rigid_Body(rigid_body_id_j).simplicial_object){
                             already_adjusted=true;break;}}
                     if(!already_adjusted){
-                        TV delta,edge_lengths=box.Edge_Lengths();for(int d=1;d<=TV::dimension;d++) if(edge_lengths[d]==0) delta[d]=false_thickness;
+                        TV delta,edge_lengths=box.Edge_Lengths();for(int d=0;d<TV::dimension;d++) if(edge_lengths[d]==0) delta[d]=false_thickness;
                         box.Change_Size(delta+extra_padding_distance);}
                     rigid_body->Update_Bounding_Box();}}}}
 }
@@ -797,7 +797,7 @@ Push_Out_From_Rigid_Body(RIGID_BODY<TV>& rigid_body,ARRAY<RIGID_BODY_PARTICLE_IN
             A.Set_Submatrix(TV::dimension*(TV::dimension==3)+1,1,Y*M[1]); // Don't compile index out of bounds in 2D, even though this case cannot happen in 2D.
             b.Set_Subvector(TV::dimension+1,Y*b_helper[1]);
             MATRIX<T,1,TV::dimension+T_SPIN::dimension> A_row;
-            for(int i=1;i<=TV::dimension;i++){
+            for(int i=0;i<TV::dimension;i++){
                 Z_helper.Get_Submatrix(i,1,A_row);
                 int matrix_index=i==u_index?0:1;
                 A.Set_Submatrix(i,1,A_row*M[matrix_index]);

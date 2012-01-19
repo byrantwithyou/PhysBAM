@@ -249,7 +249,7 @@ Rigid_Fracture_Where_High_Stress(const T small_number)
                     T_DIAGONAL_MATRIX eigenvalues=sigma(deformable_tet).Fast_Eigenvalues();
                     T threshold=fracture_object->fracture_threshold[number_of_cuts+1]*rigid_body->levelset_grain_boundaries->Element_Weakness_Multiplier(number_of_regions,regions);
                     T amt_over=eigenvalues.First()-threshold,amt_under=fracture_object->compressive_threshold[number_of_cuts+1]-eigenvalues.Last();
-                    if((amt_over>0 && amt_over>amt_under) || amt_under>0)for(int i=1;i<=number_of_regions-1;i++){
+                    if((amt_over>0 && amt_over>amt_under) || amt_under>0)for(int i=0;i<number_of_regions-1;i++){
                         VECTOR<T,4> element_phi;rigid_body->levelset_grain_boundaries->Phi_For_Region_In_Element(t,regions[i],element_phi);
                         fracture_object->Add_Cut_Based_On_Phi(rigid_body->rigid_to_deformable_tets(t),element_phi);}}}}}
     fracture_object->Fracture_Where_High_Stress(sigma,spatial_fracture_bias_direction);*/

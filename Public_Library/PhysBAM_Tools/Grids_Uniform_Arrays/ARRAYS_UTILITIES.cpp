@@ -53,7 +53,7 @@ Compute_Gradient_At_Cells_From_Face_Data(const T_GRID& face_grid,T_ARRAYS_DIMENS
 {
     TV one_over_dx=face_grid.one_over_dX;
     for(CELL_ITERATOR iterator(face_grid,number_of_ghost_cells);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
-        for(int axis=1;axis<=T_GRID::dimension;axis++){TV_INT first_face_index=iterator.First_Face_Index(axis),second_face_index=iterator.Second_Face_Index(axis);
+        for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT first_face_index=iterator.First_Face_Index(axis),second_face_index=iterator.Second_Face_Index(axis);
             grad_cell_array(cell_index)[axis]=one_over_dx[axis]*(face_array.Component(axis)(second_face_index)-face_array.Component(axis)(first_face_index));}}
 }
 //#####################################################################
@@ -65,7 +65,7 @@ Compute_Divergence_At_Cells_From_Face_Data(const T_GRID& face_grid,T_ARRAYS_DIME
     TV one_over_dx=face_grid.one_over_dX;
     for(CELL_ITERATOR iterator(face_grid,number_of_ghost_cells);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         div_cell_array(cell_index)=T2();
-        for(int axis=1;axis<=T_GRID::dimension;axis++){TV_INT first_face_index=iterator.First_Face_Index(axis),second_face_index=iterator.Second_Face_Index(axis);
+        for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT first_face_index=iterator.First_Face_Index(axis),second_face_index=iterator.Second_Face_Index(axis);
             div_cell_array(cell_index)+=one_over_dx[axis]*(face_array.Component(axis)(second_face_index)-face_array.Component(axis)(first_face_index));}}
 }
 //#####################################################################

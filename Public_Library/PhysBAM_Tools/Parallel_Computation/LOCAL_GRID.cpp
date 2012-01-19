@@ -90,7 +90,7 @@ Get(const T_ARRAYS& global_data,T_ARRAYS& local_data) const
 template<class T_GRID> template<class T_FACE_ARRAYS> void LOCAL_GRID<T_GRID>::
 Put_Faces(const T_FACE_ARRAYS& local_data,T_FACE_ARRAYS& global_data) const
 {
-    for(int axis=1;axis<=T_GRID::dimension;axis++) Put(local_data.Component(axis),global_data.Component(axis),mpi_grid.Face_Sentinels(axis));
+    for(int axis=0;axis<T_GRID::dimension;axis++) Put(local_data.Component(axis),global_data.Component(axis),mpi_grid.Face_Sentinels(axis));
 }
 //#####################################################################
 // Function Maximum_Error
@@ -113,7 +113,7 @@ Maximum_Error(const std::string& prefix,const T_FACE_ARRAYS& local_data,const T_
 {
     T max_error=(T)0;
     const char *axis_names[3]={"x","y","z"};
-    for(int axis=1;axis<=T_GRID::dimension;axis++){
+    for(int axis=0;axis<T_GRID::dimension;axis++){
         TV_INT index;
         max_error=Maximum_Error(local_data.Component(axis),global_data.Component(axis),bandwidth,index,mpi_grid.Face_Sentinels(axis));
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT

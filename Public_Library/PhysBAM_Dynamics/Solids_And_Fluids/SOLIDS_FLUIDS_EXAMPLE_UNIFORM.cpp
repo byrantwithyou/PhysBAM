@@ -463,7 +463,7 @@ Initialize_Swept_Occupied_Blocks_For_Advection(const T dt,const T time,T maximum
             fluids_parameters.maccormack_cell_mask(iterator.Cell_Index())=TV_INT::Componentwise_Min(iterator.Cell_Index()-grid.Domain_Indices().Minimum_Corner(),
                 grid.Domain_Indices().Maximum_Corner()-iterator.Cell_Index()).Min()>fluids_parameters.cfl;
         VECTOR<T_GRID,T_GRID::dimension> grids;
-        for(int i=1;i<=T_GRID::dimension;i++) grids[i]=grid.Get_Face_Grid(i);
+        for(int i=0;i<T_GRID::dimension;i++) grids[i]=grid.Get_Face_Grid(i);
         for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
             int axis=iterator.Axis();TV_INT index=iterator.Face_Index();
             fluids_parameters.maccormack_face_mask(axis,index)
@@ -482,14 +482,14 @@ Initialize_Swept_Occupied_Blocks_For_Advection(const T dt,const T time,T maximum
             T dx_times_band=grid.Maximum_Edge_Length()*fluids_parameters.bandwidth_without_maccormack_near_interface;
             for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next())if(fluids_parameters.particle_levelset_evolution->phi(iterator.Cell_Index())>-dx_times_band){
                 fluids_parameters.maccormack_cell_mask(iterator.Cell_Index())=false;
-                for(int axis=1;axis<=T_GRID::dimension;axis++){
+                for(int axis=0;axis<T_GRID::dimension;axis++){
                     fluids_parameters.maccormack_face_mask(axis,iterator.First_Face_Index(axis))=false;fluids_parameters.maccormack_face_mask(axis,iterator.Second_Face_Index(axis))=false;}}}
         // turn off maccormack near objects
         for(typename T_GRID::NODE_ITERATOR node_iterator(grid,2);node_iterator.Valid();node_iterator.Next()) 
             if(fluids_parameters.collision_bodies_affecting_fluid->occupied_blocks(node_iterator.Node_Index())){
                 TV_INT block_index=node_iterator.Node_Index();BLOCK_UNIFORM<T_GRID> block(grid,block_index);
                 for(int cell_index=0;cell_index<T_GRID::number_of_cells_per_block;cell_index++) fluids_parameters.maccormack_cell_mask(block.Cell(cell_index))=false;
-                for(int axis=1;axis<=T_GRID::dimension;axis++) for(int face=0;face<T_GRID::number_of_incident_faces_per_block;face++)
+                for(int axis=0;axis<T_GRID::dimension;axis++) for(int face=0;face<T_GRID::number_of_incident_faces_per_block;face++)
                     fluids_parameters.maccormack_face_mask(axis,block.Incident_Face(axis,face))=false;}}
 }
 //#####################################################################

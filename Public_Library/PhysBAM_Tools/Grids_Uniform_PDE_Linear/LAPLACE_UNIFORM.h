@@ -71,15 +71,15 @@ public:
     virtual ~LAPLACE_UNIFORM();
 
     bool All_Cell_Faces_Neumann(const TV_INT& cell_index) const
-    {for(int axis=1;axis<=T_GRID::dimension;axis++)if(!psi_N.Component(axis)(cell_index) || !psi_N.Component(axis)(cell_index+TV_INT::Axis_Vector(axis))) return false;
+    {for(int axis=0;axis<T_GRID::dimension;axis++)if(!psi_N.Component(axis)(cell_index) || !psi_N.Component(axis)(cell_index+TV_INT::Axis_Vector(axis))) return false;
     return true;}
 
     bool Any_Cell_Faces_Neumann(const TV_INT& cell_index) const
-    {for(int axis=1;axis<=T_GRID::dimension;axis++)if(psi_N.Component(axis)(cell_index) || psi_N.Component(axis)(cell_index+TV_INT::Axis_Vector(axis))) return true;
+    {for(int axis=0;axis<T_GRID::dimension;axis++)if(psi_N.Component(axis)(cell_index) || psi_N.Component(axis)(cell_index+TV_INT::Axis_Vector(axis))) return true;
     return false;}
 
     bool Any_Neighbor_Dirichlet(const TV_INT& cell_index) const
-    {for(int axis=1;axis<=T_GRID::dimension;axis++){TV_INT offset=TV_INT::Axis_Vector(axis);
+    {for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT offset=TV_INT::Axis_Vector(axis);
         if((!psi_N.Component(axis)(cell_index) && psi_D(cell_index-offset)) || (!psi_N.Component(axis)(cell_index+offset) && psi_D(cell_index+offset))) return true;}
     return false;}
 

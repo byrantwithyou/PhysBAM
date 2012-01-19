@@ -924,7 +924,7 @@ void Test_Model_Helper(const char* str,TV a0, TV a1, const MATRIX<T,2>& da0, con
 //#####################################################################
 void Test_Model_Helper(const char* str,const MATRIX<T,2>& a0, const MATRIX<T,2>& a1, const VECTOR<SYMMETRIC_MATRIX<T,2>,2>& da0, const VECTOR<SYMMETRIC_MATRIX<T,2>,2>& da1, TV df, T e)
 {
-    for(int i=1;i<=TV::m;i++){
+    for(int i=0;i<TV::m;i++){
         TV av=(da1(i)+da0(i))*df/2/e;
         TV dif=(a1.Transposed().Column(i)-a0.Transposed().Column(i))/e;
         char buff[1000];
@@ -959,7 +959,7 @@ Test_Model_Helper(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>* icm, TV &f, TV &df, T e)
     XX(z);
     XX(xi);
     XX(s);
-//#define YY(k) {for(int i=1;i<=TV::m;i++){TV av=(h1.dd##k(i)+h0.dd##k(i))*df/2/e;TV dif=(h1.d##k.Transposed().Column(i)-h0.d##k.Transposed().Column(i))/e;const char*va=#k;sprintf(buff, "============ test ============ %s %8.5f %8.5f (%8.5f)\n", va, av.Magnitude(), dif.Magnitude(), (av-dif).Magnitude());LOG::cout<<buff;}}
+//#define YY(k) {for(int i=0;i<TV::m;i++){TV av=(h1.dd##k(i)+h0.dd##k(i))*df/2/e;TV dif=(h1.d##k.Transposed().Column(i)-h0.d##k.Transposed().Column(i))/e;const char*va=#k;sprintf(buff, "============ test ============ %s %8.5f %8.5f (%8.5f)\n", va, av.Magnitude(), dif.Magnitude(), (av-dif).Magnitude());LOG::cout<<buff;}}
     XX(Q);
     XX(u);
     XX(g);

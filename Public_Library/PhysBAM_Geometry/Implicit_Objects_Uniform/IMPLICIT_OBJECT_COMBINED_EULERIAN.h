@@ -83,14 +83,14 @@ public:
 
     TV Normal(const TV& location,const int aggregate) const PHYSBAM_OVERRIDE
     {T dx=Minimum_Cell_Size();TV normal;T one_over_2_dx=(T)1/((T)2*dx);
-    for(int i=1;i<=TV::m;i++){
+    for(int i=0;i<TV::m;i++){
         TV offset=dx*TV::Axis_Vector(i);
         normal[i]=(Value(location+offset)-Value(location-offset))*one_over_2_dx;}
     return normal.Normalized();}
 
     TV Extended_Normal(const TV& location,const int aggregate=-1) const PHYSBAM_OVERRIDE
     {T dx=Minimum_Cell_Size();TV normal;T one_over_2_dx=(T)1/((T)2*dx);
-    for(int i=1;i<=TV::m;i++){
+    for(int i=0;i<TV::m;i++){
         TV offset=dx*TV::Axis_Vector(i);
         normal[i]=(Extended_Value(location+offset)-Extended_Value(location-offset))*one_over_2_dx;}
     return normal.Normalized();}

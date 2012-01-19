@@ -1012,7 +1012,7 @@ void Create_Joints(int parent_id,int child_id,int joint_type)
     JOINT<TV>* joint=0;
     if(joint_type==ANGLE_JOINT_TYPE) joint=new ANGLE_JOINT<TV>;
     if(joint_type==POINT_JOINT_TYPE) joint=new POINT_JOINT<TV>;
-    for(int i=1;i<=T_SPIN::dimension;i++) joint->control_dof(i)=true;
+    for(int i=0;i<T_SPIN::dimension;i++) joint->control_dof(i)=true;
     ARTICULATED_RIGID_BODY_IMPULSE_ACCUMULATOR<TV>* arb_impulse_accumulator=new ARTICULATED_RIGID_BODY_IMPULSE_ACCUMULATOR<TV>(*joint,arb);
     joint->impulse_accumulator=arb_impulse_accumulator;
 
@@ -1044,7 +1044,7 @@ void Joints_From_List(int joint_type)
         JOINT<TV>* joint=0;
         if(joint_type==ANGLE_JOINT_TYPE) joint=new ANGLE_JOINT<TV>;
         if(joint_type==POINT_JOINT_TYPE) joint=new POINT_JOINT<TV>;
-        for(int i=1;i<=T_SPIN::dimension;i++) joint->control_dof(i)=true;
+        for(int i=0;i<T_SPIN::dimension;i++) joint->control_dof(i)=true;
         ARTICULATED_RIGID_BODY_IMPULSE_ACCUMULATOR<TV>* arb_impulse_accumulator=new ARTICULATED_RIGID_BODY_IMPULSE_ACCUMULATOR<TV>(*joint,arb);
         joint->impulse_accumulator=arb_impulse_accumulator;
         bone_hierarchy(id).Append(id+1);

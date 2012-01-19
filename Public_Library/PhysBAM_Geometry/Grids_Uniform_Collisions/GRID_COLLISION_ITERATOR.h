@@ -35,7 +35,7 @@ public:
         bool operator<(const ENTRY&e) const
         {
             if(face.axis!=e.face.axis) return face.axis<e.face.axis;
-            for(int a=1;a<=TV::m;a++) if(a!=face.axis) if(face.index(a)!=e.face.index(a)) return face.index(a)<e.face.index(a);
+            for(int a=0;a<TV::m;a++) if(a!=face.axis) if(face.index(a)!=e.face.index(a)) return face.index(a)<e.face.index(a);
             return face.index(face.axis)<e.face.index(face.axis);
         }
     };

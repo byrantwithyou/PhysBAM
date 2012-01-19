@@ -124,7 +124,7 @@ Advance_To_Target_Time(const T target_time)
                 TV_INT global_index=example.mac_grid.Clamp_To_Cell(local_iterator.Location());
                 GRID<TV>& ghost_mac_grid=*example.mac_grid.sub_mac_grids(global_index);ARRAY<T,FACE_INDEX<TV::dimension> >& ghost_face_velocities=*example.face_velocities.sub_arrays(global_index);
                 FACE_INDEX<TV::dimension> ghost_local_index(local_iterator.Axis(),ghost_mac_grid.Clamped_Index(local_iterator.Location())+TV_INT::All_Ones_Vector());
-                for(int i=1;i<=TV::dimension;i++) if(i!=local_iterator.Axis() && ghost_local_index.index(i)>local_mac_grid.Counts()(i)) ghost_local_index.index(i)=local_mac_grid.Counts()(i);
+                for(int i=0;i<TV::dimension;i++) if(i!=local_iterator.Axis() && ghost_local_index.index(i)>local_mac_grid.Counts()(i)) ghost_local_index.index(i)=local_mac_grid.Counts()(i);
                 face_velocities_ghost(local_iterator.Full_Index())=ghost_face_velocities(ghost_local_index);}
             example.advection_scalar.Update_Advection_Equation_Cell(local_mac_grid,local_density,density_ghost,local_face_velocities,example.boundary_scalar,dt,time);
             example.advection_scalar.Update_Advection_Equation_Cell(local_mac_grid,local_temperature,temperature_ghost,local_face_velocities,example.boundary_scalar,dt,time);

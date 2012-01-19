@@ -232,7 +232,7 @@ void Set_Ghost_Density_And_Temperature_Inside_Flame_Core() PHYSBAM_OVERRIDE
     T bandwidth=2*fluids_parameters.grid->Minimum_Edge_Length();
     for(CELL_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){TV_INT index=iterator.Cell_Index();
         T cell_flame_speed_multiplier=0;
-        for(int i=1;i<=T_GRID::dimension;i++)
+        for(int i=0;i<T_GRID::dimension;i++)
             cell_flame_speed_multiplier+=flame_speed_multiplier.Component(i)(iterator.First_Face_Index(i))+flame_speed_multiplier.Component(i)(iterator.Second_Face_Index(i));
         cell_flame_speed_multiplier/=2*T_GRID::dimension;
         if(-phi(index)<0){

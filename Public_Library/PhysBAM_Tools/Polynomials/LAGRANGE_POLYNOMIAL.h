@@ -26,8 +26,8 @@ public:
 
     T operator()(const T x_input) const PHYSBAM_OVERRIDE
     {T result=0;
-    for(int i=1;i<=degree+1;i++){
-        T phi=1;for(int j=1;j<=degree+1;j++) if(i != j) phi*=(x_input-x(j));
+    for(int i=0;i<degree+1;i++){
+        T phi=1;for(int j=0;j<degree+1;j++) if(i != j) phi*=(x_input-x(j));
         result+=c(i)*phi/d(i);}
     return result;}
 

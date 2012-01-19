@@ -84,13 +84,13 @@ public:
 
     static void Set_Euler_State_From_rho_velocity_And_internal_energy(T_ARRAYS_DIMENSION_BASE& U,const TV_INT& cell,const T rho,const TV& velocity,const T e)
     {U(cell)(1)=rho;
-    for(int k=1;k<=T_GRID::dimension;k++) U(cell)(k+1)=rho*velocity[k];
+    for(int k=0;k<T_GRID::dimension;k++) U(cell)(k+1)=rho*velocity[k];
     U(cell)(T_GRID::dimension+2)=rho*(e+velocity.Magnitude_Squared()*(T).5);}
 
     static VECTOR<T,T_GRID::dimension+2> Get_Euler_State_From_rho_velocity_And_internal_energy(const T rho,const TV& velocity,const T e)
     {VECTOR<T,T_GRID::dimension+2> U;
      U(1)=rho;
-     for(int k=1;k<=T_GRID::dimension;k++) U(k+1)=rho*velocity[k];
+     for(int k=0;k<T_GRID::dimension;k++) U(k+1)=rho*velocity[k];
      U(T_GRID::dimension+2)=rho*(e+(T).5*velocity.Magnitude_Squared());
      return U;}
 
@@ -132,7 +132,7 @@ public:
 
     void Set_Custom_Boundary(BOUNDARY_UNIFORM<T_GRID,TV_DIMENSION>& boundary_input)
     {boundary=&boundary_input;
-    for(int axis=1;axis<=T_GRID::dimension;axis++){
+    for(int axis=0;axis<T_GRID::dimension;axis++){
         open_boundaries(2*axis-1)=boundary->Constant_Extrapolation(2*axis-1);
         open_boundaries(2*axis)=boundary->Constant_Extrapolation(2*axis);}}
     

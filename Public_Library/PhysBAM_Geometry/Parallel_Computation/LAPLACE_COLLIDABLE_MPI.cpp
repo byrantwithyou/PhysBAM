@@ -65,7 +65,7 @@ Synchronize_Solution_Regions()
     partitions.Resize(filled_region_ranks.m);
     for(int color=0;color<filled_region_ranks.m;color++){
         partitions(color).Set_Number_Of_Sides(T_PARALLEL_GRID::number_of_faces_per_cell);
-        for(int s=1;s<=T_PARALLEL_GRID::number_of_faces_per_cell;s++){
+        for(int s=0;s<T_PARALLEL_GRID::number_of_faces_per_cell;s++){
             int global_rank=mpi_grid->side_neighbor_ranks(s);
             if(global_rank==MPI::PROC_NULL) partitions(color).neighbor_ranks(s)=MPI::PROC_NULL;
             else MPI::Group::Translate_ranks(*mpi_grid->group,1,&global_rank,(*groups)(color),&partitions(color).neighbor_ranks(s));}}

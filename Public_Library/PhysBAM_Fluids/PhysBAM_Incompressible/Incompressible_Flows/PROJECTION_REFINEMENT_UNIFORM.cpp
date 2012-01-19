@@ -20,7 +20,7 @@ PROJECTION_REFINEMENT_UNIFORM(const T_GRID& mac_grid,const int scale,const T alp
     :PROJECTION_DYNAMICS_UNIFORM<T_GRID>(GRID<TV>(TV_INT(),RANGE<TV>(),true),flame_input,multiphase,use_variable_beta,use_poisson),thread_queue(0),coarse_mpi_grid(0),fine_mpi_grid(0),
     fast_local_projection(scale),beta_face(use_poisson?poisson->beta_face:*new T_FACE_ARRAYS_SCALAR()),alpha(alpha_in),coarse_scale(scale)
 {
-    for(int i=1;i<=TV::dimension;i++) for(int j=1;j<2;j++){domain_boundary(i)(j)=true;solid_wall(i)(j)=false;}
+    for(int i=0;i<TV::dimension;i++) for(int j=1;j<2;j++){domain_boundary(i)(j)=true;solid_wall(i)(j)=false;}
     scale_face_inverse=(T)((TV::dimension==2)?(1./scale):(1./(scale*scale)));
     if(poisson) poisson->Set_Variable_beta(true);
     this->Initialize_Grid(mac_grid); //TODO: Fix this hack
@@ -33,7 +33,7 @@ PROJECTION_REFINEMENT_UNIFORM(const T_GRID& mac_grid,T_LEVELSET& levelset_input,
     :PROJECTION_DYNAMICS_UNIFORM<T_GRID>(mac_grid,levelset_input),thread_queue(0),coarse_mpi_grid(0),fine_mpi_grid(0),fast_local_projection(scale),
      beta_face(poisson->beta_face),alpha(alpha_in),coarse_scale(scale)
 {
-    for(int i=1;i<=TV::dimension;i++) for(int j=1;j<2;j++){domain_boundary(i)(j)=true;solid_wall(i)(j)=false;}
+    for(int i=0;i<TV::dimension;i++) for(int j=1;j<2;j++){domain_boundary(i)(j)=true;solid_wall(i)(j)=false;}
     scale_face_inverse=(T)((TV::dimension==2)?(1./scale):(1./(scale*scale)));
 }
 //#####################################################################
@@ -111,7 +111,7 @@ Set_Beta_Face_For_Boundary_Conditions(T_FACE_ARRAYS_SCALAR& coarse_face_velociti
 template<class T_GRID> void PROJECTION_REFINEMENT_UNIFORM<T_GRID>::
 Set_Coarse_Boundary_Conditions(T_FACE_ARRAYS_SCALAR& coarse_face_velocities)
 {
-    for(int axis=1;axis<=TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
+    for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
         if(domain_boundary(axis)(axis_side)){ //Need to check mpi as smaller solves are never using mpi (for now)
             TV_INT interior_cell_offset=axis_side==1?TV_INT():-TV_INT::Axis_Vector(axis);    
             for(typename GRID<TV>::FACE_ITERATOR local_iterator(coarse_grid,1,GRID<TV>::BOUNDARY_REGION,side);local_iterator.Valid();local_iterator.Next()){

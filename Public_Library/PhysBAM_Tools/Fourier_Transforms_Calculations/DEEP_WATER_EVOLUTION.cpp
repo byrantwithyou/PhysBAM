@@ -26,13 +26,13 @@ Initialize()
         PHYSBAM_FATAL_ERROR();}
     h.Resize(grid.Domain_Indices());
     if(lambda){ // displacements for choppy waves
-        for(int k=1;k<=TV::m;k++) displacement[k].Resize(grid.Domain_Indices());
+        for(int k=0;k<TV::m;k++) displacement[k].Resize(grid.Domain_Indices());
         Xh.Resize(grid.Domain_Indices());}
 
     h_hat.Resize(FREQUENCY_ITERATOR<TV>::Domain_Indices(grid));
     h_hat1.Resize(FREQUENCY_ITERATOR<TV>::Domain_Indices(grid));
     h_hat2.Resize(FREQUENCY_ITERATOR<TV>::Domain_Indices(grid));
-    for(int axis=1;axis<=TV::m;axis++) dXh_hat[axis].Resize(FREQUENCY_ITERATOR<TV>::Domain_Indices(grid));
+    for(int axis=0;axis<TV::m;axis++) dXh_hat[axis].Resize(FREQUENCY_ITERATOR<TV>::Domain_Indices(grid));
 
     // Initialize FFT stuff
     fft.grid=grid;
@@ -100,13 +100,13 @@ Advance_Height(const T dt)
     Advance_H_Hats(dt);
 
     // Initialize the (0) elements since they won't get set below
-    for(int axis=1;axis<=TV::m;axis++) dXh_hat[axis](TV_INT())=COMPLEX<T>();
+    for(int axis=0;axis<TV::m;axis++) dXh_hat[axis](TV_INT())=COMPLEX<T>();
 
     for(FREQUENCY_ITERATOR<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT I=iterator.Index();
         TV k1=iterator.Frequency();
         T k=k1.Magnitude();
         h_hat(I)=h_hat1(I)+h_hat2(I);
-        if(k) for(int axis=1;axis<=TV::m;axis++)
+        if(k) for(int axis=0;axis<TV::m;axis++)
             dXh_hat[axis](I)=COMPLEX<T>(0,-k1[axis]/k)*h_hat(I);}
 
     // Set DC to 0
@@ -115,9 +115,9 @@ Advance_Height(const T dt)
     if(filter_high_frequencies) fft.Filter_High_Frequencies(h_hat,high_frequency_cutoff);
     fft.Inverse_Transform(h_hat,h,true,false);
     if(lambda){
-        for(int k=1;k<=TV::m;k++) fft.Inverse_Transform(dXh_hat[k],displacement[k],true,false);
+        for(int k=0;k<TV::m;k++) fft.Inverse_Transform(dXh_hat[k],displacement[k],true,false);
         for(NODE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index();
-            TV DX;for(int axis=1;axis<=TV::m;axis++) DX[axis]=displacement[axis](node);
+            TV DX;for(int axis=0;axis<TV::m;axis++) DX[axis]=displacement[axis](node);
             Xh(node)=grid.X(node)+lambda*DX;}}
 }
 //#####################################################################

@@ -48,7 +48,7 @@ Update_Advection_Equation_Face_Lookup(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z
     const T_FACE_LOOKUP& face_velocities,T_BOUNDARY& boundary,const T dt,const T time,
     const T_FACE_LOOKUP* Z_min_ghost,const T_FACE_LOOKUP* Z_max_ghost,T_FACE_ARRAYS_SCALAR* Z_min,T_FACE_ARRAYS_SCALAR* Z_max)
 {
-    for(int axis=1;axis<=TV::dimension;axis++){
+    for(int axis=0;axis<TV::dimension;axis++){
         RANGE<TV_INT> domain=grid.Domain_Indices();domain.max_corner+=TV_INT::Axis_Vector(axis);
         DOMAIN_ITERATOR_THREADED_ALPHA<ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>,TV>(domain,thread_queue).template Run<int,const T_GRID&,T_FACE_ARRAYS_SCALAR&,const T_FACE_LOOKUP&,const T_FACE_LOOKUP&,T_BOUNDARY&,T,T,const T_FACE_LOOKUP*,const T_FACE_LOOKUP*,T_FACE_ARRAYS_SCALAR*,T_FACE_ARRAYS_SCALAR*>(*this,&ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>::Update_Advection_Equation_Face_Lookup_Threaded,axis,grid,Z,Z_ghost,face_velocities,boundary,dt,time,Z_min_ghost,Z_max_ghost,Z_min,Z_max);}
 }

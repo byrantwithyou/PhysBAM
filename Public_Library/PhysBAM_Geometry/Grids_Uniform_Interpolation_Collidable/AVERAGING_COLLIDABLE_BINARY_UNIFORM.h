@@ -32,13 +32,13 @@ public:
 
     TV Face_To_Node_Vector(const T_GRID& grid,const TV_INT& node_index,const T_FACE_LOOKUP& u_face) const
     {const typename T_FACE_LOOKUP::LOOKUP& lookup=u_face.Starting_Point_Cell(node_index);
-    TV value;for(int axis=1;axis<=T_GRID::dimension;axis++)for(int face=1;face<=T_GRID::number_of_nodes_per_face;face++)
+    TV value;for(int axis=0;axis<T_GRID::dimension;axis++)for(int face=0;face<T_GRID::number_of_nodes_per_face;face++)
         value[axis]+=lookup(axis,T_GRID::Node_Face_Index(axis,node_index,face));
     return value/T_GRID::number_of_nodes_per_face;}
 
     TV Face_To_Cell_Vector(const T_GRID& grid,const TV_INT& cell_index,const T_FACE_LOOKUP& u_face) const
     {const typename T_FACE_LOOKUP::LOOKUP& lookup=u_face.Starting_Point_Cell(cell_index);lookup.Set_Reference_Point(grid.X(cell_index));
-    TV value;for(int axis=1;axis<=T_GRID::dimension;axis++)
+    TV value;for(int axis=0;axis<T_GRID::dimension;axis++)
         value[axis]=(T).5*(lookup(axis,grid.First_Face_Index_In_Cell(axis,cell_index))+lookup(axis,grid.Second_Face_Index_In_Cell(axis,cell_index)));
     return value;}
 

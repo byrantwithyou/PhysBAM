@@ -46,7 +46,7 @@ Create_Even_Sized_Grid_Given_Cell_Size(const RANGE<TV>& domain,const T cell_size
     TV edge_lengths(domain.Edge_Lengths());
     TV_INT cells(TV_INT(ceil(edge_lengths/cell_size))+2*boundary_nodes);
     TV cell_sizes;cell_sizes.Fill(cell_size);
-    for(int i=1;i<=TV::dimension;i++) if(cells(i)&1) cell_sizes(i)=edge_lengths(i)/++cells(i);
+    for(int i=0;i<TV::dimension;i++) if(cells(i)&1) cell_sizes(i)=edge_lengths(i)/++cells(i);
     cells+=2*boundary_nodes; // TODO: Why do we do this again?
     TV domain_center=domain.Center(),actual_domain_half_size=(T).5*cell_sizes*TV(cells);
     return GRID<TV>(cells,RANGE<TV>(domain_center-actual_domain_half_size,domain_center+actual_domain_half_size),mac_grid);

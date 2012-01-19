@@ -51,7 +51,7 @@ Compare_Collision_Index() const
     const COLLISION_FACE_INFO<TV>& cfi=collision_face_info(collision_index);
     if(cfi.axis<axis) return -1;
     if(cfi.axis>axis) return 1;
-    for(int i=1;i<=TV::dimension;i++){
+    for(int i=0;i<TV::dimension;i++){
         if(cfi.index(i)<index(i)) return -1;
         if(cfi.index(i)>index(i)) return 1;}
     return 0;

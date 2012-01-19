@@ -271,7 +271,7 @@ void Set_PD_Targets(const T dt,const T time) PHYSBAM_OVERRIDE
     if(use_motion_capture && !kinematic_motion){
        //motion capture input
        for(int i=0;i<arb.joint_mesh.joints.m;i++){JOINT<TV>& joint=*arb.joint_mesh.joints(i);
-            bool controlled=false;for(int j=1;j<=T_SPIN::dimension;j++) if(joint.control_dof(j)) controlled=true;
+            bool controlled=false;for(int j=0;j<T_SPIN::dimension;j++) if(joint.control_dof(j)) controlled=true;
             if(!joint.joint_function || !controlled) continue;
             RIGID_BODY<TV>* parent=arb.Parent(joint.id_number),*child=arb.Child(joint.id_number);
             int parent_index=id_to_index(parent->particle_index),child_index=id_to_index(child->particle_index);
@@ -956,7 +956,7 @@ void Prune_Joints()
         std::string parent_name=body_motion.names(parent_index),child_name=body_motion.names(child_index);
         for(int i=0;i<controlled_bones.m;i++) if(child_name.find(controlled_bones(i))!=std::string::npos){
             joint.joint_function->active=false;joint.global_post_stabilization=false;
-            for(int i=1;i<=T_SPIN::dimension;i++) joint.control_dof(i)=true;
+            for(int i=0;i<T_SPIN::dimension;i++) joint.control_dof(i)=true;
             done=true;break;}
         if(done) continue;
         for(int i=0;i<uncontrolled_bones.m;i++) if(child_name.find(uncontrolled_bones(i))!=std::string::npos){
@@ -1015,7 +1015,7 @@ void Root_Joint()
         std::string parent_name=body_motion.names(parent_index),child_name=body_motion.names(child_index);
         if(child_name.find("Spine1")!=std::string::npos){
             joint.use_joint_function=false;joint.global_post_stabilization=false;
-            for(int i=1;i<=T_SPIN::dimension;i++) joint.control_dof(i)=true;}
+            for(int i=0;i<T_SPIN::dimension;i++) joint.control_dof(i)=true;}
         else if(child_name.find("Spine")!=std::string::npos || child_name.find("Arm")!=std::string::npos || child_name.find("Clavicle")!=std::string::npos ||
             child_name.find("Hand")!=std::string::npos || child_name.find("Neck")!=std::string::npos || child_name.find("Head")!=std::string::npos){
             /*delete joint.joint_function;joint.joint_function=0;*/joint.use_pd=true;}
@@ -1035,7 +1035,7 @@ void Spine_Joints()
         std::string parent_name=body_motion.names(parent_index),child_name=body_motion.names(child_index);
         if(child_name.find("Spine")!=std::string::npos || child_name.find("Neck")!=std::string::npos || child_name.find("Head")!=std::string::npos){
             joint.use_joint_function=false;joint.global_post_stabilization=false;
-            for(int i=1;i<=T_SPIN::dimension;i++) joint.control_dof(i)=true;}
+            for(int i=0;i<T_SPIN::dimension;i++) joint.control_dof(i)=true;}
         else if(child_name.find("Arm")!=std::string::npos || child_name.find("Clavicle")!=std::string::npos || child_name.find("Hand")!=std::string::npos){
             delete joint.joint_function;joint.joint_function=0;}
         else if(kinematic_motion){delete joint.joint_function;joint.joint_function=0;child->Is_Kinematic()=true;parent->Is_Kinematic()=true;}
@@ -1053,7 +1053,7 @@ void Arm_Joints()
         std::string parent_name=body_motion.names(parent_index),child_name=body_motion.names(child_index);
         if(child_name.find("Arm")!=std::string::npos || child_name.find("Clavicle")!=std::string::npos || child_name.find("Hand")!=std::string::npos){
             joint.use_joint_function=false;joint.global_post_stabilization=false;
-            for(int i=1;i<=T_SPIN::dimension;i++) joint.control_dof(i)=true;}
+            for(int i=0;i<T_SPIN::dimension;i++) joint.control_dof(i)=true;}
         else if(child_name.find("Spine")!=std::string::npos || child_name.find("Neck")!=std::string::npos || child_name.find("Head")!=std::string::npos){
             delete joint.joint_function;joint.joint_function=0;}
         else if(kinematic_motion){delete joint.joint_function;joint.joint_function=0;child->Is_Kinematic()=true;parent->Is_Kinematic()=true;}
@@ -1072,7 +1072,7 @@ void Upper_Joints()
         if(child_name.find("Spine")!=std::string::npos || child_name.find("Arm")!=std::string::npos || child_name.find("Clavicle")!=std::string::npos ||
             child_name.find("Hand")!=std::string::npos || child_name.find("Neck")!=std::string::npos || child_name.find("Head")!=std::string::npos){
             joint.use_joint_function=false;joint.global_post_stabilization=false;
-            for(int i=1;i<=T_SPIN::dimension;i++) joint.control_dof(i)=true;}
+            for(int i=0;i<T_SPIN::dimension;i++) joint.control_dof(i)=true;}
         else if(kinematic_motion){delete joint.joint_function;joint.joint_function=0;child->Is_Kinematic()=true;parent->Is_Kinematic()=true;}
         else joint.use_pd=true;}
 }
@@ -1089,7 +1089,7 @@ void Joints_From_List(int joint_type)
         JOINT<TV>* joint=0;
         if(joint_type==ANGLE_JOINT_TYPE) joint=new ANGLE_JOINT<TV>;
         if(joint_type==POINT_JOINT_TYPE) joint=new POINT_JOINT<TV>;
-        for(int i=1;i<=T_SPIN::dimension;i++) joint->control_dof(i)=true;
+        for(int i=0;i<T_SPIN::dimension;i++) joint->control_dof(i)=true;
         ARTICULATED_RIGID_BODY_IMPULSE_ACCUMULATOR<TV>* arb_impulse_accumulator=new ARTICULATED_RIGID_BODY_IMPULSE_ACCUMULATOR<TV>(*joint,arb);
         joint->impulse_accumulator=arb_impulse_accumulator;
         joint->global_post_stabilization=false;

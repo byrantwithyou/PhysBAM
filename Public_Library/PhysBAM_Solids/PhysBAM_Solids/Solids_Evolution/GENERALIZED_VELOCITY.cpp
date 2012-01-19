@@ -92,12 +92,12 @@ Pack(VECTOR_ND<T> &velocities) const
     PHYSBAM_ASSERT(velocities.Size()==Raw_Size());
     int index=0;
     for(int i=1;i<=V.Size();i++)
-        for(int j=1;j<=TV::dimension;j++)
+        for(int j=0;j<TV::dimension;j++)
             velocities(++index)=V.array(i)(j);
     for(int i=1;i<=rigid_V.Size();i++){
-        for(int j=1;j<=TV::dimension;j++)
+        for(int j=0;j<TV::dimension;j++)
             velocities(++index)=rigid_V(i).linear(j);
-        for(int j=1;j<=T_SPIN::dimension;j++)
+        for(int j=0;j<T_SPIN::dimension;j++)
             velocities(++index)=rigid_V(i).angular(j);}
 }
 //#####################################################################
@@ -109,12 +109,12 @@ Unpack(VECTOR_ND<T> &velocities)
     PHYSBAM_ASSERT(velocities.Size()==Raw_Size());
     int index=0;
     for(int i=1;i<=V.Size();i++)
-        for(int j=1;j<=TV::dimension;j++)
+        for(int j=0;j<TV::dimension;j++)
             V.array(i)(j)=velocities(++index);
     for(int i=1;i<=rigid_V.Size();i++){
-        for(int j=1;j<=TV::dimension;j++)
+        for(int j=0;j<TV::dimension;j++)
             rigid_V(i).linear(j)=velocities(++index);
-        for(int j=1;j<=T_SPIN::dimension;j++)
+        for(int j=0;j<T_SPIN::dimension;j++)
             rigid_V(i).angular(j)=velocities(++index);}
 }
 //#####################################################################
@@ -126,12 +126,12 @@ Unpack_And_Add(VECTOR_ND<T> &velocities)
     PHYSBAM_ASSERT(velocities.Size()==Raw_Size());
     int index=0;
     for(int i=1;i<=V.Size();i++)
-        for(int j=1;j<=TV::dimension;j++)
+        for(int j=0;j<TV::dimension;j++)
             V.array(i)(j)+=velocities(++index);
     for(int i=1;i<=rigid_V.Size();i++){
-        for(int j=1;j<=TV::dimension;j++)
+        for(int j=0;j<TV::dimension;j++)
             rigid_V(i).linear(j)+=velocities(++index);
-        for(int j=1;j<=T_SPIN::dimension;j++)
+        for(int j=0;j<T_SPIN::dimension;j++)
             rigid_V(i).angular(j)+=velocities(++index);}
 }
 //#####################################################################

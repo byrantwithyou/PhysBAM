@@ -55,7 +55,7 @@ Has_Angular_Constraint() const
 template<class TV> void POINT_JOINT<TV>::
 Constrain_Angles(T_SPIN& angles_input) const
 {
-    for(int i=1;i<=T_SPIN::dimension;i++) angles_input(i)=wrap(angles_input(i),(T)-pi,(T)pi);
+    for(int i=0;i<T_SPIN::dimension;i++) angles_input(i)=wrap(angles_input(i),(T)-pi,(T)pi);
     angles_input=rotation_limits.Clamp(angles_input);
 }
 //#####################################################################

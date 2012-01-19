@@ -84,7 +84,7 @@ CFL(T_FACE_ARRAYS_SCALAR& face_velocities) const
     T dt_convection=0;
     for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
         T local_V_norm=0;
-        for(int axis=1;axis<=T_GRID::dimension;axis++)
+        for(int axis=0;axis<T_GRID::dimension;axis++)
             local_V_norm+=grid.one_over_dX[axis]*maxabs(face_velocities(axis,grid.First_Face_Index_In_Cell(axis,cell)),
                 face_velocities(axis,grid.Second_Face_Index_In_Cell(axis,cell)));
         dt_convection=max(dt_convection,local_V_norm);}

@@ -29,7 +29,7 @@ public:
 
 //#####################################################################
     void Add_Explicit_Forces(const T_GRID& grid,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time) PHYSBAM_OVERRIDE
-    {for(int axis=1;axis<=T_GRID::dimension;axis++) if(gravity_direction[axis]) face_velocities.Component(axis)+=dt*gravity*gravity_direction[axis];}
+    {for(int axis=0;axis<T_GRID::dimension;axis++) if(gravity_direction[axis]) face_velocities.Component(axis)+=dt*gravity*gravity_direction[axis];}
     void Add_Implicit_Forces_Projection(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& face_velocities_ghost,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time) PHYSBAM_OVERRIDE {}
     void Initialize_Grids(const T_GRID& grid) PHYSBAM_OVERRIDE {}
     T CFL(const T_GRID& grid,const T_FACE_ARRAYS_SCALAR& face_velocities) PHYSBAM_OVERRIDE

@@ -144,7 +144,7 @@ Set_MPI_Grid(T_MPI_GRID& mpi_grid_input)
         fluid_comm=new MPI::Intracomm;
         *fluid_comm=mpi_grid->comm->Create(*fluid_group);
         partition.Set_Number_Of_Sides(T_PARALLEL_GRID::number_of_faces_per_cell);
-        for(int s=1;s<=T_PARALLEL_GRID::number_of_faces_per_cell;s++){
+        for(int s=0;s<T_PARALLEL_GRID::number_of_faces_per_cell;s++){
             int global_rank=mpi_grid->side_neighbor_ranks(s);
             if(global_rank==MPI::PROC_NULL) partition.neighbor_ranks(s)=MPI::PROC_NULL;
             else MPI::Group::Translate_ranks(*mpi_grid->group,1,&global_rank,*fluid_group,&partition.neighbor_ranks(s));}
@@ -212,14 +212,14 @@ Find_Matrix_Indices(const GRID<TV>& local_grid,const T_ARRAYS_BOOL& valid_diverg
     RANGE<TV_INT> domain_indices=local_grid.Domain_Indices();
     Find_Matrix_Indices_In_Region(local_grid,valid_divergence_cells,0,domain_indices,cell_index_to_matrix_index,face_ghost_cell_index,face_ghost_cell_index_map,face_lambdas,divergence_indices,cell_count);
     INTERVAL<int> dummy_box;
-    for(int axis=1;axis<=TV::dimension;axis++){
+    for(int axis=0;axis<TV::dimension;axis++){
         RANGE<TV_INT> region(domain_indices);
         region.min_corner(axis)=region.max_corner(axis)=domain_indices.min_corner(axis)-1;
         Find_Matrix_Indices_In_Region(local_grid,valid_divergence_cells,2*(axis-1)+1,region,cell_index_to_matrix_index,face_ghost_cell_index,face_ghost_cell_index_map,face_lambdas,dummy_box,cell_count);
         region.min_corner(axis)=region.max_corner(axis)=domain_indices.max_corner(axis)+1;
         Find_Matrix_Indices_In_Region(local_grid,valid_divergence_cells,2*(axis-1)+2,region,cell_index_to_matrix_index,face_ghost_cell_index,face_ghost_cell_index_map,face_lambdas,dummy_box,cell_count);
     }
-    for(int axis=1;axis<=TV::dimension;axis++){
+    for(int axis=0;axis<TV::dimension;axis++){
         RANGE<TV_INT> region(domain_indices);
         region.min_corner(axis)=region.max_corner(axis)=domain_indices.min_corner(axis);
         Find_Boundary_Indices_In_Region(local_grid,valid_divergence_cells,2*(axis-1)+1,region,cell_index_to_matrix_index,face_ghost_cell_index,face_lambdas);
@@ -274,7 +274,7 @@ Find_Matrix_Indices_In_Region(const GRID<TV>& local_grid,const T_ARRAYS_BOOL& va
     RANGE<TV_INT> expanded_domain_indices=local_grid.Domain_Indices().Thickened(1);
     for(CELL_ITERATOR iterator(local_grid,region);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();
-        for(int axis=1;axis<=TV::dimension;axis++){
+        for(int axis=0;axis<TV::dimension;axis++){
             TV_INT axis_vector=TV_INT::Axis_Vector(axis);
             int first_ghost_cell_index=face_ghost_cell_index(1,axis,cell_index); // looking IN to this cell
             if(first_ghost_cell_index/* && expanded_domain_indices.Lazy_Inside(cell_index-axis_vector)*/){
@@ -298,7 +298,7 @@ Find_Matrix_Indices_In_Region(const GRID<TV>& local_grid,const T_ARRAYS_BOOL& va
 
     for(CELL_ITERATOR iterator(local_grid,region);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();
-        for(int axis=1;axis<=TV::dimension;axis++){
+        for(int axis=0;axis<TV::dimension;axis++){
             TV_INT axis_vector=TV_INT::Axis_Vector(axis);
             int first_ghost_cell_index=face_ghost_cell_index(1,axis,cell_index);
             if(first_ghost_cell_index){
@@ -345,7 +345,7 @@ Find_Matrix_Indices_In_Region(const GRID<TV>& local_grid,const T_ARRAYS_BOOL& va
         TV_INT cell_index=iterator.Cell_Index();
         //if(cell_index(1)==0 && cell_index(2)==1)
         //DEBUG_UTILITIES::Debug_Breakpoint();
-        for(int axis=1;axis<=TV::dimension;axis++){
+        for(int axis=0;axis<TV::dimension;axis++){
             TV_INT axis_vector=TV_INT::Axis_Vector(axis);
             if(expanded_domain_indices.Lazy_Inside(cell_index-axis_vector) && face_lambdas(2,axis,cell_index)!=0){
 #ifdef BRICK
@@ -389,7 +389,7 @@ Find_Boundary_Indices_In_Region(const GRID<TV>& local_grid,const T_ARRAYS_BOOL& 
     ARRAY<int> boundary_ghost_cells;
     for(CELL_ITERATOR iterator(local_grid,region);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();
-        for(int second_axis=1;second_axis<=TV::dimension;second_axis++){
+        for(int second_axis=0;second_axis<TV::dimension;second_axis++){
             TV_INT axis_vector=TV_INT::Axis_Vector(second_axis);
             if(!poisson->psi_N(second_axis,cell_index) && face_ghost_cell_index(1,second_axis,cell_index) && domain_indices_shrink_axis.Lazy_Outside(cell_index-axis_vector)){
 #ifdef BRICK
@@ -407,7 +407,7 @@ Find_Boundary_Indices_In_Region(const GRID<TV>& local_grid,const T_ARRAYS_BOOL& 
     RANGE<TV_INT> contracted_domain_indices=local_grid.Domain_Indices();contracted_domain_indices.Change_Size(-TV_INT::Axis_Vector(axis));
     for(CELL_ITERATOR iterator(local_grid,region);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();
-        for(int second_axis=1;second_axis<=TV::dimension;second_axis++){
+        for(int second_axis=0;second_axis<TV::dimension;second_axis++){
             TV_INT axis_vector=TV_INT::Axis_Vector(second_axis);
             if(contracted_domain_indices.Lazy_Outside(cell_index-axis_vector) && face_lambdas(2,second_axis,cell_index)!=0)
                 ++boundary_cell_count;
@@ -452,7 +452,7 @@ Find_Boundary_Indices_In_Region(const GRID<TV>& local_grid,const T_ARRAYS_BOOL& 
 
     /*for(CELL_ITERATOR iterator(local_grid,region);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();
-        for(int second_axis=1;second_axis<=TV::dimension;second_axis++){
+        for(int second_axis=0;second_axis<TV::dimension;second_axis++){
             TV_INT second_axis_vector=TV_INT::Axis_Vector(second_axis);
             if(!poisson->psi_N(second_axis,cell_index) && face_ghost_cell_index(1,second_axis,cell_index) && domain_indices_shrink_axis.Lazy_Outside(cell_index-second_axis_vector))
                 partition.boundary_indices(domain_side)(++boundary_cell_count)=face_ghost_cell_index(1,second_axis,cell_index);
@@ -469,7 +469,7 @@ Find_Boundary_Indices_In_Region(const GRID<TV>& local_grid,const T_ARRAYS_BOOL& 
 
     for(CELL_ITERATOR iterator(local_grid,region);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();
-        for(int second_axis=1;second_axis<=TV::dimension;second_axis++){
+        for(int second_axis=0;second_axis<TV::dimension;second_axis++){
             TV_INT axis_vector=TV_INT::Axis_Vector(second_axis);
             if(contracted_domain_indices.Lazy_Outside(cell_index-axis_vector) && face_lambdas(2,second_axis,cell_index)!=0){
 #ifdef BRICK

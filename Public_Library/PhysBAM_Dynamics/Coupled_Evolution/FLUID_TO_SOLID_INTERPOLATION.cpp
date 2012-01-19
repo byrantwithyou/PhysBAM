@@ -54,7 +54,7 @@ Compute(const int ghost_cells)
 {
     entries.Resize(coupled_particles.m);
     for(int i=0;i<entries.m;i++)
-        for(int a=1;a<=TV::m;a++)
+        for(int a=0;a<TV::m;a++)
             Compute_Weights(particles.X(coupled_particles(i)),a,entries(i)(a));
 }
 //#####################################################################
@@ -64,7 +64,7 @@ template<class TV> void FLUID_TO_SOLID_INTERPOLATION<TV>::
 Times_Add(const VECTOR_ND<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& solid_velocity) const
 {
     for(int j=0;j<coupled_particles.m;j++){int p=coupled_particles(j);
-        for(int a=1;a<=TV::m;a++){
+        for(int a=0;a<TV::m;a++){
             T& v=solid_velocity.V.array(p)(a);
             const ARRAY<ENTRY>& array=entries(p)(a);
             for(int i=0;i<array.m;i++)
@@ -77,7 +77,7 @@ template<class TV> void FLUID_TO_SOLID_INTERPOLATION<TV>::
 Transpose_Times_Add(const GENERALIZED_VELOCITY<TV>& solid_force,VECTOR_ND<T>& fluid_force) const
 {
     for(int j=0;j<coupled_particles.m;j++){int p=coupled_particles(j);
-        for(int a=1;a<=TV::m;a++){
+        for(int a=0;a<TV::m;a++){
             T v=solid_force.V.array(p)(a);
             const ARRAY<ENTRY>& array=entries(p)(a);
             for(int i=0;i<array.m;i++)
@@ -95,7 +95,7 @@ Print_Each_Matrix(int n,int fluid_faces,GENERALIZED_VELOCITY<TV>& G) const
     reverse_map_deformable.Subset(G.V.indices)=IDENTITY_ARRAY<>(G.V.Size());
 
     for(int j=0;j<coupled_particles.m;j++){int p=coupled_particles(j);
-        for(int a=1;a<=TV::m;a++){
+        for(int a=0;a<TV::m;a++){
             const ARRAY<ENTRY>& array=entries(p)(a);
             for(int i=0;i<array.m;i++)
                 oo.Add_Sparse_Entry((reverse_map_deformable(p)-1)*TV::m+a,array(i).i,array(i).w);}}

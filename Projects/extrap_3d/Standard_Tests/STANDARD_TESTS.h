@@ -2644,7 +2644,7 @@ void Test_Model_Helper(const char* str,TV a0, TV a1, const MATRIX<T,3>& da0, con
 //#####################################################################
 void Test_Model_Helper(const char* str,const MATRIX<T,3>& a0, const MATRIX<T,3>& a1, const VECTOR<SYMMETRIC_MATRIX<T,3>,3>& da0, const VECTOR<SYMMETRIC_MATRIX<T,3>,3>& da1, TV df, T e)
 {
-    for(int i=1;i<=TV::m;i++){
+    for(int i=0;i<TV::m;i++){
         TV av=(da1(i)+da0(i))*df/2/e;
         TV dif=(a1.Transposed().Column(i)-a0.Transposed().Column(i))/e;
         char buff[1000];

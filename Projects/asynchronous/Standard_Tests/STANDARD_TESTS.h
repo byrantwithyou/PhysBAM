@@ -670,7 +670,7 @@ void Single_Hair()
     T perturb_threshold=(T)1e-4;
     ARRAY<TV> points;
     ARRAY<bool> segment_perturbed;
-    for(int i=1;i<=n_segments+2;i++) points.Append(TV(T(T(i-1)/T(n_segments)),0,0));
+    for(int i=0;i<n_segments+2;i++) points.Append(TV(T(T(i-1)/T(n_segments)),0,0));
     segment_perturbed.Append(false);
     for(int i=1;i<points.m;i++){
         if(i>1 && TRIANGLE_3D<T>(points(i-1),points(i),points(i+1)).Area()<perturb_threshold) segment_perturbed.Append(true);

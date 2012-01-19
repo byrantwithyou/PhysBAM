@@ -53,12 +53,12 @@ template<class T_GRID> template<class T_FACE_ARRAYS2> MPI_PACKAGE MPI_UNIFORM_GR
 Package_Face_Data(T_FACE_ARRAYS2& data,const ARRAY<RANGE<TV_INT> >& regions) const
 {
     MPI::Aint displacements[T_GRID::dimension];MPI::Datatype old_types[T_GRID::dimension];int lengths[T_GRID::dimension];
-    for(int axis=1;axis<=T_GRID::dimension;axis++){
+    for(int axis=0;axis<T_GRID::dimension;axis++){
         lengths[axis-1]=1;
         displacements[axis-1]=(MPI::Aint)&data.Component(axis)(regions(axis).Minimum_Corner());
         old_types[axis-1]=MPI_PACKAGE::Make_Arrays_Type(data.Component(axis),regions(axis));}
     MPI::Datatype datatype=MPI::Datatype::Create_struct(T_GRID::dimension,lengths,displacements,old_types);
-    for(int axis=1;axis<=T_GRID::dimension;axis++) old_types[axis-1].Free();
+    for(int axis=0;axis<T_GRID::dimension;axis++) old_types[axis-1].Free();
     return MPI_PACKAGE(datatype);
 }
 //#####################################################################

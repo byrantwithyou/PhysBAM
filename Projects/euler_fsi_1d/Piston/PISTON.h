@@ -210,7 +210,7 @@ void Set_Dirichlet_Boundary_Conditions(const T time) PHYSBAM_OVERRIDE
        for(int i=-piston_width;i<=piston_width;i++){
            TV_INT cell_index(piston_index.x+i);
            euler.psi(cell_index)=false;
-           for(int axis=1;axis<=T_GRID::dimension;axis++){
+           for(int axis=0;axis<T_GRID::dimension;axis++){
                psi_N.Component(axis)(euler.grid.First_Face_Index_In_Cell(axis,cell_index))=true;face_velocities.Component(axis)(euler.grid.First_Face_Index_In_Cell(axis,cell_index))=0;
                psi_N.Component(axis)(euler.grid.Second_Face_Index_In_Cell(axis,cell_index))=true;face_velocities.Component(axis)(euler.grid.Second_Face_Index_In_Cell(axis,cell_index))=0;}}}
    if(test_number==3){TV_INT face_index=euler.grid.Cell(TV(piston_initial_position),0);

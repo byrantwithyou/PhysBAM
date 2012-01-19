@@ -96,7 +96,7 @@ template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION> void ADV
 Clamp_Weights_To_Grid(const RANGE<TV_INT>& inside_domain,ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >& weights)
 {
     T delta=(T)1e-5;
-    for(int i=0;i<weights.m;i++) if(!inside_domain.Lazy_Inside(weights(i).x.index)) for(int j=1;j<=TV::dimension;j++){
+    for(int i=0;i<weights.m;i++) if(!inside_domain.Lazy_Inside(weights(i).x.index)) for(int j=0;j<TV::dimension;j++){
         TV_INT index=TV_INT::All_Ones_Vector()*2;index(j)=weights(i).x.index(j);
         if(!inside_domain.Lazy_Inside(index)){
             int side=1;if(index(j)>inside_domain.max_corner(j)) side=2;else assert(index(j)<inside_domain.min_corner(j));
@@ -110,7 +110,7 @@ template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION> void ADV
 Clamp_X_To_Grid(const GRID<TV>& grid,TV& X)
 {
     bool outside=false;RANGE<TV> range=grid.Domain();
-    if(!range.Lazy_Inside(X)) for(int i=1;i<=TV::dimension;i++){TV point=range.min_corner;point(i)=X(i);
+    if(!range.Lazy_Inside(X)) for(int i=0;i<TV::dimension;i++){TV point=range.min_corner;point(i)=X(i);
         if(!range.Lazy_Inside(point)){
             int side=1;if(point(i)>range.max_corner(i)) side=2;else assert(point(i)<range.min_corner(i));
             if(solid_walls_hack_axis(i)(side)) outside=true;}}
@@ -120,7 +120,7 @@ Clamp_X_To_Grid(const GRID<TV>& grid,TV& X)
 template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION> bool ADVECTION_CONSERVATIVE_UNIFORM<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>::
 Is_Outside(const RANGE<TV_INT>& inside_domain,const FACE_INDEX<TV::dimension>& face)
 {
-    if(!inside_domain.Lazy_Inside(face.index)) for(int i=1;i<=TV::dimension;i++){
+    if(!inside_domain.Lazy_Inside(face.index)) for(int i=0;i<TV::dimension;i++){
         TV_INT index=TV_INT::All_Ones_Vector()*2;index(i)=face.index(i);
         if(!inside_domain.Lazy_Inside(index)){
             int side=1;if(index(i)>inside_domain.max_corner(i)) side=2;else assert(index(i)<inside_domain.min_corner(i));
@@ -137,7 +137,7 @@ Is_MPI_Boundary(const RANGE<TV_INT>& inside_domain,const FACE_INDEX<TV::dimensio
 template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION> bool ADVECTION_CONSERVATIVE_UNIFORM<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>::
 Is_MPI_Boundary(const RANGE<TV_INT>& inside_domain,const TV_INT& index)
 {
-    if(!inside_domain.Lazy_Inside(index)) for(int i=1;i<=TV::dimension;i++){
+    if(!inside_domain.Lazy_Inside(index)) for(int i=0;i<TV::dimension;i++){
         TV_INT tmp_index=TV_INT::All_Ones_Vector()*2;tmp_index(i)=index(i);
         if(!inside_domain.Lazy_Inside(tmp_index)){
             int side=1;if(tmp_index(i)>inside_domain.max_corner(i)) side=2;else assert(tmp_index(i)<inside_domain.min_corner(i));
@@ -211,7 +211,7 @@ template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION> void ADV
 Cell_Diffusion(const T_GRID& grid,ARRAY<T,TV_INT>& sum_jc_cell,T_ARRAYS_T2& Z,T_BOUNDARY_T2& boundary,BOUNDARY_UNIFORM<T_GRID,T>* boundary_sum)
 {
     for(int iter=0;iter<num_diffusion_iterations;iter++){
-        for(int axis=1;axis<=TV::dimension;axis++){
+        for(int axis=0;axis<TV::dimension;axis++){
             if(evenodd_cell==0){
                 RANGE<TV_INT> domain=grid.Domain_Indices();domain.max_corner-=TV_INT::All_Ones_Vector();domain.min_corner+=TV_INT::All_Ones_Vector();domain.max_corner(axis)+=1;
                 for(FACE_ITERATOR iterator(grid,domain,axis);iterator.Valid();iterator.Next()) Cell_Diffusion_Helper(iterator,sum_jc_cell,Z);}
@@ -248,9 +248,9 @@ Face_Diffusion(const T_GRID& grid,ARRAY<T,FACE_INDEX<TV::dimension> >& sum_jc,T_
 {
     PHYSBAM_DEBUG_WRITE_SUBSTEP("Before diffusion",0,0);
     for(int iter=0;iter<num_diffusion_iterations;iter++){
-        for(int axis=1;axis<=TV::dimension;axis++){
+        for(int axis=0;axis<TV::dimension;axis++){
             if(evenodd==0){
-                for(int axis2=1;axis2<=TV::dimension;axis2++){if(axis==axis2) continue;//handled above
+                for(int axis2=0;axis2<TV::dimension;axis2++){if(axis==axis2) continue;//handled above
                     RANGE<TV_INT> domain=grid.Domain_Indices();
                     domain.max_corner(axis)+=1;domain.min_corner(axis2)+=1;
                     if(solid_walls_hack_axis(axis)(1)) domain.min_corner(axis)+=1;
@@ -262,7 +262,7 @@ Face_Diffusion(const T_GRID& grid,ARRAY<T,FACE_INDEX<TV::dimension> >& sum_jc,T_
                 for(CELL_ITERATOR iterator(grid,domain);iterator.Valid();iterator.Next()) Face_Diffusion_Helper(iterator,axis,sum_jc,Z,inside);}
             else{
                 ARRAY<FACE_ITERATOR*> faces;ARRAY<CELL_ITERATOR*> cells;
-                for(int axis2=1;axis2<=TV::dimension;axis2++){if(axis==axis2) continue;//handled above
+                for(int axis2=0;axis2<TV::dimension;axis2++){if(axis==axis2) continue;//handled above
                     RANGE<TV_INT> domain=grid.Domain_Indices();
                     domain.max_corner(axis)+=1;domain.min_corner(axis2)+=1;
                     if(solid_walls_hack_axis(axis)(1)) domain.min_corner(axis)+=1;
@@ -285,7 +285,7 @@ Face_Diffusion(const T_GRID& grid,ARRAY<T,FACE_INDEX<TV::dimension> >& sum_jc,T_
                 boundary_sum->Fill_Ghost_Cells_Face(grid,sum_jc,sum_jc_ghost,0,number_of_ghost_cells); //Sync for mpi boundaries
                 for(int side=0;side<2;side++){
                     if(evenodd==0){
-                        for(int axis2=1;axis2<=TV::dimension;axis2++){if(axis==axis2 || !mpi_boundary(axis2)(side)) continue;//handled above
+                        for(int axis2=0;axis2<TV::dimension;axis2++){if(axis==axis2 || !mpi_boundary(axis2)(side)) continue;//handled above
                             RANGE<TV_INT> domain=grid.Domain_Indices();domain.max_corner(axis)++;
                             if(side==1) domain.max_corner(axis2)=domain.min_corner(axis2);
                             else{domain.max_corner(axis2)++;domain.min_corner(axis2)=domain.max_corner(axis2);}
@@ -296,7 +296,7 @@ Face_Diffusion(const T_GRID& grid,ARRAY<T,FACE_INDEX<TV::dimension> >& sum_jc,T_
                         if(mpi_boundary(axis)(side)) for(CELL_ITERATOR iterator(grid,domain);iterator.Valid();iterator.Next()) Face_Diffusion_Helper(iterator,axis,sum_jc_ghost,Z_ghost_local,inside);}
                     else{
                         ARRAY<FACE_ITERATOR*> faces;ARRAY<CELL_ITERATOR*> cells;
-                        for(int axis2=1;axis2<=TV::dimension;axis2++){if(axis==axis2 || !mpi_boundary(axis2)(side)) continue;//handled above
+                        for(int axis2=0;axis2<TV::dimension;axis2++){if(axis==axis2 || !mpi_boundary(axis2)(side)) continue;//handled above
                             RANGE<TV_INT> domain=grid.Domain_Indices();domain.max_corner(axis)++;
                             if(side==1) domain.max_corner(axis2)=domain.min_corner(axis2);
                             else{domain.max_corner(axis2)++;domain.min_corner(axis2)=domain.max_corner(axis2);}
@@ -458,7 +458,7 @@ Update_Advection_Equation_Face_Lookup(T_GRID& grid,T_ARRAYS_SCALAR& phi1,T_ARRAY
         inside1(iterator.Full_Index())=false;
         inside2(iterator.Full_Index())=false;}
     for(CELL_ITERATOR iterator(grid,2*number_of_ghost_cells+1);iterator.Valid();iterator.Next()){
-        for(int axis=1;axis<=TV::dimension;axis++){
+        for(int axis=0;axis<TV::dimension;axis++){
             if(!inside1(FACE_INDEX<TV::dimension>(axis,iterator.First_Face_Index(axis)))) inside1(FACE_INDEX<TV::dimension>(axis,iterator.First_Face_Index(axis)))=lsv1.Phi(iterator.Location())<=0;
             if(!inside1(FACE_INDEX<TV::dimension>(axis,iterator.Second_Face_Index(axis)))) inside1(FACE_INDEX<TV::dimension>(axis,iterator.Second_Face_Index(axis)))=lsv1.Phi(iterator.Location())<=0;
             if(!inside2(FACE_INDEX<TV::dimension>(axis,iterator.First_Face_Index(axis)))) inside2(FACE_INDEX<TV::dimension>(axis,iterator.First_Face_Index(axis)))=lsv2.Phi(iterator.Location())<=0;

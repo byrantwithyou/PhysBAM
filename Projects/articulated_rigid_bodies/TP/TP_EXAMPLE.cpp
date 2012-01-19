@@ -106,7 +106,7 @@ Make_Lathe_Chain_2(VECTOR_3D<T> start_point,VECTOR_3D<T> direction,int number_of
     
     }
     if(start_joint) if(branch_joint) arb.Add_Articulation(branch_body,num_bodies+1,branch_joint);else arb.Add_Articulation(num_bodies,num_bodies+1,num_joints);
-    for(int i=1;i<=number_of_links-1;i++) arb.Add_Articulation(num_bodies+i,num_bodies+i+1,num_joints+i);
+    for(int i=0;i<number_of_links-1;i++) arb.Add_Articulation(num_bodies+i,num_bodies+i+1,num_joints+i);
 
     for(int j=0;j<branch_num;j++){
         arb.joint_mesh.joint_description_list.Add_Joint_Description();
@@ -153,7 +153,7 @@ Make_Lathe_Chain(VECTOR_3D<T>& start,VECTOR_3D<T> orient,int num_in_chain,bool s
     }
 
     if(start_joint) arb.Add_Articulation(num_bodies,num_bodies+1,num_joints);
-    for(int i=1;i<=num_in_chain-1;i++) arb.Add_Articulation(num_bodies+i,num_bodies+i+1,num_joints+i);
+    for(int i=0;i<num_in_chain-1;i++) arb.Add_Articulation(num_bodies+i,num_bodies+i+1,num_joints+i);
 
     num_joints+=num_in_chain-1;
     if(end_joint) num_joints+=1;

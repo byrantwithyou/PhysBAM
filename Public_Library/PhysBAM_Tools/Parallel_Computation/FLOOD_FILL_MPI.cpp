@@ -274,7 +274,7 @@ Find_Global_Colors(ARRAY<bool,VECTOR<int,1> >& color_is_global,const RANGE<TV_IN
 {
     int proc_null=mpi_grid.threaded_grid?-1:MPI::PROC_NULL;
     const ARRAY<int>& side_neighbor_ranks=mpi_grid.threaded_grid?mpi_grid.threaded_grid->side_neighbor_ranks:mpi_grid.side_neighbor_ranks;
-    for(int axis=1;axis<=T_GRID::dimension;axis++)for(int axis_side=0;axis_side<=1;axis_side++){
+    for(int axis=0;axis<T_GRID::dimension;axis++)for(int axis_side=0;axis_side<=1;axis_side++){
         int side=2*axis-1+axis_side;
         if(side_neighbor_ranks(side)!=proc_null){
             for(typename T_GRID::FACE_ITERATOR iterator(local_grid,0,T_GRID::BOUNDARY_REGION,side);iterator.Valid();iterator.Next())if(!psi_N.Component(axis)(iterator.Face_Index())){

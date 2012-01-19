@@ -140,7 +140,7 @@ ISend_Particles(const MPI_UNIFORM_GRID<T_GRID>& mpi_grid,T_PARTICLES& particles,
     buffers.Resize(T_GRID::number_of_one_ring_neighbors_per_cell);
     ARRAY<ARRAY<PAIR<T_PARTICLES*,int> > > exchange_particles(T_GRID::number_of_one_ring_neighbors_per_cell);
     // TODO: this is inefficient because it does an entire box check even if only some sides are needed, and doesn't locally delete sent particles
-    for(int n=1;n<=T_GRID::number_of_one_ring_neighbors_per_cell;n++)if(mpi_grid.all_neighbor_ranks(n)!=MPI::PROC_NULL){
+    for(int n=0;n<T_GRID::number_of_one_ring_neighbors_per_cell;n++)if(mpi_grid.all_neighbor_ranks(n)!=MPI::PROC_NULL){
         exchange_particles(n).Preallocate(100);
         for(int i=1;i<=particles.array_collection->Size();i++){
             if(!domain.Lazy_Inside(particles.X(i)) && neighbor_domains(n).Lazy_Inside(particles.X(i)))

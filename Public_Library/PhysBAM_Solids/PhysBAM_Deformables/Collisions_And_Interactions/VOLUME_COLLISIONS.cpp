@@ -101,10 +101,10 @@ Compute_Collision_Triangles(T_OBJECT& obj1,T_OBJECT& obj2)
         //    continue;
         visited_particles1.Set_All(obj1.mesh.elements(a));
         visited_particles2.Set_All(obj2.mesh.elements(b));
-        for(int i=1;i<=TV::m+1;i++){
-            for(int j=1;j<=TV::m+1;j++){
+        for(int i=0;i<TV::m+1;i++){
+            for(int j=0;j<TV::m+1;j++){
                 VECTOR<int,TV::m*2> I;
-                for(int k=1;k<=TV::m;k++){
+                for(int k=0;k<TV::m;k++){
                     I(k)=obj1.mesh.elements(a)(compute_collision_triangles_order[TV::m-2][i-1][k-1]);
                     I(k+TV::m)=obj2.mesh.elements(b)(compute_collision_triangles_order[TV::m-2][j-1][k-1]);}
                 int sign=Sort_Pair(I);

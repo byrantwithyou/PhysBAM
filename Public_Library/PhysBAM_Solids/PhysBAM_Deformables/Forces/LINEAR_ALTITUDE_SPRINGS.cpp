@@ -90,9 +90,9 @@ Compute_Plasticity(const int h,const int t,const T current_length)
 template<class TV,int d> void LINEAR_ALTITUDE_SPRINGS<TV,d>::
 Clamp_Restlength_With_Fraction_Of_Springs(const T fraction)
 {
-    ARRAY<T> length((d+1)*parameters.m,false);for(int s=0;s<parameters.m;s++) for(int k=1;k<=d+1;k++) length((d+1)*(s-1)+k)=parameters(s)(k).restlength;Sort(length);
+    ARRAY<T> length((d+1)*parameters.m,false);for(int s=0;s<parameters.m;s++) for(int k=0;k<d+1;k++) length((d+1)*(s-1)+k)=parameters(s)(k).restlength;Sort(length);
     T minimum_restlength=length(min((int)(fraction*length.m)+1,length.m));LOG::cout<<"Enlarging the restlength of all altitude springs below "<<minimum_restlength<<std::endl;
-    for(int i=0;i<parameters.m;i++) for(int k=1;k<=d+1;k++) parameters(i)(k).restlength=max(minimum_restlength,parameters(i)(k).restlength);
+    for(int i=0;i<parameters.m;i++) for(int k=0;k<d+1;k++) parameters(i)(k).restlength=max(minimum_restlength,parameters(i)(k).restlength);
 }
 //#####################################################################
 // Function Print_Restlength_Statistics
@@ -101,8 +101,8 @@ template<class TV,int d> void LINEAR_ALTITUDE_SPRINGS<TV,d>::
 Print_Restlength_Statistics() const
 {
     LOG::cout<<"Altitude Springs - Total Springs = "<<(d+1)*parameters.m<<std::endl;
-    ARRAY<T> length((d+1)*parameters.m,false);for(int s=0;s<parameters.m;s++) for(int k=1;k<=d+1;k++) length((d+1)*s+k-(d+1))=parameters(s)(k).restlength;Sort(length);
-    ARRAY<T> visual_length((d+1)*parameters.m,false);for(int s=0;s<parameters.m;s++) for(int k=1;k<=d+1;k++)visual_length((d+1)*s+k-(d+1))=parameters(s)(k).visual_restlength;
+    ARRAY<T> length((d+1)*parameters.m,false);for(int s=0;s<parameters.m;s++) for(int k=0;k<d+1;k++) length((d+1)*s+k-(d+1))=parameters(s)(k).restlength;Sort(length);
+    ARRAY<T> visual_length((d+1)*parameters.m,false);for(int s=0;s<parameters.m;s++) for(int k=0;k<d+1;k++)visual_length((d+1)*s+k-(d+1))=parameters(s)(k).visual_restlength;
     Sort(visual_length);
     int one_percent=(int)(.01*length.m)+1,ten_percent=(int)(.1*length.m)+1,median=(int)(.5*length.m)+1;
     LOG::cout<<"Altitude Springs - Smallest Restlength = "<<length(1)<<", Visual Restlength = "<<visual_length(1)<<std::endl;
@@ -118,7 +118,7 @@ Enable_Plasticity(const ARRAY<VECTOR<T,d+1> >& plastic_yield_strain_input,const 
 {
     use_plasticity=true;plasticity_clamp_ratio=plasticity_clamp_ratio_input;
     plastic_parameters.Resize(parameters.m,false,false);
-    for(int i=0;i<parameters.m;i++) for(int k=1;k<=d+1;k++){PLASTIC_PARAMETER& plastic_parameter=plastic_parameters(i)(k);
+    for(int i=0;i<parameters.m;i++) for(int k=0;k<d+1;k++){PLASTIC_PARAMETER& plastic_parameter=plastic_parameters(i)(k);
         plastic_parameter.visual_restlength=parameters(i)(k).visual_restlength;
         plastic_parameter.yield_strain=plastic_yield_strain_input(i)(k);
         plastic_parameter.hardening=plastic_hardening_input(i)(k);}
@@ -131,7 +131,7 @@ Enable_Plasticity(const T plastic_yield_strain_input,const T plastic_hardening_i
 {
     use_plasticity=true;plasticity_clamp_ratio=plasticity_clamp_ratio_input;
     plastic_parameters.Resize(parameters.m,false,false);
-    for(int i=0;i<parameters.m;i++) for(int k=1;k<=d+1;k++){PLASTIC_PARAMETER& plastic_parameter=plastic_parameters(i)(k);
+    for(int i=0;i<parameters.m;i++) for(int k=0;k<d+1;k++){PLASTIC_PARAMETER& plastic_parameter=plastic_parameters(i)(k);
         plastic_parameter.visual_restlength=parameters(i)(k).visual_restlength;
         plastic_parameter.yield_strain=plastic_yield_strain_input;
         plastic_parameter.hardening=plastic_hardening_input;}
@@ -142,7 +142,7 @@ Enable_Plasticity(const T plastic_yield_strain_input,const T plastic_hardening_i
 template<class TV,int d> void LINEAR_ALTITUDE_SPRINGS<TV,d>::
 Set_Stiffness(const T youngs_modulus_input)
 {
-    for(int i=0;i<parameters.m;i++) for(int k=1;k<=d+1;k++) parameters(i)(k).youngs_modulus=youngs_modulus_input;Invalidate_CFL();
+    for(int i=0;i<parameters.m;i++) for(int k=0;k<d+1;k++) parameters(i)(k).youngs_modulus=youngs_modulus_input;Invalidate_CFL();
 }
 //#####################################################################
 // Function Set_Stiffness
@@ -150,7 +150,7 @@ Set_Stiffness(const T youngs_modulus_input)
 template<class TV,int d> void LINEAR_ALTITUDE_SPRINGS<TV,d>::
 Set_Stiffness(const ARRAY<VECTOR<T,d+1> >& youngs_modulus_input)
 {
-    for(int i=0;i<parameters.m;i++) for(int k=1;k<=d+1;k++) parameters(i)(k).youngs_modulus=youngs_modulus_input(i)(k);Invalidate_CFL();
+    for(int i=0;i<parameters.m;i++) for(int k=0;k<d+1;k++) parameters(i)(k).youngs_modulus=youngs_modulus_input(i)(k);Invalidate_CFL();
 }
 //#####################################################################
 // Function Set_Restlength
@@ -158,7 +158,7 @@ Set_Stiffness(const ARRAY<VECTOR<T,d+1> >& youngs_modulus_input)
 template<class TV,int d> void LINEAR_ALTITUDE_SPRINGS<TV,d>::
 Set_Restlength(const ARRAY<VECTOR<T,d+1> >& restlength_input)
 {
-    for(int i=0;i<parameters.m;i++) for(int k=1;k<=d+1;k++) parameters(i)(k).restlength=restlength_input(i)(k);
+    for(int i=0;i<parameters.m;i++) for(int k=0;k<d+1;k++) parameters(i)(k).restlength=restlength_input(i)(k);
 }
 //#####################################################################
 // Function Clamp_Restlength
@@ -167,7 +167,7 @@ template<class TV,int d> void LINEAR_ALTITUDE_SPRINGS<TV,d>::
 Clamp_Restlength(const T clamped_restlength)
 {
     Invalidate_CFL();
-    for(int i=0;i<parameters.m;i++) for(int k=1;k<=d+1;k++) parameters(i)(k).restlength=max(parameters(i)(k).visual_restlength,clamped_restlength);
+    for(int i=0;i<parameters.m;i++) for(int k=0;k<d+1;k++) parameters(i)(k).restlength=max(parameters(i)(k).visual_restlength,clamped_restlength);
 }
 //#####################################################################
 // Function Set_Damping
@@ -175,7 +175,7 @@ Clamp_Restlength(const T clamped_restlength)
 template<class TV,int d> void LINEAR_ALTITUDE_SPRINGS<TV,d>::
 Set_Damping(const ARRAY<VECTOR<T,d+1> >& damping_input)
 {
-    for(int i=0;i<parameters.m;i++) for(int k=1;k<=d+1;k++) parameters(i)(k).damping=damping_input(i)(k);Invalidate_CFL();
+    for(int i=0;i<parameters.m;i++) for(int k=0;k<d+1;k++) parameters(i)(k).damping=damping_input(i)(k);Invalidate_CFL();
 }
 //#####################################################################
 // Function Set_Damping
@@ -183,7 +183,7 @@ Set_Damping(const ARRAY<VECTOR<T,d+1> >& damping_input)
 template<class TV,int d> void LINEAR_ALTITUDE_SPRINGS<TV,d>::
 Set_Damping(const T damping_input)
 {
-    for(int i=0;i<parameters.m;i++) for(int k=1;k<=d+1;k++) parameters(i)(k).damping=damping_input;Invalidate_CFL();
+    for(int i=0;i<parameters.m;i++) for(int k=0;k<d+1;k++) parameters(i)(k).damping=damping_input;Invalidate_CFL();
 }
 //#####################################################################
 // Function Create_Altitude_Springs_Base

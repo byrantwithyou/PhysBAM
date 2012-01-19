@@ -266,7 +266,7 @@ Scale_And_Apply_Impulses()
         if(pf_target_impulses(i) == TV()) continue;
         const VECTOR<int,d+1>& nodes=point_face_pairs_internal(i);
         VECTOR<T,d+1> one_over_m(one_over_mass.Subset(nodes));
-        for(int j=1;j<=d+1;j++) V(nodes(j))+=pf_target_weights(i)(j)*one_over_m[j]*pf_target_impulses(i);}
+        for(int j=0;j<d+1;j++) V(nodes(j))+=pf_target_weights(i)(j)*one_over_m[j]*pf_target_impulses(i);}
     for(int i=0;i<ee_target_impulses.m;i++){
         if(ee_target_impulses(i) == TV()) continue;
         const VECTOR<int,2*d-2>& nodes=edge_edge_pairs_internal(i);

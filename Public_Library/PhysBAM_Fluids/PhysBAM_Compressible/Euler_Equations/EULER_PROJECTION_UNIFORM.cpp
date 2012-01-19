@@ -197,7 +197,7 @@ Compute_Divergence(const FACE_LOOKUP& face_lookup)
     // Compute divergence at cell centers
     for(CELL_ITERATOR iterator(euler->grid);iterator.Valid();iterator.Next()){
         const typename FACE_LOOKUP::LOOKUP& lookup=face_lookup.Starting_Point_Cell(iterator.Cell_Index());
-        T divergence=0;for(int axis=1;axis<=T_GRID::dimension;axis++){
+        T divergence=0;for(int axis=0;axis<T_GRID::dimension;axis++){
             divergence+=(lookup(axis,iterator.Second_Face_Index(axis))-lookup(axis,iterator.First_Face_Index(axis)))*one_over_dx[axis];}
         elliptic_solver->f(iterator.Cell_Index())=divergence;}
 }
@@ -221,7 +221,7 @@ Compute_Advected_Pressure(const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const T_FACE_
 
     FLOOD_FILL_1D find_connected_components;
     T_ARRAYS_SCALAR rhs(euler->grid.Domain_Indices());ARRAY<T,VECTOR<int,1> > p_1d,u,u_px;
-    for(int axis=1;axis<=T_GRID::dimension;axis++){
+    for(int axis=0;axis<T_GRID::dimension;axis++){
         GRID<VECTOR<T,1> > grid_1d=euler->grid.Get_1D_Grid(axis);
         p_1d.Resize(grid_1d.Domain_Indices(3));u.Resize(grid_1d.Domain_Indices(3));u_px.Resize(grid_1d.Domain_Indices(3));
         T_GRID_LOWER_DIM lower_dimension_grid=euler->grid.Remove_Dimension(axis);
@@ -231,7 +231,7 @@ Compute_Advected_Pressure(const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const T_FACE_
         for(CELL_ITERATOR_LOWER_DIM iterator(lower_dimension_grid);iterator.Valid();iterator.Next()){TV_INT_LOWER_DIM cell_index=iterator.Cell_Index();
             for(int i=-2;i<=grid_1d.counts.x+3;i++) u(i)=v_cell(cell_index.Insert(i,axis))[axis];
             for(int i=0;i<grid_1d.counts.x;i++) colors(i)=euler->psi(cell_index.Insert(i,axis))?0:-1;
-            for(int i=1;i<=grid_1d.counts.x+1;i++) psi_N_axis(i)=elliptic_solver->psi_N(axis,cell_index.Insert(i,axis));
+            for(int i=0;i<grid_1d.counts.x+1;i++) psi_N_axis(i)=elliptic_solver->psi_N(axis,cell_index.Insert(i,axis));
             int number_of_regions=find_connected_components.Flood_Fill(colors,psi_N_axis);
             for(int color=0;color<number_of_regions;color++){
                 for(int i=-2;i<=grid_1d.counts.x+3;i++) p_1d(i)=p_ghost(cell_index.Insert(i,axis));
@@ -322,7 +322,7 @@ Get_Ghost_Pressures(const T dt,const T time,const T_ARRAYS_BOOL& psi_D,const T_F
     pressure_boundary->Fill_Ghost_Cells(euler->grid,pressure,p_ghost,dt,time,1);
     // Restore dirichlet pressures at non-periodic dirichlet cells which are extrapolated by pressure_boundary
     if(!use_neumann_condition_for_outflow_boundaries){
-        for(int axis=1;axis<=T_GRID::dimension;axis++) if(!elliptic_solver->periodic_boundary[axis]){
+        for(int axis=0;axis<T_GRID::dimension;axis++) if(!elliptic_solver->periodic_boundary[axis]){
             for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
                 for(CELL_ITERATOR iterator(euler->grid,1,T_GRID::GHOST_REGION,side);iterator.Valid();iterator.Next()){
                     TV_INT cell_index=iterator.Cell_Index();
@@ -375,7 +375,7 @@ Apply_Pressure(const T_ARRAYS_SCALAR& p_ghost,const T_FACE_ARRAYS_SCALAR& p_face
     // update momentum
     for(CELL_ITERATOR iterator(euler->grid);iterator.Valid();iterator.Next()) if(euler->psi(iterator.Cell_Index())){
         TV_INT cell_index=iterator.Cell_Index();
-        for(int axis=1;axis<=T_GRID::dimension;axis++){
+        for(int axis=0;axis<T_GRID::dimension;axis++){
             TV_INT first_face_index=iterator.First_Face_Index(axis),second_face_index=iterator.Second_Face_Index(axis);
             T p_hat_first_face=p_hat_face.Component(axis)(first_face_index);
             T p_hat_second_face=p_hat_face.Component(axis)(second_face_index);
@@ -400,7 +400,7 @@ Apply_Pressure(const T_ARRAYS_SCALAR& p_ghost,const T_FACE_ARRAYS_SCALAR& p_face
    // update energy
    for(CELL_ITERATOR iterator(euler->grid);iterator.Valid();iterator.Next()) if(euler->psi(iterator.Cell_Index())){TV_INT cell_index=iterator.Cell_Index();
        T div_p_hat_u=0;
-       for(int axis=1;axis<=T_GRID::dimension;axis++){
+       for(int axis=0;axis<T_GRID::dimension;axis++){
            TV_INT first_face_index=iterator.First_Face_Index(axis),second_face_index=iterator.Second_Face_Index(axis);
            T p_hat_first_face=p_hat_face.Component(axis)(first_face_index);
            T p_hat_second_face=p_hat_face.Component(axis)(second_face_index);
@@ -425,7 +425,7 @@ Consistent_Boundary_Conditions() const
         LOG::cout<<"checking for consistent mpi boundaries"<<std::endl;
         T_ARRAYS_BOOL psi_D_ghost(elliptic_solver->psi_D);T_FACE_ARRAYS_SCALAR psi_N_ghost(euler->grid);
         euler->mpi_grid->Exchange_Boundary_Cell_Data(psi_D_ghost,1);
-        for(int axis=1;axis<=T_GRID::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
+        for(int axis=0;axis<T_GRID::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
             if(euler->mpi_grid->Neighbor(axis,axis_side)){TV_INT exterior_cell_offset=axis_side==1?-TV_INT::Axis_Vector(axis):TV_INT();
                 for(FACE_ITERATOR iterator(euler->grid,0,T_GRID::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
                     TV_INT face=iterator.Face_Index(),cell=face+exterior_cell_offset;int axis=iterator.Axis();

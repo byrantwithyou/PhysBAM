@@ -76,7 +76,7 @@ In_Place_PLU_Factorization(MATRIX_BASE<T,T_MATRIX2>& L,COLUMN_PERMUTATION& p)
         for(int i=j+1;i<=Columns();i++) if(abs((*this)(i,j))>value){row=i;value=abs((*this)(i,j));}
         if(row!=j){ // need to switch rows
             exchange(p(j),p(row)); // update permutation matrix
-            for(int k=1;k<=j-1;k++) exchange(L(j,k),L(row,k)); // update L
+            for(int k=0;k<j-1;k++) exchange(L(j,k),L(row,k)); // update L
             for(int k=j;k<=Columns();k++) exchange((*this)(j,k),(*this)(row,k));} // update U
         // standard LU factorization steps
         T diagonal_inverse=1/(*this)(j,j);for(int i=j;i<=Columns();i++) L(i,j)=(*this)(i,j)*diagonal_inverse; // fill in the column for L
@@ -90,7 +90,7 @@ In_Place_Cholesky_Factorization()
 {
     assert(Rows()==Columns());
     for(int j=1;j<=Columns();j++){ // for each column
-        for(int k=1;k<=j-1;k++) for(int i=j;i<=Rows();i++) (*this)(i,j)-=(*this)(j,k)*(*this)(i,k); // subtract off the known stuff in previous columns
+        for(int k=0;k<j-1;k++) for(int i=j;i<=Rows();i++) (*this)(i,j)-=(*this)(j,k)*(*this)(i,k); // subtract off the known stuff in previous columns
         (*this)(j,j)=sqrt((*this)(j,j));T diagonal_inverse=1/(*this)(j,j);for(int i=j+1;i<=Columns();i++) (*this)(i,j)*=diagonal_inverse;} // update L
     for(int i=1;i<=Rows();i++) for(int j=i+1;j<=Columns();j++) (*this)(i,j)=0; // zero out upper triangular part  TODO: Loop the other way around
 }

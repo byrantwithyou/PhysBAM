@@ -151,7 +151,7 @@ Get_Point_Surface_Element_Pairs_Helper(const RIGID_DEFORMABLE_COLLISIONS<VECTOR<
         TV w;int t=collision_body.Get_Tetrahedron_Near_Point(particles.X(particle_index),w,particles_to_ignore);if(!t) continue;
         TV surface_weights;int surface_triangle=collision_body.Get_Surface_Triangle(t,w,surface_weights,true);if(!surface_triangle) continue;
         VECTOR<int,3> element(collision_body.triangulated_surface.mesh.elements(surface_triangle));elements.Append(element);weights.Append(surface_weights);
-        TV distance=-particles.X(particle_index);for(int j=1;j<=TV::dimension;j++) distance+=particles.X(element(j))*surface_weights(j);
+        TV distance=-particles.X(particle_index);for(int j=0;j<TV::dimension;j++) distance+=particles.X(element(j))*surface_weights(j);
         particle_distances.Append(distance);}
 }
 //#####################################################################
@@ -1013,7 +1013,7 @@ Push_Out_From_Rigid_Body(RIGID_BODY<TV>& rigid_body,ARRAY<RIGID_BODY_PARTICLE_IN
             A.Set_Submatrix(TV::dimension*(TV::dimension==3)+1,1,Y*M[1]); // Don't compile index out of bounds in 2D, even though this case cannot happen in 2D.
             b.Set_Subvector(TV::dimension+1,Y*b_helper[1]);
             MATRIX<T,1,TV::dimension+T_SPIN::dimension> A_row;
-            for(int i=1;i<=TV::dimension;i++){
+            for(int i=0;i<TV::dimension;i++){
                 Z_helper.Get_Submatrix(i,1,A_row);
                 int matrix_index=i==u_index?0:1;
                 A.Set_Submatrix(i,1,A_row*M[matrix_index]);
@@ -1129,7 +1129,7 @@ Push_Out_From_Particle(const int particle)
     // apply push to elements
     for(int i=0;i<elements.m;i++){
         TV impulse=(velocity-particle_distances(i))/bindings(i)->One_Over_Effective_Mass();
-        for(int j=1;j<=ELEMENT::dimension;j++)
+        for(int j=0;j<ELEMENT::dimension;j++)
             Apply_Displacement_To_Particle(bindings(i)->parents[j],particles.one_over_mass(bindings(i)->parents[j])*bindings(i)->weights[j]*impulse);}
 
     // apply push to rigid bodies

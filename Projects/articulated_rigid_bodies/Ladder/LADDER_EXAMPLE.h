@@ -293,7 +293,7 @@ void Load_Joint_Frames()
     for(int i=0;i<starting_joint_positions.m;i++){
         (*input)>>starting_joint_positions(i).x;
         FRAME_3D<T> frame;
-        for(int j=1;j<=number_of_keyframes-1;j++)(*input)>>starting_joint_positions(i).y;
+        for(int j=0;j<number_of_keyframes-1;j++)(*input)>>starting_joint_positions(i).y;
         (*input)>>frame;
     }
 }

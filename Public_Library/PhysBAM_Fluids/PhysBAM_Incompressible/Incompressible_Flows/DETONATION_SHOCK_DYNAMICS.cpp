@@ -142,7 +142,7 @@ Make_NB_Indices(T_GRID &grid,T_ARRAYS_SCALAR &phi,ARRAY<TV_INT>& indices_interfa
     indices_interface.Clean_Memory();// Clean memory of lists
     for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
         T phi_1=phi_ghost(iterator.Cell_Index());
-        for(int i=1;i<=T_GRID::number_of_faces_per_cell;i++){// painful symmetric debugging, T_GRID::dimension was a big mistake
+        for(int i=0;i<T_GRID::number_of_faces_per_cell;i++){// painful symmetric debugging, T_GRID::dimension was a big mistake
             TV_INT neighbor_index=iterator.Cell_Neighbor(i);
             if(!phi_ghost.Valid_Index(neighbor_index))continue;
             T phi_2=phi_ghost(neighbor_index);

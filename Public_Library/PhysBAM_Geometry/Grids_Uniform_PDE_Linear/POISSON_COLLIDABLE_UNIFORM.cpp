@@ -197,9 +197,9 @@ Apply_Second_Order_Cut_Cell_Method(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLA
     assert(levelset);
     TV minus_one_over_dx_squared=(T)-1*Inverse(grid.dX*grid.dX);
 
-    if(use_variable_beta && !beta_given_on_faces) for(int i=1;i<=TV::dimension;i++){
+    if(use_variable_beta && !beta_given_on_faces) for(int i=0;i<TV::dimension;i++){
         RANGE<TV_INT> face_domain(domain);
-        for(int axis=1;axis<=TV::dimension;axis++){
+        for(int axis=0;axis<TV::dimension;axis++){
             if(face_domain.min_corner(axis)==grid.Domain_Indices(1).min_corner(axis)) face_domain.min_corner(axis)+=1;
             if(face_domain.max_corner(axis)==grid.Domain_Indices(1).max_corner(axis)) face_domain.max_corner(axis)-=1;}
         if(face_domain.min_corner(i)==grid.Domain_Indices().min_corner(i)) face_domain.min_corner(i)+=1;
@@ -224,9 +224,9 @@ Apply_Second_Order_Cut_Cell_Method(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLA
                     T beta_new=(T).5*(beta_ghost+variable_beta(first_cell_index));
                     A_right_i=beta_new/max(theta,second_order_cut_cell_threshold)*minus_one_over_dx_squared[axis];
                     A_array(color).Add_Element(matrix_index,matrix_index,A_right_i);b_array(color)(matrix_index)+=A_right_i*u_interface.Component(axis)(face_index);}}}}
-    else for(int i=1;i<=TV::dimension;i++){
+    else for(int i=0;i<TV::dimension;i++){
         RANGE<TV_INT> face_domain(domain);
-        for(int axis=1;axis<=TV::dimension;axis++){
+        for(int axis=0;axis<TV::dimension;axis++){
             if(face_domain.min_corner(axis)==grid.Domain_Indices(1).min_corner(axis)) face_domain.min_corner(axis)+=1;
             if(face_domain.max_corner(axis)==grid.Domain_Indices(1).max_corner(axis)) face_domain.max_corner(axis)-=1;}
         if(face_domain.min_corner(i)==grid.Domain_Indices().min_corner(i)) face_domain.min_corner(i)+=1;

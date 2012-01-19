@@ -123,7 +123,7 @@ Fill_Ghost_Cells(const T_GRID& grid,const T_ARRAYS_DIMENSION_BASE& u,T_ARRAYS_DI
     T_ARRAYS_DIMENSION_BASE::Put(u,u_ghost); // interior
     ARRAY<RANGE<TV_INT> > regions;Find_Ghost_Regions(grid,regions,number_of_ghost_cells);
 
-    for(int axis=1;axis<=T_GRID::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){int side=2*axis+axis_side-2;
+    for(int axis=0;axis<T_GRID::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){int side=2*axis+axis_side-2;
         if(!periodic[axis]) Fill_Single_Ghost_Region(grid,u_ghost,side,regions(side));
         else for(CELL_ITERATOR iterator(grid,regions(side));iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
                 int period=repeats_at_last_node[axis]?counts[axis]-1:counts[axis];
@@ -196,7 +196,7 @@ Apply_Boundary_Condition(const T_GRID& grid,T_ARRAYS_DIMENSION_BASE& u,const T t
 {
     //TODO: get rid of the helper functions
     //Apply_Boundary_Condition_Helper(grid,u,time);
-    for(int axis=1;axis<=T_GRID::dimension;axis++)
+    for(int axis=0;axis<T_GRID::dimension;axis++)
         if(periodic[axis] && repeats_at_last_node[axis]){
             for(CELL_ITERATOR iterator(grid,0,T_GRID::BOUNDARY_INTERIOR_REGION,2*axis);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
                 TV_INT opposite_cell=cell_index;opposite_cell[axis]=1;

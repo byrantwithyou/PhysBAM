@@ -36,19 +36,19 @@ public:
 
     T2 From_Base_Node(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X,const TV_INT& index) const PHYSBAM_OVERRIDE
     {T basis[T_GRID::dimension][4];T2 sum=T2();TV X_normalized=(X-grid.X(index))*grid.one_over_dX;
-    for(int axis=1;axis<=T_GRID::dimension;axis++) Catmull_Rom_Basis(X_normalized[axis],basis[axis-1]);
+    for(int axis=0;axis<T_GRID::dimension;axis++) Catmull_Rom_Basis(X_normalized[axis],basis[axis-1]);
     for(T_CELL_ITERATOR iterator(grid,RANGE<TV_INT>(index-TV_INT::All_Ones_Vector(),index+2*TV_INT::All_Ones_Vector()));iterator.Valid();iterator.Next()){
-        T product=1;for(int axis=1;axis<=T_GRID::dimension;axis++) product*=basis[axis-1][iterator.Cell_Index()[axis]-index[axis]+1];
+        T product=1;for(int axis=0;axis<T_GRID::dimension;axis++) product*=basis[axis-1][iterator.Cell_Index()[axis]-index[axis]+1];
         sum+=u(iterator.Cell_Index())*product;}
     return sum;}
 
     T2 From_Base_Node_Derivative(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X,const TV_INT& index,const TV_BOOL& derivative) const
     {T basis[T_GRID::dimension][4];T2 sum=T2();TV X_normalized=(X-grid.X(index))*grid.one_over_dX;
-    for(int axis=1;axis<=T_GRID::dimension;axis++)
+    for(int axis=0;axis<T_GRID::dimension;axis++)
         if(derivative[axis]) Catmull_Rom_Basis_Derivative(X_normalized[axis],basis[axis-1]);
         else Catmull_Rom_Basis(X_normalized[axis],basis[axis-1]);
     for(T_CELL_ITERATOR iterator(grid,RANGE<TV_INT>(index-TV_INT::All_Ones_Vector(),index+2*TV_INT::All_Ones_Vector()));iterator.Valid();iterator.Next()){
-        T product=1;for(int axis=1;axis<=T_GRID::dimension;axis++) product*=basis[axis-1][iterator.Cell_Index()[axis]-index[axis]+1];
+        T product=1;for(int axis=0;axis<T_GRID::dimension;axis++) product*=basis[axis-1][iterator.Cell_Index()[axis]-index[axis]+1];
         sum+=u(iterator.Cell_Index())*product;}
     return sum;}
 

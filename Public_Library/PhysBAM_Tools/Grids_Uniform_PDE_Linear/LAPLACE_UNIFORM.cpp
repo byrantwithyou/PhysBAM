@@ -106,7 +106,7 @@ Find_A_Part_One(RANGE<TV_INT>& domain,T_ARRAYS_INT& cell_index_to_matrix_index,A
         int color=filled_region_colors(cell_index);assert(color!=0);
         if(color!=-1 && (filled_region_touches_dirichlet(color)||solve_neumann_regions)){
             int row_count=1;
-            for(int axis=1;axis<=T_GRID::dimension;axis++){TV_INT offset;offset[axis]=1;
+            for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT offset;offset[axis]=1;
                 if(((filled_region_colors.Valid_Index(cell_index-offset) && filled_region_colors(cell_index-offset)==color) ||
                     (grid.Domain_Indices().Lazy_Outside(cell_index-offset) && periodic_boundary[axis])) && !psi_N.Component(axis)(cell_index)) row_count++;
                 if(((filled_region_colors.Valid_Index(cell_index+offset) && filled_region_colors(cell_index+offset)==color) ||
@@ -125,7 +125,7 @@ Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array
             int matrix_index=cell_index_to_matrix_index(cell_index);
             SPARSE_MATRIX_FLAT_NXN<T>& A=A_array(filled_region_colors(cell_index));VECTOR_ND<T>& b=b_array(filled_region_colors(cell_index));b(matrix_index)=f(cell_index);
             T row_sum=default_row_sum;
-            for(int axis=1;axis<=T_GRID::dimension;axis++){TV_INT offset;offset[axis]=1;
+            for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT offset;offset[axis]=1;
                 if(filled_region_colors.Valid_Index(cell_index-offset)){
                     if(use_psi_R && (r=psi_R.Component(axis)(cell_index))) row_sum+=one_over_dx2[axis]*r;
                     else if(psi_N.Component(axis)(cell_index)) row_sum+=one_over_dx2[axis];
@@ -217,15 +217,15 @@ Compute_Matrix_Indices_Threaded(ARRAY<RANGE<TV_INT> >& domains,ARRAY<ARRAY<INTER
         for(int color=0;color<interior_indices.m;color++) interior_indices(color)(i).min_corner=filled_region_cell_count(color)+1;
         Compute_Matrix_Indices(interior_domain,filled_region_cell_count,matrix_index_to_cell_index_array,cell_index_to_matrix_index);
         for(int color=0;color<interior_indices.m;color++) interior_indices(color)(i).max_corner=filled_region_cell_count(color);}
-    for(int axis=1;axis<=TV::dimension;axis++) for(int side=0;side<2;side++){int s=(axis-1)*2+side;
+    for(int axis=0;axis<TV::dimension;axis++) for(int side=0;side<2;side++){int s=(axis-1)*2+side;
         RANGE<TV_INT> exterior_domain(grid.Domain_Indices(1));
         for(int axis2=axis+1;axis2<=TV::dimension;axis2++){exterior_domain.min_corner(axis2)++;exterior_domain.max_corner(axis2)--;}
         if(side==1) exterior_domain.max_corner(axis)=exterior_domain.min_corner(axis);
         else exterior_domain.min_corner(axis)=exterior_domain.max_corner(axis);
         for(int i=0;i<domains.m;i++){
             RANGE<TV_INT> interior_domain(domains(i));
-            interior_domain.max_corner-=TV_INT::All_Ones_Vector();for(int axis=1;axis<=TV_INT::dimension;axis++) if(interior_domain.max_corner(axis)==grid.Domain_Indices().max_corner(axis)) interior_domain.max_corner(axis)++;
-            interior_domain.min_corner+=TV_INT::All_Ones_Vector();for(int axis=1;axis<=TV_INT::dimension;axis++) if(interior_domain.min_corner(axis)==grid.Domain_Indices().min_corner(axis)) interior_domain.min_corner(axis)--;
+            interior_domain.max_corner-=TV_INT::All_Ones_Vector();for(int axis=0;axis<TV_INT::dimension;axis++) if(interior_domain.max_corner(axis)==grid.Domain_Indices().max_corner(axis)) interior_domain.max_corner(axis)++;
+            interior_domain.min_corner+=TV_INT::All_Ones_Vector();for(int axis=0;axis<TV_INT::dimension;axis++) if(interior_domain.min_corner(axis)==grid.Domain_Indices().min_corner(axis)) interior_domain.min_corner(axis)--;
             for(int color=0;color<interior_indices.m;color++) ghost_indices(color)(i)(s).min_corner=filled_region_cell_count(color)+1;
             Compute_Matrix_Indices(RANGE<TV_INT>::Intersect(exterior_domain,interior_domain),filled_region_cell_count,matrix_index_to_cell_index_array,cell_index_to_matrix_index);
             for(int color=0;color<interior_indices.m;color++) ghost_indices(color)(i)(s).max_corner=filled_region_cell_count(color);}}
@@ -255,10 +255,10 @@ Find_Solution_Regions()
     filled_region_touches_dirichlet.Remove_All();
     // do the fill
     if(mpi_grid){
-        for(int axis=1;axis<=T_GRID::dimension;axis++) for(int side=0;side<=1;side++) for(CELL_ITERATOR iterator(grid,1,T_GRID::GHOST_REGION,2*axis-1+side);iterator.Valid();iterator.Next()){
-            for(int face=1;face<=T_GRID::dimension;face++)if(face!=axis){
+        for(int axis=0;axis<T_GRID::dimension;axis++) for(int side=0;side<=1;side++) for(CELL_ITERATOR iterator(grid,1,T_GRID::GHOST_REGION,2*axis-1+side);iterator.Valid();iterator.Next()){
+            for(int face=0;face<T_GRID::dimension;face++)if(face!=axis){
                 psi_N.Component(face)(iterator.Cell_Index())=true;psi_N.Component(face)(iterator.Cell_Index()+TV_INT::Axis_Vector(face))=true;}}
-        for(int axis=1;axis<=T_GRID::dimension;axis++) for(int side=0;side<=1;side++) for(CELL_ITERATOR iterator(grid,1,T_GRID::GHOST_REGION,2*axis-1+side);iterator.Valid();iterator.Next()){
+        for(int axis=0;axis<T_GRID::dimension;axis++) for(int side=0;side<=1;side++) for(CELL_ITERATOR iterator(grid,1,T_GRID::GHOST_REGION,2*axis-1+side);iterator.Valid();iterator.Next()){
             if(!psi_N.Component(axis)(iterator.Cell_Index()+(1-side)*TV_INT::Axis_Vector(axis))&&!psi_D(iterator.Cell_Index()))filled_region_colors(iterator.Cell_Index())=0;}}
     number_of_regions=flood_fill.Flood_Fill(filled_region_colors,psi_N,&filled_region_touches_dirichlet);
     // correct flood fill for distributed grids

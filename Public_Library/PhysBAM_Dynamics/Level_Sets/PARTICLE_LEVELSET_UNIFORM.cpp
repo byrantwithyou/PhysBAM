@@ -875,12 +875,12 @@ Delete_Particles_Outside_Grid()
 
     RANGE<TV_INT> real_domain(levelset.grid.Domain_Indices());real_domain.max_corner+=TV_INT::All_Ones_Vector();
     RANGE<TV_INT> domain(levelset.grid.Domain_Indices(3));domain.max_corner+=TV_INT::All_Ones_Vector();
-    for(int axis=1;axis<=TV::dimension;axis++) for(int side=0;side<2;side++){
+    for(int axis=0;axis<TV::dimension;axis++) for(int side=0;side<2;side++){
         RANGE<TV_INT> ghost_domain(domain);
         if(side==1) ghost_domain.max_corner(axis)=real_domain.min_corner(axis)-1;
         else ghost_domain.min_corner(axis)=real_domain.max_corner(axis)+1;
         DOMAIN_ITERATOR_THREADED_ALPHA<PARTICLE_LEVELSET_UNIFORM<T_GRID>,TV>(ghost_domain,thread_queue).Run(*this,&PARTICLE_LEVELSET_UNIFORM<T_GRID>::Delete_Particles_Far_Outside_Grid);}
-    for(int axis=1;axis<=TV::dimension;axis++) for(int side=0;side<2;side++){
+    for(int axis=0;axis<TV::dimension;axis++) for(int side=0;side<2;side++){
         RANGE<TV_INT> boundary_domain(real_domain);
         if(side==1) boundary_domain.max_corner(axis)=real_domain.min_corner(axis);
         else boundary_domain.min_corner(axis)=real_domain.max_corner(axis);
@@ -944,7 +944,7 @@ Delete_Particles_In_Local_Maximum_Phi_Cells_Threaded(RANGE<TV_INT>& domain,const
 {
     for(CELL_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
         bool local_minima=true;
-        for(int axis=1;axis<=T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
+        for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
             if(sign*levelset.phi(cell)<sign*levelset.phi(cell+axis_vector)-tolerance||sign*levelset.phi(cell)<sign*levelset.phi(cell-axis_vector)-tolerance){local_minima=false;break;}}
         if(!local_minima)continue;
         TV_INT blocks[T_GRID::number_of_nodes_per_cell];levelset.grid.Nodes_In_Cell_From_Minimum_Corner_Node(cell,blocks);
@@ -1237,7 +1237,7 @@ Delete_Particles_Far_From_Interface_Part_One(RANGE<TV_INT>& domain,T_ARRAYS_CHAR
 {
     const T_ARRAYS_BOOL_DIMENSION& cell_neighbors_visible=levelset.collision_body_list->cell_neighbors_visible;
     for(CELL_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
-        for(int axis=1;axis<=T_GRID::dimension;axis++){TV_INT neighbor=cell+TV_INT::Axis_Vector(axis);
+        for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT neighbor=cell+TV_INT::Axis_Vector(axis);
             if(near_interface.Valid_Index(neighbor) && cell_neighbors_visible(cell)(axis) && LEVELSET_UTILITIES<T>::Interface(levelset.phi(cell),levelset.phi(neighbor))){
             near_interface(cell)=near_interface(neighbor)=1;}}}
 }
@@ -1251,7 +1251,7 @@ Delete_Particles_Far_From_Interface_Part_Two(RANGE<TV_INT>& domain,T_ARRAYS_CHAR
     RANGE<TV_INT> ghost_domain(domain);if(ghost_domain.min_corner.x>0) ghost_domain.min_corner.x-=1;
     char new_mask=1<<distance,old_mask=new_mask-1;
     for(CELL_ITERATOR iterator(levelset.grid,ghost_domain);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
-        for(int axis=1;axis<=T_GRID::dimension;axis++){TV_INT neighbor=cell+TV_INT::Axis_Vector(axis);
+        for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT neighbor=cell+TV_INT::Axis_Vector(axis);
             if(near_interface.Valid_Index(neighbor) && cell_neighbors_visible(cell)(axis) && (near_interface(cell)|near_interface(neighbor))&old_mask){
                 if(domain.Lazy_Inside(cell)) near_interface(cell)|=new_mask;if(domain.Lazy_Inside(neighbor)) near_interface(neighbor)|=new_mask;}}}
 }

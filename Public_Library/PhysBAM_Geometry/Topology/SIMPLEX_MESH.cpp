@@ -169,7 +169,7 @@ Add_Element_If_Not_Already_There(const VECTOR<int,d+1>& nodes)
 {
     if(int element=Simplex(nodes)) return element;
     elements.Append(nodes);
-    for(int i=1;i<=d+1;i++) (*incident_elements)(nodes[i]).Append(elements.m);
+    for(int i=0;i<d+1;i++) (*incident_elements)(nodes[i]).Append(elements.m);
     return elements.m;
 }
 //#####################################################################

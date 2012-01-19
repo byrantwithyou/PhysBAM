@@ -27,7 +27,7 @@ Evaluate(const T t)
 {
     assert(Start_Time()<=t && t<End_Time());
     T2 sum=T2();
-    for(int i=1;i<=control_points.m-k;i++){sum+=Basis_Function(i,k,t)*control_points(i+k/2);}
+    for(int i=0;i<control_points.m-k;i++){sum+=Basis_Function(i,k,t)*control_points(i+k/2);}
     return sum;
 }
 //#####################################################################
@@ -38,7 +38,7 @@ Clamped_Evaluate(const T t)
 {
     T2 sum=T2();
     T clamped_t=clamp(t,Start_Time(),End_Time()-(T)1e-7);
-    for(int i=1;i<=control_points.m-k;i++){sum+=Basis_Function(i,k,clamped_t)*control_points(i+k/2);}
+    for(int i=0;i<control_points.m-k;i++){sum+=Basis_Function(i,k,clamped_t)*control_points(i+k/2);}
     return sum;
 }
 //#####################################################################

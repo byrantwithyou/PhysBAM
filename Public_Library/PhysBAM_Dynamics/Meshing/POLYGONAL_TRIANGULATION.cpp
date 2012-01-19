@@ -106,7 +106,7 @@ Triangulate_Nonconvex_Planar_Connected_Polygon(const ARRAY<VECTOR<T,2> >& positi
         if(segments(s)[2]!=segments(s%segments.m+1)[1]) PHYSBAM_FATAL_ERROR();
         vertices.Append(segments(s)[1]);}
     if(vertices.m<3) PHYSBAM_FATAL_ERROR();
-    for(int s=1;s<=segments.m-2;s++)
+    for(int s=0;s<segments.m-2;s++)
         triangles.Append(VECTOR<int,3>(vertices(1),vertices(s+1),vertices(s+2)));
 
 #if 0

@@ -421,13 +421,13 @@ Set_PD_Targets()
     if(solid_body_collection.rigid_body_collection.articulated_rigid_body.Has_Actuators()){
         if(current_joints.m>0) for(int i=0;i<current_joints.m;i++){assert(joint_mesh.Is_Active(current_joints(i)));
             JOINT<TV>& joint=*joint_mesh(current_joints(i));
-            bool control=false;for(int j=1;j<=T_SPIN::dimension;j++) if(joint.control_dof(j)) control=true;
+            bool control=false;for(int j=0;j<T_SPIN::dimension;j++) if(joint.control_dof(j)) control=true;
             if(!joint.joint_function || !control) continue;
             joint.joint_function->active=true;joint.global_post_stabilization=true;
             joint.joint_function->Set_Target_Angular_Velocity(Set_PD_Targets_Helper(solid_body_collection.rigid_body_collection.articulated_rigid_body.Parent(joint.id_number),&joint));}
         else for(JOINT_ID i(1);i<=joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue;
             JOINT<TV>& joint=*joint_mesh(i);
-            bool control=false;for(int j=1;j<=T_SPIN::dimension;j++) if(joint.control_dof(j)) control=true;
+            bool control=false;for(int j=0;j<T_SPIN::dimension;j++) if(joint.control_dof(j)) control=true;
             if(!joint.joint_function || !control) continue;
             joint.joint_function->active=true;joint.global_post_stabilization=true;
             joint.joint_function->Set_Target_Angular_Velocity(Set_PD_Targets_Helper(solid_body_collection.rigid_body_collection.articulated_rigid_body.Parent(joint.id_number),&joint));}}
@@ -492,7 +492,7 @@ Create_All_Clusters(RIGID_BODY_COLLISION_MANAGER_HASH* collision_manager)
     for(JOINT_ID i(1);i<=joint_mesh.Size();i++){JOINT_ID joint_id=i;
         if(!joint_mesh.Is_Active(i)) continue;
         bool controlled=false;
-        for(int j=1;j<=T_SPIN::dimension;j++) if(joint_mesh(i)->control_dof(j)) controlled=true;
+        for(int j=0;j<T_SPIN::dimension;j++) if(joint_mesh(i)->control_dof(j)) controlled=true;
         if(!controlled) continue;
         int parent_cluster=Parent(joint_id)->particle_index,child_cluster=Child(joint_id)->particle_index;
         ARRAY<bool,JOINT_ID> blocking_list_single;blocking_list_single.Resize(joint_mesh.Size());
@@ -711,7 +711,7 @@ Evaluate_Force_To_Stay(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T 
     for(JOINT_ID i(1);i<=joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue;
         JOINT<TV>& joint=*joint_mesh(i);
         joint.impulse_accumulator->Reset();
-        bool control=false;for(int j=1;j<=T_SPIN::dimension;j++) if(joint.control_dof(j)) control=true;
+        bool control=false;for(int j=0;j<T_SPIN::dimension;j++) if(joint.control_dof(j)) control=true;
         if(!joint.joint_function || !control){joint.joint_function->active=false;joint.global_post_stabilization=false;continue;} //Turn off joints we don't control
         else{joint.joint_function->active=true;joint.global_post_stabilization=true;}
         if(hack) joint.joint_function->Set_Target_Angle(joint.joint_function->Angle());}
@@ -861,9 +861,9 @@ Evaluate_Force(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,con
     
     for(JOINT_ID i(1);i<=joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue;
         JOINT<TV>& joint=*joint_mesh(i);
-        bool control=false;for(int j=1;j<=T_SPIN::dimension;j++) if(joint.control_dof(j)) control=true;
+        bool control=false;for(int j=0;j<T_SPIN::dimension;j++) if(joint.control_dof(j)) control=true;
         if(!joint.joint_function || !control) continue;
-        T_SPIN angles;for(int j=1;j<=T_SPIN::dimension;j++) angles(j)=grad?dx*(*grad)((Value(i)-1)*T_SPIN::dimension+j):0;
+        T_SPIN angles;for(int j=0;j<T_SPIN::dimension;j++) angles(j)=grad?dx*(*grad)((Value(i)-1)*T_SPIN::dimension+j):0;
         ROTATION<TV> target_delta=ROTATION<TV>::From_Euler_Angles(angles);
         ROTATION<TV> target_angle=target_delta*joint.joint_function->Angle();
         T_SPIN new_euler_angles=target_angle.Euler_Angles();joint.Constrain_Angles(new_euler_angles);
@@ -907,9 +907,9 @@ Normalize_Gradient(VECTOR_ND<T>& grad)
     if(grad.Magnitude()) for(JOINT_ID i(1);i<=joint_mesh.Size();i++){
         if(!joint_mesh.Is_Active(i)) continue;
         TV joint_gradient;
-        for(int j=1;j<=T_SPIN::dimension;j++) joint_gradient(j)=grad((Value(i)-1)*T_SPIN::dimension+j);
+        for(int j=0;j<T_SPIN::dimension;j++) joint_gradient(j)=grad((Value(i)-1)*T_SPIN::dimension+j);
         if(joint_gradient.Magnitude()) joint_gradient.Normalize();
-        for(int j=1;j<=T_SPIN::dimension;j++) grad((Value(i)-1)*T_SPIN::dimension+j)=joint_gradient(j);}
+        for(int j=0;j<T_SPIN::dimension;j++) grad((Value(i)-1)*T_SPIN::dimension+j)=joint_gradient(j);}
 }
 //#####################################################################
 // Function Normalized_Gradient
@@ -921,9 +921,9 @@ Normalized_Gradient(const VECTOR_ND<T>& grad)
     if(grad.Magnitude()) for(JOINT_ID i(1);i<=joint_mesh.Size();i++){
         if(!joint_mesh.Is_Active(i)) continue;
         TV joint_gradient;
-        for(int j=1;j<=T_SPIN::dimension;j++) joint_gradient(j)=grad((Value(i)-1)*T_SPIN::dimension+j);
+        for(int j=0;j<T_SPIN::dimension;j++) joint_gradient(j)=grad((Value(i)-1)*T_SPIN::dimension+j);
         if(joint_gradient.Magnitude()) joint_gradient.Normalize();
-        for(int j=1;j<=T_SPIN::dimension;j++) normalized_gradient((Value(i)-1)*T_SPIN::dimension+j)=joint_gradient(j);}
+        for(int j=0;j<T_SPIN::dimension;j++) normalized_gradient((Value(i)-1)*T_SPIN::dimension+j)=joint_gradient(j);}
     return normalized_gradient;
 }
 //#####################################################################
@@ -936,14 +936,14 @@ Compute_Gradient(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
         JOINT<TV>& joint=*joint_mesh(i);
         if(!joint.joint_function) continue;
         VECTOR<bool,T_SPIN::dimension> constrain=joint.Angular_Constraints();
-        bool control=false;for(int j=1;j<=T_SPIN::dimension;j++) if(joint.control_dof(j) && !constrain(j)) control=true;
+        bool control=false;for(int j=0;j<T_SPIN::dimension;j++) if(joint.control_dof(j) && !constrain(j)) control=true;
         if(control){current_angle(i)=joint.joint_function->Angle();joint.joint_function->active=false;joint.global_post_stabilization=false;}}
     for(JOINT_ID i(1);i<=joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue;
         JOINT<TV>& joint=*joint_mesh(i);
         if(!joint.joint_function) continue;
         VECTOR<bool,T_SPIN::dimension> constrain=joint.Angular_Constraints();
         RANDOM_NUMBERS<T> random;T n=random.Get_Uniform_Number((T)0,(T)1);
-        for(int j=1;j<=T_SPIN::dimension;j++){
+        for(int j=0;j<T_SPIN::dimension;j++){
             if(constrain(j) || !joint.control_dof(j)) continue; //if we can't move the joint dof don't try
             PAIR<T,T_SPIN> force_forward=Evaluate_Force_For_Joint(face_velocities,dt,time,i,j,1);PAIR<T,T_SPIN> force_backward=Evaluate_Force_For_Joint(face_velocities,dt,time,i,j,-1);
             negative_gradient((Value(i)-1)*T_SPIN::dimension+j)=(minimize?(T)-1:(T)1)*(force_forward.x-force_backward.x)/(force_forward.y(j)-force_backward.y(j));
@@ -974,7 +974,7 @@ Compute_Gradient_From_Graph(ENVIRONMENTAL_STATE<T_GRID>* current_state)
                 JOINT<TV>& joint=*joint_mesh(id);
                 ROTATION<TV> angle=possible_next_state->angles(id);T_SPIN euler_angle=angle.Euler_Angles();
                 T_SPIN angle_constrained=angle.Euler_Angles();joint.Constrain_Angles(angle_constrained);
-                T sum=0;for(int k=1;k<=T_SPIN::dimension;k++){sum+=abs(angle_constrained(k)-euler_angle(k));}
+                T sum=0;for(int k=0;k<T_SPIN::dimension;k++){sum+=abs(angle_constrained(k)-euler_angle(k));}
                 if(sum>threshold){angle_is_possible=false;break;}}
             if(angle_is_possible){minimized_force=possible_next_state->force_to_stay;next_state=possible_next_state;}}}
     if(next_state==NULL) return false;
@@ -1014,9 +1014,9 @@ Steepest_Descent(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
         T step=Golden_Section_Search(face_velocities,dt,time,0,1,dx);
         for(JOINT_ID i(1);i<=joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue;
             JOINT<TV>& joint=*joint_mesh(i);
-            bool control=false;for(int j=1;j<=T_SPIN::dimension;j++) if(joint.control_dof(j)) control=true;
+            bool control=false;for(int j=0;j<T_SPIN::dimension;j++) if(joint.control_dof(j)) control=true;
             if(!joint.joint_function || !control) continue;
-            T_SPIN angles;for(int j=1;j<=T_SPIN::dimension;j++) angles(j)=dx*negative_gradient((Value(i)-1)*T_SPIN::dimension+j);
+            T_SPIN angles;for(int j=0;j<T_SPIN::dimension;j++) angles(j)=dx*negative_gradient((Value(i)-1)*T_SPIN::dimension+j);
             ROTATION<TV> target_angle=ROTATION<TV>::From_Euler_Angles(angles)*current_angle(i);
             T_SPIN target_angle_constrained=target_angle.Euler_Angles();joint.Constrain_Angles(target_angle_constrained);
             current_angle(i)=ROTATION<TV>::Spherical_Linear_Interpolation(joint.joint_function->Angle(),ROTATION<TV>::From_Euler_Angles(target_angle_constrained),step);}}
@@ -1085,7 +1085,7 @@ Update_Position_Based_State(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,con
 
                 if(line_search) real_dx*=Golden_Section_Search(face_velocities,dt,target_time,0,1,real_dx);
             
-                for(JOINT_ID i(1);i<=joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue; for(int j=1;j<=T_SPIN::dimension;j++){
+                for(JOINT_ID i(1);i<=joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue; for(int j=0;j<T_SPIN::dimension;j++){
                     int index=(Value(i)-1)*T_SPIN::dimension+j;
                     if(negative_gradient(index)*dF_array_multipliers(index).x<(T)0) dF_array_multipliers(index)=PAIR<T,T>((T)0,max(dF_array_multipliers(index).y*(T).5,min_multiplier));
                     else if(negative_gradient(index)!=(T)0){
@@ -1096,12 +1096,12 @@ Update_Position_Based_State(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,con
     if(!negative_gradient.Size() || !solids) return;
     for(JOINT_ID i(1);i<=joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue;
         JOINT<TV>& joint=*joint_mesh(i);
-        bool control=false;for(int j=1;j<=T_SPIN::dimension;j++) if(joint.control_dof(j)) control=true;
+        bool control=false;for(int j=0;j<T_SPIN::dimension;j++) if(joint.control_dof(j)) control=true;
         if(!joint.joint_function || !control) continue;
         ROTATION<TV> target_angle;
         if(use_precomputed_angle) target_angle=(*target_angles)(i);
         else{
-            T_SPIN angles;for(int j=1;j<=T_SPIN::dimension;j++) angles(j)=real_dx*negative_gradient((Value(i)-1)*T_SPIN::dimension+j)*dF_array_multipliers((Value(i)-1)*T_SPIN::dimension+j).y;
+            T_SPIN angles;for(int j=0;j<T_SPIN::dimension;j++) angles(j)=real_dx*negative_gradient((Value(i)-1)*T_SPIN::dimension+j)*dF_array_multipliers((Value(i)-1)*T_SPIN::dimension+j).y;
             target_angle=ROTATION<TV>::From_Euler_Angles(angles)*current_angle(i);}
         T_SPIN target_angle_constrained=target_angle.Euler_Angles();joint.Constrain_Angles(target_angle_constrained);
         joint.joint_function->Set_Target_Angle(ROTATION<TV>::From_Euler_Angles(target_angle_constrained));

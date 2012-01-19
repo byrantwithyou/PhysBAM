@@ -27,13 +27,13 @@ public:
 
     TV Face_To_Cell_Vector(const T_GRID& grid,const TV_INT& cell_index,const T_FACE_LOOKUP& u_face) const
     {const typename T_FACE_LOOKUP::LOOKUP& lookup=u_face.Starting_Point_Cell(cell_index);
-    TV value;for(int axis=1;axis<=T_GRID::dimension;axis++)
+    TV value;for(int axis=0;axis<T_GRID::dimension;axis++)
         value[axis]=(T).5*(lookup(axis,grid.First_Face_Index_In_Cell(axis,cell_index))+lookup(axis,grid.Second_Face_Index_In_Cell(axis,cell_index)));
     return value;}
 
     TV Face_To_Node_Vector(const T_GRID& grid,const TV_INT& node_index,const T_FACE_LOOKUP& u_face) const
     {const typename T_FACE_LOOKUP::LOOKUP& lookup=u_face.Starting_Point_Cell(node_index);
-    TV value;for(int axis=1;axis<=T_GRID::dimension;axis++)for(int face=1;face<=T_GRID::number_of_nodes_per_face;face++)
+    TV value;for(int axis=0;axis<T_GRID::dimension;axis++)for(int face=0;face<T_GRID::number_of_nodes_per_face;face++)
         value[axis]+=lookup(axis,T_GRID::Node_Face_Index(axis,node_index,face));
     return value/T_GRID::number_of_nodes_per_face;}
 
@@ -76,7 +76,7 @@ public:
     {static const int axis_to_other_axis[3][2]={{2,3},{1,3},{1,2}};
     int axis=iterator.Axis();typename GRID<VECTOR<T,3> >::INDEX face=iterator.Face_Index(),cell1,cell2;iterator.Unordered_Cell_Indices_Touching_Face(cell1,cell2);
     VECTOR<T,3> value;value[axis]=u_face(axis,face);
-    for(int i=1;i<=T_GRID::dimension-1;i++){
+    for(int i=0;i<T_GRID::dimension-1;i++){
         int other_axis=axis_to_other_axis[axis-1][i-1];
         value[other_axis]=(T).25*(u_face(other_axis,grid.First_Face_Index_In_Cell(other_axis,cell1))+u_face(other_axis,grid.Second_Face_Index_In_Cell(other_axis,cell1))+
                             u_face(other_axis,grid.First_Face_Index_In_Cell(other_axis,cell2))+u_face(other_axis,grid.Second_Face_Index_In_Cell(other_axis,cell2)));}

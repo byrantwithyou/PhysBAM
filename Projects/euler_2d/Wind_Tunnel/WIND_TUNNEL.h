@@ -156,7 +156,7 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
     //set custom boundary
     TV velocity_initial(u_vel_initial,v_vel_initial);
     VECTOR<VECTOR<bool,2>,T_GRID::dimension> valid_wall;
-    for(int axis=1;axis<=T_GRID::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++)
+    for(int axis=0;axis<T_GRID::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++)
         valid_wall[axis][axis_side]=(fluids_parameters.mpi_grid?!fluids_parameters.mpi_grid->Neighbor(axis,axis_side):true) && !fluids_parameters.domain_walls[axis][axis_side];
     valid_wall[3]=VECTOR<bool,2>::Constant_Vector(false);
 
@@ -252,7 +252,7 @@ void Set_Dirichlet_Boundary_Conditions(const T time) PHYSBAM_OVERRIDE
             inside=inside || (location.y<=domain_center.y && location.x>=domain.max_corner.x-wall_thickness);} // bottom right 
         if(inside){
             euler.psi(iterator.Cell_Index())=false;
-            for(int axis=1;axis<=T_GRID::dimension;axis++){
+            for(int axis=0;axis<T_GRID::dimension;axis++){
                 psi_N.Component(axis)(iterator.First_Face_Index(axis))=true;face_velocities.Component(axis)(iterator.First_Face_Index(axis))=0;
                 psi_N.Component(axis)(iterator.Second_Face_Index(axis))=true;face_velocities.Component(axis)(iterator.Second_Face_Index(axis))=0;}}}
 }

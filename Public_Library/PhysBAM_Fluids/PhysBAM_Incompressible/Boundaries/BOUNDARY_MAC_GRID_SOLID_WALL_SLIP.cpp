@@ -25,11 +25,11 @@ Fill_Ghost_Cells_Face(const T_GRID& grid,const T_FACE_ARRAYS_SCALAR& u,T_FACE_AR
 {
     assert(grid.Is_MAC_Grid());
     T_FACE_ARRAYS_SCALAR::Put(u,u_ghost); // interior
-    for(int face_axis=1;face_axis<=T_GRID::dimension;face_axis++){
+    for(int face_axis=0;face_axis<T_GRID::dimension;face_axis++){
         T_GRID face_grid=grid.Get_Face_Grid(face_axis);
         T_ARRAYS_BASE& u_ghost_component=u_ghost.Component(face_axis);
         ARRAY<RANGE<TV_INT> > regions;Find_Ghost_Regions(face_grid,regions,number_of_ghost_cells);
-        for(int side=1;side<=T_GRID::number_of_faces_per_cell;side++){
+        for(int side=0;side<T_GRID::number_of_faces_per_cell;side++){
             if(Constant_Extrapolation(side)) Fill_Single_Ghost_Region(face_grid,u_ghost_component,side,regions(side));
             else Reflect_Single_Ghost_Region(face_axis,face_grid,u_ghost_component,side,regions(side));}}
 }
@@ -54,7 +54,7 @@ template<class T_GRID> void BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<T_GRID>::
 Apply_Boundary_Condition_Face(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& u,const T time) 
 {
     assert(grid.Is_MAC_Grid());
-    for(int side=1;side<=T_GRID::number_of_faces_per_cell;side++)
+    for(int side=0;side<T_GRID::number_of_faces_per_cell;side++)
         if(!Constant_Extrapolation(side)) Zero_Single_Boundary_Side(grid,u,side);
 }
 //#####################################################################

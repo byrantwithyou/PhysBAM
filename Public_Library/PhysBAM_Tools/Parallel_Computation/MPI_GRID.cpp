@@ -56,10 +56,10 @@ MPI_GRID(T_GRID& local_grid_input,const int number_of_ghost_cells_input,const bo
     side_neighbor_directions.Resize(T_GRID::number_of_neighbors_per_node);
     all_neighbor_ranks.Resize(T_GRID::number_of_one_ring_neighbors_per_cell);
     all_neighbor_directions.Resize(T_GRID::number_of_one_ring_neighbors_per_cell);
-    for(int n=1;n<=T_GRID::number_of_neighbors_per_node;n++){
+    for(int n=0;n<T_GRID::number_of_neighbors_per_node;n++){
         side_neighbor_ranks(n)=process_ranks(T_GRID::Node_Neighbor(coordinates,n));
         side_neighbor_directions(n)=T_GRID::Node_Neighbor(TV_INT(),n);}
-    for(int n=1;n<=T_GRID::number_of_one_ring_neighbors_per_cell;n++){
+    for(int n=0;n<T_GRID::number_of_one_ring_neighbors_per_cell;n++){
         all_neighbor_ranks(n)=process_ranks(T_GRID::One_Ring_Neighbor(coordinates,n));
         all_neighbor_directions(n)=T_GRID::One_Ring_Neighbor(TV_INT(),n);}
     if(!group_input) group=new MPI::Group(comm->Get_group());
@@ -68,7 +68,7 @@ MPI_GRID(T_GRID& local_grid_input,const int number_of_ghost_cells_input,const bo
     local_grid=Restrict_Grid(coordinates);
     // initialize offset
     TV_INT start_index;TV_INT end_index;
-    for(int axis=1;axis<=T_GRID::dimension;axis++)
+    for(int axis=0;axis<T_GRID::dimension;axis++)
         start_index[axis]=boundaries(axis)(coordinates[axis]);
     local_to_global_offset=start_index-TV_INT::All_Ones_Vector();
     // initialize global column index boundaries
@@ -76,7 +76,7 @@ MPI_GRID(T_GRID& local_grid_input,const int number_of_ghost_cells_input,const bo
     int offset=0;
     for(int proc=0;proc<all_coordinates.m;proc++){
         TV_INT proc_coordinates=all_coordinates(proc);
-        for(int axis=1;axis<=T_GRID::dimension;axis++){
+        for(int axis=0;axis<T_GRID::dimension;axis++){
             start_index[axis]=boundaries(axis)(proc_coordinates[axis]);
             end_index[axis]=boundaries(axis)(proc_coordinates[axis]+1);}
         int owned_pressure_values=(end_index-start_index).Product();
@@ -90,7 +90,7 @@ MPI_GRID(T_GRID& local_grid_input,const int number_of_ghost_cells_input,const bo
         local_cell_index_to_global_column_index_map(iterator.Cell_Index())=offset;
         offset++;}
     // now go through each of the boundaries and do those
-    for(int axis=1;axis<=T_GRID::dimension;axis++)
+    for(int axis=0;axis<T_GRID::dimension;axis++)
         for(int axis_side=0;axis_side<2;axis_side++){
             int side=2*axis-(2-axis_side);
             int neighbor_rank=side_neighbor_ranks(side);
@@ -99,7 +99,7 @@ MPI_GRID(T_GRID& local_grid_input,const int number_of_ghost_cells_input,const bo
                 int start_column_index=global_column_index_boundaries(neighbor_rank+1).x;
                 // Make that neighbors local_grid
                 TV_INT proc_coordinates=all_coordinates(neighbor_rank+1);
-                for(int temp_axis=1;temp_axis<=T_GRID::dimension;temp_axis++){
+                for(int temp_axis=0;temp_axis<T_GRID::dimension;temp_axis++){
                     start_index[temp_axis]=boundaries(temp_axis)(proc_coordinates[temp_axis]);
                     end_index[temp_axis]=boundaries(temp_axis)(proc_coordinates[temp_axis]+1);}
                 CELL_ITERATOR my_iterator(local_grid,0,T_GRID::BOUNDARY_INTERIOR_REGION,side);
@@ -136,14 +136,14 @@ Initialize_Communicator(const bool manual,MPI::Group* group)
     else{ // setup communicator manually to guarantee reasonable topology for SMP clusters
         // sort axes in decreasing order of how much we have to communicate along them
         ARRAY<int> axes(T_GRID::dimension);ARRAY<T> axis_lengths(T_GRID::dimension);
-        for(int axis=1;axis<=T_GRID::dimension;axis++){axes(axis)=axis;axis_lengths(axis)=(T)global_grid.Domain_Indices().Maximum_Corner()[axis]/extents[axis];}
+        for(int axis=0;axis<T_GRID::dimension;axis++){axes(axis)=axis;axis_lengths(axis)=(T)global_grid.Domain_Indices().Maximum_Corner()[axis]/extents[axis];}
         Sort(axes,Indirect_Comparison(axis_lengths));
         // lay out process ranks on grid
         Fill_Process_Ranks(process_grid,process_ranks,axes);
         // fill in ghost process_ranks for periodic domains
         if(periodic!=TV_BOOL()) for(NODE_ITERATOR iterator(process_grid,1,T_GRID::GHOST_REGION);iterator.Valid();iterator.Next()){
             TV_INT node=iterator.Node_Index(),wrapped_node=node;
-            for(int axis=1;axis<=T_GRID::dimension;axis++) if(periodic[axis]) wrapped_node[axis]=(node[axis]+process_grid.Counts()[axis]-1)%process_grid.Counts()[axis]+1;
+            for(int axis=0;axis<T_GRID::dimension;axis++) if(periodic[axis]) wrapped_node[axis]=(node[axis]+process_grid.Counts()[axis]-1)%process_grid.Counts()[axis]+1;
             process_ranks(node)=process_ranks(wrapped_node);}
         // allocate communicator
         *comm=group?MPI::COMM_WORLD.Create(*group):MPI::COMM_WORLD.Dup();
@@ -195,13 +195,13 @@ template<class T_GRID> void MPI_GRID<T_GRID>::
 Initialize(VECTOR<VECTOR<bool,2>,T_GRID::dimension>& domain_walls)
 {   
     // fix walls
-    for(int i=1;i<=T_GRID::number_of_neighbors_per_node;i++)
+    for(int i=0;i<T_GRID::number_of_neighbors_per_node;i++)
         if(side_neighbor_ranks(i)!=MPI::PROC_NULL) domain_walls((i+1)/2)(i&1?1:2)=false;
 
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     LOG::cout<<"mpi world rank = "<<MPI::COMM_WORLD.Get_rank()<<std::endl;
     LOG::cout<<"mpi cartesian rank = "<<rank<<std::endl;
-    for(int axis=1;axis<=T_GRID::dimension;axis++)
+    for(int axis=0;axis<T_GRID::dimension;axis++)
         LOG::cout<<"mpi boundaries "<<axis<<" = "<<boundaries(axis)(coordinates[axis])<<" to "<<boundaries(axis)(coordinates[axis]+1)<<std::endl;
     LOG::cout<<"mpi topology = "<<process_grid.Domain_Indices()<<std::endl;
     LOG::cout<<"mpi process ranks = \n"<<process_ranks;
@@ -317,7 +317,7 @@ template<class T_GRID> T_GRID MPI_GRID<T_GRID>::
 Restrict_Grid(const TV_INT& coordinates) const
 {
     TV_INT start_index,end_index;
-    for(int axis=1;axis<=T_GRID::dimension;axis++){
+    for(int axis=0;axis<T_GRID::dimension;axis++){
         start_index[axis]=boundaries(axis)(coordinates[axis]);
         end_index[axis]=boundaries(axis)(coordinates[axis]+1);}
     return T_GRID(end_index-start_index+TV_INT::All_Ones_Vector(),RANGE<TV>(global_grid.X(start_index),global_grid.X(end_index))).Get_MAC_Grid();
@@ -581,16 +581,16 @@ Exchange_Boundary_Face_Data(const T_MPI_GRID& mpi_grid,T_FACE_ARRAYS& data,const
     ARRAY<MPI_PACKAGE> packages;ARRAY<MPI::Request> requests;
     // send
     ARRAY<ARRAY<RANGE<TV_INT> > > send_regions(T_MPI_GRID::GRID_T::dimension);
-    for(int axis=1;axis<=T_MPI_GRID::GRID_T::dimension;axis++)Find_Boundary_Regions(send_regions(axis),mpi_grid.Face_Sentinels(axis),true,boundary_band,true);
+    for(int axis=0;axis<T_MPI_GRID::GRID_T::dimension;axis++)Find_Boundary_Regions(send_regions(axis),mpi_grid.Face_Sentinels(axis),true,boundary_band,true);
     for(int n=1;n<=send_regions(1).m;n++)if(all_neighbor_ranks(n)!=MPI::PROC_NULL){
-        ARRAY<RANGE<TV_INT> > send_regions_n(T_MPI_GRID::GRID_T::dimension);for(int axis=1;axis<=T_MPI_GRID::GRID_T::dimension;axis++)send_regions_n(axis)=send_regions(axis)(n);
+        ARRAY<RANGE<TV_INT> > send_regions_n(T_MPI_GRID::GRID_T::dimension);for(int axis=0;axis<T_MPI_GRID::GRID_T::dimension;axis++)send_regions_n(axis)=send_regions(axis)(n);
         MPI_PACKAGE package=mpi_grid.Package_Face_Data(data,send_regions_n);
         packages.Append(package);requests.Append(package.Isend(*comm,all_neighbor_ranks(n),Get_Send_Tag(all_neighbor_directions(n))));}
     // receive
     ARRAY<ARRAY<RANGE<TV_INT> > > recv_regions(T_MPI_GRID::GRID_T::dimension);
-    for(int axis=1;axis<=T_MPI_GRID::GRID_T::dimension;axis++)Find_Boundary_Regions(recv_regions(axis),mpi_grid.Face_Sentinels(axis),true,ghost_band,true);
+    for(int axis=0;axis<T_MPI_GRID::GRID_T::dimension;axis++)Find_Boundary_Regions(recv_regions(axis),mpi_grid.Face_Sentinels(axis),true,ghost_band,true);
     for(int n=1;n<=recv_regions(1).m;n++)if(all_neighbor_ranks(n)!=MPI::PROC_NULL){
-        ARRAY<RANGE<TV_INT> > recv_regions_n(T_MPI_GRID::GRID_T::dimension);for(int axis=1;axis<=T_MPI_GRID::GRID_T::dimension;axis++)recv_regions_n(axis)=recv_regions(axis)(n);
+        ARRAY<RANGE<TV_INT> > recv_regions_n(T_MPI_GRID::GRID_T::dimension);for(int axis=0;axis<T_MPI_GRID::GRID_T::dimension;axis++)recv_regions_n(axis)=recv_regions(axis)(n);
         MPI_PACKAGE package=mpi_grid.Package_Face_Data(data,recv_regions_n);
         packages.Append(package);requests.Append(package.Irecv(*comm,all_neighbor_ranks(n),Get_Recv_Tag(all_neighbor_directions(n))));}
     // finish
@@ -605,7 +605,7 @@ Average_Common_Face_Data(const T_MPI_GRID& mpi_grid,T_FACE_ARRAYS& data) const
     //PHYSBAM_NOT_IMPLEMENTED(); // TODO: we probably don't need this function, but I'll leave it here for now
 
     ARRAY<ARRAY<RANGE<TV_INT> > > regions(T_GRID::dimension);
-    for(int axis=1;axis<=T_GRID::dimension;axis++)Find_Boundary_Regions(regions(axis),mpi_grid.Parallel_Face_Sentinels(axis),false,RANGE<VECTOR<int,1> >(0,0),false);
+    for(int axis=0;axis<T_GRID::dimension;axis++)Find_Boundary_Regions(regions(axis),mpi_grid.Parallel_Face_Sentinels(axis),false,RANGE<VECTOR<int,1> >(0,0),false);
     ARRAY<MPI_PACKAGE> packages(regions(1).m);ARRAY<ARRAY<T> > buffers(regions(1).m);
     MPI::Datatype T_type=MPI_UTILITIES::Datatype<T>();
     // send and receive into temporary buffers
@@ -634,7 +634,7 @@ template<class T_GRID> template<class T_MPI_GRID,class T_FACE_ARRAYS_BOOL> void 
 Union_Common_Face_Data(const T_MPI_GRID& mpi_grid,T_FACE_ARRAYS_BOOL& data) const
 {
     ARRAY<ARRAY<RANGE<TV_INT> > > regions(T_GRID::dimension);
-    for(int axis=1;axis<=T_GRID::dimension;axis++)Find_Boundary_Regions(regions(axis),mpi_grid.Parallel_Face_Sentinels(axis),false,RANGE<VECTOR<int,1> >(0,0),false);
+    for(int axis=0;axis<T_GRID::dimension;axis++)Find_Boundary_Regions(regions(axis),mpi_grid.Parallel_Face_Sentinels(axis),false,RANGE<VECTOR<int,1> >(0,0),false);
     ARRAY<MPI_PACKAGE> packages(regions(1).m);ARRAY<ARRAY<bool> > buffers(regions(1).m);
     MPI::Datatype T_type=MPI_UTILITIES::Datatype<bool>();
     // send and receive into temporary buffers
@@ -663,7 +663,7 @@ template<class T_GRID> template<class T_MPI_GRID,class T_FACE_ARRAYS> void MPI_G
 Copy_Common_Face_Data(const T_MPI_GRID& mpi_grid,T_FACE_ARRAYS& data) const
 {
     ARRAY<ARRAY<RANGE<TV_INT> > > regions(T_GRID::dimension);
-    for(int axis=1;axis<=T_GRID::dimension;axis++)Find_Boundary_Regions(regions(axis),mpi_grid.Parallel_Face_Sentinels(axis),false,RANGE<VECTOR<int,1> >(0,0),false);
+    for(int axis=0;axis<T_GRID::dimension;axis++)Find_Boundary_Regions(regions(axis),mpi_grid.Parallel_Face_Sentinels(axis),false,RANGE<VECTOR<int,1> >(0,0),false);
     ARRAY<MPI_PACKAGE> packages(regions(1).m);ARRAY<ARRAY<T> > buffers(regions(1).m);
     MPI::Datatype T_type=MPI_UTILITIES::Datatype<T>();
     // send and receive into temporary buffers
@@ -684,7 +684,7 @@ template<class T_GRID> template<class T_MPI_GRID,class T_FACE_ARRAYS> void MPI_G
 Assert_Common_Face_Data(const T_MPI_GRID& mpi_grid,T_FACE_ARRAYS& data,const T tolerance) const
 {   
     ARRAY<ARRAY<RANGE<TV_INT> > > regions(T_GRID::dimension);
-    for(int axis=1;axis<=T_GRID::dimension;axis++)Find_Boundary_Regions(regions(axis),mpi_grid.Parallel_Face_Sentinels(axis),false,RANGE<VECTOR<int,1> >(0,0),false);
+    for(int axis=0;axis<T_GRID::dimension;axis++)Find_Boundary_Regions(regions(axis),mpi_grid.Parallel_Face_Sentinels(axis),false,RANGE<VECTOR<int,1> >(0,0),false);
     ARRAY<MPI_PACKAGE> packages(regions(1).m);ARRAY<ARRAY<T> > buffers(regions(1).m);
     MPI::Datatype T_type=MPI_UTILITIES::Datatype<T>();
     // send and receive into temporary buffers
@@ -718,12 +718,12 @@ Sync_Common_Face_Weights_From(ARRAY<ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >,FA
     ARRAY<int,VECTOR<int,2> > all_sizes(range);
     ARRAY<ARRAY<TRIPLE<FACE_INDEX<TV::dimension>,FACE_INDEX<TV::dimension>,T> > > transfer_per_proc(number_of_processes); 
     ARRAY<ARRAY<TRIPLE<FACE_INDEX<TV::dimension>,FACE_INDEX<TV::dimension>,T> > > receive_per_proc(number_of_processes); 
-    for(int axis=1;axis<=TV::dimension;axis++) for(int side=0;side<2;side++){
+    for(int axis=0;axis<TV::dimension;axis++) for(int side=0;side<2;side++){
         int other_rank=side_neighbor_ranks(2*(axis-1)+side);if(other_rank<0) continue;
         RANGE<TV_INT> domain=local_grid.Domain_Indices();
         if(side==1) domain.max_corner(axis)=domain.min_corner(axis)+(ghost_cells-1);
         else domain.min_corner(axis)=domain.max_corner(axis)-(ghost_cells-1);
-        for(int axis2=1;axis2<=TV::dimension;axis2++){
+        for(int axis2=0;axis2<TV::dimension;axis2++){
             RANGE<TV_INT> face_domain=local_grid.Domain_Indices(ghost_cells);
             if(side==1) face_domain.min_corner(axis)+=ghost_cells;
             else face_domain.max_corner(axis)-=ghost_cells;
@@ -774,12 +774,12 @@ Sync_Common_Face_Weights_To(ARRAY<ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >,FACE
     ARRAY<int,VECTOR<int,2> > all_sizes(range);
     ARRAY<ARRAY<TRIPLE<FACE_INDEX<TV::dimension>,FACE_INDEX<TV::dimension>,T> > > transfer_per_proc(number_of_processes); 
     ARRAY<ARRAY<TRIPLE<FACE_INDEX<TV::dimension>,FACE_INDEX<TV::dimension>,T> > > receive_per_proc(number_of_processes); 
-    for(int axis=1;axis<=TV::dimension;axis++) for(int side=0;side<2;side++){
+    for(int axis=0;axis<TV::dimension;axis++) for(int side=0;side<2;side++){
         int other_rank=side_neighbor_ranks(2*(axis-1)+side);if(other_rank<0) continue;
         RANGE<TV_INT> domain=local_grid.Domain_Indices();
         if(side==1) domain.max_corner(axis)=domain.min_corner(axis)+(ghost_cells-1);
         else domain.min_corner(axis)=domain.max_corner(axis)-(ghost_cells-1);
-        for(int axis2=1;axis2<=TV::dimension;axis2++){
+        for(int axis2=0;axis2<TV::dimension;axis2++){
             RANGE<TV_INT> face_domain=local_grid.Domain_Indices(ghost_cells);
             if(side==1) face_domain.min_corner(axis)+=ghost_cells;
             else face_domain.max_corner(axis)-=ghost_cells;
@@ -832,7 +832,7 @@ Sync_Common_Cell_Weights_From(ARRAY<ARRAY<PAIR<TV_INT,T> >,TV_INT>& weights_to,A
     ARRAY<int,VECTOR<int,2> > all_sizes(range);
     ARRAY<ARRAY<TRIPLE<TV_INT,TV_INT,T> > > transfer_per_proc(number_of_processes); 
     ARRAY<ARRAY<TRIPLE<TV_INT,TV_INT,T> > > receive_per_proc(number_of_processes);
-    for(int axis=1;axis<=TV::dimension;axis++) for(int side=0;side<2;side++){
+    for(int axis=0;axis<TV::dimension;axis++) for(int side=0;side<2;side++){
         int other_rank=side_neighbor_ranks(2*(axis-1)+side);if(other_rank<0) continue;
         RANGE<TV_INT> domain=local_grid.Domain_Indices(),ghost_domain=local_grid.Domain_Indices(ghost_cells);
         if(side==1) ghost_domain.min_corner(axis)+=ghost_cells;
@@ -880,7 +880,7 @@ Sync_Common_Cell_Weights_To(ARRAY<ARRAY<PAIR<TV_INT,T> >,TV_INT>& weights_to,ARR
     ARRAY<int,VECTOR<int,2> > all_sizes(range);
     ARRAY<ARRAY<TRIPLE<TV_INT,TV_INT,T> > > transfer_per_proc(number_of_processes); 
     ARRAY<ARRAY<TRIPLE<TV_INT,TV_INT,T> > > receive_per_proc(number_of_processes);
-    for(int axis=1;axis<=TV::dimension;axis++) for(int side=0;side<2;side++){
+    for(int axis=0;axis<TV::dimension;axis++) for(int side=0;side<2;side++){
         int other_rank=side_neighbor_ranks(2*(axis-1)+side);if(other_rank<0) continue;
         RANGE<TV_INT> domain=local_grid.Domain_Indices(),ghost_domain=local_grid.Domain_Indices(ghost_cells);
         if(side==1) ghost_domain.min_corner(axis)+=ghost_cells;

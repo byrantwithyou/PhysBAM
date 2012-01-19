@@ -48,7 +48,7 @@ Fill_Level(const GRID<TV>& grid,const T_LEVELSET& phi,int ghost,MAPPING& m,ARRAY
     for(int i=2;i<=m.index_to_node.m;i++){
         TV N=phi.Normal(grid.X(m.index_to_node(i)));
         normal.Append(N);
-        for(int d=1;d<=TV::m;d++){
+        for(int d=0;d<TV::m;d++){
             int s=N(d)<0?1:-1;
             TV_INT ind=m.index_to_node(i);
             for(int j=0;j<2;j++){
@@ -77,7 +77,7 @@ Fill_Level(const GRID<TV>& grid,const T_LEVELSET& phi,int ghost,MAPPING& m,ARRAY
     stencil.Resize(m.max_solve_index(order));
     for(int i=2;i<=m.max_solve_index(order);i++){
         TV N=normal(i);
-        for(int d=1;d<=TV::m;d++){
+        for(int d=0;d<TV::m;d++){
             int s=N(d)<0?1:-1;
             STENCIL& st=stencil(i)(d);
             st.scale=s*N(d)*grid.one_over_dX(d);
@@ -100,7 +100,7 @@ Fill_un(const MAPPING& m,const TV& one_over_dx,const ARRAY<TV>& normal,const ARR
     for(int i=m.max_solve_index(o+1)+1;i<=m.max_solve_index(mo*2-o+1);i++){
         const TV_INT& index=m.index_to_node(i);
         T2 v=0;
-        for(int d=1;d<=TV::m;d++){
+        for(int d=0;d<TV::m;d++){
             TV_INT a=index,b=index;a(d)--;b(d)++;
             v+=(x(m.node_to_index(b))-x(m.node_to_index(a)))*(T).5*one_over_dx(d)*normal(i)(d);}
         xn(i)=v;}
@@ -113,7 +113,7 @@ Extrapolate_FE(const MAPPING& m,const ARRAY<VECTOR<STENCIL,TV::m> >& stencil,con
 {
     for(int i=2;i<=m.max_solve_index(o);i++){
         T2 dot=0,zi=z?(*z)(i):0,a=0;
-        for(int d=1;d<=TV::m;d++){
+        for(int d=0;d<TV::m;d++){
             // Second order ENO.
             const STENCIL& s=stencil(i)(d);
             VECTOR<T2,4> f(u(s.nodes(1)),u(s.nodes(2)),u(s.nodes(3)),u(s.nodes(4)));
@@ -173,7 +173,7 @@ Extrapolate_Cell(const GRID<TV>& grid,const T_LEVELSET& phi,int ghost,ARRAYS_ND_
 template<class TV,class T2> void EXTRAPOLATION_HIGHER_ORDER<TV,T2>::
 Extrapolate_Face(const GRID<TV>& grid,const T_LEVELSET& phi,int ghost,ARRAY<T2,FACE_INDEX<TV::m> >& u,int iterations,int order,T distance)
 {
-    for(int i=1;i<=TV::m;i++){
+    for(int i=0;i<TV::m;i++){
         GRID<TV> node_grid(grid.Get_Face_Grid(i));
         Extrapolate_Node(node_grid,phi,ghost,u.Component(i),iterations,order,distance);}
 }

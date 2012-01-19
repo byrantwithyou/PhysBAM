@@ -175,11 +175,11 @@ Find_b(VECTOR_ND<T>& b,const ARRAY<int>& matrix_indices)
             PSI_D_EDGE e1,e2;psi_D_edges(s).Get(e1,e2);
             if(mi){
                 VECTOR<int,TV::m>& nodes=psi_D_mesh->elements(e1.simplex);
-                T u_point=0;for(int i=1;i<=TV::m;i++) u_point+=e1.weights[i]*u_boundary(nodes[i]);
+                T u_point=0;for(int i=0;i<TV::m;i++) u_point+=e1.weights[i]*u_boundary(nodes[i]);
                 b(mi)-=offdiagonal(s)/e1.theta*u_point;}
             if(mj){
                 VECTOR<int,TV::m>& nodes=psi_D_mesh->elements(e2.simplex);
-                T u_point=0;for(int i=1;i<=TV::m;i++) u_point+=e2.weights[i]*u_boundary(nodes[i]);
+                T u_point=0;for(int i=0;i<TV::m;i++) u_point+=e2.weights[i]*u_boundary(nodes[i]);
                 b(mj)-=offdiagonal(s)/e2.theta*u_point;}}
         else if(mi && !mj) b(mi)-=offdiagonal(s)*u(nodes[2]);
         else if(!mi && mj) b(mj)-=offdiagonal(s)*u(nodes[1]);}

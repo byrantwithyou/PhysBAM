@@ -19,7 +19,7 @@ Gradient(const TV& X) const
 {
     T dx=(T)1e-4;
     TV grad;
-    for(int a=1;a<=TV::m;a++){
+    for(int a=0;a<TV::m;a++){
         TV Y=X;Y(a)-=dx;
         T l=Theta(Y);
         Y(a)+=2*dx;

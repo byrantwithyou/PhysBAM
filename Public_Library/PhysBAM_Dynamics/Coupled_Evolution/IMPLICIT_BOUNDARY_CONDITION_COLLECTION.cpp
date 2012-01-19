@@ -84,7 +84,7 @@ Compute_Boundary_Condition_Info(const ARRAY<T,TV_INT>& p,const ARRAY<T,FACE_INDE
 template<class TV> bool IMPLICIT_BOUNDARY_CONDITION_COLLECTION<TV>::
 All_Cell_Faces_Neumann(const TV_INT& cell_index) const
 {
-    for(int axis=1;axis<=TV::dimension;axis++)
+    for(int axis=0;axis<TV::dimension;axis++)
         if(!psi_N.Component(axis)(cell_index) || !psi_N.Component(axis)(cell_index+TV_INT::Axis_Vector(axis)))
             return false;
     return true;

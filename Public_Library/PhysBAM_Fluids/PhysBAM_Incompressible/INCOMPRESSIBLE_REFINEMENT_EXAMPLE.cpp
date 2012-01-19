@@ -25,7 +25,7 @@ INCOMPRESSIBLE_REFINEMENT_EXAMPLE(const STREAM_TYPE stream_type_input)
     projection(coarse_mac_grid,false,false,true,true),incompressible(fine_mac_grid,projection),advection_scalar(0),threaded_advection_scalar(0),
     boundary(0),rigid_geometry_collection(this),thread_queue(0)
 {
-    for(int i=1;i<=TV::dimension;i++){domain_boundary(i)(1)=true;domain_boundary(i)(2)=true;}
+    for(int i=0;i<TV::dimension;i++){domain_boundary(i)(1)=true;domain_boundary(i)(2)=true;}
     Initialize_Geometry_Particle();
     Initialize_Read_Write_Structures();
 }

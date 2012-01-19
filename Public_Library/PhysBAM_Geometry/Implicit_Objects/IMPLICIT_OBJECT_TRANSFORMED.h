@@ -219,7 +219,7 @@ public:
     VECTOR<T,d-1> Principal_Curvatures(const TV& X) const PHYSBAM_OVERRIDE
     {
         VECTOR<T,d-1> curvatures=object_space_implicit_object->Principal_Curvatures(Object_Space_Point(X));
-        for(int i=1;i<=d-1;i++) curvatures(i)=Object_Space_Length(curvatures(i)); // Note: Curvatures transform "backwards"
+        for(int i=0;i<d-1;i++) curvatures(i)=Object_Space_Length(curvatures(i)); // Note: Curvatures transform "backwards"
         return curvatures;
     }
     T Integration_Step(const T phi) const PHYSBAM_OVERRIDE;

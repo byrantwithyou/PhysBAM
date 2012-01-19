@@ -356,7 +356,7 @@ template<class TV,int d_input> typename CUTTING_GEOMETRY<TV,d_input>::T_CUTTING_
 Get_Face_Weights_From_Embedding_Simplex(const VECTOR<int,d_cut+1>& face_nodes,const VECTOR<int,d_embed+1>& embedding_simplex_nodes) const
 {
     T_CUTTING_SIMPLEX_WEIGHTS weights;
-    for(int i=1;i<=T_CUTTING_SIMPLEX_WEIGHTS::dimension;i++){
+    for(int i=0;i<T_CUTTING_SIMPLEX_WEIGHTS::dimension;i++){
         int index=embedding_simplex_nodes.Find(face_nodes(i));weights(i)=T_EMBEDDING_WEIGHTS();
         if(index<=T_EMBEDDING_WEIGHTS::dimension) weights(i)(index)=(T)1;}
     return weights;

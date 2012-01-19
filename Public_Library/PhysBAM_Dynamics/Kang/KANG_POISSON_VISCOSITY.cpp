@@ -53,7 +53,7 @@ Pressure_Jump(const TV_INT& cell,T dt) const
     TV du_n;
     TV N=LEVELSET::Normal_At_Node(*fluids_parameters.grid,old_phi,cell);
 
-    for(int d=1;d<=TV::m;d++){
+    for(int d=0;d<TV::m;d++){
         TV_INT cellp=cell,celln=cell;
         cellp(d)++;
         celln(d)--;
@@ -83,7 +83,7 @@ Viscosity_Jump(const TV_INT& cell) const
     MATRIX<T,TV::m> du;
     TV N=LEVELSET::Normal_At_Node(*fluids_parameters.grid,old_phi,cell);
 
-    for(int d=1;d<=TV::m;d++){
+    for(int d=0;d<TV::m;d++){
         TV_INT cellp=cell,celln=cell;
         cellp(d)++;
         celln(d)--;
@@ -248,7 +248,7 @@ Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt,bool implicit)
 {
     face_velocities_ghost.Resize(*fluids_parameters.grid,3,false);
     fluids_parameters.incompressible->boundary->Fill_Ghost_Cells_Face(*fluids_parameters.grid,face_velocities,face_velocities_ghost,0,3);
-    for(int d=1;d<=TV::m;d++){
+    for(int d=0;d<TV::m;d++){
         Apply_Viscosity(face_velocities,d,dt,implicit);
         PHYSBAM_DEBUG_WRITE_SUBSTEP("after viscosity direction",0,1);}
 }

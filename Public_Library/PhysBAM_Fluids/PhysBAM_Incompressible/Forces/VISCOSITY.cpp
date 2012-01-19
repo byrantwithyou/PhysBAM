@@ -42,7 +42,7 @@ template<class T_GRID> void VISCOSITY<T_GRID>::
 Add_Implicit_Forces_Before_Projection(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& face_velocities_ghost,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
 {
     if(!dt || (!use_variable_viscosity && viscosity==0)) return;
-    for(int axis=1;axis<=T_GRID::dimension;axis++){
+    for(int axis=0;axis<T_GRID::dimension;axis++){
         IMPLICIT_VISCOSITY_UNIFORM<T_GRID> implicit_viscosity(elliptic_solver,variable_viscosity,density,viscosity,elliptic_solver.mpi_grid,axis,use_variable_viscosity,use_psi_R);
         implicit_viscosity.Viscous_Update(grid,face_velocities,face_velocities_ghost,dt,time,maximum_implicit_viscosity_iterations);}
     if(elliptic_solver.mpi_grid) elliptic_solver.mpi_grid->Copy_Common_Face_Data(face_velocities);

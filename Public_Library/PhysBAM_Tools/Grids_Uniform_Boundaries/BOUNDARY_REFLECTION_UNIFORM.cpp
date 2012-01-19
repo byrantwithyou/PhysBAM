@@ -19,7 +19,7 @@ Fill_Ghost_Cells(const T_GRID& grid,const T_ARRAYS_T2& u,T_ARRAYS_T2& u_ghost,co
 {
     T_ARRAYS_T2::Put(u,u_ghost); // interior
     ARRAY<RANGE<TV_INT> > regions;Find_Ghost_Regions(grid,regions,number_of_ghost_cells);
-    for(int side=1;side<=T_GRID::number_of_faces_per_cell;side++) Fill_Single_Ghost_Region(grid,u_ghost,regions(side),side,dt,time,number_of_ghost_cells);
+    for(int side=0;side<T_GRID::number_of_faces_per_cell;side++) Fill_Single_Ghost_Region(grid,u_ghost,regions(side),side,dt,time,number_of_ghost_cells);
 }
 //#####################################################################
 // Function Fill_Single_Ghost_Region

@@ -1765,7 +1765,7 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
             i=1;j=1;V(i+m*(j-1))*=TV();i=1;j=n;V(i+m*(j-1))*=TV();i=m;j=1;V(i+m*(j-1))*=TV();i=m;j=n;V(i+m*(j-1))*=TV();}}
     else if(test_number==36){
         int i=1;int m=(int)(aspect_ratio*number_side_panels)+1;//,n=number_side_panels+1;
-        for(int j=1;j<=number_side_panels+1;j++) V(i+m*(j-1))*=TV(0,0,0);}
+        for(int j=0;j<number_side_panels+1;j++) V(i+m*(j-1))*=TV(0,0,0);}
     else if(test_number==38){
         for(int i=0;i<hair_layout_grid.counts.x;i++) for(int j=0;j<hair_layout_grid.counts.y;j++){
             int index=hair_layout_grid.counts.z*(j-1+(i-1)*hair_layout_grid.counts.y)+1;
@@ -1818,7 +1818,7 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
             i=1;j=1;V(i+m*(j-1))*=TV();i=1;j=n;V(i+m*(j-1))*=TV();i=m;j=1;V(i+m*(j-1))*=TV();i=m;j=n;V(i+m*(j-1))*=TV();}}
     else if(test_number==36){
         int i=1;int m=(int)(aspect_ratio*number_side_panels)+1;//,n=number_side_panels+1;
-        for(int j=1;j<=number_side_panels+1;j++) V(i+m*(j-1))*=TV(0,0,0);}
+        for(int j=0;j<number_side_panels+1;j++) V(i+m*(j-1))*=TV(0,0,0);}
     else if(test_number==38){
         for(int i=0;i<hair_layout_grid.counts.x;i++) for(int j=0;j<hair_layout_grid.counts.y;j++){
             int index=hair_layout_grid.counts.z*(j-1+(i-1)*hair_layout_grid.counts.y)+1;

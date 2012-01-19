@@ -264,7 +264,7 @@ Apply_Isobaric_Fix(const T dt,const T time)
     for(CELL_ITERATOR iterator(euler.grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         if(euler.psi(cell_index) && phi_all_solids_negated(cell_index)<0){
             bool encountered_neumann_face=false;TV_INT reference_point;
-            for(int axis=1;axis<=T_GRID::dimension;axis++){
+            for(int axis=0;axis<T_GRID::dimension;axis++){
                 TV_INT first_face_index=iterator.First_Face_Index(axis),second_face_index=iterator.Second_Face_Index(axis);
                 if(euler.euler_projection.elliptic_solver->psi_N.Component(axis)(first_face_index) &&
                         euler.euler_projection.elliptic_solver->psi_N.Component(axis)(second_face_index)) continue; // cant get a reference point

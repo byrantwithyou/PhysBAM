@@ -50,7 +50,7 @@ public:
 
     //void Neighbor_Face_Stencil(VECTOR<SIDED_FACE_INDEX<d>,2*d-2>& neighbor_faces) const
     //{TV_INT real_cell=Real_Cell_Index();
-    //for(int i=1;i<=d-1;i++){int a=i+(i>=axis);
+    //for(int i=0;i<d-1;i++){int a=i+(i>=axis);
     //    neighbor_faces(2*i-1)=SIDED_FACE_INDEX<d>(2,a,real_cell);
     //    neighbor_faces(2*i)=SIDED_FACE_INDEX<d>(1,a,real_cell+TV_INT::Axis_Vector(a));}}
 };

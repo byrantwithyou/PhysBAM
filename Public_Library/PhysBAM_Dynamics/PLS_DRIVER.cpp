@@ -81,10 +81,10 @@ Initialize()
     ADVECTION_CONSERVATIVE_UNIFORM<GRID<TV>,T>* advection_conservative=dynamic_cast<ADVECTION_CONSERVATIVE_UNIFORM<GRID<TV>,T>*>(example.incompressible.advection);
     if(advection_conservative){
         VECTOR<VECTOR<bool,2>,TV::dimension> domain_boundary_local;
-        for(int i=1;i<=TV::dimension;i++){domain_boundary_local(i)(1)=true;domain_boundary_local(i)(2)=true;}        
+        for(int i=0;i<TV::dimension;i++){domain_boundary_local(i)(1)=true;domain_boundary_local(i)(2)=true;}        
         if(example.mpi_grid) example.mpi_grid->Initialize(domain_boundary_local);
         if(example.mpi_grid) example.mpi_grid->Initialize(advection_conservative->solid_walls_hack_axis);
-        for(int i=1;i<=TV::dimension;i++){advection_conservative->mpi_boundary(i)(1)=!domain_boundary_local(i)(1);advection_conservative->mpi_boundary(i)(2)=!domain_boundary_local(i)(2);}}
+        for(int i=0;i<TV::dimension;i++){advection_conservative->mpi_boundary(i)(1)=!domain_boundary_local(i)(1);advection_conservative->mpi_boundary(i)(2)=!domain_boundary_local(i)(2);}}
     example.incompressible.mpi_grid=example.mpi_grid;
     example.projection.elliptic_solver->mpi_grid=example.mpi_grid;
     example.particle_levelset_evolution.Particle_Levelset(1).mpi_grid=example.mpi_grid;

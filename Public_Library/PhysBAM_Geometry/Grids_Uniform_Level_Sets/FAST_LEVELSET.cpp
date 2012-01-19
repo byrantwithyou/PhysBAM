@@ -39,7 +39,7 @@ CFL(const T_FACE_ARRAYS_SCALAR& face_velocities) const
     T dt_convection=0;
     for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();if(abs(phi(cell))<=half_band_width){
         T local_V_norm=0;
-        for(int axis=1;axis<=T_GRID::dimension;axis++)
+        for(int axis=0;axis<T_GRID::dimension;axis++)
             local_V_norm+=grid.one_over_dX[axis]*maxabs(face_velocities(axis,grid.First_Face_Index_In_Cell(axis,cell)),face_velocities(axis,grid.Second_Face_Index_In_Cell(axis,cell)));
         dt_convection=max(dt_convection,local_V_norm);}}
     T dt_curvature=(curvature_motion && T_GRID::dimension>1)?sigma*2*grid.one_over_dX.Magnitude_Squared():0;

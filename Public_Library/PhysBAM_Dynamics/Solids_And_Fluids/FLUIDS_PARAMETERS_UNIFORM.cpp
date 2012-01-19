@@ -236,7 +236,7 @@ Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles
     T max_collision_distance=particle_levelset_evolution->particle_levelset.Particle_Collision_Distance(particles.quantized_collision_distance(index));
     T min_collision_distance=particle_levelset_evolution->particle_levelset.min_collision_distance_factor*max_collision_distance;
     TV min_corner=grid->domain.Minimum_Corner(),max_corner=grid->domain.Maximum_Corner();
-    for(int axis=1;axis<=T_GRID::dimension;axis++){
+    for(int axis=0;axis<T_GRID::dimension;axis++){
         if(domain_walls[axis][1] && X_new[axis]<min_corner[axis]+max_collision_distance){
             T collision_distance=X[axis]-min_corner[axis];
             if(collision_distance>max_collision_distance)collision_distance=X_new[axis]-min_corner[axis];
@@ -363,7 +363,7 @@ Set_Domain_Boundary_Conditions(LAPLACE_UNIFORM<T_GRID>& elliptic_solver,T_FACE_A
 {
     T_ARRAYS_BOOL& psi_D=elliptic_solver.psi_D;T_FACE_ARRAYS_BOOL& psi_N=elliptic_solver.psi_N;
 
-    for(int axis=1;axis<=T_GRID::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){
+    for(int axis=0;axis<T_GRID::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){
         int side=2*(axis-1)+axis_side;
         TV_INT interior_cell_offset=axis_side==1?TV_INT():-TV_INT::Axis_Vector(axis);
         TV_INT exterior_cell_offset=axis_side==1?-TV_INT::Axis_Vector(axis):TV_INT();
@@ -487,7 +487,7 @@ Move_Grid(T_FACE_ARRAYS_SCALAR& face_velocities,const TV_INT& shift_domain,const
         {T_ARRAYS_SCALAR phi_ghost(grid->Domain_Indices(number_of_ghost_cells),false);phi_boundary->Fill_Ghost_Cells(*grid,particle_levelset_evolution->phi,phi_ghost,0,time,number_of_ghost_cells);
         T_ARRAYS_SCALAR::Limited_Shifted_Get(particle_levelset_evolution->phi,phi_ghost,temp_shift);}
         {T_FACE_ARRAYS_SCALAR face_velocities_ghost(*grid,number_of_ghost_cells,false);fluid_boundary->Fill_Ghost_Cells_Face(*grid,face_velocities,face_velocities_ghost,time,number_of_ghost_cells);
-        for(int axis=1;axis<=T_GRID::dimension;axis++)
+        for(int axis=0;axis<T_GRID::dimension;axis++)
             T_ARRAYS_SCALAR::Limited_Shifted_Get(face_velocities.Component(axis),face_velocities_ghost.Component(axis),temp_shift);}
         {T_ARRAYS_SCALAR p_ghost(p_grid.Domain_Indices(number_of_ghost_cells),false);BOUNDARY_UNIFORM<T_GRID,T>().Fill_Ghost_Cells(p_grid,incompressible->projection.p,p_ghost,0,time,number_of_ghost_cells);
         T_ARRAYS_SCALAR::Limited_Shifted_Get(incompressible->projection.p,p_ghost,temp_shift);}
@@ -509,7 +509,7 @@ Move_Grid(T_FACE_ARRAYS_SCALAR& face_velocities,const T time)
     if(move_grid_explicitly){callbacks->Move_Grid_Explicitly(time);return;} // otherwise move automatically
 
     TV_INT shift;
-    for(int axis=1;axis<=T_GRID::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){
+    for(int axis=0;axis<T_GRID::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){
         int side=2*(axis-1)+axis_side;TV_INT offset=(axis_side==1?-1:1)*moving_grid_number_of_cells*TV_INT::Axis_Vector(axis);
         // loop over boundary region by looping over ghost region and shifting inwards
         for(CELL_ITERATOR iterator(*grid,moving_grid_number_of_cells,T_GRID::GHOST_REGION,side);iterator.Valid();iterator.Next())

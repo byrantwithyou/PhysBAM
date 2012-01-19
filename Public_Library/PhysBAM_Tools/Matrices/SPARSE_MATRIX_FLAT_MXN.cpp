@@ -552,7 +552,7 @@ Get_Row(ARRAY<SPARSE_MATRIX_ENTRY<T> >& q_i,int row)
 template<class T> void
 Check_Sorted(ARRAY<SPARSE_MATRIX_ENTRY<T> >& q)
 {
-    for(int i=1;i<=q.m-1;i++)
+    for(int i=0;i<q.m-1;i++)
         assert(q(i).j<q(i+1).j);
 }
 //#####################################################################

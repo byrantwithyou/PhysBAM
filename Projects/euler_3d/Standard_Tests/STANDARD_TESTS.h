@@ -576,7 +576,7 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
 
     //set custom boundary
     VECTOR<VECTOR<bool,2>,T_GRID::dimension> valid_wall;
-    for(int axis=1;axis<=T_GRID::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++)
+    for(int axis=0;axis<T_GRID::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++)
         valid_wall[axis][axis_side]=(fluids_parameters.mpi_grid?!fluids_parameters.mpi_grid->Neighbor(axis,axis_side):true) && !fluids_parameters.domain_walls[axis][axis_side];
 
     TV far_field_velocity=TV(state_outside(2),state_outside(3),state_outside(4));
@@ -647,7 +647,7 @@ void Read_Soot_Velocities()
         TV location=iterator.Location();
         if(soot_domain.Inside(location,soot_dx_over_2)){
             T velocity;
-            for(int axis=1;axis<=T_GRID::dimension;axis++){
+            for(int axis=0;axis<T_GRID::dimension;axis++){
                 velocity=soot_interpolation.Clamped_To_Array_Face_Component(axis,soot_grid,FACE_LOOKUP_UNIFORM<T_GRID>(soot_mac_velocities),location);
                 U(cell_index)(axis+1)=U(cell_index)(1)*velocity;}}}
 }

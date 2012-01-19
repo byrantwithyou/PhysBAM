@@ -31,7 +31,7 @@ PLS_EXAMPLE(const STREAM_TYPE stream_type_input)
 {
     Initialize_Particles();Initialize_Read_Write_General_Structures();
     incompressible.Set_Custom_Advection(advection_scalar);
-    for(int i=1;i<=TV::dimension;i++){domain_boundary(i)(1)=true;domain_boundary(i)(2)=true;}
+    for(int i=0;i<TV::dimension;i++){domain_boundary(i)(1)=true;domain_boundary(i)(2)=true;}
     domain_boundary(2)(2)=false;
 }
 //#####################################################################

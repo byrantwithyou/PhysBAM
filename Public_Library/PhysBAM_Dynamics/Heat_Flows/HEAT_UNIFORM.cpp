@@ -37,7 +37,7 @@ Euler_Step(const T dt,const T time)
     TV kappa_over_DX2=kappa*sqr(grid.one_over_dX);
     laplace.f.Fill(0);
     for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();if(!laplace.psi_D(cell))
-        for(int axis=1;axis<=T_GRID::dimension;axis++){
+        for(int axis=0;axis<T_GRID::dimension;axis++){
             TV_INT face1=iterator.First_Face_Index(axis),face2=iterator.Second_Face_Index(axis),offset=TV_INT::Axis_Vector(axis);
             if(!laplace.psi_N.Component(axis)(face1)) laplace.f(cell)-=(Q(cell)-Q(cell-offset))*kappa_over_DX2[axis];
             if(!laplace.psi_N.Component(axis)(face2)) laplace.f(cell)+=(Q(cell+offset)-Q(cell))*kappa_over_DX2[axis];}}
@@ -81,7 +81,7 @@ Crank_Nicolson_Calculate_Right_Hand_Side(const T dt,const T time)
     for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
         laplace.f(cell)=Q(cell);
         if(!laplace.psi_D(cell)){
-            for(int axis=1;axis<=T_GRID::dimension;axis++){
+            for(int axis=0;axis<T_GRID::dimension;axis++){
                 TV_INT face1=iterator.First_Face_Index(axis),face2=iterator.Second_Face_Index(axis),offset=TV_INT::Axis_Vector(axis);
                 if(!laplace.psi_N.Component(axis)(face1)) laplace.f(cell)-=(Q(cell)-Q(cell-offset))*half_dt_kappa_over_DX2[axis];
                 if(!laplace.psi_N.Component(axis)(face2)) laplace.f(cell)+=(Q(cell+offset)-Q(cell))*half_dt_kappa_over_DX2[axis];}}}

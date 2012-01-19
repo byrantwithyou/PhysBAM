@@ -137,7 +137,7 @@ public:
         VECTOR<VECTOR<bool,2>,T_GRID::dimension> domain_walls;
         for(int i=0;i<3;i++) for(int j=0;j<2;j++) domain_walls[i][j]=true;
         if(mpi_grid)mpi_grid->Initialize(domain_walls);
-        for(int axis=1;axis<=T_GRID::dimension;axis++){
+        for(int axis=0;axis<T_GRID::dimension;axis++){
             for(int side=0;side<2;side++){
                 int side_number=(axis-1)*2+side;
                 if(domain_walls[axis][side]) for(CELL_ITERATOR iterator(levelset.grid,1,T_GRID::GHOST_REGION,side_number);iterator.Valid();iterator.Next()){

@@ -67,7 +67,7 @@ public:
     template<class T2> void Sync_Particles(const ARRAYS_ND_BASE<VECTOR<T2,TV::dimension> >& local_data,ARRAYS_ND_BASE<VECTOR<T2,TV::dimension> >& global_data) const
     {
         RANGE<TV_INT> domain=local_grid.Domain_Indices();
-        for(int axis=1;axis<=TV::dimension;axis++) if(domain.max_corner(axis)+local_to_global_offset(axis)==global_grid.Domain_Indices().max_corner(axis)) domain.max_corner(axis)++;
+        for(int axis=0;axis<TV::dimension;axis++) if(domain.max_corner(axis)+local_to_global_offset(axis)==global_grid.Domain_Indices().max_corner(axis)) domain.max_corner(axis)++;
         for(NODE_ITERATOR iterator(local_grid,domain);iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index();global_data(node+local_to_global_offset)=local_data(node);}
     }
 

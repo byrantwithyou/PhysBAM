@@ -91,7 +91,7 @@ Add_Velocity_Dependent_Forces_First_Half(ARRAY_VIEW<const TV> V,ARRAY_VIEW<T> ag
     if(apply_implicit_forces)
         for(int i=0;i<referenced_particles.m;i++){int p=referenced_particles(i);
             TV t=c*V(p);
-            for(int a=1;a<=TV::m;a++) aggregate((i-1)*TV::m+a)=t(a);}
+            for(int a=0;a<TV::m;a++) aggregate((i-1)*TV::m+a)=t(a);}
 }
 //#####################################################################
 // Function Add_Velocity_Dependent_Forces_Second_Half
@@ -103,7 +103,7 @@ Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T> aggregate,ARRAY_VI
     if(apply_implicit_forces)
         for(int i=0;i<referenced_particles.m;i++){int p=referenced_particles(i);
             TV t;
-            for(int a=1;a<=TV::m;a++) t(a)=aggregate((i-1)*TV::m+a);
+            for(int a=0;a<TV::m;a++) t(a)=aggregate((i-1)*TV::m+a);
             F(p)+=c*t;}
 }
 //#####################################################################

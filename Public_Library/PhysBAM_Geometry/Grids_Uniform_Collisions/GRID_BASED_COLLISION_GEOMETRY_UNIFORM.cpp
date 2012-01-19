@@ -79,7 +79,7 @@ Compute_Grid_Visibility()
 
     // face neighbors
     for(FACE_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT index=iterator.Face_Index();
-        for(int direction=1;direction<=T_GRID::dimension;direction++){TV_INT direction_offset=TV_INT::Axis_Vector(direction);
+        for(int direction=0;direction<T_GRID::dimension;direction++){TV_INT direction_offset=TV_INT::Axis_Vector(direction);
             ARRAY<COLLISION_GEOMETRY_ID> objects;objects_in_cell.Get_Objects_For_Cells(iterator.Second_Cell_Index(),iterator.Second_Cell_Index()+direction_offset,collision_geometry_collection.bodies.m,objects);
             if(!objects.m) continue;
             if(collision_geometry_collection.Intersection_Between_Points(iterator.Location(),grid.Face(axis,iterator.Face_Index()+direction_offset),&objects))

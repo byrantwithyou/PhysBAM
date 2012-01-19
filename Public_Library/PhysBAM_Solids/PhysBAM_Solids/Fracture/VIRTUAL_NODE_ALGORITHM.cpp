@@ -151,7 +151,7 @@ Add_Embedded_Subelement(EMBEDDED_OBJECT<TV,d>& embedded_object,const EMBEDDED_OB
 
     VECTOR<int,d> emb_nodes;
     for(int i=0;i<emb_nodes.m;i++){
-        for(int j1=1;j1<=current_nodes.m-1;j1++) for(int j2=j1+1;j2<=current_nodes.m;j2++)
+        for(int j1=0;j1<current_nodes.m-1;j1++) for(int j2=j1+1;j2<=current_nodes.m;j2++)
             if(old_embedded_object.Are_Parents(VECTOR<int,2>(old_nodes[j1],old_nodes[j2]),old_emb_nodes[i])){
                 emb_nodes[i]=embedded_object.Embedded_Particle_On_Segment(current_nodes[j1],current_nodes[j2]);goto NEXT;}
         NEXT:;}

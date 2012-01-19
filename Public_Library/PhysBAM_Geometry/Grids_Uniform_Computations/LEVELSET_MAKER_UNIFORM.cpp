@@ -210,15 +210,15 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
     if(positive_boundary_band){
         RANGE<TV> clip(grid.X_plus_half(TV_INT()+positive_boundary_band),grid.X_plus_half(grid.counts-positive_boundary_band));
         for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++){
-            for(int i=1;i<=positive_boundary_band+1;i++) phi(i,j,k)=max(phi(i,j,k),clip.min_corner.x-grid.Axis_X(i,1));
+            for(int i=0;i<positive_boundary_band+1;i++) phi(i,j,k)=max(phi(i,j,k),clip.min_corner.x-grid.Axis_X(i,1));
             for(int i=grid.counts.x-positive_boundary_band;i<=grid.counts.x;i++) phi(i,j,k)=max(phi(i,j,k),grid.Axis_X(i,1)-clip.max_corner.x);}
 
         for(int i=0;i<grid.counts.x;i++) for(int k=0;k<grid.counts.z;k++){
-            for(int j=1;j<=positive_boundary_band+1;j++) phi(i,j,k)=max(phi(i,j,k),clip.min_corner.y-grid.Axis_X(j,2));
+            for(int j=0;j<positive_boundary_band+1;j++) phi(i,j,k)=max(phi(i,j,k),clip.min_corner.y-grid.Axis_X(j,2));
             for(int j=grid.counts.y-positive_boundary_band;j<=grid.counts.y;j++) phi(i,j,k)=max(phi(i,j,k),grid.Axis_X(j,2)-clip.max_corner.y);}
 
         for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++){
-            for(int k=1;k<=positive_boundary_band+1;k++) phi(i,j,k)=max(phi(i,j,k),clip.min_corner.z-grid.Axis_X(k,3));
+            for(int k=0;k<positive_boundary_band+1;k++) phi(i,j,k)=max(phi(i,j,k),clip.min_corner.z-grid.Axis_X(k,3));
             for(int k=grid.counts.z-positive_boundary_band;k<=grid.counts.z;k++) phi(i,j,k)=max(phi(i,j,k),grid.Axis_X(k,3)-clip.max_corner.z);}}
 
     if(use_fmm && (compute_unsigned_distance_function || compute_signed_distance_function)){

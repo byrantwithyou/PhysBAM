@@ -47,7 +47,7 @@ Compute(const T dt,const ARRAY<bool,FACE_INDEX<d> >& psi_N,T mu)
 
     for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(grid,1);iterator.Valid();iterator.Next()){
         int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();FACE_INDEX<d> this_face(iterator.Full_Index());
-        for(int other_axis=1;other_axis<=TV::dimension;other_axis++){
+        for(int other_axis=0;other_axis<TV::dimension;other_axis++){
             last_id++;
             FACE_INDEX<d> other_face(axis,face_index+TV_INT::Axis_Vector(other_axis));T weight=coefficient*face_areas(axis);
             int this_index(0),other_index(0);

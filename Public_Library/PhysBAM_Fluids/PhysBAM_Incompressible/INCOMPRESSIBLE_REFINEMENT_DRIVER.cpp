@@ -199,7 +199,7 @@ Advance_To_Target_Time(const T target_time)
                     for(int i=0;i<number_of_cells;i++){
                         TV diff_vector=iterator.Location()-example.coarse_mac_grid.Center(neighbor_coarse_cells(i));
                         areas(i)=T(1);
-                        for(int axis=1;axis<=TV::dimension;axis++) areas(i)*=example.coarse_mac_grid.dX(axis)-abs(diff_vector(axis));
+                        for(int axis=0;axis<TV::dimension;axis++) areas(i)*=example.coarse_mac_grid.dX(axis)-abs(diff_vector(axis));
                         total_area+=areas(i);}
                     for(int i=0;i<number_of_cells;i++) F_fine(iterator.Cell_Index())+=(areas(i)/total_area)*F(neighbor_coarse_cells(i));}
                 example.incompressible.Apply_Vorticity_Confinement_Force(example.fine_face_velocities,F_fine);}}

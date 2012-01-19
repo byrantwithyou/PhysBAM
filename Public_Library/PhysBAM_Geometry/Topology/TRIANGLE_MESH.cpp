@@ -85,10 +85,10 @@ Initialize_Square_Mesh(const int m,const int n,const bool reverse_triangles) // 
 {
     Clean_Memory();number_nodes=m*n;elements.Exact_Resize(2*(m-1)*(n-1));
     if(reverse_triangles){
-        int t=0;for(int i=1;i<=m-1;i++)for(int j=1;j<=n-1;j++){ // counterclockwise node ordering
+        int t=0;for(int i=0;i<m-1;i++)for(int j=0;j<n-1;j++){ // counterclockwise node ordering
             elements(++t).Set(i+m*(j-1),i+1+m*(j-1),i+m*j);elements(++t).Set(i+1+m*(j-1),i+1+m*j,i+m*j);}}
     else{
-        int t=0;for(int i=1;i<=m-1;i++)for(int j=1;j<=n-1;j++){ // counterclockwise node ordering
+        int t=0;for(int i=0;i<m-1;i++)for(int j=0;j<n-1;j++){ // counterclockwise node ordering
             elements(++t).Set(i+m*(j-1),i+1+m*(j-1),i+1+m*j);elements(++t).Set(i+m*(j-1),i+1+m*j,i+m*j);}}
 }
 //#####################################################################
@@ -98,7 +98,7 @@ void TRIANGLE_MESH::
 Initialize_Equilateral_Mesh(const int m,const int n)
 {
     Clean_Memory();number_nodes=m*n;elements.Exact_Resize(2*(m-1)*(n-1));
-    int t=0;for(int i=1;i<=m-1;i++)for(int j=1;j<=n-1;j++){ // counterclockwise node ordering
+    int t=0;for(int i=0;i<m-1;i++)for(int j=0;j<n-1;j++){ // counterclockwise node ordering
         if(j%2){elements(++t).Set(i+m*(j-1),i+1+m*(j-1),i+m*j);elements(++t).Set(i+1+m*(j-1),i+1+m*j,i+m*j);}
         else{elements(++t).Set(i+m*(j-1),i+1+m*(j-1),i+1+m*j);elements(++t).Set(i+m*(j-1),i+1+m*j,i+m*j);}}
 }
@@ -132,7 +132,7 @@ void TRIANGLE_MESH::
 Initialize_Herring_Bone_Mesh(const int m,const int n) // construct a regular m-by-n herring bone rectangular mesh
 {
     Clean_Memory();number_nodes=m*n;elements.Exact_Resize(2*(m-1)*(n-1));
-    int t=0;for(int i=1;i<=m-1;i++)for(int j=1;j<=n-1;j++){ // counterclockwise node ordering
+    int t=0;for(int i=0;i<m-1;i++)for(int j=0;j<n-1;j++){ // counterclockwise node ordering
         if(i%2){elements(++t).Set(i+m*(j-1),i+1+m*(j-1),i+m*j);elements(++t).Set(i+1+m*(j-1),i+1+m*j,i+m*j);}
         else{elements(++t).Set(i+m*(j-1),i+1+m*(j-1),i+1+m*j);elements(++t).Set(i+m*(j-1),i+1+m*j,i+m*j);}}
 }
@@ -146,7 +146,7 @@ Initialize_Cylinder_Mesh(const int m,const int n,const bool create_caps)
     if(create_caps){elements.Exact_Resize(2*m*n);number_nodes=m*n+2;}
     else{elements.Exact_Resize(2*(m-1)*n);number_nodes=m*n;}
     for(int j=0;j<n;j++){int j_1=j==n?1:j+1;
-        for(int i=1;i<=m-1;i++){elements(++t).Set(j+(i-1)*n,j+i*n,j_1+i*n);elements(++t).Set(j+(i-1)*n,j_1+i*n,j_1+(i-1)*n);}
+        for(int i=0;i<m-1;i++){elements(++t).Set(j+(i-1)*n,j+i*n,j_1+i*n);elements(++t).Set(j+(i-1)*n,j_1+i*n,j_1+(i-1)*n);}
         if(create_caps){elements(++t).Set(m*n+1,j,j_1);elements(++t).Set(m*n+2,j_1+(m-1)*n,j+(m-1)*n);}}
 }
 //#####################################################################

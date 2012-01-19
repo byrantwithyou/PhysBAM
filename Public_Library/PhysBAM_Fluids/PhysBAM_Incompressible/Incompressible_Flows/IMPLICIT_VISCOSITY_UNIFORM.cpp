@@ -74,7 +74,7 @@ Variable_Viscosity_Explicit_Part(const T density,const T_ARRAYS_SCALAR& variable
     TV one_over_DX=grid.one_over_dX;
     for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
         int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index(),first_cell=iterator.First_Cell_Index(),second_cell=iterator.Second_Cell_Index();
-        for(int term_axis=1;term_axis<=T_GRID::dimension;term_axis++){
+        for(int term_axis=0;term_axis<T_GRID::dimension;term_axis++){
             TV_INT positive_base_index=face_index+TV_INT::Axis_Vector(term_axis);
             T velocity_deriv_plus=one_over_DX[axis]*(face_velocities_ghost(term_axis,positive_base_index)-face_velocities_ghost(term_axis,positive_base_index-TV_INT::Axis_Vector(axis))),
                 velocity_deriv_minus=one_over_DX[axis]*(face_velocities_ghost(term_axis,face_index)-face_velocities_ghost(term_axis,face_index-TV_INT::Axis_Vector(axis)));
@@ -135,16 +135,16 @@ Setup_Boundary_Conditions(const T_FACE_ARRAYS_SCALAR& face_velocities)
     // set neumann b.c. around a cell if its corresponding face in the pressure grid has psi_D set on both sides
     for(CELL_ITERATOR iterator(face_grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index(),p_face_index=cell_index;
         TV_INT p_cell_index_1,p_cell_index_2;T_GRID::Cells_Touching_Face(axis,p_face_index,p_cell_index_1,p_cell_index_2);
-        if(p_psi_D(p_cell_index_1)&&p_psi_D(p_cell_index_2)) for(int face_axis=1;face_axis<=T_GRID::dimension;face_axis++){
+        if(p_psi_D(p_cell_index_1)&&p_psi_D(p_cell_index_2)) for(int face_axis=0;face_axis<T_GRID::dimension;face_axis++){
             psi_N(face_axis,face_grid.First_Face_Index_In_Cell(face_axis,cell_index))=psi_N(face_axis,face_grid.Second_Face_Index_In_Cell(face_axis,cell_index))=true;}}
 
     // do the same for the sides tangential to the axis being iterated over
-    for(int grid_axis=1;grid_axis<=T_GRID::dimension;grid_axis++)if(grid_axis!=axis)for(int side=0;side<2;side++){
+    for(int grid_axis=0;grid_axis<T_GRID::dimension;grid_axis++)if(grid_axis!=axis)for(int side=0;side<2;side++){
         for(CELL_ITERATOR iterator(face_grid,1,T_GRID::GHOST_REGION,2*(grid_axis-1)+side);iterator.Valid();iterator.Next()){
             TV_INT cell_index=iterator.Cell_Index(),p_face_index=cell_index;
             TV_INT p_cell_index_1,p_cell_index_2;T_GRID::Cells_Touching_Face(axis,p_face_index,p_cell_index_1,p_cell_index_2);
             if(p_psi_D.Valid_Index(p_cell_index_1)&&p_psi_D.Valid_Index(p_cell_index_2)&&p_psi_D(p_cell_index_1)&&p_psi_D(p_cell_index_2))
-                for(int face_axis=1;face_axis<=T_GRID::dimension;face_axis++){
+                for(int face_axis=0;face_axis<T_GRID::dimension;face_axis++){
                     psi_N(face_axis,face_grid.First_Face_Index_In_Cell(face_axis,cell_index))=psi_N(face_axis,face_grid.Second_Face_Index_In_Cell(face_axis,cell_index))=true;}}}
 
     // set neumann for the faces in the same axis that are on dirichlet primal cells
@@ -153,13 +153,13 @@ Setup_Boundary_Conditions(const T_FACE_ARRAYS_SCALAR& face_velocities)
         psi_N(axis,iterator.Face_Index())=true;
 
     // set slip boundary conditions for tangential walls
-    for(int other_axis=1;other_axis<=T_GRID::dimension;other_axis++) if(other_axis!=axis){
+    for(int other_axis=0;other_axis<T_GRID::dimension;other_axis++) if(other_axis!=axis){
         for(FACE_ITERATOR iterator(face_grid,0,T_GRID::BOUNDARY_REGION,0,other_axis);iterator.Valid();iterator.Next()){TV_INT face_index=iterator.Face_Index(),p_node_index=face_index;
             if(p_psi_N(other_axis,p_node_index-axis_offset)||p_psi_N(other_axis,p_node_index)) psi_N(other_axis,face_index)=true;}}
 
     // set slip boundary conditions for tangential walls
     if(p_psi_R.base_pointer)
-        for(int other_axis=1;other_axis<=T_GRID::dimension;other_axis++) if(other_axis!=axis){
+        for(int other_axis=0;other_axis<T_GRID::dimension;other_axis++) if(other_axis!=axis){
             for(FACE_ITERATOR iterator(face_grid,0,T_GRID::BOUNDARY_REGION,0,other_axis);iterator.Valid();iterator.Next()){TV_INT face_index=iterator.Face_Index(),p_node_index=face_index;
                 T a=p_psi_R(other_axis,p_node_index-axis_offset),b=p_psi_R(other_axis,p_node_index);
                 if(a || b) psi_R(other_axis,face_index)=(T).5*(a+b);}}

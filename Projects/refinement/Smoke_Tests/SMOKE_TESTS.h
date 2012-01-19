@@ -181,7 +181,7 @@ public:
     {BASE::Write_Output_Files(frame);}
 
     void Set_Coarse_Boundary_Conditions()
-    {for(int axis=1;axis<=TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
+    {for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
         if(domain_boundary(axis)(axis_side)){ //Need to check mpi as smaller solves are never using mpi (for now)
             TV_INT interior_cell_offset=axis_side==1?TV_INT():-TV_INT::Axis_Vector(axis);    
             for(typename GRID<TV>::FACE_ITERATOR local_iterator(coarse_mac_grid,1,GRID<TV>::BOUNDARY_REGION,side);local_iterator.Valid();local_iterator.Next()){TV_INT cell=local_iterator.Face_Index()+interior_cell_offset;
@@ -207,7 +207,7 @@ public:
             projection.poisson->beta_face.Component(iterator.Axis())(iterator.Face_Index())*=(factor==1)?sub_scale_face_inverse:0.5*sub_scale_face_inverse;}}}
 
     void Set_Fine_Boundary_Conditions(GRID<TV>& local_mac_grid,ARRAY<T,FACE_INDEX<TV::dimension> >& local_face_velocities,ARRAY<bool,FACE_INDEX<TV::dimension> >& psi_N)
-    {for(int axis=1;axis<=TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++) if(domain_boundary(axis)(axis_side)){int side=2*(axis-1)+axis_side;
+    {for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++) if(domain_boundary(axis)(axis_side)){int side=2*(axis-1)+axis_side;
          for(typename GRID<TV>::FACE_ITERATOR local_iterator(fine_mac_grid,1,GRID<TV>::BOUNDARY_REGION,side);local_iterator.Valid();local_iterator.Next()){TV_INT boundary_face=axis_side==1?local_iterator.Face_Index()+TV_INT::Axis_Vector(axis):local_iterator.Face_Index()-TV_INT::Axis_Vector(axis);
              if(axis!=2 && fine_face_velocities.Component(axis).Valid_Index(boundary_face)) fine_face_velocities(FACE_INDEX<TV::dimension>(axis,boundary_face))=0;}}
     for(typename GRID<TV>::FACE_ITERATOR local_iterator(local_mac_grid);local_iterator.Valid();local_iterator.Next()){
@@ -290,7 +290,7 @@ public:
                 if(fine_psi_N(fine_index)) sum(sum_index)+=fine_face_velocities_save(fine_index);}}
         //update based on (1-a)*((1/A)*(Vco-avg Vs))+a*(Vfo+(Vcn-Vco)*(1/A))
         for(typename GRID<TV>::FACE_ITERATOR local_iterator(local_mac_grid,0,GRID<TV>::BOUNDARY_REGION);local_iterator.Valid();local_iterator.Next()){
-            TV_INT2 index;int offset=0;for(int i=1;i<=TV::dimension;i++){if(i==local_iterator.Axis()){offset++;continue;}index(i-offset)=local_iterator.Face_Index()(i);}
+            TV_INT2 index;int offset=0;for(int i=0;i<TV::dimension;i++){if(i==local_iterator.Axis()){offset++;continue;}index(i-offset)=local_iterator.Face_Index()(i);}
             FACE_INDEX<TV::dimension> coarse_index,fine_index=FACE_INDEX<TV::dimension>(local_iterator.Axis(),iterator.Cell_Index()*sub_scale+local_iterator.Face_Index()-sub_scale*TV_INT::All_Ones_Vector());
             if(local_iterator.First_Boundary()) coarse_index=FACE_INDEX<TV::dimension>(local_iterator.Axis(),coarse_mac_grid.First_Face_Index_In_Cell(local_iterator.Axis(),iterator.Cell_Index()));
             else coarse_index=FACE_INDEX<TV::dimension>(local_iterator.Axis(),coarse_mac_grid.Second_Face_Index_In_Cell(local_iterator.Axis(),iterator.Cell_Index()));
@@ -330,7 +330,7 @@ public:
             if(fine_psi_N(fine_index)) sum(sum_index)+=fine_face_velocities_save(fine_index);}}
     //update based on (1-a)*((1/A)*(Vco-avg Vs))+a*(Vfo+(Vcn-Vco)*(1/A))
     for(typename GRID<TV>::FACE_ITERATOR local_iterator(local_mac_grid,0,GRID<TV>::BOUNDARY_REGION);local_iterator.Valid();local_iterator.Next()){
-        TV_INT2 index;int offset=0;for(int i=1;i<=TV::dimension;i++){if(i==local_iterator.Axis()){offset++;continue;}index(i-offset)=local_iterator.Face_Index()(i);}
+        TV_INT2 index;int offset=0;for(int i=0;i<TV::dimension;i++){if(i==local_iterator.Axis()){offset++;continue;}index(i-offset)=local_iterator.Face_Index()(i);}
         FACE_INDEX<TV::dimension> coarse_index,fine_index=FACE_INDEX<TV::dimension>(local_iterator.Axis(),coarse_cell_index*sub_scale+local_iterator.Face_Index()-sub_scale*TV_INT::All_Ones_Vector());
         if(local_iterator.First_Boundary()) coarse_index=FACE_INDEX<TV::dimension>(local_iterator.Axis(),coarse_mac_grid.First_Face_Index_In_Cell(local_iterator.Axis(),coarse_cell_index));
         else coarse_index=FACE_INDEX<TV::dimension>(local_iterator.Axis(),coarse_mac_grid.Second_Face_Index_In_Cell(local_iterator.Axis(),coarse_cell_index));
@@ -420,7 +420,7 @@ public:
             matrix_index_to_cell_index(matrix_index)=cell_index;}
         for(int i=0;i<row_counts.m;i++){
             int boundary=0;
-            for(int j=1;j<=TV::dimension;j++) if(matrix_index_to_cell_index(i)(j)==1 || matrix_index_to_cell_index(i)(j)==local_mac_grid.Counts()(j)) boundary++;
+            for(int j=0;j<TV::dimension;j++) if(matrix_index_to_cell_index(i)(j)==1 || matrix_index_to_cell_index(i)(j)==local_mac_grid.Counts()(j)) boundary++;
             row_counts(i)=(2*TV::dimension+1)-boundary;}
         A.Set_Row_Lengths(row_counts);
         TV one_over_dx2=Inverse(local_mac_grid.dX*local_mac_grid.dX);
@@ -463,7 +463,7 @@ public:
         for(typename GRID<TV>::CELL_ITERATOR local_iterator(local_mac_grid);local_iterator.Valid();local_iterator.Next()){
             TV_INT cell_index=local_iterator.Cell_Index();
             local_projection.elliptic_solver->f(cell_index)=T(0);
-            for(int axis=1;axis<=TV::dimension;axis++){
+            for(int axis=0;axis<TV::dimension;axis++){
                 TV_INT first_face_index=local_iterator.First_Face_Index(axis),second_face_index=local_iterator.Second_Face_Index(axis);
                 local_projection.elliptic_solver->f(cell_index)+=face_velocities.Component(axis)(second_face_index)-face_velocities.Component(axis)(first_face_index);}}        
         Scaled_Direct_Solvers(local_projection.p,local_projection.elliptic_solver->f,scale);
@@ -561,7 +561,7 @@ public:
     inline int Cell_Boundary_Type(const ARRAY<T,FACE_INDEX<TV::dimension> >& beta_face,const typename GRID<TV>::CELL_ITERATOR& iterator)
     {
         bool has_solid=false,has_fluid=false;
-        for(int axis=1;axis<=TV::dimension;axis++){
+        for(int axis=0;axis<TV::dimension;axis++){
             if(beta_face.Component(axis)(iterator.First_Face_Index(axis))<1) has_solid=true;
             if(beta_face.Component(axis)(iterator.Second_Face_Index(axis))<1) has_solid=true;
             if(beta_face.Component(axis)(iterator.First_Face_Index(axis))>0) has_fluid=true;
@@ -593,7 +593,7 @@ public:
                 if(local_psi_N(local_iterator.Full_Index())) sum(sum_index)+=local_face_velocities(local_iterator.Full_Index());}}
         FACE_INDEX<TV::dimension> coarse_index;
         for(typename GRID<TV>::FACE_ITERATOR local_iterator(local_mac_grid,0,GRID<TV>::BOUNDARY_REGION);local_iterator.Valid();local_iterator.Next()){
-            TV_INT2 index;int offset=0;for(int i=1;i<=TV::dimension;i++){if(i==local_iterator.Axis()){offset++;continue;}index(i-offset)=local_iterator.Face_Index()(i);}
+            TV_INT2 index;int offset=0;for(int i=0;i<TV::dimension;i++){if(i==local_iterator.Axis()){offset++;continue;}index(i-offset)=local_iterator.Face_Index()(i);}
             if(local_iterator.First_Boundary()) coarse_index=FACE_INDEX<TV::dimension>(local_iterator.Axis(),coarse_iterator.First_Face_Index(local_iterator.Axis()));
             else coarse_index=FACE_INDEX<TV::dimension>(local_iterator.Axis(),coarse_iterator.Second_Face_Index(local_iterator.Axis()));
             T area=coarse_beta_face(coarse_index),one_over_area=1./area;
@@ -693,7 +693,7 @@ public:
                 for(typename GRID<TV>::CELL_ITERATOR local_iterator(local_mac_grid);local_iterator.Valid();local_iterator.Next()){
                     TV_INT cell_index=local_iterator.Cell_Index();
                     local_projection_array(level)->poisson->f(cell_index)=T(0);
-                    for(int axis=1;axis<=TV::dimension;axis++){
+                    for(int axis=0;axis<TV::dimension;axis++){
                         TV_INT first_face_index=local_iterator.First_Face_Index(axis),second_face_index=local_iterator.Second_Face_Index(axis);
                         local_projection_array(level)->poisson->f(cell_index)+=local_face_velocities_array(level)->Component(axis)(second_face_index)-local_face_velocities_array(level)->Component(axis)(first_face_index);}}
                 Solve_For_Pressure_Analytically(local_projection_array(level)->p,local_projection_array(level)->poisson->f);
@@ -739,7 +739,7 @@ public:
                 for(typename GRID<TV>::CELL_ITERATOR local_iterator(local_mac_grid);local_iterator.Valid();local_iterator.Next()){
                     TV_INT cell_index=local_iterator.Cell_Index();
                     local_projection_array(level)->poisson->f(cell_index)=T(0);
-                    for(int axis=1;axis<=TV::dimension;axis++){
+                    for(int axis=0;axis<TV::dimension;axis++){
                         TV_INT first_face_index=local_iterator.First_Face_Index(axis),second_face_index=local_iterator.Second_Face_Index(axis);
                         local_projection_array(level)->poisson->f(cell_index)+=local_face_velocities_array(level)->Component(axis)(second_face_index)-local_face_velocities_array(level)->Component(axis)(first_face_index);}}
                 Solve_For_Pressure_Analytically(local_projection_array(level)->p,local_projection_array(level)->poisson->f);

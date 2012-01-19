@@ -63,7 +63,7 @@ public:
 
     void Initialize_Cube_Mesh(const int m,const int n,const int p)
     {Clean_Memory();number_nodes=m*n*p;elements.Resize((m-1)*(n-1)*(p-1));
-    int t=0;for(int k=1;k<=p-1;k++) for(int j=1;j<=n-1;j++) for(int i=1;i<=m-1;i++){t++;
+    int t=0;for(int k=0;k<p-1;k++) for(int j=0;j<n-1;j++) for(int i=0;i<m-1;i++){t++;
         elements(t)(1)=i+m*n*(k-1)+m*(j-1);elements(t)(2)=i+m*n*k+m*(j-1);elements(t)(3)=i+m*n*(k-1)+m*j;elements(t)(4)=i+m*n*k+m*j;elements(t)(5)=(i+1)+m*n*(k-1)+m*(j-1);
         elements(t)(6)=(i+1)+m*n*k+m*(j-1);elements(t)(7)=(i+1)+m*n*(k-1)+m*j;elements(t)(8)=(i+1)+m*n*k+m*j;}}
 

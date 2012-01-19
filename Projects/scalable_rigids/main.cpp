@@ -258,7 +258,7 @@ int main(int argc,char* argv[])
     Mi.Set_Row_Lengths(Mi_row_counts);
     Mi.n=TV::dimension*n;
     for(int i=0;i<n;i++)
-        for(int j=1;j<=TV::dimension;j++)
+        for(int j=0;j<TV::dimension;j++)
         {
             int k=TV::dimension*(i-1)+j;
             Mi.Set_Element(k,k,1.0/masses(i));
@@ -270,7 +270,7 @@ int main(int argc,char* argv[])
     C.n=Mi.n;
     for(int i=0;i<constraint_pairs.m;i++)
     {
-        for(int j=1;j<=TV::dimension;j++)
+        for(int j=0;j<TV::dimension;j++)
         {
             C.Set_Element(i,(constraint_pairs(i)(1)-1)*TV::dimension+j,-constraint_normals(i)(j));
             C.Set_Element(i,(constraint_pairs(i)(2)-1)*TV::dimension+j,constraint_normals(i)(j));

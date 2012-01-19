@@ -125,7 +125,7 @@ Initialize_Grid_Structures_Subobject(T_FACE_ARRAYS_INT& face_velocities_count,T_
     for(CELL_ITERATOR iterator(grid,box);iterator.Valid();iterator.Next()){
         T phi_value=collision_body.Implicit_Geometry_Extended_Value(iterator.Location());
         phi(iterator.Cell_Index())=min(phi_value,phi(iterator.Cell_Index()));
-        if(phi_value<0) for(int axis=1;axis<=T_GRID::dimension;axis++){
+        if(phi_value<0) for(int axis=0;axis<T_GRID::dimension;axis++){
             TV_INT face1=iterator.First_Face_Index(axis),face2=iterator.Second_Face_Index(axis);
             if(face_operations.Component(axis)(face1)!=subobject){face_operations.Component(axis)(face1)=subobject;
                 face_velocities.Component(axis)(face1)=collision_body.Pointwise_Object_Velocity(grid.Face(axis,face1))[axis];face_velocities_count.Component(axis)(face1)++;}

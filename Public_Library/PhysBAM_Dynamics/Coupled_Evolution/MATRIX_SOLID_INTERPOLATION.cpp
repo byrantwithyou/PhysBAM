@@ -170,7 +170,7 @@ Print_Each_Matrix(int n,GENERALIZED_VELOCITY<TV>& G) const
             int base=G.V.Size()*TV::dimension+(index-1)*TWIST<TV>::dimension;
             oo.Add_Sparse_Entry(Value(i),base+axis,rigid_weights(j).weight);
             VECTOR<T,TV::SPIN::m> cpm=MATRIX<T,TV::SPIN::m,TV::m>::Cross_Product_Matrix(rigid_weights(j).radius).Column(axis)*rigid_weights(j).weight;
-            for(int k=1;k<=TV::SPIN::m;k++) oo.Add_Sparse_Entry(Value(i),base+TV::m+k,cpm(k));}}
+            for(int k=0;k<TV::SPIN::m;k++) oo.Add_Sparse_Entry(Value(i),base+TV::m+k,cpm(k));}}
 
     oo.End_Sparse_Matrix();
 }
@@ -215,7 +215,7 @@ Add_Raw_Matrix(ARRAY<TRIPLE<int,int,T> >& data) const
             int base=this->V_indices->m*TV::dimension+(index-1)*TWIST<TV>::dimension;
             data.Append(TRIPLE<int,int,T>(Value(i),base+axis,rigid_weights(j).weight));
             VECTOR<T,TV::SPIN::m> cpm=MATRIX<T,TV::SPIN::m,TV::m>::Cross_Product_Matrix(rigid_weights(j).radius).Column(axis)*rigid_weights(j).weight;
-            for(int k=1;k<=TV::SPIN::m;k++) data.Append(TRIPLE<int,int,T>(Value(i),base+TV::m+k,cpm(k)));}}
+            for(int k=0;k<TV::SPIN::m;k++) data.Append(TRIPLE<int,int,T>(Value(i),base+TV::m+k,cpm(k)));}}
 }
 //#####################################################################
 template class MATRIX_SOLID_INTERPOLATION<VECTOR<float,1> >;

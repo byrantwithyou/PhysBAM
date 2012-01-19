@@ -126,7 +126,7 @@ template<class T> struct FLUID_TO_SOLID_INTERPOLATION_CUT_DISPATCH<VECTOR<T,2> >
             for(int i=0;i<cc.clipped_segments.m;i++){const CLIP_ENTRY& e=cc.clipped_segments(i);
                 SEGMENT_2D<T> segment(X(curve.mesh.elements(e.i).x),X(curve.mesh.elements(e.i).y));
                 TV n=(segment.x2-segment.x1).Rotate_Clockwise_90()*(e.b-e.a);
-                for(int a=1;a<=TV::m;a++)
+                for(int a=0;a<TV::m;a++)
                     for(int k=0;k<=1;k++){
                         FACE_INDEX<TV::m> f(a,cell);
                         f.index(a)+=k;
@@ -148,7 +148,7 @@ template<class T> struct FLUID_TO_SOLID_INTERPOLATION_CUT_DISPATCH<VECTOR<T,2> >
             CUT_CELL& cc=it.Data();
             VECTOR<TV,TV::m> edges;
             int count=0;
-            for(int a=1;a<=TV::m;a++)
+            for(int a=0;a<TV::m;a++)
                 for(int k=0;k<=1;k++){
                     FACE_INDEX<TV::m> f(a,cell);
                     f.index(a)+=k;
@@ -521,7 +521,7 @@ Print_Each_Matrix(int n,int fluid_faces,GENERALIZED_VELOCITY<TV>& G) const
     reverse_map_deformable.Subset(G.V.indices)=IDENTITY_ARRAY<>(G.V.Size());
 
     for(int i=0;i<entries.m;i++){const ARRAY<ENTRY>& array=entries(i);
-        for(int a=1;a<=TV::m;a++){
+        for(int a=0;a<TV::m;a++){
             HASHTABLE<int,T> face_weights;
             for(int j=0;j<array.m;j++){const ENTRY& e=array(j);
                 if(face_weights.Contains(e.i)) face_weights.Get(e.i)+=e.w(a);
@@ -545,7 +545,7 @@ Add_Raw_Matrix(ARRAY<TRIPLE<int,int,T> >& data) const
     reverse_map_deformable.Subset(*this->V_indices)=IDENTITY_ARRAY<>(this->V_size);
 
     for(int i=0;i<entries.m;i++){const ARRAY<ENTRY>& array=entries(i);
-        for(int a=1;a<=TV::m;a++){
+        for(int a=0;a<TV::m;a++){
             HASHTABLE<int,T> face_weights;
             for(int j=0;j<array.m;j++){const ENTRY& e=array(j);
                 if(face_weights.Contains(e.i)) face_weights.Get(e.i)+=e.w(a);

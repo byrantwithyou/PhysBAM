@@ -47,7 +47,7 @@ template<class TV> void MUSCLE<TV>::
 Initialize()
 {
     ARRAY<T_MUSCLE_SEGMENT_DATA> segment_data;
-    for(int i=1;i<=via_points.m+1;i++) {segment_data.Append(T_MUSCLE_SEGMENT_DATA(MUSCLE_SEGMENT<TV>::LINEAR_SEGMENT,
+    for(int i=0;i<via_points.m+1;i++) {segment_data.Append(T_MUSCLE_SEGMENT_DATA(MUSCLE_SEGMENT<TV>::LINEAR_SEGMENT,
         ANALYTIC_SURFACE_MUSCLE_SEGMENT<T>::CURVE_NONE,ARRAY<T>()));}
     Initialize(segment_data);
 }
@@ -168,7 +168,7 @@ Apply_Fixed_Impulse_At_All_Points(const T impulse)
     else{
         TV F=impulse*(via_points(1)->Embedded_Position()-attachment_point_1->Embedded_Position()).Normalized();
         attachment_point_1->Apply_Impulse(F);via_points(1)->Apply_Impulse(-F);
-        for(int i=1;i<=via_points.m-1;i++){
+        for(int i=0;i<via_points.m-1;i++){
             F=impulse*(via_points(i+1)->Embedded_Position()-via_points(i)->Embedded_Position()).Normalized();
             via_points(i)->Apply_Impulse(F);via_points(i+1)->Apply_Impulse(-F);}
         F=impulse*(attachment_point_2->Embedded_Position()-via_points(via_points.m)->Embedded_Position()).Normalized();
