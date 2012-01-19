@@ -210,7 +210,7 @@ Display(const int in_color) const
                     OpenGL_String(rigid_body_collection.rigid_body_particle.X(i)+scale*forces_and_torques(i).x,label);}}
 
             for(int i(1);i<=extra_components.Size();i++)
-                for(int j=1;j<=extra_components(i).m;j++)
+                for(int j=0;j<extra_components(i).m;j++)
                     extra_components(i)(j)->Display(in_color);
 
             if(show_object_names){

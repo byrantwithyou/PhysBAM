@@ -327,7 +327,7 @@ Find_Ghost_Regions_Threaded(SPARSE_MATRIX_FLAT_NXN<T>& A,const ARRAY<VECTOR<int,
             int buffer_size=sizeof(int)+sizeof(T)*columns_to_receive(node_rank).m;
             THREAD_PACKAGE pack(buffer_size);int position=0;pack.send_tid=my_rank;pack.recv_tid=node_rank-1;
             *(int*)(&pack.buffer(position+1))=columns_to_receive(node_rank).m;position+=sizeof(int);
-            for(int i=1;i<=columns_to_receive(node_rank).m;i++){*(int*)(&pack.buffer(position+1))=columns_to_receive(node_rank)(i);position+=sizeof(int);}
+            for(int i=0;i<columns_to_receive(node_rank).m;i++){*(int*)(&pack.buffer(position+1))=columns_to_receive(node_rank)(i);position+=sizeof(int);}
             pthread_mutex_lock(thread_grid->lock);
             thread_grid->buffers.Append(pack);
             pthread_mutex_unlock(thread_grid->lock);}}
@@ -336,7 +336,7 @@ Find_Ghost_Regions_Threaded(SPARSE_MATRIX_FLAT_NXN<T>& A,const ARRAY<VECTOR<int,
     for(int buf=0;buf<thread_grid->buffers.m;buf++){if(thread_grid->buffers(buf).recv_tid!=my_rank) continue;
         int source=thread_grid->buffers(buf).send_tid;int position=0;
         columns_to_send(source+1).Resize(*(int*)(&thread_grid->buffers(buf).buffer(position+1)));position+=sizeof(int);
-        for(int i=1;i<=columns_to_send(source+1).m;i++){columns_to_send(source+1)(i)=*(int*)(&thread_grid->buffers(buf).buffer(position+1));position+=sizeof(int);}}
+        for(int i=0;i<columns_to_send(source+1).m;i++){columns_to_send(source+1)(i)=*(int*)(&thread_grid->buffers(buf).buffer(position+1));position+=sizeof(int);}}
     pthread_barrier_wait(thread_grid->barr);
     if(thread_grid->tid==1) thread_grid->buffers.m=0;
     pthread_barrier_wait(thread_grid->barr);
@@ -354,7 +354,7 @@ Fill_Ghost_Cells_Far(VECTOR_ND<T>& x)
         if(node_rank-1!=my_rank){
             // First build the array of column values wanted
             ARRAY<T> send_array(columns_to_send(node_rank).m);
-            for(int i=1;i<=columns_to_send(node_rank).m;i++)
+            for(int i=0;i<columns_to_send(node_rank).m;i++)
                 send_array(i)=x(columns_to_send(node_rank)(i));
             MPI_PACKAGE package(send_array);
             packages.Append(package);requests.Append(package.Isend(comm,node_rank-1,tag));}}
@@ -371,7 +371,7 @@ Fill_Ghost_Cells_Far(VECTOR_ND<T>& x)
     // For the ones we received, stick them into x
     for(int node_rank=0;node_rank<columns_to_receive.m;node_rank++){
         if(node_rank-1!=my_rank)
-            for(int i=1;i<=columns_to_receive(node_rank).m;i++)
+            for(int i=0;i<columns_to_receive(node_rank).m;i++)
                 x(columns_to_receive(node_rank)(i))=columns_to_receive_values(node_rank)(i);}
 }
 //#####################################################################
@@ -386,7 +386,7 @@ Fill_Ghost_Cells_Threaded(VECTOR_ND<T>& x)
         if(node_rank-1!=my_rank){
             // First build the array of column values wanted
             THREAD_PACKAGE pack(columns_to_send(node_rank).m*sizeof(T));pack.send_tid=my_rank;pack.recv_tid=node_rank-1;int position=0;
-            for(int i=1;i<=columns_to_send(node_rank).m;i++){*(T*)(pack.buffer(position+1))=x(columns_to_send(node_rank)(i));position+=sizeof(T);}
+            for(int i=0;i<columns_to_send(node_rank).m;i++){*(T*)(pack.buffer(position+1))=x(columns_to_send(node_rank)(i));position+=sizeof(T);}
             pthread_mutex_lock(thread_grid->lock);
             thread_grid->buffers.Append(pack);
             pthread_mutex_unlock(thread_grid->lock);}}
@@ -396,7 +396,7 @@ Fill_Ghost_Cells_Threaded(VECTOR_ND<T>& x)
     for(int buf=0;buf<thread_grid->buffers.m;buf++){if(my_rank!=thread_grid->buffers(buf).recv_tid) continue;
         // First build the array of column values we will receive
         int node_rank=thread_grid->buffers(buf).send_tid;columns_to_receive_values(node_rank).Resize(columns_to_receive(node_rank).m);int position=0;
-        for(int i=1;i<=columns_to_receive_values(node_rank).m;i++){columns_to_receive_values(node_rank)(i)=*(T*)(&thread_grid->buffers(buf).buffer(position+1));position+=sizeof(T);}}
+        for(int i=0;i<columns_to_receive_values(node_rank).m;i++){columns_to_receive_values(node_rank)(i)=*(T*)(&thread_grid->buffers(buf).buffer(position+1));position+=sizeof(T);}}
     pthread_barrier_wait(thread_grid->barr);
     if(thread_grid->tid==1) thread_grid->buffers.m=0;
     pthread_barrier_wait(thread_grid->barr);
@@ -404,7 +404,7 @@ Fill_Ghost_Cells_Threaded(VECTOR_ND<T>& x)
     // For the ones we received, stick them into x
     for(int node_rank=0;node_rank<columns_to_receive.m;node_rank++){
         if(node_rank-1!=my_rank)
-            for(int i=1;i<=columns_to_receive(node_rank).m;i++)
+            for(int i=0;i<columns_to_receive(node_rank).m;i++)
                 x(columns_to_receive(node_rank)(i))=columns_to_receive_values(node_rank)(i);}
 }
 //#####################################################################

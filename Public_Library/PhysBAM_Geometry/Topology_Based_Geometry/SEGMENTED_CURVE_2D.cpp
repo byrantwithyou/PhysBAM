@@ -142,7 +142,7 @@ Segment_Segment_Intersection(const SEGMENT_MESH& test_segment_mesh,ARRAY_VIEW<co
     ARRAY<ARRAY<int> > segments_near_segments(test_segment_mesh.elements.m);Get_Segments_Near_Segments(segments_near_segments,test_segment_mesh,X,thickness_over_2,update_bounding_boxes);
     for(int s1=0;s1<test_segment_mesh.elements.m;s1++){
         SEGMENT_2D<T> segment1(X(test_segment_mesh.elements(s1)(1)),X(test_segment_mesh.elements(s1)(2)));
-        for(int k=1;k<=segments_near_segments(s1).m;k++){int s2=segments_near_segments(s1)(k);
+        for(int k=0;k<segments_near_segments(s1).m;k++){int s2=segments_near_segments(s1)(k);
             SEGMENT_2D<T> segment2(X(mesh.elements(s2)(1)),X(mesh.elements(s2)(2)));
             if(INTERSECTION::Intersects(segment1,segment2,thickness_over_2)){intersection=true;
                 if(intersecting_segment_segment_pairs) intersecting_segment_segment_pairs->Append(VECTOR<int,2>(s1,s2));else return true;}}}
@@ -162,7 +162,7 @@ Get_Segments_Near_Segments(ARRAY<ARRAY<int> >& segments_near_segments,const SEGM
         int node1,node2;test_segment_mesh.elements(k).Get(node1,node2);
         RANGE<TV> box(X(node1));box.Enlarge_To_Include_Point(X(node2));
         hierarchy->Intersection_List(box,segments_near_segments(k),thickness_over_2);
-        for(int kk=1;kk<=segments_near_segments(k).m;kk++){int s=segments_near_segments(k)(kk); // remove elements that contain a node of the segment being tested
+        for(int kk=0;kk<segments_near_segments(k).m;kk++){int s=segments_near_segments(k)(kk); // remove elements that contain a node of the segment being tested
             for(int i=0;i<2;i++) if(mesh.elements(s)(i) == node1 || mesh.elements(s)(i) == node2){segments_near_segments(k).Remove_Index_Lazy(kk);kk--;break;}}}
     
     if(!hierarchy_defined){delete hierarchy;hierarchy=0;}

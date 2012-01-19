@@ -250,7 +250,7 @@ void Optimize_Particle_Order(const int reorder_partition_input)
 
     for(int reorder_partition=min_reorder_partition;reorder_partition<=max_reorder_partition;reorder_partition++){
         ARRAY<int> local_indices(segment_mesh.number_nodes);
-        for(int i=1;i<=partition_nodes(reorder_partition).m;i++) local_indices(partition_nodes(reorder_partition)(i))=i;
+        for(int i=0;i<partition_nodes(reorder_partition).m;i++) local_indices(partition_nodes(reorder_partition)(i))=i;
         SEGMENT_MESH local_segment_mesh;
         for(int s=0;s<segment_mesh.elements.m;s++) local_segment_mesh.elements.Append(VECTOR<int,2>::Map(local_indices,segment_mesh.elements(s)));
         local_segment_mesh.Delete_Elements_With_Missing_Nodes();local_segment_mesh.number_nodes=partition_nodes(reorder_partition).m;
@@ -294,12 +294,12 @@ void Optimize_Particle_Order(const int reorder_partition_input)
                         node2=neighbor_nodes(node1)(random_numbers.Get_Uniform_Integer(1,neighbor_nodes(node1).m));
                     else if(swap_nearby){
                         node2=node1+random_numbers.Get_Uniform_Integer(1,swap_nearby);if(node2>neighbor_nodes.m) continue;}
-                    for(int i=1;i<=neighbor_nodes(node1).m;i++){
+                    for(int i=0;i<neighbor_nodes(node1).m;i++){
                         int neighbor=neighbor_nodes(node1)(i);
                         if(neighbor!=node2){
                             new_functional-=Log_Distance(VECTOR<int,2>::Map(node_locations,VECTOR<int,2>(node1,neighbor)));
                             new_functional+=Log_Distance(VECTOR<int,2>::Map(node_locations,VECTOR<int,2>(node2,neighbor)));}}
-                    for(int i=1;i<=neighbor_nodes(node2).m;i++){
+                    for(int i=0;i<neighbor_nodes(node2).m;i++){
                         int neighbor=neighbor_nodes(node2)(i);
                         if(neighbor!=node1){
                             new_functional-=Log_Distance(VECTOR<int,2>::Map(node_locations,VECTOR<int,2>(node2,neighbor)));
@@ -312,7 +312,7 @@ void Optimize_Particle_Order(const int reorder_partition_input)
                     int start=random_numbers.Get_Uniform_Integer(1,neighbor_nodes.m);
                     int end=start+random_numbers.Get_Uniform_Integer(1,reverse_range);
                     if(end>neighbor_nodes.m) continue;
-                    for(int n1=start;n1<=end;n1++)for(int a=1;a<=neighbor_nodes(n1).m;a++){int n2=neighbor_nodes(n1)(a);
+                    for(int n1=start;n1<=end;n1++)for(int a=0;a<neighbor_nodes(n1).m;a++){int n2=neighbor_nodes(n1)(a);
                         if(n2<start || n2>end){
                             new_functional-=Log_Distance(VECTOR<int,2>::Map(node_locations,VECTOR<int,2>(n1,n2)));
                             new_functional+=Log_Distance(VECTOR<int,2>::Map(node_locations,VECTOR<int,2>(start+end-n1,n2)));}

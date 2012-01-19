@@ -209,7 +209,7 @@ Update_Geometry(const int id)
             if(!opengl_triangulated_area(id)->color_map) opengl_triangulated_area(id)->color_map=new ARRAY<OPENGL_COLOR>;
             FILE_UTILITIES::Read_From_File<RW>(color_map_filename,*opengl_triangulated_area(id)->color_map);}
         else if(opengl_triangulated_area(id)->color_map){delete opengl_triangulated_area(id)->color_map;opengl_triangulated_area(id)->color_map=0;}}
-    for(int i=1;i<=extra_components(id).m;i++) extra_components(id)(i)->Set_Frame(frame);
+    for(int i=0;i<extra_components(id).m;i++) extra_components(id)(i)->Set_Frame(frame);
 }
 //#####################################################################
 // Function Destroy_Geometry
@@ -388,7 +388,7 @@ Display(const int in_color) const
                     OpenGL_String(rigid_body_collection.rigid_body_particle.X(i)+scale*forces_and_torques(i).x,label);}}
 
             for(int i(1);i<=extra_components.Size();i++)
-                for(int j=1;j<=extra_components(i).m;j++)
+                for(int j=0;j<extra_components(i).m;j++)
                     extra_components(i)(j)->Display(in_color);
 
             if(show_object_names){

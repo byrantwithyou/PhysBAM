@@ -83,7 +83,7 @@ Add_Rigid_Body(RIGID_BODY<TV>* rigid_body,const int simplicial_boundary_id,const
     if(simplicial_boundary_id) rigid_body_particle.structure_ids(id)(1)=simplicial_boundary_id;
     if(implicit_object_id) rigid_body_particle.structure_ids(id)(2)=implicit_object_id;
     if(simplicial_interior_id) rigid_body_particle.structure_ids(id)(3)=simplicial_interior_id;
-    for(int i=1;i<=rigid_body_particle.structure_ids(id).m;i++) if(rigid_body_particle.structure_ids(id)(i) && !rigid_geometry_collection.structure_list.Element(rigid_body_particle.structure_ids(id)(i))) PHYSBAM_FATAL_ERROR();
+    for(int i=0;i<rigid_body_particle.structure_ids(id).m;i++) if(rigid_body_particle.structure_ids(id)(i) && !rigid_geometry_collection.structure_list.Element(rigid_body_particle.structure_ids(id)(i))) PHYSBAM_FATAL_ERROR();
     return id;
 }
 //#####################################################################

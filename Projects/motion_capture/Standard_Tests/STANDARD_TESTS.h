@@ -793,7 +793,7 @@ void Human_Cluster(int frame)
         rigid_body.Update_Bounding_Box();
         //cluster code
         int done=false;
-        for(int j=0;j<cluster_bones.m;j++) for(int k=1;k<=cluster_bones(j).m;k++) if(body_name.find(cluster_bones(j)(k))!=std::string::npos){children(j).Append(rigid_body.particle_index);done=true;}
+        for(int j=0;j<cluster_bones.m;j++) for(int k=0;k<cluster_bones(j).m;k++) if(body_name.find(cluster_bones(j)(k))!=std::string::npos){children(j).Append(rigid_body.particle_index);done=true;}
         if(!done) referenced_rigid_particles->Append(rigid_body.particle_index);
         if(i==1){
             T_INERTIA_TENSOR& inertia_tensor=arb.rigid_body_collection.rigid_body_particle.inertia_tensor(rigid_body_ids(i));
@@ -861,7 +861,7 @@ void Create_Joints_From_Cluster_Hierarchy(int joint_type,int parent)
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
     RIGID_BODY_CLUSTER_BINDINGS<TV>& rigid_bindings=solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings;
-    for(int i=1;i<=body_motion.bone_hierarchy(parent).m;i++){
+    for(int i=0;i<body_motion.bone_hierarchy(parent).m;i++){
         int child=body_motion.name_to_track_index.Get(body_motion.bone_hierarchy(parent)(i));
         int parent_index=rigid_bindings.Get_Parent_Index(rigid_body_ids(parent));
         int child_index=rigid_bindings.Get_Parent_Index(rigid_body_ids(child));
@@ -894,7 +894,7 @@ void Create_Joints_From_Cluster_Hierarchy(int joint_type,int parent)
 void Create_Joints_From_Hierarchy(int joint_type,int parent)
 {
     ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
-    for(int i=1;i<=body_motion.bone_hierarchy(parent).m;i++){
+    for(int i=0;i<body_motion.bone_hierarchy(parent).m;i++){
         std::string body_name=body_motion.names(parent);
         int child=body_motion.name_to_track_index.Get(body_motion.bone_hierarchy(parent)(i));
         JOINT<TV>* joint=0;
@@ -923,7 +923,7 @@ void Initialize_Bone_Hierarchy_For_Human()
     for(int i=0;i<body_motion.bone_hierarchy.m;i++){
         std::string body_name=body_motion.names(i);
         int parent=i,parent_index=rigid_body_ids(parent);
-        for(int j=1;j<=body_motion.bone_hierarchy(i).m;j++){
+        for(int j=0;j<body_motion.bone_hierarchy(i).m;j++){
             int child=body_motion.name_to_track_index.Get(body_motion.bone_hierarchy(i)(j)),child_index=rigid_body_ids(child);
             bone_hierarchy(parent_index).Append(child_index);}}
 }
@@ -938,7 +938,7 @@ void Initialize_Bone_Hierarchy_For_Cluster_Human()
         int parent=i,parent_index=rigid_body_ids(parent);
         int cluster_parent_index=rigid_bindings.Get_Parent_Index(parent_index);
         if(!cluster_parent_index) cluster_parent_index=parent_index; 
-        for(int j=1;j<=body_motion.bone_hierarchy(i).m;j++){
+        for(int j=0;j<body_motion.bone_hierarchy(i).m;j++){
             int child=body_motion.name_to_track_index.Get(body_motion.bone_hierarchy(i)(j)),child_index=rigid_body_ids(child);
             int cluster_child_index=rigid_bindings.Get_Parent_Index(child_index);
             if(!cluster_child_index) cluster_child_index=child_index; 

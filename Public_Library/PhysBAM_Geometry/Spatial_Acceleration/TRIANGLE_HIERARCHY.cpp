@@ -120,7 +120,7 @@ Calculate_Bounding_Box_Radii(const ARRAY<RANGE<TV> >& bounding_boxes,ARRAY<T>& r
     if(triangles_per_group) for(int k=0;k<leaves;k++){
         VECTOR<T,3> center=bounding_boxes(k).Center();int node1,node2,node3;triangle_mesh.elements(k).Get(node1,node2,node3);
         radius(k)=0;
-        for(int i=1;i<=triangles_in_group(i).m;i++)
+        for(int i=0;i<triangles_in_group(i).m;i++)
             radius(k)=max(radius(k),(particles.X(node1)-center).Magnitude_Squared(),(particles.X(node2)-center).Magnitude_Squared(),(particles.X(node3)-center).Magnitude_Squared());
         radius(k)=sqrt(radius(k));}
     else for(int k=0;k<leaves;k++){
@@ -166,7 +166,7 @@ Intersection(const int box,RAY<VECTOR<T,3> >& ray,const T thickness,const T thic
         if(triangles_per_group){
             bool intersected=false;
             if(triangle_list){
-                for(int i=1;i<=triangles_in_group(box).m;i++){
+                for(int i=0;i<triangles_in_group(box).m;i++){
                     RAY<VECTOR<T,3> > ray_temp=ray;
                     if(INTERSECTION::Lazy_Intersects(ray_temp,(*triangle_list)(triangles_in_group(box)(i)).Bounding_Box(),thickness_over_two) && 
                        INTERSECTION::Intersects(ray,(*triangle_list)(triangles_in_group(box)(i)),thickness_over_two)){
@@ -175,7 +175,7 @@ Intersection(const int box,RAY<VECTOR<T,3> >& ray,const T thickness,const T thic
                 return intersected;}
             else{
                 bool intersected=false;
-                for(int i=1;i<=triangles_in_group(box).m;i++){
+                for(int i=0;i<triangles_in_group(box).m;i++){
                     int node1,node2,node3;triangle_mesh.elements(triangles_in_group(box)(i)).Get(node1,node2,node3);
                     TRIANGLE_3D<T> triangle(particles.X(node1),particles.X(node2),particles.X(node3));
                     RAY<VECTOR<T,3> > ray_temp=ray;

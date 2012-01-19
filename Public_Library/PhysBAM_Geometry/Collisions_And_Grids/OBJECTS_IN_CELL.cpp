@@ -40,7 +40,7 @@ Get_Objects_For_Cells_Cell(const T_INDEX& cell) const
     if(object_in_cell(cell)>ID()){
         ID object=object_in_cell(cell);
         if(!operation_hash.Is_Marked_Current(object)){operation_hash.Mark(object);merge.Append(object);}}
-    else if(object_in_cell(cell)<ID())for(int item=1;item<=object_list(ID(-Value(object_in_cell(cell)))).m;item++){
+    else if(object_in_cell(cell)<ID())for(int item=0;item<object_list(ID(-Value(object_in_cell(cell)))).m;item++){
         ID object=object_list(ID(-Value(object_in_cell(cell))))(item);
         if(!operation_hash.Is_Marked_Current(object)){operation_hash.Mark(object);merge.Append(object);}}
 }

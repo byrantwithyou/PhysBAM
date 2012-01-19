@@ -571,7 +571,7 @@ void Set_External_Positions(ARRAY_VIEW<TV> X,const T time)
     for(int p=0;p<num_planks;p++){
         RIGID_BODY<TV>& plank_rigid_body=*arb->rigid_bodies_list.rigid_bodies(plank_ids(p));
         FRAME_3D<T> inverted_frame=plank_rigid_body.frame.Inverse();
-        for(int i=1;i<=enslaved_nodes(p).m;i++){
+        for(int i=0;i<enslaved_nodes(p).m;i++){
             X(enslaved_nodes(p)(i))=inverted_frame.Local_Coordinate(positions_relative_to_plank_frames(p)(i));}}
 }
 //#####################################################################
@@ -580,7 +580,7 @@ void Set_External_Positions(ARRAY_VIEW<TV> X,const T time)
 void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time)
 {
     assert(fragment_id==FRAGMENT_ID(1));
-    for(int p=0;p<num_planks;p++)for(int i=1;i<=enslaved_nodes(p).m;i++){
+    for(int p=0;p<num_planks;p++)for(int i=0;i<enslaved_nodes(p).m;i++){
         X(enslaved_nodes(p)(i))=TV();} 
 }
 //#####################################################################

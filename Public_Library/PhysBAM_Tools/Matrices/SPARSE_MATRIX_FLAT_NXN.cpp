@@ -37,7 +37,7 @@ SPARSE_MATRIX_FLAT_NXN(const ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& matrices)
     int index=1;
     for(int i=0;i<matrices.m;i++)for(int j=1;j<=matrices(i).n;j++,index++) offsets(index+1)=offsets(index)+matrices(i).offsets(j+1)-matrices(i).offsets(j);
     A.Resize(offsets(n+1)-1);
-    for(int i=0;i<matrices.m;i++)for(int j=1;j<=matrices(i).A.m;j++){A(matrix_element_offsets(i)+j).j=matrices(i).A(j).j+matrix_row_offsets(i);A(matrix_element_offsets(i)+j).a=matrices(i).A(j).a;}
+    for(int i=0;i<matrices.m;i++)for(int j=0;j<matrices(i).A.m;j++){A(matrix_element_offsets(i)+j).j=matrices(i).A(j).j+matrix_row_offsets(i);A(matrix_element_offsets(i)+j).a=matrices(i).A(j).a;}
 }
 //#####################################################################
 // Destructor

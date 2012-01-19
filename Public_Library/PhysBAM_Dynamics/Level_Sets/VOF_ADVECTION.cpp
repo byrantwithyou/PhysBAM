@@ -120,7 +120,7 @@ Negative_Material(const TV_INT& cell_index,const bool force_full_refinement)
     // compute material
     T negative_material=0;
     for(int i=0;i<cell_refinement_simplices.m;i++) negative_material+=T_SIMPLEX::Negative_Material(cell_particle_X,cell_phis,cell_refinement_simplices(i));
-    for(int i=1;i<=removed_negative_particle_volumes_in_cell(cell_index).m;i++) negative_material+=removed_negative_particle_volumes_in_cell(cell_index)(i).z;
+    for(int i=0;i<removed_negative_particle_volumes_in_cell(cell_index).m;i++) negative_material+=removed_negative_particle_volumes_in_cell(cell_index)(i).z;
     // TODO: negative material should be strictly nonnegative - ought to be able to remove the clamp from below, but ought to check this.  Also, precompute the particle contributions.
     //negative_material+=Get_Unmodified_Particle_Volume_In_Cell(particle_levelset.negative_particles,cell_index)+Get_Particle_Volume_In_Cell(particle_levelset.removed_negative_particles,cell_index);
     return clamp(negative_material,(T)0,full_cell_size);
@@ -152,7 +152,7 @@ template<class TV> template<class T_ARRAYS_PARTICLES> typename TV::SCALAR VOF_AD
 Get_Outside_Particle_Volume_In_Cell(T_ARRAYS_ARRAY_PARTICLE_VOLUME_REFERENCE& particle_volumes_in_cell,T_ARRAYS_PARTICLES& particles,const TV_INT& cell_index)
 {
     T particle_volume=0;
-    for(int i=1;i<=particle_volumes_in_cell(cell_index).m;i++) particle_volume+=particle_volumes_in_cell(cell_index)(i).z;
+    for(int i=0;i<particle_volumes_in_cell(cell_index).m;i++) particle_volume+=particle_volumes_in_cell(cell_index)(i).z;
     return particle_volume;
 }
 //#####################################################################
@@ -161,7 +161,7 @@ Get_Outside_Particle_Volume_In_Cell(T_ARRAYS_ARRAY_PARTICLE_VOLUME_REFERENCE& pa
 template<class TV> template<class T_ARRAYS_PARTICLES> void VOF_ADVECTION<TV>::
 Modify_Particle_Material_Volume_In_Cell(T_ARRAYS_ARRAY_PARTICLE_VOLUME_REFERENCE& particle_volumes_in_cell,T_ARRAYS_PARTICLES& particles,const TV_INT& cell_index,const T volume_of_material_density)
 {
-    for(int i=1;i<=particle_volumes_in_cell(cell_index).m;i++){
+    for(int i=0;i<particle_volumes_in_cell(cell_index).m;i++){
         PARTICLE_LEVELSET_PARTICLES<TV>& cell_particles=*particles(particle_volumes_in_cell(cell_index)(i).x);
         ARRAY_VIEW<T>* material_volume=cell_particles.array_collection->template Get_Array<T>(ATTRIBUTE_ID_MATERIAL_VOLUME);
         (*material_volume)(particle_volumes_in_cell(cell_index)(i).y)+=particle_volumes_in_cell(cell_index)(i).z*volume_of_material_density;}
@@ -449,7 +449,7 @@ Cut_Simplicial_Object_With_Zero_Isocontour()
     level_simplex_cells.Resize(preimage.meshes.m);
     for(int level=0;level<level_simplex_cells.m;level++){
         level_simplex_cells(level).Resize(preimage.meshes(level)->elements.m);
-        for(int t=1;t<=level_simplex_cells(level).m;t++)
+        for(int t=0;t<level_simplex_cells(level).m;t++)
             if(preimage.Leaf(level,t)){
                 if(level>1) level_simplex_cells(level)(t)=level_simplex_cells(level-1)((*preimage.parent(level))(t));
                 int leaf=(*preimage.leaf_number(level))(t);
@@ -557,7 +557,7 @@ Advect_Material_Preimages(const T_FACE_LOOKUP& face_velocities,const T dt,const 
     T_FACE_LOOKUP face_velocities_initial(face_velocities.V_face),face_velocities_final(use_frozen_velocity?face_velocities.V_face:V);
     
     const T maximum_refinement_fraction=(T)1/(1<<(maximum_refinement_depth+2));
-    for(int f=1;f<=Faces(object);f++){
+    for(int f=0;f<Faces(object);f++){
         const VECTOR<int,2>& face_neighbors=Face_Neighbors(object,f);
         const T_FACE_ELEMENT& face=Face(object,f);
         int fixed_nodes=0;
@@ -830,7 +830,7 @@ Refine_Or_Coarsen_Geometry()
     for(int level=0;level<level_material_volume.m;level++) level_material_volume(level).Resize((*preimage.meshes(level)).elements.m);
     
     simplex_preimage_material_volume.Fill((T)0);
-    for(int level=0;level<level_material_volume.m;level++) for(int i=1;i<=level_material_volume(level).m;i++) if(level_material_volume(level)(i)){
+    for(int level=0;level<level_material_volume.m;level++) for(int i=0;i<level_material_volume(level).m;i++) if(level_material_volume(level)(i)){
         if(preimage.Leaf(level,i)) simplex_preimage_material_volume((*preimage.leaf_number(level))(i))=level_material_volume(level)(i);
         else{
             T child_volume[T_RED_GREEN_SIMPLICES::number_of_red_children];T parent_volume=0;

@@ -633,7 +633,7 @@ Remove_Simplex_List(const ARRAY<int>& tetrahedron_list,ARRAY<HASHTABLE<int,int> 
     for(int level=0;level<meshes.m;level++){
         // remove tetrahedrons to be deleted from incident elements
         // TODO: is incident_elements special or not?
-        for(int i=1;i<=level_tetrahedron_list(level).m;i++) for(int j=0;j<3;j++){int node=meshes(level)->elements(level_tetrahedron_list(level)(i))(j);
+        for(int i=0;i<level_tetrahedron_list(level).m;i++) for(int j=0;j<3;j++){int node=meshes(level)->elements(level_tetrahedron_list(level)(i))(j);
             int index=0;(*meshes(level)->incident_elements)(node).Find(level_tetrahedron_list(level)(i),index);PHYSBAM_ASSERT(index);
             (*meshes(level)->incident_elements)(node).Remove_Index_Lazy(index);}
 

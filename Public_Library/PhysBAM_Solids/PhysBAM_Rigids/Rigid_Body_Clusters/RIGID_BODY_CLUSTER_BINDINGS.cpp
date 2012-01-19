@@ -117,7 +117,7 @@ Delete_Binding(const int parent_particle)
     rigid_body_collection.rigid_geometry_collection.Reactivate_Geometry(cluster.parent);
     for(RIGID_CLUSTER_CONSTITUENT_ID i(1);i<=cluster.children.Size();i++){
         int child=cluster.children(i);
-        for(int j=1;j<=binding_index(child).m;j++) if(binding_index(child)(j).x==parent_particle){binding_index(child).Remove_Index_Lazy(j);break;}}
+        for(int j=0;j<binding_index(child).m;j++) if(binding_index(child)(j).x==parent_particle){binding_index(child).Remove_Index_Lazy(j);break;}}
     binding_index(parent_particle).Remove_All();
     reverse_bindings.Delete(parent_particle);
     rigid_body_collection.rigid_body_particle.Remove_Body(parent_particle);
@@ -402,7 +402,7 @@ Build_Aggregate_Geometry(const int parent)
     ARRAY<T_SIMPLICIAL_OBJECT*> objects;
     ARRAY<FRAME<TV> > relative_frames;
 
-    for(int j=1;j<=rigid_body_collection.rigid_body_particle.structure_ids(parent).m;j++) if(rigid_body_collection.rigid_body_particle.structure_ids(parent)(j))
+    for(int j=0;j<rigid_body_collection.rigid_body_particle.structure_ids(parent).m;j++) if(rigid_body_collection.rigid_body_particle.structure_ids(parent)(j))
         rigid_body_collection.rigid_geometry_collection.structure_list.Remove_Element(rigid_body_collection.rigid_body_particle.structure_ids(parent)(j));
 
     ARRAY<IMPLICIT_OBJECT<TV>*>* implicits=new ARRAY<IMPLICIT_OBJECT<TV>*>;

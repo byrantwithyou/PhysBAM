@@ -363,7 +363,7 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY<VECTOR<T,3> >& V,const T time)
 {
     assert(fragment_id<=deformable_object_enslaved_nodes.m);
     if(enslaving_stop_time!=-1 && time>enslaving_stop_time) return;
-    for(int i=1;i<=deformable_object_enslaved_nodes(fragment_id).m;i++) V(deformable_object_enslaved_nodes(fragment_id)(i))=VECTOR<T,3>();
+    for(int i=0;i<deformable_object_enslaved_nodes(fragment_id).m;i++) V(deformable_object_enslaved_nodes(fragment_id)(i))=VECTOR<T,3>();
 }
 //#####################################################################
 // Function Update_Time_Varying_Material_Properties

@@ -49,7 +49,7 @@ Flood_Fill_From_Seed_Node(const GRAPH& graph,ARRAY<int>& colors,const int fill_c
     while(!flood_fill_stack.Empty()){
         const int node=flood_fill_stack.Pop();
         if(colors(node)==-1){touches_uncolorable_node=true;continue;}else if(colors(node)!=0)continue;colors(node)=fill_color;
-        for(int i=1;i<=graph.edges(node).m;i++){
+        for(int i=0;i<graph.edges(node).m;i++){
             int neighbor_node=graph.edges(node)(i);
             if(graph.valid_nodes(neighbor_node)&&colors(neighbor_node)<=0) flood_fill_stack.Push(neighbor_node);}}
 }

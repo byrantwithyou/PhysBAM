@@ -1089,7 +1089,7 @@ void Get_Constrained_Particle_Data()
 void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE
 {
     assert(fragment_id==FRAGMENT_ID(1));
-    for(int p=0;p<num_bones_present;p++)for(int i=1;i<=enslaved_nodes(p).m;i++){
+    for(int p=0;p<num_bones_present;p++)for(int i=0;i<enslaved_nodes(p).m;i++){
         X(enslaved_nodes(p)(i))=TV();} 
 }
 //#####################################################################
@@ -1102,7 +1102,7 @@ void Set_External_Positions(ARRAY_VIEW<TV> X,const T time)
     for(int p=0;p<num_bones_present;p++){
         RIGID_BODY<TV>& bone_rigid_body=*arb->rigid_body_list.rigid_bodies(bone_ids(p));
         FRAME<TV> inverted_frame=bone_rigid_body.Frame().Inverse();
-        for(int i=1;i<=enslaved_nodes(p).m;i++){
+        for(int i=0;i<enslaved_nodes(p).m;i++){
             X(enslaved_nodes(p)(i))=inverted_frame.Inverse_Times(positions_relative_to_bone_frames(p)(i));}}
 }
 //#####################################################################

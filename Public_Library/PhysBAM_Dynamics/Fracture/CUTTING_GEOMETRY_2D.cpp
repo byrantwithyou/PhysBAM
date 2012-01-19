@@ -98,7 +98,7 @@ Split_Existing_Polygons()
                 const CUTTING_POLYGON& cutting_polygon=current_cutting_polygons(cutting_polygon_index);
                 if(cutting_polygon.simplex_owner!=i) PHYSBAM_FATAL_ERROR("TODO: remove this check");
                 ARRAY<VECTOR<int,2> > all_polygonal_segments_on_simplex;
-                for(int run=1;run<=polygon_mesh.elements(cutting_polygon.polygon_index).m;run++){
+                for(int run=0;run<polygon_mesh.elements(cutting_polygon.polygon_index).m;run++){
                     ARRAY<int>& pair=polygon_mesh.elements(cutting_polygon.polygon_index)(run);
                     assert(pair.m==2);
                     all_polygonal_segments_on_simplex.Append(VECTOR<int,2>(pair(1),pair(2)));}

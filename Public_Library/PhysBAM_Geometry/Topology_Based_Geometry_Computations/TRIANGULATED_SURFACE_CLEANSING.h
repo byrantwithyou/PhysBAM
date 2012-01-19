@@ -77,17 +77,17 @@ Close_Surface(TRIANGULATED_SURFACE<T>& ts,const bool merge_coincident_vertices,c
         ARRAY<ARRAY<VECTOR<int,2> > >& connected_segments=*ts.mesh.boundary_mesh->connected_segments;
         for(int i=0;i<connected_segments.m;i++){
             TV centroid;
-            for(int j=1;j<=connected_segments(i).m;j++){int node1,node2;connected_segments(i)(j).Get(node1,node2);centroid+=ts.particles.X(node1)+ts.particles.X(node2);}
+            for(int j=0;j<connected_segments(i).m;j++){int node1,node2;connected_segments(i)(j).Get(node1,node2);centroid+=ts.particles.X(node1)+ts.particles.X(node2);}
             centroid/=(T)(2*connected_segments(i).m); // assuming we count each node exactly twice, this gives us the average
             int new_particle_index=ts.particles.array_collection->Add_Element();ts.mesh.number_nodes++;ts.particles.X(new_particle_index)=centroid;
             if(ts.particles.store_velocity){
                 TV velocity;
-                for(int j=1;j<=connected_segments(i).m;j++){int node1,node2;connected_segments(i)(j).Get(node1,node2);velocity+=ts.particles.V(node1)+ts.particles.V(node2);}
+                for(int j=0;j<connected_segments(i).m;j++){int node1,node2;connected_segments(i)(j).Get(node1,node2);velocity+=ts.particles.V(node1)+ts.particles.V(node2);}
                 ts.particles.V(new_particle_index)=velocity/(T)(2*connected_segments(i).m);}
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
             if(verbose){LOG::cout<<"Adding particle "<<new_particle_index<<": "<<ts.particles.X(new_particle_index)<<std::endl;LOG::cout<<"Adding triangles: "<<std::flush;}
 #endif
-            for(int j=1;j<=connected_segments(i).m;j++){ // assumes segment orientation is consistent with triangle orientation!
+            for(int j=0;j<connected_segments(i).m;j++){ // assumes segment orientation is consistent with triangle orientation!
                 int node1,node2;connected_segments(i)(j).Get(node1,node2);
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
                 if(verbose) LOG::cout<<"("<<node2<<","<<node1<<","<<new_particle_index<<") "<<std::flush;

@@ -230,7 +230,7 @@ template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>:
 Update_Geometry(const int id)
 {
     BASE::Update_Geometry(id);
-    for(int i=1;i<=extra_components(id).m;i++) extra_components(id)(i)->Set_Frame(frame);
+    for(int i=0;i<extra_components(id).m;i++) extra_components(id)(i)->Set_Frame(frame);
 }
 //#####################################################################
 // Function Destroy_Geometry

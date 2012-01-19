@@ -305,7 +305,7 @@ Postprocess_Particles(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T t
             T particles_in_cell_ratio=0;
             if(!uniform_attraction_force)particles_in_cell_ratio=interpolation.Clamped_To_Array_Cell(grid,cell_weight,sph_particles.X(p))*one_over_target_particles_per_cell;
             if(particles_in_cell_ratio>=1) continue;
-            for(int i=1;i<=particles_in_cell(cell).m;i++){
+            for(int i=0;i<particles_in_cell(cell).m;i++){
                 int k=particles_in_cell(cell)(i);if(k==p)continue;
                 T strength=attraction_strength*(1-particles_in_cell_ratio);
                 TV X_minus_Xp=X-sph_particles.X(k);T distance=X_minus_Xp.Magnitude();X_minus_Xp.Normalize();T x=distance-attraction_restlength;T force_magnitude=0;
@@ -343,7 +343,7 @@ Rasterize_Velocities_To_Grid(T_FACE_ARRAYS_SCALAR& velocities,T_ARRAYS_SCALAR& c
 
     for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()){
         TV_INT cell=iterator.Cell_Index();TV X=grid.Center(cell);
-        for(int k=1;k<=particles_in_cell(cell).m;k++){
+        for(int k=0;k<particles_in_cell(cell).m;k++){
             int p=particles_in_cell(cell)(k);
             TV X_minus_Xp=X-sph_particles.X(p);T distance_squared=X_minus_Xp.Magnitude_Squared();
             T weight=(1-distance_squared*one_over_radius_squared)*one_over_total_particle_cell_weight(p); 
@@ -354,7 +354,7 @@ Rasterize_Velocities_To_Grid(T_FACE_ARRAYS_SCALAR& velocities,T_ARRAYS_SCALAR& c
             if(weight>0)cell_weight(cell)+=weight_multiplier*weight;}}
     for(FACE_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()){
         TV_INT face=iterator.Face_Index();int axis=iterator.Axis();TV X=grid.Face(axis,face);TV_INT cell=face;
-        for(int k=1;k<=particles_in_cell(cell).m;k++){
+        for(int k=0;k<particles_in_cell(cell).m;k++){
             int p=particles_in_cell(cell)(k);
             TV X_minus_Xp=X-sph_particles.X(p);T distance_squared=X_minus_Xp.Magnitude_Squared();
             T weight=(1-distance_squared*one_over_radius_squared)*one_over_total_particle_face_weight(p);
@@ -373,7 +373,7 @@ Calculate_Particle_Deltas(const T_FACE_ARRAYS_SCALAR& minus_face_delta,ARRAY<TV>
 
     for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
         TV_INT face=iterator.Face_Index();int axis=iterator.Axis();TV X=grid.Face(axis,face);TV_INT cell=face;grid.Clamp(cell);
-        for(int k=1;k<=particles_in_cell(cell).m;k++){
+        for(int k=0;k<particles_in_cell(cell).m;k++){
             int p=particles_in_cell(cell)(k);
             TV X_minus_Xp=X-sph_particles.X(p);T distance_squared=X_minus_Xp.Magnitude_Squared();
             T weight=1-distance_squared*one_over_radius_squared;
@@ -430,7 +430,7 @@ Modify_Levelset_And_Particles_To_Create_Fluid(const T time,T_FACE_ARRAYS_SCALAR*
     bool created_fluid_from_particles=false;
     for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
         TV_INT cell=iterator.Cell_Index();TV X=grid.Center(cell);
-        for(int k=1;k<=removed_negative_particles_affecting_cell(cell).m;k++){
+        for(int k=0;k<removed_negative_particles_affecting_cell(cell).m;k++){
             PAIR<TV_INT,int>& particle_record=removed_negative_particles_affecting_cell(cell)(k);
             TV X_minus_Xp=X-removed_negative_particles(particle_record.x)->X(particle_record.y);T distance_squared=X_minus_Xp.Magnitude_Squared();
             T weight=(1-distance_squared*one_over_radius_squared)*one_over_total_removed_negative_particle_cell_weight(particle_record.x)(particle_record.y);
@@ -445,7 +445,7 @@ Modify_Levelset_And_Particles_To_Create_Fluid(const T time,T_FACE_ARRAYS_SCALAR*
         for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){ 
             TV_INT cell=iterator.Cell_Index();
             if(converting_cells(cell)){ // TODO: Use smooth density function to determine if a particle contributes to the levelset
-                for(int p=1;p<=removed_negative_particles_affecting_cell(cell).m;p++){
+                for(int p=0;p<removed_negative_particles_affecting_cell(cell).m;p++){
                     PAIR<TV_INT,int>& particle_record=removed_negative_particles_affecting_cell(cell)(p);
                     TV Xp=removed_negative_particles(particle_record.x)->X(particle_record.y);
                     T radius_plus_phi=blending_particle_radius+particle_levelset_evolution->phi(cell);

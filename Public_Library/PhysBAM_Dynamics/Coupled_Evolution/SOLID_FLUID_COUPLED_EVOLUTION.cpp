@@ -491,7 +491,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
     if(fluids){
         T_ARRAYS_SCALAR& p=Get_Pressure();
         // Copy pressures back into pressure array
-        for(int i=0;i<x_array.v.m;i++) for(int j=1;j<=x_array.v(i).n;j++) p(matrix_index_to_cell_index_array(i)(j))=x_array.v(i)(j);
+        for(int i=0;i<x_array.v.m;i++) for(int j=0;j<x_array.v(i).n;j++) p(matrix_index_to_cell_index_array(i)(j))=x_array.v(i)(j);
         PHYSBAM_DEBUG_WRITE_SUBSTEP("unscaled final pressures (sf coupled evolution)",0,1);
 
         // scale pressure back to get a real pressure

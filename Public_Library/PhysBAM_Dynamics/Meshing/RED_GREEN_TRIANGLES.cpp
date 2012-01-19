@@ -359,7 +359,7 @@ Remove_Simplex_List(const ARRAY<int>& triangle_list,ARRAY<HASHTABLE<int,int> >* 
     for(int level=0;level<meshes.m;level++){
         // remove triangles to be deleted from incident elements
         // TODO: is incident_elements special or not?
-        for(int i=1;i<=level_triangle_list(level).m;i++) for(int j=0;j<3;j++){int node=meshes(level)->elements(level_triangle_list(level)(i))(j);
+        for(int i=0;i<level_triangle_list(level).m;i++) for(int j=0;j<3;j++){int node=meshes(level)->elements(level_triangle_list(level)(i))(j);
             int index=0;(*meshes(level)->incident_elements)(node).Find(level_triangle_list(level)(i),index);assert(index);
             (*meshes(level)->incident_elements)(node).Remove_Index_Lazy(index);}
 
@@ -379,7 +379,7 @@ Remove_Simplex_List(const ARRAY<int>& triangle_list,ARRAY<HASHTABLE<int,int> >* 
         // delete edges which have a node that is no longer referenced by the elements
         ARRAY<int> nodes_referenced(object.particles.array_collection->Size());meshes(level)->Mark_Nodes_Referenced(nodes_referenced,1);
         ARRAY<int> deleted_edge_indices;
-        for(int i=1;i<=level_triangle_list(level).m;i++) for(int j=0;j<3;j++){
+        for(int i=0;i<level_triangle_list(level).m;i++) for(int j=0;j<3;j++){
             int edge=element_edges(level)(level_triangle_list(level)(i))(j);int node1,node2;segment_mesh.elements(edge).Get(node1,node2);
             if(!nodes_referenced(node1) || !nodes_referenced(node2)){
                 int index=0;(*segment_mesh.incident_elements)(node1).Find(edge,index);if(index) (*segment_mesh.incident_elements)(node1).Remove_Index_Lazy(index);

@@ -198,10 +198,10 @@ Update_Collision_Pair_Helper(RIGID_BODY<TV>& body1,RIGID_BODY<TV>& body2,const T
         if(fractured_bodies(1) || fractured_bodies(2)){
             rigid_body_collection.Update_Simulated_Particles();
             Initialize_Data_Structures(false);
-            for(int i=1;i<=added_bodies(1).m;i++){
+            for(int i=0;i<added_bodies(1).m;i++){
                 collision_callbacks.Euler_Step_Position_With_New_Velocity(added_bodies(1)(i),dt,time);
                 skip_collision_check.Set_Last_Moved(added_bodies(1)(i));}
-            for(int i=1;i<=added_bodies(2).m;i++){
+            for(int i=0;i<added_bodies(2).m;i++){
                 collision_callbacks.Euler_Step_Position_With_New_Velocity(added_bodies(2)(i),dt,time);
                 skip_collision_check.Set_Last_Moved(added_bodies(2)(i));}}}
     else RIGID_BODY<TV>::Apply_Impulse(body_parent1,body_parent2,collision_location,impulse.linear,impulse.angular,mpi_one_ghost);
@@ -501,7 +501,7 @@ Compute_Contact_Graph(const T dt,const T time,ARTICULATED_RIGID_BODY<TV>* articu
         for(int i=0;i<contact_stack.m;i++){
             INDIRECT_ARRAY<ARRAY<int>,ARRAY<int>&> contact_subset=body_stack.Subset(contact_stack(i));
             contact_subset.Fill(i);
-            for(int j=1;j<=contact_stack(i).m;j++) if(rigid_body_collection.Rigid_Body(contact_stack(i)(j)).Has_Infinite_Inertia()) stack_static_bodies.Set(PAIR<int,int>(i,contact_stack(i)(j)));}
+            for(int j=0;j<contact_stack(i).m;j++) if(rigid_body_collection.Rigid_Body(contact_stack(i)(j)).Has_Infinite_Inertia()) stack_static_bodies.Set(PAIR<int,int>(i,contact_stack(i)(j)));}
         for(COLLISION_GEOMETRY_ID i(1);i<=rigid_body_collection.rigid_geometry_collection.collision_body_list->bodies.Size();i++){
             int rigid_body_id=rigid_body_collection.rigid_geometry_collection.collision_body_list->collision_geometry_id_to_geometry_id.Get(i);
             if(rigid_body_id) if(rigid_body_collection.Is_Active(rigid_body_id) && rigid_body_collection.Rigid_Body(rigid_body_id).Has_Infinite_Inertia()) body_stack(rigid_body_id)=-2;}
@@ -513,7 +513,7 @@ Compute_Contact_Graph(const T dt,const T time,ARTICULATED_RIGID_BODY<TV>* articu
             if(state(2)==-2 && stack_static_bodies.Contains(PAIR<int,int>(state(1),edge_pairs(i)(2)))) continue;
             for(int j=0;j<2;j++){int& stack_value=body_stack(edge_pairs(i)(j));if(stack_value!=-2) stack_value=-1;}}
         for(int i=contact_stack.m;i>=1;i--) if(body_stack.Subset(contact_stack(i)).Find(-1)){
-            for(int j=1;j<=contact_stack(i).m;j++) if(body_stack(contact_stack(i)(j))!=-2) body_stack(contact_stack(i)(j))=-1;
+            for(int j=0;j<contact_stack(i).m;j++) if(body_stack(contact_stack(i)(j))!=-2) body_stack(contact_stack(i)(j))=-1;
             contact_stack.Remove_Index_Lazy(i);}
         for(int i=edge_pairs.m;i>=1;i--){
             VECTOR<int,2> state(body_stack.Subset(edge_pairs(i)));
@@ -531,13 +531,13 @@ Compute_Contact_Graph(const T dt,const T time,ARTICULATED_RIGID_BODY<TV>* articu
     precomputed_contact_pairs_for_level.Resize(contact_graph.Number_Of_Levels());saved_contact_pairs_for_level.Resize(contact_graph.Number_Of_Levels());
     for(int level=0;level<contact_graph.Number_Of_Levels();level++){
         ARRAY<VECTOR<int,2> >& pairs=precomputed_contact_pairs_for_level(level);pairs.Resize(0);saved_contact_pairs_for_level(level).Resize(0);
-        for(int i=1;i<=contact_graph.directed_graph.Nodes_In_Level(level).m;i++){
+        for(int i=0;i<contact_graph.directed_graph.Nodes_In_Level(level).m;i++){
             int body_id=contact_graph.directed_graph.Nodes_In_Level(level)(i);
             if(!rigid_body_collection.Is_Active(body_id)){
                 PHYSBAM_ASSERT(contact_graph.directed_graph.Nodes_In_Level(level).m==1);
                 contact_graph.directed_graph.Nodes_In_Level(level).Remove_All();
                 continue;}
-            for(int j=1;j<=contact_graph.directed_graph.Parents(body_id).m;j++){
+            for(int j=0;j<contact_graph.directed_graph.Parents(body_id).m;j++){
                 int other_body_id=contact_graph.directed_graph.Parents(body_id)(j);
                 int other_body_level=contact_graph.directed_graph.Level_Of_Node(other_body_id);assert(other_body_level<=level);
                 // only add the pair once if they are both parents of each other
@@ -615,7 +615,7 @@ Process_Push_Out_Legacy()
                         if(parent_id_2!=id_2)
                             rigid_body_cluster_bindings.Clamp_Particles_To_Embedded_Positions(rigid_body_cluster_bindings.Get_Parent(rigid_body_collection.Rigid_Body(id_2)).particle_index);
                         need_more_iterations2=true;need_another_iteration=true;need_more_iterations=true;}}}
-            if(use_freezing_with_push_out) for(int i=1;i<=contact_graph.directed_graph.Nodes_In_Level(level).m;i++)
+            if(use_freezing_with_push_out) for(int i=0;i<contact_graph.directed_graph.Nodes_In_Level(level).m;i++)
                 rigid_body_collection.Rigid_Body(contact_graph.directed_graph.Nodes_In_Level(level)(i)).is_temporarily_static=true;}
 
         if(mpi_rigids){
@@ -855,7 +855,7 @@ Get_Rigid_Body_Depth(int i,ARRAY<int,int>& depths)
     if(depths(i)!=-1) return depths(i);
     else{
         depths(i)=0;
-        for(int child=1;child<=contact_graph.directed_graph.Children(i).m;child++)
+        for(int child=0;child<contact_graph.directed_graph.Children(i).m;child++)
             depths(i)+=Get_Rigid_Body_Depth(contact_graph.directed_graph.Children(i)(child),depths);
         depths(i)++;
         return depths(i);}
@@ -870,7 +870,7 @@ Compute_Contact_Frequency()
     int stack_depth=2;
 
     ARRAY<ARRAY<int>,int> adj(contact_graph.directed_graph.Number_Nodes());
-    for(int i(1);i<=adj.m;i++) for(int j=1;j<=contact_graph.directed_graph.Parents(i).m;j++){
+    for(int i(1);i<=adj.m;i++) for(int j=0;j<contact_graph.directed_graph.Parents(i).m;j++){
         adj(i).Append(contact_graph.directed_graph.Parents(i)(j));adj(contact_graph.directed_graph.Parents(i)(j)).Append(i);}
 
     ARRAY<int,int> depths(adj.m);depths.Fill(-1);
@@ -878,7 +878,7 @@ Compute_Contact_Frequency()
 
     pairs_scale.Remove_All();
     for(int i(1);i<=adj.m;i++){
-        for(int j=1;j<=adj(i).m;j++){
+        for(int j=0;j<adj(i).m;j++){
             VECTOR<int,2> sorted_pair=VECTOR<int,2>(i,adj(i)(j)).Sorted();
             if(!pairs_scale.Contains(sorted_pair)){
                 TWIST<TV> relative_twist=rigid_body_collection.rigid_body_particle.twist(i)-rigid_body_collection.rigid_body_particle.twist(adj(i)(j));
@@ -899,7 +899,7 @@ Construct_Stacks()
     T linear_threshold_squared=(T)1e-4,angular_threshold_squared=(T)1e-4;
 
     ARRAY<ARRAY<int>,int> adj(contact_graph.directed_graph.Number_Nodes());
-    for(int i(1);i<=adj.m;i++) for(int j=1;j<=contact_graph.directed_graph.Parents(i).m;j++){
+    for(int i(1);i<=adj.m;i++) for(int j=0;j<contact_graph.directed_graph.Parents(i).m;j++){
         adj(i).Append(contact_graph.directed_graph.Parents(i)(j));adj(contact_graph.directed_graph.Parents(i)(j)).Append(i);}
 
     ARRAY<int,int> visited(rigid_body_collection.rigid_body_particle.array_collection->Size());
@@ -914,7 +914,7 @@ Construct_Stacks()
             int j=stack.Pop();
             list.Append(j);
             if(rigid_body_collection.Rigid_Body(j).Has_Infinite_Inertia()){has_infinite_inertia_body=true;continue;}
-            for(int k=1;k<=adj(j).m;k++) if(visited(adj(j)(k))!=i){
+            for(int k=0;k<adj(j).m;k++) if(visited(adj(j)(k))!=i){
                 visited(adj(j)(k))=i;
                 stack.Push(adj(j)(k));}}
         if(!has_infinite_inertia_body || list.m<=1) continue;
@@ -1294,7 +1294,7 @@ Clean_Up_Fractured_Items_From_Lists(ARRAY<VECTOR<int,2> >& pairs,const int curre
         if(!called_from_contact){ // TODO: add new contact pairs to the list as well
             // Go through added bodies, and collide them against all other bodies and add them to the pairs list
             spatial_partition->Set_Collision_Body_Thickness(0);
-            for(int k=0;k<added_bodies.m;k++) for(int body=1;body<=added_bodies(k).m;body++)
+            for(int k=0;k<added_bodies.m;k++) for(int body=0;body<added_bodies(k).m;body++)
                 Get_Bounding_Box_Collision_Pairs_Of_Body(pairs,added_bodies(k)(body),
                     parameters.collision_bounding_box_thickness);}}
 }

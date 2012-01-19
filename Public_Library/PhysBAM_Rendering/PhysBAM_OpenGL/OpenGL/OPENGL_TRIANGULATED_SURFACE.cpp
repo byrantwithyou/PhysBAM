@@ -242,7 +242,7 @@ Display(const int in_color) const
             for(int i=0;i<connected_segments.m;i++){
                 OPENGL_COLOR::Random().Send_To_GL_Pipeline();
                 vertices.Resize(0);
-                for(int j=1;j<=connected_segments(i).m;j++){
+                for(int j=0;j<connected_segments(i).m;j++){
                     int node1,node2;connected_segments(i)(j).Get(node1,node2);
                     OpenGL_Line(surface.particles.X(node1),surface.particles.X(node2),vertices);}
                 OpenGL_Draw_Arrays(GL_LINES,3,vertices);}

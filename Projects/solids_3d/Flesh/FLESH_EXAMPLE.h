@@ -153,14 +153,14 @@ void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE
 {
     for(int rb=0;rb<constrained_nodes.m;rb++){
         FRAME_3D<T> frame=solids_parameters.rigid_body_parameters.list(rb)->frame;
-        for(int i=1;i<=constrained_nodes(rb).m;i++) X(constrained_nodes(rb)(i))=frame*constrained_nodes_reference_frame_positions(rb)(i);}
+        for(int i=0;i<constrained_nodes(rb).m;i++) X(constrained_nodes(rb)(i))=frame*constrained_nodes_reference_frame_positions(rb)(i);}
 }
 //#####################################################################
 // Zero_Out_Enslaved_Position_Nodes
 //#####################################################################
 void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE
 {
-    for(int rb=0;rb<constrained_nodes.m;rb++) for(int i=1;i<=constrained_nodes(rb).m;i++) X(constrained_nodes(rb)(i))=TV();
+    for(int rb=0;rb<constrained_nodes.m;rb++) for(int i=0;i<constrained_nodes(rb).m;i++) X(constrained_nodes(rb)(i))=TV();
 }
 //#####################################################################
 // Function Update_Collision_Body_Positions_And_Velocities

@@ -60,7 +60,7 @@ Calculate_Bounding_Box_Radii(const ARRAY<RANGE<TV> >& bounding_boxes,ARRAY<T>& r
 {
     if(particles_per_group) for(int k=0;k<leaves;k++){
         TV center=bounding_boxes(k).Center();T max_radius_squared=0;
-        for(int i=1;i<=particles_in_group(k).m;i++) max_radius_squared=max(max_radius_squared,(X(particles_in_group(k)(i))-center).Magnitude_Squared());
+        for(int i=0;i<particles_in_group(k).m;i++) max_radius_squared=max(max_radius_squared,(X(particles_in_group(k)(i))-center).Magnitude_Squared());
         radius(k)=sqrt(max_radius_squared);}
     else for(int k=0;k<leaves;k++){TV center=bounding_boxes(k).Center();radius(k)=sqrt((X(k)-center).Magnitude_Squared());}
 }

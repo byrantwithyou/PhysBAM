@@ -222,7 +222,7 @@ End_Asymmetric_Collisions(const int body_1,const int body_2,VECTOR<ARRAY<int>,2>
     evolution.rigid_angular_momentum_difference(body_2)=asymmetric_collision_stored_difference.angular;
     evolution.rigid_velocity_difference(body_2)=asymmetric_collision_stored_difference.linear;
     if(added_bodies(2).m){
-        for(int body=1;body<=added_bodies(2).m;body++){
+        for(int body=0;body<added_bodies(2).m;body++){
             int new_body_id=added_bodies(2)(body);
             evolution.rigid_angular_momentum_difference(new_body_id)=asymmetric_collision_stored_difference.angular;
             evolution.rigid_velocity_difference(new_body_id)=asymmetric_collision_stored_difference.linear;}}
@@ -230,7 +230,7 @@ End_Asymmetric_Collisions(const int body_1,const int body_2,VECTOR<ARRAY<int>,2>
         evolution.rigid_angular_momentum_difference(body_2)=asymmetric_collision_stored_difference.angular;
         evolution.rigid_velocity_difference(body_2)=asymmetric_collision_stored_difference.linear;}
 
-    for(int body=1;body<=added_bodies(1).m;body++) Restore_Position(added_bodies(1)(body));
+    for(int body=0;body<added_bodies(1).m;body++) Restore_Position(added_bodies(1)(body));
 }
 //#####################################################################
 template class RIGIDS_ONLY_COLLISION_CALLBACKS<VECTOR<float,1> >;

@@ -102,7 +102,7 @@ Generate_Levels() // collapses all cycles into a single level
     level_of_node.Resize(parents.m);
     ARRAY<int> component_id;int number_components=Strongly_Connected_Components(component_id);
     DIRECTED_GRAPH_CORE component_graph(number_components);
-    for(int i(1);i<=parents.m;i++){int parent=component_id(i);for(int j=1;j<=children(i).m;j++){
+    for(int i(1);i<=parents.m;i++){int parent=component_id(i);for(int j=0;j<children(i).m;j++){
         int child=component_id(children(i)(j));if(parent != child) component_graph.Add_Edge(parent,child,true);}}
     ARRAY<int> finish_time,node_index;component_graph.Topological_Sort_Assuming_Cycle_Free(finish_time,node_index);
     nodes_in_level.Resize(number_components);for(int i=0;i<number_components;i++) nodes_in_level(i).Remove_All();
@@ -117,7 +117,7 @@ Get_Depth_In_Graph(const DIRECTED_GRAPH_CORE& self,const int index,T_DEPTHS& dep
 {
     if(depths(index)) return depths(index);
     assert(int(recursion_depth)<self.parents.m); // detect cycles
-    int max_depth=0;for(int k=1;k<=self.parents(index).m;k++) max_depth=max(max_depth,Get_Depth_In_Graph(self,self.parents(index)(k),depths PHYSBAM_DEBUG_ONLY(,recursion_depth+1)));
+    int max_depth=0;for(int k=0;k<self.parents(index).m;k++) max_depth=max(max_depth,Get_Depth_In_Graph(self,self.parents(index)(k),depths PHYSBAM_DEBUG_ONLY(,recursion_depth+1)));
     return depths(index)=max_depth+1;
 }
 }
@@ -134,7 +134,7 @@ void DIRECTED_GRAPH_CORE::
 Visit(const int index,ARRAY<int>& finish_time,ARRAY<int>& node_index,ARRAY<short,int>& visit_tag,int& time,bool& cycle_free)
 {
     visit_tag(index)=1;
-    for(int i=1;i<=children(index).m;i++){
+    for(int i=0;i<children(index).m;i++){
         if(!visit_tag(children(index)(i))) Visit(children(index)(i),finish_time,node_index,visit_tag,time,cycle_free);
         else if(visit_tag(children(index)(i)) == 1) cycle_free=false;}
     visit_tag(index)=2;finish_time(index)=time;node_index(time)=index;time++;
@@ -146,7 +146,7 @@ void DIRECTED_GRAPH_CORE::
 Visit_Transpose(const int index,ARRAY<short,int>& visit_tag,ARRAY<int>& component)
 {
     visit_tag(index)=1;component.Append(index);
-    for(int i=1;i<=parents(index).m;i++) if(!visit_tag(parents(index)(i))) Visit_Transpose(parents(index)(i),visit_tag,component);
+    for(int i=0;i<parents(index).m;i++) if(!visit_tag(parents(index)(i))) Visit_Transpose(parents(index)(i),visit_tag,component);
     visit_tag(index)=2;
 }
 //#####################################################################
@@ -155,7 +155,7 @@ Visit_Transpose(const int index,ARRAY<short,int>& visit_tag,ARRAY<int>& componen
 void DIRECTED_GRAPH_CORE::
 Visit_Assuming_Cycle_Free(const int index,ARRAY<int>& finish_time,ARRAY<int>& node_index,int& time)
 {
-    for(int i=1;i<=children(index).m;i++)if(!finish_time(children(index)(i)))
+    for(int i=0;i<children(index).m;i++)if(!finish_time(children(index)(i)))
         Visit_Assuming_Cycle_Free(children(index)(i),finish_time,node_index,time);
     finish_time(index)=time;node_index(time)=index;time++;
 }

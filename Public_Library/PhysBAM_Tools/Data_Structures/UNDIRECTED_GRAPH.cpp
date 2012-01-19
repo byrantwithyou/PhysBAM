@@ -91,7 +91,7 @@ Connected_Components(ARRAY<int,int>& component_id) // returns total number of co
         component_id(seed)=++component;
         while(!stack.Empty()){
             int current=stack.Pop();
-            for(int j=1;j<=adjacent_edges(current).m;j++){
+            for(int j=0;j<adjacent_edges(current).m;j++){
                 int eid=adjacent_edges(current)(j);
                 int other_node=(edges(eid).x==current?edges(eid).y:edges(eid).x);
                 if(!component_id(other_node)){
@@ -106,7 +106,7 @@ void UNDIRECTED_GRAPH_CORE::
 Generate_Next_Level_Of_Breadth_First_Directed_Graph(DIRECTED_GRAPH_CORE& directed_graph,ARRAY<bool,int>& marked_nodes,ARRAY<bool,int>& marked_edges,QUEUE<int>& queue)
 {
     const int node=queue.Dequeue();
-    for(int i=1;i<=adjacent_edges(node).m;i++){int edge=adjacent_edges(node)(i);if(!marked_edges(edge)){
+    for(int i=0;i<adjacent_edges(node).m;i++){int edge=adjacent_edges(node)(i);if(!marked_edges(edge)){
         int parent=edges(edge).x,child=edges(edge).y;
         int next_node=parent==node?child:parent;
         if(next_node){
@@ -129,7 +129,7 @@ Depth_First_Directed_Graph(const int root_node,DIRECTED_GRAPH_CORE& directed_gra
 void UNDIRECTED_GRAPH_CORE::
 Generate_Next_Level_Of_Depth_First_Directed_Graph(DIRECTED_GRAPH_CORE& directed_graph,ARRAY<bool,int>& marked,const int node)
 {
-    for(int i=1;i<=adjacent_edges(node).m;i++){int edge=adjacent_edges(node)(i);
+    for(int i=0;i<adjacent_edges(node).m;i++){int edge=adjacent_edges(node)(i);
         int parent=edges(edge).x,child=edges(edge).y;
         int next_node=parent==node?child:parent;
         if(next_node){

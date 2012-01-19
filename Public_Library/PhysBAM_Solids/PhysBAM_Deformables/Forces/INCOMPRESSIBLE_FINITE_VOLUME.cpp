@@ -374,10 +374,10 @@ Diagonal_Elements(ARRAY<T>& D) const
         D(p)=T();
         INDIRECT_ARRAY<ARRAY<TV>,ARRAY<int>&> forces_subset=forces.Subset(node_regions(p));
         forces_subset.Fill(TV());
-        for(int j=1;j<=incident_elements(p).m;j++){int t=incident_elements(p)(j);
+        for(int j=0;j<incident_elements(p).m;j++){int t=incident_elements(p)(j);
             strain_measure.Distribute_Force(forces,strain_measure.mesh.elements(t),-Bs_per_node(t));}
         forces.Subset(node_regions(p))*=particles.one_over_mass.Subset(node_regions(p));
-        for(int j=1;j<=incident_elements(p).m;j++){int t=incident_elements(p)(j);
+        for(int j=0;j<incident_elements(p).m;j++){int t=incident_elements(p)(j);
             D(p)-=T_MATRIX::Inner_Product(Bs_per_node(t),strain_measure.Ds(forces,t));}}
 }
 //#####################################################################

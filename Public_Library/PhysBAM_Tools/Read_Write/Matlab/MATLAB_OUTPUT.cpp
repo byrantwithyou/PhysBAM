@@ -38,7 +38,7 @@ Convert_Bytes(T& data) const
 {
     union {T data;char raw[sizeof(T)];} input,output;
     input.data=data;
-    for(int k=1;k<=(int)sizeof(T);k++) output.raw[k-1]=input.raw[sizeof(T)-k];
+    for(int k=0;k<(int)sizeof(T);k++) output.raw[k-1]=input.raw[sizeof(T)-k];
     data=output.data;
 }
 //#####################################################################

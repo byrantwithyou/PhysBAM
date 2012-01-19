@@ -582,14 +582,14 @@ Exchange_Boundary_Face_Data(const T_MPI_GRID& mpi_grid,T_FACE_ARRAYS& data,const
     // send
     ARRAY<ARRAY<RANGE<TV_INT> > > send_regions(T_MPI_GRID::GRID_T::dimension);
     for(int axis=0;axis<T_MPI_GRID::GRID_T::dimension;axis++)Find_Boundary_Regions(send_regions(axis),mpi_grid.Face_Sentinels(axis),true,boundary_band,true);
-    for(int n=1;n<=send_regions(1).m;n++)if(all_neighbor_ranks(n)!=MPI::PROC_NULL){
+    for(int n=0;n<send_regions(1).m;n++)if(all_neighbor_ranks(n)!=MPI::PROC_NULL){
         ARRAY<RANGE<TV_INT> > send_regions_n(T_MPI_GRID::GRID_T::dimension);for(int axis=0;axis<T_MPI_GRID::GRID_T::dimension;axis++)send_regions_n(axis)=send_regions(axis)(n);
         MPI_PACKAGE package=mpi_grid.Package_Face_Data(data,send_regions_n);
         packages.Append(package);requests.Append(package.Isend(*comm,all_neighbor_ranks(n),Get_Send_Tag(all_neighbor_directions(n))));}
     // receive
     ARRAY<ARRAY<RANGE<TV_INT> > > recv_regions(T_MPI_GRID::GRID_T::dimension);
     for(int axis=0;axis<T_MPI_GRID::GRID_T::dimension;axis++)Find_Boundary_Regions(recv_regions(axis),mpi_grid.Face_Sentinels(axis),true,ghost_band,true);
-    for(int n=1;n<=recv_regions(1).m;n++)if(all_neighbor_ranks(n)!=MPI::PROC_NULL){
+    for(int n=0;n<recv_regions(1).m;n++)if(all_neighbor_ranks(n)!=MPI::PROC_NULL){
         ARRAY<RANGE<TV_INT> > recv_regions_n(T_MPI_GRID::GRID_T::dimension);for(int axis=0;axis<T_MPI_GRID::GRID_T::dimension;axis++)recv_regions_n(axis)=recv_regions(axis)(n);
         MPI_PACKAGE package=mpi_grid.Package_Face_Data(data,recv_regions_n);
         packages.Append(package);requests.Append(package.Irecv(*comm,all_neighbor_ranks(n),Get_Recv_Tag(all_neighbor_directions(n))));}
@@ -610,7 +610,7 @@ Average_Common_Face_Data(const T_MPI_GRID& mpi_grid,T_FACE_ARRAYS& data) const
     MPI::Datatype T_type=MPI_UTILITIES::Datatype<T>();
     // send and receive into temporary buffers
     ARRAY<MPI::Request> requests;
-    for(int n=1;n<=regions(1).m;n++)if(side_neighbor_ranks(n)!=MPI::PROC_NULL){int axis=(n-1)/2+1;
+    for(int n=0;n<regions(1).m;n++)if(side_neighbor_ranks(n)!=MPI::PROC_NULL){int axis=(n-1)/2+1;
         packages(n)=mpi_grid.Package_Common_Face_Data(data,axis,regions(axis)(n));
         requests.Append(packages(n).Isend(*comm,side_neighbor_ranks(n),Get_Send_Tag(side_neighbor_directions(n))));
         buffers(n).Resize(packages(n).Size()/sizeof(T));
@@ -618,7 +618,7 @@ Average_Common_Face_Data(const T_MPI_GRID& mpi_grid,T_FACE_ARRAYS& data) const
     // wait
     MPI_UTILITIES::Wait_All(requests);
     // average received data with local data (TODO: find a cleaner general way to do this)
-    for(int n=1;n<=regions(1).m;n++)if(side_neighbor_ranks(n)!=MPI::PROC_NULL){
+    for(int n=0;n<regions(1).m;n++)if(side_neighbor_ranks(n)!=MPI::PROC_NULL){
         ARRAY<char> pack_buffer(packages(n).Pack_Size(*comm));packages(n).Pack(pack_buffer,*comm);
         ARRAY<T> local_buffer(buffers(n).m);
         int position=0;T_type.Unpack(pack_buffer.Get_Array_Pointer(),pack_buffer.m,local_buffer.Get_Array_Pointer(),local_buffer.m,position,*comm);
@@ -639,7 +639,7 @@ Union_Common_Face_Data(const T_MPI_GRID& mpi_grid,T_FACE_ARRAYS_BOOL& data) cons
     MPI::Datatype T_type=MPI_UTILITIES::Datatype<bool>();
     // send and receive into temporary buffers
     ARRAY<MPI::Request> requests;
-    for(int n=1;n<=regions(1).m;n++)if(side_neighbor_ranks(n)!=MPI::PROC_NULL){int axis=(n-1)/2+1;
+    for(int n=0;n<regions(1).m;n++)if(side_neighbor_ranks(n)!=MPI::PROC_NULL){int axis=(n-1)/2+1;
         packages(n)=mpi_grid.Package_Common_Face_Data(data,axis,regions(axis)(n));
         requests.Append(packages(n).Isend(*comm,side_neighbor_ranks(n),Get_Send_Tag(side_neighbor_directions(n))));
         buffers(n).Resize(packages(n).Size()/sizeof(bool));
@@ -647,11 +647,11 @@ Union_Common_Face_Data(const T_MPI_GRID& mpi_grid,T_FACE_ARRAYS_BOOL& data) cons
     // wait
     MPI_UTILITIES::Wait_All(requests);
     // average received data with local data (TODO: find a cleaner general way to do this)
-    for(int n=1;n<=regions(1).m;n++)if(side_neighbor_ranks(n)!=MPI::PROC_NULL){
+    for(int n=0;n<regions(1).m;n++)if(side_neighbor_ranks(n)!=MPI::PROC_NULL){
         ARRAY<char> pack_buffer(packages(n).Pack_Size(*comm));packages(n).Pack(pack_buffer,*comm);
         ARRAY<bool> local_buffer(buffers(n).m);
         int position=0;T_type.Unpack(pack_buffer.Get_Array_Pointer(),pack_buffer.m,local_buffer.Get_Array_Pointer(),local_buffer.m,position,*comm);
-        for(int i=1;i<=buffers(n).m;i++) local_buffer(i)=local_buffer(i)||buffers(n)(i);
+        for(int i=0;i<buffers(n).m;i++) local_buffer(i)=local_buffer(i)||buffers(n)(i);
         position=0;T_type.Pack(local_buffer.Get_Array_Pointer(),local_buffer.m,pack_buffer.Get_Array_Pointer(),pack_buffer.m,position,*comm);
         packages(n).Unpack(pack_buffer,*comm);}
     MPI_PACKAGE::Free_All(packages);
@@ -669,7 +669,7 @@ Copy_Common_Face_Data(const T_MPI_GRID& mpi_grid,T_FACE_ARRAYS& data) const
     // send and receive into temporary buffers
     int tag=Get_Unique_Tag();
     ARRAY<MPI::Request> requests;
-    for(int n=1;n<=regions(1).m;n++)if(side_neighbor_ranks(n)!=MPI::PROC_NULL){int axis=(n-1)/2+1;
+    for(int n=0;n<regions(1).m;n++)if(side_neighbor_ranks(n)!=MPI::PROC_NULL){int axis=(n-1)/2+1;
         packages(n)=mpi_grid.Package_Common_Face_Data(data,axis,regions(axis)(n));
         if(n%2==1) requests.Append(packages(n).Isend(*comm,side_neighbor_ranks(n),tag));
         else requests.Append(packages(n).Irecv(*comm,side_neighbor_ranks(n),tag));}
@@ -689,7 +689,7 @@ Assert_Common_Face_Data(const T_MPI_GRID& mpi_grid,T_FACE_ARRAYS& data,const T t
     MPI::Datatype T_type=MPI_UTILITIES::Datatype<T>();
     // send and receive into temporary buffers
     ARRAY<MPI::Request> requests;
-    for(int n=1;n<=regions(1).m;n++)if(side_neighbor_ranks(n)!=MPI::PROC_NULL){int axis=(n-1)/2+1;
+    for(int n=0;n<regions(1).m;n++)if(side_neighbor_ranks(n)!=MPI::PROC_NULL){int axis=(n-1)/2+1;
         packages(n)=mpi_grid.Package_Common_Face_Data(data,axis,regions(axis)(n));
         requests.Append(packages(n).Isend(*comm,side_neighbor_ranks(n),Get_Send_Tag(side_neighbor_directions(n))));
         buffers(n).Resize(packages(n).Size()/sizeof(T));
@@ -697,7 +697,7 @@ Assert_Common_Face_Data(const T_MPI_GRID& mpi_grid,T_FACE_ARRAYS& data,const T t
     // wait
     MPI_UTILITIES::Wait_All(requests);
     // average received data with local data (TODO: find a cleaner general way to do this)
-    for(int n=1;n<=regions(1).m;n++)if(side_neighbor_ranks(n)!=MPI::PROC_NULL){
+    for(int n=0;n<regions(1).m;n++)if(side_neighbor_ranks(n)!=MPI::PROC_NULL){
         ARRAY<char> pack_buffer(packages(n).Pack_Size(*comm));packages(n).Pack(pack_buffer,*comm);
         ARRAY<T> local_buffer(buffers(n).m);
         int position=0;T_type.Unpack(pack_buffer.Get_Array_Pointer(),pack_buffer.m,local_buffer.Get_Array_Pointer(),local_buffer.m,position,*comm);
@@ -743,7 +743,7 @@ Sync_Common_Face_Weights_From(ARRAY<ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >,FA
     for(int i=0;i<number_of_processes;i++){if(transfer_per_proc(i).m==0) continue;
         int buffer_size=MPI_UTILITIES::Datatype<TV_INT>().Pack_size(transfer_per_proc(i).m*2,*comm)+MPI_UTILITIES::Datatype<int>().Pack_size(transfer_per_proc(i).m*2,*comm)+MPI_UTILITIES::Datatype<T>().Pack_size(transfer_per_proc(i).m,*comm);
         send_buffer(i).Resize(buffer_size);int position=0;
-        for(int j=1;j<=transfer_per_proc(i).m;j++) MPI_UTILITIES::Pack(transfer_per_proc(i)(j).x.index,transfer_per_proc(i)(j).x.axis,transfer_per_proc(i)(j).y.index,transfer_per_proc(i)(j).y.axis,transfer_per_proc(i)(j).z,send_buffer(i),position,*comm);
+        for(int j=0;j<transfer_per_proc(i).m;j++) MPI_UTILITIES::Pack(transfer_per_proc(i)(j).x.index,transfer_per_proc(i)(j).x.axis,transfer_per_proc(i)(j).y.index,transfer_per_proc(i)(j).y.axis,transfer_per_proc(i)(j).z,send_buffer(i),position,*comm);
         requests.Append(comm->Isend(&send_buffer(i)(1),position,MPI::PACKED,i-1,tag));}
     for(int i=0;i<number_of_processes;i++){if(receive_per_proc(i).m==0) continue;
         MPI::Status status;comm->Probe(i-1,tag,status);
@@ -751,13 +751,13 @@ Sync_Common_Face_Weights_From(ARRAY<ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >,FA
         requests.Append(comm->Irecv(recv_buffers(i).m?&(recv_buffers(i)(1)):0,recv_buffers(i).m,MPI_PACKED,i-1,tag));}
     MPI_UTILITIES::Wait_All(requests);
     for(int i=0;i<number_of_processes;i++){int position=0;
-        for(int j=1;j<=receive_per_proc(i).m;j++){
+        for(int j=0;j<receive_per_proc(i).m;j++){
             TRIPLE<FACE_INDEX<TV::dimension>,FACE_INDEX<TV::dimension>,T>& data=receive_per_proc(i)(j);
             MPI_UTILITIES::Unpack(data.x.index,data.x.axis,data.y.index,data.y.axis,data.z,recv_buffers(i),position,*comm);
             data.x.index-=local_to_global_offset;data.y.index-=local_to_global_offset;
             RANGE<TV_INT> face_domain=local_grid.Domain_Indices();face_domain.max_corner(data.x.axis)++;
             if(ignore_boundary_faces && face_domain.Lazy_Inside(data.x.index)) continue;
-            int index=0;for(int j=1;j<=weights_to(data.x).m;j++) if(weights_to(data.x)(j).x==data.y) index=j;
+            int index=0;for(int j=0;j<weights_to(data.x).m;j++) if(weights_to(data.x)(j).x==data.y) index=j;
             assert(data.z>-1e-5);
             if(data.z<0) data.z=0;
             if(index) weights_to(data.x)(index).y=data.z;
@@ -799,7 +799,7 @@ Sync_Common_Face_Weights_To(ARRAY<ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >,FACE
     for(int i=0;i<number_of_processes;i++){if(transfer_per_proc(i).m==0) continue;
         int buffer_size=MPI_UTILITIES::Datatype<TV_INT>().Pack_size(transfer_per_proc(i).m*2,*comm)+MPI_UTILITIES::Datatype<int>().Pack_size(transfer_per_proc(i).m*2,*comm)+MPI_UTILITIES::Datatype<T>().Pack_size(transfer_per_proc(i).m,*comm);
         send_buffer(i).Resize(buffer_size);int position=0;
-        for(int j=1;j<=transfer_per_proc(i).m;j++) MPI_UTILITIES::Pack(transfer_per_proc(i)(j).x.index,transfer_per_proc(i)(j).x.axis,transfer_per_proc(i)(j).y.index,transfer_per_proc(i)(j).y.axis,transfer_per_proc(i)(j).z,send_buffer(i),position,*comm);
+        for(int j=0;j<transfer_per_proc(i).m;j++) MPI_UTILITIES::Pack(transfer_per_proc(i)(j).x.index,transfer_per_proc(i)(j).x.axis,transfer_per_proc(i)(j).y.index,transfer_per_proc(i)(j).y.axis,transfer_per_proc(i)(j).z,send_buffer(i),position,*comm);
         requests.Append(comm->Isend(&send_buffer(i)(1),position,MPI::PACKED,i-1,tag));}
     for(int i=0;i<number_of_processes;i++){if(receive_per_proc(i).m==0) continue;
         MPI::Status status;comm->Probe(i-1,tag,status);
@@ -807,13 +807,13 @@ Sync_Common_Face_Weights_To(ARRAY<ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >,FACE
         requests.Append(comm->Irecv(recv_buffers(i).m?&(recv_buffers(i)(1)):0,recv_buffers(i).m,MPI_PACKED,i-1,tag));}
     MPI_UTILITIES::Wait_All(requests);
     for(int i=0;i<number_of_processes;i++){int position=0;
-        for(int j=1;j<=receive_per_proc(i).m;j++){
+        for(int j=0;j<receive_per_proc(i).m;j++){
             TRIPLE<FACE_INDEX<TV::dimension>,FACE_INDEX<TV::dimension>,T>& data=receive_per_proc(i)(j);
             MPI_UTILITIES::Unpack(data.x.index,data.x.axis,data.y.index,data.y.axis,data.z,recv_buffers(i),position,*comm);
             data.x.index-=local_to_global_offset;data.y.index-=local_to_global_offset;
             RANGE<TV_INT> face_domain=local_grid.Domain_Indices();face_domain.max_corner(data.x.axis)++;
             if(ignore_boundary_faces && face_domain.Lazy_Inside(data.x.index)) continue;
-            int index=0;for(int j=1;j<=weights_to(data.y).m;j++) if(weights_to(data.y)(j).x==data.x) index=j;
+            int index=0;for(int j=0;j<weights_to(data.y).m;j++) if(weights_to(data.y)(j).x==data.x) index=j;
             assert(data.z>-1e-5);
             if(data.z<0) data.z=0;
             if(index) weights_to(data.y)(index).y=data.z;
@@ -852,7 +852,7 @@ Sync_Common_Cell_Weights_From(ARRAY<ARRAY<PAIR<TV_INT,T> >,TV_INT>& weights_to,A
     for(int i=0;i<number_of_processes;i++){if(transfer_per_proc(i).m==0) continue;
         int buffer_size=MPI_UTILITIES::Datatype<TV_INT>().Pack_size(transfer_per_proc(i).m*2,*comm)+MPI_UTILITIES::Datatype<T>().Pack_size(transfer_per_proc(i).m,*comm);
         send_buffer(i).Resize(buffer_size);int position=0;
-        for(int j=1;j<=transfer_per_proc(i).m;j++) MPI_UTILITIES::Pack(transfer_per_proc(i)(j).x,transfer_per_proc(i)(j).y,transfer_per_proc(i)(j).z,send_buffer(i),position,*comm);
+        for(int j=0;j<transfer_per_proc(i).m;j++) MPI_UTILITIES::Pack(transfer_per_proc(i)(j).x,transfer_per_proc(i)(j).y,transfer_per_proc(i)(j).z,send_buffer(i),position,*comm);
         requests.Append(comm->Isend(&send_buffer(i)(1),position,MPI::PACKED,i-1,tag));}
     for(int i=0;i<number_of_processes;i++){if(receive_per_proc(i).m==0) continue;
         MPI::Status status;comm->Probe(i-1,tag,status);
@@ -860,11 +860,11 @@ Sync_Common_Cell_Weights_From(ARRAY<ARRAY<PAIR<TV_INT,T> >,TV_INT>& weights_to,A
         requests.Append(comm->Irecv(recv_buffers(i).m?&(recv_buffers(i)(1)):0,recv_buffers(i).m,MPI_PACKED,i-1,tag));}
     MPI_UTILITIES::Wait_All(requests);
     for(int i=0;i<number_of_processes;i++){int position=0;
-        for(int j=1;j<=receive_per_proc(i).m;j++){
+        for(int j=0;j<receive_per_proc(i).m;j++){
             TRIPLE<TV_INT,TV_INT,T>& data=receive_per_proc(i)(j);
             MPI_UTILITIES::Unpack(data.x,data.y,data.z,recv_buffers(i),position,*comm);
             TV_INT target_cell=data.y-local_to_global_offset;
-            int index=0;for(int k=1;k<=weights_to(data.x-local_to_global_offset).m;k++) if(weights_to(data.x-local_to_global_offset)(k).x==target_cell) index=k;
+            int index=0;for(int k=0;k<weights_to(data.x-local_to_global_offset).m;k++) if(weights_to(data.x-local_to_global_offset)(k).x==target_cell) index=k;
             assert(data.z>-delta);
             if(data.z<0) data.z=0;
             if(index) weights_to(data.x-local_to_global_offset)(index).y=data.z;
@@ -900,7 +900,7 @@ Sync_Common_Cell_Weights_To(ARRAY<ARRAY<PAIR<TV_INT,T> >,TV_INT>& weights_to,ARR
     for(int i=0;i<number_of_processes;i++){if(transfer_per_proc(i).m==0) continue;
         int buffer_size=MPI_UTILITIES::Datatype<TV_INT>().Pack_size(transfer_per_proc(i).m*2,*comm)+MPI_UTILITIES::Datatype<T>().Pack_size(transfer_per_proc(i).m,*comm);
         send_buffer(i).Resize(buffer_size);int position=0;
-        for(int j=1;j<=transfer_per_proc(i).m;j++) MPI_UTILITIES::Pack(transfer_per_proc(i)(j).x,transfer_per_proc(i)(j).y,transfer_per_proc(i)(j).z,send_buffer(i),position,*comm);
+        for(int j=0;j<transfer_per_proc(i).m;j++) MPI_UTILITIES::Pack(transfer_per_proc(i)(j).x,transfer_per_proc(i)(j).y,transfer_per_proc(i)(j).z,send_buffer(i),position,*comm);
         requests.Append(comm->Isend(&send_buffer(i)(1),position,MPI::PACKED,i-1,tag));}
     for(int i=0;i<number_of_processes;i++){if(receive_per_proc(i).m==0) continue;
         MPI::Status status;comm->Probe(i-1,tag,status);
@@ -908,11 +908,11 @@ Sync_Common_Cell_Weights_To(ARRAY<ARRAY<PAIR<TV_INT,T> >,TV_INT>& weights_to,ARR
         requests.Append(comm->Irecv(recv_buffers(i).m?&(recv_buffers(i)(1)):0,recv_buffers(i).m,MPI_PACKED,i-1,tag));}
     MPI_UTILITIES::Wait_All(requests);
     for(int i=0;i<number_of_processes;i++){int position=0;
-        for(int j=1;j<=receive_per_proc(i).m;j++){
+        for(int j=0;j<receive_per_proc(i).m;j++){
             TRIPLE<TV_INT,TV_INT,T>& data=receive_per_proc(i)(j);
             MPI_UTILITIES::Unpack(data.x,data.y,data.z,recv_buffers(i),position,*comm);
             TV_INT target_cell=data.x-local_to_global_offset;
-            int index=0;for(int k=1;k<=weights_to(data.y-local_to_global_offset).m;k++) if(weights_to(data.y-local_to_global_offset)(k).x==target_cell) index=k;
+            int index=0;for(int k=0;k<weights_to(data.y-local_to_global_offset).m;k++) if(weights_to(data.y-local_to_global_offset)(k).x==target_cell) index=k;
             assert(data.z>-1e-5);
             if(data.z<0) data.z=0;
             if(index) weights_to(data.y-local_to_global_offset)(index).y=data.z;

@@ -70,7 +70,7 @@ public:
         const ARRAY<ARRAY<T> >& muscle_densities)
     {int n=strain_measure.mesh.elements.m;
     tet_muscles.Resize(n);tet_fibers.Resize(n);tet_densities.Resize(n);tension.Resize(n);tension_derivative.Resize(n);active_tension_unit_activation.Resize(n);
-    for(int m=0;m<muscle_tets.m;m++) for(int t=1;t<=muscle_tets(m).m;t++){
+    for(int m=0;m<muscle_tets.m;m++) for(int t=0;t<muscle_tets(m).m;t++){
         tet_muscles(muscle_tets(m)(t)).Append(m);tet_densities(muscle_tets(m)(t)).Append(muscle_densities(m)(t));
         tet_fibers(muscle_tets(m)(t)).Append(strain_measure.F(muscle_tets(m)(t)).Transpose_Times(muscle_fibers(m)(t)));
         tension(muscle_tets(m)(t)).Append(0);active_tension_unit_activation(muscle_tets(m)(t)).Append(0);tension_derivative(muscle_tets(m)(t)).Append(0);}}
@@ -79,7 +79,7 @@ public:
         const ARRAY<ARRAY<T> >& muscle_densities)
     {int n=8*strain_measure.hexahedron_mesh.hexahedrons.m;
     tet_muscles.Resize(n);tet_fibers.Resize(n);tet_densities.Resize(n);tension.Resize(n);tension_derivative.Resize(n);active_tension_unit_activation.Resize(n);
-    for(int m=0;m<muscle_tets.m;m++) for(int t=1;t<=muscle_tets(m).m;t++){
+    for(int m=0;m<muscle_tets.m;m++) for(int t=0;t<muscle_tets(m).m;t++){
         tet_muscles(muscle_tets(m)(t)).Append(m);tet_densities(muscle_tets(m)(t)).Append(muscle_densities(m)(t));
         tet_fibers(muscle_tets(m)(t)).Append(strain_measure.F((muscle_tets(m)(t)-1)%8+1,(muscle_tets(m)(t)-1)/8+1).Transpose_Times(muscle_fibers(m)(t)));
         tension(muscle_tets(m)(t)).Append(0);active_tension_unit_activation(muscle_tets(m)(t)).Append(0);tension_derivative(muscle_tets(m)(t)).Append(0);}}
@@ -109,7 +109,7 @@ public:
     DIAGONAL_MATRIX<T,3> F_threshold=F.Max(failure_threshold),C=F_threshold*F_threshold,F_cube=C*F_threshold,F_inverse=F_threshold.Inverse(),isotropic_part;
     MATRIX<T,3> anisotropic_part;T I_C=C.Trace(),II_C=(C*C).Trace(),J=F_threshold.Determinant(),Jcc=pow(J,-(T)two_thirds);
     isotropic_part=(2*Jcc*(mu_10+Jcc*mu_01*I_C))*F_threshold-(2*Jcc*Jcc*mu_01)*F_cube+((kappa*log(J)-(T)two_thirds*Jcc*(mu_10*I_C+Jcc*mu_01*(I_C*I_C-II_C))))*F_inverse;
-    for(int m=1;m<=tet_muscles(tetrahedron_index).m;m++){
+    for(int m=0;m<tet_muscles(tetrahedron_index).m;m++){
         VECTOR<T,3> fiber=V.Transpose_Times(tet_fibers(tetrahedron_index)(m)),F_fiber=F_threshold*fiber;
         anisotropic_part+=(tension(tetrahedron_index)(m)/F_fiber.Magnitude())*MATRIX<T,3>::Outer_Product(F_fiber,fiber);}
     return scale*(anisotropic_part+isotropic_part);}
@@ -159,7 +159,7 @@ public:
         const int tetrahedron_index) const
     {MATRIX<T,3> dP=scale*dPi_dF.Differential(dF);
     DIAGONAL_MATRIX<T,3> F_threshold=F.Max(failure_threshold);
-    for(int m=1;m<=tet_muscles(tetrahedron_index).m;m++){
+    for(int m=0;m<tet_muscles(tetrahedron_index).m;m++){
         VECTOR<T,3> fiber=V.Transpose_Times(tet_fibers(tetrahedron_index)(m)),F_fiber=F_threshold*fiber,dF_fiber=dF*fiber;
         T stretch_squared=F_fiber.Magnitude_Squared(),stretch=sqrt(stretch_squared);
         T c1=tension(tetrahedron_index)(m)/stretch,c2=(tension_derivative(tetrahedron_index)(m)-c1)/stretch_squared;
@@ -169,7 +169,7 @@ public:
 
     void Update_State_Dependent_Auxiliary_Variables(const DIAGONAL_MATRIX<T,3>& F,const MATRIX<T,3>& V,const int tetrahedron_index) PHYSBAM_OVERRIDE
     {DIAGONAL_MATRIX<T,3> F_threshold=F.Max(failure_threshold);
-    for(int m=1;m<=tet_muscles(tetrahedron_index).m;m++){
+    for(int m=0;m<tet_muscles(tetrahedron_index).m;m++){
         VECTOR<T,3> fiber=V.Transpose_Times(tet_fibers(tetrahedron_index)(m)),F_fiber=F_threshold*fiber;T stretch=F_fiber.Magnitude();
         tension(tetrahedron_index)(m)=Tension(tetrahedron_index,m,stretch);
         active_tension_unit_activation(tetrahedron_index)(m)=Active_Tension_Unit_Activation(tetrahedron_index,m,stretch);

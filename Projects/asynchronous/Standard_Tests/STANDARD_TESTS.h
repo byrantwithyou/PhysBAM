@@ -861,7 +861,7 @@ void Write_Saved_Interpolation_Curve_To_File(const std::string& filename,ARRAY<I
     Write_Binary(output,curve.m);
     for(int i=0;i<curve.m;i++){
         Write_Binary(output,curve(i).control_points.m); 
-        for(int j=1;j<=curve(i).control_points.m;j++){
+        for(int j=0;j<curve(i).control_points.m;j++){
             Write_Binary(output,curve(i).control_points(j).t); 
             Write_Binary(output,curve(i).control_points(j).value(1));
             Write_Binary(output,curve(i).control_points(j).value(2));

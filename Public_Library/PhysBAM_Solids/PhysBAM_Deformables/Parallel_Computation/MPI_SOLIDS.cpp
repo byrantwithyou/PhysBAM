@@ -85,7 +85,7 @@ Compute_Mpi_Partition(MPI_PARTITION& mpi_partition,const SEGMENT_MESH& connectiv
 
     ARRAY<bool> done(partition_id_from_particle_index.Size());
     HASHTABLE<PAIR<int,PARTITION_ID> > pair_done;
-    for(int j=1;j<=particles_of_partition(Partition()).m;j++){int p=particles_of_partition(Partition())(j);
+    for(int j=0;j<particles_of_partition(Partition()).m;j++){int p=particles_of_partition(Partition())(j);
         if(p<=deformable_body_collection->particles.array_collection->Size()){
             const ARRAY<int>& neighbor_particles=(*connectivity.neighbor_nodes)(p);
             for(int i=0;i<neighbor_particles.m;i++){int n=neighbor_particles(i);

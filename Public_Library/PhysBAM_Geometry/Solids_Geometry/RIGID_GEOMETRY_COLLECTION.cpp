@@ -192,7 +192,7 @@ template<class TV> void RIGID_GEOMETRY_COLLECTION<TV>::
 Destroy_Unreferenced_Geometry() 
 {
     ARRAY<bool> referenced(structure_list.Number_Of_Active_Elements());
-    for(int i=0;i<particles.array_collection->Size();i++) for(int j=1;j<=particles.structure_ids(i).m;j++) if(particles.structure_ids(i)(j))
+    for(int i=0;i<particles.array_collection->Size();i++) for(int j=0;j<particles.structure_ids(i).m;j++) if(particles.structure_ids(i)(j))
         referenced(structure_list.Element_Index(particles.structure_ids(i)(j)))=true;
     for(int i=structure_list.Number_Of_Active_Elements();i>=1;i--) if(!referenced(i)) structure_list.Remove_Element(structure_list.Active_Element_Id(i));
 }

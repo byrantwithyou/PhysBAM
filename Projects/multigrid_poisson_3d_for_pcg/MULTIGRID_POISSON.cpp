@@ -227,7 +227,7 @@ Initialize_Boundary_Region(){
 //    block=1;
     LOG::Time("Block Enumeration");
     for(int c=0;c<2;c++){
-	for(int b=1;b<=boundary_block_base_index(c).m;b++){ // for each block with boundary indices
+	for(int b=0;b<boundary_block_base_index(c).m;b++){ // for each block with boundary indices
             const T_INDEX& offset=boundary_block_base_index(c)(b);
  	    boundary_block_start.Append(boundary_indices.m+1); // first boundary_index of the block (1-indexed)
 

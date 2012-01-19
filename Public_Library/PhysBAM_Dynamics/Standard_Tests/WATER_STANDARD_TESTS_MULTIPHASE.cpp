@@ -153,7 +153,7 @@ Initialize_Advection(const bool always_use_objects)
     else fluids_parameters.Use_No_Fluid_Coupling_Defaults();
 
     if(use_open_wall)
-        for(int i=1;i<=Number_Of_Regions(test_number);i++){
+        for(int i=0;i<Number_Of_Regions(test_number);i++){
             BOUNDARY_PHI_WATER<T_GRID>* boundary=new BOUNDARY_PHI_WATER<T_GRID>();
             boundary->Set_Velocity_Pointer(fluid_collection.incompressible_fluid_collection.face_velocities);
             if(i==air_region)boundary->sign=-1;

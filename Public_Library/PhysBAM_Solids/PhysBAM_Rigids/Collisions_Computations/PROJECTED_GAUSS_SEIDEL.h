@@ -101,7 +101,7 @@ template<class T,int D>
     for(int i=0;i<n_dual;i++)
     {
         T diagonal=0;
-        for(int j=1;j<=C_block(i).m;j++)
+        for(int j=0;j<C_block(i).m;j++)
         {
             VECTOR<T,D>& block=C_block(i)(j).y;
             VECTOR<T,D> Ai_block=A_block_diagonal_inverse(C_block(i)(j).x)*block;
@@ -119,7 +119,7 @@ template<class T,int D>
         for(int i=0;i<n_dual;i++)
         {
             T row_sum=0;
-            for(int j=1;j<=C_block(i).m;j++)
+            for(int j=0;j<C_block(i).m;j++)
                 row_sum+=VECTOR<T,D>::Dot_Product(C_block(i)(j).y,x(C_block(i)(j).x));
 
             T residual=c(i)-row_sum;
@@ -137,7 +137,7 @@ template<class T,int D>
 
             lambda(i)=new_lambda;
 
-            for(int j=1;j<=C_block(i).m;j++)
+            for(int j=0;j<C_block(i).m;j++)
                 x(C_block(i)(j).x)+=lambda_offset*AiC(i)(j).y;
         }
 

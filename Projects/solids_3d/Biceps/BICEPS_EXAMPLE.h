@@ -127,7 +127,7 @@ void Set_External_Velocities(ARRAY<VECTOR_3D<T> >& V,const T time){
     if(!constrain_attachments) return;
     switch(id_number){
     case 1:
-        for(int b=0;b<bone_attachments.m;b++)for(int t=1;t<=bone_attachments(b).m;t++){
+        for(int b=0;b<bone_attachments.m;b++)for(int t=0;t<bone_attachments(b).m;t++){
             int i,j,k,l;solids_parameters.deformable_body_parameters.list(1).tetrahedralized_volume->tetrahedron_mesh.tetrahedrons.Get(bone_attachments(b)(t),i,j,k,l);
             V(i)=V(j)=V(k)=V(l)=VECTOR_3D<T>(0,0,0);}
         break;
@@ -140,7 +140,7 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY<VECTOR_3D<T> >& V,const T time){
     if(!constrain_attachments) return;
     switch(id_number){
     case 1:
-        for(int b=0;b<bone_attachments.m;b++)for(int t=1;t<=bone_attachments(b).m;t++){
+        for(int b=0;b<bone_attachments.m;b++)for(int t=0;t<bone_attachments(b).m;t++){
             int i,j,k,l;solids_parameters.deformable_body_parameters.list(1).tetrahedralized_volume->tetrahedron_mesh.tetrahedrons.Get(bone_attachments(b)(t),i,j,k,l);
             V(i)=V(j)=V(k)=V(l)=VECTOR_3D<T>(0,0,0);}
         break;

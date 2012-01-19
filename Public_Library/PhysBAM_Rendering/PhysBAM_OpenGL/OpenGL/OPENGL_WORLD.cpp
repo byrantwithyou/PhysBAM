@@ -101,7 +101,7 @@ OPENGL_WORLD()
 OPENGL_WORLD::
 ~OPENGL_WORLD()
 {
-    for(int index=0;index<key_bindings_by_category.m;index++) for(int key=1;key<=key_bindings_by_category(index).key_bindings.m;key++) delete key_bindings_by_category(index).key_bindings(key).y;
+    for(int index=0;index<key_bindings_by_category.m;index++) for(int key=0;key<key_bindings_by_category(index).key_bindings.m;key++) delete key_bindings_by_category(index).key_bindings(key).y;
     Clear_All_Lights();
     delete window;
     delete arcball;
@@ -281,7 +281,7 @@ Unbind_Key(const OPENGL_KEY& key)
 {
     key_bindings(key.Index()).Remove_All();
     for(int i=0;i<key_bindings_by_category.m;i++)
-        for(int j=1;j<=key_bindings_by_category(i).key_bindings.m;j++)
+        for(int j=0;j<key_bindings_by_category(i).key_bindings.m;j++)
             if(key_bindings_by_category(i).key_bindings(j).x==key){
                 delete key_bindings_by_category(i).key_bindings(j).y;
                 key_bindings_by_category(i).key_bindings(j).y=0;
@@ -877,7 +877,7 @@ Display_Auto_Help()
         if(key_bindings_by_category(i).key_bindings.m>0){
             strings1.Append(key_bindings_by_category(i).name+":");
             strings2.Append("");
-            for(int j=1;j<=key_bindings_by_category(i).key_bindings.m;j++){
+            for(int j=0;j<key_bindings_by_category(i).key_bindings.m;j++){
                 std::ostringstream string_stream1,string_stream2;
                 string_stream1.flags(std::ios::right);string_stream1.width(5);
                 string_stream1<<key_bindings_by_category(i).key_bindings(j).x.Name();

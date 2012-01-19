@@ -174,7 +174,7 @@ void Initialize_Tetrahedron_Collisions()
 //#####################################################################
 void Set_External_Positions(ARRAY<VECTOR_3D<T> >& X,const T time) PHYSBAM_OVERRIDE {
     switch(id_number){
-    case 1: for(int i=0;i<attached_nodes.m;i++)for(int j=1;j<=attached_nodes(i).m;j++) X(attached_nodes(i)(j))=X_save(attached_nodes(i)(j)); break;
+    case 1: for(int i=0;i<attached_nodes.m;i++)for(int j=0;j<attached_nodes(i).m;j++) X(attached_nodes(i)(j))=X_save(attached_nodes(i)(j)); break;
     default:std::cout<<"Unrecognized deformable object id number"<<std::endl;exit(1);}
 }
 //#####################################################################
@@ -182,7 +182,7 @@ void Set_External_Positions(ARRAY<VECTOR_3D<T> >& X,const T time) PHYSBAM_OVERRI
 //#####################################################################
 void Zero_Out_Enslaved_Position_Nodes(ARRAY<VECTOR_3D<T> >& X,const T time) PHYSBAM_OVERRIDE {
     switch(id_number){
-    case 1: for(int i=0;i<attached_nodes.m;i++)for(int j=1;j<=attached_nodes(i).m;j++) X(attached_nodes(i)(j))=VECTOR_3D<T>(); break;
+    case 1: for(int i=0;i<attached_nodes.m;i++)for(int j=0;j<attached_nodes(i).m;j++) X(attached_nodes(i)(j))=VECTOR_3D<T>(); break;
     default:std::cout<<"Unrecognized deformable object id number"<<std::endl;exit(1);}
 }
 //#####################################################################

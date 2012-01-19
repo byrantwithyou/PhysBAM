@@ -376,7 +376,7 @@ Update_Geometry(const int id)
         }
     }
 
-    //for(int i=1;i<=extra_components(id).m;i++) extra_components(id)(i)->Set_Frame(frame);
+    //for(int i=0;i<extra_components(id).m;i++) extra_components(id)(i)->Set_Frame(frame);
 }
 //#####################################################################
 // Function Destroy_Geometry

@@ -536,8 +536,8 @@ Update_Particle_Cells_Find_List(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLES& partic
 {
     for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();
     typename T_ARRAYS_PARTICLES::ELEMENT cell_particles=particles(block);
-    for(int i=1;i<=number_of_particles_per_block(block).m;i++){
-        for(int k=1;k<=number_of_particles_per_block(block)(i);k++){
+    for(int i=0;i<number_of_particles_per_block(block).m;i++){
+        for(int k=0;k<number_of_particles_per_block(block)(i);k++){
             TV_INT final_block=levelset.grid.Block_Index(cell_particles->X(k),1);
             if(final_block!=block){
                 list_to_process(final_block).Append(TRIPLE<TV_INT,typename T_ARRAYS_PARTICLES::ELEMENT,int>(block,cell_particles,k));}}
@@ -556,7 +556,7 @@ Update_Particle_Cells_Part_Two_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLES
     typedef typename REMOVE_POINTER<typename T_ARRAYS_PARTICLES::ELEMENT>::TYPE T_PARTICLES;
     const T_PARTICLES& template_particles=choice<(2-IS_SAME<T_PARTICLES,PARTICLE_LEVELSET_PARTICLES<TV> >::value)>(this->template_particles,this->template_removed_particles);
     for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT final_block=iterator.Node_Index();
-        for(int i=1;i<=list_to_process(final_block).m;i++){
+        for(int i=0;i<list_to_process(final_block).m;i++){
             T_PARTICLES* cell_particles=list_to_process(final_block)(i).y;int k=list_to_process(final_block)(i).z;
             if(!particles(final_block))particles(final_block)=Allocate_Particles(template_particles);
             Copy_Particle(*cell_particles,*particles(final_block),k);}}
@@ -573,7 +573,7 @@ Update_Particle_Cells_Part_Three_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_PARTICL
 {
     typedef typename REMOVE_POINTER<typename T_ARRAYS_PARTICLES::ELEMENT>::TYPE T_PARTICLES;
     for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT final_block=iterator.Node_Index();
-        for(int i=1;i<=list_to_process(final_block).m;i++){
+        for(int i=0;i<list_to_process(final_block).m;i++){
             T_PARTICLES* cell_particles=list_to_process(final_block)(i).y;int k=list_to_process(final_block)(i).z;
             assert(cell_particles->radius(k)>0);
             cell_particles->radius(k)=-(T)1;}}
@@ -764,7 +764,7 @@ Reseed_Add_Particles_Threaded_Part_Two(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLE_L
         int attempts=0;
         ARRAY_VIEW<int>* id=store_unique_particle_id?cell_particles->array_collection->template Get_Array<int>(ATTRIBUTE_ID_ID):0;
         ARRAY_VIEW<T>* material_volume=vof_advection?cell_particles->array_collection->template Get_Array<T>(ATTRIBUTE_ID_MATERIAL_VOLUME):0;
-        for(int k=1;k<=number_of_particles_to_add(block_index);k++){
+        for(int k=0;k<number_of_particles_to_add(block_index);k++){
             PARTICLE_LEVELSET_PARTICLES<TV>* local_cell_particles=cell_particles;
             //if(mutexes && thread_queue) pthread_mutex_lock(&(*mutexes)((*domain_index)(block_index)));
             int index=Add_Particle(cell_particles);

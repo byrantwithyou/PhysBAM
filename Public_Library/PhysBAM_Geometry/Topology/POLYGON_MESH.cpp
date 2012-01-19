@@ -100,7 +100,7 @@ Initialize_Segment_Mesh()
 {
     delete segment_mesh;segment_mesh=new SEGMENT_MESH;segment_mesh->number_nodes=number_nodes;
     HASHTABLE<VECTOR<int,2> > segment_list;
-    for(int e=0;e<elements.m;e++) for(int c=1;c<=elements(e).m;c++){
+    for(int e=0;e<elements.m;e++) for(int c=0;c<elements(e).m;c++){
         ARRAY<int>& component=elements(e)(c);
         for(int p=0;p<component.m;p++){
             VECTOR<int,2> sorted_segment=VECTOR<int,2>(component(p),component(p%component.m+1)).Sorted();
@@ -116,7 +116,7 @@ Initialize_Element_Oriented_Edges()
     delete element_oriented_edges;element_oriented_edges=new ARRAY<ARRAY<ARRAY<PAIR<int,bool> > > >(elements.m);
     for(int e=0;e<elements.m;e++){
         (*element_oriented_edges)(e).Resize(elements(e).m);
-        for(int c=1;c<=elements(e).m;c++){
+        for(int c=0;c<elements(e).m;c++){
             ARRAY<int>& component=elements(e)(c);
             for(int p=0;p<component.m;p++){
                 VECTOR<int,2> oriented_segment(component(p),component(p%component.m+1));
@@ -133,7 +133,7 @@ Initialize_Edge_Elements()
     if(!segment_mesh) PHYSBAM_FATAL_ERROR();
     delete edge_elements;edge_elements=new ARRAY<ARRAY<int> >(segment_mesh->elements.m);
     OPERATION_HASH<> hash(segment_mesh->elements.m);
-    for(int e=0;e<elements.m;e++) for(int c=1;c<=elements(e).m;c++){
+    for(int e=0;e<elements.m;e++) for(int c=0;c<elements(e).m;c++){
         ARRAY<int>& component=elements(e)(c);
         for(int p=0;p<component.m;p++){
             int s=segment_mesh->Segment(component(p),component(p%component.m+1));if(!s) PHYSBAM_FATAL_ERROR();

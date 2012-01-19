@@ -111,7 +111,7 @@ Force_Derivative(ARRAY<TV>& dFdl,ARRAY<TWIST<TV> >& dFrdl,const int control_id) 
     if(control_id<=21) affine_differential.x[control_id-13]=(T)1;
     else translation_differential[control_id-21]=(T)1;
     ARRAY<TV> dXdl(X.m);
-    for(int i=1;i<=attached_nodes(jaw_attachment_index).m;i++)
+    for(int i=0;i<attached_nodes(jaw_attachment_index).m;i++)
         dXdl(attached_nodes(jaw_attachment_index)(i))=cranium_transform.affine_transform*(affine_differential*X(attached_nodes(jaw_attachment_index)(i))+translation_differential);
     dFdl.Fill(TV());
     dFrdl.Fill(TWIST<TV>());
@@ -131,7 +131,7 @@ Position_Derivative(ARRAY<TV>& dXdl,const int control_id) const
     affine_differential_transformed=affine_differential*cranium_transform.affine_transform.Inverse();
     translation_differential_transformed=translation_differential-affine_differential_transformed*cranium_transform.translation;
     for(int i=0;i<dXdl.m;i++) dXdl(i)=affine_differential_transformed*X(i)+translation_differential_transformed;
-    for(int i=0;i<attached_nodes.m;i++) for(int j=1;j<=attached_nodes(i).m;j++)
+    for(int i=0;i<attached_nodes.m;i++) for(int j=0;j<attached_nodes(i).m;j++)
         if(i==jaw_attachment_index) affine_differential*(jaw_transform.affine_transform*X_save(attached_nodes(i)(j))+jaw_transform.translation)+translation_differential;
         else dXdl(attached_nodes(i)(j))=affine_differential*X_save(attached_nodes(i)(j))+translation_differential;
 }
@@ -142,7 +142,7 @@ template<class T> void ATTACHMENT_FRAME_CONTROL_SET<T>::
 Set_Attachment_Positions(ARRAY<TV>&X) const
 {
     QUASI_RIGID_TRANSFORM_3D<T> jaw_transform_composite=QUASI_RIGID_TRANSFORM_3D<T>::Composite_Transform(cranium_transform,jaw_transform);
-    for(int i=0;i<attached_nodes.m;i++) for(int j=1;j<=attached_nodes(i).m;j++)
+    for(int i=0;i<attached_nodes.m;i++) for(int j=0;j<attached_nodes(i).m;j++)
         if(i==jaw_attachment_index) X(attached_nodes(i)(j))=jaw_transform_composite.affine_transform*X_save(attached_nodes(i)(j))+jaw_transform_composite.translation;
         else X(attached_nodes(i)(j))=cranium_transform.affine_transform*X_save(attached_nodes(i)(j))+cranium_transform.translation;
 }

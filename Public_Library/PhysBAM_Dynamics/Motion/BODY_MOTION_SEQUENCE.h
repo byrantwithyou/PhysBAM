@@ -58,10 +58,10 @@ public:
 
     void Update_Transforms_From_Scale(int bone,int frame,T length_change)
     {base_position(bone).targeted_transform.t+=TV((T)0,length_change,(T)0);
-    for(int i=1;i<=bone_hierarchy(bone).m;i++) Update_Transforms_From_Scale(this->name_to_track_index.Get(bone_hierarchy(bone)(i)),frame,length_change);}
+    for(int i=0;i<bone_hierarchy(bone).m;i++) Update_Transforms_From_Scale(this->name_to_track_index.Get(bone_hierarchy(bone)(i)),frame,length_change);}
     
     void Update_Base_Transforms(int bone,int frame,T length_change)
-    {for(int i=1;i<=bone_hierarchy(bone).m;i++) if(this->names(bone)!="Root"||bone_hierarchy(bone)(i)=="Spine1"){ //this is a hack so legs are not affected when root is scaled
+    {for(int i=0;i<bone_hierarchy(bone).m;i++) if(this->names(bone)!="Root"||bone_hierarchy(bone)(i)=="Spine1"){ //this is a hack so legs are not affected when root is scaled
         Update_Transforms_From_Scale(this->name_to_track_index.Get(bone_hierarchy(bone)(i)),frame,length_change);Update_Targeted_Transforms(bone,frame);}};
 
     void Update_Base_Transforms(int bone,int frame)
@@ -73,23 +73,23 @@ public:
     void Update_Children_Rotation(int bone,int frame,FRAME<TV> &root_trans,FRAME<TV> &transform)
     {base_position(bone).targeted_rotation=FRAME<TV>(root_trans.t,ROTATION<TV>())*transform*Inverse_Trans(root_trans)*base_position(bone).rotation;
     Update_Targeted_Transforms(bone,frame);
-    for(int i=1;i<=bone_hierarchy(bone).m;i++) Update_Children_Rotation(this->name_to_track_index.Get(bone_hierarchy(bone)(i)),frame,root_trans,transform);}
+    for(int i=0;i<bone_hierarchy(bone).m;i++) Update_Children_Rotation(this->name_to_track_index.Get(bone_hierarchy(bone)(i)),frame,root_trans,transform);}
 
     void Update_Children_Rotation(int bone,int frame,FRAME<TV> &transform)
-    {for(int i=1;i<=bone_hierarchy(bone).m;i++) 
+    {for(int i=0;i<bone_hierarchy(bone).m;i++) 
         Update_Children_Rotation(this->name_to_track_index.Get(bone_hierarchy(bone)(i)),frame,this->trajectories(bone)(frame+1).transform,transform);}
 
     void Update_Children_Translation_Helper(int bone,int frame,FRAME<TV> &transform)
     {base_position(bone).targeted_translation=transform*base_position(bone).translation;
     Update_Targeted_Transforms(bone,frame);
-    for(int i=1;i<=bone_hierarchy(bone).m;i++) Update_Children_Translation_Helper(this->name_to_track_index.Get(bone_hierarchy(bone)(i)),frame,transform);}
+    for(int i=0;i<bone_hierarchy(bone).m;i++) Update_Children_Translation_Helper(this->name_to_track_index.Get(bone_hierarchy(bone)(i)),frame,transform);}
 
     void Update_Children_Translation(int bone,int frame,FRAME<TV> &transform)
-    {for(int i=1;i<=bone_hierarchy(bone).m;i++) 
+    {for(int i=0;i<bone_hierarchy(bone).m;i++) 
         Update_Children_Translation_Helper(this->name_to_track_index.Get(bone_hierarchy(bone)(i)),frame,transform);}
 
     void Update_Children_Scale(int bone,int frame,FRAME<TV> &transform)
-    {for(int i=1;i<=bone_hierarchy(bone).m;i++) if(this->names(bone)!="Root"||bone_hierarchy(bone)(i)=="Spine1")
+    {for(int i=0;i<bone_hierarchy(bone).m;i++) if(this->names(bone)!="Root"||bone_hierarchy(bone)(i)=="Spine1")
         Update_Children_Translation_Helper(this->name_to_track_index.Get(bone_hierarchy(bone)(i)),frame,transform);}
 
     void Update_Transforms(int bone,int frame)

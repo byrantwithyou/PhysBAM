@@ -68,7 +68,7 @@ Read(const STREAM_TYPE stream_type,const std::string& directory,const int frame,
                 if(needs_init) needs_init->Append(p);
                 RIGID_GEOMETRY<TV>* rigid_geometry=object.New_Body(p);
                 if(p<=object.rigid_body_names.Size()) rigid_geometry->Set_Name(object.rigid_body_names(p));
-                for(int s=1;s<=object.particles.structure_ids(p).m;s++)
+                for(int s=0;s<object.particles.structure_ids(p).m;s++)
                     if(object.particles.structure_ids(p)(s))
                         rigid_geometry->Add_Structure(*object.structure_list.Element(object.particles.structure_ids(p)(s)));}
             if(object.Is_Active(p) && object.particles.structure_ids(p)==VECTOR<int,3>()) object.Deactivate_Geometry(p);}}

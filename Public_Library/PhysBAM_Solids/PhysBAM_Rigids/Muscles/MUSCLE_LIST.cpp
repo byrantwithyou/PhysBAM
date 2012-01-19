@@ -27,7 +27,7 @@ Initialize_Muscle_Attachments_On_Rigid_Body()
             attachment_1=attachment_2;}}
 
 #if 0
-    for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++) for(int j=1;j<=muscle_attachments_on_rigid_body(i).m;j++){
+    for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++) for(int j=0;j<muscle_attachments_on_rigid_body(i).m;j++){
         TRIPLE<int,T_ATTACHMENT_POINT*,T_ATTACHMENT_POINT*>& value=muscle_attachments_on_rigid_body(i)(j);
         LOG::cout<<"Body "<<i<<", muscle "<<value.x<<", pt1 ("<<value.y->Rigid_Body().id_number<<","<<value.y->object_space_position 
            <<"), pt2 ("<<value.z->Rigid_Body().id_number<<","<< value.z->object_space_position<<")"<<std::endl;

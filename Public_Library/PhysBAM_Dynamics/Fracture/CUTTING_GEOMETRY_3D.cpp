@@ -426,9 +426,9 @@ Inside_Outside_Determination_For_Unconnected_Polygonal_Regions(const int simplex
     bool something_is_contained=false;
     for(int i=0;i<unconnected_polygonal_regions.m;i++) for(int j=0;j<unconnected_polygonal_regions.m;j++) if(i!=j){
         int particle=0;
-        for(int a=1;a<=unconnected_polygonal_regions(i).m;a++){
+        for(int a=0;a<unconnected_polygonal_regions(i).m;a++){
             int p=unconnected_polygonal_regions(i)(a)[1];bool ok=true;
-            for(int k=1;k<=unconnected_polygonal_regions(j).m;k++){
+            for(int k=0;k<unconnected_polygonal_regions(j).m;k++){
                 if(unconnected_polygonal_regions(j)(k).Contains(p)){ok=false;break;}}
             if(ok){particle=p;break;}}
         if(particle){
@@ -452,13 +452,13 @@ Inside_Outside_Determination_For_Unconnected_Polygonal_Regions(const int simplex
             if(unconnected_polygonal_regions(i).m==2) continue; // degenerate polygons are always negatively oriented, and have no area (TODO: set has_no_area?)
             // determine if region has no area
             bool all_segments_appear_both_ways=true;
-            for(int j=1;j<=unconnected_polygonal_regions(i).m;j++){
+            for(int j=0;j<unconnected_polygonal_regions(i).m;j++){
                 if(!unconnected_polygonal_regions(i).Contains(unconnected_polygonal_regions(i)(j).Reversed())){
                     all_segments_appear_both_ways=false;break;}}
             unjoined_region_has_no_area(i)=all_segments_appear_both_ways;
             // figure out orientation
             T sum=0;
-            for(int j=1;j<=unconnected_polygonal_regions(i).m;j++){
+            for(int j=0;j<unconnected_polygonal_regions(i).m;j++){
                 const VECTOR<int,2>& seg_1=unconnected_polygonal_regions(i)(j);
                 const VECTOR<int,2>& seg_2=unconnected_polygonal_regions(i)(j+1>unconnected_polygonal_regions(i).m?1:j+1);
                 VECTOR<T,2> seg_11=intersection_registry->Get_Simplex_Weights_Of_Intersection(seg_1(1),simplex);
@@ -476,7 +476,7 @@ Inside_Outside_Determination_For_Unconnected_Polygonal_Regions(const int simplex
             // add particles for parent
             particles_on_polygon.Append(ARRAY<int>(unconnected_polygonal_regions(region_id).Project(1)));
             // add particles for each child
-            for(int j=1;j<=in_out_graph.Children(region_id).m;j++){int child_region=in_out_graph.Children(region_id)(j);
+            for(int j=0;j<in_out_graph.Children(region_id).m;j++){int child_region=in_out_graph.Children(region_id)(j);
                 if(used(child_region)) continue;
                 if(depths(region_id)+1==depths(child_region) &&
                     (unjoined_region_orientations(region_id)!=unjoined_region_orientations(child_region) || unjoined_region_has_no_area(child_region))){
@@ -493,17 +493,17 @@ Draw_Polygon(const int simplex,const bool flipped,const ARRAY<ARRAY<VECTOR<int,2
         T hsb=(T)(.3*(i%10)/9);
         LOG::cout<<"% Run "<<i<<std::endl;
         LOG::cout<<" newpath "<<std::endl;
-        for(int j=1;j<=unconnected_polygonal_regions(i).m;j++){
+        for(int j=0;j<unconnected_polygonal_regions(i).m;j++){
             const int p=unconnected_polygonal_regions(i)(j)[1];
             VECTOR<T,2> X1=intersection_registry->Get_Simplex_Weights_Of_Intersection(p,simplex);
             LOG::cout<<"  "<<X1<<(j==1?" moveto ":" lineto ");}
         LOG::cout<<"\n"<<hsb<<" .5 1 sethsbcolor fill \n newpath "<<std::endl;
-        for(int j=1;j<=unconnected_polygonal_regions(i).m;j++){
+        for(int j=0;j<unconnected_polygonal_regions(i).m;j++){
             const int p=unconnected_polygonal_regions(i)(j)[1];
             VECTOR<T,2> X1=intersection_registry->Get_Simplex_Weights_Of_Intersection(p,simplex);
             LOG::cout<<"  "<<X1<<" ("<<p<<") point ";}
         LOG::cout<<"\n newpath "<<std::endl;
-        for(int j=1;j<=unconnected_polygonal_regions(i).m;j++){
+        for(int j=0;j<unconnected_polygonal_regions(i).m;j++){
             const VECTOR<int,2>& p=unconnected_polygonal_regions(i)(j);
             VECTOR<T,2> X1=intersection_registry->Get_Simplex_Weights_Of_Intersection(p[1],simplex);
             VECTOR<T,2> X2=intersection_registry->Get_Simplex_Weights_Of_Intersection(p[2],simplex);

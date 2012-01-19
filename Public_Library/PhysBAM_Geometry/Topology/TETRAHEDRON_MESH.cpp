@@ -420,7 +420,7 @@ Initialize_Boundary_Mesh_Of_Subset(TRIANGLE_MESH& boundary_mesh_of_subset,const 
             bool lowest_index_tet=true,boundary_face=false;
             // For non-manifold meshes, add a boundary face only for the lowest indexed incident tet
             if(!adjacent_tets_per_face(p).m) boundary_face=true;
-            for(int q=1;q<=adjacent_tets_per_face(p).m;q++)
+            for(int q=0;q<adjacent_tets_per_face(p).m;q++)
                 if(!subset(adjacent_tets_per_face(p)(q))) boundary_face=true;
                 else if(adjacent_tets_per_face(p)(q)<t) lowest_index_tet=false;
             if(boundary_face&&lowest_index_tet) switch(p){

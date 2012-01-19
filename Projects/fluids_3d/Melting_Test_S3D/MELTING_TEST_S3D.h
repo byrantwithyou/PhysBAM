@@ -232,7 +232,7 @@ void Set_External_Velocities(ARRAY<VECTOR<T,3> >& V,const T time)
 void Zero_Out_Enslaved_Velocity_Nodes(ARRAY<VECTOR<T,3> >& V,const T time)
 {
 //    assert(id_number<=deformable_object_enslaved_nodes.m);
-//    for(int i=1;i<=deformable_object_enslaved_nodes(id_number).m;i++) V(deformable_object_enslaved_nodes(id_number)(i))=VECTOR<T,3>();
+//    for(int i=0;i<deformable_object_enslaved_nodes(id_number).m;i++) V(deformable_object_enslaved_nodes(id_number)(i))=VECTOR<T,3>();
 }
 //#####################################################################
 // Function Update_Time_Varying_Material_Properties

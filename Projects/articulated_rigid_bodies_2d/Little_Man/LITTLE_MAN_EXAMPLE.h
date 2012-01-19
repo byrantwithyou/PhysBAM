@@ -356,7 +356,7 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE{
     // objects only collide with ground
     RIGID_BODY_LIST_2D<T>& rigid_body_list=solids_parameters.rigid_body_parameters.list;
     solids_evolution->rigid_body_collisions->collision_manager.Use_Collision_Matrix();
-    for(int i=1;i<=rigid_body_list.Number_Of_Elements()-1;i++) for(int j=1;j<=rigid_body_list.Number_Of_Elements()-1;j++)
+    for(int i=0;i<rigid_body_list.Number_Of_Elements()-1;i++) for(int j=0;j<rigid_body_list.Number_Of_Elements()-1;j++)
         solids_evolution->rigid_body_collisions->collision_manager.Set_Rigid_Body_Collides_With_Other_Rigid_Body(i,j,false);
 }
 //#####################################################################

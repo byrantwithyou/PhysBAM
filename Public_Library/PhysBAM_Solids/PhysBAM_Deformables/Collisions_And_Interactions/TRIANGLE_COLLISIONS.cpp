@@ -728,17 +728,17 @@ Apply_Rigid_Body_Motions(const T dt,ARRAY<ARRAY<int> >& rigid_lists)
     T one_over_dt=1/dt;
     for(int list=0;list<rigid_lists.m;list++) if(rigid_lists(list).m){
         TV average_velocity,center_of_mass;T total_mass=0;
-        for(int kk=1;kk<=rigid_lists(list).m;kk++){int p=rigid_lists(list)(kk);
+        for(int kk=0;kk<rigid_lists(list).m;kk++){int p=rigid_lists(list)(kk);
             total_mass+=full_particles.mass(p);center_of_mass+=full_particles.mass(p)*X_self_collision_free(p);
             average_velocity+=full_particles.mass(p)*(full_particles.X(p)-X_self_collision_free(p));}
         T one_over_total_mass=1/total_mass;center_of_mass*=one_over_total_mass;average_velocity*=one_over_dt*one_over_total_mass;  
         T_SPIN L=T_SPIN(); // moment of inertia & angular momentum
-        for(int kk=1;kk<=rigid_lists(list).m;kk++){int p=rigid_lists(list)(kk);
+        for(int kk=0;kk<rigid_lists(list).m;kk++){int p=rigid_lists(list)(kk);
             TV radial_vector=X_self_collision_free(p)-center_of_mass;
             L+=TV::Cross_Product(radial_vector,full_particles.mass(p)*(full_particles.X(p)-X_self_collision_free(p)));} // TODO: figure out why it could be bad to hoist mass out of Cross_Product
         L*=one_over_dt;T_SPIN omega=Inverse(Inertia_Tensor(rigid_lists(list),full_particles.mass,X_self_collision_free,center_of_mass))*L; // TODO: use pseudoinverse
         ROTATION<TV> R=ROTATION<TV>::From_Rotation_Vector(dt*omega);
-        for(int kk=1;kk<=rigid_lists(list).m;kk++){int p=rigid_lists(list)(kk);
+        for(int kk=0;kk<rigid_lists(list).m;kk++){int p=rigid_lists(list)(kk);
             TV new_position=center_of_mass+dt*average_velocity+R.Rotate(X_self_collision_free(p)-center_of_mass);
             full_particles.V(p)=one_over_dt*(new_position-X_self_collision_free(p));
             assert(geometry.modified_full(p));recently_modified_full(p)=true;}}

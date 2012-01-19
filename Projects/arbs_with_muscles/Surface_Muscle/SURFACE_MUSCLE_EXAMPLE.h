@@ -304,7 +304,7 @@ void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE
     for(int p=0;p<num_planks;p++){
         //if(p==1) continue;
         RIGID_BODY<TV>& plank_rigid_body=*arb->rigid_body_list.rigid_bodies(plank_ids(p));
-        for(int i=1;i<=enslaved_nodes(p).m;i++){
+        for(int i=0;i<enslaved_nodes(p).m;i++){
 //            X(enslaved_nodes(p)(i))=inverted_frame.r.Inverse_Rotate(positions_relative_to_plank_frames(p)(i)-inverted_frame.t);}}
             X(enslaved_nodes(p)(i))=plank_rigid_body.Frame()*positions_relative_to_plank_frames(p)(i);}}
 }
@@ -316,7 +316,7 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
     for(int p=0;p<num_planks;p++){
         //if(p==1) continue;
         RIGID_BODY<TV>& plank_rigid_body=*arb->rigid_body_list.rigid_bodies(plank_ids(p));
-        for(int i=1;i<=enslaved_nodes(p).m;i++){
+        for(int i=0;i<enslaved_nodes(p).m;i++){
 //            V(enslaved_nodes(p)(i))=TV(1,0,0);}}
             V(enslaved_nodes(p)(i))=plank_rigid_body.Pointwise_Object_Velocity(plank_rigid_body.World_Space_Point(positions_relative_to_plank_frames(p)(i)));}}
 }
@@ -327,7 +327,7 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
 {
     for(int p=0;p<num_planks;p++){
         //if(p==1) continue;
-        for(int i=1;i<=enslaved_nodes(p).m;i++){
+        for(int i=0;i<enslaved_nodes(p).m;i++){
             V(enslaved_nodes(p)(i))=TV();}}
 }
 //#####################################################################

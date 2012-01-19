@@ -372,7 +372,7 @@ Update_Advection_Equation_Cell_Lookup(const T_GRID& grid,T_ARRAYS_T2& Z,const T_
         Clamp_Weights_To_Objects(grid,forward_weights);
         for(int i=0;i<forward_weights.m;i++){assert(forward_weights(i).y>-1e-5);if(forward_weights(i).y<0) forward_weights(i).y=0;}
         for(int i=0;i<forward_weights.m;i++){
-            int index=0;for(int j=1;j<=weights_to(cell).m;j++) if(weights_to(cell)(j).x==forward_weights(i).x) index=j;
+            int index=0;for(int j=0;j<weights_to(cell).m;j++) if(weights_to(cell)(j).x==forward_weights(i).x) index=j;
             if(index) weights_to(cell)(index).y+=forward_weights(i).y*remaining;
             else{
                 weights_to(cell).Append(PAIR<TV_INT,T>(forward_weights(i).x,forward_weights(i).y*remaining));
@@ -593,7 +593,7 @@ Update_Advection_Equation_Face_Lookup(T_GRID& grid,T_ARRAYS_SCALAR& phi1,T_ARRAY
         for(int i=0;i<forward_weights.m;i++){//assert(forward_weights(i).y>-delta);
             if(forward_weights(i).y<0) forward_weights(i).y=0;}
         for(int i=0;i<forward_weights.m;i++){if(forward_weights(i).y==0) continue;
-            int index=0;for(int j=1;j<=weights_to(face).m;j++) if(weights_to(face)(j).x==forward_weights(i).x) index=j;
+            int index=0;for(int j=0;j<weights_to(face).m;j++) if(weights_to(face)(j).x==forward_weights(i).x) index=j;
             if(index) weights_to(face)(index).y+=forward_weights(i).y*remaining;
             else{
                 weights_to(face).Append(PAIR<FACE_INDEX<TV::dimension>,T>(forward_weights(i).x,forward_weights(i).y*remaining));
@@ -723,7 +723,7 @@ Update_Advection_Equation_Face_Lookup(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z
         Clamp_Weights_To_Grid(inside_domain,forward_weights);
         Clamp_Weights_To_Objects(grid,forward_weights);
         for(int i=0;i<forward_weights.m;i++){
-            int index=0;for(int j=1;j<=weights_to(face).m;j++) if(weights_to(face)(j).x==forward_weights(i).x) index=j;
+            int index=0;for(int j=0;j<weights_to(face).m;j++) if(weights_to(face)(j).x==forward_weights(i).x) index=j;
             if(index) weights_to(face)(index).y+=forward_weights(i).y*remaining;
             else{
                 if(forward_weights(i).y==0) continue;

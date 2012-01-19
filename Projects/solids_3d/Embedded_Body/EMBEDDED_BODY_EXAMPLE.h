@@ -301,7 +301,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE
 {
     for(int i=0;i<boundary_nodes.m;i++) V(boundary_nodes(i))=TV();
-    for(int i=0;i<attached_nodes.m;i++) for(int j=1;j<=attached_nodes(i).m;j++) V(attached_nodes(i)(j))=effective_V(attached_nodes(i)(j));
+    for(int i=0;i<attached_nodes.m;i++) for(int j=0;j<attached_nodes(i).m;j++) V(attached_nodes(i)(j))=effective_V(attached_nodes(i)(j));
 }
 //#####################################################################
 // Function Set_External_Positions
@@ -316,7 +316,7 @@ void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE
 void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_velocity_time) PHYSBAM_OVERRIDE
 {
     for(int i=0;i<boundary_nodes.m;i++) V(boundary_nodes(i))=TV();
-    for(int i=0;i<attached_nodes.m;i++) for(int j=1;j<=attached_nodes(i).m;j++) V(attached_nodes(i)(j))=TV();
+    for(int i=0;i<attached_nodes.m;i++) for(int j=0;j<attached_nodes(i).m;j++) V(attached_nodes(i)(j))=TV();
 }
 //#####################################################################
 };

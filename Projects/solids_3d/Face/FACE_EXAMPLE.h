@@ -287,7 +287,7 @@ void Update_Time_Varying_Material_Properties(const T time)
     ARRAY<TV> X_initial(number_of_particles),X_final(number_of_particles);effective_V.Resize(number_of_particles,false,false);
     Read_Controls(control_directory+"/",previous_control_frame);attachment_frame_controls->Set_Attachment_Positions(X_initial);control_parameters.Save_Controls();
     Read_Controls(control_directory+"/",previous_control_frame+1);attachment_frame_controls->Set_Attachment_Positions(X_final);control_parameters.Interpolate(interpolation_fraction);
-    for(int i=0;i<attached_nodes.m;i++) for(int j=1;j<=attached_nodes(i).m;j++)
+    for(int i=0;i<attached_nodes.m;i++) for(int j=0;j<attached_nodes(i).m;j++)
         effective_V(attached_nodes(i)(j))=(T)control_frame_rate*(X_final(attached_nodes(i)(j))-X_initial(attached_nodes(i)(j)));
     control_parameters.Print_Diagnostics();
 }
@@ -296,7 +296,7 @@ void Update_Time_Varying_Material_Properties(const T time)
 //#####################################################################
 void Set_External_Velocities(ARRAY_VIEW<TV> V,const T time) PHYSBAM_OVERRIDE
 {
-    for(int i=0;i<attached_nodes.m;i++) for(int j=1;j<=attached_nodes(i).m;j++) V(attached_nodes(i)(j))=effective_V(attached_nodes(i)(j));
+    for(int i=0;i<attached_nodes.m;i++) for(int j=0;j<attached_nodes(i).m;j++) V(attached_nodes(i)(j))=effective_V(attached_nodes(i)(j));
 }
 //#####################################################################
 // Function Set_External_Positions
@@ -310,14 +310,14 @@ void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T time) PHYSBAM_OVERRIDE
 {
-    for(int i=0;i<attached_nodes.m;i++) for(int j=1;j<=attached_nodes(i).m;j++) V(attached_nodes(i)(j))=TV();
+    for(int i=0;i<attached_nodes.m;i++) for(int j=0;j<attached_nodes(i).m;j++) V(attached_nodes(i)(j))=TV();
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Position_Nodes
 //#####################################################################
 void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE
 {
-    for(int i=0;i<attached_nodes.m;i++) for(int j=1;j<=attached_nodes(i).m;j++) X(attached_nodes(i)(j))=TV();
+    for(int i=0;i<attached_nodes.m;i++) for(int j=0;j<attached_nodes(i).m;j++) X(attached_nodes(i)(j))=TV();
 }
 //#####################################################################
 // Function Update_Collision_Body_Positions_And_Velocities

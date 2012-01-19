@@ -130,7 +130,7 @@ Adjust_Nodes_For_Collision_Body_Collisions(BINDING_LIST<TV>& binding_list,SOFT_B
         ARRAY<int> collision_count(check_collision.m);
         for(COLLISION_GEOMETRY_ID body_id(1);body_id<=bodies->m;body_id++) if((*bodies)(body_id)){
             COLLISION_GEOMETRY<TV>& collision_body=*(*bodies)(body_id);
-            for(int j=1;j<=collision_body_candidate_nodes(body_id).m;j++){int node=collision_body_candidate_nodes(body_id)(j);
+            for(int j=0;j<collision_body_candidate_nodes(body_id).m;j++){int node=collision_body_candidate_nodes(body_id)(j);
                 if(particle_states(node).enforce && (!is_protected(node) || protecting_bodies_of_nodes(node).Contains(body_id))
                     && collision_body.Implicit_Geometry_Lazy_Inside(particles.X(node),(thickness_table?thickness_table->Get_Default(node,0):0)-(T)1e-5)){
                     collision_count(node)++;if(collision_count(node)>1){particle_states(node).enforce=false;particles.X(node)=X_save(node);particles.V(node)=V_old(node);}}}}}
@@ -141,7 +141,7 @@ Adjust_Nodes_For_Collision_Body_Collisions(BINDING_LIST<TV>& binding_list,SOFT_B
                 check_collision,collision_tolerance,particle_states,particle_to_collision_body_id,maximum_levelset_collision_projection_velocity,dt,friction_table,thickness_table);
         ARRAY<int> collision_count(check_collision.m);
         for(COLLISION_GEOMETRY_ID body_id(1);body_id<=bodies->m;body_id++) if((*bodies)(body_id))
-            for(int j=1;j<=collision_body_candidate_nodes(body_id).m;j++){int node=collision_body_candidate_nodes(body_id)(j);
+            for(int j=0;j<collision_body_candidate_nodes(body_id).m;j++){int node=collision_body_candidate_nodes(body_id)(j);
                 if(particle_states(node).enforce && (*bodies)(body_id)->Implicit_Geometry_Lazy_Inside(particles.X(node),(thickness_table?thickness_table->Get_Default(node,0):0)-(T)1e-5)){
                     collision_count(node)++;if(collision_count(node)>1){particle_states(node).enforce=false;particles.X(node)=X_save(node);particles.V(node)=V_old(node);}}}}
     else for(COLLISION_GEOMETRY_ID body_id=bodies->m;body_id>=COLLISION_GEOMETRY_ID(1);body_id--)

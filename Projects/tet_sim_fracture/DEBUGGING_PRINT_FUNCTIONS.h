@@ -142,7 +142,7 @@ static bool Verify_Embedded_Triangles_In_Tetrahedron(EMBEDDED_TETRAHEDRALIZED_VO
 
 static bool Verify_Children_Of_This_Node(EMBEDDED_TETRAHEDRALIZED_VOLUME<T>& etv, int tet_node)
 {
-    for(int c=1;c<=etv.Number_Of_Children(tet_node);c++){
+    for(int c=0;c<etv.Number_Of_Children(tet_node);c++){
         int child=etv.Child(tet_node,c);
         if(!etv.Is_Parent(tet_node,child)){assert(false);return false;}
     }

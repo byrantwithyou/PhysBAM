@@ -96,7 +96,7 @@ Broadcast_Positions(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input)
     ARRAY<char> send_buffer;ARRAY<MPI::Request> requests;
     int buffer_size=rigid_body_collection_input.rigid_body_particle.array_collection->Pack_Size()*particles_of_partition(id).m+1;
     send_buffer.Resize(buffer_size);int position=0;
-    for(int b=1;b<=particles_of_partition(id).m;b++){
+    for(int b=0;b<particles_of_partition(id).m;b++){
         rigid_body_collection_input.rigid_body_particle.array_collection->Pack(send_buffer,position,particles_of_partition(id)(b));}
     for(int i=0;i<number_of_processors;i++)
         if(i-1!=rank)
@@ -113,7 +113,7 @@ Broadcast_Positions(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input)
     for(int i=0;i<number_of_processors;i++){
         if(i-1!=rank){
             int position=0;
-            for(int b=1;b<=particles_of_partition(PARTITION_ID(i)).m;b++){
+            for(int b=0;b<particles_of_partition(PARTITION_ID(i)).m;b++){
                 int rigid_body_index=particles_of_partition(PARTITION_ID(i))(b);
                 RIGID_GEOMETRY<TV>* rigid_geometry=rigid_body_collection_input.rigid_body_particle.rigid_geometry(rigid_body_index);
                 rigid_body_collection_input.rigid_body_particle.array_collection->Unpack(recv_buffers(i),position,rigid_body_index);
@@ -135,7 +135,7 @@ Update_Partitions(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,
 
     ARRAY<ARRAY<int> > bodies_to_send(number_of_processors);
     TV domain_size=local_domain.Edge_Lengths();
-    for(int body=1;body<=particles_of_partition(PARTITION_ID(rank+1)).m;body++){
+    for(int body=0;body<particles_of_partition(PARTITION_ID(rank+1)).m;body++){
         int body_id=particles_of_partition(PARTITION_ID(rank+1))(body);
         if(!local_domain.Lazy_Inside(rigid_body_collection_input.rigid_body_particle.X(body_id))){
             TV_INT partition_coordinate;
@@ -167,18 +167,18 @@ Update_Partitions(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,
             ARRAY<ARRAY<int> > moved_bodies(number_of_processors);
             MPI_UTILITIES::Unpack(moved_bodies,recv_buffers(i),position,*comm);
             for(int new_proc=0;new_proc<moved_bodies.m;new_proc++){
-                for(int body=1;body<=moved_bodies(new_proc).m;body++){
+                for(int body=0;body<moved_bodies(new_proc).m;body++){
                     partition_id_from_particle_index(moved_bodies(new_proc)(body))=PARTITION_ID(new_proc);
-                    for(int b=1;b<=particles_of_partition(PARTITION_ID(i)).m;b++){ // TODO faster way to do this?
+                    for(int b=0;b<particles_of_partition(PARTITION_ID(i)).m;b++){ // TODO faster way to do this?
                         if(particles_of_partition(PARTITION_ID(i))(b)==moved_bodies(new_proc)(body)){
                             particles_of_partition(PARTITION_ID(i)).Remove_Index_Lazy(b);
                             break;}}
                     particles_of_partition(PARTITION_ID(new_proc)).Append(moved_bodies(new_proc)(body));}}}
         else{
             for(int new_proc=0;new_proc<bodies_to_send.m;new_proc++){
-                for(int body=1;body<=bodies_to_send(new_proc).m;body++){
+                for(int body=0;body<bodies_to_send(new_proc).m;body++){
                     partition_id_from_particle_index(bodies_to_send(new_proc)(body))=PARTITION_ID(new_proc);
-                    for(int b=1;b<=particles_of_partition(PARTITION_ID(rank+1)).m;b++){ // TODO faster way to do this?
+                    for(int b=0;b<particles_of_partition(PARTITION_ID(rank+1)).m;b++){ // TODO faster way to do this?
                         if(particles_of_partition(PARTITION_ID(rank+1))(b)==bodies_to_send(new_proc)(body)){
                             particles_of_partition(PARTITION_ID(rank+1)).Remove_Index_Lazy(b);
                             break;}}

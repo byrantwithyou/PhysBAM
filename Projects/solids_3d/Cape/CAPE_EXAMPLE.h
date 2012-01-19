@@ -140,7 +140,7 @@ public:
     bool Corner_Search(ARRAY<ARRAY<int> >& graph,PARTICLES<T,VECTOR_3D<T> >& particles,ARRAY<VECTOR_3D<T> >& edge,ARRAY<bool>& marks,int node,int goal)
     {marks(node)=true;
     std::cout<<"node "<<node<<", degree "<<graph(node).m<<"\n";
-    for(int a=1;a<=graph(node).m;a++){
+    for(int a=0;a<graph(node).m;a++){
         int p=graph(node)(a);
         if(p==goal){std::cout<<"found "<<p<<"\n";edge.Append(particles.X(p));edge.Append(particles.X(node));return true;}
         else if(!marks(p) && Corner_Search(graph,particles,edge,marks,p,goal)){edge.Append(particles.X(node));return true;}}

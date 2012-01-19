@@ -195,7 +195,7 @@ Exchange_Boundary_Particles_Threaded(const THREADED_UNIFORM_GRID<T_GRID>& thread
         if(!exchange_particles(n).m) continue;
         THREAD_PACKAGE pack((sizeof(int)+sizeof(T_PARTICLES*))*exchange_particles(n).m+sizeof(int));pack.send_tid=threaded_grid.tid;pack.recv_tid=threaded_grid.all_neighbor_ranks(n);
         int position=0;*(int*)(&pack.buffer(position+1))=exchange_particles(n).m;position+=sizeof(int);
-        for(int i=1;i<=exchange_particles(n).m;i++){
+        for(int i=0;i<exchange_particles(n).m;i++){
             *(T_PARTICLES**)(&pack.buffer(position+1))=exchange_particles(n)(i).x;position+=sizeof(T_PARTICLES*);
             *(int*)(&pack.buffer(position+1))=exchange_particles(n)(i).y;position+=sizeof(int);}
         pthread_mutex_lock(threaded_grid.lock);
@@ -278,7 +278,7 @@ Exchange_Overlapping_Block_Particles_Threaded(const THREADED_UNIFORM_GRID<T_GRID
         if(!exchange_particles(n).m) continue;
         THREAD_PACKAGE pack((sizeof(int)+sizeof(T_PARTICLES*))*exchange_particles(n).m+sizeof(int));pack.send_tid=threaded_grid.tid;pack.recv_tid=threaded_grid.all_neighbor_ranks(n);
         int position=0;*(int*)(&pack.buffer(position+1))=exchange_particles(n).m;position+=sizeof(int);
-        for(int i=1;i<=exchange_particles(n).m;i++){
+        for(int i=0;i<exchange_particles(n).m;i++){
             *(T_PARTICLES**)(&pack.buffer(position+1))=exchange_particles(n)(i).x;position+=sizeof(T_PARTICLES*);
             *(int*)(&pack.buffer(position+1))=exchange_particles(n)(i).y;position+=sizeof(int);}
         pthread_mutex_lock(threaded_grid.lock);

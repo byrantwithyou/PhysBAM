@@ -291,7 +291,7 @@ template<class T_GRID> void SEARCH_CONTROLLER<T_GRID>::
 Make_Cluster_List(int parent,ARRAY<int>& child_bodies)
 {
     child_bodies.Append(parent);
-    for(int i=1;i<=bone_hierarchy(parent).m;i++) Make_Cluster_List(bone_hierarchy(parent)(i),child_bodies);
+    for(int i=0;i<bone_hierarchy(parent).m;i++) Make_Cluster_List(bone_hierarchy(parent)(i),child_bodies);
 }
 //#####################################################################
 // Function Project_Solid_Velocities
@@ -467,7 +467,7 @@ Create_Clusters_From_Joint_List(const ARRAY<bool,JOINT_ID>& blocking_joint,ARRAY
                 RIGID_BODY<TV>& body=solid_body_collection.rigid_body_collection.Rigid_Body(id);
                 body_lists.Last().Append(body.particle_index);
                 if(body.Has_Infinite_Inertia()) continue;
-                for(int i=1;i<=graph.Adjacent_Edges(id).m;i++){
+                for(int i=0;i<graph.Adjacent_Edges(id).m;i++){
                     JOINT_ID jid=graph.Adjacent_Edges(id)(i);
                     if(blocking_joint(jid)) continue;
                     int oid=graph.Edges(jid).y+(Value(graph.Edges(jid).x)-Value(id));
@@ -501,13 +501,13 @@ Create_All_Clusters(RIGID_BODY_COLLISION_MANAGER_HASH* collision_manager)
         Create_Clusters_From_Joint_List(blocking_list_single,body_lists,adjacent_lists);
         if(body_lists(adjacent_lists(joint_id).x).Size()>1){
             ARRAY<int,RIGID_CLUSTER_CONSTITUENT_ID> children;
-            for(int i=1;i<=body_lists(adjacent_lists(joint_id).x).Size();i++) children.Append(body_lists(adjacent_lists(joint_id).x)(i));
+            for(int i=0;i<body_lists(adjacent_lists(joint_id).x).Size();i++) children.Append(body_lists(adjacent_lists(joint_id).x)(i));
             joint_clusters(joint_id).x=rigid_bindings.Add_Binding(children);
             RIGID_BODY<TV>* rigid_body_cluster=&solid_body_collection.rigid_body_collection.Rigid_Body(joint_clusters(joint_id).x);
             parent_cluster=rigid_body_cluster->particle_index;}
         if(body_lists(adjacent_lists(joint_id).y).Size()>1){
             ARRAY<int,RIGID_CLUSTER_CONSTITUENT_ID> children;
-            for(int i=1;i<=body_lists(adjacent_lists(joint_id).y).Size();i++) children.Append(body_lists(adjacent_lists(joint_id).y)(i));
+            for(int i=0;i<body_lists(adjacent_lists(joint_id).y).Size();i++) children.Append(body_lists(adjacent_lists(joint_id).y)(i));
             joint_clusters(joint_id).y=rigid_bindings.Add_Binding(children);
             RIGID_BODY<TV>* rigid_body_cluster=&solid_body_collection.rigid_body_collection.Rigid_Body(joint_clusters(joint_id).y);
             child_cluster=rigid_body_cluster->particle_index;}
@@ -530,7 +530,7 @@ Create_All_Clusters(RIGID_BODY_COLLISION_MANAGER_HASH* collision_manager)
             int cluster_particle=done(adjacent_lists(joint_id).x);
             if(!cluster_particle){
                 ARRAY<int,RIGID_CLUSTER_CONSTITUENT_ID> children;
-                for(int i=1;i<=body_lists(adjacent_lists(joint_id).x).Size();i++) children.Append(body_lists(adjacent_lists(joint_id).x)(i));
+                for(int i=0;i<body_lists(adjacent_lists(joint_id).x).Size();i++) children.Append(body_lists(adjacent_lists(joint_id).x)(i));
                 cluster_particle=rigid_bindings.Add_Binding(children);
                 done(adjacent_lists(joint_id).x)=cluster_particle;
                 global_clusters.Append(cluster_particle);}
@@ -540,7 +540,7 @@ Create_All_Clusters(RIGID_BODY_COLLISION_MANAGER_HASH* collision_manager)
             int cluster_particle=done(adjacent_lists(joint_id).y);
             if(!cluster_particle){
                 ARRAY<int,RIGID_CLUSTER_CONSTITUENT_ID> children;
-                for(int i=1;i<=body_lists(adjacent_lists(joint_id).y).Size();i++) children.Append(body_lists(adjacent_lists(joint_id).y)(i));
+                for(int i=0;i<body_lists(adjacent_lists(joint_id).y).Size();i++) children.Append(body_lists(adjacent_lists(joint_id).y)(i));
                 cluster_particle=rigid_bindings.Add_Binding(children);
                 done(adjacent_lists(joint_id).y)=cluster_particle;
                 global_clusters.Append(cluster_particle);}

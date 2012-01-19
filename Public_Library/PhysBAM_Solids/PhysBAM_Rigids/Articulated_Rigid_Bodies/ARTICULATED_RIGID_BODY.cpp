@@ -217,7 +217,7 @@ Update_Child_From_Parents(const int child_id,const ARRAY<int>& parents)
     ARRAY<ROTATION<TV> > rotations;
     for(int p=0;p<parents.m;p++){
         JOINT_ID edge_id(0);
-        for(int e=1;e<=joint_mesh.undirected_graph.Adjacent_Edges(child_id).m;e++){JOINT_ID edge=joint_mesh.undirected_graph.Adjacent_Edges(child_id)(e);
+        for(int e=0;e<joint_mesh.undirected_graph.Adjacent_Edges(child_id).m;e++){JOINT_ID edge=joint_mesh.undirected_graph.Adjacent_Edges(child_id)(e);
             if(Child_Id(edge)==parents(p) || Parent_Id(edge)==parents(p)){edge_id=edge;break;}}
         JOINT<TV>& joint=*joint_mesh(edge_id);
         FRAME<TV> F_wc=rigid_body_collection.Rigid_Body(parents(p)).Frame()*joint.F_pc(); // TODO: looks broken, should be line below?
@@ -232,7 +232,7 @@ template<class TV> void ARTICULATED_RIGID_BODY_BASE<TV>::
 Update_Parent_Joint_States(const int child_id,const ARRAY<int>& parents)
 {
     if(!parents.m) return;
-    for(int p=0;p<parents.m;p++) for(int e=1;e<=joint_mesh.undirected_graph.Adjacent_Edges(child_id).m;e++){JOINT_ID edge=joint_mesh.undirected_graph.Adjacent_Edges(child_id)(e);
+    for(int p=0;p<parents.m;p++) for(int e=0;e<joint_mesh.undirected_graph.Adjacent_Edges(child_id).m;e++){JOINT_ID edge=joint_mesh.undirected_graph.Adjacent_Edges(child_id)(e);
         // J = (F_wj)^-1*F_wc*(F_jc)^-1 = F_jw*F_wc*F_cj
         if(Child_Id(edge)==parents(p)){
             JOINT<TV>& joint=*joint_mesh(edge);

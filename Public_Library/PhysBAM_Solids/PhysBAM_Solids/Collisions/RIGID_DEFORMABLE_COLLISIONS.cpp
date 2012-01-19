@@ -395,7 +395,7 @@ Add_Elastic_Collisions(const T dt,const T time,ARRAY<ROTATION<TV> >& rigid_rotat
             deformable_body_collection.collisions.Compute_Candidate_Nodes_For_Collision_Body_Collisions(rigid_collision_bodies);
             for(COLLISION_GEOMETRY_ID collision_body_id(1);collision_body_id<=rigid_collision_bodies.m;collision_body_id++){
                 RIGID_BODY<TV>& rigid_body=dynamic_cast<RIGID_BODY<TV>&>(dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>&>(*rigid_collision_bodies(collision_body_id)).rigid_geometry);
-                for(int j=1;j<=deformable_body_collection.collisions.collision_body_candidate_nodes(collision_body_id).m;j++){
+                for(int j=0;j<deformable_body_collection.collisions.collision_body_candidate_nodes(collision_body_id).m;j++){
                     int k=deformable_body_collection.collisions.collision_body_candidate_nodes(collision_body_id)(j);
                     if(Update_Rigid_Deformable_Collision_Pair(rigid_body,k,dt,time,X_save,V_save,rigid_X_save,rigid_rotation_save,rigid_angular_momentum_difference,
                             rigid_velocity_difference) && !rigid_body.Has_Infinite_Inertia()){

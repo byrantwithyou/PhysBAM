@@ -116,25 +116,25 @@ Triangulate_Nonconvex_Planar_Connected_Polygon(const ARRAY<VECTOR<T,2> >& positi
     //    if(float_vertices.Contains(float_vertex)) PHYSBAM_FATAL_ERROR();
     //    float_vertices.Insert(float_vertex);}
     // ensure no 2 segments are intersecting (in float coordinates)
-    //for(int c1=0;c1<segments_input.m;c1++) for(int s1=1;s1<=segments_input(c1).m;s1++) for(int c2=c1,s2=s1+1;c2<=segments_input.m;c2++) for(;s2<=segments_input(c2).m;s2++){
+    //for(int c1=0;c1<segments_input.m;c1++) for(int s1=0;s1<segments_input(c1).m;s1++) for(int c2=c1,s2=s1+1;c2<=segments_input.m;c2++) for(;s2<=segments_input(c2).m;s2++){
     //    int i,j,k,l;segments_input(c1)(s1).Get(i,j);segments_input(c2)(s2).Get(k,l);
     //    if(i!=k&&i!=l&&j!=k&&j!=l&&EXACT_SIMPLEX_INTERACTIONS::Exact_Segment_Intersection((TV_float)positions(i),(TV_float)positions(j),(TV_float)positions(k),(TV_float)positions(l)))
     //        PHYSBAM_FATAL_ERROR();}
     // polygon boundaries might still not have proper inclusion or (counter-)clockwise ordering
     ARRAY<VECTOR<int,2> > all_segments;ARRAY<bool> segments_used;
     ARRAY<ARRAY<int> > outgoing_segments(positions.m);ARRAY<ARRAY<int> > incoming_segments(positions.m);
-    for(int i=0;i<segments_input.m;i++) for(int j=1;j<=segments_input(i).m;j++){
+    for(int i=0;i<segments_input.m;i++) for(int j=0;j<segments_input(i).m;j++){
         int segment_index=all_segments.Append(segments_input(i)(j));segments_used.Append(false);
         outgoing_segments(segments_input(i)(j)(1)).Append(segment_index);
         incoming_segments(segments_input(i)(j)(2)).Append(segment_index);}
     // make segments to connect holes
     HASHTABLE<VECTOR<int,2> > already_connected_holes;
     for(int hole=2;hole<=segments_input.m;hole++){
-        for(int j=1;j<=segments_input(hole).m;j++){
+        for(int j=0;j<segments_input(hole).m;j++){
             int first_node_on_hole_segment=segments_input(hole)(j)(1);
             // find other node on a different component
             for(int comp=0;comp<segments_input.m;comp++) if(hole!=comp&&!already_connected_holes.Contains(VECTOR<int,2>(hole,comp).Sorted())){
-                for(int k=1;k<=segments_input(comp).m;k++){int candidate_node=segments_input(comp)(k)(1);
+                for(int k=0;k<segments_input(comp).m;k++){int candidate_node=segments_input(comp)(k)(1);
                 if(!Segment_Intersects(VECTOR<int,2>(first_node_on_hole_segment,candidate_node),all_segments,positions)){
                     int segment_index=all_segments.Append(VECTOR<int,2>(first_node_on_hole_segment,candidate_node));segments_used.Append(false);
                     outgoing_segments(first_node_on_hole_segment).Append(segment_index);

@@ -447,7 +447,7 @@ void Create_Joints_From_Cluster_Hierarchy(int joint_type,int parent)
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
     RIGID_BODY_CLUSTER_BINDINGS<TV>& rigid_bindings=solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings;
-    for(int i=1;i<=body_motion.bone_hierarchy(parent).m;i++){
+    for(int i=0;i<body_motion.bone_hierarchy(parent).m;i++){
         int child=body_motion.name_to_track_index.Get(body_motion.bone_hierarchy(parent)(i));
         int parent_index=rigid_bindings.Get_Parent_Index(arb.rigid_body_list(rigid_body_ids(parent))->particle_index);
         int child_index=rigid_bindings.Get_Parent_Index(arb.rigid_body_list(rigid_body_ids(child))->particle_index);
@@ -480,7 +480,7 @@ void Create_Joints_From_Cluster_Hierarchy(int joint_type,int parent)
 void Create_Joints_From_Hierarchy(int joint_type,int parent)
 {
     ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
-    for(int i=1;i<=body_motion.bone_hierarchy(parent).m;i++){
+    for(int i=0;i<body_motion.bone_hierarchy(parent).m;i++){
         std::string body_name=body_motion.names(parent);
         int child=body_motion.name_to_track_index.Get(body_motion.bone_hierarchy(parent)(i));
         JOINT<TV>* joint=0;

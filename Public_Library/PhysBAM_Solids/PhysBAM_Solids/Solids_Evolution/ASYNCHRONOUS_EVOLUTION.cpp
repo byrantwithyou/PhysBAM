@@ -552,12 +552,12 @@ Compute_Blob_Properties()
         blobs(i).mass=0;
         blobs(i).inertia=T_SYMMETRIC_MATRIX();
         blobs(i).center=TV();
-        for(int j=1;j<=blobs(i).blob_particles.m;j++){int p=blobs(i).blob_particles(j);
+        for(int j=0;j<blobs(i).blob_particles.m;j++){int p=blobs(i).blob_particles(j);
             blobs(i).mass+=solid_body_collection.deformable_body_collection.particles.mass(p);
             blobs(i).center+=solid_body_collection.deformable_body_collection.particles.mass(p)*solid_body_collection.deformable_body_collection.particles.X(p);}
 
         blobs(i).center/=blobs(i).mass;
-        for(int j=1;j<=blobs(i).blob_particles.m;j++){int p=blobs(i).blob_particles(j);
+        for(int j=0;j<blobs(i).blob_particles.m;j++){int p=blobs(i).blob_particles(j);
             TV r=solid_body_collection.deformable_body_collection.particles.X(p)-blobs(i).center;
             blobs(i).inertia+=solid_body_collection.deformable_body_collection.particles.mass(p)*
                 (MATRIX_POLICY<TV>::CROSS_PRODUCT_MATRIX::Cross_Product_Matrix(r).Times_Transpose(MATRIX_POLICY<TV>::CROSS_PRODUCT_MATRIX::Cross_Product_Matrix(r))).Symmetric_Part();}}
@@ -571,14 +571,14 @@ Project(GENERALIZED_VELOCITY<TV>& V) const
     if(!use_projection || !asynchronous_mode==FINE_SCALE) return;
     for(int i=0;i<blobs.m;i++){
         TV impulse;T_SPIN torque;
-        for(int j=1;j<=blobs(i).blob_particles.m;j++){int p=blobs(i).blob_particles(j);
+        for(int j=0;j<blobs(i).blob_particles.m;j++){int p=blobs(i).blob_particles(j);
             impulse+=V.V.array(p);
             torque+=TV::Cross_Product(solid_body_collection.deformable_body_collection.particles.X(p)-blobs(i).center,V.V.array(p));}
 
         impulse/=blobs(i).mass;
         torque=blobs(i).inertia.Solve_Linear_System(torque);
 
-        for(int j=1;j<=blobs(i).blob_particles.m;j++){int p=blobs(i).blob_particles(j);
+        for(int j=0;j<blobs(i).blob_particles.m;j++){int p=blobs(i).blob_particles(j);
             TV v_rigid_projected=solid_body_collection.deformable_body_collection.particles.mass(p)*(impulse+TV::Cross_Product(torque,solid_body_collection.deformable_body_collection.particles.X(p)-blobs(i).center));
             V.V.array(p)=((T)1-projection_rigidity)*V.V.array(p)+projection_rigidity*v_rigid_projected;}}
 }

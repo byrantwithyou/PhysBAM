@@ -243,7 +243,7 @@ Initialize_Original_Embedding(const T_EMBEDDING_OBJECT& original_embedding)
     current_embedding->mesh.elements.Flattened().Get_Unique(embedding_nodes);
     for(int i=0;i<embedding_nodes.m;i++){int node=embedding_nodes(i);ARRAY<int> simplices;
         ARRAY<T_CUT_WEIGHTS> all_weights(faces_on_vertices(node).m);
-        for(int i=1;i<=faces_on_vertices(node).m;i++){int face=faces_on_vertices(node)(i);
+        for(int i=0;i<faces_on_vertices(node).m;i++){int face=faces_on_vertices(node)(i);
             int parent;bool found=embedding_face_to_simplex.Get(face,parent);if(!found) PHYSBAM_FATAL_ERROR("Could not find simplex");
             simplices.Append(parent);
             all_weights(i)=Get_Node_Weights_From_Face(node,embedding_faces.elements(face));}

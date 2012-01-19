@@ -30,10 +30,10 @@ public:
     {Add_Directed_Edge(node1,node2);Add_Directed_Edge(node2,node1);}
 
     bool Edge_Present(const int from,const int to) const // not efficient for more than sparsely connected graphs (need to use sorted arrays and binary search in that case)
-    {for(int i=1;i<=edges(from).m;i++)if(edges(from)(i)==to)return true;return false;}
+    {for(int i=0;i<edges(from).m;i++)if(edges(from)(i)==to)return true;return false;}
 
     void Remove_Directed_Edge(const int from,const int to)
-    {for(int i=1;i<=edges(from).m;i++)if(edges(from)(i)==to)edges(from).Remove_Index(i);}
+    {for(int i=0;i<edges(from).m;i++)if(edges(from)(i)==to)edges(from).Remove_Index(i);}
 
 //#####################################################################
 };

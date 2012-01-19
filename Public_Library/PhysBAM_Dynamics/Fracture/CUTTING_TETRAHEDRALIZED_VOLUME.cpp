@@ -123,7 +123,7 @@ Initialize_Original_Embedding(const TETRAHEDRALIZED_VOLUME<T>& original_tetrahed
     const ARRAY<ARRAY<int> >& faces_on_vertices=*current_tetrahedralized_volume->mesh.triangle_mesh->incident_elements;
     for(int node=0;node<current_tetrahedralized_volume->mesh.number_nodes;node++){ARRAY<int> simplices;
         ARRAY<VECTOR<T,2> > all_weights(faces_on_vertices(node).m);
-        for(int i=1;i<=faces_on_vertices(node).m;i++){int face=faces_on_vertices(node)(i);
+        for(int i=0;i<faces_on_vertices(node).m;i++){int face=faces_on_vertices(node)(i);
             int parent;bool found=embedding_face_to_simplex.Get(face,parent);if(!found) PHYSBAM_FATAL_ERROR();
             simplices.Append(parent);
             all_weights(i)=Get_Node_Weights_From_Triangle(node,embedding_faces.elements(face));}
@@ -963,9 +963,9 @@ Inside_Outside_Determination_For_Unconnected_Polygonal_Regions(const int simplex
     bool something_is_contained=false;
     for(int i=0;i<unconnected_polygonal_regions.m;i++) for(int j=0;j<unconnected_polygonal_regions.m;j++) if(i!=j){
         int particle=0;
-        for(int a=1;a<=unconnected_polygonal_regions(i).m;a++){
+        for(int a=0;a<unconnected_polygonal_regions(i).m;a++){
             int p=unconnected_polygonal_regions(i)(a)[1];bool ok=true;
-            for(int k=1;k<=unconnected_polygonal_regions(j).m;k++){
+            for(int k=0;k<unconnected_polygonal_regions(j).m;k++){
                 if(unconnected_polygonal_regions(j)(k).Contains(p)){ok=false;break;}}
             if(ok){particle=p;break;}}
         if(particle){
@@ -989,13 +989,13 @@ Inside_Outside_Determination_For_Unconnected_Polygonal_Regions(const int simplex
             if(unconnected_polygonal_regions(i).m==2) continue; // degenerate polygons are always negatively oriented, and have no area (TODO: set has_no_area?)
             // determine if region has no area
             bool all_segments_appear_both_ways=true;
-            for(int j=1;j<=unconnected_polygonal_regions(i).m;j++){
+            for(int j=0;j<unconnected_polygonal_regions(i).m;j++){
                 if(!unconnected_polygonal_regions(i).Contains(unconnected_polygonal_regions(i)(j).Reversed())){
                     all_segments_appear_both_ways=false;break;}}
             unjoined_region_has_no_area(i)=all_segments_appear_both_ways;
             // figure out orientation
             T sum=0;
-            for(int j=1;j<=unconnected_polygonal_regions(i).m;j++){
+            for(int j=0;j<unconnected_polygonal_regions(i).m;j++){
                 const VECTOR<int,2>& seg_1=unconnected_polygonal_regions(i)(j);
                 const VECTOR<int,2>& seg_2=unconnected_polygonal_regions(i)(j+1>unconnected_polygonal_regions(i).m?1:j+1);
                 VECTOR<T,2> seg_11=intersection_registry->Get_Simplex_Weights_Of_Intersection(seg_1(1),simplex);
@@ -1013,7 +1013,7 @@ Inside_Outside_Determination_For_Unconnected_Polygonal_Regions(const int simplex
             // add particles for parent
             particles_on_polygon.Append(ARRAY<int>(unconnected_polygonal_regions(region_id).Project(1)));
             // add particles for each child
-            for(int j=1;j<=in_out_graph.Children(region_id).m;j++){int child_region=in_out_graph.Children(region_id)(j);
+            for(int j=0;j<in_out_graph.Children(region_id).m;j++){int child_region=in_out_graph.Children(region_id)(j);
                 if(used(child_region)) continue;
                 if(depths(region_id)+1==depths(child_region) &&
                     (unjoined_region_orientations(region_id)!=unjoined_region_orientations(child_region) || unjoined_region_has_no_area(child_region))){
@@ -1060,7 +1060,7 @@ Find_Material_Regions()
                 TV polygon_to_examine_normal=Get_Child_Cutting_Simplex_Local_Normal(cutting_simplex_owner);
                 if(cutting_polygon.flipped) polygon_to_examine_normal*=(T)-1;
                 const ARRAY<ARRAY<PAIR<int,bool> > >& edges_for_polygon=element_oriented_edges(polygon_element_index);
-                for(int i=0;i<edges_for_polygon.m;i++) for(int j=1;j<=edges_for_polygon(i).m;j++){
+                for(int i=0;i<edges_for_polygon.m;i++) for(int j=0;j<edges_for_polygon(i).m;j++){
                     const PAIR<int,bool>& oriented_edge=edges_for_polygon(i)(j);int segment_index=oriented_edge.x;bool segment_flipped_in_mesh=oriented_edge.y;
                     // obtain transform for this polygon
                     int node_1=(segment_flipped_in_mesh?polygon_segment_mesh.elements(segment_index)(2):polygon_segment_mesh.elements(segment_index)(1));
@@ -1108,7 +1108,7 @@ Determine_Duplicate_Tets_And_Duplicate_Particles()
     hash_all_new_uncollapsed_particles.Remove_All();
     // duplicate particles in each tet
     for(int otet=0;otet<regions_per_tet.m;otet++){const VECTOR<int,4>& vertices_for_tet=current_embedding_tetrahedrons(otet);
-        for(int j=1;j<=regions_per_tet(otet).m;j++){
+        for(int j=0;j<regions_per_tet(otet).m;j++){
             HASHTABLE<int> particle_ids_checked;
             new_tets_per_current(otet).Append(++num_new_tets);
             int dup_tet=num_new_tets;const ARRAY<int> cutting_polygons_in_this_region=regions_per_tet(otet)(j);
@@ -1125,7 +1125,7 @@ Determine_Duplicate_Tets_And_Duplicate_Particles()
             // look at all original nodes in this region and create a duplicate copy
             for(int k=0;k<cutting_polygons_in_this_region.m;k++){int polygon_element_index=Cutting_Polygon_To_Element(cutting_polygons_in_this_region(k));
                 const ARRAY<ARRAY<int > >& particles_for_polygon=polygon_mesh.elements(polygon_element_index);
-                for(int p=0;p<particles_for_polygon.m;p++) for(int q=1;q<=particles_for_polygon(p).m;q++){
+                for(int p=0;p<particles_for_polygon.m;p++) for(int q=0;q<particles_for_polygon(p).m;q++){
                     int orig_intersection=particles_for_polygon(p)(q);int particle_id=cutting_particles.Particle_Id_From_Intersection(orig_intersection);
                     if(!particle_ids_checked.Set(particle_id)) continue;
                     // find parents for non-node particles
@@ -1197,7 +1197,7 @@ Duplicate_And_Merge_Elements()
         for(int p=0;p<tet_indices_for_this_face.m;p++) for(int q=p+1;q<=tet_indices_for_this_face.m;q++){
             int tet_index_1=tet_indices_for_this_face(p);int tet_index_2=tet_indices_for_this_face(q);
             // look at each possible pair of regions
-            for(int j=1;j<=regions_per_tet(tet_index_1).m;j++) for(int k=1;k<=regions_per_tet(tet_index_2).m;k++){bool join=false;
+            for(int j=0;j<regions_per_tet(tet_index_1).m;j++) for(int k=0;k<regions_per_tet(tet_index_2).m;k++){bool join=false;
                 const ARRAY<int>& region_1=regions_per_tet(tet_index_1)(j);const ARRAY<int>& region_2=regions_per_tet(tet_index_2)(k);
                 for(int v=0;v<region_1.m;v++){int polygon_element_index_1=Cutting_Polygon_To_Element(region_1(v));
                     int element_opposite=polygon_mesh.Opposite_Oriented_Element(polygon_element_index_1);if(!element_opposite) continue;
@@ -1211,7 +1211,7 @@ Duplicate_And_Merge_Elements()
                     if(verbose) LOG::cout<<"Joining original tets "<<tet_index_1<<" and "<<tet_index_2<<" with copies "<<j<<" and "<<k<<std::endl;}}}}
     // collapse dup particles per original particle
     for(int opar=0;opar<uncollapsed_new_particles_per_all_current_particle_ids.m;opar++){
-        for(int i=1;i<=uncollapsed_new_particles_per_all_current_particle_ids(opar).m;i++) for(int j=i+1;j<=uncollapsed_new_particles_per_all_current_particle_ids(opar).m;j++){
+        for(int i=0;i<uncollapsed_new_particles_per_all_current_particle_ids(opar).m;i++) for(int j=i+1;j<=uncollapsed_new_particles_per_all_current_particle_ids(opar).m;j++){
             int dup_particle_1=uncollapsed_new_particles_per_all_current_particle_ids(opar)(i);int dup_particle_2=uncollapsed_new_particles_per_all_current_particle_ids(opar)(j);
             const ARRAY<int>& parents_1=new_parents_per_new_particle(dup_particle_1);
             const ARRAY<int>& parents_2=new_parents_per_new_particle(dup_particle_2);
@@ -1269,9 +1269,9 @@ Duplicate_And_Merge_Elements()
                     collapsed_dup_particles_2(k)=new_particle_indices(union_vertices.Find(particle_index));
                     assert(collapsed_dup_particles_2(k)>0 && collapsed_dup_particles_2(k)<=new_particles.array_collection->Size());}
                 if(collapsed_dup_particles_1==collapsed_dup_particles_2){create=false;
-                    for(int p=1;p<=regions_per_tet(otet)(i).m;p++){int polygon_element_index=Cutting_Polygon_To_Element(regions_per_tet(otet)(i)(p));
+                    for(int p=0;p<regions_per_tet(otet)(i).m;p++){int polygon_element_index=Cutting_Polygon_To_Element(regions_per_tet(otet)(i)(p));
                         const ARRAY<ARRAY<int> >& polygon_nodes=polygon_mesh.elements(polygon_element_index);
-                        for(int q=0;q<polygon_nodes.m;q++) for(int r=1;r<=polygon_nodes(q).m;r++){
+                        for(int q=0;q<polygon_nodes.m;q++) for(int r=0;r<polygon_nodes(q).m;r++){
                             int original_intersection=polygon_nodes(q)(r);int particle_id=cutting_particles.Particle_Id_From_Intersection(original_intersection);
                             int particle_index=-1;
                             if(!hash_all_new_uncollapsed_particles.Get(PAIR<int,int>(dtet_1,particle_id),particle_index)) continue;
@@ -1296,7 +1296,7 @@ Duplicate_And_Merge_Elements()
             final_parent_weights_per_new_particle.Append(new_parent_weights_per_new_particle(pcdup));}}
     // fix dup tet numbers
     dup_tet_before_to_after_collapse.Remove_All();dup_tet_after_to_before_collapse.Remove_All();int count=0;
-    for(int i=0;i<new_tets_per_current.m;i++) for(int j=1;j<=new_tets_per_current(i).m;j++){int num=++count;
+    for(int i=0;i<new_tets_per_current.m;i++) for(int j=0;j<new_tets_per_current(i).m;j++){int num=++count;
         dup_tet_before_to_after_collapse.Insert(new_tets_per_current(i)(j),num);
         dup_tet_after_to_before_collapse.Insert(num,new_tets_per_current(i)(j));}
 }
@@ -1331,7 +1331,7 @@ Create_Boundary_Surface()
     final_duplicated_boundary_mesh.Set_Number_Nodes(duplicate_particles.array_collection->Size());
     // make duplicate polygons
     for(int otet=0;otet<new_tets_per_current.m;otet++){
-        for(int i=1;i<=regions_per_tet(otet).m;i++){
+        for(int i=0;i<regions_per_tet(otet).m;i++){
             int dtet=new_tets_per_current(otet)(i);
             const ARRAY<int>& cutting_polygons_for_region=regions_per_tet(otet)(i);
             for(int j=0;j<cutting_polygons_for_region.m;j++){
@@ -1345,7 +1345,7 @@ Create_Boundary_Surface()
                 for(int k=0;k<polygon_particles.m;k++){
                     new_polygon_particles.Append(ARRAY<int>());
                     ARRAY<int>& new_polygon=new_polygon_particles.Last();
-                    for(int p=1;p<=polygon_particles(k).m;p++){
+                    for(int p=0;p<polygon_particles(k).m;p++){
                         int original_intersection=polygon_particles(k)(p);int particle_id=cutting_particles.Particle_Id_From_Intersection(original_intersection);
                         int real_dup_particle=-1;
                         if(!hash_all_new_uncollapsed_particles.Get(PAIR<int,int>(dtet,particle_id),real_dup_particle)) PHYSBAM_FATAL_ERROR();
@@ -1381,7 +1381,7 @@ Create_Boundary_Surface()
             fake_polygon.Append(ARRAY<int>());
             ARRAY<int>& fake_loop=fake_polygon.Last();
             fake_loop.Preallocate(polygon_particles(k).m);
-            for(int p=1;p<=polygon_particles(k).m;p++)
+            for(int p=0;p<polygon_particles(k).m;p++)
                 fake_loop.Append(real_particle_per_fake_particle.Find(polygon_particles(k)(p)));}
         ARRAY<VECTOR<int,3> > triangles;
         POLYGONAL_TRIANGULATION<T>::Triangulate_Nonconvex_Nonsimple_Polygon(fake_positions,fake_polygon,triangles);
@@ -1514,7 +1514,7 @@ Add_New_Child_Simplices_And_Create_New_Polygon_Mesh(POLYGON_MESH& new_polygon_me
     for(int otet=0;otet<regions_per_tet.m;otet++){
         const ARRAY<int>& unique_child_simplices=simplices_per_current_tet(otet);
         // for each child simplex in this region, add it as a new simplex
-        for(int region_index=1;region_index<=regions_per_tet(otet).m;region_index++){
+        for(int region_index=0;region_index<regions_per_tet(otet).m;region_index++){
             const ARRAY<int>& cutting_polygons_for_region=regions_per_tet(otet)(region_index);
             int dtet=new_tets_per_current(otet)(region_index);
             int actual_dtet;
@@ -1563,7 +1563,7 @@ Add_New_Child_Simplices_And_Create_New_Polygon_Mesh(POLYGON_MESH& new_polygon_me
                 for(int k=0;k<polygon_particles.m;k++){
                     new_polygon_particles.Append(ARRAY<int>());
                     ARRAY<int>& new_polygon=new_polygon_particles.Last();
-                    for(int p=1;p<=polygon_particles(k).m;p++){
+                    for(int p=0;p<polygon_particles(k).m;p++){
                         int original_intersection=polygon_particles(k)(p),particle_id=cutting_particles.Particle_Id_From_Intersection(original_intersection);
                         assert(cutting_particles.particle_ids_types(particle_id)!=CUTTING_PARTICLES::TET_NODE_ID);
                         int real_dup_particle=-1;
@@ -1599,7 +1599,7 @@ Build_New_Intersection_Registry(POLYGON_MESH& new_polygon_mesh,ARRAY<CUTTING_POL
         int dtet=-1;bool found_dtet=dup_tet_after_to_before_collapse.Get(actual_dtet,dtet);if(!found_dtet) PHYSBAM_FATAL_ERROR();
         bool found=new_child_simplex_to_old_child_simplex.Get(new_child_simplex,old_child_simplex);if(!found) PHYSBAM_FATAL_ERROR();
         ARRAY<ARRAY<int> > particles_on_polygon=new_polygon_mesh.elements(cutting_polygon.polygon_index);
-        for(int i=0;i<particles_on_polygon.m;i++) for(int j=1;j<=particles_on_polygon(i).m;j++){
+        for(int i=0;i<particles_on_polygon.m;i++) for(int j=0;j<particles_on_polygon(i).m;j++){
             int new_particle=particles_on_polygon(i)(j);
             int particle_id=current_particle_id_per_collapsed_new_particle(new_particle);
             assert(cutting_particles.particle_ids_types(particle_id)!=CUTTING_PARTICLES::TET_NODE_ID);
@@ -1946,17 +1946,17 @@ Draw_Polygon(const int simplex,const bool flipped,const ARRAY<ARRAY<VECTOR<int,2
         T hsb=(T)(.3*(i%10)/9);
         LOG::cout<<"% Run "<<i<<std::endl;
         LOG::cout<<" newpath "<<std::endl;
-        for(int j=1;j<=unconnected_polygonal_regions(i).m;j++){
+        for(int j=0;j<unconnected_polygonal_regions(i).m;j++){
             const int p=unconnected_polygonal_regions(i)(j)[1];
             VECTOR<T,2> X1=intersection_registry->Get_Simplex_Weights_Of_Intersection(p,simplex);
             LOG::cout<<"  "<<X1<<(j==1?" moveto ":" lineto ");}
         LOG::cout<<"\n"<<hsb<<" .5 1 sethsbcolor fill \n newpath "<<std::endl;
-        for(int j=1;j<=unconnected_polygonal_regions(i).m;j++){
+        for(int j=0;j<unconnected_polygonal_regions(i).m;j++){
             const int p=unconnected_polygonal_regions(i)(j)[1];
             VECTOR<T,2> X1=intersection_registry->Get_Simplex_Weights_Of_Intersection(p,simplex);
             LOG::cout<<"  "<<X1<<" ("<<p<<") point ";}
         LOG::cout<<"\n newpath "<<std::endl;
-        for(int j=1;j<=unconnected_polygonal_regions(i).m;j++){
+        for(int j=0;j<unconnected_polygonal_regions(i).m;j++){
             const VECTOR<int,2>& p=unconnected_polygonal_regions(i)(j);
             VECTOR<T,2> X1=intersection_registry->Get_Simplex_Weights_Of_Intersection(p[1],simplex);
             VECTOR<T,2> X2=intersection_registry->Get_Simplex_Weights_Of_Intersection(p[2],simplex);

@@ -47,7 +47,7 @@ Extend_Material_Tets_In_Embedding_Tets(const TETRAHEDRALIZED_VOLUME<T>& material
         for(int i=0;i<initial_material_tet_intersections;i++)tet_present.Mark(material_tets_in_embedding_tets(et)(i));
         for(int i=0;i<initial_material_tet_intersections;i++){
             int mt=material_tets_in_embedding_tets(et)(i);
-            for(int j=1;j<=neighbor_tetrahedrons(mt).m;j++){
+            for(int j=0;j<neighbor_tetrahedrons(mt).m;j++){
                 int nmt=neighbor_tetrahedrons(mt)(j);
                 if(!tet_present.Is_Marked_Current(nmt)){material_tets_in_embedding_tets(et).Append(nmt);tet_present.Mark(nmt);}}}
         tet_present.Next_Operation();if(verbose&&et%10000==0)std::cout<<"Processed "<<et<<" tets"<<std::endl;}
@@ -69,7 +69,7 @@ Propagate_Material_To_Empty_Embedding_Tets(const TETRAHEDRALIZED_VOLUME<T>& embe
         if(!empty_tets.m)break;
         for(int i=0;i<empty_tets.m;i++){
             int et=empty_tets(i);
-            for(int j=1;j<=adjacent_tetrahedrons(et).m;j++){
+            for(int j=0;j<adjacent_tetrahedrons(et).m;j++){
                 int aet=adjacent_tetrahedrons(et)(j);
                 if(tet_occupied.Is_Marked_Current(aet))material_tets_in_embedding_tets(et).Append_Unique_Elements(material_tets_in_embedding_tets(aet));}}}
 }
@@ -101,7 +101,7 @@ Compute_Connected_Components_And_Split(const TETRAHEDRALIZED_VOLUME<T>& material
             // Sweep component, adding neighbors as necessary
             for(int i=0;i<current_component.m;i++){
                 int mt=current_component(i);
-                for(int j=1;j<=neighbor_tetrahedrons(mt).m;j++){
+                for(int j=0;j<neighbor_tetrahedrons(mt).m;j++){
                     int nmt=neighbor_tetrahedrons(mt)(j);
                     if(tet_present.Is_Marked_Current(nmt)){
                         current_component.Append(nmt);

@@ -251,7 +251,7 @@ void Initialize_Joint_Between(JOINT<TV>* joint,const RIGID_BODY<TV>& parent,cons
 void Create_Joints_From_Hierarchy(int parent)
 {
     ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
-    for(int i=1;i<=body_motion.bone_hierarchy(parent).m;i++){
+    for(int i=0;i<body_motion.bone_hierarchy(parent).m;i++){
         int child=body_motion.name_to_track_index.Get(body_motion.bone_hierarchy(parent)(i));
         JOINT<TV>* joint=new POINT_JOINT<TV>;
         Initialize_Joint_Between(joint,arb.rigid_body_collection.Rigid_Body(rigid_body_ids(parent)),arb.rigid_body_collection.Rigid_Body(rigid_body_ids(child)),TV(0,1,0));

@@ -338,7 +338,7 @@ void Initialize_Bodies()
         deformable_object->Add_Bending_Elements(deformable_object->triangulated_surface->triangle_mesh);
         Add_To_Fluid_Simulation(*deformable_object,true,true,pressure_force_scale);
     
-        for(int i=1;i<=deformable_object_enslaved_nodes(id).m;i++){
+        for(int i=0;i<deformable_object_enslaved_nodes(id).m;i++){
             std::cout << "SETTING PARTICLES " << deformable_object_enslaved_nodes(id)(i) << " to large mass" << std::endl;
             deformable_object->triangulated_surface->particles.mass(deformable_object_enslaved_nodes(id)(i))=1e30;}
     }
@@ -359,9 +359,9 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY<VECTOR<T,3> >& V,const T time)
 {
     assert(id_number<=deformable_object_enslaved_nodes.m);
     if(example_number==101){
-        if(time<3){for(int i=1;i<=deformable_object_enslaved_nodes(id_number).m;i++) V(deformable_object_enslaved_nodes(id_number)(i))=VECTOR<T,3>();}
+        if(time<3){for(int i=0;i<deformable_object_enslaved_nodes(id_number).m;i++) V(deformable_object_enslaved_nodes(id_number)(i))=VECTOR<T,3>();}
         else{for(int i=0;i<2;i++) V(deformable_object_enslaved_nodes(id_number)(i))=VECTOR<T,3>();}}
-    else{for(int i=1;i<=deformable_object_enslaved_nodes(id_number).m;i++) V(deformable_object_enslaved_nodes(id_number)(i))=VECTOR<T,3>();}
+    else{for(int i=0;i<deformable_object_enslaved_nodes(id_number).m;i++) V(deformable_object_enslaved_nodes(id_number)(i))=VECTOR<T,3>();}
 }
 //#####################################################################
 // Function Update_Time_Varying_Material_Properties

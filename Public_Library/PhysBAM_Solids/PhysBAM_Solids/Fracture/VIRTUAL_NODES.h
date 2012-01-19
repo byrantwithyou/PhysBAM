@@ -32,7 +32,7 @@ public:
     for(int i=0;i<virtual_nodes.m;i++) replicas(virtual_nodes(i).corresponding_real_node).Append(i);}
 
     int Donor_Node(const int recipient,const int real_node) const
-    {if(real_node<=replicas.m) for(int k=1;k<=replicas(real_node).m;k++){
+    {if(real_node<=replicas.m) for(int k=0;k<replicas(real_node).m;k++){
         const VIRTUAL_NODE& virtual_node=virtual_nodes(replicas(real_node)(k));
         if(virtual_node.Is_Received_By(recipient)) return virtual_node.index;}
     return real_node;}

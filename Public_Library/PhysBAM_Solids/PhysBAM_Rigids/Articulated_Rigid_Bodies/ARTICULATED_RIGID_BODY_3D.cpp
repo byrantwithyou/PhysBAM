@@ -111,7 +111,7 @@ Compute_Position_Based_State(const T dt,const T time)
     for(int i=0;i<dynamic_rigid_body_particles.m;i++){int p=dynamic_rigid_body_particles(i);
         RIGID_BODY<TV>& rigid_body=rigid_body_collection.Rigid_Body(p);SYMMETRIC_MATRIX<T,3> I_inverse=rigid_body.World_Space_Inertia_Tensor_Inverse();
         int id=rigid_body.particle_index;
-        for(int i=1;i<=joints_on_rigid_body(id).m;i++) for(int j=i;j<=joints_on_rigid_body(id).m;j++){
+        for(int i=0;i<joints_on_rigid_body(id).m;i++) for(int j=i;j<=joints_on_rigid_body(id).m;j++){
             int joint_index_1=joints_on_rigid_body(id)(i).x,joint_index_2=joints_on_rigid_body(id)(j).x;
 
             // joints that won't take part in global post stabilization are skipped
@@ -432,11 +432,11 @@ Solve_Velocities_for_PD(const T time,const T dt,bool test_system,bool print_matr
                 assert(joint_constrained_dimensions(i)>=3); // assume unconstrained linear directions, constrained angular directions
                 int istart=joint_offset_in_post_stabilization_matrix(i);
                 constrained_delta_relative_joint_velocities.Set_Subvector(istart,delta_relative_twist.linear);
-                for(int ii=1;ii<=joint_constrained_dimensions(i)-3;ii++){
+                for(int ii=0;ii<joint_constrained_dimensions(i)-3;ii++){
                     TV u;joint_angular_constraint_matrix(i).Get_Column(ii,u);constrained_delta_relative_joint_velocities(istart+ii+2)=TV::Dot_Product(u,delta_relative_twist.angular);}}
             if(joint_muscle_control_dimensions(i)){ // assume muscle control only affects angular dof's
                 int istart=joint_offset_in_muscle_control_matrix(i);
-                for(int ii=1;ii<=joint_muscle_control_dimensions(i);ii++){
+                for(int ii=0;ii<joint_muscle_control_dimensions(i);ii++){
                     TV u;joint_angular_muscle_control_matrix(i).Get_Column(ii,u);muscle_controlled_delta_relative_joint_velocities(istart+ii-1)=TV::Dot_Product(u,delta_relative_twist.angular);}}}
 
         if(!use_muscle_actuators || !muscle_list->muscles.m){ // With no muscles we can solve the system directly
@@ -465,7 +465,7 @@ Solve_Velocities_for_PD(const T time,const T dt,bool test_system,bool print_matr
             assert(joint_constrained_dimensions(i)>=3); // unconstrained linear directions, constrained angular directions
             int istart=joint_offset_in_post_stabilization_matrix(i);
             TV impulse;joint_constraint_impulses.Get_Subvector(istart,impulse);
-            TV angular_impulse;for(int ii=1;ii<=joint_constrained_dimensions(i)-3;ii++){
+            TV angular_impulse;for(int ii=0;ii<joint_constrained_dimensions(i)-3;ii++){
                 TV u;joint_angular_constraint_matrix(i).Get_Column(ii,u);angular_impulse+=joint_constraint_impulses(istart+ii+2)*u;}
             if(joint_mesh.joints(i)->impulse_accumulator) joint_mesh.joints(i)->impulse_accumulator->Add_Impulse(joint_locations(i),TWIST<TV>(impulse,angular_impulse));
             RIGID_BODY<TV>::Apply_Impulse(*Parent(joint_mesh.joints(i)->id_number),*Child(joint_mesh.joints(i)->id_number),joint_locations(i),impulse,angular_impulse);}}

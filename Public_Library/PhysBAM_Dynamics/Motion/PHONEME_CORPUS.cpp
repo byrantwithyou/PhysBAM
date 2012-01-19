@@ -248,7 +248,7 @@ Brute_Force_Phoneme_Arrangement_Helper(const ARRAY<ARRAY<PHONEME_SEGMENT<T>*> >&
     const T stiffness=(T)1.0;
     GRID<VECTOR<T,1> > sampling_grid(1+(int)(phoneme_arrangement.valid_segment->Size()*frame_rate),*phoneme_arrangement.valid_segment);
     bool better=false;
-    for(int i=1;i<=phoneme_candidates(position).m;i++){
+    for(int i=0;i<phoneme_candidates(position).m;i++){
         phoneme_arrangement.list(position).Set_Sample(*phoneme_candidates(position)(i)->phoneme_sample);
         phoneme_arrangement.list(position).phoneme_sample_name=phoneme_candidates(position)(i)->phoneme_sample_name;
         T result;
@@ -379,7 +379,7 @@ Produce_Phoneme_Arrangement(const ARRAY<std::string>& phonemes,const ARRAY<T>& s
         for(int i=0;i<phonemes.m;i++){
             int best_index=indices(i);
             T result=Phoneme_Metric_Helper(phoneme_candidates,indices,starting_times,lengths,leading_times,trailing_times);
-            for(int j=1;j<=phoneme_candidates(i).m;j++){
+            for(int j=0;j<phoneme_candidates(i).m;j++){
                 if(j==indices(i)) continue;
                 ARRAY<int> local=indices;
                 local(i)=j;

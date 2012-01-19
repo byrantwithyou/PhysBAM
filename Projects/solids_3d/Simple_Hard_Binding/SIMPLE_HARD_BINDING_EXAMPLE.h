@@ -275,7 +275,7 @@ void Delete_Subsamples(const int triangle)
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
     
     // only need to delete the particles
-    for(int i=1;i<=triangle_free_particles(triangle).m;i++){
+    for(int i=0;i<triangle_free_particles(triangle).m;i++){
         int soft_bound_particle=triangle_free_particles(triangle)(i);
         int hard_bound_particle=soft_bindings.Parent(soft_bound_particle);
         particles.array_collection->Add_To_Deletion_List(soft_bound_particle);
@@ -291,7 +291,7 @@ void Persist_Subsamples(const int triangle,ARRAY<BINDING<TV>*>& new_binding_list
     BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
     
-    for(int i=1;i<=triangle_free_particles(triangle).m;i++){
+    for(int i=0;i<triangle_free_particles(triangle).m;i++){
         int soft_bound_particle=triangle_free_particles(triangle)(i);
         // save soft binding
         const VECTOR<int,2>& soft_binding=soft_bindings.bindings(soft_bindings.Soft_Binding(soft_bound_particle));

@@ -164,7 +164,7 @@ Reinitialize(bool force)
             scale/=ui_scale;
             LOG::cout<<"Scaling by "<<scale<<std::endl;
             ui_scale=body_motion.trajectories(id_to_index.Get(id))(frame+1).length/body_motion.base_position(id_to_index.Get(id)).length;
-            for(int i=1;i<=opengl_component_rigid_body_collection.rigid_body_collection.Rigid_Body(id).structures.m;i++){
+            for(int i=0;i<opengl_component_rigid_body_collection.rigid_body_collection.Rigid_Body(id).structures.m;i++){
                 if(rigid_filename=="cyllink"){
                     RIGID_BODY<TV> *rigid_body=&opengl_component_rigid_body_collection.rigid_body_collection.Rigid_Body(id);
                     if(ANALYTIC_IMPLICIT_OBJECT<CYLINDER<T> >* analytic_object=dynamic_cast<ANALYTIC_IMPLICIT_OBJECT<CYLINDER<T> >*>(rigid_body->structures(i))){
