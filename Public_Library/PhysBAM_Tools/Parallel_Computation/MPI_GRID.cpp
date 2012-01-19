@@ -447,9 +447,9 @@ Find_Boundary_Regions(ARRAY<RANGE<TV_INT> >& regions,const RANGE<TV_INT>& sentin
 template<class T> RANGE<VECTOR<int,1> >
 Find_Region_Box_Helper(const ARRAY<int,VECTOR<int,1> >& process_ranks,const GRID<VECTOR<T,1> >& other_grid,const VECTOR<int,1>& coordinates,const RANGE<VECTOR<int,1> >& sentinels,const int band)
 {
-    RANGE<VECTOR<int,1> > box=RANGE<VECTOR<int,1> >(1,other_grid.numbers_of_cells.x)+sentinels;
-    if(process_ranks(GRID<VECTOR<T,1> >::Node_Neighbor(coordinates,1))<0) box.min_corner.x-=band;
-    if(process_ranks(GRID<VECTOR<T,1> >::Node_Neighbor(coordinates,2))<0) box.max_corner.x+=band;
+    RANGE<VECTOR<int,1> > box=RANGE<VECTOR<int,1> >(0,other_grid.numbers_of_cells.x)+sentinels;
+    if(process_ranks(GRID<VECTOR<T,1> >::Node_Neighbor(coordinates,0))<0) box.min_corner.x-=band;
+    if(process_ranks(GRID<VECTOR<T,1> >::Node_Neighbor(coordinates,1))<0) box.max_corner.x+=band;
     return box;
 }
 //#####################################################################
@@ -458,11 +458,11 @@ Find_Region_Box_Helper(const ARRAY<int,VECTOR<int,1> >& process_ranks,const GRID
 template<class T> RANGE<VECTOR<int,2> >
 Find_Region_Box_Helper(const ARRAY<int,VECTOR<int,2> >& process_ranks,const GRID<VECTOR<T,2> >& other_grid,const VECTOR<int,2>& coordinates,const RANGE<VECTOR<int,2> >& sentinels,const int band)
 {
-    RANGE<VECTOR<int,2> > box=RANGE<VECTOR<int,2> >(1,other_grid.numbers_of_cells.x,1,other_grid.numbers_of_cells.y)+sentinels;
-    if(process_ranks(GRID<VECTOR<T,2> >::Node_Neighbor(coordinates,1))<0) box.min_corner.x-=band;
-    if(process_ranks(GRID<VECTOR<T,2> >::Node_Neighbor(coordinates,2))<0) box.max_corner.x+=band;
-    if(process_ranks(GRID<VECTOR<T,2> >::Node_Neighbor(coordinates,3))<0) box.min_corner.y-=band;
-    if(process_ranks(GRID<VECTOR<T,2> >::Node_Neighbor(coordinates,4))<0) box.max_corner.y+=band;
+    RANGE<VECTOR<int,2> > box=RANGE<VECTOR<int,2> >(0,other_grid.numbers_of_cells.x,0,other_grid.numbers_of_cells.y)+sentinels;
+    if(process_ranks(GRID<VECTOR<T,2> >::Node_Neighbor(coordinates,0))<0) box.min_corner.x-=band;
+    if(process_ranks(GRID<VECTOR<T,2> >::Node_Neighbor(coordinates,1))<0) box.max_corner.x+=band;
+    if(process_ranks(GRID<VECTOR<T,2> >::Node_Neighbor(coordinates,2))<0) box.min_corner.y-=band;
+    if(process_ranks(GRID<VECTOR<T,2> >::Node_Neighbor(coordinates,3))<0) box.max_corner.y+=band;
     return box;
 }
 //#####################################################################
@@ -471,13 +471,13 @@ Find_Region_Box_Helper(const ARRAY<int,VECTOR<int,2> >& process_ranks,const GRID
 template<class T> RANGE<VECTOR<int,3> >
 Find_Region_Box_Helper(const ARRAY<int,VECTOR<int,3> >& process_ranks,const GRID<VECTOR<T,3> >& other_grid,const VECTOR<int,3>& coordinates,const RANGE<VECTOR<int,3> >& sentinels,const int band)
 {
-    RANGE<VECTOR<int,3> > box=RANGE<VECTOR<int,3> >(1,other_grid.numbers_of_cells.x,1,other_grid.numbers_of_cells.y,1,other_grid.numbers_of_cells.z)+sentinels;
-    if(process_ranks(GRID<VECTOR<T,3> >::Node_Neighbor(coordinates,1))<0) box.min_corner.x-=band;
-    if(process_ranks(GRID<VECTOR<T,3> >::Node_Neighbor(coordinates,2))<0) box.max_corner.x+=band;
-    if(process_ranks(GRID<VECTOR<T,3> >::Node_Neighbor(coordinates,3))<0) box.min_corner.y-=band;
-    if(process_ranks(GRID<VECTOR<T,3> >::Node_Neighbor(coordinates,4))<0) box.max_corner.y+=band;
-    if(process_ranks(GRID<VECTOR<T,3> >::Node_Neighbor(coordinates,5))<0) box.min_corner.z-=band;
-    if(process_ranks(GRID<VECTOR<T,3> >::Node_Neighbor(coordinates,6))<0) box.max_corner.z+=band;
+    RANGE<VECTOR<int,3> > box=RANGE<VECTOR<int,3> >(0,other_grid.numbers_of_cells.x,0,other_grid.numbers_of_cells.y,0,other_grid.numbers_of_cells.z)+sentinels;
+    if(process_ranks(GRID<VECTOR<T,3> >::Node_Neighbor(coordinates,0))<0) box.min_corner.x-=band;
+    if(process_ranks(GRID<VECTOR<T,3> >::Node_Neighbor(coordinates,1))<0) box.max_corner.x+=band;
+    if(process_ranks(GRID<VECTOR<T,3> >::Node_Neighbor(coordinates,2))<0) box.min_corner.y-=band;
+    if(process_ranks(GRID<VECTOR<T,3> >::Node_Neighbor(coordinates,3))<0) box.max_corner.y+=band;
+    if(process_ranks(GRID<VECTOR<T,3> >::Node_Neighbor(coordinates,4))<0) box.min_corner.z-=band;
+    if(process_ranks(GRID<VECTOR<T,3> >::Node_Neighbor(coordinates,5))<0) box.max_corner.z+=band;
     return box;
 }
 //#####################################################################
