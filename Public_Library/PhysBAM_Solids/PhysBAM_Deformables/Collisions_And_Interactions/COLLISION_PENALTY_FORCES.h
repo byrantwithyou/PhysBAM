@@ -98,7 +98,7 @@ public:
     void Update_Forces_And_Derivatives() // Currently works only with a single fragment
     {for(int p=0;p<check_collision.m;p++){
         int index=check_collision(p);collision_force(p)=TV();collision_force_derivative(p)=T_SYMMETRIC_MATRIX();
-        for(COLLISION_GEOMETRY_ID r(1);r<=collision_body_list->bodies.m;r++) if(collision_body_list->Is_Active(r)){
+        for(COLLISION_GEOMETRY_ID r(0);r<collision_body_list->bodies.m;r++) if(collision_body_list->Is_Active(r)){
             COLLISION_GEOMETRY<TV>& collision_body=*collision_body_list->bodies(r);
             if(!skip_collision_body(r) && (perform_self_collision || collision_body.collision_geometry_id!=collision_body_list_id)){
                 int collision_body_particle_index=0;if(collision_body_list_id==collision_body.collision_geometry_id) collision_body_particle_index=index;

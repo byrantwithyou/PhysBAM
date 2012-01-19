@@ -45,7 +45,7 @@ Push_Surface_Outside_Of_Collision_Bodies(const T push_distance,const int max_num
             GEOMETRY_PARTICLES<TV>& particles=structure.triangulated_surface->particles;
             ARRAY_VIEW<TV> X(particles.X),V(particles.V);
             V=X;
-            for(int p=0;p<particles.array_collection->Size();p++) for(COLLISION_GEOMETRY_ID r(1);r<=collision_body_list.bodies.m;r++)
+            for(int p=0;p<particles.array_collection->Size();p++) for(COLLISION_GEOMETRY_ID r(0);r<collision_body_list.bodies.m;r++)
                 if(collision_body_list.Is_Active(r) && collision_body_list.bodies(r)->Implicit_Geometry_Lazy_Inside_And_Value(X(p),depth,push_distance)){
                     depth=push_distance-depth+collision_tolerance;interactions++;
                     COLLISION_BODY_HELPER<TV>::Adjust_Point_For_Collision(*collision_body_list.bodies(r),X(p),depth);}}

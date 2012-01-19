@@ -692,7 +692,7 @@ void Clear_Inside_Solid_Soot()
     T_GRID& grid=*fluids_parameters.grid;
     GRID_BASED_COLLISION_GEOMETRY_UNIFORM<T_GRID>& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
 
-    for(COLLISION_GEOMETRY_ID id(1);id<=collision_bodies_affecting_fluid.collision_geometry_collection.bodies.m;id++)
+    for(COLLISION_GEOMETRY_ID id(0);id<collision_bodies_affecting_fluid.collision_geometry_collection.bodies.m;id++)
         if(collision_bodies_affecting_fluid.collision_geometry_collection.Is_Active(id)){
             COLLISION_GEOMETRY<TV>& collision_body=*(collision_bodies_affecting_fluid.collision_geometry_collection.bodies(id));
             collision_body.Update_Bounding_Box();

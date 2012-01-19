@@ -109,11 +109,11 @@ Print() const
     // Flat print
     for(int i=0;i<pressure.n;i++)
         LOG::cout<<pressure(i)<<" ";
-    for(COUPLING_CONSTRAINT_ID i(1);i<=lambda.Size();i++)
+    for(COUPLING_CONSTRAINT_ID i(0);i<lambda.Size();i++)
         LOG::cout<<lambda(i)<<" ";
-    for(FORCE_AGGREGATE_ID i(1);i<=force_coefficients.Size();i++)
+    for(FORCE_AGGREGATE_ID i(0);i<force_coefficients.Size();i++)
         LOG::cout<<force_coefficients(i)<<" ";
-    for(VISCOUS_FORCE_ID i(1);i<=viscous_force_coefficients.Size();i++)
+    for(VISCOUS_FORCE_ID i(0);i<viscous_force_coefficients.Size();i++)
         LOG::cout<<viscous_force_coefficients(i)<<" ";
 }
 //#####################################################################

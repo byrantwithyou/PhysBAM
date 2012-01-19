@@ -226,7 +226,7 @@ Get_Rigid_And_Tetrahedron_Collision_Bodies()
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     tetrahedron_collision_bodies.Remove_All();rigid_collision_bodies.Remove_All();
-    for(COLLISION_GEOMETRY_ID i(1);i<=deformable_body_collection.collisions.collision_body_list.bodies.m;i++) if(deformable_body_collection.collisions.collision_body_list.Is_Active(i)){
+    for(COLLISION_GEOMETRY_ID i(0);i<deformable_body_collection.collisions.collision_body_list.bodies.m;i++) if(deformable_body_collection.collisions.collision_body_list.Is_Active(i)){
         COLLISION_GEOMETRY<TV>* collision_body=deformable_body_collection.collisions.collision_body_list.bodies(i);
         if(dynamic_cast<TETRAHEDRON_COLLISION_BODY<T>*>(collision_body)) tetrahedron_collision_bodies.Append(collision_body);
         else if(RIGID_COLLISION_GEOMETRY<TV>* body=dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>*>(collision_body))
@@ -393,7 +393,7 @@ Add_Elastic_Collisions(const T dt,const T time,ARRAY<ROTATION<TV> >& rigid_rotat
         // TODO: support use_protectors and disable_multiple_levelset_collisions
         if(solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions && rigid_collision_bodies.m){
             deformable_body_collection.collisions.Compute_Candidate_Nodes_For_Collision_Body_Collisions(rigid_collision_bodies);
-            for(COLLISION_GEOMETRY_ID collision_body_id(1);collision_body_id<=rigid_collision_bodies.m;collision_body_id++){
+            for(COLLISION_GEOMETRY_ID collision_body_id(0);collision_body_id<rigid_collision_bodies.m;collision_body_id++){
                 RIGID_BODY<TV>& rigid_body=dynamic_cast<RIGID_BODY<TV>&>(dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>&>(*rigid_collision_bodies(collision_body_id)).rigid_geometry);
                 for(int j=0;j<deformable_body_collection.collisions.collision_body_candidate_nodes(collision_body_id).m;j++){
                     int k=deformable_body_collection.collisions.collision_body_candidate_nodes(collision_body_id)(j);
@@ -1058,7 +1058,7 @@ template<class TV,class T_BODY> void Compute_Particle_Candidates_Fill_Hash(HASHT
     const ARRAY<COLLISION_GEOMETRY<TV>*,COLLISION_GEOMETRY_ID>& collision_bodies,const ARRAY<ARRAY<int>,COLLISION_GEOMETRY_ID>& collision_body_candidate_nodes)
 {
     particle_collision_candidates.Remove_All();
-    for(COLLISION_GEOMETRY_ID body(1);body<=collision_bodies.m;body++) if(collision_bodies(body))
+    for(COLLISION_GEOMETRY_ID body(0);body<collision_bodies.m;body++) if(collision_bodies(body))
         for(int j=0;j<collision_body_candidate_nodes(collision_bodies(body)->collision_geometry_id).m;j++){int k=collision_body_candidate_nodes(body)(j);
             particle_collision_candidates.Get_Or_Insert(k).Append(dynamic_cast<T_BODY*>(collision_bodies(body)));}
 }

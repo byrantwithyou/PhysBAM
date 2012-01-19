@@ -49,7 +49,7 @@ template<class T_GRID> void GRID_BASED_COLLISION_GEOMETRY<T_GRID>::
 Rasterize_Objects()
 {
     objects_in_cell.Reset(grid,number_of_ghost_cells);
-    for(COLLISION_GEOMETRY_ID i(1);i<=collision_geometry_collection.bodies.m;i++)
+    for(COLLISION_GEOMETRY_ID i(0);i<collision_geometry_collection.bodies.m;i++)
         if(collision_geometry_collection.bodies(i) && collision_geometry_collection.Is_Active(i) && collision_geometry_collection.bodies(i)->active)
             RASTERIZATION::Rasterize_Object(*collision_geometry_collection.bodies(i),grid,objects_in_cell,i);
 }
@@ -60,7 +60,7 @@ template<class T_GRID> bool GRID_BASED_COLLISION_GEOMETRY<T_GRID>::
 Earliest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,T_WEIGHTS& weights,COLLISION_GEOMETRY_ID& body_id,int& simplex_id,const ARRAY<COLLISION_GEOMETRY_ID>* objects) const
 {
     T min_time=FLT_MAX;bool collision=false;T current_hit_time;T_WEIGHTS current_weights;int current_simplex_id;
-    if(!objects){for(COLLISION_GEOMETRY_ID i(1);i<=collision_geometry_collection.bodies.m;i++) if(Is_Active(i) && collision_geometry_collection.bodies(i)->active && 
+    if(!objects){for(COLLISION_GEOMETRY_ID i(0);i<collision_geometry_collection.bodies.m;i++) if(Is_Active(i) && collision_geometry_collection.bodies(i)->active && 
         collision_geometry_collection.bodies(i)->Earliest_Simplex_Crossover(start_X,end_X,dt,current_hit_time,current_weights,current_simplex_id) && current_hit_time < min_time){
             min_time=hit_time=current_hit_time;weights=current_weights;body_id=i;simplex_id=current_simplex_id;collision=true;}}
     else for(int k=0;k<objects->m;k++){COLLISION_GEOMETRY_ID i=(*objects)(k);if(Is_Active(i) && collision_geometry_collection.bodies(i)->active && 
@@ -90,7 +90,7 @@ Latest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_tim
 {
     returned_collision_type=POINT_SIMPLEX_NO_COLLISION;POINT_SIMPLEX_COLLISION_TYPE collision_type;
     T max_time=-FLT_MAX;bool collision=false;T current_hit_time;T_WEIGHTS current_weights;int current_simplex_id;
-    if(!objects){for(COLLISION_GEOMETRY_ID i(1);i<=collision_geometry_collection.bodies.m;i++) if(Is_Active(i) && collision_geometry_collection.bodies(i)->active && 
+    if(!objects){for(COLLISION_GEOMETRY_ID i(0);i<collision_geometry_collection.bodies.m;i++) if(Is_Active(i) && collision_geometry_collection.bodies(i)->active && 
         collision_geometry_collection.bodies(i)->Latest_Simplex_Crossover(start_X,end_X,dt,current_hit_time,current_weights,current_simplex_id,collision_type) && current_hit_time > max_time){
             max_time=hit_time=current_hit_time;weights=current_weights;body_id=i;simplex_id=current_simplex_id;collision=true;
             returned_collision_type=collision_type;}}
@@ -106,7 +106,7 @@ Latest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_tim
 template<class T_GRID> bool GRID_BASED_COLLISION_GEOMETRY<T_GRID>::
 Any_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,const ARRAY<COLLISION_GEOMETRY_ID>* objects) const
 {
-    if(!objects){for(COLLISION_GEOMETRY_ID i(1);i<=collision_geometry_collection.bodies.m;i++) if(Is_Active(i) && collision_geometry_collection.bodies(i)->active && collision_geometry_collection.bodies(i)->Any_Simplex_Crossover(start_X,end_X,dt)) return true;}
+    if(!objects){for(COLLISION_GEOMETRY_ID i(0);i<collision_geometry_collection.bodies.m;i++) if(Is_Active(i) && collision_geometry_collection.bodies(i)->active && collision_geometry_collection.bodies(i)->Any_Simplex_Crossover(start_X,end_X,dt)) return true;}
     else for(int k=0;k<objects->m;k++){COLLISION_GEOMETRY_ID i=(*objects)(k);if(Is_Active(i) && collision_geometry_collection.bodies(i)->active && collision_geometry_collection.bodies(i)->Any_Simplex_Crossover(start_X,end_X,dt)) return true;}
     return false;
 }
@@ -116,7 +116,7 @@ Any_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,const ARRAY<C
 template<class T_GRID> void GRID_BASED_COLLISION_GEOMETRY<T_GRID>::
 Update_Intersection_Acceleration_Structures(const bool use_swept_simplex_hierarchy,const int state1,const int state2)
 {
-    for(COLLISION_GEOMETRY_ID i(1);i<=collision_geometry_collection.bodies.m;i++) if(Is_Active(i)) collision_geometry_collection.bodies(i)->Update_Intersection_Acceleration_Structures(use_swept_simplex_hierarchy,state1,state2);
+    for(COLLISION_GEOMETRY_ID i(0);i<collision_geometry_collection.bodies.m;i++) if(Is_Active(i)) collision_geometry_collection.bodies(i)->Update_Intersection_Acceleration_Structures(use_swept_simplex_hierarchy,state1,state2);
 }
 //##################################################################### 
 // Function Get_Body_Penetration
@@ -132,7 +132,7 @@ Get_Body_Penetration(const TV& start_X,const TV& end_X,const T contour_value,con
              current_body_velocity) && current_hit_time<hit_time){
              body_id=i;hit_time=current_hit_time;
              simplex_id=current_simplex_id;start_phi=current_start_phi;end_phi=current_end_phi;end_body_normal=current_end_body_normal;body_velocity=current_body_velocity;}}
-    else for(COLLISION_GEOMETRY_ID i(1);i<=collision_geometry_collection.bodies.Size();i++) 
+    else for(COLLISION_GEOMETRY_ID i(0);i<collision_geometry_collection.bodies.Size();i++) 
         if(Is_Active(i) && collision_geometry_collection.bodies(i)->Get_Body_Penetration(start_X,end_X,contour_value,dt,current_hit_time,current_simplex_id,current_start_phi,current_end_phi,current_end_body_normal,
                 current_body_velocity) && current_hit_time<hit_time){
             body_id=i;hit_time=current_hit_time;
@@ -148,7 +148,7 @@ Push_Out_Point(TV& X,const T collision_distance,const bool check_particle_crosso
     T distance=FLT_MAX,current_distance;TV X_old=X;
     if(objects) for(int k=0;k<objects->m;k++){COLLISION_GEOMETRY_ID i=(*objects)(k);TV current_X=X_old;
         if(collision_geometry_collection.bodies(i)->Push_Out_Point(current_X,collision_distance,current_distance) && current_distance<distance){X=current_X;distance=current_distance;}}
-    else for(COLLISION_GEOMETRY_ID i(1);i<=collision_geometry_collection.bodies.Size();i++){TV current_X=X_old;
+    else for(COLLISION_GEOMETRY_ID i(0);i<collision_geometry_collection.bodies.Size();i++){TV current_X=X_old;
         if(Is_Active(i) && collision_geometry_collection.bodies(i)->Push_Out_Point(current_X,collision_distance,current_distance) && current_distance<distance){X=current_X;distance=current_distance;}}
     if(distance<FLT_MAX){COLLISION_GEOMETRY_ID body_id;int simplex_id;TV intersection_point;
         if(check_particle_crossover) particle_crossover=collision_geometry_collection.Intersection_Between_Points(X_old,X,body_id,simplex_id,intersection_point,objects);
@@ -178,7 +178,7 @@ Swept_Occupied_Block(const T_BLOCK& block) const
 template<class T_GRID> void GRID_BASED_COLLISION_GEOMETRY<T_GRID>::
 Read_State(TYPED_ISTREAM& input,const int state_index)
 {
-    for(COLLISION_GEOMETRY_ID i(1);i<=collision_geometry_collection.bodies.m;i++) if(Is_Active(i)) collision_geometry_collection.bodies(i)->Read_State(input,state_index);
+    for(COLLISION_GEOMETRY_ID i(0);i<collision_geometry_collection.bodies.m;i++) if(Is_Active(i)) collision_geometry_collection.bodies(i)->Read_State(input,state_index);
 }
 //##################################################################### 
 // Function Write_State
@@ -186,7 +186,7 @@ Read_State(TYPED_ISTREAM& input,const int state_index)
 template<class T_GRID> void GRID_BASED_COLLISION_GEOMETRY<T_GRID>::
 Write_State(TYPED_OSTREAM& output,const int state_index) const
 {
-    for(COLLISION_GEOMETRY_ID i(1);i<=collision_geometry_collection.bodies.m;i++) if(Is_Active(i)) collision_geometry_collection.bodies(i)->Write_State(output,state_index);
+    for(COLLISION_GEOMETRY_ID i(0);i<collision_geometry_collection.bodies.m;i++) if(Is_Active(i)) collision_geometry_collection.bodies(i)->Write_State(output,state_index);
 }
 #endif
 //#####################################################################

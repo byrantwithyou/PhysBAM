@@ -329,11 +329,11 @@ void Preprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE
 
     // the minimum distance of each particle to a collision object
     ARRAY<ARRAY<T>,COLLISION_GEOMETRY_ID> particle_distances(collision_body_list.Size());
-    for(COLLISION_GEOMETRY_ID i(1);i<=particle_distances.Size();i++){
+    for(COLLISION_GEOMETRY_ID i(0);i<particle_distances.Size();i++){
         particle_distances(i).Resize(particles.array_collection->Size());
         INDIRECT_ARRAY<ARRAY<T>,ARRAY<int>&> subset=particle_distances(i).Subset(surface_particles);subset.Fill((T)FLT_MAX);}
     for(int i=0;i<surface_particles.m;i++){int p=surface_particles(i);
-        for(COLLISION_GEOMETRY_ID body(1);body<=collision_body_list.Size();body++)
+        for(COLLISION_GEOMETRY_ID body(0);body<collision_body_list.Size();body++)
             particle_distances(body)(p)=PhysBAM::min(particle_distances(body)(p),collision_body_list(body).Implicit_Geometry_Extended_Value(particles.X(p)));}
 
     // iterate over surface elements

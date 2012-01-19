@@ -114,7 +114,7 @@ Compute(const int ghost_cells)
 template<class TV> void MATRIX_SOLID_INTERPOLATION<TV>::
 Times_Add(const GENERALIZED_VELOCITY<TV>& solids,ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints) const
 {
-    for(COUPLING_CONSTRAINT_ID i(1);i<=rows.m;i++){
+    for(COUPLING_CONSTRAINT_ID i(0);i<rows.m;i++){
         const ARRAY<DEFORMABLE_WEIGHT>& deformable_weights=rows(i).deformable_weights;
         const ARRAY<RIGID_WEIGHT>& rigid_weights=rows(i).rigid_weights;
         const int axis=rows(i).axis;
@@ -133,7 +133,7 @@ Times_Add(const GENERALIZED_VELOCITY<TV>& solids,ARRAY<T,COUPLING_CONSTRAINT_ID>
 template<class TV> void MATRIX_SOLID_INTERPOLATION<TV>::
 Transpose_Times_Add(const ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints,GENERALIZED_VELOCITY<TV>& solids) const
 {
-    for(COUPLING_CONSTRAINT_ID i(1);i<=rows.m;i++){
+    for(COUPLING_CONSTRAINT_ID i(0);i<rows.m;i++){
         const ARRAY<DEFORMABLE_WEIGHT>& deformable_weights=rows(i).deformable_weights;
         const ARRAY<RIGID_WEIGHT>& rigid_weights=rows(i).rigid_weights;
         const int axis=rows(i).axis;
@@ -158,7 +158,7 @@ Print_Each_Matrix(int n,GENERALIZED_VELOCITY<TV>& G) const
     ARRAY<int> reverse_map_rigid(G.rigid_V.array.Size());
     reverse_map_rigid.Subset(G.rigid_V.indices)=IDENTITY_ARRAY<>(G.rigid_V.Size());
 
-    for(COUPLING_CONSTRAINT_ID i(1);i<=rows.m;i++){
+    for(COUPLING_CONSTRAINT_ID i(0);i<rows.m;i++){
         const ARRAY<DEFORMABLE_WEIGHT>& deformable_weights=rows(i).deformable_weights;
         const ARRAY<RIGID_WEIGHT>& rigid_weights=rows(i).rigid_weights;
         const int axis=rows(i).axis;
@@ -180,7 +180,7 @@ Print_Each_Matrix(int n,GENERALIZED_VELOCITY<TV>& G) const
 template<class TV> void MATRIX_SOLID_INTERPOLATION<TV>::
 Add_Diagonal(ARRAY<T,COUPLING_CONSTRAINT_ID>& diagonal,const GENERALIZED_MASS<TV>& solid_mass) const
 {
-    for(COUPLING_CONSTRAINT_ID i(1);i<=rows.m;i++){
+    for(COUPLING_CONSTRAINT_ID i(0);i<rows.m;i++){
         const ARRAY<DEFORMABLE_WEIGHT>& deformable_weights=rows(i).deformable_weights;
         const ARRAY<RIGID_WEIGHT>& rigid_weights=rows(i).rigid_weights;
         T diag=0;
@@ -203,7 +203,7 @@ Add_Raw_Matrix(ARRAY<TRIPLE<int,int,T> >& data) const
     ARRAY<int> reverse_map_rigid(this->rigid_V_size);
     reverse_map_rigid.Subset(*this->rigid_V_indices)=IDENTITY_ARRAY<>(this->rigid_V_indices->m);
 
-    for(COUPLING_CONSTRAINT_ID i(1);i<=rows.m;i++){
+    for(COUPLING_CONSTRAINT_ID i(0);i<rows.m;i++){
         const ARRAY<DEFORMABLE_WEIGHT>& deformable_weights=rows(i).deformable_weights;
         const ARRAY<RIGID_WEIGHT>& rigid_weights=rows(i).rigid_weights;
         const int axis=rows(i).axis;

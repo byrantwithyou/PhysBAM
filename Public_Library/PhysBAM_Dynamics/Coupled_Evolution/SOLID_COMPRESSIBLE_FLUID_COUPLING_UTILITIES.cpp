@@ -190,7 +190,7 @@ Compute_Phi_Solids(const int number_of_ghost_cells)
     outside_fluid.Fill(false);
     T_FACE_ARRAYS_BOOL kinematic_faces(euler.grid.Domain_Indices(1));kinematic_faces.Fill(false);
 
-    for(COLLISION_GEOMETRY_ID id(1);id<=collision_bodies_affecting_fluid->collision_geometry_collection.bodies.m;id++)
+    for(COLLISION_GEOMETRY_ID id(0);id<collision_bodies_affecting_fluid->collision_geometry_collection.bodies.m;id++)
         if(collision_bodies_affecting_fluid->collision_geometry_collection.Is_Active(id)){
             COLLISION_GEOMETRY<TV>& collision_body=*(collision_bodies_affecting_fluid->collision_geometry_collection.bodies(id));
             T collision_thickness_over_two=(T).5*collision_bodies_affecting_fluid->collision_thickness;
@@ -334,7 +334,7 @@ Initialize_Collision_Data()
     CUT_CELL_COMPUTATIONS::Compute_Cut_Geometries(euler.grid,1,*collision_bodies_affecting_fluid,cut_cells_np1);
 
     psi_np1.Fill(true);
-    for(COLLISION_GEOMETRY_ID id(1);id<=collision_bodies_affecting_fluid->collision_geometry_collection.bodies.m;id++)
+    for(COLLISION_GEOMETRY_ID id(0);id<collision_bodies_affecting_fluid->collision_geometry_collection.bodies.m;id++)
         if(collision_bodies_affecting_fluid->collision_geometry_collection.Is_Active(id)){
             COLLISION_GEOMETRY<TV>& collision_body=*(collision_bodies_affecting_fluid->collision_geometry_collection.bodies(id));
             T collision_thickness_over_two=(T).5*collision_bodies_affecting_fluid->collision_thickness;
@@ -375,7 +375,7 @@ Update_Np1_Collision_Data(const T dt)
     CUT_CELL_COMPUTATIONS::Compute_Cut_Geometries(euler.grid,1,*collision_bodies_affecting_fluid,cut_cells_np1);
 
     T_ARRAYS_BOOL::Put(psi_np1,psi_n); psi_np1.Fill(true);
-    for(COLLISION_GEOMETRY_ID id(1);id<=collision_bodies_affecting_fluid->collision_geometry_collection.bodies.m;id++)
+    for(COLLISION_GEOMETRY_ID id(0);id<collision_bodies_affecting_fluid->collision_geometry_collection.bodies.m;id++)
         if(collision_bodies_affecting_fluid->collision_geometry_collection.Is_Active(id)){
             COLLISION_GEOMETRY<TV>& collision_body=*(collision_bodies_affecting_fluid->collision_geometry_collection.bodies(id));
             T collision_thickness_over_two=(T).5*collision_bodies_affecting_fluid->collision_thickness;
@@ -399,7 +399,7 @@ Update_Np1_Collision_Data(const T dt)
 
     uncovered_cells.Fill(false);
     collision_bodies_affecting_fluid->Restore_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_OLD_STATE);
-    for(COLLISION_GEOMETRY_ID id(1);id<=collision_bodies_affecting_fluid->collision_geometry_collection.bodies.m;id++)
+    for(COLLISION_GEOMETRY_ID id(0);id<collision_bodies_affecting_fluid->collision_geometry_collection.bodies.m;id++)
         if(collision_bodies_affecting_fluid->collision_geometry_collection.Is_Active(id)){
             COLLISION_GEOMETRY<TV>& collision_body=*(collision_bodies_affecting_fluid->collision_geometry_collection.bodies(id));
             for(CELL_ITERATOR iterator(euler.grid,euler.grid.Clamp_To_Cell(collision_body.Axis_Aligned_Bounding_Box().Thickened(euler.grid.dX.Max()*(T)2),1));iterator.Valid();iterator.Next()){
@@ -420,7 +420,7 @@ Compute_Intermediate_Solid_Position_Data(const T dt)
     CUT_CELL_COMPUTATIONS::Compute_Cut_Geometries(euler.grid,1,*collision_bodies_affecting_fluid,cut_cells_n_p_half);
 
     psi_n_p_half.Fill(true);
-    for(COLLISION_GEOMETRY_ID id(1);id<=collision_bodies_affecting_fluid->collision_geometry_collection.bodies.m;id++)
+    for(COLLISION_GEOMETRY_ID id(0);id<collision_bodies_affecting_fluid->collision_geometry_collection.bodies.m;id++)
         if(collision_bodies_affecting_fluid->collision_geometry_collection.Is_Active(id)){
             COLLISION_GEOMETRY<TV>& collision_body=*(collision_bodies_affecting_fluid->collision_geometry_collection.bodies(id));
             T collision_thickness_over_two=(T).5*collision_bodies_affecting_fluid->collision_thickness;
@@ -444,7 +444,7 @@ Compute_Intermediate_Solid_Position_Data(const T dt)
 
     uncovered_cells_n_p_half.Fill(false);
     collision_bodies_affecting_fluid->Restore_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_OLD_STATE);
-    for(COLLISION_GEOMETRY_ID id(1);id<=collision_bodies_affecting_fluid->collision_geometry_collection.bodies.m;id++)
+    for(COLLISION_GEOMETRY_ID id(0);id<collision_bodies_affecting_fluid->collision_geometry_collection.bodies.m;id++)
         if(collision_bodies_affecting_fluid->collision_geometry_collection.Is_Active(id)){
             COLLISION_GEOMETRY<TV>& collision_body=*(collision_bodies_affecting_fluid->collision_geometry_collection.bodies(id));
             for(CELL_ITERATOR iterator(euler.grid,euler.grid.Clamp_To_Cell(collision_body.Axis_Aligned_Bounding_Box().Thickened(euler.grid.dX.Max()*(T)2),1));iterator.Valid();iterator.Next()){

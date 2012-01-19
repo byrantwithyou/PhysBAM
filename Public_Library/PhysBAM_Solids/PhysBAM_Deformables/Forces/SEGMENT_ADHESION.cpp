@@ -206,7 +206,7 @@ Update_Springs(const bool search_hierarchy)
             LOG::Time("Compute External Pair State");
             external_springs.Remove_All();external_spring_segments.Remove_All();
             const ARRAY_VIEW<T>& one_over_effective_mass=particles.one_over_effective_mass;
-            for(PARTITION_ID partition(1);partition<=input_pairs.Size();partition++){
+            for(PARTITION_ID partition(0);partition<input_pairs.Size();partition++){
                 ARRAY<T_PAIR>& pairs=input_pairs(partition);
                 for(int j=0;j<pairs.m;j++){
                     const VECTOR<int,2>& segment_indices=pairs(j).x;const VECTOR<T,2>& segment_weights=pairs(j).y;
@@ -242,13 +242,13 @@ Update_Springs(const bool search_hierarchy)
             }
 #if 0
             LOG::Time("update ghost/boundary particles");
-            for(FRAGMENT_ID fragment(1);fragment<=mpi_solids->force_boundaries_of_fragment.Size();fragment++)
+            for(FRAGMENT_ID fragment(0);fragment<mpi_solids->force_boundaries_of_fragment.Size();fragment++)
                 mpi_solids->force_boundaries_of_fragment.Remove_All(); // TODO: NOT GENERAL ONLY FOR HAIR
             PHYSBAM_ASSERT(mpi_solids->fragments_of_partition(mpi_solids->Partition()).Size()==1);
             FRAGMENT_ID my_fragment=mpi_solids->fragments_of_partition(mpi_solids->Partition())(1);
             mpi_solids->force_boundaries_of_fragment.Resize(mpi_solids->partition_from_fragment.Size());
             ARRAY<PAIR<FRAGMENT_ID,ARRAY<int> > >& local_boundary_list=mpi_solids->force_boundaries_of_fragment(my_fragment);
-            for(PARTITION_ID other_partition(1);other_partition<=my_boundary.Size();other_partition++) if(other_partition!=mpi_solids->Partition()){
+            for(PARTITION_ID other_partition(0);other_partition<my_boundary.Size();other_partition++) if(other_partition!=mpi_solids->Partition()){
                 PHYSBAM_ASSERT(mpi_solids->fragments_of_partition(other_partition).Size()==1);
                 FRAGMENT_ID other_fragment=mpi_solids->fragments_of_partition(other_partition)(1);
                 local_boundary_list.Append(PAIR<FRAGMENT_ID,ARRAY<int> >(other_fragment,my_boundary(other_partition)));

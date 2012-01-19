@@ -171,7 +171,7 @@ void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
         ARRAY<T> particle_distances(particles.array_collection->Size());
         particle_distances.Subset(surface_particles).Fill((T)FLT_MAX);
         for(int i=0;i<surface_particles.m;i++){int p=surface_particles(i);
-            for(COLLISION_GEOMETRY_ID body(1);body<=collision_body_list.bodies.m;body++)
+            for(COLLISION_GEOMETRY_ID body(0);body<collision_body_list.bodies.m;body++)
                 particle_distances(p)=PhysBAM::min(particle_distances(p),collision_body_list.bodies(body)->Implicit_Geometry_Extended_Value(particles.X(p)));}
         ARRAY<int> triangles_to_refine;
         for(int t=0;t<triangulated_surface.mesh.elements.m;t++){

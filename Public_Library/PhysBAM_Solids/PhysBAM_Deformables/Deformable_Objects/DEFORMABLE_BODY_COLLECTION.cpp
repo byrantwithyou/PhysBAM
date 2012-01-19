@@ -258,9 +258,9 @@ Update_Simulated_Particles(DEFORMABLES_EXAMPLE_FORCES_AND_VELOCITIES<TV>& exampl
 
     if(mpi_solids){
         simulated_particles=dynamic_particles;
-        for(PARTITION_ID n(1);n<=mpi_solids->mpi_partition_binding.ghost_dynamic_particles.Size();n++)
+        for(PARTITION_ID n(0);n<mpi_solids->mpi_partition_binding.ghost_dynamic_particles.Size();n++)
             simulated_particles.Append_Elements(mpi_solids->mpi_partition_binding.ghost_dynamic_particles(n));
-        for(PARTITION_ID n(1);n<=mpi_solids->mpi_partition_force.ghost_dynamic_particles.Size();n++)
+        for(PARTITION_ID n(0);n<mpi_solids->mpi_partition_force.ghost_dynamic_particles.Size();n++)
             simulated_particles.Append_Elements(mpi_solids->mpi_partition_force.ghost_dynamic_particles(n));
         simulated_particles.Prune_Duplicates();
         binding_list.Compute_Particle_Closure_Based_On_Embedding(simulated_particles);}

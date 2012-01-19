@@ -1070,7 +1070,7 @@ void Activate_Secondary_Simulation()
     // Disable collisions
     deformable_body_collection.collisions.collision_structures.Remove_All();
     solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Remove_All();
-    for(COLLISION_GEOMETRY_ID id(1);id<=collision_body_list.Size();id++) collision_body_list.Remove_Body(id);
+    for(COLLISION_GEOMETRY_ID id(0);id<collision_body_list.Size();id++) collision_body_list.Remove_Body(id);
 
     solid_body_collection.Update_Simulated_Particles();
 

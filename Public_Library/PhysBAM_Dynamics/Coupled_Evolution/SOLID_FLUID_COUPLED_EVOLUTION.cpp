@@ -351,7 +351,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
             grid_domain.Change_Size(fluids_parameters.grid->dX*(T).5);
             ARRAY<int> boundary_particles(particles.array_collection->Size());boundary_particles.Fill(0);
             GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
-            for(COLLISION_GEOMETRY_ID i(1);i<=collision_bodies_affecting_fluid.collision_geometry_collection.bodies.m;i++)
+            for(COLLISION_GEOMETRY_ID i(0);i<collision_bodies_affecting_fluid.collision_geometry_collection.bodies.m;i++)
                 if(collision_bodies_affecting_fluid.collision_geometry_collection.Is_Active(i)){
                     COLLISION_GEOMETRY<TV>& body=*collision_bodies_affecting_fluid.collision_geometry_collection.bodies(i);
                     if(!body.active) continue;
@@ -562,7 +562,7 @@ Transfer_Momentum_And_Set_Boundary_Conditions(const T time,GENERALIZED_VELOCITY<
 
         //TODO (mlentine): This only works with the first collision body?
         DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>* collisions=0;
-        for(COLLISION_GEOMETRY_ID i(1);i<=fluids_parameters.collision_bodies_affecting_fluid->collision_geometry_collection.bodies.m;i++)
+        for(COLLISION_GEOMETRY_ID i(0);i<fluids_parameters.collision_bodies_affecting_fluid->collision_geometry_collection.bodies.m;i++)
             if(fluids_parameters.collision_bodies_affecting_fluid->collision_geometry_collection.Is_Active(i)){
                 collisions=dynamic_cast<DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>*>(fluids_parameters.collision_bodies_affecting_fluid->collision_geometry_collection.bodies(i));if(collisions) break;}
         for(int deformable_simplex=0;deformable_simplex<deformable_simplices.m;deformable_simplex++){
@@ -677,7 +677,7 @@ Compute_W(const T current_position_time)
     rigid_body_count=0;kinematic_rigid_bodies.Remove_All();
 
     T_ARRAYS_STRUCTURE_SIMPLEX_LIST structure_simplex_list(grid.Domain_Indices(1));
-    for(COLLISION_GEOMETRY_ID i(1);i<=collision_bodies_affecting_fluid.collision_geometry_collection.bodies.m;i++)
+    for(COLLISION_GEOMETRY_ID i(0);i<collision_bodies_affecting_fluid.collision_geometry_collection.bodies.m;i++)
         if(collision_bodies_affecting_fluid.collision_geometry_collection.Is_Active(i)){
             COLLISION_GEOMETRY<TV>& body=*collision_bodies_affecting_fluid.collision_geometry_collection.bodies(i);
             if(!body.active) continue;
@@ -1127,7 +1127,7 @@ Apply_Solid_Boundary_Conditions(const T time,const bool use_pseudo_velocities,T_
         int state1=COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_OLD_STATE;int state2=COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_NEW_STATE;
         // TODO: fix once DEFORMABLE_OBJECT_FLUID_COLLISIONS::saved_states is moved
         DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>* collisions=0;
-        for(COLLISION_GEOMETRY_ID i(1);i<=fluids_parameters.collision_bodies_affecting_fluid->collision_geometry_collection.bodies.m;i++)
+        for(COLLISION_GEOMETRY_ID i(0);i<fluids_parameters.collision_bodies_affecting_fluid->collision_geometry_collection.bodies.m;i++)
             if(fluids_parameters.collision_bodies_affecting_fluid->collision_geometry_collection.Is_Active(i)){
                 collisions=dynamic_cast<DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>*>(fluids_parameters.collision_bodies_affecting_fluid->collision_geometry_collection.bodies(i));if(collisions) break;}
         for(FACE_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){

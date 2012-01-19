@@ -510,7 +510,7 @@ Initialize_Bodies()
         ARRAY<int,HAIR_ID> roots(number_of_hairs);
         ARRAY<ARRAY<int>,HAIR_ID> hairs(next_segment_id);
         for(int p=0;p<particles.array_collection->Size();p++) hairs(particle_to_spring_id(p)).Append(p);
-        for(HAIR_ID i(1);i<=number_of_hairs;i++){
+        for(HAIR_ID i(0);i<number_of_hairs;i++){
             T min_dist=-1;
             for (int p=1;p<=hairs(i).m;p++){
                 T dist=implicit_rigid_body->implicit_object->Signed_Distance(particles.X(hairs(i)(p)));
@@ -553,12 +553,12 @@ Initialize_Bodies()
         // update reverse map of all non root particles to new root (and connected component) asignment)
 //        for(int p=0;p<particles.array_collection->Size();p++) partition_id_from_particle_index(p)=partition_id_from_particle_index(particle_connectivity.Find(p));
         // repopulate forward map
-        for(PARTITION_ID i(1);i<=particles_of_partition.Size();i++) particles_of_partition(i).Remove_All();
+        for(PARTITION_ID i(0);i<particles_of_partition.Size();i++) particles_of_partition(i).Remove_All();
         for(int p=0;p<particles.array_collection->Size();p++) particles_of_partition(partition_id_from_particle_index(p)).Append(p);
-        for(PARTITION_ID i(1);i<=particles_of_partition.Size();i++) LOG::cout<<"Partition "<<i<<" has "<<particles_of_partition(i).Size()<<" particles"<<std::endl;
+        for(PARTITION_ID i(0);i<particles_of_partition.Size();i++) LOG::cout<<"Partition "<<i<<" has "<<particles_of_partition(i).Size()<<" particles"<<std::endl;
         //partition_fixed_nodes.Resize(solid_body_collection.deformable_body_collection.mpi_solids->Number_Of_Partitions());
         partition_spring_representative.Resize(solid_body_collection.deformable_body_collection.mpi_solids->Number_Of_Partitions());
-        for(HAIR_ID hid(1);hid<=spring_id_to_particle.Size();hid++) partition_spring_representative(partition_id_from_particle_index(spring_id_to_particle(hid))).Append(spring_id_to_particle(hid));
+        for(HAIR_ID hid(0);hid<spring_id_to_particle.Size();hid++) partition_spring_representative(partition_id_from_particle_index(spring_id_to_particle(hid))).Append(spring_id_to_particle(hid));
 
         // Restrict fixed nodes
         for(int i=fixed_nodes.m;i>=1;i--){

@@ -57,7 +57,7 @@ Compute_Occupied_Blocks(const bool with_body_motion,const T extra_thickness,cons
 {
     T_ARRAYS_BOOL& occupied=with_body_motion?swept_occupied_blocks:occupied_blocks;
     occupied.Resize(grid.Block_Indices(3),false,false);occupied.Fill(false);
-    for(COLLISION_GEOMETRY_ID i(1);i<=collision_geometry_collection.bodies.m;i++)
+    for(COLLISION_GEOMETRY_ID i(0);i<collision_geometry_collection.bodies.m;i++)
         if(collision_geometry_collection.bodies(i) && collision_geometry_collection.bodies(i)->active)
             RASTERIZATION::Compute_Occupied_Blocks(*collision_geometry_collection.bodies(i),grid,occupied,with_body_motion,extra_thickness,body_thickness_factor);
 }
@@ -131,7 +131,7 @@ Compute_Simplices_In_Cell(ARRAY<ARRAY<PAIR<COLLISION_GEOMETRY_ID,int> >,TV_INT>&
     int ghost_cells,T thickness,bool assume_active) const
 {
     simplices_in_cell.Resize(grid.Domain_Indices(ghost_cells+1));
-    for(COLLISION_GEOMETRY_ID i(1);i<=bodies.m;i++) if(assume_active || Is_Active(i)){ // Is_Active is not safe to call if different bodies list is used
+    for(COLLISION_GEOMETRY_ID i(0);i<bodies.m;i++) if(assume_active || Is_Active(i)){ // Is_Active is not safe to call if different bodies list is used
         COLLISION_GEOMETRY<TV>* body=bodies(i);
         int n=body->Number_Of_Simplices();
         for(int e=0;e<n;e++){

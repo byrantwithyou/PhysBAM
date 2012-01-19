@@ -38,7 +38,7 @@ template<class T> ARTICULATED_RIGID_BODY<VECTOR<T,3> >::
 template<class T> void ARTICULATED_RIGID_BODY<VECTOR<T,3> >::
 Compute_Desired_PD_Velocity(const T dt,const T time)
 {
-    for(JOINT_ID i(1);i<=joint_mesh.Size();i++)
+    for(JOINT_ID i(0);i<joint_mesh.Size();i++)
         if(joint_mesh.Is_Active(i) && joint_mesh(i)->joint_function && joint_mesh(i)->joint_function->active && (!Parent(i)->Has_Infinite_Inertia() || !Child(i)->Has_Infinite_Inertia()))
             joint_mesh(i)->joint_function->Compute_Desired_PD_Velocity(dt,time);
 }

@@ -931,7 +931,7 @@ void Update_Subsamples()
     particle_distances.Subset(surface_particles).Fill(FLT_MAX);
 
     for(int i=0;i<surface_particles.m;i++){int p=surface_particles(i);
-        for(COLLISION_GEOMETRY_ID body(1);body<=collision_body_list.Size();body++)
+        for(COLLISION_GEOMETRY_ID body(0);body<collision_body_list.Size();body++)
             particle_distances(p)=PhysBAM::min(particle_distances(p),collision_body_list(body).Implicit_Geometry_Extended_Value(particles.X(p)));}
 
     // iterate over surface elements

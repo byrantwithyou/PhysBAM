@@ -394,7 +394,7 @@ Poststabilization_Projection(ARRAY_VIEW<TWIST<TV> > twist,const bool symmetric)
     if(!use_poststab_in_cg || !use_poststab) return;
 
     int iterations=poststabilization_projection_iterations;if(symmetric) iterations=(iterations+1)/2;
-    for(int i=0;i<iterations;i++) for(JOINT_ID j(1);j<=joint_mesh.Size();j++) if(joint_mesh.Is_Active(j)) Poststabilization_Projection_Joint(j,twist);
+    for(int i=0;i<iterations;i++) for(JOINT_ID j(0);j<joint_mesh.Size();j++) if(joint_mesh.Is_Active(j)) Poststabilization_Projection_Joint(j,twist);
     if(symmetric) for(int i=0;i<iterations;i++) for(JOINT_ID j=joint_mesh.Size();j>=JOINT_ID(1);j--) if(joint_mesh.Is_Active(j)) Poststabilization_Projection_Joint(j,twist);
 }
 //####################################################################################
@@ -626,7 +626,7 @@ Apply_Poststabilization_With_CG(T dt,bool correct_position,bool test_system,bool
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("BM-%i.txt",solve_id).c_str()).Write("BM",system,q,s);
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("BP-%i.txt",solve_id).c_str()).Write_Projection("BP",system,q);}}
 
-    if(correct_position){for(JOINT_ID j(1);j<=joint_mesh.Size();j++) if(joint_mesh.Is_Active(j)) rhs.v(j)=-Joint_Error(j)/dt;}
+    if(correct_position){for(JOINT_ID j(0);j<joint_mesh.Size();j++) if(joint_mesh.Is_Active(j)) rhs.v(j)=-Joint_Error(j)/dt;}
     else{system.Scatter(rigid_body_collection.rigid_body_particle.twist,rhs.v);rhs*=-(T)1;}
     if(print_matrix) OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("b-%i.txt",solve_id).c_str()).Write("b",rhs);
 

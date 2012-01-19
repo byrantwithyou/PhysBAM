@@ -251,7 +251,7 @@ Save_PD_State()
     pd_state_save.Resize(joint_mesh.Size(),false,false);
     joint_function_active_save.Resize(joint_mesh.Size(),false,false);
     constrain_pd_save=solid_body_collection.rigid_body_collection.articulated_rigid_body.constrain_pd_directions;
-    for(JOINT_ID i(1);i<=joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue;
+    for(JOINT_ID i(0);i<joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue;
         if(joint_mesh(i)->joint_function){
             k_p_save(i)=joint_mesh(i)->joint_function->k_p;
             joint_function_active_save(i)=joint_mesh(i)->joint_function->active;}
@@ -264,7 +264,7 @@ template<class T_GRID> void SEARCH_CONTROLLER<T_GRID>::
 Restore_PD_State()
 {
     solid_body_collection.rigid_body_collection.articulated_rigid_body.constrain_pd_directions=constrain_pd_save;
-    for(JOINT_ID i(1);i<=joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue;
+    for(JOINT_ID i(0);i<joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue;
         if(joint_mesh(i)->joint_function){
             joint_mesh(i)->joint_function->Set_k_p(k_p_save(i));
             joint_mesh(i)->joint_function->active=joint_function_active_save(i);}
@@ -319,7 +319,7 @@ Project_Solid_Velocities(const T time)
     T_WORLD_SPACE_INERTIA_TENSOR inertia_tensor;
     ARRAY<int> cluster_list;
     bool has_kinematic=false;
-    for(JOINT_ID i(1);i<=joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue;
+    for(JOINT_ID i(0);i<joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue;
         JOINT<TV>& joint=*joint_mesh(i);
         RIGID_BODY<TV> *parent_body=Parent(joint.id_number),*child_body=Child(joint.id_number);
         if((parent_body->Has_Infinite_Inertia() || child_body->Has_Infinite_Inertia()) && !(parent_body->Has_Infinite_Inertia() && child_body->Has_Infinite_Inertia())){
@@ -332,19 +332,19 @@ Project_Solid_Velocities(const T time)
             cluster_list.Remove_All();
             if(use_clusters && joint_clusters(joint.id_number).x){
                 T_CLUSTER& cluster=*rigid_bindings.reverse_bindings.Get(joint_clusters(joint.id_number).x);
-                for(RIGID_CLUSTER_CONSTITUENT_ID j(1);j<=cluster.children.Size();j++) cluster_list.Append(cluster.children(j));}
+                for(RIGID_CLUSTER_CONSTITUENT_ID j(0);j<cluster.children.Size();j++) cluster_list.Append(cluster.children(j));}
             else{
                 if(rigid_bindings.Is_Parent(parent_body->particle_index)){
                     T_CLUSTER& cluster=*rigid_bindings.reverse_bindings.Get(rigid_bindings.Get_Parent_Index(parent_body->particle_index));
-                    for(RIGID_CLUSTER_CONSTITUENT_ID j(1);j<=cluster.children.Size();j++) cluster_list.Append(cluster.children(j));}
+                    for(RIGID_CLUSTER_CONSTITUENT_ID j(0);j<cluster.children.Size();j++) cluster_list.Append(cluster.children(j));}
                 else cluster_list.Append(parent_body->particle_index);}
             if(use_clusters && joint_clusters(joint.id_number).y){
                 T_CLUSTER& cluster=*rigid_bindings.reverse_bindings.Get(joint_clusters(joint.id_number).y);
-                for(RIGID_CLUSTER_CONSTITUENT_ID j(1);j<=cluster.children.Size();j++) cluster_list.Append(cluster.children(j));}
+                for(RIGID_CLUSTER_CONSTITUENT_ID j(0);j<cluster.children.Size();j++) cluster_list.Append(cluster.children(j));}
             else{
                 if(rigid_bindings.Is_Parent(child_body->particle_index)){
                     T_CLUSTER& cluster=*rigid_bindings.reverse_bindings.Get(rigid_bindings.Get_Parent_Index(child_body->particle_index));
-                    for(RIGID_CLUSTER_CONSTITUENT_ID j(1);j<=cluster.children.Size();j++) cluster_list.Append(cluster.children(j));}
+                    for(RIGID_CLUSTER_CONSTITUENT_ID j(0);j<cluster.children.Size();j++) cluster_list.Append(cluster.children(j));}
                 else cluster_list.Append(child_body->particle_index);}
             ARRAY<int> active_clusters;
             rigid_bindings.Deactivate_And_Return_Clusters(active_clusters,(incorporate_fluids?fluids_parameters->collision_bodies_affecting_fluid:0));
@@ -425,7 +425,7 @@ Set_PD_Targets()
             if(!joint.joint_function || !control) continue;
             joint.joint_function->active=true;joint.global_post_stabilization=true;
             joint.joint_function->Set_Target_Angular_Velocity(Set_PD_Targets_Helper(solid_body_collection.rigid_body_collection.articulated_rigid_body.Parent(joint.id_number),&joint));}
-        else for(JOINT_ID i(1);i<=joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue;
+        else for(JOINT_ID i(0);i<joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue;
             JOINT<TV>& joint=*joint_mesh(i);
             bool control=false;for(int j=0;j<T_SPIN::dimension;j++) if(joint.control_dof(j)) control=true;
             if(!joint.joint_function || !control) continue;
@@ -439,7 +439,7 @@ template<class TV> void SEARCH_CONTROLLER<TV>::
 Zero_PD_Targets()
 {
     if(solid_body_collection.rigid_body_collection.articulated_rigid_body.Has_Actuators()){
-        for(JOINT_ID i(1);i<=joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i) || !joint_mesh(i)->joint_function) continue;
+        for(JOINT_ID i(0);i<joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i) || !joint_mesh(i)->joint_function) continue;
             JOINT<TV>& joint=*joint_mesh(i);
             joint.joint_function->active=true;joint.global_post_stabilization=true;
             joint.joint_function->Set_Target_Angle(joint.joint_function->Angle());}}
@@ -455,7 +455,7 @@ Create_Clusters_From_Joint_List(const ARRAY<bool,JOINT_ID>& blocking_joint,ARRAY
     adjacent_lists.Resize(solid_body_collection.rigid_body_collection.articulated_rigid_body.joint_mesh.Size());
     ARRAY<int,int> done(graph.Last_Node());
     STACK<int> stack;
-    for(JOINT_ID j(1);j<=blocking_joint.Size();j++) if(blocking_joint(j)){
+    for(JOINT_ID j(0);j<blocking_joint.Size();j++) if(blocking_joint(j)){
         VECTOR<int,2> adjacent_list_j(adjacent_lists(j).x,adjacent_lists(j).y);
         for(int k=0;k<2;k++) if(int b=(k==1?graph.Edges(j).x:graph.Edges(j).y)){
             RIGID_BODY<TV>& rbody=solid_body_collection.rigid_body_collection.Rigid_Body(b);
@@ -489,7 +489,7 @@ Create_All_Clusters(RIGID_BODY_COLLISION_MANAGER_HASH* collision_manager)
     use_clusters=true;rigid_body_particles_number=solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size();
 
     ARRAY<JOINT<TV>*> joints;
-    for(JOINT_ID i(1);i<=joint_mesh.Size();i++){JOINT_ID joint_id=i;
+    for(JOINT_ID i(0);i<joint_mesh.Size();i++){JOINT_ID joint_id=i;
         if(!joint_mesh.Is_Active(i)) continue;
         bool controlled=false;
         for(int j=0;j<T_SPIN::dimension;j++) if(joint_mesh(i)->control_dof(j)) controlled=true;
@@ -523,7 +523,7 @@ Create_All_Clusters(RIGID_BODY_COLLISION_MANAGER_HASH* collision_manager)
     
     ARRAY<ARRAY<int> > body_lists;ARRAY<VECTOR<int,2>,JOINT_ID> adjacent_lists;
     Create_Clusters_From_Joint_List(blocking_list,body_lists,adjacent_lists);done.Resize(body_lists.Size());
-    for(JOINT_ID i(1);i<=joint_mesh.Size();i++){JOINT_ID joint_id=i;
+    for(JOINT_ID i(0);i<joint_mesh.Size();i++){JOINT_ID joint_id=i;
         if(!joint_mesh.Is_Active(i)) continue;
         int parent_cluster=Parent(joint_id)->particle_index,child_cluster=Child(joint_id)->particle_index;
         if(adjacent_lists(joint_id).x>0 && body_lists(adjacent_lists(joint_id).x).Size()>1){
@@ -675,7 +675,7 @@ Evaluate_Force_To_Stay_For_Joint(T_FACE_ARRAYS_SCALAR& face_velocities,const T d
     PHYSBAM_DEBUG_WRITE_SUBSTEP(STRING_UTILITIES::string_sprintf("Evaluate Force Start (search_controller) time=%f",time),0,0);
     T F=0;current_joints=joints;Save_PD_State();
     Save_Nested_State(face_velocities);
-    for(JOINT_ID i(1);i<=joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue;
+    for(JOINT_ID i(0);i<joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue;
         joint_mesh(i)->global_post_stabilization=false;
         joint_mesh(i)->joint_function->active=false;}
     for(int i=0;i<joints.m;i++){assert(joint_mesh.Is_Active(joints(i)));
@@ -708,7 +708,7 @@ Evaluate_Force_To_Stay(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T 
     PHYSBAM_DEBUG_WRITE_SUBSTEP(STRING_UTILITIES::string_sprintf("Evaluate Force Start (search_controller) time=%f",time),0,0);
     T F=0;Save_PD_State();
     Save_Nested_State(face_velocities);
-    for(JOINT_ID i(1);i<=joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue;
+    for(JOINT_ID i(0);i<joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue;
         JOINT<TV>& joint=*joint_mesh(i);
         joint.impulse_accumulator->Reset();
         bool control=false;for(int j=0;j<T_SPIN::dimension;j++) if(joint.control_dof(j)) control=true;
@@ -729,7 +729,7 @@ Evaluate_Force_To_Stay(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T 
     Restore_Nested_State(face_velocities);
     Restore_PD_State();
     PHYSBAM_DEBUG_WRITE_SUBSTEP(STRING_UTILITIES::string_sprintf("Evaluate Force End (search_controller) time=%f",time),0,0);
-    for(JOINT_ID i(1);i<=joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue;
+    for(JOINT_ID i(0);i<joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue;
         F+=joint_mesh(i)->impulse_accumulator->Energy();}
     return F;
 }
@@ -859,7 +859,7 @@ Evaluate_Force(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,con
 
     Save_PD_State();
     
-    for(JOINT_ID i(1);i<=joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue;
+    for(JOINT_ID i(0);i<joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue;
         JOINT<TV>& joint=*joint_mesh(i);
         bool control=false;for(int j=0;j<T_SPIN::dimension;j++) if(joint.control_dof(j)) control=true;
         if(!joint.joint_function || !control) continue;
@@ -886,7 +886,7 @@ Evaluate_Force(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,con
 
     ARRAY<JOINT_ID> force_list,drag_list;
     for(int i=0;i<strain_joints.m;i++) force_list.Append(strain_joints(i)); 
-    for(JOINT_ID i(1);i<=joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue;
+    for(JOINT_ID i(0);i<joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue;
         if(objective(i)==FORCE) force_list.Append_Unique(i);
         if(objective(i)==DRAG) drag_list.Append(i);}
     if(force_list.m>0) F=Evaluate_Force_To_Stay_For_Joint(face_velocities,dt,time,force_list);
@@ -904,7 +904,7 @@ Evaluate_Force(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,con
 template<class T_GRID> void SEARCH_CONTROLLER<T_GRID>::
 Normalize_Gradient(VECTOR_ND<T>& grad)
 {
-    if(grad.Magnitude()) for(JOINT_ID i(1);i<=joint_mesh.Size();i++){
+    if(grad.Magnitude()) for(JOINT_ID i(0);i<joint_mesh.Size();i++){
         if(!joint_mesh.Is_Active(i)) continue;
         TV joint_gradient;
         for(int j=0;j<T_SPIN::dimension;j++) joint_gradient(j)=grad((Value(i)-1)*T_SPIN::dimension+j);
@@ -918,7 +918,7 @@ template<class T_GRID> VECTOR_ND<typename T_GRID::SCALAR> SEARCH_CONTROLLER<T_GR
 Normalized_Gradient(const VECTOR_ND<T>& grad)
 {
     VECTOR_ND<T> normalized_gradient;
-    if(grad.Magnitude()) for(JOINT_ID i(1);i<=joint_mesh.Size();i++){
+    if(grad.Magnitude()) for(JOINT_ID i(0);i<joint_mesh.Size();i++){
         if(!joint_mesh.Is_Active(i)) continue;
         TV joint_gradient;
         for(int j=0;j<T_SPIN::dimension;j++) joint_gradient(j)=grad((Value(i)-1)*T_SPIN::dimension+j);
@@ -932,13 +932,13 @@ Normalized_Gradient(const VECTOR_ND<T>& grad)
 template<class T_GRID> void SEARCH_CONTROLLER<T_GRID>::
 Compute_Gradient(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
 {
-    for(JOINT_ID i(1);i<=joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue;
+    for(JOINT_ID i(0);i<joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue;
         JOINT<TV>& joint=*joint_mesh(i);
         if(!joint.joint_function) continue;
         VECTOR<bool,T_SPIN::dimension> constrain=joint.Angular_Constraints();
         bool control=false;for(int j=0;j<T_SPIN::dimension;j++) if(joint.control_dof(j) && !constrain(j)) control=true;
         if(control){current_angle(i)=joint.joint_function->Angle();joint.joint_function->active=false;joint.global_post_stabilization=false;}}
-    for(JOINT_ID i(1);i<=joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue;
+    for(JOINT_ID i(0);i<joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue;
         JOINT<TV>& joint=*joint_mesh(i);
         if(!joint.joint_function) continue;
         VECTOR<bool,T_SPIN::dimension> constrain=joint.Angular_Constraints();
@@ -970,7 +970,7 @@ Compute_Gradient_From_Graph(ENVIRONMENTAL_STATE<T_GRID>* current_state)
         ENVIRONMENTAL_STATE<T_GRID>* possible_next_state=graph_index_to_state_map(next_possible_states(i));
         if(minimized_force==0 || possible_next_state->force_to_stay<minimized_force){
             bool angle_is_possible=true;
-            for(JOINT_ID id(1);id<=possible_next_state->angles.Size();id++){
+            for(JOINT_ID id(0);id<possible_next_state->angles.Size();id++){
                 JOINT<TV>& joint=*joint_mesh(id);
                 ROTATION<TV> angle=possible_next_state->angles(id);T_SPIN euler_angle=angle.Euler_Angles();
                 T_SPIN angle_constrained=angle.Euler_Angles();joint.Constrain_Angles(angle_constrained);
@@ -1012,7 +1012,7 @@ Steepest_Descent(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
         if(negative_gradient.Magnitude()<threshold) return 0;
         Normalize_Gradient(negative_gradient);
         T step=Golden_Section_Search(face_velocities,dt,time,0,1,dx);
-        for(JOINT_ID i(1);i<=joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue;
+        for(JOINT_ID i(0);i<joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue;
             JOINT<TV>& joint=*joint_mesh(i);
             bool control=false;for(int j=0;j<T_SPIN::dimension;j++) if(joint.control_dof(j)) control=true;
             if(!joint.joint_function || !control) continue;
@@ -1053,14 +1053,14 @@ Update_Position_Based_State(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,con
             current_state->external_force_dir.Normalize();}
        
         current_state->angles.Resize(joint_mesh.Size());
-        for(JOINT_ID i(1);i<=joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue;
+        for(JOINT_ID i(0);i<joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue;
             JOINT<TV>& joint=*joint_mesh(i);if(!joint.joint_function) continue;
             current_state->angles(i)=joint.joint_function->Angle();}
         
         if(collecting_data){
             ARRAY<JOINT_ID> force_list,drag_list;
             for(int i=0;i<strain_joints.m;i++) force_list.Append(strain_joints(i)); 
-            for(JOINT_ID i(1);i<=joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue;
+            for(JOINT_ID i(0);i<joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue;
                 if(objective(i)==FORCE) force_list.Append_Unique(i);
                 if(objective(i)==DRAG) drag_list.Append(i);}
             if(force_list.m>0) current_state->force_to_stay=Evaluate_Force_To_Stay_For_Joint(face_velocities,dt,time,force_list);
@@ -1085,7 +1085,7 @@ Update_Position_Based_State(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,con
 
                 if(line_search) real_dx*=Golden_Section_Search(face_velocities,dt,target_time,0,1,real_dx);
             
-                for(JOINT_ID i(1);i<=joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue; for(int j=0;j<T_SPIN::dimension;j++){
+                for(JOINT_ID i(0);i<joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue; for(int j=0;j<T_SPIN::dimension;j++){
                     int index=(Value(i)-1)*T_SPIN::dimension+j;
                     if(negative_gradient(index)*dF_array_multipliers(index).x<(T)0) dF_array_multipliers(index)=PAIR<T,T>((T)0,max(dF_array_multipliers(index).y*(T).5,min_multiplier));
                     else if(negative_gradient(index)!=(T)0){
@@ -1094,7 +1094,7 @@ Update_Position_Based_State(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,con
                     else dF_array_multipliers(index).x=(T)0;}}}}}
 
     if(!negative_gradient.Size() || !solids) return;
-    for(JOINT_ID i(1);i<=joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue;
+    for(JOINT_ID i(0);i<joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue;
         JOINT<TV>& joint=*joint_mesh(i);
         bool control=false;for(int j=0;j<T_SPIN::dimension;j++) if(joint.control_dof(j)) control=true;
         if(!joint.joint_function || !control) continue;

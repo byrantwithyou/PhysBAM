@@ -355,7 +355,7 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
             if(!body_list){LOG::cout<<"Error: Voxel_Data Use_Collision_Aware_Interpolation set to true, but collision list is null"<<std::endl;exit(1);}
             LOG::cout<<"Using collidable thin shell interpolation..."<<std::endl;
             GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >* fluid_collision_body_list=new GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >(*grid);
-            for(COLLISION_GEOMETRY_ID i(1);i<=body_list->m;i++) if((*body_list)(i)) fluid_collision_body_list->collision_geometry_collection.Add_Body((*body_list)(i),0,false);
+            for(COLLISION_GEOMETRY_ID i(0);i<body_list->m;i++) if((*body_list)(i)) fluid_collision_body_list->collision_geometry_collection.Add_Body((*body_list)(i),0,false);
             ARRAY<bool,VECTOR<int,3> >* cell_valid_mask=new ARRAY<bool,VECTOR<int,3> >(grid->Domain_Indices(3),false);cell_valid_mask->Fill(true);
             LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<GRID<TV>,T>* linear=new LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<GRID<TV>,T>(*fluid_collision_body_list,cell_valid_mask,0);
             LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<GRID<TV>,TV>* linear_vector=
@@ -454,13 +454,13 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
                 phi->Resize(1,grid->counts.x,1,grid->counts.y,1,grid->counts.z);}
             LOG::cout<<"Using collidable thin shell interpolation..."<<std::endl;
             GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >* fluid_collision_body_list=new GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >(*grid);
-            for(COLLISION_GEOMETRY_ID i(1);i<=body_list->m;i++) if((*body_list)(i)) fluid_collision_body_list->collision_geometry_collection.Add_Body((*body_list)(i),0,false);
+            for(COLLISION_GEOMETRY_ID i(0);i<body_list->m;i++) if((*body_list)(i)) fluid_collision_body_list->collision_geometry_collection.Add_Body((*body_list)(i),0,false);
 
             if(revalidate_for_subdivision){ // TODO: clean this up
                 ARRAY<bool,VECTOR<int,3> > current_arrays_valid(grid->Domain_Indices(3)),next_arrays_valid(grid->Domain_Indices(3));
-                for(COLLISION_GEOMETRY_ID i(1);i<=body_list->m;i++) if((*body_list)(i)) (*body_list)(i)->Restore_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_OLD_STATE);
+                for(COLLISION_GEOMETRY_ID i(0);i<body_list->m;i++) if((*body_list)(i)) (*body_list)(i)->Restore_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_OLD_STATE);
                 fluid_collision_body_list->Save_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_OLD_STATE,(T)0);
-                for(COLLISION_GEOMETRY_ID i(1);i<=body_list->m;i++) if((*body_list)(i)) (*body_list)(i)->Restore_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_NEW_STATE);
+                for(COLLISION_GEOMETRY_ID i(0);i<body_list->m;i++) if((*body_list)(i)) (*body_list)(i)->Restore_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_NEW_STATE);
                 fluid_collision_body_list->Save_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_NEW_STATE,(T)1);
                 ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM<GRID<TV>,T> advection(*fluid_collision_body_list,current_arrays_valid,next_arrays_valid,(T)1e-5,true);
 

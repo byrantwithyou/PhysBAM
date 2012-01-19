@@ -88,7 +88,7 @@ Initialize_Data_Structures(const bool reset)
 template<class TV> void RIGID_BODY_COLLISIONS<TV>::
 Adjust_Bounding_Boxes(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const T false_thickness,const T extra_padding_distance)
 {
-    for(COLLISION_GEOMETRY_ID i(1);i<=rigid_body_collection.rigid_geometry_collection.collision_body_list->bodies.Size();i++){
+    for(COLLISION_GEOMETRY_ID i(0);i<rigid_body_collection.rigid_geometry_collection.collision_body_list->bodies.Size();i++){
         RIGID_COLLISION_GEOMETRY<TV>* rigid_collision_geometry=dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>*>(rigid_body_collection.rigid_geometry_collection.collision_body_list->bodies(i));
         if(rigid_collision_geometry){RIGID_BODY<TV>* rigid_body=dynamic_cast<RIGID_BODY<TV>*>(&rigid_collision_geometry->rigid_geometry);
             if(rigid_body) if(rigid_body_collection.Is_Active(rigid_body->particle_index)){
@@ -96,7 +96,7 @@ Adjust_Bounding_Boxes(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const T f
                     assert(rigid_body->simplicial_object->bounding_box);
                     RANGE<TV>& box=*rigid_body->simplicial_object->bounding_box;
                     bool already_adjusted=false; // multiple rigid bodies can share a triangulated surface - don't adjust bounding box multiple times
-                    for(COLLISION_GEOMETRY_ID j(1);j<=i-1;j++) if(rigid_body_collection.rigid_geometry_collection.collision_body_list->Is_Active(j)){
+                    for(COLLISION_GEOMETRY_ID j(0);j<i-1;j++) if(rigid_body_collection.rigid_geometry_collection.collision_body_list->Is_Active(j)){
                         int rigid_body_id_j=rigid_body_collection.rigid_geometry_collection.collision_body_list->collision_geometry_id_to_geometry_id.Get(j);
                         if(rigid_body_id_j && rigid_body_collection.Is_Active(rigid_body_id_j) && rigid_body_collection.Rigid_Body(rigid_body_id_j).simplicial_object &&
                             rigid_body->simplicial_object==rigid_body_collection.Rigid_Body(rigid_body_id_j).simplicial_object){
@@ -452,7 +452,7 @@ Get_Contact_Pairs(const T dt,const T time,ARRAY<VECTOR<int,2> >& pairs)
     if(rigid_body_cluster_bindings.collide_constituent_bodies) 
         for(T_REVERSE_BINDING_ITERATOR i(rigid_body_cluster_bindings.reverse_bindings);i.Valid();i.Next()){
             const T_CLUSTER& bindings=*i.Data();
-            for(RIGID_CLUSTER_CONSTITUENT_ID j(1);j<=bindings.children.Size();j++)
+            for(RIGID_CLUSTER_CONSTITUENT_ID j(0);j<bindings.children.Size();j++)
                 if(rigid_body_collection.rigid_geometry_collection.collision_body_list->geometry_id_to_collision_geometry_id.Contains(bindings.children(j)))
                     colliding_rigid_body_particles.Append(bindings.children(j));}
     for(int n=0;n<rigid_body_collection.dynamic_rigid_body_particles.m;n++)
@@ -502,7 +502,7 @@ Compute_Contact_Graph(const T dt,const T time,ARTICULATED_RIGID_BODY<TV>* articu
             INDIRECT_ARRAY<ARRAY<int>,ARRAY<int>&> contact_subset=body_stack.Subset(contact_stack(i));
             contact_subset.Fill(i);
             for(int j=0;j<contact_stack(i).m;j++) if(rigid_body_collection.Rigid_Body(contact_stack(i)(j)).Has_Infinite_Inertia()) stack_static_bodies.Set(PAIR<int,int>(i,contact_stack(i)(j)));}
-        for(COLLISION_GEOMETRY_ID i(1);i<=rigid_body_collection.rigid_geometry_collection.collision_body_list->bodies.Size();i++){
+        for(COLLISION_GEOMETRY_ID i(0);i<rigid_body_collection.rigid_geometry_collection.collision_body_list->bodies.Size();i++){
             int rigid_body_id=rigid_body_collection.rigid_geometry_collection.collision_body_list->collision_geometry_id_to_geometry_id.Get(i);
             if(rigid_body_id) if(rigid_body_collection.Is_Active(rigid_body_id) && rigid_body_collection.Rigid_Body(rigid_body_id).Has_Infinite_Inertia()) body_stack(rigid_body_id)=-2;}
 
@@ -569,7 +569,7 @@ Process_Push_Out_Legacy()
 
         need_another_iteration=false;
         if(use_freezing_with_push_out)
-            for(COLLISION_GEOMETRY_ID i(1);i<=rigid_body_collection.rigid_geometry_collection.collision_body_list->bodies.Size();i++){
+            for(COLLISION_GEOMETRY_ID i(0);i<rigid_body_collection.rigid_geometry_collection.collision_body_list->bodies.Size();i++){
                 RIGID_COLLISION_GEOMETRY<TV>* rigid_collision_geometry=dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>*>(rigid_body_collection.rigid_geometry_collection.collision_body_list->bodies(i));
                 if(rigid_collision_geometry){RIGID_BODY<TV>* rigid_body=dynamic_cast<RIGID_BODY<TV>*>(&rigid_collision_geometry->rigid_geometry);
                     if(rigid_body) if(rigid_body_collection.Is_Active(rigid_body->particle_index)) rigid_body_collection.Rigid_Body(rigid_body->particle_index).is_temporarily_static=false;}}
@@ -622,7 +622,7 @@ Process_Push_Out_Legacy()
             int need_another_iteration_int=(int)need_another_iteration;
             need_another_iteration=mpi_rigids->Reduce_Max(need_another_iteration_int)>0?true:false;
             mpi_rigids->Exchange_All_Pushes(rigid_body_collection,mpi_rigid_X_save,mpi_rigid_rotation_save,*this);}}
-    if(use_freezing_with_push_out) for(COLLISION_GEOMETRY_ID i(1);i<=rigid_body_collection.rigid_geometry_collection.collision_body_list->bodies.Size();i++){
+    if(use_freezing_with_push_out) for(COLLISION_GEOMETRY_ID i(0);i<rigid_body_collection.rigid_geometry_collection.collision_body_list->bodies.Size();i++){
         RIGID_COLLISION_GEOMETRY<TV>* rigid_collision_geometry=dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>*>(rigid_body_collection.rigid_geometry_collection.collision_body_list->bodies(i));
         if(rigid_collision_geometry){RIGID_BODY<TV>* rigid_body=dynamic_cast<RIGID_BODY<TV>*>(&rigid_collision_geometry->rigid_geometry);
             if(rigid_body) if(rigid_body_collection.Is_Active(rigid_body->particle_index)) rigid_body_collection.Rigid_Body(rigid_body->particle_index).is_temporarily_static=false;}}
@@ -936,7 +936,7 @@ template<class TV> bool RIGID_BODY_COLLISIONS<TV>::
 Check_For_Any_Interpenetration()
 {
     spatial_partition->Set_Collision_Body_Thickness(0);
-    for(COLLISION_GEOMETRY_ID i(1);i<=rigid_body_collection.rigid_geometry_collection.collision_body_list->bodies.Size();i++){
+    for(COLLISION_GEOMETRY_ID i(0);i<rigid_body_collection.rigid_geometry_collection.collision_body_list->bodies.Size();i++){
         RIGID_COLLISION_GEOMETRY<TV>* rigid_collision_geometry=dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>*>(rigid_body_collection.rigid_geometry_collection.collision_body_list->bodies(i));
         if(rigid_collision_geometry){RIGID_BODY<TV>* rigid_body=dynamic_cast<RIGID_BODY<TV>*>(&rigid_collision_geometry->rigid_geometry);
             if(rigid_body) if(rigid_body_collection.Is_Active(rigid_body->particle_index) && rigid_body_collection.Rigid_Body(rigid_body->particle_index).Is_Simulated()){
@@ -959,7 +959,7 @@ Find_All_Bounding_Box_Pairs(const T thickness)
 {
     spatial_partition->Reinitialize();
     ARRAY<VECTOR<int,2> > pairs;
-    for(COLLISION_GEOMETRY_ID i(1);i<=rigid_body_collection.rigid_geometry_collection.collision_body_list->bodies.Size();i++){
+    for(COLLISION_GEOMETRY_ID i(0);i<rigid_body_collection.rigid_geometry_collection.collision_body_list->bodies.Size();i++){
         RIGID_COLLISION_GEOMETRY<TV>* rigid_collision_geometry=dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>*>(rigid_body_collection.rigid_geometry_collection.collision_body_list->bodies(i));
         if(rigid_collision_geometry){RIGID_BODY<TV>* rigid_body=dynamic_cast<RIGID_BODY<TV>*>(&rigid_collision_geometry->rigid_geometry);if(rigid_body){
             spatial_partition->Get_Potential_Collisions(i,object_indices);
@@ -981,7 +981,7 @@ Print_Interpenetration_Statistics()
     ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<TV> > particle_intersections;
     particle_intersections.Preallocate(1000);
 
-    for(COLLISION_GEOMETRY_ID i(1);i<=rigid_body_collection.rigid_geometry_collection.collision_body_list->bodies.Size();i++){
+    for(COLLISION_GEOMETRY_ID i(0);i<rigid_body_collection.rigid_geometry_collection.collision_body_list->bodies.Size();i++){
         RIGID_COLLISION_GEOMETRY<TV>* rigid_collision_geometry=dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>*>(rigid_body_collection.rigid_geometry_collection.collision_body_list->bodies(i));
         if(rigid_collision_geometry){RIGID_BODY<TV>* rigid_body=dynamic_cast<RIGID_BODY<TV>*>(&rigid_collision_geometry->rigid_geometry);
             if(rigid_body) if(rigid_body_collection.Is_Active(rigid_body->particle_index) && rigid_body_collection.Rigid_Body(rigid_body->particle_index).Is_Simulated()){
@@ -1038,7 +1038,7 @@ Get_Bounding_Box_Collision_Pairs(const T dt,const T time,ARRAY<VECTOR<int,2> >& 
     if(rigid_body_cluster_bindings.collide_constituent_bodies) 
         for(T_REVERSE_BINDING_ITERATOR i(rigid_body_cluster_bindings.reverse_bindings);i.Valid();i.Next()){
             const T_CLUSTER& bindings=*i.Data();
-            for(RIGID_CLUSTER_CONSTITUENT_ID j(1);j<=bindings.children.Size();j++)
+            for(RIGID_CLUSTER_CONSTITUENT_ID j(0);j<bindings.children.Size();j++)
                 if(rigid_body_collection.rigid_geometry_collection.collision_body_list->geometry_id_to_collision_geometry_id.Contains(bindings.children(j)))
                     colliding_rigid_body_particles.Append(bindings.children(j));}
     for(int n=0;n<rigid_body_collection.dynamic_rigid_body_particles.m;n++){
@@ -1256,7 +1256,7 @@ Set_Level_Temporarily_Static(const int level)
 template<class TV> void RIGID_BODY_COLLISIONS<TV>::
 Clear_Temporarily_Static()
 {
-    for(COLLISION_GEOMETRY_ID i(1);i<=rigid_body_collection.rigid_geometry_collection.collision_body_list->bodies.Size();i++){
+    for(COLLISION_GEOMETRY_ID i(0);i<rigid_body_collection.rigid_geometry_collection.collision_body_list->bodies.Size();i++){
         RIGID_COLLISION_GEOMETRY<TV>* rigid_collision_geometry=dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>*>(rigid_body_collection.rigid_geometry_collection.collision_body_list->bodies(i));
         if(rigid_collision_geometry){RIGID_BODY<TV>* rigid_body=dynamic_cast<RIGID_BODY<TV>*>(&rigid_collision_geometry->rigid_geometry);
             if(rigid_body) if(rigid_body_collection.Is_Active(rigid_body->particle_index)) rigid_body_collection.Rigid_Body(rigid_body->particle_index).is_temporarily_static=false;}}

@@ -374,7 +374,7 @@ Setup_Tolerances(const VECTOR_T& F,const VECTOR_ND<T>& fluid_velocity,const GENE
 
     T eps=(T)1e-5;
     if(solid_node){
-        for(FORCE_AGGREGATE_ID i(1);i<=F.force_coefficients.Size();i++)
+        for(FORCE_AGGREGATE_ID i(0);i<F.force_coefficients.Size();i++)
             tolerances.force_coefficients(i)=max(eps,(T)1e-2*abs(F.force_coefficients(i)));
         solids_velocity_star_projected=structure_velocity;
         solid_system->Project(solids_velocity_star_projected);} // TODO: Exchange
@@ -387,16 +387,16 @@ Setup_Tolerances(const VECTOR_T& F,const VECTOR_ND<T>& fluid_velocity,const GENE
         for(int i=0;i<index_map.real_cell_indices.m;i++){int index=index_map.real_cell_indices(i);
             if(tolerances.pressure(index)<eps_velocity) tolerances.pressure(index)=eps_velocity;}
 
-        for(COUPLING_CONSTRAINT_ID i(1);i<=F.lambda.Size();i++)
+        for(COUPLING_CONSTRAINT_ID i(0);i<F.lambda.Size();i++)
             tolerances.lambda(i)=max((T)1e-3,abs(F.lambda(i)));
     
 
         solid_interpolation->Times(solids_velocity_star_projected,temporary_lambdas);
-        for(COUPLING_CONSTRAINT_ID i(1);i<=temporary_lambdas.Size();i++)
+        for(COUPLING_CONSTRAINT_ID i(0);i<temporary_lambdas.Size();i++)
             tolerances.lambda(i)=max(eps,scaling_factor*max(tolerances.lambda(i),abs(temporary_lambdas(i))));
 
         if(use_viscous_forces){
-            for(VISCOUS_FORCE_ID i(1);i<=F.viscous_force_coefficients.Size();i++)
+            for(VISCOUS_FORCE_ID i(0);i<F.viscous_force_coefficients.Size();i++)
                 tolerances.viscous_force_coefficients(i)=max(eps,(T)1e-2*abs(F.viscous_force_coefficients(i)));}}
     tolerances*=(T)1e-5;
 }
@@ -619,7 +619,7 @@ Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& bV,KRYLOV_VECTOR_BASE<T>& bR) 
         Exchange_Pressure(R.pressure);
         fluid_poisson->Apply_Preconditioner(R.pressure);
 
-        for(COUPLING_CONSTRAINT_ID i(1);i<=lambda_diagonal_preconditioner.m;i++)
+        for(COUPLING_CONSTRAINT_ID i(0);i<lambda_diagonal_preconditioner.m;i++)
             R.lambda(i)*=lambda_diagonal_preconditioner(i);}
 }
 //#####################################################################
@@ -650,13 +650,13 @@ Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& bR) const
     for(int i=0;i<index_map.real_cell_indices.m;i++){int index=index_map.real_cell_indices(i);
         if(abs(R.pressure(index))>tolerances.pressure(index)) pressure_converged=false;}
     bool lambda_converged=true;
-    for(COUPLING_CONSTRAINT_ID i(1);i<=tolerances.lambda.Size();i++)
+    for(COUPLING_CONSTRAINT_ID i(0);i<tolerances.lambda.Size();i++)
         if(abs(R.lambda(i))>tolerances.lambda(i)) lambda_converged=false;
     bool forces_converged=true;
-    for(FORCE_AGGREGATE_ID i(1);i<=tolerances.force_coefficients.Size();i++)
+    for(FORCE_AGGREGATE_ID i(0);i<tolerances.force_coefficients.Size();i++)
         if(abs(R.force_coefficients(i))>tolerances.force_coefficients(i)) forces_converged=false;
     bool viscous_forces_converged=true;
-    for(VISCOUS_FORCE_ID i(1);i<=tolerances.viscous_force_coefficients.Size();i++)
+    for(VISCOUS_FORCE_ID i(0);i<tolerances.viscous_force_coefficients.Size();i++)
         if(abs(R.viscous_force_coefficients(i))>tolerances.viscous_force_coefficients(i)) viscous_forces_converged=false;
     T ret=(pressure_converged && lambda_converged && forces_converged && viscous_forces_converged)?0:FLT_MAX;
     return mpi_solid_fluid?mpi_solid_fluid->Reduce_Max(ret):ret;
@@ -677,17 +677,17 @@ Linf_Norm(const VECTOR_T& R) const
 
     T coupling_convergence_norm=0;
     COUPLING_CONSTRAINT_ID max_lambda_error=COUPLING_CONSTRAINT_ID(0);
-    for(COUPLING_CONSTRAINT_ID i(1);i<=R.lambda.Size();i++){
+    for(COUPLING_CONSTRAINT_ID i(0);i<R.lambda.Size();i++){
         T lambda_error=abs(R.lambda(i));
         if(lambda_error>coupling_convergence_norm){
             max_lambda_error=i;
             coupling_convergence_norm=lambda_error;}}
 
     T forces_convergence_norm=(T)0;
-    for(FORCE_AGGREGATE_ID i(1);i<=R.force_coefficients.Size();i++) forces_convergence_norm=max(forces_convergence_norm,abs(R.force_coefficients(i)));
+    for(FORCE_AGGREGATE_ID i(0);i<R.force_coefficients.Size();i++) forces_convergence_norm=max(forces_convergence_norm,abs(R.force_coefficients(i)));
 
     T viscous_forces_convergence_norm=(T)0;
-    for(VISCOUS_FORCE_ID i(1);i<=R.viscous_force_coefficients.Size();i++) viscous_forces_convergence_norm=max(viscous_forces_convergence_norm,abs(R.viscous_force_coefficients(i)));
+    for(VISCOUS_FORCE_ID i(0);i<R.viscous_force_coefficients.Size();i++) viscous_forces_convergence_norm=max(viscous_forces_convergence_norm,abs(R.viscous_force_coefficients(i)));
     T convergence_norm=max(fluid_convergence_norm,coupling_convergence_norm,forces_convergence_norm,viscous_forces_convergence_norm);
 
     LOG::cout<<"Max pressure error at cell "<<max_pressure_error_cell<<" = "<<fluid_convergence_norm<<std::endl;
@@ -797,7 +797,7 @@ Compute_Lambda_Diagonal_Preconditioner()
     lambda_diagonal_preconditioner.Fill(0);
     solid_interpolation->Add_Diagonal(lambda_diagonal_preconditioner,*solid_mass);
     fluid_interpolation->Add_Diagonal(lambda_diagonal_preconditioner,*fluid_mass);
-    for(COUPLING_CONSTRAINT_ID i(1);i<=lambda_diagonal_preconditioner.m;i++)
+    for(COUPLING_CONSTRAINT_ID i(0);i<lambda_diagonal_preconditioner.m;i++)
         lambda_diagonal_preconditioner(i)=lambda_diagonal_preconditioner(i)?1/lambda_diagonal_preconditioner(i):1;
 }
 //#####################################################################

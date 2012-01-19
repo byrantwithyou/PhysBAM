@@ -227,7 +227,7 @@ Setup_Solids(const T dt,const T current_velocity_time,const T current_position_t
 
     // use F so we don't change the actual solid velocities
     DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>* collisions=0;
-    for(COLLISION_GEOMETRY_ID i(1);i<=fluids_parameters.collision_bodies_affecting_fluid->collision_geometry_collection.bodies.m;i++)
+    for(COLLISION_GEOMETRY_ID i(0);i<fluids_parameters.collision_bodies_affecting_fluid->collision_geometry_collection.bodies.m;i++)
         if(fluids_parameters.collision_bodies_affecting_fluid->collision_geometry_collection.Is_Active(i)){
             collisions=dynamic_cast<DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>*>(fluids_parameters.collision_bodies_affecting_fluid->collision_geometry_collection.bodies(i));if(collisions) break;}
 
@@ -617,7 +617,7 @@ template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>::
 Fill_Coupled_Face_Data(const COUPLING_CONSTRAINT_ID number_of_coupling_faces,const ARRAY<FACE_INDEX<TV::dimension> >& indexed_faces,
     const ARRAY<T,COUPLING_CONSTRAINT_ID>& coupling_face_data,T_FACE_ARRAYS_SCALAR& face_data)
 {
-    for(COUPLING_CONSTRAINT_ID i(1);i<=number_of_coupling_faces;i++){
+    for(COUPLING_CONSTRAINT_ID i(0);i<number_of_coupling_faces;i++){
         FACE_INDEX<TV::dimension> face_index=indexed_faces(Value(i));
         face_data(face_index)=coupling_face_data(i);}
 }

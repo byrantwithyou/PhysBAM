@@ -51,7 +51,7 @@ Implicit_Geometry_Extended_Value(const TV& location) const
 template<class T_GRID> void FLUID_COLLISION_BODY_INACCURATE_UNION<T_GRID>::
 Update_Intersection_Acceleration_Structures(const bool use_swept_simplex_hierarchy,const int state1,const int state2)
 {
-    for(COLLISION_GEOMETRY_ID i(1);i<=collision_bodies.collision_geometry_collection.bodies.m;i++) if(collision_bodies.Is_Active(i)) collision_bodies.collision_geometry_collection.bodies(i)->Update_Intersection_Acceleration_Structures(use_swept_simplex_hierarchy,state1,state2);
+    for(COLLISION_GEOMETRY_ID i(0);i<collision_bodies.collision_geometry_collection.bodies.m;i++) if(collision_bodies.Is_Active(i)) collision_bodies.collision_geometry_collection.bodies(i)->Update_Intersection_Acceleration_Structures(use_swept_simplex_hierarchy,state1,state2);
 }
 //#####################################################################
 // Function Restore_State
@@ -59,7 +59,7 @@ Update_Intersection_Acceleration_Structures(const bool use_swept_simplex_hierarc
 template<class T_GRID> void FLUID_COLLISION_BODY_INACCURATE_UNION<T_GRID>::
 Restore_State(const int state_index)
 {
-    for(COLLISION_GEOMETRY_ID i(1);i<=collision_bodies.collision_geometry_collection.bodies.m;i++) if(collision_bodies.Is_Active(i)) collision_bodies.collision_geometry_collection.bodies(i)->Restore_State(state_index);
+    for(COLLISION_GEOMETRY_ID i(0);i<collision_bodies.collision_geometry_collection.bodies.m;i++) if(collision_bodies.Is_Active(i)) collision_bodies.collision_geometry_collection.bodies(i)->Restore_State(state_index);
 }
 //#####################################################################
 // Function Save_State
@@ -67,7 +67,7 @@ Restore_State(const int state_index)
 template<class T_GRID> void FLUID_COLLISION_BODY_INACCURATE_UNION<T_GRID>::
 Save_State(const int state_index,const T time)
 {
-    for(COLLISION_GEOMETRY_ID i(1);i<=collision_bodies.collision_geometry_collection.bodies.m;i++) if(collision_bodies.Is_Active(i)) collision_bodies.collision_geometry_collection.bodies(i)->Save_State(state_index,time);
+    for(COLLISION_GEOMETRY_ID i(0);i<collision_bodies.collision_geometry_collection.bodies.m;i++) if(collision_bodies.Is_Active(i)) collision_bodies.collision_geometry_collection.bodies(i)->Save_State(state_index,time);
 }
 //#####################################################################
 // Function Read_State
@@ -75,7 +75,7 @@ Save_State(const int state_index,const T time)
 template<class T_GRID> void FLUID_COLLISION_BODY_INACCURATE_UNION<T_GRID>::
 Read_State(TYPED_ISTREAM& input,const int state_index)
 {
-    for(COLLISION_GEOMETRY_ID i(1);i<=collision_bodies.collision_geometry_collection.bodies.m;i++) if(collision_bodies.Is_Active(i)) collision_bodies.collision_geometry_collection.bodies(i)->Read_State(input,state_index);
+    for(COLLISION_GEOMETRY_ID i(0);i<collision_bodies.collision_geometry_collection.bodies.m;i++) if(collision_bodies.Is_Active(i)) collision_bodies.collision_geometry_collection.bodies(i)->Read_State(input,state_index);
 }
 //#####################################################################
 // Function Write_State
@@ -83,7 +83,7 @@ Read_State(TYPED_ISTREAM& input,const int state_index)
 template<class T_GRID> void FLUID_COLLISION_BODY_INACCURATE_UNION<T_GRID>::
 Write_State(TYPED_OSTREAM& output,const int state_index) const
 {
-    for(COLLISION_GEOMETRY_ID i(1);i<=collision_bodies.collision_geometry_collection.bodies.m;i++) if(collision_bodies.Is_Active(i)) collision_bodies.collision_geometry_collection.bodies(i)->Write_State(output,state_index);
+    for(COLLISION_GEOMETRY_ID i(0);i<collision_bodies.collision_geometry_collection.bodies.m;i++) if(collision_bodies.Is_Active(i)) collision_bodies.collision_geometry_collection.bodies(i)->Write_State(output,state_index);
 }
 //#####################################################################
 // Function Initialize_Grid_Structures
@@ -107,7 +107,7 @@ Initialize_Grid_Structures_Helper(OBJECTS_IN_CELL<T_GRID,COLLISION_GEOMETRY_ID>&
     face_velocities_set.Resize(grid,3,false,false);face_velocities_set.Fill(false);
     T_FACE_ARRAYS_INT face_velocities_count(grid,3);
     T_FACE_ARRAYS_COLLISION_GEOMETRY_ID face_operations(grid,3);
-    for(COLLISION_GEOMETRY_ID i(1);i<=collision_bodies.collision_geometry_collection.bodies.m;i++)if(collision_bodies.Is_Active(i) && collision_bodies.collision_geometry_collection.bodies(i)->active)
+    for(COLLISION_GEOMETRY_ID i(0);i<collision_bodies.collision_geometry_collection.bodies.m;i++)if(collision_bodies.Is_Active(i) && collision_bodies.collision_geometry_collection.bodies(i)->active)
         Initialize_Grid_Structures_Subobject(face_velocities_count,face_operations,i,typename T_GRID::GRID_TAG());
     for(typename T_GRID::FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) if(face_velocities_count.Component(iterator.Axis())(iterator.Face_Index())){
         face_velocities.Component(iterator.Axis())(iterator.Face_Index())/=face_velocities_count.Component(iterator.Axis())(iterator.Face_Index());

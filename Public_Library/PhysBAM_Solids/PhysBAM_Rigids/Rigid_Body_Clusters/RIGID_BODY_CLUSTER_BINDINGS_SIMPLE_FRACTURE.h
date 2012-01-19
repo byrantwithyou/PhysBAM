@@ -50,7 +50,7 @@ public:
     void Initialize_Strain(const int parent,FRACTURE_DATA& data)
     {typename RIGID_BODY_CLUSTER_BINDINGS<TV>::CLUSTER& cluster=*bindings.reverse_bindings.Get(parent);
     // compute restlengths  
-    for(RIGID_CLUSTER_CONSTITUENT_ID i(1);i<=cluster.children.Size();i++) for(RIGID_CLUSTER_CONSTITUENT_ID j(1);j<i;j++){
+    for(RIGID_CLUSTER_CONSTITUENT_ID i(0);i<cluster.children.Size();i++) for(RIGID_CLUSTER_CONSTITUENT_ID j(1);j<i;j++){
         RIGID_BODY<TV> &child_1=rigid_body_collection.Rigid_Body(cluster.children(i)),&child_2=rigid_body_collection.Rigid_Body(cluster.children(j));
         data.connections.Append(VECTOR<RIGID_CLUSTER_CONSTITUENT_ID,2>(i,j));
         data.restlengths.Append((child_2.Frame().t-child_1.Frame().t).Magnitude());
@@ -114,13 +114,13 @@ public:
         int number_components=undirected.Connected_Components(components);
         if(number_components==1) continue;
         ARRAY<ARRAY<int,RIGID_CLUSTER_CONSTITUENT_ID> > new_cluster_constituents(number_components);
-        for(RIGID_CLUSTER_CONSTITUENT_ID i(1);i<=cluster.children.Size();i++)
+        for(RIGID_CLUSTER_CONSTITUENT_ID i(0);i<cluster.children.Size();i++)
             new_cluster_constituents(components(i)).Append(cluster.children(i));
         bindings.Delete_Binding(parent);
         for(int i=0;i<new_cluster_constituents.m;i++) if(new_cluster_constituents(i).Size()>RIGID_CLUSTER_CONSTITUENT_ID(1)) bindings.Add_Binding(new_cluster_constituents(i));}
     //for(typename HASHTABLE<int,typename RIGID_BODY_CLUSTER_BINDINGS<TV>::CLUSTER>::ITERATOR iterator(bindings.reverse_bindings);iterator.Valid();iterator.Next()){
     //    LOG::cout<<"cluster parent "<<iterator.Key()<<std::endl; 
-    //    for(RIGID_CLUSTER_CONSTITUENT_ID j(1);j<=iterator.Data().children.Size();j++)
+    //    for(RIGID_CLUSTER_CONSTITUENT_ID j(0);j<iterator.Data().children.Size();j++)
     //        LOG::cout<<"   constituent "<<iterator.Data().children(j)<<std::endl;}
     //for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++){
     //    LOG::cout<<"rigid "<<i<<" -> "<<(i<=bindings.binding_index.m?bindings.binding_index(i).x:0)<<std::endl;}

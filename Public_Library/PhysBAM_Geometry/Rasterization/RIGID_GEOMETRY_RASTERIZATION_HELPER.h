@@ -57,7 +57,7 @@ template<class TV,class T_GRID> void Rasterize_Object_Generic(const COLLISION_GE
             RANGE<TV> box=RANGE<TV>::Bounding_Box(pts).Thickened(collision_geometry.collision_thickness);
             Rasterize_Box(grid,objects,box,id);}
     else
-        for(COLLISION_GEOMETRY_ID i(1);i<=collision_geometry.collision_geometries_for_rasterization->m;i++)
+        for(COLLISION_GEOMETRY_ID i(0);i<collision_geometry.collision_geometries_for_rasterization->m;i++)
             if((*collision_geometry.collision_geometries_for_rasterization)(i) && (*collision_geometry.collision_geometries_for_rasterization)(i)->active)
                 Rasterize_Object(*(*collision_geometry.collision_geometries_for_rasterization)(i),grid,objects,id);
 }

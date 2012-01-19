@@ -45,7 +45,7 @@ Initialize()
     effective_mass.Resize(joint_mesh.Size());
     intermediate_twists.Resize(articulated_rigid_body.rigid_body_collection.rigid_body_particle.array_collection->Size());
     keep_joint.Remove_All();
-    for(JOINT_ID j(1);j<=joint_mesh.Size();j++) if(joint_mesh.Is_Active(j)){
+    for(JOINT_ID j(0);j<joint_mesh.Size();j++) if(joint_mesh.Is_Active(j)){
         const RIGID_BODY<TV>& parent_body=*articulated_rigid_body.Parent(j);
         const RIGID_BODY<TV>& child_body=*articulated_rigid_body.Child(j);
         location(j)=joint_mesh(j)->Location(parent_body,child_body);
@@ -60,7 +60,7 @@ Initialize()
     if(break_loops){
         keep_joint.Resize(joint_mesh.Size());
         UNION_FIND<int> u(intermediate_twists.m);
-        for(JOINT_ID j(1);j<=joint_mesh.Size();j++) if(joint_mesh.Is_Active(j)){
+        for(JOINT_ID j(0);j<joint_mesh.Size();j++) if(joint_mesh.Is_Active(j)){
             int p=articulated_rigid_body.Parent_Id(j),c=articulated_rigid_body.Child_Id(j);
             if(u.Find(p)==u.Find(c)) continue;
             keep_joint(j)=true;
@@ -73,7 +73,7 @@ template<class TV> void ARTICULATED_SYSTEM<TV>::
 Gather(const ARRAY_VIEW<const TWIST<TV>,JOINT_ID> x,ARRAY_VIEW<TWIST<TV> > y) const
 {
     const JOINT_MESH<TV>& joint_mesh=articulated_rigid_body.joint_mesh;
-    for(JOINT_ID j(1);j<=joint_mesh.Size();j++) if(joint_mesh.Is_Active(j)){
+    for(JOINT_ID j(0);j<joint_mesh.Size();j++) if(joint_mesh.Is_Active(j)){
         if(break_loops && !keep_joint(j)) continue;
         y(articulated_rigid_body.Parent_Id(j))+=articulated_rigid_body.Parent(j)->Gather(x(j),location(j));
         y(articulated_rigid_body.Child_Id(j))-=articulated_rigid_body.Child(j)->Gather(x(j),location(j));}
@@ -94,7 +94,7 @@ template<class TV> void ARTICULATED_SYSTEM<TV>::
 Scatter(const ARRAY_VIEW<const TWIST<TV> > x,ARRAY_VIEW<TWIST<TV>,JOINT_ID> y) const
 {
     const JOINT_MESH<TV>& joint_mesh=articulated_rigid_body.joint_mesh;
-    for(JOINT_ID j(1);j<=joint_mesh.Size();j++) if(joint_mesh.Is_Active(j)){
+    for(JOINT_ID j(0);j<joint_mesh.Size();j++) if(joint_mesh.Is_Active(j)){
         if(break_loops && !keep_joint(j)) continue;
         y(j)+=articulated_rigid_body.Parent(j)->Scatter(x(articulated_rigid_body.Parent_Id(j)),location(j));
         y(j)-=articulated_rigid_body.Child(j)->Scatter(x(articulated_rigid_body.Child_Id(j)),location(j));}
@@ -114,7 +114,7 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const
     Inverse_Mass(intermediate_twists);
     Scatter(intermediate_twists,twist);
     if(break_loops)
-        for(JOINT_ID j(1);j<=articulated_rigid_body.joint_mesh.Size();j++) if(articulated_rigid_body.joint_mesh.Is_Active(j))
+        for(JOINT_ID j(0);j<articulated_rigid_body.joint_mesh.Size();j++) if(articulated_rigid_body.joint_mesh.Is_Active(j))
             if(!keep_joint(j))
                 twist(j)=wrench(j);
 
@@ -147,7 +147,7 @@ Project(KRYLOV_VECTOR_BASE<T>& x) const
 {
     const JOINT_MESH<TV>& joint_mesh=articulated_rigid_body.joint_mesh;
     ARRAY<TWIST<TV>,JOINT_ID>& twist=debug_cast<ARTICULATED_VECTOR<TV>&>(x).v;
-    for(JOINT_ID j(1);j<=joint_mesh.Size();j++) if(joint_mesh.Is_Active(j)){
+    for(JOINT_ID j(0);j<joint_mesh.Size();j++) if(joint_mesh.Is_Active(j)){
         if(break_loops && !keep_joint(j)) continue;
         twist(j).linear=prismatic_projection(j)*twist(j).linear;
         twist(j).angular=angular_projection(j)*twist(j).angular;}
@@ -164,7 +164,7 @@ Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) con
 
     // TODO: Better inner product.
     double r=0;
-    for(JOINT_ID j(1);j<=joint_mesh.Size();j++) if(joint_mesh.Is_Active(j))
+    for(JOINT_ID j(0);j<joint_mesh.Size();j++) if(joint_mesh.Is_Active(j))
         r+=VECTOR<T,TWIST<TV>::dimension>::Dot_Product(xx(j).Get_Vector(),yy(j).Get_Vector());
     return r;
 }

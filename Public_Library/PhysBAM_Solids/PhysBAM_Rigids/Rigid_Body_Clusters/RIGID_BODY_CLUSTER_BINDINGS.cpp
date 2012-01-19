@@ -49,9 +49,9 @@ Update_Joint_Structures(const int parent)
     CLUSTER& cluster=*reverse_bindings.Get(parent);
     HASHTABLE<int> hashtable;
     articulated_rigid_body.joint_mesh.undirected_graph.Ensure_Number_Nodes(rigid_body_collection.rigid_body_particle.array_collection->Size());
-    for(RIGID_CLUSTER_CONSTITUENT_ID i(1);i<=cluster.children.Size();i++)
+    for(RIGID_CLUSTER_CONSTITUENT_ID i(0);i<cluster.children.Size();i++)
         hashtable.Set(cluster.children(i));
-    for(RIGID_CLUSTER_CONSTITUENT_ID i(1);i<=cluster.children.Size();i++){
+    for(RIGID_CLUSTER_CONSTITUENT_ID i(0);i<cluster.children.Size();i++){
         int id=cluster.children(i);
         const ARRAY<JOINT_ID>& list=articulated_rigid_body.joint_mesh.undirected_graph.Adjacent_Edges(id);
         for(int j=0;j<list.m;j++){
@@ -89,7 +89,7 @@ Add_Binding(const ARRAY<int,RIGID_CLUSTER_CONSTITUENT_ID>& child_particles)
     cluster.parent=parent;cluster.stored_active=false;
     binding_index.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size());
     bool has_static=false,has_kinematic=false;
-    for(RIGID_CLUSTER_CONSTITUENT_ID i(1);i<=child_particles.Size();i++){
+    for(RIGID_CLUSTER_CONSTITUENT_ID i(0);i<child_particles.Size();i++){
         cluster.children.Append(child_particles(i));
         cluster.child_to_parent.Append(FRAME<TV>());
         RIGID_BODY<TV>& body=rigid_body_collection.Rigid_Body(child_particles(i));
@@ -115,7 +115,7 @@ Delete_Binding(const int parent_particle)
     Set_Binding_Active(parent_particle,false);
     CLUSTER& cluster=*reverse_bindings.Get(parent_particle);
     rigid_body_collection.rigid_geometry_collection.Reactivate_Geometry(cluster.parent);
-    for(RIGID_CLUSTER_CONSTITUENT_ID i(1);i<=cluster.children.Size();i++){
+    for(RIGID_CLUSTER_CONSTITUENT_ID i(0);i<cluster.children.Size();i++){
         int child=cluster.children(i);
         for(int j=0;j<binding_index(child).m;j++) if(binding_index(child)(j).x==parent_particle){binding_index(child).Remove_Index_Lazy(j);break;}}
     binding_index(parent_particle).Remove_All();
@@ -155,7 +155,7 @@ Set_Binding_Active(const int parent_particle,const bool active,GRID_BASED_COLLIS
             else{articulated_rigid_body.Substitute_Joint_Child_Body(cluster.boundary_joints(i).joint_id,parent_particle);}}
         if(fluid_collision_body_list && fluid_collision_body_list->collision_geometry_collection.bodies.m){
             fluid_collision_body_list->collision_geometry_collection.Add_Body(new RIGID_COLLISION_GEOMETRY<TV>(rigid_body_collection.Rigid_Body(parent_particle)),parent_particle,true);
-            for(RIGID_CLUSTER_CONSTITUENT_ID i(1);i<=cluster.children.Size();i++){
+            for(RIGID_CLUSTER_CONSTITUENT_ID i(0);i<cluster.children.Size();i++){
                 COLLISION_GEOMETRY<TV>& child_collision_geometry=*fluid_collision_body_list->collision_geometry_collection.Get_Collision_Geometry(cluster.children(i));
                 fluid_collision_body_list->collision_geometry_collection.Remove_Body(child_collision_geometry.collision_geometry_id);}}}
     else{
@@ -170,7 +170,7 @@ Set_Binding_Active(const int parent_particle,const bool active,GRID_BASED_COLLIS
         if(fluid_collision_body_list && fluid_collision_body_list->collision_geometry_collection.bodies.m){
             COLLISION_GEOMETRY<TV>& parent_geometry=*rigid_body_collection.rigid_geometry_collection.collision_body_list->Get_Collision_Geometry(parent_particle);
             fluid_collision_body_list->collision_geometry_collection.Remove_Body(parent_geometry.collision_geometry_id);
-            for(RIGID_CLUSTER_CONSTITUENT_ID i(1);i<=cluster.children.Size();i++){
+            for(RIGID_CLUSTER_CONSTITUENT_ID i(0);i<cluster.children.Size();i++){
                 fluid_collision_body_list->collision_geometry_collection.Add_Body(new RIGID_COLLISION_GEOMETRY<TV>(rigid_body_collection.Rigid_Body(cluster.children(i))),cluster.children(i),true);}}}
 
     cluster.active=active;
@@ -178,7 +178,7 @@ Set_Binding_Active(const int parent_particle,const bool active,GRID_BASED_COLLIS
         rigid_body_collection.rigid_body_particle.X(parent_particle)=TV::All_Ones_Vector()*1e10;
         rigid_body_collection.rigid_body_particle.twist(parent_particle).linear=TV::All_Ones_Vector()*1e10;
         rigid_body_collection.rigid_body_particle.twist(parent_particle).angular=T_SPIN::All_Ones_Vector()*1e10;}
-    for(RIGID_CLUSTER_CONSTITUENT_ID i(1);i<=cluster.children.Size();i++) if(active) Make_Active_Parent(parent_particle,binding_index(cluster.children(i)));
+    for(RIGID_CLUSTER_CONSTITUENT_ID i(0);i<cluster.children.Size();i++) if(active) Make_Active_Parent(parent_particle,binding_index(cluster.children(i)));
 }
 //#####################################################################
 // Function Deactivate_And_Return_Clusters
@@ -270,7 +270,7 @@ Distribute_Force_To_Parents(ARRAY_VIEW<TWIST<TV> > wrench_full) const
     for(T_REVERSE_BINDING_ITERATOR iterator(reverse_bindings);iterator.Valid();iterator.Next()){
         int parent=iterator.Key();
         const CLUSTER& cluster=*iterator.Data();
-        if(cluster.active && !cluster.infinite_body) for(RIGID_CLUSTER_CONSTITUENT_ID j(1);j<=cluster.children.Size();j++){
+        if(cluster.active && !cluster.infinite_body) for(RIGID_CLUSTER_CONSTITUENT_ID j(0);j<cluster.children.Size();j++){
             const int child=cluster.children(j);
             if(rigid_body_collection.Rigid_Body(child).Has_Infinite_Inertia()) continue;
             wrench_full(parent).linear+=wrench_full(child).linear;
@@ -284,7 +284,7 @@ template<class TV> void RIGID_BODY_CLUSTER_BINDINGS<TV>::
 Clamp_Particles_To_Embedded_Positions(const int parent) const
 {
     const CLUSTER& cluster=*reverse_bindings.Get(parent);
-    if(cluster.active) for(RIGID_CLUSTER_CONSTITUENT_ID j(1);j<=cluster.children.Size();j++){
+    if(cluster.active) for(RIGID_CLUSTER_CONSTITUENT_ID j(0);j<cluster.children.Size();j++){
         const int child=cluster.children(j);
         if(rigid_body_collection.Rigid_Body(child).Has_Infinite_Inertia()) continue;
         rigid_body_collection.Rigid_Body(child).Set_Frame(rigid_body_collection.Rigid_Body(parent).Frame()*cluster.child_to_parent(j));}
@@ -296,7 +296,7 @@ template<class TV> void RIGID_BODY_CLUSTER_BINDINGS<TV>::
 Clamp_Particles_To_Embedded_Velocities(const int parent) const
 {
     const CLUSTER& cluster=*reverse_bindings.Get(parent);
-    if(cluster.active) for(RIGID_CLUSTER_CONSTITUENT_ID j(1);j<=cluster.children.Size();j++){
+    if(cluster.active) for(RIGID_CLUSTER_CONSTITUENT_ID j(0);j<cluster.children.Size();j++){
         const int child=cluster.children(j);
         if(rigid_body_collection.Rigid_Body(child).Has_Infinite_Inertia()) continue;
         rigid_body_collection.rigid_body_particle.twist(child).linear=rigid_body_collection.Rigid_Body(parent).Pointwise_Object_Velocity(rigid_body_collection.rigid_body_particle.X(child));
@@ -310,7 +310,7 @@ template<class TV> void RIGID_BODY_CLUSTER_BINDINGS<TV>::
 Clamp_Particles_To_Embedded_Velocities(const int parent,ARRAY_VIEW<TWIST<TV> >& twist) const
 {
     const CLUSTER& cluster=*reverse_bindings.Get(parent);
-    if(cluster.active) for(RIGID_CLUSTER_CONSTITUENT_ID j(1);j<=cluster.children.Size();j++){
+    if(cluster.active) for(RIGID_CLUSTER_CONSTITUENT_ID j(0);j<cluster.children.Size();j++){
         const int child=cluster.children(j);
         if(rigid_body_collection.Rigid_Body(child).Has_Infinite_Inertia()) continue;
         twist(child).linear=rigid_body_collection.Rigid_Body(parent).Pointwise_Object_Velocity(
@@ -325,7 +325,7 @@ Clear_Hard_Bound_Particles(ARRAY<bool>& particle_is_simulated) const
 {
     for(T_REVERSE_BINDING_ITERATOR i(reverse_bindings);i.Valid();i.Next()){
         const CLUSTER& bindings=*i.Data();
-        if(bindings.active) for(RIGID_CLUSTER_CONSTITUENT_ID j(1);j<=bindings.children.Size();j++) particle_is_simulated(bindings.children(j))=false;}
+        if(bindings.active) for(RIGID_CLUSTER_CONSTITUENT_ID j(0);j<bindings.children.Size();j++) particle_is_simulated(bindings.children(j))=false;}
 }
 //#####################################################################
 // Function Distribute_Force_To_Parents
@@ -353,7 +353,7 @@ namespace{
         // compute aggregate inertia tensor and angular momentum
         typename RIGID_BODY_POLICY<TV>::WORLD_SPACE_INERTIA_TENSOR inertia_tensor;
         parent_body.Angular_Momentum()=T_SPIN();
-        for(RIGID_CLUSTER_CONSTITUENT_ID i(1);i<=cluster.children.Size();i++){
+        for(RIGID_CLUSTER_CONSTITUENT_ID i(0);i<cluster.children.Size();i++){
             int child=cluster.children(i);RIGID_BODY<TV>& child_body=rigid_body_collection.Rigid_Body(child);
             TV s=(child_body.X()-parent_body.X());
             inertia_tensor+=child_body.World_Space_Inertia_Tensor()+MATRIX_POLICY<TV>::CROSS_PRODUCT_MATRIX::Cross_Product_Matrix(child_body.Mass()*s).Times_Cross_Product_Matrix_Transpose_With_Symmetric_Result(s);
@@ -380,7 +380,7 @@ Distribute_Mass_To_Parent(const int parent)
         rbp.mass(parent)=T();
         rbp.inertia_tensor(parent)=typename RIGID_BODY_POLICY<TV>::INERTIA_TENSOR();
         // Find center of mass
-        for(RIGID_CLUSTER_CONSTITUENT_ID i(1);i<=cluster.children.Size();i++){
+        for(RIGID_CLUSTER_CONSTITUENT_ID i(0);i<cluster.children.Size();i++){
             int child=cluster.children(i);
             rbp.mass(parent)+=rbp.mass(child);
             rbp.X(parent)+=rbp.X(child)*rbp.mass(child);
@@ -388,7 +388,7 @@ Distribute_Mass_To_Parent(const int parent)
         rbp.X(parent)/=rbp.mass(parent);
         rbp.twist(parent).linear/=rbp.mass(parent);
         Distribute_Mass_To_Parents_Helper(rigid_body_collection,cluster,parent);}
-    for(RIGID_CLUSTER_CONSTITUENT_ID i(1);i<=cluster.children.Size();i++){
+    for(RIGID_CLUSTER_CONSTITUENT_ID i(0);i<cluster.children.Size();i++){
         int child=cluster.children(i);RIGID_BODY<TV>& child_body=rigid_body_collection.Rigid_Body(child);
         cluster.child_to_parent(i)=rigid_body_collection.Rigid_Body(parent).Frame().Inverse()*child_body.Frame();}
 }
@@ -406,7 +406,7 @@ Build_Aggregate_Geometry(const int parent)
         rigid_body_collection.rigid_geometry_collection.structure_list.Remove_Element(rigid_body_collection.rigid_body_particle.structure_ids(parent)(j));
 
     ARRAY<IMPLICIT_OBJECT<TV>*>* implicits=new ARRAY<IMPLICIT_OBJECT<TV>*>;
-    for(RIGID_CLUSTER_CONSTITUENT_ID i(1);i<=cluster.children.Size();i++){
+    for(RIGID_CLUSTER_CONSTITUENT_ID i(0);i<cluster.children.Size();i++){
         int child=cluster.children(i);RIGID_BODY<TV>& child_body=rigid_body_collection.Rigid_Body(child);
         if(child_body.simplicial_object){
             objects.Append(child_body.simplicial_object);
@@ -432,7 +432,7 @@ Update_Aggregate_Geometry(const int parent)
     ARRAY<T_SIMPLICIAL_OBJECT*> objects;
     ARRAY<FRAME<TV> > relative_frames;
 
-    for(RIGID_CLUSTER_CONSTITUENT_ID i(1);i<=cluster.children.Size();i++){
+    for(RIGID_CLUSTER_CONSTITUENT_ID i(0);i<cluster.children.Size();i++){
         int child=cluster.children(i);RIGID_BODY<TV>& child_body=rigid_body_collection.Rigid_Body(child);
         if(child_body.simplicial_object){
             objects.Append(child_body.simplicial_object);

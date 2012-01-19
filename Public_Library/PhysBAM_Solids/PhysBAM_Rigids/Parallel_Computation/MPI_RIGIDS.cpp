@@ -283,7 +283,7 @@ Simple_Partition(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,
     COLLISION_GEOMETRY_SPATIAL_PARTITION<COLLISION_GEOMETRY<TV>,const ARRAY<COLLISION_GEOMETRY<TV>*,COLLISION_GEOMETRY_ID>,COLLISION_GEOMETRY_ID>& spatial_partition)
 {
     particles_of_partition.Resize(PARTITION_ID(number_of_processors+1)); // Last index is for global particles
-    for(PARTITION_ID id(1);id<=particles_of_partition.Size();id++) particles_of_partition(id).Resize(0);
+    for(PARTITION_ID id(0);id<particles_of_partition.Size();id++) particles_of_partition(id).Resize(0);
     partition_id_from_particle_index.Remove_All();
     partition_id_from_particle_index.Resize(rigid_body_collection_input.rigid_body_particle.array_collection->Size());
 

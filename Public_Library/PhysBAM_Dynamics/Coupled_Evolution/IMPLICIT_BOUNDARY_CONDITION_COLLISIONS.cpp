@@ -48,7 +48,7 @@ Update_Boundary_Conditions(const GRID<TV>& grid,ARRAY<bool,TV_INT>& psi_D,ARRAY<
                 psi_D(cell_index)=true;p(cell_index)=p_inside_solid;}}
         return;}
 
-    for(COLLISION_GEOMETRY_ID i(1);i<=collision_geometry_collection.Size();i++) if(collision_geometry_collection.Is_Active(i)){
+    for(COLLISION_GEOMETRY_ID i(0);i<collision_geometry_collection.Size();i++) if(collision_geometry_collection.Is_Active(i)){
         T collision_thickness_over_two=collision_geometry_collection.collision_body_thickness*(T).5;
         if(DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>* object=dynamic_cast<DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>*>(&collision_geometry_collection(i))){
             if(!object->volume_object){

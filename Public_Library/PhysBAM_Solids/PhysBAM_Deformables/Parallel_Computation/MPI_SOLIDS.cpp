@@ -96,7 +96,7 @@ Compute_Mpi_Partition(MPI_PARTITION& mpi_partition,const SEGMENT_MESH& connectiv
                 if(done(n)) continue;
                 done(n)=true;
                 mpi_partition.ghost_dynamic_particles(np).Append(n);}}}
-    for(PARTITION_ID p(1);p<=mpi_partition.ghost_dynamic_particles.m;p++){
+    for(PARTITION_ID p(0);p<mpi_partition.ghost_dynamic_particles.m;p++){
         if(mpi_partition.ghost_dynamic_particles(p).m)
             mpi_partition.neighbor_partitions.Append(p);
         Sort(mpi_partition.ghost_dynamic_particles(p));
@@ -147,7 +147,7 @@ Gather_Data(ARRAY_VIEW<T_DATA> array) const
     if(rank==0){
         // Count others
         ARRAY<int,PARTITION_ID> counts(particles_of_partition.m),offsets(particles_of_partition.m);
-        for(PARTITION_ID p(1);p<=particles_of_partition.m;p++){
+        for(PARTITION_ID p(0);p<particles_of_partition.m;p++){
             counts(p)=particles_of_partition(p).m;
             if(p>PARTITION_ID(1)) offsets(p)=offsets(p-1)+counts(p-1);}
 
@@ -155,7 +155,7 @@ Gather_Data(ARRAY_VIEW<T_DATA> array) const
         comm->Gatherv(data_of_partition.Get_Array_Pointer(),data_of_partition.m,MPI_UTILITIES::Datatype<T_DATA>(),all_data.Get_Array_Pointer(),counts.Get_Array_Pointer(),
             offsets.Get_Array_Pointer(),MPI_UTILITIES::Datatype<T_DATA>(),0);
 
-        for(PARTITION_ID p(1);p<=particles_of_partition.m;p++){
+        for(PARTITION_ID p(0);p<particles_of_partition.m;p++){
             array.Subset(particles_of_partition(p))=all_data.Subset(IDENTITY_ARRAY<>(counts(p))+offsets(p));}}
     else comm->Gatherv(data_of_partition.Get_Array_Pointer(),data_of_partition.m,MPI_UTILITIES::Datatype<T_DATA>(),0,0,0,MPI_UTILITIES::Datatype<T_DATA>(),0);
 }
@@ -177,7 +177,7 @@ All_Gather_Particles(ARRAY_VIEW<TV> X,ARRAY_VIEW<TV> V) const
     data_of_partition.Append_Elements(V.Subset(particles_of_partition(Partition())));
 
     ARRAY<int,PARTITION_ID> counts(particles_of_partition.m),offsets(particles_of_partition.m);
-    for(PARTITION_ID p(1);p<=particles_of_partition.m;p++){
+    for(PARTITION_ID p(0);p<particles_of_partition.m;p++){
         counts(p)=particles_of_partition(p).m*2;
         if(p>PARTITION_ID(1)) offsets(p)=offsets(p-1)+counts(p-1);}
 
@@ -185,7 +185,7 @@ All_Gather_Particles(ARRAY_VIEW<TV> X,ARRAY_VIEW<TV> V) const
     comm->Allgatherv(data_of_partition.Get_Array_Pointer(),data_of_partition.m,MPI_UTILITIES::Datatype<TV>(),all_data.Get_Array_Pointer(),counts.Get_Array_Pointer(),
         offsets.Get_Array_Pointer(),MPI_UTILITIES::Datatype<TV>());
 
-    for(PARTITION_ID p(1);p<=particles_of_partition.m;p++){
+    for(PARTITION_ID p(0);p<particles_of_partition.m;p++){
         int half_count=counts(p)/2;
         X.Subset(particles_of_partition(p))=all_data.Subset(IDENTITY_ARRAY<>(half_count)+offsets(p));
         V.Subset(particles_of_partition(p))=all_data.Subset(IDENTITY_ARRAY<>(half_count)+(offsets(p)+half_count));}
@@ -325,7 +325,7 @@ All_Scatter_Adhesion_Pairs(ARRAY<ARRAY<PAIR<VECTOR<int,2>,VECTOR<typename TV::SC
 {
     int tag=Get_Unique_Tag();
     ARRAY<MPI::Request> requests;ARRAY<ARRAY<char>,PARTITION_ID> send_buffers(Number_Of_Partitions());
-    for(PARTITION_ID partition(1);partition<=pairs_to_scatter.Size();partition++){
+    for(PARTITION_ID partition(0);partition<pairs_to_scatter.Size();partition++){
         if(partition!=Partition()){
             send_buffers(partition).Resize(1+MPI_UTILITIES::Pack_Size(pairs_to_scatter(partition),*comm));int position=0;
             MPI_UTILITIES::Pack(pairs_to_scatter(partition),send_buffers(partition),position,*comm);
@@ -564,11 +564,11 @@ KD_Tree_Partition(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection_inp
     KD_TREE<TV> kd_tree(false);kd_tree.Create_KD_Tree(X);PARTITION_ID partition;
     KD_Tree_Partition_Helper(IDENTITY_ARRAY<int>(X.Size()),*kd_tree.root_node,0,height,partition,particles_of_partition);
     LOG::cout<<"Partition Statistics: ";
-    for(PARTITION_ID i(1);i<=particles_of_partition.Size();i++) LOG::cout<<particles_of_partition(i).Size()<<", ";
+    for(PARTITION_ID i(0);i<particles_of_partition.Size();i++) LOG::cout<<particles_of_partition(i).Size()<<", ";
     LOG::cout<<std::endl;
     partition_id_from_particle_index.Remove_All();
     partition_id_from_particle_index.Resize(deformable_body_collection_input.particles.array_collection->Size()+rigid_geometry_collection_input.particles.array_collection->Size());
-    for(PARTITION_ID i(1);i<=particles_of_partition.Size();i++){
+    for(PARTITION_ID i(0);i<particles_of_partition.Size();i++){
         INDIRECT_ARRAY<ARRAY<PARTITION_ID> > partition_subset(partition_id_from_particle_index,particles_of_partition(i));
         if(partition_id_from_particle_index.Size()) partition_subset.Fill(i);}
 }
@@ -587,11 +587,11 @@ KD_Tree_Partition_Subset(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collect
     KD_TREE<TV> kd_tree(false);kd_tree.Create_KD_Tree(X_nodes);PARTITION_ID partition;
     KD_Tree_Partition_Helper(nodes,*kd_tree.root_node,0,height,partition,particles_of_partition);
     LOG::cout<<"Partition Statistics: ";
-    for(PARTITION_ID i(1);i<=particles_of_partition.Size();i++) LOG::cout<<particles_of_partition(i).Size()<<", ";
+    for(PARTITION_ID i(0);i<particles_of_partition.Size();i++) LOG::cout<<particles_of_partition(i).Size()<<", ";
     LOG::cout<<std::endl;
     partition_id_from_particle_index.Remove_All();
     partition_id_from_particle_index.Resize(deformable_body_collection_input.particles.array_collection->Size()+rigid_geometry_collection_input.particles.array_collection->Size());
-    for(PARTITION_ID i(1);i<=particles_of_partition.Size();i++){
+    for(PARTITION_ID i(0);i<particles_of_partition.Size();i++){
         INDIRECT_ARRAY<ARRAY<PARTITION_ID> > partition_subset(partition_id_from_particle_index,particles_of_partition(i));
         partition_subset.Fill(i);}
 }
@@ -641,7 +641,7 @@ template<class TV,class T_ARRAY_PAIR> void Distribute_Repulsion_Pairs_Helper(con
             processor_pair_indices(processor).Append_Elements(components(i));}
         // construct particle list to send
         ARRAY<ARRAY<ARRAY<int>,PARTITION_ID>,PARTITION_ID> send_matrix(mpi_solids.particles_of_partition.Size()),receive_matrix(mpi_solids.particles_of_partition.Size());
-        for(PARTITION_ID i(1);i<=mpi_solids.particles_of_partition.Size();i++){
+        for(PARTITION_ID i(0);i<mpi_solids.particles_of_partition.Size();i++){
             send_matrix(i).Resize(mpi_solids.particles_of_partition.Size());receive_matrix(i).Resize(mpi_solids.particles_of_partition.Size());}
         for(int p=0;p<particle_to_component.m;p++){int component=particle_to_component(p);
             if(component){
@@ -683,7 +683,7 @@ Gather_Repulsion_Inputs(ARRAY_VIEW<TV> X_self_collision_free,ARRAY_VIEW<TV> X,AR
     int tag=Get_Unique_Tag();
     ARRAY<MPI_PACKAGE> packages;ARRAY<MPI::Request> requests;
     // send
-    for(PARTITION_ID other_proc(1);other_proc<=send_particles.Size();other_proc++) if(other_proc!=Partition() && send_particles(other_proc).Size()>0){
+    for(PARTITION_ID other_proc(0);other_proc<send_particles.Size();other_proc++) if(other_proc!=Partition() && send_particles(other_proc).Size()>0){
         ARRAY<MPI_PACKAGE> packages_to_union;
         //packages_to_union.Append(X_self_collision_free.Subset(send_particles(other_proc)));
         packages_to_union.Append(MPI_PACKAGE(X.Subset(send_particles(other_proc))));
@@ -693,7 +693,7 @@ Gather_Repulsion_Inputs(ARRAY_VIEW<TV> X_self_collision_free,ARRAY_VIEW<TV> X,AR
         requests.Append(package.Isend(*comm,Partition_To_Rank(other_proc),tag));
         MPI_PACKAGE::Free_All(packages_to_union);}
     // receive
-    for(PARTITION_ID other_proc(1);other_proc<=receive_particles.Size();other_proc++) if(other_proc!=Partition() && receive_particles(other_proc).Size()>0){
+    for(PARTITION_ID other_proc(0);other_proc<receive_particles.Size();other_proc++) if(other_proc!=Partition() && receive_particles(other_proc).Size()>0){
         ARRAY<MPI_PACKAGE> packages_to_union;
         //packages_to_union.Append(X_self_collision_free.Subset(receive_particles(other_proc)));
         packages_to_union.Append(MPI_PACKAGE(X.Subset(receive_particles(other_proc))));

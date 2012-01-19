@@ -46,16 +46,16 @@ public:
     virtual ~GRID_BASED_COLLISION_GEOMETRY();
 
     void Save_State(const int state_index,const T time=0)
-    {for(COLLISION_GEOMETRY_ID i(1);i<=collision_geometry_collection.bodies.m;i++) if(Is_Active(i)) collision_geometry_collection.bodies(i)->Save_State(state_index,time);}
+    {for(COLLISION_GEOMETRY_ID i(0);i<collision_geometry_collection.bodies.m;i++) if(Is_Active(i)) collision_geometry_collection.bodies(i)->Save_State(state_index,time);}
 
     void Restore_State(const int state_index)
-    {for(COLLISION_GEOMETRY_ID i(1);i<=collision_geometry_collection.bodies.m;i++) if(Is_Active(i)) collision_geometry_collection.bodies(i)->Restore_State(state_index);}
+    {for(COLLISION_GEOMETRY_ID i(0);i<collision_geometry_collection.bodies.m;i++) if(Is_Active(i)) collision_geometry_collection.bodies(i)->Restore_State(state_index);}
 
     void Average_States(const int state1, const int state2,const int result_state,const T interpolation_distance)
-    {for(COLLISION_GEOMETRY_ID i(1);i<=collision_geometry_collection.bodies.m;i++) if(Is_Active(i)) collision_geometry_collection.bodies(i)->Average_States(state1,state2,result_state,interpolation_distance);}
+    {for(COLLISION_GEOMETRY_ID i(0);i<collision_geometry_collection.bodies.m;i++) if(Is_Active(i)) collision_geometry_collection.bodies(i)->Average_States(state1,state2,result_state,interpolation_distance);}
 
     void Delete_State(const int state_index)
-    {for(COLLISION_GEOMETRY_ID i(1);i<=collision_geometry_collection.bodies.m;i++) if(Is_Active(i)) collision_geometry_collection.bodies(i)->Delete_State(state_index);}
+    {for(COLLISION_GEOMETRY_ID i(0);i<collision_geometry_collection.bodies.m;i++) if(Is_Active(i)) collision_geometry_collection.bodies(i)->Delete_State(state_index);}
     
     bool Intersection_With_Any_Simplicial_Object(RAY<TV>& ray,COLLISION_GEOMETRY_ID& body_id,const ARRAY<COLLISION_GEOMETRY_ID>* objects=0) const
     {return collision_geometry_collection.Intersection_With_Any_Simplicial_Object(ray,body_id,objects);}

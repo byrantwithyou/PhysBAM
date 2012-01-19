@@ -67,7 +67,7 @@ Compute(int ghost_cells)
 template<class TV> void MATRIX_FLUID_INTERPOLATION<TV>::
 Times_Add(const VECTOR_ND<T>& faces,ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints) const
 {
-    for(COUPLING_CONSTRAINT_ID i(1);i<=rows.m;i++)
+    for(COUPLING_CONSTRAINT_ID i(0);i<rows.m;i++)
         constraints(i)+=faces(rows(i));
 }
 //#####################################################################
@@ -76,7 +76,7 @@ Times_Add(const VECTOR_ND<T>& faces,ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints
 template<class TV> void MATRIX_FLUID_INTERPOLATION<TV>::
 Transpose_Times_Add(const ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints,VECTOR_ND<T>& faces) const
 {
-    for(COUPLING_CONSTRAINT_ID i(1);i<=rows.m;i++)
+    for(COUPLING_CONSTRAINT_ID i(0);i<rows.m;i++)
         faces(rows(i))+=constraints(i);
 }
 //#####################################################################
@@ -105,7 +105,7 @@ Print_Each_Matrix(int n) const
     OCTAVE_OUTPUT<T> oo(STRING_UTILITIES::string_sprintf("W-%i.txt",n).c_str());
     oo.Begin_Sparse_Matrix("W",Value(rows.m),index_map.Number_Faces());
 
-    for(COUPLING_CONSTRAINT_ID i(1);i<=rows.m;i++)
+    for(COUPLING_CONSTRAINT_ID i(0);i<rows.m;i++)
         oo.Add_Sparse_Entry(Value(i),rows(i),1);
 
     oo.End_Sparse_Matrix();
@@ -116,7 +116,7 @@ Print_Each_Matrix(int n) const
 template<class TV> void MATRIX_FLUID_INTERPOLATION<TV>::
 Add_Diagonal(ARRAY<T,COUPLING_CONSTRAINT_ID>& diagonal,const GENERALIZED_FLUID_MASS<TV>& fluid_mass) const
 {
-    for(COUPLING_CONSTRAINT_ID i(1);i<=rows.m;i++)
+    for(COUPLING_CONSTRAINT_ID i(0);i<rows.m;i++)
         diagonal(i)+=fluid_mass.one_over_fluid_mass_at_faces(rows(i));
 }
 //#####################################################################
@@ -125,7 +125,7 @@ Add_Diagonal(ARRAY<T,COUPLING_CONSTRAINT_ID>& diagonal,const GENERALIZED_FLUID_M
 template<class TV> void MATRIX_FLUID_INTERPOLATION<TV>::
 Add_Raw_Matrix(ARRAY<TRIPLE<int,int,T> >& data) const
 {
-    for(COUPLING_CONSTRAINT_ID i(1);i<=rows.m;i++)
+    for(COUPLING_CONSTRAINT_ID i(0);i<rows.m;i++)
         data.Append(TRIPLE<int,int,T>(Value(i),rows(i),1));
 }
 //#####################################################################
