@@ -137,7 +137,7 @@ public:
     {return Derived()(i);}
 
     bool Valid_Index(const ID i) const
-    {return (unsigned)i.Value<Value(Size());}
+    {return (unsigned)Value(i)<Value(Size());}
 
     ARRAY_VIEW<ELEMENT_OF_T> Flattened() // valid only for contiguous arrays of VECTOR<T,d>
     {T_ARRAY& self=Derived();return ARRAY_VIEW<typename T::ELEMENT>(T::m*self.Size(),self.Get_Array_Pointer()->begin());}
@@ -217,7 +217,7 @@ public:
     {assert(Size()==a2.Size());double result(0);ID size=Size();for(ID i(0);i<size;i++) result+=m(i).Inner_Product((*this)(i),a2(i));return result;}
 
     T Max() const
-    {const T_ARRAY& self=Derived();T result=self(ID(1));ID m=self.Size();for(ID i(2);i<=m;i++) result=PhysBAM::max(result,self(i));return result;}
+    {const T_ARRAY& self=Derived();T result=self(ID(0));ID m=self.Size();for(ID i(1);i<m;i++) result=PhysBAM::max(result,self(i));return result;}
 
     T Maxabs() const
     {const T_ARRAY& self=Derived();T result=T();;ID m=self.Size();for(ID i(0);i<m;i++) result=PhysBAM::max(result,abs(self(i)));return result;}
@@ -226,16 +226,16 @@ public:
     {const T_ARRAY& self=Derived();T result=T();ID m=self.Size();for(ID i(0);i<m;i++) result=PhysBAM::maxmag(result,self(i));return result;}
 
     ID Argmax() const
-    {const T_ARRAY& self=Derived();ID result(1),m=self.Size();for(ID i(2);i<=m;i++) if(self(i)>self(result)) result=i;return result;}
+    {const T_ARRAY& self=Derived();ID result(0),m=self.Size();for(ID i(1);i<m;i++) if(self(i)>self(result)) result=i;return result;}
 
     T Min() const
-    {const T_ARRAY& self=Derived();T result=self(ID(1));ID m=self.Size();for(ID i(2);i<=m;i++) result=PhysBAM::min(result,self(i));return result;}
+    {const T_ARRAY& self=Derived();T result=self(ID(0));ID m=self.Size();for(ID i(1);i<m;i++) result=PhysBAM::min(result,self(i));return result;}
 
     T Minmag() const
-    {const T_ARRAY& self=Derived();T result=self(ID(1));ID m=self.Size();for(ID i(2);i<=m;i++) result=PhysBAM::minmag(result,self(i));return result;}
+    {const T_ARRAY& self=Derived();T result=self(ID(0));ID m=self.Size();for(ID i(1);i<m;i++) result=PhysBAM::minmag(result,self(i));return result;}
 
     ID Argmin() const
-    {const T_ARRAY& self=Derived();ID result(1),m=self.Size();for(ID i(2);i<=m;i++) if(self(i)<self(result)) result=i;return result;}
+    {const T_ARRAY& self=Derived();ID result(0),m=self.Size();for(ID i(1);i<m;i++) if(self(i)<self(result)) result=i;return result;}
 
     T Componentwise_Maxabs() const
     {const T_ARRAY& self=Derived();T result=T();ID m=self.Size();for(ID i(0);i<m;i++) result=T::Componentwise_Max(result,abs(self(i)));return result;}
@@ -255,7 +255,7 @@ public:
     template<class T_ARRAY1>
     ELEMENT Weighted_Sum(const T_ARRAY1& weights) const
     {STATIC_ASSERT_SAME(typename T_ARRAY1::ELEMENT,SCALAR);assert(weights.Size()==Size());
-    ELEMENT result((ELEMENT()));INDEX m=Size();for(INDEX i(1);i<=m;i++) result+=weights(i)*(*this)(i);return result;}
+    ELEMENT result((ELEMENT()));INDEX m=Size();for(INDEX i(0);i<m;i++) result+=weights(i)*(*this)(i);return result;}
 
     ID Find(const T& element) const
     {const T_ARRAY& self=Derived();ID m=self.Size();
@@ -293,7 +293,7 @@ public:
     {T_ARRAY& self=Derived();HASHTABLE<T> hash(Value(self.Size())*3/2);int j=0;for(int i=0;i<self.Size();i++) if(hash.Set(self(i))) self(++j)=self(i);self.Resize(j);}
 
     void Coalesce()
-    {Sort(*this);T_ARRAY& self=Derived();int j=0;if(self.Size()>0) j=1;for(int i=2;i<=self.Size();i++){if(!(self(j)<self(i))) self(j).Merge(self(i));else self(++j)=self(i);}self.Resize(j);}
+    {Sort(*this);T_ARRAY& self=Derived();int j=0;if(self.Size()>0) j=0;for(int i=1;i<self.Size();i++){if(!(self(j)<self(i))) self(j).Merge(self(i));else self(++j)=self(i);}self.Resize(j);}
 
     void Fill(T value)
     {T_ARRAY& self=Derived();ID m=self.Size();for(ID i(0);i<m;i++) self(i)=value;}
@@ -375,7 +375,7 @@ public:
     T_ARRAY& self=Derived();ID index_m=index.Size();
     if(index_m==0) return;
     ID curr=0;
-    for(ID k=index_m;k>=ID(1);k--)if(index(k)!=curr){curr=index(k);self.Remove_Index_Lazy(curr);}
+    for(ID k=index_m-1;k>=ID(0);k--)if(index(k)!=curr){curr=index(k);self.Remove_Index_Lazy(curr);}
     self.Compact();}
 
     int Pack_Size() const

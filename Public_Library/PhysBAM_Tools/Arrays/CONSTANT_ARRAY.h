@@ -32,7 +32,7 @@ public:
     {return m;}
 
     const T& operator()(const ID i) const
-    {assert((unsigned)i<m);return constant;}
+    {assert((unsigned)i<(unsigned)m);return constant;}
 
 //#####################################################################
 };

@@ -65,11 +65,11 @@ Fast_Singular_Value_Decomposition(MATRIX<T,3>& U,DIAGONAL_MATRIX<T,3>& singular_
     if(Determinant()<0) singular_values.x33=-singular_values.x33; // 9m+5a
 
     // compute singular vectors
-    U.Column(1)=(*this*V.Column(1)).Normalized(); // 15m+8a+1d+1s
-    VECTOR<T,3> v1_orthogonal=U.Column(1).Unit_Orthogonal_Vector(); // 6m+2a+1d+1s
-    MATRIX<T,3,2> other_v(v1_orthogonal,VECTOR<T,3>::Cross_Product(U.Column(1),v1_orthogonal)); // 6m+3a
-    U.Column(2)=other_v*(other_v.Transpose_Times(*this*V.Column(2))).Normalized(); // 6m+3a + 6m+4a + 9m+6a + 6m+2a+1d+1s = 27m+15a+1d+1s
-    U.Column(3)=VECTOR<T,3>::Cross_Product(U.Column(1),U.Column(2)); // 6m+3a
+    U.Column(0)=(*this*V.Column(0)).Normalized(); // 15m+8a+1d+1s
+    VECTOR<T,3> v1_orthogonal=U.Column(0).Unit_Orthogonal_Vector(); // 6m+2a+1d+1s
+    MATRIX<T,3,2> other_v(v1_orthogonal,VECTOR<T,3>::Cross_Product(U.Column(0),v1_orthogonal)); // 6m+3a
+    U.Column(1)=other_v*(other_v.Transpose_Times(*this*V.Column(1))).Normalized(); // 6m+3a + 6m+4a + 9m+6a + 6m+2a+1d+1s = 27m+15a+1d+1s
+    U.Column(2)=VECTOR<T,3>::Cross_Product(U.Column(0),U.Column(1)); // 6m+3a
 }
 //#####################################################################
 // Function Fast_Indefinite_Polar_Decomposition
@@ -87,7 +87,7 @@ template<class T> T MATRIX<T,3>::
 Simplex_Minimum_Altitude() const
 {
     typedef VECTOR<T,3> TV;
-    TV X1=Column(1),X2=Column(2),X3=Column(3);
+    TV X1=Column(0),X2=Column(1),X3=Column(2);
     return minabs(
         TV::Dot_Product(X1,TV::Cross_Product(X2-X1,X3-X1).Normalized()),
         TV::Dot_Product(X2-X1,TV::Cross_Product(X3,X2).Normalized()),

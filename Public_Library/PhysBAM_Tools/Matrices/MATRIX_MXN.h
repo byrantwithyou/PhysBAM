@@ -109,13 +109,13 @@ public:
     delete[] x;x=x_new;m=m_new;n=n_new;}
 
     T& operator()(const int i,const int j)
-    {assert((unsigned)i<m);assert((unsigned)j<n);return x[j*m+i];}
+    {assert((unsigned)i<(unsigned)m);assert((unsigned)j<(unsigned)n);return x[j*m+i];}
 
     const T& operator()(const int i,const int j) const
-    {assert((unsigned)i<m);assert((unsigned)j<n);return x[j*m+i];}
+    {assert((unsigned)i<(unsigned)m);assert((unsigned)j<(unsigned)n);return x[j*m+i];}
 
     bool Valid_Index(const int i,const int j) const
-    {return (unsigned)i<m && (unsigned)j<n;}
+    {return (unsigned)i<(unsigned)m && (unsigned)j<(unsigned)n;}
 
     bool operator==(const MATRIX_MXN& A) const
     {if(m!=A.m || n!=A.n) return false;

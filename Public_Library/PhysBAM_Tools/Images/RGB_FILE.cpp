@@ -62,10 +62,10 @@ Write(const std::string& filename,const ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& imag
     std::ostream* output=FILE_UTILITIES::Safe_Open_Output(filename,true,false); // no compression
     RGB_HEADER header;header.Initialize(image.counts.x,image.counts.y);header.channels=d;
     Write_Binary<T>(*output,header);
+    for(int j=0;j<image.counts.y;j++) for(int i=0;i<image.counts.x;i++) Write_Binary<T>(*output,IMAGE<T>::Scalar_Color_To_Byte_Color(image(i,j)[0]));
     for(int j=0;j<image.counts.y;j++) for(int i=0;i<image.counts.x;i++) Write_Binary<T>(*output,IMAGE<T>::Scalar_Color_To_Byte_Color(image(i,j)[1]));
     for(int j=0;j<image.counts.y;j++) for(int i=0;i<image.counts.x;i++) Write_Binary<T>(*output,IMAGE<T>::Scalar_Color_To_Byte_Color(image(i,j)[2]));
-    for(int j=0;j<image.counts.y;j++) for(int i=0;i<image.counts.x;i++) Write_Binary<T>(*output,IMAGE<T>::Scalar_Color_To_Byte_Color(image(i,j)[3]));
-    if(d==4) for(int j=0;j<image.counts.y;j++) for(int i=0;i<image.counts.x;i++) Write_Binary<T>(*output,IMAGE<T>::Scalar_Color_To_Byte_Color(image(i,j)[4]));
+    if(d==4) for(int j=0;j<image.counts.y;j++) for(int i=0;i<image.counts.x;i++) Write_Binary<T>(*output,IMAGE<T>::Scalar_Color_To_Byte_Color(image(i,j)[3]));
     delete output;
 }
 //#####################################################################

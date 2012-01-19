@@ -131,7 +131,7 @@ public:
     {}
 
     explicit ROTATION(const MATRIX<T,2>& A)
-        :c(A.Column(1).Normalized())
+        :c(A.Column(0).Normalized())
     {}
 
     const COMPLEX<T>& Complex() const

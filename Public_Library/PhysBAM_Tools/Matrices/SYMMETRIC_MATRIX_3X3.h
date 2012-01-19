@@ -47,12 +47,12 @@ public:
 
     void From_Matrix(const MATRIX<T,3>& matrix_input)
     {
-        x11=matrix_input(1,1);
-        x21=matrix_input(2,1);
-        x31=matrix_input(3,1);
-        x22=matrix_input(2,2);
-        x32=matrix_input(3,2);
-        x33=matrix_input(3,3);
+        x11=matrix_input(0,0);
+        x21=matrix_input(1,0);
+        x31=matrix_input(2,0);
+        x22=matrix_input(1,1);
+        x32=matrix_input(2,1);
+        x33=matrix_input(2,2);
     }
 
     int Rows() const
@@ -77,10 +77,10 @@ public:
     {return Element_Lower(j,i);}
 
     T& Element_Lower(int i,int j)
-    {assert((unsigned)i<=3 && (unsigned)j<=i);return ((T*)this)[((5-j)*j>>1)+i];}
+    {assert((unsigned)i<3 && (unsigned)j<=i);return ((T*)this)[((5-j)*j>>1)+i];}
 
     const T& Element_Lower(int i,int j) const
-    {assert((unsigned)i<=3 && (unsigned)j<=i);return ((const T*)this)[((5-j)*j>>1)+i];}
+    {assert((unsigned)i<3 && (unsigned)j<=i);return ((const T*)this)[((5-j)*j>>1)+i];}
 
     VECTOR<T,3> Column(const int axis) const
     {assert((unsigned)axis<3);return axis==1?VECTOR<T,3>(x11,x21,x31):axis==2?VECTOR<T,3>(x21,x22,x32):VECTOR<T,3>(x31,x32,x33);}

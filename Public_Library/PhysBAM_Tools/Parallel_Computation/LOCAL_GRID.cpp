@@ -117,7 +117,7 @@ Maximum_Error(const std::string& prefix,const T_FACE_ARRAYS& local_data,const T_
         TV_INT index;
         max_error=Maximum_Error(local_data.Component(axis),global_data.Component(axis),bandwidth,index,mpi_grid.Face_Sentinels(axis));
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
-        if(max_error>threshold){LOG::cout<<prefix<<", face "<<axis_names[axis-1]<<" = "<<max_error<<" ("<<index<<")"<<std::endl;}
+        if(max_error>threshold){LOG::cout<<prefix<<", face "<<axis_names[axis]<<" = "<<max_error<<" ("<<index<<")"<<std::endl;}
 #endif
         }
     return max_error;

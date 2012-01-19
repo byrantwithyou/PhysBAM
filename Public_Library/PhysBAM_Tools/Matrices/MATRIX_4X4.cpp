@@ -36,17 +36,17 @@ Inverse() const
     T a=x[pivot_row-1];assert(a!=0);
     VECTOR<T,3> b(x[3+pivot_row],x[7+pivot_row],x[11+pivot_row]),c;MATRIX<T,3> d;
     switch(pivot_row){
-        case 1:c=VECTOR<T,3>(x[1],x[2],x[3]);d=MATRIX<T,3>(x[5],x[6],x[7],x[9],x[10],x[11],x[13],x[14],x[15]);break;
-        case 2:c=VECTOR<T,3>(x[0],x[2],x[3]);d=MATRIX<T,3>(x[4],x[6],x[7],x[8],x[10],x[11],x[12],x[14],x[15]);break;
-        case 3:c=VECTOR<T,3>(x[0],x[1],x[3]);d=MATRIX<T,3>(x[4],x[5],x[7],x[8],x[9],x[11],x[12],x[13],x[15]);break;
+        case 0:c=VECTOR<T,3>(x[1],x[2],x[3]);d=MATRIX<T,3>(x[5],x[6],x[7],x[9],x[10],x[11],x[13],x[14],x[15]);break;
+        case 1:c=VECTOR<T,3>(x[0],x[2],x[3]);d=MATRIX<T,3>(x[4],x[6],x[7],x[8],x[10],x[11],x[12],x[14],x[15]);break;
+        case 2:c=VECTOR<T,3>(x[0],x[1],x[3]);d=MATRIX<T,3>(x[4],x[5],x[7],x[8],x[9],x[11],x[12],x[13],x[15]);break;
         default:c=VECTOR<T,3>(x[0],x[1],x[2]);d=MATRIX<T,3>(x[4],x[5],x[6],x[8],x[9],x[10],x[12],x[13],x[14]);}
     T m=-1/a;b*=m;d+=MATRIX<T,3>::Outer_Product(c,b); // find schur complement
     MATRIX<T,3> h=d.Inverse();VECTOR<T,3> g=h*(c*m);VECTOR<T,3> f=b*h;T e=VECTOR<T,3>::Dot_Product(b,g)-m; // compute parts of inverse
     switch(pivot_row){
-        case 1:return MATRIX(e,g.x,g.y,g.z,f.x,h(1,1),h(2,1),h(3,1),f.y,h(1,2),h(2,2),h(3,2),f.z,h(1,3),h(2,3),h(3,3));break;
-        case 2:return MATRIX(f.x,h(1,1),h(2,1),h(3,1),e,g.x,g.y,g.z,f.y,h(1,2),h(2,2),h(3,2),f.z,h(1,3),h(2,3),h(3,3));break;
-        case 3:return MATRIX(f.x,h(1,1),h(2,1),h(3,1),f.y,h(1,2),h(2,2),h(3,2),e,g.x,g.y,g.z,f.z,h(1,3),h(2,3),h(3,3));break;}
-    return MATRIX(f.x,h(1,1),h(2,1),h(3,1),f.y,h(1,2),h(2,2),h(3,2),f.z,h(1,3),h(2,3),h(3,3),e,g.x,g.y,g.z);
+        case 0:return MATRIX(e,g.x,g.y,g.z,f.x,h(0,0),h(1,0),h(2,0),f.y,h(0,1),h(1,1),h(2,1),f.z,h(0,2),h(1,2),h(2,2));break;
+        case 1:return MATRIX(f.x,h(0,0),h(1,0),h(2,0),e,g.x,g.y,g.z,f.y,h(0,1),h(1,1),h(2,1),f.z,h(0,2),h(1,2),h(2,2));break;
+        case 2:return MATRIX(f.x,h(0,0),h(1,0),h(2,0),f.y,h(0,1),h(1,1),h(2,1),e,g.x,g.y,g.z,f.z,h(0,2),h(1,2),h(2,2));break;}
+    return MATRIX(f.x,h(0,0),h(1,0),h(2,0),f.y,h(0,1),h(1,1),h(2,1),f.z,h(0,2),h(1,2),h(2,2),e,g.x,g.y,g.z);
 }
 //#####################################################################
 // Function Cofactor_Matrix

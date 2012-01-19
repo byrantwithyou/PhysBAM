@@ -108,8 +108,8 @@ public:
                    x[8]-A.x[8],x[9]-A.x[9],x[10]-A.x[10],x[11]-A.x[11],x[12]-A.x[12],x[13]-A.x[13],x[14]-A.x[14],x[15]-A.x[15]);}
 
     VECTOR<T,4> operator*(const VECTOR<T,4>& v) const
-    {return VECTOR<T,4>(x[0]*v(1)+x[4]*v(2)+x[8]*v(3)+x[12]*v(4),x[1]*v(1)+x[5]*v(2)+x[9]*v(3)+x[13]*v(4),
-                   x[2]*v(1)+x[6]*v(2)+x[10]*v(3)+x[14]*v(4),x[3]*v(1)+x[7]*v(2)+x[11]*v(3)+x[15]*v(4));}
+    {return VECTOR<T,4>(x[0]*v(0)+x[4]*v(1)+x[8]*v(2)+x[12]*v(3),x[1]*v(0)+x[5]*v(1)+x[9]*v(2)+x[13]*v(3),
+                   x[2]*v(0)+x[6]*v(1)+x[10]*v(2)+x[14]*v(3),x[3]*v(0)+x[7]*v(1)+x[11]*v(2)+x[15]*v(3));}
 
     MATRIX operator*(const T a) const
     {return MATRIX(a*x[0],a*x[1],a*x[2],a*x[3],a*x[4],a*x[5],a*x[6],a*x[7],a*x[8],a*x[9],a*x[10],a*x[11],a*x[12],a*x[13],a*x[14],a*x[15]);}

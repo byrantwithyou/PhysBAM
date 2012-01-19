@@ -45,7 +45,7 @@ public:
     {}
 
     void From_Matrix(const MATRIX<T,2>& matrix_input)
-    {x11=matrix_input(1,1);x21=matrix_input(2,1);x22=matrix_input(2,2);}
+    {x11=matrix_input(0,0);x21=matrix_input(1,0);x22=matrix_input(1,1);}
 
     int Rows() const
     {return 2;}

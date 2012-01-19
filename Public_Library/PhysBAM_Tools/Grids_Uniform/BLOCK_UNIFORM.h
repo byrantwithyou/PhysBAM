@@ -34,17 +34,17 @@ private:
     TV_INT Face_X(const int face_index) const
     {assert(0<=face_index&&face_index<T_GRID::number_of_faces_per_block/T_GRID::dimension);
     static const int lookup[][3]={{-1,-1,-1},{0,-1,-1},{1,-1,-1},{-1,0,-1},{0,0,-1},{1,0,-1},{-1,-1,0},{0,-1,0},{1,-1,0},{-1,0,0},{0,0,0},{1,0,0}};
-    TV_INT face;for(int i=0;i<T_GRID::dimension;i++)face[i]=block_index[i]+lookup[face_index][i-1];return face;}
+    TV_INT face;for(int i=0;i<T_GRID::dimension;i++)face[i]=block_index[i]+lookup[face_index][i];return face;}
 
     TV_INT Face_Y(const int face_index) const
     {assert(0<=face_index&&face_index<T_GRID::number_of_faces_per_block/T_GRID::dimension&&T_GRID::dimension>=2);
     static const int lookup[][3]={{-1,-1,-1},{0,-1,-1},{-1,0,-1},{0,0,-1},{-1,1,-1},{0,1,-1},{-1,-1,0},{0,-1,0},{-1,0,0},{0,0,0},{-1,1,0},{0,1,0}};
-    TV_INT face;for(int i=0;i<T_GRID::dimension;i++)face[i]=block_index[i]+lookup[face_index][i-1];return face;}
+    TV_INT face;for(int i=0;i<T_GRID::dimension;i++)face[i]=block_index[i]+lookup[face_index][i];return face;}
 
     TV_INT Face_Z(const int face_index) const
     {assert(0<=face_index&&face_index<T_GRID::number_of_faces_per_block/T_GRID::dimension&&T_GRID::dimension==3);
     static const int lookup[][3]={{-1,-1,-1},{0,-1,-1},{-1,0,-1},{0,0,-1},{-1,-1,0},{0,-1,0},{-1,0,0},{0,0,0},{-1,-1,1},{0,-1,1},{-1,0,1},{0,0,1}};
-    TV_INT face;for(int i=0;i<T_GRID::dimension;i++)face[i]=block_index[i]+lookup[face_index][i-1];return face;}
+    TV_INT face;for(int i=0;i<T_GRID::dimension;i++)face[i]=block_index[i]+lookup[face_index][i];return face;}
 
 public:
     template<class T_FACE_LOOKUP>
@@ -80,7 +80,7 @@ public:
     TV_INT Cell(const int cell_index) const
     {assert(0<=cell_index&&cell_index<T_GRID::number_of_cells_per_block);
     static const int lookup[][3]={{-1,-1,-1},{0,-1,-1},{-1,0,-1},{0,0,-1},{-1,-1,0},{0,-1,0},{-1,0,0},{0,0,0}};
-    TV_INT cell;for(int i=0;i<T_GRID::dimension;i++)cell[i]=block_index[i]+lookup[cell_index][i-1];return cell;}
+    TV_INT cell;for(int i=0;i<T_GRID::dimension;i++)cell[i]=block_index[i]+lookup[cell_index][i];return cell;}
 
     void All_Cell_Indices(TV_INT cell_indices[T_GRID::number_of_cells_per_block]) const
     {for(int i=0;i<T_GRID::number_of_cells_per_block;i++)cell_indices[i]=Cell(i);}
@@ -106,7 +106,7 @@ public:
 
     TV_INT Incident_Face(const int axis,const int face_index)
     {static const int lookup[3][4][3]={{{0,-1,-1},{0,0,-1},{0,-1,0},{0,0,0}},{{-1,0,-1},{0,0,-1},{-1,0,0},{0,0,0}},{{-1,-1,0},{0,-1,0},{-1,0,0},{0,0,0}}};
-    TV_INT incident_face;for(int i=0;i<T_GRID::dimension;i++) incident_face[i]=block_index[i]+lookup[axis-1][face_index][i-1];
+    TV_INT incident_face;for(int i=0;i<T_GRID::dimension;i++) incident_face[i]=block_index[i]+lookup[axis][face_index][i];
     return incident_face;}
 
 //#####################################################################

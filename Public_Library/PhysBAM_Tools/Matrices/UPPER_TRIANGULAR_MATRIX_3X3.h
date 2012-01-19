@@ -49,10 +49,10 @@ public:
     {return 3;}
 
     T& operator()(const int i,const int j)
-    {assert((unsigned)i<=j && (unsigned)j<3);return ((T*)this)[((j*(j+1))>>1)+i];}
+    {assert((unsigned)i<=(unsigned)j && (unsigned)j<3);return ((T*)this)[((j*(j+1))>>1)+i];}
 
     const T& operator()(const int i,const int j) const
-    {assert((unsigned)i<=j && (unsigned)j<3);return ((const T*)this)[((j*(j+1))>>1)+i];}
+    {assert((unsigned)i<=(unsigned)j && (unsigned)j<3);return ((const T*)this)[((j*(j+1))>>1)+i];}
 
     bool Valid_Index(const int i,const int j) const
     {return (unsigned)i<=j && (unsigned)j<3;}
