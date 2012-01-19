@@ -111,7 +111,7 @@ Fill_Ghost_Cells_Helper(const GRID<TV>& grid,const ARRAY<VECTOR<T,4> ,VECTOR<int
 
     for(k=0;k<u_ghost.length;k++) for(i=0;i<m;i++){
         for(j=-3;j<0;j++) u_ghost(k,i,j)=u_ghost(k,i,j+n-1); //bottom
-        for(j=n1;j<n+3;j++) u_ghost(k,i,j)=u_ghost(k,i,j-n+1); //top
+        for(j=-3;j<n+3;j++) u_ghost(k,i,j)=u_ghost(k,i,j-n+1); //top
     }
 }
 template<class T_GRID,class T2> void BOUNDARY_EULER_EQUATIONS_SOLID_WALL_PERIODIC<T_GRID,T2>::

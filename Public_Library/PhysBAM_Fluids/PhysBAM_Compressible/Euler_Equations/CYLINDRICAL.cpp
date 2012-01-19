@@ -24,15 +24,15 @@ Euler_Step(const T dt,const T time)
     ARRAY<TV_DIMENSION,VECTOR<int,2> > S(0,m,0,n);
     for(i=0;i<m;i++) for(j=0;j<n;j++){
         T rho=U(i,j)(0);
-        T u=U(i,j)(1)/U(i,j)(0);
-        T v=U(i,j)(2)/U(i,j)(0);
-        T e=U(i,j)(3)/U(i,j)(0)-(sqr(u)+sqr(v))/2;
-        T rho_u=U(i,j)(1);
+        T u=U(i,j)(0)/U(i,j)(0);
+        T v=U(i,j)(1)/U(i,j)(0);
+        T e=U(i,j)(2)/U(i,j)(0)-(sqr(u)+sqr(v))/2;
+        T rho_u=U(i,j)(0);
         T coefficient=-1/grid.Axis_X(i,0);
         S(i,j)(0)=coefficient*rho_u;
-        S(i,j)(1)=coefficient*rho_u*u;
-        S(i,j)(2)=coefficient*rho_u*v;
-        S(i,j)(3)=coefficient*(U(i,j)(3)+eos->p(rho,e))*u;}
+        S(i,j)(0)=coefficient*rho_u*u;
+        S(i,j)(1)=coefficient*rho_u*v;
+        S(i,j)(2)=coefficient*(U(i,j)(2)+eos->p(rho,e))*u;}
     
     T_FACE_ARRAYS_BOOL psi_N(grid.Get_MAC_Grid_At_Regular_Positions());
     T_FACE_ARRAYS_SCALAR face_velocities(grid.Get_MAC_Grid_At_Regular_Positions());

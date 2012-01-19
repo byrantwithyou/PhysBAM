@@ -15,7 +15,7 @@ using namespace PhysBAM;
 template<class T> void BURGERS_1D_EIGENSYSTEM_F<T>::
 Flux(const int m,const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,ARRAY<TV_DIMENSION,VECTOR<int,1> >& F,ARRAY<TV_DIMENSION,VECTOR<int,1> >* U_clamped)       
 {
-    for(int i=-2;i<=m+3;i++) F(i)(1)=sqr(U(i)(1)); // u^2
+    for(int i=-2;i<=m+3;i++) F(i)(0)=sqr(U(i)(0)); // u^2
 }
 //#####################################################################
 // Function Eigenvalues
@@ -25,11 +25,11 @@ template<class T> bool BURGERS_1D_EIGENSYSTEM_F<T>::
 Eigenvalues(const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,const int i,ARRAY<T,VECTOR<int,1> >& lambda,ARRAY<T,VECTOR<int,1> >& lambda_left,ARRAY<T,VECTOR<int,1> >& lambda_right)
 {
     // eigenvalues on the left - at point i
-    lambda_left(1)=U(i)(1);      
+    lambda_left(0)=U(i)(0);      
     // eigenvalues on the right - at point i+1
-    lambda_right(1)=U(i+1)(1);
+    lambda_right(0)=U(i+1)(0);
     // eigenvalues in the center - at flux i
-    lambda(1)=(U(i)(1)+U(i+1)(1))/2;
+    lambda(0)=(U(i)(0)+U(i+1)(0))/2;
 
     return true; // eigensystem is well defined
 }  
@@ -40,8 +40,8 @@ Eigenvalues(const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,const int i,ARRAY<T,VECT
 template<class T> void BURGERS_1D_EIGENSYSTEM_F<T>::
 Eigenvectors(const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,const int i,MATRIX<T,d,d>& L,MATRIX<T,d,d>& R)
 {
-    L(1,1)=1;
-    R(1,1)=1;
+    L(0,0)=1;
+    R(0,0)=1;
 }  
 //#####################################################################
 template class BURGERS_1D_EIGENSYSTEM_F<float>;

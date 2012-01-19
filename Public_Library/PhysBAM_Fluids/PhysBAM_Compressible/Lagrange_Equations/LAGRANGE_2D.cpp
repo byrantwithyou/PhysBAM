@@ -18,24 +18,24 @@ Euler_Step(const T dt,const T time)
     int m=grid.m,n=grid.n;
     
     // find nodal masses
-    ARRAY<T,VECTOR<int,2> > M_node(1,m,1,n);
+    ARRAY<T,VECTOR<int,2> > M_node(0,m,1,n);
     for(i=0;i<m-1;i++) for(j=0;j<n-1;j++){
         T mass_over_4=mass(i,j)/4;
         M_node(i,j)+=mass_over_4;M_node(i+1,j)+=mass_over_4;M_node(i,j+1)+=mass_over_4;M_node(i+1,j+1)+=mass_over_4;}
     
     // get grid information
-    ARRAY<T,VECTOR<int,2> > L1(1,m-1,1,n),L2(1,m,1,n-1);grid.Get_Lengths(L1,L2);
-    ARRAY<T,VECTOR<int,2> > N1_x(1,m-1,1,n),N1_y(1,m-1,1,n),N2_x(1,m,1,n-1),N2_y(1,m,1,n-1);grid.Get_Normals(N1_x,N1_y,N2_x,N2_y);
-    ARRAY<T,VECTOR<int,2> > LL1(1,m-1,1,n-1),LL2(1,m-1,1,n-1),LL3(1,m-1,1,n-1),LL4(1,m-1,1,n-1);
+    ARRAY<T,VECTOR<int,2> > L1(0,m-1,1,n),L2(0,m,1,n-1);grid.Get_Lengths(L1,L2);
+    ARRAY<T,VECTOR<int,2> > N1_x(0,m-1,1,n),N1_y(0,m-1,1,n),N2_x(0,m,1,n-1),N2_y(0,m,1,n-1);grid.Get_Normals(N1_x,N1_y,N2_x,N2_y);
+    ARRAY<T,VECTOR<int,2> > LL1(0,m-1,1,n-1),LL2(0,m-1,1,n-1),LL3(0,m-1,1,n-1),LL4(0,m-1,1,n-1);
     grid.Get_Sub_Zone_Lengths(LL1,LL2,LL3,LL4); 
-    ARRAY<T,VECTOR<int,2> > AA1(1,m-1,1,n-1),AA2(1,m-1,1,n-1),AA3(1,m-1,1,n-1),AA4(1,m-1,1,n-1);
+    ARRAY<T,VECTOR<int,2> > AA1(0,m-1,1,n-1),AA2(0,m-1,1,n-1),AA3(0,m-1,1,n-1),AA4(0,m-1,1,n-1);
     grid.Get_Sub_Zone_Areas(AA1,AA2,AA3,AA4);
-    ARRAY<T,VECTOR<int,2> > NN1_x(1,m-1,1,n-1),NN1_y(1,m-1,1,n-1),NN2_x(1,m-1,1,n-1),NN2_y(1,m-1,1,n-1),
-                      NN3_x(1,m-1,1,n-1),NN3_y(1,m-1,1,n-1),NN4_x(1,m-1,1,n-1),NN4_y(1,m-1,1,n-1);
+    ARRAY<T,VECTOR<int,2> > NN1_x(0,m-1,1,n-1),NN1_y(0,m-1,1,n-1),NN2_x(0,m-1,1,n-1),NN2_y(0,m-1,1,n-1),
+                      NN3_x(0,m-1,1,n-1),NN3_y(0,m-1,1,n-1),NN4_x(0,m-1,1,n-1),NN4_y(0,m-1,1,n-1);
     grid.Get_Sub_Zone_Normals(NN1_x,NN1_y,NN2_x,NN2_y,NN3_x,NN3_y,NN4_x,NN4_y); 
 
     // forces F, and heating rates H = -F dot V 
-    ARRAY<T,VECTOR<int,2> > F_x(1,m,1,n),F_y(1,m,1,n),H(1,m-1,1,n-1);
+    ARRAY<T,VECTOR<int,2> > F_x(0,m,1,n),F_y(0,m,1,n),H(0,m-1,1,n-1);
 
     // pressue
     for(i=0;i<m-1;i++) for(j=0;j<n-1;j++){
@@ -70,15 +70,15 @@ Euler_Step(const T dt,const T time)
     for(i=0;i<m;i++) for(j=0;j<n;j++){F_x(i,j)+=external_force_x(i,j);F_y(i,j)+=external_force_y(i,j);}
 
     // artificial viscosity  
-    ARRAY<T,VECTOR<int,2> > Q1(1,m-1,1,n-1),Q2(1,m-1,1,n-1),Q3(1,m-1,1,n-1),Q4(1,m-1,1,n-1);
+    ARRAY<T,VECTOR<int,2> > Q1(0,m-1,1,n-1),Q2(0,m-1,1,n-1),Q3(0,m-1,1,n-1),Q4(0,m-1,1,n-1);
     artificial_viscosity->Get_Artificial_Viscosity(eos,grid,mass,u,v,energy,Q1,Q2,Q3,Q4);
     // compute directions of the velocity jumps
-    ARRAY<T,VECTOR<int,2> > V1_x(1,m-1,1,n),V1_y(1,m-1,1,n);
+    ARRAY<T,VECTOR<int,2> > V1_x(0,m-1,1,n),V1_y(0,m-1,1,n);
     for(i=0;i<m-1;i++) for(j=0;j<n;j++){
         T u_jump=u(i+1,j)-u(i,j),v_jump=v(i+1,j)-v(i,j),magnitude=sqrt(sqr(u_jump)+sqr(v_jump));
         if(abs(magnitude) <= 1e-8*maxabs(u(i,j),v(i,j),u(i+1,j),v(i+1,j))){V1_x(i,j)=0;V1_y(i,j)=0;}
         else{V1_x(i,j)=u_jump/magnitude;V1_y(i,j)=v_jump/magnitude;}}
-    ARRAY<T,VECTOR<int,2> > V2_x(1,m,1,n-1),V2_y(1,m,1,n-1);
+    ARRAY<T,VECTOR<int,2> > V2_x(0,m,1,n-1),V2_y(0,m,1,n-1);
     for(i=0;i<m;i++) for(j=0;j<n-1;j++){
         T u_jump=u(i,j+1)-u(i,j),v_jump=v(i,j+1)-v(i,j),magnitude=sqrt(sqr(u_jump)+sqr(v_jump));
         if(abs(magnitude) <= 1e-8*maxabs(u(i,j),v(i,j),u(i,j+1),v(i,j+1))){V2_x(i,j)=0;V2_y(i,j)=0;}
@@ -159,19 +159,19 @@ CFL()
     int m=grid.m,n=grid.n;
 
     // grid
-    ARRAY<T,VECTOR<int,2> > length(1,m-1,1,n-1);
-    ARRAY<T,VECTOR<int,2> > L1(1,m-1,1,n),L2(1,m,1,n-1);grid.Get_Lengths(L1,L2);
-    ARRAY<T,VECTOR<int,2> > LL1(1,m-1,1,n-1),LL2(1,m-1,1,n-1),LL3(1,m-1,1,n-1),LL4(1,m-1,1,n-1);
+    ARRAY<T,VECTOR<int,2> > length(0,m-1,1,n-1);
+    ARRAY<T,VECTOR<int,2> > L1(0,m-1,1,n),L2(0,m,1,n-1);grid.Get_Lengths(L1,L2);
+    ARRAY<T,VECTOR<int,2> > LL1(0,m-1,1,n-1),LL2(0,m-1,1,n-1),LL3(0,m-1,1,n-1),LL4(0,m-1,1,n-1);
     grid.Get_Sub_Zone_Lengths(LL1,LL2,LL3,LL4);
     for(i=0;i<m-1;i++) for(j=0;j<n-1;j++) length(i,j)=min(L1(i,j),L1(i,j+1),L2(i,j),L2(i+1,j),LL1(i,j)+LL2(i,j),LL3(i,j)+LL4(i,j));
 
     // artificial viscosity
-    ARRAY<T,VECTOR<int,2> > Q(1,m-1,1,n-1),Q1(1,m-1,1,n-1),Q2(1,m-1,1,n-1),Q3(1,m-1,1,n-1),Q4(1,m-1,1,n-1);
+    ARRAY<T,VECTOR<int,2> > Q(0,m-1,1,n-1),Q1(0,m-1,1,n-1),Q2(0,m-1,1,n-1),Q3(0,m-1,1,n-1),Q4(0,m-1,1,n-1);
     artificial_viscosity->Get_Artificial_Viscosity(eos,grid,mass,u,v,energy,Q1,Q2,Q3,Q4);
     for(i=0;i<m-1;i++) for(j=0;j<n-1;j++) Q(i,j)=max(Q1(i,j),Q2(i,j),Q3(i,j),Q4(i,j));
 
     // material strength
-    ARRAY<T,VECTOR<int,2> > S(1,m-1,1,n-1);
+    ARRAY<T,VECTOR<int,2> > S(0,m-1,1,n-1);
     if(material_strength){
         T S1,S2,S3,S4;
         for(i=0;i<m-1;i++) for(j=0;j<n-1;j++){
@@ -180,8 +180,8 @@ CFL()
             S(i,j)=maxabs(S1/LL3(i,j),S2/LL4(i,j),S3/LL1(i,j),S4/LL2(i,j));}}
     
     // determine the time step
-    ARRAY<T,VECTOR<int,2> > timestep(1,m-1,1,n-1);
-    ARRAY<T,VECTOR<int,2> > AA1(1,m-1,1,n-1),AA2(1,m-1,1,n-1),AA3(1,m-1,1,n-1),AA4(1,m-1,1,n-1);
+    ARRAY<T,VECTOR<int,2> > timestep(0,m-1,1,n-1);
+    ARRAY<T,VECTOR<int,2> > AA1(0,m-1,1,n-1),AA2(0,m-1,1,n-1),AA3(0,m-1,1,n-1),AA4(0,m-1,1,n-1);
     grid.Get_Sub_Zone_Areas(AA1,AA2,AA3,AA4);
     for(i=0;i<m-1;i++) for(j=0;j<n-1;j++){
         T mass_over_4=mass(i,j)/4;

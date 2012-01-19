@@ -44,7 +44,7 @@ Attenuate_To_Far_Field_Values_Using_Riemann_Invariants(const T_ARRAYS_DIMENSION_
     T gamma=dynamic_cast<EOS_GAMMA<T>*>(euler->eos)->gamma;
     T net_inflow_attenuation=exp((inflow_attenuation-1)*dt);
 
-    T rho=u_ghost(node_index)(1);
+    T rho=u_ghost(node_index)(0);
     T u_velocity=EULER<T_GRID>::Get_Velocity_Component(u_ghost,node_index,1);
     T e=EULER<T_GRID>::e(u_ghost,node_index);
 
@@ -84,13 +84,13 @@ Attenuate_To_Far_Field_Values_Using_Characteristics(const T_ARRAYS_DIMENSION_BAS
     int axis=(side+1)/2;
     MATRIX<T,d,d> L,R;
     TV_DIMENSION LU,LU_far_field;
-    ARRAY<T,VECTOR<int,1> > lambda(1,d),lambda_left(1,d),lambda_right(1,d);
+    ARRAY<T,VECTOR<int,1> > lambda(0,d),lambda_left(0,d),lambda_right(0,d);
 
     // extract a 1d array
     int min_index=u_ghost.Domain_Indices().min_corner[axis],max_index=u_ghost.Domain_Indices().max_corner[axis];
     TV_INT current_index=node_index;
     ARRAY<TV_DIMENSION,VECTOR<int,1> > U_1d(min_index,max_index);
-    for(int i=min_index;i<=max_index;i++){current_index[axis]=i;U_1d(i)=u_ghost(current_index);}
+    for(int i=min_index;i<max_index;i++){current_index[axis]=i;U_1d(i)=u_ghost(current_index);}
 
     // apply L
     euler->eigensystems_default[axis]->Eigenvectors(U_1d,node_index[axis],L,R);
@@ -149,7 +149,7 @@ Fill_Single_Ghost_Region(const T_GRID& grid,T_ARRAYS_DIMENSION_BASE& u_ghost,con
         else reflection_times_two=2*boundary;
         for(CELL_ITERATOR iterator(grid,region);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
             TV_INT reflected_node=cell;reflected_node[axis]=reflection_times_two-cell[axis];
-            T rho=u_ghost(reflected_node)(1);
+            T rho=u_ghost(reflected_node)(0);
             TV velocity=EULER<T_GRID>::Get_Velocity(u_ghost,reflected_node);velocity(axis)*=-1;
             T e=EULER<T_GRID>::e(u_ghost,reflected_node);
             EULER<T_GRID>::Set_Euler_State_From_rho_velocity_And_internal_energy(u_ghost,cell,rho,velocity,e);}}
@@ -177,7 +177,7 @@ Apply_Boundary_Condition_Single_Side(const T_GRID& grid,T_ARRAYS_DIMENSION_BASE&
     if(!euler->mpi_grid||!euler->mpi_grid->Neighbor(axis,axis_side)){
         if(!Constant_Extrapolation(side)) for(CELL_ITERATOR iterator(grid,0,T_GRID::BOUNDARY_INTERIOR_REGION,side);iterator.Valid();iterator.Next()){
             TV_INT boundary_node=iterator.Cell_Index();
-            T rho=u(boundary_node)(1);
+            T rho=u(boundary_node)(0);
             TV velocity=EULER<T_GRID>::Get_Velocity(u,boundary_node);
             T e=EULER<T_GRID>::e(u,boundary_node);
             velocity[axis]=0; // Boundary condition

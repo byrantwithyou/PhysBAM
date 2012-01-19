@@ -117,16 +117,16 @@ Compute_Flux_Without_Clamping(const T_GRID& grid,const T_ARRAYS_DIMENSION_SCALAR
             for(int axis_slice=0;axis_slice<T_GRID::dimension;axis_slice++){
                 slice_index[axis_slice]=cell_index_full_dimension[axis_slice];}
 
-            for(int i=U_start;i<=U_end;i++){
+            for(int i=U_start;i<U_end;i++){
                 psi_axis(i)=psi(cell_index.Insert(i,axis));
                 filled_region_colors(i)=psi_axis(i)?0:-1;}
-            for(int i=U_start;i<=U_end+1;i++) psi_N_axis(i)=psi_N(axis,cell_index.Insert(i,axis));
+            for(int i=U_start;i<U_end+1;i++) psi_N_axis(i)=psi_N(axis,cell_index.Insert(i,axis));
             int number_of_regions=find_connected_components.Flood_Fill(filled_region_colors,psi_N_axis);
             for(int color=0;color<number_of_regions;color++){
-                for(int i=U_ghost_start;i<=U_ghost_end;i++) U_1d_axis(i)=U_ghost(cell_index.Insert(i,axis));
-                if(U_ghost_clamped) for(int i=U_ghost_start;i<=U_ghost_end;i++) U_flux_1d_axis(i)=(*U_ghost_clamped)(cell_index.Insert(i,axis));
+                for(int i=U_ghost_start;i<U_ghost_end;i++) U_1d_axis(i)=U_ghost(cell_index.Insert(i,axis));
+                if(U_ghost_clamped) for(int i=U_ghost_start;i<U_ghost_end;i++) U_flux_1d_axis(i)=(*U_ghost_clamped)(cell_index.Insert(i,axis));
                 psi_axis_current_component.Fill(false);
-                for(int i=U_start;i<=U_end;i++) psi_axis_current_component(i)=(filled_region_colors(i)==color);
+                for(int i=U_start;i<U_end;i++) psi_axis_current_component(i)=(filled_region_colors(i)==color);
                 VECTOR<int,2> region_boundary=find_connected_components.region_boundaries(color);
                 VECTOR<bool,2> psi_N_boundary(psi_N_axis(region_boundary.x),psi_N_axis(region_boundary.y+1));
                 if(thinshell) object_boundary->Fill_Ghost_Cells_Neumann(grid.Get_1D_Grid(axis),U_1d_axis,face_velocities,cell_index,axis,order,use_exact_neumann_face_location,
@@ -135,15 +135,15 @@ Compute_Flux_Without_Clamping(const T_GRID& grid,const T_ARRAYS_DIMENSION_SCALAR
                     if(thinshell) object_boundary->Fill_Ghost_Cells_Neumann(grid.Get_1D_Grid(axis),U_flux_1d_axis,face_velocities,cell_index,axis,order,use_exact_neumann_face_location,
                         VECTOR<int,2>(U_start,U_end),find_connected_components.region_boundaries(color),psi_N_boundary,callbacks);
                 VECTOR<bool,2> outflow_boundaries_current_component;
-                outflow_boundaries_current_component(0)=outflow_boundaries_axis(0)&&(!psi_N_boundary(0));outflow_boundaries_current_component(1)=outflow_boundaries_axis(1)&&(!psi_N_boundary(1));
+                outflow_boundaries_current_component(0)=outflow_boundaries_axis(0)&&(!psi_N_boundary(0));outflow_boundaries_current_component(0)=outflow_boundaries_axis(0)&&(!psi_N_boundary(0));
                 (eigensystems[axis])->slice_index=slice_index;(eigensystems_explicit[axis])->slice_index=slice_index;
                 ARRAY<TV_DIMENSION,VECTOR<int,1> >* U_flux_pointer=U_ghost_clamped?(&U_flux_1d_axis):0;
                 Conservation_Solver(U_end,dx[axis],psi_axis_current_component,U_1d_axis,flux_axis_1d,*eigensystems[axis],*eigensystems_explicit[axis],
                     outflow_boundaries_current_component,U_flux_pointer);}
-            for(int i=U_start;i<=U_end;i++) for(int k=0;k<d;k++)
+            for(int i=U_start;i<U_end;i++) for(int k=0;k<d;k++)
                 if(!scale_outgoing_fluxes_to_clamp_variable||(!U_ghost_clamped&&k==clamped_variable_index)||(U_ghost_clamped&&k!=clamped_variable_index))
                     rhs(cell_index.Insert(i,axis))(k)+=flux_axis_1d(i)(k);
-            if(save_fluxes) for(int i=U_start-1;i<=U_end;i++) for(int k=0;k<d;k++)
+            if(save_fluxes) for(int i=U_start-1;i<U_end;i++) for(int k=0;k<d;k++)
                 if(!scale_outgoing_fluxes_to_clamp_variable||(!U_ghost_clamped&&k==clamped_variable_index)||(U_ghost_clamped&&k!=clamped_variable_index))
                     fluxes.Component(axis)(cell_index.Insert(i+1,axis))(k)=flux_temp(i)(k);}}
 }
@@ -261,24 +261,24 @@ Update_Conservation_Law_For_Specialized_Shallow_Water_Equations(GRID<TV>& grid,T
     ARRAY<bool,VECTOR<int,1> > psi_x(0,m);
     for(j=0;j<n;j++){
         for(i=0;i<m;i++) psi_x(i)=psi(i,j);
-        for(i=-2;i<=m+3;i++){U_1d_x(i)(0)=U_ghost(i,j)(0);U_1d_x(i)(1)=U_ghost(i,j)(1);}
+        for(i=-3;i<m+3;i++){U_1d_x(i)(0)=U_ghost(i,j)(0);U_1d_x(i)(1)=U_ghost(i,j)(1);}
         eigensystem_F.slice_index=VECTOR<int,3>(0,j,0);
         solver.Conservation_Solver(m,dx,psi_x,U_1d_x,Fx_1d,eigensystem_F,eigensystem_F,VECTOR<bool,2>(outflow_boundaries(0),outflow_boundaries(1)));
         for(i=0;i<m;i++){rhs(i,j)(0)=Fx_1d(i)(0);rhs(i,j)(1)=Fx_1d(i)(1);}
         if(save_fluxes) 
-            for(i=0;i<=m;i++){fluxes.Component(0)(i+1,j)(0)=solver.flux_temp(i)(0);fluxes.Component(0)(i+1,j)(1)=solver.flux_temp(i)(1);fluxes.Component(0)(i+1,j)(2)=0;}}
+            for(i=0;i<m;i++){fluxes.Component(0)(i+1,j)(0)=solver.flux_temp(i)(0);fluxes.Component(0)(i+1,j)(1)=solver.flux_temp(i)(1);fluxes.Component(0)(i+1,j)(2)=0;}}
 
     if(save_fluxes) solver.flux_temp.Resize(0,n,true,false);
     ARRAY<VECTOR<T,2> ,VECTOR<int,1> > U_1d_y(-3,n+3),Gy_1d(0,n);
     ARRAY<bool,VECTOR<int,1> > psi_y(0,n);
     for(i=0;i<m;i++){
         for(j=0;j<n;j++) psi_y(j)=psi(i,j);
-        for(j=-2;j<=n+3;j++){U_1d_y(j)(0)=U_ghost(i,j)(0);U_1d_y(j)(1)=U_ghost(i,j)(2);}
+        for(j=-3;j<n+3;j++){U_1d_y(j)(0)=U_ghost(i,j)(0);U_1d_y(j)(1)=U_ghost(i,j)(2);}
         eigensystem_G.slice_index=VECTOR<int,3>(i,0,0);
         solver.Conservation_Solver(n,dy,psi_y,U_1d_y,Gy_1d,eigensystem_G,eigensystem_G,VECTOR<bool,2>(outflow_boundaries(2),outflow_boundaries(3)));
         for(j=0;j<n;j++){rhs(i,j)(0)+=Gy_1d(j)(0);rhs(i,j)(2)=Gy_1d(j)(1);}
         if(save_fluxes)
-            for(j=0;j<=n;j++){fluxes.Component(1)(i,j+1)(0)=solver.flux_temp(j)(0);fluxes.Component(1)(i,j+1)(1)=0;fluxes.Component(1)(i,j+1)(2)=solver.flux_temp(j)(1);}}
+            for(j=0;j<n;j++){fluxes.Component(1)(i,j+1)(0)=solver.flux_temp(j)(0);fluxes.Component(1)(i,j+1)(1)=0;fluxes.Component(1)(i,j+1)(2)=solver.flux_temp(j)(1);}}
 
     for(i=0;i<m;i++) for(j=0;j<n;j++) if(psi(i,j)) U(i,j)-=dt*rhs(i,j);
 }

@@ -16,14 +16,14 @@ Euler_Step(const T dt,const T time)
     int m=grid.m;
 
     // find nodal masses
-    ARRAY<T,VECTOR<int,1> > M_node(1,m);
+    ARRAY<T,VECTOR<int,1> > M_node(0,m);
     for(i=0;i<m-1;i++){T mass_over_2=mass(i)/2;M_node(i)+=mass_over_2;M_node(i+1)+=mass_over_2;}
     
     // get grid lengths
-    ARRAY<T,VECTOR<int,1> > L(1,m-1);grid.Get_Lengths(L);
+    ARRAY<T,VECTOR<int,1> > L(0,m-1);grid.Get_Lengths(L);
     
     // forces F, and heating rates H = -F dot V 
-    ARRAY<T,VECTOR<int,1> > F(1,m),H(1,m-1);
+    ARRAY<T,VECTOR<int,1> > F(0,m),H(0,m-1);
 
     // pressue
     for(i=0;i<m-1;i++){
@@ -35,7 +35,7 @@ Euler_Step(const T dt,const T time)
     for(i=0;i<m;i++) F(i)+=external_force(i);
 
     // artificial viscosity  
-    ARRAY<T,VECTOR<int,1> > Q(1,m-1);
+    ARRAY<T,VECTOR<int,1> > Q(0,m-1);
     artificial_viscosity->Get_Artificial_Viscosity(eos,grid,mass,velocity,energy,Q);
     for(i=0;i<m-1;i++){
         F(i)+=-Q(i);H(i)+=Q(i)*velocity(i);
@@ -70,15 +70,15 @@ CFL()
     int i;
     int m=grid.m;
 
-    ARRAY<T,VECTOR<int,1> > L(1,m-1);grid.Get_Lengths(L);
+    ARRAY<T,VECTOR<int,1> > L(0,m-1);grid.Get_Lengths(L);
     
-    ARRAY<T,VECTOR<int,1> > Q(1,m-1);
+    ARRAY<T,VECTOR<int,1> > Q(0,m-1);
     artificial_viscosity->Get_Artificial_Viscosity(eos,grid,mass,velocity,energy,Q);
 
-    ARRAY<T,VECTOR<int,1> > S(1,m-1);
+    ARRAY<T,VECTOR<int,1> > S(0,m-1);
     if(material_strength) for(i=0;i<m-1;i++) S(i)=-stiffness*(L(i)/L_not(i)-1);
 
-    ARRAY<T,VECTOR<int,1> > timestep(1,m-1);
+    ARRAY<T,VECTOR<int,1> > timestep(0,m-1);
     for(i=0;i<m-1;i++){
         T density=mass(i)/L(i);         
         T P=eos.p(density,energy(i))+Q(i)+abs(S(i));

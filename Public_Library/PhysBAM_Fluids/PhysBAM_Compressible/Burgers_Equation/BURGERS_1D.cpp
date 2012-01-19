@@ -17,11 +17,11 @@ Euler_Step(const T dt,const T time)
     int m=grid.counts.x;
     int ghost_cells=3;
 
-    ARRAY<TV,VECTOR<int,1> > U_ghost(1-ghost_cells,m+ghost_cells);
+    ARRAY<TV,VECTOR<int,1> > U_ghost(-ghost_cells,m+ghost_cells);
     boundary->Fill_Ghost_Cells(grid,U,U_ghost,dt,time,ghost_cells);
 
     // doesn't  support cut out grids
-    ARRAY<bool,VECTOR<int,1> > psi(1,m);psi.Fill(true);
+    ARRAY<bool,VECTOR<int,1> > psi(0,m);psi.Fill(true);
     T_FACE_ARRAYS_BOOL psi_N(grid.Get_MAC_Grid_At_Regular_Positions());
     T_FACE_ARRAYS_SCALAR face_velocities(grid.Get_MAC_Grid_At_Regular_Positions());
     VECTOR<EIGENSYSTEM<T,TV>*,1> eigensystem(&eigensystem_F);
@@ -37,8 +37,8 @@ CFL()
 {
     int m=grid.counts.x;T dx=grid.dX.x;
 
-    ARRAY<T,VECTOR<int,1> > u(1,m);
-    for(int i=0;i<m;i++) u(i)=U(i)(1);
+    ARRAY<T,VECTOR<int,1> > u(0,m);
+    for(int i=0;i<m;i++) u(i)=U(i)(0);
     T dt_convect=u.Maxabs()/dx;
 
     return 1/max(dt_convect,1/max_time_step);
