@@ -17,27 +17,27 @@ Euler_Step(const T dt,const T time)
     int i,k;
     int ghost_cells=3;
 
-    ARRAY<TV_DIMENSION,VECTOR<int,1> > U_ghost(1-ghost_cells,m+ghost_cells);
+    ARRAY<TV_DIMENSION,VECTOR<int,1> > U_ghost(-ghost_cells,m+ghost_cells);
     boundary->Fill_Ghost_Cells(grid,U,U_ghost,dt,time,ghost_cells);
     
     // evaluate source terms
-    ARRAY<TV_DIMENSION,VECTOR<int,1> > S(1,m);
+    ARRAY<TV_DIMENSION,VECTOR<int,1> > S(0,m);
     for(i=0;i<m;i++){
-        T rho=U(i)(1);
-        T u=U(i)(2)/U(i)(1);
-        T e=U(i)(3)/U(i)(1)-sqr(u)/2;
-        T rho_u=U(i)(2);
+        T rho=U(i)(0);
+        T u=U(i)(1)/U(i)(0);
+        T e=U(i)(2)/U(i)(0)-sqr(u)/2;
+        T rho_u=U(i)(1);
         T coefficient=-2/grid.X(VECTOR<int,1>(i)).x;
-        S(i)(1)=coefficient*rho_u;
-        S(i)(2)=coefficient*rho_u*u;
-        S(i)(3)=coefficient*(U(i)(3)+eos->p(rho,e))*u;}
+        S(i)(0)=coefficient*rho_u;
+        S(i)(1)=coefficient*rho_u*u;
+        S(i)(2)=coefficient*(U(i)(2)+eos->p(rho,e))*u;}
     
     T_FACE_ARRAYS_BOOL psi_N(grid.Get_MAC_Grid_At_Regular_Positions());
     T_FACE_ARRAYS_SCALAR face_velocities(grid.Get_MAC_Grid_At_Regular_Positions());
     VECTOR<EIGENSYSTEM<T,VECTOR<T,3> >*,1> eigensystem(&eigensystem_F);
     if(cut_out_grid) conservation->Update_Conservation_Law(grid,U,U_ghost,*psi_pointer,dt,eigensystem,eigensystem,psi_N,face_velocities);
     else{ // not a cut out grid
-        ARRAY<bool,VECTOR<int,1> > psi(1,m);psi.Fill(1);
+        ARRAY<bool,VECTOR<int,1> > psi(0,m);psi.Fill(1);
         conservation->Update_Conservation_Law(grid,U,U_ghost,psi,dt,eigensystem,eigensystem,psi_N,face_velocities);}
 
     // add source terms

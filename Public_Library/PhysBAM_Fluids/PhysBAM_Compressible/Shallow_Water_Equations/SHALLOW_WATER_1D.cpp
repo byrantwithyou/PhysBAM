@@ -16,13 +16,13 @@ Euler_Step(const T dt,const T time)
 {  
     int m=grid.counts.x;
     int ghost_cells=3;
-    ARRAY<TV_DIMENSION,VECTOR<int,1> > U_ghost(1-ghost_cells,m+ghost_cells);boundary->Fill_Ghost_Cells(grid,U,U_ghost,dt,time,ghost_cells);
+    ARRAY<TV_DIMENSION,VECTOR<int,1> > U_ghost(0-ghost_cells,m+ghost_cells);boundary->Fill_Ghost_Cells(grid,U,U_ghost,dt,time,ghost_cells);
 
     // make sure things'll work in conservation law solver
-    for(int i=0;i<grid.counts.x;i++) if (U(i)(1) < min_height){U(i)(1)=min_height;U(i)(2)=0;}
-    for(int i=-ghost_cells;i<m+ghost_cells;i++) if(U_ghost(i)(1) < min_height){U_ghost(i)(1)=min_height;U_ghost(i)(2)=0;}
+    for(int i=0;i<grid.counts.x;i++) if (U(i)(0) < min_height){U(i)(0)=min_height;U(i)(1)=0;}
+    for(int i=-ghost_cells;i<m+ghost_cells;i++) if(U_ghost(i)(0) < min_height){U_ghost(i)(0)=min_height;U_ghost(i)(1)=0;}
 
-    ARRAY<bool,VECTOR<int,1> > psi(1,m);psi.Fill(true); // no cut out grids
+    ARRAY<bool,VECTOR<int,1> > psi(0,m);psi.Fill(true); // no cut out grids
     T_FACE_ARRAYS_BOOL psi_N(grid.Get_MAC_Grid_At_Regular_Positions());
     T_FACE_ARRAYS_SCALAR face_velocities(grid.Get_MAC_Grid_At_Regular_Positions());
     VECTOR<EIGENSYSTEM<T,VECTOR<T,2> >*,1> eigensystem(&eigensystem_F);
@@ -37,7 +37,7 @@ CFL()
 {
     T max_speed=0;
     for(int i=0;i<grid.counts.x;i++){
-        T u=(U(i)(1)!=0)?(U(i)(2)/U(i)(1)):0,celerity=sqrt(gravity*U(i)(1));
+        T u=(U(i)(0)!=0)?(U(i)(1)/U(i)(0)):0,celerity=sqrt(gravity*U(i)(0));
         max_speed=max(max_speed,abs(u)+celerity);}
     T dt_convect=max_speed*grid.one_over_dX.x;
     return 1/dt_convect;
