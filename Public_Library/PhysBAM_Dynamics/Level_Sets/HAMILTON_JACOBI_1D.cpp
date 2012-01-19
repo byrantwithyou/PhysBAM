@@ -44,7 +44,7 @@ Calculate_Derivatives(ARRAY<T,VECTOR<int,1> >& phi_ghost,ARRAY<T,VECTOR<int,1> >
     int m=grid.counts.x;T dx=grid.dX.x;
     int ghost_cells=3;
     ARRAY<T,VECTOR<int,1> > phi_1d_x(1-ghost_cells,m+ghost_cells);
-    for(int i=1-ghost_cells;i<=m+ghost_cells;i++) phi_1d_x(i)=phi_ghost(i);
+    for(int i=-ghost_cells;i<m+ghost_cells;i++) phi_1d_x(i)=phi_ghost(i);
     if(spatial_order == 5) HJ_WENO(m,dx,phi_1d_x,phix_minus,phix_plus);
     else HJ_ENO(spatial_order,m,dx,phi_1d_x,phix_minus,phix_plus);
 }

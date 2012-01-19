@@ -375,7 +375,7 @@ Delete_Children(const int level,const int tet,ARRAY<int>& deleted_tet_indices,AR
          ki=segment_midpoints((*meshes(level)->element_edges)(tet)(3)),il=segment_midpoints((*meshes(level)->element_edges)(tet)(4)),
          jl=segment_midpoints((*meshes(level)->element_edges)(tet)(5)),kl=segment_midpoints((*meshes(level)->element_edges)(tet)(6));
     // make the list of deleted tets (namely, the children) and zero out children
-    int p;for(p=1;p<=8&&(*children(level))(tet)(p);p++){deleted_tet_indices.Append((*children(level))(tet)(p));(*children(level))(tet)(p)=0;}
+    int p;for(p=0;p<8&&(*children(level))(tet)(p);p++){deleted_tet_indices.Append((*children(level))(tet)(p));(*children(level))(tet)(p)=0;}
     // get a list of edges to delete (begin by finding all children edges, then filter the red ones out)
     ARRAY<int> children_edges;children_edges.Preallocate(25);
     for(p=0;p<deleted_tet_indices.m;p++) for(int q=0;q<6;q++) // get a list of all children edges

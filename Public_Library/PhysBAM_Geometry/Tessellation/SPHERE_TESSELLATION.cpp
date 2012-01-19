@@ -40,12 +40,12 @@ template<class T> TRIANGULATED_AREA<T>* Generate_Triangles(const SPHERE<VECTOR<T
     TRIANGULATED_AREA<T>* area=TRIANGULATED_AREA<T>::Create();
     GEOMETRY_PARTICLES<TV>& particles=area->particles;particles.array_collection->Add_Elements(1+3*levels*(levels+1));
     particles.X(1)=TV(0,0);
-    for(int i=1,k=1;i<=levels;i++)
+    for(int i=0,k=0;i<levels;i++)
         for(int j=0;j<i*6;j++){
             T a=(T)pi/3*(j-(T).5*(i-1))/i;
-            particles.X(++k)=(T)i*TV(cos(a),sin(a));}
-    for(int i=2;i<=7;i++) area->mesh.elements.Append(E(1,i,((i-1)%6+2)));
-    for(int i=2,p=2;i<=levels;i++){
+            particles.X(k++)=(T)i*TV(cos(a),sin(a));}
+    for(int i=1;i<7;i++) area->mesh.elements.Append(E(1,i,((i-1)%6+1)));
+    for(int i=1,p=1;i<levels;i++){
         int n=i*6;
         int c=p+n-6;
         area->mesh.elements.Append(E(c-1,c+n-1,c));

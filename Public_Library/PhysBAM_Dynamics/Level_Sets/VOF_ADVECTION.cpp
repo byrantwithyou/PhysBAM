@@ -806,7 +806,7 @@ Refine_Or_Coarsen_Geometry()
                 if(excessive_edge) triangle_list.Append(leaf_number);}
             if(!preimage.Red(level,t)){
                 int parent=(*preimage.parent(level))(t);T parent_material_volume=(T)0;
-                for(int j=1;j<=T_RED_GREEN_SIMPLICES::number_of_red_children && (*preimage.children(level-1))(parent)(j);j++){
+                for(int j=0;j<T_RED_GREEN_SIMPLICES::number_of_red_children && (*preimage.children(level-1))(parent)(j);j++){
                     int child=(*preimage.children(level-1))(parent)(j);
                     int child_leaf_number=(*preimage.leaf_number(level))(child);
                     parent_material_volume+=simplex_preimage_material_volume(child_leaf_number);
@@ -835,7 +835,7 @@ Refine_Or_Coarsen_Geometry()
         else{
             T child_volume[T_RED_GREEN_SIMPLICES::number_of_red_children];T parent_volume=0;
             T actual_parent_volume=T_SIMPLEX::Signed_Size(object.particles.X.Subset((*preimage.meshes(level)).elements(i)));
-            for(int j=1;j<=T_RED_GREEN_SIMPLICES::number_of_red_children && (*preimage.children(level))(i)(j);j++){
+            for(int j=0;j<T_RED_GREEN_SIMPLICES::number_of_red_children && (*preimage.children(level))(i)(j);j++){
                 int child=(*preimage.children(level))(i)(j);
                 child_volume[j-1]=T_SIMPLEX::Signed_Size(object.particles.X.Subset((*preimage.meshes(level+1)).elements(child)));
                 if(child_volume[j-1]*actual_parent_volume<0) child_volume[j-1]*=-1; // should only happen for slivers...
@@ -844,7 +844,7 @@ Refine_Or_Coarsen_Geometry()
             T parent_material_volume=level_material_volume(level)(i);
             if(parent_volume==0) one_over_parent_volume=(T)1;
             else one_over_parent_volume=(T)1/parent_volume;
-            for(int j=1;j<=T_RED_GREEN_SIMPLICES::number_of_red_children && (*preimage.children(level))(i)(j);j++){
+            for(int j=0;j<T_RED_GREEN_SIMPLICES::number_of_red_children && (*preimage.children(level))(i)(j);j++){
                 int child=(*preimage.children(level))(i)(j);
                 T child_material_volume=parent_material_volume*child_volume[j-1]*one_over_parent_volume;
                 level_material_volume(level+1)(child)=child_material_volume;}}

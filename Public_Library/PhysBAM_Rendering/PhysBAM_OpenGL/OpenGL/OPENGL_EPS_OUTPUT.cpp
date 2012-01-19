@@ -60,11 +60,11 @@ End()
     Transform_Buffer();
     switch(glmode){
         case GL_POINTS: for(int i=0;i<buffer.m;i++) Draw_Point(buffer(i)); break;
-        case GL_LINES: for(int i=1;i<=buffer.m;i+=2) Draw_Line(buffer(i),buffer(i+1)); break;
-        case GL_TRIANGLES: for(int i=1;i<=buffer.m;i+=3) Draw_Polygon(i,3); break;
-        case GL_QUADS: for(int i=1;i<=buffer.m;i+=4) Draw_Polygon(i,4); break;
+        case GL_LINES: for(int i=0;i<buffer.m;i+=2) Draw_Line(buffer(i),buffer(i+1)); break;
+        case GL_TRIANGLES: for(int i=0;i<buffer.m;i+=3) Draw_Polygon(i,3); break;
+        case GL_QUADS: for(int i=0;i<buffer.m;i+=4) Draw_Polygon(i,4); break;
         case GL_POLYGON: Draw_Polygon(1,buffer.m); break;
-        case GL_LINE_LOOP: for(int i=2;i<=buffer.m;i++) Draw_Line(buffer.Last(),buffer(1)); break;
+        case GL_LINE_LOOP: for(int i=1;i<buffer.m;i++) Draw_Line(buffer.Last(),buffer(1)); break;
         default:LOG::cout<<"Unhandled mode "<<glmode<<std::endl;break;
     }
     buffer.Remove_All();

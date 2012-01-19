@@ -29,7 +29,7 @@ public:
 
     void Compute_Coefficients(const VECTOR_ND<T>& x,const VECTOR_ND<T>& y)
     {assert(x.n == degree+1 && y.n == degree+1);MATRIX_MXN<T> A(degree+1,degree+1);
-    for(int i=0;i<degree+1;i++){A(i,1)=1;for(int j=2;j<=degree+1;j++)A(i,j)=x(i)*A(i,j-1);}
+    for(int i=0;i<degree+1;i++){A(i,1)=1;for(int j=1;j<degree+1;j++)A(i,j)=x(i)*A(i,j-1);}
     VECTOR_ND<T> c_temp=A.PLU_Solve(y);for(int i=0;i<degree+1;i++)c(i)=c_temp(i);}
 
 //#####################################################################

@@ -97,7 +97,7 @@ Display(const int in_color) const
     // print strings
     OPENGL_COLOR::White().Send_To_GL_Pipeline();
     T height=vertical_offset;
-    for(int i=1; i<= strings.m; i++){OpenGL_String(VECTOR<float,2>(horizontal_offset,height),strings(i),GLUT_BITMAP_8_BY_13);height-=vspace;}
+    for(int i=0;i<strings.m;i++){OpenGL_String(VECTOR<float,2>(horizontal_offset,height),strings(i),GLUT_BITMAP_8_BY_13);height-=vspace;}
     // reet opengl state
     glPopAttrib();
     glPopMatrix();glMatrixMode(GL_MODELVIEW);glPopMatrix();

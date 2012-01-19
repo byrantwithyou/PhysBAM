@@ -447,18 +447,18 @@ public:
 
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     void Print_Grid_Array(VECTOR<int,1> counts,int ghost_cells=0)
-    {for(int i=1-ghost_cells;i<=counts.x+ghost_cells;i++) LOG::cout<<(operator()(VECTOR<int,1>(i)));LOG::cout<<std::endl;}
+    {for(int i=-ghost_cells;i<counts.x+ghost_cells;i++) LOG::cout<<(operator()(VECTOR<int,1>(i)));LOG::cout<<std::endl;}
 
     void Print_Grid_Array(VECTOR<int,2> counts,int ghost_cells=0)
-    {for(int i=1-ghost_cells;i<=counts.x+ghost_cells;i++){
-        for(int j=1-ghost_cells;j<=counts.y+ghost_cells;j++) LOG::cout<<(operator()(VECTOR<int,2>(i,j)));
+    {for(int i=-ghost_cells;i<counts.x+ghost_cells;i++){
+        for(int j=-ghost_cells;j<counts.y+ghost_cells;j++) LOG::cout<<(operator()(VECTOR<int,2>(i,j)));
         LOG::cout<<std::endl;}
     LOG::cout<<std::endl;}
 
     void Print_Grid_Array(VECTOR<int,3> counts,int ghost_cells=0)
-    {for(int i=1-ghost_cells;i<=counts.x+ghost_cells;i++){
-        for(int j=1-ghost_cells;j<=counts.y+ghost_cells;j++){
-            for(int k=1-ghost_cells;k<=counts.z+ghost_cells;k++) LOG::cout<<(operator()(VECTOR<int,3>(i,j,k)));
+    {for(int i=-ghost_cells;i<counts.x+ghost_cells;i++){
+        for(int j=-ghost_cells;j<counts.y+ghost_cells;j++){
+            for(int k=-ghost_cells;k<counts.z+ghost_cells;k++) LOG::cout<<(operator()(VECTOR<int,3>(i,j,k)));
             LOG::cout<<std::endl;}
         LOG::cout<<std::endl;}
     LOG::cout<<std::endl;}

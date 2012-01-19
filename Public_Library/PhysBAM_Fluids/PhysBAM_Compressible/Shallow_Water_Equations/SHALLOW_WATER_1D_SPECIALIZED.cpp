@@ -20,11 +20,11 @@ Euler_Step(const T dt,const T time)
     ARRAY<bool,VECTOR<int,1> > psi(1,m,false);psi.Fill(true); // no cut out grids
 
     static ARRAY<bool,VECTOR<int,1> > zero_height(1-ghost_cells,m+ghost_cells);zero_height.Fill(false);
-    for(int i=1-ghost_cells;i<=grid.counts.x+ghost_cells;i++) if(U_ghost(i)(1)<=min_height) zero_height(i)=true;
+    for(int i=-ghost_cells;i<grid.counts.x+ghost_cells;i++) if(U_ghost(i)(1)<=min_height) zero_height(i)=true;
 
     ARRAY<T,VECTOR<int,1> > ground_ghost(1-ghost_cells,grid.counts.x+ghost_cells);
     if(ground) BOUNDARY_UNIFORM<GRID<TV>,T>().Fill_Ghost_Cells(grid,*ground,ground_ghost,dt,time,ghost_cells);
-    for(int i=1-ghost_cells;i<=grid.counts.x+ghost_cells;i++) eta_ghost(i)=U_ghost(i)(1)+ground_ghost(i);
+    for(int i=-ghost_cells;i<grid.counts.x+ghost_cells;i++) eta_ghost(i)=U_ghost(i)(1)+ground_ghost(i);
 
     T_FACE_ARRAYS_BOOL psi_N(grid.Get_MAC_Grid_At_Regular_Positions());
     T_FACE_ARRAYS_SCALAR face_velocities(grid.Get_MAC_Grid_At_Regular_Positions());

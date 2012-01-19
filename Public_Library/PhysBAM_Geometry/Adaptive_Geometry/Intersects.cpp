@@ -29,7 +29,7 @@ namespace GEOMETRIC_PREDICATES_DETAIL{
             bool could_be_a_separator=true;
             VECTOR<int,2> sign;
             int next_sign=0;
-            for(int u=1;u<=m+n&&could_be_a_separator;++u){
+            for(int u=0;u<m+n&&could_be_a_separator;++u){
                 if(u==v1) continue;
                 const TV& y=all_vertices[u];
                 next_sign=Adaptive_Signed_Volume<T_EXACT,T>(x1,y).Sign();
@@ -65,7 +65,7 @@ namespace GEOMETRIC_PREDICATES_DETAIL{
                 bool could_be_a_separator=true;
                 VECTOR<int,2> sign;
                 int next_sign=0;
-                for(int u=1;u<=m+n&&could_be_a_separator;++u){
+                for(int u=0;u<m+n&&could_be_a_separator;++u){
                     if(u==v1||u==v2) continue;
                     const TV& y=all_vertices[u];
                     next_sign=Adaptive_Signed_Volume<T_EXACT>(x1,x2,y).Sign();
@@ -104,7 +104,7 @@ namespace GEOMETRIC_PREDICATES_DETAIL{
                     bool could_be_a_separator=true;
                     VECTOR<int,2> sign(0,0);
                     int next_sign=0;
-                    for(int u=1;u<=m+n&&could_be_a_separator;++u){
+                    for(int u=0;u<m+n&&could_be_a_separator;++u){
                         if(u==v1||u==v2||u==v3) continue;
                         const TV& y=all_vertices[u];
                         next_sign=Adaptive_Signed_Volume<T_EXACT>(x1,x2,x3,y).Sign();
@@ -144,7 +144,7 @@ namespace GEOMETRIC_PREDICATES_DETAIL{
         VECTOR<VECTOR<T,d-1>,m> simplex1_proj;
         VECTOR<VECTOR<T,d-1>,n> simplex2_proj;
         bool intersects=false,is_degenerate=true;
-        for(int k=1;k<=d&&is_degenerate;++k){
+        for(int k=0;k<d&&is_degenerate;++k){
             for(int i=0;i<m;i++) simplex1_proj[i]=simplex1[i].Remove_Index(k);
             for(int i=0;i<n;i++) simplex2_proj[i]=simplex2[i].Remove_Index(k);
             intersects=Intersects<T_EXACT>(simplex1_proj,simplex2_proj,&is_degenerate);}

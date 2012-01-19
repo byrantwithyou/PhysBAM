@@ -15,7 +15,7 @@ namespace INTERSECTION{
 template<class T> bool Intersects(const RANGE<VECTOR<T,2> >& box,const LINE_2D<T>& line,const T thickness_over_two)
 {
     bool points_on_positive_side=false,points_on_negative_side=false;
-    for(int i=0;i<=1;i++)for(int j=0;j<=1;j++){
+    for(int i=0;i<2;i++)for(int j=0;j<2;j++){
         VECTOR<T,2> test_point(i?box.min_corner.x:box.max_corner.x,j?box.min_corner.y:box.max_corner.y);
         T distance=VECTOR<T,2>::Dot_Product(line.normal,test_point-line.x1);
         if(distance>-thickness_over_two) points_on_positive_side=true;

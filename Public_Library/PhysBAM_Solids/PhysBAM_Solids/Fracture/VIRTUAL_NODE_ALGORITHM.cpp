@@ -240,7 +240,7 @@ Rebuild_Embedded_Object(EMBEDDED_OBJECT<TV,d>& embedded_object,ARRAY<int>& map_t
     for(int t=0;t<mesh.elements.m;t++){
         int old_element=map_to_old_simplices(t);
         VECTOR<int,2*d-2> old_emb_subelements=old_embedded_object.Embedded_Subelements_In_Element(old_element);
-        for(int i=1;i<=old_emb_subelements.m && old_emb_subelements[i];i++)
+        for(int i=0;i<old_emb_subelements.m && old_emb_subelements[i];i++)
             Add_Embedded_Subelement(embedded_object,old_embedded_object,old_emb_subelements[i],t,old_element);}
 
     // remap orientation_index if necessary

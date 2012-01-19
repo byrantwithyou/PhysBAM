@@ -301,7 +301,7 @@ Update_Points(const VECTOR<int,2>& start_index,const VECTOR<int,2>& end_index)
     opengl_points->points.Resize((end_index.x-start_index.x+1)*(end_index.y-start_index.y+1));
     int index=1;
     OPENGL_COLOR_MAP<T2>* color_map=color_maps(current_color_map);
-    for(int i=start_index.x,i_active_cells=1;i<=end_index.x;i++,i_active_cells++) for(int j=start_index.y,j_active_cells=1;j<=end_index.y;j++,j_active_cells++) if(!active_cells || (*active_cells)(i_active_cells,j_active_cells)){
+    for(int i=start_index.x,i_active_cells=0;i<end_index.x;i++,i_active_cells++) for(int j=start_index.y,j_active_cells=0;j<=end_index.y;j++,j_active_cells++) if(!active_cells || (*active_cells)(i_active_cells,j_active_cells)){
         opengl_points->points(index)=grid.X(i,j);
         opengl_points->Set_Point_Color(index,color_map->Lookup(Pre_Map_Value(values(i,j))));
         index++;}

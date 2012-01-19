@@ -645,7 +645,7 @@ Handle_Keypress_Main(const OPENGL_KEY& key,int x,int y)
 
     if(key_bindings(index).m >=1)
     {
-        for(int i=1;i <=key_bindings(index).m;i++)
+        for(int i=0;i<key_bindings(index).m;i++)
             (*key_bindings(index)(i))();
         window->Redisplay();
     }

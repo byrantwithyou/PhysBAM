@@ -109,7 +109,7 @@ Set_Levelset_Callbacks(LEVELSET_CALLBACKS<T_GRID>& levelset_callbacks_input)
 template<class T_GRID> int LEVELSET_MULTIPLE<T_GRID>::
 Inside_Region(const TV_INT& index) const // assumes exactly one Phi<0 on a node
 {
-    for(int k=1;k<phis.m;k++) if(Phi(k,index)<=0) return k;
+    for(int k=0;k<phis.m-1;k++) if(Phi(k,index)<=0) return k;
     assert(Phi(phis.m,index)<=0);
     return phis.m;
 }
@@ -119,7 +119,7 @@ Inside_Region(const TV_INT& index) const // assumes exactly one Phi<0 on a node
 template<class T_GRID> int LEVELSET_MULTIPLE<T_GRID>::
 Inside_Region(const TV_INT& index,T& phi) const // assumes exactly one Phi<0 on a node
 {
-    for(int k=1;k<phis.m;k++){phi=Phi(k,index);if(phi<=0) return k;}
+    for(int k=0;k<phis.m-1;k++){phi=Phi(k,index);if(phi<=0) return k;}
     phi=Phi(phis.m,index);
     assert(phi<=0);
     return phis.m;

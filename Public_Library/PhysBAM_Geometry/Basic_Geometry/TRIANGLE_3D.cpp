@@ -268,7 +268,7 @@ Cut_With_Hyperplane_And_Discard_Outside_Simplices(const TRIANGLE_3D<T>& triangle
             for(int i=0;i<3;i++)if(LEVELSET_UTILITIES<T>::Sign(phi_nodes(i))==single_node_sign){
                 VECTOR<VECTOR<T,3>,2> interface_locations;int index=i%3+1;
                 VECTOR<int,2> other_locations;
-                for(int j=1;j<=2;j++,index=index%3+1){
+                for(int j=0;j<2;j++,index=(index+1)%3){
                     other_locations(j)=index;
                     interface_locations(j)=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(X_nodes(i),X_nodes(index),LEVELSET_UTILITIES<T>::Theta(phi_nodes(i),phi_nodes(index)));}
                 if(positive_count==1){ // add two triangles to negative triangles

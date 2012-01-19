@@ -148,7 +148,7 @@ Fracture_Where_High_Stress(ARRAY<T_SYMMETRIC_MATRIX>& sigma,ARRAY<TV>& spatial_f
             for(int a=0;a<(*embedded_object.simplicial_object.mesh.adjacent_elements)(t).m;a++){
                 int adj_t=(*embedded_object.simplicial_object.mesh.adjacent_elements)(t)(a);
                 VECTOR<int,2*d-2> emb_elements=embedded_object.Embedded_Subelements_In_Element(adj_t);
-                for(int i=1;i<=emb_elements.m && emb_elements[i];i++){
+                for(int i=0;i<emb_elements.m && emb_elements[i];i++){
                     int isolated_node=embedded_object.Node_Separated_By_Embedded_Subelement(emb_elements[i]);
                     if(!isolated_node || embedded_object.simplicial_object.mesh.Node_In_Simplex(isolated_node,t)){
                         TV emb_face_normal=Embedded_Subelement_Normal(embedded_object,emb_elements[i],adj_t);

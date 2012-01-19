@@ -27,7 +27,7 @@ public:
         object.Set_Active_Element(index,STRUCTURE<TV>::Create_From_Name(object.names(id)));
         FILE_UTILITIES::Read_From_File<RW>(STRING_UTILITIES::string_sprintf("%s/common/%s%d.%s",prefix.c_str(),list_name.c_str(),id,object.Active_Element(index)->Extension().c_str()),*object.Active_Element(index));}
 
-    for(ID id=1;id<=object.Size();id++)
+    for(ID id=0;id<object.Size();id++)
         if(object.Is_Active(id)){
             STRUCTURE<TV>& structure=*object.Active_Element(object.Element_Index(id));
             std::string filename=STRING_UTILITIES::string_sprintf("%s/%d/%s%d.%s",prefix.c_str(),frame,list_name.c_str(),id,structure.Extension().c_str());
@@ -48,7 +48,7 @@ public:
     if(frame==0 || needs_write.Size()) FILE_UTILITIES::Write_To_File<RW>(STRING_UTILITIES::string_sprintf("%s/common/%skey",prefix.c_str(),list_name.c_str()),object.names);
     needs_write.Remove_All();
 
-    for(ID id=1;id<=object.Size();id++)
+    for(ID id=0;id<object.Size();id++)
         if(object.Is_Active(id)){
             STRUCTURE<TV>& structure=*object.Active_Element(object.Element_Index(id));
             if(structure.update_every_frame){

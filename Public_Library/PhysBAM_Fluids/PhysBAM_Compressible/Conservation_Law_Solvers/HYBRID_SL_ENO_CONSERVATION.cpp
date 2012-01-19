@@ -115,7 +115,7 @@ Update_Conservation_Law(T_GRID& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS
                     T cell_stuff = U_ghost(cell_index)(dim) * cell_volume;
                     if(abs(sigma(cell_index)) > abs(cell_stuff)) {
                         T one_over_sigma = cell_stuff / sigma(cell_index);
-                        for(int i=1;i<= donors(cell_index).Size();++i){
+                        for(int i=0;i<donors(cell_index).Size();++i){
                             weights(donors(cell_index)(i)).x *= one_over_sigma;}}
                     else {
                         T remainder = (cell_stuff - sigma(cell_index))/cell_volume;

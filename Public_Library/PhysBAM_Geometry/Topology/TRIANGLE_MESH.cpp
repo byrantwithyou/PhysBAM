@@ -262,7 +262,7 @@ Initialize_Boundary_Mesh()
             if(i==2) exchange(face.x,face.y); // ensure cyclic order
             const ARRAY<int>& incident_elements_to_face1=(*incident_elements)(face[1]);
             bool another_element_on_face=false;
-            for(int j=1;j<=incident_elements_to_face1.m&&!another_element_on_face;++j)
+            for(int j=0;j<incident_elements_to_face1.m&&!another_element_on_face;++j)
                 another_element_on_face=(incident_elements_to_face1(j)!=e&&Nodes_In_Simplex(face,incident_elements_to_face1(j)));
             if(!another_element_on_face) boundary_elements.Append(face);}}
     if(!incident_elements_defined){delete incident_elements;incident_elements=0;}
@@ -286,7 +286,7 @@ Initialize_Node_On_Boundary()
             VECTOR<int,dimension> face=element.Remove_Index(i);
             const ARRAY<int>& incident_elements_to_face1=(*incident_elements)(face[1]);
             bool another_element_on_face=false;
-            for(int j=1;j<=incident_elements_to_face1.m&&!another_element_on_face;++j)
+            for(int j=0;j<incident_elements_to_face1.m&&!another_element_on_face;++j)
                 another_element_on_face=(incident_elements_to_face1(j)!=e&&Nodes_In_Simplex(face,incident_elements_to_face1(j)));
             if(!another_element_on_face){node_on_boundary->Subset(face).Fill(true);}}}
     if(!incident_elements_defined){delete incident_elements;incident_elements=0;}

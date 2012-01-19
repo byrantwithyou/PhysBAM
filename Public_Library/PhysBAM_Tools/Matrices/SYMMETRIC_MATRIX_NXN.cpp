@@ -88,7 +88,7 @@ Jacobi_Solve_Eigenproblem(ARRAY<VECTOR<int,2> >& givens_pairs,ARRAY<VECTOR<T,2> 
     for(int iteration=0;iteration<max_iterations;iteration++){
         T max_off_diagonal_element=0;
         int i_max=0,j_max=0;
-        for(int j=1;j<n;j++) for(int i=j+1;i<=n;i++) if(abs((*this)(i,j))>max_off_diagonal_element){max_off_diagonal_element=abs((*this)(i,j));i_max=i;j_max=j;}
+        for(int j=0;j<n;j++) for(int i=j+1;i<n;i++) if(abs((*this)(i,j))>max_off_diagonal_element){max_off_diagonal_element=abs((*this)(i,j));i_max=i;j_max=j;}
         if(max_off_diagonal_element<tolerance) return;
         T q=(T).5*((*this)(i_max,i_max)-(*this)(j_max,j_max))/(*this)(i_max,j_max),t,c,s;
         t=(q>0)?(T)1/(q+sqrt(q*q+(T)1)):(T)1/(q-sqrt(q*q+(T)1));

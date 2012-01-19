@@ -138,12 +138,12 @@ public:
 
     void Corners(ARRAY<TV,VECTOR<int,2> >& corners) const
     {STATIC_ASSERT(d==2);corners.Resize(0,1,0,1);
-    for(int i=0;i<=1;i++) for(int j=0;j<=1;j++)
+    for(int i=0;i<2;i++) for(int j=0;j<2;j++)
         corners(i,j)=TV(i?max_corner.x:min_corner.x,j?max_corner.y:min_corner.y);}
 
     void Corners(ARRAY<TV,VECTOR<int,3> >& corners) const
     {STATIC_ASSERT(d==3);corners.Resize(0,1,0,1,0,1);
-    for(int i=0;i<=1;i++) for(int j=0;j<=1;j++) for(int k=0;k<=1;k++)
+    for(int i=0;i<2;i++) for(int j=0;j<2;j++) for(int k=0;k<2;k++)
         corners(i,j,k)=TV(i?max_corner.x:min_corner.x,j?max_corner.y:min_corner.y,k?max_corner.z:min_corner.z);}
 
     T Size() const // assumes nonnegative entries

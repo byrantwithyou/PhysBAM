@@ -374,7 +374,7 @@ Add_Elastic_Collisions(const T dt,const T time,ARRAY<ROTATION<TV> >& rigid_rotat
             solids_parameters.deformable_object_collision_parameters.spatial_partition_number_of_cells,solids_parameters.deformable_object_collision_parameters.spatial_partition_voxel_size_scale_factor);
 
     bool need_another_iteration=true;
-    for(int i=1;i<=solids_parameters.rigid_body_collision_parameters.collision_iterations && need_another_iteration;i++){need_another_iteration=false;
+    for(int i=0;i<solids_parameters.rigid_body_collision_parameters.collision_iterations && need_another_iteration;i++){need_another_iteration=false;
         // rigid/rigid collisions
         if(!kinematic_rigid_bodies_only && solids_parameters.rigid_body_collision_parameters.perform_collisions){
             // Calls skip_collision_check.Skip_Pair and if necessary skip_collision_check.Set_Last_Checked

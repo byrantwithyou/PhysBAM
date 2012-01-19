@@ -288,7 +288,7 @@ Remove_Degeneracy()
     Sort(list);
     LOOP_ENTRY<TV> * pa = &list(list.m);
     for(int i=0;i<list.m;i++) pa=pa->next=&list(i);
-    for(int i=1;i<=list.m;i++,pa=pa->next){
+    for(int i=0;i<list.m;i++,pa=pa->next){
         if(pa->cell==pa->next->cell) continue;
         LOOP_ENTRY<TV> *x=pa;
         while(x->next!=pa && x->next->cell==x->next->next->cell) x=x->next;

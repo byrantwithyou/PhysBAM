@@ -92,7 +92,7 @@ Setup_AEROF_PhysBAM_Mapping(TETRAHEDRALIZED_VOLUME<T>& tet_volume,ARRAY<ARRAY<in
         MPI_UTILITIES::Unpack(indices,recv_buffers(i),position,*comm);
         ARRAY<TV> positions(indices.m);INDIRECT_ARRAY<ARRAY<TV>,IDENTITY_ARRAY<int> > recv_positions(positions,IDENTITY_ARRAY<int>(indices.m));
         MPI_UTILITIES::Unpack(recv_positions,recv_buffers(i),position,*comm);
-        for(int new_particle=1;new_particle<=indices.m;new_particle+=4){
+        for(int new_particle=0;new_particle<indices.m;new_particle+=4){
             for(int p=0;p<4;p++){
                 if(!global_to_local_physbam_map(indices(new_particle+p))){
                     global_to_local_physbam_map(indices(new_particle+p))=local_tet_volume->particles.array_collection->Add_Element();

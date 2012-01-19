@@ -388,7 +388,7 @@ Compute_ddE(const GENERAL_ENERGY<T>& base,const TV& f,const int simplex)
         Hu_it(i)=H(a,a)*u_it(i)+H_iitt(i)*u(b)-H(a,b)*u_it(i);
         T u2_it=sqr(m)*(fm1(a)+fm1(b));
         uTu_it(i)=2*T_itit(i)*u(a)*u(b)+T_iiittt(i)*sqr(u(a))+TT(b)(b,b)*u2_it-T_itit(i)*sqr(u(a))-TT(a)(b,b)*u2_it;}
-    for(int i=1;i<=(TV::m==3)*TV::m;i++){
+    for(int i=0;i<(TV::m==3)*TV::m;i++){
         int a=i%3+1,b=a%3+1;
         Hu_it(i)+=H_xit(i)*u(i);
         uTu_it(i)+=T_xxit(i)*sqr(u(i))+2*u(i)*T_xiitt(i)*u(b)+2*u(i)*(TT(i)(a,a)*u_it(i)-TT(i)(a,b)*u_it(i));}

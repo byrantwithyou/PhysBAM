@@ -38,7 +38,7 @@ template<class T,class TV> void Compute_Stiffness_Matrix_Helper(SEGMENT_MESH& me
     ARRAY<int> row_lengths(mesh.number_nodes);
     for(int s=0;s<mesh.elements.m;s++) row_lengths(mesh.elements(s).Min())++;
     for(int p=0;p<mesh.number_nodes;p++){const ARRAY<int>& neighbors=(*mesh.neighbor_nodes)(p);
-        for(int i=1;i<neighbors.m;i++) for(int j=i+1;j<=neighbors.m;j++) row_lengths(min(neighbors(i),neighbors(j)))++;}
+        for(int i=0;i<neighbors.m;i++) for(int j=i+1;j<neighbors.m;j++) row_lengths(min(neighbors(i),neighbors(j)))++;}
 
     // ensure no empty rows
     ARRAY<int> empty_rows;for(int p=0;p<mesh.number_nodes;p++) if(!row_lengths(p)) empty_rows.Append(p);
@@ -49,7 +49,7 @@ template<class T,class TV> void Compute_Stiffness_Matrix_Helper(SEGMENT_MESH& me
     // compute stiffness matrix
     stiffness_matrix_diagonal=CONSTANT_ARRAY<T>(mesh.number_nodes,0);
     for(int p=0;p<mesh.number_nodes;p++){const ARRAY<int>& neighbors=(*mesh.neighbor_nodes)(p);
-        for(int i=1;i<neighbors.m;i++) for(int j=i+1;j<=neighbors.m;j++){
+        for(int i=0;i<neighbors.m;i++) for(int j=i+1;j<neighbors.m;j++){
             const VECTOR<int,3> nodes(neighbors(i),p,neighbors(j));
             TV X1=X(nodes[1]),X2=X(nodes[2]),X3=X(nodes[3]);
             TV e12=X2-X1,e23=X3-X2;

@@ -1097,7 +1097,7 @@ Add_Elastic_Collisions(const T dt,const T time)
     rigid_body_particle_intersections.Remove_All();
     VECTOR<COLLISION_GEOMETRY_IMPULSE_ACCUMULATOR<TV>*,2> stored_accumulator;
     ARRAY<VECTOR<int,2> > pairs;pairs.Preallocate(10);bool need_another_iteration=true;
-    for(int i=1;i<=parameters.collision_iterations && need_another_iteration;i++){
+    for(int i=0;i<parameters.collision_iterations && need_another_iteration;i++){
         if(mpi_rigids){
             mpi_rigids->Clear_Impulse_Accumulators(rigid_body_collection);
             mpi_rigid_velocity_save.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size(),false,false);

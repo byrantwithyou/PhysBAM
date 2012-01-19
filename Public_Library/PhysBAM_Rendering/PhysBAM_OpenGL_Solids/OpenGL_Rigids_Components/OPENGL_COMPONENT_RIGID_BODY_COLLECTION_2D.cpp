@@ -161,7 +161,7 @@ Display(const int in_color) const
                     glPushName(i);
                     OPENGL_SHAPES::Draw_Dot(articulation_points(i),articulation_point_color,5);
                     glPopName();}
-                if(mode!=GL_SELECT) for(int i=1;i<=articulation_points.m;i+=2){
+                if(mode!=GL_SELECT) for(int i=0;i<articulation_points.m;i+=2){
                     OPENGL_SHAPES::Draw_Segment(articulation_points(i),articulation_points(i+1),segment_color,5);}
                 if(mode==GL_SELECT){glPopName();glPopAttrib();}
                 if(mode!=GL_SELECT && current_selection && current_selection->type==OPENGL_SELECTION::ARTICULATED_RIGID_BODIES_JOINT_2D){

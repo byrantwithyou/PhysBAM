@@ -855,10 +855,10 @@ Compute_Inverse_Mass_Matrix(SPARSE_MATRIX_FLAT_MXN<T>& inverse_mass)
         matrix_helper.New_Block();
         int k=1;
         for(int i=0;i<solid_mass->one_over_mass.Size();i++)
-            for(int j=1;j<=TV::m;j++,k++)
+            for(int j=0;j<TV::m;j++,k++)
                 matrix_helper.data.Append(TRIPLE<int,int,T>(k,k,solid_mass->one_over_mass(i)));
         for(int i=0;i<solid_mass->world_space_rigid_mass_inverse.Size();i++){
-            for(int j=1;j<=TV::m;j++,k++)
+            for(int j=0;j<TV::m;j++,k++)
                 matrix_helper.data.Append(TRIPLE<int,int,T>(k,k,solid_mass->world_space_rigid_mass_inverse(i).mass));
             for(int j=0;j<TV::SPIN::m;j++)
                 for(int n=0;n<TV::SPIN::m;n++)

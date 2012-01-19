@@ -248,7 +248,7 @@ Negative_Material(const ARRAY<VECTOR<T,3> >& X,const ARRAY<T>& phis,const VECTOR
       case 1:
         for(int i=0;i<4;i++)if(local_phi[i]>0){
             VECTOR<VECTOR<T,3>,3> interface_locations;int index=i%4+1;
-            for(int j=1;j<=3;j++,index=index%4+1)
+            for(int j=0;j<3;j++,index=(index+1)%4)
                 interface_locations[j]=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(X(indices[i]),X(indices[index]),LEVELSET_UTILITIES<T>::Theta(local_phi[i],local_phi[index]));
             if(i%2 == 1) exchange(interface_locations[1],interface_locations[3]);
             return Signed_Volume(X(indices[1]),X(indices[2]),X(indices[3]),X(indices[4]))+TETRAHEDRON<T>::Signed_Volume(X(indices[i]),interface_locations[1],interface_locations[2],interface_locations[3]);}
@@ -257,7 +257,7 @@ Negative_Material(const ARRAY<VECTOR<T,3> >& X,const ARRAY<T>& phis,const VECTOR
         for(int i=0;i<4;i++){if(local_phi[i]<=0) negative_indices[negative_count++]=i;else positive_indices[positive_count++]=i;}
         if((negative_indices[1]-negative_indices[0])%2 == 1) exchange(positive_indices[0],positive_indices[1]);  // odd wrong, even right (odd=swap)
         VECTOR<T,3> interface_locations[2][2];
-        for(int j=0;j<=1;j++)for(int k=0;k<=1;k++){
+        for(int j=0;j<2;j++)for(int k=0;k<2;k++){
             int n=negative_indices[j],p=positive_indices[k];
             interface_locations[j][k]=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(X(indices[n]),X(indices[p]),LEVELSET_UTILITIES<T>::Theta(local_phi[n],local_phi[p]));}
         // the tets are: (1-,1+2-,2+2-,1-2+) and (1-,1-1+,1+2-,1-2+), and (1-,1+2-,2-,2-2+)
@@ -268,7 +268,7 @@ Negative_Material(const ARRAY<VECTOR<T,3> >& X,const ARRAY<T>& phis,const VECTOR
       case 3:
         for(int i=0;i<4;i++)if(local_phi[i]<=0){
             VECTOR<VECTOR<T,3>,3> interface_locations;int index=i%4+1;
-            for(int j=1;j<=3;j++,index=index%4+1)
+            for(int j=0;j<3;j++,index=(index+1)%4)
                 interface_locations[j]=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(X(indices[i]),X(indices[index]),LEVELSET_UTILITIES<T>::Theta(local_phi[i],local_phi[index]));
             if(i%2 == 1) exchange(interface_locations[1],interface_locations[3]);
             return -TETRAHEDRON<T>::Signed_Volume(X(indices[i]),interface_locations[1],interface_locations[2],interface_locations[3]);}
@@ -297,10 +297,10 @@ Clip_To_Box(const RANGE<TV>& box,ARRAY<TETRAHEDRON<T> >& clipped_simplices) cons
     clipped_simplices.Remove_All();
     clipped_simplices.Append(*this);
     for(int axis=0;axis<TV::dimension;axis++){
-        for(int i=clipped_simplices.m;i>=1;i--){
+        for(int i=clipped_simplices.m-1;i>=0;i--){
             Cut_With_Hyperplane_And_Discard_Outside_Simplices(clipped_simplices(i),PLANE<T>(-TV::Axis_Vector(axis),box.min_corner),clipped_simplices);
             clipped_simplices.Remove_Index_Lazy(i);}
-        for(int i=clipped_simplices.m;i>=1;i--){
+        for(int i=clipped_simplices.m-1;i>=0;i--){
             // TODO: make this more efficient by not removing a triangle that is fully inside
             Cut_With_Hyperplane_And_Discard_Outside_Simplices(clipped_simplices(i),PLANE<T>(TV::Axis_Vector(axis),box.max_corner),clipped_simplices);
             clipped_simplices.Remove_Index_Lazy(i);}}
@@ -326,7 +326,7 @@ Cut_With_Hyperplane_And_Discard_Outside_Simplices(const TETRAHEDRON<T>& tetrahed
             for(int i=0;i<4;i++)if(phi_nodes[i]>0){
                 VECTOR<VECTOR<T,3>,3> interface_locations;int index=i%4+1;
                 VECTOR<int,3> other_indices;
-                for(int j=1;j<=3;j++,index=index%4+1){
+                for(int j=0;j<3;j++,index=(index+1)%4){
                     other_indices[j]=index;
                     interface_locations[j]=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(X_nodes[i],X_nodes[index],LEVELSET_UTILITIES<T>::Theta(phi_nodes[i],phi_nodes[index]));}
                 if(i%2 == 0){exchange(interface_locations[1],interface_locations[3]);exchange(other_indices[1],other_indices[3]);}
@@ -340,7 +340,7 @@ Cut_With_Hyperplane_And_Discard_Outside_Simplices(const TETRAHEDRON<T>& tetrahed
             for(int i=0;i<4;i++){if(phi_nodes[i]<=0) negative_indices[negative_count++]=i;else positive_indices[positive_count++]=i;}
             if((negative_indices[1]-negative_indices[0])%2 == 1) exchange(positive_indices[0],positive_indices[1]);  // odd wrong, even right (odd=swap)
             VECTOR<T,3> interface_locations[2][2];
-            for(int j=0;j<=1;j++)for(int k=0;k<=1;k++){
+            for(int j=0;j<2;j++)for(int k=0;k<2;k++){
                 int n=negative_indices[j],p=positive_indices[k];
                 interface_locations[j][k]=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(X_nodes[n],X_nodes[p],LEVELSET_UTILITIES<T>::Theta(phi_nodes[n],phi_nodes[p]));}
             // the tets are: (1-,1+2-,2+2-,1-2+) and (1-,1-1+,1+2-,1-2+), and (1-,1+2-,2-,2-2+)
@@ -353,7 +353,7 @@ Cut_With_Hyperplane_And_Discard_Outside_Simplices(const TETRAHEDRON<T>& tetrahed
             for(int i=0;i<4;i++)if(phi_nodes[i]<=0){
                 VECTOR<VECTOR<T,3>,3> interface_locations;int index=i%4+1;
                 VECTOR<int,3> other_indices;
-                for(int j=1;j<=3;j++,index=index%4+1){
+                for(int j=0;j<3;j++,index=(index+1)%4){
                     other_indices[j]=index;
                     interface_locations[j]=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(X_nodes[i],X_nodes[index],LEVELSET_UTILITIES<T>::Theta(phi_nodes[i],phi_nodes[index]));}
                 if(i%2 == 0){exchange(interface_locations[1],interface_locations[3]);exchange(other_indices[1],other_indices[3]);}
@@ -384,7 +384,7 @@ Cut_Simplex(ARRAY<VECTOR<T,3> >& X,const VECTOR<int,4>& indices,const VECTOR<VEC
         for(int i=0;i<4;i++)if(phi_nodes[i]>0){
             VECTOR<int,3> interface_locations;int index=i%4+1;
             VECTOR<int,3> other_indices;
-            for(int j=1;j<=3;j++,index=index%4+1){
+            for(int j=0;j<3;j++,index=(index+1)%4){
                 other_indices[j]=indices[index];
                 interface_locations[j]=X.Append(LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(X_nodes[i],X_nodes[index],LEVELSET_UTILITIES<T>::Theta(phi_nodes[i],phi_nodes[index])));}
             if(i%2 == 0){exchange(interface_locations[1],interface_locations[3]);exchange(other_indices[1],other_indices[3]);}
@@ -400,7 +400,7 @@ Cut_Simplex(ARRAY<VECTOR<T,3> >& X,const VECTOR<int,4>& indices,const VECTOR<VEC
         for(int i=0;i<4;i++){if(phi_nodes[i]<=0) negative_indices[negative_count++]=i;else positive_indices[positive_count++]=i;}
         if((negative_indices[1]-negative_indices[0])%2 == 1) exchange(positive_indices[0],positive_indices[1]);  // odd wrong, even right (odd=swap)
         int interface_locations[2][2];
-        for(int j=0;j<=1;j++)for(int k=0;k<=1;k++){
+        for(int j=0;j<2;j++)for(int k=0;k<2;k++){
             int n=negative_indices[j],p=positive_indices[k];
             interface_locations[j][k]=X.Append(LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(X_nodes[n],X_nodes[p],LEVELSET_UTILITIES<T>::Theta(phi_nodes[n],phi_nodes[p])));}
         // the tets are: (1-,1+2-,2+2-,1-2+) and (1-,1-1+,1+2-,1-2+), and (1-,1+2-,2-,2-2+)
@@ -417,7 +417,7 @@ Cut_Simplex(ARRAY<VECTOR<T,3> >& X,const VECTOR<int,4>& indices,const VECTOR<VEC
         for(int i=0;i<4;i++)if(phi_nodes[i]<=0){
             VECTOR<int,3> interface_locations;int index=i%4+1;
             VECTOR<int,3> other_indices;
-            for(int j=1;j<=3;j++,index=index%4+1){
+            for(int j=0;j<3;j++,index=(index+1)%4){
                 other_indices[j]=indices[index];
                 interface_locations[j]=X.Append(LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(X_nodes[i],X_nodes[index],LEVELSET_UTILITIES<T>::Theta(phi_nodes[i],phi_nodes[index])));}
             if(i%2 == 0){exchange(interface_locations[1],interface_locations[3]);exchange(other_indices[1],other_indices[3]);}

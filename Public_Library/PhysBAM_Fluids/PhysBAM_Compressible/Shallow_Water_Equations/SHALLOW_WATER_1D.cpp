@@ -20,7 +20,7 @@ Euler_Step(const T dt,const T time)
 
     // make sure things'll work in conservation law solver
     for(int i=0;i<grid.counts.x;i++) if (U(i)(1) < min_height){U(i)(1)=min_height;U(i)(2)=0;}
-    for(int i=1-ghost_cells;i<=m+ghost_cells;i++) if(U_ghost(i)(1) < min_height){U_ghost(i)(1)=min_height;U_ghost(i)(2)=0;}
+    for(int i=-ghost_cells;i<m+ghost_cells;i++) if(U_ghost(i)(1) < min_height){U_ghost(i)(1)=min_height;U_ghost(i)(2)=0;}
 
     ARRAY<bool,VECTOR<int,1> > psi(1,m);psi.Fill(true); // no cut out grids
     T_FACE_ARRAYS_BOOL psi_N(grid.Get_MAC_Grid_At_Regular_Positions());

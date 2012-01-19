@@ -126,7 +126,7 @@ public:
         FRAME<TV> inverse_frame=Frame().Inverse();
         for(int i=0;i<particles.array_collection->Size();i++) particles.X(i)=inverse_frame*particles.X(i);
 
-        RANGE<TV> box=RANGE<TV>::Empty_Box();for(int i=1; i <= particles.array_collection->Size(); i++) box.Enlarge_To_Include_Point(particles.X(i));
+        RANGE<TV> box=RANGE<TV>::Empty_Box();for(int i=0;i<particles.array_collection->Size();i++) box.Enlarge_To_Include_Point(particles.X(i));
         T uniform_levelset_cell_size=box.Edge_Lengths().Max_Abs()/30; // 30 chosen based on average, don't think this actually used so wanted something reasonable        LOG::cout<<"Bounding box: "<<box<<std::endl;
         LOG::cout<<"cell_size: "<<uniform_levelset_cell_size<<" and edge length: "<<box.Edge_Lengths().Max_Abs()<<std::endl;
 

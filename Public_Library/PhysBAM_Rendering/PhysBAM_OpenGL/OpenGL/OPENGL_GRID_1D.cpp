@@ -44,7 +44,7 @@ Display(const int in_color) const
     glDisable(GL_LIGHTING);
     glPointSize(3.0);
     ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-    for(int i=1-ghost_cells;i<=grid.counts.x+ghost_cells;i++) OpenGL_Vertex(VECTOR<T,3>(grid.Axis_X(i,1),(T)0,(T)0),vertices);
+    for(int i=-ghost_cells;i<grid.counts.x+ghost_cells;i++) OpenGL_Vertex(VECTOR<T,3>(grid.Axis_X(i,1),(T)0,(T)0),vertices);
     OpenGL_Draw_Arrays(GL_POINTS,3,vertices);
     glPopAttrib();
 

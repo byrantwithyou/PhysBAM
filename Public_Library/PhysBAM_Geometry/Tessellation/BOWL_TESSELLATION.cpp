@@ -24,7 +24,7 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(const BOWL<T>& bow
     MATRIX<T,3,2> radial_basis;
     radial_basis.Column(1)=TV(0,0,1);
     radial_basis.Column(2)=TV(1,0,0);
-    for(int i=1,p=0;i<=n_radial;++i){
+    for(int i=0,p=0;i<n_radial;++i){
         TV radial=radial_basis*COMPLEX<T>::Unit_Polar(T(2*pi/n_radial)*i).Vector();
         for (int j=n_vertical; j>=0; j--){
             TV spherical=radial_basis*COMPLEX<T>::Unit_Polar(T(0.5*pi/n_vertical)*j).Vector();

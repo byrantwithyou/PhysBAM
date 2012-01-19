@@ -35,7 +35,7 @@ public:
     {int embedded_node=Embedded_Particle_On_Segment(node1,node2);if(!embedded_node)return false;
     VECTOR<int,4> triangles=Embedded_Subelements_In_Element(tetrahedron);
     int global_embedded_node=embedded_particles.active_indices(embedded_node);
-    for(int i=1;i<=4 && triangles[i];i++){
+    for(int i=0;i<4 && triangles[i];i++){
         if(embedded_mesh.Node_In_Triangle(global_embedded_node,triangles[i])) return true;}
     return false;}
 

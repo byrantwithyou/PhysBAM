@@ -75,7 +75,7 @@ Compute(int ghost_cells)
 
         alpha=(X-cell_X)*sign/index_map.grid.dX(face.axis);
         T ia[2]={(T)(0.5*(1-alpha)),(T)(0.5*alpha)};
-        for(int a=0;a<d;a++) if(a!=face.axis) for(int s=0;s<=1;s++) for(int j=0;j<=1;j++){
+        for(int a=0;a<d;a++) if(a!=face.axis) for(int s=0;s<2;s++) for(int j=0;j<2;j++){
             FACE_INDEX<d> current_face(a,cell);
             current_face.index(face.axis)+=sign*j;
             current_face.index(a)+=s;

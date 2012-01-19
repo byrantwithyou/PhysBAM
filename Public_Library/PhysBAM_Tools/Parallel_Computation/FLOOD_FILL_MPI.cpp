@@ -88,7 +88,7 @@ Synchronize_Colors()
     ARRAY<T_ARRAYS_INT> colors_copy(boundary_regions.m);
     // send left (front) colors
     ARRAY<MPI::Request> send_requests;
-    for(int side=1;side<=T_PARALLEL_GRID::number_of_faces_per_cell;side+=2)if(mpi_grid.side_neighbor_ranks(side)!=MPI::PROC_NULL){
+    for(int side=0;side<T_PARALLEL_GRID::number_of_faces_per_cell;side+=2)if(mpi_grid.side_neighbor_ranks(side)!=MPI::PROC_NULL){
         Resize_Helper(colors_copy(side),local_grid,boundary_regions(side));
         Translate_Local_Colors_To_Global_Colors(color_map,colors_copy(side),boundary_regions(side),global_color_offset);
         MPI_PACKAGE package=mpi_grid.Package_Cell_Data(colors_copy(side),boundary_regions(side));
@@ -97,7 +97,7 @@ Synchronize_Colors()
     // receive right (back) colors and initialize union find
     UNION_FIND<> union_find(total_global_colors);
     {ARRAY<MPI::Request> recv_requests;
-    for(int side=2;side<=T_PARALLEL_GRID::number_of_faces_per_cell;side+=2)if(mpi_grid.side_neighbor_ranks(side)!=MPI::PROC_NULL){
+    for(int side=1;side<T_PARALLEL_GRID::number_of_faces_per_cell;side+=2)if(mpi_grid.side_neighbor_ranks(side)!=MPI::PROC_NULL){
         Resize_Helper(colors_copy(side),local_grid,boundary_regions(side));
         MPI_PACKAGE package=mpi_grid.Package_Cell_Data(colors_copy(side),boundary_regions(side));
         packages.Append(package);
@@ -181,7 +181,7 @@ Synchronize_Colors_Threaded()
 
     ARRAY<T_ARRAYS_INT> colors_copy(boundary_regions.m);
     // send left (front) colors
-    for(int side=1;side<=T_PARALLEL_GRID::number_of_faces_per_cell;side+=2)if(mpi_grid.threaded_grid->side_neighbor_ranks(side)!=-1){
+    for(int side=0;side<T_PARALLEL_GRID::number_of_faces_per_cell;side+=2)if(mpi_grid.threaded_grid->side_neighbor_ranks(side)!=-1){
         Resize_Helper(colors_copy(side),local_grid,boundary_regions(side));
         Translate_Local_Colors_To_Global_Colors(color_map,colors_copy(side),boundary_regions(side),global_color_offset);
         THREAD_PACKAGE pack=mpi_grid.threaded_grid->Package_Cell_Data(colors_copy(side),boundary_regions(side));pack.recv_tid=mpi_grid.threaded_grid->side_neighbor_ranks(side);
@@ -191,7 +191,7 @@ Synchronize_Colors_Threaded()
     // receive right (back) colors and initialize union find
     UNION_FIND<> union_find(total_global_colors);
     pthread_barrier_wait(mpi_grid.threaded_grid->barr);
-    {for(int side=2;side<=T_PARALLEL_GRID::number_of_faces_per_cell;side+=2)if(mpi_grid.threaded_grid->side_neighbor_ranks(side)!=-1){
+    {for(int side=1;side<T_PARALLEL_GRID::number_of_faces_per_cell;side+=2)if(mpi_grid.threaded_grid->side_neighbor_ranks(side)!=-1){
         Resize_Helper(colors_copy(side),local_grid,boundary_regions(side));
         int index=0;for(int i=0;i<mpi_grid.threaded_grid->buffers.m;i++) if(mpi_grid.threaded_grid->buffers(i).send_tid==mpi_grid.threaded_grid->side_neighbor_ranks(side) && mpi_grid.threaded_grid->buffers(i).recv_tid==mpi_grid.threaded_grid->rank) index=i;
         PHYSBAM_ASSERT(index);int position=0;

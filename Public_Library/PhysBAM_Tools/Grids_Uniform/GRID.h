@@ -541,12 +541,12 @@ public:
     {for(int a=0;a<TV::m;a++){INDEX_FACE fi(a,index);n(a*2-1)=fi;fi.index(a)++;n(a*2)=fi;}}
 
     template<class T2> void Put_Ghost(const T2& constant,ARRAYS_ND_BASE<VECTOR<T2,3> >& array,const int ghost_cells) const
-    {for(int j=1-ghost_cells;j<=counts.y+ghost_cells;j++) for(int ij=1-ghost_cells;ij<=counts.z+ghost_cells;ij++) for(int s=0;s<ghost_cells;s++) array(1-s,j,ij)=array(counts.x+s,j,ij)=constant;
-    for(int i=0;i<counts.x;i++) for(int ij=1-ghost_cells;ij<=counts.z+ghost_cells;ij++) for(int s=0;s<ghost_cells;s++) array(i,1-s,ij)=array(i,counts.y+s,ij)=constant;
+    {for(int j=-ghost_cells;j<counts.y+ghost_cells;j++) for(int ij=-ghost_cells;ij<counts.z+ghost_cells;ij++) for(int s=0;s<ghost_cells;s++) array(1-s,j,ij)=array(counts.x+s,j,ij)=constant;
+    for(int i=0;i<counts.x;i++) for(int ij=-ghost_cells;ij<counts.z+ghost_cells;ij++) for(int s=0;s<ghost_cells;s++) array(i,1-s,ij)=array(i,counts.y+s,ij)=constant;
     for(int i=0;i<counts.x;i++) for(int j=0;j<counts.y;j++) for(int s=0;s<ghost_cells;s++) array(i,j,1-s)=array(i,j,counts.z+s)=constant;}
 
     template<class T2> void Put_Ghost(const T2& constant,ARRAYS_ND_BASE<VECTOR<T2,2> >& array,const int ghost_cells) const
-    {for(int j=1-ghost_cells;j<=counts.y+ghost_cells;j++) for(int s=0;s<ghost_cells;s++) array(1-s,j)=array(counts.x+s,j)=constant;
+    {for(int j=-ghost_cells;j<counts.y+ghost_cells;j++) for(int s=0;s<ghost_cells;s++) array(1-s,j)=array(counts.x+s,j)=constant;
     for(int i=0;i<counts.x;i++) for(int s=0;s<ghost_cells;s++) array(i,1-s)=array(i,counts.y+s)=constant;}
 
     template<class T2> void Put_Ghost(const T2& constant,ARRAYS_ND_BASE<VECTOR<T2,1> >& array,const int ghost_cells) const

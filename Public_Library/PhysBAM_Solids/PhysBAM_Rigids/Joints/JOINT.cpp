@@ -190,10 +190,10 @@ Constraint_Matrix_Helper(const ROTATION<TV>& orientation,MATRIX_MXN<T>& constrai
     MATRIX<T,d> R(orientation.Rotation_Matrix());
     int constrained_axes=constrain.Number_True();
     constrained_matrix.Resize(d,constrained_axes);
-    for(int i=1,k=1;i<=d;i++) if(constrain(i)) constrained_matrix.Set_Column(k++,R.Column(i));
+    for(int i=0,k=0;i<d;i++) if(constrain(i)) constrained_matrix.Set_Column(k++,R.Column(i));
     if(unconstrained_matrix){
         unconstrained_matrix->Resize(d,d-constrained_axes);
-        for(int i=1,k=1;i<=d;i++) if(!constrain(i)) unconstrained_matrix->Set_Column(k++,R.Column(i));}
+        for(int i=0,k=0;i<d;i++) if(!constrain(i)) unconstrained_matrix->Set_Column(k++,R.Column(i));}
 }
 //#####################################################################
 // Function Constraint_Matrix_Helper

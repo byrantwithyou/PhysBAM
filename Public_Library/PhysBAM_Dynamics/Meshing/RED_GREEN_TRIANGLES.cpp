@@ -185,7 +185,7 @@ Delete_Children(const int level,const int tri,ARRAY<int>& deleted_tri_indices,AR
     int i,j,k;meshes(level)->elements(tri).Get(i,j,k);
     int ij=segment_midpoints(element_edges(level)(tri)(1)),jk=segment_midpoints(element_edges(level)(tri)(2)),ki=segment_midpoints(element_edges(level)(tri)(3));
      // make the list of deleted triangles (namely, the children) and zero out children
-    int p;for(p=1;p<=4&&(*children(level))(tri)(p);p++){deleted_tri_indices.Append((*children(level))(tri)(p));(*children(level))(tri)(p)=0;}
+    int p;for(p=0;p<4&&(*children(level))(tri)(p);p++){deleted_tri_indices.Append((*children(level))(tri)(p));(*children(level))(tri)(p)=0;}
     // get a list of edges to delete (begin by finding all children edges, then filter the red ones out)
     ARRAY<int> children_edges;children_edges.Preallocate(5);
     for(p=0;p<deleted_tri_indices.m;p++) for(int q=0;q<3;q++) // get a list of all children edges
@@ -329,7 +329,7 @@ template<class TV> void RED_GREEN_TRIANGLES<TV>::
 Unrefined_Parents(const int node,ARRAY<int>& parents,ARRAY<T>& weights) const
 {
     parents.Remove_All();parents.Append(node);weights.Remove_All();weights.Append((T)1);
-    for(int i=1;i<=parents.m;){
+    for(int i=0;i<parents.m;){
         if(!(*segment_index_from_midpoint_index)(parents(i))){i++;continue;}
         T old_weight=weights(i);VECTOR<int,2> segment=segment_mesh.elements((*segment_index_from_midpoint_index)(parents(i)));
         parents.Remove_Index_Lazy(i);weights.Remove_Index_Lazy(i);

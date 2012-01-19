@@ -29,14 +29,14 @@ Negative_Material(const ARRAY<TV>& X,const ARRAY<T>& phis,const VECTOR<int,3>& i
             // draw positive triangle. has correct positive/negative area based on whether triangle is backwards or not
             for(int i=0;i<3;i++)if(local_phi[i]>0){
                 VECTOR<TV,2> interface_locations;int index=i%3+1;
-                for(int j=1;j<=2;j++,index=index%3+1)
+                for(int j=0;j<2;j++,index=(index+1)%3)
                     interface_locations[j]=LINEAR_INTERPOLATION<T,TV>::Linear(X(indices[i]),X(indices[index]),LEVELSET_UTILITIES<T>::Theta(local_phi[i],local_phi[index]));
                 return area-TRIANGLE_2D<T>::Signed_Area(X(indices[i]),interface_locations[1],interface_locations[2]);}
         case 2:
             // draw negative triangle
             for(int i=0;i<3;i++)if(local_phi[i]<=0){
                 VECTOR<TV,2> interface_locations;int index=i%3+1;
-                for(int j=1;j<=2;j++,index=index%3+1)
+                for(int j=0;j<2;j++,index=(index+1)%3)
                     interface_locations[j]=LINEAR_INTERPOLATION<T,TV>::Linear(X(indices[i]),X(indices[index]),LEVELSET_UTILITIES<T>::Theta(local_phi[i],local_phi[index]));
                 return TRIANGLE_2D<T>::Signed_Area(X(indices[i]),interface_locations[1],interface_locations[2]);}
         case 3: return (T)0;}
@@ -74,7 +74,7 @@ Cut_Simplex(ARRAY<TV>& X,const VECTOR<int,3>& indices,const VECTOR<TV,3>& X_node
         for(int i=0;i<3;i++)if(phi_nodes[i]>0){
             VECTOR<int,2> interface_locations;int index=i%3+1;
             VECTOR<int,2> other_locations;
-            for(int j=1;j<=2;j++,index=index%3+1){
+            for(int j=0;j<2;j++,index=(index+1)%3){
                 other_locations[j]=indices[index];
                 interface_locations[j]=X.Append(LINEAR_INTERPOLATION<T,TV>::Linear(X_nodes[i],X_nodes[index],LEVELSET_UTILITIES<T>::Theta(phi_nodes[i],phi_nodes[index])));}
             // add triangle to right tris
@@ -88,7 +88,7 @@ Cut_Simplex(ARRAY<TV>& X,const VECTOR<int,3>& indices,const VECTOR<TV,3>& X_node
         for(int i=0;i<3;i++)if(phi_nodes[i]<=0){
             VECTOR<int,2> interface_locations;int index=i%3+1;
             VECTOR<int,2> other_locations;
-            for(int j=1;j<=2;j++,index=index%3+1){
+            for(int j=0;j<2;j++,index=(index+1)%3){
                 other_locations[j]=indices[index];
                 interface_locations[j]=X.Append(LINEAR_INTERPOLATION<T,TV>::Linear(X_nodes[i],X_nodes[index],LEVELSET_UTILITIES<T>::Theta(phi_nodes[i],phi_nodes[index])));}
             // add triangle to left tris
@@ -141,7 +141,7 @@ Cut_With_Hyperplane_And_Discard_Outside_Simplices(const TRIANGLE_2D<T>& triangle
             for(int i=0;i<3;i++)if(LEVELSET_UTILITIES<T>::Sign(phi_nodes(i))==single_node_sign){
                 VECTOR<VECTOR<T,2>,2> interface_locations;int index=i%3+1;
                 VECTOR<int,2> other_locations;
-                for(int j=1;j<=2;j++,index=index%3+1){
+                for(int j=0;j<2;j++,index=(index+1)%3){
                     other_locations(j)=index;
                     interface_locations(j)=LINEAR_INTERPOLATION<T,VECTOR<T,2> >::Linear(X_nodes(i),X_nodes(index),LEVELSET_UTILITIES<T>::Theta(phi_nodes(i),phi_nodes(index)));}
                 if(positive_count==1){ // add two triangles to negative triangles

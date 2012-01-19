@@ -31,7 +31,7 @@ template<class T> static void Fill_Process_Ranks(GRID<VECTOR<T,2> >& process_gri
 {
     int next_rank=0;
     VECTOR<int,2> extents=process_grid.Domain_Indices().Maximum_Corner(),half_extents=extents/2;
-    for(int i=1;i<=half_extents[axes(1)];i++)for(int j=1;j<=half_extents[axes(2)];j++)
+    for(int i=0;i<half_extents[axes(1)];i++)for(int j=0;j<half_extents[axes(2)];j++)
         for(int ii=0;ii<2;ii++)for(int jj=0;jj<2;jj++){
             VECTOR<int,2> permuted_index(2*i+ii-1,2*j+jj-1),index;
             for(int a=0;a<2;a++)index[axes(a)]=permuted_index[a];
@@ -42,7 +42,7 @@ template<class T> static void Fill_Process_Ranks(GRID<VECTOR<T,3> >& process_gri
 {
     int next_rank=0;
     VECTOR<int,3> extents=process_grid.Domain_Indices().Maximum_Corner(),half_extents=extents/2;
-    for(int i=1;i<=half_extents[axes(1)];i++)for(int j=1;j<=half_extents[axes(2)];j++)for(int ij=1;ij<=half_extents[axes(3)];ij++)
+    for(int i=0;i<half_extents[axes(1)];i++)for(int j=0;j<half_extents[axes(2)];j++)for(int ij=0;ij<half_extents[axes(3)];ij++)
         for(int ii=0;ii<2;ii++)for(int jj=0;jj<2;jj++)for(int ijij=0;ijij<2;ijij++){
             VECTOR<int,3> permuted_index(2*i+ii-1,2*j+jj-1,2*ij+ijij-1),index;
             for(int a=0;a<3;a++)index[axes(a)]=permuted_index[a];

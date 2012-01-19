@@ -76,7 +76,7 @@ CUTTING_SIMPLEX(const VECTOR<int,d>& nodes,SIMPLEX_TYPE type,T abs_tol,int paren
     for(int i=0;i<d;i++){
         bool& inside=node_in_embedded_simplex[i];
         inside=true;
-        for(int j=1;j<=d&&inside;++j) {
+        for(int j=0;j<d&&inside;++j) {
             int sign=adaptive_weights[i][j].Sign();
             if(sign==0) PHYSBAM_FATAL_ERROR("degeneracy");
             inside=(sign>0);}

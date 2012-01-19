@@ -421,7 +421,7 @@ void Discard_Valence_Zero_Particles_And_Renumber(PARTICLES<TV>& particles,T_MESH
 
     // make condensation mapping
     condensation_mapping.Resize(mesh1.number_nodes,false,false);condensation_mapping.Fill(0);
-    for(int t=1,counter=0;t<=mesh1.number_nodes;t++) if(node_is_used(t)) condensation_mapping(t)=++counter;
+    for(int t=0,counter=0;t<mesh1.number_nodes;t++) if(node_is_used(t)) condensation_mapping(t)=++counter;
 
     // make new triangle mesh
     mesh1.number_nodes=0;
@@ -516,7 +516,7 @@ Create_Initial_Mesh(const T bcc_lattice_cell_size,const bool use_adaptive_refine
             int t_junction=particle_to_t_junction(p);
             parents.Append(t_junction_parents(t_junction)(1));weights.Append((T).5);
             parents.Append(t_junction_parents(t_junction)(2));weights.Append((T).5);
-            for(int i=1;i<=parents.m;){
+            for(int i=0;i<parents.m;){
                 if(!particle_to_t_junction(parents(i))){i++;continue;}
                 T old_weight=weights(i);t_junction=particle_to_t_junction(parents(i));
                 parents.Remove_Index_Lazy(i);weights.Remove_Index_Lazy(i);

@@ -61,7 +61,7 @@ Fill_Ghost_Cells_Helper(const GRID<TV>& grid,const ARRAY<VECTOR<T,3> ,VECTOR<int
     ARRAY<VECTOR<T,3> ,VECTOR<int,1> >::Put(u,u_ghost); // interior
 
     if(Constant_Extrapolation(1)) Fill_Single_Ghost_Region(grid,u_ghost,1,regions(1));
-    else for(i=1-number_of_ghost_cells;i<=0;i++){ // left
+    else for(i=-number_of_ghost_cells;i<0;i++){ // left
             periodic_point=m+i-1;
             T rho=u_ghost(1,periodic_point);
             T u_velocity=-u_ghost(2,periodic_point)/u_ghost(1,periodic_point);
@@ -70,7 +70,7 @@ Fill_Ghost_Cells_Helper(const GRID<TV>& grid,const ARRAY<VECTOR<T,3> ,VECTOR<int
             u_ghost(2,i)=rho*u_velocity;
             u_ghost(3,i)=rho*(e+sqr(u_velocity)/2);}
     if(Constant_Extrapolation(2)) Fill_Single_Ghost_Region(grid,u_ghost,2,regions(2));
-    else for(i=m+1;i<=m+number_of_ghost_cells;i++){ // right
+    else for(i=m;i<m+number_of_ghost_cells;i++){ // right
             periodic_point=i-m+1;
             T rho=u_ghost(1,2*periodic_point);
             T u_velocity=-u_ghost(2,2*periodic_point)/u_ghost(1,2*periodic_point);

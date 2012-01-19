@@ -356,10 +356,10 @@ Triangulate_Nonconvex_Nonsimple_Polygon(const VECTORT2_ARRAY& coordinates,const 
         ARRAY<int>& loop_1=polygon(1);
         const ARRAY<int>& loop_ell=polygon(ell);
         bool spliced=false;
-        for(int i=1;i<=loop_1.m&&!spliced;++i){
+        for(int i=0;i<loop_1.m&&!spliced;++i){
             int v1=loop_1(i);
             const VECTOR<T,2>& x1=coordinates(v1);
-            for(int j=1;j<=loop_ell.m&&!spliced;++j){
+            for(int j=0;j<loop_ell.m&&!spliced;++j){
                 int v2=loop_ell(j);
                 const VECTOR<T,2>& x2=coordinates(v2);
                 // trial segment is (x1,x2)
@@ -368,7 +368,7 @@ Triangulate_Nonconvex_Nonsimple_Polygon(const VECTORT2_ARRAY& coordinates,const 
                 int m=ell;
                 do{
                     const ARRAY<int>& loop_m=polygon(m);
-                    for(int k=1;k<=loop_m.m&&!intersects;++k){
+                    for(int k=0;k<loop_m.m&&!intersects;++k){
                         int u1=loop_m(k),u2=loop_m(k%loop_m.m+1);assert(u1!=u2);
                         if(u1==v1||u1==v2||u2==v1||u2==v2) continue;
                         const VECTOR<T,2> &y1=coordinates(u1),&y2=coordinates(u2);

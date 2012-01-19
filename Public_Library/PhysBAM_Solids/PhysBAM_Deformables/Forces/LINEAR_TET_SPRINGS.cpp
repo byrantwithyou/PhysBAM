@@ -293,12 +293,12 @@ Find_Shortest_Spring(const int tet,const VECTOR<int,4> element_nodes,VECTOR<int,
 {
     ARRAY_VIEW<const TV> X(particles.X);
     int maximum_cross_squared_index=0;T maximum_cross_squared=(T)-FLT_MAX;TV maximum_cross;
-    for(unsigned char h=1;h<=4;h++){
+    for(unsigned char h=0;h<4;h++){
         VECTOR<int,4> spring_nodes=Spring_Nodes(h,element_nodes);
         TV u_cross_v=TV::Cross_Product(X(spring_nodes[3])-X(spring_nodes[2]),X(spring_nodes[4])-X(spring_nodes[2]));
         T u_cross_v_squared=u_cross_v.Magnitude_Squared();
         if(u_cross_v_squared>maximum_cross_squared){maximum_cross_squared_index=h;maximum_cross_squared=u_cross_v_squared;maximum_cross=u_cross_v;}}
-    for(unsigned char h=5;h<=7;h++){
+    for(unsigned char h=4;h<7;h++){
         VECTOR<int,4> spring_nodes=Spring_Nodes(h,element_nodes);
         TV u_cross_v=TV::Cross_Product(X(spring_nodes[2])-X(spring_nodes[1]),X(spring_nodes[4])-X(spring_nodes[3]));
         T u_cross_v_squared=u_cross_v.Magnitude_Squared();

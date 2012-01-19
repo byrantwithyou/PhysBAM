@@ -190,7 +190,7 @@ Opposite_Oriented_Element(const int element) const
     if(!segment_mesh || !element_oriented_edges) PHYSBAM_FATAL_ERROR();
     ARRAY<int> candidate_elements=(*edge_elements)((*element_oriented_edges)(element)(1)(1).x);
     for(int c=0;c<(*element_oriented_edges)(element).m;c++){
-        for(int s=(c==1)?2:1;s<=(*element_oriented_edges)(element)(c).m;s++){
+        for(int s=(c==0)?1:0;s<(*element_oriented_edges)(element)(c).m;s++){
             PAIR<int,bool>& oriented_edge=(*element_oriented_edges)(element)(c)(s);
             int node1,node2;segment_mesh->elements(oriented_edge.x).Get(node1,node2);
             if(oriented_edge.y) exchange(node1,node2);

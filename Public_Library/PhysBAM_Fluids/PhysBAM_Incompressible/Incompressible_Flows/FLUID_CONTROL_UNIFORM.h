@@ -65,7 +65,7 @@ public:
     T_ARRAYS_VECTOR cell_array(levelset.grid.Domain_Indices(ghost_cells));
     for(CELL_ITERATOR iterator(levelset.grid);iterator.Valid();iterator.Next()){
         for(int axis=0;axis<levelset.grid.dimension;axis++) cell_array(iterator.Cell_Index())[axis]=(T).5*(array(axis,iterator.First_Face_Index(axis))+array(axis,iterator.Second_Face_Index(axis)));}
-    for(int i=1;i<=smoothing_steps;i+=1){
+    for(int i=0;i<smoothing_steps;i++){
         boundary->Fill_Ghost_Cells(levelset.grid,cell_array,cell_array,0,0,ghost_cells); // TODO: use real time/dt
         SMOOTH::Smooth<T_GRID>(cell_array,1,0);}
     boundary->Fill_Ghost_Cells(levelset.grid,cell_array,cell_array,0,0,ghost_cells); // TODO: use real dt/time

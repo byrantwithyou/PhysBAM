@@ -73,13 +73,13 @@ public:
     {segments.Append(VECTOR<int,2>(1,2));}
 
     static void Make_List(ARRAY<VECTOR<T,3> >& points,const ARRAY<VECTOR<T,3> ,VECTOR<int,3> >& corners)
-    {points.Resize(8);int index=1;for(int k=0;k<=1;k++)for(int j=0;j<=1;j++)for(int i=0;i<=1;i++) points(index++)=corners(i,j,k);}
+    {points.Resize(8);int index=0;for(int k=0;k<2;k++)for(int j=0;j<2;j++)for(int i=0;i<2;i++) points(index++)=corners(i,j,k);}
 
     static void Make_List(ARRAY<VECTOR<T,2> >& points,const ARRAY<VECTOR<T,2> ,VECTOR<int,2> >& corners)
-    {points.Resize(4);int index=1;for(int j=0;j<=1;j++)for(int i=0;i<=1;i++) points(index++)=corners(i,j);}
+    {points.Resize(4);int index=0;for(int j=0;j<2;j++)for(int i=0;i<2;i++) points(index++)=corners(i,j);}
 
     static void Make_List(ARRAY<VECTOR<T,1> >& points,const ARRAY<VECTOR<T,1> ,VECTOR<int,1> >& corners)
-    {points.Resize(2);int index=1;for(int i=0;i<=1;i++) points(index++)=corners(i);}
+    {points.Resize(2);int index=0;for(int i=0;i<2;i++) points(index++)=corners(i);}
 
     static void Refine_Simplex(const IMPLICIT_OBJECT_INTERSECTOR<VECTOR<T,1> >& implicit_object_intersector,ARRAY<VECTOR<int,2> >& segments,
         ARRAY<VECTOR<T,1> >& particle_X,const VECTOR<int,2>& indices)

@@ -99,7 +99,7 @@ Calculate_Derivatives(ARRAY<T,VECTOR<int,3> >& phi_ghost,ARRAY<T,VECTOR<int,3> >
     // x-direction
     ARRAY<T,VECTOR<int,1> > phi_1d_x(1-ghost_cells,m+ghost_cells),phix_minus_1d(1,m),phix_plus_1d(1,m); 
     for(j=0;j<n;j++) for(ij=0;ij<mn;ij++){
-        for(i=1-ghost_cells;i<=m+ghost_cells;i++) phi_1d_x(i)=phi_ghost(i,j,ij);
+        for(i=-ghost_cells;i<m+ghost_cells;i++) phi_1d_x(i)=phi_ghost(i,j,ij);
         if(spatial_order == 5) HJ_WENO(m,dx,phi_1d_x,phix_minus_1d,phix_plus_1d);
         else HJ_ENO(spatial_order,m,dx,phi_1d_x,phix_minus_1d,phix_plus_1d);
         for(i=0;i<m;i++){phix_minus(i,j,ij)=phix_minus_1d(i);phix_plus(i,j,ij)=phix_plus_1d(i);}}
@@ -107,7 +107,7 @@ Calculate_Derivatives(ARRAY<T,VECTOR<int,3> >& phi_ghost,ARRAY<T,VECTOR<int,3> >
     // y-direction
     ARRAY<T,VECTOR<int,1> > phi_1d_y(1-ghost_cells,n+ghost_cells),phiy_minus_1d(1,n),phiy_plus_1d(1,n); 
     for(i=0;i<m;i++) for(ij=0;ij<mn;ij++){
-        for(j=1-ghost_cells;j<=n+ghost_cells;j++) phi_1d_y(j)=phi_ghost(i,j,ij);
+        for(j=-ghost_cells;j<n+ghost_cells;j++) phi_1d_y(j)=phi_ghost(i,j,ij);
         if(spatial_order == 5) HJ_WENO(n,dy,phi_1d_y,phiy_minus_1d,phiy_plus_1d);
         else HJ_ENO(spatial_order,n,dy,phi_1d_y,phiy_minus_1d,phiy_plus_1d);
         for(j=0;j<n;j++){phiy_minus(i,j,ij)=phiy_minus_1d(j);phiy_plus(i,j,ij)=phiy_plus_1d(j);}}
@@ -115,7 +115,7 @@ Calculate_Derivatives(ARRAY<T,VECTOR<int,3> >& phi_ghost,ARRAY<T,VECTOR<int,3> >
     // z-direction
     ARRAY<T,VECTOR<int,1> > phi_1d_z(1-ghost_cells,mn+ghost_cells),phiz_minus_1d(1,n),phiz_plus_1d(1,n); 
     for(i=0;i<m;i++) for(j=0;j<n;j++){
-        for(ij=1-ghost_cells;ij<=mn+ghost_cells;ij++) phi_1d_z(ij)=phi_ghost(i,j,ij);
+        for(ij=-ghost_cells;ij<mn+ghost_cells;ij++) phi_1d_z(ij)=phi_ghost(i,j,ij);
         if(spatial_order == 5) HJ_WENO(mn,dz,phi_1d_z,phiz_minus_1d,phiz_plus_1d);
         else HJ_ENO(spatial_order,mn,dz,phi_1d_z,phiz_minus_1d,phiz_plus_1d);
         for(ij=0;ij<mn;ij++){phiz_minus(i,j,ij)=phiz_minus_1d(ij);phiz_plus(i,j,ij)=phiz_plus_1d(ij);}}

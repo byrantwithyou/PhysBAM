@@ -20,9 +20,9 @@ Euler_Step(const T dt,const T time)
     ARRAY<bool,VECTOR<int,2> > psi(1,m,1,n);psi.Fill(true); // no cut out grids
 
     static ARRAY<bool,VECTOR<int,2> > zero_height(1-ghost_cells,m+ghost_cells,1-ghost_cells,n+ghost_cells);zero_height.Fill(false);
-    for(int i=1-ghost_cells;i<=grid.counts.x+ghost_cells;i++) for(int j=1-ghost_cells;j<=grid.counts.y+ghost_cells;j++) if(U_ghost(i,j)(1)<=min_height) zero_height(i,j)=true;
+    for(int i=-ghost_cells;i<grid.counts.x+ghost_cells;i++) for(int j=-ghost_cells;j<grid.counts.y+ghost_cells;j++) if(U_ghost(i,j)(1)<=min_height) zero_height(i,j)=true;
 
-    for(int i=1-ghost_cells;i<=grid.counts.x+ghost_cells;i++) for(int j=1-ghost_cells;j<=grid.counts.y+ghost_cells;j++) eta_ghost(i,j)=U_ghost(i,j)(1)+(*ground_ghost)(i,j);
+    for(int i=-ghost_cells;i<grid.counts.x+ghost_cells;i++) for(int j=-ghost_cells;j<grid.counts.y+ghost_cells;j++) eta_ghost(i,j)=U_ghost(i,j)(1)+(*ground_ghost)(i,j);
 
     internal_conservation.Save_Fluxes();conservation->Save_Fluxes();
     internal_conservation.Update_Conservation_Law_For_Specialized_Shallow_Water_Equations(grid,U,U_ghost,psi,dt,eigensystem_F,eigensystem_G,*conservation);
