@@ -144,71 +144,71 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\..\adler32.c"
+				RelativePath="..\adler32.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\compress.c"
+				RelativePath="..\compress.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\crc32.c"
+				RelativePath="..\crc32.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\deflate.c"
+				RelativePath="..\deflate.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\example.c"
+				RelativePath="..\example.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\gzclose.c"
+				RelativePath="..\gzclose.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\gzlib.c"
+				RelativePath="..\gzlib.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\gzread.c"
+				RelativePath="..\gzread.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\gzwrite.c"
+				RelativePath="..\gzwrite.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\infback.c"
+				RelativePath="..\infback.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\inffast.c"
+				RelativePath="..\inffast.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\inflate.c"
+				RelativePath="..\inflate.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\inftrees.c"
+				RelativePath="..\inftrees.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\minigzip.c"
+				RelativePath="..\minigzip.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\trees.c"
+				RelativePath="..\trees.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\uncompr.c"
+				RelativePath="..\uncompr.c"
 				>
 			</File>
 			<File
-				RelativePath="..\..\zutil.c"
+				RelativePath="..\zutil.c"
 				>
 			</File>
 		</Filter>
@@ -218,43 +218,43 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\..\crc32.h"
+				RelativePath="..\crc32.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\deflate.h"
+				RelativePath="..\deflate.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\gzguts.h"
+				RelativePath="..\gzguts.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\inffast.h"
+				RelativePath="..\inffast.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\inffixed.h"
+				RelativePath="..\inffixed.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\inflate.h"
+				RelativePath="..\inflate.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\inftrees.h"
+				RelativePath="..\inftrees.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\zconf.h"
+				RelativePath="..\zconf.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\zlib.h"
+				RelativePath="..\zlib.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\zutil.h"
+				RelativePath="..\zutil.h"
 				>
 			</File>
 		</Filter>

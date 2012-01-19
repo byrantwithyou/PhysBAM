@@ -59,8 +59,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="PhysBAM_Tools.lib PhysBAM_Geometry.lib PhysBAM_Solids.lib"
-				AdditionalLibraryDirectories="&quot;$(BOOST_ROOT)/lib&quot;;&quot;../../../Public_Library/PhysBAM_Tools/msvc9/PhysBAM_Tools/$(ConfigurationName)&quot;;&quot;../../../Public_Library/PhysBAM_Geometry/msvc9/PhysBAM_Geometry/$(ConfigurationName)&quot;;&quot;../../../Public_Library/PhysBAM_Solids/msvc9/PhysBAM_Solids/$(ConfigurationName)&quot;"
+				AdditionalLibraryDirectories="&quot;$(BOOST_ROOT)/lib&quot;"
 				GenerateDebugInformation="true"
 				TargetMachine="1"
 			/>
@@ -131,8 +130,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="PhysBAM_Tools.lib PhysBAM_Geometry.lib PhysBAM_Solids.lib"
-				AdditionalLibraryDirectories="&quot;$(BOOST_ROOT)/lib&quot;;&quot;../../../Public_Library/PhysBAM_Tools/msvc9/PhysBAM_Tools/$(ConfigurationName)&quot;;&quot;../../../Public_Library/PhysBAM_Geometry/msvc9/PhysBAM_Geometry/$(ConfigurationName)&quot;;&quot;../../../Public_Library/PhysBAM_Solids/msvc9/PhysBAM_Solids/$(ConfigurationName)&quot;"
+				AdditionalLibraryDirectories="&quot;$(BOOST_ROOT)/lib&quot;"
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"

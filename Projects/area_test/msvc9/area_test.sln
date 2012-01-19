@@ -2,6 +2,17 @@
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "area_test", "area_test.vcproj", "{06F67846-89D3-49DD-934F-800DEEC025F9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{34821F2A-80FD-41D8-86CD-3574113ED40F} = {34821F2A-80FD-41D8-86CD-3574113ED40F}
+		{DC29AE8E-76B7-4062-83A9-192F0AD0A984} = {DC29AE8E-76B7-4062-83A9-192F0AD0A984}
+		{61291894-448C-42BB-A54D-15B3B012BF88} = {61291894-448C-42BB-A54D-15B3B012BF88}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PhysBAM_Tools", "..\..\..\Public_Library\PhysBAM_Tools\msvc9\PhysBAM_Tools.vcproj", "{34821F2A-80FD-41D8-86CD-3574113ED40F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PhysBAM_Geometry", "..\..\..\Public_Library\PhysBAM_Geometry\msvc9\PhysBAM_Geometry.vcproj", "{61291894-448C-42BB-A54D-15B3B012BF88}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PhysBAM_Solids", "..\..\..\Public_Library\PhysBAM_Solids\msvc9\PhysBAM_Solids.vcproj", "{DC29AE8E-76B7-4062-83A9-192F0AD0A984}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,6 +24,18 @@ Global
 		{06F67846-89D3-49DD-934F-800DEEC025F9}.Debug|Win32.Build.0 = Debug|Win32
 		{06F67846-89D3-49DD-934F-800DEEC025F9}.Release|Win32.ActiveCfg = Release|Win32
 		{06F67846-89D3-49DD-934F-800DEEC025F9}.Release|Win32.Build.0 = Release|Win32
+		{34821F2A-80FD-41D8-86CD-3574113ED40F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{34821F2A-80FD-41D8-86CD-3574113ED40F}.Debug|Win32.Build.0 = Debug|Win32
+		{34821F2A-80FD-41D8-86CD-3574113ED40F}.Release|Win32.ActiveCfg = Release|Win32
+		{34821F2A-80FD-41D8-86CD-3574113ED40F}.Release|Win32.Build.0 = Release|Win32
+		{61291894-448C-42BB-A54D-15B3B012BF88}.Debug|Win32.ActiveCfg = Debug|Win32
+		{61291894-448C-42BB-A54D-15B3B012BF88}.Debug|Win32.Build.0 = Debug|Win32
+		{61291894-448C-42BB-A54D-15B3B012BF88}.Release|Win32.ActiveCfg = Release|Win32
+		{61291894-448C-42BB-A54D-15B3B012BF88}.Release|Win32.Build.0 = Release|Win32
+		{DC29AE8E-76B7-4062-83A9-192F0AD0A984}.Debug|Win32.ActiveCfg = Debug|Win32
+		{DC29AE8E-76B7-4062-83A9-192F0AD0A984}.Debug|Win32.Build.0 = Debug|Win32
+		{DC29AE8E-76B7-4062-83A9-192F0AD0A984}.Release|Win32.ActiveCfg = Release|Win32
+		{DC29AE8E-76B7-4062-83A9-192F0AD0A984}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
