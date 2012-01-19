@@ -833,10 +833,10 @@ Initialize_Rigid_Deformable_Contact_Projection(PRECOMPUTE_CONTACT_PROJECTION& pr
 
     if(!has_infinite_inertia){
         typename MATRIX_POLICY<T_SPIN>::SYMMETRIC_MATRIX inertia=precompute.rigid_body.World_Space_Inertia_Tensor();
-        precompute.A.Set_Submatrix(1,1,L+precompute.rigid_body.Mass());
-        precompute.A.Set_Submatrix(TV::dimension+1,1,rL);
-        precompute.A.Set_Submatrix(1,TV::dimension+1,rL.Transposed());
-        precompute.A.Set_Submatrix(TV::dimension+1,TV::dimension+1,rLr+inertia);
+        precompute.A.Set_Submatrix(0,0,L+precompute.rigid_body.Mass());
+        precompute.A.Set_Submatrix(TV::dimension,0,rL);
+        precompute.A.Set_Submatrix(0,TV::dimension,rL.Transposed());
+        precompute.A.Set_Submatrix(TV::dimension,TV::dimension,rLr+inertia);
         if(precompute.A_inverted) precompute.A.In_Place_Cholesky_Inverse();}
 }
 //#####################################################################
@@ -866,7 +866,7 @@ Apply_Rigid_Deformable_Contact_Projection(ARRAY_VIEW<const TV> X,ARRAY_VIEW<TV> 
         VECTOR<T,TV::dimension+T_SPIN::dimension> m_inverse_j_full;
         if(precompute.A_inverted) m_inverse_j_full=precompute.A*b;
         else m_inverse_j_full=precompute.A.In_Place_Cholesky_Solve(b);
-        m_inverse_j_full.Get_Subvector(1,m_inverse_j);m_inverse_j_full.Get_Subvector(TV::dimension+1,m_inverse_j_tau);
+        m_inverse_j_full.Get_Subvector(0,m_inverse_j);m_inverse_j_full.Get_Subvector(TV::dimension,m_inverse_j_tau);
         twist.linear+=m_inverse_j;twist.angular+=m_inverse_j_tau;}
 
     // compute particle impulses and apply to particles
@@ -984,10 +984,10 @@ Push_Out_From_Rigid_Body(RIGID_BODY<TV>& rigid_body,ARRAY<RIGID_BODY_PARTICLE_IN
 
         MATRIX<T,TV::dimension+T_SPIN::dimension> M[2];
         for(int i=0;i<=1;i++) if(equation_type!=(i?0:3)){
-            M[i].Set_Submatrix(1,1,K_inverse_sum[i]);
-                M[i].Set_Submatrix(TV::dimension+1,1,mr[i]);
-            M[i].Set_Submatrix(1,TV::dimension+1,mr[i].Transposed());
-            M[i].Set_Submatrix(TV::dimension+1,TV::dimension+1,mrr[i]);}
+            M[i].Set_Submatrix(0,0,K_inverse_sum[i]);
+                M[i].Set_Submatrix(TV::dimension,0,mr[i]);
+            M[i].Set_Submatrix(0,TV::dimension,mr[i].Transposed());
+            M[i].Set_Submatrix(TV::dimension,TV::dimension,mrr[i]);}
 
         // set up our system
         MATRIX<T,TV::dimension+T_SPIN::dimension> A;VECTOR<T,TV::dimension+T_SPIN::dimension> b;
@@ -995,35 +995,35 @@ Push_Out_From_Rigid_Body(RIGID_BODY<TV>& rigid_body,ARRAY<RIGID_BODY_PARTICLE_IN
         else if(equation_type==3){A=M[1];b=VECTOR<T,TV::dimension+T_SPIN::dimension>(ms[1],mrs[1]);}
         else if(equation_type==1){ // one outer body static
             MATRIX<T,T_SPIN::dimension,TV::dimension+T_SPIN::dimension> Z;MATRIX<T,TV::dimension,TV::dimension+T_SPIN::dimension> Y;
-            Z.Set_Submatrix(1,1,-MATRIX_POLICY<TV>::CROSS_PRODUCT_MATRIX::Cross_Product_Matrix(centroid));Z.Set_Submatrix(1,TV::dimension+1,MATRIX<T,T_SPIN::dimension>::Identity_Matrix());
-            Y.Set_Submatrix(1,1,MATRIX<T,TV::dimension>::Identity_Matrix());Y.Set_Submatrix(1,T_SPIN::dimension+1,-MATRIX_POLICY<TV>::CROSS_PRODUCT_MATRIX::Cross_Product_Matrix(centroid));
-            A.Set_Submatrix(1,1,Z*M[0]);
-            A.Set_Submatrix(T_SPIN::dimension+1,1,Y*M[1]);
-            b.Set_Subvector(1,Z*VECTOR<T,TV::dimension+T_SPIN::dimension>(ms[0],mrs[0]));
-            b.Set_Subvector(T_SPIN::dimension+1,Y*VECTOR<T,TV::dimension+T_SPIN::dimension>(ms[1],mrs[1]));}
+            Z.Set_Submatrix(0,0,-MATRIX_POLICY<TV>::CROSS_PRODUCT_MATRIX::Cross_Product_Matrix(centroid));Z.Set_Submatrix(0,TV::dimension,MATRIX<T,T_SPIN::dimension>::Identity_Matrix());
+            Y.Set_Submatrix(0,0,MATRIX<T,TV::dimension>::Identity_Matrix());Y.Set_Submatrix(0,T_SPIN::dimension,-MATRIX_POLICY<TV>::CROSS_PRODUCT_MATRIX::Cross_Product_Matrix(centroid));
+            A.Set_Submatrix(0,0,Z*M[0]);
+            A.Set_Submatrix(T_SPIN::dimension,0,Y*M[1]);
+            b.Set_Subvector(0,Z*VECTOR<T,TV::dimension+T_SPIN::dimension>(ms[0],mrs[0]));
+            b.Set_Subvector(T_SPIN::dimension,Y*VECTOR<T,TV::dimension+T_SPIN::dimension>(ms[1],mrs[1]));}
         else{
             assert(equation_type==2 && TV::dimension==3);
             int u_index=eigenvalues.To_Vector().Arg_Max();
             MATRIX<T,TV::dimension,TV::dimension+T_SPIN::dimension> Z_helper;
-            Z_helper.Set_Submatrix(1,1,-MATRIX_POLICY<TV>::CROSS_PRODUCT_MATRIX::Cross_Product_Matrix(centroid));Z_helper.Set_Submatrix(1,TV::dimension+1,MATRIX<T,T_SPIN::dimension>::Identity_Matrix());
+            Z_helper.Set_Submatrix(0,0,-MATRIX_POLICY<TV>::CROSS_PRODUCT_MATRIX::Cross_Product_Matrix(centroid));Z_helper.Set_Submatrix(0,TV::dimension,MATRIX<T,T_SPIN::dimension>::Identity_Matrix());
             Z_helper=eigenvectors.Transpose_Times(Z_helper);
             MATRIX<T,TV::dimension,TV::dimension+T_SPIN::dimension> Y;
-            Y.Set_Submatrix(1,1,MATRIX<T,TV::dimension>::Identity_Matrix());Y.Set_Submatrix(1,T_SPIN::dimension+1,MATRIX_POLICY<TV>::CROSS_PRODUCT_MATRIX::Cross_Product_Matrix(centroid));
+            Y.Set_Submatrix(0,0,MATRIX<T,TV::dimension>::Identity_Matrix());Y.Set_Submatrix(0,T_SPIN::dimension,MATRIX_POLICY<TV>::CROSS_PRODUCT_MATRIX::Cross_Product_Matrix(centroid));
             VECTOR<T,TV::dimension+T_SPIN::dimension> b_helper[2]={VECTOR<T,TV::dimension+T_SPIN::dimension>(ms[0],mrs[0]),VECTOR<T,TV::dimension+T_SPIN::dimension>(ms[1],mrs[1])};
-            A.Set_Submatrix(TV::dimension*(TV::dimension==3)+1,1,Y*M[1]); // Don't compile index out of bounds in 2D, even though this case cannot happen in 2D.
-            b.Set_Subvector(TV::dimension+1,Y*b_helper[1]);
+            A.Set_Submatrix(TV::dimension*(TV::dimension==3),0,Y*M[1]); // Don't compile index out of bounds in 2D, even though this case cannot happen in 2D.
+            b.Set_Subvector(TV::dimension,Y*b_helper[1]);
             MATRIX<T,1,TV::dimension+T_SPIN::dimension> A_row;
             for(int i=0;i<TV::dimension;i++){
-                Z_helper.Get_Submatrix(i,1,A_row);
+                Z_helper.Get_Submatrix(i,0,A_row);
                 int matrix_index=i==u_index?0:1;
-                A.Set_Submatrix(i,1,A_row*M[matrix_index]);
+                A.Set_Submatrix(i,0,A_row*M[matrix_index]);
                 b(i)=(A_row*b_helper[matrix_index]).x;}}
 
         // compute impulse as delta twist
         VECTOR<T,TV::dimension+T_SPIN::dimension> delta_twist;
         if(equation_type==0 || equation_type==3) delta_twist=A.In_Place_Cholesky_Solve(b);
         else delta_twist=A.Solve_Linear_System(b);
-        delta_twist.Get_Subvector(1,velocity);delta_twist.Get_Subvector(TV::dimension+1,angular_velocity);}
+        delta_twist.Get_Subvector(0,velocity);delta_twist.Get_Subvector(TV::dimension,angular_velocity);}
 
     // apply push to particles
     for(int i=0;i<particle_interactions.m;i++){int p=particle_interactions(i);

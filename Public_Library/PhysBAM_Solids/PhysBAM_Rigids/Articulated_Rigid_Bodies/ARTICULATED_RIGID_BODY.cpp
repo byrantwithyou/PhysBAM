@@ -436,25 +436,25 @@ Initialize_Poststabilization_Projection()
         for(int j=0;j<=1;j++){
             MATRIX_MXN<T> r_star_p=prismatic_constraints.Cross_Product_Matrix_Times(location-rigid_bodies[j]->X());
             R_D[j].Resize(d+s,p+a);
-            R_D[j].Set_Submatrix(1,1,prismatic_constraints);
-            R_D[j].Set_Submatrix(d+1,1,r_star_p);
-            R_D[j].Set_Submatrix(d+1,p+1,angular_constraints);
+            R_D[j].Set_Submatrix(0,0,prismatic_constraints);
+            R_D[j].Set_Submatrix(d,0,r_star_p);
+            R_D[j].Set_Submatrix(d,p,angular_constraints);
             M_inverse_R_D[j].Resize(d+s,p+a);
             if(!rigid_bodies[j]->Has_Infinite_Inertia()){
-                M_inverse_R_D[j].Set_Submatrix(1,1,prismatic_constraints/rigid_bodies[j]->Mass());
+                M_inverse_R_D[j].Set_Submatrix(0,0,prismatic_constraints/rigid_bodies[j]->Mass());
                 T_WORLD_SPACE_INERTIA_TENSOR inverse_inertia=rigid_bodies[j]->World_Space_Inertia_Tensor_Inverse();
-                M_inverse_R_D[j].Set_Submatrix(d+1,1,inverse_inertia*r_star_p);
-                M_inverse_R_D[j].Set_Submatrix(d+1,p+1,inverse_inertia*angular_constraints);}}
+                M_inverse_R_D[j].Set_Submatrix(d,0,inverse_inertia*r_star_p);
+                M_inverse_R_D[j].Set_Submatrix(d,p,inverse_inertia*angular_constraints);}}
 
         lambda_to_delta_v(joint_id).Resize(2*(d+s),p+a);
-        lambda_to_delta_v(joint_id).Set_Submatrix(1,1,M_inverse_R_D[0]);
-        lambda_to_delta_v(joint_id).Set_Submatrix(d+s+1,1,-M_inverse_R_D[1]);
+        lambda_to_delta_v(joint_id).Set_Submatrix(0,0,M_inverse_R_D[0]);
+        lambda_to_delta_v(joint_id).Set_Submatrix(d+s,0,-M_inverse_R_D[1]);
 
         v_to_lambda(joint_id).Resize(p+a,2*(d+s));
         MATRIX_MXN<T> DT_g_D=R_D[0].Transpose_Times(M_inverse_R_D[0])+R_D[1].Transpose_Times(M_inverse_R_D[1]);
         MATRIX_MXN<T> inverse_DT_g_D;DT_g_D.Cholesky_Inverse(inverse_DT_g_D);
-        v_to_lambda(joint_id).Set_Submatrix(1,1,inverse_DT_g_D.Times_Transpose(R_D[0]));
-        v_to_lambda(joint_id).Set_Submatrix(1,d+s+1,-inverse_DT_g_D.Times_Transpose(R_D[1]));}
+        v_to_lambda(joint_id).Set_Submatrix(0,0,inverse_DT_g_D.Times_Transpose(R_D[0]));
+        v_to_lambda(joint_id).Set_Submatrix(0,d+s,-inverse_DT_g_D.Times_Transpose(R_D[1]));}
 }
 //#####################################################################
 // Function Generate_Process_List_Using_Contact_Graph
@@ -540,10 +540,10 @@ Effective_Inertia_Inverse(MATRIX<T,d+s>& inertia_inverse,JOINT_ID joint_id) cons
     T_WORLD_SPACE_INERTIA_TENSOR inertia_inverse_child=child_body.World_Space_Inertia_Tensor_Inverse();
     TV location=(T).5*(parent_body.World_Space_Point(joint_mesh(joint_id)->frame_pj.t)+child_body.World_Space_Point(joint_mesh(joint_id)->frame_cj.t));
     MATRIX<T,s,d> cross_term=inertia_inverse_parent*MATRIX<T,s,d>::Cross_Product_Matrix(location-parent_body.X())+inertia_inverse_child*MATRIX<T,s,d>::Cross_Product_Matrix(location-child_body.X());
-    inertia_inverse.Add_To_Submatrix(1,1,MATRIX<T,d>(parent_body.Impulse_Factor(location)+child_body.Impulse_Factor(location)));
-    inertia_inverse.Add_To_Submatrix(1,d+1,cross_term.Transposed());
-    inertia_inverse.Add_To_Submatrix(d+1,1,cross_term);
-    inertia_inverse.Add_To_Submatrix(d+1,d+1,inertia_inverse_parent+inertia_inverse_child);
+    inertia_inverse.Add_To_Submatrix(0,0,MATRIX<T,d>(parent_body.Impulse_Factor(location)+child_body.Impulse_Factor(location)));
+    inertia_inverse.Add_To_Submatrix(0,d,cross_term.Transposed());
+    inertia_inverse.Add_To_Submatrix(d,0,cross_term);
+    inertia_inverse.Add_To_Submatrix(d,d,inertia_inverse_parent+inertia_inverse_child);
 }
 //#####################################################################
 // Function Substitute_Joint_Parent_Body

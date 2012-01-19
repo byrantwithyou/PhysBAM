@@ -84,14 +84,14 @@ Compute_Position_Based_State(const T dt,const T time)
         // full constraint matrix (linear and angular)
         joint_constrained_dimensions(i)=3+joint_angular_constraint_matrix(i).Columns(); // includes PD dimensions
         joint_constraint_matrix(i)=MATRIX_MXN<T>(6,joint_constrained_dimensions(i));
-        joint_constraint_matrix(i).Set_Submatrix(1,1,MATRIX<T,3>::Identity_Matrix());
-        joint_constraint_matrix(i).Set_Submatrix(4,4,joint_angular_constraint_matrix(i));
+        joint_constraint_matrix(i).Set_Submatrix(0,0,MATRIX<T,3>::Identity_Matrix());
+        joint_constraint_matrix(i).Set_Submatrix(3,3,joint_angular_constraint_matrix(i));
 
         // full muscle control matrix
         if(use_muscle_actuators){
             joint_muscle_control_dimensions(i)=(joint.joint_function && joint.joint_function->active && joint.joint_function->muscle_control)?3-joint_angular_constraint_matrix(i).Columns():0; // muscle control dimensions
             joint_muscle_control_matrix(i)=MATRIX_MXN<T>(6,joint_muscle_control_dimensions(i));
-            joint_muscle_control_matrix(i).Set_Submatrix(4,1,joint_angular_muscle_control_matrix(i));}}
+            joint_muscle_control_matrix(i).Set_Submatrix(3,0,joint_angular_muscle_control_matrix(i));}}
 
     joint_offset_in_post_stabilization_matrix.Resize(joint_mesh.joints.m);
     for(int i=0;i<joint_mesh.joints.m;i++) joint_offset_in_post_stabilization_matrix(i)=(i==1)?1:joint_offset_in_post_stabilization_matrix(i-1)+joint_constrained_dimensions(i-1);
@@ -126,7 +126,7 @@ Compute_Position_Based_State(const T dt,const T time)
             MATRIX<T,3> c21=I_inverse.Times_Cross_Product_Matrix(r2),c12=I_inverse.Cross_Product_Matrix_Times(-r1);
             MATRIX<T,3> c11=c21.Cross_Product_Matrix_Times(-r1)+1/rigid_body.Mass();
             SYMMETRIC_MATRIX<T,3> c22=I_inverse;
-            MATRIX_MXN<T> C(6,6);C.Add_To_Submatrix(1,1,c11);C.Add_To_Submatrix(1,4,c12);C.Add_To_Submatrix(4,1,c21);C.Add_To_Submatrix(4,4,c22);
+            MATRIX_MXN<T> C(6,6);C.Add_To_Submatrix(0,0,c11);C.Add_To_Submatrix(0,3,c12);C.Add_To_Submatrix(3,0,c21);C.Add_To_Submatrix(3,3,c22);
             // important: sign of block is negative if the joints at which impulse is applied and measured are opposite types (parent/child)
             if(joints_on_rigid_body(id)(i).y!=joints_on_rigid_body(id)(j).y) C*=-1;
 
@@ -167,7 +167,7 @@ Compute_Position_Based_State(const T dt,const T time)
                         TV direction=(muscle_attachments.z->Embedded_Position()-muscle_attachments.y->Embedded_Position()).Normalized();
                         TV c21_along_direction=I_inverse*TV::Cross_Product(r_attach,direction);
                         TV c11_along_direction=TV::Cross_Product(c21_along_direction,r_joint)+direction/body.Mass();
-                        VECTOR_ND<T> C_along_direction(6);C_along_direction.Set_Subvector(1,c11_along_direction);C_along_direction.Set_Subvector(4,c21_along_direction);
+                        VECTOR_ND<T> C_along_direction(6);C_along_direction.Set_Subvector(0,c11_along_direction);C_along_direction.Set_Subvector(3,c21_along_direction);
                         if(t==1) C_along_direction=-C_along_direction; // child gets negative sign because the relative velocity measures parent vel - child vel
                         global_post_stabilization_matrix_12.Add_To_Submatrix(joint_offset_in_post_stabilization_matrix(i),muscle_index,
                             joint_constraint_matrix(i).Transpose_Times(C_along_direction));
@@ -218,15 +218,15 @@ Solve_For_Muscle_Control(MATRIX_MXN<T>& A,const VECTOR_ND<T>& b,VECTOR_ND<T>& x,
             LOG::cout<<"equations_to_keep = "<<equations_to_keep<<std::endl;}
 
         MATRIX_MXN<T> B(equations_to_keep);MATRIX_MXN<T> S(B.n,0),N(equations_to_keep,A.n-equations_to_keep),epsilon_hat(A.m-equations_to_keep,A.n);
-        A_after_QR.Get_Submatrix(1,1,B);A_after_QR.Get_Submatrix(1,equations_to_keep+1,N);A_after_QR.Get_Submatrix(equations_to_keep+1,1,epsilon_hat);
+        A_after_QR.Get_Submatrix(0,0,B);A_after_QR.Get_Submatrix(0,equations_to_keep,N);A_after_QR.Get_Submatrix(equations_to_keep,0,epsilon_hat);
         MATRIX_MXN<T> epsilon_hat_unpermuted=epsilon_hat.Unpermute_Columns(permute); // store as unpermuted quantities
 
         MATRIX_MXN<T> D(number_of_muscles); // this is actually the square root of the weight
         T sqrt_min_activation_penalty=sqrt(min_activation_penalty);for(int i=0;i<number_of_muscles;i++) D(i,i)=sqrt_min_activation_penalty;
 
-        VECTOR_ND<int> permute_B(B.n),permute_S,permute_N(N.n);permute.Get_Subvector(1,permute_B);permute.Get_Subvector(B.n+1,permute_N);
+        VECTOR_ND<int> permute_B(B.n),permute_S,permute_N(N.n);permute.Get_Subvector(0,permute_B);permute.Get_Subvector(B.n,permute_N);
         VECTOR_ND<T> b(B.m),f_hat(epsilon_hat.m),x_B(B.n),x_S,x_N(N.n);
-        b_after_QR.Get_Subvector(1,b);b_after_QR.Get_Subvector(equations_to_keep+1,f_hat);
+        b_after_QR.Get_Subvector(0,b);b_after_QR.Get_Subvector(equations_to_keep,f_hat);
 
         // Solve for x_B given previous guess for remainder of vector.  If x_B is within bounds then we have a good initial guess which we can pass to QP.
         bool last_values_are_feasible=false;
@@ -252,8 +252,8 @@ Solve_For_Muscle_Control(MATRIX_MXN<T>& A,const VECTOR_ND<T>& b,VECTOR_ND<T>& x,
 
         if(!last_values_are_feasible) LINEAR_PROGRAMMING<T>::Find_Feasible_Solution(B,N,x_B,b,x_N,permute_B,permute_N,x,x_min,x_max,tolerance,step_tolerance,verbose);
         else{
-            x.Set_Subvector(1,x_B);x.Set_Subvector(B.n+1,x_S);x.Set_Subvector(B.n+S.n+1,x_N);
-            permute.Set_Subvector(1,permute_B);permute.Set_Subvector(B.n+1,permute_S);permute.Set_Subvector(B.n+S.n+1,permute_N);
+            x.Set_Subvector(0,x_B);x.Set_Subvector(B.n,x_S);x.Set_Subvector(B.n+S.n,x_N);
+            permute.Set_Subvector(0,permute_B);permute.Set_Subvector(B.n,permute_S);permute.Set_Subvector(B.n+S.n,permute_N);
             x=x.Unpermute(permute);}
 
         VECTOR_ND<T> x_lp=x;
@@ -309,9 +309,9 @@ Solve_For_Muscle_Control(MATRIX_MXN<T>& A,const VECTOR_ND<T>& b,VECTOR_ND<T>& x,
 
             int equations_to_keep=transformed_A.Number_Of_Nonzero_Rows((T)1e-6);
             MATRIX_MXN<T> R(equations_to_keep,equations_to_keep);MATRIX_MXN<T> U(equations_to_keep,A.n-equations_to_keep),G(A.m-equations_to_keep,A.n-equations_to_keep);
-            transformed_A.Get_Submatrix(1,1,R);transformed_A.Get_Submatrix(1,equations_to_keep+1,U);transformed_A.Get_Submatrix(equations_to_keep+1,equations_to_keep+1,G);
+            transformed_A.Get_Submatrix(0,0,R);transformed_A.Get_Submatrix(0,equations_to_keep,U);transformed_A.Get_Submatrix(equations_to_keep,equations_to_keep,G);
             VECTOR_ND<T> b1(R.n),b2(G.m),x1(R.n),x2(U.n);
-            transformed_b.Get_Subvector(1,b1);transformed_b.Get_Subvector(b1.n+1,b2);
+            transformed_b.Get_Subvector(0,b1);transformed_b.Get_Subvector(b1.n,b2);
 
             // Z is
             // ( -R^-1 * U )
@@ -326,8 +326,8 @@ Solve_For_Muscle_Control(MATRIX_MXN<T>& A,const VECTOR_ND<T>& b,VECTOR_ND<T>& x,
                 column=R.Upper_Triangular_Solve(u);
                 for(int i=0;i<U.m;i++) negative_R_inverse_U(i,j)=-column(i);}
             VECTOR_ND<T> negative_R_inverse_b1(-R.Upper_Triangular_Solve(b1));
-            MATRIX_MXN<T> Z(A.n,U.n);Z.Add_To_Submatrix(1,1,negative_R_inverse_U);Z.Add_To_Submatrix(equations_to_keep+1,1,MATRIX_MXN<T>::Identity_Matrix(U.n));
-            VECTOR_ND<T> Z_rhs(A.n);Z_rhs.Set_Subvector(1,negative_R_inverse_b1);
+            MATRIX_MXN<T> Z(A.n,U.n);Z.Add_To_Submatrix(0,0,negative_R_inverse_U);Z.Add_To_Submatrix(equations_to_keep,0,MATRIX_MXN<T>::Identity_Matrix(U.n));
+            VECTOR_ND<T> Z_rhs(A.n);Z_rhs.Set_Subvector(0,negative_R_inverse_b1);
 
             MATRIX_MXN<T> sqrt_D(number_of_muscles,number_of_muscles);
             MATRIX_MXN<T> ls_A(G.m+A.n,G.n);VECTOR_ND<T> ls_b(G.m+A.n);
@@ -345,12 +345,12 @@ Solve_For_Muscle_Control(MATRIX_MXN<T>& A,const VECTOR_ND<T>& b,VECTOR_ND<T>& x,
                 // least squares matrix is
                 // ( G         )
                 // ( D^1/2 * Z )
-                ls_A.Set_Zero_Matrix();ls_A.Add_To_Submatrix(1,1,G);ls_A.Add_To_Submatrix(G.m+1,1,sqrt_D*Z);
-                ls_b.Set_Subvector(1,b2);ls_b.Set_Subvector(G.m+1,sqrt_D*Z_rhs);
+                ls_A.Set_Zero_Matrix();ls_A.Add_To_Submatrix(0,0,G);ls_A.Add_To_Submatrix(G.m,0,sqrt_D*Z);
+                ls_b.Set_Subvector(0,b2);ls_b.Set_Subvector(G.m,sqrt_D*Z_rhs);
 
                 x2=ls_A.Normal_Equations_Solve(ls_b);
                 x1=negative_R_inverse_U*x2-negative_R_inverse_b1;
-                x.Set_Subvector(1,x1);x.Set_Subvector(x1.n+1,x2);}
+                x.Set_Subvector(0,x1);x.Set_Subvector(x1.n,x2);}
 
             x=x.Unpermute(permute);
 
@@ -390,15 +390,15 @@ Solve_Minimum_Norm_Solution_For_Linear_Constraints(MATRIX_MXN<T>& A,const VECTOR
         LOG::cout<<A_after_QR<<std::endl<<b_after_QR<<std::endl<<permute<<std::endl;}
     LOG::cout<<"Global poststabilization: got "<<equations_to_keep<<" dof"<<std::endl;
 
-    MATRIX_MXN<T> B(equations_to_keep);A_after_QR.Get_Submatrix(1,1,B);
+    MATRIX_MXN<T> B(equations_to_keep);A_after_QR.Get_Submatrix(0,0,B);
 
     if(equations_to_keep==A.n) x=B.Upper_Triangular_Solve(b_after_QR).Unpermute(permute); // unique solution
     else{
         // extract submatrices and subvectors
         int epsilon_size=A.n-equations_to_keep;
-        MATRIX_MXN<T> epsilon(epsilon_size);A_after_QR.Get_Submatrix(equations_to_keep+1,equations_to_keep+1,epsilon);
-        MATRIX_MXN<T> S(equations_to_keep,epsilon_size);A_after_QR.Get_Submatrix(1,equations_to_keep+1,S);
-        VECTOR_ND<T> b_B(equations_to_keep),b_epsilon(epsilon_size);b_after_QR.Get_Subvector(1,b_B);b_after_QR.Get_Subvector(equations_to_keep+1,b_epsilon);
+        MATRIX_MXN<T> epsilon(epsilon_size);A_after_QR.Get_Submatrix(equations_to_keep,equations_to_keep,epsilon);
+        MATRIX_MXN<T> S(equations_to_keep,epsilon_size);A_after_QR.Get_Submatrix(0,equations_to_keep,S);
+        VECTOR_ND<T> b_B(equations_to_keep),b_epsilon(epsilon_size);b_after_QR.Get_Subvector(0,b_B);b_after_QR.Get_Subvector(equations_to_keep,b_epsilon);
         // construct the matrix
         MATRIX_MXN<T> B_inverse_S=B.Upper_Triangular_Solve(S);
         MATRIX_MXN<T> C(epsilon_size);MATRIX_MXN<T>::Add_Transpose_Times(B_inverse_S,B_inverse_S,C);MATRIX_MXN<T>::Add_Transpose_Times(epsilon,epsilon,C);C.Add_Identity_Matrix();
@@ -408,7 +408,7 @@ Solve_Minimum_Norm_Solution_For_Linear_Constraints(MATRIX_MXN<T>& A,const VECTOR
         // compute solution vector 
         VECTOR_ND<T> x_S=C.Cholesky_Solve(rhs);
         MATRIX_MXN<T>::Subtract_Times(S,x_S,b_B);x_B=B.Upper_Triangular_Solve(b_B);
-        x.Resize(A.n);x.Set_Subvector(1,x_B);x.Set_Subvector(B.n+1,x_S);x=x.Unpermute(permute);}
+        x.Resize(A.n);x.Set_Subvector(0,x_B);x.Set_Subvector(B.n,x_S);x=x.Unpermute(permute);}
 
     if(verbose) LOG::cout<<"Result of linearly constrained optimization:\n"<<x<<std::endl;
 }

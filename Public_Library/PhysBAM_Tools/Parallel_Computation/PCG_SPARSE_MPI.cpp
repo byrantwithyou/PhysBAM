@@ -176,9 +176,9 @@ Parallel_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x_local,VECTOR_ND<T>& 
 
     VECTOR_ND<T> temp(global_n,false),z(global_n,false),p_interior,x_interior;
     VECTOR_ND<T> x_global(global_n),p_global(global_n,false);
-    for(int i=0;i<global_n;i++) x_global(i+proc_column_index_boundaries(my_rank+1).x-1)=x_local(i);
-    p_interior.Set_Subvector_View(p_global,INTERVAL<int>(proc_column_index_boundaries(my_rank+1).x,proc_column_index_boundaries(my_rank+1).y));
-    x_interior.Set_Subvector_View(x_global,INTERVAL<int>(proc_column_index_boundaries(my_rank+1).x,proc_column_index_boundaries(my_rank+1).y));
+    for(int i=0;i<global_n;i++) x_global(i+proc_column_index_boundaries(my_rank).x-1)=x_local(i);
+    p_interior.Set_Subvector_View(p_global,INTERVAL<int>(proc_column_index_boundaries(my_rank).x,proc_column_index_boundaries(my_rank).y));
+    x_interior.Set_Subvector_View(x_global,INTERVAL<int>(proc_column_index_boundaries(my_rank).x,proc_column_index_boundaries(my_rank).y));
 
     // adjust x for the null space
     if(pcg.enforce_compatibility && pcg.remove_null_space_solution_component) x_global-=(T)(Global_Sum(x_interior.Sum_Double_Precision())/global_n);
@@ -195,7 +195,7 @@ Parallel_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x_local,VECTOR_ND<T>& 
 
     // find an incomplete cholesky preconditioner - actually an LU that saves square roots, and an inverted diagonal to save on divides
     if(pcg.incomplete_cholesky && (recompute_preconditioner || !A.C)){
-        if(A.C)delete A.C;A.C=A.Create_Submatrix(INTERVAL<int>(proc_column_index_boundaries(my_rank+1).x,proc_column_index_boundaries(my_rank+1).y));
+        if(A.C)delete A.C;A.C=A.Create_Submatrix(INTERVAL<int>(proc_column_index_boundaries(my_rank).x,proc_column_index_boundaries(my_rank).y));
         A.C->In_Place_Incomplete_Cholesky_Factorization(pcg.modified_incomplete_cholesky,pcg.modified_incomplete_cholesky_coefficient,
             pcg.preconditioner_zero_tolerance,pcg.preconditioner_zero_replacement);}
 
@@ -234,7 +234,7 @@ Parallel_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x_local,VECTOR_ND<T>& 
     }
 
     // Copy stuff back into x_local
-    for(int i=0;i<global_n;i++) x_local(i)=x_global(i+proc_column_index_boundaries(my_rank+1).x-1);
+    for(int i=0;i<global_n;i++) x_local(i)=x_global(i+proc_column_index_boundaries(my_rank).x-1);
 }
 //#####################################################################
 // Function Initialize_Datatypes
@@ -272,7 +272,7 @@ Find_Ghost_Regions(SPARSE_MATRIX_FLAT_NXN<T>& A,const ARRAY<VECTOR<int,2> >& pro
             column_needed(A.A(row_index).j)=true;}}
     int my_rank=comm.Get_rank();ARRAY<int> temp_indices;temp_indices.Preallocate(proc_column_index_boundaries(1).y-proc_column_index_boundaries(1).x);
     for(int node_rank=0;node_rank<proc_column_index_boundaries.m;node_rank++){
-        if(node_rank-1!=my_rank){
+        if(node_rank!=my_rank){
             temp_indices.Remove_All();
             for(int column_index=proc_column_index_boundaries(node_rank).x;column_index<=proc_column_index_boundaries(node_rank).y;column_index++)
                 if(column_needed(column_index)) temp_indices.Append(column_index);
@@ -283,7 +283,7 @@ Find_Ghost_Regions(SPARSE_MATRIX_FLAT_NXN<T>& A,const ARRAY<VECTOR<int,2> >& pro
     ARRAY<ARRAY<char> > send_buffers(columns_to_send.m);ARRAY<MPI::Request> requests;
     int tag=1; // TODO change this to an actual tag value
     for(int node_rank=0;node_rank<columns_to_receive.m;node_rank++){
-        if(node_rank-1!=my_rank){
+        if(node_rank!=my_rank){
             int buffer_size=1+MPI_UTILITIES::Pack_Size(columns_to_receive(node_rank),comm);
             send_buffers(node_rank).Resize(buffer_size);int position=0;
             MPI_UTILITIES::Pack(columns_to_receive(node_rank),send_buffers(node_rank),position,comm);
@@ -315,7 +315,7 @@ Find_Ghost_Regions_Threaded(SPARSE_MATRIX_FLAT_NXN<T>& A,const ARRAY<VECTOR<int,
             column_needed(A.A(row_index).j)=true;}}
     int my_rank=thread_grid->rank;ARRAY<int> temp_indices;temp_indices.Preallocate(proc_column_index_boundaries(1).y-proc_column_index_boundaries(1).x);
     for(int node_rank=0;node_rank<proc_column_index_boundaries.m;node_rank++){
-        if(node_rank-1!=my_rank){
+        if(node_rank!=my_rank){
             temp_indices.Remove_All();
             for(int column_index=proc_column_index_boundaries(node_rank).x;column_index<=proc_column_index_boundaries(node_rank).y;column_index++)
                 if(column_needed(column_index)) temp_indices.Append(column_index);
@@ -323,7 +323,7 @@ Find_Ghost_Regions_Threaded(SPARSE_MATRIX_FLAT_NXN<T>& A,const ARRAY<VECTOR<int,
             columns_to_receive(node_rank)=temp_indices;}}
 
     for(int node_rank=0;node_rank<columns_to_receive.m;node_rank++){
-        if(node_rank-1!=my_rank){
+        if(node_rank!=my_rank){
             int buffer_size=sizeof(int)+sizeof(T)*columns_to_receive(node_rank).m;
             THREAD_PACKAGE pack(buffer_size);int position=0;pack.send_tid=my_rank;pack.recv_tid=node_rank-1;
             *(int*)(&pack.buffer(position+1))=columns_to_receive(node_rank).m;position+=sizeof(int);
@@ -351,7 +351,7 @@ Fill_Ghost_Cells_Far(VECTOR_ND<T>& x)
     int my_rank=comm.Get_rank();int tag=1;
     // Send out the column values that we owe other people
     for(int node_rank=0;node_rank<columns_to_send.m;node_rank++){
-        if(node_rank-1!=my_rank){
+        if(node_rank!=my_rank){
             // First build the array of column values wanted
             ARRAY<T> send_array(columns_to_send(node_rank).m);
             for(int i=0;i<columns_to_send(node_rank).m;i++)
@@ -361,7 +361,7 @@ Fill_Ghost_Cells_Far(VECTOR_ND<T>& x)
     // Receive the column values that others owe us
     ARRAY<ARRAY<T> > columns_to_receive_values(columns_to_receive.m);
     for(int node_rank=0;node_rank<columns_to_receive.m;node_rank++){
-        if(node_rank-1!=my_rank){
+        if(node_rank!=my_rank){
             // First build the array of column values we will receive
             columns_to_receive_values(node_rank).Resize(columns_to_receive(node_rank).m);
             MPI_PACKAGE package(columns_to_receive_values(node_rank));
@@ -370,7 +370,7 @@ Fill_Ghost_Cells_Far(VECTOR_ND<T>& x)
 
     // For the ones we received, stick them into x
     for(int node_rank=0;node_rank<columns_to_receive.m;node_rank++){
-        if(node_rank-1!=my_rank)
+        if(node_rank!=my_rank)
             for(int i=0;i<columns_to_receive(node_rank).m;i++)
                 x(columns_to_receive(node_rank)(i))=columns_to_receive_values(node_rank)(i);}
 }
@@ -383,7 +383,7 @@ Fill_Ghost_Cells_Threaded(VECTOR_ND<T>& x)
     int my_rank=thread_grid->rank;
     // Send out the column values that we owe other people
     for(int node_rank=0;node_rank<columns_to_send.m;node_rank++){
-        if(node_rank-1!=my_rank){
+        if(node_rank!=my_rank){
             // First build the array of column values wanted
             THREAD_PACKAGE pack(columns_to_send(node_rank).m*sizeof(T));pack.send_tid=my_rank;pack.recv_tid=node_rank-1;int position=0;
             for(int i=0;i<columns_to_send(node_rank).m;i++){*(T*)(pack.buffer(position+1))=x(columns_to_send(node_rank)(i));position+=sizeof(T);}
@@ -403,7 +403,7 @@ Fill_Ghost_Cells_Threaded(VECTOR_ND<T>& x)
 
     // For the ones we received, stick them into x
     for(int node_rank=0;node_rank<columns_to_receive.m;node_rank++){
-        if(node_rank-1!=my_rank)
+        if(node_rank!=my_rank)
             for(int i=0;i<columns_to_receive(node_rank).m;i++)
                 x(columns_to_receive(node_rank)(i))=columns_to_receive_values(node_rank)(i);}
 }

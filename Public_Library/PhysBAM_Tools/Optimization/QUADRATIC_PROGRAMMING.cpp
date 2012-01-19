@@ -89,10 +89,10 @@ Find_Optimal_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& S,MATRIX_MXN<T>& N,VECTOR_
         if(x_S.n){
             MATRIX_MXN<T> negative_B_inverse_S=-B.Upper_Triangular_Solve(S);
             MATRIX_MXN<T> Z(B.n+S.n+N.n,S.n),D_hat_times_Z(x.n+f_hat.n,S.n);
-            Z.Add_To_Submatrix(1,1,negative_B_inverse_S);for(int i=0;i<S.n;i++)Z(B.n+i,i)=1;
-            D_hat_times_Z.Add_To_Submatrix(1,1,D*Z);D_hat_times_Z.Add_To_Submatrix(x.n+1,1,epsilon_hat*Z);
+            Z.Add_To_Submatrix(0,0,negative_B_inverse_S);for(int i=0;i<S.n;i++) Z(B.n+i,i)=1;
+            D_hat_times_Z.Add_To_Submatrix(0,0,D*Z);D_hat_times_Z.Add_To_Submatrix(x.n,0,epsilon_hat*Z);
 
-            VECTOR_ND<T> rhs(x.n+f_hat.n);rhs.Set_Subvector(1,D*(-x));rhs.Set_Subvector(x.n+1,f_hat-epsilon_hat*x);
+            VECTOR_ND<T> rhs(x.n+f_hat.n);rhs.Set_Subvector(0,D*(-x));rhs.Set_Subvector(x.n,f_hat-epsilon_hat*x);
             VECTOR_ND<T> p_S=D_hat_times_Z.Normal_Equations_Solve(rhs);
             VECTOR_ND<T> p_B=negative_B_inverse_S*p_S;
            

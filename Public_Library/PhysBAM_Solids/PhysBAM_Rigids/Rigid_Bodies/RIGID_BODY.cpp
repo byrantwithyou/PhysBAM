@@ -77,7 +77,7 @@ Print_Pairs(const RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const ARRAY<V
 {
     LOG::cout<<"{";
     for(int i=0;i<pairs.m;i++){
-        LOG::cout<<"(\""<<rigid_body_collection.Rigid_Body(pairs(i)(1)).name<<"\", \""<<rigid_body_collection.Rigid_Body(pairs(i)(2)).name<<"\")";if(i<pairs.m) LOG::cout<<", ";}
+        LOG::cout<<"(\""<<rigid_body_collection.Rigid_Body(pairs(i)(0)).name<<"\", \""<<rigid_body_collection.Rigid_Body(pairs(i)(1)).name<<"\")";if(i<pairs.m) LOG::cout<<", ";}
     LOG::cout<<"}";
 }
 //#####################################################################
@@ -306,19 +306,19 @@ Find_Impulse_And_Angular_Impulse_Helper(const RIGID_BODY<TV>& body1,const RIGID_
     MATRIX_MXN<T> r_cross_P_1=prismatic_constraint_matrix.Cross_Product_Matrix_Times(r1),r_cross_P_2=prismatic_constraint_matrix.Cross_Product_Matrix_Times(r2);
     MATRIX_MXN<T> P_T_r_cross_T_I_inverse_1=r_cross_P_1.Transpose_Times(I_inverse_1),P_T_r_cross_T_I_inverse_2=r_cross_P_2.Transpose_Times(I_inverse_2);
     MATRIX_MXN<T> C(prismatic_constrained_axes+angular_constrained_axes);
-    C.Set_Submatrix(1,1,P_T_r_cross_T_I_inverse_1*r_cross_P_1+P_T_r_cross_T_I_inverse_2*r_cross_P_2+m1_inv_plus_m2_inv*prismatic_constraint_matrix.Transpose_Times(prismatic_constraint_matrix));
+    C.Set_Submatrix(0,0,P_T_r_cross_T_I_inverse_1*r_cross_P_1+P_T_r_cross_T_I_inverse_2*r_cross_P_2+m1_inv_plus_m2_inv*prismatic_constraint_matrix.Transpose_Times(prismatic_constraint_matrix));
     if(angular_constrained_axes){
-        C.Set_Submatrix(prismatic_constrained_axes+1,prismatic_constrained_axes+1,angular_constraint_matrix.Transpose_Times((I_inverse_1+I_inverse_2)*angular_constraint_matrix));
+        C.Set_Submatrix(prismatic_constrained_axes,prismatic_constrained_axes,angular_constraint_matrix.Transpose_Times((I_inverse_1+I_inverse_2)*angular_constraint_matrix));
         MATRIX_MXN<T> c12=(P_T_r_cross_T_I_inverse_1+P_T_r_cross_T_I_inverse_2)*angular_constraint_matrix;
-        C.Set_Submatrix(1,prismatic_constrained_axes+1,c12);C.Set_Submatrix(prismatic_constrained_axes+1,1,c12.Transposed());}
+        C.Set_Submatrix(0,prismatic_constrained_axes,c12);C.Set_Submatrix(prismatic_constrained_axes,0,c12.Transposed());}
 
     VECTOR_ND<T> b(prismatic_constrained_axes+angular_constrained_axes);
-    b.Set_Subvector(1,prismatic_constraint_matrix.Transpose_Times(delta_relative_twist_at_location.linear));
-    if(angular_constrained_axes) b.Set_Subvector(prismatic_constrained_axes+1,angular_constraint_matrix.Transpose_Times(delta_relative_twist_at_location.angular));
+    b.Set_Subvector(0,prismatic_constraint_matrix.Transpose_Times(delta_relative_twist_at_location.linear));
+    if(angular_constrained_axes) b.Set_Subvector(prismatic_constrained_axes,angular_constraint_matrix.Transpose_Times(delta_relative_twist_at_location.angular));
 
     TWIST<TV> impulse;VECTOR_ND<T> x=C.Cholesky_Solve(b),linear(prismatic_constrained_axes),angular(angular_constrained_axes);
-    x.Get_Subvector(1,linear);impulse.linear=prismatic_constraint_matrix*linear;
-    if(angular_constrained_axes){x.Get_Subvector(prismatic_constrained_axes+1,angular);impulse.angular=angular_constraint_matrix*angular;}
+    x.Get_Subvector(0,linear);impulse.linear=prismatic_constraint_matrix*linear;
+    if(angular_constrained_axes){x.Get_Subvector(prismatic_constrained_axes,angular);impulse.angular=angular_constraint_matrix*angular;}
     return impulse;
 }
 template<class TV> TWIST<TV> RIGID_BODY<TV>::
@@ -344,7 +344,7 @@ template<class T,class TV> static TWIST<TV> Find_Impulse_And_Angular_Impulse_Hel
         I_inverse_2.Conjugate_With_Cross_Product_Matrix(location-body2.X())+1/body1.Mass()+1/body2.Mass();
     MATRIX<T,1,2> c12=I_inverse_1.Times_Cross_Product_Matrix(location-body1.X())+I_inverse_2.Times_Cross_Product_Matrix(location-body2.X());
     MATRIX<T,1> c22=I_inverse_1+I_inverse_2;
-    SYMMETRIC_MATRIX<T,3> A(c11.x11,c11.x21,c12(1,1),c11.x22,c12(1,2),c22.x11);
+    SYMMETRIC_MATRIX<T,3> A(c11.x11,c11.x21,c12(0,0),c11.x22,c12(0,1),c22.x11);
 
     VECTOR<T,3> b(delta_relative_twist_at_location.linear.x,delta_relative_twist_at_location.linear.y,delta_relative_twist_at_location.angular.x);
     VECTOR<T,3> all_impulses=A.Inverse()*b;
@@ -483,10 +483,10 @@ Effective_Inertia_Inverse(MATRIX<T,mm>& extended_mass_inverse,const TV& location
     MATRIX<T,T_SPIN::m> Ii=World_Space_Inertia_Tensor_Inverse();
     MATRIX<T,T_SPIN::m,TV::m> Ii_rs=Ii.Times_Cross_Product_Matrix(r);
     MATRIX<T,TV::m> mi_rst_Ii_rs=Ii_rs.Cross_Product_Matrix_Transpose_Times(r)+1/Mass();
-    extended_mass_inverse.Set_Submatrix(1,1,mi_rst_Ii_rs);
-    extended_mass_inverse.Set_Submatrix(1,1+TV::m,Ii_rs.Transposed());
-    extended_mass_inverse.Set_Submatrix(1+TV::m,1,Ii_rs);
-    extended_mass_inverse.Set_Submatrix(1+TV::m,1+TV::m,Ii);
+    extended_mass_inverse.Set_Submatrix(0,0,mi_rst_Ii_rs);
+    extended_mass_inverse.Set_Submatrix(0,TV::m,Ii_rs.Transposed());
+    extended_mass_inverse.Set_Submatrix(TV::m,0,Ii_rs);
+    extended_mass_inverse.Set_Submatrix(TV::m,TV::m,Ii);
 }
 //#####################################################################
 // Function Effective_Inertia_At_Point
@@ -501,10 +501,10 @@ Effective_Inertia(MATRIX<T,mm>& extended_mass_inverse,const TV& location) const
     MATRIX<T,TV::m> A=MATRIX<T,TV::m>()+m;
     MATRIX<T,T_SPIN::m,TV::m> B=-m*MATRIX<T,T_SPIN::m,TV::m>::Cross_Product_Matrix(r);
     MATRIX<T,T_SPIN::m> C=World_Space_Inertia_Tensor_Inverse()-B.Times_Cross_Product_Matrix_Transpose(r);
-    extended_mass_inverse.Set_Submatrix(1,1,A);
-    extended_mass_inverse.Set_Submatrix(1,1+TV::m,B.Transposed());
-    extended_mass_inverse.Set_Submatrix(1+TV::m,1,B);
-    extended_mass_inverse.Set_Submatrix(1+TV::m,1+TV::m,C);
+    extended_mass_inverse.Set_Submatrix(0,0,A);
+    extended_mass_inverse.Set_Submatrix(0,TV::m,B.Transposed());
+    extended_mass_inverse.Set_Submatrix(TV::m,0,B);
+    extended_mass_inverse.Set_Submatrix(TV::m,TV::m,C);
 }
 //#####################################################################
 // Function Effective_Inertia_Inverse_Times
@@ -532,13 +532,13 @@ template<class TV> void RIGID_BODY<TV>::
 Gather_Matrix(MATRIX<T,mm>& gather,const TV& location) const
 {
     gather.Set_Identity_Matrix();
-    gather.Set_Submatrix(1+TV::m,1,MATRIX<T,T_SPIN::m,TV::m>::Cross_Product_Matrix(location-X()));
+    gather.Set_Submatrix(TV::m,0,MATRIX<T,T_SPIN::m,TV::m>::Cross_Product_Matrix(location-X()));
 }
 template<class TV> void RIGID_BODY<TV>::
 Scatter_Matrix(MATRIX<T,mm>& scatter,const TV& location) const
 {
     scatter.Set_Identity_Matrix();
-    scatter.Set_Submatrix(1,1+TV::m,MATRIX<T,T_SPIN::m,TV::m>::Cross_Product_Matrix(location-X()).Transposed());
+    scatter.Set_Submatrix(0,TV::m,MATRIX<T,T_SPIN::m,TV::m>::Cross_Product_Matrix(location-X()).Transposed());
 }
 //#####################################################################
 template class RIGID_BODY<VECTOR<float,1> >;

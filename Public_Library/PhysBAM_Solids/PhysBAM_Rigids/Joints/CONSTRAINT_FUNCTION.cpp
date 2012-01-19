@@ -143,14 +143,14 @@ LINEAR_AND_ANGULAR_CONSTRAINT_FUNCTION(const ARTICULATED_RIGID_BODY<TV>& arb,con
 template<class T> VECTOR<T,3> LINEAR_AND_ANGULAR_CONSTRAINT_FUNCTION<VECTOR<T,2> >::
 F(const T_IMPULSE& j) const
 {
-    TV jn;j.Get_Subvector(1,jn);T j_tau=j(3);
+    TV jn;j.Get_Subvector(0,jn);T j_tau=j(3);
     TV f_linear[2];T_SPIN f_angular[2];T_CONSTRAINT_ERROR f_of_j;
     for(int i=0;i<=1;i++){
         T_SPIN j_total=TV::Cross_Product(rhat[i],jn)+j_tau;
         f_linear[i]=F_Linear_Helper(j_total,i);
         f_angular[i]=angular.F_Helper(j_total,i);}
-    f_of_j.Set_Subvector(1,f_linear[0]-f_linear[1]+linear.one_over_m*jn+linear.c);
-    f_of_j.Set_Subvector(3,f_angular[0]-f_angular[1]);
+    f_of_j.Set_Subvector(0,f_linear[0]-f_linear[1]+linear.one_over_m*jn+linear.c);
+    f_of_j.Set_Subvector(2,f_angular[0]-f_angular[1]);
     return f_of_j;
 }
 //#####################################################################
@@ -159,16 +159,16 @@ F(const T_IMPULSE& j) const
 template<class T> MATRIX<T,3> LINEAR_AND_ANGULAR_CONSTRAINT_FUNCTION<VECTOR<T,2> >::
 Jacobian(const T_IMPULSE& j) const
 {
-    TV jn;j.Get_Subvector(1,jn);T j_tau=j(3);
+    TV jn;j.Get_Subvector(0,jn);T j_tau=j(3);
     MATRIX<T,3> A;
-    A.Add_To_Submatrix(1,1,one_over_m_matrix);
+    A.Add_To_Submatrix(0,0,one_over_m_matrix);
     T_SPIN j_total[2]={TV::Cross_Product(rhat[0],jn)+j_tau,TV::Cross_Product(rhat[1],jn)+j_tau};
     for(int i=0;i<=1;i++){
         MATRIX<T,3,1> A_angular;
-        A_angular.Add_To_Submatrix(1,1,Jacobian_Linear_Helper(j_total[i],i));
-        A_angular(3,1)=angular.Jacobian_Helper(i).x11;
-        A.Add_To_Submatrix(1,3,A_angular);
-        A.Add_To_Submatrix(1,1,A_angular*rhat_star[i]);}
+        A_angular.Add_To_Submatrix(0,0,Jacobian_Linear_Helper(j_total[i],i));
+        A_angular(2,0)=angular.Jacobian_Helper(i).x11;
+        A.Add_To_Submatrix(0,2,A_angular);
+        A.Add_To_Submatrix(0,0,A_angular*rhat_star[i]);}
     return A;
 }
 //#####################################################################
@@ -177,16 +177,16 @@ Jacobian(const T_IMPULSE& j) const
 template<class T> void LINEAR_AND_ANGULAR_CONSTRAINT_FUNCTION<VECTOR<T,2> >::
 Initialize()
 {
-    for(int i=0;i<=1;i++){
+    for(int i=0;i<2;i++){
         rhat[i]=linear.location-linear.p[i];
         rhat_star[i]=MATRIX<T,1,2>::Cross_Product_Matrix(rhat[i]);}
     one_over_m_matrix=linear.one_over_m*DIAGONAL_MATRIX<T,2>::Identity_Matrix();
     // compute the metric tensor
     MATRIX<T,1,2> cross_term=linear.inverse_inertia_rhat_star[0]+linear.inverse_inertia_rhat_star[1];
-    metric_tensor.Add_To_Submatrix(1,1,linear.metric_tensor);
-    metric_tensor.Add_To_Submatrix(1,3,cross_term.Transposed());
-    metric_tensor.Add_To_Submatrix(3,1,cross_term);
-    metric_tensor.Add_To_Submatrix(3,3,angular.metric_tensor);
+    metric_tensor.Add_To_Submatrix(0,0,linear.metric_tensor);
+    metric_tensor.Add_To_Submatrix(0,2,cross_term.Transposed());
+    metric_tensor.Add_To_Submatrix(2,0,cross_term);
+    metric_tensor.Add_To_Submatrix(2,2,angular.metric_tensor);
 }
 //#####################################################################
 // Function F_Linear_Helper
@@ -315,7 +315,7 @@ F_Helper(const T_IMPULSE& j_tau,const int i) const
 template<class T> MATRIX<T,3> ANGULAR_CONSTRAINT_FUNCTION<VECTOR<T,3> >::
 Jacobian_Helper(const T_IMPULSE& j_tau_i,const T_IMPULSE& j_tau_1_m_i,const int i) const
 {
-    ROTATION<TV> f=F_Helper(j_tau_1_m_i,1-i);MATRIX<T,3,4> m;m.Set_Column(1,-f.Quaternion().v);m.Set_Submatrix(1,2,MATRIX<T,3>::Cross_Product_Matrix(f.Quaternion().v)+f.Quaternion().s);
+    ROTATION<TV> f=F_Helper(j_tau_1_m_i,1-i);MATRIX<T,3,4> m;m.Set_Column(0,-f.Quaternion().v);m.Set_Submatrix(0,0,MATRIX<T,3>::Cross_Product_Matrix(f.Quaternion().v)+f.Quaternion().s);
     return m*Jacobian_Old_Helper(j_tau_i,i);
 }
 //#####################################################################
@@ -332,7 +332,7 @@ Jacobian_Old_Helper(const T_IMPULSE& j_tau,const int i) const
         MATRIX<T,3> dv_w_dj_times_s_theta=sign*half_sinc_theta*(inverse_inertia[i]-MATRIX<T,3>::Outer_Product(v_w,inverse_inertia[i]*v_w));
         TV scalar=(-q_w_old[i].Quaternion().s*s_theta-c_theta*TV::Dot_Product(q_w_old[i].Quaternion().v,v_w))*dtheta_w_dj-dv_w_dj_times_s_theta.Transpose_Times(q_w_old[i].Quaternion().v);
         MATRIX<T,3> S=MATRIX<T,3>::Outer_Product(-s_theta*q_w_old[i].Quaternion().v+c_theta*modified_b_star[i]*v_w,dtheta_w_dj)+modified_b_star[i]*dv_w_dj_times_s_theta;
-        A.Set_Row(1,scalar);A.Set_Submatrix(2,1,S);}
+        A.Set_Row(0,scalar);A.Set_Submatrix(1,0,S);}
     return A;
 }
 //#####################################################################
@@ -370,14 +370,14 @@ LINEAR_AND_ANGULAR_CONSTRAINT_FUNCTION(const ARTICULATED_RIGID_BODY<TV>& arb,con
 template<class T> VECTOR<T,6> LINEAR_AND_ANGULAR_CONSTRAINT_FUNCTION<VECTOR<T,3> >::
 F(const T_IMPULSE& j) const
 {
-    TV jn,j_tau;j.Get_Subvector(1,jn);j.Get_Subvector(4,j_tau);
+    TV jn,j_tau;j.Get_Subvector(0,jn);j.Get_Subvector(3,j_tau);
         TV f_linear[2];ROTATION<TV> f_angular[2];T_CONSTRAINT_ERROR f_of_j;
-    for(int i=0;i<=1;i++){
+    for(int i=0;i<2;i++){
         TV j_total=TV::Cross_Product(rhat[i],jn)+j_tau;
         f_linear[i]=F_Linear_Helper(j_total,i);
         f_angular[i]=angular.F_Helper(j_total,i);}
-    f_of_j.Set_Subvector(1,f_linear[0]-f_linear[1]+linear.one_over_m*jn+linear.c);
-    f_of_j.Set_Subvector(4,(f_angular[0]*f_angular[1].Inverse()).Quaternion().v);
+    f_of_j.Set_Subvector(0,f_linear[0]-f_linear[1]+linear.one_over_m*jn+linear.c);
+    f_of_j.Set_Subvector(3,(f_angular[0]*f_angular[1].Inverse()).Quaternion().v);
     return f_of_j;
 }
 //#####################################################################
@@ -388,15 +388,15 @@ Jacobian(const T_IMPULSE& j) const
 {
     TV jn,j_tau;j.Get_Subvector(1,jn);j.Get_Subvector(4,j_tau);
     MATRIX<T,6> A;MATRIX<T,6,3> A_angular;
-    A.Add_To_Submatrix(1,1,one_over_m_matrix);
+    A.Add_To_Submatrix(0,0,one_over_m_matrix);
     TV j_total[2]={TV::Cross_Product(rhat[0],jn)+j_tau,TV::Cross_Product(rhat[1],jn)+j_tau};
     for(int i=0;i<=1;i++){
         int sign=1-2*i;
         A_angular.Set_Zero_Matrix();
-        A_angular.Add_To_Submatrix(1,1,Jacobian_Linear_Helper(j_total[i],i));
-        A_angular.Add_To_Submatrix(4,1,angular.Jacobian_Helper(j_total[i],j_total[1-i],i)*(T)sign);
-        A.Add_To_Submatrix(1,4,A_angular);
-        A.Add_To_Submatrix(1,1,A_angular.Times_Cross_Product_Matrix(rhat[i]));}
+        A_angular.Add_To_Submatrix(0,0,Jacobian_Linear_Helper(j_total[i],i));
+        A_angular.Add_To_Submatrix(3,0,angular.Jacobian_Helper(j_total[i],j_total[1-i],i)*(T)sign);
+        A.Add_To_Submatrix(0,3,A_angular);
+        A.Add_To_Submatrix(0,0,A_angular.Times_Cross_Product_Matrix(rhat[i]));}
     return A;
 }
 //#####################################################################
@@ -409,10 +409,10 @@ Initialize()
     one_over_m_matrix=linear.one_over_m*DIAGONAL_MATRIX<T,3>::Identity_Matrix();
     // compute the metric tensor
     MATRIX<T,3> cross_term=linear.inverse_inertia_rhat_star[0]+linear.inverse_inertia_rhat_star[1];
-    metric_tensor.Add_To_Submatrix(1,1,linear.metric_tensor);
-    metric_tensor.Add_To_Submatrix(1,4,cross_term.Transposed());
-    metric_tensor.Add_To_Submatrix(4,1,cross_term);
-    metric_tensor.Add_To_Submatrix(4,4,angular.metric_tensor);
+    metric_tensor.Add_To_Submatrix(0,0,linear.metric_tensor);
+    metric_tensor.Add_To_Submatrix(0,3,cross_term.Transposed());
+    metric_tensor.Add_To_Submatrix(3,0,cross_term);
+    metric_tensor.Add_To_Submatrix(3,3,angular.metric_tensor);
 }
 //#####################################################################
 // Function F_Linear_Helper
