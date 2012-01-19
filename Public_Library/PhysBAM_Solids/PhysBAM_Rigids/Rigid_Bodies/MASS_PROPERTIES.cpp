@@ -49,18 +49,18 @@ Compute_Properties(MASS_PROPERTIES<TV,d>&,NORMAL_IMPLEMENTATION)
     if(filled && d!=TV::m-1) PHYSBAM_FATAL_ERROR("only codimension 1 objects can be filled");
 
     // compute volume and center
-    const TV base=object.particles.X(object.mesh.elements(1)[1]);
+    const TV base=object.particles.X(object.mesh.elements(0)[0]);
     T scaled_volume=0; // (d+filled)!*volume
     TV scaled_center_times_volume; // (d+1+filled)!*center*volume
     TV particle_X[d+1];
     for(int t=0;t<object.mesh.elements.m;t++){const VECTOR<int,d+1>& nodes=object.mesh.elements(t);
         MATRIX<T,TV::m,d+1> DX;
-        for(int i=0;i<nodes.m;i++) particle_X[i-1]=object.particles.X(nodes(i)); // THIS NEEDS TO BE HERE BECAUSE OF A COMPILER BUG IN GCC 4.0.2
-        for(int i=0;i<nodes.m;i++) DX.Column(i)=particle_X[i-1]-base;
+        for(int i=0;i<nodes.m;i++) particle_X[i]=object.particles.X(nodes(i)); // THIS NEEDS TO BE HERE BECAUSE OF A COMPILER BUG IN GCC 4.0.2
+        for(int i=0;i<nodes.m;i++) DX.Column(i)=particle_X[i]-base;
         T scaled_element_volume=filled?DX.Parallelepiped_Measure():STRAIN_MEASURE<TV,d>::Ds(object.particles.X,nodes).Parallelepiped_Measure();
-        if(t==-1){LOG::cout<<object.particles.X(nodes(1))<<object.particles.X(nodes(2))<<std::endl; // THIS NEEDS TO BE HERE BECAUSE OF A COMPILER BUG IN GCC 4.0.1
-            LOG::cout<<object.particles.X(nodes(1))<<object.particles.X(nodes(3))<<std::endl;
-            LOG::cout<<object.particles.X(nodes(3))<<base<<std::endl;}
+        if(t==-1){LOG::cout<<object.particles.X(nodes(0))<<object.particles.X(nodes(1))<<std::endl; // THIS NEEDS TO BE HERE BECAUSE OF A COMPILER BUG IN GCC 4.0.1
+            LOG::cout<<object.particles.X(nodes(0))<<object.particles.X(nodes(2))<<std::endl;
+            LOG::cout<<object.particles.X(nodes(2))<<base<<std::endl;}
         scaled_volume+=scaled_element_volume;
         scaled_center_times_volume+=scaled_element_volume*DX.Column_Sum();}
     volume=(T)1/FACTORIAL<d+filled>::value*scaled_volume;
@@ -71,8 +71,8 @@ Compute_Properties(MASS_PROPERTIES<TV,d>&,NORMAL_IMPLEMENTATION)
     T_WORLD_SPACE_INERTIA_TENSOR scaled_covariance=T_WORLD_SPACE_INERTIA_TENSOR(); // (d+2+filled)!*covariance (or trace(covariance) in 2d)
     for(int t=0;t<object.mesh.elements.m;t++){const VECTOR<int,d+1>& nodes=object.mesh.elements(t);
         MATRIX<T,TV::m,d+1> DX;
-        for(int i=0;i<nodes.m;i++) particle_X[i-1]=object.particles.X(nodes(i)); // THIS NEEDS TO BE HERE BECAUSE OF A COMPILER BUG IN GCC 4.0.2
-        for(int i=0;i<nodes.m;i++) DX.Column(i)=particle_X[i-1]-center;
+        for(int i=0;i<nodes.m;i++) particle_X[i]=object.particles.X(nodes(i)); // THIS NEEDS TO BE HERE BECAUSE OF A COMPILER BUG IN GCC 4.0.2
+        for(int i=0;i<nodes.m;i++) DX.Column(i)=particle_X[i]-center;
         T scaled_element_volume=filled?DX.Parallelepiped_Measure():STRAIN_MEASURE<TV,d>::Ds(object.particles.X,nodes).Parallelepiped_Measure();
         scaled_covariance+=Scaled_Element_Covariance(scaled_element_volume,DX);}
     

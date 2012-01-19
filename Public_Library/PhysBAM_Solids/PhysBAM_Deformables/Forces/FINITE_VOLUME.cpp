@@ -169,7 +169,7 @@ template<class T> void Set_Inversion_Based_On_Implicit_Surface(FINITE_VOLUME<VEC
 {
     VECTOR<T,3> normal=implicit_surface.Normal(fvm.strain_measure.mesh_object.Centroid(triangle));
     if(VECTOR<T,3>::Dot_Product(normal,fvm.U(triangle).Weighted_Normal())<0){
-        fvm.Fe_hat(triangle).x22*=-1;fvm.U(triangle).Column(2)*=-1;}
+        fvm.Fe_hat(triangle).x22*=-1;fvm.U(triangle).Column(1)*=-1;}
 }}
 template<class TV,int d> void FINITE_VOLUME<TV,d>::
 Update_Position_Based_State(const T time,const bool is_position_update)
@@ -210,8 +210,8 @@ Update_Position_Based_State(const T time,const bool is_position_update)
                         dG=U(t)*anisotropic_model->dP_From_dF(U(t).Transpose_Times(dDs)*De_inverse_hat(t),Fe_hat(t),(*V)(t),(*dPi_dFe)(t),Be_scales(t),t)
                             .Times_Transpose(De_inverse_hat(t));
                     for(int i=0;i<TV::m;i++) for(int j=0;j<d;j++) dfdx(l+1,j+1)(k,i)=dG(i,j);}
-                for(int i=2;i<=d+1;i++){dfdx(i,1)=MATRIX<T,TV::m>();for(int j=2;j<=d+1;j++) dfdx(i,1)-=dfdx(i,j);}
-                for(int j=0;j<d+1;j++){dfdx(1,j)=MATRIX<T,TV::m>();for(int i=2;i<=d+1;i++) dfdx(1,j)-=dfdx(i,j);}
+                for(int i=1;i<d+1;i++){dfdx(i,0)=MATRIX<T,TV::m>();for(int j=1;j<d+1;j++) dfdx(i,0)-=dfdx(i,j);}
+                for(int j=0;j<d+1;j++){dfdx(0,j)=MATRIX<T,TV::m>();for(int i=1;i<d+1;i++) dfdx(0,j)-=dfdx(i,j);}
                 VECTOR<int,d+1> nodes=strain_measure.mesh.elements(t);
                 for(int v=0;v<nodes.m;v++) (*node_stiffness)(nodes[v])+=dfdx(v,v).Symmetric_Part();
                 VECTOR<int,d*(d+1)/2> edges=(*strain_measure.mesh.element_edges)(t);
@@ -358,9 +358,9 @@ Semi_Implicit_Impulse_Precomputation(const T time,const T max_dt,ARRAY<T>* time_
         data.nodes=strain_measure.mesh.elements(t);
         data.Bm_scale=Be_scales(t);
         VECTOR<T,d+1> masses(particles.mass.Subset(data.nodes));
-        DIAGONAL_MATRIX<T,d> M_inverse=DIAGONAL_MATRIX<T,d>(masses.Remove_Index(1)).Inverse();
+        DIAGONAL_MATRIX<T,d> M_inverse=DIAGONAL_MATRIX<T,d>(masses.Remove_Index(0)).Inverse();
         SYMMETRIC_MATRIX<T,d> W=SYMMETRIC_MATRIX<T,d>::Conjugate_With_Transpose(strain_measure.Dm_inverse(t),
-            -data.Bm_scale*M_inverse-SYMMETRIC_MATRIX<T,d>::Unit_Matrix(data.Bm_scale/masses[1])); // note sign of scale factor
+            -data.Bm_scale*M_inverse-SYMMETRIC_MATRIX<T,d>::Unit_Matrix(data.Bm_scale/masses[0])); // note sign of scale factor
         MATRIX<T,d> V;W.Fast_Solve_Eigenproblem(data.W,V);
         data.Dm_inverse=strain_measure.Dm_inverse(t)*V;
         data.dt_cfl=min(max_dt,cfl_number/sqrt(constitutive_model.Maximum_Elastic_Stiffness(t)/((use_uniform_density?density:(*density_list)(t))*sqr(strain_measure.Rest_Altitude(t)))));

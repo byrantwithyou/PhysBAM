@@ -262,7 +262,7 @@ public:
     template<int d>
     T_MATRIX& operator+=(const SYMMETRIC_MATRIX<T,d>& A)
     {WARN_IF_NOT_EFFICIENT(T_MATRIX,SYMMETRIC_MATRIX<T,d>);assert(Rows()==A.Rows() && Columns()==A.Columns());
-    for(int j=0;j<Columns();j++){for(int i=j+1;i<=Rows();i++){T element=A.Element_Lower(i,j);(*this)(i,j)+=element;(*this)(j,i)+=element;}(*this)(j,j)+=A.Element_Lower(j,j);}
+    for(int j=0;j<Columns();j++){for(int i=j+1;i<Rows();i++){T element=A.Element_Lower(i,j);(*this)(i,j)+=element;(*this)(j,i)+=element;}(*this)(j,j)+=A.Element_Lower(j,j);}
     return Derived();}
 
     template<class T_MATRIX1>
@@ -388,7 +388,7 @@ public:
     template<class T_VECTOR>
     LEFT_VECTOR Transpose_Lower_Triangular_Solve(const VECTOR_BASE<T,T_VECTOR>& b) const
     {assert(Rows()==Columns() && Columns()==b.Size());LEFT_VECTOR x(b);
-    for(int i=0;i<Columns();i++){x(i)/=(*this)(i,i);for(int j=i+1;j<=Columns();j++) x(j)-=(*this)(i,j)*x(i);}
+    for(int i=0;i<Columns();i++){x(i)/=(*this)(i,i);for(int j=i+1;j<Columns();j++) x(j)-=(*this)(i,j)*x(i);}
     return x;}
 
     template<class T_VECTOR>

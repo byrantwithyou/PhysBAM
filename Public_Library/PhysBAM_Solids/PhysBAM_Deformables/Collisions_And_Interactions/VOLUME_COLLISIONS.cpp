@@ -54,29 +54,29 @@ Compute_Collision_Triangles()
 }
 int compute_collision_triangles_order[2][4][3]=
 {
-    {{2,3},{3,1},{1,2}},
-    {{1,2,3},{2,3,4},{3,4,1},{4,1,2}}
+    {{1,2},{2,0},{0,1}},
+    {{0,1,2},{1,2,3},{2,3,0},{3,0,1}}
 };
 static int Sort_Pair(VECTOR<int,4>& I)
 {
     int sign=1;
-    if(I(1)<I(2)){exchange(I(1),I(2));sign=-sign;}
-    if(I(3)<I(4)){exchange(I(3),I(4));sign=-sign;}
-    if(I(1)<I(3)) for(int k=0;k<2;k++) exchange(I(k),I(k+2));
+    if(I(0)<I(1)){exchange(I(0),I(1));sign=-sign;}
+    if(I(2)<I(3)){exchange(I(2),I(3));sign=-sign;}
+    if(I(0)<I(2)) for(int k=0;k<2;k++) exchange(I(k),I(k+2));
     return sign;
 }
 static int Sort_Pair(VECTOR<int,6>& I)
 {
     int sign=1;
+    if(I(0)<I(1)){exchange(I(0),I(1));sign=-sign;}
+    if(I(0)<I(2)){exchange(I(0),I(2));sign=-sign;}
     if(I(1)<I(2)){exchange(I(1),I(2));sign=-sign;}
-    if(I(1)<I(3)){exchange(I(1),I(3));sign=-sign;}
-    if(I(2)<I(3)){exchange(I(2),I(3));sign=-sign;}
 
+    if(I(3)<I(4)){exchange(I(3),I(4));sign=-sign;}
+    if(I(3)<I(5)){exchange(I(3),I(5));sign=-sign;}
     if(I(4)<I(5)){exchange(I(4),I(5));sign=-sign;}
-    if(I(4)<I(6)){exchange(I(4),I(6));sign=-sign;}
-    if(I(5)<I(6)){exchange(I(5),I(6));sign=-sign;}
 
-    if(I(1)<I(4)) for(int k=0;k<3;k++) exchange(I(k),I(k+3));
+    if(I(0)<I(3)) for(int k=0;k<3;k++) exchange(I(k),I(k+3));
     return sign;
 }
 //#####################################################################
@@ -105,8 +105,8 @@ Compute_Collision_Triangles(T_OBJECT& obj1,T_OBJECT& obj2)
             for(int j=0;j<TV::m+1;j++){
                 VECTOR<int,TV::m*2> I;
                 for(int k=0;k<TV::m;k++){
-                    I(k)=obj1.mesh.elements(a)(compute_collision_triangles_order[TV::m-2][i-1][k-1]);
-                    I(k+TV::m)=obj2.mesh.elements(b)(compute_collision_triangles_order[TV::m-2][j-1][k-1]);}
+                    I(k)=obj1.mesh.elements(a)(compute_collision_triangles_order[TV::m-2][i][k]);
+                    I(k+TV::m)=obj2.mesh.elements(b)(compute_collision_triangles_order[TV::m-2][j][k]);}
                 int sign=Sort_Pair(I);
                 to_process.Get_Or_Insert(I)+=sign;}}}
 
@@ -123,11 +123,11 @@ Compute_Collision_Triangles(T_OBJECT& obj1,T_OBJECT& obj2)
         VECTOR<int,TV::m*2> I=it.Key();
         ORIGIN_AREAS::VOL_DATA<T,TV::m,TV::m*2> data;
         TV PTS[TV::m*2];
-        for(int k=0;k<TV::m*2;k++) PTS[k-1]=X(I(k));
+        for(int k=0;k<TV::m*2;k++) PTS[k]=X(I(k));
         Volume_From_Simplices(data,x0,PTS); // gotta love ADL!
         area+=sign*data.V;
-        for(int k=0;k<TV::m*2;k++) gradient.Get_Or_Insert(I(k))+=sign*data.G[k-1];
-        for(int k=0;k<TV::m*2;k++) for(int m=0;m<TV::m*2;m++) hessian.Get_Or_Insert(VECTOR<int,2>(I(k),I(m)))+=sign*data.H[k-1][m-1];}
+        for(int k=0;k<TV::m*2;k++) gradient.Get_Or_Insert(I(k))+=sign*data.G[k];
+        for(int k=0;k<TV::m*2;k++) for(int m=0;m<TV::m*2;m++) hessian.Get_Or_Insert(VECTOR<int,2>(I(k),I(m)))+=sign*data.H[k][m];}
 }
 template class VOLUME_COLLISIONS<VECTOR<float,2> >;
 template class VOLUME_COLLISIONS<VECTOR<float,3> >;
