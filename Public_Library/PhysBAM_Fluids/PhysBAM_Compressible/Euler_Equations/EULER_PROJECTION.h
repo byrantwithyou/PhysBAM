@@ -36,7 +36,7 @@ public:
         for(typename T_GRID::CELL_ITERATOR  iterator(grid,grid.number_of_ghost_cells);iterator.Valid();iterator.Next()){
             INDEX cell_index=iterator.Cell_Index();
             const TV_U& U=U_ghost(cell_index);
-            T rho=U(1); T c_squared=eos->c_squared(rho,EULER<T_GRID>::e(U));
+            T rho=U(0); T c_squared=eos->c_squared(rho,EULER<T_GRID>::e(U));
             one_over_rho_c_squared(cell_index)=(T)1/(rho*c_squared);}
     }
 };

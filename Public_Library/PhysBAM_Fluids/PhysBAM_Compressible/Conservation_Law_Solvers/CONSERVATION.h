@@ -7,9 +7,9 @@
 //
 // This class solves U_t + F(U)_x + G(U)_y + H(U)_z = 0 for one Euler step.
 //
-// Input vector U as (1,m) by (1,n) by (1,mn).
+// Input vector U as (0,m) by (0,n) by (0,mn).
 // Input vector U_ghost as (-2,m+3) by (-2,n+3) by (-2,mn+3). 
-// Input psi as (1,m) by (1,n) by (1,mn). When psi=true, solve the equaitions. When psi=false, do NOT solve the equations.
+// Input psi as (0,m) by (0,n) by (0,mn). When psi=true, solve the equaitions. When psi=false, do NOT solve the equations.
 //
 //#####################################################################
 #ifndef __CONSERVATION__

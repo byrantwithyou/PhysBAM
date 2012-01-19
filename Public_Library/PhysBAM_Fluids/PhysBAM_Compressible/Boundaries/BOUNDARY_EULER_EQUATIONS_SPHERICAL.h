@@ -42,16 +42,16 @@ Fill_Ghost_Cells(const GRID<TV>& grid,const T_ARRAYS_DIMENSION_BASE& u,T_ARRAYS_
     T_ARRAYS_DIMENSION_BASE::Put(u,u_ghost); // interior
 
     // left
-    for(i=-2;i<=0;i++){ 
-        T rho=u_ghost(1-i)(1);
-        T u_velocity=-u_ghost(1-i)(2)/u_ghost(1-i)(1);
-        T e=u_ghost(1-i)(3)/u_ghost(1-i)(1)-sqr(u_velocity)/2;
-        u_ghost(i)(1)=rho;
-        u_ghost(i)(2)=rho*u_velocity;
-        u_ghost(i)(3)=rho*(e+sqr(u_velocity)/2);}
+    for(i=-3;i<0;i++){ 
+        T rho=u_ghost(-i)(0);
+        T u_velocity=-u_ghost(-i)(1)/u_ghost(-i)(0);
+        T e=u_ghost(-i)(2)/u_ghost(-i)(0)-sqr(u_velocity)/2;
+        u_ghost(i)(0)=rho;
+        u_ghost(i)(1)=rho*u_velocity;
+        u_ghost(i)(2)=rho*(e+sqr(u_velocity)/2);}
         
      // right 
-    u_ghost(m+3)=u_ghost(m+2)=u_ghost(m+1)=u_ghost(m);
+    u_ghost(m+2)=u_ghost(m+1)=u_ghost(m)=u_ghost(m-1);
 }
 //#####################################################################
 }

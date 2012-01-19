@@ -5,7 +5,7 @@
 // Class BOUNDARY_EULER_EQUATIONS_SOLID_WALL_PERIODIC
 //#####################################################################
 //
-// If an axis is set to be periodic then it is periodic with period m-1*grid.dx:U(m)=U(1), if repeats_at_last_node is true, otherwise its periodic with period m*grid.dx: U(m+1)=U(1).
+// If an axis is set to be periodic then it is periodic with period m-1*grid.dx:U(m)=U(0), if repeats_at_last_node is true, otherwise its periodic with period m*grid.dx: U(m+1)=U(0).
 //
 //#####################################################################
 #ifndef __BOUNDARY_EULER_EQUATIONS_SOLID_WALL_PERIODIC__
@@ -60,24 +60,24 @@ Fill_Ghost_Cells_Helper(const GRID<TV>& grid,const ARRAY<VECTOR<T,3> ,VECTOR<int
     ARRAY<RANGE<VECTOR<int,1> > > regions;Find_Ghost_Regions(grid,regions,number_of_ghost_cells);
     ARRAY<VECTOR<T,3> ,VECTOR<int,1> >::Put(u,u_ghost); // interior
 
-    if(Constant_Extrapolation(1)) Fill_Single_Ghost_Region(grid,u_ghost,1,regions(1));
+    if(Constant_Extrapolation(1)) Fill_Single_Ghost_Region(grid,u_ghost,1,regions(0));
     else for(i=-number_of_ghost_cells;i<0;i++){ // left
             periodic_point=m+i-1;
-            T rho=u_ghost(1,periodic_point);
-            T u_velocity=-u_ghost(2,periodic_point)/u_ghost(1,periodic_point);
-            T e=u_ghost(3,periodic_point)/u_ghost(1,periodic_point)-sqr(-u_velocity)/2;
-            u_ghost(1,i)=rho;
-            u_ghost(2,i)=rho*u_velocity;
-            u_ghost(3,i)=rho*(e+sqr(u_velocity)/2);}
-    if(Constant_Extrapolation(2)) Fill_Single_Ghost_Region(grid,u_ghost,2,regions(2));
+            T rho=u_ghost(0,periodic_point);
+            T u_velocity=-u_ghost(1,periodic_point)/u_ghost(0,periodic_point);
+            T e=u_ghost(2,periodic_point)/u_ghost(0,periodic_point)-sqr(-u_velocity)/2;
+            u_ghost(0,i)=rho;
+            u_ghost(1,i)=rho*u_velocity;
+            u_ghost(2,i)=rho*(e+sqr(u_velocity)/2);}
+    if(Constant_Extrapolation(1)) Fill_Single_Ghost_Region(grid,u_ghost,2,regions(1));
     else for(i=m;i<m+number_of_ghost_cells;i++){ // right
             periodic_point=i-m+1;
-            T rho=u_ghost(1,2*periodic_point);
-            T u_velocity=-u_ghost(2,2*periodic_point)/u_ghost(1,2*periodic_point);
-            T e=u_ghost(3,2*periodic_point)/u_ghost(1,2*periodic_point)-sqr(-u_velocity)/2;
-            u_ghost(1,i)=rho;
-            u_ghost(2,i)=rho*u_velocity;
-            u_ghost(3,i)=rho*(e+sqr(u_velocity)/2);}
+            T rho=u_ghost(0,2*periodic_point);
+            T u_velocity=-u_ghost(1,2*periodic_point)/u_ghost(0,2*periodic_point);
+            T e=u_ghost(2,2*periodic_point)/u_ghost(0,2*periodic_point)-sqr(-u_velocity)/2;
+            u_ghost(0,i)=rho;
+            u_ghost(1,i)=rho*u_velocity;
+            u_ghost(2,i)=rho*(e+sqr(u_velocity)/2);}
 }
 template<class T_GRID,class T2> void BOUNDARY_EULER_EQUATIONS_SOLID_WALL_PERIODIC<T_GRID,T2>::
 Fill_Ghost_Cells_Helper(const GRID<TV>& grid,const ARRAY<VECTOR<T,4> ,VECTOR<int,2> >& u,ARRAY<VECTOR<T,4> ,VECTOR<int,2> >& u_ghost,const T dt,const T time,const int number_of_ghost_cells)
@@ -89,29 +89,29 @@ Fill_Ghost_Cells_Helper(const GRID<TV>& grid,const ARRAY<VECTOR<T,4> ,VECTOR<int
 
     if(constant_extrapolation[1][1]) Fill_Left_Ghost_Cells(grid,u_ghost,time);
     else
-        for(j=0;j<n;j++) for(i=-2;i<=0;i++){ // left
-            T rho=u_ghost(1,2-i,j);
-            T u_velocity=-u_ghost(2,2-i,j)/u_ghost(1,2-i,j);
-            T v_velocity=u_ghost(3,2-i,j)/u_ghost(1,2-i,j);
-            T e=u_ghost(4,2-i,j)/u_ghost(1,2-i,j)-(sqr(-u_velocity)+sqr(v_velocity))/2;
-            u_ghost(1,i,j)=rho;
-            u_ghost(2,i,j)=rho*u_velocity;
-            u_ghost(3,i,j)=rho*v_velocity;
-            u_ghost(4,i,j)=rho*(e+(sqr(u_velocity)+sqr(v_velocity))/2);}
+        for(j=0;j<n;j++) for(i=-3;i<0;i++){ // left
+            T rho=u_ghost(0,2-i,j);
+            T u_velocity=-u_ghost(1,2-i,j)/u_ghost(0,2-i,j);
+            T v_velocity=u_ghost(2,2-i,j)/u_ghost(0,2-i,j);
+            T e=u_ghost(3,2-i,j)/u_ghost(0,2-i,j)-(sqr(-u_velocity)+sqr(v_velocity))/2;
+            u_ghost(0,i,j)=rho;
+            u_ghost(1,i,j)=rho*u_velocity;
+            u_ghost(2,i,j)=rho*v_velocity;
+            u_ghost(3,i,j)=rho*(e+(sqr(u_velocity)+sqr(v_velocity))/2);}
     if(constant_extrapolation[1][2]) Fill_Right_Ghost_Cells(grid,u_ghost,time);
-    else for(j=0;j<n;j++) for(i=m+1;i<=m+3;i++){ // right
-            T rho=u_ghost(1,2*m-i,j);
-            T u_velocity=-u_ghost(2,2*m-i,j)/u_ghost(1,2*m-i,j);
-            T v_velocity=u_ghost(3,2*m-i,j)/u_ghost(1,2*m-i,j);
-            T e=u_ghost(4,2*m-i,j)/u_ghost(1,2*m-i,j)-(sqr(-u_velocity)+sqr(v_velocity))/2;
-            u_ghost(1,i,j)=rho;
-            u_ghost(2,i,j)=rho*u_velocity;
-            u_ghost(3,i,j)=rho*v_velocity;
-            u_ghost(4,i,j)=rho*(e+(sqr(u_velocity)+sqr(v_velocity))/2);}
+    else for(j=0;j<n;j++) for(i=m;i<m+3;i++){ // right
+            T rho=u_ghost(0,2*m-i,j);
+            T u_velocity=-u_ghost(1,2*m-i,j)/u_ghost(0,2*m-i,j);
+            T v_velocity=u_ghost(2,2*m-i,j)/u_ghost(0,2*m-i,j);
+            T e=u_ghost(3,2*m-i,j)/u_ghost(0,2*m-i,j)-(sqr(-u_velocity)+sqr(v_velocity))/2;
+            u_ghost(0,i,j)=rho;
+            u_ghost(1,i,j)=rho*u_velocity;
+            u_ghost(2,i,j)=rho*v_velocity;
+            u_ghost(3,i,j)=rho*(e+(sqr(u_velocity)+sqr(v_velocity))/2);}
 
     for(k=0;k<u_ghost.length;k++) for(i=0;i<m;i++){
-        for(j=-2;j<=0;j++) u_ghost(k,i,j)=u_ghost(k,i,j+n-1); //bottom
-        for(j=n+1;j<=n+3;j++) u_ghost(k,i,j)=u_ghost(k,i,j-n+1); //top
+        for(j=-3;j<0;j++) u_ghost(k,i,j)=u_ghost(k,i,j+n-1); //bottom
+        for(j=n1;j<n+3;j++) u_ghost(k,i,j)=u_ghost(k,i,j-n+1); //top
     }
 }
 template<class T_GRID,class T2> void BOUNDARY_EULER_EQUATIONS_SOLID_WALL_PERIODIC<T_GRID,T2>::
@@ -140,22 +140,22 @@ Apply_Boundary_Condition_Helper(const GRID<TV>& grid,ARRAY<VECTOR<T,3> ,VECTOR<i
     int m=grid.m;
 
     if(!constant_extrapolation[1][1]){ // left wall
-        T rho=u(1,1);
-        T u_velocity=u(2,1)/u(1,1);
-        T e=u(3,1)/u(1,1)-sqr(u_velocity)/2;
+        T rho=u(0,1);
+        T u_velocity=u(1,1)/u(0,1);
+        T e=u(2,1)/u(0,1)-sqr(u_velocity)/2;
         u_velocity=0;
-        u(1,1)=rho;
-        u(2,1)=rho*u_velocity;
-        u(3,1)=rho*(e+sqr(u_velocity)/2);}
+        u(0,1)=rho;
+        u(1,1)=rho*u_velocity;
+        u(2,1)=rho*(e+sqr(u_velocity)/2);}
 
     if(!constant_extrapolation[1][2]){ // right wall
-        T rho=u(1,m);
-        T u_velocity=u(2,m)/u(1,m);
-        T e=u(3,m)/u(1,m)-sqr(u_velocity)/2;
+        T rho=u(0,m);
+        T u_velocity=u(1,m)/u(0,m);
+        T e=u(2,m)/u(0,m)-sqr(u_velocity)/2;
         u_velocity=0;
-        u(1,m)=rho;
-        u(2,m)=rho*u_velocity;
-        u(3,m)=rho*(e+sqr(u_velocity)/2);}
+        u(0,m)=rho;
+        u(1,m)=rho*u_velocity;
+        u(2,m)=rho*(e+sqr(u_velocity)/2);}
 }
 template<class T_GRID,class T2> void BOUNDARY_EULER_EQUATIONS_SOLID_WALL_PERIODIC<T_GRID,T2>::
 Apply_Boundary_Condition_Helper(const GRID<TV>& grid,ARRAY<VECTOR<T,4> ,VECTOR<int,2> >& u,const T time)
@@ -166,28 +166,28 @@ Apply_Boundary_Condition_Helper(const GRID<TV>& grid,ARRAY<VECTOR<T,4> ,VECTOR<i
     if(!constant_extrapolation[1][1])
         for(j=0;j<n;j++){
             // left wall
-            T rho=u(1,1,j);
-            T u_velocity=u(2,1,j)/u(1,1,j);
-            T v_velocity=u(3,1,j)/u(1,1,j);
-            T e=u(4,1,j)/u(1,1,j)-(sqr(u_velocity)+sqr(v_velocity))/2;
+            T rho=u(0,0,j);
+            T u_velocity=u(1,0,j)/u(0,0,j);
+            T v_velocity=u(2,0,j)/u(0,0,j);
+            T e=u(3,0,j)/u(0,0,j)-(sqr(u_velocity)+sqr(v_velocity))/2;
             u_velocity=0;
-            u(1,1,j)=rho;
-            u(2,1,j)=rho*u_velocity;
-            u(3,1,j)=rho*v_velocity;
-            u(4,1,j)=rho*(e+(sqr(u_velocity)+sqr(v_velocity))/2);}
+            u(0,0,j)=rho;
+            u(1,0,j)=rho*u_velocity;
+            u(2,0,j)=rho*v_velocity;
+            u(3,0,j)=rho*(e+(sqr(u_velocity)+sqr(v_velocity))/2);}
 
     if(!constant_extrapolation[1][2])
         for(j=0;j<n;j++){
             // right wall
-            T rho=u(1,m,j);
-            T u_velocity=u(2,m,j)/u(1,m,j);
-            T v_velocity=u(3,m,j)/u(1,m,j);
-            T e=u(4,m,j)/u(1,m,j)-(sqr(u_velocity)+sqr(v_velocity))/2;
+            T rho=u(0,m,j);
+            T u_velocity=u(1,m,j)/u(0,m,j);
+            T v_velocity=u(2,m,j)/u(0,m,j);
+            T e=u(3,m,j)/u(0,m,j)-(sqr(u_velocity)+sqr(v_velocity))/2;
             u_velocity=0;
-            u(1,m,j)=rho;
-            u(2,m,j)=rho*u_velocity;
-            u(3,m,j)=rho*v_velocity;
-            u(4,m,j)=rho*(e+(sqr(u_velocity)+sqr(v_velocity))/2);}
+            u(0,m,j)=rho;
+            u(1,m,j)=rho*u_velocity;
+            u(2,m,j)=rho*v_velocity;
+            u(3,m,j)=rho*(e+(sqr(u_velocity)+sqr(v_velocity))/2);}
 
     for(i=0;i<m;i++) for(k=0;k<u.length;k++) u(k,i,n)=u(k,i,1);
 }

@@ -42,21 +42,21 @@ template<class T> void EULER_3D_EIGENSYSTEM_G_ADVECTION_ONLY<T>::
 Flux(const int n,const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,ARRAY<TV_DIMENSION,VECTOR<int,1> >& G,ARRAY<TV_DIMENSION,VECTOR<int,1> >* U_clamped)
 {
     if(U_clamped){
-        for(int j=-2;j<=n+3;j++){
-            T u=U(j)(2)/U(j)(1),v=U(j)(3)/U(j)(1),w=U(j)(4)/U(j)(1);
-            G(j)(1)=(*U_clamped)(j)(3);       // rho_clamped*v
-            G(j)(2)=(*U_clamped)(j)(3)*u;     // rho_clamped*u*v
-            G(j)(3)=(*U_clamped)(j)(3)*v;     // rho_clamped*v^2
-            G(j)(4)=(*U_clamped)(j)(3)*w;     // rho_clamped*v*w
-            G(j)(5)=(*U_clamped)(j)(5)*v;}}   // E_from_rho_clamped*v
+        for(int j=-3;j<n+3;j++){
+            T u=U(j)(1)/U(j)(0),v=U(j)(2)/U(j)(0),w=U(j)(3)/U(j)(0);
+            G(j)(0)=(*U_clamped)(j)(2);       // rho_clamped*v
+            G(j)(1)=(*U_clamped)(j)(2)*u;     // rho_clamped*u*v
+            G(j)(2)=(*U_clamped)(j)(2)*v;     // rho_clamped*v^2
+            G(j)(3)=(*U_clamped)(j)(2)*w;     // rho_clamped*v*w
+            G(j)(4)=(*U_clamped)(j)(4)*v;}}   // E_from_rho_clamped*v
     else{
-        for(int j=-2;j<=n+3;j++){
-            T u=U(j)(2)/U(j)(1),v=U(j)(3)/U(j)(1),w=U(j)(4)/U(j)(1);
-            G(j)(1)=U(j)(3);       // rho*v
-            G(j)(2)=U(j)(3)*u;     // rho*u*v
-            G(j)(3)=U(j)(3)*v;     // rho*v^2
-            G(j)(4)=U(j)(3)*w;     // rho*v*w
-            G(j)(5)=U(j)(5)*v;}}   // E*v
+        for(int j=-3;j<n+3;j++){
+            T u=U(j)(1)/U(j)(0),v=U(j)(2)/U(j)(0),w=U(j)(3)/U(j)(0);
+            G(j)(0)=U(j)(2);       // rho*v
+            G(j)(1)=U(j)(2)*u;     // rho*u*v
+            G(j)(2)=U(j)(2)*v;     // rho*v^2
+            G(j)(3)=U(j)(2)*w;     // rho*v*w
+            G(j)(4)=U(j)(4)*v;}}   // E*v
 }
 //#####################################################################
 // Function Flux_Divided_By_Velocity
@@ -74,8 +74,8 @@ template<class T> T EULER_3D_EIGENSYSTEM_G_ADVECTION_ONLY<T>::
 Get_Face_Velocity_Component(const int face_index,const bool use_standard_average,const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U)
 {
     T average_v;
-    if(use_standard_average) average_v=(U(face_index)(3)/U(face_index)(1)+U(face_index+1)(3)/U(face_index+1)(1))*(T).5;
-    else average_v=(U(face_index)(3)+U(face_index+1)(3))/(U(face_index)(1)+U(face_index+1)(1));
+    if(use_standard_average) average_v=(U(face_index)(2)/U(face_index)(0)+U(face_index+1)(2)/U(face_index+1)(0))*(T).5;
+    else average_v=(U(face_index)(2)+U(face_index+1)(2))/(U(face_index)(0)+U(face_index+1)(0));
     return average_v;
 }
 //#####################################################################
@@ -85,23 +85,23 @@ template<class T> void EULER_3D_EIGENSYSTEM_G_ADVECTION_ONLY<T>::
 Flux_Using_Face_Velocity(VECTOR<int,2> range,const int face_index,const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,ARRAY<TV_DIMENSION,VECTOR<int,1> >& G,const bool use_standard_average,ARRAY<TV_DIMENSION,VECTOR<int,1> >* U_clamped)
 {
     T average_v;
-    if(use_standard_average) average_v=(U(face_index)(3)/U(face_index)(1)+U(face_index+1)(3)/U(face_index+1)(1))*(T).5;
-    else average_v=(U(face_index)(3)+U(face_index+1)(3))/(U(face_index)(1)+U(face_index+1)(1));
+    if(use_standard_average) average_v=(U(face_index)(2)/U(face_index)(0)+U(face_index+1)(2)/U(face_index+1)(0))*(T).5;
+    else average_v=(U(face_index)(2)+U(face_index+1)(2))/(U(face_index)(0)+U(face_index+1)(0));
 
     if(U_clamped){
-        for(int i=range.x;i<=range.y;i++){
+        for(int i=range.x;i<range.y;i++){
+            G(i)(0)=(*U_clamped)(i)(0)*average_v;
             G(i)(1)=(*U_clamped)(i)(1)*average_v;
             G(i)(2)=(*U_clamped)(i)(2)*average_v;
             G(i)(3)=(*U_clamped)(i)(3)*average_v;
-            G(i)(4)=(*U_clamped)(i)(4)*average_v;
-            G(i)(5)=(*U_clamped)(i)(5)*average_v;}}
+            G(i)(4)=(*U_clamped)(i)(4)*average_v;}}
     else{
-        for(int i=range.x;i<=range.y;i++){
+        for(int i=range.x;i<range.y;i++){
+            G(i)(0)=U(i)(0)*average_v;
             G(i)(1)=U(i)(1)*average_v;
             G(i)(2)=U(i)(2)*average_v;
             G(i)(3)=U(i)(3)*average_v;
-            G(i)(4)=U(i)(4)*average_v;
-            G(i)(5)=U(i)(5)*average_v;}}
+            G(i)(4)=U(i)(4)*average_v;}}
 }
 //#####################################################################
 // Function Maximum_Magnitude_Eigenvalue
@@ -110,7 +110,7 @@ Flux_Using_Face_Velocity(VECTOR<int,2> range,const int face_index,const ARRAY<TV
 template<class T> T EULER_3D_EIGENSYSTEM_G_ADVECTION_ONLY<T>::
 Maximum_Magnitude_Eigenvalue(const TV_DIMENSION& U_cell)
 {
-    return abs(U_cell(3)/U_cell(1));
+    return abs(U_cell(2)/U_cell(0));
 }
 //#####################################################################
 // Function Eigenvalues
@@ -122,18 +122,18 @@ Eigenvalues(const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,const int j,ARRAY<T,VECT
     int cavitation=0;
 
     // eigenvalues on the left - at point j
-    T v=U(j)(3)/U(j)(1);
-    lambda_left(1)=lambda_left(2)=lambda_left(3)=lambda_left(4)=lambda_left(5)=v;
+    T v=U(j)(2)/U(j)(0);
+    lambda_left(0)=lambda_left(1)=lambda_left(2)=lambda_left(3)=lambda_left(4)=v;
 
     // eigenvalues on the right - at point j+1
-    v=U(j+1)(3)/U(j+1)(1);
-    lambda_right(1)=lambda_right(2)=lambda_right(3)=lambda_right(4)=lambda_right(5)=v;
+    v=U(j+1)(2)/U(j+1)(0);
+    lambda_right(0)=lambda_right(1)=lambda_right(2)=lambda_right(3)=lambda_right(4)=v;
 
     // eigenvalues in the center - at flux j
-    T rho=(U(j)(1)+U(j+1)(1))/2;
-    T rho_v=(U(j)(3)+U(j+1)(3))/2;
+    T rho=(U(j)(0)+U(j+1)(0))/2;
+    T rho_v=(U(j)(2)+U(j+1)(2))/2;
     v=rho_v/rho;
-    lambda(1)=lambda(2)=lambda(3)=lambda(4)=lambda(5)=v;
+    lambda(0)=lambda(1)=lambda(2)=lambda(3)=lambda(4)=v;
 
     return (!cavitation); //cavitation --> loss of hyperbolicity, else well defined eigensystem
 }

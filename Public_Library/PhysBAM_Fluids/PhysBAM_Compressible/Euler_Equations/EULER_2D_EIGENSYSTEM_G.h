@@ -43,7 +43,7 @@ template<class T> void EULER_2D_EIGENSYSTEM_G<T>::
 Flux(const int n,const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,ARRAY<TV_DIMENSION,VECTOR<int,1> >& G,ARRAY<TV_DIMENSION,VECTOR<int,1> >* U_clamped)       
 {
     if(only_pressure_flux){
-        for(int j=-2;j<=n+3;j++){
+        for(int j=-3;j<n+3;j++){
             T p=eos->p(U(j)(0),e(U(j)(0),U(j)(1),U(j)(2),U(j)(3)));
             G(j)(0)=0;
             G(j)(1)=0;
@@ -52,7 +52,7 @@ Flux(const int n,const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,ARRAY<TV_DIMENSION,
         return;}
 
     if(U_clamped){
-        for(int j=-2;j<=n+3;j++){
+        for(int j=-3;j<n+3;j++){
             T u=U(j)(1)/U(j)(0),v=U(j)(2)/U(j)(0);
             T p=eos->p(U(j)(0),e(U(j)(0),U(j)(1),U(j)(2),U(j)(3)));
             G(j)(0)=(*U_clamped)(j)(2);         // rho_clamped*v
@@ -60,7 +60,7 @@ Flux(const int n,const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,ARRAY<TV_DIMENSION,
             G(j)(2)=(*U_clamped)(j)(2)*v+p;     // rho_clamped*v^2_p
             G(j)(3)=((*U_clamped)(j)(3)+p)*v;}} // (E_from_rho_clamped+p)*v
     else{
-        for(int j=-2;j<=n+3;j++){
+        for(int j=-3;j<n+3;j++){
             T u=U(j)(1)/U(j)(0),v=U(j)(2)/U(j)(0);
             T p=eos->p(U(j)(0),e(U(j)(0),U(j)(1),U(j)(2),U(j)(3)));
             G(j)(0)=U(j)(2);         // rho*v
@@ -75,7 +75,7 @@ template<class T> void EULER_2D_EIGENSYSTEM_G<T>::
 Flux_Using_Face_Velocity(VECTOR<int,2> range,const int face_index,const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,ARRAY<TV_DIMENSION,VECTOR<int,1> >& G,const bool use_standard_average,ARRAY<TV_DIMENSION,VECTOR<int,1> >* U_clamped)
 {
     if(only_pressure_flux){
-        for(int j=range.x;j<=range.y;j++){
+        for(int j=range.x;j<range.y;j++){
             T p=eos->p(U(j)(0),e(U(j)(0),U(j)(1),U(j)(2),U(j)(3)));
             G(j)(0)=0;
             G(j)(1)=0;
@@ -88,14 +88,14 @@ Flux_Using_Face_Velocity(VECTOR<int,2> range,const int face_index,const ARRAY<TV
     else average_v=(U(face_index)(2)+U(face_index+1)(2))/(U(face_index)(0)+U(face_index+1)(0));
 
     if(U_clamped){
-        for(int j=range.x;j<=range.y;j++){
+        for(int j=range.x;j<range.y;j++){
             T p=eos->p(U(j)(0),e(U(j)(0),U(j)(1),U(j)(2),U(j)(3)));
             G(j)(0)=(*U_clamped)(j)(0)*average_v;
             G(j)(1)=(*U_clamped)(j)(1)*average_v;
             G(j)(2)=(*U_clamped)(j)(2)*average_v+p;
             G(j)(3)=((*U_clamped)(j)(3)+p)*average_v;}}
     else{
-        for(int j=range.x;j<=range.y;j++){
+        for(int j=range.x;j<range.y;j++){
             T p=eos->p(U(j)(0),e(U(j)(0),U(j)(1),U(j)(2),U(j)(3)));
             G(j)(0)=U(j)(0)*average_v;
             G(j)(1)=U(j)(1)*average_v;
