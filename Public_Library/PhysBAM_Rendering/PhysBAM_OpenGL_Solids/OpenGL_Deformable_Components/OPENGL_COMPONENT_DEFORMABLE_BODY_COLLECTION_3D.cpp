@@ -206,18 +206,18 @@ Display(const int in_color) const
                 const POINT_FACE_REPULSION_PAIR<TV>& pair=point_triangle_interaction_pairs(k);
                 INDIRECT_ARRAY<const ARRAY_VIEW<TV>,VECTOR<int,4>&> X(deformable_body_collection.particles.X,pair.nodes);
                 glColor3f(.5f,1,.5f);
-                OpenGL_Line(X(1),TRIANGLE_3D<T>(X(2),X(3),X(4)).Surface(X(1)));
+                OpenGL_Line(X(0),TRIANGLE_3D<T>(X(1),X(2),X(3)).Surface(X(0)));
                 glColor3f(0,1,1);
-                OpenGL_Line(X(1),X(2));OpenGL_Line(X(1),X(3));OpenGL_Line(X(1),X(4));}
+                OpenGL_Line(X(0),X(1));OpenGL_Line(X(0),X(2));OpenGL_Line(X(0),X(3));}
             OpenGL_End();
             OpenGL_Begin(GL_TRIANGLES);
             for(int k=0;k<point_triangle_interaction_pairs.Size();k++){
                 const POINT_FACE_REPULSION_PAIR<TV>& pair=point_triangle_interaction_pairs(k);
                 INDIRECT_ARRAY<const ARRAY_VIEW<TV>,VECTOR<int,4>&> X(deformable_body_collection.particles.X,pair.nodes);
                 glColor4f(0,.6f,.8f,.5f);
-                OpenGL_Triangle(X(1),X(3),X(2));
-                OpenGL_Triangle(X(1),X(2),X(4));
-                OpenGL_Triangle(X(1),X(4),X(3));}
+                OpenGL_Triangle(X(0),X(2),X(1));
+                OpenGL_Triangle(X(0),X(1),X(3));
+                OpenGL_Triangle(X(0),X(3),X(2));}
             OpenGL_End();}
 
         // visualize edge edge interactions
@@ -227,11 +227,11 @@ Display(const int in_color) const
                 const EDGE_EDGE_REPULSION_PAIR<TV>& pair=edge_edge_interaction_pairs(k);
                 INDIRECT_ARRAY<const ARRAY_VIEW<TV>,VECTOR<int,4>&> X(deformable_body_collection.particles.X,pair.nodes);
                 glColor3f(1,1,0);
-                VECTOR<T,2> weights;SEGMENT_3D<T>(X(1),X(2)).Shortest_Vector_Between_Segments(SEGMENT_3D<T>(X(3),X(4)),weights);
-                OpenGL_Line((1-weights.x)*X(1)+weights.x*X(2),(1-weights.y)*X(3)+weights.y*X(4));
-                //OpenGL_Line(X(1),X(3));OpenGL_Line(X(1),X(4));OpenGL_Line(X(2),X(3));OpenGL_Line(X(2),X(4));
+                VECTOR<T,2> weights;SEGMENT_3D<T>(X(0),X(1)).Shortest_Vector_Between_Segments(SEGMENT_3D<T>(X(2),X(3)),weights);
+                OpenGL_Line((1-weights.x)*X(0)+weights.x*X(1),(1-weights.y)*X(2)+weights.y*X(3));
+                //OpenGL_Line(X(0),X(2));OpenGL_Line(X(0),X(3));OpenGL_Line(X(1),X(2));OpenGL_Line(X(1),X(3));
                 glColor3f(1,.5,0);
-                OpenGL_Line(X(1),X(2));OpenGL_Line(X(3),X(4));}
+                OpenGL_Line(X(0),X(1));OpenGL_Line(X(2),X(3));}
             OpenGL_End();}
         glPopAttrib();}
 
