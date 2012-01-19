@@ -191,7 +191,7 @@ Print_Each_Matrix(int n,const GENERALIZED_VELOCITY<TV>& V,T sqrt_dt) const
     oo.Begin_Sparse_Matrix("C",Value(total_force_dof),c);
     G*=0;
     ARRAY<T,FORCE_AGGREGATE_ID> force_coefficients(total_force_dof);
-    for(int i=1;i<=c;i++){
+    for(int i=0;i<c;i++){
         G.Raw_Get(i)=1;
         Times(G,force_coefficients);
         G.Raw_Get(i)=0;

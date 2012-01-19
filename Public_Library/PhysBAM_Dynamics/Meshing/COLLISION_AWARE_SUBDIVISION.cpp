@@ -69,7 +69,7 @@ Subdivide(const int number_of_subdivisions,const bool push_outside_collision_bod
     if(push_outside_collision_bodies){
         bool sucessful=Push_Surface_Outside_Of_Collision_Bodies(push_distance,push_attempts);
         if(verbose && !sucessful) LOG::cout<<"unable to push surface ouside of collision bodies in "<<push_attempts<<" attempts"<<std::endl;}
-    for(int k=1;k<=number_of_subdivisions;k++){
+    for(int k=0;k<number_of_subdivisions;k++){
         if(verbose) LOG::cout<<"Subdivision "<<k<<"...";
         Subdivide();
         if(verbose) LOG::cout<<"done."<<std::endl;}

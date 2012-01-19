@@ -152,7 +152,7 @@ Initialize_Segment_Mesh()
     if(owns_segment_mesh) delete segment_mesh;else owns_segment_mesh=true;
     bool neighbor_nodes_defined=neighbor_nodes!=0;if(!neighbor_nodes) Initialize_Neighbor_Nodes();
     // number of edges = half the sum of the degree (or a little more if there are loop edges)
-    int total_degree=0;for(int i=1;i<=number_nodes;i++) total_degree+=(*neighbor_nodes)(i).m;
+    int total_degree=0;for(int i=0;i<number_nodes;i++) total_degree+=(*neighbor_nodes)(i).m;
     segment_mesh=new SEGMENT_MESH();
     segment_mesh->number_nodes=number_nodes;
     segment_mesh->elements.Preallocate((total_degree+1)/2); // add one for subtle optimization purposes
@@ -585,7 +585,7 @@ Identify_Edge_Connected_Components(ARRAY<int>& label)
     STACK<int> flood_fill_stack;flood_fill_stack.Preallocate(elements.m);
     bool neighbor_nodes_defined=neighbor_nodes!=0;if(!neighbor_nodes_defined)Initialize_Neighbor_Nodes();
     label.Resize(number_nodes,false,false);label.Fill(0);
-    int id=0;for(int p=1;p<=number_nodes;p++) if(!label(p)){
+    int id=0;for(int p=0;p<number_nodes;p++) if(!label(p)){
         id++;label(p)=id;flood_fill_stack.Push(p);
         while(!flood_fill_stack.Empty()){
             int top=flood_fill_stack.Pop();

@@ -98,11 +98,11 @@ Broadcast_Positions(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input)
     send_buffer.Resize(buffer_size);int position=0;
     for(int b=1;b<=particles_of_partition(id).m;b++){
         rigid_body_collection_input.rigid_body_particle.array_collection->Pack(send_buffer,position,particles_of_partition(id)(b));}
-    for(int i=1;i<=number_of_processors;i++)
+    for(int i=0;i<number_of_processors;i++)
         if(i-1!=rank)
             requests.Append(comm->Isend(&(send_buffer(1)),position,MPI::PACKED,i-1,tag));
     ARRAY<ARRAY<char> > recv_buffers(number_of_processors);
-    for(int i=1;i<=number_of_processors;i++){
+    for(int i=0;i<number_of_processors;i++){
         if(i-1!=rank){
             MPI::Status status;
             comm->Probe(i-1,tag,status);
@@ -110,7 +110,7 @@ Broadcast_Positions(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input)
             requests.Append(comm->Irecv(recv_buffers(i).m?&(recv_buffers(i)(1)):0,recv_buffers(i).m,MPI_PACKED,i-1,tag));}}
     MPI_UTILITIES::Wait_All(requests);
 
-    for(int i=1;i<=number_of_processors;i++){
+    for(int i=0;i<number_of_processors;i++){
         if(i-1!=rank){
             int position=0;
             for(int b=1;b<=particles_of_partition(PARTITION_ID(i)).m;b++){
@@ -149,11 +149,11 @@ Update_Partitions(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,
     int buffer_size=MPI_UTILITIES::Pack_Size(bodies_to_send,*comm)+1;
     send_buffers.Resize(buffer_size);int position=0;
     MPI_UTILITIES::Pack(bodies_to_send,send_buffers,position,*comm);
-    for(int i=1;i<=number_of_processors;i++)
+    for(int i=0;i<number_of_processors;i++)
         if(i-1!=rank)
             requests.Append(comm->Isend(&(send_buffers(1)),position,MPI::PACKED,i-1,tag));
     ARRAY<ARRAY<char> > recv_buffers(number_of_processors);
-    for(int i=1;i<=number_of_processors;i++){
+    for(int i=0;i<number_of_processors;i++){
         if(i-1!=rank){
             MPI::Status status;
             comm->Probe(i-1,tag,status);
@@ -161,7 +161,7 @@ Update_Partitions(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,
             requests.Append(comm->Irecv(recv_buffers(i).m?&(recv_buffers(i)(1)):0,recv_buffers(i).m,MPI_PACKED,i-1,tag));}}
     MPI_UTILITIES::Wait_All(requests);
 
-    for(int i=1;i<=number_of_processors;i++){
+    for(int i=0;i<number_of_processors;i++){
         if(i-1!=rank){
             int position=0;
             ARRAY<ARRAY<int> > moved_bodies(number_of_processors);
@@ -273,7 +273,7 @@ Split_Dimension(const T x,const int processes,ARRAY<T>& boundaries)
 {
     T range_over_processes=x/processes;
     boundaries.Resize(processes+1);boundaries(1)=0;
-    for(int p=1;p<=processes;p++)boundaries(p+1)=boundaries(p)+range_over_processes;
+    for(int p=0;p<processes;p++)boundaries(p+1)=boundaries(p)+range_over_processes;
 }
 //#####################################################################
 // Function Simple_Partition
@@ -404,11 +404,11 @@ Prune_And_Exchange_Impulses(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,ARR
         RIGID_BODY<TV>& rigid_body=rigid_body_collection.Rigid_Body(accumulators_to_send(b));
         RIGID_BODY_IMPULSE_ACCUMULATOR<TV,TV::dimension-1> *impulse_accumulator=dynamic_cast<RIGID_BODY_IMPULSE_ACCUMULATOR<TV,TV::dimension-1>*>(rigid_body.impulse_accumulator);
         MPI_UTILITIES::Pack(accumulators_to_send(b),impulse_accumulator->accumulated_impulse.linear,impulse_accumulator->accumulated_impulse.angular,send_buffer,position,*comm);}
-    for(int i=1;i<=number_of_processors;i++)
+    for(int i=0;i<number_of_processors;i++)
         if(i-1!=rank)
             requests.Append(comm->Isend(&(send_buffer(1)),position,MPI::PACKED,i-1,tag));
     ARRAY<ARRAY<char> > recv_buffers(number_of_processors);
-    for(int i=1;i<=number_of_processors;i++){
+    for(int i=0;i<number_of_processors;i++){
         if(i-1!=rank){
             MPI::Status status;
             comm->Probe(i-1,tag,status);
@@ -417,12 +417,12 @@ Prune_And_Exchange_Impulses(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,ARR
     MPI_UTILITIES::Wait_All(requests);
     
     // Process the received impulses
-    for(int i=1;i<=number_of_processors;i++){
+    for(int i=0;i<number_of_processors;i++){
         if(i-1!=rank){
             int position=0;
             int accumulators_to_recv;
             MPI_UTILITIES::Unpack(accumulators_to_recv,recv_buffers(i),position,*comm);
-            for(int b=1;b<=accumulators_to_recv;b++){
+            for(int b=0;b<accumulators_to_recv;b++){
                 int body_id;
                 TV linear_impulse;
                 T_SPIN angular_impulse;

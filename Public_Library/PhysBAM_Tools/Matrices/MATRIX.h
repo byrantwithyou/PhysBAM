@@ -49,7 +49,7 @@ public:
     template<class T_MATRIX>
     explicit MATRIX(const MATRIX_BASE<T,T_MATRIX>& A)
     {
-        assert(m==A.Rows() && n==A.Columns());for(int j=1;j<=n;j++) for(int i=1;i<=m;i++) (*this)(i,j)=A(i,j);
+        assert(m==A.Rows() && n==A.Columns());for(int j=0;j<n;j++) for(int i=0;i<m;i++) (*this)(i,j)=A(i,j);
     }
 
     int Rows() const
@@ -108,46 +108,46 @@ public:
     {MATRIX matrix;for(int i=0;i<size;i++) matrix.x[i]=x[i]*a;return matrix;}
 
     VECTOR<T,m> operator*(const VECTOR<T,n>& y) const
-    {VECTOR<T,m> result;for(int j=1;j<=n;j++) for(int i=1;i<=m;i++) result(i)+=(*this)(i,j)*y(j);return result;}
+    {VECTOR<T,m> result;for(int j=0;j<n;j++) for(int i=0;i<m;i++) result(i)+=(*this)(i,j)*y(j);return result;}
 
     template<int p>
     MATRIX<T,m,p> operator*(const MATRIX<T,n,p>& A) const
-    {MATRIX<T,m,p> matrix;for(int j=1;j<=p;j++) for(int k=1;k<=n;k++) for(int i=1;i<=m;i++) matrix(i,j)+=(*this)(i,k)*A(k,j);return matrix;}
+    {MATRIX<T,m,p> matrix;for(int j=0;j<p;j++) for(int k=0;k<n;k++) for(int i=0;i<m;i++) matrix(i,j)+=(*this)(i,k)*A(k,j);return matrix;}
 
     MATRIX<T,m,n> operator*(const SYMMETRIC_MATRIX<T,n>& A) const
-    {MATRIX<T,m,n> matrix;for(int j=1;j<=n;j++) for(int k=1;k<=n;k++) for(int i=1;i<=m;i++) matrix(i,j)+=(*this)(i,k)*A(k,j);return matrix;}
+    {MATRIX<T,m,n> matrix;for(int j=0;j<n;j++) for(int k=0;k<n;k++) for(int i=0;i<m;i++) matrix(i,j)+=(*this)(i,k)*A(k,j);return matrix;}
 
     MATRIX<T,m,n> operator*(const DIAGONAL_MATRIX<T,n>& A) const
-    {MATRIX<T,m,n> matrix;for(int j=1;j<=n;j++) for(int i=1;i<=m;i++) matrix(i,j)=(*this)(i,j)*A(j,j);return matrix;}
+    {MATRIX<T,m,n> matrix;for(int j=0;j<n;j++) for(int i=0;i<m;i++) matrix(i,j)=(*this)(i,j)*A(j,j);return matrix;}
 
     MATRIX_MXN<T> operator*(const MATRIX_MXN<T>& A) const
-    {assert(n==A.m);MATRIX_MXN<T> matrix(m,A.n);for(int j=1;j<=A.n;j++) for(int i=1;i<=m;i++) for(int k=1;k<=n;k++) matrix(i,j)+=(*this)(i,k)*A(k,j);return matrix;}
+    {assert(n==A.m);MATRIX_MXN<T> matrix(m,A.n);for(int j=1;j<=A.n;j++) for(int i=0;i<m;i++) for(int k=0;k<n;k++) matrix(i,j)+=(*this)(i,k)*A(k,j);return matrix;}
 
     MATRIX<T,n,m> Transposed() const
-    {MATRIX<T,n,m> matrix;for(int i=1;i<=m;i++) for(int j=1;j<=n;j++) matrix(j,i)=(*this)(i,j);return matrix;}
+    {MATRIX<T,n,m> matrix;for(int i=0;i<m;i++) for(int j=0;j<n;j++) matrix(j,i)=(*this)(i,j);return matrix;}
 
     VECTOR<T,n> Transpose_Times(const VECTOR<T,m>& y) const
-    {VECTOR<T,n> result;for(int j=1;j<=n;j++) for(int i=1;i<=m;i++) result(j)+=(*this)(i,j)*y(i);return result;}
+    {VECTOR<T,n> result;for(int j=0;j<n;j++) for(int i=0;i<m;i++) result(j)+=(*this)(i,j)*y(i);return result;}
 
     template<int p>
     MATRIX<T,n,p> Transpose_Times(const MATRIX<T,m,p>& A) const
-    {MATRIX<T,n,p> matrix;for(int j=1;j<=p;j++) for(int i=1;i<=n;i++) for(int k=1;k<=m;k++) matrix(i,j)+=(*this)(k,i)*A(k,j);return matrix;}
+    {MATRIX<T,n,p> matrix;for(int j=0;j<p;j++) for(int i=0;i<n;i++) for(int k=0;k<m;k++) matrix(i,j)+=(*this)(k,i)*A(k,j);return matrix;}
 
     template<int p>
     MATRIX<T,m,p> Times_Transpose(const MATRIX<T,p,n>& A) const
-    {MATRIX<T,m,p> matrix;for(int j=1;j<=p;j++) for(int i=1;i<=m;i++) for(int k=1;k<=n;k++) matrix(i,j)+=(*this)(i,k)*A(j,k);return matrix;}
+    {MATRIX<T,m,p> matrix;for(int j=0;j<p;j++) for(int i=0;i<m;i++) for(int k=0;k<n;k++) matrix(i,j)+=(*this)(i,k)*A(j,k);return matrix;}
 
     MATRIX Times_Cross_Product_Matrix(const VECTOR<T,3>& v) const
-    {STATIC_ASSERT(n==3);MATRIX matrix;for(int i=1;i<=m;i++) matrix.Set_Row(i,VECTOR<T,3>::Cross_Product(VECTOR<T,3>((*this)(i,1),(*this)(i,2),(*this)(i,3)),v));return matrix;}
+    {STATIC_ASSERT(n==3);MATRIX matrix;for(int i=0;i<m;i++) matrix.Set_Row(i,VECTOR<T,3>::Cross_Product(VECTOR<T,3>((*this)(i,1),(*this)(i,2),(*this)(i,3)),v));return matrix;}
 
     MATRIX Times_Cross_Product_Matrix_Transpose(const VECTOR<T,3>& v) const
-    {STATIC_ASSERT(n==3);MATRIX matrix;for(int i=1;i<=m;i++) matrix.Set_Row(i,VECTOR<T,3>::Cross_Product(v,VECTOR<T,3>((*this)(i,1),(*this)(i,2),(*this)(i,3))));return matrix;}
+    {STATIC_ASSERT(n==3);MATRIX matrix;for(int i=0;i<m;i++) matrix.Set_Row(i,VECTOR<T,3>::Cross_Product(v,VECTOR<T,3>((*this)(i,1),(*this)(i,2),(*this)(i,3))));return matrix;}
 
     MATRIX Cross_Product_Matrix_Times(const VECTOR<T,3>& v) const
-    {STATIC_ASSERT(m==3);MATRIX matrix;for(int i=1;i<=n;i++) matrix.Set_Column(i,VECTOR<T,3>::Cross_Product(v,VECTOR<T,3>((*this)(1,i),(*this)(2,i),(*this)(3,i))));return matrix;}
+    {STATIC_ASSERT(m==3);MATRIX matrix;for(int i=0;i<n;i++) matrix.Set_Column(i,VECTOR<T,3>::Cross_Product(v,VECTOR<T,3>((*this)(1,i),(*this)(2,i),(*this)(3,i))));return matrix;}
 
     MATRIX Cross_Product_Matrix_Transpose_Times(const VECTOR<T,3>& v) const
-    {STATIC_ASSERT(m==3);MATRIX matrix;for(int i=1;i<=n;i++) matrix.Set_Column(i,VECTOR<T,3>::Cross_Product(VECTOR<T,3>((*this)(1,i),(*this)(2,i),(*this)(3,i)),v));return matrix;}
+    {STATIC_ASSERT(m==3);MATRIX matrix;for(int i=0;i<n;i++) matrix.Set_Column(i,VECTOR<T,3>::Cross_Product(VECTOR<T,3>((*this)(1,i),(*this)(2,i),(*this)(3,i)),v));return matrix;}
 
     MATRIX<T,m,2> Times_Cross_Product_Matrix(const VECTOR<T,2>& v) const
     {STATIC_ASSERT(n==1);return (*this)*MATRIX<T,1,2>::Cross_Product_Matrix(v);}
@@ -183,16 +183,16 @@ public:
     {STATIC_ASSERT(m==0 && n==1);return MATRIX<T,0,1>();}
 
     MATRIX Permute_Columns(const VECTOR<int,n>& p) const
-    {MATRIX x;for(int i=1;i<=m;i++) for(int j=1;j<=n;j++) x(i,j)=(*this)(i,p(j));return x;}
+    {MATRIX x;for(int i=0;i<m;i++) for(int j=0;j<n;j++) x(i,j)=(*this)(i,p(j));return x;}
 
     MATRIX Unpermute_Columns(const VECTOR<int,n>& p) const
-    {MATRIX x;for(int i=1;i<=m;i++) for(int j=1;j<=n;j++) x(i,p(j))=(*this)(i,j);return x;}
+    {MATRIX x;for(int i=0;i<m;i++) for(int j=0;j<n;j++) x(i,p(j))=(*this)(i,j);return x;}
 
     static MATRIX Outer_Product(const VECTOR<T,m>& u,const VECTOR<T,n>& v)
-    {MATRIX result;for(int i=1;i<=m;i++) for(int j=1;j<=n;j++) result(i,j)=u(i)*v(j);return result;}
+    {MATRIX result;for(int i=0;i<m;i++) for(int j=0;j<n;j++) result(i,j)=u(i)*v(j);return result;}
 
     MATRIX<T,n> Normal_Equations_Matrix() const
-    {MATRIX<T,n> result;for(int j=1;j<=n;j++) for(int i=1;i<=n;i++) for(int k=1;k<=m;k++) result(i,j)+=(*this)(k,i)*(*this)(k,j);return result;}
+    {MATRIX<T,n> result;for(int j=0;j<n;j++) for(int i=0;i<n;i++) for(int k=0;k<m;k++) result(i,j)+=(*this)(k,i)*(*this)(k,j);return result;}
 
     VECTOR<T,n> Normal_Equations_Solve(const VECTOR<T,m>& b) const
     {MATRIX<T,n> A_transpose_A(Normal_Equations_Matrix());VECTOR<T,n> A_transpose_b(Transpose_Times(b));return A_transpose_A.Cholesky_Solve(A_transpose_b);}

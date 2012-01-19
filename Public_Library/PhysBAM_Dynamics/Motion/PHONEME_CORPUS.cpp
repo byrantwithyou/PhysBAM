@@ -36,7 +36,7 @@ Gather_Phoneme_Statistics_Helper(PHONEME_CORPUS<T>* phoneme_corpus,ARRAY<PHONEME
             if(!means(t+1).n)means(t+1).Resize(controls.n);
             means(t+1)+=controls;}}
     VECTOR_ND<T> per_attribute_mean(means(1).n);
-    for(int t=1;t<=frame_length;t++){
+    for(int t=0;t<frame_length;t++){
         means(t)/=(T)phonemes.m;
         for(int i=1;i<=per_attribute_mean.n;i++) per_attribute_mean(i)+=abs(means(t)(i));}
     per_attribute_mean/=(T)frame_length;

@@ -682,7 +682,7 @@ Add_To_Rigid_Lists(ARRAY<ARRAY<int> >& rigid_lists,ARRAY<int>& list_index,const 
             if(!current_list){rigid_lists(add_list).Append(node);list_index(node)=add_list;} // add to the add_list
             else if(current_list != add_list){ // not already in the add_list, but in another list - combine current_list with the add_list
                 int new_nodes=rigid_lists(current_list).m;rigid_lists(add_list).Resize(rigid_lists(add_list).m+new_nodes);
-                for(int j=1;j<=new_nodes;j++){rigid_lists(add_list)(rigid_lists(add_list).m-new_nodes+j)=rigid_lists(current_list)(j);list_index(rigid_lists(current_list)(j))=add_list;}
+                for(int j=0;j<new_nodes;j++){rigid_lists(add_list)(rigid_lists(add_list).m-new_nodes+j)=rigid_lists(current_list)(j);list_index(rigid_lists(current_list)(j))=add_list;}
                 rigid_lists(current_list).Resize(0);}} // kill off the current list
         rigid_lists.Resize(rigid_lists.m-1);} // remove the new list since we combined it with another
 }

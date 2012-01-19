@@ -87,10 +87,10 @@ public:
     {return n;}
 
     T& operator()(const int i)
-    {assert(i>=1 && i<=n);return x[i-1];}
+    {assert((unsigned)i<n);return x[i];}
 
     const T& operator()(const int i) const
-    {assert(i>=1 && i<=n);return x[i-1];}
+    {assert((unsigned)i<n);return x[i];}
 
     T* Get_Array_Pointer()
     {return x;}

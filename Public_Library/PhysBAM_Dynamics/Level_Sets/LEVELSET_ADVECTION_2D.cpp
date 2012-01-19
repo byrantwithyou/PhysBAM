@@ -26,7 +26,7 @@ Euler_Step(const ARRAY<T,FACE_INDEX<TV::dimension> >& face_velocity,const T dt,c
     if(levelset->curvature_motion){ // do curvature first - based on phi^n
         T one_over_two_dx=1/(2*grid.dX.x),one_over_two_dy=1/(2*grid.dX.y);
         bool curvature_defined=(levelset->curvature!=0);levelset->Compute_Curvature(time);
-        for(int i=1;i<=m;i++) for(int j=1;j<=n;j++){
+        for(int i=0;i<m;i++) for(int j=0;j<n;j++){
             T phix=(phi_ghost(i+1,j)-phi_ghost(i-1,j))*one_over_two_dx,phiy=(phi_ghost(i,j+1)-phi_ghost(i,j-1))*one_over_two_dy;
             phi(i,j)-=dt*levelset->sigma*(*levelset->curvature)(i,j)*sqrt(sqr(phix)+sqr(phiy));}
         boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,dt,time,number_of_ghost_cells); 
@@ -48,7 +48,7 @@ Reinitialize(const int time_steps,const T time)
     
     ARRAY<T,VECTOR<int,2> > sign_phi(1,m,1,n); // smeared out sign function
     T epsilon=sqr(grid.dX.Max());
-    for(int i=1;i<=m;i++) for(int j=1;j<=n;j++) sign_phi(i,j)=phi(i,j)/sqrt(sqr(phi(i,j))+epsilon);
+    for(int i=0;i<m;i++) for(int j=0;j<n;j++) sign_phi(i,j)=phi(i,j)/sqrt(sqr(phi(i,j))+epsilon);
 
     T dt=reinitialization_cfl*grid.min_dX;
     RUNGEKUTTA<ARRAY<T,VECTOR<int,2> > > rungekutta(phi); 
@@ -56,7 +56,7 @@ Reinitialize(const int time_steps,const T time)
     rungekutta.Set_Order(reinitialization_runge_kutta_order);
     rungekutta.Set_Time(time);
     rungekutta.Pseudo_Time();
-    for(int k=1;k<=time_steps;k++){
+    for(int k=0;k<time_steps;k++){
         rungekutta.Start(dt);
         for(int kk=1;kk<=rungekutta.order;kk++){Euler_Step_Of_Reinitialization(sign_phi,dt,time);rungekutta.Main();}
     } 

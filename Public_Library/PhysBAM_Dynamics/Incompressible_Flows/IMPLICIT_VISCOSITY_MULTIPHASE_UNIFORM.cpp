@@ -54,14 +54,14 @@ Setup_Viscosity(const T dt)
 
     // set viscosity coefficients
     ARRAY<T> dt_times_kinematic_viscosity(number_of_regions);
-    for(int i=1;i<=number_of_regions;i++) dt_times_kinematic_viscosity(i)=dt*viscosities(i)/densities(i);
+    for(int i=0;i<number_of_regions;i++) dt_times_kinematic_viscosity(i)=dt*viscosities(i)/densities(i);
     heat_poisson.Set_Constant_beta(dt_times_kinematic_viscosity);
 
     // set up internal levelset
     heat_poisson.Use_Internal_Level_Set(number_of_regions);
     T_AVERAGING averaging;const T_LEVELSET_MULTIPLE& cell_centered_levelset_multiple=*projection_dynamics.poisson_collidable->levelset_multiple;
     for(CELL_ITERATOR iterator(face_grid,2);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index(),p_face_index=cell_index;
-        for(int i=1;i<=number_of_regions;i++) heat_poisson.levelset_multiple->phis(i)(cell_index)=averaging.Cell_To_Face(projection.p_grid,axis,p_face_index,cell_centered_levelset_multiple.phis(i));}
+        for(int i=0;i<number_of_regions;i++) heat_poisson.levelset_multiple->phis(i)(cell_index)=averaging.Cell_To_Face(projection.p_grid,axis,p_face_index,cell_centered_levelset_multiple.phis(i));}
     heat_poisson.levelset_multiple->Project_Levelset(2);
 
     if(projection_dynamics.flame) Calculate_Velocity_Jump();

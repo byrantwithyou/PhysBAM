@@ -210,7 +210,7 @@ Face_Diffusion_Helper(CELL_ITERATOR& iterator,int axis,ARRAY<T,FACE_INDEX<TV::di
 template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION> void ADVECTION_CONSERVATIVE_UNIFORM<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>::
 Cell_Diffusion(const T_GRID& grid,ARRAY<T,TV_INT>& sum_jc_cell,T_ARRAYS_T2& Z,T_BOUNDARY_T2& boundary,BOUNDARY_UNIFORM<T_GRID,T>* boundary_sum)
 {
-    for(int iter=1;iter<=num_diffusion_iterations;iter++){
+    for(int iter=0;iter<num_diffusion_iterations;iter++){
         for(int axis=1;axis<=TV::dimension;axis++){
             if(evenodd_cell==0){
                 RANGE<TV_INT> domain=grid.Domain_Indices();domain.max_corner-=TV_INT::All_Ones_Vector();domain.min_corner+=TV_INT::All_Ones_Vector();domain.max_corner(axis)+=1;
@@ -247,7 +247,7 @@ template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION> void ADV
 Face_Diffusion(const T_GRID& grid,ARRAY<T,FACE_INDEX<TV::dimension> >& sum_jc,T_FACE_ARRAYS_SCALAR& Z,T_BOUNDARY& boundary,BOUNDARY_UNIFORM<T_GRID,T>* boundary_sum,ARRAY<bool,FACE_INDEX<TV::dimension> >* inside)
 {
     PHYSBAM_DEBUG_WRITE_SUBSTEP("Before diffusion",0,0);
-    for(int iter=1;iter<=num_diffusion_iterations;iter++){
+    for(int iter=0;iter<num_diffusion_iterations;iter++){
         for(int axis=1;axis<=TV::dimension;axis++){
             if(evenodd==0){
                 for(int axis2=1;axis2<=TV::dimension;axis2++){if(axis==axis2) continue;//handled above
@@ -391,7 +391,7 @@ Update_Advection_Equation_Cell_Lookup(const T_GRID& grid,T_ARRAYS_T2& Z,const T_
 
     ARRAY<T,TV_INT> sum_ic(grid.Domain_Indices(number_of_ghost_cells));
     boundary_sum->Fill_Ghost_Cells(grid,sum_jc_cell,sum_ic,dt,time,number_of_ghost_cells);
-    for(int i=1;i<=num_iterations;i++){
+    for(int i=0;i<num_iterations;i++){
         for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
             if(ghost_box.Lazy_Inside(iterator.Location())) continue;            
             ARRAY<PAIR<TV_INT,int> >& local_weights=weights_from(cell);
@@ -613,7 +613,7 @@ Update_Advection_Equation_Face_Lookup(T_GRID& grid,T_ARRAYS_SCALAR& phi1,T_ARRAY
 
     ARRAY<T,FACE_INDEX<TV::dimension> > sum_ic(grid,number_of_ghost_cells,false);
     boundary_sum->Fill_Ghost_Cells_Face(grid,sum_jc,sum_ic,time,number_of_ghost_cells);
-    for(int iter=1;iter<=num_iterations;iter++){
+    for(int iter=0;iter<num_iterations;iter++){
         for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> face=iterator.Full_Index();
             if(ghost_box.Lazy_Inside(iterator.Location())) continue;
             if(!inside2(face)) continue; //Don't clamp weights for outside cells
@@ -744,7 +744,7 @@ Update_Advection_Equation_Face_Lookup(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z
 
     ARRAY<T,FACE_INDEX<TV::dimension> > sum_ic(grid,number_of_ghost_cells,false);
     boundary_sum->Fill_Ghost_Cells_Face(grid,sum_jc,sum_ic,time,number_of_ghost_cells);
-    for(int iter=1;iter<=num_iterations;iter++){
+    for(int iter=0;iter<num_iterations;iter++){
         for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> face=iterator.Full_Index();
             RANGE<TV_INT> inside_domain=grid.Domain_Indices();inside_domain.min_corner+=TV_INT::Axis_Vector(face.axis);
             if(Is_Outside(inside_domain,face)) continue;

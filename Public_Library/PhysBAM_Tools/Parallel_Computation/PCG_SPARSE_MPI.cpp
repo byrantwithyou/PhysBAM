@@ -41,24 +41,24 @@ Serial_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,VECTOR
             MPI_UTILITIES::Unpack(partition_array(source+1),A_array(source+1),x_array(source+1),b_array(source+1),buffer,position,comm);}
         // find total sizes and offsets
         int global_rows=0,global_entries=0;
-        for(int p=1;p<=processors;p++){
+        for(int p=0;p<processors;p++){
             partition_array(p).Set_Interior_Offset(global_rows);
             global_rows+=partition_array(p).Interior_Rows();
             global_entries+=partition_array(p).Interior_Entries(A_array(p));}
-        for(int p=1;p<=processors;p++){SPARSE_MATRIX_PARTITION& partition=partition_array(p);
+        for(int p=0;p<processors;p++){SPARSE_MATRIX_PARTITION& partition=partition_array(p);
             for(int s=1;s<=partition.number_of_sides;s++)
                 if(partition.neighbor_ranks(s)!=MPI::PROC_NULL) partition.neighbors(s)=&partition_array(partition.neighbor_ranks(s)+1);}
         // find global offsets
         SPARSE_MATRIX_FLAT_NXN<T> global_A;
         global_A.n=global_rows;global_A.offsets.Resize(global_rows+1);
         {int current_row=1,current_index=1;global_A.offsets(1)=1;
-        for(int p=1;p<=processors;p++) for(int i=partition_array(p).interior_indices.min_corner;i<=partition_array(p).interior_indices.max_corner;i++)
+        for(int p=0;p<processors;p++) for(int i=partition_array(p).interior_indices.min_corner;i<=partition_array(p).interior_indices.max_corner;i++)
             global_A.offsets(++current_row)=current_index+=A_array(p).offsets(i+1)-A_array(p).offsets(i);
         assert(current_row==global_rows+1 && global_A.offsets(current_row)==global_entries+1);}
         // assemble full linear system
         global_A.A.Resize(global_entries);
         VECTOR_ND<T> global_x(global_rows),global_b(global_rows);
-        for(int p=1;p<=processors;p++) for(int i=partition_array(p).interior_indices.min_corner;i<=partition_array(p).interior_indices.max_corner;i++){
+        for(int p=0;p<processors;p++) for(int i=partition_array(p).interior_indices.min_corner;i<=partition_array(p).interior_indices.max_corner;i++){
             int global_i=partition_array(p).Translate_Index(i);
             global_x(global_i)=x_array(p)(i);
             global_b(global_i)=b_array(p)(i);
@@ -71,7 +71,7 @@ Serial_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,VECTOR
         assert(global_A.Symmetric());global_A.Positive_Diagonal_And_Nonnegative_Row_Sum((T)1e-4);
         pcg.Solve(global_A,global_x,global_b,q,s,r,k,z,tolerance);
         // take apart result
-        for(int p=1;p<=processors;p++){
+        for(int p=0;p<processors;p++){
             SPARSE_MATRIX_PARTITION& partition=partition_array(p);
             for(int i=partition.interior_indices.min_corner;i<=partition.interior_indices.max_corner;i++) x_array(p)(i)=global_x(partition.Translate_Interior_Index(i));
             for(int region=1;region<=partition.number_of_sides;region++){
@@ -136,13 +136,13 @@ Parallel_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,cons
 
         // update search direction
         rho_old=rho;rho=Global_Sum(VECTOR_ND<T>::Dot_Product_Double_Precision(z_interior,b_interior));
-        T beta=0;if(iteration==1) p_interior=z_interior;else{beta=(T)(rho/rho_old);for(int i=1;i<=interior_n;i++) p_interior(i)=z_interior(i)+beta*p_interior(i);} // when iteration=1, beta=0
+        T beta=0;if(iteration==1) p_interior=z_interior;else{beta=(T)(rho/rho_old);for(int i=0;i<interior_n;i++) p_interior(i)=z_interior(i)+beta*p_interior(i);} // when iteration=1, beta=0
 
         // update solution and residual
         Fill_Ghost_Cells(p);
         A.Times(p,temp);
         T alpha=(T)(rho/Global_Sum(VECTOR_ND<T>::Dot_Product_Double_Precision(p_interior,temp_interior)));
-        for(int i=1;i<=interior_n;i++){x_interior(i)+=alpha*p_interior(i);b_interior(i)-=alpha*temp_interior(i);}
+        for(int i=0;i<interior_n;i++){x_interior(i)+=alpha*p_interior(i);b_interior(i)-=alpha*temp_interior(i);}
 
         // remove null space component of b before computing residual norm because we might have converged up to the null space but have some null space component left due to roundoff
         if(pcg.enforce_compatibility) b_interior-=(T)(Global_Sum(b_interior.Sum_Double_Precision())/global_n);
@@ -176,7 +176,7 @@ Parallel_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x_local,VECTOR_ND<T>& 
 
     VECTOR_ND<T> temp(global_n,false),z(global_n,false),p_interior,x_interior;
     VECTOR_ND<T> x_global(global_n),p_global(global_n,false);
-    for(int i=1;i<=global_n;i++) x_global(i+proc_column_index_boundaries(my_rank+1).x-1)=x_local(i);
+    for(int i=0;i<global_n;i++) x_global(i+proc_column_index_boundaries(my_rank+1).x-1)=x_local(i);
     p_interior.Set_Subvector_View(p_global,INTERVAL<int>(proc_column_index_boundaries(my_rank+1).x,proc_column_index_boundaries(my_rank+1).y));
     x_interior.Set_Subvector_View(x_global,INTERVAL<int>(proc_column_index_boundaries(my_rank+1).x,proc_column_index_boundaries(my_rank+1).y));
 
@@ -212,13 +212,13 @@ Parallel_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x_local,VECTOR_ND<T>& 
 
         // update search direction
         rho_old=rho;rho=Global_Sum(VECTOR_ND<T>::Dot_Product_Double_Precision(z,b_local));
-        T beta=0;if(iteration==1) p_interior=z;else{beta=(T)(rho/rho_old);for(int i=1;i<=global_n;i++) p_interior(i)=z(i)+beta*p_interior(i);} // when iteration=1, beta=0
+        T beta=0;if(iteration==1) p_interior=z;else{beta=(T)(rho/rho_old);for(int i=0;i<global_n;i++) p_interior(i)=z(i)+beta*p_interior(i);} // when iteration=1, beta=0
 
         // update solution and residual
         Fill_Ghost_Cells_Far(p_global);
         A.Times(p_global,temp);
         T alpha=(T)(rho/Global_Sum(VECTOR_ND<T>::Dot_Product_Double_Precision(p_interior,temp)));
-        for(int i=1;i<=global_n;i++){x_interior(i)+=alpha*p_interior(i);b_local(i)-=alpha*temp(i);}
+        for(int i=0;i<global_n;i++){x_interior(i)+=alpha*p_interior(i);b_local(i)-=alpha*temp(i);}
 
         // remove null space component of b before computing residual norm because we might have converged up to the null space but have some null space component left due to roundoff
         if(pcg.enforce_compatibility) b_local-=(T)(Global_Sum(b_local.Sum_Double_Precision())/global_n);
@@ -234,7 +234,7 @@ Parallel_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x_local,VECTOR_ND<T>& 
     }
 
     // Copy stuff back into x_local
-    for(int i=1;i<=global_n;i++) x_local(i)=x_global(i+proc_column_index_boundaries(my_rank+1).x-1);
+    for(int i=0;i<global_n;i++) x_local(i)=x_global(i+proc_column_index_boundaries(my_rank+1).x-1);
 }
 //#####################################################################
 // Function Initialize_Datatypes

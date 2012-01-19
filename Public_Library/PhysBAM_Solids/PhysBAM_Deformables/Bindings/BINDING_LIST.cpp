@@ -235,7 +235,7 @@ Read(TYPED_ISTREAM& input)
 {
     Clean_Memory();
     int m;Read_Binary(input,m);bindings.Preallocate(m);
-    for(int k=1;k<=m;k++){BINDING<TV>* binding=BINDING<TV>::Create(input,particles);
+    for(int k=0;k<m;k++){BINDING<TV>* binding=BINDING<TV>::Create(input,particles);
         Add_Binding(binding);}
 }
 //#####################################################################

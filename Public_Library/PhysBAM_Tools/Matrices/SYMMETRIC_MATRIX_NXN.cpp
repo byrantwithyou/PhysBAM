@@ -44,7 +44,7 @@ template<class T> SYMMETRIC_MATRIX_NXN<T> SYMMETRIC_MATRIX_NXN<T>::
 Outer_Product(const VECTOR_ND<T>& u)
 {
     SYMMETRIC_MATRIX_NXN<T> result(u.n);
-    for(int i=1;i<=u.n;i++) for(int j=1;j<=i;j++) result(i,j)=u(i)*u(j);
+    for(int i=1;i<=u.n;i++) for(int j=0;j<i;j++) result(i,j)=u(i)*u(j);
     return result;
 }
 //#####################################################################
@@ -54,7 +54,7 @@ template<class T> SYMMETRIC_MATRIX_NXN<T> SYMMETRIC_MATRIX_NXN<T>::
 Sqr() const
 {
     SYMMETRIC_MATRIX_NXN<T> result(n);
-    for(int j=1;j<=n;j++) for(int i=j;i<=n;i++){
+    for(int j=0;j<n;j++) for(int i=j;i<=n;i++){
         for(int k=1;k<j;k++) result(i,j)+=x[((2*n-k)*(k-1)>>1)+i-1]*x[((2*n-k)*(k-1)>>1)+j-1];
         for(int k=j;k<=i;k++) result(i,j)+=x[((2*n-k)*(k-1)>>1)+i-1]*x[((2*n-j)*(j-1)>>1)+k-1];
         for(int k=i+1;k<=n;k++) result(i,j)+=x[((2*n-i)*(i-1)>>1)+k-1]*x[((2*n-j)*(j-1)>>1)+k-1];}
@@ -85,7 +85,7 @@ Jacobi_Solve_Eigenproblem(ARRAY<VECTOR<int,2> >& givens_pairs,ARRAY<VECTOR<T,2> 
     assert(n>=2);
     givens_pairs.Resize(0);
     givens_coefficients.Resize(0);
-    for(int iteration=1;iteration<=max_iterations;iteration++){
+    for(int iteration=0;iteration<max_iterations;iteration++){
         T max_off_diagonal_element=0;
         int i_max=0,j_max=0;
         for(int j=1;j<n;j++) for(int i=j+1;i<=n;i++) if(abs((*this)(i,j))>max_off_diagonal_element){max_off_diagonal_element=abs((*this)(i,j));i_max=i;j_max=j;}
@@ -110,9 +110,9 @@ Maximum_Eigenvalue_Eigenvector_Pair(T& max_eigenvalue,VECTOR_ND<T>& max_eigenvec
     VECTOR_ND<T> last_eigenvector(n);
     T randomization_factor=(T)1,tolerance_squared=sqr(tolerance),tolerance_scaled=tolerance/sqrt((T)n);
     max_eigenvector.Resize(n); // Must provide initial guess if no randomization is used
-    for(int iteration=1;iteration<=max_iterations;iteration++){
+    for(int iteration=0;iteration<max_iterations;iteration++){
         last_eigenvector=max_eigenvector;
-        if(random_numbers) for(int i=1;i<=n;i++) last_eigenvector(i)+=random_numbers->Get_Uniform_Number(-randomization_factor,randomization_factor);
+        if(random_numbers) for(int i=0;i<n;i++) last_eigenvector(i)+=random_numbers->Get_Uniform_Number(-randomization_factor,randomization_factor);
         last_eigenvector/=VECTOR_ND<T>::Dot_Product_Double_Precision(last_eigenvector,last_eigenvector);
         max_eigenvector=(*this)*last_eigenvector;
         max_eigenvalue=VECTOR_ND<T>::Dot_Product_Double_Precision(max_eigenvector,max_eigenvector);
@@ -130,7 +130,7 @@ template<class T> void SYMMETRIC_MATRIX_NXN<T>::
 In_Place_Cholesky_Factorization(MATRIX_MXN<T>& L)
 {
     L=MATRIX_MXN<T>(n);
-    for(int j=1;j<=n;j++){ // for each column
+    for(int j=0;j<n;j++){ // for each column
         for(int k=1;k<=j-1;k++) for(int i=j;i<=n;i++) Element_Lower(i,j)-=L(j,k)*L(i,k); // subtract off the known stuff in previous columns
         L(j,j)=sqrt(Element_Lower(j,j));
         T diagonal_inverse=1/L(j,j);

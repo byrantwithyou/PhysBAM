@@ -197,7 +197,7 @@ Update_Position_Based_State(const T time,const bool is_position_update)
             if(dP_dFe) anisotropic_model->Stress_Derivative(Fe_hat(t),V_local,(*dP_dFe)(t),t);
             De_inverse_hat(t)=strain_measure.Dm_inverse(t)*V_local;if(V) (*V)(t)=V_local;
             if(node_stiffness && edge_stiffness){
-                for(int k=1;k<=TV::m;k++) for(int l=1;l<=d;l++){
+                for(int k=1;k<=TV::m;k++) for(int l=0;l<d;l++){
                     T_MATRIX dDs,dG;dDs(k,l)=(T)1;
                     if(!dPi_dFe && !dP_dFe) // precompute damping matrix
                         dG=U(t)*constitutive_model.P_From_Strain_Rate(Fe_hat(t),U(t).Transpose_Times(dDs)*De_inverse_hat(t),Be_scales(t),t).Times_Transpose(De_inverse_hat(t));
@@ -209,7 +209,7 @@ Update_Position_Based_State(const T time,const bool is_position_update)
                     else
                         dG=U(t)*anisotropic_model->dP_From_dF(U(t).Transpose_Times(dDs)*De_inverse_hat(t),Fe_hat(t),(*V)(t),(*dPi_dFe)(t),Be_scales(t),t)
                             .Times_Transpose(De_inverse_hat(t));
-                    for(int i=1;i<=TV::m;i++) for(int j=1;j<=d;j++) dfdx(l+1,j+1)(k,i)=dG(i,j);}
+                    for(int i=1;i<=TV::m;i++) for(int j=0;j<d;j++) dfdx(l+1,j+1)(k,i)=dG(i,j);}
                 for(int i=2;i<=d+1;i++){dfdx(i,1)=MATRIX<T,TV::m>();for(int j=2;j<=d+1;j++) dfdx(i,1)-=dfdx(i,j);}
                 for(int j=1;j<=d+1;j++){dfdx(1,j)=MATRIX<T,TV::m>();for(int i=2;i<=d+1;i++) dfdx(1,j)-=dfdx(i,j);}
                 VECTOR<int,d+1> nodes=strain_measure.mesh.elements(t);

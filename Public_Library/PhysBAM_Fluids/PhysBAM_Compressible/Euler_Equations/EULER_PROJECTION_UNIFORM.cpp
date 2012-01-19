@@ -233,7 +233,7 @@ Compute_Advected_Pressure(const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const T_FACE_
             for(int i=1;i<=grid_1d.counts.x;i++) colors(i)=euler->psi(cell_index.Insert(i,axis))?0:-1;
             for(int i=1;i<=grid_1d.counts.x+1;i++) psi_N_axis(i)=elliptic_solver->psi_N(axis,cell_index.Insert(i,axis));
             int number_of_regions=find_connected_components.Flood_Fill(colors,psi_N_axis);
-            for(int color=1;color<=number_of_regions;color++){
+            for(int color=0;color<number_of_regions;color++){
                 for(int i=-2;i<=grid_1d.counts.x+3;i++) p_1d(i)=p_ghost(cell_index.Insert(i,axis));
                 region_boundary=find_connected_components.region_boundaries(color);
                 VECTOR<bool,2> psi_N_boundary=VECTOR<bool,2>(psi_N_axis(region_boundary.x),psi_N_axis(region_boundary.y+1));

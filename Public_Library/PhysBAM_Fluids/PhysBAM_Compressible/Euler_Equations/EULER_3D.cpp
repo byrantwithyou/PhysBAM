@@ -41,7 +41,7 @@ CFL()
     
     ARRAY<T,VECTOR<int,3> > u_minus_c(1,m,1,n,1,mn),u_plus_c(1,m,1,n,1,mn),v_minus_c(1,m,1,n,1,mn),
              v_plus_c(1,m,1,n,1,mn),w_minus_c(1,m,1,n,1,mn),w_plus_c(1,m,1,n,1,mn);
-    for(int i=1;i<=m;i++) for(int j=1;j<=n;j++) for(int ij=1;ij<=mn;ij++){
+    for(int i=0;i<m;i++) for(int j=0;j<n;j++) for(int ij=0;ij<mn;ij++){
         if(!psi_pointer || (*psi_pointer)(i,j,ij)==1){
             T u=U(i,j,ij)(2)/U(i,j,ij)(1),v=U(i,j,ij)(3)/U(i,j,ij)(1),
                    w=U(i,j,ij)(4)/U(i,j,ij)(1);

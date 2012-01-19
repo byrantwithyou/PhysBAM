@@ -171,7 +171,7 @@ Reinitialize(const bool force,const bool read_geometry)
         if(has_init_destroy_information) for(int i=1;i<=needs_init.m;i++){
             int id=needs_init(i);PHYSBAM_ASSERT(rigid_geometry_collection->Is_Active(id));
             Create_Geometry(id);}
-        else for(int i=1;i<=max_number_of_bodies;i++){if(rigid_geometry_collection->Is_Active(i)) Create_Geometry(i);} // TODO: can we figure out what bodies need_init
+        else for(int i=0;i<max_number_of_bodies;i++){if(rigid_geometry_collection->Is_Active(i)) Create_Geometry(i);} // TODO: can we figure out what bodies need_init
 
         // Only display real bodies (not ghost bodies)
         if (FILE_UTILITIES::File_Exists(STRING_UTILITIES::string_sprintf("%s/%d/partition",basedir.c_str(),frame))) {

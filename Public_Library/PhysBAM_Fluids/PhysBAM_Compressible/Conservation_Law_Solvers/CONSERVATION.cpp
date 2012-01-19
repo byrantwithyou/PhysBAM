@@ -46,7 +46,7 @@ Alpha(const ARRAY<T,VECTOR<int,1> >& lambda_left,const ARRAY<T,VECTOR<int,1> >& 
 {
     if(field_by_field_alpha) return amplification_factor*maxabs(lambda_left(k),lambda_right(k));
     else{
-        T lambda_max=0;for(int kk=1;kk<=length;kk++) lambda_max=maxabs(lambda_max,lambda_left(kk),lambda_right(kk));
+        T lambda_max=0;for(int kk=0;kk<length;kk++) lambda_max=maxabs(lambda_max,lambda_left(kk),lambda_right(kk));
         return amplification_factor*lambda_max;}
 }
 //#####################################################################
@@ -122,7 +122,7 @@ Compute_Flux_Without_Clamping(const T_GRID& grid,const T_ARRAYS_DIMENSION_SCALAR
                 filled_region_colors(i)=psi_axis(i)?0:-1;}
             for(int i=U_start;i<=U_end+1;i++) psi_N_axis(i)=psi_N(axis,cell_index.Insert(i,axis));
             int number_of_regions=find_connected_components.Flood_Fill(filled_region_colors,psi_N_axis);
-            for(int color=1;color<=number_of_regions;color++){
+            for(int color=0;color<number_of_regions;color++){
                 for(int i=U_ghost_start;i<=U_ghost_end;i++) U_1d_axis(i)=U_ghost(cell_index.Insert(i,axis));
                 if(U_ghost_clamped) for(int i=U_ghost_start;i<=U_ghost_end;i++) U_flux_1d_axis(i)=(*U_ghost_clamped)(cell_index.Insert(i,axis));
                 psi_axis_current_component.Fill(false);
@@ -140,10 +140,10 @@ Compute_Flux_Without_Clamping(const T_GRID& grid,const T_ARRAYS_DIMENSION_SCALAR
                 ARRAY<TV_DIMENSION,VECTOR<int,1> >* U_flux_pointer=U_ghost_clamped?(&U_flux_1d_axis):0;
                 Conservation_Solver(U_end,dx[axis],psi_axis_current_component,U_1d_axis,flux_axis_1d,*eigensystems[axis],*eigensystems_explicit[axis],
                     outflow_boundaries_current_component,U_flux_pointer);}
-            for(int i=U_start;i<=U_end;i++) for(int k=1;k<=d;k++)
+            for(int i=U_start;i<=U_end;i++) for(int k=0;k<d;k++)
                 if(!scale_outgoing_fluxes_to_clamp_variable||(!U_ghost_clamped&&k==clamped_variable_index)||(U_ghost_clamped&&k!=clamped_variable_index))
                     rhs(cell_index.Insert(i,axis))(k)+=flux_axis_1d(i)(k);
-            if(save_fluxes) for(int i=U_start-1;i<=U_end;i++) for(int k=1;k<=d;k++)
+            if(save_fluxes) for(int i=U_start-1;i<=U_end;i++) for(int k=0;k<d;k++)
                 if(!scale_outgoing_fluxes_to_clamp_variable||(!U_ghost_clamped&&k==clamped_variable_index)||(U_ghost_clamped&&k!=clamped_variable_index))
                     fluxes.Component(axis)(cell_index.Insert(i+1,axis))(k)=flux_temp(i)(k);}}
 }

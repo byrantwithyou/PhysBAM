@@ -210,7 +210,7 @@ Update_Simulated_Particles(DEFORMABLES_EXAMPLE_FORCES_AND_VELOCITIES<TV>& exampl
 {
     int particles_number=particles.array_collection->Size();
 
-    ARRAY<bool> particle_is_simulated(particles_number);for(int i=1;i<=particles_number;i++) particle_is_simulated(i)=true;
+    ARRAY<bool> particle_is_simulated(particles_number);for(int i=0;i<particles_number;i++) particle_is_simulated(i)=true;
     particle_is_simulated.Subset(particles.array_collection->deletion_list).Fill(false);
     example_forces_and_velocities.Set_Deformable_Particle_Is_Simulated(particle_is_simulated);
 
@@ -247,9 +247,9 @@ Update_Simulated_Particles(DEFORMABLES_EXAMPLE_FORCES_AND_VELOCITIES<TV>& exampl
         // setup mpi
         mpi_solids->Update(*this,dependency_mesh_force,dependency_mesh_binding);}
     else{
-        for(int p=1;p<=particles_number;p++) if(particle_is_simulated(p)) simulated_particles.Append(p);
+        for(int p=0;p<particles_number;p++) if(particle_is_simulated(p)) simulated_particles.Append(p);
         binding_list.Clear_Hard_Bound_Particles(particle_is_simulated); // Prevent hard bound particles from being added to dynamic_particles
-        for(int p=1;p<=particles_number;p++) if(particle_is_simulated(p)) dynamic_particles.Append(p);}
+        for(int p=0;p<particles_number;p++) if(particle_is_simulated(p)) dynamic_particles.Append(p);}
 
     ARRAY<bool> particle_is_simulated_actual(particles_number);
     INDIRECT_ARRAY<ARRAY<bool>,ARRAY<int>&> simulated_subset=particle_is_simulated_actual.Subset(simulated_particles);

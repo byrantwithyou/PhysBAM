@@ -106,7 +106,7 @@ Fast_Marching_Method_Outside_Band(const T half_band_width,const T time,const T s
     ARRAY<T,VECTOR<int,1> > phi_ghost(grid.Domain_Indices(ghost_cells),false);boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
     FAST_MARCHING_METHOD_UNIFORM<GRID<TV> > fmm(*this,ghost_cells);
     fmm.Fast_Marching_Method(phi_ghost,stopping_distance);
-    for(int i=1;i<=m;i++) if(abs(phi_ghost(i)) > half_band_width) phi(i)=phi_ghost(i);
+    for(int i=0;i<m;i++) if(abs(phi_ghost(i)) > half_band_width) phi(i)=phi_ghost(i);
     boundary->Apply_Boundary_Condition(grid,phi,time);
 }
 //#####################################################################

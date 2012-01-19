@@ -28,7 +28,7 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(const SPHERE<VECTO
     triangles(5).Set(5,1,4);triangles(6).Set(5,3,1);triangles(7).Set(2,3,5);triangles(8).Set(2,5,4);
     surface->mesh.number_nodes=6;
     surface->mesh.Initialize_Neighbor_Nodes();
-    for(int i=1;i<=levels;i++) surface->Root_Three_Subdivide();
+    for(int i=0;i<levels;i++) surface->Root_Three_Subdivide();
     for(int p=1;p<=particles.array_collection->Size();p++) particles.X(p)=sphere.center+sphere.radius*particles.X(p).Normalized();
     return surface;
 }
@@ -66,7 +66,7 @@ template<class T> SEGMENTED_CURVE_2D<T>* Tessellate_Boundary(const SPHERE<VECTOR
     SEGMENTED_CURVE_2D<T>* curve=SEGMENTED_CURVE_2D<T>::Create();
     int n=1<<levels;
     curve->particles.array_collection->Add_Elements(n);
-    for(int i=1;i<=n;i++) curve->particles.X(i)=VECTOR<T,2>((T)cos(i*two_pi/n),(T)sin(i*two_pi/n))*sphere.radius+sphere.center;
+    for(int i=0;i<n;i++) curve->particles.X(i)=VECTOR<T,2>((T)cos(i*two_pi/n),(T)sin(i*two_pi/n))*sphere.radius+sphere.center;
     for(int i=1;i<n;i++) curve->mesh.elements.Append(VECTOR<int,2>(i,i+1));
     curve->mesh.elements.Append(VECTOR<int,2>(n,1));
     curve->Update_Number_Nodes();

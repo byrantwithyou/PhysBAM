@@ -60,8 +60,8 @@ Euler_Step(const T dt,const T time)
             update_flux=true;}
 
         if(update_flux){ 
-            if(i>0) for(int k=1;k<=d;k++) U(i)(k)+=dt*(old_flux(i+1)(k)-new_flux_left(k))*grid.one_over_dX.x; // update cell on left
-            if(i<grid.counts.x) for(int k=1;k<=d;k++) U(i+1)(k)-=dt*(old_flux(i+1)(k)-new_flux_right(k))*grid.one_over_dX.x;} // update cell on right
+            if(i>0) for(int k=0;k<d;k++) U(i)(k)+=dt*(old_flux(i+1)(k)-new_flux_left(k))*grid.one_over_dX.x; // update cell on left
+            if(i<grid.counts.x) for(int k=0;k<d;k++) U(i+1)(k)-=dt*(old_flux(i+1)(k)-new_flux_right(k))*grid.one_over_dX.x;} // update cell on right
 
         // for debugging
         postprocessed_flux(i)(1)=new_flux_left(1);postprocessed_flux(i)(2)=new_flux_left(2);postprocessed_flux(i)(3)=new_flux_right(1);postprocessed_flux(i)(4)=new_flux_right(2);}

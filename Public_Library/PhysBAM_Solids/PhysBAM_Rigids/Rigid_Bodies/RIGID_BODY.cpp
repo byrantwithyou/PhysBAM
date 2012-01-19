@@ -456,7 +456,7 @@ Initialize_From_Tetrahedralized_Volume_And_Triangulated_Surface(TETRAHEDRALIZED_
     triangulated_surface_condensed->mesh.Initialize_Mesh(triangulated_surface.mesh);
     triangulated_surface_condensed->particles.array_collection->Initialize(*triangulated_surface.particles.array_collection); 
     triangulated_surface_condensed->Discard_Valence_Zero_Particles_And_Renumber();
-    for(int i=1;i<=subdivision_loops;i++) triangulated_surface_condensed->Linearly_Subdivide();
+    for(int i=0;i<subdivision_loops;i++) triangulated_surface_condensed->Linearly_Subdivide();
     Add_Structure(*triangulated_surface_condensed);
     if(!create_levelset_test || (*create_levelset_test)(tetrahedralized_volume)){
         LEVELSET_IMPLICIT_OBJECT<TV>* levelset=LEVELSET_IMPLICIT_OBJECT<TV>::Create();

@@ -91,7 +91,7 @@ Reinitialize(bool force,bool read_geometry)
         embedded_surface_objects.Delete_Pointers_And_Clean_Memory();embedded_surface_objects.Resize(m);
         boundary_surface_objects.Delete_Pointers_And_Clean_Memory();boundary_surface_objects.Resize(m);
         hard_bound_boundary_surface_objects.Delete_Pointers_And_Clean_Memory();hard_bound_boundary_surface_objects.Resize(m);
-        for(int i=1;i<=m;i++){
+        for(int i=0;i<m;i++){
             STRUCTURE<TV>* structure=deformable_body_collection.deformable_geometry.structures(i);
             if(EMBEDDED_MATERIAL_SURFACE<TV,2>* embedding=dynamic_cast<EMBEDDED_MATERIAL_SURFACE<TV,2>*>(structure)){
                 if(first_time) LOG::cout<<"object "<<i<<": embedded triangulated surface\n";

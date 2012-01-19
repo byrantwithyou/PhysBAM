@@ -289,7 +289,7 @@ All_Gather_Intersecting_Pairs(HASHTABLE<VECTOR<int,d1> >& intersecting_point_fac
     // gather point face pairs
     {int total_point_face_count=0;
     ARRAY<int> point_face_counts(number_of_ranks,false),point_face_displacements(number_of_ranks,false);
-    for(int k=1;k<=number_of_ranks;k++){
+    for(int k=0;k<number_of_ranks;k++){
         point_face_displacements(k)=total_point_face_count;
         point_face_counts(k)=global_counts(k)[1];
         total_point_face_count+=global_counts(k)[1];}
@@ -304,7 +304,7 @@ All_Gather_Intersecting_Pairs(HASHTABLE<VECTOR<int,d1> >& intersecting_point_fac
     // gather edge edge pairs
     {int total_edge_edge_count=0;
     ARRAY<int> edge_edge_counts(number_of_ranks,false),edge_edge_displacements(number_of_ranks,false);
-    for(int k=1;k<=number_of_ranks;k++){
+    for(int k=0;k<number_of_ranks;k++){
         edge_edge_displacements(k)=total_edge_edge_count;
         edge_edge_counts(k)=global_counts(k)[2];
         total_edge_edge_count+=global_counts(k)[2];}

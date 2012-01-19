@@ -53,7 +53,7 @@ Initialize_Hierarchy_Using_KD_Tree()
 template<class T> void TETRAHEDRON_HIERARCHY<T>::
 Calculate_Bounding_Boxes(ARRAY<RANGE<TV> >& bounding_boxes,ARRAY_VIEW<const TV> X) 
 {
-    for(int k=1;k<=leaves;k++){const VECTOR<int,4>& nodes=tetrahedron_mesh.elements(k);
+    for(int k=0;k<leaves;k++){const VECTOR<int,4>& nodes=tetrahedron_mesh.elements(k);
         bounding_boxes(k)=RANGE<TV>::Bounding_Box(X.Subset(nodes));}
 }
 //#####################################################################
@@ -62,7 +62,7 @@ Calculate_Bounding_Boxes(ARRAY<RANGE<TV> >& bounding_boxes,ARRAY_VIEW<const TV> 
 template<class T> void TETRAHEDRON_HIERARCHY<T>::
 Calculate_Bounding_Boxes(ARRAY<RANGE<TV> >& bounding_boxes,ARRAY_VIEW<const TV> start_X,ARRAY_VIEW<const TV> end_X)
 {
-    for(int k=1;k<=leaves;k++){const VECTOR<int,4>& nodes=tetrahedron_mesh.elements(k);
+    for(int k=0;k<leaves;k++){const VECTOR<int,4>& nodes=tetrahedron_mesh.elements(k);
         bounding_boxes(k)=RANGE<TV>::Combine(RANGE<TV>::Bounding_Box(start_X.Subset(nodes)),RANGE<TV>::Bounding_Box(end_X.Subset(nodes)));}
 }
 //#####################################################################
@@ -71,7 +71,7 @@ Calculate_Bounding_Boxes(ARRAY<RANGE<TV> >& bounding_boxes,ARRAY_VIEW<const TV> 
 template<class T> void TETRAHEDRON_HIERARCHY<T>::
 Calculate_Bounding_Boxes(ARRAY<RANGE<TV> >& bounding_boxes,const FRAME<TV>& start_frame,const FRAME<TV>& end_frame)
 {
-    for(int k=1;k<=leaves;k++){const VECTOR<int,4>& nodes=tetrahedron_mesh.elements(k);
+    for(int k=0;k<leaves;k++){const VECTOR<int,4>& nodes=tetrahedron_mesh.elements(k);
         bounding_boxes(k)=RANGE<TV>::Combine(
             RANGE<TV>::Bounding_Box(start_frame*particles.X(nodes[1]),start_frame*particles.X(nodes[2]),start_frame*particles.X(nodes[3]),start_frame*particles.X(nodes[4])),
             RANGE<TV>::Bounding_Box(end_frame*particles.X(nodes[1]),end_frame*particles.X(nodes[2]),end_frame*particles.X(nodes[3]),end_frame*particles.X(nodes[4])));}
@@ -83,7 +83,7 @@ Calculate_Bounding_Boxes(ARRAY<RANGE<TV> >& bounding_boxes,const FRAME<TV>& star
 template<class T> void TETRAHEDRON_HIERARCHY<T>::
 Calculate_Bounding_Box_Radii(const ARRAY<RANGE<TV> >& bounding_boxes,ARRAY<T>& radius) 
 {
-    for(int k=1;k<=leaves;k++){
+    for(int k=0;k<leaves;k++){
         TV center=bounding_boxes(k).Center();int node1,node2,node3,node4;tetrahedron_mesh.elements(k).Get(node1,node2,node3,node4);
         radius(k)=sqrt(max((particles.X(node1)-center).Magnitude_Squared(),(particles.X(node2)-center).Magnitude_Squared(),(particles.X(node3)-center).Magnitude_Squared(),
             (particles.X(node4)-center).Magnitude_Squared()));}

@@ -28,12 +28,12 @@ SOBOL(const RANGE<TV>& box)
 
     // compute direction numbers
     v.Resize(max_bits);
-    for(int i=1;i<=d;i++){
+    for(int i=0;i<d;i++){
         const int degree=polynomial_degree[i];
         const int polynomial=polynomial_value[i];
         // fill in initial values for m (taken from Numerical Recipes, since according to Bratley and Fox optimal values satisfy complicated conditions
         ARRAY<TI> m(v.m);
-        for(int j=1;j<=degree;j++) m(j)=m_initial[i-1][j-1];
+        for(int j=0;j<degree;j++) m(j)=m_initial[i-1][j-1];
         // fill in rest of m using recurrence
         for(int j=degree+1;j<=v.m;j++){
             m(j)=(m(j-degree)<<degree)^m(j-degree);
@@ -61,7 +61,7 @@ Get_Vector()
     int rightmost_zero_position=1+integer_log_exact(rightmost_bit((int)~n));
     PHYSBAM_ASSERT(rightmost_zero_position<=v.m,"Ran out of bits (this means floating point precision has already been exhausted)");
     const VECTOR<TI,d>& vc=v(rightmost_zero_position);
-    for(int i=1;i<=d;i++) x[i]^=vc[i];
+    for(int i=0;i<d;i++) x[i]^=vc[i];
     n++;
     return offset+scales*TV(x);
 }

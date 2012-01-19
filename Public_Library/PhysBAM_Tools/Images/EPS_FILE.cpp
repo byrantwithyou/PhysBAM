@@ -58,7 +58,7 @@ Bound(const TV& pt)
 template<class T> template<int d> void EPS_FILE<T>::
 Bound(const VECTOR<TV,d>& pts)
 {
-    for(int i=1;i<=d;i++) Bound(pts(i));
+    for(int i=0;i<d;i++) Bound(pts(i));
 }
 //#####################################################################
 // Function Draw_Object_Colored

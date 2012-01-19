@@ -76,7 +76,7 @@ Iterative_Find_Interface(TV left,TV right,const int iterations) const
     T phi_left=Phi(left),phi_right=Phi(right);
     TV interface=LINEAR_INTERPOLATION<T,TV>::Linear(left,right,LEVELSET_UTILITIES<T>::Theta(phi_left,phi_right));
     int phi_left_sign=(phi_left<=0?-1:1),phi_right_sign=(phi_right<=0?-1:1);
-    for(int i=1;i<=iterations;i++){
+    for(int i=0;i<iterations;i++){
         T phi=Phi(interface);
         int phi_sign=(phi<=0?-1:1);
         if(phi_left_sign*phi_sign<0){

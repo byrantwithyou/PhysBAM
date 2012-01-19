@@ -65,14 +65,14 @@ Intersect_With_Rigid_Body(const FRACTURE_REGION<T>& body,const bool use_particle
     int num_colors=flood_fill.Flood_Fill(colors,edge_is_blocked);
     ARRAY<RANGE<TV_INT> > region_counts;
     region_counts.Resize(num_colors);
-    for(int region=1;region<=num_colors;region++) region_counts(region)=RANGE<TV_INT>::Zero_Box().Thickened(-INT_MAX);
+    for(int region=0;region<num_colors;region++) region_counts(region)=RANGE<TV_INT>::Zero_Box().Thickened(-INT_MAX);
     if(num_colors>1)
         for(NODE_ITERATOR iterator(fragment_implicit_object->levelset.grid);iterator.Valid();iterator.Next()){
             int color=colors(iterator.index);
             if(color>0) region_counts(color).Enlarge_To_Include_Point(iterator.index);}
     else region_counts(1)=fragment_implicit_object->levelset.grid.Domain_Indices();
     // for each color, construct the particles and fracture region correctly
-    for(int color=1;color<=num_colors;color++){
+    for(int color=0;color<num_colors;color++){
         LEVELSET_IMPLICIT_OBJECT<TV>* region_implicit_object;
         if(num_colors==1) region_implicit_object=fragment_implicit_object;
         else{

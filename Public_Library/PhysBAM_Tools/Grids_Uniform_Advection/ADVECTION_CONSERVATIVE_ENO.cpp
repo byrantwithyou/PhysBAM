@@ -62,7 +62,7 @@ Advection_Solver(const int m,const T dx,const ARRAY<T2,VECTOR<int,1> >& Z,const 
         T2 flux_right=ENO(dx,DUZ1(i+1)-alpha*DZ1(i+1),-(DUZ2(i+1)-alpha*DZ2(i+1)),-(DUZ2(i)-alpha*DZ2(i)),DUZ3(i+1)-alpha*DZ3(i+1),DUZ3(i)-alpha*DZ3(i),DUZ3(i-1)-alpha*DZ3(i-1));
         flux(i)=(T)(.5*(flux_left+flux_right));}
 
-    for(int i=1;i<=m;i++) u_Zx(i)=(flux(i)-flux(i-1))*one_over_dx;
+    for(int i=0;i<m;i++) u_Zx(i)=(flux(i)-flux(i-1))*one_over_dx;
 }
 //#####################################################################
 template class ADVECTION_CONSERVATIVE_ENO<GRID<VECTOR<float,1> >,float>;

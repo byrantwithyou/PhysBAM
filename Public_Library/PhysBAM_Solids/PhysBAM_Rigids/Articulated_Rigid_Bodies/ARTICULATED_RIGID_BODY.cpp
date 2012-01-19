@@ -394,8 +394,8 @@ Poststabilization_Projection(ARRAY_VIEW<TWIST<TV> > twist,const bool symmetric)
     if(!use_poststab_in_cg || !use_poststab) return;
 
     int iterations=poststabilization_projection_iterations;if(symmetric) iterations=(iterations+1)/2;
-    for(int i=1;i<=iterations;i++) for(JOINT_ID j(1);j<=joint_mesh.Size();j++) if(joint_mesh.Is_Active(j)) Poststabilization_Projection_Joint(j,twist);
-    if(symmetric) for(int i=1;i<=iterations;i++) for(JOINT_ID j=joint_mesh.Size();j>=JOINT_ID(1);j--) if(joint_mesh.Is_Active(j)) Poststabilization_Projection_Joint(j,twist);
+    for(int i=0;i<iterations;i++) for(JOINT_ID j(1);j<=joint_mesh.Size();j++) if(joint_mesh.Is_Active(j)) Poststabilization_Projection_Joint(j,twist);
+    if(symmetric) for(int i=0;i<iterations;i++) for(JOINT_ID j=joint_mesh.Size();j>=JOINT_ID(1);j--) if(joint_mesh.Is_Active(j)) Poststabilization_Projection_Joint(j,twist);
 }
 //####################################################################################
 // Function Poststabilization_Projection_Joint
@@ -482,7 +482,7 @@ Apply_Poststabilization(bool test_system,bool print_matrix,const bool target_pd,
         Apply_Poststabilization_With_CG(0,false,test_system,print_matrix);
         return;}
 
-    for(int k=1;k<=poststabilization_iterations;k++) for(int i=1;i<=joint_mesh.joints.m;i++){JOINT<TV>& joint=*joint_mesh.joints(i);
+    for(int k=0;k<poststabilization_iterations;k++) for(int i=1;i<=joint_mesh.joints.m;i++){JOINT<TV>& joint=*joint_mesh.joints(i);
         if((angular_damping_only && !joint.angular_damping) || (skip_global_post_stabilized_joints && joint.global_post_stabilization)) continue;
         Apply_Poststabilization_To_Joint(joint.id_number,target_pd);}
 }

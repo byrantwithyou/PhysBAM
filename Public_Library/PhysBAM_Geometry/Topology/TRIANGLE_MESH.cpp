@@ -109,7 +109,7 @@ void TRIANGLE_MESH::
 Initialize_Torus_Mesh(const int m,const int n)
 {
     Clean_Memory();number_nodes=m*n;elements.Exact_Resize(2*m*n);assert((n&1)==0);
-    int t=0;for(int i=1;i<=m;i++) for(int j=1;j<=n;j++){ // counterclockwise node ordering
+    int t=0;for(int i=0;i<m;i++) for(int j=0;j<n;j++){ // counterclockwise node ordering
         int i1=i==m?1:i+1,j1=j==n?1:j+1;
         if(j&1){elements(++t).Set(i+m*(j-1),i1+m*(j-1),i+m*(j1-1));elements(++t).Set(i1+m*(j-1),i1+m*(j1-1),i+m*(j1-1));}
         else{elements(++t).Set(i+m*(j-1),i1+m*(j-1),i1+m*(j1-1));elements(++t).Set(i+m*(j-1),i1+m*(j1-1),i+m*(j1-1));}}
@@ -121,7 +121,7 @@ void TRIANGLE_MESH::
 Initialize_Circle_Mesh(const int num_radial,const int num_tangential) // construct a circle
 {
     Clean_Memory();number_nodes=num_radial*num_tangential;elements.Exact_Resize(2*(num_radial-1)*num_tangential);
-    int t=0,n=num_tangential;for(int i=0;i<num_radial-1;i++)for(int j=1;j<=n;j++){ // counterclockwise node ordering
+    int t=0,n=num_tangential;for(int i=0;i<num_radial-1;i++)for(int j=0;j<n;j++){ // counterclockwise node ordering
         if(j&1){elements(++t).Set(i*n+j,i*n+(j%n)+1,(i+1)*n+j);elements(++t).Set((i+1)*n+j,i*n+(j%n)+1,(i+1)*n+(j%n)+1);}
         else{elements(++t).Set(i*n+j,i*n+(j%n)+1,(i+1)*n+j%n+1);elements(++t).Set((i+1)*n+j,i*n+j,(i+1)*n+(j%n)+1);}}
 }
@@ -145,7 +145,7 @@ Initialize_Cylinder_Mesh(const int m,const int n,const bool create_caps)
     Clean_Memory();int t=0;
     if(create_caps){elements.Exact_Resize(2*m*n);number_nodes=m*n+2;}
     else{elements.Exact_Resize(2*(m-1)*n);number_nodes=m*n;}
-    for(int j=1;j<=n;j++){int j_1=j==n?1:j+1;
+    for(int j=0;j<n;j++){int j_1=j==n?1:j+1;
         for(int i=1;i<=m-1;i++){elements(++t).Set(j+(i-1)*n,j+i*n,j_1+i*n);elements(++t).Set(j+(i-1)*n,j_1+i*n,j_1+(i-1)*n);}
         if(create_caps){elements(++t).Set(m*n+1,j,j_1);elements(++t).Set(m*n+2,j_1+(m-1)*n,j+(m-1)*n);}}
 }
@@ -165,7 +165,7 @@ Initialize_Topologically_Sorted_Neighbor_Nodes()
         Add_Ordered_Neighbors(neighbors(j),neighbor_links(j),k,i);
         Add_Ordered_Neighbors(neighbors(k),neighbor_links(k),i,j);}
     topologically_sorted_neighbor_nodes=new ARRAY<ARRAY<int> >(number_nodes);
-    for(int i=1;i<=number_nodes;i++) if(neighbors(i).m){
+    for(int i=0;i<number_nodes;i++) if(neighbors(i).m){
         (*topologically_sorted_neighbor_nodes)(i).Exact_Resize(neighbors(i).m);
         ARRAY<bool> not_first(neighbors(i).m);for(int j=1;j<=neighbors(i).m;j++) if(neighbor_links(i)(j)) not_first(neighbor_links(i)(j))=true;
         int node_index=1;while(node_index <= neighbors(i).m && not_first(node_index)) node_index++; // now find the first node in the linked list
@@ -182,7 +182,7 @@ Initialize_Topologically_Sorted_Incident_Elements()
     delete topologically_sorted_incident_elements;topologically_sorted_incident_elements=new ARRAY<ARRAY<int> >(number_nodes);
     Initialize_Incident_Elements();
     bool topologically_sorted_neighbor_nodes_defined=topologically_sorted_neighbor_nodes!=0;if(!topologically_sorted_neighbor_nodes_defined) Initialize_Topologically_Sorted_Neighbor_Nodes();
-    for(int p=1;p<=number_nodes;p++){
+    for(int p=0;p<number_nodes;p++){
         ARRAY<int>& neighbors=(*topologically_sorted_neighbor_nodes)(p);
         int m=neighbors.m;assert(m>=2);
         int last_triangle=Triangle(p,neighbors(1),neighbors(m));
@@ -200,7 +200,7 @@ Initialize_Segment_Mesh()
     delete segment_mesh;
     bool neighbor_nodes_defined=neighbor_nodes!=0;if(!neighbor_nodes_defined) Initialize_Neighbor_Nodes();
     // number of edges = half the sum of the degree (or a little more if there are loop edges)
-    int total_degree=0;for(int i=1;i<=number_nodes;i++) total_degree+=(*neighbor_nodes)(i).m;
+    int total_degree=0;for(int i=0;i<number_nodes;i++) total_degree+=(*neighbor_nodes)(i).m;
     segment_mesh=new SEGMENT_MESH();
     segment_mesh->number_nodes=number_nodes;
     segment_mesh->elements.Preallocate((total_degree+1)/2); // add one for subtle optimization purposes
@@ -315,7 +315,7 @@ Non_Manifold_Nodes(ARRAY<int>& node_list)
     bool neighbor_nodes_defined=neighbor_nodes!=0;if(!neighbor_nodes) Initialize_Neighbor_Nodes();
     node_list.Remove_All();
 
-    for(int i=1;i<=number_nodes;i++){
+    for(int i=0;i<number_nodes;i++){
         if((*neighbor_nodes)(i).m != (*incident_elements)(i).m) node_list.Append(i);
         else if((*neighbor_nodes)(i).m > 0){
             ARRAY<int> ordered_neighbors;ordered_neighbors.Preallocate((*neighbor_nodes)(i).m);

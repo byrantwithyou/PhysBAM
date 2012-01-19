@@ -209,7 +209,7 @@ Advect_With_Vorticity(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T t
         face_normal_vectors(full_index)=(T)((vortex_normal_vector(iterator.First_Cell_Index())(axis)+vortex_normal_vector(iterator.Second_Cell_Index())(axis))/2.);}
 
     //Advect energy using vorticity vectors
-    for(int i=1;i<=iterations;i++){
+    for(int i=0;i<iterations;i++){
         boundary->Set_Fixed_Boundary(true,0);
         ARRAY<T,FACE_INDEX<TV::dimension> > kinetic_energy_ghost(grid,7),face_normals_ghost(grid,4);
         boundary->Fill_Ghost_Cells_Face(grid,kinetic_energy,kinetic_energy_ghost,time,7);

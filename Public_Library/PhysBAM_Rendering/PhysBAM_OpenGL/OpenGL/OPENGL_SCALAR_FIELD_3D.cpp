@@ -372,8 +372,8 @@ void Update_Slice_Helper(OPENGL_SCALAR_FIELD_3D<T,bool>* self,int tex_width,int 
 
     OPENGL_COLOR* bitmap=new OPENGL_COLOR[tex_width*tex_height];
     OPENGL_COLOR_MAP<bool>* color_map=self->color_maps(self->current_color_map);
-    for(int i=1;i<=tex_width;i++)
-        for(int j=1;j<=tex_height;j++){
+    for(int i=0;i<tex_width;i++)
+        for(int j=0;j<tex_height;j++){
             bool value=bool();
             switch (slice->axis){
                 case 1: value=self->values(slice->index,domain_start.y+j-1,domain_start.z+tex_width-i);break;
@@ -399,8 +399,8 @@ void Update_Slice_Helper(OPENGL_SCALAR_FIELD_3D<T,int>* self,int tex_width,int t
 
     OPENGL_COLOR* bitmap=new OPENGL_COLOR[tex_width*tex_height];
     OPENGL_COLOR_MAP<int>* color_map=self->color_maps(self->current_color_map);
-    for(int i=1;i<=tex_width;i++)
-        for(int j=1;j<=tex_height;j++){
+    for(int i=0;i<tex_width;i++)
+        for(int j=0;j<tex_height;j++){
             int value=int();
             switch (slice->axis){
                 case 1: value=self->values(slice->index,domain_start.y+j-1,domain_start.z+tex_width-i);break;
@@ -432,8 +432,8 @@ void Update_Slice_Helper(OPENGL_SCALAR_FIELD_3D<T,T2>* self,int tex_width,int te
     OPENGL_COLOR_MAP<T2>* color_map=self->color_maps(self->current_color_map);
 
     LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,T2> interpolation;
-    for(int i=1;i<=tex_width;i++)
-        for(int j=1;j<=tex_height;j++){
+    for(int i=0;i<tex_width;i++)
+        for(int j=0;j<tex_height;j++){
             T2 value=T2();
             TV location;
             switch (slice->axis){

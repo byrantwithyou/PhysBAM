@@ -199,7 +199,7 @@ Delete_Particles_From_Deletion_List(ARRAY<PAIR<PARTICLE_LEVELSET_PARTICLES<TV>*,
                 while(particles_link->next){parent_particles=particles_link;particles_link=particles_link->next;}}}
         deletion_particles=&particles;level--;
         if(level<0){assert(deletion_list.m==0);return;}
-        for(int i=1;i<=level;i++){deletion_particles=deletion_particles->next;}}
+        for(int i=0;i<level;i++){deletion_particles=deletion_particles->next;}}
 }
 //#####################################################################
 // Function Delete_Particle

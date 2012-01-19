@@ -219,7 +219,7 @@ Make_Incompressible(const T dt,const bool correct_volume)
             VECTOR<int,d>& element=boundary_mesh.elements(t);
             INDIRECT_ARRAY<ARRAY<T>,VECTOR<int,d>&> boundary_pressures_subset=boundary_pressures.Subset(element);
             T p_sum=boundary_pressures_subset.Sum();
-            for(int i=1;i<=d;i++) gradient_full(element[i])-=(p_sum+boundary_pressures(element[i]))*boundary_normals(t);}
+            for(int i=0;i<d;i++) gradient_full(element[i])-=(p_sum+boundary_pressures(element[i]))*boundary_normals(t);}
         for(ELEMENT_ITERATOR iterator(force_dynamic_particles);iterator.Valid();iterator.Next()){int p=iterator.Data();
             particles.V(p)+=particles.one_over_mass(p)*gradient_full(p);}}
 
@@ -403,7 +403,7 @@ Project_Vector_Field(ARRAY_VIEW<TV> field) const
     Project_All_Isolated_Clamping_Constraints(field,projection_data);
     Project_All_Clamping_Constraints(field,projection_data);
     if(repulsions && use_self_moving_projection && d==3 && (projection_data.point_face_pairs.m || projection_data.edge_edge_pairs.m))
-        for(int i=1;i<=self_collision_subcycles;i++){
+        for(int i=0;i<self_collision_subcycles;i++){
             TRIANGLE_REPULSIONS<TV>::Project_All_Moving_Constraints(projection_data.point_face_precomputed,projection_data.edge_edge_precomputed,field);
             Project_All_Clamping_Constraints(field,projection_data);}
 }

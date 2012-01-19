@@ -41,7 +41,7 @@ MPI_SOLID_FLUID_SLIP()
 
     group=new MPI::Group(comm->Get_group());
     solid_ranks.Resize(number_of_solid_processes);
-    for(int i=1;i<=number_of_solid_processes;i++)solid_ranks(i)=i-1;
+    for(int i=0;i<number_of_solid_processes;i++)solid_ranks(i)=i-1;
     solid_group=new MPI::Group(group->Incl(solid_ranks.n,&solid_ranks(1)));
     fluid_ranks.Resize(number_of_processes-number_of_solid_processes);
     for(int i=1;i<=fluid_ranks.n;i++)fluid_ranks(i)=i+number_of_solid_processes-1;

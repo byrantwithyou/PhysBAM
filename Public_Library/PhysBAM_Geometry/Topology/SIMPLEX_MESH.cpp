@@ -86,7 +86,7 @@ Simplex(const VECTOR<int,d+1>& nodes) const
     assert(incident_elements);
     // find shortest list of elements
     int short_list=nodes[1];VECTOR<int,d> check=nodes.Remove_Index(1);
-    for(int i=1;i<=d;i++)if((*incident_elements)(check[i]).m < (*incident_elements)(short_list).m) exchange(short_list,check[i]);
+    for(int i=0;i<d;i++)if((*incident_elements)(check[i]).m < (*incident_elements)(short_list).m) exchange(short_list,check[i]);
     // search short list for other nodes
     for(int k=1;k<=(*incident_elements)(short_list).m;k++){int t=(*incident_elements)(short_list)(k);
         if(Nodes_In_Simplex(check,t)) return t;}
@@ -102,7 +102,7 @@ Initialize_Neighbor_Nodes()
     for(int t=1;t<=elements.m;t++){VECTOR<int,d+1>& element=elements(t);
         for(int i=1;i<=element.m;i++)for(int j=1;j<=element.m;j++)if(i!=j)
             (*neighbor_nodes)(element[i]).Append_Unique(element[j]);}
-    for(int p=1;p<=number_nodes;p++) (*neighbor_nodes)(p).Compact(); // remove extra space
+    for(int p=0;p<number_nodes;p++) (*neighbor_nodes)(p).Compact(); // remove extra space
 }
 //#####################################################################
 // Function Initialize_Incident_Elements
@@ -113,7 +113,7 @@ Initialize_Incident_Elements()
     delete incident_elements;incident_elements=new ARRAY<ARRAY<int> >(number_nodes);
     for(int t=1;t<=elements.m;t++){VECTOR<int,d+1>& element=elements(t); // for each element, put it on each of its nodes' lists of simplices
         for(int i=1;i<=element.m;i++) (*incident_elements)(element[i]).Append(t);}
-    for(int p=1;p<=number_nodes;p++) (*incident_elements)(p).Compact(); // remove extra space
+    for(int p=0;p<number_nodes;p++) (*incident_elements)(p).Compact(); // remove extra space
 }
 //#####################################################################
 // Function Initialize_Adjacent_Elements
@@ -229,7 +229,7 @@ Number_Of_Nodes_With_Minimum_Valence()
 {
     bool neighbor_nodes_defined=neighbor_nodes!=0;if(!neighbor_nodes_defined) Initialize_Neighbor_Nodes();
     int number_of_nodes_with_minimum_valence=0,minimum=Minimum_Valence();
-    for(int t=1;t<=number_nodes;t++) if(minimum == (*neighbor_nodes)(t).m) number_of_nodes_with_minimum_valence++;
+    for(int t=0;t<number_nodes;t++) if(minimum == (*neighbor_nodes)(t).m) number_of_nodes_with_minimum_valence++;
     if(!neighbor_nodes_defined){delete neighbor_nodes;neighbor_nodes=0;}
     return number_of_nodes_with_minimum_valence;
 }
@@ -241,7 +241,7 @@ Minimum_Valence(int* index)
 {
     bool neighbor_nodes_defined=neighbor_nodes!=0;if(!neighbor_nodes_defined) Initialize_Neighbor_Nodes();
     int minimum=INT_MAX,minimum_index=0;
-    for(int p=1;p<=number_nodes;p++)if((*neighbor_nodes)(p).m && (*neighbor_nodes)(p).m < minimum){
+    for(int p=0;p<number_nodes;p++)if((*neighbor_nodes)(p).m && (*neighbor_nodes)(p).m < minimum){
         minimum=(*neighbor_nodes)(p).m;minimum_index=p;}
     if(index) *index=minimum_index;
     if(!neighbor_nodes_defined){delete neighbor_nodes;neighbor_nodes=0;}
@@ -255,7 +255,7 @@ Maximum_Valence(int* index)
 {
     bool neighbor_nodes_defined=neighbor_nodes!=0;if(!neighbor_nodes_defined) Initialize_Neighbor_Nodes();
     int maximum=0,maximum_index=0;
-    for(int p=1;p<=number_nodes;p++)if((*neighbor_nodes)(p).m > maximum){
+    for(int p=0;p<number_nodes;p++)if((*neighbor_nodes)(p).m > maximum){
         maximum=(*neighbor_nodes)(p).m;maximum_index=p;}
     if(index) *index=maximum_index;
     if(!neighbor_nodes_defined){delete neighbor_nodes;neighbor_nodes=0;}
@@ -320,7 +320,7 @@ Set_Number_Nodes(const int number_nodes_input)
 template<int d> void SIMPLEX_MESH<d>::
 Add_Dependencies(SEGMENT_MESH& dependency_mesh) const
 {
-    for(int t=1;t<=elements.m;t++) for(int i=1;i<=d;i++) for(int j=i+1;j<=d+1;j++) dependency_mesh.Add_Element_If_Not_Already_There(VECTOR<int,2>(elements(t)[i],elements(t)[j]));
+    for(int t=1;t<=elements.m;t++) for(int i=0;i<d;i++) for(int j=i+1;j<=d+1;j++) dependency_mesh.Add_Element_If_Not_Already_There(VECTOR<int,2>(elements(t)[i],elements(t)[j]));
 }
 //#####################################################################
 // Function Mark_Nodes_Referenced

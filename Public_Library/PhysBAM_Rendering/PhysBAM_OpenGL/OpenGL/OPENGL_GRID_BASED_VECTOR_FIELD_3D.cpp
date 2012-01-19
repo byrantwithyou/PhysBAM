@@ -56,13 +56,13 @@ Update()
         if(count>max_vectors_3d){
             int inc=max(1,(int)ceil(pow((T)count/max_vectors_3d,(T)one_third)));
             m/=inc;n/=inc;mn/=inc;
-            for(int i=1;i<=m;i++)for(int j=1;j<=n;j++)for(int ij=1;ij<=mn;ij++){
+            for(int i=0;i<m;i++)for(int j=0;j<n;j++)for(int ij=0;ij<mn;ij++){
                 VECTOR<int,3> grid_index(i*inc,j*inc,ij*inc);
                 if(V(grid_index)!=VECTOR<T,3>()){
                     index++;if(index>num_vectors)break;
                     vector_field(index)=V(grid_index);
                     vector_locations(index)=grid.X(grid_index);}}}
-        else for(int i=1;i<=m;i++)for(int j=1;j<=n;j++)for(int ij=1;ij<=mn;ij++)if(V(i,j,ij)!=VECTOR<T,3>()){
+        else for(int i=0;i<m;i++)for(int j=0;j<n;j++)for(int ij=0;ij<mn;ij++)if(V(i,j,ij)!=VECTOR<T,3>()){
             vector_field(++index)=V(i,j,ij);vector_locations(index)=grid.X(i,j,ij);}}
     else{
         VECTOR<int,3> domain_start(V.domain.min_corner.x,V.domain.min_corner.y,V.domain.min_corner.z),domain_end(V.domain.max_corner.x,V.domain.max_corner.y,V.domain.max_corner.z);

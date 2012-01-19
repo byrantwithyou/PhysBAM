@@ -1073,7 +1073,7 @@ Find_Material_Regions()
                     // find polygon with sharpest angle
                     ARRAY<int> polygons_on_this_edge;T min_value_found=(T)1e2;int best_polygon_so_far=-1;
                     int number_of_incident_polygons=polygon_mesh.Elements_On_Oriented_Edge(node_1,node_2,&polygons_on_this_edge);assert(number_of_incident_polygons>0);
-                    for(int k=1;k<=number_of_incident_polygons;k++){int candidate_polygon_element_index=polygons_on_this_edge(k);int candidate_cutting_polygon_index;
+                    for(int k=0;k<number_of_incident_polygons;k++){int candidate_polygon_element_index=polygons_on_this_edge(k);int candidate_cutting_polygon_index;
                         T angle=0;bool found=polygon_element_to_cutting_polygon.Get(candidate_polygon_element_index,candidate_cutting_polygon_index);if(!found) continue;
                         if(polygon_element_index==polygon_mesh.Opposite_Oriented_Element(candidate_polygon_element_index)){angle=99.;}
                         else{

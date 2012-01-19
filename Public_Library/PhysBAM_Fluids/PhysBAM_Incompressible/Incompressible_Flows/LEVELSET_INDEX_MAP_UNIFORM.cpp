@@ -42,7 +42,7 @@ Compute(int axis,VECTOR<bool,d> periodic_boundary_input)
         if(b && !(periodic_boundary[index.axis] && index.index[index.axis]==1))
             face_to_index(index)=index_to_face.Append(index);}
 
-    for(int a=1;a<=d;a++) if(periodic_boundary[a])
+    for(int a=0;a<d;a++) if(periodic_boundary[a])
         for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,0,GRID<TV>::BOUNDARY_REGION,2*a,a);it.Valid();it.Next()){
             FACE_INDEX<d> index=it.Full_Index();
             FACE_INDEX<d> matching_index(index);matching_index.index(a)=1;
@@ -64,7 +64,7 @@ template<class TV> void LEVELSET_INDEX_MAP_UNIFORM<TV>::
 Scatter(const VECTOR_ND<T>& u,ARRAY<T,FACE_INDEX<d> >& v) const
 {
     for(int i=1;i<=index_to_face.m;i++) v(index_to_face(i))=u(i);
-    for(int a=1;a<=d;a++) if(periodic_boundary[a])
+    for(int a=0;a<d;a++) if(periodic_boundary[a])
         for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,0,GRID<TV>::BOUNDARY_REGION,2*a,a);it.Valid();it.Next()){
             FACE_INDEX<d> index=it.Full_Index();
             FACE_INDEX<d> matching_index(index);matching_index.index(a)=1;

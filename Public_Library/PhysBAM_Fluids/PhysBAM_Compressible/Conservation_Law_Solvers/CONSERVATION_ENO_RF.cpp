@@ -53,7 +53,7 @@ Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1>
             // transfer the divided differences into the characteristic fields
             for(j=1;j<=eno_order;j++) for(int ii=i+1-j;ii<=i+1;ii++) if(ii >= -2 && ii <= m+4-j) for(k=1;k<=d;k++){
                 LDU(k,ii)(j)=LDF(k,ii)(j)=0;
-                for(int kk=1;kk<=d;kk++){LDU(k,ii)(j)+=L(k,kk)*DU(kk,ii)(j);LDF(k,ii)(j)+=L(k,kk)*DF(kk,ii)(j);}}
+                for(int kk=0;kk<d;kk++){LDU(k,ii)(j)+=L(k,kk)*DU(kk,ii)(j);LDF(k,ii)(j)+=L(k,kk)*DF(kk,ii)(j);}}
             Dstate_ptr=&LDU;Dflux_ptr=&LDF;}
         else{Dstate_ptr=&DU;Dflux_ptr=&DF;}
         ARRAY<VECTOR<T,eno_order> ,VECTOR<int,2> > &Dstate=*Dstate_ptr,&Dflux=*Dflux_ptr;
@@ -68,7 +68,7 @@ Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1>
                 T flux_left=Dflux(k,i)(1)+alpha*Dstate(k,i)(1);
                 T flux_right=Dflux(k,i+1)(1)-alpha*Dstate(k,i+1)(1);
                 flux_total=(T).5*(flux_left+flux_right);}
-            if(!eigensystem.All_Eigenvalues_Same()) for(int kk=1;kk<=d;kk++) flux(i)(kk)+=flux_total*R(k,kk);
+            if(!eigensystem.All_Eigenvalues_Same()) for(int kk=0;kk<d;kk++) flux(i)(kk)+=flux_total*R(k,kk);
             else flux(i)(k)=flux_total;}
         else if(eno_order == 2) for(k=1;k<=d;k++){ 
             if(lambda_left(k)*lambda_right(k) > 0)
@@ -79,7 +79,7 @@ Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1>
                 T flux_left=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,Dflux(k,i)(1)+alpha*Dstate(k,i)(1),Dflux(k,i-1)(2)+alpha*Dstate(k,i-1)(2),Dflux(k,i)(2)+alpha*Dstate(k,i)(2));
                 T flux_right=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,Dflux(k,i+1)(1)-alpha*Dstate(k,i+1)(1),-(Dflux(k,i+1)(2)-alpha*Dstate(k,i+1)(2)),-(Dflux(k,i)(2)-alpha*Dstate(k,i)(2)));
                 flux_total=(T).5*(flux_left+flux_right);}
-            if(!eigensystem.All_Eigenvalues_Same()) for(int kk=1;kk<=d;kk++) flux(i)(kk)+=flux_total*R(k,kk);
+            if(!eigensystem.All_Eigenvalues_Same()) for(int kk=0;kk<d;kk++) flux(i)(kk)+=flux_total*R(k,kk);
             else flux(i)(k)=flux_total;}
         else if(eno_order == 3) for(k=1;k<=d;k++){
             if(lambda_left(k)*lambda_right(k) > 0)
@@ -92,7 +92,7 @@ Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1>
                 T flux_right=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,Dflux(k,i+1)(1)-alpha*Dstate(k,i+1)(1),-(Dflux(k,i+1)(2)-alpha*Dstate(k,i+1)(2)),-(Dflux(k,i)(2)-alpha*Dstate(k,i)(2)),
                     Dflux(k,i+1)(3)-alpha*Dstate(k,i+1)(3),Dflux(k,i)(3)-alpha*Dstate(k,i)(3),Dflux(k,i-1)(3)-alpha*Dstate(k,i-1)(3));
                 flux_total=(T).5*(flux_left+flux_right);}
-            if(!eigensystem.All_Eigenvalues_Same()) for(int kk=1;kk<=d;kk++) flux(i)(kk)+=flux_total*R(k,kk);
+            if(!eigensystem.All_Eigenvalues_Same()) for(int kk=0;kk<d;kk++) flux(i)(kk)+=flux_total*R(k,kk);
             else flux(i)(k)=flux_total;}}
 
     // difference the fluxes

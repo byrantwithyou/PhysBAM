@@ -92,15 +92,15 @@ Post_Stabilization_With_Actuation(const JOINT_ID joint_id)
             int active_muscles=muscles_crossing_joints(joint_mesh.Joint_Index_From_Id(joint_id)).m;
             // Create A and b
             MATRIX_MXN<T> A(1,active_muscles);
-            for(int i=1;i<=active_muscles;i++){const T& moment_arm=muscles_crossing_joints(joint_mesh.Joint_Index_From_Id(joint_id))(i).y;A(1,i)=moment_arm;}
+            for(int i=0;i<active_muscles;i++){const T& moment_arm=muscles_crossing_joints(joint_mesh.Joint_Index_From_Id(joint_id))(i).y;A(1,i)=moment_arm;}
             VECTOR_ND<T> b(1);b.Set_Subvector(1,angular_impulse);
             // Solve least squares assuming all muscles are active
             MATRIX_MXN<T> A_transpose_A=A.Normal_Equations_Matrix();
             // assume all relative weights are 1
-            for(int i=1;i<=active_muscles;i++) A_transpose_A(i,i)+=min_activation_penalty;
+            for(int i=0;i<active_muscles;i++) A_transpose_A(i,i)+=min_activation_penalty;
             VECTOR_ND<T> A_transpose_b=A.Transpose_Times(b);
             VECTOR_ND<T> impulse_magnitudes=A_transpose_A.Cholesky_Solve(A_transpose_b);
-            for(int i=1;i<=active_muscles;i++){int muscle_index=muscles_crossing_joints(joint_mesh.Joint_Index_From_Id(joint_id))(i).x;
+            for(int i=0;i<active_muscles;i++){int muscle_index=muscles_crossing_joints(joint_mesh.Joint_Index_From_Id(joint_id))(i).x;
                 LOG::cout<<"muscle "<<i<<" impulse "<<impulse_magnitudes(i)<<std::endl;
                 muscle_list->muscles(muscle_index)->Apply_Fixed_Impulse_At_All_Points(impulse_magnitudes(i));
                 muscle_activations(muscle_index)+=impulse_magnitudes(i);}}}
@@ -115,7 +115,7 @@ Solve_Velocities_for_PD(const T time,const T dt,bool test_system,bool print_matr
 {
     // don't do extra actuation iterations if not using actuators
     if(!use_pd_actuators && !use_muscle_actuators){Apply_Poststabilization(test_system,print_matrix);return;}
-    for(int iteration=1;iteration<=actuation_iterations;iteration++) for(int k=1;k<=poststabilization_iterations;k++)
+    for(int iteration=0;iteration<actuation_iterations;iteration++) for(int k=0;k<poststabilization_iterations;k++)
         for(int i=1;i<=joint_mesh.joints.m;i++) Post_Stabilization_With_Actuation(joint_mesh.joints(i)->id_number);
 }
 //####################################################################################

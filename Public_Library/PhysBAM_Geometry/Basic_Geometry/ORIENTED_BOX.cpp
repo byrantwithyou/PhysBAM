@@ -22,8 +22,8 @@ template<class T,class T_BOX> static bool Intersection_Helper(const ORIENTED_BOX
 template<class TV> bool ORIENTED_BOX<TV>::
 Intersection(const ORIENTED_BOX& box) const
 {
-    for(int i=1;i<=d;i++) if(Separating_Test(box,edges.Column(i)) || Separating_Test(box,box.edges.Column(i))) return false;
-    for(int i=1;i<=d;i++) for(int j=1;j<=d;j++) if(Intersection_Helper(*this,box,edges.Column(i),box.edges.Column(j))) return false;
+    for(int i=0;i<d;i++) if(Separating_Test(box,edges.Column(i)) || Separating_Test(box,box.edges.Column(i))) return false;
+    for(int i=0;i<d;i++) for(int j=0;j<d;j++) if(Intersection_Helper(*this,box,edges.Column(i),box.edges.Column(j))) return false;
     return true; // otherwise
 }
 //#####################################################################
@@ -32,14 +32,14 @@ Intersection(const ORIENTED_BOX& box) const
 template<class TV> bool ORIENTED_BOX<TV>::
 Intersection(const RANGE<TV>& box) const
 {
-    for(int j=1;j<=d;j++){
+    for(int j=0;j<d;j++){
         T line_min=corner(j),line_max=corner(j);
-        for(int i=1;i<=d;i++) if(edges.Column(i)(j)>0) line_max+=edges.Column(i)(j);else line_min+=edges.Column(i)(j);
+        for(int i=0;i<d;i++) if(edges.Column(i)(j)>0) line_max+=edges.Column(i)(j);else line_min+=edges.Column(i)(j);
         if(line_max<box.min_corner(j) || line_min>box.max_corner(j)) return false;}
-    for(int i=1;i<=d;i++) if(Separating_Test(box,edges.Column(i))) return false;
-    if(d==3) for(int j=1;j<=d;j++){
+    for(int i=0;i<d;i++) if(Separating_Test(box,edges.Column(i))) return false;
+    if(d==3) for(int j=0;j<d;j++){
         TV box_edge;box_edge(j)=box.max_corner(j)-box.min_corner(j);
-        for(int i=1;i<=d;i++) if(Intersection_Helper(*this,box,edges.Column(i),box_edge)) return false;}
+        for(int i=0;i<d;i++) if(Intersection_Helper(*this,box,edges.Column(i),box_edge)) return false;}
     return true; // otherwise
 }
 //#####################################################################
@@ -70,7 +70,7 @@ Project_Points_Onto_Line(const TV& direction,T& line_min,T& line_max) const
 {
     line_min=line_max=TV::Dot_Product(direction,corner);
     TV e=edges.Transpose_Times(direction);
-    for(int i=1;i<=d;i++) if(e(i)>0) line_max+=e(i);else line_min+=e(i);
+    for(int i=0;i<d;i++) if(e(i)>0) line_max+=e(i);else line_min+=e(i);
 }
 //#####################################################################
 // Function Signed_Distance
@@ -94,7 +94,7 @@ Normal(const TV& X) const
     if(lengths.Contains(0)) PHYSBAM_NOT_IMPLEMENTED();
     TV DX=edges.Transpose_Times(X-Center()),DX_clamp=DX;
     bool outside=false;
-    for(int i=1;i<=d;i++){
+    for(int i=0;i<d;i++){
         if(abs(DX[i])>=(T).5*lengths[i]) outside=true;
         else DX_clamp[i]=0;}
     if(outside)

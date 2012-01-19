@@ -103,16 +103,16 @@ public:
     {return 1;}
 
     const T& operator[](const int i) const
-    {assert(i==1);return x;}
+    {assert(i==0);return x;}
 
     T& operator[](const int i)
-    {assert(i==1);return x;}
+    {assert(i==0);return x;}
 
     const T& operator()(const int i) const
-    {assert(i==1);return x;}
+    {assert(i==0);return x;}
 
     T& operator()(const int i)
-    {assert(i==1);return x;}
+    {assert(i==0);return x;}
 
     bool operator==(const VECTOR& v) const
     {return x==v.x;}

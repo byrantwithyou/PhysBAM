@@ -58,7 +58,7 @@ Construct_Indices(const int ghost_cells)
     real_cell_indices_reverse_map.Resize(indexed_cells.m);
     real_cell_indices_reverse_map.Fill(-1);
     for(int i=1;i<=real_cell_indices.m;++i) real_cell_indices_reverse_map(real_cell_indices(i))=i;
-    for(int axis=1;axis<=d;axis++){
+    for(int axis=0;axis<d;axis++){
         if(boundary_condition_collection.periodic_boundary[axis]){
             for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,1,GRID<TV>::GHOST_REGION,2*axis);iterator.Valid();iterator.Next()){
                 TV_INT cell_index=iterator.Cell_Index();
@@ -110,7 +110,7 @@ Register_Cell_Index(const TV_INT& index,const int ghost_cells)
 
         if(outside){
             // TODO: handle ghost cells for periodic boundaries
-            for(int axis=1;axis<=d;axis++)
+            for(int axis=0;axis<d;axis++)
                 if(boundary_condition_collection.periodic_boundary[axis] && (index(axis)<1 || index(axis)>grid.counts(axis)))
                     return;}
         else{cell_index=indexed_cells.Append(index);

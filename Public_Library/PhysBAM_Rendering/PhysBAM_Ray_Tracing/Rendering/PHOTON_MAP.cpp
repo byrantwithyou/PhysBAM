@@ -107,7 +107,7 @@ Irradiance_Estimate(const TV& location,const TV& normal,const T max_distance_squ
     if(ray.debug_ray) ray.debug_ray->Add_Comment(STRING_UTILITIES::string_sprintf("Actual Max Distance Squared %f",actual_max_distance_squared));
     //const T alpha=0.918,beta=1.953;
     T one_over_k=T(1)/T(1.1);
-    for(int i=1;i<=found_samples;i++){
+    for(int i=0;i<found_samples;i++){
         PHOTON<T>& photon=*nearby_photons(i);
         //T filter_weight=alpha*(1-(1-exp(-beta*photon_squared_distances(i)/(2*actual_max_distance_squared)))/(1-exp(-beta)));
         T filter_weight=1-sqrt(photon_squared_distances(i))*one_over_max_distance*one_over_k;
@@ -237,7 +237,7 @@ Print_Photon_Tree(const int depth,const int index)
 {
     if(index>photons.m)return;
     if(index==1)LOG::cout<<"PHOTON TREE"<<std::endl;
-    for(int i=1;i<=depth;i++)LOG::cout<<" ";
+    for(int i=0;i<depth;i++)LOG::cout<<" ";
     LOG::cout<<"Photon "<<photons(index).location<<" Split on "<<photons(index).kdtree_split_axis<<std::endl;
     Print_Photon_Tree(depth+5,index*2);
     Print_Photon_Tree(depth+5,index*2+1);

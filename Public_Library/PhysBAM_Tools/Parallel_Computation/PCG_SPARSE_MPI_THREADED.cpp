@@ -82,13 +82,13 @@ Solve(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<IN
 
         // update search direction
         rho_old=rho;rho=Global_Sum(VECTOR_ND<T>::Dot_Product_Double_Precision(z_interior,b_interior),tid);
-        T beta=0;if(iteration==1) p_interior=z_interior;else{beta=(T)(rho/rho_old);for(int i=1;i<=interior_n;i++) p_interior(i)=z_interior(i)+beta*p_interior(i);} // when iteration=1, beta=0
+        T beta=0;if(iteration==1) p_interior=z_interior;else{beta=(T)(rho/rho_old);for(int i=0;i<interior_n;i++) p_interior(i)=z_interior(i)+beta*p_interior(i);} // when iteration=1, beta=0
 
         // update solution and residual
         Fill_Ghost_Cells(p);
         A.Times(interior_indices,ghost_indices,p,temp);
         T alpha=(T)(rho/Global_Sum(VECTOR_ND<T>::Dot_Product_Double_Precision(p_interior,temp_interior),tid));
-        for(int i=1;i<=interior_n;i++){x_interior(i)+=alpha*p_interior(i);b_interior(i)-=alpha*temp_interior(i);}
+        for(int i=0;i<interior_n;i++){x_interior(i)+=alpha*p_interior(i);b_interior(i)-=alpha*temp_interior(i);}
 
         // remove null space component of b before computing residual norm because we might have converged up to the null space but have some null space component left due to roundoff
         if(pcg.enforce_compatibility) b_interior-=(T)(Global_Sum(b_interior.Sum_Double_Precision(),tid)/global_n);

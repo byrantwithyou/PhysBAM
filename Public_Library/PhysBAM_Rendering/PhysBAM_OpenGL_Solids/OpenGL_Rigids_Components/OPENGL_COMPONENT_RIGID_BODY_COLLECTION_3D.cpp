@@ -95,7 +95,7 @@ Read_Articulated_Information(const std::string& filename)
     std::istream* input=FILE_UTILITIES::Safe_Open_Input(filename);
     // this will need to be changed to reflect multiple articulation points per rigid body
     int numpoints=0;Read_Binary<RW>(*input,numpoints);articulation_points.Exact_Resize(numpoints);joint_frames.Exact_Resize(numpoints);
-    for(int i=1;i<=numpoints;i++) Read_Binary<RW>(*input,articulation_points(i),joint_frames(i));
+    for(int i=0;i<numpoints;i++) Read_Binary<RW>(*input,articulation_points(i),joint_frames(i));
     Read_Binary<RW>(*input,projected_COM);delete input;
 }
 //#####################################################################

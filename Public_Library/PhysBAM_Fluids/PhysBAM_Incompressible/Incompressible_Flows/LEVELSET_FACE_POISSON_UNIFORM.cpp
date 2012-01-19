@@ -36,7 +36,7 @@ Compute(int axis)
     typedef BOUNDARY_CONDITIONS_CALLBACKS<TV> CB;
     for(int i=1;i<=index_map.index_to_face.m;i++){FACE_INDEX<d> face=index_map.index_to_face(i);
         T middle_value=-2*one_over_dX2.Sum();
-        for(int a=1;a<=d;a++){
+        for(int a=0;a<d;a++){
             for(int s=-1;s<=1;s+=2){
                 FACE_INDEX<d> neighbor=face;
                 neighbor.index(a)+=s;

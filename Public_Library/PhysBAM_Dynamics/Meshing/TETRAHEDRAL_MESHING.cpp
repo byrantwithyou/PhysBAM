@@ -83,7 +83,7 @@ Snap_Nodes_To_Level_Set_Boundary(const int iterations)
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     TETRAHEDRON_MESH& mesh=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>().mesh;
     if(!mesh.boundary_nodes) mesh.Initialize_Boundary_Nodes();
-    for(int t=1;t<=mesh.boundary_nodes->m;t++) for(int k=1;k<=iterations;k++){
+    for(int t=1;t<=mesh.boundary_nodes->m;t++) for(int k=0;k<iterations;k++){
         int node=(*mesh.boundary_nodes)(t);TV X=deformable_body_collection.particles.X(node);
         deformable_body_collection.particles.X(node)-=implicit_surface->Extended_Phi(X)*implicit_surface->Extended_Normal(X);}
     FILE_UTILITIES::Create_Directory(output_directory);
@@ -126,11 +126,11 @@ template<class T> void TETRAHEDRAL_MESHING<T>::
 Create_Final_Mesh_With_Optimization(const int number_of_initial_steps,const int number_of_final_steps,const bool verbose)
 {
     Write_Output_Files(frame);
-    for(int i=1;i<=number_of_initial_steps;i++){
+    for(int i=0;i<number_of_initial_steps;i++){
         if(verbose) LOG::cout<<"Working on initial iteration "<<i<<" of "<<number_of_initial_steps<<"+"<<number_of_final_steps<<std::endl;
         Optimization_Sweep(i/(T)(i+2),verbose);
         Write_Output_Files(++frame);}
-    for(int i=1;i<=number_of_final_steps;i++){
+    for(int i=0;i<number_of_final_steps;i++){
         if(verbose) LOG::cout<<"Working on iteration "<<i<<" of "<<number_of_final_steps<<" (full step towards boundary)"<<std::endl;
         Optimization_Sweep(1,verbose);
         Write_Output_Files(++frame);}
@@ -365,7 +365,7 @@ Create_Final_Mesh_With_Dynamics(const T time_step,const int number_of_force_step
     Write_Output_Files(frame);
 
     // forces
-    for(int k=1;k<=number_of_force_steps;k++){
+    for(int k=0;k<number_of_force_steps;k++){
         Advance_Dynamics((k-1)*time_step,k*time_step,verbose);
         if(verbose) LOG::cout<<"TIME STEP = "<<k<<", TIME = "<<" "<<k*time_step<<std::endl;
         Write_Output_Files(++frame);}
@@ -475,7 +475,7 @@ Create_Initial_Mesh(const T bcc_lattice_cell_size,const bool use_adaptive_refine
     RED_GREEN_TETRAHEDRA<T> redgreen(tetrahedralized_volume);
     if(use_adaptive_refinement){
         ARRAY<int> tets_to_refine;tets_to_refine.Preallocate(5000);
-        for(int iterations=1;iterations<=max_subdivision_levels;iterations++){
+        for(int iterations=0;iterations<max_subdivision_levels;iterations++){
             tets_to_refine.Remove_All();
             LOG::cout<<"Checking for refinement "<<std::flush;
             for(int t=1;t<=mesh.elements.m;t++){

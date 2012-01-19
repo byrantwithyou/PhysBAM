@@ -354,7 +354,7 @@ Compute_ddE(const GENERAL_ENERGY<T>& base,const TV& f,const int simplex)
     for(int i=1; i<=d; i++) ddz-=fm1(i)/sqr(q(i))*ddq(i);
     ddxi=2*cube(xi)*SYMMETRIC_MATRIX<T,d>::Outer_Product(dz)-sqr(xi)*ddz;
     ddphi=SYMMETRIC_MATRIX<T,d>::Transpose_Times_With_Symmetric_Result(dg,dq);
-    for(int i=1;i<=d;i++) ddphi+=g(i)*ddq(i);
+    for(int i=0;i<d;i++) ddphi+=g(i)*ddq(i);
     ddm=3*m2*m3*SYMMETRIC_MATRIX<T,d>::Outer_Product(fm1)-m3;
     for(int i=1; i<=d; i++){
         MATRIX<T,d> t;

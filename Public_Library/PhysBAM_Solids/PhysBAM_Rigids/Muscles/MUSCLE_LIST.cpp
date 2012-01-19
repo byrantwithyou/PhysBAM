@@ -44,7 +44,7 @@ Read(const STREAM_TYPE stream_type,const std::string& directory,const int frame)
     std::istream* input=FILE_UTILITIES::Safe_Open_Input(STRING_UTILITIES::string_sprintf("%s/%d/muscle_states",directory.c_str(),frame));
     TYPED_ISTREAM typed_input=TYPED_ISTREAM(*input,stream_type);
     int num_muscles;Read_Binary(typed_input,num_muscles);//muscles.Resize(num_muscles);
-    for(int i=1;i<=num_muscles;i++){
+    for(int i=0;i<num_muscles;i++){
         MUSCLE<TV>* muscle=new MUSCLE<TV>(muscle_force_curve);
         muscle->Read(typed_input,rigid_body_collection);
         muscles.Append(muscle);}

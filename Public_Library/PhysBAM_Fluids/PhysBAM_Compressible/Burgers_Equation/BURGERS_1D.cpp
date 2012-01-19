@@ -38,7 +38,7 @@ CFL()
     int m=grid.counts.x;T dx=grid.dX.x;
 
     ARRAY<T,VECTOR<int,1> > u(1,m);
-    for(int i=1;i<=m;i++) u(i)=U(i)(1);
+    for(int i=0;i<m;i++) u(i)=U(i)(1);
     T dt_convect=u.Maxabs()/dx;
 
     return 1/max(dt_convect,1/max_time_step);

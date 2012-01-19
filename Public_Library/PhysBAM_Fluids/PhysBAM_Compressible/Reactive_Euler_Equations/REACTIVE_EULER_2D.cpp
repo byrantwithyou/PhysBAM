@@ -39,7 +39,7 @@ CFL()
     int m=grid.counts.x,n=grid.counts.y;T dx=grid.dX.x,dy=grid.dX.y;
     
     ARRAY<T,VECTOR<int,2> > u_minus_c(1,m,1,n),u_plus_c(1,m,1,n),v_minus_c(1,m,1,n),v_plus_c(1,m,1,n);
-    for(int i=1;i<=m;i++) for(int j=1;j<=n;j++){
+    for(int i=0;i<m;i++) for(int j=0;j<n;j++){
         if(!cut_out_grid || (cut_out_grid && (*psi_pointer)(i,j)==1)){
             T u=U(i,j)(2)/U(i,j)(1),v=U(i,j)(3)/U(i,j)(1);
             T Y=U(i,j)(5)/U(i,j)(1);

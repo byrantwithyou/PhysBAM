@@ -38,7 +38,7 @@ Power_Iterate_Shifted(VECTOR_ND<T>& x,const T shift,T& eigenvalue,const T tolera
 {
     VECTOR_ND<T> y(Size(),false);
     T tolerance_squared_over_2=sqr(tolerance)/2;
-    for(int iteration=1;iteration<=max_iterations;iteration++){
+    for(int iteration=0;iteration<max_iterations;iteration++){
         T magnitude=x.Magnitude();if(!magnitude) return false;
         x/=magnitude;
         Multiply(x,y);if(shift) y+=shift*x;

@@ -650,7 +650,7 @@ Generate_Stratified_Sample_Points(const VECTOR<int,2>& pixel_index,const CAMERA<
     if(use_four_subpixels){
         for(int quadrant=0;quadrant<4;quadrant++){
             TV2 subpixel_center=subpixel_grid.X(2*pixel_index+VECTOR<int,2>(quadrant/4,quadrant%4));
-            for(int sample_index=1;sample_index<=samples_per_pixel;sample_index++){
+            for(int sample_index=0;sample_index<samples_per_pixel;sample_index++){
                 SAMPLE sample;
                 sample.time=0;
                 sample.alpha=0;
@@ -660,7 +660,7 @@ Generate_Stratified_Sample_Points(const VECTOR<int,2>& pixel_index,const CAMERA<
                 samples.Append(sample);}}}
     else{
         TV2 pixel_center=grid.X(pixel_index);
-        for(int sample_index=1;sample_index<=samples_per_pixel;sample_index++){
+        for(int sample_index=0;sample_index<samples_per_pixel;sample_index++){
             SAMPLE sample;
             sample.time=0;
             sample.alpha=0;

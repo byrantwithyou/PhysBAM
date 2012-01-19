@@ -127,7 +127,7 @@ Fracture_Where_High_Stress(ARRAY<T_SYMMETRIC_MATRIX>& sigma,ARRAY<TV>& spatial_f
     if(number_of_smoothing_passes){
         ARRAY<T> size(embedded_object.simplicial_object.mesh.elements.m);
         for(int t=1;t<=embedded_object.simplicial_object.mesh.elements.m;t++) size(t)=embedded_object.simplicial_object.Element_Size(t);
-        for(int pass=1;pass<=number_of_smoothing_passes;pass++) for(int t=1;t<=embedded_object.simplicial_object.mesh.elements.m;t++){
+        for(int pass=0;pass<number_of_smoothing_passes;pass++) for(int t=1;t<=embedded_object.simplicial_object.mesh.elements.m;t++){
             T total_size=size(t);
             sigma(t)*=size(t);
             for(int a=1;a<=(*embedded_object.simplicial_object.mesh.adjacent_elements)(t).m;a++){
@@ -197,10 +197,10 @@ Set_Random_Fracture_Bias_Stress_Scaling_Constant(const T fracture_threshold,cons
     T fracture_threshold_over_two=(T).5*fracture_threshold;
     for(int t=1;t<=embedded_object.simplicial_object.mesh.elements.m;t++)
         fracture_bias_stress_scaling(t)=random_numbers.Get_Uniform_Number((T)-fracture_threshold_over_two,(T)fracture_threshold_over_two);
-    for(int iteration=1;iteration<=averaging_iterations;iteration++) for(int t=1;t<=embedded_object.simplicial_object.mesh.elements.m;t++){
+    for(int iteration=0;iteration<averaging_iterations;iteration++) for(int t=1;t<=embedded_object.simplicial_object.mesh.elements.m;t++){
         int number_of_adjacent_elements=(*embedded_object.simplicial_object.mesh.adjacent_elements)(t).m;
         T average=fracture_bias_stress_scaling(t);
-        for(int i=1;i<=number_of_adjacent_elements;i++){
+        for(int i=0;i<number_of_adjacent_elements;i++){
             int adjacent_t=(*embedded_object.simplicial_object.mesh.adjacent_elements)(t)(i);
             average+=fracture_bias_stress_scaling(adjacent_t);}
         average/=(T)(number_of_adjacent_elements+1);
@@ -221,7 +221,7 @@ Initiation_Point(const int element)
     if(initiation_point_positions){
         assert(initiation_point_positions->m==number_of_fracture_initiations);
         TV reference_centroid=reference_simplicial_object.Centroid(corresponding_simplex_in_reference(element));
-        for(int i=1;i<=number_of_fracture_initiations;i++) if(((*initiation_point_positions)(i)-reference_centroid).Magnitude()<(*initiation_point_radii)(i)) return false;
+        for(int i=0;i<number_of_fracture_initiations;i++) if(((*initiation_point_positions)(i)-reference_centroid).Magnitude()<(*initiation_point_radii)(i)) return false;
         if(!initiation_point_reference_seed_positions) initiation_point_positions->Append(reference_centroid);
         else if(number_of_fracture_initiations){int i=number_of_fracture_initiations+1;
             if(((*initiation_point_reference_seed_positions)(i)-reference_centroid).Magnitude()<(*initiation_point_radii)(i)) return false;

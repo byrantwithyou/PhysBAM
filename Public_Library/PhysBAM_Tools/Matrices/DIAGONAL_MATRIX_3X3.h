@@ -54,19 +54,19 @@ public:
     {return 3;}
 
     T& operator()(const int i)
-    {assert(i>=1 && i<=3);return ((T*)this)[i-1];}
+    {assert((unsigned)i<3);return ((T*)this)[i];}
 
     const T& operator()(const int i) const
-    {assert(i>=1 && i<=3);return ((T*)this)[i-1];}
+    {assert((unsigned)i<3);return ((T*)this)[i];}
 
     T& operator()(const int i,const int j)
-    {assert(i>=1 && i<=3 && i==j);return ((T*)this)[i-1];}
+    {assert((unsigned)i<3 && i==j);return ((T*)this)[i];}
 
     const T& operator()(const int i,const int j) const
-    {assert(i>=1 && i<=3 && i==j);return ((T*)this)[i-1];}
+    {assert((unsigned)i<3 && i==j);return ((T*)this)[i];}
 
     bool Valid_Index(const int i,const int j) const
-    {return 1<=i && i<=3 && i==j;}
+    {return (unsigned)i<3 && i==j;}
 
     T First() const
     {return x11;}

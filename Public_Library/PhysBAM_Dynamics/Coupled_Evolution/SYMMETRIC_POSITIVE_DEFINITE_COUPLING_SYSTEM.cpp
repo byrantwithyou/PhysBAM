@@ -891,8 +891,8 @@ Compute_Full_Preconditioner()
     int size_viscous=use_viscous_forces?Value(fluid_viscous_forces->Viscous_Forces_Size()):0;
     int offset_lambda=size_p,offset_force=offset_lambda+size_lambda,offset_viscous=offset_force+size_force;
 
-    if(!leakproof_solve) for(int i=1;i<=size_force;i++) full_matrix(offset_force+i,offset_force+i)+=1;
-    if(use_viscous_forces) for(int i=1;i<=size_viscous;i++) full_matrix(offset_viscous+i,offset_viscous+i)+=1;
+    if(!leakproof_solve) for(int i=0;i<size_force;i++) full_matrix(offset_force+i,offset_force+i)+=1;
+    if(use_viscous_forces) for(int i=0;i<size_viscous;i++) full_matrix(offset_viscous+i,offset_viscous+i)+=1;
     for(int i=1;i<=one_over_rho_c_squared_flat.n;i++) full_matrix(i,i)+=one_over_rho_c_squared_flat(i);
 
     full_matrix.Construct_Incomplete_Cholesky_Factorization();

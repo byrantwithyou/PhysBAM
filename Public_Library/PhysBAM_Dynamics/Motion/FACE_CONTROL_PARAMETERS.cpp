@@ -327,8 +327,8 @@ Read_Configuration_From_File(const STREAM_TYPE& stream_type,const std::string fi
     int number_of_control_sets;
     Read_Binary(typed_input,number_of_control_sets);
     ARRAY<int> control_set_types(number_of_control_sets);
-    for(int i=1;i<=number_of_control_sets;i++) Read_Binary(typed_input,control_set_types(i));
-    for(int i=1;i<=number_of_control_sets;i++){
+    for(int i=0;i<number_of_control_sets;i++) Read_Binary(typed_input,control_set_types(i));
+    for(int i=0;i<number_of_control_sets;i++){
         switch(control_set_types(i)){
             case FACE_CONTROL_SET<T>::ACTIVATION:{
                 ACTIVATION_CONTROL_SET<T>* activation_control_set=new ACTIVATION_CONTROL_SET<T>();

@@ -180,9 +180,9 @@ Get_Local_Positions_For_Particles(const int m,const int n,GEOMETRY_PARTICLES<TV>
 {
     assert(particles.array_collection->Size()==m*n+2);
     T length=Length(),dtheta=(T)two_pi/n;
-    for(int i=1;i<=m;i++){
+    for(int i=0;i<m;i++){
         T x_fraction=(i-1)/(T)(m-1);T distance_from_axis=Get_Fractional_Curve_Value(x_fraction,false);
-        for(int j=1;j<=n;j++) particles.X(j+(i-1)*n)=TV(x_fraction*length,distance_from_axis*sin((j-1)*dtheta),distance_from_axis*cos((j-1)*dtheta));}
+        for(int j=0;j<n;j++) particles.X(j+(i-1)*n)=TV(x_fraction*length,distance_from_axis*sin((j-1)*dtheta),distance_from_axis*cos((j-1)*dtheta));}
     particles.X(m*n+1)=TV(0,0,0);particles.X(m*n+2)=TV(length,0,0);
 }
 //#####################################################################
@@ -191,7 +191,7 @@ Get_Local_Positions_For_Particles(const int m,const int n,GEOMETRY_PARTICLES<TV>
 template<class T> void ANALYTIC_SURFACE_MUSCLE_SEGMENT<T>::
 Initialize()
 {
-    BASE::Initialize();for(int i=1;i<=activation_memory;i++) Set_Current_Activation(0);
+    BASE::Initialize();for(int i=0;i<activation_memory;i++) Set_Current_Activation(0);
     initial_volume=Compute_Volume();initial_length=Length();initial_curve_length=Curve_Length();
     T subst=0;num_segments_over_2=100;
     initial_segment_volumes.Resize(2*num_segments_over_2);fractional_segment_endpoints.Resize(2*num_segments_over_2);

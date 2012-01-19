@@ -45,7 +45,7 @@ Write(const std::string& filename,const ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& imag
     int line_width=header.w*3,line_padding=((line_width+3)&~3)-line_width;
     for(int j=1;j<=header.h;j++){
         for(int i=1;i<=header.w;i++){VECTOR<unsigned char,d> byte=IMAGE<T>::Scalar_Color_To_Byte_Color(image(i,j));Write_Binary<T>(*output,VECTOR<unsigned char,3>(byte[3],byte[2],byte[1]));}
-        for(int i=1;i<=line_padding;i++) Write_Binary<T>(*output,(unsigned char)0);}
+        for(int i=0;i<line_padding;i++) Write_Binary<T>(*output,(unsigned char)0);}
     delete output;
 }
 //#####################################################################

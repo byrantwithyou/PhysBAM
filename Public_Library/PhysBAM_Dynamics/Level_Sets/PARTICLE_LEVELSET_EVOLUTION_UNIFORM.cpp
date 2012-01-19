@@ -101,7 +101,7 @@ Advance_Levelset(const T dt)
     else{
         if(!rungekutta_phi) Initialize_Runge_Kutta();
         rungekutta_phi->Start(dt);
-        for(int k=1;k<=runge_kutta_order_levelset;k++){
+        for(int k=0;k<runge_kutta_order_levelset;k++){
             if(k == 1 || !use_frozen_velocity) particle_levelset.levelset.levelset_callbacks->Get_Levelset_Velocity(grid,particle_levelset.levelset,V,time);
             levelset_advection.Euler_Step(V,dt,time,particle_levelset.number_of_ghost_cells);
             time=rungekutta_phi->Main();}}
@@ -138,7 +138,7 @@ Advance_Particles(T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,const PARTICLE
     T_ARRAYS_RUNGEKUTTA rungekutta_particles;rungekutta_particles.Resize(mac_grid.Domain_Indices(1));
     for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()) if(particles(iterator.Cell_Index()))
         rungekutta_particles(iterator.Cell_Index())=RUNGEKUTTA<ARRAY_VIEW<TV> >::Create(particles(iterator.Cell_Index())->X,runge_kutta_order_particles,dt,current_time);
-    for(int k=1;k<=runge_kutta_order_particles;k++){
+    for(int k=0;k<runge_kutta_order_particles;k++){
         if(k == 1 || !use_frozen_velocity) particle_levelset.levelset.levelset_callbacks->Get_Levelset_Velocity(grid,particle_levelset.levelset,V,current_time);
         particle_levelset.Euler_Step_Particles_Wrapper(V,particles,particle_type,dt,current_time,false,k==1,false);
         for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()) if(particles(iterator.Cell_Index())) current_time=rungekutta_particles(iterator.Cell_Index())->Main();}
@@ -163,7 +163,7 @@ Advance_Particles(T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES& particles,const 
     T_ARRAYS_RUNGEKUTTA rungekutta_particles;rungekutta_particles.Resize(mac_grid.Domain_Indices(1));
     for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()) if(particles(iterator.Cell_Index()))
         rungekutta_particles(iterator.Cell_Index())=RUNGEKUTTA<ARRAY_VIEW<TV> >::Create(particles(iterator.Cell_Index())->X,runge_kutta_order_particles,dt,current_time);
-    for(int k=1;k<=runge_kutta_order_particles;k++){
+    for(int k=0;k<runge_kutta_order_particles;k++){
         if(k == 1 || !use_frozen_velocity) particle_levelset.levelset.levelset_callbacks->Get_Levelset_Velocity(grid,particle_levelset.levelset,V,current_time);
         particle_levelset.Euler_Step_Particles_Wrapper(V,particles,particle_type,dt,current_time,false,k==1,false);
         for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()) if(particles(iterator.Cell_Index())) current_time=rungekutta_particles(iterator.Cell_Index())->Main();}
@@ -218,7 +218,7 @@ template<class T_GRID> void PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>::
 Apply_Mass_Conservation(const int number_of_regions,const T time,const T dt,T_FACE_ARRAYS_SCALAR& face_velocities)
 {
     // TODO: determine conditions for when to perform this correction
-    for(int i=1;i<=number_of_regions;i++){
+    for(int i=0;i<number_of_regions;i++){
         Particle_Levelset(i).vof_advection->Make_Approximately_Incompressible(face_velocities,dt,time);
         Particle_Levelset(i).vof_advection->Refine_Or_Coarsen_Geometry();}
 }
@@ -229,7 +229,7 @@ template<class T_GRID> void PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>::
 Reinitialize_Geometry(const int number_of_regions)
 {
     // precondition: rasterize must have been called
-    for(int i=1;i<=number_of_regions;i++) Particle_Levelset(i).vof_advection->Create_Geometry();
+    for(int i=0;i<number_of_regions;i++) Particle_Levelset(i).vof_advection->Create_Geometry();
 }
 //#####################################################################
 // Function Perform_Conservative_Advection
@@ -238,7 +238,7 @@ template<class T_GRID> void PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>::
 Perform_Conservative_Advection(const int number_of_regions,const T time,const T dt,T_FACE_ARRAYS_SCALAR& face_velocities)
 {
     typename INTERPOLATION_POLICY<GRID<TV> >::FACE_LOOKUP V_lookup(face_velocities);
-    for(int i=1;i<=number_of_regions;i++) Particle_Levelset(i).vof_advection->Perform_Conservative_Advection(V_lookup,dt,time);
+    for(int i=0;i<number_of_regions;i++) Particle_Levelset(i).vof_advection->Perform_Conservative_Advection(V_lookup,dt,time);
 }
 //#####################################################################
 template class PARTICLE_LEVELSET_EVOLUTION_UNIFORM<GRID<VECTOR<float,1> > >;

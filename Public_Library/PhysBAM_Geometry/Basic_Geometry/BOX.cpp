@@ -55,7 +55,7 @@ Normal(const TV& X) const
     else{
         TV phis_max=X-max_corner,phis_min=min_corner-X;
         TV normal;
-        for(int i=1;i<=d;i++){
+        for(int i=0;i<d;i++){
             T phi=max(phis_min[i],phis_max[i]);
             normal[i]=phi>0?(phis_max[i]>phis_min[i]?phi:-phi):0;}
         return normal.Normalized();}

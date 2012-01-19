@@ -57,7 +57,7 @@ template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
 Set_Row_Lengths(ARRAY_VIEW<int> lengths)
 {
     m=lengths.m;offsets.Resize(m+1,false,false);offsets(1)=1;
-    for(int i=1;i<=m;i++){offsets(i+1)=offsets(i)+lengths(i);}
+    for(int i=0;i<m;i++){offsets(i+1)=offsets(i)+lengths(i);}
     A.Resize(offsets(m+1)-1);
 }
 //#####################################################################
@@ -114,7 +114,7 @@ template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
 Times_Add(const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const
 {
     int index=offsets(1);
-    for(int i=1;i<=m;i++){
+    for(int i=0;i<m;i++){
         int end=offsets(i+1);T sum=(T)0;
         for(;index<end;index++) sum+=A(index).a*x(A(index).j);
         result(i)+=sum;}
@@ -126,7 +126,7 @@ template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
 Times_Subtract(const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const
 {
     int index=offsets(1);
-    for(int i=1;i<=m;i++){
+    for(int i=0;i<m;i++){
         int end=offsets(i+1);T sum=(T)0;
         for(;index<end;index++) sum+=A(index).a*x(A(index).j);
         result(i)-=sum;}
@@ -147,7 +147,7 @@ template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
 Transpose_Times_Add(const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const
 {
     int index=offsets(1);
-    for(int i=1;i<=m;i++){
+    for(int i=0;i<m;i++){
         int end=offsets(i+1);T y=x(i);
         for(;index<end;index++) result(A(index).j)+=A(index).a*y;}
 }
@@ -158,7 +158,7 @@ template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
 Transpose_Times_Subtract(const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const
 {
     int index=offsets(1);
-    for(int i=1;i<=m;i++){
+    for(int i=0;i<m;i++){
         int end=offsets(i+1);T y=x(i);
         for(;index<end;index++) result(A(index).j)-=A(index).a*y;}
 }
@@ -203,7 +203,7 @@ template<class T> SPARSE_MATRIX_FLAT_MXN<T>& SPARSE_MATRIX_FLAT_MXN<T>::
 operator+=(const T a)
 {
     int index=offsets(1);
-    for(int i=1;i<=m;i++){
+    for(int i=0;i<m;i++){
         int end=offsets(i+1),found=0;
         for(;index<end;index++){if(A(index).j==i){found=1;A(index).a+=a;}}
         PHYSBAM_ASSERT(found);}
@@ -225,7 +225,7 @@ Compress(SPARSE_MATRIX_FLAT_MXN<T>& compressed)
 {
     ARRAY<int> row_lengths(m);
     int index=offsets(1);
-    for(int i=1;i<=m;i++){
+    for(int i=0;i<m;i++){
         int end=offsets(i+1);
         while(index<end){if(!A(index).j) break;
             index++;row_lengths(i)++;}
@@ -233,7 +233,7 @@ Compress(SPARSE_MATRIX_FLAT_MXN<T>& compressed)
     compressed.Set_Row_Lengths(row_lengths);
     index=offsets(1);
     int compressed_index=1;
-    for(int i=1;i<=m;i++){
+    for(int i=0;i<m;i++){
         int end=offsets(i+1);
         while(index<end){if(!A(index).j) break;
             compressed.A(compressed_index++)=A(index);index++;}
@@ -247,7 +247,7 @@ Transpose(SPARSE_MATRIX_FLAT_MXN<T>& A_transpose) const
 {
     ARRAY<int> row_lengths(n);for(int index=1;index<=A.m;index++) row_lengths(A(index).j)++;
     A_transpose.Set_Row_Lengths(row_lengths);A_transpose.n=m;
-    for(int i=1;i<=m;i++) for(int index=offsets(i);index<offsets(i+1);index++) A_transpose(A(index).j,i)=A(index).a;
+    for(int i=0;i<m;i++) for(int index=offsets(i);index<offsets(i+1);index++) A_transpose(A(index).j,i)=A(index).a;
 }
 //#####################################################################
 // Function Times_Transpose
@@ -260,7 +260,7 @@ Times_Transpose(const SPARSE_MATRIX_FLAT_MXN<T>& rhs)
     const int columns=rhs.m;const int rows=m;
     ARRAY<int> row_lengths(rows);
     ARRAY<int> right_columns_present,left_rows_present;
-    for(int i=1;i<=m;i++) if(offsets(i+1)-offsets(i)) left_rows_present.Append(i);
+    for(int i=0;i<m;i++) if(offsets(i+1)-offsets(i)) left_rows_present.Append(i);
     for(int i=1;i<=rhs.m;i++) if(rhs.offsets(i+1)-rhs.offsets(i)) right_columns_present.Append(i);
     
     for(int i=1;i<=left_rows_present.m;i++){
@@ -297,7 +297,7 @@ Times_Diagonal_Times(const VECTOR_ND<T> diagonal,const SPARSE_MATRIX_FLAT_MXN<T>
     const int columns=rhs.n,rows=m;
     ARRAY<int> row_lengths(rows);
     ARRAY<int> column_indices;
-    for(int row=1;row<=rows;row++){
+    for(int row=0;row<rows;row++){
         int start=offsets(row),end=offsets(row+1);
         column_indices.Remove_All();
         for(int i=start;i<end;i++){ // insertion sort to get actual row counts, worst-case cost C^2
@@ -311,7 +311,7 @@ Times_Diagonal_Times(const VECTOR_ND<T> diagonal,const SPARSE_MATRIX_FLAT_MXN<T>
     result.Set_Row_Lengths(row_lengths);
     result.n=columns;
 
-    for(int row=1;row<=rows;row++){
+    for(int row=0;row<rows;row++){
         int start=offsets(row),end=offsets(row+1);
         for(int i=start;i<end;i++){
             int col=A(i).j;
@@ -342,7 +342,7 @@ operator+(const SPARSE_MATRIX_FLAT_NXN<T>& A_rhs) const
     assert(m==n && n==A_rhs.n);
     ARRAY<int> row_lengths(m);
     int left_index=offsets(1),right_index=A_rhs.offsets(1);
-    for(int i=1;i<=m;i++){
+    for(int i=0;i<m;i++){
         int left_end=offsets(i+1),right_end=A_rhs.offsets(i+1);
         while(left_index<left_end && right_index<right_end){
             if(A(left_index).j==A_rhs.A(right_index).j){row_lengths(i)++;left_index++;right_index++;}
@@ -354,11 +354,11 @@ operator+(const SPARSE_MATRIX_FLAT_NXN<T>& A_rhs) const
     result.Set_Row_Lengths(row_lengths);
 
     int index=offsets(1);
-    for(int i=1;i<=m;i++){int end=offsets(i+1);
+    for(int i=0;i<m;i++){int end=offsets(i+1);
         for(;index<end;index++) result(i,A(index).j)=A(index).a;}
 
     index=A_rhs.offsets(1);
-    for(int i=1;i<=m;i++){int end=A_rhs.offsets(i+1);
+    for(int i=0;i<m;i++){int end=A_rhs.offsets(i+1);
         for(;index<end;index++) result(i,A_rhs.A(index).j)+=A_rhs.A(index).a;}
     return result;
 }
@@ -371,7 +371,7 @@ operator+(const SPARSE_MATRIX_FLAT_MXN& A_rhs) const
     assert(m==A_rhs.m && n==A_rhs.n);
     ARRAY<int> row_lengths(m);
     int left_index=offsets(1),right_index=A_rhs.offsets(1);
-    for(int i=1;i<=m;i++){
+    for(int i=0;i<m;i++){
         int left_end=offsets(i+1),right_end=A_rhs.offsets(i+1);
         while(left_index<left_end && right_index<right_end){
             if(A(left_index).j==A_rhs.A(right_index).j){row_lengths(i)++;left_index++;right_index++;}
@@ -383,11 +383,11 @@ operator+(const SPARSE_MATRIX_FLAT_MXN& A_rhs) const
     result.Set_Row_Lengths(row_lengths);result.n=n;
 
     int index=offsets(1);
-    for(int i=1;i<=m;i++){int end=offsets(i+1);
+    for(int i=0;i<m;i++){int end=offsets(i+1);
         for(;index<end;index++) result(i,A(index).j)=A(index).a;}
 
     index=A_rhs.offsets(1);
-    for(int i=1;i<=m;i++){int end=A_rhs.offsets(i+1);
+    for(int i=0;i<m;i++){int end=A_rhs.offsets(i+1);
         for(;index<end;index++) result(i,A_rhs.A(index).j)+=A_rhs.A(index).a;}
     return result;
 }
@@ -400,7 +400,7 @@ operator-(const SPARSE_MATRIX_FLAT_MXN& A_rhs) const
     assert(m==A_rhs.m && n==A_rhs.n);
     ARRAY<int> row_lengths(m);
     int left_index=offsets(1),right_index=A_rhs.offsets(1);
-    for(int i=1;i<=m;i++){
+    for(int i=0;i<m;i++){
         int left_end=offsets(i+1),right_end=A_rhs.offsets(i+1);
         while(left_index<left_end && right_index<right_end){
             if(A(left_index).j==A_rhs.A(right_index).j){row_lengths(i)++;left_index++;right_index++;}
@@ -412,11 +412,11 @@ operator-(const SPARSE_MATRIX_FLAT_MXN& A_rhs) const
     result.Set_Row_Lengths(row_lengths);result.n=n;
 
     int index=offsets(1);
-    for(int i=1;i<=m;i++){int end=offsets(i+1);
+    for(int i=0;i<m;i++){int end=offsets(i+1);
         for(;index<end;index++) result(i,A(index).j)=A(index).a;}
 
     index=A_rhs.offsets(1);
-    for(int i=1;i<=m;i++){int end=A_rhs.offsets(i+1);
+    for(int i=0;i<m;i++){int end=A_rhs.offsets(i+1);
         for(;index<end;index++) result(i,A_rhs.A(index).j)-=A_rhs.A(index).a;}
     return result;
 }
@@ -431,7 +431,7 @@ operator*(const SPARSE_MATRIX_FLAT_MXN& rhs) const
     const int columns=rhs.n,rows=m;
     ARRAY<int> row_lengths(rows);
     ARRAY<int> column_indices;
-    for(int row=1;row<=rows;row++){
+    for(int row=0;row<rows;row++){
         int start=offsets(row),end=offsets(row+1);
         column_indices.Remove_All();
         for(int i=start;i<end;i++){ // insertion sort to get actual row counts, worst-case cost C^2
@@ -445,7 +445,7 @@ operator*(const SPARSE_MATRIX_FLAT_MXN& rhs) const
     result.Set_Row_Lengths(row_lengths);
     result.n=columns;
 
-    for(int row=1;row<=rows;row++){
+    for(int row=0;row<rows;row++){
         int start=offsets(row),end=offsets(row+1);
         for(int i=start;i<end;i++){
             int col=A(i).j;
@@ -474,7 +474,7 @@ template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
 Write_Row_Lengths()
 {
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
-    for(int i=1;i<=m;i++) LOG::cout<<offsets(i+1)-offsets(i)<<" ";
+    for(int i=0;i<m;i++) LOG::cout<<offsets(i+1)-offsets(i)<<" ";
     LOG::cout<<std::endl;
 #endif
 }
@@ -485,7 +485,7 @@ template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
 Print_Row(const int row)
 {
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
-    for(int i=1;i<=n;i++) if(Element_Present(row,i)) LOG::cout<<"Col: "<<i<<" Val: "<<(*this)(row,i)<<",  ";
+    for(int i=0;i<n;i++) if(Element_Present(row,i)) LOG::cout<<"Col: "<<i<<" Val: "<<(*this)(row,i)<<",  ";
     LOG::cout<<std::endl;
 #endif
 }
@@ -535,7 +535,7 @@ Finish_Row()
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
 Sort_Entries()
 {
-    for(int i=1;i<=m;i++){ARRAY_VIEW<SPARSE_MATRIX_ENTRY<T> > view(A.Array_View(offsets(i),offsets(i+1)-offsets(i)));Sort(view);}
+    for(int i=0;i<m;i++){ARRAY_VIEW<SPARSE_MATRIX_ENTRY<T> > view(A.Array_View(offsets(i),offsets(i+1)-offsets(i)));Sort(view);}
 }
 //#####################################################################
 // Function Get_Row
@@ -616,7 +616,7 @@ Construct_Incomplete_LQ_Factorization(const int p_l,const int p_q,const T zero_t
     ARRAY<SPARSE_MATRIX_ENTRY<T> > q_i,l_i;
     delete Q;delete L;Q=new SPARSE_MATRIX_FLAT_MXN<T>();L=new SPARSE_MATRIX_FLAT_MXN<T>();
     (*Q).Reset(n);(*L).Reset(m);
-    for(int i=1;i<=m;i++){
+    for(int i=0;i<m;i++){
         Get_Row(q_i,i);
         (*Q).Fast_Sparse_Multiply(q_i,l_i);
         Keep_Largest_N(l_i,p_l);

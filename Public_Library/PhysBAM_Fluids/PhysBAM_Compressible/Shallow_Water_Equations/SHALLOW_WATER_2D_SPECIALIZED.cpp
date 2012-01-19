@@ -62,8 +62,8 @@ Euler_Step(const T dt,const T time)
             update_flux=true;}
 
         if(update_flux){
-            if(i>0) for(int k=1;k<=d;k++) U(i,j)(k)+=dt*(old_flux_x(i+1,j)(k)-new_flux_left(k))*grid.one_over_dX.x; // update cell on left
-            if(i<grid.counts.x) for(int k=1;k<=d;k++) U(i+1,j)(k)-=dt*(old_flux_x(i+1,j)(k)-new_flux_right(k))*grid.one_over_dX.x;} // update cell on right
+            if(i>0) for(int k=0;k<d;k++) U(i,j)(k)+=dt*(old_flux_x(i+1,j)(k)-new_flux_left(k))*grid.one_over_dX.x; // update cell on left
+            if(i<grid.counts.x) for(int k=0;k<d;k++) U(i+1,j)(k)-=dt*(old_flux_x(i+1,j)(k)-new_flux_right(k))*grid.one_over_dX.x;} // update cell on right
 
         // for debugging
         postprocessed_flux_x(i,j)(1)=new_flux_left(1);postprocessed_flux_x(i,j)(2)=new_flux_left(2);postprocessed_flux_x(i,j)(3)=new_flux_left(3);
@@ -98,8 +98,8 @@ Euler_Step(const T dt,const T time)
             update_flux=true;}
         
         if(update_flux){
-            if(j>0) for(int k=1;k<=d;k++) U(i,j)(k)+=dt*(old_flux_y(i,j+1)(k)-new_flux_left(k))*grid.one_over_dX.y; // update cell on left
-            if(j<grid.counts.y) for(int k=1;k<=d;k++) U(i,j+1)(k)-=dt*(old_flux_y(i,j+1)(k)-new_flux_right(k))*grid.one_over_dX.y;} // update cell on right
+            if(j>0) for(int k=0;k<d;k++) U(i,j)(k)+=dt*(old_flux_y(i,j+1)(k)-new_flux_left(k))*grid.one_over_dX.y; // update cell on left
+            if(j<grid.counts.y) for(int k=0;k<d;k++) U(i,j+1)(k)-=dt*(old_flux_y(i,j+1)(k)-new_flux_right(k))*grid.one_over_dX.y;} // update cell on right
         
         // for debugging
         postprocessed_flux_y(i,j)(1)=new_flux_left(1);postprocessed_flux_y(i,j)(2)=new_flux_left(2);postprocessed_flux_y(i,j)(3)=new_flux_left(3);

@@ -55,7 +55,7 @@ template<class TV> template<class T_ARRAY_TV> void SEGMENT_HIERARCHY<TV>::
 Calculate_Bounding_Boxes_Helper(ARRAY<RANGE<TV> >& bounding_boxes,T_ARRAY_TV X)
 {
     STATIC_ASSERT((IS_SAME<TV,typename T_ARRAY_TV::ELEMENT>::value && IS_ARRAY_VIEW<T_ARRAY_TV>::value));
-    for(int k=1;k<=leaves;k++){
+    for(int k=0;k<leaves;k++){
         int node1,node2;segment_mesh.elements(k).Get(node1,node2);
         bounding_boxes(k)=RANGE<TV>::Bounding_Box(X(node1),X(node2));}
 }
@@ -66,7 +66,7 @@ template<class TV> template<class T_ARRAY_TV> void SEGMENT_HIERARCHY<TV>::
 Calculate_Bounding_Boxes_Helper(ARRAY<RANGE<TV> >& bounding_boxes,T_ARRAY_TV start_X,T_ARRAY_TV end_X)
 {
     STATIC_ASSERT((IS_SAME<TV,typename T_ARRAY_TV::ELEMENT>::value && IS_ARRAY_VIEW<T_ARRAY_TV>::value));
-    for(int k=1;k<=leaves;k++){
+    for(int k=0;k<leaves;k++){
         int node1,node2;segment_mesh.elements(k).Get(node1,node2);
         bounding_boxes(k)=RANGE<TV>::Bounding_Box(start_X(node1),start_X(node2),end_X(node1),end_X(node2));}
 }
@@ -76,7 +76,7 @@ Calculate_Bounding_Boxes_Helper(ARRAY<RANGE<TV> >& bounding_boxes,T_ARRAY_TV sta
 template<class TV> void SEGMENT_HIERARCHY<TV>::
 Calculate_Bounding_Boxes(ARRAY<RANGE<TV> >& bounding_boxes,const FRAME<TV>& start_frame,const FRAME<TV>& end_frame)
 {
-    for(int k=1;k<=leaves;k++){
+    for(int k=0;k<leaves;k++){
         int node1,node2;segment_mesh.elements(k).Get(node1,node2);
         bounding_boxes(k)=RANGE<TV>::Bounding_Box(start_frame*particles.X(node1),start_frame*particles.X(node2),end_frame*particles.X(node1),end_frame*particles.X(node2));}
 }
@@ -87,7 +87,7 @@ Calculate_Bounding_Boxes(ARRAY<RANGE<TV> >& bounding_boxes,const FRAME<TV>& star
 template<class TV> void SEGMENT_HIERARCHY<TV>::
 Calculate_Bounding_Box_Radii(const ARRAY<RANGE<TV> >& bounding_boxes,ARRAY<T>& radius)
 {
-    for(int k=1;k<=leaves;k++){
+    for(int k=0;k<leaves;k++){
         TV center=bounding_boxes(k).Center();int node1,node2;segment_mesh.elements(k).Get(node1,node2);
         radius(k)=sqrt(max((particles.X(node1)-center).Magnitude_Squared(),(particles.X(node2)-center).Magnitude_Squared()));}
 }

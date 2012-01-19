@@ -214,25 +214,25 @@ Update_Simulated_Particles()
     ARRAY<bool> particle_is_simulated(rigid_particles_number);
     INDIRECT_ARRAY<ARRAY<bool>,ARRAY<int>&> simulated_subset=particle_is_simulated.Subset(rigid_body_particle.array_collection->deletion_list);
     simulated_subset.Fill(false);
-    for(int i=1;i<=rigid_particles_number;i++)
+    for(int i=0;i<rigid_particles_number;i++)
         if(Is_Active(i) && Rigid_Body(i).Is_Simulated()) // TODO: Can't everything be defaulted to true?
             particle_is_simulated(i)=true;
     rigids_example_forces_and_velocities->Set_Rigid_Particle_Is_Simulated(particle_is_simulated);
-    for(int i=1;i<=rigid_particles_number;i++)
+    for(int i=0;i<rigid_particles_number;i++)
         if(!Is_Active(i) || !Rigid_Body(i).Is_Simulated())
             particle_is_simulated(i)=false;
 
     simulated_rigid_body_particles.Remove_All();
     dynamic_rigid_body_particles.Remove_All();
 
-    for(int p=1;p<=rigid_particles_number;p++) if(particle_is_simulated(p)) simulated_rigid_body_particles.Append(p);
+    for(int p=0;p<rigid_particles_number;p++) if(particle_is_simulated(p)) simulated_rigid_body_particles.Append(p);
 
     rigid_body_cluster_bindings.Clear_Hard_Bound_Particles(particle_is_simulated);
 
-    for(int p=1;p<=rigid_particles_number;p++) if(particle_is_simulated(p)) dynamic_rigid_body_particles.Append(p);
+    for(int p=0;p<rigid_particles_number;p++) if(particle_is_simulated(p)) dynamic_rigid_body_particles.Append(p);
 
     static_rigid_bodies.Remove_All();kinematic_rigid_bodies.Remove_All();static_and_kinematic_rigid_bodies.Remove_All();
-    for(int p=1;p<=rigid_particles_number;p++) if(Is_Active(p)){RIGID_BODY<TV>& rigid_body=Rigid_Body(p);
+    for(int p=0;p<rigid_particles_number;p++) if(Is_Active(p)){RIGID_BODY<TV>& rigid_body=Rigid_Body(p);
         if(rigid_body.is_static){static_rigid_bodies.Append(p);static_and_kinematic_rigid_bodies.Append(p);}
         if(rigid_body_particle.kinematic(p)){kinematic_rigid_bodies.Append(p);static_and_kinematic_rigid_bodies.Append(p);}}
 

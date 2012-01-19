@@ -201,7 +201,7 @@ Solve_For_Muscle_Control(MATRIX_MXN<T>& A,const VECTOR_ND<T>& b,VECTOR_ND<T>& x,
         // NOTE: we normalize x to be between 0 to 1 so our optimization is hopefully better conditioned
         // (this assumes x_min=0).  We multiply x back with the peak force before returning below.
         ARRAY<PAIR<bool,T> > x_min(number_of_muscles),x_max(number_of_muscles);
-        for(int j=1;j<=number_of_muscles;j++){
+        for(int j=0;j<number_of_muscles;j++){
             MUSCLE<TV>* muscle=muscle_list->muscles(j);
             // TODO: include tendon length 
             // TODO: is this min necessary?
@@ -222,7 +222,7 @@ Solve_For_Muscle_Control(MATRIX_MXN<T>& A,const VECTOR_ND<T>& b,VECTOR_ND<T>& x,
         MATRIX_MXN<T> epsilon_hat_unpermuted=epsilon_hat.Unpermute_Columns(permute); // store as unpermuted quantities
 
         MATRIX_MXN<T> D(number_of_muscles); // this is actually the square root of the weight
-        T sqrt_min_activation_penalty=sqrt(min_activation_penalty);for(int i=1;i<=number_of_muscles;i++) D(i,i)=sqrt_min_activation_penalty;
+        T sqrt_min_activation_penalty=sqrt(min_activation_penalty);for(int i=0;i<number_of_muscles;i++) D(i,i)=sqrt_min_activation_penalty;
 
         VECTOR_ND<int> permute_B(B.n),permute_S,permute_N(N.n);permute.Get_Subvector(1,permute_B);permute.Get_Subvector(B.n+1,permute_N);
         VECTOR_ND<T> b(B.m),f_hat(epsilon_hat.m),x_B(B.n),x_S,x_N(N.n);
@@ -279,16 +279,16 @@ Solve_For_Muscle_Control(MATRIX_MXN<T>& A,const VECTOR_ND<T>& b,VECTOR_ND<T>& x,
             VECTOR_ND<T> negative_penalty(number_of_muscles);
             MATRIX_MXN<T> A_transpose_A=A.Normal_Equations_Matrix();
             int iterations=enforce_nonnegative_activations?activation_optimization_iterations:1;
-            for(int optimization_iteration=1;optimization_iteration<=iterations;optimization_iteration++){
+            for(int optimization_iteration=0;optimization_iteration<iterations;optimization_iteration++){
 
-                //if(optimization_iteration==2) for(int i=1;i<=number_of_muscles;i++){
+                //if(optimization_iteration==2) for(int i=0;i<number_of_muscles;i++){
                 //    if(x(i)<=0) negative_penalty(i)=max_negative_penalty;}
-                if(optimization_iteration>1) for(int i=1;i<=number_of_muscles;i++){
+                if(optimization_iteration>1) for(int i=0;i<number_of_muscles;i++){
                     if(x(i)>0) negative_penalty(i)=0;
                     else negative_penalty(i)=clamp(negative_penalty_factor*negative_penalty(i),min_negative_penalty,max_negative_penalty);}
 
                 // assume all relative weights are 1
-                for(int i=1;i<=number_of_muscles;i++) A_transpose_A(i,i)+=min_activation_penalty+negative_penalty(i);
+                for(int i=0;i<number_of_muscles;i++) A_transpose_A(i,i)+=min_activation_penalty+negative_penalty(i);
                 VECTOR_ND<T> A_transpose_b=A.Transpose_Times(b);
                 x=A_transpose_A.Cholesky_Solve(A_transpose_b);}}
         if(!getenv("OLD_LS")){
@@ -332,15 +332,15 @@ Solve_For_Muscle_Control(MATRIX_MXN<T>& A,const VECTOR_ND<T>& b,VECTOR_ND<T>& x,
             MATRIX_MXN<T> sqrt_D(number_of_muscles,number_of_muscles);
             MATRIX_MXN<T> ls_A(G.m+A.n,G.n);VECTOR_ND<T> ls_b(G.m+A.n);
             MATRIX_MXN<T> A_transpose_A=A.Normal_Equations_Matrix();
-            for(int optimization_iteration=1;optimization_iteration<=iterations;optimization_iteration++){
+            for(int optimization_iteration=0;optimization_iteration<iterations;optimization_iteration++){
 
-                //if(optimization_iteration==2) for(int i=1;i<=number_of_muscles;i++){
+                //if(optimization_iteration==2) for(int i=0;i<number_of_muscles;i++){
                 //    if(x(i)<=0) negative_penalty(i)=max_negative_penalty;}
-                if(optimization_iteration>1) for(int i=1;i<=number_of_muscles;i++){
+                if(optimization_iteration>1) for(int i=0;i<number_of_muscles;i++){
                     if(x(i)>0) negative_penalty(i)=0;
                     else negative_penalty(i)=clamp(negative_penalty_factor*negative_penalty(i),min_negative_penalty,max_negative_penalty);}
 
-                for(int i=1;i<=number_of_muscles;i++) sqrt_D(i,i)=sqrt(min_activation_penalty+negative_penalty(i));
+                for(int i=0;i<number_of_muscles;i++) sqrt_D(i,i)=sqrt(min_activation_penalty+negative_penalty(i));
 
                 // least squares matrix is
                 // ( G         )

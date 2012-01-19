@@ -75,7 +75,7 @@ Compute(int ghost_cells)
 
         alpha=(X-cell_X)*sign/index_map.grid.dX(face.axis);
         T ia[2]={(T)(0.5*(1-alpha)),(T)(0.5*alpha)};
-        for(int a=1;a<=d;a++) if(a!=face.axis) for(int s=0;s<=1;s++) for(int j=0;j<=1;j++){
+        for(int a=0;a<d;a++) if(a!=face.axis) for(int s=0;s<=1;s++) for(int j=0;j<=1;j++){
             FACE_INDEX<d> current_face(a,cell);
             current_face.index(face.axis)+=sign*j;
             current_face.index(a)+=s;
@@ -88,7 +88,7 @@ Compute(int ghost_cells)
 template<class TV> void MATRIX_FLUID_INTERPOLATION_EXTRAPOLATED<TV>::
 Times_Add(const VECTOR_ND<T>& faces,ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints) const
 {
-    for(int i=1;i<=stencils.m;i++) for(int a=1;a<=d;a++){
+    for(int i=1;i<=stencils.m;i++) for(int a=0;a<d;a++){
         T& constraint=constraints(COUPLING_CONSTRAINT_ID(d*(i-1)+a));
         const VECTOR<PAIR<int,T>,4>& e=stencils(i).s(a);
         for(int j=1;j<=4;j++) constraint+=faces(e(j).x)*e(j).y;}
@@ -99,7 +99,7 @@ Times_Add(const VECTOR_ND<T>& faces,ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints
 template<class TV> void MATRIX_FLUID_INTERPOLATION_EXTRAPOLATED<TV>::
 Transpose_Times_Add(const ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints,VECTOR_ND<T>& faces) const
 {
-    for(int i=1;i<=stencils.m;i++) for(int a=1;a<=d;a++){
+    for(int i=1;i<=stencils.m;i++) for(int a=0;a<d;a++){
         T constraint=constraints(COUPLING_CONSTRAINT_ID(d*(i-1)+a));
         const VECTOR<PAIR<int,T>,4>& e=stencils(i).s(a);
         for(int j=1;j<=4;j++) faces(e(j).x)+=constraint*e(j).y;}
@@ -121,7 +121,7 @@ Print_Each_Matrix(int n) const
     OCTAVE_OUTPUT<T> oo(STRING_UTILITIES::string_sprintf("W-%i.txt",n).c_str());
     oo.Begin_Sparse_Matrix("W",Value(Number_Of_Constraints()),index_map.Number_Faces());
 
-    for(int i=1;i<=stencils.m;i++) for(int a=1;a<=d;a++){
+    for(int i=1;i<=stencils.m;i++) for(int a=0;a<d;a++){
         const VECTOR<PAIR<int,T>,4>& e=stencils(i).s(a);
         for(int j=1;j<=4;j++) oo.Add_Sparse_Entry(d*(i-1)+a,e(j).x,e(j).y);}
 
@@ -133,7 +133,7 @@ Print_Each_Matrix(int n) const
 template<class TV> void MATRIX_FLUID_INTERPOLATION_EXTRAPOLATED<TV>::
 Add_Raw_Matrix(ARRAY<TRIPLE<int,int,T> >& data) const
 {
-    for(int i=1;i<=stencils.m;i++) for(int a=1;a<=d;a++){
+    for(int i=1;i<=stencils.m;i++) for(int a=0;a<d;a++){
         const VECTOR<PAIR<int,T>,4>& e=stencils(i).s(a);
         for(int j=1;j<=4;j++) data.Append(TRIPLE<int,int,T>(d*(i-1)+a,e(j).x,e(j).y));}
 }
@@ -143,7 +143,7 @@ Add_Raw_Matrix(ARRAY<TRIPLE<int,int,T> >& data) const
 template<class TV> void MATRIX_FLUID_INTERPOLATION_EXTRAPOLATED<TV>::
 Add_Diagonal(ARRAY<T,COUPLING_CONSTRAINT_ID>& diagonal,const GENERALIZED_FLUID_MASS<TV>& fluid_mass) const
 {
-    for(int i=1;i<=stencils.m;i++) for(int a=1;a<=d;a++){
+    for(int i=1;i<=stencils.m;i++) for(int a=0;a<d;a++){
         T& diag=diagonal(COUPLING_CONSTRAINT_ID(d*(i-1)+a));
         const VECTOR<PAIR<int,T>,4>& e=stencils(i).s(a);
         for(int j=1;j<=4;j++) diag+=fluid_mass.one_over_fluid_mass_at_faces(e(j).x)*sqr(e(j).y);}

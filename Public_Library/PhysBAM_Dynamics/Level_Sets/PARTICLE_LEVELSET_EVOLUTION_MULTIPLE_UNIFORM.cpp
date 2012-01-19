@@ -101,7 +101,7 @@ Advance_Levelset(const T dt)
         levelset_advection_multiple.Euler_Step(V,dt,time,particle_levelset_multiple.number_of_ghost_cells);time+=dt;}
     else{
         for(int i=1;i<=rungekutta_phis.m;i++)rungekutta_phis(i)->Start(dt);
-        for(int k=1;k<=runge_kutta_order_levelset;k++){
+        for(int k=0;k<runge_kutta_order_levelset;k++){
             if(k == 1 || !use_frozen_velocity) particle_levelset_multiple.levelset_multiple.levelset_callbacks->Get_Levelset_Velocity(grid,particle_levelset_multiple.levelset_multiple,V,time);
             levelset_advection_multiple.Euler_Step(V,dt,time,particle_levelset_multiple.number_of_ghost_cells);
             for(int i=1;i<=rungekutta_phis.m;i++)time=rungekutta_phis(i)->Main();}}

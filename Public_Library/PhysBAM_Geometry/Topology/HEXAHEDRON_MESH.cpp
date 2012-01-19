@@ -64,7 +64,7 @@ Initialize_Incident_Elements()
         (*incident_elements)(p3).Append(h);(*incident_elements)(p4).Append(h);
         (*incident_elements)(p5).Append(h);(*incident_elements)(p6).Append(h);
         (*incident_elements)(p7).Append(h);(*incident_elements)(p8).Append(h);}
-    for(int i=1;i<=number_nodes;i++) (*incident_elements)(i).Compact(); // remove extra space
+    for(int i=0;i<number_nodes;i++) (*incident_elements)(i).Compact(); // remove extra space
 }
 //#####################################################################
 // Function Initialize_Adjacent_Elements

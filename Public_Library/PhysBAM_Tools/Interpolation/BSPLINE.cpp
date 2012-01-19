@@ -65,8 +65,8 @@ Clamp_End_Points()
     int number_of_knots=control_points_times.m;int new_points=k-1;
     ARRAY<T> new_control_points_times;new_control_points_times.Resize(number_of_knots+2*new_points);
     ARRAY<T2> new_control_points;new_control_points.Resize(number_of_knots+2*new_points);
-    for(int i=1;i<=number_of_knots;i++){new_control_points_times(i+new_points)=control_points_times(i);new_control_points(i+new_points)=control_points(i);}
-    for(int i=1;i<=new_points;i++){
+    for(int i=0;i<number_of_knots;i++){new_control_points_times(i+new_points)=control_points_times(i);new_control_points(i+new_points)=control_points(i);}
+    for(int i=0;i<new_points;i++){
         new_control_points_times(i)=control_points_times(1);new_control_points_times(number_of_knots+new_points+i)=control_points_times(number_of_knots);
         new_control_points(i)=control_points(1);new_control_points(number_of_knots+new_points+i)=control_points(number_of_knots);}
     control_points_times=new_control_points_times;control_points=new_control_points;

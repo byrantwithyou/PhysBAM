@@ -65,7 +65,7 @@ Setup_AEROF_PhysBAM_Mapping(TETRAHEDRALIZED_VOLUME<T>& tet_volume,ARRAY<ARRAY<in
 
     int tag=Get_Unique_Tag();
     ARRAY<ARRAY<char> > send_buffers(number_of_processes);ARRAY<MPI::Request> requests;
-    for(int i=1;i<=number_of_processes;i++){
+    for(int i=0;i<number_of_processes;i++){
         INDIRECT_ARRAY<ARRAY<VECTOR<int,4> > > proc_tets=tet_volume.mesh.elements.Subset(tets_to_send(i));
         ARRAY<int> local_indices,global_indices;
         for(int t=1;t<=proc_tets.Size();t++){
@@ -77,7 +77,7 @@ Setup_AEROF_PhysBAM_Mapping(TETRAHEDRALIZED_VOLUME<T>& tet_volume,ARRAY<ARRAY<in
         MPI_UTILITIES::Pack(global_indices,positions,send_buffers(i),position,*comm);
         requests.Append(comm->Isend(&(send_buffers(i)(1)),position,MPI::PACKED,i-1,tag));}
     ARRAY<ARRAY<char> > recv_buffers(number_of_processes);
-    for(int i=1;i<=number_of_processes;i++){
+    for(int i=0;i<number_of_processes;i++){
         MPI::Status status;
         comm->Probe(i-1,tag,status);
         recv_buffers(i).Resize(status.Get_count(MPI::PACKED));
@@ -87,7 +87,7 @@ Setup_AEROF_PhysBAM_Mapping(TETRAHEDRALIZED_VOLUME<T>& tet_volume,ARRAY<ARRAY<in
     interior_particles_to_recv.Resize(number_of_processes);ghost_particles_to_recv.Resize(number_of_processes);
     global_to_local_physbam_map.Resize(global_particle_count);global_to_local_physbam_map.Fill(0);
     local_tet_volume->particles.array_collection->Delete_All_Elements();
-    for(int i=1;i<=number_of_processes;i++){
+    for(int i=0;i<number_of_processes;i++){
         ARRAY<int> indices;int position=0;
         MPI_UTILITIES::Unpack(indices,recv_buffers(i),position,*comm);
         ARRAY<TV> positions(indices.m);INDIRECT_ARRAY<ARRAY<TV>,IDENTITY_ARRAY<int> > recv_positions(positions,IDENTITY_ARRAY<int>(indices.m));
@@ -104,19 +104,19 @@ Setup_AEROF_PhysBAM_Mapping(TETRAHEDRALIZED_VOLUME<T>& tet_volume,ARRAY<ARRAY<in
     local_tet_volume->Update_Number_Nodes();
 
     tag=Get_Unique_Tag();
-    for(int i=1;i<=number_of_processes;i++){
+    for(int i=0;i<number_of_processes;i++){
         int buffer_size=MPI_UTILITIES::Pack_Size(interior_particles_to_recv(i),ghost_particles_to_recv(i),*comm)+1;
         send_buffers(i).Resize(buffer_size);int position=0;
         MPI_UTILITIES::Pack(interior_particles_to_recv(i),ghost_particles_to_recv(i),send_buffers(i),position,*comm);
         requests.Append(comm->Isend(&(send_buffers(i)(1)),position,MPI::PACKED,i-1,tag));}
-    for(int i=1;i<=number_of_processes;i++){
+    for(int i=0;i<number_of_processes;i++){
         MPI::Status status;
         comm->Probe(i-1,tag,status);
         recv_buffers(i).Resize(status.Get_count(MPI::PACKED));
         requests.Append(comm->Irecv(&(recv_buffers(i)(1)),recv_buffers(i).m,MPI_PACKED,i-1,tag));}
     MPI_UTILITIES::Wait_All(requests);
     interior_particles_to_send.Resize(number_of_processes);ghost_particles_to_send.Resize(number_of_processes);
-    for(int i=1;i<=number_of_processes;i++){
+    for(int i=0;i<number_of_processes;i++){
         int position=0;
         MPI_UTILITIES::Unpack(interior_particles_to_send(i),ghost_particles_to_send(i),recv_buffers(i),position,*comm);}
     
@@ -132,7 +132,7 @@ Exchange_Compressible_Data(COMPRESSIBLE_FLUID_PARTICLES<TV>& particles_aerof)
     int interior_tag=Get_Unique_Tag();
     int ghost_tag=Get_Unique_Tag();
     ARRAY<ARRAY<char> > interior_send_buffers(number_of_processes),ghost_send_buffers(number_of_processes);ARRAY<MPI::Request> requests;
-    for(int i=1;i<=number_of_processes;i++){
+    for(int i=0;i<number_of_processes;i++){
         if(i-1!=rank){
             INDIRECT_ARRAY<ARRAY<int> > proc_interior_particles_to_send=global_to_local_aerof_map.Subset(interior_particles_to_send(i)),
                 proc_ghost_particles_to_send=global_to_local_aerof_map.Subset(ghost_particles_to_send(i));
@@ -152,7 +152,7 @@ Exchange_Compressible_Data(COMPRESSIBLE_FLUID_PARTICLES<TV>& particles_aerof)
             MPI_UTILITIES::Pack(ghost_rho,ghost_u,ghost_E,ghost_phi,ghost_grad_phi,ghost_send_buffers(i),position,*comm);
             requests.Append(comm->Isend(&(ghost_send_buffers(i)(1)),position,MPI::PACKED,i-1,ghost_tag));}}
     ARRAY<ARRAY<char> > interior_recv_buffers(number_of_processes),ghost_recv_buffers(number_of_processes);
-    for(int i=1;i<=number_of_processes;i++){
+    for(int i=0;i<number_of_processes;i++){
         if(i-1!=rank){
             MPI::Status status;
             comm->Probe(i-1,interior_tag,status);
@@ -162,7 +162,7 @@ Exchange_Compressible_Data(COMPRESSIBLE_FLUID_PARTICLES<TV>& particles_aerof)
             ghost_recv_buffers(i).Resize(status.Get_count(MPI::PACKED));
             requests.Append(comm->Irecv(&(ghost_recv_buffers(i)(1)),ghost_recv_buffers(i).m,MPI_PACKED,i-1,ghost_tag));}}
     MPI_UTILITIES::Wait_All(requests);
-    for(int i=1;i<=number_of_processes;i++){
+    for(int i=0;i<number_of_processes;i++){
         if(i-1!=rank){
             int position=0;
             INDIRECT_ARRAY<ARRAY<int> > local_indices_of_interior_particles_to_recv=global_to_local_physbam_map.Subset(interior_particles_to_recv(i)),
@@ -211,7 +211,7 @@ Exchange_Back_Compressible_Data(COMPRESSIBLE_FLUID_PARTICLES<TV>& particles_aero
 { 
     int tag=Get_Unique_Tag();
     ARRAY<ARRAY<char> > send_buffers(number_of_processes);ARRAY<MPI::Request> requests;
-    for(int i=1;i<=number_of_processes;i++){
+    for(int i=0;i<number_of_processes;i++){
         if(i-1!=rank){
             INDIRECT_ARRAY<ARRAY<int> > local_indices_of_interior_particles_to_recv=global_to_local_physbam_map.Subset(interior_particles_to_recv(i)),
                 local_indices_of_ghost_particles_to_recv=global_to_local_physbam_map.Subset(ghost_particles_to_recv(i));
@@ -223,14 +223,14 @@ Exchange_Back_Compressible_Data(COMPRESSIBLE_FLUID_PARTICLES<TV>& particles_aero
             MPI_UTILITIES::Pack(interior_rho,interior_u,interior_E,interior_phi,interior_grad_phi,send_buffers(i),position,*comm);
             requests.Append(comm->Isend(&(send_buffers(i)(1)),position,MPI::PACKED,i-1,tag));}}
     ARRAY<ARRAY<char> > recv_buffers(number_of_processes);
-    for(int i=1;i<=number_of_processes;i++){
+    for(int i=0;i<number_of_processes;i++){
         if(i-1!=rank){
             MPI::Status status;
             comm->Probe(i-1,tag,status);
             recv_buffers(i).Resize(status.Get_count(MPI::PACKED));
             requests.Append(comm->Irecv(&(recv_buffers(i)(1)),recv_buffers(i).m,MPI_PACKED,i-1,tag));}}
     MPI_UTILITIES::Wait_All(requests);
-    for(int i=1;i<=number_of_processes;i++){
+    for(int i=0;i<number_of_processes;i++){
         if(i-1!=rank){
             int position=0;
             INDIRECT_ARRAY<ARRAY<int> > proc_interior_particles_to_send=global_to_local_aerof_map.Subset(interior_particles_to_send(i));

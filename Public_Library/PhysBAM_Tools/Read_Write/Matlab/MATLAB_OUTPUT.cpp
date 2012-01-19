@@ -48,7 +48,7 @@ template<class T> void MATLAB_OUTPUT::
 Write_Header_File(const std::string& file_name,const GRID<VECTOR<T,1> >& grid,const int stepnumber)
 {
     int m=grid.counts.x;
-    ARRAY<T,VECTOR<int,1> > x(1,m);for(int i=1;i<=m;i++) x(i)=grid.Axis_X(i,1);
+    ARRAY<T,VECTOR<int,1> > x(1,m);for(int i=0;i<m;i++) x(i)=grid.Axis_X(i,1);
     Write_Header_File(file_name,x,stepnumber);
 }
 //#####################################################################
@@ -61,7 +61,7 @@ Write_Header_File(const std::string& file_name,const ARRAY<T,VECTOR<int,1> >& x,
     std::ofstream Matlab_Output;
     Matlab_Output.open(STRING_UTILITIES::string_sprintf("%s.%d",file_name.c_str(),stepnumber).c_str(),std::ios::out|std::ios::binary);
     data_int=m;if(!little_endian) Convert_Bytes(data_int);Matlab_Output.write((const char*)&data_int,4);
-    for(int i=1;i<=m;i++){data_double=x(i);if(!little_endian) Convert_Bytes(data_double);Matlab_Output.write((const char*)&data_double,8);}
+    for(int i=0;i<m;i++){data_double=x(i);if(!little_endian) Convert_Bytes(data_double);Matlab_Output.write((const char*)&data_double,8);}
     Matlab_Output.close();
 }
 //#####################################################################
@@ -71,7 +71,7 @@ template<class T> void MATLAB_OUTPUT::
 Write_Header_File(const std::string& file_name,const GRID<VECTOR<T,2> >& grid,const int stepnumber)
 {
     int m=grid.Counts().x,n=grid.Counts().y;
-    ARRAY<T,VECTOR<int,2> > x(1,m,1,n),y(1,m,1,n);for(int i=1;i<=m;i++) for(int j=1;j<=n;j++){x(i,j)=grid.X(i,j).x;y(i,j)=grid.X(i,j).y;}
+    ARRAY<T,VECTOR<int,2> > x(1,m,1,n),y(1,m,1,n);for(int i=0;i<m;i++) for(int j=0;j<n;j++){x(i,j)=grid.X(i,j).x;y(i,j)=grid.X(i,j).y;}
     Write_Header_File(file_name,x,y,stepnumber);
 }
 //#####################################################################
@@ -85,8 +85,8 @@ Write_Header_File(const std::string& file_name,const ARRAY<T,VECTOR<int,2> >& x,
     Matlab_Output.open(STRING_UTILITIES::string_sprintf("%s.%d",file_name.c_str(),stepnumber).c_str(),std::ios::out|std::ios::binary);
     data_int=m;if(!little_endian) Convert_Bytes(data_int);Matlab_Output.write((const char*)&data_int,4);
     data_int=n;if(!little_endian) Convert_Bytes(data_int);Matlab_Output.write((const char*)&data_int,4);
-    int i;for(i=1;i<=m;i++) for(int j=1;j<=n;j++){data_double=x(i,j);if(!little_endian) Convert_Bytes(data_double);Matlab_Output.write((const char*)&data_double,8);}
-    for(i=1;i<=m;i++) for(int j=1;j<=n;j++){data_double=y(i,j);if(!little_endian) Convert_Bytes(data_double);Matlab_Output.write((const char*)&data_double,8);}
+    int i;for(i=1;i<=m;i++) for(int j=0;j<n;j++){data_double=x(i,j);if(!little_endian) Convert_Bytes(data_double);Matlab_Output.write((const char*)&data_double,8);}
+    for(i=1;i<=m;i++) for(int j=0;j<n;j++){data_double=y(i,j);if(!little_endian) Convert_Bytes(data_double);Matlab_Output.write((const char*)&data_double,8);}
     Matlab_Output.close();
 }
 //#####################################################################
@@ -97,8 +97,8 @@ Write_Header_File(const std::string& file_name,const GRID<VECTOR<T,3> >& grid,co
 {
     int m=grid.Counts().x,n=grid.Counts().y,mn=grid.Counts().z;
     ARRAY<T,VECTOR<int,3> > x(1,m,1,n,1,mn),y(1,m,1,n,1,mn),z(1,m,1,n,1,mn);
-    for(int i=1;i<=m;i++) for(int j=1;j<=n;j++) for(int ij=1;ij<=mn;ij++){x(i,j,ij)=grid.X(i,j,ij).x;y(i,j,ij)=grid.X(i,j,ij).y;z(i,j,ij)=grid.X(i,j,ij).z;}
-    for(int i=1;i<=m;i++) for(int j=1;j<=n;j++) for(int ij=1;ij<=mn;ij++){x(i,j,ij)=grid.X(i,j,ij).x;y(i,j,ij)=grid.X(i,j,ij).y;z(i,j,ij)=grid.X(i,j,ij).z;}
+    for(int i=0;i<m;i++) for(int j=0;j<n;j++) for(int ij=0;ij<mn;ij++){x(i,j,ij)=grid.X(i,j,ij).x;y(i,j,ij)=grid.X(i,j,ij).y;z(i,j,ij)=grid.X(i,j,ij).z;}
+    for(int i=0;i<m;i++) for(int j=0;j<n;j++) for(int ij=0;ij<mn;ij++){x(i,j,ij)=grid.X(i,j,ij).x;y(i,j,ij)=grid.X(i,j,ij).y;z(i,j,ij)=grid.X(i,j,ij).z;}
     Write_Header_File(file_name,x,y,z,stepnumber);
 }
 //#####################################################################
@@ -112,11 +112,11 @@ Write_Header_File(const std::string& file_name,const ARRAY<T,VECTOR<int,3> >& x,
     data_int=m;if(!little_endian) Convert_Bytes(data_int);Matlab_Output.write((const char*)&data_int,4);
     data_int=n;if(!little_endian) Convert_Bytes(data_int);Matlab_Output.write((const char*)&data_int,4);
     data_int=mn;if(!little_endian) Convert_Bytes(data_int);Matlab_Output.write((const char*)&data_int,4);
-    int i;for(i=1;i<=m;i++) for(int j=1;j<=n;j++) for(int ij=1;ij<=mn;ij++){
+    int i;for(i=1;i<=m;i++) for(int j=0;j<n;j++) for(int ij=0;ij<mn;ij++){
         data_double=x(i,j,ij);if(!little_endian) Convert_Bytes(data_double);Matlab_Output.write((const char*)&data_double,8);}
-    for(i=1;i<=m;i++) for(int j=1;j<=n;j++) for(int ij=1;ij<=mn;ij++){
+    for(i=1;i<=m;i++) for(int j=0;j<n;j++) for(int ij=0;ij<mn;ij++){
         data_double=y(i,j,ij);if(!little_endian) Convert_Bytes(data_double);Matlab_Output.write((const char*)&data_double,8);}
-    for(i=1;i<=m;i++) for(int j=1;j<=n;j++) for(int ij=1;ij<=mn;ij++){
+    for(i=1;i<=m;i++) for(int j=0;j<n;j++) for(int ij=0;ij<mn;ij++){
         data_double=z(i,j,ij);if(!little_endian) Convert_Bytes(data_double);Matlab_Output.write((const char*)&data_double,8);}
     Matlab_Output.close();
 }
@@ -128,7 +128,7 @@ Write_Output_File(const std::string& file_name,const ARRAY<T,VECTOR<int,1> >& ou
 {
     int m=output.domain.max_corner.x;double data_double;
     std::ofstream Matlab_Output;Matlab_Output.open(STRING_UTILITIES::string_sprintf("%s.%d",file_name.c_str(),stepnumber).c_str(),std::ios::out|std::ios::binary);
-    for(int i=1;i<=m;i++){data_double=output(i);if(!little_endian) Convert_Bytes(data_double);Matlab_Output.write((const char*)&data_double,8);}
+    for(int i=0;i<m;i++){data_double=output(i);if(!little_endian) Convert_Bytes(data_double);Matlab_Output.write((const char*)&data_double,8);}
     Matlab_Output.close();
 }
 //#####################################################################
@@ -139,7 +139,7 @@ Write_Output_File(const std::string& file_name,const ARRAY<T,VECTOR<int,2> >& ou
 {
     int m=output.domain.max_corner.x,n=output.domain.max_corner.y;double data_double;
     std::ofstream Matlab_Output;Matlab_Output.open(STRING_UTILITIES::string_sprintf("%s.%d",file_name.c_str(),stepnumber).c_str(),std::ios::out|std::ios::binary);
-    for(int i=1;i<=m;i++) for(int j=1;j<=n;j++){data_double=output(i,j);if(!little_endian) Convert_Bytes(data_double);Matlab_Output.write((const char*)&data_double,8);}
+    for(int i=0;i<m;i++) for(int j=0;j<n;j++){data_double=output(i,j);if(!little_endian) Convert_Bytes(data_double);Matlab_Output.write((const char*)&data_double,8);}
     Matlab_Output.close();
 }
 //#####################################################################
@@ -150,7 +150,7 @@ Write_Output_File(const std::string& file_name,const ARRAY<T,VECTOR<int,3> >& ou
 {
     int m=output.domain.max_corner.x,n=output.domain.max_corner.y,mn=output.domain.max_corner.z;double data_double;
     std::ofstream Matlab_Output;Matlab_Output.open(STRING_UTILITIES::string_sprintf("%s.%d",file_name.c_str(),stepnumber).c_str(),std::ios::out|std::ios::binary);
-    for(int i=1;i<=m;i++) for(int j=1;j<=n;j++) for(int ij=1;ij<=mn;ij++){
+    for(int i=0;i<m;i++) for(int j=0;j<n;j++) for(int ij=0;ij<mn;ij++){
         data_double=output(i,j,ij);if(!little_endian) Convert_Bytes(data_double);Matlab_Output.write((const char*)&data_double,8);}
     Matlab_Output.close();
 }
@@ -163,7 +163,7 @@ Write_Output_File(const std::string& file_name,const ARRAY_VIEW<VECTOR<T,d> >& X
     std::ofstream Matlab_Output;
     Matlab_Output.open(STRING_UTILITIES::string_sprintf("%s.%d",file_name.c_str(),stepnumber).c_str(),std::ios::out|std::ios::binary);
     int data_int=X.Size();if(!little_endian) Convert_Bytes(data_int);Matlab_Output.write((const char*)&data_int,4);
-    for(int a=1;a<=d;a++) for(int k=1;k<=X.Size();k++){
+    for(int a=0;a<d;a++) for(int k=1;k<=X.Size();k++){
         double data_double=X(k)[a];if(!little_endian) Convert_Bytes(data_double);Matlab_Output.write((const char*)&data_double,8);}
     Matlab_Output.close();
 }

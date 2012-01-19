@@ -105,7 +105,7 @@ Read(TYPED_ISTREAM& input)
     int region_count;
     Read_Binary(input,region_count);
     regions.Resize(region_count);
-    for(int r=1;r<=region_count;r++){
+    for(int r=0;r<region_count;r++){
         regions(r)=new FRACTURE_REGION<T>(0,0,false);
         regions(r)->Read(input);
         if(use_particle_partitions) regions(r)->Initialize_Particle_Partition();}

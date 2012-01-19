@@ -38,7 +38,7 @@ Reinitialize(const int time_steps,const T time)
     
     ARRAY<T,VECTOR<int,1> > sign_phi(1,m); // smeared out sign function
     T epsilon=sqr(dx);
-    for(int i=1;i<=m;i++) sign_phi(i)=phi(i)/sqrt(sqr(phi(i))+epsilon);
+    for(int i=0;i<m;i++) sign_phi(i)=phi(i)/sqrt(sqr(phi(i))+epsilon);
 
     T dt=reinitialization_cfl*dx;
     RUNGEKUTTA<ARRAY<T,VECTOR<int,1> > > rungekutta(phi);
@@ -46,7 +46,7 @@ Reinitialize(const int time_steps,const T time)
     rungekutta.Set_Order(reinitialization_runge_kutta_order);
     rungekutta.Set_Time(time);
     rungekutta.Pseudo_Time();
-    for(int k=1;k<=time_steps;k++){
+    for(int k=0;k<time_steps;k++){
         rungekutta.Start(dt);
         for(int kk=1;kk<=rungekutta.order;kk++){Euler_Step_Of_Reinitialization(sign_phi,dt,time);rungekutta.Main();}
     } 

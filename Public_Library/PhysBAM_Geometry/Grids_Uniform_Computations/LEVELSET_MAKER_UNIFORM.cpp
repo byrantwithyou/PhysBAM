@@ -177,13 +177,13 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
             if(verbose) LOG::Time("Marking boundary region as outside");
             flood_fill.Identify_Colors_Touching_Boundary(number_of_colors,colors,edge_is_blocked_x,edge_is_blocked_y,edge_is_blocked_z,color_touches_boundary);
             if(verbose && color_touches_boundary.Number_True()>1) LOG::cerr<<"Warning: Got "<<color_touches_boundary.Number_True()<<" colors touching boundary"<<std::endl;
-            for(int i=1;i<=number_of_colors;i++) color_is_inside(i)=!color_touches_boundary(i);}
+            for(int i=0;i<number_of_colors;i++) color_is_inside(i)=!color_touches_boundary(i);}
         else{
             ARRAY<T> color_maximum_distance(number_of_colors,false);color_maximum_distance.Fill(-1);
             ARRAY<TV_INT> color_representatives(number_of_colors);
             for(int i=1;i<=grid.counts.x;i++)for(int j=1;j<=grid.counts.y;j++)for(int k=1;k<=grid.counts.z;k++)if(closest_triangle_index(i,j,k) && color_maximum_distance(colors(i,j,k))<phi(i,j,k)){
                 color_maximum_distance(colors(i,j,k))=phi(i,j,k);color_representatives(colors(i,j,k))=TV_INT(i,j,k);}
-            for(int color=1;color<=number_of_colors;color++){
+            for(int color=0;color<number_of_colors;color++){
                 if(color_maximum_distance(color)<0){LOG::cerr<<"Error: could not determine inside/outside for color "<<color<<std::endl;PHYSBAM_FATAL_ERROR();}
                 else color_is_inside(color)=triangulated_surface.Inside_Relative_To_Triangle(grid.X(color_representatives(color)),
                     closest_triangle_index(color_representatives(color)),surface_thickness_over_two);}}
@@ -194,7 +194,7 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
             if(verbose) LOG::cout<<"Keeping only largest inside region (max region size = "<<max_region_size<<")... "<<std::flush;
 #endif
-            for(int i=1;i<=number_of_colors;i++) if(color_is_inside(i) && region_size(i)<max_region_size) color_is_inside(i)=false;}
+            for(int i=0;i<number_of_colors;i++) if(color_is_inside(i) && region_size(i)<max_region_size) color_is_inside(i)=false;}
         if(flip_sign_if_corners_are_inside){ // If the majority of corners are labelled as inside then we flip signs
             int num_corners_inside=(int)color_is_inside(colors(1,1,1))+(int)color_is_inside(colors(1,1,grid.counts.z))+
                                    (int)color_is_inside(colors(1,grid.counts.y,1))+(int)color_is_inside(colors(1,grid.counts.y,grid.counts.z))+
@@ -204,7 +204,7 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
                 if(verbose) LOG::cout<<"Majority of corners are inside -- flipping sign!"<<std::endl;
 #endif
-                for(int i=1;i<=number_of_colors;i++) color_is_inside(i)=!color_is_inside(i);}}
+                for(int i=0;i<number_of_colors;i++) color_is_inside(i)=!color_is_inside(i);}}
         for(int i=1;i<=grid.counts.x;i++) for(int j=1;j<=grid.counts.y;j++) for(int k=1;k<=grid.counts.z;k++) if(color_is_inside(colors(i,j,k))) phi(i,j,k)*=-1;}
 
     if(positive_boundary_band){

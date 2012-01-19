@@ -84,7 +84,7 @@ Set_Row_Lengths(const ARRAY<int>& lengths)
 {
     diagonal_index.Clean_Memory();delete C;C=0;n=lengths.m;
     offsets.Resize(n+1,false,false);offsets(1)=1;
-    for(int i=1;i<=n;i++){assert(lengths(i));offsets(i+1)=offsets(i)+lengths(i);}
+    for(int i=0;i<n;i++){assert(lengths(i));offsets(i+1)=offsets(i)+lengths(i);}
     A.Resize(offsets(n+1)-1);
 }
 //#####################################################################
@@ -128,7 +128,7 @@ template<class T> void SPARSE_MATRIX_FLAT_NXN<T>::
 Initialize_Diagonal_Index()
 {
     diagonal_index.Resize(n,false,false);
-    for(int i=1;i<=n;i++){diagonal_index(i)=Find_Index(i,i);assert(A(diagonal_index(i)).j==i);}
+    for(int i=0;i<n;i++){diagonal_index(i)=Find_Index(i,i);assert(A(diagonal_index(i)).j==i);}
 }
 //#####################################################################
 // Function Multiply
@@ -191,7 +191,7 @@ operator*=(const T a)
 template<class T> SPARSE_MATRIX_FLAT_NXN<T>& SPARSE_MATRIX_FLAT_NXN<T>::
 operator+=(const T a)
 {
-    for(int i=1;i<=n;i++) (*this)(i,i)+=a;
+    for(int i=0;i<n;i++) (*this)(i,i)+=a;
     return *this;
 }
 //#####################################################################
@@ -200,7 +200,7 @@ operator+=(const T a)
 template<class T> SPARSE_MATRIX_FLAT_NXN<T>& SPARSE_MATRIX_FLAT_NXN<T>::
 operator-=(const T a)
 {
-    for(int i=1;i<=n;i++) (*this)(i,i)-=a;
+    for(int i=0;i<n;i++) (*this)(i,i)-=a;
     return *this;
 }
 //#####################################################################
@@ -209,7 +209,7 @@ operator-=(const T a)
 template<class T> bool SPARSE_MATRIX_FLAT_NXN<T>::
 Symmetric(const T tolerance) const
 {
-    for(int i=1;i<=n;i++)for(int index=offsets(i);index<offsets(i+1);index++)
+    for(int i=0;i<n;i++)for(int index=offsets(i);index<offsets(i+1);index++)
         if(abs(A(index).a-(*this)(A(index).j,i))>tolerance) return false;
     return true;
 }
@@ -220,7 +220,7 @@ template<class T> bool SPARSE_MATRIX_FLAT_NXN<T>::
 Positive_Diagonal_And_Nonnegative_Row_Sum(const T tolerance) const
 {
     bool return_value=true;
-    for(int i=1;i<=n;i++){
+    for(int i=0;i<n;i++){
         if((*this)(i,i)<=0){
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
             LOG::cout<<"diagonal entry "<<i<<" contains nonpositive element: "<<(*this)(i,i)<<std::endl;
@@ -242,7 +242,7 @@ Transpose(SPARSE_MATRIX_FLAT_NXN<T>& A_transpose) const
 {
     ARRAY<int> row_lengths(n);for(int index=1;index<=A.m;index++)row_lengths(A(index).j)++;
     A_transpose.Set_Row_Lengths(row_lengths);
-    for(int i=1;i<=n;i++) for(int index=offsets(i);index<offsets(i+1);index++) A_transpose(A(index).j,i)=A(index).a;
+    for(int i=0;i<n;i++) for(int index=offsets(i);index<offsets(i+1);index++) A_transpose(A(index).j,i)=A(index).a;
 }
 //#####################################################################
 // Function Is_Transpose
@@ -251,7 +251,7 @@ template<class T> bool SPARSE_MATRIX_FLAT_NXN<T>::
 Is_Transpose(const SPARSE_MATRIX_FLAT_NXN<T>& A_transpose,const T tolerance) const
 {
     assert(A_transpose.n==n);
-    for(int i=1;i<=n;i++)for(int index=offsets(i);index<offsets(i+1);index++)if(abs(A(index).a-A_transpose(A(index).j,i))>tolerance) return false;
+    for(int i=0;i<n;i++)for(int index=offsets(i);index<offsets(i+1);index++)if(abs(A(index).a-A_transpose(A(index).j,i))>tolerance) return false;
     return true;
 }
 //#####################################################################
@@ -260,13 +260,13 @@ Is_Transpose(const SPARSE_MATRIX_FLAT_NXN<T>& A_transpose,const T tolerance) con
 template<class T> void SPARSE_MATRIX_FLAT_NXN<T>::
 Solve_Forward_Substitution(const VECTOR_ND<T>& b,VECTOR_ND<T>& x,const bool diagonal_is_identity,const bool diagonal_is_inverted) const
 {
-    if(diagonal_is_identity) for(int i=1;i<=n;i++){
+    if(diagonal_is_identity) for(int i=0;i<n;i++){
         T sum=0;for(int index=offsets(i);index<diagonal_index(i);index++)sum+=A(index).a*x(A(index).j);
         x(i)=b(i)-sum;}
-    else if(!diagonal_is_inverted) for(int i=1;i<=n;i++){
+    else if(!diagonal_is_inverted) for(int i=0;i<n;i++){
         T sum=0;for(int index=offsets(i);index<diagonal_index(i);index++)sum+=A(index).a*x(A(index).j);
         x(i)=(b(i)-sum)/A(diagonal_index(i)).a;}
-    else for(int i=1;i<=n;i++){
+    else for(int i=0;i<n;i++){
         T sum=0;for(int index=offsets(i);index<diagonal_index(i);index++)sum+=A(index).a*x(A(index).j);
         x(i)=(b(i)-sum)*A(diagonal_index(i)).a;}
 }
@@ -304,7 +304,7 @@ template<class T> void SPARSE_MATRIX_FLAT_NXN<T>::
 In_Place_Incomplete_Cholesky_Factorization(const bool modified_version,const T modified_coefficient,const T zero_tolerance,const T zero_replacement)
 {
     Initialize_Diagonal_Index();
-    for(int i=1;i<=n;i++){ // for each row
+    for(int i=0;i<n;i++){ // for each row
         int row_diagonal_index=diagonal_index(i),row_end=offsets(i+1)-1;T sum=0;
         for(int k_bar=offsets(i);k_bar<row_diagonal_index;k_bar++){ // for all the entries before the diagonal element
             int k=A(k_bar).j;int row2_diagonal_index=diagonal_index(k),row2_end=offsets(k+1)-1;
@@ -325,7 +325,7 @@ template<class T> void SPARSE_MATRIX_FLAT_NXN<T>::
 Gauss_Seidel_Single_Iteration(VECTOR_ND<T>& x,const VECTOR_ND<T>& b)
 {
     assert(x.n==b.n && x.n==n);
-    for(int i=1;i<=n;i++){
+    for(int i=0;i<n;i++){
         T rho=0;T diagonal_entry=0;
         for(int index=offsets(i);index<offsets(i+1);index++){
             if(A(index).j==i) diagonal_entry=A(index).a;
@@ -340,9 +340,9 @@ Gauss_Seidel_Solve(VECTOR_ND<T>& x,const VECTOR_ND<T>& b,const T tolerance,const
 {
     assert(x.n==b.n && x.n==n);
     VECTOR_ND<T> last_x(x);
-    for(int k=1;k<=max_iterations;k++){
+    for(int k=0;k<max_iterations;k++){
         Gauss_Seidel_Single_Iteration(x,b);
-        T residual=0;for(int j=1;j<=n;j++){residual+=sqr(last_x(j)-x(j));last_x(j)=x(j);}if(residual < tolerance) return;}
+        T residual=0;for(int j=0;j<n;j++){residual+=sqr(last_x(j)-x(j));last_x(j)=x(j);}if(residual < tolerance) return;}
 }
 //#####################################################################
 // Function Write_Row_Lengths
@@ -351,7 +351,7 @@ template<class T> void SPARSE_MATRIX_FLAT_NXN<T>::
 Write_Row_Lengths()
 {
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
-    for(int i=1;i<=n;i++)LOG::cout<<offsets(i+1)-offsets(i)<<" ";LOG::cout<<std::endl;
+    for(int i=0;i<n;i++)LOG::cout<<offsets(i+1)-offsets(i)<<" ";LOG::cout<<std::endl;
 #endif
 }
 //#####################################################################
@@ -361,7 +361,7 @@ template<class T> void SPARSE_MATRIX_FLAT_NXN<T>::
 Print_Row(const int row)
 {
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
-    for(int i=1;i<=n;i++)if(Element_Present(row,i))LOG::cout<<"Col: "<<i<<" Val: "<<(*this)(row,i)<<",  ";
+    for(int i=0;i<n;i++)if(Element_Present(row,i))LOG::cout<<"Col: "<<i<<" Val: "<<(*this)(row,i)<<",  ";
     LOG::cout<<std::endl;
 #endif
 }
@@ -401,7 +401,7 @@ Finish_Row()
 template<class T> void SPARSE_MATRIX_FLAT_NXN<T>::
 Sort_Entries()
 {
-    for(int i=1;i<=n;i++){ARRAY_VIEW<SPARSE_MATRIX_ENTRY<T> > view(A.Array_View(offsets(i),offsets(i+1)-offsets(i)));Sort(view);}
+    for(int i=0;i<n;i++){ARRAY_VIEW<SPARSE_MATRIX_ENTRY<T> > view(A.Array_View(offsets(i),offsets(i+1)-offsets(i)));Sort(view);}
 }
 //#####################################################################
 // Function Conjugate_With_Diagonal_Matrix
@@ -410,7 +410,7 @@ template<class T> void SPARSE_MATRIX_FLAT_NXN<T>::
 Conjugate_With_Diagonal_Matrix(VECTOR_ND<T>& x)
 {
     int index=offsets(1);
-    for(int i=1;i<=n;i++){
+    for(int i=0;i<n;i++){
         int end=offsets(i+1);
         for(;index<end;index++) A(index).a*=x(i)*x(A(index).j);}
 }

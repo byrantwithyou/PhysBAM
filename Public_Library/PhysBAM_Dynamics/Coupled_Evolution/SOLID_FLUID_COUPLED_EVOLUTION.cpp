@@ -271,7 +271,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
         ARRAY<int,VECTOR<int,1> > filled_region_cell_count(-1,number_of_regions);
         A_array.Resize(number_of_regions);b_array.Resize(number_of_regions);
         for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()) filled_region_cell_count(poisson.filled_region_colors(iterator.Cell_Index()))++;
-        for(int color=1;color<=number_of_regions;color++) if(poisson.filled_region_touches_dirichlet(color)||poisson.solve_neumann_regions){
+        for(int color=0;color<number_of_regions;color++) if(poisson.filled_region_touches_dirichlet(color)||poisson.solve_neumann_regions){
             matrix_index_to_cell_index_array(color).Resize(filled_region_cell_count(color));}
         filled_region_cell_count.Fill(0); // reusing this array in order to make the indirection arrays
 
@@ -292,7 +292,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
         colors=filled_region_cell_count.domain.max_corner.x;
 
         interior_regions.Resize(colors);
-        for(int color=1;color<=colors;color++) if(filled_region_cell_count(color)>0){
+        for(int color=0;color<colors;color++) if(filled_region_cell_count(color)>0){
             if(!poisson.laplace_mpi || color>poisson.laplace_mpi->partitions.m) interior_regions(color)=INTERVAL<int>(1,filled_region_cell_count(color));
             else interior_regions(color)=poisson.laplace_mpi->partitions(color).interior_indices;}}
 
@@ -824,7 +824,7 @@ template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION<TV>::
 Compute_Coupling_Terms_Deformable(const T_ARRAYS_INT& cell_index_to_matrix_index,const ARRAY<INTERVAL<int> >& interior_regions,const int colors)
 {
     ARRAY<ARRAY<int> > row_counts(colors);
-    for(int i=1;i<=colors;i++) row_counts(i).Resize(solid_body_collection.deformable_body_collection.dynamic_particles.Size()*TV::dimension); // TODO: fix // TODO: is this right?
+    for(int i=0;i<colors;i++) row_counts(i).Resize(solid_body_collection.deformable_body_collection.dynamic_particles.Size()*TV::dimension); // TODO: fix // TODO: is this right?
 
     // have face weights.  Want to set up W^T * \nabla.  dual cells correspond to rows of W.
     // stencil for grad p looks like (p_i+1 - p_i)/dx
@@ -857,7 +857,7 @@ Compute_Coupling_Terms_Deformable(const T_ARRAYS_INT& cell_index_to_matrix_index
                     nodal_fluid_mass(dual_cell_weight(i).x)(axis)+=dual_cell_fluid_mass*dual_cell_weight(i).y;}}}
 
         // assume we've done everything in terms of dynamic particles
-        for(int i=1;i<=colors;i++){
+        for(int i=0;i<colors;i++){
             J_deformable(i).n=interior_regions(i).Size()+1;
             J_deformable(i).Set_Row_Lengths(row_counts(i));
             PROJECTED_ARRAY<ARRAY<SPARSE_MATRIX_ENTRY<T> >,T_PROJECTED_INDEX> J_deformableiAj=J_deformable(i).A.template Project<int,&SPARSE_MATRIX_ENTRY<T>::j>();
@@ -892,7 +892,7 @@ Compute_Coupling_Terms_Deformable(const T_ARRAYS_INT& cell_index_to_matrix_index
                 int j_row=TV::dimension*(dual_cell_weight(i).x-1)+axis;T weight=dual_cell_weight(i).y;
                 if(left_column_index>0) J_deformable(left_column_color).Add_Element(j_row,left_column_index,weight*left_column_weight);
                 if(right_column_index>0) J_deformable(right_column_color).Add_Element(j_row,right_column_index,weight*right_column_weight);}}
-        for(int i=1;i<=colors;i++){SPARSE_MATRIX_FLAT_MXN<T> temp(J_deformable(i));temp.Compress(J_deformable(i));}}
+        for(int i=0;i<colors;i++){SPARSE_MATRIX_FLAT_MXN<T> temp(J_deformable(i));temp.Compress(J_deformable(i));}}
 }
 //#####################################################################
 // Function Compute_Coupling_Terms_Rigid
@@ -905,12 +905,12 @@ Compute_Coupling_Terms_Rigid(const T_ARRAYS_INT& cell_index_to_matrix_index,cons
     ARRAY<int> rigid_body_particles_to_dynamic_rigid_body_particles_map(rigid_body_particles.array_collection->Size());
     rigid_body_particles_to_dynamic_rigid_body_particles_map.Subset(kinematic_rigid_bodies)=IDENTITY_ARRAY<int>(kinematic_rigid_bodies.m);
 
-    for(int i=1;i<=colors;i++) kinematic_row_counts(i).Resize(rigid_body_count*rows_per_rigid_body);
+    for(int i=0;i<colors;i++) kinematic_row_counts(i).Resize(rigid_body_count*rows_per_rigid_body);
     J_rigid_kinematic.Resize(colors);
 
     if(fluids_parameters.fluid_affects_solid){
         rigid_body_particles_to_dynamic_rigid_body_particles_map.Subset(solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles)=IDENTITY_ARRAY<int>(solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m);
-        for(int i=1;i<=colors;i++) row_counts(i).Resize(solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m*rows_per_rigid_body); // TODO: fix
+        for(int i=0;i<colors;i++) row_counts(i).Resize(solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m*rows_per_rigid_body); // TODO: fix
         rigid_body_fluid_mass.Resize(solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m);rigid_body_fluid_mass.Fill(T_DIAGONAL_MATRIX());
         rigid_body_updated_center_of_mass.Resize(solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m);rigid_body_updated_center_of_mass.Fill(TV());
         J_rigid.Resize(colors);}

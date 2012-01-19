@@ -11,7 +11,7 @@ using namespace PhysBAM;
 template<class T> void GRID_LAGRANGE_1D<T>::
 Euler_Step(const ARRAY<T,VECTOR<int,1> >& u,const T dt)
 {       
-    for(int i=1;i<=m;i++) x(i)+=dt*u(i); 
+    for(int i=0;i<m;i++) x(i)+=dt*u(i); 
 }
 //#####################################################################
 // Function Get_Lengths

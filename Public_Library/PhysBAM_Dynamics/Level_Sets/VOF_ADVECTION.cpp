@@ -93,7 +93,7 @@ Negative_Material(const TV_INT& cell_index,const bool force_full_refinement)
     // compute phis for extant nodes
     T minimum_phi=FLT_MAX,maximum_phi=-FLT_MAX;
 
-    for(int i=1;i<=last_node;i++){T& phi=cell_phis(i);
+    for(int i=0;i<last_node;i++){T& phi=cell_phis(i);
         phi=grid_nodal_phis(phi_indices[i-1]);
         if(phi<minimum_phi) minimum_phi=phi;
         if(phi>maximum_phi) maximum_phi=phi;}
@@ -378,16 +378,16 @@ Create_Geometry()
                 // TODO: need to modify particles here too, just in case we have any (although that's unlikely)
                 if(!total_lower_dimensional_preimage_volume){ // divide it up evenly...not that it's likely to matter in this case
                     T average_simplex_volume=number_of_simplices?volume_of_material(cell_index)/number_of_simplices:0;
-                    for(int i=1;i<=number_of_simplices;i++) simplex_preimage_material_volume(simplices_in_cell(i))=average_simplex_volume;}
+                    for(int i=0;i<number_of_simplices;i++) simplex_preimage_material_volume(simplices_in_cell(i))=average_simplex_volume;}
                 else{
                     T volume_of_material_density=volume_of_material(cell_index)/total_lower_dimensional_preimage_volume;
-                    for(int i=1;i<=number_of_simplices;i++) simplex_preimage_material_volume(simplices_in_cell(i))=lower_dimensional_preimage_volume(i)*volume_of_material_density;}
-                for(int i=1;i<=number_of_simplices;i++) cell_material_volume+=simplex_preimage_material_volume(simplices_in_cell(i));}
+                    for(int i=0;i<number_of_simplices;i++) simplex_preimage_material_volume(simplices_in_cell(i))=lower_dimensional_preimage_volume(i)*volume_of_material_density;}
+                for(int i=0;i<number_of_simplices;i++) cell_material_volume+=simplex_preimage_material_volume(simplices_in_cell(i));}
             else{
                 T volume_of_material_density=volume_of_material(cell_index)/total_preimage_volume;
                 cell_material_volume+=volume_of_material_density*negative_particle_volume;
                 Modify_Particle_Material_Volume_In_Cell(removed_negative_particle_volumes_in_cell,particle_levelset.removed_negative_particles,cell_index,volume_of_material_density);
-                for(int i=1;i<=number_of_simplices;i++){simplex_preimage_material_volume(simplices_in_cell(i))=simplex_preimage_volume(i)*volume_of_material_density;
+                for(int i=0;i<number_of_simplices;i++){simplex_preimage_material_volume(simplices_in_cell(i))=simplex_preimage_volume(i)*volume_of_material_density;
                     cell_material_volume+=simplex_preimage_material_volume(simplices_in_cell(i));}}
             if(abs(cell_material_volume-volume_of_material(cell_index))/volume_of_material(cell_index)>.1)
                 LOG::cout<<"Cell "<<cell_index<<": was "<<volume_of_material(cell_index)<<", now "<<cell_material_volume<<std::endl;
@@ -488,7 +488,7 @@ Iterative_Find_Interface(TV left,TV right,const int iterations) const
     T phi_left=Phi(left),phi_right=Phi(right);
     TV theta=LINEAR_INTERPOLATION<T,TV>::Linear(left,right,LEVELSET_UTILITIES<T>::Theta(phi_left,phi_right));
     int phi_left_sign=(phi_left<=0?-1:1),phi_right_sign=(phi_right<=0?-1:1);
-    for(int i=1;i<=iterations;i++){
+    for(int i=0;i<iterations;i++){
         T phi=Phi(theta);
         int phi_sign=(phi<=0?-1:1);
         if(phi_left_sign*phi_sign<0){
@@ -513,7 +513,7 @@ Advect_Material_Preimages(const T_FACE_LOOKUP& face_velocities,const T dt,const 
     // TODO: store copy of old particle positions
     if(runge_kutta_order_particles == 2 && use_frozen_velocity){
         // move material nodes, second-order
-        for(int i=1;i<=particle_number;i++) if(material_particles(i) && !fixed_particle_list(i)){ // TODO: avoid conditionals here by keeping a list of material particles rather than flags
+        for(int i=0;i<particle_number;i++) if(material_particles(i) && !fixed_particle_list(i)){ // TODO: avoid conditionals here by keeping a list of material particles rather than flags
             TV& node=particle_X(i);
             TV offset=dt*Velocity(face_velocities,node,start_time,use_analytic_velocities);
             TV second_offset=dt*Velocity(face_velocities,node+offset,start_time,use_analytic_velocities);
@@ -524,13 +524,13 @@ Advect_Material_Preimages(const T_FACE_LOOKUP& face_velocities,const T dt,const 
         T time=start_time;
         // TODO: this is inefficient.  Need to only keep the particles we care about.  Do this by building a list and changing the indices on the fly?
         RUNGEKUTTA<ARRAY_VIEW<TV> >* rungekutta=RUNGEKUTTA<ARRAY_VIEW<TV> >::Create(particle_X,runge_kutta_order_particles,dt,time);
-        for(int k=1;k<=runge_kutta_order_particles;k++){
+        for(int k=0;k<runge_kutta_order_particles;k++){
             if(k == 1 || !use_frozen_velocity) particle_levelset.levelset.levelset_callbacks->Get_Levelset_Velocity(grid,particle_levelset.levelset,V,time);
             // TODO: ghost velocities should not be necessary unless we have periodic boundary conditions or we're on the edge or we're doing parallel...I guess they might be necessary
             particle_levelset.levelset.boundary->Fill_Ghost_Cells_Face(grid,V,V_ghost,time,particle_levelset.number_of_ghost_cells);
             T_FACE_LOOKUP V_lookup(V_ghost);
             
-            for(int i=1;i<=particle_number;i++) if(material_particles(i) && !fixed_particle_list(i)){ // TODO: avoid conditionals here by keeping a list of material particles rather than flags
+            for(int i=0;i<particle_number;i++) if(material_particles(i) && !fixed_particle_list(i)){ // TODO: avoid conditionals here by keeping a list of material particles rather than flags
                 TV& node=particle_X(i);
                 TV velocity=Velocity(V_lookup,node,start_time,use_analytic_velocities);
                 node+=dt*velocity; // TODO: clamp to domain walls (not parallel/outflow walls)

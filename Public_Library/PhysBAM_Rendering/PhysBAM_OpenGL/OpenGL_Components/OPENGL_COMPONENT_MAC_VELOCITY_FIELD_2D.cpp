@@ -216,10 +216,10 @@ Update_Streamlines()
     mac_velocity_field.Component(2)=opengl_mac_velocity_field->v;
     FACE_LOOKUP_UNIFORM<GRID<TV> > V_lookup(mac_velocity_field);
 
-    for(int i=1;i<=number_of_streamlines;i++){
+    for(int i=0;i<number_of_streamlines;i++){
         int p=streamlines.particles.array_collection->Add_Element();
         TV X=streamlines.particles.X(p)=random.Get_Uniform_Vector(grid.domain);
-        for(int step=1;step<=number_of_steps;step++){
+        for(int step=0;step<number_of_steps;step++){
             TV velocity=linear_interpolation.Clamped_To_Array_Face(grid,V_lookup,X);
             TV X_new=X+step_length*velocity;
             velocity=(T).5*(velocity+linear_interpolation.Clamped_To_Array_Face(grid,V_lookup,X_new));

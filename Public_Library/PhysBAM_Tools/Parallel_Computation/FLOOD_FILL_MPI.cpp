@@ -74,7 +74,7 @@ Synchronize_Colors()
     ARRAY<int,VECTOR<int,1> > color_map(-1,number_of_regions);color_map(-1)=-1;color_map(0)=0;
     {ARRAY<bool,VECTOR<int,1> > color_is_global(-1,number_of_regions);
     Find_Global_Colors(color_is_global,RANGE<typename T_PARALLEL_GRID::VECTOR_INT>::Centered_Box());
-    for(int color=1;color<=number_of_regions;color++)if(color_is_global(color)) color_map(color)=++global_color_count;}
+    for(int color=0;color<number_of_regions;color++)if(color_is_global(color)) color_map(color)=++global_color_count;}
 
     // send numbers of global colors to everyone
     ARRAY<int> global_color_counts(mpi_grid.number_of_processes);
@@ -122,7 +122,7 @@ Synchronize_Colors()
     // fix color map for global colors
     number_of_regions=0;
     ARRAY<int> global_to_final_color_map(total_global_colors);
-    for(int i=1;i<=total_global_colors;i++){
+    for(int i=0;i<total_global_colors;i++){
         int root=final_union_find.Find(i);
         if(!global_to_final_color_map(root)) global_to_final_color_map(root)=++number_of_regions;
         global_to_final_color_map(i)=global_to_final_color_map(root);}
@@ -169,7 +169,7 @@ Synchronize_Colors_Threaded()
     ARRAY<int,VECTOR<int,1> > color_map(-1,number_of_regions);color_map(-1)=-1;color_map(0)=0;
     {ARRAY<bool,VECTOR<int,1> > color_is_global(-1,number_of_regions);
     Find_Global_Colors(color_is_global,RANGE<typename T_PARALLEL_GRID::VECTOR_INT>::Centered_Box());
-    for(int color=1;color<=number_of_regions;color++)if(color_is_global(color)) color_map(color)=++global_color_count;}
+    for(int color=0;color<number_of_regions;color++)if(color_is_global(color)) color_map(color)=++global_color_count;}
 
     // send numbers of global colors to everyone
     ARRAY<int> global_color_counts(mpi_grid.threaded_grid->number_of_processes);
@@ -221,7 +221,7 @@ Synchronize_Colors_Threaded()
     // fix color map for global colors
     number_of_regions=0;
     ARRAY<int> global_to_final_color_map(total_global_colors);
-    for(int i=1;i<=total_global_colors;i++){
+    for(int i=0;i<total_global_colors;i++){
         int root=final_union_find.Find(i);
         if(!global_to_final_color_map(root)) global_to_final_color_map(root)=++number_of_regions;
         global_to_final_color_map(i)=global_to_final_color_map(root);}

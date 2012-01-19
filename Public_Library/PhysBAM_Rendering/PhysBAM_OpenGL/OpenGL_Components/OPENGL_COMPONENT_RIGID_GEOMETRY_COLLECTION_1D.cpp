@@ -88,7 +88,7 @@ Reinitialize(const bool force,const bool read_geometry)
         if(has_init_destroy_information) for(int i=1;i<=needs_init.m;i++){
             int id=needs_init(i);PHYSBAM_ASSERT(rigid_geometry_collection->Is_Active(id));
             Create_Geometry(id);}
-        else for(int i=1;i<=max_number_of_bodies;i++){if(rigid_geometry_collection->Is_Active(i)) Create_Geometry(i);} // TODO: can we figure out what bodies need_init
+        else for(int i=0;i<max_number_of_bodies;i++){if(rigid_geometry_collection->Is_Active(i)) Create_Geometry(i);} // TODO: can we figure out what bodies need_init
 
         // Update active bodies / remove inactive bodies
         for(int id(1);id<=rigid_geometry_collection->particles.array_collection->Size();id++){

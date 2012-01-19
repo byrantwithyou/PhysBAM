@@ -86,7 +86,7 @@ Get_Ellipsoid(const int p) const
     particle_tree.Locate_Nearest_Neighbors(particles.X(p),FLT_MAX,points_found,squared_distance_to_points_found,number_of_points_found,max_squared_distance_to_points_found,particles.X);
     
     ARRAY<TV> positions(number_of_points_in_estimate);
-    for(int i=1;i<=number_of_points_in_estimate;i++)positions(i)=particles.X(points_found(i));
+    for(int i=0;i<number_of_points_in_estimate;i++)positions(i)=particles.X(points_found(i));
 
     ELLIPSOID<T> covariance=ELLIPSOID<T>::Covariance_Ellipsoid(positions);
     T density=number_of_points_in_estimate/((T)four_thirds_pi*cube(sqrt(max_squared_distance_to_points_found)));

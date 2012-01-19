@@ -45,7 +45,7 @@ private:
 public:
 
     const T operator()(const int i) const
-    {assert(i>=1 && i<=n);for(int j=1;j<=number_of_active_indices;j++) if(indices[j] == i) return x[j];else if(indices[j]>i) break;
+    {assert((unsigned)i<n);for(int j=1;j<=number_of_active_indices;j++) if(indices[j] == i) return x[j];else if(indices[j]>i) break;
     return T();}
 
     void Set_Element(const int i,const T& element)

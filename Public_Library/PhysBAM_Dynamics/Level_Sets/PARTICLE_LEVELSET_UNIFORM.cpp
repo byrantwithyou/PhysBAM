@@ -1223,7 +1223,7 @@ Delete_Particles_Far_From_Interface(const int discrete_band)
     Consistency_Check(domain,negative_particles);
     DOMAIN_ITERATOR_THREADED_ALPHA<PARTICLE_LEVELSET_UNIFORM<T_GRID>,TV>(levelset.grid.Domain_Indices(3),thread_queue).template Run<T_ARRAYS_CHAR&>(*this,&PARTICLE_LEVELSET_UNIFORM<T_GRID>::Delete_Particles_Far_From_Interface_Part_One,near_interface);
     DOMAIN_ITERATOR_THREADED_ALPHA<PARTICLE_LEVELSET_UNIFORM<T_GRID>,TV> part_two_iterator(levelset.grid.Domain_Indices(3),thread_queue);
-    for(int distance=1;distance<=discrete_band;distance++){
+    for(int distance=0;distance<discrete_band;distance++){
         part_two_iterator.template Run<T_ARRAYS_CHAR&,int>(*this,&PARTICLE_LEVELSET_UNIFORM<T_GRID>::Delete_Particles_Far_From_Interface_Part_Two,near_interface,distance);}
     DOMAIN_ITERATOR_THREADED_ALPHA<PARTICLE_LEVELSET_UNIFORM<T_GRID>,TV>(domain,thread_queue).template Run<T_ARRAYS_CHAR&>(*this,&PARTICLE_LEVELSET_UNIFORM<T_GRID>::Delete_Particles_Far_From_Interface_Part_Three,near_interface);
     Consistency_Check(domain,positive_particles);

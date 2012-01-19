@@ -194,7 +194,7 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 {
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
         int total_springs=use_shortest_spring_only?1:4;
-        for(int spring_index=1;spring_index<=total_springs;spring_index++){
+        for(int spring_index=0;spring_index<total_springs;spring_index++){
             const SPRING_STATE* state_ptr;
             if(use_shortest_spring_only) state_ptr=&spring_states(t);
             else state_ptr=&spring_states_all_springs(t)[spring_index];
@@ -216,7 +216,7 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
 {
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
         int total_springs=use_shortest_spring_only?1:4;
-        for(int spring_index=1;spring_index<=total_springs;spring_index++){
+        for(int spring_index=0;spring_index<total_springs;spring_index++){
             const SPRING_STATE* state_ptr;
             if(use_shortest_spring_only) state_ptr=&spring_states(t);
             else state_ptr=&spring_states_all_springs(t)[spring_index];
@@ -238,7 +238,7 @@ Velocity_Dependent_Forces_Size() const
     int aggregate_id=0;
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
         int total_springs=use_shortest_spring_only?1:4;
-        for(int spring_index=1;spring_index<=total_springs;spring_index++){
+        for(int spring_index=0;spring_index<total_springs;spring_index++){
             const SPRING_STATE* state_ptr;
             if(use_shortest_spring_only) state_ptr=&spring_states(t);
             else state_ptr=&spring_states_all_springs(t)[spring_index];
@@ -255,7 +255,7 @@ Add_Velocity_Dependent_Forces_First_Half(ARRAY_VIEW<const TV> V,ARRAY_VIEW<T> ag
     int aggregate_id=1;
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
         int total_springs=use_shortest_spring_only?1:4;
-        for(int spring_index=1;spring_index<=total_springs;spring_index++){
+        for(int spring_index=0;spring_index<total_springs;spring_index++){
             const SPRING_STATE* state_ptr;
             if(use_shortest_spring_only) state_ptr=&spring_states(t);
             else state_ptr=&spring_states_all_springs(t)[spring_index];
@@ -275,7 +275,7 @@ Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T> aggregate,ARRAY_VI
     int aggregate_id=1;
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
         int total_springs=use_shortest_spring_only?1:4;
-        for(int spring_index=1;spring_index<=total_springs;spring_index++){
+        for(int spring_index=0;spring_index<total_springs;spring_index++){
             const SPRING_STATE* state_ptr;
             if(use_shortest_spring_only) state_ptr=&spring_states(t);
             else state_ptr=&spring_states_all_springs(t)[spring_index];
@@ -295,7 +295,7 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F
 {
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
         int total_springs=use_shortest_spring_only?1:4;
-        for(int spring_index=1;spring_index<=total_springs;spring_index++){
+        for(int spring_index=0;spring_index<total_springs;spring_index++){
             const SPRING_STATE* state_ptr;
             if(use_shortest_spring_only) state_ptr=&spring_states(t);
             else state_ptr=&spring_states_all_springs(t)[spring_index];
@@ -368,7 +368,7 @@ Add_Force_Data(ARRAY<FORCE_DATA<TV> >& force_data_list,const std::string& force_
     else force_data.name=force_name;
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
         int total_springs=use_shortest_spring_only?1:4;
-        for(int spring_index=1;spring_index<=total_springs;spring_index++){
+        for(int spring_index=0;spring_index<total_springs;spring_index++){
             const SPRING_STATE* state_ptr;
             if(use_shortest_spring_only) state_ptr=&spring_states(t);
             else state_ptr=&spring_states_all_springs(t)[spring_index];

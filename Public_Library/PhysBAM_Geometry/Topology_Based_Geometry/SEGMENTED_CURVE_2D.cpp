@@ -118,7 +118,7 @@ Find_First_Segment_Segment_Intersection(const SEGMENT_MESH& test_segment_mesh,AR
 #endif
         return true;}
     else{
-        for(int loops=1;loops<=max_coarsening_attempts;loops++){
+        for(int loops=0;loops<max_coarsening_attempts;loops++){
             T distance=pow((T)2,loops)*thickness_over_2;
             if(Segment_Segment_Intersection(test_segment_mesh,X,distance,false)){
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT

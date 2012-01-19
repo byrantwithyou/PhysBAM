@@ -28,7 +28,7 @@ CLONE_ARRAY(const CLONEABLE_BASE& template_object,const int count)
 CLONE_ARRAY<CLONEABLE_BASE>::
 ~CLONE_ARRAY()
 {
-    for(int i=1;i<=count;i++)
+    for(int i=0;i<count;i++)
         (*this)(i).~CLONEABLE_BASE();
     delete[] data;
 }

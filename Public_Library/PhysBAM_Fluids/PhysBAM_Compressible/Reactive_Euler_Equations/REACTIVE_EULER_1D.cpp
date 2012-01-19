@@ -39,7 +39,7 @@ CFL()
     int m=grid.counts.x;T dx=grid.dX.x;
     
     ARRAY<T,VECTOR<int,1> > u_minus_c(1,m),u_plus_c(1,m);
-    for(int i=1;i<=m;i++){
+    for(int i=0;i<m;i++){
         if(!cut_out_grid || (cut_out_grid && (*psi_pointer)(i)==1)){
             T u=U(i)(2)/U(i)(1);
             T Y=U(i)(4)/U(i)(1);

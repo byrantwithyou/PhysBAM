@@ -55,7 +55,7 @@ template<class TV> void LEVELSET_VISCOSITY_UNIFORM<TV>::
 Apply_Viscosity(ARRAY<T,FACE_INDEX<d> >& u,bool fully_explicit,bool fully_implicit,bool coupled)
 {
     if(coupled) Apply_Full_Viscosity(u,fully_explicit,fully_implicit,0);
-    else for(int a=1;a<=d;a++) Apply_Full_Viscosity(u,fully_explicit,fully_implicit,a);
+    else for(int a=0;a<d;a++) Apply_Full_Viscosity(u,fully_explicit,fully_implicit,a);
 }
 //#####################################################################
 // Function Apply_Implicit_Viscosity

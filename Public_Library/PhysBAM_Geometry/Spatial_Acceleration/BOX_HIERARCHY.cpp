@@ -55,7 +55,7 @@ Set_Leaf_Boxes(const ARRAY<RANGE<TV> >& boxes,const bool reinitialize)
 template<class TV> void BOX_HIERARCHY<TV>::
 Thicken_Leaf_Boxes(const T extra_thickness)
 {
-    for(int k=1;k<=leaves;k++) box_hierarchy(k).Change_Size(extra_thickness);
+    for(int k=0;k<leaves;k++) box_hierarchy(k).Change_Size(extra_thickness);
 }
 //#####################################################################
 // Function Initialize_Hierarchy_Using_KD_Tree
@@ -111,7 +111,7 @@ Update_Modified_Nonleaf_Boxes(ARRAY<bool>& modified)
 template<class TV> void BOX_HIERARCHY<TV>::
 Calculate_Bounding_Box_Radii(const ARRAY<RANGE<TV> >& bounding_boxes,ARRAY<T>& radius) 
 {
-    for(int k=1;k<=leaves;k++) radius(k)=(T).5*bounding_boxes(k).Edge_Lengths().Magnitude();
+    for(int k=0;k<leaves;k++) radius(k)=(T).5*bounding_boxes(k).Edge_Lengths().Magnitude();
 }
 //#####################################################################
 // Function Update_Nonleaf_Box_Radii

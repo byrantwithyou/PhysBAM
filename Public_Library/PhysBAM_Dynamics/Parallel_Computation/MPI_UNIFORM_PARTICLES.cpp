@@ -56,7 +56,7 @@ Recv_Particles(const MPI_UNIFORM_GRID<T_GRID>& mpi_grid,const T_PARTICLES& templ
     TV wrap_offset=-mpi_grid.Wrap_Offset(-direction);
     int m;MPI_UTILITIES::Unpack(m,buffer,position,comm);
     RANGE<TV> domain=mpi_grid.local_grid.Domain();
-    for(int i=1;i<=m;i++){
+    for(int i=0;i<m;i++){
         MPI_UTILITIES::Unpack(*recv_particles,1,buffer,position,comm);
         TV& X=recv_particles->X(1);X+=wrap_offset;
         if(!domain.Lazy_Inside(X)) continue;
@@ -84,7 +84,7 @@ Recv_Block_Particles(const MPI_UNIFORM_GRID<T_GRID>& mpi_grid,const T_PARTICLES&
     TV wrap_offset=-mpi_grid.Wrap_Offset(-direction);
     int m;MPI_UTILITIES::Unpack(m,buffer,position,comm);
     RANGE<TV> domain=mpi_grid.local_grid.Domain();
-    for(int i=1;i<=m;i++){
+    for(int i=0;i<m;i++){
         MPI_UTILITIES::Unpack(*recv_particles,1,buffer,position,comm);
         TV& X=recv_particles->X(1);X+=wrap_offset;
         if(domain.Lazy_Inside(X)) continue;
@@ -112,7 +112,7 @@ Recv_Ghost_Particles(const MPI_UNIFORM_GRID<T_GRID>& mpi_grid,const T_PARTICLES&
     TV wrap_offset=-mpi_grid.Wrap_Offset(-direction);
     int m;MPI_UTILITIES::Unpack(m,buffer,position,comm);
     RANGE<TV> domain=mpi_grid.local_grid.Domain();
-    for(int i=1;i<=m;i++){
+    for(int i=0;i<m;i++){
         MPI_UTILITIES::Unpack(*recv_particles,1,buffer,position,comm);
         TV& X=recv_particles->X(1);X+=wrap_offset;
         if(domain.Lazy_Inside(X)) continue;
@@ -164,7 +164,7 @@ Recv_Particles(const MPI_UNIFORM_GRID<T_GRID>& mpi_grid,T_PARTICLES& particles,c
     TV wrap_offset=-mpi_grid.Wrap_Offset(-direction);
     int m;MPI_UTILITIES::Unpack(m,buffer,position,comm);
     int number=particles.array_collection->Size();particles.array_collection->Add_Elements(m);
-    for(int i=1;i<=m;i++){
+    for(int i=0;i<m;i++){
         MPI_UTILITIES::Unpack(particles,++number,buffer,position,comm);
         particles.X(number)+=wrap_offset;}
 }
@@ -205,7 +205,7 @@ Exchange_Boundary_Particles_Threaded(const THREADED_UNIFORM_GRID<T_GRID>& thread
     // probe and receive
     for(int buf=1;buf<=threaded_grid.buffers.m;buf++){if(threaded_grid.tid!=threaded_grid.buffers(buf).recv_tid) continue;
         THREAD_PACKAGE& pack=threaded_grid.buffers(buf);int position=0;int size=*(int*)(&pack.buffer(position+1));position+=sizeof(int);
-        for(int i=1;i<=size;i++){
+        for(int i=0;i<size;i++){
             T_PARTICLES* recv_particles=*(T_PARTICLES**)(&pack.buffer(position+1));position+=sizeof(T_PARTICLES*);
             int index=*(int*)(&pack.buffer(position+1));position+=sizeof(int);
             TV& X=recv_particles->X(index);
@@ -288,7 +288,7 @@ Exchange_Overlapping_Block_Particles_Threaded(const THREADED_UNIFORM_GRID<T_GRID
     pthread_barrier_wait(threaded_grid.barr);
     for(int buf=1;buf<=threaded_grid.buffers.m;buf++){if(threaded_grid.tid!=threaded_grid.buffers(buf).recv_tid) continue;
         THREAD_PACKAGE& pack=threaded_grid.buffers(buf);int position=0;int size=*(int*)(&pack.buffer(position+1));position+=sizeof(int);
-        for(int i=1;i<=size;i++){
+        for(int i=0;i<size;i++){
             T_PARTICLES* recv_particles=*(T_PARTICLES**)(&pack.buffer(position+1));position+=sizeof(T_PARTICLES*);
             int index=*(int*)(&pack.buffer(position+1));position+=sizeof(int);
             TV& X=recv_particles->X(index);

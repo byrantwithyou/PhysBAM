@@ -122,7 +122,7 @@ namespace{
     Get_Cutting_Simplex_Weights_From_Embedding_Simplex(const VECTOR<VECTOR<T,d>,d>& cutting_simplex_X,const VECTOR<VECTOR<T,d>,d+1>& embedding_simplex_X)
     {
         VECTOR<VECTOR<T,d>,d> all_weights;
-        for(int i=1;i<=d;i++) all_weights(i)=Barycentric_Coordinates(cutting_simplex_X(i),embedding_simplex_X);
+        for(int i=0;i<d;i++) all_weights(i)=Barycentric_Coordinates(cutting_simplex_X(i),embedding_simplex_X);
         return all_weights;
     }
 }

@@ -111,7 +111,7 @@ Initialize_Fluid_Evolution(T_FACE_ARRAYS_SCALAR& incompressible_face_velocities)
         particle_levelset_evolution_multiple=new PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>(grid->Get_MAC_Grid(),number_of_ghost_cells);
         if(!projection) projection=new PROJECTION_DYNAMICS_UNIFORM<T_GRID>(*grid,fire,true,false);
         incompressible_multiphase=new INCOMPRESSIBLE_MULTIPHASE_UNIFORM<T_GRID>(grid->Get_MAC_Grid(),*projection);
-        phi_boundary_multiphase.Resize(number_of_regions);for(int i=1;i<=number_of_regions;i++) phi_boundary_multiphase(i)=&phi_boundary_reflection;
+        phi_boundary_multiphase.Resize(number_of_regions);for(int i=0;i<number_of_regions;i++) phi_boundary_multiphase(i)=&phi_boundary_reflection;
         phi_boundary=0;
         particle_levelset_evolution=particle_levelset_evolution_multiple;
         incompressible=incompressible_multiphase;}
@@ -170,7 +170,7 @@ Use_Fluid_Coupling_Defaults()
     if(!compressible) soot_fuel_container.Use_Semi_Lagrangian_Collidable_Advection(*collision_bodies_affecting_fluid,incompressible->valid_mask);
     density_container.Use_Semi_Lagrangian_Collidable_Advection(*collision_bodies_affecting_fluid,incompressible->valid_mask);
     temperature_container.Use_Semi_Lagrangian_Collidable_Advection(*collision_bodies_affecting_fluid,incompressible->valid_mask);
-    for(int i=1;i<=number_of_regions;i++){
+    for(int i=0;i<number_of_regions;i++){
         particle_levelset_evolution->Levelset_Advection(i).Use_Semi_Lagrangian_Collidable_Advection(*collision_bodies_affecting_fluid,collidable_phi_replacement_value,incompressible->valid_mask);
         particle_levelset_evolution->Levelset(i).Set_Collision_Body_List(*collision_bodies_affecting_fluid);}
     /*if(use_slip) incompressible->Use_Semi_Lagrangian_Collidable_Slip_Advection(*collision_bodies_affecting_fluid);
@@ -178,7 +178,7 @@ Use_Fluid_Coupling_Defaults()
     else incompressible->Use_Semi_Lagrangian_Fire_Multiphase_Collidable_Advection(*collision_bodies_affecting_fluid,incompressible->projection,
         particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple); // TODO: fire does not work with thin shells, need to test for this
     if(use_maccormack_semi_lagrangian_advection){
-        if(use_maccormack_for_level_set) for(int i=1;i<=number_of_regions;i++) particle_levelset_evolution->Levelset_Advection(i).Use_Maccormack_Advection(maccormack_cell_mask);
+        if(use_maccormack_for_level_set) for(int i=0;i<number_of_regions;i++) particle_levelset_evolution->Levelset_Advection(i).Use_Maccormack_Advection(maccormack_cell_mask);
         soot_container.Use_Maccormack_Advection(maccormack_cell_mask);
         soot_fuel_container.Use_Maccormack_Advection(maccormack_cell_mask);
         density_container.Use_Maccormack_Advection(maccormack_cell_mask);
@@ -197,7 +197,7 @@ Use_No_Fluid_Coupling_Defaults()
     if(!compressible) soot_fuel_container.Set_Custom_Advection(semi_lagrangian);
     density_container.Set_Custom_Advection(semi_lagrangian);
     temperature_container.Set_Custom_Advection(semi_lagrangian);
-    for(int i=1;i<=number_of_regions;i++){
+    for(int i=0;i<number_of_regions;i++){
         if(false && analytic_test){assert(particle_levelset_evolution->runge_kutta_order_levelset==3);particle_levelset_evolution->Levelset_Advection(i).Set_Custom_Advection(hamilton_jacobi_weno);}
         else if(use_conservative_advection) particle_levelset_evolution->Levelset_Advection(i).Set_Custom_Advection(*advection_conservative);
         else particle_levelset_evolution->Levelset_Advection(i).Set_Custom_Advection(semi_lagrangian);}
@@ -206,7 +206,7 @@ Use_No_Fluid_Coupling_Defaults()
         incompressible->Set_Custom_Advection(semi_lagrangian);}
     else incompressible->Use_Semi_Lagrangian_Fire_Multiphase_Advection(incompressible_multiphase->projection,particle_levelset_evolution_multiple->Levelset_Multiple());
     if(use_maccormack_semi_lagrangian_advection){
-        if(use_maccormack_for_level_set) for(int i=1;i<=number_of_regions;i++) particle_levelset_evolution->Levelset_Advection(i).Set_Custom_Advection(maccormack_semi_lagrangian);
+        if(use_maccormack_for_level_set) for(int i=0;i<number_of_regions;i++) particle_levelset_evolution->Levelset_Advection(i).Set_Custom_Advection(maccormack_semi_lagrangian);
         soot_container.Set_Custom_Advection(maccormack_semi_lagrangian);
         soot_fuel_container.Set_Custom_Advection(maccormack_semi_lagrangian);
         density_container.Set_Custom_Advection(maccormack_semi_lagrangian);
@@ -256,7 +256,7 @@ Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles
 template<class T_GRID> void FLUIDS_PARAMETERS_UNIFORM<T_GRID>::
 Delete_Particles_Inside_Objects(const T time)
 {
-    for(int i=1;i<=number_of_regions;i++){
+    for(int i=0;i<number_of_regions;i++){
         PARTICLE_LEVELSET_UNIFORM<T_GRID>* particle_levelset;
         if(number_of_regions==1) particle_levelset=&particle_levelset_evolution->particle_levelset;
         else particle_levelset=particle_levelset_evolution_multiple->particle_levelset_multiple.particle_levelsets(i);
@@ -313,7 +313,7 @@ Update_Fluid_Parameters(const T dt,const T time)
     if(use_variable_vorticity_confinement) callbacks->Get_Variable_Vorticity_Confinement(incompressible->variable_vorticity_confinement,time);
 
     if(number_of_regions>=2){
-        for(int i=1;i<=number_of_regions;i++) if(use_multiphase_strain(i)){
+        for(int i=0;i<number_of_regions;i++) if(use_multiphase_strain(i)){
             incompressible_multiphase->strains(i)->Set_Elastic_Modulus(elastic_moduli(i));
             incompressible_multiphase->strains(i)->Set_Plasticity_Components(plasticity_alphas(i),plasticity_gammas(i));}
         if(use_reacting_flow) incompressible_multiphase->projection.Set_Flame_Speed_Constants(densities,normal_flame_speeds,curvature_flame_speeds);
@@ -416,7 +416,7 @@ Get_Body_Force(T_FACE_ARRAYS_SCALAR& force,const T dt,const T time)
         T_ARRAYS_SCALAR temperature_ghost(grid->Domain_Indices(number_of_ghost_cells),false);
         temperature_container.boundary->Fill_Ghost_Cells_Cell(*grid,temperature_container.temperature,temperature_ghost,time,number_of_ghost_cells);
         T_LEVELSET_MULTIPLE& levelset_multiple=particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple;
-        ARRAY<T> one_over_densities(number_of_regions);for(int i=1;i<=number_of_regions;i++) one_over_densities(i)=(T)1/densities(i);
+        ARRAY<T> one_over_densities(number_of_regions);for(int i=0;i<number_of_regions;i++) one_over_densities(i)=(T)1/densities(i);
         for(FACE_ITERATOR iterator(*grid,0,T_GRID::WHOLE_REGION,0,2);iterator.Valid();iterator.Next()){ // y-direction forces only
             T temperature;
             int region=levelset_multiple.Inside_Region_Face(iterator.Axis(),iterator.Face_Index());
@@ -688,7 +688,7 @@ Read_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direct
                     FILE_UTILITIES::Read_From_Text_File(output_directory+"/"+f+"/last_unique_particle_id",particle_levelset.last_unique_particle_id);
                 if(use_strain && write_strain) FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/"+f+"/strain",incompressible->strain->e);}
             else if(number_of_regions>=2){
-                for(int i=1;i<=number_of_regions;i++){
+                for(int i=0;i<number_of_regions;i++){
                     std::string ii=STRING_UTILITIES::string_sprintf("%d",i),i_dot_f=ii+"."+f; // TODO(jontg): This still does .%d.gz
                     T_PARTICLE_LEVELSET& particle_levelset=*particle_levelset_evolution_multiple->particle_levelset_multiple.particle_levelsets(i);
                     FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/levelset_"+i_dot_f,particle_levelset.levelset);
@@ -721,7 +721,7 @@ Read_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direct
                 particle_levelset.vof_advection->Read(stream_type,output_directory,f);
                 particle_levelset.vof_advection->volume_of_material_initialized=true;}
             else if(number_of_regions>=2){
-                for(int i=1;i<=number_of_regions;i++){
+                for(int i=0;i<number_of_regions;i++){
                     std::string i_dot_f=STRING_UTILITIES::string_sprintf("%d.%s",i,f.c_str());
                     T_PARTICLE_LEVELSET& particle_levelset=*particle_levelset_evolution_multiple->particle_levelset_multiple.particle_levelsets(i);
                     FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/negative_material_"+i_dot_f,particle_levelset.vof_advection->volume_of_material);
@@ -789,7 +789,7 @@ Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direc
                 if(store_particle_ids)
                     FILE_UTILITIES::Write_To_Text_File(output_directory+"/"+f+"/last_unique_particle_id",particle_levelset.last_unique_particle_id);}
             else if(number_of_regions>=2){
-                for(int i=1;i<=number_of_regions;i++){
+                for(int i=0;i<number_of_regions;i++){
                     std::string ii=STRING_UTILITIES::string_sprintf("%d",i),i_dot_f=ii+"."+f; // TODO(jontg) ...
                     T_PARTICLE_LEVELSET& particle_levelset=*particle_levelset_evolution_multiple->particle_levelset_multiple.particle_levelsets(i);
                     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/levelset_"+i_dot_f,particle_levelset.levelset);
@@ -809,7 +809,7 @@ Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direc
             if(write_strain){
                 if(use_strain && number_of_regions==1) FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/strain",incompressible->strain->e);
                 if(use_multiphase_strain.Count_Matches(0)<number_of_regions && number_of_regions>=2)
-                    for(int i=1;i<=number_of_regions;i++){
+                    for(int i=0;i<number_of_regions;i++){
                         if(incompressible_multiphase->strains(i)){
                             std::string i_dot_f=STRING_UTILITIES::string_sprintf("%d.%s",i,f.c_str()); // TODO(jontg): ...
                             T_ARRAYS_SYMMETRIC_MATRIX e_ghost(grid->Domain_Indices(number_of_ghost_cells),false);
@@ -824,7 +824,7 @@ Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direc
                 if(write_debug_data) FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/mass_fluxes",
                     particle_levelset_evolution->particle_levelset.vof_advection->volume_fluxes);}
             else if(number_of_regions>=2){
-                for(int i=1;i<=number_of_regions;i++){
+                for(int i=0;i<number_of_regions;i++){
                     std::string i_dot_f=STRING_UTILITIES::string_sprintf("%d.%s",i,f.c_str()); // TODO(jontg): ...
                     T_PARTICLE_LEVELSET& particle_levelset=*particle_levelset_evolution_multiple->particle_levelset_multiple.particle_levelsets(i);
                     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/negative_material_"+i_dot_f,particle_levelset.vof_advection->volume_of_material);}}}

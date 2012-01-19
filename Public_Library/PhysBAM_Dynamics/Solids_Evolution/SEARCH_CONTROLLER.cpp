@@ -598,7 +598,7 @@ Add_Fluid_Drag(const T dt,const T time,ARRAY<TV> &F,ARRAY<TWIST<TV> > &rigid_F)
                 ARRAY<int,VECTOR<int,1> > filled_region_cell_count(-1,number_of_regions);
                 matrix_index_to_cell_index_array.Resize(number_of_regions);cell_index_to_matrix_index.Resize(fluids_parameters->grid->Domain_Indices(1));
                 for(CELL_ITERATOR iterator(*fluids_parameters->grid,1);iterator.Valid();iterator.Next()) filled_region_cell_count(poisson->filled_region_colors(iterator.Cell_Index()))++;
-                for(int color=1;color<=number_of_regions;color++) if(poisson->filled_region_touches_dirichlet(color)||poisson->solve_neumann_regions){
+                for(int color=0;color<number_of_regions;color++) if(poisson->filled_region_touches_dirichlet(color)||poisson->solve_neumann_regions){
                         matrix_index_to_cell_index_array(color).Resize(filled_region_cell_count(color));}
                 filled_region_cell_count.Fill(0); // reusing this array in order to make the indirection arrays
 
@@ -607,7 +607,7 @@ Add_Fluid_Drag(const T dt,const T time,ARRAY<TV> &F,ARRAY<TWIST<TV> > &rigid_F)
 
                 int colors=filled_region_cell_count.domain.max_corner.x;
                 interior_regions.Resize(colors);
-                for(int color=1;color<=colors;color++) if(filled_region_cell_count(color)>0){
+                for(int color=0;color<colors;color++) if(filled_region_cell_count(color)>0){
                     if(!poisson->laplace_mpi || color>poisson->laplace_mpi->partitions.m) interior_regions(color)=INTERVAL<int>(1,filled_region_cell_count(color));
                     else interior_regions(color)=poisson->laplace_mpi->partitions(color).interior_indices;}}
             solid_fluid_coupled_evolution->Compute_Coupling_Terms_Rigid(cell_index_to_matrix_index,interior_regions,number_of_regions);

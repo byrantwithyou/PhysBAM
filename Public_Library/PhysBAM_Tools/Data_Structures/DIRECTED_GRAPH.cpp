@@ -105,7 +105,7 @@ Generate_Levels() // collapses all cycles into a single level
     for(int i(1);i<=parents.m;i++){int parent=component_id(i);for(int j=1;j<=children(i).m;j++){
         int child=component_id(children(i)(j));if(parent != child) component_graph.Add_Edge(parent,child,true);}}
     ARRAY<int> finish_time,node_index;component_graph.Topological_Sort_Assuming_Cycle_Free(finish_time,node_index);
-    nodes_in_level.Resize(number_components);for(int i=1;i<=number_components;i++) nodes_in_level(i).Remove_All();
+    nodes_in_level.Resize(number_components);for(int i=0;i<number_components;i++) nodes_in_level(i).Remove_All();
     for(int i(1);i<=parents.m;i++){int level=number_components+1-finish_time(component_id(i));level_of_node(i)=level;nodes_in_level(level).Append(i);} // level 1 has the highest finish time
 }
 //#####################################################################

@@ -26,7 +26,7 @@ OPENGL_COMPONENT_FACE_CONTROL_PARAMETERS(const std::string& basedir_input,const 
     if(input){
         int control_sets;
         Read_Binary<RW>(*input,control_sets);
-        for(int i=1;i<=control_sets;i++){
+        for(int i=0;i<control_sets;i++){
             int control_set_type;
             Read_Binary<RW>(*input,control_set_type);
             if(control_set_type==FACE_CONTROL_SET<T>::ACTIVATION){

@@ -58,7 +58,7 @@ Solve(const T time,const bool solution_regions_already_computed)
     ARRAY<int,VECTOR<int,1> > filled_region_cell_count(-1,number_of_regions);
     ARRAY<SPARSE_MATRIX_FLAT_NXN<T> > A_array(number_of_regions);ARRAY<VECTOR_ND<T> > b_array(number_of_regions);
     for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()) filled_region_cell_count(filled_region_colors(iterator.Cell_Index()))++;
-    for(int color=1;color<=number_of_regions;color++) if(filled_region_touches_dirichlet(color)||solve_neumann_regions){
+    for(int color=0;color<number_of_regions;color++) if(filled_region_touches_dirichlet(color)||solve_neumann_regions){
         matrix_index_to_cell_index_array(color).Resize(filled_region_cell_count(color));}
     filled_region_cell_count.Fill(0); // reusing this array in order to make the indirection arrays
     DOMAIN_ITERATOR_THREADED_ALPHA<LAPLACE_UNIFORM<T_GRID>,TV> threaded_iterator(grid.Domain_Indices(1),thread_queue,1,1,2,1);
@@ -68,7 +68,7 @@ Solve(const T time,const bool solution_regions_already_computed)
         for(CELL_ITERATOR iterator(grid,interior_domain);iterator.Valid();iterator.Next()) domain_index(iterator.Cell_Index())=i;}
     ARRAY<ARRAY<INTERVAL<int> > > interior_indices(number_of_regions);
     ARRAY<ARRAY<ARRAY<INTERVAL<int> > > > ghost_indices(number_of_regions);
-    for(int color=1;color<=number_of_regions;color++){
+    for(int color=0;color<number_of_regions;color++){
         interior_indices(color).Resize(threaded_iterator.number_of_domains);ghost_indices(color).Resize(threaded_iterator.number_of_domains);
         for(int i=1;i<=threaded_iterator.domains.m;i++) ghost_indices(color)(i).Resize(2*TV::dimension);}
     if(!mpi_grid && !thread_queue) Compute_Matrix_Indices(grid.Domain_Indices(1),filled_region_cell_count,matrix_index_to_cell_index_array,cell_index_to_matrix_index);
@@ -77,7 +77,7 @@ Solve(const T time,const bool solution_regions_already_computed)
     else laplace_mpi->Find_Matrix_Indices(filled_region_cell_count,cell_index_to_matrix_index,matrix_index_to_cell_index_array);
     RANGE<TV_INT> domain=grid.Domain_Indices(1);
     Find_A(domain,A_array,b_array,filled_region_cell_count,cell_index_to_matrix_index);
-    for(int color=1;color<=number_of_regions;color++) if(filled_region_cell_count(color)>0 && (filled_region_touches_dirichlet(color)||solve_neumann_regions)){
+    for(int color=0;color<number_of_regions;color++) if(filled_region_cell_count(color)>0 && (filled_region_touches_dirichlet(color)||solve_neumann_regions)){
         pcg.Enforce_Compatibility(!filled_region_touches_dirichlet(color)&&enforce_compatibility);
         Solve_Subregion(interior_indices(color),ghost_indices(color),matrix_index_to_cell_index_array(color),A_array(color),b_array(color),color,&domain_index);}
     if(!solve_neumann_regions) for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()){
@@ -170,7 +170,7 @@ Solve_Subregion(ARRAY<INTERVAL<int> >& interior_indices,ARRAY<ARRAY<INTERVAL<int
     int number_of_unknowns=matrix_index_to_cell_index.m;
     A.Negate();b*=(T)-1;
     VECTOR_ND<T> x(number_of_unknowns),q,s,r,k,z;
-    for(int i=1;i<=number_of_unknowns;i++) x(i)=u(matrix_index_to_cell_index(i));
+    for(int i=0;i<number_of_unknowns;i++) x(i)=u(matrix_index_to_cell_index(i));
     Find_Tolerance(b); // needs to happen after b is completely set up
     if(pcg.show_results) LOG::cout << "solving " << number_of_unknowns << " cells to tolerance " << tolerance << std::endl;
     DOMAIN_ITERATOR_THREADED_ALPHA<PCG_SPARSE_THREADED<TV>,TV> threaded_iterator(grid.Domain_Indices(1),thread_queue,1,1,2,1);
@@ -185,7 +185,7 @@ Solve_Subregion(ARRAY<INTERVAL<int> >& interior_indices,ARRAY<ARRAY<INTERVAL<int
     else{
         if(use_threaded_solve) DOMAIN_ITERATOR_THREADED_ALPHA<LAPLACE_MPI<T_GRID>,TV>(grid.Domain_Indices(1),thread_queue,1,1,2,1).template Run<const ARRAY<int,TV_INT>&,ARRAY<INTERVAL<int> >&,ARRAY<ARRAY<INTERVAL<int> > >&,SPARSE_MATRIX_FLAT_NXN<T>&,VECTOR_ND<T>&,VECTOR_ND<T>&,VECTOR_ND<T>&,VECTOR_ND<T>&,VECTOR_ND<T>&,VECTOR_ND<T>&,VECTOR_ND<T>&,T,int,int>(*laplace_mpi,&LAPLACE_MPI<T_GRID>::Solve_Threaded,*domain_index,interior_indices,ghost_indices,A,x,b,q,s,r,k,z,tolerance,color,1);
         else laplace_mpi->Solve(A,x,b,q,s,r,k,z,tolerance,color);}
-    for(int i=1;i<=number_of_unknowns;i++){TV_INT cell_index=matrix_index_to_cell_index(i);u(cell_index)=x(i);}
+    for(int i=0;i<number_of_unknowns;i++){TV_INT cell_index=matrix_index_to_cell_index(i);u(cell_index)=x(i);}
 }
 //#####################################################################
 // Function Compute_Matrix_Indices

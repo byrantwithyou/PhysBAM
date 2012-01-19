@@ -33,12 +33,12 @@ Jacobi_Singular_Value_Decomposition(ARRAY<VECTOR<int,2> >& left_givens_pairs,ARR
 {
     assert(m>=2 && n>=2);
     ARRAY<PAIR<int,T> > max_off_diagonal_element_of_row(m);
-    for(int i=1;i<=m;i++) Update_Max_Off_Diagonal_Element_Of_Row_After_Row_Change(*this,max_off_diagonal_element_of_row,i);
+    for(int i=0;i<m;i++) Update_Max_Off_Diagonal_Element_Of_Row_After_Row_Change(*this,max_off_diagonal_element_of_row,i);
     left_givens_pairs.Remove_All();left_givens_coefficients.Remove_All();
     right_givens_pairs.Remove_All();right_givens_coefficients.Remove_All();
-    for(int iteration=1;iteration<=max_iterations;iteration++){
+    for(int iteration=0;iteration<max_iterations;iteration++){
         T max_off_diagonal_element=0;int i_max=0,j_max=0;
-        for(int i=1;i<=m;i++)
+        for(int i=0;i<m;i++)
             if(max_off_diagonal_element_of_row(i).y>max_off_diagonal_element){max_off_diagonal_element=max_off_diagonal_element_of_row(i).y;i_max=i;j_max=max_off_diagonal_element_of_row(i).x;}
         if(max_off_diagonal_element<tolerance) return;
         if(i_max>n){

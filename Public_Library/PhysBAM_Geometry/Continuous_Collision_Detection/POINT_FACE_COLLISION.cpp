@@ -55,7 +55,7 @@ Point_Face_Collision(const TRIANGLE_3D<T>& tri,const VECTOR<T,3>& x,const VECTOR
     // find and check roots
     T distance;
     ITERATIVE_SOLVER<double> iterative_solver;iterative_solver.tolerance=1e-14;
-    for(int k=1;k<=num_intervals;k++){
+    for(int k=0;k<num_intervals;k++){
         collision_time=dt*(T)iterative_solver.Bisection_Secant_Root(cubic,intervals(k).min_corner,intervals(k).max_corner);
         TRIANGLE_3D<T> triangle(tri.x1+collision_time*v1,tri.x2+collision_time*v2,tri.x3+collision_time*v3);
         if(triangle.Point_Face_Interaction(x+collision_time*v,v,v1,v2,v3,collision_thickness,distance,normal,weights,relative_speed,true,exit_early)) return true;}

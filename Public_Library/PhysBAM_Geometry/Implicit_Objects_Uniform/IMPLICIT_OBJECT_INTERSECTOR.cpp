@@ -43,7 +43,7 @@ Negative_Material_In_Cell(const GRID<TV>& grid,const TV_INT& cell_index,const bo
     // compute phis for extant nodes
     T minimum_phi=FLT_MAX,maximum_phi=-FLT_MAX;
 
-    for(int i=1;i<=last_node;i++){T& phi=cell_phis(i);
+    for(int i=0;i<last_node;i++){T& phi=cell_phis(i);
         phi=grid_nodal_phis(phi_indices[i-1]);
         if(phi<minimum_phi) minimum_phi=phi;
         if(phi>maximum_phi) maximum_phi=phi;}
@@ -89,7 +89,7 @@ Negative_Material_In_Box(const RANGE<TV>& box,const bool force_full_refinement)
     // compute phis for extant nodes
     T minimum_phi=FLT_MAX,maximum_phi=-FLT_MAX;
 
-    for(int i=1;i<=last_node;i++){T& phi=cell_phis(i);
+    for(int i=0;i<last_node;i++){T& phi=cell_phis(i);
         phi=Extended_Phi(cell_particle_X(i));
         if(phi<minimum_phi) minimum_phi=phi;
         if(phi>maximum_phi) maximum_phi=phi;}
@@ -135,7 +135,7 @@ Negative_Material_In_Box_Excluding_Object(const RANGE<TV>& box,const ARRAY<IMPLI
     // compute phis for extant nodes
     T minimum_phi=FLT_MAX,maximum_phi=-FLT_MAX;
 
-    for(int i=1;i<=last_node;i++){T& phi=cell_phis(i);
+    for(int i=0;i<last_node;i++){T& phi=cell_phis(i);
         phi=Extended_Phi(cell_particle_X(i));
         // TODO This is the slow way to do it...
         for(int j=1;j<=excluded_implicit_objects.m;++j) phi=max(phi,-excluded_implicit_objects(j)->Extended_Phi(cell_particle_X(i)));
@@ -177,7 +177,7 @@ Iterative_Find_Interface(TV left,TV right,const int iterations) const
     T phi_left=Extended_Phi(left),phi_right=Extended_Phi(right);
     TV theta=LINEAR_INTERPOLATION<T,TV>::Linear(left,right,LEVELSET_UTILITIES<T>::Theta(phi_left,phi_right));
     int phi_left_sign=(phi_left<=0?-1:1),phi_right_sign=(phi_right<=0?-1:1);
-    for(int i=1;i<=iterations;i++){
+    for(int i=0;i<iterations;i++){
         T phi=Extended_Phi(theta);
         int phi_sign=(phi<=0?-1:1);
         if(phi_left_sign*phi_sign<0){

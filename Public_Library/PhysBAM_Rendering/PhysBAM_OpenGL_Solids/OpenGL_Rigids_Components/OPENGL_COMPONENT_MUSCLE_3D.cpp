@@ -110,7 +110,7 @@ Read_Muscle_Internal_Particles(const std::string& filename)
 {
     std::istream* input=FILE_UTILITIES::Safe_Open_Input(filename);
     int numpoints=0;Read_Binary<T>(*input,numpoints);muscle_internal_particles.Exact_Resize(numpoints);
-    for(int i=1;i<=numpoints;i++) Read_Binary<T>(*input,muscle_internal_particles(i));
+    for(int i=0;i<numpoints;i++) Read_Binary<T>(*input,muscle_internal_particles(i));
     delete input;
 }
 //#####################################################################

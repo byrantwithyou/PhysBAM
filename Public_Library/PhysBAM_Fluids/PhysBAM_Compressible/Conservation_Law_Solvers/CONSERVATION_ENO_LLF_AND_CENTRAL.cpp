@@ -52,25 +52,25 @@ Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1>
             // transfer the divided differences into the characteristic fields
             for(j=1;j<=eno_order;j++) for(int ii=i+1-j;ii<=i+1;ii++) if(ii >= -2 && ii <= m+4-j) for(k=1;k<=d;k++){
                 LDU(k,ii)(j)=LDF(k,ii)(j)=0;
-                for(int kk=1;kk<=d;kk++){LDU(k,ii)(j)+=L(k,kk)*DU(kk,ii)(j);LDF(k,ii)(j)+=L(k,kk)*DF(kk,ii)(j);}}
+                for(int kk=0;kk<d;kk++){LDU(k,ii)(j)+=L(k,kk)*DU(kk,ii)(j);LDF(k,ii)(j)+=L(k,kk)*DF(kk,ii)(j);}}
             // find a flux in each characteristic field
             if(eno_order == 1) for(k=1;k<=d;k++){
                 T alpha=Alpha(lambda_left,lambda_right,k,d);
                 T flux_left=LDF(k,i)(1)+alpha*LDU(k,i)(1);
                 T flux_right=LDF(k,i+1)(1)-alpha*LDU(k,i+1)(1);
-                for(int kk=1;kk<=d;kk++) flux(i)(kk)+=(T).5*(flux_left+flux_right)*R(k,kk);}
+                for(int kk=0;kk<d;kk++) flux(i)(kk)+=(T).5*(flux_left+flux_right)*R(k,kk);}
             else if(eno_order == 2) for(k=1;k<=d;k++){
                 T alpha=Alpha(lambda_left,lambda_right,k,d);
                 T flux_left=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,LDF(k,i)(1)+alpha*LDU(k,i)(1),LDF(k,i-1)(2)+alpha*LDU(k,i-1)(2),LDF(k,i)(2)+alpha*LDU(k,i)(2));
                 T flux_right=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,LDF(k,i+1)(1)-alpha*LDU(k,i+1)(1),-(LDF(k,i+1)(2)-alpha*LDU(k,i+1)(2)),-(LDF(k,i)(2)-alpha*LDU(k,i)(2)));
-                for(int kk=1;kk<=d;kk++) flux(i)(kk)+=(T).5*(flux_left+flux_right)*R(k,kk);}
+                for(int kk=0;kk<d;kk++) flux(i)(kk)+=(T).5*(flux_left+flux_right)*R(k,kk);}
             else if(eno_order == 3) for(k=1;k<=d;k++){
                 T alpha=Alpha(lambda_left,lambda_right,k,d);
                 T flux_left=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,LDF(k,i)(1)+alpha*LDU(k,i)(1),LDF(k,i-1)(2)+alpha*LDU(k,i-1)(2),LDF(k,i)(2)+alpha*LDU(k,i)(2),
                                                                        LDF(k,i-2)(3)+alpha*LDU(k,i-2)(3),LDF(k,i-1)(3)+alpha*LDU(k,i-1)(3),LDF(k,i)(3)+alpha*LDU(k,i)(3));
                 T flux_right=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,LDF(k,i+1)(1)-alpha*LDU(k,i+1)(1),-(LDF(k,i+1)(2)-alpha*LDU(k,i+1)(2)),-(LDF(k,i)(2)-alpha*LDU(k,i)(2)),
                                                                          LDF(k,i+1)(3)-alpha*LDU(k,i+1)(3),LDF(k,i)(3)-alpha*LDU(k,i)(3),LDF(k,i-1)(3)-alpha*LDU(k,i-1)(3));
-                for(int kk=1;kk<=d;kk++) flux(i)(kk)+=(T).5*(flux_left+flux_right)*R(k,kk);}}
+                for(int kk=0;kk<d;kk++) flux(i)(kk)+=(T).5*(flux_left+flux_right)*R(k,kk);}}
         else{ // use the central scheme
             // change parameters
             int save_alpha=field_by_field_alpha;field_by_field_alpha=0; // use maximum alpha

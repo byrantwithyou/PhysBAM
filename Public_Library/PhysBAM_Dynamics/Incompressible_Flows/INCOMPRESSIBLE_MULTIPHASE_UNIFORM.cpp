@@ -158,7 +158,7 @@ Advance_One_Time_Step_Implicit_Part(T_FACE_ARRAYS_SCALAR& face_velocities,const 
 //        int ghost_cells=3;
 //        ARRAY<T,VECTOR<int,3> > phi_ghost(grid.Domain_Indices(3));levelset.boundary->Fill_Ghost_Cells(grid,levelset.phi,phi_ghost,dt,time,ghost_cells);
 //        projection.poisson->Find_Constant_beta(phi_ghost);
-//        for(int i=1;i<=m;i++) for(int j=1;j<=n;j++) for(int ij=1;ij<=mn;ij++){
+//        for(int i=0;i<m;i++) for(int j=0;j<n;j++) for(int ij=0;ij<mn;ij++){
 //            T dt_over_rho=.125*dt*(projection.poisson->beta_right(i-1,j,ij)+projection.poisson->beta_right(i,j,ij)+projection.poisson->beta_top(i,j-1,ij)+projection.poisson->beta_top(i,j,ij)
 //                +projection.poisson->beta_back(i,j,ij-1)+projection.poisson->beta_back(i,j,ij));
 //            V(i,j,ij).x+=dt_over_rho*u_viscosity(i,j,ij);V(i,j,ij).y+=dt_over_rho*v_viscosity(i,j,ij);V(i,j,ij).z+=dt_over_rho*w_viscosity(i,j,ij);}
@@ -419,7 +419,7 @@ Discretize_Viscous_Terms(const ARRAY<T,VECTOR<int,3> >& phi,const T dt)
             projection.poisson->u_jump(i,j,ij)=2*dt*viscosity_jump*VECTOR<T,3>::Dot_Product(UX*N,N);}
 
         // update u_viscosity = viscosity*uxx + viscosity*uyy + viscosity*uzz
-        for(int i=1;i<=m;i++) for(int j=1;j<=n;j++) for(int ij=1;ij<=mn;ij++){ 
+        for(int i=0;i<m;i++) for(int j=0;j<n;j++) for(int ij=0;ij<mn;ij++){ 
             T viscosity_ux_left,viscosity_ux_right,viscosity_uy_bottom,viscosity_uy_top,viscosity_uz_front,viscosity_uz_back;
             T phi_mid=phi(i,j,ij),phi_left=phi(i-1,j,ij),phi_right=phi(i+1,j,ij),phi_bottom=phi(i,j-1,ij),phi_top=phi(i,j+1,ij),phi_front=phi(i,j,ij-1),phi_back=phi(i,j,ij+1);
             if(LEVELSET_UTILITIES<VECTOR<T,3> >::Interface(phi_left,phi_mid)){
@@ -468,7 +468,7 @@ Discretize_Viscous_Terms(const ARRAY<T,VECTOR<int,3> >& phi,const T dt)
                                +(viscosity_uz_back-viscosity_uz_front)/dz;}
             
         // update v_viscosity = viscosity*vxx + viscosity*vyy + viscosity*vzz
-        for(int i=1;i<=m;i++) for(int j=1;j<=n;j++) for(int ij=1;ij<=mn;ij++){
+        for(int i=0;i<m;i++) for(int j=0;j<n;j++) for(int ij=0;ij<mn;ij++){
             T viscosity_vx_left,viscosity_vx_right,viscosity_vy_bottom,viscosity_vy_top,viscosity_vz_front,viscosity_vz_back;
             T phi_mid=phi(i,j,ij),phi_left=phi(i-1,j,ij),phi_right=phi(i+1,j,ij),phi_bottom=phi(i,j-1,ij),phi_top=phi(i,j+1,ij),phi_front=phi(i,j,ij-1),phi_back=phi(i,j,ij+1);
             if(LEVELSET_UTILITIES<VECTOR<T,3> >::Interface(phi_left,phi_mid)){
@@ -517,7 +517,7 @@ Discretize_Viscous_Terms(const ARRAY<T,VECTOR<int,3> >& phi,const T dt)
                                +(viscosity_vz_back-viscosity_vz_front)/dz;}
 
         // update w_viscosity = viscosity*wxx + viscosity*wyy + viscosity*wzz
-        for(int i=1;i<=m;i++) for(int j=1;j<=n;j++) for(int ij=1;ij<=mn;ij++){
+        for(int i=0;i<m;i++) for(int j=0;j<n;j++) for(int ij=0;ij<mn;ij++){
             T viscosity_wx_left,viscosity_wx_right,viscosity_wy_bottom,viscosity_wy_top,viscosity_wz_front,viscosity_wz_back;
             T phi_mid=phi(i,j,ij),phi_left=phi(i-1,j,ij),phi_right=phi(i+1,j,ij),phi_bottom=phi(i,j-1,ij),phi_top=phi(i,j+1,ij),phi_front=phi(i,j,ij-1),phi_back=phi(i,j,ij+1);
             if(LEVELSET_UTILITIES<VECTOR<T,3> >::Interface(phi_left,phi_mid)){
@@ -577,22 +577,22 @@ Discretize_Viscous_Terms(const ARRAY<T,VECTOR<int,2> >& phi,const T dt)
 
     ARRAY<T,VECTOR<int,2> > viscosity_x_half(0,m,1,n),ux_x_half(0,m,1,n),vx_x_half(0,m,1,n);
     ARRAY<T,VECTOR<int,2> > viscosity_y_half(1,m,0,n),uy_y_half(1,m,0,n),vy_y_half(1,m,0,n);
-    for(int i=0;i<=m;i++) for(int j=1;j<=n;j++){
+    for(int i=0;i<=m;i++) for(int j=0;j<n;j++){
         viscosity_x_half(i,j)=LEVELSET_UTILITIES<VECTOR<T,2> >::Heaviside((T).5*(phi(i,j)+phi(i+1,j)),viscosity_minus,viscosity_plus,half_width);
         ux_x_half(i,j)=(V_ghost(i+1,j).x-V_ghost(i,j).x)/dx;
         vx_x_half(i,j)=(V_ghost(i+1,j).y-V_ghost(i,j).y)/dx;}
-    for(int i=1;i<=m;i++) for(int j=0;j<=n;j++){
+    for(int i=0;i<m;i++) for(int j=0;j<=n;j++){
         viscosity_y_half(i,j)=LEVELSET_UTILITIES<VECTOR<T,2> >::Heaviside((T).5*(phi(i,j)+phi(i,j+1)),viscosity_minus,viscosity_plus,half_width);
         uy_y_half(i,j)=(V_ghost(i,j+1).x-V_ghost(i,j).x)/dy;
         vy_y_half(i,j)=(V_ghost(i,j+1).y-V_ghost(i,j).y)/dy;}
 
     if(!GFM){ //delta function method
         ARRAY<T,VECTOR<int,2> > uy_x_half(0,m,1,n),vx_y_half(1,m,0,n);
-        {ARRAY<T,VECTOR<int,2> > uy_nodes(0,m+1,1,n);for(int i=0;i<=m+1;i++) for(int j=1;j<=n;j++) uy_nodes(i,j)=(V_ghost(i,j+1).x-V_ghost(i,j-1).x)/(2*dy);
-        for(int i=0;i<=m;i++) for(int j=1;j<=n;j++) uy_x_half(i,j)=(T).5*(uy_nodes(i,j)+uy_nodes(i+1,j));}
-        {ARRAY<T,VECTOR<int,2> > vx_nodes(1,m,0,n+1);for(int i=1;i<=m;i++) for(int j=0;j<=n+1;j++) vx_nodes(i,j)=(V_ghost(i+1,j).y-V_ghost(i-1,j).y)/(2*dx);
-        for(int i=1;i<=m;i++) for(int j=0;j<=n;j++) vx_y_half(i,j)=(T).5*(vx_nodes(i,j)+vx_nodes(i,j+1));}
-        for(int i=1;i<=m;i++) for(int j=1;j<=n;j++){
+        {ARRAY<T,VECTOR<int,2> > uy_nodes(0,m+1,1,n);for(int i=0;i<=m+1;i++) for(int j=0;j<n;j++) uy_nodes(i,j)=(V_ghost(i,j+1).x-V_ghost(i,j-1).x)/(2*dy);
+        for(int i=0;i<=m;i++) for(int j=0;j<n;j++) uy_x_half(i,j)=(T).5*(uy_nodes(i,j)+uy_nodes(i+1,j));}
+        {ARRAY<T,VECTOR<int,2> > vx_nodes(1,m,0,n+1);for(int i=0;i<m;i++) for(int j=0;j<=n+1;j++) vx_nodes(i,j)=(V_ghost(i+1,j).y-V_ghost(i-1,j).y)/(2*dx);
+        for(int i=0;i<m;i++) for(int j=0;j<=n;j++) vx_y_half(i,j)=(T).5*(vx_nodes(i,j)+vx_nodes(i,j+1));}
+        for(int i=0;i<m;i++) for(int j=0;j<n;j++){
             u_viscosity(i,j)=2*(viscosity_x_half(i,j)*ux_x_half(i,j)-viscosity_x_half(i-1,j)*ux_x_half(i-1,j))/dx+(viscosity_y_half(i,j)*(uy_y_half(i,j)+vx_y_half(i,j))-viscosity_y_half(i,j-1)*(uy_y_half(i,j-1)+vx_y_half(i,j-1)))/dy;
             v_viscosity(i,j)=(viscosity_x_half(i,j)*(uy_x_half(i,j)+vx_x_half(i,j))-viscosity_x_half(i-1,j)*(uy_x_half(i-1,j)+vx_x_half(i-1,j)))/dx+2*(viscosity_y_half(i,j)*vy_y_half(i,j)-viscosity_y_half(i,j-1)*vy_y_half(i,j-1))/dy;}}
     else{ // GFM      
@@ -618,7 +618,7 @@ Discretize_Viscous_Terms(const ARRAY<T,VECTOR<int,2> >& phi,const T dt)
             projection.poisson->u_jump(i,j)=2*dt*viscosity_jump*VECTOR<T,2>::Dot_Product(UX*N,N);}
 
         // update u_viscosity = viscosity*uxx + viscosity*uyy
-        for(int i=1;i<=m;i++) for(int j=1;j<=n;j++){
+        for(int i=0;i<m;i++) for(int j=0;j<n;j++){
             T viscosity_ux_left,viscosity_ux_right,viscosity_uy_bottom,viscosity_uy_top;
             T phi_mid=phi(i,j),phi_left=phi(i-1,j),phi_right=phi(i+1,j),phi_bottom=phi(i,j-1),phi_top=phi(i,j+1);
             if(LEVELSET_UTILITIES<VECTOR<T,2> >::Interface(phi_left,phi_mid)){
@@ -644,7 +644,7 @@ Discretize_Viscous_Terms(const ARRAY<T,VECTOR<int,2> >& phi,const T dt)
             u_viscosity(i,j)=(viscosity_ux_right-viscosity_ux_left)/dx+(viscosity_uy_top-viscosity_uy_bottom)/dy;}
 
         // update v_viscosity = viscosity*vxx + viscosity*vyy
-        for(int i=1;i<=m;i++) for(int j=1;j<=n;j++){
+        for(int i=0;i<m;i++) for(int j=0;j<n;j++){
             T viscosity_vx_left,viscosity_vx_right,viscosity_vy_bottom,viscosity_vy_top;
             T phi_mid=phi(i,j),phi_left=phi(i-1,j),phi_right=phi(i+1,j),phi_bottom=phi(i,j-1),phi_top=phi(i,j+1);
             if(LEVELSET_UTILITIES<VECTOR<T,2> >::Interface(phi_left,phi_mid)){

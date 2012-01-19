@@ -302,7 +302,7 @@ Centroid_Of_Neighbors(const int node) const
     assert(mesh.neighbor_nodes);
     TV target;
     int number_of_neighbors=(*mesh.neighbor_nodes)(node).m;
-    for(int j=1;j<=number_of_neighbors;j++) target+=particles.X((*mesh.neighbor_nodes)(node)(j));
+    for(int j=0;j<number_of_neighbors;j++) target+=particles.X((*mesh.neighbor_nodes)(node)(j));
     if(number_of_neighbors != 0) target/=(T)number_of_neighbors;
     else target=particles.X(node); // if no neighbors, return the current node location
     return target;

@@ -308,7 +308,7 @@ Split_Dimension(const int m,const int processes,ARRAY<int>& boundaries)
 {
     int cells_over_processes=(m-1)/processes,cells_mod_processes=(m-1)%processes;
     boundaries.Resize(processes+1);boundaries(1)=1;
-    for(int p=1;p<=processes;p++)boundaries(p+1)=boundaries(p)+cells_over_processes+(p<=cells_mod_processes);
+    for(int p=0;p<processes;p++)boundaries(p+1)=boundaries(p)+cells_over_processes+(p<=cells_mod_processes);
 }
 //#####################################################################
 // Function Restrict_Grid
@@ -735,22 +735,22 @@ Sync_Common_Face_Weights_From(ARRAY<ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >,FA
                     if(!face_domain.Lazy_Inside(local_weights(i).x.index)) 
                         transfer_per_proc(other_rank+1).Append(TRIPLE<FACE_INDEX<TV::dimension>,FACE_INDEX<TV::dimension>,T>(FACE_INDEX<TV::dimension>(cell.axis,cell.index+local_to_global_offset),
                             FACE_INDEX<TV::dimension>(local_weights(i).x.axis,local_weights(i).x.index+local_to_global_offset),local_weights(i).y));}}}}
-    for(int i=1;i<=number_of_processes;i++) all_sizes(rank+1,i)=transfer_per_proc(i).m;
-    for(int i=1;i<=number_of_processes;i++) for(int j=1;j<=number_of_processes;j++){int output;MPI_UTILITIES::Reduce(all_sizes(i,j),output,MPI::MAX,*comm);all_sizes(i,j)=output;}
-    for(int i=1;i<=number_of_processes;i++) receive_per_proc(i).Resize(all_sizes(i,rank+1));
+    for(int i=0;i<number_of_processes;i++) all_sizes(rank+1,i)=transfer_per_proc(i).m;
+    for(int i=0;i<number_of_processes;i++) for(int j=0;j<number_of_processes;j++){int output;MPI_UTILITIES::Reduce(all_sizes(i,j),output,MPI::MAX,*comm);all_sizes(i,j)=output;}
+    for(int i=0;i<number_of_processes;i++) receive_per_proc(i).Resize(all_sizes(i,rank+1));
     ARRAY<MPI::Request> requests;
     ARRAY<ARRAY<char> > recv_buffers(number_of_processes);ARRAY<ARRAY<char> > send_buffer(number_of_processes);
-    for(int i=1;i<=number_of_processes;i++){if(transfer_per_proc(i).m==0) continue;
+    for(int i=0;i<number_of_processes;i++){if(transfer_per_proc(i).m==0) continue;
         int buffer_size=MPI_UTILITIES::Datatype<TV_INT>().Pack_size(transfer_per_proc(i).m*2,*comm)+MPI_UTILITIES::Datatype<int>().Pack_size(transfer_per_proc(i).m*2,*comm)+MPI_UTILITIES::Datatype<T>().Pack_size(transfer_per_proc(i).m,*comm);
         send_buffer(i).Resize(buffer_size);int position=0;
         for(int j=1;j<=transfer_per_proc(i).m;j++) MPI_UTILITIES::Pack(transfer_per_proc(i)(j).x.index,transfer_per_proc(i)(j).x.axis,transfer_per_proc(i)(j).y.index,transfer_per_proc(i)(j).y.axis,transfer_per_proc(i)(j).z,send_buffer(i),position,*comm);
         requests.Append(comm->Isend(&send_buffer(i)(1),position,MPI::PACKED,i-1,tag));}
-    for(int i=1;i<=number_of_processes;i++){if(receive_per_proc(i).m==0) continue;
+    for(int i=0;i<number_of_processes;i++){if(receive_per_proc(i).m==0) continue;
         MPI::Status status;comm->Probe(i-1,tag,status);
         recv_buffers(i).Resize(status.Get_count(MPI::PACKED));
         requests.Append(comm->Irecv(recv_buffers(i).m?&(recv_buffers(i)(1)):0,recv_buffers(i).m,MPI_PACKED,i-1,tag));}
     MPI_UTILITIES::Wait_All(requests);
-    for(int i=1;i<=number_of_processes;i++){int position=0;
+    for(int i=0;i<number_of_processes;i++){int position=0;
         for(int j=1;j<=receive_per_proc(i).m;j++){
             TRIPLE<FACE_INDEX<TV::dimension>,FACE_INDEX<TV::dimension>,T>& data=receive_per_proc(i)(j);
             MPI_UTILITIES::Unpack(data.x.index,data.x.axis,data.y.index,data.y.axis,data.z,recv_buffers(i),position,*comm);
@@ -791,22 +791,22 @@ Sync_Common_Face_Weights_To(ARRAY<ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >,FACE
                     if(!face_domain.Lazy_Inside(local_weights(i).x.index)) 
                         transfer_per_proc(other_rank+1).Append(TRIPLE<FACE_INDEX<TV::dimension>,FACE_INDEX<TV::dimension>,T>(FACE_INDEX<TV::dimension>(cell.axis,cell.index+local_to_global_offset),
                             FACE_INDEX<TV::dimension>(local_weights(i).x.axis,local_weights(i).x.index+local_to_global_offset),weights_to(local_weights(i).x)(local_weights(i).y).y));}}}}
-    for(int i=1;i<=number_of_processes;i++) all_sizes(rank+1,i)=transfer_per_proc(i).m;
-    for(int i=1;i<=number_of_processes;i++) for(int j=1;j<=number_of_processes;j++){int output;MPI_UTILITIES::Reduce(all_sizes(i,j),output,MPI::MAX,*comm);all_sizes(i,j)=output;}
-    for(int i=1;i<=number_of_processes;i++) receive_per_proc(i).Resize(all_sizes(i,rank+1));
+    for(int i=0;i<number_of_processes;i++) all_sizes(rank+1,i)=transfer_per_proc(i).m;
+    for(int i=0;i<number_of_processes;i++) for(int j=0;j<number_of_processes;j++){int output;MPI_UTILITIES::Reduce(all_sizes(i,j),output,MPI::MAX,*comm);all_sizes(i,j)=output;}
+    for(int i=0;i<number_of_processes;i++) receive_per_proc(i).Resize(all_sizes(i,rank+1));
     ARRAY<MPI::Request> requests;
     ARRAY<ARRAY<char> > recv_buffers(number_of_processes);ARRAY<ARRAY<char> > send_buffer(number_of_processes);
-    for(int i=1;i<=number_of_processes;i++){if(transfer_per_proc(i).m==0) continue;
+    for(int i=0;i<number_of_processes;i++){if(transfer_per_proc(i).m==0) continue;
         int buffer_size=MPI_UTILITIES::Datatype<TV_INT>().Pack_size(transfer_per_proc(i).m*2,*comm)+MPI_UTILITIES::Datatype<int>().Pack_size(transfer_per_proc(i).m*2,*comm)+MPI_UTILITIES::Datatype<T>().Pack_size(transfer_per_proc(i).m,*comm);
         send_buffer(i).Resize(buffer_size);int position=0;
         for(int j=1;j<=transfer_per_proc(i).m;j++) MPI_UTILITIES::Pack(transfer_per_proc(i)(j).x.index,transfer_per_proc(i)(j).x.axis,transfer_per_proc(i)(j).y.index,transfer_per_proc(i)(j).y.axis,transfer_per_proc(i)(j).z,send_buffer(i),position,*comm);
         requests.Append(comm->Isend(&send_buffer(i)(1),position,MPI::PACKED,i-1,tag));}
-    for(int i=1;i<=number_of_processes;i++){if(receive_per_proc(i).m==0) continue;
+    for(int i=0;i<number_of_processes;i++){if(receive_per_proc(i).m==0) continue;
         MPI::Status status;comm->Probe(i-1,tag,status);
         recv_buffers(i).Resize(status.Get_count(MPI::PACKED));
         requests.Append(comm->Irecv(recv_buffers(i).m?&(recv_buffers(i)(1)):0,recv_buffers(i).m,MPI_PACKED,i-1,tag));}
     MPI_UTILITIES::Wait_All(requests);
-    for(int i=1;i<=number_of_processes;i++){int position=0;
+    for(int i=0;i<number_of_processes;i++){int position=0;
         for(int j=1;j<=receive_per_proc(i).m;j++){
             TRIPLE<FACE_INDEX<TV::dimension>,FACE_INDEX<TV::dimension>,T>& data=receive_per_proc(i)(j);
             MPI_UTILITIES::Unpack(data.x.index,data.x.axis,data.y.index,data.y.axis,data.z,recv_buffers(i),position,*comm);
@@ -844,22 +844,22 @@ Sync_Common_Cell_Weights_From(ARRAY<ARRAY<PAIR<TV_INT,T> >,TV_INT>& weights_to,A
             for(int i=1;i<=local_weights.m;i++){
                 if(!ghost_domain.Lazy_Inside(local_weights(i).x)) 
                     transfer_per_proc(other_rank+1).Append(TRIPLE<TV_INT,TV_INT,T>(local_to_global_offset+cell,local_to_global_offset+local_weights(i).x,local_weights(i).y));}}}
-    for(int i=1;i<=number_of_processes;i++) all_sizes(rank+1,i)=transfer_per_proc(i).m;
-    for(int i=1;i<=number_of_processes;i++) for(int j=1;j<=number_of_processes;j++){int output;MPI_UTILITIES::Reduce(all_sizes(i,j),output,MPI::MAX,*comm);all_sizes(i,j)=output;}
-    for(int i=1;i<=number_of_processes;i++) receive_per_proc(i).Resize(all_sizes(i,rank+1));
+    for(int i=0;i<number_of_processes;i++) all_sizes(rank+1,i)=transfer_per_proc(i).m;
+    for(int i=0;i<number_of_processes;i++) for(int j=0;j<number_of_processes;j++){int output;MPI_UTILITIES::Reduce(all_sizes(i,j),output,MPI::MAX,*comm);all_sizes(i,j)=output;}
+    for(int i=0;i<number_of_processes;i++) receive_per_proc(i).Resize(all_sizes(i,rank+1));
     ARRAY<MPI::Request> requests;
     ARRAY<ARRAY<char> > recv_buffers(number_of_processes);ARRAY<ARRAY<char> > send_buffer(number_of_processes);
-    for(int i=1;i<=number_of_processes;i++){if(transfer_per_proc(i).m==0) continue;
+    for(int i=0;i<number_of_processes;i++){if(transfer_per_proc(i).m==0) continue;
         int buffer_size=MPI_UTILITIES::Datatype<TV_INT>().Pack_size(transfer_per_proc(i).m*2,*comm)+MPI_UTILITIES::Datatype<T>().Pack_size(transfer_per_proc(i).m,*comm);
         send_buffer(i).Resize(buffer_size);int position=0;
         for(int j=1;j<=transfer_per_proc(i).m;j++) MPI_UTILITIES::Pack(transfer_per_proc(i)(j).x,transfer_per_proc(i)(j).y,transfer_per_proc(i)(j).z,send_buffer(i),position,*comm);
         requests.Append(comm->Isend(&send_buffer(i)(1),position,MPI::PACKED,i-1,tag));}
-    for(int i=1;i<=number_of_processes;i++){if(receive_per_proc(i).m==0) continue;
+    for(int i=0;i<number_of_processes;i++){if(receive_per_proc(i).m==0) continue;
         MPI::Status status;comm->Probe(i-1,tag,status);
         recv_buffers(i).Resize(status.Get_count(MPI::PACKED));
         requests.Append(comm->Irecv(recv_buffers(i).m?&(recv_buffers(i)(1)):0,recv_buffers(i).m,MPI_PACKED,i-1,tag));}
     MPI_UTILITIES::Wait_All(requests);
-    for(int i=1;i<=number_of_processes;i++){int position=0;
+    for(int i=0;i<number_of_processes;i++){int position=0;
         for(int j=1;j<=receive_per_proc(i).m;j++){
             TRIPLE<TV_INT,TV_INT,T>& data=receive_per_proc(i)(j);
             MPI_UTILITIES::Unpack(data.x,data.y,data.z,recv_buffers(i),position,*comm);
@@ -892,22 +892,22 @@ Sync_Common_Cell_Weights_To(ARRAY<ARRAY<PAIR<TV_INT,T> >,TV_INT>& weights_to,ARR
             for(int i=1;i<=local_weights.m;i++)
                 if(!ghost_domain.Lazy_Inside(local_weights(i).x)){
                     transfer_per_proc(other_rank+1).Append(TRIPLE<TV_INT,TV_INT,T>(local_to_global_offset+cell,local_to_global_offset+local_weights(i).x,weights_to(local_weights(i).x)(local_weights(i).y).y));}}}
-    for(int i=1;i<=number_of_processes;i++) all_sizes(rank+1,i)=transfer_per_proc(i).m;
-    for(int i=1;i<=number_of_processes;i++) for(int j=1;j<=number_of_processes;j++){int output;MPI_UTILITIES::Reduce(all_sizes(i,j),output,MPI::MAX,*comm);all_sizes(i,j)=output;}
-    for(int i=1;i<=number_of_processes;i++) receive_per_proc(i).Resize(all_sizes(i,rank+1));
+    for(int i=0;i<number_of_processes;i++) all_sizes(rank+1,i)=transfer_per_proc(i).m;
+    for(int i=0;i<number_of_processes;i++) for(int j=0;j<number_of_processes;j++){int output;MPI_UTILITIES::Reduce(all_sizes(i,j),output,MPI::MAX,*comm);all_sizes(i,j)=output;}
+    for(int i=0;i<number_of_processes;i++) receive_per_proc(i).Resize(all_sizes(i,rank+1));
     ARRAY<MPI::Request> requests;
     ARRAY<ARRAY<char> > recv_buffers(number_of_processes);ARRAY<ARRAY<char> > send_buffer(number_of_processes);
-    for(int i=1;i<=number_of_processes;i++){if(transfer_per_proc(i).m==0) continue;
+    for(int i=0;i<number_of_processes;i++){if(transfer_per_proc(i).m==0) continue;
         int buffer_size=MPI_UTILITIES::Datatype<TV_INT>().Pack_size(transfer_per_proc(i).m*2,*comm)+MPI_UTILITIES::Datatype<T>().Pack_size(transfer_per_proc(i).m,*comm);
         send_buffer(i).Resize(buffer_size);int position=0;
         for(int j=1;j<=transfer_per_proc(i).m;j++) MPI_UTILITIES::Pack(transfer_per_proc(i)(j).x,transfer_per_proc(i)(j).y,transfer_per_proc(i)(j).z,send_buffer(i),position,*comm);
         requests.Append(comm->Isend(&send_buffer(i)(1),position,MPI::PACKED,i-1,tag));}
-    for(int i=1;i<=number_of_processes;i++){if(receive_per_proc(i).m==0) continue;
+    for(int i=0;i<number_of_processes;i++){if(receive_per_proc(i).m==0) continue;
         MPI::Status status;comm->Probe(i-1,tag,status);
         recv_buffers(i).Resize(status.Get_count(MPI::PACKED));
         requests.Append(comm->Irecv(recv_buffers(i).m?&(recv_buffers(i)(1)):0,recv_buffers(i).m,MPI_PACKED,i-1,tag));}
     MPI_UTILITIES::Wait_All(requests);
-    for(int i=1;i<=number_of_processes;i++){int position=0;
+    for(int i=0;i<number_of_processes;i++){int position=0;
         for(int j=1;j<=receive_per_proc(i).m;j++){
             TRIPLE<TV_INT,TV_INT,T>& data=receive_per_proc(i)(j);
             MPI_UTILITIES::Unpack(data.x,data.y,data.z,recv_buffers(i),position,*comm);

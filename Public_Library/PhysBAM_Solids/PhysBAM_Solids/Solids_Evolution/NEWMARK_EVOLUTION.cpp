@@ -497,7 +497,7 @@ Read_Position_Update_Projection_Data(const STREAM_TYPE stream_type,const std::st
     TYPED_ISTREAM typed_input(*input,stream_type);
     int precompute_contact_projections_size;
     Read_Binary(typed_input,precompute_contact_projections_size);
-    for(int i=1;i<=precompute_contact_projections_size;i++){
+    for(int i=0;i<precompute_contact_projections_size;i++){
         int index;
         Read_Binary(typed_input,index);
         typename RIGID_DEFORMABLE_COLLISIONS<TV>::PRECOMPUTE_CONTACT_PROJECTION* p=

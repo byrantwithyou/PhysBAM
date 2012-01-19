@@ -117,7 +117,7 @@ Reinitialize(bool force,bool read_geometry)
         free_particles_objects.Delete_Pointers_And_Clean_Memory();free_particles_objects.Resize(m);
         free_particles_indirect_arrays.Delete_Pointers_And_Clean_Memory();free_particles_indirect_arrays.Resize(m);
         int color_map_index=15;
-        for(int i=1;i<=m;i++){
+        for(int i=0;i<m;i++){
             STRUCTURE<TV>* structure=deformable_geometry->structures(i);
             if(SEGMENTED_CURVE<TV>* segmented_curve=dynamic_cast<SEGMENTED_CURVE<TV>*>(structure)){
                 if(first_time) LOG::cout<<"object "<<i<<": segmented curve\n";
@@ -351,7 +351,7 @@ Create_One_Big_Triangulated_Surface_And_Write_To_File()
         tetrahedralized_volume->Initialize_Triangulated_Surface();
         TRIANGULATED_SURFACE<T>& individual_boundary_triangulated_surface=*tetrahedralized_volume->triangulated_surface;
         int individual_number_of_triangles=individual_boundary_triangulated_surface.mesh.elements.m;
-        for(int t=1;t<=individual_number_of_triangles;t++) mesh.elements.Append(individual_boundary_triangulated_surface.mesh.elements(t));}
+        for(int t=0;t<individual_number_of_triangles;t++) mesh.elements.Append(individual_boundary_triangulated_surface.mesh.elements(t));}
     mesh.number_nodes=particles.array_collection->Size();
     FILE_UTILITIES::Write_To_File<T>("one_big_tri_surface.tri",triangulated_surface);
 }

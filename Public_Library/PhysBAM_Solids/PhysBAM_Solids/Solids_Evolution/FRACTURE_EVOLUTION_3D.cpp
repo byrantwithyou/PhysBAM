@@ -275,7 +275,7 @@ Rigid_Fracture_Where_High_Stress(const T small_number)
                     T_DIAGONAL_MATRIX eigenvalues=sigma(deformable_tet).Fast_Eigenvalues();
                     T threshold=fracture_object->fracture_threshold[min(number_of_cuts+1,3)]*rigid_body.grain_boundaries(grain_boundary)->Element_Weakness_Multiplier(t,number_of_regions,regions);
                     T amt_over=eigenvalues.First()-threshold;//amt_under=fracture_object->compressive_threshold[number_of_cuts+1]-eigenvalues.Last_Element();
-                    for(int region=1;region<=number_of_regions;region++){
+                    for(int region=0;region<number_of_regions;region++){
                         accumulator(regions(region))+=amt_over;number_of_nodes(regions(region))++;}}
                 //TODO: why iis this commented out?
                 //for(int region=1;region<=accumulator.m;region++)accumulator(region)/=number_of_nodes(region);
@@ -289,9 +289,9 @@ Rigid_Fracture_Where_High_Stress(const T small_number)
                         if(number_of_regions==1) continue;
                         bool fracture=false;
                         // can't do region check for 
-                        for(int region=1;region<=number_of_regions;region++)if(accumulator(regions(region))>0){fracture=true;break;}
+                        for(int region=0;region<number_of_regions;region++)if(accumulator(regions(region))>0){fracture=true;break;}
                         if(fracture){
-                            for(int i=1;i<=number_of_regions;i++){
+                            for(int i=0;i<number_of_regions;i++){
                                 VECTOR<T,4> element_phi;rigid_body.grain_boundaries(grain_boundary)->Phi_For_Region_In_Element(t,regions[i],element_phi);
                                 fracture_object->Add_Cut_Based_On_Phi(rigid_body.rigid_to_deformable_tets(t),element_phi);
                                 if(number_of_regions==2) break;}}}}}}}

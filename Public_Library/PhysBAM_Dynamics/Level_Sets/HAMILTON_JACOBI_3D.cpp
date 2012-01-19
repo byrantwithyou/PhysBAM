@@ -20,7 +20,7 @@ Euler_Step(const T dt,const T time)
         
     if(curvature_motion){ // do curvature first - based on phi^n
         bool curvature_defined=(curvature!=0);Compute_Curvature(time);
-        for(int i=1;i<=m;i++) for(int j=1;j<=n;j++) for(int ij=1;ij<=mn;ij++){
+        for(int i=0;i<m;i++) for(int j=0;j<n;j++) for(int ij=0;ij<mn;ij++){
             T phix=(phi_ghost(i+1,j,ij)-phi_ghost(i-1,j,ij))/(2*dx);
             T phiy=(phi_ghost(i,j+1,ij)-phi_ghost(i,j-1,ij))/(2*dy);
             T phiz=(phi_ghost(i,j,ij+1)-phi_ghost(i,j,ij-1))/(2*dz);

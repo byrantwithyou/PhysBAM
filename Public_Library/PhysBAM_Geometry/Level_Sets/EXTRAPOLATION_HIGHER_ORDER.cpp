@@ -155,7 +155,7 @@ Extrapolate_Node(const GRID<TV>& grid,const T_LEVELSET& phi,int ghost,ARRAYS_ND_
     for(int o=1;o<order;o++) Fill_un(m,grid.one_over_dX,normal,du[o-1],du[o],o,order);
     for(int i=0;i<order;i++) du[i](1)=FLT_MAX/100; // Sentinal values for ENO.
     tmp(1)=FLT_MAX/100;
-    for(int o=order;o>0;o--) for(int i=1;i<=iterations;i++) Extrapolate_RK2(m,stencil,du[o-1],(o!=order?&du[o]:0),tmp,o,dt);
+    for(int o=order;o>0;o--) for(int i=0;i<iterations;i++) Extrapolate_RK2(m,stencil,du[o-1],(o!=order?&du[o]:0),tmp,o,dt);
     for(int i=2;i<=m.max_solve_index(1);i++) u(m.index_to_node(i))=du[0](i);
 }
 //#####################################################################

@@ -130,16 +130,16 @@ public:
     {return m;}
 
     const T& operator[](const int i) const
-    {assert(1<=i && i<=d);return array[i-1];}
+    {assert((unsigned)i<d);return array[i];}
 
     T& operator[](const int i)
-    {assert(1<=i && i<=d);return array[i-1];}
+    {assert((unsigned)i<d);return array[i];}
 
     const T& operator()(const int i) const
-    {assert(1<=i && i<=d);return array[i-1];}
+    {assert((unsigned)i<d);return array[i];}
 
     T& operator()(const int i)
-    {assert(1<=i && i<=d);return array[i-1];}
+    {assert((unsigned)i<d);return array[i];}
 
     bool operator==(const VECTOR& v) const
     {for(int i=0;i<d;i++) if(array[i]!=v.array[i]) return false;return true;}

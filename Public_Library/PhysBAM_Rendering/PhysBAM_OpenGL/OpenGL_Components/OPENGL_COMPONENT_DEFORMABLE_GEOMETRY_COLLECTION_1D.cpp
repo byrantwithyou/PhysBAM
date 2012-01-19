@@ -74,7 +74,7 @@ Reinitialize(bool force,bool read_geometry)
     if(read_static_variables){
         int m=deformable_geometry_collection->structures.m;active_list.Resize(m,true,true,true);
         point_simplices_1d_objects.Delete_Pointers_And_Clean_Memory();point_simplices_1d_objects.Resize(m);
-        for(int i=1;i<=m;i++){
+        for(int i=0;i<m;i++){
             STRUCTURE<TV>* structure=deformable_geometry_collection->structures(i);
             if(POINT_SIMPLICES_1D<T>* point_simplices_1d=dynamic_cast<POINT_SIMPLICES_1D<T>*>(structure)){
                 if(first_time) LOG::cout<<"object "<<i<<": point simplices 1d\n";

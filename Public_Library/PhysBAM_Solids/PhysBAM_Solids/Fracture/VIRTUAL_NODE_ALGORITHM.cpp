@@ -116,7 +116,7 @@ Construct_Virtual_Nodes(EMBEDDED_OBJECT<TV,d>& embedded_object,ARRAY<int>& map_t
         int components=Mark_Disconnected_Components_In_One_Ring(embedded_object,node,marked);
         // make a virtual_node for each component disconnected from the center node
         ARRAY<int> virtual_node_index(components);
-        for(int component_index=1;component_index<=components;component_index++) virtual_node_index(component_index)=virtual_nodes.Add_Virtual_Node(node);
+        for(int component_index=0;component_index<components;component_index++) virtual_node_index(component_index)=virtual_nodes.Add_Virtual_Node(node);
         for(int i=1;i<=(*mesh.neighbor_nodes)(node).m;i++){
             int neighbor_node=(*mesh.neighbor_nodes)(node)(i);
             if(marked(neighbor_node)>0) virtual_nodes(virtual_node_index(marked(neighbor_node))).recipients.Append(neighbor_node);}}

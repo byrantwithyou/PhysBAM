@@ -69,7 +69,7 @@ template<class T,class GENERATOR> template<int d> VECTOR<T,d> RANDOM_NUMBERS<T,G
 Get_Uniform_Vector(const VECTOR<T,d>& v0,const VECTOR<T,d>& v1)
 {
     VECTOR<T,d> r;
-    for(int i=1;i<=d;i++) r(i)=Get_Uniform_Number(v0(i),v1(i));
+    for(int i=0;i<d;i++) r(i)=Get_Uniform_Number(v0(i),v1(i));
     return r;
 }
 //#####################################################################
@@ -120,7 +120,7 @@ Fill_Uniform(DIAGONAL_MATRIX<T,d>& m,const T a,const T b)
 template<class T,class GENERATOR> template<int d> void RANDOM_NUMBERS<T,GENERATOR>::
 Fill_Uniform(SYMMETRIC_MATRIX<T,d>& m,const T a,const T b)
 {
-    for(int i=1;i<=m.Rows();i++) for(int j=1;j<=i;j++) m(i,j)=Get_Uniform_Number(a,b);
+    for(int i=1;i<=m.Rows();i++) for(int j=0;j<i;j++) m(i,j)=Get_Uniform_Number(a,b);
 }
 //#####################################################################
 // Function Fill_Uniform_Matrix
@@ -128,7 +128,7 @@ Fill_Uniform(SYMMETRIC_MATRIX<T,d>& m,const T a,const T b)
 template<class T,class GENERATOR> template<int d> void RANDOM_NUMBERS<T,GENERATOR>::
 Fill_Uniform(UPPER_TRIANGULAR_MATRIX<T,d>& m,const T a,const T b)
 {
-    for(int j=1;j<=d;j++) for(int i=1;i<=j;i++) m(i,j)=Get_Uniform_Number(a,b);
+    for(int j=0;j<d;j++) for(int i=0;i<j;i++) m(i,j)=Get_Uniform_Number(a,b);
 }
 //#####################################################################
 // Function Fill_Uniform

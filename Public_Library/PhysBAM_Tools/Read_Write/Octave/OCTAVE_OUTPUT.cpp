@@ -65,7 +65,7 @@ Write(const char* name,const KRYLOV_SYSTEM_BASE<T>& m,KRYLOV_VECTOR_BASE<T>& l,K
     Begin_Sparse_Matrix(name,l.Raw_Size(),b);
     l*=0;
     r*=0;
-    for(int i=1;i<=b;i++){
+    for(int i=0;i<b;i++){
         r.Raw_Get(i)=1;
         m.Multiply(r,l);
         r.Raw_Get(i)=0;
@@ -92,7 +92,7 @@ Write_Projection(const char* name,const KRYLOV_SYSTEM_BASE<T>& m,KRYLOV_VECTOR_B
     int b=r.Raw_Size();
     Begin_Sparse_Matrix(name,r.Raw_Size(),b);
     r*=0;
-    for(int i=1;i<=b;i++){
+    for(int i=0;i<b;i++){
         r*=0;
         r.Raw_Get(i)=1;
         m.Project(r);
@@ -109,7 +109,7 @@ Write_Preconditioner(const char* name,const KRYLOV_SYSTEM_BASE<T>& m,KRYLOV_VECT
     int b=r.Raw_Size();
     Begin_Sparse_Matrix(name,r.Raw_Size(),b);
     r*=0;
-    for(int i=1;i<=b;i++){
+    for(int i=0;i<b;i++){
         r*=0;
         r.Raw_Get(i)=1;
         Append_Sparse_Column(m.Precondition(r,s));}
@@ -232,7 +232,7 @@ Append_Sparse_Column(const KRYLOV_VECTOR_BASE<T>& v)
 {
     int n=v.Raw_Size();
     current_column++;
-    for(int j=1;j<=n;j++)
+    for(int j=0;j<n;j++)
         if(T x=v.Raw_Get(j)){
             out<<j<<" "<<current_column<<" "<<x<<std::endl;
             nnz++;}
@@ -287,7 +287,7 @@ Append_Sparse_Diagonal_Block(const MATRIX_BASE<T2,T_MATRIX>& m)
 template<class T> template<int d> void OCTAVE_OUTPUT<T>::
 Append_Sparse_Diagonal_Block(const DIAGONAL_MATRIX<T,d>& m)
 {
-    for(int i=1;i<=d;i++){
+    for(int i=0;i<d;i++){
         current_column++;
         if(T x=m(i,i)){
             out<<current_column<<" "<<current_column<<" "<<x<<std::endl;
@@ -299,8 +299,8 @@ Append_Sparse_Diagonal_Block(const DIAGONAL_MATRIX<T,d>& m)
 template<class T> template<int d> void OCTAVE_OUTPUT<T>::
 Append_Sparse_Diagonal_Block(const SYMMETRIC_MATRIX<T,d>& m)
 {
-    for(int i=1;i<=d;i++)
-        for(int j=1;j<=d;j++)
+    for(int i=0;i<d;i++)
+        for(int j=0;j<d;j++)
             if(T x=m(i,j)){
                 out<<(i+current_column)<<" "<<(j+current_column)<<" "<<x<<std::endl;
                 nnz++;}
@@ -333,7 +333,7 @@ template<class T> template<class T2,int d> void OCTAVE_OUTPUT<T>::
 Write(const char* name,const ARRAY<VECTOR<T2,d>,VECTOR<int,2> >& m)
 {
     out<<"# name: "<<name<<"\n# type: matrix\n# ndims: 3\n"<<m.counts.x<<" "<<m.counts.y<<" "<<d<<"\n";
-    for(int i=1;i<=d;i++)
+    for(int i=0;i<d;i++)
         for(UNIFORM_ARRAY_ITERATOR<2> it(m.domain);it.Valid();it.Next())
             out<<m(it.Index())(i)<<std::endl;
 }

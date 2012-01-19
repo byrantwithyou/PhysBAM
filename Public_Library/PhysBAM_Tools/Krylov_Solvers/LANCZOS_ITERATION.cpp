@@ -76,7 +76,7 @@ Test_Symmetry(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& w,KRYLO
     system.Multiply(*V.x,*V.y);
     system.Project(*V.y);
 
-    for(int i=1;i<=iterations;i++){
+    for(int i=0;i<iterations;i++){
         double Ax_dot_Ax=system.Inner_Product(*V.y,*V.y);
         if(!Ax_dot_Ax){
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT

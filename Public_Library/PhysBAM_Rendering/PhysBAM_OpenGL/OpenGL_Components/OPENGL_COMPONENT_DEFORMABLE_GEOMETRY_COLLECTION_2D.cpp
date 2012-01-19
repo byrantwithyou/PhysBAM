@@ -64,7 +64,7 @@ Reinitialize(bool force)
         free_particles_objects.Delete_Pointers_And_Clean_Memory();free_particles_objects.Resize(m);
         free_particles_indirect_arrays.Delete_Pointers_And_Clean_Memory();free_particles_indirect_arrays.Resize(m);
         int color_map_index=15;
-        for(int i=1;i<=m;i++){
+        for(int i=0;i<m;i++){
             STRUCTURE<TV>* structure=deformable_geometry_collection->structures(i);
             if(SEGMENTED_CURVE_2D<T>* segmented_curve=dynamic_cast<SEGMENTED_CURVE_2D<T>*>(structure)){
                 if(first_time) LOG::cout<<"object "<<i<<": segmented curve\n";

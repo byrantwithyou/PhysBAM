@@ -27,7 +27,7 @@ Test_System(KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& y,KRYLOV_VECTOR_BASE
     double a,b,r;
     bool pass=true;
     int n=x.Raw_Size();
-    for(int i=1;i<=n;i++){
+    for(int i=0;i<n;i++){
         x.Raw_Get(i)=random.Get_Uniform_Number(-1,1);
         y.Raw_Get(i)=random.Get_Uniform_Number(-1,1);}
 
