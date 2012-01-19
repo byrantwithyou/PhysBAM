@@ -202,7 +202,7 @@ Transform_Buffer()
         VECTOR<T,4> obj=buffer(i).Append(1);
         VECTOR<T,4> eye=model*obj;
         VECTOR<T,4> clip=proj*eye;
-        TV device=clip.Remove_Index(4)/clip(4);
+        TV device=clip.Remove_Index(3)/clip(3);
         TV window((device.x+1)*(view[2]/2)+view[0],(device.y+1)*(view[3]/2)+view[1],device.z);
         buffer(i)=window;}
 #endif
