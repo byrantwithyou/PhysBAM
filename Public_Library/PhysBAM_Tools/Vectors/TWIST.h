@@ -76,7 +76,7 @@ public:
     {return VECTOR<T,dimension>(linear,angular);}
 
     void Set_Vector(const VECTOR<T,dimension>& vector)
-    {vector.Get_Subvector(1,linear);vector.Get_Subvector(TV::m+1,angular);}
+    {vector.Get_Subvector(0,linear);vector.Get_Subvector(TV::m,angular);}
 
     static T Dot_Product(const TWIST& v1,const TWIST& v2)
     {return TV::Dot_Product(v1.linear,v2.linear)+T_SPIN::Dot_Product(v1.angular,v2.angular);};

@@ -395,7 +395,7 @@ Poststabilization_Projection(ARRAY_VIEW<TWIST<TV> > twist,const bool symmetric)
 
     int iterations=poststabilization_projection_iterations;if(symmetric) iterations=(iterations+1)/2;
     for(int i=0;i<iterations;i++) for(JOINT_ID j(0);j<joint_mesh.Size();j++) if(joint_mesh.Is_Active(j)) Poststabilization_Projection_Joint(j,twist);
-    if(symmetric) for(int i=0;i<iterations;i++) for(JOINT_ID j=joint_mesh.Size();j>=JOINT_ID(1);j--) if(joint_mesh.Is_Active(j)) Poststabilization_Projection_Joint(j,twist);
+    if(symmetric) for(int i=0;i<iterations;i++) for(JOINT_ID j=joint_mesh.Size()-1;j>=JOINT_ID(0);j--) if(joint_mesh.Is_Active(j)) Poststabilization_Projection_Joint(j,twist);
 }
 //####################################################################################
 // Function Poststabilization_Projection_Joint
