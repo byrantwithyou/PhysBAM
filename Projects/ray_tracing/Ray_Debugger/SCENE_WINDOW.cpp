@@ -81,7 +81,7 @@ template<class T> void SCENE_WINDOW<T>::Draw_Subsurface_Scattering_Samples(SUBSU
     glPointSize(3.0f);
     
     glBegin(GL_POINTS);
-    for(int i=1;i<=bssrdf_tree->samples.m;++i){
+    for(int i=0;i<bssrdf_tree->samples.m;i++){
         VECTOR<T,3> curval=bssrdf_tree->samples(i).transmitted_irradiance;
         glColor3f(curval.x, curval.y, curval.z);
         OpenGL_Vertex(bssrdf_tree->samples(i).position);
@@ -90,7 +90,7 @@ template<class T> void SCENE_WINDOW<T>::Draw_Subsurface_Scattering_Samples(SUBSU
     
     glPointSize(1.0f);
     glBegin(GL_LINES);
-    for(int i=1;i<=bssrdf_tree->samples.m;++i){
+    for(int i=0;i<bssrdf_tree->samples.m;i++){
         glColor3f(0.0,0.0,1.0);
         OpenGL_Vertex(bssrdf_tree->samples(i).position);
         OpenGL_Vertex(bssrdf_tree->samples(i).position + (T)0.25 * bssrdf_tree->samples(i).normal / 5);

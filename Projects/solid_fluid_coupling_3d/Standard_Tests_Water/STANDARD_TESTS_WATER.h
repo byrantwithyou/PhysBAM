@@ -975,7 +975,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(triangulated_surface,solid_density,true);
 
             BOX<TV> binding_box=BOX<TV>(TV((T)-2,(T)0,(T)-1),TV(pole_x_location+(T).01,(T)2,(T)1));
-            for(int i=1;i<=triangulated_surface.particles.array_collection->Size();++i){TV& position=triangulated_surface.particles.X(i);
+            for(int i=0;i<triangulated_surface.particles.array_collection->Size();i++){TV& position=triangulated_surface.particles.X(i);
                 if(binding_box.Lazy_Inside(position)){
                     constrained_node_positions.Append(PAIR<int,TV>(i,position));}}
             break;}

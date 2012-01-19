@@ -126,7 +126,7 @@ Initialize_Boundary_Mesh()
     bool incident_elements_defined=incident_elements!=0;
 
     if(!incident_elements_defined) Initialize_Incident_Elements();
-    for(int i=1;i<=incident_elements->m;++i){
+    for(int i=0;i<incident_elements->m;i++){
         ARRAY<int>& current_incident_elements=(*incident_elements)(i);
         if(current_incident_elements.m==1){
             boundary_elements.Append(VECTOR<int,dimension>(i));

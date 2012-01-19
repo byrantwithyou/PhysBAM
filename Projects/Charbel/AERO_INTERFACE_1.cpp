@@ -200,7 +200,7 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,COMPRESSIBLE_FLU
         mpi_charbel->Exchange_Compressible_Data(*particles_aerof);
         particles=&mpi_charbel->physbam_particles;
 
-        for(int i=1;i<=particles->number;++i){
+        for(int i=0;i<particles->number;i++){
             particles->phi(i)=inaccurate_union->levelset(particles->X(i));
             particles->grad_phi(i)=interpolation.Clamped_To_Array(mpi_grid->local_grid,gradient,particles->X(i));}
 
@@ -359,7 +359,7 @@ Compute_Ghost_Cells(TETRAHEDRALIZED_VOLUME<T>& tet_volume_aerof,COMPRESSIBLE_FLU
     T_LINEAR_INTERPOLATION_DIMENSION interpolation_dimension;
     T max_distance,object_velocity_normal_component;TV location,normal_direction,reflected_point;
     BOX<TV> domain=grid.Domain();
-    for(int i=1;i<=particles->number;++i){
+    for(int i=0;i<particles->number;i++){
         TV& location=particles->X(i);
         if(domain.Inside(location,(T)0) && Inside_Solid(location) && abs(inaccurate_union->levelset(location)) <= solid_extrapolation_bandwidth){
             T_ARRAYS_ELEMENT values=interpolation_dimension.Clamped_To_Array(grid,euler.U,location);

@@ -346,7 +346,7 @@ Initialize_Collision_Data()
         TV_INT cell_index=iterator.Cell_Index();
         if(!psi_np1(cell_index) || (cut_cells_np1(cell_index) && !cut_cells_np1(cell_index)->dominant_element)) cell_volumes_np1(cell_index)=0;
         if(cut_cells_np1(cell_index))
-            for(int poly=1;poly<=cut_cells_np1(cell_index)->geometry.Size();++poly){
+            for(int poly=0;poly<cut_cells_np1(cell_index)->geometry.Size();poly++){
                 POLYGON<TV>& polygon=cut_cells_np1(cell_index)->geometry(poly);
                 T volume=polygon.Area();
                 if(poly==cut_cells_np1(cell_index)->dominant_element){
@@ -355,7 +355,7 @@ Initialize_Collision_Data()
                     LOG::cout<<"No visible neighbors for cut cell ";for(int i=0;i<polygon.X.Size();i++) LOG::cout<<polygon.X(i)<<", ";LOG::cout<<"discarding "<<volume<<" volume"<<std::endl;
                     continue;}
                 volume /= cut_cells_np1(cell_index)->visibility(poly).Size();
-                for(int n=1;n<=cut_cells_np1(cell_index)->visibility(poly).Size();++n)
+                for(int n=0;n<cut_cells_np1(cell_index)->visibility(poly).Size();n++)
                     cell_volumes_np1(cut_cells_np1(cell_index)->visibility(poly)(n)) += volume;}}
 
     uncovered_cells.Fill(false);
@@ -387,7 +387,7 @@ Update_Np1_Collision_Data(const T dt)
         TV_INT cell_index=iterator.Cell_Index();
         if(!psi_np1(cell_index) || (cut_cells_np1(cell_index) && !cut_cells_np1(cell_index)->dominant_element)) cell_volumes_np1(cell_index)=0;
         if(cut_cells_np1(cell_index))
-            for(int poly=1;poly<=cut_cells_np1(cell_index)->geometry.Size();++poly){
+            for(int poly=0;poly<cut_cells_np1(cell_index)->geometry.Size();poly++){
                 POLYGON<TV>& polygon=cut_cells_np1(cell_index)->geometry(poly);
                 T volume=polygon.Area();
                 if(poly==cut_cells_np1(cell_index)->dominant_element){cell_volumes_np1(cell_index)=volume;continue;}
@@ -395,7 +395,7 @@ Update_Np1_Collision_Data(const T dt)
                     LOG::cout<<"No visible neighbors for cut cell ";for(int i=0;i<polygon.X.Size();i++) LOG::cout<<polygon.X(i)<<", ";LOG::cout<<"discarding "<<volume<<" volume"<<std::endl;
                     continue;}
                 volume /= cut_cells_np1(cell_index)->visibility(poly).Size();
-                for(int n=1;n<=cut_cells_np1(cell_index)->visibility(poly).Size();++n) cell_volumes_np1(cut_cells_np1(cell_index)->visibility(poly)(n)) += volume;}}
+                for(int n=0;n<cut_cells_np1(cell_index)->visibility(poly).Size();n++) cell_volumes_np1(cut_cells_np1(cell_index)->visibility(poly)(n)) += volume;}}
 
     uncovered_cells.Fill(false);
     collision_bodies_affecting_fluid->Restore_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_OLD_STATE);
@@ -432,7 +432,7 @@ Compute_Intermediate_Solid_Position_Data(const T dt)
         TV_INT cell_index=iterator.Cell_Index();
         if(!psi_n_p_half(cell_index) || (cut_cells_n_p_half(cell_index) && !cut_cells_n_p_half(cell_index)->dominant_element)) cell_volumes_n_p_half(cell_index)=0;
         if(cut_cells_n_p_half(cell_index))
-            for(int poly=1;poly<=cut_cells_n_p_half(cell_index)->geometry.Size();++poly){
+            for(int poly=0;poly<cut_cells_n_p_half(cell_index)->geometry.Size();poly++){
                 POLYGON<TV>& polygon=cut_cells_n_p_half(cell_index)->geometry(poly);
                 T volume=polygon.Area();
                 if(poly==cut_cells_n_p_half(cell_index)->dominant_element){cell_volumes_n_p_half(cell_index)=volume;continue;}
@@ -440,7 +440,7 @@ Compute_Intermediate_Solid_Position_Data(const T dt)
                     LOG::cout<<"No visible neighbors for cut cell ";for(int i=0;i<polygon.X.Size();i++) LOG::cout<<polygon.X(i)<<", ";LOG::cout<<"discarding "<<volume<<" volume"<<std::endl;
                     continue;}
                 volume /= cut_cells_n_p_half(cell_index)->visibility(poly).Size();
-                for(int n=1;n<=cut_cells_n_p_half(cell_index)->visibility(poly).Size();++n) cell_volumes_n_p_half(cut_cells_n_p_half(cell_index)->visibility(poly)(n)) += volume;}}
+                for(int n=0;n<cut_cells_n_p_half(cell_index)->visibility(poly).Size();n++) cell_volumes_n_p_half(cut_cells_n_p_half(cell_index)->visibility(poly)(n)) += volume;}}
 
     uncovered_cells_n_p_half.Fill(false);
     collision_bodies_affecting_fluid->Restore_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_OLD_STATE);
@@ -535,12 +535,12 @@ template<class TV> void Advect_Near_Interface_Data(const GRID<TV>& grid,const ty
                 LOG::cout<<"Swept cell "<<cell_index<<" encountered"<<std::endl;
                 if(near_interface(cell_index)){ // Backward cast to populate a newly uncovered cell
                     CUT_CELLS<T,TV::dimension>* cut_cells=cut_cells_np1(cell_index);
-                    if(cut_cells) for(int poly=1;poly<=cut_cells->geometry.Size();++poly){
+                    if(cut_cells) for(int poly=0;poly<cut_cells->geometry.Size();poly++){
                         if(cut_cells->visibility(poly).Contains(cell_index)){
                             if(cut_cells->visibility(poly).Size()<=1) LOG::cout<<"Lost material in uncovered cell "<<cell_index<<" which has no visible neighbors at t_np1"<<std::endl;
                             else{
                                 T volume_fraction=cut_cells->geometry(poly).Area()/((T)(cut_cells->visibility(poly).Size()-1));
-                                for(int visible_neighbor=1;visible_neighbor<=cut_cells->visibility(poly).Size();++visible_neighbor){
+                                for(int visible_neighbor=0;visible_neighbor<cut_cells->visibility(poly).Size();visible_neighbor++){
                                     TV_INT neighbor=cut_cells->visibility(poly)(visible_neighbor);
                                     if(neighbor==cell_index) continue;
                                     else{
@@ -549,12 +549,12 @@ template<class TV> void Advect_Near_Interface_Data(const GRID<TV>& grid,const ty
                     else LOG::cout<<"Cell "<<cell_index<<" is swept but is not a cut cell at t_np1!"<<std::endl;}
 
                 CUT_CELLS<T,TV::dimension>* cut_cells=cut_cells_n(cell_index); // Push out any data from a newly covered cell
-                if(cut_cells) for(int poly=1;poly<=cut_cells->geometry.Size();++poly){
+                if(cut_cells) for(int poly=0;poly<cut_cells->geometry.Size();poly++){
                         if(cut_cells->visibility(poly).Contains(cell_index)){
                             if(cut_cells->visibility(poly).Size()==1) LOG::cout<<"Lost material in uncovered cell "<<cell_index<<" which has no visible neighbors at t_n"<<std::endl;
                             else{
                                 T volume_fraction=cut_cells->geometry(poly).Area()/((T)(cut_cells->visibility(poly).Size()-1));
-                                for(int visible_neighbor=1;visible_neighbor<=cut_cells->visibility(poly).Size();++visible_neighbor){
+                                for(int visible_neighbor=0;visible_neighbor<cut_cells->visibility(poly).Size();visible_neighbor++){
                                     TV_INT neighbor=cut_cells->visibility(poly)(visible_neighbor);
                                     if(neighbor==cell_index) continue;
                                     else{
@@ -589,10 +589,10 @@ template<class TV> void Advect_Near_Interface_Data(const GRID<TV>& grid,const ty
                             if(swept_cells(donor_cell)) continue;// already handled in *forward* step above
                             T weight=U_n(donor_cell)(variable_index) * INTERSECTION::Intersection_Area(cell_preimage,cut_cells->geometry(cut_cells->dominant_element));
                             Add_Weight_To_Advection(weight, donor_cell, receiver_cell, weights, donors, receivers, sigma);}
-                        else for(int poly=1;poly<=cut_cells->geometry.Size();++poly){
+                        else for(int poly=0;poly<cut_cells->geometry.Size();poly++){
                             if(cut_cells->visibility(poly).Contains(receiver_cell) && INTERSECTION::Intersection_Area(cell_preimage,cut_cells->geometry(poly)) >= (T)1e-6*cut_cells->geometry(poly).Area()){
                                 T volume=cut_cells->geometry(poly).Area() / (T)cut_cells->visibility(poly).Size();
-                                for(int visible_neighbor=1;visible_neighbor<=cut_cells->visibility(poly).Size();++visible_neighbor){
+                                for(int visible_neighbor=0;visible_neighbor<cut_cells->visibility(poly).Size();visible_neighbor++){
                                     TV_INT neighbor=cut_cells->visibility(poly)(visible_neighbor);
                                     Add_Weight_To_Advection(U_n(neighbor)(variable_index) * volume, neighbor, receiver_cell, weights, donors, receivers, sigma);}}}}}}}
         }
@@ -636,10 +636,10 @@ template<class TV> void Advect_Near_Interface_Data(const GRID<TV>& grid,const ty
                             if(cut_cells->dominant_element && cut_cells->visibility(cut_cells->dominant_element).Contains(donor_cell)){
                                T weight=INTERSECTION::Intersection_Area(cell_postimage,cut_cells->geometry(cut_cells->dominant_element));
                                distributed_volume+=weight; forward_weights.Append(PAIR<TV_INT,T>(receiver_cell,weight));}
-                            else for(int poly=1;poly<=cut_cells->geometry.Size();++poly){
+                            else for(int poly=0;poly<cut_cells->geometry.Size();poly++){
                                 if(cut_cells->visibility(poly).Contains(donor_cell)){
                                     T volume=INTERSECTION::Intersection_Area(cell_postimage,cut_cells->geometry(poly)) / (T)cut_cells->visibility(poly).Size();
-                                    for(int visible_neighbor=1;visible_neighbor<=cut_cells->visibility(poly).Size();++visible_neighbor){
+                                    for(int visible_neighbor=0;visible_neighbor<cut_cells->visibility(poly).Size();visible_neighbor++){
                                         TV_INT neighbor=cut_cells->visibility(poly)(visible_neighbor);
                                         distributed_volume+=volume; forward_weights.Append(PAIR<TV_INT,T>(neighbor,volume));}}}}}
 

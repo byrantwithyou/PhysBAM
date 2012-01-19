@@ -441,8 +441,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             build_tet=true;FILE_UTILITIES::Read_From_File(stream_type,data_directory+STRING_UTILITIES::string_sprintf("/joint_levelset_%d.tri",test_number),*surface_original);}
         else{if(use_embedding) build_tri=true;build_tet=true;}
 
-        if(surface_original) for(int i=1;i<=surface_original->particles.array_collection->Size();++i) surface_original->particles.X(i)+=TV(0,(T)15,0);
-        for(int i=1;i<=volume_original->particles.array_collection->Size();++i) volume_original->particles.X(i)+=TV(0,(T)15,0);                
+        if(surface_original) for(int i=0;i<surface_original->particles.array_collection->Size();i++) surface_original->particles.X(i)+=TV(0,(T)15,0);
+        for(int i=0;i<volume_original->particles.array_collection->Size();i++) volume_original->particles.X(i)+=TV(0,(T)15,0);                
         PHYSBAM_ASSERT(!build_tri); // Make baby jesus cry
 
         if(build_tri || build_tet){
@@ -474,7 +474,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 volume_original->Discard_Tetrahedrons_Outside_Implicit_Surface(*implicit);
                 volume_original->Discard_Valence_Zero_Particles_And_Renumber();
                 volume_original->Update_Number_Nodes();
-                if(read_in_phi_from_file) for(int i=1;i<=volume_original->particles.array_collection->Size();++i) volume_original->particles.X(i)+=TV(0,(T)15,0);                
+                if(read_in_phi_from_file) for(int i=0;i<volume_original->particles.array_collection->Size();i++) volume_original->particles.X(i)+=TV(0,(T)15,0);                
                 FILE_UTILITIES::Write_To_File<float>(data_directory+STRING_UTILITIES::string_sprintf("/joint_levelset_%d.tet",test_number),*volume_original);}
             if(build_tri){
                 surface_original=DUALCONTOUR_3D<T>::Create_Triangulated_Surface_From_Levelset(implicit->levelset);  

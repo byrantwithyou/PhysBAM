@@ -144,7 +144,7 @@ public:
         T denominator=((st2.y-st1.y)*(st3.x-st1.x)-(st3.y-st1.y)*(st2.x-st1.x));
         TV dpds=((st2.y-st1.y)*(p3-p1)-(st3.y-st1.y)*(p2-p1))/denominator;
         (*tangent_vectors)(index1)+=dpds;(*tangent_vectors)(index2)+=dpds;(*tangent_vectors)(index3)+=dpds;}
-    for(int i=1;i<=tangent_vectors->m;++i){
+    for(int i=0;i<tangent_vectors->m;i++){
         TV cur_normal=(*triangulated_surface.vertex_normals)(i);
         // Gram-Schmidt orthogonalize and normalize each tangent vector
         (*tangent_vectors)(i)=((*tangent_vectors)(i)-cur_normal*TV::Dot_Product(cur_normal,(*tangent_vectors)(i))).Normalized();}}

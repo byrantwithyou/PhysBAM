@@ -208,7 +208,7 @@ public:
     {if(!surface.triangle_list) surface.Update_Triangle_List();
     ARRAY<TV> point_weights(points.m);ARRAY<int> triangle_correspondences(points.m);
     ARRAY<T> triangle_areas(surface.triangle_list->m);
-    for(int i=1;i<=surface.triangle_list->m;++i){
+    for(int i=0;i<surface.triangle_list->m;i++){
         triangle_areas(i)=(*surface.triangle_list)(i).Area();}
     for(int i=0;i<points.m;i++){
         triangle_correspondences(i)=points(i).triangle;

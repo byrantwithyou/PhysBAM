@@ -278,7 +278,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         bottom_collisions.object.Initialize_Hierarchy();Add_To_Fluid_Simulation(bottom_collisions);
 
         PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
-        for(int i=1;i<=particles.array_collection->Size();++i)
+        for(int i=0;i<particles.array_collection->Size();i++)
             if(particles.X(i).x==(T)0 || particles.X(i).x==(T)1 || particles.X(i).y==(T)0 || (abs(particles.X(i).y-(T).75) < 1e-10)) bound_particles.Append(i);
 
         original_position=solid_body_collection.deformable_body_collection.particles.X(50);

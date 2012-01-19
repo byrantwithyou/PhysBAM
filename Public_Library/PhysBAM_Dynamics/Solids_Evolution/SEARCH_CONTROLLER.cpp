@@ -622,7 +622,7 @@ Add_Fluid_Drag(const T dt,const T time,ARRAY<TV> &F,ARRAY<TWIST<TV> > &rigid_F)
             PHYSBAM_DEBUG_WRITE_SUBSTEP("Rescaling pressures to be viewable for Add_Fluid_Drag (search_controller)",0,0);
             VECTOR_ND<T> x_array;
             GENERALIZED_VELOCITY<TV> V_with_kinematic_rigid(F_neg,kinematic_rigid_bodies,solid_body_collection);
-            for(int i=1;i<=solid_fluid_coupled_evolution->J_rigid_kinematic.m;++i){
+            for(int i=0;i<solid_fluid_coupled_evolution->J_rigid_kinematic.m;i++){
                 x_array.Resize(solid_fluid_coupled_evolution->matrix_index_to_cell_index_array(i).Size());
                 for(int j=0;j<solid_fluid_coupled_evolution->matrix_index_to_cell_index_array(i).Size();j++) x_array(j)=p(solid_fluid_coupled_evolution->matrix_index_to_cell_index_array(i)(j));
 

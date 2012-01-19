@@ -23,7 +23,7 @@ Inside(const VECTOR<T,3>& location,const T thickness_over_two) const
     // find the voxel that contains the location - left borders
     int i,j,ij;Find_Voxel(location,i,j,ij);
     // check all the spheres in that voxel
-    if(voxel_sphere_list(i,j,ij)) for(int k=1;k<=voxel_sphere_list(i,j,ij)->m;k++) if(spheres((*voxel_sphere_list(i,j,ij))(k)).Inside(location,thickness_over_two)) return true;
+    if(voxel_sphere_list(i,j,ij)) for(int k=0;k<voxel_sphere_list(i,j,ij)->m;k++) if(spheres((*voxel_sphere_list(i,j,ij))(k)).Inside(location,thickness_over_two)) return true;
 
     return false; // otherwise
 }
@@ -38,7 +38,7 @@ Outside(const VECTOR<T,3>& location,const T thickness_over_two) const
     // find the voxel that contains the location - left borders
     int i,j,ij;Find_Voxel(location,i,j,ij);
     // check all the spheres in that voxel
-    if(voxel_sphere_list(i,j,ij)) for(int k=1;k<=voxel_sphere_list(i,j,ij)->m;k++) if(!spheres((*voxel_sphere_list(i,j,ij))(k)).Outside(location,thickness_over_two)) return false;
+    if(voxel_sphere_list(i,j,ij)) for(int k=0;k<voxel_sphere_list(i,j,ij)->m;k++) if(!spheres((*voxel_sphere_list(i,j,ij))(k)).Outside(location,thickness_over_two)) return false;
 
     return true; // otherwise
 }

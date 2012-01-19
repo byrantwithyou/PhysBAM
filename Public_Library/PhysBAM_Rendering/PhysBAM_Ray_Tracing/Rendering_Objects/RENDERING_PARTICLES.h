@@ -45,7 +45,7 @@ public:
     for(int i=particles_array.domain.min_corner.x;i<=particles_array.domain.max_corner.x;i++) for(int j=particles_array.domain.min_corner.y;j<=particles_array.domain.max_corner.y;j++) for(int ij=particles_array.domain.min_corner.z;ij<=particles_array.domain.max_corner.z;ij++) {POINT_CLOUD<TV>* particles=particles_array(i,j,ij);
         if(particles){
             ARRAY_VIEW<T> radius=*particles->array_collection->template Get_Array<T>(ATTRIBUTE_ID(15)); // radius is attribute 15
-            for(int p=1;p<=particles->array_collection->Size();++p) if(INTERSECTION::Intersects(object_space_ray,SPHERE<TV>(particles->X(p),scale*radius(p)),small_number)) {
+            for(int p=0;p<particles->array_collection->Size();p++) if(INTERSECTION::Intersects(object_space_ray,SPHERE<TV>(particles->X(p),scale*radius(p)),small_number)) {
                 object_space_ray.aggregate_id=particle_to_aggregate_id(i,j,ij)(p);intersection=true;}}}
     if(intersection){ray.t_max=object_space_ray.t_max;ray.semi_infinite=object_space_ray.semi_infinite;ray.aggregate_id=object_space_ray.aggregate_id;}
     return intersection;}
@@ -63,7 +63,7 @@ public:
         POINT_CLOUD<TV>* particles=particles_array(i,j,ij);
         if(particles){
             ARRAY_VIEW<T> radius=*particles->array_collection->template Get_Array<T>(ATTRIBUTE_ID(15)); // radius is attribute 15
-            for(int p=1;p<=particles->array_collection->Size();++p) if(SPHERE<TV>(particles->X(p),scale*radius(p)).Inside(Object_Space_Point(location),small_number)) return true;}}
+            for(int p=0;p<particles->array_collection->Size();p++) if(SPHERE<TV>(particles->X(p),scale*radius(p)).Inside(Object_Space_Point(location),small_number)) return true;}}
         return false;} 
 
     TV Normal(const TV& location,const int aggregate=1) const  PHYSBAM_OVERRIDE
@@ -76,7 +76,7 @@ public:
         POINT_CLOUD<TV>* particles=particles_array(i,j,ij);
         if(particles){
             ARRAY_VIEW<T> radius=*particles->array_collection->template Get_Array<T>(ATTRIBUTE_ID(15)); // radius is attribute 15
-            for(int p=1;p<=particles->array_collection->Size();++p){
+            for(int p=0;p<particles->array_collection->Size();p++){
                 T radius_scalar=scale*radius(p);
                 TV radius_vector(radius_scalar,radius_scalar,radius_scalar),world_center=transform.Homogeneous_Times(particles->X(p));
                 RANGE<TV> world_space_bounding_box(world_center-radius_vector,world_center+radius_vector);

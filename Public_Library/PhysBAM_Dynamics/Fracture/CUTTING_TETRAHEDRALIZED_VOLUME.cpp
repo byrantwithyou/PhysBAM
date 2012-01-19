@@ -277,7 +277,7 @@ Find_Triangle_Triangle_Intersections()
     intersecting_simplices_per_simplex.Clean_Memory();
     intersecting_simplices_per_simplex.Exact_Resize(cutting_simplices->simplices.m);
     VECTOR<int,2> one_two(1,2);
-    for(int tet=1;tet<=current_tetrahedralized_volume->mesh.elements.m;++tet){
+    for(int tet=0;tet<current_tetrahedralized_volume->mesh.elements.m;tet++){
         const ARRAY<int>& simplices=simplices_per_current_tet(tet);
         // TODO: this only needs to create a box hierarchy.
         TRIANGULATED_SURFACE<T>& triangulated_surface=*TRIANGULATED_SURFACE<T>::Create();

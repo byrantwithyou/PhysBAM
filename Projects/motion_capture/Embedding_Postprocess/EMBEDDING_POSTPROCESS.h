@@ -210,7 +210,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     TRIANGULATED_SURFACE<T>* surface_original=TRIANGULATED_SURFACE<T>::Create(),*surface=0;
     if(FILE_UTILITIES::File_Exists(data_directory+STRING_UTILITIES::string_sprintf("/joint_levelset_%d.tri",read_test_number))){
         FILE_UTILITIES::Read_From_File(stream_type,data_directory+STRING_UTILITIES::string_sprintf("/joint_levelset_%d.tri",read_test_number),*surface_original);
-        if(read_test_number==6) for(int i=1;i<=surface_original->particles.array_collection->Size();++i) surface_original->particles.X(i)+=TV(0,(T)7,0);
+        if(read_test_number==6) for(int i=0;i<surface_original->particles.array_collection->Size();i++) surface_original->particles.X(i)+=TV(0,(T)7,0);
         surface=(TRIANGULATED_SURFACE<T>*)surface_original->Append_Particles_And_Create_Copy(particles);}
     else PHYSBAM_FATAL_ERROR();
     surface->Update_Number_Nodes();

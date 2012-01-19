@@ -49,7 +49,7 @@ void Compute_Cut_Geometries(const GRID<VECTOR<T,1> >& grid,const int num_ghost_c
                     cut_cells(index)->dominant_element=poly_index;
                     cut_cells(index)->visibility(poly_index).Append(index);}
                 if(!cut_cells(index)->dominant_element)
-                    for(int node=1;!cut_cells(index)->dominant_element && node<=cut_cells(index)->geometry(poly_index).X.Size();++node)
+                    for(int node=0;!cut_cells(index)->dominant_element && node<cut_cells(index)->geometry(poly_index).X.Size();++node)
                         if(!Is_Occluded_Cell_Center<T,1>(cut_cells(index)->geometry(poly_index).X(node),grid.Center(index),collision_bodies_affecting_fluid.objects_in_cell,collision_bodies_affecting_fluid.collision_geometry_collection,index)){
                             cut_cells(index)->dominant_element=poly_index;
                             cut_cells(index)->visibility(poly_index).Append(index);}
@@ -66,7 +66,7 @@ void Compute_Cut_Geometries(const GRID<VECTOR<T,1> >& grid,const int num_ghost_c
                     cut_cells(index)->dominant_element=poly_index;
                     cut_cells(index)->visibility(poly_index).Append(index);}
                 if(!cut_cells(index)->dominant_element)
-                    for(int node=1;!cut_cells(index)->dominant_element && node<=cut_cells(index)->geometry(poly_index).X.Size();++node)
+                    for(int node=0;!cut_cells(index)->dominant_element && node<cut_cells(index)->geometry(poly_index).X.Size();++node)
                         if(!Is_Occluded_Cell_Center<T,1>(cut_cells(index)->geometry(poly_index).X(node),grid.Center(index),collision_bodies_affecting_fluid.objects_in_cell,collision_bodies_affecting_fluid.collision_geometry_collection,index)){
                             cut_cells(index)->dominant_element=poly_index;
                             cut_cells(index)->visibility(poly_index).Append(index);}

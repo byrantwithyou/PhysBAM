@@ -52,7 +52,7 @@ template<class TV> void GRID_COLLISION_ITERATOR<TV>::
 Initialize(const COLLISION_GEOMETRY<TV>& cg)
 {
     ARRAY<TRIANGLE_3D<T> > elements;
-    for(int i=1,n=cg.Number_Of_Simplices();i<=n;i++)
+    for(int i=0,n=cg.Number_Of_Simplices();i<n;i++)
         elements.Append(cg.World_Space_Simplex(i));
     Initialize(elements);
 }

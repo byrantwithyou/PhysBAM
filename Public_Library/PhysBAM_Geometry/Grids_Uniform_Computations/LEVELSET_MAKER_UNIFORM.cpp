@@ -25,7 +25,7 @@ static void Process_Segment(const int m,const ARRAY<bool,VECTOR<int,3> >& edge_i
     typedef VECTOR<int,3> TV_INT;
     TV_INT index=start_index,increment;increment[axis]=1;
     int segment_start=1;bool segment_starts_inside=false;
-    for(index[axis]=1;index[axis]<=m;index[axis]++){
+    for(index[axis]=0;index[axis]<m;index[axis]++){
         if(index[axis]>1 && edge_is_blocked(index)){segment_start=index[axis];segment_starts_inside=is_inside(index);}
         if(index[axis]==m || (index[axis]<m && edge_is_blocked(index+increment))){
             int segment_end=index[axis];bool segment_ends_inside=index[axis]<m?is_inside(index):false;
