@@ -115,7 +115,7 @@ Add_Rigid_Body(const std::string& name,const T scaling_factor,const T friction,c
         if(name=="ground") implicit=Add_Analytic_Ground(TV(),scaling_factor);
         if(implicit){
             if(TV::m==3){
-                STRUCTURE<TV>* structure=choice<TV::m-1>(implicit,TESSELLATION::Generate_Triangles(*implicit));
+                STRUCTURE<TV>* structure=choice<TV::m-2>(implicit,TESSELLATION::Generate_Triangles(*implicit));
                 if(!rigid_body_collection.rigid_geometry_collection.Register_Analytic_Replacement_Structure(basename+".tri",scaling_factor,structure))
                     delete structure;}
             else
