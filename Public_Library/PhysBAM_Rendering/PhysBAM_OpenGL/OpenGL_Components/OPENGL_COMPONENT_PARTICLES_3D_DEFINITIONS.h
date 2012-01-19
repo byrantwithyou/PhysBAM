@@ -134,7 +134,7 @@ Get_Selection(GLuint* buffer,int buffer_size)
     // We have the OPENGL_POINTS_3D index but need to find the particle index
     int point_index=buffer[0],particle_index=0;
     int active_count=0;
-    for(particle_index=1;particle_index<=particles->array_collection->Size();particle_index++)if(++active_count==point_index) break;
+    for(particle_index=0;particle_index<particles->array_collection->Size();particle_index++)if(++active_count==point_index) break;
     selection->index=particle_index;
     ARRAY_VIEW<int>* ids=0;if(use_ids) ids=Get_Particles_Id_Array();
     if(ids){selection->has_id=true;selection->id=(*ids)(particle_index);}

@@ -280,7 +280,7 @@ Split_Grid(const GRID<VECTOR<T,3> >& global_grid,const VECTOR<int,3>& processes_
     if(processes_per_dimension!=VECTOR<int,3>()) count=processes_per_dimension;
     else{ // try to figure out counts by minimizing surface area between processes
         int minimum_surface_area=INT_MAX;VECTOR<int,3> test_count;
-        for(test_count.z=1;test_count.z<=number_of_processes;test_count.z++) if(number_of_processes%test_count.z==0){
+        for(test_count.z=0;test_count.z<number_of_processes;test_count.z++) if(number_of_processes%test_count.z==0){
             if(Minimize_2D_Surface_Area<T>(number_of_processes/test_count.z,m,n,test_count.x)){
                 test_count.y=number_of_processes/(test_count.x*test_count.z);
                 int surface_area=test_count.x*(n*mn)+test_count.y*(m*mn)+test_count.z*(m*n);

@@ -51,7 +51,7 @@ void Run()
 
     int i,j,k;
     // check particle positions for NaN
-    for(i=1; i<=particles.number; i++) if(particles.active(i)){
+    for(i=0;i<particles.number;i++) if(particles.active(i)){
         if(!Number_Is_Finite(particles.X(i).x) || !Number_Is_Finite(particles.X(i).y) || !Number_Is_Finite(particles.X(i).z)){
             cout<<"#### particle "<<i<<" has suspicious coordinates "<<particles.X(i)<<endl;surface_problems=true;}}
 
@@ -62,13 +62,13 @@ void Run()
     // check for non-manifold edges (incident to 3 or more triangles) and orientation problems
     mesh.Initialize_Segment_Mesh();
     mesh.Initialize_Edge_Triangles();
-    for(i=1; i<=mesh.segment_mesh->segments.m; i++){
+    for(i=0;i<mesh.segment_mesh->segments.m;i++){
         int p=mesh.segment_mesh->segments(1,i),q=mesh.segment_mesh->segments(2,i);
         if((*mesh.edge_triangles)(i).m>=3){
             cout<<"#### edge "<<i<<" ("<<p<<","<<q<<") has too many incident triangles:"<<endl;
-            for(j=1; j<=(*mesh.edge_triangles)(i).m; j++){
+            for(j=0;j<(*mesh.edge_triangles)(i).m;j++){
                 cout<<"  triangle "<<(*mesh.edge_triangles)(i)(j)<<" (";
-                for(k=1; k<=3; k++) cout<<" "<<mesh.triangles(k,(*mesh.edge_triangles)(i)(j));
+                for(k=0;k<3;k++) cout<<" "<<mesh.triangles(k,(*mesh.edge_triangles)(i)(j));
                 cout<<")"<<endl;}
             surface_problems=true;}
         else if((*mesh.edge_triangles)(i).m==2){
@@ -112,7 +112,7 @@ void Run()
     mesh.Initialize_Topologically_Sorted_Neighbor_Nodes();
     assert(mesh.neighbor_nodes->m==mesh.number_nodes);
     ARRAY<ARRAY<int> > &top_nbrs=*mesh.neighbor_nodes;
-    for(i=1; i<=mesh.number_nodes; i++){
+    for(i=0;i<mesh.number_nodes;i++){
         if(nbrs(i).m!=top_nbrs(i).m){
             cout<<"Topologically sorted neighbors has "<<top_nbrs(i).m<<" entries for node "<<i<<" versus ";
             cout<<nbrs(i).m<<" for regular neighbors"<<endl;
@@ -133,7 +133,7 @@ void Run()
     if(surface.Check_For_Self_Intersection(thickness,&triangle_pairs)){
         surface_problems=true;
         cout<<"Surface self-intersects for the following pairs of triangles"<<endl;
-        for(j=1; j<=triangle_pairs.m; j++) cout<<"  "<<triangle_pairs(1,j)<<" "<<triangle_pairs(2,j)<<endl;}
+        for(j=0;j<triangle_pairs.m;j++) cout<<"  "<<triangle_pairs(1,j)<<" "<<triangle_pairs(2,j)<<endl;}
 
     if(!surface_problems) cout<<filename<<" appears to be ok"<<endl;
     else cout<<"#### "<<filename<<" has problems!"<<endl;

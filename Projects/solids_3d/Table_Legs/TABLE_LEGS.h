@@ -66,7 +66,7 @@ void Initialize_Cloth(TRIANGLE_MESH*& triangle_mesh,PARTICLE_3D*& particles,TRIA
     triangulated_surface=new TRIANGULATED_SURFACE(*triangle_mesh,*particles);
     triangle_mesh->Initialize_Square_Mesh(m,n);
     particles->Update_Position_And_Velocity();particles->Store_Mass();
-    for(k=1;k<=triangle_mesh->number_nodes;k++) particles->array_collection->Add_Element();
+    for(k=0;k<triangle_mesh->number_nodes;k++) particles->array_collection->Add_Element();
     if(!restart_step_number){    
         for(int i=0;i<m;i++) for(int j=0;j<n;j++){
             int node=i+m*(j-1);
@@ -77,14 +77,14 @@ void Initialize_Cloth(TRIANGLE_MESH*& triangle_mesh,PARTICLE_3D*& particles,TRIA
         char File_Name[256];sprintf(File_Name,"%s/position.%d",data_directory,restart_step_number);
         input.open(File_Name,std::ios::in|std::ios::binary);
         double data_double;
-        for(k=1;k<=triangle_mesh->number_nodes;k++){
+        for(k=0;k<triangle_mesh->number_nodes;k++){
             input.read((char*)&data_double,8);particles->X(k).x=(double)data_double;
             input.read((char*)&data_double,8);particles->X(k).y=(double)data_double;
             input.read((char*)&data_double,8);particles->X(k).z=(double)data_double;}
         input.close();
         sprintf(File_Name,"%s/velocity.%d",data_directory,restart_step_number);
         input.open(File_Name,std::ios::in|std::ios::binary);
-        for(k=1;k<=triangle_mesh->number_nodes;k++){
+        for(k=0;k<triangle_mesh->number_nodes;k++){
             input.read((char*)&data_double,8);particles->V(k).x=(double)data_double;
             input.read((char*)&data_double,8);particles->V(k).y=(double)data_double;
             input.read((char*)&data_double,8);particles->V(k).z=(double)data_double;}

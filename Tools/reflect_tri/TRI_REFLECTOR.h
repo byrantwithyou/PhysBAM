@@ -159,7 +159,7 @@ public:
             return;
         }
         *(centers(*active_surface)) = VECTOR_3D<T>(0, 0, 0);
-        for(i=1;i<=surface->particles.number;i++)
+        for(i=0;i<surface->particles.number;i++)
         {
             surface->particles.X(i) = cur_transform * surface->particles.X(i);
             *(centers(*active_surface)) += surface->particles.X(i);
@@ -216,7 +216,7 @@ public:
             return;
         }
         cur_transform = MATRIX_4X4<T>::Translation_Matrix(*center) * cur_transform;
-        for(i=1;i<=surface->particles.number;i++)
+        for(i=0;i<surface->particles.number;i++)
             surface->particles.X(i) = cur_transform * surface->particles.X(i);
         (*transform) = cur_transform * (*transform);
     }

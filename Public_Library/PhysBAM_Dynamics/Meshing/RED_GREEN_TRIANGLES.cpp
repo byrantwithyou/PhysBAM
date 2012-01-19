@@ -237,21 +237,21 @@ Add_Midpoint(const int segment,const int level,const int tri)
     // list it
     segment_midpoints(segment)=new_node;
     // add edge neighbors of triangle to the stack if not already there
-    int i;for(i=1;i<=(*meshes(level)->incident_elements)(node1).m;i++){
+    int i;for(i=0;i<(*meshes(level)->incident_elements)(node1).m;i++){
         int s=(*meshes(level)->incident_elements)(node1)(i);
         if(s != tri && !(*index_in_stack(level))(s)){
             int a,b,c;meshes(level)->elements(s).Get(a,b,c);assert(a == node1 || b == node1 || c == node1);
             if(node2 == a || node2 == b || node2 == c){ // not incident on edge
                 stack.Append(VECTOR<int,2>(level,s));(*index_in_stack(level))(s)=stack.m;}}}
     // check previous level for triangles incident on the edge
-    if(level > 1 && node1 <= meshes(level-1)->number_nodes) for(i=1;i<=(*meshes(level-1)->incident_elements)(node1).m;i++){
+    if(level > 1 && node1 <= meshes(level-1)->number_nodes) for(i=0;i<(*meshes(level-1)->incident_elements)(node1).m;i++){
         int s=(*meshes(level-1)->incident_elements)(node1)(i);
         if(!(*index_in_stack(level-1))(s)){
             int a,b,c;meshes(level-1)->elements(s).Get(a,b,c);
             if(node2 == a || node2 == b || node2 == c){ // not incident on edge
                 stack.Append(VECTOR<int,2>(level-1,s));(*index_in_stack(level-1))(s)=stack.m;}}}
     // check next level for triangles incident on the edge
-    if(level < meshes.m && node1 <= meshes(level+1)->number_nodes) for(i=1;i<=(*meshes(level+1)->incident_elements)(node1).m;i++){
+    if(level < meshes.m && node1 <= meshes(level+1)->number_nodes) for(i=0;i<(*meshes(level+1)->incident_elements)(node1).m;i++){
         int s=(*meshes(level+1)->incident_elements)(node1)(i);
         if(!(*index_in_stack(level+1))(s)){
             int a,b,c;meshes(level+1)->elements(s).Get(a,b,c);assert(a == node1 || b == node1 || c == node1);
@@ -310,11 +310,11 @@ template<class TV> void RED_GREEN_TRIANGLES<TV>::
 Rebuild_Object()
 {
     int number_of_leaves=0;
-    int level,tri;for(level=0;level<meshes.m;level++) for(tri=1;tri<=meshes(level)->elements.m; tri++) if(Leaf(level,tri)) number_of_leaves++;
+    int level,tri;for(level=0;level<meshes.m;level++) for(tri=0;tri<meshes(level)->elements.m;tri++) if(Leaf(level,tri)) number_of_leaves++;
     object.mesh.elements.Resize(number_of_leaves);
     leaf_levels_and_indices.Exact_Resize(number_of_leaves);
     int index_into_triangles=1;
-    for(level=0;level<meshes.m;level++) for(tri=1;tri<=meshes(level)->elements.m;tri++) 
+    for(level=0;level<meshes.m;level++) for(tri=0;tri<meshes(level)->elements.m;tri++) 
         if(Leaf(level,tri)){
             object.mesh.elements(index_into_triangles)=meshes(level)->elements(tri);
             leaf_levels_and_indices(index_into_triangles).Set(level,tri);(*leaf_number(level))(tri)=index_into_triangles;index_into_triangles++;}

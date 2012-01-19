@@ -117,7 +117,7 @@ public:
         if(processes_per_dimension!=VECTOR<int,3>()) count=processes_per_dimension;
         else{ // try to figure out counts by minimizing surface area between processes
             T minimum_surface_area=FLT_MAX;VECTOR<int,3> test_count;
-            for(test_count.z=1;test_count.z<=number_of_domains;test_count.z++) if(number_of_domains%test_count.z==0){
+            for(test_count.z=0;test_count.z<number_of_domains;test_count.z++) if(number_of_domains%test_count.z==0){
                 if(Minimize_2D_Surface_Area(number_of_domains/test_count.z,x,y,test_count.x)){
                     test_count.y=number_of_domains/(test_count.x*test_count.z);
                     T surface_area=((T)test_count.x)*(y*z)+((T)test_count.y)*(x*z)+((T)test_count.z)*(x*y);

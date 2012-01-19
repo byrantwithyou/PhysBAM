@@ -116,7 +116,7 @@ Get_Selection(GLuint *buffer,int buffer_size)
     // We have the OPENGL_POINTS_2D index but need to find the particle index
     int particle_index=0;
     int active_count=0;
-    for(particle_index=1;particle_index<=particles_multiple(particle_set)->array_collection->Size();particle_index++){
+    for(particle_index=0;particle_index<particles_multiple(particle_set)->array_collection->Size();particle_index++){
         active_count++;
         if(active_count==point_index) break;}
     selection->index=particle_index;

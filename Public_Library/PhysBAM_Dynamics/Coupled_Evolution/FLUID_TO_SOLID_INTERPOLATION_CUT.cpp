@@ -56,7 +56,7 @@ template<class T> struct FLUID_TO_SOLID_INTERPOLATION_CUT_DISPATCH<VECTOR<T,2> >
         const ARRAY_VIEW<TV> X(curve.particles.X);
 
         CLIP_ENTRY ce;
-        for(ce.i=1;ce.i<=curve.mesh.elements.m;ce.i++){
+        for(ce.i=0;ce.i<curve.mesh.elements.m;ce.i++){
             SEGMENT_2D<T> segment(X(curve.mesh.elements(ce.i).x),X(curve.mesh.elements(ce.i).y));
             PHYSBAM_ASSERT(index_map.grid.domain.Lazy_Inside(segment.x1) && index_map.grid.domain.Lazy_Inside(segment.x2));
             RANGE<TV_INT> box(index_map.grid.Cell(segment.x1,3));

@@ -71,7 +71,7 @@ Reinitialize(const int time_steps,const T time)
     ARRAY<T,VECTOR<int,3> > sign_phi(1,m,1,n,1,mn); // smeared out sign function
     T epsilon=sqr(grid.dX.Max());
     TV_INT i;
-    for(i.x=1;i.x<=m;i.x++) for(i.y=1;i.y<=n;i.y++) for(i.z=1;i.z<=mn;i.z++) sign_phi(i)=phi(i)/sqrt(sqr(phi(i))+epsilon);
+    for(i.x=0;i.x<m;i.x++) for(i.y=0;i.y<n;i.y++) for(i.z=0;i.z<mn;i.z++) sign_phi(i)=phi(i)/sqrt(sqr(phi(i))+epsilon);
 
     T dt=reinitialization_cfl*grid.min_dX;
     RUNGEKUTTA<ARRAY<T,VECTOR<int,3> > > rungekutta(phi);
@@ -100,33 +100,33 @@ Euler_Step_Of_Reinitialization(const ARRAY<T,VECTOR<int,3> >& sign_phi,const T d
     ARRAY<T,VECTOR<int,3> > rhs(1,m,1,n,1,mn);
 
     ARRAY<T,VECTOR<int,1> > phi_1d_x(1-ghost_cells,m+ghost_cells),phix_minus(1,m),phix_plus(1,m);
-    for(i.y=1;i.y<=n;i.y++) for(i.z=1;i.z<=mn;i.z++){
+    for(i.y=0;i.y<n;i.y++) for(i.z=0;i.z<mn;i.z++){
         for(i.x=1-ghost_cells;i.x<=m+ghost_cells;i.x++) phi_1d_x(i.x)=phi_ghost(i);
         if(reinitialization_spatial_order == 5) HJ_WENO(m,dx,phi_1d_x,phix_minus,phix_plus);
         else HJ_ENO(reinitialization_spatial_order,m,dx,phi_1d_x,phix_minus,phix_plus);
-        for(i.x=1;i.x<=m;i.x++)
+        for(i.x=0;i.x<m;i.x++)
             if(LEVELSET_UTILITIES<T>::Sign(phi(i)) < 0) rhs(i)=sqr(max(-phix_minus(i.x),phix_plus(i.x),(T)0));
             else rhs(i)=sqr(max(phix_minus(i.x),-phix_plus(i.x),(T)0));}
 
     ARRAY<T,VECTOR<int,1> > phi_1d_y(1-ghost_cells,n+ghost_cells),phiy_minus(1,n),phiy_plus(1,n);
-    for(i.x=1;i.x<=m;i.x++) for(i.z=1;i.z<=mn;i.z++){
+    for(i.x=0;i.x<m;i.x++) for(i.z=0;i.z<mn;i.z++){
         for(i.y=1-ghost_cells;i.y<=n+ghost_cells;i.y++) phi_1d_y(i.y)=phi_ghost(i);
         if(reinitialization_spatial_order == 5) HJ_WENO(n,dy,phi_1d_y,phiy_minus,phiy_plus);
         else HJ_ENO(reinitialization_spatial_order,n,dy,phi_1d_y,phiy_minus,phiy_plus);
-        for(i.y=1;i.y<=n;i.y++)
+        for(i.y=0;i.y<n;i.y++)
             if(LEVELSET_UTILITIES<T>::Sign(phi(i)) < 0) rhs(i)+=sqr(max(-phiy_minus(i.y),phiy_plus(i.y),(T)0));
             else rhs(i)+=sqr(max(phiy_minus(i.y),-phiy_plus(i.y),(T)0));}
 
     ARRAY<T,VECTOR<int,1> > phi_1d_z(1-ghost_cells,mn+ghost_cells),phiz_minus(1,mn),phiz_plus(1,mn);
-    for(i.x=1;i.x<=m;i.x++) for(i.y=1;i.y<=n;i.y++){
+    for(i.x=0;i.x<m;i.x++) for(i.y=0;i.y<n;i.y++){
         for(i.z=1-ghost_cells;i.z<=mn+ghost_cells;i.z++) phi_1d_z(i.z)=phi_ghost(i);
         if(reinitialization_spatial_order == 5) HJ_WENO(mn,dz,phi_1d_z,phiz_minus,phiz_plus);
         else HJ_ENO(reinitialization_spatial_order,mn,dz,phi_1d_z,phiz_minus,phiz_plus);
-        for(i.z=1;i.z<=mn;i.z++)
+        for(i.z=0;i.z<mn;i.z++)
             if(LEVELSET_UTILITIES<T>::Sign(phi(i)) < 0) rhs(i)+=sqr(max(-phiz_minus(i.z),phiz_plus(i.z),(T)0));
             else rhs(i)+=sqr(max(phiz_minus(i.z),-phiz_plus(i.z),(T)0));}
 
-    for(i.x=1;i.x<=m;i.x++) for(i.y=1;i.y<=n;i.y++) for(i.z=1;i.z<=mn;i.z++){
+    for(i.x=0;i.x<m;i.x++) for(i.y=0;i.y<n;i.y++) for(i.z=0;i.z<mn;i.z++){
         phi(i)-=dt*sign_phi(i)*(sqrt(rhs(i))-1);
         if(LEVELSET_UTILITIES<T>::Interface(phi_ghost(i),phi(i))) phi(i)=LEVELSET_UTILITIES<T>::Sign(phi_ghost(i))*levelset->small_number*grid.min_dX;}
 

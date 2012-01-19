@@ -209,7 +209,7 @@ virtual void Initialize_Bias_Stress_Constants(const EMBEDDED_TETRAHEDRALIZED_VOL
 //
 //    //shift above floor && scale
 //    int i;
-//    for(i=1;i<=embedded_tetrahedralized_volume.tetrahedralized_volume.particles.array_collection->Size();i++) {embedded_tetrahedralized_volume.tetrahedralized_volume.particles.X(i).y+=3;embedded_tetrahedralized_volume.tetrahedralized_volume.particles.X(i)*=.2;}
+//    for(i=0;i<embedded_tetrahedralized_volume.tetrahedralized_volume.particles.array_collection->Size();i++) {embedded_tetrahedralized_volume.tetrahedralized_volume.particles.X(i).y+=3;embedded_tetrahedralized_volume.tetrahedralized_volume.particles.X(i)*=.2;}
 //    embedded_tetrahedralized_volume.tetrahedralized_volume.Update_Bounding_Box();
 //    
 //    if(restart_step_number == 0){

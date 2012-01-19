@@ -76,7 +76,7 @@ void DK::Build(int p0, DK_VERTEX_LIST<float, double> &vlist)
         maps.Append(vlist(indices(i)));
     }
     //now, let's set the angles.
-    for(i=1; i<=maps.m; i++)
+    for(i=0;i<maps.m;i++)
         maps(i)->weight=GetAngle(i, i-1, i+1, maps, p0);
     
     ARRAY <DK_VERTEX <double> *> free_vlist;
@@ -198,7 +198,7 @@ bool DK::Output(char *filename)
         }
     }
 
-    for(i=1; i<=vertices_info.m; i++)
+    for(i=0;i<vertices_info.m;i++)
     {
         int ti=currentmesh->triangles(1, i);
         int tj=currentmesh->triangles(2, i);

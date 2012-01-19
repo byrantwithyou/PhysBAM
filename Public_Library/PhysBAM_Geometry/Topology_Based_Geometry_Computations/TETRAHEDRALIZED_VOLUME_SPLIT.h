@@ -27,13 +27,13 @@ void Split_Along_Fracture_Plane(TETRAHEDRALIZED_VOLUME<T>& tv,const PLANE<T>& pl
     int t;for(t=0;t<tv.mesh.elements.m;t++){int i,j,k,l;tv.mesh.elements(t).Get(i,j,k,l);
         TV x1=tv.particles.X(i),x2=tv.particles.X(j),x3=tv.particles.X(k),x4=tv.particles.X(l),centroid=(T).25*(x1+x2+x3+x4);
         if(plane.Signed_Distance(centroid) >= 0){positive_side(t)=true;number_on_positive_side++;}}
-    int p;for(p=1;p<=tv.particles.array_collection->Size();p++){
+    int p;for(p=0;p<tv.particles.array_collection->Size();p++){
         bool seen_positive_side=false,seen_negative_side=false;
         for(t=0;t<(*tv.mesh.incident_elements)(p).m;t++){
             if(positive_side((*tv.mesh.incident_elements)(p)(t))) seen_positive_side=true;else seen_negative_side=true;}
         if(seen_positive_side && seen_negative_side) particle_replicated(p)=1;}
     int number_of_new_particles=0;
-    for(p=1;p<=tv.particles.array_collection->Size();p++) if(particle_replicated(p)){ // assumes we're storing mass (this is not set here!), position, & velocity
+    for(p=0;p<tv.particles.array_collection->Size();p++) if(particle_replicated(p)){ // assumes we're storing mass (this is not set here!), position, & velocity
         int new_index=tv.particles.array_collection->Add_Element();particle_replicated(p)=new_index;number_of_new_particles++;
         tv.particles.X(new_index)=tv.particles.X(p);tv.particles.V(new_index)=tv.particles.V(p);}
     // loop through tets and change indices in negative_side to new_indices (from particle_replicated)

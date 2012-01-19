@@ -41,11 +41,11 @@ Initialize_Optimization(const bool verbose)
     initial_min_altitude=TRIANGLE_2D<T>::Minimum_Altitude(xi,xj,xk);
     initial_area=TRIANGLE_2D<T>::Area(xi,xj,xk);
     map_from_nodes_to_boundary_list.Resize(1,triangle_mesh.number_nodes);
-    for(i=1;i<=triangle_mesh.boundary_nodes->m;i++) map_from_nodes_to_boundary_list((*triangle_mesh.boundary_nodes)(i))=i;
+    for(i=0;i<triangle_mesh.boundary_nodes->m;i++) map_from_nodes_to_boundary_list((*triangle_mesh.boundary_nodes)(i))=i;
     for(i=0;i<layers.m;i++) delete layers(i);layers.Resize(1);layers(1)=triangle_mesh.boundary_nodes;
     triangle_mesh.boundary_nodes=0; // we don't need it hanging off the mesh object any more
     if(verbose) LOG::cout<<"boundary layer has "<<layers(1)->m<<" nodes"<<std::endl;
-    ARRAY<bool,VECTOR<int,1> > marked(1,triangle_mesh.number_nodes);for(i=1;i<=layers(1)->m;i++) marked((*layers(1))(i))=true;
+    ARRAY<bool,VECTOR<int,1> > marked(1,triangle_mesh.number_nodes);for(i=0;i<layers(1)->m;i++) marked((*layers(1))(i))=true;
     for(int l=2;;l++){
         layers.Append(new ARRAY<int>);
         for(int i=0;i<layers(l-1)->m;i++){

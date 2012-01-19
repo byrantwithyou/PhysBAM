@@ -425,21 +425,21 @@ Add_Midpoint(const int segment,const int level,const int tet)
     // list it
     segment_midpoints(segment)=new_node;
     // add edge neighbors of tet to the stack if not already there
-    int i;for(i=1;i<=(*meshes(level)->incident_elements)(node1).m;i++){
+    int i;for(i=0;i<(*meshes(level)->incident_elements)(node1).m;i++){
         int s=(*meshes(level)->incident_elements)(node1)(i);
         if(s != tet && !(*index_in_stack(level))(s)){
             int a,b,c,d;meshes(level)->elements(s).Get(a,b,c,d);assert(a == node1 || b == node1 || c == node1 || d == node1);
             if(node2 == a || node2 == b || node2 == c || node2 == d){ // not incident on edge
                 stack.Append(VECTOR<int,2>(level,s));(*index_in_stack(level))(s)=stack.m;}}}
     // check previous level for tets incident on the edge
-    if(level > 1 && node1 <= meshes(level-1)->number_nodes) for(i=1;i<=(*meshes(level-1)->incident_elements)(node1).m;i++){
+    if(level > 1 && node1 <= meshes(level-1)->number_nodes) for(i=0;i<(*meshes(level-1)->incident_elements)(node1).m;i++){
         int s=(*meshes(level-1)->incident_elements)(node1)(i);
         if(!(*index_in_stack(level-1))(s)){
             int a,b,c,d;meshes(level-1)->elements(s).Get(a,b,c,d);
             if(node2 == a || node2 == b || node2 == c || node2 == d){ // not incident on edge
                 stack.Append(VECTOR<int,2>(level-1,s));(*index_in_stack(level-1))(s)=stack.m;}}}
     // check next level for tets incident on the edge
-    if(level < meshes.m && node1 <= meshes(level+1)->number_nodes) for(i=1;i<=(*meshes(level+1)->incident_elements)(node1).m;i++){
+    if(level < meshes.m && node1 <= meshes(level+1)->number_nodes) for(i=0;i<(*meshes(level+1)->incident_elements)(node1).m;i++){
         int s=(*meshes(level+1)->incident_elements)(node1)(i);
         if(!(*index_in_stack(level+1))(s)){
             int a,b,c,d;meshes(level+1)->elements(s).Get(a,b,c,d);assert(a == node1 || b == node1 || c == node1 || d == node1);
@@ -500,11 +500,11 @@ template<class T> void RED_GREEN_TETRAHEDRA<T>::
 Rebuild_Object()
 {
     int number_of_leaves=0;
-    int level,tet;for(level=0;level<meshes.m;level++) for(tet=1;tet<=meshes(level)->elements.m;tet++) if(Leaf(level,tet)) number_of_leaves++;
+    int level,tet;for(level=0;level<meshes.m;level++) for(tet=0;tet<meshes(level)->elements.m;tet++) if(Leaf(level,tet)) number_of_leaves++;
     object.mesh.elements.Resize(number_of_leaves);
     leaf_levels_and_indices.Exact_Resize(number_of_leaves);
     int index_into_tets=1;
-    for(level=0;level<meshes.m;level++) for(tet=1;tet<=meshes(level)->elements.m;tet++) 
+    for(level=0;level<meshes.m;level++) for(tet=0;tet<meshes(level)->elements.m;tet++) 
         if(Leaf(level,tet)){
             for(int i=0;i<4;i++) object.mesh.elements(index_into_tets)(i)=meshes(level)->elements(tet)(i);
             leaf_levels_and_indices(index_into_tets).Set(level,tet);(*leaf_number(level))(tet)=index_into_tets;index_into_tets++;}
@@ -671,9 +671,9 @@ Initialize()
     segment_midpoints.Resize(segment_mesh.elements.m);
     index_in_stack.Append(new ARRAY<int>(meshes(1)->elements.m));
     leaf_levels_and_indices.Resize(meshes(1)->elements.m);
-    int t;for(t=1;t<=meshes(1)->elements.m;t++){leaf_levels_and_indices(t)(1)=1;leaf_levels_and_indices(t)(2)=t;}
+    int t;for(t=0;t<meshes(1)->elements.m;t++){leaf_levels_and_indices(t)(1)=1;leaf_levels_and_indices(t)(2)=t;}
     leaf_number.Append(new ARRAY<int>(meshes(1)->elements.m));
-    for(t=1;t<=meshes(1)->elements.m;t++) (*leaf_number(1))(t)=t;
+    for(t=0;t<meshes(1)->elements.m;t++) (*leaf_number(1))(t)=t;
 }
 template<class T> void RED_GREEN_TETRAHEDRA<T>::
 Clean_Memory()

@@ -209,7 +209,7 @@ Dump_Images()
 {
     ARRAYS<VECTOR<VECTOR<T,3> ,2> > image;
     VECTOR<int,3> image_index;
-    for(image_index.y=1;image_index.y<=image_resolution.y;image_index.y++){
+    for(image_index.y=0;image_index.y<image_resolution.y;image_index.y++){
         std::cout<<"Slice "<<image_index.y<<" of "<<image_resolution.y<<std::endl;
         Read_Slice(image_index.y);
         Convert_To_Image(image);
