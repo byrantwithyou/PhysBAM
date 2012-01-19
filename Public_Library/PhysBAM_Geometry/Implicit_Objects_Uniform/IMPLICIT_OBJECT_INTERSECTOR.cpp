@@ -147,9 +147,9 @@ Negative_Material_In_Box_Excluding_Object(const RANGE<TV>& box,const ARRAY<IMPLI
     int unrefined_point_count=last_node;
     int last_parent_simplex=0,first_parent_simplex=1;
     for(int depth=0;depth<maximum_refinement_depth;depth++){
-        first_parent_simplex=last_parent_simplex+1;
+        first_parent_simplex=last_parent_simplex;
         last_parent_simplex=cell_refinement_simplices.m;
-        for(int s=last_parent_simplex;s>=first_parent_simplex;s--){
+        for(int s=last_parent_simplex-1;s>=first_parent_simplex;s--){
             const T_ELEMENT simplex=cell_refinement_simplices(s);
             if(depth < minimum_refinement_depth || Refinement_Condition(cell_particle_X,cell_phis,simplex) || force_full_refinement){
                 last_parent_simplex--;
@@ -157,7 +157,7 @@ Negative_Material_In_Box_Excluding_Object(const RANGE<TV>& box,const ARRAY<IMPLI
                 Refine_Simplex(*this,cell_refinement_simplices,cell_particle_X,simplex);}}
         cell_phis.Resize(cell_particle_X.m);
         // compute phis for extant nodes
-        for(int i=last_node+1;i<=cell_phis.m;i++){T& phi=cell_phis(i);
+        for(int i=last_node;i<cell_phis.m;i++){T& phi=cell_phis(i);
             phi=Extended_Phi(cell_particle_X(i));
             for(int j=0;j<excluded_implicit_objects.m;j++) phi=max(phi,-excluded_implicit_objects(j)->Extended_Phi(cell_particle_X(i)));}
         last_node=cell_phis.m;}

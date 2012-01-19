@@ -149,7 +149,7 @@ public:
     {Resize_Helper(m_new,initialize_new_elements);m=buffer_size;}
 
     ID Append(const T& element) PHYSBAM_ALWAYS_INLINE
-    {Ensure_Enough_Space(m+1);m++;(*this)(m)=element;return m;}
+    {Ensure_Enough_Space(m+1);(*this)(m)=element;return m++;}
 
     template<class T_ARRAY>
     void Append_Elements(const T_ARRAY& append_array)

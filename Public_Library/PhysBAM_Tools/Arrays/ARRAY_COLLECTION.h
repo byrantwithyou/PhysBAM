@@ -110,7 +110,7 @@ public:
     {Initialize(elements_per_cell.array);}
 
     int Append(const ARRAY_COLLECTION& source,int from)
-    {Copy_Element(source,from,Add_Element());return number;}
+    {Copy_Element(source,from,Add_Element());return number-1;}
 
     void Append(const ARRAY_COLLECTION& from_elements)
     {int offset=number;Add_Elements(from_elements.number);Copy_All_Elements_Helper(from_elements,offset);}
