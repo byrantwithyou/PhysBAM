@@ -29,7 +29,7 @@ void Apply_Fractal_Subdivision(TRIANGLE_SUBDIVISION& ts,ARRAY_VIEW<const TV> bas
     for(int i=0;i<ts.triangle_mesh.number_nodes;i++)if((*ts.triangle_mesh.neighbor_nodes)(i).m) subdivided_values(i)=base_values(i);
     // interpolate values on edges
     RANDOM_NUMBERS<T> random;
-    for(int k=1;k<=ts.triangle_mesh.segment_mesh->elements.m;k++){
+    for(int k=0;k<ts.triangle_mesh.segment_mesh->elements.m;k++){
         int node1=ts.triangle_mesh.segment_mesh->elements(k)(1);
         int node2=ts.triangle_mesh.segment_mesh->elements(k)(2);
         TV midpoint=(T).5*(base_values(node1)+base_values(node2));

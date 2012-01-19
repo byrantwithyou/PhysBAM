@@ -61,7 +61,7 @@ template<class T> void RIGID_FRACTURE_QUASISTATICS_FORCES<T>::
 Add_External_Forces(ARRAY_VIEW<TV> F,const T time)
 {
     if(!initialized) return;
-    for(int i=1;i<=fracture_object->rigid_to_deformable_particles.m;i++)F(fracture_object->rigid_to_deformable_particles(i))+=fracture_object->World_Space_Vector((*impulses)(i));
+    for(int i=0;i<fracture_object->rigid_to_deformable_particles.m;i++)F(fracture_object->rigid_to_deformable_particles(i))+=fracture_object->World_Space_Vector((*impulses)(i));
     //F+=*impulses;
 }
 //#####################################################################

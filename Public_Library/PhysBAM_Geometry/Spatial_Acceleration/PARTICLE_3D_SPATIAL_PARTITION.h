@@ -65,7 +65,7 @@ public:
     interacting_particle_indices.Remove_All();
     for(int i=voxel.x-1;i<=voxel.x+1;i++) for(int j=voxel.y-1;j<=voxel.y+1;j++) for(int k=voxel.z-1;k<=voxel.z+1;k++){
         ARRAY<int>* occupancy_list=0;
-        if(hashtable.Get(VECTOR<int,3>(i,j,k),occupancy_list)) for(int t=1;t<=occupancy_list->m;t++){
+        if(hashtable.Get(VECTOR<int,3>(i,j,k),occupancy_list)) for(int t=0;t<occupancy_list->m;t++){
             int index=(*occupancy_list)(t);
             if((index > particle_index || (!only_higher_indices  && index != particle_index))&&(particles.X(particle_index)-particles.X(index)).Magnitude_Squared() <= interaction_radius_squared) 
                 interacting_particle_indices.Append(index);}}}

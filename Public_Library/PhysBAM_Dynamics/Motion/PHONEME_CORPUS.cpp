@@ -277,7 +277,7 @@ Brute_Force_Phoneme_Arrangement(const ARRAY<std::string>& phonemes,const ARRAY<T
     phoneme_arrangement->Set_Custom_Interpolation(interpolation);
     phoneme_arrangement->Set_Face_Control_Parameters(face_control_parameters);
     phoneme_arrangement->list.Resize(phonemes.m);
-    for(int i=1;i<=phoneme_arrangement->list.m;i++){
+    for(int i=0;i<phoneme_arrangement->list.m;i++){
         PHONEME_SEGMENT<T>& phoneme_segment=phoneme_arrangement->list(i);
 #if ALTERNATE_PHONEMES
         phoneme_segment.peak=starting_times(i)+lengths(i)/2;
@@ -290,7 +290,7 @@ Brute_Force_Phoneme_Arrangement(const ARRAY<std::string>& phonemes,const ARRAY<T
     phoneme_arrangement->Update_Valid_Segment();
     // Yankee-search!
     Brute_Force_Phoneme_Arrangement_Helper(phoneme_candidates,1,*phoneme_arrangement,best_result,indices,weights);
-    for(int i=1;i<=phoneme_arrangement->list.m;i++){
+    for(int i=0;i<phoneme_arrangement->list.m;i++){
         LOG::cout<<"Phoneme "<<phoneme_candidates(i)(indices(i))->phoneme_sample_name<<" at index "<<indices(i)<<std::endl;
         PHONEME_SEGMENT<T>& phoneme_segment=phoneme_arrangement->list(i);
         phoneme_segment.Set_Sample(*phoneme_candidates(i)(indices(i))->phoneme_sample);
@@ -313,7 +313,7 @@ Produce_Phoneme_Arrangement(const ARRAY<std::string>& phonemes,const ARRAY<T>& s
     phoneme_arrangement->Set_Face_Control_Parameters(face_control_parameters);
     phoneme_arrangement->list.Resize(phonemes.m);
     for(int i=0;i<phonemes.m;i++){phoneme_candidates.Append(*Get_Phonemes(phonemes(i)));if(!phoneme_candidates(i).m) return 0;indices(i)=1;}
-    for(int i=1;i<=phoneme_arrangement->list.m;i++){
+    for(int i=0;i<phoneme_arrangement->list.m;i++){
         PHONEME_SEGMENT<T>& phoneme_segment=phoneme_arrangement->list(i);
         phoneme_segment.Set_Sample(*phoneme_candidates(i)(1)->phoneme_sample);
         phoneme_segment.phoneme_sample_name=phoneme_candidates(i)(1)->phoneme_sample_name;
@@ -365,7 +365,7 @@ Produce_Phoneme_Arrangement(const ARRAY<std::string>& phonemes,const ARRAY<T>& s
     /*scalings=phoneme_arrangement->Optimal_Scaling(sampling_grid,stiffness);
     LOG::cout<<scalings<<std::endl;
     T rescale=scalings.Sum()/scalings.Magnitude_Squared();
-    for(int i=1;i<=phoneme_arrangement->list.m;i++){
+    for(int i=0;i<phoneme_arrangement->list.m;i++){
         PHONEME_SEGMENT<T>& phoneme_segment=phoneme_arrangement->list(i);
         phoneme_segment.scaling*=rescale;}*/
             
@@ -389,7 +389,7 @@ Produce_Phoneme_Arrangement(const ARRAY<std::string>& phonemes,const ARRAY<T>& s
         change=abs(change-Phoneme_Metric_Helper(phoneme_candidates,indices,starting_times,lengths,leading_times,trailing_times));}
     PHONEME_ARRANGEMENT<T> *phoneme_arrangement=new PHONEME_ARRANGEMENT<T>;
     phoneme_arrangement->list.Resize(phonemes.m);
-    for(int i=1;i<=phoneme_arrangement->list.m;i++){
+    for(int i=0;i<phoneme_arrangement->list.m;i++){
         LOG::cout<<"Phoneme "<<phoneme_candidates(i)(indices(i))->phoneme_sample_name<<" at index "<<indices(i)<<std::endl;
         PHONEME_SEGMENT<T>& phoneme_segment=phoneme_arrangement->list(i);
         phoneme_segment=PHONEME_SEGMENT<T>(*phoneme_candidates(i)(indices(i)));

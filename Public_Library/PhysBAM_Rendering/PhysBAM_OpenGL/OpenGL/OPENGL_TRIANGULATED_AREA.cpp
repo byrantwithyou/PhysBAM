@@ -247,7 +247,7 @@ Draw_Segments() const
     PHYSBAM_ASSERT(triangulated_area.mesh.segment_mesh);
     segment_color.Send_To_GL_Pipeline();
     ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-    for(int i=1;i<=triangulated_area.mesh.segment_mesh->elements.m;i++){
+    for(int i=0;i<triangulated_area.mesh.segment_mesh->elements.m;i++){
         int node1,node2;triangulated_area.mesh.segment_mesh->elements(i).Get(node1,node2);
         OpenGL_Line(triangulated_area.particles.X(node1),triangulated_area.particles.X(node2),vertices);}
     OpenGL_Draw_Arrays(GL_LINES,2,vertices);
@@ -263,7 +263,7 @@ Draw_Segments_For_Selection() const
     glPushAttrib(GL_LINE_BIT);
     glLineWidth(OPENGL_PREFERENCES::selection_line_width);
     glPushName(0);
-    for(int i=1;i<=triangulated_area.mesh.segment_mesh->elements.m;i++){
+    for(int i=0;i<triangulated_area.mesh.segment_mesh->elements.m;i++){
         int node1,node2;
         triangulated_area.mesh.segment_mesh->elements(i).Get(node1,node2);
         glLoadName(i);

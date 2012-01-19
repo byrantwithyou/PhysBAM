@@ -156,7 +156,7 @@ Initialize_Segment_Mesh()
     segment_mesh=new SEGMENT_MESH();
     segment_mesh->number_nodes=number_nodes;
     segment_mesh->elements.Preallocate((total_degree+1)/2); // add one for subtle optimization purposes
-    for(int node=1;node<=neighbor_nodes->m;node++) for(int k=1;k<=(*neighbor_nodes)(node).m;k++) // do nodes in ascending order so that no edges are counted more than once
+    for(int node=0;node<neighbor_nodes->m;node++) for(int k=1;k<=(*neighbor_nodes)(node).m;k++) // do nodes in ascending order so that no edges are counted more than once
         if(node<=(*neighbor_nodes)(node)(k)) segment_mesh->elements.Append(VECTOR<int,2>(node,(*neighbor_nodes)(node)(k))); 
     if(!neighbor_nodes_defined){delete neighbor_nodes;neighbor_nodes=0;}
 }
@@ -216,7 +216,7 @@ Initialize_Tetrahedron_Faces()
     delete tetrahedron_faces;tetrahedron_faces=new ARRAY<VECTOR<int,4> >(elements.m);
     if(!triangle_mesh) Initialize_Triangle_Mesh(); //triangles only make sense when referring to a triangle mesh
     bool triangle_tetrahedrons_defined=triangle_tetrahedrons!=0;if(!triangle_tetrahedrons_defined) Initialize_Triangle_Tetrahedrons();
-    for(int tri=1;tri<=triangle_tetrahedrons->m;tri++){
+    for(int tri=0;tri<triangle_tetrahedrons->m;tri++){
         int tri_i,tri_j,tri_k;triangle_mesh->elements(tri).Get(tri_i,tri_j,tri_k);
         for(int face=0;face<2;face++){
             int tet=(*triangle_tetrahedrons)(tri)(face),tet_i,tet_j,tet_k,tet_l,local_tet_index_for_face=1;
@@ -275,7 +275,7 @@ Initialize_Node_On_Boundary()
 {
     delete node_on_boundary;node_on_boundary=new ARRAY<bool>(number_nodes);
     bool boundary_mesh_defined=boundary_mesh!=0;if(!boundary_mesh_defined) Initialize_Boundary_Mesh();
-    for(int t=1;t<=boundary_mesh->elements.m;t++){
+    for(int t=0;t<boundary_mesh->elements.m;t++){
         int i,j,k;boundary_mesh->elements(t).Get(i,j,k);
         (*node_on_boundary)(i)=(*node_on_boundary)(j)=(*node_on_boundary)(k)=true;}
     if(!boundary_mesh_defined){delete boundary_mesh;boundary_mesh=0;}
@@ -288,7 +288,7 @@ Initialize_Boundary_Nodes()
 {
     delete boundary_nodes;boundary_nodes=new ARRAY<int>;
     bool boundary_mesh_defined=boundary_mesh!=0;if(!boundary_mesh_defined) Initialize_Boundary_Mesh();
-    for(int t=1;t<=boundary_mesh->elements.m;t++){
+    for(int t=0;t<boundary_mesh->elements.m;t++){
         int i,j,k;boundary_mesh->elements(t).Get(i,j,k);
         boundary_nodes->Append(i);boundary_nodes->Append(j);boundary_nodes->Append(k);}
     if(!boundary_mesh_defined){delete boundary_mesh;boundary_mesh=0;}
@@ -307,7 +307,7 @@ Initialize_Edge_Tetrahedrons()
     edge_tetrahedrons=new ARRAY<ARRAY<int> >(segment_mesh->elements.m);
     bool element_edges_defined=element_edges!=0;if(!element_edges_defined) Initialize_Element_Edges();
     for(int t=0;t<elements.m;t++) for(int i=0;i<6;i++) (*edge_tetrahedrons)((*element_edges)(t)(i)).Append(t);
-    for(int i=1;i<=segment_mesh->elements.m;i++) (*edge_tetrahedrons)(i).Compact();
+    for(int i=0;i<segment_mesh->elements.m;i++) (*edge_tetrahedrons)(i).Compact();
     if(!element_edges_defined){delete element_edges;element_edges=0;}
 }
 //#####################################################################
@@ -320,7 +320,7 @@ Initialize_Triangle_Tetrahedrons()
     if(!triangle_mesh) Initialize_Triangle_Mesh();
     triangle_tetrahedrons=new ARRAY<VECTOR<int,2> >(triangle_mesh->elements.m);
     bool incident_elements_defined=incident_elements!=0;if(!incident_elements_defined) Initialize_Incident_Elements();
-    for(int t=1;t<=triangle_mesh->elements.m;t++){
+    for(int t=0;t<triangle_mesh->elements.m;t++){
         const VECTOR<int,3>& triangle_nodes=triangle_mesh->elements(t);int i=triangle_nodes[1];
         for(int tet=1;tet<=(*incident_elements)(i).m;tet++){
             const VECTOR<int,4>& original_nodes=elements((*incident_elements)(i)(tet));

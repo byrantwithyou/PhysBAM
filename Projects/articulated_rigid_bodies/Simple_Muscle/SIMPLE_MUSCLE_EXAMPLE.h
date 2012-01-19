@@ -139,7 +139,7 @@ void Simple_Muscle_Across_Joint()
         frame_track=new FRAME_TRACK_3D<T>(samples,0,period);frame_track->periodic=true;
         for(int i=0;i<samples;i++){
             frame_track->trajectory(i)=FRAME_3D<T>(QUATERNION<T>(initial_angle+(target_angle-initial_angle)*0.5*(1-cos(2*pi*(i-1)/(samples-1))),VECTOR<T,3>(1,0,0)));}
-        for(int i=1;i<=arb->joint_mesh.joints.m;i++) arb->joint_mesh.joints(i)->joint_function->track=frame_track;
+        for(int i=0;i<arb->joint_mesh.joints.m;i++) arb->joint_mesh.joints(i)->joint_function->track=frame_track;
     }
 
     for(int i=0;i<num_bodies;i++){

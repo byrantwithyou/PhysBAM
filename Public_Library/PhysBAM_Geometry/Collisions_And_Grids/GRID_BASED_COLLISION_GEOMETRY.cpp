@@ -63,7 +63,7 @@ Earliest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_t
     if(!objects){for(COLLISION_GEOMETRY_ID i(1);i<=collision_geometry_collection.bodies.m;i++) if(Is_Active(i) && collision_geometry_collection.bodies(i)->active && 
         collision_geometry_collection.bodies(i)->Earliest_Simplex_Crossover(start_X,end_X,dt,current_hit_time,current_weights,current_simplex_id) && current_hit_time < min_time){
             min_time=hit_time=current_hit_time;weights=current_weights;body_id=i;simplex_id=current_simplex_id;collision=true;}}
-    else for(int k=1;k<=objects->m;k++){COLLISION_GEOMETRY_ID i=(*objects)(k);if(Is_Active(i) && collision_geometry_collection.bodies(i)->active && 
+    else for(int k=0;k<objects->m;k++){COLLISION_GEOMETRY_ID i=(*objects)(k);if(Is_Active(i) && collision_geometry_collection.bodies(i)->active && 
         collision_geometry_collection.bodies(i)->Earliest_Simplex_Crossover(start_X,end_X,dt,current_hit_time,current_weights,current_simplex_id) && current_hit_time < min_time){
             min_time=hit_time=current_hit_time;weights=current_weights;body_id=i;simplex_id=current_simplex_id;collision=true;}}
     return collision;
@@ -94,7 +94,7 @@ Latest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_tim
         collision_geometry_collection.bodies(i)->Latest_Simplex_Crossover(start_X,end_X,dt,current_hit_time,current_weights,current_simplex_id,collision_type) && current_hit_time > max_time){
             max_time=hit_time=current_hit_time;weights=current_weights;body_id=i;simplex_id=current_simplex_id;collision=true;
             returned_collision_type=collision_type;}}
-    else for(int k=1;k<=objects->m;k++){COLLISION_GEOMETRY_ID i=(*objects)(k);if(Is_Active(i) && collision_geometry_collection.bodies(i)->active && 
+    else for(int k=0;k<objects->m;k++){COLLISION_GEOMETRY_ID i=(*objects)(k);if(Is_Active(i) && collision_geometry_collection.bodies(i)->active && 
         collision_geometry_collection.bodies(i)->Latest_Simplex_Crossover(start_X,end_X,dt,current_hit_time,current_weights,current_simplex_id,collision_type) && current_hit_time > max_time){
             max_time=hit_time=current_hit_time;weights=current_weights;body_id=i;simplex_id=current_simplex_id;collision=true;
             returned_collision_type=collision_type;}}
@@ -107,7 +107,7 @@ template<class T_GRID> bool GRID_BASED_COLLISION_GEOMETRY<T_GRID>::
 Any_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,const ARRAY<COLLISION_GEOMETRY_ID>* objects) const
 {
     if(!objects){for(COLLISION_GEOMETRY_ID i(1);i<=collision_geometry_collection.bodies.m;i++) if(Is_Active(i) && collision_geometry_collection.bodies(i)->active && collision_geometry_collection.bodies(i)->Any_Simplex_Crossover(start_X,end_X,dt)) return true;}
-    else for(int k=1;k<=objects->m;k++){COLLISION_GEOMETRY_ID i=(*objects)(k);if(Is_Active(i) && collision_geometry_collection.bodies(i)->active && collision_geometry_collection.bodies(i)->Any_Simplex_Crossover(start_X,end_X,dt)) return true;}
+    else for(int k=0;k<objects->m;k++){COLLISION_GEOMETRY_ID i=(*objects)(k);if(Is_Active(i) && collision_geometry_collection.bodies(i)->active && collision_geometry_collection.bodies(i)->Any_Simplex_Crossover(start_X,end_X,dt)) return true;}
     return false;
 }
 //##################################################################### 
@@ -127,7 +127,7 @@ Get_Body_Penetration(const TV& start_X,const TV& end_X,const T contour_value,con
     const ARRAY<COLLISION_GEOMETRY_ID>* objects) const
 {
     T hit_time=FLT_MAX;T current_hit_time;int current_simplex_id;T current_start_phi,current_end_phi;TV current_end_body_normal,current_body_velocity;
-    if(objects) for(int k=1;k<=objects->m;k++){COLLISION_GEOMETRY_ID i=(*objects)(k);
+    if(objects) for(int k=0;k<objects->m;k++){COLLISION_GEOMETRY_ID i=(*objects)(k);
         if(collision_geometry_collection.bodies(i)->Get_Body_Penetration(start_X,end_X,contour_value,dt,current_hit_time,current_simplex_id,current_start_phi,current_end_phi,current_end_body_normal,
              current_body_velocity) && current_hit_time<hit_time){
              body_id=i;hit_time=current_hit_time;
@@ -146,7 +146,7 @@ template<class T_GRID> bool GRID_BASED_COLLISION_GEOMETRY<T_GRID>::
 Push_Out_Point(TV& X,const T collision_distance,const bool check_particle_crossover,bool& particle_crossover,const ARRAY<COLLISION_GEOMETRY_ID>* objects) const
 {
     T distance=FLT_MAX,current_distance;TV X_old=X;
-    if(objects) for(int k=1;k<=objects->m;k++){COLLISION_GEOMETRY_ID i=(*objects)(k);TV current_X=X_old;
+    if(objects) for(int k=0;k<objects->m;k++){COLLISION_GEOMETRY_ID i=(*objects)(k);TV current_X=X_old;
         if(collision_geometry_collection.bodies(i)->Push_Out_Point(current_X,collision_distance,current_distance) && current_distance<distance){X=current_X;distance=current_distance;}}
     else for(COLLISION_GEOMETRY_ID i(1);i<=collision_geometry_collection.bodies.Size();i++){TV current_X=X_old;
         if(Is_Active(i) && collision_geometry_collection.bodies(i)->Push_Out_Point(current_X,collision_distance,current_distance) && current_distance<distance){X=current_X;distance=current_distance;}}

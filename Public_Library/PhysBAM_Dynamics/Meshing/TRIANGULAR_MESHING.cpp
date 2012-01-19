@@ -21,7 +21,7 @@ void TRIANGULAR_MESHING<T>::
 Snap_Nodes_To_Level_Set_Boundary(const int output_frame,const int iterations)
 {
     triangle_mesh.Initialize_Boundary_Nodes();
-    for(int t=1;t<=triangle_mesh.boundary_nodes->m;t++) for(int k=0;k<iterations;k++){
+    for(int t=0;t<triangle_mesh.boundary_nodes->m;t++) for(int k=0;k<iterations;k++){
         int node=(*triangle_mesh.boundary_nodes)(t);VECTOR<T,2> X=particles.X(node);
         particles.X(node)-=implicit_curve(X)*implicit_curve.Normal(X);}
     Write_Tri_File_Format(output_frame,output_directory);
@@ -168,7 +168,7 @@ template<class T> void TRIANGULAR_MESHING<T>::
 Compute_Boundary_Mesh_Normals()
 {
     boundary_mesh_normals.Fill(VECTOR<T,2>());
-    for(int t=1;t<=triangle_mesh.boundary_mesh->elements.m;t++){
+    for(int t=0;t<triangle_mesh.boundary_mesh->elements.m;t++){
         int i,j;triangle_mesh.boundary_mesh->elements(t).Get(i,j);
         VECTOR<T,2> normal(-particles.X(j).y+particles.X(i).y,particles.X(j).x-particles.X(i).x);
         normal.Normalize();

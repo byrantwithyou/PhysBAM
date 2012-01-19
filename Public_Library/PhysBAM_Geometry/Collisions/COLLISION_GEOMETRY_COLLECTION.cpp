@@ -108,7 +108,7 @@ Intersection_With_Any_Simplicial_Object(RAY<TV>& ray,COLLISION_GEOMETRY_ID& body
 {
     bool hit=false;
     if(!objects){for(COLLISION_GEOMETRY_ID i(1);i<=bodies.m;i++) if(Is_Active(i) && bodies(i)->active && bodies(i)->Simplex_Intersection(ray)){body_id=i;hit=true;}}
-    else for(int k=1;k<=objects->m;k++){COLLISION_GEOMETRY_ID i=(*objects)(k);if(Is_Active(i) && bodies(i)->active && bodies(i)->Simplex_Intersection(ray)){body_id=i;hit=true;}}
+    else for(int k=0;k<objects->m;k++){COLLISION_GEOMETRY_ID i=(*objects)(k);if(Is_Active(i) && bodies(i)->active && bodies(i)->Simplex_Intersection(ray)){body_id=i;hit=true;}}
     return hit;
 }
 //##################################################################### 
@@ -119,7 +119,7 @@ Closest_Non_Intersecting_Point_Of_Any_Simplicial_Object(RAY<TV>& ray,COLLISION_G
 {
     bool hit=false;
     if(!objects){for(COLLISION_GEOMETRY_ID i(1);i<=bodies.m;i++)if(Is_Active(i) && bodies(i)->active && bodies(i)->Simplex_Closest_Non_Intersecting_Point(ray)){body_id=i;hit=true;}}
-    else for(int k=1;k<=objects->m;k++){COLLISION_GEOMETRY_ID i=(*objects)(k);if(Is_Active(i) && bodies(i)->active && bodies(i)->Simplex_Closest_Non_Intersecting_Point(ray)){body_id=i;hit=true;}}
+    else for(int k=0;k<objects->m;k++){COLLISION_GEOMETRY_ID i=(*objects)(k);if(Is_Active(i) && bodies(i)->active && bodies(i)->Simplex_Closest_Non_Intersecting_Point(ray)){body_id=i;hit=true;}}
     return hit;
 }
 //##################################################################### 
@@ -129,7 +129,7 @@ template<class TV> bool COLLISION_GEOMETRY_COLLECTION<TV>::
 Inside_Any_Simplex_Of_Any_Body(const TV& location,COLLISION_GEOMETRY_ID& body_id,int& simplex_id,const ARRAY<COLLISION_GEOMETRY_ID>* objects) const
 {
     if(!objects){for(COLLISION_GEOMETRY_ID i(1);i<=bodies.m;i++) if(Is_Active(i) && bodies(i)->active && bodies(i)->Inside_Any_Simplex(location,simplex_id)){body_id=i;return true;}}
-    else for(int k=1;k<=objects->m;k++){COLLISION_GEOMETRY_ID i=(*objects)(k);if(Is_Active(i) && bodies(i)->active && bodies(i)->Inside_Any_Simplex(location,simplex_id)){body_id=i;return true;}}
+    else for(int k=0;k<objects->m;k++){COLLISION_GEOMETRY_ID i=(*objects)(k);if(Is_Active(i) && bodies(i)->active && bodies(i)->Inside_Any_Simplex(location,simplex_id)){body_id=i;return true;}}
     return false;
 }
 //##################################################################### 
@@ -139,7 +139,7 @@ template<class TV> bool COLLISION_GEOMETRY_COLLECTION<TV>::
 Inside_Any_Body(const TV& location,const T thickness_over_two,COLLISION_GEOMETRY_ID& body_id,const ARRAY<COLLISION_GEOMETRY_ID>* objects) const
 {
     if(!objects){for(COLLISION_GEOMETRY_ID i(1);i<=bodies.m;i++) if(Is_Active(i) && bodies(i)->active && bodies(i)->Inside(location,thickness_over_two)){body_id=i;return true;}}
-    else for(int k=1;k<=objects->m;k++){COLLISION_GEOMETRY_ID i=(*objects)(k);if(Is_Active(i) && bodies(i)->active && bodies(i)->Inside(location,thickness_over_two)){body_id=i;return true;}}
+    else for(int k=0;k<objects->m;k++){COLLISION_GEOMETRY_ID i=(*objects)(k);if(Is_Active(i) && bodies(i)->active && bodies(i)->Inside(location,thickness_over_two)){body_id=i;return true;}}
     return false;
 }
 //##################################################################### 
@@ -152,7 +152,7 @@ Implicit_Geometry_Lazy_Inside_Any_Body(const TV& location,COLLISION_GEOMETRY_ID&
         for(COLLISION_GEOMETRY_ID i(1);i<=bodies.m;i++){
             if(Is_Active(i) && bodies(i)->active && bodies(i)->Implicit_Geometry_Lazy_Inside(location)){body_id=i;return true;}}}
     else{
-        for(int k=1;k<=objects->m;k++){COLLISION_GEOMETRY_ID i=(*objects)(k);
+        for(int k=0;k<objects->m;k++){COLLISION_GEOMETRY_ID i=(*objects)(k);
             if(Is_Active(i) && bodies(i)->active && bodies(i)->Implicit_Geometry_Lazy_Inside(location)){body_id=i;return true;}}}
     return false;
 }
@@ -168,7 +168,7 @@ Closest_Boundary_Point(const TV& location,const T max_distance,T& distance,COLLI
 //         current_point=bodies(i)->Closest_Point_On_Boundary(location,max_distance,(T)0,1,&current_simplex_id,&current_distance);
         current_point=bodies(i)->Simplex_Closest_Point_On_Boundary(location,max_distance,(T)0,&current_simplex_id,&current_distance);
         if(current_distance<distance){distance=current_distance;point=current_point;simplex_id=current_simplex_id;body_id=i;}}}
-    else for(int k=1;k<=objects->m;k++){COLLISION_GEOMETRY_ID i=(*objects)(k);if(Is_Active(i) && bodies(i)->active){
+    else for(int k=0;k<objects->m;k++){COLLISION_GEOMETRY_ID i=(*objects)(k);if(Is_Active(i) && bodies(i)->active){
 //         current_point=bodies(i)->Closest_Point_On_Boundary(location,max_distance,(T)0,1,&current_simplex_id,&current_distance);
         current_point=bodies(i)->Simplex_Closest_Point_On_Boundary(location,max_distance,(T)0,&current_simplex_id,&current_distance);
         if(current_distance<distance){distance=current_distance;point=current_point;simplex_id=current_simplex_id;body_id=i;}}}

@@ -399,7 +399,7 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         bool negate=parameters.Get_Parameter("Negate",(bool)false);
         FILE_UTILITIES::template Read_From_File<RW>(Animated_Filename(raw_filename,frame),*implicit_surface);
         LOG::cout<<"Grid "<<(*grid)<<std::endl;
-        if(negate) for(int i=1;i<=grid->counts.x;i++)for(int j=1;j<=grid->counts.y;j++)for(int ij=1;ij<=grid->counts.z;ij++)(*phi)(i,j,ij)=-(*phi)(i,j,ij);
+        if(negate) for(int i=0;i<grid->counts.x;i++)for(int j=0;j<grid->counts.y;j++)for(int ij=0;ij<grid->counts.z;ij++)(*phi)(i,j,ij)=-(*phi)(i,j,ij);
         T contour=parameters.Get_Parameter("Contour",(T)0);
         if(contour) *phi-=contour;
         int reinitialization_band=parameters.Get_Parameter("Reinitialization_Band",(int)5);

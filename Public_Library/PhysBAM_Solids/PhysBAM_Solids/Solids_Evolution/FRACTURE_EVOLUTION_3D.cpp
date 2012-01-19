@@ -52,7 +52,7 @@ Initialize_Bodies()
     // map fracture_bias_direction_to_rotated_space
     if(true/*spatial_fracture_bias_direction.m!=0*/){
         assert(fracture_object->fracture_bias_direction.m==fracture_object->reference_simplicial_object.mesh.elements.m);
-        for(int t=1;t<=fracture_object->fracture_bias_direction.m;t++){
+        for(int t=0;t<fracture_object->fracture_bias_direction.m;t++){
             MATRIX<T,3> Q=finite_volume.strain_measure.Ds(deformable_body_collection.particles.X,t)*finite_volume.strain_measure.Dm_inverse(t);Q.Transpose();
             fracture_object->fracture_bias_direction(t)=Q*fracture_object->fracture_bias_direction(t);}
     }//spatial_fracture_bias_direction.Resize(0);}
@@ -506,7 +506,7 @@ Process_Rigid_Fracture(const T dt,const T time,SOLIDS_EVOLUTION<TV>* rigid_defor
             COLLISION_GEOMETRY_IMPULSE_ACCUMULATOR<TV>* collision_body_impulse_accumulator=
                 rigid_body_collection.collision_body_list->Get_Collision_Geometry(rigid_body_fracture_object->particle_index)->impulse_accumulator;
             RIGID_BODY_IMPULSE_ACCUMULATOR<TV,3>& impulse_accumulator=dynamic_cast<RIGID_BODY_IMPULSE_ACCUMULATOR<TV,3>&>(*collision_body_impulse_accumulator);
-            for(int rp=1;rp<=impulse_accumulator.accumulated_node_impulses->m;rp++)if((*impulse_accumulator.accumulated_node_impulses)(rp).Magnitude_Squared()>threshold_squared){
+            for(int rp=0;rp<impulse_accumulator.accumulated_node_impulses->m;rp++)if((*impulse_accumulator.accumulated_node_impulses)(rp).Magnitude_Squared()>threshold_squared){
                 rigid_bodies_with_impulse.Append(i);break;}}
 
     if(rigid_bodies_with_impulse.m){

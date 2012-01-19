@@ -164,12 +164,12 @@ void Adjust_Density_And_Temperature_With_Sources(const T time)
 {
     if(test_number==1){
         if(!fluids_parameters.mpi_grid || !fluids_parameters.mpi_grid->Neighbor(3,2))
-            for(int i=1;i<=fluids_parameters.grid->counts.x;i++) for(int j=1;j<=fluids_parameters.grid->counts.y;j++){
+            for(int i=0;i<fluids_parameters.grid->counts.x;i++) for(int j=0;j<fluids_parameters.grid->counts.y;j++){
                 TV X=fluids_parameters.grid->X(VECTOR<int,3>(i,j,0));
                 if(VECTOR<T,2>(X.x,X.y-(T).6).Magnitude()<(T).1)
                     fluids_parameters.density_container.density(i,j,fluids_parameters.grid->counts.z-1)=(T)1;}}
     else if(test_number==2 || test_number==3){
-        for(int i=1;i<=fluids_parameters.grid->counts.x;i++) for(int j=1;j<=fluids_parameters.grid->counts.y;j++) for(int ij=1;ij<=fluids_parameters.grid->counts.z;ij++){
+        for(int i=0;i<fluids_parameters.grid->counts.x;i++) for(int j=0;j<fluids_parameters.grid->counts.y;j++) for(int ij=0;ij<fluids_parameters.grid->counts.z;ij++){
             if(source_sphere.Lazy_Inside(fluids_parameters.grid->X(i,j,ij))){
                 fluids_parameters.density_container.density(i,j,ij)=(T)1;}}}
 }

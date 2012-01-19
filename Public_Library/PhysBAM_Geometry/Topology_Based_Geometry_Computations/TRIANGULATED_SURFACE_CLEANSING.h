@@ -29,7 +29,7 @@ Close_Surface(TRIANGULATED_SURFACE<T>& ts,const bool merge_coincident_vertices,c
     ARRAY<T> minimum_incident_boundary_segment_length(ts.mesh.boundary_mesh->number_nodes,false);
     minimum_incident_boundary_segment_length.Fill(FLT_MAX);
     T maximum_boundary_segment_length=0;
-    for(int i=1;i<=ts.mesh.boundary_mesh->elements.m;i++){
+    for(int i=0;i<ts.mesh.boundary_mesh->elements.m;i++){
         int node1,node2;ts.mesh.boundary_mesh->elements(i).Get(node1,node2);
         T length=(ts.particles.X(node1)-ts.particles.X(node2)).Magnitude();
         minimum_incident_boundary_segment_length(node1)=min(minimum_incident_boundary_segment_length(node1),length);

@@ -63,7 +63,7 @@ void Initialize_Cloth_State(TRIANGLE_MESH*& triangle_mesh,PARTICLE_3D*& particle
     else{
         triangle_mesh->Initialize_Herring_Bone_Mesh(m,n);
         particles->Update_Position_And_Velocity();particles->Store_Mass();
-        for(int k=1;k<=triangle_mesh->number_nodes;k++) particles->array_collection->Add_Element();
+        for(int k=0;k<triangle_mesh->number_nodes;k++) particles->array_collection->Add_Element();
         double mass_node=aspect_ratio*sqr(side_length)/(m*n);
         copy(mass_node,particles->mass);
         for(int i=0;i<m;i++) for(int j=0;j<n;j++){

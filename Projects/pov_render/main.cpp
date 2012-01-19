@@ -89,7 +89,7 @@ void Emit_Smooth_Surface(std::ofstream& fout,TRIANGULATED_SURFACE<T>* ts, const 
         LOG::cout<<"Texture mapping file data:  "<<texture_map_file<<"  "<<coords.m<<"  "<<ignore<<"  "<<map.m<<"  "<<ts->mesh.elements.m<<std::endl;
     }
 
-    for(int i=1;i<=ts->mesh.elements.m;i++){
+    for(int i=0;i<ts->mesh.elements.m;i++){
         fout<<"smooth_triangle { ";
         VECTOR<TV,3> X(ts->particles.X.Subset(ts->mesh.elements(i)));
         VECTOR<TV,3> N;
@@ -122,7 +122,7 @@ void Emit_Rigid_Body(std::ofstream& fout,const HASHTABLE<std::string,std::string
     RIGID_BODY<TV>& rigid_body=collection.Rigid_Body(atoi(options.Get("index").c_str()));
 
     TRIANGULATED_SURFACE<T>* ts=rigid_body.simplicial_object->Create_Compact_Copy();
-    for(int i=1;i<=ts->particles.X.m;i++) ts->particles.X(i)=rigid_body.Frame()*ts->particles.X(i);
+    for(int i=0;i<ts->particles.X.m;i++) ts->particles.X(i)=rigid_body.Frame()*ts->particles.X(i);
 
     Apply_Options(ts,options);
     Emit_Smooth_Surface(fout,ts,options);

@@ -195,14 +195,14 @@ void Skeleton_In_Flesh()
     arb->Update_With_Breadth_First_Directed_Graph(root);
 
     // make joint functions to try to keep this pose
-    for(int i=1;i<=da_man->joint.m;i++) if(da_man->joint(i)){
+    for(int i=0;i<da_man->joint.m;i++) if(da_man->joint(i)){
         da_man->Create_Joint_Function(i);JOINT_FUNCTION<TV>* joint_function=da_man->joint(i)->joint_function;
         joint_function->muscle_control=use_muscle_control;
         joint_function->Set_k_p(k_p);
         joint_function->Set_Target_Angle(joint_function->Angle());
     }
 
-    for(int i=1;i<=da_man->muscles.m;i++) if(da_man->muscles(i)){
+    for(int i=0;i<da_man->muscles.m;i++) if(da_man->muscles(i)){
         T length=da_man->muscles(i)->Total_Length();
         T total_rest_length=da_man->muscles(i)->optimal_length + da_man->muscles(i)->tendon_slack_length;
         if(total_rest_length>1.5*length){
@@ -224,7 +224,7 @@ void Skeleton_In_Flesh()
 */
     if(arb->use_muscle_actuators){
         LOG::cout<<"Joints with only muscle control"<<std::endl;
-        for(int i=1;i<=arb->joint_mesh.joints.m;i++) if(arb->joint_mesh.joints(i)->joint_function && arb->joint_mesh.joints(i)->joint_function->muscle_control)
+        for(int i=0;i<arb->joint_mesh.joints.m;i++) if(arb->joint_mesh.joints(i)->joint_function && arb->joint_mesh.joints(i)->joint_function->muscle_control)
             LOG::cout<<"\t"<<arb->joint_mesh.joints(i)->name<<std::endl;}
     for(int i(1);i<=rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if(rigid_body_collection.Is_Active(i)) rigid_body_collection.Rigid_Body(i).Set_Coefficient_Of_Friction(1);
 }

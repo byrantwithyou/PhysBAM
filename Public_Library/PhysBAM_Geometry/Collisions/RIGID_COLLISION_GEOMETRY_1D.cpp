@@ -31,7 +31,7 @@ Earliest_Simplex_Crossover(const VECTOR<T,1>& start_X,const VECTOR<T,1>& end_X,c
     const T collision_thickness_over_two=(T).5*collision_thickness;
     T min_time=FLT_MAX;bool collision=false;T current_hit_time,relative_speed;ONE current_weight;
     TV normal;
-    for(int segment_number=1;segment_number<=rigid_geometry.simplicial_object->mesh.elements.m;segment_number++){
+    for(int segment_number=0;segment_number<rigid_geometry.simplicial_object->mesh.elements.m;segment_number++){
         POINT_SIMPLEX_1D<T> initial_segment=World_Space_Simplex(segment_number),final_segment=World_Space_Simplex(segment_number,saved_states(1).x);
         POINT_SIMPLEX_COLLISION_TYPE collision_type=
             CONTINUOUS_COLLISION_DETECTION_COMPUTATIONS::Robust_Point_Point_Collision(initial_segment,final_segment,start_X,end_X,dt,collision_thickness_over_two,current_hit_time,normal,current_weight,relative_speed);
@@ -66,7 +66,7 @@ Any_Simplex_Crossover(const VECTOR<T,1>& start_X,const VECTOR<T,1>& end_X,const 
     const T collision_thickness_over_two=(T).5*collision_thickness;
     T current_hit_time,relative_speed;ONE current_weight;
     TV normal;
-    for(int segment_number=1;segment_number<=rigid_geometry.simplicial_object->mesh.elements.m;segment_number++){
+    for(int segment_number=0;segment_number<rigid_geometry.simplicial_object->mesh.elements.m;segment_number++){
         POINT_SIMPLEX_1D<T> initial_segment=World_Space_Simplex(segment_number),final_segment=World_Space_Simplex(segment_number,saved_states(1).x);
         POINT_SIMPLEX_COLLISION_TYPE collision_type=
             CONTINUOUS_COLLISION_DETECTION_COMPUTATIONS::Robust_Point_Point_Collision(initial_segment,final_segment,start_X,end_X,dt,collision_thickness_over_two,current_hit_time,normal,current_weight,relative_speed);
@@ -80,7 +80,7 @@ template<class T> void RIGID_COLLISION_GEOMETRY<VECTOR<T,1> >::
 Get_Simplex_Bounding_Boxes(ARRAY<RANGE<TV> >& bounding_boxes,const bool with_body_motion,const T extra_thickness,const T body_thickness_factor) const
 {
     if(!rigid_geometry.simplicial_object->point_simplex_list) rigid_geometry.simplicial_object->Update_Point_Simplex_List();
-    for(int t=1;t<=rigid_geometry.simplicial_object->mesh.elements.m;t++){
+    for(int t=0;t<rigid_geometry.simplicial_object->mesh.elements.m;t++){
         RANGE<TV> box=rigid_geometry.World_Space_Simplex_Bounding_Box(t);
         if(with_body_motion) box.Enlarge_To_Include_Box(rigid_geometry.World_Space_Simplex_Bounding_Box(t,saved_states(1).x));
         box.Change_Size(extra_thickness+body_thickness_factor*collision_thickness);

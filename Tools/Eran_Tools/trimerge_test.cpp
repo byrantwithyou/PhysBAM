@@ -36,11 +36,11 @@ void Do_It()
         surface->Discard_Valence_Zero_Particles_And_Renumber();
         int old_number_of_particles=merged_surface->particles.number,old_number_of_triangles=merged_surface->triangle_mesh.triangles.m;
         merged_surface->particles.Add_Particles(surface->particles.number);
-        for(int p=1;p<=surface->particles.number;p++){
+        for(int p=0;p<surface->particles.number;p++){
             surface->particles.X(p)=xform*surface->particles.X(p);
             merged_surface->particles.Copy_Particle(surface->particles,p,old_number_of_particles+p);}
         merged_surface->triangle_mesh.triangles.Resize(3,merged_surface->triangle_mesh.triangles.m+surface->triangle_mesh.triangles.m);
-        for(int t=1;t<=surface->triangle_mesh.triangles.m;t++){int node1,node2,node3;surface->triangle_mesh.triangles.Get(t,node1,node2,node3);
+        for(int t=0;t<surface->triangle_mesh.triangles.m;t++){int node1,node2,node3;surface->triangle_mesh.triangles.Get(t,node1,node2,node3);
             merged_surface->triangle_mesh.triangles.Set(old_number_of_triangles+t,node1+old_number_of_particles,node2+old_number_of_particles,node3+old_number_of_particles);}}
 
     merged_surface->triangle_mesh.number_nodes=merged_surface->particles.number;

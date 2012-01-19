@@ -299,7 +299,7 @@ void PD_Plank_Curl_Test(int& num_joints,int& num_rigid_bodies,TV shift,ROTATION<
         child_body=0;
         joint=0;
     }
-    for(int i=1;i<=arb->joint_mesh.joints.m;i++){
+    for(int i=0;i<arb->joint_mesh.joints.m;i++){
         LOG::cout<<"Desired rotation for joint "<<i<<" is "<<arb->joint_mesh.joints(i)->joint_function->target_angle<<std::endl;}
 
     LOG::cout<<"initializing point joint example"<<std::endl;
@@ -548,7 +548,7 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
     PHYSBAM_FATAL_ERROR("pd is now done in the framework");
     if(traditional_pd){
         precomputed_pd_torques.Resize(solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size());precomputed_pd_torques.Fill(TV());
-        for(int i=1;i<=arb->joint_mesh.joints.m;i++) if(arb->joint_mesh.joints(i)->joint_function){
+        for(int i=0;i<arb->joint_mesh.joints.m;i++) if(arb->joint_mesh.joints(i)->joint_function){
             JOINT<TV>* joint=arb->joint_mesh.joints(i);JOINT_FUNCTION<TV>* jfunc=joint->joint_function;
             RIGID_BODY<TV>* parent=arb->Parent(joint->id_number),*child=arb->Child(joint->id_number);
             ROTATION<TV> Fp_wj=parent->Rotation()*joint->F_pj().r;

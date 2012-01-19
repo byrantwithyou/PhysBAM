@@ -121,7 +121,7 @@ Initialize_Original_Embedding(const TETRAHEDRALIZED_VOLUME<T>& original_tetrahed
             regions_per_tet(tet)(1).Append(current_cutting_polygons.m);}}
     // intersection registry (vertices)
     const ARRAY<ARRAY<int> >& faces_on_vertices=*current_tetrahedralized_volume->mesh.triangle_mesh->incident_elements;
-    for(int node=1;node<=current_tetrahedralized_volume->mesh.number_nodes;node++){ARRAY<int> simplices;
+    for(int node=0;node<current_tetrahedralized_volume->mesh.number_nodes;node++){ARRAY<int> simplices;
         ARRAY<VECTOR<T,2> > all_weights(faces_on_vertices(node).m);
         for(int i=1;i<=faces_on_vertices(node).m;i++){int face=faces_on_vertices(node)(i);
             int parent;bool found=embedding_face_to_simplex.Get(face,parent);if(!found) PHYSBAM_FATAL_ERROR();
@@ -574,7 +574,7 @@ Split_Existing_Polygons()
 {
     // TODO: What's the purpose of polygons_per_element???
     polygons_per_element=CONSTANT_ARRAY<ARRAY<int> >(current_tetrahedralized_volume->mesh.elements.m,ARRAY<int>());
-    for(int tet=1;tet<=current_tetrahedralized_volume->mesh.elements.m;tet++){
+    for(int tet=0;tet<current_tetrahedralized_volume->mesh.elements.m;tet++){
         const ARRAY<int>& simplices=simplices_per_current_tet(tet);
         int last_old_simplex_index=last_old_simplex_index_per_current_tet(tet);
         for(int i=1;i<=last_old_simplex_index;++i){
@@ -616,7 +616,7 @@ Split_Existing_Polygons()
 template<class T> void CUTTING_TETRAHEDRALIZED_VOLUME<T>::
 Add_Polygons_On_New_Simplices()
 {
-    for(int tet=1;tet<=current_tetrahedralized_volume->mesh.elements.m;tet++){
+    for(int tet=0;tet<current_tetrahedralized_volume->mesh.elements.m;tet++){
         if(verbose) LOG::cout<<"polygons_per_element("<<tet<<")="<<polygons_per_element(tet)<<std::endl;
         const ARRAY<int>& simplices=simplices_per_current_tet(tet);
         int last_old_simplex_index=last_old_simplex_index_per_current_tet(tet);
@@ -1038,7 +1038,7 @@ Find_Material_Regions()
     const ARRAY<ARRAY<ARRAY<PAIR<int,bool> > > >& element_oriented_edges=*polygon_mesh.element_oriented_edges;
     regions_per_tet.Clean_Memory();
     regions_per_tet.Resize(current_tetrahedralized_volume->mesh.elements.m);
-    for(int tet=1;tet<=current_tetrahedralized_volume->mesh.elements.m;tet++){const ARRAY<int>& polygons=polygons_per_element(tet);
+    for(int tet=0;tet<current_tetrahedralized_volume->mesh.elements.m;tet++){const ARRAY<int>& polygons=polygons_per_element(tet);
         HASHTABLE<int,int> polygon_element_to_cutting_polygon;
         for(int i=0;i<polygons.m;i++) polygon_element_to_cutting_polygon.Insert(current_cutting_polygons(polygons(i)).polygon_index,polygons(i));
         if(verbose) LOG::cout<<"Tet "<<tet<<" has all polygons: "<<polygons<<std::endl;
@@ -1469,7 +1469,7 @@ Build_New_Cutting_Simplices_And_Intersection_Registry()
 template<class T> void CUTTING_TETRAHEDRALIZED_VOLUME<T>::
 Add_Cuts_To_New_Cutting_Simplices(CUTTING_SIMPLICES<T,3>& new_cutting_simplices,HASHTABLE<int,int>& old_cut_to_new_cut) const
 {
-    for(int i=1;i<=cutting_simplices->simplices.m;i++) if(cutting_simplices->simplices(i).type==CUTTING_SIMPLEX<T,3>::GLOBAL_CUT_FACE){
+    for(int i=0;i<cutting_simplices->simplices.m;i++) if(cutting_simplices->simplices(i).type==CUTTING_SIMPLEX<T,3>::GLOBAL_CUT_FACE){
         int new_index=new_cutting_simplices.Add_Simplex(cutting_simplices->simplices(i).nodes,CUTTING_SIMPLEX<T,3>::GLOBAL_CUT_FACE);
         old_cut_to_new_cut.Insert(i,new_index);}
 }

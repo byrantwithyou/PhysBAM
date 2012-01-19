@@ -96,7 +96,7 @@ Add_Rigid_Body_And_Geometry(RIGID_BODY<TV>* rigid_body)
     int id=rigid_body->particle_index;
     assert(rigid_body->structures.m<=3);
     rigid_body_particle.structure_ids(id)=VECTOR<int,3>();
-    for(int s=1;s<=rigid_body->structures.m;s++) rigid_body_particle.structure_ids(id)(s)=rigid_geometry_collection.structure_list.Add_Element(rigid_body->structures(s));
+    for(int s=0;s<rigid_body->structures.m;s++) rigid_body_particle.structure_ids(id)(s)=rigid_geometry_collection.structure_list.Add_Element(rigid_body->structures(s));
     return id;
 }
 //#####################################################################

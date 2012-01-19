@@ -197,7 +197,7 @@ List_Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
                 HASHTABLE<int> component_done;
                 for(int p=0;p<label.m;p++) if(component_done.Set(label(p))){
                     TETRAHEDRALIZED_VOLUME<T>* component_volume=TETRAHEDRALIZED_VOLUME<T>::Create(deformable_body_collection.particles);
-                    for(int t=1;t<=volume->mesh.elements.m;t++) if(label.Subset(volume->mesh.elements(t)).Contains(label(p)))
+                    for(int t=0;t<volume->mesh.elements.m;t++) if(label.Subset(volume->mesh.elements(t)).Contains(label(p)))
                         component_volume->mesh.elements.Append(volume->mesh.elements(t));
                     component_volume->Update_Number_Nodes();
                     deformable_body_collection.Add_Structure(component_volume);}

@@ -167,7 +167,7 @@ Get_Objects_Intersecting_Particle(const int particle_index,ARRAY<ELEMENT>& trian
 
     // check all candidate rigid bodies
     if(ARRAY<RIGID_COLLISION_GEOMETRY<TV>*>* rigid_bodies_candidates=particle_rigid_body_candidates.Get_Pointer(particle_index)){
-        for(int i=1;i<=rigid_bodies_candidates->m;i++){
+        for(int i=0;i<rigid_bodies_candidates->m;i++){
             const RIGID_GEOMETRY<TV>& rigid_geometry=(*rigid_bodies_candidates)(i)->rigid_geometry;
             if(rigid_geometry.Implicit_Geometry_Lazy_Inside(location,solids_parameters.rigid_body_collision_parameters.collision_body_thickness)){
                 bodies.Append(rigid_geometry.particle_index);
@@ -636,7 +636,7 @@ Process_Contact(const T dt,const T time,ARTICULATED_RIGID_BODY<TV>* articulated_
 
                 // prestabilization
                 if(articulated_rigid_body)
-                    for(int i=1;i<=articulated_rigid_body->contact_level_iterations;i++) for(int j=1;j<=articulated_rigid_body->process_list(level).m;j++){
+                    for(int i=0;i<articulated_rigid_body->contact_level_iterations;i++) for(int j=1;j<=articulated_rigid_body->process_list(level).m;j++){
                         rigid_body_collisions.Apply_Prestabilization_To_Joint(dt,time,*articulated_rigid_body,articulated_rigid_body->process_list(level)(j),epsilon_scale);
                         need_another_level_iteration=need_another_iteration=true;}
 

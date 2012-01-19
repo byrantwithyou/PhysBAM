@@ -313,7 +313,7 @@ void Get_Initial_Data(TRIANGULATED_SURFACE<T>& triangulated_surface)
     if(!neighbor_nodes_defined){delete triangle_mesh.neighbor_nodes;triangle_mesh.neighbor_nodes=0;}
     
     collision_surface->triangle_mesh.triangles.Append_Elements(triangle_mesh.triangles);
-    for(int t=1;t<=collision_surface->triangle_mesh.triangles.m;t++){
+    for(int t=0;t<collision_surface->triangle_mesh.triangles.m;t++){
         int i,j,k;triangle_mesh.triangles.Get(t,i,j,k);
         if(disabled1(i)>0 || disabled1(j)>0 || disabled1(k)>0)collision_surface->triangle_mesh.triangles(1,t)=0;}
     collision_surface->triangle_mesh.Delete_Triangles_With_Missing_Nodes();
@@ -326,7 +326,7 @@ void Get_Initial_Data(TRIANGULATED_SURFACE<T>& triangulated_surface)
 
     visual_mesh.triangles.Append_Elements(triangle_mesh.triangles);
     visual_mesh.triangles.Append_Elements(buddha_volume.triangulated_surface->triangle_mesh.triangles);
-    for(int t=1;t<=buddha_volume.triangulated_surface->triangle_mesh.triangles.m;t++)for(int a=0;a<3;a++)
+    for(int t=0;t<buddha_volume.triangulated_surface->triangle_mesh.triangles.m;t++)for(int a=0;a<3;a++)
         visual_mesh.triangles(a,t+triangle_mesh.triangles.m)+=particles.array_collection->Size();
     visual_mesh.number_nodes=particles.array_collection->Size()+buddha_particles.array_collection->Size();
     visual_particles.Initialize_Particles(particles);
@@ -449,7 +449,7 @@ void Update_Rigid_Body_Velocities(ARRAY<RIGID_BODY<TV>*>& rigid_bodies,const T t
 void Cape_Set_Positions(const T time)
 {
     //Read_Fractional_Buddha(time);
-    for(int p=1;p<=full_particles->number;p++){
+    for(int p=0;p<full_particles->number;p++){
         int t=attachments(p);if(t<=0)continue;
         int i,j,k,l;buddha_mesh.tetrahedrons.Get(t,i,j,k,l);
         VECTOR_3D<T> w=barycentric_coordinates(p);
@@ -462,7 +462,7 @@ void Cape_Set_Positions(const T time)
 void Set_External_Velocities(ARRAY<VECTOR_3D<T> ,VECTOR<int,1> >& V,const T time)
 {
     Read_Fractional_Buddha(time);
-    for(int p=1;p<=full_particles->number;p++){
+    for(int p=0;p<full_particles->number;p++){
         int t=attachments(p);if(t<=0)continue;
         int i,j,k,l;buddha_mesh.tetrahedrons.Get(t,i,j,k,l);
         VECTOR_3D<T> w=barycentric_coordinates(p);
@@ -474,7 +474,7 @@ void Set_External_Velocities(ARRAY<VECTOR_3D<T> ,VECTOR<int,1> >& V,const T time
 // for external forces and velocities
 void Zero_Out_Enslaved_Velocity_Nodes(ARRAY<VECTOR_3D<T> ,VECTOR<int,1> >& V,const T time)
 {
-    for(int p=1;p<=full_particles->number;p++)if(attachments(p)>0)V(p)=VECTOR_3D<T>(0);
+    for(int p=0;p<full_particles->number;p++)if(attachments(p)>0)V(p)=VECTOR_3D<T>(0);
 }
 //#####################################################################
 // Function Initialize_Triangulated_Surface_Collisions

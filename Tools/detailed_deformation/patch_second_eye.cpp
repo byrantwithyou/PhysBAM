@@ -68,7 +68,7 @@ int main(int argc,char *argv[])
     BOX_3D<float> left_box(left_center-(float).5*left_edges,left_center+(float).5*left_edges);
     
     cout<<"Process bounding box..."<<endl;
-    for(int i=1;i<=tet_vol.triangulated_surface->triangle_mesh.triangles.m;i++){
+    for(int i=0;i<tet_vol.triangulated_surface->triangle_mesh.triangles.m;i++){
         int j,k,l;tet_vol.triangulated_surface->triangle_mesh.triangles.Get(i,j,k,l);
         if((!left_box.Inside(tet_particles.X(j))||!left_box.Inside(tet_particles.X(k))||!left_box.Inside(tet_particles.X(l))))deletion_list.Append(i);}
 
@@ -148,7 +148,7 @@ int main(int argc,char *argv[])
     VECTOR_3D<float> interior_color(.88,.67,.63);
     cout<<"Interior color is: "<<interior_color<<endl;
     cout<<"Adding tet triangles and particles to tri mesh..."<<endl;
-    for(int i=1;i<=tet_vol.triangulated_surface->triangle_mesh.triangles.m;i++){
+    for(int i=0;i<tet_vol.triangulated_surface->triangle_mesh.triangles.m;i++){
         int j,k,l;tet_vol.triangulated_surface->triangle_mesh.triangles.Get(i,j,k,l);
         if(!particle_map(l)){
             tri_particles.Add_Particle();particle_map(l)=tri_particles.number;tri_particles.X(tri_particles.number)=tet_particles.X(l);tri_mesh.number_nodes++;old_nodes.Append_Unique(tri_particles.number);}

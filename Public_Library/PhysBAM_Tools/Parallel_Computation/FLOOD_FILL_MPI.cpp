@@ -145,7 +145,7 @@ Synchronize_Colors()
     // remap color_touches_uncolorable
     if(color_touches_uncolorable){
         ARRAY<bool> new_color_touches_uncolorable(number_of_regions);
-        for(int i=1;i<=color_touches_uncolorable->m;i++)if(color_map(i)>0) new_color_touches_uncolorable(color_map(i))|=(*color_touches_uncolorable)(i);
+        for(int i=0;i<color_touches_uncolorable->m;i++)if(color_map(i)>0) new_color_touches_uncolorable(color_map(i))|=(*color_touches_uncolorable)(i);
         color_touches_uncolorable->Exchange(new_color_touches_uncolorable);
         // synchronize color_touches_uncolorable, TODO: this could be merged with above communication
         ARRAY<bool> global_color_touches_uncolorable(color_ranks.m);
@@ -193,7 +193,7 @@ Synchronize_Colors_Threaded()
     pthread_barrier_wait(mpi_grid.threaded_grid->barr);
     {for(int side=2;side<=T_PARALLEL_GRID::number_of_faces_per_cell;side+=2)if(mpi_grid.threaded_grid->side_neighbor_ranks(side)!=-1){
         Resize_Helper(colors_copy(side),local_grid,boundary_regions(side));
-        int index=0;for(int i=1;i<=mpi_grid.threaded_grid->buffers.m;i++) if(mpi_grid.threaded_grid->buffers(i).send_tid==mpi_grid.threaded_grid->side_neighbor_ranks(side) && mpi_grid.threaded_grid->buffers(i).recv_tid==mpi_grid.threaded_grid->rank) index=i;
+        int index=0;for(int i=0;i<mpi_grid.threaded_grid->buffers.m;i++) if(mpi_grid.threaded_grid->buffers(i).send_tid==mpi_grid.threaded_grid->side_neighbor_ranks(side) && mpi_grid.threaded_grid->buffers(i).recv_tid==mpi_grid.threaded_grid->rank) index=i;
         PHYSBAM_ASSERT(index);int position=0;
         for(CELL_ITERATOR iterator(local_grid,boundary_regions(side));iterator.Valid();iterator.Next()) colors_copy(side).Unpack(mpi_grid.threaded_grid->buffers(index).buffer,position,iterator.Cell_Index());
         Find_Color_Matches(color_map,union_find,colors_copy(side),boundary_regions(side),global_color_offset);}}
@@ -210,7 +210,7 @@ Synchronize_Colors_Threaded()
     mpi_grid.threaded_grid->buffers.Append(pack);
     pthread_mutex_unlock(mpi_grid.threaded_grid->lock);}
     pthread_barrier_wait(mpi_grid.threaded_grid->barr);
-    for(int buf=1;buf<=mpi_grid.threaded_grid->buffers.m;buf++){int position=0;
+    for(int buf=0;buf<mpi_grid.threaded_grid->buffers.m;buf++){int position=0;
         union_find.parents.Resize(*(int*)(&pack.buffer(position+1)));position+=sizeof(int);union_find.ranks.Resize(*(int*)(&pack.buffer(position+1)));position+=sizeof(int);
         for(int i=0;i<union_find.parents.m;i++) union_find.parents.Unpack(mpi_grid.threaded_grid->buffers(buf).buffer,position,i);for(int i=0;i<union_find.ranks.m;i++) union_find.ranks.Unpack(mpi_grid.threaded_grid->buffers(buf).buffer,position,i);
         final_union_find.Merge(union_find);}
@@ -244,7 +244,7 @@ Synchronize_Colors_Threaded()
     // remap color_touches_uncolorable
     if(color_touches_uncolorable){
         ARRAY<bool> new_color_touches_uncolorable(number_of_regions);
-        for(int i=1;i<=color_touches_uncolorable->m;i++)if(color_map(i)>0) new_color_touches_uncolorable(color_map(i))|=(*color_touches_uncolorable)(i);
+        for(int i=0;i<color_touches_uncolorable->m;i++)if(color_map(i)>0) new_color_touches_uncolorable(color_map(i))|=(*color_touches_uncolorable)(i);
         color_touches_uncolorable->Exchange(new_color_touches_uncolorable);
         // synchronize color_touches_uncolorable, TODO: this could be merged with above communication
         ARRAY<bool> global_color_touches_uncolorable(color_ranks.m);
@@ -255,7 +255,7 @@ Synchronize_Colors_Threaded()
         mpi_grid.threaded_grid->buffers.Append(pack);
         pthread_mutex_unlock(mpi_grid.threaded_grid->lock);}
         pthread_barrier_wait(mpi_grid.threaded_grid->barr);
-        for(int buf=1;buf<=mpi_grid.threaded_grid->buffers.m;buf++){int position=0;
+        for(int buf=0;buf<mpi_grid.threaded_grid->buffers.m;buf++){int position=0;
             for(int i=0;i<global_color_touches_uncolorable.m;i++) global_color_touches_uncolorable.Unpack(mpi_grid.threaded_grid->buffers(buf).buffer,position,i);
             for(int i=0;i<global_color_touches_uncolorable.m;i++) (*color_touches_uncolorable)(i)|=global_color_touches_uncolorable(i);}
         pthread_barrier_wait(mpi_grid.threaded_grid->barr);

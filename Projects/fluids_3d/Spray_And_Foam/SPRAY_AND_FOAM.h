@@ -206,7 +206,7 @@ void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 void Adjust_Density_And_Temperature_With_Sources(const T time) PHYSBAM_OVERRIDE
 {
     // keep density >= 0 and T >=0
-    for(int i=1;i<=fluids_parameters.grid->counts.x;i++)for(int j=1;j<=fluids_parameters.grid->counts.y;j++)for(int ij=1;ij<=fluids_parameters.grid->counts.z;ij++){
+    for(int i=0;i<fluids_parameters.grid->counts.x;i++)for(int j=0;j<fluids_parameters.grid->counts.y;j++)for(int ij=0;ij<fluids_parameters.grid->counts.z;ij++){
         if(interpolated_water_phi(i,j,ij)<=0)
             fluids_parameters.density_container.density(i,j,ij)=0;
         else
@@ -260,7 +260,7 @@ void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
 
 /*
     BOX<VECTOR<T,3> > source_domain(15,17,15,17,19,21);
-    for(int i=1;i<=fluids_parameters.grid->m;i++)for(int j=1;j<=fluids_parameters.grid->n;j++)for(int ij=1;ij<=fluids_parameters.grid->mn;ij++)if(source_domain.Lazy_Inside(fluids_parameters.grid->X(i,j,ij))){
+    for(int i=0;i<fluids_parameters.grid->m;i++)for(int j=0;j<fluids_parameters.grid->n;j++)for(int ij=0;ij<fluids_parameters.grid->mn;ij++)if(source_domain.Lazy_Inside(fluids_parameters.grid->X(i,j,ij))){
         fluids_parameters.density_container.density(i,j,ij)=1;}
 */
 

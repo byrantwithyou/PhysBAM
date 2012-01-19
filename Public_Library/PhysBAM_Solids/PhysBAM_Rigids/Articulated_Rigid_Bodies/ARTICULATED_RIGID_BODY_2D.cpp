@@ -53,7 +53,7 @@ Compute_Position_Based_State(const T dt,const T time)
                     T moment_arm=TV::Cross_Product(muscle_attachments.y->Embedded_Position()-location,direction).x;
                     muscles_crossing_joints(i).Append(PAIR<int,T>(muscle_attachments.x,moment_arm));
                     LOG::cout<<"joint "<<i<<" muscle "<<j<<" moment arm "<<moment_arm<<std::endl;}}
-        for(int i=1;i<=muscle_list->muscles.m;i++){muscle_list->muscles(i)->Update_Segments();}}
+        for(int i=0;i<muscle_list->muscles.m;i++){muscle_list->muscles(i)->Update_Segments();}}
 }
 //####################################################################################
 // Compute_Target_PD_Angular_Impulse

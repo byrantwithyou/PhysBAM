@@ -356,7 +356,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
                     COLLISION_GEOMETRY<TV>& body=*collision_bodies_affecting_fluid.collision_geometry_collection.bodies(i);
                     if(!body.active) continue;
                     if(DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>* deformable=dynamic_cast<DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>*>(&body))
-                        for(int simplex=1;simplex<=deformable->object.mesh.elements.m;simplex++){
+                        for(int simplex=0;simplex<deformable->object.mesh.elements.m;simplex++){
                             RANGE<TV> simplex_bounding_box(particles.X(deformable->object.mesh.elements(simplex)(1)));
                             for(int node=2;node<=deformable->object.mesh.dimension;node++) simplex_bounding_box.Enlarge_To_Include_Point(particles.X(deformable->object.mesh.elements(simplex)(node)));
                             if(grid_domain.Lazy_Intersection(simplex_bounding_box)){
@@ -693,7 +693,7 @@ Compute_W(const T current_position_time)
                 if(!thin_shell) PHYSBAM_NOT_IMPLEMENTED();
                 mesh=&thin_shell->mesh;}
             else PHYSBAM_FATAL_ERROR();
-            for(int e=1;e<=mesh->elements.m;e++){
+            for(int e=0;e<mesh->elements.m;e++){
                 const RANGE<TV>& box=body.World_Space_Simplex(e).Bounding_Box();
                 RANGE<TV_INT> bounding_grid_cells(grid.Clamp_To_Cell(box.min_corner,1),grid.Clamp_To_Cell(box.max_corner,1));
                 for(CELL_ITERATOR iterator(grid,bounding_grid_cells);iterator.Valid();iterator.Next())

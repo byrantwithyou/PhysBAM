@@ -157,7 +157,7 @@ public:
 
     void Rescale_Texture_Coordinates(T scale)
     {assert(texture_coordinates);
-    for(int i=1;i<=texture_coordinates->m;i++)
+    for(int i=0;i<texture_coordinates->m;i++)
     {T x_rescaled=(*texture_coordinates)(i).x*scale,y_rescaled=(*texture_coordinates)(i).y*scale;
     (*texture_coordinates)(i).x=x_rescaled-floor(x_rescaled);
     (*texture_coordinates)(i).y=y_rescaled-floor(y_rescaled);}}

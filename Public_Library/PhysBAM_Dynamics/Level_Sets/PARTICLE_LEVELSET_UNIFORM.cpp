@@ -184,13 +184,13 @@ template<class T_GRID> void PARTICLE_LEVELSET_UNIFORM<T_GRID>::
 Modify_Levelset_Using_Escaped_Particles(T_FACE_ARRAYS_SCALAR* V,ARRAY<T_ARRAYS_PARTICLE_LEVELSET_PARTICLES*>* other_positive_particles)
 {
     if(bias_towards_negative_particles){
-        if(other_positive_particles)for(int i=1;i<=other_positive_particles->m;i++)Modify_Levelset_Using_Escaped_Particles(levelset.phi,*(*other_positive_particles)(i),0,1);
+        if(other_positive_particles)for(int i=0;i<other_positive_particles->m;i++)Modify_Levelset_Using_Escaped_Particles(levelset.phi,*(*other_positive_particles)(i),0,1);
         Modify_Levelset_Using_Escaped_Particles(levelset.phi,positive_particles,0,1);Modify_Levelset_Using_Escaped_Particles(levelset.phi,negative_particles,0,-1);
         if(reincorporate_removed_particles_everywhere) Modify_Levelset_Using_Escaped_Particles(levelset.phi,removed_negative_particles,V,-1);}
     else{
         T_ARRAYS_SCALAR phi_minus(levelset.phi),phi_plus(levelset.phi);
         Modify_Levelset_Using_Escaped_Particles(phi_minus,negative_particles,0,-1);Modify_Levelset_Using_Escaped_Particles(phi_plus,positive_particles,0,1);
-        if(other_positive_particles)for(int i=1;i<=other_positive_particles->m;i++)Modify_Levelset_Using_Escaped_Particles(phi_plus,*(*other_positive_particles)(i),0,1);
+        if(other_positive_particles)for(int i=0;i<other_positive_particles->m;i++)Modify_Levelset_Using_Escaped_Particles(phi_plus,*(*other_positive_particles)(i),0,1);
         if(reincorporate_removed_particles_everywhere) Modify_Levelset_Using_Escaped_Particles(phi_minus,removed_negative_particles,V,-1);
         for(CELL_ITERATOR iterator(levelset.grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();levelset.phi(cell)=minmag(phi_minus(cell),phi_plus(cell));}}
 }

@@ -53,7 +53,7 @@ Create_Material_Surface_From_Manifold_Embedded_Surface(const bool verbose)
     for(int t=0;t<mesh.elements.m;t++) node_is_material.Subset(mesh.elements(t))=embedded_object.node_in_simplex_is_material(t);
     bool boundary_mesh_defined=mesh.boundary_mesh!=0;if(!boundary_mesh_defined) mesh.Initialize_Boundary_Mesh();
     // TODO: the following loop only does something when part of the simulation boundary is real boundary, but this function doesn't handle that case correctly
-    for(int t=1;t<=mesh.boundary_mesh->elements.m;t++){ // add pure material tetrahedron faces to boundary mesh
+    for(int t=0;t<mesh.boundary_mesh->elements.m;t++){ // add pure material tetrahedron faces to boundary mesh
         VECTOR<int,3>& triangle=mesh.boundary_mesh->elements(t);
         if(node_is_material(triangle.x) && node_is_material(triangle.y) && node_is_material(triangle.z)) material_surface_mesh.elements.Append(triangle);}
     if(!boundary_mesh_defined){delete mesh.boundary_mesh;mesh.boundary_mesh=0;}

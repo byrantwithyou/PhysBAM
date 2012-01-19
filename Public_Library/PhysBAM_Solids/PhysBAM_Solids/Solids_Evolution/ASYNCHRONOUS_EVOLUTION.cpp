@@ -472,7 +472,7 @@ Set_Force_Active_Particles(DEFORMABLES_FORCES<TV>* force,const ARRAY<bool>& fine
     ARRAY<int> list;
     FORCE_ELEMENTS* fe=0;
     if(LINEAR_SPRINGS<TV>* spring=dynamic_cast<LINEAR_SPRINGS<TV>*>(force)){
-        for(int i=1;i<=spring->segment_mesh.elements.m;i++) if(fine_list.Subset(spring->segment_mesh.elements(i)).Contains(false)!=is_fine) list.Append(i);
+        for(int i=0;i<spring->segment_mesh.elements.m;i++) if(fine_list.Subset(spring->segment_mesh.elements(i)).Contains(false)!=is_fine) list.Append(i);
         fe=&spring->force_segments;
         if(!is_fine) for(int i=0;i<list.m;i++) for(int j=0;j<2;j++) coarsescale_forces_particles_map.Set(spring->segment_mesh.elements(list(i))(j));}
     else if(GRAVITY<TV>* gravity=dynamic_cast<GRAVITY<TV>*>(force)){
@@ -480,7 +480,7 @@ Set_Force_Active_Particles(DEFORMABLES_FORCES<TV>* force,const ARRAY<bool>& fine
         fe=&gravity->force_particles;
         if(!is_fine) coarsescale_forces_particles_map.Set_All(list);}
     else if(LINEAR_ALTITUDE_SPRINGS<TV,3>* spring=dynamic_cast<LINEAR_ALTITUDE_SPRINGS<TV,3>*>(force)){
-        for(int i=1;i<=spring->mesh.elements.m;i++) if(fine_list.Subset(spring->mesh.elements(i)).Contains(false)!=is_fine) list.Append(i);
+        for(int i=0;i<spring->mesh.elements.m;i++) if(fine_list.Subset(spring->mesh.elements(i)).Contains(false)!=is_fine) list.Append(i);
         fe=&spring->force_elements;
         if(!is_fine) for(int i=0;i<list.m;i++) for(int j=0;j<4;j++) coarsescale_forces_particles_map.Set(spring->mesh.elements(list(i))(j));}
     else if(SCALED_DEFORMABLES_FORCES<TV>* scaled_force=dynamic_cast<SCALED_DEFORMABLES_FORCES<TV>*>(force)){

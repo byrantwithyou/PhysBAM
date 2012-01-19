@@ -350,7 +350,7 @@ public:
 
     void Write_Motion_Data()
     {Update_All_Frames();
-    for(int i=1;i<=body_motion->trajectories.m;i++) for(int j=1;j<=body_motion->trajectories(i).counts.x;j++)
+    for(int i=0;i<body_motion->trajectories.m;i++) for(int j=1;j<=body_motion->trajectories(i).counts.x;j++)
         body_motion->trajectories(i)(j).transform=body_motion->trajectories(i)(j).targeted_translation*body_motion->trajectories(i)(j).targeted_rotation;
     FILE_UTILITIES::Write_To_File<T>(motion_output,*body_motion);}
     DEFINE_CALLBACK_CREATOR(ATTACHMENT_VISUALIZATION,Write_Motion_Data);

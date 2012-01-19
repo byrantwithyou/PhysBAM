@@ -41,7 +41,7 @@ Initialize_Bodies()
 
     // map fracture_bias_direction_to_rotated_space
     if(spatial_fracture_bias_direction.m != 0){
-        for(int t=1;t<=fracture_object->fracture_bias_direction.m;t++){
+        for(int t=0;t<fracture_object->fracture_bias_direction.m;t++){
             MATRIX<T,3,2> Q=finite_volume.strain_measure.Ds(deformable_body_collection.particles.X,t)*finite_volume.strain_measure.Dm_inverse(t);
             fracture_object->fracture_bias_direction(t)=Q.Transpose_Times(spatial_fracture_bias_direction(t));}
         spatial_fracture_bias_direction.Resize(0);}

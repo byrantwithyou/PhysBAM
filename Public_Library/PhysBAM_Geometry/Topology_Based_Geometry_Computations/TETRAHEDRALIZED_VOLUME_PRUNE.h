@@ -52,7 +52,7 @@ void Interior_Edges_With_Boundary_Nodes(TETRAHEDRALIZED_VOLUME<T>& tv,ARRAY<VECT
     if(!boundary_mesh_segment_mesh_incident_elements_defined) tv.mesh.boundary_mesh->segment_mesh->Initialize_Incident_Elements();
 
     deletion_list->Resize(0);
-    for(int t=1;t<=tv.mesh.boundary_nodes->m;t++){
+    for(int t=0;t<tv.mesh.boundary_nodes->m;t++){
         int node1=(*tv.mesh.boundary_nodes)(t);
         for(int i=1;i<=(*tv.mesh.neighbor_nodes)(node1).m;i++){
             int node2=(*tv.mesh.neighbor_nodes)(node1)(i);

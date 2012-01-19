@@ -104,7 +104,7 @@ Calculate_Boundary_From_Levelset_On_Nodes(EMBEDDED_OBJECT<TV,d>& eo,ARRAY<T>& ph
     bool embedded_incident_elements_defined=eo.embedded_mesh.incident_elements!=0;if(!embedded_incident_elements_defined) eo.embedded_mesh.Initialize_Incident_Elements();
 
     // calculate embedded particles
-    for(int s=1;s<=eo.simplicial_object.mesh.segment_mesh->elements.m;s++){
+    for(int s=0;s<eo.simplicial_object.mesh.segment_mesh->elements.m;s++){
         int n1,n2;eo.simplicial_object.mesh.segment_mesh->elements(s).Get(n1,n2);T phi1=phi(n1),phi2=phi(n2);
         if(LEVELSET_UTILITIES<T>::Interface(phi1,phi2)){
             int inside,outside;if(phi1 <= 0){inside=n1;outside=n2;}else{inside=n2;outside=n1;exchange(phi1,phi2);}

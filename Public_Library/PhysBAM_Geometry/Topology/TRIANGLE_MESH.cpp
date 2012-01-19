@@ -204,7 +204,7 @@ Initialize_Segment_Mesh()
     segment_mesh=new SEGMENT_MESH();
     segment_mesh->number_nodes=number_nodes;
     segment_mesh->elements.Preallocate((total_degree+1)/2); // add one for subtle optimization purposes
-    for(int node=1;node<=neighbor_nodes->m;node++) for(int k=1;k<=(*neighbor_nodes)(node).m;k++) // do nodes in ascending order so that no edges are counted more than once
+    for(int node=0;node<neighbor_nodes->m;node++) for(int k=1;k<=(*neighbor_nodes)(node).m;k++) // do nodes in ascending order so that no edges are counted more than once
         if(node<=(*neighbor_nodes)(node)(k)) segment_mesh->elements.Append(VECTOR<int,2>(node,(*neighbor_nodes)(node)(k)));
     if(!neighbor_nodes_defined){delete neighbor_nodes;neighbor_nodes=0;}
 }
@@ -236,7 +236,7 @@ Initialize_Edge_Triangles()
         int e1,e2,e3;(*element_edges)(t).Get(e1,e2,e3);
         (*edge_triangles)(e1).Append(t);(*edge_triangles)(e2).Append(t);(*edge_triangles)(e3).Append(t);}
     if(!triangle_edges_defined){delete element_edges;element_edges=0;}
-    for(int s=1;s<=segment_mesh->elements.m;s++){
+    for(int s=0;s<segment_mesh->elements.m;s++){
         (*edge_triangles)(s).Compact();
         if((*edge_triangles)(s).m==2){
             int s1,s2,t1,t2,t3;segment_mesh->elements(s).Get(s1,s2);elements((*edge_triangles)(s)(1)).Get(t1,t2,t3);
@@ -299,7 +299,7 @@ Initialize_Boundary_Nodes()
 {
     delete boundary_nodes;boundary_nodes=new ARRAY<int>;
     bool boundary_mesh_defined=boundary_mesh!=0;if(!boundary_mesh_defined) Initialize_Boundary_Mesh();
-    for(int t=1;t<=boundary_mesh->elements.m;t++){int i,j;boundary_mesh->elements(t).Get(i,j);boundary_nodes->Append(i);boundary_nodes->Append(j);}
+    for(int t=0;t<boundary_mesh->elements.m;t++){int i,j;boundary_mesh->elements(t).Get(i,j);boundary_nodes->Append(i);boundary_nodes->Append(j);}
     if(!boundary_mesh_defined){delete boundary_mesh;boundary_mesh=0;}
 
     Sort(*boundary_nodes);

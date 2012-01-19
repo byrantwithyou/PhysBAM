@@ -92,7 +92,7 @@ Set_Material(const int object,const OPENGL_MATERIAL& front_material,const OPENGL
 template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_3D<T,RW>::
 Set_All_Materials(const OPENGL_MATERIAL& meshfront,const OPENGL_MATERIAL& front_material,const OPENGL_MATERIAL& back_material)
 {
-    for(int i=1;i<=deformable_geometry->structures.m;i++) Set_Material(i,front_material,back_material);
+    for(int i=0;i<deformable_geometry->structures.m;i++) Set_Material(i,front_material,back_material);
 }
 //#####################################################################
 // Function Reinitialize
@@ -147,7 +147,7 @@ Reinitialize(bool force,bool read_geometry)
                 free_particles_indirect_arrays(i)=new INDIRECT_ARRAY<ARRAY_VIEW<TV> >(deformable_geometry->particles.X,fp->nodes);
                 free_particles_objects(i)=new OPENGL_FREE_PARTICLES<TV>(*deformable_geometry,*free_particles_indirect_arrays(i),color_map->Lookup(color_map_index--));}
             else{if(first_time) LOG::cout<<"object "<<i<<": object unrecognized at geometry level\n";}}}
-    for(int i=1;i<=deformable_geometry->structures.m;i++){
+    for(int i=0;i<deformable_geometry->structures.m;i++){
         std::string i_string=STRING_UTILITIES::string_sprintf("%d",i);
         if(tetrahedralized_volume_objects(i)) has_tetrahedralized_volumes=true;
         if(hexahedralized_volume_objects(i)) has_hexahedralized_volumes=true;
@@ -284,7 +284,7 @@ Display(const int in_color) const
         glDisable(GL_LIGHTING);
         ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
         SEGMENTED_CURVE<TV>* segmented_curve=deformable_geometry->template Find_Structure<SEGMENTED_CURVE<TV>*>(display_relative_velocity_mode);
-        for(int j=1;j<=segmented_curve->mesh.elements.m;j++){int p1=segmented_curve->mesh.elements(j)(1),p2=segmented_curve->mesh.elements(j)(2);
+        for(int j=0;j<segmented_curve->mesh.elements.m;j++){int p1=segmented_curve->mesh.elements(j)(1),p2=segmented_curve->mesh.elements(j)(2);
             TV relative_velocity=deformable_geometry->particles.V(p2)-deformable_geometry->particles.V(p1);
             TV edge_vector=deformable_geometry->particles.X(p2)-deformable_geometry->particles.X(p1);
             T edge_length=edge_vector.Magnitude();
@@ -344,7 +344,7 @@ Create_One_Big_Triangulated_Surface_And_Write_To_File()
 {
     GEOMETRY_PARTICLES<VECTOR<T,3> >& particles=deformable_geometry->particles;TRIANGLE_MESH mesh;
     TRIANGULATED_SURFACE<T> triangulated_surface(mesh,particles);
-    for(int index=1;index<=deformable_geometry->structures.m;index++){
+    for(int index=0;index<deformable_geometry->structures.m;index++){
         LOG::cout<<"Adding "<<index<<"th triangulated surface out of "<<deformable_geometry->structures.m<<" surfaces"<<std::endl;
         TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_geometry->structures(index));
         if(!tetrahedralized_volume) continue;

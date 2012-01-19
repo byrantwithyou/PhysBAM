@@ -174,7 +174,7 @@ Compute_Position_Based_State(const T dt,const T time)
                         global_post_stabilization_matrix_22.Add_To_Submatrix(joint_offset_in_muscle_control_matrix(i),muscle_index,
                             joint_muscle_control_matrix(i).Transpose_Times(C_along_direction));}}}}}
 
-    for(int i=1;i<=muscle_list->muscles.m;i++) muscle_list->muscles(i)->Update_Segments();
+    for(int i=0;i<muscle_list->muscles.m;i++) muscle_list->muscles(i)->Update_Segments();
 }
 //####################################################################################
 // Function Solve_For_Muscle_Control
@@ -454,7 +454,7 @@ Solve_Velocities_for_PD(const T time,const T dt,bool test_system,bool print_matr
             Solve_For_Muscle_Control(A,b,muscle_impulse_magnitudes,dt);
 
             // apply and increment muscle impulses
-            for(int i=1;i<=muscle_list->muscles.m;i++){
+            for(int i=0;i<muscle_list->muscles.m;i++){
                 muscle_activations(i)=(muscle_impulse_magnitudes(i)/dt-muscle_list->muscles(i)->Passive_Force(muscle_list->muscles(i)->Total_Length()))/muscle_list->muscles(i)->Force(1);
                 muscle_list->muscles(i)->Apply_Fixed_Impulse_At_All_Points(muscle_impulse_magnitudes(i));}
 

@@ -84,7 +84,7 @@ template<class T_GRID,class T2> void EXTRAPOLATION_UNIFORM<T_GRID,T2>::
 Initialize(const T_ARRAYS_BASE& phi,T_ARRAYS_BOOL_BASE& done,T_ARRAYS_BOOL_BASE& close,ARRAY<TV_INT>& heap,int& heap_length)
 {  
     assert(!seed_indices||!seed_done);
-    if(seed_indices) for(int i=1;i<=seed_indices->m;i++) done((*seed_indices)(i))=true;
+    if(seed_indices) for(int i=0;i<seed_indices->m;i++) done((*seed_indices)(i))=true;
     else if(seed_done) T_ARRAYS_BOOL_BASE::Put(*seed_done,done);
     else for(NODE_ITERATOR iterator(node_grid,ghost_cells);iterator.Valid();iterator.Next()) if(phi(iterator.Node_Index()) <= 0) done(iterator.Node_Index())=true;
 

@@ -42,14 +42,14 @@ public:
 
     if(ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.array_collection->template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR)){
         Store_Point_Colors(true);
-        for(int i=1;i<=point_colors->m;i++)
+        for(int i=0;i<point_colors->m;i++)
             (*point_colors)(i)=OPENGL_COLOR((*color_attribute)(i));}
 
     if(id) *point_ids=*id;
 
     if(ARRAY_VIEW<T>* radius_attribute=particles.array_collection->template Get_Array<T>(ATTRIBUTE_ID_RADIUS)){
         Store_Point_Radii(true);
-        for(int i=1;i<=point_radii->m;i++)
+        for(int i=0;i<point_radii->m;i++)
             (*point_radii)(i)=(*radius_attribute)(i);}}
 
     bool Use_Bounding_Box() const PHYSBAM_OVERRIDE {return points.Size()>0;}

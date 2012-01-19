@@ -333,7 +333,7 @@ Find_Ghost_Regions_Threaded(SPARSE_MATRIX_FLAT_NXN<T>& A,const ARRAY<VECTOR<int,
             pthread_mutex_unlock(thread_grid->lock);}}
     // Receive a list from each of the other procs, and store this list
     pthread_barrier_wait(thread_grid->barr);
-    for(int buf=1;buf<=thread_grid->buffers.m;buf++){if(thread_grid->buffers(buf).recv_tid!=my_rank) continue;
+    for(int buf=0;buf<thread_grid->buffers.m;buf++){if(thread_grid->buffers(buf).recv_tid!=my_rank) continue;
         int source=thread_grid->buffers(buf).send_tid;int position=0;
         columns_to_send(source+1).Resize(*(int*)(&thread_grid->buffers(buf).buffer(position+1)));position+=sizeof(int);
         for(int i=1;i<=columns_to_send(source+1).m;i++){columns_to_send(source+1)(i)=*(int*)(&thread_grid->buffers(buf).buffer(position+1));position+=sizeof(int);}}
@@ -393,7 +393,7 @@ Fill_Ghost_Cells_Threaded(VECTOR_ND<T>& x)
     // Receive the column values that others owe us
     ARRAY<ARRAY<T> > columns_to_receive_values(columns_to_receive.m);
     pthread_barrier_wait(thread_grid->barr);
-    for(int buf=1;buf<=thread_grid->buffers.m;buf++){if(my_rank!=thread_grid->buffers(buf).recv_tid) continue;
+    for(int buf=0;buf<thread_grid->buffers.m;buf++){if(my_rank!=thread_grid->buffers(buf).recv_tid) continue;
         // First build the array of column values we will receive
         int node_rank=thread_grid->buffers(buf).send_tid;columns_to_receive_values(node_rank).Resize(columns_to_receive(node_rank).m);int position=0;
         for(int i=1;i<=columns_to_receive_values(node_rank).m;i++){columns_to_receive_values(node_rank)(i)=*(T*)(&thread_grid->buffers(buf).buffer(position+1));position+=sizeof(T);}}

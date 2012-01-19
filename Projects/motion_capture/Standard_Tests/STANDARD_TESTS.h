@@ -652,7 +652,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 else{
                     LOG::cout<<"M: Clusters are []"<<std::endl;}}
         }
-        for(int i=1;i<=controller->global_clusters.m;i++){
+        for(int i=0;i<controller->global_clusters.m;i++){
             T_CLUSTER& bindings_of_parent=*rigid_bindings.reverse_bindings.Get(controller->global_clusters(i));        
             LOG::cout<<"M: Global Cluster ["<<bindings_of_parent.children<<"]";
         }

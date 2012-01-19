@@ -114,7 +114,7 @@ public:
         hook_location_changed.y-=(T).01;
 
         VECTOR<T,3> weights;int closest_tet=0;
-        for(int t=1;t<=tissue_tet_vol->mesh.elements.m;t++){
+        for(int t=0;t<tissue_tet_vol->mesh.elements.m;t++){
             int i,j,k,l;tissue_tet_vol->mesh.elements.Get(t,i,j,k,l);
             weights=TETRAHEDRON<T>::Barycentric_Coordinates(hook_location_changed,particles.X(i),particles.X(j),particles.X(k),particles.X(l));
             if(weights.x > -(T)1e-4 && weights.y > -(T)1e-4 && weights.z > -(T)1e-4 && (T)1-(weights.x+weights.y+weights.z) > -(T)1e-4){
@@ -160,7 +160,7 @@ public:
         suture_end1_changed.y-=(T).01;suture_end2_changed.y-=(T).01;
 
         VECTOR<T,3> weights1;int closest_tet1=0;
-        for(int t=1;t<=tissue_tet_vol->mesh.elements.m;t++){
+        for(int t=0;t<tissue_tet_vol->mesh.elements.m;t++){
             int i,j,k,l;tissue_tet_vol->mesh.elements.Get(t,i,j,k,l);
             weights1=TETRAHEDRON<T>::Barycentric_Coordinates(suture_end1_changed,particles.X(i),particles.X(j),particles.X(k),particles.X(l));
             if(weights1.x > -(T)1e-4 && weights1.y > -(T)1e-4 && weights1.z > -(T)1e-4 && (T)1-(weights1.x+weights1.y+weights1.z) > -(T)1e-4){
@@ -168,7 +168,7 @@ public:
                 break;}}
 
         VECTOR<T,3> weights2;int closest_tet2=0;
-        for(int t=1;t<=tissue_tet_vol->mesh.elements.m;t++){
+        for(int t=0;t<tissue_tet_vol->mesh.elements.m;t++){
             int i,j,k,l;tissue_tet_vol->mesh.elements.Get(t,i,j,k,l);
             weights2=TETRAHEDRON<T>::Barycentric_Coordinates(suture_end2_changed,particles.X(i),particles.X(j),particles.X(k),particles.X(l));
             if(weights2.x > -(T)1e-4 && weights2.y > -(T)1e-4 && weights2.z > -(T)1e-4 && (T)1-(weights2.x+weights2.y+weights2.z) > -(T)1e-4){

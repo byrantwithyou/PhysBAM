@@ -233,7 +233,7 @@ Display(const int in_color) const
 #if 0
             vertices.Resize(0);
             OPENGL_COLOR::Yellow().Send_To_GL_Pipeline();
-            for(int i=1;i<=surface.mesh.boundary_mesh->elements.m;i++){
+            for(int i=0;i<surface.mesh.boundary_mesh->elements.m;i++){
                 int node1,node2;surface.mesh.boundary_mesh->elements(i).Get(node1,node2);
                 OpenGL_Line(surface.particles.X(node1),surface.particles.X(node2),vertices);}
             OpenGL_Draw_Arrays(GL_LINES,3,vertices);
@@ -553,7 +553,7 @@ Draw_Segments_For_Selection() const
     glPushAttrib(GL_LINE_BIT);
     glLineWidth(OPENGL_PREFERENCES::selection_line_width);
     glPushName(0);
-    for(int s=1;s<=surface.mesh.segment_mesh->elements.m;s++){
+    for(int s=0;s<surface.mesh.segment_mesh->elements.m;s++){
         int i,j;surface.mesh.segment_mesh->elements(s).Get(i,j);
         glLoadName(s);
         ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;

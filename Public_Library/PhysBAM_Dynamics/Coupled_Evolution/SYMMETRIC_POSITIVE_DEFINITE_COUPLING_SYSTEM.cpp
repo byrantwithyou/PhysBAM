@@ -289,7 +289,7 @@ Compute(int ghost_cells,const T dt_input,const T current_velocity_time,const T_F
 template<class TV> void SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
 Add_Dirichlet_Pressures_To_Velocity(const ARRAY<T,TV_INT>& pressure,VECTOR_ND<T>& fluid_velocity_vector) const
 {
-    for(int i=1;i<=fluid_gradient->ghost_gradient.m;i++){const typename MATRIX_FLUID_GRADIENT_BASE<TV>::GHOST_GRADIENT_ENTRY& ge=fluid_gradient->ghost_gradient(i);
+    for(int i=0;i<fluid_gradient->ghost_gradient.m;i++){const typename MATRIX_FLUID_GRADIENT_BASE<TV>::GHOST_GRADIENT_ENTRY& ge=fluid_gradient->ghost_gradient(i);
         fluid_velocity_vector(ge.face)-=fluid_mass->one_over_fluid_mass_at_faces(ge.face)*ge.weight*pressure(ge.index)*dt;}
 }
 //#####################################################################
@@ -303,7 +303,7 @@ Add_Surface_Tension(VECTOR_ND<T>& fluid_velocity_vector) const
     
     T mx=0,av=0;
     int n=0;
-    for(int i=1;i<=fluid_gradient->interface_gradient.m;i++){const typename MATRIX_FLUID_GRADIENT_BASE<TV>::INTERFACE_ENTRY& ie=fluid_gradient->interface_gradient(i);
+    for(int i=0;i<fluid_gradient->interface_gradient.m;i++){const typename MATRIX_FLUID_GRADIENT_BASE<TV>::INTERFACE_ENTRY& ie=fluid_gradient->interface_gradient(i);
         FACE_INDEX<TV::m> face_index=index_map.indexed_faces(ie.face);
         TV_INT cell1=face_index.First_Cell_Index(),cell2=face_index.Second_Cell_Index();
         T phi1=levelset->phi(cell1),phi2=levelset->phi(cell2),theta;

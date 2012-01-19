@@ -110,7 +110,7 @@ Send_Generalized_Velocity_To_Fluid(const GENERALIZED_VELOCITY<TV>& BV) const
     const VECTOR_T& V=debug_cast<const VECTOR_T&>(BV);
     int tag_solid_to_fluid=mpi_solid_fluid->Get_Unique_Tag();
     ARRAY<ARRAY<char> > send_buffers(mpi_solid_fluid->fluid_ranks.n);ARRAY<MPI::Request> requests;
-    for(int i=1;i<=mpi_solid_fluid->fluid_ranks.n;i++){
+    for(int i=0;i<mpi_solid_fluid->fluid_ranks.n;i++){
         const INDIRECT_ARRAY<ARRAY_VIEW<TV> > V_boundary(V.V.array,coupled_deformable_particle_indices(i));
         int buffer_size=MPI_UTILITIES::Pack_Size(V_boundary,V.rigid_V,*mpi_solid_fluid->comm)+1;
         send_buffers(i).Resize(buffer_size);int position=0;
@@ -126,14 +126,14 @@ Get_Generalized_Velocity_From_Fluid(GENERALIZED_VELOCITY<TV>& V) const
 {
     int tag_fluid_to_solid=mpi_solid_fluid->Get_Unique_Tag();
     ARRAY<ARRAY<char> > receive_buffers(mpi_solid_fluid->fluid_ranks.n);ARRAY<MPI::Request> requests;
-    for(int i=1;i<=mpi_solid_fluid->fluid_ranks.n;i++){
+    for(int i=0;i<mpi_solid_fluid->fluid_ranks.n;i++){
         INDIRECT_ARRAY<ARRAY<TV>,IDENTITY_ARRAY<int> > fluid_V_boundary(recv_fluid_V_boundary_arrays(i),IDENTITY_ARRAY<int>(recv_fluid_V_boundary_arrays(i).Size()));
         INDIRECT_ARRAY<ARRAY<TWIST<TV> >,IDENTITY_ARRAY<int> > fluid_rigid_V_boundary(recv_fluid_rigid_V_boundary_arrays(i),IDENTITY_ARRAY<int>(recv_fluid_rigid_V_boundary_arrays(i).Size()));
         int buffer_size=MPI_UTILITIES::Pack_Size(fluid_V_boundary,fluid_rigid_V_boundary,*mpi_solid_fluid->comm)+1;
         receive_buffers(i).Resize(buffer_size);
         requests.Append(mpi_solid_fluid->comm->Irecv(&(receive_buffers(i)(1)),buffer_size,MPI::PACKED,i,tag_fluid_to_solid));}
     MPI_UTILITIES::Wait_All(requests);
-    for(int i=1;i<=mpi_solid_fluid->fluid_ranks.n;i++){
+    for(int i=0;i<mpi_solid_fluid->fluid_ranks.n;i++){
         INDIRECT_ARRAY<ARRAY_VIEW<TV> > fluid_V_boundary(V.V.array,coupled_deformable_particle_indices(i));
         INDIRECT_ARRAY<ARRAY<TV>,IDENTITY_ARRAY<int> > recv_fluid_V_boundary(recv_fluid_V_boundary_arrays(i),IDENTITY_ARRAY<int>(recv_fluid_V_boundary_arrays(i).Size()));
         INDIRECT_ARRAY<ARRAY<TWIST<TV> >,IDENTITY_ARRAY<int> > recv_fluid_rigid_V_boundary(recv_fluid_rigid_V_boundary_arrays(i),IDENTITY_ARRAY<int>(recv_fluid_rigid_V_boundary_arrays(i).Size()));

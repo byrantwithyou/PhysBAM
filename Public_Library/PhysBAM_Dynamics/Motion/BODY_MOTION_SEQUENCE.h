@@ -30,10 +30,10 @@ public:
 
     void Resize(int start_frame,int end_frame)
     {if(end_frame==0) end_frame=this->trajectories(1).m;
-    for(int i=1;i<=this->trajectories.m;i++) for(int j=start_frame;j<=end_frame;j++) this->trajectories(i)(j-start_frame+1)=this->trajectories(i)(j);}
+    for(int i=0;i<this->trajectories.m;i++) for(int j=start_frame;j<=end_frame;j++) this->trajectories(i)(j-start_frame+1)=this->trajectories(i)(j);}
 
     void Rescale(T scaling_factor)
-    {for(int i=1;i<=this->trajectories.m;i++){base_position(i).Rescale(scaling_factor);for(int j=1;j<=this->trajectories(i).m;j++) this->trajectories(i)(j).Rescale(scaling_factor);}}
+    {for(int i=0;i<this->trajectories.m;i++){base_position(i).Rescale(scaling_factor);for(int j=1;j<=this->trajectories(i).m;j++) this->trajectories(i)(j).Rescale(scaling_factor);}}
 
     FRAME<TV> Inverse_Trans(FRAME<TV>& trans_input)
     {return FRAME<TV>(TV(-1*trans_input.t.x,-1*trans_input.t.y,-1*trans_input.t.z),ROTATION<TV>());}
@@ -108,18 +108,18 @@ public:
     {for(int i=1;i<=this->trajectories(bone).m;i++) Update_Targeted_Transforms(bone,i-1);}
     
     void Update_Targeted_Transforms_Frame(int frame)
-    {for(int i=1;i<=this->trajectories.m;i++) Update_Targeted_Transforms(i,frame);}
+    {for(int i=0;i<this->trajectories.m;i++) Update_Targeted_Transforms(i,frame);}
     
     void Update_Targeted_Transforms()
-    {for(int i=1;i<=this->trajectories.m;i++) for(int j=1;j<=this->trajectories(i).m;j++) Update_Targeted_Transforms(i,j-1);}
+    {for(int i=0;i<this->trajectories.m;i++) for(int j=1;j<=this->trajectories(i).m;j++) Update_Targeted_Transforms(i,j-1);}
 
     void Propogate_Lengths(int frame)
-    {for(int i=1;i<=this->trajectories.m;i++){
+    {for(int i=0;i<this->trajectories.m;i++){
         for(int j=0;j<frame;j++) this->trajectories(i)(j).length=this->trajectories(i)(frame+1).length;
         for(int j=frame+2;j<=this->trajectories(i).counts.x;j++) this->trajectories(i)(j).length=this->trajectories(i)(frame+1).length;}}
 
     void Propogate_Transforms(int frame)
-    {for(int i=1;i<=this->trajectories.m;i++){
+    {for(int i=0;i<this->trajectories.m;i++){
         for(int j=0;j<frame;j++)
             this->trajectories(i)(j).targeted_transform=base_position(i).targeted_transform*this->trajectories(i)(j).targeted_translation*this->trajectories(i)(j).targeted_rotation;
         for(int j=frame+2;j<=this->trajectories(i).counts.x;j++)

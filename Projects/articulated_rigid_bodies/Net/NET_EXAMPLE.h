@@ -444,7 +444,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             Add_Fused_Hands_And_Feet(true);}
         else da_man->Initialize_Bodies();
 
-        for(int i=1;i<=da_man->bones.m;i++) if(da_man->bones(i)->particle_index) man_bones.Append(da_man->bones(i));
+        for(int i=0;i<da_man->bones.m;i++) if(da_man->bones(i)->particle_index) man_bones.Append(da_man->bones(i));
 
         if(parameter_list.Is_Defined("skeleton_mass")){
             T mass=parameter_list.Get_Parameter("skeleton_mass",(T)100);
@@ -453,7 +453,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         VISIBLE_HUMAN<T>::Read_Joint_Limits(arb,parameter_list);
 
         T k_p=parameter_list.Get_Parameter("k_p",(T)100);
-        for(int i=1;i<=da_man->joint.m;i++) if(da_man->joint(i)){
+        for(int i=0;i<da_man->joint.m;i++) if(da_man->joint(i)){
             assert(!da_man->joint(i)->secondary_point_of_bend_joint);
             da_man->Create_Joint_Function(i);JOINT_FUNCTION<TV>* joint_function=da_man->joint(i)->joint_function;
             joint_function->muscle_control=true;
@@ -473,7 +473,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             std::istringstream sstr(soft_joints);std::string joint;
             LOG::cout<<"Setting soft joints: ";
             while(sstr >> joint){
-                for(int i=1;i<=arb->joint_mesh.joints.m;i++) if(arb->joint_mesh.joints(i)->joint_function)
+                for(int i=0;i<arb->joint_mesh.joints.m;i++) if(arb->joint_mesh.joints(i)->joint_function)
                     if(arb->joint_mesh.joints(i)->name==joint || arb->joint_mesh.joints(i)->name==joint+"_left"){
                         LOG::cout<<arb->joint_mesh.joints(i)->name<<" ";
                         arb->joint_mesh.joints(i)->joint_function->Set_k_p(soft_k_p);}}
@@ -487,7 +487,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             VISIBLE_HUMAN<T>::Load_Splines(motion_track_name,motion_spline,3);
 
             T track_speedup_factor=parameter_list.Get_Parameter("track_speedup_factor",(T)10);
-            for(int i=1;i<=arb->joint_mesh.joints.m;i++) if(arb->joint_mesh.joints(i)){JOINT<TV>* joint=arb->joint_mesh.joints(i);
+            for(int i=0;i<arb->joint_mesh.joints.m;i++) if(arb->joint_mesh.joints(i)){JOINT<TV>* joint=arb->joint_mesh.joints(i);
                 if(!joint->joint_function || joint->name.find("radiocarpal")!=std::string::npos) continue;
                 joint->joint_function->track=VISIBLE_HUMAN<T>::Read_Frame_Track_From_Spline(motion_spline,joint->name,true,1000,track_speedup_factor);
                 if(!joint->joint_function->track) continue;
@@ -632,14 +632,14 @@ void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) PHYSBAM
 //#####################################################################
 void Update_Joints(const T time)
 {
-    for(int i=1;i<=arb->joint_mesh.joints.m;i++){
+    for(int i=0;i<arb->joint_mesh.joints.m;i++){
         if(arb->joint_mesh.joints(i)->joint_function){
             FRAME<TV> desired_frame=FRAME<TV>(arb->joint_mesh.joints(i)->joint_function->Target_Angle(time));
             arb->joint_mesh.joints(i)->Set_Joint_Frame(desired_frame);}
         else if(arb->joint_mesh.joints(i)->secondary_point_of_bend_joint){
             std::string name=arb->joint_mesh.joints(i)->name;std::string::size_type pos=name.find("_secondary_point");
             assert(pos!=std::string::npos);std::string reference_name=name.substr(0,pos);
-            for(int j=1;j<=arb->joint_mesh.joints.m;j++) if(arb->joint_mesh.joints(j)->name==reference_name && arb->joint_mesh.joints(j)->joint_function){
+            for(int j=0;j<arb->joint_mesh.joints.m;j++) if(arb->joint_mesh.joints(j)->name==reference_name && arb->joint_mesh.joints(j)->joint_function){
                 if(verbose) LOG::cout<<"Found reference '"<<reference_name<<"' for '"<<name<<"'"<<std::endl;
                 FRAME<TV> desired_frame=FRAME<TV>(arb->joint_mesh.joints(j)->joint_function->Target_Angle(time));
                 arb->joint_mesh.joints(i)->Set_Joint_Frame(desired_frame);}}}

@@ -88,7 +88,7 @@ Update_Faces_And_Hierarchies_With_Collision_Free_Positions(ARRAY_VIEW<const T> n
     PHYSBAM_ASSERT(node_thickness_multiplier>=1);
     if(segmented_curve){
         segmented_curve->hierarchy->Update_Leaf_Boxes(X_old_full);
-        for(int s=1;s<=segmented_curve->mesh.elements.m;s++) // increase box size for node thickness
+        for(int s=0;s<segmented_curve->mesh.elements.m;s++) // increase box size for node thickness
             segmented_curve->hierarchy->box_hierarchy(s).Change_Size(node_thickness_multiplier*node_thickness.Subset(segmented_curve->mesh.elements(s)).Min());
         segmented_curve->hierarchy->Update_Nonleaf_Boxes();}
     if(d==3 && triangulated_surface)

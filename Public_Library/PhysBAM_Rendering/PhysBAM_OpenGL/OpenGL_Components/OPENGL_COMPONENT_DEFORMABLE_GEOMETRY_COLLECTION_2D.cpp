@@ -76,7 +76,7 @@ Reinitialize(bool force)
                 triangulated_area->mesh.Initialize_Segment_Mesh(); // to enable segment selection
                 triangulated_area_objects(i)=new OPENGL_TRIANGULATED_AREA<T>(*triangulated_area,true);}
             else PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Weird object %d",i));}}
-    for(int i=1;i<=deformable_geometry_collection->structures.m;i++){
+    for(int i=0;i<deformable_geometry_collection->structures.m;i++){
         std::string suffix=STRING_UTILITIES::string_sprintf("_%d",i);
         std::string frame_prefix=STRING_UTILITIES::string_sprintf("%s/%d",prefix.c_str(),frame);
         if(FILE_UTILITIES::File_Exists(frame_prefix+"stress_map_of_triangulated_area"+suffix)){

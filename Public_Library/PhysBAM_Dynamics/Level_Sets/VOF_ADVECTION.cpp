@@ -422,7 +422,7 @@ Cut_Simplicial_Object_With_Zero_Isocontour()
     // create list of cut segments and list of cut simplices
     ARRAY<int> inefficient_segment_list;
     ARRAY<VECTOR<int,2> > cut_segments;ARRAY<int> cut_simplices;
-    for(int s=1;s<=object.mesh.segment_mesh->elements.m;s++){
+    for(int s=0;s<object.mesh.segment_mesh->elements.m;s++){
         int i,j;object.mesh.segment_mesh->elements(s).Get(i,j);
         if(phis(i)*phis(j)>=0) continue;
         inefficient_segment_list.Append(preimage.segment_mesh.Simplex(VECTOR<int,2>(i,j)));

@@ -455,7 +455,7 @@ Apply_Projections_In_Position_Update(const T dt,const T time)
             if(TV::Dot_Product(relative_velocity,normal)>0) rigid_deformable_collisions->rigid_body_collisions.rigid_body_particle_intersections.Delete(iterator.Key());}}
 
     // iterate over rigid/deformable
-    for(int i=1;i<=rigid_deformable_collisions->precompute_contact_projections.m;i++){
+    for(int i=0;i<rigid_deformable_collisions->precompute_contact_projections.m;i++){
         typename RIGID_DEFORMABLE_COLLISIONS<TV>::PRECOMPUTE_CONTACT_PROJECTION& precompute=*rigid_deformable_collisions->precompute_contact_projections(i);
         const RIGID_BODY<TV>& body=precompute.rigid_body;
         for(int j=0;j<precompute.particles.m;j++){const int p=precompute.particles(j);
@@ -479,7 +479,7 @@ Write_Position_Update_Projection_Data(const STREAM_TYPE stream_type,const std::s
     std::ostream* output=FILE_UTILITIES::Safe_Open_Output(prefix+"projection_data_rigid_deformable");
     TYPED_OSTREAM typed_output(*output,stream_type);
     Write_Binary(typed_output,rigid_deformable_collisions->precompute_contact_projections.m);
-    for(int i=1;i<=rigid_deformable_collisions->precompute_contact_projections.m;i++){
+    for(int i=0;i<rigid_deformable_collisions->precompute_contact_projections.m;i++){
         typename RIGID_DEFORMABLE_COLLISIONS<TV>::PRECOMPUTE_CONTACT_PROJECTION& p=*rigid_deformable_collisions->precompute_contact_projections(i);
         Write_Binary(typed_output,p.rigid_body.particle_index,p.particles,p.V_rel_target,p.N_over_NT_K_N,p.r,p.N,p.rN,p.A,p.A_inverted);}
     delete output;

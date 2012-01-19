@@ -442,7 +442,7 @@ Average_Edge_Length() const
 {
     bool segment_mesh_defined=mesh.segment_mesh!=0;if(!segment_mesh_defined) mesh.Initialize_Segment_Mesh();
     T average_edge_length=0;
-    for(int s=1;s<=mesh.segment_mesh->elements.m;s++){
+    for(int s=0;s<mesh.segment_mesh->elements.m;s++){
         int i,j;mesh.segment_mesh->elements(s).Get(i,j);
         average_edge_length+=(particles.X(i)-particles.X(j)).Magnitude();}
     if(mesh.segment_mesh->elements.m) average_edge_length/=mesh.segment_mesh->elements.m;

@@ -217,7 +217,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             da_man->bones(VISIBLE_HUMAN<T>::BONE_L_ANKLE)->is_static=true;}
 
         T k_p=parameter_list.Get_Parameter("k_p",(T)100);
-        for(int i=1;i<=da_man->joint.m;i++) if(da_man->joint(i) && !da_man->joint(i)->joint_function){
+        for(int i=0;i<da_man->joint.m;i++) if(da_man->joint(i) && !da_man->joint(i)->joint_function){
             JOINT_FUNCTION<TV>* joint_function=da_man->Create_Joint_Function(i);
             joint_function->Set_k_p(k_p);joint_function->Set_Target_Angle(joint_function->Angle());}
         
@@ -517,7 +517,7 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 void Update_Joints(const T time)
 {
-    for(int i=1;i<=arb->joint_mesh.joints.m;i++)
+    for(int i=0;i<arb->joint_mesh.joints.m;i++)
         if(arb->joint_mesh.joints(i)->joint_function)
             arb->joint_mesh.joints(i)->Set_Joint_Frame(FRAME<TV>(arb->joint_mesh.joints(i)->joint_function->Target_Angle(time)));
     arb->Update_With_Breadth_First_Directed_Graph(root);

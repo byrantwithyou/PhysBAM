@@ -139,7 +139,7 @@ void Get_Initial_Data()
         HASHTABLE<int,int> hard_to_soft;
         surface->mesh.elements.Flattened().Get_Unique(tri_particles);
         particles.array_collection->Preallocate(tri_particles.m);
-        for(int t=1;t<=volume->mesh.elements.m;t++){
+        for(int t=0;t<volume->mesh.elements.m;t++){
             const VECTOR<int,4>& nodes=volume->mesh.elements(t);
             TETRAHEDRON<T> tet(particles.X.Subset(nodes));
             for(int i=0;i<tri_particles.m;i++){int p=tri_particles(i);
@@ -151,7 +151,7 @@ void Get_Initial_Data()
                     particles.X(soft_particle)=particles.X(p);
                     hard_to_soft.Insert(p,soft_particle);
                     soft_bindings.Add_Binding(VECTOR<int,2>(p,soft_particle),!use_zero_length_springs);}}}
-        for(int t=1;t<=surface->mesh.elements.m;t++){
+        for(int t=0;t<surface->mesh.elements.m;t++){
             VECTOR<int,3> nodes=surface->mesh.elements(t);
             for(int k=0;k<3;k++) nodes[k]=hard_to_soft.Get(nodes[k]);
             esurface->mesh.elements.Append(nodes);}

@@ -37,7 +37,7 @@ Update_Vertex_Normals(TRIANGULATED_SURFACE<T>& ts)
         delete ts.face_vertex_normals;ts.face_vertex_normals=0;
         if(!ts.vertex_normals) ts.vertex_normals=new ARRAY<TV>(ts.mesh.number_nodes);
         else ts.vertex_normals->Resize(ts.mesh.number_nodes);
-        for(int k=1;k<=ts.vertex_normals->m;k++){
+        for(int k=0;k<ts.vertex_normals->m;k++){
             (*ts.vertex_normals)(k)=TV(); // initialize to zero
             for(int kk=1;kk<=(*ts.mesh.incident_elements)(k).m;kk++) 
                 (*ts.vertex_normals)(k)+=(*ts.triangle_list)((*ts.mesh.incident_elements)(k)(kk)).Area()*(*ts.triangle_list)((*ts.mesh.incident_elements)(k)(kk)).normal;

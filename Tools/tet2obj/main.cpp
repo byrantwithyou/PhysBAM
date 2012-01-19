@@ -29,7 +29,7 @@ template<class T,class RW> void Convert(const std::string& input_filename,const 
     for(int p=1;p<=tetrahedralized_volume->particles.array_collection->Size();p++)
         (*output)<<STRING_UTILITIES::string_sprintf("v %lg %lg %lg\n",tetrahedralized_volume->particles.X(p)[1],tetrahedralized_volume->particles.X(p)[2],tetrahedralized_volume->particles.X(p)[3]);
 
-    for(int e=1;e<=tetrahedralized_volume->mesh.elements.m;e++)
+    for(int e=0;e<tetrahedralized_volume->mesh.elements.m;e++)
         (*output)<<STRING_UTILITIES::string_sprintf("f %d %d %d %d\n",tetrahedralized_volume->mesh.elements(e)[1],tetrahedralized_volume->mesh.elements(e)[2],tetrahedralized_volume->mesh.elements(e)[3],tetrahedralized_volume->mesh.elements(e)[4]);
     delete output;
 }

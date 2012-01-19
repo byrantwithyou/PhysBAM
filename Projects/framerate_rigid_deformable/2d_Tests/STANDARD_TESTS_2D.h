@@ -395,7 +395,7 @@ void Hanging_Cloth_Test()
     mesh.Initialize_Segment_Mesh();
 
     SEGMENTED_CURVE<TV> *segmented_curve=SEGMENTED_CURVE<TV>::Create(particles);
-    for(int s=1;s<=mesh.segment_mesh->elements.m;s++)
+    for(int s=0;s<mesh.segment_mesh->elements.m;s++)
         segmented_curve->mesh.elements.Append(VECTOR<int,2>(mesh.segment_mesh->elements(s)(1),mesh.segment_mesh->elements(s)(2)));
     tests.Copy_And_Add_Structure(*segmented_curve,0);
 

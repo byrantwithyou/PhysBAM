@@ -130,7 +130,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     int number_of_regions=2;
     grain_boundaries.Fill_Node_Regions_With_Uniform_Vectors(number_of_regions);
     //grain_boundaries.Print_Number_In_Regions(number_of_regions);
-    for(int t=1;t<=fracture_object->fracture_bias_direction.m;t++) LOG::cout<<"fracture_bias_direction("<<t<<")="<<fracture_object->fracture_bias_direction(t)<<std::endl;
+    for(int t=0;t<fracture_object->fracture_bias_direction.m;t++) LOG::cout<<"fracture_bias_direction("<<t<<")="<<fracture_object->fracture_bias_direction(t)<<std::endl;
     //grain_boundaries.Smooth_Fracture_Bias_Directions(9);
 
     deformable_object.collisions.collision_structures.Append_Elements(deformable_object.structures);

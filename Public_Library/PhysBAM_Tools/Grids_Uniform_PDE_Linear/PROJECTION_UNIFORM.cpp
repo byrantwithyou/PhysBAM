@@ -139,7 +139,7 @@ template<class T_GRID> void PROJECTION_UNIFORM<T_GRID>::
 Enforce_Velocity_Compatibility(T_FACE_ARRAYS_SCALAR& face_velocities)
 {
     bool found_neumann_region=false;
-    for(int color=1;color<=elliptic_solver->number_of_regions;color++)if(!elliptic_solver->filled_region_touches_dirichlet(color)){found_neumann_region=true;break;}
+    for(int color=0;color<elliptic_solver->number_of_regions;color++)if(!elliptic_solver->filled_region_touches_dirichlet(color)){found_neumann_region=true;break;}
     if(!found_neumann_region) return; // don't need to do any of the following
 
     TV one_over_dx=Inverse(p_grid.dX);T cell_size=p_grid.Cell_Size();
@@ -169,7 +169,7 @@ Enforce_Velocity_Compatibility(T_FACE_ARRAYS_SCALAR& face_velocities)
             elliptic_solver->mpi_grid->Reduce_Add(global_boundary_size,global_boundary_size_result);
             for(int i=1;i<=elliptic_solver->laplace_mpi->number_of_global_regions;i++){compatibility_fraction(i)=global_compatibility_fraction_result(i);boundary_size(i)=global_boundary_size_result(i);}}}
 
-    for(int i=1;i<=elliptic_solver->number_of_regions;i++) if(boundary_size(i)) compatibility_fraction(i)*=cell_size/boundary_size(i);
+    for(int i=0;i<elliptic_solver->number_of_regions;i++) if(boundary_size(i)) compatibility_fraction(i)*=cell_size/boundary_size(i);
 
     // adjust the compatibility error to zero
     for(FACE_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()){

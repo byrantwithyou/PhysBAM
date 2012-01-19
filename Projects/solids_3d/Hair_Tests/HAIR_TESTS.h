@@ -100,7 +100,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             TRIANGULATED_SURFACE<T>& surface=tests.Create_Triangulated_Object(data_directory+"/Triangulated_Surfaces/noodle_half_torus.tri",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)1.6,0))),false,true); //,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(),ROTATION<TV>((T).8,TV(1,0,0))));
             volume=TETRAHEDRALIZED_VOLUME<T>::Create(particles);
             volume->mesh.Initialize_Bending_Tetrahedrons(surface.mesh);
-            for(int t=1;t<=volume->mesh.elements.m;t++){
+            for(int t=0;t<volume->mesh.elements.m;t++){
                 VECTOR<int,4>& nodes=volume->mesh.elements(t);
                 if(TETRAHEDRON<T>(particles.X.Subset(nodes)).Signed_Volume()<0) exchange(nodes[3],nodes[4]);}
             //deformable_body_collection.deformable_geometry.Add_Structure(volume);
@@ -108,7 +108,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         }break;
         case 2: {
             volume=&tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)1.6,0))),false,true,1000);
-            for(int t=1;t<=volume->mesh.elements.m;t++){
+            for(int t=0;t<volume->mesh.elements.m;t++){
                 VECTOR<int,4>& nodes=volume->mesh.elements(t);
                 if(TETRAHEDRON<T>(particles.X.Subset(nodes)).Signed_Volume()<0) exchange(nodes[3],nodes[4]);}
             deformable_body_collection.deformable_geometry.Add_Structure(volume);

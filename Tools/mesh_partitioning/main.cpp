@@ -66,7 +66,7 @@ public:
         TETRAHEDRON_MESH visualization_mesh;
         TETRAHEDRALIZED_VOLUME<T> visualization_volume(visualization_mesh,tetrahedralized_volume->particles);
         visualization_volume.Update_Number_Nodes();
-        for(int t=1;t<=tetrahedralized_volume->mesh.elements.m;t++){
+        for(int t=0;t<tetrahedralized_volume->mesh.elements.m;t++){
             VECTOR<int,4> nodes=tetrahedralized_volume->mesh.elements(t);
             VECTOR<int,4> element_labels=VECTOR<int,4>(node_labels.Subset(nodes)).Sorted();
             if(element_labels[1]==element_labels[4]) visualization_mesh.elements.Append(nodes);}

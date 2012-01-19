@@ -158,12 +158,12 @@ Transform_Rigid_Body(RIGID_BODY<TV>* rigid_body, MATRIX<T,4>& left_transform)
 {
     //transform triangulated surface
     TRIANGULATED_SURFACE<T> *surface=rigid_body->triangulated_surface;
-    for(int i=1;i<=surface->particles.array_size;i++)
+    for(int i=0;i<surface->particles.array_size;i++)
     {
         surface->particles.X(i)=left_transform * surface->particles.X(i);
     }
     int temp;
-    for(int j=1;j<=surface->triangle_mesh.triangles.m;j++)
+    for(int j=0;j<surface->triangle_mesh.triangles.m;j++)
     {
         temp=surface->triangle_mesh.triangles(1,j);
         surface->triangle_mesh.triangles(1,j)=surface->triangle_mesh.triangles(3,j);

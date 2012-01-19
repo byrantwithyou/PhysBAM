@@ -92,7 +92,7 @@ static bool Verify_Embedded_Particle_On_Segment(EMBEDDED_TETRAHEDRALIZED_VOLUME<
 {
     bool segment_mesh_defined=etv.tetrahedralized_volume.tetrahedron_mesh.segment_mesh!=0;
     if(!segment_mesh_defined)etv.tetrahedralized_volume.tetrahedron_mesh.Initialize_Segment_Mesh();
-    for(int s=1;s<=etv.tetrahedralized_volume.tetrahedron_mesh.segment_mesh->segments.m;s++){
+    for(int s=0;s<etv.tetrahedralized_volume.tetrahedron_mesh.segment_mesh->segments.m;s++){
         int a,b;etv.tetrahedralized_volume.tetrahedron_mesh.segment_mesh->segments.Get(s,a,b);
         int emb_node=etv.Embedded_Particle_On_Segment(a,b);
         if(emb_node){

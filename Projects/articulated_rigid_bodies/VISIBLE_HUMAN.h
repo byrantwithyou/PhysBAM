@@ -904,7 +904,7 @@ MUSCLE<TV>* Reflected_Muscle(MUSCLE<TV>* muscle)
     reflected_muscle->Set_Name(muscle->name+"_left");
     reflected_muscle->Set_Attachment_Point_1(Reflected_Constrained_Point(muscle->attachment_point_1));
     reflected_muscle->Set_Attachment_Point_2(Reflected_Constrained_Point(muscle->attachment_point_2));
-    for(int i=1;i<=muscle->via_points.m;i++) reflected_muscle->Add_Via_Point(Reflected_Constrained_Point(muscle->via_points(i)));
+    for(int i=0;i<muscle->via_points.m;i++) reflected_muscle->Add_Via_Point(Reflected_Constrained_Point(muscle->via_points(i)));
     // if any of the attachment/via points returned null then we can't create the muscle (some body doesn't exist)
     int dummy_index;if(!reflected_muscle->attachment_point_1 || !reflected_muscle->attachment_point_2 || reflected_muscle->via_points.Find(0,dummy_index)){delete reflected_muscle;return 0;}
     if(verbose) LOG::cout<<"Reflecting "<<muscle->name<<" -> "<<reflected_muscle->name<<std::endl;
@@ -1143,11 +1143,11 @@ void Make_Wrapping_Objects()
 //#####################################################################
 static void Read_Joint_Limits(ARTICULATED_RIGID_BODY<TV>* arb,PARAMETER_LIST& parameter_list)
 {
-    for(int i=1;i<=arb->joint_mesh.joints.m;i++){JOINT<TV>* joint=arb->joint_mesh.joints(i);
+    for(int i=0;i<arb->joint_mesh.joints.m;i++){JOINT<TV>* joint=arb->joint_mesh.joints(i);
         std::string prefix=joint->name+".limits.";
         VECTOR<T,2> x,y,z;
         JOINT<TV>* mirrored_joint=0;
-        for(int j=1;j<=arb->joint_mesh.joints.m;j++) if(arb->joint_mesh.joints(j)->name==joint->name+"_left") mirrored_joint=arb->joint_mesh.joints(j);
+        for(int j=0;j<arb->joint_mesh.joints.m;j++) if(arb->joint_mesh.joints(j)->name==joint->name+"_left") mirrored_joint=arb->joint_mesh.joints(j);
         if(joint->joint_type==JOINT<TV>::TYPE_POINT_JOINT){
             if(parameter_list.Is_Defined(prefix+"x")){
                 VECTOR<T,2> limits=(T)(pi/180)*parameter_list.Get_Parameter(prefix+"x",VECTOR<T,2>());

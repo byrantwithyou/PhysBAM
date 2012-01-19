@@ -96,7 +96,7 @@ void Solve(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,RIGIDS_COLLISION_CAL
                                 if(!use_saved_pairs) rigid_body_collisions.saved_contact_pairs_for_level(level).Append_Unique(pairs(i));
                                 need_another_level_iteration=true;need_another_iteration=true;}}}
                     if(articulated_rigid_body)
-                        for(int i=1;i<=articulated_rigid_body->contact_level_iterations;i++) for(int j=1;j<=articulated_rigid_body->process_list(level).m;j++){
+                        for(int i=0;i<articulated_rigid_body->contact_level_iterations;i++) for(int j=1;j<=articulated_rigid_body->process_list(level).m;j++){
                             rigid_body_collisions.Apply_Prestabilization_To_Joint(dt,time,*articulated_rigid_body,articulated_rigid_body->process_list(level)(j),epsilon_scale);
                             need_another_level_iteration=need_another_iteration=true;}}}
 
@@ -155,7 +155,7 @@ Update_Analytic_Multibody_Contact(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisio
     IMPLICIT_OBJECT<TV>* levelset_base=&levelset;
     if(IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >* levelset_transformed=dynamic_cast<IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >*>(levelset_base)) 
         levelset_base=levelset_transformed->object_space_implicit_object;
-    for(int i=1;i<=multibody.levelsets->m;i++){
+    for(int i=0;i<multibody.levelsets->m;i++){
         VECTOR<std::string,2> key(typeid(*dynamic_cast<IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >&>(*(*multibody.levelsets)(i)).object_space_implicit_object).name(),typeid(*levelset_base).name());
         if(typename ANALYTICS<TV>::UPDATE_ANALYTIC_CONTACT_PAIR_T* contact_function=analytic_contact_registry.Get_Pointer(key.Sorted()))
             return_val|=(*contact_function)(rigid_body_collisions,collision_callbacks,id_1,id_2,(*multibody.levelsets)(i),&levelset,correct_contact_energy,max_iterations,epsilon_scale,dt,time,mpi_one_ghost);

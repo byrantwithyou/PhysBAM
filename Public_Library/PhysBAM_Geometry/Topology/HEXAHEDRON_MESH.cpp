@@ -211,7 +211,7 @@ Initialize_Face_Hexahedrons()
     if(!faces) Initialize_Faces();
     bool incident_elements_defined=incident_elements!=0;if(!incident_elements) Initialize_Incident_Elements();
     delete face_hexahedrons;face_hexahedrons=new ARRAY<VECTOR<int,2> >(faces->m);
-    for(int f=1;f<=faces->m;f++){
+    for(int f=0;f<faces->m;f++){
         int node1=(*faces)(f)(1),node2=(*faces)(f)(2),node3=(*faces)(f)(3),node4=(*faces)(f)(4),count=0;exchange_sort(node1,node2,node3,node4);
         for(int h=1;h<=(*incident_elements)(node1).m;h++){
             for(int hf=0;hf<6;hf++){

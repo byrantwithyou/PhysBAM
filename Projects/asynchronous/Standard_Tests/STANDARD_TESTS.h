@@ -1445,7 +1445,7 @@ void Asynchronous_Sphere()
         if(test_number==15 || test_number==16){
             SEGMENTED_CURVE<TV>* complementary_boundary_segmented_curve=SEGMENTED_CURVE<TV>::Create(deformable_body_collection.particles);
             HASHTABLE<VECTOR<int,2> > edge_mesh_element_map;
-            for(int i=1;i<=boundary_one_ring_segmented_curve->mesh.elements.m;i++) edge_mesh_element_map.Set(boundary_one_ring_segmented_curve->mesh.elements(i));
+            for(int i=0;i<boundary_one_ring_segmented_curve->mesh.elements.m;i++) edge_mesh_element_map.Set(boundary_one_ring_segmented_curve->mesh.elements(i));
             for(int i=1;i<=volume->mesh.segment_mesh->elements.m;i++) if(!edge_mesh_element_map.Contains(volume->mesh.segment_mesh->elements(i)))
                 complementary_boundary_segmented_curve->mesh.elements.Append(volume->mesh.segment_mesh->elements(i));
             complementary_boundary_segmented_curve->Update_Number_Nodes();
@@ -1455,8 +1455,8 @@ void Asynchronous_Sphere()
             // Add complementary boundary tet mesh for altitude, edge springs
             TETRAHEDRALIZED_VOLUME<T>* complementary_boundary_tetrahedralized_volume=TETRAHEDRALIZED_VOLUME<T>::Create(deformable_body_collection.particles);
             HASHTABLE<VECTOR<int,4> > volume_mesh_element_map;
-            for(int i=1;i<=boundary_tetrahedralized_volume->mesh.elements.m;i++) volume_mesh_element_map.Set(boundary_tetrahedralized_volume->mesh.elements(i));
-            for(int i=1;i<=volume->mesh.elements.m;i++) if(!volume_mesh_element_map.Contains(volume->mesh.elements(i)))
+            for(int i=0;i<boundary_tetrahedralized_volume->mesh.elements.m;i++) volume_mesh_element_map.Set(boundary_tetrahedralized_volume->mesh.elements(i));
+            for(int i=0;i<volume->mesh.elements.m;i++) if(!volume_mesh_element_map.Contains(volume->mesh.elements(i)))
                 complementary_boundary_tetrahedralized_volume->mesh.elements.Append(volume->mesh.elements(i));
             complementary_boundary_tetrahedralized_volume->Update_Number_Nodes();
             deformable_body_collection.deformable_geometry.Add_Structure(complementary_boundary_tetrahedralized_volume);
@@ -2370,11 +2370,11 @@ void Asynchronous_Projected_Sphere()
             curve_temp->mesh.elements=volume->mesh.segment_mesh->elements;
             curve_temp->Update_Number_Nodes();
             T shortest=FLT_MAX;
-            for(int i=1;i<=curve_temp->mesh.elements.m;i++){VECTOR<int,2> e=curve_temp->mesh.elements(i);
+            for(int i=0;i<curve_temp->mesh.elements.m;i++){VECTOR<int,2> e=curve_temp->mesh.elements(i);
                 T length=(deformable_body_collection.particles.X(e(2))-deformable_body_collection.particles.X(e(1))).Magnitude();
                 if(length<shortest) shortest=length;}
             T largest=0;int largest_index=-1;
-            for(int i=1;i<=volume->mesh.elements.m;i++){
+            for(int i=0;i<volume->mesh.elements.m;i++){
                 T v=volume->Volume(i);
                 if(v>largest){largest=v;largest_index=i;}}
 
@@ -2451,7 +2451,7 @@ void Asynchronous_Projected_Sphere()
             // Add complementary curves
             SEGMENTED_CURVE<TV>* complementary_boundary_segmented_curve=SEGMENTED_CURVE<TV>::Create(deformable_body_collection.particles);
             HASHTABLE<VECTOR<int,2> > edge_mesh_element_map;
-            for(int i=1;i<=boundary_one_ring_segmented_curve->mesh.elements.m;i++) edge_mesh_element_map.Set(boundary_one_ring_segmented_curve->mesh.elements(i));
+            for(int i=0;i<boundary_one_ring_segmented_curve->mesh.elements.m;i++) edge_mesh_element_map.Set(boundary_one_ring_segmented_curve->mesh.elements(i));
             for(int i=1;i<=volume->mesh.segment_mesh->elements.m;i++) if(!edge_mesh_element_map.Contains(volume->mesh.segment_mesh->elements(i)))
                 complementary_boundary_segmented_curve->mesh.elements.Append(volume->mesh.segment_mesh->elements(i));
             complementary_boundary_segmented_curve->Update_Number_Nodes();
@@ -2461,8 +2461,8 @@ void Asynchronous_Projected_Sphere()
             // Add complementary boundary tet mesh for altitude, edge springs
             TETRAHEDRALIZED_VOLUME<T>* complementary_boundary_tetrahedralized_volume=TETRAHEDRALIZED_VOLUME<T>::Create(deformable_body_collection.particles);
             HASHTABLE<VECTOR<int,4> > volume_mesh_element_map;
-            for(int i=1;i<=boundary_tetrahedralized_volume->mesh.elements.m;i++) volume_mesh_element_map.Set(boundary_tetrahedralized_volume->mesh.elements(i));
-            for(int i=1;i<=volume->mesh.elements.m;i++) if(!volume_mesh_element_map.Contains(volume->mesh.elements(i)))
+            for(int i=0;i<boundary_tetrahedralized_volume->mesh.elements.m;i++) volume_mesh_element_map.Set(boundary_tetrahedralized_volume->mesh.elements(i));
+            for(int i=0;i<volume->mesh.elements.m;i++) if(!volume_mesh_element_map.Contains(volume->mesh.elements(i)))
                 complementary_boundary_tetrahedralized_volume->mesh.elements.Append(volume->mesh.elements(i));
             complementary_boundary_tetrahedralized_volume->Update_Number_Nodes();
             deformable_body_collection.deformable_geometry.Add_Structure(complementary_boundary_tetrahedralized_volume);

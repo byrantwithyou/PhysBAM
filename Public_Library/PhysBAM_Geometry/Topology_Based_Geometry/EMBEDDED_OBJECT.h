@@ -109,7 +109,7 @@ public:
 
     T Fraction_Of_Elements_With_Embedded_Subelements()
     {if(!embedded_subelements_in_parent_element_index) return 0;
-    int count=0;for(int t=1;t<=embedded_subelements_in_parent_element_index->m;t++) if((*embedded_subelements_in_parent_element_index)(t)) count++;
+    int count=0;for(int t=0;t<embedded_subelements_in_parent_element_index->m;t++) if((*embedded_subelements_in_parent_element_index)(t)) count++;
     return (T)count/(T)embedded_subelements_in_parent_element_index->m;}
 
     void Update_Bounding_Box()

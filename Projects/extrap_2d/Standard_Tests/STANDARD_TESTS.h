@@ -1033,7 +1033,7 @@ void Init_Scatter_Plot()
 void Update_Scatter_Plot()
 {
     for(int f=1,k=1;FINITE_VOLUME<TV,2>* force=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,2>*>(f);f++){
-        for(int i=1;i<=force->Fe_hat.m;i++){
+        for(int i=0;i<force->Fe_hat.m;i++){
             if(!use_contrails) contrail(k).Remove_All();
             contrail(k++).Append(force->Fe_hat(i).To_Vector());}}
 }

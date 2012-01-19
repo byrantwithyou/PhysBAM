@@ -128,7 +128,7 @@ public:
 
     void Transpose(SPARSE_MATRIX_NXN<T>& A_transpose)
     {assert(A_transpose.n==n);
-    for(int i=0;i<n;i++){SPARSE_VECTOR_ND<T>* row=A(i);for(int j=1;j<=row->number_of_active_indices;j++) A_transpose.Set_Element(row->indices[j],i,row->x[j]);}}
+    for(int i=0;i<n;i++){SPARSE_VECTOR_ND<T>* row=A(i);for(int j=0;j<row->number_of_active_indices;j++) A_transpose.Set_Element(row->indices[j],i,row->x[j]);}}
 
     bool Is_Transpose(SPARSE_MATRIX_NXN<T>& A_transpose,T tolerance)
     {assert(A_transpose.n==n);

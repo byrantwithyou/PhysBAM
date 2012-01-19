@@ -271,7 +271,7 @@ bool Get_Solid_Source_Velocities(ARRAY<int>& deformable_simplices,ARRAY<T>& defo
         //else if ((int)time%4==2){
         //else if ((int)time%4==0) force_magnitude*=-1*sin(alpha*(T)pi);
         else force_magnitude=0;
-        if(use_deformable) for(int i=1;i<=source_elements->m;i++){deformable_simplices.Append((*source_elements)(i));deformable_simplex_forces.Append(force_magnitude);}
+        if(use_deformable) for(int i=0;i<source_elements->m;i++){deformable_simplices.Append((*source_elements)(i));deformable_simplex_forces.Append(force_magnitude);}
         else{PHYSBAM_FATAL_ERROR();}
         return true;
     }
@@ -655,7 +655,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         source_elements=new ARRAY<int>();
         for(int p=1;p<=solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size();p++) tests.Bind_Unbound_Particles_In_Rigid_Body(solid_body_collection.rigid_body_collection.Rigid_Body(p),particle_array);
         
-        //for(int i=1;i<=soft_bound_surface->mesh.elements.m;i++){int j,k,l;soft_bound_surface->mesh.elements(i).Get(j,k,l);
+        //for(int i=0;i<soft_bound_surface->mesh.elements.m;i++){int j,k,l;soft_bound_surface->mesh.elements(i).Get(j,k,l);
         /*for(int i=1;i<=volume->Get_Boundary_Object().mesh.elements.m;i++){int j,k,l;volume->Get_Boundary_Object().mesh.elements(i).Get(j,k,l);
             if(particles.X(j).y<=14.75&&particles.X(k).y<=14.75&&particles.X(l).y<=14.75&&
                abs(particles.X(j).x)<=1&&abs(particles.X(k).x)<=1&&abs(particles.X(l).x)<=1&&
@@ -675,7 +675,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         //for(int i=0;i<particle_array.m;i++){
         for(int i=1;i<=particles.array_collection->Size();i++){
             referenced_particles->Append(i);
-            for(int j=1;j<=source_rigid_particles->m;j++) if(solid_body_collection.rigid_body_collection.Rigid_Body((*source_rigid_particles)(j)).implicit_object->Inside(particles.X(i))) source_particles->Append(i);
+            for(int j=0;j<source_rigid_particles->m;j++) if(solid_body_collection.rigid_body_collection.Rigid_Body((*source_rigid_particles)(j)).implicit_object->Inside(particles.X(i))) source_particles->Append(i);
         }
 
         for(int i=1;i<=deformable_objects_to_simulate.m;++i){

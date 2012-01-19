@@ -42,11 +42,11 @@ void Initialize_Tetrahedralized_Volume(HEXAHEDRALIZED_VOLUME<T>& hv)
         TV hex_center;for(int i=0;i<8;i++) hex_center+=hv.particles.X(p(i));hex_center*=(T).125;
         hv.particles.X(hv.particles.array_collection->Add_Element())=hex_center;hex_particle_indices(h)=hv.particles.array_collection->Size();}
     //add node in the center of each boundary face
-    for(int f=1;f<=hv.mesh.faces->m;f++){
+    for(int f=0;f<hv.mesh.faces->m;f++){
         int h=(*hv.mesh.face_hexahedrons)(f)(2),node1,node2,node3,node4;(*hv.mesh.faces)(f).Get(node1,node2,node3,node4);
         if(!h){hv.particles.X(hv.particles.array_collection->Add_Element())=(T).25*(hv.particles.X(node1)+hv.particles.X(node2)+hv.particles.X(node3)+hv.particles.X(node4));face_particle_indices(f)=hv.particles.array_collection->Size();}}
     //for each face, add in four tets from the associated octahedron
-    for(int f=1;f<=hv.mesh.faces->m;f++){
+    for(int f=0;f<hv.mesh.faces->m;f++){
         int h_outward,h_inward,h1,h2,p1,p2,p3,p4,ph_outward,ph_inward;(*hv.mesh.faces)(f).Get(p1,p2,p3,p4);
         //find which hexahedron the face is outwardly oriented with
         h1=(*hv.mesh.face_hexahedrons)(f)(1);h2=(*hv.mesh.face_hexahedrons)(f)(2);h_outward=h1;h_inward=h2;

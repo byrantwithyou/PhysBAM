@@ -87,7 +87,7 @@ Clamp_Repulsion_Thickness_With_Meshes(ARRAY_VIEW<const TV> X,const T scale)
 {
     for(int k=0;k<geometry.structure_geometries.m;k++){
         STRUCTURE_INTERACTION_GEOMETRY<TV>& structure=*geometry.structure_geometries(k);
-        if(structure.segmented_curve) for(int s=1;s<=structure.segmented_curve->mesh.elements.m;s++){
+        if(structure.segmented_curve) for(int s=0;s<structure.segmented_curve->mesh.elements.m;s++){
             int i,j;structure.segmented_curve->mesh.elements(s).Get(i,j);T d=scale*(X(i)-X(j)).Magnitude();
             repulsion_thickness(i)=min(repulsion_thickness(i),d);repulsion_thickness(j)=min(repulsion_thickness(j),d);}}
 }

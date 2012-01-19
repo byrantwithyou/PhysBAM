@@ -30,7 +30,7 @@ public:
 
     LEVELSET_ADVECTION_MULTIPLE(T_LEVELSET_MULTIPLE* _levelsets):levelsets(_levelsets)
     {
-        for(int i=1;i<=levelsets->levelsets.m;i++)
+        for(int i=0;i<levelsets->levelsets.m;i++)
             levelset_advections.Append(T_FAST_LEVELSET_ADVECTION(levelsets->levelsets(i)));
     }
     

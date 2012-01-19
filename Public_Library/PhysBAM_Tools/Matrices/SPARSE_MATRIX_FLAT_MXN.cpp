@@ -43,7 +43,7 @@ Create_Submatrix(const INTERVAL<int>& rows)
     submatrix->offsets.Resize(submatrix->n+1);
     submatrix->A.Resize(entries);
     int next_index=1,shift=rows.min_corner-1;
-    for(int i=1;i<=submatrix->n;i++){
+    for(int i=0;i<submatrix->n;i++){
         submatrix->offsets(i)=next_index;
         for(int old_index=offsets(i);old_index<offsets(i+1);old_index++)if(rows.Lazy_Inside(A(old_index).j)){
             submatrix->A(next_index).j=A(old_index).j-shift;submatrix->A(next_index).a=A(old_index).a;next_index++;}}

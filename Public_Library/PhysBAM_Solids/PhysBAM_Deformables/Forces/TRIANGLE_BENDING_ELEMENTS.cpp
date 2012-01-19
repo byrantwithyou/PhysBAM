@@ -247,7 +247,7 @@ template<class T> void TRIANGLE_BENDING_ELEMENTS<T>::
 Copy_Back_Save_Quantities(const ARRAY<int>& node_map_to_saved)
 {
     HASHTABLE<VECTOR<int,2>,int> save_bending_quadruples_hashtable(2*bending_quadruples_save->m);
-    for(int q=1;q<=bending_quadruples_save->m;q++) save_bending_quadruples_hashtable.Insert(VECTOR<int,2>((*bending_quadruples_save)(q)(2),(*bending_quadruples_save)(q)(3)),q);
+    for(int q=0;q<bending_quadruples_save->m;q++) save_bending_quadruples_hashtable.Insert(VECTOR<int,2>((*bending_quadruples_save)(q)(2),(*bending_quadruples_save)(q)(3)),q);
     plastic_yield->Resize(bending_quadruples.m,false,false);
     sine_half_elastic_angle->Resize(bending_quadruples.m,false,false);
     for(int q=0;q<bending_quadruples.m;q++){

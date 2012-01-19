@@ -102,7 +102,7 @@ public:
     tets.subset.Remove_All();
     cut--;if(cut<0)cut=range;
     T y=ymin+(ymax-ymin)*cut/range;
-    for(int t=1;t<=tets.mesh->elements.m;t++){
+    for(int t=0;t<tets.mesh->elements.m;t++){
         int i,j,k,l;tets.mesh->elements(t).Get(i,j,k,l);
         if(tets.particles->X(i).y<y || tets.particles->X(j).y<y || tets.particles->X(k).y<y || tets.particles->X(l).y<y)
             tets.subset.Append(t);}}

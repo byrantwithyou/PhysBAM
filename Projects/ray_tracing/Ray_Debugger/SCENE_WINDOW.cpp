@@ -152,7 +152,7 @@ template<class T> void SCENE_WINDOW<T>::Draw_Photons()
     if(display_used_photons){// display photons that were used in yellow
         glDisable(GL_DEPTH_TEST);
         glBegin(GL_POINTS);
-        if(selected_ray)for(int i=1;i<=selected_ray->photons_used.m;i++){
+        if(selected_ray)for(int i=0;i<selected_ray->photons_used.m;i++){
             PHOTON<T>& photon=*selected_ray->photons_used(i);
             glColor3f(1,1,0);
             OpenGL_Vertex(photon.location);}
@@ -218,7 +218,7 @@ template<class T> void SCENE_WINDOW<T>::Draw_Ray(RENDERING_RAY_DEBUG<T>* debug_r
         glBegin(GL_POINTS);
         glVertex3f((GLfloat)point2.x,(GLfloat)point2.y,(GLfloat)point2.z);
         glEnd();}
-    for(int i=1;i<=debug_ray->children.m;i++)Draw_Ray(debug_ray->children(i));
+    for(int i=0;i<debug_ray->children.m;i++)Draw_Ray(debug_ray->children(i));
 }
 //#####################################################################
 // Select_Ray

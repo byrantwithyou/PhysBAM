@@ -817,7 +817,7 @@ void Get_Initial_Data()
                 binding_segment_mesh.elements.Append(VECTOR<int,2>(child_particles(p),p));}
             binding_segment_mesh.Set_Number_Nodes(particles.array_collection->Size());
             TRIANGULATED_SURFACE<T>* triangulated_surface=TRIANGULATED_SURFACE<T>::Create(particles);
-            for(int t=1;t<=tetrahedralized_volume.triangulated_surface->mesh.elements.m;t++)
+            for(int t=0;t<tetrahedralized_volume.triangulated_surface->mesh.elements.m;t++)
                 triangulated_surface->mesh.elements.Append(VECTOR<int,3>::Map(child_particles,tetrahedralized_volume.triangulated_surface->mesh.elements(t)));
             deformable_body_collection.deformable_geometry.Add_Structure(triangulated_surface);
             automatically_add_to_collision_structures=false;

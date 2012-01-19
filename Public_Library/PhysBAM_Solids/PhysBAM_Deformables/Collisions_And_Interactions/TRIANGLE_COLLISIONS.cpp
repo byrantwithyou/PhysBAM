@@ -76,7 +76,7 @@ Update_Swept_Hierachies_And_Compute_Pairs(ARRAY_VIEW<TV> X,ARRAY_VIEW<TV> X_self
         if(d==3 && structure.triangulated_surface){
             BOX_HIERARCHY<TV>& hierarchy=structure.Face_Hierarchy();
             structure.triangulated_surface_modified.Resize(hierarchy.box_hierarchy.m,false,false);
-            for(int kk=1;kk<=structure.triangulated_surface->mesh.elements.m;kk++){
+            for(int kk=0;kk<structure.triangulated_surface->mesh.elements.m;kk++){
                 const VECTOR<int,3>& nodes=structure.triangulated_surface->mesh.elements(kk);
                 structure.triangulated_surface_modified(kk)=VECTOR<bool,3>(recently_modified.Subset(nodes)).Contains(true); // TODO: hacking around compiler bug
                 if(structure.triangulated_surface_modified(kk))
@@ -86,7 +86,7 @@ Update_Swept_Hierachies_And_Compute_Pairs(ARRAY_VIEW<TV> X,ARRAY_VIEW<TV> X_self
         if(structure.segmented_curve){
             SEGMENT_HIERARCHY<TV>& hierarchy=*structure.segmented_curve->hierarchy;
             structure.segmented_curve_modified.Resize(hierarchy.box_hierarchy.m,false,false);
-            for(int kk=1;kk<=structure.segmented_curve->mesh.elements.m;kk++){
+            for(int kk=0;kk<structure.segmented_curve->mesh.elements.m;kk++){
                 const VECTOR<int,2>& nodes=structure.segmented_curve->mesh.elements(kk);
                 structure.segmented_curve_modified(kk)=VECTOR<bool,2>(recently_modified.Subset(nodes)).Contains(true); // TODO: hacking around compiler bug
                 if(structure.segmented_curve_modified(kk))
@@ -768,7 +768,7 @@ Stop_Nodes_Before_Self_Collision(const T dt)
             if(d==3 && structure.triangulated_surface){
                 BOX_HIERARCHY<TV>& hierarchy=structure.Face_Hierarchy();
                 structure.triangulated_surface_modified.Resize(hierarchy.box_hierarchy.m,false,false);
-                for(int kk=1;kk<=structure.triangulated_surface->mesh.elements.m;kk++){
+                for(int kk=0;kk<structure.triangulated_surface->mesh.elements.m;kk++){
                     const VECTOR<int,3>& nodes=structure.triangulated_surface->mesh.elements(kk);
                     structure.triangulated_surface_modified(kk)=attempts==1 || modified_full.Subset(nodes).Contains(true);
                     if(structure.triangulated_surface_modified(kk))
@@ -778,7 +778,7 @@ Stop_Nodes_Before_Self_Collision(const T dt)
             if(structure.segmented_curve){
                 SEGMENT_HIERARCHY<TV>& hierarchy=*structure.segmented_curve->hierarchy;
                 structure.segmented_curve_modified.Resize(hierarchy.box_hierarchy.m,false,false);
-                for(int kk=1;kk<=structure.segmented_curve->mesh.elements.m;kk++){
+                for(int kk=0;kk<structure.segmented_curve->mesh.elements.m;kk++){
                     const VECTOR<int,2>& nodes=structure.segmented_curve->mesh.elements(kk);
                     structure.segmented_curve_modified(kk)=attempts==1 || modified_full.Subset(nodes).Contains(true);
                     if(structure.segmented_curve_modified(kk))

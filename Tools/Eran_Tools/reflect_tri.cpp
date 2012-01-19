@@ -23,7 +23,7 @@ int main(int argc,char*argv[])
     if(FILE_UTILITIES::File_Exists(rgd_filename)){
         std::cout << "Putting in world frame using rgd file " << rgd_filename << std::endl;
         RIGID_BODY_3D<T> rigid_body;FILE_UTILITIES::Read_From_File<T>(rgd_filename,rigid_body);
-        for(int i=1;i<=tri_surf->particles.number;i++) tri_surf->particles.X(i)=rigid_body.frame*tri_surf->particles.X(i);    }
+        for(int i=0;i<tri_surf->particles.number;i++) tri_surf->particles.X(i)=rigid_body.frame*tri_surf->particles.X(i);    }
 
 #if 0
     VECTOR<T,3> x1=(T).5*(VECTOR<T,3>(0.298154,0.147101,0.979182)+VECTOR<T,3>(0.298926,0.144395,0.979307))+VECTOR<T,3>(0.002,0,0);
@@ -37,9 +37,9 @@ int main(int argc,char*argv[])
 #endif
     MATRIX<T,4> xform(-0.999,0.03998,0.01999,0,0.03998,0.9992,-0.0003998,0,0.01999,-0.0003998,0.9998,0,0.575378,-0.0115075,-0.00575377,1);
 
-    for(int i=1;i<=tri_surf->particles.number;i++) tri_surf->particles.X(i)=xform*tri_surf->particles.X(i);    
+    for(int i=0;i<tri_surf->particles.number;i++) tri_surf->particles.X(i)=xform*tri_surf->particles.X(i);    
     // invert orientation
-    for(int t=1;t<=tri_surf->triangle_mesh.triangles.m;t++){
+    for(int t=0;t<tri_surf->triangle_mesh.triangles.m;t++){
         int i,j,k;tri_surf->triangle_mesh.triangles.Get(t,i,j,k);tri_surf->triangle_mesh.triangles.Set(t,i,k,j);}
     FILE_UTILITIES::Write_To_File<T>(FILE_UTILITIES::Get_Basename(filename)+"_reflected.tri",*tri_surf);
 

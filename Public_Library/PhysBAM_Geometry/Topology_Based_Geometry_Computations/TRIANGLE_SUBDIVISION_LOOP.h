@@ -37,7 +37,7 @@ void Apply_Loop_Subdivision(TRIANGLE_SUBDIVISION& ts,ARRAY_VIEW<const TV> base_v
             VECTOR<T,3> neighbor_sum=base_values(neighbors(i)(1));for(int j=2;j<=neighbors(i).m;j++)neighbor_sum+=base_values(neighbors(i)(j));
             subdivided_values(i)=alpha*base_values(i)+(1-alpha)/neighbors(i).m*neighbor_sum;}}
     // edge values
-    for(int i=1;i<=ts.triangle_mesh.segment_mesh->elements.m;i++){
+    for(int i=0;i<ts.triangle_mesh.segment_mesh->elements.m;i++){
         int index=ts.start_index_for_new_nodes-1+i;
         int j,end1,end2;ts.triangle_mesh.segment_mesh->elements(i).Get(end1,end2);
         if(boundary_neighbors(end1).m && boundary_neighbors(end2).m && boundary_neighbors(end1).Find(end2,j)) // if boundary edge

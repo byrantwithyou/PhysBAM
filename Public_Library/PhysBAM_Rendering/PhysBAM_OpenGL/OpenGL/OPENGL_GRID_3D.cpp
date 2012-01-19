@@ -167,14 +167,14 @@ Display(const int in_color) const
         else if (current_selection->type == OPENGL_SELECTION::GRID_CELL_LIST_3D)
         {
             OPENGL_SELECTION_GRID_CELL_LIST_3D<T> *real_selection = (OPENGL_SELECTION_GRID_CELL_LIST_3D<T>*)current_selection;
-            for(int i=1;i<=real_selection->indicies.m;i++){
+            for(int i=0;i<real_selection->indicies.m;i++){
                 VECTOR<T,3> min_corner=grid.Node(real_selection->indicies(i)),max_corner=min_corner+grid.dX;
                 OPENGL_SELECTION::Draw_Highlighted_Box(min_corner,max_corner);}
         }
         else if (current_selection->type == OPENGL_SELECTION::GRID_NODE_LIST_3D)
         {
             OPENGL_SELECTION_GRID_NODE_LIST_3D<T> *real_selection = (OPENGL_SELECTION_GRID_NODE_LIST_3D<T>*)current_selection;
-            for(int i=1;i<=real_selection->indicies.m;i++) OPENGL_SELECTION::Draw_Highlighted_Vertex(grid.Node(real_selection->indicies(i)));
+            for(int i=0;i<real_selection->indicies.m;i++) OPENGL_SELECTION::Draw_Highlighted_Vertex(grid.Node(real_selection->indicies(i)));
         }
     }
 

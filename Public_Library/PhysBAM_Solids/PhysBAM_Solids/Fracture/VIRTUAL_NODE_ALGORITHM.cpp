@@ -216,7 +216,7 @@ Rebuild_Embedded_Object(EMBEDDED_OBJECT<TV,d>& embedded_object,ARRAY<int>& map_t
     map_to_old_embedded_particles=IDENTITY_ARRAY<>(embedded_object.embedded_particles.active_indices.m);
     ARRAY<bool> embedded_node_already_used(embedded_object.embedded_particles.active_indices.m);
     mesh.Initialize_Segment_Mesh();mesh.segment_mesh->Initialize_Incident_Elements();
-    for(int s=1;s<=mesh.segment_mesh->elements.m;s++){
+    for(int s=0;s<mesh.segment_mesh->elements.m;s++){
         VECTOR<int,2> nodes=mesh.segment_mesh->elements(s);
         VECTOR<int,2> old_nodes(map_to_old_particles.Subset(nodes));
         int old_embedded_particle=old_embedded_object.Embedded_Particle_On_Segment(old_nodes);

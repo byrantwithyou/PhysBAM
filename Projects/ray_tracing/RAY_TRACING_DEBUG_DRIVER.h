@@ -130,7 +130,7 @@ public:
     if(ray->ray.ray_type==RENDERING_RAY<T>::PHOTON_RAY)type="PHOTON";
     sprintf(buf,"%s hit_object=%s semi_infinite=%s aggregate_id=%d",type,ray->hit_object?"true":"false",ray->ray.ray.semi_infinite?"true":"false",ray->ray.ray.aggregate_id);
     tree->add_sub(buf,1,0,(void*)ray);
-    for(int i=1;i<=ray->children.m;i++){
+    for(int i=0;i<ray->children.m;i++){
         Populate_Ray_Tree(tree,ray->children(i),depth+1);
     }
     tree->traverse_up();}
@@ -166,7 +166,7 @@ public:
     if(ray->hit_object){sprintf(buf,"Hit Object: aggregate_id=%d",ray->ray.ray.aggregate_id);out.add(buf);}
     // print all ray comments
     out.add("");
-    for(int i=1;i<=ray->comments.m;i++)out.add(ray->comments(i).c_str());}
+    for(int i=0;i<ray->comments.m;i++)out.add(ray->comments(i).c_str());}
 
     static void Click_Object(void *widget)
     {Fl_Hold_Browser* browser=((Fl_Hold_Browser*)widget);

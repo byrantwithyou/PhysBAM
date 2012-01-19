@@ -78,7 +78,7 @@ template<class TV,int d_input> void CUTTING_GEOMETRY_2D<TV,d_input>::
 Split_Existing_Polygons()
 {
     polygons_per_element=CONSTANT_ARRAY<ARRAY<int> >(current_embedding->mesh.elements.m,ARRAY<int>());
-    for(int i=1;i<=cutting_simplices->index_for_last_old_cutting_simplex;i++) if(!cutting_simplices->Simplex_Is_Parent(i)){
+    for(int i=0;i<cutting_simplices->index_for_last_old_cutting_simplex;i++) if(!cutting_simplices->Simplex_Is_Parent(i)){
         int tet_owner=cutting_simplices->simplices(i).element_owner;
         // obtain all new segments on simplex
         ARRAY<int> new_particles_on_simplex;

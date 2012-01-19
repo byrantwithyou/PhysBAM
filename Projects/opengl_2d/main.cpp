@@ -321,7 +321,7 @@ Initialize_Components_And_Key_Bindings()
     if(!FILE_UTILITIES::Frame_File_Exists(filename,start_frame) && !FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/levelset_1",start_frame)) filename=basedir+"/%d/levelset.phi"; // for backwards compatiblity
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame) || FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/levelset_1",start_frame)){
         levelset_component=new OPENGL_COMPONENT_LEVELSET_2D<T>(filename,basedir+"/%d/levelset_%d");
-        if(levelset_component->opengl_levelsets.m>1) for(int j=1;j<=levelset_component->opengl_levelsets.m;j++){
+        if(levelset_component->opengl_levelsets.m>1) for(int j=0;j<levelset_component->opengl_levelsets.m;j++){
             levelset_component->opengl_levelsets(j)->draw_cells=true;
             levelset_component->opengl_levelsets(j)->draw_area=false;
             levelset_component->opengl_levelsets(j)->draw_curve=true;
@@ -442,7 +442,7 @@ Initialize_Components_And_Key_Bindings()
     filename=basedir+"/%d/kinetic_energy";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         ke_component=new OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>(mac_grid,filename);
-        for(int i=1;i<=ke_component->opengl_adaptive_mac_velocity_fields.m;i++){
+        for(int i=0;i<ke_component->opengl_adaptive_mac_velocity_fields.m;i++){
             ke_component->opengl_adaptive_mac_velocity_fields(i)->size=.01;
             ke_component->opengl_adaptive_mac_velocity_fields(i)->vector_color=OPENGL_COLOR::Green();
             ke_component->opengl_adaptive_mac_velocity_fields(i)->Set_Velocity_Mode(OPENGL_MAC_VELOCITY_FIELD_2D<T>::FACE_CENTERED);}
@@ -451,7 +451,7 @@ Initialize_Components_And_Key_Bindings()
     filename=basedir+"/%d/mac_velocities";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         mac_velocity_component=new OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>(mac_grid,filename);
-        for(int i=1;i<=mac_velocity_component->opengl_adaptive_mac_velocity_fields.m;i++){
+        for(int i=0;i<mac_velocity_component->opengl_adaptive_mac_velocity_fields.m;i++){
             mac_velocity_component->opengl_adaptive_mac_velocity_fields(i)->size=.01;
             mac_velocity_component->opengl_adaptive_mac_velocity_fields(i)->vector_color=OPENGL_COLOR::Magenta();
             mac_velocity_component->opengl_adaptive_mac_velocity_fields(i)->Set_Velocity_Mode(OPENGL_MAC_VELOCITY_FIELD_2D<T>::FACE_CENTERED);}
@@ -460,7 +460,7 @@ Initialize_Components_And_Key_Bindings()
     filename=basedir+"/%d/compressible_mac_velocities";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         mac_velocity_component=new OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>(mac_grid,filename);
-        for(int i=1;i<=mac_velocity_component->opengl_adaptive_mac_velocity_fields.m;i++){
+        for(int i=0;i<mac_velocity_component->opengl_adaptive_mac_velocity_fields.m;i++){
             mac_velocity_component->opengl_adaptive_mac_velocity_fields(i)->size=.01;
             mac_velocity_component->opengl_adaptive_mac_velocity_fields(i)->vector_color=OPENGL_COLOR::Magenta();
             mac_velocity_component->opengl_adaptive_mac_velocity_fields(i)->Set_Velocity_Mode(OPENGL_MAC_VELOCITY_FIELD_2D<T>::FACE_CENTERED);}
@@ -476,7 +476,7 @@ Initialize_Components_And_Key_Bindings()
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         std::cout<<"Using mass fluxes (from "<<filename<<")"<<std::endl;
         OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>* face_flux_component=new OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>(mac_grid,filename);
-        for(int i=1;i<=face_flux_component->opengl_adaptive_mac_velocity_fields.m;i++){
+        for(int i=0;i<face_flux_component->opengl_adaptive_mac_velocity_fields.m;i++){
             face_flux_component->opengl_adaptive_mac_velocity_fields(i)->size=.01;
             face_flux_component->opengl_adaptive_mac_velocity_fields(i)->vector_color=OPENGL_COLOR::Magenta();
             face_flux_component->opengl_adaptive_mac_velocity_fields(i)->Set_Velocity_Mode(OPENGL_MAC_VELOCITY_FIELD_2D<T>::FACE_CENTERED);}
@@ -516,7 +516,7 @@ Initialize_Components_And_Key_Bindings()
     filename=basedir+"/%d/coarse_mac_velocities";
     if(has_valid_coarse_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         coarse_mac_velocity_component=new OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T>(coarse_mac_grid,filename);
-        for(int i=1;i<=coarse_mac_velocity_component->opengl_adaptive_mac_velocity_fields.m;i++){
+        for(int i=0;i<coarse_mac_velocity_component->opengl_adaptive_mac_velocity_fields.m;i++){
             coarse_mac_velocity_component->opengl_adaptive_mac_velocity_fields(i)->size=.01;
             coarse_mac_velocity_component->opengl_adaptive_mac_velocity_fields(i)->vector_color=OPENGL_COLOR::Blue();
             coarse_mac_velocity_component->opengl_adaptive_mac_velocity_fields(i)->Set_Velocity_Mode(OPENGL_MAC_VELOCITY_FIELD_2D<T>::FACE_CENTERED);}

@@ -86,7 +86,7 @@ Initialize(const ARRAY<TRIANGLE_3D<T> >& elements)
         VECTOR<int,2> closest_element;
         for(int s=0;s<2;s++){
             if(const ARRAY<int>* list=elements_in_cell.Get_Pointer(it.Key().Cell_Index(s))){
-                for(int i=1;i<=list->m;i++){
+                for(int i=0;i<list->m;i++){
                     if(INTERSECTION::Intersects(ray1,elements((*list)(i)),thickness)) closest_element(1)=(*list)(i);
                     if(INTERSECTION::Intersects(ray2,elements((*list)(i)),thickness)) closest_element(2)=(*list)(i);}}}
             

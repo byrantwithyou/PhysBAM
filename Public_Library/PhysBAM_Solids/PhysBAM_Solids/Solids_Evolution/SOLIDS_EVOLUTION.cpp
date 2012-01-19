@@ -215,7 +215,7 @@ template<class TV> void SOLIDS_EVOLUTION<TV>::
 Postprocess_Frame(const int frame)
 {
     ARTICULATED_RIGID_BODY<TV>& articulated_rigid_body=solid_body_collection.rigid_body_collection.articulated_rigid_body;
-    if(articulated_rigid_body.use_muscle_actuators) for(int i=1;i<=articulated_rigid_body.muscle_list->muscles.m;i++){
+    if(articulated_rigid_body.use_muscle_actuators) for(int i=0;i<articulated_rigid_body.muscle_list->muscles.m;i++){
         articulated_rigid_body.muscle_list->muscles(i)->Set_Segment_Activations(articulated_rigid_body.muscle_activations(i));
         articulated_rigid_body.muscle_list->muscles(i)->Update_Segments();}
     if(solids_parameters.triangle_collision_parameters.perform_self_collision && solids_parameters.triangle_collision_parameters.check_mesh_for_self_intersection

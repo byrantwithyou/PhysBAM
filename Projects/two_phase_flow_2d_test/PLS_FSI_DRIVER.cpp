@@ -399,7 +399,7 @@ Advance_Particles_With_PLS(T dt)
     ARRAY<T,FACE_INDEX<TV::m> >& face_velocities=example.fluid_collection.incompressible_fluid_collection.face_velocities;
     LINEAR_INTERPOLATION_MAC<TV,T> interp(*example.fluids_parameters.grid);
     RUNGEKUTTA<ARRAY_VIEW<TV> >* rk=RUNGEKUTTA<ARRAY_VIEW<TV> >::Create(X,example.fluids_parameters.particle_levelset_evolution->runge_kutta_order_particles,dt,0);
-    for(int k=1;k<=example.fluids_parameters.particle_levelset_evolution->runge_kutta_order_particles;k++){
+    for(int k=0;k<example.fluids_parameters.particle_levelset_evolution->runge_kutta_order_particles;k++){
         for(int p=0;p<X.m;p++) X(p)+=dt*interp.Clamped_To_Array(face_velocities,X(p));
         rk->Main();}
     delete rk;

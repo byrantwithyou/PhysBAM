@@ -354,7 +354,7 @@ Draw_In_Color_From_Spectrum() const
 {
     if(spectrum.m!=mesh->elements.m) PHYSBAM_FATAL_ERROR("Spectrum has incorrect size");
     T spectrum_max=spectrum.Max(),spectrum_min=spectrum.Min();
-    for(int t=1;t<=mesh->elements.m;t++){
+    for(int t=0;t<mesh->elements.m;t++){
         int i,j,k,l;mesh->elements(t).Get(i,j,k,l);
         VECTOR<T,3> xi=particles->X(i),xj=particles->X(j),xk=particles->X(k),xl=particles->X(l);
         TETRAHEDRON<T> tet(xi,xj,xk,xl);
@@ -382,7 +382,7 @@ Draw_In_Color_From_Color_Map() const
 {
     glPushAttrib(GL_ENABLE_BIT|GL_CURRENT_BIT);
     glDisable(GL_LIGHTING);
-    for(int t=1;t<=mesh->elements.m;t++){
+    for(int t=0;t<mesh->elements.m;t++){
         (*color_map)(t).Send_To_GL_Pipeline();
         int i,j,k,l;mesh->elements(t).Get(i,j,k,l);
         VECTOR<T,3> xi=particles->X(i),xj=particles->X(j),xk=particles->X(k),xl=particles->X(l);
@@ -414,13 +414,13 @@ Draw_Boundary_Triangles(const TETRAHEDRON_MESH& tetrahedron_mesh) const
 
     ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> normals;
     if(smooth_normals)
-        for(int t=1;t<=tetrahedron_mesh.boundary_mesh->elements.m;t++){
+        for(int t=0;t<tetrahedron_mesh.boundary_mesh->elements.m;t++){
             int i,j,k;tetrahedron_mesh.boundary_mesh->elements(t).Get(i,j,k);
             OpenGL_Normal((*vertex_normals)(i),normals);OpenGL_Vertex(particles->X(i),vertices);
             OpenGL_Normal((*vertex_normals)(j),normals);OpenGL_Vertex(particles->X(j),vertices);
             OpenGL_Normal((*vertex_normals)(k),normals);OpenGL_Vertex(particles->X(k),vertices);}
     else
-        for(int t=1;t<=tetrahedron_mesh.boundary_mesh->elements.m;t++){
+        for(int t=0;t<tetrahedron_mesh.boundary_mesh->elements.m;t++){
             int i,j,k;tetrahedron_mesh.boundary_mesh->elements(t).Get(i,j,k);
             VECTOR<T,3> xi=particles->X(i),xj=particles->X(j),xk=particles->X(k);
             for(int plane_vertices=0;plane_vertices<3;plane_vertices++) OpenGL_Normal(TRIANGLE_3D<T>::Normal(xi,xj,xk),normals);
@@ -505,7 +505,7 @@ Update_Cutaway_Plane()
         case 6:threshold=box.max_corner.z+cutaway_fraction*(box.min_corner.z-box.max_corner.z);for(int p=1;p<=particles->array_collection->Size();p++)inside(p)=particles->X(p).z>threshold;break;}
     cutaway_mesh.number_nodes=mesh->number_nodes;
     cutaway_mesh.elements.Remove_All();
-    for(int t=1;t<=mesh->elements.m;t++){
+    for(int t=0;t<mesh->elements.m;t++){
         int i,j,k,l;mesh->elements(t).Get(i,j,k,l);
         if(inside(i) || inside(j) || inside(k) || inside(l)) cutaway_mesh.elements.Append(VECTOR<int,4>(i,j,k,l));}
     cutaway_mesh.Initialize_Boundary_Mesh();
@@ -660,7 +660,7 @@ Draw_Tetrahedra_For_Selection() const
     glPushAttrib(GL_ENABLE_BIT);
     glDisable(GL_CULL_FACE);
     glPushName(0);
-    for(int t=1;t<=mesh->elements.m;t++){
+    for(int t=0;t<mesh->elements.m;t++){
         glLoadName(t);
         ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
         int i,j,k,l;mesh->elements(t).Get(i,j,k,l);

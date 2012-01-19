@@ -2337,7 +2337,7 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
     {
         solid_body_collection.deformable_body_collection.collisions.check_collision.Fill(true);
         for(int f=1;FINITE_VOLUME<TV,3>* fvm = solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>*>(f);f++)
-            for(int t=1;t<=fvm->Fe_hat.m;t++){
+            for(int t=0;t<fvm->Fe_hat.m;t++){
                // LOG::cout << "booya " << stretch_cutoff << std::endl;
                 if(fvm->Fe_hat(t).x11>=stretch_cutoff)
                     solid_body_collection.deformable_body_collection.collisions.check_collision.Subset(fvm->strain_measure.mesh_object.mesh.elements(t)).Fill(false);}
@@ -2446,7 +2446,7 @@ void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
     if(test_number==51) for(int i=0;i<particles.X.m;i++) if(particles.V(i).x>6) particles.V(i).x=6;
     T min_volume=FLT_MAX;
     for(int v=1;TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(v);v++){
-        for(int i=1;i<=tetrahedralized_volume->mesh.elements.m;i++){
+        for(int i=0;i<tetrahedralized_volume->mesh.elements.m;i++){
             T vol=tetrahedralized_volume->Signed_Size(i);
             if(vol<min_volume) min_volume=vol;}}
     LOG::cout<<"Minimum tet volume: "<<min_volume<<std::endl;

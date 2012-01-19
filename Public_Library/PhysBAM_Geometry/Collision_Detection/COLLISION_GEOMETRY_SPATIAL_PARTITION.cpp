@@ -210,7 +210,7 @@ Get_Potential_Collisions(const ID index,const RANGE<TV_INT>& range,ARRAY<ID>& ob
     GRID<TV> unused;
     for(typename GRID<TV>::CELL_ITERATOR iterator(unused,range);iterator.Valid();iterator.Next()){TV_INT voxel=iterator.Cell_Index();
         ARRAY<ID>* occupancy_list=0;
-        if(hashtable.Get(voxel,occupancy_list)) for(int t=1;t<=occupancy_list->m;t++){
+        if(hashtable.Get(voxel,occupancy_list)) for(int t=0;t<occupancy_list->m;t++){
             ID k=(*occupancy_list)(t);
             if(k>index || (!only_higher_index && k!=index))
                 if(!already_added.Is_Marked_Current(k)){already_added.Mark(k);object_indices.Append(k);}}}

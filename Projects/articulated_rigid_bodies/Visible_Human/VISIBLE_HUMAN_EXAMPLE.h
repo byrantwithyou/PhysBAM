@@ -333,14 +333,14 @@ void Skeleton_In_Flesh()
     arb->Update_With_Breadth_First_Directed_Graph(root);
 
     // make joint functions to try to keep this pose
-    for(int i=1;i<=da_man->joint.m;i++) if(da_man->joint(i)){
+    for(int i=0;i<da_man->joint.m;i++) if(da_man->joint(i)){
         da_man->Create_Joint_Function(i);JOINT_FUNCTION<TV>* joint_function=da_man->joint(i)->joint_function;
         joint_function->muscle_control=true;
         joint_function->Set_k_p(k_p);
         joint_function->Set_Target_Angle(joint_function->Angle());
     }
 
-    for(int i=1;i<=da_man->muscles.m;i++) if(da_man->muscles(i)){
+    for(int i=0;i<da_man->muscles.m;i++) if(da_man->muscles(i)){
         T length=da_man->muscles(i)->Total_Length();
         T total_rest_length=da_man->muscles(i)->optimal_length + da_man->muscles(i)->tendon_slack_length;
         if(total_rest_length>(T)1.5*length){
@@ -361,7 +361,7 @@ void Skeleton_In_Flesh()
 
     if(arb->use_muscle_actuators){
         LOG::cout << "Joints with only muscle control"<<std::endl;
-        for(int i=1;i<=arb->joint_mesh.joints.m;i++) if(arb->joint_mesh.joints(i)->joint_function && arb->joint_mesh.joints(i)->joint_function->muscle_control)
+        for(int i=0;i<arb->joint_mesh.joints.m;i++) if(arb->joint_mesh.joints(i)->joint_function && arb->joint_mesh.joints(i)->joint_function->muscle_control)
             LOG::cout << "\t" << arb->joint_mesh.joints(i)->name << std::endl;}
     for(int i=1;i<=rigid_body_list.Number_Of_Elements();i++) rigid_body_particles.Rigid_Body(i).Set_Coefficient_Of_Friction(1);
 }
@@ -476,7 +476,7 @@ void Default_Example2()
     arb->Update_With_Breadth_First_Directed_Graph(root);
     
     // what are joint functions, should all joints have joint functions?
-    for(int i=1;i<=da_man->joint.m;i++) if(da_man->joint(i)){
+    for(int i=0;i<da_man->joint.m;i++) if(da_man->joint(i)){
         da_man->Create_Joint_Function(i); JOINT_FUNCTION<TV>* joint_function=da_man->joint(i)->joint_function;
         joint_function->Set_k_p(k_p);
         joint_function->Set_Target_Angle(joint_function->Angle());
@@ -562,7 +562,7 @@ void Default_Example()
 
     
     
-    for(int i=1;i<=da_man->joint.m;i++) if(da_man->joint(i)){
+    for(int i=0;i<da_man->joint.m;i++) if(da_man->joint(i)){
         da_man->Create_Joint_Function(i);JOINT_FUNCTION<TV>* joint_function=da_man->joint(i)->joint_function;
         joint_function->Set_k_p(k_p);
 //        if(i==VISIBLE_HUMAN<T>::JOINT_R_STERNOCLAVICULAR || i==VISIBLE_HUMAN<T>::JOINT_R_ACROMIOCLAVICULAR || i==VISIBLE_HUMAN<T>::JOINT_R_GLENOHUMERAL)
@@ -582,7 +582,7 @@ void Default_Example()
     
     
     //if(getenv("SET_ZERO")){
-    //for(int i=1;i<=da_man->joint.m;i++) if(da_man->joint(i)) da_man->joint(i)->Set_Joint_Frame(FRAME<TV>());
+    //for(int i=0;i<da_man->joint.m;i++) if(da_man->joint(i)) da_man->joint(i)->Set_Joint_Frame(FRAME<TV>());
       // arb->Update_With_Breadth_First_Directed_Graph(da_man->bones(VISIBLE_HUMAN<T>::BONE_CRANIUM)->id_number);
       //arb->Update_With_Breadth_First_Directed_Graph(da_man->bones(VISIBLE_HUMAN<T>::BONE_THORAX)->id_number);//}
     }
@@ -722,7 +722,7 @@ void Push_Up()
     arb->Update_With_Breadth_First_Directed_Graph(root);
 
     // make joint functions to try to keep this pose
-    for(int i=1;i<=da_man->joint.m;i++) if(da_man->joint(i)){
+    for(int i=0;i<da_man->joint.m;i++) if(da_man->joint(i)){
         da_man->Create_Joint_Function(i);JOINT_FUNCTION<TV>* joint_function=da_man->joint(i)->joint_function;
         joint_function->muscle_control=true;
         joint_function->Set_k_p(k_p);
@@ -738,7 +738,7 @@ void Push_Up()
         jfunc->muscle_control=true;
         jfunc->Set_Target_Angle(jfunc->Angle());jfunc->Set_k_p(k_p);}
 
-    for(int i=1;i<=da_man->muscles.m;i++) if(da_man->muscles(i) && !da_man->muscles(i)->peak_force && da_man->muscles(i)->name.find("_left")==std::string::npos){
+    for(int i=0;i<da_man->muscles.m;i++) if(da_man->muscles(i) && !da_man->muscles(i)->peak_force && da_man->muscles(i)->name.find("_left")==std::string::npos){
         T length=da_man->muscles(i)->Total_Length();
         LOG::cout << "cat > " << da_man->muscles(i)->name << ".param << EOF" << std::endl;
         LOG::cout << "// values not available from SIMM model so we made them up by dividing length at rest state into half muscle half tendon" << std::endl;
@@ -749,14 +749,14 @@ void Push_Up()
         LOG::cout << "EOF" << std::endl;
     }
 
-    for(int i=1;i<=da_man->muscles.m;i++) if(da_man->muscles(i)){
+    for(int i=0;i<da_man->muscles.m;i++) if(da_man->muscles(i)){
         T length=da_man->muscles(i)->Total_Length();
         T total_rest_length=da_man->muscles(i)->optimal_length + da_man->muscles(i)->tendon_slack_length;
         if(total_rest_length>(T)1.5*length){
             std::cout << "Muscle " << da_man->muscles(i)->name << ": (" << da_man->muscles(i)->optimal_length << "+" << da_man->muscles(i)->tendon_slack_length << ") " << total_rest_length << " vs " << length << std::endl;}}
 
 //    T peak_force=parameter_list.Get_Parameter("peak_force",(T)1);
-//    for(int i=1;i<=da_man->muscles.m;i++) if(da_man->muscles(i)) da_man->muscles(i)->Set_Peak_Force(peak_force);
+//    for(int i=0;i<da_man->muscles.m;i++) if(da_man->muscles(i)) da_man->muscles(i)->Set_Peak_Force(peak_force);
 
     // Determine which joints will get PD as opposed to muscle actuation
     if(da_man->joint(VISIBLE_HUMAN<T>::JOINT_R_STERNOCLAVICULAR)) da_man->joint(VISIBLE_HUMAN<T>::JOINT_R_STERNOCLAVICULAR)->joint_function->muscle_control=false;
@@ -774,7 +774,7 @@ void Push_Up()
 
     if(arb->use_muscle_actuators){
         LOG::cout << "Joints with only muscle control"<<std::endl;
-        for(int i=1;i<=arb->joint_mesh.joints.m;i++) if(arb->joint_mesh.joints(i)->joint_function && arb->joint_mesh.joints(i)->joint_function->muscle_control)
+        for(int i=0;i<arb->joint_mesh.joints.m;i++) if(arb->joint_mesh.joints(i)->joint_function && arb->joint_mesh.joints(i)->joint_function->muscle_control)
             LOG::cout << "\t" << arb->joint_mesh.joints(i)->name << std::endl;}
 
     for(int i=0;i<rigid_body_list.rigid_bodies.m;i++) rigid_body_list.rigid_bodies(i)->Set_Coefficient_Of_Friction(1);
@@ -795,7 +795,7 @@ void Read_Mocap_Data()
     /*da_man->bones(VISIBLE_HUMAN<T>::BONE_L_ANKLE)->is_static=true;
       da_man->bones(VISIBLE_HUMAN<T>::BONE_R_ANKLE)->is_static=true;*/
     T k_p=parameter_list.Get_Parameter("k_p",(T)50);
-    for(int i=1;i<=da_man->joint.m;i++){
+    for(int i=0;i<da_man->joint.m;i++){
         std::cout<<"joint name is "<<da_man->joint(i)->name<<"\n";
         int track = my_motion.Track_Index(da_man->joint(i)->name);
         if (track != -1){
@@ -934,7 +934,7 @@ void Add_Foot_Ground_Joints()
 //#####################################################################
 void Update_Joints(const /*int frame*/T time)
 {
-    for(int i=1;i<=arb->joint_mesh.joints.m;i++)
+    for(int i=0;i<arb->joint_mesh.joints.m;i++)
         if(arb->joint_mesh.joints(i)->joint_function && arb->joint_mesh.joints(i)->joint_function->track)
             arb->joint_mesh.joints(i)->Set_Joint_Frame(arb->joint_mesh.joints(i)->joint_function->track->Frame(time));
     arb->Update_With_Breadth_First_Directed_Graph(root);
@@ -974,14 +974,14 @@ void Save_Masses()
     LOG::cout << "--- saving masses" << std::endl;
     saved_masses.Resize(da_man->bones.m);
     // TODO: confirm this mass is world-space
-    for(int i=1;i<=da_man->bones.m;i++) if(da_man->bones(i))
+    for(int i=0;i<da_man->bones.m;i++) if(da_man->bones(i))
         saved_masses(i)=da_man->bones(i)->Mass();
 }
 void Restore_Masses()
 {
     if(!da_man) return;
     LOG::cout << "--- restoring masses" << std::endl;
-    for(int i=1;i<=da_man->bones.m;i++) if(da_man->bones(i)){
+    for(int i=0;i<da_man->bones.m;i++) if(da_man->bones(i)){
         da_man->bones(i)->Mass()=saved_masses(i);}
 }
 //#####################################################################

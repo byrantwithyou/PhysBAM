@@ -361,7 +361,7 @@ Kang_Circle(bool use_surface)
         front_tracked_structure=&solids_tests.Copy_And_Add_Structure(*TESSELLATION::Tessellate_Boundary(object,solid_refinement));
         solid_body_collection.deformable_body_collection.particles.array_collection->Add_Elements(20*resolution);
         particle_segments.Resize(front_tracked_structure->mesh.elements.Flattened().Max());
-        for(int i=1;i<=front_tracked_structure->mesh.elements.m;i++){
+        for(int i=0;i<front_tracked_structure->mesh.elements.m;i++){
             particle_segments(front_tracked_structure->mesh.elements(i).x).y=i;
             particle_segments(front_tracked_structure->mesh.elements(i).y).x=i;}
         if(make_ellipse) for(int i=0;i<particle_segments.m;i++) front_tracked_structure->particles.X(i)/=TV((T)1.1,(T).9);
@@ -404,7 +404,7 @@ Oscillating_Circle(bool use_surface)
         SPHERE<TV> circle;
         TRIANGULATED_AREA<T>* area=&solids_tests.Copy_And_Add_Structure(*TESSELLATION::Generate_Triangles(circle,solid_refinement));
         LINEAR_POINT_ATTRACTION<TV>* stf=new LINEAR_POINT_ATTRACTION<TV>(*area,TV(.5,.5),linear_force);
-        for(int i=1;i<=stf->referenced_particles.m;i++){int p=stf->referenced_particles(i);
+        for(int i=0;i<stf->referenced_particles.m;i++){int p=stf->referenced_particles(i);
             TV& X=area->particles.X(p);
             if(X==TV()){X=TV(.5,.5);continue;}
             T angle=atan2(X.y,X.x);
@@ -422,14 +422,14 @@ Oscillating_Circle(bool use_surface)
     else if(use_surface){
         SPHERE<TV> object;
         front_tracked_structure=&solids_tests.Copy_And_Add_Structure(*TESSELLATION::Tessellate_Boundary(object,solid_refinement));
-        for(int i=1;i<=front_tracked_structure->particles.X.m;i++){
+        for(int i=0;i<front_tracked_structure->particles.X.m;i++){
             T angle=(T)(i*2*pi/front_tracked_structure->particles.X.m);
             T radius=circle_radius+circle_perturbation*cos(oscillation_mode*angle);
             front_tracked_structure->particles.X(i)=TV((T).5*m+radius*cos(angle),(T).5*m+radius*sin(angle));}
         solid_body_collection.deformable_body_collection.particles.mass.Fill((T)1);
         solid_body_collection.deformable_body_collection.particles.array_collection->Add_Elements(20*resolution);
         particle_segments.Resize(front_tracked_structure->mesh.elements.Flattened().Max());
-        for(int i=1;i<=front_tracked_structure->mesh.elements.m;i++){
+        for(int i=0;i<front_tracked_structure->mesh.elements.m;i++){
             particle_segments(front_tracked_structure->mesh.elements(i).x).y=i;
             particle_segments(front_tracked_structure->mesh.elements(i).y).x=i;}
         saved_tracked_particles_X=front_tracked_structure->particles.X.Prefix(particle_segments.m);
@@ -493,7 +493,7 @@ Sync_Front_Tracked_Particles_To_Level_Set()
 {
     return;
     for(int i=0;i<particle_segments.m;i++) Sync_Particle_To_Level_Set(i);
-//    for(int i=1;i<=front_tracked_structure->mesh.elements.m;i++) Divide_Segment(i);
+//    for(int i=0;i<front_tracked_structure->mesh.elements.m;i++) Divide_Segment(i);
 //    for(int i=particle_segments.m;i>=1;i--) Remove_Particle(i);
     for(int i=0;i<particle_segments.m;i++) solid_body_collection.deformable_body_collection.particles.mass(i)=Compute_New_Mass(i);
 }

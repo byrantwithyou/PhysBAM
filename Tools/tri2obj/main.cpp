@@ -29,7 +29,7 @@ template<class T,class RW> void Convert(const std::string& input_filename,const 
     for(int p=1;p<=triangulated_surface->particles.array_collection->Size();p++)
         (*output)<<STRING_UTILITIES::string_sprintf("v %lg %lg %lg\n",triangulated_surface->particles.X(p)[1],triangulated_surface->particles.X(p)[2],triangulated_surface->particles.X(p)[3]);
 
-    for(int e=1;e<=triangulated_surface->mesh.elements.m;e++)
+    for(int e=0;e<triangulated_surface->mesh.elements.m;e++)
         (*output)<<STRING_UTILITIES::string_sprintf("f %d %d %d\n",triangulated_surface->mesh.elements(e)[1],triangulated_surface->mesh.elements(e)[2],triangulated_surface->mesh.elements(e)[3]);
     delete output;
 }

@@ -99,11 +99,11 @@ public:
         MATRIX_4X4<T> cur_transform = MATRIX_4X4<T>::Translation_Matrix(-(*centers(*active_surface)));
         cur_transform = MATRIX_4X4<T>(-1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1)*cur_transform;
         cur_transform = MATRIX_4X4<T>::Translation_Matrix(*centers(*active_surface))*cur_transform;
-        for(int i=1;i<=surface->particles.number;i++)
+        for(int i=0;i<surface->particles.number;i++)
         {
             surface->particles.X(i) = cur_transform * surface->particles.X(i);
         }
-        for(int j=1;j<=surface->triangle_mesh.triangles.m;j++)
+        for(int j=0;j<surface->triangle_mesh.triangles.m;j++)
         {
             int temp = surface->triangle_mesh.triangles(1,j);
             surface->triangle_mesh.triangles(1,j) = surface->triangle_mesh.triangles(3,j);
@@ -317,11 +317,11 @@ public:
         TRIANGULATED_SURFACE<T>* surface, *original_surface;
         surface = surfaces(*active_surface);
         original_surface = original_surfaces(*active_surface);
-        for(int i=1;i<=surface->particles.number;i++)
+        for(int i=0;i<surface->particles.number;i++)
         {
             surface->particles.X(i) = (*transform) * original_surface->particles.X(i);
         }
-        for(int j=1;j<=surface->triangle_mesh.triangles.m;j++)
+        for(int j=0;j<surface->triangle_mesh.triangles.m;j++)
         {
             surface->triangle_mesh.triangles(1,j) = original_surface->triangle_mesh.triangles(3,j);
             surface->triangle_mesh.triangles(3,j) = original_surface->triangle_mesh.triangles(1,j);
@@ -778,7 +778,7 @@ public:
         gl_surfaces.Append(ots);
         world.Add_Object(ots,true,true);
         VECTOR_3D<T> *center = new VECTOR_3D<T>(0, 0, 0);
-        for(int i=1;i<=surface->particles.number;i++)
+        for(int i=0;i<surface->particles.number;i++)
         {
             (*center) += surface->particles.X(i);
         }
@@ -801,8 +801,8 @@ public:
         OPENGL_TETS<T>* tets=new OPENGL_TETS<T>(&(vol->tetrahedron_mesh),&(vol->particles),OPENGL_MATERIAL::Plastic(OPENGL_COLOR(float(.9),float(.1),float(.1))));
         world.Add_Object(tets,true,true);
         //transform reflected tets
-        for(int i=1;i<=reflected_vol->particles.number;i++)reflected_vol->particles.X(i)=start_transform*vol->particles.X(i);
-        for(int j=1;j<=reflected_vol->tetrahedron_mesh.tetrahedrons.m;j++){
+        for(int i=0;i<reflected_vol->particles.number;i++)reflected_vol->particles.X(i)=start_transform*vol->particles.X(i);
+        for(int j=0;j<reflected_vol->tetrahedron_mesh.tetrahedrons.m;j++){
             reflected_vol->tetrahedron_mesh.tetrahedrons(1,j)=vol->tetrahedron_mesh.tetrahedrons(3,j);
             reflected_vol->tetrahedron_mesh.tetrahedrons(3,j)=vol->tetrahedron_mesh.tetrahedrons(1,j);}
         OPENGL_TETS<T>* reflected_tets=new OPENGL_TETS<T>(&(reflected_vol->tetrahedron_mesh),&(reflected_vol->particles),OPENGL_MATERIAL::Plastic(OPENGL_COLOR(float(.9),float(.1),float(.1))));

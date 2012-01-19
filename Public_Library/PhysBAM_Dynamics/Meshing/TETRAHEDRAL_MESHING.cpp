@@ -83,7 +83,7 @@ Snap_Nodes_To_Level_Set_Boundary(const int iterations)
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     TETRAHEDRON_MESH& mesh=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>().mesh;
     if(!mesh.boundary_nodes) mesh.Initialize_Boundary_Nodes();
-    for(int t=1;t<=mesh.boundary_nodes->m;t++) for(int k=0;k<iterations;k++){
+    for(int t=0;t<mesh.boundary_nodes->m;t++) for(int k=0;k<iterations;k++){
         int node=(*mesh.boundary_nodes)(t);TV X=deformable_body_collection.particles.X(node);
         deformable_body_collection.particles.X(node)-=implicit_surface->Extended_Phi(X)*implicit_surface->Extended_Normal(X);}
     FILE_UTILITIES::Create_Directory(output_directory);
@@ -100,7 +100,7 @@ Initialize_Optimization(const bool verbose)
     mesh.boundary_mesh->Initialize_Neighbor_Nodes();mesh.boundary_mesh->Initialize_Incident_Elements();
     mesh.Initialize_Boundary_Nodes(); // assumes that Initialize_Boundary_Nodes will use boundary_mesh
     map_from_nodes_to_boundary_list.Resize(mesh.number_nodes);
-    for(int i=1;i<=mesh.boundary_nodes->m;i++) map_from_nodes_to_boundary_list((*mesh.boundary_nodes)(i))=i;
+    for(int i=0;i<mesh.boundary_nodes->m;i++) map_from_nodes_to_boundary_list((*mesh.boundary_nodes)(i))=i;
     for(int i=0;i<layers.m;i++) delete layers(i);layers.Resize(1);layers(1)=mesh.boundary_nodes;
     mesh.boundary_nodes=0; // we don't need it hanging off the mesh object any more
     if(verbose) LOG::cout<<"boundary layer has "<<layers(1)->m<<" nodes"<<std::endl;
@@ -301,7 +301,7 @@ Compute_Boundary_Mesh_Normals()
     TETRAHEDRON_MESH& mesh=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>().mesh;
     PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     boundary_mesh_normals.Fill(TV());PLANE<T> p;
-    for(int t=1;t<=mesh.boundary_mesh->elements.m;t++){
+    for(int t=0;t<mesh.boundary_mesh->elements.m;t++){
         int i,j,k;mesh.boundary_mesh->elements(t).Get(i,j,k);
         p.Specify_Three_Points(particles.X(i),particles.X(j),particles.X(k));
         boundary_mesh_normals(map_from_nodes_to_boundary_list(i))+=p.normal;
@@ -339,7 +339,7 @@ Initialize_Dynamics()
     SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(tetrahedralized_volume,density,use_constant_mass);
     if(boundary_mass_multiplicative_factor!=1){
         bool boundary_nodes_defined=mesh.boundary_nodes!=0;if(!boundary_nodes_defined) mesh.Initialize_Boundary_Nodes();
-        for(int i=1;i<=mesh.boundary_nodes->m;i++) tetrahedralized_volume.particles.X(i)*=boundary_mass_multiplicative_factor;
+        for(int i=0;i<mesh.boundary_nodes->m;i++) tetrahedralized_volume.particles.X(i)*=boundary_mass_multiplicative_factor;
         if(!boundary_nodes_defined){delete mesh.boundary_nodes;mesh.boundary_nodes=0;}}
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents();
     solid_body_collection.deformable_body_collection.binding_list.Clear_Hard_Bound_Particles(deformable_body_collection.particles.mass);

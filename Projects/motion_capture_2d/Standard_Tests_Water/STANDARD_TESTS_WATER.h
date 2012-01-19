@@ -664,7 +664,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         //for(int i=0;i<particle_array.m;i++){
         for(int i=1;i<=particles.array_collection->Size();i++){
             referenced_particles->Append(i);
-            for(int j=1;j<=source_rigid_particles->m;j++) if(solid_body_collection.rigid_body_collection.Rigid_Body((*source_rigid_particles)(j)).implicit_object->Inside(particles.X(i))) source_particles->Append(i);
+            for(int j=0;j<source_rigid_particles->m;j++) if(solid_body_collection.rigid_body_collection.Rigid_Body((*source_rigid_particles)(j)).implicit_object->Inside(particles.X(i))) source_particles->Append(i);
         }
 
         for(int i=1;i<=deformable_objects_to_simulate.m;++i){

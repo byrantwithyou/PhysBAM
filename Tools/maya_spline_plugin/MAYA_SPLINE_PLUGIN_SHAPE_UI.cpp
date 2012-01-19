@@ -186,7 +186,7 @@ Draw_Wireframe(const MDrawRequest & request,M3dView & view) const
         if(lighting_save) glDisable(GL_LIGHTING);
         TRIANGULATED_SURFACE<float>& surface=*(shape->tetrahedralized_volume->triangulated_surface);
         glBegin(GL_LINES);
-        for(int i=1;i<=shape->uvw_iso_mesh.m;i++){
+        for(int i=0;i<shape->uvw_iso_mesh.m;i++){
             int node1,node2;shape->uvw_iso_mesh.Get(i,node1,node2);
             OpenGL_Vertex(surface.particles.X(node1));
             OpenGL_Vertex(surface.particles.X(node2));}

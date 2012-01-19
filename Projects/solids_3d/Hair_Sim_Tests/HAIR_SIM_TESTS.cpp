@@ -333,19 +333,19 @@ Initialize_Bodies()
 
     // Fix tetrahedra orientation
     int i=1;
-    for(int t=1;t<=volume->mesh.elements.m;t++){
+    for(int t=0;t<volume->mesh.elements.m;t++){
         VECTOR<int,4>& nodes=volume->mesh.elements(t);
         if (TETRAHEDRON<T>(particles.X.Subset(nodes)).Signed_Volume()<0) exchange(nodes[3],nodes[4]);
         i++;}
-    for(int t=1;t<=volume->mesh.elements.m;t++){
+    for(int t=0;t<volume->mesh.elements.m;t++){
         VECTOR<int,4>& nodes=volume->mesh.elements(t);
         if (TETRAHEDRON<T>(particles.X.Subset(nodes)).Signed_Volume()<0) PHYSBAM_FATAL_ERROR();}
     volume->Update_Number_Nodes();
-    for(int t=1;t<=sim_guide_volume->mesh.elements.m;t++){
+    for(int t=0;t<sim_guide_volume->mesh.elements.m;t++){
         VECTOR<int,4>& nodes=sim_guide_volume->mesh.elements(t);
         if (TETRAHEDRON<T>(particles.X.Subset(nodes)).Signed_Volume()<0) exchange(nodes[3],nodes[4]);
         i++;}
-    for(int t=1;t<=sim_guide_volume->mesh.elements.m;t++){
+    for(int t=0;t<sim_guide_volume->mesh.elements.m;t++){
         VECTOR<int,4>& nodes=sim_guide_volume->mesh.elements(t);
         if (TETRAHEDRON<T>(particles.X.Subset(nodes)).Signed_Volume()<0) PHYSBAM_FATAL_ERROR();}
     sim_guide_volume->Update_Number_Nodes();

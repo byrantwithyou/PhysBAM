@@ -424,7 +424,7 @@ Initialize_Fluids_Grids()
         fluids_parameters.incompressible->Initialize_Grids(grid);
         if(fluids_parameters.use_strain && fluids_parameters.incompressible->strain) fluids_parameters.incompressible->strain->Initialize_Grid(grid);}
     if(fluids_parameters.use_slip) dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>&>(solids_evolution).Initialize_Grid_Arrays();
-    if(number_of_regions>=2) for(int i=1;i<=fluids_parameters.incompressible_multiphase->strains.m;i++) if(fluids_parameters.incompressible_multiphase->strains(i))
+    if(number_of_regions>=2) for(int i=0;i<fluids_parameters.incompressible_multiphase->strains.m;i++) if(fluids_parameters.incompressible_multiphase->strains(i))
         fluids_parameters.incompressible_multiphase->strains(i)->Initialize_Grid(grid);
 }
 //#####################################################################

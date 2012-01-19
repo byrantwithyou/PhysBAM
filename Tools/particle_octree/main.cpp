@@ -26,7 +26,7 @@ void Get_Particle_Bounding_Boxes(const T_PARTICLES_ARRAY_3D& particles_array, AR
 {
     for(int i=particles_array.m_start;i<=particles_array.m_end;i++) for(int j=particles_array.n_start;j<=particles_array.n_end;j++) for(int ij=particles_array.mn_start;ij<=particles_array.mn_end;ij++) {
         PARTICLE_LEVELSET_REMOVED_PARTICLES<T,VECTOR_3D<T> >* particles = particles_array(i,j,ij);
-        if(particles) for(int p=1;p<=particles->number;p++) {
+        if(particles) for(int p=0;p<particles->number;p++) {
             T radius=scale*particles->radius(p);
             particles_bounding_box(i,j,ij).Append(particle_blender.Get_Bounding_Box(3*radius,radius,particles->X(p),particles->V(p)));
             number_of_particles++;
@@ -116,7 +116,7 @@ int main(int argc, char* argv[])
     std::cout<<"-- Added "<<rigid_body_list.rigid_bodies.m<<" objects"<<std::endl;
     for(int i=6;i<=rigid_body_list.rigid_bodies.m;i++){
         RIGID_BODY_3D<T>& rigid_body=*rigid_body_list.rigid_bodies(i);//*rigid_body_list(i);
-        for(int i=1;i<=rigid_body.triangulated_surface->particles.number;i++) rigid_body.triangulated_surface->particles.X(i)=rigid_body.World_Space_Point(rigid_body.triangulated_surface->particles.X(i));
+        for(int i=0;i<rigid_body.triangulated_surface->particles.number;i++) rigid_body.triangulated_surface->particles.X(i)=rigid_body.World_Space_Point(rigid_body.triangulated_surface->particles.X(i));
         rigid_body.triangulated_surface->Update_Bounding_Box();rigid_body.triangulated_surface->Refresh_Auxiliary_Structures();
         triangulated_surfaces.Append(rigid_body.triangulated_surface);}
     
@@ -150,13 +150,13 @@ int main(int argc, char* argv[])
     FILE_UTILITIES::Write_To_File<RW>(STRING_UTILITIES::string_sprintf("%s/object_levelset.%d",output_directory.c_str(),frame).c_str(),implicit_surface);}
 
     phi_objects-=object_expansion*grid->max_dx_dy_dz;
-    for(int i=1;i<=grid->m;i++)for(int j=1;j<=grid->n;j++)for(int ij=1;ij<=grid->mn;ij++)
+    for(int i=0;i<grid->m;i++)for(int j=0;j<grid->n;j++)for(int ij=0;ij<grid->mn;ij++)
         levelset.phi(i,j,ij)=min(levelset.phi(i,j,ij),phi_objects(i,j,ij));
 
     std::cout<<"Adding negative particles to removed negative particles"<<std::endl;
     for(int i=negative_particles_array.m_start;i<=negative_particles_array.m_end;i++) for(int j=negative_particles_array.n_start;j<=negative_particles_array.n_end;j++) for(int ij=negative_particles_array.mn_start;ij<=negative_particles_array.mn_end;ij++) {
         PARTICLE_LEVELSET_PARTICLES<T,VECTOR_3D<T> >* particles = negative_particles_array(i,j,ij);
-        if(particles) for(int p=1;p<=particles->number;p++){
+        if(particles) for(int p=0;p<particles->number;p++){
             if(implicit_surface.levelset.Phi(particles->X(p))>0) {
                 if(!particles_array(i,j,ij)) particles_array(i,j,ij)=new PARTICLE_LEVELSET_REMOVED_PARTICLES<T,VECTOR_3D<T> >();
                 PARTICLES::Move_Particle(*particles,*particles_array(i,j,ij),p);}}}
@@ -181,7 +181,7 @@ int main(int argc, char* argv[])
     for(int i=particles_array.m_start;i<=particles_array.m_end;i++) for(int j=particles_array.n_start;j<=particles_array.n_end;j++) for(int ij=particles_array.mn_start;ij<=particles_array.mn_end;ij++) {
         PARTICLE_LEVELSET_REMOVED_PARTICLES<T,VECTOR_3D<T> >* particles = particles_array(i,j,ij);
         if(particles){
-            for(int p=1;p<=particles->number;p++){
+            for(int p=0;p<particles->number;p++){
                 BOX_3D<T> particle_bounding_box=particles_bounding_box(i,j,ij)(p);
                 VECTOR_3D<T> particle_box_size(particle_bounding_box.Size());
                 int cells_x=(int)ceil(particle_box_size.x/2/octree_grid.uniform_grid.dx);
@@ -207,7 +207,7 @@ int main(int argc, char* argv[])
     for(int i=particles_array.m_start;i<=particles_array.m_end;i++) for(int j=particles_array.n_start;j<=particles_array.n_end;j++) for(int ij=particles_array.mn_start;ij<=particles_array.mn_end;ij++) {
         PARTICLE_LEVELSET_REMOVED_PARTICLES<T,VECTOR_3D<T> >* particles = particles_array(i,j,ij);
         if(particles){
-            for(int p=1;p<=particles->number;p++){
+            for(int p=0;p<particles->number;p++){
                 BOX_3D<T> particle_bounding_box=particles_bounding_box(i,j,ij)(p);
                 T radius=scale*particles->radius(p);
                 T velocity_magnitude_squared=particles->V(p).Magnitude_Squared();

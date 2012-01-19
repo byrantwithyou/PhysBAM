@@ -611,7 +611,7 @@ MUSCLE<TV>* Add_Basic_Muscle(const std::string& name,RIGID_BODY<TV>& origin_body
 void Initialize_Muscle_Segments()
 {
     ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
-    for(int i=1;i<=arb.muscle_list->muscles.m;i++) arb.muscle_list->muscles(i)->Initialize();
+    for(int i=0;i<arb.muscle_list->muscles.m;i++) arb.muscle_list->muscles(i)->Initialize();
 }
 //#####################################################################
 // Function Large_Cluster_Cube

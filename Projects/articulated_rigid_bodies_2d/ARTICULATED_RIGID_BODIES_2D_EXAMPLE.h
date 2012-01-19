@@ -76,7 +76,7 @@ public:
 //#####################################################################
 virtual void Initialize_Rigid_Body_Forces()
 {
-    for(int i=1;i<=rigid_body_list->rigid_bodies.m;i++)
+    for(int i=0;i<rigid_body_list->rigid_bodies.m;i++)
         if(!rigid_body_list->rigid_bodies(i)->is_static) 
 //            rigid_body_list->rigid_bodies(i)->Add_Basic_Forces(gravity,VECTOR_2D<T>(gravity_direction.x,gravity_direction.y),ether_viscosity,0);
             rigid_body_list->rigid_bodies(i)->Add_Basic_Forces(solids_parameters.gravity,VECTOR_2D<T>(solids_parameters.gravity_direction.x,solids_parameters.gravity_direction.y),ether_viscosity,0);
@@ -89,7 +89,7 @@ void Load_Restart_Data(const int frame)
 {
     std::cout << "Restarting from frame " << frame << std::endl;
     rigid_body_list->template Read<T>(output_directory,frame);
-    for(int i=1;i<=rigid_body_list->rigid_bodies.m;i++) rigid_body_list->rigid_bodies(i)->Update_Angular_Velocity();
+    for(int i=0;i<rigid_body_list->rigid_bodies.m;i++) rigid_body_list->rigid_bodies(i)->Update_Angular_Velocity();
 }
 //#####################################################################
 // Function Initialize_Rigid_Body

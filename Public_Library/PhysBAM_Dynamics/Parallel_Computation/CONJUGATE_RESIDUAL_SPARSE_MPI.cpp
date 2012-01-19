@@ -116,7 +116,7 @@ Parallel_Solve(T_SYSTEM& system,TV2& x_array,const TV2& b_array,TV2& p_array,TV2
 template<class TV> void CONJUGATE_RESIDUAL_SPARSE_MPI<TV>::
 Fill_Ghost_Cells(KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& v_array)
 {
-    for(int p=1;p<=partitions->m;p++){
+    for(int p=0;p<partitions->m;p++){
         SPARSE_MATRIX_PARTITION& partition=(*partitions)(p);
         VECTOR_ND<T>& v=v_array.v(p);
         ARRAY<MPI::Datatype>& boundary_datatypes=boundary_datatypes_array(p);
@@ -134,7 +134,7 @@ Initialize_Datatypes()
 {
     boundary_datatypes_array.Resize(partitions->m);
     ghost_datatypes_array.Resize(partitions->m);
-    for(int p=1;p<=partitions->m;p++){
+    for(int p=0;p<partitions->m;p++){
         SPARSE_MATRIX_PARTITION& partition=(*partitions)(p);
         ARRAY<MPI::Datatype>& boundary_datatypes=boundary_datatypes_array(p);
         ARRAY<MPI::Datatype>& ghost_datatypes=ghost_datatypes_array(p);

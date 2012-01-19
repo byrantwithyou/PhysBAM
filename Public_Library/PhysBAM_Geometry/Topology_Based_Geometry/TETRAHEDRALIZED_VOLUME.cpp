@@ -363,7 +363,7 @@ Maximum_Edge_Length(int* index)
     if(mesh.number_nodes!=particles.array_collection->Size()) PHYSBAM_FATAL_ERROR();
     bool segment_mesh_defined=mesh.segment_mesh!=0;if(!segment_mesh_defined) mesh.Initialize_Segment_Mesh();
     int s_save=0;T maximum=0;
-    for(int s=1;s<=mesh.segment_mesh->elements.m;s++){int i,j;mesh.segment_mesh->elements(s).Get(i,j);
+    for(int s=0;s<mesh.segment_mesh->elements.m;s++){int i,j;mesh.segment_mesh->elements(s).Get(i,j);
         T temp=(particles.X(i)-particles.X(j)).Magnitude();if(temp > maximum){maximum=temp;s_save=s;}}
     if(index) *index=s_save;
     if(!segment_mesh_defined){delete mesh.segment_mesh;mesh.segment_mesh=0;}
@@ -378,7 +378,7 @@ Minimum_Edge_Length(int* index)
     if(mesh.number_nodes!=particles.array_collection->Size()) PHYSBAM_FATAL_ERROR();
     bool segment_mesh_defined=mesh.segment_mesh!=0;if(!segment_mesh_defined) mesh.Initialize_Segment_Mesh();
     int s_save=0;T minimum=FLT_MAX;
-    for(int s=1;s<=mesh.segment_mesh->elements.m;s++){int i,j;mesh.segment_mesh->elements(s).Get(i,j);
+    for(int s=0;s<mesh.segment_mesh->elements.m;s++){int i,j;mesh.segment_mesh->elements(s).Get(i,j);
         T temp=(particles.X(i)-particles.X(j)).Magnitude();if(temp < minimum){minimum=temp;s_save=s;}}
     if(index) *index=s_save;
     if(!segment_mesh_defined){delete mesh.segment_mesh;mesh.segment_mesh=0;}
@@ -395,7 +395,7 @@ Advance_Interior_Laplacian_Smoothing()
     bool neighbor_nodes_defined=mesh.neighbor_nodes!=0;if(!neighbor_nodes_defined) mesh.Initialize_Neighbor_Nodes();
     bool node_on_boundary_defined=mesh.node_on_boundary!=0;if(!node_on_boundary_defined) mesh.Initialize_Node_On_Boundary();
     // compute the centroid of the neighbors - if on the boundary, just use boundary neighbors
-    for(int i=1;i<=mesh.neighbor_nodes->m;i++){
+    for(int i=0;i<mesh.neighbor_nodes->m;i++){
         int number=0;TV target;
         for(int j=1;j<=(*mesh.neighbor_nodes)(i).m;j++){
             int node=(*mesh.neighbor_nodes)(i)(j);
