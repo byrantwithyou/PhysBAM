@@ -83,12 +83,14 @@ Calculate_Boundary_From_Levelset_On_Nodes(EMBEDDED_OBJECT<TV,d>& eo,ARRAY<T>& ph
 {
     if(discard_elements_outside_levelset){ // TODO: Consider doing this before initializing the embedded object
         assert(eo.embedded_particles.active_indices.m==0); // Discarding should be done before adding any embedded particles
-        for(int t=eo.simplicial_object.mesh.elements.m;t>0;t--){
+        for(int t=eo.simplicial_object.mesh.elements.m-1;t>=0;t--){
             VECTOR<T,d+1> phi_t(phi.Subset(eo.simplicial_object.mesh.elements(t)));
-            if(phi_t.Min()>0) eo.simplicial_object.mesh.elements.Remove_Index_Lazy(t);}
+            if(phi_t.Min()>0) eo.simplicial_object.mesh.elements.Remove_Index_Lazy(t);
+        }
         ARRAY<int> condensation_mapping;eo.simplicial_object.Discard_Valence_Zero_Particles_And_Renumber(condensation_mapping);
         ARRAY<T> phi_new(eo.particles.array_collection->Size());for(int k=0;k<phi.m;k++) if(condensation_mapping(k)) phi_new(condensation_mapping(k))=phi(k);
-        phi.Exchange(phi_new);}
+        phi.Exchange(phi_new);
+    }
 
     if(eo.embedded_particles.active_indices.m){
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT

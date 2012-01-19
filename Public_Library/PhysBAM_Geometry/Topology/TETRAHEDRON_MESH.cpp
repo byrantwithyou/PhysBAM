@@ -182,12 +182,12 @@ Initialize_Triangle_Mesh()
         VECTOR<int,4> sorted_nodes=elements(t).Sorted();
         for(int i=0;i<sorted_nodes.m;i++){VECTOR<int,3> triangle=sorted_nodes.Remove_Index(i);
             triangle_list.Set(triangle);}}
-    triangle_mesh=new TRIANGLE_MESH();
-    triangle_mesh->elements.Exact_Resize(triangle_list.Size());
-    int triangle=0;
-    for(HASHTABLE_ITERATOR<VECTOR<int,3> > iterator(triangle_list);iterator.Valid();iterator.Next())
-        triangle_mesh->elements(triangle++)=iterator.Key();
-    triangle_mesh->number_nodes=number_nodes;
+    // triangle_mesh=new TRIANGLE_MESH();
+    // triangle_mesh->elements.Exact_Resize(triangle_list.Size());
+    // int triangle=0;
+    // for(HASHTABLE_ITERATOR<VECTOR<int,3> > iterator(triangle_list);iterator.Valid();iterator.Next())
+    //     triangle_mesh->elements(triangle++)=iterator.Key();
+    // triangle_mesh->number_nodes=number_nodes;
 }
 //#####################################################################
 // Function Initialize_Element_Edges
@@ -321,15 +321,15 @@ Initialize_Triangle_Tetrahedrons()
     triangle_tetrahedrons=new ARRAY<VECTOR<int,2> >(triangle_mesh->elements.m);
     bool incident_elements_defined=incident_elements!=0;if(!incident_elements_defined) Initialize_Incident_Elements();
     for(int t=0;t<triangle_mesh->elements.m;t++){
-        const VECTOR<int,3>& triangle_nodes=triangle_mesh->elements(t);int i=triangle_nodes[1];
-        for(int tet=0;tet<(*incident_elements)(i).m;tet++){
-            const VECTOR<int,4>& original_nodes=elements((*incident_elements)(i)(tet));
-            VECTOR<int,4> nodes;
-            int p=1;for(;p<=24;p++){
-                nodes=permute_four(original_nodes,p);
-                if(nodes.Remove_Index(4)==triangle_nodes) break;}
-            if(p<=24) (*triangle_tetrahedrons)(t)(permutation_of_four_is_even(p)?2:1)=(*incident_elements)(i)(tet);}}
-    if(!incident_elements_defined){delete incident_elements;incident_elements=0;}
+         const VECTOR<int,3>& triangle_nodes=triangle_mesh->elements(t);int i=triangle_nodes[0];
+         for(int tet=0;tet<(*incident_elements)(i).m;tet++){
+             const VECTOR<int,4>& original_nodes=elements((*incident_elements)(i)(tet));
+             VECTOR<int,4> nodes;
+             int p=0;for(;p<24;p++){
+                 nodes=permute_four(original_nodes,p);
+                 if(nodes.Remove_Index(2)==triangle_nodes) break;}
+             if(p<24) (*triangle_tetrahedrons)(t)(permutation_of_four_is_even(p)?1:0)=(*incident_elements)(i)(tet);}}
+    // if(!incident_elements_defined){delete incident_elements;incident_elements=0;}
 }
 //#####################################################################
 // Function Number_Of_Boundary_Tetrahedrons

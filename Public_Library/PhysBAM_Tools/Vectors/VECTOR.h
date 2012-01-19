@@ -106,7 +106,7 @@ public:
     template<int n>
     VECTOR(const VECTOR<T,n>& v1,const VECTOR<T,d-n>& v2)
     {
-        for(int i=0;i<n;i++) (*this)(i)=v1(i);for(int i=n+1;i<=d;i++) (*this)(i)=v2(i-n);
+        for(int i=0;i<n;i++) (*this)(i)=v1(i);for(int i=n;i<d;i++) (*this)(i)=v2(i-n);
     }
 
     template<class T_VECTOR> typename ENABLE_IF<AND<IS_SAME<T,typename T_VECTOR::ELEMENT>::value,INTS_EQUAL<T_VECTOR::m,d>::value>::value,VECTOR&>::TYPE
@@ -278,18 +278,18 @@ public:
     return r;}
 
     VECTOR<T,4> Sorted() const
-    {STATIC_ASSERT(d==4);VECTOR<T,4> r(*this);exchange_sort(r[1],r[2],r[3],r[4]);return r;}
+    {STATIC_ASSERT(d==4);VECTOR<T,4> r(*this);exchange_sort(r[0],r[1],r[2],r[3]);return r;}
 
     VECTOR Reversed() const
     {VECTOR r;for(int i=0;i<d;i++) r.array[d-i-1]=array[i];return r;}
 
     template<int d1,int d2> VECTOR<T,d2-d1+1> Slice() const
     {STATIC_ASSERT(((1<=d1) && (d2<=d)));
-    VECTOR<T,d2-d1+1> r;for(int i=d1;i<=d2;i++) r[i-d1+1]=(*this)[i];return r;}
+    VECTOR<T,d2-d1+1> r;for(int i=d1;i<d2;i++) r[i-d1]=(*this)[i];return r;}
 
     template<int n> void Split(VECTOR<T,n>& v1,VECTOR<T,d-n>& v2) const
     {for(int i=0;i<n;i++) v1(i)=(*this)(i);
-    for(int i=n+1;i<=d;i++) v2(i-n)=(*this)(i);}
+    for(int i=n;i<d;i++) v2(i-n)=(*this)(i);}
 
     T* begin() // for stl
     {return array;}

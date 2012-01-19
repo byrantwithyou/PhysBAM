@@ -120,7 +120,7 @@ public:
 
     template<class T_VECTOR1,class T_VECTOR2>
     static double Dot_Product_Double_Precision(const VECTOR_BASE<T,T_VECTOR1>& v1,const VECTOR_BASE<T,T_VECTOR2>& v2,const int start_index,const int end_index)
-    {v1.Static_Assert_Not_Small();Assert_Same_Size(v1,v2);double sum=0;for(int i=start_index;i<=end_index;i++) sum+=(double)v1(i)*(double)v2(i);return sum;}
+    {v1.Static_Assert_Not_Small();Assert_Same_Size(v1,v2);double sum=0;for(int i=start_index;i<end_index;i++) sum+=(double)v1(i)*(double)v2(i);return sum;}
 
     T Sum() const
     {Static_Assert_Not_Small();T result=0;for(int i=0;i<Size();i++) result+=(*this)(i);return result;}
@@ -135,7 +135,7 @@ public:
     {Static_Assert_Not_Small();double result=0;for(int i=0;i<Size();i++) result+=(*this)(i);return result;}
     
     double Sum_Double_Precision(int start_index,int end_index) const
-    {Static_Assert_Not_Small();double result=0;for(int i=start_index;i<=end_index;i++) result+=(*this)(i);return result;}
+    {Static_Assert_Not_Small();double result=0;for(int i=start_index;i<end_index;i++) result+=(*this)(i);return result;}
 
     T Maximum_Magnitude() const
     {T result=0;for(int i=0;i<Size();i++) result=PhysBAM::max(result,abs((*this)(i)));return result;}
@@ -211,10 +211,10 @@ public:
     (*this)(m2)=x1;(*this)(m1)=-x2;}
 
     T Min() const
-    {T result=(*this)(1);for(int i=2;i<=Size();i++) result=min(result,(*this)(i));return result;}
+    {T result=(*this)(0);for(int i=1;i<Size();i++) result=min(result,(*this)(i));return result;}
 
     T Max() const
-    {T result=(*this)(1);for(int i=2;i<=Size();i++) result=max(result,(*this)(i));return result;}
+    {T result=(*this)(0);for(int i=1;i<Size();i++) result=max(result,(*this)(i));return result;}
 
     template<class T_VECTOR1,class T_VECTOR2>
     static T Angle_Between(const VECTOR_BASE<T,T_VECTOR1>& u,const VECTOR_BASE<T,T_VECTOR2>& v) // 0 .. pi
