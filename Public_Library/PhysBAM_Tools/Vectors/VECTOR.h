@@ -74,7 +74,7 @@ public:
     explicit VECTOR(const VECTOR<T2,d2>& v)
     {
         STATIC_ASSERT(d2<=d);
-        for(int i=0;i<d2;i++) array[i]=(T)v[i+1];
+        for(int i=0;i<d2;i++) array[i]=(T)v[i];
         for(int i=d2;i<d;i++) array[i]=T();
     }
 
@@ -82,7 +82,7 @@ public:
     explicit VECTOR(const INDIRECT_ARRAY<T_VECTOR,T_INDICES>& v)
     {
         STATIC_ASSERT((IS_SAME<T,typename INDIRECT_ARRAY<T_VECTOR,T_INDICES>::ELEMENT>::value && INDIRECT_ARRAY<T_VECTOR,T_INDICES>::m==d));
-        for(int i=0;i<d;i++) array[i]=v(i+1);
+        for(int i=0;i<d;i++) array[i]=v(i);
     }
 
     VECTOR(const VECTOR& v)
@@ -94,13 +94,13 @@ public:
     template<class T_VECTOR>
     explicit VECTOR(const VECTOR_BASE<T,T_VECTOR>& v)
     {
-        assert(d==v.Size());for(int i=0;i<d;i++) array[i]=v(i+1);
+        assert(d==v.Size());for(int i=0;i<d;i++) array[i]=v(i);
     }
 
     template<class T_VECTOR> // TODO: This constructor should go away.
     VECTOR(const VECTOR_EXPRESSION<T,T_VECTOR>& v,typename ENABLE_IF<IS_SAME<typename VECTOR_TYPE<T_VECTOR>::TYPE,VECTOR>::value,UNUSABLE>::TYPE unusable=UNUSABLE())
     {
-        assert(d==v.Size());for(int i=0;i<d;i++) array[i]=v(i+1);
+        assert(d==v.Size());for(int i=0;i<d;i++) array[i]=v(i);
     }
 
     template<int n>
@@ -112,7 +112,7 @@ public:
     template<class T_VECTOR> typename ENABLE_IF<AND<IS_SAME<T,typename T_VECTOR::ELEMENT>::value,INTS_EQUAL<T_VECTOR::m,d>::value>::value,VECTOR&>::TYPE
     operator=(const T_VECTOR& v)
     {
-        for(int i=0;i<d;i++) array[i]=v(i+1);return *this;
+        for(int i=0;i<d;i++) array[i]=v(i);return *this;
     }
 
     VECTOR& operator=(const VECTOR& v)
@@ -123,7 +123,7 @@ public:
     template<class T_VECTOR>
     VECTOR& operator=(const VECTOR_BASE<T,T_VECTOR>& v)
     {
-        assert(d==v.Size());for(int i=0;i<d;i++) array[i]=v(i+1);return *this;
+        assert(d==v.Size());for(int i=0;i<d;i++) array[i]=v(i);return *this;
     }
 
     int Size() const

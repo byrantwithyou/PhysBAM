@@ -33,15 +33,15 @@ SOBOL(const RANGE<TV>& box)
         const int polynomial=polynomial_value[i];
         // fill in initial values for m (taken from Numerical Recipes, since according to Bratley and Fox optimal values satisfy complicated conditions
         ARRAY<TI> m(v.m);
-        for(int j=0;j<degree;j++) m(j)=m_initial[i-1][j-1];
+        for(int j=0;j<degree;j++) m(j)=m_initial[i][j];
         // fill in rest of m using recurrence
         for(int j=degree+1;j<=v.m;j++){
             m(j)=(m(j-degree)<<degree)^m(j-degree);
             for(int k=1;k<degree;k++) 
                 if(polynomial&(1<<(k-1))) m(j)^=m(j-k)<<k;}
         // compute direction vectors (stored as Vi * 2^v.m)
-        for(int j=1;j<=v.m;j++)
-            v(j)[i]=m(j)<<(v.m-j);}
+        for(int j=0;j<v.m;j++)
+            v(j)[i]=m(j)<<(v.m-j-1);}
 
     // start counting
     n=0;
