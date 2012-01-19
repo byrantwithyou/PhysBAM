@@ -288,7 +288,7 @@ public:
     void Set_Coarse_Boundary_Conditions_Only()
     {
         ARRAY<bool,TV_INT>& psi_D=projection.elliptic_solver->psi_D;ARRAY<bool,FACE_INDEX<TV::dimension> >& psi_N=projection.elliptic_solver->psi_N;
-        for(int axis=1;axis<=GRID<TV>::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){
+        for(int axis=0;axis<GRID<TV>::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){
             int side=2*(axis-1)+axis_side;
             TV_INT interior_cell_offset=axis_side==1?TV_INT():-TV_INT::Axis_Vector(axis);
             TV_INT exterior_cell_offset=axis_side==1?-TV_INT::Axis_Vector(axis):TV_INT();
@@ -748,7 +748,7 @@ public:
         for(typename GRID<TV>::CELL_ITERATOR iterator(local_mac_grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
             T row_sum=default_row_sum;
             int matrix_index=cell_index_to_matrix_index(cell_index);
-            for(int axis=1;axis<=GRID<TV>::dimension;axis++){TV_INT offset;offset[axis]=1;
+            for(int axis=0;axis<GRID<TV>::dimension;axis++){TV_INT offset;offset[axis]=1;
                 if(local_projection.elliptic_solver->psi_N.Component(axis)(cell_index)) row_sum+=one_over_dx2[axis];
                 else A.Set_Element(matrix_index,cell_index_to_matrix_index(cell_index-offset),one_over_dx2[axis]);
                 if(local_projection.elliptic_solver->psi_N.Component(axis)(cell_index+offset)) row_sum+=one_over_dx2[axis];

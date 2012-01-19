@@ -35,7 +35,7 @@ Negative_Material_In_Cell(const GRID<TV>& grid,const TV_INT& cell_index,const bo
     static TV_INT phi_indices[GRID<TV>::number_of_nodes_per_cell];grid.Nodes_In_Cell_From_Minimum_Corner_Node(cell_index,phi_indices);
 
     cell_particle_X.Resize(GRID<TV>::number_of_nodes_per_cell);
-    for(int i=1;i<=GRID<TV>::number_of_nodes_per_cell;i++) cell_particle_X(i)=grid.Node(phi_indices[i-1]);
+    for(int i=0;i<GRID<TV>::number_of_nodes_per_cell;i++) cell_particle_X(i)=grid.Node(phi_indices[i-1]);
     cell_refinement_simplices.Remove_All();Refined_Object_Initialization_Helper(cell_refinement_simplices);
 
     int last_node=cell_particle_X.m;

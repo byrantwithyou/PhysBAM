@@ -99,7 +99,7 @@ public:
     bool Negative(const GRID<TV>& grid,const int axis,const TV_INT& face_index,const T_ARRAYS_SCALAR& phi)
     {// this check is potentially expensive! leave inefficient for the moment
     TV_INT cells[GRID<TV>::number_of_cells_per_node];
-    for(int node=1;node<=GRID<TV>::number_of_nodes_per_face;node++){
+    for(int node=0;node<GRID<TV>::number_of_nodes_per_face;node++){
         grid.Cells_Neighboring_Node(grid.Face_Node_Index(axis,face_index,node),cells);
         for(int c=0;c<GRID<TV>::number_of_cells_per_node;c++) if(phi(cells[c])<=0) return true;}
     return false;}

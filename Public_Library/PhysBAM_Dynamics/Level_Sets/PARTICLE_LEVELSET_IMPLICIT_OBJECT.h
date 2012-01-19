@@ -63,7 +63,7 @@ public:
             for(int k=0;k<block_particles.array_collection->Size();k++){
                 if(levelset.Phi(block_particles.X(k))*one_over_radius_multiplier>block_particles.radius(k)){
                     influence(k)=true;
-                    for(int cell=1;cell<=GRID<TV>::number_of_cells_per_node;cell++)
+                    for(int cell=0;cell<GRID<TV>::number_of_cells_per_node;cell++)
                         particle_influence(p_grid.Node_Cell_Index(block_index,cell))=true;}
                 else influence(k)=false;}}
         else influence.Resize(0);}}

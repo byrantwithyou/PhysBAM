@@ -129,7 +129,7 @@ Project(const T dt,const T time)
     T delta=3*example.mac_grid.dX.Max();
     ARRAY<T,TV_INT> phi_ghost(example.mac_grid.Domain_Indices(3));
     example.boundary->Fill_Ghost_Cells(example.mac_grid,example.levelset.phi,phi_ghost,dt,time,3);
-    for(int axis=1;axis<=GRID<TV>::dimension;axis++){
+    for(int axis=0;axis<GRID<TV>::dimension;axis++){
         GRID<TV> face_grid=example.mac_grid.Get_Face_Grid(axis);ARRAY<T,TV_INT> phi_face(face_grid.Domain_Indices(),false);T_ARRAYS_BASE& face_velocity=example.face_velocities.Component(axis);
         ARRAY<bool,TV_INT> fixed_face(face_grid.Domain_Indices());
         for(typename GRID<TV>::FACE_ITERATOR iterator(example.mac_grid,0,GRID<TV>::WHOLE_REGION,0,axis);iterator.Valid();iterator.Next()){

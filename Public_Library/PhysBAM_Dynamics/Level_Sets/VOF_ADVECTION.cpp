@@ -56,12 +56,12 @@ VOF_ADVECTION(PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset_input,T_FA
     cells_valid.Resize(grid.Domain_Indices(3));
     // find domain edges which can be traversed (i.e. parallel boundaries or outflow walls)
     bool valid_edges[GRID<TV>::dimension][2]; // TODO: Add outflow walls below
-    for(int axis=1;axis<=GRID<TV>::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++) valid_edges[axis-1][axis_side-1]=mpi_grid?mpi_grid->Neighbor(axis,axis_side):false;
+    for(int axis=0;axis<GRID<TV>::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++) valid_edges[axis-1][axis_side-1]=mpi_grid?mpi_grid->Neighbor(axis,axis_side):false;
     RANGE<TV_INT> domain=grid.Domain_Indices();TV_INT domain_max=domain.Maximum_Corner(),domain_min=domain.Minimum_Corner();
     for(CELL_ITERATOR iterator(grid,3);iterator.Valid();iterator.Next()){
         TV_INT cell=iterator.Cell_Index();
         bool valid=true;
-        for(int axis=1;axis<=GRID<TV>::dimension;axis++)
+        for(int axis=0;axis<GRID<TV>::dimension;axis++)
             if((cell(axis)>domain_max(axis) && !valid_edges[axis-1][1]) || (cell(axis)<domain_min(axis) && !valid_edges[axis-1][0])){valid=false;break;}
         cells_valid(cell)=valid;}
 }
@@ -85,7 +85,7 @@ Negative_Material(const TV_INT& cell_index,const bool force_full_refinement)
     static TV_INT phi_indices[GRID<TV>::number_of_nodes_per_cell];grid.Nodes_In_Cell_From_Minimum_Corner_Node(cell_index,phi_indices);
 
     cell_particle_X.Resize(GRID<TV>::number_of_nodes_per_cell);
-    for(int i=1;i<=GRID<TV>::number_of_nodes_per_cell;i++) cell_particle_X(i)=grid.Node(phi_indices[i-1]);
+    for(int i=0;i<GRID<TV>::number_of_nodes_per_cell;i++) cell_particle_X(i)=grid.Node(phi_indices[i-1]);
     cell_refinement_simplices.Remove_All();Refined_Object_Initialization_Helper(cell_refinement_simplices);
 
     int last_node=cell_particle_X.m;
@@ -184,7 +184,7 @@ Create_Preimage_Particles_From_Old_Postimage_Simplices(const TV_INT& cell_index,
 
         // dice material simplex
         simplices_in_cell.Remove_All();junk_simplices.Remove_All();simplices_in_cell.Append(local_simplex);
-        for(int axis=1;axis<=GRID<TV>::dimension;axis++) for(int node=0;node<=1;node++){
+        for(int axis=0;axis<GRID<TV>::dimension;axis++) for(int node=0;node<=1;node++){
             TV_INT right_cell=cell_index+node*TV_INT::Axis_Vector(axis);
             // cut away outside bits
             T_HYPERPLANE cutting_surface(TV::Axis_Vector(axis),grid.Face(axis,right_cell));
@@ -617,7 +617,7 @@ Rasterize_Material_Postimages()
         if(Signed_Size(local_simplex,simplex_particles)==0) lower_dimensional_postimage=true;
 
         // dice material simplices
-        for(int axis=1;axis<=GRID<TV>::dimension;axis++){
+        for(int axis=0;axis<GRID<TV>::dimension;axis++){
             for(int node=1;node<high_node(axis)-low_node(axis);node++){ // only need to cut in-between nodes
                 for(FACE_ITERATOR iterator(box_grid,0,GRID<TV>::INTERIOR_REGION,0,axis);iterator.Valid();iterator.Next()){ // TODO: is this set of loops doing more work than necessary?
                     // for all tets in left, cut them and place pieces into right/left, then move to next cell
@@ -687,7 +687,7 @@ Adjust_Node_For_Domain_Boundaries(TV& node)
 {
     assert(fluids_parameters);
     TV min_corner=fluids_parameters->grid->domain.Minimum_Corner(),max_corner=fluids_parameters->grid->domain.Maximum_Corner();
-    for(int axis=1;axis<=GRID<TV>::dimension;axis++){
+    for(int axis=0;axis<GRID<TV>::dimension;axis++){
         if(fluids_parameters->domain_walls(axis)(1) && node[axis] < min_corner[axis]) node[axis]=min_corner[axis];
         if(fluids_parameters->domain_walls(axis)(2) && node[axis] > max_corner[axis]) node[axis]=max_corner[axis];}
 }
@@ -1072,7 +1072,7 @@ template<class TV> bool VOF_ADVECTION<TV>::
 Find_Fixed_Cell_On_Point(const TV& point,TV_INT& opposing_cell,TV& face_normal,const T length_scale) const
 {
     TV_INT cell=grid.Cell(point,3);
-    for(int axis=1;axis<=GRID<TV>::dimension;axis++){
+    for(int axis=0;axis<GRID<TV>::dimension;axis++){
         if(grid.Face_Domain(axis,cell,grid.Minimum_Edge_Length()*length_scale).Lazy_Inside(point)){
             if(fixed_cells(cell)) opposing_cell=cell;else opposing_cell=cell-TV_INT::Axis_Vector(axis);
             face_normal=(grid.Face(axis,cell)-grid.Center(opposing_cell)).Normalized();

@@ -1068,7 +1068,7 @@ void Get_Constrained_Particle_Data()
     assert(draw_flesh);
 
     bone_ids.Resize(num_bones_present=0);
-    for(int i=1;i<=VISIBLE_HUMAN<T>::num_bones;i++)
+    for(int i=0;i<VISIBLE_HUMAN<T>::num_bones;i++)
         if(da_man->bones(i)->particle_index) {bone_ids.Append(da_man->bones(i)->particle_index); num_bones_present++;}
 
     PARTICLES<TV>& particles=(solid_body_collection.deformable_object.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>()).particles;
