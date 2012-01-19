@@ -263,7 +263,7 @@ public:
     return false;}
 
     VECTOR<T,d-1> Remove_Index(const int index) const
-    {assert(1<=index && index<=d);VECTOR<T,d-1> r;for(int i=1;i<=d-1;i++) r[i]=(*this)[i+(i>=index)];return r;}
+    {assert((unsigned)index<d);VECTOR<T,d-1> r;for(int i=1;i<=d-1;i++) r[i]=(*this)[i+(i>=index)];return r;}
 
     VECTOR<T,d+1> Insert(const T& element,const int index) const
     {VECTOR<T,d+1> r;r[index]=element;for(int i=0;i<d;i++) r[i+(i>=index)]=(*this)[i];return r;}

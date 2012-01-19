@@ -66,7 +66,7 @@ Set_Row_Lengths(ARRAY_VIEW<int> lengths)
 template<class T> int SPARSE_MATRIX_FLAT_MXN<T>::
 Find_Index(const int i,const int j) const
 {
-    assert(A.m);assert(1<=i && i<=m);assert(1<=j && j<=n);
+    assert(A.m);assert((unsigned)i<m);assert((unsigned)j<n);
     int index=offsets(i);while(A(index).j && A(index).j<j)index++;
     assert(index<offsets(i+1));return index;
 }
@@ -76,7 +76,7 @@ Find_Index(const int i,const int j) const
 template<class T> int SPARSE_MATRIX_FLAT_MXN<T>::
 Find_Index_Exists(const int i,const int j) const
 {
-    assert(A.m);assert(1<=i && i<=m);assert(1<=j && j<=n);
+    assert(A.m);assert((unsigned)i<m);assert((unsigned)j<n);
     int index=offsets(i);while(A(index).j && A(index).j<j)index++;
     if(index<offsets(i+1) && A(index).j==j)
         return index;
@@ -103,7 +103,7 @@ operator()(const int i,const int j)
 template<class T> bool SPARSE_MATRIX_FLAT_MXN<T>::
 Element_Present(const int i,const int j) const
 {
-    assert(1<=i && i<=m);assert(1<=j && j<=n);
+    assert((unsigned)i<m);assert((unsigned)j<n);
     for(int index=offsets(i);index<offsets(i+1);index++)if(A(index).j==j) return true;
     return false;
 }

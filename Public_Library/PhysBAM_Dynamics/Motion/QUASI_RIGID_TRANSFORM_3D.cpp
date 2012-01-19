@@ -42,7 +42,7 @@ Rigidity_Penalty() const
 template<class T> T QUASI_RIGID_TRANSFORM_3D<T>::
 Rigidity_Penalty_Gradient(const int i) const
 {
-    assert(1<=i && i<=12);
+    assert((unsigned)i<12);
     if(i>9) return 0;
     MATRIX<T,3> gradient=affine_transform*(affine_transform.Normal_Equations_Matrix()-1);
     return (T)4*gradient.x[i-1];

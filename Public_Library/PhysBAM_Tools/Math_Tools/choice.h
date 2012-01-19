@@ -15,8 +15,8 @@ template<int i,class T1,class T2,class T3> struct choice_helper;
 
 template<class T> struct choice_helper<0,T,void,void>
 {
-    T& operator()(const int i,T& a,T& b){assert(1<=i&&i<=2);T* choices[]={0,&a,&b};return *choices[i];}
-    T& operator()(const int i,T& a,T& b,T& c){assert(1<=i&&i<=3);T* choices[]={0,&a,&b,&c};return *choices[i];}
+    T& operator()(const int i,T& a,T& b){assert((unsigned)i<2);T* choices[]={0,&a,&b};return *choices[i];}
+    T& operator()(const int i,T& a,T& b,T& c){assert((unsigned)i<3);T* choices[]={0,&a,&b,&c};return *choices[i];}
 };
 
 template<class T1,class T2> struct choice_helper<1,T1,T2,void> {static T1& helper(T1& a,T2& b){return a;}};

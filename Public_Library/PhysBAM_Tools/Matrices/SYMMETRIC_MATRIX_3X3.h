@@ -83,7 +83,7 @@ public:
     {assert(i<=3 && j>=1 && j<=i);return ((const T*)this)[((6-j)*(j-1)>>1)+i-1];}
 
     VECTOR<T,3> Column(const int axis) const
-    {assert(1<=axis && axis<=3);return axis==1?VECTOR<T,3>(x11,x21,x31):axis==2?VECTOR<T,3>(x21,x22,x32):VECTOR<T,3>(x31,x32,x33);}
+    {assert((unsigned)axis<3);return axis==1?VECTOR<T,3>(x11,x21,x31):axis==2?VECTOR<T,3>(x21,x22,x32):VECTOR<T,3>(x31,x32,x33);}
 
     bool operator==(const SYMMETRIC_MATRIX& A) const
     {return x11==A.x11 && x21==A.x21 && x31==A.x31 && x22==A.x22 && x32==A.x32 && x33==A.x33;}

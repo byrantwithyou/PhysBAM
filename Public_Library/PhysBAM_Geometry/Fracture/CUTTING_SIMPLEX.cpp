@@ -128,7 +128,7 @@ Get_Adaptive_Weights(VECTOR<GET_ADAPTIVE_WEIGHTS_RESULT_TYPE,d>& adaptive_weight
 template<class T,int d> void CUTTING_SIMPLEX<T,d>::
 Get_Adaptive_Weights(VECTOR<GET_ADAPTIVE_WEIGHTS_RESULT_TYPE,d>& adaptive_weights,int node_index,CUTTING_SIMPLEX_COORDINATE_SHARED<T,d>* shared) const
 {
-    assert(1<=node_index&&node_index<=d);
+    assert((unsigned)node_index<d);
     // for a fake node, we shouldn't be using the coordinate, so no need to resort to exact arithmetic
     T error=(nodes[node_index]!=0?abs_tol:0);
     for(int j=1;j<=d;++j){

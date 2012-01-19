@@ -156,7 +156,7 @@ public:
     {return RANGE<TV>::Bounding_Box(x1,x2,x3);}
 
     const TV& X(const int i) const
-    {assert(1<=i && i<=3);
+    {assert((unsigned)i<3);
     switch(i){
         case 1: return x1;
         case 2: return x2;
@@ -164,7 +164,7 @@ public:
     PHYSBAM_FATAL_ERROR();}
 
     TV& X(const int i)
-    {assert(1<=i && i<=3);
+    {assert((unsigned)i<3);
     switch(i){
         case 1: return x1;
         case 2: return x2;

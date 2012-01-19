@@ -314,7 +314,7 @@ public:
     assert(1<=axis&&axis<=3&&1<=node&&node<=4);return face_index+corner_from_face_offset[axis-1][node-1];}
 
     static TV_INT Face_Node_Index(const int axis,const VECTOR<int,2>& face_index,const int node)
-    {assert(1<=node&&node<=2);TV_INT index=face_index;index[3-axis]+=node-1;return index;}
+    {assert((unsigned)node<2);TV_INT index=face_index;index[3-axis]+=node-1;return index;}
 
     static TV_INT Face_Node_Index(const int axis,const VECTOR<int,1>& face_index,const int node)
     {assert(axis==1&&node==1);return face_index;}
@@ -327,7 +327,7 @@ public:
     assert(1<=face&&face<=4&&1<=axis&&axis<=3);return node_index+face_from_node_offset[axis-1][face-1];}
 
     static TV_INT Node_Face_Index(const int axis,const VECTOR<int,2>& node_index,const int face)
-    {assert(1<=face&&face<=2);TV_INT index=node_index;index[3-axis]+=face-2;return index;}
+    {assert((unsigned)face<2);TV_INT index=node_index;index[3-axis]+=face-2;return index;}
 
     static TV_INT Node_Face_Index(const int axis,const VECTOR<int,1>& node_index,const int face)
     {assert(axis==1&&face==1);return node_index;}
@@ -337,7 +337,7 @@ public:
         {TV(0,-1,-1),TV(0,1,-1),TV(0,-1,1)},
         {TV(-1,0,-1),TV(1,0,-1),TV(-1,0,1)},
         {TV(-1,-1,0),TV(1,-1,0),TV(-1,1,0)}};
-    assert(1<=axis&&axis<=3);vectors[3]=dX;vectors[3][axis]=0;for(int i=0;i<3;i++) vectors[i]=vectors[3]*multipliers[axis-1][i];}
+    assert((unsigned)axis<3);vectors[3]=dX;vectors[3][axis]=0;for(int i=0;i<3;i++) vectors[i]=vectors[3]*multipliers[axis-1][i];}
 
     void Face_Corner_To_Opposite_Corner_Vectors(const int axis,VECTOR<T,2> vectors[2])
     {vectors[1]=dX;vectors[1][axis]=0;vectors[0]=(T)-1*vectors[1];}
@@ -475,15 +475,15 @@ public:
 
     static VECTOR<int,3> Node_Neighbor(const VECTOR<int,3>& index,const int i)
     {static const VECTOR<int,3> neighbor_offset[6]={VECTOR<int,3>(-1,0,0),VECTOR<int,3>(1,0,0),VECTOR<int,3>(0,-1,0),VECTOR<int,3>(0,1,0),VECTOR<int,3>(0,0,-1),VECTOR<int,3>(0,0,1)};
-    assert(1<=i&&i<=6);return index+neighbor_offset[i-1];}
+    assert((unsigned)i<6);return index+neighbor_offset[i-1];}
 
     static VECTOR<int,2> Node_Neighbor(const VECTOR<int,2>& index,const int i)
     {static const VECTOR<int,2> neighbor_offset[4]={VECTOR<int,2>(-1,0),VECTOR<int,2>(1,0),VECTOR<int,2>(0,-1),VECTOR<int,2>(0,1)};
-    assert(1<=i&&i<=4);return index+neighbor_offset[i-1];}
+    assert((unsigned)i<4);return index+neighbor_offset[i-1];}
 
     static VECTOR<int,1> Node_Neighbor(const VECTOR<int,1>& index,const int i) // i=1 to 2
     {static const VECTOR<int,1> neighbor_offset[2]={VECTOR<int,1>(-1),VECTOR<int,1>(1)};
-    assert(1<=i&&i<=2);return index+neighbor_offset[i-1];}
+    assert((unsigned)i<2);return index+neighbor_offset[i-1];}
 
     static VECTOR<int,0> Node_Neighbor(const VECTOR<int,0>& index,const int i) // i=1
     {assert(1==i);return index;}
@@ -527,12 +527,12 @@ public:
     TV_INT(1,0,-1),TV_INT(-1,1,-1),TV_INT(0,1,-1),TV_INT(1,1,-1),TV_INT(-1,-1,0),TV_INT(0,-1,0),TV_INT(1,-1,0),
     TV_INT(-1,0,0),TV_INT(1,0,0),TV_INT(-1,1,0),TV_INT(0,1,0),TV_INT(1,1,0),TV_INT(-1,-1,1),TV_INT(0,-1,1),
     TV_INT(1,-1,1),TV_INT(-1,0,1),TV_INT(0,0,1),TV_INT(1,0,1),TV_INT(-1,1,1),TV_INT(0,1,1), TV_INT(1,1,1)};
-    assert(1<=i&&i<=26);return index+neighbor_offset[i-1];}
+    assert((unsigned)i<26);return index+neighbor_offset[i-1];}
 
     static TV_INT One_Ring_Neighbor(const VECTOR<int,2>& index,const int i)
     {static const TV_INT neighbor_offset[8]={TV_INT(-1,-1),TV_INT(0,-1),TV_INT(1,-1),TV_INT(-1,0),TV_INT(1,0),TV_INT(-1,1),
         TV_INT(0,1),TV_INT(1,1)};
-    assert(1<=i&&i<=8);return index+neighbor_offset[i-1];}
+    assert((unsigned)i<8);return index+neighbor_offset[i-1];}
 
     static TV_INT One_Ring_Neighbor(const VECTOR<int,1>& index,const int i)
     {return Node_Neighbor(index,i);}

@@ -199,7 +199,7 @@ Pack_Size() const
 void ARRAY_COLLECTION::
 Pack(ARRAY_VIEW<char> buffer,int& position,const int p) const
 {
-    assert(1<=p && p<=number);
+    assert((unsigned)p<number);
     for(ATTRIBUTE_INDEX i(1);i<=arrays.m;i++)
         arrays(i)->Pack(buffer,position,p);
 }
@@ -209,7 +209,7 @@ Pack(ARRAY_VIEW<char> buffer,int& position,const int p) const
 void ARRAY_COLLECTION::
 Unpack(ARRAY_VIEW<const char> buffer,int& position,const int p)
 {
-    assert(1<=p && p<=number);
+    assert((unsigned)p<number);
     for(ATTRIBUTE_INDEX i(1);i<=arrays.m;i++)
         arrays(i)->Unpack(buffer,position,p);
 }

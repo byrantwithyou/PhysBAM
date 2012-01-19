@@ -62,7 +62,7 @@ public:
     {Resize(0);}
 
     void Add_To_Deletion_List(const int p)
-    {assert(1<=p && p<=number);deletion_list.Append(p);}
+    {assert((unsigned)p<number);deletion_list.Append(p);}
 
     ATTRIBUTE_INDEX Get_Attribute_Index(const ATTRIBUTE_ID attribute_id) const
     {ATTRIBUTE_INDEX index=Find_Attribute_Index(attribute_id);if(index<=arrays.m && arrays(index)->id==attribute_id) return index;return ATTRIBUTE_INDEX();}

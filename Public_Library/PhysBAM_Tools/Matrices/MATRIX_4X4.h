@@ -70,10 +70,10 @@ public:
     {return 1<=i && i<=4 && 1<=j && j<=4;}
 
     VECTOR<T,4>& Column(const int j)
-    {assert(1<=j && j<=4);return *(VECTOR<T,4>*)(x+4*(j-1));}
+    {assert((unsigned)j<4);return *(VECTOR<T,4>*)(x+4*(j-1));}
 
     const VECTOR<T,4>& Column(const int j) const
-    {assert(1<=j && j<=4);return *(const VECTOR<T,4>*)(x+4*(j-1));}
+    {assert((unsigned)j<4);return *(const VECTOR<T,4>*)(x+4*(j-1));}
 
     bool operator==(const MATRIX& A) const
     {for(int i=0;i<16;i++) if(x[i]!=A.x[i]) return false;return true;}

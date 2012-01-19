@@ -93,7 +93,7 @@ Control_Active(const int control_id)
 template<class T> bool ATTACHMENT_FRAME_CONTROL_SET<T>::
 Positions_Determined_Kinematically(const int control_id) const
 {
-    assert(1<=control_id && control_id<=24);
+    assert((unsigned)control_id<24);
     return control_id<=12;
 }
 //#####################################################################
@@ -123,7 +123,7 @@ Force_Derivative(ARRAY<TV>& dFdl,ARRAY<TWIST<TV> >& dFrdl,const int control_id) 
 template<class T> void ATTACHMENT_FRAME_CONTROL_SET<T>::
 Position_Derivative(ARRAY<TV>& dXdl,const int control_id) const
 {
-    assert(1<=control_id && control_id<=12);
+    assert((unsigned)control_id<12);
     MATRIX<T,3> affine_differential,affine_differential_transformed;
     TV translation_differential,translation_differential_transformed;
     if(control_id<=9) affine_differential.x[control_id-1]=(T)1;
@@ -191,7 +191,7 @@ Penalty() const
 template<class T> T ATTACHMENT_FRAME_CONTROL_SET<T>::
 Penalty_Gradient(const int control_id) const
 {
-    assert(1<=control_id && control_id<=24);
+    assert((unsigned)control_id<24);
     T penalty_gradient=0;
     if(control_id<=12) penalty_gradient+=rigidity_penalty_coefficient*cranium_transform.Rigidity_Penalty_Gradient(control_id);
     if(control_id>=13) penalty_gradient+=rigidity_penalty_coefficient*jaw_transform.Rigidity_Penalty_Gradient(control_id-12);

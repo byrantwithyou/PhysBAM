@@ -95,10 +95,10 @@ public:
     {return Component(index.side,index.axis)(index.index);}
 
     T_ARRAY_VIEW& Component(const int side,const int axis)
-    {assert(1<=axis&&axis<=dimension);return *sided_data[side](axis);}
+    {assert((unsigned)axis<dimension);return *sided_data[side](axis);}
 
     const T_ARRAY_VIEW& Component(const int side,const int axis) const
-    {assert(1<=axis&&axis<=dimension);return *sided_data[side](axis);}
+    {assert((unsigned)axis<dimension);return *sided_data[side](axis);}
 
     TV Cell_Centered_Average(const TV_INT& cell_index) const
     {TV average;for(int axis=0;axis<dimension;axis++) average(axis)=(T).5*(Component(2,axis)(cell_index)+Component(1,axis)(cell_index+TV_INT::Axis_Vector(axis)));return average;}
