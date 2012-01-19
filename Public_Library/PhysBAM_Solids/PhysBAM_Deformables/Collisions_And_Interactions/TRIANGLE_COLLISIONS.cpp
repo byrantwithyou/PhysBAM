@@ -107,13 +107,13 @@ Update_Swept_Hierachies_And_Compute_Pairs(ARRAY_VIEW<TV> X,ARRAY_VIEW<TV> X_self
     point_face_pairs_external.Remove_All();edge_edge_pairs_external.Remove_All();
     for(int pair_i=0;pair_i<geometry.interacting_structure_pairs.m;pair_i++){VECTOR<int,2>& pair=geometry.interacting_structure_pairs(pair_i);
         if(compute_point_face_collisions){
-            for(int i=0;i<2;i++){if(i==2 && pair[1]==pair[2]) break;
+            for(int i=0;i<2;i++){if(i==2 && pair[0]==pair[1]) break;
                 STRUCTURE_INTERACTION_GEOMETRY<TV>& structure_1=*geometry.structure_geometries(pair[i]);
-                STRUCTURE_INTERACTION_GEOMETRY<TV>& structure_2=*geometry.structure_geometries(pair[3-i]);
+                STRUCTURE_INTERACTION_GEOMETRY<TV>& structure_2=*geometry.structure_geometries(pair[1-i]);
                 Get_Moving_Faces_Near_Moving_Points(structure_1,structure_2,point_face_pairs_internal,point_face_pairs_external,detection_thickness);}}
         if(compute_edge_edge_collisions){
-            STRUCTURE_INTERACTION_GEOMETRY<TV>& structure_1=*geometry.structure_geometries(pair[1]);
-            STRUCTURE_INTERACTION_GEOMETRY<TV>& structure_2=*geometry.structure_geometries(pair[2]);
+            STRUCTURE_INTERACTION_GEOMETRY<TV>& structure_1=*geometry.structure_geometries(pair[0]);
+            STRUCTURE_INTERACTION_GEOMETRY<TV>& structure_2=*geometry.structure_geometries(pair[1]);
             Get_Moving_Edges_Near_Moving_Edges(structure_1,structure_2,edge_edge_pairs_internal,edge_edge_pairs_external,detection_thickness);}}
 }
 //#####################################################################
@@ -244,8 +244,8 @@ Scale_And_Apply_Impulses()
         if(pf_target_impulses(i) == TV()) continue;
         const VECTOR<int,d+1>& nodes=point_face_pairs_internal(i);
         // Compute actual new relative_speed
-        T relative_speed=TV::Dot_Product(impulse_velocities(nodes(1))-
-            (pf_target_weights(i)(2)*impulse_velocities(nodes(2))+pf_target_weights(i)(3)*impulse_velocities(nodes(3))+pf_target_weights(i)(4)*impulse_velocities(nodes(4))),
+        T relative_speed=TV::Dot_Product(impulse_velocities(nodes(0))-
+            (pf_target_weights(i)(1)*impulse_velocities(nodes(1))+pf_target_weights(i)(2)*impulse_velocities(nodes(2))+pf_target_weights(i)(3)*impulse_velocities(nodes(3))),
             pf_normals(i));
         if(relative_speed*pf_old_speeds(i)<0){
             T new_scale=-(relative_speed-pf_old_speeds(i))/pf_old_speeds(i);
@@ -254,8 +254,8 @@ Scale_And_Apply_Impulses()
         if(ee_target_impulses(i) == TV()) continue;
         const VECTOR<int,2*d-2>& nodes=edge_edge_pairs_internal(i);
         // Compute actual new relative_speed
-        T relative_speed=TV::Dot_Product(-(ee_target_weights(i)(1)*impulse_velocities(nodes(1))+ee_target_weights(i)(2)*impulse_velocities(nodes(2))+
-                ee_target_weights(i)(3)*impulse_velocities(nodes(3))+ee_target_weights(i)(4)*impulse_velocities(nodes(4))),ee_normals(i));
+        T relative_speed=TV::Dot_Product(-(ee_target_weights(i)(0)*impulse_velocities(nodes(0))+ee_target_weights(i)(1)*impulse_velocities(nodes(1))+
+                ee_target_weights(i)(2)*impulse_velocities(nodes(2))+ee_target_weights(i)(3)*impulse_velocities(nodes(3))),ee_normals(i));
         if(relative_speed*ee_old_speeds(i)<0){
             T new_scale=-(relative_speed-ee_old_speeds(i))/ee_old_speeds(i);
             ee_target_impulses(i)/=new_scale;}}
@@ -330,7 +330,7 @@ Adjust_Velocity_For_Point_Face_Collision(const T dt,const bool rigid,ARRAY<ARRAY
     int collisions=0,skipping_already_rigid=0;T collision_time;
     for(int i=0;i<pairs.m;i++){const VECTOR<int,d+1>& nodes=pairs(i);
         GAUSS_JACOBI_PF_DATA pf_data(pf_target_impulses(i),pf_target_weights(i),pf_normals(i),pf_old_speeds(i));
-        if(rigid){VECTOR<int,d+1> node_rigid_indices(list_index.Subset(nodes));if(node_rigid_indices(1) && node_rigid_indices.Elements_Equal()){skipping_already_rigid++;continue;}}
+        if(rigid){VECTOR<int,d+1> node_rigid_indices(list_index.Subset(nodes));if(node_rigid_indices(0) && node_rigid_indices.Elements_Equal()){skipping_already_rigid++;continue;}}
         bool collided;
         if(final_repulsion_only)
             collided=Point_Face_Final_Repulsion(pf_data,nodes,dt,POINT_FACE_REPULSION_PAIR<TV>::Total_Repulsion_Thickness(repulsion_thickness,nodes),collision_time,attempt_ratio,
@@ -354,14 +354,14 @@ Adjust_Velocity_For_Point_Face_Collision(const T dt,const bool rigid,ARRAY<ARRAY
 //#####################################################################
 template<class T,class T_ARRAY> T Create_Edges(const T_ARRAY& X,const VECTOR<int,2>& nodes,const ARRAY<T>& repulsion_thickness,POINT_2D<T>& point1,POINT_2D<T>& point2)
 {
-    point1=POINT_2D<T>(X(nodes[1]));
-    point2=POINT_2D<T>(X(nodes[2]));
+    point1=POINT_2D<T>(X(nodes[0]));
+    point2=POINT_2D<T>(X(nodes[1]));
     return EDGE_EDGE_REPULSION_PAIR<typename T_ARRAY::ELEMENT>::Total_Repulsion_Thickness(repulsion_thickness,nodes);
 }
 template<class T,class T_ARRAY> T Create_Edges(const T_ARRAY& X,const VECTOR<int,4>& nodes,const ARRAY<T>& repulsion_thickness,SEGMENT_3D<T>& segment1,SEGMENT_3D<T>& segment2)
 {
-    segment1=SEGMENT_3D<T>(X(nodes[1]),X(nodes[2]));
-    segment2=SEGMENT_3D<T>(X(nodes[3]),X(nodes[4]));
+    segment1=SEGMENT_3D<T>(X(nodes[0]),X(nodes[1]));
+    segment2=SEGMENT_3D<T>(X(nodes[2]),X(nodes[3]));
     return EDGE_EDGE_REPULSION_PAIR<typename T_ARRAY::ELEMENT>::Total_Repulsion_Thickness(repulsion_thickness,nodes);
 }
 template<class TV> int TRIANGLE_COLLISIONS<TV>::
@@ -391,30 +391,30 @@ namespace{
 template<class T,class TV> inline void Update_Velocity_Helper(const T scalar_impulse,const VECTOR<T,2> weights,const TV& normal,const VECTOR<T,3>& one_over_m,
     INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,3>&> V,typename TRIANGLE_COLLISIONS<VECTOR<T,2> >::GAUSS_JACOBI_PF_DATA* pf_data=0)
 {
-    TV impulse=Pseudo_Divide(scalar_impulse,one_over_m[1]+sqr(weights.x)*one_over_m[2]+sqr(weights.y)*one_over_m[3])*normal;
-    V(1)-=one_over_m[1]*impulse;V(2)+=weights.x*one_over_m[2]*impulse;V(3)+=weights.y*one_over_m[3]*impulse;
+    TV impulse=Pseudo_Divide(scalar_impulse,one_over_m[0]+sqr(weights.x)*one_over_m[1]+sqr(weights.y)*one_over_m[2])*normal;
+    V(0)-=one_over_m[0]*impulse;V(1)+=weights.x*one_over_m[1]*impulse;V(2)+=weights.y*one_over_m[2]*impulse;
     if(pf_data){
         pf_data->target_impulse=impulse;
-        pf_data->target_weight(1)=-1;pf_data->target_weight(2)=weights.x;pf_data->target_weight(3)=weights.y;
+        pf_data->target_weight(0)=-1;pf_data->target_weight(1)=weights.x;pf_data->target_weight(2)=weights.y;
         pf_data->target_normal=normal;}
 }
 template<class T,class TV> inline void Update_Velocity_Helper(const T scalar_impulse,const VECTOR<T,3> weights,const TV& normal,const VECTOR<T,4>& one_over_m,
     INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,4>&> V,typename TRIANGLE_COLLISIONS<VECTOR<T,3> >::GAUSS_JACOBI_PF_DATA* pf_data=0)
 {
-    TV impulse=Pseudo_Divide(scalar_impulse,one_over_m[1]+sqr(weights.x)*one_over_m[2]+sqr(weights.y)*one_over_m[3]+sqr(weights.z)*one_over_m[4])*normal;
-    V(1)-=one_over_m[1]*impulse;V(2)+=weights.x*one_over_m[2]*impulse;V(3)+=weights.y*one_over_m[3]*impulse;V(4)+=weights.z*one_over_m[4]*impulse;
+    TV impulse=Pseudo_Divide(scalar_impulse,one_over_m[0]+sqr(weights.x)*one_over_m[1]+sqr(weights.y)*one_over_m[2]+sqr(weights.z)*one_over_m[3])*normal;
+    V(0)-=one_over_m[0]*impulse;V(1)+=weights.x*one_over_m[1]*impulse;V(2)+=weights.y*one_over_m[2]*impulse;V(3)+=weights.z*one_over_m[3]*impulse;
     if(pf_data){
         pf_data->target_impulse=impulse;
-        pf_data->target_weight(1)=-1;pf_data->target_weight(2)=weights.x;pf_data->target_weight(3)=weights.y;pf_data->target_weight(4)=weights.z;
+        pf_data->target_weight(0)=-1;pf_data->target_weight(1)=weights.x;pf_data->target_weight(2)=weights.y;pf_data->target_weight(3)=weights.z;
         pf_data->target_normal=normal;}
 }
 template<class T,class TV> inline SEGMENT_2D<T> Create_Final_Face(const SEGMENT_2D<T>& face,const INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,2>&> V_face,const T dt)
 {
-    return SEGMENT_2D<T>(face.x1+dt*V_face(1),face.x2+dt*V_face(2));
+    return SEGMENT_2D<T>(face.x1+dt*V_face(0),face.x2+dt*V_face(1));
 }
 template<class T,class TV> inline TRIANGLE_3D<T> Create_Final_Face(const TRIANGLE_3D<T>& face,const INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,3>&> V_face,const T dt)
 {
-    return TRIANGLE_3D<T>(face.x1+dt*V_face(1),face.x2+dt*V_face(2),face.x3+dt*V_face(3));
+    return TRIANGLE_3D<T>(face.x1+dt*V_face(0),face.x2+dt*V_face(1),face.x3+dt*V_face(2));
 }
 }
 template<class TV> bool TRIANGLE_COLLISIONS<TV>::
@@ -426,10 +426,10 @@ Point_Face_Collision(GAUSS_JACOBI_PF_DATA& pf_data,const VECTOR<int,d+1>& nodes,
     ARRAY_VIEW<T>& one_over_mass=geometry.deformable_body_collection.particles.one_over_mass;
     ARRAY_VIEW<TV> V(geometry.deformable_body_collection.particles.V);
     ARRAY_VIEW<TV> V_save(impulse_velocities);
-    VECTOR<int,d> face_nodes=nodes.Remove_Index(1);
+    VECTOR<int,d> face_nodes=nodes.Remove_Index(0);
 
-    T relative_speed;TV normal,weights;T_FACE face(X.Subset(nodes.Remove_Index(1)));
-    if(face.Point_Face_Collision(X(nodes[1]),V(nodes[1]),V.Subset(nodes.Remove_Index(1)),dt,collision_thickness,collision_time,normal,weights,relative_speed,exit_early)){
+    T relative_speed;TV normal,weights;T_FACE face(X.Subset(nodes.Remove_Index(0)));
+    if(face.Point_Face_Collision(X(nodes[0]),V(nodes[0]),V.Subset(nodes.Remove_Index(0)),dt,collision_thickness,collision_time,normal,weights,relative_speed,exit_early)){
         if(exit_early) return true;
         VECTOR<T,d+1> one_over_m(one_over_mass.Subset(nodes));
         if(geometry.mass_modifier) geometry.mass_modifier->Point_Face_Mass(attempt_ratio,nodes,weights,one_over_m);
@@ -453,10 +453,10 @@ Point_Face_Pull_In(const VECTOR<int,d+1>& nodes,ARRAY_VIEW<TV> V,const T dt,cons
 {
     ARRAY_VIEW<TV> X(geometry.X_self_collision_free);
     ARRAY_VIEW<T>& one_over_mass=geometry.deformable_body_collection.particles.one_over_mass;
-    VECTOR<int,d> face_nodes=nodes.Remove_Index(1);
+    VECTOR<int,d> face_nodes=nodes.Remove_Index(0);
     T_FACE face(X.Subset(face_nodes));
     T relative_speed;TV normal,weights;INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,d>&> V_face(V,face_nodes);T collision_time;
-    if(face.Point_Face_Collision(X(nodes[1]),V(nodes[1]),V_face,dt,collision_thickness,collision_time,normal,weights,relative_speed,false)){
+    if(face.Point_Face_Collision(X(nodes[0]),V(nodes[0]),V_face,dt,collision_thickness,collision_time,normal,weights,relative_speed,false)){
         VECTOR<T,d+1> one_over_m(one_over_mass.Subset(nodes));
         // want to stop before the collision time, basically...but let's do it by distance
         // assume distance is positive
@@ -490,20 +490,20 @@ Point_Face_Final_Repulsion(GAUSS_JACOBI_PF_DATA& pf_data,const VECTOR<int,d+1>& 
     ARRAY_VIEW<T>& one_over_mass=geometry.deformable_body_collection.particles.one_over_mass;
     ARRAY_VIEW<TV> V(geometry.deformable_body_collection.particles.V);
     ARRAY_VIEW<TV> V_save(impulse_velocities);
-    VECTOR<int,d> face_nodes=nodes.Remove_Index(1);INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,d>&> V_face(V,face_nodes);
+    VECTOR<int,d> face_nodes=nodes.Remove_Index(0);INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,d>&> V_face(V,face_nodes);
 
     // check to see if the final position is too close
-    T relative_speed;TV normal,weights;T_FACE face(X.Subset(nodes.Remove_Index(1)));
-    T distance;T_FACE face2=Create_Final_Face(face,V_face,dt);TV point(X(nodes[1])+dt*V(nodes[1]));
-    if(face2.Point_Face_Interaction(point,V(nodes[1]),V_face,collision_thickness,distance,normal,weights,relative_speed,true,exit_early)){
+    T relative_speed;TV normal,weights;T_FACE face(X.Subset(nodes.Remove_Index(0)));
+    T distance;T_FACE face2=Create_Final_Face(face,V_face,dt);TV point(X(nodes[0])+dt*V(nodes[0]));
+    if(face2.Point_Face_Interaction(point,V(nodes[0]),V_face,collision_thickness,distance,normal,weights,relative_speed,true,exit_early)){
         collision_time=dt;if(exit_early) return true;
         VECTOR<T,d+1> one_over_m(one_over_mass.Subset(nodes));
         if(geometry.mass_modifier) geometry.mass_modifier->Point_Face_Mass(attempt_ratio,nodes,weights,one_over_m);
         if(!use_gauss_jacobi && relative_speed<0){
             final_point_face_collisions++;
             Update_Velocity_Helper((1+restitution_coefficient)*relative_speed,weights,normal,one_over_m,V.Subset(nodes));
-            face2=Create_Final_Face(face,V_face,dt);point=X(nodes[1])+dt*V(nodes[1]); // update point and face and see if repulsion is still necessary
-            if(!face2.Point_Face_Interaction(point,V(nodes[1]),V_face,collision_thickness,distance,normal,weights,relative_speed,false,exit_early)) return true;}
+            face2=Create_Final_Face(face,V_face,dt);point=X(nodes[0])+dt*V(nodes[0]); // update point and face and see if repulsion is still necessary
+            if(!face2.Point_Face_Interaction(point,V(nodes[0]),V_face,collision_thickness,distance,normal,weights,relative_speed,false,exit_early)) return true;}
         final_point_face_repulsions++;
         T final_relative_speed=final_repulsion_limiter_fraction*(repulsion_thickness-distance)/dt;
         if(relative_speed >= final_relative_speed) return true;
@@ -532,7 +532,7 @@ Adjust_Velocity_For_Edge_Edge_Collision(const T dt,const bool rigid,ARRAY<ARRAY<
 
     for(int i=0;i<pairs.m;i++){const VECTOR<int,2*d-2>& nodes=pairs(i);
         GAUSS_JACOBI_EE_DATA ee_data(ee_target_impulses(i),ee_target_weights(i),ee_normals(i),ee_old_speeds(i));
-        if(rigid){VECTOR<int,2*d-2> node_rigid_indices(list_index.Subset(nodes));if(node_rigid_indices(1) && node_rigid_indices.Elements_Equal()){skipping_already_rigid++;continue;}}
+        if(rigid){VECTOR<int,2*d-2> node_rigid_indices(list_index.Subset(nodes));if(node_rigid_indices(0) && node_rigid_indices.Elements_Equal()){skipping_already_rigid++;continue;}}
         bool collided;
         if(final_repulsion_only)
             collided=Edge_Edge_Final_Repulsion(ee_data,nodes,dt,collision_time,attempt_ratio,(exit_early||rigid));
@@ -560,34 +560,34 @@ namespace{
 template<class T,class TV> inline void Update_Velocity_Helper(const T scalar_impulse,const VECTOR<T,2> weights,const VECTOR<T,2>& one_over_m_edges,const TV& normal,
     INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,2>&> V_edges,typename TRIANGLE_COLLISIONS<VECTOR<T,2> >::GAUSS_JACOBI_EE_DATA* ee_data=0)
 {
-    TV impulse=Pseudo_Divide(scalar_impulse,one_over_m_edges(1)+one_over_m_edges(2))*normal;
-    V_edges(1)-=one_over_m_edges(1)*impulse;V_edges(2)+=one_over_m_edges(2)*impulse;
+    TV impulse=Pseudo_Divide(scalar_impulse,one_over_m_edges(0)+one_over_m_edges(1))*normal;
+    V_edges(0)-=one_over_m_edges(0)*impulse;V_edges(1)+=one_over_m_edges(1)*impulse;
     if(ee_data){
         ee_data->target_impulse=impulse;
-        ee_data->target_weight(1)=(T)-1;ee_data->target_weight(2)=(T)1;
+        ee_data->target_weight(0)=(T)-1;ee_data->target_weight(1)=(T)1;
         ee_data->target_normal=normal;}
 }
 template<class T,class TV> inline void Update_Velocity_Helper(const T scalar_impulse,const VECTOR<T,2> weights,const VECTOR<T,4>& one_over_m_edges,const TV& normal,
     INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,4>&> V_edges,typename TRIANGLE_COLLISIONS<VECTOR<T,3> >::GAUSS_JACOBI_EE_DATA* ee_data=0)
 {
-    TV impulse=Pseudo_Divide(scalar_impulse,sqr(1-weights.x)*one_over_m_edges(1)+sqr(weights.x)*one_over_m_edges(2)+sqr(1-weights.y)*one_over_m_edges(3)+sqr(weights.y)*one_over_m_edges(4))*normal;
-    V_edges(1)-=(1-weights.x)*one_over_m_edges(1)*impulse;V_edges(2)-=weights.x*one_over_m_edges(2)*impulse;V_edges(3)+=(1-weights.y)*one_over_m_edges(3)*impulse;V_edges(4)+=weights.y*one_over_m_edges(4)*impulse;
+    TV impulse=Pseudo_Divide(scalar_impulse,sqr(1-weights.x)*one_over_m_edges(0)+sqr(weights.x)*one_over_m_edges(1)+sqr(1-weights.y)*one_over_m_edges(2)+sqr(weights.y)*one_over_m_edges(3))*normal;
+    V_edges(0)-=(1-weights.x)*one_over_m_edges(0)*impulse;V_edges(1)-=weights.x*one_over_m_edges(1)*impulse;V_edges(2)+=(1-weights.y)*one_over_m_edges(2)*impulse;V_edges(3)+=weights.y*one_over_m_edges(3)*impulse;
     if(ee_data){
         ee_data->target_impulse=impulse;
-        ee_data->target_weight(1)=weights.x-1;ee_data->target_weight(2)=-weights.x;ee_data->target_weight(3)=1-weights.y;ee_data->target_weight(4)=weights.y;
+        ee_data->target_weight(0)=weights.x-1;ee_data->target_weight(1)=-weights.x;ee_data->target_weight(2)=1-weights.y;ee_data->target_weight(3)=weights.y;
         ee_data->target_normal=normal;}
 }
 template<class T,class TV> inline void Create_Final_Edges(const POINT_2D<T>& edge1_input,const POINT_2D<T>& edge2_input,const INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,2>&> V_edges,
     const T dt,POINT_2D<T>& edge1_final,POINT_2D<T>& edge2_final)
 {
-    edge1_final=POINT_2D<T>(edge1_input+dt*V_edges(1));
-    edge2_final=POINT_2D<T>(edge2_input+dt*V_edges(2));
+    edge1_final=POINT_2D<T>(edge1_input+dt*V_edges(0));
+    edge2_final=POINT_2D<T>(edge2_input+dt*V_edges(1));
 }
 template<class T,class TV> inline void Create_Final_Edges(const SEGMENT_3D<T>& edge1_input,const SEGMENT_3D<T>& edge2_input,const INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,4>&> V_edges,
     const T dt,SEGMENT_3D<T>& edge1_final,SEGMENT_3D<T>& edge2_final)
 {
-    edge1_final=SEGMENT_3D<T>(edge1_input.x1+dt*V_edges(1),edge1_input.x2+dt*V_edges(2));
-    edge2_final=SEGMENT_3D<T>(edge2_input.x1+dt*V_edges(3),edge2_input.x2+dt*V_edges(4));
+    edge1_final=SEGMENT_3D<T>(edge1_input.x1+dt*V_edges(0),edge1_input.x2+dt*V_edges(1));
+    edge2_final=SEGMENT_3D<T>(edge2_input.x1+dt*V_edges(2),edge2_input.x2+dt*V_edges(3));
 }
 }
 template<class TV> bool TRIANGLE_COLLISIONS<TV>::
@@ -773,7 +773,7 @@ Stop_Nodes_Before_Self_Collision(const T dt)
                     structure.triangulated_surface_modified(kk)=attempts==1 || modified_full.Subset(nodes).Contains(true);
                     if(structure.triangulated_surface_modified(kk))
                         hierarchy.box_hierarchy(kk)=RANGE<TV>::Combine(RANGE<TV>::Bounding_Box(X.Subset(nodes)),
-                            RANGE<TV>::Bounding_Box(X(nodes[1])+dt*V(nodes[1]),X(nodes[2])+dt*V(nodes[2]),X(nodes[3])+dt*V(nodes[3])));}
+                            RANGE<TV>::Bounding_Box(X(nodes[0])+dt*V(nodes[0]),X(nodes[1])+dt*V(nodes[1]),X(nodes[2])+dt*V(nodes[2])));}
                 hierarchy.Update_Modified_Nonleaf_Boxes(structure.triangulated_surface_modified);}
             if(structure.segmented_curve){
                 SEGMENT_HIERARCHY<TV>& hierarchy=*structure.segmented_curve->hierarchy;
@@ -782,7 +782,7 @@ Stop_Nodes_Before_Self_Collision(const T dt)
                     const VECTOR<int,2>& nodes=structure.segmented_curve->mesh.elements(kk);
                     structure.segmented_curve_modified(kk)=attempts==1 || modified_full.Subset(nodes).Contains(true);
                     if(structure.segmented_curve_modified(kk))
-                        hierarchy.box_hierarchy(kk)=RANGE<TV>::Combine(RANGE<TV>::Bounding_Box(X.Subset(nodes)),RANGE<TV>::Bounding_Box(X(nodes[1])+dt*V(nodes[1]),X(nodes[2])+dt*V(nodes[2])));}
+                        hierarchy.box_hierarchy(kk)=RANGE<TV>::Combine(RANGE<TV>::Bounding_Box(X.Subset(nodes)),RANGE<TV>::Bounding_Box(X(nodes[0])+dt*V(nodes[0]),X(nodes[1])+dt*V(nodes[1])));}
                 hierarchy.Update_Modified_Nonleaf_Boxes(structure.segmented_curve_modified);}
             
             {PARTICLE_HIERARCHY<TV,INDIRECT_ARRAY<ARRAY_VIEW<TV> > >& hierarchy=structure.particle_hierarchy;
@@ -797,13 +797,13 @@ Stop_Nodes_Before_Self_Collision(const T dt)
         point_face_pairs_internal.Remove_All();edge_edge_pairs_internal.Remove_All();
         for(int pair_i=0;pair_i<geometry.interacting_structure_pairs.m;pair_i++){VECTOR<int,2>& pair=geometry.interacting_structure_pairs(pair_i);
             if(compute_point_face_collisions){
-                for(int i=0;i<2;i++){if(i==2 && pair[1]==pair[2]) break;
+                for(int i=0;i<2;i++){if(i==2 && pair[0]==pair[1]) break;
                     STRUCTURE_INTERACTION_GEOMETRY<TV>& structure_1=*geometry.structure_geometries(pair[i]);
-                    STRUCTURE_INTERACTION_GEOMETRY<TV>& structure_2=*geometry.structure_geometries(pair[3-i]);
+                    STRUCTURE_INTERACTION_GEOMETRY<TV>& structure_2=*geometry.structure_geometries(pair[1-i]);
                     Get_Moving_Faces_Near_Moving_Points(structure_1,structure_2,point_face_pairs_internal,point_face_pairs_external,collision_thickness);}}
             if(compute_edge_edge_collisions){
-                STRUCTURE_INTERACTION_GEOMETRY<TV>& structure_1=*geometry.structure_geometries(pair[1]);
-                STRUCTURE_INTERACTION_GEOMETRY<TV>& structure_2=*geometry.structure_geometries(pair[2]);
+                STRUCTURE_INTERACTION_GEOMETRY<TV>& structure_1=*geometry.structure_geometries(pair[0]);
+                STRUCTURE_INTERACTION_GEOMETRY<TV>& structure_2=*geometry.structure_geometries(pair[1]);
                 Get_Moving_Edges_Near_Moving_Edges(structure_1,structure_2,edge_edge_pairs_internal,edge_edge_pairs_external,collision_thickness);}}
         LOG::Stat("point triangle collision pairs",point_face_pairs_internal.m);
         LOG::Stat("edge edge collision pairs",edge_edge_pairs_internal.m);
