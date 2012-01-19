@@ -62,9 +62,9 @@ Compute_Delta_Flux_For_Clamping_Variable(const T_GRID& grid,const int number_of_
         T outgoing_flux=0;overshoot_percentages(cell_index)=0;
         for(int i=0;i<T_GRID::dimension*2;i++) clamp_flux(i)=false;
         for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT first_face_index=iterator.First_Face_Index(axis),second_face_index=iterator.Second_Face_Index(axis);
-            if(flux.Component(axis)(first_face_index)(clamped_variable_index)<0){clamp_flux(2*axis-1)=true;
+            if(flux.Component(axis)(first_face_index)(clamped_variable_index)<0){clamp_flux(2*axis)=true;
                 outgoing_flux-=dt*flux.Component(axis)(first_face_index)(clamped_variable_index)*one_over_dx[axis];}
-            if(flux.Component(axis)(second_face_index)(clamped_variable_index)>0){clamp_flux(2*axis)=true;
+            if(flux.Component(axis)(second_face_index)(clamped_variable_index)>0){clamp_flux(2*axis+1)=true;
                 outgoing_flux+=dt*flux.Component(axis)(second_face_index)(clamped_variable_index)*one_over_dx[axis];}}
         
         if((U(cell_index)(clamped_variable_index)-clamped_value)<=0) overshoot_percentages(cell_index)=1;
@@ -77,12 +77,12 @@ Compute_Delta_Flux_For_Clamping_Variable(const T_GRID& grid,const int number_of_
                 overshoot_percentages(cell_index)=overshoot/outgoing_flux;}}
         if(overshoot_percentages(cell_index))
             for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT first_face_index=iterator.First_Face_Index(axis),second_face_index=iterator.Second_Face_Index(axis);
-                if(clamp_flux(2*axis-1)){
+                if(clamp_flux(2*axis)){
                     if(!psi_N.Component(axis)(first_face_index))
                         delta_flux.Component(axis)(first_face_index)(clamped_variable_index)=(-overshoot_percentages(cell_index))*flux.Component(axis)(first_face_index)(clamped_variable_index);
                     else rhs(cell_index)(clamped_variable_index)+=overshoot_percentages(cell_index)*flux.Component(axis)(first_face_index)(clamped_variable_index)*one_over_dx[axis];}
                 
-                if(clamp_flux(2*axis)){
+                if(clamp_flux(2*axis+1)){
                     if(!psi_N.Component(axis)(second_face_index))
                         delta_flux.Component(axis)(second_face_index)(clamped_variable_index)=(-overshoot_percentages(cell_index))*flux.Component(axis)(second_face_index)(clamped_variable_index);
                     else rhs(cell_index)(clamped_variable_index)-=overshoot_percentages(cell_index)*flux.Component(axis)(second_face_index)(clamped_variable_index)*one_over_dx[axis];}}}
@@ -107,7 +107,7 @@ Compute_Flux_Without_Clamping(const T_GRID& grid,const T_ARRAYS_DIMENSION_SCALAR
         ARRAY<TV_DIMENSION,VECTOR<int,1> > U_1d_axis(U_ghost_start,U_ghost_end),flux_axis_1d(U_start,U_end);
         if(U_ghost_clamped) U_flux_1d_axis.Resize(U_ghost_start,U_ghost_end);
         ARRAY<bool,VECTOR<int,1> > psi_axis(U_start,U_end),psi_N_axis(U_start,U_end+1);
-        VECTOR<bool,2> outflow_boundaries_axis(outflow_boundaries(2*axis-1),outflow_boundaries(2*axis));
+        VECTOR<bool,2> outflow_boundaries_axis(outflow_boundaries(2*axis),outflow_boundaries(2*axis+1));
         ARRAY<int,VECTOR<int,1> > filled_region_colors(U_start,U_end);
         ARRAY<bool,VECTOR<int,1> > psi_axis_current_component(U_start,U_end);
         if(save_fluxes) flux_temp.Resize(U_start-1,U_end,true,false);
@@ -135,7 +135,7 @@ Compute_Flux_Without_Clamping(const T_GRID& grid,const T_ARRAYS_DIMENSION_SCALAR
                     if(thinshell) object_boundary->Fill_Ghost_Cells_Neumann(grid.Get_1D_Grid(axis),U_flux_1d_axis,face_velocities,cell_index,axis,order,use_exact_neumann_face_location,
                         VECTOR<int,2>(U_start,U_end),find_connected_components.region_boundaries(color),psi_N_boundary,callbacks);
                 VECTOR<bool,2> outflow_boundaries_current_component;
-                outflow_boundaries_current_component(1)=outflow_boundaries_axis(1)&&(!psi_N_boundary(1));outflow_boundaries_current_component(2)=outflow_boundaries_axis(2)&&(!psi_N_boundary(2));
+                outflow_boundaries_current_component(0)=outflow_boundaries_axis(0)&&(!psi_N_boundary(0));outflow_boundaries_current_component(1)=outflow_boundaries_axis(1)&&(!psi_N_boundary(1));
                 (eigensystems[axis])->slice_index=slice_index;(eigensystems_explicit[axis])->slice_index=slice_index;
                 ARRAY<TV_DIMENSION,VECTOR<int,1> >* U_flux_pointer=U_ghost_clamped?(&U_flux_1d_axis):0;
                 Conservation_Solver(U_end,dx[axis],psi_axis_current_component,U_1d_axis,flux_axis_1d,*eigensystems[axis],*eigensystems_explicit[axis],
@@ -208,8 +208,8 @@ Update_Conservation_Law(T_GRID& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS
 
     T_ARRAYS_SCALAR rho_dt(grid.Domain_Indices()), e_dt(grid.Domain_Indices());
     for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
-        T clamp_rho_cell=clamp_rho*U_ghost(cell_index)(1);
-        if(rhs(cell_index)(1)>0 && U_ghost(cell_index)(1)>=clamp_rho_cell) rho_dt(cell_index)=(U_ghost(cell_index)(1)-clamp_rho_cell)/rhs(cell_index)(1);
+        T clamp_rho_cell=clamp_rho*U_ghost(cell_index)(0);
+        if(rhs(cell_index)(0)>0 && U_ghost(cell_index)(0)>=clamp_rho_cell) rho_dt(cell_index)=(U_ghost(cell_index)(0)-clamp_rho_cell)/rhs(cell_index)(0);
         else rho_dt(cell_index)=dt;
 
         T momentum_dt=dt;
@@ -217,10 +217,10 @@ Update_Conservation_Law(T_GRID& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS
         for(int axis=0;axis<TV::dimension;axis++){
             T tmp_dt=dt;
             T momentum_flux_sqr=rhs(cell_index)(axis+1)*rhs(cell_index)(axis+1);
-            T a=2*rhs(cell_index)(1)*rhs(cell_index)(d)-momentum_flux_sqr-2*clamp_e_cell*rhs(cell_index)(1)*rhs(cell_index)(1);
-            T c=2*U_ghost(cell_index)(d)*U_ghost(cell_index)(1)-2*clamp_e_cell*U_ghost(cell_index)(1)*U_ghost(cell_index)(1)-U_ghost(cell_index)(axis+1)*U_ghost(cell_index)(axis+1);
+            T a=2*rhs(cell_index)(0)*rhs(cell_index)(d)-momentum_flux_sqr-2*clamp_e_cell*rhs(cell_index)(0)*rhs(cell_index)(0);
+            T c=2*U_ghost(cell_index)(d)*U_ghost(cell_index)(0)-2*clamp_e_cell*U_ghost(cell_index)(0)*U_ghost(cell_index)(0)-U_ghost(cell_index)(axis+1)*U_ghost(cell_index)(axis+1);
             if(dt*a>0){
-                T b_over_two=U_ghost(cell_index)(axis+1)*rhs(cell_index)(axis+1)-U_ghost(cell_index)(1)*rhs(cell_index)(d)-U_ghost(cell_index)(d)*rhs(cell_index)(1)+2*clamp_e_cell*U_ghost(cell_index)(1)*rhs(cell_index)(1);
+                T b_over_two=U_ghost(cell_index)(axis+1)*rhs(cell_index)(axis+1)-U_ghost(cell_index)(0)*rhs(cell_index)(d)-U_ghost(cell_index)(d)*rhs(cell_index)(0)+2*clamp_e_cell*U_ghost(cell_index)(0)*rhs(cell_index)(0);
                 T b_sqr_over_four=b_over_two*b_over_two;
                 T ac=a*c;
                 if(b_sqr_over_four>ac){
@@ -252,33 +252,33 @@ Update_Conservation_Law_For_Specialized_Shallow_Water_Equations(GRID<TV>& grid,T
     if(save_fluxes!=solver.save_fluxes) PHYSBAM_FATAL_ERROR();
 
     int i,j;int m=grid.counts.x,n=grid.counts.y;T dx=grid.dX.x,dy=grid.dX.y;
-    ARRAY<VECTOR<T,3> ,VECTOR<int,2> > rhs(1,m,1,n);
+    ARRAY<VECTOR<T,3> ,VECTOR<int,2> > rhs(0,m,1,n);
 
     if(save_fluxes) fluxes.Resize(grid);
 
     if(save_fluxes) solver.flux_temp.Resize(0,m,true,false);
-    ARRAY<VECTOR<T,2> ,VECTOR<int,1> > U_1d_x(-2,m+3),Fx_1d(1,m);
-    ARRAY<bool,VECTOR<int,1> > psi_x(1,m);
+    ARRAY<VECTOR<T,2> ,VECTOR<int,1> > U_1d_x(-3,m+3),Fx_1d(0,m);
+    ARRAY<bool,VECTOR<int,1> > psi_x(0,m);
     for(j=0;j<n;j++){
         for(i=0;i<m;i++) psi_x(i)=psi(i,j);
-        for(i=-2;i<=m+3;i++){U_1d_x(i)(1)=U_ghost(i,j)(1);U_1d_x(i)(2)=U_ghost(i,j)(2);}
+        for(i=-2;i<=m+3;i++){U_1d_x(i)(0)=U_ghost(i,j)(0);U_1d_x(i)(1)=U_ghost(i,j)(1);}
         eigensystem_F.slice_index=VECTOR<int,3>(0,j,0);
-        solver.Conservation_Solver(m,dx,psi_x,U_1d_x,Fx_1d,eigensystem_F,eigensystem_F,VECTOR<bool,2>(outflow_boundaries(1),outflow_boundaries(2)));
-        for(i=0;i<m;i++){rhs(i,j)(1)=Fx_1d(i)(1);rhs(i,j)(2)=Fx_1d(i)(2);}
+        solver.Conservation_Solver(m,dx,psi_x,U_1d_x,Fx_1d,eigensystem_F,eigensystem_F,VECTOR<bool,2>(outflow_boundaries(0),outflow_boundaries(1)));
+        for(i=0;i<m;i++){rhs(i,j)(0)=Fx_1d(i)(0);rhs(i,j)(1)=Fx_1d(i)(1);}
         if(save_fluxes) 
-            for(i=0;i<=m;i++){fluxes.Component(1)(i+1,j)(1)=solver.flux_temp(i)(1);fluxes.Component(1)(i+1,j)(2)=solver.flux_temp(i)(2);fluxes.Component(1)(i+1,j)(3)=0;}}
+            for(i=0;i<=m;i++){fluxes.Component(0)(i+1,j)(0)=solver.flux_temp(i)(0);fluxes.Component(0)(i+1,j)(1)=solver.flux_temp(i)(1);fluxes.Component(0)(i+1,j)(2)=0;}}
 
     if(save_fluxes) solver.flux_temp.Resize(0,n,true,false);
-    ARRAY<VECTOR<T,2> ,VECTOR<int,1> > U_1d_y(-2,n+3),Gy_1d(1,n);
-    ARRAY<bool,VECTOR<int,1> > psi_y(1,n);
+    ARRAY<VECTOR<T,2> ,VECTOR<int,1> > U_1d_y(-3,n+3),Gy_1d(0,n);
+    ARRAY<bool,VECTOR<int,1> > psi_y(0,n);
     for(i=0;i<m;i++){
         for(j=0;j<n;j++) psi_y(j)=psi(i,j);
-        for(j=-2;j<=n+3;j++){U_1d_y(j)(1)=U_ghost(i,j)(1);U_1d_y(j)(2)=U_ghost(i,j)(3);}
+        for(j=-2;j<=n+3;j++){U_1d_y(j)(0)=U_ghost(i,j)(0);U_1d_y(j)(1)=U_ghost(i,j)(2);}
         eigensystem_G.slice_index=VECTOR<int,3>(i,0,0);
-        solver.Conservation_Solver(n,dy,psi_y,U_1d_y,Gy_1d,eigensystem_G,eigensystem_G,VECTOR<bool,2>(outflow_boundaries(3),outflow_boundaries(4)));
-        for(j=0;j<n;j++){rhs(i,j)(1)+=Gy_1d(j)(1);rhs(i,j)(3)=Gy_1d(j)(2);}
+        solver.Conservation_Solver(n,dy,psi_y,U_1d_y,Gy_1d,eigensystem_G,eigensystem_G,VECTOR<bool,2>(outflow_boundaries(2),outflow_boundaries(3)));
+        for(j=0;j<n;j++){rhs(i,j)(0)+=Gy_1d(j)(0);rhs(i,j)(2)=Gy_1d(j)(1);}
         if(save_fluxes)
-            for(j=0;j<=n;j++){fluxes.Component(2)(i,j+1)(1)=solver.flux_temp(j)(1);fluxes.Component(2)(i,j+1)(2)=0;fluxes.Component(2)(i,j+1)(3)=solver.flux_temp(j)(2);}}
+            for(j=0;j<=n;j++){fluxes.Component(1)(i,j+1)(0)=solver.flux_temp(j)(0);fluxes.Component(1)(i,j+1)(1)=0;fluxes.Component(1)(i,j+1)(2)=solver.flux_temp(j)(1);}}
 
     for(i=0;i<m;i++) for(j=0;j<n;j++) if(psi(i,j)) U(i,j)-=dt*rhs(i,j);
 }
