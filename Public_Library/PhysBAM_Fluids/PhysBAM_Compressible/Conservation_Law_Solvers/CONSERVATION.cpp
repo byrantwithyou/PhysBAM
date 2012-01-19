@@ -217,10 +217,10 @@ Update_Conservation_Law(T_GRID& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS
         for(int axis=0;axis<TV::dimension;axis++){
             T tmp_dt=dt;
             T momentum_flux_sqr=rhs(cell_index)(axis+1)*rhs(cell_index)(axis+1);
-            T a=2*rhs(cell_index)(0)*rhs(cell_index)(d)-momentum_flux_sqr-2*clamp_e_cell*rhs(cell_index)(0)*rhs(cell_index)(0);
-            T c=2*U_ghost(cell_index)(d)*U_ghost(cell_index)(0)-2*clamp_e_cell*U_ghost(cell_index)(0)*U_ghost(cell_index)(0)-U_ghost(cell_index)(axis+1)*U_ghost(cell_index)(axis+1);
+            T a=2*rhs(cell_index)(0)*rhs(cell_index)(d-1)-momentum_flux_sqr-2*clamp_e_cell*rhs(cell_index)(0)*rhs(cell_index)(0);
+            T c=2*U_ghost(cell_index)(d-1)*U_ghost(cell_index)(0)-2*clamp_e_cell*U_ghost(cell_index)(0)*U_ghost(cell_index)(0)-U_ghost(cell_index)(axis+1)*U_ghost(cell_index)(axis+1);
             if(dt*a>0){
-                T b_over_two=U_ghost(cell_index)(axis+1)*rhs(cell_index)(axis+1)-U_ghost(cell_index)(0)*rhs(cell_index)(d)-U_ghost(cell_index)(d)*rhs(cell_index)(0)+2*clamp_e_cell*U_ghost(cell_index)(0)*rhs(cell_index)(0);
+                T b_over_two=U_ghost(cell_index)(axis+1)*rhs(cell_index)(axis+1)-U_ghost(cell_index)(0)*rhs(cell_index)(d-1)-U_ghost(cell_index)(d-1)*rhs(cell_index)(0)+2*clamp_e_cell*U_ghost(cell_index)(0)*rhs(cell_index)(0);
                 T b_sqr_over_four=b_over_two*b_over_two;
                 T ac=a*c;
                 if(b_sqr_over_four>ac){

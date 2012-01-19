@@ -208,7 +208,7 @@ Apply_Pressure_To_Internal_Energy(const T dt)
 
     for(CELL_ITERATOR iterator(euler.grid);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();
-        euler.U(cell_index)(T_GRID::dimension+2) += laplacian_p_cavitation_cell(cell_index)*dt;}
+        euler.U(cell_index)(T_GRID::dimension+1) += laplacian_p_cavitation_cell(cell_index)*dt;}
 
     euler.Invalidate_Ghost_Cells();
 }

@@ -406,9 +406,9 @@ Apply_Pressure(const T_ARRAYS_SCALAR& p_ghost,const T_FACE_ARRAYS_SCALAR& p_face
            T p_hat_second_face=p_hat_face.Component(axis)(second_face_index);
            div_p_hat_u+=(p_hat_second_face*face_velocities_np1.Component(axis)(second_face_index)-p_hat_first_face*face_velocities_np1.Component(axis)(first_face_index))*one_over_dx[axis];
            if(fluxes){
-               (*fluxes).Component(axis)(first_face_index)(T_GRID::dimension+2)=p_hat_first_face*one_over_dt*face_velocities_np1.Component(axis)(first_face_index);
-               (*fluxes).Component(axis)(second_face_index)(T_GRID::dimension+2)=p_hat_second_face*one_over_dt*face_velocities_np1.Component(axis)(second_face_index);}}
-       euler->U(cell_index)(T_GRID::dimension+2)-=div_p_hat_u;}
+               (*fluxes).Component(axis)(first_face_index)(T_GRID::dimension+1)=p_hat_first_face*one_over_dt*face_velocities_np1.Component(axis)(first_face_index);
+               (*fluxes).Component(axis)(second_face_index)(T_GRID::dimension+1)=p_hat_second_face*one_over_dt*face_velocities_np1.Component(axis)(second_face_index);}}
+       euler->U(cell_index)(T_GRID::dimension+1)-=div_p_hat_u;}
 
     //if(incompressible_coupling_callbacks) incompressible_coupling_callbacks->Apply_Pressure_At_Incompressible_Faces();
 
