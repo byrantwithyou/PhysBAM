@@ -311,7 +311,7 @@ public:
         {TV_INT(0,0,0),TV_INT(0,1,0),TV_INT(0,0,1),TV_INT(0,1,1)},
         {TV_INT(0,0,0),TV_INT(1,0,0),TV_INT(0,0,1),TV_INT(1,0,1)},
         {TV_INT(0,0,0),TV_INT(1,0,0),TV_INT(0,1,0),TV_INT(1,1,0)}};
-    assert(1<=axis&&axis<=3&&1<=node&&node<=4);return face_index+corner_from_face_offset[axis-1][node-1];}
+    assert((unsigned)axis<3&&(unsigned)node<4);return face_index+corner_from_face_offset[axis-1][node-1];}
 
     static TV_INT Face_Node_Index(const int axis,const VECTOR<int,2>& face_index,const int node)
     {assert((unsigned)node<2);TV_INT index=face_index;index[3-axis]+=node-1;return index;}
@@ -324,7 +324,7 @@ public:
         {TV_INT(0,-1,-1),TV_INT(0,0,-1),TV_INT(0,-1,0),TV_INT(0,0,0)},
         {TV_INT(-1,0,-1),TV_INT(-1,0,0),TV_INT(0,0,-1),TV_INT(0,0,0)},
         {TV_INT(-1,-1,0),TV_INT(0,-1,0),TV_INT(-1,0,0),TV_INT(0,0,0)}};
-    assert(1<=face&&face<=4&&1<=axis&&axis<=3);return node_index+face_from_node_offset[axis-1][face-1];}
+    assert((unsigned)face<4&&(unsigned)axis<3);return node_index+face_from_node_offset[axis-1][face-1];}
 
     static TV_INT Node_Face_Index(const int axis,const VECTOR<int,2>& node_index,const int face)
     {assert((unsigned)face<2);TV_INT index=node_index;index[3-axis]+=face-2;return index;}

@@ -190,10 +190,10 @@ public:
         x(i)=(b(i)-rho)/(*this)(i,i);}}
 
     void Left_Givens_Rotation(const int i,const int j,const T c,const T s)
-    {assert(1<=i && i<j && j<=m);for(int k=0;k<n;k++){T x=(*this)(i,k);(*this)(i,k)=c*(*this)(i,k)-s*(*this)(j,k);(*this)(j,k)=s*x+c*(*this)(j,k);}}
+    {assert(0<=i && i<j && j<m);for(int k=0;k<n;k++){T x=(*this)(i,k);(*this)(i,k)=c*(*this)(i,k)-s*(*this)(j,k);(*this)(j,k)=s*x+c*(*this)(j,k);}}
     
     void Right_Givens_Rotation(const int i,const int j,const T c,const T s)
-    {assert(1<=i && i<j && j<=n);for(int k=0;k<m;k++){T x=(*this)(k,i);(*this)(k,i)=c*(*this)(k,i)-s*(*this)(k,j);(*this)(k,j)=s*x+c*(*this)(k,j);}}
+    {assert(0<=i && i<j && j<n);for(int k=0;k<m;k++){T x=(*this)(k,i);(*this)(k,i)=c*(*this)(k,i)-s*(*this)(k,j);(*this)(k,j)=s*x+c*(*this)(k,j);}}
 
 //#####################################################################
     void Jacobi_Singular_Value_Decomposition(ARRAY<VECTOR<int,2> >& left_givens_pairs,ARRAY<VECTOR<T,2> >& left_givens_coefficients,

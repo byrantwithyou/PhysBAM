@@ -31,7 +31,7 @@ operator=(const HYPOTHETICAL_CUT_TETRAHEDRONS& old_cut)
 template<class T> void HYPOTHETICAL_CUT_TETRAHEDRONS<T>::
 Initialize_Hypothetical_Cut(const VECTOR<T,3>& fracture_normal_input,const int cut_index_input,const int tetrahedron_input)
 {
-    assert(1<=cut_index_input && cut_index_input <= 7);
+    assert((unsigned)cut_index_input<7);
     cut_index=cut_index_input;
     fracture_normal=fracture_normal_input;
     tetrahedron=tetrahedron_input;

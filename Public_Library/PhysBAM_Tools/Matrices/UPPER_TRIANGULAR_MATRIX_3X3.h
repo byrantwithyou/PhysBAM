@@ -49,13 +49,13 @@ public:
     {return 3;}
 
     T& operator()(const int i,const int j)
-    {assert(1<=i && i<=j && j<=3);return ((T*)this)[((j*(j-1))>>1)+i-1];}
+    {assert(0<=i && i<=j && j<3);return ((T*)this)[((j*(j+1))>>1)+i];}
 
     const T& operator()(const int i,const int j) const
-    {assert(1<=i && i<=j && j<=3);return ((const T*)this)[((j*(j-1))>>1)+i-1];}
+    {assert(0<=i && i<=j && j<3);return ((const T*)this)[((j*(j+1))>>1)+i];}
 
     bool Valid_Index(const int i,const int j) const
-    {return 1<=i && i<=j && j<=3;}
+    {return 0<=i && i<=j && j<3;}
 
     bool operator==(const UPPER_TRIANGULAR_MATRIX& A) const
     {return x11==A.x11 && x12==A.x12 && x22==A.x22 && x13==A.x13 && x23==A.x23 && x33==A.x33;}

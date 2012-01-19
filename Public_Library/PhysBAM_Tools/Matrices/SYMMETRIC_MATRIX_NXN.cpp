@@ -67,7 +67,7 @@ template<class T> void SYMMETRIC_MATRIX_NXN<T>::
 Givens_Conjugate(const int i,const int j,const T c,const T s)
 {
     if(i>j){Givens_Conjugate(j,i,c,-s);return;}
-    assert(1<=i && i<j && j<=n);
+    assert(0<=i && i<j && j<n);
     for(int k=1;k<i;k++){T u=(*this)(i,k),v=(*this)(j,k);(*this)(i,k)=c*u-s*v;(*this)(j,k)=s*u+c*v;}
     for(int k=i+1;k<j;k++){T u=(*this)(k,i),v=(*this)(j,k);(*this)(k,i)=c*u-s*v;(*this)(j,k)=s*u+c*v;}
     for(int k=j+1;k<=n;k++){T u=(*this)(k,i),v=(*this)(k,j);(*this)(k,i)=c*u-s*v;(*this)(k,j)=s*u+c*v;}

@@ -53,7 +53,7 @@ Rigidity_Penalty_Gradient(const int i) const
 template<class T> T QUASI_RIGID_TRANSFORM_3D<T>::
 Ridigity_Penalty_Hessian_Definite_Part(const int i,const int j) const
 {
-    assert(1<=i && i<=12  &&  1<=j && j<=12);
+    assert((unsigned)i<12  && (unsigned)j<12);
     if(i>9 || j>9) return 0;
     MATRIX<T,3> U,V;DIAGONAL_MATRIX<T,3> Sigma;
     affine_transform.Fast_Singular_Value_Decomposition(U,Sigma,V);

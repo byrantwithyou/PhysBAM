@@ -204,7 +204,7 @@ Penalty_Gradient(const int control_id) const
 template<class T> T ATTACHMENT_FRAME_CONTROL_SET<T>::
 Penalty_Hessian(const int control_id1,const int control_id2) const
 {
-    assert(1<=control_id1 && control_id1<=24 && 1<=control_id2 && control_id2<=24);
+    assert((unsigned)control_id1<24 && (unsigned)control_id2<24);
     T penalty_hessian=0;
     if(control_id1<=12 && control_id2<=12) penalty_hessian+=rigidity_penalty_coefficient*cranium_transform.Ridigity_Penalty_Hessian_Definite_Part(control_id1,control_id2);
     if(control_id1>=13 && control_id2>=13) penalty_hessian+=rigidity_penalty_coefficient*jaw_transform.Ridigity_Penalty_Hessian_Definite_Part(control_id1-12,control_id2-12);

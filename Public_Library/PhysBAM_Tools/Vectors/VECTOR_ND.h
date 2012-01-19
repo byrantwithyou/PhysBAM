@@ -70,7 +70,7 @@ public:
     {if(owns_data) delete[] x;}
 
     void Set_Subvector_View(const VECTOR_ND& v,const INTERVAL<int>& range)
-    {assert(1<=range.min_corner && range.min_corner<=range.max_corner+1 && range.max_corner<=v.n);
+    {assert(0<=range.min_corner && range.min_corner<range.max_corner+1 && range.max_corner<v.n);
     if(owns_data) delete[] x;owns_data=false;n=range.max_corner-range.min_corner+1;x=v.x+range.min_corner-1;}
 
     VECTOR_ND& operator=(const VECTOR_ND& source)

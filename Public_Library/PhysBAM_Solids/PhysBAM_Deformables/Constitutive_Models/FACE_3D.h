@@ -115,7 +115,7 @@ public:
     return scale*(anisotropic_part+isotropic_part);}
     
     MATRIX<T,3> P_From_Strain_Unit_Activation(const DIAGONAL_MATRIX<T,3>& F,const MATRIX<T,3>& V,const T scale,const int tetrahedron_index,const int muscle_id) const
-    {assert(1<=muscle_id&&muscle_id<=muscle_activations.m);DIAGONAL_MATRIX<T,3> F_threshold=F.Max(failure_threshold);
+    {assert((unsigned)muscle_id<muscle_activations.m);DIAGONAL_MATRIX<T,3> F_threshold=F.Max(failure_threshold);
     int tet_muscle_index=tet_muscles(tetrahedron_index).Find(muscle_id);
     if(!tet_muscle_index)return MATRIX<T,3>();
     VECTOR<T,3> fiber=V.Transpose_Times(tet_fibers(tetrahedron_index)(tet_muscle_index)),F_fiber=F_threshold*fiber;

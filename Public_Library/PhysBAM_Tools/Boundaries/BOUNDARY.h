@@ -40,7 +40,7 @@ public:
     {Set_Constant_Extrapolation(TV_SIDES());}
 
     virtual bool Constant_Extrapolation(const int side) const
-    {assert(1<=side && side <=6);int axis=(side+1)/2;return constant_extrapolation(axis)(side&1?1:2);}
+    {assert((unsigned)side<6);int axis=(side+1)/2;return constant_extrapolation(axis)(side&1?1:2);}
 
     virtual void Set_Fixed_Boundary(const bool use_fixed_boundary_input=true,const T2 fixed_boundary_value_input=T2())
     {use_fixed_boundary=use_fixed_boundary_input;fixed_boundary_value=fixed_boundary_value_input;

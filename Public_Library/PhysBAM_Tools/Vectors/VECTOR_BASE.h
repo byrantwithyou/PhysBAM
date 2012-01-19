@@ -199,7 +199,7 @@ public:
     return *this-2*v_dot_a/v_dot_v*v;}
 
     void Givens_Rotate(const int i,const int j,const T c,const T s)
-    {if(i>j){Givens_Rotate(j,i,c,-s);return;}assert(1<=i && i<j && j<=Size());T u=(*this)(i),v=(*this)(j);(*this)(i)=c*u-s*v;(*this)(j)=s*u+c*v;}
+    {if(i>j){Givens_Rotate(j,i,c,-s);return;}assert(0<=i && i<j && j<Size());T u=(*this)(i),v=(*this)(j);(*this)(i)=c*u-s*v;(*this)(j)=s*u+c*v;}
 
     void Set_To_Orthogonal_Vector() // result isn't normalized
     {assert(Size()>=2);int m1=1,m2=2;

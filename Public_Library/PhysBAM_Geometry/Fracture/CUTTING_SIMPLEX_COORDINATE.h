@@ -103,8 +103,7 @@ public:
     {assert(reference_count>0);return --reference_count;}
 
     EXACT_RATIONAL<T> Exact(int node_index, int coordinate_index)
-    {assert((unsigned)node_index<d);
-    assert(1<=coordinate_index&&coordinate_index<=d+1);
+    {assert((unsigned)node_index<d);assert((unsigned)coordinate_index<d+1);
     assert(cutting_simplex.nodes[node_index]!=0);
     if(adaptive_coordinates==0){
         adaptive_coordinates=new COORDINATES_COLLECTION_TYPE;
