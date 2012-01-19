@@ -95,14 +95,14 @@ template<class T,class TV> void Intersect_Segment_Segment(PT_DATA<T>& data,const
     data.V=tdata.V+Q;
     data.G[3]=MATRIX<T,3>::Identity_Matrix();
     for(int i=0;i<4;i++){
-        if(i) data.G[i-1]=tdata.G[i];
+        if(i) data.G[i]=tdata.G[i];
         data.G[3]-=tdata.G[i];}
 
     for(int s=0;s<3;s++) for(int i=0;i<4;i++){data.H[s][i][3]=data.H[s][3][i]=MATRIX<T,3>();}
     for(int s=0;s<3;s++) for(int i=0;i<4;i++) for(int j=0;j<4;j++){
-        if(i && j) data.H[s][i-1][j-1]=tdata.H[s][i][j];
-        if(i) data.H[s][i-1][3]-=tdata.H[s][i][j];
-        if(j) data.H[s][3][j-1]-=tdata.H[s][i][j];
+        if(i && j) data.H[s][i][j]=tdata.H[s][i][j];
+        if(i) data.H[s][i][3]-=tdata.H[s][i][j];
+        if(j) data.H[s][3][j]-=tdata.H[s][i][j];
         data.H[s][3][3]+=tdata.H[s][i][j];}
 }
 

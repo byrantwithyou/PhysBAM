@@ -35,7 +35,7 @@ Negative_Material_In_Cell(const GRID<TV>& grid,const TV_INT& cell_index,const bo
     static TV_INT phi_indices[GRID<TV>::number_of_nodes_per_cell];grid.Nodes_In_Cell_From_Minimum_Corner_Node(cell_index,phi_indices);
 
     cell_particle_X.Resize(GRID<TV>::number_of_nodes_per_cell);
-    for(int i=0;i<GRID<TV>::number_of_nodes_per_cell;i++) cell_particle_X(i)=grid.Node(phi_indices[i-1]);
+    for(int i=0;i<GRID<TV>::number_of_nodes_per_cell;i++) cell_particle_X(i)=grid.Node(phi_indices[i]);
     cell_refinement_simplices.Remove_All();Refined_Object_Initialization_Helper(cell_refinement_simplices);
 
     int last_node=cell_particle_X.m;
@@ -44,7 +44,7 @@ Negative_Material_In_Cell(const GRID<TV>& grid,const TV_INT& cell_index,const bo
     T minimum_phi=FLT_MAX,maximum_phi=-FLT_MAX;
 
     for(int i=0;i<last_node;i++){T& phi=cell_phis(i);
-        phi=grid_nodal_phis(phi_indices[i-1]);
+        phi=grid_nodal_phis(phi_indices[i]);
         if(phi<minimum_phi) minimum_phi=phi;
         if(phi>maximum_phi) maximum_phi=phi;}
 

@@ -29,8 +29,8 @@ Triangle_Intersection_Area(const TRIANGLE_2D<T>& a,const TRIANGLE_2D<T>& b,VECTO
             ORIGIN_AREAS::Volume_From_Simplices(data,TV(),X);
             A+=data.V;
 
-            for(int k=0;k<4;k++) G(I(k))+=(const TV&)data.G[k-1];
-            for(int k=0;k<4;k++) for(int m=0;m<4;m++) H(I(k))(I(m))+=data.H[k-1][m-1];
+            for(int k=0;k<4;k++) G(I(k))+=(const TV&)data.G[k];
+            for(int k=0;k<4;k++) for(int m=0;m<4;m++) H(I(k))(I(m))+=data.H[k][m];
 #else // #if 0|1
             VECTOR<TV,4> tG;
             VECTOR<VECTOR<MATRIX<T,2>,4>,4> tH;

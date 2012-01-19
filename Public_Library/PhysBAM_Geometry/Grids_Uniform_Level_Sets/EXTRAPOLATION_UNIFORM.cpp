@@ -135,7 +135,7 @@ Update_Close_Point(T_ARRAYS_T2_BASE& u,const T_ARRAYS_BASE& phi,const T_ARRAYS_B
     assert(number_of_axis);
     if(number_of_axis==1) u(index)=value[0];
     else if(T_GRID::dimension==2 || number_of_axis==2){
-        T a=phix_dx[0]*optimization_scale[missing_axis-1],b=phix_dx[1],denominator=a+b,fraction=(T).5;
+        T a=phix_dx[0]*optimization_scale[missing_axis],b=phix_dx[1],denominator=a+b,fraction=(T).5;
         if(denominator > small_number) fraction=clamp(a/denominator,(T)0,(T)1);
         u(index)=fraction*value[0]+(1-fraction)*value[1];}
     else{PHYSBAM_ASSERT(T_GRID::dimension==3); // should only get here in 3D
