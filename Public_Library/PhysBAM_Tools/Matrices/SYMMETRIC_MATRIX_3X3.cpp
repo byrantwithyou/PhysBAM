@@ -93,7 +93,7 @@ Solve_Eigenproblem(DIAGONAL_MATRIX<T,3>& eigenvalues,MATRIX<T,3>& eigenvectors) 
 {
     T a11=x11,a12=x21,a13=x31,a22=x22,a23=x32,a33=x33;
     T v11=1,v12=0,v13=0,v21=0,v22=1,v23=0,v31=0,v32=0,v33=1;
-    int sweep;for(sweep=1;sweep<=50;sweep++){
+    int sweep;for(sweep=0;sweep<50;sweep++){
         T sum=abs(a12)+abs(a13)+abs(a23);
         if(sum==0) break;
         T threshold=sweep<4?(T)(1./45)*sum:0;

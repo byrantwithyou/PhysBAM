@@ -94,7 +94,7 @@ void Initialize_Cloth_Dynamics(DEFORMABLE_TRIANGULATED_SURFACE*& cloth)
     stretch_x->segment_mesh.number_nodes=m*n;
     stretch_x->segment_mesh.segments.Resize(2,1,(m-1)*n);
     k=0;
-    for(i=1;i<=m-1;i++) for(j=1;j<=n;j++){
+    for(i=0;i<m-1;i++) for(j=0;j<n;j++){
         k++;
         stretch_x->segment_mesh.segments(1,k)=i+m*(j-1);
         stretch_x->segment_mesh.segments(2,k)=i+1+m*(j-1);}
@@ -110,7 +110,7 @@ void Initialize_Cloth_Dynamics(DEFORMABLE_TRIANGULATED_SURFACE*& cloth)
     stretch_y->segment_mesh.number_nodes=m*n;
     stretch_y->segment_mesh.segments.Resize(2,1,m*(n-1));
     k=0;
-    for(i=1;i<=m;i++) for(j=1;j<=n-1;j++){
+    for(i=0;i<m;i++) for(j=0;j<n-1;j++){
         k++;
         stretch_y->segment_mesh.segments(1,k)=i+m*(j-1);
         stretch_y->segment_mesh.segments(2,k)=i+m*j;}
@@ -126,7 +126,7 @@ void Initialize_Cloth_Dynamics(DEFORMABLE_TRIANGULATED_SURFACE*& cloth)
     shear->segment_mesh.number_nodes=m*n;
     shear->segment_mesh.segments.Resize(2,1,2*(m-1)*(n-1));
     k=0;
-    for(i=1;i<=m-1;i++) for(j=1;j<=n-1;j++){
+    for(i=0;i<m-1;i++) for(j=0;j<n-1;j++){
         k++;
         shear->segment_mesh.segments(1,k)=i+m*(j-1);
         shear->segment_mesh.segments(2,k)=i+1+m*j;

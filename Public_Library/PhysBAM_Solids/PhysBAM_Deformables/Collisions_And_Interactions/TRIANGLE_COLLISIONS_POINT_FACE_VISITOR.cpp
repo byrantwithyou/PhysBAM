@@ -49,7 +49,7 @@ Store(const int point_index,const int face_index)
     if(intersecting_point_face_pairs.Size() && intersecting_point_face_pairs.Contains(nodes)) return;
     if (mpi_solids){
         VECTOR<PARTITION_ID,d+1> processors(mpi_solids->partition_id_from_particle_index.Subset(nodes));
-        int i; for(i=1;i<=d;i++) if (processors(i)!=processors(d+1)) {pairs_external.Append(nodes);return;}
+        int i; for(i=0;i<d;i++) if (processors(i)!=processors(d+1)) {pairs_external.Append(nodes);return;}
         pairs_internal.Append(nodes);}
     else pairs_internal.Append(nodes);
 }

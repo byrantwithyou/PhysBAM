@@ -35,8 +35,8 @@ Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1>
     // divided differences
     ARRAY<VECTOR<T,eno_order> ,VECTOR<int,2> > DU(1,d,-2,m+3),DF(1,d,-2,m+3);
     ARRAY<TV_DIMENSION,VECTOR<int,1> > F(-2,m+3);eigensystem.Flux(m,U,F); 
-    for(i=-2;i<=m+3;i++) for(k=1;k<=d;k++){DU(k,i)(1)=U(i)(k);DF(k,i)(1)=F(i)(k);}
-    for(j=2;j<=eno_order;j++) for(k=1;k<=d;k++) for(i=-2;i<=m+4-j;i++){DU(k,i)(j)=(DU(k,i+1)(j-1)-DU(k,i)(j-1))/(j*dx);DF(k,i)(j)=(DF(k,i+1)(j-1)-DF(k,i)(j-1))/(j*dx);}
+    for(i=-2;i<=m+3;i++) for(k=0;k<d;k++){DU(k,i)(1)=U(i)(k);DF(k,i)(1)=F(i)(k);}
+    for(j=2;j<=eno_order;j++) for(k=0;k<d;k++) for(i=-2;i<=m+4-j;i++){DU(k,i)(j)=(DU(k,i+1)(j-1)-DU(k,i)(j-1))/(j*dx);DF(k,i)(j)=(DF(k,i+1)(j-1)-DF(k,i)(j-1))/(j*dx);}
 
     // calculate the fluxes 
     ARRAY<bool,VECTOR<int,1> > psi_ghost(0,m+1);ARRAY<bool,VECTOR<int,1> >::Put(psi,psi_ghost); // ghost points for the if statement below  
@@ -51,7 +51,7 @@ Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1>
         if(!eigensystem.All_Eigenvalues_Same()){
             eigensystem.Eigenvectors(U,i,L,R);
             // transfer the divided differences into the characteristic fields
-            for(j=1;j<=eno_order;j++) for(int ii=i+1-j;ii<=i+1;ii++) if(ii >= -2 && ii <= m+4-j) for(k=1;k<=d;k++){
+            for(j=0;j<eno_order;j++) for(int ii=i+1-j;ii<=i+1;ii++) if(ii >= -2 && ii <= m+4-j) for(k=0;k<d;k++){
                 LDU(k,ii)(j)=LDF(k,ii)(j)=0;
                 for(int kk=0;kk<d;kk++){LDU(k,ii)(j)+=L(k,kk)*DU(kk,ii)(j);LDF(k,ii)(j)+=L(k,kk)*DF(kk,ii)(j);}}
             Dstate_ptr=&LDU;Dflux_ptr=&LDF;}
@@ -59,7 +59,7 @@ Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1>
         ARRAY<VECTOR<T,eno_order> ,VECTOR<int,2> > &Dstate=*Dstate_ptr,&Dflux=*Dflux_ptr;
         // find a flux in each characteristic field
         T flux_total;
-        if(eno_order == 1) for(k=1;k<=d;k++){   
+        if(eno_order == 1) for(k=0;k<d;k++){   
             if(lambda_left(k)*lambda_right(k) > 0)
                 if(lambda(k) > 0) flux_total=Dflux(k,i)(1);
                 else flux_total=Dflux(k,i+1)(1);
@@ -70,7 +70,7 @@ Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1>
                 flux_total=(T).5*(flux_left+flux_right);}
             if(!eigensystem.All_Eigenvalues_Same()) for(int kk=0;kk<d;kk++) flux(i)(kk)+=flux_total*R(k,kk);
             else flux(i)(k)=flux_total;}
-        else if(eno_order == 2) for(k=1;k<=d;k++){ 
+        else if(eno_order == 2) for(k=0;k<d;k++){ 
             if(lambda_left(k)*lambda_right(k) > 0)
                 if(lambda(k) > 0) flux_total=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,Dflux(k,i)(1),Dflux(k,i-1)(2),Dflux(k,i)(2));
                 else flux_total=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,Dflux(k,i+1)(1),-Dflux(k,i+1)(2),-Dflux(k,i)(2));
@@ -81,7 +81,7 @@ Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1>
                 flux_total=(T).5*(flux_left+flux_right);}
             if(!eigensystem.All_Eigenvalues_Same()) for(int kk=0;kk<d;kk++) flux(i)(kk)+=flux_total*R(k,kk);
             else flux(i)(k)=flux_total;}
-        else if(eno_order == 3) for(k=1;k<=d;k++){
+        else if(eno_order == 3) for(k=0;k<d;k++){
             if(lambda_left(k)*lambda_right(k) > 0)
                 if(lambda(k) > 0) flux_total=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,Dflux(k,i)(1),Dflux(k,i-1)(2),Dflux(k,i)(2),Dflux(k,i-2)(3),Dflux(k,i-1)(3),Dflux(k,i)(3));
                 else flux_total=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,Dflux(k,i+1)(1),-Dflux(k,i+1)(2),-Dflux(k,i)(2),Dflux(k,i+1)(3),Dflux(k,i)(3),Dflux(k,i-1)(3));
@@ -97,7 +97,7 @@ Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1>
 
     // difference the fluxes
     T one_over_dx=1/dx;
-    for(i=1;i<=m;i++) if(psi_ghost(i)) Fx(i)=(flux(i)-flux(i-1))*one_over_dx;
+    for(i=0;i<m;i++) if(psi_ghost(i)) Fx(i)=(flux(i)-flux(i-1))*one_over_dx;
     if(save_fluxes) for(i=0;i<=m;i++) if(psi_ghost(i) || psi_ghost(i+1)) flux_temp(i)=flux(i);
 }
 //#####################################################################

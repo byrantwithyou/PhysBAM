@@ -36,8 +36,8 @@ Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1>
     // divided differences    
     ARRAY<VECTOR<T,eno_order> ,VECTOR<int,2> > DU(1,d,-2,m+3),DF(1,d,-2,m+3);
     ARRAY<TV_DIMENSION,VECTOR<int,1> > F(-2,m+3);eigensystem.Flux(m,U,F); 
-    for(i=-2;i<=m+3;i++) for(k=1;k<=d;k++){DU(k,i)(1)=U(i)(k);DF(k,i)(1)=F(i)(k);}
-    for(j=2;j<=eno_order;j++) for(k=1;k<=d;k++) for(i=-2;i<=m+4-j;i++){DU(k,i)(j)=(DU(k,i+1)(j-1)-DU(k,i)(j-1))/(j*dx);DF(k,i)(j)=(DF(k,i+1)(j-1)-DF(k,i)(j-1))/(j*dx);}
+    for(i=-2;i<=m+3;i++) for(k=0;k<d;k++){DU(k,i)(1)=U(i)(k);DF(k,i)(1)=F(i)(k);}
+    for(j=2;j<=eno_order;j++) for(k=0;k<d;k++) for(i=-2;i<=m+4-j;i++){DU(k,i)(j)=(DU(k,i+1)(j-1)-DU(k,i)(j-1))/(j*dx);DF(k,i)(j)=(DF(k,i+1)(j-1)-DF(k,i)(j-1))/(j*dx);}
                 
     // calculate the fluxes 
     ARRAY<bool,VECTOR<int,1> > psi_ghost(0,m+1);ARRAY<bool,VECTOR<int,1> >::Put(psi,psi_ghost); // ghost points for the if statement below  
@@ -50,21 +50,21 @@ Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1>
         if(eigensystem.Eigenvalues(U,i,lambda,lambda_left,lambda_right)){
             eigensystem.Eigenvectors(U,i,L,R);
             // transfer the divided differences into the characteristic fields
-            for(j=1;j<=eno_order;j++) for(int ii=i+1-j;ii<=i+1;ii++) if(ii >= -2 && ii <= m+4-j) for(k=1;k<=d;k++){
+            for(j=0;j<eno_order;j++) for(int ii=i+1-j;ii<=i+1;ii++) if(ii >= -2 && ii <= m+4-j) for(k=0;k<d;k++){
                 LDU(k,ii)(j)=LDF(k,ii)(j)=0;
                 for(int kk=0;kk<d;kk++){LDU(k,ii)(j)+=L(k,kk)*DU(kk,ii)(j);LDF(k,ii)(j)+=L(k,kk)*DF(kk,ii)(j);}}
             // find a flux in each characteristic field
-            if(eno_order == 1) for(k=1;k<=d;k++){
+            if(eno_order == 1) for(k=0;k<d;k++){
                 T alpha=Alpha(lambda_left,lambda_right,k,d);
                 T flux_left=LDF(k,i)(1)+alpha*LDU(k,i)(1);
                 T flux_right=LDF(k,i+1)(1)-alpha*LDU(k,i+1)(1);
                 for(int kk=0;kk<d;kk++) flux(i)(kk)+=(T).5*(flux_left+flux_right)*R(k,kk);}
-            else if(eno_order == 2) for(k=1;k<=d;k++){
+            else if(eno_order == 2) for(k=0;k<d;k++){
                 T alpha=Alpha(lambda_left,lambda_right,k,d);
                 T flux_left=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,LDF(k,i)(1)+alpha*LDU(k,i)(1),LDF(k,i-1)(2)+alpha*LDU(k,i-1)(2),LDF(k,i)(2)+alpha*LDU(k,i)(2));
                 T flux_right=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,LDF(k,i+1)(1)-alpha*LDU(k,i+1)(1),-(LDF(k,i+1)(2)-alpha*LDU(k,i+1)(2)),-(LDF(k,i)(2)-alpha*LDU(k,i)(2)));
                 for(int kk=0;kk<d;kk++) flux(i)(kk)+=(T).5*(flux_left+flux_right)*R(k,kk);}
-            else if(eno_order == 3) for(k=1;k<=d;k++){
+            else if(eno_order == 3) for(k=0;k<d;k++){
                 T alpha=Alpha(lambda_left,lambda_right,k,d);
                 T flux_left=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,LDF(k,i)(1)+alpha*LDU(k,i)(1),LDF(k,i-1)(2)+alpha*LDU(k,i-1)(2),LDF(k,i)(2)+alpha*LDU(k,i)(2),
                                                                        LDF(k,i-2)(3)+alpha*LDU(k,i-2)(3),LDF(k,i-1)(3)+alpha*LDU(k,i-1)(3),LDF(k,i)(3)+alpha*LDU(k,i)(3));
@@ -76,12 +76,12 @@ Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1>
             int save_alpha=field_by_field_alpha;field_by_field_alpha=0; // use maximum alpha
             T save_amplification_factor=amplification_factor;amplification_factor=central_amplification_factor;
             // find a flux in each component
-            if(central_order == 1) for(k=1;k<=d;k++){
+            if(central_order == 1) for(k=0;k<d;k++){
                 T alpha=Alpha(lambda_left,lambda_right,k,d);
                 T flux_left=DF(k,i)(1)+alpha*DU(k,i)(1);
                 T flux_right=DF(k,i+1)(1)-alpha*DU(k,i+1)(1);
                 flux(i)(k)=(T).5*(flux_left+flux_right);}
-            else if(central_order == 2) for(k=1;k<=d;k++){
+            else if(central_order == 2) for(k=0;k<d;k++){
                 T alpha=Alpha(lambda_left,lambda_right,k,d);
                 T flux_left=Minmod(dx,DF(k,i)(1)+alpha*DU(k,i)(1),DF(k,i-1)(2)+alpha*DU(k,i-1)(2),DF(k,i)(2)+alpha*DU(k,i)(2));
                 T flux_right=Minmod(dx,DF(k,i+1)(1)-alpha*DU(k,i+1)(1),-(DF(k,i+1)(2)-alpha*DU(k,i+1)(2)),-(DF(k,i)(2)-alpha*DU(k,i)(2)));
@@ -92,7 +92,7 @@ Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1>
 
     // difference the fluxes
     T one_over_dx=1/dx;
-    for(i=1;i<=m;i++) if(psi_ghost(i)) Fx(i)=(flux(i)-flux(i-1))*one_over_dx;
+    for(i=0;i<m;i++) if(psi_ghost(i)) Fx(i)=(flux(i)-flux(i-1))*one_over_dx;
 }
 //#####################################################################
 #define INSTANTIATION_HELPER(T_GRID) \

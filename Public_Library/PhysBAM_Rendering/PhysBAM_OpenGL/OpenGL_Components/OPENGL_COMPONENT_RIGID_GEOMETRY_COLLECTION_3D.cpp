@@ -401,10 +401,10 @@ Initialize_Display_Lists()
     cout<<"Initializing display lists..."<<endl;
     int i;
     // First create display lists for original triangulated surface
-    for(i=1;i<=rigid_body_list.triangulated_surface_list.preallocated.m;i++)
+    for(i=0;i<rigid_body_list.triangulated_surface_list.preallocated.m;i++)
         if(!rigid_body_list.triangulated_surface_list.preallocated(i)){
             opengl_triangulated_surface(i)->Create_Display_List();}
-    for(i=1;i<=rigid_body_list.triangulated_surface_list.preallocated.m;i++){
+    for(i=0;i<rigid_body_list.triangulated_surface_list.preallocated.m;i++){
         int first_instance=rigid_body_list.triangulated_surface_list.preallocated(i);
         if(first_instance>0){
             int first_instance_id=opengl_triangulated_surface(first_instance)->Get_Display_List_Id();

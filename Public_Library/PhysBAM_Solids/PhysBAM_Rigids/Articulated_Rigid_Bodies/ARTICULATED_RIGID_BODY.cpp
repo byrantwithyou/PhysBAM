@@ -259,7 +259,7 @@ Compute_Constraint_Correcting_Impulse(T_CONSTRAINT_FUNCTION& constraint_error_fu
     T f_of_j_norm=constraint_error_function.Convergence_Norm_Squared(f_of_j);
 
     int iterations;
-    for(iterations=1;iterations<=max_iterations;iterations++){
+    for(iterations=0;iterations<max_iterations;iterations++){
         if(f_of_j_norm<=iterative_tolerance_squared) break;
 
         T_IMPULSE delta_j=constraint_error_function.Jacobian(j).Solve_Linear_System(-f_of_j);

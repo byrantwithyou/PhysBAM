@@ -460,7 +460,7 @@ Find_Grid_Info_2D_By_Name(const std::string &grid_name, const std::string &refer
 {
     GRID_INFO_2D<T> *grid_info=0;
     int index;
-    for(index=1;index<=grid_info_list_2d.m;index++) if(grid_info_list_2d(index)->name == grid_name) break;
+    for(index=0;index<grid_info_list_2d.m;index++) if(grid_info_list_2d(index)->name == grid_name) break;
     if(index == grid_info_list_2d.m+1) {
         std::cerr << "Error: Could not find Grid_2D '" << grid_name << "'";
         if(!referenced_by.empty()) std::cerr << " referenced by " << referenced_by;
@@ -475,7 +475,7 @@ Find_Grid_Info_3D_By_Name(const std::string &grid_name, const std::string &refer
 {
     GRID_INFO_3D<T> *grid_info=0;
     int index;
-    for(index=1;index<=grid_info_list_3d.m;index++) if(grid_info_list_3d(index)->name == grid_name) break;
+    for(index=0;index<grid_info_list_3d.m;index++) if(grid_info_list_3d(index)->name == grid_name) break;
     if(index == grid_info_list_3d.m+1) {
         std::cerr << "Error: Could not find Grid_3D '" << grid_name << "'";
         if(!referenced_by.empty()) std::cerr << " referenced by " << referenced_by;

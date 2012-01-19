@@ -58,7 +58,7 @@ void Initialize_Phi()
 void Adjust_Phi_And_Get_Velocities_For_Objects(const T time)
 {    
     int i,j,ij;
-    for(i=1;i<=m;i++) for(j=1;j<=n;j++) for(ij=1;ij<=mn;ij++){
+    for(i=0;i<m;i++) for(j=0;j<n;j++) for(ij=0;ij<mn;ij++){
         T y_velocity=(T)1.0;
         RENDERING_SPHERE sphere(VECTOR<T,3>(.5,.25+y_velocity*time,.5),.075);
         VECTOR<T,3> point_loc(grid.x(i),grid.y(j),grid.z(ij));
@@ -69,11 +69,11 @@ void Adjust_Phi_And_Get_Velocities_For_Objects(const T time)
             u_fixed(i,j,ij)=0;v_fixed(i,j,ij)=y_velocity;w_fixed(i,j,ij)=0;}}
     
     T lambda=(T).25,y_velocity=(T)1,x0=(T).5,y0=(T).25+y_velocity*time,z0=(T).5,radius=(T).075;
-    for(i=1;i<=m+1;i++) for(j=1;j<=n;j++) for(ij=1;ij<=mn;ij++)
+    for(i=0;i<m+1;i++) for(j=0;j<n;j++) for(ij=0;ij<mn;ij++)
         if(radius > sqrt(sqr(grid->x(i)-x0)+sqr(grid->y(j)-y0)+sqr(grid->z(ij)-z0))) (*u)(i,j,ij)=(*u)(i,j,ij)*lambda+(1-lambda)*0;
-    for(i=1;i<=m+1;i++) for(j=1;j<=n+1;j++) for(ij=1;ij<=mn;ij++)
+    for(i=0;i<m+1;i++) for(j=0;j<n+1;j++) for(ij=0;ij<mn;ij++)
         if(radius > sqrt(sqr(grid->x(i)-x0)+sqr(grid->y(j)-y0)+sqr(grid->z(ij)-z0))) (*v)(i,j,ij)=(*v)(i,j,ij)*lambda+(1-lambda)*y_velocity;
-    for(i=1;i<=m+1;i++) for(j=1;j<=n;j++) for(ij=1;ij<=mn+1;ij++)
+    for(i=0;i<m+1;i++) for(j=0;j<n;j++) for(ij=0;ij<mn+1;ij++)
         if(radius > sqrt(sqr(grid->x(i)-x0)+sqr(grid->y(j)-y0)+sqr(grid->z(ij)-z0))) (*w)(i,j,ij)=(*w)(i,j,ij)*lambda+(1-lambda)*0;
 }
 //#####################################################################

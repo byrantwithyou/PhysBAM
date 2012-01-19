@@ -345,17 +345,17 @@ Discretize_Viscous_Terms(const ARRAY<T,VECTOR<int,3> >& phi,const T dt)
     ARRAY<T,VECTOR<int,3> > viscosity_x_half(0,m,1,n,1,mn),ux_x_half(0,m,1,n,1,mn),vx_x_half(0,m,1,n,1,mn),wx_x_half(0,m,1,n,1,mn);
     ARRAY<T,VECTOR<int,3> > viscosity_y_half(1,m,0,n,1,mn),uy_y_half(1,m,0,n,1,mn),vy_y_half(1,m,0,n,1,mn),wy_y_half(1,m,0,n,1,mn);
     ARRAY<T,VECTOR<int,3> > viscosity_z_half(1,m,1,n,0,mn),uz_z_half(1,m,1,n,0,mn),vz_z_half(1,m,1,n,0,mn),wz_z_half(1,m,1,n,0,mn);
-    for(i=0;i<=m;i++) for(j=1;j<=n;j++) for(ij=1;ij<=mn;ij++){
+    for(i=0;i<=m;i++) for(j=0;j<n;j++) for(ij=0;ij<mn;ij++){
         viscosity_x_half(i,j,ij)=LEVELSET_UTILITIES<VECTOR<T,3> >::Heaviside((T).5*(phi(i,j,ij)+phi(i+1,j,ij)),viscosity_minus,viscosity_plus,half_width);
         ux_x_half(i,j,ij)=(V_ghost(i+1,j,ij).x-V_ghost(i,j,ij).x)/dx;
         vx_x_half(i,j,ij)=(V_ghost(i+1,j,ij).y-V_ghost(i,j,ij).y)/dx;
         wx_x_half(i,j,ij)=(V_ghost(i+1,j,ij).z-V_ghost(i,j,ij).z)/dx;}
-    for(i=1;i<=m;i++) for(j=0;j<=n;j++) for(ij=1;ij<=mn;ij++){
+    for(i=0;i<m;i++) for(j=0;j<=n;j++) for(ij=0;ij<mn;ij++){
         viscosity_y_half(i,j,ij)=LEVELSET_UTILITIES<VECTOR<T,3> >::Heaviside((T).5*(phi(i,j,ij)+phi(i,j+1,ij)),viscosity_minus,viscosity_plus,half_width);
         uy_y_half(i,j,ij)=(V_ghost(i,j+1,ij).x-V_ghost(i,j,ij).x)/dy;
         vy_y_half(i,j,ij)=(V_ghost(i,j+1,ij).y-V_ghost(i,j,ij).y)/dy;
         wy_y_half(i,j,ij)=(V_ghost(i,j+1,ij).z-V_ghost(i,j,ij).z)/dy;}
-    for(i=1;i<=m;i++) for(j=1;j<=n;j++) for(ij=0;ij<=mn;ij++){
+    for(i=0;i<m;i++) for(j=0;j<n;j++) for(ij=0;ij<=mn;ij++){
         viscosity_z_half(i,j,ij)=LEVELSET_UTILITIES<VECTOR<T,3> >::Heaviside((T).5*(phi(i,j,ij)+phi(i,j,ij+1)),viscosity_minus,viscosity_plus,half_width);
         uz_z_half(i,j,ij)=(V_ghost(i,j,ij+1).x-V_ghost(i,j,ij).x)/dz;
         vz_z_half(i,j,ij)=(V_ghost(i,j,ij+1).y-V_ghost(i,j,ij).y)/dz;
@@ -364,33 +364,33 @@ Discretize_Viscous_Terms(const ARRAY<T,VECTOR<int,3> >& phi,const T dt)
     if(!GFM){
         ARRAY<T,VECTOR<int,3> > uy_x_half(0,m,1,n,1,mn),uz_x_half(0,m,1,n,1,mn),vx_y_half(1,m,0,n,1,mn),vz_y_half(1,m,0,n,1,mn),wx_z_half(1,m,1,n,0,mn),wy_z_half(1,m,1,n,0,mn);
         {ARRAY<T,VECTOR<int,3> > uy_nodes(0,m+1,1,n,1,mn),uz_nodes(0,m+1,1,n,1,mn);
-        for(i=0;i<=m+1;i++) for(j=1;j<=n;j++) for(ij=1;ij<=mn;ij++){
+        for(i=0;i<=m+1;i++) for(j=0;j<n;j++) for(ij=0;ij<mn;ij++){
             uy_nodes(i,j,ij)=(V_ghost(i,j+1,ij).x-V_ghost(i,j-1,ij).x)/(2*dy);uz_nodes(i,j,ij)=(V_ghost(i,j,ij+1).x-V_ghost(i,j,ij-1).x)/(2*dz);}
-        for(i=0;i<=m;i++) for(j=1;j<=n;j++) for(ij=1;ij<=mn;ij++){
+        for(i=0;i<=m;i++) for(j=0;j<n;j++) for(ij=0;ij<mn;ij++){
             uy_x_half(i,j,ij)=(T).5*(uy_nodes(i,j,ij)+uy_nodes(i+1,j,ij));uz_x_half(i,j,ij)=(T).5*(uz_nodes(i,j,ij)+uz_nodes(i+1,j,ij));}}
         {ARRAY<T,VECTOR<int,3> > vx_nodes(1,m,0,n+1,1,mn),vz_nodes(1,m,0,n+1,1,mn);
-        for(i=1;i<=m;i++) for(j=0;j<=n+1;j++) for(ij=1;ij<=mn;ij++){
+        for(i=0;i<m;i++) for(j=0;j<=n+1;j++) for(ij=0;ij<mn;ij++){
             vx_nodes(i,j,ij)=(V_ghost(i+1,j,ij).y-V_ghost(i-1,j,ij).y)/(2*dx);vz_nodes(i,j,ij)=(V_ghost(i,j,ij+1).y-V_ghost(i,j,ij-1).y)/(2*dz);}
-        for(i=1;i<=m;i++) for(j=0;j<=n;j++) for(ij=1;ij<=mn;ij++){
+        for(i=0;i<m;i++) for(j=0;j<=n;j++) for(ij=0;ij<mn;ij++){
             vx_y_half(i,j,ij)=(T).5*(vx_nodes(i,j,ij)+vx_nodes(i,j+1,ij));vz_y_half(i,j,ij)=(T).5*(vz_nodes(i,j,ij)+vz_nodes(i,j+1,ij));}}
         {ARRAY<T,VECTOR<int,3> > wx_nodes(1,m,1,n,0,mn+1),wy_nodes(1,m,1,n,0,mn+1);
-        for(i=1;i<=m;i++) for(j=1;j<=n;j++) for(ij=0;ij<=mn+1;ij++){
+        for(i=0;i<m;i++) for(j=0;j<n;j++) for(ij=0;ij<=mn+1;ij++){
             wx_nodes(i,j,ij)=(V_ghost(i+1,j,ij).z-V_ghost(i-1,j,ij).z)/(2*dx);wy_nodes(i,j,ij)=(V_ghost(i,j+1,ij).z-V_ghost(i,j-1,ij).z)/(2*dy);}     
-        for(i=1;i<=m;i++) for(j=1;j<=n;j++) for(ij=0;ij<=mn;ij++){
+        for(i=0;i<m;i++) for(j=0;j<n;j++) for(ij=0;ij<=mn;ij++){
             wx_z_half(i,j,ij)=(T).5*(wx_nodes(i,j,ij)+wx_nodes(i,j,ij+1));wy_z_half(i,j,ij)=(T).5*(wy_nodes(i,j,ij)+wy_nodes(i,j,ij+1));}
 
         // (2*viscosity*ux)x + (viscosity*(uy+vx))y + (viscosity*(uz+wx))z
-        for(i=1;i<=m;i++) for(j=1;j<=n;j++) for(ij=1;ij<=mn;ij++)
+        for(i=0;i<m;i++) for(j=0;j<n;j++) for(ij=0;ij<mn;ij++)
             u_viscosity(i,j,ij)=2*(viscosity_x_half(i,j,ij)*ux_x_half(i,j,ij)-viscosity_x_half(i-1,j,ij)*ux_x_half(i-1,j,ij))/dx+
                                        (viscosity_y_half(i,j,ij)*(uy_y_half(i,j,ij)+vx_y_half(i,j,ij))-viscosity_y_half(i,j-1,ij)*(uy_y_half(i,j-1,ij)+vx_y_half(i,j-1,ij)))/dy+
                                        (viscosity_z_half(i,j,ij)*(uz_z_half(i,j,ij)+wx_z_half(i,j,ij))-viscosity_z_half(i,j,ij-1)*(uz_z_half(i,j,ij-1)+wx_z_half(i,j,ij-1)))/dz;
         // (viscosity*(uy+vx))x + (2*viscosity*vy)y + (viscosity*(vz+wy))z
-        for(i=1;i<=m;i++) for(j=1;j<=n;j++) for(ij=1;ij<=mn;ij++)
+        for(i=0;i<m;i++) for(j=0;j<n;j++) for(ij=0;ij<mn;ij++)
             v_viscosity(i,j,ij)=(viscosity_x_half(i,j,ij)*(uy_x_half(i,j,ij)+vx_x_half(i,j,ij))-viscosity_x_half(i-1,j,ij)*(uy_x_half(i-1,j,ij)+vx_x_half(i-1,j,ij)))/dx+
                                        2*(viscosity_y_half(i,j,ij)*vy_y_half(i,j,ij)-viscosity_y_half(i,j-1,ij)*vy_y_half(i,j-1,ij))/dy+
                                        (viscosity_z_half(i,j,ij)*(vz_z_half(i,j,ij)+wy_z_half(i,j,ij))-viscosity_z_half(i,j,ij-1)*(vz_z_half(i,j,ij-1)+wy_z_half(i,j,ij-1)))/dz;
         // (viscosity*(uz+wx))x + (viscosity(vz+wy))y + (2*viscosity*wz)z
-        for(i=1;i<=m;i++) for(j=1;j<=n;j++) for(ij=1;ij<=mn;ij++)
+        for(i=0;i<m;i++) for(j=0;j<n;j++) for(ij=0;ij<mn;ij++)
             w_viscosity(i,j,ij)=(viscosity_x_half(i,j,ij)*(uz_x_half(i,j,ij)+wx_x_half(i,j,ij))-viscosity_x_half(i-1,j,ij)*(uz_x_half(i-1,j,ij)+wx_x_half(i-1,j,ij)))/dx+
                                         (viscosity_y_half(i,j,ij)*(vz_y_half(i,j,ij)+wy_y_half(i,j,ij))-viscosity_y_half(i,j-1,ij)*(vz_y_half(i,j-1,ij)+wy_y_half(i,j-1,ij)))/dy+
                                         2*(viscosity_z_half(i,j,ij)*wz_z_half(i,j,ij)-viscosity_z_half(i,j,ij-1)*wz_z_half(i,j,ij-1))/dz;}

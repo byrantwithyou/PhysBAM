@@ -96,14 +96,14 @@ Write_Matlab_Data_File(const int stepnumber, const T_GRID& grid, const ARRAY<T,3
     // output primitive variables . . . . 
     //density
     sprintf(file_name,"%s/u1",output_directory);
-    for(i=1;i<=m;i++) output(i) = u(1,i);
+    for(i=0;i<m;i++) output(i) = u(1,i);
     matlab_output.Write_Output_File(file_name,output,stepnumber);
     //momentum
-    for(i=1;i<=m;i++) output(i) = u(2,i);
+    for(i=0;i<m;i++) output(i) = u(2,i);
     sprintf(file_name,"%s/u2",output_directory);
     matlab_output.Write_Output_File(file_name,output,stepnumber);
     //internal energy
-    for(i=1;i<=m;i++) output(i) = u(3,i);
+    for(i=0;i<m;i++) output(i) = u(3,i);
     sprintf(file_name,"%s/u3",output_directory);
     matlab_output.Write_Output_File(file_name,output,stepnumber);
 }

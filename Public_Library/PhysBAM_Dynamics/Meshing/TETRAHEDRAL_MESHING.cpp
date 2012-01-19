@@ -648,7 +648,7 @@ Discard_To_Get_Nice_Topology(RED_GREEN_TETRAHEDRA<T>& redgreen,ARRAY<bool>& keep
         node_on_boundary.Fill(false);node_on_boundary.Resize(mesh.number_nodes);
         for(int t=0;t<boundary_mesh.elements.m;t++){
             int i,j,k;boundary_mesh.elements(t).Get(i,j,k);node_on_boundary(i)=true;node_on_boundary(j)=true;node_on_boundary(k)=true;}
-        boundary_nodes.Resize(0);int i;for(i=1;i<=node_on_boundary.m;i++) if(node_on_boundary(i)) boundary_nodes.Append(i);
+        boundary_nodes.Resize(0);int i;for(i=0;i<node_on_boundary.m;i++) if(node_on_boundary(i)) boundary_nodes.Append(i);
         boundary_mesh.Initialize_Segment_Mesh();boundary_mesh.segment_mesh->Initialize_Incident_Elements(); // for fast Segment() calls
         mesh.Initialize_Segment_Mesh_Of_Subset(subset_segment_mesh,keep_tet_flag);
         subset_segment_mesh.Initialize_Neighbor_Nodes(); // so we can look at just neighbors of boundary nodes

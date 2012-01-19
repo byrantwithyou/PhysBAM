@@ -48,7 +48,7 @@ public:
 void WAVE::Initialize_Phi(){
     int i,j;
     int m=grid.m,n=grid.n;
-    for(i=1;i<=m;i++) for(j=1;j<=n;j++){
+    for(i=0;i<m;i++) for(j=0;j<n;j++){
         double x=grid.x(i),y=grid.y(j);
         double g=9.8,d=10,h=10,argument=sqrt(3*h/(4*cube(d)))*x;
         double sech=2/(exp(argument)+exp(-argument)),height=d+h*sqr(sech);
@@ -58,12 +58,12 @@ void WAVE::Initialize_Phi(){
 //#####################################################################
 void WAVE::Initialize_Velocities(){
     int i,j;
-    for(i=1;i<=u_grid.m;i++) for(j=1;j<=u_grid.n;j++){
+    for(i=0;i<u_grid.m;i++) for(j=0;j<u_grid.n;j++){
         double x=u_grid.x(i),y=u_grid.y(j);
         double g=9.8,d=10,h=10,argument=sqrt(3*h/(4*cube(d)))*x;
         double sech=2/(exp(argument)+exp(-argument));
         (u)(i,j)=sqrt(g*d)*h/d*sqr(sech);}
-    for(i=1;i<=v_grid.m;i++) for(j=1;j<=v_grid.n;j++){
+    for(i=0;i<v_grid.m;i++) for(j=0;j<v_grid.n;j++){
         double x=v_grid.x(i),y=v_grid.y(j);
         double g=9.8,d=10,h=10,argument=sqrt(3*h/(4*cube(d)))*x;
         double sech=2/(exp(argument)+exp(-argument)),tanh=(exp(argument)-exp(-argument))/(exp(argument)+exp(-argument));
@@ -91,11 +91,11 @@ void WAVE::Delete_Particles_Inside_Geometry(PARTICLE_LEVELSET_2D& particle_level
     // sloped bottom
     int k;
     // delete negative particles inside object
-    for(k=1;k<=particle_levelset.negative_particles.array_size;k++) if(particle_levelset.negative_particles.active(k)){
+    for(k=0;k<particle_levelset.negative_particles.array_size;k++) if(particle_levelset.negative_particles.active(k)){
         double x=particle_levelset.negative_particles.x(k),y=particle_levelset.negative_particles.y(k);
         if(x > 50 && (14*y-x+0)/sqrt(197) < -epsilon) particle_levelset.negative_particles.Delete_Particle(k);} // include buffer zone
     // delete positive particles inside object
-    for(k=1;k<=particle_levelset.positive_particles.array_size;k++) if(particle_levelset.positive_particles.active(k)){
+    for(k=0;k<particle_levelset.positive_particles.array_size;k++) if(particle_levelset.positive_particles.active(k)){
         double x=particle_levelset.positive_particles.x(k),y=particle_levelset.positive_particles.y(k);
         if(x > 50 && (14*y-x+0)/sqrt(197) < -epsilon) particle_levelset.positive_particles.Delete_Particle(k);}} // include buffer zone
 //#####################################################################

@@ -21,7 +21,7 @@ Fill_Ghost_Cells(GRID_2D& grid,ARRAY_2D& u,ARRAY_2D& u_ghost,const double dt,con
 
     put(u,u_ghost); // interior
 
-    for(j=1;j<=n;j++){
+    for(j=0;j<n;j++){
         u_ghost(0,j)=u_ghost(1,j);  // left 
         u_ghost(-1,j)=u_ghost(2,j); // left 
         u_ghost(-2,j)=u_ghost(3,j); // left 

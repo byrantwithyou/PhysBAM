@@ -22,7 +22,7 @@ Euler_Step(const T dt,const T time)
     
     // evaluate source terms
     ARRAY<TV_DIMENSION,VECTOR<int,2> > S(1,m,1,n);
-    for(i=1;i<=m;i++) for(j=1;j<=n;j++){
+    for(i=0;i<m;i++) for(j=0;j<n;j++){
         T rho=U(i,j)(1);
         T u=U(i,j)(2)/U(i,j)(1);
         T v=U(i,j)(3)/U(i,j)(1);
@@ -43,7 +43,7 @@ Euler_Step(const T dt,const T time)
         conservation->Update_Conservation_Law(grid,U,U_ghost,psi,dt,eigensystem,eigensystem,psi_N,face_velocities);}
 
     // add source terms
-    for(i=1;i<=m;i++) for(j=1;j<=n;j++) U(i,j)+=dt*S(i,j);
+    for(i=0;i<m;i++) for(j=0;j<n;j++) U(i,j)+=dt*S(i,j);
     
     boundary->Apply_Boundary_Condition(grid,U,time+dt); 
 }

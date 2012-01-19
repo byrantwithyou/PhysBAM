@@ -43,7 +43,7 @@ Fill_Ghost_Cells(GRID_2D<T>& grid,ARRAY<T2,VECTOR<int,2> >& u,ARRAY<T2,VECTOR<in
     ARRAY<T2,VECTOR<int,2> >::put(u,u_ghost); // interior
 
     // constant boundary condition for left and right
-    for(j=1;j<=n;j++){
+    for(j=0;j<n;j++){
         u_ghost(-2,j)=u_ghost(-1,j)=u_ghost(0,j)=u_ghost(1,j);  // left 
         u_ghost(m+3,j)=u_ghost(m+2,j)=u_ghost(m+1,j)=u_ghost(m,j);} // right 
     // constant extrapolation on top
@@ -65,7 +65,7 @@ Apply_Boundary_Condition(GRID_2D<T>& grid,ARRAY<T2,VECTOR<int,2> >& u,const T ti
     int m=grid.m,n=grid.n;
     int i;
 
-    for(i=1;i<=m;i++) u(i,1)=(T2)0; // new - do not set top to zero u(i,n,ij)=0; 
+    for(i=0;i<m;i++) u(i,1)=(T2)0; // new - do not set top to zero u(i,n,ij)=0; 
 }  
 //#####################################################################
 }

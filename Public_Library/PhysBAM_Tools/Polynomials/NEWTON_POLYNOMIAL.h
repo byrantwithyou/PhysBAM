@@ -27,9 +27,9 @@ public:
     {T y=c(degree+1);for(int i=degree;i>=1;i--) y=c(i)+(x_input-x(i))*y;return y;}
 
     void Compute_Coefficients(const VECTOR_ND<T>& x_input,const VECTOR_ND<T>& y_input)
-    {int i,j;assert(x_input.n == degree+1 && y_input.n == degree+1);for(i=1;i<=degree+1;i++) x(i)=x_input(i);
-    VECTOR_ND<T> f(degree+1);for(i=1;i<=degree+1;i++) f(i)=y_input(i); c(1)=f(1);
-    for(j=1;j<=degree;j++){for(i=1;i<=degree+1-j;i++) f(i)=(f(i+1)-f(i))/(x(i+1+j-1)-x(i)); c(j+1)=f(1);}}
+    {int i,j;assert(x_input.n == degree+1 && y_input.n == degree+1);for(i=0;i<degree+1;i++) x(i)=x_input(i);
+    VECTOR_ND<T> f(degree+1);for(i=0;i<degree+1;i++) f(i)=y_input(i); c(1)=f(1);
+    for(j=0;j<degree;j++){for(i=0;i<degree+1-j;i++) f(i)=(f(i+1)-f(i))/(x(i+1+j-1)-x(i)); c(j+1)=f(1);}}
 
 //#####################################################################
 };

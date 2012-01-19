@@ -42,7 +42,7 @@ Initialize_Optimization(const bool verbose)
     initial_area=TRIANGLE_2D<T>::Area(xi,xj,xk);
     map_from_nodes_to_boundary_list.Resize(1,triangle_mesh.number_nodes);
     for(i=1;i<=triangle_mesh.boundary_nodes->m;i++) map_from_nodes_to_boundary_list((*triangle_mesh.boundary_nodes)(i))=i;
-    for(i=1;i<=layers.m;i++) delete layers(i);layers.Resize(1);layers(1)=triangle_mesh.boundary_nodes;
+    for(i=0;i<layers.m;i++) delete layers(i);layers.Resize(1);layers(1)=triangle_mesh.boundary_nodes;
     triangle_mesh.boundary_nodes=0; // we don't need it hanging off the mesh object any more
     if(verbose) LOG::cout<<"boundary layer has "<<layers(1)->m<<" nodes"<<std::endl;
     ARRAY<bool,VECTOR<int,1> > marked(1,triangle_mesh.number_nodes);for(i=1;i<=layers(1)->m;i++) marked((*layers(1))(i))=true;
@@ -50,7 +50,7 @@ Initialize_Optimization(const bool verbose)
         layers.Append(new ARRAY<int>);
         for(int i=1;i<=layers(l-1)->m;i++){
             j=(*layers(l-1))(i);
-            for(k=1;k<=(*triangle_mesh.incident_elements)(j).m;k++) for(int a=0;a<3;a++){
+            for(k=0;k<(*triangle_mesh.incident_elements)(j).m;k++) for(int a=0;a<3;a++){
                 int b=triangle_mesh.elements((*triangle_mesh.incident_elements)(j)(k))(a);
                 if(!marked(b)){layers(l)->Append(b);marked(b)=true;}}}
         if(layers(l)->m == 0){delete layers(l);layers.Remove_End();break;}
@@ -65,7 +65,7 @@ template<class T> void TRIANGULAR_MESHING<T>::
 Create_Final_Mesh_With_Optimization(const int number_of_initial_steps,const int number_of_final_steps,int* frame_number,const bool verbose)
 {
     int local_frame=0;if(!frame_number) frame_number=&local_frame;
-    int i;for(i=1;i<=number_of_initial_steps;i++){
+    int i;for(i=0;i<number_of_initial_steps;i++){
         worst_boundary_quality=FLT_MAX;worst_interior_quality=FLT_MAX;
         if(verbose) LOG::cout<<"Working on initial iteration "<<i<<" of "<<number_of_initial_steps<<"+"<<number_of_final_steps<<std::endl;
         Optimize_Boundary_Layer((T).05);if(verbose) LOG::cout<<'.';
@@ -73,7 +73,7 @@ Create_Final_Mesh_With_Optimization(const int number_of_initial_steps,const int 
         for(j=layers.m;j>=2;j--){Optimize_Interior_Layer(j,true);if(verbose) LOG::cout<<'.';}
         Optimize_Boundary_Layer((T).05,true);if(verbose) LOG::cout<<'.'<<std::endl;
         Write_Tri_File_Format(*frame_number,output_directory);++*frame_number;}
-    for(i=1;i<=number_of_final_steps;i++){
+    for(i=0;i<number_of_final_steps;i++){
         worst_boundary_quality=FLT_MAX;worst_interior_quality=FLT_MAX;
         if(verbose) LOG::cout<<"Working on iteration "<<i<<" of "<<number_of_final_steps<<" (full step towards boundary)"<<std::endl;
         Optimize_Boundary_Layer(1);if(verbose) LOG::cout<<'.';
@@ -89,10 +89,10 @@ template<class T> void TRIANGULAR_MESHING<T>::
 Optimize_Boundary_Layer(const T compression_fraction,const bool reverse)
 {
     ARRAY<VECTOR<T,2> > directions(2);ARRAY<int>& nodes=*layers(1);
-    int i;for(i=1;i<=nodes.m;i++) 
+    int i;for(i=0;i<nodes.m;i++) 
         particles.X(nodes(i))-=compression_fraction*implicit_curve(particles.X(nodes(i)))*boundary_mesh_normals(map_from_nodes_to_boundary_list(nodes(i)));
     Compute_Boundary_Mesh_Normals();
-    for(i=1;i<=nodes.m;i++){
+    for(i=0;i<nodes.m;i++){
         int j;if(reverse) j=nodes(nodes.m+1-i);else j=nodes(i);
         VECTOR<T,2> normal=boundary_mesh_normals(map_from_nodes_to_boundary_list(j));
         directions(1)=VECTOR<T,2>(normal.y,-normal.x);

@@ -43,7 +43,7 @@ Fill_Ghost_Cells(const GRID<TV>& grid,const T_ARRAYS_T2& u,T_ARRAYS_T2& u_ghost,
     T_ARRAYS_T2::Put(u,u_ghost); // interior
 
     // left
-    for(i=-2;i<=0;i++) for(j=1;j<=n;j++){
+    for(i=-2;i<=0;i++) for(j=0;j<n;j++){
         T rho=u_ghost(1-i,j)(1);
         T u_velocity=-u_ghost(1-i,j)(2)/u_ghost(1-i,j)(1);
         T v_velocity=u_ghost(1-i,j)(3)/u_ghost(1-i,j)(1);
@@ -54,7 +54,7 @@ Fill_Ghost_Cells(const GRID<TV>& grid,const T_ARRAYS_T2& u,T_ARRAYS_T2& u_ghost,
         u_ghost(i,j)(4)=rho*(e+(sqr(u_velocity)+sqr(v_velocity))/2);}
 
     // constant extrapolation
-    for(j=1;j<=n;j++) u_ghost(m+3,j)=u_ghost(m+2,j)=u_ghost(m+1,j)=u_ghost(m,j); // right
+    for(j=0;j<n;j++) u_ghost(m+3,j)=u_ghost(m+2,j)=u_ghost(m+1,j)=u_ghost(m,j); // right
     for(i=-2;i<=m+3;i++){
         u_ghost(i,-2)=u_ghost(i,-1)=u_ghost(i,0)=u_ghost(i,1);           // bottom
         u_ghost(i,n+3)=u_ghost(i,n+2)=u_ghost(i,n+1)=u_ghost(i,n);} // top

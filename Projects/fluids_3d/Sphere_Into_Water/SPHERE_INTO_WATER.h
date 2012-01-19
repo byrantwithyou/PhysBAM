@@ -63,7 +63,7 @@ void Adjust_Phi_And_Get_Velocities_For_Objects(const T time)
     double temp_time=time;
     if(time >= .075) 
         temp_time=.075;
-    for(i=1;i<=m;i++) for(j=1;j<=n;j++) for(ij=1;ij<=mn;ij++)
+    for(i=0;i<m;i++) for(j=0;j<n;j++) for(ij=0;ij<mn;ij++)
     {
         VECTOR_3D point_loc(grid->x(i),grid->y(j),grid->z(ij));
         if (sphere.Inside(point_loc))

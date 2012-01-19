@@ -48,7 +48,7 @@ Update()
     OPENGL_UNIFORM_SLICE* slice=(OPENGL_UNIFORM_SLICE*)this->slice;
     if(!slice || slice->mode==OPENGL_SLICE::NO_SLICE){
         int count=0;int index;
-        for(index=1;index<=V.array.Size();index++)if(V.array(index)!=VECTOR<T,3>()) count++;
+        for(index=0;index<V.array.Size();index++)if(V.array(index)!=VECTOR<T,3>()) count++;
         int num_vectors=min(count,max_vectors_3d);
         vector_field.Resize(num_vectors);
         vector_locations.Resize(num_vectors);

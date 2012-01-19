@@ -378,9 +378,9 @@ Delete_Children(const int level,const int tet,ARRAY<int>& deleted_tet_indices,AR
     int p;for(p=1;p<=8&&(*children(level))(tet)(p);p++){deleted_tet_indices.Append((*children(level))(tet)(p));(*children(level))(tet)(p)=0;}
     // get a list of edges to delete (begin by finding all children edges, then filter the red ones out)
     ARRAY<int> children_edges;children_edges.Preallocate(25);
-    for(p=1;p<=deleted_tet_indices.m;p++) for(int q=0;q<6;q++) // get a list of all children edges
+    for(p=0;p<deleted_tet_indices.m;p++) for(int q=0;q<6;q++) // get a list of all children edges
         children_edges.Append_Unique((*meshes(level+1)->element_edges)(deleted_tet_indices(p))(q));
-    for(p=1;p<=children_edges.m;p++){
+    for(p=0;p<children_edges.m;p++){
         int q,r;segment_mesh.elements(children_edges(p)).Get(q,r);
         if((q==ij&&r==kl) || (q==jk&&r==il) || (q==ki&&r==jl) || (q==il&&r==jk) || (q==jl&&r==ki) || (q==kl&&r==ij)) 
             deleted_edge_indices.Append(children_edges(p)); // delete interior edges
@@ -394,16 +394,16 @@ Delete_Children(const int level,const int tet,ARRAY<int>& deleted_tet_indices,AR
             deleted_edge_indices.Append(children_edges(p));
             edge_owned_by_other_tet_so_break_out_of_loop_without_appending:;}}
     // now do the actual deletion
-    for(p=1;p<=deleted_tet_indices.m;p++) for(int q=0;q<4;q++){ // remove deleted tets from incident_tets
+    for(p=0;p<deleted_tet_indices.m;p++) for(int q=0;q<4;q++){ // remove deleted tets from incident_tets
         int node=meshes(level+1)->elements(deleted_tet_indices(p))(q),index=0;
         (*meshes(level+1)->incident_elements)(node).Find(deleted_tet_indices(p),index);PHYSBAM_ASSERT(index);
         (*meshes(level+1)->incident_elements)(node).Remove_Index_Lazy(index);}
-    for(p=1;p<=deleted_edge_indices.m;p++) for(int q=0;q<2;q++){ // remove deleted edges from incident_segments
+    for(p=0;p<deleted_edge_indices.m;p++) for(int q=0;q<2;q++){ // remove deleted edges from incident_segments
         int node=segment_mesh.elements(deleted_edge_indices(p))(q),index=0;
         (*segment_mesh.incident_elements)(node).Find(deleted_edge_indices(p),index);PHYSBAM_ASSERT(index);
         (*segment_mesh.incident_elements)(node).Remove_Index_Lazy(index);}
     // then zero out occurances in the stack
-    for(p=1;p<=deleted_tet_indices.m;p++){
+    for(p=0;p<deleted_tet_indices.m;p++){
         int t=deleted_tet_indices(p);
         if((*index_in_stack(level+1))(t)){
             stack((*index_in_stack(level+1))(t)).Set(0,0); // can't remove since it would screw up index_in_stack, mark as no longer relevent
@@ -489,9 +489,9 @@ Add_Tetrahedron(ARRAY<int>& free_tet_indices,const int level,const int i,const i
     if(segment_midpoints(ij) || segment_midpoints(jk) || segment_midpoints(ki) || segment_midpoints(il) || segment_midpoints(jl) || 
         segment_midpoints(kl)){stack.Append(VECTOR<int,2>(level,index));(*index_in_stack(level))(index)=stack.m;}
     // add tet to incident_tets
-    int a;for(a=1;a<=4;a++) (*tet_mesh.incident_elements)(tet_mesh.elements(index)(a)).Append(index);
+    int a;for(a=0;a<4;a++) (*tet_mesh.incident_elements)(tet_mesh.elements(index)(a)).Append(index);
     // add tet to parent's list of children
-    for(a=1;a<=8;a++) if(!(*children(level-1))(parent_index)(a)){(*children(level-1))(parent_index)(a)=index;break;}
+    for(a=0;a<8;a++) if(!(*children(level-1))(parent_index)(a)){(*children(level-1))(parent_index)(a)=index;break;}
 }
 //#####################################################################
 // Function Rebuild_Object
@@ -500,11 +500,11 @@ template<class T> void RED_GREEN_TETRAHEDRA<T>::
 Rebuild_Object()
 {
     int number_of_leaves=0;
-    int level,tet;for(level=1;level<=meshes.m;level++) for(tet=1;tet<=meshes(level)->elements.m;tet++) if(Leaf(level,tet)) number_of_leaves++;
+    int level,tet;for(level=0;level<meshes.m;level++) for(tet=1;tet<=meshes(level)->elements.m;tet++) if(Leaf(level,tet)) number_of_leaves++;
     object.mesh.elements.Resize(number_of_leaves);
     leaf_levels_and_indices.Exact_Resize(number_of_leaves);
     int index_into_tets=1;
-    for(level=1;level<=meshes.m;level++) for(tet=1;tet<=meshes(level)->elements.m;tet++) 
+    for(level=0;level<meshes.m;level++) for(tet=1;tet<=meshes(level)->elements.m;tet++) 
         if(Leaf(level,tet)){
             for(int i=0;i<4;i++) object.mesh.elements(index_into_tets)(i)=meshes(level)->elements(tet)(i);
             leaf_levels_and_indices(index_into_tets).Set(level,tet);(*leaf_number(level))(tet)=index_into_tets;index_into_tets++;}

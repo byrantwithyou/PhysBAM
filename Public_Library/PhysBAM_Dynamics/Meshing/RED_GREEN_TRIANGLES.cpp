@@ -188,23 +188,23 @@ Delete_Children(const int level,const int tri,ARRAY<int>& deleted_tri_indices,AR
     int p;for(p=1;p<=4&&(*children(level))(tri)(p);p++){deleted_tri_indices.Append((*children(level))(tri)(p));(*children(level))(tri)(p)=0;}
     // get a list of edges to delete (begin by finding all children edges, then filter the red ones out)
     ARRAY<int> children_edges;children_edges.Preallocate(5);
-    for(p=1;p<=deleted_tri_indices.m;p++) for(int q=0;q<3;q++) // get a list of all children edges
+    for(p=0;p<deleted_tri_indices.m;p++) for(int q=0;q<3;q++) // get a list of all children edges
         children_edges.Append_Unique(element_edges(level+1)(deleted_tri_indices(p))(q));
-    for(p=1;p<=children_edges.m;p++){
+    for(p=0;p<children_edges.m;p++){
         int q,r;segment_mesh.elements(children_edges(p)).Get(q,r);
         if((q==i && r==jk) || (q==j && r==ki) || (q==k && r==ij))
             deleted_edge_indices.Append(children_edges(p));} // delete interior edges
     // now do the actual deletion
-    for(p=1;p<=deleted_tri_indices.m;p++) for(int q=0;q<3;q++){ // remove deleted triangles from incident_triangles
+    for(p=0;p<deleted_tri_indices.m;p++) for(int q=0;q<3;q++){ // remove deleted triangles from incident_triangles
         int node=meshes(level+1)->elements(deleted_tri_indices(p))(q),index=0;
         (*meshes(level+1)->incident_elements)(node).Find(deleted_tri_indices(p),index);assert(index);
         (*meshes(level+1)->incident_elements)(node).Remove_Index_Lazy(index);}
-    for(p=1;p<=deleted_edge_indices.m;p++) for(int q=0;q<2;q++){ // remove deleted edges from incident_segments
+    for(p=0;p<deleted_edge_indices.m;p++) for(int q=0;q<2;q++){ // remove deleted edges from incident_segments
         int node=segment_mesh.elements(deleted_edge_indices(p))(q),index=0;
         (*segment_mesh.incident_elements)(node).Find(deleted_edge_indices(p),index);assert(index);
         (*segment_mesh.incident_elements)(node).Remove_Index_Lazy(index);}
     // then zero out occurances in the stack
-    for(p=1;p<=deleted_tri_indices.m;p++){
+    for(p=0;p<deleted_tri_indices.m;p++){
         int t=deleted_tri_indices(p);
         if((*index_in_stack(level+1))(t)){
             stack((*index_in_stack(level+1))(t)).Set(0,0); // can't remove since it would screw up index_in_stack, mark as no longer relevent
@@ -299,9 +299,9 @@ Add_Triangle(ARRAY<int>& free_triangle_indices,const int level,const int i,const
     // check if this new tri has a T-junction
     if(segment_midpoints(ij) || segment_midpoints(jk) || segment_midpoints(ki)){stack.Append(VECTOR<int,2>(level,index));(*index_in_stack(level))(index)=stack.m;}
     // add tri to incident_tris
-    int a;for(a=1;a<=3;a++) (*triangle_mesh.incident_elements)(triangle_mesh.elements(index)(a)).Append(index);
+    int a;for(a=0;a<3;a++) (*triangle_mesh.incident_elements)(triangle_mesh.elements(index)(a)).Append(index);
     // add tri to parent's list of children
-    for(a=1;a<=4;a++) if(!(*children(level-1))(parent_index)(a)){(*children(level-1))(parent_index)(a)=index;break;}
+    for(a=0;a<4;a++) if(!(*children(level-1))(parent_index)(a)){(*children(level-1))(parent_index)(a)=index;break;}
 }
 //#####################################################################
 // Function Rebuild_Object
@@ -310,11 +310,11 @@ template<class TV> void RED_GREEN_TRIANGLES<TV>::
 Rebuild_Object()
 {
     int number_of_leaves=0;
-    int level,tri;for(level=1;level<=meshes.m;level++) for(tri=1;tri<=meshes(level)->elements.m; tri++) if(Leaf(level,tri)) number_of_leaves++;
+    int level,tri;for(level=0;level<meshes.m;level++) for(tri=1;tri<=meshes(level)->elements.m; tri++) if(Leaf(level,tri)) number_of_leaves++;
     object.mesh.elements.Resize(number_of_leaves);
     leaf_levels_and_indices.Exact_Resize(number_of_leaves);
     int index_into_triangles=1;
-    for(level=1;level<=meshes.m;level++) for(tri=1;tri<=meshes(level)->elements.m;tri++) 
+    for(level=0;level<meshes.m;level++) for(tri=1;tri<=meshes(level)->elements.m;tri++) 
         if(Leaf(level,tri)){
             object.mesh.elements(index_into_triangles)=meshes(level)->elements(tri);
             leaf_levels_and_indices(index_into_triangles).Set(level,tri);(*leaf_number(level))(tri)=index_into_triangles;index_into_triangles++;}

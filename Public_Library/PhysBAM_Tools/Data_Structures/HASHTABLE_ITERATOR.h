@@ -41,7 +41,7 @@ public:
     {}
 
     void Reset()
-    {for(current_h=1;current_h<=hashtable.table.m;current_h++) if(hashtable.table(current_h).state==ENTRY_ACTIVE) return;current_h=0;}
+    {for(current_h=0;current_h<hashtable.table.m;current_h++) if(hashtable.table(current_h).state==ENTRY_ACTIVE) return;current_h=0;}
 
     const TK& Key() const
     {return hashtable.table(current_h).key;}

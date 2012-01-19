@@ -17,9 +17,9 @@ Get_Artificial_Viscosity(EOS<T>& eos,GRID_LAGRANGE_1D<T>& grid,const ARRAY<T,VEC
     int m=grid.m;   
     
     ARRAY<T,VECTOR<int,1> > length(1,m-1);grid.Get_Lengths(length);
-    ARRAY<T,VECTOR<int,1> > u_jump(1,m-1); for(i=1;i<=m-1;i++) u_jump(i)=velocity(i+1)-velocity(i);
+    ARRAY<T,VECTOR<int,1> > u_jump(1,m-1); for(i=0;i<m-1;i++) u_jump(i)=velocity(i+1)-velocity(i);
 
-    for(i=1;i<=m-1;i++){
+    for(i=0;i<m-1;i++){
         if(u_jump(i) >= 0) Q(i)=0;
         else{
             T density=mass(i)/length(i),sound_speed=eos.c(density,energy(i));

@@ -63,9 +63,9 @@ Fill_Ghost_Cells(const GRID<TV>& grid,const T_ARRAYS_T2& u,T_ARRAYS_T2& u_ghost,
     T_ARRAYS_T2::Put(u,u_ghost); // interior
 
     //just keep this the same for now . . .
-    if (left_constant_extrapolation) for(j=1;j<=n;j++) u_ghost(-2,j)=u_ghost(-1,j)=u_ghost(0,j)=u_ghost(1,j);
+    if (left_constant_extrapolation) for(j=0;j<n;j++) u_ghost(-2,j)=u_ghost(-1,j)=u_ghost(0,j)=u_ghost(1,j);
     else
-        for(j=1;j<=n;j++) for(i=-2;i<=0;i++){ // left
+        for(j=0;j<n;j++) for(i=-2;i<=0;i++){ // left
             T rho=u_ghost(2-i,j)(1);
             T u_velocity=-u_ghost(2-i,j)(2)/u_ghost(2-i,j)(1);
             T v_velocity=u_ghost(2-i,j)(3)/u_ghost(2-i,j)(1);
@@ -74,9 +74,9 @@ Fill_Ghost_Cells(const GRID<TV>& grid,const T_ARRAYS_T2& u,T_ARRAYS_T2& u_ghost,
             u_ghost(i,j)(2)=rho*u_velocity;
             u_ghost(i,j)(3)=rho*v_velocity;
             u_ghost(i,j)(4)=rho*(e+(sqr(u_velocity)+sqr(v_velocity))/2);}
-    if (right_constant_extrapolation) for(j=1;j<=n;j++) u_ghost(m+3,j)=u_ghost(m+2,j)=u_ghost(m+1,j)=u_ghost(m,j);
+    if (right_constant_extrapolation) for(j=0;j<n;j++) u_ghost(m+3,j)=u_ghost(m+2,j)=u_ghost(m+1,j)=u_ghost(m,j);
     else
-        for(j=1;j<=n;j++) for(i=m+1;i<=m+3;i++){ // right
+        for(j=0;j<n;j++) for(i=m+1;i<=m+3;i++){ // right
             T rho=u_ghost(2*m-i,j)(1);
             T u_velocity=-u_ghost(2*m-i,j)(2)/u_ghost(2*m-i,j)(1);
             T v_velocity=u_ghost(2*m-i,j)(3)/u_ghost(2*m-i,j)(1);
@@ -87,7 +87,7 @@ Fill_Ghost_Cells(const GRID<TV>& grid,const T_ARRAYS_T2& u,T_ARRAYS_T2& u_ghost,
             u_ghost(i,j)(4)=rho*(e+(sqr(u_velocity)+sqr(v_velocity))/2);}
 
     int shift_index = (shift != 0) ? (n-1)/shift : 0; //always n-1 grids pts separating two points . . . 
-    for(i=1;i<=m;i++) {
+    for(i=0;i<m;i++) {
         for(j=-2;j<=0;j++) u_ghost(i,j)=u_ghost(clamp(i+shift_index,1,m),j+n-1); //bottom
         for(j=n+1;j<=n+3;j++) u_ghost(i,j)=u_ghost(clamp(i-shift_index,1,m),j-n+1); //top
     }
@@ -105,7 +105,7 @@ Apply_Boundary_Condition(const GRID<TV>& grid,T_ARRAYS_T2& u,const T time)
     int shift = (int)floor(tan(angle)+1.e-16);
 
     if (!left_constant_extrapolation) 
-        for(j=1;j<=n;j++){
+        for(j=0;j<n;j++){
             // left wall
             T rho=u(1,j)(1);
             T u_velocity=u(1,j)(2)/u(1,j)(1);
@@ -118,7 +118,7 @@ Apply_Boundary_Condition(const GRID<TV>& grid,T_ARRAYS_T2& u,const T time)
             u(1,j)(4)=rho*(e+(sqr(u_velocity)+sqr(v_velocity))/2);}
 
     if (!right_constant_extrapolation)
-        for(j=1;j<=n;j++){
+        for(j=0;j<n;j++){
             // right wall
             T rho=u(m,j)(1);
             T u_velocity=u(m,j)(2)/u(m,j)(1);
@@ -131,7 +131,7 @@ Apply_Boundary_Condition(const GRID<TV>& grid,T_ARRAYS_T2& u,const T time)
             u(m,j)(4)=rho*(e+(sqr(u_velocity)+sqr(v_velocity))/2);}
 
     int shift_index = (shift != 0) ? (n-1)/shift : 0; //assuming square grid . . . 
-    for(i=1;i<=m;i++) u(i,n) = u(clamp(i-shift_index,1,m),1);
+    for(i=0;i<m;i++) u(i,n) = u(clamp(i-shift_index,1,m),1);
 }
 //#####################################################################
 }

@@ -87,7 +87,7 @@ void Initialize_Embedded_Tetrahedralized_Volume(EMBEDDED_TETRAHEDRALIZED_VOLUME&
     
     if(restart_step_number == 0){
         VECTOR_3D<double> center(embedded_tetrahedralized_volume.tetrahedralized_volume.bounding_box->Center());double bottom=embedded_tetrahedralized_volume.tetrahedralized_volume.bounding_box->ymin;
-        for(i=1;i<=embedded_tetrahedralized_volume.tetrahedralized_volume.particles.array_size;i++){
+        for(i=0;i<embedded_tetrahedralized_volume.tetrahedralized_volume.particles.array_size;i++){
             embedded_tetrahedralized_volume.tetrahedralized_volume.particles.V(i)=initial_velocity+VECTOR_3D<double>::Cross_Product(initial_angular_velocity,embedded_tetrahedralized_volume.tetrahedralized_volume.particles.X(i)-center);
             embedded_tetrahedralized_volume.tetrahedralized_volume.particles.X(i)=center+initial_orientation.Rotate(embedded_tetrahedralized_volume.tetrahedralized_volume.particles.X(i)-center);
             embedded_tetrahedralized_volume.tetrahedralized_volume.particles.X(i).y+=initial_height-bottom;}}
@@ -131,7 +131,7 @@ virtual void Fracture_Along_Level_Set(EMBEDDED_TETRAHEDRALIZED_VOLUME& embedded_
     int incident_tetrahedrons_defined=(int)mesh.incident_tetrahedrons;if(!incident_tetrahedrons_defined) mesh.Initialize_Incident_Tetrahedrons();
     int number_on_positive_side=0,number_on_negative_side=0,number_intersecting_boundary=0;
     int t,p;
-    for(t=1;t<=mesh.tetrahedrons.m;t++){
+    for(t=0;t<mesh.tetrahedrons.m;t++){
         int i,j,k,l;mesh.tetrahedrons.Get(t,i,j,k,l);
         double phi1=embedded_tetrahedralized_volume.phi(i),phi2=embedded_tetrahedralized_volume.phi(j),
                phi3=embedded_tetrahedralized_volume.phi(k),phi4=embedded_tetrahedralized_volume.phi(l);
@@ -142,14 +142,14 @@ virtual void Fracture_Along_Level_Set(EMBEDDED_TETRAHEDRALIZED_VOLUME& embedded_
     }
     
     
-    for(t=1;t<=mesh.tetrahedrons.m;t++){
+    for(t=0;t<mesh.tetrahedrons.m;t++){
         if(tetrahedron_label(t) == 1) number_on_positive_side++;
         else if(tetrahedron_label(t) == -1) number_on_negative_side++;
         else if(tetrahedron_label(t) ==  0) number_intersecting_boundary++;
         else{std::cout << "error with tetrahedron_label passed" << std::endl;return;}
     }
     int number_of_new_particles=0;
-    for(t=1;t<=mesh.tetrahedrons.m;t++){
+    for(t=0;t<mesh.tetrahedrons.m;t++){
         if(tetrahedron_label(t) == 0){
             for(int a=0;a<4;a++){
                 int node=mesh.tetrahedrons(a,t);
@@ -161,9 +161,9 @@ virtual void Fracture_Along_Level_Set(EMBEDDED_TETRAHEDRALIZED_VOLUME& embedded_
         }
     }
     
-    for(p=1;p<=particle_replicated.m;p++){
+    for(p=0;p<particle_replicated.m;p++){
         if(particle_replicated(p)){
-            for(t=1;t<=(*mesh.incident_tetrahedrons)(p).m;t++){
+            for(t=0;t<(*mesh.incident_tetrahedrons)(p).m;t++){
                 int tetrahedron=(*mesh.incident_tetrahedrons)(p)(t);
                 if(tetrahedron_label(tetrahedron) == -1){
                     int i,j,k,l;mesh.tetrahedrons.Get(tetrahedron,i,j,k,l);
@@ -177,7 +177,7 @@ virtual void Fracture_Along_Level_Set(EMBEDDED_TETRAHEDRALIZED_VOLUME& embedded_
         }
     }
 
-    for(t=1;t<=tetrahedron_label.m;t++){
+    for(t=0;t<tetrahedron_label.m;t++){
         if(tetrahedron_label(t) == 0){
             int i,j,k,l;mesh.tetrahedrons.Get(t,i,j,k,l);
             mesh.tetrahedrons.Append(particle_replicated(i),particle_replicated(j),particle_replicated(k),particle_replicated(l));
@@ -186,7 +186,7 @@ virtual void Fracture_Along_Level_Set(EMBEDDED_TETRAHEDRALIZED_VOLUME& embedded_
 
     //repair phi
     embedded_tetrahedralized_volume.phi.Resize(particles.array_collection->Size());
-    for(p=1;p<=particle_replicated.m;p++){
+    for(p=0;p<particle_replicated.m;p++){
         if(particle_replicated(p)) embedded_tetrahedralized_volume.phi(particle_replicated(p))=embedded_tetrahedralized_volume.phi(p);
     }
 

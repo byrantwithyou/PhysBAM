@@ -52,7 +52,7 @@ Line_Search_Quadratic_Golden_Section(NONLINEAR_FUNCTION<T(T)>& F,T a,T b,T& x,in
     T m=(T).5*(a+b),t;
     BRACKET s={a,m,b,F(a),F(m),F(b)};
     int i;
-    for(i=1;i<=max_iterations;i++){
+    for(i=0;i<max_iterations;i++){
         if(abs(s.b-s.a)<interval_tolerance*(abs(s.a)+abs(s.b))) break;
         int r=Compute_Quadratic_Minimum(s,t,quadratic_tolerance);
         if(!r) break;
@@ -74,7 +74,7 @@ Line_Search_Golden_Section(NONLINEAR_FUNCTION<T(T)>& F,T a,T b,T& x,int max_iter
     BRACKET s={a,m,b,F(a),F(m),F(b)};
     int i;
     interval_tolerance*=abs(s.a)+abs(s.b);
-    for(i=1;i<=max_iterations;i++){
+    for(i=0;i<max_iterations;i++){
         if(abs(s.b-s.a)<interval_tolerance) break;
         t=s.a+s.b-s.m;
         Update_Interval(s,t,F(t));}

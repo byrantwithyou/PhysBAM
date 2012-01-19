@@ -28,33 +28,33 @@ Get_Artificial_Viscosity(EOS<T>& eos,GRID_LAGRANGE_2D<T>& grid,const ARRAY<T,VEC
 
     // find the density at each node
     ARRAY<T,VECTOR<int,2> > density(1,m,1,n),M_node(1,m,1,n),A_node(1,m,1,n);
-    for(i=1;i<=m-1;i++) for(j=1;j<=n-1;j++){
+    for(i=0;i<m-1;i++) for(j=0;j<n-1;j++){
         T mass_over_4=mass(i,j)/4;
         M_node(i,j)+=mass_over_4;M_node(i+1,j)+=mass_over_4;M_node(i,j+1)+=mass_over_4;M_node(i+1,j+1)+=mass_over_4;
         A_node(i,j)+=AA1(i,j);A_node(i+1,j)+=AA2(i,j);A_node(i,j+1)+=AA3(i,j);A_node(i+1,j+1)+=AA4(i,j);}
-    for(i=1;i<=m;i++) for(j=1;j<=n;j++) density(i,j)=M_node(i,j)/A_node(i,j);
+    for(i=0;i<m;i++) for(j=0;j<n;j++) density(i,j)=M_node(i,j)/A_node(i,j);
     
     // find the sound speed at each node
     ARRAY<T,VECTOR<int,2> > sound_speed(1,m,1,n),e_node(1,m,1,n);
-    for(i=1;i<=m-1;i++) for(j=1;j<=n-1;j++){
+    for(i=0;i<m-1;i++) for(j=0;j<n-1;j++){
         T e_corner=energy(i,j)*mass(i,j)/4;
         e_node(i,j)+=e_corner;e_node(i+1,j)+=e_corner;e_node(i,j+1)+=e_corner;e_node(i+1,j+1)+=e_corner;}
-    for(i=1;i<=m;i++) for(j=1;j<=n;j++) sound_speed(i,j)=eos.c(density(i,j),e_node(i,j)/M_node(i,j));
+    for(i=0;i<m;i++) for(j=0;j<n;j++) sound_speed(i,j)=eos.c(density(i,j),e_node(i,j)/M_node(i,j));
     
     // find jumps in the velocity
     ARRAY<T,VECTOR<int,2> > u_jump1(1,m-1,1,n),v_jump1(1,m-1,1,n),velocity_jump1(1,m-1,1,n),V1_x(1,m-1,1,n),V1_y(1,m-1,1,n);
-    for(i=1;i<=m-1;i++) for(j=1;j<=n;j++){
+    for(i=0;i<m-1;i++) for(j=0;j<n;j++){
         u_jump1(i,j)=u(i+1,j)-u(i,j);v_jump1(i,j)=v(i+1,j)-v(i,j);velocity_jump1(i,j)=sqrt(sqr(u_jump1(i,j))+sqr(v_jump1(i,j)));
         if(abs(velocity_jump1(i,j)) <= 1e-8*maxabs(u(i,j),v(i,j),u(i+1,j),v(i+1,j))){V1_x(i,j)=0;V1_y(i,j)=0;}
         else{V1_x(i,j)=u_jump1(i,j)/velocity_jump1(i,j);V1_y(i,j)=v_jump1(i,j)/velocity_jump1(i,j);}}
     ARRAY<T,VECTOR<int,2> > u_jump2(1,m,1,n-1),v_jump2(1,m,1,n-1),velocity_jump2(1,m,1,n-1),V2_x(1,m,1,n-1),V2_y(1,m,1,n-1);
-    for(i=1;i<=m;i++) for(j=1;j<=n-1;j++){
+    for(i=0;i<m;i++) for(j=0;j<n-1;j++){
         u_jump2(i,j)=u(i,j+1)-u(i,j);v_jump2(i,j)=v(i,j+1)-v(i,j);velocity_jump2(i,j)=sqrt(sqr(u_jump2(i,j))+sqr(v_jump2(i,j)));
         if(abs(velocity_jump2(i,j)) <= 1e-8*maxabs(u(i,j),v(i,j),u(i,j+1),v(i,j+1))){V2_x(i,j)=0;V2_y(i,j)=0;}
         else{V2_x(i,j)=u_jump2(i,j)/velocity_jump2(i,j);V2_y(i,j)=v_jump2(i,j)/velocity_jump2(i,j);}} 
 
     // compute artificial viscosities
-    for(i=1;i<=m-1;i++) for(j=1;j<=n-1;j++){
+    for(i=0;i<m-1;i++) for(j=0;j<n-1;j++){
         // bottom edge
         if(V1_x(i,j)*NN3_x(i,j)+V1_y(i,j)*NN3_y(i,j) >= 0) Q1(i,j)=0;
         else{

@@ -33,8 +33,8 @@ public:
 
     void Compute_Coefficients(const VECTOR_ND<T>& x_input,const VECTOR_ND<T>& y_input)
     {int i,j;assert(x_input.n == degree+1 && y_input.n == degree+1);
-    for(i=1;i<=degree+1;i++){x(i)=x_input(i);c(i)=y_input(i);}
-    for(i=1;i<=degree+1;i++){d(i)=1;for(j=1;j<=degree+1;j++) if(i != j) d(i)*=(x(i)-x(j));}}
+    for(i=0;i<degree+1;i++){x(i)=x_input(i);c(i)=y_input(i);}
+    for(i=0;i<degree+1;i++){d(i)=1;for(j=0;j<degree+1;j++) if(i != j) d(i)*=(x(i)-x(j));}}
 
 //#####################################################################
 };

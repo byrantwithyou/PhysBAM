@@ -118,7 +118,7 @@ Compress_Expansion(ARRAY<T>& e)
       Fast_Two_Sum(Q,enow,Qnew,q);
       if(q!=0){h.Append(const_cast<T&>(Qnew));Q=q;} else Q=Qnew;}
   ARRAYS_COMPUTATIONS::Reverse_In_Place(h);
-  for(hindex=1;hindex<=h.m;hindex++){
+  for(hindex=0;hindex<h.m;hindex++){
       hnow=h(hindex);
       Fast_Two_Sum(hnow,Q,Qnew,q);
       if(q!=0) h(top++)=q;

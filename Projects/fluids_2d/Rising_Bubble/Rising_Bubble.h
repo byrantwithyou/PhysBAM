@@ -45,7 +45,7 @@ public:
 void RISING_BUBBLE::Initialize_Phi(){
     int i,j;
     int m=grid.m,n=grid.n;
-    for(i=1;i<=m;i++) for(j=1;j<=n;j++) phi(i,j)=minmag(grid.y(j)-.5,.125-sqrt(sqr(grid.x(i)-.5)+sqr(grid.y(j)-.25)));}
+    for(i=0;i<m;i++) for(j=0;j<n;j++) phi(i,j)=minmag(grid.y(j)-.5,.125-sqrt(sqr(grid.x(i)-.5)+sqr(grid.y(j)-.25)));}
 //#####################################################################
 // Function Write_Matlab_Data_File
 //#####################################################################

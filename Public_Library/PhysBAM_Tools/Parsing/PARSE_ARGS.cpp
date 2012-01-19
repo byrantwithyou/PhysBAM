@@ -269,11 +269,11 @@ void PARSE_ARGS::
 Print_Usage(bool do_exit) const
 {
     int i;LOG::cerr<<"Usage: "<<program_name<<" ";
-    for(i=1;i<=arg_data_list.m;i++){arg_data_list(i).Print_Synopsis();LOG::cerr<<" ";}
+    for(i=0;i<arg_data_list.m;i++){arg_data_list(i).Print_Synopsis();LOG::cerr<<" ";}
     LOG::cerr<<extra_args_synopsis<<std::endl;
     int width=0;
-    for(i=1;i<=arg_data_list.m;i++){int len=(int)arg_data_list(i).str.length();if(len>width)width=len;}
-    for(i=1;i<=arg_data_list.m;i++){arg_data_list(i).Print_Description(width+2);LOG::cerr<<std::endl;}
+    for(i=0;i<arg_data_list.m;i++){int len=(int)arg_data_list(i).str.length();if(len>width)width=len;}
+    for(i=0;i<arg_data_list.m;i++){arg_data_list(i).Print_Description(width+2);LOG::cerr<<std::endl;}
     LOG::cerr<<extra_args_desc<<std::endl;if(extra_usage_callback)extra_usage_callback();if(do_exit) exit(-1);
 }
 //#####################################################################

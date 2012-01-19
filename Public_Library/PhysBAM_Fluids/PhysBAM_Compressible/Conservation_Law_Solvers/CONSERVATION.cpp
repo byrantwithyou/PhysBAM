@@ -259,28 +259,28 @@ Update_Conservation_Law_For_Specialized_Shallow_Water_Equations(GRID<TV>& grid,T
     if(save_fluxes) solver.flux_temp.Resize(0,m,true,false);
     ARRAY<VECTOR<T,2> ,VECTOR<int,1> > U_1d_x(-2,m+3),Fx_1d(1,m);
     ARRAY<bool,VECTOR<int,1> > psi_x(1,m);
-    for(j=1;j<=n;j++){
-        for(i=1;i<=m;i++) psi_x(i)=psi(i,j);
+    for(j=0;j<n;j++){
+        for(i=0;i<m;i++) psi_x(i)=psi(i,j);
         for(i=-2;i<=m+3;i++){U_1d_x(i)(1)=U_ghost(i,j)(1);U_1d_x(i)(2)=U_ghost(i,j)(2);}
         eigensystem_F.slice_index=VECTOR<int,3>(0,j,0);
         solver.Conservation_Solver(m,dx,psi_x,U_1d_x,Fx_1d,eigensystem_F,eigensystem_F,VECTOR<bool,2>(outflow_boundaries(1),outflow_boundaries(2)));
-        for(i=1;i<=m;i++){rhs(i,j)(1)=Fx_1d(i)(1);rhs(i,j)(2)=Fx_1d(i)(2);}
+        for(i=0;i<m;i++){rhs(i,j)(1)=Fx_1d(i)(1);rhs(i,j)(2)=Fx_1d(i)(2);}
         if(save_fluxes) 
             for(i=0;i<=m;i++){fluxes.Component(1)(i+1,j)(1)=solver.flux_temp(i)(1);fluxes.Component(1)(i+1,j)(2)=solver.flux_temp(i)(2);fluxes.Component(1)(i+1,j)(3)=0;}}
 
     if(save_fluxes) solver.flux_temp.Resize(0,n,true,false);
     ARRAY<VECTOR<T,2> ,VECTOR<int,1> > U_1d_y(-2,n+3),Gy_1d(1,n);
     ARRAY<bool,VECTOR<int,1> > psi_y(1,n);
-    for(i=1;i<=m;i++){
-        for(j=1;j<=n;j++) psi_y(j)=psi(i,j);
+    for(i=0;i<m;i++){
+        for(j=0;j<n;j++) psi_y(j)=psi(i,j);
         for(j=-2;j<=n+3;j++){U_1d_y(j)(1)=U_ghost(i,j)(1);U_1d_y(j)(2)=U_ghost(i,j)(3);}
         eigensystem_G.slice_index=VECTOR<int,3>(i,0,0);
         solver.Conservation_Solver(n,dy,psi_y,U_1d_y,Gy_1d,eigensystem_G,eigensystem_G,VECTOR<bool,2>(outflow_boundaries(3),outflow_boundaries(4)));
-        for(j=1;j<=n;j++){rhs(i,j)(1)+=Gy_1d(j)(1);rhs(i,j)(3)=Gy_1d(j)(2);}
+        for(j=0;j<n;j++){rhs(i,j)(1)+=Gy_1d(j)(1);rhs(i,j)(3)=Gy_1d(j)(2);}
         if(save_fluxes)
             for(j=0;j<=n;j++){fluxes.Component(2)(i,j+1)(1)=solver.flux_temp(j)(1);fluxes.Component(2)(i,j+1)(2)=0;fluxes.Component(2)(i,j+1)(3)=solver.flux_temp(j)(2);}}
 
-    for(i=1;i<=m;i++) for(j=1;j<=n;j++) if(psi(i,j)) U(i,j)-=dt*rhs(i,j);
+    for(i=0;i<m;i++) for(j=0;j<n;j++) if(psi(i,j)) U(i,j)-=dt*rhs(i,j);
 }
 //#####################################################################
 // Function Log_Parameters

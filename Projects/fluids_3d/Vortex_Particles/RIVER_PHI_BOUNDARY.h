@@ -25,11 +25,11 @@ public:
     Fill_Front_Ghost_Cells(grid,u_ghost,time);Fill_Back_Ghost_Cells(grid,u_ghost,time);
     const int n=grid.n,mn=grid.mn;int j,ij;
     // override at the inflow
-    for(j=1;j<=n;j++) for(ij=1;ij<=mn;ij++){
+    for(j=0;j<n;j++) for(ij=0;ij<mn;ij++){
         if((implicit && implicit->Lazy_Inside(grid.X(1,j,ij))) || grid.y(j) > inflow_height) u_ghost(-2,j,ij)=u_ghost(-1,j,ij)=u_ghost(0,j,ij)=grid.dx;
         else u_ghost(-2,j,ij)=u_ghost(-1,j,ij)=u_ghost(0,j,ij)=-grid.dx;}
     // don't suck water out of outflow
-    for(j=1;j<=n;j++) for(ij=1;ij<=mn;ij++) u_ghost(grid.m+1,j,ij)=u_ghost(grid.m+2,j,ij)=u_ghost(grid.m+3,j,ij)=u_ghost(grid.m,j,ij);}
+    for(j=0;j<n;j++) for(ij=0;ij<mn;ij++) u_ghost(grid.m+1,j,ij)=u_ghost(grid.m+2,j,ij)=u_ghost(grid.m+3,j,ij)=u_ghost(grid.m,j,ij);}
 //#####################################################################
 };
 }

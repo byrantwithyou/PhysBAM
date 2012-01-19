@@ -85,8 +85,8 @@ Write_Header_File(const std::string& file_name,const ARRAY<T,VECTOR<int,2> >& x,
     Matlab_Output.open(STRING_UTILITIES::string_sprintf("%s.%d",file_name.c_str(),stepnumber).c_str(),std::ios::out|std::ios::binary);
     data_int=m;if(!little_endian) Convert_Bytes(data_int);Matlab_Output.write((const char*)&data_int,4);
     data_int=n;if(!little_endian) Convert_Bytes(data_int);Matlab_Output.write((const char*)&data_int,4);
-    int i;for(i=1;i<=m;i++) for(int j=0;j<n;j++){data_double=x(i,j);if(!little_endian) Convert_Bytes(data_double);Matlab_Output.write((const char*)&data_double,8);}
-    for(i=1;i<=m;i++) for(int j=0;j<n;j++){data_double=y(i,j);if(!little_endian) Convert_Bytes(data_double);Matlab_Output.write((const char*)&data_double,8);}
+    int i;for(i=0;i<m;i++) for(int j=0;j<n;j++){data_double=x(i,j);if(!little_endian) Convert_Bytes(data_double);Matlab_Output.write((const char*)&data_double,8);}
+    for(i=0;i<m;i++) for(int j=0;j<n;j++){data_double=y(i,j);if(!little_endian) Convert_Bytes(data_double);Matlab_Output.write((const char*)&data_double,8);}
     Matlab_Output.close();
 }
 //#####################################################################
@@ -112,11 +112,11 @@ Write_Header_File(const std::string& file_name,const ARRAY<T,VECTOR<int,3> >& x,
     data_int=m;if(!little_endian) Convert_Bytes(data_int);Matlab_Output.write((const char*)&data_int,4);
     data_int=n;if(!little_endian) Convert_Bytes(data_int);Matlab_Output.write((const char*)&data_int,4);
     data_int=mn;if(!little_endian) Convert_Bytes(data_int);Matlab_Output.write((const char*)&data_int,4);
-    int i;for(i=1;i<=m;i++) for(int j=0;j<n;j++) for(int ij=0;ij<mn;ij++){
+    int i;for(i=0;i<m;i++) for(int j=0;j<n;j++) for(int ij=0;ij<mn;ij++){
         data_double=x(i,j,ij);if(!little_endian) Convert_Bytes(data_double);Matlab_Output.write((const char*)&data_double,8);}
-    for(i=1;i<=m;i++) for(int j=0;j<n;j++) for(int ij=0;ij<mn;ij++){
+    for(i=0;i<m;i++) for(int j=0;j<n;j++) for(int ij=0;ij<mn;ij++){
         data_double=y(i,j,ij);if(!little_endian) Convert_Bytes(data_double);Matlab_Output.write((const char*)&data_double,8);}
-    for(i=1;i<=m;i++) for(int j=0;j<n;j++) for(int ij=0;ij<mn;ij++){
+    for(i=0;i<m;i++) for(int j=0;j<n;j++) for(int ij=0;ij<mn;ij++){
         data_double=z(i,j,ij);if(!little_endian) Convert_Bytes(data_double);Matlab_Output.write((const char*)&data_double,8);}
     Matlab_Output.close();
 }

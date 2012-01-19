@@ -63,14 +63,14 @@ void Update_Geometry_Old()
     // source
     if(time == 0){ 
         ELLIPSOID ellipsoid(VECTOR_3D(.5,.5,.5),VECTOR_3D(.4,.2,.2));
-        for(i=1;i<=m;i++) for(j=1;j<=n;j++) for(ij=1;ij<=mn;ij++)
+        for(i=0;i<m;i++) for(j=0;j<n;j++) for(ij=0;ij<mn;ij++)
             if(ellipsoid.Inside(VECTOR_3D(grid->x(i),grid->y(j),grid->z(ij)))){(*density)(i,j,ij)=1;(*T)(i,j,ij)=1;}}
 
 //    CYLINDER cylinder();
 //    cylinder->Set_Radius(.1);cylinder->Set_Height(.1);
 //    double x_location=.1+2.4*time/9;
 //    cylinder->Transform(Translation_Matrix(VECTOR_3D(x_location,.1,(zmax+zmin)/2)));
-//    for(i=1;i<=m;i++) for(j=1;j<=n;j++) for(ij=1;ij<=mn;ij++)
+//    for(i=0;i<m;i++) for(j=0;j<n;j++) for(ij=0;ij<mn;ij++)
 //        if(cylinder->Inside(VECTOR_3D(grid->x(i),grid->y(j),grid->z(ij)))){
 //            (*density)(i,j,ij)=1;(*T)(i,j,ij)=1;(*psi_N)(i,j,ij)=1;/*(*u_fixed)(i,j,ij)=.2;*/(*v_fixed)(i,j,ij)=.8;}
         
@@ -78,7 +78,7 @@ void Update_Geometry_Old()
     RENDERING_BOX box(.2,.8,.45,.55,.45,.55);
     double speed=2*pi,rotation=speed*time;
     box.transform.MATRIX_4X4::Translation_Matrix(VECTOR_3D(.5,0,.5))*box.transform.MATRIX_4X4::Rotation_Matrix_Y_Axis(rotation)*box.transform.MATRIX_4X4::Translation_Matrix(VECTOR_3D(-.5,0,-.5));
-    for(i=1;i<=m;i++) for(j=1;j<=n;j++) for(ij=1;ij<=mn;ij++)
+    for(i=0;i<m;i++) for(j=0;j<n;j++) for(ij=0;ij<mn;ij++)
         if(box.Inside(VECTOR_3D(grid->x(i),grid->y(j),grid->z(ij)))){
             (*psi_N)(i,j,ij)=1;
             (*u_fixed)(i,j,ij)=speed*(grid->z(ij)-.5);

@@ -1141,7 +1141,7 @@ void Get_Initial_Data()
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(surface,density);
             int i,j;int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;
             i=1;j=1;particles.mass(i+m*(j-1))=FLT_MAX;i=1;j=n;particles.mass(i+m*(j-1))=FLT_MAX;
-            //i=1;for(j=1;j<=n;j++) particles.mass(i+m*(j-1))=FLT_MAX;
+            //i=1;for(j=0;j<n;j++) particles.mass(i+m*(j-1))=FLT_MAX;
             //particles.mass(1)=FLT_MAX;
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(surface,true);}
             break;
@@ -1151,8 +1151,8 @@ void Get_Initial_Data()
             TRIANGULATED_SURFACE<T>& surface=tests.Create_Cloth_Panel(number_side_panels,side_length,aspect_ratio,RIGID_BODY_STATE<TV>());
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(surface,density);
             int i,j;int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;
-            i=1;for(j=1;j<=n;j++) particles.mass(i+m*(j-1))=FLT_MAX;
-            i=m;for(j=1;j<=n;j++) particles.mass(i+m*(j-1))=FLT_MAX;
+            i=1;for(j=0;j<n;j++) particles.mass(i+m*(j-1))=FLT_MAX;
+            i=m;for(j=0;j<n;j++) particles.mass(i+m*(j-1))=FLT_MAX;
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(surface,true);}
             break;
         case 42: 
@@ -1715,11 +1715,11 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
     else if(test_number==47){
         int i,j;int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;
         i=1;j=1;V(i+m*(j-1))=TV();i=1;j=n;V(i+m*(j-1))=TV();}
-        //i=1;for(j=1;j<=n;j++) V(i+m*(j-1))=TV();}
+        //i=1;for(j=0;j<n;j++) V(i+m*(j-1))=TV();}
     else if(test_number==48){
         int i,j;int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;
-        i=1;for(j=1;j<=n;j++) V(i+m*(j-1))=TV();
-        i=m;for(j=1;j<=n;j++) V(i+m*(j-1))=TV();}
+        i=1;for(j=0;j<n;j++) V(i+m*(j-1))=TV();
+        i=m;for(j=0;j<n;j++) V(i+m*(j-1))=TV();}
     else if(test_number==10){
         int i,j;int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;
         i=1;j=1;V(i+m*(j-1))=test_10_frame_velocity;i=1;j=n;V(i+m*(j-1))=test_10_frame_velocity;}
@@ -1783,11 +1783,11 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
     if(test_number==47){
         int i,j;int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;
         i=1;j=1;V(i+m*(j-1))=TV();i=1;j=n;V(i+m*(j-1))=TV();}
-    //i=1;for(j=1;j<=n;j++) V(i+m*(j-1))=TV();}
+    //i=1;for(j=0;j<n;j++) V(i+m*(j-1))=TV();}
     if(test_number==48){
         int i,j;int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;
-        i=1;for(j=1;j<=n;j++) V(i+m*(j-1))=TV();
-        i=m;for(j=1;j<=n;j++) V(i+m*(j-1))=TV();}
+        i=1;for(j=0;j<n;j++) V(i+m*(j-1))=TV();
+        i=m;for(j=0;j<n;j++) V(i+m*(j-1))=TV();}
     if(test_number==14){
         int i,j;int m=(int)(aspect_ratio*number_side_panels)+1;
         i=1;j=1;V(i+m*(j-1))=TV();i=(m/3);j=1;V(i+m*(j-1))=TV();

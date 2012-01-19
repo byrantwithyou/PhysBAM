@@ -39,7 +39,7 @@ Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAY<TV,VECTOR<int,2> >& u,ARRAY<TV
 
     ARRAY<TV,VECTOR<int,2> >::put(u,u_ghost); // interior
 
-    for(j=1;j<=n;j++){
+    for(j=0;j<n;j++){
         u_ghost(0,j)=u_ghost(m-1,j);  // left 
         u_ghost(-1,j)=u_ghost(m-2,j); // left 
         u_ghost(-2,j)=u_ghost(m-3,j); // left 
@@ -65,8 +65,8 @@ Apply_Boundary_Condition(const GRID<TV>& grid,ARRAY<TV,VECTOR<int,2> >& u,const 
     int m=grid.m,n=grid.n;
     int j;
 
-    for(j=1;j<=n;j++) u(1,j)=u(m,j);  // left 
-    //for(i=1;i<=m;i++) u(i,1)=0;  // top 
+    for(j=0;j<n;j++) u(1,j)=u(m,j);  // left 
+    //for(i=0;i<m;i++) u(i,1)=0;  // top 
 }
 //#####################################################################
 }

@@ -36,11 +36,11 @@ Euler_Step(const T dt,const T time)
         T phix_min=min(phix_minus(1,1,1),phix_plus(1,1,1)),phix_max=max(phix_minus(1,1,1),phix_plus(1,1,1)),
                     phiy_min=min(phiy_minus(1,1,1),phiy_plus(1,1,1)),phiy_max=max(phiy_minus(1,1,1),phiy_plus(1,1,1)),
                     phiz_min=min(phiz_minus(1,1,1),phiz_plus(1,1,1)),phiz_max=max(phiz_minus(1,1,1),phiz_plus(1,1,1));
-        for(i=1;i<=m;i++) for(j=1;j<=n;j++) for(ij=1;ij<=mn;ij++){
+        for(i=0;i<m;i++) for(j=0;j<n;j++) for(ij=0;ij<mn;ij++){
             phix_min=min(phix_min,phix_minus(i,j,ij),phix_plus(i,j,ij));phix_max=max(phix_max,phix_minus(i,j,ij),phix_plus(i,j,ij));
             phiy_min=min(phiy_min,phiy_minus(i,j,ij),phiy_plus(i,j,ij));phiy_max=max(phiy_max,phiy_minus(i,j,ij),phiy_plus(i,j,ij));
             phiz_min=min(phiz_min,phiz_minus(i,j,ij),phiz_plus(i,j,ij));phiz_max=max(phiz_max,phiz_minus(i,j,ij),phiz_plus(i,j,ij));}
-        for(i=1;i<=m;i++) for(j=1;j<=n;j++) for(ij=1;ij<=mn;ij++){
+        for(i=0;i<m;i++) for(j=0;j<n;j++) for(ij=0;ij<mn;ij++){
             T phix_ave=(phix_minus(i,j,ij)+phix_plus(i,j,ij))/2,phix_difference=(phix_plus(i,j,ij)-phix_minus(i,j,ij))/2,
                         phiy_ave=(phiy_minus(i,j,ij)+phiy_plus(i,j,ij))/2,phiy_difference=(phiy_plus(i,j,ij)-phiy_minus(i,j,ij))/2,
                         phiz_ave=(phiz_minus(i,j,ij)+phiz_plus(i,j,ij))/2,phiz_difference=(phiz_plus(i,j,ij)-phiz_minus(i,j,ij))/2;
@@ -52,11 +52,11 @@ Euler_Step(const T dt,const T time)
         T phix_min=min(phix_minus(1,1,1),phix_plus(1,1,1)),phix_max=max(phix_minus(1,1,1),phix_plus(1,1,1)),
                     phiy_min=min(phiy_minus(1,1,1),phiy_plus(1,1,1)),phiy_max=max(phiy_minus(1,1,1),phiy_plus(1,1,1)),
                     phiz_min=min(phiz_minus(1,1,1),phiz_plus(1,1,1)),phiz_max=max(phiz_minus(1,1,1),phiz_plus(1,1,1));
-        for(i=1;i<=m;i++) for(j=1;j<=n;j++) for(ij=1;ij<=mn;ij++){
+        for(i=0;i<m;i++) for(j=0;j<n;j++) for(ij=0;ij<mn;ij++){
             phix_min=min(phix_min,phix_minus(i,j,ij),phix_plus(i,j,ij));phix_max=max(phix_max,phix_minus(i,j,ij),phix_plus(i,j,ij));
             phiy_min=min(phiy_min,phiy_minus(i,j,ij),phiy_plus(i,j,ij));phiy_max=max(phiy_max,phiy_minus(i,j,ij),phiy_plus(i,j,ij));
             phiz_min=min(phiz_min,phiz_minus(i,j,ij),phiz_plus(i,j,ij));phiz_max=max(phiz_max,phiz_minus(i,j,ij),phiz_plus(i,j,ij));}
-        for(i=1;i<=m;i++) for(j=1;j<=n;j++) for(ij=1;ij<=mn;ij++){
+        for(i=0;i<m;i++) for(j=0;j<n;j++) for(ij=0;ij<mn;ij++){
             T phix_min_local=min(phix_minus(i,j,ij),phix_plus(i,j,ij)),phix_max_local=max(phix_minus(i,j,ij),phix_plus(i,j,ij)),
                        phiy_min_local=min(phiy_minus(i,j,ij),phiy_plus(i,j,ij)),phiy_max_local=max(phiy_minus(i,j,ij),phiy_plus(i,j,ij)),
                        phiz_min_local=min(phiz_minus(i,j,ij),phiz_plus(i,j,ij)),phiz_max_local=max(phiz_minus(i,j,ij),phiz_plus(i,j,ij));
@@ -68,7 +68,7 @@ Euler_Step(const T dt,const T time)
                                   -hamiltonian.Maxabs_H2(phix_min,phix_max,phiy_min_local,phiy_max_local,phiz_min,phiz_max,i,j,ij,time)*phiy_difference
                                   -hamiltonian.Maxabs_H3(phix_min,phix_max,phiy_min,phiy_max,phiz_min_local,phiz_max_local,i,j,ij,time)*phiz_difference);}}
     else if(LLLF_viscosity)
-        for(i=1;i<=m;i++) for(j=1;j<=n;j++) for(ij=1;ij<=mn;ij++){
+        for(i=0;i<m;i++) for(j=0;j<n;j++) for(ij=0;ij<mn;ij++){
             T phix_min_local=min(phix_minus(i,j,ij),phix_plus(i,j,ij)),phix_max_local=max(phix_minus(i,j,ij),phix_plus(i,j,ij)),
                        phiy_min_local=min(phiy_minus(i,j,ij),phiy_plus(i,j,ij)),phiy_max_local=max(phiy_minus(i,j,ij),phiy_plus(i,j,ij)),
                        phiz_min_local=min(phiz_minus(i,j,ij),phiz_plus(i,j,ij)),phiz_max_local=max(phiz_minus(i,j,ij),phiz_plus(i,j,ij));
@@ -98,27 +98,27 @@ Calculate_Derivatives(ARRAY<T,VECTOR<int,3> >& phi_ghost,ARRAY<T,VECTOR<int,3> >
     
     // x-direction
     ARRAY<T,VECTOR<int,1> > phi_1d_x(1-ghost_cells,m+ghost_cells),phix_minus_1d(1,m),phix_plus_1d(1,m); 
-    for(j=1;j<=n;j++) for(ij=1;ij<=mn;ij++){
+    for(j=0;j<n;j++) for(ij=0;ij<mn;ij++){
         for(i=1-ghost_cells;i<=m+ghost_cells;i++) phi_1d_x(i)=phi_ghost(i,j,ij);
         if(spatial_order == 5) HJ_WENO(m,dx,phi_1d_x,phix_minus_1d,phix_plus_1d);
         else HJ_ENO(spatial_order,m,dx,phi_1d_x,phix_minus_1d,phix_plus_1d);
-        for(i=1;i<=m;i++){phix_minus(i,j,ij)=phix_minus_1d(i);phix_plus(i,j,ij)=phix_plus_1d(i);}}
+        for(i=0;i<m;i++){phix_minus(i,j,ij)=phix_minus_1d(i);phix_plus(i,j,ij)=phix_plus_1d(i);}}
 
     // y-direction
     ARRAY<T,VECTOR<int,1> > phi_1d_y(1-ghost_cells,n+ghost_cells),phiy_minus_1d(1,n),phiy_plus_1d(1,n); 
-    for(i=1;i<=m;i++) for(ij=1;ij<=mn;ij++){
+    for(i=0;i<m;i++) for(ij=0;ij<mn;ij++){
         for(j=1-ghost_cells;j<=n+ghost_cells;j++) phi_1d_y(j)=phi_ghost(i,j,ij);
         if(spatial_order == 5) HJ_WENO(n,dy,phi_1d_y,phiy_minus_1d,phiy_plus_1d);
         else HJ_ENO(spatial_order,n,dy,phi_1d_y,phiy_minus_1d,phiy_plus_1d);
-        for(j=1;j<=n;j++){phiy_minus(i,j,ij)=phiy_minus_1d(j);phiy_plus(i,j,ij)=phiy_plus_1d(j);}}
+        for(j=0;j<n;j++){phiy_minus(i,j,ij)=phiy_minus_1d(j);phiy_plus(i,j,ij)=phiy_plus_1d(j);}}
 
     // z-direction
     ARRAY<T,VECTOR<int,1> > phi_1d_z(1-ghost_cells,mn+ghost_cells),phiz_minus_1d(1,n),phiz_plus_1d(1,n); 
-    for(i=1;i<=m;i++) for(j=1;j<=n;j++){
+    for(i=0;i<m;i++) for(j=0;j<n;j++){
         for(ij=1-ghost_cells;ij<=mn+ghost_cells;ij++) phi_1d_z(ij)=phi_ghost(i,j,ij);
         if(spatial_order == 5) HJ_WENO(mn,dz,phi_1d_z,phiz_minus_1d,phiz_plus_1d);
         else HJ_ENO(spatial_order,mn,dz,phi_1d_z,phiz_minus_1d,phiz_plus_1d);
-        for(ij=1;ij<=mn;ij++){phiz_minus(i,j,ij)=phiz_minus_1d(ij);phiz_plus(i,j,ij)=phiz_plus_1d(ij);}}
+        for(ij=0;ij<mn;ij++){phiz_minus(i,j,ij)=phiz_minus_1d(ij);phiz_plus(i,j,ij)=phiz_plus_1d(ij);}}
 }
 //#####################################################################
 // Function CFL
@@ -141,14 +141,14 @@ CFL(const T time)
         T phix_min=min(phix_minus(1,1,1),phix_plus(1,1,1)),phix_max=max(phix_minus(1,1,1),phix_plus(1,1,1)),
                     phiy_min=min(phiy_minus(1,1,1),phiy_plus(1,1,1)),phiy_max=max(phiy_minus(1,1,1),phiy_plus(1,1,1)),
                     phiz_min=min(phiz_minus(1,1,1),phiz_plus(1,1,1)),phiz_max=max(phiz_minus(1,1,1),phiz_plus(1,1,1));
-        for(i=1;i<=m;i++) for(j=1;j<=n;j++) for(ij=1;ij<=mn;ij++){
+        for(i=0;i<m;i++) for(j=0;j<n;j++) for(ij=0;ij<mn;ij++){
             phix_min=min(phix_min,phix_minus(i,j,ij),phix_plus(i,j,ij));phix_max=max(phix_max,phix_minus(i,j,ij),phix_plus(i,j,ij));
             phiy_min=min(phiy_min,phiy_minus(i,j,ij),phiy_plus(i,j,ij));phiy_max=max(phiy_max,phiy_minus(i,j,ij),phiy_plus(i,j,ij));
             phiz_min=min(phiz_min,phiz_minus(i,j,ij),phiz_plus(i,j,ij));phiz_max=max(phiz_max,phiz_minus(i,j,ij),phiz_plus(i,j,ij));}
         maxabs_H1=hamiltonian.Maxabs_H1(phix_min,phix_max,phiy_min,phiy_max,phiz_min,phiz_max,1,1,1,time);
         maxabs_H2=hamiltonian.Maxabs_H2(phix_min,phix_max,phiy_min,phiy_max,phiz_min,phiz_max,1,1,1,time);
         maxabs_H3=hamiltonian.Maxabs_H3(phix_min,phix_max,phiy_min,phiy_max,phiz_min,phiz_max,1,1,1,time);
-        for(i=1;i<=m;i++) for(j=1;j<=n;j++) for(ij=1;ij<=mn;ij++){
+        for(i=0;i<m;i++) for(j=0;j<n;j++) for(ij=0;ij<mn;ij++){
             maxabs_H1=max(maxabs_H1,hamiltonian.Maxabs_H1(phix_min,phix_max,phiy_min,phiy_max,phiz_min,phiz_max,i,j,ij,time));
             maxabs_H2=max(maxabs_H2,hamiltonian.Maxabs_H2(phix_min,phix_max,phiy_min,phiy_max,phiz_min,phiz_max,i,j,ij,time));
             maxabs_H3=max(maxabs_H3,hamiltonian.Maxabs_H3(phix_min,phix_max,phiy_min,phiy_max,phiz_min,phiz_max,i,j,ij,time));}}   
@@ -156,14 +156,14 @@ CFL(const T time)
         T phix_min=min(phix_minus(1,1,1),phix_plus(1,1,1)),phix_max=max(phix_minus(1,1,1),phix_plus(1,1,1)),
                     phiy_min=min(phiy_minus(1,1,1),phiy_plus(1,1,1)),phiy_max=max(phiy_minus(1,1,1),phiy_plus(1,1,1)),
                     phiz_min=min(phiz_minus(1,1,1),phiz_plus(1,1,1)),phiz_max=max(phiz_minus(1,1,1),phiz_plus(1,1,1));
-        for(i=1;i<=m;i++) for(j=1;j<=n;j++) for(ij=1;ij<=mn;ij++){
+        for(i=0;i<m;i++) for(j=0;j<n;j++) for(ij=0;ij<mn;ij++){
             phix_min=min(phix_min,phix_minus(i,j,ij),phix_plus(i,j,ij));phix_max=max(phix_max,phix_minus(i,j,ij),phix_plus(i,j,ij));
             phiy_min=min(phiy_min,phiy_minus(i,j,ij),phiy_plus(i,j,ij));phiy_max=max(phiy_max,phiy_minus(i,j,ij),phiy_plus(i,j,ij));
             phiz_min=min(phiz_min,phiz_minus(i,j,ij),phiz_plus(i,j,ij));phiz_max=max(phiz_max,phiz_minus(i,j,ij),phiz_plus(i,j,ij));}
         maxabs_H1=hamiltonian.Maxabs_H1(phix_minus(1,1,1),phix_plus(1,1,1),phiy_min,phiy_max,phiz_min,phiz_max,1,1,1,time);
         maxabs_H2=hamiltonian.Maxabs_H2(phix_min,phix_max,phiy_minus(1,1,1),phiy_plus(1,1,1),phiz_min,phiz_max,1,1,1,time);
         maxabs_H3=hamiltonian.Maxabs_H3(phix_min,phix_max,phiy_min,phiy_max,phiz_minus(1,1,1),phiz_plus(1,1,1),1,1,1,time);
-        for(i=1;i<=m;i++) for(j=1;j<=n;j++) for(ij=1;ij<=mn;ij++){
+        for(i=0;i<m;i++) for(j=0;j<n;j++) for(ij=0;ij<mn;ij++){
             T phix_min_local=min(phix_minus(i,j,ij),phix_plus(i,j,ij)),phix_max_local=max(phix_minus(i,j,ij),phix_plus(i,j,ij)),
                        phiy_min_local=min(phiy_minus(i,j,ij),phiy_plus(i,j,ij)),phiy_max_local=max(phiy_minus(i,j,ij),phiy_plus(i,j,ij)),
                        phiz_min_local=min(phiz_minus(i,j,ij),phiz_plus(i,j,ij)),phiz_max_local=max(phiz_minus(i,j,ij),phiz_plus(i,j,ij));
@@ -177,7 +177,7 @@ CFL(const T time)
                                                                   phiz_plus(1,1,1),1,1,1,time);
         maxabs_H3=hamiltonian.Maxabs_H3(phix_minus(1,1,1),phix_plus(1,1,1),phiy_minus(1,1,1),phiy_plus(1,1,1),phiz_minus(1,1,1),
                                                                   phiz_plus(1,1,1),1,1,1,time);
-        for(i=1;i<=m;i++) for(j=1;j<=n;j++) for(ij=1;ij<=mn;ij++){
+        for(i=0;i<m;i++) for(j=0;j<n;j++) for(ij=0;ij<mn;ij++){
             T phix_min_local=min(phix_minus(i,j,ij),phix_plus(i,j,ij)),phix_max_local=max(phix_minus(i,j,ij),phix_plus(i,j,ij)),
                        phiy_min_local=min(phiy_minus(i,j,ij),phiy_plus(i,j,ij)),phiy_max_local=max(phiy_minus(i,j,ij),phiy_plus(i,j,ij)),
                        phiz_min_local=min(phiz_minus(i,j,ij),phiz_plus(i,j,ij)),phiz_max_local=max(phiz_minus(i,j,ij),phiz_plus(i,j,ij));

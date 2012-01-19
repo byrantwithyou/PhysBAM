@@ -26,13 +26,13 @@ public:
 
     const int m=grid.m,n=grid.n,mn=grid.mn;int i,j,ij;
     // PHYSBAM_OVERRIDE at the inflow
-    for(j=1;j<=n;j++) for(ij=1;ij<=mn;ij++){
+    for(j=0;j<n;j++) for(ij=0;ij<mn;ij++){
         if(grid.y(j) > inflow_height+initial_base) u_ghost(-2,j,ij)=u_ghost(-1,j,ij)=u_ghost(0,j,ij)=grid.dx;
         else u_ghost(-2,j,ij)=u_ghost(-1,j,ij)=u_ghost(0,j,ij)=-grid.dx;
     // don't suck water out of outflow
-    for(j=1;j<=n;j++) for(ij=1;ij<=mn;ij++) u_ghost(grid.m+1,j,ij)=u_ghost(grid.m+2,j,ij)=u_ghost(grid.m+3,j,ij)=u_ghost(grid.m,j,ij);
+    for(j=0;j<n;j++) for(ij=0;ij<mn;ij++) u_ghost(grid.m+1,j,ij)=u_ghost(grid.m+2,j,ij)=u_ghost(grid.m+3,j,ij)=u_ghost(grid.m,j,ij);
     // don't suck water from ceiling
-    for(i=1;i<=m;i++) for(ij=1;ij<=mn;ij++) u_ghost(i,grid.n+1,ij)=u_ghost(i,grid.n+2,ij)=u_ghost(i,grid.n+3,ij)=grid.dx;}
+    for(i=0;i<m;i++) for(ij=0;ij<mn;ij++) u_ghost(i,grid.n+1,ij)=u_ghost(i,grid.n+2,ij)=u_ghost(i,grid.n+3,ij)=grid.dx;}
     }
 
 //#####################################################################

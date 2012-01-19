@@ -24,8 +24,8 @@ template<class T> void GRID_LAGRANGE_2D<T>::
 Get_Lengths(ARRAY<T,VECTOR<int,2> >& L1,ARRAY<T,VECTOR<int,2> >& L2)
 {
     int i,j;
-    for(i=1;i<=m-1;i++) for(j=1;j<=n;j++){VECTOR<T,3> v1(x(i,j),y(i,j),0),v2(x(i+1,j),y(i+1,j),0),v3=v2-v1;L1(i,j)=v3.Magnitude();}
-    for(i=1;i<=m;i++) for(j=1;j<=n-1;j++){VECTOR<T,3> v1(x(i,j),y(i,j),0),v2(x(i,j+1),y(i,j+1),0),v3=v2-v1;L2(i,j)=v3.Magnitude();}
+    for(i=0;i<m-1;i++) for(j=0;j<n;j++){VECTOR<T,3> v1(x(i,j),y(i,j),0),v2(x(i+1,j),y(i+1,j),0),v3=v2-v1;L1(i,j)=v3.Magnitude();}
+    for(i=0;i<m;i++) for(j=0;j<n-1;j++){VECTOR<T,3> v1(x(i,j),y(i,j),0),v2(x(i,j+1),y(i,j+1),0),v3=v2-v1;L2(i,j)=v3.Magnitude();}
 }
 //#####################################################################
 // Function Get_Areas
@@ -54,8 +54,8 @@ Get_Normals(ARRAY<T,VECTOR<int,2> >& N1_x,ARRAY<T,VECTOR<int,2> >& N1_y,ARRAY<T,
 {
     int i,j;
     ARRAY<T,VECTOR<int,2> > L1(1,m-1,1,n),L2(1,m,1,n-1);Get_Lengths(L1,L2);
-    for(i=1;i<=m-1;i++) for(j=1;j<=n;j++){N1_x(i,j)=-(y(i+1,j)-y(i,j))/L1(i,j);N1_y(i,j)=(x(i+1,j)-x(i,j))/L1(1,j);}
-    for(i=1;i<=m;i++) for(j=1;j<=n-1;j++){N2_x(i,j)=(y(i,j+1)-y(i,j))/L2(i,j);N2_y(i,j)=-(x(i,j+1)-x(i,j))/L2(i,j);}
+    for(i=0;i<m-1;i++) for(j=0;j<n;j++){N1_x(i,j)=-(y(i+1,j)-y(i,j))/L1(i,j);N1_y(i,j)=(x(i+1,j)-x(i,j))/L1(1,j);}
+    for(i=0;i<m;i++) for(j=0;j<n-1;j++){N2_x(i,j)=(y(i,j+1)-y(i,j))/L2(i,j);N2_y(i,j)=-(x(i,j+1)-x(i,j))/L2(i,j);}
 }
 //#####################################################################
 // Function Get_Centers
@@ -75,8 +75,8 @@ template<class T> void GRID_LAGRANGE_2D<T>::
 Get_Midpoints(ARRAY<T,VECTOR<int,2> >& M1_x,ARRAY<T,VECTOR<int,2> >& M1_y,ARRAY<T,VECTOR<int,2> >& M2_x,ARRAY<T,VECTOR<int,2> >& M2_y)
 {
     int i,j;
-    for(i=1;i<=m-1;i++) for(j=1;j<=n;j++){M1_x(i,j)=(x(i,j)+x(i+1,j))/2;M1_y(i,j)=(y(i,j)+y(i+1,j))/2;}
-    for(i=1;i<=m;i++) for(j=1;j<=n-1;j++){M2_x(i,j)=(x(i,j)+x(i,j+1))/2;M2_y(i,j)=(y(i,j)+y(i,j+1))/2;}
+    for(i=0;i<m-1;i++) for(j=0;j<n;j++){M1_x(i,j)=(x(i,j)+x(i+1,j))/2;M1_y(i,j)=(y(i,j)+y(i+1,j))/2;}
+    for(i=0;i<m;i++) for(j=0;j<n-1;j++){M2_x(i,j)=(x(i,j)+x(i,j+1))/2;M2_y(i,j)=(y(i,j)+y(i,j+1))/2;}
 }
 //#####################################################################
 // Function Get_Sub_Zone_Lengths

@@ -81,26 +81,26 @@ Write_Matlab_Data_File(const int stepnumber, const GRID<TV>& grid, const ARRAY<T
         // output primitive variables . . . . 
         //density
         sprintf(file_name,"%s/density",output_directory);
-        for(i=1;i<=m;i++) output(i) = u(1,i);
+        for(i=0;i<m;i++) output(i) = u(1,i);
         matlab_output.Write_Output_File(file_name,output,stepnumber);
         //velocity
-        for(i=1;i<=m;i++) output(i) = u(2,i)/u(1,i);
+        for(i=0;i<m;i++) output(i) = u(2,i)/u(1,i);
         sprintf(file_name,"%s/velocity",output_directory);
         matlab_output.Write_Output_File(file_name,output,stepnumber);
         //pressure
-        for(i=1;i<=m;i++) output1(i) = (tmp_eos->gamma-1.0)*(u(3,i)-.5*u(2,i)*output(i));
+        for(i=0;i<m;i++) output1(i) = (tmp_eos->gamma-1.0)*(u(3,i)-.5*u(2,i)*output(i));
         sprintf(file_name,"%s/pressure",output_directory);
         matlab_output.Write_Output_File(file_name,output1,stepnumber);
         //entropy
-        for(i=1;i<=m;i++) output(i) = tmp_eos->Cv*log(output1(i)/pow(u(1,i),tmp_eos->gamma));
+        for(i=0;i<m;i++) output(i) = tmp_eos->Cv*log(output1(i)/pow(u(1,i),tmp_eos->gamma));
         sprintf(file_name,"%s/entropy",output_directory);
         matlab_output.Write_Output_File(file_name,output,stepnumber);
         //speed of sound
-        for(i=1;i<=m;i++) output(i) = sqrt(tmp_eos->gamma*output1(i)/u(1,i));
+        for(i=0;i<m;i++) output(i) = sqrt(tmp_eos->gamma*output1(i)/u(1,i));
         sprintf(file_name,"%s/sound_speed",output_directory);
         matlab_output.Write_Output_File(file_name,output,stepnumber);
         //Mach number
-        for(i=1;i<=m;i++) output(i) = (u(2,i)/u(1,i))/output(i);
+        for(i=0;i<m;i++) output(i) = (u(2,i)/u(1,i))/output(i);
         sprintf(file_name,"%s/mach_number",output_directory);
         matlab_output.Write_Output_File(file_name,output,stepnumber);
 }

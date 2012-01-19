@@ -91,17 +91,17 @@ Initialize_Octahedron_Mesh(const int m,const int n,const int p)
     Clean_Memory();
     number_nodes=m*n*p+(m+1)*(n+1)*(p+1);elements.Exact_Resize(4*(m-1)*n*p+4*m*(n-1)*p+4*m*n*(p-1));
     int t=0,i,j,k;
-    for(i=1;i<=m;i++)for(j=1;j<=n;j++)for(k=1;k<=p-1;k++){ // loop over k-oriented edges in inner cube mesh
+    for(i=0;i<m;i++)for(j=0;j<n;j++)for(k=0;k<p-1;k++){ // loop over k-oriented edges in inner cube mesh
         elements(++t).Set(Lattice(i,j,k,m,n,p),Lattice(i,j,k+1,m,n,p),Half_Lattice(i-1,j-1,k,m,n,p),Half_Lattice(i,j-1,k,m,n,p));
         elements(++t).Set(Lattice(i,j,k,m,n,p),Lattice(i,j,k+1,m,n,p),Half_Lattice(i,j-1,k,m,n,p),Half_Lattice(i,j,k,m,n,p));
         elements(++t).Set(Lattice(i,j,k,m,n,p),Lattice(i,j,k+1,m,n,p),Half_Lattice(i,j,k,m,n,p),Half_Lattice(i-1,j,k,m,n,p));
         elements(++t).Set(Lattice(i,j,k,m,n,p),Lattice(i,j,k+1,m,n,p),Half_Lattice(i-1,j,k,m,n,p),Half_Lattice(i-1,j-1,k,m,n,p));}
-    for(i=1;i<=m;i++)for(j=1;j<=n-1;j++)for(k=1;k<=p;k++){ // loop over j-oriented edge in inner cube mesh
+    for(i=0;i<m;i++)for(j=0;j<n-1;j++)for(k=0;k<p;k++){ // loop over j-oriented edge in inner cube mesh
         elements(++t).Set(Lattice(i,j,k,m,n,p),Lattice(i,j+1,k,m,n,p),Half_Lattice(i,j,k-1,m,n,p),Half_Lattice(i-1,j,k-1,m,n,p));
         elements(++t).Set(Lattice(i,j,k,m,n,p),Lattice(i,j+1,k,m,n,p),Half_Lattice(i,j,k,m,n,p),Half_Lattice(i,j,k-1,m,n,p));
         elements(++t).Set(Lattice(i,j,k,m,n,p),Lattice(i,j+1,k,m,n,p),Half_Lattice(i-1,j,k,m,n,p),Half_Lattice(i,j,k,m,n,p));
         elements(++t).Set(Lattice(i,j,k,m,n,p),Lattice(i,j+1,k,m,n,p),Half_Lattice(i-1,j,k-1,m,n,p),Half_Lattice(i-1,j,k,m,n,p));}
-    for(i=1;i<=m-1;i++)for(j=1;j<=n;j++)for(k=1;k<=p;k++){ // loop over i-oriented edge in inner cube mesh
+    for(i=0;i<m-1;i++)for(j=0;j<n;j++)for(k=0;k<p;k++){ // loop over i-oriented edge in inner cube mesh
         elements(++t).Set(Lattice(i,j,k,m,n,p),Lattice(i+1,j,k,m,n,p),Half_Lattice(i,j-1,k-1,m,n,p),Half_Lattice(i,j,k-1,m,n,p));
         elements(++t).Set(Lattice(i,j,k,m,n,p),Lattice(i+1,j,k,m,n,p),Half_Lattice(i,j,k-1,m,n,p),Half_Lattice(i,j,k,m,n,p));
         elements(++t).Set(Lattice(i,j,k,m,n,p),Lattice(i+1,j,k,m,n,p),Half_Lattice(i,j,k,m,n,p),Half_Lattice(i,j-1,k,m,n,p));
@@ -385,7 +385,7 @@ Initialize_Segment_Mesh_Of_Subset(SEGMENT_MESH& segment_mesh_of_subset,const ARR
 {
     segment_mesh_of_subset.Clean_Memory();int t,i,j,k,l;
     ARRAY<ARRAY<int> > higher_neighbors(number_nodes); // figure out all higher-numbered neighbors first
-    for(t=1;t<=elements.m;t++) if(subset(t)){
+    for(t=0;t<elements.m;t++) if(subset(t)){
         elements(t).Get(i,j,k,l);
         if(i < j) higher_neighbors(i).Append_Unique(j);else higher_neighbors(j).Append_Unique(i);
         if(i < k) higher_neighbors(i).Append_Unique(k);else higher_neighbors(k).Append_Unique(i);
@@ -393,9 +393,9 @@ Initialize_Segment_Mesh_Of_Subset(SEGMENT_MESH& segment_mesh_of_subset,const ARR
         if(j < k) higher_neighbors(j).Append_Unique(k);else higher_neighbors(k).Append_Unique(j);
         if(j < l) higher_neighbors(j).Append_Unique(l);else higher_neighbors(l).Append_Unique(j);
         if(k < l) higher_neighbors(k).Append_Unique(l);else higher_neighbors(l).Append_Unique(k);}
-    int number_segments=0;for(i=1;i<=number_nodes;i++) number_segments+=higher_neighbors(i).m;
+    int number_segments=0;for(i=0;i<number_nodes;i++) number_segments+=higher_neighbors(i).m;
     segment_mesh_of_subset.elements.Exact_Resize(number_segments);
-    t=0;for(i=1;i<=number_nodes;i++) for(j=1;j<=higher_neighbors(i).m;j++) segment_mesh_of_subset.elements(++t).Set(i,higher_neighbors(i)(j));
+    t=0;for(i=0;i<number_nodes;i++) for(j=0;j<higher_neighbors(i).m;j++) segment_mesh_of_subset.elements(++t).Set(i,higher_neighbors(i)(j));
     segment_mesh_of_subset.number_nodes=number_nodes;
 }
 //#####################################################################

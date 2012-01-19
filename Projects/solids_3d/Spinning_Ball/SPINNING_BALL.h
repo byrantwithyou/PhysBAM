@@ -102,7 +102,7 @@ void Initialize_Cloth(TRIANGLE_MESH*& triangle_mesh,PARTICLE_3D*& particles,TRIA
     stretch_x->segment_mesh.number_nodes=m*n;
     stretch_x->segment_mesh.segments.Resize(2,1,(m-1)*n);
     k=0;
-    for(i=1;i<=m-1;i++) for(j=1;j<=n;j++){
+    for(i=0;i<m-1;i++) for(j=0;j<n;j++){
         k++;
         stretch_x->segment_mesh.segments(1,k)=i+m*(j-1);
         stretch_x->segment_mesh.segments(2,k)=i+1+m*(j-1);}
@@ -118,7 +118,7 @@ void Initialize_Cloth(TRIANGLE_MESH*& triangle_mesh,PARTICLE_3D*& particles,TRIA
     stretch_y->segment_mesh.number_nodes=m*n;
     stretch_y->segment_mesh.segments.Resize(2,1,m*(n-1));
     k=0;
-    for(i=1;i<=m;i++) for(j=1;j<=n-1;j++){
+    for(i=0;i<m;i++) for(j=0;j<n-1;j++){
         k++;
         stretch_y->segment_mesh.segments(1,k)=i+m*(j-1);
         stretch_y->segment_mesh.segments(2,k)=i+m*j;}
@@ -134,7 +134,7 @@ void Initialize_Cloth(TRIANGLE_MESH*& triangle_mesh,PARTICLE_3D*& particles,TRIA
     shear->segment_mesh.number_nodes=m*n;
     shear->segment_mesh.segments.Resize(2,1,2*(m-1)*(n-1));
     k=0;
-    for(i=1;i<=m-1;i++) for(j=1;j<=n-1;j++){
+    for(i=0;i<m-1;i++) for(j=0;j<n-1;j++){
         k++;
         shear->segment_mesh.segments(1,k)=i+m*(j-1);
         shear->segment_mesh.segments(2,k)=i+1+m*j;
@@ -152,7 +152,7 @@ void Initialize_Cloth(TRIANGLE_MESH*& triangle_mesh,PARTICLE_3D*& particles,TRIA
     UNIFORM_BENDING_SPRINGS *bend_x=new UNIFORM_BENDING_SPRINGS(*particles);
     bend_x->bending_triples.Resize(3,1,(m-2)*n);
     k=0;
-    for(i=2;i<=m-1;i++) for(j=1;j<=n;j++){
+    for(i=2;i<=m-1;i++) for(j=0;j<n;j++){
         k++;
         bend_x->bending_triples(1,k)=i-1+m*(j-1);
         bend_x->bending_triples(2,k)=i+m*(j-1);
@@ -165,7 +165,7 @@ void Initialize_Cloth(TRIANGLE_MESH*& triangle_mesh,PARTICLE_3D*& particles,TRIA
     UNIFORM_BENDING_SPRINGS *bend_y=new UNIFORM_BENDING_SPRINGS(*particles);
     bend_y->bending_triples.Resize(3,1,m*(n-2));
     k=0;
-    for(i=1;i<=m;i++) for(j=2;j<=n-1;j++){
+    for(i=0;i<m;i++) for(j=2;j<=n-1;j++){
         k++;
         bend_y->bending_triples(1,k)=i+m*(j-2);
         bend_y->bending_triples(2,k)=i+m*(j-1);
@@ -247,8 +247,8 @@ void Update_Object_Velocities(ARRAY<RIGID_BODY<TV>*>& scripted_objects,double ti
 void Set_External_Forces(ARRAY<VECTOR_3D>& F,ARRAY<double>& mass,double time)
 {
     int k;
-    for(k=1;k<=F.m;k++) F(k)=VECTOR_3D(0,0,0); // initialize
-    for(k=1;k<=F.m;k++) F(k).y+=(-9.8*mass(k)); // add gravity
+    for(k=0;k<F.m;k++) F(k)=VECTOR_3D(0,0,0); // initialize
+    for(k=0;k<F.m;k++) F(k).y+=(-9.8*mass(k)); // add gravity
 }
 //#####################################################################
 // Function Set_External_Velocities

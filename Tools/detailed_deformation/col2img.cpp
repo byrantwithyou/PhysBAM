@@ -26,7 +26,7 @@ int main(int argc,char *argv[])
     cout<<"Reading colors..."<<endl;
     FILE_UTILITIES::Read_From_File<float>(argv[1],colors);
  
-    int m,n;for(m=(int)sqrt(colors.m);m>=1;m--)for(n=1;n<=colors.m;n++)if(m*n==colors.m)goto found;
+    int m,n;for(m=(int)sqrt(colors.m);m>=1;m--)for(n=0;n<colors.m;n++)if(m*n==colors.m)goto found;
     cout<<"Could not be converted..."<<endl;exit(-1);
 
   found:

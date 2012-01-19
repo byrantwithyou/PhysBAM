@@ -298,7 +298,7 @@ Calculate_Triangulated_Surface_From_Marching_Tetrahedra(const T_GRID& tet_grid,T
     triangulated_surface.Clean_Memory();triangulated_surface.mesh.Clean_Memory();triangulated_surface.particles.array_collection->Clean_Memory();
     ARRAY<VECTOR<int,6>,VECTOR<int,3> > edge(1,tet_grid.counts.x,1,tet_grid.counts.y,1,tet_grid.counts.z);
     // create particles
-    int i;for(i=1;i<=tet_grid.counts.x;i++) for(int j=0;j<tet_grid.counts.y;j++) for(int k=0;k<tet_grid.counts.z;k++){
+    int i;for(i=0;i<tet_grid.counts.x;i++) for(int j=0;j<tet_grid.counts.y;j++) for(int k=0;k<tet_grid.counts.z;k++){
         edge(i,j,k)(1)=If_Zero_Crossing_Add_Particle(triangulated_surface,tet_grid.X(i,j,k),tet_grid.X(i+1,j,k));
         edge(i,j,k)(2)=If_Zero_Crossing_Add_Particle(triangulated_surface,tet_grid.X(i,j,k),tet_grid.X(i,j+1,k));
         edge(i,j,k)(3)=If_Zero_Crossing_Add_Particle(triangulated_surface,tet_grid.X(i,j,k),tet_grid.X(i,j,k+1));

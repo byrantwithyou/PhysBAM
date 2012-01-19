@@ -197,7 +197,7 @@ void Random_Scene_Generator(const ARRAY<std::string>& filenames,
     random_numbers.Set_Seed(random_seed);
 
     int i, start_body=rigid_bodies.m+1;
-    for(i=1;i<=filenames.m;i++){ // create all the objects to get their bounding boxes
+    for(i=0;i<filenames.m;i++){ // create all the objects to get their bounding boxes
         T scale = random_placement.Random_Scale(random_numbers);
         RIGID_BODY<TV>* rigid_body=Initialize_Rigid_Body(filenames(i),scale);
         char name[256];

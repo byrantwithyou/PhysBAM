@@ -47,7 +47,7 @@ void WATER_INTO_BOX::Initialize_Phi(){
     int i,j;
     int m=grid.m,n=grid.n;
     double dx=grid.dx,dy=grid.dy,xmin=grid.xmin,xmax=grid.xmax;
-    for(i=1;i<=m;i++) for(j=1;j<=n;j++){
+    for(i=0;i<m;i++) for(j=0;j<n;j++){
         double x=grid.x(i),y=grid.y(j);
         if((fabs(x-(xmin+xmax)/2) <= .1*(xmax-xmin)) && y >= grid.y(n)-3.*dy) phi(i,j)=-dx;
         else phi(i,j)=dx;}}
@@ -97,12 +97,12 @@ void WATER_INTO_BOX::Delete_Particles_Inside_Geometry(){
     double epsilon=.0001*max(dx,dy);
     double x_center=xmin+.4*(xmax-xmin),y_center=ymin+.1*(ymax-ymin),radius=.1*(xmax-xmin);
     // delete negative particles inside object
-    for(k=1;k<=particle_levelset.negative_particles.array_size;k++) if(particle_levelset.negative_particles.active(k)){
+    for(k=0;k<particle_levelset.negative_particles.array_size;k++) if(particle_levelset.negative_particles.active(k)){
         double x=particle_levelset.negative_particles.x(k),y=particle_levelset.negative_particles.y(k);
         double distance=sqrt(sqr(x-x_center)+sqr(y-y_center)); 
         if(distance < radius-epsilon) particle_levelset.negative_particles.Delete_Particle(k);} // include buffer zone
         // delete positive particles inside object
-    for(k=1;k<=particle_levelset.positive_particles.array_size;k++) if(particle_levelset.positive_particles.active(k)){
+    for(k=0;k<particle_levelset.positive_particles.array_size;k++) if(particle_levelset.positive_particles.active(k)){
         double x=particle_levelset.positive_particles.x(k),y=particle_levelset.positive_particles.y(k);
         double distance=sqrt(sqr(x-x_center)+sqr(y-y_center)); 
         if(distance < radius-epsilon)  particle_levelset.positive_particles.Delete_Particle(k);}} // include buffer zone

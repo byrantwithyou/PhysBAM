@@ -566,7 +566,7 @@ Keep_Largest_N(ARRAY<SPARSE_MATRIX_ENTRY<T> >& q,int n)
     int j;
     for(int i=0;i<q.m;i++){
         T element_magnitude=abs(q(i).a);
-        for(j=1;j<=elements.m;j++)
+        for(j=0;j<elements.m;j++)
             if(element_magnitude>abs(elements(j).a)){
                 elements.Insert(q(i),j);
                 break;}

@@ -23,12 +23,12 @@ Euler_Step(const T dt,const T time)
         
     if(LF_viscosity){
         T phix_min=min(phix_minus(1),phix_plus(1)),phix_max=max(phix_minus(1),phix_plus(1));
-        for(i=1;i<=m;i++){phix_min=min(phix_min,phix_minus(i),phix_plus(i));phix_max=max(phix_max,phix_minus(i),phix_plus(i));}
-        for(i=1;i<=m;i++){
+        for(i=0;i<m;i++){phix_min=min(phix_min,phix_minus(i),phix_plus(i));phix_max=max(phix_max,phix_minus(i),phix_plus(i));}
+        for(i=0;i<m;i++){
             T phix_ave=(phix_minus(i)+phix_plus(i))/2,phix_difference=(phix_plus(i)-phix_minus(i))/2;
             phi(i)-=dt*(hamiltonian.H(phix_ave,i,time)-hamiltonian.Maxabs_H1(phix_min,phix_max,i,time)*phix_difference);}}
     else // LLF and LLLF are the same in 1D
-        for(i=1;i<=m;i++){
+        for(i=0;i<m;i++){
             T phix_min=min(phix_minus(i),phix_plus(i)),phix_max=max(phix_minus(i),phix_plus(i));
             T phix_ave=(phix_minus(i)+phix_plus(i))/2,phix_difference=(phix_plus(i)-phix_minus(i))/2;
             phi(i)-=dt*(hamiltonian.H(phix_ave,i,time)-hamiltonian.Maxabs_H1(phix_min,phix_max,i,time)*phix_difference);}
@@ -65,13 +65,13 @@ CFL(const T time)
     T maxabs_H1;
     if(LF_viscosity){
         T phix_min=min(phix_minus(1),phix_plus(1)),phix_max=max(phix_minus(1),phix_plus(1));
-        for(i=1;i<=m;i++){phix_min=min(phix_min,phix_minus(i),phix_plus(i));phix_max=max(phix_max,phix_minus(i),phix_plus(i));}
+        for(i=0;i<m;i++){phix_min=min(phix_min,phix_minus(i),phix_plus(i));phix_max=max(phix_max,phix_minus(i),phix_plus(i));}
         maxabs_H1=hamiltonian.Maxabs_H1(phix_min,phix_max,1,time);
-        for(i=1;i<=m;i++) maxabs_H1=max(maxabs_H1,hamiltonian.Maxabs_H1(phix_min,phix_max,i,time));}
+        for(i=0;i<m;i++) maxabs_H1=max(maxabs_H1,hamiltonian.Maxabs_H1(phix_min,phix_max,i,time));}
     else{ // LLF and LLLF are the same in 1D
         T phix_min=min(phix_minus(1),phix_plus(1)),phix_max=max(phix_minus(1),phix_plus(1));
         maxabs_H1=hamiltonian.Maxabs_H1(phix_min,phix_max,1,time);
-        for(i=1;i<=m;i++){
+        for(i=0;i<m;i++){
             phix_min=min(phix_minus(i),phix_plus(i)),phix_max=max(phix_minus(i),phix_plus(i));
             maxabs_H1=max(maxabs_H1,hamiltonian.Maxabs_H1(phix_min,phix_max,i,time));}}
 

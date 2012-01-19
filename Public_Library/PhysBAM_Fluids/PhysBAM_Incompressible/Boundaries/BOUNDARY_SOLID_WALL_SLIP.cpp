@@ -32,14 +32,14 @@ Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAY<TV,VECTOR<int,2> >& V,ARRAY<TV
     if(V.length != 1) PHYSBAM_FUNCTION_IS_NOT_DEFINED();
     int i,j,m=grid.m,n=grid.n;
 
-    for(i=1;i<=m;i++) for(j=1;j<=n;j++) V_ghost(i,j)=V(i,j); // interior
+    for(i=0;i<m;i++) for(j=0;j<n;j++) V_ghost(i,j)=V(i,j); // interior
 
     if(left_constant_extrapolation) Fill_Left_Ghost_Cells(grid,V_ghost,time);
-    else for(j=1;j<=n;j++){
+    else for(j=0;j<n;j++){
         V_ghost(0,j).x=-V_ghost(2,j).x;V_ghost(-1,j).x=-V_ghost(3,j).x;V_ghost(-2,j).x=-V_ghost(4,j).x;
         V_ghost(0,j).y=V_ghost(2,j).y;V_ghost(-1,j).y=V_ghost(3,j).y;V_ghost(-2,j).y=V_ghost(4,j).y;}  
     if(right_constant_extrapolation) Fill_Right_Ghost_Cells(grid,V_ghost,time);
-    else for(j=1;j<=n;j++){
+    else for(j=0;j<n;j++){
         V_ghost(m+1,j).x=-V_ghost(m-1,j).x;V_ghost(m+2,j).x=-V_ghost(m-2,j).x;V_ghost(m+3,j).x=-V_ghost(m-3,j).x;
         V_ghost(m+1,j).y=V_ghost(m-1,j).y;V_ghost(m+2,j).y=V_ghost(m-2,j).y;V_ghost(m+3,j).y=V_ghost(m-3,j).y;}  
     if(bottom_constant_extrapolation) Fill_Bottom_Ghost_Cells(grid,V_ghost,time);
@@ -59,10 +59,10 @@ Apply_Boundary_Condition(const GRID<TV>& grid,ARRAY<TV,VECTOR<int,2> >& V,const 
 {
     if(V.length != 1) PHYSBAM_FUNCTION_IS_NOT_DEFINED();
     int i,j,m=grid.m,n=grid.n;
-    if(!left_constant_extrapolation)for(j=1;j<=n;j++)V(1,j).x=0;
-    if(!right_constant_extrapolation)for(j=1;j<=n;j++)V(m,j).x=0;  
-    if(!bottom_constant_extrapolation)for(i=1;i<=m;i++)V(i,1).y=0;
-    if(!top_constant_extrapolation)for(i=1;i<=m;i++)V(i,n).y=0;
+    if(!left_constant_extrapolation)for(j=0;j<n;j++)V(1,j).x=0;
+    if(!right_constant_extrapolation)for(j=0;j<n;j++)V(m,j).x=0;  
+    if(!bottom_constant_extrapolation)for(i=0;i<m;i++)V(i,1).y=0;
+    if(!top_constant_extrapolation)for(i=0;i<m;i++)V(i,n).y=0;
 }
 //#####################################################################
 // Function Fill_Ghost_Cells
@@ -73,25 +73,25 @@ Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAY<TV,VECTOR<int,3> >& V,ARRAY<TV
     if(V.length != 1) PHYSBAM_FUNCTION_IS_NOT_DEFINED();
     int i,j,ij,m=grid.m,n=grid.n,mn=grid.mn;
 
-    for(i=1;i<=m;i++) for(j=1;j<=n;j++) for(ij=1;ij<=mn;ij++) V_ghost(i,j,ij)=V(i,j,ij); // interior
+    for(i=0;i<m;i++) for(j=0;j<n;j++) for(ij=0;ij<mn;ij++) V_ghost(i,j,ij)=V(i,j,ij); // interior
 
     if(left_constant_extrapolation) Fill_Left_Ghost_Cells(grid,V_ghost,time);
-    else for(j=1;j<=n;j++) for(ij=1;ij<=mn;ij++){
+    else for(j=0;j<n;j++) for(ij=0;ij<mn;ij++){
         V_ghost(0,j,ij)[1]=-V_ghost(2,j,ij)[1];V_ghost(-1,j,ij)[1]=-V_ghost(3,j,ij)[1];V_ghost(-2,j,ij)[1]=-V_ghost(4,j,ij)[1];
         V_ghost(0,j,ij)[2]=V_ghost(2,j,ij)[2];V_ghost(-1,j,ij)[2]=V_ghost(3,j,ij)[2];V_ghost(-2,j,ij)[2]=V_ghost(4,j,ij)[2];
         V_ghost(0,j,ij)[3]=V_ghost(2,j,ij)[3];V_ghost(-1,j,ij)[3]=V_ghost(3,j,ij)[3];V_ghost(-2,j,ij)[3]=V_ghost(4,j,ij)[3];}  
     if(right_constant_extrapolation) Fill_Right_Ghost_Cells(grid,V_ghost,time);
-    else for(j=1;j<=n;j++) for(ij=1;ij<=mn;ij++){
+    else for(j=0;j<n;j++) for(ij=0;ij<mn;ij++){
         V_ghost(m+1,j,ij)[1]=-V_ghost(m-1,j,ij)[1];V_ghost(m+2,j,ij)[1]=-V_ghost(m-2,j,ij)[1];V_ghost(m+3,j,ij)[1]=-V_ghost(m-3,j,ij)[1];
         V_ghost(m+1,j,ij)[2]=V_ghost(m-1,j,ij)[2];V_ghost(m+2,j,ij)[2]=V_ghost(m-2,j,ij)[2];V_ghost(m+3,j,ij)[2]=V_ghost(m-3,j,ij)[2];
         V_ghost(m+1,j,ij)[3]=V_ghost(m-1,j,ij)[3];V_ghost(m+2,j,ij)[3]=V_ghost(m-2,j,ij)[3];V_ghost(m+3,j,ij)[3]=V_ghost(m-3,j,ij)[3];}  
     if(bottom_constant_extrapolation) Fill_Bottom_Ghost_Cells(grid,V_ghost,time);
-    else for(i=-2;i<=m+3;i++) for(ij=1;ij<=mn;ij++){
+    else for(i=-2;i<=m+3;i++) for(ij=0;ij<mn;ij++){
         V_ghost(i,0,ij)[1]=V_ghost(i,2,ij)[1];V_ghost(i,-1,ij)[1]=V_ghost(i,3,ij)[1];V_ghost(i,-2,ij)[1]=V_ghost(i,4,ij)[1];
         V_ghost(i,0,ij)[2]=-V_ghost(i,2,ij)[2];V_ghost(i,-1,ij)[2]=-V_ghost(i,3,ij)[2];V_ghost(i,-2,ij)[2]=-V_ghost(i,4,ij)[2];
         V_ghost(i,0,ij)[3]=V_ghost(i,2,ij)[3];V_ghost(i,-1,ij)[3]=V_ghost(i,3,ij)[3];V_ghost(i,-2,ij)[3]=V_ghost(i,4,ij)[3];}
     if(top_constant_extrapolation) Fill_Top_Ghost_Cells(grid,V_ghost,time);
-    else for(i=-2;i<=m+3;i++) for(ij=1;ij<=mn;ij++){
+    else for(i=-2;i<=m+3;i++) for(ij=0;ij<mn;ij++){
         V_ghost(i,n+1,ij)[1]=V_ghost(i,n-1,ij)[1];V_ghost(i,n+2,ij)[1]=V_ghost(i,n-2,ij)[1];V_ghost(i,n+3,ij)[1]=V_ghost(i,n-3,ij)[1];
         V_ghost(i,n+1,ij)[2]=-V_ghost(i,n-1,ij)[2];V_ghost(i,n+2,ij)[2]=-V_ghost(i,n-2,ij)[2];V_ghost(i,n+3,ij)[2]=-V_ghost(i,n-3,ij)[2];
         V_ghost(i,n+1,ij)[3]=V_ghost(i,n-1,ij)[3];V_ghost(i,n+2,ij)[3]=V_ghost(i,n-2,ij)[3];V_ghost(i,n+3,ij)[3]=V_ghost(i,n-3,ij)[3];}
@@ -114,10 +114,10 @@ Apply_Boundary_Condition(const GRID<TV>& grid,ARRAY<TV,VECTOR<int,3> >& V,const 
 {
     if(V.length != 1) PHYSBAM_FUNCTION_IS_NOT_DEFINED();
     int i,j,ij,m=grid.m,n=grid.n,mn=grid.mn;
-    if(!left_constant_extrapolation)for(j=1;j<=n;j++)for(ij=1;ij<=mn;ij++)V(1,j,ij)[1]=0;
-    if(!right_constant_extrapolation)for(j=1;j<=n;j++)for(ij=1;ij<=mn;ij++)V(m,j,ij)[1]=0;
-    if(!bottom_constant_extrapolation)for(i=1;i<=m;i++)for(ij=1;ij<=mn;ij++)V(i,1,ij)[2]=0;
-    if(!top_constant_extrapolation)for(i=1;i<=m;i++)for(ij=1;ij<=mn;ij++)V(i,n,ij)[2]=0;
-    if(!front_constant_extrapolation)for(i=1;i<=m;i++)for(j=1;j<=n;j++)V(i,j,1)[3]=0;
-    if(!back_constant_extrapolation)for(i=1;i<=m;i++)for(j=1;j<=n;j++)V(i,j,mn)[3]=0;
+    if(!left_constant_extrapolation)for(j=0;j<n;j++)for(ij=0;ij<mn;ij++)V(1,j,ij)[1]=0;
+    if(!right_constant_extrapolation)for(j=0;j<n;j++)for(ij=0;ij<mn;ij++)V(m,j,ij)[1]=0;
+    if(!bottom_constant_extrapolation)for(i=0;i<m;i++)for(ij=0;ij<mn;ij++)V(i,1,ij)[2]=0;
+    if(!top_constant_extrapolation)for(i=0;i<m;i++)for(ij=0;ij<mn;ij++)V(i,n,ij)[2]=0;
+    if(!front_constant_extrapolation)for(i=0;i<m;i++)for(j=0;j<n;j++)V(i,j,1)[3]=0;
+    if(!back_constant_extrapolation)for(i=0;i<m;i++)for(j=0;j<n;j++)V(i,j,mn)[3]=0;
 }

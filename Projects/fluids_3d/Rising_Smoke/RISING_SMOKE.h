@@ -52,7 +52,7 @@ void Update_Sources(const GRID<TV>& grid,ARRAY<T,VECTOR<int,3> >& u,ARRAY<T,VECT
     T source_xmax = (T).1;
     float source_zmax = (T).3;
 
-    for(i=1;i<=m;i++) for(j=1;j<=n;j++) for(ij=1;ij<=mn;ij++){
+    for(i=0;i<m;i++) for(j=0;j<n;j++) for(ij=0;ij<mn;ij++){
         T x=grid.x(i);
         T y=grid.y(j);
         T z=grid.z(ij);
@@ -61,7 +61,7 @@ void Update_Sources(const GRID<TV>& grid,ARRAY<T,VECTOR<int,3> >& u,ARRAY<T,VECT
             density(i,j,ij)=rho;temperature(i,j,ij)=T_burnt;}}
 
     // keep density >= 0 and T >=0
-    for(i=1;i<=m;i++) for(j=1;j<=n;j++) for(ij=1;ij<=mn;ij++){
+    for(i=0;i<m;i++) for(j=0;j<n;j++) for(ij=0;ij<mn;ij++){
         if(density(i,j,ij) < 0) density(i,j,ij)=0;
         if(temperature(i,j,ij) < T_air) temperature(i,j,ij)=T_air;}
 }
@@ -72,9 +72,9 @@ void Set_Domain_Boundary_Conditions(ARRAY<bool,VECTOR<int,3> >& psi_N,ARRAY<bool
 {
     int i,j,ij;
     // set up Dirichlet boundary conditions on the outside edges
-    for(i=1;i<=m;i++) for(j=1;j<=n;j++){psi_D(i,j,0)=psi_D(i,j,mn+1)=1;p(i,j,0)=p(i,j,mn+1)=0;}
-    for(i=1;i<=m;i++) for(ij=1;ij<=mn;ij++){psi_D(i,0,ij)=psi_D(i,n+1,ij)=1;p(i,0,ij)=p(i,n+1,ij)=0;}
-    for(j=1;j<=n;j++) for(ij=1;ij<=mn;ij++){psi_D(0,j,ij)=psi_D(m+1,j,ij)=1;p(0,j,ij)=p(m+1,j,ij)=0;}
+    for(i=0;i<m;i++) for(j=0;j<n;j++){psi_D(i,j,0)=psi_D(i,j,mn+1)=1;p(i,j,0)=p(i,j,mn+1)=0;}
+    for(i=0;i<m;i++) for(ij=0;ij<mn;ij++){psi_D(i,0,ij)=psi_D(i,n+1,ij)=1;p(i,0,ij)=p(i,n+1,ij)=0;}
+    for(j=0;j<n;j++) for(ij=0;ij<mn;ij++){psi_D(0,j,ij)=psi_D(m+1,j,ij)=1;p(0,j,ij)=p(m+1,j,ij)=0;}
 }
 //#####################################################################
 // Function Update_Forces
@@ -85,7 +85,7 @@ void Update_Forces(const GRID<TV>& grid,const ARRAY<T,VECTOR<int,3> >& u,const A
 {
     int i,j,ij;
     // control buoyancy force
-    for(i=1;i<=m;i++) for(j=1;j<=n+1;j++) for(ij=1;ij<=mn;ij++){ // y-direction forces only
+    for(i=0;i<m;i++) for(j=0;j<n+1;j++) for(ij=0;ij<mn;ij++){ // y-direction forces only
         T rho_atm=rho_bottom+(rho_top-rho_bottom)*(grid.y(j)-ymin)/(ymax-ymin);
         T den=(density_ghost(i,j-1,ij)+density_ghost(i,j,ij))/2,temp=(T_ghost(i,j-1,ij)+T_ghost(i,j,ij))/2;
         force_y(i,j,ij)=-(rho_atm-den);}
@@ -103,13 +103,13 @@ void Write_Data_File(const GRID<TV>& grid,const ARRAY<T,VECTOR<int,3> >& u,const
         if(!FILE_UTILITIES::Directory_Exists(matlab_directory.c_str())) FILE_UTILITIES::Create_Directory(matlab_directory.c_str());
         MATLAB_OUTPUT matlab_output;ARRAY<T,VECTOR<int,2> > output(1,n,1,mn);
         sprintf(filename,"%s/header",matlab_directory.c_str());matlab_output.Write_Header_File(filename,grid_2d,frame);
-        for(j=1;j<=n;j++) for(ij=1;ij<=mn;ij++)output(j,ij)=density(m/2,j,ij);
+        for(j=0;j<n;j++) for(ij=0;ij<mn;ij++)output(j,ij)=density(m/2,j,ij);
         sprintf(filename,"%s/density",matlab_directory.c_str());matlab_output.Write_Output_File(filename,output,frame);
-        for(j=1;j<=n;j++) for(ij=1;ij<=mn;ij++)output(j,ij)=temperature(m/2,j,ij);
+        for(j=0;j<n;j++) for(ij=0;ij<mn;ij++)output(j,ij)=temperature(m/2,j,ij);
         sprintf(filename,"%s/temperature",matlab_directory.c_str());matlab_output.Write_Output_File(filename,output,frame);
-        for(j=1;j<=n;j++) for(ij=1;ij<=mn;ij++)output(j,ij)=(T).5*(v(m/2,j,ij)+v(m/2,j+1,ij));
+        for(j=0;j<n;j++) for(ij=0;ij<mn;ij++)output(j,ij)=(T).5*(v(m/2,j,ij)+v(m/2,j+1,ij));
         sprintf(filename,"%s/velocity1",matlab_directory.c_str());matlab_output.Write_Output_File(filename,output,frame);
-        for(j=1;j<=n;j++) for(ij=1;ij<=mn;ij++)output(j,ij)=(T).5*(w(m/2,j,ij)+w(m/2,j,ij+1));
+        for(j=0;j<n;j++) for(ij=0;ij<mn;ij++)output(j,ij)=(T).5*(w(m/2,j,ij)+w(m/2,j,ij+1));
         sprintf(filename,"%s/velocity2",matlab_directory.c_str());matlab_output.Write_Output_File(filename,output,frame);}
 
     if(write_output_files){

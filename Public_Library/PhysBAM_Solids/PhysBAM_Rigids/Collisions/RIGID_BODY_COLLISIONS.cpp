@@ -396,7 +396,7 @@ Update_Levelset_Collision_Pair(const int id_1,const int id_2,const T dt,const T 
     // get all points in levelset, and iterate until each is (at some point) no longer interpenetrating or moving out of the levelset
     ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<TV> > particle_intersections;int i;
     particle_intersections.Preallocate(100);
-    for(i=1;i<=collision_pair_iterations;i++){
+    for(i=0;i<collision_pair_iterations;i++){
         T smallest_value;int smallest_index;TV collision_location,collision_normal,collision_relative_velocity;bool ignored_separating;
         bool found_intersection=Get_Deepest_Intersection_Point(id_1,id_2,particle_intersections,smallest_value,smallest_index,collision_location,collision_normal,
             collision_relative_velocity,true,0,ignored_separating);
