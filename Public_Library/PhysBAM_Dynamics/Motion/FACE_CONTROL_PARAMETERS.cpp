@@ -32,7 +32,7 @@ Active_Size() const
     int n=0;
     for(int s=1;
     s<=list.m;
-    s++) for(int c=1;c<=list(s)->Size();c++) if(list(s)->Control_Active(c)) n++;
+    s++) for(int c=0;c<list(s)->Size();c++) if(list(s)->Control_Active(c)) n++;
     return n;
 }
 template<class T> int FACE_CONTROL_PARAMETERS<T>::
@@ -41,14 +41,14 @@ Active_Kinematic_Size() const
     int n=0;
     for(int s=1;
     s<=list.m;
-    s++) for(int c=1;c<=list(s)->Size();c++) if(list(s)->Control_Active(c)&&list(s)->Positions_Determined_Kinematically(c)) n++;
+    s++) for(int c=0;c<list(s)->Size();c++) if(list(s)->Control_Active(c)&&list(s)->Positions_Determined_Kinematically(c)) n++;
     return n;
 }
 template<class T> int FACE_CONTROL_PARAMETERS<T>::
 Active_Nonkinematic_Size() const
 {
     int n=0;
-    for(int s=0;s<list.m;s++) for(int c=1;c<=list(s)->Size();c++) if(list(s)->Control_Active(c)&&!list(s)->Positions_Determined_Kinematically(c)) n++;
+    for(int s=0;s<list.m;s++) for(int c=0;c<list(s)->Size();c++) if(list(s)->Control_Active(c)&&!list(s)->Positions_Determined_Kinematically(c)) n++;
     return n;
 }
 template<class T> void FACE_CONTROL_PARAMETERS<T>::

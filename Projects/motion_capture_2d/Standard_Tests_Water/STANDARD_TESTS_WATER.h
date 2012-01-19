@@ -656,7 +656,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         // binding the deformable particles to the rigid bodies
         ARRAY<int> particle_array;volume->mesh.elements.Flattened().Get_Unique(particle_array);
         for(int p=0;p<solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size();p++) tests.Bind_Unbound_Particles_In_Rigid_Body(solid_body_collection.rigid_body_collection.Rigid_Body(p),particle_array);
-        for(int i=1;i<=volume->Get_Boundary_Object().mesh.elements.m;i++){int j,k;volume->Get_Boundary_Object().mesh.elements(i).Get(j,k);
+        for(int i=0;i<volume->Get_Boundary_Object().mesh.elements.m;i++){int j,k;volume->Get_Boundary_Object().mesh.elements(i).Get(j,k);
             if(particles.X(j).y<=6.8&&particles.X(k).y<=6.8) LOG::cout<<"M_DEBUG Found elem "<<i<<" with positions "<<particles.X(j)<<" and "<<particles.X(k)<<" and indices "<<j<<" and "<<k<<std::endl;}
         LOG::cout<<"M_DEBUG volume number "<<volume->Get_Boundary_Object().mesh.elements.m<<std::endl;
 

@@ -202,7 +202,7 @@ void Intersections_Using_Hierarchy_And_Edges_Helper(RIGID_BODY<VECTOR<T,3> >& bo
                        Transform_From_Body1_To_Body2_Coordinates<TV>(body1.simplicial_object->particles.X(node1),rotation,translation),value,contour_value)){
                     particle_intersections.Append(RIGID_BODY_PARTICLE_INTERSECTION<TV>(body1.simplicial_object->particles.X(node1),node1,id1,id2));
                     if(exit_early) return;
-                    for(int j=1;j<=(*mesh.segment_mesh->incident_elements)(node1).m;j++) // mark incident edges as checked
+                    for(int j=0;j<(*mesh.segment_mesh->incident_elements)(node1).m;j++) // mark incident edges as checked
                         segment_checked((*mesh.segment_mesh->incident_elements)(node1)(j))=true;}
                 else phi_value(node1)=value;}
             int node2=mesh.segment_mesh->elements(edge)(2);
@@ -211,7 +211,7 @@ void Intersections_Using_Hierarchy_And_Edges_Helper(RIGID_BODY<VECTOR<T,3> >& bo
                        Transform_From_Body1_To_Body2_Coordinates<TV>(body1.simplicial_object->particles.X(node2),rotation,translation),value,contour_value)){
                     particle_intersections.Append(RIGID_BODY_PARTICLE_INTERSECTION<TV>(body1.simplicial_object->particles.X(node2),node2,id1,id2));
                     if(exit_early) return;
-                    for(int j=1;j<=(*mesh.segment_mesh->incident_elements)(node2).m;j++) // mark incident edges as checked
+                    for(int j=0;j<(*mesh.segment_mesh->incident_elements)(node2).m;j++) // mark incident edges as checked
                         segment_checked((*mesh.segment_mesh->incident_elements)(node2)(j))=true;}
                 else phi_value(node2)=value;}
             if(collidable && !((*collidable)(node1) && (*collidable)(node2))) {checked(node1)=true;checked(node2)=true;segment_checked(edge)=true;continue;}

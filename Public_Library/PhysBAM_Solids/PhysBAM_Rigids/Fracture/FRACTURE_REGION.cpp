@@ -126,10 +126,10 @@ Intersect_With_Rigid_Body(const FRACTURE_REGION<T>& body,const bool use_particle
                 TV_INT old_index=iterator.index+region_counts(color).min_corner-TV_INT::All_Ones_Vector();
                 if(region_implicit_object->levelset.phi(iterator.index)-particle_intersection_thickness<=0){
                     TV_INT my_cell_index=old_index+fragment_counts.min_corner-TV_INT::All_Ones_Vector();
-                    for(int p=1;p<=particle_partition->partition(my_cell_index).m;p++){
+                    for(int p=0;p<particle_partition->partition(my_cell_index).m;p++){
                         int added_particle=region_triangulated_surface->particles.array_collection->Add_Element();
                         region_triangulated_surface->particles.X(added_particle)=triangulated_surface->particles.X(particle_partition->partition(my_cell_index)(p));}
-                    for(int p=1;p<=body.particle_partition->partition(my_cell_index+offset).m;p++){
+                    for(int p=0;p<body.particle_partition->partition(my_cell_index+offset).m;p++){
                         TV point_to_add=bo2o_RS*body.triangulated_surface->particles.X(body.particle_partition->partition(my_cell_index+offset)(p))+bo2o_T;
                         int added_particle=region_triangulated_surface->particles.array_collection->Add_Element();
                         region_triangulated_surface->particles.X(added_particle)=point_to_add;}}}}

@@ -287,8 +287,8 @@ Create_Geometry()
     last_particle_index=object.particles.array_collection->Size();
     for(int depth=0;depth<minimum_refinement_depth;depth++){
         simplex_list.Remove_All();
-        if(depth<minimum_refinement_depth) for(int i=1;i<=preimage.meshes(depth+1)->elements.m;i++) simplex_list.Append((*preimage.leaf_number(depth+1))(i));
-        else for(int i=1;i<=preimage.meshes(depth+1)->elements.m;i++){
+        if(depth<minimum_refinement_depth) for(int i=0;i<preimage.meshes(depth+1)->elements.m;i++) simplex_list.Append((*preimage.leaf_number(depth+1))(i));
+        else for(int i=0;i<preimage.meshes(depth+1)->elements.m;i++){
             const T_ELEMENT& simplex=preimage.meshes(depth+1)->elements(i);
             if(Refinement_Condition(phis.Subset(simplex),object.particles.X.Subset(simplex))) simplex_list.Append((*preimage.leaf_number(depth+1))(i));}
         preimage.Refine_Simplex_List(simplex_list);
@@ -310,7 +310,7 @@ Create_Geometry()
         // hah hah hah, sucks to be you if you have to debug this!
         level_simplex_cells.Resize(depth+2);
         level_simplex_cells(depth+2).Resize(preimage.meshes(depth+2)->elements.m);
-        for(int i=1;i<=preimage.meshes(depth+1)->elements.m;i++){
+        for(int i=0;i<preimage.meshes(depth+1)->elements.m;i++){
             int child_count=0,child_simplex;
             while(child_count<1<<TV::dimension && (child_simplex=(*preimage.children(depth+1))(i)(++child_count)))
                 level_simplex_cells(depth+2)(child_simplex)=level_simplex_cells(depth+1)(i);}}

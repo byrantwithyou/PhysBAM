@@ -338,7 +338,7 @@ void Initialize_Bodies(const ARRAY<bool>& bone_filter=ARRAY<bool>())
         bool has_all_rigid_bodies=true;
 //         if(!muscles(i)->attachment_point_1 || !((muscles(i)->attachment_point_1))->particle_index) has_all_rigid_bodies=false;
 //         if(!muscles(i)->attachment_point_2 || !((muscles(i)->attachment_point_2))->particle_index) has_all_rigid_bodies=false;
-//         for(int j=1;j<=muscles(i)->via_points.m;j++) if(!muscles(i)->via_points(j)->particle_index) has_all_rigid_bodies=false;
+//         for(int j=0;j<muscles(i)->via_points.m;j++) if(!muscles(i)->via_points(j)->particle_index) has_all_rigid_bodies=false;
         if(has_all_rigid_bodies){
             if(verbose) LOG::cout<<"Adding muscle "<<muscles(i)->name<<" to muscle list"<<std::endl;
             arb->muscle_list->Add_Muscle(muscles(i));}

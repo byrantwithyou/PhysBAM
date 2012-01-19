@@ -45,7 +45,7 @@ int main(int argc,char *argv[])
     big_mesh.Initialize_Boundary_Mesh();
     big_mesh.boundary_mesh->Initialize_Connected_Segments();
     cout<<"Connected boundaries: "<<(*big_mesh.boundary_mesh->connected_segments).m<<" ";
-    for(int i=1;i<=(*big_mesh.boundary_mesh->connected_segments).m;i++)
+    for(int i=0;i<(*big_mesh.boundary_mesh->connected_segments).m;i++)
         cout<<(*big_mesh.boundary_mesh->connected_segments)(i).m<<" ";
     cout<<endl; 
 
@@ -89,7 +89,7 @@ int main(int argc,char *argv[])
     big_mesh.Initialize_Boundary_Mesh();
     big_mesh.boundary_mesh->Initialize_Connected_Segments();
     cout<<"Connected boundaries: "<<(*big_mesh.boundary_mesh->connected_segments).m<<" ";
-    for(int i=1;i<=(*big_mesh.boundary_mesh->connected_segments).m;i++)
+    for(int i=0;i<(*big_mesh.boundary_mesh->connected_segments).m;i++)
         cout<<(*big_mesh.boundary_mesh->connected_segments)(i).m<<" ";
     cout<<endl;
 
@@ -109,7 +109,7 @@ int main(int argc,char *argv[])
     big_mesh.Initialize_Boundary_Mesh();
     big_mesh.boundary_mesh->Initialize_Connected_Segments();
     cout<<"Connected boundaries: "<<(*big_mesh.boundary_mesh->connected_segments).m<<" ";
-    for(int i=1;i<=(*big_mesh.boundary_mesh->connected_segments).m;i++)
+    for(int i=0;i<(*big_mesh.boundary_mesh->connected_segments).m;i++)
         cout<<(*big_mesh.boundary_mesh->connected_segments)(i).m<<" ";
     cout<<endl;
 

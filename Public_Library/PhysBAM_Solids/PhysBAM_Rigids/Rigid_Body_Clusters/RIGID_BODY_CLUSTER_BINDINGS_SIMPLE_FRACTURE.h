@@ -60,7 +60,7 @@ public:
     void Find_Weakest_Links(int root,T min_strain,HASHTABLE<int>& visited,ARRAY<int>& edges)
     {if(!visited.Contains(root)) visited.Insert(root);
     ARRAY<int> next_nodes;
-    for(int i=1;i<=graph->Adjacent_Edges(root).m;i++){
+    for(int i=0;i<graph->Adjacent_Edges(root).m;i++){
         PAIR<int,int> edge=graph->Edges(graph->Adjacent_Edges(root)(i));
         int other_node=edge.x;if(other_node==root) other_node=edge.y;
         if(visited.Contains(other_node)) continue;

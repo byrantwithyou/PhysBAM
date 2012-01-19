@@ -159,7 +159,7 @@ Compute_Position_Based_State(const T dt,const T time)
                 if(!body.Has_Infinite_Inertia() && muscle_list->muscle_attachments_on_rigid_body(body_id).m){
                     TV r_joint=joint_location(i)-body.X();
                     SYMMETRIC_MATRIX<T,3> I_inverse=body.World_Space_Inertia_Tensor_Inverse();
-                    for(int j=1;j<=muscle_list->muscle_attachments_on_rigid_body(body_id).m;j++){
+                    for(int j=0;j<muscle_list->muscle_attachments_on_rigid_body(body_id).m;j++){
                         TRIPLE<int,ATTACHMENT_POINT<TV>*,ATTACHMENT_POINT<TV>*>& muscle_attachments=muscle_list->muscle_attachments_on_rigid_body(body_id)(j);
                         int muscle_index=muscle_attachments.x;
                         // compute 6x1 vector which is the change in linear and angular velocity in response to unit muscle impulse along its line of action

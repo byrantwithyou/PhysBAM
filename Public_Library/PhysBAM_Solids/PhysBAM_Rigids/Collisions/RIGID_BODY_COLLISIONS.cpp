@@ -1171,7 +1171,7 @@ Shock_Propagation_Using_Graph(const T dt,const T time,ARTICULATED_RIGID_BODY<TV>
                                     mpi_rigids->Is_Dynamic_Ghost_Body(rigid_body_collection.Rigid_Body(id_2)))))){
                             if(!use_saved_pairs) saved_contact_pairs_for_level(level).Append_Unique(pairs(i));need_another_level_iteration=true;need_another_iteration=true;}}
                 if(articulated_rigid_body && articulated_rigid_body->use_shock_propagation)
-                    for(int i=0;i<articulated_rigid_body->shock_propagation_level_iterations;i++) for(int j=1;j<=articulated_rigid_body->process_list(level).m;j++){
+                    for(int i=0;i<articulated_rigid_body->shock_propagation_level_iterations;i++) for(int j=0;j<articulated_rigid_body->process_list(level).m;j++){
                         JOINT_ID joint_id=articulated_rigid_body->process_list(level)(j);
                         RIGID_BODY<TV> &parent=*articulated_rigid_body->Parent(joint_id),&child=*articulated_rigid_body->Child(joint_id);
                         bool old_temporarily_static_parent=parent.is_temporarily_static,old_temporarily_static_child=child.is_temporarily_static;
@@ -1193,7 +1193,7 @@ Shock_Propagation_Using_Graph(const T dt,const T time,ARTICULATED_RIGID_BODY<TV>
     if(articulated_rigid_body && !articulated_rigid_body->use_shock_propagation && articulated_rigid_body->do_final_pass){
         articulated_rigid_body->Store_Velocities_And_Momenta();
         for(int i=0;i<articulated_rigid_body->shock_propagation_level_iterations;i++)
-            for(int level=0;level<contact_graph.Number_Of_Levels();level++) for(int j=1;j<=articulated_rigid_body->process_list(level).m;j++)
+            for(int level=0;level<contact_graph.Number_Of_Levels();level++) for(int j=0;j<articulated_rigid_body->process_list(level).m;j++)
                Apply_Prestabilization_To_Joint(dt,time,*articulated_rigid_body,articulated_rigid_body->process_list(level)(j),epsilon_scale);
         articulated_rigid_body->Restore_Velocities_And_Momenta();}
     if(prune_stacks_from_contact) Apply_Stacking_Contact();

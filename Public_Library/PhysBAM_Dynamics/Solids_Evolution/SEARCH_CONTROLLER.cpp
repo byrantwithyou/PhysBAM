@@ -624,7 +624,7 @@ Add_Fluid_Drag(const T dt,const T time,ARRAY<TV> &F,ARRAY<TWIST<TV> > &rigid_F)
             GENERALIZED_VELOCITY<TV> V_with_kinematic_rigid(F_neg,kinematic_rigid_bodies,solid_body_collection);
             for(int i=1;i<=solid_fluid_coupled_evolution->J_rigid_kinematic.m;++i){
                 x_array.Resize(solid_fluid_coupled_evolution->matrix_index_to_cell_index_array(i).Size());
-                for(int j=1;j<=solid_fluid_coupled_evolution->matrix_index_to_cell_index_array(i).Size();j++) x_array(j)=p(solid_fluid_coupled_evolution->matrix_index_to_cell_index_array(i)(j));
+                for(int j=0;j<solid_fluid_coupled_evolution->matrix_index_to_cell_index_array(i).Size();j++) x_array(j)=p(solid_fluid_coupled_evolution->matrix_index_to_cell_index_array(i)(j));
 
                 VECTOR_ND<T> x_array_i;x_array_i.Set_Subvector_View(x_array,interior_regions(i));
                 SOLID_FLUID_SYSTEM<TV,SPARSE_MATRIX_FLAT_NXN<T> >::Add_J_Rigid_Times_Pressure(solid_fluid_coupled_evolution->J_rigid_kinematic(i),x_array_i,V_with_kinematic_rigid);

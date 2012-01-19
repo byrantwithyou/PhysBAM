@@ -150,7 +150,7 @@ void Subsample_Surface()
     FREE_PARTICLES<TV>& free_particles=deformable_body_collection.deformable_geometry.template Find_Structure<FREE_PARTICLES<TV>&>();
 
     // Sprinkle more points on the boundary
-    for(int i=1;i<=subsamples*surface->mesh.elements.m;i++){
+    for(int i=0;i<subsamples*surface->mesh.elements.m;i++){
         int triangle=random_numbers.Get_Uniform_Integer(1,surface->mesh.elements.m);
         VECTOR<T,3> weights;do{weights=random_numbers.Get_Uniform_Vector(TV(),TV(1,1,1));}while(weights.x+weights.y>=1);weights.z=(T)1-weights.x-weights.y;
         int hard_bound_particle=particles.array_collection->Add_Element();

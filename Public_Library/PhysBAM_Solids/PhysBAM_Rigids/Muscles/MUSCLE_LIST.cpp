@@ -17,7 +17,7 @@ Initialize_Muscle_Attachments_On_Rigid_Body()
     for(int i(1);i<=rigid_body_collection.rigid_body_particle.array_collection->Size();i++) muscle_attachments_on_rigid_body(i).Remove_All();
     for(int i=0;i<muscles.m;i++){
         ATTACHMENT_POINT<TV>* attachment_1=muscles(i)->attachment_point_1;
-        for(int j=1;j<=muscles(i)->via_points.m+1;j++){
+        for(int j=0;j<muscles(i)->via_points.m+1;j++){
             ATTACHMENT_POINT<TV>* attachment_2=j>muscles(i)->via_points.m?muscles(i)->attachment_point_2:muscles(i)->via_points(j);
             if(&attachment_1->rigid_body!=&attachment_2->rigid_body){ // store neighboring attachment points that are on different bodies
                 muscle_attachments_on_rigid_body(attachment_1->rigid_body.particle_index).Append(

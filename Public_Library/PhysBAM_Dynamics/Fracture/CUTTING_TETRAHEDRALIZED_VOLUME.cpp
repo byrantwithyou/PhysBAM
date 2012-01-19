@@ -1147,7 +1147,7 @@ Compute_Parents_And_Weights_For_Nodes(const int orig_intersection,const VECTOR<i
     ARRAY<int>& new_parents,ARRAY<T>& parent_weights) const
 {
     ARRAY<int> boundaries;
-    for(int i=1;i<=intersection_registry->simplices_on_intersection(orig_intersection).m;i++){
+    for(int i=0;i<intersection_registry->simplices_on_intersection(orig_intersection).m;i++){
         int simplex=intersection_registry->simplices_on_intersection(orig_intersection)(i);
         if(cutting_simplices->simplices(simplex).type==CUTTING_SIMPLEX<T,3>::GLOBAL_EMBEDDING_FACE)
             boundaries.Append(simplex);}

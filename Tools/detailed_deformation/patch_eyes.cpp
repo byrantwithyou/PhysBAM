@@ -88,11 +88,11 @@ int main(int argc,char *argv[])
     int smallest_i=1;
     
     cout<<"Processing boundary nodes..."<<endl;
-    for(int i=1;i<=(*tri_mesh.boundary_mesh->ordered_loop_nodes)(smallest_i).m;i++){
+    for(int i=0;i<(*tri_mesh.boundary_mesh->ordered_loop_nodes)(smallest_i).m;i++){
         int node=(*tri_mesh.boundary_mesh->ordered_loop_nodes)(smallest_i)(i),t;
         tet_vol.triangulated_surface->Oriented_Surface(tri_particles.X(node),(*tri_surf.vertex_normals)(1,node),0.1,0.1,&t,0);
         triangle_marks(t)=t;
-        for(int j=1;j<=(*tet_vol.triangulated_surface->triangle_mesh.neighbor_triangles)(t).m;j++){
+        for(int j=0;j<(*tet_vol.triangulated_surface->triangle_mesh.neighbor_triangles)(t).m;j++){
             triangle_marks((*tet_vol.triangulated_surface->triangle_mesh.neighbor_triangles)(t)(j))=(*tet_vol.triangulated_surface->triangle_mesh.neighbor_triangles)(t)(j);}}
 
     cout<<"Walking mesh..."<<endl;
@@ -100,7 +100,7 @@ int main(int argc,char *argv[])
     while(queue.m){
         int curr_triangle;queue.Pop(curr_triangle);
         deletion_list.Append(curr_triangle);
-        for(int i=1;i<=(*tet_vol.triangulated_surface->triangle_mesh.adjacent_triangles)(curr_triangle).m;i++){
+        for(int i=0;i<(*tet_vol.triangulated_surface->triangle_mesh.adjacent_triangles)(curr_triangle).m;i++){
             int cand_triangle=(*tet_vol.triangulated_surface->triangle_mesh.adjacent_triangles)(curr_triangle)(i);
             if(!triangle_marks(cand_triangle)&&!deletion_list.Find(cand_triangle))queue.Append_Unique(cand_triangle);}}
     
@@ -131,7 +131,7 @@ int main(int argc,char *argv[])
     
     deletion_list.Clean_Memory();
     cout<<"Processing nodes..."<<endl;
-    for(int i=0;i<nodes.m;i++)for(int j=1;j<=(*tet_vol.triangulated_surface->triangle_mesh.incident_triangles)(nodes(i)).m;j++)
+    for(int i=0;i<nodes.m;i++)for(int j=0;j<(*tet_vol.triangulated_surface->triangle_mesh.incident_triangles)(nodes(i)).m;j++)
         deletion_list.Append((*tet_vol.triangulated_surface->triangle_mesh.incident_triangles)(nodes(i))(j));
     
     cout<<"Deleting..."<<endl;
@@ -175,7 +175,7 @@ int main(int argc,char *argv[])
     int tet_x_min_i=ARRAY<VECTOR_3D<float> >::argcomp(tri_particles.X.array,(*tri_mesh.boundary_mesh->ordered_loop_nodes)(tet_i),compare_vector_min_x<VECTOR_3D<float> >);
     int tet_x_max_i=ARRAY<VECTOR_3D<float> >::argcomp(tri_particles.X.array,(*tri_mesh.boundary_mesh->ordered_loop_nodes)(tet_i),compare_vector_max_x<VECTOR_3D<float> >);
 
-    for(int w=1;w<=(*tri_mesh.boundary_mesh->ordered_loop_nodes).m;w++)
+    for(int w=0;w<(*tri_mesh.boundary_mesh->ordered_loop_nodes).m;w++)
         cout<<"The boundary segment loop("<<w<<") has "<<(*tri_mesh.boundary_mesh->ordered_loop_nodes)(w).m<<" segments..."<<endl;
     
     float curr_pos,next_pos;int i=tri_x_min_i,curr_j=tet_x_min_i;
@@ -216,7 +216,7 @@ int main(int argc,char *argv[])
     cout<<"Re-Initialize tri ordered loops..."<<endl;
     tri_mesh.Initialize_Boundary_Mesh();
     tri_mesh.boundary_mesh->Initialize_Ordered_Loop_Nodes();
-    for(int w=1;w<=(*tri_mesh.boundary_mesh->ordered_loop_nodes).m;w++)
+    for(int w=0;w<(*tri_mesh.boundary_mesh->ordered_loop_nodes).m;w++)
         cout<<"The boundary segment loop("<<w<<") has "<<(*tri_mesh.boundary_mesh->ordered_loop_nodes)(w).m<<" segments..."<<endl;
 
     //Bad stuff below
@@ -267,7 +267,7 @@ int main(int argc,char *argv[])
     cout<<"Re-Initialize tri ordered loops..."<<endl;
     tri_mesh.Initialize_Boundary_Mesh();
     tri_mesh.boundary_mesh->Initialize_Ordered_Loop_Nodes();
-    for(int w=1;w<=(*tri_mesh.boundary_mesh->ordered_loop_nodes).m;w++)
+    for(int w=0;w<(*tri_mesh.boundary_mesh->ordered_loop_nodes).m;w++)
         cout<<"The boundary segment loop("<<w<<") has "<<(*tri_mesh.boundary_mesh->ordered_loop_nodes)(w).m<<" segments..."<<endl;
 
     cout<<endl<<"Writing output mesh..."<<endl;

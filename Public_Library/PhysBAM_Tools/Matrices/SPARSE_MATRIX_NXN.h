@@ -184,7 +184,7 @@ public:
     {assert(x.n==b.n && x.n==n);
     for(int i=0;i<n;i++){
         T rho=0;T diag_entry=0;
-        for(int j=1;j<=A(i)->number_of_active_indices;j++){
+        for(int j=0;j<A(i)->number_of_active_indices;j++){
             int index=A(i)->indices[j];
             if(index==i){diag_entry=A(i)->x[j];continue;}
             rho+=A(i)->x[j]*x(index);}

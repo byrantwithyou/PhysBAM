@@ -43,7 +43,7 @@ draw()
         glPushMatrix();glMultMatrixf(matrix.x);
         if(world.standard_objects(i)==selected_object){glColor4f(1.0f,1.0f,0.7f,0.3f);glEnable(GL_BLEND);glDepthMask(GL_FALSE);}else glColor4f(0.7f,0.7f,0.7f,0.3f);
         glBegin(GL_TRIANGLES);  
-        for(int j=1;j<=object_triangles(i)->mesh.elements.m;j++){
+        for(int j=0;j<object_triangles(i)->mesh.elements.m;j++){
             VECTOR<int,3> nodes=object_triangles(i)->mesh.elements(j);
             TRIANGLE_3D<T> triangle(object_triangles(i)->particles.X(nodes(1)),object_triangles(i)->particles.X(nodes(2)),object_triangles(i)->particles.X(nodes(3)));
             OpenGL_Normal(triangle.Normal());OpenGL_Vertex(triangle.x1);OpenGL_Vertex(triangle.x2);OpenGL_Vertex(triangle.x3);}

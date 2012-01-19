@@ -46,7 +46,7 @@ Compute_Position_Based_State(const T dt,const T time)
             TV location=joint.Location(*Parent(joint.id_number),*Child(joint.id_number));
 
             muscles_crossing_joints(i).Remove_All();
-            for(int j=1;j<=muscle_list->muscle_attachments_on_rigid_body(parent_id).m;j++)
+            for(int j=0;j<muscle_list->muscle_attachments_on_rigid_body(parent_id).m;j++)
                 if(muscle_list->muscle_attachments_on_rigid_body(parent_id)(j).z->rigid_body.particle_index==child_id){
                     TRIPLE<int,ATTACHMENT_POINT<TV>*,ATTACHMENT_POINT<TV>*>& muscle_attachments=muscle_list->muscle_attachments_on_rigid_body(parent_id)(j);
                     TV direction=(muscle_attachments.z->Embedded_Position()-muscle_attachments.y->Embedded_Position()).Normalized();

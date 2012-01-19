@@ -606,7 +606,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             case 3:
                 for(PARTITION_ID r(1);r<=solid_body_collection.deformable_body_collection.mpi_solids->particles_of_partition.Size();r++){
                     ARRAY<int> deletion_list;
-                    for(int i=1;i<=solid_body_collection.deformable_body_collection.mpi_solids->particles_of_partition(r).m;i++){int p=solid_body_collection.deformable_body_collection.mpi_solids->particles_of_partition(r)(i);
+                    for(int i=0;i<solid_body_collection.deformable_body_collection.mpi_solids->particles_of_partition(r).m;i++){int p=solid_body_collection.deformable_body_collection.mpi_solids->particles_of_partition(r)(i);
                         if(solid_body_collection.deformable_body_collection.binding_list.Binding(p)) deletion_list.Append(i);}
                     solid_body_collection.deformable_body_collection.mpi_solids->particles_of_partition(r).Remove_Sorted_Indices(deletion_list);}
                 break;

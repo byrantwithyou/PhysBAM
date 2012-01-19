@@ -96,7 +96,7 @@ void Solve(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,RIGIDS_COLLISION_CAL
                                 if(!use_saved_pairs) rigid_body_collisions.saved_contact_pairs_for_level(level).Append_Unique(pairs(i));
                                 need_another_level_iteration=true;need_another_iteration=true;}}}
                     if(articulated_rigid_body)
-                        for(int i=0;i<articulated_rigid_body->contact_level_iterations;i++) for(int j=1;j<=articulated_rigid_body->process_list(level).m;j++){
+                        for(int i=0;i<articulated_rigid_body->contact_level_iterations;i++) for(int j=0;j<articulated_rigid_body->process_list(level).m;j++){
                             rigid_body_collisions.Apply_Prestabilization_To_Joint(dt,time,*articulated_rigid_body,articulated_rigid_body->process_list(level)(j),epsilon_scale);
                             need_another_level_iteration=need_another_iteration=true;}}}
 

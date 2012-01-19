@@ -30,9 +30,9 @@ Initialize()
     segment_midpoints.Resize(segment_mesh.elements.m);
     index_in_stack.Append(new ARRAY<int>(meshes(1)->elements.m));
     leaf_levels_and_indices.Resize(meshes(1)->elements.m);
-    for(int t=1;t<=meshes(1)->elements.m;t++){leaf_levels_and_indices(t)(1)=1;leaf_levels_and_indices(t)(2)=t;}
+    for(int t=0;t<meshes(1)->elements.m;t++){leaf_levels_and_indices(t)(1)=1;leaf_levels_and_indices(t)(2)=t;}
     leaf_number.Append(new ARRAY<int>(meshes(1)->elements.m));
-    for(int t=1;t<=meshes(1)->elements.m;t++) (*leaf_number(1))(t)=t;
+    for(int t=0;t<meshes(1)->elements.m;t++) (*leaf_number(1))(t)=t;
 }
 //#####################################################################
 // Function Clean_Memory
@@ -370,7 +370,7 @@ Remove_Simplex_List(const ARRAY<int>& triangle_list,ARRAY<HASHTABLE<int,int> >* 
         meshes(level)->Delete_Sorted_Elements(level_triangle_list(level),simplex_map);
         if(level<parent.m) for(int i=0;i<(*parent(level+1)).m;i++) simplex_map.Get((*parent(level+1))(i),(*parent(level+1))(i));
         if(parent(level)) parent(level)->Remove_Sorted_Indices_Lazy(level_triangle_list(level));
-        if(level>1) for(int i=1;i<=children(level-1)->m;i++){for(int j=0;j<4;j++) simplex_map.Get((*children(level-1))(i)(j),(*children(level-1))(i)(j));
+        if(level>1) for(int i=0;i<children(level-1)->m;i++){for(int j=0;j<4;j++) simplex_map.Get((*children(level-1))(i)(j),(*children(level-1))(i)(j));
             (*children(level-1))(i)=(*children(level-1))(i).Sorted().Reversed();}
         children(level)->Remove_Sorted_Indices_Lazy(level_triangle_list(level));
         for(int i=0;i<leaf_levels_and_indices.m;i++) if(leaf_levels_and_indices(i)(1)==level) simplex_map.Get(leaf_levels_and_indices(i)(2),leaf_levels_and_indices(i)(2));

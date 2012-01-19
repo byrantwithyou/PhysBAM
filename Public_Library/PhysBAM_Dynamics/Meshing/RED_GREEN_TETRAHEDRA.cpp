@@ -386,7 +386,7 @@ Delete_Children(const int level,const int tet,ARRAY<int>& deleted_tet_indices,AR
             deleted_edge_indices.Append(children_edges(p)); // delete interior edges
         else if((q==i && (r==jk || r==jl || r==kl)) || (q==j && (r==ki || r==il || r==kl)) || (q==k && (r==ij || r==il || r==jl)) || (q==l && (r==ij || r==jk || r==ki)) || 
             (r==i && (q==jk || q==jl || q==kl)) || (r==j && (q==ki || q==il || q==kl)) || (r==k && (q==ij || q==il || q==jl)) || (r==l && (q==ij || q==jk || q==ki))){ // delete face bisectors
-            for(int s=1;s<=(*meshes(level+1)->incident_elements)(q).m;s++){ // check incident tets for this edge
+            for(int s=0;s<(*meshes(level+1)->incident_elements)(q).m;s++){ // check incident tets for this edge
                 int t=(*meshes(level+1)->incident_elements)(q)(s);
                 if((*parent(level+1))(t)!=tet){ // only look at tets with a different parent (i.e. not children that should be deleted)
                     int a,b,c,d;meshes(level+1)->elements(t).Get(a,b,c,d);
@@ -559,14 +559,14 @@ Coarsen_Complete_Refinements_Of_Subset(TETRAHEDRON_MESH& final_mesh,ARRAY<bool>&
     for(int t=0;t<mesh.elements.m;t++) if(!subset(t)){
         int tet,level;leaf_levels_and_indices(t).Get(level,tet);
         tetrahedron_kept(level)(tet)=false;Unmark_Parents(tetrahedron_kept,level,tet);}
-    if(!allow_red_coarsening) for(int level=meshes.m;level>=2;level--) for(int tet=1;tet<=meshes(level)->elements.m;tet++)
+    if(!allow_red_coarsening) for(int level=meshes.m;level>=2;level--) for(int tet=0;tet<meshes(level)->elements.m;tet++)
         if(tetrahedron_kept(level)(tet) && Red(level,tet)) Unmark_Parents(tetrahedron_kept,level,tet);
     // Prevent turning uncoarsenable nodes into T-junctions
-    if(node_is_uncoarsenable) for(int level=meshes.m;level>=2;level--) for(int tet=1;tet<=meshes(level)->elements.m;tet++)
+    if(node_is_uncoarsenable) for(int level=meshes.m;level>=2;level--) for(int tet=0;tet<meshes(level)->elements.m;tet++)
         if(tetrahedron_kept(level)(tet)) for(int i=0;i<4;i++){int node=meshes(level)->elements(tet)(i);
             if((*node_is_uncoarsenable)(node) && !meshes(level-1)->elements((*parent(level))(tet)).Contains(node)) Unmark_Parents(tetrahedron_kept,level,tet);}
     final_mesh.Clean_Memory();
-    for(int level=0;level<meshes.m;level++) for(int tet=1;tet<=meshes(level)->elements.m;tet++) if(tetrahedron_kept(level)(tet)){
+    for(int level=0;level<meshes.m;level++) for(int tet=0;tet<meshes(level)->elements.m;tet++) if(tetrahedron_kept(level)(tet)){
         Unmark_Children(tetrahedron_kept,level,tet);final_mesh.elements.Append(meshes(level)->elements(tet));}
     final_mesh.number_nodes=mesh.number_nodes;
 
@@ -644,7 +644,7 @@ Remove_Simplex_List(const ARRAY<int>& tetrahedron_list,ARRAY<HASHTABLE<int,int> 
         meshes(level)->Delete_Sorted_Elements(level_tetrahedron_list(level),simplex_map);
         if(level<parent.m) for(int i=0;i<(*parent(level+1)).m;i++) simplex_map.Get((*parent(level+1))(i),(*parent(level+1))(i));
         if(parent(level)) parent(level)->Remove_Sorted_Indices_Lazy(level_tetrahedron_list(level));
-        if(level>1) for(int i=1;i<=children(level-1)->m;i++){for(int j=0;j<4;j++) simplex_map.Get((*children(level-1))(i)(j),(*children(level-1))(i)(j));
+        if(level>1) for(int i=0;i<children(level-1)->m;i++){for(int j=0;j<4;j++) simplex_map.Get((*children(level-1))(i)(j),(*children(level-1))(i)(j));
             // really we just need the zeros at the end...bubble it?
             VECTOR<int,number_of_red_children>& child_list=(*children(level-1))(i);
             for(int i=0;i<number_of_red_children;i++) if(child_list(i)==0) for(int j=i+1;j<=number_of_red_children;j++) if(child_list(j)>0){exchange(child_list(j),child_list(i));break;}}

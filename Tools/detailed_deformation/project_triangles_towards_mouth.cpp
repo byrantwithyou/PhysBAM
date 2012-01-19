@@ -59,7 +59,7 @@ int main(int argc,char *argv[])
     tri_surf.avoid_normal_interpolation_across_sharp_edges=false;
 
 
-    for(int i=1;i<=(*tri_mesh.boundary_mesh->ordered_loop_nodes).m;i++)
+    for(int i=0;i<(*tri_mesh.boundary_mesh->ordered_loop_nodes).m;i++)
         cout<<i<<" "<<(*tri_mesh.boundary_mesh->ordered_loop_nodes)(i).m<<endl;
 
     //int smallest_i=ARRAY<ARRAY<int> >::argcomp(*tri_mesh.boundary_mesh->ordered_loop_nodes,compare_array_min_m<ARRAY<ARRAY<int> > >);

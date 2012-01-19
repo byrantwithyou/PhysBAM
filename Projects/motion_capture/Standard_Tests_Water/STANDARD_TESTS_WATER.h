@@ -656,17 +656,17 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         for(int p=0;p<solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size();p++) tests.Bind_Unbound_Particles_In_Rigid_Body(solid_body_collection.rigid_body_collection.Rigid_Body(p),particle_array);
         
         //for(int i=0;i<soft_bound_surface->mesh.elements.m;i++){int j,k,l;soft_bound_surface->mesh.elements(i).Get(j,k,l);
-        /*for(int i=1;i<=volume->Get_Boundary_Object().mesh.elements.m;i++){int j,k,l;volume->Get_Boundary_Object().mesh.elements(i).Get(j,k,l);
+        /*for(int i=0;i<volume->Get_Boundary_Object().mesh.elements.m;i++){int j,k,l;volume->Get_Boundary_Object().mesh.elements(i).Get(j,k,l);
             if(particles.X(j).y<=14.75&&particles.X(k).y<=14.75&&particles.X(l).y<=14.75&&
                abs(particles.X(j).x)<=1&&abs(particles.X(k).x)<=1&&abs(particles.X(l).x)<=1&&
                abs(particles.X(j).z)<=1&&abs(particles.X(k).z)<=1&&abs(particles.X(l).z)<=1
                ){LOG::cout<<"M_DEBUG Found elem "<<i<<" with positions "<<particles.X(j)<<" and "<<particles.X(k)<<" and "<<particles.X(l)<<" and indices "<<j<<" and "<<k<<" and "<<l<<std::endl;source_elements->Append(i);}}
-        for(int i=1;i<=volume->Get_Boundary_Object().mesh.elements.m;i++){int j,k,l;volume->Get_Boundary_Object().mesh.elements(i).Get(j,k,l);
+        for(int i=0;i<volume->Get_Boundary_Object().mesh.elements.m;i++){int j,k,l;volume->Get_Boundary_Object().mesh.elements(i).Get(j,k,l);
             if(particles.X(j).y>=16&&particles.X(k).y>=16&&particles.X(l).y>=16&&
                abs(particles.X(j).x)<=1&&abs(particles.X(k).x)<=1&&abs(particles.X(l).x)<=1&&
                abs(particles.X(j).z)<=1&&abs(particles.X(k).z)<=1&&abs(particles.X(l).z)<=1
                ){LOG::cout<<"M_DEBUG Found elem "<<i<<" with positions "<<particles.X(j)<<" and "<<particles.X(k)<<" and "<<particles.X(l)<<" and indices "<<j<<" and "<<k<<" and "<<l<<std::endl;source_elements->Append(i);}}*/
-        for(int i=1;i<=volume->Get_Boundary_Object().mesh.elements.m;i++){int j,k,l;volume->Get_Boundary_Object().mesh.elements(i).Get(j,k,l);
+        for(int i=0;i<volume->Get_Boundary_Object().mesh.elements.m;i++){int j,k,l;volume->Get_Boundary_Object().mesh.elements(i).Get(j,k,l);
             source_elements->Append(i);}
 
         //deformable_body_collection.deformable_geometry.Add_Structure(&volume->Get_Boundary_Object());

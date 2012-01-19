@@ -104,10 +104,10 @@ Initialize_Optimization(const bool verbose)
     for(int i=0;i<layers.m;i++) delete layers(i);layers.Resize(1);layers(1)=mesh.boundary_nodes;
     mesh.boundary_nodes=0; // we don't need it hanging off the mesh object any more
     if(verbose) LOG::cout<<"boundary layer has "<<layers(1)->m<<" nodes"<<std::endl;
-    ARRAY<bool,VECTOR<int,1> > marked(1,mesh.number_nodes);for(int i=1;i<=layers(1)->m;i++) marked((*layers(1))(i))=true;
+    ARRAY<bool,VECTOR<int,1> > marked(1,mesh.number_nodes);for(int i=0;i<layers(1)->m;i++) marked((*layers(1))(i))=true;
     for(int l=2;;l++){
         layers.Append(new ARRAY<int>);
-        for(int i=1;i<=layers(l-1)->m;i++){
+        for(int i=0;i<layers(l-1)->m;i++){
             int j=(*layers(l-1))(i);
             for(int k=0;k<(*mesh.incident_elements)(j).m;k++) for(int a=0;a<4;a++){
                 int b=mesh.elements((*mesh.incident_elements)(j)(k))(a);
@@ -190,7 +190,7 @@ Optimize_Interior_Layer(const int layer,const bool reverse)
     directions(5)=TV(-(T).90174918437566,-(T).34565929710323,(T).25955357597988);
     directions(6)=TV((T).21863854196520,-(T).86642677947325,(T).44888954518784);
     directions(7)=TV(-(T).58820534751966,(T).35620151622547,-(T).72604059734147);
-    for(int i=1;i<=layers(layer)->m;i++){int j;if(reverse) j=(*layers(layer))(layers(layer)->m+1-i);else j=(*layers(layer))(i);Search_For_Best_Position(j,directions);}
+    for(int i=0;i<layers(layer)->m;i++){int j;if(reverse) j=(*layers(layer))(layers(layer)->m+1-i);else j=(*layers(layer))(i);Search_For_Best_Position(j,directions);}
 }
 //#####################################################################
 // Function Search_For_Best_Position
@@ -261,7 +261,7 @@ Quality_Of_Worst_Incident_Boundary_Triangle(const int node)
     TETRAHEDRON_MESH& mesh=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>().mesh;
     PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     TRIANGLE_3D<T> triangle;T worst_quality=1;
-    for(int s=1;s<=(*mesh.boundary_mesh->incident_elements)(node).m;s++){
+    for(int s=0;s<(*mesh.boundary_mesh->incident_elements)(node).m;s++){
         int t=(*mesh.boundary_mesh->incident_elements)(node)(s);
         int i,j,k;mesh.boundary_mesh->elements(t).Get(i,j,k);
         triangle.Specify_Three_Points(particles.X(i),particles.X(j),particles.X(k));

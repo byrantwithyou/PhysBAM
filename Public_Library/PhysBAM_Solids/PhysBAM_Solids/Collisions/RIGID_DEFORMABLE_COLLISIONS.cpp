@@ -636,7 +636,7 @@ Process_Contact(const T dt,const T time,ARTICULATED_RIGID_BODY<TV>* articulated_
 
                 // prestabilization
                 if(articulated_rigid_body)
-                    for(int i=0;i<articulated_rigid_body->contact_level_iterations;i++) for(int j=1;j<=articulated_rigid_body->process_list(level).m;j++){
+                    for(int i=0;i<articulated_rigid_body->contact_level_iterations;i++) for(int j=0;j<articulated_rigid_body->process_list(level).m;j++){
                         rigid_body_collisions.Apply_Prestabilization_To_Joint(dt,time,*articulated_rigid_body,articulated_rigid_body->process_list(level)(j),epsilon_scale);
                         need_another_level_iteration=need_another_iteration=true;}
 
@@ -1059,7 +1059,7 @@ template<class TV,class T_BODY> void Compute_Particle_Candidates_Fill_Hash(HASHT
 {
     particle_collision_candidates.Remove_All();
     for(COLLISION_GEOMETRY_ID body(1);body<=collision_bodies.m;body++) if(collision_bodies(body))
-        for(int j=1;j<=collision_body_candidate_nodes(collision_bodies(body)->collision_geometry_id).m;j++){int k=collision_body_candidate_nodes(body)(j);
+        for(int j=0;j<collision_body_candidate_nodes(collision_bodies(body)->collision_geometry_id).m;j++){int k=collision_body_candidate_nodes(body)(j);
             particle_collision_candidates.Get_Or_Insert(k).Append(dynamic_cast<T_BODY*>(collision_bodies(body)));}
 }
 //#####################################################################

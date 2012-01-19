@@ -64,7 +64,7 @@ public:
     {frame_to_video.Remove_All();frame_to_local_frame.Remove_All();video_to_frames.Remove_All();
     for(int i=0;i<videos.m;i++){
         VECTOR<int,2> frames(frame_to_video.m+1,0);
-        for(int frame=1;frame<=videos(i)->Frame_Count();frame++){frame_to_video.Append(i);frame_to_local_frame.Append(frame);}
+        for(int frame=0;frame<videos(i)->Frame_Count();frame++){frame_to_video.Append(i);frame_to_local_frame.Append(frame);}
         frames[2]=frame_to_video.m;video_to_frames.Append(frames);}}
         
     void Initialize_Texture()

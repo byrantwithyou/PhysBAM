@@ -48,7 +48,7 @@ Initialize_Optimization(const bool verbose)
     ARRAY<bool,VECTOR<int,1> > marked(1,triangle_mesh.number_nodes);for(i=1;i<=layers(1)->m;i++) marked((*layers(1))(i))=true;
     for(int l=2;;l++){
         layers.Append(new ARRAY<int>);
-        for(int i=1;i<=layers(l-1)->m;i++){
+        for(int i=0;i<layers(l-1)->m;i++){
             j=(*layers(l-1))(i);
             for(k=0;k<(*triangle_mesh.incident_elements)(j).m;k++) for(int a=0;a<3;a++){
                 int b=triangle_mesh.elements((*triangle_mesh.incident_elements)(j)(k))(a);
@@ -112,7 +112,7 @@ Optimize_Interior_Layer(const int layer,const bool reverse)
     directions(3)=VECTOR<T,2>((T)-.80901699437494742410229341718282,(T).58778525229247312916870595463907);
     directions(4)=VECTOR<T,2>((T)-.80901699437494742410229341718282,(T)-.58778525229247312916870595463907);
     directions(5)=VECTOR<T,2>((T).30901699437494742410229341718282,(T)-.95105651629515357211643933337938);
-    for(int i=1;i<=layers(layer)->m;i++){int j;if(reverse) j=(*layers(layer))(layers(layer)->m+1-i);else j=(*layers(layer))(i);Search_For_Best_Position(j,directions);}
+    for(int i=0;i<layers(layer)->m;i++){int j;if(reverse) j=(*layers(layer))(layers(layer)->m+1-i);else j=(*layers(layer))(i);Search_For_Best_Position(j,directions);}
 }
 //#####################################################################
 // Function Search_For_Best_Position -- Need to modify

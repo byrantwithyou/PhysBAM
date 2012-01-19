@@ -37,7 +37,7 @@ public:
         for(int i=0;i<remove.m;i++) containers_of_top_level_container.Delete_If_Present(remove(i));
         for(int i=0;i<rebuild.m;i++){ID2 id=rebuild(i);
             ARRAY<ID1>& list=containers_of_top_level_container.Get_Or_Insert(id);list.Remove_All();
-            for(int f=1;f<=top_level_containers(id)->containers.m;f++) if(elements_of_container.Contains(top_level_containers(id)->containers(f))) list.Append(top_level_containers(id)->containers(f));}
+            for(int f=0;f<top_level_containers(id)->containers.m;f++) if(elements_of_container.Contains(top_level_containers(id)->containers(f))) list.Append(top_level_containers(id)->containers(f));}
     }
 
     void Print() const

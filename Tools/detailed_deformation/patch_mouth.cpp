@@ -81,7 +81,7 @@ int main(int argc,char *argv[])
     ARRAY<int> triangle_marks(tet_vol.triangulated_surface->triangle_mesh.triangles.m);
     
     cout<<"Processing boundary nodes..."<<endl;
-    for(int i=1;i<=(*tri_mesh.boundary_mesh->ordered_loop_nodes)(smallest_i).m;i++){
+    for(int i=0;i<(*tri_mesh.boundary_mesh->ordered_loop_nodes)(smallest_i).m;i++){
         int node=(*tri_mesh.boundary_mesh->ordered_loop_nodes)(smallest_i)(i),t;
         tet_vol.triangulated_surface->Oriented_Surface(tri_particles.X(node),(*tri_surf.vertex_normals)(1,node),0.001,0.001,&t,0);
         triangle_marks(t)=t;}
@@ -91,7 +91,7 @@ int main(int argc,char *argv[])
     while(queue.m){
         int curr_triangle;queue.Pop(curr_triangle);
         deletion_list.Append(curr_triangle);
-        for(int i=1;i<=(*tet_vol.triangulated_surface->triangle_mesh.adjacent_triangles)(curr_triangle).m;i++){
+        for(int i=0;i<(*tet_vol.triangulated_surface->triangle_mesh.adjacent_triangles)(curr_triangle).m;i++){
             int cand_triangle=(*tet_vol.triangulated_surface->triangle_mesh.adjacent_triangles)(curr_triangle)(i);
             if(!triangle_marks(cand_triangle)&&!deletion_list.Find(cand_triangle))queue.Append_Unique(cand_triangle);}}
     
@@ -119,7 +119,7 @@ int main(int argc,char *argv[])
     nodes.Append_Unique((*tet_vol.triangulated_surface->triangle_mesh.boundary_mesh->connected_segments)(smallest_i)(j,i));
 
     cout<<"Processing nodes..."<<endl;
-    for(int i=0;i<nodes.m;i++)for(int j=1;j<=(*tet_vol.triangulated_surface->triangle_mesh.incident_triangles)(nodes(i)).m;j++)
+    for(int i=0;i<nodes.m;i++)for(int j=0;j<(*tet_vol.triangulated_surface->triangle_mesh.incident_triangles)(nodes(i)).m;j++)
             deletion_list.Append((*tet_vol.triangulated_surface->triangle_mesh.incident_triangles)(nodes(i))(j));
     
     cout<<"Deleting and refreshing..."<<endl;

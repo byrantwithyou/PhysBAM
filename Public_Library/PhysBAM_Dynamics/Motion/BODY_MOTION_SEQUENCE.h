@@ -33,7 +33,7 @@ public:
     for(int i=0;i<this->trajectories.m;i++) for(int j=start_frame;j<=end_frame;j++) this->trajectories(i)(j-start_frame+1)=this->trajectories(i)(j);}
 
     void Rescale(T scaling_factor)
-    {for(int i=0;i<this->trajectories.m;i++){base_position(i).Rescale(scaling_factor);for(int j=1;j<=this->trajectories(i).m;j++) this->trajectories(i)(j).Rescale(scaling_factor);}}
+    {for(int i=0;i<this->trajectories.m;i++){base_position(i).Rescale(scaling_factor);for(int j=0;j<this->trajectories(i).m;j++) this->trajectories(i)(j).Rescale(scaling_factor);}}
 
     FRAME<TV> Inverse_Trans(FRAME<TV>& trans_input)
     {return FRAME<TV>(TV(-1*trans_input.t.x,-1*trans_input.t.y,-1*trans_input.t.z),ROTATION<TV>());}
@@ -42,7 +42,7 @@ public:
     {this->trajectories(bone)(frame+1).length=base_position(bone).length;}
 
     void Update_Trajectories(int bone)
-    {for(int i=1;i<=this->trajectories(bone).counts.x;i++) Update_Trajectories(bone,i-1);
+    {for(int i=0;i<this->trajectories(bone).counts.x;i++) Update_Trajectories(bone,i-1);
     ui_position(bone).targeted_transform=FRAME<TV>();ui_position(bone).targeted_translation=FRAME<TV>();ui_position(bone).targeted_rotation=FRAME<TV>();}
 
     void Update_Trajectories(int bone,int frame)
@@ -68,7 +68,7 @@ public:
     {Update_Base_Transforms(bone,frame,base_position(bone).length-base_position(bone).length/ui_position(bone).length);}
 
     void Update_Base_Transforms(int bone)
-    {for(int i=1;i<=this->trajectories(bone).m;i++) Update_Base_Transforms(bone,i-1);}
+    {for(int i=0;i<this->trajectories(bone).m;i++) Update_Base_Transforms(bone,i-1);}
 
     void Update_Children_Rotation(int bone,int frame,FRAME<TV> &root_trans,FRAME<TV> &transform)
     {base_position(bone).targeted_rotation=FRAME<TV>(root_trans.t,ROTATION<TV>())*transform*Inverse_Trans(root_trans)*base_position(bone).rotation;
@@ -105,13 +105,13 @@ public:
     {this->trajectories(bone)(frame+1).length=base_position(bone).length*ui_position(bone).length;}
     
     void Update_Targeted_Transforms_Bone(int bone)
-    {for(int i=1;i<=this->trajectories(bone).m;i++) Update_Targeted_Transforms(bone,i-1);}
+    {for(int i=0;i<this->trajectories(bone).m;i++) Update_Targeted_Transforms(bone,i-1);}
     
     void Update_Targeted_Transforms_Frame(int frame)
     {for(int i=0;i<this->trajectories.m;i++) Update_Targeted_Transforms(i,frame);}
     
     void Update_Targeted_Transforms()
-    {for(int i=0;i<this->trajectories.m;i++) for(int j=1;j<=this->trajectories(i).m;j++) Update_Targeted_Transforms(i,j-1);}
+    {for(int i=0;i<this->trajectories.m;i++) for(int j=0;j<this->trajectories(i).m;j++) Update_Targeted_Transforms(i,j-1);}
 
     void Propogate_Lengths(int frame)
     {for(int i=0;i<this->trajectories.m;i++){
