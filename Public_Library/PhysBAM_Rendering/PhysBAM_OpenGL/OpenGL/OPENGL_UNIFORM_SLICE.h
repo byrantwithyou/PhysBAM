@@ -76,7 +76,7 @@ public:
     void Toggle_Slice_Axis() PHYSBAM_OVERRIDE
     {
         if(Is_Slice_Mode()) {
-            axis=axis%3+1;
+            axis=(axis+1)%3;
             index=Maximum_Slice_Index_In_Current_Mode()/2+1;
             Update_Clip_Planes();
         }

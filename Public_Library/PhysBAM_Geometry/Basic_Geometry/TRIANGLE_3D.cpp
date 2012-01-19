@@ -266,7 +266,7 @@ Cut_With_Hyperplane_And_Discard_Outside_Simplices(const TRIANGLE_3D<T>& triangle
             single_node_sign=positive_count==1?1:-1;
             // draw positive triangle. has correct positive/negative area based on whether triangle is backwards or not
             for(int i=0;i<3;i++)if(LEVELSET_UTILITIES<T>::Sign(phi_nodes(i))==single_node_sign){
-                VECTOR<VECTOR<T,3>,2> interface_locations;int index=i%3+1;
+                VECTOR<VECTOR<T,3>,2> interface_locations;int index=(i+1)%3;
                 VECTOR<int,2> other_locations;
                 for(int j=0;j<2;j++,index=(index+1)%3){
                     other_locations(j)=index;

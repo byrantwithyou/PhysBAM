@@ -167,7 +167,7 @@ Intersection(const VECTOR<TV,3>& triangle,const VECTOR<TV,2>& segment,bool *is_r
         if(i==4){if(is_robust_input) *is_robust_input=true;return false;}}
     // Case 2 : try combinations of one point on triangle and one point on segment
     for(int segment_i=0;segment_i<2;segment_i++) for(int triangle_i=0;triangle_i<3;triangle_i++){
-        VECTOR<int,2> other_triangle_indices(triangle_i%3+1,(triangle_i%3+1)%3+1);
+        VECTOR<int,2> other_triangle_indices((triangle_i+1)%3,(triangle_i+2)%3);
         int other_segment_i=3-segment_i;
         area1=Signed_Area_Times_Two(VECTOR<TV,3>(segment(segment_i),triangle(triangle_i),segment(other_segment_i)));if(!area1.y){is_robust=false;continue;}
         for(int dummy=0;dummy<2;dummy++){int other_triangle_i=other_triangle_indices(dummy);

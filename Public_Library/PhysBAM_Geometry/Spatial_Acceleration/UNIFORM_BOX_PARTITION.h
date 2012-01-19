@@ -40,7 +40,7 @@ public:
     VECTOR<int,3> dimensions;
     int max_axis=lengths.Dominant_Axis();T max_dimension=((T)3*pow((T)boxes_input.m,(T)one_third));
     dimensions[max_axis]=(int)max_dimension; 
-    int other_axis_1=max_axis%3+1;int other_axis_2=other_axis_1%3+1; // rotate to get other axis indices
+    int other_axis_1=(max_axis+1)%3;int other_axis_2=(other_axis_1+1)%3; // rotate to get other axis indices
     dimensions[other_axis_1]=(int)(max_dimension*T(lengths[other_axis_1])/T(lengths[max_axis]));
     dimensions[other_axis_2]=(int)(max_dimension*T(lengths[other_axis_2])/T(lengths[max_axis]));
     dimensions=clamp_min(dimensions,VECTOR<int,3>(1,1,1));

@@ -48,8 +48,8 @@ Fill_Single_Ghost_Region_Threaded(RANGE<TV_INT>& region,const T_GRID& grid,T_ARR
 {
     if(use_extrapolation_mode && Constant_Extrapolation(side)) BOUNDARY_UNIFORM<T_GRID,T>::Fill_Single_Ghost_Region(grid,u_ghost,side,region);
     else{ // either phi=phi_object for a wall, or no wall
-        int axis_side=(side-1)%2+1;
-        int axis=(side-1)/2+1;
+        int axis_side=side%2;
+        int axis=side/2;
         RANGE<TV_INT> domain_indices=grid.Domain_Indices();
         int inward_sign=axis_side==1?1:-1;T dx=grid.dX[axis],half_dx=(T).5*dx;
         int cell_boundary=Boundary(side,region),face_boundary=cell_boundary+axis_side-1;

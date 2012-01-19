@@ -127,7 +127,7 @@ Average_To_Invalidated_Face(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& face_values
                 T sum=0;int count=0;
                 int side=invalid_indices(k).x; // across cell always visible, neighboring cell visible iff cells can see each other
                 TV_INT face_index=invalid_indices(k).y;
-                int other_side=side%2+1;
+                int other_side=(side+1)%2;
                 if(face_velocities_valid_mask(other_side,arrays_axis,face_index) && cell_neighbors_visible(face_index-TV_INT::Axis_Vector(arrays_axis))(arrays_axis)){
                     face_values_slip(side,arrays_axis,face_index)=face_values_slip(other_side,arrays_axis,face_index);
                 }else{
@@ -167,7 +167,7 @@ Average_To_Invalidated_Face(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& face_values
                 T sum=0;int count=0;
                 int side=invalid_indices(k).x; // across cell always visible, neighboring cell visible iff cells can see each other
                 TV_INT face_index=invalid_indices(k).y;
-                int other_side=side%2+1;
+                int other_side=(side+1)%2;
                 if(face_velocities_valid_mask(other_side,arrays_axis,face_index) && cell_neighbors_visible(face_index-TV_INT::Axis_Vector(arrays_axis))(arrays_axis)){
                     face_values_slip(side,arrays_axis,face_index)=face_values_slip(other_side,arrays_axis,face_index);
                 }else{

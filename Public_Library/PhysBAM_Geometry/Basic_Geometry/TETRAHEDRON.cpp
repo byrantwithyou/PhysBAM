@@ -247,7 +247,7 @@ Negative_Material(const ARRAY<VECTOR<T,3> >& X,const ARRAY<T>& phis,const VECTOR
       case 0: return Signed_Volume(X(indices[0]),X(indices[1]),X(indices[2]),X(indices[3]));
       case 1:
         for(int i=0;i<4;i++)if(local_phi[i]>0){
-            VECTOR<VECTOR<T,3>,3> interface_locations;int index=i%4+1;
+            VECTOR<VECTOR<T,3>,3> interface_locations;int index=(i+1)%4;
             for(int j=0;j<3;j++,index=(index+1)%4)
                 interface_locations[j]=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(X(indices[i]),X(indices[index]),LEVELSET_UTILITIES<T>::Theta(local_phi[i],local_phi[index]));
             if(i%2 == 0) exchange(interface_locations[0],interface_locations[2]);
@@ -267,7 +267,7 @@ Negative_Material(const ARRAY<VECTOR<T,3> >& X,const ARRAY<T>& phis,const VECTOR
             TETRAHEDRON<T>::Signed_Volume(n0,interface_locations[0][0],interface_locations[1][0],interface_locations[0][1]);}
       case 3:
         for(int i=0;i<4;i++)if(local_phi[i]<=0){
-            VECTOR<VECTOR<T,3>,3> interface_locations;int index=i%4+1;
+            VECTOR<VECTOR<T,3>,3> interface_locations;int index=(i+1)%4;
             for(int j=0;j<3;j++,index=(index+1)%4)
                 interface_locations[j]=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(X(indices[i]),X(indices[index]),LEVELSET_UTILITIES<T>::Theta(local_phi[i],local_phi[index]));
             if(i%2 == 0) exchange(interface_locations[0],interface_locations[2]);
@@ -324,7 +324,7 @@ Cut_With_Hyperplane_And_Discard_Outside_Simplices(const TETRAHEDRON<T>& tetrahed
             break;
         case 1: // tet in positive halfspace, three tets in negative
             for(int i=0;i<4;i++)if(phi_nodes[i]>0){
-                VECTOR<VECTOR<T,3>,3> interface_locations;int index=i%4+1;
+                VECTOR<VECTOR<T,3>,3> interface_locations;int index=(i+1)%4;
                 VECTOR<int,3> other_indices;
                 for(int j=0;j<3;j++,index=(index+1)%4){
                     other_indices[j]=index;
@@ -351,7 +351,7 @@ Cut_With_Hyperplane_And_Discard_Outside_Simplices(const TETRAHEDRON<T>& tetrahed
             break;}
         case 3: // tet in negative halfspace, three tets in positive
             for(int i=0;i<4;i++)if(phi_nodes[i]<=0){
-                VECTOR<VECTOR<T,3>,3> interface_locations;int index=i%4+1;
+                VECTOR<VECTOR<T,3>,3> interface_locations;int index=(i+1)%4;
                 VECTOR<int,3> other_indices;
                 for(int j=0;j<3;j++,index=(index+1)%4){
                     other_indices[j]=index;
@@ -382,7 +382,7 @@ Cut_Simplex(ARRAY<VECTOR<T,3> >& X,const VECTOR<int,4>& indices,const VECTOR<VEC
         break;
       case 1: // tet in positive halfspace, three tets in negative
         for(int i=0;i<4;i++)if(phi_nodes[i]>0){
-            VECTOR<int,3> interface_locations;int index=i%4+1;
+            VECTOR<int,3> interface_locations;int index=(i+1)%4;
             VECTOR<int,3> other_indices;
             for(int j=0;j<3;j++,index=(index+1)%4){
                 other_indices[j]=indices[index];
@@ -415,7 +415,7 @@ Cut_Simplex(ARRAY<VECTOR<T,3> >& X,const VECTOR<int,4>& indices,const VECTOR<VEC
         break;
       case 3: // tet in negative halfspace, three tets in positive
         for(int i=0;i<4;i++)if(phi_nodes[i]<=0){
-            VECTOR<int,3> interface_locations;int index=i%4+1;
+            VECTOR<int,3> interface_locations;int index=(i+1)%4;
             VECTOR<int,3> other_indices;
             for(int j=0;j<3;j++,index=(index+1)%4){
                 other_indices[j]=indices[index];

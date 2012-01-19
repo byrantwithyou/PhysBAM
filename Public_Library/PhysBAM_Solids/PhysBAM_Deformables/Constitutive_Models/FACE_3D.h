@@ -81,7 +81,7 @@ public:
     tet_muscles.Resize(n);tet_fibers.Resize(n);tet_densities.Resize(n);tension.Resize(n);tension_derivative.Resize(n);active_tension_unit_activation.Resize(n);
     for(int m=0;m<muscle_tets.m;m++) for(int t=0;t<muscle_tets(m).m;t++){
         tet_muscles(muscle_tets(m)(t)).Append(m);tet_densities(muscle_tets(m)(t)).Append(muscle_densities(m)(t));
-        tet_fibers(muscle_tets(m)(t)).Append(strain_measure.F((muscle_tets(m)(t)-1)%8+1,(muscle_tets(m)(t)-1)/8+1).Transpose_Times(muscle_fibers(m)(t)));
+        tet_fibers(muscle_tets(m)(t)).Append(strain_measure.F(muscle_tets(m)(t)%8,muscle_tets(m)(t)/8).Transpose_Times(muscle_fibers(m)(t)));
         tension(muscle_tets(m)(t)).Append(0);active_tension_unit_activation(muscle_tets(m)(t)).Append(0);tension_derivative(muscle_tets(m)(t)).Append(0);}}
 
     T Tension(const int tet_index,const int tet_muscle_index,const T stretch) const

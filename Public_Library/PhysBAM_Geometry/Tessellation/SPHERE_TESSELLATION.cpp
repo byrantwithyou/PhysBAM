@@ -44,7 +44,7 @@ template<class T> TRIANGULATED_AREA<T>* Generate_Triangles(const SPHERE<VECTOR<T
         for(int j=0;j<i*6;j++){
             T a=(T)pi/3*(j-(T).5*(i-1))/i;
             particles.X(k++)=(T)i*TV(cos(a),sin(a));}
-    for(int i=1;i<7;i++) area->mesh.elements.Append(E(1,i,((i-1)%6+1)));
+    for(int i=1;i<7;i++) area->mesh.elements.Append(E(1,i,i%6));
     for(int i=1,p=1;i<levels;i++){
         int n=i*6;
         int c=p+n-6;
