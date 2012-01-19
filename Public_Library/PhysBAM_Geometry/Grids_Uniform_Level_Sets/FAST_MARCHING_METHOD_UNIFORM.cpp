@@ -250,7 +250,7 @@ Initialize_Interface_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,T
 
     T sqr_epsilon_cell_size=sqr(levelset.small_number*cell_grid.Cell_Size()),sqr_epsilon_face_size[3];
     if(T_GRID::dimension==2){sqr_epsilon_face_size[2]=sqr_epsilon_cell_size;}
-    else if(T_GRID::dimension==3) for(int axis=0;axis<3;axis++) sqr_epsilon_face_size[axis-1]=sqr_epsilon_cell_size/sqr(cell_grid.dX[axis]);
+    else if(T_GRID::dimension==3) for(int axis=0;axis<3;axis++) sqr_epsilon_face_size[axis]=sqr_epsilon_cell_size/sqr(cell_grid.dX[axis]);
     
     T fmm_initialization_iterative_tolerance_absolute=levelset.fmm_initialization_iterative_tolerance*cell_grid.Minimum_Edge_Length();    
  
@@ -288,7 +288,7 @@ Initialize_Interface_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,T
             assert(number_of_axis);
             if(number_of_axis==1) phi_new(index)=value[0];
             else if(number_of_axis==2){T d2=sqr(value[0])+sqr(value[1]);
-                if(d2 > sqr_epsilon_face_size[missing_axis-1]) phi_new(index)=value[0]*value[1]/sqrt(d2);else phi_new(index)=min(value[0],value[1]);}
+                if(d2 > sqr_epsilon_face_size[missing_axis]) phi_new(index)=value[0]*value[1]/sqrt(d2);else phi_new(index)=min(value[0],value[1]);}
             else{PHYSBAM_ASSERT(T_GRID::dimension==3); // 2d should never get to this point
                 T value_xy=value[0]*value[1],value_xz=value[0]*value[2],value_yz=value[1]*value[2],d2=sqr(value_xy)+sqr(value_xz)+sqr(value_yz);
                 if(d2 > sqr_epsilon_cell_size) phi_new(index)=value_xy*value[2]/sqrt(d2);else phi_new(index)=min(value[0],value[1],value[2]);}
@@ -316,7 +316,7 @@ Initialize_Interface_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,T
                 else value[number_of_axis]=min(LEVELSET_UTILITIES<T>::Theta(phi_ghost(index),phi_ghost(high)),LEVELSET_UTILITIES<T>::Theta(phi_ghost(index),phi_ghost(low)))*dx;
                 number_of_axis++;}
             if(number_of_axis==1) phi_new(index)=value[0];
-            else if(number_of_axis==2){T d2=sqr(value[0])+sqr(value[1]);if(d2 > sqr_epsilon_face_size[missing_axis-1]) phi_new(index)=value[0]*value[1]/sqrt(d2);else phi_new(index)=min(value[0],value[1]);}
+            else if(number_of_axis==2){T d2=sqr(value[0])+sqr(value[1]);if(d2 > sqr_epsilon_face_size[missing_axis]) phi_new(index)=value[0]*value[1]/sqrt(d2);else phi_new(index)=min(value[0],value[1]);}
             else{PHYSBAM_ASSERT(T_GRID::dimension==3); // 2d should never get to this point
                 T value_xy=value[0]*value[1],value_xz=value[0]*value[2],value_yz=value[1]*value[2],d2=sqr(value_xy)+sqr(value_xz)+sqr(value_yz);
                 if(d2 > sqr_epsilon_cell_size) phi_new(index)=value_xy*value[2]/sqrt(d2);else phi_new(index)=min(value[0],value[1],value[2]);}

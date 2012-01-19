@@ -87,14 +87,14 @@ Initialize(const ARRAY<TRIANGLE_3D<T> >& elements)
         for(int s=0;s<2;s++){
             if(const ARRAY<int>* list=elements_in_cell.Get_Pointer(it.Key().Cell_Index(s))){
                 for(int i=0;i<list->m;i++){
-                    if(INTERSECTION::Intersects(ray1,elements((*list)(i)),thickness)) closest_element(1)=(*list)(i);
-                    if(INTERSECTION::Intersects(ray2,elements((*list)(i)),thickness)) closest_element(2)=(*list)(i);}}}
+                    if(INTERSECTION::Intersects(ray1,elements((*list)(i)),thickness)) closest_element(0)=(*list)(i);
+                    if(INTERSECTION::Intersects(ray2,elements((*list)(i)),thickness)) closest_element(1)=(*list)(i);}}}
             
-        if(closest_element(1) && !closest_element(2)) closest_element(2)=closest_element(1);
-        else if(closest_element(2) && !closest_element(1)) closest_element(1)=closest_element(2);
-        if(!closest_element(1)) continue;
+        if(closest_element(0) && !closest_element(1)) closest_element(1)=closest_element(0);
+        else if(closest_element(1) && !closest_element(0)) closest_element(0)=closest_element(1);
+        if(!closest_element(0)) continue;
         
-        VECTOR<bool,2> inside(elements(closest_element(1)).Signed_Distance(X)<0,elements(closest_element(2)).Signed_Distance(Y)<0);
+        VECTOR<bool,2> inside(elements(closest_element(0)).Signed_Distance(X)<0,elements(closest_element(1)).Signed_Distance(Y)<0);
         ENTRY e={it.Key(),inside,closest_element};
         faces.Append(e);}
 
@@ -144,16 +144,16 @@ Next_Helper()
     while(1){
         cur++;
         if(cur>faces.m){last=index.index(index.axis)-1;return;}
-        if(faces(cur).inside(2)) break;}
+        if(faces(cur).inside(1)) break;}
     index=faces(cur).face;
     while(1){
         cur++;
-        PHYSBAM_ASSERT(cur<=faces.m && faces(cur).face.axis==index.axis && faces(cur).inside(1));
-        if(!faces(cur).inside(2)) break;}
+        PHYSBAM_ASSERT(cur<faces.m && faces(cur).face.axis==index.axis && faces(cur).inside(0));
+        if(!faces(cur).inside(1)) break;}
     PHYSBAM_ASSERT(index.index.Remove_Index(index.axis)==faces(cur).face.index.Remove_Index(index.axis));
     last=faces(cur).face.index(index.axis);
     
-    if(index.index(index.axis)<1-ghost) index.index(index.axis)=1-ghost;
+    if(index.index(index.axis)<-ghost) index.index(index.axis)=-ghost;
     if(last>grid.counts(index.axis)+ghost) last=grid.counts(index.axis)+ghost;
     if(!face_domain(index.axis).Lazy_Inside(index.index)) Next_Helper();
 }
@@ -191,7 +191,7 @@ Next_Helper()
         if(!faces(cur).inside(2)) break;}
     PHYSBAM_ASSERT(index.Remove_Index(TV::m)==faces(cur).face.index.Remove_Index(TV::m));
     last=faces(cur).face.index(TV::m)-1;
-    if(index(TV::m)<1-ghost) index(TV::m)=1-ghost;
+    if(index(TV::m)<-ghost) index(TV::m)=-ghost;
     if(last>grid.counts(TV::m)+ghost) last=grid.counts(TV::m)+ghost;
     if(!grid.Inside_Domain(index,ghost) || last<index(TV::m)) Next_Helper();
 }

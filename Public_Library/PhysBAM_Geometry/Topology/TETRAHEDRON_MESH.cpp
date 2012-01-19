@@ -92,20 +92,20 @@ Initialize_Octahedron_Mesh(const int m,const int n,const int p)
     number_nodes=m*n*p+(m+1)*(n+1)*(p+1);elements.Exact_Resize(4*(m-1)*n*p+4*m*(n-1)*p+4*m*n*(p-1));
     int t=0,i,j,k;
     for(i=0;i<m;i++)for(j=0;j<n;j++)for(k=0;k<p-1;k++){ // loop over k-oriented edges in inner cube mesh
-        elements(++t).Set(Lattice(i,j,k,m,n,p),Lattice(i,j,k+1,m,n,p),Half_Lattice(i-1,j-1,k,m,n,p),Half_Lattice(i,j-1,k,m,n,p));
-        elements(++t).Set(Lattice(i,j,k,m,n,p),Lattice(i,j,k+1,m,n,p),Half_Lattice(i,j-1,k,m,n,p),Half_Lattice(i,j,k,m,n,p));
-        elements(++t).Set(Lattice(i,j,k,m,n,p),Lattice(i,j,k+1,m,n,p),Half_Lattice(i,j,k,m,n,p),Half_Lattice(i-1,j,k,m,n,p));
-        elements(++t).Set(Lattice(i,j,k,m,n,p),Lattice(i,j,k+1,m,n,p),Half_Lattice(i-1,j,k,m,n,p),Half_Lattice(i-1,j-1,k,m,n,p));}
+        elements(t++).Set(Lattice(i,j,k,m,n,p),Lattice(i,j,k+1,m,n,p),Half_Lattice(i-1,j-1,k,m,n,p),Half_Lattice(i,j-1,k,m,n,p));
+        elements(t++).Set(Lattice(i,j,k,m,n,p),Lattice(i,j,k+1,m,n,p),Half_Lattice(i,j-1,k,m,n,p),Half_Lattice(i,j,k,m,n,p));
+        elements(t++).Set(Lattice(i,j,k,m,n,p),Lattice(i,j,k+1,m,n,p),Half_Lattice(i,j,k,m,n,p),Half_Lattice(i-1,j,k,m,n,p));
+        elements(t++).Set(Lattice(i,j,k,m,n,p),Lattice(i,j,k+1,m,n,p),Half_Lattice(i-1,j,k,m,n,p),Half_Lattice(i-1,j-1,k,m,n,p));}
     for(i=0;i<m;i++)for(j=0;j<n-1;j++)for(k=0;k<p;k++){ // loop over j-oriented edge in inner cube mesh
-        elements(++t).Set(Lattice(i,j,k,m,n,p),Lattice(i,j+1,k,m,n,p),Half_Lattice(i,j,k-1,m,n,p),Half_Lattice(i-1,j,k-1,m,n,p));
-        elements(++t).Set(Lattice(i,j,k,m,n,p),Lattice(i,j+1,k,m,n,p),Half_Lattice(i,j,k,m,n,p),Half_Lattice(i,j,k-1,m,n,p));
-        elements(++t).Set(Lattice(i,j,k,m,n,p),Lattice(i,j+1,k,m,n,p),Half_Lattice(i-1,j,k,m,n,p),Half_Lattice(i,j,k,m,n,p));
-        elements(++t).Set(Lattice(i,j,k,m,n,p),Lattice(i,j+1,k,m,n,p),Half_Lattice(i-1,j,k-1,m,n,p),Half_Lattice(i-1,j,k,m,n,p));}
+        elements(t++).Set(Lattice(i,j,k,m,n,p),Lattice(i,j+1,k,m,n,p),Half_Lattice(i,j,k-1,m,n,p),Half_Lattice(i-1,j,k-1,m,n,p));
+        elements(t++).Set(Lattice(i,j,k,m,n,p),Lattice(i,j+1,k,m,n,p),Half_Lattice(i,j,k,m,n,p),Half_Lattice(i,j,k-1,m,n,p));
+        elements(t++).Set(Lattice(i,j,k,m,n,p),Lattice(i,j+1,k,m,n,p),Half_Lattice(i-1,j,k,m,n,p),Half_Lattice(i,j,k,m,n,p));
+        elements(t++).Set(Lattice(i,j,k,m,n,p),Lattice(i,j+1,k,m,n,p),Half_Lattice(i-1,j,k-1,m,n,p),Half_Lattice(i-1,j,k,m,n,p));}
     for(i=0;i<m-1;i++)for(j=0;j<n;j++)for(k=0;k<p;k++){ // loop over i-oriented edge in inner cube mesh
-        elements(++t).Set(Lattice(i,j,k,m,n,p),Lattice(i+1,j,k,m,n,p),Half_Lattice(i,j-1,k-1,m,n,p),Half_Lattice(i,j,k-1,m,n,p));
-        elements(++t).Set(Lattice(i,j,k,m,n,p),Lattice(i+1,j,k,m,n,p),Half_Lattice(i,j,k-1,m,n,p),Half_Lattice(i,j,k,m,n,p));
-        elements(++t).Set(Lattice(i,j,k,m,n,p),Lattice(i+1,j,k,m,n,p),Half_Lattice(i,j,k,m,n,p),Half_Lattice(i,j-1,k,m,n,p));
-        elements(++t).Set(Lattice(i,j,k,m,n,p),Lattice(i+1,j,k,m,n,p),Half_Lattice(i,j-1,k,m,n,p),Half_Lattice(i,j-1,k-1,m,n,p));}
+        elements(t++).Set(Lattice(i,j,k,m,n,p),Lattice(i+1,j,k,m,n,p),Half_Lattice(i,j-1,k-1,m,n,p),Half_Lattice(i,j,k-1,m,n,p));
+        elements(t++).Set(Lattice(i,j,k,m,n,p),Lattice(i+1,j,k,m,n,p),Half_Lattice(i,j,k-1,m,n,p),Half_Lattice(i,j,k,m,n,p));
+        elements(t++).Set(Lattice(i,j,k,m,n,p),Lattice(i+1,j,k,m,n,p),Half_Lattice(i,j,k,m,n,p),Half_Lattice(i,j-1,k,m,n,p));
+        elements(t++).Set(Lattice(i,j,k,m,n,p),Lattice(i+1,j,k,m,n,p),Half_Lattice(i,j-1,k,m,n,p),Half_Lattice(i,j-1,k-1,m,n,p));}
 }
 //#####################################################################
 // Function Initialize_Cube_Mesh
@@ -116,17 +116,17 @@ Initialize_Cube_Mesh(const int m,const int n,const int p) // 5 tetrahedrons per 
     Clean_Memory();number_nodes=m*n*p;elements.Exact_Resize(5*(m-1)*(n-1)*(p-1));int t=0;
     for(int i=0;i<m-1;i++)for(int j=0;j<n-1;j++)for(int k=0;k<p-1;k++){
         if((i+j+k)%2 == 0){
-            elements(++t).Set(i+m*(j-1)+m*n*(k-1),i+1+m*(j-1)+m*n*(k-1),i+m*j+m*n*(k-1),i+m*(j-1)+m*n*k);
-            elements(++t).Set(i+1+m*(j-1)+m*n*(k-1),i+1+m*(j-1)+m*n*k,i+1+m*j+m*n*k,i+m*(j-1)+m*n*k);
-            elements(++t).Set(i+m*j+m*n*(k-1),i+1+m*j+m*n*(k-1),i+1+m*j+m*n*k,i+1+m*(j-1)+m*n*(k-1));
-            elements(++t).Set(i+m*j+m*n*k,i+1+m*j+m*n*k,i+m*(j-1)+m*n*k,i+m*j+m*n*(k-1));
-            elements(++t).Set(i+1+m*(j-1)+m*n*(k-1),i+m*(j-1)+m*n*k,i+1+m*j+m*n*k,i+m*j+m*n*(k-1));}
+            elements(t++).Set(i+m*(j-1)+m*n*(k-1),i+1+m*(j-1)+m*n*(k-1),i+m*j+m*n*(k-1),i+m*(j-1)+m*n*k);
+            elements(t++).Set(i+1+m*(j-1)+m*n*(k-1),i+1+m*(j-1)+m*n*k,i+1+m*j+m*n*k,i+m*(j-1)+m*n*k);
+            elements(t++).Set(i+m*j+m*n*(k-1),i+1+m*j+m*n*(k-1),i+1+m*j+m*n*k,i+1+m*(j-1)+m*n*(k-1));
+            elements(t++).Set(i+m*j+m*n*k,i+1+m*j+m*n*k,i+m*(j-1)+m*n*k,i+m*j+m*n*(k-1));
+            elements(t++).Set(i+1+m*(j-1)+m*n*(k-1),i+m*(j-1)+m*n*k,i+1+m*j+m*n*k,i+m*j+m*n*(k-1));}
         else{
-            elements(++t).Set(i+m*(j-1)+m*n*(k-1),i+1+m*(j-1)+m*n*(k-1),i+1+m*j+m*n*(k-1),i+1+m*(j-1)+m*n*k);
-            elements(++t).Set(i+m*(j-1)+m*n*(k-1),i+m*j+m*n*(k-1),i+m*j+m*n*k,i+1+m*j+m*n*(k-1));
-            elements(++t).Set(i+m*j+m*n*k,i+1+m*(j-1)+m*n*k,i+m*(j-1)+m*n*k,i+m*(j-1)+m*n*(k-1));
-            elements(++t).Set(i+m*j+m*n*k,i+1+m*j+m*n*k,i+1+m*(j-1)+m*n*k,i+1+m*j+m*n*(k-1));
-            elements(++t).Set(i+m*j+m*n*k,i+m*(j-1)+m*n*(k-1),i+1+m*j+m*n*(k-1),i+1+m*(j-1)+m*n*k);}}
+            elements(t++).Set(i+m*(j-1)+m*n*(k-1),i+1+m*(j-1)+m*n*(k-1),i+1+m*j+m*n*(k-1),i+1+m*(j-1)+m*n*k);
+            elements(t++).Set(i+m*(j-1)+m*n*(k-1),i+m*j+m*n*(k-1),i+m*j+m*n*k,i+1+m*j+m*n*(k-1));
+            elements(t++).Set(i+m*j+m*n*k,i+1+m*(j-1)+m*n*k,i+m*(j-1)+m*n*k,i+m*(j-1)+m*n*(k-1));
+            elements(t++).Set(i+m*j+m*n*k,i+1+m*j+m*n*k,i+1+m*(j-1)+m*n*k,i+1+m*j+m*n*(k-1));
+            elements(t++).Set(i+m*j+m*n*k,i+m*(j-1)+m*n*(k-1),i+1+m*j+m*n*(k-1),i+1+m*(j-1)+m*n*k);}}
 }
 //#####################################################################
 // Function Initialize_Prismatic_Cube_Mesh
@@ -136,12 +136,12 @@ Initialize_Prismatic_Cube_Mesh(const int m,const int n,const int p) // 6 tetrahe
 {
     Clean_Memory();number_nodes=m*n*p;elements.Exact_Resize(6*(m-1)*(n-1)*(p-1));int t=0;
     for(int i=0;i<m-1;i++)for(int j=0;j<n-1;j++)for(int k=0;k<p-1;k++){
-        elements(++t).Set(Lattice(i,j,k,m,n,p),Lattice(i+1,j,k,m,n,p),Lattice(i+1,j+1,k,m,n,p),Lattice(i+1,j+1,k+1,m,n,p));
-        elements(++t).Set(Lattice(i,j,k,m,n,p),Lattice(i+1,j,k,m,n,p),Lattice(i+1,j+1,k+1,m,n,p),Lattice(i+1,j,k+1,m,n,p));
-        elements(++t).Set(Lattice(i,j,k,m,n,p),Lattice(i+1,j,k+1,m,n,p),Lattice(i+1,j+1,k+1,m,n,p),Lattice(i,j,k+1,m,n,p));
-        elements(++t).Set(Lattice(i,j,k,m,n,p),Lattice(i+1,j+1,k+1,m,n,p),Lattice(i,j+1,k+1,m,n,p),Lattice(i,j,k+1,m,n,p));
-        elements(++t).Set(Lattice(i,j,k,m,n,p),Lattice(i+1,j+1,k+1,m,n,p),Lattice(i,j+1,k,m,n,p),Lattice(i,j+1,k+1,m,n,p));
-        elements(++t).Set(Lattice(i,j,k,m,n,p),Lattice(i+1,j+1,k,m,n,p),Lattice(i,j+1,k,m,n,p),Lattice(i+1,j+1,k+1,m,n,p));}
+        elements(t++).Set(Lattice(i,j,k,m,n,p),Lattice(i+1,j,k,m,n,p),Lattice(i+1,j+1,k,m,n,p),Lattice(i+1,j+1,k+1,m,n,p));
+        elements(t++).Set(Lattice(i,j,k,m,n,p),Lattice(i+1,j,k,m,n,p),Lattice(i+1,j+1,k+1,m,n,p),Lattice(i+1,j,k+1,m,n,p));
+        elements(t++).Set(Lattice(i,j,k,m,n,p),Lattice(i+1,j,k+1,m,n,p),Lattice(i+1,j+1,k+1,m,n,p),Lattice(i,j,k+1,m,n,p));
+        elements(t++).Set(Lattice(i,j,k,m,n,p),Lattice(i+1,j+1,k+1,m,n,p),Lattice(i,j+1,k+1,m,n,p),Lattice(i,j,k+1,m,n,p));
+        elements(t++).Set(Lattice(i,j,k,m,n,p),Lattice(i+1,j+1,k+1,m,n,p),Lattice(i,j+1,k,m,n,p),Lattice(i,j+1,k+1,m,n,p));
+        elements(t++).Set(Lattice(i,j,k,m,n,p),Lattice(i+1,j+1,k,m,n,p),Lattice(i,j+1,k,m,n,p),Lattice(i+1,j+1,k+1,m,n,p));}
 }
 //#####################################################################
 // Function Initialize_Segment_Mesh
@@ -186,7 +186,7 @@ Initialize_Triangle_Mesh()
     triangle_mesh->elements.Exact_Resize(triangle_list.Size());
     int triangle=0;
     for(HASHTABLE_ITERATOR<VECTOR<int,3> > iterator(triangle_list);iterator.Valid();iterator.Next())
-        triangle_mesh->elements(++triangle)=iterator.Key();
+        triangle_mesh->elements(triangle++)=iterator.Key();
     triangle_mesh->number_nodes=number_nodes;
 }
 //#####################################################################
@@ -395,7 +395,7 @@ Initialize_Segment_Mesh_Of_Subset(SEGMENT_MESH& segment_mesh_of_subset,const ARR
         if(k < l) higher_neighbors(k).Append_Unique(l);else higher_neighbors(l).Append_Unique(k);}
     int number_segments=0;for(i=0;i<number_nodes;i++) number_segments+=higher_neighbors(i).m;
     segment_mesh_of_subset.elements.Exact_Resize(number_segments);
-    t=0;for(i=0;i<number_nodes;i++) for(j=0;j<higher_neighbors(i).m;j++) segment_mesh_of_subset.elements(++t).Set(i,higher_neighbors(i)(j));
+    t=0;for(i=0;i<number_nodes;i++) for(j=0;j<higher_neighbors(i).m;j++) segment_mesh_of_subset.elements(t++).Set(i,higher_neighbors(i)(j));
     segment_mesh_of_subset.number_nodes=number_nodes;
 }
 //#####################################################################
@@ -424,10 +424,10 @@ Initialize_Boundary_Mesh_Of_Subset(TRIANGLE_MESH& boundary_mesh_of_subset,const 
                 if(!subset(adjacent_tets_per_face(p)(q))) boundary_face=true;
                 else if(adjacent_tets_per_face(p)(q)<t) lowest_index_tet=false;
             if(boundary_face&&lowest_index_tet) switch(p){
-                case 1:boundary_mesh_of_subset.elements.Append(VECTOR<int,3>(j,k,l));break;
-                case 2:boundary_mesh_of_subset.elements.Append(VECTOR<int,3>(i,l,k));break;
-                case 3:boundary_mesh_of_subset.elements.Append(VECTOR<int,3>(i,j,l));break;
-                case 4:boundary_mesh_of_subset.elements.Append(VECTOR<int,3>(i,k,j));break;}}}
+                case 0:boundary_mesh_of_subset.elements.Append(VECTOR<int,3>(j,k,l));break;
+                case 1:boundary_mesh_of_subset.elements.Append(VECTOR<int,3>(i,l,k));break;
+                case 2:boundary_mesh_of_subset.elements.Append(VECTOR<int,3>(i,j,l));break;
+                case 3:boundary_mesh_of_subset.elements.Append(VECTOR<int,3>(i,k,j));break;}}}
     if(!adjacent_elements_defined){delete adjacent_elements;adjacent_elements=0;}
 }
 //#####################################################################

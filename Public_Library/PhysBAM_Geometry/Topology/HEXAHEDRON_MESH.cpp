@@ -104,8 +104,8 @@ Initialize_Faces()
     for(int h=0;h<elements.m;h++){
         const VECTOR<int,8>& nodes=elements(h);
         for(int f=0;f<6;f++){
-            VECTOR<int,4> face;for(int k=0;k<4;k++) face[k]=nodes(face_indices[f][k-1]);
-            if(quad_list.Set(face.Sorted())) faces->Append(VECTOR<int,4>(nodes(face[1]),nodes(face[2]),nodes(face[3]),nodes(face[4])));}}
+            VECTOR<int,4> face;for(int k=0;k<4;k++) face[k]=nodes(face_indices[f][k]);
+            if(quad_list.Set(face.Sorted())) faces->Append(VECTOR<int,4>(nodes(face[0]),nodes(face[1]),nodes(face[2]),nodes(face[3])));}}
 }
 //#####################################################################
 // Function Initialize_Node_On_Boundary
@@ -116,7 +116,7 @@ Initialize_Node_On_Boundary()
     delete node_on_boundary;node_on_boundary=new ARRAY<bool>(number_nodes);ARRAY<int> p(8);
     bool incident_elements_defined=incident_elements!=0;if(!incident_elements) Initialize_Incident_Elements();
     for(int h=0;h<elements.m;h++){
-        elements(h).Get(p(1),p(2),p(3),p(4),p(5),p(6),p(7),p(8));
+        elements(h).Get(p(0),p(1),p(2),p(3),p(4),p(5),p(6),p(7));
         for(int f=0;f<6;f++)if(Number_Of_Hexahedrons_Across_Face(h,p(face_indices[f][0]),p(face_indices[f][1]),p(face_indices[f][2]),p(face_indices[f][3])) == 0){
             (*node_on_boundary)(p(face_indices[f][0]))=true;(*node_on_boundary)(p(face_indices[f][1]))=true;
             (*node_on_boundary)(p(face_indices[f][2]))=true;(*node_on_boundary)(p(face_indices[f][3]))=true;}}
@@ -131,7 +131,7 @@ Initialize_Boundary_Nodes()
     delete boundary_nodes;boundary_nodes=new ARRAY<int>;ARRAY<int> p(8);
     bool incident_elements_defined=incident_elements!=0;if(!incident_elements) Initialize_Incident_Elements();
     for(int h=0;h<elements.m;h++){
-        elements(h).Get(p(1),p(2),p(3),p(4),p(5),p(6),p(7),p(8));
+        elements(h).Get(p(0),p(1),p(2),p(3),p(4),p(5),p(6),p(7));
         for(int f=0;f<6;f++)if(Number_Of_Hexahedrons_Across_Face(h,p(face_indices[f][0]),p(face_indices[f][1]),p(face_indices[f][2]),p(face_indices[f][3])) == 0){
             boundary_nodes->Append(p(face_indices[f][0]));boundary_nodes->Append(p(face_indices[f][1]));
             boundary_nodes->Append(p(face_indices[f][2]));boundary_nodes->Append(p(face_indices[f][3]));}}
@@ -150,7 +150,7 @@ Number_Of_Hexahedrons_Across_Face(const int hexahedron,const int node1,const int
     int n1=node1,n2=node2,n3=node3,n4=node4;exchange_sort(n1,n2,n3,n4);
     for(int h=0;h<(*incident_elements)(n1).m;h++){
         int hexahedron2=(*incident_elements)(n1)(h);if(hexahedron==hexahedron2) continue; // hexahedron in question
-        elements(hexahedron2).Get(p(1),p(2),p(3),p(4),p(5),p(6),p(7),p(8));
+        elements(hexahedron2).Get(p(0),p(1),p(2),p(3),p(4),p(5),p(6),p(7));
         for(int f=0;f<6;f++){
             int i[4];for(int k=0;k<4;k++)i[k]=p(face_indices[f][k]);exchange_sort(i[0],i[1],i[2],i[3]);
             if(n1==i[0] && n2==i[1] && n3==i[2] && n4==i[3]){count++;break;}}}
@@ -166,7 +166,7 @@ Delete_Hexahedrons_With_Missing_Nodes()
     int number_deleted=0;
     for(int t=0;t<elements.m;t++){
         int i[8];elements(t).Get(i[0],i[1],i[2],i[3],i[4],i[5],i[6],i[7]);
-        if(!(i[0]&&i[1]&&i[2]&&i[3]&&i[4]&&i[5]&&i[6]&&i[7])) deletion_list(++number_deleted)=t;}
+        if(!(i[0]&&i[1]&&i[2]&&i[3]&&i[4]&&i[5]&&i[6]&&i[7])) deletion_list(number_deleted++)=t;}
     deletion_list.Resize(number_deleted);
     Delete_Hexahedrons(deletion_list);
     return number_deleted;
@@ -180,9 +180,9 @@ Delete_Hexahedrons(const ARRAY<int>& deletion_list)
     int last_index=elements.m;
     for(int k=0;k<deletion_list.m;k++){
         int index=deletion_list(k);
-        if(index > last_index) index=elements(index)(1); // hexahedron was moved, reset index to its new location
+        if(index > last_index) index=elements(index)(0); // hexahedron was moved, reset index to its new location
         for(int kk=0;kk<8;kk++) elements(index)(kk)=elements(last_index)(kk);
-        elements(last_index)(1)=index; // remembers where a hexahedron was moved to, in case it needs to be deleted later
+        elements(last_index)(0)=index; // remembers where a hexahedron was moved to, in case it needs to be deleted later
         last_index--;}
     elements.Exact_Resize(last_index);
     Refresh_Auxiliary_Structures();
@@ -212,11 +212,11 @@ Initialize_Face_Hexahedrons()
     bool incident_elements_defined=incident_elements!=0;if(!incident_elements) Initialize_Incident_Elements();
     delete face_hexahedrons;face_hexahedrons=new ARRAY<VECTOR<int,2> >(faces->m);
     for(int f=0;f<faces->m;f++){
-        int node1=(*faces)(f)(1),node2=(*faces)(f)(2),node3=(*faces)(f)(3),node4=(*faces)(f)(4),count=0;exchange_sort(node1,node2,node3,node4);
+        int node1=(*faces)(f)(0),node2=(*faces)(f)(1),node3=(*faces)(f)(2),node4=(*faces)(f)(3),count=0;exchange_sort(node1,node2,node3,node4);
         for(int h=0;h<(*incident_elements)(node1).m;h++){
             for(int hf=0;hf<6;hf++){
-                ARRAY<int> p(4);for(int k=0;k<4;k++)p(k+1)=elements((*incident_elements)(node1)(h))(face_indices[hf][k]);exchange_sort(p(1),p(2),p(3),p(4));
-                if(node1==p(1) && node2==p(2) && node3==p(3) && node4==p(4)){(*face_hexahedrons)(f)(++count)=(*incident_elements)(node1)(h);break;}}
+                ARRAY<int> p(3);for(int k=0;k<4;k++)p(k+1)=elements((*incident_elements)(node1)(h))(face_indices[hf][k]);exchange_sort(p(0),p(1),p(2),p(3));
+                if(node1==p(0) && node2==p(1) && node3==p(2) && node4==p(3)){(*face_hexahedrons)(f)(count++)=(*incident_elements)(node1)(h);break;}}
             if(count>1) break;}}
     if(!incident_elements_defined){delete incident_elements;incident_elements=0;}
 }
@@ -226,7 +226,7 @@ Initialize_Face_Hexahedrons()
 void HEXAHEDRON_MESH::
 Add_Dependencies(SEGMENT_MESH& dependency_mesh) const
 {
-    for(int t=0;t<elements.m;t++) for(int i=0;i<7;i++) for(int j=i+1;j<=8;j++) dependency_mesh.Add_Element_If_Not_Already_There(VECTOR<int,2>(elements(t)[i],elements(t)[j]));
+    for(int t=0;t<elements.m;t++) for(int i=0;i<7;i++) for(int j=i+1;j<8;j++) dependency_mesh.Add_Element_If_Not_Already_There(VECTOR<int,2>(elements(t)[i],elements(t)[j]));
 }
 //#####################################################################
 // Function Set_Number_Nodes

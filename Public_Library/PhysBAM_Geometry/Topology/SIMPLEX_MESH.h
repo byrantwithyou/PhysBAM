@@ -65,7 +65,7 @@ public:
 
     static int Other_Node(const VECTOR<int,d+1>& simplex_nodes,const VECTOR<int,d>& subsimplex_nodes)
     {for(int i=0;i<d;i++) if(!subsimplex_nodes.Contains(simplex_nodes[i])) return simplex_nodes[i];
-    assert(!subsimplex_nodes.Contains(simplex_nodes[d+1]));return simplex_nodes[d+1];}
+    assert(!subsimplex_nodes.Contains(simplex_nodes[d]));return simplex_nodes[d];}
 
     template<class T> static VECTOR<T,d> Node_Weights(const VECTOR<int,d+1>& simplex_nodes,const int node)
     {VECTOR<T,d> weights;int i=simplex_nodes.Find(node);assert(i);if(i<=d) weights(i)=(T)1;return weights;}

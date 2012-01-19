@@ -45,7 +45,7 @@ Fill_Level(const GRID<TV>& grid,const T_LEVELSET& phi,int ghost,MAPPING& m,ARRAY
         else if(p<=(distance+(T)1e-4)*grid.dX.Max()) m.node_to_index(it.index)=m.index_to_node.Append(it.index);}
 
     // Ensure that two upwind nodes are being solved for.
-    for(int i=2;i<=m.index_to_node.m;i++){
+    for(int i=1;i<m.index_to_node.m;i++){
         TV N=phi.Normal(grid.X(m.index_to_node(i)));
         normal.Append(N);
         for(int d=0;d<TV::m;d++){
@@ -55,7 +55,7 @@ Fill_Level(const GRID<TV>& grid,const T_LEVELSET& phi,int ghost,MAPPING& m,ARRAY
                 ind(d)+=s;
                 int& k=m.node_to_index(ind);
                 if(!k) k=m.index_to_node.Append(ind);}}}
-    m.max_solve_index(1)=m.index_to_node.m;
+    m.max_solve_index(0)=m.index_to_node.m;
 
     // Register additional cells inside for derivatives.
     for(int o=0,i=0;o<order*2;o++){
@@ -75,7 +75,7 @@ Fill_Level(const GRID<TV>& grid,const T_LEVELSET& phi,int ghost,MAPPING& m,ARRAY
 
     // Register sentinal layer and precompute stencils.
     stencil.Resize(m.max_solve_index(order));
-    for(int i=2;i<=m.max_solve_index(order);i++){
+    for(int i=1;i<m.max_solve_index(order);i++){
         TV N=normal(i);
         for(int d=0;d<TV::m;d++){
             int s=N(d)<0?1:-1;
@@ -88,7 +88,7 @@ Fill_Level(const GRID<TV>& grid,const T_LEVELSET& phi,int ghost,MAPPING& m,ARRAY
             ind(d)-=4*s;
             int& n=m.node_to_index(ind);
             if(!n) n=1;
-            st.nodes(1)=n;}}
+            st.nodes(0)=n;}}
 }
 //#####################################################################
 // Function Fill_un
@@ -111,16 +111,16 @@ Fill_un(const MAPPING& m,const TV& one_over_dx,const ARRAY<TV>& normal,const ARR
 template<class TV,class T2> void EXTRAPOLATION_HIGHER_ORDER<TV,T2>::
 Extrapolate_FE(const MAPPING& m,const ARRAY<VECTOR<STENCIL,TV::m> >& stencil,const ARRAY<T2>& u,ARRAY<T2>& y,const ARRAY<T2>* z,int o,T dt,T alpha)
 {
-    for(int i=2;i<=m.max_solve_index(o);i++){
+    for(int i=1;i<m.max_solve_index(o);i++){
         T2 dot=0,zi=z?(*z)(i):0,a=0;
         for(int d=0;d<TV::m;d++){
             // Second order ENO.
             const STENCIL& s=stencil(i)(d);
-            VECTOR<T2,4> f(u(s.nodes(1)),u(s.nodes(2)),u(s.nodes(3)),u(s.nodes(4)));
-            VECTOR<T2,3> df(f(2)-f(1),f(3)-f(2),f(4)-f(3));
-            VECTOR<T2,2> ddf(df(2)-df(1),df(3)-df(2));
-            if(abs(ddf(1))<abs(ddf(2))) a=(T).5*(f(3)-f(1));
-            else a=df(2)-(T).5*ddf(2);
+            VECTOR<T2,4> f(u(s.nodes(0)),u(s.nodes(1)),u(s.nodes(2)),u(s.nodes(3)));
+            VECTOR<T2,3> df(f(1)-f(0),f(2)-f(1),f(3)-f(2));
+            VECTOR<T2,2> ddf(df(1)-df(0),df(2)-df(1));
+            if(abs(ddf(0))<abs(ddf(1))) a=(T).5*(f(2)-f(0));
+            else a=df(1)-(T).5*ddf(1);
             dot+=a*s.scale;}
         y(i)+=alpha*(u(i)-y(i)-dt*(dot-zi));}
 }
@@ -151,12 +151,12 @@ Extrapolate_Node(const GRID<TV>& grid,const T_LEVELSET& phi,int ghost,ARRAYS_ND_
     ARRAY<T2> du[3];
     du[0].Resize(m.max_solve_index(2*order+1));
     ARRAY<T2> tmp(m.max_solve_index(2*order+1));
-    for(int i=m.max_solve_index(1)+1;i<=m.max_solve_index(2*order+1);i++) du[0](i)=u(m.index_to_node(i));
+    for(int i=m.max_solve_index(0)+1;i<=m.max_solve_index(2*order+1);i++) du[0](i)=u(m.index_to_node(i));
     for(int o=1;o<order;o++) Fill_un(m,grid.one_over_dX,normal,du[o-1],du[o],o,order);
-    for(int i=0;i<order;i++) du[i](1)=FLT_MAX/100; // Sentinal values for ENO.
-    tmp(1)=FLT_MAX/100;
+    for(int i=0;i<order;i++) du[i](0)=FLT_MAX/100; // Sentinal values for ENO.
+    tmp(0)=FLT_MAX/100;
     for(int o=order;o>0;o--) for(int i=0;i<iterations;i++) Extrapolate_RK2(m,stencil,du[o-1],(o!=order?&du[o]:0),tmp,o,dt);
-    for(int i=2;i<=m.max_solve_index(1);i++) u(m.index_to_node(i))=du[0](i);
+    for(int i=1;i<m.max_solve_index(0);i++) u(m.index_to_node(i))=du[0](i);
 }
 //#####################################################################
 // Function Quadratic_Extrapolate

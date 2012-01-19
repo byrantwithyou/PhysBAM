@@ -63,7 +63,7 @@ Principal_Curvatures(const TV& X) const
     TV N=grad_phi;T grad_phi_magnitude=N.Normalize();
     SYMMETRIC_MATRIX<T,3> P=(T)1-SYMMETRIC_MATRIX<T,3>::Outer_Product(N),M=SYMMETRIC_MATRIX<T,3>::Conjugate(P,Hessian(X))/grad_phi_magnitude;
     T trace=M.Trace();
-    QUADRATIC<T> quadratic(-1,trace,sqr(M(2,1))-M(1,1)*M(2,2)+sqr(M(3,1))-M(1,1)*M(3,3)+sqr(M(3,2))-M(2,2)*M(3,3));
+    QUADRATIC<T> quadratic(-1,trace,sqr(M(1,1))-M(0,1)*M(1,2)+sqr(M(2,1))-M(0,1)*M(2,3)+sqr(M(2,2))-M(1,2)*M(2,3));
     quadratic.Compute_Roots();
     if(quadratic.roots == 0) (T).5*VECTOR<T,2>(trace,trace);
     else if(quadratic.roots == 1) return VECTOR<T,2>(quadratic.root1,quadratic.root1);
@@ -185,7 +185,7 @@ Fast_Marching_Method(ARRAY<bool,VECTOR<int,3> >& seed_indices,const T time,const
 template<class T_GRID> void LEVELSET_3D<T_GRID>::
 Get_Signed_Distance_Using_FMM(ARRAY<T,TV_INT>& signed_distance,const T time,const T stopping_distance,const ARRAY<VECTOR<int,3> >* seed_indices,const bool add_seed_indices_for_ghost_cells)
 {
-    const int ghost_cells=max(2*number_of_ghost_cells+1,1-phi.Domain_Indices().Minimum_Corner()(1));
+    const int ghost_cells=max(2*number_of_ghost_cells+1,1-phi.Domain_Indices().Minimum_Corner()(0));
     ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(ghost_cells),false);boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
     FAST_MARCHING_METHOD_UNIFORM<T_GRID > fmm(*this,ghost_cells,thread_queue);
     fmm.Fast_Marching_Method(phi_ghost,stopping_distance,seed_indices,add_seed_indices_for_ghost_cells);
@@ -198,7 +198,7 @@ Get_Signed_Distance_Using_FMM(ARRAY<T,TV_INT>& signed_distance,const T time,cons
 template<class T_GRID> void LEVELSET_3D<T_GRID>::
 Get_Signed_Distance_Using_FMM(ARRAY<T,TV_INT>& signed_distance,ARRAY<bool,VECTOR<int,3> >& seed_indices,const T time,const T stopping_distance,const bool add_seed_indices_for_ghost_cells)
 {
-    const int ghost_cells=max(2*number_of_ghost_cells+1,1-phi.Domain_Indices().Minimum_Corner()(1));
+    const int ghost_cells=max(2*number_of_ghost_cells+1,1-phi.Domain_Indices().Minimum_Corner()(0));
     ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(ghost_cells),false);boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
     FAST_MARCHING_METHOD_UNIFORM<T_GRID > fmm(*this,ghost_cells,thread_queue);
     fmm.Fast_Marching_Method(phi_ghost,seed_indices,stopping_distance,add_seed_indices_for_ghost_cells);
@@ -247,31 +247,31 @@ Calculate_Triangulated_Surface_From_Marching_Tetrahedra(TRIANGULATED_SURFACE<T>&
     ARRAY<VECTOR<int,6>,VECTOR<int,3> > edge(m_start,m_end,n_start,n_end,mn_start,mn_end);
     // create particles
     for(int i=m_start;i<=m_end;i++) for(int j=n_start;j<=n_end;j++) for(int k=mn_start;k<=mn_end;k++){TV_INT index(i,j,k);
-        if(i<m_end) edge(index)(1)=If_Zero_Crossing_Add_Particle_By_Index(triangulated_surface,index,VECTOR<int,3>(i+1,j,k));
-        if(j<n_end) edge(index)(2)=If_Zero_Crossing_Add_Particle_By_Index(triangulated_surface,index,VECTOR<int,3>(i,j+1,k));
-        if(k<mn_end)edge(index)(3)=If_Zero_Crossing_Add_Particle_By_Index(triangulated_surface,index,VECTOR<int,3>(i,j,k+1));
+        if(i<m_end) edge(index)(0)=If_Zero_Crossing_Add_Particle_By_Index(triangulated_surface,index,VECTOR<int,3>(i+1,j,k));
+        if(j<n_end) edge(index)(1)=If_Zero_Crossing_Add_Particle_By_Index(triangulated_surface,index,VECTOR<int,3>(i,j+1,k));
+        if(k<mn_end)edge(index)(2)=If_Zero_Crossing_Add_Particle_By_Index(triangulated_surface,index,VECTOR<int,3>(i,j,k+1));
         if((i+j+k)%2 == 0){
-            if(j<n_end&&k<mn_end)edge(index)(4)=If_Zero_Crossing_Add_Particle_By_Index(triangulated_surface,VECTOR<int,3>(i,j+1,k),VECTOR<int,3>(i,j,k+1));
-            if(i<m_end&&k<mn_end)edge(index)(5)=If_Zero_Crossing_Add_Particle_By_Index(triangulated_surface,VECTOR<int,3>(i+1,j,k),VECTOR<int,3>(i,j,k+1));
-            if(i<m_end&&j<n_end) edge(index)(6)=If_Zero_Crossing_Add_Particle_By_Index(triangulated_surface,VECTOR<int,3>(i,j+1,k),VECTOR<int,3>(i+1,j,k));}
+            if(j<n_end&&k<mn_end)edge(index)(3)=If_Zero_Crossing_Add_Particle_By_Index(triangulated_surface,VECTOR<int,3>(i,j+1,k),VECTOR<int,3>(i,j,k+1));
+            if(i<m_end&&k<mn_end)edge(index)(4)=If_Zero_Crossing_Add_Particle_By_Index(triangulated_surface,VECTOR<int,3>(i+1,j,k),VECTOR<int,3>(i,j,k+1));
+            if(i<m_end&&j<n_end) edge(index)(5)=If_Zero_Crossing_Add_Particle_By_Index(triangulated_surface,VECTOR<int,3>(i,j+1,k),VECTOR<int,3>(i+1,j,k));}
         else{
-            if(j<n_end&&k<mn_end)edge(index)(4)=If_Zero_Crossing_Add_Particle_By_Index(triangulated_surface,index,VECTOR<int,3>(i,j+1,k+1));
-            if(i<m_end&&k<mn_end)edge(index)(5)=If_Zero_Crossing_Add_Particle_By_Index(triangulated_surface,index,VECTOR<int,3>(i+1,j,k+1));
-            if(i<m_end&&j<n_end) edge(index)(6)=If_Zero_Crossing_Add_Particle_By_Index(triangulated_surface,index,VECTOR<int,3>(i+1,j+1,k));}}
+            if(j<n_end&&k<mn_end)edge(index)(3)=If_Zero_Crossing_Add_Particle_By_Index(triangulated_surface,index,VECTOR<int,3>(i,j+1,k+1));
+            if(i<m_end&&k<mn_end)edge(index)(4)=If_Zero_Crossing_Add_Particle_By_Index(triangulated_surface,index,VECTOR<int,3>(i+1,j,k+1));
+            if(i<m_end&&j<n_end) edge(index)(5)=If_Zero_Crossing_Add_Particle_By_Index(triangulated_surface,index,VECTOR<int,3>(i+1,j+1,k));}}
     // calculate triangles
     for(int i=m_start;i<=m_end-1;i++) for(int j=n_start;j<=n_end-1;j++) for(int k=mn_start;k<=mn_end-1;k++)
         if((i+j+k)%2 == 0){
-            Append_Triangles(triangulated_surface,edge(i,j,k)(1),edge(i,j,k)(2),edge(i,j,k)(3),edge(i,j,k)(6),edge(i,j,k)(4),edge(i,j,k)(5),phi(i,j,k)); // bottom left
-            Append_Triangles(triangulated_surface,edge(i,j,k+1)(6),edge(i+1,j,k)(4),edge(i+1,j,k+1)(2),edge(i,j,k)(5),edge(i+1,j,k)(3),edge(i,j,k+1)(1),phi(i+1,j+1,k+1)); // bottom right
-            Append_Triangles(triangulated_surface,edge(i,j+1,k)(1),edge(i+1,j,k)(2),edge(i+1,j+1,k)(3),edge(i,j,k)(6),edge(i+1,j,k)(4),edge(i,j+1,k)(5),phi(i+1,j+1,k)); // top front
-            Append_Triangles(triangulated_surface,edge(i,j+1,k)(3),edge(i,j,k)(4),edge(i,j+1,k)(5),edge(i,j,k+1)(2),edge(i,j,k+1)(6),edge(i,j+1,k+1)(1),phi(i,j+1,k)); // top back
-            Append_Triangles(triangulated_surface,edge(i,j,k)(6),edge(i,j+1,k)(5),edge(i,j,k)(4),edge(i+1,j,k)(4),edge(i,j,k+1)(6),edge(i,j,k)(5),phi(i,j+1,k));} // center
+            Append_Triangles(triangulated_surface,edge(i,j,k)(0),edge(i,j,k)(1),edge(i,j,k)(2),edge(i,j,k)(5),edge(i,j,k)(3),edge(i,j,k)(4),phi(i,j,k)); // bottom left
+            Append_Triangles(triangulated_surface,edge(i,j,k+1)(5),edge(i+1,j,k)(3),edge(i+1,j,k+1)(1),edge(i,j,k)(4),edge(i+1,j,k)(2),edge(i,j,k+1)(0),phi(i+1,j+1,k+1)); // bottom right
+            Append_Triangles(triangulated_surface,edge(i,j+1,k)(0),edge(i+1,j,k)(1),edge(i+1,j+1,k)(2),edge(i,j,k)(5),edge(i+1,j,k)(3),edge(i,j+1,k)(4),phi(i+1,j+1,k)); // top front
+            Append_Triangles(triangulated_surface,edge(i,j+1,k)(2),edge(i,j,k)(3),edge(i,j+1,k)(4),edge(i,j,k+1)(1),edge(i,j,k+1)(5),edge(i,j+1,k+1)(0),phi(i,j+1,k)); // top back
+            Append_Triangles(triangulated_surface,edge(i,j,k)(5),edge(i,j+1,k)(4),edge(i,j,k)(3),edge(i+1,j,k)(3),edge(i,j,k+1)(5),edge(i,j,k)(4),phi(i,j+1,k));} // center
         else{
-            Append_Triangles(triangulated_surface,edge(i,j,k)(6),edge(i+1,j,k)(2),edge(i+1,j,k)(4),edge(i,j,k)(1),edge(i+1,j,k)(3),edge(i,j,k)(5),phi(i+1,j+1,k)); // bottom front
-            Append_Triangles(triangulated_surface,edge(i,j,k)(5),edge(i,j,k)(4),edge(i,j,k)(3),edge(i,j,k+1)(6),edge(i,j,k+1)(2),edge(i,j,k+1)(1),phi(i,j,k)); // bottom back
-            Append_Triangles(triangulated_surface,edge(i,j,k)(6),edge(i,j,k)(2),edge(i,j,k)(4),edge(i,j+1,k)(1),edge(i,j+1,k)(3),edge(i,j+1,k)(5),phi(i,j,k)); // top left
-            Append_Triangles(triangulated_surface,edge(i,j+1,k)(5),edge(i,j+1,k+1)(1),edge(i,j,k+1)(6),edge(i+1,j+1,k)(3),edge(i+1,j,k+1)(2),edge(i+1,j,k)(4),phi(i,j+1,k+1)); // top right
-            Append_Triangles(triangulated_surface,edge(i,j,k)(6),edge(i,j,k)(4),edge(i,j,k)(5),edge(i,j+1,k)(5),edge(i,j,k+1)(6),edge(i+1,j,k)(4),phi(i,j,k));} // center
+            Append_Triangles(triangulated_surface,edge(i,j,k)(5),edge(i+1,j,k)(1),edge(i+1,j,k)(3),edge(i,j,k)(0),edge(i+1,j,k)(2),edge(i,j,k)(4),phi(i+1,j+1,k)); // bottom front
+            Append_Triangles(triangulated_surface,edge(i,j,k)(4),edge(i,j,k)(3),edge(i,j,k)(2),edge(i,j,k+1)(5),edge(i,j,k+1)(1),edge(i,j,k+1)(0),phi(i,j,k)); // bottom back
+            Append_Triangles(triangulated_surface,edge(i,j,k)(5),edge(i,j,k)(1),edge(i,j,k)(3),edge(i,j+1,k)(0),edge(i,j+1,k)(2),edge(i,j+1,k)(4),phi(i,j,k)); // top left
+            Append_Triangles(triangulated_surface,edge(i,j+1,k)(4),edge(i,j+1,k+1)(0),edge(i,j,k+1)(5),edge(i+1,j+1,k)(2),edge(i+1,j,k+1)(1),edge(i+1,j,k)(3),phi(i,j+1,k+1)); // top right
+            Append_Triangles(triangulated_surface,edge(i,j,k)(5),edge(i,j,k)(3),edge(i,j,k)(4),edge(i,j+1,k)(4),edge(i,j,k+1)(5),edge(i+1,j,k)(3),phi(i,j,k));} // center
     triangulated_surface.mesh.number_nodes=triangulated_surface.particles.array_collection->Size();
     triangulated_surface.Remove_Degenerate_Triangles();
 }
@@ -296,34 +296,34 @@ Calculate_Triangulated_Surface_From_Marching_Tetrahedra(const T_GRID& tet_grid,T
     assert(tet_grid.domain.min_corner.x >= grid.domain.min_corner.x && tet_grid.domain.max_corner.x <= grid.domain.max_corner.x && tet_grid.domain.min_corner.y >= grid.domain.min_corner.y && tet_grid.domain.max_corner.y <= grid.domain.max_corner.y && tet_grid.domain.min_corner.z >= grid.domain.min_corner.z &&
                tet_grid.domain.max_corner.z <= grid.domain.max_corner.z);
     triangulated_surface.Clean_Memory();triangulated_surface.mesh.Clean_Memory();triangulated_surface.particles.array_collection->Clean_Memory();
-    ARRAY<VECTOR<int,6>,VECTOR<int,3> > edge(1,tet_grid.counts.x,1,tet_grid.counts.y,1,tet_grid.counts.z);
+    ARRAY<VECTOR<int,6>,VECTOR<int,3> > edge(0,tet_grid.counts.x,1,tet_grid.counts.y,1,tet_grid.counts.z);
     // create particles
     int i;for(i=0;i<tet_grid.counts.x;i++) for(int j=0;j<tet_grid.counts.y;j++) for(int k=0;k<tet_grid.counts.z;k++){
-        edge(i,j,k)(1)=If_Zero_Crossing_Add_Particle(triangulated_surface,tet_grid.X(i,j,k),tet_grid.X(i+1,j,k));
-        edge(i,j,k)(2)=If_Zero_Crossing_Add_Particle(triangulated_surface,tet_grid.X(i,j,k),tet_grid.X(i,j+1,k));
-        edge(i,j,k)(3)=If_Zero_Crossing_Add_Particle(triangulated_surface,tet_grid.X(i,j,k),tet_grid.X(i,j,k+1));
+        edge(i,j,k)(0)=If_Zero_Crossing_Add_Particle(triangulated_surface,tet_grid.X(i,j,k),tet_grid.X(i+1,j,k));
+        edge(i,j,k)(1)=If_Zero_Crossing_Add_Particle(triangulated_surface,tet_grid.X(i,j,k),tet_grid.X(i,j+1,k));
+        edge(i,j,k)(2)=If_Zero_Crossing_Add_Particle(triangulated_surface,tet_grid.X(i,j,k),tet_grid.X(i,j,k+1));
         if((i+j+k)%2 == 0){
-            edge(i,j,k)(4)=If_Zero_Crossing_Add_Particle(triangulated_surface,tet_grid.X(i,j+1,k),tet_grid.X(i,j,k+1));
-            edge(i,j,k)(5)=If_Zero_Crossing_Add_Particle(triangulated_surface,tet_grid.X(i+1,j,k),tet_grid.X(i,j,k+1));
-            edge(i,j,k)(6)=If_Zero_Crossing_Add_Particle(triangulated_surface,tet_grid.X(i,j+1,k),tet_grid.X(i+1,j,k));}
+            edge(i,j,k)(3)=If_Zero_Crossing_Add_Particle(triangulated_surface,tet_grid.X(i,j+1,k),tet_grid.X(i,j,k+1));
+            edge(i,j,k)(4)=If_Zero_Crossing_Add_Particle(triangulated_surface,tet_grid.X(i+1,j,k),tet_grid.X(i,j,k+1));
+            edge(i,j,k)(5)=If_Zero_Crossing_Add_Particle(triangulated_surface,tet_grid.X(i,j+1,k),tet_grid.X(i+1,j,k));}
         else{
-            edge(i,j,k)(4)=If_Zero_Crossing_Add_Particle(triangulated_surface,tet_grid.X(i,j,k),tet_grid.X(i,j+1,k+1));
-            edge(i,j,k)(5)=If_Zero_Crossing_Add_Particle(triangulated_surface,tet_grid.X(i,j,k),tet_grid.X(i+1,j,k+1));
-            edge(i,j,k)(6)=If_Zero_Crossing_Add_Particle(triangulated_surface,tet_grid.X(i,j,k),tet_grid.X(i+1,j+1,k));}}
+            edge(i,j,k)(3)=If_Zero_Crossing_Add_Particle(triangulated_surface,tet_grid.X(i,j,k),tet_grid.X(i,j+1,k+1));
+            edge(i,j,k)(4)=If_Zero_Crossing_Add_Particle(triangulated_surface,tet_grid.X(i,j,k),tet_grid.X(i+1,j,k+1));
+            edge(i,j,k)(5)=If_Zero_Crossing_Add_Particle(triangulated_surface,tet_grid.X(i,j,k),tet_grid.X(i+1,j+1,k));}}
     // calculate triangles
     for(i=1;i<tet_grid.counts.x;i++) for(int j=1;j<tet_grid.counts.y;j++) for(int k=1;k<tet_grid.counts.z;k++)
         if((i+j+k)%2 == 0){
-            Append_Triangles(triangulated_surface,edge(i,j,k)(1),edge(i,j,k)(2),edge(i,j,k)(3),edge(i,j,k)(6),edge(i,j,k)(4),edge(i,j,k)(5),Phi(tet_grid.X(i,j,k))); // bottom left
-            Append_Triangles(triangulated_surface,edge(i,j,k+1)(6),edge(i+1,j,k)(4),edge(i+1,j,k+1)(2),edge(i,j,k)(5),edge(i+1,j,k)(3),edge(i,j,k+1)(1),Phi(tet_grid.X(i+1,j+1,k+1))); // bottom right
-            Append_Triangles(triangulated_surface,edge(i,j+1,k)(1),edge(i+1,j,k)(2),edge(i+1,j+1,k)(3),edge(i,j,k)(6),edge(i+1,j,k)(4),edge(i,j+1,k)(5),Phi(tet_grid.X(i+1,j+1,k))); // top front
-            Append_Triangles(triangulated_surface,edge(i,j+1,k)(3),edge(i,j,k)(4),edge(i,j+1,k)(5),edge(i,j,k+1)(2),edge(i,j,k+1)(6),edge(i,j+1,k+1)(1),Phi(tet_grid.X(i,j+1,k))); // top back
-            Append_Triangles(triangulated_surface,edge(i,j,k)(6),edge(i,j+1,k)(5),edge(i,j,k)(4),edge(i+1,j,k)(4),edge(i,j,k+1)(6),edge(i,j,k)(5),Phi(tet_grid.X(i,j+1,k)));} // center
+            Append_Triangles(triangulated_surface,edge(i,j,k)(0),edge(i,j,k)(1),edge(i,j,k)(2),edge(i,j,k)(5),edge(i,j,k)(3),edge(i,j,k)(4),Phi(tet_grid.X(i,j,k))); // bottom left
+            Append_Triangles(triangulated_surface,edge(i,j,k+1)(5),edge(i+1,j,k)(3),edge(i+1,j,k+1)(1),edge(i,j,k)(4),edge(i+1,j,k)(2),edge(i,j,k+1)(0),Phi(tet_grid.X(i+1,j+1,k+1))); // bottom right
+            Append_Triangles(triangulated_surface,edge(i,j+1,k)(0),edge(i+1,j,k)(1),edge(i+1,j+1,k)(2),edge(i,j,k)(5),edge(i+1,j,k)(3),edge(i,j+1,k)(4),Phi(tet_grid.X(i+1,j+1,k))); // top front
+            Append_Triangles(triangulated_surface,edge(i,j+1,k)(2),edge(i,j,k)(3),edge(i,j+1,k)(4),edge(i,j,k+1)(1),edge(i,j,k+1)(5),edge(i,j+1,k+1)(0),Phi(tet_grid.X(i,j+1,k))); // top back
+            Append_Triangles(triangulated_surface,edge(i,j,k)(5),edge(i,j+1,k)(4),edge(i,j,k)(3),edge(i+1,j,k)(3),edge(i,j,k+1)(5),edge(i,j,k)(4),Phi(tet_grid.X(i,j+1,k)));} // center
         else{
-            Append_Triangles(triangulated_surface,edge(i,j,k)(6),edge(i+1,j,k)(2),edge(i+1,j,k)(4),edge(i,j,k)(1),edge(i+1,j,k)(3),edge(i,j,k)(5),Phi(tet_grid.X(i+1,j+1,k))); // bottom front
-            Append_Triangles(triangulated_surface,edge(i,j,k)(5),edge(i,j,k)(4),edge(i,j,k)(3),edge(i,j,k+1)(6),edge(i,j,k+1)(2),edge(i,j,k+1)(1),Phi(tet_grid.X(i,j,k))); // bottom back
-            Append_Triangles(triangulated_surface,edge(i,j,k)(6),edge(i,j,k)(2),edge(i,j,k)(4),edge(i,j+1,k)(1),edge(i,j+1,k)(3),edge(i,j+1,k)(5),Phi(tet_grid.X(i,j,k))); // top left
-            Append_Triangles(triangulated_surface,edge(i,j+1,k)(5),edge(i,j+1,k+1)(1),edge(i,j,k+1)(6),edge(i+1,j+1,k)(3),edge(i+1,j,k+1)(2),edge(i+1,j,k)(4),Phi(tet_grid.X(i,j+1,k+1))); // top right
-            Append_Triangles(triangulated_surface,edge(i,j,k)(6),edge(i,j,k)(4),edge(i,j,k)(5),edge(i,j+1,k)(5),edge(i,j,k+1)(6),edge(i+1,j,k)(4),Phi(tet_grid.X(i,j,k)));} // center
+            Append_Triangles(triangulated_surface,edge(i,j,k)(5),edge(i+1,j,k)(1),edge(i+1,j,k)(3),edge(i,j,k)(0),edge(i+1,j,k)(2),edge(i,j,k)(4),Phi(tet_grid.X(i+1,j+1,k))); // bottom front
+            Append_Triangles(triangulated_surface,edge(i,j,k)(4),edge(i,j,k)(3),edge(i,j,k)(2),edge(i,j,k+1)(5),edge(i,j,k+1)(1),edge(i,j,k+1)(0),Phi(tet_grid.X(i,j,k))); // bottom back
+            Append_Triangles(triangulated_surface,edge(i,j,k)(5),edge(i,j,k)(1),edge(i,j,k)(3),edge(i,j+1,k)(0),edge(i,j+1,k)(2),edge(i,j+1,k)(4),Phi(tet_grid.X(i,j,k))); // top left
+            Append_Triangles(triangulated_surface,edge(i,j+1,k)(4),edge(i,j+1,k+1)(0),edge(i,j,k+1)(5),edge(i+1,j+1,k)(2),edge(i+1,j,k+1)(1),edge(i+1,j,k)(3),Phi(tet_grid.X(i,j+1,k+1))); // top right
+            Append_Triangles(triangulated_surface,edge(i,j,k)(5),edge(i,j,k)(3),edge(i,j,k)(4),edge(i,j+1,k)(4),edge(i,j,k+1)(5),edge(i+1,j,k)(3),Phi(tet_grid.X(i,j,k)));} // center
     triangulated_surface.mesh.number_nodes=triangulated_surface.particles.array_collection->Size();
     triangulated_surface.Remove_Degenerate_Triangles();
 }

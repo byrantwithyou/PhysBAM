@@ -54,23 +54,23 @@ public:
     {T maximum_edge_length_magnitude_squared=0; 
     for(int i=0;i<GRID<TV>::dimension;i++)for(int j=i+1;j<=GRID<TV>::dimension+1;j++)
         maximum_edge_length_magnitude_squared=max(maximum_edge_length_magnitude_squared,(X(indices[i])-X(indices[j])).Magnitude_Squared());
-    T result=sqr(phis(indices[1]));for(int i=2;i<=GRID<TV>::dimension+1;i++) result=min(result,sqr(phis(indices[i])));
+    T result=sqr(phis(indices[0]));for(int i=2;i<=GRID<TV>::dimension+1;i++) result=min(result,sqr(phis(indices[i])));
     return result<=maximum_edge_length_magnitude_squared;}
 
     static void Refined_Object_Initialization_Helper(ARRAY<VECTOR<int,4> >& tets)
     {// corner tets
-    tets.Append(VECTOR<int,4>(2,6,4,1));
-    tets.Append(VECTOR<int,4>(3,7,1,4));
-    tets.Append(VECTOR<int,4>(5,6,1,7));
-    tets.Append(VECTOR<int,4>(8,6,7,4));
+    tets.Append(VECTOR<int,4>(1,5,3,0));
+    tets.Append(VECTOR<int,4>(2,6,0,3));
+    tets.Append(VECTOR<int,4>(4,5,0,6));
+    tets.Append(VECTOR<int,4>(7,5,6,3));
     // inside tet
-    tets.Append(VECTOR<int,4>(1,7,6,4));}
+    tets.Append(VECTOR<int,4>(0,6,5,3));}
 
     static void Refined_Object_Initialization_Helper(ARRAY<VECTOR<int,3> >& tris)
-    {tris.Append(VECTOR<int,3>(1,2,3));tris.Append(VECTOR<int,3>(2,4,3));}
+    {tris.Append(VECTOR<int,3>(0,1,2));tris.Append(VECTOR<int,3>(1,3,2));}
 
     static void Refined_Object_Initialization_Helper(ARRAY<VECTOR<int,2> >& segments)
-    {segments.Append(VECTOR<int,2>(1,2));}
+    {segments.Append(VECTOR<int,2>(0,1));}
 
     static void Make_List(ARRAY<VECTOR<T,3> >& points,const ARRAY<VECTOR<T,3> ,VECTOR<int,3> >& corners)
     {points.Resize(8);int index=0;for(int k=0;k<2;k++)for(int j=0;j<2;j++)for(int i=0;i<2;i++) points(index++)=corners(i,j,k);}
@@ -83,7 +83,7 @@ public:
 
     static void Refine_Simplex(const IMPLICIT_OBJECT_INTERSECTOR<VECTOR<T,1> >& implicit_object_intersector,ARRAY<VECTOR<int,2> >& segments,
         ARRAY<VECTOR<T,1> >& particle_X,const VECTOR<int,2>& indices)
-    {const int x1=indices[1],x2=indices[2];
+    {const int x1=indices[0],x2=indices[1];
     const VECTOR<T,1> X1=particle_X(x1),X2=particle_X(x2);
     int midpoint=particle_X.Append(implicit_object_intersector.Iterative_Find_Interface(X1,X2));
     segments.Append(VECTOR<int,2>(x1,midpoint));
@@ -91,7 +91,7 @@ public:
 
     static void Refine_Simplex(const IMPLICIT_OBJECT_INTERSECTOR<VECTOR<T,2> >& implicit_object_intersector,ARRAY<VECTOR<int,3> >& tris,
         ARRAY<VECTOR<T,2> >& particle_X,const VECTOR<int,3>& indices)
-    {const int x1=indices[1],x2=indices[2],x3=indices[3];
+    {const int x1=indices[0],x2=indices[1],x3=indices[2];
     const VECTOR<T,2> X1=particle_X(x1),X2=particle_X(x2),X3=particle_X(x3);
     int first_midpoint=particle_X.Append(implicit_object_intersector.Iterative_Find_Interface(X1,X2));
     int second_midpoint=particle_X.Append(implicit_object_intersector.Iterative_Find_Interface(X2,X3));
@@ -103,7 +103,7 @@ public:
 
     static void Refine_Simplex(const IMPLICIT_OBJECT_INTERSECTOR<VECTOR<T,3> >& implicit_object_intersector,ARRAY<VECTOR<int,4> >& tets,
         ARRAY<VECTOR<T,3> >& particle_X,const VECTOR<int,4>& indices)
-    {const int x1=indices[1],x2=indices[2],x3=indices[3],x4=indices[4];
+    {const int x1=indices[0],x2=indices[1],x3=indices[2],x4=indices[3];
     const VECTOR<T,3> X1=particle_X(x1),X2=particle_X(x2),X3=particle_X(x3),X4=particle_X(x4);
     int first_midpoint=particle_X.Append(implicit_object_intersector.Iterative_Find_Interface(X1,X2));
     int second_midpoint=particle_X.Append(implicit_object_intersector.Iterative_Find_Interface(X1,X3));
