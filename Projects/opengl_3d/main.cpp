@@ -163,7 +163,7 @@ Parse_Arguments(PARSE_ARGS &parse_args)
     if(parse_args.Is_Value_Set("-rigid_bodies_no_draw")){ARRAY<int> int_list;
         STRING_UTILITIES::Parse_Integer_List(parse_args.Get_String_Value("-rigid_bodies_no_draw"),int_list);
         rigid_bodies_no_draw_list.Resize(int_list.Size());
-        for(int i=1;i<=rigid_bodies_no_draw_list.m;i++) rigid_bodies_no_draw_list(i)=int(int_list(i));}
+        for(int i=0;i<rigid_bodies_no_draw_list.m;i++) rigid_bodies_no_draw_list(i)=int(int_list(i));}
 
     STRING_UTILITIES::Parse_Integer_List(parse_args.Get_String_Value("-deformable_no_draw"),deformable_no_draw_list);
     for(int i=deformable_no_draw_list.m;i;i--)
@@ -313,7 +313,7 @@ Initialize_Components_And_Key_Bindings()
         rigid_bodies_component->Set_Vector_Size(0.01);
         rigid_bodies_component->Set_Frame(start_frame); // needed before reinitialize so that no draw list will work
         rigid_bodies_component->Reinitialize();
-        for(int i=1;i<=rigid_bodies_no_draw_list.m;i++){
+        for(int i=0;i<rigid_bodies_no_draw_list.m;i++){
             std::cout<<"Rigid bodies: not drawing object "<<rigid_bodies_no_draw_list(i)<<std::endl;
             rigid_bodies_component->Set_Draw_Object(rigid_bodies_no_draw_list(i),false);}
         // Read hints if available

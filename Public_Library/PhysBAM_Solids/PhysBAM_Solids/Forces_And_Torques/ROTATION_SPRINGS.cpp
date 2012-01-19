@@ -32,7 +32,7 @@ Update_Position_Based_State(const T time)
     if(mpi_solids) PHYSBAM_NOT_IMPLEMENTED("MPI support");
 
     states.Remove_All();
-    for(int s=1;s<=mesh.elements.m;s++){
+    for(int s=0;s<mesh.elements.m;s++){
         int parent,child;mesh.elements(s).Get(parent,child);
         const ROTATION<TV> &q_world_parent=rigid_body_collection.rigid_body_particle.rotation(parent),&q_world_child=rigid_body_collection.rigid_body_particle.rotation(child); // q_a_b means rotation from b to a
         const ROTATION<TV> &q_joint_parent=object_to_joint_rotations(s)[1],&q_joint_child=object_to_joint_rotations(s)[2];
@@ -56,7 +56,7 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) con
 {
     if(mpi_solids) PHYSBAM_NOT_IMPLEMENTED("MPI support");
 
-    for(int i=1;i<=states.m;i++){const STATE& state=states(i);
+    for(int i=0;i<states.m;i++){const STATE& state=states(i);
         const VECTOR<int,2>& nodes=mesh.elements(state.edge);
         rigid_F(nodes[1]).angular+=state.torque;
         rigid_F(nodes[2]).angular-=state.torque;}
@@ -69,7 +69,7 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TW
 {
     if(mpi_solids) PHYSBAM_NOT_IMPLEMENTED("MPI support");
 
-    for(int i=1;i<=states.m;i++){const STATE& state=states(i);
+    for(int i=0;i<states.m;i++){const STATE& state=states(i);
         const VECTOR<int,2>& nodes=mesh.elements(state.edge);
         T_SPIN torque=damping(state.edge)*(rigid_V(nodes[2]).angular-rigid_V(nodes[1]).angular);
         rigid_F(nodes[1]).angular+=torque;

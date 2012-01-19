@@ -181,7 +181,7 @@ void Set_Ghost_Density_And_Temperature_Inside_Flame_Core() PHYSBAM_OVERRIDE
         
         for(CELL_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
             T cell_flame_speed_multiplier=0;
-            for(int i=1;i<=2;i++)
+            for(int i=0;i<2;i++)
                 cell_flame_speed_multiplier+=flame_speed_multiplier.Component(i)(iterator.First_Face_Index(i))+flame_speed_multiplier.Component(i)(iterator.Second_Face_Index(i));
             cell_flame_speed_multiplier*=.25;
             if(-phi(iterator.Cell_Index())<0){

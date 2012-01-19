@@ -59,7 +59,7 @@ public:
     bool Segment_Is_Broken(const int node1,const int node2) const
     {if(!Embedded_Particle_On_Segment(node1,node2)) return false;
     ARRAY<int> tetrahedrons_on_edge;simplicial_object.mesh.Tetrahedrons_On_Edge(VECTOR<int,2>(node1,node2),tetrahedrons_on_edge);
-    for(int t=1;t<=tetrahedrons_on_edge.m;t++) if(!Nodes_Are_Separated_In_Simplex(node1,node2,tetrahedrons_on_edge(t))) return false;
+    for(int t=0;t<tetrahedrons_on_edge.m;t++) if(!Nodes_Are_Separated_In_Simplex(node1,node2,tetrahedrons_on_edge(t))) return false;
     return true;}
     
     int Number_Of_Edges_With_Embedded_Particles(const int tetrahedron) const
@@ -69,11 +69,11 @@ public:
     return (ij>0)+(ik>0)+(il>0)+(jk>0)+(jl>0)+(kl>0);}
 
     int Number_Of_Tetrahedra_With_Cuts() const
-    {int count=0;for(int t=1;t<=simplicial_object.mesh.elements.m;t++) if(Number_Of_Embedded_Cuts(t) > 0) count++;
+    {int count=0;for(int t=0;t<simplicial_object.mesh.elements.m;t++) if(Number_Of_Embedded_Cuts(t) > 0) count++;
     return count;}
 
     int Number_Of_Tetrahedra_With_N_Cuts(const int n) const
-    {int count=0;for(int t=1;t<=simplicial_object.mesh.elements.m;t++) if(Number_Of_Embedded_Cuts(t) == n) count++;
+    {int count=0;for(int t=0;t<simplicial_object.mesh.elements.m;t++) if(Number_Of_Embedded_Cuts(t) == n) count++;
     return count;}
 
     T Fraction_Of_Tetrahedra_With_N_Cuts(const int n) const

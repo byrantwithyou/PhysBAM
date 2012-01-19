@@ -129,7 +129,7 @@ int main(int argc, char* argv[])
             subdomain2=BOX_3D<T>(VECTOR<T,3>(parse_args.Get_Vector_3D_Value("-subdomain_2_minimum_corner")),VECTOR<T,3>(parse_args.Get_Vector_3D_Value("-subdomain_2_maximum_corner")));}
         std::cout << "Pruning particles outside " << subdomain << " and " << subdomain2 << std::endl;
         int count=0;
-        for(int i=1;i<=particles_array.m;i++) if(particles_array(i)){
+        for(int i=0;i<particles_array.m;i++) if(particles_array(i)){
             PARTICLE_LEVELSET_REMOVED_PARTICLES<T,VECTOR<T,3> >* particles=particles_array(i);
             for(int p=particles->number;p>=1;p--){if(subdomain.Lazy_Outside(particles->X(p)) && subdomain2.Lazy_Outside(particles->X(p))){count++;particles->Delete_Particle(p);}}
             if(!particles->number){delete particles;particles_array(i)=0;}}
@@ -152,7 +152,7 @@ int main(int argc, char* argv[])
     if(parse_args.Is_Value_Set("-rigid_bodies")){
         rigid_body_list.Read<T>(STRING_UTILITIES::string_sprintf("%s/",input_directory.c_str()),frame,true,false);
         ARRAY<int> id_list;STRING_UTILITIES::Parse_Integer_List(parse_args.Get_String_Value("-rigid_bodies"),id_list);
-        for(int i=1;i<=id_list.m;i++){int id=id_list(i);
+        for(int i=0;i<id_list.m;i++){int id=id_list(i);
             std::cout << "Adding rigid body " << id << " to collision body list" << std::endl;
             rigid_body_list(id)->surface_roughness=minimum_surface_roughness;
             collision_body_list.Add_Body(rigid_body_list(id));}
@@ -162,7 +162,7 @@ int main(int argc, char* argv[])
         deformable_object_list.Read_Static_Variables<T>(prefix);
         deformable_object_list.Read_Dynamic_Variables<T>(prefix,frame);
         ARRAY<int> id_list;STRING_UTILITIES::Parse_Integer_List(parse_args.Get_String_Value("-deformable_objects"),id_list);
-        for(int i=1;i<=id_list.m;i++){int id=id_list(i);
+        for(int i=0;i<id_list.m;i++){int id=id_list(i);
             std::cout << "Adding deformable object " << id << " to collision body list" << std::endl;
             deformable_object_list(id).Initialize_Collision_Geometry();
             deformable_object_list(id).collisions.triangulated_surface->Update_Bounding_Box();
@@ -199,12 +199,12 @@ int main(int argc, char* argv[])
     if(parse_args.Is_Value_Set("-phi_clamp")){
         T phi_clamp=octree_grid.Minimum_Edge_Length()*parse_args.Get_Integer_Value("-phi_clamp");
         std::cout << "clamping phi: " << phi_clamp << std::endl;
-        for(int i=1;i<=octree_grid.number_of_nodes;i++) water_phi(i)=clamp(water_phi(i),-phi_clamp,phi_clamp);
+        for(int i=0;i<octree_grid.number_of_nodes;i++) water_phi(i)=clamp(water_phi(i),-phi_clamp,phi_clamp);
     }
     else if(parse_args.Is_Value_Set("-phi_clamp_test")){
         T phi_clamp=octree_grid.minimum_cell_size*removed_particle_processing.blending_parameter*(T)removed_particle_processing.particle_power;
         std::cout << "clamping phi: " << phi_clamp << std::endl;
-        for(int i=1;i<=octree_grid.number_of_nodes;i++) water_phi(i)=clamp(water_phi(i),-phi_clamp,phi_clamp);
+        for(int i=0;i<octree_grid.number_of_nodes;i++) water_phi(i)=clamp(water_phi(i),-phi_clamp,phi_clamp);
     }
 
     ARRAY<T>& particle_octree_phi=removed_particle_processing.particle_octree_phi;
@@ -234,7 +234,7 @@ int main(int argc, char* argv[])
 
             int old_number_of_cells=octree_grid.number_of_cells,old_number_of_nodes=octree_grid.number_of_nodes,old_number_of_faces=octree_grid.number_of_faces;
 
-            for(int i=1;i<=octree_grid.uniform_grid.m;i++)for(int j=1;j<=octree_grid.uniform_grid.n;j++)for(int ij=1;ij<=octree_grid.uniform_grid.mn;ij++)
+            for(int i=0;i<octree_grid.uniform_grid.m;i++)for(int j=0;j<octree_grid.uniform_grid.n;j++)for(int ij=0;ij<octree_grid.uniform_grid.mn;ij++)
                 if(octree_grid.cells(i,j,ij)->Has_Children()) Coarsen_Tree(octree_grid.cells(i,j,ij),octree_phi,refinement_distance);
 
             ARRAY<int> cell_mapping_array,node_mapping_array,face_mapping_array;
@@ -270,7 +270,7 @@ int main(int argc, char* argv[])
         ARRAY<T> octree_phi(particle_octree_phi);
         octree_phi+=octree_grid.minimum_cell_size*removed_particle_processing.blending_parameter*removed_particle_processing.particle_power;
         Fast_March(octree_grid,octree_phi,parse_args);
-        for(int i=1;i<=octree_grid.number_of_nodes;i++) octree_phi(i)=min(octree_phi(i),water_phi(i));
+        for(int i=0;i<octree_grid.number_of_nodes;i++) octree_phi(i)=min(octree_phi(i),water_phi(i));
         Fast_March_And_Write(octree_grid,octree_phi,union_octree_levelset_filename,parse_args);
     }
 
@@ -281,7 +281,7 @@ int main(int argc, char* argv[])
 
 #if 0
         // special test of plain averaging
-        for(int i=1;i<=octree_grid.number_of_nodes;i++){
+        for(int i=0;i<octree_grid.number_of_nodes;i++){
             T particles_only_phi=particle_octree_phi(i)+octree_grid.minimum_cell_size*removed_particle_processing.blending_parameter*removed_particle_processing.particle_power;
             octree_phi(i)=0.5*(water_phi(i)+particles_only_phi);
         }
@@ -289,7 +289,7 @@ int main(int argc, char* argv[])
         Fast_March_And_Write(octree_grid,octree_phi,STRING_UTILITIES::string_sprintf("%s/plain_average_octree_levelset.%d",output_directory.c_str(),frame),parse_args);
 
         // minmag_1
-        for(int i=1;i<=octree_grid.number_of_nodes;i++){
+        for(int i=0;i<octree_grid.number_of_nodes;i++){
             T particles_only_phi=particle_octree_phi(i)+octree_grid.minimum_cell_size*removed_particle_processing.blending_parameter*removed_particle_processing.particle_power;
             octree_phi(i)=minmag(particles_only_phi,water_phi(i));
         }
@@ -297,7 +297,7 @@ int main(int argc, char* argv[])
         Fast_March_And_Write(octree_grid,octree_phi,STRING_UTILITIES::string_sprintf("%s/minmag_1_octree_levelset.%d",output_directory.c_str(),frame),parse_args);
 
         // minmag_2
-        for(int i=1;i<=octree_grid.number_of_nodes;i++){
+        for(int i=0;i<octree_grid.number_of_nodes;i++){
             T particles_only_phi=particle_octree_phi(i)+octree_grid.minimum_cell_size*removed_particle_processing.blending_parameter*removed_particle_processing.particle_power;
             T union_phi=min(particles_only_phi,water_phi(i));
             octree_phi(i)=minmag(union_phi,water_phi(i));
@@ -306,7 +306,7 @@ int main(int argc, char* argv[])
         Fast_March_And_Write(octree_grid,octree_phi,STRING_UTILITIES::string_sprintf("%s/minmag_2_octree_levelset.%d",output_directory.c_str(),frame),parse_args);
 
         // minmag_3
-        for(int i=1;i<=octree_grid.number_of_nodes;i++){
+        for(int i=0;i<octree_grid.number_of_nodes;i++){
             T particles_only_phi=particle_octree_phi(i)+octree_grid.minimum_cell_size*removed_particle_processing.blending_parameter*removed_particle_processing.particle_power;
             T union_phi=min(particles_only_phi,water_phi(i));
             octree_phi(i)=union_phi;
@@ -314,7 +314,7 @@ int main(int argc, char* argv[])
 
         Fast_March(octree_grid,octree_phi,parse_args);
 
-        for(int i=1;i<=octree_grid.number_of_nodes;i++){
+        for(int i=0;i<octree_grid.number_of_nodes;i++){
             octree_phi(i)=minmag(octree_phi(i),water_phi(i));
         }
 
@@ -322,9 +322,9 @@ int main(int argc, char* argv[])
 
 #endif
         // special blendings
-//        for(int cell=1;cell<=5;cell++){
+//        for(int cell=0;cell<5;cell++){
         for(int cell=5;cell<=5;cell++){
-            for(int i=1;i<=octree_grid.number_of_nodes;i++){
+            for(int i=0;i<octree_grid.number_of_nodes;i++){
                 T particles_only_phi=particle_octree_phi(i)+octree_grid.minimum_cell_size*removed_particle_processing.blending_parameter*removed_particle_processing.particle_power;
                 T alpha=clamp(water_phi(i)/(cell*octree_grid.Minimum_Edge_Length()),(T)0,(T)1);
                 octree_phi(i)=(1-alpha)*(water_phi(i)+particle_octree_phi(i)) + alpha*particles_only_phi;}
@@ -333,21 +333,21 @@ int main(int argc, char* argv[])
      
         // special blendings
         {int cell=8;
-            for(int i=1;i<=octree_grid.number_of_nodes;i++){
+            for(int i=0;i<octree_grid.number_of_nodes;i++){
                 T particles_only_phi=particle_octree_phi(i)+octree_grid.minimum_cell_size*removed_particle_processing.blending_parameter*removed_particle_processing.particle_power;
                 T alpha=clamp(water_phi(i)/(cell*octree_grid.Minimum_Edge_Length()),(T)0,(T)1);
                 octree_phi(i)=(1-alpha)*(water_phi(i)+particle_octree_phi(i)) + alpha*particles_only_phi;}
             Fast_March_And_Write(octree_grid,octree_phi,STRING_UTILITIES::string_sprintf("%s/blend_%d_octree_levelset.%d",output_directory.c_str(),cell,frame),parse_args);
         }
         {int cell=10;
-            for(int i=1;i<=octree_grid.number_of_nodes;i++){
+            for(int i=0;i<octree_grid.number_of_nodes;i++){
                 T particles_only_phi=particle_octree_phi(i)+octree_grid.minimum_cell_size*removed_particle_processing.blending_parameter*removed_particle_processing.particle_power;
                 T alpha=clamp(water_phi(i)/(cell*octree_grid.Minimum_Edge_Length()),(T)0,(T)1);
                 octree_phi(i)=(1-alpha)*(water_phi(i)+particle_octree_phi(i)) + alpha*particles_only_phi;}
             Fast_March_And_Write(octree_grid,octree_phi,STRING_UTILITIES::string_sprintf("%s/blend_%d_octree_levelset.%d",output_directory.c_str(),cell,frame),parse_args);
         }
         {int cell=15;
-            for(int i=1;i<=octree_grid.number_of_nodes;i++){
+            for(int i=0;i<octree_grid.number_of_nodes;i++){
                 T particles_only_phi=particle_octree_phi(i)+octree_grid.minimum_cell_size*removed_particle_processing.blending_parameter*removed_particle_processing.particle_power;
                 T alpha=clamp(water_phi(i)/(cell*octree_grid.Minimum_Edge_Length()),(T)0,(T)1);
                 octree_phi(i)=(1-alpha)*(water_phi(i)+particle_octree_phi(i)) + alpha*particles_only_phi;}
@@ -356,8 +356,8 @@ int main(int argc, char* argv[])
 
 #if 0
         // special blendings
-        for(int cell=1;cell<=5;cell++){
-            for(int i=1;i<=octree_grid.number_of_nodes;i++){
+        for(int cell=0;cell<5;cell++){
+            for(int i=0;i<octree_grid.number_of_nodes;i++){
                 T particles_only_phi=particle_octree_phi(i)+octree_grid.minimum_cell_size*removed_particle_processing.blending_parameter*removed_particle_processing.particle_power;
                 T alpha=clamp(water_phi(i)/(cell*octree_grid.Minimum_Edge_Length()),(T)0,(T)1);
                 octree_phi(i)=(1-alpha)*(water_phi(i)) + alpha*particles_only_phi;}
@@ -366,21 +366,21 @@ int main(int argc, char* argv[])
         
         // special blendings
         {int cell=8;
-            for(int i=1;i<=octree_grid.number_of_nodes;i++){
+            for(int i=0;i<octree_grid.number_of_nodes;i++){
                 T particles_only_phi=particle_octree_phi(i)+octree_grid.minimum_cell_size*removed_particle_processing.blending_parameter*removed_particle_processing.particle_power;
                 T alpha=clamp(water_phi(i)/(cell*octree_grid.Minimum_Edge_Length()),(T)0,(T)1);
                 octree_phi(i)=(1-alpha)*(water_phi(i)) + alpha*particles_only_phi;}
             Fast_March_And_Write(octree_grid,octree_phi,STRING_UTILITIES::string_sprintf("%s/water_blend_%d_octree_levelset.%d",output_directory.c_str(),cell,frame),parse_args);
         }
         {int cell=10;
-            for(int i=1;i<=octree_grid.number_of_nodes;i++){
+            for(int i=0;i<octree_grid.number_of_nodes;i++){
                 T particles_only_phi=particle_octree_phi(i)+octree_grid.minimum_cell_size*removed_particle_processing.blending_parameter*removed_particle_processing.particle_power;
                 T alpha=clamp(water_phi(i)/(cell*octree_grid.Minimum_Edge_Length()),(T)0,(T)1);
                 octree_phi(i)=(1-alpha)*(water_phi(i)) + alpha*particles_only_phi;}
             Fast_March_And_Write(octree_grid,octree_phi,STRING_UTILITIES::string_sprintf("%s/water_blend_%d_octree_levelset.%d",output_directory.c_str(),cell,frame),parse_args);
         }
         {int cell=15;
-            for(int i=1;i<=octree_grid.number_of_nodes;i++){
+            for(int i=0;i<octree_grid.number_of_nodes;i++){
                 T particles_only_phi=particle_octree_phi(i)+octree_grid.minimum_cell_size*removed_particle_processing.blending_parameter*removed_particle_processing.particle_power;
                 T alpha=clamp(water_phi(i)/(cell*octree_grid.Minimum_edge_Length()),(T)0,(T)1);
                 octree_phi(i)=(1-alpha)*(water_phi(i)) + alpha*particles_only_phi;}

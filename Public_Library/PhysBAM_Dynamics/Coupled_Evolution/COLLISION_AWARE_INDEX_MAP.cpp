@@ -124,7 +124,7 @@ template<class TV> void COLLISION_AWARE_INDEX_MAP<TV>::
 Collect(const ARRAY<T,FACE_INDEX<d> >& faces,const ARRAY<T>& constrained_faces,VECTOR_ND<T>& flattened_faces) const
 {
     flattened_faces.Resize(Number_Faces());
-    for(int i=1;i<=indexed_faces.m;i++)
+    for(int i=0;i<indexed_faces.m;i++)
         flattened_faces(i)=faces(indexed_faces(i));
     for(int i=1;i<=indexed_constraints.m;++i)
         flattened_faces(indexed_faces.m+i)=constrained_faces(i);
@@ -136,7 +136,7 @@ template<class TV> void COLLISION_AWARE_INDEX_MAP<TV>::
 Collect(const ARRAY<T,TV_INT>& cells,VECTOR_ND<T>& flattened_cells) const
 {
     flattened_cells.Resize(Number_Cells());
-    for(int i=1;i<=real_cell_indices.m;i++){int index=real_cell_indices(i);
+    for(int i=0;i<real_cell_indices.m;i++){int index=real_cell_indices(i);
         flattened_cells(index)=cells(indexed_cells(index));}
 }
 //#####################################################################
@@ -147,7 +147,7 @@ template<class TV> void COLLISION_AWARE_INDEX_MAP<TV>::
 Collect_Indexed_Cells(const ARRAY<T,TV_INT>& cells,VECTOR_ND<T>& flattened_cells) const
 {
     flattened_cells.Resize(Number_Cells());
-    for(int i=1;i<=indexed_cells.m;i++)
+    for(int i=0;i<indexed_cells.m;i++)
         flattened_cells(i)=cells(indexed_cells(i));
 }
 //#####################################################################
@@ -156,7 +156,7 @@ Collect_Indexed_Cells(const ARRAY<T,TV_INT>& cells,VECTOR_ND<T>& flattened_cells
 template<class TV> void COLLISION_AWARE_INDEX_MAP<TV>::
 Distribute(const VECTOR_ND<T>& flattened_faces,ARRAY<T,FACE_INDEX<d> >& faces,ARRAY<T>& constrained_faces) const
 {
-    for(int i=1;i<=indexed_faces.m;i++)
+    for(int i=0;i<indexed_faces.m;i++)
         faces(indexed_faces(i))=flattened_faces(i);
     for(int i=1;i<=indexed_constraints.m;++i){
         faces(indexed_constraints(i).Face_Index())=flattened_faces(indexed_faces.m+i); // HACK: Send these back to the incompressible guys.
@@ -168,7 +168,7 @@ Distribute(const VECTOR_ND<T>& flattened_faces,ARRAY<T,FACE_INDEX<d> >& faces,AR
 template<class TV> void COLLISION_AWARE_INDEX_MAP<TV>::
 Distribute(const VECTOR_ND<T>& flattened_cells,ARRAY<T,TV_INT>& cells) const
 {
-    for(int i=1;i<=real_cell_indices.m;i++){int index=real_cell_indices(i);
+    for(int i=0;i<real_cell_indices.m;i++){int index=real_cell_indices(i);
         cells(indexed_cells(index))=flattened_cells(index);}
 }
 //#####################################################################
@@ -178,7 +178,7 @@ Distribute(const VECTOR_ND<T>& flattened_cells,ARRAY<T,TV_INT>& cells) const
 template<class TV> void COLLISION_AWARE_INDEX_MAP<TV>::
 Distribute_Indexed_Cells(const VECTOR_ND<T>& flattened_cells,ARRAY<T,TV_INT>& cells) const
 {
-    for(int i=1;i<=indexed_cells.m;i++)
+    for(int i=0;i<indexed_cells.m;i++)
         cells(indexed_cells(i))=flattened_cells(i);
 }
 //#####################################################################
@@ -187,13 +187,13 @@ Distribute_Indexed_Cells(const VECTOR_ND<T>& flattened_cells,ARRAY<T,TV_INT>& ce
 template<class TV> void COLLISION_AWARE_INDEX_MAP<TV>::
 Clear(const int ghost_cells)
 {
-    for(int i=1;i<=indexed_faces.m;i++){
+    for(int i=0;i<indexed_faces.m;i++){
         const FACE_INDEX<d>& face_index=indexed_faces(i);
         face_indices(face_index)=0;}
     indexed_faces.Remove_All();
 
     last_coupling_cell=0;
-    for(int i=1;i<=indexed_cells.m;i++)
+    for(int i=0;i<indexed_cells.m;i++)
         cell_indices(indexed_cells(i))=0;
     indexed_cells.Remove_All();
     real_cell_indices.Remove_All();
@@ -211,7 +211,7 @@ Print(int id) const
     OCTAVE_OUTPUT<T> oo(buff);
     oo.Write("last_coupling_cell",(T)last_coupling_cell);
     ARRAY<VECTOR<int,TV::m+1> > flat_faces;
-    for(int i=1;i<=indexed_faces.m;i++) flat_faces.Append(indexed_faces(i).index.Insert(indexed_faces(i).axis,1));
+    for(int i=0;i<indexed_faces.m;i++) flat_faces.Append(indexed_faces(i).index.Insert(indexed_faces(i).axis,1));
     oo.Write("indexed_faces",flat_faces);
     oo.Write("indexed_cells",indexed_cells);
     oo.Write("real_cell_indices",real_cell_indices);

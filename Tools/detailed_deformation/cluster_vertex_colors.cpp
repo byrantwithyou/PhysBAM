@@ -48,14 +48,14 @@ int main(int argc,char *argv[])
     do{ // Cluster vertex colors
         cout<<iterations<<endl;iterations++;
         converged=true;
-        for(int i=1;i<=vertex_colors.m;i++){ // Assign vertices to new clusters
+        for(int i=0;i<vertex_colors.m;i++){ // Assign vertices to new clusters
             float min_distance=LuvApproxDistance(vertex_colors(i),clusters(1).z);int cluster=1;
             for(int j=2;j<=num_clusters;j++){
                 float temp_distance=LuvApproxDistance(vertex_colors(i),clusters(j).z);
                 if(min_distance>temp_distance){min_distance=temp_distance;cluster=j;}}
             if(vertex_clusters(i)!=cluster){converged=false;vertex_clusters(i)=cluster;}
             clusters(cluster).x++;clusters(cluster).y+=vertex_colors(i);}
-        for(int i=1;i<=num_clusters;i++){ // Update cluster centers
+        for(int i=0;i<num_clusters;i++){ // Update cluster centers
             clusters(i).z=clusters(i).y/clusters(i).x;
             cout<<clusters(i).x<<" "<<clusters(i).z<<endl;
             clusters(i).x=0;clusters(i).y=VECTOR_3D<float>();}

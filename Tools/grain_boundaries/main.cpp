@@ -121,17 +121,17 @@ int main(int argc,const char *argv[])
     RED_GREEN_TETRAHEDRA<T> redgreen(fracturing_geom);
     
     T fracture_point_thickness=(T).01;
-    for(int level=1;level<=max_refinement_levels;level++){
+    for(int level=0;level<max_refinement_levels;level++){
         fracturing_geom.Update_Tetrahedron_List();
         fracturing_geom.Initialize_Hierarchy();
         ARRAY<bool> refine_tet(fracturing_geom.mesh.elements.m);
-        for(int p=1;p<=fracture_points.m;p++){
+        for(int p=0;p<fracture_points.m;p++){
             TV& X=fracture_points(p);
             ARRAY<int> intersection_list;
             (*fracturing_geom.hierarchy).Intersection_List(X,intersection_list,fracture_point_thickness);
             refine_tet.Subset(intersection_list).Fill(true);}
         ARRAY<int> tets_to_refine;
-        for(int t=1;t<=fracturing_geom.mesh.elements.m;t++) if(refine_tet(t)) tets_to_refine.Append(t);
+        for(int t=0;t<fracturing_geom.mesh.elements.m;t++) if(refine_tet(t)) tets_to_refine.Append(t);
         redgreen.Refine_Simplex_List(tets_to_refine);}
 
     //FILE_UTILITIES::Write_To_File(stream_type,"refined_fracture_geometry.tet",fracturing_geom);
@@ -158,7 +158,7 @@ int main(int argc,const char *argv[])
         fracturing_geom.Update_Tetrahedron_List();
         fracturing_geom.Initialize_Hierarchy();
         ARRAY<bool> seen_this_tet_before(fracturing_geom.mesh.elements.m);
-        for(int s=1;s<=num_seeds;s++){
+        for(int s=0;s<num_seeds;s++){
             int seed_tet;
             ARRAY<int> intersection_list;
             (*fracturing_geom.hierarchy).Intersection_List(grain_centers(s),intersection_list,(T)1e-1);
@@ -177,7 +177,7 @@ int main(int argc,const char *argv[])
             seen_this_tet_before(seed_tet)=true;}}
     else{
         std::cout<<"initializing seed tets..."<<std::endl;
-        for(int s=1;s<=num_seeds;s++){
+        for(int s=0;s<num_seeds;s++){
             int random_tet;
             do {
                 random_tet=random_number.Get_Uniform_Integer(1,fracturing_geom_mesh.elements.m);
@@ -351,19 +351,19 @@ int main(int argc,const char *argv[])
     //don't smootht the boundary nodes
     interface_mesh.Initialize_Node_On_Boundary();
 
-    for(int p=1;p<=fracturing_geom_particles.number;p++) smoothed_vertices(p)=fracturing_geom_particles.X(p);
+    for(int p=0;p<fracturing_geom_particles.number;p++) smoothed_vertices(p)=fracturing_geom_particles.X(p);
     
-    for(int s=1;s<=num_interface_surface_smooting_steps;s++){
-        for(int p=1;p<=fracturing_geom_particles.number;p++) smoothed_vertices_save(p)=smoothed_vertices(p);
-        for(int p=1;p<=fracturing_geom_particles.number;p++){
+    for(int s=0;s<num_interface_surface_smooting_steps;s++){
+        for(int p=0;p<fracturing_geom_particles.number;p++) smoothed_vertices_save(p)=smoothed_vertices(p);
+        for(int p=0;p<fracturing_geom_particles.number;p++){
             ARRAY<int>& neighbor_nodes=(*interface_mesh.neighbor_nodes)(p);
             TV average_neighbor_location=smoothed_vertices_save(p);
             if(!(*interface_mesh.node_on_boundary)(p)){
-                for(int n=1;n<=neighbor_nodes.m;n++) average_neighbor_location+=smoothed_vertices_save(neighbor_nodes(n));
+                for(int n=0;n<neighbor_nodes.m;n++) average_neighbor_location+=smoothed_vertices_save(neighbor_nodes(n));
                 average_neighbor_location/=(T)(neighbor_nodes.m+1);}
             smoothed_vertices(p)=average_neighbor_location;}}
 
-    for(int p=1;p<=fracturing_geom_particles.number;p++) fracturing_geom_particles.X(p)=smoothed_vertices(p);
+    for(int p=0;p<fracturing_geom_particles.number;p++) fracturing_geom_particles.X(p)=smoothed_vertices(p);
     
 
     FILE_UTILITIES::Write_To_File(stream_type,"interface_surface.tri",interface_surface);

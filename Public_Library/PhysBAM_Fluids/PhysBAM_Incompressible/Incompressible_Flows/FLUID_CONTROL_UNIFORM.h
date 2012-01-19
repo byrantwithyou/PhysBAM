@@ -64,7 +64,7 @@ public:
     {int ghost_cells=3;
     T_ARRAYS_VECTOR cell_array(levelset.grid.Domain_Indices(ghost_cells));
     for(CELL_ITERATOR iterator(levelset.grid);iterator.Valid();iterator.Next()){
-        for(int axis=1;axis<=levelset.grid.dimension;axis++) cell_array(iterator.Cell_Index())[axis]=(T).5*(array(axis,iterator.First_Face_Index(axis))+array(axis,iterator.Second_Face_Index(axis)));}
+        for(int axis=0;axis<levelset.grid.dimension;axis++) cell_array(iterator.Cell_Index())[axis]=(T).5*(array(axis,iterator.First_Face_Index(axis))+array(axis,iterator.Second_Face_Index(axis)));}
     for(int i=1;i<=smoothing_steps;i+=1){
         boundary->Fill_Ghost_Cells(levelset.grid,cell_array,cell_array,0,0,ghost_cells); // TODO: use real time/dt
         SMOOTH::Smooth<T_GRID>(cell_array,1,0);}
@@ -135,10 +135,10 @@ public:
             if(levelset.phi(iterator.Cell_Index())>0){projection.laplace->psi_D(iterator.Cell_Index())=true;projection.p(iterator.Cell_Index())=0;}
 
         VECTOR<VECTOR<bool,2>,T_GRID::dimension> domain_walls;
-        for(int i=1;i<=3;i++) for(int j=1;j<=2;j++) domain_walls[i][j]=true;
+        for(int i=0;i<3;i++) for(int j=0;j<2;j++) domain_walls[i][j]=true;
         if(mpi_grid)mpi_grid->Initialize(domain_walls);
         for(int axis=1;axis<=T_GRID::dimension;axis++){
-            for(int side=1;side<=2;side++){
+            for(int side=0;side<2;side++){
                 int side_number=(axis-1)*2+side;
                 if(domain_walls[axis][side]) for(CELL_ITERATOR iterator(levelset.grid,1,T_GRID::GHOST_REGION,side_number);iterator.Valid();iterator.Next()){
                     projection.laplace->psi_D(iterator.Cell_Index())=true;projection.p(iterator.Cell_Index())=0;}}}

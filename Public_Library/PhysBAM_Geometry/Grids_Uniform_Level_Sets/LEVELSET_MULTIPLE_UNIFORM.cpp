@@ -38,7 +38,7 @@ Project_Levelset(const int number_of_ghost_cells)
         int minimum_region,second_minimum_region;T minimum_phi,second_minimum_phi;
         Two_Minimum_Regions(iterator.Cell_Index(),minimum_region,second_minimum_region,minimum_phi,second_minimum_phi);
         T correction=(T).5*(minimum_phi+second_minimum_phi);
-        for(int k=1;k<=phis.m;k++) phis(k)(iterator.Cell_Index())-=correction;}
+        for(int k=0;k<phis.m;k++) phis(k)(iterator.Cell_Index())-=correction;}
 }
 //#####################################################################
 // Function Project_Levelset
@@ -65,7 +65,7 @@ Get_Single_Levelset(const ARRAY<bool>& positive_regions,T_LEVELSET& levelset,con
             T minimum_phi;int minimum_region=Inside_Region(iterator.Cell_Index(),minimum_phi);
             if(positive_regions(minimum_region)) phi_ghost(iterator.Cell_Index())=-minimum_phi; // make levelset positive in the dirichlet regions
             else phi_ghost(iterator.Cell_Index())=minimum_phi;}}
-    int number_of_positive_regions=0;for(int i=1;i<=positive_regions.m;i++)if(positive_regions(i))number_of_positive_regions++;
+    int number_of_positive_regions=0;for(int i=0;i<positive_regions.m;i++)if(positive_regions(i))number_of_positive_regions++;
     if(number_of_positive_regions>1)levelset.Fast_Marching_Method();
 }
 //#####################################################################

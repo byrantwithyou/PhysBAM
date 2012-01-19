@@ -26,7 +26,7 @@ public:
     for(int i=0;i<=object.number_of_active_indices;i++){Write_Binary<RW>(output,object.indices[i]);Write_Binary<RW>(output,object.x[i]);}}
 };
 template<class T> inline std::ostream& operator<<(std::ostream& output_stream,const SPARSE_VECTOR_ND<T>& v)
-{for(int i=1;i<=v.n;i++)output_stream<<v(i)<<" ";output_stream<<std::endl;return output_stream;}
+{for(int i=0;i<v.n;i++)output_stream<<v(i)<<" ";output_stream<<std::endl;return output_stream;}
 }
 #endif
 #endif

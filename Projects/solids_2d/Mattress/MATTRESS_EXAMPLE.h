@@ -74,7 +74,7 @@ void Get_Initial_Data() PHYSBAM_OVERRIDE
 
     triangulated_area.Update_Bounding_Box();
     TV center(triangulated_area.bounding_box->Center());T bottom=triangulated_area.bounding_box->ymin;
-    for(int i=1;i<=triangulated_area.particles.array_size;i++){
+    for(int i=0;i<triangulated_area.particles.array_size;i++){
         particles.X(i)=center+MATRIX<T,2>::Rotation_Matrix(initial_orientation)*(particles.X(i)-center);
         particles.V(i)=initial_velocity+TV::Cross_Product(initial_angular_velocity,particles.X(i)-center);
         particles.X(i).y+=initial_height-bottom;}
@@ -114,7 +114,7 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T time) PHYSBAM_OVERRIDE
 {
     switch(id_number){
     case 1:
-        if(fix_boundary)for(int j=1,index=0;j<=mattress_grid.n;j++)for(int k=1;k<=mattress_grid.m;k++){index++;V(index)=TV(0,0);V(V.m+1-index)=TV(0,0);}
+        if(fix_boundary)for(int j=1,index=0;j<=mattress_grid.n;j++)for(int k=0;k<mattress_grid.m;k++){index++;V(index)=TV(0,0);V(V.m+1-index)=TV(0,0);}
         break;
     default:std::cout<<"Unrecognized deformable object id number"<<std::endl;exit(1);}
 }
@@ -125,7 +125,7 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T time) PHYSBAM_OVE
 {
     switch(id_number){
     case 1:
-        if(fix_boundary)for(int j=1,index=0;j<=mattress_grid.n;j++)for(int k=1;k<=mattress_grid.m;k++){index++;V(index)=TV();V(V.m+1-index)=TV();}
+        if(fix_boundary)for(int j=1,index=0;j<=mattress_grid.n;j++)for(int k=0;k<mattress_grid.m;k++){index++;V(index)=TV();V(V.m+1-index)=TV();}
         break;
     default:std::cout<<"Unrecognized deformable object id number"<<std::endl;exit(1);}
 }

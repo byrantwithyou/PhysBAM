@@ -34,7 +34,7 @@ Adjust_Nodes_For_Collisions(COLLISION_GEOMETRY<TV>& body,ARRAY_VIEW<const TV> X_
     ARRAY<COLLISION_GEOMETRY_ID>& particle_to_collision_geometry_id,const T max_relative_velocity,const T dt,const HASHTABLE<int,T> *friction_table,const HASHTABLE<int,T> *thickness_table)
 {
     int interactions=0;T depth,one_over_dt=1/dt;ARRAY_VIEW<TV> X(collision_particles.X),V(collision_particles.V);
-    for(int pp=1;pp<=nodes_to_check.m;pp++){
+    for(int pp=0;pp<nodes_to_check.m;pp++){
         int p=nodes_to_check(pp),soft_binding=soft_bindings.Soft_Binding(p);
         T thickness=thickness_table?thickness_table->Get_Default(p,0):0;
         COLLISION_PARTICLE_STATE<TV>& collision=collision_particle_state(p);

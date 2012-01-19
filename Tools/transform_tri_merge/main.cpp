@@ -27,7 +27,7 @@ void Do_It()
 
     std::istream* input=FILE_UTILITIES::Safe_Open_Input(parse_args.Extra_Arg(1),false);
     *input>>num_surfaces;
-    for(int i=1;i<=num_surfaces;i++){
+    for(int i=0;i<num_surfaces;i++){
         *input>>surface_name>>scaling_factor>>input_frame;
         std::cout << "Reading " << surface_name << std::endl;
         TRIANGULATED_SURFACE<T> *surface=0;FILE_UTILITIES::Create_From_File<T>(surface_name+".tri.gz",surface);

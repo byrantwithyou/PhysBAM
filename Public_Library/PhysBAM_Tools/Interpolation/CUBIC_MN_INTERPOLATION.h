@@ -35,7 +35,7 @@ public:
     temp=abs(alpha);weights.Append((m0*temp+m1)*temp*temp+m3);
     temp=abs(1-alpha);weights.Append((m0*temp+m1)*temp*temp+m3);
     temp=abs(2-alpha);weights.Append(((n0*temp+n1)*temp+n2)*temp+n3);
-    for(int i=1;i<=weights.m;i++) weights(i)=max((T)0.,min((T)1.,weights(i)));
+    for(int i=0;i<weights.m;i++) weights(i)=max((T)0.,min((T)1.,weights(i)));
     return weights;}*/
 
     ARRAY<T> Cubic_MN_Weights(const T alpha) const;

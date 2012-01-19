@@ -18,7 +18,7 @@ Flood_Fill(const GRAPH& graph,ARRAY<int>& colors,ARRAY<bool>* color_touches_unco
     int seed_node;int fill_color=0;
     flood_fill_stack.Preallocate(graph.edges.m);
     ARRAY<int> uncolored_nodes;uncolored_nodes.Preallocate(graph.valid_nodes.m);
-    for(int i=1;i<=graph.valid_nodes.m;i++) if(graph.valid_nodes(i)) uncolored_nodes.Append(i);
+    for(int i=0;i<graph.valid_nodes.m;i++) if(graph.valid_nodes(i)) uncolored_nodes.Append(i);
     while(Find_Uncolored_Node(graph,colors,uncolored_nodes,seed_node)){
         bool touches_uncolorable_node;fill_color++;Flood_Fill_From_Seed_Node(graph,colors,fill_color,touches_uncolorable_node,seed_node);
         if(color_touches_uncolorable_node)color_touches_uncolorable_node->Append(touches_uncolorable_node);}

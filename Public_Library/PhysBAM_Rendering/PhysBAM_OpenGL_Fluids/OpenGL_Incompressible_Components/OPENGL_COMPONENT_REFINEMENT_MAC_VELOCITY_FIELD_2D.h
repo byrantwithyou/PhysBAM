@@ -52,11 +52,11 @@ public:
     virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
 
     void Set_Size(T s)
-    {size=s;for(int i=1;i<=opengl_refinement_mac_velocity_fields.array.m;i++) if(opengl_refinement_mac_velocity_fields.array(i)) opengl_refinement_mac_velocity_fields.array(i)->size=s;}
+    {size=s;for(int i=0;i<opengl_refinement_mac_velocity_fields.array.m;i++) if(opengl_refinement_mac_velocity_fields.array(i)) opengl_refinement_mac_velocity_fields.array(i)->size=s;}
     void Set_Vector_Color(OPENGL_COLOR c)
-    {vector_color=c;for(int i=1;i<=opengl_refinement_mac_velocity_fields.array.m;i++) if(opengl_refinement_mac_velocity_fields.array(i)) opengl_refinement_mac_velocity_fields.array(i)->vector_color=c;}
+    {vector_color=c;for(int i=0;i<opengl_refinement_mac_velocity_fields.array.m;i++) if(opengl_refinement_mac_velocity_fields.array(i)) opengl_refinement_mac_velocity_fields.array(i)->vector_color=c;}
     void Set_Velocity_Mode(typename OPENGL_MAC_VELOCITY_FIELD_2D<T>::VELOCITY_MODE m)
-    {velocity_mode=m;for(int i=1;i<=opengl_refinement_mac_velocity_fields.array.m;i++) if(opengl_refinement_mac_velocity_fields.array(i)) opengl_refinement_mac_velocity_fields.array(i)->Set_Velocity_Mode(m);}
+    {velocity_mode=m;for(int i=0;i<opengl_refinement_mac_velocity_fields.array.m;i++) if(opengl_refinement_mac_velocity_fields.array(i)) opengl_refinement_mac_velocity_fields.array(i)->Set_Velocity_Mode(m);}
 
     void Toggle_Velocity_Mode();
     void Toggle_Velocity_Mode_And_Draw();

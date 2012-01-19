@@ -126,7 +126,7 @@ public:
 
     ~SIMPLE_MUSCLE_EXAMPLE()
     {
-        for(int i=1;i<=deformable_body_initial_states.m;i++)
+        for(int i=0;i<deformable_body_initial_states.m;i++)
             delete deformable_body_initial_states(i);
     }
 
@@ -213,13 +213,13 @@ void Simple_Muscle_Across_Joint()
     if(parameter_list.Get_Parameter("use_frame_track",false)){
         int samples=1000;T period=10;
         frame_track=new FRAME_TRACK_3D<T>(samples,0,period);frame_track->periodic=true;
-        for(int i=1;i<=samples;i++){
+        for(int i=0;i<samples;i++){
             frame_track->trajectory(i)=FRAME_3D<T>(QUATERNION<T>(initial_angle+(target_angle-initial_angle)*0.5*(1-cos(2*pi*(i-1)/(samples-1))),VECTOR<T,3>(1,0,0)));}
         for(int i=1;i<=arb->joint_mesh.joints.m;i++) arb->joint_mesh.joints(i)->joint_function->track=frame_track;
     }
 
     
-    for(int i=1;i<=num_bodies;i++){
+    for(int i=0;i<num_bodies;i++){
         int id=plank_ids(i)=solids_parameters.rigid_body_parameters.list.template Add_Rigid_Body<RW>(data_directory+"/Rigid_Bodies/plank",(T).2);
         RIGID_BODY<TV>* rigid_body=arb->rigid_bodies_list.rigid_bodies(id);
         rigid_body->triangulated_surface->Rescale(plank_rescale.x,plank_rescale.y,plank_rescale.z);
@@ -305,7 +305,7 @@ void Stand_Test()
     int num_bodies=parameter_list.Get_Parameter("num_bodies",(int)2);
     T k_p=parameter_list.Get_Parameter("k_p",(T)100);
 
-    for(int i=1;i<=num_bodies;i++){
+    for(int i=0;i<num_bodies;i++){
         int id=solids_parameters.rigid_body_parameters.list.template Add_Rigid_Body<RW>(data_directory+"/Rigid_Bodies/plank",(T).2);
         RIGID_BODY<TV>* rigid_body=arb->rigid_bodies_list.rigid_bodies(id);
         rigid_body->frame.r=QUATERNION<T>(pi/2,VECTOR<T,3>(0,1,0));
@@ -546,7 +546,7 @@ void Get_Initial_Data()
     delete structure;
 
     // correct number nodes
-    for(int i=1;i<=deformable_object.structures.m;i++) deformable_object.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_object.structures.m;i++) deformable_object.structures(i)->Update_Number_Nodes();
 
     // Rigid Bodies
     Initialize_Rigid_Bodies();
@@ -568,7 +568,7 @@ void Update_Collision_Body_Positions_And_Velocities(const T time) PHYSBAM_OVERRI
 void Set_External_Positions(ARRAY_VIEW<TV> X,const T time)
 {
     assert(id_number==1);
-    for(int p=1;p<=num_planks;p++){
+    for(int p=0;p<num_planks;p++){
         RIGID_BODY<TV>& plank_rigid_body=*arb->rigid_bodies_list.rigid_bodies(plank_ids(p));
         FRAME_3D<T> inverted_frame=plank_rigid_body.frame.Inverse();
         for(int i=1;i<=enslaved_nodes(p).m;i++){
@@ -580,7 +580,7 @@ void Set_External_Positions(ARRAY_VIEW<TV> X,const T time)
 void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time)
 {
     assert(fragment_id==FRAGMENT_ID(1));
-    for(int p=1;p<=num_planks;p++)for(int i=1;i<=enslaved_nodes(p).m;i++){
+    for(int p=0;p<num_planks;p++)for(int i=1;i<=enslaved_nodes(p).m;i++){
         X(enslaved_nodes(p)(i))=TV();} 
 }
 //#####################################################################
@@ -613,7 +613,7 @@ void Get_Constrained_Particle_Data()
     positions_relative_to_plank_frames.Resize(num_planks);
 
     for(int i=1;i<=mattress_dimensions.x*mattress_dimensions.y*mattress_dimensions.z;i++){
-        for(int p=1;p<=num_planks;p++){
+        for(int p=0;p<num_planks;p++){
             RIGID_BODY<TV>& plank_rigid_body=*arb->rigid_bodies_list.rigid_bodies(plank_ids(p));
             if (!plank_rigid_body.Implicit_Geometry_Lazy_Outside(particles.X(i))) {
                 enslaved_nodes(p).Append(i);

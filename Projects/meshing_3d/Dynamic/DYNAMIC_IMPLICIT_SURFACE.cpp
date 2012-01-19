@@ -302,7 +302,7 @@ Parse(const char*& str)
 template<class T> void DYNAMIC_IMPLICIT_SURFACE<T>::
 Eval(const TV& X) const
 {
-    for(int i=1;i<=eval_list.m;i++) eval_list(i)->Compute(X);
+    for(int i=0;i<eval_list.m;i++) eval_list(i)->Compute(X);
 
 //    for(typename HASHTABLE<std::string,DYNAMIC_OP<T>*>::CONST_ITERATOR it(dict);it.Valid();it.Next())
 //        LOG::cout<<it.Key()<<" ->  "<<it.Data()->S<<std::endl;

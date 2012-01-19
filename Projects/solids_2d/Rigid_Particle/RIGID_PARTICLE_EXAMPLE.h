@@ -58,7 +58,7 @@ virtual void Get_Initial_Data()
     particles.Store_Velocity();
 
     // add particles and set up segmented curve
-    for(int i=1;i<=20;i++){
+    for(int i=0;i<20;i++){
         particles.array_collection->Add_Element();
         particles.mass(i)=1;
         particles.X(i)=TV((T)i,0);
@@ -66,7 +66,7 @@ virtual void Get_Initial_Data()
     deformable_object.Add_Structure(&segmented_curve);
 
     // rigid bodies
-    for(int i=1;i<=3;i++){
+    for(int i=0;i<3;i++){
         solids_parameters.rigid_body_parameters.list.template Add_Rigid_Body<T>(data_directory+"/Rigid_Bodies_2D/square",(T)1);
         rigid_bodies(i)->frame.t=TV((T)5*i+(T).5,0);
         rigid_bodies(i)->frame.r=COMPLEX<T>::Unit_Polar(0);

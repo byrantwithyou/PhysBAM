@@ -84,7 +84,7 @@ Display(const int in_color) const
         glPopAttrib();}
     if(draw_surface_muscles){
         glPushName(6);
-        for(int i=1;i<=opengl_triangulated_surface.m;i++){
+        for(int i=0;i<opengl_triangulated_surface.m;i++){
             int muscle_index=surface_muscle_indices(i).x;int segment_index=surface_muscle_indices(i).y;
             if(mode==GL_SELECT){glPushName(muscle_index);glPushName(segment_index);glPushName(i);}
             ANALYTIC_SURFACE_MUSCLE_SEGMENT<T>* segment=(ANALYTIC_SURFACE_MUSCLE_SEGMENT<T>*)articulated_rigid_body->muscle_list->muscles(muscle_index)->muscle_segments(segment_index);
@@ -100,7 +100,7 @@ Display(const int in_color) const
             glPushMatrix();OpenGL_Translate(segment->frame.t);OpenGL_Rotate(segment->frame.r);glLineWidth(2);OPENGL_PREFERENCES::selection_highlight_color.Send_To_GL_Pipeline();
             opengl_triangulated_surface(surface_index)->Draw();glLineWidth(OPENGL_PREFERENCES::line_width);glPopMatrix();glPopAttrib();}}
     if(draw_muscle_internal_particles){
-        for(int i=1;i<=muscle_internal_particles.m;i++){glPushName(i);OPENGL_SHAPES::Draw_Dot(muscle_internal_particles(i),OPENGL_COLOR::Red(),5);glPopName();}}
+        for(int i=0;i<muscle_internal_particles.m;i++){glPushName(i);OPENGL_SHAPES::Draw_Dot(muscle_internal_particles(i),OPENGL_COLOR::Red(),5);glPopName();}}
 }
 //#####################################################################
 // Function Read_Muscle_Internal_Particles
@@ -185,7 +185,7 @@ Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION *selection) c
             output_stream << "Insertion = (" << attachment_point_2->rigid_body.name << ", " << attachment_point_2->object_space_position << ")" << std::endl;
             if(muscle.via_points.m){
                 output_stream << "Via points: ";
-                for(int i=1;i<=muscle.via_points.m;i++) 
+                for(int i=0;i<muscle.via_points.m;i++) 
                     output_stream << "(" << muscle.via_points(i)->rigid_body.name << ", " << muscle.via_points(i)->object_space_position << ") ";
                 output_stream << std::endl;}
             output_stream << std::endl;

@@ -68,7 +68,7 @@ public:
     {
         opengl_selection.indicies.Remove_All();
         if(selection.m==0) {opengl_grid_3d->Clear_Highlight();return;}
-        for(int i=1;i<=selection.m;i++) opengl_selection.indicies.Append(selection(i).y);
+        for(int i=0;i<selection.m;i++) opengl_selection.indicies.Append(selection(i).y);
         opengl_grid_3d->Highlight_Selection(&opengl_selection);
     }
 
@@ -210,7 +210,7 @@ public:
     void Calculate_Bounds()
     {expanded=true;
     min_x=selection(1).y.x;max_x=selection(1).y.x;min_y=selection(1).y.y;max_y=selection(1).y.y;min_z=selection(1).y.z;max_z=selection(1).y.z;
-    for(int i=1;i<=selection.m;i++){
+    for(int i=0;i<selection.m;i++){
         if(selection(i).y.x<min_x) min_x=selection(i).y.x;
         if(selection(i).y.x>max_x) max_x=selection(i).y.x;
         if(selection(i).y.y<min_y) min_y=selection(i).y.y;
@@ -226,7 +226,7 @@ public:
     {if(is_valid) return;
     is_valid=true;
     for(int i=phi.domain.min_corner.x;i<=phi.domain.max_corner.x;i++) for(int j=phi.domain.min_corner.y;j<=phi.domain.max_corner.y;j++) for(int ij=phi.domain.min_corner.z;ij<=phi.domain.max_corner.z;ij++) copy_phi(i,j,ij)=grid.min_dX;
-    for(int i=1;i<=selection.m;i++) copy_phi(selection(i).y)=selection(i).x;
+    for(int i=0;i<selection.m;i++) copy_phi(selection(i).y)=selection(i).x;
     copy_levelset.Fast_Marching_Method(0,grid.dX.x*8);}
 
     void Toggle_Paint_Mode()
@@ -258,16 +258,16 @@ public:
     DEFINE_CALLBACK_CREATOR(ATTACHMENT_VISUALIZATION,Cut_Selection);
 
     void Paste_Selection()
-    {for(int i=1;i<=copy.m;i++) phi(copy(i).y)=copy(i).x;}
+    {for(int i=0;i<copy.m;i++) phi(copy(i).y)=copy(i).x;}
     DEFINE_CALLBACK_CREATOR(ATTACHMENT_VISUALIZATION,Paste_Selection);
 
     void Delete_Selection()
-    {for(int i=1;i<=selection.m;i++) phi(selection(i).y)=grid.min_dX;
+    {for(int i=0;i<selection.m;i++) phi(selection(i).y)=grid.min_dX;
     Update_Current_Levelset();}
     DEFINE_CALLBACK_CREATOR(ATTACHMENT_VISUALIZATION,Delete_Selection);
 
     void Fill_Selection()
-    {for(int i=1;i<=selection.m;i++) phi(selection(i).y)=-grid.min_dX;
+    {for(int i=0;i<selection.m;i++) phi(selection(i).y)=-grid.min_dX;
     Update_Current_Levelset();}
     DEFINE_CALLBACK_CREATOR(ATTACHMENT_VISUALIZATION,Fill_Selection);
 
@@ -297,9 +297,9 @@ public:
     if(!OPENGL_WORLD::Singleton()->prompt_response.empty()){
         std::istringstream sstream(OPENGL_WORLD::Singleton()->prompt_response);
         sstream>>iterations;}
-    for(int i=1;i<=iterations;i++){
+    for(int i=0;i<iterations;i++){
         if(expanded) levelset_advection.Euler_Step_Subset(V,min_x,max_x,min_y,max_y,min_z,max_z,step,0,3);
-        else for(int i=1;i<=selection.m;i++) levelset_advection.Euler_Step_Cell(V,selection(i).y.x,selection(i).y.y,selection(i).y.z,step,0,3);}
+        else for(int i=0;i<selection.m;i++) levelset_advection.Euler_Step_Cell(V,selection(i).y.x,selection(i).y.y,selection(i).y.z,step,0,3);}
     Update_Current_Levelset();}
     DEFINE_CALLBACK_CREATOR(ATTACHMENT_VISUALIZATION,Smooth_Selection_Response);
 

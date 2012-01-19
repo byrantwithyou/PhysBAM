@@ -59,7 +59,7 @@ Fill_Ghost_Cells(const T_GRID& grid,const T_ARRAYS_T2& u,T_ARRAYS_T2& u_ghost,co
     assert(grid.Is_MAC_Grid() && phi && V);T_ARRAYS_T2::Put(u,u_ghost);
     RANGE<TV_INT> domain_indices=grid.Domain_Indices();
     ARRAY<RANGE<TV_INT> > regions;Find_Ghost_Regions(grid,regions,number_of_ghost_cells);
-    for(int axis=1;axis<=T_GRID::dimension;axis++)for(int axis_side=1;axis_side<=2;axis_side++){
+    for(int axis=1;axis<=T_GRID::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){
         int side=2*axis+axis_side-2;
         if(use_extrapolation_mode && Constant_Extrapolation(side)) BOUNDARY_UNIFORM<T_GRID,T>::Fill_Single_Ghost_Region(grid,u_ghost,side,regions(side));
         else{ // either phi=phi_object for a wall, or no wall

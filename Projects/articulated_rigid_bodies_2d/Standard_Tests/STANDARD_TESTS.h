@@ -258,7 +258,7 @@ int Large_Cluster_Square(FRAME<TV>shift_frame,T scale=1)
     // CLUSTER 1
     ARRAY<RIGID_BODY<TV>*>& bodies=*new ARRAY<RIGID_BODY<TV>*>(4);
     int count=0;
-    for(int i=1;i<=4;i++){
+    for(int i=0;i<4;i++){
 //        bodies(i)->Set_Name(STRING_UTILITIES::string_sprintf("child::%d",bodies(i)));}
         bodies(i)=&tests.Add_Rigid_Body("subdivided_box",1,(T).5);
         bodies(i)->Set_Name(STRING_UTILITIES::string_sprintf("child::%d",bodies(i)));

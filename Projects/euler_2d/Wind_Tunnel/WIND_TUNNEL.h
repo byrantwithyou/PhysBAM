@@ -156,7 +156,7 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
     //set custom boundary
     TV velocity_initial(u_vel_initial,v_vel_initial);
     VECTOR<VECTOR<bool,2>,T_GRID::dimension> valid_wall;
-    for(int axis=1;axis<=T_GRID::dimension;axis++) for(int axis_side=1;axis_side<=2;axis_side++)
+    for(int axis=1;axis<=T_GRID::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++)
         valid_wall[axis][axis_side]=(fluids_parameters.mpi_grid?!fluids_parameters.mpi_grid->Neighbor(axis,axis_side):true) && !fluids_parameters.domain_walls[axis][axis_side];
     valid_wall[3]=VECTOR<bool,2>::Constant_Vector(false);
 

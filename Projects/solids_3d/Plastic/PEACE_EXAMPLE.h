@@ -71,7 +71,7 @@ public:
     peace_phi.Resize(1,grey.m,1,grey.n);
     rgb_file.Eight_Bit_Integer_To_Unit_Float(grey,peace_phi);
     peace_grid.Initialize(grey.m,grey.n,-1,1,-1,1);
-    for(int i=1;i<=peace_phi.m;i++)for(int j=1;j<=peace_phi.m;j++)
+    for(int i=0;i<peace_phi.m;i++)for(int j=0;j<peace_phi.m;j++)
         peace_phi(i,j)=peace_phi(i,j)-(T).5;
     peace_levelset.Fast_Marching_Method();}
     

@@ -36,7 +36,7 @@ TIMER()
     timers(1).elapsed=timers(1).start=0;
     free_timers=IDENTITY_ARRAY<>(timers.Size());
     overhead=0;timers(1).accumulator=0;
-    for(int i=1;i<=100;i++){Start(1);Stop(1);}
+    for(int i=0;i<100;i++){Start(1);Stop(1);}
     overhead=timers(1).accumulator*.01;
 }
 //#####################################################################

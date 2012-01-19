@@ -96,7 +96,7 @@ Reinitialize(bool force)
         if(FILE_UTILITIES::File_Exists(frame_filename)) FILE_UTILITIES::Read_From_File<RW>(frame_filename,motion);
         else return;}
     if(particles.array_collection->Size() != motion.trajectories.m){particles.array_collection->Delete_All_Elements();particles.array_collection->Add_Elements(motion.trajectories.m);}
-    for(int i=1;i<=motion.trajectories.m;i++) particles.X(i)=motion.X(i,one_over_frame_rate*frame);
+    for(int i=0;i<motion.trajectories.m;i++) particles.X(i)=motion.X(i,one_over_frame_rate*frame);
     frame_loaded=frame;valid=true;
 }
 //#####################################################################

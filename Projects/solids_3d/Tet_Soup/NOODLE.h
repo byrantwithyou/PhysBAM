@@ -74,7 +74,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     TV X=particles.X(1);for(int p=1;p<=particles.array_collection->Size();p++){particles.X(p)-=X;particles.V(p)=TV(0,-10,0);}
 
     // correct number nodes
-    for(int i=1;i<=deformable_object.structures.m;i++) deformable_object.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_object.structures.m;i++) deformable_object.structures(i)->Update_Number_Nodes();
 
     // collisions
     deformable_object.collisions.collision_structures.Append_Elements(deformable_object.structures);

@@ -27,7 +27,7 @@ Euler_Step(const T dt,const T time)
     internal_conservation.Save_Fluxes();conservation->Save_Fluxes();
     internal_conservation.Update_Conservation_Law_For_Specialized_Shallow_Water_Equations(grid,U,U_ghost,psi,dt,eigensystem_F,eigensystem_G,*conservation);
 
-    if(epsilon_u || epsilon_v) for(int i=1;i<=grid.counts.x;i++) for(int j=1;j<=grid.counts.y;j++){
+    if(epsilon_u || epsilon_v) for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++){
         T u_yy=sqr(grid.one_over_dX.y)*(U_ghost(i,j+1)(2)-2*U_ghost(i,j)(2)+U_ghost(i,j-1)(2));
         T v_xx=sqr(grid.one_over_dX.x)*(U_ghost(i+1,j)(3)-2*U_ghost(i,j)(3)+U_ghost(i-1,j)(3));
         U(i,j)(2)+=dt*epsilon_u*abs(U(i,j)(3))*u_yy;
@@ -35,9 +35,9 @@ Euler_Step(const T dt,const T time)
 
     // x fluxes
     ARRAY_VIEW<TV_DIMENSION,VECTOR<int,2> >& old_flux_x=internal_conservation.fluxes.Component(1);
-    for(int i=0;i<=grid.counts.x;i++) for(int j=1;j<=grid.counts.y;j++){
+    for(int i=0;i<=grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++){
         bool zero_left=zero_height(i,j),zero_right=zero_height(i+1,j),update_flux=false;
-        ARRAY<T,VECTOR<int,1> > new_flux_left(1,3),new_flux_right(1,3);for(int k=1;k<=3;k++) new_flux_left(k)=new_flux_right(k)=old_flux_x(i+1,j)(k);
+        ARRAY<T,VECTOR<int,1> > new_flux_left(1,3),new_flux_right(1,3);for(int k=0;k<3;k++) new_flux_left(k)=new_flux_right(k)=old_flux_x(i+1,j)(k);
 
         if(zero_left && zero_right){ // no mass flux between empty cells
             new_flux_left(1)=new_flux_right(1)=0;
@@ -71,9 +71,9 @@ Euler_Step(const T dt,const T time)
 
     // y fluxes
     ARRAY_VIEW<TV_DIMENSION,VECTOR<int,2> >& old_flux_y=internal_conservation.fluxes.Component(2);
-    for(int i=1;i<=grid.counts.x;i++) for(int j=0;j<=grid.counts.y;j++){
+    for(int i=0;i<grid.counts.x;i++) for(int j=0;j<=grid.counts.y;j++){
         bool zero_left=zero_height(i,j),zero_right=zero_height(i,j+1),update_flux=false;
-        ARRAY<T,VECTOR<int,1> > new_flux_left(1,3),new_flux_right(1,3);for(int k=1;k<=3;k++) new_flux_left(k)=new_flux_right(k)=old_flux_y(i,j+1)(k);
+        ARRAY<T,VECTOR<int,1> > new_flux_left(1,3),new_flux_right(1,3);for(int k=0;k<3;k++) new_flux_left(k)=new_flux_right(k)=old_flux_y(i,j+1)(k);
         
         if(zero_left && zero_right){ // no mass flux between empty cells
             new_flux_left(1)=new_flux_right(1)=0;
@@ -106,7 +106,7 @@ Euler_Step(const T dt,const T time)
         postprocessed_flux_y(i,j)(4)=new_flux_right(1);postprocessed_flux_y(i,j)(5)=new_flux_right(2);postprocessed_flux_y(i,j)(6)=new_flux_right(3);}
     
     T two_min_height=(T)2.01*min_height;
-    for(int i=1;i<=grid.counts.x;i++) for(int j=1;j<=grid.counts.y;j++){
+    for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++){
         if(U_ghost(i,j)(1)<=two_min_height) U(i,j)(2)=U(i,j)(3)=0; // correct for where we have zero fluxes due to small average h
         if(U(i,j)(1)<0) U(i,j)(1)=0;}
 
@@ -119,7 +119,7 @@ template<class T> T SHALLOW_WATER_2D_SPECIALIZED<T>::
 CFL()
 {
     T max_x_speed=0,max_y_speed=0;
-    for(int i=1;i<=grid.counts.x;i++) for(int j=1;j<=grid.counts.y;j++){
+    for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++){
         T u=U(i,j)(2),v=U(i,j)(3),celerity=sqrt(gravity*U(i,j)(1));
         max_x_speed=max(max_x_speed,abs(u)+celerity);
         max_y_speed=max(max_y_speed,abs(v)+celerity);}

@@ -65,7 +65,7 @@ bool Inside_Any_Triangle(const TRIANGULATED_SURFACE<T>& ts,const VECTOR<T,3>& lo
 {
     assert(ts.hierarchy);assert(ts.triangle_list);
     ARRAY<int> nearby_triangles;ts.hierarchy->Intersection_List(location,nearby_triangles,thickness_over_two);
-    for(int k=1;k<=nearby_triangles.m;k++){
+    for(int k=0;k<nearby_triangles.m;k++){
         TRIANGLE_3D<T>& triangle=(*ts.triangle_list)(nearby_triangles(k));
         if(triangle.Point_Inside_Triangle(location,thickness_over_two)){triangle_id=nearby_triangles(k);return true;}}
     return false;

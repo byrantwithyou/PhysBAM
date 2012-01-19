@@ -101,7 +101,7 @@ Initialize_Optimization(const bool verbose)
     mesh.Initialize_Boundary_Nodes(); // assumes that Initialize_Boundary_Nodes will use boundary_mesh
     map_from_nodes_to_boundary_list.Resize(mesh.number_nodes);
     for(int i=1;i<=mesh.boundary_nodes->m;i++) map_from_nodes_to_boundary_list((*mesh.boundary_nodes)(i))=i;
-    for(int i=1;i<=layers.m;i++) delete layers(i);layers.Resize(1);layers(1)=mesh.boundary_nodes;
+    for(int i=0;i<layers.m;i++) delete layers(i);layers.Resize(1);layers(1)=mesh.boundary_nodes;
     mesh.boundary_nodes=0; // we don't need it hanging off the mesh object any more
     if(verbose) LOG::cout<<"boundary layer has "<<layers(1)->m<<" nodes"<<std::endl;
     ARRAY<bool,VECTOR<int,1> > marked(1,mesh.number_nodes);for(int i=1;i<=layers(1)->m;i++) marked((*layers(1))(i))=true;
@@ -109,14 +109,14 @@ Initialize_Optimization(const bool verbose)
         layers.Append(new ARRAY<int>);
         for(int i=1;i<=layers(l-1)->m;i++){
             int j=(*layers(l-1))(i);
-            for(int k=1;k<=(*mesh.incident_elements)(j).m;k++) for(int a=1;a<=4;a++){
+            for(int k=1;k<=(*mesh.incident_elements)(j).m;k++) for(int a=0;a<4;a++){
                 int b=mesh.elements((*mesh.incident_elements)(j)(k))(a);
                 if(!marked(b)){layers(l)->Append(b);marked(b)=true;}}}
         if(layers(l)->m==0){delete layers(l);layers.Remove_End();break;}
         if(verbose) LOG::cout<<"layer "<<l<<" has "<<layers(l)->m<<" nodes"<<std::endl;}
     boundary_mesh_normals.Resize(layers(1)->m);
     if(replace_green_refinement_with_embedded_t_junctions)
-        for(int i=1;i<=layers.m;i++) for(int j=layers(i)->m;j>=1;j--) if(!(*mesh.incident_elements)((*layers(i))(j)).m) layers(i)->Remove_Index_Lazy(j);
+        for(int i=0;i<layers.m;i++) for(int j=layers(i)->m;j>=1;j--) if(!(*mesh.incident_elements)((*layers(i))(j)).m) layers(i)->Remove_Index_Lazy(j);
     Compute_Boundary_Mesh_Normals();
 }
 //#####################################################################
@@ -158,11 +158,11 @@ Optimize_Boundary_Layer(const T compression_fraction,const bool reverse)
     Check_For_Interrupts();
     PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     ARRAY<TV> directions(5);ARRAY<int>& nodes=*layers(1);
-    for(int i=1;i<=nodes.m;i++){
+    for(int i=0;i<nodes.m;i++){
         particles.X(nodes(i))-=compression_fraction*(*implicit_surface)(particles.X(nodes(i)))*boundary_mesh_normals(map_from_nodes_to_boundary_list(nodes(i)));
         Update_Dependent_Nodes(nodes(i));}
     Compute_Boundary_Mesh_Normals();
-    for(int i=1;i<=nodes.m;i++){
+    for(int i=0;i<nodes.m;i++){
         int p=nodes(reverse?nodes.m+1-i:i);
         TV normal=boundary_mesh_normals(map_from_nodes_to_boundary_list(p));
         if(abs(normal.x)>abs(normal.z) || abs(normal.y)>abs(normal.z)) directions(1)=TV(normal.y,-normal.x,0);
@@ -220,7 +220,7 @@ Search_For_Best_Position(const int node,const ARRAY<TV>& directions,bool include
     int strikes=0,last_direction=1;
     while(strikes<=3){
         T localbest_quality=best_quality;TV localbest_x=best_x;
-        for(int d=1;d<=directions.m;d++){
+        for(int d=0;d<directions.m;d++){
             int this_direction;if(d%2) this_direction=last_direction+d/2;else this_direction=last_direction-d/2;
             this_direction=(this_direction+directions.m-1)%directions.m+1;
             particles.X(node)=best_x+alpha*directions(this_direction);Update_Dependent_Nodes(node);
@@ -307,7 +307,7 @@ Compute_Boundary_Mesh_Normals()
         boundary_mesh_normals(map_from_nodes_to_boundary_list(i))+=p.normal;
         boundary_mesh_normals(map_from_nodes_to_boundary_list(j))+=p.normal;
         boundary_mesh_normals(map_from_nodes_to_boundary_list(k))+=p.normal;}
-    for(int i=1;i<=boundary_mesh_normals.m;i++) boundary_mesh_normals(i).Normalize();
+    for(int i=0;i<boundary_mesh_normals.m;i++) boundary_mesh_normals(i).Normalize();
 }
 //#####################################################################
 // Function Update_Dependent_Nodes
@@ -414,9 +414,9 @@ void Discard_Valence_Zero_Particles_And_Renumber(PARTICLES<TV>& particles,T_MESH
 
     // mark which nodes are used
     ARRAY<bool> node_is_used(mesh1.number_nodes);
-    for(int t=1;t<=mesh1.elements.m;t++){
+    for(int t=0;t<mesh1.elements.m;t++){
         node_is_used.Subset(mesh1.elements(t)).Fill(true);}
-    for(int t=1;t<=mesh2.elements.m;t++){
+    for(int t=0;t<mesh2.elements.m;t++){
         node_is_used.Subset(mesh2.elements(t)).Fill(true);}
 
     // make condensation mapping
@@ -425,16 +425,16 @@ void Discard_Valence_Zero_Particles_And_Renumber(PARTICLES<TV>& particles,T_MESH
 
     // make new triangle mesh
     mesh1.number_nodes=0;
-    for(int t=1;t<=mesh1.elements.m;t++){
+    for(int t=0;t<mesh1.elements.m;t++){
         mesh1.elements(t)=condensation_mapping.Subset(mesh1.elements(t));
         mesh1.number_nodes=max(mesh1.number_nodes,mesh1.elements(t).Max());}
-    for(int t=1;t<=mesh2.elements.m;t++){
+    for(int t=0;t<mesh2.elements.m;t++){
         mesh2.elements(t)=condensation_mapping.Subset(mesh2.elements(t));
         mesh1.number_nodes=max(mesh1.number_nodes,mesh2.elements(t).Max());}
     mesh2.number_nodes=mesh1.number_nodes;
 
     // do particles same way
-    for(int p=1;p<=condensation_mapping.m;p++) if(!condensation_mapping(p)) particles.array_collection->Add_To_Deletion_List(p);
+    for(int p=0;p<condensation_mapping.m;p++) if(!condensation_mapping(p)) particles.array_collection->Add_To_Deletion_List(p);
     for(int p=condensation_mapping.m+1;p<=particles.array_collection->Size();p++) particles.array_collection->Add_To_Deletion_List(p);
     particles.array_collection->Delete_Elements_On_Deletion_List(true);particles.array_collection->Compact();
 
@@ -478,7 +478,7 @@ Create_Initial_Mesh(const T bcc_lattice_cell_size,const bool use_adaptive_refine
         for(int iterations=0;iterations<max_subdivision_levels;iterations++){
             tets_to_refine.Remove_All();
             LOG::cout<<"Checking for refinement "<<std::flush;
-            for(int t=1;t<=mesh.elements.m;t++){
+            for(int t=0;t<mesh.elements.m;t++){
                 if(t%10000==0){
                     LOG::cout<<"."<<std::flush;
                     Check_For_Interrupts();}
@@ -500,7 +500,7 @@ Create_Initial_Mesh(const T bcc_lattice_cell_size,const bool use_adaptive_refine
             TRIANGLE_MESH minimal_boundary_mesh;
             minimal_mesh.Initialize_Boundary_Mesh_With_T_Junctions(minimal_boundary_mesh,t_junctions,t_junction_parents);
             ARRAY<bool> node_is_uncoarsenable(mesh.number_nodes);
-            for(int t=1;t<=minimal_boundary_mesh.elements.m;t++){
+            for(int t=0;t<minimal_boundary_mesh.elements.m;t++){
                 node_is_uncoarsenable.Subset(minimal_boundary_mesh.elements(t)).Fill(true);}
             redgreen.Coarsen_Complete_Refinements_Of_Subset(final_mesh,keep_tet_flag,t_junctions,t_junction_parents,allow_coarsening_to_non_graded_mesh,&node_is_uncoarsenable);}
         else{assert(!allow_coarsening_to_non_graded_mesh); // In the absence of discarding coarsening would just produce the unrefined BCC lattice
@@ -510,7 +510,7 @@ Create_Initial_Mesh(const T bcc_lattice_cell_size,const bool use_adaptive_refine
         mesh.Initialize_Incident_Elements();boundary_mesh->Initialize_Incident_Elements();
         BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
         ARRAY<int> particle_to_t_junction(particles.array_collection->Size());
-        for(int i=1;i<=t_junctions.m;i++) if((*mesh.incident_elements)(t_junctions(i)).m || (*boundary_mesh->incident_elements)(t_junctions(i)).m) particle_to_t_junction(t_junctions(i))=i;
+        for(int i=0;i<t_junctions.m;i++) if((*mesh.incident_elements)(t_junctions(i)).m || (*boundary_mesh->incident_elements)(t_junctions(i)).m) particle_to_t_junction(t_junctions(i))=i;
         for(int p=1;p<=particles.array_collection->Size();p++) if(particle_to_t_junction(p)){
             ARRAY<int> parents;ARRAY<T> weights;
             int t_junction=particle_to_t_junction(p);
@@ -520,7 +520,7 @@ Create_Initial_Mesh(const T bcc_lattice_cell_size,const bool use_adaptive_refine
                 if(!particle_to_t_junction(parents(i))){i++;continue;}
                 T old_weight=weights(i);t_junction=particle_to_t_junction(parents(i));
                 parents.Remove_Index_Lazy(i);weights.Remove_Index_Lazy(i);
-                for(int j=1;j<=2;j++){
+                for(int j=0;j<2;j++){
                     int new_parent=t_junction_parents(t_junction)(j);
                     int index=parents.Find(new_parent);if(!index){index=parents.Append(new_parent);weights.Append((T)0);}
                     weights(index)+=(T).5*old_weight;}}
@@ -532,7 +532,7 @@ Create_Initial_Mesh(const T bcc_lattice_cell_size,const bool use_adaptive_refine
               default: PHYSBAM_FATAL_ERROR();}}
         ARRAY<int> condensation_mapping;
         Discard_Valence_Zero_Particles_And_Renumber(particles,mesh,*boundary_mesh,condensation_mapping);
-        for(int b=1;b<=binding_list.bindings.m;b++)
+        for(int b=0;b<binding_list.bindings.m;b++)
             if(LINEAR_BINDING<TV,2>* binding=dynamic_cast<LINEAR_BINDING<TV,2>*>(binding_list.bindings(b))){
                 binding->particle_index=condensation_mapping(binding->particle_index);binding->parents=condensation_mapping.Subset(binding->parents);}
             else if(LINEAR_BINDING<TV,3>* binding=dynamic_cast<LINEAR_BINDING<TV,3>*>(binding_list.bindings(b))){
@@ -541,9 +541,9 @@ Create_Initial_Mesh(const T bcc_lattice_cell_size,const bool use_adaptive_refine
                 binding->particle_index=condensation_mapping(binding->particle_index);binding->parents=condensation_mapping.Subset(binding->parents);}
             else PHYSBAM_NOT_IMPLEMENTED();
         dependent_nodes=new ARRAY<ARRAY<int> >(mesh.number_nodes);
-        for(int b=1;b<=binding_list.bindings.m;b++){
+        for(int b=0;b<binding_list.bindings.m;b++){
             ARRAY<int> parents=binding_list.bindings(b)->Parents();
-            for(int p=1;p<=parents.m;p++) (*dependent_nodes)(parents(p)).Append(binding_list.bindings(b)->particle_index);}
+            for(int p=0;p<parents.m;p++) (*dependent_nodes)(parents(p)).Append(binding_list.bindings(b)->particle_index);}
         binding_list.Update_Binding_Index_From_Particle_Index();}
     else{
         for(int t=mesh.elements.m;t>=1;t--) if(!keep_tet_flag(t)) mesh.elements.Remove_Index_Lazy(t);mesh.elements.Compact();
@@ -606,7 +606,7 @@ Discard_To_Get_Nice_Topology(RED_GREEN_TETRAHEDRA<T>& redgreen,ARRAY<bool>& keep
     boundary_mesh.Initialize_Segment_Mesh();boundary_mesh.Initialize_Neighbor_Nodes();
 
     ARRAY<VECTOR<int,2> > edges_to_refine;
-    for(int i=1;i<=particles.array_collection->Size();i++) if((*boundary_mesh.neighbor_nodes)(i).m==3) for(int j=1;j<=3;j++) // refine degree 3 nodes
+    for(int i=1;i<=particles.array_collection->Size();i++) if((*boundary_mesh.neighbor_nodes)(i).m==3) for(int j=0;j<3;j++) // refine degree 3 nodes
         edges_to_refine.Append(VECTOR<int,2>(i,(*boundary_mesh.neighbor_nodes)(i)(j)));
     if(verbose) LOG::cout<<"Subdividing "<<edges_to_refine.m<<" undesirable surface edges."<<std::endl;
     redgreen.Subdivide_Segment_List(edges_to_refine);edges_to_refine.Clean_Memory();
@@ -614,15 +614,15 @@ Discard_To_Get_Nice_Topology(RED_GREEN_TETRAHEDRA<T>& redgreen,ARRAY<bool>& keep
     Envelope_Interior_Nodes(keep_tet_flag);
     mesh.Initialize_Boundary_Mesh_Of_Subset(boundary_mesh,keep_tet_flag);boundary_mesh.Initialize_Segment_Mesh();
     ARRAY<bool> node_on_boundary(mesh.number_nodes);
-    for(int t=1;t<=boundary_mesh.elements.m;t++){
+    for(int t=0;t<boundary_mesh.elements.m;t++){
         int i,j,k;boundary_mesh.elements(t).Get(i,j,k);node_on_boundary(i)=true;node_on_boundary(j)=true;node_on_boundary(k)=true;}
     ARRAY<int> boundary_nodes;boundary_nodes.Preallocate(boundary_mesh.elements.m);
-    for(int i=1;i<=node_on_boundary.m;i++) if(node_on_boundary(i)) boundary_nodes.Append(i);
+    for(int i=0;i<node_on_boundary.m;i++) if(node_on_boundary(i)) boundary_nodes.Append(i);
     boundary_mesh.segment_mesh->Initialize_Incident_Elements(); // for fast Segment() calls
     SEGMENT_MESH subset_segment_mesh;mesh.Initialize_Segment_Mesh_Of_Subset(subset_segment_mesh,keep_tet_flag);
     subset_segment_mesh.Initialize_Neighbor_Nodes(); // so we can look at just neighbors of boundary nodes
     ARRAY<VECTOR<int,2> > bad_segment_list;
-    for(int i=1;i<=boundary_nodes.m;i++){
+    for(int i=0;i<boundary_nodes.m;i++){
         int node1=boundary_nodes(i);
         for(int j=1;j<=(*subset_segment_mesh.neighbor_nodes)(node1).m;j++){
             int node2=(*subset_segment_mesh.neighbor_nodes)(node1)(j);
@@ -639,28 +639,28 @@ Discard_To_Get_Nice_Topology(RED_GREEN_TETRAHEDRA<T>& redgreen,ARRAY<bool>& keep
     number_bad_elements+=non_manifold_nodes.m;
     if(non_manifold_nodes.m){
         ARRAY<int> tets_to_refine;tets_to_refine.Preallocate(25*non_manifold_nodes.m);
-        for(int i=1;i<=non_manifold_nodes.m;i++) for(int j=1;j<=(*mesh.incident_elements)(non_manifold_nodes(i)).m;j++)
+        for(int i=0;i<non_manifold_nodes.m;i++) for(int j=1;j<=(*mesh.incident_elements)(non_manifold_nodes(i)).m;j++)
             tets_to_refine.Append((*mesh.incident_elements)(non_manifold_nodes(i))(j));
         redgreen.Refine_Simplex_List(tets_to_refine);Envelope_Interior_Nodes(keep_tet_flag);}
 
     while(number_bad_elements){ // continue to envelope while there may be bad things
         mesh.Initialize_Boundary_Mesh_Of_Subset(boundary_mesh,keep_tet_flag);
         node_on_boundary.Fill(false);node_on_boundary.Resize(mesh.number_nodes);
-        for(int t=1;t<=boundary_mesh.elements.m;t++){
+        for(int t=0;t<boundary_mesh.elements.m;t++){
             int i,j,k;boundary_mesh.elements(t).Get(i,j,k);node_on_boundary(i)=true;node_on_boundary(j)=true;node_on_boundary(k)=true;}
         boundary_nodes.Resize(0);int i;for(i=1;i<=node_on_boundary.m;i++) if(node_on_boundary(i)) boundary_nodes.Append(i);
         boundary_mesh.Initialize_Segment_Mesh();boundary_mesh.segment_mesh->Initialize_Incident_Elements(); // for fast Segment() calls
         mesh.Initialize_Segment_Mesh_Of_Subset(subset_segment_mesh,keep_tet_flag);
         subset_segment_mesh.Initialize_Neighbor_Nodes(); // so we can look at just neighbors of boundary nodes
         bad_segment_list.Resize(0);
-        for(int i=1;i<=boundary_nodes.m;i++){
+        for(int i=0;i<boundary_nodes.m;i++){
             int node1=boundary_nodes(i);
             for(int j=1;j<=(*subset_segment_mesh.neighbor_nodes)(node1).m;j++){
                 int node2=(*subset_segment_mesh.neighbor_nodes)(node1)(j);
                 if(node1<node2 && node_on_boundary(node2) && !boundary_mesh.segment_mesh->Segment(node1,node2)) bad_segment_list.Append(VECTOR<int,2>(node1,node2));}}
         if(verbose) LOG::cout<<"Enveloping "<<bad_segment_list.m<<" bad interior edges."<<std::endl;
         number_bad_elements=bad_segment_list.m;
-        for(int i=1;i<=bad_segment_list.m;i++){
+        for(int i=0;i<bad_segment_list.m;i++){
             int node1,node2;bad_segment_list(i).Get(node1,node2);T maxphi1=-(T)FLT_MAX,maxphi2=-(T)FLT_MAX;
             for(int j=1;j<=(*mesh.incident_elements)(node1).m;j++) if(!keep_tet_flag((*mesh.incident_elements)(node1)(j))){
                 int a,b,c,d;mesh.elements((*mesh.incident_elements)(node1)(j)).Get(a,b,c,d);
@@ -674,7 +674,7 @@ Discard_To_Get_Nice_Topology(RED_GREEN_TETRAHEDRA<T>& redgreen,ARRAY<bool>& keep
         boundary_mesh.Non_Manifold_Nodes(non_manifold_nodes);
         if(verbose) LOG::cout<<"Fixing "<<non_manifold_nodes.m<<" bad nodes."<<std::endl;
         number_bad_elements+=non_manifold_nodes.m;
-        for(int i=1;i<=non_manifold_nodes.m;i++) for(int j=1;j<=(*mesh.incident_elements)(non_manifold_nodes(i)).m;j++)
+        for(int i=0;i<non_manifold_nodes.m;i++) for(int j=1;j<=(*mesh.incident_elements)(non_manifold_nodes(i)).m;j++)
             keep_tet_flag((*mesh.incident_elements)(non_manifold_nodes(i))(j))=true;}
 }
 //##############################################################################
@@ -688,7 +688,7 @@ Envelope_Interior_Nodes(ARRAY<bool>& keep_tet_flag)
 
     keep_tet_flag.Resize(mesh.elements.m);keep_tet_flag.Fill(false);
     mesh.Initialize_Incident_Elements();mesh.Initialize_Neighbor_Nodes();
-    for(int i=1;i<=mesh.number_nodes;i++){
+    for(int i=0;i<mesh.number_nodes;i++){
         T phi=implicit_surface->Extended_Phi(particles.X(i));
         if(phi<0){bool envelope_node=true;
             for(int j=1;j<=(*mesh.neighbor_nodes)(i).m;j++) if(implicit_surface->Extended_Phi(particles.X((*mesh.neighbor_nodes)(i)(j)))>-3*phi){

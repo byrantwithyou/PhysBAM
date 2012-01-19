@@ -33,13 +33,13 @@ public:
     objects.Append(object);}
         
     void Preprocess_Efficiency_Structures(RENDER_WORLD<T>& world) PHYSBAM_OVERRIDE
-    {for(int i=1;i<=objects.m;i++){objects(i)->Get_Aggregate_World_Space_Bounding_Boxes(primitives);objects(i)->Preprocess_Efficiency_Structures(world);}
+    {for(int i=0;i<objects.m;i++){objects(i)->Get_Aggregate_World_Space_Bounding_Boxes(primitives);objects(i)->Preprocess_Efficiency_Structures(world);}
     ARRAY<PAIR<RANGE<VECTOR<T,3> >,RENDERING_OBJECT_ACCELERATION_PRIMITIVE<T>*> > box_input;
-    for(int i=1;i<=primitives.m;i++) box_input.Append(PAIR<RANGE<VECTOR<T,3> >,RENDERING_OBJECT_ACCELERATION_PRIMITIVE<T>*>(primitives(i).world_bounding_box,&primitives(i)));
+    for(int i=0;i<primitives.m;i++) box_input.Append(PAIR<RANGE<VECTOR<T,3> >,RENDERING_OBJECT_ACCELERATION_PRIMITIVE<T>*>(primitives(i).world_bounding_box,&primitives(i)));
     uniform_grid.Initialize(box_input);}
     
     bool Inside(const VECTOR<T,3>& location,RENDERING_OBJECT<T>** intersected_object) const PHYSBAM_OVERRIDE
-    {for(int i=1;i<=objects.m;i++) if(objects(i)->support_transparent_overlapping_objects&&objects(i)->Inside(location)){*intersected_object=(RENDERING_OBJECT<T>*)this;return true;}
+    {for(int i=0;i<objects.m;i++) if(objects(i)->support_transparent_overlapping_objects&&objects(i)->Inside(location)){*intersected_object=(RENDERING_OBJECT<T>*)this;return true;}
     return false;}
 
     TRIANGULATED_SURFACE<T>* Generate_Triangles() const PHYSBAM_OVERRIDE

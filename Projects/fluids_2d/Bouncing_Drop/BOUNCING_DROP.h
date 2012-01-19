@@ -51,7 +51,7 @@ void Initialize_Phi()
 {
     VECTOR_2D<T> center((T).5,(T).5);
     T radius=(T).2;
-    for(int i=1;i<=fluids_parameters.grid.m;i++)for(int j=1;j<=fluids_parameters.grid.n;j++)
+    for(int i=0;i<fluids_parameters.grid.m;i++)for(int j=0;j<fluids_parameters.grid.n;j++)
         fluids_parameters.particle_levelset_evolution.phi(i,j)=(fluids_parameters.grid.X(i,j)-center).Magnitude()-radius;
 }
 //#####################################################################
@@ -61,7 +61,7 @@ void Initialize_Velocities()
 {
     VECTOR_2D<T> center((T).5,(T).7);
     T scale=10;
-    for(int i=1;i<=fluids_parameters.grid.m;i++)for(int j=1;j<=fluids_parameters.grid.n;j++)
+    for(int i=0;i<fluids_parameters.grid.m;i++)for(int j=0;j<fluids_parameters.grid.n;j++)
         //    V(i,j)=scale*VECTOR_2D<T>(grid.x(i)-center.x,0);
         fluids_parameters.particle_levelset_evolution.V(i,j)=VECTOR_2D<T>(0,-scale);
 }

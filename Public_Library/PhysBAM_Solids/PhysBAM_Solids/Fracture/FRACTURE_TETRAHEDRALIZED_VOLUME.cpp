@@ -52,7 +52,7 @@ template<class T> void FRACTURE_TETRAHEDRALIZED_VOLUME<T>::
 Add_First_Cut_Based_On_Phi(const int tetrahedron,const VECTOR<T,4>& tetrahedron_phi)
 {
     VECTOR<int,4> nodes=embedded_object.simplicial_object.mesh.elements(tetrahedron);
-    int positive_count=0;for(int i=1;i<=4;i++)if(tetrahedron_phi(i)>0)positive_count++;
+    int positive_count=0;for(int i=0;i<4;i++)if(tetrahedron_phi(i)>0)positive_count++;
     assert(positive_count==1 || positive_count==2 || positive_count==3);
     int i,j,k,l,pi=1,pj=2,pk=3,pl=4;int count=1;
     if(positive_count==2){
@@ -82,7 +82,7 @@ template<class T> void FRACTURE_TETRAHEDRALIZED_VOLUME<T>::
 Add_Next_Cut_Based_On_Phi(const int tetrahedron,const VECTOR<T,4>& tetrahedron_phi,const bool second_cut)
 {
     VECTOR<int,4> nodes=embedded_object.simplicial_object.mesh.elements(tetrahedron);
-    int positive_count=0;for(int i=1;i<=4;i++)if(tetrahedron_phi(i)>0)positive_count++;
+    int positive_count=0;for(int i=0;i<4;i++)if(tetrahedron_phi(i)>0)positive_count++;
     assert(positive_count==1 || positive_count==2 || positive_count==3);
     int i,j,k,l,pi=1,pj=2,pk=3,pl=4;int count=1;
     if(positive_count==2){
@@ -114,7 +114,7 @@ template<class T> int FRACTURE_TETRAHEDRALIZED_VOLUME<T>::
 Add_Intersected_Points_To_Embedded_Tetrahedralized_Volume(const int tetrahedron,const TV& fracture_normal,HYPOTHETICAL_CUT_TETRAHEDRONS<T>& hypothetical_cut)
 {
     T best_cut_quality=(T)-FLT_MAX;
-    for(int a=1;a<=7;a++){
+    for(int a=0;a<7;a++){
         HYPOTHETICAL_CUT_TETRAHEDRONS<T> hc(embedded_object);hc.Initialize_Hypothetical_Cut(fracture_normal,a,tetrahedron);
         if(!hc.hypothetical_nodes.m) continue;
         if(!hc.Edges_Shared_With_Existing_Embedded_Surface()) continue;
@@ -354,7 +354,7 @@ template<class T> int FRACTURE_TETRAHEDRALIZED_VOLUME<T>::
 Add_Best_Embedded_Triangle_Or_Quad_With_Two_Triangles(const TV& fracture_normal,const int tetrahedron,HYPOTHETICAL_CUT_TETRAHEDRONS<T>& hypothetical_cut)
 {
     T best_cut_quality=(T)-FLT_MAX;
-    for(int a=1;a<=7;a++){
+    for(int a=0;a<7;a++){
         HYPOTHETICAL_CUT_TETRAHEDRONS<T> hc(embedded_object);
         hc.Initialize_Hypothetical_Cut(fracture_normal,a,tetrahedron);
         if(!hc.hypothetical_nodes.m)continue;

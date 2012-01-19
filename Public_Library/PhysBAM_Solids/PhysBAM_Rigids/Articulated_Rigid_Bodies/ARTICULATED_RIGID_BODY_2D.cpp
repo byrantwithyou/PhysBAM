@@ -33,14 +33,14 @@ template<class T> ARTICULATED_RIGID_BODY<VECTOR<T,2> >::
 template<class T> void ARTICULATED_RIGID_BODY<VECTOR<T,2> >::
 Compute_Position_Based_State(const T dt,const T time)
 {
-    for(int i=1;i<=joint_mesh.joints.m;i++) if(joint_mesh.joints(i)->joint_function) joint_mesh.joints(i)->joint_function->Compute_Desired_PD_Velocity(dt,time);
+    for(int i=0;i<joint_mesh.joints.m;i++) if(joint_mesh.joints(i)->joint_function) joint_mesh.joints(i)->joint_function->Compute_Desired_PD_Velocity(dt,time);
     if(use_muscle_actuators){
         if(!muscle_list) muscle_list=new MUSCLE_LIST<TV>(rigid_body_collection);
         muscle_list->Initialize_Muscle_Attachments_On_Rigid_Body();
         // Only looks for muscles connecting parent-child across joint
         muscles_crossing_joints.Resize(joint_mesh.joints.m);
         muscle_activations.Resize(muscle_list->muscles.m);muscle_activations.Fill((T)0);
-        for(int i=1;i<=joint_mesh.joints.m;i++){
+        for(int i=0;i<joint_mesh.joints.m;i++){
             JOINT<TV>& joint=*joint_mesh.joints(i);
             int parent_id=Parent_Id(joint.id_number),child_id=Child_Id(joint.id_number);
             TV location=joint.Location(*Parent(joint.id_number),*Child(joint.id_number));
@@ -116,7 +116,7 @@ Solve_Velocities_for_PD(const T time,const T dt,bool test_system,bool print_matr
     // don't do extra actuation iterations if not using actuators
     if(!use_pd_actuators && !use_muscle_actuators){Apply_Poststabilization(test_system,print_matrix);return;}
     for(int iteration=0;iteration<actuation_iterations;iteration++) for(int k=0;k<poststabilization_iterations;k++)
-        for(int i=1;i<=joint_mesh.joints.m;i++) Post_Stabilization_With_Actuation(joint_mesh.joints(i)->id_number);
+        for(int i=0;i<joint_mesh.joints.m;i++) Post_Stabilization_With_Actuation(joint_mesh.joints(i)->id_number);
 }
 //####################################################################################
 // Function Create_Joint_Function
@@ -137,7 +137,7 @@ Output_Articulation_Points(const STREAM_TYPE stream_type,const std::string& outp
     std::ostream* output=FILE_UTILITIES::Safe_Open_Output(STRING_UTILITIES::string_sprintf("%s/%d/arb_info",output_directory.c_str(),frame));
     TYPED_OSTREAM typed_output(*output,stream_type);
     Write_Binary(typed_output,joint_mesh.joints.m*2);
-    for(int i=1;i<=joint_mesh.joints.m;i++){
+    for(int i=0;i<joint_mesh.joints.m;i++){
         JOINT<TV>& joint=*joint_mesh.joints(i);
         const RIGID_BODY<TV> &parent=*Parent(joint.id_number),&child=*Child(joint.id_number);
         TV ap1=parent.World_Space_Point(joint.F_pj().t),ap2=child.World_Space_Point(joint.F_cj().t);

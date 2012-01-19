@@ -167,7 +167,7 @@ template<class T,class T_PARTICLES,class RW> void OPENGL_COMPONENT_PARTICLES_2D<
 Clear_Highlight()
 {
     if(use_ids) Clear_Id_Selection();
-    else for(int i=1;i<=opengl_points_multiple.m;i++) opengl_points_multiple(i)->Clear_Selection();
+    else for(int i=0;i<opengl_points_multiple.m;i++) opengl_points_multiple(i)->Clear_Selection();
 }
 
 template<class T,class T_PARTICLES,class RW> void OPENGL_COMPONENT_PARTICLES_2D<T,T_PARTICLES,RW>::
@@ -285,14 +285,14 @@ Reinitialize(bool force)
 template<class T,class T_PARTICLES,class RW> void OPENGL_COMPONENT_PARTICLES_2D<T,T_PARTICLES,RW>::
 Toggle_Draw_Point_Numbers()
 {
-    for(int i=1;i<=opengl_points_multiple.m;i++)
+    for(int i=0;i<opengl_points_multiple.m;i++)
         opengl_points_multiple(i)->draw_point_numbers=!opengl_points_multiple(i)->draw_point_numbers;
 }
 
 template<class T,class T_PARTICLES,class RW> void OPENGL_COMPONENT_PARTICLES_2D<T,T_PARTICLES,RW>::
 Toggle_Draw_Radii()
 {
-    for(int i=1;i<=opengl_points_multiple.m;i++)
+    for(int i=0;i<opengl_points_multiple.m;i++)
         opengl_points_multiple(i)->draw_radii=!opengl_points_multiple(i)->draw_radii;
 }
 
@@ -376,7 +376,7 @@ Select_Particles_By_Ids(const ARRAY<int> &ids)
 template<class T,class T_PARTICLES,class RW> void OPENGL_COMPONENT_PARTICLES_2D<T,T_PARTICLES,RW>::
 Clear_Id_Selection()
 {
-    for(int i=1;i<=selected_ids.m;i++) selected_ids(i).Remove_All();
+    for(int i=0;i<selected_ids.m;i++) selected_ids(i).Remove_All();
     Apply_Id_Selection();
 }
 

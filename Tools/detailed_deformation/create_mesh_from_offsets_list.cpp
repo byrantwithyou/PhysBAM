@@ -49,7 +49,7 @@ int main(int argc,char *argv[])
     tet_vol.Update_Tetrahedron_List();
 
     ARRAY<int> particles_to_update;
-    for(int i=1;i<=tet_particles.number;i++)if(condensation_map(i)!=0)particles_to_update.Append(i);
+    for(int i=0;i<tet_particles.number;i++)if(condensation_map(i)!=0)particles_to_update.Append(i);
 
     int frame=atoi(argv[2]);
 
@@ -61,7 +61,7 @@ int main(int argc,char *argv[])
         
     cout<<"Updating condensation based positions..."<<endl;
     // Use the condensation map to update tetrahedral particles appropriately
-    for(int i=1;i<=particles_to_update.m;i++)tet_particles.X(particles_to_update(i))=deformable_object_list(1).tetrahedralized_volume->particles.X(condensation_map(particles_to_update(i)));
+    for(int i=0;i<particles_to_update.m;i++)tet_particles.X(particles_to_update(i))=deformable_object_list(1).tetrahedralized_volume->particles.X(condensation_map(particles_to_update(i)));
 
     cout<<"Initializing deformable object triangulated surface..."<<endl;
     deformable_object_list(1).tetrahedralized_volume->Initialize_Triangulated_Surface();
@@ -72,7 +72,7 @@ int main(int argc,char *argv[])
     
     cout<<"Transforming hires mesh via barycentric coords..."<<endl;
     // Reconstruct triangle mesh points from offsets        
-    for(int p=1;p<=tri_particles.number;p++){if(tri_particles.X(p).y>-lower_cutoff)
+    for(int p=0;p<tri_particles.number;p++){if(tri_particles.X(p).y>-lower_cutoff)
         tri_particles.X(p)=(*tet_vol.tetrahedron_list)(offset_particles(p).x).Point_From_Barycentric_Coordinates(offset_particles(p).y);}
     
     /*
@@ -83,12 +83,12 @@ int main(int argc,char *argv[])
     std::istream* input=FILE_UTILITIES::Safe_Open_Input(string(argv[1])+"/face_control_set_types");
     if(!input){cout<<"Face control set types not found."<<endl;exit(-1);}
     int control_sets;Read_Binary<float>(*input,control_sets);cout<<"Procesing "<<control_sets<<" control sets..."<<endl;
-    for(int i=1;i<=control_sets;i++){
+    for(int i=0;i<control_sets;i++){
         int control_set_type;Read_Binary<float>(*input,control_set_type);
         if(control_set_type==FACE_CONTROL_SET<float>::ACTIVATION){
             act_control_set=new ACTIVATION_CONTROL_SET<float>;ARRAY<std::string> muscle_names;
             FILE_UTILITIES::Read_From_File<float>(STRING_UTILITIES::string_sprintf("%s/face_control_set_%d.muscle_names",argv[1],i),muscle_names);
-            for(int j=1;j<=muscle_names.m;j++) act_control_set->Add_Activation(muscle_names(j));
+            for(int j=0;j<muscle_names.m;j++) act_control_set->Add_Activation(muscle_names(j));
             face_control_parameters.list.Append(act_control_set);}
         else if(control_set_type==FACE_CONTROL_SET<float>::ATTACHMENT_FRAME){
             ARRAY<ARRAY<int> > nodes_dummy;
@@ -101,7 +101,7 @@ int main(int argc,char *argv[])
 
     cout<<"Applying rotations..."<<endl;
     // Apply affine transformations (rotation) to flesh
-    for(int p=1;p<=tri_particles.number;p++)
+    for(int p=0;p<tri_particles.number;p++)
         tri_particles.X(p)=att_control_set->cranium_transform.affine_transform*tri_particles.X(p)+att_control_set->cranium_transform.translation;
     */   
     cout<<"Writing triangle mesh..."<<endl;

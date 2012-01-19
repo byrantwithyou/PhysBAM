@@ -117,7 +117,7 @@ Generate_Muscles(std::string listfile)
 {
     Load_List(listfile, muscle_list);
 
-    for(int i=1;i<=muscle_list.m;i++) 
+    for(int i=0;i<muscle_list.m;i++) 
     {
         // Name
         std::string filename=muscle_list(i);
@@ -134,13 +134,13 @@ Generate_Muscles(std::string listfile)
         OPENGL_COMPONENT_MUSCLE_3D<T> *muscle = new OPENGL_COMPONENT_MUSCLE_3D<T>(this);        
         muscle->parameters.Resize(num_points);
         // Read in this information for each point
-        for(int i=1;i<=num_points;i++)
+        for(int i=0;i<num_points;i++)
         {      
             muscle->parameters(i).Resize(4);
             if (i==1) {
                 *input>>x>>y>>z>>bone_name>>attached;
                 segment_type = "";
-                for(int p=1;p<=4;p++) muscle->parameters(i)(p)=0.0;
+                for(int p=0;p<4;p++) muscle->parameters(i)(p)=0.0;
             }
             else {
                 *input>>x>>y>>z>>bone_name>>attached>>segment_type;
@@ -283,7 +283,7 @@ template<class T> void ARTICULATION_VISUALIZATION<T>::
 Save_Muscles()
 {   
     // Iterate over all muscles and write modified data back out
-    for(int i=1;i<=muscle_list.m;i++) 
+    for(int i=0;i<muscle_list.m;i++) 
     {
         // get name
         std::string filename=muscle_list(i);
@@ -311,7 +311,7 @@ Save_Muscles()
 
             // write out
             *output<<m->points(i)<<" "<<bname<<" "<<m->attach(i)<<" "<<m->segment_type(i);
-            if(m->segment_type(i)=="analytic") for(int p=1;p<=4;p++) *output<<" "<<m->parameters(i)(p);
+            if(m->segment_type(i)=="analytic") for(int p=0;p<4;p++) *output<<" "<<m->parameters(i)(p);
             *output<<std::endl;
         }
 

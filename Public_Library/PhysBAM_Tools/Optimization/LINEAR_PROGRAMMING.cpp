@@ -14,8 +14,8 @@ template<class T> void LINEAR_PROGRAMMING<T>::
 Move_Column_From_B_To_N_And_Shift_Down(MATRIX_MXN<T>& B,VECTOR_ND<int>& permute_B,const int b_column,MATRIX_MXN<T>& N,VECTOR_ND<int>& permute_N,const int n_column)
 {
     assert(B.m==B.n);
-    for(int i=1;i<=B.n;i++)N(i,n_column)=B(i,b_column);permute_N(n_column)=permute_B(b_column);
-    for(int j=b_column;j<B.n;j++){for(int i=1;i<=B.n;i++)B(i,j)=B(i,j+1);permute_B(j)=permute_B(j+1);}
+    for(int i=0;i<B.n;i++)N(i,n_column)=B(i,b_column);permute_N(n_column)=permute_B(b_column);
+    for(int j=b_column;j<B.n;j++){for(int i=0;i<B.n;i++)B(i,j)=B(i,j+1);permute_B(j)=permute_B(j+1);}
 }
 //####################################################################################
 // Function Update_Upper_Triangular_Matrix_After_Column_Shift
@@ -31,7 +31,7 @@ Update_Upper_Triangular_Matrix_After_Column_Shift(MATRIX_MXN<T>& A,MATRIX_MXN<T>
         assert(abs(A(i+1,i))>tolerance);
         VECTOR<T,2> v(A(i,i),A(i+1,i));A(i,i)=v.Magnitude();A(i+1,i)=0;v.Normalize();
         for(int j=i+1;j<=A.n;j++) givens_rotate(A(i,j),A(i+1,j),v.x,v.y);
-        for(int j=1;j<=N.n;j++) givens_rotate(N(i,j),N(i+1,j),v.x,v.y);
+        for(int j=0;j<N.n;j++) givens_rotate(N(i,j),N(i+1,j),v.x,v.y);
         givens_rotate(b(i),b(i+1),v.x,v.y);}
 
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
@@ -50,7 +50,7 @@ Find_Feasible_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& N,VECTOR_ND<T>& x_B,VECTO
 {
     assert(B.m==B.n);
     ARRAY<bool> x_in_feasible_region(B.n+N.n);
-    for(int i=1;i<=x_N.n;i++){ // TODO: starting x_N at min values (or max if no min)
+    for(int i=0;i<x_N.n;i++){ // TODO: starting x_N at min values (or max if no min)
         if(x_min(permute_N(i)).x) x_N(i)=x_min(permute_N(i)).y;
         else{assert(x_max(permute_N(i)).x);x_N(i)=x_max(permute_N(i)).y;} // must have a max if no min
         x_in_feasible_region(permute_N(i))=true;}
@@ -70,7 +70,7 @@ Find_Feasible_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& N,VECTOR_ND<T>& x_B,VECTO
 
         bool have_unsatisfied_constraint=false;
         // TODO: maybe use tolerance to consider anything in [x_min-tol,x_max+tol] as being in feasible region
-        for(int i=1;i<=B.n;i++){
+        for(int i=0;i<B.n;i++){
             if(!x_in_feasible_region(permute_B(i)) && x_min(permute_B(i)).x && x_B(i)<x_min(permute_B(i)).y){c_B(i)=-1;have_unsatisfied_constraint=true;}
             else if(!x_in_feasible_region(permute_B(i)) && x_max(permute_B(i)).x && x_B(i)>x_max(permute_B(i)).y){c_B(i)=+1;have_unsatisfied_constraint=true;}
             else{ // clamp ones we know should be in feasible region
@@ -91,7 +91,7 @@ Find_Feasible_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& N,VECTOR_ND<T>& x_B,VECTO
 #endif
 
         int index_to_release=0;T sigma_to_release=0;
-        for(int i=1;i<=N.n;i++) if((sigma(i)<0 && x_min(permute_N(i)).x && x_N(i)==x_min(permute_N(i)).y) ||
+        for(int i=0;i<N.n;i++) if((sigma(i)<0 && x_min(permute_N(i)).x && x_N(i)==x_min(permute_N(i)).y) ||
                                    (sigma(i)>0 && x_max(permute_N(i)).x && x_N(i)==x_max(permute_N(i)).y))
             if(abs(sigma(i))>sigma_to_release){sigma_to_release=abs(sigma(i));index_to_release=i;}
       
@@ -122,7 +122,7 @@ Find_Feasible_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& N,VECTOR_ND<T>& x_B,VECTO
         // check if we hit any other constraint
         // NOTE: if p_B(i) is close to zero we don't clamp against that variable because if we did and ended up trying to swap
         // columns from N and B then the new B would not be full rank and trying to update it using LU would give us a zero on the diagonal
-        for(int i=1;i<=B.n;i++) if(!x_in_feasible_region(permute_B(i)) || abs(p_B(i)*alpha)>=step_tolerance){
+        for(int i=0;i<B.n;i++) if(!x_in_feasible_region(permute_B(i)) || abs(p_B(i)*alpha)>=step_tolerance){
             if(p_B(i)>0 && x_max(permute_B(i)).x && (x_in_feasible_region(permute_B(i)) || (x_max(permute_B(i)).y-x_B(i))>0) && (x_max(permute_B(i)).y-x_B(i))/p_B(i)<alpha){
                 alpha=max((T)0,(x_max(permute_B(i)).y-x_B(i))/p_B(i));limiting_index=i;limiting_value=x_max(permute_B(i)).y;}
             else if(p_B(i)<0 && x_min(permute_B(i)).x && (x_in_feasible_region(permute_B(i)) || (x_min(permute_B(i)).y-x_B(i))<0) && (x_min(permute_B(i)).y-x_B(i))/p_B(i)<alpha){
@@ -134,7 +134,7 @@ Find_Feasible_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& N,VECTOR_ND<T>& x_B,VECTO
 #endif
 
         // robustly detect when a variable enters feasible region as a result of moving by alpha
-        for(int i=1;i<=B.n;i++) if(!x_in_feasible_region(permute_B(i))){
+        for(int i=0;i<B.n;i++) if(!x_in_feasible_region(permute_B(i))){
             if((p_B(i)>0 && x_min(permute_B(i)).x && x_B(i)<=x_min(permute_B(i)).y && (x_min(permute_B(i)).y-x_B(i))/p_B(i)<=alpha) ||
                (p_B(i)<0 && x_max(permute_B(i)).x && x_B(i)>=x_max(permute_B(i)).y && (x_max(permute_B(i)).y-x_B(i))/p_B(i)<=alpha))
                 x_in_feasible_region(permute_B(i))=true;}
@@ -142,7 +142,7 @@ Find_Feasible_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& N,VECTOR_ND<T>& x_B,VECTO
         if(!limiting_index){
 #if 0
             alpha=0;limiting_index=0; // see how far we need to go to satisfy as much as possible
-            for(int i=1;i<=B.n;i++)
+            for(int i=0;i<B.n;i++)
                 if(p_B(i)>0 && x_min(permute_B(i)).x && (x_min(permute_B(i)).y-x_B(i))/p_B(i)>alpha){alpha=(x_min(permute_B(i)).y-x_B(i))/p_B(i);limiting_index=i;}
                 else if(p_B(i)<0 && x_max(permute_B(i)).x && (x_max(permute_B(i)).y-x_B(i))/p_B(i)>alpha){alpha=(x_max(permute_B(i)).y-x_B(i))/p_B(i);limiting_index=i;}
             x_B+=alpha*p_B;
@@ -190,7 +190,7 @@ Find_Feasible_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& N,VECTOR_ND<T>& x_B,VECTO
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         LOG::cout << "PHYSBAM_WARNING: clamping values into feasible region after unsuccessful LP solve" << std::endl;
 #endif
-        for(int i=1;i<=x_B.n;i++) if(!x_in_feasible_region(permute_B(i))){
+        for(int i=0;i<x_B.n;i++) if(!x_in_feasible_region(permute_B(i))){
             if(x_min(permute_B(i)).x) x_B(i)=max(x_B(i),x_min(permute_B(i)).y);
             if(x_max(permute_B(i)).x) x_B(i)=min(x_B(i),x_max(permute_B(i)).y);}}
 

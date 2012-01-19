@@ -34,7 +34,7 @@ int main(int argc,char **argv)
     tetrahedralized_volume.Update_Tetrahedron_List();
 
     LOG::cout<<"tetrahedra = "<<tetrahedron_mesh.tetrahedrons.m<<std::endl;
-    for(int t=1;t<=tetrahedron_mesh.tetrahedrons.m;t++){
+    for(int t=0;t<tetrahedron_mesh.tetrahedrons.m;t++){
         TETRAHEDRON<T> tet=(*tetrahedralized_volume.tetrahedron_list)(t);
         if(tet.Aspect_Ratio() > aspect_ratio){
             LOG::cout<<"removing tet "<<t<<" with aspect ratio "<<tet.Aspect_Ratio()<<std::endl;

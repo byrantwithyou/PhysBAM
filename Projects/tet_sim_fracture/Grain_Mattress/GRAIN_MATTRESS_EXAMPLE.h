@@ -77,7 +77,7 @@ void Get_Initial_Data()
 
     tetrahedralized_volume.Update_Bounding_Box();
     TV center(tetrahedralized_volume.bounding_box->Center());T bottom=tetrahedralized_volume.bounding_box->min_corner.y;
-    for(int i=1;i<=particles.array_size;i++){
+    for(int i=0;i<particles.array_size;i++){
         particles.V(i)=initial_velocity+TV::Cross_Product(initial_angular_velocity,particles.X(i)-center);
         particles.X(i)=center+initial_orientation.Rotate(particles.X(i)-center);
         particles.X(i).y+=initial_height-bottom;}

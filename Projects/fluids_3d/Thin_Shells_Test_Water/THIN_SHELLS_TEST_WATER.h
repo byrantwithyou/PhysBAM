@@ -453,7 +453,7 @@ void Initialize_Phi()
     // Not so good to set up a heaviside function here because then the interface will
     // be exactly between the two nodes which can lead to roundoff issues when setting dirichlet cells, etc.
     GRID<TV>& grid=fluids_parameters.grid;
-    for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++) for(int ij=1;ij<=grid.mn;ij++)
+    for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++) for(int ij=0;ij<grid.mn;ij++)
         fluids_parameters.particle_levelset_evolution.phi(i,j,ij)=grid.y(j)-grid.ymin-initial_water_level;
 }
 //#####################################################################

@@ -93,7 +93,7 @@ Display(const int in_color) const
     bool draw_embedded_curves=false;
     switch(display_mode){
         case 0:draw_embedded_curves=true;break;}
-    for(int i=1;i<=segmented_curve_objects.m;i++){
+    for(int i=0;i<segmented_curve_objects.m;i++){
         glPushName(i);
         if(draw_embedded_curves && embedded_curve_objects(i)){glPushName(5);embedded_curve_objects(i)->Display(in_color);glPopName();}
         glPopName();}
@@ -114,7 +114,7 @@ template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T
 Set_Vector_Size(const T vector_size)
 {
     BASE::Set_Vector_Size(vector_size);
-    for(int i=1;i<=embedded_curve_objects.m;i++) if(embedded_curve_objects(i)) embedded_curve_objects(i)->velocity_scale=velocity_scale; // apply to objects which already exist
+    for(int i=0;i<embedded_curve_objects.m;i++) if(embedded_curve_objects(i)) embedded_curve_objects(i)->velocity_scale=velocity_scale; // apply to objects which already exist
 }
 //#####################################################################
 // Function Increase_Vector_Size
@@ -123,7 +123,7 @@ template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T
 Increase_Vector_Size()
 {
     BASE::Increase_Vector_Size();
-    for(int i=1;i<=embedded_curve_objects.m;i++) if(embedded_curve_objects(i)) embedded_curve_objects(i)->velocity_scale=velocity_scale; // apply to objects which already exist
+    for(int i=0;i<embedded_curve_objects.m;i++) if(embedded_curve_objects(i)) embedded_curve_objects(i)->velocity_scale=velocity_scale; // apply to objects which already exist
 }
 //#####################################################################
 // Function Decrease_Vector_Size
@@ -132,7 +132,7 @@ template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T
 Decrease_Vector_Size()
 {
     BASE::Decrease_Vector_Size();
-    for(int i=1;i<=embedded_curve_objects.m;i++) if(embedded_curve_objects(i)) embedded_curve_objects(i)->velocity_scale=velocity_scale; // apply to objects which already exist
+    for(int i=0;i<embedded_curve_objects.m;i++) if(embedded_curve_objects(i)) embedded_curve_objects(i)->velocity_scale=velocity_scale; // apply to objects which already exist
 }
 //#####################################################################
 // Function Toggle_Draw_Velocities
@@ -141,7 +141,7 @@ template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T
 Toggle_Draw_Velocities()
 {
     BASE::Toggle_Draw_Velocities();
-    for(int i=1;i<=embedded_curve_objects.m;i++) if(embedded_curve_objects(i)) embedded_curve_objects(i)->draw_velocities=draw_velocities;
+    for(int i=0;i<embedded_curve_objects.m;i++) if(embedded_curve_objects(i)) embedded_curve_objects(i)->draw_velocities=draw_velocities;
 }
 //#####################################################################
 // Function Get_Selection
@@ -170,7 +170,7 @@ template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<T
 Clear_Highlight()
 {
     BASE::Clear_Highlight();
-    for(int i=1;i<=embedded_curve_objects.m;i++)if(embedded_curve_objects(i))embedded_curve_objects(i)->Clear_Highlight();
+    for(int i=0;i<embedded_curve_objects.m;i++)if(embedded_curve_objects(i))embedded_curve_objects(i)->Clear_Highlight();
 }
 //#####################################################################
 template class OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D<float,float>;

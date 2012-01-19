@@ -21,7 +21,7 @@ void PhysBAM::NR_fourn(const int isign,const ARRAY<int>& dim,ARRAY<float>& data)
     float tempi,tempr;
     double theta,wi,wpi,wpr,wr,wtemp;
 
-    for(int i=1;i<=dim.m;i++)if(dim(i)&(dim(i)-1)){
+    for(int i=0;i<dim.m;i++)if(dim(i)&(dim(i)-1)){
         LOG::cerr<<"Input dimensions must be powers of two: "<<dim;PHYSBAM_FATAL_ERROR();}
 
     for(ntot=1,idim=1;idim<=dim.m;idim++) ntot*=dim(idim);

@@ -59,14 +59,14 @@ public:
     ~RIGID_BODY_FRACTURE_OBJECT_3D(){}
 
     void Update_Particle_To_Rigid_Body_Id_Mapping()
-    {for(int p=1;p<=rigid_to_deformable_particles.m;p++) particle_to_rigid_body_id(rigid_to_deformable_particles(p))=particle_index;}
+    {for(int p=0;p<rigid_to_deformable_particles.m;p++) particle_to_rigid_body_id(rigid_to_deformable_particles(p))=particle_index;}
 
     void Initialize_Grain_Boundaries(const ARRAY<TV>& seed_positions,const ARRAY<T>& seed_weakness_multipliers,const FRACTURE_CALLBACKS<TV>* fracture_callbacks,const bool levelset_grain_boundaries=true) // seed positions are specified in world space
     {
         ARRAY<TV> object_space_seed_positions(seed_positions.m);
         SIMPLEX_MESH<3>& mesh=this->template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>().mesh;
         FRAME<TV> inverse_frame=Frame().Inverse();
-        for(int i=1;i<=seed_positions.m;i++) object_space_seed_positions(i)=inverse_frame*seed_positions(i);
+        for(int i=0;i<seed_positions.m;i++) object_space_seed_positions(i)=inverse_frame*seed_positions(i);
         if(levelset_grain_boundaries){
             grain_boundaries.Append(new LEVELSET_GRAIN_BOUNDARIES<TV,3>(particles,mesh,object_space_seed_positions,seed_weakness_multipliers,Frame(),fracture_callbacks));
         }
@@ -93,7 +93,7 @@ public:
 
         // get all the particles of the material surface
         int index=1;
-        for(int particle_id=1;particle_id<=solid_body_collection.deformable_body_collection.dynamic_particles.m;particle_id++){
+        for(int particle_id=0;particle_id<solid_body_collection.deformable_body_collection.dynamic_particles.m;particle_id++){
             int i=solid_body_collection.deformable_body_collection.dynamic_particles(particle_id);
             rigid_to_deformable_particles(index)=i;
             deformable_to_rigid_particles(i)=index;
@@ -101,13 +101,13 @@ public:
             index++;}
 
         ARRAY<VECTOR<int,3> > tri_elements;tri_elements.Preallocate(embedding.material_surface.mesh.elements.m);
-        for(int t=1;t<=embedding.material_surface_mesh.elements.m;t++){
+        for(int t=0;t<embedding.material_surface_mesh.elements.m;t++){
             int index1=embedding.material_surface_mesh.elements(t)[1];
             int index2=embedding.material_surface_mesh.elements(t)[2],index3=embedding.material_surface_mesh.elements(t)[3];
             tri_elements.Append(VECTOR<int,3>(deformable_to_rigid_particles(index1),deformable_to_rigid_particles(index2),deformable_to_rigid_particles(index3)));}
 
         ARRAY<VECTOR<int,4> > tet_elements;tet_elements.Preallocate(deformable_tetrahedralized_volume.mesh.elements.m);rigid_to_deformable_tets.Preallocate(deformable_tetrahedralized_volume.mesh.elements.m);
-        for(int t=1;t<=deformable_tetrahedralized_volume.mesh.elements.m;t++){
+        for(int t=0;t<deformable_tetrahedralized_volume.mesh.elements.m;t++){
             int index1=deformable_tetrahedralized_volume.mesh.elements(t)[1];
             int index2=deformable_tetrahedralized_volume.mesh.elements(t)[2],index3=deformable_tetrahedralized_volume.mesh.elements(t)[3],index4=deformable_tetrahedralized_volume.mesh.elements(t)[4];
             tet_elements.Append(VECTOR<int,4>(deformable_to_rigid_particles(index1),deformable_to_rigid_particles(index2),deformable_to_rigid_particles(index3),deformable_to_rigid_particles(index4)));
@@ -138,7 +138,7 @@ public:
     {
         // currently contains all particles
         PARTICLES<TV>& deformable_particles=solid_body_collection.deformable_body_collection.particles;
-        for(int p=1;p<=rigid_to_deformable_particles.m;p++) {
+        for(int p=0;p<rigid_to_deformable_particles.m;p++) {
             deformable_particles.array_collection->Copy_Element(*particles.array_collection,deformable_to_rigid_particles(rigid_to_deformable_particles(p)),rigid_to_deformable_particles(p));
             deformable_particles.X(rigid_to_deformable_particles(p))=Frame()*particles.X(deformable_to_rigid_particles(rigid_to_deformable_particles(p)));
             deformable_particles.V(rigid_to_deformable_particles(p))=Pointwise_Object_Velocity(deformable_particles.X(deformable_to_rigid_particles(rigid_to_deformable_particles(p))));}

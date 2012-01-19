@@ -58,7 +58,7 @@ void HEXAHEDRON_MESH::
 Initialize_Incident_Elements()
 {
     delete incident_elements;incident_elements=new ARRAY<ARRAY<int> >(number_nodes);
-    for(int h=1;h<=elements.m;h++){ // for each hexahedron, put it on each of its nodes lists of hexahedrons
+    for(int h=0;h<elements.m;h++){ // for each hexahedron, put it on each of its nodes lists of hexahedrons
         int p1,p2,p3,p4,p5,p6,p7,p8;elements(h).Get(p1,p2,p3,p4,p5,p6,p7,p8);
         (*incident_elements)(p1).Append(h);(*incident_elements)(p2).Append(h);
         (*incident_elements)(p3).Append(h);(*incident_elements)(p4).Append(h);
@@ -74,12 +74,12 @@ Initialize_Adjacent_Elements()
 {
     delete adjacent_elements;adjacent_elements=new ARRAY<ARRAY<int> >(elements.m);
     bool incident_elements_defined=incident_elements!=0;if(!incident_elements) Initialize_Incident_Elements();
-    for(int h=1;h<=elements.m;h++){ // for each hexahedron, make the list of adjacent hexahedrons
+    for(int h=0;h<elements.m;h++){ // for each hexahedron, make the list of adjacent hexahedrons
         int p1,p2,p3,p4,p5,p6,p7,p8;elements(h).Get(p1,p2,p3,p4,p5,p6,p7,p8);
         Find_And_Append_Adjacent_Elements(h,p1,p2,p3,p4);Find_And_Append_Adjacent_Elements(h,p5,p6,p7,p8);Find_And_Append_Adjacent_Elements(h,p3,p4,p7,p8);
         Find_And_Append_Adjacent_Elements(h,p1,p2,p5,p6);Find_And_Append_Adjacent_Elements(h,p2,p4,p6,p8);Find_And_Append_Adjacent_Elements(h,p1,p3,p5,p7);}
     if(!incident_elements_defined){delete incident_elements;incident_elements=0;}
-    for(int h=1;h<=elements.m;h++) (*adjacent_elements)(h).Compact(); // remove extra space
+    for(int h=0;h<elements.m;h++) (*adjacent_elements)(h).Compact(); // remove extra space
 }
 //#####################################################################
 // Function Find_And_Append_Adjacent_Elements
@@ -101,10 +101,10 @@ Initialize_Faces()
 {
     delete faces;faces=new ARRAY<VECTOR<int,4> >;
     HASHTABLE<VECTOR<int,4> > quad_list(2*elements.m); // list of faces currently found
-    for(int h=1;h<=elements.m;h++){
+    for(int h=0;h<elements.m;h++){
         const VECTOR<int,8>& nodes=elements(h);
         for(int f=0;f<6;f++){
-            VECTOR<int,4> face;for(int k=1;k<=4;k++) face[k]=nodes(face_indices[f][k-1]);
+            VECTOR<int,4> face;for(int k=0;k<4;k++) face[k]=nodes(face_indices[f][k-1]);
             if(quad_list.Set(face.Sorted())) faces->Append(VECTOR<int,4>(nodes(face[1]),nodes(face[2]),nodes(face[3]),nodes(face[4])));}}
 }
 //#####################################################################
@@ -115,7 +115,7 @@ Initialize_Node_On_Boundary()
 {
     delete node_on_boundary;node_on_boundary=new ARRAY<bool>(number_nodes);ARRAY<int> p(8);
     bool incident_elements_defined=incident_elements!=0;if(!incident_elements) Initialize_Incident_Elements();
-    for(int h=1;h<=elements.m;h++){
+    for(int h=0;h<elements.m;h++){
         elements(h).Get(p(1),p(2),p(3),p(4),p(5),p(6),p(7),p(8));
         for(int f=0;f<6;f++)if(Number_Of_Hexahedrons_Across_Face(h,p(face_indices[f][0]),p(face_indices[f][1]),p(face_indices[f][2]),p(face_indices[f][3])) == 0){
             (*node_on_boundary)(p(face_indices[f][0]))=true;(*node_on_boundary)(p(face_indices[f][1]))=true;
@@ -130,7 +130,7 @@ Initialize_Boundary_Nodes()
 {
     delete boundary_nodes;boundary_nodes=new ARRAY<int>;ARRAY<int> p(8);
     bool incident_elements_defined=incident_elements!=0;if(!incident_elements) Initialize_Incident_Elements();
-    for(int h=1;h<=elements.m;h++){
+    for(int h=0;h<elements.m;h++){
         elements(h).Get(p(1),p(2),p(3),p(4),p(5),p(6),p(7),p(8));
         for(int f=0;f<6;f++)if(Number_Of_Hexahedrons_Across_Face(h,p(face_indices[f][0]),p(face_indices[f][1]),p(face_indices[f][2]),p(face_indices[f][3])) == 0){
             boundary_nodes->Append(p(face_indices[f][0]));boundary_nodes->Append(p(face_indices[f][1]));
@@ -164,7 +164,7 @@ Delete_Hexahedrons_With_Missing_Nodes()
 {
     ARRAY<int> deletion_list(elements.m);
     int number_deleted=0;
-    for(int t=1;t<=elements.m;t++){
+    for(int t=0;t<elements.m;t++){
         int i[8];elements(t).Get(i[0],i[1],i[2],i[3],i[4],i[5],i[6],i[7]);
         if(!(i[0]&&i[1]&&i[2]&&i[3]&&i[4]&&i[5]&&i[6]&&i[7])) deletion_list(++number_deleted)=t;}
     deletion_list.Resize(number_deleted);
@@ -178,10 +178,10 @@ void HEXAHEDRON_MESH::
 Delete_Hexahedrons(const ARRAY<int>& deletion_list)
 {
     int last_index=elements.m;
-    for(int k=1;k<=deletion_list.m;k++){
+    for(int k=0;k<deletion_list.m;k++){
         int index=deletion_list(k);
         if(index > last_index) index=elements(index)(1); // hexahedron was moved, reset index to its new location
-        for(int kk=1;kk<=8;kk++) elements(index)(kk)=elements(last_index)(kk);
+        for(int kk=0;kk<8;kk++) elements(index)(kk)=elements(last_index)(kk);
         elements(last_index)(1)=index; // remembers where a hexahedron was moved to, in case it needs to be deleted later
         last_index--;}
     elements.Exact_Resize(last_index);
@@ -195,7 +195,7 @@ Initialize_Boundary_Mesh()
 {
     delete boundary_mesh;ARRAY<VECTOR<int,3> > triangle_list;
     bool incident_elements_defined=incident_elements!=0;if(!incident_elements) Initialize_Incident_Elements();
-    for(int h=1;h<=elements.m;h++)for(int f=0;f<6;f++){
+    for(int h=0;h<elements.m;h++)for(int f=0;f<6;f++){
         int p[4];for(int k=0;k<4;k++)p[k]=elements(h)(face_indices[f][k]);
         if(Number_Of_Hexahedrons_Across_Face(h,p[0],p[1],p[2],p[3]) == 0){
             triangle_list.Append(VECTOR<int,3>(p[0],p[1],p[2]));triangle_list.Append(VECTOR<int,3>(p[0],p[2],p[3]));}}
@@ -226,7 +226,7 @@ Initialize_Face_Hexahedrons()
 void HEXAHEDRON_MESH::
 Add_Dependencies(SEGMENT_MESH& dependency_mesh) const
 {
-    for(int t=1;t<=elements.m;t++) for(int i=1;i<=7;i++) for(int j=i+1;j<=8;j++) dependency_mesh.Add_Element_If_Not_Already_There(VECTOR<int,2>(elements(t)[i],elements(t)[j]));
+    for(int t=0;t<elements.m;t++) for(int i=0;i<7;i++) for(int j=i+1;j<=8;j++) dependency_mesh.Add_Element_If_Not_Already_There(VECTOR<int,2>(elements(t)[i],elements(t)[j]));
 }
 //#####################################################################
 // Function Set_Number_Nodes
@@ -246,6 +246,6 @@ Set_Number_Nodes(const int number_nodes_input)
 void HEXAHEDRON_MESH::
 Mark_Nodes_Referenced(ARRAY<int>& marks,const int mark) const
 {
-    for(int e=1;e<=elements.m;e++) marks.Subset(elements(e)).Fill(mark);
+    for(int e=0;e<elements.m;e++) marks.Subset(elements(e)).Fill(mark);
 }
 //#####################################################################

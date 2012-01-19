@@ -65,7 +65,7 @@ public:
 int Get_Intersecting_Tetrahedron(const PARTICLES<T,TV>& particles,const TV& location,const TETRAHEDRALIZED_VOLUME<T>& dynamic_volume)
 {
     ARRAY<int> intersection_list;dynamic_volume.tetrahedron_hierarchy->Intersection_List(location,intersection_list);
-    for(int i=1;i<=intersection_list.m;i++) if(TETRAHEDRON<T>(particles.X.Subset(dynamic_volume.mesh.elements(intersection_list(i)))).Inside(location)) return intersection_list(i);
+    for(int i=0;i<intersection_list.m;i++) if(TETRAHEDRON<T>(particles.X.Subset(dynamic_volume.mesh.elements(intersection_list(i)))).Inside(location)) return intersection_list(i);
     return 0;
 }
 //#####################################################################
@@ -86,20 +86,20 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     // create random embedded tet soup
     TETRAHEDRON<T> tet(particles.X.Subset(dynamic_volume.mesh.elements(1)));tet.X=tet.X-tet.Center();
-    for(int i=1;i<=number_embedded_tets;i++){
+    for(int i=0;i<number_embedded_tets;i++){
         int element=random_numbers.Get_Uniform_Integer(1,dynamic_volume.mesh.elements.m);VECTOR<T,3> weights=random_numbers.Get_Direction<TV>();
         VECTOR<T,3> translation=TETRAHEDRON<T>(particles.X.Subset(dynamic_volume.mesh.elements(element))).Point_From_Barycentric_Coordinates(weights);
         T scale=random_numbers.Get_Uniform_Number((T).2,(T)2);
         QUATERNION<T> rotation=QUATERNION<T>::From_Rotation_Vector(random_numbers.Get_Direction<TV>());
         ARRAY<int> intersection_list;ARRAY<TV> X(4);
-        for(int p=1;p<=4;p++){
+        for(int p=0;p<4;p++){
             X(p)=translation+(rotation.Rotate(tet.X(p)))*scale;
             int intersecting_tet=Get_Intersecting_Tetrahedron(particles,X(p),dynamic_volume);if(!intersecting_tet) break;
             intersection_list.Append(intersecting_tet);}
         if(intersection_list.m!=4){i--;continue;}
         int offset=particles.array_collection->Size();particles.array_collection->Add_Elements(4);
         tet_soup.mesh.elements.Append(VECTOR<int,4>(1,2,3,4)+offset);
-        for(int p=1;p<=4;p++){
+        for(int p=0;p<4;p++){
             VECTOR<int,4> parents=dynamic_volume.mesh.elements(intersection_list(p));
             VECTOR<T,3> weights=TETRAHEDRON<T>(particles.X.Subset(parents)).Barycentric_Coordinates(X(p));
             particles.mass(offset+p)=1;
@@ -111,7 +111,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     tests.Add_Ground();
 
     // correct number nodes
-    for(int i=1;i<=deformable_object.structures.m;i++) deformable_object.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_object.structures.m;i++) deformable_object.structures(i)->Update_Number_Nodes();
 
     tet_soup.Initialize_Triangulated_Surface();
     TRIANGULATED_SURFACE<T>& colliding_surface=tests.Create_Drifted_Surface(*tet_soup.triangulated_surface,solid_body_collection.deformable_body_collection.soft_bindings,true); //TODO: use binding springs?

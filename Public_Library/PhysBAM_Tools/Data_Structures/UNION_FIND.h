@@ -74,7 +74,7 @@ public:
     {pairs.Remove_All();for(ID i(1);i<=Size();i++){ID j=Find(i);if(i!=j) pairs.Append(PAIR<ID,ID>(i,j));}}
 
     void Merge_Forest_Edges(const ARRAY<PAIR<ID,ID> >& pairs)
-    {for(int i=1;i<=pairs.m;i++) Union(pairs(i).x,pairs(i).y);}
+    {for(int i=0;i<pairs.m;i++) Union(pairs(i).x,pairs(i).y);}
 
 private:
     ID Find_Without_Path_Compression(const ID i) const

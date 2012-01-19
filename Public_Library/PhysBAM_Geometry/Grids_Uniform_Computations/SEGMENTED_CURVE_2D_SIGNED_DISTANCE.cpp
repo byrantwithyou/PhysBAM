@@ -25,7 +25,7 @@ template<class T> void Calculate(SEGMENTED_CURVE_2D<T>& curve,const GRID<VECTOR<
 
     T epsilon=(T)1e-8*grid.min_dX;
     int total_cells=grid.counts.x*grid.counts.y,cells_done=0,progress=-1;
-    for(int i=1;i<=grid.counts.x;i++) for(int j=1;j<=grid.counts.y;j++){
+    for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++){
         phi(i,j)=curve.Calculate_Signed_Distance(grid.X(i,j),epsilon);
         if(print_progress){
             cells_done++;int new_progress=(int)((T)100*cells_done/total_cells);

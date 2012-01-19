@@ -41,7 +41,7 @@ template<class TV> void POISSON_PROJECTION_SYSTEM<TV>::
 Project(KRYLOV_VECTOR_BASE<T>& x) const
 {
     VECTOR_T& vx=dynamic_cast<VECTOR_T&>(x);
-    for(int i=1;i<=projections.m;i++) vx.v-=projections(i)*vx.v.Dot_Product(vx.v,projections(i));
+    for(int i=0;i<projections.m;i++) vx.v-=projections(i)*vx.v.Dot_Product(vx.v,projections(i));
 }
 template<class TV> void POISSON_PROJECTION_SYSTEM<TV>::
 Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& x) const

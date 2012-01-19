@@ -72,7 +72,7 @@ Display(const int in_color) const
         glDisable(GL_LIGHTING);
         velocity_color.Send_To_GL_Pipeline();
         vertices.Resize(0);
-        for(int i=1;i<=particles.X.m;i++){
+        for(int i=0;i<particles.X.m;i++){
             TV X=particles.X(i);
             TV Y=X+(*V)(i)*scale_velocities;
             OpenGL_Line(X,Y,vertices);}
@@ -82,7 +82,7 @@ Display(const int in_color) const
 #ifndef USE_OPENGLES
     if(mode==GL_SELECT) glPushName(0);
 #endif
-    for(int i=1;i<=particles.X.m;i++){
+    for(int i=0;i<particles.X.m;i++){
 #ifndef USE_OPENGLES
         if(mode==GL_SELECT) glLoadName(i);
 #endif

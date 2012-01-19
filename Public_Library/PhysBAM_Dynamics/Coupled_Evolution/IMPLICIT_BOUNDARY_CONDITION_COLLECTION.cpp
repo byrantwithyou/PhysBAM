@@ -36,7 +36,7 @@ Compute(const GRID<TV>& grid,ARRAY<T,TV_INT>& p,ARRAY<T,FACE_INDEX<TV::dimension
     psi_D.Fill(false);
     psi_N.Fill(false);
     if(use_psi_R) psi_R.Fill((T)0);
-    for(int i=1;i<=boundary_conditions.m;i++) boundary_conditions(i)->Update_Boundary_Conditions(grid,psi_D,psi_N,p,face_velocities,time);
+    for(int i=0;i<boundary_conditions.m;i++) boundary_conditions(i)->Update_Boundary_Conditions(grid,psi_D,psi_N,p,face_velocities,time);
 
     if(set_all_neumann_cells_to_dirichlet){
         for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,1);iterator.Valid();iterator.Next()) if(All_Cell_Faces_Neumann(iterator.Cell_Index())){

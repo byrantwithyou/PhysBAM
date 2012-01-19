@@ -74,7 +74,7 @@ Add_Impulse(const TV& location,const TWIST<TV>& impulse)
             VECTOR<int,d+1>& nodes=simplicial_object->mesh.elements(simplex);
             //VECTOR<T,d+1> weights=T_SIMPLEX::Barycentric_Coordinates(object_space_location,X.Subset(nodes));
             VECTOR<T,d+1> weights;
-            for(int i=1;i<=weights.m;i++) (*accumulated_node_impulses)(nodes[i])+=weights[i]*object_space_impulse;}}
+            for(int i=0;i<weights.m;i++) (*accumulated_node_impulses)(nodes[i])+=weights[i]*object_space_impulse;}}
 }
 //#####################################################################
 template class RIGID_BODY_IMPULSE_ACCUMULATOR<VECTOR<float,1>,0>;

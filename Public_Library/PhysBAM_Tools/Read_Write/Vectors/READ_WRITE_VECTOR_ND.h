@@ -25,7 +25,7 @@ public:
     {Write_Binary<RW>(output,object.n);Write_Binary_Array<RW>(output,object.x,object.n);}
 };
 template<class T> inline std::istream& operator>>(std::istream& input,VECTOR_ND<T>& v)
-{FILE_UTILITIES::Ignore(input,'[');for(int i=1;i<=v.n;i++) input>>v(i);FILE_UTILITIES::Ignore(input,']');return input;}
+{FILE_UTILITIES::Ignore(input,'[');for(int i=0;i<v.n;i++) input>>v(i);FILE_UTILITIES::Ignore(input,']');return input;}
 }
 #endif
 #endif

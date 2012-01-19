@@ -77,7 +77,7 @@ template<class T> void Update_Faces_And_Hierarchies_With_Collision_Free_Position
     const T node_thickness_multiplier,ARRAY_VIEW<const VECTOR<T,3> > X_old_full)
 {
     triangulated_surface.Update_Triangle_List(X_old_full);triangulated_surface.hierarchy->Update_Leaf_Boxes(X_old_full);
-    for(int t=1;t<=triangulated_surface.mesh.elements.m;t++) // increase box size for node thickness
+    for(int t=0;t<triangulated_surface.mesh.elements.m;t++) // increase box size for node thickness
         triangulated_surface.hierarchy->box_hierarchy(t).Change_Size(node_thickness_multiplier*node_thickness.Subset(triangulated_surface.mesh.elements(t)).Min());
     triangulated_surface.hierarchy->Update_Nonleaf_Boxes();
 }
@@ -94,7 +94,7 @@ Update_Faces_And_Hierarchies_With_Collision_Free_Positions(ARRAY_VIEW<const T> n
     if(d==3 && triangulated_surface)
         Update_Faces_And_Hierarchies_With_Collision_Free_Positions_Helper(*triangulated_surface,node_thickness,node_thickness_multiplier,X_old_full);
     particle_hierarchy.Update_Leaf_Boxes(X_old_full.Subset(collision_particles.active_indices));
-    for(int k=1;k<=particle_hierarchy.leaves;k++) particle_hierarchy.box_hierarchy(k).Change_Size(node_thickness_multiplier*node_thickness(collision_particles.active_indices(k)));
+    for(int k=0;k<particle_hierarchy.leaves;k++) particle_hierarchy.box_hierarchy(k).Change_Size(node_thickness_multiplier*node_thickness(collision_particles.active_indices(k)));
     particle_hierarchy.Update_Nonleaf_Boxes();
 }
 //#####################################################################
@@ -106,7 +106,7 @@ Update_Processor_Masks_Helper(T_OBJECT& object,T_HIERARCHY& hierarchy,const PART
     typedef typename T_OBJECT::MESH T_MESH;
     // build the leaf masks
     masks.Resize(hierarchy.box_hierarchy.m);
-    for(int e=1;e<=object.mesh.elements.m;e++){
+    for(int e=0;e<object.mesh.elements.m;e++){
         VECTOR<PARTITION_ID,T_MESH::dimension+1> processors(partition_id_from_particle_index.Subset(object.mesh.elements(e)));
         PARTITION_ID simplex_owner=processors.Min();
         masks(e)=0;if(simplex_owner==processor) masks(e)|=2;else if(simplex_owner>processor) masks(e)|=1;}
@@ -124,7 +124,7 @@ Update_Processor_Masks(const PARTITION_ID processor,const ARRAY<PARTITION_ID>& p
     if(triangulated_surface)
         Update_Processor_Masks_Helper(*triangulated_surface,*triangulated_surface->hierarchy,processor,partition_id_from_particle_index,triangulated_surface_processor_masks);
     point_processor_masks.Resize(particle_hierarchy.box_hierarchy.m);
-    for(int e=1;e<=collision_particles.active_indices.m;e++){
+    for(int e=0;e<collision_particles.active_indices.m;e++){
         int p=collision_particles.active_indices(e);PARTITION_ID particle_processor=partition_id_from_particle_index(p);
         point_processor_masks(e)=0;if(particle_processor==processor) point_processor_masks(e)|=2;else if(particle_processor>processor) point_processor_masks(e)|=1;}
     for(int k=particle_hierarchy.leaves+1;k<=point_processor_masks.m;k++) point_processor_masks(k)=point_processor_masks(particle_hierarchy.children(k-particle_hierarchy.leaves)(1))

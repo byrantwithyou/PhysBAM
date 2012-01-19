@@ -49,7 +49,7 @@ Set_Restlengths()
 {
     restlength.Resize(attachment_radius.m);
     Invalidate_CFL();
-    for(int i=1;i<=segment_mesh.elements.m;i++) restlength(i)=Spring_Length(i);
+    for(int i=0;i<segment_mesh.elements.m;i++) restlength(i)=Spring_Length(i);
     visual_restlength=restlength;
 }
 //#####################################################################
@@ -135,7 +135,7 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TW
     for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
         const STATE& state=states(s);
         VECTOR<TV,2> V;
-        for(int i=1;i<=2;i++){
+        for(int i=0;i<2;i++){
             const TWIST<TV>& twist=rigid_V(segment_mesh.elements(s)(i));
             V(i)=twist.linear+TV::Cross_Product(twist.angular,state.r(i));}
         TV force=(state.coefficient*TV::Dot_Product(V(2)-V(1),state.direction))*state.direction;
@@ -150,7 +150,7 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V,AR
     for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
         const STATE& state=states(s);
         VECTOR<TV,2> V;
-        for(int i=1;i<=2;i++){
+        for(int i=0;i<2;i++){
             const TWIST<TV>& twist=rigid_V(segment_mesh.elements(s)(i));
             V(i)=twist.linear+TV::Cross_Product(twist.angular,state.r(i));}
         TV dl=V(2)-V(1),dl_projected=dl.Projected_On_Unit_Direction(state.direction);
@@ -168,7 +168,7 @@ Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> frequency)
 //         const VECTOR<int,2>& nodes=segment_mesh.elements(s);
 //         T ym=youngs_modulus(s);
 //         T d=damping(s);
-//         for(int k=1;k<=2;k++){
+//         for(int k=0;k<2;k++){
 //             frequency(nodes[k]).elastic_squared+=particles.one_over_effective_mass(nodes[k])/restlength(s)*4*ym*one_over_cfl_number_squared;
 //             frequency(nodes[k]).damping+=particles.one_over_effective_mass(nodes[k])/restlength(s)*2*d*one_over_cfl_number;}}
 }
@@ -224,7 +224,7 @@ Print_Deformation_Statistics() const
 {
     LOG::SCOPE scope("linear spring deformation","linear spring deformation");
     ARRAY<T> deformation(segment_mesh.elements.m,false);
-    for(int s=1;s<=segment_mesh.elements.m;s++){
+    for(int s=0;s<segment_mesh.elements.m;s++){
         int i,j;segment_mesh.elements(s).Get(i,j);
         T length=Spring_Length(i),rl=visual_restlength(s);
         deformation(s)=rl?abs(length-rl)/rl:length==0?0:FLT_MAX;}
@@ -242,7 +242,7 @@ template<class TV> typename TV::SCALAR RIGID_LINEAR_SPRINGS<TV>::
 Maximum_Compression_Or_Expansion_Fraction(int* index) const
 {
     T max_compression=0;int max_index=1;
-    for(int s=1;s<=segment_mesh.elements.m;s++){
+    for(int s=0;s<segment_mesh.elements.m;s++){
         int i,j;segment_mesh.elements(s).Get(i,j);
         T length=Spring_Length(s);
         T rl=visual_restlength(s);

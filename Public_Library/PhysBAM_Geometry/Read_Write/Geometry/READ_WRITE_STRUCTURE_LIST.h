@@ -23,7 +23,7 @@ public:
     {ARRAY<ID> needs_init;
     Read_Write<OBJECT_BASE,RW>::Read(object,STRING_UTILITIES::string_sprintf("%s/%d/%s",prefix.c_str(),frame,list_name.c_str()),needs_init);
     FILE_UTILITIES::Read_From_File<RW>(STRING_UTILITIES::string_sprintf("%s/common/%skey",prefix.c_str(),list_name.c_str()),object.names);
-    for(int i=1;i<=needs_init.m;i++){ID id=needs_init(i),index=object.Element_Index(id);
+    for(int i=0;i<needs_init.m;i++){ID id=needs_init(i),index=object.Element_Index(id);
         object.Set_Active_Element(index,STRUCTURE<TV>::Create_From_Name(object.names(id)));
         FILE_UTILITIES::Read_From_File<RW>(STRING_UTILITIES::string_sprintf("%s/common/%s%d.%s",prefix.c_str(),list_name.c_str(),id,object.Active_Element(index)->Extension().c_str()),*object.Active_Element(index));}
 

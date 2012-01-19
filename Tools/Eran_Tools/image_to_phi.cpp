@@ -26,7 +26,7 @@ void Convert(PARSE_ARGS &parse_args)
     ARRAYS<VECTOR<T,2> > phi(grid);LEVELSET_2D<T> levelset(grid,phi);
 
     LINEAR_INTERPOLATION<T,VECTOR<T,3> > color_interpolation;
-    for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++){phi(i,j)=2*image(i,j).Magnitude()/root_three-(T)1;}
+    for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++){phi(i,j)=2*image(i,j).Magnitude()/root_three-(T)1;}
 
     if(parse_args.Get_Option_Value("-fmm")) levelset.Fast_Marching_Method(0,10*grid.max_dx_dy);
 

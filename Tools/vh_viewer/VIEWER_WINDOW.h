@@ -154,7 +154,7 @@ private:
     if(!filename) return;
     FILE_UTILITIES::Read_From_File<T>(filename,tissues_id_list);
     int dummy;
-    for(int i=1;i<=tissues_id_list.m;i++){
+    for(int i=0;i<tissues_id_list.m;i++){
         if(window.tissues_hash.Get(tissues_id_list(i),dummy)) continue;
         std::string s=str(boost::format("(%d) %s")%tissues_id_list(i)%window.visible_human.labels(tissues_id_list(i)).c_str());
         window.tissue_browser.add(s.c_str(),(void*)tissues_id_list(i));

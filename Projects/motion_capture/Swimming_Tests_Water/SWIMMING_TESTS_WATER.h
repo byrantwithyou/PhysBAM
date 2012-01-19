@@ -209,7 +209,7 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
     int frame=(int)(time*motion_frame_rate)+1;
     T alpha=time*motion_frame_rate-frame+1;
     if(test_number==1){
-        for(int i=1;i<=arb.joint_mesh.joints.m;i++){JOINT<TV>& joint=*arb.joint_mesh.joints(i);
+        for(int i=0;i<arb.joint_mesh.joints.m;i++){JOINT<TV>& joint=*arb.joint_mesh.joints(i);
             RIGID_BODY<TV>* parent=arb.Parent(joint.id_number),*child=arb.Child(joint.id_number);
             int parent_index=id_to_index(parent->particle_index),child_index=id_to_index(child->particle_index);
             FRAME<TV> rigid_base_transform_parent1=rigid_base_transform,rigid_base_transform_child1=rigid_base_transform;
@@ -226,7 +226,7 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
     if(test_number==9){
         T desired_x=(T)two_pi/16;
         ROTATION<TV> desired_rotation=ROTATION<TV>(desired_x*sin(4*time),TV(0,1,0));
-        for(int i=1;i<=arb.joint_mesh.joints.m;i++){JOINT<TV>& joint=*arb.joint_mesh.joints(i);
+        for(int i=0;i<arb.joint_mesh.joints.m;i++){JOINT<TV>& joint=*arb.joint_mesh.joints(i);
             if(joint.joint_function) joint.joint_function->Set_Target_Angle(desired_rotation);}}
 }
 //#####################################################################
@@ -290,7 +290,7 @@ void Floppy_Human()
     //adding bones
     id_to_index.Resize(int(body_motion.trajectories.m));
     rigid_body_ids.Resize(body_motion.trajectories.m);
-    for(int i=1;i<=body_motion.trajectories.m;i++){
+    for(int i=0;i<body_motion.trajectories.m;i++){
         T scale=(T).95,length=body_motion.trajectories(i)(1).length,height=scale*length,radius=(T).18;
         RIGID_BODY<TV>& rigid_body=solids_tests.Add_Analytic_Cylinder(height,radius);
         int id=rigid_body.particle_index;assert(id);
@@ -462,7 +462,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
 
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents();
@@ -510,9 +510,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     // collide structures with the ground and walls only
     if(test_number==1 || test_number==9){
         deformable_body_collection.collisions.Use_Structure_Collide_Collision_Body(true);
-        for(int s=1;s<=deformable_body_collection.deformable_geometry.structures.m;s++) for(int r=1;r<=rigid_bodies_to_collide_against.m;r++)
+        for(int s=0;s<deformable_body_collection.deformable_geometry.structures.m;s++) for(int r=0;r<rigid_bodies_to_collide_against.m;r++)
             deformable_body_collection.collisions.structure_collide_collision_body(s).Set(rigid_body_collection.rigid_geometry_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(rigid_bodies_to_collide_against(r)));
-        for(int i=1;i<=solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->limit_time_step_by_strain_rate=false;}
+        for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->limit_time_step_by_strain_rate=false;}
 }
 //#####################################################################
 };

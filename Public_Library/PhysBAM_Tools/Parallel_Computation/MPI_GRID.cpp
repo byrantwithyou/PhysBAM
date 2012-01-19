@@ -74,7 +74,7 @@ MPI_GRID(T_GRID& local_grid_input,const int number_of_ghost_cells_input,const bo
     // initialize global column index boundaries
     ARRAY<VECTOR<int,2> > global_column_index_boundaries(number_of_processes);
     int offset=0;
-    for(int proc=1;proc<=all_coordinates.m;proc++){
+    for(int proc=0;proc<all_coordinates.m;proc++){
         TV_INT proc_coordinates=all_coordinates(proc);
         for(int axis=1;axis<=T_GRID::dimension;axis++){
             start_index[axis]=boundaries(axis)(proc_coordinates[axis]);
@@ -91,7 +91,7 @@ MPI_GRID(T_GRID& local_grid_input,const int number_of_ghost_cells_input,const bo
         offset++;}
     // now go through each of the boundaries and do those
     for(int axis=1;axis<=T_GRID::dimension;axis++)
-        for(int axis_side=1;axis_side<=2;axis_side++){
+        for(int axis_side=0;axis_side<2;axis_side++){
             int side=2*axis-(2-axis_side);
             int neighbor_rank=side_neighbor_ranks(side);
             if(neighbor_rank>=0){
@@ -164,7 +164,7 @@ Initialize_Communicator(const bool manual,MPI::Group* group)
 template<class T> static void Fill_Process_Ranks(GRID<VECTOR<T,1> >& process_grid,ARRAY<int,VECTOR<int,1> >& process_ranks,ARRAY<int>& axes)
 {
     VECTOR<int,1> extents=process_grid.Domain_Indices().Maximum_Corner();
-    for(int i=1;i<=extents.x;i++)process_ranks(i)=i-1;
+    for(int i=0;i<extents.x;i++)process_ranks(i)=i-1;
 }
 template<class T> static void Fill_Process_Ranks(GRID<VECTOR<T,2> >& process_grid,ARRAY<int,VECTOR<int,2> >& process_ranks,ARRAY<int>& axes)
 {
@@ -173,9 +173,9 @@ template<class T> static void Fill_Process_Ranks(GRID<VECTOR<T,2> >& process_gri
     for(int i=1;i<=half_extents[axes(1)];i++)for(int j=1;j<=half_extents[axes(2)];j++)
         for(int ii=0;ii<2;ii++)for(int jj=0;jj<2;jj++){
             VECTOR<int,2> permuted_index(2*i+ii-1,2*j+jj-1),index;
-            for(int a=1;a<=2;a++)index[axes(a)]=permuted_index[a];
+            for(int a=0;a<2;a++)index[axes(a)]=permuted_index[a];
             process_ranks(index)=next_rank++;}
-    for(int i=1;i<=extents.x;i++)for(int j=1;j<=extents.y;j++)if(process_ranks(i,j)==MPI::PROC_NULL) process_ranks(i,j)=next_rank++;
+    for(int i=0;i<extents.x;i++)for(int j=0;j<extents.y;j++)if(process_ranks(i,j)==MPI::PROC_NULL) process_ranks(i,j)=next_rank++;
 }
 template<class T> static void Fill_Process_Ranks(GRID<VECTOR<T,3> >& process_grid,ARRAY<int,VECTOR<int,3> >& process_ranks,ARRAY<int>& axes)
 {
@@ -184,9 +184,9 @@ template<class T> static void Fill_Process_Ranks(GRID<VECTOR<T,3> >& process_gri
     for(int i=1;i<=half_extents[axes(1)];i++)for(int j=1;j<=half_extents[axes(2)];j++)for(int ij=1;ij<=half_extents[axes(3)];ij++)
         for(int ii=0;ii<2;ii++)for(int jj=0;jj<2;jj++)for(int ijij=0;ijij<2;ijij++){
             VECTOR<int,3> permuted_index(2*i+ii-1,2*j+jj-1,2*ij+ijij-1),index;
-            for(int a=1;a<=3;a++)index[axes(a)]=permuted_index[a];
+            for(int a=0;a<3;a++)index[axes(a)]=permuted_index[a];
             process_ranks(index)=next_rank++;}
-    for(int i=1;i<=extents.x;i++)for(int j=1;j<=extents.y;j++)for(int ij=1;ij<=extents.z;ij++)if(process_ranks(i,j,ij)==MPI::PROC_NULL) process_ranks(i,j,ij)=next_rank++;
+    for(int i=0;i<extents.x;i++)for(int j=0;j<extents.y;j++)for(int ij=0;ij<extents.z;ij++)if(process_ranks(i,j,ij)==MPI::PROC_NULL) process_ranks(i,j,ij)=next_rank++;
 }
 //#####################################################################
 // Function Initialize
@@ -540,12 +540,12 @@ Exchange_Boundary_Cell_Data(const T_MPI_GRID& mpi_grid,const T_GRID& local_grid,
     const ARRAY<TV_INT>& neighbor_directions=include_corners?all_neighbor_directions:side_neighbor_directions;
     // send
     ARRAY<RANGE<TV_INT> > send_regions;Find_Boundary_Regions(send_regions,sentinels,false,RANGE<VECTOR<int,1> >(0,bandwidth-1),include_corners,true,local_grid);
-    for(int n=1;n<=send_regions.m;n++)if(neighbor_ranks(n)!=MPI::PROC_NULL){
+    for(int n=0;n<send_regions.m;n++)if(neighbor_ranks(n)!=MPI::PROC_NULL){
         MPI_PACKAGE package=mpi_grid.Package_Cell_Data(data,send_regions(n));
         packages.Append(package);requests.Append(package.Isend(*comm,neighbor_ranks(n),Get_Send_Tag(neighbor_directions(n))));}
     // receive
     ARRAY<RANGE<TV_INT> > recv_regions;Find_Boundary_Regions(recv_regions,sentinels,false,RANGE<VECTOR<int,1> >(-bandwidth,-1),include_corners,true,local_grid);
-    for(int n=1;n<=recv_regions.m;n++)if(neighbor_ranks(n)!=MPI::PROC_NULL){
+    for(int n=0;n<recv_regions.m;n++)if(neighbor_ranks(n)!=MPI::PROC_NULL){
         MPI_PACKAGE package=mpi_grid.Package_Cell_Data(data,recv_regions(n));
         packages.Append(package);requests.Append(package.Irecv(*comm,neighbor_ranks(n),Get_Recv_Tag(neighbor_directions(n))));}
     // finish
@@ -560,12 +560,12 @@ Exchange_Boundary_Cell_Data(const T_MPI_GRID& mpi_grid,const T_GRID& local_grid,
     const ARRAY<TV_INT>& neighbor_directions=include_corners?all_neighbor_directions:side_neighbor_directions;
     // send
     ARRAY<RANGE<TV_INT> > send_regions;Find_Boundary_Regions(send_regions,sentinels,false,RANGE<VECTOR<int,1> >(0,bandwidth-1),include_corners,true,local_grid);
-    for(int n=1;n<=send_regions.m;n++)if(neighbor_ranks(n)!=MPI::PROC_NULL){
+    for(int n=0;n<send_regions.m;n++)if(neighbor_ranks(n)!=MPI::PROC_NULL){
         MPI_PACKAGE package=mpi_grid.Package_Cell_Data(data,send_regions(n));
         packages.Append(package);requests.Append(package.Isend(*comm,neighbor_ranks(n),Get_Send_Tag(neighbor_directions(n))));}
     // receive
     ARRAY<RANGE<TV_INT> > recv_regions;Find_Boundary_Regions(recv_regions,sentinels,false,RANGE<VECTOR<int,1> >(-bandwidth,-1),include_corners,true,local_grid);
-    for(int n=1;n<=recv_regions.m;n++)if(neighbor_ranks(n)!=MPI::PROC_NULL){
+    for(int n=0;n<recv_regions.m;n++)if(neighbor_ranks(n)!=MPI::PROC_NULL){
         MPI_PACKAGE package=mpi_grid.Package_Cell_Data(data,recv_regions(n));
         packages.Append(package);requests.Append(package.Irecv(*comm,neighbor_ranks(n),Get_Recv_Tag(neighbor_directions(n))));}
     // finish
@@ -701,7 +701,7 @@ Assert_Common_Face_Data(const T_MPI_GRID& mpi_grid,T_FACE_ARRAYS& data,const T t
         ARRAY<char> pack_buffer(packages(n).Pack_Size(*comm));packages(n).Pack(pack_buffer,*comm);
         ARRAY<T> local_buffer(buffers(n).m);
         int position=0;T_type.Unpack(pack_buffer.Get_Array_Pointer(),pack_buffer.m,local_buffer.Get_Array_Pointer(),local_buffer.m,position,*comm);
-        for(int i=1;i<=local_buffer.m;i++) assert(abs(buffers(n)(i)-local_buffer(i))<=tolerance);
+        for(int i=0;i<local_buffer.m;i++) assert(abs(buffers(n)(i)-local_buffer(i))<=tolerance);
         position=0;T_type.Pack(local_buffer.Get_Array_Pointer(),local_buffer.m,pack_buffer.Get_Array_Pointer(),pack_buffer.m,position,*comm);
         packages(n).Unpack(pack_buffer,*comm);}
     MPI_PACKAGE::Free_All(packages);
@@ -718,7 +718,7 @@ Sync_Common_Face_Weights_From(ARRAY<ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >,FA
     ARRAY<int,VECTOR<int,2> > all_sizes(range);
     ARRAY<ARRAY<TRIPLE<FACE_INDEX<TV::dimension>,FACE_INDEX<TV::dimension>,T> > > transfer_per_proc(number_of_processes); 
     ARRAY<ARRAY<TRIPLE<FACE_INDEX<TV::dimension>,FACE_INDEX<TV::dimension>,T> > > receive_per_proc(number_of_processes); 
-    for(int axis=1;axis<=TV::dimension;axis++) for(int side=1;side<=2;side++){
+    for(int axis=1;axis<=TV::dimension;axis++) for(int side=0;side<2;side++){
         int other_rank=side_neighbor_ranks(2*(axis-1)+side);if(other_rank<0) continue;
         RANGE<TV_INT> domain=local_grid.Domain_Indices();
         if(side==1) domain.max_corner(axis)=domain.min_corner(axis)+(ghost_cells-1);
@@ -731,7 +731,7 @@ Sync_Common_Face_Weights_From(ARRAY<ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >,FA
             else face_domain.max_corner(axis2)++;
             for(FACE_ITERATOR iterator(local_grid,domain,axis2);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> cell=iterator.Full_Index();
                 ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >& local_weights=weights_to(cell);
-                for(int i=1;i<=local_weights.m;i++){
+                for(int i=0;i<local_weights.m;i++){
                     if(!face_domain.Lazy_Inside(local_weights(i).x.index)) 
                         transfer_per_proc(other_rank+1).Append(TRIPLE<FACE_INDEX<TV::dimension>,FACE_INDEX<TV::dimension>,T>(FACE_INDEX<TV::dimension>(cell.axis,cell.index+local_to_global_offset),
                             FACE_INDEX<TV::dimension>(local_weights(i).x.axis,local_weights(i).x.index+local_to_global_offset),local_weights(i).y));}}}}
@@ -774,7 +774,7 @@ Sync_Common_Face_Weights_To(ARRAY<ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >,FACE
     ARRAY<int,VECTOR<int,2> > all_sizes(range);
     ARRAY<ARRAY<TRIPLE<FACE_INDEX<TV::dimension>,FACE_INDEX<TV::dimension>,T> > > transfer_per_proc(number_of_processes); 
     ARRAY<ARRAY<TRIPLE<FACE_INDEX<TV::dimension>,FACE_INDEX<TV::dimension>,T> > > receive_per_proc(number_of_processes); 
-    for(int axis=1;axis<=TV::dimension;axis++) for(int side=1;side<=2;side++){
+    for(int axis=1;axis<=TV::dimension;axis++) for(int side=0;side<2;side++){
         int other_rank=side_neighbor_ranks(2*(axis-1)+side);if(other_rank<0) continue;
         RANGE<TV_INT> domain=local_grid.Domain_Indices();
         if(side==1) domain.max_corner(axis)=domain.min_corner(axis)+(ghost_cells-1);
@@ -787,7 +787,7 @@ Sync_Common_Face_Weights_To(ARRAY<ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >,FACE
             else face_domain.max_corner(axis2)++;
             for(FACE_ITERATOR iterator(local_grid,domain,axis2);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> cell=iterator.Full_Index();
                 ARRAY<PAIR<FACE_INDEX<TV::dimension>,int> >& local_weights=weights_from(cell);
-                for(int i=1;i<=local_weights.m;i++){
+                for(int i=0;i<local_weights.m;i++){
                     if(!face_domain.Lazy_Inside(local_weights(i).x.index)) 
                         transfer_per_proc(other_rank+1).Append(TRIPLE<FACE_INDEX<TV::dimension>,FACE_INDEX<TV::dimension>,T>(FACE_INDEX<TV::dimension>(cell.axis,cell.index+local_to_global_offset),
                             FACE_INDEX<TV::dimension>(local_weights(i).x.axis,local_weights(i).x.index+local_to_global_offset),weights_to(local_weights(i).x)(local_weights(i).y).y));}}}}
@@ -832,7 +832,7 @@ Sync_Common_Cell_Weights_From(ARRAY<ARRAY<PAIR<TV_INT,T> >,TV_INT>& weights_to,A
     ARRAY<int,VECTOR<int,2> > all_sizes(range);
     ARRAY<ARRAY<TRIPLE<TV_INT,TV_INT,T> > > transfer_per_proc(number_of_processes); 
     ARRAY<ARRAY<TRIPLE<TV_INT,TV_INT,T> > > receive_per_proc(number_of_processes);
-    for(int axis=1;axis<=TV::dimension;axis++) for(int side=1;side<=2;side++){
+    for(int axis=1;axis<=TV::dimension;axis++) for(int side=0;side<2;side++){
         int other_rank=side_neighbor_ranks(2*(axis-1)+side);if(other_rank<0) continue;
         RANGE<TV_INT> domain=local_grid.Domain_Indices(),ghost_domain=local_grid.Domain_Indices(ghost_cells);
         if(side==1) ghost_domain.min_corner(axis)+=ghost_cells;
@@ -841,7 +841,7 @@ Sync_Common_Cell_Weights_From(ARRAY<ARRAY<PAIR<TV_INT,T> >,TV_INT>& weights_to,A
         else domain.min_corner(axis)=domain.max_corner(axis)-(ghost_cells-1);
         for(CELL_ITERATOR iterator(local_grid,domain);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
             ARRAY<PAIR<TV_INT,T> >& local_weights=weights_to(cell);
-            for(int i=1;i<=local_weights.m;i++){
+            for(int i=0;i<local_weights.m;i++){
                 if(!ghost_domain.Lazy_Inside(local_weights(i).x)) 
                     transfer_per_proc(other_rank+1).Append(TRIPLE<TV_INT,TV_INT,T>(local_to_global_offset+cell,local_to_global_offset+local_weights(i).x,local_weights(i).y));}}}
     for(int i=0;i<number_of_processes;i++) all_sizes(rank+1,i)=transfer_per_proc(i).m;
@@ -880,7 +880,7 @@ Sync_Common_Cell_Weights_To(ARRAY<ARRAY<PAIR<TV_INT,T> >,TV_INT>& weights_to,ARR
     ARRAY<int,VECTOR<int,2> > all_sizes(range);
     ARRAY<ARRAY<TRIPLE<TV_INT,TV_INT,T> > > transfer_per_proc(number_of_processes); 
     ARRAY<ARRAY<TRIPLE<TV_INT,TV_INT,T> > > receive_per_proc(number_of_processes);
-    for(int axis=1;axis<=TV::dimension;axis++) for(int side=1;side<=2;side++){
+    for(int axis=1;axis<=TV::dimension;axis++) for(int side=0;side<2;side++){
         int other_rank=side_neighbor_ranks(2*(axis-1)+side);if(other_rank<0) continue;
         RANGE<TV_INT> domain=local_grid.Domain_Indices(),ghost_domain=local_grid.Domain_Indices(ghost_cells);
         if(side==1) ghost_domain.min_corner(axis)+=ghost_cells;
@@ -889,7 +889,7 @@ Sync_Common_Cell_Weights_To(ARRAY<ARRAY<PAIR<TV_INT,T> >,TV_INT>& weights_to,ARR
         else domain.min_corner(axis)=domain.max_corner(axis)-(ghost_cells-1);
         for(CELL_ITERATOR iterator(local_grid,domain);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
             ARRAY<PAIR<TV_INT,int> >& local_weights=weights_from(cell);
-            for(int i=1;i<=local_weights.m;i++)
+            for(int i=0;i<local_weights.m;i++)
                 if(!ghost_domain.Lazy_Inside(local_weights(i).x)){
                     transfer_per_proc(other_rank+1).Append(TRIPLE<TV_INT,TV_INT,T>(local_to_global_offset+cell,local_to_global_offset+local_weights(i).x,weights_to(local_weights(i).x)(local_weights(i).y).y));}}}
     for(int i=0;i<number_of_processes;i++) all_sizes(rank+1,i)=transfer_per_proc(i).m;

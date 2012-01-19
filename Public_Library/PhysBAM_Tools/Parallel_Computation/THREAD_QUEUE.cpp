@@ -17,7 +17,7 @@ THREAD_QUEUE::THREAD_QUEUE(const int thread_count,const bool set_affinity)
     pthread_cond_init(&done_condition,0);
     pthread_cond_init(&todo_condition,0);
     pthread_mutex_init(&queue_lock,0);
-    for(int i=1;i<=threads.m;i++){
+    for(int i=0;i<threads.m;i++){
         pthread_create(&threads(i),0,Thread_Routine,this);
         if(set_affinity){
             cpu_set_t cpuset;CPU_ZERO(&cpuset);CPU_SET(i-1,&cpuset);
@@ -29,8 +29,8 @@ THREAD_QUEUE::THREAD_QUEUE(const int thread_count,const bool set_affinity)
 THREAD_QUEUE::~THREAD_QUEUE()
 {
     EXITER* exiter=new EXITER[threads.m];
-    for(int i=1;i<=threads.m;i++) Queue(&exiter[i-1]);
-    for(int i=1;i<=threads.m;i++) pthread_join(threads(i),NULL);
+    for(int i=0;i<threads.m;i++) Queue(&exiter[i-1]);
+    for(int i=0;i<threads.m;i++) pthread_join(threads(i),NULL);
     
     pthread_cond_destroy(&done_condition);
     pthread_cond_destroy(&todo_condition);

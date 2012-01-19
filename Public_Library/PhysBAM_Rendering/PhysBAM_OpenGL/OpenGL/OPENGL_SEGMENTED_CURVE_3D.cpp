@@ -42,8 +42,8 @@ Display(const int in_color) const
     len=selected_edges.m/2+2;
     HASHTABLE<int,bool> seen(len);
     if(hide_unselected){
-        for(int i=1;i<=selected_edges.m;i++){edge=selected_edges(i);parent_curve->curve.mesh.elements(edge).Get(node1,node2);seen.Set(node1,true);seen.Set(node2,true);}
-        for(int i=1;i<=curve.mesh.elements.m;i++){const VECTOR<int,2> edge=curve.mesh.elements(i);
+        for(int i=0;i<selected_edges.m;i++){edge=selected_edges(i);parent_curve->curve.mesh.elements(edge).Get(node1,node2);seen.Set(node1,true);seen.Set(node2,true);}
+        for(int i=0;i<curve.mesh.elements.m;i++){const VECTOR<int,2> edge=curve.mesh.elements(i);
             if(seen.Contains(edge[1])||seen.Contains(edge[2])){seen.Set(edge[1],true);seen.Set(edge[2],true);}}}
     
     glMatrixMode(GL_MODELVIEW);
@@ -64,7 +64,7 @@ Display(const int in_color) const
     {
         if(use_solid_color){
             vertices.Resize(0);
-            for(int t=1;t<=curve.mesh.elements.m;t++){
+            for(int t=0;t<curve.mesh.elements.m;t++){
                 int i=curve.mesh.elements(t)(1),j=curve.mesh.elements(t)(2);
                 if(!hide_unselected || (seen.Contains(i) && seen.Contains(j))){
                     OpenGL_Vertex(curve.particles.X(i),vertices);OpenGL_Vertex(curve.particles.X(j),vertices);}}
@@ -73,9 +73,9 @@ Display(const int in_color) const
             if(smooth_normals){
                 Initialize_Vertex_Normals();
                 vertices.Resize(0);normals.Resize(0);
-                for(int i=1;i<=segment_nodes.m;i++){int p=segment_nodes(i);
+                for(int i=0;i<segment_nodes.m;i++){int p=segment_nodes(i);
                     const ARRAY<int>& incident=(*curve.mesh.incident_elements)(p);
-                    for(int j=1;j<=incident.m;j++){const VECTOR<int,2>& nodes=curve.mesh.elements(incident(j));
+                    for(int j=0;j<incident.m;j++){const VECTOR<int,2>& nodes=curve.mesh.elements(incident(j));
                         if(!hide_unselected || (seen.Contains(nodes[1]) && seen.Contains(nodes[2]))){
                             OpenGL_Normal(vertex_normals.Get(nodes[1]),normals);OpenGL_Vertex(curve.particles.X(nodes[1]),vertices);
                             OpenGL_Normal(vertex_normals.Get(nodes[2]),normals);OpenGL_Vertex(curve.particles.X(nodes[2]),vertices);}}}
@@ -83,11 +83,11 @@ Display(const int in_color) const
             else{
                 vertices.Resize(0);normals.Resize(0);
                 VECTOR<T,3> camera_direction=TV(OPENGL_WORLD::Singleton()->Get_Camera_Position()-OPENGL_WORLD::Singleton()->Get_Target_Position()).Normalized();
-                for(int s=1;s<=curve.mesh.elements.m;s++){
+                for(int s=0;s<curve.mesh.elements.m;s++){
                     const VECTOR<int,2>& nodes=curve.mesh.elements(s);
                     if(!hide_unselected || (seen.Contains(nodes[1]) && seen.Contains(nodes[2]))){
                         VECTOR<TV,2> Xs(curve.particles.X.Subset(nodes));
-                        for(int line_vertices=1;line_vertices<=2;line_vertices++) OpenGL_Normal(Camera_Oriented_Normal(camera_direction,Xs),normals);
+                        for(int line_vertices=0;line_vertices<2;line_vertices++) OpenGL_Normal(Camera_Oriented_Normal(camera_direction,Xs),normals);
                         OpenGL_Vertex(Xs[1],vertices);OpenGL_Vertex(Xs[2],vertices);}}
                 OpenGL_Draw_Arrays_With_Normals(GL_LINES,3,vertices,normals);}}
 
@@ -102,7 +102,7 @@ Display(const int in_color) const
             else if(current_selection->type == OPENGL_SELECTION::SEGMENTED_CURVE_3D) {
                 int node1,node2;
                 ARRAY<VECTOR<VECTOR<T,3>,2> > lines;
-                for(int i=1;i<=selected_edges.m;i++){
+                for(int i=0;i<selected_edges.m;i++){
                     curve.mesh.elements(selected_edges(i)).Get(node1,node2);
                     lines.Append(VECTOR<VECTOR<T,3>,2>(curve.particles.X(node1),curve.particles.X(node2)));}
                 OPENGL_SELECTION::Draw_Highlighted_Curve(lines);}}}
@@ -136,10 +136,10 @@ Initialize_Vertex_Normals() const
     bool incident_segments_defined=(curve.mesh.incident_elements!=0);if(!incident_segments_defined) curve.mesh.Initialize_Incident_Elements();
     segment_nodes.Remove_All();curve.mesh.elements.Flattened().Get_Unique(segment_nodes);
     vertex_normals.Remove_All();
-    for(int i=1;i<=segment_nodes.m;i++){int p=segment_nodes(i);
+    for(int i=0;i<segment_nodes.m;i++){int p=segment_nodes(i);
         const ARRAY<int>& incident=(*curve.mesh.incident_elements)(p);
         VECTOR<T,3> normal;
-        for(int j=1;j<=incident.m;j++){const VECTOR<int,2>& nodes=curve.mesh.elements(incident(j));VECTOR<TV,2> Xs(curve.particles.X.Subset(nodes));
+        for(int j=0;j<incident.m;j++){const VECTOR<int,2>& nodes=curve.mesh.elements(incident(j));VECTOR<TV,2> Xs(curve.particles.X.Subset(nodes));
             normal+=Camera_Oriented_Normal(camera_direction,Xs);}
         normal.Normalize();
         vertex_normals.Set(p,normal);}
@@ -208,7 +208,7 @@ Get_Selected_Edges() const
             edge=edges.Dequeue();
             sel_edges.Append(edge);
             adjacent=(*parent_curve->curve.mesh.adjacent_elements)(edge);
-            for(int i=1;i<=adjacent.m;i++) if (!seen.Contains(adjacent(i))){seen.Set(adjacent(i),true);edges.Enqueue(adjacent(i));}}}
+            for(int i=0;i<adjacent.m;i++) if (!seen.Contains(adjacent(i))){seen.Set(adjacent(i),true);edges.Enqueue(adjacent(i));}}}
     return sel_edges;
 }
 //#####################################################################
@@ -306,7 +306,7 @@ Draw_Segments_For_Selection() const
     glPushAttrib(GL_LINE_BIT);
     glLineWidth(OPENGL_PREFERENCES::selection_line_width);
     glPushName(0);
-    for(int i=1;i<=curve.mesh.elements.m;i++){
+    for(int i=0;i<curve.mesh.elements.m;i++){
         int node1,node2;curve.mesh.elements(i).Get(node1,node2);
         glLoadName(i);
         ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;

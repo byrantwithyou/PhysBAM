@@ -173,7 +173,7 @@ public:
     {assert(n==p.n);MATRIX_MXN<T> x(m,n);for(int i=0;i<m;i++) for(int j=0;j<n;j++) x(i,p(j))=(*this)(i,j);return x;}
 
     static MATRIX_MXN<T> Outer_Product(const VECTOR_ND<T> u,const VECTOR_ND<T> v)
-    {MATRIX_MXN<T> result(u.n,v.n);for(int i=1;i<=u.n;i++) for(int j=1;j<=v.n;j++) result(i,j)=u(i)*v(j);return result;}
+    {MATRIX_MXN<T> result(u.n,v.n);for(int i=0;i<u.n;i++) for(int j=0;j<v.n;j++) result(i,j)=u(i)*v(j);return result;}
 
     MATRIX_MXN<T> Normal_Equations_Matrix() const
     {MATRIX_MXN<T> result(n);for(int j=0;j<n;j++) for(int i=j;i<=n;i++){T a=0;for(int k=0;k<m;k++) a+=(*this)(k,i)*(*this)(k,j);result(i,j)=result(j,i)=a;}return result;}

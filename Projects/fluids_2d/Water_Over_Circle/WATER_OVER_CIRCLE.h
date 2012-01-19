@@ -48,7 +48,7 @@ public:
 void Initialize_Phi(){
     int m=grid.m,n=grid.n;
     T dx=grid.dx,dy=grid.dy,xmin=grid.xmin,xmax=grid.xmax;
-    for(int i=1;i<=m;i++) for(int j=1;j<=n;j++){
+    for(int i=0;i<m;i++) for(int j=0;j<n;j++){
         T x=grid.x(i),y=grid.y(j);
         if((fabs(x-(xmin+xmax)/2) <= .1*(xmax-xmin)) && y >= grid.y(n)-3.*dy) phi(i,j)=-dx;
         else phi(i,j)=dx;}}
@@ -56,7 +56,7 @@ void Initialize_Phi(){
 // Function Get_Source_Velocities
 //#####################################################################
 void Get_Source_Velocities(const T time){
-    for(int i=1;i<=m;i++) for(int j=1;j<=n;j++){
+    for(int i=0;i<m;i++) for(int j=0;j<n;j++){
         T x=grid.x(i),y=grid.y(j),dy=grid.dy,xmin=grid.xmin,xmax=grid.xmax;
         if((fabs(x-(xmin+xmax)/2) <= .1*(xmax-xmin)) && y >= grid.y(n)-3.*dy){
             psi_N(i,j)=true;V_fixed(i,j)=VECTOR_2D<T>(0,-4);}}}
@@ -64,7 +64,7 @@ void Get_Source_Velocities(const T time){
 // Function Adjust_Phi_With_Sources
 //#####################################################################
 void Adjust_Phi_With_Sources(const T time){
-    for(int i=1;i<=m;i++) for(int j=1;j<=n;j++){
+    for(int i=0;i<m;i++) for(int j=0;j<n;j++){
         T x=grid.x(i),y=grid.y(j),dx=grid.dx,dy=grid.dy,xmin=grid.xmin,xmax=grid.xmax;
         if((fabs(x-(xmin+xmax)/2) <= .1*(xmax-xmin)) && y >= grid.y(n)-3.*dy) phi(i,j)=((time<1.0/frame_rate*4)?-dx:dx);}}
 //#####################################################################
@@ -76,7 +76,7 @@ void Get_Source_Reseed_Mask(ARRAY<bool,VECTOR<int,2> >*& reseed, const T time){
     T dx=grid.dx,dy=grid.dy,xmin=grid.xmin,xmax=grid.xmax;
     T padding=3*dx;
     ARRAY<bool,VECTOR<int,2> >::copy(false,*reseed);
-    for(int i=1;i<=m;i++) for(int j=1;j<=n;j++){
+    for(int i=0;i<m;i++) for(int j=0;j<n;j++){
         T x=grid.x(i),y=grid.y(j);
         if((fabs(x-(xmin+xmax)/2) <= .1*(xmax-xmin)+padding) && y >= grid.y(n)-3.*dy-2*padding){
               if(time < 1.0/frame_rate*4) (*reseed)(i,j)=true;}}}
@@ -98,7 +98,7 @@ virtual void Adjust_Phi_And_Get_Velocities_For_Objects(ARRAY<VECTOR_2D<T> ,VECTO
 void Delete_Particles_Inside_Objects(HEAVY_PARTICLES<T,VECTOR_2D<T> >& particles,const T time)
 {
     VECTOR_2D<T> updated_center = center+velocity_object*time;
-    for(int k=1;k<=particles.array_size;k++) if(particles.active(k)) 
+    for(int k=0;k<particles.array_size;k++) if(particles.active(k)) 
         if(sqrt(sqr(particles.X(k).x-updated_center.x)+sqr(particles.X(k).y-updated_center.y)) < radius) particles.Delete_Particle(k);
 }
 //#####################################################################

@@ -45,7 +45,7 @@ public:
     }
 
     ~TRIANGULAR_MESHING()
-    {for(int i=1;i<=layers.m;i++) delete layers(i);layers.Resize(0);}
+    {for(int i=0;i<layers.m;i++) delete layers(i);layers.Resize(0);}
 
     void Set_Curvature_Subdivision_Threshold(const T curvature_subdivision_threshold_input=.7)
     {curvature_subdivision_threshold=curvature_subdivision_threshold_input;}

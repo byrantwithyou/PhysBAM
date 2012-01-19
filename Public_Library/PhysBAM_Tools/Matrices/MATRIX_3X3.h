@@ -69,7 +69,7 @@ public:
     template<class T_MATRIX>
     explicit MATRIX(const MATRIX_BASE<T,T_MATRIX>& A)
     {
-        assert(A.Rows()==3 && A.Columns()==3);for(int j=1;j<=3;j++) for(int i=1;i<=3;i++) (*this)(i,j)=A(i,j);
+        assert(A.Rows()==3 && A.Columns()==3);for(int j=0;j<3;j++) for(int i=0;i<3;i++) (*this)(i,j)=A(i,j);
     }
 
     MATRIX& operator=(const MATRIX& matrix_input)

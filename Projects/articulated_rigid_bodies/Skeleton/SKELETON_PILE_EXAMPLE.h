@@ -73,7 +73,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     ARRAY<RIGID_BODY<TV>*>& rigid_bodies=solids_parameters.rigid_body_parameters.list.rigid_bodies;
     LOG::cout<<"rigid_bodies.m="<<rigid_bodies.m<<std::endl;
-    for(int i=1;i<=rigid_bodies.m;i++) if(!rigid_bodies(i)->is_static && !rigid_bodies(i)->is_kinematic)
+    for(int i=0;i<rigid_bodies.m;i++) if(!rigid_bodies(i)->is_static && !rigid_bodies(i)->is_kinematic)
         rigid_bodies(i)->Add_Basic_Forces(solids_parameters.gravity,solids_parameters.gravity_direction,solids_parameters.rigid_body_evolution_parameters.rigid_body_ether_viscosity,0);
 
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >::Initialize_Bodies();
@@ -96,7 +96,7 @@ void Make_Skeletons()
             frames(I).r=QUATERNION<T>::From_Rotation_Vector(max_angle*random.Get_Vector_In_Unit_Sphere<TV>());
             frames(I).t=iterator.Location()-box_center;}
         int intersections;
-        for(int attempts=1;attempts<=200;attempts++){intersections=0;
+        for(int attempts=0;attempts<200;attempts++){intersections=0;
             for(FACE_ITERATOR iterator(grid,0,GRID<TV>::INTERIOR_REGION);iterator.Valid();iterator.Next()){
                 VECTOR<int,3> I=iterator.First_Cell_Index(),J=iterator.Second_Cell_Index();
                 if(ORIENTED_BOX<TV>(skeleton_bounding_box,frames(I).Inverse_Times(frames(J))).Intersection(skeleton_bounding_box)){
@@ -114,7 +114,7 @@ void Make_Skeletons()
 
 // compute the skeleton bounding box
 //    BOX_3D<T> bounding_box=BOX_3D<T>::Empty_Box();
-//    for(int i=1;i<=skeleton.bones.m;i++){skeleton.bones(i)->Update_Bounding_Box();bounding_box.Enlarge_To_Include_Box(skeleton.bones(i)->axis_aligned_bounding_box);}
+//    for(int i=0;i<skeleton.bones.m;i++){skeleton.bones(i)->Update_Bounding_Box();bounding_box.Enlarge_To_Include_Box(skeleton.bones(i)->axis_aligned_bounding_box);}
 //    LOG::cout<<"Axis aligned bounding box="<<bounding_box<<std::endl;
 }
 //#####################################################################

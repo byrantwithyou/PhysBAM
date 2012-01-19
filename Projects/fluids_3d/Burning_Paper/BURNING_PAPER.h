@@ -405,7 +405,7 @@ void Initialize_Forces()
     constrained_nodes.Resize(0);ARRAY<VECTOR<T,3> > corners(4);
     corners(1)=VECTOR<T,3>(box.xmin,box.ymin,0);corners(2)=VECTOR<T,3>(box.xmin,box.ymax,0);corners(3)=VECTOR<T,3>(box.xmax,box.ymin,0);corners(4)=VECTOR<T,3>(box.xmax,box.ymax,0);
     T lower_edge=box.xmin;
-    for(int p=1;p<=particles.array_collection->Size();p++)for(int c=1;c<=4;c++){
+    for(int p=1;p<=particles.array_collection->Size();p++)for(int c=0;c<4;c++){
         VECTOR<T,3>& X=particles.X(p);
         if((corners(c)-X).Magnitude()<1e-5 || fabs(X.x-lower_edge)<1e-5){constrained_nodes.Append(p);break;}}
 }
@@ -419,7 +419,7 @@ void Melting_Levelset_Substep(const int object,const T dt,const T time)
     if(0 && cutout){
         LEVELSET_TRIANGULATED_OBJECT<T,VECTOR<T,3> >& levelset=*melting_parameters.levelsets(1);
         ARRAY<VECTOR_2D<T> >& node_locations=levelset.grid.Node_Locations();
-        for(int n=1;n<=levelset.phi.m;n++) levelset.phi(n)=max(levelset.phi(n),cutout_levelset.Phi(node_locations(n)));}
+        for(int n=0;n<levelset.phi.m;n++) levelset.phi(n)=max(levelset.phi(n),cutout_levelset.Phi(node_locations(n)));}
 }
 //#####################################################################
 // Function Solids_Example_Set_External_Velocities
@@ -427,7 +427,7 @@ void Melting_Levelset_Substep(const int object,const T dt,const T time)
 void Set_External_Velocities(ARRAY<VECTOR<T,3> >& V,const T time)
 {
     SOLIDS_FLUIDS_EXAMPLE_3D<RW>::Set_External_Velocities(V,time,id_number);
-    for(int c=1;c<=constrained_nodes.m;c++)V(constrained_nodes(c))=VECTOR<T,3>();
+    for(int c=0;c<constrained_nodes.m;c++)V(constrained_nodes(c))=VECTOR<T,3>();
 }
 //#####################################################################
 // Function Solids_Example_Zero_Out_Enslaved_Velocity_Nodes
@@ -435,7 +435,7 @@ void Set_External_Velocities(ARRAY<VECTOR<T,3> >& V,const T time)
 void Zero_Out_Enslaved_Velocity_Nodes(ARRAY<VECTOR<T,3> >& V,const T time)
 {
     SOLIDS_FLUIDS_EXAMPLE_3D<RW>::Zero_Out_Enslaved_Velocity_Nodes(V,time,id_number);
-    for(int c=1;c<=constrained_nodes.m;c++)V(constrained_nodes(c))=VECTOR<T,3>();
+    for(int c=0;c<constrained_nodes.m;c++)V(constrained_nodes(c))=VECTOR<T,3>();
 }
 //#####################################################################
 // Function Update_Time_Varying_Material_Properties
@@ -459,11 +459,11 @@ template<class SOURCE> void Get_Source_Velocities(const SOURCE& source,const T t
 {
     GRID<TV> &u_grid=fluids_parameters.u_grid,&v_grid=fluids_parameters.v_grid,&w_grid=fluids_parameters.w_grid;
     PROJECTION_3D<T>& projection=fluids_parameters.incompressible.projection;
-    for(int i=1;i<=u_grid.m;i++) for(int j=1;j<=u_grid.n;j++) for(int ij=1;ij<=u_grid.mn;ij++) if(source.Lazy_Inside(world_to_source*u_grid.X(i,j,ij))){
+    for(int i=0;i<u_grid.m;i++) for(int j=0;j<u_grid.n;j++) for(int ij=0;ij<u_grid.mn;ij++) if(source.Lazy_Inside(world_to_source*u_grid.X(i,j,ij))){
         projection.elliptic_solver->psi_N_u(i,j,ij)=true;projection.u(i,j,ij)=source_velocity.x;if(fluids_parameters.fire)projection.u_fuel(i,j,ij)=source_velocity.x;}
-    for(int i=1;i<=v_grid.m;i++) for(int j=1;j<=v_grid.n;j++) for(int ij=1;ij<=v_grid.mn;ij++) if(source.Lazy_Inside(world_to_source*v_grid.X(i,j,ij))){
+    for(int i=0;i<v_grid.m;i++) for(int j=0;j<v_grid.n;j++) for(int ij=0;ij<v_grid.mn;ij++) if(source.Lazy_Inside(world_to_source*v_grid.X(i,j,ij))){
         projection.elliptic_solver->psi_N_v(i,j,ij)=true;projection.v(i,j,ij)=source_velocity.y;if(fluids_parameters.fire)projection.v_fuel(i,j,ij)=source_velocity.y;}
-    for(int i=1;i<=w_grid.m;i++) for(int j=1;j<=w_grid.n;j++) for(int ij=1;ij<=w_grid.mn;ij++) if(source.Lazy_Inside(world_to_source*w_grid.X(i,j,ij))){
+    for(int i=0;i<w_grid.m;i++) for(int j=0;j<w_grid.n;j++) for(int ij=0;ij<w_grid.mn;ij++) if(source.Lazy_Inside(world_to_source*w_grid.X(i,j,ij))){
         projection.elliptic_solver->psi_N_w(i,j,ij)=true;projection.w(i,j,ij)=source_velocity.z;if(fluids_parameters.fire)projection.w_fuel(i,j,ij)=source_velocity.z;}
 }
 //#####################################################################
@@ -480,7 +480,7 @@ void Get_Source_Velocities(const T time)
 //#####################################################################
 template<class SOURCE> void Initialize_Phi(const SOURCE& source)
 {
-    for(int i=1;i<=fluids_parameters.grid.m;i++) for(int j=1;j<=fluids_parameters.grid.n;j++) for(int ij=1;ij<=fluids_parameters.grid.mn;ij++) 
+    for(int i=0;i<fluids_parameters.grid.m;i++) for(int j=0;j<fluids_parameters.grid.n;j++) for(int ij=0;ij<fluids_parameters.grid.mn;ij++) 
         if(source.Lazy_Inside(world_to_source*fluids_parameters.grid.X(i,j,ij)))
             fluids_parameters.particle_levelset_evolution.particle_levelset.levelset.phi(i,j,ij)=-fluids_parameters.grid.dx;
         else
@@ -508,7 +508,7 @@ void Initialize_Levelset_Velocity(const int object,ARRAY<VECTOR_2D<T> >& V)
 //#####################################################################
 template<class SOURCE> void Adjust_Phi_With_Sources(const SOURCE& source,const T time)
 {
-    for(int i=1;i<=fluids_parameters.grid.m;i++) for(int j=1;j<=fluids_parameters.grid.n;j++) for(int ij=1;ij<=fluids_parameters.grid.mn;ij++) 
+    for(int i=0;i<fluids_parameters.grid.m;i++) for(int j=0;j<fluids_parameters.grid.n;j++) for(int ij=0;ij<fluids_parameters.grid.mn;ij++) 
 //        if(source.Lazy_Inside(world_to_source*fluids_parameters.grid.X(i,j,ij)))
         if(source.Lazy_Inside(world_to_source*fluids_parameters.grid.X(i,j,ij))&&fluids_parameters.particle_levelset_evolution.particle_levelset.levelset.phi(i,j,ij)>0)
             fluids_parameters.particle_levelset_evolution.particle_levelset.levelset.phi(i,j,ij)=-fluids_parameters.grid.dx;
@@ -539,8 +539,8 @@ void Initialize_Siggraph()
     IMAGE<T>::Read(data_directory+"/Images/siggraph_print.png",image);
     T y=(T).3*image.n/image.n;
     cutout_grid.Initialize(image.m,image.n,0,1,-y/2,y/2);cutout_phi.Resize(cutout_grid);
-    //for(int i=1;i<=image.m;i++)for(int j=1;j<=image.n;j++)LOG::cout<<image(i,j)<<std::endl;
-    for(int i=1;i<=image.m;i++)for(int j=1;j<=image.n;j++)cutout_phi(i,j)=.5-image(i,image.n-j+1).x;
+    //for(int i=0;i<image.m;i++)for(int j=0;j<image.n;j++)LOG::cout<<image(i,j)<<std::endl;
+    for(int i=0;i<image.m;i++)for(int j=0;j<image.n;j++)cutout_phi(i,j)=.5-image(i,image.n-j+1).x;
     cutout_levelset.Fast_Marching_Method();
     FILE_UTILITIES::Write_To_File<RW>(output_directory+"/cutout_levelset.phi",cutout_levelset);
     inflammable_levelset=&cutout_levelset;
@@ -557,8 +557,8 @@ void Initialize_SCA()
     T x=(T)13/(1293+23);
     T y=(T).3;
     cutout_grid.Initialize(image.m,image.n,x,1-x,-y/2,y/2);cutout_phi.Resize(cutout_grid);
-    //for(int i=1;i<=image.m;i++)for(int j=1;j<=image.n;j++)LOG::cout<<image(i,j)<<std::endl;
-    for(int i=1;i<=image.m;i++)for(int j=1;j<=image.n;j++)cutout_phi(i,j)=.5-image(i,image.n-j+1).x;
+    //for(int i=0;i<image.m;i++)for(int j=0;j<image.n;j++)LOG::cout<<image(i,j)<<std::endl;
+    for(int i=0;i<image.m;i++)for(int j=0;j<image.n;j++)cutout_phi(i,j)=.5-image(i,image.n-j+1).x;
     cutout_levelset.Fast_Marching_Method();
     FILE_UTILITIES::Write_To_File<RW>(output_directory+"/cutout_levelset.phi",cutout_levelset);
     inflammable_levelset=&cutout_levelset;
@@ -574,7 +574,7 @@ void Initialize_TVCG()
     T x=(T).02;
     T y=(T).22;
     cutout_grid.Initialize(image.m,image.n,x,1-x,-y/2,y/2);cutout_phi.Resize(cutout_grid);
-    for(int i=1;i<=image.m;i++)for(int j=1;j<=image.n;j++)cutout_phi(i,j)=.5-image(i,image.n-j+1).x;
+    for(int i=0;i<image.m;i++)for(int j=0;j<image.n;j++)cutout_phi(i,j)=.5-image(i,image.n-j+1).x;
     cutout_levelset.Fast_Marching_Method();
     FILE_UTILITIES::Write_To_File<RW>(output_directory+"/cutout_levelset.phi",cutout_levelset);
     inflammable_levelset=&cutout_levelset;

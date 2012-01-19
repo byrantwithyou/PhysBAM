@@ -401,7 +401,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         tests.Set_Mass_Of_Particles(segmented_curve,solid_mass/segmented_curve.Total_Size(),false);
         
         // correct number nodes
-        for(int i=1;i<=solid_body_collection.deformable_body_collection.deformable_geometry.structures.m;i++){
+        for(int i=0;i<solid_body_collection.deformable_body_collection.deformable_geometry.structures.m;i++){
             solid_body_collection.deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();}
 
         // correct mass
@@ -436,9 +436,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         Add_Volumetric_Body_To_Fluid_Simulation(rect,true,true);}
 
     if(fluids_parameters.use_slip){
-        for(int i=1;i<=solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->compute_half_forces=true;
-        for(int k=1;k<=solid_body_collection.deformable_body_collection.deformables_forces.m;k++) solid_body_collection.deformable_body_collection.deformables_forces(k)->compute_half_forces=true;
-        for(int i=1;i<=solid_body_collection.rigid_body_collection.rigids_forces.m;i++) solid_body_collection.rigid_body_collection.rigids_forces(i)->compute_half_forces=true;}
+        for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->compute_half_forces=true;
+        for(int k=0;k<solid_body_collection.deformable_body_collection.deformables_forces.m;k++) solid_body_collection.deformable_body_collection.deformables_forces(k)->compute_half_forces=true;
+        for(int i=0;i<solid_body_collection.rigid_body_collection.rigids_forces.m;i++) solid_body_collection.rigid_body_collection.rigids_forces(i)->compute_half_forces=true;}
 }
 //#####################################################################
 // Function Intialize_Euler_State
@@ -453,7 +453,7 @@ void Initialize_Euler_State() PHYSBAM_OVERRIDE
 
     //initialize grid variables
     //1 == density, 2 == momentum, 3 == total energy
-    // for(int i=1;i<=grid.counts.x;i++){
+    // for(int i=0;i<grid.counts.x;i++){
     for(CELL_ITERATOR iter(grid);iter.Valid();iter.Next()){
         TV location=iter.Location();
         T rho=0.,u=0.,p=0.;

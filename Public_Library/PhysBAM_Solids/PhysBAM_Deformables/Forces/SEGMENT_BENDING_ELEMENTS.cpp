@@ -19,8 +19,8 @@ using namespace PhysBAM;
 template<class T> void SEGMENT_BENDING_ELEMENTS<T>::
 Add_Dependencies(SEGMENT_MESH& dependency_mesh) const
 {
-    for(int t=1;t<=bending_triples.m;t++)
-        for(int i=1;i<=2;i++) for(int j=i+1;j<=3;j++) dependency_mesh.Add_Element_If_Not_Already_There(VECTOR<int,2>(bending_triples(t)[i],bending_triples(t)[j]));
+    for(int t=0;t<bending_triples.m;t++)
+        for(int i=0;i<2;i++) for(int j=i+1;j<=3;j++) dependency_mesh.Add_Element_If_Not_Already_There(VECTOR<int,2>(bending_triples(t)[i],bending_triples(t)[j]));
 }
 //#####################################################################
 // Function Update_Mpi
@@ -40,12 +40,12 @@ Set_Triples_From_Segment_Mesh(SEGMENT_MESH& mesh)
 
     // allocate proper array sizes
     int number_triples=0;
-    for(int t=1;t<=mesh.elements.m;t++) for(int a=1;a<=(*mesh.adjacent_elements)(t).m;a++) if((*mesh.adjacent_elements)(t)(a)>t) number_triples++;
+    for(int t=0;t<mesh.elements.m;t++) for(int a=1;a<=(*mesh.adjacent_elements)(t).m;a++) if((*mesh.adjacent_elements)(t)(a)>t) number_triples++;
     bending_triples.Resize(number_triples);length_scale.Resize(number_triples);stiffness.Resize(number_triples);
     sine_half_rest_angle.Resize(number_triples);damping.Resize(number_triples);
 
     int index=0; // reset number
-    for(int t=1;t<=mesh.elements.m;t++){
+    for(int t=0;t<mesh.elements.m;t++){
         VECTOR<int,2> segment1=mesh.elements(t);
         for(int a=1;a<=(*mesh.adjacent_elements)(t).m;a++){
             int s=(*mesh.adjacent_elements)(t)(a);
@@ -61,7 +61,7 @@ Set_Triples_From_Segment_Mesh(SEGMENT_MESH& mesh)
 template<class T> void SEGMENT_BENDING_ELEMENTS<T>::
 Set_Constants_From_Particles(const T material_stiffness,const T material_damping)
 {
-    for(int q=1;q<=bending_triples.m;q++){
+    for(int q=0;q<bending_triples.m;q++){
         int i,j,k;bending_triples(q).Get(i,j,k);
         TV n1=(particles.X(j)-particles.X(i)).Rotate_Clockwise_90(),n2=(particles.X(k)-particles.X(j)).Rotate_Clockwise_90();
         length_scale(q)=(T).5*(n1.Normalize()+n2.Normalize());

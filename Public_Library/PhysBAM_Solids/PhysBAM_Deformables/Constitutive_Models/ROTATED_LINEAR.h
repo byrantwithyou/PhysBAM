@@ -48,7 +48,7 @@ public:
     youngs_modulus=youngs_modulus_input;poissons_ratio=poissons_ratio_input;
     assert(youngs_modulus.m==poissons_ratio.m);
     lambda.Resize(youngs_modulus.m);mu.Resize(youngs_modulus.m);alpha.Resize(youngs_modulus.m);beta.Resize(youngs_modulus.m);
-    for(int e=1;e<=youngs_modulus.m;e++){
+    for(int e=0;e<youngs_modulus.m;e++){
         assert(poissons_ratio(e)>-1 && poissons_ratio(e)<(T).5);
         lambda(e)=youngs_modulus(e)*poissons_ratio(e)/((1+poissons_ratio(e))*(1-2*poissons_ratio(e)));
         mu(e)=youngs_modulus(e)/(2*(1+poissons_ratio(e)));

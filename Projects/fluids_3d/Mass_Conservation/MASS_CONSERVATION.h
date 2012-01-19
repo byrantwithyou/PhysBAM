@@ -267,7 +267,7 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
         ARRAY<SPHERE<TV> > sources(drops);
         ARRAY<TV> velocities(drops);
         BOX<TV> velocity_box(-(T).2,(T).2,-(T).2,(T).2,-(T).2,(T).2);
-        for(int i=1;i<=drops;i++){
+        for(int i=0;i<drops;i++){
             sources(i).center=random.Get_Uniform_Vector(grid.Domain());
             sources(i).radius=random.Get_Uniform_Number(radius_min,radius_max);
             velocities(i)=random.Get_Uniform_Vector(velocity_box);}
@@ -275,11 +275,11 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
             TV location=iterator.Location();TV_INT cell=iterator.Cell_Index();
             T& phi=fluids_parameters.particle_levelset_evolution->phi(iterator.Cell_Index());
             phi=FLT_MAX;
-            for(int i=1;i<=drops;i++) phi=min(phi,sources(i).Signed_Distance(location));}
+            for(int i=0;i<drops;i++) phi=min(phi,sources(i).Signed_Distance(location));}
         for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
             TV location=iterator.Location();TV_INT face=iterator.Face_Index();int axis=iterator.Axis();
             T phi=FLT_MAX;
-            for(int i=1;i<=drops;i++){
+            for(int i=0;i<drops;i++){
                 T phi_source=sources(i).Signed_Distance(location);
                 if(phi_source<phi){
                     phi=phi_source;

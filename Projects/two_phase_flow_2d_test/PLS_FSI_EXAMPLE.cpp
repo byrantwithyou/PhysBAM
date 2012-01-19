@@ -206,7 +206,7 @@ Adjust_Phi_With_Source(const GEOMETRY& source,const int region,const T_TRANSFORM
         TV source_X=world_to_source.Homogeneous_Times(iterator.Location());
         if(source.Inside(source_X,-bandwidth)){
             T source_signed_distance=source.Signed_Distance(source_X);
-            for(int i=1;i<=fluids_parameters.number_of_regions;i++){
+            for(int i=0;i<fluids_parameters.number_of_regions;i++){
                 if(i==region) phis(i)(iterator.Cell_Index())=min(phis(i)(iterator.Cell_Index()),source_signed_distance);
                 else phis(i)(iterator.Cell_Index())=max(phis(i)(iterator.Cell_Index()),-source_signed_distance);}}}
 }

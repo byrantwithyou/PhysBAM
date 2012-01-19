@@ -146,7 +146,7 @@ public:
         initial_angular_velocity.Resize(number_of_objects);
         
         RANDOM_NUMBERS random;random.Set_Seed(1234);// set the seed so that the example is reproducible
-        for(int i=1;i<=number_of_objects;i++){
+        for(int i=0;i<number_of_objects;i++){
             initial_position(i)=VECTOR<T,3>(random.Get_Uniform_Number((T)-.5,(T).5)-(T).5*side_length,2.5+1.5*i-(T).5*side_length,random.Get_Uniform_Number((T)-.5,(T).5)-(T).5*side_length);
             do{initial_orientation(i).s=random.Get_Uniform_Number(0,1);initial_orientation(i).v=random.Get_Uniform_Vector(VECTOR<T,3>(-1,-1,-1),VECTOR<T,3>(1,1,1));}while(initial_orientation(i).Magnitude()>1);
             initial_orientation(i).Normalize();
@@ -162,7 +162,7 @@ public:
 //#####################################################################
 void Initialize_Deformable_And_Rigid_Bodies()
 {
-    for(int i=1;i<=number_of_objects;i++){
+    for(int i=0;i<number_of_objects;i++){
         int index=solids_parameters.deformable_body_parameters.list.Add_Deformable_Embedded_Tetrahedralized_Volume(15,1e-2);
         Add_Melting_Object(melting_parameters.DEFORMABLE,index);}
 
@@ -206,7 +206,7 @@ void Initialize_Phi(const int object,ARRAY<T>& phi)
     RED_GREEN_GRID_3D<T>& grid=melting_parameters.levelsets(1)->grid;
     ARRAY<VECTOR<T,3> >& node_locations=grid.Node_Locations();
     
-    for(int p=1;p<=phi.m;p++) phi(p)=torus.Phi(node_locations(p));    
+    for(int p=0;p<phi.m;p++) phi(p)=torus.Phi(node_locations(p));    
 }
 //#####################################################################
 // Function Initialize_Levelset_Velocity
@@ -216,9 +216,9 @@ void Initialize_Levelset_Velocity(const int object,ARRAY<VECTOR<T,3> >& V)
     //RED_GREEN_GRID_3D<T>& grid=melting_parameters.levelsets(1)->grid;
     //ARRAY<VECTOR<T,3> >& node_locations=grid.Node_Locations();
     
-    for(int p=1;p<=V.m;p++) V(p)=VECTOR<T,3>(0,0,0);    
-//    for(int p=1;p<=V.m;p++) V(p)=VECTOR<T,3>(node_locations(p).y-sphere.center.y,0,0);
-//    for(int p=1;p<=V.m;p++) V(p)=-node_locations(p)+circle.center;
+    for(int p=0;p<V.m;p++) V(p)=VECTOR<T,3>(0,0,0);    
+//    for(int p=0;p<V.m;p++) V(p)=VECTOR<T,3>(node_locations(p).y-sphere.center.y,0,0);
+//    for(int p=0;p<V.m;p++) V(p)=-node_locations(p)+circle.center;
 }
 //#####################################################################
 // Function Initialize_Levelset_Velocity
@@ -228,16 +228,16 @@ void Melting_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
     BOX_3D<T> box(-1.5,1.5,.8,1.3,-1.5,1.5);T dy=box.ymax-1;
 
     // set the velocities so that it appears as if the table is hot and melting the tori
-    for(int object=1;object<=melting_parameters.levelsets.m;object++){
+    for(int object=0;object<melting_parameters.levelsets.m;object++){
         LEVELSET_TETRAHEDRALIZED_VOLUME<T>& levelset=*melting_parameters.levelsets(object);
         RED_GREEN_GRID_3D<T>& grid=levelset.grid;
         EMBEDDED_TETRAHEDRALIZED_VOLUME<T>& embedded_tetrahedralized_volume=levelset.embedded_tetrahedralized_volume;
         PARTICLES<T,VECTOR<T,3> >& particles=embedded_tetrahedralized_volume.particles;
         // map data to the cell based indices
         ARRAY<VECTOR<T,3> > cell_based_X(grid.number_of_nodes);
-        for(int i=1;i<=grid.number_of_nodes;i++)if(levelset.node_to_particle_mapping(i))
+        for(int i=0;i<grid.number_of_nodes;i++)if(levelset.node_to_particle_mapping(i))
             cell_based_X(i)=particles.X.array(levelset.node_to_particle_mapping(i));
-        for(int i=1;i<=cell_based_X.m;i++)if(box.Inside(cell_based_X(i))){
+        for(int i=0;i<cell_based_X.m;i++)if(box.Inside(cell_based_X(i))){
             melting_parameters.levelsets(object)->phi(i)+=clamp(((box.ymax-cell_based_X(i).y)/dy)*torus_melting_speed,(T)0,torus_melting_speed)*dt;}}
 
     WATER_MELTING_EXAMPLE_3D<T,RW>::Melting_Substep(dt,time);
@@ -269,8 +269,8 @@ void Initialize_Forces()
         undeformed_tetrahedron_particles.Delete_Pointers_And_Clean_Memory();undeformed_tetrahedron_particles.Resize(number_of_objects);
         undeformed_triangle_particles.Delete_Pointers_And_Clean_Memory();undeformed_triangle_particles.Resize(number_of_objects);
         undeformed_triangulated_surface.Delete_Pointers_And_Clean_Memory();undeformed_triangulated_surface.Resize(number_of_objects);
-        for(int i=1;i<=undeformed_levelset.m;i++)undeformed_levelset(i)->Destroy_Data();undeformed_levelset.Delete_Pointers_And_Clean_Memory();undeformed_levelset.Resize(number_of_objects);
-        for(int object=1;object<=number_of_objects;object++){
+        for(int i=0;i<undeformed_levelset.m;i++)undeformed_levelset(i)->Destroy_Data();undeformed_levelset.Delete_Pointers_And_Clean_Memory();undeformed_levelset.Resize(number_of_objects);
+        for(int object=0;object<number_of_objects;object++){
             LOG::Push_Scope("collision body","creating collision body %d",object);
             DEFORMABLE_OBJECT_3D<T>& deformable_object=solids_parameters.deformable_body_parameters.list(object);
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_object.embedded_tetrahedralized_volume->tetrahedralized_volume;
@@ -291,7 +291,7 @@ void Initialize_Forces()
             std::cout<<grid<<std::endl;
             phi.Resize(grid);
             LOG::Time("rasterizing levelset");
-            for(int i=1;i<=grid.m;i++)for(int j=1;j<=grid.n;j++)for(int ij=1;ij<=grid.mn;ij++)phi(i,j,ij)=levelset.Phi(grid.X(i,j,ij));
+            for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++)for(int ij=0;ij<grid.mn;ij++)phi(i,j,ij)=levelset.Phi(grid.X(i,j,ij));
             // create collision body
             TETRAHEDRON_COLLISION_BODY<T>* collision_body=new TETRAHEDRON_COLLISION_BODY<T>(tetrahedralized_volume,&triangulated_surface);
             collision_body->Set_Implicit_Surface(undeformed_levelset(object));
@@ -301,7 +301,7 @@ void Initialize_Forces()
             deformable_object.collisions.collision_body_list_id=solids_parameters.collision_body_list.collision_bodies.m;
             LOG::Pop_Scope();}}
 
-    for(int object=1;object<=number_of_objects;object++){
+    for(int object=0;object<number_of_objects;object++){
         DEFORMABLE_OBJECT_3D<T>& deformable_object=solids_parameters.deformable_body_parameters.list(object);
         TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_object.embedded_tetrahedralized_volume->tetrahedralized_volume;
         
@@ -325,7 +325,7 @@ void Initialize_Phi()
     GRID<TV>& grid=fluids_parameters.grid;
     fluids_parameters.particle_levelset_evolution.particle_levelset.Set_Minimum_Particle_Radius((T).2*grid.max_dx_dy_dz);
     fluids_parameters.particle_levelset_evolution.particle_levelset.Set_Maximum_Particle_Radius((T).7*grid.max_dx_dy_dz);
-    for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++) for(int ij=1;ij<=grid.mn;ij++)
+    for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++) for(int ij=0;ij<grid.mn;ij++)
         fluids_parameters.particle_levelset_evolution.phi(i,j,ij)=grid.y(j)-grid.ymin-initial_water_level;
 }
 //#####################################################################
@@ -336,11 +336,11 @@ void Initialize_Phi()
     WATER_MELTING_EXAMPLE_3D<T,RW>::Get_Object_Velocities(dt,time);
     GRID<TV> &u_grid=fluids_parameters.u_grid,&v_grid=fluids_parameters.v_grid,&w_grid=fluids_parameters.w_grid;
     PROJECTION_3D<T>& projection=fluids_parameters.incompressible.projection;LAPLACE_3D<T>& elliptic_solver=*fluids_parameters.incompressible.projection.elliptic_solver;
-    for(int i=1;i<=u_grid.m;i++) for(int j=1;j<=u_grid.n;j++) for(int ij=1;ij<=u_grid.mn;ij++) if(phi_table(i,j,ij)+phi_table(i,j+1,ij)+phi_table(i,j,ij+1)+phi_table(i,j+1,ij+1)<0){
+    for(int i=0;i<u_grid.m;i++) for(int j=0;j<u_grid.n;j++) for(int ij=0;ij<u_grid.mn;ij++) if(phi_table(i,j,ij)+phi_table(i,j+1,ij)+phi_table(i,j,ij+1)+phi_table(i,j+1,ij+1)<0){
         elliptic_solver.psi_N_u(i,j,ij)=true;projection.u(i,j,ij)=0;}
-    for(int i=1;i<=v_grid.m;i++) for(int j=1;j<=v_grid.n;j++) for(int ij=1;ij<=v_grid.mn;ij++) if(phi_table(i,j,ij)+phi_table(i+1,j,ij)+phi_table(i,j,ij+1)+phi_table(i+1,j,ij+1)<0){
+    for(int i=0;i<v_grid.m;i++) for(int j=0;j<v_grid.n;j++) for(int ij=0;ij<v_grid.mn;ij++) if(phi_table(i,j,ij)+phi_table(i+1,j,ij)+phi_table(i,j,ij+1)+phi_table(i+1,j,ij+1)<0){
         elliptic_solver.psi_N_v(i,j,ij)=true;projection.v(i,j,ij)=0;}
-    for(int i=1;i<=w_grid.m;i++) for(int j=1;j<=w_grid.n;j++) for(int ij=1;ij<=w_grid.mn;ij++) if(phi_table(i,j,ij)+phi_table(i,j+1,ij)+phi_table(i+1,j,ij)+phi_table(i+1,j+1,ij)<0){
+    for(int i=0;i<w_grid.m;i++) for(int j=0;j<w_grid.n;j++) for(int ij=0;ij<w_grid.mn;ij++) if(phi_table(i,j,ij)+phi_table(i,j+1,ij)+phi_table(i+1,j,ij)+phi_table(i+1,j+1,ij)<0){
         elliptic_solver.psi_N_w(i,j,ij)=true;projection.w(i,j,ij)=0;}
 }*/
 //#####################################################################

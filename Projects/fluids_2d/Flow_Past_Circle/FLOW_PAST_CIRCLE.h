@@ -157,7 +157,7 @@ void Get_Source_Velocities(ARRAY<T,FACE_INDEX<2> >& face_velocities,ARRAY<bool,F
 {
     GRID<TV> u_grid=fluids_parameters.grid->Get_X_Face_Grid(),v_grid=fluids_parameters.grid->Get_Y_Face_Grid();
     T flow_speed=(T)1;
-    for(int j=1;j<=u_grid.counts.y;j++){
+    for(int j=0;j<u_grid.counts.y;j++){
         FACE_INDEX<2> a(1,TV_INT(1,j)),b(1,TV_INT(u_grid.counts.x,j));
         face_velocities(a)=flow_speed;
         psi_N(a)=true;}
@@ -200,9 +200,9 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 
     ARRAY<T,FACE_INDEX<TV::m> >& face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
     LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,T> interp;
-    for(int i=1;i<=sample_points.m;i++){
+    for(int i=0;i<sample_points.m;i++){
         TV X=sample_points(i),V;
-        for(int d=1;d<=V.m;d++)
+        for(int d=0;d<V.m;d++)
             V(d)=interp.Clamped_To_Array(fluids_parameters.grid->Get_Face_Grid(d),face_velocities.Component(d),X);
         LOG::cout<<"velocity at "<<X<<" : "<<V<<std::endl;}
 }
@@ -217,7 +217,7 @@ void Mark_Outside(ARRAY<bool,FACE_INDEX<TV::m> >& outside) PHYSBAM_OVERRIDE
     for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) if(circle.Lazy_Inside(iterator.Location())){
         VECTOR<FACE_INDEX<2>,4> faces;
         GRID<TV>::Neighboring_Faces(faces,iterator.index);
-        for(int i=1;i<=faces.m;i++) outside(faces(i))=true;}
+        for(int i=0;i<faces.m;i++) outside(faces(i))=true;}
 }
 //#####################################################################
 // Function Get_Viscosity_Boundary_Along_Ray

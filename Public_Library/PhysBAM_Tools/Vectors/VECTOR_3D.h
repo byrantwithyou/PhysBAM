@@ -356,7 +356,7 @@ public:
     {assert(1<=index && index<=3);return VECTOR<T,2>(index>1?x:y,index<3?z:y);}
 
     VECTOR<T,4> Insert(const T& element,const int index) const
-    {VECTOR<T,4> r;r[index]=element;for(int i=1;i<=3;i++) r[i+(i>=index)]=(*this)[i];return r;}
+    {VECTOR<T,4> r;r[index]=element;for(int i=0;i<3;i++) r[i+(i>=index)]=(*this)[i];return r;}
 
     VECTOR<T,4> Append(const T& element) const
     {return VECTOR<T,4>(x,y,z,element);}

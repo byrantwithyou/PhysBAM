@@ -28,13 +28,13 @@ SOLID_FLUID_SYSTEM(BACKWARD_EULER_SYSTEM<TV>& solid_system_input,const ARRAY<SPA
 {
     temp_array.Resize(A_array.m);
     modified_world_space_rigid_inertia_tensor_inverse.Resize(modified_world_space_rigid_inertia_tensor.m);
-    for(int i=1;i<=modified_world_space_rigid_inertia_tensor.m;i++) modified_world_space_rigid_inertia_tensor_inverse(i)=modified_world_space_rigid_inertia_tensor(i).Inverse();
+    for(int i=0;i<modified_world_space_rigid_inertia_tensor.m;i++) modified_world_space_rigid_inertia_tensor_inverse(i)=modified_world_space_rigid_inertia_tensor(i).Inverse();
     modified_world_space_rigid_mass.Resize(rigid_body_fluid_mass.m);modified_world_space_rigid_mass_inverse.Resize(rigid_body_fluid_mass.m);
-    for(int i=1;i<=rigid_body_fluid_mass.m;i++){
+    for(int i=0;i<rigid_body_fluid_mass.m;i++){
         modified_world_space_rigid_mass(i)=rigid_body_fluid_mass(i)+solid_system.projection_data.mass.world_space_rigid_mass(i).mass;
         modified_world_space_rigid_mass_inverse(i)=modified_world_space_rigid_mass(i).Inverse();}
     modified_mass.Resize(fluid_mass.m);one_over_modified_mass.Resize(fluid_mass.m);
-    for(int i=1;i<=fluid_mass.m;i++){
+    for(int i=0;i<fluid_mass.m;i++){
         modified_mass(i)=fluid_mass(i)+solid_system.solid_body_collection.deformable_body_collection.particles.mass(solid_system.solid_body_collection.deformable_body_collection.dynamic_particles(i));
         one_over_modified_mass(i)=modified_mass(i).Inverse();}
 }
@@ -53,14 +53,14 @@ template<class TV,class T_MATRIX> void SOLID_FLUID_SYSTEM<TV,T_MATRIX>::
 Print_Matrix(VECTOR_T& V,VECTOR_T& F)
 {
     // treat vector as: p, deformable v, rigid v (linear, angular)
-    for(int i=1;i<=fluid_system.A.n;i++){ // fluid rows
-        for(int j=1;j<=fluid_system.A.n;j++) if(fluid_system.A.Element_Present(i,j)) LOG::cout<<fluid_system.A(i,j)<<" "; else LOG::cout<<"0\t";
-        for(int j=1;j<=J.m;j++) if(J.Element_Present(j,i)) LOG::cout<<J(j,i)<<"\t"; else LOG::cout<<"0\t";
-        for(int j=1;j<=J_rigid.m;j++) if(J_rigid.Element_Present(j,i)) LOG::cout<<J_rigid(j,i)<<"\t";else LOG::cout<<"0\t";
+    for(int i=0;i<fluid_system.A.n;i++){ // fluid rows
+        for(int j=0;j<fluid_system.A.n;j++) if(fluid_system.A.Element_Present(i,j)) LOG::cout<<fluid_system.A(i,j)<<" "; else LOG::cout<<"0\t";
+        for(int j=0;j<J.m;j++) if(J.Element_Present(j,i)) LOG::cout<<J(j,i)<<"\t"; else LOG::cout<<"0\t";
+        for(int j=0;j<J_rigid.m;j++) if(J_rigid.Element_Present(j,i)) LOG::cout<<J_rigid(j,i)<<"\t";else LOG::cout<<"0\t";
         LOG::cout<<std::endl;
     }
-    for(int i=1;i<=J.m;i++){ // solid rows
-        for(int j=1;j<=J.n;j++) if(J.Element_Present(i,j)) LOG::cout<<J(i,j)<<"\t";else LOG::cout<<"0\t";
+    for(int i=0;i<J.m;i++){ // solid rows
+        for(int j=0;j<J.n;j++) if(J.Element_Present(i,j)) LOG::cout<<J(i,j)<<"\t";else LOG::cout<<"0\t";
         // need to get solid terms
         int our_dynamic_particle_index=(i-1)/TV::dimension+1;int our_axis=i-(our_dynamic_particle_index-1)*TV::dimension;
 
@@ -74,8 +74,8 @@ Print_Matrix(VECTOR_T& V,VECTOR_T& F)
             LOG::cout<<F.solid_velocity.V(our_dynamic_particle_index)(our_axis)<<"\t";}
         LOG::cout<<std::endl;
     }
-    for(int i=1;i<=J_rigid.m;i++){ // solid rows
-        for(int j=1;j<=J_rigid.n;j++) if(J_rigid.Element_Present(i,j)) LOG::cout<<J_rigid(i,j)<<"\t";else LOG::cout<<"0\t";
+    for(int i=0;i<J_rigid.m;i++){ // solid rows
+        for(int j=0;j<J_rigid.n;j++) if(J_rigid.Element_Present(i,j)) LOG::cout<<J_rigid(i,j)<<"\t";else LOG::cout<<"0\t";
         // need to get solid terms
         int our_rigid_particle_index=(i-1)/rows_per_rigid_body+1;int our_component=i-(our_rigid_particle_index-1)*rows_per_rigid_body;
 
@@ -111,7 +111,7 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& bV,KRYLOV_VECTOR_BASE<T>& bF) const
         F.solid_velocity.rigid_V(i).linear=Solid_Sign()*(modified_world_space_rigid_mass(i)*V.solid_velocity.rigid_V(i).linear-solid_system.dt*F.solid_velocity.rigid_V(i).linear);
         F.solid_velocity.rigid_V(i).angular=Solid_Sign()*(modified_world_space_rigid_inertia_tensor(i)*V.solid_velocity.rigid_V(i).angular-solid_system.dt*F.solid_velocity.rigid_V(i).angular);}
 
-    for(int i=1;i<=A_array.m;i++){
+    for(int i=0;i<A_array.m;i++){
         const SPARSE_MATRIX_FLAT_NXN<T>& A=A_array(i);
         const SPARSE_MATRIX_FLAT_MXN<T>& J_deformable=J_deformable_array(i);
         const SPARSE_MATRIX_FLAT_MXN<T>& J_rigid=J_rigid_array(i);
@@ -144,7 +144,7 @@ template<class TV,class T_MATRIX> void SOLID_FLUID_SYSTEM<TV,T_MATRIX>::
 Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& bV,KRYLOV_VECTOR_BASE<T>& bR) const  // solve MR=V
 {
     const VECTOR_T& V=debug_cast<const VECTOR_T&>(bV);VECTOR_T& R=debug_cast<VECTOR_T&>(bR);
-    for(int i=1;i<=A_array.m;i++){
+    for(int i=0;i<A_array.m;i++){
         const SPARSE_MATRIX_FLAT_NXN<T>& A=A_array(i);
         temp_array(i).Resize(A.n);
         A.C->Solve_Forward_Substitution(V.pressure(i),temp_array(i),true); // diagonal should be treated as the identity
@@ -167,7 +167,7 @@ template<class TV,class T_MATRIX> double SOLID_FLUID_SYSTEM<TV,T_MATRIX>::
 Inner_Product(const KRYLOV_VECTOR_BASE<T>& bV1,const KRYLOV_VECTOR_BASE<T>& bV2) const
 {
     const VECTOR_T& V1=debug_cast<const VECTOR_T&>(bV1),&V2=debug_cast<const VECTOR_T&>(bV2);
-    double fluid_inner_product=0.0;for(int i=1;i<=V1.pressure.m;i++) fluid_inner_product+=Dot_Product_Double_Precision(V1.pressure(i),V2.pressure(i));
+    double fluid_inner_product=0.0;for(int i=0;i<V1.pressure.m;i++) fluid_inner_product+=Dot_Product_Double_Precision(V1.pressure(i),V2.pressure(i));
     double solid_inner_product=0.0;
     for(int i=1;i<=V1.solid_velocity.V.Size();i++) solid_inner_product+=Dot_Product(V1.solid_velocity.V(i),modified_mass(i)*V2.solid_velocity.V(i));
     for(int i=1;i<=V1.solid_velocity.rigid_V.Size();i++){
@@ -183,7 +183,7 @@ template<class TV,class T_MATRIX> typename TV::SCALAR SOLID_FLUID_SYSTEM<TV,T_MA
 Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& bR) const
 {
     const VECTOR_T& R=debug_cast<const VECTOR_T&>(bR);
-    T fluid_convergence_norm=(T)0;for(int i=1;i<=R.pressure.m;i++) fluid_convergence_norm=max(fluid_convergence_norm,R.pressure(i).Maximum_Magnitude());
+    T fluid_convergence_norm=(T)0;for(int i=0;i<R.pressure.m;i++) fluid_convergence_norm=max(fluid_convergence_norm,R.pressure(i).Maximum_Magnitude());
     T solid_convergence_norm=solid_system.Convergence_Norm(R.solid_velocity);T scaled_fluid_convergence_norm=solid_tolerance/fluid_tolerance*fluid_convergence_norm;
     T convergence_norm=max(solid_convergence_norm,scaled_fluid_convergence_norm);
     //LOG::cout<<"residual norm: "<<Inner_Product(R,R)<<std::endl;
@@ -200,7 +200,7 @@ Add_J_Deformable_Transpose_Times_Velocity(const SPARSE_MATRIX_FLAT_MXN<T>& J_def
     assert(pressure.n==J_deformable.n && J_deformable.m==V.V.indices.Size()*TV::dimension);
     // computes pressure+=J*V.V
     int index=J_deformable.offsets(1);
-    for(int i=1;i<=J_deformable.m;i++){
+    for(int i=0;i<J_deformable.m;i++){
         const int end=J_deformable.offsets(i+1);
         for(;index<end;index++){
             int dynamic_particle_index=(i-1)/TV::dimension+1;int axis=i-(dynamic_particle_index-1)*TV::dimension;
@@ -215,7 +215,7 @@ Add_J_Rigid_Transpose_Times_Velocity(const SPARSE_MATRIX_FLAT_MXN<T>& J_rigid,co
     assert(pressure.n==J_rigid.n && J_rigid.m==V.rigid_V.indices.Size()*rows_per_rigid_body);
     // computes pressure+=J*V.V
     int index=J_rigid.offsets(1);
-    for(int i=1;i<=J_rigid.m;i++){
+    for(int i=0;i<J_rigid.m;i++){
         const int end=J_rigid.offsets(i+1);
         for(;index<end;index++){
             int rigid_particle_index=(i-1)/rows_per_rigid_body+1;int component=i-(rigid_particle_index-1)*rows_per_rigid_body;
@@ -230,7 +230,7 @@ Add_J_Deformable_Times_Pressure(const SPARSE_MATRIX_FLAT_MXN<T>& J_deformable,co
 {
     assert(pressure.n==J_deformable.n && J_deformable.m==V.V.indices.Size()*TV::dimension);
     int index=J_deformable.offsets(1);
-    for(int i=1;i<=J_deformable.m;i++){
+    for(int i=0;i<J_deformable.m;i++){
         const int end=J_deformable.offsets(i+1);
         for(;index<end;index++){
             int dynamic_particle_index=(i-1)/TV::dimension+1;int axis=i-(dynamic_particle_index-1)*TV::dimension;
@@ -245,7 +245,7 @@ Add_J_Rigid_Times_Pressure(const SPARSE_MATRIX_FLAT_MXN<T>& J_rigid,const VECTOR
     assert(pressure.n==J_rigid.n && J_rigid.m==V.rigid_V.indices.Size()*rows_per_rigid_body);
     // computes pressure+=J*V.V
     int index=J_rigid.offsets(1);
-    for(int i=1;i<=J_rigid.m;i++){
+    for(int i=0;i<J_rigid.m;i++){
         const int end=J_rigid.offsets(i+1);
         for(;index<end;index++){
             int rigid_particle_index=(i-1)/rows_per_rigid_body+1;int component=i-(rigid_particle_index-1)*rows_per_rigid_body;

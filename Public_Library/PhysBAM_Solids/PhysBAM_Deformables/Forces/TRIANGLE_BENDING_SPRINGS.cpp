@@ -35,10 +35,10 @@ Initialize(TRIANGLE_MESH& triangle_mesh)
 {
     if(!triangle_mesh.adjacent_elements) triangle_mesh.Initialize_Adjacent_Elements();
     int number_quadruples=0;
-    for(int t=1;t<=triangle_mesh.elements.m;t++) for(int a=1;a<=(*triangle_mesh.adjacent_elements)(t).m;a++) if((*triangle_mesh.adjacent_elements)(t)(a) > t) number_quadruples++;
+    for(int t=0;t<triangle_mesh.elements.m;t++) for(int a=1;a<=(*triangle_mesh.adjacent_elements)(t).m;a++) if((*triangle_mesh.adjacent_elements)(t)(a) > t) number_quadruples++;
     ARRAY<VECTOR<int,2> > segment_list(number_quadruples);
     int index=0; // reset number
-    for(int t=1;t<=triangle_mesh.elements.m;t++){
+    for(int t=0;t<triangle_mesh.elements.m;t++){
         int t1,t2,t3;triangle_mesh.elements(t).Get(t1,t2,t3);
         for(int a=1;a<=(*triangle_mesh.adjacent_elements)(t).m;a++){
             int s=(*triangle_mesh.adjacent_elements)(t)(a);

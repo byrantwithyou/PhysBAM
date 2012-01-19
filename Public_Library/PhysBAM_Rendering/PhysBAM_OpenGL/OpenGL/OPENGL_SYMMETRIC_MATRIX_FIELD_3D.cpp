@@ -16,7 +16,7 @@ Display(const int in_color) const
     glPushAttrib(GL_LIGHTING_BIT|GL_TEXTURE_BIT|GL_LINE_BIT);
     glLineWidth(1);glDisable(GL_LIGHTING);glDisable(GL_TEXTURE_2D);
     ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-    for(int i=1;i<=entries.m;i++){
+    for(int i=0;i<entries.m;i++){
         VECTOR<T,3> node=entries(i).x;MATRIX<T,3> line=size*entries(i).y;VECTOR<bool,3> p=entries(i).z;
         (p.x?positive_color:negative_color).Send_To_GL_Pipeline();
         OpenGL_Line(node-line.Column(1),node+line.Column(1),vertices);

@@ -66,13 +66,13 @@ public:
 
     void Turn_Smooth_Shading_On() PHYSBAM_OVERRIDE
     {BASE::Turn_Smooth_Shading_On();
-    for(int i=1;i<=boundary_surface_objects.m;i++)if(boundary_surface_objects(i))boundary_surface_objects(i)->Turn_Smooth_Shading_On();
-    for(int i=1;i<=embedded_surface_objects.m;i++)if(embedded_surface_objects(i))embedded_surface_objects(i)->Turn_Smooth_Shading_On();}
+    for(int i=0;i<boundary_surface_objects.m;i++)if(boundary_surface_objects(i))boundary_surface_objects(i)->Turn_Smooth_Shading_On();
+    for(int i=0;i<embedded_surface_objects.m;i++)if(embedded_surface_objects(i))embedded_surface_objects(i)->Turn_Smooth_Shading_On();}
     
     void Turn_Smooth_Shading_Off() PHYSBAM_OVERRIDE
     {BASE::Turn_Smooth_Shading_Off();
-    for(int i=1;i<=boundary_surface_objects.m;i++)if(boundary_surface_objects(i))boundary_surface_objects(i)->Turn_Smooth_Shading_Off();
-    for(int i=1;i<=embedded_surface_objects.m;i++)if(embedded_surface_objects(i))embedded_surface_objects(i)->Turn_Smooth_Shading_Off();}
+    for(int i=0;i<boundary_surface_objects.m;i++)if(boundary_surface_objects(i))boundary_surface_objects(i)->Turn_Smooth_Shading_Off();
+    for(int i=0;i<embedded_surface_objects.m;i++)if(embedded_surface_objects(i))embedded_surface_objects(i)->Turn_Smooth_Shading_Off();}
 
     void Cycle_Forces_Mode();
     void Cycle_Hard_Bound_Surface_Display_Mode();

@@ -57,13 +57,13 @@ template<class T> void SPHERE_PARTITION<T>::
 Set_Up_Grid(const int m,const int n,const int mn)
 {
     box=RANGE<TV>::Empty_Box();
-    for(int k=1;k<=spheres.m;k++)box.Enlarge_To_Include_Box(spheres(k).Bounding_Box());
+    for(int k=0;k<spheres.m;k++)box.Enlarge_To_Include_Box(spheres(k).Bounding_Box());
     grid.Initialize(m,n,mn,box);
     
-    for(int i=1;i<=voxel_sphere_list.counts.x;i++) for(int j=1;j<=voxel_sphere_list.counts.y;j++) for(int ij=1;ij<=voxel_sphere_list.counts.z;ij++){
+    for(int i=0;i<voxel_sphere_list.counts.x;i++) for(int j=0;j<voxel_sphere_list.counts.y;j++) for(int ij=0;ij<voxel_sphere_list.counts.z;ij++){
         delete voxel_sphere_list(i,j,ij);voxel_sphere_list(i,j,ij)=0;}
     voxel_sphere_list.Resize(1,grid.counts.x-1,1,grid.counts.y-1,1,grid.counts.z-1);
-    for(int k=1;k<=spheres.m;k++){
+    for(int k=0;k<spheres.m;k++){
         // find the grid cell that contains the sphere - left borders
         int i_left,j_bottom,ij_front;Find_Voxel(spheres(k).center,i_left,j_bottom,ij_front);
         // find the starting and stopping values for the sphere extent

@@ -242,11 +242,11 @@ template<class T> T TETRAHEDRON<T>::
 Negative_Material(const ARRAY<VECTOR<T,3> >& X,const ARRAY<T>& phis,const VECTOR<int,4>& indices)
 {
     VECTOR<T,4> local_phi;
-    int positive_count=0;for(int i=1;i<=4;i++) positive_count+=((local_phi[i]=phis(indices[i]))>0);
+    int positive_count=0;for(int i=0;i<4;i++) positive_count+=((local_phi[i]=phis(indices[i]))>0);
     switch(positive_count){
       case 0: return Signed_Volume(X(indices[1]),X(indices[2]),X(indices[3]),X(indices[4]));
       case 1:
-        for(int i=1;i<=4;i++)if(local_phi[i]>0){
+        for(int i=0;i<4;i++)if(local_phi[i]>0){
             VECTOR<VECTOR<T,3>,3> interface_locations;int index=i%4+1;
             for(int j=1;j<=3;j++,index=index%4+1)
                 interface_locations[j]=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(X(indices[i]),X(indices[index]),LEVELSET_UTILITIES<T>::Theta(local_phi[i],local_phi[index]));
@@ -254,7 +254,7 @@ Negative_Material(const ARRAY<VECTOR<T,3> >& X,const ARRAY<T>& phis,const VECTOR
             return Signed_Volume(X(indices[1]),X(indices[2]),X(indices[3]),X(indices[4]))+TETRAHEDRON<T>::Signed_Volume(X(indices[i]),interface_locations[1],interface_locations[2],interface_locations[3]);}
       case 2:{
         positive_count=0;int negative_count=0;int negative_indices[2],positive_indices[2];
-        for(int i=1;i<=4;i++){if(local_phi[i]<=0) negative_indices[negative_count++]=i;else positive_indices[positive_count++]=i;}
+        for(int i=0;i<4;i++){if(local_phi[i]<=0) negative_indices[negative_count++]=i;else positive_indices[positive_count++]=i;}
         if((negative_indices[1]-negative_indices[0])%2 == 1) exchange(positive_indices[0],positive_indices[1]);  // odd wrong, even right (odd=swap)
         VECTOR<T,3> interface_locations[2][2];
         for(int j=0;j<=1;j++)for(int k=0;k<=1;k++){
@@ -266,7 +266,7 @@ Negative_Material(const ARRAY<VECTOR<T,3> >& X,const ARRAY<T>& phis,const VECTOR
             TETRAHEDRON<T>::Signed_Volume(n0,interface_locations[1][0],interface_locations[1][1],interface_locations[0][1])+
             TETRAHEDRON<T>::Signed_Volume(n0,interface_locations[0][0],interface_locations[1][0],interface_locations[0][1]);}
       case 3:
-        for(int i=1;i<=4;i++)if(local_phi[i]<=0){
+        for(int i=0;i<4;i++)if(local_phi[i]<=0){
             VECTOR<VECTOR<T,3>,3> interface_locations;int index=i%4+1;
             for(int j=1;j<=3;j++,index=index%4+1)
                 interface_locations[j]=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(X(indices[i]),X(indices[index]),LEVELSET_UTILITIES<T>::Theta(local_phi[i],local_phi[index]));
@@ -284,7 +284,7 @@ Cut_With_Hyperplane(ARRAY<VECTOR<T,3> >& X,const PLANE<T>& cutting_plane,const V
 {
     VECTOR<T,4> phis;
     VECTOR<VECTOR<T,3>,4> X_nodes;
-    for(int i=1;i<=4;i++){X_nodes[i]=X(indices[i]);phis[i]=cutting_plane.Signed_Distance(X_nodes[i]);}
+    for(int i=0;i<4;i++){X_nodes[i]=X(indices[i]);phis[i]=cutting_plane.Signed_Distance(X_nodes[i]);}
     Cut_Simplex(X,indices,X_nodes,phis,left_simplices,right_simplices);
 }
 //#####################################################################
@@ -314,16 +314,16 @@ Cut_With_Hyperplane_And_Discard_Outside_Simplices(const TETRAHEDRON<T>& tetrahed
     // left simplices are in the negative halfspace, right simplices in the positive halfspace
     VECTOR<T,4> phi_nodes;
     VECTOR<VECTOR<T,3>,4> X_nodes;X_nodes(1)=tetrahedron.X[1];X_nodes(2)=tetrahedron.X[2];X_nodes(3)=tetrahedron.X[3];X_nodes(4)=tetrahedron.X[4];
-    for(int i=1;i<=4;i++){phi_nodes(i)=cutting_plane.Signed_Distance(X_nodes(i));}
+    for(int i=0;i<4;i++){phi_nodes(i)=cutting_plane.Signed_Distance(X_nodes(i));}
 
     int positive_count=0;
-    for(int i=1;i<=4;i++) if(phi_nodes[i]>0) positive_count++;
+    for(int i=0;i<4;i++) if(phi_nodes[i]>0) positive_count++;
     switch(positive_count){
         case 0: // we are in the negative halfspace
             negative_tetrahedra.Append(tetrahedron);
             break;
         case 1: // tet in positive halfspace, three tets in negative
-            for(int i=1;i<=4;i++)if(phi_nodes[i]>0){
+            for(int i=0;i<4;i++)if(phi_nodes[i]>0){
                 VECTOR<VECTOR<T,3>,3> interface_locations;int index=i%4+1;
                 VECTOR<int,3> other_indices;
                 for(int j=1;j<=3;j++,index=index%4+1){
@@ -337,7 +337,7 @@ Cut_With_Hyperplane_And_Discard_Outside_Simplices(const TETRAHEDRON<T>& tetrahed
                 return;}
         case 2:{ // three tets in each halfspace
             positive_count=0;int negative_count=0;int negative_indices[2],positive_indices[2];
-            for(int i=1;i<=4;i++){if(phi_nodes[i]<=0) negative_indices[negative_count++]=i;else positive_indices[positive_count++]=i;}
+            for(int i=0;i<4;i++){if(phi_nodes[i]<=0) negative_indices[negative_count++]=i;else positive_indices[positive_count++]=i;}
             if((negative_indices[1]-negative_indices[0])%2 == 1) exchange(positive_indices[0],positive_indices[1]);  // odd wrong, even right (odd=swap)
             VECTOR<T,3> interface_locations[2][2];
             for(int j=0;j<=1;j++)for(int k=0;k<=1;k++){
@@ -350,7 +350,7 @@ Cut_With_Hyperplane_And_Discard_Outside_Simplices(const TETRAHEDRON<T>& tetrahed
             negative_tetrahedra.Append(TETRAHEDRON<T>(n0,interface_locations[0][0],interface_locations[1][0],interface_locations[0][1]));
             break;}
         case 3: // tet in negative halfspace, three tets in positive
-            for(int i=1;i<=4;i++)if(phi_nodes[i]<=0){
+            for(int i=0;i<4;i++)if(phi_nodes[i]<=0){
                 VECTOR<VECTOR<T,3>,3> interface_locations;int index=i%4+1;
                 VECTOR<int,3> other_indices;
                 for(int j=1;j<=3;j++,index=index%4+1){
@@ -375,13 +375,13 @@ Cut_Simplex(ARRAY<VECTOR<T,3> >& X,const VECTOR<int,4>& indices,const VECTOR<VEC
 {
     // left simplices are in the negative halfspace, right simplices in the positive halfspace
     int positive_count=0;
-    for(int i=1;i<=4;i++) if(phi_nodes[i]>0) positive_count++;
+    for(int i=0;i<4;i++) if(phi_nodes[i]>0) positive_count++;
     switch(positive_count){
       case 0: // we are in the negative halfspace
         Add_Points_As_Tetrahedron(X,left_simplices,indices[1],indices[2],indices[3],indices[4]);
         break;
       case 1: // tet in positive halfspace, three tets in negative
-        for(int i=1;i<=4;i++)if(phi_nodes[i]>0){
+        for(int i=0;i<4;i++)if(phi_nodes[i]>0){
             VECTOR<int,3> interface_locations;int index=i%4+1;
             VECTOR<int,3> other_indices;
             for(int j=1;j<=3;j++,index=index%4+1){
@@ -397,7 +397,7 @@ Cut_Simplex(ARRAY<VECTOR<T,3> >& X,const VECTOR<int,4>& indices,const VECTOR<VEC
             return;}
       case 2:{ // three tets in each halfspace
         positive_count=0;int negative_count=0;int negative_indices[2],positive_indices[2];
-        for(int i=1;i<=4;i++){if(phi_nodes[i]<=0) negative_indices[negative_count++]=i;else positive_indices[positive_count++]=i;}
+        for(int i=0;i<4;i++){if(phi_nodes[i]<=0) negative_indices[negative_count++]=i;else positive_indices[positive_count++]=i;}
         if((negative_indices[1]-negative_indices[0])%2 == 1) exchange(positive_indices[0],positive_indices[1]);  // odd wrong, even right (odd=swap)
         int interface_locations[2][2];
         for(int j=0;j<=1;j++)for(int k=0;k<=1;k++){
@@ -414,7 +414,7 @@ Cut_Simplex(ARRAY<VECTOR<T,3> >& X,const VECTOR<int,4>& indices,const VECTOR<VEC
         Add_Points_As_Tetrahedron(X,right_simplices,p0,interface_locations[0][0],interface_locations[0][1],interface_locations[1][0]);}
         break;
       case 3: // tet in negative halfspace, three tets in positive
-        for(int i=1;i<=4;i++)if(phi_nodes[i]<=0){
+        for(int i=0;i<4;i++)if(phi_nodes[i]<=0){
             VECTOR<int,3> interface_locations;int index=i%4+1;
             VECTOR<int,3> other_indices;
             for(int j=1;j<=3;j++,index=index%4+1){

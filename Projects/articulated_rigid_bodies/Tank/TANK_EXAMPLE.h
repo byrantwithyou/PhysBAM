@@ -270,7 +270,7 @@ void Create_Static_Joints()
     T split=(T).39;
     T start=-(split*(num_joints+1))*(T).5;
 
-    for(int i=1;i<=total_joints;i++){JOINT<TV> *left_joint=new POINT_JOINT<TV>(),*right_joint=new POINT_JOINT<TV>();
+    for(int i=0;i<total_joints;i++){JOINT<TV> *left_joint=new POINT_JOINT<TV>(),*right_joint=new POINT_JOINT<TV>();
         arb->joint_mesh.Add_Articulation(treads[0](i)->particle_index,treads[0](i+1)->particle_index,left_joint);
         arb->joint_mesh.Add_Articulation(treads[0](i)->particle_index,treads[0](i+1)->particle_index,right_joint);
         left_joint->Set_Joint_To_Child_Frame(FRAME<TV>(TV((T)-.425,split/2,(T)-.05)));
@@ -278,7 +278,7 @@ void Create_Static_Joints()
         right_joint->Set_Joint_To_Child_Frame(FRAME<TV>(TV((T).425,split/2,(T)-.05)));
         right_joint->Set_Joint_To_Parent_Frame(FRAME<TV>(TV((T).425,-split/2,(T)-.05)));}
 
-    for(int i=1;i<=total_joints;i++){JOINT<TV> *left_joint=new POINT_JOINT<TV>(),*right_joint=new POINT_JOINT<TV>();
+    for(int i=0;i<total_joints;i++){JOINT<TV> *left_joint=new POINT_JOINT<TV>(),*right_joint=new POINT_JOINT<TV>();
         arb->joint_mesh.Add_Articulation(treads[1](i)->particle_index,treads[1](i+1)->particle_index,left_joint);
         arb->joint_mesh.Add_Articulation(treads[1](i)->particle_index,treads[1](i+1)->particle_index,right_joint);
         left_joint->Set_Joint_To_Child_Frame(FRAME<TV>(TV((T)-.425,split/2,(T)-.05)));
@@ -305,7 +305,7 @@ void Create_Static_Joints()
 //#####################################################################
 void Reset_Joints()
 {
-    for(int i=1;i<=dynamic_joints.m;i++) arb->joint_mesh.Remove_Articulation(dynamic_joints(i)->id_number);
+    for(int i=0;i<dynamic_joints.m;i++) arb->joint_mesh.Remove_Articulation(dynamic_joints(i)->id_number);
     dynamic_joints.Remove_All();
 
     RIGID_BODY<TV>* joint_gears[]={gears[2],gears[0],gears[5],gears[3]};

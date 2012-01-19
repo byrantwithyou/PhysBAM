@@ -26,7 +26,7 @@ void Apply_Fractal_Subdivision(TRIANGLE_SUBDIVISION& ts,ARRAY_VIEW<const TV> bas
     // neighbor_nodes are used to identify which nodes are in the base mesh - construct here and delete when this class is deleted
     if(!ts.triangle_mesh.neighbor_nodes){ts.delete_neighbor_nodes=true;ts.triangle_mesh.Initialize_Neighbor_Nodes();}
     if(!ts.triangle_mesh.incident_elements){ts.delete_incident_elements=true;ts.triangle_mesh.Initialize_Incident_Elements();}
-    for(int i=1;i<=ts.triangle_mesh.number_nodes;i++)if((*ts.triangle_mesh.neighbor_nodes)(i).m) subdivided_values(i)=base_values(i);
+    for(int i=0;i<ts.triangle_mesh.number_nodes;i++)if((*ts.triangle_mesh.neighbor_nodes)(i).m) subdivided_values(i)=base_values(i);
     // interpolate values on edges
     RANDOM_NUMBERS<T> random;
     for(int k=1;k<=ts.triangle_mesh.segment_mesh->elements.m;k++){
@@ -38,7 +38,7 @@ void Apply_Fractal_Subdivision(TRIANGLE_SUBDIVISION& ts,ARRAY_VIEW<const TV> bas
         ARRAY<int> adjacent_triangles;
         ts.triangle_mesh.Triangles_On_Edge(node1,node2,&adjacent_triangles);
         TV normal;
-        for(int i=1;i<=adjacent_triangles.m;i++){
+        for(int i=0;i<adjacent_triangles.m;i++){
             int n1,n2,n3;ts.triangle_mesh.elements(adjacent_triangles(i)).Get(n1,n2,n3);
             normal+=TRIANGLE_3D<T>::Normal(base_values(n1),base_values(n2),base_values(n3));}
         normal.Normalize();

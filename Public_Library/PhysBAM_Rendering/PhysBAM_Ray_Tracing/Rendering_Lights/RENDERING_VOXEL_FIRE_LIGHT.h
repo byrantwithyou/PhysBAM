@@ -47,7 +47,7 @@ public:
         pdf.Resize(1,fire_voxels.grid.counts.x,1,fire_voxels.grid.counts.y,1,fire_voxels.grid.counts.z);
         T cell_volume=fire_voxels.grid.dX.x*fire_voxels.grid.dX.y*fire_voxels.grid.dX.z;
         total_average_power=0;total_power=VECTOR<T,3>(0,0,0);
-        for(int i=1;i<=fire_voxels.grid.counts.x;i++)for(int j=1;j<=fire_voxels.grid.counts.y;j++)for(int ij=1;ij<=fire_voxels.grid.counts.z;ij++){
+        for(int i=0;i<fire_voxels.grid.counts.x;i++)for(int j=0;j<fire_voxels.grid.counts.y;j++)for(int ij=0;ij<fire_voxels.grid.counts.z;ij++){
             T cell_power;VECTOR<T,3> cell_power_spectrum;
             if(fire_shader.empty_implicit_surface && fire_shader.empty_implicit_surface->Lazy_Inside(fire_voxels.grid.X(i,j,ij))){cell_power=0;cell_power_spectrum=VECTOR<T,3>(0,0,0);}
             else{
@@ -62,25 +62,25 @@ public:
         PROGRESS_INDICATOR progress(grid.counts.x);
         LOG::cout<<"    Generating CDF for Pr(z|x,y)";
         z_cdf.Resize(1,grid.counts.x,1,grid.counts.y);
-        for(int i=1;i<=grid.counts.x;i++){
+        for(int i=0;i<grid.counts.x;i++){
             progress.Progress();
-            for(int j=1;j<=grid.counts.y;j++){
+            for(int j=0;j<grid.counts.y;j++){
                 z_cdf(i,j).Initialize(grid.counts.z);
-                for(int ij=1;ij<=grid.counts.z;ij++)z_cdf(i,j).pdf(ij)=pdf(i,j,ij);
+                for(int ij=0;ij<grid.counts.z;ij++)z_cdf(i,j).pdf(ij)=pdf(i,j,ij);
                 z_cdf(i,j).Compute_Cumulative_Distribution_Function();}}
         // generate cdf for Pr(y|x)
         progress.Initialize(grid.counts.x);
         LOG::cout<<"    Generating CDF for Pr(y|x)";
         y_cdf.Resize(1,grid.counts.x);
-        for(int i=1;i<=grid.counts.x;i++){
+        for(int i=0;i<grid.counts.x;i++){
             progress.Progress();
             y_cdf(i).Initialize(grid.counts.y);
-            for(int j=1;j<=grid.counts.y;j++)y_cdf(i).pdf(j)=z_cdf(i,j).normalization_constant;
+            for(int j=0;j<grid.counts.y;j++)y_cdf(i).pdf(j)=z_cdf(i,j).normalization_constant;
             y_cdf(i).Compute_Cumulative_Distribution_Function();}
         // generate cdf for Pr(x)
         LOG::cout<<"    Generating CDF for Pr(x)..."<<std::endl;
         x_cdf.Initialize(grid.counts.x);
-        for(int i=1;i<=grid.counts.x;i++)x_cdf.pdf(i)=y_cdf(i).normalization_constant;
+        for(int i=0;i<grid.counts.x;i++)x_cdf.pdf(i)=y_cdf(i).normalization_constant;
         x_cdf.Compute_Cumulative_Distribution_Function();
         LOG::cout<<"x_cdf normalization "<<x_cdf.normalization_constant<<" total_power "<<total_average_power<<std::endl;
     }

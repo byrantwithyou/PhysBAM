@@ -45,7 +45,7 @@ public:
     {if(X.x>=(T).25&&X.x<=(T).75)return true;else return false;}
 
     virtual void Initialize_Velocities()
-    {for(int i=1;i<=fluids_parameters.grid.m;i++)for(int j=1;j<=fluids_parameters.grid.n;j++){
+    {for(int i=0;i<fluids_parameters.grid.m;i++)for(int j=0;j<fluids_parameters.grid.n;j++){
         if(fluids_parameters.grid.x(i)<(T).25)fluids_parameters.incompressible.V(i,j)=VECTOR_2D<T>(-4,0);
         else if(fluids_parameters.grid.x(i)>(T).75)fluids_parameters.incompressible.V(i,j)=VECTOR_2D<T>(4,0);
         else fluids_parameters.incompressible.V(i,j)=VECTOR_2D<T>(0,0);}}
@@ -54,7 +54,7 @@ public:
     {}
 
     void Initialize_Phi()
-    {for(int i=1;i<=fluids_parameters.grid.m;i++)for(int j=1;j<=fluids_parameters.grid.n;j++)
+    {for(int i=0;i<fluids_parameters.grid.m;i++)for(int j=0;j<fluids_parameters.grid.n;j++)
         if(Is_Fuel(fluids_parameters.grid.X(i,j))) fluids_parameters.particle_levelset_evolution.particle_levelset.levelset.phi(i,j)=-fluids_parameters.grid.dx;
         else fluids_parameters.particle_levelset_evolution.particle_levelset.levelset.phi(i,j)=fluids_parameters.grid.dx;}
 

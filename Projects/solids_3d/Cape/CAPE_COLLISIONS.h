@@ -63,10 +63,10 @@ public:
     {if(!disabled)disabled=new ARRAY<bool>();disabled->Resize_List(particles_1.number);
     Find_Closest_Points();
     ARRAY<int> queue;
-    for(int p=1;p<=particles_1.number;p++)if(close_triangles(p) && Close_Point_Phi(p)<0){
+    for(int p=0;p<particles_1.number;p++)if(close_triangles(p) && Close_Point_Phi(p)<0){
         queue.Append(p);(*disabled)(p)=true;}
     bool neighbor_nodes_defined=triangle_mesh_1.neighbor_nodes!=0;if(!neighbor_nodes_defined)triangle_mesh_1.Initialize_Neighbor_Nodes();
-    for(int i=1;i<=queue.m;i++){
+    for(int i=0;i<queue.m;i++){
         int p=queue(i);
         for(int a=1;a<=(*triangle_mesh_1.neighbor_nodes)(p).m;a++){
             int q=(*triangle_mesh_1.neighbor_nodes)(p)(a);
@@ -83,7 +83,7 @@ public:
     std::cout<<"    processing collisions...\n";
     // ARRAY<bool>::copy(false,flypaper);
     int close_count=0,interactions=0;//flies=0;
-    for(int p=1;p<=particles_1.number;p++)if(close_triangles(p) && !(*enforce_collision_velocity)(p) && !(disabled && (*disabled)(p))){
+    for(int p=0;p<particles_1.number;p++)if(close_triangles(p) && !(*enforce_collision_velocity)(p) && !(disabled && (*disabled)(p))){
         close_count++;interactions+=Process_Collision(dt,p);}
     std::cout<<"    close points = "<<close_count<<"\n";
     std::cout<<"    interactions = "<<interactions<<"\n";}
@@ -146,10 +146,10 @@ public:
     */
     if(box1<=hierarchy_1->leaves){
         if(box2<=hierarchy_2->leaves)Find_Closest_Points_In_Triangles(box1,box2);
-        else{for(int c=1;c<=2;c++)Find_Closest_Points_In_Boxes(box1,hierarchy_2->children(c,box2-hierarchy_2->leaves));}}
+        else{for(int c=0;c<2;c++)Find_Closest_Points_In_Boxes(box1,hierarchy_2->children(c,box2-hierarchy_2->leaves));}}
     else if(box2<=hierarchy_2->leaves || radius_1<radius_2)
-        for(int c=1;c<=2;c++)Find_Closest_Points_In_Boxes(hierarchy_1->children(c,box1-hierarchy_1->leaves),box2);
-    else for(int c=1;c<=2;c++)Find_Closest_Points_In_Boxes(box1,hierarchy_2->children(c,box2-hierarchy_2->leaves));}
+        for(int c=0;c<2;c++)Find_Closest_Points_In_Boxes(hierarchy_1->children(c,box1-hierarchy_1->leaves),box2);
+    else for(int c=0;c<2;c++)Find_Closest_Points_In_Boxes(box1,hierarchy_2->children(c,box2-hierarchy_2->leaves));}
     
     void Find_Closest_Points()
     {hierarchy_1->Update_Boxes();hierarchy_2->Update_Boxes();

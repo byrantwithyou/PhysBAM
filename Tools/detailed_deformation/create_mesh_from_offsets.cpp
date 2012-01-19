@@ -47,7 +47,7 @@ int main(int argc,char *argv[])
     cout<<"Reading coord file..."<<endl;
     FILE_UTILITIES::Read_From_File<float>(argv[3],offset_particles);cout<<"Processing..."<<endl;
     
-    for(int p=1;p<=tri_particles.number;p++)
+    for(int p=0;p<tri_particles.number;p++)
         if(tri_particles.X(p).y>-lower_cutoff)tri_particles.X(p)=(*tet_vol.tetrahedron_list)(offset_particles(p).x).Point_From_Barycentric_Coordinates(offset_particles(p).y);
 
     FILE_UTILITIES::Write_To_File<float>("deformed_mesh_coord.tri",tri_surf);

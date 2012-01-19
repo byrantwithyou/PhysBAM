@@ -152,8 +152,8 @@ void Ring_Test()
         rigid_body.Set_Mass(10);
         rigid_body.simplicial_object->Set_Desired_Particle_Partition_Size(VECTOR<int,3>(3,1,3));}
 
-    for(int i=1;i<=poles;i++)
-        for(int j=1;j<=poles;j++){
+    for(int i=0;i<poles;i++)
+        for(int j=0;j<poles;j++){
             // Poles
             RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("Rings_Test/medium_cylinder",1,mu);
             rigid_body.Set_Name(STRING_UTILITIES::string_sprintf("pole %d %d",i,j));
@@ -187,8 +187,8 @@ void Bone_Test()
         rigid_body.Set_Mass(10);
         rigid_body.simplicial_object->Set_Desired_Particle_Partition_Size(VECTOR<int,3>(3,1,3));}
 
-    for(int i=1;i<=poles;i++)
-        for(int j=1;j<=poles;j++){
+    for(int i=0;i<poles;i++)
+        for(int j=0;j<poles;j++){
             // Poles
             RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("Rings_Test/medium_cylinder",1,mu);
             rigid_body.Set_Name(STRING_UTILITIES::string_sprintf("pole %d %d",i,j));
@@ -281,8 +281,8 @@ void Bricks()
     int height=1;
     T offset=0;
 
-    for(int x=1;x<=width;x++)
-        for(int y=1;y<=height;y++)
+    for(int x=0;x<width;x++)
+        for(int y=0;y<height;y++)
         {
             RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("subdivided_box",1,1);
             rigid_body.X()=TV(2.0*x+offset*(y%2),2.0*y-1.0,0);

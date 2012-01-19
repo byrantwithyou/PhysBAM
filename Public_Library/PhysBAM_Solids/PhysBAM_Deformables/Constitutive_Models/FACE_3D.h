@@ -64,13 +64,13 @@ public:
 
     void Set_Material_Properties_Of_Subset(const ARRAY<int>& tetrahedron_list,const T mu_10,const T mu_01,const T kappa)
     {assert(tet_mu_10&&tet_mu_01&&tet_kappa);
-    for(int i=1;i<=tetrahedron_list.m;i++) {(*tet_mu_10)(tetrahedron_list(i))=mu_10;(*tet_mu_01)(tetrahedron_list(i))=mu_01;(*tet_kappa)(tetrahedron_list(i))=kappa;}}
+    for(int i=0;i<tetrahedron_list.m;i++) {(*tet_mu_10)(tetrahedron_list(i))=mu_10;(*tet_mu_01)(tetrahedron_list(i))=mu_01;(*tet_kappa)(tetrahedron_list(i))=kappa;}}
 
     void Initialize_Fiber_Data(const STRAIN_MEASURE<TV,3>& strain_measure,const ARRAY<ARRAY<int> >& muscle_tets,const ARRAY<ARRAY<VECTOR<T,3> > >& muscle_fibers,
         const ARRAY<ARRAY<T> >& muscle_densities)
     {int n=strain_measure.mesh.elements.m;
     tet_muscles.Resize(n);tet_fibers.Resize(n);tet_densities.Resize(n);tension.Resize(n);tension_derivative.Resize(n);active_tension_unit_activation.Resize(n);
-    for(int m=1;m<=muscle_tets.m;m++) for(int t=1;t<=muscle_tets(m).m;t++){
+    for(int m=0;m<muscle_tets.m;m++) for(int t=1;t<=muscle_tets(m).m;t++){
         tet_muscles(muscle_tets(m)(t)).Append(m);tet_densities(muscle_tets(m)(t)).Append(muscle_densities(m)(t));
         tet_fibers(muscle_tets(m)(t)).Append(strain_measure.F(muscle_tets(m)(t)).Transpose_Times(muscle_fibers(m)(t)));
         tension(muscle_tets(m)(t)).Append(0);active_tension_unit_activation(muscle_tets(m)(t)).Append(0);tension_derivative(muscle_tets(m)(t)).Append(0);}}
@@ -79,7 +79,7 @@ public:
         const ARRAY<ARRAY<T> >& muscle_densities)
     {int n=8*strain_measure.hexahedron_mesh.hexahedrons.m;
     tet_muscles.Resize(n);tet_fibers.Resize(n);tet_densities.Resize(n);tension.Resize(n);tension_derivative.Resize(n);active_tension_unit_activation.Resize(n);
-    for(int m=1;m<=muscle_tets.m;m++) for(int t=1;t<=muscle_tets(m).m;t++){
+    for(int m=0;m<muscle_tets.m;m++) for(int t=1;t<=muscle_tets(m).m;t++){
         tet_muscles(muscle_tets(m)(t)).Append(m);tet_densities(muscle_tets(m)(t)).Append(muscle_densities(m)(t));
         tet_fibers(muscle_tets(m)(t)).Append(strain_measure.F((muscle_tets(m)(t)-1)%8+1,(muscle_tets(m)(t)-1)/8+1).Transpose_Times(muscle_fibers(m)(t)));
         tension(muscle_tets(m)(t)).Append(0);active_tension_unit_activation(muscle_tets(m)(t)).Append(0);tension_derivative(muscle_tets(m)(t)).Append(0);}}

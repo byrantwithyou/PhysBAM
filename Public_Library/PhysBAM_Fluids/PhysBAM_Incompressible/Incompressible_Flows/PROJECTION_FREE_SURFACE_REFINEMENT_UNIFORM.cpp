@@ -58,7 +58,7 @@ Set_Coarse_Boundary_Conditions(T_FACE_ARRAYS_SCALAR& coarse_face_velocities)
 {
     int ghost=max(3,coarse_scale);
     phi_boundary->Fill_Ghost_Cells(fine_grid,levelset.phi,phi_ghost,0,0,ghost);
-    for(int axis=1;axis<=T_GRID::dimension;axis++) for(int axis_side=1;axis_side<=2;axis_side++){
+    for(int axis=1;axis<=T_GRID::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){
         int side=2*(axis-1)+axis_side;
         TV_INT interior_cell_offset=axis_side==1?TV_INT():-TV_INT::Axis_Vector(axis);
         TV_INT exterior_cell_offset=axis_side==1?-TV_INT::Axis_Vector(axis):TV_INT();
@@ -174,7 +174,7 @@ template<class T_GRID> void PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<T_GRID>::
 Set_Levelset_Boundary_Conditions(const GRID<TV>& levelset_grid,ARRAY<T,FACE_INDEX<TV::dimension> >& levelset_velocities,const ARRAY<T,TV_INT>& levelset_phi,const T time)
 {
     Map_Fine_To_Levelset_For_Constraints(levelset_velocities);
-    for(int axis=1;axis<=TV::dimension;axis++) for(int axis_side=1;axis_side<=2;axis_side++){int side=2*(axis-1)+axis_side;
+    for(int axis=1;axis<=TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
         TV_INT interior_cell_offset=axis_side==1?TV_INT():-TV_INT::Axis_Vector(axis);
         TV_INT exterior_cell_offset=axis_side==1?-TV_INT::Axis_Vector(axis):TV_INT();
         TV_INT boundary_face_offset=axis_side==1?TV_INT::Axis_Vector(axis):-TV_INT::Axis_Vector(axis);
@@ -191,7 +191,7 @@ Set_Levelset_Boundary_Conditions(const GRID<TV>& levelset_grid,ARRAY<T,FACE_INDE
         if(levelset_phi(iterator.Cell_Index())>0){
             levelset_projection.elliptic_solver->psi_D(iterator.Cell_Index())=true;levelset_projection.p(iterator.Cell_Index())=0;}}
     for(typename GRID<TV>::CELL_ITERATOR iterator(coarse_grid);iterator.Valid();iterator.Next()){ 
-        if(!Contains_Outside(iterator.Cell_Index(),levelset_phi,buffer)) for(int axis=1;axis<=TV::dimension;axis++) for(int axis_side=1;axis_side<=2;axis_side++){
+        if(!Contains_Outside(iterator.Cell_Index(),levelset_phi,buffer)) for(int axis=1;axis<=TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){
             TV_INT offset=(axis_side==1?-TV_INT::Axis_Vector(axis):TV_INT::Axis_Vector(axis));
             TV_INT face=iterator.Cell_Index()+(axis_side==1?TV_INT():TV_INT::Axis_Vector(axis));
             if(domain_boundary(axis)(axis_side) && ((iterator.Cell_Index()(axis)+offset(axis))<1 || (iterator.Cell_Index()(axis)+offset(axis))>coarse_grid.Counts()(axis))) continue;

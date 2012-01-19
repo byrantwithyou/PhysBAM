@@ -76,7 +76,7 @@ Update_Springs(const bool search_hierarchy)
         if(state.distance>thickness){
             deletion_list.Append(i.Key());
             segments_with_springs(i.Key()[1])--;}}
-    //if(!new_springs) for(int i=1;i<=deletion_list.m;i++)springs->Delete(deletion_list(i));
+    //if(!new_springs) for(int i=0;i<deletion_list.m;i++)springs->Delete(deletion_list(i));
 
     if(search_hierarchy){ 
         // Initialize/Update Hierarchy
@@ -85,7 +85,7 @@ Update_Springs(const bool search_hierarchy)
         guide_curve.hierarchy->Update_Nonleaf_Boxes();
 
         // find new pairs
-        for(int i=1;i<=curve.mesh.elements.m;i++){
+        for(int i=0;i<curve.mesh.elements.m;i++){
             const VECTOR<int,2> &segment_nodes=curve.mesh.elements(i);
             SEGMENT_3D<T> segment=curve.particles.X.Subset(segment_nodes);
             RANGE<TV> box(segment.x1,segment.x2);
@@ -96,7 +96,7 @@ Update_Springs(const bool search_hierarchy)
             VECTOR<T,2> weights;
             TV normal;
             T distance=0;
-            for(int j=1;j<=intersections.m;j++){
+            for(int j=0;j<intersections.m;j++){
                 SEGMENT_3D<T> guide_segment=guide_curve.particles.X.Subset(guide_curve.mesh.elements(intersections(j)));
                 normal=segment.Shortest_Vector_Between_Segments(guide_segment,weights);
                 if((distance>normal.Magnitude()||min_index==-1)&&segments_with_springs(intersections(j))<2*max_connections){

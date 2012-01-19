@@ -79,8 +79,8 @@ bool Test()
     if((!aa != !bb) || fabs((aa-bb)/bb)>1e-5) if(tmp_cases==trap_cases){printf("ZG %g %g %g   ", aa, bb, fabs((aa-bb)/bb));LOG::cout<<tmp_cases<<"   "<<trap_cases<<std::endl;}
 
     MATRIX<T,8> M1,M2;
-    for(int i=1;i<=8;i++) for(int j=1;j<=8;j++) M1(i,j)=H1((i+1)/2)((j+1)/2)((i+1)%2+1,(j+1)%2+1);
-    for(int i=1;i<=8;i++) for(int j=1;j<=8;j++) M2(i,j)=H2((i+1)/2)((j+1)/2)((i+1)%2+1,(j+1)%2+1);
+    for(int i=0;i<8;i++) for(int j=0;j<8;j++) M1(i,j)=H1((i+1)/2)((j+1)/2)((i+1)%2+1,(j+1)%2+1);
+    for(int i=0;i<8;i++) for(int j=0;j<8;j++) M2(i,j)=H2((i+1)/2)((j+1)/2)((i+1)%2+1,(j+1)%2+1);
 
     VECTOR<T,8> dG1=(M1+M2)/(T)2*Va;
     VECTOR<T,8> dG2=V2-V1;
@@ -135,8 +135,8 @@ bool Tri_Test()
     if((fabs(aa)>1e-5 || fabs(bb)>1e-5) && fabs((aa-bb)/bb)>1e-5){printf("TG %g %g %g   ", aa, bb, fabs((aa-bb)/bb));LOG::cout<<tmp_cases<<"   "<<trap_cases<<std::endl;}
 
     MATRIX<T,12> M1,M2;
-    for(int i=1;i<=12;i++) for(int j=1;j<=12;j++) M1(i,j)=H1((i+1)/2)((j+1)/2)((i+1)%2+1,(j+1)%2+1);
-    for(int i=1;i<=12;i++) for(int j=1;j<=12;j++) M2(i,j)=H2((i+1)/2)((j+1)/2)((i+1)%2+1,(j+1)%2+1);
+    for(int i=0;i<12;i++) for(int j=0;j<12;j++) M1(i,j)=H1((i+1)/2)((j+1)/2)((i+1)%2+1,(j+1)%2+1);
+    for(int i=0;i<12;i++) for(int j=0;j<12;j++) M2(i,j)=H2((i+1)/2)((j+1)/2)((i+1)%2+1,(j+1)%2+1);
 
     VECTOR<T,12> dG1=(M1+M2)/(T)2*Va/e;
     VECTOR<T,12> dG2=(V2-V1)/e;
@@ -172,11 +172,11 @@ void Test_Triangulated_Areas()
     VECTOR_ND<T> G1(ta1->particles.X.m*2);
     MATRIX_MXN<T> H1(ta1->particles.X.m*2,ta1->particles.X.m*2);
     for(HASHTABLE<int,TV>::ITERATOR it(vc.gradient);it.Valid();it.Next())
-        for(int s=1;s<=2;s++)
+        for(int s=0;s<2;s++)
             G1(it.Key()*2-2+s)=it.Data()(s);
     for(HASHTABLE<VECTOR<int,2>,MATRIX<T,2> >::ITERATOR it(vc.hessian);it.Valid();it.Next())
-        for(int s=1;s<=2;s++)
-            for(int t=1;t<=2;t++)
+        for(int s=0;s<2;s++)
+            for(int t=0;t<2;t++)
                 H1(it.Key().x*2-2+s,it.Key().y*2-2+t)=it.Data()(s,t);
 
     T e=1e-5;
@@ -193,11 +193,11 @@ void Test_Triangulated_Areas()
     VECTOR_ND<T> G2(ta1->particles.X.m*2);
     MATRIX_MXN<T> H2(ta1->particles.X.m*2,ta1->particles.X.m*2);
     for(HASHTABLE<int,TV>::ITERATOR it(vc.gradient);it.Valid();it.Next())
-        for(int s=1;s<=2;s++)
+        for(int s=0;s<2;s++)
             G2(it.Key()*2-2+s)=it.Data()(s);
     for(HASHTABLE<VECTOR<int,2>,MATRIX<T,2> >::ITERATOR it(vc.hessian);it.Valid();it.Next())
-        for(int s=1;s<=2;s++)
-            for(int t=1;t<=2;t++)
+        for(int s=0;s<2;s++)
+            for(int t=0;t<2;t++)
                 H2(it.Key().x*2-2+s,it.Key().y*2-2+t)=it.Data()(s,t);
 
     OCTAVE_OUTPUT<T> oo("m.txt");
@@ -314,9 +314,9 @@ void Case_Test()
     int ii[13]={0,1,1,1,2,3,4,5,5,5,6,7,8};
     VECTOR<T,12>& V12=(VECTOR<T,12>&)G1;
     VECTOR<T,8> V;
-    for(int i=1;i<=12;i++) V(ii[i])=V12(i);
+    for(int i=0;i<12;i++) V(ii[i])=V12(i);
     MATRIX<T,8> M;
-    for(int i=1;i<=12;i++) for(int j=1;j<=12;j++) M(ii[i],ii[j])=H1((i+1)/2)((j+1)/2)((i+1)%2+1,(j+1)%2+1);
+    for(int i=0;i<12;i++) for(int j=0;j<12;j++) M(ii[i],ii[j])=H1((i+1)/2)((j+1)/2)((i+1)%2+1,(j+1)%2+1);
     VECTOR<T,8>& W=(VECTOR<T,8>&)data.G;
     MATRIX<T,8> N;for(int i=0;i<4;i++) for(int j=0;j<4;j++) N.Set_Submatrix(2*i+1,2*j+1,data.H[i][j]);
 
@@ -512,7 +512,7 @@ int main(int argc,char *argv[])
 //    for(int k=0;k<1000000;k++)
 //        Test();
 
-//    for(int i=1;i<=100;i++) Test_Triangle_Intersection<TV>();
+//    for(int i=0;i<100;i++) Test_Triangle_Intersection<TV>();
 
     for(int i=0;i<10000;i++)
     {

@@ -46,7 +46,7 @@ void Initialize_Body(const bool use_axial_springs,const VECTOR_3D<T>& offset)
 #if 1
     triangle_mesh.number_nodes=4;
     triangle_mesh.triangles.Exact_Resize(3,2);
-    for(int i=1;i<=4;i++){particles.array_collection->Add_Element();particles.V(i)=VECTOR_3D<T>();}
+    for(int i=0;i<4;i++){particles.array_collection->Add_Element();particles.V(i)=VECTOR_3D<T>();}
     particles.X(1)=offset+VECTOR_3D<T>(1,10,0);
     particles.X(2)=offset+VECTOR_3D<T>(0,10,-1);
     particles.X(3)=offset+VECTOR_3D<T>(0,10,1);
@@ -57,10 +57,10 @@ void Initialize_Body(const bool use_axial_springs,const VECTOR_3D<T>& offset)
 #else
     int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;
     triangle_mesh.Initialize_Herring_Bone_Mesh(m,n);
-    for(int k=1;k<=triangle_mesh.number_nodes;k++) particles.array_collection->Add_Element();
+    for(int k=0;k<triangle_mesh.number_nodes;k++) particles.array_collection->Add_Element();
     T mass_node=aspect_ratio*sqr(side_length)/(m*n);ARRAY<T>::copy(mass_node,particles.mass.array); 
     T dx=aspect_ratio*side_length/(m-1),dy=side_length/(n-1);
-    for(int i=1;i<=m;i++) for(int j=1;j<=n;j++){int node=i+m*(j-1);
+    for(int i=0;i<m;i++) for(int j=0;j<n;j++){int node=i+m*(j-1);
         particles.X(node)=offset+VECTOR_3D<T>((i-1)*dx,.5,(j-1)*dy);
         particles.V(node)=VECTOR_3D<T>(0,0,0);}
 #endif
@@ -97,7 +97,7 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY<VECTOR_3D<T> >& V,const T time)
 {
 #if 0
     int i,j;int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;
-    for(int i=1;i<=m/2+1;i++) for(int j=1;j<=n;j++)V(i+m*(j-1))=VECTOR_3D<T>(0,0,0);i=1;j=n;
+    for(int i=1;i<=m/2+1;i++) for(int j=0;j<n;j++)V(i+m*(j-1))=VECTOR_3D<T>(0,0,0);i=1;j=n;
 #endif
     V(2)=V(3)=VECTOR_3D<T>();
 }

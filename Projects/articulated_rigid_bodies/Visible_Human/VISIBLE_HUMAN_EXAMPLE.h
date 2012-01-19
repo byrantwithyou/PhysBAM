@@ -208,7 +208,7 @@ void Initialize_Rigid_Bodies()
         da_man->bones(VISIBLE_HUMAN<T>::BONE_L_ANKLE)->is_static=true;}
 
     ARRAY<RIGID_BODY<TV>*>& rigid_bodies=rigid_body_list.rigid_bodies;
-    if(use_gravity) for(int i=1;i<=rigid_bodies.m;i++) if(!rigid_bodies(i)->is_static)
+    if(use_gravity) for(int i=0;i<rigid_bodies.m;i++) if(!rigid_bodies(i)->is_static)
         rigid_bodies(i)->Add_Basic_Forces(solids_parameters.gravity,solids_parameters.gravity_direction,solids_parameters.rigid_body_evolution_parameters.rigid_body_ether_viscosity,0);
     solids_parameters.collision_body_list.Add_Bodies(rigid_body_particles);
     
@@ -251,7 +251,7 @@ void Get_Initial_Data()
         DEFORMABLE_OBJECT<TV>& deformable_object=solid_body_collection.deformable_object;
         deformable_body_rest_positions.Resize(number_of_deformable_bodies);
 
-        for(int index=1;index<=number_of_deformable_bodies;index++){
+        for(int index=0;index<number_of_deformable_bodies;index++){
             // initialize geometry
             STRUCTURE<TV>* structure=Create_Tetrahedralized_Volume(index);
 
@@ -263,7 +263,7 @@ void Get_Initial_Data()
             delete structure;}
 
         // correct number nodes
-        for(int i=1;i<=deformable_object.structures.m;i++) deformable_object.structures(i)->Update_Number_Nodes();}
+        for(int i=0;i<deformable_object.structures.m;i++) deformable_object.structures(i)->Update_Number_Nodes();}
 
     // Rigid Bodies
     Initialize_Rigid_Bodies();
@@ -777,7 +777,7 @@ void Push_Up()
         for(int i=1;i<=arb->joint_mesh.joints.m;i++) if(arb->joint_mesh.joints(i)->joint_function && arb->joint_mesh.joints(i)->joint_function->muscle_control)
             LOG::cout << "\t" << arb->joint_mesh.joints(i)->name << std::endl;}
 
-    for(int i=1;i<=rigid_body_list.rigid_bodies.m;i++) rigid_body_list.rigid_bodies(i)->Set_Coefficient_Of_Friction(1);
+    for(int i=0;i<rigid_body_list.rigid_bodies.m;i++) rigid_body_list.rigid_bodies(i)->Set_Coefficient_Of_Friction(1);
 }
 //#####################################################################
 // Function Read_Mocap_Data
@@ -843,7 +843,7 @@ void Create_Push_Up_Tracks()
     T elbow_start=parameter_list.Get_Parameter("elbow_start",3*(T)pi/4),elbow_end=parameter_list.Get_Parameter("elbow_end",(T).2);
     TV shoulder_prerot=parameter_list.Get_Parameter("shoulder_prerotation",TV());
     TV shoulder_postrot=parameter_list.Get_Parameter("shoulder_postrotation",TV());
-    for(int i=1;i<=samples;i++){
+    for(int i=0;i<samples;i++){
         T t=(T)(i-1)/(samples-1) - tracks_start_time/period; // normally starts at zero but offset by time at which motion is starting
         shoulder_track->trajectory(i)=FRAME<TV>(QUATERNION<T>::From_Rotation_Vector(shoulder_prerot)*
                                                   QUATERNION<T>(shoulder_start+(shoulder_end-shoulder_start)*(T)0.5*(1-cos(2*(T)pi*t)),TV(1,0,0))*
@@ -863,7 +863,7 @@ void Create_Skeleton_In_Flesh_Tracks()
     T elbow_start=parameter_list.Get_Parameter("elbow_start",(T)0),elbow_end=parameter_list.Get_Parameter("elbow_end",(T)pi/4);
     TV shoulder_prerot=parameter_list.Get_Parameter("shoulder_prerotation",TV());
     TV shoulder_postrot=parameter_list.Get_Parameter("shoulder_postrotation",TV());
-    for(int i=1;i<=samples;i++){
+    for(int i=0;i<samples;i++){
         T t=(T)(i-1)/(samples-1) - tracks_start_time/period; // normally starts at zero but offset by time at which motion is starting
         shoulder_track->trajectory(i)=FRAME<TV>(QUATERNION<T>::From_Rotation_Vector(shoulder_prerot)*
                                                   QUATERNION<T>(shoulder_start+(shoulder_end-shoulder_start)*(T)0.5*(1-cos(2*(T)pi*t)),TV(1,0,0))*
@@ -1077,7 +1077,7 @@ void Get_Constrained_Particle_Data()
     positions_relative_to_bone_frames.Resize(num_bones_present);
 
     for(int i=1;i<=particles.array_collection->Size();i++)
-        for(int p=1;p<=num_bones_present;p++){
+        for(int p=0;p<num_bones_present;p++){
             RIGID_BODY<TV>& bone_rigid_body=*arb->rigid_body_list.rigid_bodies(bone_ids(p));
             if (!bone_rigid_body.Implicit_Geometry_Lazy_Outside(particles.X(i))){
                 enslaved_nodes(p).Append(i);
@@ -1089,7 +1089,7 @@ void Get_Constrained_Particle_Data()
 void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE
 {
     assert(fragment_id==FRAGMENT_ID(1));
-    for(int p=1;p<=num_bones_present;p++)for(int i=1;i<=enslaved_nodes(p).m;i++){
+    for(int p=0;p<num_bones_present;p++)for(int i=1;i<=enslaved_nodes(p).m;i++){
         X(enslaved_nodes(p)(i))=TV();} 
 }
 //#####################################################################
@@ -1099,7 +1099,7 @@ void Set_External_Positions(ARRAY_VIEW<TV> X,const T time)
 {
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.deformable_object.rigid_body_particles;
     assert(fragment_id==FRAGMENT_ID(1));
-    for(int p=1;p<=num_bones_present;p++){
+    for(int p=0;p<num_bones_present;p++){
         RIGID_BODY<TV>& bone_rigid_body=*arb->rigid_body_list.rigid_bodies(bone_ids(p));
         FRAME<TV> inverted_frame=bone_rigid_body.Frame().Inverse();
         for(int i=1;i<=enslaved_nodes(p).m;i++){

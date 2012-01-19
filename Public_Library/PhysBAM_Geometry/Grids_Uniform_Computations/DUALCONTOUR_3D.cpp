@@ -36,7 +36,7 @@ Generate_Topology()
         if(phi1<=0&&phi2>0)topology.Append(VECTOR<int,4>(index_i_j,index_j,index,index_i));
         else if(phi1>0&&phi2<=0)topology.Append(VECTOR<int,4>(index_i,index,index_j,index_i_j));}
     topology.Compact();
-    for(int t=1;t<=topology.m;t++){
+    for(int t=0;t<topology.m;t++){
         int i,j,k,l;topology(t).Get(i,j,k,l);
         vertices.array(i)=vertices.array(j)=vertices.array(k)=vertices.array(l)=1;}
 }
@@ -93,7 +93,7 @@ Get_Triangulated_Surface()
     mesh.number_nodes=geometry.m;
     mesh.elements.Exact_Resize(2*topology.m);
     int current_triangle=1;
-    for(int t=1;t<=topology.m;t++){
+    for(int t=0;t<topology.m;t++){
         int i,j,k,l;topology(t).Get(i,j,k,l);i=vertices.array(i);j=vertices.array(j);k=vertices.array(k);l=vertices.array(l);
         mesh.elements(current_triangle++).Set(i,j,l);mesh.elements(current_triangle++).Set(j,k,l);}
     surface->Update_Triangle_List();surface->Use_Vertex_Normals();surface->vertex_normals=vertex_normals;

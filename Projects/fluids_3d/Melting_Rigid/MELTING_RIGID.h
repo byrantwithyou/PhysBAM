@@ -165,7 +165,7 @@ public:
 //        basic_forces.Resize(number_of_objects);
 
         RANDOM_NUMBERS random;random.Set_Seed(1234);// set the seed so that the example is reproducible
-        for(int i=1;i<=number_of_objects;i++){
+        for(int i=0;i<number_of_objects;i++){
             initial_position(i)=VECTOR<T,3>(random.Get_Uniform_Number((T)-.4,(T).4),2.5+1.5*i,random.Get_Uniform_Number((T)-.4,(T).4));
             //initial_position(i)=VECTOR<T,3>(0,2.5+1.5*i,0);
             do{initial_orientation(i).s=random.Get_Uniform_Number(0,1);initial_orientation(i).v=random.Get_Uniform_Vector(VECTOR<T,3>(-1,-1,-1),VECTOR<T,3>(1,1,1));}while(initial_orientation(i).Magnitude()>1);
@@ -209,10 +209,10 @@ public:
         T cfl=icecube_levelset->CFL(V);
         printf("\nSmoothing icecube:  ");
         int number_of_iterations=5;
-        for(int i=1;i<=5;i++)
+        for(int i=0;i<5;i++)
         {
             printf("%d%% ",(int)((T)i*((T)100/(T)number_of_iterations)));fflush(stdout);
-            for(int j=1;j<=20;j++){printf(".");fflush(stdout);icecube_levelset->Euler_Step(V,cfl,0);}
+            for(int j=0;j<20;j++){printf(".");fflush(stdout);icecube_levelset->Euler_Step(V,cfl,0);}
             icecube_levelset->Reinitialize();
         }
         FILE_UTILITIES::Write_To_File<RW>("icecube.phi",*icecube_levelset);*/
@@ -274,7 +274,7 @@ void Update_Fluid_Parameters(const T dt,const T time)
 //#####################################################################
 void Initialize_Deformable_And_Rigid_Bodies()
 {
-    for(int i=1;i<=number_of_objects;i++){
+    for(int i=0;i<number_of_objects;i++){
         Add_Melting_Object(melting_parameters.RIGID,0);}
 
     T domain_scale=1;
@@ -344,12 +344,12 @@ void Initialize_Phi(const int object,ARRAY<T>& phi)
 {
     RED_GREEN_GRID_3D<T>& grid=melting_parameters.levelsets(object)->grid;
     ARRAY<VECTOR<T,3> >& node_locations=grid.Node_Locations();
-    for(int p=1;p<=phi.m;p++){
+    for(int p=0;p<phi.m;p++){
         phi(p)=icecube_levelset->Extended_Phi(((T)1/scaling)*(node_locations(p)-levelset_center)+levelset_center);}
 /*
     VECTOR<T,3> center=grid.uniform_grid.Domain().Center();
     T size=.35;
-    for(int p=1;p<=phi.m;p++){
+    for(int p=0;p<phi.m;p++){
         VECTOR<T,3> distance=node_locations(p)-center;
         phi(p)=max(fabs(distance.x),fabs(distance.y),fabs(distance.z))-size;}*/
 }
@@ -362,9 +362,9 @@ void Initialize_Levelset_Velocity(const int object,ARRAY<VECTOR<T,3> >& V)
     //ARRAY<VECTOR<T,3> >& node_locations=grid.Node_Locations();
 
 //    melting_parameters.use_constant_melting_speed=true;melting_parameters.constant_melting_speed=melting_speed;
-    for(int p=1;p<=V.m;p++) V(p)=VECTOR<T,3>(0,0,0);
-//    for(int p=1;p<=V.m;p++) V(p)=VECTOR<T,3>(node_locations(p).y-sphere.center.y,0,0);
-//    for(int p=1;p<=V.m;p++) V(p)=-node_locations(p)+circle.center;
+    for(int p=0;p<V.m;p++) V(p)=VECTOR<T,3>(0,0,0);
+//    for(int p=0;p<V.m;p++) V(p)=VECTOR<T,3>(node_locations(p).y-sphere.center.y,0,0);
+//    for(int p=0;p<V.m;p++) V(p)=-node_locations(p)+circle.center;
 }
 //#####################################################################
 // Function Initialize_Levelset_Velocity
@@ -378,7 +378,7 @@ void Melting_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
         //EXTRAPOLATION_3D<T,T> extrapolate(fluids_parameters.grid,phi_object_temp,smoothed_temperature);extrapolate.Set_Band_Width(15);extrapolate.Extrapolate();}
 
         T maximum_vel=0;
-        for(int object=1;object<=melting_parameters.levelsets.m;object++){
+        for(int object=0;object<melting_parameters.levelsets.m;object++){
             LEVELSET_TETRAHEDRALIZED_VOLUME<T>& levelset=*melting_parameters.levelsets(object);
             RED_GREEN_GRID_3D<T>& grid=levelset.grid;
             int index=melting_parameters.body_index(object);
@@ -390,7 +390,7 @@ void Melting_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
             if(use_temperature)
             {
                 LINEAR_INTERPOLATION<T,T> interpolation;
-                for(int i=1;i<=node_locations.m;i++){
+                for(int i=0;i<node_locations.m;i++){
                     T temperature=interpolation.Clamped_To_Array(fluids_parameters.grid,smoothed_temperature,frame*node_locations(i));
 //                    if((frame*node_locations(i)).x>.6)melting_parameters.levelsets(object)->phi(i)+=dt;
                     if(temperature>melting_temperature)
@@ -403,15 +403,15 @@ void Melting_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
             }
             else{
                 maximum_vel=melting_speed;
-                for(int i=1;i<=node_locations.m;i++)if(fluids_parameters.particle_levelset_evolution.particle_levelset.levelset.Phi(frame*node_locations(i))<0){
+                for(int i=0;i<node_locations.m;i++)if(fluids_parameters.particle_levelset_evolution.particle_levelset.levelset.Phi(frame*node_locations(i))<0){
                     melting_parameters.levelsets(object)->phi(i)+=melting_speed*dt;}}}
         maximum_velocity=maximum_vel;
     }
     /*if(example_number==2){
-        for(int object=1;object<=melting_parameters.levelsets.m;object++){
+        for(int object=0;object<melting_parameters.levelsets.m;object++){
             LEVELSET_TETRAHEDRALIZED_VOLUME<T>& levelset=*melting_parameters.levelsets(object);
             RED_GREEN_GRID_3D<T>& grid=levelset.grid;
-            for(int i=1;i<=grid.number_of_nodes;i++){
+            for(int i=0;i<grid.number_of_nodes;i++){
             melting_parameters.levelsets(object)->phi(i)+=.2*dt;}}}*/
     if(example_number==3)
         if(time>start_melting_time){
@@ -439,7 +439,7 @@ void Initialize_Forces()
 {
     PHYSBAM_FATAL_ERROR("BASIC FORCES NO LONGER EXIST");
 #if 0
-    for(int object=1;object<=melting_parameters.body_index.m;object++){
+    for(int object=0;object<melting_parameters.body_index.m;object++){
         int index=melting_parameters.body_index(object);if(!index)continue;
         RIGID_BODY<TV>& rigid_body=*solids_parameters.rigid_body_parameters.list(index);
         std::cout<<rigid_body.position<<std::endl;
@@ -469,7 +469,7 @@ void Initialize_Phi()
     GRID<TV>& grid=fluids_parameters.grid;
     fluids_parameters.particle_levelset_evolution.particle_levelset.Set_Minimum_Particle_Radius((T).2*grid.max_dx_dy_dz);
     fluids_parameters.particle_levelset_evolution.particle_levelset.Set_Maximum_Particle_Radius((T).7*grid.max_dx_dy_dz);
-    for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++) for(int ij=1;ij<=grid.mn;ij++)
+    for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++) for(int ij=0;ij<grid.mn;ij++)
         fluids_parameters.particle_levelset_evolution.phi(i,j,ij)=grid.y(j)-grid.ymin-initial_water_level;
 }
 //#####################################################################
@@ -479,7 +479,7 @@ template<class SOURCE> void Adjust_Phi_With_Sources(const SOURCE& source,const T
 {
     if(!use_source) return;
     GRID<TV>& grid=fluids_parameters.grid;
-    for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++) for(int ij=1;ij<=grid.mn;ij++){
+    for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++) for(int ij=0;ij<grid.mn;ij++){
         VECTOR<T,3> source_X=world_to_source*grid.X(i,j,ij);
         if(source.Lazy_Inside(source_X)) fluids_parameters.particle_levelset_evolution.phi(i,j,ij)=min(fluids_parameters.particle_levelset_evolution.phi(i,j,ij),source.Signed_Distance(source_X));}
 }
@@ -499,7 +499,7 @@ template<class SOURCE> void Get_Source_Reseed_Mask(const SOURCE& source,ARRAY<bo
     GRID<TV>& grid=fluids_parameters.grid;
     if(cell_centered_mask) delete cell_centered_mask;cell_centered_mask=new ARRAY<bool,VECTOR<int,3> >(grid);
     T padding=3*grid.max_dx_dy_dz;
-    for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++) for(int ij=1;ij<=grid.mn;ij++) if(!source.Outside(world_to_source*grid.X(i,j,ij),padding)) (*cell_centered_mask)(i,j,ij)=true;
+    for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++) for(int ij=0;ij<grid.mn;ij++) if(!source.Outside(world_to_source*grid.X(i,j,ij),padding)) (*cell_centered_mask)(i,j,ij)=true;
 }
 //#####################################################################
 // Function Get_Source_Reseed_Mask
@@ -516,9 +516,9 @@ template<class SOURCE> void Get_Source_Velocities(const SOURCE& source,const T t
 {
     GRID<TV> &u_grid=fluids_parameters.u_grid,&v_grid=fluids_parameters.v_grid,&w_grid=fluids_parameters.w_grid;
     PROJECTION_3D<T>& projection=fluids_parameters.incompressible.projection;
-    for(int i=1;i<=u_grid.m;i++) for(int j=1;j<=u_grid.n;j++) for(int ij=1;ij<=u_grid.mn;ij++) if(source.Lazy_Inside(world_to_source*u_grid.X(i,j,ij))){projection.elliptic_solver->psi_N_u(i,j,ij)=true;projection.u(i,j,ij)=source_velocity.x;}
-    for(int i=1;i<=v_grid.m;i++) for(int j=1;j<=v_grid.n;j++) for(int ij=1;ij<=v_grid.mn;ij++) if(source.Lazy_Inside(world_to_source*v_grid.X(i,j,ij))){projection.elliptic_solver->psi_N_v(i,j,ij)=true;projection.v(i,j,ij)=source_velocity.y;}
-    for(int i=1;i<=w_grid.m;i++) for(int j=1;j<=w_grid.n;j++) for(int ij=1;ij<=w_grid.mn;ij++) if(source.Lazy_Inside(world_to_source*w_grid.X(i,j,ij))){projection.elliptic_solver->psi_N_w(i,j,ij)=true;projection.w(i,j,ij)=source_velocity.z;}
+    for(int i=0;i<u_grid.m;i++) for(int j=0;j<u_grid.n;j++) for(int ij=0;ij<u_grid.mn;ij++) if(source.Lazy_Inside(world_to_source*u_grid.X(i,j,ij))){projection.elliptic_solver->psi_N_u(i,j,ij)=true;projection.u(i,j,ij)=source_velocity.x;}
+    for(int i=0;i<v_grid.m;i++) for(int j=0;j<v_grid.n;j++) for(int ij=0;ij<v_grid.mn;ij++) if(source.Lazy_Inside(world_to_source*v_grid.X(i,j,ij))){projection.elliptic_solver->psi_N_v(i,j,ij)=true;projection.v(i,j,ij)=source_velocity.y;}
+    for(int i=0;i<w_grid.m;i++) for(int j=0;j<w_grid.n;j++) for(int ij=0;ij<w_grid.mn;ij++) if(source.Lazy_Inside(world_to_source*w_grid.X(i,j,ij))){projection.elliptic_solver->psi_N_w(i,j,ij)=true;projection.w(i,j,ij)=source_velocity.z;}
 }
 //#####################################################################
 // Function Get_Source_Velocities
@@ -536,14 +536,14 @@ void Update_Melting_Substep_Parameters(const T dt,const T time)
     if(use_temperature){
         GRID<TV>& grid=fluids_parameters.grid;
         temperature_container.Euler_Step(dt,time);
-        for(int i=1;i<=grid.m;i++)for(int j=1;j<=grid.n;j++)for(int ij=1;ij<=grid.mn;ij++){
+        for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++)for(int ij=0;ij<grid.mn;ij++){
             if(fluids_parameters.particle_levelset_evolution.phi(i,j,ij)<0){
                 if(use_source){
                     if(cylinder_source.Lazy_Inside(world_to_source*grid.X(i,j,ij)))
                         temperature_container.temperature_3d(i,j,ij)=temperature_container.hot_point;}}
             /*else temperature_container.temperature_3d(i,j,ij)=temperature_container.ambient_temperature;*/}}
 
-    for(int i=1;i<=basic_forces.m;i++)if(basic_forces(i)){
+    for(int i=0;i<basic_forces.m;i++)if(basic_forces(i)){
         basic_forces(i)->V_grid=fluids_parameters.incompressible.projection.p_grid;
         //basic_forces(i)->wind_pressure_scaling_factor=0;
     }
@@ -552,19 +552,19 @@ void Update_Melting_Substep_Parameters(const T dt,const T time)
     pressure=fluids_parameters.incompressible.projection.p;
 
     GRID<TV>& grid=fluids_parameters.incompressible.projection.p_grid;
-    for(int i=1;i<=grid.m;i++)for(int j=1;j<=grid.n;j++)for(int ij=1;ij<=grid.mn;ij++)
+    for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++)for(int ij=0;ij<grid.mn;ij++)
         if(phi_objects(i,j,ij)+phi_objects(i+1,j,ij)+phi_objects(i,j+1,ij)+phi_objects(i+1,j+1,ij)+phi_objects(i,j,ij+1)+phi_objects(i+1,j,ij+1)+phi_objects(i,j+1,ij+1)+phi_objects(i+1,j+1,ij+1)<0)
             pressure(i,j,ij)=0;
     /*if(time>start_melting_time)*/
-    for(int i=1;i<=grid.m;i++)for(int j=0;j<=2;j++)for(int ij=1;ij<=grid.mn;ij++)
+    for(int i=0;i<grid.m;i++)for(int j=0;j<=2;j++)for(int ij=0;ij<grid.mn;ij++)
         pressure(i,j,ij)=10;//min((T)ground_pressure_value,(time-2)*ground_pressure_value);
-    for(int i=0;i<=2;i++)for(int j=1;j<=grid.n;j++)for(int ij=1;ij<=grid.mn;ij++)
+    for(int i=0;i<=2;i++)for(int j=0;j<grid.n;j++)for(int ij=0;ij<grid.mn;ij++)
         pressure(i,j,ij)=5;//min((T)ground_pressure_value,(time-2)*ground_pressure_value);
-    for(int i=grid.m-2;i<=grid.m;i++)for(int j=1;j<=grid.n;j++)for(int ij=1;ij<=grid.mn;ij++)
+    for(int i=grid.m-2;i<=grid.m;i++)for(int j=0;j<grid.n;j++)for(int ij=0;ij<grid.mn;ij++)
         pressure(i,j,ij)=5;//min((T)ground_pressure_value,(time-2)*ground_pressure_value);
-    for(int i=1;i<=grid.m;i++)for(int j=1;j<=grid.n;j++)for(int ij=0;ij<=2;ij++)
+    for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++)for(int ij=0;ij<=2;ij++)
         pressure(i,j,ij)=5;//min((T)ground_pressure_value,(time-2)*ground_pressure_value);
-    for(int i=1;i<=grid.m;i++)for(int j=1;j<=grid.n;j++)for(int ij=grid.mn-2;ij<=grid.mn;ij++)
+    for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++)for(int ij=grid.mn-2;ij<=grid.mn;ij++)
         pressure(i,j,ij)=5;//min((T)ground_pressure_value,(time-2)*ground_pressure_value);
 
     printf("\n\nMINIMUM PRESSURE IS: %f ---- MAXIMUM PRESSURE IS: %f\n",pressure.Min(),pressure.Max());
@@ -573,7 +573,7 @@ void Update_Melting_Substep_Parameters(const T dt,const T time)
     if(!first)ARRAY<T,VECTOR<int,3> >::copy(.5,pressure,.5,pressure_old,pressure);
     printf("\n\nMINIMUM PRESSURE IS: %f ---- MAXIMUM PRESSURE IS: %f\n",pressure.Min(),pressure.Max());
     first=false;
-//    for(int i=1;i<=grid.m;i++)for(int j=1;j<=grid.n;j++)for(int ij=1;ij<=grid.mn;ij++)
+//    for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++)for(int ij=0;ij<grid.mn;ij++)
 //        pressure(i,j,ij)=1000*(4-grid.X(i,j,ij).y);
 }
 //#####################################################################

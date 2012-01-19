@@ -83,7 +83,7 @@ public:
 
     void Update_Subset_Index_From_Element_Index()
     {subset_index_from_point_cloud_index.Resize(point_cloud.array_collection->Size(),false,false);subset_index_from_point_cloud_index.Fill(0);
-    for(int p=1;p<=active_indices.m;p++)subset_index_from_point_cloud_index(active_indices(p))=p;}
+    for(int p=0;p<active_indices.m;p++)subset_index_from_point_cloud_index(active_indices(p))=p;}
 
     void Update_Number_Nodes()
     {subset_index_from_point_cloud_index.Resize(point_cloud.array_collection->Size());}

@@ -102,7 +102,7 @@ public:
     {
         fluids_parameters.particle_levelset_evolution->particle_levelset.removed_positive_particles(TV_INT(1,1))=fluids_parameters.particle_levelset_evolution->particle_levelset.template_removed_particles.Clone();
         int particle_count=40;
-        for(int i=1;i<=particle_count;i++){
+        for(int i=0;i<particle_count;i++){
             int particle_index=fluids_parameters.particle_levelset_evolution->particle_levelset.removed_positive_particles(TV_INT(1,1))->array_collection->Add_Element();
             fluids_parameters.particle_levelset_evolution->particle_levelset.removed_positive_particles(TV_INT(1,1))->X(particle_index)=TV((T).05,.05+(i/(T)particle_count)*0.9);
         }
@@ -304,7 +304,7 @@ static int Water_Test_Number(const int test_number)
 //#####################################################################
 FRAME<TV> Find_Placement(RANDOM_NUMBERS<T>& random,const BOX<TV>& bounding_box,ARRAY<ORIENTED_BOX<TV> >& bounding_boxes,const BOX<TV>& world,bool want_rotate)
 {
-    for(int i=1;i<=10000;i++){
+    for(int i=0;i<10000;i++){
         FRAME<TV> frame;
         if(want_rotate) frame.r=random.template Get_Rotation<TV>();
         ORIENTED_BOX<TV> oriented_box(bounding_box,frame.r);
@@ -312,7 +312,7 @@ FRAME<TV> Find_Placement(RANDOM_NUMBERS<T>& random,const BOX<TV>& bounding_box,A
         frame.t=random.Get_Uniform_Vector(world.min_corner-new_box.min_corner,world.max_corner-new_box.max_corner);
         oriented_box.corner+=frame.t;
         bool okay=true;
-        for(int j=1;j<=bounding_boxes.m;j++) if(oriented_box.Intersection(bounding_boxes(j))){okay=false;break;}
+        for(int j=0;j<bounding_boxes.m;j++) if(oriented_box.Intersection(bounding_boxes(j))){okay=false;break;}
         if(okay){
             bounding_boxes.Append(oriented_box);
             return frame;}}
@@ -430,8 +430,8 @@ void Get_Source_Velocities(T_FACE_ARRAYS_SCALAR& face_velocities,T_FACE_ARRAYS_B
 #if 0
     if(water_tests.test_number==1) BASE::Get_Source_Velocities(water_tests.source,water_tests.world_to_source,water_tests.source_velocity);
 #endif
-    for(int i=1;i<=fountain_source.m;i++) BASE::Get_Source_Velocities(fountain_source(i),world_to_source,fountain_source_velocity(i));
-    //if(test_number==4) for(int i=1;i<=fountain_source.m;i++){
+    for(int i=0;i<fountain_source.m;i++) BASE::Get_Source_Velocities(fountain_source(i),world_to_source,fountain_source_velocity(i));
+    //if(test_number==4) for(int i=0;i<fountain_source.m;i++){
     //    for(FACE_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) if(fountain_source(i).Lazy_Inside(world_to_source.Homogeneous_Times(iterator.Location()))){
     //        int axis=iterator.Axis();//fluids_parameters.incompressible->projection.elliptic_solver->psi_N.Component(axis)(iterator.Face_Index())=true;
     //        fluid_collection.incompressible_fluid_collection.face_velocities.Component(axis)(iterator.Face_Index())=fountain_source_velocity(i)[axis];}}
@@ -542,13 +542,13 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             RANDOM_NUMBERS<T> random;
             random.Set_Seed(1234);
 
-            for(int i=1;i<=num_spheres;i++){
+            for(int i=0;i<num_spheres;i++){
                 RIGID_BODY<TV>& rigid_body_sphere=solids_tests.Add_Rigid_Body("circle",scale,(T)0);
                 rigid_body_sphere.Update_Bounding_Box();
                 rigid_body_sphere.Set_Frame(Find_Placement(random,rigid_body_sphere.axis_aligned_bounding_box,bounding_boxes,world,true));
                 rigid_body_sphere.Set_Mass(sphere_mass);}
 
-            for(int i=1;i<=num_blocks;i++){
+            for(int i=0;i<num_blocks;i++){
                 RIGID_BODY<TV>& rigid_body_block=solids_tests.Add_Rigid_Body("square",scale,(T)0);
                 rigid_body_block.Update_Bounding_Box();
                 rigid_body_block.Set_Frame(Find_Placement(random,rigid_body_block.axis_aligned_bounding_box,bounding_boxes,world,true));
@@ -707,7 +707,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
 
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents();

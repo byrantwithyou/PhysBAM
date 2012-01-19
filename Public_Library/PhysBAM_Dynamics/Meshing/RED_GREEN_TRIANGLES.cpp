@@ -54,7 +54,7 @@ Refine_Simplex_List(const T_ARRAY& triangle_list)
 {
     STATIC_ASSERT((IS_SAME<int,typename T_ARRAY::ELEMENT>::value));
     object.particles.array_collection->Preallocate(object.particles.array_collection->Size()+3*triangle_list.Size());
-    for(int level=1;level<=index_in_stack.m;level++) index_in_stack(level)->Fill(0);
+    for(int level=0;level<index_in_stack.m;level++) index_in_stack(level)->Fill(0);
     for(int i=1;i<=triangle_list.Size();i++){
         int level,tri;leaf_levels_and_indices(triangle_list(i)).Get(level,tri);
         if(!Red(level,tri)){tri=(*parent(level))(tri);level-=1;}
@@ -127,7 +127,7 @@ Regularly_Refine_Triangle(const int level,const int tri)
     free_triangle_indices.Preallocate(2);free_edge_indices.Preallocate(5);
     Delete_Children(level,tri,free_triangle_indices,free_edge_indices);
     ARRAY<int> midpoints(3),subedges(9);Get_Existing_Subindices(level,tri,midpoints,subedges);
-    for(int a=1;a<=3;a++) if(!midpoints(a)) midpoints(a)=Add_Midpoint(element_edges(level)(tri)(a),level,tri);
+    for(int a=0;a<3;a++) if(!midpoints(a)) midpoints(a)=Add_Midpoint(element_edges(level)(tri)(a),level,tri);
     int i,j,k;meshes(level)->elements(tri).Get(i,j,k);
     int ij=midpoints(1),jk=midpoints(2),ki=midpoints(3);
     if(!subedges(1)) Add_Segment(free_edge_indices,i,ij);
@@ -151,7 +151,7 @@ template<class TV> void RED_GREEN_TRIANGLES<TV>::
 Get_Existing_Subindices(const int level,const int tri,ARRAY<int>& midpoints,ARRAY<int>& subedges)
 {
     assert(midpoints.m==3 && subedges.m==9);
-    for(int e=1;e<=3;e++) midpoints(e)=segment_midpoints(element_edges(level)(tri)(e));
+    for(int e=0;e<3;e++) midpoints(e)=segment_midpoints(element_edges(level)(tri)(e));
     int i,j,k;meshes(level)->elements(tri).Get(i,j,k);
     int ij=midpoints(1),jk=midpoints(2),ki=midpoints(3);
     if(ij){subedges(1)=segment_mesh.Segment(i,ij);subedges(3)=segment_mesh.Segment(j,ij);if(jk) subedges(7)=segment_mesh.Segment(ij,jk);if(ki) subedges(9)=segment_mesh.Segment(ki,ij);}
@@ -188,18 +188,18 @@ Delete_Children(const int level,const int tri,ARRAY<int>& deleted_tri_indices,AR
     int p;for(p=1;p<=4&&(*children(level))(tri)(p);p++){deleted_tri_indices.Append((*children(level))(tri)(p));(*children(level))(tri)(p)=0;}
     // get a list of edges to delete (begin by finding all children edges, then filter the red ones out)
     ARRAY<int> children_edges;children_edges.Preallocate(5);
-    for(p=1;p<=deleted_tri_indices.m;p++) for(int q=1;q<=3;q++) // get a list of all children edges
+    for(p=1;p<=deleted_tri_indices.m;p++) for(int q=0;q<3;q++) // get a list of all children edges
         children_edges.Append_Unique(element_edges(level+1)(deleted_tri_indices(p))(q));
     for(p=1;p<=children_edges.m;p++){
         int q,r;segment_mesh.elements(children_edges(p)).Get(q,r);
         if((q==i && r==jk) || (q==j && r==ki) || (q==k && r==ij))
             deleted_edge_indices.Append(children_edges(p));} // delete interior edges
     // now do the actual deletion
-    for(p=1;p<=deleted_tri_indices.m;p++) for(int q=1;q<=3;q++){ // remove deleted triangles from incident_triangles
+    for(p=1;p<=deleted_tri_indices.m;p++) for(int q=0;q<3;q++){ // remove deleted triangles from incident_triangles
         int node=meshes(level+1)->elements(deleted_tri_indices(p))(q),index=0;
         (*meshes(level+1)->incident_elements)(node).Find(deleted_tri_indices(p),index);assert(index);
         (*meshes(level+1)->incident_elements)(node).Remove_Index_Lazy(index);}
-    for(p=1;p<=deleted_edge_indices.m;p++) for(int q=1;q<=2;q++){ // remove deleted edges from incident_segments
+    for(p=1;p<=deleted_edge_indices.m;p++) for(int q=0;q<2;q++){ // remove deleted edges from incident_segments
         int node=segment_mesh.elements(deleted_edge_indices(p))(q),index=0;
         (*segment_mesh.incident_elements)(node).Find(deleted_edge_indices(p),index);assert(index);
         (*segment_mesh.incident_elements)(node).Remove_Index_Lazy(index);}
@@ -216,7 +216,7 @@ Delete_Children(const int level,const int tri,ARRAY<int>& deleted_tri_indices,AR
 template<class TV> void RED_GREEN_TRIANGLES<TV>::
 Add_Midpoints_If_Not_Already_There(const int level,const int tri)
 {
-    for(int i=1;i<=3;i++){int s=element_edges(level)(tri)(i);if(!segment_midpoints(s)) Add_Midpoint(s,level,tri);}
+    for(int i=0;i<3;i++){int s=element_edges(level)(tri)(i);if(!segment_midpoints(s)) Add_Midpoint(s,level,tri);}
 }
 //#####################################################################
 // Function Add_Midpoint
@@ -292,7 +292,7 @@ Add_Triangle(ARRAY<int>& free_triangle_indices,const int level,const int i,const
         element_edges(level).Resize(index);children(level)->Resize(index);index_in_stack(level)->Resize(index);}
     else{
         index=free_triangle_indices.Pop();triangle_mesh.elements(index).Set(i,j,k);
-        (*parent(level))(index)=parent_index;for(int a=1;a<=4;a++) (*children(level))(index)(a)=0;(*index_in_stack(level))(index)=0;}
+        (*parent(level))(index)=parent_index;for(int a=0;a<4;a++) (*children(level))(index)(a)=0;(*index_in_stack(level))(index)=0;}
     // create triangle edges
     int ij=segment_mesh.Segment(i,j),jk=segment_mesh.Segment(j,k),ki=segment_mesh.Segment(k,i);
     element_edges(level)(index).Set(ij,jk,ki);
@@ -333,7 +333,7 @@ Unrefined_Parents(const int node,ARRAY<int>& parents,ARRAY<T>& weights) const
         if(!(*segment_index_from_midpoint_index)(parents(i))){i++;continue;}
         T old_weight=weights(i);VECTOR<int,2> segment=segment_mesh.elements((*segment_index_from_midpoint_index)(parents(i)));
         parents.Remove_Index_Lazy(i);weights.Remove_Index_Lazy(i);
-        for(int j=1;j<=2;j++){
+        for(int j=0;j<2;j++){
             int new_parent=segment(j);
             int index=parents.Find(new_parent);if(!index){index=parents.Append(new_parent);weights.Append((T)0);}
             weights(index)+=(T).5*old_weight;}}
@@ -348,7 +348,7 @@ Remove_Simplex_List(const ARRAY<int>& triangle_list,ARRAY<HASHTABLE<int,int> >* 
 
     // build a list of all triangles on all levels to be deleted by going down the tree from each input triangle
     ARRAY<ARRAY<int> > level_triangle_list(meshes.m);
-    for(int i=1;i<=triangle_list.m;i++){
+    for(int i=0;i<triangle_list.m;i++){
         int level,tri;leaf_levels_and_indices(triangle_list(i)).Get(level,tri);
         do{level_triangle_list(level).Append_Unique(tri);
         }while(level>1 && (tri=(*parent(level--))(tri)));}
@@ -356,10 +356,10 @@ Remove_Simplex_List(const ARRAY<int>& triangle_list,ARRAY<HASHTABLE<int,int> >* 
     ARRAY<HASHTABLE<int,int> > default_level_simplex_maps;if(!level_simplex_maps) level_simplex_maps=&default_level_simplex_maps;
     (*level_simplex_maps).Resize(meshes.m);
 
-    for(int level=1;level<=meshes.m;level++){
+    for(int level=0;level<meshes.m;level++){
         // remove triangles to be deleted from incident elements
         // TODO: is incident_elements special or not?
-        for(int i=1;i<=level_triangle_list(level).m;i++) for(int j=1;j<=3;j++){int node=meshes(level)->elements(level_triangle_list(level)(i))(j);
+        for(int i=1;i<=level_triangle_list(level).m;i++) for(int j=0;j<3;j++){int node=meshes(level)->elements(level_triangle_list(level)(i))(j);
             int index=0;(*meshes(level)->incident_elements)(node).Find(level_triangle_list(level)(i),index);assert(index);
             (*meshes(level)->incident_elements)(node).Remove_Index_Lazy(index);}
 
@@ -370,16 +370,16 @@ Remove_Simplex_List(const ARRAY<int>& triangle_list,ARRAY<HASHTABLE<int,int> >* 
         meshes(level)->Delete_Sorted_Elements(level_triangle_list(level),simplex_map);
         if(level<parent.m) for(int i=1;i<=(*parent(level+1)).m;i++) simplex_map.Get((*parent(level+1))(i),(*parent(level+1))(i));
         if(parent(level)) parent(level)->Remove_Sorted_Indices_Lazy(level_triangle_list(level));
-        if(level>1) for(int i=1;i<=children(level-1)->m;i++){for(int j=1;j<=4;j++) simplex_map.Get((*children(level-1))(i)(j),(*children(level-1))(i)(j));
+        if(level>1) for(int i=1;i<=children(level-1)->m;i++){for(int j=0;j<4;j++) simplex_map.Get((*children(level-1))(i)(j),(*children(level-1))(i)(j));
             (*children(level-1))(i)=(*children(level-1))(i).Sorted().Reversed();}
         children(level)->Remove_Sorted_Indices_Lazy(level_triangle_list(level));
-        for(int i=1;i<=leaf_levels_and_indices.m;i++) if(leaf_levels_and_indices(i)(1)==level) simplex_map.Get(leaf_levels_and_indices(i)(2),leaf_levels_and_indices(i)(2));
+        for(int i=0;i<leaf_levels_and_indices.m;i++) if(leaf_levels_and_indices(i)(1)==level) simplex_map.Get(leaf_levels_and_indices(i)(2),leaf_levels_and_indices(i)(2));
         leaf_number(level)->Remove_Sorted_Indices_Lazy(level_triangle_list(level));
 
         // delete edges which have a node that is no longer referenced by the elements
         ARRAY<int> nodes_referenced(object.particles.array_collection->Size());meshes(level)->Mark_Nodes_Referenced(nodes_referenced,1);
         ARRAY<int> deleted_edge_indices;
-        for(int i=1;i<=level_triangle_list(level).m;i++) for(int j=1;j<=3;j++){
+        for(int i=1;i<=level_triangle_list(level).m;i++) for(int j=0;j<3;j++){
             int edge=element_edges(level)(level_triangle_list(level)(i))(j);int node1,node2;segment_mesh.elements(edge).Get(node1,node2);
             if(!nodes_referenced(node1) || !nodes_referenced(node2)){
                 int index=0;(*segment_mesh.incident_elements)(node1).Find(edge,index);if(index) (*segment_mesh.incident_elements)(node1).Remove_Index_Lazy(index);
@@ -394,7 +394,7 @@ Remove_Simplex_List(const ARRAY<int>& triangle_list,ARRAY<HASHTABLE<int,int> >* 
 template<class TV> void RED_GREEN_TRIANGLES<TV>::
 Print() const
 {
-    for(int level=1;level<=meshes.m;level++){
+    for(int level=0;level<meshes.m;level++){
         LOG::cout << "There are " << meshes(level)->elements.m << " elements at level " << level << std::endl;
         LOG::cout << "      and object.particles.array_collection->Size()=" << object.particles.array_collection->Size() << std::endl;
         LOG::cout << "      and meshes(level)->incident_elements->m="  << meshes(level)->incident_elements->m << std::endl;}

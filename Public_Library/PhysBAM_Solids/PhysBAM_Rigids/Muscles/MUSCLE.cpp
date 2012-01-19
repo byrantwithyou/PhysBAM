@@ -64,7 +64,7 @@ Initialize(ARRAY<T_MUSCLE_SEGMENT_DATA>& segment_data)
         for(int i=1;i<via_points.m;i++){muscle_segments.Append(Create_Muscle_Segment(via_points(i),via_points(i+1),
             segment_data(i+1).x,segment_data(i+1).y,segment_data(i+1).z));}
         muscle_segments.Append(Create_Muscle_Segment(via_points(via_points.m),attachment_point_2,segment_data(via_points.m+1).x,segment_data(via_points.m+1).y,segment_data(via_points.m+1).z));}
-    for(int i=1;i<=muscle_segments.m;i++){muscle_segments(i)->Initialize();}
+    for(int i=0;i<muscle_segments.m;i++){muscle_segments(i)->Initialize();}
 }
 //#####################################################################
 // Function Create_Muscle_Segment
@@ -105,7 +105,7 @@ Total_Velocity() const
 {
     T total_velocity=0;TV position2,velocity2,path;
     TV position1=attachment_point_1->Embedded_Position(),velocity1=attachment_point_1->Embedded_Velocity();
-    for(int i=1;i<=via_points.m;i++){
+    for(int i=0;i<via_points.m;i++){
         position2=via_points(i)->Embedded_Position();velocity2=via_points(i)->Embedded_Velocity();
         total_velocity+=TV::Dot_Product(velocity1-velocity2,(position1-position2).Normalized());
         position1=position2;velocity1=velocity2;}
@@ -143,7 +143,7 @@ Calculate_Activation(const T desired_force) const
 template<class TV> void MUSCLE<TV>::
 Update_Segments()
 {
-    for(int i=1;i<=muscle_segments.m;i++){
+    for(int i=0;i<muscle_segments.m;i++){
         muscle_segments(i)->Update_Parameters();
         muscle_segments(i)->Update_Frame();}
 }
@@ -154,7 +154,7 @@ template<class TV> void MUSCLE<TV>::
 Set_Segment_Activations(const T activation) 
 {
     // all segments have the same activation currently
-    for(int i=1;i<=muscle_segments.m;i++){muscle_segments(i)->Set_Current_Activation(activation);}
+    for(int i=0;i<muscle_segments.m;i++){muscle_segments(i)->Set_Current_Activation(activation);}
 }
 //#####################################################################
 // Function Apply_Fixed_Impulse_At_All_Points
@@ -195,9 +195,9 @@ Read(TYPED_ISTREAM& input_stream,RIGID_BODY_COLLECTION<TV>& rigid_body_collectio
     // Delete_Pointers_And_Clean_Memory(); // TODO: figure out who should own the attachment points (who should delete them)
     attachment_point_1=Read_Constrained_Point(input_stream,rigid_body_collection);attachment_point_2=Read_Constrained_Point(input_stream,rigid_body_collection);
     int num_via_points;Read_Binary(input_stream,num_via_points);via_points.Resize(num_via_points);
-    for(int i=1;i<=via_points.m;i++) via_points(i)=Read_Constrained_Point(input_stream,rigid_body_collection);
+    for(int i=0;i<via_points.m;i++) via_points(i)=Read_Constrained_Point(input_stream,rigid_body_collection);
     int num_muscle_segments;Read_Binary(input_stream,num_muscle_segments);muscle_segments.Resize(num_muscle_segments);
-    for(int i=1;i<=muscle_segments.m;i++) muscle_segments(i)=MUSCLE_SEGMENT<TV>::Create_From_Input(input_stream);
+    for(int i=0;i<muscle_segments.m;i++) muscle_segments(i)=MUSCLE_SEGMENT<TV>::Create_From_Input(input_stream);
     if(!via_points.m){muscle_segments(1)->point_1=attachment_point_1;
     muscle_segments(1)->point_2=attachment_point_2;}
     else{muscle_segments(1)->point_1=attachment_point_1;muscle_segments(1)->point_2=via_points(1);
@@ -213,8 +213,8 @@ Write(TYPED_OSTREAM& output_stream) const
     Write_Binary(output_stream,optimal_length,peak_force,pennation_angle,tendon_slack_length,max_shortening_velocity,name);
     Write_Constrained_Point(output_stream,attachment_point_1);
     Write_Constrained_Point(output_stream,attachment_point_2);
-    Write_Binary(output_stream,via_points.m);for(int i=1;i<=via_points.m;i++) Write_Constrained_Point(output_stream,via_points(i));
-    Write_Binary(output_stream,muscle_segments.m);for(int i=1;i<=muscle_segments.m;i++){muscle_segments(i)->Write(output_stream);}
+    Write_Binary(output_stream,via_points.m);for(int i=0;i<via_points.m;i++) Write_Constrained_Point(output_stream,via_points(i));
+    Write_Binary(output_stream,muscle_segments.m);for(int i=0;i<muscle_segments.m;i++){muscle_segments(i)->Write(output_stream);}
 }
 //#####################################################################
 template class MUSCLE<VECTOR<float,3> >;

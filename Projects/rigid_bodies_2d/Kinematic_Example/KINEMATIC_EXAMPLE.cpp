@@ -145,7 +145,7 @@ Initialize_Rigid_Bodies()
 #endif
 #endif
 
-        //for(int i=1;i<=rigid_body_parameters.list.rigid_bodies.m;i++) if(!rigid_body_parameters.list.rigid_bodies(i)->is_static) rigid_body_parameters.list.rigid_bodies(i)->is_kinematic=true;
+        //for(int i=0;i<rigid_body_parameters.list.rigid_bodies.m;i++) if(!rigid_body_parameters.list.rigid_bodies(i)->is_static) rigid_body_parameters.list.rigid_bodies(i)->is_kinematic=true;
     }
 
 #if 0
@@ -159,7 +159,7 @@ Initialize_Rigid_Bodies()
 #endif
 
     Update_Animated_Parameters(0);
-    for(int i=1;i<=rigid_body_parameters.list.rigid_bodies.m;i++){
+    for(int i=0;i<rigid_body_parameters.list.rigid_bodies.m;i++){
         rigid_body=rigid_body_parameters.list.rigid_bodies(i);
         if(rigid_body->rigid_body_collection.rigid_body_particle.kinematic(rigid_body->particle_index)){
             Set_External_Position_And_Orientation(rigid_body->position,rigid_body->orientation,0,i);

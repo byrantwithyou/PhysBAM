@@ -54,7 +54,7 @@ Initialize_Object()
     diagonal.Resize(particles.array_collection->Size(),false,false);diagonal.Fill((T)0);
     INDIRECT_ARRAY<ARRAY<T> > diagonal_full(diagonal,particles.subset_index_from_point_cloud_index);
     offdiagonal.Resize(mesh.segment_mesh->elements.m,false);offdiagonal.Fill((T)0);
-    for(int t=1;t<=mesh.elements.m;t++){
+    for(int t=0;t<mesh.elements.m;t++){
         VECTOR<int,d+1>& nodes=mesh.elements(t);
         VECTOR<int,d==2?3:6>& edges=(*mesh.element_edges)(t);
         T_MATRIX Dm=STRAIN_MEASURE<TV,d>::Ds(object.particles.X,nodes);
@@ -73,9 +73,9 @@ template<class T_OBJECT,class T_PSI_D_EDGES,class T> static void Initialize_Diri
     if(!triangulated_surface.hierarchy) triangulated_surface.Initialize_Hierarchy();
     SEGMENT_MESH& segment_mesh=*object.mesh.segment_mesh;
     psi_D_edges.Resize(segment_mesh.elements.m);
-    for(int s=1;s<=segment_mesh.elements.m;s++){
+    for(int s=0;s<segment_mesh.elements.m;s++){
         VECTOR<int,2>& nodes=segment_mesh.elements(s);
-        for(int i=1;i<=2;i++){
+        for(int i=0;i<2;i++){
             RAY<VECTOR<T,3> > ray(SEGMENT_3D<T>(object.particles.X(nodes[i]),object.particles.X(nodes[3-i])));T magnitude=ray.t_max;
             if(triangulated_surface.hierarchy->Intersection(ray,psi_D_edges(s)(i).weights,thickness_over_2)){
                 psi_D_edges(s)(i).theta=ray.t_max/magnitude;psi_D_edges(s)(i).simplex=ray.aggregate_id;}}
@@ -94,7 +94,7 @@ Initialize_Dirichlet_Boundary(T_BOUNDARY_OBJECT& boundary_object,const T thickne
     if(verbose) LOG::Time("initializing Dirichlet surface");
     Initialize_Dirichlet_Boundary_Helper(object,psi_D_edges,boundary_object,thickness_over_2);
     int intersections=0;
-    for(int s=1;s<=psi_D_edges.m;s++)for(int i=1;i<=2;i++)if(psi_D_edges(s)(i).simplex){
+    for(int s=0;s<psi_D_edges.m;s++)for(int i=0;i<2;i++)if(psi_D_edges(s)(i).simplex){
         intersections++;psi_D_edges(s)(i).theta=max(psi_D_edges(s)(i).theta,second_order_cut_cell_threshold);}
     u_boundary.Resize(boundary_object.particles.array_collection->Size());
     psi_D_mesh=&boundary_object.mesh;
@@ -121,11 +121,11 @@ Solve(const ARRAY<int>& matrix_indices,SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>
 {
     if(u.m != particles.array_collection->Size()) PHYSBAM_FATAL_ERROR();
     Find_Tolerance(b);
-    VECTOR_ND<T> x(b.n),q,s,r,k,z;for(int p=1;p<=diagonal.m;p++)if(matrix_indices(p)) x(matrix_indices(p))=u(p);
+    VECTOR_ND<T> x(b.n),q,s,r,k,z;for(int p=0;p<diagonal.m;p++)if(matrix_indices(p)) x(matrix_indices(p))=u(p);
     pcg.Enforce_Compatibility(b.n==diagonal.m);
     if(pcg.show_results) LOG::cout<<"solving "<<b.n<<" nodes to tolerance "<<tolerance<<std::endl;
     pcg.Solve(A,x,b,q,s,r,k,z,tolerance,recompute_preconditioner);
-    for(int p=1;p<=diagonal.m;p++)if(matrix_indices(p)) u(p)=x(matrix_indices(p));
+    for(int p=0;p<diagonal.m;p++)if(matrix_indices(p)) u(p)=x(matrix_indices(p));
 }
 //#####################################################################
 // Function Find_Row_Lengths
@@ -135,7 +135,7 @@ Find_Row_Lengths(ARRAY<int>& row_lengths,const ARRAY<int>& matrix_indices)
 {
     row_lengths+=1;
     SEGMENT_MESH& segment_mesh=*object.mesh.segment_mesh;
-    for(int s=1;s<=segment_mesh.elements.m;s++){
+    for(int s=0;s<segment_mesh.elements.m;s++){
         VECTOR<int,2> nodes(particles.subset_index_from_point_cloud_index.Subset(segment_mesh.elements(s)));
         int mi=matrix_indices(nodes[1]),mj=matrix_indices(nodes[2]);
         if(mi && mj && !(psi_D_edges.m && psi_D_edges(s)(1).simplex)){row_lengths(mi)++;row_lengths(mj)++;}}
@@ -147,9 +147,9 @@ template<class TV,int d> void LAPLACE_SIMPLICIAL_NODE<TV,d>::
 Find_A(SPARSE_MATRIX_FLAT_NXN<T>& A,const ARRAY<int>& matrix_indices)
 {
     SEGMENT_MESH& segment_mesh=*object.mesh.segment_mesh;
-    for(int p=1;p<=diagonal.m;p++){int m=matrix_indices(p);
+    for(int p=0;p<diagonal.m;p++){int m=matrix_indices(p);
         if(m) A.Set_Element(m,m,diagonal(p));}
-    for(int s=1;s<=segment_mesh.elements.m;s++){
+    for(int s=0;s<segment_mesh.elements.m;s++){
         VECTOR<int,2> nodes(particles.subset_index_from_point_cloud_index.Subset(segment_mesh.elements(s)));
         int mi=matrix_indices(nodes[1]),mj=matrix_indices(nodes[2]);
         if(psi_D_edges.m && psi_D_edges(s)(1).simplex){
@@ -168,7 +168,7 @@ Find_b(VECTOR_ND<T>& b,const ARRAY<int>& matrix_indices)
     if(u.m != particles.array_collection->Size()) PHYSBAM_FATAL_ERROR();
     if(psi_D_mesh && u_boundary.Size() != psi_D_mesh->number_nodes) PHYSBAM_FATAL_ERROR();
     SEGMENT_MESH& segment_mesh=*object.mesh.segment_mesh;
-    for(int s=1;s<=offdiagonal.m;s++){
+    for(int s=0;s<offdiagonal.m;s++){
         VECTOR<int,2> nodes(particles.subset_index_from_point_cloud_index.Subset(segment_mesh.elements(s)));
         int mi=matrix_indices(nodes[1]),mj=matrix_indices(nodes[2]);
         if(psi_D_edges.m && psi_D_edges(s)(1).simplex){
@@ -192,7 +192,7 @@ Find_Matrix_Indices(ARRAY<int>& matrix_indices)
 {
     int count=0;
     matrix_indices.Resize(diagonal.m);
-    for(int p=1;p<=diagonal.m;p++)if(diagonal(p) && !psi_D(p)) matrix_indices(p)=++count;
+    for(int p=0;p<diagonal.m;p++)if(diagonal(p) && !psi_D(p)) matrix_indices(p)=++count;
     return count;
 }
 //#####################################################################

@@ -55,7 +55,7 @@ public:
 //#####################################################################
 void Initialize_Phi()
 {
-    for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++) for(int ij=1;ij<=grid.mn;ij++) {
+    for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++) for(int ij=0;ij<grid.mn;ij++) {
         if (j<(int)(grid.n*3.5/5)) phi(i,j,ij)=-grid.dx; else phi(i,j,ij)=grid.dx;
         if(cylinder.Inside(VECTOR<T,3>(grid.x(i),grid.y(j),grid.z(ij)))) phi(i,j,ij)=-grid.dx;}
 }
@@ -70,7 +70,7 @@ void Adjust_Phi_And_Get_Velocities_For_Objects(const T dt,const T time,const ARR
     cylinder.Set_Transform(MATRIX<T,4>::Identity_Matrix());
     cylinder.Update_Transform(MATRIX<T,4>::Translation_Matrix(VECTOR<T,3>(xmin+cylinder.cylinder.radius+velocity*time,(ymin+ymax)/2,(zmin+zmax)/2)));
     T epsilon=(T)1e-4*max(grid.dx,grid.dy,grid.dz);
-    for(int i=1;i<=m;i++) for(int j=1;j<=n;j++) for(int ij=1;ij<=mn;ij++){
+    for(int i=0;i<m;i++) for(int j=0;j<n;j++) for(int ij=0;ij<mn;ij++){
         VECTOR<T,3> location(grid.x(i),grid.y(j),grid.z(ij));
         if(cylinder.Inside(location)){
             phi(i,j,ij)=-grid.dx;
@@ -87,7 +87,7 @@ void Adjust_Phi_And_Get_Velocities_For_Objects(const T dt,const T time,const ARR
 // doesn't take into account the object velocity !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 void Adjust_Particle_Velocity_For_Objects(const GRID<TV>& grid,HEAVY_PARTICLES<T,VECTOR<T,3> >& particles,const T dt,const T time)
 {
-    for(int k=1;k<=particles.array_size;k++) if(particles.active(k)){
+    for(int k=0;k<particles.array_size;k++) if(particles.active(k)){
         VECTOR<T,3> X=particles.X(k),V=particles.V(k),Xnew(X+dt*V);
         if(cylinder.Inside(Xnew)){
             VECTOR<T,3> N=cylinder.Normal(X);V-=VECTOR<T,3>::Dot_Product(V,N)*N;
@@ -99,7 +99,7 @@ void Adjust_Particle_Velocity_For_Objects(const GRID<TV>& grid,HEAVY_PARTICLES<T
 //#####################################################################
 void Delete_Particles_Inside_Objects(const GRID<TV>& grid,HEAVY_PARTICLES<T,VECTOR<T,3> >& particles,const T time)
 {
-    for(int k=1;k<=particles.array_size;k++) if(particles.active(k)) 
+    for(int k=0;k<particles.array_size;k++) if(particles.active(k)) 
         if(cylinder.Inside(particles.X(k))) particles.Delete_Particle(k);
 }
 //#####################################################################

@@ -82,7 +82,7 @@ Transform(const ARRAY<T,VECTOR<int,2> >& u,ARRAY<COMPLEX<T> ,VECTOR<int,2> >& u_
 {
     ARRAY<int> dim(grid.counts);
     data.Resize(2*grid.counts.x*grid.counts.y,false,false);
-    for(int i=1,k=0;i<=grid.counts.x;i++) for(int j=1;j<=grid.counts.y;j++){data(++k)=(float)u(i,j);data(++k)=0;}
+    for(int i=1,k=0;i<=grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++){data(++k)=(float)u(i,j);data(++k)=0;}
     NR_fourn(-1,dim,data);
     for(int i=0,k=0;i<=grid.counts.x-1;i++) {for(int j=0;j<=grid.counts.y/2;j++){u_hat(i,j).re=data(++k);u_hat(i,j).im=data(++k);} k+=grid.counts.y-2;}
 }
@@ -99,8 +99,8 @@ Inverse_Transform(ARRAY<COMPLEX<T> ,VECTOR<int,2> >& u_hat,ARRAY<T,VECTOR<int,2>
         for(int j=0;j<=grid.counts.y/2;j++){data(++k)=(float)u_hat(i,j).re;data(++k)=(float)u_hat(i,j).im;}
         for(int j=grid.counts.y/2+1;j<=grid.counts.y-1;j++){data(++k)=(float)u_hat(negi,grid.counts.y-j).re;data(++k)=-(float)u_hat(negi,grid.counts.y-j).im;}}
     NR_fourn(+1,dim,data);
-    if(normalize){T coefficient=T(1)/(grid.counts.x*grid.counts.y);for(int k=0,i=1;i<=grid.counts.x;i++)for(int j=1;j<=grid.counts.y;j++){u(i,j)=coefficient*(T)data(++k);++k;}}
-    else for(int k=0,i=1;i<=grid.counts.x;i++)for(int j=1;j<=grid.counts.y;j++){u(i,j)=(T)data(++k);++k;}
+    if(normalize){T coefficient=T(1)/(grid.counts.x*grid.counts.y);for(int k=0,i=1;i<=grid.counts.x;i++)for(int j=0;j<grid.counts.y;j++){u(i,j)=coefficient*(T)data(++k);++k;}}
+    else for(int k=0,i=1;i<=grid.counts.x;i++)for(int j=0;j<grid.counts.y;j++){u(i,j)=(T)data(++k);++k;}
 }
 //#####################################################################
 #endif // ********************************************************************************************************************************************************************************************************

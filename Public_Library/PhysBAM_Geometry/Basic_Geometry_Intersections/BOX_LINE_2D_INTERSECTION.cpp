@@ -30,7 +30,7 @@ template<class T> T Halfspace_Intersection_Size(const RANGE<VECTOR<T,2> >& box,c
     // Normalize input and remember how.  After normalization: box is a unit box, normal.z>=normal.y>=normal.x>=0.  Normalize to cube center outside or on the boundary.
     bool flip[2]={false},exchange_xy=false,compliment=false;
     T y0=VECTOR<T,2>::Dot_Product(halfspace.x1-box.min_corner,halfspace.normal);VECTOR<T,2> scaling=box.Edge_Lengths(),normal=halfspace.normal*scaling;
-    for(int i=1;i<=2;i++) if(normal(i)<0){normal(i)=-normal(i);y0+=normal(i);flip[i-1]=true;}
+    for(int i=0;i<2;i++) if(normal(i)<0){normal(i)=-normal(i);y0+=normal(i);flip[i-1]=true;}
     if(normal.y<normal.x){exchange(normal.y,normal.x);exchange_xy=true;}
     y0/=normal.y;normal/=normal.y;T nx=normal.x,volume=0;if(2*y0-nx>1){y0=1-y0+nx;compliment=true;}
     // At this point, there are three case.  Compute them analytically.  Same approach as 3D, but much simpler.
@@ -39,7 +39,7 @@ template<class T> T Halfspace_Intersection_Size(const RANGE<VECTOR<T,2> >& box,c
     else{volume=y0-(T).5*nx;if(centroid) *centroid=VECTOR<T,2>(y0-(T)two_thirds*nx,sqr(volume)+sqr(nx)/12)/(volume*2);}
     // Undo the normalizations to convert normalized centroid and volume into world space.
     if(compliment){volume=1-volume;if(centroid) *centroid=-((volume-1)**centroid+(T).5)/volume+1;}
-    if(centroid){if(exchange_xy) exchange(centroid->y,centroid->x);for(int i=1;i<=2;i++) if(flip[i-1]) (*centroid)(i)=1-(*centroid)(i);*centroid=*centroid*scaling+box.min_corner;}
+    if(centroid){if(exchange_xy) exchange(centroid->y,centroid->x);for(int i=0;i<2;i++) if(flip[i-1]) (*centroid)(i)=1-(*centroid)(i);*centroid=*centroid*scaling+box.min_corner;}
     return volume*box.Size();
 }
 //#####################################################################

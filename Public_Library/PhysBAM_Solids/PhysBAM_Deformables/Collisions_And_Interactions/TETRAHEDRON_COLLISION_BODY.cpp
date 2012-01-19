@@ -95,7 +95,7 @@ Implicit_Geometry_Lazy_Outside_Extended_Levelset_And_Value(const TV& location,T&
     else{ // outside for certain
         ARRAY<int> intersection_list;triangulated_surface.hierarchy->Intersection_List(location,intersection_list,collision_thickness);
         T closest_distance=FLT_MAX;
-        for(int t=1;t<=intersection_list.m;t++){
+        for(int t=0;t<intersection_list.m;t++){
             int i,j,k,tri=intersection_list(t);triangle_mesh.elements(tri).Get(i,j,k);
             T distance=TRIANGLE_3D<T>(particles.X(i),particles.X(j),particles.X(k)).Distance_To_Triangle(location);if(distance<closest_distance) closest_distance=distance;}
         phi_value=closest_distance;return true;}
@@ -121,7 +121,7 @@ Implicit_Geometry_Normal(const TV& location,const int aggregate) const
     else{ // outside for certain
         ARRAY<int> intersection_list;triangulated_surface.hierarchy->Intersection_List(location,intersection_list,collision_thickness);
         T closest_distance_squared=FLT_MAX;TV closest_normal;int closest_triangle=0;TV closest_tri_weights;
-        for(int t=1;t<=intersection_list.m;t++){
+        for(int t=0;t<intersection_list.m;t++){
             int i,j,k,tri=intersection_list(t);triangle_mesh.elements(tri).Get(i,j,k);
             TV tri_weights,closest_point=TRIANGLE_3D<T>(particles.X(i),particles.X(j),particles.X(k)).Closest_Point(location,tri_weights),normal=location-closest_point;
             T distance_squared=normal.Magnitude_Squared();
@@ -152,7 +152,7 @@ Implicit_Geometry_Normal(const TV& location,T& phi_value,const int aggregate,con
     else{ // outside for certain
         ARRAY<int> intersection_list;triangulated_surface.hierarchy->Intersection_List(location,intersection_list,collision_thickness);
         T closest_distance_squared=FLT_MAX;TV closest_normal;int closest_triangle=0;TV closest_tri_weights;
-        for(int t=1;t<=intersection_list.m;t++){
+        for(int t=0;t<intersection_list.m;t++){
             int i,j,k,tri=intersection_list(t);triangle_mesh.elements(tri).Get(i,j,k);
             TRIANGLE_3D<T> triangle(particles.X(i),particles.X(j),particles.X(k));
             TV tri_weights,closest_point=triangle.Closest_Point(location,tri_weights),normal=location-closest_point;
@@ -182,9 +182,9 @@ Get_Tetrahedron_Near_Point(const TV& point,TV& weights,const ARRAY<int>& particl
     TETRAHEDRON_MESH& tetrahedron_mesh=tetrahedralized_volume.mesh;
     ARRAY<int> intersection_list;tetrahedralized_volume.hierarchy->Intersection_List(point,intersection_list);
     T max_min_weight=-(T)FLT_MAX;int closest=0;
-    for(int p=1;p<=intersection_list.m;p++){
+    for(int p=0;p<intersection_list.m;p++){
         int t=intersection_list(p);VECTOR<int,4> nodes=tetrahedron_mesh.elements(t);int i,j,k,l;nodes.Get(i,j,k,l);
-        for(int q=1;q<=particles_to_ignore.m;q++) if(nodes.Contains(particles_to_ignore(q))) goto CONTINUE;
+        for(int q=0;q<particles_to_ignore.m;q++) if(nodes.Contains(particles_to_ignore(q))) goto CONTINUE;
         {TV w=TETRAHEDRON<T>::First_Three_Barycentric_Coordinates(point,particles.X(i),particles.X(j),particles.X(k),particles.X(l));T min_weight=min(w.x,w.y,w.z,1-w.x-w.y-w.z);
         if(min_weight>max_min_weight){
             weights=w;if(min_weight>0 && TETRAHEDRON<T>(particles.X(i),particles.X(j),particles.X(k),particles.X(l)).Signed_Volume()>min_tet_volume_tolerance) return t;
@@ -208,7 +208,7 @@ Get_Surface_Triangle(const int tetrahedron_index,const TV& tetrahedron_weights,T
     for(T thickness=collision_thickness;!nearby_surface_triangles.m;thickness*=(T)2)
         undeformed_triangulated_surface.hierarchy->Intersection_List(surface_location,nearby_surface_triangles,thickness);
     int closest_triangle=0;T closest_distance_squared=(T)FLT_MAX;TV closest_projected_point;
-    for(int t=1;t<=nearby_surface_triangles.m;t++){
+    for(int t=0;t<nearby_surface_triangles.m;t++){
         TRIANGLE_3D<T>& surface_triangle=(*undeformed_triangulated_surface.triangle_list)(nearby_surface_triangles(t));
         TV weights,projected_point=surface_triangle.Closest_Point(surface_location,weights);
         T distance_squared=(surface_location-projected_point).Magnitude_Squared();
@@ -259,12 +259,12 @@ Adjust_Nodes_For_Collisions(ARRAY_VIEW<const TV> X_old,PARTICLES<TV>& collision_
     int interactions=0;ARRAY_VIEW<TV> X(collision_particles.X),V(collision_particles.V);
     tetrahedralized_volume.hierarchy->Update_Boxes(collision_thickness);
     ARRAY<VECTOR<int,2> > interaction_pair;ARRAY<TV> weights,position_change;
-    for(int pp=1;pp<=nodes_to_check.m;pp++){int p=nodes_to_check(pp);
+    for(int pp=0;pp<nodes_to_check.m;pp++){int p=nodes_to_check(pp);
         ARRAY<int> particles_to_ignore;
         particles_to_ignore.Append(p);particles_to_ignore.Append_Elements(soft_bindings.Parents(p));
         TV w;int t=Get_Tetrahedron_Near_Point(X(p),w,particles_to_ignore);
         if(t){interaction_pair.Append(VECTOR<int,2>(p,t));weights.Append(w);}}
-    for(int k=1;k<=interaction_pair.m;k++){
+    for(int k=0;k<interaction_pair.m;k++){
         int p,t;interaction_pair(k).Get(p,t);
         TV surface_weights;int surface_triangle=Get_Surface_Triangle(t,weights(k),surface_weights,true);
         if(surface_triangle){
@@ -274,7 +274,7 @@ Adjust_Nodes_For_Collisions(ARRAY_VIEW<const TV> X_old,PARTICLES<TV>& collision_
             position_change.Append(change);}
         else interaction_pair(k)(2)=0;}
     int count=0;
-    for(int pair=1;pair<=interaction_pair.m;pair++){
+    for(int pair=0;pair<interaction_pair.m;pair++){
         int p,t;interaction_pair(pair).Get(p,t);
         if(t) X(p)+=relaxation_factor*position_change(++count);}
     if(interactions) soft_bindings.Adjust_Parents_For_Changes_In_Surface_Children(particle_on_surface);

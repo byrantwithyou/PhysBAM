@@ -23,9 +23,9 @@ Update_Vertex_Normals(TRIANGULATED_SURFACE<T>& ts)
         delete ts.vertex_normals;ts.vertex_normals=0;
         if(!ts.face_vertex_normals) ts.face_vertex_normals=new ARRAY<VECTOR<TV,3> >(ts.mesh.elements.m);else ts.face_vertex_normals->Resize(ts.mesh.elements.m);
         TV face_normal,normal,zero_vector(0,0,0);
-        for(int t=1;t<=ts.mesh.elements.m;t++){
+        for(int t=0;t<ts.mesh.elements.m;t++){
             face_normal=ts.Face_Normal(t);
-            for(int i=1;i<=3;i++){
+            for(int i=0;i<3;i++){
                 normal=zero_vector;int node=ts.mesh.elements(t)(i); 
                 for(int k=1;k<=(*ts.mesh.incident_elements)(node).m;k++){
                     TRIANGLE_3D<T>& triangle=(*ts.triangle_list)((*ts.mesh.incident_elements)(node)(k));

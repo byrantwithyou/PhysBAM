@@ -120,7 +120,7 @@ operator*(const MATRIX_MXN<T>& A) const
 {
     assert(3==A.m);
     MATRIX_MXN<T> matrix(3,A.n);
-    for(int j=1;j<=A.n;j++) for(int i=1;i<=3;i++) for(int k=1;k<=3;k++) matrix(i,j)+=(*this)(i,k)*A(k,j);
+    for(int j=0;j<A.n;j++) for(int i=0;i<3;i++) for(int k=0;k<3;k++) matrix(i,j)+=(*this)(i,k)*A(k,j);
     return matrix;
 }
 //#####################################################################

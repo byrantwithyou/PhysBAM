@@ -522,9 +522,9 @@ Trapezoid_Intersection_Area(TV a,TV b,TV c,TV d,VECTOR<TV,4>& G,VECTOR<VECTOR<MA
 
     if(b.x<d.x) A=sign*Trapezoid_Intersection_Area_Case_1(a,b,c,d,tG,tH); // a c b d
     else A=sign*Trapezoid_Intersection_Area_Case_2(a,b,c,d,tG,tH); // a c d b
-    for(int i=1;i<=4;i++){
+    for(int i=0;i<4;i++){
         G(indices(i))=sign*tG(i);
-        for(int j=1;j<=4;j++) H(indices(i))(indices(j))=sign*tH(i)(j);}
+        for(int j=0;j<4;j++) H(indices(i))(indices(j))=sign*tH(i)(j);}
 
     return A;
 }

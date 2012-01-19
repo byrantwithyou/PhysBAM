@@ -19,11 +19,11 @@ namespace{
 template<class T> static void 
 Update_Max_Off_Diagonal_Element_Of_Row_After_Row_Change(const MATRIX_MXN<T>& A,ARRAY<PAIR<int,T> >& max_off_diagonal_element_of_row,const int i)
 {max_off_diagonal_element_of_row(i)=PAIR<int,T>();
-for(int j=1;j<=A.n;j++) if(i!=j) 
+for(int j=0;j<A.n;j++) if(i!=j) 
     if(abs(A(i,j))>max_off_diagonal_element_of_row(i).y){max_off_diagonal_element_of_row(i).y=abs(A(i,j));max_off_diagonal_element_of_row(i).x=j;}}
 template<class T> static void 
 Update_Max_Off_Diagonal_Element_Of_Row_After_Column_Change(const MATRIX_MXN<T>& A,ARRAY<PAIR<int,T> >& max_off_diagonal_element_of_row,const int j)
-{for(int i=1;i<=A.m;i++) if(i!=j){
+{for(int i=0;i<A.m;i++) if(i!=j){
     if(abs(A(i,j))>max_off_diagonal_element_of_row(i).y){max_off_diagonal_element_of_row(i).y=abs(A(i,j));max_off_diagonal_element_of_row(i).x=j;}
     else if(max_off_diagonal_element_of_row(i).x==j) Update_Max_Off_Diagonal_Element_Of_Row_After_Row_Change(A,max_off_diagonal_element_of_row,i);}}
 }

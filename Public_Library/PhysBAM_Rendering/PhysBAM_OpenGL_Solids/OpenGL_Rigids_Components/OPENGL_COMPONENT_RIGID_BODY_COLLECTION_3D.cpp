@@ -172,7 +172,7 @@ Reinitialize_Without_Files(const bool force)
         BASE::Resize_Structures(max_number_of_bodies);
 
         // Initialize bodies which have become active
-        for(int i=1;i<=needs_init.m;i++){
+        for(int i=0;i<needs_init.m;i++){
             int id=needs_init(i);PHYSBAM_ASSERT(rigid_body_collection.Is_Active(id));
             Create_Geometry(id);}
         
@@ -261,7 +261,7 @@ Display(const int in_color) const
         if(draw_articulation_points){
             OPENGL_COLOR articulation_point_color(0.8,0.8,0.2),segment_color(0,0,1),com_color(1,0,0);
             if(mode==GL_SELECT){glPushName(4);glPushAttrib(GL_POINT_BIT);glPointSize(OPENGL_PREFERENCES::selection_point_size);}
-            for(int i=1;i<=articulation_points.m;i++){
+            for(int i=0;i<articulation_points.m;i++){
                 glPushName(i);
                 OPENGL_SHAPES::Draw_Dot(articulation_points(i),articulation_point_color,5);
                 glPopName();}
@@ -276,7 +276,7 @@ Display(const int in_color) const
 
     RANGE<VECTOR<T,3> > axes_box(0,2,0,2,0,2);
     //RANGE<VECTOR<T,3> > axes_box(0,velocity_field.size,0,velocity_field.size,0,velocity_field.size);
-    if(draw_joint_frames==1) for(int i=1;i<=joint_frames.m;i++)(OPENGL_AXES<T>(joint_frames(i),axes_box)).Display();
+    if(draw_joint_frames==1) for(int i=0;i<joint_frames.m;i++)(OPENGL_AXES<T>(joint_frames(i),axes_box)).Display();
     else if(draw_joint_frames==2) for(int i=2;i<=joint_frames.m;i+=2)(OPENGL_AXES<T>(joint_frames(i),axes_box)).Display();
     else if(draw_joint_frames==3) for(int i=1;i<=joint_frames.m;i+=2)(OPENGL_AXES<T>(joint_frames(i),axes_box)).Display();
 

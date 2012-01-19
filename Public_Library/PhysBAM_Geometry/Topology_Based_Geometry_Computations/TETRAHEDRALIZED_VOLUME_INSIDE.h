@@ -17,7 +17,7 @@ bool Inside_Any_Simplex(const TETRAHEDRALIZED_VOLUME<T>& tv,const VECTOR<T,3>& l
 {
     assert(tv.hierarchy);assert(tv.tetrahedron_list);
     ARRAY<int> nearby_tetrahedrons;tv.hierarchy->Intersection_List(location,nearby_tetrahedrons,thickness_over_two);
-    for(int k=1;k<=nearby_tetrahedrons.m;k++){
+    for(int k=0;k<nearby_tetrahedrons.m;k++){
         TETRAHEDRON<T>& tetrahedron=(*tv.tetrahedron_list)(nearby_tetrahedrons(k));
         if(tetrahedron.Inside(location,thickness_over_two)){tetrahedron_id=nearby_tetrahedrons(k);return true;}}
     return false;

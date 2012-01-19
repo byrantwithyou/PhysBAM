@@ -29,14 +29,14 @@ Register_Neighbors_As_Collision_Faces()
     HASHTABLE<FACE_INDEX<TV::m>,int> new_faces;
     VECTOR<FACE_INDEX<TV::m>,TV::m*2> faces;
     VECTOR<ARRAY<PAIR<COLLISION_GEOMETRY_ID,int> >,TV::m> simplices,merged;
-    for(int i=1;i<=collision_face_info.m;i++) old_faces.Set(FACE_INDEX<TV::m>(collision_face_info(i).axis,collision_face_info(i).index),i);
+    for(int i=0;i<collision_face_info.m;i++) old_faces.Set(FACE_INDEX<TV::m>(collision_face_info(i).axis,collision_face_info(i).index),i);
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
         if((*outside_fluid)(it.index)) continue;
         grid.Neighboring_Faces(faces,it.index);
         for(int i=1;i<=TV::m;i++){simplices(i).Remove_All();merged(i).Remove_All();}
-        for(int i=1;i<=faces.m;i++) if(int* a=old_faces.Get_Pointer(faces(i))) simplices((i+1)/2).Append_Unique_Elements(collision_face_info(*a).simplices);
+        for(int i=0;i<faces.m;i++) if(int* a=old_faces.Get_Pointer(faces(i))) simplices((i+1)/2).Append_Unique_Elements(collision_face_info(*a).simplices);
         for(int i=1;i<=TV::m;i++) if(simplices(i).m) for(int j=1;j<=TV::m;j++) if(j!=i) merged(j).Append_Unique_Elements(simplices(i));
-        for(int i=1;i<=faces.m;i++) if(merged((i+1)/2).m && !old_faces.Contains(faces(i))){
+        for(int i=0;i<faces.m;i++) if(merged((i+1)/2).m && !old_faces.Contains(faces(i))){
             if(int* a=new_faces.Get_Pointer(faces(i))) collision_face_info(*a).simplices.Append_Unique_Elements(merged((i+1)/2));
             else{
                 cfi.axis=faces(i).axis;

@@ -41,7 +41,7 @@ public:
     void Set_Flame_Speed_Constants(const ARRAY<T>& densities_input,const ARRAY<T,VECTOR<int,2> >& normal_flame_speeds,const ARRAY<T,VECTOR<int,2> >& curvature_flame_speeds)
     {flame_speed_constants.Resize(1,densities_input.m,1,densities_input.m,false,false);flame_speed_constants.Fill(0);
     densities=densities_input;
-    for(int i=1;i<=densities_input.m;i++)for(int j=1;j<=densities_input.m;j++)if(i!=j&&(normal_flame_speeds(i,j)!=0||curvature_flame_speeds(i,j)!=0)){
+    for(int i=0;i<densities_input.m;i++)for(int j=0;j<densities_input.m;j++)if(i!=j&&(normal_flame_speeds(i,j)!=0||curvature_flame_speeds(i,j)!=0)){
         flame_speed_constants(i,j).x=normal_flame_speeds(i,j);assert((normal_flame_speeds(i,j)-normal_flame_speeds(j,i))<(T)1e-6); // must be symmetric
         flame_speed_constants(i,j).y=curvature_flame_speeds(i,j);assert((curvature_flame_speeds(i,j)+curvature_flame_speeds(j,i))<(T)1e-6); // must be skew symmetric
         if(densities(i)>densities(j)) flame_speed_constants(i,j).z=-densities(i)*(1/densities(i)-1/densities(j)); // make sure that the higher density is the reaction source

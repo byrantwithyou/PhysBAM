@@ -219,7 +219,7 @@ Advance_To_Target_Time(const T target_time)
         // kinematic_update
         kinematic_evolution.Set_External_Positions(example.rigid_geometry_collection.particles.X,example.rigid_geometry_collection.particles.rotation,time);
         kinematic_evolution.Set_External_Velocities(example.rigid_geometry_collection.particles.twist,time,time);
-        for(int i=1;i<=example.rigid_geometry_collection.kinematic_rigid_geometry.m;i++){
+        for(int i=0;i<example.rigid_geometry_collection.kinematic_rigid_geometry.m;i++){
             RIGID_GEOMETRY<TV>& rigid_geometry=example.rigid_geometry_collection.Rigid_Geometry(i);            
             rigid_geometry.X()+=dt*rigid_geometry.Twist().linear;
             rigid_geometry.Rotation()=ROTATION<TV>::From_Rotation_Vector(dt*rigid_geometry.Twist().angular)*rigid_geometry.Rotation();rigid_geometry.Rotation().Normalize();}
@@ -232,7 +232,7 @@ Advance_To_Target_Time(const T target_time)
             rungekutta_u.Set_Order(example.order);rungekutta_u.Set_Time(time);rungekutta_u.Start(dt);
             rungekutta_scalar.Set_Grid_And_Boundary_Condition(example.mac_grid,*example.boundary);
             rungekutta_scalar.Set_Order(example.order);rungekutta_scalar.Set_Time(time);rungekutta_scalar.Start(dt);T rk_time=time;
-            for(int rk_substep=1;rk_substep<=rungekutta_u.order;rk_substep++){
+            for(int rk_substep=0;rk_substep<rungekutta_u.order;rk_substep++){
                 Scalar_Advance(dt,rk_time);
                 // velocity update
                 if(!example.analytic_test){

@@ -40,7 +40,7 @@ Initialize_Hierarchy_Using_KD_Tree()
 {
     KD_TREE<TV> kd_tree(false);
     ARRAY<TV> centroids(tetrahedron_mesh.elements.m);
-    for(int t=1;t<=tetrahedron_mesh.elements.m;t++){
+    for(int t=0;t<tetrahedron_mesh.elements.m;t++){
         int i,j,k,l;tetrahedron_mesh.elements(t).Get(i,j,k,l);centroids(t)=TETRAHEDRON<T>::Center(particles.X(i),particles.X(j),particles.X(k),particles.X(l));}
     kd_tree.Create_Left_Balanced_KD_Tree(centroids);
     leaves=tetrahedron_mesh.elements.m;parents.Resize(leaves);children.Remove_All();

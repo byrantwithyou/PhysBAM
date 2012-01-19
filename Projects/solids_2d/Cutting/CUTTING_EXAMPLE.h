@@ -64,7 +64,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     ARRAY<ARRAY<int> > embedding_map;
     FILE_UTILITIES::Read_From_File<RW>("../cutting_better_2d/Output_Dup/embedding_map",embedding_map);
-    for(int p=1;p<=embedding_map.m;p++){
+    for(int p=0;p<embedding_map.m;p++){
         ARRAY<int>& parents=embedding_map(p);
         if(parents.m==2){
             VECTOR<T,2> weights=SEGMENT_2D<T>::Barycentric_Coordinates(particles.X(p),particles.X(parents(1)),particles.X(parents(2)));
@@ -82,7 +82,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     solids_parameters.collision_body_list.Add_Bodies(solids_parameters.rigid_body_parameters.list);
 
     // correct number nodes
-    for(int i=1;i<=deformable_object.structures.m;i++) deformable_object.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_object.structures.m;i++) deformable_object.structures(i)->Update_Number_Nodes();
 
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents(particles.mass.array);
@@ -102,14 +102,14 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 //#####################################################################
 void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE
 {
-    for(int i=1;i<=attached_nodes.m;i++) V(attached_nodes(i))=TV();
+    for(int i=0;i<attached_nodes.m;i++) V(attached_nodes(i))=TV();
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes
 //#####################################################################
 void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE
 {
-    for(int i=1;i<=attached_nodes.m;i++) V(attached_nodes(i))=TV();
+    for(int i=0;i<attached_nodes.m;i++) V(attached_nodes(i))=TV();
 }
 //#####################################################################
 };

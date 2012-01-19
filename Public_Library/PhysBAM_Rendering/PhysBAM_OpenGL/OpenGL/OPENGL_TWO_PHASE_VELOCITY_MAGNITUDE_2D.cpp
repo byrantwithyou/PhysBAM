@@ -46,7 +46,7 @@ Update()
 
     int minus_count=0,plus_count=0;
 
-    for(int i=1;i<=grid.counts.x;i++)for(int j=1;j<=grid.counts.y;j++) if(levelset.phi(i,j)<=0)minus_count++;else plus_count++;
+    for(int i=0;i<grid.counts.x;i++)for(int j=0;j<grid.counts.y;j++) if(levelset.phi(i,j)<=0)minus_count++;else plus_count++;
 
     int minus_index=1,plus_index=1;
     minus.vector_field.Resize(minus_count);minus.vector_locations.Resize(minus_count);

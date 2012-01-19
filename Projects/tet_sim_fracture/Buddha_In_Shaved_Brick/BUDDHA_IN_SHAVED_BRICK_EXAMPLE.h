@@ -108,7 +108,7 @@ virtual void Initialize_Embedded_Tetrahedralized_Volume(EMBEDDED_TETRAHEDRALIZED
     embedded_tetrahedralized_volume.tetrahedralized_volume.tetrahedron_mesh.Initialize_Incident_Tetrahedrons();
     embedded_tetrahedralized_volume.tetrahedralized_volume.Update_Bounding_Box();
     VECTOR_3D<T> center(embedded_tetrahedralized_volume.tetrahedralized_volume.bounding_box->Center());T bottom=embedded_tetrahedralized_volume.tetrahedralized_volume.bounding_box->ymin;
-    for(int i=1;i<=embedded_tetrahedralized_volume.tetrahedralized_volume.particles.array_size;i++){
+    for(int i=0;i<embedded_tetrahedralized_volume.tetrahedralized_volume.particles.array_size;i++){
         embedded_tetrahedralized_volume.tetrahedralized_volume.particles.V(i)=initial_velocity+VECTOR_3D<T>::Cross_Product(initial_angular_velocity,embedded_tetrahedralized_volume.tetrahedralized_volume.particles.X(i)-center);
         embedded_tetrahedralized_volume.tetrahedralized_volume.particles.X(i)=center+initial_orientation.Rotate(embedded_tetrahedralized_volume.tetrahedralized_volume.particles.X(i)-center);
         embedded_tetrahedralized_volume.tetrahedralized_volume.particles.X(i).y+=initial_height-bottom;}
@@ -178,7 +178,7 @@ virtual bool Add_Scripted_Cuts(EMBEDDED_TETRAHEDRALIZED_VOLUME<T>& reference_emb
     T height=LINEAR_INTERPOLATION<T,T>::Linear(box.ymax,((T)1.-lambda)*box.ymax+lambda*box.ymin,2*time/(5. - initial_time));
 
     int number_fully_in_box=0;
-    for(int t=1;t<=ref_tet_vol.tetrahedron_mesh.tetrahedrons.m;t++){
+    for(int t=0;t<ref_tet_vol.tetrahedron_mesh.tetrahedrons.m;t++){
         int i,j,k,l;ref_tet_vol.tetrahedron_mesh.tetrahedrons.Get(t,i,j,k,l);
         VECTOR_3D<T> xi=ref_tet_vol.particles.X(i),xj=ref_tet_vol.particles.X(j),xk=ref_tet_vol.particles.X(k),xl=ref_tet_vol.particles.X(l);
         if(!ref_tet_vol.Completely_Inside_Box(t,box))continue;
@@ -274,14 +274,14 @@ virtual void Initialize_Reference_Fracture_Tetrahedralized_Volume(const EMBEDDED
 //#####################################################################
 virtual void Set_External_Velocities(ARRAY<VECTOR_3D<T> ,VECTOR<int,1> >& V,const T time)
 {
-    for(int i=1;i<=constrained_nodes.m;i++) V(constrained_nodes(i))=VECTOR_3D<T>(0,0,0);
+    for(int i=0;i<constrained_nodes.m;i++) V(constrained_nodes(i))=VECTOR_3D<T>(0,0,0);
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes
 //#####################################################################
 virtual void Zero_Out_Enslaved_Velocity_Nodes(ARRAY<VECTOR_3D<T> ,VECTOR<int,1> >& V,const T time)
 {
-    for(int i=1;i<=constrained_nodes.m;i++) V(constrained_nodes(i))=VECTOR_3D<T>(0,0,0);
+    for(int i=0;i<constrained_nodes.m;i++) V(constrained_nodes(i))=VECTOR_3D<T>(0,0,0);
 } 
 //#####################################################################
 // Function Initialize_Bias_Stress_Constants

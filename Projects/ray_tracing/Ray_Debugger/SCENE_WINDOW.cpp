@@ -38,7 +38,7 @@ draw()
     // Draw objects
     glEnable(GL_LIGHTING);
     glColor3f(0.7f,0.7f,0.7f);
-    if(world.standard_objects.m==object_triangles.m)for(int i=1;i<=world.standard_objects.m;i++)if(object_triangles(i)){
+    if(world.standard_objects.m==object_triangles.m)for(int i=0;i<world.standard_objects.m;i++)if(object_triangles(i)){
         MATRIX<float,4> matrix;for(int k=0;k<16;k++)matrix.x[k]=world.standard_objects(i)->transform.x[k];
         glPushMatrix();glMultMatrixf(matrix.x);
         if(world.standard_objects(i)==selected_object){glColor4f(1.0f,1.0f,0.7f,0.3f);glEnable(GL_BLEND);glDepthMask(GL_FALSE);}else glColor4f(0.7f,0.7f,0.7f,0.3f);
@@ -65,7 +65,7 @@ draw()
 template<class T> void SCENE_WINDOW<T>::Initialize_Objects()
 {
     object_triangles.Remove_All();
-    for(int i=1;i<=world.standard_objects.m;i++){RENDERING_OBJECT<T>* object=world.standard_objects(i);object_triangles.Append(object->Generate_Triangles());}
+    for(int i=0;i<world.standard_objects.m;i++){RENDERING_OBJECT<T>* object=world.standard_objects(i);object_triangles.Append(object->Generate_Triangles());}
     selected_object=0;
 }
 template<class T> void SCENE_WINDOW<T>::Draw_Irradiance_Cache()

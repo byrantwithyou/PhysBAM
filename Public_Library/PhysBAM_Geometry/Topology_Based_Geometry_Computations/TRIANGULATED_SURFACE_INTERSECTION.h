@@ -55,7 +55,7 @@ bool Segment_Triangle_Intersection(TRIANGULATED_SURFACE<T>& ts,const SEGMENT_MES
 {  
     bool intersection=false;
     ARRAY<ARRAY<int> > triangles_near_edges(test_segment_mesh.elements.m);ts.Get_Triangles_Near_Edges(triangles_near_edges,test_segment_mesh,X,thickness_over_2,update_bounding_boxes);
-    for(int e=1;e<=test_segment_mesh.elements.m;e++){
+    for(int e=0;e<test_segment_mesh.elements.m;e++){
         SEGMENT_3D<T> segment(X(test_segment_mesh.elements(e)(1)),X(test_segment_mesh.elements(e)(2)));
         for(int k=1;k<=triangles_near_edges(e).m;k++){int t=triangles_near_edges(e)(k);
             TRIANGLE_3D<T> triangle(X(ts.mesh.elements(t)(1)),X(ts.mesh.elements(t)(2)),X(ts.mesh.elements(t)(3)));
@@ -70,12 +70,12 @@ void Get_Triangles_Near_Edges(TRIANGULATED_SURFACE<T>& ts,ARRAY<ARRAY<int> >& tr
     bool hierarchy_defined=ts.hierarchy!=0;if(!hierarchy_defined) ts.Initialize_Hierarchy(false);
     if(!hierarchy_defined || update_bounding_boxes) ts.hierarchy->Update_Boxes(X);
 
-    for(int k=1;k<=test_segment_mesh.elements.m;k++){
+    for(int k=0;k<test_segment_mesh.elements.m;k++){
         int node1,node2;test_segment_mesh.elements(k).Get(node1,node2);
         RANGE<VECTOR<T,3> > box(X(node1));box.Enlarge_To_Include_Point(X(node2));
         ts.hierarchy->Intersection_List(box,triangles_near_edges(k),thickness_over_2);
         for(int kk=1;kk<=triangles_near_edges(k).m;kk++){int t=triangles_near_edges(k)(kk); // remove elements that contain a node of the edge being tested
-            for(int i=1;i<=3;i++) if(ts.mesh.elements(t)(i) == node1 || ts.mesh.elements(t)(i) == node2){triangles_near_edges(k).Remove_Index_Lazy(kk);kk--;break;}}}
+            for(int i=0;i<3;i++) if(ts.mesh.elements(t)(i) == node1 || ts.mesh.elements(t)(i) == node2){triangles_near_edges(k).Remove_Index_Lazy(kk);kk--;break;}}}
     
     if(!hierarchy_defined){delete ts.hierarchy;ts.hierarchy=0;}
 }

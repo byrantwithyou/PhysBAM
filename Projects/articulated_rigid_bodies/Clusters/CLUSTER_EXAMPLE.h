@@ -260,7 +260,7 @@ void Cubes_With_Constraints(int& num_joints,int& num_rigid_bodies,VECTOR<T,3> sh
 
     if(springs){
         // add particles and set up segmented curve
-        for(int i=1;i<=4;i++){
+        for(int i=0;i<4;i++){
             particles.array_collection->Add_Element();
             particles.mass(i)=1;}
 
@@ -369,9 +369,9 @@ void One_Large_Cube(int& num_joints,int& num_rigid_bodies,VECTOR<T,3> shift,cons
     ((RIGID_BODY_CLUSTER_3D<T>*)arb->rigid_bodies_list(cluster1))->perform_cluster_breaks=true;
     ((RIGID_BODY_CLUSTER_3D<T>*)arb->rigid_bodies_list(cluster1))->Initialize_Initial_Strain();
     ARRAY<ARRAY<T> > strain;strain.Resize(((RIGID_BODY_CLUSTER_3D<T>*)arb->rigid_bodies_list(cluster1))->constituent_bodies.m);
-//    for(int i=1;i<=strain.m;i++){strain(i).Resize(((RIGID_BODY_CLUSTER_3D<T>*)arb->rigid_bodies_list(cluster1))->constituent_bodies.m);strain(i).Fill((T)1.01);}
-    for(int i=1;i<=strain.m;i++){strain(i).Resize(((RIGID_BODY_CLUSTER_3D<T>*)arb->rigid_bodies_list(cluster1))->constituent_bodies.m);strain(i).Fill((T)0);}
-    for(int i=1;i<=4;i++) for(int j=1;j<=4;j++) strain(i)(j)=1.5;
+//    for(int i=0;i<strain.m;i++){strain(i).Resize(((RIGID_BODY_CLUSTER_3D<T>*)arb->rigid_bodies_list(cluster1))->constituent_bodies.m);strain(i).Fill((T)1.01);}
+    for(int i=0;i<strain.m;i++){strain(i).Resize(((RIGID_BODY_CLUSTER_3D<T>*)arb->rigid_bodies_list(cluster1))->constituent_bodies.m);strain(i).Fill((T)0);}
+    for(int i=0;i<4;i++) for(int j=0;j<4;j++) strain(i)(j)=1.5;
     ((RIGID_BODY_CLUSTER_3D<T>*)arb->rigid_bodies_list(cluster1))->Initialize_Allowable_Strain(&strain);
 }
 //#####################################################################

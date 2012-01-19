@@ -137,12 +137,12 @@ void Simple_Muscle_Across_Joint()
     if(parameter_list.Get_Parameter("use_frame_track",false)){
         int samples=1000;T period=2;
         frame_track=new FRAME_TRACK_3D<T>(samples,0,period);frame_track->periodic=true;
-        for(int i=1;i<=samples;i++){
+        for(int i=0;i<samples;i++){
             frame_track->trajectory(i)=FRAME_3D<T>(QUATERNION<T>(initial_angle+(target_angle-initial_angle)*0.5*(1-cos(2*pi*(i-1)/(samples-1))),VECTOR<T,3>(1,0,0)));}
         for(int i=1;i<=arb->joint_mesh.joints.m;i++) arb->joint_mesh.joints(i)->joint_function->track=frame_track;
     }
 
-    for(int i=1;i<=num_bodies;i++){
+    for(int i=0;i<num_bodies;i++){
         int id=solids_parameters.rigid_body_parameters.list.template Add_Rigid_Body<RW>(data_directory+"/Rigid_Bodies/plank",(T).2,true,false,false);
         RIGID_BODY<TV>* rigid_body=arb->rigid_body_list.rigid_bodies(id);
         rigid_body->triangulated_surface->Rescale(plank_rescale.x,plank_rescale.y,plank_rescale.z);
@@ -230,7 +230,7 @@ void Stand_Test()
     int num_bodies=parameter_list.Get_Parameter("num_bodies",(int)2);
     T k_p=parameter_list.Get_Parameter("k_p",(T)100);
 
-    for(int i=1;i<=num_bodies;i++){
+    for(int i=0;i<num_bodies;i++){
         int id=solids_parameters.rigid_body_parameters.list.template Add_Rigid_Body<RW>(data_directory+"/Rigid_Bodies/plank",(T).2,true,false,false);
         RIGID_BODY<TV>* rigid_body=arb->rigid_body_list.rigid_bodies(id);
         rigid_body->frame.r=QUATERNION<T>(pi/2,VECTOR<T,3>(0,1,0));

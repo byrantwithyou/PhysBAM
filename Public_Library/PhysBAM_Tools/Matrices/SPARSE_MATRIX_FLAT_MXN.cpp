@@ -177,7 +177,7 @@ Transpose_Times(const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
 Negate()
 {
-    for(int index=1;index<=A.m;index++) A(index).a=-A(index).a;
+    for(int index=0;index<A.m;index++) A(index).a=-A(index).a;
 }
 //#####################################################################
 // Function operator*=
@@ -185,7 +185,7 @@ Negate()
 template<class T> SPARSE_MATRIX_FLAT_MXN<T>& SPARSE_MATRIX_FLAT_MXN<T>::
 operator*=(const T a)
 {
-    for(int index=1;index<=A.m;index++) A(index).a*=a;
+    for(int index=0;index<A.m;index++) A(index).a*=a;
     return *this;
 }
 //#####################################################################
@@ -245,7 +245,7 @@ Compress(SPARSE_MATRIX_FLAT_MXN<T>& compressed)
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
 Transpose(SPARSE_MATRIX_FLAT_MXN<T>& A_transpose) const
 {
-    ARRAY<int> row_lengths(n);for(int index=1;index<=A.m;index++) row_lengths(A(index).j)++;
+    ARRAY<int> row_lengths(n);for(int index=0;index<A.m;index++) row_lengths(A(index).j)++;
     A_transpose.Set_Row_Lengths(row_lengths);A_transpose.n=m;
     for(int i=0;i<m;i++) for(int index=offsets(i);index<offsets(i+1);index++) A_transpose(A(index).j,i)=A(index).a;
 }
@@ -261,12 +261,12 @@ Times_Transpose(const SPARSE_MATRIX_FLAT_MXN<T>& rhs)
     ARRAY<int> row_lengths(rows);
     ARRAY<int> right_columns_present,left_rows_present;
     for(int i=0;i<m;i++) if(offsets(i+1)-offsets(i)) left_rows_present.Append(i);
-    for(int i=1;i<=rhs.m;i++) if(rhs.offsets(i+1)-rhs.offsets(i)) right_columns_present.Append(i);
+    for(int i=0;i<rhs.m;i++) if(rhs.offsets(i+1)-rhs.offsets(i)) right_columns_present.Append(i);
     
-    for(int i=1;i<=left_rows_present.m;i++){
+    for(int i=0;i<left_rows_present.m;i++){
         int row=left_rows_present(i);
         int start=offsets(row),end=offsets(row+1);
-        for(int j=1;j<=right_columns_present.m;j++){
+        for(int j=0;j<right_columns_present.m;j++){
             int col=right_columns_present(j);
             int right_index=rhs.offsets(col);int right_end=rhs.offsets(col+1);int index=start;
             while(index<end && right_index<right_end){
@@ -274,10 +274,10 @@ Times_Transpose(const SPARSE_MATRIX_FLAT_MXN<T>& rhs)
                 else if(A(index).j>rhs.A(right_index).j) right_index++;
                 else index++;}}}
     result.Set_Row_Lengths(row_lengths);result.n=columns;
-    for(int i=1;i<=left_rows_present.m;i++){
+    for(int i=0;i<left_rows_present.m;i++){
         int row=left_rows_present(i);
         int start=offsets(row),end=offsets(row+1);
-        for(int j=1;j<=right_columns_present.m;j++){
+        for(int j=0;j<right_columns_present.m;j++){
             int col=right_columns_present(j);
             int right_index=rhs.offsets(col);int right_end=rhs.offsets(col+1);int index=start;
             while(index<end && right_index<right_end){
@@ -328,7 +328,7 @@ template<class T> SPARSE_MATRIX_FLAT_MXN<T> SPARSE_MATRIX_FLAT_MXN<T>::
 Scale_Rows(const VECTOR_ND<T>& d) const
 {
     SPARSE_MATRIX_FLAT_MXN<T> result=*this;
-    for(int i=1;i<=result.m;i++)
+    for(int i=0;i<result.m;i++)
         for(int j=result.offsets(i);j<result.offsets(i+1);j++)
             result.A(j).a*=d(i);
     return result;
@@ -495,8 +495,8 @@ Print_Row(const int row)
 template<class T> std::ostream&
 operator<<(std::ostream& output_stream,const SPARSE_MATRIX_FLAT_MXN<T>& A)
 {
-    for(int i=1;i<=A.m;i++){
-        for(int j=1;j<=A.n;j++)output_stream<<(A.Element_Present(i,j)?A(i,j):0)<<" ";
+    for(int i=0;i<A.m;i++){
+        for(int j=0;j<A.n;j++)output_stream<<(A.Element_Present(i,j)?A(i,j):0)<<" ";
         output_stream<<std::endl;}
     return output_stream;
 }
@@ -564,7 +564,7 @@ Keep_Largest_N(ARRAY<SPARSE_MATRIX_ENTRY<T> >& q,int n)
     static ARRAY<SPARSE_MATRIX_ENTRY<T> > elements;
     elements.Resize(0);
     int j;
-    for(int i=1;i<=q.m;i++){
+    for(int i=0;i<q.m;i++){
         T element_magnitude=abs(q(i).a);
         for(j=1;j<=elements.m;j++)
             if(element_magnitude>abs(elements(j).a)){
@@ -584,7 +584,7 @@ Subtract_C_Times(ARRAY<SPARSE_MATRIX_ENTRY<T> >& q,T c,const ARRAY_VIEW<SPARSE_M
 {
     int q_index=0;
     int current_q_column=0;
-    for(int view_index=1;view_index<=view.m;view_index++){
+    for(int view_index=0;view_index<view.m;view_index++){
         while(q_index<q.m && current_q_column<view(view_index).j){q_index++;current_q_column=q(q_index).j;}
         if(current_q_column==view(view_index).j){
             q(q_index).a-=c*view(view_index).a;
@@ -604,7 +604,7 @@ template<class T> T
 Two_Norm(ARRAY<SPARSE_MATRIX_ENTRY<T> >& q)
 {
     double total=0;
-    for(int i=1;i<=q.m;i++) total+=sqr(q(i).a);
+    for(int i=0;i<q.m;i++) total+=sqr(q(i).a);
     return (T)sqrt(total);
 }
 //#####################################################################
@@ -620,16 +620,16 @@ Construct_Incomplete_LQ_Factorization(const int p_l,const int p_q,const T zero_t
         Get_Row(q_i,i);
         (*Q).Fast_Sparse_Multiply(q_i,l_i);
         Keep_Largest_N(l_i,p_l);
-        for(int j=1;j<=l_i.m;j++)
+        for(int j=0;j<l_i.m;j++)
             Subtract_C_Times(q_i,l_i(j).a,(*Q).A.Array_View((*Q).offsets(l_i(j).j),(*Q).offsets(l_i(j).j+1)-(*Q).offsets(l_i(j).j)));
         Keep_Largest_N(q_i,p_q);
         T magnitude=Two_Norm(q_i);
         if(magnitude<zero_tolerance){PHYSBAM_FATAL_ERROR("Zero pivot in LQ factorization");magnitude=zero_replacement;}
         T one_over_magnitude=Inverse(magnitude);
-        for(int j=1;j<=q_i.m;j++)
+        for(int j=0;j<q_i.m;j++)
             (*Q).Append_Entry_To_Current_Row(q_i(j).j,q_i(j).a*one_over_magnitude);
         (*Q).Finish_Row();
-        for(int j=1;j<=l_i.m;j++)
+        for(int j=0;j<l_i.m;j++)
             (*L).Append_Entry_To_Current_Row(l_i(j).j,l_i(j).a);
         (*L).Append_Entry_To_Current_Row(i,magnitude);
         (*L).Finish_Row();
@@ -644,7 +644,7 @@ Fast_Sparse_Multiply(ARRAY<SPARSE_MATRIX_ENTRY<T> >& q,ARRAY<SPARSE_MATRIX_ENTRY
     SPARSE_MATRIX_FLAT_MXN<T> transpose;
     Transpose(transpose);
     l.Resize(0);
-    for(int i=1;i<=q.m;i++)
+    for(int i=0;i<q.m;i++)
         Subtract_C_Times(l,-q(i).a,transpose.A.Array_View(transpose.offsets(q(i).j),transpose.offsets(q(i).j+1)-transpose.offsets(q(i).j)));
 }
 //#####################################################################

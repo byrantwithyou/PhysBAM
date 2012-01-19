@@ -336,7 +336,7 @@ void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 void Initialize_Volume_Forces(T stiffness,T damping,ARRAY<TETRAHEDRALIZED_VOLUME<T>*>& structures_for_forces,int force_type)
 {
     DEFORMABLES_FORCES<TV>* force=0;
-    for(int i=1;i<=structures_for_forces.m;i++){
+    for(int i=0;i<structures_for_forces.m;i++){
         TETRAHEDRALIZED_VOLUME<T>* structure=structures_for_forces(i);
         if(!structure->mesh.elements.m) continue;
         force=Create_Altitude_Springs(*structure,(T)stiffness/(1+sqrt((T)2)),(T)damping);
@@ -354,7 +354,7 @@ void Initialize_Volume_Forces(T stiffness,T damping,ARRAY<TETRAHEDRALIZED_VOLUME
 void Initialize_Edge_Forces(T stiffness,T damping,ARRAY<SEGMENTED_CURVE<TV>*>& structures_for_forces,int force_type)
 {
     DEFORMABLES_FORCES<TV>* force=0;
-    for(int i=1;i<=structures_for_forces.m;i++){
+    for(int i=0;i<structures_for_forces.m;i++){
         SEGMENTED_CURVE<TV>* structure=structures_for_forces(i);
         if(!structure->mesh.elements.m) continue;
         force=Create_Edge_Springs(*structure,(T)stiffness/(1+sqrt((T)2)),(T)damping);
@@ -404,7 +404,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
       default: PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Unrecognized test number %d",test_number));}
 
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
     
     // correct mass
     binding_list.Distribute_Mass_To_Parents();
@@ -435,7 +435,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         ARRAY<TETRAHEDRALIZED_VOLUME<T>*>& tetrahedralized_volumes_for_forces=(test_number==15 || test_number==16)?complementary_boundary_tetrahedralized_volumes:primary_tetrahedralized_volumes;
         if(!primary_segmented_curves.m) for(int i=1;SEGMENTED_CURVE<TV>* segmented_curve=deformable_body_collection.deformable_geometry.template Find_Structure<SEGMENTED_CURVE<TV>*>(i);i++)
                 primary_segmented_curves.Append(segmented_curve);
-        if(!primary_segmented_curves.m) for(int i=1;i<=tetrahedralized_volumes_for_forces.m;i++){
+        if(!primary_segmented_curves.m) for(int i=0;i<tetrahedralized_volumes_for_forces.m;i++){
                 TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=tetrahedralized_volumes_for_forces(i);
                 tetrahedralized_volume->mesh.Initialize_Segment_Mesh();
                 SEGMENTED_CURVE<TV>* segmented_curve=SEGMENTED_CURVE<TV>::Create(deformable_body_collection.particles);
@@ -479,18 +479,18 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     // Set fully_implicit flag
     if(!(asynchronous_evolution && split_forces_into_fine_coarse) && fully_implicit) 
-        for(int i=1;i<=solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->use_implicit_velocity_independent_forces=true;
+        for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->use_implicit_velocity_independent_forces=true;
 
     // add collision structures
     if(test_number==10 || test_number==11 || test_number==12 || test_number==13 || test_number==14 || test_number==15 || test_number==16 
             || test_number==17 || test_number==23 || test_number==24){
-        for(int i=1;i<=primary_tetrahedralized_volumes.m;i++){
+        for(int i=0;i<primary_tetrahedralized_volumes.m;i++){
             deformable_body_collection.collisions.collision_structures.Append(primary_tetrahedralized_volumes(i));
             if(solids_parameters.triangle_collision_parameters.perform_self_collision){
                 LOG::cout<<"Adding structure "<<i<<std::endl;
                 solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append(primary_tetrahedralized_volumes(i));}}}
     else{
-        for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) if(!dynamic_cast<SEGMENTED_CURVE<TV>*>(deformable_body_collection.deformable_geometry.structures(i))){
+        for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) if(!dynamic_cast<SEGMENTED_CURVE<TV>*>(deformable_body_collection.deformable_geometry.structures(i))){
             deformable_body_collection.collisions.collision_structures.Append(deformable_body_collection.deformable_geometry.structures(i));
             if(solids_parameters.triangle_collision_parameters.perform_self_collision && (!dynamic_cast<FREE_PARTICLES<TV>*>(deformable_body_collection.deformable_geometry.structures(i))))
                 solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append(deformable_body_collection.deformable_geometry.structures(i));}}
@@ -506,7 +506,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     if(test_number==15 || test_number==16) Initialize_Sphere_Analytic_Test();
 
     // disable strain rate CFL for all forces
-    for(int i=1;i<=solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->limit_time_step_by_strain_rate=false;
+    for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->limit_time_step_by_strain_rate=false;
 }
 //#####################################################################
 // Function Cloth_Balll
@@ -610,7 +610,7 @@ void Sphere_Fall()
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     solids_parameters.triangle_collision_parameters.perform_self_collision=number_of_spheres>=2;
 
-    for(int i=1;i<=number_of_spheres;i++){
+    for(int i=0;i<number_of_spheres;i++){
         primary_tetrahedralized_volumes.Append(&tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)i,(T)(2*i+1),0))),true,true,1000));}
 
     tests.Add_Ground();
@@ -620,7 +620,7 @@ void Sphere_Fall()
         solids_parameters.implicit_solve_parameters.project_nullspace_frequency=1;
         split_forces_into_fine_coarse=false;
         
-        for(int i=1;i<=number_of_spheres;i++){
+        for(int i=0;i<number_of_spheres;i++){
             TETRAHEDRALIZED_VOLUME<T>& volume=*primary_tetrahedralized_volumes(i);
             volume.mesh.Initialize_Node_On_Boundary();
             ARRAY<int> blob_particles;
@@ -776,11 +776,11 @@ void Single_Hair()
 
     // Fix tetrahedra orientation
     i=1;
-    for(int t=1;t<=volume.mesh.elements.m;t++){
+    for(int t=0;t<volume.mesh.elements.m;t++){
         VECTOR<int,4>& nodes=volume.mesh.elements(t);
         if(TETRAHEDRON<T>(particles.X.Subset(nodes)).Signed_Volume()<0) exchange(nodes[3],nodes[4]);
         i++;}
-    for(int t=1;t<=volume.mesh.elements.m;t++){
+    for(int t=0;t<volume.mesh.elements.m;t++){
         VECTOR<int,4>& nodes=volume.mesh.elements(t);
         if(TETRAHEDRON<T>(particles.X.Subset(nodes)).Signed_Volume()<0) PHYSBAM_FATAL_ERROR();}
 
@@ -859,7 +859,7 @@ void Write_Saved_Interpolation_Curve_To_File(const std::string& filename,ARRAY<I
     std::ostream* output_raw=FILE_UTILITIES::Safe_Open_Output(filename);
     TYPED_OSTREAM output(*output_raw,stream_type);
     Write_Binary(output,curve.m);
-    for(int i=1;i<=curve.m;i++){
+    for(int i=0;i<curve.m;i++){
         Write_Binary(output,curve(i).control_points.m); 
         for(int j=1;j<=curve(i).control_points.m;j++){
             Write_Binary(output,curve(i).control_points(j).t); 
@@ -878,9 +878,9 @@ void Read_Saved_Interpolation_Curve_From_File(const std::string& filename,ARRAY<
     int m,n;
     Read_Binary(input,m);
     curve.Resize(m);
-    for(int i=1;i<=m;i++){
+    for(int i=0;i<m;i++){
         Read_Binary(input,n);
-        for(int j=1;j<=n;j++){
+        for(int j=0;j<n;j++){
             T t;TV value;
             Read_Binary(input,t);
             Read_Binary(input,value(1));
@@ -1002,7 +1002,7 @@ void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
         PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
         for(int p=1;p<=particles.array_collection->Size();p++) particles.X(p).y+=random.Get_Uniform_Number((T)0,perturbation_size);}
     if((test_number==10 || test_number==12) && frame<=sim_length+1)
-        for(int i=1;i<=num_controlled_particles;i++){
+        for(int i=0;i<num_controlled_particles;i++){
             saved_V(i).Add_Control_Point(Time_At_Frame(frame-1),deformable_body_collection.particles.V(i));
             saved_X(i).Add_Control_Point(Time_At_Frame(frame-1),deformable_body_collection.particles.X(i));}
     if(((test_number==10 || test_number==12) && frame==sim_length+1) || ((test_number==11 || test_number==13) && frame==sim_length+1)){
@@ -1017,7 +1017,7 @@ void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
             deformable_body_collection.particles.X(it.Data())=saved_X(it.Key()).Value(0);
             deformable_body_collection.particles.V(it.Data())=saved_V(it.Key()).Value(0);
             if(test_number!=12) solid_body_collection.deformable_body_collection.soft_bindings.Add_Binding(VECTOR<int,2>(it.Data(),it.Key()),false);}
-        for(int i=1;i<=num_controlled_particles;i++){
+        for(int i=0;i<num_controlled_particles;i++){
             deformable_body_collection.particles.X(i)=saved_X(i).Value(0);
             deformable_body_collection.particles.V(i)=saved_V(i).Value(0);}
         Activate_Secondary_Simulation();}
@@ -1049,12 +1049,12 @@ void Activate_Secondary_Simulation()
     T stiffness=(T)1e4*soft_surface_multiplier;
     if(test_number==12 || test_number==13){
         //tests.Add_Gravity();
-        for(int i=1;i<=number_of_spheres;i++){
+        for(int i=0;i<number_of_spheres;i++){
             solid_body_collection.Add_Force(new DEFORMABLE_GRAVITY<TV>(deformable_body_collection.particles,boundary_one_ring_segmented_curves(i)->mesh));
             solid_body_collection.Add_Force(Create_Altitude_Springs(*boundary_tetrahedralized_volumes(i),(T)stiffness/(1+sqrt((T)2)),(T)soft_bound_edge_damping));
             solid_body_collection.Add_Force(Create_Edge_Springs(*boundary_one_ring_segmented_curves(i),(T)stiffness/(1+sqrt((T)2)),(T)soft_bound_edge_damping));}}
     else{
-        for(int i=1;i<=number_of_spheres;i++){
+        for(int i=0;i<number_of_spheres;i++){
             solid_body_collection.Add_Force(new DEFORMABLE_GRAVITY<TV>(deformable_body_collection.particles,primary_segmented_curves(i)->mesh));
             solid_body_collection.Add_Force(Create_Edge_Springs(*new_boundary_segmented_curves(i),(T)stiffness/(1+sqrt((T)2)),soft_bound_edge_damping));}
 
@@ -1074,7 +1074,7 @@ void Activate_Secondary_Simulation()
 
     solid_body_collection.Update_Simulated_Particles();
 
-    //if(fully_implicit) for(int i=1;i<=solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->use_implicit_velocity_independent_forces=true;
+    //if(fully_implicit) for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->use_implicit_velocity_independent_forces=true;
 
     ground->X().y=-999;
 }
@@ -1135,7 +1135,7 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
             for(int j=1;j<=n;j+=test_9_skipped_particles_number) V(Particle_Index_From_Coordinates(1,j,m))=TV();
             for(int j=1;j<=n;j+=test_9_skipped_particles_number) V(Particle_Index_From_Coordinates(m,j,m))=TV((T).1,0,0);}
     else if((test_number==10 || test_number==11 || test_number==12 || test_number==13) && velocity_time>sim_switch_time)
-            for(int i=1;i<=num_controlled_particles;i++) V(i)=saved_V(i).Value(velocity_time-subtract_time);
+            for(int i=0;i<num_controlled_particles;i++) V(i)=saved_V(i).Value(velocity_time-subtract_time);
     if(test_number==22) V(2)=TV();
 }
 //#####################################################################
@@ -1146,7 +1146,7 @@ void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE
     if(asynchronous_evolution) asynchronous_evolution->Set_External_Positions(X,time);
     if(animated_particle) X(animated_particle)=animation_curve.Value(time);
     if((test_number==10 || test_number==11 || test_number==12 || test_number==13) && time>sim_switch_time){
-        for(int i=1;i<=num_controlled_particles;i++) X(i)=saved_X(i).Value(time-subtract_time);}
+        for(int i=0;i<num_controlled_particles;i++) X(i)=saved_X(i).Value(time-subtract_time);}
     if(asynchronous_evolution) asynchronous_evolution->Set_External_Positions(X,time);
     if(test_number==22) X(2)=TV(-restlength_analytic,0,0);
 }
@@ -1183,7 +1183,7 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
         for(int j=1;j<=n;j+=test_9_skipped_particles_number) V(Particle_Index_From_Coordinates(1,j,m))=TV();
         for(int j=1;j<=n;j+=test_9_skipped_particles_number) V(Particle_Index_From_Coordinates(m,j,m))=TV();}
     else if((test_number==10 || test_number==11 || test_number==12 || test_number==13) && velocity_time>sim_switch_time){
-        for(int i=1;i<=num_controlled_particles;i++) V(i)=TV();}
+        for(int i=0;i<num_controlled_particles;i++) V(i)=TV();}
     if(test_number==22) V(2)=TV();
 }
 //#####################################################################
@@ -1231,7 +1231,7 @@ void Soft_Bound_Sphere_Surface()
     if(test_number==11 || test_number==13) last_frame=300;
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-    for(int i=1;i<=number_of_spheres;i++){
+    for(int i=0;i<number_of_spheres;i++){
         primary_tetrahedralized_volumes.Append(&tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)i,(T)(2*i+1),0))),true,true,1000));}
     ground=&tests.Add_Ground();
 
@@ -1252,14 +1252,14 @@ void Add_Secondary_Simulation_Structures()
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     // TODO: What about frame zero.
     LOG::cout<<"MAKING COPY OF MESH"<<std::endl;
-    for(int i=1;i<=number_of_spheres;i++){
+    for(int i=0;i<number_of_spheres;i++){
         TETRAHEDRALIZED_VOLUME<T>* volume=primary_tetrahedralized_volumes(i);
         TRIANGULATED_SURFACE<T>* new_surface=Add_Copy_of_Boundary_Object(volume,particle_map);
         new_boundary_surfaces.Append(new_surface);}
 
     if(test_number==10 || test_number==11){
         // Add new_surface segment mesh for edge springs
-        for(int i=1;i<=number_of_spheres;i++){
+        for(int i=0;i<number_of_spheres;i++){
             TRIANGULATED_SURFACE<T>* new_surface=new_boundary_surfaces(i);
             new_surface->mesh.Initialize_Segment_Mesh();
             SEGMENTED_CURVE<TV>* new_boundary_segmented_curve=SEGMENTED_CURVE<TV>::Create(deformable_body_collection.particles);
@@ -1270,7 +1270,7 @@ void Add_Secondary_Simulation_Structures()
     
     if(test_number==12 || test_number==13){
         // Add boundary one ring segment mesh for edge springs
-        for(int i=1;i<=number_of_spheres;i++){
+        for(int i=0;i<number_of_spheres;i++){
             TETRAHEDRALIZED_VOLUME<T>* volume=primary_tetrahedralized_volumes(i);
             volume->mesh.Initialize_Segment_Mesh();
             SEGMENTED_CURVE<TV> *boundary_one_ring_segmented_curve=SEGMENTED_CURVE<TV>::Create(solid_body_collection.deformable_body_collection.particles);
@@ -1297,7 +1297,7 @@ TRIANGULATED_SURFACE<T>* Add_Copy_of_Boundary_Object(TETRAHEDRALIZED_VOLUME<T>* 
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     TRIANGULATED_SURFACE<T>* compact_surface_copy=volume->Get_Boundary_Object().Create_Compact_Copy();
     TRIANGULATED_SURFACE<T>* new_surface=&tests.Copy_And_Add_Structure(*compact_surface_copy,0);
-    for(int i=1;i<=volume->triangulated_surface->mesh.elements.m;i++) for(int j=1;j<=3;j++){
+    for(int i=1;i<=volume->triangulated_surface->mesh.elements.m;i++) for(int j=0;j<3;j++){
         int old_index=volume->triangulated_surface->mesh.elements(i)(j);
         int new_index=new_surface->mesh.elements(i)(j);
         bool new_entry=particle_map.Set(old_index,new_index);
@@ -1313,10 +1313,10 @@ template<int d>
 void Add_Mapped_Elements(const ARRAY<VECTOR<int,d> >& elements,ARRAY<VECTOR<int,d> >& new_elements,const HASHTABLE<int,int>& map)
 {
     VECTOR<int,d> new_element;
-    for(int i=1;i<=elements.m;i++){
+    for(int i=0;i<elements.m;i++){
         bool element_mapped=false;
         new_element=elements(i);
-        for(int j=1;j<=d;j++){
+        for(int j=0;j<d;j++){
             const int *mapped_index=map.Get_Pointer(elements(i)(j));
             if(mapped_index){new_element[j]=*mapped_index;element_mapped=true;}}
         if(element_mapped) new_elements.Append(new_element);}
@@ -1327,7 +1327,7 @@ void Add_Mapped_Elements(const ARRAY<VECTOR<int,d> >& elements,ARRAY<VECTOR<int,
 void Expand_One_Ring_Particles(const ARRAY<VECTOR<int,2> >& elements,const HASHTABLE<int,int>& all_old_particles,const HASHTABLE<int,int>& frontier_particles,HASHTABLE<int,int>& new_particles)
 {
     VECTOR<int,2> edge;
-    for(int i=1;i<=elements.m;i++){
+    for(int i=0;i<elements.m;i++){
         edge=elements(i);
         const int *front_index_1=frontier_particles.Get_Pointer(edge(1));
         const int *front_index_2=frontier_particles.Get_Pointer(edge(2));
@@ -1346,7 +1346,7 @@ void Expand_One_Ring_Particles(const ARRAY<VECTOR<int,2> >& elements,const HASHT
 void Expand_N_Rings(const int n,const ARRAY<VECTOR<int,2> >& elements,HASHTABLE<int,int>& all_old_particles,HASHTABLE<int,int>& frontier_particles)
 {
     HASHTABLE<int,int> new_particles;
-    for(int i=1;i<=n;i++){
+    for(int i=0;i<n;i++){
         new_particles.Clean_Memory();
         Expand_One_Ring_Particles(elements,all_old_particles,frontier_particles,new_particles);
         for(HASHTABLE_ITERATOR<int,int> it(new_particles);it.Valid();it.Next()) all_old_particles.Set(it.Key(),it.Data());
@@ -1369,7 +1369,7 @@ void Asynchronous_Sphere()
     if(test_number==15 || test_number==16) asynchronous_evolution=new ASYNCHRONOUS_EVOLUTION<TV>(solid_body_collection,solids_evolution,solids_parameters.cfl,true,projection_rigidity);
 
     if(test_number==16) number_of_spheres=3;
-    for(int sphere_index=1;sphere_index<=number_of_spheres;sphere_index++){
+    for(int sphere_index=0;sphere_index<number_of_spheres;sphere_index++){
         particle_map.Clean_Memory();
         if(test_number==16){
             switch(sphere_index){
@@ -1412,13 +1412,13 @@ void Asynchronous_Sphere()
             case 2: //left
                 for(int i=1;i<=all_particles.Size();i++) center+=deformable_body_collection.particles.X(all_particles(i));
                 center/=(T)all_particles.m;
-                for(int i=1;i<=all_particles.m;i++) if(deformable_body_collection.particles.X(all_particles(i))(1)<center(1))
+                for(int i=0;i<all_particles.m;i++) if(deformable_body_collection.particles.X(all_particles(i))(1)<center(1))
                     particle_map.Set(i,i);
                 break;
             case 3: //top
-                for(int i=1;i<=all_particles.m;i++) center+=deformable_body_collection.particles.X(all_particles(i));
+                for(int i=0;i<all_particles.m;i++) center+=deformable_body_collection.particles.X(all_particles(i));
                 center/=(T)all_particles.m;
-                for(int i=1;i<=all_particles.m;i++) if(deformable_body_collection.particles.X(all_particles(i))(2)<center(2))
+                for(int i=0;i<all_particles.m;i++) if(deformable_body_collection.particles.X(all_particles(i))(2)<center(2))
                     particle_map.Set(i,i);
                 break;
             default: PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Unrecognized config type %d",type_of_asynchronous_configuration));}
@@ -1426,7 +1426,7 @@ void Asynchronous_Sphere()
         if(invert_asynchronous_implicit){
             HASHTABLE<int,int> copy_particle_map=particle_map;
             particle_map.Clean_Memory();
-            for(int i=1;i<=all_particles.m;i++){int p=all_particles(i);
+            for(int i=0;i<all_particles.m;i++){int p=all_particles(i);
                 if(!copy_particle_map.Contains(p)) particle_map.Set(p,p);}}
  
         SEGMENTED_CURVE<TV> *boundary_one_ring_segmented_curve=SEGMENTED_CURVE<TV>::Create(solid_body_collection.deformable_body_collection.particles);
@@ -1463,7 +1463,7 @@ void Asynchronous_Sphere()
             complementary_boundary_tetrahedralized_volumes.Append(complementary_boundary_tetrahedralized_volume);}}
 
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents();
@@ -1474,7 +1474,7 @@ void Asynchronous_Sphere()
     T stiffness=(T)1e4*soft_surface_multiplier;
     DEFORMABLES_FORCES<TV>* force;
     ARRAY<int> affected_particle_indices,affected_rigid_body_particle_indices;
-    for(int sphere_index=1;sphere_index<=number_of_spheres;sphere_index++){
+    for(int sphere_index=0;sphere_index<number_of_spheres;sphere_index++){
         
         if(!boundary_one_ring_segmented_curves(sphere_index)->mesh.elements.m) continue;
 
@@ -1495,7 +1495,7 @@ void Asynchronous_Sphere()
 
     if(test_number==15 || test_number==16){
         HASHTABLE<int> temp_particle_map;
-        for(int i=1;i<=number_of_spheres;i++){
+        for(int i=0;i<number_of_spheres;i++){
             ARRAY_VIEW<int> boundary_particle_index=boundary_tetrahedralized_volumes(i)->mesh.elements.Flattened();
             for(int j=1;j<=boundary_particle_index.Size();j++) temp_particle_map.Set(boundary_particle_index(j));}
         for(int i=1;i<=deformable_body_collection.particles.array_collection->Size();i++) if(!temp_particle_map.Contains(i))
@@ -1527,9 +1527,9 @@ void Asynchronous_Armadillo()
 template<int d>
 void Add_Layered_Elements(const ARRAY<VECTOR<int,d> >& elements,ARRAY<VECTOR<int,d> >& new_elements,ARRAY<VECTOR<int,d> >& new_complementary_elements,const int particle_index_offset,const GRID<TV>& grid,const int total_layer_number,const int asynchronous_layer_interval,const int non_layer_interval)
 {
-    for(int i=1;i<=elements.m;i++){
+    for(int i=0;i<elements.m;i++){
         int min_layer=total_layer_number;
-        for(int j=1;j<=d;j++){
+        for(int j=0;j<d;j++){
             int layer=(elements(i)(j)-particle_index_offset)%(grid.counts.x*grid.counts.y)/grid.counts.x;
             if(layer<min_layer) min_layer=layer;}
         min_layer%=asynchronous_layer_interval+non_layer_interval;
@@ -1551,7 +1551,7 @@ void Asynchronous_Layered_Box()
 
     int number_of_boxes=3,total_layer_number=10,asynchronous_layer_interval,non_layer_interval;
     int particle_index_offset;
-    for(int box_index=1;box_index<=number_of_boxes;box_index++){
+    for(int box_index=0;box_index<number_of_boxes;box_index++){
         switch(box_index){
             case 1: asynchronous_layer_interval=0;non_layer_interval=10;break;
             case 2: asynchronous_layer_interval=1;non_layer_interval=1;break;
@@ -1585,7 +1585,7 @@ void Asynchronous_Layered_Box()
         complementary_boundary_tetrahedralized_volumes.Append(complementary_volume);}
 
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
     
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents();
@@ -1596,7 +1596,7 @@ void Asynchronous_Layered_Box()
     T stiffness=(T)1e4*soft_surface_multiplier;
     DEFORMABLES_FORCES<TV>* force;
     ARRAY<int> affected_particle_indices,affected_rigid_body_particle_indices;
-    for(int box_index=1;box_index<=number_of_boxes;box_index++){
+    for(int box_index=0;box_index<number_of_boxes;box_index++){
         
         if(!boundary_one_ring_segmented_curves(box_index)->mesh.elements.m) continue;
 
@@ -1613,7 +1613,7 @@ void Asynchronous_Layered_Box()
         asynchronous_evolution->Add_Finescale_Force(force,affected_particle_indices,affected_rigid_body_particle_indices,fine_fully_implicit);}
 
     stiffness=(T)1e4*stiffness_multiplier;
-    for(int box_index=1;box_index<=number_of_boxes;box_index++){
+    for(int box_index=0;box_index<number_of_boxes;box_index++){
         
         if(!complementary_boundary_segmented_curves(box_index)->mesh.elements.m) continue;
         // Get affected_particle_indices
@@ -1626,14 +1626,14 @@ void Asynchronous_Layered_Box()
         asynchronous_evolution->Add_Coarsescale_Force(force,affected_particle_indices,affected_rigid_body_particle_indices,coarse_fully_implicit,true);}
 
     HASHTABLE<int> temp_particle_map;
-    for(int i=1;i<=number_of_boxes;i++){
+    for(int i=0;i<number_of_boxes;i++){
         ARRAY_VIEW<int> boundary_particle_index=boundary_tetrahedralized_volumes(i)->mesh.elements.Flattened();
         for(int j=1;j<=boundary_particle_index.Size();j++) temp_particle_map.Set(boundary_particle_index(j));}
     for(int i=1;i<=deformable_body_collection.particles.array_collection->Size();i++) if(!temp_particle_map.Contains(i))
         gravity_particles.Append(i);
 
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
         
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents();
@@ -1660,7 +1660,7 @@ void Gravity_Test()
 
     asynchronous_evolution=new ASYNCHRONOUS_EVOLUTION<TV>(solid_body_collection,solids_evolution,solids_parameters.cfl,true,projection_rigidity);
 
-    for(int i=1;i<=3;i++){
+    for(int i=0;i<3;i++){
         int p=particles.array_collection->Add_Element();
         particles.X(p)=TV((T)i,5,0);
         particles.mass(p)=7;
@@ -1690,7 +1690,7 @@ void Ether_Drag_Test()
 
     asynchronous_evolution=new ASYNCHRONOUS_EVOLUTION<TV>(solid_body_collection,solids_evolution,solids_parameters.cfl,true,projection_rigidity);
 
-    for(int i=1;i<=3;i++){
+    for(int i=0;i<3;i++){
         int p=particles.array_collection->Add_Element();
         particles.X(p)=TV((T)i,0,0);
         particles.V(p)=TV(0,4,0);
@@ -1736,7 +1736,7 @@ void Spring_Test()
     else initial_displacement_analytic=(T)1;
     orthogonal_velocity=0;if(use_orthogonal_velocity) orthogonal_velocity=100;
 
-    for(int i=1;i<=3;i++){
+    for(int i=0;i<3;i++){
         int p=particles.array_collection->Add_Element();
         if(parameter==3) particles.X(p)=TV(-1,(i-2)*restlength_analytic,0);
         else particles.X(p)=TV((i-2)*restlength_analytic,0,0);
@@ -2257,18 +2257,18 @@ void Adaptive_Asynchronous()
     ground=&tests.Add_Ground();
 
     asynchronous_evolution=new ASYNCHRONOUS_EVOLUTION<TV>(solid_body_collection,solids_evolution,solids_parameters.cfl,true,projection_rigidity);
-    for(int sphere_index=1;sphere_index<=number_of_spheres;sphere_index++){
+    for(int sphere_index=0;sphere_index<number_of_spheres;sphere_index++){
         primary_tetrahedralized_volumes.Append(&tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)sphere_index,(T)(2*sphere_index+1)+height_offset,0))),true,true,1000));}
 
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents();
     solid_body_collection.deformable_body_collection.binding_list.Clear_Hard_Bound_Particles(deformable_body_collection.particles.mass);
     deformable_body_collection.particles.Compute_Auxiliary_Attributes(solid_body_collection.deformable_body_collection.soft_bindings);solid_body_collection.deformable_body_collection.soft_bindings.Set_Mass_From_Effective_Mass();
 
-    for(int sphere_index=1;sphere_index<=number_of_spheres;sphere_index++){
+    for(int sphere_index=0;sphere_index<number_of_spheres;sphere_index++){
         TETRAHEDRALIZED_VOLUME<T>* volume=primary_tetrahedralized_volumes(sphere_index);
         volume->mesh.Initialize_Segment_Mesh();
         ARRAY_VIEW<int> flattened_volume=volume->mesh.elements.Flattened();
@@ -2359,7 +2359,7 @@ void Asynchronous_Projected_Sphere()
         default: PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Unrecognized model number %d",test_number));}
 
     int middle_sphere_number=number_of_spheres/2+1;
-    for(int sphere_index=1;sphere_index<=number_of_spheres;sphere_index++){
+    for(int sphere_index=0;sphere_index<number_of_spheres;sphere_index++){
         particle_map.Clean_Memory();
         primary_tetrahedralized_volumes.Append(&tests.Create_Tetrahedralized_Volume(model_file,RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)(sphere_index-middle_sphere_number)*scale,(T)(2*sphere_index+start_point)*scale+height_offset,0)),TWIST<TV>(TV(),TV(0,0,rotation))),true,use_constant_mass,1000,model_scale));
         TETRAHEDRALIZED_VOLUME<T>* volume=primary_tetrahedralized_volumes(sphere_index);
@@ -2469,7 +2469,7 @@ void Asynchronous_Projected_Sphere()
             complementary_boundary_tetrahedralized_volumes.Append(complementary_boundary_tetrahedralized_volume);}}
 
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents();
@@ -2480,7 +2480,7 @@ void Asynchronous_Projected_Sphere()
     T stiffness=(T)1e4*soft_surface_multiplier*scale;
     DEFORMABLES_FORCES<TV>* force;
     ARRAY<int> affected_particle_indices,affected_rigid_body_particle_indices;
-    for(int sphere_index=1;sphere_index<=number_of_spheres;sphere_index++){
+    for(int sphere_index=0;sphere_index<number_of_spheres;sphere_index++){
         if(!test_implicit_in_explicit_out){
             if(!use_async){
                 TETRAHEDRALIZED_VOLUME<T>* volume=primary_tetrahedralized_volumes(sphere_index);

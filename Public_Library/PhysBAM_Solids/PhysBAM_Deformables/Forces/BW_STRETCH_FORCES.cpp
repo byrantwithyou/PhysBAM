@@ -43,11 +43,11 @@ Update_Position_Based_State(const T time,const bool is_position_update)
         state.C=material_force_state.rest_state_triangle_area*VECTOR<T,2>(material_force_state.w_u_magnitude-material_force_state.b_u,
             material_force_state.w_v_magnitude-material_force_state.b_v);
         state.C_dot=VECTOR<T,2>();
-        for(int i=1;i<=3;i++){
+        for(int i=0;i<3;i++){
             state.dC_dx(i)=MATRIX<T,3,2>(material_force_state.rest_state_triangle_area*material_force_state.dwu_dx(i)*material_force_state.w_u,
                 material_force_state.rest_state_triangle_area*material_force_state.dwv_dx(i)*material_force_state.w_v);
             state.C_dot+=state.dC_dx(i).Transposed()*particles.V(state.nodes[i]);}
-        for(int i=1;i<=3;i++) for(int j=1;j<=3;j++){
+        for(int i=0;i<3;i++) for(int j=0;j<3;j++){
             MATRIX<T,3> dCu_dxi_dxj=(material_force_state.rest_state_triangle_area/material_force_state.w_u_magnitude)*material_force_state.dwu_dx(i)*
                 material_force_state.dwu_dx(j)*(MATRIX<T,3>::Identity_Matrix()-MATRIX<T,3>::Outer_Product(material_force_state.w_u,material_force_state.w_u));
             MATRIX<T,3> dCv_dxi_dxj=(material_force_state.rest_state_triangle_area/material_force_state.w_v_magnitude)*material_force_state.dwv_dx(i)*

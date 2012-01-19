@@ -22,7 +22,7 @@ void Check_Intervals(CUBIC<double>& cubic,int num_intervals,VECTOR<INTERVAL<doub
         LOG::cout << "mask " << mask << std::endl;
         return;
     }
-    for(int i=1;i<=num_intervals;i++){
+    for(int i=0;i<num_intervals;i++){
         double interval_endpoint1=cubic(intervals(i).min_corner);
         double interval_endpoint2=cubic(intervals(i).max_corner);
         if(interval_endpoint1*interval_endpoint2>0 && (abs(interval_endpoint1) > 1e-11 && abs(interval_endpoint2) > 1e-11)){
@@ -51,7 +51,7 @@ int main(int argc,char* argv[])
     blah*=1.5;
     blah=blah.Thickened(.1);
     RANDOM_NUMBERS<double> rn;
-    for(int i=1;i<=1000000;i++){
+    for(int i=0;i<1000000;i++){
         double t=rn.Get_Uniform_Number(blah.min_corner,blah.max_corner);
         double u=rn.Get_Uniform_Number(blah.min_corner,blah.max_corner);
         if(t>u) exchange(t,u);
@@ -67,7 +67,7 @@ int main(int argc,char* argv[])
     }
 */
     RANDOM_NUMBERS<double> rn;
-    for(int i=1;i<=1000000000;i++){
+    for(int i=0;i<1000000000;i++){
         int index=rn.Get_Uniform_Integer(1,4);
         VECTOR<double,3> roots;
         roots(1)=rn.Get_Uniform_Number(-10,10);
@@ -93,15 +93,15 @@ int main(int argc,char* argv[])
                 INTERVAL<double> new_interval(t,u);
                 int mask=0;
                 int normal_roots=0;
-                for(int i=1;i<=3;i++) if(new_interval.Lazy_Inside(roots(i))) normal_roots++;
+                for(int i=0;i<3;i++) if(new_interval.Lazy_Inside(roots(i))) normal_roots++;
                 mask|=(1<<normal_roots);
                 int shrunk_roots=0;
                 INTERVAL<double> shrunk_interval=new_interval.Thickened(1e-11);
-                for(int i=1;i<=3;i++) if(shrunk_interval.Lazy_Inside(roots(i))) shrunk_roots++;
+                for(int i=0;i<3;i++) if(shrunk_interval.Lazy_Inside(roots(i))) shrunk_roots++;
                 mask|=(1<<shrunk_roots);
                 int expanded_roots=0;
                 INTERVAL<double> expanded_interval=new_interval.Thickened(-1e-11);
-                for(int i=1;i<=3;i++) if(expanded_interval.Lazy_Inside(roots(i))) expanded_roots++;
+                for(int i=0;i<3;i++) if(expanded_interval.Lazy_Inside(roots(i))) expanded_roots++;
                 mask|=(1<<expanded_roots);
                 int num_intervals=0;
                 VECTOR<INTERVAL<double>,3> intervals;

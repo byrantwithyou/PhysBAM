@@ -517,8 +517,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 33:{
             TRIANGULATED_AREA<T>* ta=TRIANGULATED_AREA<T>::Create(particles);
             ta->particles.array_collection->Add_Elements(7);
-            for(int i=1;i<=7;i++) ta->particles.X(i)=TV((T).5*(i-4),(T).5*sqrt(3)*(i%2));
-            for(int i=1;i<=5;i++) ta->mesh.elements.Append(VECTOR<int,3>(i,i+1,i+2));
+            for(int i=0;i<7;i++) ta->particles.X(i)=TV((T).5*(i-4),(T).5*sqrt(3)*(i%2));
+            for(int i=0;i<5;i++) ta->mesh.elements.Append(VECTOR<int,3>(i,i+1,i+2));
             ta->Update_Number_Nodes();
             ta->mesh.Make_Orientations_Consistent();
             solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(ta);
@@ -561,7 +561,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(solid_body_collection.deformable_body_collection.deformable_geometry.structures);
 
     // correct number nodes
-    for(int i=1;i<=solid_body_collection.deformable_body_collection.deformable_geometry.structures.m;i++) solid_body_collection.deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<solid_body_collection.deformable_body_collection.deformable_geometry.structures.m;i++) solid_body_collection.deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents();
@@ -662,10 +662,10 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     if(parse_args->Is_Value_Set("-solver_iterations")) solids_parameters.implicit_solve_parameters.cg_iterations=parse_args->Get_Integer_Value("-solver_iterations");
     if(parse_args->Is_Value_Set("-cgsolids")) solids_parameters.implicit_solve_parameters.cg_tolerance=(T)parse_args->Get_Double_Value("-cgsolids");
 
-    if(!semi_implicit) for(int i=1;i<=solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->use_implicit_velocity_independent_forces=true;
-    if(!semi_implicit) for(int i=1;i<=solid_body_collection.rigid_body_collection.rigids_forces.m;i++)
+    if(!semi_implicit) for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->use_implicit_velocity_independent_forces=true;
+    if(!semi_implicit) for(int i=0;i<solid_body_collection.rigid_body_collection.rigids_forces.m;i++)
         solid_body_collection.rigid_body_collection.rigids_forces(i)->use_implicit_velocity_independent_forces=true;
-    if(!semi_implicit) for(int i=1;i<=solid_body_collection.deformable_body_collection.deformables_forces.m;i++) solid_body_collection.deformable_body_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=true;
+    if(!semi_implicit) for(int i=0;i<solid_body_collection.deformable_body_collection.deformables_forces.m;i++) solid_body_collection.deformable_body_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=true;
 
     if(scatter_plot) Init_Scatter_Plot();
 
@@ -679,7 +679,7 @@ void Place_Triangle(int tri,T s1,T s2,T a,T b,TV shift)
     PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     ROTATION<TV> rot(ROTATION<TV>::From_Angle(a)),rot2(ROTATION<TV>::From_Angle(b+a));
     TV com(0,sqrt(3)/6);
-    for(int i=1;i<=3;i++) particles.X(3*(tri-1)+i)=rot2.Rotate(TV(s1,s2)*rot.Inverse_Rotate(particles.X(3*(tri-1)+i)-com))+shift;
+    for(int i=0;i<3;i++) particles.X(3*(tri-1)+i)=rot2.Rotate(TV(s1,s2)*rot.Inverse_Rotate(particles.X(3*(tri-1)+i)-com))+shift;
 }
 //#####################################################################
 // Function Set_Kinematic_Positions
@@ -713,7 +713,7 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
         int m=mattress_grid.counts.x;
 	int n=mattress_grid.counts.y;
         TV velocity=velocity_time<5.0?attachment_velocity:TV();
-        for(int j=1;j<=n;j++){V(1+m*(j-1))=-velocity;V(m+m*(j-1))=velocity;}}
+        for(int j=0;j<n;j++){V(1+m*(j-1))=-velocity;V(m+m*(j-1))=velocity;}}
     if(test_number==24){
         int m=mattress_grid.counts.x;
 	int n=mattress_grid.counts.y;
@@ -747,7 +747,7 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
         TV velocity_bot=velocity_time<final_time?TV((T)0,-velocity):TV();
         TV velocity_rig=velocity_time<final_time?TV(velocity,(T)0):TV();
         TV velocity_lef=velocity_time<final_time?TV(-velocity,(T)0):TV();
-        for(int j=1;j<=n;j++){V(1+m*(j-1))=velocity_lef;V(m+m*(j-1))=velocity_rig;}
+        for(int j=0;j<n;j++){V(1+m*(j-1))=velocity_lef;V(m+m*(j-1))=velocity_rig;}
         for(int i=2*m/5+1;i<=3*m/5+1;i++){V(i)=velocity_bot;V(m*(n-1)+i)=velocity_top;}}
     if(test_number==27){
         int m=mattress_grid.counts.x;
@@ -756,7 +756,7 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
         T final_time=40;
         TV velocity_rig=velocity_time<final_time?TV(-velocity,(T)0):TV();
         TV velocity_lef=velocity_time<final_time?TV(velocity,(T)0):TV();
-        for(int j=1;j<=n;j++){V(1+m*(j-1))=velocity_lef;V(m+m*(j-1))=velocity_rig;}}
+        for(int j=0;j<n;j++){V(1+m*(j-1))=velocity_lef;V(m+m*(j-1))=velocity_rig;}}
     if(test_number==30){
         int m=mattress_grid.counts.x;
         int n=mattress_grid.counts.y;
@@ -764,12 +764,12 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
         T final_time=8000;
         TV velocity_rig=velocity_time<final_time?TV(velocity,(T)0):TV();
         TV velocity_lef=velocity_time<final_time?TV(-velocity,(T)0):TV();
-        for(int j=1;j<=n;j++){V(1+m*(j-1))=velocity_lef;V(m+m*(j-1))=velocity_rig;}}
+        for(int j=0;j<n;j++){V(1+m*(j-1))=velocity_lef;V(m+m*(j-1))=velocity_rig;}}
     if(test_number==28){
         int m=mattress_grid.counts.x;
         int n=mattress_grid.counts.y;
         TV velocity=velocity_time<5.0?attachment_velocity:TV();
-        for(int j=1;j<=n;j++){V(1+m*(j-1))=-velocity;V(m+m*(j-1))=velocity;}}
+        for(int j=0;j<n;j++){V(1+m*(j-1))=-velocity;V(m+m*(j-1))=velocity;}}
     if(test_number==31){V(1)=TV(0,.2);V(2).y=0;V(3).y=0;}
     if(test_number==32){V(1)=V(3)=TV(0,0);V(3).x=0;}
     if(test_number==33){V(1)=V(2)=V(4)=V(6)=V(7)=TV();}
@@ -782,7 +782,7 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
     if(test_number==20){
         int m=mattress_grid.counts.x;
 	int n=mattress_grid.counts.y;
-        for(int j=1;j<=n;j++) V(1+m*(j-1))=V(m+m*(j-1))=TV();}
+        for(int j=0;j<n;j++) V(1+m*(j-1))=V(m+m*(j-1))=TV();}
     if(test_number==24){
         int m=mattress_grid.counts.x;
 	int n=mattress_grid.counts.y;
@@ -798,20 +798,20 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
     if(test_number==26){
         int m=mattress_grid.counts.x;
 	int n=mattress_grid.counts.y;
-        for(int j=1;j<=n;j++){V(1+m*(j-1))=TV();V(m+m*(j-1))=TV();}
+        for(int j=0;j<n;j++){V(1+m*(j-1))=TV();V(m+m*(j-1))=TV();}
         for(int i=2*m/5+1;i<=3*m/5+1;i++){V(i)=TV();V(m*(n-1)+i)=TV();}}
     if(test_number==27){
         int m=mattress_grid.counts.x;
 	int n=mattress_grid.counts.y;
-        for(int j=1;j<=n;j++){V(1+m*(j-1))=TV();V(m+m*(j-1))=TV();}}
+        for(int j=0;j<n;j++){V(1+m*(j-1))=TV();V(m+m*(j-1))=TV();}}
     if(test_number==30){
         int m=mattress_grid.counts.x;
         int n=mattress_grid.counts.y;
-        for(int j=1;j<=n;j++){V(1+m*(j-1))=TV();V(m+m*(j-1))=TV();}}
+        for(int j=0;j<n;j++){V(1+m*(j-1))=TV();V(m+m*(j-1))=TV();}}
     if(test_number==28){
         int m=mattress_grid.counts.x;
         int n=mattress_grid.counts.y;
-        for(int j=1;j<=n;j++) V(1+m*(j-1))=V(m+m*(j-1))=TV();}
+        for(int j=0;j<n;j++) V(1+m*(j-1))=V(m+m*(j-1))=TV();}
     if(test_number==31){V(1)=TV();V(2).y=0;V(3).y=0;}
     if(test_number==32){V(1)=V(3)=TV();V(3).x=0;}
     if(test_number==33){V(1)=V(2)=V(4)=V(6)=V(7)=TV();}
@@ -828,7 +828,7 @@ void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {
 void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE
 {
     int m=mattress_grid.counts.x;
-    for(int j=1;j<=mattress_grid.counts.y;j++) X(1+m*(j-1))=X(m+m*(j-1))=TV(0,0);
+    for(int j=0;j<mattress_grid.counts.y;j++) X(1+m*(j-1))=X(m+m*(j-1))=TV(0,0);
 }
 //#####################################################################
 // Function Write_Output_Files
@@ -970,7 +970,7 @@ Test_Model_Helper(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>* icm, TV &f, TV &df, T e)
 void Test_Model(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>& icm)
 {
     RANDOM_NUMBERS<T> random;
-    for(int i=1;i<=20;i++){
+    for(int i=0;i<20;i++){
         TV f;
         random.Fill_Uniform(f,0,2);
         T e=1e-4;
@@ -992,8 +992,8 @@ void Test_Model(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>& icm)
 void Primary_Contour(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>& icm)
 {
     ARRAY<VECTOR<T,3>,VECTOR<int,2> > img(1,image_size,1,image_size);
-    for(int i=1;i<=image_size;i++)
-        for(int j=1;j<=image_size;j++){
+    for(int i=0;i<image_size;i++)
+        for(int j=0;j<image_size;j++){
             T x=(2*i-image_size)*sigma_range/image_size+1e-5;
             T y=(2*j-image_size)*sigma_range/image_size;
             TV g=icm.P_From_Strain(DIAGONAL_MATRIX<T,2>(x,y),1,1).To_Vector();
@@ -1008,7 +1008,7 @@ void Primary_Contour(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>& icm)
             T val=TV::Dot_Product(evec,g);
             img(VECTOR<int,2>(i,j))=VECTOR<T,3>(val<0,val>=0,0);}
 
-    for(int i=1;i<=image_size;i++){if(i%10>0 && i%10<5) img(VECTOR<int,2>(i,image_size/2))=img(VECTOR<int,2>(image_size/2,i))=VECTOR<T,3>(0,0,1);}
+    for(int i=0;i<image_size;i++){if(i%10>0 && i%10<5) img(VECTOR<int,2>(i,image_size/2))=img(VECTOR<int,2>(image_size/2,i))=VECTOR<T,3>(0,0,1);}
 
     PPM_FILE<T>::Write("primary_contour.ppm", img);
 }
@@ -1049,16 +1049,16 @@ void Dump_Scatter_Plot(int frame)
     eps.Set_Point_Size(4*sigma_range/image_size);
     eps.fixed_bounding_box=true;
     eps.bounding_box=RANGE<TV>(-sigma_range,sigma_range,-sigma_range,sigma_range);
-    for(int i=1;i<=contrail.m;i++){
+    for(int i=0;i<contrail.m;i++){
         eps.Line_Color(contrail_colors(i));
         for(int j=2;j<=contrail(i).m;j++)
             eps.Draw_Line(contrail(i)(j-1),contrail(i)(j));}
-    for(int i=1;i<=contrail.m;i++){
+    for(int i=0;i<contrail.m;i++){
         eps.Line_Color(contrail_colors(i));
         eps.Draw_Point(contrail(i).Last());}
     eps.Line_Color(VECTOR<T,3>());
 
-    for(int i=1;i<=contour_segments.m;i++)
+    for(int i=0;i<contour_segments.m;i++)
         eps.Draw_Line(contour_segments(i).x,contour_segments(i).y);
 
     eps.Draw_Line(TV(0,-image_size),TV(0,image_size));
@@ -1084,8 +1084,8 @@ void Add_Primary_Contour_Segments(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>& icm)
 {
     ARRAY<TV,VECTOR<int,2> > evec(1,image_size,1,image_size);
     ARRAY<TV,VECTOR<int,2> > grad(1,image_size,1,image_size);
-    for(int i=1;i<=image_size;i++)
-        for(int j=1;j<=image_size;j++){
+    for(int i=0;i<image_size;i++)
+        for(int j=0;j<image_size;j++){
             T x=(2*i-image_size)*sigma_range/image_size+1e-5;
             T y=(2*j-image_size)*sigma_range/image_size;
             TV g=icm.P_From_Strain(DIAGONAL_MATRIX<T,2>(x,y),1,1).To_Vector();
@@ -1136,7 +1136,7 @@ void Plot_Energy_Density(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>* icm,T stiffness)
     TRIANGULATED_AREA<T>& ta=tests.Create_Mattress(GRID<TV>(2+image_size+1,2+image_size+1,-sigma_range,sigma_range,-sigma_range,sigma_range),true,RIGID_BODY_STATE<TV>());
     TRIANGULATED_SURFACE<T> ts(ta.mesh,*new PARTICLES<VECTOR<T,3> >);
     ts.particles.array_collection->Add_Elements(ta.particles.X.m);
-    for(int i=1;i<=ta.particles.X.m;i++){
+    for(int i=0;i<ta.particles.X.m;i++){
         TV X=ta.particles.X(i);
         X.x+=1.1e-4;
         X.y+=2.3e-4;
@@ -1177,7 +1177,7 @@ void Plot_Energy_Landscape()
     INTERPOLATED_COLOR_MAP<T> mp;
     mp.Initialize_Colors(E.Min(),E.Max(),false,true,false);
 
-    for(int i=1;i<=X.m;i++){
+    for(int i=0;i<X.m;i++){
         Add_Debug_Particle(X(i),mp(E(i)));
         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,N(i));}
     particles.X=TX;
@@ -1207,11 +1207,11 @@ void Plot_Contour_Landscape(int frame)
             DIAGONAL_MATRIX<T,2> F(X),P=icm->P_From_Strain(F,1,0)*plot_scale;
             out<<"p "<<X<<" "<<-P.To_Vector().Normalized()<<std::endl;}
 
-    for(int i=1;i<=fv.Fe_hat.m;i++){
+    for(int i=0;i<fv.Fe_hat.m;i++){
         contrail(i).Append(fv.Fe_hat(i).To_Vector());
         out<<"c "<<contrail(i)<<std::endl;}
 
-    for(int i=1;i<=contour_segments.m;i++){
+    for(int i=0;i<contour_segments.m;i++){
         if(is_neo && (contour_segments(i).x.Min()<.2 || contour_segments(i).y.Min()<.2 || contour_segments(i).y.Max()<.5)) continue;
         out<<"u "<<contour_segments(i)<<std::endl;}
 
@@ -1234,7 +1234,7 @@ void Energy_Profile_Plot(int frame)
 
         energy_mesh=new TRIANGULATED_SURFACE<T>(ta.mesh,*new PARTICLES<VECTOR<T,3> >);
         energy_mesh->particles.array_collection->Add_Elements(ta.particles.X.m);
-        for(int i=1;i<=ta.particles.X.m;i++){
+        for(int i=0;i<ta.particles.X.m;i++){
             TV X=ta.particles.X(i);
             X.x+=1.1e-4;
             X.y+=2.3e-4;
@@ -1256,7 +1256,7 @@ void Energy_Profile_Plot(int frame)
     LOG::cout<<this->debug_particles.debug_particles.X.m<<std::endl;
     energy_particles.array_collection->Add_Elements(this->debug_particles.debug_particles.X.m);
     LOG::cout<<energy_particles.X.m<<std::endl;
-    for(int i=1;i<=energy_particles.X.m;i++){
+    for(int i=0;i<energy_particles.X.m;i++){
         TV X=this->debug_particles.debug_particles.X(i);
         DIAGONAL_MATRIX<T,2> F(X),P=icm->P_From_Strain(F,1,0)*plot_scale;
         energy_particles.X(i)=X.Append((icm->Energy_Density(F,0)-energy_profile_plot_min)*plot_scale+1e-2);

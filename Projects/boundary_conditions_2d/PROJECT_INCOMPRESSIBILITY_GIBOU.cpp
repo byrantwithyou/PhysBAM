@@ -165,11 +165,11 @@ void Project_Incompressibility_Gibou(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> 
         FACE_INDEX<d> face=it.Full_Index();
         VECTOR<TV,2> X;
         T dxi=grid.one_over_dX(it.Axis());
-        for(int i=1;i<=2;i++) X(i)=grid.X(face.Cell_Index(i));
+        for(int i=0;i<2;i++) X(i)=grid.X(face.Cell_Index(i));
         T fraction=Face_Fraction(grid,X(1),X(2),callback);
         if(fraction<1e-8) continue;
         index_to_face.Append(face);
-        for(int i=1;i<=2;i++){
+        for(int i=0;i<2;i++){
             int& index=cell_to_index(face.Cell_Index(i));
             if(!index) index=index_to_cell.Append(face.Cell_Index(i));
             system.gradient.Append_Entry_To_Current_Row(index,sign(i)*dxi);
@@ -198,14 +198,14 @@ void Project_Incompressibility_Gibou(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> 
     z.v.Resize(index_to_cell.m);
 
     VECTOR_ND<T> temp(index_to_face.m);
-    for(int i=1;i<=index_to_face.m;i++) temp(i)=u(index_to_face(i));
+    for(int i=0;i<index_to_face.m;i++) temp(i)=u(index_to_face(i));
     VECTOR_ND<T> old_u=temp;
     system.neg_divergence.Times(temp,b.v);
 
     ARRAY<T,TV_INT> p(grid.Domain_Indices(1));
-    for(int i=1;i<=index_to_cell.m;i++) p(index_to_cell(i))=b.v(i);
+    for(int i=0;i<index_to_cell.m;i++) p(index_to_cell(i))=b.v(i);
     ERROR_COLOR_MAP<T> color(1e-12,1,true,true,true);
-    for(int i=1;i<=index_to_cell.m;i++) Add_Debug_Particle(grid.X(index_to_cell(i)),color(p(index_to_cell(i))));
+    for(int i=0;i<index_to_cell.m;i++) Add_Debug_Particle(grid.X(index_to_cell(i)),color(p(index_to_cell(i))));
     Dump_Frame<RW>(u,"divergence");
     ai.Print("DIVERGENCE",p);
     s=b;
@@ -230,11 +230,11 @@ void Project_Incompressibility_Gibou(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> 
     LOG::cout<<"P-inf "<<INTERVAL<T>::Bounding_Box(x.v).Size()<<std::endl;
     VECTOR_ND<T> tmp(x.v);
     LOG::cout<<"P-1 "<<(tmp-=x.v.Average()).L1_Norm()/x.v.n<<std::endl;
-    for(int i=1;i<=index_to_cell.m;i++) p(index_to_cell(i))=x.v(i);
+    for(int i=0;i<index_to_cell.m;i++) p(index_to_cell(i))=x.v(i);
     if(neumann_pocket) p.Subset(ai.cell_samples)-=p.Subset(ai.cell_samples).Average();
 //    ai.Print("PRESSURE",p);
 
-    for(int i=1;i<=index_to_cell.m;i++) Add_Debug_Particle(grid.X(index_to_cell(i)),color(p(index_to_cell(i))));
+    for(int i=0;i<index_to_cell.m;i++) Add_Debug_Particle(grid.X(index_to_cell(i)),color(p(index_to_cell(i))));
     Dump_Frame<RW>(u,"pressures");
 
 //    ARRAY<T,FACE_INDEX<d> > new_u(u.Domain_Indices(),true);
@@ -244,14 +244,14 @@ void Project_Incompressibility_Gibou(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> 
     system.gradient.Times(x.v,temp);
     temp*=system.beta_inverse;
 
-    for(int i=1;i<=index_to_face.m;i++) Add_Debug_Particle(grid.Axis_X_Face(index_to_face(i)),color(temp(i)));
+    for(int i=0;i<index_to_face.m;i++) Add_Debug_Particle(grid.Axis_X_Face(index_to_face(i)),color(temp(i)));
     Dump_Frame<RW>(u,"du");
 
-    for(int i=1;i<=index_to_face.m;i++) u(index_to_face(i))-=temp(i);
+    for(int i=0;i<index_to_face.m;i++) u(index_to_face(i))-=temp(i);
     old_u-=temp;
 
 /*
-    for(int i=1;i<=index_to_face.m;i++){
+    for(int i=0;i<index_to_face.m;i++){
         T t=temp(i);
         T nu=new_u(index_to_face(i));
         T r=(t-nu)/std::max((T)1e-30,std::max(std::abs(t),std::abs(nu)));
@@ -266,31 +266,31 @@ void Project_Incompressibility_Gibou(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> 
      }
 */
 
-    for(int i=1;i<=index_to_face.m;i++){
+    for(int i=0;i<index_to_face.m;i++){
         if(callback.Inside(grid.Axis_X_Face(index_to_face(i))))
             Add_Debug_Particle(grid.Axis_X_Face(index_to_face(i)),VECTOR<T,3>(0,0,1));
         else Add_Debug_Particle(grid.Axis_X_Face(index_to_face(i)),VECTOR<T,3>(1,1,0));}
 
-    for(int i=1;i<=index_to_cell.m;i++) Add_Debug_Particle(grid.X(index_to_cell(i)),VECTOR<T,3>(0,1,0));
+    for(int i=0;i<index_to_cell.m;i++) Add_Debug_Particle(grid.X(index_to_cell(i)),VECTOR<T,3>(0,1,0));
     Dump_Frame<RW>(u,"in-out tests");
 
-    for(int i=1;i<=index_to_face.m;i++){
+    for(int i=0;i<index_to_face.m;i++){
         TV X=grid.Axis_X_Face(index_to_face(i));
         T uu=u(index_to_face(i));
         T au=callback.Analytic_Velocity(X,time)(index_to_face(i).axis);
         Add_Debug_Particle(X,color(abs(uu-au)));}
     Dump_Frame<RW>(u,"direct error");
 
-    for(int i=1;i<=index_to_face.m;i++) old_u(i)=u(index_to_face(i));
+    for(int i=0;i<index_to_face.m;i++) old_u(i)=u(index_to_face(i));
     system.neg_divergence.Times(old_u,s.v);
-    for(int i=1;i<=index_to_cell.m;i++) Add_Debug_Particle(grid.X(index_to_cell(i)),color(s.v(i)));
+    for(int i=0;i<index_to_cell.m;i++) Add_Debug_Particle(grid.X(index_to_cell(i)),color(s.v(i)));
     Dump_Frame<RW>(u,"residual divergence");
     LOG::cout<<"MAX RESIDUAL BEFORE EXTRAP "<<s.v.Maximum_Magnitude()<<std::endl;
 
 //     Fill_Ghost_Cells(grid,3,3,u,callback);
-//     for(int i=1;i<=index_to_face.m;i++) old_u(i)=u(index_to_face(i));
+//     for(int i=0;i<index_to_face.m;i++) old_u(i)=u(index_to_face(i));
 //     system.neg_divergence.Times(old_u,s.v);
-//     for(int i=1;i<=index_to_cell.m;i++) Add_Debug_Particle(grid.X(index_to_cell(i)),color(s.v(i)));
+//     for(int i=0;i<index_to_cell.m;i++) Add_Debug_Particle(grid.X(index_to_cell(i)),color(s.v(i)));
 //     Dump_Frame<RW>(u,"residual divergence (after extrap)");
 //     LOG::cout<<"MAX RESIDUAL AFTER EXTRAP "<<s.v.Maximum_Magnitude()<<std::endl;
 

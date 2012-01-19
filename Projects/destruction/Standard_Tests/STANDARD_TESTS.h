@@ -229,7 +229,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         default: PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Unrecognized test number %d",test_number));}
 
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     // correct mass
     binding_list.Distribute_Mass_To_Parents();
@@ -257,7 +257,7 @@ void Display_Pattern()
     solid_body_collection.print_residuals=false;
 
     FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),fracture_pattern_index),fracture_pattern);
-    for(int i=1;i<=fracture_pattern.regions.m;i++){
+    for(int i=0;i<fracture_pattern.regions.m;i++){
         RIGID_BODY<TV>* new_body=new RIGID_BODY<TV>(rigid_body_collection,true);
         new_body->Add_Structure(*fracture_pattern.regions(i)->triangulated_surface);
         new_body->Add_Structure(*fracture_pattern.regions(i)->implicit_object);
@@ -272,7 +272,7 @@ void Prescore_Cube()
     solid_body_collection.print_diagnostics=false;
     solid_body_collection.print_residuals=false;
 
-    for(int i=1;i<=89;i++){
+    for(int i=0;i<89;i++){
         if(i==36 || i==71 || i==30) continue;
         RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body(STRING_UTILITIES::string_sprintf("Fractured_Cube/fragment.%02d",i),1,(T).5);(void)rigid_body;}
 
@@ -289,7 +289,7 @@ void Prescore_Pillar()
     solid_body_collection.print_diagnostics=false;
     solid_body_collection.print_residuals=false;
 
-    for(int i=1;i<=94;i++){
+    for(int i=0;i<94;i++){
         if(i==90) continue;
         RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body(STRING_UTILITIES::string_sprintf("Fractured_Pillar/fragment.%02d",i),1,(T).5);(void)rigid_body;
         if(rigid_body.Mass()<(T)1e-5) rigid_body_collection.rigid_body_particle.Remove_Body(rigid_body.particle_index);}
@@ -364,7 +364,7 @@ void Sphere_Pillar()
     solid_body_collection.print_diagnostics=false;
     solid_body_collection.print_residuals=false;
 
-    for(int i=1;i<=94;i++){
+    for(int i=0;i<94;i++){
         if(i==90) continue;
         RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body(STRING_UTILITIES::string_sprintf("Fractured_Pillar/fragment.%02d",i),1,(T).5);(void)rigid_body;
         rigid_body.Update_Bounding_Box();T_ORIENTED_BOX oriented_box=rigid_body.Oriented_Bounding_Box();
@@ -421,9 +421,9 @@ void Ball_Hitting_Wall()
     int particle_index=1;
     for(int side=0;side<=1;side++){
         // Construct top and bottom
-        for(int x=1;x<=dimensions.x;x++) for(int z=1;z<=dimensions.z;z++){
+        for(int x=0;x<dimensions.x;x++) for(int z=0;z<dimensions.z;z++){
             particles.X(particle_index)=box.min_corner+dx*TV((T)x-1,side?(T)dimensions.y-1:0,(T)z-1);particle_index++;}
-        for(int x=1;x<=dimensions.x;x++) for(int y=2;y<=dimensions.y-1;y++){
+        for(int x=0;x<dimensions.x;x++) for(int y=2;y<=dimensions.y-1;y++){
             particles.X(particle_index)=box.min_corner+dx*TV((T)x-1,(T)y-1,side?(T)dimensions.z-1:0);particle_index++;}
         for(int z=2;z<=dimensions.z-1;z++) for(int y=2;y<=dimensions.y-1;y++){
             particles.X(particle_index)=box.min_corner+dx*TV(side?(T)dimensions.x-1:0,(T)y-1,(T)z-1);particle_index++;}}
@@ -549,9 +549,9 @@ void Raining_Spheres()
     int particle_index=1;
     for(int side=0;side<=1;side++){
         // Construct top and bottom
-        for(int x=1;x<=dimensions.x;x++) for(int z=1;z<=dimensions.z;z++){
+        for(int x=0;x<dimensions.x;x++) for(int z=0;z<dimensions.z;z++){
             particles.X(particle_index)=box.min_corner+dx*TV((T)x-1,side?(T)dimensions.y-1:0,(T)z-1);particle_index++;}
-        for(int x=1;x<=dimensions.x;x++) for(int y=2;y<=dimensions.y-1;y++){
+        for(int x=0;x<dimensions.x;x++) for(int y=2;y<=dimensions.y-1;y++){
             particles.X(particle_index)=box.min_corner+dx*TV((T)x-1,(T)y-1,side?(T)dimensions.z-1:0);particle_index++;}
         for(int z=2;z<=dimensions.z-1;z++) for(int y=2;y<=dimensions.y-1;y++){
             particles.X(particle_index)=box.min_corner+dx*TV(side?(T)dimensions.x-1:0,(T)y-1,(T)z-1);particle_index++;}}
@@ -614,7 +614,7 @@ void Raining_Spheres()
         num_spheres=parameter;
         maximum_fall_speed=sqrt(3*g*h);
         rigid_body_clamp_time.Append(PAIR<int,T>(large_sphere_body.particle_index,(world_height-10)/maximum_fall_speed));}
-    for(int i=1;i<=num_spheres;i++){
+    for(int i=0;i<num_spheres;i++){
         RIGID_BODY<TV>& sphere_body=tests.Add_Rigid_Body("sphere_refined",(T).35,(T).2,true,true);
         sphere_body.Update_Bounding_Box();
         sphere_body.Set_Frame(Find_Placement(random,sphere_body.axis_aligned_bounding_box,bounding_boxes,world,false));
@@ -635,7 +635,7 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
 {
     RIGID_BODY_COLLISIONS<TV>& collisions=*solids_evolution->rigid_body_collisions;
     if(solids_parameters.rigid_body_collision_parameters.use_fracture_pattern && collisions.fracture_pattern && !collisions.fracture_pattern->regions.m){
-        for(int i=1;i<=fracture_pattern.regions.m;i++) collisions.fracture_pattern->regions.Append(fracture_pattern.regions(i));}
+        for(int i=0;i<fracture_pattern.regions.m;i++) collisions.fracture_pattern->regions.Append(fracture_pattern.regions(i));}
     if(test_number==2){
         collisions.Set_Contact_Level_Iterations(2);
         collisions.Set_Contact_Pair_Iterations(20);
@@ -662,10 +662,10 @@ void Create_Pattern(const int test_number)
             GRID<TV> levelset_grid(TV_INT(100,100,100),BOX<TV>(TV((T)-2.5,(T)-2.5,(T)-2.5),TV((T)2.5,(T)2.5,(T)2.5)),false);
             ARRAY<int,VECTOR<int,3> > regions(levelset_grid.Domain_Indices());regions.Fill(-1);
             ARRAY<TV_INT> neighbor_list;
-            for(int s=1;s<=seed_points.m;s++){
+            for(int s=0;s<seed_points.m;s++){
                 TV_INT cell_index=levelset_grid.Cell(seed_points(s),0);
                 regions(cell_index)=s;
-                for(int axis=1;axis<=3;axis++) for(int side=-1;side<=1;side+=2){
+                for(int axis=0;axis<3;axis++) for(int side=-1;side<=1;side+=2){
                     TV_INT neighbor_index=cell_index+side*TV_INT::Axis_Vector(axis);
                     if(levelset_grid.Domain_Indices().Lazy_Inside(neighbor_index) && regions(neighbor_index)==-1)
                         neighbor_list.Append(neighbor_index);}}
@@ -674,7 +674,7 @@ void Create_Pattern(const int test_number)
                 TV_INT cell_index=neighbor_list(rand_int);
                 if(regions(cell_index)==-1){
                     ARRAY<int> filled_neighbors;
-                    for(int axis=1;axis<=3;axis++) for(int side=-1;side<=1;side+=2){
+                    for(int axis=0;axis<3;axis++) for(int side=-1;side<=1;side+=2){
                         TV_INT neighbor_index=cell_index+side*TV_INT::Axis_Vector(axis);
                         if(levelset_grid.Domain_Indices().Lazy_Inside(neighbor_index)){
                             if(regions(neighbor_index)!=-1) filled_neighbors.Append(regions(neighbor_index));
@@ -682,7 +682,7 @@ void Create_Pattern(const int test_number)
                     int region_index=rn.Get_Uniform_Integer(1,filled_neighbors.m);
                     regions(cell_index)=filled_neighbors(region_index);}
                 neighbor_list.Remove_Index_Lazy(rand_int);}
-            for(int r=1;r<=seed_points.m;r++){
+            for(int r=0;r<seed_points.m;r++){
                 LOG::cout << "constructing region " << r << std::endl;
                 RANGE<TV_INT> local_counts=RANGE<TV_INT>::Zero_Box().Thickened(-INT_MAX);
                 BOX<TV> local_domain;
@@ -690,7 +690,7 @@ void Create_Pattern(const int test_number)
                     if(regions(iterator.index)==r){
                         local_counts.Enlarge_To_Include_Point(iterator.index);
                         local_domain.Enlarge_To_Include_Point(iterator.Location());
-                        for(int axis=1;axis<=3;axis++) for(int side=-1;side<=1;side+=2){
+                        for(int axis=0;axis<3;axis++) for(int side=-1;side<=1;side+=2){
                             TV_INT neighbor_index=iterator.index+side*TV_INT::Axis_Vector(axis);
                             local_counts.Enlarge_To_Include_Point(neighbor_index);
                             local_domain.Enlarge_To_Include_Point(levelset_grid.Node(neighbor_index));}}}
@@ -702,7 +702,7 @@ void Create_Pattern(const int test_number)
                     TV_INT global_index=iterator.index+local_counts.min_corner-1;
                     if(levelset_grid.Domain_Indices().Lazy_Inside(global_index) && regions(global_index)==r){
                         local_phi(iterator.index)=-FLT_MAX;
-                        for(int axis=1;axis<=3;axis++) for(int side=-1;side<=1;side+=2){
+                        for(int axis=0;axis<3;axis++) for(int side=-1;side<=1;side+=2){
                             TV_INT global_neighbor_index=global_index+side*TV_INT::Axis_Vector(axis);
                             TV_INT local_neighbor_index=iterator.index+side*TV_INT::Axis_Vector(axis);
                             if(!levelset_grid.Domain_Indices().Lazy_Inside(global_neighbor_index) || regions(global_neighbor_index)!=r){
@@ -721,7 +721,7 @@ void Create_Pattern(const int test_number)
             FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/fracture_pattern.%d",output_directory.c_str(),test_number),fracture_pattern);
             return;}
         case 3:
-            for(int i=1;i<=89;i++){
+            for(int i=0;i<89;i++){
                 RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body(STRING_UTILITIES::string_sprintf("Fractured_Cube/fragment.%02d",i),1,(T).5);(void)rigid_body;
                 rigid_body.Update_Bounding_Box();domain.Enlarge_To_Include_Box(rigid_body.axis_aligned_bounding_box);}
             pattern_center=TV_INT(25,25,25);
@@ -908,7 +908,7 @@ void Create_Raining_Spheres_Pattern()
 void Create_Box_Split_Pattern()
 {
     FRACTURE_PATTERN<T> fp;
-    for(int i=1;i<=2;i++){
+    for(int i=0;i<2;i++){
         int resolution=100;T edge_length=4;T dx=edge_length/resolution;int ghost_cells=2;
         TV half_edge_length;half_edge_length.Fill(edge_length/2);
         TV_INT counts;counts.Fill(resolution);half_edge_length.Fill(edge_length/2);
@@ -947,27 +947,27 @@ void Create_Pyramid_Pattern(BOX<TV> boundary,const int min_resolution,const int 
     corners+=VECTOR<int,4>::All_Ones_Vector();
     TV jitter((T).001,(T).002,(T).003);
     FRACTURE_PATTERN<T> fp;
-    for(int m=1;m<=6;m++){
+    for(int m=0;m<6;m++){
         GRID<TV>& grid=*new GRID<TV>(TV_INT(rint(boundary.Edge_Lengths()/dx))+1,boundary,false);
         ARRAY<T,VECTOR<int,3> >& phi=*new ARRAY<T,VECTOR<int,3> >(grid.Domain_Indices());
         TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
         TV pt_inside=pts.Subset(corners(m)).Average();
         phi.Fill(-FLT_MAX);
-        for(int i=1;i<=4;i++){
+        for(int i=0;i<4;i++){
             TRIANGLE_3D<T> tri(pts(corners(m)(i)),pts(corners(m)(i%4+1)),center);
             for(NODE_ITERATOR iterator(grid);iterator.Valid();iterator.Next())
                 phi(iterator.index)=-min(-phi(iterator.index),tri.Distance_To_Triangle(iterator.Location()+jitter));}
-        for(int i=1;i<=4;i++){
+        for(int i=0;i<4;i++){
             PLANE<T> plane(pts(corners(m)(i)),pts(corners(m)(i%4+1)),center);
             if(plane.Signed_Distance(pt_inside)>0) plane.normal=-plane.normal;
             for(NODE_ITERATOR iterator(grid);iterator.Valid();iterator.Next())
                 if(plane.Signed_Distance(iterator.Location()+jitter)>0) phi(iterator.index)=abs(phi(iterator.index));}
 
         surface->particles.X(surface->particles.array_collection->Add_Element())=center;
-        for(int i=1;i<=4;i++){
+        for(int i=0;i<4;i++){
             TV A=pts(corners(m)(i)),B=pts(corners(m)(i%4+1)),C=center;
-            for(int j=1;j<=subdivision;j++){
-                for(int k=1;k<=j;k++){
+            for(int j=0;j<subdivision;j++){
+                for(int k=0;k<j;k++){
                     TV D=C+(B-C)*((T)k/j);
                     TV E=A+(D-A)*((T)j/subdivision);
                     surface->particles.X(surface->particles.array_collection->Add_Element())=E;}}}
@@ -981,7 +981,7 @@ void Create_Pyramid_Pattern(BOX<TV> boundary,const int min_resolution,const int 
         fr->fracture_offset=center_index;
         fp.regions.Append(fr);}
     FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),test_number),fp);
-    for(int m=1;m<=6;m++){
+    for(int m=0;m<6;m++){
         delete &fp.regions(m)->implicit_object->levelset.grid;
         delete &fp.regions(m)->implicit_object->levelset.phi;}
 }
@@ -1016,7 +1016,7 @@ void Create_Crossing_Planes_Pattern()
             for(NODE_ITERATOR iterator(grid);iterator.Valid();iterator.Next())
                 phi(iterator.index)=max(plane1.Signed_Distance(iterator.Location()+jitter),plane2.Signed_Distance(iterator.Location()+jitter));
             TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
-            for(int plane=1;plane<=2;plane++){
+            for(int plane=0;plane<2;plane++){
                 T min_x_coord=min(center.x,x_coords(plane));
                 T max_x_coord=max(center.x,x_coords(plane));
                 bool flipped=min_x_coord==center.x;
@@ -1024,7 +1024,7 @@ void Create_Crossing_Planes_Pattern()
                 T z_step=(flipped?-side:side)*(original_half_edge_length.z-center.z)/nodes_per_long_side;
                 T x=min_x_coord;
                 T z=flipped?center.z:side*original_half_edge_length.z;
-                for(int x_node=1;x_node<=nodes_per_long_side;x_node++){
+                for(int x_node=0;x_node<nodes_per_long_side;x_node++){
                     for(T y=-original_half_edge_length.y;y<=original_half_edge_length.y;y+=edge_lengths.y/nodes_per_static_side)
                         surface->particles.X(surface->particles.array_collection->Add_Element())=TV(x,y,z);
                     x+=x_step;z-=z_step;}}
@@ -1057,7 +1057,7 @@ void Create_Crossing_Planes_Pattern()
             for(NODE_ITERATOR iterator(grid);iterator.Valid();iterator.Next())
                 phi(iterator.index)=max(plane1.Signed_Distance(iterator.Location()+jitter),plane2.Signed_Distance(iterator.Location()+jitter));
             TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
-            for(int plane=1;plane<=2;plane++){
+            for(int plane=0;plane<2;plane++){
                 T min_z_coord=min(center.z,z_coords(plane));
                 T max_z_coord=max(center.z,z_coords(plane));
                 bool flipped=min_z_coord==center.z;
@@ -1065,7 +1065,7 @@ void Create_Crossing_Planes_Pattern()
                 T x_step=(flipped?-side:side)*(original_half_edge_length.x-center.x)/nodes_per_long_side;
                 T z=min_z_coord;
                 T x=flipped?center.x:side*original_half_edge_length.x;
-                for(int z_node=1;z_node<=nodes_per_long_side;z_node++){
+                for(int z_node=0;z_node<nodes_per_long_side;z_node++){
                     for(T y=-original_half_edge_length.y;y<=original_half_edge_length.y;y+=edge_lengths.y/nodes_per_static_side)
                         surface->particles.X(surface->particles.array_collection->Add_Element())=TV(x,y,z);
                     z+=z_step;x-=x_step;}}
@@ -1088,25 +1088,25 @@ void Create_Grain_Boundary_Surfaces()
 {
     BOX<TV> wall_box(TV((T)-3,(T)-.2,(T)-2),TV((T)3,(T).2,(T)2));
     TRIANGULATED_SURFACE<T>* wall_surface=TESSELLATION::Generate_Triangles(wall_box);
-    for(int i=1;i<=3;i++)
+    for(int i=0;i<3;i++)
         wall_surface->Linearly_Subdivide();
     FILE_UTILITIES::Write_To_File(stream_type,"wall.tri",*wall_surface);
 
     BOX<TV> cylinder_box(TV((T)-1,(T)-2,(T)-1),TV((T)1,(T)2,(T)1));
     TRIANGULATED_SURFACE<T>* cylinder_surface=TESSELLATION::Generate_Triangles(cylinder_box);
-    for(int i=1;i<=3;i++)
+    for(int i=0;i<3;i++)
         cylinder_surface->Linearly_Subdivide();
     FILE_UTILITIES::Write_To_File(stream_type,"cylinder.tri",*cylinder_surface);
 
     BOX<TV> bunny_box(TV((T)-.6,(T)-.6,(T)-.45),TV((T).6,(T).6,(T).45));
     TRIANGULATED_SURFACE<T>* bunny_surface=TESSELLATION::Generate_Triangles(bunny_box);
-    for(int i=1;i<=3;i++)
+    for(int i=0;i<3;i++)
         bunny_surface->Linearly_Subdivide();
     FILE_UTILITIES::Write_To_File(stream_type,"bunny.tri",*bunny_surface);
 
     BOX<TV> raining_box(TV((T)-2,(T)-2,(T)-2),TV((T)2,(T)2,(T)2));
     TRIANGULATED_SURFACE<T>* raining_surface=TESSELLATION::Generate_Triangles(raining_box);
-    for(int i=1;i<=3;i++)
+    for(int i=0;i<3;i++)
         raining_surface->Linearly_Subdivide();
     FILE_UTILITIES::Write_To_File(stream_type,"raining.tri",*raining_surface);
 }
@@ -1197,7 +1197,7 @@ void Grain_Points()
     PHYSBAM_ASSERT(F);
 
     fprintf(F,"%d\n",num_pts);
-    for(int i=1;i<=num_pts;i++){
+    for(int i=0;i<num_pts;i++){
         TV x;
         x.x=random.Get_Gaussian();
         x.y=random.Get_Gaussian();
@@ -1249,7 +1249,7 @@ void Friction_Test()
 //#####################################################################
 FRAME<TV> Find_Placement(RANDOM_NUMBERS<T>& random,const BOX<TV>& bounding_box,ARRAY<ORIENTED_BOX<TV> >& bounding_boxes,const BOX<TV>& world,bool want_rotate)
 {
-    for(int i=1;i<=10000;i++){
+    for(int i=0;i<10000;i++){
         FRAME<TV> frame;
         if(want_rotate) frame.r=random.template Get_Rotation<TV>();
         ORIENTED_BOX<TV> oriented_box(bounding_box,frame.r);
@@ -1257,7 +1257,7 @@ FRAME<TV> Find_Placement(RANDOM_NUMBERS<T>& random,const BOX<TV>& bounding_box,A
         frame.t=random.Get_Uniform_Vector(world.min_corner-new_box.min_corner,world.max_corner-new_box.max_corner);
         oriented_box.corner+=frame.t;
         bool okay=true;
-        for(int j=1;j<=bounding_boxes.m;j++) if(oriented_box.Intersection(bounding_boxes(j))){okay=false;break;}
+        for(int j=0;j<bounding_boxes.m;j++) if(oriented_box.Intersection(bounding_boxes(j))){okay=false;break;}
         if(okay){
             bounding_boxes.Append(oriented_box);
             return frame;}}
@@ -1269,7 +1269,7 @@ FRAME<TV> Find_Placement(RANDOM_NUMBERS<T>& random,const BOX<TV>& bounding_box,A
 void Advance_One_Time_Step_End_Callback(const T dt,const T time)
 {
     if(test_number==12 && maximum_fall_speed){
-        for(int i=1;i<=rigid_body_clamp_time.m;i++) if(rigid_body_clamp_time(i).y>=time){int id=rigid_body_clamp_time(i).x;
+        for(int i=0;i<rigid_body_clamp_time.m;i++) if(rigid_body_clamp_time(i).y>=time){int id=rigid_body_clamp_time(i).x;
             if(rigid_body_collection.Is_Active(id)){
                 RIGID_BODY<TV>& rigid_body=rigid_body_collection.Rigid_Body(id);
                 T speed=rigid_body.Twist().linear.Magnitude();

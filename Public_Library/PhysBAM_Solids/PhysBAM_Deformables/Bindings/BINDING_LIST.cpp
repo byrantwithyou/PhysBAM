@@ -60,9 +60,9 @@ template<class TV> void BINDING_LIST<TV>::
 Update_Binding_Index_From_Particle_Index()
 {
     binding_index_from_particle_index.Clean_Memory();
-    int max_particle_index=0;for(int b=1;b<=bindings.m;b++) max_particle_index=max(max_particle_index,bindings(b)->particle_index);
+    int max_particle_index=0;for(int b=0;b<bindings.m;b++) max_particle_index=max(max_particle_index,bindings(b)->particle_index);
     binding_index_from_particle_index.Resize(max_particle_index);
-    for(int b=1;b<=bindings.m;b++){assert(!binding_index_from_particle_index(bindings(b)->particle_index));binding_index_from_particle_index(bindings(b)->particle_index)=b;}
+    for(int b=0;b<bindings.m;b++){assert(!binding_index_from_particle_index(bindings(b)->particle_index));binding_index_from_particle_index(bindings(b)->particle_index)=b;}
 }
 //#####################################################################
 // Function Add_Dependencies
@@ -70,7 +70,7 @@ Update_Binding_Index_From_Particle_Index()
 template<class TV> void BINDING_LIST<TV>::
 Add_Dependencies(SEGMENT_MESH& dependency_mesh) const
 {
-    for(int b=1;b<=bindings.m;b++) bindings(b)->Add_Dependencies(dependency_mesh);
+    for(int b=0;b<bindings.m;b++) bindings(b)->Add_Dependencies(dependency_mesh);
 }
 //#####################################################################
 // Function Compute_Dependency_Closure_Based_On_Embedding
@@ -79,9 +79,9 @@ template<class TV> void BINDING_LIST<TV>::
 Compute_Dependency_Closure_Based_On_Embedding(SEGMENT_MESH& dependency_mesh) const
 {
     ARRAY<VECTOR<int,2> > dependencies;dependency_mesh.elements.Exchange(dependencies);dependency_mesh.Refresh_Auxiliary_Structures();
-    for(int i=1;i<=dependencies.m;i++){VECTOR<int,2>& dependency=dependencies(i);
+    for(int i=0;i<dependencies.m;i++){VECTOR<int,2>& dependency=dependencies(i);
         ARRAY<int> parents1(Dynamic_Parents(dependency.x)),parents2(Dynamic_Parents(dependency.y));
-        for(int i=1;i<=parents1.m;i++) for(int j=1;j<=parents2.m;j++) dependency_mesh.Add_Element_If_Not_Already_There(VECTOR<int,2>(parents1(i),parents2(j)));}
+        for(int i=0;i<parents1.m;i++) for(int j=0;j<parents2.m;j++) dependency_mesh.Add_Element_If_Not_Already_There(VECTOR<int,2>(parents1(i),parents2(j)));}
 }
 //#####################################################################
 // Function Compute_Particle_Closure_Based_On_Embedding
@@ -91,7 +91,7 @@ Compute_Particle_Closure_Based_On_Embedding(ARRAY<int>& particle_set) const
 {
     ARRAY<bool> particle_is_present(particles.array_collection->Size());
     particle_is_present.Subset(particle_set).Fill(true);
-    for(int b=1;b<=bindings.m;b++){BINDING<TV>& binding=*bindings(b);
+    for(int b=0;b<bindings.m;b++){BINDING<TV>& binding=*bindings(b);
         if(!particle_is_present.Subset(binding.Parents()).Contains(false) && !particle_is_present(binding.particle_index)) particle_set.Append(binding.particle_index);}
 }
 //#####################################################################
@@ -100,7 +100,7 @@ Compute_Particle_Closure_Based_On_Embedding(ARRAY<int>& particle_set) const
 template<class TV> void BINDING_LIST<TV>::
 Clamp_Particles_To_Embedded_Positions() const
 {
-    for(int i=1;i<=bindings.m;i++) bindings(i)->Clamp_To_Embedded_Position();
+    for(int i=0;i<bindings.m;i++) bindings(i)->Clamp_To_Embedded_Position();
 }
 //#####################################################################
 // Function Clamp_Particles_To_Embedded_Velocities
@@ -108,7 +108,7 @@ Clamp_Particles_To_Embedded_Positions() const
 template<class TV> void BINDING_LIST<TV>::
 Clamp_Particles_To_Embedded_Velocities() const
 {
-    for(int i=1;i<=bindings.m;i++) bindings(i)->Clamp_To_Embedded_Velocity();
+    for(int i=0;i<bindings.m;i++) bindings(i)->Clamp_To_Embedded_Velocity();
 }
 //#####################################################################
 // Function Clamp_Particles_To_Embedded_Positions
@@ -116,7 +116,7 @@ Clamp_Particles_To_Embedded_Velocities() const
 template<class TV> void BINDING_LIST<TV>::
 Clamp_Particles_To_Embedded_Positions(ARRAY_VIEW<TV> X) const
 {
-    for(int i=1;i<=bindings.m;i++) X(bindings(i)->particle_index)=bindings(i)->Embedded_Position(X);
+    for(int i=0;i<bindings.m;i++) X(bindings(i)->particle_index)=bindings(i)->Embedded_Position(X);
 }
 //#####################################################################
 // Function Clamp_Particles_To_Embedded_Velocities
@@ -124,7 +124,7 @@ Clamp_Particles_To_Embedded_Positions(ARRAY_VIEW<TV> X) const
 template<class TV> void BINDING_LIST<TV>::
 Clamp_Particles_To_Embedded_Velocities(ARRAY_VIEW<TV> V) const
 {
-    for(int i=1;i<=bindings.m;i++) V(bindings(i)->particle_index)=bindings(i)->Embedded_Velocity(V);
+    for(int i=0;i<bindings.m;i++) V(bindings(i)->particle_index)=bindings(i)->Embedded_Velocity(V);
 }
 //#####################################################################
 // Function Clamp_Particles_To_Embedded_Velocities
@@ -132,7 +132,7 @@ Clamp_Particles_To_Embedded_Velocities(ARRAY_VIEW<TV> V) const
 template<class TV> void BINDING_LIST<TV>::
 Clamp_Particles_To_Embedded_Velocities(ARRAY_VIEW<TV> V,ARRAY_VIEW<const TWIST<TV> > twist) const
 {
-    for(int i=1;i<=bindings.m;i++) V(bindings(i)->particle_index)=bindings(i)->Embedded_Velocity(V,twist);
+    for(int i=0;i<bindings.m;i++) V(bindings(i)->particle_index)=bindings(i)->Embedded_Velocity(V,twist);
 }
 //#####################################################################
 // Function Distribute_Force_To_Parents
@@ -140,7 +140,7 @@ Clamp_Particles_To_Embedded_Velocities(ARRAY_VIEW<TV> V,ARRAY_VIEW<const TWIST<T
 template<class TV> void BINDING_LIST<TV>::
 Distribute_Force_To_Parents(ARRAY_VIEW<TV> F_full) const
 {
-    for(int i=1;i<=bindings.m;i++) bindings(i)->Distribute_Force_To_Parents(F_full,F_full(bindings(i)->particle_index));
+    for(int i=0;i<bindings.m;i++) bindings(i)->Distribute_Force_To_Parents(F_full,F_full(bindings(i)->particle_index));
 }
 //#####################################################################
 // Function Distribute_Force_To_Parents
@@ -148,7 +148,7 @@ Distribute_Force_To_Parents(ARRAY_VIEW<TV> F_full) const
 template<class TV> void BINDING_LIST<TV>::
 Distribute_Force_To_Parents(ARRAY_VIEW<TV> F_full,ARRAY_VIEW<TWIST<TV> > wrench_full) const
 {
-    for(int i=1;i<=bindings.m;i++) bindings(i)->Distribute_Force_To_Parents(F_full,wrench_full,F_full(bindings(i)->particle_index));
+    for(int i=0;i<bindings.m;i++) bindings(i)->Distribute_Force_To_Parents(F_full,wrench_full,F_full(bindings(i)->particle_index));
 }
 //#####################################################################
 // Function Distribute_Mass_To_Parents
@@ -156,7 +156,7 @@ Distribute_Force_To_Parents(ARRAY_VIEW<TV> F_full,ARRAY_VIEW<TWIST<TV> > wrench_
 template<class TV> void BINDING_LIST<TV>::
 Distribute_Mass_To_Parents() const
 {
-    for(int b=1;b<=bindings.m;b++) bindings(b)->Distribute_Mass_To_Parents(particles.mass);
+    for(int b=0;b<bindings.m;b++) bindings(b)->Distribute_Mass_To_Parents(particles.mass);
 }
 //#####################################################################
 // Function Adjust_Parents_For_Changes_In_Surface_Children
@@ -173,7 +173,7 @@ Adjust_Parents_For_Changes_In_Surface_Children(const ARRAY<bool>& particle_on_su
     PHYSBAM_ASSERT(deformable_body_collection);
 
     // figure out which embedded points are not where they should be or have differing velocities
-    for(int i=1;i<=bindings.m;i++){
+    for(int i=0;i<bindings.m;i++){
         BINDING<TV>& binding=*bindings(i);
         int p=binding.particle_index;
         const ARRAY<int>& parents=binding.Parents();
@@ -181,9 +181,9 @@ Adjust_Parents_For_Changes_In_Surface_Children(const ARRAY<bool>& particle_on_su
             TV Xp=binding.Embedded_Position(),Vp=binding.Embedded_Velocity();
             if(particles.X(p)!=Xp || particles.V(p)!=Vp){interactions++;
                 TV delta_X=particles.X(p)-Xp,delta_V=particles.V(p)-Vp;
-                for(int j=1;j<=parents.m;j++) if(!particle_on_surface(parents(j))){
+                for(int j=0;j<parents.m;j++) if(!particle_on_surface(parents(j))){
                         self_collision.Set(parents(j));total_delta_X.Get_Or_Insert(parents(j))+=delta_X;total_delta_V.Get_Or_Insert(parents(j))+=delta_V;}}}
-        for(int j=1;j<=parents.m;j++) number_of_children.Get_Or_Insert(parents(j))++;} // TODO: consider only counting children that are on the surface
+        for(int j=0;j<parents.m;j++) number_of_children.Get_Or_Insert(parents(j))++;} // TODO: consider only counting children that are on the surface
 
     // adjust parents to match changes in children, skipping parents on the surface since they may also be self-colliding
     for(typename HASHTABLE<int>::ITERATOR it(self_collision);it.Valid();it.Next()){int p=it.Key();
@@ -208,7 +208,7 @@ Adjust_Parents_For_Changes_In_Surface_Children_Velocities(const ARRAY<bool>& par
     PHYSBAM_ASSERT(deformable_body_collection);
 
     // figure out which embedded points are not where they should be or have differing velocities
-    for(int i=1;i<=bindings.m;i++){
+    for(int i=0;i<bindings.m;i++){
         BINDING<TV>& binding=*bindings(i);
         int p=binding.particle_index;
         const ARRAY<int>& parents=binding.Parents();
@@ -216,9 +216,9 @@ Adjust_Parents_For_Changes_In_Surface_Children_Velocities(const ARRAY<bool>& par
             TV Vp=binding.Embedded_Velocity();
             if(particles.V(p)!=Vp){interactions++;
                 TV delta_V=particles.V(p)-Vp;
-                for(int j=1;j<=parents.m;j++) if(!particle_on_surface(parents(j))){
+                for(int j=0;j<parents.m;j++) if(!particle_on_surface(parents(j))){
                         self_collision.Set(parents(j));total_delta_V.Get_Or_Insert(parents(j))+=delta_V;}}}
-        for(int j=1;j<=parents.m;j++) number_of_children.Get_Or_Insert(parents(j))++;} // TODO: consider only counting children that are on the surface
+        for(int j=0;j<parents.m;j++) number_of_children.Get_Or_Insert(parents(j))++;} // TODO: consider only counting children that are on the surface
 
     // adjust parents to match changes in children, skipping parents on the surface since they may also be self-colliding
     for(typename HASHTABLE<int>::ITERATOR it(self_collision);it.Valid();it.Next()){int p=it.Key();
@@ -245,7 +245,7 @@ template<class TV> void BINDING_LIST<TV>::
 Write(TYPED_OSTREAM& output) const
 {
     Write_Binary(output,bindings.m);
-    for(int k=1;k<=bindings.m;k++) bindings(k)->Write(output);
+    for(int k=0;k<bindings.m;k++) bindings(k)->Write(output);
 }
 //#####################################################################
 template class BINDING_LIST<VECTOR<float,1> >;

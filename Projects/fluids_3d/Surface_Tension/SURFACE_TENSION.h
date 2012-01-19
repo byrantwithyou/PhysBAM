@@ -89,7 +89,7 @@ void Construct_Levelsets_For_Objects(const T time)
     V_object.Resize(grid,3,false,false);
     for(int i=-2;i<=grid.m+3;i++)for(int j=-2;j<=grid.n+3;j++)for(int ij=-2;ij<=grid.mn+3;ij++){
         T min_phi=1;int min_r=1;VECTOR<T,3> X=grid.X(i,j,ij);
-        for(int r=1;r<=solids_parameters.rigid_body_parameters.list.rigid_bodies.m;r++){
+        for(int r=0;r<solids_parameters.rigid_body_parameters.list.rigid_bodies.m;r++){
             T phi=solids_parameters.rigid_body_parameters.list(r)->Implicit_Surface_Value(X);
             if(min_phi>phi){min_phi=phi;min_r=r;}}
         phi_object(i,j,ij)=min_phi;
@@ -161,7 +161,7 @@ void Get_Source_Velocities(const T time)
 {
     Get_Source_Velocities(source,MATRIX<T,4>::Identity_Matrix(),source_velocity,time);
     GRID<TV>& grid=fluids_parameters.grid;
-    if(fluids_parameters.use_strain)for(int i=1;i<=grid.m;i++)for(int j=1;j<=grid.n;j++)for(int ij=1;ij<=grid.mn;ij++)
+    if(fluids_parameters.use_strain)for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++)for(int ij=0;ij<grid.mn;ij++)
         if(source.Lazy_Inside(grid.X(i,j,ij))) fluids_parameters.e(i,j,ij)=SYMMETRIC_MATRIX<T,3>();
 }
 //#####################################################################

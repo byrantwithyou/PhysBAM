@@ -72,7 +72,7 @@ void Get_Initial_Data()
     solids_parameters.rigid_body_parameters.list(index)->is_kinematic = true;
     kinematic_body_vel=5;
 
-    for(int i=1;i<=solids_parameters.rigid_body_parameters.list.rigid_bodies.m;i++){RIGID_BODY<TV>& rigid_body=*solids_parameters.rigid_body_parameters.list(i);
+    for(int i=0;i<solids_parameters.rigid_body_parameters.list.rigid_bodies.m;i++){RIGID_BODY<TV>& rigid_body=*solids_parameters.rigid_body_parameters.list(i);
         if(rigid_body.is_kinematic) Set_Kinematic_Positions(rigid_body.frame,time,rigid_body.particle_index);}
 }
 //#####################################################################

@@ -54,7 +54,7 @@ public:
 
     void Initialize_Mesh_With_Particle_Offset(const HEXAHEDRON_MESH& mesh,const int particle_offset)
     {elements.Resize(mesh.elements.m,false,false);VECTOR<int,8> shift=particle_offset*VECTOR<int,8>::All_Ones_Vector();
-    for(int t=1;t<=elements.m;t++) elements(t)=mesh.elements(t)+shift;
+    for(int t=0;t<elements.m;t++) elements(t)=mesh.elements(t)+shift;
     number_nodes=0;} // TODO: currently leaves number_nodes uninitialized
 
     bool Node_In_Hexahedron(const int node,const int hexahedron) const
@@ -68,7 +68,7 @@ public:
         elements(t)(6)=(i+1)+m*n*k+m*(j-1);elements(t)(7)=(i+1)+m*n*(k-1)+m*j;elements(t)(8)=(i+1)+m*n*k+m*j;}}
 
     template<class T_CONNECTIVITY> void Add_Connectivity(T_CONNECTIVITY& connectivity) const
-    {for(int t=1;t<=elements.m;t++) connectivity.Union(elements(t));}
+    {for(int t=0;t<elements.m;t++) connectivity.Union(elements(t));}
 
 //#####################################################################
     void Delete_Auxiliary_Structures();

@@ -50,8 +50,8 @@ template<class T> SIMPLE_TRIANGLE_BENDING_ELEMENTS<T>::
 template<class T> void SIMPLE_TRIANGLE_BENDING_ELEMENTS<T>::
 Add_Dependencies(SEGMENT_MESH& dependency_mesh) const
 {
-    for(int q=1;q<=bending_quadruples.m;q++)
-        for(int i=1;i<=3;i++) for(int j=i+1;j<=4;j++) dependency_mesh.Add_Element_If_Not_Already_There(VECTOR<int,2>(bending_quadruples(q)[i],bending_quadruples(q)[j]));
+    for(int q=0;q<bending_quadruples.m;q++)
+        for(int i=0;i<3;i++) for(int j=i+1;j<=4;j++) dependency_mesh.Add_Element_If_Not_Already_There(VECTOR<int,2>(bending_quadruples(q)[i],bending_quadruples(q)[j]));
 }
 //#####################################################################
 // Function Update_Mpi
@@ -72,12 +72,12 @@ Set_Quadruples_From_Triangle_Mesh(TRIANGLE_MESH& mesh)
 
     // allocate proper array sizes
     int number_quadruples=0;
-    for(int t=1;t<=mesh.elements.m;t++) for(int a=1;a<=(*mesh.adjacent_elements)(t).m;a++) if((*mesh.adjacent_elements)(t)(a)>t) number_quadruples++;
+    for(int t=0;t<mesh.elements.m;t++) for(int a=1;a<=(*mesh.adjacent_elements)(t).m;a++) if((*mesh.adjacent_elements)(t)(a)>t) number_quadruples++;
     bending_quadruples.Resize(number_quadruples);bending_stiffness.Resize(number_quadruples);
     damping.Resize(number_quadruples);
 
     int index=0; // reset number
-    for(int t=1;t<=mesh.elements.m;t++){
+    for(int t=0;t<mesh.elements.m;t++){
         int t1,t2,t3;mesh.elements(t).Get(t1,t2,t3);
         for(int a=1;a<=(*mesh.adjacent_elements)(t).m;a++){
             int s=(*mesh.adjacent_elements)(t)(a);
@@ -88,7 +88,7 @@ Set_Quadruples_From_Triangle_Mesh(TRIANGLE_MESH& mesh)
 
     linear_bindings.Resize(number_quadruples);
     ARRAY_VIEW<const TV> X(particles.X);
-    for(int q=1;q<=bending_quadruples.m;q++){
+    for(int q=0;q<bending_quadruples.m;q++){
         int i,j,k,l;bending_quadruples(q).Get(i,j,k,l);
         //TV xij=X(i)-X(j),xik=X(i)-X(k),xlk=X(l)-X(k),xlj=X(l)-X(j);
         //SEGMENT_3D<T> shared_edge(X(j),X(k));
@@ -115,7 +115,7 @@ template<class T> void SIMPLE_TRIANGLE_BENDING_ELEMENTS<T>::
 Set_Constants_From_Particles(const T material_stiffness,const T material_damping)
 {
     fictitious_edge_length.Resize(damping.m);
-    for(int q=1;q<=bending_quadruples.m;q++){
+    for(int q=0;q<bending_quadruples.m;q++){
         int i,j,k,l;bending_quadruples(q).Get(i,j,k,l);
         TV n1=TV::Cross_Product(particles.X(i)-particles.X(j),particles.X(i)-particles.X(k)).Normalized(),
             n2=TV::Cross_Product(particles.X(l)-particles.X(k),particles.X(l)-particles.X(j)).Normalized(),e=particles.X(k)-particles.X(j);

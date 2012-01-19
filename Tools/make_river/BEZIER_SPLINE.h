@@ -32,17 +32,17 @@ public:
 
     void Find_Segment(const T s,int& segment,T& t)
     {assert(s>=0&&s<=total_length);
-    for(int segment=1;segment<=segments;segment++) if(arclength_table(segment)(samples_per_segment) >= s) 
-        for(int i=1;i<=samples_per_segment;i++) if(arclength_table(segment)(i) >= s){segment=segment;t=(i-1)*one_over_samples_per_segment;return;}
+    for(int segment=0;segment<segments;segment++) if(arclength_table(segment)(samples_per_segment) >= s) 
+        for(int i=0;i<samples_per_segment;i++) if(arclength_table(segment)(i) >= s){segment=segment;t=(i-1)*one_over_samples_per_segment;return;}
     assert(false);}
 
     void Compute_Arclength()
     {arclength_table.Resize(segments);
     T distance=0;
-    for(int segment=1;segment<=segments;segment++){
+    for(int segment=0;segment<segments;segment++){
         arclength_table(segment).Resize(samples_per_segment);
         T2 old_value=f(segment,0);
-        for(int i=1;i<=samples_per_segment;i++){
+        for(int i=0;i<samples_per_segment;i++){
             T t=(i-1)*one_over_samples_per_segment;T2 new_value=f(segment,t);
             distance+=(new_value-old_value).Magnitude();arclength_table(segment)(i)=distance;
             //std::cout<<"Distance "<<segment<<" i="<<i<<" t="<<t<<" "<<distance<<std::endl;

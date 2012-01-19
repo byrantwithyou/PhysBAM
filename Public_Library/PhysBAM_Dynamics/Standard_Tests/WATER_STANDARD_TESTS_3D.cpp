@@ -163,7 +163,7 @@ Initialize(const int test_number_input,const int resolution)
         source_to_world(2)=rot*rot*source_to_world(1);
         source_to_world(3)=rot*source_to_world(1);
         source_to_world(4)=rot*rot*rot*source_to_world(1);
-        for(int i=1;i<=4;i++){source_velocity(i)=source_to_world(i).Extract_Rotation()*TV((T)1.2,0,0);world_to_source(i)=source_to_world(i).Inverse();}}
+        for(int i=0;i<4;i++){source_velocity(i)=source_to_world(i).Extract_Rotation()*TV((T)1.2,0,0);world_to_source(i)=source_to_world(i).Inverse();}}
     if(test_number==5){
         world_to_source.Append(MATRIX<T,4>::Identity_Matrix());
         sources.Append(CYLINDER<T>(TV((T).03,(T).18,(T).05),TV((T).06,(T).2,(T).05),(T).015));
@@ -299,7 +299,7 @@ Initial_Phi(const TV& X) const
         phi=min(torus.Signed_Distance(X),phi);
         phi=min(cylinder.Signed_Distance(X),phi);
     }
-    for(int s=1;s<=sources.m;s++)phi=min(phi,sources(s).Signed_Distance(world_to_source(s).Homogeneous_Times(X)));
+    for(int s=0;s<sources.m;s++)phi=min(phi,sources(s).Signed_Distance(world_to_source(s).Homogeneous_Times(X)));
     return phi;
 }
 //#####################################################################

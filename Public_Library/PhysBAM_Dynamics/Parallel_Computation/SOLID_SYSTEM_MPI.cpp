@@ -36,16 +36,16 @@ SOLID_SYSTEM_MPI(BACKWARD_EULER_SYSTEM<TV>& solid_system_input,ARRAY<T_DIAGONAL_
     coupled_deformable_particle_indices(coupled_deformable_particle_indices_input),newmark_evolution(newmark_evolution_input)
 {
     modified_world_space_rigid_inertia_tensor_inverse.Resize(modified_world_space_rigid_inertia_tensor.m);
-    for(int i=1;i<=modified_world_space_rigid_inertia_tensor.m;i++) modified_world_space_rigid_inertia_tensor_inverse(i)=modified_world_space_rigid_inertia_tensor(i).Inverse();
+    for(int i=0;i<modified_world_space_rigid_inertia_tensor.m;i++) modified_world_space_rigid_inertia_tensor_inverse(i)=modified_world_space_rigid_inertia_tensor(i).Inverse();
     modified_world_space_rigid_mass.Resize(rigid_body_fluid_mass.m);modified_world_space_rigid_mass_inverse.Resize(rigid_body_fluid_mass.m);
-    for(int i=1;i<=modified_world_space_rigid_mass_inverse.m;i++){modified_world_space_rigid_mass(i)=rigid_body_fluid_mass(i)+solid_system.projection_data.mass.world_space_rigid_mass(i).mass;
+    for(int i=0;i<modified_world_space_rigid_mass_inverse.m;i++){modified_world_space_rigid_mass(i)=rigid_body_fluid_mass(i)+solid_system.projection_data.mass.world_space_rigid_mass(i).mass;
         modified_world_space_rigid_mass_inverse(i)=modified_world_space_rigid_mass(i).Inverse();}
     modified_mass.Resize(fluid_mass.m);one_over_modified_mass.Resize(fluid_mass.m);
-    for(int i=1;i<=one_over_modified_mass.m;i++){modified_mass(i)=fluid_mass(i)+solid_system.projection_data.mass.mass(i);
+    for(int i=0;i<one_over_modified_mass.m;i++){modified_mass(i)=fluid_mass(i)+solid_system.projection_data.mass.mass(i);
         one_over_modified_mass(i)=modified_mass(i).Inverse();}
     recv_fluid_V_boundary_arrays.Resize(coupled_deformable_particle_indices.m);
     recv_fluid_rigid_V_boundary_arrays.Resize(coupled_deformable_particle_indices.m);
-    for(int i=1;i<=coupled_deformable_particle_indices.m;i++){
+    for(int i=0;i<coupled_deformable_particle_indices.m;i++){
         recv_fluid_V_boundary_arrays(i).Resize(coupled_deformable_particle_indices(i).m);
         recv_fluid_rigid_V_boundary_arrays(i).Resize(rigid_V_size);}
 }

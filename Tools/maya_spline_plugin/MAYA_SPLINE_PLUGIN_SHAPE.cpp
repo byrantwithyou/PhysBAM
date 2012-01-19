@@ -246,19 +246,19 @@ Update_Tesselation(MAYA_SPLINE_PLUGIN_GEOMETRY* geometry)
         tetrahedralized_volume->Initialize_Triangulated_Surface();tetrahedralized_volume->triangulated_surface->triangle_mesh.Initialize_Segment_Mesh();
         controls_ghost.Resize(cp_grid,2);
         ARRAYS<VECTOR<int,3> > grid_to_particle(1,eval_grid.m,1,eval_grid.n,1,eval_grid.mn);int index=1;
-        for(int ij=1;ij<=eval_grid.mn;ij++) for(int j=1;j<=eval_grid.n;j++) for(int i=1;i<=eval_grid.m;i++){
+        for(int ij=0;ij<eval_grid.mn;ij++) for(int j=0;j<eval_grid.n;j++) for(int i=0;i<eval_grid.m;i++){
             grid_to_particle(i,j,ij)=index;index++;}
         // make an iso line mesh
         uvw_iso_mesh.Resize(2,0);// should be cp_grid.m*cp_grid.n*eval_grid.mn+cp_grid.m*eval_grid.n+eval_grid.m*cp_grid.n*cp_grid.mn);
-        for(int i=1;i<=cp_grid.m;i++) for(int j=1;j<=cp_grid.n;j++){
+        for(int i=0;i<cp_grid.m;i++) for(int j=0;j<cp_grid.n;j++){
             int ii=(i-1)*divisions.x+1,jj=(j-1)*divisions.y+1;for(int ij=2;ij<=eval_grid.mn;ij++) uvw_iso_mesh.Append(grid_to_particle(ii,jj,ij-1),grid_to_particle(ii,jj,ij));}
-        for(int j=1;j<=cp_grid.n;j++) for(int ij=1;ij<=cp_grid.mn;ij++){
+        for(int j=0;j<cp_grid.n;j++) for(int ij=0;ij<cp_grid.mn;ij++){
             int jj=(j-1)*divisions.y+1,iijj=(ij-1)*divisions.z+1;for(int i=2;i<=eval_grid.m;i++) uvw_iso_mesh.Append(grid_to_particle(i-1,jj,iijj),grid_to_particle(i,jj,iijj));}
-        for(int i=1;i<=cp_grid.m;i++) for(int ij=1;ij<=cp_grid.mn;ij++){
+        for(int i=0;i<cp_grid.m;i++) for(int ij=0;ij<cp_grid.mn;ij++){
             int ii=(i-1)*divisions.x+1,iijj=(ij-1)*divisions.z+1;for(int j=2;j<=eval_grid.n;j++) uvw_iso_mesh.Append(grid_to_particle(ii,j-1,iijj),grid_to_particle(ii,j,iijj));}}
     ARRAYS<VECTOR<VECTOR_3D<float> ,3> >::put(geometry->controls,controls_ghost);
     CATMULL_ROM_SPLINE_INTERPOLATION<float,VECTOR_3D<float> > interpolation;int index=1;
-    for(int ij=1;ij<=eval_grid.mn;ij++) for(int j=1;j<=eval_grid.n;j++) for(int i=1;i<=eval_grid.m;i++) {
+    for(int ij=0;ij<eval_grid.mn;ij++) for(int j=0;j<eval_grid.n;j++) for(int i=0;i<eval_grid.m;i++) {
         tetrahedralized_volume->particles.X(index)=interpolation.Clamped_To_Array(cp_grid,controls_ghost,eval_grid.X(i,j,ij));index++;}
 }
 //#####################################################################

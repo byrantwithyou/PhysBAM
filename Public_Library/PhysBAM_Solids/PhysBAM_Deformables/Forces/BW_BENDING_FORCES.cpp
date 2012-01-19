@@ -34,10 +34,10 @@ BW_BENDING_FORCES(PARTICLES<TV>& particles,TRIANGLE_MESH& triangle_mesh_input,co
 
     bool adjacent_triangles_defined=(triangle_mesh.adjacent_elements!=0);if(!adjacent_triangles_defined) triangle_mesh.Initialize_Adjacent_Elements();
     int number_quadruples=0;
-    for(int t=1;t<=triangle_mesh.elements.m;t++) for(int a=1;a<=(*triangle_mesh.adjacent_elements)(t).m;a++) if((*triangle_mesh.adjacent_elements)(t)(a)>t) number_quadruples++;
+    for(int t=0;t<triangle_mesh.elements.m;t++) for(int a=1;a<=(*triangle_mesh.adjacent_elements)(t).m;a++) if((*triangle_mesh.adjacent_elements)(t)(a)>t) number_quadruples++;
     constraint_particles.Resize(number_quadruples,false);
     int index=0; // reset number
-    for(int t=1;t<=triangle_mesh.elements.m;t++){
+    for(int t=0;t<triangle_mesh.elements.m;t++){
         int t1,t2,t3;triangle_mesh.elements(t).Get(t1,t2,t3);
         for(int a=1;a<=(*triangle_mesh.adjacent_elements)(t).m;a++){
             int s=(*triangle_mesh.adjacent_elements)(t)(a);
@@ -71,8 +71,8 @@ template<class TV> BW_BENDING_FORCES<TV>::
 template<class TV> void BW_BENDING_FORCES<TV>::
 Add_Dependencies(SEGMENT_MESH& dependency_mesh) const
 {
-    for(int q=1;q<=constraint_particles.m;q++)
-        for(int i=1;i<=3;i++) for(int j=i+1;j<=4;j++) dependency_mesh.Add_Element_If_Not_Already_There(VECTOR<int,2>(constraint_particles(q)[i],constraint_particles(q)[j]));
+    for(int q=0;q<constraint_particles.m;q++)
+        for(int i=0;i<3;i++) for(int j=i+1;j<=4;j++) dependency_mesh.Add_Element_If_Not_Already_There(VECTOR<int,2>(constraint_particles(q)[i],constraint_particles(q)[j]));
 }
 //#####################################################################
 // Function Update_Mpi
@@ -118,10 +118,10 @@ Update_Position_Based_State(const T time,const bool is_position_update)
         VECTOR<VECTOR<VECTOR<T,3>,3>,4> de_dx;
         MATRIX<MATRIX<T,3>,4> d2sin_theta_dx_dy;
         MATRIX<MATRIX<T,3>,4> d2cos_theta_dx_dy;
-        for(int i=1;i<=4;i++){
+        for(int i=0;i<4;i++){
             MATRIX<T,3> S_q_a=MATRIX<T,3>::Cross_Product_Matrix(q_a(i));
             MATRIX<T,3> S_q_b=MATRIX<T,3>::Cross_Product_Matrix(q_b(i));
-            for(int j=1;j<=3;j++){
+            for(int j=0;j<3;j++){
                 dn_a_dx(i)(j)=-S_q_a.Column(j)/bending_state.n_a_magnitude;
                 dn_b_dx(i)(j)=-S_q_b.Column(j)/bending_state.n_b_magnitude;
                 de_dx(i)(j)=(q_e(i)*TV::Axis_Vector(j))/bending_state.e_magnitude;
@@ -134,9 +134,9 @@ Update_Position_Based_State(const T time,const bool is_position_update)
                     TV::Dot_Product(TV::Cross_Product(bending_state.n_a,bending_state.n_b),de_dx(i)(j));
                 state.dC_dx(i)(j,1)=cos_theta*dsin_theta_dx(i)(j)-sin_theta*dcos_theta_dx(i)(j);}
             state.C_dot+=state.dC_dx(i).Transposed()*particles.V(state.nodes[i]);}
-        for(int i=1;i<=4;i++){
-            for(int j=1;j<=4;j++){
-                for(int s=1;s<=3;s++) for(int t=1;t<=3;t++){
+        for(int i=0;i<4;i++){
+            for(int j=0;j<4;j++){
+                for(int s=0;s<3;s++) for(int t=0;t<3;t++){
                     TV dn_a_dxs_dyt=-MATRIX<T,3>::Cross_Product_Matrix(dq_a_i_j_t(i,j)(t)).Column(s)/bending_state.n_a_magnitude;
                     TV dn_b_dxs_dyt=-MATRIX<T,3>::Cross_Product_Matrix(dq_b_i_j_t(i,j)(t)).Column(s)/bending_state.n_b_magnitude;
                     TV de_dx_dy=TV();
@@ -168,10 +168,10 @@ Update_Position_Based_State(const T time,const bool is_position_update)
                     d2cos_theta_dx_dy(i,j)(t,s)=TV::Dot_Product(dn_a_dxs_dyt,bending_state.n_b)+TV::Dot_Product(dn_b_dx(j)(t),dn_a_dx(i)(s))+
                         TV::Dot_Product(dn_a_dx(j)(t),dn_b_dx(i)(s))+TV::Dot_Product(bending_state.n_a,dn_b_dxs_dyt);}}}
 
-        for(int i=1;i<=4;i++){
-            for(int j=1;j<=4;j++){
+        for(int i=0;i<4;i++){
+            for(int j=0;j<4;j++){
                 MATRIX<T,3> dC_dxi_dxj;
-                for(int s=1;s<=3;s++) for(int t=1;t<=3;t++)
+                for(int s=0;s<3;s++) for(int t=0;t<3;t++)
                     dC_dxi_dxj(s,t)=dcos_theta_dx(j)(t)*dsin_theta_dx(i)(s)+cos_theta*d2sin_theta_dx_dy(i,j)(s,t)-dsin_theta_dx(j)(t)*dcos_theta_dx(i)(s)-sin_theta*d2cos_theta_dx_dy(i,j)(s,t);
                 state.dC_dxi_dxj_times_C(i,j)=dC_dxi_dxj*state.C(1);
                 state.dC_dxi_dxj_times_C_dot(i,j)=dC_dxi_dxj*state.C_dot(1);}}}

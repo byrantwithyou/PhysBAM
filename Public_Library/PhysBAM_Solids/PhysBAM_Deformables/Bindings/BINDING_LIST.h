@@ -70,7 +70,7 @@ public:
 
     template<class T_ARRAY>
     void Clear_Hard_Bound_Particles(T_ARRAY& array) const
-    {for(int b=1;b<=bindings.m;b++) array(bindings(b)->particle_index)=typename T_ARRAY::ELEMENT();}
+    {for(int b=0;b<bindings.m;b++) array(bindings(b)->particle_index)=typename T_ARRAY::ELEMENT();}
 
 //#####################################################################
     void Clean_Memory();

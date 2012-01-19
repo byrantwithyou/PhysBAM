@@ -58,7 +58,7 @@ public:
     {ARRAY<PAIR<TV_INT,T> > weights;T w=(X.x-grid.X(index.x).x)*grid.one_over_dX.x;
     T2 phi=From_Base_Node_Helper(grid,u,X,index);T2 phi_linear=(1-w)*u(index.x)+w*u(index.x+1);T alpha=(u(index.x)+u(index.x+1))?(phi-phi_linear)/(u(index.x)+u(index.x+1)):0;
     weights.Append(PAIR<TV_INT,T>(TV_INT(index.x),1-w+alpha));weights.Append(PAIR<TV_INT,T>(TV_INT(index.x+1),w+alpha));
-    for(int i=1;i<=weights.m;i++) weights(i).y=max((T)0.,min((T)1.,weights(i).y));
+    for(int i=0;i<weights.m;i++) weights(i).y=max((T)0.,min((T)1.,weights(i).y));
     T error=phi-(1-w+alpha)*u(index.x)-(w+alpha)*u(index.x+1);
     if(abs(error)>1e-5) LOG::cout<<"Error is "<<error<<" and weights are "<<weights<<std::endl;
     return weights;}*/
@@ -68,7 +68,7 @@ public:
     {ARRAY<PAIR<TV_INT,T> > weights;T w=(X.x-grid.X(index.x).x)*grid.one_over_dX.x;
     T2 phi=From_Base_Node_Helper(grid,u,X,index);T2 phi_linear=(1-w)*u(index.x)+w*u(index.x+1);T alpha=(u(index.x)+u(index.x+1))?(phi-phi_linear)/(u(index.x)+u(index.x+1)):0;
     weights.Append(PAIR<TV_INT,T>(TV_INT(index.x),1-w+alpha));weights.Append(PAIR<TV_INT,T>(TV_INT(index.x+1),w+alpha));
-    for(int i=1;i<=weights.m;i++) weights(i).y=max((T)0.,min((T)1.,weights(i).y));
+    for(int i=0;i<weights.m;i++) weights(i).y=max((T)0.,min((T)1.,weights(i).y));
     T error=phi-(1-w+alpha)*u(index.x)-(w+alpha)*u(index.x+1);
     if(abs(error)>1e-5) LOG::cout<<"Error is "<eights(const GRID<TV>& grid,const ARRAYS_ND_BASE<VECTOR<T2,1> >& u,const VECTOR<T,1>& X,const VECTOR<int,1>& index) const
     {ARRAY<PAIR<TV_INT,T> > weights;T2 phi=From_Base_Node(grid,u,X,index);T w=(X.x-grid.X(index.x).x)*grid.one_over_dX.x;
@@ -83,7 +83,7 @@ public:
         x(2)=1-w;x(3)=w;x(4)=0;x(1)=u(index.x)*x(2)+u(index.x+1)*x(3)+u(index.x+2)*x(4);
         weights.Append(PAIR<TV_INT,T>(TV_INT(index.x),0));weights.Append(PAIR<TV_INT,T>(TV_INT(index.x+1),0));weights.Append(PAIR<TV_INT,T>(TV_INT(index.x+2),0));}
     //Calculate x
-    for(int i=1;i<=3;i++) weights(i).y=x(i+1);
+    for(int i=0;i<3;i++) weights(i).y=x(i+1);
     return weights;}*/
     
     //Clamp Version of Gibou
@@ -101,7 +101,7 @@ public:
     //weights.Append(PAIR<TV_INT,T>(TV_INT(index.x-1),w*(w-1)/2.));
     //weights.Append(PAIR<TV_INT,T>(TV_INT(index.x),w*w-1));
     //weights.Append(PAIR<TV_INT,T>(TV_INT(index.x+1),w*(w+1)/2.));
-    for(int i=1;i<=weights.m;i++) weights(i).y=max((T)0.,min((T)1.,weights(i).y));
+    for(int i=0;i<weights.m;i++) weights(i).y=max((T)0.,min((T)1.,weights(i).y));
     return weights;}*/
 
     T2 From_Base_Node(const GRID<TV>& grid,const ARRAYS_ND_BASE<VECTOR<T2,2> >& u,const VECTOR<T,2>& X,const VECTOR<int,2>& index) const;

@@ -26,9 +26,9 @@ template<class T> LINEAR_ALTITUDE_SPRINGS_3D<T>::
 template<class T> void LINEAR_ALTITUDE_SPRINGS_3D<T>::
 Set_Stiffness_Based_On_Reduced_Mass(const T scaling_coefficient) // assumes mass and restlength are already defined
 {
-    for(int t=1;t<=mesh.elements.m;t++){
+    for(int t=0;t<mesh.elements.m;t++){
         int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
-        for(int s=1;s<=4;s++){int node1,node2,node3,node4;
+        for(int s=0;s<4;s++){int node1,node2,node3,node4;
             Fill_Node_Indices(i,j,k,l,s,node1,node2,node3,node4);
             T one_over_triangle_mass=(T)one_ninth*(particles.one_over_effective_mass(node2)+particles.one_over_effective_mass(node3)+particles.one_over_effective_mass(node4)),
                   one_over_particle_mass=particles.one_over_effective_mass(node1),harmonic_mass=Pseudo_Inverse(one_over_particle_mass+one_over_triangle_mass);
@@ -49,7 +49,7 @@ template<class T> void LINEAR_ALTITUDE_SPRINGS_3D<T>::
 Set_Restlength_From_Material_Coordinates(ARRAY_VIEW<const TV> material_coordinates)
 {
     Invalidate_CFL();
-    for(int t=1;t<=mesh.elements.m;t++){
+    for(int t=0;t<mesh.elements.m;t++){
         int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
         // TODO: use a for loop instead
         TV barycentric=TRIANGLE_3D<T>::Clamped_Barycentric_Coordinates(material_coordinates(i),material_coordinates(j),material_coordinates(l),material_coordinates(k));
@@ -61,7 +61,7 @@ Set_Restlength_From_Material_Coordinates(ARRAY_VIEW<const TV> material_coordinat
         barycentric=TRIANGLE_3D<T>::Clamped_Barycentric_Coordinates(material_coordinates(l),material_coordinates(i),material_coordinates(j),material_coordinates(k));
         parameters(t)(4).restlength=(material_coordinates(l)-barycentric.x*material_coordinates(i)-barycentric.y*material_coordinates(j)-barycentric.z*material_coordinates(k)).Normalize();
         assert(parameters(t)(1).restlength>0);assert(parameters(t)(2).restlength>0);assert(parameters(t)(3).restlength>0);assert(parameters(t)(4).restlength>0);
-        for(int k=1;k<=4;k++) parameters(t)(k).visual_restlength=parameters(t)(k).restlength;}
+        for(int k=0;k<4;k++) parameters(t)(k).visual_restlength=parameters(t)(k).restlength;}
 }
 //#####################################################################
 // Function Set_Overdamping_Fraction
@@ -69,7 +69,7 @@ Set_Restlength_From_Material_Coordinates(ARRAY_VIEW<const TV> material_coordinat
 template<class T> void LINEAR_ALTITUDE_SPRINGS_3D<T>::
 Set_Overdamping_Fraction(const T overdamping_fraction) // 1 is critically damped
 {
-    for(int t=1;t<=mesh.elements.m;t++){
+    for(int t=0;t<mesh.elements.m;t++){
         int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
         // TODO: use a for loop instead
         T harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(i)+(T)one_ninth*(particles.one_over_effective_mass(j)+particles.one_over_effective_mass(k)+particles.one_over_effective_mass(l)));
@@ -88,7 +88,7 @@ Set_Overdamping_Fraction(const T overdamping_fraction) // 1 is critically damped
 template<class T> void LINEAR_ALTITUDE_SPRINGS_3D<T>::
 Set_Overdamping_Fraction(const ARRAY<VECTOR<T,4> >& overdamping_fraction) // 1 is critically damped
 {
-    for(int t=1;t<=mesh.elements.m;t++){
+    for(int t=0;t<mesh.elements.m;t++){
         int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
         // TODO: use a for loop instead
         T harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(i)+(T)one_ninth*(particles.one_over_effective_mass(j)+particles.one_over_effective_mass(k)+particles.one_over_effective_mass(l)));
@@ -107,9 +107,9 @@ Set_Overdamping_Fraction(const ARRAY<VECTOR<T,4> >& overdamping_fraction) // 1 i
 template<class T> void LINEAR_ALTITUDE_SPRINGS_3D<T>::
 Ensure_Minimum_Overdamping_Fraction(const T overdamping_fraction) // 1 is critically damped
 {
-    ARRAY<VECTOR<T,4> > save_damping(parameters.m);for(int i=1;i<=parameters.m;i++) for(int k=1;k<=4;k++) save_damping(i)(k)=parameters(i)(k).damping;
+    ARRAY<VECTOR<T,4> > save_damping(parameters.m);for(int i=0;i<parameters.m;i++) for(int k=0;k<4;k++) save_damping(i)(k)=parameters(i)(k).damping;
     Set_Overdamping_Fraction(overdamping_fraction);
-    for(int k=1;k<=parameters.m;k++) for(int i=1;i<=4;i++) parameters(k)(i).damping=max(parameters(k)(i).damping,save_damping(k)(i));
+    for(int k=0;k<parameters.m;k++) for(int i=0;i<4;i++) parameters(k)(i).damping=max(parameters(k)(i).damping,save_damping(k)(i));
 }
 //#####################################################################
 // Function Fill_Node_Indices
@@ -164,7 +164,7 @@ Update_Position_Based_State(const T time,const bool is_position_update)
         if(use_shortest_spring_only){
             int hmin=0;T cross_area_max=-(T)FLT_MAX;
             if(is_position_update){
-                for(int h=1;h<=4;h++){
+                for(int h=0;h<4;h++){
                     Fill_Node_Indices(i,j,k,l,h,node1,node2,node3,node4);
                     T cross_area=TV::Cross_Product(X(node3)-X(node2),X(node4)-X(node2)).Magnitude_Squared();
                     if(cross_area>cross_area_max){hmin=h;cross_area_max=cross_area;}}}
@@ -173,16 +173,16 @@ Update_Position_Based_State(const T time,const bool is_position_update)
             SPRING_STATE& state=spring_states(t);
             if(Fill_Spring_State(t,hmin,node1,node2,node3,node4,state)) used_springs++;}
         else{
-            for(int h=1;h<=4;h++){
+            for(int h=0;h<4;h++){
                 Fill_Node_Indices(i,j,k,l,h,node1,node2,node3,node4);
                 SPRING_STATE& state=spring_states_all_springs(t)[h];
                 if(Fill_Spring_State(t,h,node1,node2,node3,node4,state)) used_springs++;}}}
 
     if(print_number_used) LOG::cout<<"using "<<used_springs<<" of "<<total_elements<<" altitude springs"<<std::endl;
     if(compute_half_forces){
-        if(use_shortest_spring_only) for(int i=1;i<=spring_states.m;i++){
+        if(use_shortest_spring_only) for(int i=0;i<spring_states.m;i++){
             spring_states(i).sqrt_coefficient=sqrt(spring_states(i).coefficient);}
-        else for(int i=1;i<=spring_states_all_springs.m;i++) for(int h=1;h<=4;h++){
+        else for(int i=0;i<spring_states_all_springs.m;i++) for(int h=0;h<4;h++){
                 spring_states_all_springs(i)(h).sqrt_coefficient=sqrt(spring_states_all_springs(i)(h).coefficient);}}
     if(!mesh.incident_elements) mesh.Initialize_Incident_Elements();
 }
@@ -338,7 +338,7 @@ CFL_Strain_Rate() const
         int i,j,k,l;elements(t).Get(i,j,k,l);
         if(use_shortest_spring_only){
             int hmin=0;T cross_area_max=(T)-FLT_MAX;
-            for(int h=1;h<=4;h++){
+            for(int h=0;h<4;h++){
                 Fill_Node_Indices(i,j,k,l,h,node1,node2,node3,node4);
                 T cross_area=TV::Cross_Product(X(node3)-X(node2),X(node4)-X(node2)).Magnitude_Squared();
                 if(cross_area>cross_area_max){hmin=h;cross_area_max=cross_area;}}
@@ -347,7 +347,7 @@ CFL_Strain_Rate() const
             max_strain_rate=max(max_strain_rate,abs(strain_rate));
             if(cache_strain){strains_of_spring(t)=VECTOR<T,2>(abs(strain_rate),abs(strain));}}
         else{
-            for(int h=1;h<=4;h++){
+            for(int h=0;h<4;h++){
                 Fill_Node_Indices(i,j,k,l,h,node1,node2,node3,node4);
                 if(!Compute_Strain_Rate_And_Strain(t,h,node1,node2,node3,node4,strain_rate,strain)) continue;
                 Compute_Strain_Rate_And_Strain(t,h,node1,node2,node3,node4,strain_rate,strain);

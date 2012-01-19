@@ -118,7 +118,7 @@ void Initialize_Euler_State() PHYSBAM_OVERRIDE
     //non-oblique for the moment . . .
     //initialize grid variables
     //1 == density, 2 == momentum, 3 == total energy
-    for(int i=1;i<=grid.counts.x;i++) for(int j=1;j<=grid.counts.y;j++){
+    for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++){
         T rho=(T)0.,u_vel=(T)0.,v_vel=(T)0.,p=(T)0.;
         T curr_x_jump_pos=initial_x_jump_pos + recip_slope*(j-1)*grid.dX.y;
         if(grid.Axis_X(i,1) < curr_x_jump_pos) {rho=(T)1.;p=(T)1.;} else {rho=(T).125;p=(T).1;}

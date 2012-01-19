@@ -97,7 +97,7 @@ void Initialize_SPH_Particles() PHYSBAM_OVERRIDE
     //sph_particles.array_collection->Preallocate(number_of_particles);
     if(tests.test_number==1){
         fluids_parameters.sph_evolution->target_particles_per_unit_volume=10000;
-        for(int i=1;i<=number_of_particles;i++){
+        for(int i=0;i<number_of_particles;i++){
             TV X=random.Get_Uniform_Vector(TV((T).7,0,(T).4),TV(1,1,(T).6));
             int id=sph_particles.array_collection->Add_Element();
             sph_particles.X(id)=X;}}

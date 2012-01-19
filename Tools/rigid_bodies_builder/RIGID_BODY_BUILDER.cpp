@@ -165,7 +165,7 @@ Calculate_Center_Of_Mass_And_Inertia_Tensor_Thin_Shell(TRIANGULATED_SURFACE<T> &
     center_of_mass=VECTOR_3D<T>(0,0,0);
     inertia_tensor=SYMMETRIC_MATRIX_3X3<T>();
     TRIANGLE_MESH &triangle_mesh=triangulated_surface.triangle_mesh;
-    for(int t=1;t<=triangle_mesh.triangles.m;t++){
+    for(int t=0;t<triangle_mesh.triangles.m;t++){
         TRIANGLE_3D<T> triangle=triangulated_surface.Get_Triangle(t);
         VECTOR_3D<T> sample_point=triangle.Center();
         T area = triangle.Area();

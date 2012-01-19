@@ -223,12 +223,12 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     ARRAY<TRIPLE<int,int,TV> > bindings; 
     ARRAY<int> tets;const T tolerance=(T)1e-4;
     ARRAY<int> surface_particles;surface->mesh.elements.Flattened().Get_Unique(surface_particles);
-    for(int i=1;i<=surface_particles.m;i++){int p=surface_particles(i);
+    for(int i=0;i<surface_particles.m;i++){int p=surface_particles(i);
         tets.Remove_All();volume->hierarchy->Intersection_List(particles.X(p),tets,tolerance);T tol_current=tolerance;
         while(tets.m==0){tol_current*=2;volume->hierarchy->Intersection_List(particles.X(p),tets,tol_current);}
         TV bary=TETRAHEDRON<T>::First_Three_Barycentric_Coordinates(particles.X(p),particles.X.Subset(volume->mesh.elements(tets(1))));
         bindings.Append(TRIPLE<int,int,TV>(p,tets(1),bary));}
-    for(int i=1;i<=bindings.m;i++){
+    for(int i=0;i<bindings.m;i++){
         if(bindings(i).y==0) continue;
         VECTOR<int,4> nodes=volume->mesh.elements(bindings(i).y);
         binding_list.Add_Binding(new LINEAR_BINDING<TV,4>(particles,bindings(i).x,nodes,bindings(i).z));}
@@ -241,7 +241,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     //solids_parameters.collision_body_list.Add_Bodies(solid_body_collection.deformable_body_collection.rigid_body_particles);
 
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents();

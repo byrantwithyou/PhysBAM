@@ -31,7 +31,7 @@ public:
     return pools(pools.m)+(current++);}
 
     void Delete_All()
-    {for(int i=1;i<=pools.m;i++) delete[] pools(i);
+    {for(int i=0;i<pools.m;i++) delete[] pools(i);
     pools.Remove_All();current=block_size;}
 
 //#####################################################################

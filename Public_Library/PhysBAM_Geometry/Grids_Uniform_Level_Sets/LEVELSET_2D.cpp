@@ -161,7 +161,7 @@ Fast_Marching_Method_Outside_Band(const T half_band_width,const T time,const T s
     ARRAY<T,VECTOR<int,2> > phi_ghost(grid.Domain_Indices(ghost_cells),false);boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
     FAST_MARCHING_METHOD_UNIFORM<T_GRID> fmm(*this,ghost_cells);
     fmm.Fast_Marching_Method(phi_ghost,stopping_distance);
-    for(int i=1;i<=grid.counts.x;i++) for(int j=1;j<=grid.counts.y;j++) if(abs(phi_ghost(i,j)) > half_band_width) phi(i,j)=phi_ghost(i,j);
+    for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) if(abs(phi_ghost(i,j)) > half_band_width) phi(i,j)=phi_ghost(i,j);
     boundary->Apply_Boundary_Condition(grid,phi,time);
 }
 //#####################################################################
@@ -174,7 +174,7 @@ Approximate_Length(const T interface_thickness,const T time) const
     int ghost_cells=number_of_ghost_cells;
     ARRAY<T,VECTOR<int,2> > phi_ghost(grid.Domain_Indices(ghost_cells));boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
     T interface_half_width=interface_thickness*grid.dX.Max()/2,one_over_two_dx=1/(2*grid.dX.x),one_over_two_dy=1/(2*grid.dX.y),length=0;
-    for(int i=1;i<=grid.counts.x;i++) for(int j=1;j<=grid.counts.y;j++)
+    for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++)
         length+=(LEVELSET_UTILITIES<T>::Delta(phi_ghost(i,j),interface_half_width)*sqrt(sqr((phi_ghost(i+1,j)-phi_ghost(i-1,j))*one_over_two_dx)+sqr((phi_ghost(i,j+1)-phi_ghost(i,j-1))*one_over_two_dy)));
     return length*grid.dX.x*grid.dX.y;
 }

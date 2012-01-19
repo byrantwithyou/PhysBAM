@@ -126,7 +126,7 @@ Synchronize_Colors()
         int root=final_union_find.Find(i);
         if(!global_to_final_color_map(root)) global_to_final_color_map(root)=++number_of_regions;
         global_to_final_color_map(i)=global_to_final_color_map(root);}
-    for(int i=1;i<=color_map.domain.max_corner.x;i++)if(color_map(i)>0) color_map(i)=global_to_final_color_map(color_map(i)+global_color_offset);
+    for(int i=0;i<color_map.domain.max_corner.x;i++)if(color_map(i)>0) color_map(i)=global_to_final_color_map(color_map(i)+global_color_offset);
 
     // find list of processes corresponding to each color
     int end=0;
@@ -135,7 +135,7 @@ Synchronize_Colors()
     for(int r=0;r<mpi_grid.number_of_processes;r++){
         int start=end+1;end+=global_color_counts(r+1);
         for(int i=start;i<=end;i++)color_ranks(global_to_final_color_map(i)).Append_Unique(r);}
-    for(int color=1;color<=color_ranks.m;color++) assert(color_ranks(color).m>1 || mpi_grid.side_neighbor_ranks.Contains(mpi_grid.rank));
+    for(int color=0;color<color_ranks.m;color++) assert(color_ranks(color).m>1 || mpi_grid.side_neighbor_ranks.Contains(mpi_grid.rank));
 
     // remap colors
     Remap_Colors(color_map,RANGE<typename T_PARALLEL_GRID::VECTOR_INT>::Centered_Box());
@@ -205,14 +205,14 @@ Synchronize_Colors_Threaded()
     UNION_FIND<> final_union_find;
     {THREAD_PACKAGE pack(sizeof(int)*(2+union_find.parents.m)+union_find.ranks.m);
     {int position=0;*(int*)(&pack.buffer(position+1))=union_find.parents.m;position+=sizeof(int);*(int*)(&pack.buffer(position+1))=union_find.ranks.m;position+=sizeof(int);
-    for(int i=1;i<=union_find.parents.m;i++) union_find.parents.Pack(pack.buffer,position,i);for(int i=1;i<=union_find.ranks.m;i++) union_find.ranks.Pack(pack.buffer,position,i);
+    for(int i=0;i<union_find.parents.m;i++) union_find.parents.Pack(pack.buffer,position,i);for(int i=0;i<union_find.ranks.m;i++) union_find.ranks.Pack(pack.buffer,position,i);
     pthread_mutex_lock(mpi_grid.threaded_grid->lock);
     mpi_grid.threaded_grid->buffers.Append(pack);
     pthread_mutex_unlock(mpi_grid.threaded_grid->lock);}
     pthread_barrier_wait(mpi_grid.threaded_grid->barr);
     for(int buf=1;buf<=mpi_grid.threaded_grid->buffers.m;buf++){int position=0;
         union_find.parents.Resize(*(int*)(&pack.buffer(position+1)));position+=sizeof(int);union_find.ranks.Resize(*(int*)(&pack.buffer(position+1)));position+=sizeof(int);
-        for(int i=1;i<=union_find.parents.m;i++) union_find.parents.Unpack(mpi_grid.threaded_grid->buffers(buf).buffer,position,i);for(int i=1;i<=union_find.ranks.m;i++) union_find.ranks.Unpack(mpi_grid.threaded_grid->buffers(buf).buffer,position,i);
+        for(int i=0;i<union_find.parents.m;i++) union_find.parents.Unpack(mpi_grid.threaded_grid->buffers(buf).buffer,position,i);for(int i=0;i<union_find.ranks.m;i++) union_find.ranks.Unpack(mpi_grid.threaded_grid->buffers(buf).buffer,position,i);
         final_union_find.Merge(union_find);}
     pthread_barrier_wait(mpi_grid.threaded_grid->barr);
     if(mpi_grid.threaded_grid->tid==1) mpi_grid.threaded_grid->buffers.m=0;
@@ -225,7 +225,7 @@ Synchronize_Colors_Threaded()
         int root=final_union_find.Find(i);
         if(!global_to_final_color_map(root)) global_to_final_color_map(root)=++number_of_regions;
         global_to_final_color_map(i)=global_to_final_color_map(root);}
-    for(int i=1;i<=color_map.domain.max_corner.x;i++)if(color_map(i)>0) color_map(i)=global_to_final_color_map(color_map(i)+global_color_offset);
+    for(int i=0;i<color_map.domain.max_corner.x;i++)if(color_map(i)>0) color_map(i)=global_to_final_color_map(color_map(i)+global_color_offset);
 
     // find list of processes corresponding to each color
     int end=0;
@@ -234,7 +234,7 @@ Synchronize_Colors_Threaded()
     for(int r=0;r<mpi_grid.number_of_processes;r++){
         int start=end+1;end+=global_color_counts(r+1);
         for(int i=start;i<=end;i++)color_ranks(global_to_final_color_map(i)).Append_Unique(r);}
-    for(int color=1;color<=color_ranks.m;color++) assert(color_ranks(color).m>1 || mpi_grid.side_neighbor_ranks.Contains(mpi_grid.rank));
+    for(int color=0;color<color_ranks.m;color++) assert(color_ranks(color).m>1 || mpi_grid.side_neighbor_ranks.Contains(mpi_grid.rank));
 
     // remap colors
     Remap_Colors(color_map,RANGE<typename T_PARALLEL_GRID::VECTOR_INT>::Centered_Box());
@@ -250,14 +250,14 @@ Synchronize_Colors_Threaded()
         ARRAY<bool> global_color_touches_uncolorable(color_ranks.m);
         ARRAY<bool>::Get(global_color_touches_uncolorable,*color_touches_uncolorable);
         THREAD_PACKAGE pack(sizeof(bool)*global_color_touches_uncolorable.m);
-        {int position=0;for(int i=1;i<=global_color_touches_uncolorable.m;i++) global_color_touches_uncolorable.Pack(pack.buffer,position,i);
+        {int position=0;for(int i=0;i<global_color_touches_uncolorable.m;i++) global_color_touches_uncolorable.Pack(pack.buffer,position,i);
         pthread_mutex_lock(mpi_grid.threaded_grid->lock);
         mpi_grid.threaded_grid->buffers.Append(pack);
         pthread_mutex_unlock(mpi_grid.threaded_grid->lock);}
         pthread_barrier_wait(mpi_grid.threaded_grid->barr);
         for(int buf=1;buf<=mpi_grid.threaded_grid->buffers.m;buf++){int position=0;
-            for(int i=1;i<=global_color_touches_uncolorable.m;i++) global_color_touches_uncolorable.Unpack(mpi_grid.threaded_grid->buffers(buf).buffer,position,i);
-            for(int i=1;i<=global_color_touches_uncolorable.m;i++) (*color_touches_uncolorable)(i)|=global_color_touches_uncolorable(i);}
+            for(int i=0;i<global_color_touches_uncolorable.m;i++) global_color_touches_uncolorable.Unpack(mpi_grid.threaded_grid->buffers(buf).buffer,position,i);
+            for(int i=0;i<global_color_touches_uncolorable.m;i++) (*color_touches_uncolorable)(i)|=global_color_touches_uncolorable(i);}
         pthread_barrier_wait(mpi_grid.threaded_grid->barr);
         if(mpi_grid.threaded_grid->tid==1) mpi_grid.threaded_grid->buffers.m=0;
         pthread_barrier_wait(mpi_grid.threaded_grid->barr);}
@@ -342,7 +342,7 @@ Remap_Colors(ARRAY<int,VECTOR<int,1> >& color_map,const RANGE<TV_INT>&)
 template<class T_GRID> template<class T_BOX_HORIZONTAL_INT> void FLOOD_FILL_MPI<T_GRID>::
 Remap_Colors(ARRAY<int,VECTOR<int,1> >& color_map,const T_BOX_HORIZONTAL_INT&)
 {
-    for(int c=1;c<=colors.m;c++){
+    for(int c=0;c<colors.m;c++){
         int color=colors(c);assert(color); // colors should either be -1 or positive
         if(color_map(color)==0) color_map(color)=++number_of_regions;
         colors(c)=color_map(color);}

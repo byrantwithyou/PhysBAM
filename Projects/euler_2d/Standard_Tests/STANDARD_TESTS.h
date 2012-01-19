@@ -217,7 +217,7 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
 {
     //set custom boundary
     VECTOR<VECTOR<bool,2>,T_GRID::dimension> valid_wall;
-    for(int axis=1;axis<=T_GRID::dimension;axis++) for(int axis_side=1;axis_side<=2;axis_side++)
+    for(int axis=1;axis<=T_GRID::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++)
         valid_wall[axis][axis_side]=(fluids_parameters.mpi_grid?!fluids_parameters.mpi_grid->Neighbor(axis,axis_side):true) && !fluids_parameters.domain_walls[axis][axis_side];
 
     if(test_number==1 || test_number==3 || test_number==4){
@@ -290,7 +290,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         TRIANGULATED_AREA<T>& deformable_circle=tests.Create_Triangulated_Object(data_directory+"/Triangulated_Areas/circle-216.tri2d",RIGID_GEOMETRY_STATE<TV>(FRAME<TV>(TV((T).15,(T).05))),true,false,(T).05);
 
         // correct number nodes
-        for(int i=1;i<=solid_body_collection.deformable_body_collection.deformable_geometry.structures.m;i++){
+        for(int i=0;i<solid_body_collection.deformable_body_collection.deformable_geometry.structures.m;i++){
             solid_body_collection.deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();}
 
         // correct mass
@@ -344,9 +344,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(rigid_body_collection.rigid_geometry_collection);
     if(fluids_parameters.use_slip){
-        for(int i=1;i<=solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->compute_half_forces=true;
-        for(int k=1;k<=solid_body_collection.deformable_body_collection.deformables_forces.m;k++) solid_body_collection.deformable_body_collection.deformables_forces(k)->compute_half_forces=true;
-        for(int i=1;i<=solid_body_collection.rigid_body_collection.rigids_forces.m;i++) solid_body_collection.rigid_body_collection.rigids_forces(i)->compute_half_forces=true;}
+        for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->compute_half_forces=true;
+        for(int k=0;k<solid_body_collection.deformable_body_collection.deformables_forces.m;k++) solid_body_collection.deformable_body_collection.deformables_forces(k)->compute_half_forces=true;
+        for(int i=0;i<solid_body_collection.rigid_body_collection.rigids_forces.m;i++) solid_body_collection.rigid_body_collection.rigids_forces(i)->compute_half_forces=true;}
 
     THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::Add_Rigid_Body_Walls(*this);
 

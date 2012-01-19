@@ -72,7 +72,7 @@ public:
     J_s(4)=(T)root_two*VECTOR<T,3>(V_fiber_outer.x21,V_fiber_outer.x31,V_fiber_outer.x32);
     J_s(5)=(T)root_two*VECTOR<T,3>((C.x11+C.x22)*V_fiber_outer.x21,(C.x11+C.x33)*V_fiber_outer.x31,(C.x22+C.x33)*V_fiber_outer.x32);
     dP_dF.dSdC_d=dP_dF.dSdC_s=SYMMETRIC_MATRIX<T,3>();dP_dF.dSdC_ds=MATRIX<T,3>();dP_dF.F=F_threshold;dP_dF.S=S(C,V_fiber,invariants,energy_gradient);
-    for(int n=1;n<=5;n++) for(int m=n;m<=5;m++){
+    for(int n=0;n<5;n++) for(int m=n;m<=5;m++){
         int hessian_index=Hessian_Index(m,n);if(!energy_hessian(hessian_index))continue;
         if(m==n){
             dP_dF.dSdC_d+=(T)2*energy_hessian(hessian_index)*SYMMETRIC_MATRIX<T,3>::Outer_Product(J_d(m));

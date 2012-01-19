@@ -127,7 +127,7 @@ Display(const int in_color) const
         case 3:draw_triangulated_areas=true;break;
         case 4:draw_triangulated_areas=true;draw_triangles_of_material=true;break;}
 #ifndef USE_OPENGLES
-    for(int i=1;i<=segmented_curve_objects.m;i++){
+    for(int i=0;i<segmented_curve_objects.m;i++){
         glPushName(i);
         glPushName(1);
         if(segmented_curve_objects(i)) segmented_curve_objects(i)->Display(in_color);
@@ -140,7 +140,7 @@ Display(const int in_color) const
             glPushName(6);free_particles_objects(i)->Display(in_color);glPopName();}
         glPopName();}
 #else
-    for(int i=1;i<=segmented_curve_objects.m;i++){
+    for(int i=0;i<segmented_curve_objects.m;i++){
         if(segmented_curve_objects(i)) segmented_curve_objects(i)->Display(in_color);
         if(draw_triangulated_areas && triangulated_area_objects(i)) triangulated_area_objects(i)->Display(in_color);
         if(draw_triangles_of_material && triangles_of_material_objects(i)) triangles_of_material_objects(i)->Display(in_color);
@@ -155,8 +155,8 @@ template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_
 Set_Vector_Size(const T vector_size)
 {
     velocity_scale=vector_size;
-    for(int i=1;i<=segmented_curve_objects.m;i++) if(segmented_curve_objects(i)) segmented_curve_objects(i)->velocity_scale=velocity_scale; // apply to objects which already exist
-    for(int i=1;i<=triangulated_area_objects.m;i++) if(triangulated_area_objects(i)) triangulated_area_objects(i)->velocity_scale=velocity_scale;
+    for(int i=0;i<segmented_curve_objects.m;i++) if(segmented_curve_objects(i)) segmented_curve_objects(i)->velocity_scale=velocity_scale; // apply to objects which already exist
+    for(int i=0;i<triangulated_area_objects.m;i++) if(triangulated_area_objects(i)) triangulated_area_objects(i)->velocity_scale=velocity_scale;
 }
 //#####################################################################
 // Function Increase_Vector_Size
@@ -166,8 +166,8 @@ Increase_Vector_Size()
 {
     T magnitude_adjustment=(T)1.1;
     velocity_scale*=magnitude_adjustment;
-    for(int i=1;i<=segmented_curve_objects.m;i++) if(segmented_curve_objects(i)) segmented_curve_objects(i)->velocity_scale=velocity_scale; // apply to objects which already exist
-    for(int i=1;i<=triangulated_area_objects.m;i++) if(triangulated_area_objects(i)) triangulated_area_objects(i)->velocity_scale=velocity_scale;
+    for(int i=0;i<segmented_curve_objects.m;i++) if(segmented_curve_objects(i)) segmented_curve_objects(i)->velocity_scale=velocity_scale; // apply to objects which already exist
+    for(int i=0;i<triangulated_area_objects.m;i++) if(triangulated_area_objects(i)) triangulated_area_objects(i)->velocity_scale=velocity_scale;
     velocity_field.Scale_Vector_Size(magnitude_adjustment);
 }
 //#####################################################################
@@ -178,8 +178,8 @@ Decrease_Vector_Size()
 {
     T magnitude_adjustment=(T)1/(T)1.1;
     velocity_scale*=magnitude_adjustment;
-    for(int i=1;i<=segmented_curve_objects.m;i++) if(segmented_curve_objects(i)) segmented_curve_objects(i)->velocity_scale=velocity_scale; // apply to objects which already exist
-    for(int i=1;i<=triangulated_area_objects.m;i++) if(triangulated_area_objects(i)) triangulated_area_objects(i)->velocity_scale=velocity_scale;
+    for(int i=0;i<segmented_curve_objects.m;i++) if(segmented_curve_objects(i)) segmented_curve_objects(i)->velocity_scale=velocity_scale; // apply to objects which already exist
+    for(int i=0;i<triangulated_area_objects.m;i++) if(triangulated_area_objects(i)) triangulated_area_objects(i)->velocity_scale=velocity_scale;
     velocity_field.Scale_Vector_Size(magnitude_adjustment);
 }
 //#####################################################################
@@ -189,8 +189,8 @@ template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_
 Toggle_Draw_Velocities()
 {
     draw_velocities=!draw_velocities;
-    for(int i=1;i<=segmented_curve_objects.m;i++) if(segmented_curve_objects(i)) segmented_curve_objects(i)->draw_velocities=draw_velocities;
-    for(int i=1;i<=triangulated_area_objects.m;i++) if(triangulated_area_objects(i)) triangulated_area_objects(i)->draw_velocities=draw_velocities;
+    for(int i=0;i<segmented_curve_objects.m;i++) if(segmented_curve_objects(i)) segmented_curve_objects(i)->draw_velocities=draw_velocities;
+    for(int i=0;i<triangulated_area_objects.m;i++) if(triangulated_area_objects(i)) triangulated_area_objects(i)->draw_velocities=draw_velocities;
 }
 //#####################################################################
 // Function Cycle_Display_Mode
@@ -216,9 +216,9 @@ Bounding_Box() const
 {
     RANGE<VECTOR<float,3> > box=RANGE<VECTOR<float,3> >::Empty_Box();
     if(draw && valid && deformable_geometry_collection->structures.m>0){
-        for(int i=1;i<=segmented_curve_objects.m;i++)if(segmented_curve_objects(i))box.Enlarge_To_Include_Box(segmented_curve_objects(i)->Bounding_Box());
-        for(int i=1;i<=triangulated_area_objects.m;i++)if(triangulated_area_objects(i))box.Enlarge_To_Include_Box(triangulated_area_objects(i)->Bounding_Box());
-        for(int i=1;i<=triangles_of_material_objects.m;i++)if(triangles_of_material_objects(i))box.Enlarge_To_Include_Box(triangles_of_material_objects(i)->Bounding_Box());}
+        for(int i=0;i<segmented_curve_objects.m;i++)if(segmented_curve_objects(i))box.Enlarge_To_Include_Box(segmented_curve_objects(i)->Bounding_Box());
+        for(int i=0;i<triangulated_area_objects.m;i++)if(triangulated_area_objects(i))box.Enlarge_To_Include_Box(triangulated_area_objects(i)->Bounding_Box());
+        for(int i=0;i<triangles_of_material_objects.m;i++)if(triangles_of_material_objects(i))box.Enlarge_To_Include_Box(triangles_of_material_objects(i)->Bounding_Box());}
     return box;
 }
 //#####################################################################
@@ -257,9 +257,9 @@ Highlight_Selection(OPENGL_SELECTION* selection)
 template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_2D<T,RW>::
 Clear_Highlight()
 {
-    for(int i=1;i<=triangulated_area_objects.m;i++)if(triangulated_area_objects(i))triangulated_area_objects(i)->Clear_Highlight();
-    for(int i=1;i<=triangles_of_material_objects.m;i++)if(triangles_of_material_objects(i))triangles_of_material_objects(i)->Clear_Highlight();
-    for(int i=1;i<=free_particles_objects.m;i++)if(free_particles_objects(i))free_particles_objects(i)->Clear_Highlight();
+    for(int i=0;i<triangulated_area_objects.m;i++)if(triangulated_area_objects(i))triangulated_area_objects(i)->Clear_Highlight();
+    for(int i=0;i<triangles_of_material_objects.m;i++)if(triangles_of_material_objects(i))triangles_of_material_objects(i)->Clear_Highlight();
+    for(int i=0;i<free_particles_objects.m;i++)if(free_particles_objects(i))free_particles_objects(i)->Clear_Highlight();
 }
 //#####################################################################
 // Function Print_Selection_Info

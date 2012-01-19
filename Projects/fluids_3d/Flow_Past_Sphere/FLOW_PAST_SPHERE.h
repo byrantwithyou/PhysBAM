@@ -95,11 +95,11 @@ void Construct_Levelsets_For_Objects(const T time)
 void Get_Object_Velocities(const T dt,const T time)
 {
     if(solids_parameters.rigid_body_parameters.list.Number_Of_Elements()<1) return;
-    for(int i=1;i<=fluids_parameters.u_grid.m;i++)for(int j=1;j<=fluids_parameters.u_grid.n;j++)for(int ij=1;ij<=fluids_parameters.u_grid.mn;ij++)
+    for(int i=0;i<fluids_parameters.u_grid.m;i++)for(int j=0;j<fluids_parameters.u_grid.n;j++)for(int ij=0;ij<fluids_parameters.u_grid.mn;ij++)
         if(levelset_object.Lazy_Inside(fluids_parameters.u_grid.X(i,j,ij))){fluids_parameters.incompressible.projection.u(i,j,ij)=0;fluids_parameters.incompressible.projection.elliptic_solver->psi_N_u(i,j,ij)=true;}
-    for(int i=1;i<=fluids_parameters.v_grid.m;i++)for(int j=1;j<=fluids_parameters.v_grid.n;j++)for(int ij=1;ij<=fluids_parameters.v_grid.n;ij++)
+    for(int i=0;i<fluids_parameters.v_grid.m;i++)for(int j=0;j<fluids_parameters.v_grid.n;j++)for(int ij=0;ij<fluids_parameters.v_grid.n;ij++)
         if(levelset_object.Lazy_Inside(fluids_parameters.v_grid.X(i,j,ij))){fluids_parameters.incompressible.projection.v(i,j,ij)=0;fluids_parameters.incompressible.projection.elliptic_solver->psi_N_v(i,j,ij)=true;}
-    for(int i=1;i<=fluids_parameters.w_grid.m;i++)for(int j=1;j<=fluids_parameters.w_grid.n;j++)for(int ij=1;ij<=fluids_parameters.w_grid.mn;ij++)
+    for(int i=0;i<fluids_parameters.w_grid.m;i++)for(int j=0;j<fluids_parameters.w_grid.n;j++)for(int ij=0;ij<fluids_parameters.w_grid.mn;ij++)
         if(levelset_object.Lazy_Inside(fluids_parameters.w_grid.X(i,j,ij))){fluids_parameters.incompressible.projection.w(i,j,ij)=0;fluids_parameters.incompressible.projection.elliptic_solver->psi_N_w(i,j,ij)=true;}
 
 }
@@ -108,14 +108,14 @@ void Get_Object_Velocities(const T dt,const T time)
 //#####################################################################
 void Adjust_Density_And_Temperature_With_Sources(const T time){
     // sources
-    for(int i=1;i<=fluids_parameters.grid.m;i++)for(int j=1;j<=fluids_parameters.grid.n;j++)for(int ij=1;ij<=fluids_parameters.grid.mn;ij++)if(source_domain.Lazy_Inside(fluids_parameters.grid.X(i,j,ij))){
+    for(int i=0;i<fluids_parameters.grid.m;i++)for(int j=0;j<fluids_parameters.grid.n;j++)for(int ij=0;ij<fluids_parameters.grid.mn;ij++)if(source_domain.Lazy_Inside(fluids_parameters.grid.X(i,j,ij))){
         fluids_parameters.density_container.density_3d(i,j,ij)=rho;fluids_parameters.temperature_container.temperature_3d(i,j,ij)=fluids_parameters.temperature_products;}
     // objects
     phi_object*=(T)-1; // because extrapolation will extrapolate into positive phi. changed back below.
     EXTRAPOLATION_3D<T,T> extrapolate(fluids_parameters.grid,phi_object,fluids_parameters.density_container.density_3d);extrapolate.Set_Band_Width(3);extrapolate.Extrapolate();
     phi_object*=(T)-1; // revert to original phi
     // keep density >= 0 and T >=0
-    for(int i=1;i<=fluids_parameters.grid.m;i++)for(int j=1;j<=fluids_parameters.grid.n;j++)for(int ij=1;ij<=fluids_parameters.grid.mn;ij++){
+    for(int i=0;i<fluids_parameters.grid.m;i++)for(int j=0;j<fluids_parameters.grid.n;j++)for(int ij=0;ij<fluids_parameters.grid.mn;ij++){
         fluids_parameters.density_container.density_3d(i,j,ij)=max((T)0,fluids_parameters.density_container.density_3d(i,j,ij));
         fluids_parameters.temperature_container.temperature_3d(i,j,ij)=max((T)fluids_parameters.temperature_container.ambient_temperature,fluids_parameters.temperature_container.temperature_3d(i,j,ij));}
 
@@ -125,11 +125,11 @@ void Adjust_Density_And_Temperature_With_Sources(const T time){
 //#####################################################################
 void Get_Source_Velocities(const T time)
 {
-    for(int i=1;i<=fluids_parameters.u_grid.m;i++)for(int j=1;j<=fluids_parameters.u_grid.n;j++)for(int ij=1;ij<=fluids_parameters.u_grid.mn;ij++)
+    for(int i=0;i<fluids_parameters.u_grid.m;i++)for(int j=0;j<fluids_parameters.u_grid.n;j++)for(int ij=0;ij<fluids_parameters.u_grid.mn;ij++)
         if(source_domain.Lazy_Inside(fluids_parameters.u_grid.X(i,j,ij))) fluids_parameters.incompressible.projection.u(i,j,ij)=0;
-    for(int i=1;i<=fluids_parameters.v_grid.m;i++)for(int j=1;j<=fluids_parameters.v_grid.n;j++)for(int ij=1;ij<=fluids_parameters.v_grid.n;ij++)
+    for(int i=0;i<fluids_parameters.v_grid.m;i++)for(int j=0;j<fluids_parameters.v_grid.n;j++)for(int ij=0;ij<fluids_parameters.v_grid.n;ij++)
         if(source_domain.Lazy_Inside(fluids_parameters.v_grid.X(i,j,ij))){fluids_parameters.incompressible.projection.v(i,j,ij)=(T).5;fluids_parameters.incompressible.projection.elliptic_solver->psi_N_v(i,j,ij)=true;}
-    for(int i=1;i<=fluids_parameters.w_grid.m;i++)for(int j=1;j<=fluids_parameters.w_grid.n;j++)for(int ij=1;ij<=fluids_parameters.w_grid.mn;ij++)
+    for(int i=0;i<fluids_parameters.w_grid.m;i++)for(int j=0;j<fluids_parameters.w_grid.n;j++)for(int ij=0;ij<fluids_parameters.w_grid.mn;ij++)
     if(source_domain.Lazy_Inside(fluids_parameters.w_grid.X(i,j,ij))) fluids_parameters.incompressible.projection.w(i,j,ij)=0;
 }
 //#####################################################################
@@ -138,7 +138,7 @@ void Get_Source_Velocities(const T time)
 void Get_Body_Force(ARRAY<VECTOR<T,3> ,VECTOR<int,3> >& force,const T dt,const T time)
 {
     // control buoyancy force
-    for(int i=1;i<=fluids_parameters.grid.m;i++) for(int j=1;j<=fluids_parameters.grid.n;j++) for(int ij=1;ij<=fluids_parameters.grid.mn;ij++){ // y-direction forces only
+    for(int i=0;i<fluids_parameters.grid.m;i++) for(int j=0;j<fluids_parameters.grid.n;j++) for(int ij=0;ij<fluids_parameters.grid.mn;ij++){ // y-direction forces only
         T rho_atm=rho_bottom+(rho_top-rho_bottom)*(fluids_parameters.grid.y(j)-fluids_parameters.grid.ymin)/(fluids_parameters.grid.ymax-fluids_parameters.grid.ymin);
         if(fluids_parameters.grid.y(j)<=2)rho_atm=1;
         T difference=fluids_parameters.temperature_container.temperature_3d(i,j,ij)-fluids_parameters.temperature_container.ambient_temperature;
@@ -154,7 +154,7 @@ void Get_Body_Force(ARRAY<VECTOR<T,3> ,VECTOR<int,3> >& force,const T dt,const T
 //        if(time <= explosion_end_time){
             int add_count=0;VORTICITY_PARTICLES<T,VECTOR<T,3> >& vorticity_particles=vortex_particle_evolution.vorticity_particles;
             VECTOR<T,3> cell_upper=(T).5*VECTOR<T,3>(grid.dx,grid.dy,grid.dz),cell_lower=-cell_upper;
-            for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++) for(int ij=1;ij<=grid.mn;ij++)
+            for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++) for(int ij=0;ij<grid.mn;ij++)
                 if(source_domain.Lazy_Inside(grid.X(i,j,ij)) && time>(T)1/24 && random.Get_Uniform_Number((T)0,(T)1)<(T).005){
                     add_count++;
                     int particle_id=vorticity_particles.array_collection->Add_Element(); 

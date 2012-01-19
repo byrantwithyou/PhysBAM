@@ -488,7 +488,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             tests.Create_Tetrahedralized_Volume(sphere_filename,RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T)5.1,0))),true,false,1000);
             tests.Create_Tetrahedralized_Volume(sphere_filename,RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T)7.2,0))),true,false,1000);
             TETRAHEDRALIZED_VOLUME<T>& merged_surface=*TETRAHEDRALIZED_VOLUME<T>::Create(particles);
-            for(int s=1;s<=deformable_body_collection.deformable_geometry.structures.m;s++){TETRAHEDRALIZED_VOLUME<T>*ts=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.deformable_geometry.structures(s));
+            for(int s=0;s<deformable_body_collection.deformable_geometry.structures.m;s++){TETRAHEDRALIZED_VOLUME<T>*ts=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.deformable_geometry.structures(s));
                 if(ts) merged_surface.mesh.elements.Append_Elements(ts->mesh.elements);}
             deformable_body_collection.deformable_geometry.structures.Clean_Memory();deformable_body_collection.deformable_geometry.Add_Structure(&merged_surface);
             tests.Add_Ground(0);
@@ -589,7 +589,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             GRID<TV> grid(tori_m,tori_n,tori_mn,0,(tori_m-1)*size,tori_base_height,tori_base_height+(tori_n-1)*size,0,(tori_mn-1)*size);
             RANDOM_NUMBERS<T> random;random.Set_Seed(12321);
             tori_initial_states.Remove_All(); 
-            for(int j=1;j<=tori_n;j++)for(int i=1;i<=tori_m;i++)for(int ij=1;ij<=tori_mn;ij++){ // Note nonstandard dimension ordering to get nice layers
+            for(int j=0;j<tori_n;j++)for(int i=0;i<tori_m;i++)for(int ij=0;ij<tori_mn;ij++){ // Note nonstandard dimension ordering to get nice layers
                 ROTATION<TV> orientation(random.Get_Uniform_Number((T)0,(T)1),random.template Get_Direction<TV>());
                 TV new_center=grid.Node(VECTOR<int,3>(i,j,ij));
                 TV angular_velocity=random.Get_Uniform_Number((T)0,tori_max_angular_velocity)*random.template Get_Direction<TV>();
@@ -598,14 +598,14 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 tori_initial_states.Append(RIGID_BODY_STATE<TV>(FRAME<TV>(new_center,orientation),TWIST<TV>(TV(),angular_velocity)));
                 tests.Create_Tetrahedralized_Volume(torus_filename,tori_initial_states.Last(),true,false,1000,1);}
             TETRAHEDRALIZED_VOLUME<T>& merged_surface=*TETRAHEDRALIZED_VOLUME<T>::Create(particles);
-            for(int s=1;s<=deformable_body_collection.deformable_geometry.structures.m;s++){TETRAHEDRALIZED_VOLUME<T>*ts=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.deformable_geometry.structures(s));
+            for(int s=0;s<deformable_body_collection.deformable_geometry.structures.m;s++){TETRAHEDRALIZED_VOLUME<T>*ts=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.deformable_geometry.structures(s));
                 if(ts) merged_surface.mesh.elements.Append_Elements(ts->mesh.elements);}
             deformable_body_collection.deformable_geometry.structures.Clean_Memory();deformable_body_collection.deformable_geometry.Add_Structure(&merged_surface);
             // rigid bodies
             if(test_number==18){
-                for(int i=1;i<=16;i++){T a=i*(T)pi/8;
+                for(int i=0;i<16;i++){T a=i*(T)pi/8;
                     body=&tests.Add_Rigid_Body("skinnyhexlink",(T)2,(T)0);body->X()=TV((T)cos(a)*6+(T)1.5,(T)2,(T)sin(a)*6+(T)1.5);body->is_static=true;}
-                for(int i=1;i<=32;i++){T a=i*(T)pi/16;
+                for(int i=0;i<32;i++){T a=i*(T)pi/16;
                     body=&tests.Add_Rigid_Body("skinnyhexlink",(T)2,(T)0);body->X()=TV((T)cos(a)*12+(T)1.5,(T)2,(T)sin(a)*12+(T)1.5);body->is_static=true;}}
             tests.Add_Ground((T).1);
 
@@ -650,7 +650,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=true;
         solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=false;
         automatically_add_to_collision_structures=false;
-        for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) if(TETRAHEDRALIZED_VOLUME<T>* volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.deformable_geometry.structures(i)))
+        for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) if(TETRAHEDRALIZED_VOLUME<T>* volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.deformable_geometry.structures(i)))
             Collide_With_Soft_Bound_Surface_Copy(*volume,rigid_body_soft);}
 
     if(use_volumetric_self_collisions && solids_parameters.triangle_collision_parameters.perform_self_collision){
@@ -673,7 +673,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);}
 
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     // correct mass
     binding_list.Distribute_Mass_To_Parents();
@@ -693,14 +693,14 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             solid_body_collection.Add_Force(Create_Edge_Binding_Springs(particles,*soft_bindings.binding_mesh,binding_stiffness,(T)1));}
         else if(use_tet_collisions){
             solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-            for(int s=1;s<=deformable_body_collection.deformable_geometry.structures.m;s++) if(TETRAHEDRALIZED_VOLUME<T>* volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.deformable_geometry.structures(s)))
+            for(int s=0;s<deformable_body_collection.deformable_geometry.structures.m;s++) if(TETRAHEDRALIZED_VOLUME<T>* volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.deformable_geometry.structures(s)))
                 tests.Initialize_Tetrahedron_Collisions(s,*volume,solids_parameters.triangle_collision_parameters);}
         else if(self_collide_with_interior_nodes){
             FREE_PARTICLES<TV>& interior=*FREE_PARTICLES<TV>::Create(particles);
-            for(int s=1;s<=deformable_body_collection.deformable_geometry.structures.m;s++) if(TETRAHEDRALIZED_VOLUME<T>* volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.deformable_geometry.structures(s))){
+            for(int s=0;s<deformable_body_collection.deformable_geometry.structures.m;s++) if(TETRAHEDRALIZED_VOLUME<T>* volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.deformable_geometry.structures(s))){
                 if(!volume->mesh.node_on_boundary) volume->mesh.Initialize_Node_On_Boundary();
                 ARRAY<int> nodes;volume->mesh.elements.Flattened().Get_Unique(nodes);
-                for(int i=1;i<=nodes.m;i++)if(!(*volume->mesh.node_on_boundary)(nodes(i))) interior.nodes.Append(nodes(i));}
+                for(int i=0;i<nodes.m;i++)if(!(*volume->mesh.node_on_boundary)(nodes(i))) interior.nodes.Append(nodes(i));}
             LOG::Stat("interior particles",interior.nodes.m);
             solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append(&interior);}}
 
@@ -722,7 +722,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     LOG::Stat("use_neumann",use_neumann);
     LOG::Stat("minimum_volume_recovery_time_scale",minimum_volume_recovery_time_scale);
     LOG::Stat("max_cg_iterations",max_cg_iterations);
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++){
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++){
         TETRAHEDRALIZED_VOLUME<T>* volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.deformable_geometry.structures(i));
         TRIANGULATED_SURFACE<T>* surface=dynamic_cast<TRIANGULATED_SURFACE<T>*>(deformable_body_collection.deformable_geometry.structures(i));
         if(volume){LOG::SCOPE scope("mesh statistics","mesh statistics");Read_Write<TETRAHEDRALIZED_VOLUME<T>,T>::Print_Statistics(LOG::cout,*volume);}
@@ -781,7 +781,7 @@ void Read_Output_Files_Solids(const int frame) PHYSBAM_OVERRIDE
         LOG::Stat("total tori",tori_initial_states.m);
         for(int torus=number_of_old_tori+1;torus<=tori_initial_states.m;torus++){
             RIGID_BODY_STATE<TV>& state=tori_initial_states(torus);
-            for(int i=1;i<=particles_per_torus;i++){int p=i+particles_per_torus*(torus-1);
+            for(int i=0;i<particles_per_torus;i++){int p=i+particles_per_torus*(torus-1);
                 particles.X(p)=state.frame.t+fall_X+ROTATION<TV>::From_Rotation_Vector(time*state.twist.angular).Rotate(X_save(p)-state.frame.t);
                 particles.V(p)=fall_V+TV::Cross_Product(state.twist.angular,X_save(p)-state.frame.t);
                 particles.mass(p)=mass_save(p);}}
@@ -806,7 +806,7 @@ void Postprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE
         T critical_distance=(T).01;
         T base_stiffness=binding_springs->constant_stiffness;
         ARRAY<T>& stiffness=binding_springs->stiffness;stiffness.Resize(soft_bindings.bindings.m);
-        for(int a=1;a<=soft_bindings.bindings.m;a++){VECTOR<int,2> binding=soft_bindings.bindings(a);
+        for(int a=0;a<soft_bindings.bindings.m;a++){VECTOR<int,2> binding=soft_bindings.bindings(a);
             T distance=(particles.X(binding.x)-particles.X(binding.y)).Magnitude();
             T ratio=distance/critical_distance;
             stiffness(a)=ratio>1?base_stiffness/ratio:base_stiffness;}
@@ -840,28 +840,28 @@ void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) PHYSBAM
 //#####################################################################
 void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE
 {
-    for(int i=1;i<=fixed_particles.m;i++) V(fixed_particles(i))=TV();
+    for(int i=0;i<fixed_particles.m;i++) V(fixed_particles(i))=TV();
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes
 //#####################################################################
 void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE
 {
-    for(int i=1;i<=fixed_particles.m;i++) V(fixed_particles(i))=TV();
+    for(int i=0;i<fixed_particles.m;i++) V(fixed_particles(i))=TV();
 }
 //#####################################################################
 // Function Set_External_Positions
 //#####################################################################
 void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE
 {
-    for(int i=1;i<=fixed_particles.m;i++) X(fixed_particles(i))=fixed_particle_positions(i);
+    for(int i=0;i<fixed_particles.m;i++) X(fixed_particles(i))=fixed_particle_positions(i);
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Position_Nodes
 //#####################################################################
 void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE
 {
-    for(int i=1;i<=fixed_particles.m;i++) X(fixed_particles(i))=TV();
+    for(int i=0;i<fixed_particles.m;i++) X(fixed_particles(i))=TV();
 }
 //#####################################################################
 };

@@ -295,7 +295,7 @@ Output_Resample(LEVELSET_3D<GRID<VECTOR<T,3> > >& supersample,const int m,const 
 template<class T> void LEVELSET_PROCESSOR<T>::
 Output_Resample(LEVELSET_3D<GRID<VECTOR<T,3> > >& resample) const
 {
-    for(int i=1;i<=resample.grid.counts.x;i++)for(int j=1;j<=resample.grid.counts.y;j++)for(int ij=1;ij<=resample.grid.counts.z;ij++)
+    for(int i=0;i<resample.grid.counts.x;i++)for(int j=0;j<resample.grid.counts.y;j++)for(int ij=0;ij<resample.grid.counts.z;ij++)
         resample.phi(i,j,ij)=levelset.Phi(resample.grid.X(i,j,ij));
 }
 //#####################################################################

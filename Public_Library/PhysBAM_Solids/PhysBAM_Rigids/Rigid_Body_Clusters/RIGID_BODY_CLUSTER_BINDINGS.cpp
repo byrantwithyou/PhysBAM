@@ -54,7 +54,7 @@ Update_Joint_Structures(const int parent)
     for(RIGID_CLUSTER_CONSTITUENT_ID i(1);i<=cluster.children.Size();i++){
         int id=cluster.children(i);
         const ARRAY<JOINT_ID>& list=articulated_rigid_body.joint_mesh.undirected_graph.Adjacent_Edges(id);
-        for(int j=1;j<=list.m;j++){
+        for(int j=0;j<list.m;j++){
             PAIR<int,int> pair=articulated_rigid_body.joint_mesh.undirected_graph.Edges(list(j));
             int oid=pair.x+(Value(pair.y)-Value(id));
             if(!hashtable.Contains(oid)){
@@ -132,7 +132,7 @@ Delete_Binding(const int parent_particle)
 template<class TV> void RIGID_BODY_CLUSTER_BINDINGS<TV>::
 Make_Active_Parent(const int parent_particle,ARRAY<PAIR<int,RIGID_CLUSTER_CONSTITUENT_ID> >& child_list)
 {
-    for(int i=1;i<=child_list.m;i++) if(child_list(i).x==parent_particle){exchange(child_list(1),child_list(i));return;}
+    for(int i=0;i<child_list.m;i++) if(child_list(i).x==parent_particle){exchange(child_list(1),child_list(i));return;}
 }
 //#####################################################################
 // Function Set_Binding_Active
@@ -148,9 +148,9 @@ Set_Binding_Active(const int parent_particle,const bool active,GRID_BASED_COLLIS
             rigid_body_collection.Rigid_Body(cluster.parent).bounding_box_up_to_date=false;}
         Distribute_Mass_To_Parent(parent_particle);
         Update_Aggregate_Geometry(parent_particle);
-        for(int i=1;i<=cluster.internal_joints.m;i++)
+        for(int i=0;i<cluster.internal_joints.m;i++)
             articulated_rigid_body.joint_mesh.Deactivate_Articulation(cluster.internal_joints(i).joint->id_number);
-        for(int i=1;i<=cluster.boundary_joints.m;i++){
+        for(int i=0;i<cluster.boundary_joints.m;i++){
             if(cluster.boundary_joints(i).is_parent){articulated_rigid_body.Substitute_Joint_Parent_Body(cluster.boundary_joints(i).joint_id,parent_particle);}
             else{articulated_rigid_body.Substitute_Joint_Child_Body(cluster.boundary_joints(i).joint_id,parent_particle);}}
         if(fluid_collision_body_list && fluid_collision_body_list->collision_geometry_collection.bodies.m){
@@ -161,9 +161,9 @@ Set_Binding_Active(const int parent_particle,const bool active,GRID_BASED_COLLIS
     else{
         Clamp_Particles_To_Embedded_Positions(parent_particle);
         Clamp_Particles_To_Embedded_Velocities(parent_particle);
-        for(int i=1;i<=cluster.internal_joints.m;i++)
+        for(int i=0;i<cluster.internal_joints.m;i++)
             articulated_rigid_body.joint_mesh.Reactivate_Articulation(cluster.internal_joints(i).parent,cluster.internal_joints(i).child,cluster.internal_joints(i).joint);
-        for(int i=1;i<=cluster.boundary_joints.m;i++){
+        for(int i=0;i<cluster.boundary_joints.m;i++){
             if(cluster.boundary_joints(i).is_parent) articulated_rigid_body.Substitute_Joint_Parent_Body(cluster.boundary_joints(i).joint_id,cluster.boundary_joints(i).boundary_body,cluster.boundary_joints(i).original_frame);
             else articulated_rigid_body.Substitute_Joint_Child_Body(cluster.boundary_joints(i).joint_id,cluster.boundary_joints(i).boundary_body,cluster.boundary_joints(i).original_frame);}
         rigid_body_collection.rigid_geometry_collection.Deactivate_Geometry(cluster.parent);
@@ -195,7 +195,7 @@ Deactivate_And_Return_Clusters(ARRAY<int>& active_bindings,GRID_BASED_COLLISION_
 template<class TV> void RIGID_BODY_CLUSTER_BINDINGS<TV>::
 Reactivate_Bindings(const ARRAY<int>& active_bindings,GRID_BASED_COLLISION_GEOMETRY<GRID<TV> >* fluid_collision_body_list)
 {
-    for(int i=1;i<=active_bindings.m;i++) Set_Binding_Active(active_bindings(i),true,fluid_collision_body_list);
+    for(int i=0;i<active_bindings.m;i++) Set_Binding_Active(active_bindings(i),true,fluid_collision_body_list);
 }
 //#####################################################################
 // Function Save_Bindings_State

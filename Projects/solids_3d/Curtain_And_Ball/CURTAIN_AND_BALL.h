@@ -59,10 +59,10 @@ void Get_Initial_Data()
 
     int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;
     triangle_mesh.Initialize_Herring_Bone_Mesh(m,n);
-    for(int k=1;k<=triangle_mesh.number_nodes;k++) particles.array_collection->Add_Element();
+    for(int k=0;k<triangle_mesh.number_nodes;k++) particles.array_collection->Add_Element();
     T mass_node=aspect_ratio*sqr(side_length)/(m*n);ARRAY<T>::copy(mass_node,particles.mass.array); 
     T dx=aspect_ratio*side_length/(m-1),dy=side_length/(n-1);
-    for(int i=1;i<=m;i++) for(int j=1;j<=n;j++){int node=i+m*(j-1);
+    for(int i=0;i<m;i++) for(int j=0;j<n;j++){int node=i+m*(j-1);
         particles.X(node)=VECTOR_3D<T>((i-1)*dx,.5,(j-1)*dy);
         particles.V(node)=VECTOR_3D<T>(0,0,0);}
 
@@ -112,7 +112,7 @@ void Update_Collision_Body_Positions_And_Velocities(const T time) PHYSBAM_OVERRI
     else{solids_parameters.rigid_body_parameters.list.rigid_bodies(2)->frame.t=VECTOR_3D<T>((T)(1.5-1.5*(time-4)),0,.5);solids_parameters.rigid_body_parameters.list.rigid_bodies(2)->velocity=VECTOR_3D<T>(-1.5,0,0);}
     if(collide_against_sphere_triangulated_surface||collide_against_sphere_particles){
         FRAME_3D<T> frame=solids_parameters.rigid_body_parameters.list.rigid_bodies(2)->frame;
-        for(int p=1;p<=sphere_particles.X.array.m;p++){
+        for(int p=0;p<sphere_particles.X.array.m;p++){
             sphere_particles.X(p)=frame*solids_parameters.rigid_body_parameters.list.rigid_bodies(2)->triangulated_surface->particles.X(p);
             sphere_particles.V(p)=solids_parameters.rigid_body_parameters.list.rigid_bodies(2)->velocity;}}
 }

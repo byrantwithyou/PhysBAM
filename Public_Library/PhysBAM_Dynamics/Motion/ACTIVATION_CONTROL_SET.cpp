@@ -59,7 +59,7 @@ Identity(const int control_id) const
 template<class T> void ACTIVATION_CONTROL_SET<T>::
 Maximal_Controls()
 {
-    for(int i=1;i<=activations.m;i++) activations(i)=max(activations(i),activations_save(i));
+    for(int i=0;i<activations.m;i++) activations(i)=max(activations(i),activations_save(i));
 }
 template<class T> bool ACTIVATION_CONTROL_SET<T>::
 Control_Active(const int control_id) const
@@ -92,7 +92,7 @@ Penalty() const
 {
     assert(activations.m==activations_save.m);
     T penalty=0;
-    for(int i=1;i<=activations.m;i++) penalty+=Piecewise_Quadratic_Penalty(activations(i),clamp<T>(activations_save(i)-max_optimization_step_length,0,activation_cutoff),
+    for(int i=0;i<activations.m;i++) penalty+=Piecewise_Quadratic_Penalty(activations(i),clamp<T>(activations_save(i)-max_optimization_step_length,0,activation_cutoff),
         clamp<T>(activations_save(i)+max_optimization_step_length,0,activation_cutoff));
     return activation_penalty_coefficient*penalty;
 }
@@ -120,31 +120,31 @@ Save_Controls()
 template<class T> void ACTIVATION_CONTROL_SET<T>::
 Project_Parameters_To_Allowable_Range(const bool active_controls_only)
 {
-    for(int i=1;i<=activations.m;i++) if(!active_controls_only || activation_active(i))
+    for(int i=0;i<activations.m;i++) if(!active_controls_only || activation_active(i))
         activations(i)=clamp<T>(activations(i),max(activations_save(i)-max_optimization_step_length,(T)0),min(activations_save(i)+max_optimization_step_length,activation_cutoff));
 }
 template<class T> void ACTIVATION_CONTROL_SET<T>::
 Interpolate(const T interpolation_fraction)
 {
-    for(int i=1;i<=activations.m;i++) activations(i)=LINEAR_INTERPOLATION<T,T>::Linear(activations_save(i),activations(i),interpolation_fraction);
+    for(int i=0;i<activations.m;i++) activations(i)=LINEAR_INTERPOLATION<T,T>::Linear(activations_save(i),activations(i),interpolation_fraction);
 }
 template<class T> void ACTIVATION_CONTROL_SET<T>::
 Scale(const T scale)
 {
-    for(int i=1;i<=activations.m;i++) activations(i)=min((T)1,activations(i)*scale);
+    for(int i=0;i<activations.m;i++) activations(i)=min((T)1,activations(i)*scale);
 }
 template<class T> T ACTIVATION_CONTROL_SET<T>::
 Distance(const ARRAY<T>& weights,int base)
 {
     T distance=0;
-    for(int i=1;i<=activations.m;i++){
+    for(int i=0;i<activations.m;i++){
         T mean=(T)(.5*abs((activations_save(i)+activations(i))));
         distance+=weights(base+i)*pow(activations_save(i)-activations(i),2)/(mean?mean:1);}
     return sqrt(distance);
 }
 template<class T> void ACTIVATION_CONTROL_SET<T>::Print_Diagnostics(std::ostream& output) const
 {
-    for(int i=1;i<=activations.m;i++) output<<STRING_UTILITIES::string_sprintf("%2d - %-35s [%s] : %g\n",i,activation_names(i).c_str(),(activation_active(i)?"active":"inactive"),activations(i));
+    for(int i=0;i<activations.m;i++) output<<STRING_UTILITIES::string_sprintf("%2d - %-35s [%s] : %g\n",i,activation_names(i).c_str(),(activation_active(i)?"active":"inactive"),activations(i));
     output<<"Penalty at current activation levels : "<<Penalty()<<std::endl;
 }
 template<class T> T ACTIVATION_CONTROL_SET<T>::

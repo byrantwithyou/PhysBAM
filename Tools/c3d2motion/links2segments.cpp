@@ -43,7 +43,7 @@ Convert(const std::string& input_filename,const std::string& output_filename)
     start+=1;
     int linkages=atoi(line.substr(start,line.length()-start).c_str());
     // get linkages
-    for(int i=1;i<=linkages;i++){
+    for(int i=0;i<linkages;i++){
         getline(infile,line,'\n');
         ARRAY<std::string> items,numbers;
         Split(line,",",items);

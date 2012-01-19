@@ -78,17 +78,17 @@ public:
     
     void Turn_Smooth_Shading_On() PHYSBAM_OVERRIDE
     {smooth_shading=true;
-    for(int i=1;i<=segmented_curve_objects.m;i++)if(segmented_curve_objects(i))segmented_curve_objects(i)->Turn_Smooth_Shading_On();
-    for(int i=1;i<=triangulated_surface_objects.m;i++)if(triangulated_surface_objects(i))triangulated_surface_objects(i)->Turn_Smooth_Shading_On();
-    for(int i=1;i<=tetrahedralized_volume_objects.m;i++)if(tetrahedralized_volume_objects(i))tetrahedralized_volume_objects(i)->Turn_Smooth_Shading_On();
-    for(int i=1;i<=hexahedralized_volume_objects.m;i++)if(hexahedralized_volume_objects(i))hexahedralized_volume_objects(i)->Turn_Smooth_Shading_On();}
+    for(int i=0;i<segmented_curve_objects.m;i++)if(segmented_curve_objects(i))segmented_curve_objects(i)->Turn_Smooth_Shading_On();
+    for(int i=0;i<triangulated_surface_objects.m;i++)if(triangulated_surface_objects(i))triangulated_surface_objects(i)->Turn_Smooth_Shading_On();
+    for(int i=0;i<tetrahedralized_volume_objects.m;i++)if(tetrahedralized_volume_objects(i))tetrahedralized_volume_objects(i)->Turn_Smooth_Shading_On();
+    for(int i=0;i<hexahedralized_volume_objects.m;i++)if(hexahedralized_volume_objects(i))hexahedralized_volume_objects(i)->Turn_Smooth_Shading_On();}
     
     void Turn_Smooth_Shading_Off() PHYSBAM_OVERRIDE
     {smooth_shading=false;
-    for(int i=1;i<=segmented_curve_objects.m;i++)if(segmented_curve_objects(i))segmented_curve_objects(i)->Turn_Smooth_Shading_Off();
-    for(int i=1;i<=triangulated_surface_objects.m;i++)if(triangulated_surface_objects(i))triangulated_surface_objects(i)->Turn_Smooth_Shading_Off();
-    for(int i=1;i<=tetrahedralized_volume_objects.m;i++)if(tetrahedralized_volume_objects(i))tetrahedralized_volume_objects(i)->Turn_Smooth_Shading_Off();
-    for(int i=1;i<=hexahedralized_volume_objects.m;i++)if(hexahedralized_volume_objects(i))hexahedralized_volume_objects(i)->Turn_Smooth_Shading_Off();}
+    for(int i=0;i<segmented_curve_objects.m;i++)if(segmented_curve_objects(i))segmented_curve_objects(i)->Turn_Smooth_Shading_Off();
+    for(int i=0;i<triangulated_surface_objects.m;i++)if(triangulated_surface_objects(i))triangulated_surface_objects(i)->Turn_Smooth_Shading_Off();
+    for(int i=0;i<tetrahedralized_volume_objects.m;i++)if(tetrahedralized_volume_objects(i))tetrahedralized_volume_objects(i)->Turn_Smooth_Shading_Off();
+    for(int i=0;i<hexahedralized_volume_objects.m;i++)if(hexahedralized_volume_objects(i))hexahedralized_volume_objects(i)->Turn_Smooth_Shading_Off();}
 
     void Set_Material(const int object,const OPENGL_MATERIAL& front_material,const OPENGL_MATERIAL& back_material);
     void Set_All_Materials(const OPENGL_MATERIAL& meshfront,const OPENGL_MATERIAL& front_material,const OPENGL_MATERIAL& back_material);

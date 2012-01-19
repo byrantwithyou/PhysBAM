@@ -69,26 +69,26 @@ void Get_Initial_Data()
     BINDING_LIST<T,TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
     SOFT_BINDINGS<T,TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
 
-    for(int i=1;i<=number_of_objects;i++)
+    for(int i=0;i<number_of_objects;i++)
         tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME_3D<T>(TV((T)1.7*(i-4)-(T).85,(T)6,0))),true,true);
-    for(int i=1;i<=deformable_object.structures.m;i++) deformable_object.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_object.structures.m;i++) deformable_object.structures(i)->Update_Number_Nodes();
 
     ARRAY<TETRAHEDRALIZED_VOLUME<T>*> tetrahedralized_volumes(deformable_object.structures.m);
-    for(int i=1;i<=deformable_object.structures.m;i++){
+    for(int i=0;i<deformable_object.structures.m;i++){
         tetrahedralized_volumes(i)=deformable_object.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(i);
         tetrahedralized_volumes(i)->Update_Tetrahedron_List();tetrahedralized_volumes(i)->Initialize_Tetrahedron_Hierarchy();}
 
     particles.Set_Array_Buffer_Size(1000);
     ARRAY<int> map_to_hard_bound_particles(particles.array_collection->Size());
-    for(int volume=1;volume<=tetrahedralized_volumes.m;volume++){
+    for(int volume=0;volume<tetrahedralized_volumes.m;volume++){
         int particles_embedded=0;
         ARRAY<int> nodes_of_structure;tetrahedralized_volumes(volume)->mesh.elements.Flattened().Get_Unique(nodes_of_structure);
-        for(int i=1;i<=nodes_of_structure.m;i++){
+        for(int i=0;i<nodes_of_structure.m;i++){
             TV& X=deformable_object.particles.X(nodes_of_structure(i));
             ARRAY<VECTOR<int,2> > candidate_embeddings;
-            for(int other_volume=1;other_volume<=deformable_object.structures.m;other_volume++) if(other_volume!=volume){
+            for(int other_volume=0;other_volume<deformable_object.structures.m;other_volume++) if(other_volume!=volume){
                 ARRAY<int> intersection_list;(*tetrahedralized_volumes(other_volume)->tetrahedron_hierarchy).Intersection_List(X,intersection_list);
-                for(int t=1;t<=intersection_list.m;t++) candidate_embeddings.Append(VECTOR<int,2>(other_volume,intersection_list(t)));}
+                for(int t=0;t<intersection_list.m;t++) candidate_embeddings.Append(VECTOR<int,2>(other_volume,intersection_list(t)));}
             for(int e=candidate_embeddings.m;e>=1;e--){int other_volume,tet;candidate_embeddings(e).Get(other_volume,tet);
                 if(!(*tetrahedralized_volumes(other_volume)->tetrahedron_list)(tet).Inside(X)) candidate_embeddings.Remove_Index_Lazy(e);}
             if(candidate_embeddings.m>1) PHYSBAM_FATAL_ERROR();
@@ -100,9 +100,9 @@ void Get_Initial_Data()
                 particles_embedded++;}}
         LOG::cout<<particles_embedded<<" particles from structure "<<volume<<" were embedded"<<std::endl;}
     SEGMENTED_CURVE<T,TV>& segmented_curve=*SEGMENTED_CURVE<T,TV>::Create(particles);
-    for(int i=1;i<=map_to_hard_bound_particles.m;i++) if(map_to_hard_bound_particles(i)) segmented_curve.mesh.elements.Append(VECTOR<int,2>(i,map_to_hard_bound_particles(i)));
+    for(int i=0;i<map_to_hard_bound_particles.m;i++) if(map_to_hard_bound_particles(i)) segmented_curve.mesh.elements.Append(VECTOR<int,2>(i,map_to_hard_bound_particles(i)));
     deformable_object.Add_Structure(&segmented_curve);
-    for(int i=1;i<=deformable_object.structures.m;i++) deformable_object.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_object.structures.m;i++) deformable_object.structures(i)->Update_Number_Nodes();
 
     tests.Add_Ground();
     tests.Add_Rigid_Body("sphere",(T)3,(T).5);
@@ -112,7 +112,7 @@ void Get_Initial_Data()
     solids_parameters.collision_body_list.Add_Bodies(solids_parameters.rigid_body_parameters.list);
 
     // correct number nodes
-    for(int i=1;i<=deformable_object.structures.m;i++) deformable_object.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_object.structures.m;i++) deformable_object.structures(i)->Update_Number_Nodes();
 
     // correct mass
     binding_list.Distribute_Mass_To_Parents(particles.mass.array);
@@ -130,7 +130,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     Get_Initial_Data();
 
-    for(int i=1;i<=number_of_objects;i++){
+    for(int i=0;i<number_of_objects;i++){
         TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_object.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(i);
         solid_body_collection.Add_Force(new GRAVITY<T,TV>(tetrahedralized_volume));
         solid_body_collection.Add_Force(Create_Diagonalized_Finite_Volume(tetrahedralized_volume,new DIAGONALIZED_NEO_HOOKEAN_3D<T>((T)3e5,(T).45,(T).01,(T).25),true,(T).1));}

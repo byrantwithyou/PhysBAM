@@ -82,7 +82,7 @@ Transform(const ARRAY<T,VECTOR<int,3> >& u,ARRAY<COMPLEX<T> ,VECTOR<int,3> >& u_
 {
     ARRAY<int> dim(grid.counts);
     data.Resize(2*grid.counts.x*grid.counts.y*grid.counts.z,false,false);
-    int k=0;for(int i=1;i<=grid.counts.x;i++) for(int j=1;j<=grid.counts.y;j++) for(int ij=1;ij<=grid.counts.z;ij++){data(++k)=(float)u(i,j,ij);data(++k)=0;}
+    int k=0;for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int ij=0;ij<grid.counts.z;ij++){data(++k)=(float)u(i,j,ij);data(++k)=0;}
     NR_fourn(-1,dim,data);
     k=0;for(int i=0;i<=grid.counts.x-1;i++) for(int j=0;j<=grid.counts.y-1;j++) {for(int ij=0;ij<=grid.counts.z/2;ij++){u_hat(i,j,ij).re=data(++k);u_hat(i,j,ij).im=data(++k);} k+=grid.counts.z-2;}
 }
@@ -100,8 +100,8 @@ Inverse_Transform(ARRAY<COMPLEX<T> ,VECTOR<int,3> >& u_hat,ARRAY<T,VECTOR<int,3>
             for(int ij=0;ij<=grid.counts.z/2;ij++){data(++k)=(float)u_hat(i,j,ij).re;data(++k)=(float)u_hat(i,j,ij).im;}
             for(int ij=grid.counts.z/2+1;ij<=grid.counts.z-1;ij++){data(++k)=(float)u_hat(negi,negj,grid.counts.z-ij).re;data(++k)=-(float)u_hat(negi,negj,grid.counts.z-ij).im;}}}
     NR_fourn(+1,dim,data);
-    if(normalize) {T coefficient=T(1.)/(grid.counts.x*grid.counts.y*grid.counts.z);k=0;for(int i=1;i<=grid.counts.x;i++) for(int j=1;j<=grid.counts.y;j++) for(int ij=1;ij<=grid.counts.z;ij++) {u(i,j,ij)=coefficient*data(++k);++k;}}
-    else {k=0;for(int i=1;i<=grid.counts.x;i++) for(int j=1;j<=grid.counts.y;j++) for(int ij=1;ij<=grid.counts.z;ij++) {u(i,j,ij)=data(++k);++k;}}
+    if(normalize) {T coefficient=T(1.)/(grid.counts.x*grid.counts.y*grid.counts.z);k=0;for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int ij=0;ij<grid.counts.z;ij++) {u(i,j,ij)=coefficient*data(++k);++k;}}
+    else {k=0;for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int ij=0;ij<grid.counts.z;ij++) {u(i,j,ij)=data(++k);++k;}}
 }
 //#####################################################################
 #endif // ********************************************************************************************************************************************************************************************************

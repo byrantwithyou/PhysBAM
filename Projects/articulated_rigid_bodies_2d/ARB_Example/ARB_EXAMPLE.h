@@ -149,7 +149,7 @@ void Chain()
     int n=getenv("CHAIN")?atoi(getenv("CHAIN")):7;
     ARRAY<RIGID_BODY<TV>*> rigid_body(n);
     bool all_rigid=parameter_list.Get_Parameter("chain_all_rigid",false);
-    for(int i=1;i<=n;i++){
+    for(int i=0;i<n;i++){
         rigid_body(i)=&tests.Add_Rigid_Body("ground",(T).01,1,false);// read only the segmented curves, that way don't get collisions between bodies
         rigid_body(i)->X()=TV((T)(2*(i-1)+1),0);
         rigid_body(i)->Set_Frame(xform*rigid_body(i)->Frame());
@@ -196,7 +196,7 @@ void Spring()
     FRAME<TV> xform(TV(0,(T).05));
 //    FRAME<TV> xform;
     RIGID_BODY<TV>* rigid_body[11]={0};
-    for(int i=1;i<=10;i++){
+    for(int i=0;i<10;i++){
         bool horizontal=((i-1)%2==0);int vertical_part=(i-1)/2;
         rigid_body[i]=&tests.Add_Rigid_Body("ground",(T).005*(horizontal?width:slanted_length),1);
         rigid_body[i]->X()=TV(0,(vertical_part+(horizontal?0:(T).5))*vertical_separation);

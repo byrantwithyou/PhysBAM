@@ -77,7 +77,7 @@ Advance_One_Time_Step_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,co
     boundary->Fill_Ghost_Cells_Face(grid,face_velocities,face_velocities_ghost,time,number_of_ghost_cells);
 
     // update strain and apply elastic forces
-    for(int i=1;i<=strains.m;i++)if(strains(i)){
+    for(int i=0;i<strains.m;i++)if(strains(i)){
         // extrapolate the velocity across the interface to get better strain boundaries
         T_ARRAYS_SCALAR phi_ghost(grid.Domain_Indices(number_of_ghost_cells));projection.poisson_collidable->levelset_multiple->levelsets(i)->boundary->Fill_Ghost_Cells(grid,projection.poisson_collidable->levelset_multiple->phis(i),phi_ghost,dt,time,number_of_ghost_cells);
         T_FACE_ARRAYS_SCALAR face_velocities_temp=face_velocities_ghost;
@@ -149,7 +149,7 @@ Advance_One_Time_Step_Implicit_Part(T_FACE_ARRAYS_SCALAR& face_velocities,const 
     boundary->Apply_Boundary_Condition_Face(grid,face_velocities,time+dt);
 
     // set up poisson equation
-    ARRAY<T> one_over_densities(projection.densities.m);for(int i=1;i<=projection.densities.m;i++)one_over_densities(i)=1/projection.densities(i);
+    ARRAY<T> one_over_densities(projection.densities.m);for(int i=0;i<projection.densities.m;i++)one_over_densities(i)=1/projection.densities(i);
     projection.poisson->Set_Constant_beta(one_over_densities);
     if(!GFM){projection.poisson->Use_Delta_Function_Method(number_of_interface_cells);projection.poisson->Smear_One_Over_beta();}
 
@@ -231,7 +231,7 @@ CFL(T_FACE_ARRAYS_SCALAR& face_velocities,const bool inviscid,const bool viscous
     T dt_viscosity=0;
     if(!inviscid){
         T norm_2_over_sqr_DX=2*Inverse(sqr_DX).L1_Norm();
-        for(int i=1;i<=viscosities.m;i++)dt_viscosity=max(dt_viscosity,viscosities(i)/projection.densities(i));
+        for(int i=0;i<viscosities.m;i++)dt_viscosity=max(dt_viscosity,viscosities(i)/projection.densities(i));
         dt_viscosity*=norm_2_over_sqr_DX;
         if(use_variable_viscosity) PHYSBAM_NOT_IMPLEMENTED();}
     // surface tension
@@ -256,7 +256,7 @@ CFL(T_FACE_ARRAYS_SCALAR& face_velocities,const bool inviscid,const bool viscous
     if(gravity) dt_force+=abs(gravity)*(downward_direction/DX).L1_Norm();
     T strain_cfl=FLT_MAX;
     if(strain){
-        for(int i=1;i<=strains.m;i++)if(strains(i))
+        for(int i=0;i<strains.m;i++)if(strains(i))
             strain_cfl=min(strain_cfl,strains(i)->CFL(projection.densities(i)));}
     dt_force+=1/strain_cfl;
     T dt_overall=(dt_convection+dt_viscosity+sqrt(sqr(dt_convection+dt_viscosity)+4*dt_force+4*sqr(dt_surface_tension)))/2; 

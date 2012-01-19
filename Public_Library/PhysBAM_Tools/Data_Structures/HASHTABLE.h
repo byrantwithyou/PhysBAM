@@ -75,7 +75,7 @@ public:
     void Resize_Table(const int estimated_max_number_of_entries_input=0)
     {int estimated_max_number_of_entries=estimated_max_number_of_entries_input;if(!estimated_max_number_of_entries) estimated_max_number_of_entries=3*number_of_entries/2;
     ARRAY<ENTRY> old_table;old_table.Exchange(table);Initialize_New_Table(estimated_max_number_of_entries);
-    for(int h=1;h<=old_table.m;h++){ENTRY& entry=old_table(h);if(entry.state==ENTRY_ACTIVE) Insert(entry);}}
+    for(int h=0;h<old_table.m;h++){ENTRY& entry=old_table(h);if(entry.state==ENTRY_ACTIVE) Insert(entry);}}
 
 private:
     int Next_Index(const int h) const // linear probing
@@ -193,20 +193,20 @@ public:
 
     void Print_Table(std::ostream& output) const
     {output<<"Entry Count: "<<number_of_entries<<" Elements to resize at: "<<next_resize<<std::endl;
-    for(int h=1;h<=table.m;h++)
+    for(int h=0;h<table.m;h++)
          output<<h<<":"<<(table(h).state==ENTRY_ACTIVE?"ACTIVE":(table(h).state==ENTRY_DELETED?"DELETED":"FREE"))<<" key="<<table(h).key<<" value="<<table(h).data<<std::endl;}
 
     void Apply_Function_To_All_Entries(void (*function)(TK&,T_UNLESS_VOID&))
-    {for(int h=1;h<=table.m;h++) if(table(h).state==ENTRY_ACTIVE) function(table(h).key,table(h).data);}
+    {for(int h=0;h<table.m;h++) if(table(h).state==ENTRY_ACTIVE) function(table(h).key,table(h).data);}
 
     void Delete_Pointers_Stored_In_Table() // of course, only valid if pointers are stored in table
-    {for(int h=1;h<=table.m;h++) if(table(h).state==ENTRY_ACTIVE){delete table(h).data;table(h).data=0;}}
+    {for(int h=0;h<table.m;h++) if(table(h).state==ENTRY_ACTIVE){delete table(h).data;table(h).data=0;}}
 
     void Reset_List_Arrays_Stored_In_Table() // of course, only works if pointers to ARRAY are stored in table
-    {for(int h=1;h<=table.m;h++) if(table(h).state==ENTRY_ACTIVE){table(h).data->Remove_All();}}
+    {for(int h=0;h<table.m;h++) if(table(h).state==ENTRY_ACTIVE){table(h).data->Remove_All();}}
 
     void Get_Keys(ARRAY<TK>& keys) const
-    {keys.Remove_All();keys.Preallocate(Size());for(int h=1;h<=table.m;h++) if(table(h).state==ENTRY_ACTIVE) keys.Append(table(h).key);}
+    {keys.Remove_All();keys.Preallocate(Size());for(int h=0;h<table.m;h++) if(table(h).state==ENTRY_ACTIVE) keys.Append(table(h).key);}
 
     template<class T_ARRAY1,class T_ARRAY2>
     void Get_Complementary_Keys(const T_ARRAY1& keys_universe,T_ARRAY2& keys_complementary) const
@@ -215,7 +215,7 @@ public:
     for(typename T_ARRAY1::INDEX i(1);i<=keys_universe.Size();i++) if(!Contains(keys_universe(i))) keys_complementary.Append(keys_universe(i));}
 
     void Get_Data(ARRAY<T_UNLESS_VOID>& data) const
-    {data.Remove_All();data.Preallocate(Size());for(int h=1;h<=table.m;h++) if(table(h).state==ENTRY_ACTIVE) data.Append(table(h).data);}
+    {data.Remove_All();data.Preallocate(Size());for(int h=0;h<table.m;h++) if(table(h).state==ENTRY_ACTIVE) data.Append(table(h).data);}
 
     ENTRY* begin()
     {return table.Get_Array_Pointer();}

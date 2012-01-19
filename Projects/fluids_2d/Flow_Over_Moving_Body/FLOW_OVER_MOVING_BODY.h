@@ -83,7 +83,7 @@ void Update_Rigid_Bodies(const T time)
     motion_curve.Add_Control_Point(1,VECTOR_2D<T>(-1.5,2));
     motion_curve.Add_Control_Point(2,VECTOR_2D<T>(-1.5,4.5));
     motion_curve.Add_Control_Point(3,VECTOR_2D<T>(1.5,2));
-    for(int i=1;i<=solids_parameters.rigid_body_parameters.list.rigid_bodies.m;i++){
+    for(int i=0;i<solids_parameters.rigid_body_parameters.list.rigid_bodies.m;i++){
         solids_parameters.rigid_body_parameters.list.rigid_bodies(i)->position=motion_curve.Value(time);
         solids_parameters.rigid_body_parameters.list.rigid_bodies(i)->velocity=motion_curve.Derivative(time);
     }
@@ -96,7 +96,7 @@ void Initialize_Phi()
     GRID<TV>& grid=fluids_parameters.grid;
     // Not so good to set up a heaviside function here because then the interface will
     // be exactly between the two nodes which can lead to roundoff issues when setting dirichlet cells, etc.
-    for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++)
+    for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++)
         fluids_parameters.particle_levelset_evolution.phi(i,j)=grid.y(j)-grid.ymin-initial_water_level;
 }
 //#####################################################################
@@ -127,7 +127,7 @@ void Adjust_Phi_With_Sources(const T time)
 {
     GRID<TV>& grid=fluids_parameters.grid;
     if(!use_source) return;
-    for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++){
+    for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++){
         VECTOR_2D<T> source_X=world_to_source*grid.X(i,j);
         if(source.Lazy_Inside(source_X)) fluids_parameters.particle_levelset_evolution.phi(i,j)=min(fluids_parameters.particle_levelset_evolution.phi(i,j),source.Signed_Distance(source_X));}
 }
@@ -139,7 +139,7 @@ void Adjust_Phi_With_Objects(const T time)
     GRID<TV>& grid=fluids_parameters.grid;INCOMPRESSIBLE_2D<T>& incompressible=fluids_parameters.incompressible;
     if(solids_parameters.rigid_body_parameters.list.rigid_bodies.m<1) return;
     T one_over_two_dx=1/(2*grid.dx),one_over_two_dy=1/(2*grid.dy);
-    for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++) if(fluids_parameters.particle_levelset_evolution.phi(i,j) < 0 && phi_object(i,j) < 0){
+    for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++) if(fluids_parameters.particle_levelset_evolution.phi(i,j) < 0 && phi_object(i,j) < 0){
         VECTOR_2D<T> V_fluid=incompressible.V(i,j);
         VECTOR_2D<T> V_object=solids_parameters.rigid_body_parameters.list.rigid_bodies(1)->Pointwise_Object_Velocity(grid.X(i,j)); // velocity object should be spatially varying
         VECTOR_2D<T> V_relative=V_fluid-V_object;
@@ -168,7 +168,7 @@ void Get_Source_Reseed_Mask(ARRAY<bool,VECTOR<int,2> >*& cell_centered_mask,cons
     if(cell_centered_mask) delete cell_centered_mask;cell_centered_mask=new ARRAY<bool,VECTOR<int,2> >(grid);
 
     T padding=3*grid.max_dx_dy;
-    for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++) if(!source.Outside(world_to_source*grid.X(i,j),padding)) (*cell_centered_mask)(i,j)=true;
+    for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++) if(!source.Outside(world_to_source*grid.X(i,j),padding)) (*cell_centered_mask)(i,j)=true;
 }
 //#####################################################################
 // Function Adjust_Particle_For_Objects
@@ -200,8 +200,8 @@ void Get_Source_Velocities(const T time)
     GRID<TV> &u_grid=fluids_parameters.u_grid,&v_grid=fluids_parameters.v_grid;
     PROJECTION_2D<T>& projection=fluids_parameters.incompressible.projection;
     if(!use_source) return;
-    for(int i=1;i<=u_grid.m;i++) for(int j=1;j<=u_grid.n;j++) if(source.Lazy_Inside(world_to_source*u_grid.X(i,j))){projection.elliptic_solver->psi_N_u(i,j)=true;projection.u(i,j)=source_velocity.x;}
-    for(int i=1;i<=v_grid.m;i++) for(int j=1;j<=v_grid.n;j++) if(source.Lazy_Inside(world_to_source*v_grid.X(i,j))){projection.elliptic_solver->psi_N_v(i,j)=true;projection.v(i,j)=source_velocity.y;}
+    for(int i=0;i<u_grid.m;i++) for(int j=0;j<u_grid.n;j++) if(source.Lazy_Inside(world_to_source*u_grid.X(i,j))){projection.elliptic_solver->psi_N_u(i,j)=true;projection.u(i,j)=source_velocity.x;}
+    for(int i=0;i<v_grid.m;i++) for(int j=0;j<v_grid.n;j++) if(source.Lazy_Inside(world_to_source*v_grid.X(i,j))){projection.elliptic_solver->psi_N_v(i,j)=true;projection.v(i,j)=source_velocity.y;}
 }
 //#####################################################################
 // Function Get_Object_Velocities

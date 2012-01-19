@@ -74,7 +74,7 @@ template<class T> T HEXAHEDRALIZED_VOLUME<T>::
 Total_Volume() const
 {
     T volume=0;
-    for(int h=1;h<=mesh.elements.m;h++){int p1,p2,p3,p4,p5,p6,p7,p8;mesh.elements(h).Get(p1,p2,p3,p4,p5,p6,p7,p8);
+    for(int h=0;h<mesh.elements.m;h++){int p1,p2,p3,p4,p5,p6,p7,p8;mesh.elements(h).Get(p1,p2,p3,p4,p5,p6,p7,p8);
         volume+=HEXAHEDRON<T>::Signed_Volume(particles.X(p1),particles.X(p2),particles.X(p3),particles.X(p4),particles.X(p5),particles.X(p6),particles.X(p7),particles.X(p8));}
     return volume;
 }

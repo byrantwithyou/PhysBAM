@@ -60,7 +60,7 @@ public:
     {stencil.Remove_All();
     for(BOX_ITERATOR<d> iterator(RANGE<T_INDEX>(-T_INDEX::All_Ones_Vector(),2*T_INDEX::All_Ones_Vector()));iterator.Valid();iterator.Next()){
         const T_INDEX dindex=iterator.Index();
-        T fscale=1;for(int v=1;v<=d;v++) switch(dindex(v)){case -1:case 2:fscale*=.25;break;;case 0:case 1:fscale*=.75;}
+        T fscale=1;for(int v=0;v<d;v++) switch(dindex(v)){case -1:case 2:fscale*=.25;break;;case 0:case 1:fscale*=.75;}
         Insert(stencil,scale*fscale,index+dindex,valid,exists);}}
 
 //#####################################################################

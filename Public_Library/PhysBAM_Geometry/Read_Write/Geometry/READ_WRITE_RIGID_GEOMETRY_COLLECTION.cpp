@@ -60,9 +60,9 @@ Read(const STREAM_TYPE stream_type,const std::string& directory,const int frame,
             object.rigid_body_names.Clean_Memory();}}
 
     ARRAY<bool> exists(last_id);exists.Subset(active_ids).Fill(true);
-    for(int i=1;i<=exists.m;i++) if(!exists(i) && object.Is_Active(i)) object.Deactivate_Geometry(i);
+    for(int i=0;i<exists.m;i++) if(!exists(i) && object.Is_Active(i)) object.Deactivate_Geometry(i);
     if(active_ids.m>0){
-        for(int i=1;i<=active_ids.m;i++){int p=active_ids(i);
+        for(int i=0;i<active_ids.m;i++){int p=active_ids(i);
             // initialize new rigid body with given id, and initialize geometry
             if(!object.particles.rigid_geometry(p)){
                 if(needs_init) needs_init->Append(p);

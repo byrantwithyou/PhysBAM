@@ -58,7 +58,7 @@ public:
 //#####################################################################
 void Initialize_Phi()
 {
-    for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++) for(int ij=1;ij<=grid.mn;ij++) phi(i,j,ij)=grid.dx;
+    for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++) for(int ij=0;ij<grid.mn;ij++) phi(i,j,ij)=grid.dx;
 }
 //#####################################################################
 // Function Specify_Variable_Viscosity_Values
@@ -77,7 +77,7 @@ void Adjust_Phi_With_Sources(const T time)
     RENDERING_CYLINDER<T> cylinder; 
     cylinder.cylinder.radius=cylinder_radius;cylinder.cylinder.Set_Height(cylinder_height);
     cylinder.Update_Transform(MATRIX<T,4>::Translation_Matrix(VECTOR<T,3>((grid.xmin+grid.xmax)/2,grid.ymax,(grid.zmin+grid.zmax)/2)));
-    for(int i=1;i<=m;i++) for(int j=1;j<=n;j++) for(int ij=1;ij<=mn;ij++) if(cylinder.Lazy_Inside(VECTOR<T,3>(grid.x(i),grid.y(j),grid.z(ij)))) phi(i,j,ij)=-grid.dx;
+    for(int i=0;i<m;i++) for(int j=0;j<n;j++) for(int ij=0;ij<mn;ij++) if(cylinder.Lazy_Inside(VECTOR<T,3>(grid.x(i),grid.y(j),grid.z(ij)))) phi(i,j,ij)=-grid.dx;
 }
 //#####################################################################
 // Function Get_Source_Velocities
@@ -87,7 +87,7 @@ void Get_Source_Velocities(const T time)
     RENDERING_CYLINDER<T> cylinder; 
     cylinder.cylinder.radius=cylinder_radius;cylinder.cylinder.Set_Height(cylinder_height);
     cylinder.Update_Transform(MATRIX<T,4>::Translation_Matrix(VECTOR<T,3>((grid.xmin+grid.xmax)/2,grid.ymax,(grid.zmin+grid.zmax)/2)));
-    for(int i=1;i<=m;i++) for(int j=1;j<=n;j++) for(int ij=1;ij<=mn;ij++) if(cylinder.Lazy_Inside(VECTOR<T,3>(grid.x(i),grid.y(j),grid.z(ij)))){
+    for(int i=0;i<m;i++) for(int j=0;j<n;j++) for(int ij=0;ij<mn;ij++) if(cylinder.Lazy_Inside(VECTOR<T,3>(grid.x(i),grid.y(j),grid.z(ij)))){
         psi_N(i,j,ij)=true;V_source(i,j,ij)=VECTOR<T,3>(0,-4,0);}
 }
 //#####################################################################
@@ -101,7 +101,7 @@ void Get_Source_Reseed_Mask(ARRAY<bool,VECTOR<int,3> >*& cell_centered_mask,cons
     RENDERING_CYLINDER<T> cylinder_mask;cylinder_mask.cylinder.radius=(T)(cylinder_radius+padding);
     cylinder_mask.cylinder.Set_Height((T)(cylinder_height+2*padding));
     cylinder_mask.Update_Transform(MATRIX<T,4>::Translation_Matrix(VECTOR<T,3>((grid.xmin+grid.xmax)/2,grid.ymax+padding,(grid.zmin+grid.zmax)/2)));
-    for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++) for(int ij=1;ij<=grid.mn;ij++) if(cylinder_mask.Lazy_Inside(VECTOR<T,3>(grid.x(i),grid.y(j),grid.z(ij)))) 
+    for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++) for(int ij=0;ij<grid.mn;ij++) if(cylinder_mask.Lazy_Inside(VECTOR<T,3>(grid.x(i),grid.y(j),grid.z(ij)))) 
         (*cell_centered_mask)(i,j,ij)=true;
 }
 //#####################################################################
@@ -121,7 +121,7 @@ void Construct_Levelsets_For_Objects(const T time)
 void Adjust_Phi_With_Objects(const T time)
 {
     T one_over_two_dx=1/(2*grid.dx),one_over_two_dy=1/(2*grid.dy),one_over_two_dz=1/(2*grid.dz);
-    for(int i=1;i<=m;i++) for(int j=1;j<=n;j++) for(int k=1;k<=mn;k++) if(phi(i,j,k) < 0 && phi_object(i,j,k) > 0){
+    for(int i=0;i<m;i++) for(int j=0;j<n;j++) for(int k=0;k<mn;k++) if(phi(i,j,k) < 0 && phi_object(i,j,k) > 0){
         VECTOR<T,3> V_fluid=VECTOR<T,3>((T).5*(u(i,j,k)+u(i+1,j,k)),(T).5*(v(i,j,k)+v(i,j+1,k)),(T).5*(w(i,j,k)+w(i,j,k+1)));
         //VECTOR<T,3> V_object=rigid_bodies(1)->Pointwise_Object_Velocity(grid.X(i,j,k)); // velocity object should be spatially varying
         VECTOR<T,3> V_relative=V_fluid;// should be V_fluid-V_object, but ibject is sitting still

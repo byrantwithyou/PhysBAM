@@ -53,7 +53,7 @@ public:
     {index_for_last_old_intersection=Number_Of_Intersections();}
 
     void Print() const
-    {for(int i=1;i<=simplices_on_intersection.m;i++) LOG::cout << "Intersection " << i << " has simplices " << simplices_on_intersection(i) << std::endl;}
+    {for(int i=0;i<simplices_on_intersection.m;i++) LOG::cout << "Intersection " << i << " has simplices " << simplices_on_intersection(i) << std::endl;}
 
     template<class RW>
     void Read(std::istream& input_stream)

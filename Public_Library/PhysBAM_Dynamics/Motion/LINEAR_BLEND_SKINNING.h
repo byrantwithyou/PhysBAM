@@ -35,7 +35,7 @@ public:
     int Find_Closest_Bone_And_Distance_Squared(T distance_squared,TV location,int frame)
     {
         int bone=0;
-        for(int i=1;i<=body_motion.trajectories.m;i++){
+        for(int i=0;i<body_motion.trajectories.m;i++){
             TV bone_length=TV(body_motion.trajectories(i)(frame).length,0,0);
             TV bone_vector=body_motion.trajectories(i)(frame).targeted_transform*bone_length;
             TV distance_vector=location-body_motion.trajectories(i)(frame).targeted_transform*TV(0,0,0);
@@ -96,7 +96,7 @@ public:
     {
         weights.Remove_All();weights.Resize(body_motion.trajectories.m);
         closest_points.Remove_All();closest_points.Resize(body_motion.trajectories.m);
-        for(int i=1;i<=body_motion.trajectories.m;i++){closest_points(i).Resize(number_particles);weights(i).Resize(number_particles);}
+        for(int i=0;i<body_motion.trajectories.m;i++){closest_points(i).Resize(number_particles);weights(i).Resize(number_particles);}
         surface.mesh.Initialize_Neighbor_Nodes();surface.mesh.Initialize_Adjacent_Elements();surface.mesh.Initialize_Neighbor_Elements();
         row_lengths.Remove_All();row_lengths.Resize(number_particles,false,false);
         for(int i=0;i<number_particles;i++) row_lengths(i)=(*surface.mesh.neighbor_nodes)(start_particles+i-1).m+1;
@@ -104,7 +104,7 @@ public:
         for(int i=0;i<number_particles;i++) row_lengths(i)=1;
         h.Set_Row_Lengths(row_lengths);
  
-        touched_elements.Resize(surface.mesh.elements.m,false,false);for(int i=1;i<=surface.mesh.elements.m;i++) touched_elements(i)=false;
+        touched_elements.Resize(surface.mesh.elements.m,false,false);for(int i=0;i<surface.mesh.elements.m;i++) touched_elements(i)=false;
         touched_particles.Resize(number_particles,false,false);for(int i=0;i<number_particles;i++) touched_particles(i)=false;
         areas.Resize(number_particles,false,false);for(int i=0;i<number_particles;i++) areas(i)=(T)0;
 
@@ -113,14 +113,14 @@ public:
             for(int j=1;j<=(*surface.mesh.neighbor_nodes)(i).m;j++){surface_laplacian.Set_Symmetric_Elements(i,(*surface.mesh.neighbor_nodes)(i)(j),0);}}
 
         assert(surface.mesh.elements.m>1);
-        for(int i=1;i<=surface.mesh.elements.m;i++) Calculate_Weights_Helper(i,frame+1,sanity_check);
+        for(int i=0;i<surface.mesh.elements.m;i++) Calculate_Weights_Helper(i,frame+1,sanity_check);
 
         if(sanity_check){
-            for(int i=1;i<=surface.mesh.elements.m;i++) if(!touched_elements(i)) PHYSBAM_FATAL_ERROR("Missed an element");
+            for(int i=0;i<surface.mesh.elements.m;i++) if(!touched_elements(i)) PHYSBAM_FATAL_ERROR("Missed an element");
             for(int i=0;i<number_particles;i++) if(!touched_particles(i)) {LOG::cout<<"Particle "<<i<<std::endl;
                 ARRAY<int> one_ring;
                 LOG::cout<<"Elements are: (";
-                for(int j=1;j<=surface.mesh.elements.m;j++) {
+                for(int j=0;j<surface.mesh.elements.m;j++) {
                     int a,b,c;surface.mesh.elements(j).Get(a,b,c);
                     if(a==i||b==i||c==i){
                         LOG::cout<<","<<j;
@@ -134,7 +134,7 @@ public:
                 ARRAY<int> one_ring;
                 LOG::cout<<"Mismatch: set elements for row "<<i<<" was set "<<row_lengths(i)<<" times but should have "<<(*surface.mesh.neighbor_nodes)(start_particles+i-1).m+1<<" times."<<std::endl;
                 LOG::cout<<"Elements are: (";
-                for(int j=1;j<=surface.mesh.elements.m;j++) {
+                for(int j=0;j<surface.mesh.elements.m;j++) {
                     int a,b,c;surface.mesh.elements(j).Get(a,b,c);
                     if(a==i||b==i||c==i){
                         LOG::cout<<","<<j;
@@ -148,7 +148,7 @@ public:
         
         for(int i=0;i<number_particles;i++) surface_laplacian.Set_Element(i,i,surface_laplacian(i,i)*(T)6./areas(i));
 
-        for(int i=1;i<=body_motion.trajectories.m;i++){
+        for(int i=0;i<body_motion.trajectories.m;i++){
             VECTOR_ND<T> b(number_particles);
             surface_laplacian.Negate();
             for(int j=0;j<number_particles;j++) surface_laplacian.Add_Element(j,j,h(j,j));
@@ -162,7 +162,7 @@ public:
         T alpha=time*motion_frame_rate-frame+1;
         for(int i=start_particles;i<=number_particles;i++){
             X(i)=TV();
-            for(int j=1;j<=body_motion.trajectories.m;j++){
+            for(int j=0;j<body_motion.trajectories.m;j++){
                 FRAME<TV> transform=FRAME<TV>::Interpolation(body_motion.trajectories(j)(frame).targeted_transform,body_motion.trajectories(j)(frame+1).targeted_transform,alpha);
                 X(i)+=transform.t*weights(j)(i);}}
     }

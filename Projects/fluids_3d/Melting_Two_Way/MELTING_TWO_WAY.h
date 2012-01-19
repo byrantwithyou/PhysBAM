@@ -195,7 +195,7 @@ public:
         initial_angular_velocity.Resize(number_of_objects);
 
         RANDOM_NUMBERS random;random.Set_Seed(1234);// set the seed so that the example is reproducible
-        for(int i=1;i<=number_of_objects;i++){
+        for(int i=0;i<number_of_objects;i++){
             initial_position(i)=positions[i-1]+VECTOR<T,3>(object_horizontal_offset,object_height_offset,object_horizontal_offset);
             do{initial_orientation(i).s=random.Get_Uniform_Number(0,1);initial_orientation(i).v=random.Get_Uniform_Vector(VECTOR<T,3>(-1,-1,-1),VECTOR<T,3>(1,1,1));}while(initial_orientation(i).Magnitude()>1);
             initial_orientation(i).Normalize();
@@ -222,7 +222,7 @@ void Initialize_Phi(const int object,ARRAY<T>& phi)
 {
     RED_GREEN_GRID_3D<T>& grid=melting_parameters.levelsets(object)->grid;
     ARRAY<VECTOR<T,3> >& node_locations=grid.Node_Locations();
-    for(int p=1;p<=phi.m;p++){
+    for(int p=0;p<phi.m;p++){
         phi(p)=icecube_levelset->Extended_Phi(((T)1/scaling)*(node_locations(p)-levelset_center)+levelset_center);}
 }
 //#####################################################################
@@ -230,14 +230,14 @@ void Initialize_Phi(const int object,ARRAY<T>& phi)
 //#####################################################################
 void Initialize_Levelset_Velocity(const int object,ARRAY<VECTOR<T,3> >& V)
 {
-    for(int p=1;p<=V.m;p++) V(p)=VECTOR<T,3>(0,0,0);    
+    for(int p=0;p<V.m;p++) V(p)=VECTOR<T,3>(0,0,0);    
 }
 //#####################################################################
 // Function Initialize_Levelset_Velocity
 //#####################################################################
 void Melting_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
 {
-    for(int object=1;object<=melting_parameters.levelsets.m;object++){
+    for(int object=0;object<melting_parameters.levelsets.m;object++){
         LEVELSET_TETRAHEDRALIZED_VOLUME<T>& levelset=*melting_parameters.levelsets(object);
         RED_GREEN_GRID_3D<T>& grid=levelset.grid;
         int index=melting_parameters.body_index(object);
@@ -248,7 +248,7 @@ void Melting_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
         ARRAY<VECTOR<T,3> >& node_locations=grid.Node_Locations();
         
         LINEAR_INTERPOLATION<T,T> interpolation;
-        for(int i=1;i<=node_locations.m;i++){
+        for(int i=0;i<node_locations.m;i++){
             T phi=interpolation.Clamped_To_Array(fluids_parameters.grid,fluids_parameters.particle_levelset_evolution.phi,frame*node_locations(i));
 
             T V=melting_speed*LEVELSET<T,VECTOR<T,3> >::Heaviside(-phi,2*fluids_parameters.grid.min_dx_dy_dz);
@@ -327,7 +327,7 @@ void Initialize_Forces()
 
     printf("\n---------- number of objects in collision lists %d %d\n\n",collision_body_affected_by_fluid.m,fluids_parameters.collision_bodies_affecting_fluid.collision_bodies.m);
 
-    for(int object=1;object<=melting_parameters.body_index.m;object++){
+    for(int object=0;object<melting_parameters.body_index.m;object++){
         int index=melting_parameters.body_index(object);if(!index)continue;
         RIGID_BODY<TV>& rigid_body=*solids_parameters.rigid_body_parameters.list(index);
         std::cout<<rigid_body.position<<std::endl;
@@ -345,7 +345,7 @@ void Initialize_Forces()
 void Initialize_Deformable_And_Rigid_Bodies()
 {
     printf("XXX Initialize_Deformable_And_Rigid_Bodies()\n");
-    for(int i=1;i<=number_of_objects;i++){
+    for(int i=0;i<number_of_objects;i++){
         Add_Melting_Object(melting_parameters.RIGID,0);}
 
     int id;
@@ -394,7 +394,7 @@ void Construct_Levelsets_For_Objects(const T time)
     GRID<TV>& grid=fluids_parameters.grid;
     phi_objects.Resize(grid,3);ARRAY<T,VECTOR<int,3> >::copy(5*grid.max_dx_dy_dz,phi_objects);
     id_objects.Resize(grid,3);ARRAY<int,VECTOR<int,3> >::copy(0,id_objects);
-    for(int object=1;object<=bodies_in_fluid.m;object++){
+    for(int object=0;object<bodies_in_fluid.m;object++){
         RIGID_BODY<TV>& rigid_body=*bodies_in_fluid(object);
         for(int i=-2;i<=grid.m+3;i++)for(int j=-2;j<=grid.n+3;j++)for(int ij=-2;ij<=grid.mn+3;ij++){
             T phi_object=rigid_body.Implicit_Surface_Extended_Value(grid.X(i,j,ij));
@@ -425,7 +425,7 @@ void Construct_Velocities_For_Objects(const bool use_effective_velocity,const bo
     ARRAY<RIGID_BODY_STATE_3D<T> > state_for_object_velocity(bodies_in_fluid.m);
     if(subtract_last_pressure_force){
         if(use_next_dt_for_velocity_adjustment) std::cout << "Using next dt " << fluids_parameters.next_dt << " to subtract last pressure force" << std::endl;
-        for(int i=1;i<=bodies_in_fluid.m;i++){
+        for(int i=0;i<bodies_in_fluid.m;i++){
             assert(&rigid_body_fluid_forces(i)->rigid_body==bodies_in_fluid(i));
             state_for_object_velocity(i)=*bodies_in_fluid(i)->saved_states(COLLISION_BODY_3D<T>::THIN_SHELLS_NEW_STATE);
             std::cout << i << ":  VELOCITY BEFORE " << state_for_object_velocity(i).velocity << std::endl;
@@ -451,7 +451,7 @@ void Initialize_Phi()
     // Not so good to set up a heaviside function here because then the interface will
     // be exactly between the two nodes which can lead to roundoff issues when setting dirichlet cells, etc.
     GRID<TV>& grid=fluids_parameters.grid;
-    for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++) for(int ij=1;ij<=grid.mn;ij++){
+    for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++) for(int ij=0;ij<grid.mn;ij++){
         fluids_parameters.particle_levelset_evolution.phi(i,j,ij)=grid.y(j)-grid.ymin-initial_water_level;
         if(phi_objects(i,j,ij)<0) fluids_parameters.particle_levelset_evolution.phi(i,j,ij)=-phi_objects(i,j,ij);
     }
@@ -484,59 +484,59 @@ void Average_Node_Velocities_To_Faces()
         static int index_lookup[5][2]={{0,0},{0,0},{1,0},{0,1},{1,1}};
         static T one_over_count_lookup[5]={0,1,(T).5,(T)one_third,(T).25};
 
-        for(int i=1;i<=projection.u_grid.m;i++) for(int j=1;j<=projection.u_grid.n;j++) for(int ij=1;ij<=projection.u_grid.mn;ij++) if(!psi_N_u_face(i,j,ij)){
+        for(int i=0;i<projection.u_grid.m;i++) for(int j=0;j<projection.u_grid.n;j++) for(int ij=0;ij<projection.u_grid.mn;ij++) if(!psi_N_u_face(i,j,ij)){
             int count=0;T velocity=0;bool mixed_face=Mixed_X_Face(i,j,ij);
             if(only_use_object_velocity_in_mixed_face && mixed_face){
-                for(int c=1;c<=4;c++){VECTOR<int,3> index(i,j+index_lookup[c][0],ij+index_lookup[c][1]);
+                for(int c=0;c<4;c++){VECTOR<int,3> index(i,j+index_lookup[c][0],ij+index_lookup[c][1]);
                     if(phi_objects(index)<0){velocity+=V(index).x;count++;}}
                 assert(count);u(i,j,ij)=velocity*one_over_count_lookup[count];}
             else if(average_velocities_in_mixed_face && mixed_face){
-                for(int c=1;c<=4;c++){VECTOR<int,3> index(i,j+index_lookup[c][0],ij+index_lookup[c][1]);velocity+=V(index).x;}
+                for(int c=0;c<4;c++){VECTOR<int,3> index(i,j+index_lookup[c][0],ij+index_lookup[c][1]);velocity+=V(index).x;}
                 u(i,j,ij)=(T).25*velocity;}
             else if(!fluids_parameters.incompressible.psi_D_old(i-1,j,ij)||!fluids_parameters.incompressible.psi_D_old(i,j,ij)){
-                for(int c=1;c<=4;c++){VECTOR<int,3> index(i,j+index_lookup[c][0],ij+index_lookup[c][1]);
+                for(int c=0;c<4;c++){VECTOR<int,3> index(i,j+index_lookup[c][0],ij+index_lookup[c][1]);
                     if(phi_objects(index)>=0){velocity+=V(index).x-V_ghost(index).x;count++;}}
                 assert(count);u(i,j,ij)+=velocity*one_over_count_lookup[count];}
             else{
-                for(int c=1;c<=4;c++){VECTOR<int,3> index(i,j+index_lookup[c][0],ij+index_lookup[c][1]);
+                for(int c=0;c<4;c++){VECTOR<int,3> index(i,j+index_lookup[c][0],ij+index_lookup[c][1]);
                     if(phi_objects(index)>=0){velocity+=V(index).x;count++;}}
                 assert(count);u(i,j,ij)=velocity*one_over_count_lookup[count];}
         }
             
-        for(int i=1;i<=projection.v_grid.m;i++) for(int j=1;j<=projection.v_grid.n;j++) for(int ij=1;ij<=projection.v_grid.mn;ij++) if(!psi_N_v_face(i,j,ij)){
+        for(int i=0;i<projection.v_grid.m;i++) for(int j=0;j<projection.v_grid.n;j++) for(int ij=0;ij<projection.v_grid.mn;ij++) if(!psi_N_v_face(i,j,ij)){
             int count=0;T velocity=0;bool mixed_face=Mixed_Y_Face(i,j,ij);
             if(only_use_object_velocity_in_mixed_face && mixed_face){
-                for(int c=1;c<=4;c++){VECTOR<int,3> index(i+index_lookup[c][0],j,ij+index_lookup[c][1]);
+                for(int c=0;c<4;c++){VECTOR<int,3> index(i+index_lookup[c][0],j,ij+index_lookup[c][1]);
                     if(phi_objects(index)<0){velocity+=V(index).y;count++;}}
                 assert(count);v(i,j,ij)=velocity*one_over_count_lookup[count];}
             else if(average_velocities_in_mixed_face && mixed_face){
-                for(int c=1;c<=4;c++){VECTOR<int,3> index(i+index_lookup[c][0],j,ij+index_lookup[c][1]);velocity+=V(index).y;}
+                for(int c=0;c<4;c++){VECTOR<int,3> index(i+index_lookup[c][0],j,ij+index_lookup[c][1]);velocity+=V(index).y;}
                 v(i,j,ij)=(T).25*velocity;}
             else if(!fluids_parameters.incompressible.psi_D_old(i,j-1,ij)||!fluids_parameters.incompressible.psi_D_old(i,j,ij)){
-                for(int c=1;c<=4;c++){VECTOR<int,3> index(i+index_lookup[c][0],j,ij+index_lookup[c][1]);
+                for(int c=0;c<4;c++){VECTOR<int,3> index(i+index_lookup[c][0],j,ij+index_lookup[c][1]);
                     if(phi_objects(index)>=0){velocity+=V(index).y-V_ghost(index).y;count++;}}
                 assert(count);v(i,j,ij)+=velocity*one_over_count_lookup[count];}
             else{
-                for(int c=1;c<=4;c++){VECTOR<int,3> index(i+index_lookup[c][0],j,ij+index_lookup[c][1]);
+                for(int c=0;c<4;c++){VECTOR<int,3> index(i+index_lookup[c][0],j,ij+index_lookup[c][1]);
                     if(phi_objects(index)>=0){velocity+=V(index).y;count++;}}
                 assert(count);v(i,j,ij)=velocity*one_over_count_lookup[count];}
         }
 
-        for(int i=1;i<=projection.w_grid.m;i++) for(int j=1;j<=projection.w_grid.n;j++) for(int ij=1;ij<=projection.w_grid.mn;ij++) if(!psi_N_w_face(i,j,ij)){
+        for(int i=0;i<projection.w_grid.m;i++) for(int j=0;j<projection.w_grid.n;j++) for(int ij=0;ij<projection.w_grid.mn;ij++) if(!psi_N_w_face(i,j,ij)){
             int count=0;T velocity=0;bool mixed_face=Mixed_Z_Face(i,j,ij);
             if(only_use_object_velocity_in_mixed_face && mixed_face){
-                for(int c=1;c<=4;c++){VECTOR<int,3> index(i,j+index_lookup[c][0],ij+index_lookup[c][1]);
+                for(int c=0;c<4;c++){VECTOR<int,3> index(i,j+index_lookup[c][0],ij+index_lookup[c][1]);
                     if(phi_objects(index)<0){velocity+=V(index).z;count++;}}
                 assert(count);w(i,j,ij)=velocity*one_over_count_lookup[count];}
             else if(average_velocities_in_mixed_face && mixed_face){
-                for(int c=1;c<=4;c++){VECTOR<int,3> index(i,j+index_lookup[c][0],ij+index_lookup[c][1]);velocity+=V(index).z;}
+                for(int c=0;c<4;c++){VECTOR<int,3> index(i,j+index_lookup[c][0],ij+index_lookup[c][1]);velocity+=V(index).z;}
                 w(i,j,ij)=(T).25*velocity;}
             else if(!fluids_parameters.incompressible.psi_D_old(i,j,ij-1)||!fluids_parameters.incompressible.psi_D_old(i,j,ij)){
-                for(int c=1;c<=4;c++){VECTOR<int,3> index(i+index_lookup[c][0],j+index_lookup[c][1],ij);
+                for(int c=0;c<4;c++){VECTOR<int,3> index(i+index_lookup[c][0],j+index_lookup[c][1],ij);
                     if(phi_objects(index)>=0){velocity+=V(index).z-V_ghost(index).z;count++;}}
                 assert(count);w(i,j,ij)+=velocity*one_over_count_lookup[count];}
             else{
-                for(int c=1;c<=4;c++){VECTOR<int,3> index(i+index_lookup[c][0],j+index_lookup[c][1],ij);
+                for(int c=0;c<4;c++){VECTOR<int,3> index(i+index_lookup[c][0],j+index_lookup[c][1],ij);
                     if(phi_objects(index)>=0){velocity+=V(index).z;count++;}}
                 assert(count);w(i,j,ij)=velocity*one_over_count_lookup[count];}
         }
@@ -564,34 +564,34 @@ void Get_Object_Velocities(const T dt,const T time) PHYSBAM_OVERRIDE
 
         ARRAY<VECTOR<T,3> ,VECTOR<int,3> >& V=fluids_parameters.incompressible.V;
         if(use_extrapolated_velocity_for_laplace) fluids_parameters.Extrapolate_Velocity_Into_Object(phi_objects,V_objects,velocity_extrapolation_band_width,false,time);
-        else for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++) for(int ij=1;ij<=grid.mn;ij++) if(phi_objects(i,j,ij)<0) V(i,j,ij)=V_objects(i,j,ij);
+        else for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++) for(int ij=0;ij<grid.mn;ij++) if(phi_objects(i,j,ij)<0) V(i,j,ij)=V_objects(i,j,ij);
 
         static int index_lookup[5][2]={{0,0},{0,0},{1,0},{0,1},{1,1}};
         static T one_over_count_lookup[5]={0,1,(T).5,(T)one_third,(T).25};
 
         // Get psi_N velocities by selectively averaging only from object when at least one node is inside object
-        for(int i=1;i<=u_grid.m;i++) for(int j=1;j<=u_grid.n;j++) for(int ij=1;ij<=u_grid.mn;ij++) 
+        for(int i=0;i<u_grid.m;i++) for(int j=0;j<u_grid.n;j++) for(int ij=0;ij<u_grid.mn;ij++) 
             if((!mixed_face_is_solid && phi_objects(i,j,ij)+phi_objects(i,j+1,ij)+phi_objects(i,j,ij+1)+phi_objects(i,j+1,ij+1)<0) || (mixed_face_is_solid && Mixed_X_Face(i,j,ij))){
                 int count=0;T velocity=0;
-                for(int c=1;c<=4;c++){
+                for(int c=0;c<4;c++){
                     VECTOR<int,3> index(i,j+index_lookup[c][0],ij+index_lookup[c][1]);
                     if(phi_objects(index)<0){velocity+=V_objects(index).x;count++;}}
                 velocity*=one_over_count_lookup[count];
                 elliptic_solver.psi_N_u(i,j,ij)=true;fluids_parameters.incompressible.projection.u(i,j,ij)=velocity;}
 
-        for(int i=1;i<=v_grid.m;i++) for(int j=1;j<=v_grid.n;j++) for(int ij=1;ij<=v_grid.mn;ij++) 
+        for(int i=0;i<v_grid.m;i++) for(int j=0;j<v_grid.n;j++) for(int ij=0;ij<v_grid.mn;ij++) 
             if((!mixed_face_is_solid && phi_objects(i,j,ij)+phi_objects(i+1,j,ij)+phi_objects(i,j,ij+1)+phi_objects(i+1,j,ij+1)<0) || (mixed_face_is_solid && Mixed_Y_Face(i,j,ij))){
                 int count=0;T velocity=0;
-                for(int c=1;c<=4;c++){
+                for(int c=0;c<4;c++){
                     VECTOR<int,3> index(i+index_lookup[c][0],j,ij+index_lookup[c][1]);
                     if(phi_objects(index)<0){velocity+=V_objects(index).y;count++;}}
                 velocity*=one_over_count_lookup[count];
                 elliptic_solver.psi_N_v(i,j,ij)=true;fluids_parameters.incompressible.projection.v(i,j,ij)=velocity;}
 
-        for(int i=1;i<=w_grid.m;i++) for(int j=1;j<=w_grid.n;j++) for(int ij=1;ij<=w_grid.mn;ij++) 
+        for(int i=0;i<w_grid.m;i++) for(int j=0;j<w_grid.n;j++) for(int ij=0;ij<w_grid.mn;ij++) 
             if((!mixed_face_is_solid && phi_objects(i,j,ij)+phi_objects(i,j+1,ij)+phi_objects(i+1,j,ij)+phi_objects(i+1,j+1,ij)<0) || (mixed_face_is_solid && Mixed_Z_Face(i,j,ij))){
                 int count=0;T velocity=0;
-                for(int c=1;c<=4;c++){
+                for(int c=0;c<4;c++){
                     VECTOR<int,3> index(i+index_lookup[c][0],j+index_lookup[c][1],ij);
                     if(phi_objects(index)<0){velocity+=V_objects(index).z;count++;}}
                 velocity*=one_over_count_lookup[count];
@@ -611,7 +611,7 @@ void Get_Object_Velocities(const T dt,const T time) PHYSBAM_OVERRIDE
             ARRAY<T,VECTOR<int,3> > combined_solid_fluid_phi(grid);
             FAST_LEVELSET_3D<GRID<TV> > combined_solid_fluid_levelset(grid,combined_solid_fluid_phi);
             combined_solid_fluid_levelset.Set_Band_Width(3);combined_solid_fluid_levelset.Reinitialize();
-            for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++) for(int ij=1;ij<=grid.mn;ij++){
+            for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++) for(int ij=0;ij<grid.mn;ij++){
                 combined_solid_fluid_phi(i,j,ij)=min(phi_objects(i,j,ij),fluids_parameters.particle_levelset_evolution.phi(i,j,ij));
                 if(phi_objects(i,j,ij)<0) fluids_parameters.incompressible.V(i,j,ij)=V_objects(i,j,ij);}
             EXTRAPOLATION_3D<T,VECTOR<T,3> > extrapolate(grid,combined_solid_fluid_phi,fluids_parameters.incompressible.V);extrapolate.Set_Band_Width(3);extrapolate.Extrapolate();}
@@ -619,10 +619,10 @@ void Get_Object_Velocities(const T dt,const T time) PHYSBAM_OVERRIDE
         static int index_lookup[5][2]={{0,0},{0,0},{1,0},{0,1},{1,1}};
         static T one_over_count_lookup[5]={0,1,(T).5,(T)one_third,(T).25};
 
-        for(int i=1;i<=u_grid.m;i++) for(int j=1;j<=u_grid.n;j++) for(int ij=1;ij<=u_grid.mn;ij++)
+        for(int i=0;i<u_grid.m;i++) for(int j=0;j<u_grid.n;j++) for(int ij=0;ij<u_grid.mn;ij++)
             if((!mixed_face_is_solid && phi_objects(i,j,ij)+phi_objects(i,j+1,ij)+phi_objects(i,j,ij+1)+phi_objects(i,j+1,ij+1)<0) || (mixed_face_is_solid && Mixed_X_Face(i,j,ij))){
                 int count=0;T density=0,velocity=0;
-                for(int c=1;c<=4;c++){
+                for(int c=0;c<4;c++){
                     VECTOR<int,3> index(i,j+index_lookup[c][0],ij+index_lookup[c][1]);
                     if(phi_objects(index)<0 && collision_body_affected_by_fluid(id_objects(index))){int body_id=id_objects(index);
                         density+=body_densities(body_id);velocity+=V_objects(index).x;count++;}}
@@ -630,10 +630,10 @@ void Get_Object_Velocities(const T dt,const T time) PHYSBAM_OVERRIDE
                 poisson->psi_N_u(i,j,ij)=true;fluids_parameters.incompressible.projection.u(i,j,ij)=velocity;
                 poisson->body_psi_N_u(i,j,ij)=true;poisson->beta_right(i-1,j,ij)=1/density;}
 
-        for(int i=1;i<=v_grid.m;i++) for(int j=1;j<=v_grid.n;j++) for(int ij=1;ij<=v_grid.mn;ij++)
+        for(int i=0;i<v_grid.m;i++) for(int j=0;j<v_grid.n;j++) for(int ij=0;ij<v_grid.mn;ij++)
             if((!mixed_face_is_solid && phi_objects(i,j,ij)+phi_objects(i+1,j,ij)+phi_objects(i,j,ij+1)+phi_objects(i+1,j,ij+1)<0) || (mixed_face_is_solid && Mixed_Y_Face(i,j,ij))){
                 int count=0;T density=0,velocity=0;
-                for(int c=1;c<=4;c++){
+                for(int c=0;c<4;c++){
                     VECTOR<int,3> index(i+index_lookup[c][0],j,ij+index_lookup[c][1]);
                     if(phi_objects(index)<0 && collision_body_affected_by_fluid(id_objects(index))){int body_id=id_objects(index);
                         density+=body_densities(body_id);velocity+=V_objects(index).y;count++;}}
@@ -641,10 +641,10 @@ void Get_Object_Velocities(const T dt,const T time) PHYSBAM_OVERRIDE
                 poisson->psi_N_v(i,j,ij)=true;fluids_parameters.incompressible.projection.v(i,j,ij)=velocity;
                 poisson->body_psi_N_v(i,j,ij)=true;poisson->beta_top(i,j-1,ij)=1/density;}
 
-        for(int i=1;i<=w_grid.m;i++) for(int j=1;j<=w_grid.n;j++) for(int ij=1;ij<=w_grid.mn;ij++)
+        for(int i=0;i<w_grid.m;i++) for(int j=0;j<w_grid.n;j++) for(int ij=0;ij<w_grid.mn;ij++)
             if((!mixed_face_is_solid && phi_objects(i,j,ij)+phi_objects(i,j+1,ij)+phi_objects(i+1,j,ij)+phi_objects(i+1,j+1,ij)<0) || (mixed_face_is_solid && Mixed_Z_Face(i,j,ij))){
                 int count=0;T density=0,velocity=0;
-                for(int c=1;c<=4;c++){
+                for(int c=0;c<4;c++){
                     VECTOR<int,3> index(i+index_lookup[c][0],j+index_lookup[c][1],ij);
                     if(phi_objects(index)<0 && collision_body_affected_by_fluid(id_objects(index))){int body_id=id_objects(index);
                         density+=body_densities(body_id);velocity+=V_objects(index).z;count++;}}
@@ -663,7 +663,7 @@ void Set_Dirichlet_Boundary_Conditions(const T time)
 
     GRID<TV>& p_grid=fluids_parameters.incompressible.projection.p_grid;
     ARRAY<T,VECTOR<int,3> >& phi=fluids_parameters.particle_levelset_evolution.phi;
-    for(int i=1;i<=p_grid.m;i++) for(int j=1;j<=p_grid.n;j++) for(int ij=1;ij<=p_grid.mn;ij++) 
+    for(int i=0;i<p_grid.m;i++) for(int j=0;j<p_grid.n;j++) for(int ij=0;ij<p_grid.mn;ij++) 
         if((phi(i,j,ij)+phi(i+1,j,ij)+phi(i,j+1,ij)+phi(i+1,j+1,ij)+phi(i,j,ij+1)+phi(i+1,j,ij+1)+phi(i,j+1,ij+1)+phi(i+1,j+1,ij+1) > 0) &&
            (phi_objects(i,j,ij)+phi_objects(i+1,j,ij)+phi_objects(i,j+1,ij)+phi_objects(i+1,j+1,ij)+phi_objects(i,j,ij+1)+phi_objects(i+1,j,ij+1)+phi_objects(i,j+1,ij+1)+phi_objects(i+1,j+1,ij+1) > 0)){
             fluids_parameters.incompressible.projection.elliptic_solver->psi_D(i,j,ij)=true;fluids_parameters.incompressible.projection.p(i,j,ij)=0;}

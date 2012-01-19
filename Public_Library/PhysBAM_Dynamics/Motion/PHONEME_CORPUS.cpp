@@ -25,11 +25,11 @@ Gather_Phoneme_Statistics_Helper(PHONEME_CORPUS<T>* phoneme_corpus,ARRAY<PHONEME
     ARRAY<PHONEME_SEGMENT<T>*>& phonemes=*node;
     VECTOR_ND<T> *errors=new VECTOR_ND<T>;
     T time_length=0;
-    for(int i=1;i<=phonemes.m;i++)time_length+=phonemes(i)->phoneme_sample->time_length;
+    for(int i=0;i<phonemes.m;i++)time_length+=phonemes(i)->phoneme_sample->time_length;
     time_length/=phonemes.m;
     int frame_length=(int)(time_length*120);
     ARRAY<VECTOR_ND<T> > means(frame_length);
-    for(int i=1;i<=phonemes.m;i++){
+    for(int i=0;i<phonemes.m;i++){
         phonemes(i)->phoneme_sample->time_length=time_length;
         for(int t=0;t<frame_length;t++){
             VECTOR_ND<T> controls=phonemes(i)->Controls(t/(T)120);
@@ -38,11 +38,11 @@ Gather_Phoneme_Statistics_Helper(PHONEME_CORPUS<T>* phoneme_corpus,ARRAY<PHONEME
     VECTOR_ND<T> per_attribute_mean(means(1).n);
     for(int t=0;t<frame_length;t++){
         means(t)/=(T)phonemes.m;
-        for(int i=1;i<=per_attribute_mean.n;i++) per_attribute_mean(i)+=abs(means(t)(i));}
+        for(int i=0;i<per_attribute_mean.n;i++) per_attribute_mean(i)+=abs(means(t)(i));}
     per_attribute_mean/=(T)frame_length;
     errors->Resize(means(1).n);
     // get deviations
-    for(int i=1;i<=phonemes.m;i++)for(int t=0;t<frame_length;t++){VECTOR_ND<T> controls=phonemes(i)->Controls(t/(T)120);for(int j=1;j<=(*errors).n;j++)(*errors)(j)+=pow(controls(j)-means(t+1)(j),2);}
+    for(int i=0;i<phonemes.m;i++)for(int t=0;t<frame_length;t++){VECTOR_ND<T> controls=phonemes(i)->Controls(t/(T)120);for(int j=1;j<=(*errors).n;j++)(*errors)(j)+=pow(controls(j)-means(t+1)(j),2);}
     LOG::cout<<"Stiffnesses for phoneme "<<phonemes(1)->phoneme_sample->name<<std::endl;
     for(int i=1;i<=(*errors).n;i++){(*errors)(i)=sqrt((*errors)(i)/phonemes.m)/abs(per_attribute_mean(i));LOG::cout<<i<<": "<<(*errors)(i)<<std::endl;}
     phoneme_corpus->phoneme_stiffness.Set(phonemes(1)->phoneme_sample->name,errors);
@@ -63,7 +63,7 @@ template<class T> void PHONEME_CORPUS<T>::
 Get_Next_Kind_Of_Phoneme(PHONEME_SEGMENT<T>& phoneme_segment)
 {
     int index=0;
-    for(int i=1;i<=phoneme_labels.m;i++) if(!phoneme_segment.phoneme_sample->name.compare(phoneme_labels(i))){index=i;break;}
+    for(int i=0;i<phoneme_labels.m;i++) if(!phoneme_segment.phoneme_sample->name.compare(phoneme_labels(i))){index=i;break;}
     if(!index) return;
     index=(index%phoneme_labels.m)+1;
     ARRAY<PHONEME_SEGMENT<T>*>& phoneme_segments=*Get_Phonemes(phoneme_labels(index));
@@ -77,7 +77,7 @@ template<class T> void PHONEME_CORPUS<T>::
 Get_Previous_Kind_Of_Phoneme(PHONEME_SEGMENT<T>& phoneme_segment)
 {
     int index=0;
-    for(int i=1;i<=phoneme_labels.m;i++) if(!phoneme_segment.phoneme_sample->name.compare(phoneme_labels(i))){index=i;break;}
+    for(int i=0;i<phoneme_labels.m;i++) if(!phoneme_segment.phoneme_sample->name.compare(phoneme_labels(i))){index=i;break;}
     if(!index) return;
     index=(index==1?phoneme_labels.m:index-1);
     ARRAY<PHONEME_SEGMENT<T>*>& phoneme_segments=*Get_Phonemes(phoneme_labels(index));
@@ -92,7 +92,7 @@ Get_Next_Phoneme(PHONEME_SEGMENT<T>& phoneme_segment)
 {
     ARRAY<PHONEME_SEGMENT<T>*>& phoneme_segments=*Get_Phonemes(phoneme_segment.phoneme_sample->name);
     int index=0;
-    for(int i=1;i<=phoneme_segments.m;i++) if(!phoneme_segment.phoneme_sample_name.compare(phoneme_segments(i)->phoneme_sample_name)){index=i;break;}
+    for(int i=0;i<phoneme_segments.m;i++) if(!phoneme_segment.phoneme_sample_name.compare(phoneme_segments(i)->phoneme_sample_name)){index=i;break;}
     if(!index) return;
     index=(index%phoneme_segments.m)+1;
     phoneme_segment.Set_Sample(*phoneme_segments(index)->phoneme_sample);
@@ -106,7 +106,7 @@ Get_Previous_Phoneme(PHONEME_SEGMENT<T>& phoneme_segment)
 {
     ARRAY<PHONEME_SEGMENT<T>*>& phoneme_segments=*Get_Phonemes(phoneme_segment.phoneme_sample->name);
     int index=0;
-    for(int i=1;i<=phoneme_segments.m;i++) if(!phoneme_segment.phoneme_sample_name.compare(phoneme_segments(i)->phoneme_sample_name)){index=i;break;}
+    for(int i=0;i<phoneme_segments.m;i++) if(!phoneme_segment.phoneme_sample_name.compare(phoneme_segments(i)->phoneme_sample_name)){index=i;break;}
     if(!index) return;
     index=(index==1?phoneme_segments.m:index-1);
     phoneme_segment.Set_Sample(*phoneme_segments(index)->phoneme_sample);
@@ -130,7 +130,7 @@ Build_Corpus(const std::string& corpus_directory)
     
     for(HASHTABLE_ITERATOR<std::string,ARRAY<PHONEME_SEGMENT<T>*>*> iterator(string_to_phoneme_index);iterator.Valid();iterator.Next()){
         ARRAY<PHONEME_SEGMENT<T>*>& phoneme_segment_list=*iterator.Data();
-        for(int i=1;i<=phoneme_segment_list.m;i++) phoneme_segment_list(i)->Set_Custom_Interpolation(interpolation);}
+        for(int i=0;i<phoneme_segment_list.m;i++) phoneme_segment_list(i)->Set_Custom_Interpolation(interpolation);}
 
     Sort(phoneme_labels);
 #else
@@ -154,7 +154,7 @@ Phoneme_Metric_Helper(PHONEME_ARRANGEMENT<T>& phoneme_arrangement,const ARRAY<T>
         //return FLT_MAX;}}
     T time_scaling_penalty=0;
     int count=0;
-    for(int i=1;i<=phoneme_arrangement.list.m;i++){
+    for(int i=0;i<phoneme_arrangement.list.m;i++){
         PHONEME_SEGMENT<T>& phoneme_segment=phoneme_arrangement.list(i);
         if(phoneme_segment.phoneme_sample->frame_length>2){
 #if ALTERNATE_PHONEMES
@@ -174,7 +174,7 @@ template<class T> T PHONEME_CORPUS<T>::
 Phoneme_Metric_Helper_Scaled(PHONEME_ARRANGEMENT<T>& phoneme_arrangement,const ARRAY<T>& scalings,const ARRAY<T>& weights)
 {
     // go through and get squared error sum
-    for(int i=1;i<=scalings.m;i++) phoneme_arrangement.list(i).scaling=scalings(i);
+    for(int i=0;i<scalings.m;i++) phoneme_arrangement.list(i).scaling=scalings(i);
     T total=0;
     // sample at ~1 frame
     phoneme_arrangement.Update_Valid_Segment();
@@ -208,7 +208,7 @@ Get_Optimal_Scalings(PHONEME_ARRANGEMENT<T>& phoneme_arrangement,const ARRAY<T>&
     const T step_size_threshold=(T)1e-5;
     while(change>tolerance){
         change=result;
-        for(int i=1;i<=optimal_scalings.m;i++){
+        for(int i=0;i<optimal_scalings.m;i++){
             T location=optimal_scalings(i);
             T step_size=(T).2;
             T left,right;
@@ -235,7 +235,7 @@ Get_Optimal_Scalings(PHONEME_ARRANGEMENT<T>& phoneme_arrangement,const ARRAY<T>&
             optimal_scalings(i)=location;
             result=Phoneme_Metric_Helper_Scaled(phoneme_arrangement,optimal_scalings,weights);}
         change=abs(change-result);}
-    for(int i=1;i<=optimal_scalings.m;i++) LOG::cout<<"Scaling "<<i<<": "<<optimal_scalings(i)<<std::endl;
+    for(int i=0;i<optimal_scalings.m;i++) LOG::cout<<"Scaling "<<i<<": "<<optimal_scalings(i)<<std::endl;
     return result;
 }
 //#####################################################################
@@ -252,11 +252,11 @@ Brute_Force_Phoneme_Arrangement_Helper(const ARRAY<ARRAY<PHONEME_SEGMENT<T>*> >&
         phoneme_arrangement.list(position).Set_Sample(*phoneme_candidates(position)(i)->phoneme_sample);
         phoneme_arrangement.list(position).phoneme_sample_name=phoneme_candidates(position)(i)->phoneme_sample_name;
         T result;
-        if(position==indices.m) {//LOG::cout<<"Trying "<<std::endl;for(int j=1;j<=indices.m;j++)LOG::cout<<phoneme_arrangement.list(j).phoneme_sample_name<<"
+        if(position==indices.m) {//LOG::cout<<"Trying "<<std::endl;for(int j=0;j<indices.m;j++)LOG::cout<<phoneme_arrangement.list(j).phoneme_sample_name<<"
                                  //";LOG::cout<<std::endl;
             VECTOR_ND<T> scalings=phoneme_arrangement.Optimal_Scaling(sampling_grid,stiffness);
             ARRAY<T> scalings_list(scalings.n);
-            for(int j=1;j<=scalings.n;j++) scalings_list(j)=scalings(j);
+            for(int j=0;j<scalings.n;j++) scalings_list(j)=scalings(j);
             result=Phoneme_Metric_Helper_Scaled(phoneme_arrangement,scalings_list,weights);
             //result=Get_Optimal_Scalings(phoneme_arrangement);
             if(result<best_result){better=true;best_result=result;indices(position)=i;}}
@@ -286,7 +286,7 @@ Brute_Force_Phoneme_Arrangement(const ARRAY<std::string>& phonemes,const ARRAY<T
         phoneme_segment.time_segment.max_corner.x=phoneme_segment.time_segment.min_corner.x+lengths(i);
         phoneme_segment.leading_context_duration=leading_times(i);
         phoneme_segment.trailing_context_duration=trailing_times(i);}
-    for(int i=1;i<=phonemes.m;i++){phoneme_candidates.Append(*Get_Phonemes(phonemes(i)));if(!phoneme_candidates(i).m) return 0;indices(i)=1;}
+    for(int i=0;i<phonemes.m;i++){phoneme_candidates.Append(*Get_Phonemes(phonemes(i)));if(!phoneme_candidates(i).m) return 0;indices(i)=1;}
     phoneme_arrangement->Update_Valid_Segment();
     // Yankee-search!
     Brute_Force_Phoneme_Arrangement_Helper(phoneme_candidates,1,*phoneme_arrangement,best_result,indices,weights);
@@ -312,7 +312,7 @@ Produce_Phoneme_Arrangement(const ARRAY<std::string>& phonemes,const ARRAY<T>& s
     phoneme_arrangement->Set_Custom_Interpolation(interpolation);
     phoneme_arrangement->Set_Face_Control_Parameters(face_control_parameters);
     phoneme_arrangement->list.Resize(phonemes.m);
-    for(int i=1;i<=phonemes.m;i++){phoneme_candidates.Append(*Get_Phonemes(phonemes(i)));if(!phoneme_candidates(i).m) return 0;indices(i)=1;}
+    for(int i=0;i<phonemes.m;i++){phoneme_candidates.Append(*Get_Phonemes(phonemes(i)));if(!phoneme_candidates(i).m) return 0;indices(i)=1;}
     for(int i=1;i<=phoneme_arrangement->list.m;i++){
         PHONEME_SEGMENT<T>& phoneme_segment=phoneme_arrangement->list(i);
         phoneme_segment.Set_Sample(*phoneme_candidates(i)(1)->phoneme_sample);
@@ -333,7 +333,7 @@ Produce_Phoneme_Arrangement(const ARRAY<std::string>& phonemes,const ARRAY<T>& s
     //GRID_1D<T> sampling_grid(1+(int)(phoneme_arrangement->valid_segment->Length()*frame_rate),*phoneme_arrangement->valid_segment);
     //VECTOR_ND<T> scalings=phoneme_arrangement->Optimal_Scaling(sampling_grid,stiffness);
     //ARRAY<T> scalings_list(scalings.n);
-    //for(int i=1;i<=scalings.n;i++) scalings_list(i)=scalings(i);
+    //for(int i=0;i<scalings.n;i++) scalings_list(i)=scalings(i);
     //T last_result=Phoneme_Metric_Helper_Scaled(*phoneme_arrangement,scalings_list);
     //T last_result=Get_Optimal_Scalings(*phoneme_arrangement);
     T last_result=Phoneme_Metric_Helper(*phoneme_arrangement,weights);
@@ -346,11 +346,11 @@ Produce_Phoneme_Arrangement(const ARRAY<std::string>& phonemes,const ARRAY<T>& s
         PHONEME_SEGMENT<T>& phoneme_segment=phoneme_arrangement->list(index);
         phoneme_segment.Set_Sample(*phoneme_candidates(index)(phoneme_index)->phoneme_sample);
         phoneme_segment.phoneme_sample_name=phoneme_candidates(index)(phoneme_index)->phoneme_sample_name;
-        //LOG::cout<<"Trying "<<std::endl;for(int j=1;j<=indices.m;j++)LOG::cout<<phoneme_arrangement->list(j).phoneme_sample_name<<" ";LOG::cout<<std::endl;
+        //LOG::cout<<"Trying "<<std::endl;for(int j=0;j<indices.m;j++)LOG::cout<<phoneme_arrangement->list(j).phoneme_sample_name<<" ";LOG::cout<<std::endl;
     
         // Testing this
         /*scalings=phoneme_arrangement->Optimal_Scaling(sampling_grid,stiffness);
-        for(int i=1;i<=scalings.n;i++) scalings_list(i)=scalings(i);
+        for(int i=0;i<scalings.n;i++) scalings_list(i)=scalings(i);
         T result=Phoneme_Metric_Helper_Scaled(*phoneme_arrangement,scalings_list);*/
         T result=Phoneme_Metric_Helper(*phoneme_arrangement,weights);
         //T result=Get_Optimal_Scalings(*phoneme_arrangement);
@@ -376,7 +376,7 @@ Produce_Phoneme_Arrangement(const ARRAY<std::string>& phonemes,const ARRAY<T>& s
     T change=tolerance+1;
     while(change>tolerance){
         change=Phoneme_Metric_Helper(phoneme_candidates,indices,starting_times,lengths,leading_times,trailing_times);
-        for(int i=1;i<=phonemes.m;i++){
+        for(int i=0;i<phonemes.m;i++){
             int best_index=indices(i);
             T result=Phoneme_Metric_Helper(phoneme_candidates,indices,starting_times,lengths,leading_times,trailing_times);
             for(int j=1;j<=phoneme_candidates(i).m;j++){

@@ -66,7 +66,7 @@ int Split_Connected_Component(TRIANGULATED_AREA<T>& ta,const int node)
         ARRAY<int> indices_to_remove(number_marked);int counter=0;
         for(t=1;t<=(*ta.mesh.incident_elements)(node).m;t++) if(marked(t)){
             indices_to_remove(++counter)=t;
-            for(int i=1;i<=3;i++) if(ta.mesh.elements((*ta.mesh.incident_elements)(node)(t))(i) == node){ 
+            for(int i=0;i<3;i++) if(ta.mesh.elements((*ta.mesh.incident_elements)(node)(t))(i) == node){ 
                 ta.mesh.elements((*ta.mesh.incident_elements)(node)(t))(i)=new_particle;break;}
             (*ta.mesh.incident_elements)(new_particle).Append((*ta.mesh.incident_elements)(node)(t));}
         (*ta.mesh.incident_elements)(node).Remove_Sorted_Indices(indices_to_remove);}

@@ -54,9 +54,9 @@ int main(int argc,char** argv)
     *input>>norm>>num_vertices>>num_polygons>>minX>>minY>>minZ>>maxX>>maxY>>maxZ; // for bounding box
     std::cout<<"verts: "<<num_vertices<<", polygons"<<num_polygons<<", bounding box: "<<minX<<":"<<maxX<<","<<minY<<":"<<maxY<<","<<minZ<<":"<<maxZ<<std::endl;
     ARRAY<VECTOR_3D<float> > vertices(num_vertices);ARRAYS<VECTOR_3D<float> > vertex_normals(1,num_vertices);float x,y,z;
-    for(int i=1;i<=num_vertices;i++){*input>>vertices(i).x>>vertices(i).y>>vertices(i).z>>x>>y>>z;vertex_normals(1,i)=VECTOR_3D<float>(x,y,z);}
+    for(int i=0;i<num_vertices;i++){*input>>vertices(i).x>>vertices(i).y>>vertices(i).z>>x>>y>>z;vertex_normals(1,i)=VECTOR_3D<float>(x,y,z);}
     int num_sides,s1,s2,s3;ARRAYS<int> triangles(3,num_polygons);
-    for(int p=1;p<=num_polygons;p++){
+    for(int p=0;p<num_polygons;p++){
         *input>>num_sides;
         if(num_sides==3){*input>>s1>>s2>>s3;triangles.Set(p,s1+1,s2+1,s3+1);}
         else{
@@ -64,7 +64,7 @@ int main(int argc,char** argv)
             for(int s=1;s<=num_sides-3;s++){s2=s3;*input>>s3;triangles.Append(s2+1,s3+1,s1+1);}}}
     std::cout<<"num_polygons: "<<triangles.m<<std::endl;
     TRIANGULATED_SURFACE<float>* triangulated_surface=new TRIANGULATED_SURFACE<float>(*new TRIANGLE_MESH(triangles),*new SOLIDS_PARTICLES<float,VECTOR_3D<float> >);
-    triangulated_surface->particles.Add_Particles(num_vertices);for(int i=1;i<=num_vertices;i++)triangulated_surface->particles.X(i)=vertices(i);
+    triangulated_surface->particles.Add_Particles(num_vertices);for(int i=0;i<num_vertices;i++)triangulated_surface->particles.X(i)=vertices(i);
     triangulated_surface->vertex_normals=&vertex_normals;
 
     //write out triangulated surface

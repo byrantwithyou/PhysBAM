@@ -39,7 +39,7 @@ RENDERING_VOXEL_SHADER(const TV& absorption_input,const TV& scattering_input,con
         else{world_xyz_to_display_xyz=MATRIX<T,3>(T(1)/xyz_white_point.x,0,0,0,T(1)/xyz_white_point.y,0,0,0,T(1)/xyz_white_point.z);}
         if(use_blackbody_ramp){
             blackbody_ramp_grid.Initialize(500,0,(T)3000);blackbody_ramp.Resize(blackbody_ramp_grid.Domain_Indices(ghost_cells));
-            for(int i=1;i<=blackbody_ramp_grid.counts.x;i++) blackbody_ramp(i)=blackbody.cie.XYZ_To_RGB(world_xyz_to_display_xyz*(blackbody.Calculate_XYZ(blackbody_ramp_grid.X(VECTOR<int,1>(i)).x)));
+            for(int i=0;i<blackbody_ramp_grid.counts.x;i++) blackbody_ramp(i)=blackbody.cie.XYZ_To_RGB(world_xyz_to_display_xyz*(blackbody.Calculate_XYZ(blackbody_ramp_grid.X(VECTOR<int,1>(i)).x)));
             BOUNDARY_UNIFORM<GRID<VECTOR<T,1> >,TV>().Fill_Ghost_Cells(blackbody_ramp_grid,blackbody_ramp,blackbody_ramp,0,0,ghost_cells);}}
 
     LOG::cout<<"absorption="<<absorption<<", scattering="<<scattering<<", inscattering_amplification="<<inscattering_amplification<<std::endl;
@@ -81,7 +81,7 @@ Attenuate_Color(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& object,co
         if((!empty_implicit_surface || !empty_implicit_surface->Lazy_Inside(sample_point)) && !empty_multiple_region){
             T volumetric_coefficient=voxel_object->Source_Term(1,sample_point);
             // inscattering
-            if(inscattering_amplification>0) for(int light_index=1;light_index<=lights.m;light_index++){
+            if(inscattering_amplification>0) for(int light_index=0;light_index<lights.m;light_index++){
                 if(world.volume_photon_map.photons.m){
                     TV normal=-ray.ray.direction;normal.Normalize();
                     attenuated_color+=(current_volumetric_step*inscattering_amplification*
@@ -93,7 +93,7 @@ Attenuate_Color(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& object,co
                 else{
                     ARRAY<RAY<TV> > sample_array;
                     lights(light_index)->Sample_Points(sample_point,TV(1,0,0),sample_array);
-                    for(int sample=1;sample<=sample_array.m;sample++){
+                    for(int sample=0;sample<sample_array.m;sample++){
                         RENDERING_RAY<T> ray_to_light(sample_array(sample),1,&object);
                         TV light_color=world.Incident_Light(ray_to_light,*lights(light_index),ray_to_light,ray);
                         accumulated_samples+=light_color*Phase(-ray_to_light.ray.direction,-ray.ray.direction);}

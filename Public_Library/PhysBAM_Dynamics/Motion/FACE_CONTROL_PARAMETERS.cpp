@@ -23,7 +23,7 @@ template<class T> int FACE_CONTROL_PARAMETERS<T>::
 Size() const
 {
     int n=0;
-    for(int s=1;s<=list.m;s++) n+=list(s)->Size();
+    for(int s=0;s<list.m;s++) n+=list(s)->Size();
     return n;
 }
 template<class T> int FACE_CONTROL_PARAMETERS<T>::
@@ -48,7 +48,7 @@ template<class T> int FACE_CONTROL_PARAMETERS<T>::
 Active_Nonkinematic_Size() const
 {
     int n=0;
-    for(int s=1;s<=list.m;s++) for(int c=1;c<=list(s)->Size();c++) if(list(s)->Control_Active(c)&&!list(s)->Positions_Determined_Kinematically(c)) n++;
+    for(int s=0;s<list.m;s++) for(int c=1;c<=list(s)->Size();c++) if(list(s)->Control_Active(c)&&!list(s)->Positions_Determined_Kinematically(c)) n++;
     return n;
 }
 template<class T> void FACE_CONTROL_PARAMETERS<T>::
@@ -141,7 +141,7 @@ template<class T> void FACE_CONTROL_PARAMETERS<T>::
 Get(VECTOR_ND<T>& values,const ARRAY<int>& subset) const
 {
     values=VECTOR_ND<T>(subset.m);
-    for(int i=1;i<=subset.m;i++) values(i)=(*this)(subset(i));
+    for(int i=0;i<subset.m;i++) values(i)=(*this)(subset(i));
 }
 template<class T> void FACE_CONTROL_PARAMETERS<T>::
 Get_Active(ARRAY<bool>& active) const
@@ -153,7 +153,7 @@ template<class T> void FACE_CONTROL_PARAMETERS<T>::
 Get_Active(ARRAY<bool>& active,const ARRAY<int>& subset) const
 {
     active.Resize(subset.m);
-    for(int i=1;i<=subset.m;i++) active(i)=Active(subset(i));
+    for(int i=0;i<subset.m;i++) active(i)=Active(subset(i));
 }
 template<class T> void FACE_CONTROL_PARAMETERS<T>::
 Set(const VECTOR_ND<T>& values)
@@ -165,12 +165,12 @@ template<class T> void FACE_CONTROL_PARAMETERS<T>::
 Set(const VECTOR_ND<T>& values,const ARRAY<int>& subset)
 {
     assert(values.n==subset.m);
-    for(int i=1;i<=subset.m;i++) (*this)(subset(i))=values(i);
+    for(int i=0;i<subset.m;i++) (*this)(subset(i))=values(i);
 }
 template<class T> void FACE_CONTROL_PARAMETERS<T>::
 Set(const T value_input,const ARRAY<int>& subset)
 {
-    for(int i=1;i<=subset.m;i++) (*this)(subset(i))=value_input;
+    for(int i=0;i<subset.m;i++) (*this)(subset(i))=value_input;
 }
 template<class T> void FACE_CONTROL_PARAMETERS<T>::
 Set_Active(const ARRAY<bool>& active)
@@ -182,18 +182,18 @@ template<class T> void FACE_CONTROL_PARAMETERS<T>::
 Set_Active(const ARRAY<bool>& active,const ARRAY<int>& subset)
 {
     assert(active.m==subset.m);
-    for(int i=1;i<=subset.m;i++) Active(subset(i))=active(i);
+    for(int i=0;i<subset.m;i++) Active(subset(i))=active(i);
 }
 template<class T> void FACE_CONTROL_PARAMETERS<T>::
 Set_Active(const bool active_input,const ARRAY<int>& subset)
 {
-    for(int i=1;i<=subset.m;i++) Active(subset(i))=active_input;
+    for(int i=0;i<subset.m;i++) Active(subset(i))=active_input;
 }
 template<class T> T FACE_CONTROL_PARAMETERS<T>::
 Penalty() const
 {
     T result=0;
-    for(int s=1;s<=list.m;s++) result+=list(s)->Penalty();
+    for(int s=0;s<list.m;s++) result+=list(s)->Penalty();
     return result;
 }
 template<class T> VECTOR_ND<T> FACE_CONTROL_PARAMETERS<T>::
@@ -201,7 +201,7 @@ Penalty_Gradient() const
 {
     ARRAY<int> subset(Active_Subset());
     VECTOR_ND<T> result(subset.m);
-    for(int i=1;i<=subset.m;i++){
+    for(int i=0;i<subset.m;i++){
         int s,c;
         Seek(subset(i),s,c);
         result(i)=list(s)->Penalty_Gradient(c);}
@@ -212,7 +212,7 @@ Penalty_Hessian() const
 {
     ARRAY<int> subset(Active_Subset());
     MATRIX_MXN<T> result(subset.m,subset.m);
-    for(int i1=1;i1<=subset.m;i1++) for(int i2=1;i2<=subset.m;i2++){
+    for(int i1=0;i1<subset.m;i1++) for(int i2=0;i2<subset.m;i2++){
         int s1,c1,s2,c2;
         Seek(subset(i1),s1,c1);
         Seek(subset(i2),s2,c2);
@@ -222,22 +222,22 @@ Penalty_Hessian() const
 template<class T> void FACE_CONTROL_PARAMETERS<T>::
 Save_Controls()
 {
-    for(int s=1;s<=list.m;s++) list(s)->Save_Controls();
+    for(int s=0;s<list.m;s++) list(s)->Save_Controls();
 }
 template<class T> void FACE_CONTROL_PARAMETERS<T>::
 Print_Diagnostics(std::ostream& output) const
 {
-    for(int s=1;s<=list.m;s++) list(s)->Print_Diagnostics(output);
+    for(int s=0;s<list.m;s++) list(s)->Print_Diagnostics(output);
 }
 template<class T> void FACE_CONTROL_PARAMETERS<T>::
 Kinematically_Update_Positions(ARRAY<TV>&X) const
 {
-    for(int s=1;s<=list.m;s++) list(s)->Kinematically_Update_Positions(X);
+    for(int s=0;s<list.m;s++) list(s)->Kinematically_Update_Positions(X);
 }
 template<class T> void FACE_CONTROL_PARAMETERS<T>::
 Kinematically_Update_Jacobian(ARRAY<TV>&dX) const
 {
-    for(int s=1;s<=list.m;s++) list(s)->Kinematically_Update_Jacobian(dX);
+    for(int s=0;s<list.m;s++) list(s)->Kinematically_Update_Jacobian(dX);
 }
 template<class T> void FACE_CONTROL_PARAMETERS<T>::
 Force_Derivative(ARRAY<TV>& dFdl,ARRAY<TWIST<TV> >& dFrdl,const int control_index) const
@@ -256,25 +256,25 @@ Position_Derivative(ARRAY<TV>& dXdl,const int control_index) const
 template<class T> void FACE_CONTROL_PARAMETERS<T>::
 Project_Parameters_To_Allowable_Range(const bool active_controls_only)
 {
-    for(int s=1;s<=list.m;s++) list(s)->Project_Parameters_To_Allowable_Range(active_controls_only);
+    for(int s=0;s<list.m;s++) list(s)->Project_Parameters_To_Allowable_Range(active_controls_only);
 }
 template<class T> void FACE_CONTROL_PARAMETERS<T>::
 Interpolate(const T interpolation_fraction)
 {
-    for(int s=1;s<=list.m;s++) list(s)->Interpolate(interpolation_fraction);
+    for(int s=0;s<list.m;s++) list(s)->Interpolate(interpolation_fraction);
 }
 template<class T> void FACE_CONTROL_PARAMETERS<T>::
 Scale(const T scale)
 {
     if(scale==1)return;
-    for(int s=1;s<=list.m;s++) list(s)->Scale(scale);
+    for(int s=0;s<list.m;s++) list(s)->Scale(scale);
 }
 template<class T> T FACE_CONTROL_PARAMETERS<T>::
 Distance(const ARRAY<T>& weights)
 {
     T distance=0;
     int base=0;
-    for(int s=1;s<=list.m;s++){
+    for(int s=0;s<list.m;s++){
         distance+=list(s)->Distance(weights,base);
         base+=list(s)->Size();}
     return distance;
@@ -348,7 +348,7 @@ Write_Configuration_To_File(const STREAM_TYPE& stream_type,const std::string fil
 {
     std::ostream* output=FILE_UTILITIES::Safe_Open_Output(filename);
     Write_Control_Set_Types(stream_type,*output);
-    for(int i=1;i<=list.m;i++)
+    for(int i=0;i<list.m;i++)
         switch(list(i)->Type()){
             case FACE_CONTROL_SET<T>::ACTIVATION: ((ACTIVATION_CONTROL_SET<T>*)list(i))->Write_Configuration(stream_type,*output);break;
             case FACE_CONTROL_SET<T>::ATTACHMENT_FRAME: ((ATTACHMENT_FRAME_CONTROL_SET<T>*)list(i))->Write_Configuration(stream_type,*output);break;
@@ -360,7 +360,7 @@ Write_Control_Set_Types(const STREAM_TYPE& stream_type,std::ostream& output_stre
 {
     TYPED_OSTREAM typed_output(output_stream,stream_type);
     Write_Binary(typed_output,list.m);
-    for(int i=1;i<=list.m;i++)Write_Binary(typed_output,(int)list(i)->Type());
+    for(int i=0;i<list.m;i++)Write_Binary(typed_output,(int)list(i)->Type());
 }
 template class FACE_CONTROL_PARAMETERS<float>;
 template void FACE_CONTROL_PARAMETERS<float>::Read<float>(std::basic_istream<char,std::char_traits<char> >&);

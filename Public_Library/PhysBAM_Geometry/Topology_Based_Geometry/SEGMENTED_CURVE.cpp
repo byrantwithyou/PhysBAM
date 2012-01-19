@@ -116,7 +116,7 @@ template<class TV> TV SEGMENTED_CURVE<TV>::
 Closest_Point_On_Curve(const TV& location,T thickness_over_two,int* closest_segment,T* distance) const
 {
     T min_distance_squared=FLT_MAX;TV point;
-    for(int i=1;i<=mesh.elements.m;i++){
+    for(int i=0;i<mesh.elements.m;i++){
         T_SEGMENT segment=segment_list?(*segment_list)(i):Get_Element(i);
         TV new_point=segment.Closest_Point_On_Segment(location);
         T distance_squared=(new_point-location).Magnitude_Squared();
@@ -142,7 +142,7 @@ template<class TV> typename TV::SCALAR SEGMENTED_CURVE<TV>::
 Average_Edge_Length() const
 {
     T average_edge_length=0;
-    for(int s=1;s<=mesh.elements.m;s++){
+    for(int s=0;s<mesh.elements.m;s++){
         int i,j;mesh.elements(s).Get(i,j);
         average_edge_length+=(particles.X(i)-particles.X(j)).Magnitude();}
     if(mesh.elements.m) average_edge_length/=mesh.elements.m;
@@ -155,7 +155,7 @@ template<class TV> typename TV::SCALAR SEGMENTED_CURVE<TV>::
 Total_Length() const
 {
     T length=0;
-    for(int t=1;t<=mesh.elements.m;t++){
+    for(int t=0;t<mesh.elements.m;t++){
         int node1=mesh.elements(t)(1),node2=mesh.elements(t)(2);
         length+=(particles.X(node1)-particles.X(node2)).Magnitude();}
     return length;

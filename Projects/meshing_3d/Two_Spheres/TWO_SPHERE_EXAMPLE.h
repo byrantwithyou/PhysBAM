@@ -39,7 +39,7 @@ void Initialize_Implicit_Surface(LEVELSET_IMPLICIT_SURFACE<T>& implicit_surface)
         implicit_surface.template Read<RW>(input); input.close(); 
     }
     else {
-        for(int i=1;i<=implicit_surface.levelset.grid.m;i++) for(int j=1;j<=implicit_surface.levelset.grid.n;j++) for(int ij=1;ij<=implicit_surface.levelset.grid.mn;ij++){
+        for(int i=0;i<implicit_surface.levelset.grid.m;i++) for(int j=0;j<implicit_surface.levelset.grid.n;j++) for(int ij=0;ij<implicit_surface.levelset.grid.mn;ij++){
             double x=implicit_surface.levelset.grid.x(i),y=implicit_surface.levelset.grid.y(j),z=implicit_surface.levelset.grid.z(ij);
             VECTOR_3D X(x,y,z);
 

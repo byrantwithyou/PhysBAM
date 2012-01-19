@@ -188,7 +188,7 @@ Process_Collisions(const T dt,const T time,const bool advance_rigid_bodies)
             solid_body_collection.rigid_body_collection.rigid_geometry_collection.Destroy_Unreferenced_Geometry();
             solid_body_collection.rigid_body_collection.Update_Simulated_Particles();
             rigid_body_collisions->Initialize_Data_Structures(true);
-            for(int i=1;i<=all_added_bodies.m;i++){
+            for(int i=0;i<all_added_bodies.m;i++){
                 rigid_body_collisions->added_bodies(1).Append(all_added_bodies(i));
                 if(!solids_fluids_parameters.mpi_solid_fluid || solids_fluids_parameters.mpi_solid_fluid->Solid_Node())
                     rigid_body_collisions->collision_callbacks.Euler_Step_Position_With_New_Velocity(all_added_bodies(i),dt,time);}

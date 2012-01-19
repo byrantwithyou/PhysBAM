@@ -313,7 +313,7 @@ Initialize_Bodies()
     solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
 
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents();
@@ -330,9 +330,9 @@ Initialize_Bodies()
         stf->apply_implicit_forces=implicit_solid;
         fluids_parameters.surface_tension=0;}
 
-    for(int i=1;i<=solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->compute_half_forces=true;
-    for(int k=1;k<=solid_body_collection.deformable_body_collection.deformables_forces.m;k++) solid_body_collection.deformable_body_collection.deformables_forces(k)->compute_half_forces=true;
-    for(int i=1;i<=solid_body_collection.rigid_body_collection.rigids_forces.m;i++) solid_body_collection.rigid_body_collection.rigids_forces(i)->compute_half_forces=true;
+    for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->compute_half_forces=true;
+    for(int k=0;k<solid_body_collection.deformable_body_collection.deformables_forces.m;k++) solid_body_collection.deformable_body_collection.deformables_forces(k)->compute_half_forces=true;
+    for(int i=0;i<solid_body_collection.rigid_body_collection.rigids_forces.m;i++) solid_body_collection.rigid_body_collection.rigids_forces(i)->compute_half_forces=true;
 }
 //#####################################################################
 // Function Kang_Circle
@@ -364,7 +364,7 @@ Kang_Circle(bool use_surface)
         for(int i=1;i<=front_tracked_structure->mesh.elements.m;i++){
             particle_segments(front_tracked_structure->mesh.elements(i).x).y=i;
             particle_segments(front_tracked_structure->mesh.elements(i).y).x=i;}
-        if(make_ellipse) for(int i=1;i<=particle_segments.m;i++) front_tracked_structure->particles.X(i)/=TV((T)1.1,(T).9);
+        if(make_ellipse) for(int i=0;i<particle_segments.m;i++) front_tracked_structure->particles.X(i)/=TV((T)1.1,(T).9);
         saved_tracked_particles_X=front_tracked_structure->particles.X.Prefix(particle_segments.m);
         particles.mass.Fill(2*(T)pi*object.radius*fluids_parameters.grid->dX.Max()*fluids_parameters.density/particles.mass.m/100);
 
@@ -451,7 +451,7 @@ Solid_Circle()
     SPHERE<TV> object(TV(),1);
     solids_tests.Copy_And_Add_Structure(*TESSELLATION::Tessellate_Boundary(object,solid_refinement));
     particles.mass+=(T)1/particles.mass.m;
-    if(make_ellipse) for(int i=1;i<=particles.X.m;i++) particles.X(i)*=TV((T).9,(T)1.1);
+    if(make_ellipse) for(int i=0;i<particles.X.m;i++) particles.X(i)*=TV((T).9,(T)1.1);
     if(T rand=fluids_parameters.viscosity=(T)parse_args->Get_Double_Value("-rand")){
         RANDOM_NUMBERS<T> random;
         random.Set_Seed(1234);
@@ -492,10 +492,10 @@ template<class T> void STANDARD_TESTS<T>::
 Sync_Front_Tracked_Particles_To_Level_Set()
 {
     return;
-    for(int i=1;i<=particle_segments.m;i++) Sync_Particle_To_Level_Set(i);
+    for(int i=0;i<particle_segments.m;i++) Sync_Particle_To_Level_Set(i);
 //    for(int i=1;i<=front_tracked_structure->mesh.elements.m;i++) Divide_Segment(i);
 //    for(int i=particle_segments.m;i>=1;i--) Remove_Particle(i);
-    for(int i=1;i<=particle_segments.m;i++) solid_body_collection.deformable_body_collection.particles.mass(i)=Compute_New_Mass(i);
+    for(int i=0;i<particle_segments.m;i++) solid_body_collection.deformable_body_collection.particles.mass(i)=Compute_New_Mass(i);
 }
 //#####################################################################
 // Function Divide_Segment
@@ -598,7 +598,7 @@ Copy_Front_Tracked_Velocity_From_Fluid()
     LINEAR_INTERPOLATION_MAC<TV,T> interp(*fluids_parameters.grid);
 
     ARRAY_VIEW<TV>& X=front_tracked_structure->particles.X,&V=front_tracked_structure->particles.V;
-    for(int i=1;i<=particle_segments.m;i++) V(i)=interp.Clamped_To_Array(face_velocities,X(i));
+    for(int i=0;i<particle_segments.m;i++) V(i)=interp.Clamped_To_Array(face_velocities,X(i));
 }
 //#####################################################################
 // Function Limit_Dt
@@ -652,7 +652,7 @@ template<class T> void STANDARD_TESTS<T>::
 Rebuild_Surface()
 {
     PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
-    for(int i=1;i<=number_surface_particles;i++)
+    for(int i=0;i<number_surface_particles;i++)
         particles.X(i)=TV();
 
     fluid_interpolation_entries.Remove_All();
@@ -774,7 +774,7 @@ FSI_Analytic_Test()
     PHYSBAM_ASSERT(fluids_parameters.use_slip);
     solid_body_collection.Set_CFL_Number(10);
 
-    for(int b=1;b<=2;b++){
+    for(int b=0;b<2;b++){
         Add_Thin_Shell_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(b));
         rigid_body_collection.Rigid_Body(b).is_static=true;}
 

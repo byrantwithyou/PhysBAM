@@ -48,12 +48,12 @@ void Apply_Viscosity(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> >& u,const BOUND
     z.v.Resize(faces.m);
 
     TV one_over_dX2=grid.one_over_dX*grid.one_over_dX;
-    for(int i=1;i<=faces.m;i++){
+    for(int i=0;i<faces.m;i++){
         FACE_INDEX<d> face=faces(i);
         TV X=grid.Axis_X_Face(face);
         if(!callback.Inside(X)) continue;
         T middle_value=-2*one_over_dX2.Sum();
-        for(int a=1;a<=d;a++){
+        for(int a=0;a<d;a++){
             for(int s=-1;s<=1;s+=2){
                 FACE_INDEX<d> neighbor=face;
                 neighbor.index(a)+=s;
@@ -77,7 +77,7 @@ void Apply_Viscosity(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> >& u,const BOUND
     P*=-dt*viscosity/density;
     P+=(T)1;
 
-    for(int i=1;i<=faces.m;i++) b.v(i)+=u(faces(i));
+    for(int i=0;i<faces.m;i++) b.v(i)+=u(faces(i));
 
     T_SYSTEM system(P);
     T_VECTOR system_vector;
@@ -96,7 +96,7 @@ void Apply_Viscosity(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> >& u,const BOUND
 
     if(verbose){OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("visc-x-%i.txt",solve_id).c_str()).Write("x",x);}
 
-    for(int i=1;i<=faces.m;i++) u(faces(i))=x.v(i);
+    for(int i=0;i<faces.m;i++) u(faces(i))=x.v(i);
 }
 
 template void Apply_Viscosity<double,VECTOR<double,1>,1>(GRID<VECTOR<double,1> > const&,ARRAY<double,FACE_INDEX<1> >&,const BOUNDARY_CONDITIONS<VECTOR<double,1> >&,double,double,double,double,int,

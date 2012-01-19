@@ -232,7 +232,7 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
     for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
         TV X=iterator.Location();
         initial_phi=1;
-        for(int s=1;s<=sources.m;s++) initial_phi=min(initial_phi,sources(s).Signed_Distance(world_to_source(s).Homogeneous_Times(X)));
+        for(int s=0;s<sources.m;s++) initial_phi=min(initial_phi,sources(s).Signed_Distance(world_to_source(s).Homogeneous_Times(X)));
         phi(iterator.Cell_Index())=initial_phi;}
 }
 //#####################################################################
@@ -263,11 +263,11 @@ void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
 {
-    for(int s=1;s<=sources.m;s++)Adjust_Phi_With_Source(sources(s),world_to_source(s));
+    for(int s=0;s<sources.m;s++)Adjust_Phi_With_Source(sources(s),world_to_source(s));
     T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES& removed_positive_particles=fluids_parameters.particle_levelset_evolution->particle_levelset.removed_positive_particles;
     GRID<TV>& grid=*fluids_parameters.grid;
 
-    for(int s=1;s<=sources.m;s++){
+    for(int s=0;s<sources.m;s++){
         for(NODE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();
             if(!removed_positive_particles(block)) continue;
             for(int p=1;p<=removed_positive_particles(block)->array_collection->Size();p++)
@@ -281,14 +281,14 @@ bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
 void Get_Source_Reseed_Mask(ARRAY<bool,VECTOR<int,2> >*& cell_centered_mask,const T time) PHYSBAM_OVERRIDE
 {
     bool first=true;
-    for(int s=1;s<=sources.m;s++){Get_Source_Reseed_Mask(sources(s),world_to_source(s),cell_centered_mask,first);first=false;}
+    for(int s=0;s<sources.m;s++){Get_Source_Reseed_Mask(sources(s),world_to_source(s),cell_centered_mask,first);first=false;}
 }
 //#####################################################################
 // Function Get_Source_Velocities
 //#####################################################################
 void Get_Source_Velocities(const T time) PHYSBAM_OVERRIDE
 {
-    for(int s=1;s<=sources.m;s++)Get_Source_Velocities(sources(s),world_to_source(s),sources_velocity(s));
+    for(int s=0;s<sources.m;s++)Get_Source_Velocities(sources(s),world_to_source(s),sources_velocity(s));
 }
 //#####################################################################
 // Function Set_Kinematic_Positions
@@ -309,7 +309,7 @@ bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) PHYSBA
 //#####################################################################
 void Limit_Dt(T& dt,const T time) PHYSBAM_OVERRIDE
 {
-    for(int s=1;s<=sources.m;s++) dt=min(dt,fluids_parameters.cfl*fluids_parameters.grid->min_dX/sources_velocity(s).Magnitude());
+    for(int s=0;s<sources.m;s++) dt=min(dt,fluids_parameters.cfl*fluids_parameters.grid->min_dX/sources_velocity(s).Magnitude());
 }
 //#####################################################################
 // Function Initialize_SPH_Particles
@@ -347,7 +347,7 @@ void Add_SPH_Particles_For_Sources(const ARRAY<ORIENTED_BOX<TV> > &sph_sources,c
 {
     GRID<TV> & grid=fluids_parameters.particle_levelset_evolution->grid;
     ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,VECTOR<int,2> >& removed_negative_particles=fluids_parameters.particle_levelset_evolution->particle_levelset.removed_negative_particles;
-    for(int s=1;s<=sph_sources.m;s++){
+    for(int s=0;s<sph_sources.m;s++){
         BOX<TV> source_bounding_box=sph_sources_bounding_box(s);
         RANGE<TV_INT> source_bounding_box_int=RANGE<TV_INT>(grid.Block_Index(TV(source_bounding_box.min_corner.x,source_bounding_box.min_corner.y),1),
                 grid.Block_Index(TV(source_bounding_box.max_corner.x,source_bounding_box.max_corner.y),1));

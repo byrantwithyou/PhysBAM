@@ -249,7 +249,7 @@ bool Get_Solid_Source_Velocities(ARRAY<int>& deformable_simplices,ARRAY<T>& defo
         else if ((int)time%4==0) force_magnitude*=-1;
         else force_magnitude=0;
         if(use_deformable){
-            //for(int i=1;i<=301;i++){deformable_simplices.Append(i);deformable_simplex_forces.Append(force_magnitude);}
+            //for(int i=0;i<301;i++){deformable_simplices.Append(i);deformable_simplex_forces.Append(force_magnitude);}
             deformable_simplices.Append(66);
             deformable_simplices.Append(68);
             deformable_simplices.Append(72);
@@ -619,14 +619,14 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             else{
                 ARRAY<int> tets;const T tolerance=(T)1e-4;
                 ARRAY<int> surface_particles;surface->mesh.elements.Flattened().Get_Unique(surface_particles);
-                for(int i=1;i<=surface_particles.m;i++){int p=surface_particles(i);
+                for(int i=0;i<surface_particles.m;i++){int p=surface_particles(i);
                     tets.Remove_All();volume->hierarchy->Intersection_List(particles.X(p),tets,tolerance);bool got_bind=false;
-                    for(int tt=1;tt<=tets.m;tt++){int t=tets(tt);
+                    for(int tt=0;tt<tets.m;tt++){int t=tets(tt);
                         VECTOR<T,3> bary=TRIANGLE_2D<T>::Barycentric_Coordinates(particles.X(p),particles.X.Subset(volume->mesh.elements(t)));
                         if(bary.x>-tolerance && bary.y>-tolerance && bary.z>-tolerance && bary.x+bary.y+bary.z<(T)1+tolerance){bindings.Append(TRIPLE<int,int,VECTOR<T,3> >(p,t,bary));got_bind=true;break;}}
                     if(!got_bind){LOG::cout<<"no binding on particle "<<p<<std::endl;bindings.Append(TRIPLE<int,int,VECTOR<T,3> >(p,0,VECTOR<T,3>(0,0,0)));}}
                 FILE_UTILITIES::Write_To_File(stream_type,data_directory+STRING_UTILITIES::string_sprintf("/bindings_2d_%d",test_number),bindings);}
-            for(int i=1;i<=bindings.m;i++){
+            for(int i=0;i<bindings.m;i++){
                 if(bindings(i).y==0) continue;
                 VECTOR<int,3> nodes=volume->mesh.elements(bindings(i).y);
                 binding_list.Add_Binding(new LINEAR_BINDING<TV,3>(particles,bindings(i).x,nodes,bindings(i).z));
@@ -661,7 +661,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         LOG::cout<<"M_DEBUG volume number "<<volume->Get_Boundary_Object().mesh.elements.m<<std::endl;
 
         referenced_particles=new ARRAY<int>();source_particles=new ARRAY<int>();
-        //for(int i=1;i<=particle_array.m;i++){
+        //for(int i=0;i<particle_array.m;i++){
         for(int i=1;i<=particles.array_collection->Size();i++){
             referenced_particles->Append(i);
             for(int j=1;j<=source_rigid_particles->m;j++) if(solid_body_collection.rigid_body_collection.Rigid_Body((*source_rigid_particles)(j)).implicit_object->Inside(particles.X(i))) source_particles->Append(i);

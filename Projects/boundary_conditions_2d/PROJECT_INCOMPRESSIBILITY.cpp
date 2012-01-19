@@ -43,7 +43,7 @@ void Project_Incompressibility(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> >& u,c
         VECTOR<TV,2> X;
         VECTOR<bool,2> inside;
         T dxi=grid.one_over_dX(it.Axis());
-        for(int i=1;i<=2;i++){
+        for(int i=0;i<2;i++){
             cell(i)=face.Cell_Index(i);
             X(i)=grid.X(cell(i));
             inside(i)=callback.Inside(X(i));
@@ -71,7 +71,7 @@ void Project_Incompressibility(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> >& u,c
         PHYSBAM_FATAL_ERROR();}
     system.gradient.Sort_Entries();
     system.beta_inverse.Resize(beta_inverse.m);
-    for(int i=1;i<=beta_inverse.m;i++) system.beta_inverse(i)=beta_inverse(i)/density;
+    for(int i=0;i<beta_inverse.m;i++) system.beta_inverse(i)=beta_inverse(i)/density;
     system.Initialize();
     if(neumann_pocket){
         system.projections.Append(VECTOR_ND<T>());
@@ -88,12 +88,12 @@ void Project_Incompressibility(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> >& u,c
     z.v.Resize(index_to_cell.m);
 
     VECTOR_ND<T> temp(index_to_face.m);
-    for(int i=1;i<=index_to_face.m;i++) temp(i)=u(index_to_face(i));
+    for(int i=0;i<index_to_face.m;i++) temp(i)=u(index_to_face(i));
     system.gradient.Transpose_Times(temp,b.v);
     b.v-=rhs; // rhs set up based on a negative definite Poisson system.
 
     ARRAY<T,TV_INT> p(grid.Domain_Indices());
-    for(int i=1;i<=index_to_cell.m;i++) p(index_to_cell(i))=b.v(i);
+    for(int i=0;i<index_to_cell.m;i++) p(index_to_cell(i))=b.v(i);
     ai.Print("DIVERGENCE",p);
 
     static int solve_id=0;solve_id++;
@@ -110,14 +110,14 @@ void Project_Incompressibility(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> >& u,c
 
     if(verbose){OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("proj-x-%i.txt",solve_id).c_str()).Write("x",x);}
 
-    for(int i=1;i<=index_to_cell.m;i++) p(index_to_cell(i))=x.v(i);
+    for(int i=0;i<index_to_cell.m;i++) p(index_to_cell(i))=x.v(i);
     if(neumann_pocket) p.Subset(ai.cell_samples)-=p.Subset(ai.cell_samples).Average();
     ai.Print("PRESSURE",p);
 
     system.gradient.Times(x.v,temp);
     temp*=system.beta_inverse;
 
-    for(int i=1;i<=index_to_face.m;i++) u(index_to_face(i))-=temp(i);
+    for(int i=0;i<index_to_face.m;i++) u(index_to_face(i))-=temp(i);
 }
 
 template void Project_Incompressibility<double,VECTOR<double,1>,1>(GRID<VECTOR<double,1> > const&,ARRAY<double,FACE_INDEX<1> >&,const BOUNDARY_CONDITIONS<VECTOR<double,1> >&,

@@ -29,7 +29,7 @@ template<class TV> void BINDING<TV>::
 Add_Dependencies(SEGMENT_MESH& dependency_mesh) const
 {
     const ARRAY<int> parents=Parents();
-    for(int i=1;i<=parents.m;i++) dependency_mesh.Add_Element_If_Not_Already_There(VECTOR<int,2>(parents(i),particle_index));
+    for(int i=0;i<parents.m;i++) dependency_mesh.Add_Element_If_Not_Already_There(VECTOR<int,2>(parents(i),particle_index));
 }
 //#####################################################################
 // Function Create_From_Name

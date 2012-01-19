@@ -139,7 +139,7 @@ Setup_Boundary_Conditions(const T_FACE_ARRAYS_SCALAR& face_velocities)
             psi_N(face_axis,face_grid.First_Face_Index_In_Cell(face_axis,cell_index))=psi_N(face_axis,face_grid.Second_Face_Index_In_Cell(face_axis,cell_index))=true;}}
 
     // do the same for the sides tangential to the axis being iterated over
-    for(int grid_axis=1;grid_axis<=T_GRID::dimension;grid_axis++)if(grid_axis!=axis)for(int side=1;side<=2;side++){
+    for(int grid_axis=1;grid_axis<=T_GRID::dimension;grid_axis++)if(grid_axis!=axis)for(int side=0;side<2;side++){
         for(CELL_ITERATOR iterator(face_grid,1,T_GRID::GHOST_REGION,2*(grid_axis-1)+side);iterator.Valid();iterator.Next()){
             TV_INT cell_index=iterator.Cell_Index(),p_face_index=cell_index;
             TV_INT p_cell_index_1,p_cell_index_2;T_GRID::Cells_Touching_Face(axis,p_face_index,p_cell_index_1,p_cell_index_2);

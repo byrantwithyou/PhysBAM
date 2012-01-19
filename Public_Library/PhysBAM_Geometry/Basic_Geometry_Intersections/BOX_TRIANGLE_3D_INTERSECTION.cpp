@@ -23,7 +23,7 @@ template<class T> bool Intersects(const RANGE<VECTOR<T,3> >& box,const TRIANGLE_
     TV sum(cp.Sum()),minsum=TV::Componentwise_Min(sum,TV()),maxsum=TV::Componentwise_Max(sum,TV());
     VECTOR<TV,3> diff=abs(VECTOR<TV,3>(x1-x2,x2-x3,x3-x1));
 
-    for(int i=1;i<=3;i++) for(int j=1;j<=3;j++){int k=j+1-3*(j==3),m=6-k-j;
+    for(int i=0;i<3;i++) for(int j=0;j<3;j++){int k=j+1-3*(j==3),m=6-k-j;
         T r=h(k)*diff(i)(m)+h(m)*diff(i)(k);if(minsum(j)-cp(i)(j)>r || maxsum(j)-cp(i)(j)<-r) return false;}
 
     if(!box.Intersection(triangle.Bounding_Box(),thickness_over_two)) return false;

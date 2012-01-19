@@ -331,7 +331,7 @@ Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,int axis,T dt,bool 
         if(index1 && index2) helper.data.Append(TRIPLE<int,int,T>(index2,index1,-A));
         if(index2) helper.data.Append(TRIPLE<int,int,T>(index2,index2,A));}
 
-    if(implicit) for(int i=1;i<=r.v.n;i++) helper.data.Append(TRIPLE<int,int,T>(i,i,r.v(i)));
+    if(implicit) for(int i=0;i<r.v.n;i++) helper.data.Append(TRIPLE<int,int,T>(i,i,r.v(i)));
 
     SPARSE_MATRIX_FLAT_NXN<T> matrix;
     helper.Compact();

@@ -129,14 +129,14 @@ void Initialize_Phi()
 
     if(test_number==1){
         CIRCLE<T> circle(VECTOR_2D<T>(.1,.7),.1);
-        for(int i=1;i<=grid.m;i++)for(int j=1;j<=grid.n;j++)phi(i,j)=circle.Signed_Distance(grid.X(i,j));}
+        for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++)phi(i,j)=circle.Signed_Distance(grid.X(i,j));}
     else if(test_number==2){
-        for(int i=1;i<=grid.m;i++)for(int j=1;j<=grid.n;j++)phi(i,j)=grid.y(j)-(T).400235234;}
+        for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++)phi(i,j)=grid.y(j)-(T).400235234;}
     else if(test_number==3){
-        for(int i=1;i<=grid.m;i++)for(int j=1;j<=grid.n;j++)phi(i,j)=grid.y(j)-(T).400235234;}
+        for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++)phi(i,j)=grid.y(j)-(T).400235234;}
     else if(test_number==4){
         CIRCLE<T> circle(VECTOR_2D<T>((T).5,(T).6),.15);
-        for(int i=1;i<=grid.m;i++)for(int j=1;j<=grid.n;j++)
+        for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++)
             phi(i,j)=min(circle.Signed_Distance(fluids_parameters.grid.X(i,j)),grid.y(j)-(T).31);}
 }
 //#####################################################################
@@ -228,9 +228,9 @@ void Average_Face_Velocities_To_Nodes()
     ARRAY<VECTOR_2D<T> ,VECTOR<int,2> >::put(V,V_ghost);
     ARRAY<VECTOR_2D<T> ,VECTOR<int,2> >::copy(VECTOR_2D<T>(0,0),V);ARRAY<VECTOR_2D<char> ,VECTOR<int,2> > count(grid);
     
-    for(int i=1;i<=u_grid.m;i++) for(int j=1;j<=u_grid.n;j++) if(!psi_N_u(i,j) && !(psi_D(i,j)&&psi_D(i-1,j))){V(i,j).x+=u(i,j);V(i,j+1).x+=u(i,j);count(i,j).x++;count(i,j+1).x++;}
-    for(int i=1;i<=v_grid.m;i++) for(int j=1;j<=v_grid.n;j++) if(!psi_N_v(i,j) && !(psi_D(i,j)&&psi_D(i,j-1))){V(i,j).y+=v(i,j);V(i+1,j).y+=v(i,j);count(i,j).y++;count(i+1,j).y++;}
-    for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++){
+    for(int i=0;i<u_grid.m;i++) for(int j=0;j<u_grid.n;j++) if(!psi_N_u(i,j) && !(psi_D(i,j)&&psi_D(i-1,j))){V(i,j).x+=u(i,j);V(i,j+1).x+=u(i,j);count(i,j).x++;count(i,j+1).x++;}
+    for(int i=0;i<v_grid.m;i++) for(int j=0;j<v_grid.n;j++) if(!psi_N_v(i,j) && !(psi_D(i,j)&&psi_D(i,j-1))){V(i,j).y+=v(i,j);V(i+1,j).y+=v(i,j);count(i,j).y++;count(i+1,j).y++;}
+    for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++){
         if(count(i,j).x>0) V(i,j).x/=(T)count(i,j).x;else V(i,j).x=0;//V_ghost(i,j).x;
         if(count(i,j).y>0) V(i,j).y/=(T)count(i,j).y;else V(i,j).y=0;/*V_ghost(i,j).y;*/}
 

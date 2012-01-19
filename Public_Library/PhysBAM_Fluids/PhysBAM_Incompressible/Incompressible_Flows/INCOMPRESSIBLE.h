@@ -125,11 +125,11 @@ public:
 
     void Set_Viscosity(const ARRAY<T>& viscosities_input)
     {viscosities=viscosities_input;
-    nonzero_viscosity=false;for(int i=1;i<=viscosities.m;i++) if(viscosities(i)!=0){nonzero_viscosity=true;break;}}
+    nonzero_viscosity=false;for(int i=0;i<viscosities.m;i++) if(viscosities(i)!=0){nonzero_viscosity=true;break;}}
 
     void Set_Surface_Tension(const ARRAY<T,VECTOR<int,2> >& surface_tensions_input)
     {surface_tensions=surface_tensions_input;
-    nonzero_surface_tension=false;for(int j=1;j<=surface_tensions.counts.x;j++) if(surface_tensions(1,j)!=0){nonzero_surface_tension=true;break;}}
+    nonzero_surface_tension=false;for(int j=0;j<surface_tensions.counts.x;j++) if(surface_tensions(1,j)!=0){nonzero_surface_tension=true;break;}}
 
     void Set_Vorticity_Confinement(const ARRAY<T> vorticity_confinements_input)
     {vorticity_confinements=vorticity_confinements_input;}

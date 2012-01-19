@@ -125,7 +125,7 @@ public:
 
     MATRIX_MXN<T> operator*(const MATRIX_MXN<T>& A) const
     {assert(A.Rows()==2);MATRIX_MXN<T> M(2,A.Columns());
-    for(int j=1;j<=A.Columns();j++) for(int k=1;k<=2;k++) for(int i=0;i<k;i++) M(i,j)+=(*this)(i,k)*A(k,j);return M;}
+    for(int j=1;j<=A.Columns();j++) for(int k=0;k<2;k++) for(int i=0;i<k;i++) M(i,j)+=(*this)(i,k)*A(k,j);return M;}
 
     MATRIX<T,2,3> Times_Transpose(const MATRIX<T,3,2>& A) const
     {return MATRIX<T,2,3>(x11*A.x[0]+x12*A.x[3],x22*A.x[3],x11*A.x[1]+x12*A.x[4],x22*A.x[4],x11*A.x[2]+x12*A.x[5],x22*A.x[5]);}

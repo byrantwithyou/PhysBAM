@@ -52,7 +52,7 @@ Read(const std::string& filename,ARRAY<VECTOR<T,3> ,VECTOR<int,2> >& image)
     image.Resize(1,cinfo.output_width,1,cinfo.output_height,false,false);
     while(cinfo.output_scanline<cinfo.output_height){
         jpeg_read_scanlines(&cinfo,row_pointer,1);int index=0;
-        for(int i=1;i<=image.counts.x;i++){
+        for(int i=0;i<image.counts.x;i++){
             unsigned char r=row[index++],g=row[index++],b=row[index++];
             image(i,image.counts.y-cinfo.output_scanline+1)=IMAGE<T>::Byte_Color_To_Scalar_Color(VECTOR<unsigned char,3>(r,g,b));}}
     jpeg_finish_decompress(&cinfo);jpeg_destroy_decompress(&cinfo);delete[] row;
@@ -82,7 +82,7 @@ Write(const std::string& filename,const ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& imag
     int row_stride=cinfo.image_width*3; // JSAMPLEs per row in image_buffer
     JSAMPLE* row=new unsigned char[row_stride];JSAMPROW row_pointer[]={row};
     while(cinfo.next_scanline < cinfo.image_height){
-        int index=0;for(int i=1;i<=image.counts.x;i++){VECTOR<unsigned char,d> pixel=IMAGE<T>::Scalar_Color_To_Byte_Color(image(i,image.counts.y-cinfo.next_scanline));row[index++]=pixel[1];row[index++]=pixel[2];row[index++]=pixel[3];} // copy row
+        int index=0;for(int i=0;i<image.counts.x;i++){VECTOR<unsigned char,d> pixel=IMAGE<T>::Scalar_Color_To_Byte_Color(image(i,image.counts.y-cinfo.next_scanline));row[index++]=pixel[1];row[index++]=pixel[2];row[index++]=pixel[3];} // copy row
         jpeg_write_scanlines(&cinfo,row_pointer,1);}
     delete[] row;
     jpeg_finish_compress(&cinfo);

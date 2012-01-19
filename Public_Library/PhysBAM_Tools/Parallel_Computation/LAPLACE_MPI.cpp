@@ -49,7 +49,7 @@ Synchronize_Solution_Regions()
     // allocate communicators for each color
     ARRAY<MPI::Group> new_groups(filled_region_ranks.m);
     ARRAY<MPI::Intracomm> new_communicators(filled_region_ranks.m);
-    for(int color=1;color<=filled_region_ranks.m;color++){
+    for(int color=0;color<filled_region_ranks.m;color++){
         new_groups(color)=mpi_grid->group->Incl(filled_region_ranks(color).m,&filled_region_ranks(color)(1));
         int i;
         for(i=1;i<=groups->m;i++)if((*groups)(i)!=MPI::GROUP_NULL && MPI::Group::Compare((*groups)(i),new_groups(color))==MPI::IDENT){
@@ -60,7 +60,7 @@ Synchronize_Solution_Regions()
 
     // allocate partitions and compute neighbor ranks
     partitions.Resize(filled_region_ranks.m);
-    for(int color=1;color<=filled_region_ranks.m;color++){
+    for(int color=0;color<filled_region_ranks.m;color++){
         partitions(color).Set_Number_Of_Sides(T_PARALLEL_GRID::number_of_faces_per_cell);
         for(int s=1;s<=T_PARALLEL_GRID::number_of_faces_per_cell;s++){
             int global_rank=mpi_grid->side_neighbor_ranks(s);

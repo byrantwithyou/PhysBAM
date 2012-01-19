@@ -24,7 +24,7 @@ Print_Mass(std::string& input_directory,GRID<TV>& grid,int frame)
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::dimension> TV_INT;
     
-    if(frame==-1){int last_frame=0;FILE_UTILITIES::Read_From_Text_File(input_directory+"/common/last_frame",last_frame);for(int i=1;i<=last_frame;i++) Print_Mass(input_directory,grid,i);return;}
+    if(frame==-1){int last_frame=0;FILE_UTILITIES::Read_From_Text_File(input_directory+"/common/last_frame",last_frame);for(int i=0;i<last_frame;i++) Print_Mass(input_directory,grid,i);return;}
     std::string f=STRING_UTILITIES::string_sprintf("%d/",frame);
     T total_density=0;ARRAY<T,TV_INT> density;FILE_UTILITIES::Read_From_File<T>(input_directory+"/"+f+"/density",density);
     for(typename GRID<TV>::CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
@@ -39,7 +39,7 @@ Print_Momentum(std::string& input_directory,GRID<TV>& grid,int frame)
 {
     typedef typename TV::SCALAR T;
     
-    if(frame==-1){int last_frame=0;FILE_UTILITIES::Read_From_Text_File(input_directory+"/common/last_frame",last_frame);for(int i=1;i<=last_frame;i++) Print_Momentum(input_directory,grid,i);return;}
+    if(frame==-1){int last_frame=0;FILE_UTILITIES::Read_From_Text_File(input_directory+"/common/last_frame",last_frame);for(int i=0;i<last_frame;i++) Print_Momentum(input_directory,grid,i);return;}
     std::string f=STRING_UTILITIES::string_sprintf("%d/",frame);
     T total_l=0;ARRAY<T,FACE_INDEX<TV::dimension> > u;FILE_UTILITIES::Read_From_File<T>(input_directory+"/"+f+"/mac_velocities",u);
     for(typename GRID<TV>::FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
@@ -54,7 +54,7 @@ Print_Energy(std::string& input_directory,GRID<TV>& grid,int frame)
 {
     typedef typename TV::SCALAR T;
     
-    if(frame==-1){int last_frame=0;FILE_UTILITIES::Read_From_Text_File(input_directory+"/common/last_frame",last_frame);for(int i=1;i<=last_frame;i++) Print_Energy(input_directory,grid,i);return;}
+    if(frame==-1){int last_frame=0;FILE_UTILITIES::Read_From_Text_File(input_directory+"/common/last_frame",last_frame);for(int i=0;i<last_frame;i++) Print_Energy(input_directory,grid,i);return;}
     std::string f=STRING_UTILITIES::string_sprintf("%d/",frame);
     std::string filename=input_directory+"/%d/kinetic_energy";
     T total_k=0;ARRAY<T,FACE_INDEX<TV::dimension> > u;bool kinetic=false;

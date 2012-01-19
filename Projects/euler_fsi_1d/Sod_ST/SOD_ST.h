@@ -296,7 +296,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         tests.Set_Mass_Of_Particles(segmented_curve,solid_mass/segmented_curve.Total_Size(),false);
         
         // correct number nodes
-        for(int i=1;i<=solid_body_collection.deformable_body_collection.deformable_geometry.structures.m;i++) solid_body_collection.deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+        for(int i=0;i<solid_body_collection.deformable_body_collection.deformable_geometry.structures.m;i++) solid_body_collection.deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
         // correct mass
         solid_body_collection.deformable_body_collection.particles.Compute_Auxiliary_Attributes(solid_body_collection.deformable_body_collection.soft_bindings);
@@ -305,7 +305,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
         POINT_SIMPLICES_1D<T>& point_simplices_1d=segmented_curve.Get_Boundary_Object();
 
-        for(int i=1;i<=point_simplices_1d.mesh.elements.m;i++){
+        for(int i=0;i<point_simplices_1d.mesh.elements.m;i++){
             LOG::cout<<"element "<<i<<"="<<point_simplices_1d.mesh.elements(i)<<", direction="<<point_simplices_1d.mesh.directions(i)<<std::endl;}
         LOG::cout<<"mass="<<solid_body_collection.deformable_body_collection.particles.mass<<std::endl;
 
@@ -346,7 +346,7 @@ void Initialize_Euler_State() PHYSBAM_OVERRIDE
     if(transition_to_incompressible) fluids_parameters.euler->euler_projection.use_neumann_condition_for_outflow_boundaries=false;
     //initialize grid variables
     //1 == density, 2 == momentum, 3 == total energy
-    for(int i=1;i<=grid.counts.x;i++){
+    for(int i=0;i<grid.counts.x;i++){
         T rho=0.,u=0.,p=0.;
         if(grid.Axis_X(i,1) <= middle_state_start_point){rho=state_left(1);u=state_left(2);p=state_left(3);}
         else if(grid.Axis_X(i,1) <= right_state_start_point){rho=state_middle(1);u=state_middle(2);p=state_middle(3);}

@@ -75,7 +75,7 @@ Reinitialize(const bool force,const bool read_geometry)
                 PHYSBAM_FATAL_ERROR("Cannot read doubles");
 #endif
         }
-        if(has_init_destroy_information) for(int i=1;i<=needs_destroy.m;i++) Destroy_Geometry(needs_destroy(i));
+        if(has_init_destroy_information) for(int i=0;i<needs_destroy.m;i++) Destroy_Geometry(needs_destroy(i));
 
         int max_number_of_bodies(max(opengl_point_simplices.Size(),rigid_geometry_collection->particles.array_collection->Size()));
         // only enlarge array as we read in more geometry to memory
@@ -85,7 +85,7 @@ Reinitialize(const bool force,const bool read_geometry)
         use_object_bounding_box.Resize(max_number_of_bodies);use_object_bounding_box.Fill(true);
 
         // Initialize bodies which have become active
-        if(has_init_destroy_information) for(int i=1;i<=needs_init.m;i++){
+        if(has_init_destroy_information) for(int i=0;i<needs_init.m;i++){
             int id=needs_init(i);PHYSBAM_ASSERT(rigid_geometry_collection->Is_Active(id));
             Create_Geometry(id);}
         else for(int i=0;i<max_number_of_bodies;i++){if(rigid_geometry_collection->Is_Active(i)) Create_Geometry(i);} // TODO: can we figure out what bodies need_init

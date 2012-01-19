@@ -29,7 +29,7 @@ template<class T> void Print_Info(const char *filename)
     cout << "number = " << particles.number << endl;
     cout << "array_size = " << particles.array_size << endl;
     ARRAY<bool> particle_referenced(particles.array_size);
-    for(int i=1;i<=mesh.triangles.m;i++) {
+    for(int i=0;i<mesh.triangles.m;i++) {
         int node1,node2,node3;
         mesh.triangles.Get(i,node1,node2,node3);
         particle_referenced(node1)=particle_referenced(node2)=particle_referenced(node3)=true;

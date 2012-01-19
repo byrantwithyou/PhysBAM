@@ -69,7 +69,7 @@ public:
             if(strain<min_strain){min_strain=strain;edges.Remove_All();next_nodes.Remove_All();}
             edges.Append(graph->Adjacent_Edges(root)(i));
             next_nodes.Append(other_node);}}
-    for(int i=1;i<=next_nodes.m;i++) Find_Weakest_Links(next_nodes(i),min_strain,visited,edges);}
+    for(int i=0;i<next_nodes.m;i++) Find_Weakest_Links(next_nodes(i),min_strain,visited,edges);}
 
     void Compute_New_Clusters_Based_On_Unclustered_Strain()
     {parents_to_rebuild.Remove_All();
@@ -93,7 +93,7 @@ public:
                     ARRAY<int> break_connections;int root=cluster.children(edge[1]);
                     if(!visited.Contains(root)){
                         Find_Weakest_Links(root,allowed_strain_local,visited,break_connections);
-                        for(int i=1;i<=break_connections.m;i++){
+                        for(int i=0;i<break_connections.m;i++){
                             VECTOR<int,2> edge=VECTOR<int,2>(graph->Edges(break_connections(i)).x,graph->Edges(break_connections(i)).y).Sorted();
                             graph->Remove_Edge(break_connections(i));
                             for(int j=data.connections.m;j>=1;j--){
@@ -105,11 +105,11 @@ public:
         for(int i=remove_connections.m;i>=1;i--) data.connections.Remove_Index_Lazy(remove_connections(i));}}
 
     bool Create_New_Clusters()
-    {for(int i_dummy=1;i_dummy<=parents_to_rebuild.m;i_dummy++){int parent=parents_to_rebuild(i_dummy);
+    {for(int i_dummy=0;i_dummy<parents_to_rebuild.m;i_dummy++){int parent=parents_to_rebuild(i_dummy);
         FRACTURE_DATA& data=fracture_data.Get(parent);
         typename RIGID_BODY_CLUSTER_BINDINGS<TV>::CLUSTER& cluster=*bindings.reverse_bindings.Get(parent);
         UNDIRECTED_GRAPH<RIGID_CLUSTER_CONSTITUENT_ID,int> undirected(cluster.children.Size());
-        for(int i=1;i<=data.connections.m;i++) undirected.Add_Edge(data.connections(i).x,data.connections(i).y,undirected.Last_Edge()+1);
+        for(int i=0;i<data.connections.m;i++) undirected.Add_Edge(data.connections(i).x,data.connections(i).y,undirected.Last_Edge()+1);
         ARRAY<int,RIGID_CLUSTER_CONSTITUENT_ID> components;
         int number_components=undirected.Connected_Components(components);
         if(number_components==1) continue;
@@ -117,7 +117,7 @@ public:
         for(RIGID_CLUSTER_CONSTITUENT_ID i(1);i<=cluster.children.Size();i++)
             new_cluster_constituents(components(i)).Append(cluster.children(i));
         bindings.Delete_Binding(parent);
-        for(int i=1;i<=new_cluster_constituents.m;i++) if(new_cluster_constituents(i).Size()>RIGID_CLUSTER_CONSTITUENT_ID(1)) bindings.Add_Binding(new_cluster_constituents(i));}
+        for(int i=0;i<new_cluster_constituents.m;i++) if(new_cluster_constituents(i).Size()>RIGID_CLUSTER_CONSTITUENT_ID(1)) bindings.Add_Binding(new_cluster_constituents(i));}
     //for(typename HASHTABLE<int,typename RIGID_BODY_CLUSTER_BINDINGS<TV>::CLUSTER>::ITERATOR iterator(bindings.reverse_bindings);iterator.Valid();iterator.Next()){
     //    LOG::cout<<"cluster parent "<<iterator.Key()<<std::endl; 
     //    for(RIGID_CLUSTER_CONSTITUENT_ID j(1);j<=iterator.Data().children.Size();j++)

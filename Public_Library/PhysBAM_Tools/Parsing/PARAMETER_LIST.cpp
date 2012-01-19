@@ -243,7 +243,7 @@ Rename(const std::string &old_name,const std::string &new_name)
 void PARAMETER_LIST::
 Write(std::ostream& output_stream) const
 {
-    for(int i=1;i<=parameter_list.m;i++){
+    for(int i=0;i<parameter_list.m;i++){
         output_stream<<parameter_list(i).x<<" = "<<parameter_list(i).y.value_string;
         if(parameter_list(i).y.description.length()>0)
             output_stream<<" // "<<parameter_list(i).y.description;
@@ -296,11 +296,11 @@ Print_Usage() const
     if(!usage.empty())LOG::cout<<"Usage: "<<program_name<<" [-param parameterfile] "<<usage<<"\n";
     LOG::cout<<"Parameters:"<<std::endl;
     int width=0;
-    for(int i=1;i<=parameter_list.m;i++){
+    for(int i=0;i<parameter_list.m;i++){
         int len=(int)parameter_list(i).x.length()+1;
         if(parameter_list(i).y.short_name.length()>0) len+=(int)parameter_list(i).y.short_name.length()+4;
         if(len>width)width=len;}
-    for(int i=1;i<=parameter_list.m;i++){
+    for(int i=0;i<parameter_list.m;i++){
         std::string name;
         if(parameter_list(i).y.short_name.length()>0) name="-"+parameter_list(i).y.short_name+", ";
         name+="-"+parameter_list(i).x;
@@ -339,7 +339,7 @@ Parse_Commandline_Arguments(int argc,char *argv[])
 int PARAMETER_LIST::
 Find_Parameter(const std::string& name) const
 {
-    for(int i=1;i<=parameter_list.m;i++)if(parameter_list(i).x==name)return i;
+    for(int i=0;i<parameter_list.m;i++)if(parameter_list(i).x==name)return i;
     return 0;
 }
 //#####################################################################

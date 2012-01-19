@@ -37,7 +37,7 @@ Fill_Ghost_Cells(const T_GRID& grid,const T_ARRAYS_BASE& u,T_ARRAYS_BASE& u_ghos
     assert(grid.Is_MAC_Grid() && V);T_ARRAYS_BASE::Put(u,u_ghost);
     RANGE<TV_INT> domain_indices=grid.Domain_Indices();
     ARRAY<RANGE<TV_INT> > regions;Find_Ghost_Regions(grid,regions,number_of_ghost_cells); 
-    for(int axis=1;axis<=T_GRID::dimension;axis++)for(int axis_side=1;axis_side<=2;axis_side++){
+    for(int axis=1;axis<=T_GRID::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){
         int side=2*axis+axis_side-2;
         Fill_Single_Ghost_Region_Threaded(regions(side), grid, u_ghost, side);}}
 //#####################################################################

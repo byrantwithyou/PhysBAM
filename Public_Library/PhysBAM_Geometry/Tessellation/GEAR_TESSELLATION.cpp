@@ -39,7 +39,7 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(const SMOOTH_GEAR<
     ARRAY<VECTOR<T,2> > pts;
     Boundary_Points(pts, gear.g, n);
     GEOMETRY_PARTICLES<TV>& particles=surface->particles;particles.array_collection->Add_Elements(pts.m*2+2);
-    for(int i=1;i<=pts.m;i++){
+    for(int i=0;i<pts.m;i++){
         particles.X(i)=pts(i).Append(-gear.w);
         particles.X(i+pts.m)=pts(i).Append(gear.w);}
     particles.X(2*pts.m+1)=TV(0,0,-gear.w);

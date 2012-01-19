@@ -34,11 +34,11 @@ public:
     TV world_tangent,world_bitangent;
     intersection_object.Get_World_Space_Tangent_And_Bitangent(intersection_point,same_side_normal,ray.ray.aggregate_id,world_tangent,world_bitangent);
     TV accumulated_diffuse_color,accumulated_specular_color;
-    for(int light_index=1;light_index<=lights.m;light_index++){
+    for(int light_index=0;light_index<lights.m;light_index++){
         TV accumulated_diffuse_samples,accumulated_specular_samples;
         ARRAY<RAY<VECTOR<T,3> > > sample_array;
         lights(light_index)->Sample_Points(same_side_position,same_side_normal,sample_array);
-        for(int sample=1;sample<=sample_array.m;sample++){
+        for(int sample=0;sample<sample_array.m;sample++){
             RENDERING_RAY<T> ray_to_light(sample_array(sample),1,&entering_object);
             //TV light_color=world.Incident_Light(ray_to_light,*lights(light_index),ray_to_light,ray);
             TV light_color=lights(light_index)->Emitted_Light(ray_to_light);

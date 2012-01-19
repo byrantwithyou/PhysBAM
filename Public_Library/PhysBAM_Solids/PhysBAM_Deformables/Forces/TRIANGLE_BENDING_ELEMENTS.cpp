@@ -18,8 +18,8 @@ using namespace PhysBAM;
 template<class T> void TRIANGLE_BENDING_ELEMENTS<T>::
 Add_Dependencies(SEGMENT_MESH& dependency_mesh) const
 {
-    for(int q=1;q<=bending_quadruples.m;q++)
-        for(int i=1;i<=3;i++) for(int j=i+1;j<=4;j++) dependency_mesh.Add_Element_If_Not_Already_There(VECTOR<int,2>(bending_quadruples(q)[i],bending_quadruples(q)[j]));
+    for(int q=0;q<bending_quadruples.m;q++)
+        for(int i=0;i<3;i++) for(int j=i+1;j<=4;j++) dependency_mesh.Add_Element_If_Not_Already_There(VECTOR<int,2>(bending_quadruples(q)[i],bending_quadruples(q)[j]));
 }
 //#####################################################################
 // Function Update_Mpi
@@ -36,7 +36,7 @@ template<class T> void TRIANGLE_BENDING_ELEMENTS<T>::
 Set_Area_Cutoff_With_Fraction_Of_Triangles(TRIANGULATED_SURFACE<T>& triangulated_surface,const T fraction)
 {
     ARRAY<VECTOR<int,3> >& elements=triangulated_surface.mesh.elements;
-    ARRAY<T> area(elements.m);for(int t=1;t<=elements.m;t++) area(t)=triangulated_surface.Area(t);Sort(area);
+    ARRAY<T> area(elements.m);for(int t=0;t<elements.m;t++) area(t)=triangulated_surface.Area(t);Sort(area);
     area_cutoff=area(min((int)(fraction*elements.m)+1,area.m));
 }
 //#####################################################################
@@ -49,12 +49,12 @@ Set_Quadruples_From_Triangle_Mesh(TRIANGLE_MESH& mesh)
 
     // allocate proper array sizes
     int number_quadruples=0;
-    for(int t=1;t<=mesh.elements.m;t++) for(int a=1;a<=(*mesh.adjacent_elements)(t).m;a++) if((*mesh.adjacent_elements)(t)(a)>t) number_quadruples++;
+    for(int t=0;t<mesh.elements.m;t++) for(int a=1;a<=(*mesh.adjacent_elements)(t).m;a++) if((*mesh.adjacent_elements)(t)(a)>t) number_quadruples++;
     bending_quadruples.Resize(number_quadruples);bending_stiffness.Resize(number_quadruples);
     sine_half_rest_angle.Resize(number_quadruples);damping.Resize(number_quadruples);
 
     int index=0; // reset number
-    for(int t=1;t<=mesh.elements.m;t++){
+    for(int t=0;t<mesh.elements.m;t++){
         int t1,t2,t3;mesh.elements(t).Get(t1,t2,t3);
         for(int a=1;a<=(*mesh.adjacent_elements)(t).m;a++){
             int s=(*mesh.adjacent_elements)(t)(a);
@@ -73,13 +73,13 @@ Set_Quadruples_From_Reference_Triangle_Mesh(TRIANGLE_MESH& mesh,const ARRAY<int>
 
     // allocate proper array sizes
     int number_quadruples=0;
-    for(int t=1;t<=mesh.elements.m;t++) for(int a=1;a<=(*mesh.adjacent_elements)(t).m;a++)
+    for(int t=0;t<mesh.elements.m;t++) for(int a=1;a<=(*mesh.adjacent_elements)(t).m;a++)
         if(triangle_map_to_reference((*mesh.adjacent_elements)(t)(a))>triangle_map_to_reference(t)) number_quadruples++;
     bending_quadruples.Resize(number_quadruples);bending_stiffness.Resize(number_quadruples);
     sine_half_rest_angle.Resize(number_quadruples);damping.Resize(number_quadruples);
 
     int index=0; // reset number
-    for(int t=1;t<=mesh.elements.m;t++){
+    for(int t=0;t<mesh.elements.m;t++){
         int t1,t2,t3;mesh.elements(t).Get(t1,t2,t3);
         for(int a=1;a<=(*mesh.adjacent_elements)(t).m;a++){
             int s=(*mesh.adjacent_elements)(t)(a);
@@ -94,7 +94,7 @@ Set_Quadruples_From_Reference_Triangle_Mesh(TRIANGLE_MESH& mesh,const ARRAY<int>
 template<class T> void TRIANGLE_BENDING_ELEMENTS<T>::
 Set_Constants_From_Particles(const T material_stiffness,const T material_damping)
 {
-    for(int q=1;q<=bending_quadruples.m;q++){
+    for(int q=0;q<bending_quadruples.m;q++){
         int i,j,k,l;bending_quadruples(q).Get(i,j,k,l);
         TV n1=TV::Cross_Product(particles.X(i)-particles.X(j),particles.X(i)-particles.X(k)).Normalized(),
             n2=TV::Cross_Product(particles.X(l)-particles.X(k),particles.X(l)-particles.X(j)).Normalized(),e=particles.X(k)-particles.X(j);
@@ -188,7 +188,7 @@ template<class T> T TRIANGLE_BENDING_ELEMENTS<T>::
 Compute_Discrete_Shell_Energy()
 {
     T energy=0;
-    for(int q=1;q<=bending_quadruples.m;q++){
+    for(int q=0;q<bending_quadruples.m;q++){
         int i,j,k,l;bending_quadruples(q).Get(i,j,k,l);
         TV n1=TV::Cross_Product(particles.X(i)-particles.X(j),particles.X(i)-particles.X(k)),
             n2=TV::Cross_Product(particles.X(l)-particles.X(k),particles.X(l)-particles.X(j)),
@@ -206,7 +206,7 @@ Initialize_Reference_Quantities(const int hash_multiple)
 {
     delete reference_bending_quadruples_hashtable;
     reference_bending_quadruples_hashtable=new HASHTABLE<VECTOR<int,2>,int>(hash_multiple*bending_quadruples.m);
-    for(int q=1;q<=bending_quadruples.m;q++) reference_bending_quadruples_hashtable->Insert(VECTOR<int,2>(bending_quadruples(q)(2),bending_quadruples(q)(3)),q);
+    for(int q=0;q<bending_quadruples.m;q++) reference_bending_quadruples_hashtable->Insert(VECTOR<int,2>(bending_quadruples(q)(2),bending_quadruples(q)(3)),q);
     reference_sine_half_rest_angle=new ARRAY<T>(sine_half_rest_angle);
     reference_bending_stiffness=new ARRAY<T>(bending_stiffness);
     reference_damping=new ARRAY<T>(damping);
@@ -221,7 +221,7 @@ Copy_Back_Reference_Quantities(const ARRAY<int>& node_map_to_reference)
     sine_half_rest_angle.Resize(bending_quadruples.m,false,false);
     damping.Resize(bending_quadruples.m,false,false);
     if(plastic_hardening) plastic_hardening->Resize(bending_quadruples.m,false,false);
-    for(int q=1;q<=bending_quadruples.m;q++){
+    for(int q=0;q<bending_quadruples.m;q++){
         int reference_j=node_map_to_reference(bending_quadruples(q)(2));
         int reference_k=node_map_to_reference(bending_quadruples(q)(3));
         int q_reference=0;reference_bending_quadruples_hashtable->Get(VECTOR<int,2>(reference_j,reference_k),q_reference);assert(q_reference);
@@ -250,7 +250,7 @@ Copy_Back_Save_Quantities(const ARRAY<int>& node_map_to_saved)
     for(int q=1;q<=bending_quadruples_save->m;q++) save_bending_quadruples_hashtable.Insert(VECTOR<int,2>((*bending_quadruples_save)(q)(2),(*bending_quadruples_save)(q)(3)),q);
     plastic_yield->Resize(bending_quadruples.m,false,false);
     sine_half_elastic_angle->Resize(bending_quadruples.m,false,false);
-    for(int q=1;q<=bending_quadruples.m;q++){
+    for(int q=0;q<bending_quadruples.m;q++){
         int save_j=node_map_to_saved(bending_quadruples(q)(2)),save_k=node_map_to_saved(bending_quadruples(q)(3));
         int q_save=0;save_bending_quadruples_hashtable.Get(VECTOR<int,2>(save_j,save_k),q_save);assert(q_save);
         (*plastic_yield)(q)=(*plastic_yield_save)(q_save);

@@ -48,7 +48,7 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
     GRID<TV>& grid=fluids_parameters.grid;
     VECTOR<T,3> center((T).5,(T).7,(T).5);
     T radius=(T).2;
-    for(int i=1;i<=grid.m;i++)for(int j=1;j<=grid.n;j++)for(int ij=1;ij<=grid.mn;ij++)
+    for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++)for(int ij=0;ij<grid.mn;ij++)
         fluids_parameters.particle_levelset_evolution.phi(i,j,ij)=min((grid.X(i,j,ij)-center).Magnitude()-radius, grid.y(j)-(T).21);
 }
 //#####################################################################

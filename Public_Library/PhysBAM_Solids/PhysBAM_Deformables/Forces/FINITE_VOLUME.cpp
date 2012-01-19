@@ -47,15 +47,15 @@ FINITE_VOLUME(const bool use_uniform_density_input,STRAIN_MEASURE<TV,d>& strain_
     if(use_uniform_density){
         T total_mass=0;
         ARRAY<int> mesh_particles;strain_measure.mesh_object.mesh.elements.Flattened().Get_Unique(mesh_particles);
-        for(int i=1;i<=mesh_particles.m;i++) total_mass+=particles.mass(mesh_particles(i));
+        for(int i=0;i<mesh_particles.m;i++) total_mass+=particles.mass(mesh_particles(i));
         density=total_mass/strain_measure.mesh_object.Total_Size();
         if(density==0) density=TV::dimension==1?1:TV::dimension==2?100:1000;}
     else{
         density_list=new ARRAY<T>(strain_measure.mesh_object.mesh.elements.m);
-        for(int i=1;i<=strain_measure.mesh.elements.m;i++){
+        for(int i=0;i<strain_measure.mesh.elements.m;i++){
             const VECTOR<int,d+1>& nodes=strain_measure.mesh.elements(i);
             T volume=strain_measure.mesh_object.Signed_Size(i);
-            for(int j=1;j<=nodes.m;j++) (*density_list)(i)+=particles.mass(nodes(j))/(*strain_measure.mesh.incident_elements)(nodes(j)).m/volume;
+            for(int j=0;j<nodes.m;j++) (*density_list)(i)+=particles.mass(nodes(j))/(*strain_measure.mesh.incident_elements)(nodes(j)).m/volume;
             if((*density_list)(i)==0) (*density_list)(i)=TV::dimension==1?1:TV::dimension==2?100:1000;}}
 }
 //#####################################################################
@@ -122,7 +122,7 @@ template<class TV,int d> void FINITE_VOLUME<TV,d>::
 Update_Be_Scales()
 {
     Be_scales.Resize(strain_measure.Dm_inverse.m,false,false);
-    for(int t=1;t<=Be_scales.m;t++) Be_scales(t)=-(T)1/FACTORIAL<d>::value/strain_measure.Dm_inverse(t).Determinant();
+    for(int t=0;t<Be_scales.m;t++) Be_scales(t)=-(T)1/FACTORIAL<d>::value/strain_measure.Dm_inverse(t).Determinant();
 }
 //#####################################################################
 // Function Initialize_Be_Scales_Save
@@ -213,9 +213,9 @@ Update_Position_Based_State(const T time,const bool is_position_update)
                 for(int i=2;i<=d+1;i++){dfdx(i,1)=MATRIX<T,TV::m>();for(int j=2;j<=d+1;j++) dfdx(i,1)-=dfdx(i,j);}
                 for(int j=1;j<=d+1;j++){dfdx(1,j)=MATRIX<T,TV::m>();for(int i=2;i<=d+1;i++) dfdx(1,j)-=dfdx(i,j);}
                 VECTOR<int,d+1> nodes=strain_measure.mesh.elements(t);
-                for(int v=1;v<=nodes.m;v++) (*node_stiffness)(nodes[v])+=dfdx(v,v).Symmetric_Part();
+                for(int v=0;v<nodes.m;v++) (*node_stiffness)(nodes[v])+=dfdx(v,v).Symmetric_Part();
                 VECTOR<int,d*(d+1)/2> edges=(*strain_measure.mesh.element_edges)(t);
-                for(int e=1;e<=edges.m;e++){
+                for(int e=0;e<edges.m;e++){
                     int i,j;strain_measure.mesh.segment_mesh->elements(edges[e]).Get(i,j);
                     int m=nodes.Find(i),n=nodes.Find(j);assert(m!=n);
                     (*edge_stiffness)(edges[e])+=dfdx(m,n);}}}}
@@ -235,7 +235,7 @@ Update_Position_Based_State(const T time,const bool is_position_update)
 
     if(compute_half_forces){
         sqrt_Be_scales.Resize(Be_scales.m);
-        for(int i=1;i<=Be_scales.m;i++) sqrt_Be_scales(i)=sqrt(-Be_scales(i));
+        for(int i=0;i<Be_scales.m;i++) sqrt_Be_scales(i)=sqrt(-Be_scales(i));
         int n=0;
         for(FORCE_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()) n++;
         half_force_size=constitutive_model.P_From_Strain_Rate_Forces_Size();
@@ -324,7 +324,7 @@ Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> frequency)
         T elastic_squared=constitutive_model.Maximum_Elastic_Stiffness(t)*one_over_altitude_squared_and_density*one_over_cfl_number_squared;
         T damping=constitutive_model.Maximum_Damping_Stiffness(t)*one_over_altitude_squared_and_density*one_over_cfl_number;
         const VECTOR<int,d+1>& nodes=strain_measure.mesh.elements(t);
-        for(int j=1;j<=nodes.m;j++){FREQUENCY_DATA& frequency_data=particle_frequency.Get_Or_Insert(nodes[j]);
+        for(int j=0;j<nodes.m;j++){FREQUENCY_DATA& frequency_data=particle_frequency.Get_Or_Insert(nodes[j]);
             frequency_data.elastic_squared=max(frequency_data.elastic_squared,elastic_squared);
             frequency_data.damping=max(frequency_data.damping,damping);}}
     for(typename HASHTABLE<int,FREQUENCY_DATA>::ITERATOR iterator(particle_frequency);iterator.Valid();iterator.Next()){

@@ -45,8 +45,8 @@ public:
 //#####################################################################
 void Initialize_Phi()
 {
-    for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++) phi(i,j)=minmag(grid.y(j)-(T).5+grid.dy/2,(T)sqrt(sqr(grid.x(i)-(T).5)+sqr(grid.y(j)-(T).75))-(T).125);
-//    for(int i=1;i<=m;i++) for(int j=1;j<=n;j++) phi(i,j)=grid.y(j)-.5;
+    for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++) phi(i,j)=minmag(grid.y(j)-(T).5+grid.dy/2,(T)sqrt(sqr(grid.x(i)-(T).5)+sqr(grid.y(j)-(T).75))-(T).125);
+//    for(int i=0;i<m;i++) for(int j=0;j<n;j++) phi(i,j)=grid.y(j)-.5;
 }
 /*
 //#####################################################################

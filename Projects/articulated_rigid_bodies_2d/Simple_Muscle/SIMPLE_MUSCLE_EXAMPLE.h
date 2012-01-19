@@ -67,7 +67,7 @@ public:
 // Function Output_Curves -- for debugging
 //#####################################################################
 void Output_Curve(const GRID<TV>& grid,const ARRAY<T,VECTOR<int,1> >& values,const std::string& filename)
-{std::ofstream output(filename.c_str());for(int i=1;i<=grid.m;i++) output<<grid.x(i)<<" "<<values(i)<<std::endl;}
+{std::ofstream output(filename.c_str());for(int i=0;i<grid.m;i++) output<<grid.x(i)<<" "<<values(i)<<std::endl;}
 void Output_Curves()
 {
     MUSCLE_FORCE_CURVE<T>& muscle_force_curve=arb->muscle_list->muscle_force_curve;

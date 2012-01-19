@@ -101,7 +101,7 @@ OPENGL_WORLD()
 OPENGL_WORLD::
 ~OPENGL_WORLD()
 {
-    for(int index=1;index<=key_bindings_by_category.m;index++) for(int key=1;key<=key_bindings_by_category(index).key_bindings.m;key++) delete key_bindings_by_category(index).key_bindings(key).y;
+    for(int index=0;index<key_bindings_by_category.m;index++) for(int key=1;key<=key_bindings_by_category(index).key_bindings.m;key++) delete key_bindings_by_category(index).key_bindings(key).y;
     Clear_All_Lights();
     delete window;
     delete arcball;
@@ -280,7 +280,7 @@ void OPENGL_WORLD::
 Unbind_Key(const OPENGL_KEY& key)
 {
     key_bindings(key.Index()).Remove_All();
-    for(int i=1;i<=key_bindings_by_category.m;i++)
+    for(int i=0;i<key_bindings_by_category.m;i++)
         for(int j=1;j<=key_bindings_by_category(i).key_bindings.m;j++)
             if(key_bindings_by_category(i).key_bindings(j).x==key){
                 delete key_bindings_by_category(i).key_bindings(j).y;
@@ -294,7 +294,7 @@ void OPENGL_WORLD::
 Unbind_Keys(const std::string& keys)
 {
     ARRAY<OPENGL_KEY> key_list;OPENGL_KEY::Parse_Key_Sequence(keys,key_list);
-    for(int i=1;i<=key_list.m;i++)Unbind_Key(key_list(i));
+    for(int i=0;i<key_list.m;i++)Unbind_Key(key_list(i));
 }
 //#####################################################################
 // Function Set_Idle_Callback
@@ -425,7 +425,7 @@ void OPENGL_WORLD::Render_World(bool selecting,bool swap_buffers)
     glLoadIdentity();
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambient_light.rgba);
     glEnable(GL_LIGHTING);
-    for(int i=1;i<=lights.m;i++) lights(i)->Send_To_GL_Pipeline(i-1);
+    for(int i=0;i<lights.m;i++) lights(i)->Send_To_GL_Pipeline(i-1);
 
     glTranslatef(0,0,-camera_distance);
     glMultMatrixf(arcball_matrix.x); // assumes MATRIX_4X4::x is a column-major array
@@ -520,7 +520,7 @@ void OPENGL_WORLD::Set_External_Mouse_Handler(OPENGL_MOUSE_HANDLER* mouse_handle
 void OPENGL_WORLD::Update_Clipping_Planes()
 {
 #ifndef USE_OPENGLES
-    for(int i=1;i<=clipping_planes.m;i++)
+    for(int i=0;i<clipping_planes.m;i++)
         if(clipping_planes(i)) OpenGL_Clip_Plane(GL_CLIP_PLANE0+(i-1),*clipping_planes(i));
 #endif
 }
@@ -530,7 +530,7 @@ void OPENGL_WORLD::Update_Clipping_Planes()
 GLenum OPENGL_WORLD::Add_Clipping_Plane(const PLANE<float> &plane)
 {
     int index=0;
-    for(int i=1;i<=clipping_planes.m;i++)
+    for(int i=0;i<clipping_planes.m;i++)
         if(!clipping_planes(i)){index=i;break;}
     if(index==0){
         clipping_planes.Append(new PLANE<float>(plane));
@@ -563,7 +563,7 @@ void OPENGL_WORLD::Remove_Clipping_Plane(GLenum id)
 //#####################################################################
 void OPENGL_WORLD::Remove_All_Clipping_Planes()
 {
-    for(int i=1;i<=clipping_planes.m;i++) delete clipping_planes(i);
+    for(int i=0;i<clipping_planes.m;i++) delete clipping_planes(i);
     clipping_planes.Remove_All();
 }
 //#####################################################################
@@ -873,7 +873,7 @@ Display_Auto_Help()
 {
 #ifndef USE_OPENGLES
     ARRAY<std::string> strings1,strings2;
-    for(int i=1;i<=key_bindings_by_category.m;i++){
+    for(int i=0;i<key_bindings_by_category.m;i++){
         if(key_bindings_by_category(i).key_bindings.m>0){
             strings1.Append(key_bindings_by_category(i).name+":");
             strings2.Append("");
@@ -898,7 +898,7 @@ void OPENGL_WORLD::
 Draw_Transparent_Text_Box(const ARRAY<std::string> &strings,const VECTOR<int,2> &top_left_corner,int vspace,void *font,const OPENGL_COLOR &color)
 {
 #ifndef USE_OPENGLES
-    int max_string_length=0;for(int i=1;i<=strings.m;i++) max_string_length=max(max_string_length,glutBitmapLength(font,(const unsigned char *)strings(i).c_str()));
+    int max_string_length=0;for(int i=0;i<strings.m;i++) max_string_length=max(max_string_length,glutBitmapLength(font,(const unsigned char *)strings(i).c_str()));
     int num_lines=strings.m;
     OPENGL_SHAPES::Draw_Translucent_Stripe(top_left_corner.x,top_left_corner.y,max_string_length+vspace,-(num_lines+1)*vspace,color);
 #endif
@@ -930,7 +930,7 @@ Display_Strings(const ARRAY<std::string> &strings,const OPENGL_COLOR &color,bool
 
     g_Height-=vspace;
     color.Send_To_GL_Pipeline();
-    for(int i=1;i<=strings.m;i++){
+    for(int i=0;i<strings.m;i++){
         OpenGL_String(VECTOR<float,2>(horizontal_offset,g_Height),strings(i),font);
         g_Height-=vspace;
     }
@@ -972,7 +972,7 @@ Display_Object_Names()
     glDisable(GL_LIGHTING);
     glColor3f(1,1,1);
 
-    for(int i=1;i<=object_list.m;i++)
+    for(int i=0;i<object_list.m;i++)
         if(object_list(i)->name.length() && object_list(i)->show_name)
             OpenGL_String(object_list(i)->frame->t,object_list(i)->name,GLUT_BITMAP_HELVETICA_12);
 
@@ -1233,7 +1233,7 @@ Scene_Bounding_Box()
 {
     RANGE<TV> bounding_box;
     bool first=true;
-    for(int i=1;i<=object_list.m;i++) if(use_bounding_box(i) && object_list(i)->Use_Bounding_Box()){
+    for(int i=0;i<object_list.m;i++) if(use_bounding_box(i) && object_list(i)->Use_Bounding_Box()){
         if(first){bounding_box=object_list(i)->Bounding_Box();first=false;}
         else bounding_box=RANGE<TV>::Combine(bounding_box,object_list(i)->Bounding_Box());}
     return bounding_box;

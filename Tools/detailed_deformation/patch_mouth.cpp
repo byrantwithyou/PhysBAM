@@ -115,11 +115,11 @@ int main(int argc,char *argv[])
     tet_vol.triangulated_surface->triangle_mesh.Initialize_Incident_Triangles();
 
     ARRAY<int> nodes;
-    for(int i=1;i<=(*tet_vol.triangulated_surface->triangle_mesh.boundary_mesh->connected_segments)(smallest_i).m;i++)for(int j=1;j<=2;j++)
+    for(int i=1;i<=(*tet_vol.triangulated_surface->triangle_mesh.boundary_mesh->connected_segments)(smallest_i).m;i++)for(int j=0;j<2;j++)
     nodes.Append_Unique((*tet_vol.triangulated_surface->triangle_mesh.boundary_mesh->connected_segments)(smallest_i)(j,i));
 
     cout<<"Processing nodes..."<<endl;
-    for(int i=1;i<=nodes.m;i++)for(int j=1;j<=(*tet_vol.triangulated_surface->triangle_mesh.incident_triangles)(nodes(i)).m;j++)
+    for(int i=0;i<nodes.m;i++)for(int j=1;j<=(*tet_vol.triangulated_surface->triangle_mesh.incident_triangles)(nodes(i)).m;j++)
             deletion_list.Append((*tet_vol.triangulated_surface->triangle_mesh.incident_triangles)(nodes(i))(j));
     
     cout<<"Deleting and refreshing..."<<endl;
@@ -202,16 +202,16 @@ int main(int argc,char *argv[])
 
     nodes.Clean_Memory();
     cout<<"Getting new nodes for triangle old boundary"<<endl;
-    for(int i=1;i<=old_nodes.m;i++)nodes.Append(condensation(old_nodes(i)));
+    for(int i=0;i<old_nodes.m;i++)nodes.Append(condensation(old_nodes(i)));
     int start=1,end=nodes.m;
-    for(int j=1;j<=levels;j++){
+    for(int j=0;j<levels;j++){
         for(int i=start;i<=end;i++) nodes.Append_Unique_Elements((*tri_mesh.neighbor_nodes)(nodes(i)));
         start=end;end=nodes.m;}
 
     cout<<"Smoothing geometry and colors..."<<endl; 
     ARRAY<VECTOR_3D<float> > new_positions(nodes.m);
     ARRAY<VECTOR_3D<float> > new_colors(nodes.m);
-    for(int k=1;k<=iterations;k++){
+    for(int k=0;k<iterations;k++){
         cout<<"Iteration "<<k<<endl;
         for(int i=1;i<nodes.m;i++){
             new_colors(i)=VECTOR_3D<float>();new_positions(i)=VECTOR_3D<float>();float total_weight=0;

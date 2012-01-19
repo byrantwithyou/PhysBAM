@@ -44,7 +44,7 @@ template<class T> SYMMETRIC_MATRIX_NXN<T> SYMMETRIC_MATRIX_NXN<T>::
 Outer_Product(const VECTOR_ND<T>& u)
 {
     SYMMETRIC_MATRIX_NXN<T> result(u.n);
-    for(int i=1;i<=u.n;i++) for(int j=0;j<i;j++) result(i,j)=u(i)*u(j);
+    for(int i=0;i<u.n;i++) for(int j=0;j<i;j++) result(i,j)=u(i)*u(j);
     return result;
 }
 //#####################################################################
@@ -260,7 +260,7 @@ Trace() const
 template<class T> std::ostream&
 operator<<(std::ostream& output_stream,const SYMMETRIC_MATRIX_NXN<T>& A)
 {
-    for(int i=1;i<=A.n;i++){for(int j=1;j<=A.n;j++) output_stream<<A(i,j)<<" ";output_stream<<std::endl;}
+    for(int i=0;i<A.n;i++){for(int j=0;j<A.n;j++) output_stream<<A(i,j)<<" ";output_stream<<std::endl;}
     return output_stream;
 }
 //#####################################################################

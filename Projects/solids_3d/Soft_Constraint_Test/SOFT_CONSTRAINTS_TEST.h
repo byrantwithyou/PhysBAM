@@ -80,7 +80,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     PARTICLES<T,VECTOR_3D<T> >* particles=&triangulated_surface->particles;
     triangulated_surface->triangle_mesh.Initialize_Herring_Bone_Mesh(cloth_grid.m,cloth_grid.n);
     particles->array_collection->Add_Elements(triangulated_surface->triangle_mesh.number_nodes);
-    for(int i=1;i<=cloth_grid.m;i++) for(int j=1;j<=cloth_grid.n;j++){
+    for(int i=0;i<cloth_grid.m;i++) for(int j=0;j<cloth_grid.n;j++){
         int node=i+cloth_grid.m*(j-1);particles->X(node)=transform*VECTOR_3D<T>(cloth_grid.X(i,j));particles->V(node)=VECTOR_3D<T>();}
     triangulated_surface->Set_Density(1);
     triangulated_surface->Set_Mass_Of_Particles(true);
@@ -93,7 +93,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     particles=&triangulated_surface->particles;
     triangulated_surface->triangle_mesh.Initialize_Herring_Bone_Mesh(cloth_grid.m,cloth_grid.n);
     particles->array_collection->Add_Elements(triangulated_surface->triangle_mesh.number_nodes);
-    for(int i=1;i<=cloth_grid.m;i++) for(int j=1;j<=cloth_grid.n;j++){
+    for(int i=0;i<cloth_grid.m;i++) for(int j=0;j<cloth_grid.n;j++){
         int node=i+cloth_grid.m*(j-1);particles->X(node)=transform*VECTOR_3D<T>(cloth_grid.X(i,j));particles->V(node)=VECTOR_3D<T>();}
     triangulated_surface->Set_Density(1);
     triangulated_surface->Set_Mass_Of_Particles(true);

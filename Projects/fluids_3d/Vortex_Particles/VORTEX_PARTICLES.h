@@ -85,11 +85,11 @@ void Get_Source_Velocities(const T time)
 {
     ARRAY<T,VECTOR<int,3> >& phi=fluids_parameters.particle_levelset_evolution.phi;GRID_3D<T>& p_grid=fluids_parameters.p_grid;
     ARRAY<T,VECTOR<int,3> >& p=fluids_parameters.incompressible.projection.p;
-    for(int j=1;j<=p_grid.n;j++) for(int ij=1;ij<=p_grid.mn;ij++)fluids_parameters.incompressible.projection.elliptic_solver->psi_D(1,j,ij)=0; // unset the dirichlet boundary...
-    for(int j=1;j<=fluids_parameters.u_grid.n;j++) for(int ij=1;ij<=fluids_parameters.u_grid.mn;ij++) if(!terrain_implicit->Lazy_Inside(fluids_parameters.p_grid.X(1,j,ij))) {
+    for(int j=0;j<p_grid.n;j++) for(int ij=0;ij<p_grid.mn;ij++)fluids_parameters.incompressible.projection.elliptic_solver->psi_D(1,j,ij)=0; // unset the dirichlet boundary...
+    for(int j=0;j<fluids_parameters.u_grid.n;j++) for(int ij=0;ij<fluids_parameters.u_grid.mn;ij++) if(!terrain_implicit->Lazy_Inside(fluids_parameters.p_grid.X(1,j,ij))) {
         fluids_parameters.incompressible.projection.elliptic_solver->psi_N_u(1,j,ij)=true;fluids_parameters.incompressible.projection.u(1,j,ij)=inflow;}
     // set pressure of each column of fluid on the boundary to rho g h, starting over if one or more air cells are found going down ..
-    for(int ij=1;ij<=p_grid.mn;ij++){
+    for(int ij=0;ij<p_grid.mn;ij++){
         T depth=0;T rho=1;
         for(int j=p_grid.n;j>=1;j--){
             fluids_parameters.incompressible.projection.elliptic_solver->psi_D(p_grid.m+1,j,ij)=true;
@@ -125,7 +125,7 @@ void Get_Body_Force(ARRAY<VECTOR<T,3> ,VECTOR<int,3> >& force,const T time,const
     return;
     VECTOR<T,3> cell_upper=(T).5*VECTOR<T,3>(grid.dx,grid.dy,grid.dz),cell_lower=-cell_upper;
     int i=1;
-    for(int j=1;j<=grid.n;j++) for(int ij=1;ij<=grid.mn;ij++) if(fluids_parameters.particle_levelset_evolution.phi(i,j,ij)<0)
+    for(int j=0;j<grid.n;j++) for(int ij=0;ij<grid.mn;ij++) if(fluids_parameters.particle_levelset_evolution.phi(i,j,ij)<0)
         if(random.Get_Uniform_Number((T)0,(T)1)<(T).0003){
             int particle_id=vorticity_particles.array_collection->Add_Element(); 
             vorticity_particles.X(particle_id)=grid.X(i,j,ij)+random.Get_Uniform_Vector(cell_lower,cell_upper);
@@ -138,7 +138,7 @@ void Get_Body_Force(ARRAY<VECTOR<T,3> ,VECTOR<int,3> >& force,const T time,const
 //#####################################################################
 void Initialize_Velocities()
 {
-    for(int i=1;i<=fluids_parameters.grid.m;i++) for(int j=1;j<=fluids_parameters.grid.n;j++) for(int ij=1;ij<=fluids_parameters.grid.mn;ij++) if(fluids_parameters.particle_levelset_evolution.phi(i,j,ij)<0)
+    for(int i=0;i<fluids_parameters.grid.m;i++) for(int j=0;j<fluids_parameters.grid.n;j++) for(int ij=0;ij<fluids_parameters.grid.mn;ij++) if(fluids_parameters.particle_levelset_evolution.phi(i,j,ij)<0)
         fluids_parameters.incompressible.V(i,j,ij)=VECTOR<T,3>(inflow,0,0);
 }
 //#####################################################################
@@ -147,9 +147,9 @@ void Initialize_Velocities()
 void Initialize_Phi()
 {
     GRID<TV>& grid=fluids_parameters.grid;
-//    for(int i=1;i<=grid.m;i++)for(int j=1;j<=grid.n;j++)for(int ij=1;ij<=grid.mn;ij++) fluids_parameters.particle_levelset_evolution.phi(i,j,ij)=grid.y(j)-(T).1;
-    for(int i=1;i<=grid.m;i++)for(int j=1;j<=grid.n;j++)for(int ij=1;ij<=grid.mn;ij++) fluids_parameters.particle_levelset_evolution.phi(i,j,ij)=grid.dx;;
-    for(int j=1;j<=grid.n;j++) for(int ij=1;ij<=grid.mn;ij++) if(!terrain_implicit->Lazy_Inside(grid.X(1,j,ij)) && grid.y(j) < custom_phi_boundary.inflow_height) fluids_parameters.particle_levelset_evolution.phi(1,j,ij)=-grid.dx;
+//    for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++)for(int ij=0;ij<grid.mn;ij++) fluids_parameters.particle_levelset_evolution.phi(i,j,ij)=grid.y(j)-(T).1;
+    for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++)for(int ij=0;ij<grid.mn;ij++) fluids_parameters.particle_levelset_evolution.phi(i,j,ij)=grid.dx;;
+    for(int j=0;j<grid.n;j++) for(int ij=0;ij<grid.mn;ij++) if(!terrain_implicit->Lazy_Inside(grid.X(1,j,ij)) && grid.y(j) < custom_phi_boundary.inflow_height) fluids_parameters.particle_levelset_evolution.phi(1,j,ij)=-grid.dx;
 
 }
 //#####################################################################
@@ -158,11 +158,11 @@ void Initialize_Phi()
 void Get_Object_Velocities(const T dt,const T time)
 {
     GRID<TV> &u_grid=fluids_parameters.u_grid,&v_grid=fluids_parameters.v_grid,&w_grid=fluids_parameters.w_grid;
-    for(int i=1;i<=u_grid.m;i++) for(int j=1;j<=u_grid.n;j++) for(int ij=1;ij<=u_grid.mn;ij++) if(terrain_implicit->Lazy_Inside(u_grid.X(i,j,ij))){
+    for(int i=0;i<u_grid.m;i++) for(int j=0;j<u_grid.n;j++) for(int ij=0;ij<u_grid.mn;ij++) if(terrain_implicit->Lazy_Inside(u_grid.X(i,j,ij))){
         fluids_parameters.incompressible.projection.u(i,j,ij)=0;fluids_parameters.incompressible.projection.elliptic_solver->psi_N_u(i,j,ij)=true;}
-    for(int i=1;i<=v_grid.m;i++) for(int j=1;j<=v_grid.n;j++) for(int ij=1;ij<=v_grid.mn;ij++) if(terrain_implicit->Lazy_Inside(v_grid.X(i,j,ij))){
+    for(int i=0;i<v_grid.m;i++) for(int j=0;j<v_grid.n;j++) for(int ij=0;ij<v_grid.mn;ij++) if(terrain_implicit->Lazy_Inside(v_grid.X(i,j,ij))){
         fluids_parameters.incompressible.projection.v(i,j,ij)=0;fluids_parameters.incompressible.projection.elliptic_solver->psi_N_v(i,j,ij)=true;}
-    for(int i=1;i<=w_grid.m;i++) for(int j=1;j<=w_grid.n;j++) for(int ij=1;ij<=w_grid.mn;ij++) if(terrain_implicit->Lazy_Inside(w_grid.X(i,j,ij))){
+    for(int i=0;i<w_grid.m;i++) for(int j=0;j<w_grid.n;j++) for(int ij=0;ij<w_grid.mn;ij++) if(terrain_implicit->Lazy_Inside(w_grid.X(i,j,ij))){
         fluids_parameters.incompressible.projection.w(i,j,ij)=0;fluids_parameters.incompressible.projection.elliptic_solver->psi_N_w(i,j,ij)=true;}
 }
 //#####################################################################
@@ -181,7 +181,7 @@ void Get_Source_Reseed_Mask(ARRAY<bool,VECTOR<int,3> >*& cell_centered_mask,cons
 {
     GRID<TV>& p_grid=fluids_parameters.p_grid;
     if(cell_centered_mask) delete cell_centered_mask;cell_centered_mask=new ARRAY<bool,VECTOR<int,3> >(1,p_grid.m,1,p_grid.n,1,p_grid.mn);
-    for(int j=1;j<=p_grid.n;j++) for(int ij=1;ij<=p_grid.mn;ij++)
+    for(int j=0;j<p_grid.n;j++) for(int ij=0;ij<p_grid.mn;ij++)
         (*cell_centered_mask)(1,j,ij)=(*cell_centered_mask)(2,j,ij)=true;
 }
 //#####################################################################

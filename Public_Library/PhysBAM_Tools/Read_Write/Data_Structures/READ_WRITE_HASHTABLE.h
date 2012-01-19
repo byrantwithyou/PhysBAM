@@ -28,11 +28,11 @@ public:
 
     static void Write(typename IF<IS_SAME<T,void>::value,std::ostream&,UNUSABLE>::TYPE output,const HASHTABLE<TK,T>& object) // void version
     {Write_Binary<RW>(output,object.number_of_entries);
-    for(int h=1;h<=object.table.m;h++) if(object.table(h).state==ENTRY_ACTIVE) Write_Binary<RW>(output,object.table(h).key);}
+    for(int h=0;h<object.table.m;h++) if(object.table(h).state==ENTRY_ACTIVE) Write_Binary<RW>(output,object.table(h).key);}
 
     static void Write(typename IF<IS_SAME<T,void>::value,UNUSABLE,std::ostream&>::TYPE output,const HASHTABLE<TK,T>& object) // non-void version
     {Write_Binary<RW>(output,object.number_of_entries);
-    for(int h=1;h<=object.table.m;h++) if(object.table(h).state==ENTRY_ACTIVE) Write_Binary<RW>(output,object.table(h).key,object.table(h).data);}
+    for(int h=0;h<object.table.m;h++) if(object.table(h).state==ENTRY_ACTIVE) Write_Binary<RW>(output,object.table(h).key,object.table(h).data);}
 };
 
 template<class K,class T>

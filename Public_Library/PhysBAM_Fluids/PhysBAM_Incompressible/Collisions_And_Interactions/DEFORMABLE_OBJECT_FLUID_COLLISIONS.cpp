@@ -111,13 +111,13 @@ Earliest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_t
         ARRAY<int> triangles_to_check;
         if(start_X==end_X) object.hierarchy->Intersection_List(start_X,triangles_to_check,collision_thickness);
         else object.hierarchy->Intersection_List(RANGE<TV>::Bounding_Box(start_X,end_X),triangles_to_check,collision_thickness);
-        for(int i=1;i<=triangles_to_check.m;i++){int t=triangles_to_check(i);
+        for(int i=0;i<triangles_to_check.m;i++){int t=triangles_to_check(i);
             POINT_SIMPLEX_COLLISION_TYPE collision_type=Simplex_Crossover(start_X,end_X,dt,current_hit_time,current_weights,t);
             if(collision_type!=POINT_SIMPLEX_NO_COLLISION && current_hit_time<min_time){
                 min_time=hit_time=current_hit_time;weights=current_weights;simplex_id=t;}}}
     else{
         LOG::cerr<<"Earliest_Simplex_Crossover: no triangle hierarchy"<<std::endl;
-        for(int t=1;t<=object.mesh.elements.m;t++){   
+        for(int t=0;t<object.mesh.elements.m;t++){   
             POINT_SIMPLEX_COLLISION_TYPE collision_type=Simplex_Crossover(start_X,end_X,dt,current_hit_time,current_weights,t);
             if(collision_type!=POINT_SIMPLEX_NO_COLLISION && current_hit_time<min_time){
                 min_time=hit_time=current_hit_time;weights=current_weights;simplex_id=t;}}}
@@ -136,13 +136,13 @@ Latest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_tim
         ARRAY<int> triangles_to_check;
         if(start_X==end_X) object.hierarchy->Intersection_List(start_X,triangles_to_check,collision_thickness);
         else object.hierarchy->Intersection_List(RANGE<TV>::Bounding_Box(start_X,end_X),triangles_to_check,collision_thickness);
-        for(int i=1;i<=triangles_to_check.m;i++){int t=triangles_to_check(i);
+        for(int i=0;i<triangles_to_check.m;i++){int t=triangles_to_check(i);
             POINT_SIMPLEX_COLLISION_TYPE collision_type=Simplex_Crossover(start_X,end_X,dt,current_hit_time,current_weights,t);
             if(collision_type!=POINT_SIMPLEX_NO_COLLISION && current_hit_time>max_time){
                 max_time=hit_time=current_hit_time;weights=current_weights;simplex_id=t;returned_collision_type=collision_type;}}}
     else{
         LOG::cerr<<"Latest_Simplex_Crossover: no triangle hierarchy"<<std::endl;
-        for(int t=1;t<=object.mesh.elements.m;t++){   
+        for(int t=0;t<object.mesh.elements.m;t++){   
             POINT_SIMPLEX_COLLISION_TYPE collision_type=Simplex_Crossover(start_X,end_X,dt,current_hit_time,current_weights,t);
             if(collision_type!=POINT_SIMPLEX_NO_COLLISION && current_hit_time>max_time){
                 max_time=hit_time=current_hit_time;weights=current_weights;simplex_id=t;returned_collision_type=collision_type;}}}
@@ -160,12 +160,12 @@ Any_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt) const
         ARRAY<int> triangles_to_check;
         if(start_X==end_X) object.hierarchy->Intersection_List(start_X,triangles_to_check,collision_thickness);
         else object.hierarchy->Intersection_List(RANGE<TV>::Bounding_Box(start_X,end_X),triangles_to_check,collision_thickness);
-        for(int i=1;i<=triangles_to_check.m;i++){int t=triangles_to_check(i);
+        for(int i=0;i<triangles_to_check.m;i++){int t=triangles_to_check(i);
             POINT_SIMPLEX_COLLISION_TYPE collision_type=Simplex_Crossover(start_X,end_X,dt,hit_time,weights,t);
             if(collision_type!=POINT_SIMPLEX_NO_COLLISION) return true;}}
     else{
         LOG::cerr<<"Any_Simplex_Crossover: no triangle hierarchy"<<std::endl;
-        for(int t=1;t<=object.mesh.elements.m;t++){   
+        for(int t=0;t<object.mesh.elements.m;t++){   
             POINT_SIMPLEX_COLLISION_TYPE collision_type=Simplex_Crossover(start_X,end_X,dt,hit_time,weights,t);
             if(collision_type!=POINT_SIMPLEX_NO_COLLISION) return true;}}
     return false;
@@ -177,7 +177,7 @@ template<class TV> void DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>::
 Get_Simplex_Bounding_Boxes(ARRAY<RANGE<TV> >& bounding_boxes,const bool with_body_motion,const T extra_thickness,const T body_thickness_factor) const
 {
     if(with_body_motion && !saved_states(1).x){LOG::cerr<<"No saved_state"<<std::endl;PHYSBAM_FATAL_ERROR();}
-    for(int t=1;t<=object.mesh.elements.m;t++){
+    for(int t=0;t<object.mesh.elements.m;t++){
         VECTOR<int,TV::dimension> nodes=object.mesh.elements(t);
         RANGE<TV> box=RANGE<TV>::Bounding_Box(object.particles.X.Subset(nodes));
         if(with_body_motion) box.Enlarge_Nonempty_Box_To_Include_Points(saved_states(1).x->X.Subset(nodes));

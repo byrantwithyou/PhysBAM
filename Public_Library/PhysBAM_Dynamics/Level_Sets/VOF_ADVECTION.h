@@ -272,7 +272,7 @@ public:
     return velocity_interpolation.Clamped_To_Array_Face(grid,face_velocities,location);}
 
     void Initialize_Refinement_Target_Segments(const ARRAY<int>& segments,RED_GREEN_TETRAHEDRA<T>& geometry)
-    {for(int i=1;i<=segments.m;i++) geometry.refinement_target_segments.Insert(segments(i),true);}
+    {for(int i=0;i<segments.m;i++) geometry.refinement_target_segments.Insert(segments(i),true);}
 
     void Initialize_Refinement_Target_Segments(const ARRAY<int>& segments,RED_GREEN_TRIANGLES<VECTOR<T,2> >& geometry)
     {}

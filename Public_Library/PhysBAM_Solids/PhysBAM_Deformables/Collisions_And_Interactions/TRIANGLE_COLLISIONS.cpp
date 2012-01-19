@@ -71,7 +71,7 @@ Update_Swept_Hierachies_And_Compute_Pairs(ARRAY_VIEW<TV> X,ARRAY_VIEW<TV> X_self
 {
         // Update swept hierarchies
     LOG::SCOPE scope("updating swept hierarchies","updating swept hierarchies");
-    for(int structure_index=1;structure_index<=geometry.structure_geometries.m;structure_index++){
+    for(int structure_index=0;structure_index<geometry.structure_geometries.m;structure_index++){
         STRUCTURE_INTERACTION_GEOMETRY<TV>& structure=*geometry.structure_geometries(structure_index);
         if(d==3 && structure.triangulated_surface){
             BOX_HIERARCHY<TV>& hierarchy=structure.Face_Hierarchy();
@@ -95,7 +95,7 @@ Update_Swept_Hierachies_And_Compute_Pairs(ARRAY_VIEW<TV> X,ARRAY_VIEW<TV> X_self
 
         {PARTICLE_HIERARCHY<TV,INDIRECT_ARRAY<ARRAY_VIEW<TV> > >& hierarchy=structure.particle_hierarchy;
             structure.point_modified.Resize(hierarchy.box_hierarchy.m,false,false);
-            for(int kk=1;kk<=hierarchy.leaves;kk++){
+            for(int kk=0;kk<hierarchy.leaves;kk++){
                 int p=structure.collision_particles.active_indices(kk);
                 structure.point_modified(kk)=recently_modified(p);
                 if(structure.point_modified(kk)) hierarchy.box_hierarchy(kk)=RANGE<TV>::Bounding_Box(X(p),X_self_collision_free(p));}
@@ -105,9 +105,9 @@ Update_Swept_Hierachies_And_Compute_Pairs(ARRAY_VIEW<TV> X,ARRAY_VIEW<TV> X_self
     // Compute pairs
     point_face_pairs_internal.Remove_All();edge_edge_pairs_internal.Remove_All();
     point_face_pairs_external.Remove_All();edge_edge_pairs_external.Remove_All();
-    for(int pair_i=1;pair_i<=geometry.interacting_structure_pairs.m;pair_i++){VECTOR<int,2>& pair=geometry.interacting_structure_pairs(pair_i);
+    for(int pair_i=0;pair_i<geometry.interacting_structure_pairs.m;pair_i++){VECTOR<int,2>& pair=geometry.interacting_structure_pairs(pair_i);
         if(compute_point_face_collisions){
-            for(int i=1;i<=2;i++){if(i==2 && pair[1]==pair[2]) break;
+            for(int i=0;i<2;i++){if(i==2 && pair[1]==pair[2]) break;
                 STRUCTURE_INTERACTION_GEOMETRY<TV>& structure_1=*geometry.structure_geometries(pair[i]);
                 STRUCTURE_INTERACTION_GEOMETRY<TV>& structure_2=*geometry.structure_geometries(pair[3-i]);
                 Get_Moving_Faces_Near_Moving_Points(structure_1,structure_2,point_face_pairs_internal,point_face_pairs_external,detection_thickness);}}
@@ -240,7 +240,7 @@ template<class TV> void TRIANGLE_COLLISIONS<TV>::
 Scale_And_Apply_Impulses()
 {
     // Go through the computed impulses, and compare them to the actual change in velocity seen. Scale back impulses accordingly
-    for(int i=1;i<=pf_target_impulses.m;i++){
+    for(int i=0;i<pf_target_impulses.m;i++){
         if(pf_target_impulses(i) == TV()) continue;
         const VECTOR<int,d+1>& nodes=point_face_pairs_internal(i);
         // Compute actual new relative_speed
@@ -250,7 +250,7 @@ Scale_And_Apply_Impulses()
         if(relative_speed*pf_old_speeds(i)<0){
             T new_scale=-(relative_speed-pf_old_speeds(i))/pf_old_speeds(i);
             pf_target_impulses(i)/=new_scale;}}
-    for(int i=1;i<=ee_target_impulses.m;i++){
+    for(int i=0;i<ee_target_impulses.m;i++){
         if(ee_target_impulses(i) == TV()) continue;
         const VECTOR<int,2*d-2>& nodes=edge_edge_pairs_internal(i);
         // Compute actual new relative_speed
@@ -262,12 +262,12 @@ Scale_And_Apply_Impulses()
     // Apply the newly scaled impulses
     ARRAY_VIEW<T>& one_over_mass=geometry.deformable_body_collection.particles.one_over_mass;
     ARRAY_VIEW<TV> V(geometry.deformable_body_collection.particles.V);
-    for(int i=1;i<=pf_target_impulses.m;i++){
+    for(int i=0;i<pf_target_impulses.m;i++){
         if(pf_target_impulses(i) == TV()) continue;
         const VECTOR<int,d+1>& nodes=point_face_pairs_internal(i);
         VECTOR<T,d+1> one_over_m(one_over_mass.Subset(nodes));
         for(int j=1;j<=d+1;j++) V(nodes(j))+=pf_target_weights(i)(j)*one_over_m[j]*pf_target_impulses(i);}
-    for(int i=1;i<=ee_target_impulses.m;i++){
+    for(int i=0;i<ee_target_impulses.m;i++){
         if(ee_target_impulses(i) == TV()) continue;
         const VECTOR<int,2*d-2>& nodes=edge_edge_pairs_internal(i);
         VECTOR<T,2*d-2> one_over_m(one_over_mass.Subset(nodes));
@@ -328,7 +328,7 @@ Adjust_Velocity_For_Point_Face_Collision(const T dt,const bool rigid,ARRAY<ARRAY
     final_point_face_repulsions=final_point_face_collisions=0;
     ARRAY<bool>& modified_full=geometry.modified_full;
     int collisions=0,skipping_already_rigid=0;T collision_time;
-    for(int i=1;i<=pairs.m;i++){const VECTOR<int,d+1>& nodes=pairs(i);
+    for(int i=0;i<pairs.m;i++){const VECTOR<int,d+1>& nodes=pairs(i);
         GAUSS_JACOBI_PF_DATA pf_data(pf_target_impulses(i),pf_target_weights(i),pf_normals(i),pf_old_speeds(i));
         if(rigid){VECTOR<int,d+1> node_rigid_indices(list_index.Subset(nodes));if(node_rigid_indices(1) && node_rigid_indices.Elements_Equal()){skipping_already_rigid++;continue;}}
         bool collided;
@@ -530,7 +530,7 @@ Adjust_Velocity_For_Edge_Edge_Collision(const T dt,const bool rigid,ARRAY<ARRAY<
     ARRAY<bool>& modified_full=geometry.modified_full;
     int collisions=0,skipping_already_rigid=0;T collision_time;
 
-    for(int i=1;i<=pairs.m;i++){const VECTOR<int,2*d-2>& nodes=pairs(i);
+    for(int i=0;i<pairs.m;i++){const VECTOR<int,2*d-2>& nodes=pairs(i);
         GAUSS_JACOBI_EE_DATA ee_data(ee_target_impulses(i),ee_target_weights(i),ee_normals(i),ee_old_speeds(i));
         if(rigid){VECTOR<int,2*d-2> node_rigid_indices(list_index.Subset(nodes));if(node_rigid_indices(1) && node_rigid_indices.Elements_Equal()){skipping_already_rigid++;continue;}}
         bool collided;
@@ -672,12 +672,12 @@ Add_To_Rigid_Lists(ARRAY<ARRAY<int> >& rigid_lists,ARRAY<int>& list_index,const 
     rigid_lists.Resize(rigid_lists.m+1);rigid_lists(rigid_lists.m)=nodes;
 
     // figure out which list it should be combined with
-    int add_list=rigid_lists.m;for(int i=1;i<=nodes.m;i++){int j=list_index(rigid_lists(rigid_lists.m)(i));if(j) add_list=min(add_list,j);}
+    int add_list=rigid_lists.m;for(int i=0;i<nodes.m;i++){int j=list_index(rigid_lists(rigid_lists.m)(i));if(j) add_list=min(add_list,j);}
 
     // set up a new list or combine with another
-    if(add_list == rigid_lists.m) for(int i=1;i<=nodes.m;i++) list_index(rigid_lists(rigid_lists.m)(i))=rigid_lists.m; // label as a new list
+    if(add_list == rigid_lists.m) for(int i=0;i<nodes.m;i++) list_index(rigid_lists(rigid_lists.m)(i))=rigid_lists.m; // label as a new list
     else{ // combine with a pre-existing list
-        for(int i=1;i<=nodes.m;i++){
+        for(int i=0;i<nodes.m;i++){
             int node=rigid_lists(rigid_lists.m)(i),current_list=list_index(node);
             if(!current_list){rigid_lists(add_list).Append(node);list_index(node)=add_list;} // add to the add_list
             else if(current_list != add_list){ // not already in the add_list, but in another list - combine current_list with the add_list
@@ -693,7 +693,7 @@ namespace{
 template<class T> MATRIX<T,0,0> Inertia_Tensor(const ARRAY<int>& rigid_list,const ARRAY_VIEW<T>& mass,const ARRAY<VECTOR<T,1> >& X_self_collision_free,const VECTOR<T,1>& center_of_mass)
 {
     MATRIX<T,0,0> I=MATRIX<T,0,0>();
-    for(int kk=1;kk<=rigid_list.m;kk++){int p=rigid_list(kk);
+    for(int kk=0;kk<rigid_list.m;kk++){int p=rigid_list(kk);
         VECTOR<T,1> radial_vector=X_self_collision_free(p)-center_of_mass;
         I+=mass(p)*MATRIX<T,0>();}
     return I;
@@ -701,7 +701,7 @@ template<class T> MATRIX<T,0,0> Inertia_Tensor(const ARRAY<int>& rigid_list,cons
 template<class T> MATRIX<T,1,1> Inertia_Tensor(const ARRAY<int>& rigid_list,const ARRAY_VIEW<T>& mass,const ARRAY<VECTOR<T,2> >& X_self_collision_free,const VECTOR<T,2>& center_of_mass)
 {
     MATRIX<T,1,1> I=MATRIX<T,1,1>();
-    for(int kk=1;kk<=rigid_list.m;kk++){int p=rigid_list(kk);
+    for(int kk=0;kk<rigid_list.m;kk++){int p=rigid_list(kk);
         VECTOR<T,2> radial_vector=X_self_collision_free(p)-center_of_mass;
         I+=mass(p)*MATRIX<T,1>(radial_vector.Magnitude_Squared());}
     return I;
@@ -709,7 +709,7 @@ template<class T> MATRIX<T,1,1> Inertia_Tensor(const ARRAY<int>& rigid_list,cons
 template<class T> SYMMETRIC_MATRIX<T,3> Inertia_Tensor(const ARRAY<int>& rigid_list,const ARRAY_VIEW<T>& mass,const ARRAY<VECTOR<T,3> >& X_self_collision_free,const VECTOR<T,3>& center_of_mass)
 {
     SYMMETRIC_MATRIX<T,3> I=SYMMETRIC_MATRIX<T,3>();
-    for(int kk=1;kk<=rigid_list.m;kk++){int p=rigid_list(kk);
+    for(int kk=0;kk<rigid_list.m;kk++){int p=rigid_list(kk);
         VECTOR<T,3> radial_vector=X_self_collision_free(p)-center_of_mass;
         I+=mass(p)*(radial_vector.Magnitude_Squared()-SYMMETRIC_MATRIX<T,3>::Outer_Product(radial_vector));}
     return I;
@@ -723,10 +723,10 @@ Apply_Rigid_Body_Motions(const T dt,ARRAY<ARRAY<int> >& rigid_lists)
     PARTICLES<TV>& full_particles=geometry.deformable_body_collection.particles;ARRAY<TV>& X_self_collision_free=geometry.X_self_collision_free;
     if(output_collision_results){
         LOG::cout<<"TOTAL RIGID GROUPS = "<<rigid_lists.m<<std::endl;
-        for(int list=1;list<=rigid_lists.m;list++) LOG::cout<<"LIST "<<list<<" = "<<rigid_lists(list).m<<" POINTS"<<std::endl<<rigid_lists(list);}
+        for(int list=0;list<rigid_lists.m;list++) LOG::cout<<"LIST "<<list<<" = "<<rigid_lists(list).m<<" POINTS"<<std::endl<<rigid_lists(list);}
     
     T one_over_dt=1/dt;
-    for(int list=1;list<=rigid_lists.m;list++) if(rigid_lists(list).m){
+    for(int list=0;list<rigid_lists.m;list++) if(rigid_lists(list).m){
         TV average_velocity,center_of_mass;T total_mass=0;
         for(int kk=1;kk<=rigid_lists(list).m;kk++){int p=rigid_lists(list)(kk);
             total_mass+=full_particles.mass(p);center_of_mass+=full_particles.mass(p)*X_self_collision_free(p);
@@ -763,7 +763,7 @@ Stop_Nodes_Before_Self_Collision(const T dt)
         T attempt_ratio=0; // we don't want to alter mass on subdivision case;
 
         // update swept hierarchies
-        for(int k=1;k<=geometry.structure_geometries.m;k++){ // set up swept hierarchies
+        for(int k=0;k<geometry.structure_geometries.m;k++){ // set up swept hierarchies
             STRUCTURE_INTERACTION_GEOMETRY<TV>& structure=*geometry.structure_geometries(k);
             if(d==3 && structure.triangulated_surface){
                 BOX_HIERARCHY<TV>& hierarchy=structure.Face_Hierarchy();
@@ -787,7 +787,7 @@ Stop_Nodes_Before_Self_Collision(const T dt)
             
             {PARTICLE_HIERARCHY<TV,INDIRECT_ARRAY<ARRAY_VIEW<TV> > >& hierarchy=structure.particle_hierarchy;
             structure.point_modified.Resize(hierarchy.box_hierarchy.m,false,false);
-            for(int kk=1;kk<=hierarchy.leaves;kk++){
+            for(int kk=0;kk<hierarchy.leaves;kk++){
                 int p=structure.collision_particles.active_indices(kk);
                 structure.point_modified(kk)=attempts==1 || modified_full(p);
                 if(structure.point_modified(kk)) hierarchy.box_hierarchy(kk)=RANGE<TV>::Bounding_Box(X(p),X(p)+dt*V(p));}
@@ -795,9 +795,9 @@ Stop_Nodes_Before_Self_Collision(const T dt)
 
         // compute pairs
         point_face_pairs_internal.Remove_All();edge_edge_pairs_internal.Remove_All();
-        for(int pair_i=1;pair_i<=geometry.interacting_structure_pairs.m;pair_i++){VECTOR<int,2>& pair=geometry.interacting_structure_pairs(pair_i);
+        for(int pair_i=0;pair_i<geometry.interacting_structure_pairs.m;pair_i++){VECTOR<int,2>& pair=geometry.interacting_structure_pairs(pair_i);
             if(compute_point_face_collisions){
-                for(int i=1;i<=2;i++){if(i==2 && pair[1]==pair[2]) break;
+                for(int i=0;i<2;i++){if(i==2 && pair[1]==pair[2]) break;
                     STRUCTURE_INTERACTION_GEOMETRY<TV>& structure_1=*geometry.structure_geometries(pair[i]);
                     STRUCTURE_INTERACTION_GEOMETRY<TV>& structure_2=*geometry.structure_geometries(pair[3-i]);
                     Get_Moving_Faces_Near_Moving_Points(structure_1,structure_2,point_face_pairs_internal,point_face_pairs_external,collision_thickness);}}
@@ -808,7 +808,7 @@ Stop_Nodes_Before_Self_Collision(const T dt)
         LOG::Stat("point triangle collision pairs",point_face_pairs_internal.m);
         LOG::Stat("edge edge collision pairs",edge_edge_pairs_internal.m);
 
-        for(int pair_index=1;pair_index<=point_face_pairs_internal.m;pair_index++){
+        for(int pair_index=0;pair_index<point_face_pairs_internal.m;pair_index++){
             const VECTOR<int,d+1>& nodes=point_face_pairs_internal(pair_index);
             if(already_stopped_full.Subset(nodes).Number_True()==d+1) continue;
             // TODO: this should not be X self collision free
@@ -824,7 +824,7 @@ Stop_Nodes_Before_Self_Collision(const T dt)
                 INDIRECT_ARRAY<ARRAY<bool>,VECTOR<int,d+1>&> modified_subset=modified_full.Subset(nodes);
                 modified_subset.Fill(true);}}
 
-        for(int pair_index=1;pair_index<=edge_edge_pairs_internal.m;pair_index++){
+        for(int pair_index=0;pair_index<edge_edge_pairs_internal.m;pair_index++){
             const VECTOR<int,2*d-2>& nodes=edge_edge_pairs_internal(pair_index);
             if(already_stopped_full.Subset(nodes).Number_True()==2*d-2) continue;
             TV temporary_vector;VECTOR<T,2*d-2> temporary_weights;T temp_old_speed;

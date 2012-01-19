@@ -56,10 +56,10 @@ public:
 
     void Dump_Log(FILE* output) PHYSBAM_OVERRIDE
     {fprintf(output,"%*s%-*s%8.4f\n",2*depth,"",50-2*depth,scope_identifier.c_str(),time);fflush(output);
-    for(int i=1;i<=children.m;i++) children(i)->Dump_Log(output);}
+    for(int i=0;i<children.m;i++) children(i)->Dump_Log(output);}
 
     void Dump_Names(FILE* output) PHYSBAM_OVERRIDE
-    {LOG_ENTRY::Dump_Names(output);for(int i=1;i<=children.m;i++)children(i)->Dump_Names(output);}
+    {LOG_ENTRY::Dump_Names(output);for(int i=0;i<children.m;i++)children(i)->Dump_Names(output);}
 
 //##################################################################### 
 };

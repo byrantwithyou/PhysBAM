@@ -45,7 +45,7 @@ void OPENGL_COMPONENT_DIAGNOSTICS::
 Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* selection) const
 {
     output_stream<<component_name<<":"<<std::endl;
-    for(int i=1;i<=lines.m;i++) output_stream<<"   "<<lines(i)<<std::endl;
+    for(int i=0;i<lines.m;i++) output_stream<<"   "<<lines(i)<<std::endl;
 }
 //#####################################################################
 // Reinitialize

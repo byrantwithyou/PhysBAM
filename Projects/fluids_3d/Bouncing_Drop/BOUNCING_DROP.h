@@ -48,7 +48,7 @@ void Initialize_Phi()
     //VECTOR<T,3> center((T).5,(T).7,(T).5);
     VECTOR<T,3> center((T).5,(T).5,(T).5);
     T radius=(T).2;
-    for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++) for(int ij=1;ij<=grid.mn;ij++)
+    for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++) for(int ij=0;ij<grid.mn;ij++)
         phi(i,j,ij)=(grid.X(i,j,ij)-center).Magnitude()-radius;
 }
 //#####################################################################
@@ -58,7 +58,7 @@ void Initialize_Velocities()
 {
     VECTOR<T,3> center((T).5,(T).7,(T).5);
     T scale=20;
-    for(int i=1;i<=grid.m;i++)for(int j=1;j<=grid.n;j++)for(int ij=1;ij<=grid.mn;ij++)
+    for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++)for(int ij=0;ij<grid.mn;ij++)
     //    V(i,j,ij)=scale*VECTOR<T,3>(grid.x(i)-center.x,0,0);
         V(i,j,ij)=VECTOR<T,3>(0,-scale,0);
 }

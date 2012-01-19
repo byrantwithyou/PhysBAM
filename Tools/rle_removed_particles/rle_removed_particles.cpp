@@ -60,7 +60,7 @@ Curvature_Motion(T_GRID& grid,ARRAY<T>& phi)
     int substeps=(int)ceil(1/dt_cfl);
     LOG::cout<<"substeps = "<<substeps<<std::endl;
     T dt=1/(T)substeps;
-    for(int step=1;step<=substeps;step++){
+    for(int step=0;step<substeps;step++){
         Rebuild(grid,phi,1);
         LOG::cout<<"number of cells = "<<grid.number_of_cells<<std::endl;
         levelset.Curvature_Motion(dt,0);
@@ -102,10 +102,10 @@ Process(const int frame)
     {ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*> particles_array;
     FILE_UTILITIES::Read_From_File<RW>("removed_negative_particles"+f,particles_array);
     int number_of_particles=0;
-    for(int b=1;b<=particles_array.m;b++)if(particles_array(b)) number_of_particles+=particles_array(b)->number;
+    for(int b=0;b<particles_array.m;b++)if(particles_array(b)) number_of_particles+=particles_array(b)->number;
     LOG::cout<<"particles = "<<number_of_particles<<std::endl;
     particles.Preallocate(number_of_particles);
-    for(int b=1;b<=particles_array.m;b++)if(particles_array(b)) particles.Take(*particles_array(b));
+    for(int b=0;b<particles_array.m;b++)if(particles_array(b)) particles.Take(*particles_array(b));
     particles_array.Delete_Pointers_And_Clean_Memory();}
 
     RLE_REMOVED_PARTICLE_PROCESSING<T> removed_particle_processing(particles);
@@ -121,7 +121,7 @@ Process(const int frame)
 
     LOG::Time("determining particle grid");
     {BOX<TV> particle_box=BOX<TV>::Empty_Box();
-    for(int p=1;p<=particles.number;p++)particle_box.Enlarge_To_Include_Point(particles.X(p));
+    for(int p=0;p<particles.number;p++)particle_box.Enlarge_To_Include_Point(particles.X(p));
     particle_box.Change_Size(2*water_grid.positive_bandwidth);
     GRID_3D<T> uniform_grid=GRID_3D<T>::Create_Grid_Given_Cell_Size(particle_box,water_grid.uniform_grid.dx/refinement,false);
     // shift grid to hit origin exactly (to prevent frame incoherent jittering)

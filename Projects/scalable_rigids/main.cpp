@@ -33,7 +33,7 @@ SPARSE_MATRIX_FLAT_MXN<T> Build_Smoothed_Aggregation_Interpolation(const SPARSE_
     /*ARRAY<int> coarse_set(n);
     coarse_set.Fill(-1);
     ARRAY<T> row_magnitudes(n);
-    for(int i=1;i<=n;i++)
+    for(int i=0;i<n;i++)
     {
         T row_magnitude=0;
         for(int j=A.offsets(i);j<A.offsets(i+1);j++)
@@ -62,7 +62,7 @@ SPARSE_MATRIX_FLAT_MXN<T> Build_Smoothed_Aggregation_Interpolation(const SPARSE_
 
     ARRAY<int> parent_set(n);
     parent_set.Fill(-1);
-    for(int i=1;i<=n;i++)
+    for(int i=0;i<n;i++)
     {
         T row_magnitude=0;
         for(int j=A.offsets(i);j<A.offsets(i+1);j++)
@@ -98,7 +98,7 @@ SPARSE_MATRIX_FLAT_MXN<T> Build_Smoothed_Aggregation_Interpolation(const SPARSE_
     aggregator.Set_Row_Lengths(aggregator_row_counts);
     aggregator.n=n_aggregates;
 
-    for(int i=1;i<=n;i++)
+    for(int i=0;i<n;i++)
         aggregator.Set_Element(i,parent_set(i),1.0);
 
     //std::cout << "aggregator " << std::endl << aggregator << std::endl;
@@ -108,7 +108,7 @@ SPARSE_MATRIX_FLAT_MXN<T> Build_Smoothed_Aggregation_Interpolation(const SPARSE_
     SPARSE_MATRIX_FLAT_MXN<T> smoother;
     smoother=A;
     smoother*=(-4.0/(3.0*eigenvalue_maximum));
-    for(int i=1;i<=n;i++)
+    for(int i=0;i<n;i++)
         smoother.Add_Element(i,i,1.0);
 
     //std::cout << "smoother " << std::endl << smoother << std::endl;
@@ -117,7 +117,7 @@ SPARSE_MATRIX_FLAT_MXN<T> Build_Smoothed_Aggregation_Interpolation(const SPARSE_
 
     //std::cout << "interpolation " << std::endl << interpolation << std::endl;
 
-    for(int i=1;i<=n;i++)
+    for(int i=0;i<n;i++)
     {
         T diagonal;
         for(int j=A.offsets(i);j<A.offsets(i+1);j++)
@@ -135,8 +135,8 @@ template<class T>
 void Gauss_Seidel(const SPARSE_MATRIX_FLAT_MXN<T>& A,const VECTOR_ND<T>& b,VECTOR_ND<T>& x,int iterations=1)
 {
     int n=A.m;
-    for(int i=1;i<=iterations;i++)
-        for(int j=1;j<=n;j++)
+    for(int i=0;i<iterations;i++)
+        for(int j=0;j<n;j++)
         {
             T row_sum=0;
             T diagonal=1;
@@ -230,15 +230,15 @@ int main(int argc,char* argv[])
     ARRAY<TV> positions;
     ARRAY<VECTOR<int,2> > constraint_pairs;
     ARRAY<TV> constraint_normals;
-    for(int i=1;i<=dim;i++)
-        for(int j=1;j<=2;j++)
+    for(int i=0;i<dim;i++)
+        for(int j=0;j<2;j++)
         {
             masses.Append(1);
             positions.Append(TV(i,j+(T)rand()/RAND_MAX,0));
         }
     
     int n=masses.Size();
-    for(int i=1;i<=n;i++)
+    for(int i=0;i<n;i++)
         for(int j=i+1;j<=n;j++)
         {
             //LOG::cout << "pair distance " << i << " " << j << " " << (positions(i)-positions(j)).Magnitude() << std::endl;
@@ -257,7 +257,7 @@ int main(int argc,char* argv[])
     Mi_row_counts.Fill(1);
     Mi.Set_Row_Lengths(Mi_row_counts);
     Mi.n=TV::dimension*n;
-    for(int i=1;i<=n;i++)
+    for(int i=0;i<n;i++)
         for(int j=1;j<=TV::dimension;j++)
         {
             int k=TV::dimension*(i-1)+j;
@@ -268,7 +268,7 @@ int main(int argc,char* argv[])
     C_row_counts.Fill(TV::dimension*2);
     C.Set_Row_Lengths(C_row_counts);
     C.n=Mi.n;
-    for(int i=1;i<=constraint_pairs.m;i++)
+    for(int i=0;i<constraint_pairs.m;i++)
     {
         for(int j=1;j<=TV::dimension;j++)
         {

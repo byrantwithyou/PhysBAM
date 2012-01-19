@@ -349,7 +349,7 @@ template<class T> T TRIANGULATED_SURFACE<T>::
 Total_Area() const
 {
     T area=0;
-    for(int t=1;t<=mesh.elements.m;t++){
+    for(int t=0;t<mesh.elements.m;t++){
         int node1=mesh.elements(t)(1),node2=mesh.elements(t)(2),node3=mesh.elements(t)(3);
         area+=TRIANGLE_3D<T>::Area(particles.X(node1),particles.X(node2),particles.X(node3));}
     return area;
@@ -361,7 +361,7 @@ template<class T> T TRIANGULATED_SURFACE<T>::
 Minimum_Angle(int* index) const
 {
     TV u,v,w;T min_cosine=1;
-    for(int t=1;t<=mesh.elements.m;t++){
+    for(int t=0;t<mesh.elements.m;t++){
         int i,j,k;mesh.elements(t).Get(i,j,k);
         u=(particles.X(i)-particles.X(j)).Normalized();v=(particles.X(j)-particles.X(k)).Normalized();w=(particles.X(k)-particles.X(i)).Normalized();
         T local_min=min(TV::Dot_Product(u,v),TV::Dot_Product(v,w),TV::Dot_Product(w,u));
@@ -375,7 +375,7 @@ template<class T> T TRIANGULATED_SURFACE<T>::
 Maximum_Angle(int* index) const
 {
     TV u,v,w;T max_cosine=-1;
-    for(int t=1;t<=mesh.elements.m;t++){
+    for(int t=0;t<mesh.elements.m;t++){
         int i,j,k;mesh.elements(t).Get(i,j,k);
         u=(particles.X(i)-particles.X(j)).Normalized();v=(particles.X(j)-particles.X(k)).Normalized();w=(particles.X(k)-particles.X(i)).Normalized();
         T local_max=max(TV::Dot_Product(u,v),TV::Dot_Product(v,w),TV::Dot_Product(w,u));
@@ -402,7 +402,7 @@ template<class T> T TRIANGULATED_SURFACE<T>::
 Average_Maximum_Angle() const
 {
     TV u,v,w;T total_max_angle=0;
-    for(int t=1;t<=mesh.elements.m;t++){
+    for(int t=0;t<mesh.elements.m;t++){
         int i,j,k;mesh.elements(t).Get(i,j,k);
         u=(particles.X(i)-particles.X(j)).Normalized();v=(particles.X(j)-particles.X(k)).Normalized();w=(particles.X(k)-particles.X(i)).Normalized();
         total_max_angle+=acos(min(-max(TV::Dot_Product(u,v),TV::Dot_Product(v,w),TV::Dot_Product(w,u)),(T)1));}
@@ -415,7 +415,7 @@ template<class T> T TRIANGULATED_SURFACE<T>::
 Minimum_Edge_Length(int* index) const
 {
     T min_edge_length_squared=FLT_MAX;
-    for(int t=1;t<=mesh.elements.m;t++){
+    for(int t=0;t<mesh.elements.m;t++){
         int i,j,k;mesh.elements(t).Get(i,j,k);
         T local_min_squared=min((particles.X(i)-particles.X(j)).Magnitude_Squared(),(particles.X(j)-particles.X(k)).Magnitude_Squared(),(particles.X(k)-particles.X(i)).Magnitude_Squared());
         if(local_min_squared < min_edge_length_squared){min_edge_length_squared=local_min_squared;if(index) *index=t;}}
@@ -428,7 +428,7 @@ template<class T> T TRIANGULATED_SURFACE<T>::
 Maximum_Edge_Length(int* index) const
 {
     T max_edge_length_squared=0;
-    for(int t=1;t<=mesh.elements.m;t++){
+    for(int t=0;t<mesh.elements.m;t++){
         int i,j,k;mesh.elements(t).Get(i,j,k);
         T local_max_squared=max((particles.X(i)-particles.X(j)).Magnitude_Squared(),(particles.X(j)-particles.X(k)).Magnitude_Squared(),(particles.X(k)-particles.X(i)).Magnitude_Squared());
         if(local_max_squared > max_edge_length_squared){max_edge_length_squared=local_max_squared;if(index) *index=t;}}
@@ -456,7 +456,7 @@ template<class T> T TRIANGULATED_SURFACE<T>::
 Maximum_Aspect_Ratio(int* index) const
 {
     T max_aspect_ratio=0;
-    for(int t=1;t<=mesh.elements.m;t++){
+    for(int t=0;t<mesh.elements.m;t++){
         int i,j,k;mesh.elements(t).Get(i,j,k);
         T local_max=TRIANGLE_3D<T>::Aspect_Ratio(particles.X(i),particles.X(j),particles.X(k));
         if(local_max > max_aspect_ratio){max_aspect_ratio=local_max;if(index) *index=t;}}
@@ -469,7 +469,7 @@ template<class T> T TRIANGULATED_SURFACE<T>::
 Average_Aspect_Ratio() const
 {
     T total_aspect_ratio=0;
-    for(int t=1;t<=mesh.elements.m;t++){
+    for(int t=0;t<mesh.elements.m;t++){
         int i,j,k;mesh.elements(t).Get(i,j,k);
         total_aspect_ratio+=TRIANGLE_3D<T>::Aspect_Ratio(particles.X(i),particles.X(j),particles.X(k));}
     return total_aspect_ratio/mesh.elements.m;
@@ -481,7 +481,7 @@ template<class T> T TRIANGULATED_SURFACE<T>::
 Minimum_Area(int* index) const
 {
     int k=0;T minimum=FLT_MAX;
-    for(int t=1;t<=mesh.elements.m;t++){
+    for(int t=0;t<mesh.elements.m;t++){
         int node1,node2,node3;mesh.elements(t).Get(node1,node2,node3);
         T temp=TRIANGLE_3D<T>::Area(particles.X(node1),particles.X(node2),particles.X(node3));
         if(temp < minimum){minimum=temp;k=t;}}
@@ -495,7 +495,7 @@ template<class T> T TRIANGULATED_SURFACE<T>::
 Minimum_Altitude(int* index) const
 {
     int k=0;T minimum=FLT_MAX;
-    for(int t=1;t<=mesh.elements.m;t++){
+    for(int t=0;t<mesh.elements.m;t++){
         int node1=mesh.elements(t)(1),node2=mesh.elements(t)(2),node3=mesh.elements(t)(3);
         T temp=TRIANGLE_3D<T>::Minimum_Altitude(particles.X(node1),particles.X(node2),particles.X(node3));
         if(temp < minimum){minimum=temp;k=t;}}
@@ -518,7 +518,7 @@ Maximum_Magnitude_Phi(const IMPLICIT_OBJECT<TV>& implicit_surface,int* index)
 template<class T> void TRIANGULATED_SURFACE<T>::
 Make_Orientations_Consistent_With_Implicit_Surface(const IMPLICIT_OBJECT<TV>& implicit_surface)
 {
-    for(int t=1;t<=mesh.elements.m;t++){
+    for(int t=0;t<mesh.elements.m;t++){
         int i,j,k;mesh.elements(t).Get(i,j,k);
         TV centroid=(T)one_third*(particles.X(i)+particles.X(j)+particles.X(k));
         TV normal=TRIANGLE_3D<T>::Normal(particles.X(i),particles.X(j),particles.X(k));
@@ -554,8 +554,8 @@ Create_Compact_Copy() const
     HASHTABLE<int,int> old_to_new;
     TRIANGLE_MESH* triangle_mesh=new TRIANGLE_MESH;
     triangle_mesh->elements.Resize(mesh.elements.m);
-    for(int i=1;i<=mesh.elements.m;i++){const VECTOR<int,3>& element=mesh.elements(i);
-        for(int j=1;j<=3;j++){
+    for(int i=0;i<mesh.elements.m;i++){const VECTOR<int,3>& element=mesh.elements(i);
+        for(int j=0;j<3;j++){
             int& a=old_to_new.Get_Or_Insert(element(j));
             if(!a) a=new_to_old.Append(element(j));
             triangle_mesh->elements(i)(j)=a;}}

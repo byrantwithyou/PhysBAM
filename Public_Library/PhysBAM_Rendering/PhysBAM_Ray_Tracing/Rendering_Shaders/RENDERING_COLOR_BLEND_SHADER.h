@@ -29,33 +29,33 @@ public:
     VECTOR<T,3> Evaluate_Diffuse_BRDF(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& exiting_object,const RENDERING_OBJECT<T>& entering_object,
         const RENDERING_OBJECT<T>& intersection_object,const VECTOR<T,3>& intersection_point,const VECTOR<T,3>& same_side_normal) const
     {VECTOR<T,3> color_accumulator;
-    for(int i=1;i<=shaders.m;i++)color_accumulator+=weights(i)*shaders(i)->Evaluate_Diffuse_BRDF(ray,exiting_object,entering_object,intersection_object,intersection_point,same_side_normal);
+    for(int i=0;i<shaders.m;i++)color_accumulator+=weights(i)*shaders(i)->Evaluate_Diffuse_BRDF(ray,exiting_object,entering_object,intersection_object,intersection_point,same_side_normal);
     return color_accumulator;}
 
     VECTOR<T,3> Shade_Surface_Using_Direct_Illumination(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& exiting_object,const RENDERING_OBJECT<T>& entering_object,
         const RENDERING_OBJECT<T>& intersection_object,const VECTOR<T,3>& intersection_point,const VECTOR<T,3>& same_side_normal) const
     {VECTOR<T,3> color_accumulator;
-    for(int i=1;i<=shaders.m;i++)color_accumulator+=weights(i)*shaders(i)->Shade_Surface_Using_Direct_Illumination(ray,exiting_object,entering_object,intersection_object,intersection_point,same_side_normal); 
+    for(int i=0;i<shaders.m;i++)color_accumulator+=weights(i)*shaders(i)->Shade_Surface_Using_Direct_Illumination(ray,exiting_object,entering_object,intersection_object,intersection_point,same_side_normal); 
     return color_accumulator;}
 
     VECTOR<T,3> Shade_Light_Ray(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& exiting_object,const RENDERING_OBJECT<T>& entering_object,
         const RENDERING_OBJECT<T>& intersection_object,const VECTOR<T,3>& intersection_point,const VECTOR<T,3>& same_side_normal,const RENDERING_LIGHT<T>& light,
         const RENDERING_RAY<T>& full_ray) const
     {VECTOR<T,3> color_accumulator;
-    for(int i=1;i<=shaders.m;i++)color_accumulator+=weights(i)*shaders(i)->Shade_Light_Ray(ray,exiting_object,entering_object,intersection_object,intersection_point,
+    for(int i=0;i<shaders.m;i++)color_accumulator+=weights(i)*shaders(i)->Shade_Light_Ray(ray,exiting_object,entering_object,intersection_object,intersection_point,
         same_side_normal,light,full_ray);
     return color_accumulator;}
 
     VECTOR<T,3> Shade_Surface_Using_Indirect_Illumination(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& exiting_object,const RENDERING_OBJECT<T>& entering_object,
         const RENDERING_OBJECT<T>& intersection_object,const VECTOR<T,3>& intersection_point,const VECTOR<T,3>& same_side_normal) const
     {VECTOR<T,3> color_accumulator;
-    for(int i=1;i<=shaders.m;i++)color_accumulator+=weights(i)*shaders(i)->Shade_Surface_Using_Indirect_Illumination(ray,exiting_object,entering_object,intersection_object,intersection_point,same_side_normal); 
+    for(int i=0;i<shaders.m;i++)color_accumulator+=weights(i)*shaders(i)->Shade_Surface_Using_Indirect_Illumination(ray,exiting_object,entering_object,intersection_object,intersection_point,same_side_normal); 
     return color_accumulator;}
 
     VECTOR<T,3> Shade_Surface_Using_Approximate_Full_Illumination(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& exiting_object,const RENDERING_OBJECT<T>& entering_object,
         const RENDERING_OBJECT<T>& intersection_object,const VECTOR<T,3>& intersection_point,const VECTOR<T,3>& same_side_normal) const
     {VECTOR<T,3> color_accumulator;
-    for(int i=1;i<=shaders.m;i++)color_accumulator+=weights(i)*shaders(i)->Shade_Surface_Using_Approximate_Full_Illumination(ray,exiting_object,entering_object,intersection_object,intersection_point,same_side_normal);
+    for(int i=0;i<shaders.m;i++)color_accumulator+=weights(i)*shaders(i)->Shade_Surface_Using_Approximate_Full_Illumination(ray,exiting_object,entering_object,intersection_object,intersection_point,same_side_normal);
     return color_accumulator;}
 
     void Receive_Photon(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& exiting_object,const RENDERING_OBJECT<T>& entering_object,

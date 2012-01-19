@@ -41,7 +41,7 @@ public:
     bool Intersection(RAY<TV> &ray) const PHYSBAM_OVERRIDE
     {RAY<TV> object_space_ray=Object_Space_Ray(ray);
     bool intersected=false;
-    for(int t=1;t<=segmented_curve.mesh.elements.m;t++){ // TODO: make this more efficient using hierarchy.
+    for(int t=0;t<segmented_curve.mesh.elements.m;t++){ // TODO: make this more efficient using hierarchy.
         const VECTOR<int,2>& nodes=segmented_curve.mesh.elements(t);
         if(INTERSECTION::Intersects(ray,CYLINDER<T>(segmented_curve.particles.X(nodes[1]),segmented_curve.particles.X(nodes[2]),thickness))) {
             ray.aggregate_id=t;intersected=true;}}
@@ -70,7 +70,7 @@ public:
 
     void Get_Aggregate_World_Space_Bounding_Boxes(ARRAY<RENDERING_OBJECT_ACCELERATION_PRIMITIVE<T> >& primitives) const PHYSBAM_OVERRIDE
     {if(add_segments_to_acceleration_structure){
-        for(int t=1;t<=segmented_curve.mesh.elements.m;t++){
+        for(int t=0;t<segmented_curve.mesh.elements.m;t++){
             const VECTOR<int,2>& nodes=segmented_curve.mesh.elements(t);
             RANGE<TV> bounding_box=RANGE<TV>::Bounding_Box(World_Space_Point(segmented_curve.particles.X(nodes[1])),World_Space_Point(segmented_curve.particles.X(nodes[2])));
             bounding_box.Change_Size(thickness);

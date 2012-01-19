@@ -121,7 +121,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
 
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     // correct mass
     binding_list.Distribute_Mass_To_Parents();
@@ -134,7 +134,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     switch(test_number){
         case 1:{ // initialize very weak forces
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
-            for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++){
+            for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++){
                 if(TRIANGULATED_SURFACE<T>* surface=dynamic_cast<TRIANGULATED_SURFACE<T>*>(deformable_body_collection.deformable_geometry.structures(i))){
                     solid_body_collection.Add_Force(Create_Edge_Springs(*surface,1/(1+sqrt((T)2)),(T)3,strain_limit));
                     solid_body_collection.Add_Force(Create_Bending_Springs(*surface,1/(1+sqrt((T)2)),(T)3,strain_limit));}}
@@ -143,7 +143,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         }break;
         case 2:{
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
-            /*for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++){
+            /*for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++){
                 if(TETRAHEDRALIZED_VOLUME<T>* volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.deformable_geometry.structures(i))){
                     solid_body_collection.Add_Force(Create_Edge_Springs(*volume,1/(1+sqrt((T)2)),(T)3));
                     solid_body_collection.Add_Force(Create_Bending_Springs(volume->Get_Boundary_Object(),1/(1+sqrt((T)2)),(T)3));}}
@@ -189,7 +189,7 @@ void Update_Time_Varying_Material_Properties(const T time)
                 //bending_springs->Set_Stiffness((T)100);
                 //bending_springs->Set_Overdamping_Fraction((T)3);
             }
-            for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++){
+            for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++){
                 if(TETRAHEDRALIZED_VOLUME<T>* volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.deformable_geometry.structures(i))){
                     volume_output_file<<time<<"\t"<<volume->Total_Volume()<<std::endl;}}
         }break;

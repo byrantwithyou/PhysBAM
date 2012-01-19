@@ -41,9 +41,9 @@ public:
     virtual ~INCOMPRESSIBLE_MULTIPHASE_UNIFORM();
 
     void Use_Strain(const ARRAY<bool>& use_multiphase_strain)
-    {for(int i=1;i<=strains.m;i++)delete strains(i);
+    {for(int i=0;i<strains.m;i++)delete strains(i);
     strains.Resize(use_multiphase_strain.m);
-    for(int i=1;i<=use_multiphase_strain.m;i++)if(use_multiphase_strain(i))strains(i)=new FLUID_STRAIN_UNIFORM<T_GRID>(grid);}
+    for(int i=0;i<use_multiphase_strain.m;i++)if(use_multiphase_strain(i))strains(i)=new FLUID_STRAIN_UNIFORM<T_GRID>(grid);}
 
     // overrides version from BASE
     void Advance_One_Time_Step_Forces(const T dt,const T time,const bool implicit_viscosity=false,const T_ARRAYS_SCALAR* phi_ghost=0)

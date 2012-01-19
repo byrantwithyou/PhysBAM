@@ -46,7 +46,7 @@ public:
 
     void Initialize_Mesh_With_Particle_Offset(const SIMPLEX_MESH& mesh,const int particle_offset)
     {elements.Resize(mesh.elements.m,false,false);
-    for(int t=1;t<=elements.m;t++) elements(t)=mesh.elements(t)+particle_offset;
+    for(int t=0;t<elements.m;t++) elements(t)=mesh.elements(t)+particle_offset;
     number_nodes=0;} // TODO: currently leaves number_nodes uninitialized
 
     bool Node_In_Simplex(const int node,const int simplex) const
@@ -55,7 +55,7 @@ public:
     template<int d2>
     bool Nodes_In_Simplex(const VECTOR<int,d2>& nodes,const int simplex) const
     {STATIC_ASSERT(d2<=d+1);const VECTOR<int,d+1>& element=elements(simplex);
-    for(int i=1;i<=nodes.m;i++) if(!element.Contains(nodes[i])) return false;return true;}
+    for(int i=0;i<nodes.m;i++) if(!element.Contains(nodes[i])) return false;return true;}
 
     void Replace_Node_In_Simplex(const int simplex,const int old_node,const int new_node)
     {VECTOR<int,d+1>& element=elements(simplex);element[element.Find(old_node)]=new_node;}
@@ -74,7 +74,7 @@ public:
     {VECTOR<VECTOR<T,d>,d2> all_weights;for(int i=0;i<d2;i++) all_weights(i)=Node_Weights<T>(simplex_nodes,subsimplex_nodes[i]);return all_weights;}
 
     template<class T_CONNECTIVITY> void Add_Connectivity(T_CONNECTIVITY& particle_connectivity) const
-    {for(int t=1;t<=elements.m;t++) particle_connectivity.Union(elements(t));}
+    {for(int t=0;t<elements.m;t++) particle_connectivity.Union(elements(t));}
 
 //#####################################################################
     virtual void Clean_Memory();

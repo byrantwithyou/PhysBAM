@@ -58,13 +58,13 @@ public:
 
     template<class RW>
     void Read_Samples(const std::string& base_directory)
-    {for(int i=1;i<=list.m;i++) list(i).template Read_Sample<RW>(base_directory);}
+    {for(int i=0;i<list.m;i++) list(i).template Read_Sample<RW>(base_directory);}
 
     void Update_Valid_Segment()
-    {if(!valid_segment)valid_segment=new RANGE<VECTOR<T,1> >;(*valid_segment)=RANGE<VECTOR<T,1> >(FLT_MAX,-FLT_MAX);for(int i=1;i<=list.m;i++)valid_segment->Enlarge_To_Include_Box(list(i).Context_Segment());}
+    {if(!valid_segment)valid_segment=new RANGE<VECTOR<T,1> >;(*valid_segment)=RANGE<VECTOR<T,1> >(FLT_MAX,-FLT_MAX);for(int i=0;i<list.m;i++)valid_segment->Enlarge_To_Include_Box(list(i).Context_Segment());}
 
     void Segments_Intersecting_Time_Instance(const T time,ARRAY<int>& segment_list) const
-    {segment_list.Remove_All();for(int i=1;i<=list.m;i++)if(list(i).Context_Segment().Inside(VECTOR<T,1>(time),0))segment_list.Append(i);}
+    {segment_list.Remove_All();for(int i=0;i<list.m;i++)if(list(i).Context_Segment().Inside(VECTOR<T,1>(time),0))segment_list.Append(i);}
 
     template <class RW>
     void Interpolate_Rigid_Body_State(RIGID_BODY_STATE<VECTOR<T,3> >& rigid_body_state,const std::string phoneme_data_directory,const std::string rigid_transform_filename_prefix,const T time)
@@ -73,8 +73,8 @@ public:
       case 0: PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("No value to interpolate from at specified time instance %d",time));
       case 1: list(segment_list(1)).template Interpolate_Rigid_Body_State<RW>(rigid_body_state,phoneme_data_directory,rigid_transform_filename_prefix,time);return;
       case 2:
-          {ARRAY<RIGID_BODY_STATE<VECTOR<T,3> > > rigid_body_states(2);for(int i=1;i<=2;i++)list(segment_list(i)).template Interpolate_Rigid_Body_State<RW>(rigid_body_states(i),phoneme_data_directory,rigid_transform_filename_prefix,time);
-          ARRAY<T> blending_weights(2);for(int i=1;i<=2;i++)blending_weights(i)=(*blending_callback)(list(segment_list(i)),time);
+          {ARRAY<RIGID_BODY_STATE<VECTOR<T,3> > > rigid_body_states(2);for(int i=0;i<2;i++)list(segment_list(i)).template Interpolate_Rigid_Body_State<RW>(rigid_body_states(i),phoneme_data_directory,rigid_transform_filename_prefix,time);
+          ARRAY<T> blending_weights(2);for(int i=0;i<2;i++)blending_weights(i)=(*blending_callback)(list(segment_list(i)),time);
           T blending_fraction=blending_weights(2)/(blending_weights(1)+blending_weights(2));
           rigid_body_state.time=time;
           rigid_body_state.frame=FRAME<TV>::Interpolation(rigid_body_states(1).frame,rigid_body_states(2).frame,blending_fraction);
@@ -89,8 +89,8 @@ public:
       case 0: PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("No value to interpolate from at specified time instance %d",time));
       case 1: list(segment_list(1)).template Interpolate_Positions<RW>(position,phoneme_data_directory,position_filename_prefix,time);return;
       case 2:
-          {ARRAY<ARRAY<VECTOR<T,3> > > positions(2);for(int i=1;i<=2;i++)list(segment_list(i)).template Interpolate_Positions<RW>(positions(i),phoneme_data_directory,position_filename_prefix,time);
-          ARRAY<T> blending_weights(2);for(int i=1;i<=2;i++)blending_weights(i)=(*blending_callback)(list(segment_list(i)),time);
+          {ARRAY<ARRAY<VECTOR<T,3> > > positions(2);for(int i=0;i<2;i++)list(segment_list(i)).template Interpolate_Positions<RW>(positions(i),phoneme_data_directory,position_filename_prefix,time);
+          ARRAY<T> blending_weights(2);for(int i=0;i<2;i++)blending_weights(i)=(*blending_callback)(list(segment_list(i)),time);
           T blending_fraction=blending_weights(2)/(blending_weights(1)+blending_weights(2));
           if(!position.m) position.Resize(positions(1).m);
           ARRAY<VECTOR<T,3> >::copy((T)1-blending_fraction,positions(1),blending_fraction,positions(2),position);return;}
@@ -106,12 +106,12 @@ public:
           VECTOR_ND<T> controls;face_control_parameters->Get(controls);return controls;}
       case 2:
           {ARRAY<VECTOR_ND<T> ,VECTOR<int,1> > blending_controls(1,2);
-          for(int i=1;i<=2;i++){
+          for(int i=0;i<2;i++){
               blending_controls(i)=list(segment_list(i)).Controls(time);
               face_control_parameters->Set(blending_controls(i));
               face_control_parameters->Scale(list(segment_list(i)).scaling);
               face_control_parameters->Get(blending_controls(i));}
-          ARRAY<T> blending_weights(2);for(int i=1;i<=2;i++)blending_weights(i)=(*blending_callback)(list(segment_list(i)),time);
+          ARRAY<T> blending_weights(2);for(int i=0;i<2;i++)blending_weights(i)=(*blending_callback)(list(segment_list(i)),time);
           T blending_fraction=blending_weights(2)/(blending_weights(1)+blending_weights(2));
           GRID<VECTOR<T,1> > blending_grid(2,0,(T)1);
           return interpolation->Clamped_To_Array(blending_grid,blending_controls,blending_fraction);}
@@ -136,7 +136,7 @@ public:
     VECTOR_ND<T> Optimal_Scaling(const GRID<VECTOR<T,1> > sampling_grid,const T stiffness,int* samples_used=0)
     {if(samples_used)*samples_used=0;
     MATRIX_MXN<T> normal_equations_matrix(list.m,list.m);VECTOR_ND<T> normal_equations_rhs(list.m);
-    for(int sample=1;sample<=sampling_grid.counts.x;sample++){
+    for(int sample=0;sample<sampling_grid.counts.x;sample++){
         T time=sampling_grid.Axis_X(sample,1);ARRAY<int> segment_list;Segments_Intersecting_Time_Instance(time,segment_list);
         if(segment_list.m==2){
             if(samples_used)(*samples_used)++;
@@ -146,7 +146,7 @@ public:
             normal_equations_matrix(i,j)-=VECTOR_ND<T>::Dot_Product(ci,cj);
             normal_equations_matrix(j,i)-=VECTOR_ND<T>::Dot_Product(cj,ci);
             normal_equations_matrix(j,j)+=VECTOR_ND<T>::Dot_Product(cj,cj);}
-        for(int segment=1;segment<=segment_list.m;segment++){
+        for(int segment=0;segment<segment_list.m;segment++){
             int i=segment_list(segment);VECTOR_ND<T> ci=list(i).Controls(time);
             normal_equations_matrix(i,i)+=sqr(stiffness)*VECTOR_ND<T>::Dot_Product(ci,ci);
             normal_equations_rhs(i)+=sqr(stiffness)*VECTOR_ND<T>::Dot_Product(ci,ci);}}

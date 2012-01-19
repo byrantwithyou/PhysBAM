@@ -130,7 +130,7 @@ Display(const int in_color) const
     if(!draw || !valid) return;
 
 #ifndef USE_OPENGLES
-    for(int i=1;i<=point_simplices_1d_objects.m;i++){
+    for(int i=0;i<point_simplices_1d_objects.m;i++){
         if(!active_list(i)) continue;
         glPushName(i);
         if(point_simplices_1d_objects(i)){
@@ -139,7 +139,7 @@ Display(const int in_color) const
             glPopName();}
         glPopName();}
 #else
-    for(int i=1;i<=point_simplices_1d_objects.m;i++){
+    for(int i=0;i<point_simplices_1d_objects.m;i++){
         if(!active_list(i)) continue;
         if(point_simplices_1d_objects(i)) point_simplices_1d_objects(i)->Display(in_color);}
 #endif
@@ -181,7 +181,7 @@ Bounding_Box() const
 {
     RANGE<VECTOR<float,3> > box=RANGE<VECTOR<float,3> >::Empty_Box();
     if(draw && valid && deformable_geometry_collection->structures.m>0){
-        for(int i=1;i<=point_simplices_1d_objects.m;i++) if(point_simplices_1d_objects(i))box.Enlarge_To_Include_Box(point_simplices_1d_objects(i)->Bounding_Box());}
+        for(int i=0;i<point_simplices_1d_objects.m;i++) if(point_simplices_1d_objects(i))box.Enlarge_To_Include_Box(point_simplices_1d_objects(i)->Bounding_Box());}
     return box;
 }
 //#####################################################################
@@ -281,7 +281,7 @@ Highlight_Selection(OPENGL_SELECTION *selection)
 template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_1D<T,RW>::
 Clear_Highlight()
 {
-    for(int i=1;i<=point_simplices_1d_objects.m;i++) if(point_simplices_1d_objects(i) && active_list(i)) point_simplices_1d_objects(i)->Clear_Highlight();
+    for(int i=0;i<point_simplices_1d_objects.m;i++) if(point_simplices_1d_objects(i) && active_list(i)) point_simplices_1d_objects(i)->Clear_Highlight();
     real_selection=0;
 }
 //#####################################################################

@@ -33,7 +33,7 @@ SEGMENT_ADHESION(PARTICLES<TV>& particles,SEGMENT_MESH& mesh,ARRAY<HAIR_ID>& par
     particle_to_spring_id(particle_to_spring_id),internal_curve(internal_mesh,particles),external_curve(external_mesh,particles),springs(new T_SPRING_HASH()),
     segments_with_springs(mesh.elements.m),intersecting_edge_edge_pairs(intersecting_edge_edge_pairs)
 {
-    for(int i=1;i<=mesh.elements.m;i++) segments_with_springs(i).x.Preallocate(max_connections);
+    for(int i=0;i<mesh.elements.m;i++) segments_with_springs(i).x.Preallocate(max_connections);
 }
 //#####################################################################
 // Function SEGMENT_ADHESION
@@ -44,7 +44,7 @@ SEGMENT_ADHESION(PARTICLES<TV>& particles,SEGMENT_MESH& mesh,ARRAY<HAIR_ID>& par
     particle_to_spring_id(particle_to_spring_id),internal_curve(internal_mesh,particles),external_curve(external_mesh,particles),springs(new T_SPRING_HASH()),
     segments_with_springs(mesh.elements.m),intersecting_edge_edge_pairs(default_intersecting_edge_edge_pairs)
 {
-    for(int i=1;i<=mesh.elements.m;i++) segments_with_springs(i).x.Preallocate(max_connections);
+    for(int i=0;i<mesh.elements.m;i++) segments_with_springs(i).x.Preallocate(max_connections);
 }
 //#####################################################################
 // Function Update_Mpi
@@ -84,10 +84,10 @@ Update_Hierarchy()
     if(!internal_curve.hierarchy || !external_curve.hierarchy){
         internal_curve.Initialize_Hierarchy(false);external_curve.Initialize_Hierarchy(false);}
     internal_curve.hierarchy->Update_Leaf_Boxes(particles.X);
-    for(int s=1;s<=internal_curve.mesh.elements.m;s++) internal_curve.hierarchy->box_hierarchy(s).Change_Size(on_distance);
+    for(int s=0;s<internal_curve.mesh.elements.m;s++) internal_curve.hierarchy->box_hierarchy(s).Change_Size(on_distance);
     internal_curve.hierarchy->Update_Nonleaf_Boxes();
     external_curve.hierarchy->Update_Leaf_Boxes(particles.X);
-    for(int s=1;s<=external_curve.mesh.elements.m;s++) external_curve.hierarchy->box_hierarchy(s).Change_Size(on_distance);
+    for(int s=0;s<external_curve.mesh.elements.m;s++) external_curve.hierarchy->box_hierarchy(s).Change_Size(on_distance);
     external_curve.hierarchy->Update_Nonleaf_Boxes();
 }
 //#####################################################################
@@ -111,7 +111,7 @@ Update_Springs(const bool search_hierarchy)
     //T old_off=off_distance;
     //VECTOR<int,2> min_elem;
     T_SPRING_HASH* new_springs=search_hierarchy?new T_SPRING_HASH():0; // many deletes can hurt open addressed hash table, use "generational" garbage collection
-    if(new_springs) for(int i=1;i<=internal_segment_indices.m;i++){int segment=internal_segment_indices(i);segments_with_springs(segment).x.Remove_All();}
+    if(new_springs) for(int i=0;i<internal_segment_indices.m;i++){int segment=internal_segment_indices(i);segments_with_springs(segment).x.Remove_All();}
     for(typename HASHTABLE<VECTOR<int,2>,SPRING_STATE>::ITERATOR i(*springs);i.Valid();i.Next()){
         const VECTOR<int,2> &segment1_nodes=curve.mesh.elements(i.Key()[1]),&segment2_nodes=curve.mesh.elements(i.Key()[2]);
         SPRING_STATE& state=i.Data();
@@ -138,7 +138,7 @@ Update_Springs(const bool search_hierarchy)
     //off_distance=old_off;
     if(!new_springs){ //not making new array, need to delete (as we haven't copied), also need to cull things that are no longer in range from external pairs (which will happen the same
                       //on ownership proc through above
-        for(int i=1;i<=deletion_list.m;i++)springs->Delete(deletion_list(i));
+        for(int i=0;i<deletion_list.m;i++)springs->Delete(deletion_list(i));
         
         // note in the case of new_springs then we will delete the entire boundary list and make it again so we don't do this
         for(int i=external_springs.m;i>=1;i--){
@@ -169,7 +169,7 @@ Update_Springs(const bool search_hierarchy)
         LOG::Time("Search Hierarchy");
         // Find new pairs
         LOG::cout<<"segments "<<internal_curve.mesh.elements.m<<std::endl;
-        for(int i=1;i<=internal_segment_indices.m;i++){int segment=internal_segment_indices(i);segments_with_springs(segment).y=false;} // we no longer have heaps
+        for(int i=0;i<internal_segment_indices.m;i++){int segment=internal_segment_indices(i);segments_with_springs(segment).y=false;} // we no longer have heaps
         EDGE_EDGE_ADHESION_VISITOR<TV> internal_visitor(*this,internal_segment_indices,internal_segment_indices,true);
         internal_curve.hierarchy->Intersection_List(*internal_curve.hierarchy,internal_visitor,ZERO());
         if(mpi_solids){
@@ -208,7 +208,7 @@ Update_Springs(const bool search_hierarchy)
             const ARRAY_VIEW<T>& one_over_effective_mass=particles.one_over_effective_mass;
             for(PARTITION_ID partition(1);partition<=input_pairs.Size();partition++){
                 ARRAY<T_PAIR>& pairs=input_pairs(partition);
-                for(int j=1;j<=pairs.m;j++){
+                for(int j=0;j<pairs.m;j++){
                     const VECTOR<int,2>& segment_indices=pairs(j).x;const VECTOR<T,2>& segment_weights=pairs(j).y;
                     SPRING_STATE state;
                     const VECTOR<int,2> &segment1_nodes=curve.mesh.elements(segment_indices[1]),&segment2_nodes=curve.mesh.elements(segment_indices[2]);
@@ -283,13 +283,13 @@ template<class TV> void SEGMENT_ADHESION<TV>::
 Update_Partitions(bool restart,MPI_SOLIDS<TV>* mpi_solids,const std::string output_directory)
 {
     this->mpi_solids=mpi_solids;
-    if(mpi_solids) for(int i=1;i<=mesh.elements.m;i++){
+    if(mpi_solids) for(int i=0;i<mesh.elements.m;i++){
         const VECTOR<int,2>& nodes=mesh.elements(i);
         VECTOR<PARTITION_ID,2> partitions(mpi_solids->partition_id_from_particle_index.Subset(nodes));
         PHYSBAM_ASSERT(partitions[1]==partitions[2]);
         if(partitions[1]==mpi_solids->Partition()){internal_segment_indices.Append(i);internal_mesh.elements.Append(nodes);}
         else{external_segment_indices.Append(i);external_mesh.elements.Append(nodes);}}
-    else for(int i=1;i<=mesh.elements.m;i++){
+    else for(int i=0;i<mesh.elements.m;i++){
         const VECTOR<int,2>& nodes=mesh.elements(i);
         internal_segment_indices.Append(i);internal_mesh.elements.Append(nodes);}
 
@@ -331,12 +331,12 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
     //    TV force=youngs_modulus*(state.distance/restlength-(T)1)*state.normal;
     //    F(state.nodes[1])-=((T)1-state.weights[1])*force;F(state.nodes[2])-=state.weights[1]*force;
     //    F(state.nodes[3])+=((T)1-state.weights[2])*force;F(state.nodes[4])+=state.weights[2]*force;}
-    for(int i=1;i<=internal_springs.m;i++){
+    for(int i=0;i<internal_springs.m;i++){
         const SPRING_STATE& state=internal_springs(i);
         TV force=youngs_modulus*(state.distance/restlength-(T)1)*state.normal;
         F(state.nodes[1])-=((T)1-state.weights[1])*force;F(state.nodes[2])-=state.weights[1]*force;
         F(state.nodes[3])+=((T)1-state.weights[2])*force;F(state.nodes[4])+=state.weights[2]*force;}
-    for(int i=1;i<=external_springs.m;i++){
+    for(int i=0;i<external_springs.m;i++){
         const SPRING_STATE& state=external_springs(i);
         TV force=youngs_modulus*(state.distance/restlength-(T)1)*state.normal;
         F(state.nodes[1])-=((T)1-state.weights[1])*force;F(state.nodes[2])-=state.weights[1]*force;
@@ -355,13 +355,13 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
     //    F(state.nodes[1])-=((T)1-state.weights[1])*force;F(state.nodes[2])-=state.weights[1]*force;
     //    F(state.nodes[3])+=((T)1-state.weights[2])*force;F(state.nodes[4])+=state.weights[2]*force;
     //}
-    for(int i=1;i<=internal_springs.m;i++){
+    for(int i=0;i<internal_springs.m;i++){
         const SPRING_STATE& state=internal_springs(i);
         TV force=state.damping/restlength*TV::Dot_Product(((T)1-state.weights[1])*V(state.nodes[1])+state.weights[1]*V(state.nodes[2])
                                        -((T)1-state.weights[2])*V(state.nodes[3])-state.weights[2]*V(state.nodes[4]),state.normal)*state.normal;
         F(state.nodes[1])-=((T)1-state.weights[1])*force;F(state.nodes[2])-=state.weights[1]*force;
         F(state.nodes[3])+=((T)1-state.weights[2])*force;F(state.nodes[4])+=state.weights[2]*force;}
-    for(int i=1;i<=external_springs.m;i++){
+    for(int i=0;i<external_springs.m;i++){
         const SPRING_STATE& state=external_springs(i);
         TV force=state.damping/restlength*TV::Dot_Product(((T)1-state.weights[1])*V(state.nodes[1])+state.weights[1]*V(state.nodes[2])
                                        -((T)1-state.weights[2])*V(state.nodes[3])-state.weights[2]*V(state.nodes[4]),state.normal)*state.normal;

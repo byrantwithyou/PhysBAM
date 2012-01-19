@@ -95,7 +95,7 @@ Initialize_Boundary_Region(){
     LOG::Time("Allocate temporaries");
     ARRAY<unsigned char,TV_INT> index_is_boundary(grid.Domain_Indices());
     ARRAY<unsigned char,TV_INT> index_is_extended_boundary(grid.Domain_Indices());
-    for(int v=1;v<=d;v++) PHYSBAM_ASSERT(n(v)%boundary_block_size==0);
+    for(int v=0;v<d;v++) PHYSBAM_ASSERT(n(v)%boundary_block_size==0);
     ARRAY<int> boundary_nodes_in_block(n(1)*n(2)*n(3)/(boundary_block_size*boundary_block_size*boundary_block_size),false);
     ARRAY<int> extended_boundary_nodes_in_block(n(1)*n(2)*n(3)/(boundary_block_size*boundary_block_size*boundary_block_size),false);
 
@@ -127,7 +127,7 @@ Initialize_Boundary_Region(){
 #else
 
     LOG::Time("Allocate Temporaries");    
-    for(int v=1;v<=d;v++) PHYSBAM_ASSERT(n(v)%2==0);
+    for(int v=0;v<d;v++) PHYSBAM_ASSERT(n(v)%2==0);
     ARRAY<bool,TV_INT> index_is_boundary(grid.Domain_Indices());
     ARRAY<bool,TV_INT> index_is_extended_boundary(grid.Domain_Indices());
 
@@ -171,7 +171,7 @@ Initialize_Boundary_Region(){
 	    index_is_extended_boundary(index)=true; 
 	    continue;
 	}
-	for(int v=1;v<=d;v++){
+	for(int v=0;v<d;v++){
 	    if(index_is_boundary(index+T_INDEX::Axis_Vector(v))){
 		index_is_extended_boundary(index)=true; 
 		break;}
@@ -181,7 +181,7 @@ Initialize_Boundary_Region(){
 	}
     }
     LOG::Time("Block Counting");
-    for(int v=1;v<=d;v++) PHYSBAM_ASSERT(n(v)%boundary_block_size==0);
+    for(int v=0;v<d;v++) PHYSBAM_ASSERT(n(v)%boundary_block_size==0);
     ARRAY<ARRAY<T_INDEX> > boundary_block_base_index; 
     boundary_block_base_index.Resize(2);
     ARRAY<T_INDEX> extended_boundary_block_base_index;
@@ -226,7 +226,7 @@ Initialize_Boundary_Region(){
     // optimized and unoptimized code will be off by 1
 //    block=1;
     LOG::Time("Block Enumeration");
-    for(int c=1;c<=2;c++){
+    for(int c=0;c<2;c++){
 	for(int b=1;b<=boundary_block_base_index(c).m;b++){ // for each block with boundary indices
             const T_INDEX& offset=boundary_block_base_index(c)(b);
  	    boundary_block_start.Append(boundary_indices.m+1); // first boundary_index of the block (1-indexed)
@@ -245,7 +245,7 @@ Initialize_Boundary_Region(){
     // by going through the blocks, 
     // we enumerate extended boundary indices
     // in a block-by-block order (for fast reading)
-    for(int b=1;b<=extended_boundary_block_base_index.m;b++){
+    for(int b=0;b<extended_boundary_block_base_index.m;b++){
 	const T_INDEX& offset=extended_boundary_block_base_index(b);
 	
 	for(BOX_ITERATOR<d> iterator(RANGE<T_INDEX>(offset,offset+T_INDEX::All_Ones_Vector()*(boundary_block_size-1)));
@@ -276,7 +276,7 @@ Build_System_Matrix(){
     // compute one_over_diagonal_part only on boundary_indices
 #ifndef MGPCG_UNOPTIMIZED
     const T* const diagonal_entries_ptr=&diagonal_entries(1,1,1);
-    for(int i=1;i<=boundary_indices.m;i++){
+    for(int i=0;i<boundary_indices.m;i++){
 	int index=boundary_indices(i);
 	if(diagonal_entries_ptr[index]!=0) 
 	    one_over_diagonal_part.Append((T)1/diagonal_entries_ptr[index]);
@@ -284,7 +284,7 @@ Build_System_Matrix(){
     }
 
 #else
-    for(int i=1;i<=boundary_indices.m;i++){
+    for(int i=0;i<boundary_indices.m;i++){
 	const T_INDEX& index=boundary_indices(i);
 	if(diagonal_entries(index)!=0) 
 	    one_over_diagonal_part.Append((T)1/diagonal_entries(index));
@@ -338,7 +338,7 @@ Initialize_Interior_Bitmaps_And_Diagonal_Entries(){
 	    int active_neighbors=0;
 	    if(cell_type(fine_index)==INTERIOR_CELL_TYPE){
 		index_is_interior_coarse_bitmask(coarse_index)|=mask;
-		for(int v=1;v<=d;v++){
+		for(int v=0;v<d;v++){
 		    if(cell_type(fine_index+T_INDEX::Axis_Vector(v))!=NEUMANN_CELL_TYPE)
 			active_neighbors++;
 		    if(cell_type(fine_index-T_INDEX::Axis_Vector(v))!=NEUMANN_CELL_TYPE)
@@ -379,11 +379,11 @@ Boundary_Relaxation(const bool reverse_order,const int subloops)
 	    for(int block=boundary_block_start.m;block>=1;block--){
 		int first_index=boundary_block_start(block);
 		int last_index=boundary_block_end(block);	
-		for(int block_loop=1;block_loop<=10;block_loop++)
+		for(int block_loop=0;block_loop<10;block_loop++)
 		    for(int i=last_index;i>=first_index;i--){
 			const T_INDEX& index=boundary_indices(i);
 			u(index)=b(index);
-			for(int v=1;v<=d;v++)
+			for(int v=0;v<d;v++)
 			    u(index)-=u(index+T_INDEX::Axis_Vector(v))
 				+u(index-T_INDEX::Axis_Vector(v));
 			u(index)*=one_over_diagonal_part(i);
@@ -392,14 +392,14 @@ Boundary_Relaxation(const bool reverse_order,const int subloops)
 
 
 	else
-	    for(int block=1;block<=boundary_block_start.m;block++){
+	    for(int block=0;block<boundary_block_start.m;block++){
 		int first_index=boundary_block_start(block);
 		int last_index=boundary_block_end(block);
-		for(int block_loop=1;block_loop<=10;block_loop++)
+		for(int block_loop=0;block_loop<10;block_loop++)
 		    for(int i=first_index;i<=last_index;i++){
 			const T_INDEX& index=boundary_indices(i);
 			u(index)=b(index);
-			for(int v=1;v<=d;v++)
+			for(int v=0;v<d;v++)
 			    u(index)-=u(index+T_INDEX::Axis_Vector(v))
 				+u(index-T_INDEX::Axis_Vector(v));
 			u(index)*=one_over_diagonal_part(i);
@@ -425,7 +425,7 @@ Apply_System_Matrix(const T_INDEX& index,const ARRAY<T,TV_INT>& u_input) const
     if(!diagonal_entries(index))
 	return (T)0;
     T lu=0;
-    for(int v=1;v<=d;v++){
+    for(int v=0;v<d;v++){
 	T_INDEX neighbor_index = index+T_INDEX::Axis_Vector(v);
 	if(diagonal_entries(neighbor_index))
 	    lu+=u_input(neighbor_index);
@@ -456,7 +456,7 @@ Subtract_Multiple_Of_System_Matrix_And_Compute_Sum_And_Extrema(const ARRAY<T,TV_
 	if(diagonal_entries(index)==0)
 	    continue;
 	T result=diagonal_entries(index)*x(index);
-	for(int v=1;v<=d;v++){
+	for(int v=0;v<d;v++){
 	    T_INDEX axis_vector=T_INDEX::Axis_Vector(v);
 	    if(diagonal_entries(index+axis_vector))
 		result+=x(index+axis_vector);
@@ -493,7 +493,7 @@ Multiply_With_System_Matrix_And_Compute_Dot_Product(const ARRAY<T,TV_INT>& x,ARR
 	if(diagonal_entries(index)==0)
 	    continue;
 	T result=diagonal_entries(index)*x(index);
-	for(int v=1;v<=d;v++){
+	for(int v=0;v<d;v++){
 	    T_INDEX axis_vector=T_INDEX::Axis_Vector(v);
 	    if(diagonal_entries(index+axis_vector))
 		result+=x(index+axis_vector);
@@ -542,7 +542,7 @@ Interior_Relaxation(const int loops,const bool compute_dot_product)
     // are computed before being applied to u(index)
 
     double dot_product=0;
-    for(int loop=1;loop<=loops;loop++){
+    for(int loop=0;loop<loops;loop++){
 	
 
 	// compute deltas on first coarse x-slice
@@ -558,7 +558,7 @@ Interior_Relaxation(const int loops,const bool compute_dot_product)
 		
 		const T_INDEX& fine_index=fine_iterator.Index();
 		delta(fine_index)=-b(fine_index);
-		for(int v=1;v<=d;v++){
+		for(int v=0;v<d;v++){
 		    delta(fine_index)+=u(fine_index+T_INDEX::Axis_Vector(v));
 		    delta(fine_index)+=u(fine_index-T_INDEX::Axis_Vector(v));
 		}
@@ -586,7 +586,7 @@ Interior_Relaxation(const int loops,const bool compute_dot_product)
 		shifted_fine_index(1)-=2;
 
 		delta(fine_index)=-b(fine_index);
-		for(int v=1;v<=d;v++){
+		for(int v=0;v<d;v++){
 		    delta(fine_index)+=u(fine_index+T_INDEX::Axis_Vector(v));
 		    delta(fine_index)+=u(fine_index-T_INDEX::Axis_Vector(v));
 		}
@@ -694,7 +694,7 @@ Relax_And_Compute_Residuals(const int interior_relaxations,const int boundary_po
 		delta(fine_index)=0;
 		if(index_is_interior_coarse_bitmask(coarse_index) & mask){
 		    delta(fine_index) = one_third*b(fine_index);
-		    for(int v=1;v<=d;v++)
+		    for(int v=0;v<d;v++)
 			delta(fine_index)+=two_thirds_over_diagonal_part*(b(fine_index+T_INDEX::Axis_Vector(v))
 			    +b(fine_index-T_INDEX::Axis_Vector(v)));
 		}
@@ -715,7 +715,7 @@ Relax_And_Compute_Residuals(const int interior_relaxations,const int boundary_po
 	    	delta(fine_index)=0;
 		if(index_is_interior_coarse_bitmask(coarse_index) & mask){
 		    delta(fine_index) = one_third*b(fine_index);
-		    for(int v=1;v<=d;v++)
+		    for(int v=0;v<d;v++)
 			delta(fine_index)+=two_thirds_over_diagonal_part*(b(fine_index+T_INDEX::Axis_Vector(v))
 			    +b(fine_index-T_INDEX::Axis_Vector(v)));
 		}
@@ -739,11 +739,11 @@ Compute_Residuals_Boundary()
     Residual_Boundary_Helper<T> residual_helper(n(1),n(2),n(3),&u(1,1,1),&b(1,1,1),&delta(1,1,1),&diagonal_entries(1,1,1),&extended_boundary_indices(1),extended_boundary_indices.m);
     residual_helper.Run_Parallel(number_of_threads);
 #else
-    for(int i=1;i<=extended_boundary_indices.m;i++){
+    for(int i=0;i<extended_boundary_indices.m;i++){
 	const T_INDEX& index=extended_boundary_indices(i);
 	if(diagonal_entries(index)!=0){
 	    delta(index)=b(index)-diagonal_entries(index)*u(index);
-	    for(int v=1;v<=d;v++)
+	    for(int v=0;v<d;v++)
 		delta(index)-=u(index+T_INDEX::Axis_Vector(v))
 		    +u(index-T_INDEX::Axis_Vector(v));
 	}

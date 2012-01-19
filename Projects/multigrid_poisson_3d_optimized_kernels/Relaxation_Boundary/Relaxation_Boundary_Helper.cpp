@@ -33,7 +33,7 @@ Run_Parallel(const int number_of_partitions)
     if(x_size*y_size*z_size<=32*32*32) {Run();return;} // Run serially for small problems
 
     if(!reverse_order){
-        for(int partition=1;partition<=number_of_partitions;partition++){
+        for(int partition=0;partition<number_of_partitions;partition++){
             int first_block_of_partition=(number_of_red_blocks/number_of_partitions)*(partition-1)+std::min(number_of_red_blocks%number_of_partitions,partition-1);
             int last_block_of_partition=(number_of_red_blocks/number_of_partitions)*partition+std::min(number_of_red_blocks%number_of_partitions,partition)-1;
             Relaxation_Boundary_Size_Specific_Thread_Helper<T,y_size,z_size>* task=
@@ -41,7 +41,7 @@ Run_Parallel(const int number_of_partitions)
             pthread_queue->Queue(task);}
         pthread_queue->Wait();}
     
-    for(int partition=1;partition<=number_of_partitions;partition++){
+    for(int partition=0;partition<number_of_partitions;partition++){
         int first_block_of_partition=(number_of_black_blocks/number_of_partitions)*(partition-1)+std::min(number_of_black_blocks%number_of_partitions,partition-1) +number_of_red_blocks;
         int last_block_of_partition=(number_of_black_blocks/number_of_partitions)*partition+std::min(number_of_black_blocks%number_of_partitions,partition)-1 +number_of_red_blocks;
 	Relaxation_Boundary_Size_Specific_Thread_Helper<T,y_size,z_size>* task=
@@ -50,7 +50,7 @@ Run_Parallel(const int number_of_partitions)
     pthread_queue->Wait();
     
     if(reverse_order){
-	for(int partition=1;partition<=number_of_partitions;partition++){
+	for(int partition=0;partition<number_of_partitions;partition++){
             int first_block_of_partition=(number_of_red_blocks/number_of_partitions)*(partition-1)+std::min(number_of_red_blocks%number_of_partitions,partition-1);
             int last_block_of_partition=(number_of_red_blocks/number_of_partitions)*partition+std::min(number_of_red_blocks%number_of_partitions,partition)-1;
             Relaxation_Boundary_Size_Specific_Thread_Helper<T,y_size,z_size>* task=

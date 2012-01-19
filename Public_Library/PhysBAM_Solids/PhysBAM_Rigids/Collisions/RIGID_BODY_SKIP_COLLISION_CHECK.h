@@ -28,7 +28,7 @@ public:
 
     void Reset()
     {skip_counter=1;
-    for(int i=1;i<=pair_last_checked.m;i++) pair_last_checked(i).Remove_All();
+    for(int i=0;i<pair_last_checked.m;i++) pair_last_checked(i).Remove_All();
     rigid_body_last_moved.Fill(1);}
 
     void Initialize(const int number_of_rigid_bodies,const bool reset)
@@ -37,7 +37,7 @@ public:
         rigid_body_last_moved.Resize(number_of_rigid_bodies,false,false);
         Reset();}
     else{
-        for(int i=1;i<=pair_last_checked.m;i++) pair_last_checked(i).Remove_All();
+        for(int i=0;i<pair_last_checked.m;i++) pair_last_checked(i).Remove_All();
         pair_last_checked.Resize(number_of_rigid_bodies,false,true);
         int old_size=rigid_body_last_moved.m;
         rigid_body_last_moved.Resize(number_of_rigid_bodies,false,true);

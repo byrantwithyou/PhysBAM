@@ -81,7 +81,7 @@ int Flood_Fill_Mesh(const ARRAY<int>& centers,ARRAY<int>& labels,ARRAY<int>& dis
     labels.Resize(segment_mesh.number_nodes);labels.Fill(0);
     distances.Resize(segment_mesh.number_nodes);distances.Fill(-1);
     QUEUE<int> queue(segment_mesh.number_nodes);
-    for(int c=1;c<=centers.m;c++){labels(centers(c))=c;distances(centers(c))=0;queue.Enqueue(centers(c));}
+    for(int c=0;c<centers.m;c++){labels(centers(c))=c;distances(centers(c))=0;queue.Enqueue(centers(c));}
     while(!queue.Empty()){
         int node=queue.Dequeue();
         for(int i=1;i<=(*segment_mesh.neighbor_nodes)(node).m;i++){
@@ -108,7 +108,7 @@ void Compute_Initial_Clustering()
     ARRAY<int> centers,distances;centers.Append(active_nodes(random_numbers.Get_Uniform_Integer(1,active_nodes.m)));
     while(centers.m<partitions){Flood_Fill_Mesh(centers,node_labels,distances);centers.Append(distances.Argmax());}
     int functional=Flood_Fill_Mesh(centers,node_labels,distances);
-    for(int partition=1;partition<=partitions;partition++) LOG::cout<<"partition "<<partition<<" has "<<node_labels.Count_Matches(partition)<<" particles"<<std::endl;
+    for(int partition=0;partition<partitions;partition++) LOG::cout<<"partition "<<partition<<" has "<<node_labels.Count_Matches(partition)<<" particles"<<std::endl;
     LOG::cout<<node_labels.Count_Matches(0)<<" particles do not belong to any partition"<<std::endl;
     LOG::cout<<"sum of squared radii = "<<functional<<std::endl;
 
@@ -147,12 +147,12 @@ void Optimize_Clustering()
 {
     LOG::SCOPE scope("Optimization");
     FILE_UTILITIES::Read_From_File<T>(output_directory+"/initial_node_labels",node_labels);partitions=node_labels.Max();
-    ARRAY<int> cluster_sizes(partitions);for(int partition=1;partition<=partitions;partition++) cluster_sizes(partition)=node_labels.Count_Matches(partition);
+    ARRAY<int> cluster_sizes(partitions);for(int partition=0;partition<partitions;partition++) cluster_sizes(partition)=node_labels.Count_Matches(partition);
     int cluster_size_functional=0;
     for(int i=1;i<partitions;i++) for(int j=i+1;j<=partitions;j++) cluster_size_functional+=sqr(cluster_sizes(i)-cluster_sizes(j));
     int cross_edges=0;
     ARRAY<int> boundary_nodes,boundary_node_index(node_labels.m),removed_boundary_nodes;
-    for(int s=1;s<=segment_mesh.elements.m;s++){
+    for(int s=0;s<segment_mesh.elements.m;s++){
         VECTOR<int,2>& segment=segment_mesh.elements(s);
         if(node_labels(segment.x)!=node_labels(segment.y)){
             cross_edges++;
@@ -174,8 +174,8 @@ void Optimize_Clustering()
     LOG::cout<<"Total functional     : "<<total_functional<<std::endl;}
 
     double temperature=initial_temperature;
-    if(boundary_nodes.m) for(int epoch=1;epoch<=epochs;epoch++){
-        for(int iteration=1;iteration<=iterations;iteration++){
+    if(boundary_nodes.m) for(int epoch=0;epoch<epochs;epoch++){
+        for(int iteration=0;iteration<iterations;iteration++){
             int node;do{node=boundary_nodes(random_numbers.Get_Uniform_Integer(1,boundary_nodes.m));}while(!boundary_node_index(node));
             int old_label=node_labels(node);
             ARRAY<int> candidate_labels;
@@ -207,7 +207,7 @@ void Optimize_Clustering()
             LOG::cout<<"total functional     : "<<total_functional<<std::endl;}}
     else LOG::cout<<"Only one partition.  No need to optimize."<<std::endl;
 
-    partition_nodes.Resize(partitions);for(int i=1;i<=node_labels.m;i++) if(node_labels(i)) partition_nodes(node_labels(i)).Append(i);
+    partition_nodes.Resize(partitions);for(int i=0;i<node_labels.m;i++) if(node_labels(i)) partition_nodes(node_labels(i)).Append(i);
     FILE_UTILITIES::Write_To_File<T>(output_directory+"/optimized_node_labels",node_labels);
     FILE_UTILITIES::Write_To_File<T>(output_directory+"/partition_nodes",partition_nodes);
     Visualize_Partitioning();
@@ -252,13 +252,13 @@ void Optimize_Particle_Order(const int reorder_partition_input)
         ARRAY<int> local_indices(segment_mesh.number_nodes);
         for(int i=1;i<=partition_nodes(reorder_partition).m;i++) local_indices(partition_nodes(reorder_partition)(i))=i;
         SEGMENT_MESH local_segment_mesh;
-        for(int s=1;s<=segment_mesh.elements.m;s++) local_segment_mesh.elements.Append(VECTOR<int,2>::Map(local_indices,segment_mesh.elements(s)));
+        for(int s=0;s<segment_mesh.elements.m;s++) local_segment_mesh.elements.Append(VECTOR<int,2>::Map(local_indices,segment_mesh.elements(s)));
         local_segment_mesh.Delete_Elements_With_Missing_Nodes();local_segment_mesh.number_nodes=partition_nodes(reorder_partition).m;
         local_segment_mesh.Initialize_Neighbor_Nodes();
         const ARRAY<ARRAY<int> >& neighbor_nodes=*local_segment_mesh.neighbor_nodes;
         ARRAY<int> node_locations(IDENTITY_ARRAY<>(local_segment_mesh.number_nodes));
 
-        FUNCTIONAL functional=0;for(int s=1;s<=local_segment_mesh.elements.m;s++) functional+=Log_Distance(VECTOR<int,2>::Map(node_locations,local_segment_mesh.elements(s)));
+        FUNCTIONAL functional=0;for(int s=0;s<local_segment_mesh.elements.m;s++) functional+=Log_Distance(VECTOR<int,2>::Map(node_locations,local_segment_mesh.elements(s)));
 
         static const bool swap_neighbors=true; // 8.39834
         static const int swap_nearby=0;//20;
@@ -285,9 +285,9 @@ void Optimize_Particle_Order(const int reorder_partition_input)
             LOG::cout<<"mutations            : swap_nearby = "<<swap_nearby<<std::endl;}
 
         double temperature=initial_temperature;
-        for(int epoch=1;epoch<=epochs;epoch++){
+        for(int epoch=0;epoch<epochs;epoch++){
             if(!reverse_range)
-                for(int iteration=1;iteration<=iterations;iteration++){
+                for(int iteration=0;iteration<iterations;iteration++){
                     FUNCTIONAL new_functional=functional;
                     int node1=random_numbers.Get_Uniform_Integer(1,neighbor_nodes.m),node2;
                     if(swap_neighbors)
@@ -307,7 +307,7 @@ void Optimize_Particle_Order(const int reorder_partition_input)
                     if(new_functional<functional || exp((functional-new_functional)/temperature)>random_numbers.Get_Number()){
                         exchange(node_locations(node1),node_locations(node2));functional=new_functional;}}
             else // reverse
-                for(int iteration=1;iteration<=iterations;iteration++){
+                for(int iteration=0;iteration<iterations;iteration++){
                     FUNCTIONAL new_functional=functional;
                     int start=random_numbers.Get_Uniform_Integer(1,neighbor_nodes.m);
                     int end=start+random_numbers.Get_Uniform_Integer(1,reverse_range);

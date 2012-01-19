@@ -73,7 +73,7 @@ void Initialize_Triangle_Area_Fractions_From_Voronoi_Regions(TRIANGULATED_AREA<T
 {
     if(!ta.triangle_area_fractions) ta.triangle_area_fractions=new ARRAY<VECTOR<T,2> >;
     ta.triangle_area_fractions->Resize(ta.mesh.elements.m);
-    for(int t=1;t<=ta.mesh.elements.m;t++){
+    for(int t=0;t<ta.mesh.elements.m;t++){
         int i,j,k;ta.mesh.elements(t).Get(i,j,k);
         VECTOR<T,3> fractions=VECTOR<T,3>(1,1,1)-TRIANGLE_2D<T>::Circumcenter_Barycentric_Coordinates(ta.particles.X(i),ta.particles.X(j),ta.particles.X(k));
         fractions.x=max(T(0),fractions.x);fractions.y=max(T(0),fractions.y);fractions.z=max(T(0),fractions.z);
@@ -88,7 +88,7 @@ void Compute_Triangle_Areas(TRIANGULATED_AREA<T>& ta)
 {
     if(!ta.triangle_areas) ta.triangle_areas=new ARRAY<T>;
     ta.triangle_areas->Resize(ta.mesh.elements.m);
-    for(int t=1;t<=ta.mesh.elements.m;t++){
+    for(int t=0;t<ta.mesh.elements.m;t++){
         int i,j,k;ta.mesh.elements(t).Get(i,j,k);
         (*ta.triangle_areas)(t)=TRIANGLE_2D<T>::Signed_Area(ta.particles.X(i),ta.particles.X(j),ta.particles.X(k));}
 }
@@ -104,7 +104,7 @@ void Compute_Nodal_Areas(TRIANGULATED_AREA<T>& ta,bool save_triangle_areas)
         if(!ta.triangle_areas) ta.triangle_areas=new ARRAY<T>;
         ta.triangle_areas->Resize(ta.mesh.elements.m);}
     ta.nodal_areas->Fill(0);
-    for(int t=1;t<=ta.mesh.elements.m;t++){
+    for(int t=0;t<ta.mesh.elements.m;t++){
         int i,j,k;ta.mesh.elements(t).Get(i,j,k);
         T area=TRIANGLE_2D<T>::Signed_Area(ta.particles.X(i),ta.particles.X(j),ta.particles.X(k));
         if(save_triangle_areas) (*ta.triangle_areas)(t)=area;

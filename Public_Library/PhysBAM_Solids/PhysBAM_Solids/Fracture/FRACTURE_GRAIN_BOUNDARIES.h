@@ -73,7 +73,7 @@ public:
     virtual void Phi_For_Region_In_Element(const int element,const int region,VECTOR<T,d+1>& phi){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
 
     int Number_Of_Nodes_In_Region(const int region)
-    {int count=0;for(int i=1;i<=mesh.number_nodes;i++)if(node_region(i)==region)count++;return count;}
+    {int count=0;for(int i=0;i<mesh.number_nodes;i++)if(node_region(i)==region)count++;return count;}
 
     virtual int Number_Of_Regions(){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();return 0;}
 

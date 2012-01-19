@@ -34,15 +34,15 @@ LINEAR_FINITE_VOLUME(T_OBJECT& object,const T youngs_modulus,const T poissons_ra
     if(use_uniform_density){
         T total_mass=0;
         ARRAY<int> mesh_particles;mesh.elements.Flattened().Get_Unique(mesh_particles);
-        for(int i=1;i<=mesh_particles.m;i++) total_mass+=particles.mass(mesh_particles(i));
+        for(int i=0;i<mesh_particles.m;i++) total_mass+=particles.mass(mesh_particles(i));
         density=total_mass/object.Total_Size();
         if(density==0) density=TV::dimension==1?1:TV::dimension==2?100:1000;}
     else{
         density_list=new ARRAY<T>(mesh.elements.m);
-        for(int i=1;i<=mesh.elements.m;i++){
+        for(int i=0;i<mesh.elements.m;i++){
             const VECTOR<int,d+1>& nodes=mesh.elements(i);
             T volume=object.Signed_Size(i);
-            for(int j=1;j<=nodes.m;j++) (*density_list)(i)+=particles.mass(nodes(j))/(*mesh.incident_elements)(nodes(j)).m/volume;
+            for(int j=0;j<nodes.m;j++) (*density_list)(i)+=particles.mass(nodes(j))/(*mesh.incident_elements)(nodes(j)).m/volume;
             if((*density_list)(i)==0) (*density_list)(i)=TV::dimension==1?1:TV::dimension==2?100:1000;}}
 }
 //#####################################################################
@@ -78,7 +78,7 @@ Initialize_Material_State(ARRAY_VIEW<const TV> X)
 {
     Dm_inverse.Resize(mesh.elements.m,false,false);Bm.Resize(mesh.elements.m,false,false);
     if(TV::m>d) normals.Resize(mesh.elements.m,false,false);
-    for(int t=1;t<=mesh.elements.m;t++){
+    for(int t=0;t<mesh.elements.m;t++){
         MATRIX<T,TV::m,d> Dm=Ds(X,t);
         if(TV::m>d) normals(t)=Normal(Dm);
         Dm_inverse(t)=Pseudoinverse(Dm);
@@ -168,7 +168,7 @@ Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> frequency)
         T elastic_squared=(lambda+2*mu)/(local_density*altitude_squared)*one_over_cfl_number_squared;
         T damping=(alpha+2*beta)/(local_density*altitude_squared)*one_over_cfl_number;
         const VECTOR<int,d+1>& nodes=mesh.elements(t);
-        for(int j=1;j<=nodes.m;j++){FREQUENCY_DATA& data=fragment_particle_frequency(nodes[j]);
+        for(int j=0;j<nodes.m;j++){FREQUENCY_DATA& data=fragment_particle_frequency(nodes[j]);
             data.elastic_squared=max(data.elastic_squared,elastic_squared);data.damping=max(data.damping,damping);}}
     for(ELEMENT_ITERATOR iterator(force_particles);iterator.Valid();iterator.Next()){int p=iterator.Data();
         frequency(p).elastic_squared+=fragment_particle_frequency(p).elastic_squared;

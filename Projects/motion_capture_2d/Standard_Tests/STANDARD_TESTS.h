@@ -339,7 +339,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     solid_body_collection.Add_Force(gravity);
     controller->bone_hierarchy=bone_hierarchy;
     
-    for(int i=1;i<=solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->limit_time_step_by_strain_rate=false;
+    for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->limit_time_step_by_strain_rate=false;
 
     // correct mass
     binding_list.Distribute_Mass_To_Parents();

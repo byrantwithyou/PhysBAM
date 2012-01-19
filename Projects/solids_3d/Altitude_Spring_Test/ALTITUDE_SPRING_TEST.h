@@ -57,10 +57,10 @@ void Initialize_Cloth(DEFORMABLE_TRIANGULATED_SURFACE<T>& cloth)
     else{
         int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;
         cloth.triangulated_surface.triangle_mesh.Initialize_Square_Mesh(m,n);
-        for(int k=1;k<=cloth.triangulated_surface.triangle_mesh.number_nodes;k++) cloth.triangulated_surface.particles.array_collection->Add_Element();
+        for(int k=0;k<cloth.triangulated_surface.triangle_mesh.number_nodes;k++) cloth.triangulated_surface.particles.array_collection->Add_Element();
         T mass_node=aspect_ratio*sqr(side_length)/(m*n);ARRAY<T>::copy(mass_node,cloth.triangulated_surface.particles.mass.array);
         T dx=aspect_ratio*side_length/(m-1),dy=side_length/(n-1);
-        for(int i=1;i<=m;i++) for(int j=1;j<=n;j++){int node=i+m*(j-1);
+        for(int i=0;i<m;i++) for(int j=0;j<n;j++){int node=i+m*(j-1);
             cloth.triangulated_surface.particles.X(node)=VECTOR_3D<T>((i-1)*dx,.5,(j-1)*dy);
             cloth.triangulated_surface.particles.V(node)=VECTOR_3D<T>(0,0,0);}}
 

@@ -29,7 +29,7 @@ template<class TV> void SURFACE_TENSION_FORCE<TV>::
 Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 {
     if(apply_explicit_forces)
-        for(int i=1;i<=surface.mesh.elements.m;i++){VECTOR<int,2> k=surface.mesh.elements(i);
+        for(int i=0;i<surface.mesh.elements.m;i++){VECTOR<int,2> k=surface.mesh.elements(i);
             TV f=(surface.particles.X(k.x)-surface.particles.X(k.y))*coefficients(i);
             F(k.x)-=f;
             F(k.y)+=f;}
@@ -57,12 +57,12 @@ Update_Position_Based_State(const T time,const bool is_position_update)
 {
     coefficients.Resize(surface.mesh.elements.m);
     normal.Resize(surface.mesh.elements.m);
-    for(int i=1;i<=surface.mesh.elements.m;i++){VECTOR<int,2> k=surface.mesh.elements(i);
+    for(int i=0;i<surface.mesh.elements.m;i++){VECTOR<int,2> k=surface.mesh.elements(i);
         normal(i)=(surface.particles.X(k.x)-surface.particles.X(k.y)).Orthogonal_Vector();
         coefficients(i)=surface_tension_coefficient/normal(i).Normalize();}
     if(this->compute_half_forces){
         sqrt_coefficients.Resize(surface.mesh.elements.m);
-        for(int i=1;i<=surface.mesh.elements.m;i++)
+        for(int i=0;i<surface.mesh.elements.m;i++)
             sqrt_coefficients(i)=sqrt(dt*coefficients(i));}
 }
 //#####################################################################
@@ -72,7 +72,7 @@ template<class TV> void SURFACE_TENSION_FORCE<TV>::
 Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
 {
     if(apply_implicit_forces)
-        for(int i=1;i<=surface.mesh.elements.m;i++){VECTOR<int,2> k=surface.mesh.elements(i);
+        for(int i=0;i<surface.mesh.elements.m;i++){VECTOR<int,2> k=surface.mesh.elements(i);
             TV f=(TV::Dot_Product((V(k.x)-V(k.y)),normal(i))*coefficients(i)*dt)*normal(i);
             F(k.x)-=f;
             F(k.y)+=f;}
@@ -115,7 +115,7 @@ template<class TV> void SURFACE_TENSION_FORCE<TV>::
 Add_Velocity_Dependent_Forces_First_Half(ARRAY_VIEW<const TV> V,ARRAY_VIEW<T> aggregate,const T time) const
 {
     if(apply_implicit_forces)
-        for(int i=1;i<=surface.mesh.elements.m;i++){VECTOR<int,2> k=surface.mesh.elements(i);
+        for(int i=0;i<surface.mesh.elements.m;i++){VECTOR<int,2> k=surface.mesh.elements(i);
             aggregate(i)=TV::Dot_Product((V(k.x)-V(k.y)),normal(i))*sqrt_coefficients(i);}
 }
 //#####################################################################
@@ -125,7 +125,7 @@ template<class TV> void SURFACE_TENSION_FORCE<TV>::
 Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T> aggregate,ARRAY_VIEW<TV> F,const T time) const
 {
     if(apply_implicit_forces)
-        for(int i=1;i<=surface.mesh.elements.m;i++){VECTOR<int,2> k=surface.mesh.elements(i);
+        for(int i=0;i<surface.mesh.elements.m;i++){VECTOR<int,2> k=surface.mesh.elements(i);
             TV f=(aggregate(i)*sqrt_coefficients(i))*normal(i);
             F(k.x)+=f;
             F(k.y)-=f;}
@@ -137,7 +137,7 @@ template<class TV> void SURFACE_TENSION_FORCE<TV>::
 Add_Raw_Velocity_Dependent_Forces_First_Half(ARRAY<TRIPLE<int,int,T> >& data) const
 {
     if(apply_implicit_forces)
-        for(int i=1;i<=surface.mesh.elements.m;i++){VECTOR<int,2> k=surface.mesh.elements(i);
+        for(int i=0;i<surface.mesh.elements.m;i++){VECTOR<int,2> k=surface.mesh.elements(i);
             int off_kx=(k.x-1)*TV::m,off_ky=(k.y-1)*TV::m;
             TV sn=sqrt_coefficients(i)*normal(i);
             for(int j=1;j<=TV::m;j++){
@@ -182,7 +182,7 @@ Potential_Energy(const T time) const
 {
     T pe=0;
     if(apply_explicit_forces)
-        for(int i=1;i<=surface.mesh.elements.m;i++){VECTOR<int,2> k=surface.mesh.elements(i);
+        for(int i=0;i<surface.mesh.elements.m;i++){VECTOR<int,2> k=surface.mesh.elements(i);
             pe+=surface_tension_coefficient*(surface.particles.X(k.x)-surface.particles.X(k.y)).Magnitude();}
     return pe;
 }
@@ -197,11 +197,11 @@ Dump_Curvatures() const
     ARRAY<TV> F(surface.mesh.elements.m);
     Add_Velocity_Independent_Forces(F,0);
     ARRAY<T> A(coefficients.m);
-    for(int i=1;i<=surface.mesh.elements.m;i++){VECTOR<int,2> k=surface.mesh.elements(i);
+    for(int i=0;i<surface.mesh.elements.m;i++){VECTOR<int,2> k=surface.mesh.elements(i);
         T len=(surface.particles.X(k.x)-surface.particles.X(k.y)).Magnitude()/2;
         A(k.x)+=len;
         A(k.y)+=len;}
-    for(int i=1;i<=F.m;i++){
+    for(int i=0;i<F.m;i++){
         T K=abs(F(i).Magnitude()/A(i)/surface_tension_coefficient);
         TV dx=surface.particles.X(i)-(T).02;
         av+=K;

@@ -22,12 +22,12 @@ void Union_Mesh_Objects_Relatively(T_OBJECT *object,const ARRAY<T_OBJECT*>& obje
     object->mesh.elements.Remove_All();
     // resize
     {int total_particles=0,total_elements=0;
-    for(int i=1;i<=object_list.m;i++){
+    for(int i=0;i<object_list.m;i++){
         total_particles+=object_list(i)->particles.array_collection->Size();
         total_elements+=object_list(i)->mesh.elements.m;}
     particles.array_collection->Preallocate(total_particles);object->mesh.elements.Preallocate(total_elements);}
     // copy
-    for(int i=1;i<=object_list.m;i++){
+    for(int i=0;i<object_list.m;i++){
         int particle_offset=particles.array_collection->Size();
         particles.array_collection->Add_Arrays(*object_list(i)->particles.array_collection);
         particles.array_collection->Append(*object_list(i)->particles.array_collection);

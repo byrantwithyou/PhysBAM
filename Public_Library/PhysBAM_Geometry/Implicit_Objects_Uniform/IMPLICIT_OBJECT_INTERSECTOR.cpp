@@ -69,7 +69,7 @@ Negative_Material_In_Cell(const GRID<TV>& grid,const TV_INT& cell_index,const bo
     if(maximum_refinement_depth>0 && cell_phis.m==unrefined_point_count) return minimum_phi<=0?full_cell_size:0;
     // compute material
     T negative_material=0;
-    for(int i=1;i<=cell_refinement_simplices.m;i++) negative_material+=T_SIMPLEX::Negative_Material(cell_particle_X,cell_phis,cell_refinement_simplices(i));
+    for(int i=0;i<cell_refinement_simplices.m;i++) negative_material+=T_SIMPLEX::Negative_Material(cell_particle_X,cell_phis,cell_refinement_simplices(i));
     return clamp(negative_material,(T)0,full_cell_size);
 }
 //#####################################################################
@@ -115,7 +115,7 @@ Negative_Material_In_Box(const RANGE<TV>& box,const bool force_full_refinement)
     if(maximum_refinement_depth>0 && cell_phis.m==unrefined_point_count) return minimum_phi<=0?box.Size():0;
     // compute material
     T negative_material=0;
-    for(int i=1;i<=cell_refinement_simplices.m;i++) negative_material+=T_SIMPLEX::Negative_Material(cell_particle_X,cell_phis,cell_refinement_simplices(i));
+    for(int i=0;i<cell_refinement_simplices.m;i++) negative_material+=T_SIMPLEX::Negative_Material(cell_particle_X,cell_phis,cell_refinement_simplices(i));
     return clamp(negative_material,(T)0,box.Size());
 }
 //#####################################################################
@@ -165,7 +165,7 @@ Negative_Material_In_Box_Excluding_Object(const RANGE<TV>& box,const ARRAY<IMPLI
     if(maximum_refinement_depth>0 && cell_phis.m==unrefined_point_count) return minimum_phi<=0?box.Size():0;
     // compute material
     T negative_material=0;
-    for(int i=1;i<=cell_refinement_simplices.m;i++) negative_material+=T_SIMPLEX::Negative_Material(cell_particle_X,cell_phis,cell_refinement_simplices(i));
+    for(int i=0;i<cell_refinement_simplices.m;i++) negative_material+=T_SIMPLEX::Negative_Material(cell_particle_X,cell_phis,cell_refinement_simplices(i));
     return clamp(negative_material,(T)0,box.Size());
 }
 //#####################################################################

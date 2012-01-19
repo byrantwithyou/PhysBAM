@@ -38,9 +38,9 @@ SLIP_SYSTEM(const bool use_preconditioner_input,BACKWARD_EULER_SYSTEM<TV>* solid
         C_s*=-1;
 #ifdef DEBUG_OUTPUT
         LOG::cout<<"C_s:"<<std::endl;
-        for(int i=1;i<=C_s.m;i++){
+        for(int i=0;i<C_s.m;i++){
             LOG::cout<<"Row "<<i<<": ";
-            for(int j=1;j<=C_s.n;j++){
+            for(int j=0;j<C_s.n;j++){
                 if(C_s.Element_Present(i,j))
                     LOG::cout<<"("<<j<<", "<<C_s(i,j)<<") ";
             }
@@ -104,9 +104,9 @@ Apply_Fluid(const VECTOR_T& V,VECTOR_ND<T>& result_dual_cells_size_vector) const
 #ifdef DEBUG_OUTPUT
     LOG::cout<<"Writing out matrix (fluid part) after solve"<<std::endl;
     SPARSE_MATRIX_FLAT_MXN<T> full_matrix_fluid_part=C_f_transpose.Scale_Rows(M_inverse);
-    for(int i=1;i<=full_matrix_fluid_part.m;i++){
+    for(int i=0;i<full_matrix_fluid_part.m;i++){
         LOG::cout<<"Row "<<i<<": ";
-        for(int j=1;j<=full_matrix_fluid_part.n;j++){
+        for(int j=0;j<full_matrix_fluid_part.n;j++){
             if(full_matrix_fluid_part.Element_Present(i,j))
                 LOG::cout<<"("<<j<<", "<<full_matrix_fluid_part(i,j)<<") ";
         }

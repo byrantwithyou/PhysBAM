@@ -87,7 +87,7 @@ Initialize_Components_And_Key_Bindings()
 {
     ANIMATED_VISUALIZATION::Initialize_Components_And_Key_Bindings();
 
-    for(int i=1;i<=filenames.m;i++){std::string filename=filenames(i);
+    for(int i=0;i<filenames.m;i++){std::string filename=filenames(i);
         if (!FILE_UTILITIES::Frame_File_Exists(filename, start_frame)){
             std::cerr << "Can't open " << FILE_UTILITIES::Get_Frame_Filename(filename, start_frame) << std::endl;
             exit(1);}
@@ -171,7 +171,7 @@ Command_Prompt_Response()
         {
             int min_height, max_height;
             sstream >> min_height >> max_height;
-            for(int i=1;i<=particle_hierarchy_component.m;i++) if(particle_hierarchy_component(i))
+            for(int i=0;i<particle_hierarchy_component.m;i++) if(particle_hierarchy_component(i))
             {
                 particle_hierarchy_component(i)->object.min_height = min_height;
                 particle_hierarchy_component(i)->object.max_height = max_height;
@@ -189,7 +189,7 @@ Command_Prompt()
 template<class T> void VISUALIZATION<T>::
 Toggle_Highlight_Boundary()
 {
-    for(int i=1;i<=triangulated_surface_component.m;i++) if(triangulated_surface_component(i))
+    for(int i=0;i<triangulated_surface_component.m;i++) if(triangulated_surface_component(i))
         triangulated_surface_component(i)->opengl_triangulated_surface.highlight_boundary = !triangulated_surface_component(i)->opengl_triangulated_surface.highlight_boundary;
 }
 

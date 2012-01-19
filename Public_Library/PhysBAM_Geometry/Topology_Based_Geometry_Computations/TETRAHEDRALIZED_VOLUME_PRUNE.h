@@ -25,11 +25,11 @@ void Discard_Spikes_From_Adjacent_Elements(TETRAHEDRALIZED_VOLUME<T>& tv,ARRAY<i
     bool adjacent_elements_defined=tv.mesh.adjacent_elements!=0;if(!adjacent_elements_defined) tv.mesh.Initialize_Adjacent_Elements();
     if(deletion_list){
         deletion_list->Resize(0);
-        for(int t=1;t<=tv.mesh.elements.m;t++) if((*tv.mesh.adjacent_elements)(t).m == 1) deletion_list->Append(t);
+        for(int t=0;t<tv.mesh.elements.m;t++) if((*tv.mesh.adjacent_elements)(t).m == 1) deletion_list->Append(t);
         tv.mesh.Delete_Sorted_Elements(*deletion_list);}
     else{
         ARRAY<int> list;
-        for(int t=1;t<=tv.mesh.elements.m;t++) if((*tv.mesh.adjacent_elements)(t).m == 1) list.Append(t);
+        for(int t=0;t<tv.mesh.elements.m;t++) if((*tv.mesh.adjacent_elements)(t).m == 1) list.Append(t);
         tv.mesh.Delete_Sorted_Elements(list);}
     if(!adjacent_elements_defined){delete tv.mesh.adjacent_elements;tv.mesh.adjacent_elements=0;}
 }
@@ -80,13 +80,13 @@ void Discard_Spikes(TETRAHEDRALIZED_VOLUME<T>& tv,ARRAY<int>* deletion_list)
     bool node_on_boundary_defined=tv.mesh.node_on_boundary!=0;if(!node_on_boundary_defined) tv.mesh.Initialize_Node_On_Boundary();
     if(deletion_list){
         deletion_list->Resize(0);
-        for(int t=1;t<=tv.mesh.elements.m;t++){int i,j,k,l;tv.mesh.elements(t).Get(i,j,k,l);
+        for(int t=0;t<tv.mesh.elements.m;t++){int i,j,k,l;tv.mesh.elements(t).Get(i,j,k,l);
             if((*tv.mesh.node_on_boundary)(i) && (*tv.mesh.node_on_boundary)(j) && (*tv.mesh.node_on_boundary)(k) && (*tv.mesh.node_on_boundary)(l))
                 deletion_list->Append(t);}
         tv.mesh.Delete_Sorted_Elements(*deletion_list);}
     else{
         ARRAY<int> list;
-        for(int t=1;t<=tv.mesh.elements.m;t++){int i,j,k,l;tv.mesh.elements(t).Get(i,j,k,l);
+        for(int t=0;t<tv.mesh.elements.m;t++){int i,j,k,l;tv.mesh.elements(t).Get(i,j,k,l);
             if((*tv.mesh.node_on_boundary)(i) && (*tv.mesh.node_on_boundary)(j) && (*tv.mesh.node_on_boundary)(k) && (*tv.mesh.node_on_boundary)(l))
                 list.Append(t);}
         tv.mesh.Delete_Sorted_Elements(list);}

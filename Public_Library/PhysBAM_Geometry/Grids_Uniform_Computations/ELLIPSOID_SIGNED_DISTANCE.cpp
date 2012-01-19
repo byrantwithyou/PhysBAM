@@ -14,7 +14,7 @@ namespace SIGNED_DISTANCE{
 //#####################################################################
 template<class TV,class T_GRID,class T_ARRAY> void Calculate_Approximate(const ELLIPSOID<TV>& ellipsoid,const T_GRID& grid,T_ARRAY& phi,bool verbose)
 {
-    for(int i=1;i<=grid.counts.x;i++)for(int j=1;j<=grid.counts.y;j++)for(int ij=1;ij<=grid.counts.z;ij++)
+    for(int i=0;i<grid.counts.x;i++)for(int j=0;j<grid.counts.y;j++)for(int ij=0;ij<grid.counts.z;ij++)
         phi(i,j,ij)=ellipsoid.Approximate_Signed_Distance(grid.X(i,j,ij));
 }
 //#####################################################################

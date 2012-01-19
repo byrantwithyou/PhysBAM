@@ -38,7 +38,7 @@ public:
     void Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* current_selection) const PHYSBAM_OVERRIDE;
     void Turn_Smooth_Shading_On() PHYSBAM_OVERRIDE;
     void Turn_Smooth_Shading_Off() PHYSBAM_OVERRIDE;
-    virtual void Slice_Has_Changed() { for(int i=1;i<=opengl_levelset_multiviews.m;i++) opengl_levelset_multiviews(i)->Set_Slice(slice); }
+    virtual void Slice_Has_Changed() { for(int i=0;i<opengl_levelset_multiviews.m;i++) opengl_levelset_multiviews(i)->Set_Slice(slice); }
 
     void Set_Frame(int frame_input) PHYSBAM_OVERRIDE;
     void Set_Draw(bool draw_input = true) PHYSBAM_OVERRIDE;

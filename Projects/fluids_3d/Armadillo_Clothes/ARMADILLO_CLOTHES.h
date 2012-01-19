@@ -233,7 +233,7 @@ void Initialize_Deformable_And_Rigid_Bodies()
     std::cout<<armadillo_grid<<std::endl;
     std::cout<<grid<<std::endl;
     //for(int i=-2;i<=grid.m+3;i++)for(int j=-2;j<=grid.n+3;j++)for(int ij=-2;ij<=grid.mn+3;ij++)
-    for(int i=1;i<=grid.m;i++)for(int j=1;j<=grid.n;j++)for(int ij=1;ij<=grid.mn;ij++)
+    for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++)for(int ij=0;ij<grid.mn;ij++)
         phi_object(i,j,ij)=armadillo_levelset.Extended_Phi(grid.X(i,j,ij)-rigid_body.position);
     LEVELSET_3D<GRID<TV> > tmp_levelset(grid,phi_object);
     FILE_UTILITIES::Write_To_File<RW>(output_directory+"/tmp2.phi",tmp_levelset);
@@ -269,7 +269,7 @@ void Initialize_Phi(const int object,ARRAY<T>& phi)
     CIRCLE<T> head(VECTOR_2D<T>(0,.01),.14*1.05*.5);
     CIRCLE<T> arm1(VECTOR_2D<T>(.38,.07),.1*1.05*.5);
     CIRCLE<T> arm2(VECTOR_2D<T>(-.37,.1),.1*1.05*.5);
-    for(int p=1;p<=phi.m;p++){
+    for(int p=0;p<phi.m;p++){
         VECTOR_2D<T>& X=node_locations(p);
         phi(p)=max(-head.Signed_Distance(X),-arm1.Signed_Distance(X),-arm2.Signed_Distance(X));}
 }
@@ -388,11 +388,11 @@ template<class SOURCE> void Get_Source_Velocities(const SOURCE& source,const T t
 {
     GRID<TV> &u_grid=fluids_parameters.u_grid,&v_grid=fluids_parameters.v_grid,&w_grid=fluids_parameters.w_grid;
     PROJECTION_3D<T>& projection=fluids_parameters.incompressible.projection;
-    for(int i=1;i<=u_grid.m;i++) for(int j=1;j<=u_grid.n;j++) for(int ij=1;ij<=u_grid.mn;ij++) if(source.Lazy_Inside(world_to_source*u_grid.X(i,j,ij))){
+    for(int i=0;i<u_grid.m;i++) for(int j=0;j<u_grid.n;j++) for(int ij=0;ij<u_grid.mn;ij++) if(source.Lazy_Inside(world_to_source*u_grid.X(i,j,ij))){
         projection.elliptic_solver->psi_N_u(i,j,ij)=true;projection.u(i,j,ij)=source_velocity.x;if(fluids_parameters.fire)projection.u_fuel(i,j,ij)=source_velocity.x;}
-    for(int i=1;i<=v_grid.m;i++) for(int j=1;j<=v_grid.n;j++) for(int ij=1;ij<=v_grid.mn;ij++) if(source.Lazy_Inside(world_to_source*v_grid.X(i,j,ij))){
+    for(int i=0;i<v_grid.m;i++) for(int j=0;j<v_grid.n;j++) for(int ij=0;ij<v_grid.mn;ij++) if(source.Lazy_Inside(world_to_source*v_grid.X(i,j,ij))){
         projection.elliptic_solver->psi_N_v(i,j,ij)=true;projection.v(i,j,ij)=source_velocity.y;if(fluids_parameters.fire)projection.v_fuel(i,j,ij)=source_velocity.y;}
-    for(int i=1;i<=w_grid.m;i++) for(int j=1;j<=w_grid.n;j++) for(int ij=1;ij<=w_grid.mn;ij++) if(source.Lazy_Inside(world_to_source*w_grid.X(i,j,ij))){
+    for(int i=0;i<w_grid.m;i++) for(int j=0;j<w_grid.n;j++) for(int ij=0;ij<w_grid.mn;ij++) if(source.Lazy_Inside(world_to_source*w_grid.X(i,j,ij))){
         projection.elliptic_solver->psi_N_w(i,j,ij)=true;projection.w(i,j,ij)=source_velocity.z;if(fluids_parameters.fire)projection.w_fuel(i,j,ij)=source_velocity.z;}
 }
 //#####################################################################
@@ -409,7 +409,7 @@ void Get_Source_Velocities(const T time)
 //#####################################################################
 template<class SOURCE> void Initialize_Phi(const SOURCE& source)
 {
-    for(int i=1;i<=fluids_parameters.grid.m;i++) for(int j=1;j<=fluids_parameters.grid.n;j++) for(int ij=1;ij<=fluids_parameters.grid.mn;ij++) 
+    for(int i=0;i<fluids_parameters.grid.m;i++) for(int j=0;j<fluids_parameters.grid.n;j++) for(int ij=0;ij<fluids_parameters.grid.mn;ij++) 
         if(source.Lazy_Inside(world_to_source*fluids_parameters.grid.X(i,j,ij)))
             fluids_parameters.particle_levelset_evolution.particle_levelset.levelset.phi(i,j,ij)=fluids_parameters.grid.dx;
         else
@@ -436,7 +436,7 @@ void Initialize_Levelset_Velocity(const int object,ARRAY<VECTOR_2D<T> >& V)
 //#####################################################################
 template<class SOURCE> void Adjust_Phi_With_Sources(const SOURCE& source,const T time)
 {
-    for(int i=1;i<=fluids_parameters.grid.m;i++) for(int j=1;j<=fluids_parameters.grid.n;j++) for(int ij=1;ij<=fluids_parameters.grid.mn;ij++) 
+    for(int i=0;i<fluids_parameters.grid.m;i++) for(int j=0;j<fluids_parameters.grid.n;j++) for(int ij=0;ij<fluids_parameters.grid.mn;ij++) 
 //        if(source.Lazy_Inside(world_to_source*fluids_parameters.grid.X(i,j,ij)))
         if(source.Lazy_Inside(world_to_source*fluids_parameters.grid.X(i,j,ij))&&fluids_parameters.particle_levelset_evolution.particle_levelset.levelset.phi(i,j,ij)<0)
             fluids_parameters.particle_levelset_evolution.particle_levelset.levelset.phi(i,j,ij)=fluids_parameters.grid.dx;
@@ -458,11 +458,11 @@ void Get_Object_Velocities(const T dt,const T time)
 {
     GRID<TV> &u_grid=fluids_parameters.u_grid,&v_grid=fluids_parameters.v_grid,&w_grid=fluids_parameters.w_grid;
     PROJECTION_3D<T>& projection=fluids_parameters.incompressible.projection;LAPLACE_3D<T>& elliptic_solver=*fluids_parameters.incompressible.projection.elliptic_solver;
-    for(int i=1;i<=u_grid.m;i++) for(int j=1;j<=u_grid.n;j++) for(int ij=1;ij<=u_grid.mn;ij++) if(phi_object(i,j,ij)+phi_object(i,j+1,ij)+phi_object(i,j,ij+1)+phi_object(i,j+1,ij+1)<0){
+    for(int i=0;i<u_grid.m;i++) for(int j=0;j<u_grid.n;j++) for(int ij=0;ij<u_grid.mn;ij++) if(phi_object(i,j,ij)+phi_object(i,j+1,ij)+phi_object(i,j,ij+1)+phi_object(i,j+1,ij+1)<0){
         elliptic_solver.psi_N_u(i,j,ij)=true;projection.u(i,j,ij)=0;projection.u_fuel(i,j,ij)=0;}
-    for(int i=1;i<=v_grid.m;i++) for(int j=1;j<=v_grid.n;j++) for(int ij=1;ij<=v_grid.mn;ij++) if(phi_object(i,j,ij)+phi_object(i+1,j,ij)+phi_object(i,j,ij+1)+phi_object(i+1,j,ij+1)<0){
+    for(int i=0;i<v_grid.m;i++) for(int j=0;j<v_grid.n;j++) for(int ij=0;ij<v_grid.mn;ij++) if(phi_object(i,j,ij)+phi_object(i+1,j,ij)+phi_object(i,j,ij+1)+phi_object(i+1,j,ij+1)<0){
         elliptic_solver.psi_N_v(i,j,ij)=true;projection.v(i,j,ij)=0;projection.v_fuel(i,j,ij)=0;}
-    for(int i=1;i<=w_grid.m;i++) for(int j=1;j<=w_grid.n;j++) for(int ij=1;ij<=w_grid.mn;ij++) if(phi_object(i,j,ij)+phi_object(i,j+1,ij)+phi_object(i+1,j,ij)+phi_object(i+1,j+1,ij)<0){
+    for(int i=0;i<w_grid.m;i++) for(int j=0;j<w_grid.n;j++) for(int ij=0;ij<w_grid.mn;ij++) if(phi_object(i,j,ij)+phi_object(i,j+1,ij)+phi_object(i+1,j,ij)+phi_object(i+1,j+1,ij)<0){
         elliptic_solver.psi_N_w(i,j,ij)=true;projection.w(i,j,ij)=0;projection.w_fuel(i,j,ij)=0;}
     //fluids_parameters.Extrapolate_Velocity_Into_Object(phi_object,*solids_parameters.rigid_body_parameters.list(armadillo_index),time);
     FIRE_MELTING_EXAMPLE_S3D<T,RW>::Get_Object_Velocities(dt,time);

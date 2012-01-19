@@ -54,7 +54,7 @@ Read(TYPED_ISTREAM& input,const std::string& directory,const int frame) // assum
     else
         Read_Write<DYNAMIC_LIST<JOINT<TV>,JOINT_ID>,double>::Read(dynamic_list,prefix,needs_init);
 #endif
-    for(int i=1;i<=joints.m;i++){JOINT_TYPE joint_type;Read_Binary(input,joint_type);
+    for(int i=0;i<joints.m;i++){JOINT_TYPE joint_type;Read_Binary(input,joint_type);
         delete joints(i);
         ARRAY<JOINT<TV>*>& nonconst_joints=const_cast<ARRAY<JOINT<TV>*>&>(joints);        
         switch(joint_type){
@@ -79,7 +79,7 @@ Write(TYPED_OSTREAM& output,const std::string& directory,const int frame) const
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
         Read_Write<DYNAMIC_LIST<JOINT<TV>,JOINT_ID>,double>::Write(dynamic_list,prefix);
 #endif
-    for(int i=1;i<=joints.m;i++){
+    for(int i=0;i<joints.m;i++){
         JOINT_TYPE joint_type;
         const std::type_info& type=typeid(*joints(i));
         if(type==typeid(POINT_JOINT<TV>)) joint_type=POINT_JOINT_TYPE;

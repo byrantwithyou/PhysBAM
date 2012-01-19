@@ -84,7 +84,7 @@ virtual void Initialize_Embedded_Tetrahedralized_Volume(EMBEDDED_TETRAHEDRALIZED
     tetrahedralized_volume.particles.Store_Mass();
 
     ARRAY<T> phi(1,tetrahedralized_volume.particles.array_collection->Size());
-    for(int p=1;p<=phi.m;p++) phi(p)=sphere.Signed_Distance(tetrahedralized_volume.particles.X(p));
+    for(int p=0;p<phi.m;p++) phi(p)=sphere.Signed_Distance(tetrahedralized_volume.particles.X(p));
     Remove_Tetrahedra_Completely_Outside_Level_Set(tetrahedralized_volume,phi);
 
     embedded_tetrahedralized_volume.embedded_surface.particles.Store_Position_And_Velocity();
@@ -94,7 +94,7 @@ virtual void Initialize_Embedded_Tetrahedralized_Volume(EMBEDDED_TETRAHEDRALIZED
     embedded_tetrahedralized_volume.Initialize_Embedded_Triangles_In_Tetrahedron();
     embedded_tetrahedralized_volume.Initialize_Embedded_Children();    
     phi.Resize(1,tetrahedralized_volume.particles.array_collection->Size());
-    for(int p=1;p<=phi.m;p++) phi(p)=sphere.Signed_Distance(tetrahedralized_volume.particles.X(p));
+    for(int p=0;p<phi.m;p++) phi(p)=sphere.Signed_Distance(tetrahedralized_volume.particles.X(p));
     assert(phi.Min() < 0);assert(phi.Max() > 0);
     embedded_tetrahedralized_volume.Calculate_Triangulated_Surface_From_Levelset_On_Tetrahedron_Nodes(phi);
     std::cout << "number of embedded_triangles=" << embedded_tetrahedralized_volume.embedded_surface.triangle_mesh.triangles.m << std::endl;
@@ -103,7 +103,7 @@ virtual void Initialize_Embedded_Tetrahedralized_Volume(EMBEDDED_TETRAHEDRALIZED
     
     tetrahedralized_volume.Update_Bounding_Box();
     VECTOR_3D<T> center(tetrahedralized_volume.bounding_box->Center());T bottom=tetrahedralized_volume.bounding_box->ymin;
-    for(int i=1;i<=tetrahedralized_volume.particles.array_size;i++){
+    for(int i=0;i<tetrahedralized_volume.particles.array_size;i++){
         tetrahedralized_volume.particles.V(i)=initial_velocity+VECTOR_3D<T>::Cross_Product(initial_angular_velocity,tetrahedralized_volume.particles.X(i)-center);
         tetrahedralized_volume.particles.X(i)=center+initial_orientation.Rotate(tetrahedralized_volume.particles.X(i)-center);
         tetrahedralized_volume.particles.X(i).y+=initial_height-bottom;}

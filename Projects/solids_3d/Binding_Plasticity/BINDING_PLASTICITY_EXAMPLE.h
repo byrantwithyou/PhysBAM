@@ -100,7 +100,7 @@ void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 int Get_Intersecting_Tetrahedron(const PARTICLES<TV>& particles,const TV& location,const TETRAHEDRALIZED_VOLUME<T>& dynamic_volume)
 {
     ARRAY<int> intersection_list;dynamic_volume.hierarchy->Intersection_List(location,intersection_list);
-    for(int i=1;i<=intersection_list.m;i++) if(TETRAHEDRON<T>(particles.X.Subset(dynamic_volume.mesh.elements(intersection_list(i)))).Inside(location)) return intersection_list(i);
+    for(int i=0;i<intersection_list.m;i++) if(TETRAHEDRON<T>(particles.X.Subset(dynamic_volume.mesh.elements(intersection_list(i)))).Inside(location)) return intersection_list(i);
     return 0;
 }
 //#####################################################################
@@ -113,12 +113,12 @@ void Create_Duplicate_Mesh(const TRIANGLE_MESH& mesh,TRIANGLE_MESH& duplicate_me
 
     ARRAY<int> mesh_nodes;mesh.elements.Flattened().Get_Unique(mesh_nodes);
     ARRAY<int> child_map(particles.array_collection->Size());
-    for(int i=1;i<=mesh_nodes.m;i++){int p=mesh_nodes(i);
+    for(int i=0;i<mesh_nodes.m;i++){int p=mesh_nodes(i);
         child_map(p)=particles.array_collection->Append(*particles.array_collection,p);}
-    for(int i=1;i<=mesh.elements.m;i++) duplicate_mesh.elements.Append(VECTOR<int,3>::Map(child_map,mesh.elements(i)));
+    for(int i=0;i<mesh.elements.m;i++) duplicate_mesh.elements.Append(VECTOR<int,3>::Map(child_map,mesh.elements(i)));
     duplicate_mesh.Set_Number_Nodes(particles.array_collection->Size());
 
-    parent_map.Resize(particles.array_collection->Size());for(int p=1;p<=child_map.m;p++) if(child_map(p)) parent_map(child_map(p))=p;
+    parent_map.Resize(particles.array_collection->Size());for(int p=0;p<child_map.m;p++) if(child_map(p)) parent_map(child_map(p))=p;
 }
 //#####################################################################
 // Function Add_Binding
@@ -129,7 +129,7 @@ void Add_Binding(const int particle_index,const ARRAY<int>& parents,const ARRAY<
     PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     if(parents.m<1||parents.m>3) PHYSBAM_FATAL_ERROR();
-    for(int i=1;i<=parents.m;i++) if(!parent_map(parents(i))) PHYSBAM_FATAL_ERROR();
+    for(int i=0;i<parents.m;i++) if(!parent_map(parents(i))) PHYSBAM_FATAL_ERROR();
 
     if(parents.m==1){
         int dynamic_parent=parent_map(parents(1));
@@ -164,9 +164,9 @@ TETRAHEDRALIZED_VOLUME<T>& Create_Deformable_Mattress()
     deformable_body_collection.deformable_geometry.Add_Structure(&embedding);
 
     // refine duplicate mattress surface
-    for(int i=1;i<=refinement_level;i++){
+    for(int i=0;i<refinement_level;i++){
         ARRAY<int> top_triangles;
-        for(int i=1;i<=embedding.material_surface.mesh.elements.m;i++)
+        for(int i=0;i<embedding.material_surface.mesh.elements.m;i++)
         if(particles.X(embedding.material_surface.mesh.elements(i)(1)).y==(T)2 && particles.X(embedding.material_surface.mesh.elements(i)(2)).y==(T)2) top_triangles.Append(i);
         redgreen->Refine_Simplex_List(top_triangles);}
     embedding.Update_Number_Nodes();embedding.material_surface.mesh.Initialize_Incident_Elements();
@@ -175,7 +175,7 @@ TETRAHEDRALIZED_VOLUME<T>& Create_Deformable_Mattress()
     redgreen->Initialize_Segment_Index_From_Midpoint_Index();
     ARRAY<int> refined_particles;embedding.material_surface_mesh.elements.Flattened().Get_Unique(refined_particles);
     ARRAY<int> parents;ARRAY<T> weights;
-    for(int i=1;i<=refined_particles.m;i++){int p=refined_particles(i);
+    for(int i=0;i<refined_particles.m;i++){int p=refined_particles(i);
         redgreen->Unrefined_Parents(p,parents,weights);
         Add_Binding(p,parents,weights,parent_map);}
     
@@ -239,7 +239,7 @@ void Postprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE
     TETRAHEDRALIZED_VOLUME<T>& mattress=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
 
     bool initialized_tet_hierarchy=false;
-    for(int b=1;b<=soft_bindings.bindings.m;b++){
+    for(int b=0;b<soft_bindings.bindings.m;b++){
         int particle_index=soft_bindings.bindings(b).x,parent=soft_bindings.bindings(b).y;
         TV dX=particles.X(parent)-particles.X(particle_index);
         if(dX.Magnitude()>plastic_yield_threshold){ // adjust the parent to lie at the threshold
@@ -316,7 +316,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     ground_id=tests.Add_Ground().particle_index;
 
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     // collisions
     EMBEDDING<TV>& embedding=deformable_body_collection.deformable_geometry.template Find_Structure<EMBEDDING<TV>&>();
@@ -327,7 +327,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     solid_body_collection.deformable_body_collection.binding_list.Clear_Hard_Bound_Particles(particles.mass);
     particles.Compute_Auxiliary_Attributes(solid_body_collection.deformable_body_collection.soft_bindings);
 //    solid_body_collection.deformable_body_collection.soft_bindings.Set_Mass_From_Effective_Mass();
-    for(int b=1;b<=solid_body_collection.deformable_body_collection.soft_bindings.bindings.m;b++){
+    for(int b=0;b<solid_body_collection.deformable_body_collection.soft_bindings.bindings.m;b++){
         VECTOR<int,2>& binding=solid_body_collection.deformable_body_collection.soft_bindings.bindings(b);
         int mass_scale=1<<2*(refinement_level+1);
         particles.effective_mass(binding.x)*=(T)1/(T)mass_scale;

@@ -23,22 +23,22 @@ void Discard_Valence_Zero_Particles_And_Renumber(MESH_OBJECT<TV,T_MESH>& mo,ARRA
 {
     // mark which nodes are used
     ARRAY<bool> node_is_used(mo.mesh.number_nodes);
-    for(int t=1;t<=mo.mesh.elements.m;t++){
+    for(int t=0;t<mo.mesh.elements.m;t++){
         INDIRECT_ARRAY<ARRAY<bool>,typename T_MESH::ELEMENT_TYPE&> subset=node_is_used.Subset(mo.mesh.elements(t));
         subset.Fill(true);}
     
     // make condensation mapping
     condensation_mapping.Resize(mo.mesh.number_nodes,false,false);condensation_mapping.Fill(0);
     int counter=0;
-    for(int t=1;t<=mo.mesh.number_nodes;t++) if(node_is_used(t)) condensation_mapping(t)=++counter;
+    for(int t=0;t<mo.mesh.number_nodes;t++) if(node_is_used(t)) condensation_mapping(t)=++counter;
     
     // make new triangle mesh
     mo.mesh.number_nodes=counter;
-    for(int t=1;t<=mo.mesh.elements.m;t++)
+    for(int t=0;t<mo.mesh.elements.m;t++)
         mo.mesh.elements(t)=condensation_mapping.Subset(mo.mesh.elements(t));
     
     // do particles same way
-    for(int p=1;p<=condensation_mapping.m;p++) if(!condensation_mapping(p)) mo.particles.array_collection->Add_To_Deletion_List(p);
+    for(int p=0;p<condensation_mapping.m;p++) if(!condensation_mapping(p)) mo.particles.array_collection->Add_To_Deletion_List(p);
     for(int p=condensation_mapping.m+1;p<=mo.particles.array_collection->Size();p++) mo.particles.array_collection->Add_To_Deletion_List(p);
     mo.particles.array_collection->Delete_Elements_On_Deletion_List(true);mo.particles.array_collection->Compact();
 

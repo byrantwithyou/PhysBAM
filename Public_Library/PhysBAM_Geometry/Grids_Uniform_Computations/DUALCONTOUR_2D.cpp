@@ -31,7 +31,7 @@ Generate_Topology()
         if(phi1<=contour_value&&phi2>contour_value) topology.Append(VECTOR<int,2>(index_i,index));
         if(phi1>contour_value && phi2<=contour_value) topology.Append(VECTOR<int,2>(index,index_i));}
     topology.Compact();
-    for(int t=1;t<=topology.m;t++){
+    for(int t=0;t<topology.m;t++){
         int i,j;topology(t).Get(i,j);
         vertices.array(i)=vertices.array(j)=1;}
 }
@@ -99,7 +99,7 @@ Get_Segmented_Curve()
     curve->particles.X=geometry;
     curve->mesh.number_nodes=geometry.m;
     curve->mesh.elements.Exact_Resize(topology.m);
-    for(int t=1;t<=topology.m;t++){
+    for(int t=0;t<topology.m;t++){
         int i,j;topology(t).Get(i,j);i=vertices.array(i);j=vertices.array(j);
         curve->mesh.elements(t).Set(i,j);}
     curve->Update_Segment_List();

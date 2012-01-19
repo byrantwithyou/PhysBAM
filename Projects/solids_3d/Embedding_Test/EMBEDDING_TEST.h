@@ -89,7 +89,7 @@ void Get_Initial_Data()
         particles.X(tet_parts[4])=TV((T)0.000000,(T)1.000000,(T)0.000000);
         surface.mesh.elements.Append(tri_parts);//deformable_body_collection.deformable_geometry.Add_Structure(&surface);
         TETRAHEDRON<T> tet(particles.X.Subset(tet_parts));
-        for(int i=1;i<=tri_parts.m;i++){
+        for(int i=0;i<tri_parts.m;i++){
             TV point=particles.X(tri_parts(i));
             if(tet.Inside(point)){
                 TV coordinates=tet.First_Three_Barycentric_Coordinates(point);
@@ -142,7 +142,7 @@ void Get_Initial_Data()
         for(int t=1;t<=volume->mesh.elements.m;t++){
             const VECTOR<int,4>& nodes=volume->mesh.elements(t);
             TETRAHEDRON<T> tet(particles.X.Subset(nodes));
-            for(int i=1;i<=tri_particles.m;i++){int p=tri_particles(i);
+            for(int i=0;i<tri_particles.m;i++){int p=tri_particles(i);
                 if(!hard_to_soft.Contains(p)  && tet.Inside(particles.X(p))){
                     TV coordinates=tet.First_Three_Barycentric_Coordinates(particles.X(p));
                     binding_list.Add_Binding(new LINEAR_BINDING<TV,4>(particles,p,nodes,coordinates));
@@ -153,7 +153,7 @@ void Get_Initial_Data()
                     soft_bindings.Add_Binding(VECTOR<int,2>(p,soft_particle),!use_zero_length_springs);}}}
         for(int t=1;t<=surface->mesh.elements.m;t++){
             VECTOR<int,3> nodes=surface->mesh.elements(t);
-            for(int k=1;k<=3;k++) nodes[k]=hard_to_soft.Get(nodes[k]);
+            for(int k=0;k<3;k++) nodes[k]=hard_to_soft.Get(nodes[k]);
             esurface->mesh.elements.Append(nodes);}
         SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(*esurface,density);
         deformable_body_collection.deformable_geometry.Add_Structure(esurface);
@@ -211,7 +211,7 @@ void Get_Initial_Data()
         particles.X(tet_parts[4])=TV((T)0.000000,(T)1.000000,(T)0.000000);
         surface.mesh.elements.Append(tri_parts);//deformable_body_collection.deformable_geometry.Add_Structure(&surface);
         TETRAHEDRON<T> tet(particles.X.Subset(tet_parts));
-        for(int i=1;i<=tri_parts.m;i++){
+        for(int i=0;i<tri_parts.m;i++){
             TV point=particles.X(tri_parts(i));
             if(tet.Inside(point)){
                 LOG::cout<<"found point "<<tri_parts(i)<<" inside the tet "<<std::endl;
@@ -237,7 +237,7 @@ void Get_Initial_Data()
         deformable_body_collection.deformable_geometry.Add_Structure(&e_surface);}
 
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
 
     // correct mass

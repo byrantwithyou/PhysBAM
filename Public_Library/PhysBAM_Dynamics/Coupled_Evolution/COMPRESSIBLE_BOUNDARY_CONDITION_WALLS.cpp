@@ -30,7 +30,7 @@ template<class TV> void COMPRESSIBLE_BOUNDARY_CONDITION_WALLS<TV>::
 Update_Boundary_Conditions(const GRID<TV>& grid,ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX<TV::dimension> >& psi_N,ARRAY<T,TV_INT>& p,
     ARRAY<T,FACE_INDEX<TV::dimension> >& face_velocities,const T time)
 {   
-    for(int axis=1;axis<=TV::dimension;axis++) for(int axis_side=1;axis_side<=2;axis_side++){
+    for(int axis=1;axis<=TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){
         int side=2*(axis-1)+axis_side;
         if(mpi_boundary(axis)(axis_side))
             for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(grid,1,GRID<TV>::GHOST_REGION,side);iterator.Valid();iterator.Next()){

@@ -74,7 +74,7 @@ public:
 
     void Get_Node_Locations(ARRAY<VECTOR<T,3> >& locations) PHYSBAM_OVERRIDE
     {locations.Resize(coarse_grid.counts.Product());map_from_accessor_index_to_my_index.Resize(locations.m);int index=1;
-    for(int i=1;i<=coarse_grid.counts.x;i++)for(int j=1;j<=coarse_grid.counts.y;j++)for(int ij=1;ij<=coarse_grid.counts.z;ij++){
+    for(int i=0;i<coarse_grid.counts.x;i++)for(int j=0;j<coarse_grid.counts.y;j++)for(int ij=0;ij<coarse_grid.counts.z;ij++){
         map_from_accessor_index_to_my_index(index)=VECTOR<int,3>(i,j,ij);
         locations(index)=coarse_grid.X(i,j,ij);index++;}}
 
@@ -107,8 +107,8 @@ public:
 protected:
     void Prepare_For_Precomputation(RENDER_WORLD<T>& world) PHYSBAM_OVERRIDE
     {precomputed_light.Resize(world.Lights().m);precomputed_light_valid.Resize(world.Lights().m);
-    for(int i=1;i<=precomputed_light.m;i++)precomputed_light(i)=new ARRAY<VECTOR<T,3> ,VECTOR<int,3> >(1,coarse_grid.counts.x,1,coarse_grid.counts.y,1,coarse_grid.counts.z);
-    for(int i=1;i<=precomputed_light.m;i++){precomputed_light_valid(i)=new ARRAY<bool,VECTOR<int,3> >(1,coarse_grid.counts.x,1,coarse_grid.counts.y,1,coarse_grid.counts.z);precomputed_light_valid(i)->Fill(false);}}
+    for(int i=0;i<precomputed_light.m;i++)precomputed_light(i)=new ARRAY<VECTOR<T,3> ,VECTOR<int,3> >(1,coarse_grid.counts.x,1,coarse_grid.counts.y,1,coarse_grid.counts.z);
+    for(int i=0;i<precomputed_light.m;i++){precomputed_light_valid(i)=new ARRAY<bool,VECTOR<int,3> >(1,coarse_grid.counts.x,1,coarse_grid.counts.y,1,coarse_grid.counts.z);precomputed_light_valid(i)->Fill(false);}}
 
 //#####################################################################
     void Postprocess_Light_Field() PHYSBAM_OVERRIDE;

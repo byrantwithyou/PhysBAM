@@ -109,11 +109,11 @@ public:
     template<int d2> void
     Get_Particles_On_Simplices(const VECTOR<int,d2>& simplices,ARRAY<int>& particles) const
     {bool is_all_cutting_simplices=false;
-    for(int i=1;i<=simplices.m;i++) if(cutting_simplices->simplices(simplices(i)).type!=T_CUTTING_SIMPLEX::LOCAL_CUT_FACE){is_all_cutting_simplices=false;break;}
+    for(int i=0;i<simplices.m;i++) if(cutting_simplices->simplices(simplices(i)).type!=T_CUTTING_SIMPLEX::LOCAL_CUT_FACE){is_all_cutting_simplices=false;break;}
     intersection_registry->Intersection_List(simplices,particles);
     // also grab particles on cuts if all cutting simplices
     if(is_all_cutting_simplices){VECTOR<int,d2> converted_simplices;ARRAY<int> particles_on_cuts;
-        for(int i=1;i<=simplices.m;i++){
+        for(int i=0;i<simplices.m;i++){
             converted_simplices(i)=cutting_simplices->simplices(simplices(i)).parent;assert((cutting_simplices->simplices(converted_simplices(i)).type==T_CUTTING_SIMPLEX::GLOBAL_CUT_FACE));}
         int embedding_simplex=cutting_simplices->simplices(simplices(1)).element_owner;const VECTOR<int,d_embed+1>& tet_nodes=current_embedding->mesh.elements(embedding_simplex);
         intersection_registry->Intersection_List_For_Cuts(converted_simplices,tet_nodes,particles_on_cuts); // only keep particle if simplices contained in our tet
@@ -127,7 +127,7 @@ public:
         cutting_particles.Add_Intersection_Id(index);}        
     intersection_registry->Register_Intersection(simplices,weights,index);
     if(verbose){LOG::cout<<"Intersection: "<<index<<std::endl;
-        for(int i=1;i<=simplices.m;i++) LOG::cout<<"simplex "<<simplices(i)<<" has weights "<<weights(i)<<std::endl;LOG::cout<<std::endl;}
+        for(int i=0;i<simplices.m;i++) LOG::cout<<"simplex "<<simplices(i)<<" has weights "<<weights(i)<<std::endl;LOG::cout<<std::endl;}
     return index;}
 
 //#####################################################################

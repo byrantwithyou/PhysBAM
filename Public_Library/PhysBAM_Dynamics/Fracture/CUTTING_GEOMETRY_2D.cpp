@@ -23,7 +23,7 @@ template<class TV,int d_input> void CUTTING_GEOMETRY_2D<TV,d_input>::
 Intersect_Simplex_With_Old_Simplices_In_Embedding(const int tri,const int new_simplex)
 {
     ARRAY<int>& old_simplices=simplices_per_current_embedding_simplex(tri);
-    for(int dummy_i=1;dummy_i<=old_simplices.m;dummy_i++) {
+    for(int dummy_i=0;dummy_i<old_simplices.m;dummy_i++) {
         int old_simplex=old_simplices(dummy_i);VECTOR<int,2> simplices(old_simplex,new_simplex);
         if(verbose) LOG::cout<<" Checking old simplices "<<old_simplex<<" with new simplex "<<new_simplex<<std::endl;
         bool converted;VECTOR<int,2> converted_simplices=cutting_simplices->Convert_Simplex_Indices_To_Global_Indices(simplices,converted);
@@ -37,13 +37,13 @@ Intersect_Simplex_With_Old_Simplices_In_Embedding(const int tri,const int new_si
         if(points_all_shared.m>=2) continue; // multiple nodes means no intersection at a point
         else if(points_all_shared.m==1){int shared_node=points_all_shared(1);
             assert(simplices==converted_simplices);
-            VECTOR<VECTOR<T,1>,2> all_weights;for(int i=1;i<=2;i++) all_weights(i)=Get_Node_Weights_From_Face(shared_node,cutting_simplices->simplices(simplices(i)).nodes);
+            VECTOR<VECTOR<T,1>,2> all_weights;for(int i=0;i<2;i++) all_weights(i)=Get_Node_Weights_From_Face(shared_node,cutting_simplices->simplices(simplices(i)).nodes);
             // skip intersection if it is outside the tet
             const VECTOR<VECTOR<T,2>,2>& simplex_weights_in_embedding=cutting_simplices->simplices(simplices(1)).weights;
             VECTOR<T,2> shared_node_weights_in_embedding=simplex_weights_in_embedding(1)*all_weights(1)[1]+simplex_weights_in_embedding(2)*(1-all_weights(1)[1]);
             if(shared_node_weights_in_embedding.Min()<0 || shared_node_weights_in_embedding.Sum()>(T)1) goto NEXT_OLD_SIMPLEX;
             // skip intersection if already added under a different name
-            for(int i=1;i<=old_simplices.m;i++) if(cutting_simplices->simplices(old_simplices(i)).nodes.Contains(shared_node))
+            for(int i=0;i<old_simplices.m;i++) if(cutting_simplices->simplices(old_simplices(i)).nodes.Contains(shared_node))
                 for(int j=i+1;j<=old_simplices.m;j++) if(cutting_simplices->simplices(old_simplices(j)).nodes.Contains(shared_node)){
                     ARRAY<int> nodes_shared_on_pair;VECTOR<int,2> alternative_simplex=VECTOR<int,2>(old_simplices(i),old_simplices(j));
                     cutting_simplices->Shared_Nodes_On_Simplices(alternative_simplex,nodes_shared_on_pair);
@@ -55,7 +55,7 @@ Intersect_Simplex_With_Old_Simplices_In_Embedding(const int tri,const int new_si
         // Case 2 - Normal Intersection
         if(cutting_simplices->Simplex_Is_Fake(old_simplex) || cutting_simplices->Simplex_Is_Fake(new_simplex)) goto NEXT_OLD_SIMPLEX;
         {VECTOR<VECTOR<VECTOR<T,2>,2>,2> weights_for_simplices;
-        for(int i=1;i<=2;i++) weights_for_simplices[i]=cutting_simplices->simplices(simplices[i]).weights;
+        for(int i=0;i<2;i++) weights_for_simplices[i]=cutting_simplices->simplices(simplices[i]).weights;
         VECTOR<VECTOR<T,1>,2> intersection_weights_in_segments;
         if(SIMPLEX_INTERACTIONS<T>::Two_Segment_Intersection_Barycentric_Coordinates(weights_for_simplices[1],weights_for_simplices[2],
                 intersection_weights_in_segments[1],intersection_weights_in_segments[2]))
@@ -90,7 +90,7 @@ Split_Existing_Polygons()
         LOG::cout<<"new particles on simplex "<<new_particles_on_simplex<<std::endl;
         // operate on each polygon on the simplex
         const ARRAY<int>& cutting_polygons_on_simplex=cutting_polygons_per_cutting_simplex(i);
-        for(int j=1;j<=cutting_polygons_on_simplex.m;j++){
+        for(int j=0;j<cutting_polygons_on_simplex.m;j++){
             int cutting_polygon_index=cutting_polygons_on_simplex(j);
             if(!new_particles_on_simplex.m){
                 polygons_per_element(tet_owner).Append(cutting_polygon_index);}
@@ -113,7 +113,7 @@ Split_Existing_Polygons()
                     int polygon_element_index=polygon_mesh.elements.Append(final_polygon_element_particles(k));
                     int new_cutting_polygon_index=current_cutting_polygons.Append(CUTTING_POLYGON(polygon_element_index,i,cutting_polygon.flipped,cutting_polygon.polygon_type));
                     polygons_per_element(tet_owner).Append(new_cutting_polygon_index);}}}}
-    if(verbose){LOG::cout<<std::endl;for(int i=1;i<=current_cutting_polygons.m;i++)
+    if(verbose){LOG::cout<<std::endl;for(int i=0;i<current_cutting_polygons.m;i++)
         LOG::cout<<"Cutting polygon "<<i<<" has polygon element "
                  <<current_cutting_polygons(i).polygon_index<<": "<<polygon_mesh.elements(current_cutting_polygons(i).polygon_index)
                  <<std::endl;}
@@ -125,11 +125,11 @@ template<class TV,int d_input> void CUTTING_GEOMETRY_2D<TV,d_input>::
 Divide_Polygon_Particles_With_New_Segments(ARRAY<VECTOR<int,2> >& all_segments,const ARRAY<int>& possible_particles_to_add,const ARRAY<ARRAY<int> >& polygon_particles,
     const int cutting_simplex,const bool flipped,ARRAY<ARRAY<ARRAY<int > > >& final_polygon_element_particles) const
 {
-    if(verbose){LOG::cout<<"All particles on simplex "<<cutting_simplex<<" before adding new ";for(int j=1;j<=all_segments.m;j++) LOG::cout<<all_segments(j)<<"; ";LOG::cout<<std::endl;
+    if(verbose){LOG::cout<<"All particles on simplex "<<cutting_simplex<<" before adding new ";for(int j=0;j<all_segments.m;j++) LOG::cout<<all_segments(j)<<"; ";LOG::cout<<std::endl;
         LOG::cout<<"     new potential particles are "<<possible_particles_to_add<<std::endl;}
     // choose subset of particles to add to this polygon
-    for(int k=1;k<=possible_particles_to_add.m;k++){const int possible_particle_to_add=possible_particles_to_add(k);
-        for(int i=1;i<=all_segments.m;i++){
+    for(int k=0;k<possible_particles_to_add.m;k++){const int possible_particle_to_add=possible_particles_to_add(k);
+        for(int i=0;i<all_segments.m;i++){
             if(all_segments(i).Contains(possible_particle_to_add)) goto NEXT_POSSIBLE_PARTICLES;
             int node1=all_segments(i)(1),node2=all_segments(i)(2);
             T X=intersection_registry->Get_Simplex_Weights_Of_Intersection(possible_particle_to_add,cutting_simplex).x,
@@ -140,8 +140,8 @@ Divide_Polygon_Particles_With_New_Segments(ARRAY<VECTOR<int,2> >& all_segments,c
                 all_segments(i)(2)=possible_particle_to_add;all_segments.Append(VECTOR<int,2>(possible_particle_to_add,node2));}}
       NEXT_POSSIBLE_PARTICLES:;
     }
-    if(verbose){LOG::cout<<"All particles on simplex "<<cutting_simplex<<" after adding new ";for(int j=1;j<=all_segments.m;j++) LOG::cout<<all_segments(j)<<"; ";LOG::cout<<std::endl;}
-    for(int i=1;i<=all_segments.m;i++){
+    if(verbose){LOG::cout<<"All particles on simplex "<<cutting_simplex<<" after adding new ";for(int j=0;j<all_segments.m;j++) LOG::cout<<all_segments(j)<<"; ";LOG::cout<<std::endl;}
+    for(int i=0;i<all_segments.m;i++){
         int polygon=final_polygon_element_particles.Append(ARRAY<ARRAY<int> >());
         int component=final_polygon_element_particles(polygon).Append(ARRAY<int>());
         final_polygon_element_particles(polygon)(component).Append(all_segments(i)(1));

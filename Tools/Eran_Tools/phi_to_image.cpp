@@ -32,9 +32,9 @@ void Convert(PARSE_ARGS &parse_args)
 
     VECTOR<T,3> negative_color(parse_args.Get_Vector_3D_Value("-negative_color"));
     VECTOR<T,3> positive_color(parse_args.Get_Vector_3D_Value("-positive_color"));
-    for(int i=1;i<=image_grid.m;i++) for(int j=1;j<=image_grid.n;j++){
+    for(int i=0;i<image_grid.m;i++) for(int j=0;j<image_grid.n;j++){
         int in_count=0;
-        for(int subi=1;subi<=sample_offset_grid.m;subi++) for(int subj=1;subj<=sample_offset_grid.n;subj++)
+        for(int subi=0;subi<sample_offset_grid.m;subi++) for(int subj=0;subj<sample_offset_grid.n;subj++)
             if(levelset.Phi(image_grid.X(i,j)+sample_offset_grid.X(subi,subj))<=0) in_count++;
         T alpha=(T)in_count/subsamples;
         image(i,j)=alpha*negative_color+(1-alpha)*positive_color;}

@@ -68,10 +68,10 @@ Build_Collision_Geometry()
     structure_geometries.Delete_Pointers_And_Clean_Memory();
     structure_geometries.Resize(structures.m);
     interacting_structure_pairs.Remove_All();
-    for(int k=1;k<=structures.m;k++){
+    for(int k=0;k<structures.m;k++){
         structure_geometries(k)=new STRUCTURE_INTERACTION_GEOMETRY<TV>(deformable_body_collection.particles);
         structure_geometries(k)->Build_Collision_Geometry(*structures(k));}
-    for(int i=1;i<=structures.m;i++) for(int j=i;j<=structures.m;j++) interacting_structure_pairs.Append(VECTOR<int,2>(i,j));
+    for(int i=0;i<structures.m;i++) for(int j=i;j<=structures.m;j++) interacting_structure_pairs.Append(VECTOR<int,2>(i,j));
     intersecting_point_face_pairs.Remove_All();
     intersecting_edge_edge_pairs.Remove_All();
 }
@@ -81,7 +81,7 @@ Build_Collision_Geometry()
 template<class TV> void TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY<TV>::
 Build_Topological_Structure_Of_Hierarchies()
 {
-    for(int k=1;k<=structure_geometries.m;k++){
+    for(int k=0;k<structure_geometries.m;k++){
         structure_geometries(k)->Build_Topological_Structure_Of_Hierarchies();
         if(mpi_solids) structure_geometries(k)->Update_Processor_Masks(mpi_solids->Partition(),
             mpi_solids->partition_id_from_particle_index);}
@@ -94,7 +94,7 @@ Allow_Intersections(const bool allow_intersections_input)
 {
     allow_intersections=allow_intersections_input;
     if(allow_intersections)
-        for(int k=1;k<=structure_geometries.m;k++)
+        for(int k=0;k<structure_geometries.m;k++)
             if(!structure_geometries(k)->triangulated_surface->mesh.element_edges) structure_geometries(k)->triangulated_surface->mesh.Initialize_Element_Edges();
 }
 //#####################################################################
@@ -118,13 +118,13 @@ template<class T,class TV> bool Check_For_Intersection_Helper(const ARRAY<STRUCT
     ARRAY_VIEW<const VECTOR<T,3> > X,const bool grow_thickness_to_find_first_self_intersection,const T threshold)
 {
     ARRAY<VECTOR<int,2> > intersecting_segment_triangle_pairs;
-    for(int i=1;i<=2;i++){if(i==2 && pair[1]==pair[2]) break;
+    for(int i=0;i<2;i++){if(i==2 && pair[1]==pair[2]) break;
         SEGMENTED_CURVE<TV>* segmented_curve=structure_geometries(pair[i])->segmented_curve;
         TRIANGULATED_SURFACE<T>* triangulated_surface=structure_geometries(pair[3-i])->triangulated_surface;
         if(segmented_curve && triangulated_surface){
             if(triangulated_surface->Segment_Triangle_Intersection(segmented_curve->mesh,X,threshold,true,&intersecting_segment_triangle_pairs)){
                 LOG::cout<<"intersections found, pair = "<<pair<<", threshold = "<<threshold<<std::endl;
-                for(int k=1;k<=intersecting_segment_triangle_pairs.m;k++){
+                for(int k=0;k<intersecting_segment_triangle_pairs.m;k++){
                     int s,t;intersecting_segment_triangle_pairs(k).Get(s,t);
                     LOG::cout<<"segment "<<s<<", triangle "<<t<<", segment nodes = "<<segmented_curve->mesh.elements(s)<<", triangle nodes = "<<triangulated_surface->mesh.elements(t)<<std::endl;}
                 return true;}
@@ -138,7 +138,7 @@ Check_For_Intersection(const bool grow_thickness_to_find_first_self_intersection
     LOG::SCOPE scope("checking for self intersection");
     ARRAY_VIEW<const TV> X(deformable_body_collection.particles.X);
     T threshold=small_number;if(thickness) threshold=thickness;
-    for(int k=1;k<=interacting_structure_pairs.m;k++){const VECTOR<int,2>& pair=interacting_structure_pairs(k);
+    for(int k=0;k<interacting_structure_pairs.m;k++){const VECTOR<int,2>& pair=interacting_structure_pairs(k);
         if(Check_For_Intersection_Helper(structure_geometries,pair,X,grow_thickness_to_find_first_self_intersection,threshold)){
             if(interaction_pair) *interaction_pair=pair;
             return true;}}
@@ -151,7 +151,7 @@ Check_For_Intersection(const bool grow_thickness_to_find_first_self_intersection
     LOG::SCOPE scope("checking for self intersection");
     ARRAY_VIEW<const TV> X(deformable_body_collection.particles.X);
     T threshold=small_number;if(thickness) threshold=thickness;
-    for(int k=1;k<=interacting_structure_pairs.m;k++){const VECTOR<int,2>& pair=interacting_structure_pairs(k);
+    for(int k=0;k<interacting_structure_pairs.m;k++){const VECTOR<int,2>& pair=interacting_structure_pairs(k);
         if(Check_For_Intersection_Helper(structure_geometries,pair,X,grow_thickness_to_find_first_self_intersection,threshold)){
             interaction_pairs.Append(pair);}}
     return interaction_pairs.Size()>0;
@@ -192,14 +192,14 @@ Compute_Intersecting_Pairs_Helper(COMPUTE_INTERSECTING_PAIRS_HELPER_INPUT_WHEN_D
     intersecting_point_face_pairs.Remove_All();intersecting_edge_edge_pairs.Remove_All();
 
     // update hierarchies
-    for(int k=1;k<=structure_geometries.m;k++){
+    for(int k=0;k<structure_geometries.m;k++){
         STRUCTURE_INTERACTION_GEOMETRY<TV>& structure=*structure_geometries(k);
         if(structure.Face_Mesh_Object()) structure.Face_Hierarchy().Update_Boxes(X_self_collision_free);
         if(d==3 && structure.segmented_curve) structure.segmented_curve->hierarchy->Update_Boxes(X_self_collision_free);}
 
     // find intersecting pairs
-    for(int pair_index=1;pair_index<=interacting_structure_pairs.m;pair_index++){const VECTOR<int,2>& pair=interacting_structure_pairs(pair_index);
-        for(int i=1;i<=2;i++){if(i==2 && (d==2 || pair[1]==pair[2])) break;
+    for(int pair_index=0;pair_index<interacting_structure_pairs.m;pair_index++){const VECTOR<int,2>& pair=interacting_structure_pairs(pair_index);
+        for(int i=0;i<2;i++){if(i==2 && (d==2 || pair[1]==pair[2])) break;
             STRUCTURE_INTERACTION_GEOMETRY<TV>& segment_structure=*structure_geometries(pair[i]);
             STRUCTURE_INTERACTION_GEOMETRY<TV>& face_structure=*structure_geometries(pair[3-i]);
             if(!segment_structure.segmented_curve || !face_structure.Face_Mesh_Object()) continue;

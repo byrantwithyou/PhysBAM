@@ -95,7 +95,7 @@ void Get_Initial_Data() PHYSBAM_OVERRIDE
 
     tetrahedralized_volume.Update_Bounding_Box();
     VECTOR_3D<T> center(tetrahedralized_volume.bounding_box->Center());T bottom=tetrahedralized_volume.bounding_box->ymin;
-    for(int i=1;i<=tetrahedralized_volume.particles.array_size;i++){
+    for(int i=0;i<tetrahedralized_volume.particles.array_size;i++){
         tetrahedralized_volume.particles.V(i)=initial_velocity+VECTOR_3D<T>::Cross_Product(initial_angular_velocity,tetrahedralized_volume.particles.X(i)-center);
         tetrahedralized_volume.particles.X(i)=center+initial_orientation.Rotate(tetrahedralized_volume.particles.X(i)-center);
         tetrahedralized_volume.particles.X(i).y+=initial_height-bottom;}
@@ -119,7 +119,7 @@ void Initialize_Collision_Bodies()
 void Set_External_Velocities(ARRAY<VECTOR_3D<T> >& V,const T time){
     switch(id_number){
     case 1:
-        if(fix_boundary)for(int j=1,index=0;j<=n_input;j++)for(int k=1;k<=m_input;k++){index++;V(index)=attachment_velocity;V(V.m+1-index)=-attachment_velocity;}
+        if(fix_boundary)for(int j=1,index=0;j<=n_input;j++)for(int k=0;k<m_input;k++){index++;V(index)=attachment_velocity;V(V.m+1-index)=-attachment_velocity;}
         break;
     default:std::cout<<"Unrecognized deformable object id number"<<std::endl;exit(1);}
 }
@@ -127,7 +127,7 @@ void Set_External_Velocities(ARRAY<VECTOR_3D<T> >& V,const T time){
 // Update_Time_Varying_Material_Properties
 //#####################################################################
 void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE {
-    for(int t=1;t<=fiber_direction.m;t++)fiber_direction(t)=VECTOR_3D<T>(0,(T)1,0);
+    for(int t=0;t<fiber_direction.m;t++)fiber_direction(t)=VECTOR_3D<T>(0,(T)1,0);
     fiber_tension=(T)5e4*time;
 }
 //#####################################################################
@@ -136,7 +136,7 @@ void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE {
 void Zero_Out_Enslaved_Velocity_Nodes(ARRAY<VECTOR_3D<T> >& V,const T time){
     switch(id_number){
     case 1:
-        if(fix_boundary)for(int j=1,index=0;j<=n_input;j++)for(int k=1;k<=m_input;k++){index++;V(index)=VECTOR_3D<T>(0,0,0);V(V.m+1-index)=VECTOR_3D<T>(0,0,0);}
+        if(fix_boundary)for(int j=1,index=0;j<=n_input;j++)for(int k=0;k<m_input;k++){index++;V(index)=VECTOR_3D<T>(0,0,0);V(V.m+1-index)=VECTOR_3D<T>(0,0,0);}
         break;
     default:std::cout<<"Unrecognized deformable object id number"<<std::endl;exit(1);}
 }

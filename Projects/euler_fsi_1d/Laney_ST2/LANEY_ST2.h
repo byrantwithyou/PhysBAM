@@ -55,7 +55,7 @@ Initialize_U(const GRID<TV>& grid, ARRAY<T,VECTOR<int,1> >& u)
 
     //initialize grid variables
     //1 =- density, 2 == momentum, 3 == total energy
-    for(int i=1;i<=m;i++)
+    for(int i=0;i<m;i++)
         if(grid.x(i) < 0){u(1,i) = 1.0; u(2,i) = 0; u(3,i) = 100000/(tmp_eos->gamma-1);}
         else {u(1,i) =  0.01; u(2,i) = 0.0; u(3,i) = 1000/(tmp_eos->gamma-1);}
 }

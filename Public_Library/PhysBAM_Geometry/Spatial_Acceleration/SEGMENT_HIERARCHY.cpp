@@ -41,7 +41,7 @@ Initialize_Hierarchy_Using_KD_Tree()
 {
     KD_TREE<TV> kd_tree(false);
     ARRAY<TV> centroids(segment_mesh.elements.m);
-    for(int t=1;t<=segment_mesh.elements.m;t++){
+    for(int t=0;t<segment_mesh.elements.m;t++){
         int i,j;segment_mesh.elements(t).Get(i,j);centroids(t)=(T).5*(particles.X(i)+particles.X(j));}
     kd_tree.Create_Left_Balanced_KD_Tree(centroids);
     leaves=segment_mesh.elements.m;parents.Resize(leaves);children.Remove_All();

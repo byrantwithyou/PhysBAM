@@ -66,10 +66,10 @@ public:
 //#####################################################################
 void Adjust_Density_And_Temperature_With_Sources(const T time)
 {
-    for(int i=1;i<=fluids_parameters.grid.m;i++)for(int j=1;j<=fluids_parameters.grid.n;j++)if(source_domain.Lazy_Inside(fluids_parameters.grid.X(i,j))){
+    for(int i=0;i<fluids_parameters.grid.m;i++)for(int j=0;j<fluids_parameters.grid.n;j++)if(source_domain.Lazy_Inside(fluids_parameters.grid.X(i,j))){
         fluids_parameters.density_container.density_2d(i,j)=rho;fluids_parameters.temperature_container.temperature_2d(i,j)=fluids_parameters.temperature_products;}
     // keep density >= 0 and T >=0
-    for(int i=1;i<=fluids_parameters.grid.m;i++)for(int j=1;j<=fluids_parameters.grid.n;j++){
+    for(int i=0;i<fluids_parameters.grid.m;i++)for(int j=0;j<fluids_parameters.grid.n;j++){
         fluids_parameters.density_container.density_2d(i,j)=max((T)0,fluids_parameters.density_container.density_2d(i,j));
         fluids_parameters.temperature_container.temperature_2d(i,j)=max((T)fluids_parameters.temperature_container.ambient_temperature,fluids_parameters.temperature_container.temperature_2d(i,j));}
 }
@@ -78,9 +78,9 @@ void Adjust_Density_And_Temperature_With_Sources(const T time)
 //#####################################################################
 void Get_Source_Velocities(const T time)
 {
-    for(int i=1;i<=fluids_parameters.u_grid.m;i++)for(int j=1;j<=fluids_parameters.u_grid.n;j++)if(source_domain.Lazy_Inside(fluids_parameters.u_grid.X(i,j)))
+    for(int i=0;i<fluids_parameters.u_grid.m;i++)for(int j=0;j<fluids_parameters.u_grid.n;j++)if(source_domain.Lazy_Inside(fluids_parameters.u_grid.X(i,j)))
         fluids_parameters.incompressible.projection.u(i,j)=0;
-    for(int i=1;i<=fluids_parameters.v_grid.m;i++)for(int j=1;j<=fluids_parameters.v_grid.n;j++)if(source_domain.Lazy_Inside(fluids_parameters.v_grid.X(i,j))){
+    for(int i=0;i<fluids_parameters.v_grid.m;i++)for(int j=0;j<fluids_parameters.v_grid.n;j++)if(source_domain.Lazy_Inside(fluids_parameters.v_grid.X(i,j))){
         fluids_parameters.incompressible.projection.v(i,j)=(T).2;fluids_parameters.incompressible.projection.elliptic_solver->psi_N_v(i,j)=true;}
 }
 //#####################################################################
@@ -120,7 +120,7 @@ void Get_Body_Force(ARRAY<VECTOR_2D<T> ,VECTOR<int,2> >& force,const T time)
         force(i,j)=VECTOR_2D<T>(force_3d.x,force_3d.y);}
     // Add particles
     int add_count=0;
-    for(int i=1;i<=fluids_parameters.grid.m;i++)for(int j=1;j<=fluids_parameters.grid.n;j++){
+    for(int i=0;i<fluids_parameters.grid.m;i++)for(int j=0;j<fluids_parameters.grid.n;j++){
         if(time>(T)1/24 && random.Get_Uniform_Number((T)0,(T)1)<(T).01 && grid_vorticity(i,j).Magnitude_Squared()>1e-6 && fluids_parameters.density_container.density_2d(i,j)>(T)particle_vorticity_minimum_density){
             add_count++;
             if(grid_vorticity(i,j).z>=0){
@@ -157,11 +157,11 @@ void Write_Output_Files(const T time,const int frame)
     FILE_UTILITIES::Write_To_File<RW>(STRING_UTILITIES::string_sprintf("%s/vorticity_particles.%d",output_directory.c_str(),frame),vorticity_positive_particles,vorticity_negative_particles);
     // Output non-zero portion of vorticity for easy visualization.
     ARRAY<T,VECTOR<int,2> > vorticity_z(fluids_parameters.grid,0,false);
-    for(int i=1;i<=fluids_parameters.grid.m;i++) for(int j=1;j<=fluids_parameters.grid.n;j++) vorticity_z(i,j)=grid_vorticity(i,j).z;
+    for(int i=0;i<fluids_parameters.grid.m;i++) for(int j=0;j<fluids_parameters.grid.n;j++) vorticity_z(i,j)=grid_vorticity(i,j).z;
     FILE_UTILITIES::Write_To_File<RW>(STRING_UTILITIES::string_sprintf("%s/grid_vorticity.%d",output_directory.c_str(),frame),vorticity_z);
-    for(int i=1;i<=fluids_parameters.grid.m;i++) for(int j=1;j<=fluids_parameters.grid.n;j++) vorticity_z(i,j)=grid_vorticity_raw_particles(i,j).z;
+    for(int i=0;i<fluids_parameters.grid.m;i++) for(int j=0;j<fluids_parameters.grid.n;j++) vorticity_z(i,j)=grid_vorticity_raw_particles(i,j).z;
     FILE_UTILITIES::Write_To_File<RW>(STRING_UTILITIES::string_sprintf("%s/grid_vorticity_raw_particles.%d",output_directory.c_str(),frame),vorticity_z);
-    for(int i=1;i<=fluids_parameters.grid.m;i++) for(int j=1;j<=fluids_parameters.grid.n;j++) vorticity_z(i,j)=grid_vorticity_particles(i,j).z;
+    for(int i=0;i<fluids_parameters.grid.m;i++) for(int j=0;j<fluids_parameters.grid.n;j++) vorticity_z(i,j)=grid_vorticity_particles(i,j).z;
     FILE_UTILITIES::Write_To_File<RW>(STRING_UTILITIES::string_sprintf("%s/grid_vorticity_particles.%d",output_directory.c_str(),frame),vorticity_z);
 }
 //#####################################################################

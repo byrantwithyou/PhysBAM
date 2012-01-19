@@ -65,7 +65,7 @@ public:
 
     void Set_Boundary_Conditions(const T time,const GRID<TV>& mac_grid,ARRAY<T,FACE_INDEX<TV::dimension> >& face_velocities,PROJECTION_DYNAMICS_UNIFORM<GRID<TV> >* projection)
     {if(projection){projection->elliptic_solver->psi_D.Fill(false);
-        for(int axis=1;axis<=TV::dimension;axis++) for(int axis_side=1;axis_side<=2;axis_side++){int side=2*(axis-1)+axis_side;
+        for(int axis=1;axis<=TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
             //if(!mpi_grid || domain_boundary(axis)(axis_side)){ //Need to check mpi as smaller solves are never using mpi (for now)
             if(true){ //No mpi yet
                 TV_INT interior_cell_offset=axis_side==1?TV_INT():-TV_INT::Axis_Vector(axis);    

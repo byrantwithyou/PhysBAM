@@ -16,7 +16,7 @@ template<class T> void BARYCENTRIC_TETRAHEDRON_ZERO_LENGTH_SPRING<T>::
 Initialize_Weights_Outer_Product()
 {
     weights_outer_product.Resize(constrained_location_weights.m);
-    for(int t=1;t<=constrained_location_weights.m;t++){
+    for(int t=0;t<constrained_location_weights.m;t++){
         T wa_1=constrained_location_weights(1,t).x,wa_2=constrained_location_weights(1,t).y,wa_3=constrained_location_weights(1,t).z,wa_4=(T)1-(wa_1+wa_2+wa_3);
         T wb_1=constrained_location_weights(2,t).x,wb_2=constrained_location_weights(2,t).y,wb_3=constrained_location_weights(2,t).z,wb_4=(T)1-(wb_1+wb_2+wb_3);
         //1
@@ -57,7 +57,7 @@ Add_Velocity_Independent_Forces(ARRAY<VECTOR<T,3> >& F,const T time) const
     ARRAY<VECTOR<T,3> >& X=particles.X.array;
     VECTOR<T,3> weights_a,weights_b,force_on_embedded_node_a,embedded_location_a,embedded_location_b;
     if(!youngs_modulus.m){
-        for(int t=1;t<=constrained_tets.m;t++){
+        for(int t=0;t<constrained_tets.m;t++){
             int ia,ja,ka,la,ib,jb,kb,lb;
             tetrahedron_mesh.elements.Get(constrained_tets(1,t),ia,ja,ka,la);
             tetrahedron_mesh.elements.Get(constrained_tets(2,t),ib,jb,kb,lb);
@@ -77,7 +77,7 @@ Add_Velocity_Independent_Forces(ARRAY<VECTOR<T,3> >& F,const T time) const
             F(kb)-=weights_b.z*force_on_embedded_node_a;
             F(lb)-=wb_4*force_on_embedded_node_a;}}
     else{
-        for(int t=1;t<=constrained_tets.m;t++){
+        for(int t=0;t<constrained_tets.m;t++){
             int ia,ja,ka,la,ib,jb,kb,lb;
             tetrahedron_mesh.elements.Get(constrained_tets(1,t),ia,ja,ka,la);
             tetrahedron_mesh.elements.Get(constrained_tets(2,t),ib,jb,kb,lb);
@@ -104,7 +104,7 @@ template<class T> void BARYCENTRIC_TETRAHEDRON_ZERO_LENGTH_SPRING<T>::
 Add_Force_Differential(const ARRAY<VECTOR<T,3> >& dX,ARRAY<VECTOR<T,3> >& dF,const T time) const
 {
     if(!youngs_modulus.m){
-        for(int t=1;t<=constrained_tets.m;t++){
+        for(int t=0;t<constrained_tets.m;t++){
             int ia,ja,ka,la;tetrahedron_mesh.elements.Get(constrained_tets(1,t),ia,ja,ka,la);
             int ib,jb,kb,lb;tetrahedron_mesh.elements.Get(constrained_tets(2,t),ib,jb,kb,lb);
             //1
@@ -128,7 +128,7 @@ Add_Force_Differential(const ARRAY<VECTOR<T,3> >& dX,ARRAY<VECTOR<T,3> >& dF,con
             dF(kb)+=-constant_youngs_modulus*(weights_outer_product(4,t).x[8]*dX(ib)+weights_outer_product(4,t).x[9]*dX(jb)+weights_outer_product(4,t).x[10]*dX(kb)+weights_outer_product(4,t).x[11]*dX(lb));
             dF(lb)+=-constant_youngs_modulus*(weights_outer_product(4,t).x[12]*dX(ib)+weights_outer_product(4,t).x[13]*dX(jb)+weights_outer_product(4,t).x[14]*dX(kb)+weights_outer_product(4,t).x[15]*dX(lb));}}
     else{
-        for(int t=1;t<=constrained_tets.m;t++){
+        for(int t=0;t<constrained_tets.m;t++){
             int ia,ja,ka,la;tetrahedron_mesh.elements.Get(constrained_tets(1,t),ia,ja,ka,la);
             int ib,jb,kb,lb;tetrahedron_mesh.elements.Get(constrained_tets(2,t),ib,jb,kb,lb);
             //1

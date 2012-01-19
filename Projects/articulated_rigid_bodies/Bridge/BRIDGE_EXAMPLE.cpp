@@ -170,7 +170,7 @@ Make_Bridge()
     LOG::cout<<"adding articulation"<<std::endl;
     for(int i=0;i<num_rungs;i++){int rung=i*5+1;
         // rung to post
-        for(int side=1;side<=2;side++) Add_Joint(int(rung),int(rung+side),new RIGID_JOINT<TV>,FRAME<TV>(TV(0,(T)-.5,0)));
+        for(int side=0;side<2;side++) Add_Joint(int(rung),int(rung+side),new RIGID_JOINT<TV>,FRAME<TV>(TV(0,(T)-.5,0)));
         // rung to sides
         if(rung>1) for(int side=-2;side<=-1;side++){
             ANGLE_JOINT<TV>& joint=static_cast<ANGLE_JOINT<TV>&>(Add_Joint(int(rung),int(rung+side),new ANGLE_JOINT<TV>,FRAME<TV>(TV(0,(T).015625,(T).3))));

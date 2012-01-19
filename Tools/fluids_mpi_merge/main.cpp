@@ -87,11 +87,11 @@ public:
     if(!FILE_UTILITIES::File_Exists(output_filename)) return true;
     // check file times
     std::string prefix=input_directory+"/"+filename+".";
-    for(int i=1;i<=number_of_processes;i++)if(FILE_UTILITIES::Compare_File_Times(input_directory+STRING_UTILITIES::string_sprintf("/%d/",i)+filename,output_filename)>0) return true;
+    for(int i=0;i<number_of_processes;i++)if(FILE_UTILITIES::Compare_File_Times(input_directory+STRING_UTILITIES::string_sprintf("/%d/",i)+filename,output_filename)>0) return true;
     return false;}
 
     bool Source_Files_Exist(const int frame) const
-    {for(int i=1;i<=number_of_processes;i++)if(!FILE_UTILITIES::File_Exists(input_directory+"/"+STRING_UTILITIES::string_sprintf("%d/%d",i,frame)+"/time")) return false;
+    {for(int i=0;i<number_of_processes;i++)if(!FILE_UTILITIES::File_Exists(input_directory+"/"+STRING_UTILITIES::string_sprintf("%d/%d",i,frame)+"/time")) return false;
     return true;}
 
     void Merge_All_Frames(const int first_frame,const int last_frame)
@@ -123,7 +123,7 @@ Merge(const int frame)
     std::string f=STRING_UTILITIES::string_sprintf("%d/",frame);
 
     local_grids.Resize(number_of_fluid_processes);
-    for(int p=1;p<=number_of_fluid_processes;p++){
+    for(int p=0;p<number_of_fluid_processes;p++){
         local_grids(p)=new LOCAL_GRID<T_GRID>(grid);
         FILE_UTILITIES::Read_From_File<RW>(input_directory+STRING_UTILITIES::string_sprintf("/%d/common/grid",p+fluid_proc_offset),*local_grids(p));}
     FILE_UTILITIES::Write_To_File<RW>(output_directory+"/common/grid",grid);
@@ -211,14 +211,14 @@ Merge_Cell_Data(const std::string& filename,const int verify_bandwidth,const boo
 {
     // read
     ARRAY<T_ARRAYS> local_data(number_of_fluid_processes);
-    for(int p=1;p<=number_of_fluid_processes;p++){std::string name=input_directory+STRING_UTILITIES::string_sprintf("/%d/",(p+fluid_proc_offset))+filename;
+    for(int p=0;p<number_of_fluid_processes;p++){std::string name=input_directory+STRING_UTILITIES::string_sprintf("/%d/",(p+fluid_proc_offset))+filename;
         if(!FILE_UTILITIES::File_Exists(name)){LOG::cout<<"Missing "<<name<<"; skipping merge"<<std::endl;return false;}
         FILE_UTILITIES::Read_From_File<RW>(name,local_data(p));}
     // merge
     T_ARRAYS global_data(grid.Cell_Indices(3));
-    for(int p=1;p<=number_of_fluid_processes;p++)local_grids(p)->Put(local_data(p),global_data);
+    for(int p=0;p<number_of_fluid_processes;p++)local_grids(p)->Put(local_data(p),global_data);
     // verify
-    for(int p=1;p<=number_of_fluid_processes;p++){TV_INT index;
+    for(int p=0;p<number_of_fluid_processes;p++){TV_INT index;
         T max_error=local_grids(p)->Maximum_Error(local_data(p),global_data,verify_bandwidth,index);
         if(max_error>0 && print_max_errors){LOG::cout<<filename<<": max error on process "<<p<<" = "<<max_error<<" ("<<index<<" = "<<local_data(p)(index)<<")"<<std::endl;}}
     if(scale) Scale_Cell_Data(global_data);
@@ -245,14 +245,14 @@ Merge_Levelset(const std::string& filename,const int verify_bandwidth)
 {
     // read
     ARRAY<T_ARRAYS> local_data(number_of_fluid_processes);
-    for(int p=1;p<=number_of_fluid_processes;p++){std::string name=input_directory+STRING_UTILITIES::string_sprintf("/%d/",(p+fluid_proc_offset))+filename;
+    for(int p=0;p<number_of_fluid_processes;p++){std::string name=input_directory+STRING_UTILITIES::string_sprintf("/%d/",(p+fluid_proc_offset))+filename;
         if(!FILE_UTILITIES::File_Exists(name)){LOG::cout<<"Missing "<<name<<"; skipping merge"<<std::endl;return false;}
         T_GRID skip;FILE_UTILITIES::Read_From_File<RW>(name,skip,local_data(p));}
     // merge
     T_ARRAYS global_data(grid.Cell_Indices(3));
-    for(int p=1;p<=number_of_fluid_processes;p++)local_grids(p)->Put(local_data(p),global_data);
+    for(int p=0;p<number_of_fluid_processes;p++)local_grids(p)->Put(local_data(p),global_data);
     // verify
-    for(int p=1;p<=number_of_fluid_processes;p++){TV_INT index;
+    for(int p=0;p<number_of_fluid_processes;p++){TV_INT index;
         T max_error=local_grids(p)->Maximum_Error(local_data(p),global_data,verify_bandwidth,index);
         if(max_error>0 && print_max_errors){LOG::cout<<filename<<": max error on process "<<p<<" = "<<max_error<<" ("<<index<<" = "<<local_data(p)(index)<<")"<<std::endl;}}
     // write
@@ -267,15 +267,15 @@ Merge_Face_Data(const std::string& filename,const int verify_bandwidth)
 {
     // read
     ARRAY<T_FACE_ARRAYS_2*> local_data(number_of_fluid_processes);
-    for(int p=1;p<=number_of_fluid_processes;p++){std::string name=input_directory+STRING_UTILITIES::string_sprintf("/%d/",(p+fluid_proc_offset))+filename;
+    for(int p=0;p<number_of_fluid_processes;p++){std::string name=input_directory+STRING_UTILITIES::string_sprintf("/%d/",(p+fluid_proc_offset))+filename;
         if(!FILE_UTILITIES::File_Exists(name)){LOG::cout<<"Missing "<<name<<"; skipping merge"<<std::endl;return false;}
         local_data(p)=new T_FACE_ARRAYS_2;
         FILE_UTILITIES::Read_From_File<RW>(name,*local_data(p));}
     // merge
     T_FACE_ARRAYS_2 global_data(grid,3);
-    for(int p=1;p<=number_of_fluid_processes;p++)local_grids(p)->Put_Faces(*local_data(p),global_data);
+    for(int p=0;p<number_of_fluid_processes;p++)local_grids(p)->Put_Faces(*local_data(p),global_data);
     // verify
-    for(int p=1;p<=number_of_fluid_processes;p++){
+    for(int p=0;p<number_of_fluid_processes;p++){
         if(print_max_errors){
             std::string prefix=filename+": max error on process "+STRING_UTILITIES::string_sprintf("%d",p);
             local_grids(p)->Maximum_Error(prefix,*local_data(p),global_data,verify_bandwidth);}}
@@ -292,13 +292,13 @@ Merge_Lists(const std::string& filename)
 {
     // read
     ARRAY<T_LIST_2*> local_data(number_of_fluid_processes);
-    for(int p=1;p<=number_of_fluid_processes;p++){std::string name=input_directory+STRING_UTILITIES::string_sprintf("/%d/",(p+fluid_proc_offset))+filename;
+    for(int p=0;p<number_of_fluid_processes;p++){std::string name=input_directory+STRING_UTILITIES::string_sprintf("/%d/",(p+fluid_proc_offset))+filename;
         if(!FILE_UTILITIES::File_Exists(name)){LOG::cout<<"Missing "<<name<<"; skipping merge"<<std::endl;return false;}
         local_data(p)=new T_LIST_2;
         FILE_UTILITIES::Read_From_File<RW>(name,*local_data(p));}
     // merge
     T_LIST_2 global_data;
-    for(int p=1;p<=number_of_fluid_processes;p++) global_data.Append_Elements(*local_data(p));
+    for(int p=0;p<number_of_fluid_processes;p++) global_data.Append_Elements(*local_data(p));
     // write
     FILE_UTILITIES::Write_To_File<RW>(output_directory+"/"+filename,global_data);
     local_data.Delete_Pointers_And_Clean_Memory();
@@ -313,17 +313,17 @@ Merge_Particles(const std::string& filename)
     // read
     int process_without_particles=0;
     ARRAY<typename T_ARRAYS_SCALAR::template REBIND<T_PARTICLES*>::TYPE> local_data(number_of_fluid_processes);
-    for(int p=1;p<=number_of_fluid_processes;p++){std::string name=input_directory+STRING_UTILITIES::string_sprintf("/%d/",(p+fluid_proc_offset))+filename;
+    for(int p=0;p<number_of_fluid_processes;p++){std::string name=input_directory+STRING_UTILITIES::string_sprintf("/%d/",(p+fluid_proc_offset))+filename;
         if(!FILE_UTILITIES::File_Exists(name)){LOG::cout<<"Missing "<<name<<"; skipping merge"<<std::endl;return false;}
         FILE_UTILITIES::Read_From_File<RW>(name,local_data(p));}
     // check for zero size
     if(process_without_particles){
-        for(int p=1;p<=number_of_fluid_processes;p++)if(local_data(p).counts.x){
+        for(int p=0;p<number_of_fluid_processes;p++)if(local_data(p).counts.x){
             LOG::cerr<<filename<<": process "<<p<<" has particles but process "<<process_without_particles<<" does not."<<std::endl;exit(1);}
         FILE_UTILITIES::Write_To_File<RW>(output_directory+"/"+filename,typename T_ARRAYS_SCALAR::template REBIND<T_PARTICLES*>::TYPE());return true;}
     // merge
     typename T_ARRAYS_SCALAR::template REBIND<T_PARTICLES*>::TYPE global_data(grid.Node_Indices());
-    for(int p=1;p<=number_of_fluid_processes;p++){
+    for(int p=0;p<number_of_fluid_processes;p++){
         RANGE<TV_INT> region=local_grids(p)->Interior_Region(RANGE<TV_INT>(TV_INT(),TV_INT::All_Ones_Vector())),interior_region=region.Thickened(-1);
         // copy interior particles
         {NODE_ITERATOR local(local_grids(p)->grid,interior_region),global(grid,interior_region+local_grids(p)->offset);
@@ -338,7 +338,7 @@ Merge_Particles(const std::string& filename)
     // write
     FILE_UTILITIES::Write_To_File<RW>(output_directory+"/"+filename,global_data);
     // free memory
-    for(int p=1;p<=number_of_fluid_processes;p++)local_data(p).Delete_Pointers_And_Clean_Memory();
+    for(int p=0;p<number_of_fluid_processes;p++)local_data(p).Delete_Pointers_And_Clean_Memory();
     global_data.Delete_Pointers_And_Clean_Memory();
     return true;
 }

@@ -98,7 +98,7 @@ public:
     void Get_Aggregate_World_Space_Bounding_Boxes(ARRAY<RENDERING_OBJECT_ACCELERATION_PRIMITIVE<T> >& primitives) const PHYSBAM_OVERRIDE
     {if(add_triangles_to_acceleration_structure){
         world_space_triangles.Remove_All();
-        for(int i=1;i<=triangulated_surface.mesh.elements.m;i++){
+        for(int i=0;i<triangulated_surface.mesh.elements.m;i++){
             int node1,node2,node3;triangulated_surface.mesh.elements(i).Get(node1,node2,node3);
             TRIANGLE_3D<T> world_space_triangle(transform.Homogeneous_Times(triangulated_surface.particles.X(node1)),transform.Homogeneous_Times(triangulated_surface.particles.X(node2)),transform.Homogeneous_Times(triangulated_surface.particles.X(node3)));
             world_space_triangles.Append(world_space_triangle);

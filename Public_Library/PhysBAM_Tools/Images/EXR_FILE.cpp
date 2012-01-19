@@ -29,8 +29,8 @@ Write(const std::string& filename,const ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& imag
     assert(image.domain.min_corner.x==1&&image.domain.min_corner.y==1&&image.length==1);
     Rgba* pixels=new Rgba[image.counts.Product()];
     int t=0;
-    if(d==3) for(int i=1;i<=image.counts.x;i++) for(int j=image.counts.y;j>=1;j--){pixels[t].r=(float)image(i,j)[1];pixels[t].g=(float)image(i,j)[2];pixels[t].b=(float)image(i,j)[3];pixels[t].a=(float)1;t++;}
-    else if (d==4) for(int i=1;i<=image.counts.x;i++) for(int j=image.counts.y;j>=1;j--){pixels[t].r=(float)image(i,j)[1];pixels[t].g=(float)image(i,j)[2];pixels[t].b=(float)image(i,j)[3];pixels[t].a=(float)image(i,j)[4];t++;}
+    if(d==3) for(int i=0;i<image.counts.x;i++) for(int j=image.counts.y;j>=1;j--){pixels[t].r=(float)image(i,j)[1];pixels[t].g=(float)image(i,j)[2];pixels[t].b=(float)image(i,j)[3];pixels[t].a=(float)1;t++;}
+    else if (d==4) for(int i=0;i<image.counts.x;i++) for(int j=image.counts.y;j>=1;j--){pixels[t].r=(float)image(i,j)[1];pixels[t].g=(float)image(i,j)[2];pixels[t].b=(float)image(i,j)[3];pixels[t].a=(float)image(i,j)[4];t++;}
     try{RgbaOutputFile file(filename.c_str(),image.counts.x,image.counts.y,WRITE_RGBA);file.setFrameBuffer(pixels,image.counts.y,1);file.writePixels(image.counts.y);}
     catch(...){LOG::cerr<<"Cannot write exr image to "<<filename<<std::endl;PHYSBAM_FATAL_ERROR();}
     delete[] pixels;
@@ -49,7 +49,7 @@ Read(const std::string& filename,ARRAY<VECTOR<T,3> ,VECTOR<int,2> >& image)
         file.readPixels(data_window.min.y,data_window.max.y);
         image.Resize(1,width,1,height);
         int t=0;
-        for(int j=image.counts.y;j>=1;j--) for(int i=1;i<=image.counts.x;i++){image(i,j)=VECTOR<T,3>((T)pixels[t].r,(T)pixels[t].g,(T)pixels[t].b);t++;}
+        for(int j=image.counts.y;j>=1;j--) for(int i=0;i<image.counts.x;i++){image(i,j)=VECTOR<T,3>((T)pixels[t].r,(T)pixels[t].g,(T)pixels[t].b);t++;}
         delete[] pixels;}
     catch(...){LOG::cerr<<"Cannot read exr image from "<<filename<<std::endl;PHYSBAM_FATAL_ERROR();}
 }

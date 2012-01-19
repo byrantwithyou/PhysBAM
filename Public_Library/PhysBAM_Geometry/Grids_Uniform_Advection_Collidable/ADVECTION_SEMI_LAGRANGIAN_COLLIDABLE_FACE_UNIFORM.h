@@ -99,7 +99,7 @@ public:
 
         while(!done){
             done=true;
-            for(int k=1;k<=invalid_indices.m;k++){ 
+            for(int k=0;k<invalid_indices.m;k++){ 
                 T sum=0;int count=0;
                 for(int axis=1;axis<=T_GRID::dimension;axis++){
                     T_VECTOR_INT min_face=invalid_indices(k).x-T_VECTOR_INT::Axis_Vector(axis),max_face=invalid_indices(k).x+T_VECTOR_INT::Axis_Vector(axis);
@@ -112,7 +112,7 @@ public:
         done=false;
         while(!done){
             done=true;
-            for(int k=1;k<=invalid_indices.m;k++){ 
+            for(int k=0;k<invalid_indices.m;k++){ 
                 T sum=0;int count=0;
                 for(int axis=1;axis<=T_GRID::dimension;axis++){
                     T_VECTOR_INT min_face=invalid_indices(k).x-T_VECTOR_INT::Axis_Vector(axis),max_face=invalid_indices(k).x+T_VECTOR_INT::Axis_Vector(axis);

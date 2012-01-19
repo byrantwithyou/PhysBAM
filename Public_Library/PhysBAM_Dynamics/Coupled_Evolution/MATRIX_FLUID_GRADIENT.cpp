@@ -40,7 +40,7 @@ Compute(const ARRAY<bool,FACE_INDEX<d> >& psi_N)
     const GRID<TV>& grid=index_map.grid;
     TV_INT grid_counts=grid.counts;
     
-    for(int i=1;i<=index_map.indexed_faces.m;i++){
+    for(int i=0;i<index_map.indexed_faces.m;i++){
         const FACE_INDEX<d>& face_index=index_map.indexed_faces(i);
         if(!psi_N(face_index)){
             Add_Cell(i,face_index.axis,face_index.First_Cell_Index(),face_areas(1)(face_index.axis));

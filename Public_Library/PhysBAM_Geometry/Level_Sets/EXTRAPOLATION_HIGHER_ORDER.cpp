@@ -51,7 +51,7 @@ Fill_Level(const GRID<TV>& grid,const T_LEVELSET& phi,int ghost,MAPPING& m,ARRAY
         for(int d=1;d<=TV::m;d++){
             int s=N(d)<0?1:-1;
             TV_INT ind=m.index_to_node(i);
-            for(int j=1;j<=2;j++){
+            for(int j=0;j<2;j++){
                 ind(d)+=s;
                 int& k=m.node_to_index(ind);
                 if(!k) k=m.index_to_node.Append(ind);}}}
@@ -82,7 +82,7 @@ Fill_Level(const GRID<TV>& grid,const T_LEVELSET& phi,int ghost,MAPPING& m,ARRAY
             STENCIL& st=stencil(i)(d);
             st.scale=s*N(d)*grid.one_over_dX(d);
             TV_INT ind=m.index_to_node(i);
-            for(int j=1;j<=3;j++){
+            for(int j=0;j<3;j++){
                 st.nodes(j+1)=m.node_to_index(ind);
                 ind(d)+=s;}
             ind(d)-=4*s;

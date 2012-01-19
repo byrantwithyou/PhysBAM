@@ -46,7 +46,7 @@ public:
     {}
 
     virtual ~DEFORMABLE_OBJECT_FLUID_COLLISIONS()
-    {for(int i=1;i<=saved_states.m;i++) delete saved_states(i).x;}
+    {for(int i=0;i<saved_states.m;i++) delete saved_states(i).x;}
 
     TV Pointwise_Node_Pseudo_Velocity(const int node_id,const int state1,const int state2)
     {TV dX=saved_states(state2).x->X(node_id)-saved_states(state1).x->X(node_id);

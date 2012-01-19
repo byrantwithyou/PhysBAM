@@ -23,7 +23,7 @@ Advance_One_Time_Step(const T dt,const T time)
     EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities=*deformable_object.example_forces_and_velocities;
 
     // do precomputation if necessary
-    for(int k=1;k<=forces.m;k++){
+    for(int k=0;k<forces.m;k++){
         FINITE_VOLUME<TV,3>* fvm=dynamic_cast<FINITE_VOLUME<TV,3>*>(forces(k));if(!fvm) continue;
         if(!fvm->semi_implicit_data) fvm->Semi_Implicit_Impulse_Precomputation(time,FLT_MAX,0,true);}
     // update position
@@ -32,7 +32,7 @@ Advance_One_Time_Step(const T dt,const T time)
     // update embedded positions
     binding_list.Clamp_Particles_To_Embedded_Positions();
     // update velocity with impulses
-    for(int k=1;k<=forces.m;k++){
+    for(int k=0;k<forces.m;k++){
         FINITE_VOLUME<TV,3>* fvm=dynamic_cast<FINITE_VOLUME<TV,3>*>(forces(k));if(!fvm) continue;
         fvm->Add_Semi_Implicit_Impulses(dt,0);}
     example_forces_and_velocities.Add_External_Impulses(particles.V,time,dt);

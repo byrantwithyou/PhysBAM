@@ -27,7 +27,7 @@ Refine_Mesh(TRIANGLE_SUBDIVISION& ts,TRIANGLE_MESH& refined_triangle_mesh,const 
     refined_triangle_mesh.elements.Exact_Resize(4*ts.triangle_mesh.elements.m);
     
     int new_t=0;
-    for(int t=1;t<=ts.triangle_mesh.elements.m;t++){
+    for(int t=0;t<ts.triangle_mesh.elements.m;t++){
         int i,j,k;ts.triangle_mesh.elements(t).Get(i,j,k);
         int edge_ij,edge_jk,edge_ki;(*ts.triangle_mesh.element_edges)(t).Get(edge_ij,edge_jk,edge_ki);
         int ij=ts.start_index_for_new_nodes-1+edge_ij,jk=ts.start_index_for_new_nodes-1+edge_jk,ki=ts.start_index_for_new_nodes-1+edge_ki;
@@ -52,11 +52,11 @@ Refine_Mesh_Dual(TRIANGLE_SUBDIVISION& ts,TRIANGLE_MESH& refined_triangle_mesh,c
     refined_triangle_mesh.elements.Exact_Resize(3*ts.triangle_mesh.elements.m);
     
     int new_t=0;
-    for(int t=1;t<=ts.triangle_mesh.elements.m;t++){
+    for(int t=0;t<ts.triangle_mesh.elements.m;t++){
         assert((*ts.triangle_mesh.adjacent_elements)(t).m==3);  // boundary subdivision unimplemented
         int tv=ts.start_index_for_new_nodes-1+t;
         int ti,tj,tk;ts.triangle_mesh.elements(t).Get(ti,tj,tk);
-        for(int a=1;a<=3;a++){
+        for(int a=0;a<3;a++){
             int s=(*ts.triangle_mesh.adjacent_elements)(t)(a);if(s<t)continue;
             int si,sj,sk;ts.triangle_mesh.elements(s).Get(si,sj,sk);
             if(ti==si||ti==sj||ti==sk){cyclic_shift(ti,tj,tk);if(ti==si||ti==sj||ti==sk)cyclic_shift(ti,tj,tk);}

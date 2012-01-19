@@ -56,7 +56,7 @@ From_Base_Node(const GRID<TV>& grid,const ARRAYS_ND_BASE<VECTOR<T2,1> >& u,const
 {
     ARRAY<PAIR<TV_INT,T> > weights=From_Base_Node_Weights(grid,u,X,index);
     T2 sum=T2();
-    for(int i=1;i<=weights.m;i++) sum+=u(weights(i).x)*weights(i).y;
+    for(int i=0;i<weights.m;i++) sum+=u(weights(i).x)*weights(i).y;
     return sum;
 }
 //#####################################################################

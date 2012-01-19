@@ -42,7 +42,7 @@ MPI_SOLID_FLUID()
     for(int i=0;i<number_of_solid_processes;i++)solid_ranks(i)=i-1;
     solid_group=new MPI::Group(group->Incl(solid_ranks.n,&solid_ranks(1)));
     fluid_ranks.Resize(number_of_processes-number_of_solid_processes);
-    for(int i=1;i<=fluid_ranks.n;i++)fluid_ranks(i)=i+number_of_solid_processes-1;
+    for(int i=0;i<fluid_ranks.n;i++)fluid_ranks(i)=i+number_of_solid_processes-1;
     fluid_group=new MPI::Group(group->Incl(fluid_ranks.n,&fluid_ranks(1)));
 }
 //#####################################################################
@@ -66,7 +66,7 @@ template<class T> void Exchange_Solid_Positions_And_Velocities_Helper(const MPI_
     RIGID_BODY_PARTICLES<VECTOR<T,1> >& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particle;
     if(mpi.Solid_Node()){
         ARRAY<ARRAY<char> > send_buffers(mpi.fluid_ranks.n);ARRAY<MPI::Request> requests;
-        for(int i=1;i<=mpi.fluid_ranks.n;i++){
+        for(int i=0;i<mpi.fluid_ranks.n;i++){
             int buffer_size=MPI_UTILITIES::Pack_Size(particles.X,rigid_body_particles.X,particles.V,rigid_body_particles.twist,*mpi.comm)+1;
             send_buffers(i).Resize(buffer_size);int position=0;
             MPI_UTILITIES::Pack(particles.X,rigid_body_particles.X,particles.V,rigid_body_particles.twist,send_buffers(i),position,*mpi.comm);
@@ -91,7 +91,7 @@ Exchange_Solid_Positions_And_Velocities(SOLID_BODY_COLLECTION<TV>& solid_body_co
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particle;
     if(Solid_Node()){
         ARRAY<ARRAY<char> > send_buffers(fluid_ranks.n);ARRAY<MPI::Request> requests;
-        for(int i=1;i<=fluid_ranks.n;i++){
+        for(int i=0;i<fluid_ranks.n;i++){
             int buffer_size=MPI_UTILITIES::Pack_Size(particles.X,rigid_body_particles.X,rigid_body_particles.rotation,particles.V,rigid_body_particles.twist,
                 rigid_body_particles.angular_momentum,*comm)+1;
             send_buffers(i).Resize(buffer_size);int position=0;
@@ -194,7 +194,7 @@ Exchange_Coupled_Deformable_Particle_List(ARRAY<int>* fluid_list,ARRAY<ARRAY<int
 {
     int tag=Get_Unique_Tag();
     if(Solid_Node()){
-        for(int i=1;i<=fluid_ranks.n;i++){
+        for(int i=0;i<fluid_ranks.n;i++){
             MPI::Status status;
             comm->Probe(MPI::ANY_SOURCE,tag,status);
             int source=status.Get_source();
@@ -216,7 +216,7 @@ Distribute_Lists_From_Solid_Node(GENERALIZED_VELOCITY<TV>& F) const
     int tag=Get_Unique_Tag();
     if(Solid_Node()){
         ARRAY<ARRAY<char> > send_buffers(fluid_ranks.n);ARRAY<MPI::Request> requests;
-        for(int i=1;i<=fluid_ranks.n;i++){
+        for(int i=0;i<fluid_ranks.n;i++){
             int buffer_size=MPI_UTILITIES::Pack_Size(F.V,F.rigid_V,*comm)+1;
             send_buffers(i).Resize(buffer_size);int position=0;
             MPI_UTILITIES::Pack(F.V,F.rigid_V,send_buffers(i),position,*comm);

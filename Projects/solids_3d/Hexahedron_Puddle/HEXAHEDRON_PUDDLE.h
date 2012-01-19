@@ -57,7 +57,7 @@ void Get_Initial_Data()
     GRID<TV> grid(3*resolution+1,3*resolution+1,resolution+1,(T)-1,(T)1,(T)-1,(T)1,-(T)one_third,(T)one_third);
     hexahedralized_volume.Initialize_Cube_Mesh_And_Particles(grid);
     T radius=(T)(one_third-1e-5);
-    for(int h=1;h<=hexahedron_mesh.hexahedrons.m;h++)for(int k=1;k<=8;k++){
+    for(int h=0;h<hexahedron_mesh.hexahedrons.m;h++)for(int k=0;k<8;k++){
         VECTOR_3D<T>& X=particles.X(hexahedron_mesh.hexahedrons(k,h));
         if(fabs(X.x)<radius && fabs(X.y)<radius)hexahedron_mesh.hexahedrons(k,h)=0;}
     hexahedron_mesh.Delete_Hexahedrons_With_Missing_Nodes();

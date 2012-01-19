@@ -91,7 +91,7 @@ void Initialize_Phi(const int object,ARRAY<T>& phi)
     RED_GREEN_GRID_3D<T>& grid=melting_parameters.levelsets(1)->grid;
     ARRAY<VECTOR_3D<T> >& node_locations=grid.Node_Locations();
     
-    for(int p=1;p<=phi.m;p++) phi(p)=sphere.Signed_Distance(node_locations(p));    
+    for(int p=0;p<phi.m;p++) phi(p)=sphere.Signed_Distance(node_locations(p));    
     //ARRAY<T>::copy(-1,phi);
 }
 //#####################################################################
@@ -103,8 +103,8 @@ void Initialize_Levelset_Velocity(const int object,ARRAY<VECTOR_3D<T> >& V)
     RED_GREEN_GRID_3D<T>& grid=melting_parameters.levelsets(1)->grid;
     ARRAY<VECTOR_3D<T> >& node_locations=grid.Node_Locations();
     
-    //for(int p=1;p<=V.m;p++) V(p)=VECTOR_3D<T>(node_locations(p).y-sphere.center.y,0,0);
-    for(int p=1;p<=V.m;p++) V(p)=VECTOR_3D<T>(3*max(1-2*fabs(node_locations(p).y-sphere.center.y),0.),0,0);
+    //for(int p=0;p<V.m;p++) V(p)=VECTOR_3D<T>(node_locations(p).y-sphere.center.y,0,0);
+    for(int p=0;p<V.m;p++) V(p)=VECTOR_3D<T>(3*max(1-2*fabs(node_locations(p).y-sphere.center.y),0.),0,0);
 }
 //#####################################################################
 // Function Initialize_Particle_Positions_And_Velocities

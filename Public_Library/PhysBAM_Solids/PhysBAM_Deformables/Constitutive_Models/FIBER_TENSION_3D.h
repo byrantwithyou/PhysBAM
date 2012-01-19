@@ -46,7 +46,7 @@ public:
         const ARRAY<ARRAY<T> >& muscle_densities)
     {int n=strain_measure.tetrahedron_mesh.tetrahedrons.m;
     tet_muscles.Resize(n);tet_fibers.Resize(n);tension.Resize(n);tet_densities.Resize(n);
-    for(int m=1;m<=muscle_tets.m;m++) for(int t=1;t<=muscle_tets(m).m;t++){
+    for(int m=0;m<muscle_tets.m;m++) for(int t=1;t<=muscle_tets(m).m;t++){
         tet_muscles(muscle_tets(m)(t)).Append(m);tet_densities(muscle_tets(m)(t)).Append(muscle_densities(m)(t));
         tet_fibers(muscle_tets(m)(t)).Append(strain_measure.F(muscle_tets(m)(t)).Transpose_Times(muscle_fibers(m)(t)));
         tension(muscle_tets(m)(t)).Append(0);}}

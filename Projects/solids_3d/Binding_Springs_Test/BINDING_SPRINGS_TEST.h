@@ -103,7 +103,7 @@ void Get_Initial_Data()
 
     // correct number nodes
     spring_segment_mesh.Set_Number_Nodes(particles.array_collection->Size());
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     // correct mass
     binding_list.Distribute_Mass_To_Parents();
@@ -142,10 +142,10 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     // try a different effective mass
     ARRAY<TV> F(particles.array_collection->Size());
-    for(int i=1;i<=solid_body_collection.deformable_body_collection.binding_list.bindings.m;i++) F(solid_body_collection.deformable_body_collection.binding_list.bindings(i)->particle_index)=TV::All_Ones_Vector();
+    for(int i=0;i<solid_body_collection.deformable_body_collection.binding_list.bindings.m;i++) F(solid_body_collection.deformable_body_collection.binding_list.bindings(i)->particle_index)=TV::All_Ones_Vector();
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Force_To_Parents(1,F);
 
-    for(int b=1;b<=solid_body_collection.deformable_body_collection.soft_bindings.bindings.m;b++){VECTOR<int,2>& binding=solid_body_collection.deformable_body_collection.soft_bindings.bindings(b);
+    for(int b=0;b<solid_body_collection.deformable_body_collection.soft_bindings.bindings.m;b++){VECTOR<int,2>& binding=solid_body_collection.deformable_body_collection.soft_bindings.bindings(b);
         particles.mass.effective_mass(binding.x)=particles.mass.array(binding.x)=particles.mass.effective_mass(binding.y)/solid_body_collection.deformable_body_collection.binding_list.Binding(binding.y)->Embedded_Force(F).x;
         particles.mass.one_over_effective_mass(binding.x)=particles.mass.one_over_mass(binding.x)=(T)1/particles.mass.array(binding.x);}
 
@@ -243,7 +243,7 @@ void Sphere()
     sphere1.Update_Number_Nodes();
     sphere2.Update_Number_Nodes();
 
-    for(int i=1;i<=sphere_particles;i++) spring_segment_mesh.elements.Append(VECTOR<int,2>(i,i+sphere_particles));
+    for(int i=0;i<sphere_particles;i++) spring_segment_mesh.elements.Append(VECTOR<int,2>(i,i+sphere_particles));
 
     deformable_body_collection.deformable_geometry.Add_Structure(&sphere1);
     deformable_body_collection.deformable_geometry.Add_Structure(&sphere2);
@@ -342,7 +342,7 @@ void Embedded_Segments()
     // embedded particles
     solid_body_collection.deformable_body_collection.binding_list.Add_Binding(new LINEAR_BINDING<TV,2>(particles,4,VECTOR<int,2>(1,2),VECTOR<T,2>(.25,.5)));
     solid_body_collection.deformable_body_collection.binding_list.Add_Binding(new LINEAR_BINDING<TV,2>(particles,5,VECTOR<int,2>(2,3),VECTOR<T,2>(.5,.5)));
-    for(int i=1;i<=solid_body_collection.deformable_body_collection.binding_list.bindings.m;i++) solid_body_collection.deformable_body_collection.binding_list.bindings(i)->Clamp_To_Embedded_Position();
+    for(int i=0;i<solid_body_collection.deformable_body_collection.binding_list.bindings.m;i++) solid_body_collection.deformable_body_collection.binding_list.bindings(i)->Clamp_To_Embedded_Position();
     particles.mass(4)=0;
     particles.mass(5)=0;
 

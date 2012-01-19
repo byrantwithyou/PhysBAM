@@ -85,7 +85,7 @@ Initialize(TRIANGLE_COLLISION_PARAMETERS<TV>& triangle_collision_parameters)
 template<class TV> void TRIANGLE_REPULSIONS<TV>::
 Clamp_Repulsion_Thickness_With_Meshes(ARRAY_VIEW<const TV> X,const T scale)
 {
-    for(int k=1;k<=geometry.structure_geometries.m;k++){
+    for(int k=0;k<geometry.structure_geometries.m;k++){
         STRUCTURE_INTERACTION_GEOMETRY<TV>& structure=*geometry.structure_geometries(k);
         if(structure.segmented_curve) for(int s=1;s<=structure.segmented_curve->mesh.elements.m;s++){
             int i,j;structure.segmented_curve->mesh.elements(s).Get(i,j);T d=scale*(X(i)-X(j)).Magnitude();
@@ -115,16 +115,16 @@ Turn_Off_Repulsions_Based_On_Current_Proximity(const T extra_factor_on_distance)
     // find interacting pairs
     point_face_interaction_pairs.Remove_All();edge_edge_interaction_pairs.Remove_All();
     // TODO: consider checking cross-structure interactions as well
-    for(int a=1;a<=geometry.interacting_structure_pairs.m;a++){VECTOR<int,2>& pair=geometry.interacting_structure_pairs(a);
+    for(int a=0;a<geometry.interacting_structure_pairs.m;a++){VECTOR<int,2>& pair=geometry.interacting_structure_pairs(a);
         if(pair[1]!=pair[2]) continue;
         STRUCTURE_INTERACTION_GEOMETRY<TV>& structure=*geometry.structure_geometries(pair[1]);
         Get_Faces_Near_Points(structure,structure,X_self_collision_free,false);
         Get_Edges_Near_Edges(structure,structure,X_self_collision_free,false);}
     // construct omit hashtables
     omit_point_face_repulsion_pairs.Remove_All();
-    for(int k=1;k<=point_face_interaction_pairs.m;k++) omit_point_face_repulsion_pairs.Insert(point_face_interaction_pairs(k).nodes);
+    for(int k=0;k<point_face_interaction_pairs.m;k++) omit_point_face_repulsion_pairs.Insert(point_face_interaction_pairs(k).nodes);
     omit_edge_edge_repulsion_pairs.Remove_All();
-    for(int k=1;k<=edge_edge_interaction_pairs.m;k++){const VECTOR<int,2*d-2>& nodes=edge_edge_interaction_pairs(k).nodes;
+    for(int k=0;k<edge_edge_interaction_pairs.m;k++){const VECTOR<int,2*d-2>& nodes=edge_edge_interaction_pairs(k).nodes;
         omit_edge_edge_repulsion_pairs.Insert(nodes); // add edge edge pairs in both orders since the hierarchy can change after this is called
         omit_edge_edge_repulsion_pairs.Insert(Flip_Edges(nodes));}
     // cleanup
@@ -145,7 +145,7 @@ Update_Faces_And_Hierarchies_With_Collision_Free_Positions(const ARRAY_VIEW<TV>*
     LOG::SCOPE scope("Update Triangles and Hierarchies","Update Triangles and Hierarchies");
     const ARRAY_VIEW<TV>& X=X_other?*X_other:geometry.X_self_collision_free;
     T multiplier=repulsion_thickness_detection_multiplier*hierarchy_repulsion_thickness_multiplier;
-    for(int k=1;k<=geometry.structure_geometries.m;k++)
+    for(int k=0;k<geometry.structure_geometries.m;k++)
         geometry.structure_geometries(k)->Update_Faces_And_Hierarchies_With_Collision_Free_Positions(repulsion_thickness,multiplier,X);
 }
 //#####################################################################
@@ -156,8 +156,8 @@ Compute_Interaction_Pairs(ARRAY_VIEW<const TV> X_other)
 {
     LOG::SCOPE scope("computing repulsion pairs", "computing repulsion pairs");
     point_face_interaction_pairs.Remove_All();edge_edge_interaction_pairs.Remove_All();
-    for(int pair_i=1;pair_i<=geometry.interacting_structure_pairs.m;pair_i++){VECTOR<int,2>& pair=geometry.interacting_structure_pairs(pair_i);
-        for(int i=1;i<=2;i++){if(i==2 && pair[1]==pair[2]) break;
+    for(int pair_i=0;pair_i<geometry.interacting_structure_pairs.m;pair_i++){VECTOR<int,2>& pair=geometry.interacting_structure_pairs(pair_i);
+        for(int i=0;i<2;i++){if(i==2 && pair[1]==pair[2]) break;
             if(compute_point_face_friction || compute_point_face_inelastic_collision_repulsion || compute_point_face_repulsion){
                 Get_Faces_Near_Points(*geometry.structure_geometries(pair[i]),*geometry.structure_geometries(pair[3-i]),X_other,true);}}
         if(compute_edge_edge_friction || compute_edge_edge_inelastic_collision_repulsion || compute_edge_edge_repulsion){
@@ -194,7 +194,7 @@ Adjust_Velocity_For_Self_Repulsion(const T dt,bool use_saved_pairs)
     ARRAY<POINT_FACE_REPULSION_PAIR<TV> > point_face_pairs(point_face_interaction_pairs);
     ARRAY<EDGE_EDGE_REPULSION_PAIR<TV> > edge_edge_pairs(edge_edge_interaction_pairs);
 
-    for(int pair_index=1;pair_index<=point_face_pairs.m;pair_index++){
+    for(int pair_index=0;pair_index<point_face_pairs.m;pair_index++){
         POINT_FACE_REPULSION_PAIR<TV>& pair=point_face_pairs(pair_index);
         T_FACE face(X_self_collision_free.Subset(pair.nodes.Remove_Index(1)));
         face.Point_Face_Interaction_Data(X_self_collision_free(pair.nodes[1]),pair.distance,pair.normal,pair.weights,perform_attractions);
@@ -204,7 +204,7 @@ Adjust_Velocity_For_Self_Repulsion(const T dt,bool use_saved_pairs)
     // TODO: MPI check fragments in super fragment for whether this fragment is in the processor?
     geometry.deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Velocities();
 
-    for(int pair_index=1;pair_index<=edge_edge_pairs.m;pair_index++){
+    for(int pair_index=0;pair_index<edge_edge_pairs.m;pair_index++){
         EDGE_EDGE_REPULSION_PAIR<TV>& pair=edge_edge_pairs(pair_index);
         // Note: don't call this, all it does is mess up the normal and has already been called when the pairs are created
         //Edge_Edge_Interaction_Data_Helper(X_self_collision_free,pair,V.Subset(pair.nodes),geometry.small_number);
@@ -541,7 +541,7 @@ Adjust_Velocity_For_Point_Face_Repulsion(const T dt,const T_ARRAY& pairs,const b
                 applied_impulses++;
                 if(0 && geometry.mass_modifier&&use_repulsions) geometry.mass_modifier->Point_Face_Mass((T)1.,pair.nodes,pair.weights,particles.one_over_mass);
                 T one_over_mass=one_over_effective_mass(p);
-                for(int i=1;i<=face_nodes.m;i++) one_over_mass+=sqr(pair.weights[i])*one_over_effective_mass(face_nodes[i]);
+                for(int i=0;i<face_nodes.m;i++) one_over_mass+=sqr(pair.weights[i])*one_over_effective_mass(face_nodes[i]);
                 TV impulse=Pseudo_Divide(scalar_impulse*direction,one_over_mass);
                 if(use_gauss_jacobi && !friction && !elastic_repulsion){
                     Update_Velocity_Helper(impulse,pair.weights,one_over_effective_mass.Subset(pair.nodes),impulse_velocities.Subset(pair.nodes));
@@ -649,8 +649,8 @@ template<class TV> void TRIANGLE_REPULSIONS<TV>::
 Project_All_Moving_Constraints(const ARRAY<PRECOMPUTE_PROJECT_POINT_FACE<VECTOR<T,3> > >& point_face_precomputed,
     const ARRAY<PRECOMPUTE_PROJECT_EDGE_EDGE<VECTOR<T,3> > >& edge_edge_precomputed,ARRAY_VIEW<VECTOR<T,3> >& field)
 {
-    for(int i=1;i<=point_face_precomputed.m;i++) point_face_precomputed(i).Project(field.Subset(point_face_precomputed(i).nodes));
-    for(int i=1;i<=edge_edge_precomputed.m;i++) edge_edge_precomputed(i).Project(field.Subset(edge_edge_precomputed(i).nodes));
+    for(int i=0;i<point_face_precomputed.m;i++) point_face_precomputed(i).Project(field.Subset(point_face_precomputed(i).nodes));
+    for(int i=0;i<edge_edge_precomputed.m;i++) edge_edge_precomputed(i).Project(field.Subset(edge_edge_precomputed(i).nodes));
     for(int i=edge_edge_precomputed.m-1;i>=1;i--) edge_edge_precomputed(i).Project(field.Subset(edge_edge_precomputed(i).nodes));
     for(int i=point_face_precomputed.m;i>=1;i--) point_face_precomputed(i).Project(field.Subset(point_face_precomputed(i).nodes));
 }
@@ -672,9 +672,9 @@ Set_Collision_Pairs(ARRAY<PRECOMPUTE_PROJECT_POINT_FACE<VECTOR<T,3> > >& point_f
     repulsion_thickness/=repulsion_thickness_multiplier;
     point_face_precomputed.Resize(point_face_pairs.m);
     edge_edge_precomputed.Resize(edge_edge_pairs.m);
-    for(int i=1;i<=point_face_pairs.m;i++){const POINT_FACE_REPULSION_PAIR<VECTOR<T,3> >& pr=point_face_pairs(i);
+    for(int i=0;i<point_face_pairs.m;i++){const POINT_FACE_REPULSION_PAIR<VECTOR<T,3> >& pr=point_face_pairs(i);
         point_face_precomputed(i).Precompute(geometry.deformable_body_collection.particles.mass.Subset(pr.nodes),pr.weights,pr.normal);}
-    for(int i=1;i<=edge_edge_pairs.m;i++){const EDGE_EDGE_REPULSION_PAIR<VECTOR<T,3> >& pr=edge_edge_pairs(i);
+    for(int i=0;i<edge_edge_pairs.m;i++){const EDGE_EDGE_REPULSION_PAIR<VECTOR<T,3> >& pr=edge_edge_pairs(i);
         edge_edge_precomputed(i).Precompute(geometry.deformable_body_collection.particles.mass.Subset(pr.nodes),pr.weights,pr.normal);}
     internal_point_face_precomputed=point_face_precomputed;
     internal_edge_edge_precomputed=edge_edge_precomputed;
@@ -686,7 +686,7 @@ template<class TV> template<class T_ARRAY> void TRIANGLE_REPULSIONS<TV>::
 Scale_And_Apply_Point_Face_Impulses(const T_ARRAY& pairs)
 {
     // Go through the computed impulses, and compare them to the actual change in velocity seen.  Scale back impulses accordingly
-    for(int i=1;i<=pf_target_impulses.m;i++){
+    for(int i=0;i<pf_target_impulses.m;i++){
         if(pf_target_impulses(i)==TV()) continue;
         const POINT_FACE_REPULSION_PAIR<TV>& pair=pairs(i);
         const VECTOR<int,d+1>& nodes=pair.nodes;
@@ -699,7 +699,7 @@ Scale_And_Apply_Point_Face_Impulses(const T_ARRAY& pairs)
     // Apply the newly scaled impulses
     ARRAY_VIEW<T>& one_over_effective_mass=geometry.deformable_body_collection.particles.one_over_effective_mass;
     ARRAY_VIEW<TV> V(geometry.deformable_body_collection.particles.V);
-    for(int i=1;i<=pf_target_impulses.m;i++){
+    for(int i=0;i<pf_target_impulses.m;i++){
         if(pf_target_impulses(i)==TV()) continue;
         const POINT_FACE_REPULSION_PAIR<TV>& pair=pairs(i);const VECTOR<int,d+1>& nodes=pair.nodes;
         Update_Velocity_Helper(pf_target_impulses(i),pair.weights,one_over_effective_mass.Subset(nodes),V.Subset(nodes));}
@@ -711,7 +711,7 @@ template<class TV> template<class T_ARRAY> void TRIANGLE_REPULSIONS<TV>::
 Scale_And_Apply_Edge_Edge_Impulses(const T_ARRAY& pairs)
 {
     // Go through the computed impulses, and compare them to the actual change in velocity seen.  Scale back impulses accordingly
-    for(int i=1;i<=ee_target_impulses.m;i++){
+    for(int i=0;i<ee_target_impulses.m;i++){
         if(ee_target_impulses(i)==TV()) continue;
         const VECTOR<int,2*d-2>& nodes=pairs(i).nodes;
         // Compute actual new relative_speed
@@ -723,7 +723,7 @@ Scale_And_Apply_Edge_Edge_Impulses(const T_ARRAY& pairs)
     // Apply the newly scaled impulses
     ARRAY_VIEW<T>& one_over_effective_mass=geometry.deformable_body_collection.particles.one_over_effective_mass;
     ARRAY_VIEW<TV> V(geometry.deformable_body_collection.particles.V);
-    for(int i=1;i<=ee_target_impulses.m;i++){
+    for(int i=0;i<ee_target_impulses.m;i++){
         if(ee_target_impulses(i)==TV()) continue;
         const VECTOR<int,2*d-2>& nodes=pairs(i).nodes;
         Edge_Edge_Update_Velocity_Helper(ee_target_impulses(i),pairs(i).weights,one_over_effective_mass.Subset(nodes),V.Subset(nodes));}

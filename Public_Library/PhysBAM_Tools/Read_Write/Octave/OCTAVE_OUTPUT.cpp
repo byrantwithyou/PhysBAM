@@ -133,7 +133,7 @@ template<class T> void OCTAVE_OUTPUT<T>::
 Write_Transpose(const char* name,const SPARSE_MATRIX_FLAT_MXN<T>& m)
 {
     out<<"# name: "<<name<<"\n# type: sparse matrix\n# nnz: "<<m.A.m<<"\n# rows: "<<m.n<<"\n# columns: "<<m.m<<"\n";
-    for(int i=1;i<=m.m;i++){
+    for(int i=0;i<m.m;i++){
         int s=m.offsets(i),e=m.offsets(i+1);
         for(int j=s;j<e;j++) out<<m.A(j).j<<" "<<i<<" "<<m.A(j).a<<"\n";}
 }
@@ -154,7 +154,7 @@ template<class T> void OCTAVE_OUTPUT<T>::
 Write_Transpose(const char* name,const SPARSE_MATRIX_FLAT_NXN<T>& m)
 {
     out<<"# name: "<<name<<"\n# type: sparse matrix\n# nnz: "<<m.A.m<<"\n# rows: "<<m.n<<"\n# columns: "<<m.n<<"\n";
-    for(int i=1;i<=m.n;i++){
+    for(int i=0;i<m.n;i++){
         int s=m.offsets(i),e=m.offsets(i+1);
         for(int j=s;j<e;j++) out<<(m.A(j).j)<<" "<<i<<" "<<m.A(j).a<<std::endl;}
 }
@@ -165,8 +165,8 @@ template<class T> void OCTAVE_OUTPUT<T>::
 Write(const char* name,const MATRIX_MXN<T>& m)
 {
     out<<"# name: "<<name<<"\n# type: matrix\n# rows: "<<m.m<<"\n# columns: "<<m.n<<"\n";
-    for(int i=1;i<=m.m;i++){
-        for(int j=1;j<=m.n;j++)
+    for(int i=0;i<m.m;i++){
+        for(int j=0;j<m.n;j++)
             out<<m(i,j)<<" ";
         out<<"\n";}
 }
@@ -177,8 +177,8 @@ template<class T> void OCTAVE_OUTPUT<T>::
 Write_Transpose(const char* name,const MATRIX_MXN<T>& m)
 {
     out<<"# name: "<<name<<"\n# type: matrix\n# rows: "<<m.m<<"\n# columns: "<<m.n<<"\n";
-    for(int i=1;i<=m.m;i++){
-        for(int j=1;j<=m.n;j++)
+    for(int i=0;i<m.m;i++){
+        for(int j=0;j<m.n;j++)
             out<<m(j,i)<<" ";
         out<<"\n";}
 }
@@ -214,7 +214,7 @@ End_Sparse_Matrix()
 {
     if(internal.m){
         Sort(internal);
-        for(int i=1;i<=internal.m;i++)
+        for(int i=0;i<internal.m;i++)
             out<<internal(i).r<<" "<<internal(i).c<<" "<<internal(i).x<<"\n";
         nnz=internal.m;
         internal.Remove_All();}

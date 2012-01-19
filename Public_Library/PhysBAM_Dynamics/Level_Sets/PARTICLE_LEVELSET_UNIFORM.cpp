@@ -491,9 +491,9 @@ Update_Particle_Cells(T_ARRAYS_PARTICLES& particles)
         threaded_iterator.template Run<T_ARRAYS_PARTICLES&,ARRAY<ARRAY<int>,TV_INT>&>(*this,&PARTICLE_LEVELSET_UNIFORM<T_GRID>::Update_Particle_Cells_Part_One_Threaded,particles,number_of_particles_per_block);
         
         ARRAY<pthread_mutex_t> mutexes(threaded_iterator.domains.m);
-        for(int i=1;i<=threaded_iterator.domains.m;i++)pthread_mutex_init(&mutexes(i),0);
+        for(int i=0;i<threaded_iterator.domains.m;i++)pthread_mutex_init(&mutexes(i),0);
         ARRAY<int,TV_INT> domain_index(domain.Thickened(1));
-        for(int i=1;i<=threaded_iterator.domains.m;i++)
+        for(int i=0;i<threaded_iterator.domains.m;i++)
             for(NODE_ITERATOR iterator(levelset.grid,threaded_iterator.domains(i));iterator.Valid();iterator.Next())
                 domain_index(iterator.Node_Index())=i; // TODO: thread
         
@@ -503,7 +503,7 @@ Update_Particle_Cells(T_ARRAYS_PARTICLES& particles)
         threaded_iterator.template Run<T_ARRAYS_PARTICLES&,const ARRAY<ARRAY<int>,TV_INT>&,ARRAY<ARRAY<TRIPLE<TV_INT,T_PARTICLES*,int> >,TV_INT>&,ARRAY<pthread_mutex_t>*,const ARRAY<int,TV_INT>*>(*this,&PARTICLE_LEVELSET_UNIFORM<T_GRID>::Update_Particle_Cells_Part_Three_Threaded,particles,number_of_particles_per_block,list_to_process,&mutexes,&domain_index);
         threaded_iterator.template Run<T_ARRAYS_PARTICLES&>(*this,&PARTICLE_LEVELSET_UNIFORM<T_GRID>::Delete_Marked_Particles,particles);
 
-        for(int i=1;i<=threaded_iterator.domains.m;i++)pthread_mutex_destroy(&mutexes(i));}
+        for(int i=0;i<threaded_iterator.domains.m;i++)pthread_mutex_destroy(&mutexes(i));}
 #else
     if(false){}
 #endif
@@ -688,9 +688,9 @@ Reseed_Add_Particles(T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,T_ARRAYS_PA
         threaded_iterator.template Run<T_ARRAYS_PARTICLE_LEVELSET_PARTICLES&,T_ARRAYS_PARTICLE_LEVELSET_PARTICLES&,int,T_ARRAYS_BOOL*,ARRAY<int,TV_INT>&>(*this,&PARTICLE_LEVELSET_UNIFORM<T_GRID>::Reseed_Add_Particles_Threaded_Part_One,particles,other_particles,sign,cell_centered_mask,number_of_particles_to_add);
 
         ARRAY<pthread_mutex_t> mutexes(threaded_iterator.domains.m);
-        for(int i=1;i<=threaded_iterator.domains.m;i++)pthread_mutex_init(&mutexes(i),0);
+        for(int i=0;i<threaded_iterator.domains.m;i++)pthread_mutex_init(&mutexes(i),0);
         ARRAY<int,TV_INT> domain_index(domain);
-        for(int i=1;i<=threaded_iterator.domains.m;i++)
+        for(int i=0;i<threaded_iterator.domains.m;i++)
             for(NODE_ITERATOR iterator(levelset.grid,threaded_iterator.domains(i));iterator.Valid();iterator.Next())
                 domain_index(iterator.Node_Index())=i; // TODO: thread
 
@@ -875,12 +875,12 @@ Delete_Particles_Outside_Grid()
 
     RANGE<TV_INT> real_domain(levelset.grid.Domain_Indices());real_domain.max_corner+=TV_INT::All_Ones_Vector();
     RANGE<TV_INT> domain(levelset.grid.Domain_Indices(3));domain.max_corner+=TV_INT::All_Ones_Vector();
-    for(int axis=1;axis<=TV::dimension;axis++) for(int side=1;side<=2;side++){
+    for(int axis=1;axis<=TV::dimension;axis++) for(int side=0;side<2;side++){
         RANGE<TV_INT> ghost_domain(domain);
         if(side==1) ghost_domain.max_corner(axis)=real_domain.min_corner(axis)-1;
         else ghost_domain.min_corner(axis)=real_domain.max_corner(axis)+1;
         DOMAIN_ITERATOR_THREADED_ALPHA<PARTICLE_LEVELSET_UNIFORM<T_GRID>,TV>(ghost_domain,thread_queue).Run(*this,&PARTICLE_LEVELSET_UNIFORM<T_GRID>::Delete_Particles_Far_Outside_Grid);}
-    for(int axis=1;axis<=TV::dimension;axis++) for(int side=1;side<=2;side++){
+    for(int axis=1;axis<=TV::dimension;axis++) for(int side=0;side<2;side++){
         RANGE<TV_INT> boundary_domain(real_domain);
         if(side==1) boundary_domain.max_corner(axis)=real_domain.min_corner(axis);
         else boundary_domain.min_corner(axis)=real_domain.max_corner(axis);

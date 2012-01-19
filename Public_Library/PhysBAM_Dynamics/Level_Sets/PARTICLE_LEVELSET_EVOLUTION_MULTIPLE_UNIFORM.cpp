@@ -28,7 +28,7 @@ PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM(const T_GRID& grid_input,const int 
 template<class T_GRID> PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>::
 ~PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM()
 {
-    for(int i=1;i<=rungekutta_phis.m;i++)delete rungekutta_phis(i);
+    for(int i=0;i<rungekutta_phis.m;i++)delete rungekutta_phis(i);
 }
 //#####################################################################
 // Function Initialize_Runge_Kutta
@@ -36,7 +36,7 @@ template<class T_GRID> PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>::
 template<class T_GRID> void PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>::
 Initialize_Runge_Kutta()
 {
-    if(runge_kutta_order_levelset > 1) for(int i=1;i<=phis.m;i++){
+    if(runge_kutta_order_levelset > 1) for(int i=0;i<phis.m;i++){
         delete rungekutta_phis(i);rungekutta_phis(i)=new RUNGEKUTTA<T_ARRAYS_SCALAR>(phis(i));
         rungekutta_phis(i)->Set_Order(runge_kutta_order_levelset);rungekutta_phis(i)->Set_Time(time);
         rungekutta_phis(i)->Set_Grid_And_Boundary_Condition(grid,*particle_levelset_multiple.particle_levelsets(i)->levelset.boundary);}
@@ -74,7 +74,7 @@ Advance_To_Time(T_FACE_ARRAYS_SCALAR* face_velocities,const T stopping_time,cons
         T dt=Time_Step(stopping_time,done);
         if(verbose) LOG::cout << "substep = " << substep << ", dt = " << dt << std::endl;
         Advance_One_Time_Step(face_velocities,dt);}
-    if(track_mass)for(int i=1;i<=particle_levelset_multiple.particle_levelsets.m;i++){
+    if(track_mass)for(int i=0;i<particle_levelset_multiple.particle_levelsets.m;i++){
         T mass=Levelset_Advection(i).Approximate_Negative_Material();
         LOG::cout << "negative material(" << i << ") = " << mass << " - change = " << (mass-initial_mass(i))/initial_mass(i)*100 << "%" << std::endl;}
 }
@@ -100,11 +100,11 @@ Advance_Levelset(const T dt)
         particle_levelset_multiple.levelset_multiple.levelset_callbacks->Get_Levelset_Velocity(grid,particle_levelset_multiple.levelset_multiple,V,time);
         levelset_advection_multiple.Euler_Step(V,dt,time,particle_levelset_multiple.number_of_ghost_cells);time+=dt;}
     else{
-        for(int i=1;i<=rungekutta_phis.m;i++)rungekutta_phis(i)->Start(dt);
+        for(int i=0;i<rungekutta_phis.m;i++)rungekutta_phis(i)->Start(dt);
         for(int k=0;k<runge_kutta_order_levelset;k++){
             if(k == 1 || !use_frozen_velocity) particle_levelset_multiple.levelset_multiple.levelset_callbacks->Get_Levelset_Velocity(grid,particle_levelset_multiple.levelset_multiple,V,time);
             levelset_advection_multiple.Euler_Step(V,dt,time,particle_levelset_multiple.number_of_ghost_cells);
-            for(int i=1;i<=rungekutta_phis.m;i++)time=rungekutta_phis(i)->Main();}}
+            for(int i=0;i<rungekutta_phis.m;i++)time=rungekutta_phis(i)->Main();}}
 }
 //#####################################################################
 // Function Advance_Particles
@@ -121,7 +121,7 @@ Advance_Particles(const T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const b
             particle_levelset_multiple.Euler_Step_Particles(face_velocities,dt,time,runge_kutta_order_particles==2);time+=dt;}
         else if(runge_kutta_order_particles == 2 || runge_kutta_order_particles == 3){
             T start_time=time;
-            for(int i=1;i<=particle_levelset_multiple.particle_levelsets.m;i++)
+            for(int i=0;i<particle_levelset_multiple.particle_levelsets.m;i++)
                 time=Advance_Particles(particle_levelset_multiple.particle_levelsets(i)->negative_particles,PARTICLE_LEVELSET_NEGATIVE,dt,start_time);
             particle_levelset_multiple.Euler_Step_Removed_Particles(dt,start_time,true);}} // can only Euler Step removed particles
 }
@@ -178,29 +178,29 @@ Reseed_Particles(const T time,const int time_step,T_ARRAYS_BOOL* cell_centered_m
 template<class T_GRID> void PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>::
 Fill_Levelset_Ghost_Cells(const T time)
 {
-    for(int i=1;i<=phis.m;i++) particle_levelset_multiple.levelset_multiple.levelsets(i)->boundary->Fill_Ghost_Cells(grid,phis(i),phis(i),0,time,particle_levelset_multiple.number_of_ghost_cells);
+    for(int i=0;i<phis.m;i++) particle_levelset_multiple.levelset_multiple.levelsets(i)->boundary->Fill_Ghost_Cells(grid,phis(i),phis(i),0,time,particle_levelset_multiple.number_of_ghost_cells);
 }
 template<class T_GRID> void PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>::
 Use_Semi_Lagrangian_Advection()
 {
-    for(int i=1;i<=phis.m;i++) levelset_advection_multiple.levelset_advections(i).Use_Local_Semi_Lagrangian_Advection();
+    for(int i=0;i<phis.m;i++) levelset_advection_multiple.levelset_advections(i).Use_Local_Semi_Lagrangian_Advection();
 }
 template<class T_GRID> void PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>::
 Use_Hamilton_Jacobi_Weno_Advection()
 {
-    for(int i=1;i<=phis.m;i++) levelset_advection_multiple.levelset_advections(i).Use_Local_WENO_For_Advection();
+    for(int i=0;i<phis.m;i++) levelset_advection_multiple.levelset_advections(i).Use_Local_WENO_For_Advection();
 }
 template<class T_GRID> void PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>::
 Use_Hamilton_Jacobi_Eno_Advection(const int order)
 {
     assert(order >= 1 && order <= 3);
-    for(int i=1;i<=phis.m;i++) levelset_advection_multiple.levelset_advections(i).Use_Local_ENO_For_Advection(order);
+    for(int i=0;i<phis.m;i++) levelset_advection_multiple.levelset_advections(i).Use_Local_ENO_For_Advection(order);
 }
 template<class T_GRID> void PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>::
 Track_Mass(const bool track_mass_input)
 {
     track_mass=track_mass_input;
-    if(track_mass) for(int i=1;i<=phis.m;i++){
+    if(track_mass) for(int i=0;i<phis.m;i++){
         initial_mass(i)=levelset_advection_multiple.levelset_advections(i).Approximate_Negative_Material();
         LOG::cout << "negative material(" << i << ") = " << initial_mass(i) << std::endl;}
 }
@@ -210,10 +210,10 @@ Initialize_Domain(const T_GRID& grid_input,const int number_of_regions)  // don'
     assert(grid_input.Is_MAC_Grid());
     grid=grid_input;
     phis.Resize(number_of_regions);
-    for(int i=1;i<=phis.m;i++) phis(i).Resize(grid.Domain_Indices(particle_levelset_multiple.number_of_ghost_cells));
+    for(int i=0;i<phis.m;i++) phis(i).Resize(grid.Domain_Indices(particle_levelset_multiple.number_of_ghost_cells));
     V.Resize(grid);
     particle_levelset_multiple.Initialize_Particle_Levelsets_And_Grid_Values(grid,phis,number_of_regions);
-    for(int i=1;i<=phis.m;i++)
+    for(int i=0;i<phis.m;i++)
         if(levelset_advection_multiple.levelset_advections(i).semi_lagrangian_collidable)
             particle_levelset_multiple.particle_levelsets(i)->levelset.Initialize_Valid_Masks(grid);
     initial_mass.Resize(number_of_regions);
@@ -229,7 +229,7 @@ Make_Signed_Distance()
 {
     if(use_fmm){
         ARRAY<int> local_advection_spatial_orders(phis.m);
-        for(int i=1;i<=phis.m;i++)
+        for(int i=0;i<phis.m;i++)
             local_advection_spatial_orders(i)=levelset_advection_multiple.levelset_advections(i).local_advection_spatial_order;
         particle_levelset_multiple.levelset_multiple.Fast_Marching_Method(local_advection_spatial_orders);}
     else if(use_reinitialization) levelset_advection_multiple.Reinitialize();
@@ -237,7 +237,7 @@ Make_Signed_Distance()
 template<class T_GRID> void PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>::
 Set_Number_Particles_Per_Cell(const int number_particles_per_cell)
 {
-    for(int i=1;i<=phis.m;i++) particle_levelset_multiple.particle_levelsets(i)->Set_Number_Particles_Per_Cell(number_particles_per_cell);
+    for(int i=0;i<phis.m;i++) particle_levelset_multiple.particle_levelsets(i)->Set_Number_Particles_Per_Cell(number_particles_per_cell);
 }
 template<class T_GRID> void PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>::
 Set_Levelset_Callbacks(LEVELSET_CALLBACKS<T_GRID>& levelset_callbacks)
@@ -248,34 +248,34 @@ template<class T_GRID> void PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>
 Initialize_FMM_Initialization_Iterative_Solver(const bool refine_fmm_initialization_with_iterative_solver_input,const int fmm_initialization_iterations_input,
         const T fmm_initialization_iterative_tolerance_input,const T fmm_initialization_iterative_drift_fraction_input)
 {
-    for(int i=1;i<=phis.m;i++) particle_levelset_multiple.levelset_multiple.levelsets(i)->Initialize_FMM_Initialization_Iterative_Solver(refine_fmm_initialization_with_iterative_solver_input,
+    for(int i=0;i<phis.m;i++) particle_levelset_multiple.levelset_multiple.levelsets(i)->Initialize_FMM_Initialization_Iterative_Solver(refine_fmm_initialization_with_iterative_solver_input,
         fmm_initialization_iterations_input,fmm_initialization_iterative_tolerance_input,fmm_initialization_iterative_drift_fraction_input);
 }
 template<class T_GRID> void PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>::
 Bias_Towards_Negative_Particles(const bool bias_towards_negative_particles)
 {
-    for(int i=1;i<=phis.m;i++) particle_levelset_multiple.particle_levelsets(i)->Bias_Towards_Negative_Particles(bias_towards_negative_particles);
+    for(int i=0;i<phis.m;i++) particle_levelset_multiple.particle_levelsets(i)->Bias_Towards_Negative_Particles(bias_towards_negative_particles);
 }
 template<class T_GRID> void PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>::
 Set_Seed(const int seed)
 {
-    for(int i=1;i<=phis.m;i++) particle_levelset_multiple.particle_levelsets(i)->random.Set_Seed(seed);
+    for(int i=0;i<phis.m;i++) particle_levelset_multiple.particle_levelsets(i)->random.Set_Seed(seed);
 }
 template<class T_GRID> void PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>::
 Seed_Particles(const T time)
 {
-    for(int i=1;i<=phis.m;i++) particle_levelset_multiple.particle_levelsets(i)->Seed_Particles(time);
+    for(int i=0;i<phis.m;i++) particle_levelset_multiple.particle_levelsets(i)->Seed_Particles(time);
 }
 template<class T_GRID> void PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>::
 Delete_Particles_Outside_Grid()
 {
-    for(int i=1;i<=phis.m;i++) particle_levelset_multiple.particle_levelsets(i)->Delete_Particles_Outside_Grid();
+    for(int i=0;i<phis.m;i++) particle_levelset_multiple.particle_levelsets(i)->Delete_Particles_Outside_Grid();
 }
 template<class T_GRID> void PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>::
 Set_CFL_Number(const T cfl_number_input)
 {
     PARTICLE_LEVELSET_EVOLUTION<T>::Set_CFL_Number(cfl_number_input);
-    for(int i=1;i<=phis.m;i++) particle_levelset_multiple.particle_levelsets(i)->cfl_number=cfl_number_input;
+    for(int i=0;i<phis.m;i++) particle_levelset_multiple.particle_levelsets(i)->cfl_number=cfl_number_input;
 }
 template<class T_GRID> PARTICLE_LEVELSET_MULTIPLE_UNIFORM<T_GRID>& PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>::
 Particle_Levelset_Multiple()

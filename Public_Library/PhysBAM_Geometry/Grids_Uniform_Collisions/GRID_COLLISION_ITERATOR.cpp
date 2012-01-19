@@ -41,7 +41,7 @@ template<class TV> void GRID_COLLISION_ITERATOR<TV>::
 Initialize(const TRIANGULATED_SURFACE<T>& ts)
 {
     ARRAY<TRIANGLE_3D<T> > elements;
-    for(int i=1;i<=ts.mesh.elements.m;i++)
+    for(int i=0;i<ts.mesh.elements.m;i++)
         elements.Append(ts.Get_Element(i));
     Initialize(elements);
 }
@@ -64,7 +64,7 @@ Initialize(const ARRAY<TRIANGLE_3D<T> >& elements)
 {
     faces.Remove_All();
     HASHTABLE<TV_INT,ARRAY<int> > elements_in_cell;
-    for(int i=1;i<=elements.m;i++){
+    for(int i=0;i<elements.m;i++){
         RANGE<TV> box=elements(i).Bounding_Box().Thickened(thickness);
         RANGE<TV_INT> range(grid.Index(box.min_corner),grid.Index(box.max_corner)+1);
         for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,range);it.Valid();it.Next())
@@ -84,7 +84,7 @@ Initialize(const ARRAY<TRIANGLE_3D<T> >& elements)
         RAY<TV> ray1(X,TV::Axis_Vector(it.Key().axis),false);ray1.semi_infinite=false;ray1.t_max=grid.dX(it.Key().axis);
         RAY<TV> ray2(Y,-TV::Axis_Vector(it.Key().axis),false);ray2.semi_infinite=false;ray2.t_max=grid.dX(it.Key().axis);
         VECTOR<int,2> closest_element;
-        for(int s=1;s<=2;s++){
+        for(int s=0;s<2;s++){
             if(const ARRAY<int>* list=elements_in_cell.Get_Pointer(it.Key().Cell_Index(s))){
                 for(int i=1;i<=list->m;i++){
                     if(INTERSECTION::Intersects(ray1,elements((*list)(i)),thickness)) closest_element(1)=(*list)(i);

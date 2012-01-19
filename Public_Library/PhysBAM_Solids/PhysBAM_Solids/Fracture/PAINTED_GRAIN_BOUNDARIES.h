@@ -72,7 +72,7 @@ public:
         T divisor=(T)1/(number_of_edge_divisions+1);
         
         int number_of_edges=0;
-        for(int tet=1;tet<=mesh.elements.m;tet++){
+        for(int tet=0;tet<mesh.elements.m;tet++){
             for(int v1=0;v1<d;v1++) for(int v2=v1+1;v2<=d+1;v2++){
                 int vertex1=mesh.elements(tet)[v1],vertex2=mesh.elements(tet)[v2];
                 if(node_region(vertex1)!=node_region(vertex2)){ // we have a crossover edge

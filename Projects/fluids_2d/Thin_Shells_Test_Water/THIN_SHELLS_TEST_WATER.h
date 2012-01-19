@@ -374,13 +374,13 @@ void Initialize_Phi()
     // Not so good to set up a heaviside function here because then the interface will
     // be exactly between the two nodes which can lead to roundoff issues when setting dirichlet cells, etc.
     GRID<TV>& grid=fluids_parameters.grid;
-    for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++)
+    for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++)
         fluids_parameters.particle_levelset_evolution.phi(i,j)=grid.y(j)-grid.ymin-initial_water_level;
 
     if(example_number==11){
         RIGID_BODY<TV>* rigid_body=solids_parameters.rigid_body_parameters.list(1);
         SEGMENTED_CURVE_2D<T>* segmented_curve=rigid_body->segmented_curve;
-        for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++){
+        for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++){
             T object_phi=segmented_curve->Calculate_Signed_Distance(rigid_body->Object_Space_Point(grid.X(i,j)));
             T& phi=fluids_parameters.particle_levelset_evolution.phi(i,j);
             if(fabs(object_phi)<fabs(phi)){phi=-object_phi;}}}

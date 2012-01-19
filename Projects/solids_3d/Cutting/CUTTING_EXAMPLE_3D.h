@@ -75,7 +75,7 @@ void Initialize_Bodies_Without_Embedding()
     solids_parameters.gravity_direction=TV(0,-1,0);
 
     // correct number nodes
-    for(int i=1;i<=deformable_object.structures.m;i++) deformable_object.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_object.structures.m;i++) deformable_object.structures(i)->Update_Number_Nodes();
 
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents(particles.mass.array);
@@ -116,22 +116,22 @@ void Initialize_Bodies_With_Embedding()
     ARRAY<ARRAY<T> > parent_weights;
     FILE_UTILITIES::Read_From_File<RW>("../cutting_3d/Output_Dup/embedding_weights",parent_weights);
     if(embedding_map.m!=parent_weights.m) PHYSBAM_FATAL_ERROR();
-    for(int p=1;p<=embedding_map.m;p++){
+    for(int p=0;p<embedding_map.m;p++){
         ARRAY<int>& parents=embedding_map(p);
         if(parents.m==2){
             VECTOR<T,2> weights(parent_weights(p)(1),parent_weights(p)(2));
             if(weights.Min()<0) LOG::cout<<"Negative barycentric coordinates on particle "<<p<<" : "<<weights<<", parents : "<<parents<<std::endl;
-            for(int i=1;i<=weights.m;i++) weights(i)=max((T)0,min(weights(i),(T)1));
+            for(int i=0;i<weights.m;i++) weights(i)=max((T)0,min(weights(i),(T)1));
             solid_body_collection.deformable_body_collection.binding_list.Add_Binding(new LINEAR_BINDING<TV,2>(particles,p,VECTOR<int,2>(parents(1),parents(2)),weights));}
         if(parents.m==3){
             VECTOR<T,3> weights(parent_weights(p)(1),parent_weights(p)(2),parent_weights(p)(3));
             if(weights.Min()<0) LOG::cout<<"Negative barycentric coordinates on particle "<<p<<" : "<<weights<<", parents : "<<parents<<std::endl;
-            for(int i=1;i<=weights.m;i++) weights(i)=max((T)0,min(weights(i),(T)1));
+            for(int i=0;i<weights.m;i++) weights(i)=max((T)0,min(weights(i),(T)1));
             solid_body_collection.deformable_body_collection.binding_list.Add_Binding(new LINEAR_BINDING<TV,3>(particles,p,VECTOR<int,3>(parents(1),parents(2),parents(3)),weights));}
         if(parents.m==4){
             VECTOR<T,3> weights(parent_weights(p)(1),parent_weights(p)(2),parent_weights(p)(3));
             if(weights.Min()<0) LOG::cout<<"Negative barycentric coordinates on particle "<<p<<" : "<<weights<<", parents : "<<parents<<std::endl;
-            for(int i=1;i<=weights.m;i++) weights(i)=max((T)0,min(weights(i),(T)1));
+            for(int i=0;i<weights.m;i++) weights(i)=max((T)0,min(weights(i),(T)1));
             solid_body_collection.deformable_body_collection.binding_list.Add_Binding(new LINEAR_BINDING<TV,4>(particles,p,VECTOR<int,4>(parents(1),parents(2),parents(3),parents(4)),weights));}}
     tests.Substitute_Soft_Bindings_For_Embedded_Nodes(boundary_surface,solid_body_collection.deformable_body_collection.binding_list,solid_body_collection.deformable_body_collection.soft_bindings);
     tests.Add_Ground();
@@ -142,7 +142,7 @@ void Initialize_Bodies_With_Embedding()
     solids_parameters.collision_body_list.Add_Bodies(solids_parameters.rigid_body_parameters.list);
 
     // correct number nodes
-    for(int i=1;i<=deformable_object.structures.m;i++) deformable_object.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_object.structures.m;i++) deformable_object.structures(i)->Update_Number_Nodes();
 
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents(particles.mass.array);
@@ -155,7 +155,7 @@ void Initialize_Bodies_With_Embedding()
 
     solid_body_collection.Update_Fragments();
 
-    //for(int i=1;i<=deformable_object.particles_of_fragment.m;i++){
+    //for(int i=0;i<deformable_object.particles_of_fragment.m;i++){
     //    TV center_of_mass=ARRAY<TV>::Average(deformable_object.particles.X.Subset(deformable_object.particles_of_fragment(i)));
     //    deformable_object.particles.X.Subset(deformable_object.particles_of_fragment(i))+=center_of_mass*10;
    // }
@@ -167,14 +167,14 @@ void Initialize_Bodies_With_Embedding()
 //#####################################################################
 void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE
 {
-    for(int i=1;i<=attached_nodes.m;i++) V(attached_nodes(i))=TV();
+    for(int i=0;i<attached_nodes.m;i++) V(attached_nodes(i))=TV();
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes
 //#####################################################################
 void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE
 {
-    for(int i=1;i<=attached_nodes.m;i++) V(attached_nodes(i))=TV();
+    for(int i=0;i<attached_nodes.m;i++) V(attached_nodes(i))=TV();
 }
 //#####################################################################
 };

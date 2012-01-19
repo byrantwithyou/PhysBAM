@@ -29,7 +29,7 @@ template<class T> void Calculate_Heaviside_Function(TRIANGULATED_SURFACE<T>& sur
 
     T epsilon=(T)1e-8*grid.min_dX;
     int total_cells=grid.counts.x*grid.counts.y*grid.counts.z,cells_done=0,progress=-1;
-    for(int i=1;i<=grid.counts.x;i++) for(int j=1;j<=grid.counts.y;j++) for(int k=1;k<=grid.counts.z;k++){
+    for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++){
         phi(i,j,k)=surface.Inside(grid.X(i,j,k),epsilon)?(T)-1:(T)1;
         if(print_progress){
             cells_done++;int new_progress=(int)((T)100*cells_done/total_cells);

@@ -76,7 +76,7 @@ void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) PHYSBAM_OVERRIDE
     T_BOUNDARY_OBJECT& boundary_object=mesh_object.Get_Boundary_Object();
 
     boundary_object.Update_Vertex_Normals();
-    for(int i=1;i<=boundary_nodes.m;i++){int p=boundary_nodes(i);
+    for(int i=0;i<boundary_nodes.m;i++){int p=boundary_nodes(i);
         F(p)-=force_attraction_coefficient*sqrt(particles.mass(p))*implicit_object(particles.X(p))*(*boundary_object.vertex_normals)(p);}
 }
 //#####################################################################
@@ -93,22 +93,22 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
         if(use_external_velocities_normal_to_boundary){
             T_BOUNDARY_OBJECT& boundary_object=mesh_object.Get_Boundary_Object();
             boundary_object.Update_Vertex_Normals();
-            for(int i=1;i<=boundary_nodes.m;i++){int p=boundary_nodes(i);
+            for(int i=0;i<boundary_nodes.m;i++){int p=boundary_nodes(i);
                 TV N=(*boundary_object.vertex_normals)(p);
                 V(p)-=(TV::Dot_Product(V(p),N)+velocity_attraction_coefficient*implicit_object(particles.X(p)))*N;}}
         else // use external velocities normal to level set
-            for(int i=1;i<=boundary_nodes.m;i++){int p=boundary_nodes(i);
+            for(int i=0;i<boundary_nodes.m;i++){int p=boundary_nodes(i);
                 TV N=implicit_object.Normal(particles.X(p));
                 V(p)-=(TV::Dot_Product(V(p),N)+velocity_attraction_coefficient*implicit_object(particles.X(p)))*N;}}
     else{
         if(use_external_velocities_normal_to_boundary){
             T_BOUNDARY_OBJECT& boundary_object=mesh_object.Get_Boundary_Object();
             boundary_object.Update_Vertex_Normals();
-            for(int i=1;i<=boundary_nodes.m;i++){int p=boundary_nodes(i);
+            for(int i=0;i<boundary_nodes.m;i++){int p=boundary_nodes(i);
                 TV N=(*boundary_object.vertex_normals)(p);
                 V(p)=-velocity_attraction_coefficient*implicit_object(particles.X(p))*N;}}
         else // use external velocities normal to level set
-            for(int i=1;i<=boundary_nodes.m;i++){int p=boundary_nodes(i);
+            for(int i=0;i<boundary_nodes.m;i++){int p=boundary_nodes(i);
                 TV N=implicit_object.Normal(particles.X(p));
                 V(p)=-velocity_attraction_coefficient*implicit_object(particles.X(p))*N;}}
 }
@@ -126,14 +126,14 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
         if(use_external_velocities_normal_to_boundary){
             T_BOUNDARY_OBJECT& boundary_object=mesh_object.Get_Boundary_Object();
             boundary_object.Update_Vertex_Normals();
-            for(int i=1;i<=boundary_nodes.m;i++){int p=boundary_nodes(i);
+            for(int i=0;i<boundary_nodes.m;i++){int p=boundary_nodes(i);
                 TV N=(*boundary_object.vertex_normals)(p);
                 V(p)-=TV::Dot_Product(V(p),N)*N;}}
         else // use external velocities normal to level set
-            for(int i=1;i<=boundary_nodes.m;i++){int p=boundary_nodes(i);
+            for(int i=0;i<boundary_nodes.m;i++){int p=boundary_nodes(i);
                 TV N=implicit_object.Normal(particles.X(p));
                 V(p)-=TV::Dot_Product(V(p),N)*N;}}
-    else for(int i=1;i<=boundary_nodes.m;i++){int p=boundary_nodes(i);
+    else for(int i=0;i<boundary_nodes.m;i++){int p=boundary_nodes(i);
         V(p)=TV();}
 }
 //#####################################################################

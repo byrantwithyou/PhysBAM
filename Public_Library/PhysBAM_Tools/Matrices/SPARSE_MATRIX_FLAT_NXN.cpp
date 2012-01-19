@@ -29,15 +29,15 @@ template<class T> SPARSE_MATRIX_FLAT_NXN<T>::
 SPARSE_MATRIX_FLAT_NXN(const ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& matrices)
     :n(0),C(0),thread_queue(0)
 {
-    for(int i=1;i<=matrices.m;i++) n+=matrices(i).n;
+    for(int i=0;i<matrices.m;i++) n+=matrices(i).n;
     offsets.Resize(n+1,false,false);offsets(1)=1;
     ARRAY<int> matrix_row_offsets(matrices.m);ARRAY<int> matrix_element_offsets(matrices.m);
     if(matrices.m){matrix_row_offsets(1)=0;matrix_element_offsets(1)=0;}
     for(int i=1;i<matrices.m;i++){matrix_row_offsets(i+1)=matrix_row_offsets(i)+matrices(i).n;matrix_element_offsets(i+1)=matrix_element_offsets(i)+matrices(i).A.m;}
     int index=1;
-    for(int i=1;i<=matrices.m;i++)for(int j=1;j<=matrices(i).n;j++,index++) offsets(index+1)=offsets(index)+matrices(i).offsets(j+1)-matrices(i).offsets(j);
+    for(int i=0;i<matrices.m;i++)for(int j=1;j<=matrices(i).n;j++,index++) offsets(index+1)=offsets(index)+matrices(i).offsets(j+1)-matrices(i).offsets(j);
     A.Resize(offsets(n+1)-1);
-    for(int i=1;i<=matrices.m;i++)for(int j=1;j<=matrices(i).A.m;j++){A(matrix_element_offsets(i)+j).j=matrices(i).A(j).j+matrix_row_offsets(i);A(matrix_element_offsets(i)+j).a=matrices(i).A(j).a;}
+    for(int i=0;i<matrices.m;i++)for(int j=1;j<=matrices(i).A.m;j++){A(matrix_element_offsets(i)+j).j=matrices(i).A(j).j+matrix_row_offsets(i);A(matrix_element_offsets(i)+j).a=matrices(i).A(j).a;}
 }
 //#####################################################################
 // Destructor
@@ -146,7 +146,7 @@ template<class T> void SPARSE_MATRIX_FLAT_NXN<T>::
 Times(const INTERVAL<int>& interval,const ARRAY<INTERVAL<int> >& ghost_intervals,const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const
 {
     Times(interval.min_corner,interval.max_corner,x,result);
-    for(int i=1;i<=ghost_intervals.m;i++) Times(ghost_intervals(i).min_corner,ghost_intervals(i).max_corner,x,result);
+    for(int i=0;i<ghost_intervals.m;i++) Times(ghost_intervals(i).min_corner,ghost_intervals(i).max_corner,x,result);
 }
 //#####################################################################
 // Function Multiply
@@ -174,7 +174,7 @@ Times_Threaded(const VECTOR_ND<T>& x,VECTOR_ND<T>& result,int row_start,int row_
 template<class T> void SPARSE_MATRIX_FLAT_NXN<T>::
 Negate()
 {
-    for(int index=1;index<=A.m;index++) A(index).a=-A(index).a;
+    for(int index=0;index<A.m;index++) A(index).a=-A(index).a;
 }
 //#####################################################################
 // Function operator*=
@@ -182,7 +182,7 @@ Negate()
 template<class T> SPARSE_MATRIX_FLAT_NXN<T>& SPARSE_MATRIX_FLAT_NXN<T>::
 operator*=(const T a)
 {
-    for(int index=1;index<=A.m;index++) A(index).a*=a;
+    for(int index=0;index<A.m;index++) A(index).a*=a;
     return *this;
 }
 //#####################################################################
@@ -240,7 +240,7 @@ Positive_Diagonal_And_Nonnegative_Row_Sum(const T tolerance) const
 template<class T> void SPARSE_MATRIX_FLAT_NXN<T>::
 Transpose(SPARSE_MATRIX_FLAT_NXN<T>& A_transpose) const
 {
-    ARRAY<int> row_lengths(n);for(int index=1;index<=A.m;index++)row_lengths(A(index).j)++;
+    ARRAY<int> row_lengths(n);for(int index=0;index<A.m;index++)row_lengths(A(index).j)++;
     A_transpose.Set_Row_Lengths(row_lengths);
     for(int i=0;i<n;i++) for(int index=offsets(i);index<offsets(i+1);index++) A_transpose(A(index).j,i)=A(index).a;
 }
@@ -419,8 +419,8 @@ Conjugate_With_Diagonal_Matrix(VECTOR_ND<T>& x)
 //#####################################################################
 template<class T> std::ostream&
 operator<<(std::ostream& output_stream,const SPARSE_MATRIX_FLAT_NXN<T>& A)
-{for(int i=1;i<=A.n;i++){
-    for(int j=1;j<=A.n;j++)output_stream<<(A.Element_Present(i,j)?A(i,j):0)<<" ";
+{for(int i=0;i<A.n;i++){
+    for(int j=0;j<A.n;j++)output_stream<<(A.Element_Present(i,j)?A(i,j):0)<<" ";
     output_stream<<std::endl;}
 return output_stream;}
 //#####################################################################

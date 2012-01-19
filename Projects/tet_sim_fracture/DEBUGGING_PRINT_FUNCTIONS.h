@@ -71,7 +71,7 @@ static void Print_Tetrahedron_Volume(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_
 static void Print_Tetrahedrons_Corresponding_To_Tetrahehdron_In_Reference(int tetrahedron_in_reference_configuration)
 {
     std::cout << "following tetrahedra correspond to " << tetrahedron_in_reference_configuration << " in the reference configuration" << std::endl;
-    for(int t=1;t<=mesh.tetrahedrons.m;t++){
+    for(int t=0;t<mesh.tetrahedrons.m;t++){
         if(Corresponding_Tetrahedron_In_Reference_ETV(t) == tetrahedron_in_reference_configuration){
             Print_Tetrahedron(mesh,t);
             Print_Tetrahedron_Volume(t);
@@ -118,7 +118,7 @@ static bool Verify_Embedded_Triangle_Is_In_Tetrahedron(EMBEDDED_TETRAHEDRALIZED_
 
 static bool Verify_Tetrahedron_Containing_Triangle(EMBEDDED_TETRAHEDRALIZED_VOLUME<T>& etv)
 {
-    for(int t=1;t<=etv.embedded_surface.triangle_mesh.triangles.m;t++){ 
+    for(int t=0;t<etv.embedded_surface.triangle_mesh.triangles.m;t++){ 
         int tetrahedron=etv.Tetrahedron_Containing_Triangle(t);
         if(!Verify_Embedded_Triangle_Is_In_Tetrahedron(etv,t,tetrahedron)){std::cout << "problem with tet containing tri" << std::endl;assert(false);exit(1);}
     }
@@ -129,7 +129,7 @@ static bool Verify_Embedded_Triangles_In_Tetrahedron(EMBEDDED_TETRAHEDRALIZED_VO
 {
     if(etv.embedded_sub_elements_in_parent_element_index->m != etv.tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.m){assert(false);return false;}
     int total_number_of_emb_tri=0;
-    for(int tet=1;tet<=etv.tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.m;tet++){
+    for(int tet=0;tet<etv.tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.m;tet++){
         int emb_tri1,emb_tri2,emb_tri3,emb_tri4;total_number_of_emb_tri+=etv.Embedded_Triangles_In_Tetrahedron(tet,emb_tri1,emb_tri2,emb_tri3,emb_tri4);
         if(emb_tri1 && !Verify_Embedded_Triangle_Is_In_Tetrahedron(etv,emb_tri1,tet)){std::cout << "problem with emb tri in tet" << std::endl;assert(false);exit(1);}
         if(emb_tri2 && !Verify_Embedded_Triangle_Is_In_Tetrahedron(etv,emb_tri2,tet)){std::cout << "problem with emb tri in tet" << std::endl;assert(false);exit(1);}
@@ -346,7 +346,7 @@ static bool Verify_Orientation_Index_Tet(EMBEDDED_TETRAHEDRALIZED_VOLUME<T>& etv
 static bool Verify_Orientation_Index(EMBEDDED_TETRAHEDRALIZED_VOLUME<T>& etv,ARRAY<int>& orientation_index)
 {
     if(orientation_index.m != etv.tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.m){assert(false);return false;}
-    for(int t=1;t<=orientation_index.m;t++){
+    for(int t=0;t<orientation_index.m;t++){
         if(!Verify_Orientation_Index_Tet(etv,t,orientation_index(t))){assert(false);return false;}
     }
     return true;
@@ -358,9 +358,9 @@ static bool Verify_Node_In_Tetrahedron_Is_Material(EMBEDDED_TETRAHEDRALIZED_VOLU
                                                    VIRTUAL_NODE_ALGORITHM<T>& vna)
 {
     ARRAY<bool>to_check(4,1,retv.tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.m);
-    for(int t=1;t<=etv.tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.m;t++){
+    for(int t=0;t<etv.tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.m;t++){
         int ref_t=vna.corresponding_tetrahedron_in_reference(t);
-        for(int a=1;a<=4;a++){
+        for(int a=0;a<4;a++){
             int node=etv.tetrahedralized_volume.tetrahedron_mesh.tetrahedrons(a,t);
             if(etv.Node_In_Tetrahedron_Is_Material(node,t)){
                 if(to_check(a,ref_t)){std::cout << "problem here" << "a=" << a << "  t=" << t << std::endl;assert(false);exit(1);return false;}
@@ -368,7 +368,7 @@ static bool Verify_Node_In_Tetrahedron_Is_Material(EMBEDDED_TETRAHEDRALIZED_VOLU
             }
         }
     }
-    for(int t=1;t<=to_check.m;t++) for(int a=1;a<=4;a++) if(!to_check(a,t)){std::cout << "problem here" << "a=" << a << "  t=" << t << std::endl;assert(false);exit(1);return false;}
+    for(int t=0;t<to_check.m;t++) for(int a=0;a<4;a++) if(!to_check(a,t)){std::cout << "problem here" << "a=" << a << "  t=" << t << std::endl;assert(false);exit(1);return false;}
 
 
 

@@ -107,7 +107,7 @@ template<class TV> void COUPLED_SYSTEM_VECTOR<TV>::
 Print() const
 {
     // Flat print
-    for(int i=1;i<=pressure.n;i++)
+    for(int i=0;i<pressure.n;i++)
         LOG::cout<<pressure(i)<<" ";
     for(COUPLING_CONSTRAINT_ID i(1);i<=lambda.Size();i++)
         LOG::cout<<lambda(i)<<" ";

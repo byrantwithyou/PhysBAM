@@ -36,19 +36,19 @@ template<class T,class TV> void Compute_Stiffness_Matrix_Helper(SEGMENT_MESH& me
 
     // compute row lengths
     ARRAY<int> row_lengths(mesh.number_nodes);
-    for(int s=1;s<=mesh.elements.m;s++) row_lengths(mesh.elements(s).Min())++;
-    for(int p=1;p<=mesh.number_nodes;p++){const ARRAY<int>& neighbors=(*mesh.neighbor_nodes)(p);
+    for(int s=0;s<mesh.elements.m;s++) row_lengths(mesh.elements(s).Min())++;
+    for(int p=0;p<mesh.number_nodes;p++){const ARRAY<int>& neighbors=(*mesh.neighbor_nodes)(p);
         for(int i=1;i<neighbors.m;i++) for(int j=i+1;j<=neighbors.m;j++) row_lengths(min(neighbors(i),neighbors(j)))++;}
 
     // ensure no empty rows
-    ARRAY<int> empty_rows;for(int p=1;p<=mesh.number_nodes;p++) if(!row_lengths(p)) empty_rows.Append(p);
+    ARRAY<int> empty_rows;for(int p=0;p<mesh.number_nodes;p++) if(!row_lengths(p)) empty_rows.Append(p);
     row_lengths.Subset(empty_rows)+=1;
     stiffness_matrix_upper.Set_Row_Lengths(row_lengths);
-    for(int i=1;i<=empty_rows.m;i++){int p=empty_rows(i);stiffness_matrix_upper(p,p)=0;}
+    for(int i=0;i<empty_rows.m;i++){int p=empty_rows(i);stiffness_matrix_upper(p,p)=0;}
 
     // compute stiffness matrix
     stiffness_matrix_diagonal=CONSTANT_ARRAY<T>(mesh.number_nodes,0);
-    for(int p=1;p<=mesh.number_nodes;p++){const ARRAY<int>& neighbors=(*mesh.neighbor_nodes)(p);
+    for(int p=0;p<mesh.number_nodes;p++){const ARRAY<int>& neighbors=(*mesh.neighbor_nodes)(p);
         for(int i=1;i<neighbors.m;i++) for(int j=i+1;j<=neighbors.m;j++){
             const VECTOR<int,3> nodes(neighbors(i),p,neighbors(j));
             TV X1=X(nodes[1]),X2=X(nodes[2]),X3=X(nodes[3]);
@@ -58,7 +58,7 @@ template<class T,class TV> void Compute_Stiffness_Matrix_Helper(SEGMENT_MESH& me
             // We'll define energy as stiffness/(2*length_scale)*(sin psi/2)^2
             T scale=length12+length23;
             VECTOR<T,3> c(1/length12,-1/length12-1/length23,1/length23);
-            for(int i=1;i<=nodes.m;i++){
+            for(int i=0;i<nodes.m;i++){
                 stiffness_matrix_diagonal(nodes[i])+=scale*sqr(c[i]);
                 for(int j=i+1;j<=nodes.m;j++){int a=nodes[i],b=nodes[j];exchange_sort(a,b);
                     stiffness_matrix_upper(a,b)+=scale*c[i]*c[j];}}}}
@@ -68,7 +68,7 @@ template<class T,class TV> void Compute_Stiffness_Matrix_Helper(TRIANGLE_MESH& m
     // compute bending quadruples
     if(!mesh.adjacent_elements) mesh.Initialize_Adjacent_Elements();
     ARRAY<VECTOR<int,4> > bending_quadruples;
-    for(int t=1;t<=mesh.elements.m;t++){
+    for(int t=0;t<mesh.elements.m;t++){
         int t1,t2,t3;mesh.elements(t).Get(t1,t2,t3);
         for(int a=1;a<=(*mesh.adjacent_elements)(t).m;a++){
             int s=(*mesh.adjacent_elements)(t)(a);
@@ -80,19 +80,19 @@ template<class T,class TV> void Compute_Stiffness_Matrix_Helper(TRIANGLE_MESH& m
     // compute row lengths
     SEGMENT_MESH& segment_mesh=mesh.Get_Segment_Mesh();
     ARRAY<int> row_lengths(mesh.number_nodes);
-    for(int s=1;s<=segment_mesh.elements.m;s++) row_lengths(segment_mesh.elements(s).Min())++;
-    for(int q=1;q<=bending_quadruples.m;q++) row_lengths(min(bending_quadruples(q)[1],bending_quadruples(q)[4]))++;
+    for(int s=0;s<segment_mesh.elements.m;s++) row_lengths(segment_mesh.elements(s).Min())++;
+    for(int q=0;q<bending_quadruples.m;q++) row_lengths(min(bending_quadruples(q)[1],bending_quadruples(q)[4]))++;
 
     // ensure no empty rows
-    ARRAY<int> empty_rows;for(int p=1;p<=mesh.number_nodes;p++) if(!row_lengths(p)) empty_rows.Append(p);
+    ARRAY<int> empty_rows;for(int p=0;p<mesh.number_nodes;p++) if(!row_lengths(p)) empty_rows.Append(p);
     row_lengths.Subset(empty_rows)+=1;
     stiffness_matrix_upper.Set_Row_Lengths(row_lengths);
-    for(int i=1;i<=empty_rows.m;i++){int p=empty_rows(i);stiffness_matrix_upper(p,p)=0;}
+    for(int i=0;i<empty_rows.m;i++){int p=empty_rows(i);stiffness_matrix_upper(p,p)=0;}
 
     // compute stiffness matrix
     // for details see Wardetzky et al., "Discrete Quadratic Curvature Energies", Computer Aided Geometric Design, 2007
     stiffness_matrix_diagonal=CONSTANT_ARRAY<T>(mesh.number_nodes,0);
-    for(int q=1;q<=bending_quadruples.m;q++){const VECTOR<int,4>& nodes=bending_quadruples(q);
+    for(int q=0;q<bending_quadruples.m;q++){const VECTOR<int,4>& nodes=bending_quadruples(q);
         TV X1=X(nodes[1]),X2=X(nodes[2]),X3=X(nodes[3]),X4=X(nodes[4]);
         TV e0=X3-X2,e1=X4-X2,e2=X1-X2,e3=X4-X3,e4=X1-X3; // edge numbering matches Wardetzky et al. p. 16
         T cross01=TV::Cross_Product(e0,e1).Magnitude(),cross02=TV::Cross_Product(e0,e2).Magnitude(),
@@ -103,7 +103,7 @@ template<class T,class TV> void Compute_Stiffness_Matrix_Helper(TRIANGLE_MESH& m
         T scale=3/(cross01+cross02);
         if(max_cot>5) scale*=25/sqr(max_cot);
         VECTOR<T,4> c;c[2]=cot03+cot04;c[3]=cot01+cot02;c[4]=-cot01-cot03;c[1]=-cot02-cot04; // node numbering matches bending quadruple
-        for(int i=1;i<=nodes.m;i++){
+        for(int i=0;i<nodes.m;i++){
             stiffness_matrix_diagonal(nodes[i])+=scale*sqr(c[i]);
             for(int j=i+1;j<=nodes.m;j++){int a=nodes[i],b=nodes[j];exchange_sort(a,b);
                 stiffness_matrix_upper(a,b)+=scale*c[i]*c[j];}}}
@@ -118,7 +118,7 @@ Compute_Stiffness_Matrix(ARRAY_VIEW<const TV> X)
 
     // verify that all edges occur in a triple/quadruple
     SEGMENT_MESH& segment_mesh=mesh.Get_Segment_Mesh();
-    for(int s=1;s<=segment_mesh.elements.m;s++){int i,j;segment_mesh.elements(s).Get(i,j);
+    for(int s=0;s<segment_mesh.elements.m;s++){int i,j;segment_mesh.elements(s).Get(i,j);
         if(i<j && !stiffness_matrix_upper.Element_Present(i,j)) PHYSBAM_FATAL_ERROR("not all edges occur in bending quadruples");}
 }
 //#####################################################################

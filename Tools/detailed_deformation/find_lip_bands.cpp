@@ -50,7 +50,7 @@ int main(int argc,char *argv[])
     cout<<x_max_i<<" "<<tri_particles.X((*tri_mesh.boundary_mesh->ordered_loop_nodes)(smallest_i)(x_max_i))<<endl;
     
     ARRAY<int> deletion_list;
-    for(int i=1;i<=tri_mesh.triangles.m;i++){deletion_list.Append(i);}
+    for(int i=0;i<tri_mesh.triangles.m;i++){deletion_list.Append(i);}
 
     string out_name="lip_band_";
     
@@ -76,7 +76,7 @@ int main(int argc,char *argv[])
     tri_surf.Update_Bounding_Box();
 
     cout<<"Flattening..."<<endl;
-    for(int i=1;i<=tri_particles.number;i++)tri_particles.X(i).y=tri_surf.bounding_box->Center().y;
+    for(int i=0;i<tri_particles.number;i++)tri_particles.X(i).y=tri_surf.bounding_box->Center().y;
     tri_surf.Refresh_Auxiliary_Structures();
 
     cout<<"Writing flat output mesh..."<<endl;

@@ -33,9 +33,9 @@ public:
 
     void Update_Top_Level_Containers(const ARRAY<T_CONTAINER2*,ID2>& top_level_containers,const ARRAY<PAIR<ID2,ID2> >& swap_pairs,const ARRAY<ID2>& rebuild,const ARRAY<ID2>& remove)
     {
-        for(int i=1;i<=swap_pairs.m;i++) containers_of_top_level_container.Exchange(swap_pairs(i).x,swap_pairs(i).y);
-        for(int i=1;i<=remove.m;i++) containers_of_top_level_container.Delete_If_Present(remove(i));
-        for(int i=1;i<=rebuild.m;i++){ID2 id=rebuild(i);
+        for(int i=0;i<swap_pairs.m;i++) containers_of_top_level_container.Exchange(swap_pairs(i).x,swap_pairs(i).y);
+        for(int i=0;i<remove.m;i++) containers_of_top_level_container.Delete_If_Present(remove(i));
+        for(int i=0;i<rebuild.m;i++){ID2 id=rebuild(i);
             ARRAY<ID1>& list=containers_of_top_level_container.Get_Or_Insert(id);list.Remove_All();
             for(int f=1;f<=top_level_containers(id)->containers.m;f++) if(elements_of_container.Contains(top_level_containers(id)->containers(f))) list.Append(top_level_containers(id)->containers(f));}
     }

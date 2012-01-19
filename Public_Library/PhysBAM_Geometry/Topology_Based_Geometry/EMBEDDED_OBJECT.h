@@ -126,7 +126,7 @@ public:
 
     bool Node_Near_Material(const int node) const
     {const ARRAY<int>& incident=(*simplicial_object.mesh.incident_elements)(node);
-    for(int i=1;i<=incident.m;i++) if(Node_In_Simplex_Is_Material(node,incident(i))) return true;
+    for(int i=0;i<incident.m;i++) if(Node_In_Simplex_Is_Material(node,incident(i))) return true;
     return false;}
 
     void Initialize_Orientation_Index_If_Necessary()

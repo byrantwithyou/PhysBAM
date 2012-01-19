@@ -89,7 +89,7 @@ public:
     T_ARRAYS_BOOL::Put_Ghost(false,cell_valid_points_current,grid,3); // don't average from boundaries
 
     while(!done){done=true;
-        for(int k=1;k<=invalid_indices.m;k++){
+        for(int k=0;k<invalid_indices.m;k++){
             T2 sum=T2();int count=0;
             for(int axis=1;axis<=T_GRID::dimension;axis++){
                 TV_INT min_cell=invalid_indices(k).x-TV_INT::Axis_Vector(axis),max_cell=invalid_indices(k).x+TV_INT::Axis_Vector(axis);
@@ -107,7 +107,7 @@ public:
     done=false;
     while(!done){
         done=true;
-        for(int k=1;k<=invalid_indices.m;k++){
+        for(int k=0;k<invalid_indices.m;k++){
             T2 sum=T2();int count=0;
             for(int axis=1;axis<=T_GRID::dimension;axis++){
                 TV_INT min_cell=invalid_indices(k).x-TV_INT::Axis_Vector(axis),max_cell=invalid_indices(k).x+TV_INT::Axis_Vector(axis);

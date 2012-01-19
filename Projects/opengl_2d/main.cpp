@@ -155,7 +155,7 @@ Parse_Arguments(PARSE_ARGS& parse_args)
     if(parse_args.Is_Value_Set("-rigid_bodies_no_draw")){ARRAY<int> int_list;
         STRING_UTILITIES::Parse_Integer_List(parse_args.Get_String_Value("-rigid_bodies_no_draw"),int_list);
         rigid_bodies_no_draw_list.Resize(int_list.Size());
-        for(int i=1;i<=rigid_bodies_no_draw_list.m;i++) rigid_bodies_no_draw_list(i)=int(int_list(i));}
+        for(int i=0;i<rigid_bodies_no_draw_list.m;i++) rigid_bodies_no_draw_list(i)=int(int_list(i));}
 
     last_frame_filename=basedir+"/common/last_frame";
 
@@ -726,7 +726,7 @@ Initialize_Components_And_Key_Bindings()
         rigid_bodies_component->Set_Vector_Size(.01);
         rigid_bodies_component->selectable=true;
         if(FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/colors",start_frame)) FILE_UTILITIES::template Read_From_File<RW>(STRING_UTILITIES::string_sprintf("%s/%d/colors",basedir.c_str(),start_frame),rigid_bodies_component->colors);
-        for(int i=1;i<=rigid_bodies_no_draw_list.m;i++){
+        for(int i=0;i<rigid_bodies_no_draw_list.m;i++){
             LOG::cout<<"Rigid bodies: not drawing object "<<rigid_bodies_no_draw_list(i)<<std::endl;
             rigid_bodies_component->Set_Draw_Object(rigid_bodies_no_draw_list(i),false);}
         opengl_world.Set_Key_Binding_Category("Rigid Bodies");

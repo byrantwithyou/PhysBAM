@@ -281,7 +281,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     else if(use_be) solids_parameters.use_trapezoidal_rule_for_velocities=false;
 
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     // correct mass
     binding_list.Distribute_Mass_To_Parents();
@@ -305,9 +305,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         PHYSBAM_DEBUG_PRINT("Spring stiffnesses",linear_stiffness,linear_damping,bending_stiffness,bending_damping);}
 
     // disable strain rate CFL for all forces
-    for(int i=1;i<=solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->limit_time_step_by_strain_rate=false;
+    for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->limit_time_step_by_strain_rate=false;
 
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) if(!dynamic_cast<SEGMENTED_CURVE<TV>*>(deformable_body_collection.deformable_geometry.structures(i))){
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) if(!dynamic_cast<SEGMENTED_CURVE<TV>*>(deformable_body_collection.deformable_geometry.structures(i))){
         deformable_body_collection.collisions.collision_structures.Append(deformable_body_collection.deformable_geometry.structures(i));
         if(solids_parameters.triangle_collision_parameters.perform_self_collision && (!dynamic_cast<FREE_PARTICLES<TV>*>(deformable_body_collection.deformable_geometry.structures(i))))
             solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append(deformable_body_collection.deformable_geometry.structures(i));}
@@ -323,9 +323,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     particles.Compute_Auxiliary_Attributes(soft_bindings);
     soft_bindings.Set_Mass_From_Effective_Mass();
 
-    if(fully_implicit) for(int i=1;i<=solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->use_implicit_velocity_independent_forces=true;
-    if(fully_implicit) for(int i=1;i<=rigid_body_collection.rigids_forces.m;i++) rigid_body_collection.rigids_forces(i)->use_implicit_velocity_independent_forces=true;
-    if(fully_implicit) for(int i=1;i<=deformable_body_collection.deformables_forces.m;i++) deformable_body_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=true;
+    if(fully_implicit) for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->use_implicit_velocity_independent_forces=true;
+    if(fully_implicit) for(int i=0;i<rigid_body_collection.rigids_forces.m;i++) rigid_body_collection.rigids_forces(i)->use_implicit_velocity_independent_forces=true;
+    if(fully_implicit) for(int i=0;i<deformable_body_collection.deformables_forces.m;i++) deformable_body_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=true;
 }
 //#####################################################################
 // Function Set_Kinematic_Positions
@@ -421,14 +421,14 @@ void Rigid_Spring()
 void Rigid_Spring_Cloth()
 {
     ARRAY<int,VECTOR<int,2> > body_indices(1,grid_m,1,grid_n);
-    for(int i=1;i<=grid_m;i++)for(int j=1;j<=grid_n;j++){
+    for(int i=0;i<grid_m;i++)for(int j=0;j<grid_n;j++){
         RIGID_BODY<TV>& body=tests.Add_Rigid_Body("sphere",1,(T)0);
         body.Set_Frame(FRAME<TV>(TV(2*i,0,2*j)));
         body_indices(i,j)=body.particle_index;}
 
     RIGID_LINEAR_SPRINGS<TV>* spring=new RIGID_LINEAR_SPRINGS<TV>(rigid_body_collection);
     int spring_index=0;
-    for(int i=1;i<=grid_m;i++)for(int j=1;j<=grid_n;j++){
+    for(int i=0;i<grid_m;i++)for(int j=0;j<grid_n;j++){
         if(i<grid_m){
             spring->Add_Spring(body_indices(i,j),body_indices(i+1,j),TV(),TV());
             spring_index++;
@@ -476,7 +476,7 @@ void Single_Particle()
 void Impulse_Chain()
 {
     ARRAY<int> body_indices;
-    for(int i=1;i<=grid_m;i++){
+    for(int i=0;i<grid_m;i++){
         RIGID_BODY<TV>& body=tests.Add_Rigid_Body("sphere",(T).5,(T)0);
         body.Set_Frame(FRAME<TV>(TV(2*i-2,0,0)));
         body_indices.Append(body.particle_index);}
@@ -511,7 +511,7 @@ void Spring_Cloth()
     SEGMENTED_CURVE<TV> *segmented_curve=SEGMENTED_CURVE<TV>::Create(particles);
     solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(segmented_curve);    
 
-    for(int i=1;i<=grid_m;i++) for(int j=1;j<=grid_n;j++){
+    for(int i=0;i<grid_m;i++) for(int j=0;j<grid_n;j++){
         particles.X((i-1)*grid_n+j)=TV(2*i-2,0,2*j-2);
         if(i<grid_m) segmented_curve->mesh.elements.Append(VECTOR<int,2>((i-1)*grid_n+j,i*grid_n+j));
         if(j<grid_n) segmented_curve->mesh.elements.Append(VECTOR<int,2>((i-1)*grid_n+j,(i-1)*grid_n+j+1));}
@@ -542,7 +542,7 @@ void Particle_Impulse_Chain()
     SEGMENTED_CURVE<TV> *segmented_curve=SEGMENTED_CURVE<TV>::Create(particles);
     solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(segmented_curve);    
 
-    for(int i=1;i<=grid_m;i++){
+    for(int i=0;i<grid_m;i++){
         particles.X(i)=TV(2*i-2,0,0);
         if(i<grid_m) segmented_curve->mesh.elements.Append(VECTOR<int,2>(i,i+1));}
 

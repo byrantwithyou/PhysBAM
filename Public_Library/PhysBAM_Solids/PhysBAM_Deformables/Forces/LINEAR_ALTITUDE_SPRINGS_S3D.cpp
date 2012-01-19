@@ -15,9 +15,9 @@ using namespace PhysBAM;
 template<class T> void LINEAR_ALTITUDE_SPRINGS_S3D<T>::
 Set_Stiffness_Based_On_Reduced_Mass(const T scaling_coefficient) // assumes mass and restlength are already defined
 {
-    for(int t=1;t<=mesh.elements.m;t++){
+    for(int t=0;t<mesh.elements.m;t++){
         int i,j,k;mesh.elements(t).Get(i,j,k);
-        for(int s=1;s<=3;s++){int node1,node2,node3;
+        for(int s=0;s<3;s++){int node1,node2,node3;
             switch(s){case 1:node1=i;node2=j;node3=k;break;case 2:node1=j;node2=k;node3=i;break;default:node1=k;node2=i;node3=j;}
             T one_over_triangle_mass=(T).25*(particles.one_over_effective_mass(node2)+particles.one_over_effective_mass(node3)),one_over_particle_mass=particles.one_over_effective_mass(node1),
                harmonic_mass=Pseudo_Inverse(one_over_particle_mass+one_over_triangle_mass);
@@ -38,12 +38,12 @@ template<class T> void LINEAR_ALTITUDE_SPRINGS_S3D<T>::
 Set_Restlength_From_Material_Coordinates(ARRAY_VIEW<const TV> X)
 {
     Invalidate_CFL();
-    for(int t=1;t<=mesh.elements.m;t++){
+    for(int t=0;t<mesh.elements.m;t++){
         int i=mesh.elements(t)(1),j=mesh.elements(t)(2),k=mesh.elements(t)(3);
         parameters(t)(1).restlength=SEGMENT_3D<T>(X(j),X(k)).Distance_From_Point_To_Line(X(i));
         parameters(t)(2).restlength=SEGMENT_3D<T>(X(i),X(k)).Distance_From_Point_To_Line(X(j));
         parameters(t)(3).restlength=SEGMENT_3D<T>(X(i),X(j)).Distance_From_Point_To_Line(X(k));
-        for(int k=1;k<=3;k++) parameters(t)(k).visual_restlength=parameters(t)(k).restlength;}
+        for(int k=0;k<3;k++) parameters(t)(k).visual_restlength=parameters(t)(k).restlength;}
 }
 //#####################################################################
 // Function Set_Overdamping_Fraction
@@ -51,7 +51,7 @@ Set_Restlength_From_Material_Coordinates(ARRAY_VIEW<const TV> X)
 template<class T> void LINEAR_ALTITUDE_SPRINGS_S3D<T>::
 Set_Overdamping_Fraction(const T overdamping_fraction) // 1 is critically damped
 {
-    for(int t=1;t<=mesh.elements.m;t++){
+    for(int t=0;t<mesh.elements.m;t++){
         int i,j,k;mesh.elements(t).Get(i,j,k);
         T harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(i)+(T).25*(particles.one_over_effective_mass(j)+particles.one_over_effective_mass(k)));
         parameters(t)(1).damping=overdamping_fraction*2*sqrt(parameters(t)(1).youngs_modulus*parameters(t)(1).restlength*harmonic_mass);
@@ -67,7 +67,7 @@ Set_Overdamping_Fraction(const T overdamping_fraction) // 1 is critically damped
 template<class T> void LINEAR_ALTITUDE_SPRINGS_S3D<T>::
 Set_Overdamping_Fraction(const ARRAY<VECTOR<T,3> >& overdamping_fraction) // 1 is critically damped
 {
-    for(int t=1;t<=mesh.elements.m;t++){
+    for(int t=0;t<mesh.elements.m;t++){
         int i,j,k;mesh.elements(t).Get(i,j,k);
         T harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(i)+(T).25*(particles.one_over_effective_mass(j)+particles.one_over_effective_mass(k)));
         parameters(t)(1).damping=overdamping_fraction(t)(1)*2*sqrt(parameters(t)(1).youngs_modulus*parameters(t)(1).restlength*harmonic_mass);
@@ -83,9 +83,9 @@ Set_Overdamping_Fraction(const ARRAY<VECTOR<T,3> >& overdamping_fraction) // 1 i
 template<class T> void LINEAR_ALTITUDE_SPRINGS_S3D<T>::
 Ensure_Minimum_Overdamping_Fraction(const T overdamping_fraction) // 1 is critically damped
 {
-    ARRAY<VECTOR<T,3> > save_damping(parameters.m);for(int i=1;i<=parameters.m;i++) for(int k=1;k<=3;k++) save_damping(i)(k)=parameters(i)(k).damping;
+    ARRAY<VECTOR<T,3> > save_damping(parameters.m);for(int i=0;i<parameters.m;i++) for(int k=0;k<3;k++) save_damping(i)(k)=parameters(i)(k).damping;
     Set_Overdamping_Fraction(overdamping_fraction);
-    for(int k=1;k<=parameters.m;k++) for(int i=1;i<=3;i++) parameters(k)(i).damping=max(parameters(k)(i).damping,save_damping(k)(i));
+    for(int k=0;k<parameters.m;k++) for(int i=0;i<3;i++) parameters(k)(i).damping=max(parameters(k)(i).damping,save_damping(k)(i));
 }
 //#####################################################################
 // Function Update_Position_Based_State
@@ -100,7 +100,7 @@ Update_Position_Based_State(const T time,const bool is_position_update)
         int i,j,k;mesh.elements(t).Get(i,j,k);
         int hmin=0;T cross_length_max=-FLT_MAX;
         if(is_position_update){
-            for(int h=1;h<=3;h++){
+            for(int h=0;h<3;h++){
                 switch(h){case 1:node2=j;node3=k;break;case 2:node2=k;node3=i;break;default:node2=i;node3=j;}
                 T cross_length=(X(node3)-X(node2)).Magnitude_Squared();if(cross_length>cross_length_max){hmin=h;cross_length_max=cross_length;}}}
         else hmin=spring_states(t).node;
@@ -164,7 +164,7 @@ CFL_Strain_Rate() const
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data(); // use shortest spring only
         int i,j,k;elements(t).Get(i,j,k);
         int hmin=0;T cross_length_max=-FLT_MAX;
-        for(int h=1;h<=3;h++){
+        for(int h=0;h<3;h++){
             switch(h){case 1:node1=i;node2=j;node3=k;break;case 2:node1=j;node2=k;node3=i;break;default:node1=k;node2=i;node3=j;}
             T cross_length=(X(node3)-X(node2)).Magnitude_Squared();
             if(cross_length>cross_length_max){hmin=h;cross_length_max=cross_length;}}

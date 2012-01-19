@@ -86,7 +86,7 @@ Project(KRYLOV_VECTOR_BASE<T>& BV) const
     VECTOR_T& V=debug_cast<VECTOR_T&>(BV);
     // Applying the projections in this order is equivalent to repeating Zero_Out_Enslaved_Velocity_Nodes after Poststabilization_Projection, which is a (mass) symmetric projection.
     rigids_evolution.Zero_Out_Enslaved_Velocity_Nodes(V.rigid_V.array,current_velocity_time+dt,current_position_time);
-    for(int i=1;i<=rigids_evolution.rigids_parameters.implicit_solve_parameters.cg_projection_iterations;i++){
+    for(int i=0;i<rigids_evolution.rigids_parameters.implicit_solve_parameters.cg_projection_iterations;i++){
         if(arb){
             arb->Poststabilization_Projection(V.rigid_V.array,true);
             rigids_evolution.Zero_Out_Enslaved_Velocity_Nodes(V.rigid_V.array,current_velocity_time+dt,current_position_time);}}
@@ -151,7 +151,7 @@ Initialize_World_Space_Masses(const RIGID_BODY_COLLECTION<TV>& rigid_body_collec
 {
     world_space_rigid_mass.Resize(rigid_body_collection.dynamic_rigid_body_particles.m,false,false);
     world_space_rigid_mass_inverse.Resize(rigid_body_collection.dynamic_rigid_body_particles.m,false,false);
-    for(int i=1;i<=rigid_body_collection.dynamic_rigid_body_particles.m;i++){int p=rigid_body_collection.dynamic_rigid_body_particles(i);
+    for(int i=0;i<rigid_body_collection.dynamic_rigid_body_particles.m;i++){int p=rigid_body_collection.dynamic_rigid_body_particles(i);
         world_space_rigid_mass(i)=rigid_body_collection.State(p).World_Space_Rigid_Mass(RIGID_BODY_MASS<TV>(rigid_mass(i),rigid_inertia_tensor(i)));
         world_space_rigid_mass_inverse(i)=rigid_body_collection.State(p).World_Space_Rigid_Mass_Inverse(RIGID_BODY_MASS<TV>(rigid_mass(i),rigid_inertia_tensor(i)));}
 }

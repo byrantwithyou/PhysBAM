@@ -21,10 +21,10 @@ Set_Spring_Phases(const ARRAY<VECTOR<T,2> >& compression_intervals_input,const A
     youngs_modulus_scaling.Resize(-compression_intervals_input.m,stretching_intervals_input.m,false,false);
     correction_force_over_youngs_modulus.Resize(-compression_intervals_input.m,stretching_intervals_input.m,false,false);
     intervals(0)=0;youngs_modulus_scaling(0)=1;correction_force_over_youngs_modulus(0)=0;
-    for(int i=1;i<=stretching_intervals_input.m;i++){ // stretching phases
+    for(int i=0;i<stretching_intervals_input.m;i++){ // stretching phases
         intervals(i)=stretching_intervals_input(i)[1];youngs_modulus_scaling(i)=stretching_intervals_input(i)[2];
         correction_force_over_youngs_modulus(i)=correction_force_over_youngs_modulus(i-1)+intervals(i)*(youngs_modulus_scaling(i-1)-youngs_modulus_scaling(i));}
-    for(int i=1;i<=compression_intervals_input.m;i++){ // compression phases
+    for(int i=0;i<compression_intervals_input.m;i++){ // compression phases
         intervals(-i)=compression_intervals_input(i)[1];youngs_modulus_scaling(-i)=compression_intervals_input(i)[2];
         correction_force_over_youngs_modulus(-i)=correction_force_over_youngs_modulus(1-i)+intervals(-i)*(youngs_modulus_scaling(1-i)-youngs_modulus_scaling(-i));}
 
@@ -125,7 +125,7 @@ Ensure_Minimum_Overdamping_Fraction(const T overdamping_fraction) // 1 is critic
     for(int i=springs_damping.domain.min_corner.x;i<=springs_damping.domain.max_corner.x;i++){
         Set_All_Springs_To_Phase(i);
         LINEAR_SPRINGS<TV>::Set_Overdamping_Fraction(overdamping_fraction);
-        for(int k=1;k<=damping.m;k++) springs_damping(i)(k)=max(springs_damping(i)(k),damping(k));}
+        for(int k=0;k<damping.m;k++) springs_damping(i)(k)=max(springs_damping(i)(k),damping(k));}
 }
 //#####################################################################
 // Function Set_All_Springs_To_Phase
@@ -133,8 +133,8 @@ Ensure_Minimum_Overdamping_Fraction(const T overdamping_fraction) // 1 is critic
 template<class TV> void MULTILINEAR_SPRINGS<TV>::
 Set_All_Springs_To_Phase(const int phase_index) // 1 is critically damped
 {
-    if(constant_base_youngs_modulus) for(int s=1;s<=segment_mesh.elements.m;s++) youngs_modulus(s)=youngs_modulus_scaling(phase_index)*constant_base_youngs_modulus;
-    else for(int s=1;s<=segment_mesh.elements.m;s++) youngs_modulus(s)=youngs_modulus_scaling(phase_index)*base_youngs_modulus(s);
+    if(constant_base_youngs_modulus) for(int s=0;s<segment_mesh.elements.m;s++) youngs_modulus(s)=youngs_modulus_scaling(phase_index)*constant_base_youngs_modulus;
+    else for(int s=0;s<segment_mesh.elements.m;s++) youngs_modulus(s)=youngs_modulus_scaling(phase_index)*base_youngs_modulus(s);
 }
 //#####################################################################
 template class MULTILINEAR_SPRINGS<VECTOR<float,2> >;

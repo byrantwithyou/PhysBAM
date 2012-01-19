@@ -253,11 +253,11 @@ Cut_With_Hyperplane_And_Discard_Outside_Simplices(const TRIANGLE_3D<T>& triangle
 {
     VECTOR<T,3> phi_nodes;
     VECTOR<VECTOR<T,3>,3> X_nodes;X_nodes(1)=triangle.x1;X_nodes(2)=triangle.x2;X_nodes(3)=triangle.x3;
-    for(int i=1;i<=3;i++){phi_nodes(i)=cutting_plane.Signed_Distance(X_nodes(i));}
+    for(int i=0;i<3;i++){phi_nodes(i)=cutting_plane.Signed_Distance(X_nodes(i));}
 
     // left simplices are in the negative halfspace, right simplices in the positive halfspace
     int positive_count=0,single_node_sign;
-    for(int i=1;i<=3;i++) if(phi_nodes(i)>0) positive_count++;
+    for(int i=0;i<3;i++) if(phi_nodes(i)>0) positive_count++;
     switch(positive_count){
         case 0: // in negative halfspace
             negative_triangles.Append(triangle);break;
@@ -265,7 +265,7 @@ Cut_With_Hyperplane_And_Discard_Outside_Simplices(const TRIANGLE_3D<T>& triangle
         case 2:
             single_node_sign=positive_count==1?1:-1;
             // draw positive triangle. has correct positive/negative area based on whether triangle is backwards or not
-            for(int i=1;i<=3;i++)if(LEVELSET_UTILITIES<T>::Sign(phi_nodes(i))==single_node_sign){
+            for(int i=0;i<3;i++)if(LEVELSET_UTILITIES<T>::Sign(phi_nodes(i))==single_node_sign){
                 VECTOR<VECTOR<T,3>,2> interface_locations;int index=i%3+1;
                 VECTOR<int,2> other_locations;
                 for(int j=1;j<=2;j++,index=index%3+1){

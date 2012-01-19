@@ -302,7 +302,7 @@ Make_Lathe_Chain(const FRAME<TV>& frame,const T scale,const T friction,const T c
     ARTICULATED_RIGID_BODY<TV>& arb=rigid_body_collection.articulated_rigid_body;
     RIGID_BODY<TV>* links[7];
 
-    for(int i=1;i<=6;i++){
+    for(int i=0;i<6;i++){
         RIGID_BODY<TV>& rigid_body=Add_Rigid_Body("ARB/lathe_object",scale,friction);
         rigid_body.Set_Coefficient_Of_Restitution(cor);
         links[i-1]=&rigid_body;
@@ -315,7 +315,7 @@ Make_Lathe_Chain(const FRAME<TV>& frame,const T scale,const T friction,const T c
             case 6:rigid_body.Set_Frame(frame*FRAME<TV>(TV(-2-2*cos((T)pi/3),4*sin((T)pi/3)*(T).5,0)*scale,ROTATION<TV>((T)pi/2,TV(0,1,0))*ROTATION<TV>(2*(T)pi/3,TV(1,0,0))));break;}}
 
     links[6]=links[0];
-    for(int i=1;i<=6;i++){
+    for(int i=0;i<6;i++){
         JOINT<TV>* joint=new POINT_JOINT<TV>();
         arb.joint_mesh.Add_Articulation(links[i-1]->particle_index,links[i]->particle_index,joint);
         joint->Set_Joint_To_Child_Frame(FRAME<TV>(TV(0,0,2*scale)));

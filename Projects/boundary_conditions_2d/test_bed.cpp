@@ -54,7 +54,7 @@ int main(int argc,char* argv[])
 
     tc.sim.obj.ai.Print("INIT",u);
 
-    for(int k=1;k<=tc.sim.steps;k++){
+    for(int k=0;k<tc.sim.steps;k++){
         First_Order_Step(tc.sim,u);
 //        Second_Order_RE_Step(tc.sim,u,u2);
         Dump_Frame<RW>(u,"step");

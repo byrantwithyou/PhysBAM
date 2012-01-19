@@ -39,7 +39,7 @@ public:
 
     void Update_Objects()
     {
-        for(int i=1;i<=objects.m;i++) objects(i)->Slice_Has_Changed();
+        for(int i=0;i<objects.m;i++) objects(i)->Slice_Has_Changed();
     }
 
     // Callbacks for convenience

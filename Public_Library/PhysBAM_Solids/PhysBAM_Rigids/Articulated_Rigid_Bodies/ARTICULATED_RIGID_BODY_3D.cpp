@@ -62,7 +62,7 @@ Compute_Position_Based_State(const T dt,const T time)
     joint_angular_constraint_matrix.Resize(joint_mesh.joints.m); // angular directions constrained by joint or PD
     joint_angular_muscle_control_matrix.Resize(joint_mesh.joints.m); // angular directions which are unconstrained (free for muscle to try to control)
 
-    for(int i=1;i<=joint_mesh.joints.m;i++){
+    for(int i=0;i<joint_mesh.joints.m;i++){
         JOINT<TV>& joint=*joint_mesh.joints(i);RIGID_BODY<TV>& parent=*Parent(joint.id_number),&child=*Child(joint.id_number);
         if(parent.Has_Infinite_Inertia() && child.Has_Infinite_Inertia()) continue;
         joints_on_rigid_body(Parent_Id(joint.id_number)).Append(PAIR<int,bool>(i,true));
@@ -94,21 +94,21 @@ Compute_Position_Based_State(const T dt,const T time)
             joint_muscle_control_matrix(i).Set_Submatrix(4,1,joint_angular_muscle_control_matrix(i));}}
 
     joint_offset_in_post_stabilization_matrix.Resize(joint_mesh.joints.m);
-    for(int i=1;i<=joint_mesh.joints.m;i++) joint_offset_in_post_stabilization_matrix(i)=(i==1)?1:joint_offset_in_post_stabilization_matrix(i-1)+joint_constrained_dimensions(i-1);
+    for(int i=0;i<joint_mesh.joints.m;i++) joint_offset_in_post_stabilization_matrix(i)=(i==1)?1:joint_offset_in_post_stabilization_matrix(i-1)+joint_constrained_dimensions(i-1);
     int total_constrained_dimensions=joint_constrained_dimensions.Sum();
     global_post_stabilization_matrix_11=MATRIX_MXN<T>(total_constrained_dimensions,total_constrained_dimensions);
     LOG::cout<<"*** Total constrained dimensions "<<total_constrained_dimensions<<std::endl;
 
     if(use_muscle_actuators){
         joint_offset_in_muscle_control_matrix.Resize(joint_mesh.joints.m);
-        for(int i=1;i<=joint_mesh.joints.m;i++) joint_offset_in_muscle_control_matrix(i)=(i==1)?1:joint_offset_in_muscle_control_matrix(i-1)+joint_muscle_control_dimensions(i-1);
+        for(int i=0;i<joint_mesh.joints.m;i++) joint_offset_in_muscle_control_matrix(i)=(i==1)?1:joint_offset_in_muscle_control_matrix(i-1)+joint_muscle_control_dimensions(i-1);
         int total_muscle_control_dimensions=joint_muscle_control_dimensions.Sum();assert(total_muscle_control_dimensions);
         global_post_stabilization_matrix_12=MATRIX_MXN<T>(total_constrained_dimensions,muscle_list->muscles.m);
         global_post_stabilization_matrix_21=MATRIX_MXN<T>(total_muscle_control_dimensions,total_constrained_dimensions);
         global_post_stabilization_matrix_22=MATRIX_MXN<T>(total_muscle_control_dimensions,muscle_list->muscles.m);
         LOG::cout<<"Muscle control: controlling "<<total_muscle_control_dimensions<<" dof with "<<muscle_list->muscles.m<<" muscles"<<std::endl;}
 
-    for(int i=1;i<=dynamic_rigid_body_particles.m;i++){int p=dynamic_rigid_body_particles(i);
+    for(int i=0;i<dynamic_rigid_body_particles.m;i++){int p=dynamic_rigid_body_particles(i);
         RIGID_BODY<TV>& rigid_body=rigid_body_collection.Rigid_Body(p);SYMMETRIC_MATRIX<T,3> I_inverse=rigid_body.World_Space_Inertia_Tensor_Inverse();
         int id=rigid_body.particle_index;
         for(int i=1;i<=joints_on_rigid_body(id).m;i++) for(int j=i;j<=joints_on_rigid_body(id).m;j++){
@@ -149,7 +149,7 @@ Compute_Position_Based_State(const T dt,const T time)
     if(use_muscle_actuators){
         if(!muscle_list) new MUSCLE_LIST<TV>(rigid_body_collection);
         muscle_list->Initialize_Muscle_Attachments_On_Rigid_Body();
-        for(int i=1;i<=joint_mesh.joints.m;i++) if(joint_mesh.joints(i)->global_post_stabilization){
+        for(int i=0;i<joint_mesh.joints.m;i++) if(joint_mesh.joints(i)->global_post_stabilization){
             int parent_id=Parent_Id(joint_mesh.joints(i)->id_number),child_id=Child_Id(joint_mesh.joints(i)->id_number);
             // joint should not have any muscle control dimensions if both bodies have infinite inertia
             assert(!rigid_body_collection.Rigid_Body(parent_id).Has_Infinite_Inertia() || !rigid_body_collection.Rigid_Body(child_id).Has_Infinite_Inertia());
@@ -207,7 +207,7 @@ Solve_For_Muscle_Control(MATRIX_MXN<T>& A,const VECTOR_ND<T>& b,VECTOR_ND<T>& x,
             // TODO: is this min necessary?
             T max_force=muscle->Force(1);T actuation_min=min(muscle->Passive_Force(muscle->Total_Length())/max_force,(T)1);
             x_min(j)=PAIR<bool,T>(true,actuation_min);x_max(j)=PAIR<bool,T>(true,1);
-            for(int i=1;i<=A.m;i++) A_after_QR(i,j)*=max_force*dt;} // multiply by the maximum value x could have had with no normalization
+            for(int i=0;i<A.m;i++) A_after_QR(i,j)*=max_force*dt;} // multiply by the maximum value x could have had with no normalization
 
         A_after_QR.In_Place_Robust_Householder_QR_Solve(b_after_QR,permute);
         int equations_to_keep=A_after_QR.Number_Of_Nonzero_Rows(zero_row_tolerance);
@@ -231,22 +231,22 @@ Solve_For_Muscle_Control(MATRIX_MXN<T>& A,const VECTOR_ND<T>& b,VECTOR_ND<T>& x,
         // Solve for x_B given previous guess for remainder of vector.  If x_B is within bounds then we have a good initial guess which we can pass to QP.
         bool last_values_are_feasible=false;
         if(last_muscle_actuations.n && last_muscle_actuations.n==number_of_muscles){ // TODO: this assumes muscle list doesn't change dynamically!
-            for(int i=1;i<=x_N.n;i++){int p=permute_N(i);x_N(i)=last_muscle_actuations(p);if(x_min(p).x) x_N(i)=max(x_N(i),x_min(p).y);if(x_max(p).x) x_N(i)=min(x_N(i),x_max(p).y);}
+            for(int i=0;i<x_N.n;i++){int p=permute_N(i);x_N(i)=last_muscle_actuations(p);if(x_min(p).x) x_N(i)=max(x_N(i),x_min(p).y);if(x_max(p).x) x_N(i)=min(x_N(i),x_max(p).y);}
             x_B=B.Upper_Triangular_Solve(b-N*x_N);
             last_values_are_feasible=true;
-            for(int i=1;i<=x_B.n;i++){
+            for(int i=0;i<x_B.n;i++){
                 if((x_min(permute_B(i)).x && x_B(i)<x_min(permute_B(i)).y) || (x_max(permute_B(i)).x && x_B(i)>x_max(permute_B(i)).y)){last_values_are_feasible=false;break;}}
             if(last_values_are_feasible){
                 LOG::cout<<"Using last activations as feasible initial guess"<<std::endl;
                 if(verbose) LOG::cout<<"Before:\nN:\n"<<N<<"\npermute_N:\n"<<permute_N<<"\nx_N:\n"<<x_N<<std::endl;
                 ARRAY<bool> move_to_S(N.n);
-                for(int i=1;i<=x_N.n;i++) if((!x_min(permute_N(i)).x || x_N(i)>x_min(permute_N(i)).y) && (!x_max(permute_N(i)).x || x_N(i)<x_max(permute_N(i)).y)) move_to_S(i)=true;
+                for(int i=0;i<x_N.n;i++) if((!x_min(permute_N(i)).x || x_N(i)>x_min(permute_N(i)).y) && (!x_max(permute_N(i)).x || x_N(i)<x_max(permute_N(i)).y)) move_to_S(i)=true;
                 S.Resize(B.n,move_to_S.Number_True());permute_S.Resize(S.n);x_S.Resize(S.n);
                 MATRIX_MXN<T> new_N(B.n,move_to_S.Number_False());VECTOR_ND<int> new_permute_N(new_N.n);VECTOR_ND<T> new_x_N(new_N.n);
                 int Sj=0,Nj=0;
-                for(int j=1;j<=move_to_S.m;j++){
-                    if(move_to_S(j)){Sj++;permute_S(Sj)=permute_N(j);x_S(Sj)=x_N(j);for(int i=1;i<=S.m;i++) S(i,Sj)=N(i,j);}
-                    else{Nj++;new_permute_N(Nj)=permute_N(j);new_x_N(Nj)=x_N(j);for(int i=1;i<=N.m;i++) new_N(i,Nj)=N(i,j);}}
+                for(int j=0;j<move_to_S.m;j++){
+                    if(move_to_S(j)){Sj++;permute_S(Sj)=permute_N(j);x_S(Sj)=x_N(j);for(int i=0;i<S.m;i++) S(i,Sj)=N(i,j);}
+                    else{Nj++;new_permute_N(Nj)=permute_N(j);new_x_N(Nj)=x_N(j);for(int i=0;i<N.m;i++) new_N(i,Nj)=N(i,j);}}
                 N=new_N;permute_N=new_permute_N;x_N=new_x_N;
                 if(verbose) LOG::cout<<"After:\nN:\n"<<N<<"\nS:\n"<<S<<"\npermute_N:\n"<<permute_N<<"\npermute_S:\n"<<permute_S<<"\nx_N:\n"<<x_N<<"\nx_S:\n"<<x_S<<std::endl;}}
 
@@ -261,7 +261,7 @@ Solve_For_Muscle_Control(MATRIX_MXN<T>& A,const VECTOR_ND<T>& b,VECTOR_ND<T>& x,
         QUADRATIC_PROGRAMMING<T>::Find_Optimal_Solution(B,S,N,x_B,x_S,b,x_N,permute_B,permute_S,permute_N,D,epsilon_hat_unpermuted,f_hat,x,x_min,x_max,tolerance,step_tolerance,verbose);
 
         last_muscle_actuations=x;
-        for(int i=1;i<=x.n;i++){T max_force=muscle_list->muscles(i)->Force(1);x_lp(i)*=max_force*dt;x(i)*=max_force*dt;}
+        for(int i=0;i<x.n;i++){T max_force=muscle_list->muscles(i)->Force(1);x_lp(i)*=max_force*dt;x(i)*=max_force*dt;}
 
         if(verbose){
             if(last_values_are_feasible) LOG::cout<<"===> Initial feasible result x (using last activations):"<<std::endl<<x_lp<<std::endl;
@@ -321,10 +321,10 @@ Solve_For_Muscle_Control(MATRIX_MXN<T>& A,const VECTOR_ND<T>& b,VECTOR_ND<T>& x,
             // ( -R^-1 * b1 )
             // (     0      )
             MATRIX_MXN<T> negative_R_inverse_U(U.m,U.n);VECTOR_ND<T> column(U.m),u(U.m);
-            for(int j=1;j<=U.n;j++){
-                for(int i=1;i<=U.m;i++) u(i)=U(i,j);
+            for(int j=0;j<U.n;j++){
+                for(int i=0;i<U.m;i++) u(i)=U(i,j);
                 column=R.Upper_Triangular_Solve(u);
-                for(int i=1;i<=U.m;i++) negative_R_inverse_U(i,j)=-column(i);}
+                for(int i=0;i<U.m;i++) negative_R_inverse_U(i,j)=-column(i);}
             VECTOR_ND<T> negative_R_inverse_b1(-R.Upper_Triangular_Solve(b1));
             MATRIX_MXN<T> Z(A.n,U.n);Z.Add_To_Submatrix(1,1,negative_R_inverse_U);Z.Add_To_Submatrix(equations_to_keep+1,1,MATRIX_MXN<T>::Identity_Matrix(U.n));
             VECTOR_ND<T> Z_rhs(A.n);Z_rhs.Set_Subvector(1,negative_R_inverse_b1);
@@ -367,7 +367,7 @@ Solve_For_Muscle_Control(MATRIX_MXN<T>& A,const VECTOR_ND<T>& b,VECTOR_ND<T>& x,
                 LOG::cout<<"NEW METHOD X:"<<std::endl<<x<<std::endl;
                 LOG::cout<<"RESIDUAL: "<<(A*x-b).Magnitude()<<std::endl;}}}
 
-    if(clamp_negative_activations) for(int i=1;i<=x.n;i++) if(x(i)<0) x(i)=0;
+    if(clamp_negative_activations) for(int i=0;i<x.n;i++) if(x(i)<0) x(i)=0;
 }
 //####################################################################################
 // Function Solve_Minimum_Norm_Solution_For_Linear_Constraints
@@ -426,7 +426,7 @@ Solve_Velocities_for_PD(const T time,const T dt,bool test_system,bool print_matr
         VECTOR_ND<T> constrained_delta_relative_joint_velocities(global_post_stabilization_matrix_11.n),joint_constraint_impulses,muscle_controlled_delta_relative_joint_velocities;
         if(use_muscle_actuators){muscle_activations.Resize(muscle_list->muscles.m);muscle_controlled_delta_relative_joint_velocities.Resize(global_post_stabilization_matrix_21.m);}
         ARRAY<TV> joint_locations(joint_mesh.joints.m);
-        for(int i=1;i<=joint_mesh.joints.m;i++) if(joint_constrained_dimensions(i) || joint_muscle_control_dimensions(i)){
+        for(int i=0;i<joint_mesh.joints.m;i++) if(joint_constrained_dimensions(i) || joint_muscle_control_dimensions(i)){
             TWIST<TV> delta_relative_twist;Delta_Relative_Twist(joint_mesh.joints(i)->id_number,true,joint_locations(i),delta_relative_twist);
             if(joint_constrained_dimensions(i)){
                 assert(joint_constrained_dimensions(i)>=3); // assume unconstrained linear directions, constrained angular directions
@@ -461,7 +461,7 @@ Solve_Velocities_for_PD(const T time,const T dt,bool test_system,bool print_matr
             joint_constraint_impulses=global_post_stabilization_matrix_11_inverse*(constrained_delta_relative_joint_velocities-global_post_stabilization_matrix_12*muscle_impulse_magnitudes);}
 
         // apply poststabilization impulses
-        for(int i=1;i<=joint_mesh.joints.m;i++) if(joint_constrained_dimensions(i)){
+        for(int i=0;i<joint_mesh.joints.m;i++) if(joint_constrained_dimensions(i)){
             assert(joint_constrained_dimensions(i)>=3); // unconstrained linear directions, constrained angular directions
             int istart=joint_offset_in_post_stabilization_matrix(i);
             TV impulse;joint_constraint_impulses.Get_Subvector(istart,impulse);
@@ -477,7 +477,7 @@ Solve_Velocities_for_PD(const T time,const T dt,bool test_system,bool print_matr
         // precompute damped stuff
         precomputed_desired_damped_angular_velocities.Resize(joint_mesh.joints.m);
         int njoints=0;
-        for(int i=1;i<=joint_mesh.joints.m;i++) if(joint_mesh.joints(i)->angular_damping){
+        for(int i=0;i<joint_mesh.joints.m;i++) if(joint_mesh.joints(i)->angular_damping){
             njoints++;JOINT<TV>& joint=*joint_mesh.joints(i);RIGID_BODY<TV> &parent=*Parent(joint.id_number),&child=*Child(joint.id_number);
             parent.Update_Angular_Velocity();child.Update_Angular_Velocity();
             precomputed_desired_damped_angular_velocities(i)=(std::exp(-joint.angular_damping*dt)-1)*RIGID_BODY<TV>::Relative_Angular_Velocity(parent,child);}
@@ -503,7 +503,7 @@ Output_Articulation_Points(const STREAM_TYPE stream_type,const std::string& outp
     std::ostream* output=FILE_UTILITIES::Safe_Open_Output(STRING_UTILITIES::string_sprintf("%s/%d/arb_info",output_directory.c_str(),frame));
     TYPED_OSTREAM typed_output(*output,stream_type);
     Write_Binary(typed_output,joint_mesh.joints.m*2);
-    for(int i=1;i<=joint_mesh.joints.m;i++){
+    for(int i=0;i<joint_mesh.joints.m;i++){
         JOINT<TV>& joint=*joint_mesh.joints(i);
         const RIGID_BODY<TV> &parent=*Parent(joint.id_number),&child=*Child(joint.id_number);
         TV ap1=parent.World_Space_Point(joint.F_pj().t),ap2=child.World_Space_Point(joint.F_cj().t);

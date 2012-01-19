@@ -77,10 +77,10 @@ int main(int argc, char* argv[])
         else ids_filename=parse_args.Get_String_Value("-ids_to_delete");
         std::ifstream input_stream(ids_filename.c_str());
         int id,max_id=0;while(input_stream >> id){ids.Append(id);max_id=max(max_id,id);}
-        ARRAY<bool> id_in_list(max_id);for(int i=1;i<=ids.m;i++) id_in_list(ids(i))=true;
+        ARRAY<bool> id_in_list(max_id);for(int i=0;i<ids.m;i++) id_in_list(ids(i))=true;
 
         int count=0;
-        for(int i=1;i<=particles_array.m;i++) if(particles_array(i)){
+        for(int i=0;i<particles_array.m;i++) if(particles_array(i)){
             PARTICLE_LEVELSET_REMOVED_PARTICLES<T,VECTOR<T,3> >* particles=particles_array(i);
             ARRAY<int>* id_array=Get_Id_Array(particles);
             for(int p=particles->number;p>=1;p--){
@@ -98,7 +98,7 @@ int main(int argc, char* argv[])
             subdomain2=BOX_3D<T>(VECTOR<T,3>(parse_args.Get_Vector_3D_Value("-subdomain_2_minimum_corner")),VECTOR<T,3>(parse_args.Get_Vector_3D_Value("-subdomain_2_maximum_corner")));}
         if(!get_ids) std::cout << "Pruning particles outside " << subdomain << " and " << subdomain2 << std::endl;
         int count=0;
-        for(int i=1;i<=particles_array.m;i++) if(particles_array(i)){
+        for(int i=0;i<particles_array.m;i++) if(particles_array(i)){
             PARTICLE_LEVELSET_REMOVED_PARTICLES<T,VECTOR<T,3> >* particles=particles_array(i);
             ARRAY<int>* id_array=0;if(get_ids) id_array=Get_Id_Array(particles);
             if(get_ids_outside){
@@ -136,7 +136,7 @@ int main(int argc, char* argv[])
             std::cerr << "and cylinder " << bottom2 << ", " << top2 << ", r="<< radius2 << std::endl;}
         std::cerr << "cylinder " << bottom << ", " << top << ", r="<< radius << std::endl;
         int count=0;
-        for(int i=1;i<=particles_array.m;i++) if(particles_array(i)){
+        for(int i=0;i<particles_array.m;i++) if(particles_array(i)){
             PARTICLE_LEVELSET_REMOVED_PARTICLES<T,VECTOR<T,3> >* particles=particles_array(i);
             ARRAY<int>* id_array=0;if(get_ids) id_array=Get_Id_Array(particles);
             if(get_ids_outside){
@@ -161,7 +161,7 @@ int main(int argc, char* argv[])
         if(!get_ids) std::cout << "Deleted " << count << " particles" << std::endl;
     }
     else if(get_ids){
-        for(int i=1;i<=particles_array.m;i++) if(particles_array(i)){
+        for(int i=0;i<particles_array.m;i++) if(particles_array(i)){
             PARTICLE_LEVELSET_REMOVED_PARTICLES<T,VECTOR<T,3> >* particles=particles_array(i);
             ARRAY<int>* id_array=0;if(get_ids) id_array=Get_Id_Array(particles);
             for(int p=particles->number;p>=1;p--){ids.Append((*id_array)(p));}}
@@ -171,7 +171,7 @@ int main(int argc, char* argv[])
         std::cout << "Writing particles to " << output_filename << std::endl;
         FILE_UTILITIES::Write_To_File<RW>(output_filename,particles_array);}
     else{
-        for(int i=1;i<=ids.m;i++) std::cout << ids(i) << std::endl;}
+        for(int i=0;i<ids.m;i++) std::cout << ids(i) << std::endl;}
     
     return 0;
 }

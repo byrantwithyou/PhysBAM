@@ -100,9 +100,9 @@ Initialize_Segment_Mesh()
 {
     delete segment_mesh;segment_mesh=new SEGMENT_MESH;segment_mesh->number_nodes=number_nodes;
     HASHTABLE<VECTOR<int,2> > segment_list;
-    for(int e=1;e<=elements.m;e++) for(int c=1;c<=elements(e).m;c++){
+    for(int e=0;e<elements.m;e++) for(int c=1;c<=elements(e).m;c++){
         ARRAY<int>& component=elements(e)(c);
-        for(int p=1;p<=component.m;p++){
+        for(int p=0;p<component.m;p++){
             VECTOR<int,2> sorted_segment=VECTOR<int,2>(component(p),component(p%component.m+1)).Sorted();
             if(segment_list.Set(sorted_segment)) segment_mesh->elements.Append(sorted_segment);}}
 }
@@ -114,11 +114,11 @@ Initialize_Element_Oriented_Edges()
 {
     if(!segment_mesh) PHYSBAM_FATAL_ERROR();
     delete element_oriented_edges;element_oriented_edges=new ARRAY<ARRAY<ARRAY<PAIR<int,bool> > > >(elements.m);
-    for(int e=1;e<=elements.m;e++){
+    for(int e=0;e<elements.m;e++){
         (*element_oriented_edges)(e).Resize(elements(e).m);
         for(int c=1;c<=elements(e).m;c++){
             ARRAY<int>& component=elements(e)(c);
-            for(int p=1;p<=component.m;p++){
+            for(int p=0;p<component.m;p++){
                 VECTOR<int,2> oriented_segment(component(p),component(p%component.m+1));
                 int s=segment_mesh->Simplex(oriented_segment);if(!s) PHYSBAM_FATAL_ERROR();
                 if(oriented_segment==segment_mesh->elements(s)) (*element_oriented_edges)(e)(c).Append(PAIR<int,bool>(s,true));
@@ -133,9 +133,9 @@ Initialize_Edge_Elements()
     if(!segment_mesh) PHYSBAM_FATAL_ERROR();
     delete edge_elements;edge_elements=new ARRAY<ARRAY<int> >(segment_mesh->elements.m);
     OPERATION_HASH<> hash(segment_mesh->elements.m);
-    for(int e=1;e<=elements.m;e++) for(int c=1;c<=elements(e).m;c++){
+    for(int e=0;e<elements.m;e++) for(int c=1;c<=elements(e).m;c++){
         ARRAY<int>& component=elements(e)(c);
-        for(int p=1;p<=component.m;p++){
+        for(int p=0;p<component.m;p++){
             int s=segment_mesh->Segment(component(p),component(p%component.m+1));if(!s) PHYSBAM_FATAL_ERROR();
             if(!hash.Is_Marked_Current(s)){(*edge_elements)(s).Append(e);hash.Mark(s);}}
         hash.Next_Operation();}
@@ -176,7 +176,7 @@ Elements_On_Oriented_Edge(const int node1,const int node2,ARRAY<int>* elements_o
     if(!s){if(elements_on_oriented_edge) elements_on_oriented_edge->Remove_All();return 0;}
     ARRAY<int>& candidate_elements_on_edge=(*edge_elements)(s);
     int elements_found=0;if(elements_on_oriented_edge) elements_on_oriented_edge->Remove_All();
-    for(int i=1;i<=candidate_elements_on_edge.m;i++) if(Oriented_Edge_In_Element(node1,node2,candidate_elements_on_edge(i))){
+    for(int i=0;i<candidate_elements_on_edge.m;i++) if(Oriented_Edge_In_Element(node1,node2,candidate_elements_on_edge(i))){
         elements_found++;if(elements_on_oriented_edge) elements_on_oriented_edge->Append(candidate_elements_on_edge(i));}
     return elements_found;
 }
@@ -206,7 +206,7 @@ Opposite_Oriented_Element(const int element) const
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     if(candidate_elements.m>1){ 
         LOG::cout << "Input: " << elements(element) << std::endl;
-        for(int i=1;i<=candidate_elements.m;i++)
+        for(int i=0;i<candidate_elements.m;i++)
             LOG::cout << "Candidate: " << elements(candidate_elements(i)) << std::endl;}
 #endif
     if(candidate_elements.m>1) PHYSBAM_FATAL_ERROR();
@@ -235,7 +235,7 @@ Split_Polygon_Edge(const int node1,const int node2,const int new_node)
     // update elements and edge_elements
     ARRAY<int> elements_on_edge=(*edge_elements)(first_edge_index);edge_elements->Append(elements_on_edge);
     // update elements_on_unoriented_edge
-    for(int e=1;e<=elements_on_unoriented_edge.m;e++){int element=elements_on_unoriented_edge(e);
+    for(int e=0;e<elements_on_unoriented_edge.m;e++){int element=elements_on_unoriented_edge(e);
         for(int c=1;c<=(*element_oriented_edges)(element).m;c++){
             for(int i=1;i<=(*element_oriented_edges)(element)(c).m;i++){
                 PAIR<int,bool>& oriented_edge=(*element_oriented_edges)(element)(c)(i);

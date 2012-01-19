@@ -17,7 +17,7 @@ template<class T> OPENGL_COLOR OPENGL_COLOR_RAMP<T>::
 Lookup(T x) const
 {
     int left_index=0,right_index=0;
-    for(int i=1;i<=color_x.m;i++){
+    for(int i=0;i<color_x.m;i++){
         if(x>color_x(i))left_index=i;
         else if(x<color_x(i)){right_index=i;break;}
         else return equal_colors(i);}

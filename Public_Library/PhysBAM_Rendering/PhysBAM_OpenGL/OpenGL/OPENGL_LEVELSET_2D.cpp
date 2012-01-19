@@ -21,7 +21,7 @@ Display(const int in_color) const
         glPushAttrib(GL_ENABLE_BIT|GL_CURRENT_BIT);
         glDisable(GL_LIGHTING);OPENGL_COLOR::White().Send_To_GL_Pipeline();
         ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-        for(int i=1;i<=levelset.grid.counts.x;i++) for(int j=1;j<=levelset.grid.counts.y;j++) if(!active_cells || (*active_cells)(i,j)){
+        for(int i=0;i<levelset.grid.counts.x;i++) for(int j=0;j<levelset.grid.counts.y;j++) if(!active_cells || (*active_cells)(i,j)){
             OpenGL_Line(grid.X(i,j),grid.X(i,j)+T(0.01)*(*levelset.normals)(i,j),vertices);}
         OpenGL_Draw_Arrays(GL_LINES,2,vertices);
         glPopAttrib();}

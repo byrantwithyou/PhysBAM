@@ -93,7 +93,7 @@ void Initialize_Phi(const int object,ARRAY<T>& phi)
     RED_GREEN_GRID_3D<T>& grid=melting_parameters.levelsets(object)->grid;
     ARRAY<VECTOR_3D<T> >& node_locations=grid.Node_Locations();
     
-    for(int p=1;p<=phi.m;p++) phi(p)=sphere.Phi(node_locations(p));    
+    for(int p=0;p<phi.m;p++) phi(p)=sphere.Phi(node_locations(p));    
     //ARRAY<T>::copy(-1,phi);
 }
 //#####################################################################
@@ -107,8 +107,8 @@ void Initialize_Levelset_Velocity(const int object,ARRAY<VECTOR_3D<T> >& V)
 //    melting_parameters.use_constant_melting_speed=true;
 //    melting_parameters.constant_melting_speed=.1;
     
-    //for(int p=1;p<=V.m;p++) V(p)=VECTOR_3D<T>(node_locations(p).y-sphere.center.y,0,0);
-    for(int p=1;p<=V.m;p++) V(p)=VECTOR_3D<T>();//VECTOR_3D<T>(1*max(1-2*fabs(node_locations(p).y-sphere.center.y),0.),0,0);
+    //for(int p=0;p<V.m;p++) V(p)=VECTOR_3D<T>(node_locations(p).y-sphere.center.y,0,0);
+    for(int p=0;p<V.m;p++) V(p)=VECTOR_3D<T>();//VECTOR_3D<T>(1*max(1-2*fabs(node_locations(p).y-sphere.center.y),0.),0,0);
 }
 //#####################################################################
 // Function Initialize_Particle_Positions_And_Velocities
@@ -125,7 +125,7 @@ void Initialize_Particle_Positions_And_Velocities(const int object)
 //#####################################################################
 void Initialize_Forces()
 {
-    for(int object=1;object<=melting_parameters.body_index.m;object++){
+    for(int object=0;object<melting_parameters.body_index.m;object++){
         int index=melting_parameters.body_index(object);if(!index)return;
         RIGID_BODY<TV>& rigid_body=*solids_parameters.rigid_body_parameters.list(index);
         rigid_body.Add_Basic_Forces(solids_parameters.gravity,solids_parameters.gravity_direction,solids_parameters.rigid_body_evolution_parameters.rigid_body_ether_viscosity,0);}

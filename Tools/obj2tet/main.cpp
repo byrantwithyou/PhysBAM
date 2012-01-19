@@ -38,10 +38,10 @@ template<class T,class RW> void Convert(const std::string& input_filename,const 
     PARTICLES<TV>& particles=*new PARTICLES<TV>;
     TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=TETRAHEDRALIZED_VOLUME<T>::Create(particles);
 
-    for(int t=1;t<=tetrahedra.m;t++)
+    for(int t=0;t<tetrahedra.m;t++)
         tetrahedralized_volume->mesh.elements.Append(tetrahedra(t));
     tetrahedralized_volume->particles.array_collection->Preallocate(vertices.m);
-    for(int v=1;v<=vertices.m;v++)
+    for(int v=0;v<vertices.m;v++)
         tetrahedralized_volume->particles.X(tetrahedralized_volume->particles.array_collection->Add_Element())=vertices(v);
     tetrahedralized_volume->Update_Number_Nodes();
     FILE_UTILITIES::Write_To_File<RW>(output_filename,*tetrahedralized_volume);

@@ -88,12 +88,12 @@ Prepare_Backward_Euler_System(DEFORMABLES_BACKWARD_EULER_SYSTEM<TV>& system,cons
         deformable_body_collection.soft_bindings.Map_Forces_From_Parents(B_full,rigid_B_full);
         deformable_body_collection.binding_list.Clear_Hard_Bound_Particles(B_full);
         if(mpi_solids) mpi_solids->Exchange_Binding_Boundary_Data_Global(B_full);
-        for(int k=1;k<=deformable_body_collection.deformables_forces.m;k++) if(dynamic_cast<BINDING_SPRINGS<TV>*>(&*deformable_body_collection.deformables_forces(k)))
+        for(int k=0;k<deformable_body_collection.deformables_forces.m;k++) if(dynamic_cast<BINDING_SPRINGS<TV>*>(&*deformable_body_collection.deformables_forces(k)))
             deformable_body_collection.deformables_forces(k)->Add_Force_Differential(particles.X,B_full,current_velocity_time+dt);
         if(mpi_solids) mpi_solids->Exchange_Binding_Boundary_Data_Global(B_full);
         deformable_body_collection.binding_list.Distribute_Force_To_Parents(B_full,rigid_B_full);}
 
-    for(int i=1;i<=deformable_body_collection.dynamic_particles.m;i++){int p=deformable_body_collection.dynamic_particles(i);
+    for(int i=0;i<deformable_body_collection.dynamic_particles.m;i++){int p=deformable_body_collection.dynamic_particles(i);
         B_full(p)=particles.V(p)+dt*particles.one_over_mass(p)*B_full(p);}
 
     V_all=B_all;
@@ -111,7 +111,7 @@ Finish_Backward_Euler_Step(const T dt,const T current_position_time,const bool v
     DEFORMABLES_VELOCITY<TV> F_all(F_full,rigid_F_full,deformable_body_collection,rigid_geometry_collection);
 
     if(velocity_update && deformables_parameters.use_post_cg_constraints){ // return rhs + dt Fd V^n+1 for friction processing
-        for(int i=1;i<=deformable_body_collection.dynamic_particles.m;i++){int p=deformable_body_collection.dynamic_particles(i);
+        for(int i=0;i<deformable_body_collection.dynamic_particles.m;i++){int p=deformable_body_collection.dynamic_particles(i);
             particles.V(p)=B_full(p)+dt*particles.one_over_mass(p)*F_full(p);}}
 
     deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Velocities(); // TODO: MPI safe?
@@ -375,7 +375,7 @@ template<class TV> void DEFORMABLES_EVOLUTION<TV>::
 Update_Positions_And_Apply_Contact_Forces(const T dt,const T time,const bool use_saved_pairs)
 {
     Euler_Step_Position(dt,time);
-    for(int i=1;i<=rigid_geometry_collection.kinematic_rigid_geometry.m;i++){
+    for(int i=0;i<rigid_geometry_collection.kinematic_rigid_geometry.m;i++){
         RIGID_GEOMETRY<TV>& rigid_geometry=rigid_geometry_collection.Rigid_Geometry(rigid_geometry_collection.kinematic_rigid_geometry(i));
         rigid_geometry.Update_Bounding_Box();}
 
@@ -393,9 +393,9 @@ Update_Positions_And_Apply_Contact_Forces(const T dt,const T time,const bool use
 template<class TV> void DEFORMABLES_EVOLUTION<TV>::
 Update_Velocity_Using_Stored_Differences(const T dt,const T time)
 {
-    for(int i=1;i<=deformable_body_collection.simulated_particles.m;i++){int p=deformable_body_collection.simulated_particles(i);
+    for(int i=0;i<deformable_body_collection.simulated_particles.m;i++){int p=deformable_body_collection.simulated_particles(i);
         deformable_body_collection.particles.V(p)+=V_difference(p);}
-    for(int i=1;i<=rigid_geometry_collection.kinematic_rigid_geometry.m;i++){int p=rigid_geometry_collection.kinematic_rigid_geometry(i);
+    for(int i=0;i<rigid_geometry_collection.kinematic_rigid_geometry.m;i++){int p=rigid_geometry_collection.kinematic_rigid_geometry(i);
         kinematic_evolution.Set_External_Velocities(rigid_geometry_collection.particles.twist(p),time+dt,p);}
 }
 //#####################################################################
@@ -406,7 +406,7 @@ Compute_Momentum_Differences()
 {
     PARTICLES<TV>& particles=deformable_body_collection.particles;
     V_difference.Resize(particles.array_collection->Size());
-    for(int i=1;i<=deformable_body_collection.simulated_particles.m;i++){
+    for(int i=0;i<deformable_body_collection.simulated_particles.m;i++){
         int p=deformable_body_collection.simulated_particles(i);V_difference(p)=particles.V(p)-V_save(p);}
 }
 //#####################################################################
@@ -444,7 +444,7 @@ Exchange_Velocity()
     PARTICLES<TV>& particles=deformable_body_collection.particles;RIGID_GEOMETRY_PARTICLES<TV>& rigid_geometry_particles=rigid_geometry_collection.particles;
     V_save.Resize(particles.array_collection->Size(),false,false);
     rigid_velocity_save.Resize(rigid_geometry_particles.array_collection->Size(),false,false);
-    for(int i=1;i<=deformable_body_collection.simulated_particles.m;i++){int p=deformable_body_collection.simulated_particles(i);
+    for(int i=0;i<deformable_body_collection.simulated_particles.m;i++){int p=deformable_body_collection.simulated_particles(i);
         exchange(V_save(p),deformable_body_collection.particles.V(p));}
     for(int i=1;i<=rigid_geometry_particles.array_collection->Size();i++) if(rigid_geometry_collection.Is_Active(i)){
         exchange(rigid_velocity_save(i),rigid_geometry_particles.twist(i).linear);}

@@ -51,10 +51,10 @@ public:
 //#####################################################################
 void Adjust_Density_And_Temperature_With_Sources(const T time) PHYSBAM_OVERRIDE
 {
-    for(int i=1;i<=fluids_parameters.grid.m;i++)for(int j=1;j<=fluids_parameters.grid.n;j++)for(int ij=1;ij<=fluids_parameters.grid.mn;ij++)if(source_domain.Lazy_Inside(fluids_parameters.grid.X(i,j,ij))){
+    for(int i=0;i<fluids_parameters.grid.m;i++)for(int j=0;j<fluids_parameters.grid.n;j++)for(int ij=0;ij<fluids_parameters.grid.mn;ij++)if(source_domain.Lazy_Inside(fluids_parameters.grid.X(i,j,ij))){
         fluids_parameters.density_container.density_3d(i,j,ij)=rho;fluids_parameters.temperature_container.temperature_3d(i,j,ij)=fluids_parameters.temperature_products;}
     // keep density >= 0 and T >=0
-    for(int i=1;i<=fluids_parameters.grid.m;i++)for(int j=1;j<=fluids_parameters.grid.n;j++)for(int ij=1;ij<=fluids_parameters.grid.mn;ij++){
+    for(int i=0;i<fluids_parameters.grid.m;i++)for(int j=0;j<fluids_parameters.grid.n;j++)for(int ij=0;ij<fluids_parameters.grid.mn;ij++){
         fluids_parameters.density_container.density_3d(i,j,ij)=max((T)0,fluids_parameters.density_container.density_3d(i,j,ij));
         fluids_parameters.temperature_container.temperature_3d(i,j,ij)=max((T)fluids_parameters.temperature_container.ambient_temperature,fluids_parameters.temperature_container.temperature_3d(i,j,ij));}
 
@@ -64,11 +64,11 @@ void Adjust_Density_And_Temperature_With_Sources(const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 void Get_Source_Velocities(const T time) PHYSBAM_OVERRIDE
 {
-    for(int i=1;i<=fluids_parameters.u_grid.m;i++)for(int j=1;j<=fluids_parameters.u_grid.n;j++)for(int ij=1;ij<=fluids_parameters.u_grid.mn;ij++)
+    for(int i=0;i<fluids_parameters.u_grid.m;i++)for(int j=0;j<fluids_parameters.u_grid.n;j++)for(int ij=0;ij<fluids_parameters.u_grid.mn;ij++)
         if(source_domain.Lazy_Inside(fluids_parameters.u_grid.X(i,j,ij))) fluids_parameters.incompressible.projection.u(i,j,ij)=0;
-    for(int i=1;i<=fluids_parameters.v_grid.m;i++)for(int j=1;j<=fluids_parameters.v_grid.n;j++)for(int ij=1;ij<=fluids_parameters.v_grid.n;ij++)
+    for(int i=0;i<fluids_parameters.v_grid.m;i++)for(int j=0;j<fluids_parameters.v_grid.n;j++)for(int ij=0;ij<fluids_parameters.v_grid.n;ij++)
         if(source_domain.Lazy_Inside(fluids_parameters.v_grid.X(i,j,ij))){fluids_parameters.incompressible.projection.v(i,j,ij)=(T).5;fluids_parameters.incompressible.projection.elliptic_solver->psi_N_v(i,j,ij)=true;}
-    for(int i=1;i<=fluids_parameters.w_grid.m;i++)for(int j=1;j<=fluids_parameters.w_grid.n;j++)for(int ij=1;ij<=fluids_parameters.w_grid.mn;ij++)
+    for(int i=0;i<fluids_parameters.w_grid.m;i++)for(int j=0;j<fluids_parameters.w_grid.n;j++)for(int ij=0;ij<fluids_parameters.w_grid.mn;ij++)
         if(source_domain.Lazy_Inside(fluids_parameters.w_grid.X(i,j,ij))) fluids_parameters.incompressible.projection.w(i,j,ij)=0;
 }
 //#####################################################################
@@ -77,7 +77,7 @@ void Get_Source_Velocities(const T time) PHYSBAM_OVERRIDE
 void Get_Body_Force(ARRAY<VECTOR<T,3> ,VECTOR<int,3> >& force,const T dt,const T time) PHYSBAM_OVERRIDE
 {
     // control buoyancy force
-    for(int i=1;i<=fluids_parameters.grid.m;i++) for(int j=1;j<=fluids_parameters.grid.n;j++) for(int ij=1;ij<=fluids_parameters.grid.mn;ij++){ // y-direction forces only
+    for(int i=0;i<fluids_parameters.grid.m;i++) for(int j=0;j<fluids_parameters.grid.n;j++) for(int ij=0;ij<fluids_parameters.grid.mn;ij++){ // y-direction forces only
         T rho_atm=rho_bottom+(rho_top-rho_bottom)*(fluids_parameters.grid.y(j)-fluids_parameters.grid.ymin)/(fluids_parameters.grid.ymax-fluids_parameters.grid.ymin);
         if(fluids_parameters.grid.y(j)<=2)rho_atm=1;
         T den=fluids_parameters.density_container.density_3d(i,j,ij);

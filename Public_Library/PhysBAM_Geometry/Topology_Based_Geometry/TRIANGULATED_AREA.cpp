@@ -134,7 +134,7 @@ Check_Signed_Area_And_Make_Consistent(const int triangle,const bool verbose)
 template<class T> void TRIANGULATED_AREA<T>::
 Check_Signed_Areas_And_Make_Consistent(const bool verbose)
 {
-    for(int t=1;t<=mesh.elements.m;t++) Check_Signed_Area_And_Make_Consistent(t,verbose);
+    for(int t=0;t<mesh.elements.m;t++) Check_Signed_Area_And_Make_Consistent(t,verbose);
 }
 //#####################################################################
 // Function Initialize_Segmented_Curve
@@ -195,7 +195,7 @@ template<class T> T TRIANGULATED_AREA<T>::
 Minimum_Area(int* index) const
 {
     int k=0;T minimum=FLT_MAX;
-    for(int t=1;t<=mesh.elements.m;t++){
+    for(int t=0;t<mesh.elements.m;t++){
         int node1=mesh.elements(t)(1),node2=mesh.elements(t)(2),node3=mesh.elements(t)(3);
         T temp=TRIANGLE_2D<T>::Area(particles.X(node1),particles.X(node2),particles.X(node3));
         if(temp < minimum){minimum=temp;k=t;}}
@@ -209,7 +209,7 @@ template<class T> T TRIANGULATED_AREA<T>::
 Minimum_Signed_Area(int* index) const
 {
     int k=0;T minimum=FLT_MAX;
-    for(int t=1;t<=mesh.elements.m;t++){
+    for(int t=0;t<mesh.elements.m;t++){
         int node1=mesh.elements(t)(1),node2=mesh.elements(t)(2),node3=mesh.elements(t)(3);
         T temp=TRIANGLE_2D<T>::Signed_Area(particles.X(node1),particles.X(node2),particles.X(node3));
         if(temp < minimum){minimum=temp;k=t;}}
@@ -223,7 +223,7 @@ template<class T> T TRIANGULATED_AREA<T>::
 Total_Area() const
 {
     T area=0;
-    for(int t=1;t<=mesh.elements.m;t++){
+    for(int t=0;t<mesh.elements.m;t++){
         int node1=mesh.elements(t)(1),node2=mesh.elements(t)(2),node3=mesh.elements(t)(3);
         area+=TRIANGLE_2D<T>::Area(particles.X(node1),particles.X(node2),particles.X(node3));}
     return area;
@@ -235,7 +235,7 @@ template<class T> T TRIANGULATED_AREA<T>::
 Minimum_Altitude(int* index) const
 {
     int k=0;T minimum=FLT_MAX;
-    for(int t=1;t<=mesh.elements.m;t++){
+    for(int t=0;t<mesh.elements.m;t++){
         int node1=mesh.elements(t)(1),node2=mesh.elements(t)(2),node3=mesh.elements(t)(3);
         T temp=TRIANGLE_2D<T>::Minimum_Altitude(particles.X(node1),particles.X(node2),particles.X(node3));
         if(temp < minimum){minimum=temp;k=t;}}
@@ -249,7 +249,7 @@ template<class T> T TRIANGULATED_AREA<T>::
 Minimum_Edge_Length(int* index) const
 {
     int t_save=0;T minimum_squared=FLT_MAX;
-    for(int t=1;t<=mesh.elements.m;t++){int i,j,k;mesh.elements(t).Get(i,j,k);
+    for(int t=0;t<mesh.elements.m;t++){int i,j,k;mesh.elements(t).Get(i,j,k);
         T temp=TRIANGLE_2D<T>::Minimum_Edge_Length_Squared(particles.X(i),particles.X(j),particles.X(k));if(temp < minimum_squared){minimum_squared=temp;t_save=t;}}
     if(index) *index=t_save;
     return sqrt(minimum_squared);
@@ -261,7 +261,7 @@ template<class T> T TRIANGULATED_AREA<T>::
 Maximum_Edge_Length(int* index) const
 {
     int t_save=0;T maximum_squared=FLT_MAX;
-    for(int t=1;t<=mesh.elements.m;t++){int i,j,k;mesh.elements(t).Get(i,j,k);
+    for(int t=0;t<mesh.elements.m;t++){int i,j,k;mesh.elements(t).Get(i,j,k);
         T temp=TRIANGLE_2D<T>::Maximum_Edge_Length_Squared(particles.X(i),particles.X(j),particles.X(k));if(temp < maximum_squared){maximum_squared=temp;t_save=t;}}
     if(index) *index=t_save;
     return sqrt(maximum_squared);
@@ -273,7 +273,7 @@ template<class T> void TRIANGULATED_AREA<T>::
 Inverted_Triangles(ARRAY<int>& inverted_triangles) const
 {
     inverted_triangles.Resize(0);
-    for(int t=1;t<=mesh.elements.m;t++){
+    for(int t=0;t<mesh.elements.m;t++){
         int node1=mesh.elements(t)(1),node2=mesh.elements(t)(2),node3=mesh.elements(t)(3);
         if(TRIANGLE_2D<T>::Signed_Area(particles.X(node1),particles.X(node2),particles.X(node3)) < 0) inverted_triangles.Append(t);}
 }
@@ -384,8 +384,8 @@ template<class T> bool TRIANGULATED_AREA<T>::
 Fix_Pair_For_Delaunay(const int triangle1,const int triangle2)
 {
     VECTOR<int,3> &t1=mesh.elements(triangle1),&t2=mesh.elements(triangle2);
-    int a1i=0;for(int j=1;j<=3;j++) if(!t2.Contains(t1(j))) a1i=j;
-    int a2i=0;for(int j=1;j<=3;j++) if(!t1.Contains(t2(j))) a2i=j;
+    int a1i=0;for(int j=0;j<3;j++) if(!t2.Contains(t1(j))) a1i=j;
+    int a2i=0;for(int j=0;j<3;j++) if(!t1.Contains(t2(j))) a2i=j;
     int a1=t1(a1i),a2=t2(a2i),b1=t1(a1i>2?a1i-2:a1i+1),b2=t1(a1i>1?a1i-1:a1i+2);
 
     assert(TRIANGLE_2D<T>(particles.X.Subset(t1)).Check_Orientation() && TRIANGLE_2D<T>(particles.X.Subset(t2)).Check_Orientation());

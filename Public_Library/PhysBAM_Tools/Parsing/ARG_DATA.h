@@ -80,8 +80,8 @@ public:
     case OPTION:boolean_value=true;current_arg++;return true;
     case INTEGER:if(current_arg+1<argc){integer_value=atoi(argv[current_arg+1]);current_arg+=2;return true;}else return false;
     case DOUBLE:if(current_arg+1<argc){double_value=atof(argv[current_arg+1]);current_arg += 2;return true;}else return false;
-    case VECTOR2:if(current_arg+2<argc){for(int i=1;i<=2;i++)vector_2d_value[i]=atof(argv[current_arg+i]);current_arg+=3;return true;}else return false;
-    case VECTOR3:if(current_arg+3<argc){for(int i=1;i<=3;i++)vector_3d_value[i]=atof(argv[current_arg+i]);current_arg+=4;return true;}else return false;
+    case VECTOR2:if(current_arg+2<argc){for(int i=0;i<2;i++)vector_2d_value[i]=atof(argv[current_arg+i]);current_arg+=3;return true;}else return false;
+    case VECTOR3:if(current_arg+3<argc){for(int i=0;i<3;i++)vector_3d_value[i]=atof(argv[current_arg+i]);current_arg+=4;return true;}else return false;
     case STRING:if(current_arg+1<argc){string_value=argv[current_arg+1];current_arg+=2;return true;}else return false;}
     return false;}
 

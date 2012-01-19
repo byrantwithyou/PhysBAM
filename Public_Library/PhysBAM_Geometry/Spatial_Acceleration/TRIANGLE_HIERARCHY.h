@@ -64,28 +64,28 @@ public:
     {if(triangles_per_group){
         ARRAY<int> group_list;group_list.Preallocate(10);
         Intersection_List(root,point,group_list,thickness_over_two);
-        for(int i=1;i<=group_list.m;i++) intersection_list.Append_Elements(triangles_in_group(group_list(i)));}
+        for(int i=0;i<group_list.m;i++) intersection_list.Append_Elements(triangles_in_group(group_list(i)));}
     else Intersection_List(root,point,intersection_list,thickness_over_two);}
     
     void Intersection_List(const RANGE<TV>& test_box,ARRAY<int>& intersection_list,const T thickness_over_two=0) const PHYSBAM_OVERRIDE
     {if(triangles_per_group){
         ARRAY<int> group_list;group_list.Preallocate(10);
         Intersection_List(root,test_box,group_list,thickness_over_two);
-        for(int i=1;i<=group_list.m;i++) intersection_list.Append_Elements(triangles_in_group(group_list(i)));}
+        for(int i=0;i<group_list.m;i++) intersection_list.Append_Elements(triangles_in_group(group_list(i)));}
     else Intersection_List(root,test_box,intersection_list,thickness_over_two);}
         
     void Intersection_List(const ORIENTED_BOX<TV>& test_box,ARRAY<int>& intersection_list) const PHYSBAM_OVERRIDE
     {if(triangles_per_group){
         ARRAY<int> group_list;group_list.Preallocate(10);
         Intersection_List(root,test_box,group_list);
-        for(int i=1;i<=group_list.m;i++) intersection_list.Append_Elements(triangles_in_group(group_list(i)));}
+        for(int i=0;i<group_list.m;i++) intersection_list.Append_Elements(triangles_in_group(group_list(i)));}
     else Intersection_List(root,test_box,intersection_list);}
     
     void Intersection_List(const PLANE<T>& test_plane,ARRAY<int>& intersection_list,const T thickness_over_two=0) const PHYSBAM_OVERRIDE
     {if(triangles_per_group){
         ARRAY<int> group_list;group_list.Preallocate(10);
         Intersection_List(root,test_plane,group_list,thickness_over_two);
-        for(int i=1;i<=group_list.m;i++) intersection_list.Append_Elements(triangles_in_group(group_list(i)));}
+        for(int i=0;i<group_list.m;i++) intersection_list.Append_Elements(triangles_in_group(group_list(i)));}
     else Intersection_List(root,test_plane,intersection_list,thickness_over_two);}
 
     void Intersection_List(const IMPLICIT_OBJECT<VECTOR<T,3> >& implicit_surface,const MATRIX<T,3>& rotation,const VECTOR<T,3>& translation,ARRAY<int>& intersection_list,
@@ -93,7 +93,7 @@ public:
     {if(triangles_per_group){
         ARRAY<int> group_list;group_list.Preallocate(10);
         Intersection_List(root,implicit_surface,rotation,translation,group_list,contour_value);
-        for(int i=1;i<=group_list.m;i++) intersection_list.Append_Elements(triangles_in_group(group_list(i)));}
+        for(int i=0;i<group_list.m;i++) intersection_list.Append_Elements(triangles_in_group(group_list(i)));}
     else Intersection_List(root,implicit_surface,rotation,translation,intersection_list,contour_value);}
 
     void Calculate_Bounding_Boxes(ARRAY<RANGE<TV> >& bounding_boxes,ARRAY_VIEW<const TV> X)

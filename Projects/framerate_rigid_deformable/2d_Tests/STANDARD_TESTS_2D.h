@@ -191,7 +191,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-6;
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     // add forces
     switch(test_number){
@@ -369,7 +369,7 @@ void Spring_Mesh()
     SEGMENTED_CURVE<TV> *segmented_curve=SEGMENTED_CURVE<TV>::Create(particles);
     solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(segmented_curve);    
 
-    for(int i=1;i<=grid_m;i++) for(int j=1;j<=grid_n;j++){
+    for(int i=0;i<grid_m;i++) for(int j=0;j<grid_n;j++){
         particles.X((i-1)*grid_n+j)=TV(i-2,j-2);
         if(i<grid_m) segmented_curve->mesh.elements.Append(VECTOR<int,2>((i-1)*grid_n+j,i*grid_n+j));
         if(j<grid_n) segmented_curve->mesh.elements.Append(VECTOR<int,2>((i-1)*grid_n+j,(i-1)*grid_n+j+1));}
@@ -391,7 +391,7 @@ void Hanging_Cloth_Test()
     int i,j;
     i=1;j=n;particles.mass(i+m*(j-1))=FLT_MAX;i=m;j=n;particles.mass(i+m*(j-1))=FLT_MAX;
     T dx=side_length/(m-1),dy=aspect_ratio*side_length/(n-1);
-    for(int i=1;i<=m;i++) for(int j=1;j<=n;j++) particles.X(i+m*(j-1))=TV((i-1)*dx,(j-1)*dy);
+    for(int i=0;i<m;i++) for(int j=0;j<n;j++) particles.X(i+m*(j-1))=TV((i-1)*dx,(j-1)*dy);
     mesh.Initialize_Segment_Mesh();
 
     SEGMENTED_CURVE<TV> *segmented_curve=SEGMENTED_CURVE<TV>::Create(particles);

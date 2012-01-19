@@ -88,7 +88,7 @@ Compute_Mpi_Partition(MPI_PARTITION& mpi_partition,const SEGMENT_MESH& connectiv
     for(int j=1;j<=particles_of_partition(Partition()).m;j++){int p=particles_of_partition(Partition())(j);
         if(p<=deformable_body_collection->particles.array_collection->Size()){
             const ARRAY<int>& neighbor_particles=(*connectivity.neighbor_nodes)(p);
-            for(int i=1;i<=neighbor_particles.m;i++){int n=neighbor_particles(i);
+            for(int i=0;i<neighbor_particles.m;i++){int n=neighbor_particles(i);
                 PARTITION_ID np=partition_id_from_particle_index(n);
                 if(np==Partition()) continue;
                 if(pair_done.Set(PAIR<int,PARTITION_ID>(p,np)))
@@ -111,11 +111,11 @@ Exchange_Boundary_Data(ARRAY_VIEW<T_DATA> array,const MPI_PARTITION& mpi_partiti
     int tag=1;
     ARRAY<MPI_PACKAGE> packages;ARRAY<MPI::Request> requests;
     // send
-    for(int i=1;i<=mpi_partition.neighbor_partitions.m;i++){int neighbor_rank=Partition_To_Rank(mpi_partition.neighbor_partitions(i));
+    for(int i=0;i<mpi_partition.neighbor_partitions.m;i++){int neighbor_rank=Partition_To_Rank(mpi_partition.neighbor_partitions(i));
         MPI_PACKAGE package(array.Subset(mpi_partition.boundary_dynamic_particles(mpi_partition.neighbor_partitions(i))));
         packages.Append(package);requests.Append(package.Isend(*comm,neighbor_rank,tag));}
     // receive
-    for(int i=1;i<=mpi_partition.neighbor_partitions.m;i++){int neighbor_rank=Partition_To_Rank(mpi_partition.neighbor_partitions(i));
+    for(int i=0;i<mpi_partition.neighbor_partitions.m;i++){int neighbor_rank=Partition_To_Rank(mpi_partition.neighbor_partitions(i));
         MPI_PACKAGE package(array.Subset(mpi_partition.ghost_dynamic_particles(mpi_partition.neighbor_partitions(i))));
         packages.Append(package);requests.Append(package.Irecv(*comm,neighbor_rank,tag));}
     // finish
@@ -356,18 +356,18 @@ Gather_Helper(const ARRAY<MPI_PACKAGE*>& packages) const
     ARRAY<MPI_PACKAGE> union_packages;ARRAY<MPI::Request> requests;
     if(rank!=0){
         ARRAY<MPI_PACKAGE> packages_to_union;
-        for(int i=1;i<=packages.m;i++) packages_to_union.Append(packages(i)->Subset(particles_of_partition(Partition())));
+        for(int i=0;i<packages.m;i++) packages_to_union.Append(packages(i)->Subset(particles_of_partition(Partition())));
         union_packages.Append(MPI_PACKAGE::Union(packages_to_union));
         requests.Append(union_packages.Last().Isend(*comm,0,tag));
         MPI_PACKAGE::Free_All(packages_to_union);}
     else for(int other_rank=1;other_rank<number_of_ranks;other_rank++){
         ARRAY<MPI_PACKAGE> packages_to_union;
-        for(int i=1;i<=packages.m;i++) packages_to_union.Append(packages(i)->Subset(particles_of_partition(Rank_To_Partition(other_rank))));
+        for(int i=0;i<packages.m;i++) packages_to_union.Append(packages(i)->Subset(particles_of_partition(Rank_To_Partition(other_rank))));
         union_packages.Append(MPI_PACKAGE::Union(packages_to_union));
         requests.Append(union_packages.Last().Irecv(*comm,other_rank,tag));
         MPI_PACKAGE::Free_All(packages_to_union);}
     MPI_UTILITIES::Wait_All(requests);MPI_PACKAGE::Free_All(union_packages);
-    for(int i=1;i<=packages.m;i++){packages(i)->Free();delete packages(i);}
+    for(int i=0;i<packages.m;i++){packages(i)->Free();delete packages(i);}
 }
 //#####################################################################
 // Function Scatter_Helper
@@ -379,18 +379,18 @@ Scatter_Helper(const ARRAY<MPI_PACKAGE*>& packages) const
     ARRAY<MPI_PACKAGE> union_packages;ARRAY<MPI::Request> requests;
     if(rank!=0){
         ARRAY<MPI_PACKAGE> packages_to_union;
-        for(int i=1;i<=packages.m;i++) packages_to_union.Append(packages(i)->Subset(particles_of_partition(Partition())));
+        for(int i=0;i<packages.m;i++) packages_to_union.Append(packages(i)->Subset(particles_of_partition(Partition())));
         union_packages.Append(MPI_PACKAGE::Union(packages_to_union));
         requests.Append(union_packages.Last().Irecv(*comm,0,tag));
         MPI_PACKAGE::Free_All(packages_to_union);}
     else for(int other_rank=1;other_rank<number_of_ranks;other_rank++){
         ARRAY<MPI_PACKAGE> packages_to_union;
-        for(int i=1;i<=packages.m;i++) packages_to_union.Append(packages(i)->Subset(particles_of_partition(Rank_To_Partition(other_rank))));
+        for(int i=0;i<packages.m;i++) packages_to_union.Append(packages(i)->Subset(particles_of_partition(Rank_To_Partition(other_rank))));
         union_packages.Append(MPI_PACKAGE::Union(packages_to_union));
         requests.Append(union_packages.Last().Isend(*comm,other_rank,tag));
         MPI_PACKAGE::Free_All(packages_to_union);}
     MPI_UTILITIES::Wait_All(requests);MPI_PACKAGE::Free_All(union_packages);
-    for(int i=1;i<=packages.m;i++){packages(i)->Free();delete packages(i);}
+    for(int i=0;i<packages.m;i++){packages(i)->Free();delete packages(i);}
 }
 //#####################################################################
 // Function Broadcast_Helper
@@ -399,11 +399,11 @@ template<class TV> void MPI_SOLIDS<TV>::
 Broadcast_Helper(const ARRAY<MPI_PACKAGE*>& packages) const
 {
     ARRAY<MPI_PACKAGE> union_packages;ARRAY<MPI_PACKAGE> packages_to_union;
-    for(int i=1;i<=packages.m;i++) packages_to_union.Append(*packages(i));
+    for(int i=0;i<packages.m;i++) packages_to_union.Append(*packages(i));
     union_packages.Append(MPI_PACKAGE::Union(packages_to_union));
     union_packages(1).Broadcast(*comm);
     MPI_PACKAGE::Free_All(union_packages);
-    for(int i=1;i<=packages.m;i++){packages(i)->Free();delete packages(i);}
+    for(int i=0;i<packages.m;i++){packages(i)->Free();delete packages(i);}
 }
 //#####################################################################
 // Function Exchange_Helper
@@ -414,22 +414,22 @@ Exchange_Helper(const ARRAY<MPI_PACKAGE*>& packages,MPI_PARTITION& mpi_partition
     int tag=1;
     ARRAY<MPI_PACKAGE> union_packages;ARRAY<MPI::Request> requests;
     // send
-    for(int i=1;i<=mpi_partition.neighbor_partitions.m;i++){PARTITION_ID neighbor_partition=mpi_partition.neighbor_partitions(i);int neighbor_rank=Partition_To_Rank(neighbor_partition);
+    for(int i=0;i<mpi_partition.neighbor_partitions.m;i++){PARTITION_ID neighbor_partition=mpi_partition.neighbor_partitions(i);int neighbor_rank=Partition_To_Rank(neighbor_partition);
         ARRAY<MPI_PACKAGE> packages_to_union;
-        for(int j=1;j<=packages.m;j++) packages_to_union.Append(packages(j)->Subset(mpi_partition.boundary_dynamic_particles(neighbor_partition)));
+        for(int j=0;j<packages.m;j++) packages_to_union.Append(packages(j)->Subset(mpi_partition.boundary_dynamic_particles(neighbor_partition)));
         union_packages.Append(MPI_PACKAGE::Union(packages_to_union));
         requests.Append(union_packages.Last().Isend(*comm,neighbor_rank,tag));
         MPI_PACKAGE::Free_All(packages_to_union);}
     // receive
-    for(int i=1;i<=mpi_partition.neighbor_partitions.m;i++){PARTITION_ID neighbor_partition=mpi_partition.neighbor_partitions(i);int neighbor_rank=Partition_To_Rank(neighbor_partition);
+    for(int i=0;i<mpi_partition.neighbor_partitions.m;i++){PARTITION_ID neighbor_partition=mpi_partition.neighbor_partitions(i);int neighbor_rank=Partition_To_Rank(neighbor_partition);
         ARRAY<MPI_PACKAGE> packages_to_union;
-        for(int j=1;j<=packages.m;j++) packages_to_union.Append(packages(j)->Subset(mpi_partition.ghost_dynamic_particles(neighbor_partition)));
+        for(int j=0;j<packages.m;j++) packages_to_union.Append(packages(j)->Subset(mpi_partition.ghost_dynamic_particles(neighbor_partition)));
         union_packages.Append(MPI_PACKAGE::Union(packages_to_union));
         requests.Append(union_packages.Last().Irecv(*comm,neighbor_rank,tag));
         MPI_PACKAGE::Free_All(packages_to_union);}
     // finish
     MPI_UTILITIES::Wait_All(requests);MPI_PACKAGE::Free_All(union_packages);
-    for(int i=1;i<=packages.m;i++){packages(i)->Free();delete packages(i);}
+    for(int i=0;i<packages.m;i++){packages(i)->Free();delete packages(i);}
 }
 //#####################################################################
 // Function Reduce_Global
@@ -515,7 +515,7 @@ Debug_Reduce_Array_Sum(ARRAY_VIEW<const T_DATA> local_values) const // sends all
         comm->Gather(&local_count,1,MPI::INT,counts.Get_Array_Pointer(),1,MPI::INT,root);
         int total_count=0;
         ARRAY<int> displacements(counts.m,false);
-        for(int k=1;k<=counts.m;k++){
+        for(int k=0;k<counts.m;k++){
             displacements(k)=total_count;
             total_count+=counts(k);}
         ARRAY<T_DATA> global_values(total_count,false);
@@ -618,14 +618,14 @@ template<class TV,class T_ARRAY_PAIR> void Distribute_Repulsion_Pairs_Helper(con
         ARRAY<unsigned int> processor_masks(pairs.m,false);
         ARRAY<ARRAY<int>,PARTITION_ID> internal_pairs(mpi_solids.particles_of_partition.Size(),false);
         int boundary_count=0;
-        for(int i=1;i<=pairs.m;i++){const T_PAIR& pair=pairs(i);
+        for(int i=0;i<pairs.m;i++){const T_PAIR& pair=pairs(i);
             PROCESSOR_VECTOR processors(mpi_solids.partition_id_from_particle_index.Subset(pair.nodes));
             processor_masks(i)=0;for(int j=1;j<=processors.Size();j++) processor_masks(i)|=1<<(mpi_solids.Partition_To_Rank(processors[j]));
             if(!power_of_two(processor_masks(i))){union_find.Union(pair.nodes);boundary_count++;}else internal_pairs(processors[1]).Append(i);}
         // Build connected components
         ARRAY<ARRAY<int> > components;ARRAY<unsigned int> component_processors;
         ARRAY<int> particle_to_component(mpi_solids.partition_id_from_particle_index.m);
-        for(int i=1;i<=pairs.m;i++){const T_PAIR& pair=pairs(i);unsigned int processor_mask=processor_masks(i);
+        for(int i=0;i<pairs.m;i++){const T_PAIR& pair=pairs(i);unsigned int processor_mask=processor_masks(i);
             if(!power_of_two(processor_mask)){
                 int root=union_find.Find(pair.nodes[1]);
                 if(!particle_to_component(root)){particle_to_component(root)=components.Append(ARRAY<int>());component_processors.Append(0);}
@@ -636,14 +636,14 @@ template<class TV,class T_ARRAY_PAIR> void Distribute_Repulsion_Pairs_Helper(con
                 component_processors(component_id)|=processor_mask;}}
         // choose processors to dump on and make list of boundary pairs processed on each processor
         ARRAY<PARTITION_ID> component_processor(components.m,false);ARRAY<ARRAY<int>,PARTITION_ID> processor_pair_indices(mpi_solids.particles_of_partition.Size());
-        for(int i=1;i<=components.m;i++){
+        for(int i=0;i<components.m;i++){
             PARTITION_ID processor=mpi_solids.Rank_To_Partition(integer_log_exact(rightmost_bit(component_processors(i))));component_processor(i)=processor;
             processor_pair_indices(processor).Append_Elements(components(i));}
         // construct particle list to send
         ARRAY<ARRAY<ARRAY<int>,PARTITION_ID>,PARTITION_ID> send_matrix(mpi_solids.particles_of_partition.Size()),receive_matrix(mpi_solids.particles_of_partition.Size());
         for(PARTITION_ID i(1);i<=mpi_solids.particles_of_partition.Size();i++){
             send_matrix(i).Resize(mpi_solids.particles_of_partition.Size());receive_matrix(i).Resize(mpi_solids.particles_of_partition.Size());}
-        for(int p=1;p<=particle_to_component.m;p++){int component=particle_to_component(p);
+        for(int p=0;p<particle_to_component.m;p++){int component=particle_to_component(p);
             if(component){
                 PARTITION_ID source=mpi_solids.partition_id_from_particle_index(p),destination=component_processor(component);
                 if(source!=destination){send_matrix(source)(destination).Append(p);receive_matrix(destination)(source).Append(p);}}}

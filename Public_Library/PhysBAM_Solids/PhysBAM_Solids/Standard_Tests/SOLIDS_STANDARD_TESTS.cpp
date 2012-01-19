@@ -57,7 +57,7 @@ Bind_Unbound_Particles_In_Rigid_Body(RIGID_BODY<TV>& rigid_body,const T_ARRAY& p
     BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
     HASHTABLE<int> exempt_particles;
     ARRAY<int> binding_candidates;
-    for(int i=1;i<=binding_list.bindings.m;i++) if(!dynamic_cast<RIGID_BODY_BINDING<TV>*>(binding_list.bindings(i))) exempt_particles.Set_All(binding_list.bindings(i)->Parents());
+    for(int i=0;i<binding_list.bindings.m;i++) if(!dynamic_cast<RIGID_BODY_BINDING<TV>*>(binding_list.bindings(i))) exempt_particles.Set_All(binding_list.bindings(i)->Parents());
     for(int i=1;i<=particle_array.Size();i++) if(exempt_particles.Set(particle_array(i))) binding_candidates.Append(particle_array(i));  // Ignore duplicates
     Bind_Particles_In_Rigid_Body(rigid_body,binding_candidates);
 }
@@ -207,11 +207,11 @@ Create_Rigid_Body_From_Triangulated_Area(TRIANGULATED_AREA<T>& triangulated_area
     if(move_only_mesh_particles){
         // mark which nodes are used
         ARRAY<bool> node_is_used(triangulated_area.mesh.number_nodes);
-        for(int i=1;i<=triangulated_area.mesh.elements.m;i++){
+        for(int i=0;i<triangulated_area.mesh.elements.m;i++){
             int node1,node2,node3;triangulated_area.mesh.elements(i).Get(node1,node2,node3);
             node_is_used(node1)=node_is_used(node2)=node_is_used(node3)=true;}        
         // shift only used particles
-        for(int i=1;i<=triangulated_area.mesh.number_nodes;i++) if(node_is_used(i)) triangulated_area.particles.X(i)-=center_of_mass;}
+        for(int i=0;i<triangulated_area.mesh.number_nodes;i++) if(node_is_used(i)) triangulated_area.particles.X(i)-=center_of_mass;}
     else triangulated_area.particles.X-=center_of_mass;
 
     if(move_body_to_center_of_mass) rigid_body->Frame().t=center_of_mass;

@@ -167,7 +167,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     tests.Add_Ground();
 
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     // correct mass
     binding_list.Distribute_Mass_To_Parents();
@@ -175,9 +175,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     particles.Compute_Auxiliary_Attributes(soft_bindings);soft_bindings.Set_Mass_From_Effective_Mass();
 
     // disable strain rate CFL for all forces
-    for(int i=1;i<=solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->limit_time_step_by_strain_rate=false;
+    for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->limit_time_step_by_strain_rate=false;
 
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) if(!dynamic_cast<SEGMENTED_CURVE<TV>*>(deformable_body_collection.deformable_geometry.structures(i))){
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) if(!dynamic_cast<SEGMENTED_CURVE<TV>*>(deformable_body_collection.deformable_geometry.structures(i))){
         deformable_body_collection.collisions.collision_structures.Append(deformable_body_collection.deformable_geometry.structures(i));
         if(solids_parameters.triangle_collision_parameters.perform_self_collision && (!dynamic_cast<FREE_PARTICLES<TV>*>(deformable_body_collection.deformable_geometry.structures(i))))
             solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append(deformable_body_collection.deformable_geometry.structures(i));}
@@ -259,7 +259,7 @@ void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE
 
     // debugging output
     ARRAY<TV> spatial_fracture_bias_direction(fracture_object->embedded_object.simplicial_object.mesh.elements.m);
-    //for(int t=1;t<=spatial_fracture_bias_direction.m;t++) spatial_fracture_bias_direction(t)=solids_parameters.fracture_evolution->Spatial_Fracture_Bias_Direction(t,(T)1e-4);
+    //for(int t=0;t<spatial_fracture_bias_direction.m;t++) spatial_fracture_bias_direction(t)=solids_parameters.fracture_evolution->Spatial_Fracture_Bias_Direction(t,(T)1e-4);
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/fracture_bias_direction"+f,spatial_fracture_bias_direction);
 
     if(!fracture_object->embedded_object.embedded_subelements_in_parent_element) fracture_object->embedded_object.Initialize_Embedded_Subelements_In_Parent_Element();
@@ -272,7 +272,7 @@ void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE
     FINITE_VOLUME<TV,3>& finite_volume=solid_body_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
     ARRAY<VECTOR<T,2> > min_max_stress_eigenvalues(finite_volume.strain_measure.mesh_object.mesh.elements.m);
     ISOTROPIC_CONSTITUTIVE_MODEL<T,3>& isotropic_model=dynamic_cast<ISOTROPIC_CONSTITUTIVE_MODEL<T,3>&>(finite_volume.constitutive_model);
-    for(int t=1;t<=finite_volume.strain_measure.mesh_object.mesh.elements.m;t++){
+    for(int t=0;t<finite_volume.strain_measure.mesh_object.mesh.elements.m;t++){
         DIAGONAL_MATRIX<T,3> eigenvalues=isotropic_model.P_From_Strain(finite_volume.Fe_hat(t),(T)1,t); // scale for volume too?
         min_max_stress_eigenvalues(t)=VECTOR<T,2>(eigenvalues.Min(),eigenvalues.Max());}
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/min_max_stress_eigenvalue"+f,min_max_stress_eigenvalues);

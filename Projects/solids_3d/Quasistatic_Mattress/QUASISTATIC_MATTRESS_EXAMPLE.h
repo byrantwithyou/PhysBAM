@@ -114,14 +114,14 @@ void Get_Initial_Data()
 
     tetrahedralized_volume.Update_Bounding_Box();
     VECTOR<T,3> center(tetrahedralized_volume.bounding_box->Center());T bottom=tetrahedralized_volume.bounding_box->ymin;
-    for(int i=1;i<=tetrahedralized_volume.particles.array_size;i++){
+    for(int i=0;i<tetrahedralized_volume.particles.array_size;i++){
         tetrahedralized_volume.particles.X(i)=center+initial_orientation.Rotate(tetrahedralized_volume.particles.X(i)-center);
         tetrahedralized_volume.particles.X(i).y+=initial_height-bottom;}
 
     X_save.Resize(tetrahedralized_volume.particles.X.array.m);ARRAY<VECTOR<T,3> >::copy(tetrahedralized_volume.particles.X.array,X_save);
 
     int index=0;
-    for(int j=1;j<=n_input;j++)for(int k=1;k<=m_input;k++){
+    for(int j=0;j<n_input;j++)for(int k=0;k<m_input;k++){
         index++;end1_center_of_mass+=X_save(index);end2_center_of_mass+=X_save(X_save.m+1-index);}
     end1_center_of_mass=((T)1/(T)index)*end1_center_of_mass;end2_center_of_mass=((T)1/(T)index)*end2_center_of_mass;
 
@@ -139,7 +139,7 @@ void Set_External_Positions(ARRAY_VIEW<VECTOR<T,3> > X,const T time,const int id
 {
     switch(id_number){
     case 1:
-        for(int j=1,index=0;j<=n_input;j++)for(int k=1;k<=m_input;k++){
+        for(int j=1,index=0;j<=n_input;j++)for(int k=0;k<m_input;k++){
             index++;if(static_example){X(index)=X_save(index)+attachment_velocity;
             X(X.m+1-index)=X_save(X.m+1-index)-attachment_velocity;}
             else{
@@ -160,7 +160,7 @@ void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<VECTOR<T,3> > X,const T time,co
 {
     switch(id_number){
     case 1:
-        for(int j=1,index=0;j<=n_input;j++)for(int k=1;k<=m_input;k++){index++;X(index)=VECTOR<T,3>(0,0,0);X(X.m+1-index)=VECTOR<T,3>(0,0,0);}
+        for(int j=1,index=0;j<=n_input;j++)for(int k=0;k<m_input;k++){index++;X(index)=VECTOR<T,3>(0,0,0);X(X.m+1-index)=VECTOR<T,3>(0,0,0);}
         break;
     default:std::cout<<"Unrecognized deformable object id number"<<std::endl;exit(1);}
 }

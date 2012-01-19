@@ -61,7 +61,7 @@ Euler_Step_Position(const T dt,const T time)
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     MPI_SOLIDS<TV>* mpi_solids=solid_body_collection.deformable_body_collection.mpi_solids;
     deformable_body_collection.particles.Euler_Step_Position(deformable_body_collection.dynamic_particles,dt);
-    for(int i=1;i<=solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m;i++)
+    for(int i=0;i<solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m;i++)
         Euler_Step_Position(dt,time,solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles(i)); // TODO: avoid unnecessary Update_Angular_Velocity
     Set_External_Positions(deformable_body_collection.particles.X,time+dt);
     kinematic_evolution.Set_External_Positions(solid_body_collection.rigid_body_collection.rigid_body_particle.X,solid_body_collection.rigid_body_collection.rigid_body_particle.rotation,time+dt);
@@ -112,7 +112,7 @@ Restore_Position(ARRAY_VIEW<const TV> X,ARRAY_VIEW<const TV> rigid_X,ARRAY_VIEW<
     particles.X.Subset(simulated_particles)=X.Subset(simulated_particles);
     rigid_body_collection.rigid_body_particle.X.Subset(simulated_rigid_body_particles)=rigid_X.Subset(simulated_rigid_body_particles);
     rigid_body_collection.rigid_body_particle.rotation.Subset(simulated_rigid_body_particles)=rigid_rotation.Subset(simulated_rigid_body_particles);
-    for(int i=1;i<=simulated_rigid_body_particles.m;i++) rigid_body_collection.Rigid_Body(simulated_rigid_body_particles(i)).Update_Angular_Velocity();
+    for(int i=0;i<simulated_rigid_body_particles.m;i++) rigid_body_collection.Rigid_Body(simulated_rigid_body_particles(i)).Update_Angular_Velocity();
     for(int i=1;i<=rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if(rigid_body_collection.Is_Active(i)){RIGID_BODY<TV>& body=rigid_body_collection.Rigid_Body(i);
         if(!body.Is_Simulated()){rigid_body_collection.rigid_body_particle.X(i)=rigid_X(i);rigid_body_collection.rigid_body_particle.rotation(i)=rigid_rotation(i);body.Update_Angular_Velocity();}}
 }
@@ -355,7 +355,7 @@ Clamp_Velocities()
     const ARRAY<int>& dynamic_rigid_body_particles=solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles;
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particle;
     T max_linear_velocity_squared=sqr(solids_parameters.rigid_body_evolution_parameters.max_rigid_body_linear_velocity),max_angular_velocity_squared=sqr(solids_parameters.rigid_body_evolution_parameters.max_rigid_body_angular_velocity);
-    for(int i=1;i<=dynamic_rigid_body_particles.m;i++){int p=dynamic_rigid_body_particles(i);
+    for(int i=0;i<dynamic_rigid_body_particles.m;i++){int p=dynamic_rigid_body_particles(i);
         T magnitude_squared=rigid_body_particles.twist(p).linear.Magnitude_Squared();
         if(magnitude_squared>max_linear_velocity_squared) rigid_body_particles.twist(p).linear*=solids_parameters.rigid_body_evolution_parameters.max_rigid_body_linear_velocity/sqrt(magnitude_squared);
         magnitude_squared=rigid_body_particles.twist(p).angular.Magnitude_Squared();
@@ -371,7 +371,7 @@ Initialize_World_Space_Masses()
 {
     world_space_rigid_mass.Resize(solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size(),false,false);
     world_space_rigid_mass_inverse.Resize(solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size(),false,false);
-    for(int i=1;i<=solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m;i++){int p=solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles(i);
+    for(int i=0;i<solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m;i++){int p=solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles(i);
         world_space_rigid_mass(p)=solid_body_collection.rigid_body_collection.State(p).World_Space_Rigid_Mass(RIGID_BODY_MASS<TV>(solid_body_collection.rigid_body_collection.rigid_body_particle.mass(p),solid_body_collection.rigid_body_collection.rigid_body_particle.inertia_tensor(p)));
         world_space_rigid_mass_inverse(p)=solid_body_collection.rigid_body_collection.State(p).World_Space_Rigid_Mass_Inverse(RIGID_BODY_MASS<TV>(solid_body_collection.rigid_body_collection.rigid_body_particle.mass(p),solid_body_collection.rigid_body_collection.rigid_body_particle.inertia_tensor(p)));}
 }

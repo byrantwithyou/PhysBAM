@@ -32,10 +32,10 @@ Compute_Bounding_Boxes()
         std::cout<<"Compute Bounding Boxes..."<<std::endl;
         ARRAYS<VECTOR<bool,1> > initialized(0,0xffff,false);initialized.Fill(false);
         bounding_boxes.Resize(0,0xffff,false,false);bounding_boxes.Fill((RANGE<VECTOR<int,3> >(-1,-1,-1,-1,-1,-1)));
-        for(int j=1;j<=image_resolution.y;j++){ 
+        for(int j=0;j<image_resolution.y;j++){ 
             std::cout<<"Slice "<<j<<" of "<<image_resolution.y<<std::endl;
             Read_Slice(j);
-            for(int i=1;i<=image_resolution.x;i++) for(int ij=1;ij<=image_resolution.z;ij++){
+            for(int i=0;i<image_resolution.x;i++) for(int ij=0;ij<image_resolution.z;ij++){
                 if(initialized(image(i,ij))) bounding_boxes(image(i,ij)).Enlarge_To_Include_Point(VECTOR<int,3>(i,j,ij));
                 else{bounding_boxes(image(i,ij)).Reset_Bounds(VECTOR<int,3>(i,j,ij));initialized(image(i,ij))=true;}}}
         FILE_UTILITIES::Write_To_File<T>(data_directory+"tissue_bounding_boxes",bounding_boxes);}
@@ -47,7 +47,7 @@ template<class T> void VH_LEVELSET_BUILDER<T>::
 Create_Levelset_Interp(const ARRAY<int>& tissues,RANGE<VECTOR<int,3> >& box,VECTOR<int,3>& granularity,const std::string filename)
 {
     assert(tissues.m>0);
-    for(int t=1;t<=tissues.m;t++){
+    for(int t=0;t<tissues.m;t++){
         if(bounding_boxes(tissues(t)).min_corner.x==-1){std::cout<<"Fatal tissue "<<tissues(t)<<" has degenerate bounding box"<<std::endl;exit(1);}
         else std::cout<<"Tissue "<<t<<" is "<<labels(tissues(t))<<std::endl;}
     
@@ -78,7 +78,7 @@ Create_Levelset_Interp(const ARRAY<int>& tissues,RANGE<VECTOR<int,3> >& box,VECT
             phi_point.x=max((int)((count_index.x-image_index_offset.x)/scale.x),1);phi_point.y=max((int)((count_index.y-image_index_offset.y)/scale.y),1);phi_point.z=max((int)((count_index.z-image_index_offset.z)/scale.z),1);
             //Find Interp Value (Trilinear interpolation)
             image_start=image_x_next=image_y_next=image_z_next=image_xy_next=image_yz_next=image_xz_next=image_xyz_next=grid.min_dx_dy_dz;
-            for(int t=1;t<=tissues.m;t++){
+            for(int t=0;t<tissues.m;t++){
                 if(image(image_index.x,image_index.z)==tissues(t)) image_start=-grid.min_dx_dy_dz;
                 if(image(image_index_next.x,image_index.z)==tissues(t)) image_x_next=-grid.min_dx_dy_dz;
                 if(image(image_index.x,image_index_next.z)==tissues(t)) image_z_next=-grid.min_dx_dy_dz;
@@ -109,7 +109,7 @@ template<class T> void VH_LEVELSET_BUILDER<T>::
 Create_Levelset(const ARRAY<int>& tissues,RANGE<VECTOR<int,3> >& box,VECTOR<int,3>& granularity,const std::string filename)
 {
     assert(tissues.m>0);
-    for(int t=1;t<=tissues.m;t++){
+    for(int t=0;t<tissues.m;t++){
         if(bounding_boxes(tissues(t)).min_corner.x==-1){std::cout<<"Fatal tissue "<<tissues(t)<<" has degenerate bounding box"<<std::endl;exit(1);}
         else std::cout<<"Tissue "<<t<<" is "<<labels(tissues(t))<<std::endl;}
     
@@ -133,7 +133,7 @@ Create_Levelset(const ARRAY<int>& tissues,RANGE<VECTOR<int,3> >& box,VECTOR<int,
             phi_point.x=max((int)((image_index.x-image_index_offset.x)/scale.x),1);phi_point.y=max((int)((image_index.y-image_index_offset.y)/scale.y),1);phi_point.z=max((int)((image_index.z-image_index_offset.z)/scale.z),1);
             if(phi_point.z<=phi.mn_end&&phi_point.y<=phi.n_end&&phi_point.x<=phi.m_end)phi(phi_point)=grid.min_dx_dy_dz;
             if(image(image_index.x,image_index.z)==tissues(9179)&&image(image_index.x,image_index.z)==tissues(680)) continue;
-            for(int t=1;t<=tissues.m;t++) if(image(image_index.x,image_index.z)==tissues(t)){
+            for(int t=0;t<tissues.m;t++) if(image(image_index.x,image_index.z)==tissues(t)){
                 if(phi_point.z<=phi.mn_end&&phi_point.y<=phi.n_end&&phi_point.x<=phi.m_end) phi(phi_point)=-grid.min_dx_dy_dz;break;}}}
     Close_Boundaries();
     std::cout<<"Making signed distance.."<<std::endl;
@@ -228,7 +228,7 @@ Convert_To_Image(ARRAYS<VECTOR<VECTOR<T,3> ,2> >& float_image)
     static VECTOR<T,3> color_scale=VECTOR<T,3>(255,255,255)/maxes;
     static T color_map_factor=(T)1/(T)256;
 
-    for(int i=1;i<=float_image.m;i++) for(int j=1;j<=float_image.n;j++){
+    for(int i=0;i<float_image.m;i++) for(int j=0;j<float_image.n;j++){
         float_image(i,j)=color_map_factor*(color_scale*VECTOR<T,3>((image(i,j)&masks.x),(image(i,j)&masks.y)>>5,(image(i,j)&masks.z)>>11));
         float_image(i,j).x-=floor(float_image(i,j).x);float_image(i,j).y-=floor(float_image(i,j).y);float_image(i,j).z-=floor(float_image(i,j).z);}
 }
@@ -257,7 +257,7 @@ template<class T> RANGE<VECTOR<int,3> > VH_LEVELSET_BUILDER<T>::
 Get_Bounding_Box(const ARRAY<int>& tissues)
 {
     if (tissues.m>0){
-        for(int t=1;t<=tissues.m;t++){
+        for(int t=0;t<tissues.m;t++){
             if(bounding_boxes(tissues(t)).min_corner.x==-1){std::cout<<"Fatal tissue "<<tissues(t)<<" has degenerate bounding box"<<std::endl;exit(1);}}
         RANGE<VECTOR<int,3> > box=bounding_boxes(tissues(1));
         for(int t=2;t<=tissues.m;t++) box.Enlarge_To_Include_Box(bounding_boxes(tissues(t)));return box;}
@@ -269,7 +269,7 @@ Get_Bounding_Box(const ARRAY<int>& tissues)
 template<class T> int VH_LEVELSET_BUILDER<T>::
 Tissue_Index(std::string tissue_label)
 {
-    for(int i=1;i<=labels.m;i++) if(labels(i)==tissue_label) return i;
+    for(int i=0;i<labels.m;i++) if(labels(i)==tissue_label) return i;
     return 0;
 }
 //#####################################################################
@@ -289,7 +289,7 @@ Make_Sub_Data_Set(std::string output_directory,RANGE<VECTOR<int,3> > box)
     for(int slice=box.min_corner.y;slice<=box.max_corner.y;slice++){
         std::cout<<"Doing slice "<<slice<<" which will be new slice "<<sub_slice<<std::endl;
         Read_Slice(slice);
-        for(int i=1;i<=size.x;i++) for(int ij=1;ij<=size.z;ij++) sub_image(i,ij)=image(i+box.min_corner.x-1,ij+box.min_corner.z-1);
+        for(int i=0;i<size.x;i++) for(int ij=0;ij<size.z;ij++) sub_image(i,ij)=image(i+box.min_corner.x-1,ij+box.min_corner.z-1);
         FILE_UTILITIES::Write_To_File<T>(STRING_UTILITIES::string_sprintf("%s/slice%05d.img",output_directory.c_str(),sub_slice),sub_image);
         sub_slice++;}
 }

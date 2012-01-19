@@ -164,7 +164,7 @@ void Initialize_Bodies()
     PARTICLES<T,VECTOR_3D<T> >& particles=deformable_object->triangulated_surface->particles;
 #if 0
     MATRIX<T,4> rotation=MATRIX<T,4>::Rotation_Matrix_Z_Axis(-2*pi/3);
-    for(int i=1;i<=cloth_grid.m/2;i++) for(int j=1;j<=cloth_grid.n;j++){
+    for(int i=1;i<=cloth_grid.m/2;i++) for(int j=0;j<cloth_grid.n;j++){
         int node=i+cloth_grid.m*(j-1);particles.X(node)=rotation*particles.X(node);}
 #endif
     particles.X.array+=VECTOR_3D<T>(0,cloth_height,0);
@@ -178,7 +178,7 @@ void Initialize_Bodies()
     solids_parameters.collision_body_list.Add_Bodies(solids_parameters.rigid_body_parameters.list);
 
     BOX_2D<T> enslaved_square(-enslaved_square_size/2,enslaved_square_size/2,-enslaved_square_size/2,enslaved_square_size/2);
-    for(int i=1;i<=cloth_grid.m;i++) for(int j=1;j<=cloth_grid.n;j++){
+    for(int i=0;i<cloth_grid.m;i++) for(int j=0;j<cloth_grid.n;j++){
         if(enslaved_square.Lazy_Inside(cloth_grid.X(i,j))){
             int node=i+cloth_grid.m*(j-1);
             enslaved_nodes.Append(node);
@@ -207,7 +207,7 @@ int Add_Deformable_Object(const GRID<TV>& cloth_grid,const MATRIX<T,4>& transfor
 
     triangle_mesh.Initialize_Herring_Bone_Mesh(cloth_grid.m,cloth_grid.n);
     particles.array_collection->Add_Elements(triangle_mesh.number_nodes);
-    for(int i=1;i<=cloth_grid.m;i++) for(int j=1;j<=cloth_grid.n;j++){
+    for(int i=0;i<cloth_grid.m;i++) for(int j=0;j<cloth_grid.n;j++){
         int node=i+cloth_grid.m*(j-1);particles.X(node)=transform*VECTOR_3D<T>(cloth_grid.X(i,j));particles.V(node)=VECTOR_3D<T>();}
 
     return index;
@@ -226,8 +226,8 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY<VECTOR_3D<T> >& V,const T time)
 {
     PARTICLES<T,VECTOR_3D<T> >& particles=solids_parameters.deformable_body_parameters.list(1).triangulated_surface->particles;
 //    if(time<0)
-    {for(int i=1;i<=enslaved_nodes.m;i++) V(enslaved_nodes(i))=VECTOR_3D<T>();}
-//    else{for(int i=1;i<=enslaved_nodes.m;i++) V(enslaved_nodes(i))=VECTOR_3D<T>::Cross_Product(particles.X(enslaved_nodes(i)),VECTOR_3D<T>(0,1,0));}
+    {for(int i=0;i<enslaved_nodes.m;i++) V(enslaved_nodes(i))=VECTOR_3D<T>();}
+//    else{for(int i=0;i<enslaved_nodes.m;i++) V(enslaved_nodes(i))=VECTOR_3D<T>::Cross_Product(particles.X(enslaved_nodes(i)),VECTOR_3D<T>(0,1,0));}
 }
 //#####################################################################
 };

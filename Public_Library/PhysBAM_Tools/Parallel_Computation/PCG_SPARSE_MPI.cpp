@@ -46,7 +46,7 @@ Serial_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,VECTOR
             global_rows+=partition_array(p).Interior_Rows();
             global_entries+=partition_array(p).Interior_Entries(A_array(p));}
         for(int p=0;p<processors;p++){SPARSE_MATRIX_PARTITION& partition=partition_array(p);
-            for(int s=1;s<=partition.number_of_sides;s++)
+            for(int s=0;s<partition.number_of_sides;s++)
                 if(partition.neighbor_ranks(s)!=MPI::PROC_NULL) partition.neighbors(s)=&partition_array(partition.neighbor_ranks(s)+1);}
         // find global offsets
         SPARSE_MATRIX_FLAT_NXN<T> global_A;
@@ -74,7 +74,7 @@ Serial_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,VECTOR
         for(int p=0;p<processors;p++){
             SPARSE_MATRIX_PARTITION& partition=partition_array(p);
             for(int i=partition.interior_indices.min_corner;i<=partition.interior_indices.max_corner;i++) x_array(p)(i)=global_x(partition.Translate_Interior_Index(i));
-            for(int region=1;region<=partition.number_of_sides;region++){
+            for(int region=0;region<partition.number_of_sides;region++){
                 for(int i=partition.ghost_indices(region).min_corner;i<=partition.ghost_indices(region).max_corner;i++) x_array(p)(i)=global_x(partition.Translate_Ghost_Index(i,region));}}
         // send result pieces
         ARRAY<MPI::Request> requests;
@@ -244,7 +244,7 @@ Initialize_Datatypes()
 {
     MPI_UTILITIES::Free_Elements_And_Clean_Memory(boundary_datatypes);MPI_UTILITIES::Free_Elements_And_Clean_Memory(ghost_datatypes);
     boundary_datatypes.Resize(partition.number_of_sides);ghost_datatypes.Resize(partition.number_of_sides);
-    for(int s=1;s<=partition.number_of_sides;s++) if(partition.neighbor_ranks(s)!=MPI::PROC_NULL){
+    for(int s=0;s<partition.number_of_sides;s++) if(partition.neighbor_ranks(s)!=MPI::PROC_NULL){
         if(partition.boundary_indices(s).m){
             const ARRAY<int>& displacements=partition.boundary_indices(s);
             ARRAY<int> block_lengths(displacements.m,false);block_lengths.Fill(1);
@@ -266,12 +266,12 @@ Find_Ghost_Regions(SPARSE_MATRIX_FLAT_NXN<T>& A,const ARRAY<VECTOR<int,2> >& pro
     columns_to_send.Resize(proc_column_index_boundaries.m);
     VECTOR_ND<bool> column_needed(A.n);
     int row_index=A.offsets(1);
-    for(int row=1;row<=A.n;row++){ // First out which columns of A we actually have stuff in
+    for(int row=0;row<A.n;row++){ // First out which columns of A we actually have stuff in
         const int end=A.offsets(row+1);
         for(;row_index<end;row_index++){
             column_needed(A.A(row_index).j)=true;}}
     int my_rank=comm.Get_rank();ARRAY<int> temp_indices;temp_indices.Preallocate(proc_column_index_boundaries(1).y-proc_column_index_boundaries(1).x);
-    for(int node_rank=1;node_rank<=proc_column_index_boundaries.m;node_rank++){
+    for(int node_rank=0;node_rank<proc_column_index_boundaries.m;node_rank++){
         if(node_rank-1!=my_rank){
             temp_indices.Remove_All();
             for(int column_index=proc_column_index_boundaries(node_rank).x;column_index<=proc_column_index_boundaries(node_rank).y;column_index++)
@@ -282,7 +282,7 @@ Find_Ghost_Regions(SPARSE_MATRIX_FLAT_NXN<T>& A,const ARRAY<VECTOR<int,2> >& pro
     // Send this to each of the other procs
     ARRAY<ARRAY<char> > send_buffers(columns_to_send.m);ARRAY<MPI::Request> requests;
     int tag=1; // TODO change this to an actual tag value
-    for(int node_rank=1;node_rank<=columns_to_receive.m;node_rank++){
+    for(int node_rank=0;node_rank<columns_to_receive.m;node_rank++){
         if(node_rank-1!=my_rank){
             int buffer_size=1+MPI_UTILITIES::Pack_Size(columns_to_receive(node_rank),comm);
             send_buffers(node_rank).Resize(buffer_size);int position=0;
@@ -309,12 +309,12 @@ Find_Ghost_Regions_Threaded(SPARSE_MATRIX_FLAT_NXN<T>& A,const ARRAY<VECTOR<int,
     columns_to_send.Resize(proc_column_index_boundaries.m);
     VECTOR_ND<bool> column_needed(A.n);
     int row_index=A.offsets(1);
-    for(int row=1;row<=A.n;row++){ // First out which columns of A we actually have stuff in
+    for(int row=0;row<A.n;row++){ // First out which columns of A we actually have stuff in
         const int end=A.offsets(row+1);
         for(;row_index<end;row_index++){
             column_needed(A.A(row_index).j)=true;}}
     int my_rank=thread_grid->rank;ARRAY<int> temp_indices;temp_indices.Preallocate(proc_column_index_boundaries(1).y-proc_column_index_boundaries(1).x);
-    for(int node_rank=1;node_rank<=proc_column_index_boundaries.m;node_rank++){
+    for(int node_rank=0;node_rank<proc_column_index_boundaries.m;node_rank++){
         if(node_rank-1!=my_rank){
             temp_indices.Remove_All();
             for(int column_index=proc_column_index_boundaries(node_rank).x;column_index<=proc_column_index_boundaries(node_rank).y;column_index++)
@@ -322,7 +322,7 @@ Find_Ghost_Regions_Threaded(SPARSE_MATRIX_FLAT_NXN<T>& A,const ARRAY<VECTOR<int,
             temp_indices.Compact();
             columns_to_receive(node_rank)=temp_indices;}}
 
-    for(int node_rank=1;node_rank<=columns_to_receive.m;node_rank++){
+    for(int node_rank=0;node_rank<columns_to_receive.m;node_rank++){
         if(node_rank-1!=my_rank){
             int buffer_size=sizeof(int)+sizeof(T)*columns_to_receive(node_rank).m;
             THREAD_PACKAGE pack(buffer_size);int position=0;pack.send_tid=my_rank;pack.recv_tid=node_rank-1;
@@ -350,7 +350,7 @@ Fill_Ghost_Cells_Far(VECTOR_ND<T>& x)
     ARRAY<MPI_PACKAGE> packages;ARRAY<MPI::Request> requests;requests.Preallocate(2*columns_to_send.m);
     int my_rank=comm.Get_rank();int tag=1;
     // Send out the column values that we owe other people
-    for(int node_rank=1;node_rank<=columns_to_send.m;node_rank++){
+    for(int node_rank=0;node_rank<columns_to_send.m;node_rank++){
         if(node_rank-1!=my_rank){
             // First build the array of column values wanted
             ARRAY<T> send_array(columns_to_send(node_rank).m);
@@ -360,7 +360,7 @@ Fill_Ghost_Cells_Far(VECTOR_ND<T>& x)
             packages.Append(package);requests.Append(package.Isend(comm,node_rank-1,tag));}}
     // Receive the column values that others owe us
     ARRAY<ARRAY<T> > columns_to_receive_values(columns_to_receive.m);
-    for(int node_rank=1;node_rank<=columns_to_receive.m;node_rank++){
+    for(int node_rank=0;node_rank<columns_to_receive.m;node_rank++){
         if(node_rank-1!=my_rank){
             // First build the array of column values we will receive
             columns_to_receive_values(node_rank).Resize(columns_to_receive(node_rank).m);
@@ -369,7 +369,7 @@ Fill_Ghost_Cells_Far(VECTOR_ND<T>& x)
     MPI_UTILITIES::Wait_All(requests);MPI_PACKAGE::Free_All(packages);
 
     // For the ones we received, stick them into x
-    for(int node_rank=1;node_rank<=columns_to_receive.m;node_rank++){
+    for(int node_rank=0;node_rank<columns_to_receive.m;node_rank++){
         if(node_rank-1!=my_rank)
             for(int i=1;i<=columns_to_receive(node_rank).m;i++)
                 x(columns_to_receive(node_rank)(i))=columns_to_receive_values(node_rank)(i);}
@@ -382,7 +382,7 @@ Fill_Ghost_Cells_Threaded(VECTOR_ND<T>& x)
 {
     int my_rank=thread_grid->rank;
     // Send out the column values that we owe other people
-    for(int node_rank=1;node_rank<=columns_to_send.m;node_rank++){
+    for(int node_rank=0;node_rank<columns_to_send.m;node_rank++){
         if(node_rank-1!=my_rank){
             // First build the array of column values wanted
             THREAD_PACKAGE pack(columns_to_send(node_rank).m*sizeof(T));pack.send_tid=my_rank;pack.recv_tid=node_rank-1;int position=0;
@@ -402,7 +402,7 @@ Fill_Ghost_Cells_Threaded(VECTOR_ND<T>& x)
     pthread_barrier_wait(thread_grid->barr);
 
     // For the ones we received, stick them into x
-    for(int node_rank=1;node_rank<=columns_to_receive.m;node_rank++){
+    for(int node_rank=0;node_rank<columns_to_receive.m;node_rank++){
         if(node_rank-1!=my_rank)
             for(int i=1;i<=columns_to_receive(node_rank).m;i++)
                 x(columns_to_receive(node_rank)(i))=columns_to_receive_values(node_rank)(i);}

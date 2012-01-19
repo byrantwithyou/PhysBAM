@@ -38,7 +38,7 @@ Fill_Ghost_Cells(const T_GRID& grid,const T_ARRAYS_T2& u,T_ARRAYS_T2& u_ghost,co
 {
     T_ARRAYS_T2::Put(u,u_ghost); // interior
     ARRAY<RANGE<TV_INT> > regions;Find_Ghost_Regions(grid,regions,number_of_ghost_cells);
-    for(int axis=1;axis<=T_GRID::dimension;axis++)for(int axis_side=1;axis_side<=2;axis_side++){
+    for(int axis=1;axis<=T_GRID::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){
         int side=2*axis+axis_side-2,outward_sign=axis_side?-1:1;
         TV direction=outward_sign*TV::Axis_Vector(axis);
         T signed_dx=outward_sign*grid.DX()[axis];

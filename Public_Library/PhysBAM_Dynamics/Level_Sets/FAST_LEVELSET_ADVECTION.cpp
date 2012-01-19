@@ -296,7 +296,7 @@ Reinitialize(const int time_steps,const T time)
     rungekutta.Pseudo_Time();
     for(int k=0;k<time_steps;k++){
         rungekutta.Start(dt);
-        for(int kk=1;kk<=rungekutta.order;kk++){Euler_Step_Of_Reinitialization(signed_distance,sign_phi,dt,time);rungekutta.Main();}
+        for(int kk=0;kk<rungekutta.order;kk++){Euler_Step_Of_Reinitialization(signed_distance,sign_phi,dt,time);rungekutta.Main();}
         }
 
     T min_DX=grid.dX.Min();

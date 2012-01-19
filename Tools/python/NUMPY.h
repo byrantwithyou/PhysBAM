@@ -195,7 +195,7 @@ Numpy_Resize(const ARRAYS_ND_BASE<T,T_ARRAYS>& array,RAW_ARRAY<const npy_intp> d
     static const int dimension=T_ARRAYS::dimension;
     PHYSBAM_ASSERT(dimensions.Size()>=dimension);
     BOX<VECTOR<int,dimension> > indices;
-    for(int a=1;a<=dimension;a++){
+    for(int a=0;a<dimension;a++){
         indices.min_corner[a]=1;
         indices.max_corner[a]=dimensions(a);}
     array.Resize(indices,false,false);

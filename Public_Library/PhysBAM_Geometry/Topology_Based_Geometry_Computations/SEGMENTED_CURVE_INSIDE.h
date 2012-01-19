@@ -17,7 +17,7 @@ bool Inside_Any_Simplex(const SEGMENTED_CURVE<VECTOR<T,d> >& sc,const VECTOR<T,d
     typedef typename BASIC_GEOMETRY_POLICY<VECTOR<T,d> >::SEGMENT T_SEGMENT;
     assert(sc.hierarchy);assert(sc.segment_list);
     ARRAY<int> nearby_segments;sc.hierarchy->Intersection_List(location,nearby_segments,thickness_over_two);
-    for(int k=1;k<=nearby_segments.m;k++){
+    for(int k=0;k<nearby_segments.m;k++){
         T_SEGMENT& segment=(*sc.segment_list)(nearby_segments(k));
         if(segment.Inside(location,thickness_over_two)){segment_id=nearby_segments(k);return true;}}
     return false;

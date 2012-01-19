@@ -76,7 +76,7 @@ virtual void Get_Initial_Data()
     SEGMENTED_CURVE<TV>& segmented_curve=*SEGMENTED_CURVE<TV>::Create(particles);
 
     // add particles and set up segmented curve
-    for(int i=1;i<=20;i++){
+    for(int i=0;i<20;i++){
         particles.array_collection->Add_Element();
         particles.mass(i)=1;
         particles.X(i)=TV((T)i,initial_height,0);
@@ -84,7 +84,7 @@ virtual void Get_Initial_Data()
     deformable_body_collection.deformable_geometry.Add_Structure(&segmented_curve);
 
     // rigid bodies
-    for(int i=1;i<=3;i++){
+    for(int i=0;i<3;i++){
         solid_body_collection.rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies/subdivided_box",(T)1.0);
         rigid_body_collection.rigid_body_particle.X(i)=TV((T)5*i+(T).5,initial_height,0);
         rigid_body_collection.rigid_body_particle.rotation(i)=ROTATION<TV>::From_Rotation_Vector(TV());

@@ -386,7 +386,7 @@ Advance_Particles_With_PLS(T dt)
     LINEAR_INTERPOLATION_MAC<TV,T> interp(*example.fluids_parameters.grid);
     RUNGEKUTTA<ARRAY_VIEW<TV> >* rk=RUNGEKUTTA<ARRAY_VIEW<TV> >::Create(X,example.fluids_parameters.particle_levelset_evolution->runge_kutta_order_particles,dt,0);
     for(int k=1;k<=example.fluids_parameters.particle_levelset_evolution->runge_kutta_order_particles;k++){
-        for(int p=1;p<=X.m;p++) X(p)+=dt*interp.Clamped_To_Array(face_velocities,X(p));
+        for(int p=0;p<X.m;p++) X(p)+=dt*interp.Clamped_To_Array(face_velocities,X(p));
         rk->Main();}
     delete rk;
 }
@@ -484,7 +484,7 @@ Advect_Fluid(const T dt,const int substep)
         rk.Set_Order(example.convection_order);
         rk.Set_Time(time);
         rk.Start(dt);
-        for(int i=1;i<=rk.order;i++){
+        for(int i=0;i<rk.order;i++){
 //            Extrapolate_Velocity_Across_Interface(face_velocities,particle_levelset_evolution->Particle_Levelset(1).levelset,extrapolation_bandwidth);
             if(!example.two_phase)
                 incompressible->Extrapolate_Velocity_Across_Interface(example.fluid_collection.incompressible_fluid_collection.face_velocities,exchanged_phi_ghost,

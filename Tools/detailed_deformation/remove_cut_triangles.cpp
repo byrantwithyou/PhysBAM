@@ -56,17 +56,17 @@ int main(int argc,char *argv[])
     ARRAY<int> small_particles_inside;
 
     cout <<"Finding interior particles"<<endl;
-    for(int i=1;i<=big_particles.number;i++)
+    for(int i=0;i<big_particles.number;i++)
         if(box.Inside(big_particles.X(i)))big_particles_inside.Append(i);
-    for(int i=1;i<=small_particles.number;i++)
+    for(int i=0;i<small_particles.number;i++)
         if(box.Inside(small_particles.X(i)))small_particles_inside.Append(i);
     
     ARRAY<int> big_to_small(big_particles.number);
    
     cout <<"Finding nearest corresponding particle for each small particle..."<<endl; //This process should use sorting... 
-    for(int i=1;i<=small_particles_inside.m;i++){
+    for(int i=0;i<small_particles_inside.m;i++){
         int c_index=0;float c_dist=big_number;
-        for(int j=1;j<=big_particles_inside.m;j++){
+        for(int j=0;j<big_particles_inside.m;j++){
             float new_dist=(small_particles.X(small_particles_inside(i))-big_particles.X(big_particles_inside(j))).Magnitude();
             if(new_dist<c_dist&&big_to_small(big_particles_inside(j))==0){c_index=j; c_dist=new_dist;}}
         assert(c_index); big_to_small(big_particles_inside(c_index))=i;}
@@ -82,7 +82,7 @@ int main(int argc,char *argv[])
     big_surf.Discard_Valence_Zero_Particles_And_Renumber(condensation);
     cout<<"Condensing to "<<big_particles.number<<"..."<<endl;
     alt_vertex_colors.Resize(big_particles.number,true,true);
-    for(int i=1;i<=vertex_colors.m;i++)
+    for(int i=0;i<vertex_colors.m;i++)
         if(condensation(i)) alt_vertex_colors(condensation(i))=vertex_colors(i);
  
     big_mesh.Initialize_Adjacent_Triangles();
@@ -103,7 +103,7 @@ int main(int argc,char *argv[])
     big_surf.Discard_Valence_Zero_Particles_And_Renumber(condensation);
     cout<<"Condensing..."<<big_particles.number<<"..."<<endl;
     vertex_colors.Resize(big_particles.number,true,true);
-    for(int i=1;i<=alt_vertex_colors.m;i++)
+    for(int i=0;i<alt_vertex_colors.m;i++)
         if(condensation(i)) vertex_colors(condensation(i))=alt_vertex_colors(i);
 
     big_mesh.Initialize_Boundary_Mesh();

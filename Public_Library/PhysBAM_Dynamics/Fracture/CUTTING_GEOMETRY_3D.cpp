@@ -30,7 +30,7 @@ Split_Existing_Polygon_Edges()
         const ARRAY<int>& simplices=intersection_registry->simplices_on_intersection(new_intersection);if(!simplices.m) PHYSBAM_FATAL_ERROR("TODO: This should be impossible");
         HASHTABLE<VECTOR<int,2> > edges_seen;
         // loop over every pair of simplices
-        for(int j=1;j<=simplices.m;j++) for(int k=j+1;k<=simplices.m;k++){
+        for(int j=0;j<simplices.m;j++) for(int k=j+1;k<=simplices.m;k++){
             int simplex_1=simplices(j),simplex_2=simplices(k);
             // TODO: why quit if both are global cut faces
             if(cutting_simplices->simplices(simplex_1).type==T_CUTTING_SIMPLEX::GLOBAL_CUT_FACE
@@ -45,7 +45,7 @@ Split_Existing_Polygon_Edges()
                 intersection_registry->Get_Simplex_Weights_Of_Intersection(all_particles(2),simplex_1);
             int dominant_axis=delta_weights.Dominant_Axis();
             // find left and right particle that we wish to insert the new ith particle between
-            for(int p=1;p<=all_particles.m;p++) if(all_particles(p)<new_intersection){ // only consider particles that existed before or have already split polygon edges
+            for(int p=0;p<all_particles.m;p++) if(all_particles(p)<new_intersection){ // only consider particles that existed before or have already split polygon edges
                 const VECTOR<T,2>& particle_weights_on_simplex=intersection_registry->Get_Simplex_Weights_Of_Intersection(all_particles(p),simplex_1);
                 if(particle_weights_on_simplex[dominant_axis]<new_particle_weights_on_simplex[dominant_axis] && particle_weights_on_simplex[dominant_axis]>closest_left_val){
                     closest_particle_left=all_particles(p);closest_left_val=particle_weights_on_simplex[dominant_axis];}
@@ -76,7 +76,7 @@ Split_Existing_Polygons()
             Get_Unoriented_Segments_On_Two_Simplices(i,j,new_unoriented_segments_on_simplex);}
         // operate on each polygon on the simplex
         const ARRAY<int>& cutting_polygons_on_simplex=cutting_polygons_per_cutting_simplex(i);
-        for(int j=1;j<=cutting_polygons_on_simplex.m;j++){
+        for(int j=0;j<cutting_polygons_on_simplex.m;j++){
             int cutting_polygon_index=cutting_polygons_on_simplex(j);
             if(!new_unoriented_segments_on_simplex.m){
                 polygons_per_element(tet_owner).Append(cutting_polygon_index);}
@@ -96,7 +96,7 @@ Split_Existing_Polygons()
                     int polygon_element_index=polygon_mesh.elements.Append(final_polygon_element_particles(k));
                     int new_cutting_polygon_index=current_cutting_polygons.Append(CUTTING_POLYGON(polygon_element_index,i,cutting_polygon.flipped,cutting_polygon.polygon_type));
                     polygons_per_element(tet_owner).Append(new_cutting_polygon_index);}}}}
-    if(verbose){LOG::cout<<std::endl;for(int i=1;i<=current_cutting_polygons.m;i++)
+    if(verbose){LOG::cout<<std::endl;for(int i=0;i<current_cutting_polygons.m;i++)
         LOG::cout<<"Cutting polygon "<<i<<" has polygon element "
                  <<current_cutting_polygons(i).polygon_index<<": "<<polygon_mesh.elements(current_cutting_polygons(i).polygon_index)
                  <<std::endl;}
@@ -112,7 +112,7 @@ Get_Simplex_Weights_For_Edge_Triangle_Intersection(const VECTOR<int,3>& simplice
     robust_interactions.Triangle_Segment_Intersection_Weights(cutting_simplices->simplices(simplices(triangle_array_index)).weights,
         cutting_simplices->Weight_For_Nodes_In_Simplex(simplices(1==triangle_array_index?2:1),shared_edge),all_weights(triangle_array_index),segment_weight);
     
-    for(int i=1;i<=3;i++) if(i!= triangle_array_index){
+    for(int i=0;i<3;i++) if(i!= triangle_array_index){
         const VECTOR<int,3>& triangle_nodes=cutting_simplices->simplices(simplices(i)).nodes;
         int permutation=1;for(;permutation<=6;permutation++) if(permute_three(triangle_nodes,permutation).Remove_Index(3)==shared_edge) break;
         assert(permutation<=6);
@@ -125,7 +125,7 @@ template<class TV,int d_input> void CUTTING_GEOMETRY_3D<TV,d_input>::
 Intersect_Simplex_With_Old_Simplices_In_Embedding(const int tet,const int new_simplex)
 {
     ARRAY<int>& old_simplices=simplices_per_current_embedding_simplex(tet);
-    for(int i=1;i<=old_simplices.m;i++) for(int j=i+1;j<=old_simplices.m;j++){
+    for(int i=0;i<old_simplices.m;i++) for(int j=i+1;j<=old_simplices.m;j++){
         if(verbose) LOG::cout<<" Checking old simplices "<<old_simplices(i)<<" and "<<old_simplices(j)<<" with new simplex "<<new_simplex<<std::endl;
         VECTOR<int,3> simplices(old_simplices(i),old_simplices(j),new_simplex);
         bool converted;VECTOR<int,3> converted_simplices=cutting_simplices->Convert_Simplex_Indices_To_Global_Indices(simplices,converted);
@@ -141,14 +141,14 @@ Intersect_Simplex_With_Old_Simplices_In_Embedding(const int tet,const int new_si
         else if(points_all_shared.m==1){int shared_node=points_all_shared(1); // they all share 1 point
             VECTOR<VECTOR<T,2>,3> all_weights;
             assert(simplices==converted_simplices); // intersection point should be all internal to a tet, i.e. so all simplices are cutting simplices
-            for(int i=1;i<=3;i++) all_weights(i)=Get_Node_Weights_From_Face(shared_node,cutting_simplices->simplices(simplices(i)).nodes);
+            for(int i=0;i<3;i++) all_weights(i)=Get_Node_Weights_From_Face(shared_node,cutting_simplices->simplices(simplices(i)).nodes);
             // ensure intersection point is inside the tet
             const VECTOR<TV,3>& simplex_weights_wrt_tet=cutting_simplices->simplices(simplices(1)).weights;
             TV particle_weights_wrt_tet=all_weights(1)(1)*simplex_weights_wrt_tet(1)+all_weights(1)(2)*simplex_weights_wrt_tet(2)+
                 ((T)1-all_weights(1).Sum())*simplex_weights_wrt_tet(3);
             if(particle_weights_wrt_tet.Min()<0 || particle_weights_wrt_tet.Sum()>(T)1) goto NEXT_OLD_SIMPLEX;
             // it's not outside, so add it if it doesn't already exist (if it already exists, it must be a shared node on child simplices in this tet)
-            for(int i=1;i<=old_simplices.m;i++) if(cutting_simplices->simplices(old_simplices(i)).nodes.Contains(shared_node))
+            for(int i=0;i<old_simplices.m;i++) if(cutting_simplices->simplices(old_simplices(i)).nodes.Contains(shared_node))
                 for(int j=i+1;j<=old_simplices.m;j++) if(cutting_simplices->simplices(old_simplices(j)).nodes.Contains(shared_node))
                     for(int k=j+1;k<=old_simplices.m;k++) if(cutting_simplices->simplices(old_simplices(k)).nodes.Contains(shared_node)){
                         ARRAY<int> nodes_shared_on_triplet;
@@ -159,12 +159,12 @@ Intersect_Simplex_With_Old_Simplices_In_Embedding(const int tet,const int new_si
                         goto NEXT_OLD_SIMPLEX;}
             Register_Cut_Intersection(converted_simplices,all_weights,0);goto NEXT_OLD_SIMPLEX;}}
         // Case 2: new simplex shares an edge with (exactly) one of the old simplices
-        for(int i=1;i<=2;i++){
+        for(int i=0;i<2;i++){
             ARRAY<int> shared_nodes;cutting_simplices->Shared_Nodes_On_Simplices(VECTOR<int,2>(converted_simplices(i),converted_simplices(3)),shared_nodes);
             if(shared_nodes.m==2 && !cutting_simplices->Simplex_Is_Fake(converted_simplices(3-i))){ // the simplex intersecting the edge shouldn't be fake (2 edges never intersect)
                 VECTOR<int,2> shared_edge(shared_nodes(1),shared_nodes(2));
                 // Find if there is another set of simplices that shares the same edge. If there is an intersection, it already has it recorded, if not then no intersection exists.
-                for(int j=1;j<=old_simplices.m;j++) if(old_simplices(j)!=converted_simplices(3) && old_simplices(j)!=simplices(3)) // TODO: why could new simplex be in old simplices
+                for(int j=0;j<old_simplices.m;j++) if(old_simplices(j)!=converted_simplices(3) && old_simplices(j)!=simplices(3)) // TODO: why could new simplex be in old simplices
                     if(cutting_simplices->simplices(old_simplices(j)).nodes.Contains_All(shared_edge)){
                         for(int k=j+1;k<=old_simplices.m;k++) if(old_simplices(k)!=converted_simplices(3) && old_simplices(k)!=simplices(3)){
                             if(cutting_simplices->simplices(old_simplices(j)).nodes==cutting_simplices->simplices(old_simplices(k)).nodes) continue;
@@ -191,9 +191,9 @@ Intersect_Simplex_With_Old_Simplices_In_Embedding(const int tet,const int new_si
             // check through other pairs of simplices that share the same edge to see if it already exists
             if(intersection_registry->intersections_on_simplex.m>=converted_simplices(3)){ // TODO: why can this use intersections_on_simplex on the previous two don't?
                 const ARRAY<int>& intersections_on_new_simplex=intersection_registry->intersections_on_simplex(converted_simplices(3));
-                for(int i=1;i<=intersections_on_new_simplex.m;i++){int old_intersection=intersections_on_new_simplex(i);
+                for(int i=0;i<intersections_on_new_simplex.m;i++){int old_intersection=intersections_on_new_simplex(i);
                     const ARRAY<int>& simplices_on_old_intersection=intersection_registry->simplices_on_intersection(old_intersection);int count=0;
-                    for(int j=1;j<=simplices_on_old_intersection.m;j++){
+                    for(int j=0;j<simplices_on_old_intersection.m;j++){
                         const VECTOR<int,3>& simplex_nodes=cutting_simplices->simplices(simplices_on_old_intersection(j)).nodes;
                         if(simplex_nodes.Contains_All(shared_edge)) count++;
                         if(count>=2){
@@ -209,9 +209,9 @@ Intersect_Simplex_With_Old_Simplices_In_Embedding(const int tet,const int new_si
                 Register_Cut_Intersection(converted_simplices,all_weights,0);}
             goto NEXT_OLD_SIMPLEX;}}
         // Case 4: normal intersection
-        {for(int i=1;i<=3;i++) if(cutting_simplices->Simplex_Is_Fake(simplices(i))) return; // we know not all are fake from above, but if any are fake we cannot normal intersect
+        {for(int i=0;i<3;i++) if(cutting_simplices->Simplex_Is_Fake(simplices(i))) return; // we know not all are fake from above, but if any are fake we cannot normal intersect
         VECTOR<VECTOR<VECTOR<T,3>,3>,3> weights_for_simplices;
-        for(int i=1;i<=3;i++) weights_for_simplices[i]=cutting_simplices->simplices(simplices[i]).weights;
+        for(int i=0;i<3;i++) weights_for_simplices[i]=cutting_simplices->simplices(simplices[i]).weights;
         VECTOR<VECTOR<T,2>,3> all_weights;
         bool intersects=SIMPLEX_INTERACTIONS<T>::Three_Triangle_Intersection_Barycentric_Coordinates(weights_for_simplices[1],weights_for_simplices[2],weights_for_simplices[3],
             all_weights[1],all_weights[2],all_weights[3]);
@@ -229,7 +229,7 @@ Get_Unoriented_Segments_On_Two_Simplices(const int simplex_1,const int simplex_2
     if(particles.m<2) return;
     // sort the particles
     ARRAY<VECTOR<T,2> > particle_weights;
-    for(int k=1;k<=particles.m;k++) particle_weights.Append(intersection_registry->Get_Simplex_Weights_Of_Intersection(particles(k),simplex_1));
+    for(int k=0;k<particles.m;k++) particle_weights.Append(intersection_registry->Get_Simplex_Weights_Of_Intersection(particles(k),simplex_1));
     int dominant_axis=(particle_weights(2)-particle_weights(1)).Dominant_Axis();
     ARRAY<int> permutation(IDENTITY_ARRAY<>(particles.m));
     Sort(permutation,Indirect_Comparison(particle_weights.Project(dominant_axis)));
@@ -244,15 +244,15 @@ Divide_Polygon_Particles_With_New_Segments(ARRAY<VECTOR<int,2> >& all_segments,c
     const int cutting_simplex,const bool flipped,ARRAY<ARRAY<ARRAY<int > > >& final_polygon_element_particles) const
 {
     // TODO: Continue here
-    if(verbose){LOG::cout<<"All segments on simplex "<<cutting_simplex<<" before adding new: ";for(int j=1;j<=all_segments.m;j++) LOG::cout<<all_segments(j)<<"; ";LOG::cout<<std::endl;}
+    if(verbose){LOG::cout<<"All segments on simplex "<<cutting_simplex<<" before adding new: ";for(int j=0;j<all_segments.m;j++) LOG::cout<<all_segments(j)<<"; ";LOG::cout<<std::endl;}
     // choose subset of new segments to add to this polygon
     bool added_any=false;
-    for(int k=1;k<=possible_segments_to_add.m;k++){const VECTOR<int,2> possible_segment_to_add=possible_segments_to_add(k);
+    for(int k=0;k<possible_segments_to_add.m;k++){const VECTOR<int,2> possible_segment_to_add=possible_segments_to_add(k);
         if(all_segments.Contains(possible_segment_to_add) || all_segments.Contains(possible_segment_to_add.Reversed())) continue;
         if(Potential_Segment_Should_Be_Added_To_Polygon(polygon_particles,flipped,cutting_simplex,possible_segment_to_add)){
             added_any=true;all_segments.Append(possible_segment_to_add);
             all_segments.Append(possible_segment_to_add.Reversed());}}
-    if(verbose){LOG::cout<<"All segments on simplex "<<cutting_simplex<<" after adding new: ";for(int j=1;j<=all_segments.m;j++) LOG::cout<<all_segments(j)<<"; ";LOG::cout<<std::endl;}
+    if(verbose){LOG::cout<<"All segments on simplex "<<cutting_simplex<<" after adding new: ";for(int j=0;j<all_segments.m;j++) LOG::cout<<all_segments(j)<<"; ";LOG::cout<<std::endl;}
     if(!added_any) // do nothing if no segments were added
         final_polygon_element_particles.Append(polygon_particles);
     else{ // 2D region finding
@@ -270,14 +270,14 @@ Potential_Segment_Should_Be_Added_To_Polygon(const ARRAY<ARRAY<int > >& particle
 {
     // TODO: Continue here
     // check inside/outside rings
-    VECTOR<bool,2> nodes_on_boundary;for(int i=1;i<=2;i++) for(int j=1;j<=particles_for_polygon.m;j++) if(particles_for_polygon(j).Contains(nodes(i))) nodes_on_boundary[i]=true;
+    VECTOR<bool,2> nodes_on_boundary;for(int i=0;i<2;i++) for(int j=0;j<particles_for_polygon.m;j++) if(particles_for_polygon(j).Contains(nodes(i))) nodes_on_boundary[i]=true;
     if(nodes_on_boundary.Contains(false)){
-        for(int i=1;i<=2;i++) if(!nodes_on_boundary[i]) for(int j=1;j<=particles_for_polygon.m;j++)
+        for(int i=0;i<2;i++) if(!nodes_on_boundary[i]) for(int j=0;j<particles_for_polygon.m;j++)
             if((j==1)^Point_Is_Inside_Unoriented_Polygon(particles_for_polygon(j),simplex,nodes[i])) return false; // first loop is outer ring and others are negative holes
         return true;}
     else{
         // both endpoints of segment are on existing points, so operate on nodes[1] arbitrarily
-        for(int i=1;i<=particles_for_polygon.m;i++){const ARRAY<int>& particles=particles_for_polygon(i);
+        for(int i=0;i<particles_for_polygon.m;i++){const ARRAY<int>& particles=particles_for_polygon(i);
             if(int j=particles.Find(nodes[1])){ // TODO: this seems to be just a call to Point_Is_Inside_Unoriented_Polygon
                 int p1=particles(j-1<1?particles.m:j-1),p2=particles(j),p3=particles(j+1>particles.m?1:j+1);
                 VECTOR<T,2> X1=intersection_registry->Get_Simplex_Weights_Of_Intersection(p1,simplex),
@@ -297,7 +297,7 @@ template<class TV,int d_input> bool CUTTING_GEOMETRY_3D<TV,d_input>::
 Point_Is_Inside_Unoriented_Polygon(const ARRAY<int>& polygon_particles,const int simplex_owner,const int point) const
 {
     T sum=0;VECTOR<T,2> point_position=intersection_registry->Get_Simplex_Weights_Of_Intersection(point,simplex_owner);
-    for(int k=1;k<=polygon_particles.m;k++){
+    for(int k=0;k<polygon_particles.m;k++){
         int node_1=polygon_particles(k);int node_2=polygon_particles(k+1>polygon_particles.m?1:k+1);
         VECTOR<T,2> node_1_position=intersection_registry->Get_Simplex_Weights_Of_Intersection(node_1,simplex_owner);
         VECTOR<T,2> node_2_position=intersection_registry->Get_Simplex_Weights_Of_Intersection(node_2,simplex_owner);
@@ -321,7 +321,7 @@ Two_Dimensional_Region_Finding_On_Cutting_Simplex(const int cutting_simplex,cons
             int start=nodes[1];
             for(;;){
                 T min_angle=100;int next_segment=0;
-                for(int i=1;i<=segments.m;i++){VECTOR<int,2> next_nodes=segments(i);
+                for(int i=0;i<segments.m;i++){VECTOR<int,2> next_nodes=segments(i);
                     if(segments(i)[1]==nodes[2]){
                         T angle;
                         if(segments(i)[2]!=nodes[1]){
@@ -347,12 +347,12 @@ Two_Dimensional_Region_Finding_On_Cutting_Simplex(const int cutting_simplex,cons
     else{
         while(unused_segments.m){
             int starting_index=0;
-            for(int j=1;j<=unused_segments.m;j++){
+            for(int j=0;j<unused_segments.m;j++){
                 if(!unused_segments.Contains(unused_segments(j).Reversed())){
-                    int count=0;for(int k=1;k<=unused_segments.m;k++) if(unused_segments(k)[2]==unused_segments(j)[1]) count++;
+                    int count=0;for(int k=0;k<unused_segments.m;k++) if(unused_segments(k)[2]==unused_segments(j)[1]) count++;
                     if(count<=1){starting_index=j;break;}}}
-            if(!starting_index) for(int j=1;j<=unused_segments.m;j++){
-                int count=0;for(int k=1;k<=unused_segments.m;k++) if(unused_segments(k)[2]==unused_segments(j)[1]) count++;
+            if(!starting_index) for(int j=0;j<unused_segments.m;j++){
+                int count=0;for(int k=0;k<unused_segments.m;k++) if(unused_segments(k)[2]==unused_segments(j)[1]) count++;
                 if(count<=1){starting_index=j;break;}}
             if(!starting_index) starting_index=1;
             ARRAY<VECTOR<int,2> > segments_for_this_fragment;segments_for_this_fragment.Append(unused_segments(starting_index));
@@ -362,7 +362,7 @@ Two_Dimensional_Region_Finding_On_Cutting_Simplex(const int cutting_simplex,cons
                 const VECTOR<int,2> seg_to_examine=segments_for_this_fragment.Last();
                 // best segment going the right way
                 T min_value_found_correct=1e2;int next_seg_in_whole_list_correct=0;
-                for(int i=1;i<=segments.m;i++) if(segments(i)[1]==seg_to_examine[2]){T angle=0;
+                for(int i=0;i<segments.m;i++) if(segments(i)[1]==seg_to_examine[2]){T angle=0;
                     if(segments(i)[2]!=seg_to_examine[1]){
                         VECTOR<T,2> cus1=intersection_registry->Get_Simplex_Weights_Of_Intersection(seg_to_examine[1],cutting_simplex);
                         VECTOR<T,2> cus2=intersection_registry->Get_Simplex_Weights_Of_Intersection(seg_to_examine[2],cutting_simplex);
@@ -377,7 +377,7 @@ Two_Dimensional_Region_Finding_On_Cutting_Simplex(const int cutting_simplex,cons
                     if(angle<min_value_found_correct){min_value_found_correct=angle;next_seg_in_whole_list_correct=i;}}
                 // best segment going the wrong way
                 T min_value_found_reversed=1e2;int next_seg_in_whole_list_reversed=0;
-                for(int i=1;i<=segments.m;i++) if(segments(i)[2]==seg_to_examine[2]){T angle=0;
+                for(int i=0;i<segments.m;i++) if(segments(i)[2]==seg_to_examine[2]){T angle=0;
                     if(segments(i)[1]!=seg_to_examine[1]){
                         VECTOR<T,2> cus1=intersection_registry->Get_Simplex_Weights_Of_Intersection(seg_to_examine[1],cutting_simplex);
                         VECTOR<T,2> cus2=intersection_registry->Get_Simplex_Weights_Of_Intersection(seg_to_examine[2],cutting_simplex);
@@ -424,7 +424,7 @@ Inside_Outside_Determination_For_Unconnected_Polygonal_Regions(const int simplex
     // get all inside/outside flags
     DIRECTED_GRAPH<int> in_out_graph(unconnected_polygonal_regions.m); // TODO: possibly rename graph to reflect correct direction
     bool something_is_contained=false;
-    for(int i=1;i<=unconnected_polygonal_regions.m;i++) for(int j=1;j<=unconnected_polygonal_regions.m;j++) if(i!=j){
+    for(int i=0;i<unconnected_polygonal_regions.m;i++) for(int j=0;j<unconnected_polygonal_regions.m;j++) if(i!=j){
         int particle=0;
         for(int a=1;a<=unconnected_polygonal_regions(i).m;a++){
             int p=unconnected_polygonal_regions(i)(a)[1];bool ok=true;
@@ -437,7 +437,7 @@ Inside_Outside_Determination_For_Unconnected_Polygonal_Regions(const int simplex
                 if(verbose) PHYSBAM_DEBUG_PRINT("Adding j,i",particles_on_j_segments,simplex,particle,j,i);
                 in_out_graph.Add_Edge(j,i);something_is_contained=true;}}}
     if(!something_is_contained) // nothing is inside anything else...
-        for(int i=1;i<=unconnected_polygonal_regions.m;i++){
+        for(int i=0;i<unconnected_polygonal_regions.m;i++){
             ARRAY<int> particles(unconnected_polygonal_regions(i).Project(1)); // if nothing is contained, it's a closed region
             if(particles.m<3) PHYSBAM_FATAL_ERROR("degenerate polygons should always be contained in other ones");
             final_polygon_element_particles.Append(ARRAY<ARRAY<int> >());
@@ -448,7 +448,7 @@ Inside_Outside_Determination_For_Unconnected_Polygonal_Regions(const int simplex
         ARRAY<bool> unjoined_region_has_no_area(unconnected_polygonal_regions.m);
         ARRAY<int> regions_in_order;
         {ARRAY<int> finish_times;in_out_graph.Topological_Sort_Assuming_Cycle_Free(finish_times,regions_in_order);}
-        for(int i=1;i<=unconnected_polygonal_regions.m;i++){
+        for(int i=0;i<unconnected_polygonal_regions.m;i++){
             if(unconnected_polygonal_regions(i).m==2) continue; // degenerate polygons are always negatively oriented, and have no area (TODO: set has_no_area?)
             // determine if region has no area
             bool all_segments_appear_both_ways=true;
@@ -489,7 +489,7 @@ Inside_Outside_Determination_For_Unconnected_Polygonal_Regions(const int simplex
 template<class TV,int d_input> void CUTTING_GEOMETRY_3D<TV,d_input>::
 Draw_Polygon(const int simplex,const bool flipped,const ARRAY<ARRAY<VECTOR<int,2> > >& unconnected_polygonal_regions) const
 {
-    for(int i=1;i<=unconnected_polygonal_regions.m;i++){
+    for(int i=0;i<unconnected_polygonal_regions.m;i++){
         T hsb=(T)(.3*(i%10)/9);
         LOG::cout<<"% Run "<<i<<std::endl;
         LOG::cout<<" newpath "<<std::endl;

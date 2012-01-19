@@ -178,7 +178,7 @@ void Initialize_Euler_State() PHYSBAM_OVERRIDE
 
     //initialize grid variables
     //1 == density, 2 == momentum, 3 == total energy
-    for(int i=1;i<=grid.counts.x;i++){
+    for(int i=0;i<grid.counts.x;i++){
         if(state_in_conserved_variabbles){
             T rho=0.,rhou=0.,E=0.;
             if(grid.Axis_X(i,1) <= middle_state_start_point){rho=state_conserved_left(1);rhou=state_conserved_left(2);E=state_conserved_left(3);}

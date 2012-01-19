@@ -22,11 +22,11 @@ Compute_Material_Tets_In_Embedding_Tets(const TETRAHEDRALIZED_VOLUME<T>& materia
     ARRAY<TETRAHEDRON<T> >& embedding_tetrahedron_list=*embedding_tetrahedralized_volume.tetrahedron_list;
 
     material_tets_in_embedding_tets.Exact_Resize(embedding_tetrahedron_list.m);
-    for(int et=1;et<=embedding_tetrahedron_list.m;et++){
+    for(int et=0;et<embedding_tetrahedron_list.m;et++){
         TETRAHEDRON<T> embedding_tet=embedding_tetrahedron_list(et).Thickened(thickness_over_two);
         ARRAY<int> intersection_list;
         material_tetrahedron_hierarchy.Intersection_List(embedding_tet.Bounding_Box(),intersection_list);
-        for(int i=1;i<=intersection_list.m;i++){
+        for(int i=0;i<intersection_list.m;i++){
             TETRAHEDRON<T>& material_tet=material_tetrahedron_list(intersection_list(i));
             if(SIMPLEX_INTERACTIONS<T>::Tetrahedron_Tetrahedron_Intersection(embedding_tet.x1,embedding_tet.x2,embedding_tet.x3,embedding_tet.x4,material_tet.x1,material_tet.x2,material_tet.x3,material_tet.x4))
                 material_tets_in_embedding_tets(et).Append(intersection_list(i));}
@@ -42,10 +42,10 @@ Extend_Material_Tets_In_Embedding_Tets(const TETRAHEDRALIZED_VOLUME<T>& material
     ARRAY<ARRAY<int> >& neighbor_tetrahedrons=*tetrahedron_mesh.neighbor_tetrahedrons;
     OPERATION_HASH tet_present;tet_present.Initialize(tetrahedron_mesh.tetrahedrons.m);
 
-    for(int et=1;et<=material_tets_in_embedding_tets.m;et++){
+    for(int et=0;et<material_tets_in_embedding_tets.m;et++){
         int initial_material_tet_intersections=material_tets_in_embedding_tets(et).m;
-        for(int i=1;i<=initial_material_tet_intersections;i++)tet_present.Mark(material_tets_in_embedding_tets(et)(i));
-        for(int i=1;i<=initial_material_tet_intersections;i++){
+        for(int i=0;i<initial_material_tet_intersections;i++)tet_present.Mark(material_tets_in_embedding_tets(et)(i));
+        for(int i=0;i<initial_material_tet_intersections;i++){
             int mt=material_tets_in_embedding_tets(et)(i);
             for(int j=1;j<=neighbor_tetrahedrons(mt).m;j++){
                 int nmt=neighbor_tetrahedrons(mt)(j);
@@ -64,10 +64,10 @@ Propagate_Material_To_Empty_Embedding_Tets(const TETRAHEDRALIZED_VOLUME<T>& embe
 
     for(int sweep=1;;sweep++){
         ARRAY<int> empty_tets;
-        for(int et=1;et<=material_tets_in_embedding_tets.m;et++)if(material_tets_in_embedding_tets(et).m)tet_occupied.Mark(et);else empty_tets.Append(et);
+        for(int et=0;et<material_tets_in_embedding_tets.m;et++)if(material_tets_in_embedding_tets(et).m)tet_occupied.Mark(et);else empty_tets.Append(et);
         if(verbose)std::cout<<"Sweep "<<sweep<<" : "<<empty_tets.m<<" empty tets found"<<std::endl;
         if(!empty_tets.m)break;
-        for(int i=1;i<=empty_tets.m;i++){
+        for(int i=0;i<empty_tets.m;i++){
             int et=empty_tets(i);
             for(int j=1;j<=adjacent_tetrahedrons(et).m;j++){
                 int aet=adjacent_tetrahedrons(et)(j);
@@ -86,9 +86,9 @@ Compute_Connected_Components_And_Split(const TETRAHEDRALIZED_VOLUME<T>& material
     int original_embedding_tets=material_tets_in_embedding_tets.m,split_embedding_tets=0;
 
     split_embedding_tets_in_parent_embedding_tets.Resize(original_embedding_tets);material_tets_in_split_embedding_tets.Resize(0);
-    for(int et=1;et<=original_embedding_tets;et++){
+    for(int et=0;et<original_embedding_tets;et++){
         ARRAY<int> unassigned_material_tets=material_tets_in_embedding_tets(et);
-        for(int i=1;i<=unassigned_material_tets.m;i++)tet_present.Mark(unassigned_material_tets(i));
+        for(int i=0;i<unassigned_material_tets.m;i++)tet_present.Mark(unassigned_material_tets(i));
         while(unassigned_material_tets.m){
             // Create new connected component
             split_embedding_tets_in_parent_embedding_tets(et).Append(++split_embedding_tets);
@@ -99,7 +99,7 @@ Compute_Connected_Components_And_Split(const TETRAHEDRALIZED_VOLUME<T>& material
             tet_present.Unmark(unassigned_material_tets(1));
             unassigned_material_tets.Remove_Index_Lazy(1);
             // Sweep component, adding neighbors as necessary
-            for(int i=1;i<=current_component.m;i++){
+            for(int i=0;i<current_component.m;i++){
                 int mt=current_component(i);
                 for(int j=1;j<=neighbor_tetrahedrons(mt).m;j++){
                     int nmt=neighbor_tetrahedrons(mt)(j);
@@ -194,10 +194,10 @@ Merge_Contiguous_Split_Embedding_Tetrahedra(const TETRAHEDRALIZED_VOLUME<T>& mat
 void Print_Histogram(const ARRAY<ARRAY<int> >& data)
 {
     int max_size=0;
-    for(int i=1;i<=data.m;i++)if(data(i).m>max_size)max_size=data(i).m;
+    for(int i=0;i<data.m;i++)if(data(i).m>max_size)max_size=data(i).m;
     ARRAYS<VECTOR<int,1> > histogram(0,max_size);
     for(int i=0;i<=max_size;i++)histogram(i)=0;
-    for(int i=1;i<=data.m;i++)histogram(data(i).m)++;
+    for(int i=0;i<data.m;i++)histogram(data(i).m)++;
     for(int i=0;i<=max_size;i++)std::cout<<i<<" : "<<histogram(i)<<std::endl;
 }
 

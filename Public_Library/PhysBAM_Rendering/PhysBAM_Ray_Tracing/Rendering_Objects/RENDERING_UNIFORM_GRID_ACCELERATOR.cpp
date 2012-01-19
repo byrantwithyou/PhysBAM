@@ -17,7 +17,7 @@ public:
     
     bool Callback(RAY<VECTOR<T,3> >& ray,const ARRAY<RENDERING_OBJECT_ACCELERATION_PRIMITIVE<T>*>& primitives,const T cell_t_max)
     {const RENDERING_OBJECT<T>* closest_object=0;
-    for(int primitive_id=1;primitive_id<=primitives.m;primitive_id++){
+    for(int primitive_id=0;primitive_id<primitives.m;primitive_id++){
         RENDERING_OBJECT_ACCELERATION_PRIMITIVE<T>& primitive=*primitives(primitive_id);
         if(primitive.operation==rendering_uniform_accelerator->operation){ // already have done this intersection
             if(primitive.hit_aggregate_id!=-1&&primitive.hit_t<=cell_t_max&&primitive.hit_t<=working_ray.t_max){

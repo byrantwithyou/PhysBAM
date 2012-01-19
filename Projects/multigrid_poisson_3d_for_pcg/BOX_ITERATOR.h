@@ -87,7 +87,7 @@ public:
 	assert(side<=2*d);
 	TV_INT min_corner=box.min_corner+1;
 	TV_INT max_corner=box.max_corner-1;
-	for(int v=1;v<=d;v++){
+	for(int v=0;v<d;v++){
 	    min_corner(v)=box.min_corner(v);
 	    max_corner(v)=box.min_corner(v);
 	    regions[(v-1)*2]=RANGE<TV_INT>(min_corner,max_corner);

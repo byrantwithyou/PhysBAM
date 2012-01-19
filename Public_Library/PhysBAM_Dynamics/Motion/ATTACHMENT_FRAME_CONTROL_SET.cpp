@@ -130,8 +130,8 @@ Position_Derivative(ARRAY<TV>& dXdl,const int control_id) const
     else translation_differential[control_id-9]=(T)1;
     affine_differential_transformed=affine_differential*cranium_transform.affine_transform.Inverse();
     translation_differential_transformed=translation_differential-affine_differential_transformed*cranium_transform.translation;
-    for(int i=1;i<=dXdl.m;i++) dXdl(i)=affine_differential_transformed*X(i)+translation_differential_transformed;
-    for(int i=1;i<=attached_nodes.m;i++) for(int j=1;j<=attached_nodes(i).m;j++)
+    for(int i=0;i<dXdl.m;i++) dXdl(i)=affine_differential_transformed*X(i)+translation_differential_transformed;
+    for(int i=0;i<attached_nodes.m;i++) for(int j=1;j<=attached_nodes(i).m;j++)
         if(i==jaw_attachment_index) affine_differential*(jaw_transform.affine_transform*X_save(attached_nodes(i)(j))+jaw_transform.translation)+translation_differential;
         else dXdl(attached_nodes(i)(j))=affine_differential*X_save(attached_nodes(i)(j))+translation_differential;
 }
@@ -142,7 +142,7 @@ template<class T> void ATTACHMENT_FRAME_CONTROL_SET<T>::
 Set_Attachment_Positions(ARRAY<TV>&X) const
 {
     QUASI_RIGID_TRANSFORM_3D<T> jaw_transform_composite=QUASI_RIGID_TRANSFORM_3D<T>::Composite_Transform(cranium_transform,jaw_transform);
-    for(int i=1;i<=attached_nodes.m;i++) for(int j=1;j<=attached_nodes(i).m;j++)
+    for(int i=0;i<attached_nodes.m;i++) for(int j=1;j<=attached_nodes(i).m;j++)
         if(i==jaw_attachment_index) X(attached_nodes(i)(j))=jaw_transform_composite.affine_transform*X_save(attached_nodes(i)(j))+jaw_transform_composite.translation;
         else X(attached_nodes(i)(j))=cranium_transform.affine_transform*X_save(attached_nodes(i)(j))+cranium_transform.translation;
 }
@@ -162,7 +162,7 @@ template<class T> void ATTACHMENT_FRAME_CONTROL_SET<T>::
 Kinematically_Update_Positions(ARRAY<TV>&X) const
 {
     QUASI_RIGID_TRANSFORM_3D<T> cranium_transform_incremental=QUASI_RIGID_TRANSFORM_3D<T>::Incremental_Transform(cranium_transform,cranium_transform_save);
-    for(int i=1;i<=X.m;i++) X(i)=cranium_transform_incremental.affine_transform*X(i)+cranium_transform_incremental.translation;
+    for(int i=0;i<X.m;i++) X(i)=cranium_transform_incremental.affine_transform*X(i)+cranium_transform_incremental.translation;
 }
 //#####################################################################
 // Function Kinematically_Update_Jacobian
@@ -171,7 +171,7 @@ template<class T> void ATTACHMENT_FRAME_CONTROL_SET<T>::
 Kinematically_Update_Jacobian(ARRAY<TV>&dX) const
 {
     QUASI_RIGID_TRANSFORM_3D<T> cranium_transform_incremental=QUASI_RIGID_TRANSFORM_3D<T>::Incremental_Transform(cranium_transform,cranium_transform_save);
-    for(int i=1;i<=X.m;i++) dX(i)=cranium_transform_incremental.affine_transform*dX(i);
+    for(int i=0;i<X.m;i++) dX(i)=cranium_transform_incremental.affine_transform*dX(i);
 }
 //#####################################################################
 // Function Penalty

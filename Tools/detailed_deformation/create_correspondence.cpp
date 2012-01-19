@@ -69,7 +69,7 @@ int main(int argc,char *argv[])
     tet_vol.triangulated_surface->avoid_normal_interpolation_across_sharp_edges=false;
 
     int one_hundredth=tri_particles.number/100;
-    for(int p=1;p<=tri_particles.number;p++){
+    for(int p=0;p<tri_particles.number;p++){
         VECTOR_3D<float> proj=tet_vol.triangulated_surface->Oriented_Surface(tri_particles.X(p),(*tri_surf.vertex_normals)(1,p),(float)0.001,(float)0.001,&nearest_triangle,0);
         int i,j,k;tet_vol.triangulated_surface->triangle_mesh.triangles.Get(nearest_triangle,i,j,k);ARRAY<int> tets_on_face;tet_vol.tetrahedron_mesh.Tetrahedrons_On_Face(i,j,k,&tets_on_face);
         offset_particles(p).x=tets_on_face(1);offset_particles(p).y=(*tet_vol.tetrahedron_list)(tets_on_face(1)).Barycentric_Coordinates(tri_particles.X(p));

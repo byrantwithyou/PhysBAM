@@ -52,7 +52,7 @@ public:
     {RENDERING_RAY<T> dummy_root;
     ARRAY<typename FILM<T>::SAMPLE> samples;
     world.camera.film.Generate_Samples(box,world.camera,samples);
-    for(int i=1;i<=samples.m;i++){
+    for(int i=0;i<samples.m;i++){
         typename FILM<T>::SAMPLE& sample=samples(i);
         RENDERING_RAY<T> ray(RAY<VECTOR<T,3> >(world.camera.position,sample.world_position-world.camera.position),1,world.Point_Inside_Object(world.camera.position));
         dummy_root.recursion_depth=0;dummy_root.current_object=world.ether;
@@ -95,7 +95,7 @@ Render(const RANGE<VECTOR<int,2> >& pixels, PROGRESS_INDICATOR &progress)
         VECTOR<int,2> lower_corner=VECTOR<int,2>(box_x*box_size.x,box_y*box_size.y)+pixels.min_corner;
         camera.film.Generate_Samples(RANGE<VECTOR<int,2> >(lower_corner,lower_corner+box_size),camera,samples);
         progress.Progress();
-        for(int i=1;i<=samples.m;i++){
+        for(int i=0;i<samples.m;i++){
             typename FILM<T>::SAMPLE& sample=samples(i);
             RENDERING_RAY<T> ray(RAY<VECTOR<T,3> >(camera.position,sample.world_position-camera.position),1,Point_Inside_Object(camera.position));
             dummy_root.recursion_depth=0;dummy_root.current_object=ether;
@@ -114,7 +114,7 @@ Render_Pixel(const VECTOR<int,2>& pixel_index,RAY_TRACER_DEBUG_DATA<T>* debug_da
     //if(use_adaptive_supersampling) return Compute_Adaptive_Pixel_Color(camera.Pixel_Center(i,j),camera.film->grid.dx,camera.film->grid.dy,0,TV(),TV(),-1,debug_data);
     ARRAY<typename FILM<T>::SAMPLE> samples;
     camera.film.Generate_Stratified_Sample_Points(pixel_index,camera,samples);
-    for(int i=1;i<=samples.m;i++){
+    for(int i=0;i<samples.m;i++){
         typename FILM<T>::SAMPLE& sample=samples(i);
         RENDERING_RAY<T> ray(RAY<VECTOR<T,3> >(camera.position,sample.world_position-camera.position),1,Point_Inside_Object(camera.position));
         dummy_root.recursion_depth=0;dummy_root.current_object=ether;
@@ -144,7 +144,7 @@ Compute_Adaptive_Pixel_Color(const TV& center,const T dx,const T dy,const int re
     positions(5)=center;
 
     ARRAY<TV > colors(5);
-    for(int i=1;i<=5;i++){
+    for(int i=0;i<5;i++){
         if(i==precomputed_index){colors(i)=precomputed_color_one;continue;}
         if(i==5-precomputed_index){colors(i)=precomputed_color_two;continue;}
         RENDERING_RAY<T> rendering_ray(RAY<VECTOR<T,3> >(camera.position,positions(i)-camera.position),1,Point_Inside_Object(camera.position));
@@ -154,7 +154,7 @@ Compute_Adaptive_Pixel_Color(const TV& center,const T dx,const T dy,const int re
     if(recursion_depth==adaptive_supersampling_depth_limit)
         return (T)0.125*colors(1)+(T)0.125*colors(2)+(T)0.125*colors(3)+(T)0.125*colors(4)+(T)0.5*colors(5);
 
-    for(int i=1;i<=4;i++)
+    for(int i=0;i<4;i++)
         if((colors(i)-colors(5)).Magnitude()<adaptive_supersampling_tolerance) colors(i)=(T)0.5*colors(i)+(T)0.5*colors(5);
         else colors(i)=Compute_Adaptive_Pixel_Color((T)0.5*(positions(i)+positions(5)),dx_2,dy_2,recursion_depth+1,colors(i),colors(5),i,debug_data);
 
@@ -168,7 +168,7 @@ template<class T> RENDERING_OBJECT<T>* RENDER_WORLD<T>::
 Closest_Intersection(RENDERING_RAY<T>& ray,const int lowest_priority)
 {
     const RENDERING_OBJECT<T>* closest_object=0;
-    for(int i=1;i<=standard_objects.m;i++)standard_objects(i)->Intersection(ray.ray,lowest_priority,&closest_object);
+    for(int i=0;i<standard_objects.m;i++)standard_objects(i)->Intersection(ray.ray,lowest_priority,&closest_object);
     return (RENDERING_OBJECT<T>*)closest_object;
 }
 //#####################################################################
@@ -273,7 +273,7 @@ Cast_Photon(RENDERING_RAY<T>& incoming_ray,const RENDERING_RAY<T>& parent_ray,co
         if(object && (working_ray.ray.Point(working_ray.ray.t_max)-working_ray.ray.endpoint).Magnitude()<=fixed_step_size) break;
 
         scattering_medium_object=0;
-        for(int i=1;i<=volumetric_objects.m;i++)
+        for(int i=0;i<volumetric_objects.m;i++)
             if(volumetric_objects(i)->volumetric_shader->supports_photon_mapping&&volumetric_objects(i)->Inside(working_ray.ray.endpoint))
                 scattering_medium_object=volumetric_objects(i);
         if(scattering_medium_object){
@@ -282,7 +282,7 @@ Cast_Photon(RENDERING_RAY<T>& incoming_ray,const RENDERING_RAY<T>& parent_ray,co
             if(!continue_scattering)return;}
         else{
             // not initially in a scattering medium, test if we hit it before object intersection
-            for(int i=1;i<=volumetric_objects.m;i++)
+            for(int i=0;i<volumetric_objects.m;i++)
                 if(volumetric_objects(i)->volumetric_shader->supports_photon_mapping&&volumetric_objects(i)->Intersection(working_ray.ray))
                     scattering_medium_object=volumetric_objects(i);
             if(scattering_medium_object){
@@ -313,7 +313,7 @@ template<class T> VECTOR<T,3> RENDER_WORLD<T>::
 Attenuate_Ray(RENDERING_RAY<T>& ray,const TV& color)
 {
     TV attenuated_color=color;
-    for(int i=1;i<=volumetric_objects.m;i++)
+    for(int i=0;i<volumetric_objects.m;i++)
         if(volumetric_objects(i)->priority>=ray.current_object->priority)
             attenuated_color=volumetric_objects(i)->volumetric_shader->Attenuate_Color(ray,*volumetric_objects(i),attenuated_color);
     return attenuated_color;
@@ -325,7 +325,7 @@ template<class T> VECTOR<T,3> RENDER_WORLD<T>::
 Attenuate_Light_Ray(RENDERING_RAY<T>& ray,const RENDERING_LIGHT<T>& light,const TV& color)
 {
     TV attenuated_light_color=color;
-    for(int i=1;i<=volumetric_objects.m;i++) 
+    for(int i=0;i<volumetric_objects.m;i++) 
         if(volumetric_objects(i)->priority>=ray.current_object->priority)
             attenuated_light_color=volumetric_objects(i)->volumetric_shader->Attenuate_Light(ray,*volumetric_objects(i),light,attenuated_light_color);
     return attenuated_light_color;
@@ -338,7 +338,7 @@ Attenuate_Photon(RENDERING_RAY<T>& ray,const TV& photon_power,bool& should_throw
 {
     TV attenuated_photon_power=photon_power;
     should_throw=false;
-    for(int i=1;i<=volumetric_objects.m;i++)
+    for(int i=0;i<volumetric_objects.m;i++)
         if(volumetric_objects(i)->priority>=ray.current_object->priority){
             attenuated_photon_power=volumetric_objects(i)->volumetric_shader->Attenuate_Photon(ray,*volumetric_objects(i),attenuated_photon_power,should_throw);
             if(should_throw) break;
@@ -351,13 +351,13 @@ Attenuate_Photon(RENDERING_RAY<T>& ray,const TV& photon_power,bool& should_throw
 template<class T> void RENDER_WORLD<T>::
 Prepare_For_Forward_Ray_Trace()
 {
-    for(int i=1;i<=standard_objects.m;i++)standard_objects(i)->Preprocess_Efficiency_Structures(*this);
-    for(int i=1;i<=volumetric_objects.m;i++)volumetric_objects(i)->Preprocess_Efficiency_Structures(*this);
+    for(int i=0;i<standard_objects.m;i++)standard_objects(i)->Preprocess_Efficiency_Structures(*this);
+    for(int i=0;i<volumetric_objects.m;i++)volumetric_objects(i)->Preprocess_Efficiency_Structures(*this);
 
     if(use_photon_mapping){ // TODO: adjust photons per light based on individual light power
         // count photon mapped lights
         int global_photon_emitting_lights=0,caustic_photon_emitting_lights=0,volume_photon_emitting_lights=0;
-        for(int i=1;i<=lights.m;i++){if(lights(i)->supports_global_photon_mapping)global_photon_emitting_lights++;if(lights(i)->supports_caustic_photon_mapping)caustic_photon_emitting_lights++;
+        for(int i=0;i<lights.m;i++){if(lights(i)->supports_global_photon_mapping)global_photon_emitting_lights++;if(lights(i)->supports_caustic_photon_mapping)caustic_photon_emitting_lights++;
             if(lights(i)->supports_volume_photon_mapping)volume_photon_emitting_lights++;}
         int global_photons_per_light=global_photon_emitting_lights?global_photon_map.Max_Number_Of_Photons()/global_photon_emitting_lights:0;
         int global_photons_remainder=global_photon_emitting_lights?global_photon_map.Max_Number_Of_Photons()%global_photon_emitting_lights:0;
@@ -370,7 +370,7 @@ Prepare_For_Forward_Ray_Trace()
         {LOG::SCOPE scope("shooting photons","Shooting Photons...%d global %d caustic %d volume\n",global_photon_map.Max_Number_Of_Photons(),caustic_photon_map.Max_Number_Of_Photons(),
             volume_photon_map.Max_Number_Of_Photons());
         RENDERING_RAY<T> dummy_ray;dummy_ray.current_object=ether;dummy_ray.recursion_depth=0;
-        for(int i=1;i<=lights.m;i++){
+        for(int i=0;i<lights.m;i++){
             LOG::SCOPE scope("light","light %d",i);
             if(lights(i)->supports_global_photon_mapping){
                 LOG::Time("global photons");

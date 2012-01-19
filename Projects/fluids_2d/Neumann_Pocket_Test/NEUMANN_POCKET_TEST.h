@@ -51,10 +51,10 @@ public:
 //#####################################################################
 void Adjust_Density_And_Temperature_With_Sources(const T time)
 {
-    for(int i=1;i<=grid.m;i++)for(int j=1;j<=grid.n;j++)if(source_domain.Lazy_Inside(grid.X(i,j))){
+    for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++)if(source_domain.Lazy_Inside(grid.X(i,j))){
         density_container.density_2d(i,j)=rho;temperature_container.temperature_2d(i,j)=temperature_products;}
     // keep density >= 0 and T >=0
-    for(int i=1;i<=grid.m;i++)for(int j=1;j<=grid.n;j++){
+    for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++){
         density_container.density_2d(i,j)=max((T)0,density_container.density_2d(i,j));
         temperature_container.temperature_2d(i,j)=max((T)temperature_container.ambient_temperature,temperature_container.temperature_2d(i,j));}
 }
@@ -64,8 +64,8 @@ void Adjust_Density_And_Temperature_With_Sources(const T time)
 void Get_Source_Velocities(ARRAY<bool,VECTOR<int,2> >& psi_N_u,ARRAY<bool,VECTOR<int,2> >& psi_N_v,ARRAY<T,VECTOR<int,2> >& u_fixed,ARRAY<T,VECTOR<int,2> >& v_fixed,const T time)
 {
 #if 0
-    for(int i=1;i<=u_grid.m;i++)for(int j=1;j<=u_grid.n;j++)if(source_domain.Lazy_Inside(u_grid.X(i,j)))u_fixed(i,j)=0;
-    for(int i=1;i<=v_grid.m;i++)for(int j=1;j<=v_grid.n;j++)if(source_domain.Lazy_Inside(v_grid.X(i,j))){v_fixed(i,j)=(T).5;psi_N_v(i,j)=true;}
+    for(int i=0;i<u_grid.m;i++)for(int j=0;j<u_grid.n;j++)if(source_domain.Lazy_Inside(u_grid.X(i,j)))u_fixed(i,j)=0;
+    for(int i=0;i<v_grid.m;i++)for(int j=0;j<v_grid.n;j++)if(source_domain.Lazy_Inside(v_grid.X(i,j))){v_fixed(i,j)=(T).5;psi_N_v(i,j)=true;}
 #endif
 }
 //#####################################################################
@@ -88,7 +88,7 @@ void Get_Object_Velocities(ARRAY<bool,VECTOR<int,2> >& psi_N_u,ARRAY<bool,VECTOR
 {
     Add_Neumann_Pocket(BOX_2D<int>(20,25,13,18),-1,1,-1,1,psi_N_u,psi_N_v,u_fixed,v_fixed);
     Add_Neumann_Pocket(BOX_2D<int>(5,10,13,18),0,0,0,0,psi_N_u,psi_N_v,u_fixed,v_fixed);
-    for(int j=1;j<=u_grid.n;j++){psi_N_u(15,j)=true;u_fixed(15,j)=0;}
+    for(int j=0;j<u_grid.n;j++){psi_N_u(15,j)=true;u_fixed(15,j)=0;}
     //Add_Neumann_Pocket(BOX_2D<int>(2,3,2,4),-2,3,-4,2,psi_N_u,psi_N_v,u_fixed,v_fixed);
     //Add_Neumann_Pocket(BOX_2D<int>(3,4,2,4),-1,1,-1,1,psi_N_u,psi_N_v,u_fixed,v_fixed);
 }

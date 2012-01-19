@@ -99,8 +99,8 @@ template<int d> void SIMPLEX_MESH<d>::
 Initialize_Neighbor_Nodes()
 {
     delete neighbor_nodes;neighbor_nodes=new ARRAY<ARRAY<int> >(number_nodes);
-    for(int t=1;t<=elements.m;t++){VECTOR<int,d+1>& element=elements(t);
-        for(int i=1;i<=element.m;i++)for(int j=1;j<=element.m;j++)if(i!=j)
+    for(int t=0;t<elements.m;t++){VECTOR<int,d+1>& element=elements(t);
+        for(int i=0;i<element.m;i++)for(int j=0;j<element.m;j++)if(i!=j)
             (*neighbor_nodes)(element[i]).Append_Unique(element[j]);}
     for(int p=0;p<number_nodes;p++) (*neighbor_nodes)(p).Compact(); // remove extra space
 }
@@ -111,8 +111,8 @@ template<int d> void SIMPLEX_MESH<d>::
 Initialize_Incident_Elements()
 {
     delete incident_elements;incident_elements=new ARRAY<ARRAY<int> >(number_nodes);
-    for(int t=1;t<=elements.m;t++){VECTOR<int,d+1>& element=elements(t); // for each element, put it on each of its nodes' lists of simplices
-        for(int i=1;i<=element.m;i++) (*incident_elements)(element[i]).Append(t);}
+    for(int t=0;t<elements.m;t++){VECTOR<int,d+1>& element=elements(t); // for each element, put it on each of its nodes' lists of simplices
+        for(int i=0;i<element.m;i++) (*incident_elements)(element[i]).Append(t);}
     for(int p=0;p<number_nodes;p++) (*incident_elements)(p).Compact(); // remove extra space
 }
 //#####################################################################
@@ -123,10 +123,10 @@ Initialize_Adjacent_Elements()
 {
     delete adjacent_elements;adjacent_elements=new ARRAY<ARRAY<int> >(elements.m);
     bool incident_elements_defined=incident_elements!=0;if(!incident_elements) Initialize_Incident_Elements();
-    for(int t=1;t<=elements.m;t++){VECTOR<int,d+1>& element=elements(t); // for each simplex, make the list of adjacent simplices
-        for(int i=1;i<=element.m;i++) Find_And_Append_Adjacent_Elements(t,element.Remove_Index(i));}
+    for(int t=0;t<elements.m;t++){VECTOR<int,d+1>& element=elements(t); // for each simplex, make the list of adjacent simplices
+        for(int i=0;i<element.m;i++) Find_And_Append_Adjacent_Elements(t,element.Remove_Index(i));}
     if(!incident_elements_defined){delete incident_elements;incident_elements=0;}
-    for(int t=1;t<=elements.m;t++) (*adjacent_elements)(t).Compact(); // remove extra space
+    for(int t=0;t<elements.m;t++) (*adjacent_elements)(t).Compact(); // remove extra space
 }
 //#####################################################################
 // Function Find_And_Append_Adjacent_Elements
@@ -153,7 +153,7 @@ Initialize_Neighbor_Elements()
     STATIC_ASSERT(d<4);static const int expected_neighbors=d==1?4:d==2?20:d==3?50:0;
     delete neighbor_elements;neighbor_elements=new ARRAY<ARRAY<int> >(elements.m);
     bool incident_elements_defined=incident_elements!=0;if(!incident_elements) Initialize_Incident_Elements();
-    for(int t=1;t<=elements.m;t++){VECTOR<int,d+1>& element=elements(t); // for each simplex, make the list of neighbor simplices
+    for(int t=0;t<elements.m;t++){VECTOR<int,d+1>& element=elements(t); // for each simplex, make the list of neighbor simplices
         ARRAY<int>& neighbors=(*neighbor_elements)(t);neighbors.Preallocate(expected_neighbors);
         neighbors.Append_Elements((*incident_elements)(element[1]));
         for(int i=2;i<=element.m;i++) neighbors.Append_Unique_Elements((*incident_elements)(element[i]));
@@ -210,7 +210,7 @@ Delete_Sorted_Elements(const ARRAY<int>& deletion_list,HASHTABLE<int,int>& index
             reverse_index_map.Insert(curr,previous_index);}
         elements.Remove_Index_Lazy(curr);}
     for(HASHTABLE_ITERATOR<int,int> iter(reverse_index_map);iter.Valid();iter.Next()) index_map.Insert(iter.Data(),iter.Key());
-    for(int i=1;i<=unique_deletion_list.m;i++) index_map.Insert(unique_deletion_list(i),0);
+    for(int i=0;i<unique_deletion_list.m;i++) index_map.Insert(unique_deletion_list(i),0);
     elements.Compact();Refresh_Auxiliary_Structures();
 }
 //#####################################################################
@@ -272,7 +272,7 @@ Update_Adjacent_Elements_From_Incident_Elements(const int node)
     for(int a=1;a<=(*incident_elements)(node).m;a++){
         int t=(*incident_elements)(node)(a);VECTOR<int,d+1>& element=elements(t);
         (*adjacent_elements)(t).Remove_All();
-        for(int i=1;i<=element.m;i++) Find_And_Append_Adjacent_Elements(t,element.Remove_Index(i));
+        for(int i=0;i<element.m;i++) Find_And_Append_Adjacent_Elements(t,element.Remove_Index(i));
         (*adjacent_elements)(t).Compact();}
     if(!incident_elements_defined){delete incident_elements;incident_elements=0;}
 }
@@ -287,7 +287,7 @@ Update_Neighbor_Nodes_From_Incident_Elements(const int node)
     (*neighbor_nodes)(node).Remove_All();
     for(int t=1;t<=(*incident_elements)(node).m;t++){
         VECTOR<int,d+1>& element=elements((*incident_elements)(node)(t));assert(element.Contains(node));
-        for(int i=1;i<=element.m;i++)if(element[i]!=node) (*neighbor_nodes)(node).Append_Unique(element[i]);}
+        for(int i=0;i<element.m;i++)if(element[i]!=node) (*neighbor_nodes)(node).Append_Unique(element[i]);}
     (*neighbor_nodes)(node).Compact();
     if(!incident_elements_defined){delete incident_elements;incident_elements=0;}
 }
@@ -320,7 +320,7 @@ Set_Number_Nodes(const int number_nodes_input)
 template<int d> void SIMPLEX_MESH<d>::
 Add_Dependencies(SEGMENT_MESH& dependency_mesh) const
 {
-    for(int t=1;t<=elements.m;t++) for(int i=0;i<d;i++) for(int j=i+1;j<=d+1;j++) dependency_mesh.Add_Element_If_Not_Already_There(VECTOR<int,2>(elements(t)[i],elements(t)[j]));
+    for(int t=0;t<elements.m;t++) for(int i=0;i<d;i++) for(int j=i+1;j<=d+1;j++) dependency_mesh.Add_Element_If_Not_Already_There(VECTOR<int,2>(elements(t)[i],elements(t)[j]));
 }
 //#####################################################################
 // Function Mark_Nodes_Referenced
@@ -328,7 +328,7 @@ Add_Dependencies(SEGMENT_MESH& dependency_mesh) const
 template<int d> template<class T> void SIMPLEX_MESH<d>::
 Mark_Nodes_Referenced(ARRAY<T>& marks,const T& mark) const
 {
-    for(int e=1;e<=elements.m;e++) marks.Subset(elements(e)).Fill(mark);
+    for(int e=0;e<elements.m;e++) marks.Subset(elements(e)).Fill(mark);
 }
 //#####################################################################
 // Function Simplices_On_Subsimplex
@@ -339,7 +339,7 @@ Simplices_On_Subsimplex(const VECTOR<int,d2>& subsimplex_nodes,ARRAY<int>& simpl
     assert(incident_elements);
     const ARRAY<int>& incident=(*incident_elements)(subsimplex_nodes[1]);
     VECTOR<int,d2-1> other_nodes=subsimplex_nodes.Remove_Index(1);
-    for(int i=1;i<=incident.m;i++){
+    for(int i=0;i<incident.m;i++){
         int simplex=incident(i);
         if(Nodes_In_Simplex(other_nodes,simplex)) simplices_on_subsimplex.Append(simplex);}
 }

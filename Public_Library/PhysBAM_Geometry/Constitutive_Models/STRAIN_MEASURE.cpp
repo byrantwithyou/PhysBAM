@@ -42,7 +42,7 @@ template<class TV,int d> void STRAIN_MEASURE<TV,d>::
 Initialize_Dm_Inverse(ARRAY_VIEW<const TV> X)
 {
     Dm_inverse.Resize(mesh.elements.m,false,false);
-    for(int t=1;t<=mesh.elements.m;t++){
+    for(int t=0;t<mesh.elements.m;t++){
         UPPER_TRIANGULAR_MATRIX<T,d> R=Ds(X,t).R_From_QR_Factorization();
         if(R.Determinant()<=0) PHYSBAM_FATAL_ERROR("Inverted or degenerate rest state");
         Dm_inverse(t)=R.Inverse();}
@@ -91,7 +91,7 @@ template<class TV,int d> void STRAIN_MEASURE<TV,d>::
 Print_Altitude_Statistics()
 {   
     if(!Dm_inverse.m) return;
-    ARRAY<T> altitude(Dm_inverse.m,false);for(int t=1;t<=altitude.m;t++)altitude(t)=Rest_Altitude(t);Sort(altitude);
+    ARRAY<T> altitude(Dm_inverse.m,false);for(int t=0;t<altitude.m;t++)altitude(t)=Rest_Altitude(t);Sort(altitude);
     LOG::cout<<"strain measure - total elements = "<<altitude.m<<std::endl;
     LOG::cout<<"strain measure - smallest altitude = "<<altitude(1)<<std::endl;
     LOG::cout<<"strain measure - one percent altitude = "<<altitude((int)(.01*altitude.m)+1)<<std::endl;

@@ -68,7 +68,7 @@ template<class T,int D>
 void Multiply(SPARSE_MATRIX_FLAT_MXN<VECTOR<T,D> >& A,VECTOR_ND<VECTOR<T,D> >& x,VECTOR_ND<T>& result)
 {
     assert(A.n==x.Size()&&A.m==result.Size());
-    for(int i=1;i<=A.m;i++)
+    for(int i=0;i<A.m;i++)
     {
         T r=0;
         for(int j=A.offsets(i);j<A.offsets(i+1);j++)
@@ -85,7 +85,7 @@ template<class T,int D>
 
     int iteration=0;
 
-    for(int i=1;i<=lambda.m;i++)
+    for(int i=0;i<lambda.m;i++)
         lambda(i)=0;
 
     ARRAY<MATRIX<T,D> > A_block_diagonal_inverse(n_block_primal);

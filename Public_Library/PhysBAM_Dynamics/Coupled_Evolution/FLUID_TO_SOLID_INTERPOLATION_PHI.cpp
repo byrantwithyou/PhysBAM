@@ -51,7 +51,7 @@ template<class TV> void FLUID_TO_SOLID_INTERPOLATION_PHI<TV>::
 Setup_Mesh()
 {
     ARRAY_VIEW<TV> X=curve.particles.X;
-    for(int i=1;i<=curve.mesh.elements.m;i++) X(i)=TV();
+    for(int i=0;i<curve.mesh.elements.m;i++) X(i)=TV();
 
     GRID<TV> dual_grid(index_map.grid.Get_Regular_Grid());
     ARRAY<T,TV_INT> dual_phi(index_map.grid.Node_Indices(2));

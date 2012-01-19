@@ -33,7 +33,7 @@ template<template<class> class ARRAY,class T> void Print_Max_Value(const ARRAY<V
 template<> void Print_Max_Value(const ARRAY<VECTOR<float,3> > &array)
 { 
     float max_magnitude_squared=-1;int max_index=0;
-    for(int i=1;i<=array.m;i++){float magnitude_squared=array(i).Magnitude_Squared();
+    for(int i=0;i<array.m;i++){float magnitude_squared=array(i).Magnitude_Squared();
         if(magnitude_squared>max_magnitude_squared){max_magnitude_squared=magnitude_squared;max_index=i;}}
     if(max_index) std::cout << "Max = " << sqrt(max_magnitude_squared) << " (at " << max_index << ")" << std::endl;
 }
@@ -77,7 +77,7 @@ template<class T,class RW> void Print_Arrays(std::istream &input, int num_arrays
         //Print_Min_Value(array); Print_Max_Value(array);
         if (verbose) {
             for (int i=1;i<=array.m;i++)
-                for(int t=1;t<=array.length;t++)
+                for(int t=0;t<array.length;t++)
                     std::cout << "array(" << t << "," << i << ") = " << array(t,i) << std::endl;
         }
         std::cout << std::endl;

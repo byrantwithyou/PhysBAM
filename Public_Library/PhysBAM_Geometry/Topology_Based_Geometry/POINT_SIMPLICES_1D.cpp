@@ -34,7 +34,7 @@ template<class T> VECTOR<T,1> POINT_SIMPLICES_1D<T>::
 Closest_Point_On_Boundary(const TV& location,const T max_depth,const T thickness_over_two,int* closest_point_simplex,T* distance) const 
 {
     T min_distance_squared=FLT_MAX;TV closest_point;
-    for(int i=1;i<=mesh.elements.m;i++){
+    for(int i=0;i<mesh.elements.m;i++){
         POINT_SIMPLEX_1D<T> point_simplex=point_simplex_list?(*point_simplex_list)(i):Get_Element(i);
         TV new_point=point_simplex.x1;
         T distance_squared=(new_point-location).Magnitude_Squared();
@@ -61,7 +61,7 @@ Calculate_Signed_Distance(const TV& location,T thickness_over_two) const
 template<class T> bool POINT_SIMPLICES_1D<T>::
 Inside(const TV& location,T thickness_over_two) const
 {
-    for(int i=1;i<=mesh.elements.m;i++){
+    for(int i=0;i<mesh.elements.m;i++){
         POINT_SIMPLEX_1D<T> point_simplex=point_simplex_list?(*point_simplex_list)(i):Get_Element(i);
         T direction=(T)(mesh.directions(i)?1:-1);
         T robust_point_simplex_location=point_simplex.x1.x+direction*thickness_over_two;

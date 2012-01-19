@@ -178,9 +178,9 @@ Initialize_Triangle_Mesh()
 {
     delete triangle_mesh;
     HASHTABLE<VECTOR<int,3> > triangle_list(2*elements.m); // list of triangles currently found
-    for(int t=1;t<=elements.m;t++){
+    for(int t=0;t<elements.m;t++){
         VECTOR<int,4> sorted_nodes=elements(t).Sorted();
-        for(int i=1;i<=sorted_nodes.m;i++){VECTOR<int,3> triangle=sorted_nodes.Remove_Index(i);
+        for(int i=0;i<sorted_nodes.m;i++){VECTOR<int,3> triangle=sorted_nodes.Remove_Index(i);
             triangle_list.Set(triangle);}}
     triangle_mesh=new TRIANGLE_MESH();
     triangle_mesh->elements.Exact_Resize(triangle_list.Size());
@@ -201,7 +201,7 @@ Initialize_Element_Edges()
     bool incident_segments_defined=segment_mesh->incident_elements!=0;
     if(!segment_mesh->incident_elements) segment_mesh->Initialize_Incident_Elements();
     // for each tetrahedron, make the lists of edges
-    for(int t=1;t<=elements.m;t++){
+    for(int t=0;t<elements.m;t++){
         int i,j,k,l;elements(t).Get(i,j,k,l);
         (*element_edges)(t).Set(segment_mesh->Segment(i,j),segment_mesh->Segment(j,k),segment_mesh->Segment(k,i),
             segment_mesh->Segment(i,l),segment_mesh->Segment(j,l),segment_mesh->Segment(k,l));}
@@ -218,7 +218,7 @@ Initialize_Tetrahedron_Faces()
     bool triangle_tetrahedrons_defined=triangle_tetrahedrons!=0;if(!triangle_tetrahedrons_defined) Initialize_Triangle_Tetrahedrons();
     for(int tri=1;tri<=triangle_tetrahedrons->m;tri++){
         int tri_i,tri_j,tri_k;triangle_mesh->elements(tri).Get(tri_i,tri_j,tri_k);
-        for(int face=1;face<=2;face++){
+        for(int face=0;face<2;face++){
             int tet=(*triangle_tetrahedrons)(tri)(face),tet_i,tet_j,tet_k,tet_l,local_tet_index_for_face=1;
             if(tet){
                 elements(tet).Get(tet_i,tet_j,tet_k,tet_l);
@@ -258,7 +258,7 @@ Initialize_Boundary_Mesh()
 {
     delete boundary_mesh;boundary_mesh=new TRIANGLE_MESH();
     bool incident_elements_defined=incident_elements!=0;if(!incident_elements) Initialize_Incident_Elements();
-    for(int t=1;t<=elements.m;t++){
+    for(int t=0;t<elements.m;t++){
         int i,j,k,l;elements(t).Get(i,j,k,l);
         if(Number_Of_Tetrahedrons_Across_Face(t,i,k,j) == 0)boundary_mesh->elements.Append(VECTOR<int,3>(i,k,j));
         if(Number_Of_Tetrahedrons_Across_Face(t,i,j,l) == 0)boundary_mesh->elements.Append(VECTOR<int,3>(i,j,l));
@@ -306,7 +306,7 @@ Initialize_Edge_Tetrahedrons()
     if(!segment_mesh) Initialize_Segment_Mesh(); // edges only makes sense when referring to a segment mesh
     edge_tetrahedrons=new ARRAY<ARRAY<int> >(segment_mesh->elements.m);
     bool element_edges_defined=element_edges!=0;if(!element_edges_defined) Initialize_Element_Edges();
-    for(int t=1;t<=elements.m;t++) for(int i=1;i<=6;i++) (*edge_tetrahedrons)((*element_edges)(t)(i)).Append(t);
+    for(int t=0;t<elements.m;t++) for(int i=0;i<6;i++) (*edge_tetrahedrons)((*element_edges)(t)(i)).Append(t);
     for(int i=1;i<=segment_mesh->elements.m;i++) (*edge_tetrahedrons)(i).Compact();
     if(!element_edges_defined){delete element_edges;element_edges=0;}
 }
@@ -338,7 +338,7 @@ int TETRAHEDRON_MESH::
 Number_Of_Boundary_Tetrahedrons()
 {
     bool adjacent_elements_defined=adjacent_elements!=0;if(!adjacent_elements) Initialize_Adjacent_Elements();
-    int number=0;for(int t=1;t<=elements.m;t++) if((*adjacent_elements)(t).m != 4) number++;
+    int number=0;for(int t=0;t<elements.m;t++) if((*adjacent_elements)(t).m != 4) number++;
     if(!adjacent_elements_defined){delete adjacent_elements;adjacent_elements=0;}
     return number;
 }
@@ -349,7 +349,7 @@ int TETRAHEDRON_MESH::
 Number_Of_Interior_Tetrahedrons()
 {  
     bool adjacent_elements_defined=adjacent_elements!=0;if(!adjacent_elements) Initialize_Adjacent_Elements();   
-    int number=0;for(int t=1;t<=elements.m;t++) if((*adjacent_elements)(t).m == 4) number++;  
+    int number=0;for(int t=0;t<elements.m;t++) if((*adjacent_elements)(t).m == 4) number++;  
     if(!adjacent_elements_defined){delete adjacent_elements;adjacent_elements=0;}
     return number;
 }
@@ -408,7 +408,7 @@ Initialize_Boundary_Mesh_Of_Subset(TRIANGLE_MESH& boundary_mesh_of_subset,const 
     boundary_mesh_of_subset.number_nodes=number_nodes;
     bool adjacent_elements_defined=(adjacent_elements!=0);if(!adjacent_elements) Initialize_Adjacent_Elements();
     // check tetrahedra for out-of-subset neighbors 
-    for(int t=1;t<=elements.m;t++) if(subset(t)){
+    for(int t=0;t<elements.m;t++) if(subset(t)){
         int i,j,k,l;elements(t).Get(i,j,k,l);
         ARRAY<ARRAY<int> > adjacent_tets_per_face(4);
         for(int p=1;p<=(*adjacent_elements)(t).m;p++)
@@ -416,7 +416,7 @@ Initialize_Boundary_Mesh_Of_Subset(TRIANGLE_MESH& boundary_mesh_of_subset,const 
             else if(!Node_In_Tetrahedron(j,(*adjacent_elements)(t)(p))) adjacent_tets_per_face(2).Append((*adjacent_elements)(t)(p));
             else if(!Node_In_Tetrahedron(k,(*adjacent_elements)(t)(p))) adjacent_tets_per_face(3).Append((*adjacent_elements)(t)(p));
             else adjacent_tets_per_face(4).Append((*adjacent_elements)(t)(p));
-        for(int p=1;p<=4;p++){
+        for(int p=0;p<4;p++){
             bool lowest_index_tet=true,boundary_face=false;
             // For non-manifold meshes, add a boundary face only for the lowest indexed incident tet
             if(!adjacent_tets_per_face(p).m) boundary_face=true;
@@ -447,7 +447,7 @@ static bool Add_Triangle_Or_Subtriangles(ARRAY<VECTOR<int,3> >& triangle_list,co
     else PHYSBAM_FATAL_ERROR(); // cannot have only 2 midpoints
     ARRAY<VECTOR<int,3> > candidate_triangle_list;
     bool subtriangle_in_triangle_mesh=false;
-    for(int t=1;t<=subtriangles.m;t++) if(Add_Triangle_Or_Subtriangles(candidate_triangle_list,triangle_mesh,segment_mesh,segment_midpoints,subtriangles(t))) subtriangle_in_triangle_mesh=true;
+    for(int t=0;t<subtriangles.m;t++) if(Add_Triangle_Or_Subtriangles(candidate_triangle_list,triangle_mesh,segment_mesh,segment_midpoints,subtriangles(t))) subtriangle_in_triangle_mesh=true;
     if(subtriangle_in_triangle_mesh) triangle_list.Append_Elements(candidate_triangle_list);else triangle_list.Append(nodes);
     return subtriangle_in_triangle_mesh || triangle_mesh.Triangle(i,j,k);
 }
@@ -467,12 +467,12 @@ Initialize_Boundary_Mesh_With_T_Junctions(TRIANGLE_MESH& boundary_mesh_with_t_ju
 
     SEGMENT_MESH extended_segment_mesh(*triangle_mesh->segment_mesh);
     ARRAY<int> segment_midpoints(extended_segment_mesh.elements.m);
-    for(int i=1;i<=t_junctions.m;i++)
+    for(int i=0;i<t_junctions.m;i++)
         if(int s=triangle_mesh->segment_mesh->Simplex(t_junction_parents(i))) segment_midpoints(s)=t_junctions(i);
         else{extended_segment_mesh.elements.Append(t_junction_parents(i));segment_midpoints.Append(t_junctions(i));
             extended_segment_mesh.number_nodes=max(extended_segment_mesh.number_nodes,t_junctions(i),t_junction_parents(i)(1),t_junction_parents(i)(2));}
     extended_segment_mesh.Initialize_Incident_Elements();
-    for(int tet=1;tet<=elements.m;tet++) for(int e=1;e<=4;e++){
+    for(int tet=0;tet<elements.m;tet++) for(int e=0;e<4;e++){
         int i,j,k,l;
         switch(e){ // get edge (i,j,k) with proper orientation
           case 1: elements(tet).Get(i,k,j,l);break;
@@ -483,7 +483,7 @@ Initialize_Boundary_Mesh_With_T_Junctions(TRIANGLE_MESH& boundary_mesh_with_t_ju
         Add_Triangle_Or_Subtriangles(boundary_mesh_with_t_junctions.elements,*triangle_mesh,extended_segment_mesh,segment_midpoints,VECTOR<int,3>(i,j,k));}
 
     HASHTABLE<VECTOR<int,3>,int> triangles_hash_table(boundary_mesh_with_t_junctions.elements.m);
-    for(int tri=1;tri<=boundary_mesh_with_t_junctions.elements.m;tri++){
+    for(int tri=0;tri<boundary_mesh_with_t_junctions.elements.m;tri++){
         VECTOR<int,3>& triangle=boundary_mesh_with_t_junctions.elements(tri);
         VECTOR<int,3> sorted_triangle=triangle.Sorted();
         int tri2;
@@ -511,7 +511,7 @@ Initialize_Bending_Tetrahedrons(TRIANGLE_MESH& triangle_mesh)
 {
     if(!triangle_mesh.adjacent_elements) triangle_mesh.Initialize_Adjacent_Elements();
     
-    for(int t=1;t<=triangle_mesh.elements.m;t++){
+    for(int t=0;t<triangle_mesh.elements.m;t++){
         VECTOR<int,3> nodes=triangle_mesh.elements(t);
         for(int a=1;a<=(*triangle_mesh.adjacent_elements)(t).m;a++){
             int s=(*triangle_mesh.adjacent_elements)(t)(a);
@@ -566,7 +566,7 @@ Identify_Face_Connected_Components(ARRAY<int>& label)
     STACK<int> flood_fill_stack;flood_fill_stack.Preallocate(elements.m);
     bool adjacent_elements_defined=adjacent_elements!=0;if(!adjacent_elements_defined)Initialize_Adjacent_Elements();
     label.Resize(elements.m,false,false);label.Fill(0);
-    int id=0;for(int t=1;t<=elements.m;t++) if(!label(t)){
+    int id=0;for(int t=0;t<elements.m;t++) if(!label(t)){
         id++;label(t)=id;flood_fill_stack.Push(t);
         while(!flood_fill_stack.Empty()){
             int top=flood_fill_stack.Pop();

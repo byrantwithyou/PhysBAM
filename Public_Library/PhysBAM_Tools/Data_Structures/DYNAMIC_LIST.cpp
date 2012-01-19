@@ -36,7 +36,7 @@ Delete_And_Clear(void* pointer)
 void DYNAMIC_LIST_CORE::
 Delete_All()
 {
-    for(int i=1;i<=array.m;i++) deleter(array(i));
+    for(int i=0;i<array.m;i++) deleter(array(i));
     array.Clean_Memory();
 }
 //#####################################################################

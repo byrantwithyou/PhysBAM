@@ -38,7 +38,7 @@ public:
     template<class T_MATRIX>
     explicit MATRIX(const MATRIX_BASE<T,T_MATRIX>& A)
     {
-        assert(A.Rows()==2 && A.Columns()==3);for(int j=1;j<=3;j++) for(int i=1;i<=2;i++) (*this)(i,j)=A(i,j);
+        assert(A.Rows()==2 && A.Columns()==3);for(int j=0;j<3;j++) for(int i=0;i<2;i++) (*this)(i,j)=A(i,j);
     }
 
     MATRIX(const T x11,const T x21,const T x12,const T x22,const T x13,const T x23)

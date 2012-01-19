@@ -104,7 +104,7 @@ int main(int argc, char* argv[])
     deformable_object_list.Read_Dynamic_Variables<RW>(input_directory+"/",frame);
 //    assert(deformable_object_list.deformable_objects.m==1);
     std::cout<<"-- Added "<<deformable_object_list.deformable_objects.m<<" objects"<<std::endl;
-    for(int i=1;i<=deformable_object_list.deformable_objects.m;i++){
+    for(int i=0;i<deformable_object_list.deformable_objects.m;i++){
         DEFORMABLE_OBJECT_3D<T>& deformable_object=deformable_object_list(i);
         deformable_object.embedded_tetrahedralized_volume->tetrahedralized_volume.tetrahedron_mesh.Initialize_Neighbor_Nodes();
         FILE_UTILITIES::Read_From_File<RW>(deformable_object_filename,deformable_object.embedded_tetrahedralized_volume_boundary_surface->boundary_surface);
@@ -124,7 +124,7 @@ int main(int argc, char* argv[])
     ARRAYS<VECTOR<T,3> > phi_objects(*grid,3);
     ARRAYS<VECTOR<T,3> >::copy(5*grid->max_dx_dy_dz,phi_objects);
     LEVELSET_MAKER_DYADIC<T> levelset_maker;
-    for(int object=1;object<=triangulated_surfaces.m;object++){
+    for(int object=0;object<triangulated_surfaces.m;object++){
         TRIANGULATED_SURFACE<T>& boundary_surface=*triangulated_surfaces(object);
         if(boundary_surface.triangle_mesh.triangles.m==0)continue;
         boundary_surface.Refresh_Auxiliary_Structures();boundary_surface.Update_Bounding_Box();
@@ -139,7 +139,7 @@ int main(int argc, char* argv[])
         GRID_3D<T> rasterization_grid(max_corner.x-min_corner.x,max_corner.y-min_corner.y,max_corner.z-min_corner.z,bounding_box);
         ARRAYS<VECTOR<T,3> > phi_object(rasterization_grid);
         if(levelset_maker.Compute_Level_Set(boundary_surface,rasterization_grid,phi_object)){
-            for(int ii=1;ii<=rasterization_grid.m;ii++)for(int jj=1;jj<=rasterization_grid.n;jj++)for(int iijj=1;iijj<=rasterization_grid.mn;iijj++){
+            for(int ii=0;ii<rasterization_grid.m;ii++)for(int jj=0;jj<rasterization_grid.n;jj++)for(int iijj=0;iijj<rasterization_grid.mn;iijj++){
                 int i=ii+min_corner.x-1,j=jj+min_corner.y-1,ij=iijj+min_corner.z-1;
                 if(phi_object(ii,jj,iijj)<phi_objects(i,j,ij)){
                     phi_objects(i,j,ij)=phi_object(ii,jj,iijj);}}}}
@@ -213,7 +213,7 @@ int main(int argc, char* argv[])
                 T velocity_magnitude_squared=particles->V(p).Magnitude_Squared();
                 ARRAY<OCTREE_CELL<T>*> intersecting_cells=particles_intersecting_cells(i,j,ij)(p);
                 MATRIX_4X4<T> rotation; if(velocity_magnitude_squared!=0) rotation=MATRIX_4X4<T>::Rotation_Matrix(particles->V(p),VECTOR_3D<T>(1,0,0));
-                for(int c=1;c<=intersecting_cells.m;c++) for(int k=0;k<8;k++){
+                for(int c=0;c<intersecting_cells.m;c++) for(int k=0;k<8;k++){
                     int node_index=intersecting_cells(c)->Node(k); if(node_operations.Is_Marked_Current(node_index)) continue;
                     T distance=(velocity_magnitude_squared==0)?particle_blender.Get_Distance(3*radius,particles->X(p),node_locations(node_index))
                         :particle_blender.Get_Distance(3*radius,radius,particles->X(p),particles->V(p),node_locations(node_index),rotation);
@@ -227,7 +227,7 @@ int main(int argc, char* argv[])
 
     std::cout<<"Merging levelset and particle levelset"<<std::endl;
     ARRAY<T> octree_phi(octree_grid.number_of_nodes,false);
-    for(int i=1;i<=octree_grid.number_of_nodes;i++) octree_phi(i)=implicit_surface.levelset.Phi(node_locations(i));//+particle_octree_phi(i);
+    for(int i=0;i<octree_grid.number_of_nodes;i++) octree_phi(i)=implicit_surface.levelset.Phi(node_locations(i));//+particle_octree_phi(i);
 
     std::cout<<"merged_octree_levelset.Fast_Marching_Method()..."<<std::flush;
     int fast_marching_method_timer=TIMER::Singleton()->Register_Timer();

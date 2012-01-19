@@ -56,7 +56,7 @@ void GLASS_OF_WATER::Initialize_Phi(){
 //#####################################################################
 void GLASS_OF_WATER::Get_Sources(double time){
     double dx=grid.dx,dy=grid.dy;
-    for(int i=1;i<=m;i++) for(int j=1;j<=n;j++){
+    for(int i=0;i<m;i++) for(int j=0;j<n;j++){
         double x=grid.x(i),y=grid.y(j),xmin=grid.xmin,xmax=grid.xmax;
         if((fabs(x-(xmin+xmax)/2+.05*(xmax-xmin)) <= .05*(xmax-xmin)) && y >= grid.y(n)-3.*dy){
             if(time <= 4){(phi)(i,j)=-dx;(psi_N)(i,j)=1;(u_fixed)(i,j)=-1;(v_fixed)(i,j)=-1;}}}}
@@ -70,7 +70,7 @@ void GLASS_OF_WATER::Get_Objects(double time){
     double xmin=grid.xmin,xmax=grid.xmax;
     // walls
     double x_center=(xmin+xmax)/2,wall_radius=(xmax-xmin)/4;
-    for(int i=1;i<=m;i++) for(int j=1;j<=n;j++){
+    for(int i=0;i<m;i++) for(int j=0;j<n;j++){
         double radius=fabs(grid.x(i)-x_center);
         if(radius > wall_radius){
         // extrapolate phi inward from outside the object
@@ -87,7 +87,7 @@ void GLASS_OF_WATER::Get_Source_Reseed_Mask(ARRAY<int,VECTOR<int,2> >& reseed_ma
     double dx=grid.dx,dy=grid.dy,xmin=grid.xmin,xmax=grid.xmax;
     double padding=3*dx;
     copy(0,reseed_mask);
-    for(int i=1;i<=m;i++) for(int j=1;j<=n;j++){
+    for(int i=0;i<m;i++) for(int j=0;j<n;j++){
       double x=grid.x(i),y=grid.y(j);
       if((fabs(x-(xmin+xmax)/2+.05*(xmax-xmin)) <= .05*(xmax-xmin)+padding) && y >= grid.y(n)-3.*dy-2*padding){
           (reseed_mask)(i,j)=1;}}}

@@ -84,7 +84,7 @@ void Initialize_Tetrahedralized_Volume(TETRAHEDRALIZED_VOLUME<T>& tetrahedralize
 
     tetrahedralized_volume.Update_Bounding_Box();
     VECTOR_3D<T> center(tetrahedralized_volume.bounding_box->Center());T bottom=tetrahedralized_volume.bounding_box->ymin;
-    for(int i=1;i<=tetrahedralized_volume.particles.array_size;i++){
+    for(int i=0;i<tetrahedralized_volume.particles.array_size;i++){
         tetrahedralized_volume.particles.V(i)=initial_velocity+VECTOR_3D<T>::Cross_Product(initial_angular_velocity,tetrahedralized_volume.particles.X(i)-center);
         tetrahedralized_volume.particles.X(i)=center+initial_orientation.Rotate(tetrahedralized_volume.particles.X(i)-center);
         tetrahedralized_volume.particles.X(i).y+=initial_height-bottom;}
@@ -118,7 +118,7 @@ virtual void Initialize_Embedded_Tetrahedralized_Volume(const TETRAHEDRALIZED_VO
     T radius=(T).8*((tetrahedralized_volume.bounding_box->Size()).Min());
     SPHERE<T> s(tetrahedralized_volume.bounding_box->Center(),radius);
     ARRAY<T> phi(1,tetrahedralized_volume.particles.array_collection->Size());
-    for(int p=1;p<=phi.m;p++) {
+    for(int p=0;p<phi.m;p++) {
         VECTOR_3D<T> xp=tetrahedralized_volume.particles.X(p);
         std::cout << xp << std::endl;
         phi(p)=((xp - s.center).Magnitude_Squared() - sqr(s.radius));
@@ -126,7 +126,7 @@ virtual void Initialize_Embedded_Tetrahedralized_Volume(const TETRAHEDRALIZED_VO
         else phi(p)= -sqrt(-phi(p));
     }
 
-    for(int p=1;p<=phi.m;p++) {
+    for(int p=0;p<phi.m;p++) {
         std::cout << phi(p) << std::endl;
     }
     embedded_tetrahedralized_volume.Initialize_Embedded_Triangles_In_Tetrahedron();

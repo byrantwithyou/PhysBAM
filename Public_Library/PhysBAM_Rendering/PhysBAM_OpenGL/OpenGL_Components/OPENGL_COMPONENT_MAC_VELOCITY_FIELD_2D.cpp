@@ -58,7 +58,7 @@ Initialize(const ARRAY<GRID<TV>*> &grid_array_input)
     else velocity_filename=FILE_UTILITIES::Get_Short_Name(velocity_filename);
 
     opengl_adaptive_mac_velocity_fields.Resize(number_of_levels);
-    for(int i=1;i<=opengl_adaptive_mac_velocity_fields.m;i++) opengl_adaptive_mac_velocity_fields(i)=new OPENGL_MAC_VELOCITY_FIELD_2D<T>(*(new GRID<TV>(*grid_array_input(i))),*(new ARRAY<T,FACE_INDEX<2> >));
+    for(int i=0;i<opengl_adaptive_mac_velocity_fields.m;i++) opengl_adaptive_mac_velocity_fields(i)=new OPENGL_MAC_VELOCITY_FIELD_2D<T>(*(new GRID<TV>(*grid_array_input(i))),*(new ARRAY<T,FACE_INDEX<2> >));
     opengl_mac_velocity_field=opengl_adaptive_mac_velocity_fields(1);
     number_of_steps=2*opengl_mac_velocity_field->grid.counts.x;
     opengl_vorticity_magnitude=new OPENGL_SCALAR_FIELD_2D<T>(opengl_mac_velocity_field->grid,*(new ARRAY<T,VECTOR<int,2> >),OPENGL_COLOR_RAMP<T>::Matlab_Jet(0,1));
@@ -79,7 +79,7 @@ Initialize(const ARRAY<GRID<TV>*> &grid_array_input)
 template<class T,class RW> OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T,RW>::
 ~OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D()
 {
-    for(int i=1;i<=opengl_adaptive_mac_velocity_fields.m;i++){
+    for(int i=0;i<opengl_adaptive_mac_velocity_fields.m;i++){
         delete &opengl_adaptive_mac_velocity_fields(i)->grid;
         delete &opengl_adaptive_mac_velocity_fields(i)->u;
         delete &opengl_adaptive_mac_velocity_fields(i)->v;}
@@ -123,7 +123,7 @@ Display(const int in_color) const
 {
     if(valid){
         if(draw){
-            if(draw_all_levels) for(int i=1;i<=opengl_adaptive_mac_velocity_fields.m;i++) opengl_adaptive_mac_velocity_fields(i)->Display(in_color);
+            if(draw_all_levels) for(int i=0;i<opengl_adaptive_mac_velocity_fields.m;i++) opengl_adaptive_mac_velocity_fields(i)->Display(in_color);
             else opengl_adaptive_mac_velocity_fields(level)->Display(in_color);}
         if(draw_divergence) opengl_divergence_field->Display(in_color);
         if(draw_vorticity) opengl_vorticity_magnitude->Display(in_color);
@@ -143,7 +143,7 @@ Reinitialize()
     if (draw || draw_divergence){
         if ((is_animation && (frame_loaded!=frame || level_loaded!=level)) || (!is_animation && frame_loaded < 0)){
             valid = false;
-            if(use_levels) for(int i=1;i<=opengl_adaptive_mac_velocity_fields.m;i++){
+            if(use_levels) for(int i=0;i<opengl_adaptive_mac_velocity_fields.m;i++){
                 std::string tmp_filename=STRING_UTILITIES::string_sprintf(directory_adaptive.c_str(),i)+FILE_UTILITIES::Get_Frame_Filename(velocity_filename.c_str(),frame);
                 if (FILE_UTILITIES::File_Exists(tmp_filename)) FILE_UTILITIES::Read_From_File<RW>(tmp_filename,opengl_adaptive_mac_velocity_fields(i)->u,opengl_adaptive_mac_velocity_fields(i)->v);
                 else return;
@@ -191,7 +191,7 @@ Update_Divergence()
         else got_all_psi=false;
         if(!got_all_psi){psi_N.Clean_Memory();psi_D.Clean_Memory();}
         divergence.Resize(1,grid.counts.x,1,grid.counts.y);
-        for(int i=1;i<=grid.counts.x;i++) for(int j=1;j<=grid.counts.y;j++){
+        for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++){
             if(got_all_psi && (psi_D(i,j) || (psi_N.Component(1)(i,j) && psi_N.Component(1)(i+1,j) && psi_N.Component(2)(i,j) && psi_N.Component(2)(i,j+1)))) divergence(i,j)=0;
             else divergence(i,j)=grid.one_over_dX.x*(u(i+1,j)-u(i,j))+grid.one_over_dX.y*(v(i,j+1)-v(i,j));}
         opengl_divergence_field->Update();}
@@ -234,7 +234,7 @@ Update_Streamlines()
 template<class T,class RW> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T,RW>::
 Toggle_Velocity_Mode()
 {
-    for(int i=1;i<=opengl_adaptive_mac_velocity_fields.m;i++) opengl_adaptive_mac_velocity_fields(i)->Toggle_Velocity_Mode();
+    for(int i=0;i<opengl_adaptive_mac_velocity_fields.m;i++) opengl_adaptive_mac_velocity_fields(i)->Toggle_Velocity_Mode();
 }
 
 template<class T,class RW> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T,RW>::
@@ -251,19 +251,19 @@ Toggle_Velocity_Mode_And_Draw()
 template<class T,class RW> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T,RW>::
 Increase_Vector_Size()
 {
-    for(int i=1;i<=opengl_adaptive_mac_velocity_fields.m;i++) opengl_adaptive_mac_velocity_fields(i)->Scale_Vector_Size(1.1);
+    for(int i=0;i<opengl_adaptive_mac_velocity_fields.m;i++) opengl_adaptive_mac_velocity_fields(i)->Scale_Vector_Size(1.1);
 }
 
 template<class T,class RW> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T,RW>::
 Decrease_Vector_Size()
 {
-    for(int i=1;i<=opengl_adaptive_mac_velocity_fields.m;i++) opengl_adaptive_mac_velocity_fields(i)->Scale_Vector_Size(1/1.1);
+    for(int i=0;i<opengl_adaptive_mac_velocity_fields.m;i++) opengl_adaptive_mac_velocity_fields(i)->Scale_Vector_Size(1/1.1);
 }
 
 template<class T,class RW> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T,RW>::
 Toggle_Arrowhead()
 {
-    for(int i=1;i<=opengl_adaptive_mac_velocity_fields.m;i++) opengl_adaptive_mac_velocity_fields(i)->draw_arrowhead = !opengl_adaptive_mac_velocity_fields(i)->draw_arrowhead;
+    for(int i=0;i<opengl_adaptive_mac_velocity_fields.m;i++) opengl_adaptive_mac_velocity_fields(i)->draw_arrowhead = !opengl_adaptive_mac_velocity_fields(i)->draw_arrowhead;
 }
 
 template<class T,class RW> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T,RW>::

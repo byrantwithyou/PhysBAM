@@ -286,11 +286,11 @@ void Load_Joint_Frames()
     int number_of_keyframes,number_of_joints;
     *input>>number_of_keyframes;
     keyframe_times.Resize(number_of_keyframes);
-    for(int i=1;i<=keyframe_times.m;i++) (*input)>>keyframe_times(i);;
+    for(int i=0;i<keyframe_times.m;i++) (*input)>>keyframe_times(i);;
 
     *input>>number_of_joints;
     starting_joint_positions.Resize(number_of_joints);
-    for(int i=1;i<=starting_joint_positions.m;i++){
+    for(int i=0;i<starting_joint_positions.m;i++){
         (*input)>>starting_joint_positions(i).x;
         FRAME_3D<T> frame;
         for(int j=1;j<=number_of_keyframes-1;j++)(*input)>>starting_joint_positions(i).y;
@@ -301,7 +301,7 @@ void Load_Joint_Frames()
 ROTATION<TV> Get_Joint_Rotation(const std::string& joint_name)
 {
     std::cout<<"Geting joint: "<<joint_name<<std::endl;
-    for(int i=1;i<=starting_joint_positions.m;i++) if(starting_joint_positions(i).x==joint_name) return starting_joint_positions(i).y.r;
+    for(int i=0;i<starting_joint_positions.m;i++) if(starting_joint_positions(i).x==joint_name) return starting_joint_positions(i).y.r;
     std::cout<<"    joint not found!!!"<<std::endl;
     return ROTATION<TV>();
 }
@@ -551,7 +551,7 @@ void Climb()
         frame_track_joints.Append(da_man->joint(VISIBLE_HUMAN<T,RW>::JOINT_L_1MC));
         frame_tracks.Append(Make_Frame_Track(thumb_angle_max,thumb_angle_min,da_man->joint(VISIBLE_HUMAN<T,RW>::JOINT_L_1MC),false,7));
 
-        for(int i=1;i<=frame_tracks.m;i++) frame_track_joints(i)->joint_function->track=frame_tracks(i);
+        for(int i=0;i<frame_tracks.m;i++) frame_track_joints(i)->joint_function->track=frame_tracks(i);
     }
     if(parameter_list.Get_Parameter("manual_joints",false)){
         Add_Ladder_Joint(parameter_list.Get_Parameter("joint_1",0),parameter_list.Get_Parameter("ladder_1",0));
@@ -565,7 +565,7 @@ void Climb()
 //#####################################################################
 void Add_Joints_To_ARB()
 {
-    for(int i=1;i<=saved_joint.m;i++) arb->joint_mesh.Add_Articulation(saved_parent(i),saved_child(i),arb->joint_mesh.Add_Joint(saved_joint(i)));
+    for(int i=0;i<saved_joint.m;i++) arb->joint_mesh.Add_Articulation(saved_parent(i),saved_child(i),arb->joint_mesh.Add_Joint(saved_joint(i)));
 }
 void Reinit_Joints()
 {
@@ -581,49 +581,49 @@ void Reinit_Joints()
     T ladder_radius=parameter_list.Get_Parameter("ladder_scale",(T)1)*parameter_list.Get_Parameter("radius_hand",(T).02); // ladder radius normally
     bool found=false;
     if(force_left_hand || force_right_hand){
-        if(force_left_hand) for(int i=1;i<=ladder_bodies.m;i++) left_hand_joint=(left_hand_joint || Check_For_New_Joint(ladder_bodies(i),dynamic_joint_check_bodies(2),ladder_radius));
-        if(force_right_hand) for(int i=1;i<=ladder_bodies.m;i++)  right_hand_joint=(right_hand_joint || Check_For_New_Joint(ladder_bodies(i),dynamic_joint_check_bodies(1),ladder_radius));
+        if(force_left_hand) for(int i=0;i<ladder_bodies.m;i++) left_hand_joint=(left_hand_joint || Check_For_New_Joint(ladder_bodies(i),dynamic_joint_check_bodies(2),ladder_radius));
+        if(force_right_hand) for(int i=0;i<ladder_bodies.m;i++)  right_hand_joint=(right_hand_joint || Check_For_New_Joint(ladder_bodies(i),dynamic_joint_check_bodies(1),ladder_radius));
     }
     else if(right_hand_joint){
-        for(int i=1;i<=ladder_bodies.m;i++) found=(found || Check_For_New_Joint(ladder_bodies(i),dynamic_joint_check_bodies(2),ladder_radius));
+        for(int i=0;i<ladder_bodies.m;i++) found=(found || Check_For_New_Joint(ladder_bodies(i),dynamic_joint_check_bodies(2),ladder_radius));
         if(found){right_hand_joint=false;left_hand_joint=true;}
-        else for(int i=1;i<=ladder_bodies.m;i++) found=(found || Check_For_New_Joint(ladder_bodies(i),dynamic_joint_check_bodies(1),ladder_radius));
+        else for(int i=0;i<ladder_bodies.m;i++) found=(found || Check_For_New_Joint(ladder_bodies(i),dynamic_joint_check_bodies(1),ladder_radius));
     }
     else if(left_hand_joint){
-        for(int i=1;i<=ladder_bodies.m;i++) found=(found || Check_For_New_Joint(ladder_bodies(i),dynamic_joint_check_bodies(1),ladder_radius));
+        for(int i=0;i<ladder_bodies.m;i++) found=(found || Check_For_New_Joint(ladder_bodies(i),dynamic_joint_check_bodies(1),ladder_radius));
         if(found){right_hand_joint=true;left_hand_joint=false;}
-        else for(int i=1;i<=ladder_bodies.m;i++) found=(found || Check_For_New_Joint(ladder_bodies(i),dynamic_joint_check_bodies(2),ladder_radius));
+        else for(int i=0;i<ladder_bodies.m;i++) found=(found || Check_For_New_Joint(ladder_bodies(i),dynamic_joint_check_bodies(2),ladder_radius));
     }
     else{
-        for(int i=1;i<=ladder_bodies.m;i++) right_hand_joint=(right_hand_joint || Check_For_New_Joint(ladder_bodies(i),dynamic_joint_check_bodies(1),ladder_radius));
-        for(int i=1;i<=ladder_bodies.m;i++) left_hand_joint=(left_hand_joint || Check_For_New_Joint(ladder_bodies(i),dynamic_joint_check_bodies(2),ladder_radius));
+        for(int i=0;i<ladder_bodies.m;i++) right_hand_joint=(right_hand_joint || Check_For_New_Joint(ladder_bodies(i),dynamic_joint_check_bodies(1),ladder_radius));
+        for(int i=0;i<ladder_bodies.m;i++) left_hand_joint=(left_hand_joint || Check_For_New_Joint(ladder_bodies(i),dynamic_joint_check_bodies(2),ladder_radius));
         std::cout<<"checking for hand joints. right hand: "<< right_hand_joint<<" left hand: "<<left_hand_joint<<std::endl;
     }
     found=false;
     T ladder_radius_foot=parameter_list.Get_Parameter("ladder_scale",(T)1)*parameter_list.Get_Parameter("radius_foot",(T).02); // ladder radius normally
     if(force_left_foot || force_right_foot){
-        if(force_left_foot) for(int i=1;i<=ladder_bodies.m;i++) left_foot_joint=(left_foot_joint || Check_For_New_Joint(ladder_bodies(i),dynamic_joint_check_bodies(4),ladder_radius_foot));
-        if(force_right_foot) for(int i=1;i<=ladder_bodies.m;i++) right_foot_joint=(right_foot_joint || Check_For_New_Joint(ladder_bodies(i),dynamic_joint_check_bodies(3),ladder_radius_foot));
+        if(force_left_foot) for(int i=0;i<ladder_bodies.m;i++) left_foot_joint=(left_foot_joint || Check_For_New_Joint(ladder_bodies(i),dynamic_joint_check_bodies(4),ladder_radius_foot));
+        if(force_right_foot) for(int i=0;i<ladder_bodies.m;i++) right_foot_joint=(right_foot_joint || Check_For_New_Joint(ladder_bodies(i),dynamic_joint_check_bodies(3),ladder_radius_foot));
     }
     else if(right_foot_joint){
-        for(int i=1;i<=ladder_bodies.m;i++) found=(found || Check_For_New_Joint(ladder_bodies(i),dynamic_joint_check_bodies(4),ladder_radius_foot));
+        for(int i=0;i<ladder_bodies.m;i++) found=(found || Check_For_New_Joint(ladder_bodies(i),dynamic_joint_check_bodies(4),ladder_radius_foot));
         if(found){right_foot_joint=false;left_foot_joint=true;}
-        else for(int i=1;i<=ladder_bodies.m;i++) found=(found || Check_For_New_Joint(ladder_bodies(i),dynamic_joint_check_bodies(3),ladder_radius_foot));
+        else for(int i=0;i<ladder_bodies.m;i++) found=(found || Check_For_New_Joint(ladder_bodies(i),dynamic_joint_check_bodies(3),ladder_radius_foot));
     }
     else if(left_foot_joint){
-        for(int i=1;i<=ladder_bodies.m;i++) found=(found || Check_For_New_Joint(ladder_bodies(i),dynamic_joint_check_bodies(3),ladder_radius_foot));
+        for(int i=0;i<ladder_bodies.m;i++) found=(found || Check_For_New_Joint(ladder_bodies(i),dynamic_joint_check_bodies(3),ladder_radius_foot));
         if(found){right_foot_joint=true;left_foot_joint=false;}
-        else for(int i=1;i<=ladder_bodies.m;i++) found=(found || Check_For_New_Joint(ladder_bodies(i),dynamic_joint_check_bodies(4),ladder_radius_foot));
+        else for(int i=0;i<ladder_bodies.m;i++) found=(found || Check_For_New_Joint(ladder_bodies(i),dynamic_joint_check_bodies(4),ladder_radius_foot));
     }
     else{
-        for(int i=1;i<=ladder_bodies.m;i++) right_foot_joint=(right_foot_joint || Check_For_New_Joint(ladder_bodies(i),dynamic_joint_check_bodies(3),ladder_radius_foot));
-        for(int i=1;i<=ladder_bodies.m;i++) left_foot_joint=(left_foot_joint || Check_For_New_Joint(ladder_bodies(i),dynamic_joint_check_bodies(4),ladder_radius_foot));
+        for(int i=0;i<ladder_bodies.m;i++) right_foot_joint=(right_foot_joint || Check_For_New_Joint(ladder_bodies(i),dynamic_joint_check_bodies(3),ladder_radius_foot));
+        for(int i=0;i<ladder_bodies.m;i++) left_foot_joint=(left_foot_joint || Check_For_New_Joint(ladder_bodies(i),dynamic_joint_check_bodies(4),ladder_radius_foot));
     }
     if(parameter_list.Get_Parameter("check_for_all_joints",false)) {
-        for(int i=1;i<=ladder_bodies.m;i++) right_hand_joint=(right_hand_joint || Check_For_New_Joint(ladder_bodies(i),dynamic_joint_check_bodies(1),ladder_radius));
-        for(int i=1;i<=ladder_bodies.m;i++) left_hand_joint=(left_hand_joint || Check_For_New_Joint(ladder_bodies(i),dynamic_joint_check_bodies(2),ladder_radius));
-        for(int i=1;i<=ladder_bodies.m;i++) right_foot_joint=(right_foot_joint || Check_For_New_Joint(ladder_bodies(i),dynamic_joint_check_bodies(3),ladder_radius_foot));
-        for(int i=1;i<=ladder_bodies.m;i++) left_foot_joint=(left_foot_joint || Check_For_New_Joint(ladder_bodies(i),dynamic_joint_check_bodies(4),ladder_radius_foot));}
+        for(int i=0;i<ladder_bodies.m;i++) right_hand_joint=(right_hand_joint || Check_For_New_Joint(ladder_bodies(i),dynamic_joint_check_bodies(1),ladder_radius));
+        for(int i=0;i<ladder_bodies.m;i++) left_hand_joint=(left_hand_joint || Check_For_New_Joint(ladder_bodies(i),dynamic_joint_check_bodies(2),ladder_radius));
+        for(int i=0;i<ladder_bodies.m;i++) right_foot_joint=(right_foot_joint || Check_For_New_Joint(ladder_bodies(i),dynamic_joint_check_bodies(3),ladder_radius_foot));
+        for(int i=0;i<ladder_bodies.m;i++) left_foot_joint=(left_foot_joint || Check_For_New_Joint(ladder_bodies(i),dynamic_joint_check_bodies(4),ladder_radius_foot));}
     }
 }
 bool Check_For_New_Joint(RIGID_BODY<TV>* ladder_body,RIGID_BODY<TV>* bone_body,const T ladder_radius)

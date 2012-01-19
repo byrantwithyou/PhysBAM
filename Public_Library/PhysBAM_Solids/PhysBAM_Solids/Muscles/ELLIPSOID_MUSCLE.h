@@ -89,7 +89,7 @@ public:
         ARRAY<bool> tet_indices;tet_indices.Resize(tet_vol->tetrahedron_list.m);
         for(int i=1;i<tet_indices.m;i++)tet_indices(i)=false;
 
-        for(int i=1;i<=touching_particle_indices.m;i++)
+        for(int i=0;i<touching_particle_indices.m;i++)
             for(int j=1;j<=(tet_vol->mesh->incident_elements(i)).m;j++)tet_indices((tet_vol->mesh->incident_elements(i))(j))=true;
 
         ARRAY<int> touching_tet_indices;
@@ -106,7 +106,7 @@ public:
 
         ARRAY<ROTATION<TV> > orientations=Update_Orientations();
         VECTOR<T,3> inv_rot_pos;
-        for(int i=1;i<=ellipsoid_list.m;i++){
+        for(int i=0;i<ellipsoid_list.m;i++){
             inv_rot_pos=orientations(i).Inverse()*position;
             T result=sqr(inv_rot_pos(1)-(ellipsoid_list(i)->center)(1))/sqr((ellipsoid_list(i)->radius)(1))+
                 sqr(inv_rot_pos(2)-(ellipsoid_list(i)->center)(2))/sqr((ellipsoid_list(i)->radius)(2))+
@@ -123,7 +123,7 @@ public:
     void Setup_Ellipsoid_List(int ellipsoid_list_size)
     {
         ellipsoid_list.Resize(ellipsoid_list_size);
-        for(int i=1;i<=ellipsoid_list.m;i++)ellipsoid_list(i)=new ELLIPSOID<T>();
+        for(int i=0;i<ellipsoid_list.m;i++)ellipsoid_list(i)=new ELLIPSOID<T>();
 
         // calculate volumes in volume list
         volume_list.Resize(ellipsoid_list_size);

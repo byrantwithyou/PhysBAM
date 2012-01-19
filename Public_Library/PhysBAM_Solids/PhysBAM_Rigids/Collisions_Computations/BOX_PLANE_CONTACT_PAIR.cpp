@@ -49,7 +49,7 @@ bool Update_Box_Plane_Contact_Pair(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisi
     BOX<TV>& box=implicit_box->analytic;
 
     ARRAY<TV> points;bool intersect=false;
-    for(int i=1;i<=8;i++){
+    for(int i=0;i<8;i++){
         TV point=box.min_corner;
         if(i>4) point(1)=box.max_corner(1);
         if(i%4==0||i%4==3) point(2)=box.max_corner(2);
@@ -64,7 +64,7 @@ bool Update_Box_Plane_Contact_Pair(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisi
     if(!intersect){rigid_body_collisions.skip_collision_check.Set_Last_Checked(i1,i2);return false;}  
     if(TV::Dot_Product(body1->Twist().linear-body2->Twist().linear,collision_normal)>=0) return false;
 
-    TV collision_location;for(int i=1;i<=points.m;i++) collision_location+=points(i);collision_location/=(T)points.m;collision_location=body1->Frame()*collision_location;
+    TV collision_location;for(int i=0;i<points.m;i++) collision_location+=points(i);collision_location/=(T)points.m;collision_location=body1->Frame()*collision_location;
     TV collision_relative_velocity=body1->Pointwise_Object_Velocity(collision_location)-body2->Pointwise_Object_Velocity(collision_location);
 
     collision_callbacks.Swap_States(i1,i2);

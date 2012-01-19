@@ -74,7 +74,7 @@ void WAVE::Initialize_Velocities(){
 void WAVE::Get_Objects(double time){
     double epsilon=.0001*max(grid.dx,grid.dy);
     // sloped bottom - screws up the step, but ok if the water surface is never near there!
-    for(int i=1;i<=m;i++) for(int j=1;j<=n;j++)
+    for(int i=0;i<m;i++) for(int j=0;j<n;j++)
         if(grid.x(i) > 50 && 14*grid.y(j)-grid.x(i)+0 < 0){
             // extrapolate phi inward
             double length=sqrt(197),nx=-1/length,ny=14/length;

@@ -576,7 +576,7 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
 
     //set custom boundary
     VECTOR<VECTOR<bool,2>,T_GRID::dimension> valid_wall;
-    for(int axis=1;axis<=T_GRID::dimension;axis++) for(int axis_side=1;axis_side<=2;axis_side++)
+    for(int axis=1;axis<=T_GRID::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++)
         valid_wall[axis][axis_side]=(fluids_parameters.mpi_grid?!fluids_parameters.mpi_grid->Neighbor(axis,axis_side):true) && !fluids_parameters.domain_walls[axis][axis_side];
 
     TV far_field_velocity=TV(state_outside(2),state_outside(3),state_outside(4));
@@ -1141,7 +1141,7 @@ void Finalize_Deformable_Bodies()
     //solid_body_collection.collision_body_list.Add_Bodies(*rigid_body_collection.rigid_geometry_collection.collision_body_list);
 
     // correct number nodes
-    for(int i=1;i<=solid_body_collection.deformable_body_collection.deformable_geometry.structures.m;i++) solid_body_collection.deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<solid_body_collection.deformable_body_collection.deformable_geometry.structures.m;i++) solid_body_collection.deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents();
@@ -1220,9 +1220,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     if(use_solids_gravity) solid_body_collection.Add_Force(new GRAVITY<TV>(solid_body_collection.deformable_body_collection.particles,rigid_body_collection,true,true,solid_gravity));
 
     // Half forces for SPD
-    for(int i=1;i<=solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->compute_half_forces=true;
-    for(int k=1;k<=solid_body_collection.deformable_body_collection.deformables_forces.m;k++) solid_body_collection.deformable_body_collection.deformables_forces(k)->compute_half_forces=true;
-    for(int i=1;i<=solid_body_collection.rigid_body_collection.rigids_forces.m;i++) solid_body_collection.rigid_body_collection.rigids_forces(i)->compute_half_forces=true;
+    for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->compute_half_forces=true;
+    for(int k=0;k<solid_body_collection.deformable_body_collection.deformables_forces.m;k++) solid_body_collection.deformable_body_collection.deformables_forces(k)->compute_half_forces=true;
+    for(int i=0;i<solid_body_collection.rigid_body_collection.rigids_forces.m;i++) solid_body_collection.rigid_body_collection.rigids_forces(i)->compute_half_forces=true;
 }
 void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 {
@@ -1253,7 +1253,7 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
     if(fluids_parameters.use_slip && solids_fluids_parameters.use_fluid_rigid_fracture){
         FRACTURE_PATTERN<T>* fp=(dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>&>(*solids_evolution)).fracture_pattern;
         if(solids_fluids_parameters.use_fluid_rigid_fracture && fp && !fp->regions.m){
-            for(int i=1;i<=fracture_pattern.regions.m;i++) fp->regions.Append(fracture_pattern.regions(i));}}
+            for(int i=0;i<fracture_pattern.regions.m;i++) fp->regions.Append(fracture_pattern.regions(i));}}
 }
 //#####################################################################
 // Function Shrink_Levelset

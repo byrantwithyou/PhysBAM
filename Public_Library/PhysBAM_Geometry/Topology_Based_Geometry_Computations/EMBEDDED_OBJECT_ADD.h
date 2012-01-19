@@ -95,7 +95,7 @@ Add_Embedded_Subelement(EMBEDDED_OBJECT<TV,d>& eo,const VECTOR<int,d>& embedded_
     assert(!eo.embedded_mesh.Simplex(global_particles));
     int new_subelement=eo.embedded_mesh.elements.Append(global_particles);
     if(eo.embedded_mesh.incident_elements) // needs to be updated
-        for(int i=1;i<=global_particles.m;i++) (*eo.embedded_mesh.incident_elements)(global_particles[i]).Append(new_subelement);
+        for(int i=0;i<global_particles.m;i++) (*eo.embedded_mesh.incident_elements)(global_particles[i]).Append(new_subelement);
     if(eo.embedded_subelements_in_parent_element) eo.Add_Embedded_Subelement_To_Embedded_Subelements_In_Element(new_subelement);
     return new_subelement;
 }

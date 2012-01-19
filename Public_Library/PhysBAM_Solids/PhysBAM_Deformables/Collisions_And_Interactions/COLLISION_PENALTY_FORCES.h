@@ -96,7 +96,7 @@ public:
         collision_body.tetrahedralized_volume.triangulated_surface->Update_Vertex_Normals();}}
 
     void Update_Forces_And_Derivatives() // Currently works only with a single fragment
-    {for(int p=1;p<=check_collision.m;p++){
+    {for(int p=0;p<check_collision.m;p++){
         int index=check_collision(p);collision_force(p)=TV();collision_force_derivative(p)=T_SYMMETRIC_MATRIX();
         for(COLLISION_GEOMETRY_ID r(1);r<=collision_body_list->bodies.m;r++) if(collision_body_list->Is_Active(r)){
             COLLISION_GEOMETRY<TV>& collision_body=*collision_body_list->bodies(r);
@@ -113,13 +113,13 @@ public:
 
     // Currently works only with a single fragment
     void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE
-    {for(int p=1;p<=check_collision.m;p++) F(check_collision(p))+=collision_force(p);}
+    {for(int p=0;p<check_collision.m;p++) F(check_collision(p))+=collision_force(p);}
 
     void Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE
     {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 
     void Add_Force_Differential(ARRAY_VIEW<const TV> dX,ARRAY_VIEW<TV> dF,const T time) const PHYSBAM_OVERRIDE // Currently works only with a single fragment
-    {for(int p=1;p<=check_collision.m;p++) dF(check_collision(p))+=collision_force_derivative(p)*dX(check_collision(p));}
+    {for(int p=0;p<check_collision.m;p++) dF(check_collision(p))+=collision_force_derivative(p)*dX(check_collision(p));}
 
     T CFL_Strain_Rate() const PHYSBAM_OVERRIDE
     {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}

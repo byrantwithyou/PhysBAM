@@ -31,7 +31,7 @@ void Motion_By_Mean_Curvature(OCTREE_LEVELSET<T>& levelset,T fmm_band,const T cf
     levelset.Compute_Curvature(time);
     T one_over_two_dx=1/(2*minimum_cell_size),one_over_two_dy=1/(2*minimum_cell_size),one_over_two_dz=1/(2*minimum_cell_size);
     VECTOR<T,3> x_offset(minimum_cell_size,0,0),y_offset(0,minimum_cell_size,0),z_offset(0,0,minimum_cell_size);
-    for(int i=1;i<=levelset.grid.number_of_nodes;i++){
+    for(int i=0;i<levelset.grid.number_of_nodes;i++){
         T phix=(levelset.grid.Interpolate_Nodes(phi_ghost,node_locations(i)+x_offset)-levelset.grid.Interpolate_Nodes(phi_ghost,node_locations(i)-x_offset))*one_over_two_dx;
         T phiy=(levelset.grid.Interpolate_Nodes(phi_ghost,node_locations(i)+y_offset)-levelset.grid.Interpolate_Nodes(phi_ghost,node_locations(i)-y_offset))*one_over_two_dy;
         T phiz=(levelset.grid.Interpolate_Nodes(phi_ghost,node_locations(i)+z_offset)-levelset.grid.Interpolate_Nodes(phi_ghost,node_locations(i)-z_offset))*one_over_two_dz;
@@ -82,7 +82,7 @@ int main(int argc,char *argv[])
     T cfl=(T)parse_args.Get_Double_Value("-cfl");
     T time=0;
     int total_steps=parse_args.Get_Integer_Value("-steps");
-    for(int substep=1;substep<=total_steps;substep++){
+    for(int substep=0;substep<total_steps;substep++){
         std::cout << "time = " << time << std::endl;
         Motion_By_Mean_Curvature(levelset,fmm_band,cfl,time); 
         if(write_substeps){

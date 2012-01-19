@@ -163,7 +163,7 @@ public:
 
     ~IMAGE_SEQUENCE_READER()
     {
-        for(int i=1;i<=cache.m;i++) if(cache(i)) delete[] cache(i);
+        for(int i=0;i<cache.m;i++) if(cache(i)) delete[] cache(i);
     }
 
     bool Valid() const
@@ -187,7 +187,7 @@ public:
     else{
         Frame(frame,temporary_image);
         unsigned char* buffer=image;
-        for(int j=height;j>=1;j--) for(int i=1;i<=width;i++){
+        for(int j=height;j>=1;j--) for(int i=0;i<width;i++){
             buffer[0]=IMAGE<T>::Scalar_Color_To_Byte_Color(temporary_image(i,j).x);
             buffer[1]=IMAGE<T>::Scalar_Color_To_Byte_Color(temporary_image(i,j).y);
             buffer[2]=IMAGE<T>::Scalar_Color_To_Byte_Color(temporary_image(i,j).z);
@@ -394,7 +394,7 @@ public:
         int ret;
 
         unsigned char* buffer=picture_rgb->data[0];
-        for(int j=height;j>=1;j--) for(int i=1;i<=width;i++){
+        for(int j=height;j>=1;j--) for(int i=0;i<width;i++){
             buffer[0]=IMAGE<T>::Scalar_Color_To_Byte_Color(image(i,j).x);
             buffer[1]=IMAGE<T>::Scalar_Color_To_Byte_Color(image(i,j).y);
             buffer[2]=IMAGE<T>::Scalar_Color_To_Byte_Color(image(i,j).z);

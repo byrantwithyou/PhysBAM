@@ -63,7 +63,7 @@ public:
 
     int Get_Send_Tag(const TV_INT& direction) const
     {STATIC_ASSERT(TV_INT::m<=3);int tag=0;
-    for(int i=1;i<=direction.m;i++){assert(abs(direction[i])<=1);tag=3*tag+direction[i]+1;}
+    for(int i=0;i<direction.m;i++){assert(abs(direction[i])<=1);tag=3*tag+direction[i]+1;}
     return tag;}
 
     int Get_Recv_Tag(const TV_INT& direction) const
@@ -72,7 +72,7 @@ public:
 protected:
     TV Wrap_Offset(const TV_INT& direction) const // offset to add to translate into space of adjacent processor
     {TV offset;TV_INT neighbor_coordinates=coordinates+direction;
-    for(int axis=1;axis<=offset.m;axis++)if(periodic[axis] && (neighbor_coordinates[axis]<1 || neighbor_coordinates[axis]>process_grid.counts[axis]))
+    for(int axis=0;axis<offset.m;axis++)if(periodic[axis] && (neighbor_coordinates[axis]<1 || neighbor_coordinates[axis]>process_grid.counts[axis]))
         offset[axis]=-direction[axis]*global_grid.domain.Edge_Lengths()[axis];
     return offset;}
 public:

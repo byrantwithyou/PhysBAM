@@ -69,7 +69,7 @@ virtual void Get_Initial_Data()
     
     GRID<TV> torus_grid(m_input,n_input,mn_input,torus.bounding_box);
     if(!cube_mesh) tetrahedralized_volume.Initialize_Octahedron_Mesh_And_Particles(torus_grid);else tetrahedralized_volume.Initialize_Cube_Mesh_And_Particles(torus_grid);
-    ARRAY<T> phi(particles.array_collection->Size());for(int p=1;p<=phi.m;p++) phi(p)=torus.Phi(particles.X(p));
+    ARRAY<T> phi(particles.array_collection->Size());for(int p=0;p<phi.m;p++) phi(p)=torus.Phi(particles.X(p));
     embedded_tetrahedralized_volume.Calculate_Triangulated_Surface_From_Levelset_On_Tetrahedron_Nodes(phi);
        
     tetrahedralized_volume.Set_Density(500);tetrahedralized_volume.Set_Mass_Of_Particles(solids_parameters.use_constant_mass);   

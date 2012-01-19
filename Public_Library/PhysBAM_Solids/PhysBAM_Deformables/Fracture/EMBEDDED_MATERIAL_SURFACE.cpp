@@ -104,12 +104,12 @@ Update_Binding_List_From_Embedding(DEFORMABLE_BODY_COLLECTION<TV>& deformable_bo
         deformable_body_collection.deformable_geometry.Add_Structure(free_particles);
         deformable_body_collection.collisions.collision_structures.Append(free_particles);}
     else free_particles->nodes.Remove_All();
-    for(int p=1;p<=embedded_particles.active_indices.m;p++) binding_list.Add_Binding(new LINEAR_BINDING<TV,2>(dynamic_cast<PARTICLES<TV>&>(particles),embedded_particles.active_indices(p),
+    for(int p=0;p<embedded_particles.active_indices.m;p++) binding_list.Add_Binding(new LINEAR_BINDING<TV,2>(dynamic_cast<PARTICLES<TV>&>(particles),embedded_particles.active_indices(p),
         parent_particles(p),VECTOR<T,2>((T)1-interpolation_fraction(p),interpolation_fraction(p))));
     ARRAY<bool> used(deformable_body_collection.particles.array_collection->Size());
     used.Subset(material_surface_mesh.elements.Flattened()).Fill(true);
     int j=0;
-    for(int p=1;p<=embedded_particles.active_indices.m;p++){
+    for(int p=0;p<embedded_particles.active_indices.m;p++){
         if(used(embedded_particles.active_indices(p))){
             if(++j>soft_particles.m) soft_particles.Append(deformable_body_collection.particles.array_collection->Add_Element());
             soft_bindings.Add_Binding(VECTOR<int,2>(soft_particles(j),embedded_particles.active_indices(p)),true);

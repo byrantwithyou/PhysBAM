@@ -28,7 +28,7 @@ Transfer_Residual_To_Coarse_Grid()
     for(BOX_ITERATOR<d> iterator(restriction_indices);iterator.Valid();iterator.Next()){
 	const T_INDEX& offset_index=iterator.Index();
  	T scale=(T)1/(1<<(d-2));
-	for(int v=1;v<=d;v++)
+	for(int v=0;v<d;v++)
 	    switch(offset_index(v)){
 		case -1:
 		case 2:
@@ -72,7 +72,7 @@ Transfer_Correction_To_Fine_Grid()
     for(BOX_ITERATOR<d> iterator(prolongation_indices);iterator.Valid();iterator.Next()){
 	const T_INDEX& offset_index=iterator.Index();
 	T scale=(T)1;
-	for(int v=1;v<=d;v++)
+	for(int v=0;v<d;v++)
 	    switch(offset_index(v)){
 		case -1:
 		case 1:

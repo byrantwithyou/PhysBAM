@@ -49,7 +49,7 @@ public:
     {T_ARRAY converted_indices=simplex_indices;INDIRECT_ARRAY<const ARRAY<CUTTING_SIMPLEX<T,d> >,T_ARRAY&> simplices_subset(simplices,simplex_indices);
     if(simplices_subset.template Project<typename CUTTING_SIMPLEX<T,d>::SIMPLEX_TYPE,&CUTTING_SIMPLEX<T,d>::type>().Contains(CUTTING_SIMPLEX<T,d>::LOCAL_EMBEDDING_FACE)){
         converted=true;
-        for(int i=1;i<=simplex_indices.m;i++){int t=simplex_indices(i);
+        for(int i=0;i<simplex_indices.m;i++){int t=simplex_indices(i);
             if(simplices(t).type==CUTTING_SIMPLEX<T,d>::LOCAL_CUT_FACE || simplices(t).type==CUTTING_SIMPLEX<T,d>::LOCAL_EMBEDDING_FACE)
                 converted_indices(i)=simplices(t).parent;}}
     else converted=false;
@@ -70,7 +70,7 @@ public:
     {const CUTTING_SIMPLEX<T,d>& simplex=simplices(simplex_index);return simplex.weights(simplex.nodes.Find(node));}
 
     template<int d2> VECTOR<VECTOR<T,d>,d2> Weight_For_Nodes_In_Simplex(const int simplex_index,const VECTOR<int,d2>& nodes)
-    {VECTOR<VECTOR<T,d>,d2> r;for(int i=1;i<=nodes.m;i++) r[i]=Weight_For_Node_In_Simplex(simplex_index,nodes[i]);return r;}
+    {VECTOR<VECTOR<T,d>,d2> r;for(int i=0;i<nodes.m;i++) r[i]=Weight_For_Node_In_Simplex(simplex_index,nodes[i]);return r;}
 
     void Set_Index_For_Last_Old_Cutting_Simplex()
     {index_for_last_old_cutting_simplex=simplices.m;}

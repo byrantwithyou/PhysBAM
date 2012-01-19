@@ -22,7 +22,7 @@ Convert(const std::string& input_filename,const std::string& output_filename)
     sequence.Initialize(marker_count,GRID_1D<T>(c3d_file.Number_Frames(),0,(c3d_file.Number_Frames()-1)/(T)c3d_file.Frame_Rate()));
     c3d_file.Get_Labels(sequence.names);
     ARRAY<C3D_POINT> points;
-    for(int i=1;i<=marker_count;i++) for(int frame=1;frame<=frame_count;frame++){
+    for(int i=0;i<marker_count;i++) for(int frame=0;frame<frame_count;frame++){
         C3D_POINT& point=c3d_file.frames(frame,i);
         sequence.trajectories(i)(frame)=(T)1e-3*VECTOR<T,3>(point.x,point.y,point.z);
         sequence.valid(i)(frame)=(bool)point.camera_visible;}
@@ -30,7 +30,7 @@ Convert(const std::string& input_filename,const std::string& output_filename)
 
     std::cout<<"Markers "<<marker_count<<" Frames "<<frame_count<<std::endl;
     std::cout<<"Marker names ";
-    for(int i=1;i<=marker_count;i++) std::cout<<" "<<sequence.names(i);
+    for(int i=0;i<marker_count;i++) std::cout<<" "<<sequence.names(i);
     std::cout<<std::endl;
     FILE_UTILITIES::Write_To_File<T>(output_filename,sequence);
 }
@@ -47,14 +47,14 @@ Get_Joint_Angles(const std::string& input_filename,const std::string& output_fil
     sequence.Initialize(marker_count,GRID_1D<T>(c3d_file.Number_Frames(),0,(c3d_file.Number_Frames()-1)/(T)c3d_file.Frame_Rate()));
     c3d_file.Get_Descriptions(sequence.names);
     ARRAY<C3D_POINT> points;
-    for(int i=1;i<=marker_count;i++) for(int frame=1;frame<=frame_count;frame++){
+    for(int i=0;i<marker_count;i++) for(int frame=0;frame<frame_count;frame++){
         C3D_POINT& point=c3d_file.frames(frame,i);
         sequence.trajectories(i)(frame)=(T)1e-3*VECTOR<T,3>(point.x,point.y,point.z);
         sequence.valid(i)(frame)=(bool)point.camera_visible;}
     Clear_Spaces(marker_count, sequence);
     std::cout<<"Markers "<<marker_count<<" Frames "<<frame_count<<std::endl;
     std::cout<<"Marker names ";
-    for(int i=1;i<=marker_count;i++) std::cout<<" "<<sequence.names(i);
+    for(int i=0;i<marker_count;i++) std::cout<<" "<<sequence.names(i);
     std::cout<<std::endl;
 
     FILE *fp=fopen(joint_filename,"rt");

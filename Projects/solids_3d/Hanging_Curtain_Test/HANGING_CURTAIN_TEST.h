@@ -56,7 +56,7 @@ void Get_Initial_Data(TRIANGULATED_SURFACE<T>& triangulated_surface)
 
     int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;
     triangle_mesh.Initialize_Herring_Bone_Mesh(m,n);
-    for(int k=1;k<=triangle_mesh.number_nodes;k++) particles.array_collection->Add_Element();
+    for(int k=0;k<triangle_mesh.number_nodes;k++) particles.array_collection->Add_Element();
     T mass_node=aspect_ratio*sqr(side_length)/(m*n);ARRAY<T,VECTOR<int,1> >::copy(mass_node,particles.mass); 
     T dx=aspect_ratio*side_length/(m-1),dy=side_length/(n-1);
 
@@ -64,7 +64,7 @@ void Get_Initial_Data(TRIANGULATED_SURFACE<T>& triangulated_surface)
     VECTOR_3D<T> cloth_x_direction(0,-1,0);
     VECTOR_3D<T> cloth_y_direction(0,0,1);
 
-    for(int i=1;i<=m;i++) for(int j=1;j<=n;j++){int node=i+m*(j-1);
+    for(int i=0;i<m;i++) for(int j=0;j<n;j++){int node=i+m*(j-1);
         particles.X(node)=corner + (i-1)*dx*cloth_x_direction + (j-1)*dy*cloth_y_direction;
         particles.V(node)=VECTOR_3D<T>(0,0,0);}
 

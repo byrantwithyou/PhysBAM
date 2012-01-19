@@ -42,7 +42,7 @@ public:
 
     static void Copy(const T c,const KRYLOV_VECTOR_BASE<T>& bc1,const KRYLOV_VECTOR_BASE<T>& bc2,KRYLOV_VECTOR_BASE<T>& bv)
     {const KRYLOV_VECTOR_T& c1=debug_cast<const KRYLOV_VECTOR_T&>(bc1),&c2=debug_cast<const KRYLOV_VECTOR_T&>(bc2);KRYLOV_VECTOR_T& v=debug_cast<KRYLOV_VECTOR_T&>(bv);
-    for(int i=1;i<=c1.v.m;i++) VECTOR_T::Copy(c,c1.v(i),c2.v(i),v.v(i));}
+    for(int i=0;i<c1.v.m;i++) VECTOR_T::Copy(c,c1.v(i),c2.v(i),v.v(i));}
 
     void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& x) const PHYSBAM_OVERRIDE // only nullspace stuff for fluids - leave out for now
     {}

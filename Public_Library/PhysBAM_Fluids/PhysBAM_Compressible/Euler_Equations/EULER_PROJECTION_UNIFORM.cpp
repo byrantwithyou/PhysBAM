@@ -230,7 +230,7 @@ Compute_Advected_Pressure(const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const T_FACE_
         VECTOR<int,2> region_boundary;
         for(CELL_ITERATOR_LOWER_DIM iterator(lower_dimension_grid);iterator.Valid();iterator.Next()){TV_INT_LOWER_DIM cell_index=iterator.Cell_Index();
             for(int i=-2;i<=grid_1d.counts.x+3;i++) u(i)=v_cell(cell_index.Insert(i,axis))[axis];
-            for(int i=1;i<=grid_1d.counts.x;i++) colors(i)=euler->psi(cell_index.Insert(i,axis))?0:-1;
+            for(int i=0;i<grid_1d.counts.x;i++) colors(i)=euler->psi(cell_index.Insert(i,axis))?0:-1;
             for(int i=1;i<=grid_1d.counts.x+1;i++) psi_N_axis(i)=elliptic_solver->psi_N(axis,cell_index.Insert(i,axis));
             int number_of_regions=find_connected_components.Flood_Fill(colors,psi_N_axis);
             for(int color=0;color<number_of_regions;color++){
@@ -323,7 +323,7 @@ Get_Ghost_Pressures(const T dt,const T time,const T_ARRAYS_BOOL& psi_D,const T_F
     // Restore dirichlet pressures at non-periodic dirichlet cells which are extrapolated by pressure_boundary
     if(!use_neumann_condition_for_outflow_boundaries){
         for(int axis=1;axis<=T_GRID::dimension;axis++) if(!elliptic_solver->periodic_boundary[axis]){
-            for(int axis_side=1;axis_side<=2;axis_side++){int side=2*(axis-1)+axis_side;
+            for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
                 for(CELL_ITERATOR iterator(euler->grid,1,T_GRID::GHOST_REGION,side);iterator.Valid();iterator.Next()){
                     TV_INT cell_index=iterator.Cell_Index();
                     TV_INT boundary_face_index=side&1?iterator.Second_Face_Index(axis):iterator.First_Face_Index(axis);
@@ -425,7 +425,7 @@ Consistent_Boundary_Conditions() const
         LOG::cout<<"checking for consistent mpi boundaries"<<std::endl;
         T_ARRAYS_BOOL psi_D_ghost(elliptic_solver->psi_D);T_FACE_ARRAYS_SCALAR psi_N_ghost(euler->grid);
         euler->mpi_grid->Exchange_Boundary_Cell_Data(psi_D_ghost,1);
-        for(int axis=1;axis<=T_GRID::dimension;axis++)for(int axis_side=1;axis_side<=2;axis_side++){int side=2*(axis-1)+axis_side;
+        for(int axis=1;axis<=T_GRID::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
             if(euler->mpi_grid->Neighbor(axis,axis_side)){TV_INT exterior_cell_offset=axis_side==1?-TV_INT::Axis_Vector(axis):TV_INT();
                 for(FACE_ITERATOR iterator(euler->grid,0,T_GRID::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
                     TV_INT face=iterator.Face_Index(),cell=face+exterior_cell_offset;int axis=iterator.Axis();

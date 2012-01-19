@@ -64,7 +64,7 @@ Advance_One_Time_Step(const T_FACE_ARRAYS_SCALAR& V,const T dt,const T time,cons
     T mean_curvature=(T)0;
     T mean_A=(T)0,mean_B=(T)0,mean_C=(T)0,mean_D=(T)0;
     T mean_Dn=(T)0,mean_Dn_dot=(T)0;
-    for(int i=1;i<=indices_interface.m;i++){TV_INT index=indices_interface(i);
+    for(int i=0;i<indices_interface.m;i++){TV_INT index=indices_interface(i);
         interfacial(index)=true;
         // Determine Control Coefficients
         curvature.array(index)=(*levelset.curvature)(index)*grid.dX.x;
@@ -115,7 +115,7 @@ Advance_One_Time_Step(const T_FACE_ARRAYS_SCALAR& V,const T dt,const T time,cons
     if(indices_interface.m>0){
         T Dcj_min=Dn.array(indices_interface(1)),Dcj_max=Dcj_min;
         T Ddot_min=Dn_dot.array(indices_interface(1)),Ddot_max=Ddot_min;
-        for(int i=1;i<=indices_interface.m;i++){TV_INT index=indices_interface(i);
+        for(int i=0;i<indices_interface.m;i++){TV_INT index=indices_interface(i);
             Dcj_min=min(Dn.array(index),Dcj_min);Dcj_max=max(Dn.array(index),Dcj_max);
             Ddot_min=min(Dn_dot.array(index),Ddot_min);Ddot_max=max(Dn_dot.array(index),Ddot_max);}
         LOG::cout<<"Dn ("<<Dcj_min<<","<<Dcj_max<<")"<<std::endl;

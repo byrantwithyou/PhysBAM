@@ -57,10 +57,10 @@ public:
 void Adjust_Density_And_Temperature_With_Sources(const T time) PHYSBAM_OVERRIDE
 {
     GRID<TV>& grid=fluids_parameters.grid;
-    if(time<=explosion_end_time) for(int i=1;i<=grid.m;i++)for(int j=1;j<=grid.n;j++)if(source_domain.Lazy_Inside(grid.X(i,j))){
+    if(time<=explosion_end_time) for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++)if(source_domain.Lazy_Inside(grid.X(i,j))){
         fluids_parameters.density_container.density_2d(i,j)=rho;fluids_parameters.temperature_container.temperature_2d(i,j)=fluids_parameters.temperature_products;}
     // keep density >= 0 and T >=0
-    for(int i=1;i<=grid.m;i++)for(int j=1;j<=grid.n;j++){
+    for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++){
         fluids_parameters.density_container.density_2d(i,j)=max((T)0,fluids_parameters.density_container.density_2d(i,j));
         fluids_parameters.temperature_container.temperature_2d(i,j)=max((T)fluids_parameters.temperature_container.ambient_temperature,fluids_parameters.temperature_container.temperature_2d(i,j));}
 }
@@ -71,7 +71,7 @@ void Get_Divergence(ARRAY<T,VECTOR<int,2> >& divergence,const T dt,const T time)
 {
     GRID<TV>& grid=fluids_parameters.grid;
     T expansion=explosion_divergence*sin(time)/exp(time);
-    for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++) if(source_domain.Lazy_Inside(grid.X(i,j))) divergence(i,j)=expansion;
+    for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++) if(source_domain.Lazy_Inside(grid.X(i,j))) divergence(i,j)=expansion;
 }
 //#####################################################################
 // Function Get_Body_Force
@@ -80,7 +80,7 @@ void Get_Body_Force(ARRAY<VECTOR_2D<T> ,VECTOR<int,2> >& force,const T dt,const 
 {
     GRID<TV>& grid=fluids_parameters.grid;DENSITY_CONTAINER<T>& density=fluids_parameters.density_container;
     TEMPERATURE_CONTAINER<T>& temperature=fluids_parameters.temperature_container;
-    for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++){ // y-direction forces only
+    for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++){ // y-direction forces only
         T rho_atm=rho_bottom+(rho_top-rho_bottom)*(grid.y(j)-grid.ymin)/(grid.ymax-grid.ymin);
         if(density.density_2d(i,j)>.5){
             T density_difference=density.density_2d(i,j)-rho_atm;

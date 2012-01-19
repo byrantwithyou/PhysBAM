@@ -227,7 +227,7 @@ Initialize_Scene()
     if(!initialization_key_sequence.empty()){
         LOG::cout<<"Initialization key sequence: '"<<initialization_key_sequence<<"'"<<std::endl;
         ARRAY<OPENGL_KEY> key_list;OPENGL_KEY::Parse_Key_Sequence(initialization_key_sequence,key_list);
-        for(int i=1;i<=key_list.m;i++)opengl_world.Handle_Keypress_Main(key_list(i),0,0);}
+        for(int i=0;i<key_list.m;i++)opengl_world.Handle_Keypress_Main(key_list(i),0,0);}
 
     if(camera_script_filename.empty() || !opengl_world.Load_View(camera_script_filename))
         opengl_world.Center_Camera_On_Scene();
@@ -239,7 +239,7 @@ void BASIC_VISUALIZATION::
 Update_OpenGL_Strings()
 {
     std::ostringstream output_stream;
-    for(int i=1;i<=component_list.m;i++) component_list(i)->Print_Selection_Info(output_stream,current_selection);
+    for(int i=0;i<component_list.m;i++) component_list(i)->Print_Selection_Info(output_stream,current_selection);
     opengl_world.Add_String(output_stream.str());
 }
 //#####################################################################
@@ -250,7 +250,7 @@ Reset_Objects_In_World()
 {
     opengl_world.Clear_All_Objects();
     // Add components
-    for(int i=1;i<=component_list.m;i++) opengl_world.Add_Object(component_list(i),true,true);
+    for(int i=0;i<component_list.m;i++) opengl_world.Add_Object(component_list(i),true,true);
     if(add_axes){
         if(!opengl_axes) opengl_axes=new OPENGL_AXES<float>();
         opengl_world.Add_Object(opengl_axes,false);}
@@ -287,7 +287,7 @@ Toggle_Axes()
 void BASIC_VISUALIZATION::
 Draw_All_Objects()
 {
-    for(int i=1;i<=component_list.m;i++) component_list(i)->Draw_All_Objects();
+    for(int i=0;i<component_list.m;i++) component_list(i)->Draw_All_Objects();
 }
 //#####################################################################
 // Function Process_Hits
@@ -303,7 +303,7 @@ Process_Hits(GLint hits,GLuint buffer[])
     opengl_world.Get_Selections(selections,hits,buffer);
     int current_priority=INT_MIN;
     float current_min_depth=FLT_MAX;
-    for(int i=1;i<=selections.m;i++){
+    for(int i=0;i<selections.m;i++){
         int this_priority=Selection_Priority(selections(i)->Actual_Type());
         if(!this_priority) continue;
 
@@ -318,7 +318,7 @@ Process_Hits(GLint hits,GLuint buffer[])
         current_min_depth=selections(i)->min_depth;}
 
     // Delete all of the other selection objects
-    for(int i=1;i<=selections.m;i++)
+    for(int i=0;i<selections.m;i++)
         if(selections(i)!=new_selection)
             delete selections(i);
 

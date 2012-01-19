@@ -37,10 +37,10 @@ int main(int argc,char* argv[])
         PARTICLES<TV>& particles=volume.particles;
         // find components
         UNION_FIND<> union_find(particles.array_collection->Size());
-        for(int t=1;t<=volume.mesh.elements.m;t++) union_find.Union(volume.mesh.elements(t));
+        for(int t=0;t<volume.mesh.elements.m;t++) union_find.Union(volume.mesh.elements(t));
         // compute volumes
         ARRAY<T> volumes(volume.particles.array_collection->Size());
-        for(int t=1;t<=volume.mesh.elements.m;t++){VECTOR<int,4>& nodes=volume.mesh.elements(t);
+        for(int t=0;t<volume.mesh.elements.m;t++){VECTOR<int,4>& nodes=volume.mesh.elements(t);
             int root=union_find.Find(nodes[1]);
             volumes(root)+=TETRAHEDRON<T>::Signed_Volume(particles.X(nodes[1]),particles.X(nodes[2]),particles.X(nodes[3]),particles.X(nodes[4]));}
         // print volumes

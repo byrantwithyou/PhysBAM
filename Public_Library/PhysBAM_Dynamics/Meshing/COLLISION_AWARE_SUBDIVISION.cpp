@@ -40,7 +40,7 @@ Push_Surface_Outside_Of_Collision_Bodies(const T push_distance,const int max_num
     geometry.Set_Small_Number((T)1e-12);
     while(!attempts || (interactions && attempts<max_number_of_attempts)){
         attempts++;interactions=0;
-        for(int s=1;s<=geometry.structure_geometries.m;s++){
+        for(int s=0;s<geometry.structure_geometries.m;s++){
             STRUCTURE_INTERACTION_GEOMETRY<TV>& structure=*geometry.structure_geometries(s);
             GEOMETRY_PARTICLES<TV>& particles=structure.triangulated_surface->particles;
             ARRAY_VIEW<TV> X(particles.X),V(particles.V);
@@ -50,7 +50,7 @@ Push_Surface_Outside_Of_Collision_Bodies(const T push_distance,const int max_num
                     depth=push_distance-depth+collision_tolerance;interactions++;
                     COLLISION_BODY_HELPER<TV>::Adjust_Point_For_Collision(*collision_body_list.bodies(r),X(p),depth);}}
         if(interactions && geometry.Check_For_Intersection(false,collision_tolerance)){
-            for(int s=1;s<=geometry.structure_geometries.m;s++){
+            for(int s=0;s<geometry.structure_geometries.m;s++){
                 STRUCTURE_INTERACTION_GEOMETRY<TV>& structure=*geometry.structure_geometries(s);
                 GEOMETRY_PARTICLES<TV>& particles=structure.triangulated_surface->particles;
                 ARRAY<TV> new_V(particles.X-particles.V);
@@ -82,7 +82,7 @@ Subdivide()
 {
     GEOMETRY_PARTICLES<TV>& full_particles=geometry.deformable_body_collection.particles;
     ARRAY<TV> goal_X;ARRAY_VIEW<TV> X(full_particles.X),V(full_particles.V);
-    for(int s=1;s<=geometry.structures.m;s++){
+    for(int s=0;s<geometry.structures.m;s++){
         TRIANGULATED_SURFACE<T>& triangulated_surface=dynamic_cast<TRIANGULATED_SURFACE<T>&>(*geometry.structures(s)); // MUST BE triangulated surface
         triangulated_surface.mesh.Set_Number_Nodes(full_particles.array_collection->Size());
         TRIANGLE_SUBDIVISION triangle_subdivision(triangulated_surface.mesh);TRIANGLE_MESH refined_mesh;triangle_subdivision.Refine_Mesh(refined_mesh);

@@ -21,7 +21,7 @@ template<class TV> KINEMATIC_EVOLUTION<TV>::
 template<class TV> void KINEMATIC_EVOLUTION<TV>::
 Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time)
 {
-    for(int i=1;i<=rigid_geometry_collection.kinematic_rigid_geometry.m;i++){int p=rigid_geometry_collection.kinematic_rigid_geometry(i);Set_External_Velocities(twist(p),velocity_time,p);}
+    for(int i=0;i<rigid_geometry_collection.kinematic_rigid_geometry.m;i++){int p=rigid_geometry_collection.kinematic_rigid_geometry(i);Set_External_Velocities(twist(p),velocity_time,p);}
     rigid_geometry_collection.rigid_geometry_example_velocities->Set_External_Velocities(twist,velocity_time,current_position_time);
 }
 //#####################################################################
@@ -62,7 +62,7 @@ Get_Current_Kinematic_Keyframes(const T dt,const T time)
     kinematic_current_state.Remove_All();kinematic_next_state.Remove_All();
     kinematic_current_state.Resize(rigid_geometry_collection.particles.array_collection->Size());
     kinematic_next_state.Resize(rigid_geometry_collection.particles.array_collection->Size());
-    for(int i=1;i<=rigid_geometry_collection.kinematic_rigid_geometry.m;i++){int p=rigid_geometry_collection.kinematic_rigid_geometry(i);
+    for(int i=0;i<rigid_geometry_collection.kinematic_rigid_geometry.m;i++){int p=rigid_geometry_collection.kinematic_rigid_geometry(i);
         kinematic_current_state(p).time=time;kinematic_next_state(p).time=time+dt;
         rigid_geometry_collection.rigid_geometry_example_velocities->Set_Kinematic_Positions(kinematic_current_state(p).frame,time,p);
         rigid_geometry_collection.rigid_geometry_example_velocities->Set_Kinematic_Positions(kinematic_next_state(p).frame,time+dt,p);
@@ -91,7 +91,7 @@ Set_External_Positions(TV& X,ROTATION<TV>& rotation,const T time,const int id)
 template<class TV> void KINEMATIC_EVOLUTION<TV>::
 Set_External_Positions(ARRAY_VIEW<TV> X,ARRAY_VIEW<ROTATION<TV> > rotation,const T time)
 {
-    for(int i=1;i<=rigid_geometry_collection.kinematic_rigid_geometry.m;i++){
+    for(int i=0;i<rigid_geometry_collection.kinematic_rigid_geometry.m;i++){
         int p=rigid_geometry_collection.kinematic_rigid_geometry(i);Set_External_Positions(X(p),rotation(p),time,p);}
     rigid_geometry_collection.rigid_geometry_example_velocities->Set_External_Positions(X,rotation,time);
 }
@@ -102,7 +102,7 @@ template<class TV> void KINEMATIC_EVOLUTION<TV>::
 Reset_Kinematic_Rigid_Bodies(const T time)
 {
     // Move kinematic bodies to their position at given time
-    for(int i=1;i<=rigid_geometry_collection.kinematic_rigid_geometry.m;i++){
+    for(int i=0;i<rigid_geometry_collection.kinematic_rigid_geometry.m;i++){
         RIGID_GEOMETRY<TV>& rigid_geometry=rigid_geometry_collection.Rigid_Geometry(rigid_geometry_collection.kinematic_rigid_geometry(i));
         Set_External_Positions(rigid_geometry.X(),rigid_geometry.Rotation(),time,rigid_geometry.particle_index);
         Set_External_Velocities(rigid_geometry.Twist(),time,rigid_geometry.particle_index);}

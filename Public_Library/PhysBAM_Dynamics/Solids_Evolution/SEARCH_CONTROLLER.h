@@ -201,7 +201,7 @@ public:
 
     JOINT<TV>* Joint(int parent_id,int child_id) const
     {
-        for(int i=1;i<=joint_mesh.joints.m;i++){
+        for(int i=0;i<joint_mesh.joints.m;i++){
             JOINT_ID joint_id=joint_mesh.joints(i)->id_number;
             if(Parent_Id(joint_id)==parent_id && Child_Id(joint_id)==child_id) return joint_mesh.joints(i);}
         return 0;

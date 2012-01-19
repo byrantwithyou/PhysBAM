@@ -15,7 +15,7 @@ Initialize_Muscle_Attachments_On_Rigid_Body()
 {
     muscle_attachments_on_rigid_body.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size());
     for(int i(1);i<=rigid_body_collection.rigid_body_particle.array_collection->Size();i++) muscle_attachments_on_rigid_body(i).Remove_All();
-    for(int i=1;i<=muscles.m;i++){
+    for(int i=0;i<muscles.m;i++){
         ATTACHMENT_POINT<TV>* attachment_1=muscles(i)->attachment_point_1;
         for(int j=1;j<=muscles(i)->via_points.m+1;j++){
             ATTACHMENT_POINT<TV>* attachment_2=j>muscles(i)->via_points.m?muscles(i)->attachment_point_2:muscles(i)->via_points(j);
@@ -59,7 +59,7 @@ Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame
     std::ostream* output=FILE_UTILITIES::Safe_Open_Output(STRING_UTILITIES::string_sprintf("%s/%d/muscle_states",directory.c_str(),frame));
     TYPED_OSTREAM typed_output=TYPED_OSTREAM(*output,stream_type);
     Write_Binary(typed_output,muscles.m);
-    for(int i=1;i<=muscles.m;i++) Write_Binary(typed_output,*muscles(i));
+    for(int i=0;i<muscles.m;i++) Write_Binary(typed_output,*muscles(i));
     delete output;
 }
 //#####################################################################

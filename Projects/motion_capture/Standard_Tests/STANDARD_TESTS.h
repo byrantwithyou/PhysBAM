@@ -233,7 +233,7 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
         controller->drag_direction=octosquid_body->Rotation().Rotate(TV(0,-1,0));
         bool old_min=controller->minimize;
         controller->minimize=((((int)cycle_time)%7==0 || ((int)cycle_time)%7==1 || ((int)cycle_time)%7==6)?false:true);
-        for(int i=1;i<=arb.joint_mesh.joints.m;i++){JOINT<TV>& joint=*arb.joint_mesh.joints(i);
+        for(int i=0;i<arb.joint_mesh.joints.m;i++){JOINT<TV>& joint=*arb.joint_mesh.joints(i);
             if(((int)cycle_time)%7==0 || ((int)cycle_time)%7==1 || ((int)cycle_time)%7==6) joint.joint_function->Set_k_p(750);
             else joint.joint_function->Set_k_p(1500);}
         if(old_min ^ controller->minimize){
@@ -270,7 +270,7 @@ void Set_PD_Targets(const T dt,const T time) PHYSBAM_OVERRIDE
     T alpha=time*motion_frame_rate-frame+1;
     if(use_motion_capture && !kinematic_motion){
        //motion capture input
-       for(int i=1;i<=arb.joint_mesh.joints.m;i++){JOINT<TV>& joint=*arb.joint_mesh.joints(i);
+       for(int i=0;i<arb.joint_mesh.joints.m;i++){JOINT<TV>& joint=*arb.joint_mesh.joints(i);
             bool controlled=false;for(int j=1;j<=T_SPIN::dimension;j++) if(joint.control_dof(j)) controlled=true;
             if(!joint.joint_function || !controlled) continue;
             RIGID_BODY<TV>* parent=arb.Parent(joint.id_number),*child=arb.Child(joint.id_number);
@@ -501,14 +501,14 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             else{
                 ARRAY<int> tets;const T tolerance=(T)1e-4;
                 ARRAY<int> surface_particles;surface->mesh.elements.Flattened().Get_Unique(surface_particles);
-                for(int i=1;i<=surface_particles.m;i++){int p=surface_particles(i);
+                for(int i=0;i<surface_particles.m;i++){int p=surface_particles(i);
                     tets.Remove_All();volume->hierarchy->Intersection_List(particles.X(p),tets,tolerance);bool got_bind=false;
-                    for(int tt=1;tt<=tets.m;tt++){int t=tets(tt);
+                    for(int tt=0;tt<tets.m;tt++){int t=tets(tt);
                         TV bary=TETRAHEDRON<T>::First_Three_Barycentric_Coordinates(particles.X(p),particles.X.Subset(volume->mesh.elements(t)));
                         if(bary.x>-tolerance && bary.y>-tolerance && bary.z>-tolerance && bary.x+bary.y+bary.z<(T)1+tolerance){bindings.Append(TRIPLE<int,int,TV>(p,t,bary));got_bind=true;break;}}
                     if(!got_bind){LOG::cout<<"no binding on particle "<<p<<std::endl;bindings.Append(TRIPLE<int,int,TV>(p,0,TV(0,0,0)));}}
                 FILE_UTILITIES::Write_To_File(stream_type,data_directory+STRING_UTILITIES::string_sprintf("/bindings_%d",test_number),bindings);}
-            for(int i=1;i<=bindings.m;i++){
+            for(int i=0;i<bindings.m;i++){
                 if(bindings(i).y==0) continue;
                 VECTOR<int,4> nodes=volume->mesh.elements(bindings(i).y);
                 binding_list.Add_Binding(new LINEAR_BINDING<TV,4>(particles,bindings(i).x,nodes,bindings(i).z));
@@ -632,7 +632,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         controller->Create_All_Clusters(collision_manager);
         rigid_bindings.Reactivate_Bindings(active_clusters);
         RIGID_BODY_CLUSTER_BINDINGS<TV>& rigid_bindings=solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings;
-        for(int i=1;i<=arb.joint_mesh.joints.m;i++){JOINT<TV>& joint=*arb.joint_mesh.joints(i);
+        for(int i=0;i<arb.joint_mesh.joints.m;i++){JOINT<TV>& joint=*arb.joint_mesh.joints(i);
             LOG::cout<<"Joint ID "<<joint.id_number<<std::endl;
             if(controller->joint_clusters(joint.id_number).x!=0){
                 T_CLUSTER& bindings_of_parent_1=*rigid_bindings.reverse_bindings.Get(controller->joint_clusters(joint.id_number).x);        
@@ -657,7 +657,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             LOG::cout<<"M: Global Cluster ["<<bindings_of_parent.children<<"]";
         }
     }
-    for(int i=1;i<=solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->limit_time_step_by_strain_rate=false;
+    for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->limit_time_step_by_strain_rate=false;
 
     //deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.template Find_Structure);
     //solids_parameters.collision_body_list.Add_Bodies(solid_body_collection.rigid_body_collection);
@@ -743,7 +743,7 @@ void Human(int frame)
     T density=1000;collision_manager=new RIGID_BODY_COLLISION_MANAGER_HASH;
     id_to_index.Resize(int(body_motion.trajectories.m));
     rigid_body_ids.Resize(body_motion.trajectories.m);
-    for(int i=1;i<=body_motion.trajectories.m;i++){
+    for(int i=0;i<body_motion.trajectories.m;i++){
         std::string body_name=body_motion.names(i);
         T scale=(T).9,length=body_motion.trajectories(i)(1).length,height=scale*length,radius=(T).18;
         RIGID_BODY<TV>& rigid_body=tests.Add_Analytic_Cylinder(height,radius,32,32);
@@ -781,7 +781,7 @@ void Human_Cluster(int frame)
     T density=1000;collision_manager=new RIGID_BODY_COLLISION_MANAGER_HASH;
     id_to_index.Resize(int(body_motion.trajectories.m+cluster_bones.m));
     rigid_body_ids.Resize(body_motion.trajectories.m+cluster_bones.m);
-    for(int i=1;i<=body_motion.trajectories.m;i++){
+    for(int i=0;i<body_motion.trajectories.m;i++){
         std::string body_name=body_motion.names(i);
         T scale=(T).9,length=body_motion.trajectories(i)(1).length,height=scale*length,radius=(T).18;
         RIGID_BODY<TV>& rigid_body=tests.Add_Analytic_Cylinder(height,radius);
@@ -793,7 +793,7 @@ void Human_Cluster(int frame)
         rigid_body.Update_Bounding_Box();
         //cluster code
         int done=false;
-        for(int j=1;j<=cluster_bones.m;j++) for(int k=1;k<=cluster_bones(j).m;k++) if(body_name.find(cluster_bones(j)(k))!=std::string::npos){children(j).Append(rigid_body.particle_index);done=true;}
+        for(int j=0;j<cluster_bones.m;j++) for(int k=1;k<=cluster_bones(j).m;k++) if(body_name.find(cluster_bones(j)(k))!=std::string::npos){children(j).Append(rigid_body.particle_index);done=true;}
         if(!done) referenced_rigid_particles->Append(rigid_body.particle_index);
         if(i==1){
             T_INERTIA_TENSOR& inertia_tensor=arb.rigid_body_collection.rigid_body_particle.inertia_tensor(rigid_body_ids(i));
@@ -808,7 +808,7 @@ void Human_Cluster(int frame)
         FRAME<TV> rigid_base_transform_i=rigid_base_transform;
         rigid_base_transform_i.t*=length;
         rigid_body.Set_Frame(body_motion.trajectories(i)(frame).targeted_transform*rigid_base_transform_i);}
-    for(int i=1;i<=children.m;i++){
+    for(int i=0;i<children.m;i++){
         int cluster_particle=rigid_bindings.Add_Binding(children(i));
         LOG::cout<<" Cluster particle "<<cluster_particle<<" has children "<<children(i)<<std::endl;
         RIGID_BODY<TV>* rigid_body_cluster=&solid_body_collection.rigid_body_collection.Rigid_Body(cluster_particle);
@@ -920,7 +920,7 @@ void Create_Joints_From_Hierarchy(int joint_type,int parent)
 void Initialize_Bone_Hierarchy_For_Human()
 {
     bone_hierarchy.Resize(body_motion.bone_hierarchy.m);
-    for(int i=1;i<=body_motion.bone_hierarchy.m;i++){
+    for(int i=0;i<body_motion.bone_hierarchy.m;i++){
         std::string body_name=body_motion.names(i);
         int parent=i,parent_index=rigid_body_ids(parent);
         for(int j=1;j<=body_motion.bone_hierarchy(i).m;j++){
@@ -934,7 +934,7 @@ void Initialize_Bone_Hierarchy_For_Cluster_Human()
 {
     RIGID_BODY_CLUSTER_BINDINGS<TV>& rigid_bindings=solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings;
     bone_hierarchy.Resize(body_motion.bone_hierarchy.m+cluster_bones.m);
-    for(int i=1;i<=body_motion.bone_hierarchy.m;i++){
+    for(int i=0;i<body_motion.bone_hierarchy.m;i++){
         int parent=i,parent_index=rigid_body_ids(parent);
         int cluster_parent_index=rigid_bindings.Get_Parent_Index(parent_index);
         if(!cluster_parent_index) cluster_parent_index=parent_index; 
@@ -950,22 +950,22 @@ void Initialize_Bone_Hierarchy_For_Cluster_Human()
 void Prune_Joints()
 {
     ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
-    for(int i=1;i<=arb.joint_mesh.joints.m;i++){JOINT<TV>& joint=*arb.joint_mesh.joints(i);
+    for(int i=0;i<arb.joint_mesh.joints.m;i++){JOINT<TV>& joint=*arb.joint_mesh.joints(i);
         bool done=false;RIGID_BODY<TV>* parent=arb.Parent(joint.id_number),*child=arb.Child(joint.id_number);
         int parent_index=id_to_index(parent->particle_index),child_index=id_to_index(child->particle_index);
         std::string parent_name=body_motion.names(parent_index),child_name=body_motion.names(child_index);
-        for(int i=1;i<=controlled_bones.m;i++) if(child_name.find(controlled_bones(i))!=std::string::npos){
+        for(int i=0;i<controlled_bones.m;i++) if(child_name.find(controlled_bones(i))!=std::string::npos){
             joint.joint_function->active=false;joint.global_post_stabilization=false;
             for(int i=1;i<=T_SPIN::dimension;i++) joint.control_dof(i)=true;
             done=true;break;}
         if(done) continue;
-        for(int i=1;i<=uncontrolled_bones.m;i++) if(child_name.find(uncontrolled_bones(i))!=std::string::npos){
+        for(int i=0;i<uncontrolled_bones.m;i++) if(child_name.find(uncontrolled_bones(i))!=std::string::npos){
             /*delete joint.joint_function;joint.joint_function=0;*/joint.joint_function->active=true;
             done=true;break;}
         if(done) continue;
         if(kinematic_motion){delete joint.joint_function;joint.joint_function=0;child->Is_Kinematic()=true;parent->Is_Kinematic()=true;}
         else joint.joint_function->active=true;}
-    //for(int i=1;i<=arb.joint_mesh.joints.m;i++){JOINT<TV>& joint=*arb.joint_mesh.joints(i);
+    //for(int i=0;i<arb.joint_mesh.joints.m;i++){JOINT<TV>& joint=*arb.joint_mesh.joints(i);
     //    if(joint.id_number>=JOINT_ID(7)&&joint.id_number<=JOINT_ID(14)){delete joint.joint_function;arb.joint_mesh.Remove_Articulation(joint.id_number);}}
 }
 //#####################################################################
@@ -974,7 +974,7 @@ void Prune_Joints()
 void Incorporate_Joint_Limits()
 {
     ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
-    for(int i=1;i<=arb.joint_mesh.joints.m;i++){
+    for(int i=0;i<arb.joint_mesh.joints.m;i++){
         POINT_JOINT<TV>* joint=dynamic_cast<POINT_JOINT<TV>*>(arb.joint_mesh.joints(i));
         if(!joint) continue;
         RIGID_BODY<TV>* parent=arb.Parent(joint->id_number),*child=arb.Child(joint->id_number);
@@ -1009,7 +1009,7 @@ void Incorporate_Joint_Limits()
 void Root_Joint()
 {
     ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
-    for(int i=1;i<=arb.joint_mesh.joints.m;i++){JOINT<TV>& joint=*arb.joint_mesh.joints(i);
+    for(int i=0;i<arb.joint_mesh.joints.m;i++){JOINT<TV>& joint=*arb.joint_mesh.joints(i);
         RIGID_BODY<TV>* parent=arb.Parent(joint.id_number),*child=arb.Child(joint.id_number);
         int parent_index=id_to_index(parent->particle_index),child_index=id_to_index(child->particle_index);
         std::string parent_name=body_motion.names(parent_index),child_name=body_motion.names(child_index);
@@ -1029,7 +1029,7 @@ void Root_Joint()
 void Spine_Joints()
 {
     ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
-    for(int i=1;i<=arb.joint_mesh.joints.m;i++){JOINT<TV>& joint=*arb.joint_mesh.joints(i);
+    for(int i=0;i<arb.joint_mesh.joints.m;i++){JOINT<TV>& joint=*arb.joint_mesh.joints(i);
         RIGID_BODY<TV>* parent=arb.Parent(joint.id_number),*child=arb.Child(joint.id_number);
         int parent_index=id_to_index(parent->particle_index),child_index=id_to_index(child->particle_index);
         std::string parent_name=body_motion.names(parent_index),child_name=body_motion.names(child_index);
@@ -1047,7 +1047,7 @@ void Spine_Joints()
 void Arm_Joints()
 {
     ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
-    for(int i=1;i<=arb.joint_mesh.joints.m;i++){JOINT<TV>& joint=*arb.joint_mesh.joints(i);
+    for(int i=0;i<arb.joint_mesh.joints.m;i++){JOINT<TV>& joint=*arb.joint_mesh.joints(i);
         RIGID_BODY<TV>* parent=arb.Parent(joint.id_number),*child=arb.Child(joint.id_number);
         int parent_index=id_to_index(parent->particle_index),child_index=id_to_index(child->particle_index);
         std::string parent_name=body_motion.names(parent_index),child_name=body_motion.names(child_index);
@@ -1065,7 +1065,7 @@ void Arm_Joints()
 void Upper_Joints()
 {
     ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
-    for(int i=1;i<=arb.joint_mesh.joints.m;i++){JOINT<TV>& joint=*arb.joint_mesh.joints(i);
+    for(int i=0;i<arb.joint_mesh.joints.m;i++){JOINT<TV>& joint=*arb.joint_mesh.joints(i);
         RIGID_BODY<TV>* parent=arb.Parent(joint.id_number),*child=arb.Child(joint.id_number);
         int parent_index=id_to_index(parent->particle_index),child_index=id_to_index(child->particle_index);
         std::string parent_name=body_motion.names(parent_index),child_name=body_motion.names(child_index);

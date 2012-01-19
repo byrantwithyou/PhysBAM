@@ -45,9 +45,9 @@ template<class T> void LINEAR_TET_SPRINGS<T>::
 Set_Restlength_From_Material_Coordinates(ARRAY_VIEW<const TV> material_coordinates)
 {
     Invalidate_CFL();
-    for(int t=1;t<=mesh.elements.m;t++){
+    for(int t=0;t<mesh.elements.m;t++){
         const VECTOR<int,4>& element_nodes=mesh.elements(t);
-        for(int s=1;s<=4;s++){
+        for(int s=0;s<4;s++){
             const VECTOR<int,4> spring_nodes=Spring_Nodes(s,element_nodes);
             SPRING_PARAMETER& param=spring_parameters(t)(s);
             param.restlength=param.visual_restlength=
@@ -62,7 +62,7 @@ Set_Restlength_From_Material_Coordinates(ARRAY_VIEW<const TV> material_coordinat
             TV normal=segment_1.Shortest_Vector_Between_Lines(segment_2,weights);
             param.visual_restlength=param.restlength=normal.Magnitude();}
         int count=0;
-        for(int i=1;i<=3;i++) for(int j=i+1;j<=4;j++) edge_restlength_squared(t)(++count)=(material_coordinates(element_nodes[j])-material_coordinates(element_nodes[i])).Magnitude_Squared();}
+        for(int i=0;i<3;i++) for(int j=i+1;j<=4;j++) edge_restlength_squared(t)(++count)=(material_coordinates(element_nodes[j])-material_coordinates(element_nodes[i])).Magnitude_Squared();}
 }
 //#####################################################################
 // Function CFL_Strain_Rate
@@ -102,7 +102,7 @@ Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> frequency)
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
         const VECTOR<int,4>& element_nodes=mesh.elements(t);
         FREQUENCY_DATA element_frequency;
-        for(int s=1;s<=4;s++){ // point face
+        for(int s=0;s<4;s++){ // point face
             const VECTOR<int,4> spring_nodes=Spring_Nodes(s,element_nodes);const SPRING_PARAMETER& param=spring_parameters(t)(s);
             T one_over_mass_times_restlength=particles.one_over_effective_mass(spring_nodes[1]);
             for(int j=2;j<=4;j++) one_over_mass_times_restlength+=(T)one_ninth*particles.one_over_effective_mass(spring_nodes[j]);
@@ -118,7 +118,7 @@ Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> frequency)
             T damping=2*param.damping*one_over_mass_times_restlength*one_over_cfl_number;
             if(elastic_squared>element_frequency.elastic_squared) element_frequency.elastic_squared=elastic_squared;
             if(damping>element_frequency.damping) element_frequency.damping=damping;}
-        for(int i=1;i<=4;i++){
+        for(int i=0;i<4;i++){
             frequency(element_nodes[i]).elastic_squared+=element_frequency.elastic_squared;
             frequency(element_nodes[i]).damping+=element_frequency.damping;}}
 }
@@ -235,9 +235,9 @@ template<class T> void LINEAR_TET_SPRINGS<T>::
 Set_Overdamping_Fraction(const T overdamping_fraction) // 1 is critically damped
 {
     ARRAY_VIEW<T>& one_over_effective_mass=particles.one_over_effective_mass;
-    for(int t=1;t<=mesh.elements.m;t++){
+    for(int t=0;t<mesh.elements.m;t++){
         const VECTOR<int,4>& element_nodes=mesh.elements(t);
-        for(int s=1;s<=4;s++){
+        for(int s=0;s<4;s++){
             VECTOR<int,4> spring_nodes=Spring_Nodes(s,element_nodes);
             SPRING_PARAMETER& spring_param=spring_parameters(t)(s);
             T harmonic_mass=Pseudo_Inverse(one_over_effective_mass(spring_nodes[1])
@@ -258,14 +258,14 @@ template<class T> void LINEAR_TET_SPRINGS<T>::
 Clamp_Restlength_With_Fraction_Of_Springs(const T fraction)
 {
     {ARRAY<T> length(spring_count*spring_parameters.m,false);
-    for(int s=1;s<=spring_parameters.m;s++) for(int k=0;k<spring_count;k++) length(spring_count*(s-1)+k)=spring_parameters(s)(k).restlength;Sort(length);
+    for(int s=0;s<spring_parameters.m;s++) for(int k=0;k<spring_count;k++) length(spring_count*(s-1)+k)=spring_parameters(s)(k).restlength;Sort(length);
     T minimum_restlength=length(min((int)(fraction*length.m)+1,length.m));LOG::cout<<"Enlarging the restlength of all altitude springs below "<<minimum_restlength<<std::endl;
-    for(int i=1;i<=spring_parameters.m;i++) for(int k=0;k<spring_count;k++) spring_parameters(i)(k).restlength=max(minimum_restlength,spring_parameters(i)(k).restlength);}
+    for(int i=0;i<spring_parameters.m;i++) for(int k=0;k<spring_count;k++) spring_parameters(i)(k).restlength=max(minimum_restlength,spring_parameters(i)(k).restlength);}
     {ARRAY<T> edge_length(6*edge_restlength_squared.m,false);
-    for(int s=1;s<=edge_restlength_squared.m;s++) for(int k=1;k<=6;k++) edge_length(6*(s-1)+k)=edge_restlength_squared(s)(k);Sort(edge_length);
+    for(int s=0;s<edge_restlength_squared.m;s++) for(int k=0;k<6;k++) edge_length(6*(s-1)+k)=edge_restlength_squared(s)(k);Sort(edge_length);
     T minimum_edge_restlength=edge_length(min((int)(fraction*edge_length.m)+1,edge_length.m));
     LOG::cout<<"Enlarging the restlength of all altitude spring edges below "<<minimum_edge_restlength<<std::endl;
-    for(int i=1;i<=edge_restlength_squared.m;i++) for(int k=1;k<=6;k++) edge_restlength_squared(i)(k)=max(minimum_edge_restlength,edge_restlength_squared(i)(k));}
+    for(int i=0;i<edge_restlength_squared.m;i++) for(int k=0;k<6;k++) edge_restlength_squared(i)(k)=max(minimum_edge_restlength,edge_restlength_squared(i)(k));}
 }
 //#####################################################################
 // Function Print_Restlength_Statistics
@@ -275,7 +275,7 @@ Print_Restlength_Statistics()
 {
     LOG::cout<<"Tetrahedron Springs - Total Springs = "<<spring_count*spring_parameters.m<<std::endl;
     ARRAY<T> length(spring_count*spring_parameters.m,false),visual_restlength(spring_count*spring_parameters.m,false);
-    for(int s=1;s<=spring_parameters.m;s++) for(int k=0;k<spring_count;k++){
+    for(int s=0;s<spring_parameters.m;s++) for(int k=0;k<spring_count;k++){
             length(spring_count*(s-1)+k)=spring_parameters(s)(k).restlength;visual_restlength(spring_count*(s-1)+k)=spring_parameters(s)(k).visual_restlength;}
     Sort(length);Sort(visual_restlength);
     int one_percent=(int)(.01*length.m)+1,ten_percent=(int)(.1*length.m)+1,median=(int)(.5*length.m)+1;
@@ -314,7 +314,7 @@ Find_Shortest_Spring(const int tet,const VECTOR<int,4> element_nodes,VECTOR<int,
         || v_length_squared<minimum_edge_compression_squared*edge_restlength_squared(tet)(edge_indices[2])) return 0;
     if(abs(maximum_cross_squared)<minimum_sin*u_length_squared*v_length_squared){
         VECTOR<int,2> edge_index;T max_distance_squared=0;
-        for(int i=1;i<=3;i++) for(int j=i+1;j<=4;j++){
+        for(int i=0;i<3;i++) for(int j=i+1;j<=4;j++){
             T distance_squared=(X(element_nodes[i])-X(element_nodes[j])).Magnitude_Squared();
             if(distance_squared>max_distance_squared){edge_index=VECTOR<int,2>(i,j);max_distance_squared=distance_squared;}}
         VECTOR<int,2> other_nodes=element_nodes.Remove_Index(edge_index[2]).Remove_Index(edge_index[1]);

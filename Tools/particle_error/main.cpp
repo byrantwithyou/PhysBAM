@@ -22,7 +22,7 @@ template<class T,class RW> void Compute_Errors(const std::string& input_base,con
     ARRAY<ARRAY<T> > errors(resolutions.m);
     for(int i=particles.m;i>=1;i--) errors(i).Resize(last_frame);
 
-    for(int frame=1;frame<=last_frame;frame++){
+    for(int frame=0;frame<last_frame;frame++){
         for(int i=particles.m;i>=1;i--){
             FILE_UTILITIES::Read_From_File<RW>(input_base+STRING_UTILITIES::string_sprintf("%d/%d/deformable_object_particles",resolutions(i),frame),particles(i));
             errors(i)(frame)=0;
@@ -31,7 +31,7 @@ template<class T,class RW> void Compute_Errors(const std::string& input_base,con
 
     for(int i=particles.m;i>=1;i--){
         std::ostream* output=FILE_UTILITIES::Safe_Open_Output(input_base+STRING_UTILITIES::string_sprintf("%d/errors.txt",resolutions(i)),false);
-        for(int frame=1;frame<=last_frame;frame++)
+        for(int frame=0;frame<last_frame;frame++)
             (*output)<<errors(i)(frame)<<std::endl;
         delete output;}
 }

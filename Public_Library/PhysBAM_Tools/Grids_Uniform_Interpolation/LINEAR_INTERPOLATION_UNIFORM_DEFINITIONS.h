@@ -37,7 +37,7 @@ void Compute_Inverse_Map_Helper(const GRID<VECTOR<T,1> >& domain_grid,const ARRA
 {
     int domain_i=1;
     T xmin=domain_grid.Axis_X(1,1),xmax=domain_grid.Axis_X(domain_grid.counts.x,1);
-    for(int i=1;i<=range_grid.counts.x;i++){
+    for(int i=0;i<range_grid.counts.x;i++){
         T function_value=range_grid.Axis_X(i,1);
         while(domain_i<domain_grid.counts.x-1 && function(domain_i+1)<function_value) domain_i++;
         inverse_function(i)=clamp(domain_grid.Axis_X(domain_i,1)+domain_grid.dX.x*(function_value-function(domain_i))/(function(domain_i+1)-function(domain_i)),xmin,xmax);}

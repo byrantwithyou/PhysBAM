@@ -108,7 +108,7 @@ void Initialize_Phi()
     ARRAY<T,VECTOR<int,3> >& phi=fluids_parameters.particle_levelset_evolution.phi;
 
     SIGNED_DISTANCE::Calculate(dome_sphere,grid,phi);phi*=-1;
-    for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++) for(int ij=1;ij<=grid.mn;ij++) phi(i,j,ij)=max(phi(i,j,ij),grid.y(j)-initial_water_level);
+    for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++) for(int ij=0;ij<grid.mn;ij++) phi(i,j,ij)=max(phi(i,j,ij),grid.y(j)-initial_water_level);
 }
 //#####################################################################
 // Function Adjust_Particle_For_Objects
@@ -135,7 +135,7 @@ void Set_Dirichlet_Nodes()
     ARRAY<T,VECTOR<int,3> >& phi=fluids_parameters.particle_levelset_evolution.phi;
 
     // set the dirichlet nodes
-    for(int i=1;i<=projection.p_grid.m;i++) for(int j=1;j<=projection.p_grid.n;j++) for(int ij=1;ij<=projection.p_grid.mn;ij++){
+    for(int i=0;i<projection.p_grid.m;i++) for(int j=0;j<projection.p_grid.n;j++) for(int ij=0;ij<projection.p_grid.mn;ij++){
         if(phi_collidable_interpolation.From_Base_Node(fluids_parameters.grid,phi,projection.p_grid.X(i,j,ij),i,j,ij) > 0)
             projection.elliptic_solver->psi_D(i,j,ij)=true;}
 }
@@ -158,7 +158,7 @@ int Find_Air_Regions(ARRAY<int,VECTOR<int,3> >& filled_region_colors,int& trappe
     // count trapped air cells
     int ambient_air_color=filled_region_colors(1,fluids_parameters.grid.n,1); // assume top front corner is ambient air
     trapped_air_cells=0;
-    for(int i=1;i<=projection.p_grid.m;i++) for(int j=1;j<=projection.p_grid.n;j++) for(int ij=1;ij<=projection.p_grid.mn;ij++)
+    for(int i=0;i<projection.p_grid.m;i++) for(int j=0;j<projection.p_grid.n;j++) for(int ij=0;ij<projection.p_grid.mn;ij++)
         if(projection.elliptic_solver->psi_D(i,j,ij)&&filled_region_colors(i,j,ij)!=ambient_air_color) trapped_air_cells+=1;
     
     return number_of_regions;
@@ -186,7 +186,7 @@ void Set_Dirichlet_Boundary_Conditions(const T time)
     // set the pressure at dirichlet nodes
     int ambient_air_color=filled_region_colors(1,fluids_parameters.grid.n,1); // assume top front corner is ambient air
     if(trapped_air_cells!=0) last_trapped_air_pressure=initial_trapped_air_pressure*initial_trapped_air_cells/trapped_air_cells;
-    for(int i=1;i<=projection.p_grid.m;i++) for(int j=1;j<=projection.p_grid.n;j++) for(int ij=1;ij<=projection.p_grid.mn;ij++){
+    for(int i=0;i<projection.p_grid.m;i++) for(int j=0;j<projection.p_grid.n;j++) for(int ij=0;ij<projection.p_grid.mn;ij++){
         if(projection.elliptic_solver->psi_D(i,j,ij)) 
             if(filled_region_colors(i,j,ij)!=ambient_air_color) projection.p(i,j,ij)=last_trapped_air_pressure;
             else projection.p(i,j,ij)=1;}

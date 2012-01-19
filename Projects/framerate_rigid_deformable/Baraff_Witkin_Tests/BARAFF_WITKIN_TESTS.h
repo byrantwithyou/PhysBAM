@@ -162,7 +162,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     deformable_body_collection.particles.Compute_Auxiliary_Attributes(soft_bindings);
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     // add forces
     switch(test_number){
@@ -308,7 +308,7 @@ void Cloth_Table_Test()
     TRIANGULATED_SURFACE<T>& ts=tests.Create_Cloth_Panel(number_side_panels,side_length,aspect_ratio,0);
     for(int i=1;i<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();i++){
         solid_body_collection.deformable_body_collection.particles.mass(i)=0;}
-    for(int i=1;i<=ts.mesh.elements.m;i++){
+    for(int i=0;i<ts.mesh.elements.m;i++){
         int node1,node2,node3;ts.mesh.elements(i).Get(node1,node2,node3);
         solid_body_collection.deformable_body_collection.particles.X(node1).y=0;
         solid_body_collection.deformable_body_collection.particles.X(node2).y=0;
@@ -338,7 +338,7 @@ void Cloth_Body_Test()
     T density=.1;
 
     TRIANGULATED_SURFACE<T>& ts=tests.Create_Cloth_Panel(number_side_panels,side_length,aspect_ratio,0);
-    for(int i=1;i<=ts.mesh.elements.m;i++){
+    for(int i=0;i<ts.mesh.elements.m;i++){
         int node1,node2,node3;ts.mesh.elements(i).Get(node1,node2,node3);
         T area=TRIANGLE_3D<T>(solid_body_collection.deformable_body_collection.particles.X.Subset(VECTOR<int,3>(node1,node2,node3))).Area();
         T m=density*area/(T)3.0;
@@ -365,7 +365,7 @@ void Cloth_Draped_On_Ground()
     T density=.1;
 
     TRIANGULATED_SURFACE<T>& ts=tests.Create_Cloth_Panel(number_side_panels,side_length,aspect_ratio,0);
-    for(int i=1;i<=ts.mesh.elements.m;i++){
+    for(int i=0;i<ts.mesh.elements.m;i++){
         int node1,node2,node3;ts.mesh.elements(i).Get(node1,node2,node3);
         T area=TRIANGLE_3D<T>(solid_body_collection.deformable_body_collection.particles.X.Subset(VECTOR<int,3>(node1,node2,node3))).Area();
         T m=density*area/(T)3.0;
@@ -385,7 +385,7 @@ void Triangulated_Surface_Forces(const bool use_stretch,const bool use_shear,con
         if(use_shear) solid_body_collection.Add_Force(Create_BW_Shear_Force(solid_body_collection.deformable_body_collection.particles,triangulated_surface->mesh,(T)100,(T)100));
         if(use_bend) solid_body_collection.Add_Force(Create_BW_Bending_Force(solid_body_collection.deformable_body_collection.particles,triangulated_surface->mesh,(T).01,(T)2e-6));}
 
-    for(int i=1;i<=solid_body_collection.deformable_body_collection.deformables_forces.m;i++) 
+    for(int i=0;i<solid_body_collection.deformable_body_collection.deformables_forces.m;i++) 
         solid_body_collection.deformable_body_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=true;
 }
 //#####################################################################

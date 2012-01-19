@@ -44,15 +44,15 @@ Update_Position_Based_State(const T time,const bool is_position_update)
         state.C=VECTOR<T,1>(material_force_state.rest_state_triangle_area*TV::Dot_Product(material_force_state.w_u*material_force_state.w_u_magnitude,
                 material_force_state.w_v*material_force_state.w_v_magnitude));
         state.C_dot=VECTOR<T,1>();
-        for(int i=1;i<=3;i++){
+        for(int i=0;i<3;i++){
             state.dC_dx(i)=MATRIX<T,3,1>(material_force_state.rest_state_triangle_area*(material_force_state.dwu_dx(i)*material_force_state.w_u*material_force_state.w_u_magnitude+
                     material_force_state.w_v*material_force_state.w_v_magnitude*material_force_state.dwv_dx(i)));
             state.C_dot+=state.dC_dx(i).Transposed()*particles.V(state.nodes[i]);}
-        for(int i=1;i<=3;i++) for(int j=1;j<=3;j++){
+        for(int i=0;i<3;i++) for(int j=0;j<3;j++){
             MATRIX<T,3> dC_dxi_dxj;
             T diagonal_term=material_force_state.rest_state_triangle_area*(material_force_state.dwu_dx(i)*material_force_state.dwv_dx(j)+
                 material_force_state.dwu_dx(j)*material_force_state.dwv_dx(i));
-            for(int s=1;s<=3;s++) for(int t=1;t<=3;t++) if(s==t) dC_dxi_dxj(s,t)=diagonal_term; else dC_dxi_dxj(s,t)=0;
+            for(int s=0;s<3;s++) for(int t=0;t<3;t++) if(s==t) dC_dxi_dxj(s,t)=diagonal_term; else dC_dxi_dxj(s,t)=0;
             state.dC_dxi_dxj_times_C(i,j)=dC_dxi_dxj*state.C(1);
             state.dC_dxi_dxj_times_C_dot(i,j)=dC_dxi_dxj*state.C_dot(1);}}
 }

@@ -39,11 +39,11 @@ template<class TV> void TRIANGLES_OF_MATERIAL<TV>::
 Perturb_Nodes_For_Collision_Freeness(const T perturb_amount)
 {
     // perturb those that have not been previously perturbed
-    for(int node=1;node<=embedded_object.embedded_particles.active_indices.m;node++) if(!previously_perturbed(node)){
+    for(int node=0;node<embedded_object.embedded_particles.active_indices.m;node++) if(!previously_perturbed(node)){
         int parent_1,parent_2;embedded_object.parent_particles(node).Get(parent_1,parent_2);
         ARRAY<int> triangles_on_edge;embedded_object.simplicial_object.mesh.Triangles_On_Edge(parent_1,parent_2,&triangles_on_edge);
         bool parent1_in_material=false,parent2_in_material=false,more_than_one_other_node_in_material=false;int other_node_in_material=0;
-        for(int t=1;t<=triangles_on_edge.m;t++){
+        for(int t=0;t<triangles_on_edge.m;t++){
             int triangle=triangles_on_edge(t);
             if(embedded_object.Node_In_Simplex_Is_Material(parent_1,triangle)) parent1_in_material=true;
             if(embedded_object.Node_In_Simplex_Is_Material(parent_2,triangle)) parent2_in_material=true;
@@ -69,7 +69,7 @@ Construct_Material_Surface_Mesh()
 {
     bool embedded_segments_in_triangle_defined=embedded_object.embedded_subelements_in_parent_element!=0;
     if(!embedded_segments_in_triangle_defined) embedded_object.Initialize_Embedded_Subelements_In_Parent_Element(); 
-    for(int t=1;t<=embedded_object.simplicial_object.mesh.elements.m;t++){
+    for(int t=0;t<embedded_object.simplicial_object.mesh.elements.m;t++){
         bool i_is_material,j_is_material,k_is_material;embedded_object.node_in_simplex_is_material(t).Get(i_is_material,j_is_material,k_is_material);
         if(i_is_material && j_is_material && k_is_material){
             Add_To_Material_Surface_Mesh_Face_Triangle(t);continue;}

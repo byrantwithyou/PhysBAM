@@ -122,7 +122,7 @@ public:
 
     MATRIX_MXN<T> operator*(const MATRIX_MXN<T>& A) const
     {assert(A.Rows()==3);MATRIX_MXN<T> M(3,A.Columns());
-    for(int j=1;j<=A.Columns();j++) for(int k=1;k<=3;k++) for(int i=0;i<k;i++) M(i,j)+=(*this)(i,k)*A(k,j);return M;}
+    for(int j=1;j<=A.Columns();j++) for(int k=0;k<3;k++) for(int i=0;i<k;i++) M(i,j)+=(*this)(i,k)*A(k,j);return M;}
 
     T Determinant() const
     {return x11*x22*x33;}

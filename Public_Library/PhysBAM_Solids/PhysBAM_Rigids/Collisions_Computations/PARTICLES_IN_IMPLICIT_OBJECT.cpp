@@ -150,8 +150,8 @@ Intersections_Using_Hierarchy(RIGID_BODY<TV>& particle_body,RIGID_BODY<TV>& leve
 {
     ARRAY<bool> checked(particle_body.simplicial_object->particles.array_collection->Size());
     ARRAY_VIEW<bool>* collidable=particle_body.simplicial_object->particles.array_collection->template Get_Array<bool>(ATTRIBUTE_ID_COLLIDABLE);
-    for(int t=1;t<=simplex_list.m;t++){const VECTOR<int,TV::dimension>& nodes=particle_body.simplicial_object->mesh.elements(simplex_list(t));
-        for(int i=1;i<=nodes.m;i++){
+    for(int t=0;t<simplex_list.m;t++){const VECTOR<int,TV::dimension>& nodes=particle_body.simplicial_object->mesh.elements(simplex_list(t));
+        for(int i=0;i<nodes.m;i++){
             if(!checked(nodes[i])){checked(nodes[i])=true;
                 if((!collidable || (*collidable)(nodes[i])) && levelset_body.implicit_object->object_space_implicit_object->Lazy_Inside(Transform_From_Body1_To_Body2_Coordinates<TV>(particle_body.simplicial_object->particles.X(nodes[i]),rotation,translation))){
                     particle_intersections.Append(RIGID_BODY_PARTICLE_INTERSECTION<TV>(particle_body.simplicial_object->particles.X(nodes[i]),nodes[i],particle_body.particle_index,levelset_body.particle_index));
@@ -193,7 +193,7 @@ void Intersections_Using_Hierarchy_And_Edges_Helper(RIGID_BODY<VECTOR<T,3> >& bo
     if(!mesh.element_edges) mesh.Initialize_Element_Edges();
     if(!body1.simplicial_object->segment_lengths) body1.simplicial_object->Initialize_Segment_Lengths();
     if(!body1.simplicial_object->triangle_list) body1.simplicial_object->Update_Triangle_List();
-    for(int t=1;t<=triangle_list1.m;t++) for(int i=1;i<=3;i++){
+    for(int t=0;t<triangle_list1.m;t++) for(int i=0;i<3;i++){
         int edge=(*mesh.element_edges)(triangle_list1(t))(i);
         if(!segment_checked(edge)){
             int node1=mesh.segment_mesh->elements(edge)(1);
@@ -220,7 +220,7 @@ void Intersections_Using_Hierarchy_And_Edges_Helper(RIGID_BODY<VECTOR<T,3> >& bo
                     x1=Transform_From_Body1_To_Body2_Coordinates<TV>(p1,rotation,translation),x2=Transform_From_Body1_To_Body2_Coordinates<TV>(p2,rotation,translation);
                 RAY<VECTOR<T,3> > ray(SEGMENT_3D<T>(x1,x2));T t_max=ray.t_max,one_over_t_max=1/t_max;
                 ARRAY<PAIR<T,bool> > intersections;intersections.Preallocate(10); // pair is (t_intersect, going_in)
-                for(int k=1;k<=triangle_list2.m;k++){ray.t_max=t_max;
+                for(int k=0;k<triangle_list2.m;k++){ray.t_max=t_max;
                     if(INTERSECTION::Lazy_Intersects(ray,(*body2.simplicial_object->triangle_list)(triangle_list2(k)))){
                         bool going_in=TV::Dot_Product((*body2.simplicial_object->triangle_list)(triangle_list2(k)).normal,ray.direction) < 0;
                         intersections.Append(PAIR<T,bool>(ray.t_max,going_in));}}
@@ -335,7 +335,7 @@ void Particles_In_Implicit_Object_Partition(RIGID_BODY<TV>& particle_body,RIGID_
         RANGE<VECTOR<int,d> > range=particle_partition.Range(bounding_box2_in_body1_coordinates);      
         for(CELL_ITERATOR iterator(particle_partition.grid,range);iterator.Valid();iterator.Next()){
             const ARRAY<int>& particles_in_cell=particle_partition.partition(iterator.Cell_Index());
-            for(int t=1;t<=particles_in_cell.m;t++){int p=particles_in_cell(t);
+            for(int t=0;t<particles_in_cell.m;t++){int p=particles_in_cell(t);
                 if(bounding_box2_in_body1_coordinates.Lazy_Inside(particles_X(p)) &&
                     object_space_implicit_object.Lazy_Inside(Transform_From_Body1_To_Body2_Coordinates<TV>(particles_X(p),rotation,translation),contour_value)){
                     particle_intersections.Append(RIGID_BODY_PARTICLE_INTERSECTION<TV>(particles_X(p),p,particle_body.particle_index,levelset_body.particle_index));
@@ -343,9 +343,9 @@ void Particles_In_Implicit_Object_Partition(RIGID_BODY<TV>& particle_body,RIGID_
     else{ // use particle partition center phi test
         ARRAY<VECTOR<int,d> > intersection_list;
         particle_partition.Intersection_List(object_space_implicit_object,rotation,translation,intersection_list,contour_value);
-        for(int i=1;i<=intersection_list.m;i++){
+        for(int i=0;i<intersection_list.m;i++){
             const ARRAY<int>& particles_in_cell=particle_partition.partition(intersection_list(i));
-            for(int t=1;t<=particles_in_cell.m;t++){int p=particles_in_cell(t);
+            for(int t=0;t<particles_in_cell.m;t++){int p=particles_in_cell(t);
                 if(bounding_box2_in_body1_coordinates.Lazy_Inside(particles_X(p)) && 
                     object_space_implicit_object.Lazy_Inside(Transform_From_Body1_To_Body2_Coordinates<TV>(particles_X(p),rotation,translation),contour_value)){
                     particle_intersections.Append(RIGID_BODY_PARTICLE_INTERSECTION<TV>(particles_X(p),p,particle_body.particle_index,levelset_body.particle_index));

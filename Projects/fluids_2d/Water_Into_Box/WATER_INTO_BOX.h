@@ -55,7 +55,7 @@ void WATER_INTO_BOX::Initialize_Phi(){
 // Function Get_Sources
 //#####################################################################
 void WATER_INTO_BOX::Get_Sources(double time){
-    for(int i=1;i<=m;i++) for(int j=1;j<=n;j++){
+    for(int i=0;i<m;i++) for(int j=0;j<n;j++){
         double x=grid.x(i),y=grid.y(j),dx=grid.dx,dy=grid.dy,xmin=grid.xmin,xmax=grid.xmax;
         if((fabs(x-(xmin+xmax)/2) <= .1*(xmax-xmin)) && y >= grid.y(n)-3.*dy){
             phi(i,j)=-dx;psi_N(i,j)=1;u_fixed(i,j)=0;v_fixed(i,j)=-2;}}}
@@ -67,7 +67,7 @@ void WATER_INTO_BOX::Get_Objects(double time){
     double epsilon=.0001*max(grid.dx,grid.dy);
     double xmin=grid.xmin,xmax=grid.xmax;
     double x_center=xmin+.4*(xmax-xmin),y_center=ymin+.1*(ymax-ymin),radius=.1*(xmax-xmin);
-    for(int i=1;i<=m;i++) for(int j=1;j<=n;j++)
+    for(int i=0;i<m;i++) for(int j=0;j<n;j++)
         if(sqrt(sqr(grid.x(i)-x_center)+sqr(grid.y(j)-y_center)) < radius){
             // extrapolate phi inward
             double nx=grid.x(i)-x_center,ny=grid.y(j)-y_center,magnitude=sqrt(sqr(nx)+sqr(ny));nx/=magnitude;ny/=magnitude;
@@ -83,7 +83,7 @@ void WATER_INTO_BOX::Get_Source_Reseed_Mask(ARRAY<int,VECTOR<int,2> >& reseed_ma
     double dx=grid.dx,dy=grid.dy,xmin=grid.xmin,xmax=grid.xmax;
     double padding=3*dx;
     copy(0,reseed_mask);
-    for(int i=1;i<=m;i++) for(int j=1;j<=n;j++){
+    for(int i=0;i<m;i++) for(int j=0;j<n;j++){
         double x=grid.x(i),y=grid.y(j);
         if((fabs(x-(xmin+xmax)/2) <= .1*(xmax-xmin)+padding) && y >= grid.y(n)-3.*dy-2*padding){
               (reseed_mask)(i,j)=1;}}}

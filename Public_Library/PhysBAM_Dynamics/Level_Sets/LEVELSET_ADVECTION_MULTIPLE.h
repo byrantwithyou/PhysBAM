@@ -35,16 +35,16 @@ public:
     }
     
     void Set_Custom_Advection(ADVECTION<T,T,T_GRID>& advection_input)
-    {for(int i=1;i<=levelset_advections.m;i++)levelset_advections(i).Set_Custom_Advection(advection_input);}
+    {for(int i=0;i<levelset_advections.m;i++)levelset_advections(i).Set_Custom_Advection(advection_input);}
     
     void Euler_Step(const T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,const int number_of_ghost_cells)
-    {for(int i=1;i<=levelset_advections.m;i++) levelset_advections(i).Euler_Step(face_velocities,dt,time,number_of_ghost_cells);}
+    {for(int i=0;i<levelset_advections.m;i++) levelset_advections(i).Euler_Step(face_velocities,dt,time,number_of_ghost_cells);}
     
     void Euler_Step(const T_ARRAYS_VECTOR& velocity,const T dt,const T time,const int number_of_ghost_cells)
-    {for(int i=1;i<=levelset_advections.m;i++) levelset_advections(i).Euler_Step(velocity,dt,time,number_of_ghost_cells);}
+    {for(int i=0;i<levelset_advections.m;i++) levelset_advections(i).Euler_Step(velocity,dt,time,number_of_ghost_cells);}
     
     void Reinitialize()
-    {for(int i=1;i<=levelset_advections.m;i++) levelset_advections(i).Reinitialize();}
+    {for(int i=0;i<levelset_advections.m;i++) levelset_advections(i).Reinitialize();}
 };
 
 }

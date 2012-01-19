@@ -38,11 +38,11 @@ public:
     {const ARRAY<RENDERING_LIGHT<T>*>& lights=world.Lights();
     TV same_side_position=intersection_point+same_side_normal*intersection_object.small_number,reflected_direction=ray.ray.Reflected_Direction(same_side_normal);
     TV accumulated_diffuse_color(0,0,0),accumulated_specular_color(0,0,0);
-    for(int light_index=1;light_index<=lights.m;light_index++){
+    for(int light_index=0;light_index<lights.m;light_index++){
         TV accumulated_diffuse_samples(0,0,0),accumulated_specular_samples(0,0,0);
         ARRAY<RAY<TV> > sample_array;
         lights(light_index)->Sample_Points(same_side_position,same_side_normal,sample_array);
-        for(int sample=1;sample<=sample_array.m;sample++){
+        for(int sample=0;sample<sample_array.m;sample++){
             RENDERING_RAY<T> ray_to_light(sample_array(sample),1,&entering_object);
             TV light_color=world.Incident_Light(ray_to_light,*lights(light_index),ray_to_light,ray);
             T L_N=TV::Dot_Product(ray_to_light.ray.direction,same_side_normal);

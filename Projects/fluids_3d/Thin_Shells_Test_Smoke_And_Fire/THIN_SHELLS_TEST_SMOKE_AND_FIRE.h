@@ -360,7 +360,7 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY<VECTOR<T,3> >& V,const T time)
     assert(id_number<=deformable_object_enslaved_nodes.m);
     if(example_number==101){
         if(time<3){for(int i=1;i<=deformable_object_enslaved_nodes(id_number).m;i++) V(deformable_object_enslaved_nodes(id_number)(i))=VECTOR<T,3>();}
-        else{for(int i=1;i<=2;i++) V(deformable_object_enslaved_nodes(id_number)(i))=VECTOR<T,3>();}}
+        else{for(int i=0;i<2;i++) V(deformable_object_enslaved_nodes(id_number)(i))=VECTOR<T,3>();}}
     else{for(int i=1;i<=deformable_object_enslaved_nodes(id_number).m;i++) V(deformable_object_enslaved_nodes(id_number)(i))=VECTOR<T,3>();}
 }
 //#####################################################################
@@ -408,7 +408,7 @@ void Get_Object_Velocities(const T dt,const T time)
 //#####################################################################
 template<class SOURCE> void Initialize_Phi(const SOURCE& source)
 {
-    for(int i=1;i<=fluids_parameters.grid.m;i++) for(int j=1;j<=fluids_parameters.grid.n;j++) for(int ij=1;ij<=fluids_parameters.grid.mn;ij++) 
+    for(int i=0;i<fluids_parameters.grid.m;i++) for(int j=0;j<fluids_parameters.grid.n;j++) for(int ij=0;ij<fluids_parameters.grid.mn;ij++) 
         if(source.Lazy_Inside(world_to_source*fluids_parameters.grid.X(i,j,ij)))
             fluids_parameters.particle_levelset_evolution.particle_levelset.levelset.phi(i,j,ij)=-fluids_parameters.grid.dx;
         else
@@ -429,7 +429,7 @@ void Initialize_Phi()
 //#####################################################################
 template<class SOURCE> void Adjust_Phi_With_Sources(const SOURCE& source,const T time)
 {
-    for(int i=1;i<=fluids_parameters.grid.m;i++) for(int j=1;j<=fluids_parameters.grid.n;j++) for(int ij=1;ij<=fluids_parameters.grid.mn;ij++) 
+    for(int i=0;i<fluids_parameters.grid.m;i++) for(int j=0;j<fluids_parameters.grid.n;j++) for(int ij=0;ij<fluids_parameters.grid.mn;ij++) 
 //        if(source.Lazy_Inside(world_to_source*fluids_parameters.grid.X(i,j,ij)))
         if(source.Lazy_Inside(world_to_source*fluids_parameters.grid.X(i,j,ij))&&fluids_parameters.particle_levelset_evolution.particle_levelset.levelset.phi(i,j,ij)>0)
             fluids_parameters.particle_levelset_evolution.particle_levelset.levelset.phi(i,j,ij)=-fluids_parameters.grid.dx;

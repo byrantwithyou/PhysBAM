@@ -147,7 +147,7 @@ int Add_Deformable_Object(const int number_of_vertices,const VECTOR_2D<T>& start
     SEGMENT_MESH& segment_mesh=segmented_curve.segment_mesh;
     PARTICLES<T,VECTOR_2D<T> >& particles=segmented_curve.particles;
     segment_mesh.Initialize_Straight_Mesh(number_of_vertices);
-    for(int i=1;i<=number_of_vertices;i++){
+    for(int i=0;i<number_of_vertices;i++){
         int index=particles.array_collection->Add_Element();assert(index==i);
         particles.X(i)=start_position+((T)(i-1)/(number_of_vertices-1))*(end_position-start_position);
         particles.V(i)=VECTOR_2D<T>(0,0);}
@@ -163,7 +163,7 @@ int Add_Circle_Deformable_Object(const int number_of_vertices)
     SEGMENT_MESH& segment_mesh=segmented_curve.segment_mesh;
     PARTICLES<T,VECTOR_2D<T> >& particles=segmented_curve.particles;
     segment_mesh.Initialize_Straight_Mesh(number_of_vertices,true);
-    for(int i=1;i<=number_of_vertices;i++){
+    for(int i=0;i<number_of_vertices;i++){
         int index=particles.array_collection->Add_Element();assert(index==i);
         T angle=(i-1)*(T)2*pi/number_of_vertices;
         VECTOR_2D<T> radial_direction(cos(angle+.5*pi),sin(angle+.5*pi));
@@ -178,13 +178,13 @@ void Update_Deforming_Volume(const T time)
 {
     LEVELSET_2D<T>& levelset=((LEVELSET_IMPLICIT_CURVE<T>*)stub_rigid_body->implicit_curve)->levelset;
 //    VECTOR_2D<T> center(0,0);T radius=0.4;
-//    for(int i=1;i<=levelset.grid.m;i++) for(int j=1;j<=levelset.grid.n;j++)
+//    for(int i=0;i<levelset.grid.m;i++) for(int j=0;j<levelset.grid.n;j++)
 //        levelset.phi(i,j)=(levelset.grid.X(i,j)-center).Magnitude()-radius;
     VECTOR_2D<T> velocity(0,0),corner=VECTOR_2D<T>(-4,-1)+time*velocity,size(8,2);
     T angular_velocity=-0.3;
     BOX_2D<T> box(corner.x,corner.x+size.x,corner.y,corner.y+size.y);
     T orientation=angular_velocity*time;MATRIX<T,2> rotation_matrix=MATRIX<T,2>::Rotation_Matrix(-orientation);
-    for(int i=1;i<=levelset.grid.m;i++) for(int j=1;j<=levelset.grid.n;j++){
+    for(int i=0;i<levelset.grid.m;i++) for(int j=0;j<levelset.grid.n;j++){
         levelset.phi(i,j)=box.Signed_Distance(rotation_matrix*levelset.grid.X(i,j));
 #if 1
         if(stub_rigid_body->velocity_field){

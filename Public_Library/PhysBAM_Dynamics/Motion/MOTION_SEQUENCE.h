@@ -73,7 +73,7 @@ public:
     else return -1;} 
 
     void Update_Name_Lookup()
-    {name_to_track_index.Clean_Memory();for(int i=1;i<=names.m;i++) name_to_track_index.Insert(names(i),i);}
+    {name_to_track_index.Clean_Memory();for(int i=0;i<names.m;i++) name_to_track_index.Insert(names(i),i);}
 
     void Set_Frame_Rate(const T frame_rate,const T initial_time=0)
     {time_grid.Initialize(time_grid.m,initial_time,initial_time+frame_rate*(time_grid.m-1));}

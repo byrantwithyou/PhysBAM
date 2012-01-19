@@ -60,7 +60,7 @@ Display(const int in_color) const
         T x_offset=0.4*mac_grid.dX.x,y_offset=0.4*mac_grid.dX.y,z_offset=0.4*mac_grid.dX.z;
         point_color.Send_To_GL_Pipeline();
         ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-        for(int i=1;i<=pseudo_dirichlet_cells.m;i++){
+        for(int i=0;i<pseudo_dirichlet_cells.m;i++){
             const VECTOR<int,3>& cell_index=pseudo_dirichlet_cells(i).x;char face_mask=pseudo_dirichlet_cells(i).z;
             VECTOR<T,3> pos=mac_grid.X(cell_index);
             if(face_mask&0x01) OpenGL_Vertex(VECTOR<T,3>(pos.x-x_offset,pos.y,pos.z),vertices);
@@ -72,7 +72,7 @@ Display(const int in_color) const
         OpenGL_Draw_Arrays(GL_POINTS,3,vertices);
         velocity_color.Send_To_GL_Pipeline();
         vertices.Resize(0);
-        for(int i=1;i<=pseudo_dirichlet_cells.m;i++){
+        for(int i=0;i<pseudo_dirichlet_cells.m;i++){
             const VECTOR<int,3>& cell_index=pseudo_dirichlet_cells(i).x;const VECTOR<T,3>& velocity=pseudo_dirichlet_cells(i).y;
             VECTOR<T,3> pos=mac_grid.X(cell_index);
             OpenGL_Line(pos,pos+velocity_scale*velocity,vertices);}
@@ -121,7 +121,7 @@ Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* current_selec
     if(current_selection && current_selection->type==OPENGL_SELECTION::GRID_CELL_3D && Is_Up_To_Date(frame)){
         VECTOR<int,3> index=((OPENGL_SELECTION_GRID_CELL_3D<T>*)current_selection)->index;
         // TODO: This is not an efficient lookup...
-        for(int i=1;i<=pseudo_dirichlet_cells.m;i++){
+        for(int i=0;i<pseudo_dirichlet_cells.m;i++){
             if(pseudo_dirichlet_cells(i).x==index){
                 output_stream<<component_name<<":  velocity = "<<pseudo_dirichlet_cells(i).y<<std::endl;}}}
 }

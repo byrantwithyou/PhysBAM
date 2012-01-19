@@ -501,7 +501,7 @@ Add_Key_Bindings()
 
 //    const int control=-'a'+1; // only works reliably for lowercase letters
     // TOOD: different keys for different elisce managers
-    for(int i=1;i<=grid_info_list_3d.m;i++) {
+    for(int i=0;i<grid_info_list_3d.m;i++) {
         opengl_world.Bind_Key('\b', grid_info_list_3d(i)->slice_manager.Toggle_Slice_Mode_CB("Toggle slice mode"));
         opengl_world.Bind_Key('\\', grid_info_list_3d(i)->slice_manager.Toggle_Slice_Axis_CB("Toggle slice axis"));
         opengl_world.Bind_Key(']', grid_info_list_3d(i)->slice_manager.Increment_Slice_CB("Increment slice"));

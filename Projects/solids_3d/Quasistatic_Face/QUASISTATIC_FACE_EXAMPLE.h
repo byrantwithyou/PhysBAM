@@ -121,7 +121,7 @@ void Get_Initial_Data()
     (*input)>>number_of_muscles;std::cout<<"muscles = "<<number_of_muscles<<std::endl;
     muscle_tets.Resize(number_of_muscles);muscle_fibers.Resize(number_of_muscles);
     muscle_densities.Resize(number_of_muscles);muscle_activations.Resize(number_of_muscles);
-    for(int i=1;i<=number_of_muscles;i++){
+    for(int i=0;i<number_of_muscles;i++){
         std::string muscle_name;(*input)>>muscle_name;input_file=input_directory+"/"+muscle_name+".constitutive_data";
         if(verbose)std::cout<<"Reading muscle data : "<<muscle_name<<".constitutive_data"<<std::endl;
         std::istream *muscle_input=FILE_UTILITIES::Safe_Open_Input(input_file);
@@ -131,7 +131,7 @@ void Get_Initial_Data()
     input_file=input_directory+"/attachment_list.txt";input=FILE_UTILITIES::Safe_Open_Input(input_file,false);
     (*input)>>number_of_attachments;std::cout<<"attachments = "<<number_of_attachments<<std::endl;
     attached_nodes.Resize(number_of_attachments);
-    for(int i=1;i<=number_of_attachments;i++){
+    for(int i=0;i<number_of_attachments;i++){
         std::string attachment_name;(*input)>>attachment_name;input_file=input_directory+"/"+attachment_name+".attached_nodes";
         if(verbose)std::cout<<"Reading attachment data : "<<attachment_name<<".attached_nodes"<<std::endl;
         std::istream *attachment_input=FILE_UTILITIES::Safe_Open_Input(input_file);
@@ -174,7 +174,7 @@ void Initialize_Tetrahedron_Collisions()
 //#####################################################################
 void Set_External_Positions(ARRAY<VECTOR_3D<T> >& X,const T time) PHYSBAM_OVERRIDE {
     switch(id_number){
-    case 1: for(int i=1;i<=attached_nodes.m;i++)for(int j=1;j<=attached_nodes(i).m;j++) X(attached_nodes(i)(j))=X_save(attached_nodes(i)(j)); break;
+    case 1: for(int i=0;i<attached_nodes.m;i++)for(int j=1;j<=attached_nodes(i).m;j++) X(attached_nodes(i)(j))=X_save(attached_nodes(i)(j)); break;
     default:std::cout<<"Unrecognized deformable object id number"<<std::endl;exit(1);}
 }
 //#####################################################################
@@ -182,7 +182,7 @@ void Set_External_Positions(ARRAY<VECTOR_3D<T> >& X,const T time) PHYSBAM_OVERRI
 //#####################################################################
 void Zero_Out_Enslaved_Position_Nodes(ARRAY<VECTOR_3D<T> >& X,const T time) PHYSBAM_OVERRIDE {
     switch(id_number){
-    case 1: for(int i=1;i<=attached_nodes.m;i++)for(int j=1;j<=attached_nodes(i).m;j++) X(attached_nodes(i)(j))=VECTOR_3D<T>(); break;
+    case 1: for(int i=0;i<attached_nodes.m;i++)for(int j=1;j<=attached_nodes(i).m;j++) X(attached_nodes(i)(j))=VECTOR_3D<T>(); break;
     default:std::cout<<"Unrecognized deformable object id number"<<std::endl;exit(1);}
 }
 //#####################################################################
@@ -190,7 +190,7 @@ void Zero_Out_Enslaved_Position_Nodes(ARRAY<VECTOR_3D<T> >& X,const T time) PHYS
 //#####################################################################
 void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE {
     switch(id_number){
-    case 1: for(int m=1;m<=muscle_activations.m;m++)muscle_activations(m)=initial_activations(m)+(time*frame_rate/last_frame)*(final_activations(m)-initial_activations(m)); break;
+    case 1: for(int m=0;m<muscle_activations.m;m++)muscle_activations(m)=initial_activations(m)+(time*frame_rate/last_frame)*(final_activations(m)-initial_activations(m)); break;
     default:std::cout<<"Unrecognized deformable object id number"<<std::endl;exit(1);}
 }
 //#####################################################################

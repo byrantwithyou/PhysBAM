@@ -64,7 +64,7 @@ void Get_Initial_Data()
 
     triangulated_area.Update_Bounding_Box();
     VECTOR_2D<T> center(triangulated_area.bounding_box->Center());T bottom=triangulated_area.bounding_box->ymin;
-    for(int i=1;i<=triangulated_area.particles.array_size;i++){
+    for(int i=0;i<triangulated_area.particles.array_size;i++){
         triangulated_area.particles.X(i)=center+MATRIX<T,2>::Rotation_Matrix(initial_orientation)*(triangulated_area.particles.X(i)-center);
         VECTOR_2D<T> radial = triangulated_area.particles.X(i)-center;
         T temp=radial.y;radial.y = -radial.x;radial.x=temp;
@@ -111,7 +111,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 void Set_External_Velocities(ARRAY<VECTOR_2D<T> >& V,const T time){
     switch(id_number){
     case 1:
-        if(fix_boundary) for(int i=1;i<=mattress_grid.m;i++) V(i)=V(i+mattress_grid.m*(mattress_grid.n-1))=VECTOR_2D<T>();
+        if(fix_boundary) for(int i=0;i<mattress_grid.m;i++) V(i)=V(i+mattress_grid.m*(mattress_grid.n-1))=VECTOR_2D<T>();
         break;
     default:std::cout<<"Unrecognized deformable object id number"<<std::endl;exit(1);}
 }
@@ -121,7 +121,7 @@ void Set_External_Velocities(ARRAY<VECTOR_2D<T> >& V,const T time){
 void Zero_Out_Enslaved_Velocity_Nodes(ARRAY<VECTOR_2D<T> >& V,const T time){
     switch(id_number){
     case 1:
-        if(fix_boundary) for(int i=1;i<=mattress_grid.m;i++) V(i)=V(i+mattress_grid.m*(mattress_grid.n-1))=VECTOR_2D<T>();
+        if(fix_boundary) for(int i=0;i<mattress_grid.m;i++) V(i)=V(i+mattress_grid.m*(mattress_grid.n-1))=VECTOR_2D<T>();
         break;
     default:std::cout<<"Unrecognized deformable object id number"<<std::endl;exit(1);}
 }

@@ -53,7 +53,7 @@ Radiometric_To_Photometric(const ARRAY<T,VECTOR<int,1> >& radiometric_spectrum) 
 {
     T conversion_constant=680; // units are lumens/watt
     T photometric_scalar=0;
-    for(int i=1;i<=grid.counts.x;i++) photometric_scalar+=Y_spectrum(i)*radiometric_spectrum(i);
+    for(int i=0;i<grid.counts.x;i++) photometric_scalar+=Y_spectrum(i)*radiometric_spectrum(i);
     photometric_scalar*=(grid.dX.x*conversion_constant);
     return photometric_scalar;
 }
@@ -66,7 +66,7 @@ Calculate_XYZ(const ARRAY<T,VECTOR<int,1> >& radiometric_radiance_spectrum) cons
 {
     VECTOR<T,3> XYZ;
     XYZ.y=Radiometric_To_Photometric(radiometric_radiance_spectrum); // Y is the photometric radiance in candela/m^2
-    for(int i=1;i<=grid.counts.x;i++){
+    for(int i=0;i<grid.counts.x;i++){
         XYZ.x+=X_spectrum(i)*radiometric_radiance_spectrum(i);XYZ.z+=Z_spectrum(i)*radiometric_radiance_spectrum(i);}
     T conversion_constant=680,scale=grid.dX.x*conversion_constant;
     XYZ.x*=scale;XYZ.z*=scale;

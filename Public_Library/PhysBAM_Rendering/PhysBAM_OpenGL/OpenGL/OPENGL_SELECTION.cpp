@@ -57,7 +57,7 @@ Draw_Highlighted_Curve(const ARRAY<VECTOR<TV,2> >& X,int id,const OPENGL_COLOR& 
     glLineWidth(OPENGL_PREFERENCES::highlighted_line_width);
     color.Send_To_GL_Pipeline();
     ARRAY<typename OPENGL_POLICY<typename TV::SCALAR>::T_GL >vertices;
-    for(int i=1;i<=X.m;i++) {OpenGL_Line(X(i).x,X(i).y,vertices);total+=X(i).x;}
+    for(int i=0;i<X.m;i++) {OpenGL_Line(X(i).x,X(i).y,vertices);total+=X(i).x;}
     OpenGL_Draw_Arrays(GL_LINES,TV::dimension,vertices);
 #ifndef USE_OPENGLES
     if(id) OpenGL_String((typename TV::SCALAR)1./X.m*(total),STRING_UTILITIES::string_sprintf("   %d",id));
@@ -161,7 +161,7 @@ Draw_Vertices_For_Selection(const SIMPLEX_MESH<d>& mesh,const GEOMETRY_PARTICLES
     glPushName(0);
     ARRAY<int> particles_in_mesh;mesh.elements.Flattened().Get_Unique(particles_in_mesh);
     ARRAY<typename OPENGL_POLICY<typename TV::SCALAR>::T_GL >vertices;
-    for(int i=1;i<=particles_in_mesh.m;i++){const int p=particles_in_mesh(i);
+    for(int i=0;i<particles_in_mesh.m;i++){const int p=particles_in_mesh(i);
         glLoadName(p);
         vertices.Resize(0);
         OpenGL_Vertex(particles.X(p),vertices);

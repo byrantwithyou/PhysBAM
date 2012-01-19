@@ -151,7 +151,7 @@ void Initialize_Tetrahedron_Collisions()
 //#####################################################################
 void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE
 {
-    for(int rb=1;rb<=constrained_nodes.m;rb++){
+    for(int rb=0;rb<constrained_nodes.m;rb++){
         FRAME_3D<T> frame=solids_parameters.rigid_body_parameters.list(rb)->frame;
         for(int i=1;i<=constrained_nodes(rb).m;i++) X(constrained_nodes(rb)(i))=frame*constrained_nodes_reference_frame_positions(rb)(i);}
 }
@@ -160,7 +160,7 @@ void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE
 {
-    for(int rb=1;rb<=constrained_nodes.m;rb++) for(int i=1;i<=constrained_nodes(rb).m;i++) X(constrained_nodes(rb)(i))=TV();
+    for(int rb=0;rb<constrained_nodes.m;rb++) for(int i=1;i<=constrained_nodes(rb).m;i++) X(constrained_nodes(rb)(i))=TV();
 }
 //#####################################################################
 // Function Update_Collision_Body_Positions_And_Velocities
@@ -169,7 +169,7 @@ void Update_Collision_Body_Positions_And_Velocities(const T time) PHYSBAM_OVERRI
 {   
     int frame=(int)(time*frame_rate+(T).5);
     std::istream *input=FILE_UTILITIES::Safe_Open_Input(keyframe_prefix+STRING_UTILITIES::string_sprintf(".%d",frame));
-    for(int i=1;i<=solids_parameters.rigid_body_parameters.list.rigid_bodies.m;i++)
+    for(int i=0;i<solids_parameters.rigid_body_parameters.list.rigid_bodies.m;i++)
         solids_parameters.rigid_body_parameters.list(i)->frame.template Read<RW>(*input);
     delete input;
 

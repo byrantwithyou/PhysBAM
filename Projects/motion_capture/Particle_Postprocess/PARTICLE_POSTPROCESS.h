@@ -139,7 +139,7 @@ void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
     if(frame>1) return;
 
     T xwidth=fluids_parameters.grid->domain.max_corner.x-fluids_parameters.grid->domain.min_corner.x,ywidth=fluids_parameters.grid->domain.max_corner.y-fluids_parameters.grid->domain.min_corner.y,zwidth=fluids_parameters.grid->domain.max_corner.z-fluids_parameters.grid->domain.min_corner.z;
-    for(int i=1;i<=num_particles_x;i++) for(int j=1;j<=num_particles_z;j++) for(int k=1;k<=(frame==1?num_particles_y:1);k++){
+    for(int i=0;i<num_particles_x;i++) for(int j=0;j<num_particles_z;j++) for(int k=1;k<=(frame==1?num_particles_y:1);k++){
         TV position=TV((float)i/(float)(num_particles_x+1)*xwidth+fluids_parameters.grid->domain.min_corner.x,(float)k/(float)(num_particles_y+1)*ywidth+fluids_parameters.grid->domain.min_corner.y,(float)j/(float)(num_particles_z+1)*zwidth+fluids_parameters.grid->domain.min_corner.z);
         TV_INT index=fluids_parameters.grid->Clamp_To_Cell(position);
         if(!fluids_parameters.particle_levelset_evolution->particle_levelset.removed_positive_particles(index))
@@ -203,7 +203,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents();

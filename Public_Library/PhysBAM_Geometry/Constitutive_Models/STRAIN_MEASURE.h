@@ -55,7 +55,7 @@ public:
     {return Dm_inverse(simplex).Inverse().Simplex_Minimum_Altitude();}
 
     T Minimum_Rest_Altitude() const
-    {T altitude=FLT_MAX;for(int t=1;t<=Dm_inverse.m;t++)altitude=min(altitude,Rest_Altitude(t));return altitude;}
+    {T altitude=FLT_MAX;for(int t=0;t<Dm_inverse.m;t++)altitude=min(altitude,Rest_Altitude(t));return altitude;}
 
     T_MATRIX Ds(ARRAY_VIEW<const TV> X,const typename IF<d==1,int,UNUSABLE<1> >::TYPE simplex) const
     {int i,j;mesh.elements(simplex).Get(i,j);

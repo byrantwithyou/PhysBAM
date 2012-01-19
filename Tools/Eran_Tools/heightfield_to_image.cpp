@@ -22,7 +22,7 @@ void Convert(PARSE_ARGS &parse_args)
 
     if (FILE_UTILITIES::Get_File_Extension(output_filename)=="exr"){
         ARRAYS<VECTOR<VECTOR<float,3> ,2> > image(1,heightfield.m,1,heightfield.n);
-        for(int i=1;i<=image.m;i++) for(int j=1;j<=image.n;j++){
+        for(int i=0;i<image.m;i++) for(int j=0;j<image.n;j++){
             image(i,j).x=(float)heightfield(heightfield.m_start+i-1,heightfield.n_start+j-1);
         }
         EXR_FILE::Write_Row_Column_Image(output_filename,image);

@@ -27,7 +27,7 @@ int main(int argc,char *argv[])
 
     int m=image.m, n=image.n;
     ARRAY<VECTOR_3D<float> > colors(m*n);
-    for(int i=1;i<=m;i++)for(int j=1;j<=n;j++) colors((j-1)*m+i)=image(i,j);
+    for(int i=0;i<m;i++)for(int j=0;j<n;j++) colors((j-1)*m+i)=image(i,j);
     
     cout<<"Writing file..."<<endl;
     FILE_UTILITIES::Write_To_File<float>("image_colors.col",colors);

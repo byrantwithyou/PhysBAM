@@ -130,7 +130,7 @@ Add_Rigid_Geometry(RIGID_GEOMETRY<TV>* rigid_geometry,STREAM_TYPE stream_type,co
             LOG::cout<<"Note: No tet file for "<<basename<<std::endl;}
     assert(structure_ids.m<=3);
     particles.structure_ids(id)=VECTOR<int,3>();
-    for(int i=1;i<=structure_ids.m;i++){
+    for(int i=0;i<structure_ids.m;i++){
         if(structure_ids(i)){
             particles.structure_ids(id)(i)=structure_ids(i);
             Rigid_Geometry(id).Add_Structure(*structure_list.Element(structure_ids(i)));}}

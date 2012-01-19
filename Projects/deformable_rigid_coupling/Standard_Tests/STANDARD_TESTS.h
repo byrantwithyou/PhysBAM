@@ -258,11 +258,11 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
     if(test_number==8){
         T desired_x=(T)two_pi/16;
         ROTATION<TV> desired_rotation=ROTATION<TV>(desired_x*sin(4*time),TV(0,1,0));
-        for(int i=1;i<=arb.joint_mesh.joints.m;i++){JOINT<TV>& joint=*arb.joint_mesh.joints(i);
+        for(int i=0;i<arb.joint_mesh.joints.m;i++){JOINT<TV>& joint=*arb.joint_mesh.joints(i);
             if(joint.joint_function) joint.joint_function->Set_Target_Angle(desired_rotation);}}
     if(test_number==14){
         T sim_time=max((T)0,time-start_time);
-        for(int i=1;i<=arb.joint_mesh.joints.m;i++){JOINT<TV>& joint=*arb.joint_mesh.joints(i);
+        for(int i=0;i<arb.joint_mesh.joints.m;i++){JOINT<TV>& joint=*arb.joint_mesh.joints(i);
             TV previous=Sidewinding_Position(sim_time,(i-1)*joint_separation);
             TV current=Sidewinding_Position(sim_time,i*joint_separation);
             TV next=Sidewinding_Position(sim_time,(i+1)*joint_separation);
@@ -273,7 +273,7 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
             if(joint.joint_function) joint.joint_function->Set_Target_Angle(joint_frame);}}
     if(test_number==16 || test_number==19){
         T sim_time=max((T)0,time-start_time);
-        for(int i=1;i<=arb.joint_mesh.joints.m;i++){JOINT<TV>& joint=*arb.joint_mesh.joints(i);
+        for(int i=0;i<arb.joint_mesh.joints.m;i++){JOINT<TV>& joint=*arb.joint_mesh.joints(i);
             ROTATION<TV> previous_orientation;
             ROTATION<TV> next_orientation(sin((T)two_pi*sim_time/period),TV(0,1,0));
             ROTATION<TV> joint_frame=joint.frame_jp.r*initial_orientation.Inverse()*previous_orientation.Inverse()*next_orientation*initial_orientation*joint.frame_cj.r;
@@ -281,7 +281,7 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
             if(joint.joint_function) joint.joint_function->Set_Target_Angle(joint_frame);}}
     if(test_number==17 || test_number==18){
         T sim_time=max((T)0,time-start_time);
-        for(int i=1;i<=arb.joint_mesh.joints.m;i++){JOINT<TV>& joint=*arb.joint_mesh.joints(i);
+        for(int i=0;i<arb.joint_mesh.joints.m;i++){JOINT<TV>& joint=*arb.joint_mesh.joints(i);
             int maggot=(i+1)/2;
             ROTATION<TV> previous_orientation;
             ROTATION<TV> next_orientation(sin((T)two_pi*sim_time/periods(maggot)+phases(maggot)),TV(0,1,0));
@@ -348,7 +348,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     if(dynamic_subsampling) Initialize_Dynamic_Subsampling();
 
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     // correct mass
     binding_list.Distribute_Mass_To_Parents();
@@ -390,7 +390,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         solid_body_collection.Add_Force(Create_Bending_Springs(*triangulated_surface,bending_stiffness,bending_damping));
         PHYSBAM_DEBUG_PRINT("Spring stiffnesses",linear_stiffness,linear_damping,bending_stiffness,bending_damping);}
 
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) if(!dynamic_cast<SEGMENTED_CURVE<TV>*>(deformable_body_collection.deformable_geometry.structures(i))){
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) if(!dynamic_cast<SEGMENTED_CURVE<TV>*>(deformable_body_collection.deformable_geometry.structures(i))){
         deformable_body_collection.collisions.collision_structures.Append(deformable_body_collection.deformable_geometry.structures(i));
         if(solids_parameters.triangle_collision_parameters.perform_self_collision && (!dynamic_cast<FREE_PARTICLES<TV>*>(deformable_body_collection.deformable_geometry.structures(i))))
             solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append(deformable_body_collection.deformable_geometry.structures(i));}
@@ -398,7 +398,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     if(test_number==8){
         // collide structures with the ground only
         deformable_body_collection.collisions.Use_Structure_Collide_Collision_Body(true);
-        for(int s=1;s<=deformable_body_collection.deformable_geometry.structures.m;s++)
+        for(int s=0;s<deformable_body_collection.deformable_geometry.structures.m;s++)
             deformable_body_collection.collisions.structure_collide_collision_body(s).Set(rigid_body_collection.rigid_geometry_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(ground->particle_index));}
 
     // correct mass
@@ -411,13 +411,13 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     if(test_number!=1) tests.Add_Gravity();
 
     // disable strain rate CFL for all forces
-    for(int i=1;i<=rigid_body_collection.rigids_forces.m;i++) rigid_body_collection.rigids_forces(i)->limit_time_step_by_strain_rate=false;
-    for(int i=1;i<=deformable_body_collection.deformables_forces.m;i++) deformable_body_collection.deformables_forces(i)->limit_time_step_by_strain_rate=false;
-    for(int i=1;i<=solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->limit_time_step_by_strain_rate=false;
+    for(int i=0;i<rigid_body_collection.rigids_forces.m;i++) rigid_body_collection.rigids_forces(i)->limit_time_step_by_strain_rate=false;
+    for(int i=0;i<deformable_body_collection.deformables_forces.m;i++) deformable_body_collection.deformables_forces(i)->limit_time_step_by_strain_rate=false;
+    for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->limit_time_step_by_strain_rate=false;
 
-    for(int i=1;i<=rigid_body_collection.rigids_forces.m;i++) rigid_body_collection.rigids_forces(i)->use_implicit_velocity_independent_forces=fully_implicit;
-    for(int i=1;i<=deformable_body_collection.deformables_forces.m;i++) deformable_body_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=fully_implicit;
-    for(int i=1;i<=solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->use_implicit_velocity_independent_forces=fully_implicit;
+    for(int i=0;i<rigid_body_collection.rigids_forces.m;i++) rigid_body_collection.rigids_forces(i)->use_implicit_velocity_independent_forces=fully_implicit;
+    for(int i=0;i<deformable_body_collection.deformables_forces.m;i++) deformable_body_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=fully_implicit;
+    for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->use_implicit_velocity_independent_forces=fully_implicit;
 }
 //#####################################################################
 // Function Advance_One_Time_Step_End_Callback
@@ -426,12 +426,12 @@ void Advance_One_Time_Step_End_Callback(const T dt,const T time)
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     if(test_number==12){
-        for(int i=1;i<=rigid_body_clamp_time.m;i++) if(rigid_body_clamp_time(i).y>=time){RIGID_BODY<TV>& rigid_body=*rigid_body_clamp_time(i).x;
+        for(int i=0;i<rigid_body_clamp_time.m;i++) if(rigid_body_clamp_time(i).y>=time){RIGID_BODY<TV>& rigid_body=*rigid_body_clamp_time(i).x;
             T speed=rigid_body.Twist().linear.Magnitude();
             if(speed>maximum_fall_speed) rigid_body.Twist().linear*=maximum_fall_speed/speed;}
 
-        for(int i=1;i<=structure_clamp_time.m;i++) if(structure_clamp_time(i).y>=time){TETRAHEDRALIZED_VOLUME<T>& volume=*structure_clamp_time(i).x;
-            for(int j=1;j<=volume.mesh.elements.m;j++){const VECTOR<int,4>& e=volume.mesh.elements(j);
+        for(int i=0;i<structure_clamp_time.m;i++) if(structure_clamp_time(i).y>=time){TETRAHEDRALIZED_VOLUME<T>& volume=*structure_clamp_time(i).x;
+            for(int j=0;j<volume.mesh.elements.m;j++){const VECTOR<int,4>& e=volume.mesh.elements(j);
                 for(int k=1;k<=e.Size();k++){
                     T speed=deformable_body_collection.particles.V(e(k)).Magnitude();
                     if(speed>maximum_fall_speed) deformable_body_collection.particles.V(e(k))*=maximum_fall_speed/speed;}}}}
@@ -497,7 +497,7 @@ void Push_Out_Test()
     last_frame=120;
     // set up two blocks to be interpenetrating
     int num_blocks=4;
-    for(int i=1;i<=num_blocks;i++){
+    for(int i=0;i<num_blocks;i++){
         RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("subdivided_box",1,(T)0);
         rigid_body.Set_Frame(FRAME<TV>(TV((T)1.8*i,(T)1.6*i,(T)0),ROTATION<TV>((T)pi/10*i,TV::Axis_Vector(1))));
         rigid_body.Set_Mass(1000);
@@ -513,7 +513,7 @@ void Push_Out_Test()
     tests.Initialize_Tetrahedron_Collisions(1,tetrahedralized_volume2,solids_parameters.triangle_collision_parameters);
 
 //    int n=10;
-//    for(int i=1;i<=n;i++) for(int j=1;j<=n;j++) for(int k=1;k<=n;k++) tests.Add_Rigid_Body("subdivided_box",1,(T)0).X()=TV(1.8*i,1.*j,1.75*k);
+//    for(int i=0;i<n;i++) for(int j=0;j<n;j++) for(int k=0;k<n;k++) tests.Add_Rigid_Body("subdivided_box",1,(T)0).X()=TV(1.8*i,1.*j,1.75*k);
 }
 //#####################################################################
 // Function Coupled_Stack
@@ -523,7 +523,7 @@ void Coupled_Stack()
     last_frame=240;
     solids_parameters.triangle_collision_parameters.perform_self_collision=false;
     dynamic_subsampling=true;
-    for(int i=1;i<=6;i++){
+    for(int i=0;i<6;i++){
         if(i%2==0){
             RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("subdivided_box",1,(T).4);
             rigid_body.X()=TV(0,(T)(2*i-1),0);
@@ -546,7 +546,7 @@ void Coupled_Stack()
 //#####################################################################
 FRAME<TV> Find_Placement(RANDOM_NUMBERS<T>& random,const BOX<TV>& bounding_box,ARRAY<ORIENTED_BOX<TV> >& bounding_boxes,const BOX<TV>& world,bool want_rotate)
 {
-    for(int i=1;i<=10000;i++){
+    for(int i=0;i<10000;i++){
         FRAME<TV> frame;
         if(want_rotate) frame.r=random.template Get_Rotation<TV>();
         ORIENTED_BOX<TV> oriented_box(bounding_box,frame.r);
@@ -554,7 +554,7 @@ FRAME<TV> Find_Placement(RANDOM_NUMBERS<T>& random,const BOX<TV>& bounding_box,A
         frame.t=random.Get_Uniform_Vector(world.min_corner-new_box.min_corner,world.max_corner-new_box.max_corner);
         oriented_box.corner+=frame.t;
         bool okay=true;
-        for(int j=1;j<=bounding_boxes.m;j++) if(oriented_box.Intersection(bounding_boxes(j))){okay=false;break;}
+        for(int j=0;j<bounding_boxes.m;j++) if(oriented_box.Intersection(bounding_boxes(j))){okay=false;break;}
         if(okay){
             bounding_boxes.Append(oriented_box);
             return frame;}}
@@ -578,7 +578,7 @@ public:
     void operator()(TRIANGULATED_SURFACE<T>& surface) const
     {
         for(int i=surface.mesh.elements.m;i>=1;i--){const VECTOR<int,3>& elements(surface.mesh.elements(i));
-            for(int j=1;j<=3;j++) if(Prune(surface.particles.X(elements(j)))){surface.mesh.elements.Remove_Index_Lazy(i);break;}}
+            for(int j=0;j<3;j++) if(Prune(surface.particles.X(elements(j)))){surface.mesh.elements.Remove_Index_Lazy(i);break;}}
         surface.Discard_Valence_Zero_Particles_And_Renumber();
         static_cast<PARTICLES<TV>&>(surface.particles).mass*=20;
     }
@@ -627,12 +627,12 @@ void Trampoline()
     ARRAY<ORIENTED_BOX<TV> > bounding_boxes;
     BOX<TV> world(TV(-2*separation,4,-2*separation),TV(2*separation,15,2*separation));
 
-     for(int i=1;i<=3;i++){
+     for(int i=0;i<3;i++){
          RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("sphere",(T).6,(T).2);
          rigid_body.Update_Bounding_Box();
          rigid_body.Set_Frame(Find_Placement(random,rigid_body.axis_aligned_bounding_box,bounding_boxes,world,false));
          rigid_body.Set_Mass(1);}
-     for(int i=1;i<=3;i++){
+     for(int i=0;i<3;i++){
          BOX<TV> box(-TV((T)3,(T)3,(T)1),TV((T)3,(T)3,(T)1));
          RIGID_BODY_STATE<TV> state(Find_Placement(random,box*(T).6,bounding_boxes,world,true));
          TETRAHEDRALIZED_VOLUME<T>& object=tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_1K.tet",state,false,false,1000,(T).6);
@@ -829,7 +829,7 @@ void Floppy_Fish()
     bones.Last()->Set_Frame(FRAME<TV>(TV((T)2.5,(T)3,0)));
 
     T density=1000;
-    for(int i=1;i<=bones.m;i++){
+    for(int i=0;i<bones.m;i++){
         bones(i)->Set_Mass(density*bones(i)->Volume());}
 
     T joint_strengths[4]={(T)1000,(T)1000,(T)400,(T)200};
@@ -978,8 +978,8 @@ void Ring_Drop()
     int num_objects=(int)(20*num_objects_multiplier);
 
     // Poles
-    for(int i=1;i<=poles;i++)
-        for(int j=1;j<=poles;j++){
+    for(int i=0;i<poles;i++)
+        for(int j=0;j<poles;j++){
             TV position((i-(poles+1)/(T)2)*7,10,(j-(poles+1)/(T)2)*7);
             RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("Rings_Test/medium_cylinder",1,mu);
             rigid_body.Set_Name(STRING_UTILITIES::string_sprintf("pole %d %d",i,j));
@@ -987,7 +987,7 @@ void Ring_Drop()
             rigid_body.X()=position;}
 
     // Rigid spheres
-    for(int i=1;i<=num_objects;i++){
+    for(int i=0;i<num_objects;i++){
         T scale=(T)1.75;
         RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("sphere",scale,mu);
         rigid_body.Update_Bounding_Box();
@@ -997,7 +997,7 @@ void Ring_Drop()
         if(clamp_time>0) rigid_body_clamp_time.Append(PAIR<RIGID_BODY<TV>*,T>(&rigid_body,clamp_time));}
 
     // Rigid tori
-    for(int i=1;i<=num_objects;i++){
+    for(int i=0;i<num_objects;i++){
         T scale=(T).75;
         RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("Rings_Test/ring_revolve",scale,mu);
 
@@ -1008,7 +1008,7 @@ void Ring_Drop()
         if(clamp_time>0) rigid_body_clamp_time.Append(PAIR<RIGID_BODY<TV>*,T>(&rigid_body,clamp_time));}
 
     // Articulated lathe chains
-    for(int i=1;i<=num_objects;i++){
+    for(int i=0;i<num_objects;i++){
         T scale=(T).65;
         BOX<TV> box(-TV((T)4.5,(T)4.5,(T)1),TV((T)4.5,(T)4.5,(T)1));
         FRAME<TV> frame=Find_Placement(random,box*scale,bounding_boxes,world,true);
@@ -1021,7 +1021,7 @@ void Ring_Drop()
 
     // Deformable tori
     TETRAHEDRALIZED_VOLUME<T>* object=0;
-    for(int i=1;i<=num_objects;i++){
+    for(int i=0;i<num_objects;i++){
         if(parameter==1 || parameter==2){
             T scale=(T)1;
             BOX<TV> box(-TV((T)2.5,(T)2.5,(T).5),TV((T)2.5,(T)2.5,(T).5));
@@ -1050,7 +1050,7 @@ void Ring_Drop()
         SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(*object,ring_mass/object->Total_Volume());}
 
     // Deformable spheres
-    for(int i=1;i<=num_objects;i++){
+    for(int i=0;i<num_objects;i++){
         T scale=(T)1.75;
         BOX<TV> box(-TV((T)1,(T)1,(T)1),TV((T)1,(T)1,(T)1));
         RIGID_BODY_STATE<TV> state(Find_Placement(random,box*scale,bounding_boxes,world,true));
@@ -1136,7 +1136,7 @@ void PD_Snake(const T scale,const TV shift,const ROTATION<TV> orient,const T k_p
 
     // Add children and joints
     T desired_x=(T)two_pi/(T)(number_of_joints+1);
-    for(int i=1;i<=number_of_joints;i++){
+    for(int i=0;i<number_of_joints;i++){
         cheight+=scale*((T)1.25+space_adjustment);
         child_body=&tests.Add_Rigid_Body("cyllink",scale*(T).2,friction);
         child_body->X()=orient.Rotate(TV(cheight,0,0))+shift;
@@ -1210,7 +1210,7 @@ void Sidewinding()
     int steps[]={1,2,3,4,5,4,3,3,4,5,6,2,1};
     int count=sizeof steps/sizeof*steps;
 
-    for(int i=1;i<=count;i++) for(int j=1;j<=6;j++){
+    for(int i=0;i<count;i++) for(int j=0;j<6;j++){
         RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("plank",(T)1,friction);
         rigid_body.X()=TV((T)(-(T)35+10*j),(T).2*steps[i-1]-(T).1,(T)(-6-2*i));
         rigid_body.Rotation()=ROTATION<TV>((T)half_pi,TV(0,1,0));
@@ -1383,7 +1383,7 @@ void Bowl_Of_Maggots(bool use_blocks)
     T scale=(T).65;
     T block_scale=(T).2;
     T torus_scale=(T).7;
-    for(int i=1;i<=20;i++){
+    for(int i=0;i<20;i++){
         FRAME<TV> frame=Find_Placement(random_numbers,maggot_box*scale*(T)1.2,bounding_boxes,world,true);
         periods.Append(random_numbers.Get_Uniform_Number((T).7,(T)1.3));
         phases.Append(random_numbers.Get_Uniform_Number((T)0,(T)two_pi));
@@ -1481,7 +1481,7 @@ void Add_Subsamples(const int surface_triangle_index,ARRAY<BINDING<TV>*>& new_bi
 
     const VECTOR<int,3>& triangle=surface_elements(surface_triangle_index);
     ARRAY<int>& particle_subsamples=triangle_free_particles(surface_triangle_index);
-    for(int i=1;i<=subsamples;i++){
+    for(int i=0;i<subsamples;i++){
         VECTOR<T,3> weights;do{weights=random_numbers.Get_Uniform_Vector(TV(),TV(1,1,1));}while(weights.x+weights.y>=1);weights.z=(T)1-weights.x-weights.y;
         int hard_bound_particle=particles.array_collection->Add_Element_From_Deletion_List();
         new_binding_list.Append(new LINEAR_BINDING<TV,3>(particles,hard_bound_particle,triangle,weights));
@@ -1500,7 +1500,7 @@ void Delete_Subsamples(const int surface_triangle_index)
 
     // only need to delete the particles
     ARRAY<int>& particle_subsamples=triangle_free_particles(surface_triangle_index);
-    for(int i=1;i<=particle_subsamples.m;i++){
+    for(int i=0;i<particle_subsamples.m;i++){
         int soft_bound_particle=particle_subsamples(i);
         int hard_bound_particle=soft_bindings.Parent(soft_bound_particle);
         particles.array_collection->Add_To_Deletion_List(soft_bound_particle);
@@ -1519,7 +1519,7 @@ void Persist_Subsamples(const int surface_triangle_index,ARRAY<BINDING<TV>*>& ne
     if(!particle_subsamples.m) return Add_Subsamples(surface_triangle_index,new_binding_list,new_soft_bindings);
 
     assert(particle_subsamples.m==subsamples);
-    for(int i=1;i<=particle_subsamples.m;i++){
+    for(int i=0;i<particle_subsamples.m;i++){
         int soft_bound_particle=particle_subsamples(i);
         // save soft binding
         const VECTOR<int,2>& soft_binding=soft_bindings.bindings(soft_bindings.Soft_Binding(soft_bound_particle));
@@ -1555,12 +1555,12 @@ void Update_Subsamples()
     particle_distances.Resize(old_number_particles);
     INDIRECT_ARRAY<ARRAY<T>,ARRAY<int>&> subset=particle_distances.Subset(surface_particles);subset.Fill(FLT_MAX);
 
-    for(int i=1;i<=surface_particles.m;i++){int p=surface_particles(i);
+    for(int i=0;i<surface_particles.m;i++){int p=surface_particles(i);
         for(COLLISION_GEOMETRY_ID body(1);body<=collision_body_list.Size();body++)
             particle_distances(p)=PhysBAM::min(particle_distances(p),collision_body_list(body).Implicit_Geometry_Extended_Value(particles.X(p)));}
 
     // iterate over surface elements
-    for(int t=1;t<=surface_elements.m;t++){
+    for(int t=0;t<surface_elements.m;t++){
         const VECTOR<int,3>& triangle=surface_elements(t);
         T triangle_distance=particle_distances.Subset(triangle).Min();
         if(triangle_distance<refinement_distance) Persist_Subsamples(t,new_binding_list,new_soft_bindings);
@@ -1568,23 +1568,23 @@ void Update_Subsamples()
 
     // rebuild free particles
     free_particles.nodes.Remove_All();
-    for(int t=1;t<=surface_elements.m;t++){
+    for(int t=0;t<surface_elements.m;t++){
         ARRAY<int>& subsamples=triangle_free_particles(t);
         if(subsamples.m) free_particles.nodes.Append_Elements(subsamples);}
 
     // rebuild hard bindings
     binding_list.Clean_Memory();
-    for(int b=1;b<=new_binding_list.m;b++) binding_list.Add_Binding(new_binding_list(b));
+    for(int b=0;b<new_binding_list.m;b++) binding_list.Add_Binding(new_binding_list(b));
 
     // rebuild soft bindings
     soft_bindings.Clean_Memory();
-    for(int b=1;b<=new_soft_bindings.m;b++) soft_bindings.Add_Binding(new_soft_bindings(b),true);
+    for(int b=0;b<new_soft_bindings.m;b++) soft_bindings.Add_Binding(new_soft_bindings(b),true);
 
     binding_list.Clamp_Particles_To_Embedded_Positions();binding_list.Clamp_Particles_To_Embedded_Velocities();
     soft_bindings.Clamp_Particles_To_Embedded_Positions();soft_bindings.Clamp_Particles_To_Embedded_Velocities();
 
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
     
     // correct mass
     binding_list.Clear_Hard_Bound_Particles(particles.mass);

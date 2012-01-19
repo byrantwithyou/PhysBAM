@@ -407,7 +407,7 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
         bool old_min=controller->minimize;
         controller->minimize=((((int)cycle_time)%7==0 || ((int)cycle_time)%7==1 || ((int)cycle_time)%7==6)?false:true);
         //controller->minimize=((((int)time)%4==0 || ((int)time)%4==1)?false:true);
-        for(int i=1;i<=arb.joint_mesh.joints.m;i++){JOINT<TV>& joint=*arb.joint_mesh.joints(i);
+        for(int i=0;i<arb.joint_mesh.joints.m;i++){JOINT<TV>& joint=*arb.joint_mesh.joints(i);
             if(((int)cycle_time)%7==0 || ((int)cycle_time)%7==1 || ((int)cycle_time)%7==6) joint.joint_function->Set_k_p(750);
             else joint.joint_function->Set_k_p(1500);}
         if(old_min ^ controller->minimize){
@@ -581,16 +581,16 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             else{
                 ARRAY<int> tets;const T tolerance=(T)1e-4;
                 ARRAY<int> surface_particles;surface->mesh.elements.Flattened().Get_Unique(surface_particles);
-                for(int i=1;i<=surface_particles.m;i++){int p=surface_particles(i);
+                for(int i=0;i<surface_particles.m;i++){int p=surface_particles(i);
                     tets.Remove_All();bool got_bind=false;
                     T search_region=tolerance/(T)2;while(tets.m==0){search_region*=(T)2;volume->hierarchy->Intersection_List(particles.X(p),tets,search_region);}
-                    for(int tt=1;tt<=tets.m;tt++){int t=tets(tt);
+                    for(int tt=0;tt<tets.m;tt++){int t=tets(tt);
                         TV bary=TETRAHEDRON<T>::First_Three_Barycentric_Coordinates(particles.X(p),particles.X.Subset(volume->mesh.elements(t)));
                         bindings.Append(TRIPLE<int,int,TV>(p,t,bary));got_bind=true;break;}
                     if(!got_bind){LOG::cout<<"no binding on particle "<<p<<std::endl;bindings.Append(TRIPLE<int,int,TV>(p,0,TV(0,0,0)));}}
                 if(false) FILE_UTILITIES::Write_To_File(stream_type,data_directory+STRING_UTILITIES::string_sprintf("/bindings_%d",test_number),bindings);}
             ARRAY<int> lookup;lookup.Resize(particles.array_collection->Size());
-            for(int i=1;i<=bindings.m;i++){
+            for(int i=0;i<bindings.m;i++){
                 if(bindings(i).y==0) continue;
                 VECTOR<int,4> nodes=volume->mesh.elements(bindings(i).y);
                 binding_list.Add_Binding(new LINEAR_BINDING<TV,4>(particles,bindings(i).x,nodes,bindings(i).z));
@@ -672,7 +672,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         //deformable_body_collection.deformable_geometry.Add_Structure(&volume->Get_Boundary_Object());
 
         referenced_particles=new ARRAY<int>();source_particles=new ARRAY<int>();
-        //for(int i=1;i<=particle_array.m;i++){
+        //for(int i=0;i<particle_array.m;i++){
         for(int i=1;i<=particles.array_collection->Size();i++){
             referenced_particles->Append(i);
             for(int j=1;j<=source_rigid_particles->m;j++) if(solid_body_collection.rigid_body_collection.Rigid_Body((*source_rigid_particles)(j)).implicit_object->Inside(particles.X(i))) source_particles->Append(i);

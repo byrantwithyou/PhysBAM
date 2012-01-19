@@ -21,7 +21,7 @@ Bloom(ARRAY<VECTOR<T,3>,VECTOR<int,2> >& image,const T bloom_radius,const T bloo
     LOG::Time("Filtering");
     ARRAY<VECTOR<T,3>,VECTOR<int,2> > bloom_image(1,image.counts.x,1,image.counts.y);
     PROGRESS_INDICATOR progress(image.counts.x*image.counts.y);
-    for(int i=1;i<=image.counts.x;i++) for(int j=1;j<=image.counts.y;j++){
+    for(int i=0;i<image.counts.x;i++) for(int j=0;j<image.counts.y;j++){
         T weight_sum=0;
         RANGE<VECTOR<int,2> > bloom_box(clamp_min(i-bloom_width,1),clamp_max(i+bloom_width,image.counts.x),clamp_min(j-bloom_width,1),clamp_max(j+bloom_width,image.counts.y));
         //std::cout<<"pixel "<<i<<","<<j<<" box="<<bloom_box<<std::endl;
@@ -36,7 +36,7 @@ Bloom(ARRAY<VECTOR<T,3>,VECTOR<int,2> >& image,const T bloom_radius,const T bloo
         progress.Progress();}
     IMAGE<T>::Write("bloom.png",bloom_image,(T)1);
     LOG::Time("Blending");
-    for(int i=1;i<=image.counts.x;i++) for(int j=1;j<=image.counts.y;j++) image(i,j)=(T)bloom_weight*bloom_image(i,j)+(1-bloom_weight)*image(i,j);
+    for(int i=0;i<image.counts.x;i++) for(int j=0;j<image.counts.y;j++) image(i,j)=(T)bloom_weight*bloom_image(i,j)+(1-bloom_weight)*image(i,j);
 }
 
 int main(int argc,char* argv[])

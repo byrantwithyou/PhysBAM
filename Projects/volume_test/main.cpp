@@ -58,7 +58,7 @@ void Case_Test()
 
     static int cnt=0;cnt++;
     if(0)
-    for(int i=1;i<=3;i++){
+    for(int i=0;i<3;i++){
         char file[100];
         sprintf(file, "dump-%c-%i.eps", 'x'+i-1, cnt);
         EPS_FILE_GEOMETRY<T> eps(file);
@@ -101,12 +101,12 @@ void Derivative_Test()
 {
     T e=1e-8;
     VECTOR<TV,6> a,da,ada;
-    for(int i=1;i<=6;i++){
+    for(int i=0;i<6;i++){
         rn.Fill_Uniform(a(i),-1,1);
         rn.Fill_Uniform(da(i),-e,e);
         ada(i)=a(i)+da(i);}
 
-    for(int i=1;i<=6;i++) printf("a(%i)=TV(%g,%g,%g);\n",i,a(i).x,a(i).y,a(i).z);
+    for(int i=0;i<6;i++) printf("a(%i)=TV(%g,%g,%g);\n",i,a(i).x,a(i).y,a(i).z);
 
     ORIGIN_AREAS::VOL_DATA<T,3,6> data0,data1;
     ORIGIN_AREAS::Volume_From_Simplices(data0,TV(),&a(1));
@@ -114,7 +114,7 @@ void Derivative_Test()
 
     T dV=(data1.V-data0.V)/e;
     T G=0;
-    for(int i=1;i<=6;i++) G+=TV::Dot_Product(da(i),data0.G[i-1]+data1.G[i-1])/2;
+    for(int i=0;i<6;i++) G+=TV::Dot_Product(da(i),data0.G[i-1]+data1.G[i-1])/2;
     G/=e;
     printf("GRAD %9.6f %9.6f (%.6f)\n", dV, G, fabs(dV-G));
 

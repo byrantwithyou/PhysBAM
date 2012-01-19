@@ -60,7 +60,7 @@ void Resample(PARSE_ARGS &parse_args)
         FILE_UTILITIES::Read_From_File<T>(input_filename,original_field);
 
         std::cout << "Resampling..." << std::flush;
-        for(int i=1;i<=resampled_grid.m;i++) for(int j=1;j<=resampled_grid.n;j++)
+        for(int i=0;i<resampled_grid.m;i++) for(int j=0;j<resampled_grid.n;j++)
             resampled_field(i,j)=interpolation.Clamped_To_Array(original_grid,original_field,resampled_grid.X(i,j));
 
         std::cout << "Writing" << std::endl;

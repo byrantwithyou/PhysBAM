@@ -179,7 +179,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
 
     T xwidth=grid.domain.max_corner.x-grid.domain.min_corner.x,ywidth=grid.domain.max_corner.y-grid.domain.min_corner.y,zwidth=grid.domain.max_corner.z-grid.domain.min_corner.z;
-    for(int i=1;i<=num_particles_x;i++) for(int j=1;j<=num_particles_z;j++) for(int k=1;k<=num_particles_y;k++){
+    for(int i=0;i<num_particles_x;i++) for(int j=0;j<num_particles_z;j++) for(int k=0;k<num_particles_y;k++){
         TV position=TV((float)i/(float)(num_particles_x+1)*xwidth+grid.domain.min_corner.x,(float)k/(float)(num_particles_y+1)*ywidth+grid.domain.min_corner.y,(float)j/(float)(num_particles_z+1)*zwidth+grid.domain.min_corner.z);
         RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("sphere",.1,(T).1);
         rigid_body.X()=position;rigid_body.Is_Kinematic()=true;
@@ -190,7 +190,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     Preprocess_Frame(0);
     
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     // correct mass
     binding_list.Distribute_Mass_To_Parents();

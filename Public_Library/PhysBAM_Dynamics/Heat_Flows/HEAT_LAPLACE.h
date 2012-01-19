@@ -54,7 +54,7 @@ public:
     T_LAPLACE::Find_A_Part_Two(domain,A_array,b_array,cell_index_to_matrix_index);
     A_array*=(T)3;
     if(coefficient!=1){A_array*=coefficient;b_array*=coefficient;}
-    for(int i=1;i<=A_array.m;i++) A_array(i)-=(T)1;}
+    for(int i=0;i<A_array.m;i++) A_array(i)-=(T)1;}
 
 //#####################################################################
 };

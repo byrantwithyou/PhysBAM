@@ -23,7 +23,7 @@ void Update_Tetrahedron_List(TETRAHEDRALIZED_VOLUME<T>& tv)
 {
     if(!tv.tetrahedron_list) tv.tetrahedron_list=new ARRAY<TETRAHEDRON<T> >;
     tv.tetrahedron_list->Resize(tv.mesh.elements.m,false,false);
-    for(int t=1;t<=tv.mesh.elements.m;t++){
+    for(int t=0;t<tv.mesh.elements.m;t++){
         (*tv.tetrahedron_list)(t).X=tv.particles.X.Subset(tv.mesh.elements(t));
         (*tv.tetrahedron_list)(t).Create_Triangles();}
 }
@@ -103,7 +103,7 @@ void Compute_Tetrahedron_Volumes(TETRAHEDRALIZED_VOLUME<T>& tv)
 {
     if(!tv.tetrahedron_volumes) tv.tetrahedron_volumes=new ARRAY<T>;
     tv.tetrahedron_volumes->Resize(tv.mesh.elements.m,false,false);
-    for(int t=1;t<=tv.mesh.elements.m;t++){int i,j,k,l;tv.mesh.elements(t).Get(i,j,k,l);
+    for(int t=0;t<tv.mesh.elements.m;t++){int i,j,k,l;tv.mesh.elements(t).Get(i,j,k,l);
         (*tv.tetrahedron_volumes)(t)=TETRAHEDRON<T>::Signed_Volume(tv.particles.X(i),tv.particles.X(j),tv.particles.X(k),tv.particles.X(l));}
 }
 //#####################################################################
@@ -117,12 +117,12 @@ void Compute_Nodal_Volumes(TETRAHEDRALIZED_VOLUME<T>& tv,bool save_tetrahedron_v
     if(save_tetrahedron_volumes){
         if(!tv.tetrahedron_volumes) tv.tetrahedron_volumes=new ARRAY<T>;
         tv.tetrahedron_volumes->Resize(tv.mesh.elements.m);
-        for(int t=1;t<=tv.mesh.elements.m;t++){int i,j,k,l;tv.mesh.elements(t).Get(i,j,k,l);
+        for(int t=0;t<tv.mesh.elements.m;t++){int i,j,k,l;tv.mesh.elements(t).Get(i,j,k,l);
             (*tv.tetrahedron_volumes)(t)=TETRAHEDRON<T>::Signed_Volume(tv.particles.X(i),tv.particles.X(j),tv.particles.X(k),tv.particles.X(l));
             T volume=(T).25*(*tv.tetrahedron_volumes)(t);
             (*tv.nodal_volumes)(i)+=volume;(*tv.nodal_volumes)(j)+=volume;(*tv.nodal_volumes)(k)+=volume;(*tv.nodal_volumes)(l)+=volume;}}
     else
-        for(int t=1;t<=tv.mesh.elements.m;t++){int i,j,k,l;tv.mesh.elements(t).Get(i,j,k,l);
+        for(int t=0;t<tv.mesh.elements.m;t++){int i,j,k,l;tv.mesh.elements(t).Get(i,j,k,l);
             T volume=(T).25*TETRAHEDRON<T>::Signed_Volume(tv.particles.X(i),tv.particles.X(j),tv.particles.X(k),tv.particles.X(l));
             (*tv.nodal_volumes)(i)+=volume;(*tv.nodal_volumes)(j)+=volume;(*tv.nodal_volumes)(k)+=volume;(*tv.nodal_volumes)(l)+=volume;}
 }

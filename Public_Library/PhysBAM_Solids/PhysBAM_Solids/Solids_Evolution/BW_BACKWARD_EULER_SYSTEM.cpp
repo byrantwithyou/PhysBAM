@@ -84,7 +84,7 @@ Project_Helper(KRYLOV_VECTOR_BASE<T>& BV,const bool negate) const
     solid_body_collection.example_forces_and_velocities->Zero_Out_Enslaved_Velocity_Nodes(V.V.array,time,time);
 
     // Cloth/body contacts
-    for(int i=1;i<=bw_collisions.cloth_body_constraints.m;i++){
+    for(int i=0;i<bw_collisions.cloth_body_constraints.m;i++){
         int particle_index=bw_collisions.cloth_body_constraints(i).x;
         RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(bw_collisions.cloth_body_constraints(i).y);
         TV particle_location=particles.X(particle_index);

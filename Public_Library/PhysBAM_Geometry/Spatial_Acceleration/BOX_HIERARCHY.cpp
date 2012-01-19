@@ -65,7 +65,7 @@ Initialize_Hierarchy_Using_KD_Tree()
 {
     KD_TREE<TV> kd_tree(false);
     ARRAY<TV> centroids(box_hierarchy.m);
-    for(int l=1;l<=box_hierarchy.m;l++)centroids(l)=box_hierarchy(l).Center();
+    for(int l=0;l<box_hierarchy.m;l++)centroids(l)=box_hierarchy(l).Center();
     kd_tree.Create_Left_Balanced_KD_Tree(centroids);
     leaves=box_hierarchy.m;parents.Resize(leaves);children.Remove_All();
     root=Initialize_Hierarchy_Using_KD_Tree_Helper(kd_tree.root_node);assert(root==2*leaves-1);

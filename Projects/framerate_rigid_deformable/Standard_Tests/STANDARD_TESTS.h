@@ -149,7 +149,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     deformable_body_collection.particles.Compute_Auxiliary_Attributes(soft_bindings);
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     // add forces
     switch(test_number){

@@ -96,7 +96,7 @@ void Get_Initial_Data()
     GRID<TV> grid(3*resolution+1,3*resolution+1,3*resolution+1,(T)-1,(T)1,(T)-1,(T)1,(T)-1,(T)1);
     hexahedralized_volume.Initialize_Cube_Mesh_And_Particles(grid);
     T radius=(T)(one_third+1e-5);
-    for(int h=1;h<=hexahedron_mesh.hexahedrons.m;h++)for(int k=1;k<=8;k++){
+    for(int h=0;h<hexahedron_mesh.hexahedrons.m;h++)for(int k=0;k<8;k++){
         VECTOR_3D<T> r=abs(particles.X(hexahedron_mesh.hexahedrons(k,h)));
         if((r.x>radius)+(r.y>radius)+(r.z>radius)>1)hexahedron_mesh.hexahedrons(k,h)=0;}
     hexahedron_mesh.Delete_Hexahedrons_With_Missing_Nodes();
@@ -193,7 +193,7 @@ void Add_External_Forces(ARRAY<VECTOR_3D<T> >& F,const T time,const int id) PHYS
     if(time<42/frame_rate) stiffness=0;
     else if(time<60/frame_rate) stiffness*=(time*frame_rate-42)/(60-42);
     for(int g=0;g<2;g++){RIGID_BODY<TV>& rigid_body=*solids_parameters.rigid_body_parameters.list.rigid_bodies(gear[g]);
-        for(int s=1;s<=segment_mesh.segments.m;s++){
+        for(int s=0;s<segment_mesh.segments.m;s++){
             int i,j;segment_mesh.segments.Get(s,i,j);VECTOR_3D<T> Xi=particles.X(i),Xj=particles.X(j);
             for(int a=1;a<gear_repulsion_sampling;a++){
                 T t=(T)a/gear_repulsion_sampling,phi;VECTOR_3D<T> X=(1-t)*Xi+t*Xj;
@@ -220,7 +220,7 @@ void Remesh_Gears()
 
     for(;;){
         T deviation=1000;int di=0;
-        for(int i=1;i<=n;i++){
+        for(int i=0;i<n;i++){
             int ip=i==1?n:i-1,in=i+1;SEGMENT_3D<T> segment(curve(ip),curve(in));
             T d=segment.Distance_From_Point_To_Segment(curve(i));
             if(deviation>d){deviation=d;di=i;}}
@@ -231,7 +231,7 @@ void Remesh_Gears()
     std::cout<<"n = "<<n<<std::endl;
 
     T min_distance=1000,max_radius=0;
-    for(int i=1;i<=n;i++){
+    for(int i=0;i<n;i++){
         min_distance=min(min_distance,(curve(i)-curve(i+1)).Magnitude());
         max_radius=max(max_radius,curve(i).Magnitude());}
     std::cout<<"min distance = "<<min_distance<<", max radius = "<<max_radius<<std::endl;
@@ -248,13 +248,13 @@ void Remesh_Gears()
 
     good_mesh.Initialize_Circle_Mesh(m_end,n);
     int circle_triangles=good_mesh.triangles.m,circle_particles=m_end*n;
-    for(int t=1;t<=circle_triangles;t++){
+    for(int t=0;t<circle_triangles;t++){
         int i,j,k;good_mesh.triangles.Get(t,i,j,k);
         good_mesh.triangles.Append(i+circle_particles,k+circle_particles,j+circle_particles);}
-    for(int j=0;j<m_end;j++)for(int i=1;i<=n;i++)good_particles.X(good_particles.array_collection->Add_Element())=(T)j/(m_end-1)*curve(i);
-    for(int j=0;j<m_end;j++)for(int i=1;i<=n;i++)good_particles.X(good_particles.array_collection->Add_Element())=(T)j/(m_end-1)*curve(i)+VECTOR_3D<T>(0,0,4);
+    for(int j=0;j<m_end;j++)for(int i=0;i<n;i++)good_particles.X(good_particles.array_collection->Add_Element())=(T)j/(m_end-1)*curve(i);
+    for(int j=0;j<m_end;j++)for(int i=0;i<n;i++)good_particles.X(good_particles.array_collection->Add_Element())=(T)j/(m_end-1)*curve(i)+VECTOR_3D<T>(0,0,4);
 
-    for(int i=1;i<=n;i++)for(int j=0;j<m_body;j++){
+    for(int i=0;i<n;i++)for(int j=0;j<m_body;j++){
         int a=good_particles.array_collection->Add_Element(),b=good_particles.array_collection->Add_Element(),c=good_particles.array_collection->Add_Element(),d=good_particles.array_collection->Add_Element();
         good_particles.X(a)=curve(i)+VECTOR_3D<T>(0,0,(T)4*j/m_body);
         good_particles.X(b)=curve(i)+VECTOR_3D<T>(0,0,(T)4*(j+1)/m_body);

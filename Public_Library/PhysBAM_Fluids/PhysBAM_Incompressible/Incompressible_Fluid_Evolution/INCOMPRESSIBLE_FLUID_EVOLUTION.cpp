@@ -53,7 +53,7 @@ Advance_One_Time_Step_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,co
 {
     T_FACE_ARRAYS_SCALAR face_velocities_ghost;face_velocities_ghost.Resize(grid,number_of_ghost_cells,false);
     boundary->Fill_Ghost_Cells_Face(grid,face_velocities,face_velocities_ghost,time,number_of_ghost_cells);
-    for(int k=1;k<=fluids_forces.m;k++) fluids_forces(k)->Add_Explicit_Forces(grid,face_velocities_ghost,face_velocities,dt,time);
+    for(int k=0;k<fluids_forces.m;k++) fluids_forces(k)->Add_Explicit_Forces(grid,face_velocities_ghost,face_velocities,dt,time);
     boundary->Apply_Boundary_Condition_Face(grid,face_velocities,time+dt);
 }
 //#####################################################################
@@ -71,8 +71,8 @@ Advance_One_Time_Step_Implicit_Part(T_FACE_ARRAYS_SCALAR& face_velocities,const 
     int ghost_cells=3;
     T_FACE_ARRAYS_SCALAR face_velocities_ghost;face_velocities_ghost.Resize(grid,ghost_cells,false);
     boundary->Fill_Ghost_Cells_Face(grid,face_velocities,face_velocities_ghost,time,ghost_cells);
-    for(int k=1;k<=fluids_forces.m;k++) fluids_forces(k)->Add_Implicit_Forces_Before_Projection(grid,face_velocities_ghost,face_velocities,dt,time);
-    for(int k=1;k<=fluids_forces.m;k++) fluids_forces(k)->Add_Implicit_Forces_Projection(grid,face_velocities_ghost,face_velocities,dt,time);
+    for(int k=0;k<fluids_forces.m;k++) fluids_forces(k)->Add_Implicit_Forces_Before_Projection(grid,face_velocities_ghost,face_velocities,dt,time);
+    for(int k=0;k<fluids_forces.m;k++) fluids_forces(k)->Add_Implicit_Forces_Projection(grid,face_velocities_ghost,face_velocities,dt,time);
 }
 //#####################################################################
 // Function CFL
@@ -89,7 +89,7 @@ CFL(T_FACE_ARRAYS_SCALAR& face_velocities) const
                 face_velocities(axis,grid.Second_Face_Index_In_Cell(axis,cell)));
         dt_convection=max(dt_convection,local_V_norm);}
     T dt_force=0;
-    for(int k=1;k<=fluids_forces.m;k++) dt_force+=fluids_forces(k)->CFL(grid,face_velocities);
+    for(int k=0;k<fluids_forces.m;k++) dt_force+=fluids_forces(k)->CFL(grid,face_velocities);
     T dt_overall=(dt_convection+sqrt(sqr(dt_convection)+4*dt_force))/2;
     return 1/max(dt_overall,1/max_time_step);
 }
@@ -100,7 +100,7 @@ template<class T_GRID> void INCOMPRESSIBLE_FLUID_EVOLUTION<T_GRID>::
 Initialize_Grids(const T_GRID& grid_input)
 {
     grid=grid_input.Get_MAC_Grid();
-    for(int k=1;k<=fluids_forces.m;k++) fluids_forces(k)->Initialize_Grids(grid);
+    for(int k=0;k<fluids_forces.m;k++) fluids_forces(k)->Initialize_Grids(grid);
 }
 //#####################################################################
 // Function Add_Force

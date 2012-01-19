@@ -138,7 +138,7 @@ public:
 
     ~SMOKE_TESTS()
     {
-        for(int i=1;i<=binary_refinement_levels;i++){
+        for(int i=0;i<binary_refinement_levels;i++){
             delete local_face_velocities_array(i);
             delete local_face_velocities_save_array(i);
             delete local_projection_array(i);}
@@ -172,16 +172,16 @@ public:
     {PHYSBAM_NOT_IMPLEMENTED();}
     
     void Initialize_Weights(ARRAY<T,VECTOR<int,1> >& weights,const int sub_scale)
-    {for(int i=1;i<=sub_scale;i++) weights(TV_INT2(i))=1/(T)sub_scale;}
+    {for(int i=0;i<sub_scale;i++) weights(TV_INT2(i))=1/(T)sub_scale;}
     
     void Initialize_Weights(ARRAY<T,VECTOR<int,2> >& weights,const int sub_scale)
-    {for(int i=1;i<=sub_scale;i++) for(int j=1;j<=sub_scale;j++) weights(TV_INT2(i,j))=1/(T)(sub_scale*sub_scale);}
+    {for(int i=0;i<sub_scale;i++) for(int j=0;j<sub_scale;j++) weights(TV_INT2(i,j))=1/(T)(sub_scale*sub_scale);}
 
     void Write_Output_Files(const int frame)
     {BASE::Write_Output_Files(frame);}
 
     void Set_Coarse_Boundary_Conditions()
-    {for(int axis=1;axis<=TV::dimension;axis++) for(int axis_side=1;axis_side<=2;axis_side++){int side=2*(axis-1)+axis_side;
+    {for(int axis=1;axis<=TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
         if(domain_boundary(axis)(axis_side)){ //Need to check mpi as smaller solves are never using mpi (for now)
             TV_INT interior_cell_offset=axis_side==1?TV_INT():-TV_INT::Axis_Vector(axis);    
             for(typename GRID<TV>::FACE_ITERATOR local_iterator(coarse_mac_grid,1,GRID<TV>::BOUNDARY_REGION,side);local_iterator.Valid();local_iterator.Next()){TV_INT cell=local_iterator.Face_Index()+interior_cell_offset;
@@ -207,7 +207,7 @@ public:
             projection.poisson->beta_face.Component(iterator.Axis())(iterator.Face_Index())*=(factor==1)?sub_scale_face_inverse:0.5*sub_scale_face_inverse;}}}
 
     void Set_Fine_Boundary_Conditions(GRID<TV>& local_mac_grid,ARRAY<T,FACE_INDEX<TV::dimension> >& local_face_velocities,ARRAY<bool,FACE_INDEX<TV::dimension> >& psi_N)
-    {for(int axis=1;axis<=TV::dimension;axis++) for(int axis_side=1;axis_side<=2;axis_side++) if(domain_boundary(axis)(axis_side)){int side=2*(axis-1)+axis_side;
+    {for(int axis=1;axis<=TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++) if(domain_boundary(axis)(axis_side)){int side=2*(axis-1)+axis_side;
          for(typename GRID<TV>::FACE_ITERATOR local_iterator(fine_mac_grid,1,GRID<TV>::BOUNDARY_REGION,side);local_iterator.Valid();local_iterator.Next()){TV_INT boundary_face=axis_side==1?local_iterator.Face_Index()+TV_INT::Axis_Vector(axis):local_iterator.Face_Index()-TV_INT::Axis_Vector(axis);
              if(axis!=2 && fine_face_velocities.Component(axis).Valid_Index(boundary_face)) fine_face_velocities(FACE_INDEX<TV::dimension>(axis,boundary_face))=0;}}
     for(typename GRID<TV>::FACE_ITERATOR local_iterator(local_mac_grid);local_iterator.Valid();local_iterator.Next()){
@@ -418,7 +418,7 @@ public:
             int matrix_index;
             count++;cell_index_to_matrix_index(cell_index)=matrix_index=count;
             matrix_index_to_cell_index(matrix_index)=cell_index;}
-        for(int i=1;i<=row_counts.m;i++){
+        for(int i=0;i<row_counts.m;i++){
             int boundary=0;
             for(int j=1;j<=TV::dimension;j++) if(matrix_index_to_cell_index(i)(j)==1 || matrix_index_to_cell_index(i)(j)==local_mac_grid.Counts()(j)) boundary++;
             row_counts(i)=(2*TV::dimension+1)-boundary;}
@@ -449,10 +449,10 @@ public:
             int number_of_unknowns=matrix_index_to_cell_index.m;            
             A.Negate();b*=(T)-1;
             VECTOR_ND<T> x(number_of_unknowns),q,s,r,k,z;
-            for(int i=1;i<=number_of_unknowns;i++) x(i)=local_projection.elliptic_solver->u(matrix_index_to_cell_index(i));
+            for(int i=0;i<number_of_unknowns;i++) x(i)=local_projection.elliptic_solver->u(matrix_index_to_cell_index(i));
             local_projection.elliptic_solver->Find_Tolerance(b);
             local_projection.elliptic_solver->pcg.Solve(A,x,b,q,s,r,k,z,local_projection.elliptic_solver->tolerance,false);
-            for(int i=1;i<=number_of_unknowns;i++)local_projection.elliptic_solver->u(matrix_index_to_cell_index(i))=x(i);
+            for(int i=0;i<number_of_unknowns;i++)local_projection.elliptic_solver->u(matrix_index_to_cell_index(i))=x(i);
         }*/
         local_projection.Apply_Pressure(face_velocities,dt,time);
         A.Negate();
@@ -548,7 +548,7 @@ public:
         local_face_velocities_array.Resize(binary_refinement_levels);
         local_face_velocities_save_array.Resize(binary_refinement_levels);
         local_projection_array.Resize(binary_refinement_levels);
-        for(int i=1;i<=binary_refinement_levels;i++){
+        for(int i=0;i<binary_refinement_levels;i++){
             local_face_velocities_array(i)=new ARRAY<T,FACE_INDEX<TV::dimension> >(local_mac_grid);
             local_face_velocities_save_array(i)=new ARRAY<T,FACE_INDEX<TV::dimension> >(local_mac_grid);
             local_projection_array(i)=new PROJECTION_UNIFORM<GRID<TV> >(local_mac_grid,true,true);

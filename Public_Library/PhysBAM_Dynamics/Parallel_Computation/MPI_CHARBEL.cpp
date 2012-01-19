@@ -61,7 +61,7 @@ Setup_AEROF_PhysBAM_Mapping(TETRAHEDRALIZED_VOLUME<T>& tet_volume,ARRAY<ARRAY<in
                 const int& global_particle_count,const RANGE<TV>& domain)
 {
     global_to_local_aerof_map.Resize(global_particle_count);global_to_local_aerof_map.Fill(0);
-    for(int i=1;i<=local_to_global_map.m;i++) global_to_local_aerof_map(local_to_global_map(i))=i;
+    for(int i=0;i<local_to_global_map.m;i++) global_to_local_aerof_map(local_to_global_map(i))=i;
 
     int tag=Get_Unique_Tag();
     ARRAY<ARRAY<char> > send_buffers(number_of_processes);ARRAY<MPI::Request> requests;

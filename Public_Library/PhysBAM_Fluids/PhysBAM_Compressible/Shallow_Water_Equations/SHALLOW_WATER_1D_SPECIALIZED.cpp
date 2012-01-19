@@ -67,7 +67,7 @@ Euler_Step(const T dt,const T time)
         postprocessed_flux(i)(1)=new_flux_left(1);postprocessed_flux(i)(2)=new_flux_left(2);postprocessed_flux(i)(3)=new_flux_right(1);postprocessed_flux(i)(4)=new_flux_right(2);}
 
     T two_min_height=(T)2.01*min_height;
-    for(int i=1;i<=grid.counts.x;i++){
+    for(int i=0;i<grid.counts.x;i++){
         if(U_ghost(i)(1)<=two_min_height) U(i)(2)=0; // correct for where we have zero fluxes due to small average h
         if(U(i)(1)<0) U(i)(1)=0;}
 
@@ -80,7 +80,7 @@ template<class T> T SHALLOW_WATER_1D_SPECIALIZED<T>::
 CFL()
 {
     T max_speed=0;
-    for(int i=1;i<=grid.counts.x;i++){
+    for(int i=0;i<grid.counts.x;i++){
         T u=U(i)(2),celerity=sqrt(gravity*U(i)(1));
         max_speed=max(max_speed,abs(u)+celerity);}
     T dt_convect=max_speed*grid.one_over_dX.x;

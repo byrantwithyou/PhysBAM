@@ -56,7 +56,7 @@ Compute_Body_Force(const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,ARRAY<VECTO
             VECTOR<T,3> local_grid_vorticity=vorticity_interpolation.Clamped_To_Array(grid,grid_vorticity,vorticity_particles.X(p));
             VECTOR<T,3> missing_vorticity=vorticity_particles.vorticity(p)-local_grid_vorticity;
             VECTOR<T,3> sign_check=missing_vorticity*vorticity_particles.vorticity(p);
-            for(int a=1;a<=3;a++) if(sign_check[a]<0) missing_vorticity[a]=0;
+            for(int a=0;a<3;a++) if(sign_check[a]<0) missing_vorticity[a]=0;
             missing_vorticity_particles.X(p)=vorticity_particles.X(p);
             missing_vorticity_particles.vorticity(p)=missing_vorticity;
             missing_vorticity_particles.radius(p)=vorticity_particles.radius(p);}

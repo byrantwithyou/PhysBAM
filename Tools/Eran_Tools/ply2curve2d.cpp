@@ -55,7 +55,7 @@ template<class T> void Convert(const char *input_filename, const char *output_fi
             if(max_segment_length){subdiv=max(1,(int)ceil(length/max_segment_length));}
             std::cout << "subdiv " << subdiv << std::endl;
             int last_node=node1;
-            for(int s=1;s<=subdiv;s++){int next_node;
+            for(int s=0;s<subdiv;s++){int next_node;
                 if(s==subdiv){next_node=node2;}
                 else{next_node=particles.Add_Particle();
                     particles.X(next_node)=particles.X(node1)+(T)s/subdiv*(particles.X(node2)-particles.X(node1));}

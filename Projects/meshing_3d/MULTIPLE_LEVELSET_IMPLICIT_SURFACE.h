@@ -34,7 +34,7 @@ public:
     {inside_threshold=inside_threshold_input;}
 
     LEVELSET_IMPLICIT_OBJECT<TV>* Select(const TV& location) const
-    {for(int i=1;i<=secondary_levelsets.m;i++)
+    {for(int i=0;i<secondary_levelsets.m;i++)
         if(secondary_levelsets(i)->levelset.grid.Domain().Inside(location,inside_threshold) ) return secondary_levelsets(i);
     return primary_levelset;}
 
@@ -60,18 +60,18 @@ public:
     {return Select(location)->Extended_Phi(location);}
 
     void Compute_Normals() PHYSBAM_OVERRIDE
-    {primary_levelset->Compute_Normals();for(int i=1;i<=secondary_levelsets.m;i++)secondary_levelsets(i)->Compute_Normals();}
+    {primary_levelset->Compute_Normals();for(int i=0;i<secondary_levelsets.m;i++)secondary_levelsets(i)->Compute_Normals();}
 
     void Update_Box() PHYSBAM_OVERRIDE
-    {primary_levelset->Update_Box();for(int i=1;i<=secondary_levelsets.m;i++)secondary_levelsets(i)->Update_Box();box=primary_levelset->box;}
+    {primary_levelset->Update_Box();for(int i=0;i<secondary_levelsets.m;i++)secondary_levelsets(i)->Update_Box();box=primary_levelset->box;}
 
     void Update_Minimum_Cell_Size(const int maximum_depth=0) PHYSBAM_OVERRIDE
-    {primary_levelset->Update_Minimum_Cell_Size();for(int i=1;i<=secondary_levelsets.m;i++)secondary_levelsets(i)->Update_Minimum_Cell_Size();
-    minimum_cell_size=primary_levelset->Minimum_Cell_Size();for(int i=1;i<=secondary_levelsets.m;i++)minimum_cell_size=min(minimum_cell_size,secondary_levelsets(i)->Minimum_Cell_Size());}
+    {primary_levelset->Update_Minimum_Cell_Size();for(int i=0;i<secondary_levelsets.m;i++)secondary_levelsets(i)->Update_Minimum_Cell_Size();
+    minimum_cell_size=primary_levelset->Minimum_Cell_Size();for(int i=0;i<secondary_levelsets.m;i++)minimum_cell_size=min(minimum_cell_size,secondary_levelsets(i)->Minimum_Cell_Size());}
 
     T Minimum_Cell_Size_Within_Box(const RANGE<TV>& box)const PHYSBAM_OVERRIDE
     {T result=primary_levelset->Minimum_Cell_Size();
-    for(int i=1;i<=secondary_levelsets.m;i++)if(box.Intersection(secondary_levelsets(i)->box,-inside_threshold))result=min(result,secondary_levelsets(i)->Minimum_Cell_Size());
+    for(int i=0;i<secondary_levelsets.m;i++)if(box.Intersection(secondary_levelsets(i)->box,-inside_threshold))result=min(result,secondary_levelsets(i)->Minimum_Cell_Size());
     return result;}
 
     T Minimum_Cell_Size() const PHYSBAM_OVERRIDE

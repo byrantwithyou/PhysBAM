@@ -54,7 +54,7 @@ public:
     void Update_Image()
     {//parent.visible_human.Convert_To_Image(image);
     if(!opengl_image) opengl_image=new OPENGL_COLOR[parent.visible_human.image_resolution.x*parent.visible_human.image_resolution.z];
-    int t=0;for(int ij=1;ij<=parent.visible_human.image_resolution.z;ij++) for(int i=1;i<=parent.visible_human.image_resolution.x;i++){
+    int t=0;for(int ij=0;ij<parent.visible_human.image_resolution.z;ij++) for(int i=0;i<parent.visible_human.image_resolution.x;i++){
         int tissue_id=parent.visible_human.image(i,ij);
         opengl_image[t++]=Color_Map(tissue_id);
         int entry;

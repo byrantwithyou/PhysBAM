@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
     GRID_3D<T> grid(600,80,400,-3,4.5,0,1,-2,3);BOX_3D<T> levelset_domain=levelset_grid.Domain();
     ARRAYS<VECTOR<T,3> > phi(grid,3);
     LINEAR_INTERPOLATION<T,T> interpolation;
-    for(int i=1;i<=grid.m;i++)for(int j=1;j<=grid.n;j++)for(int ij=1;ij<=grid.mn;ij++){
+    for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++)for(int ij=0;ij<grid.mn;ij++){
         T x=grid.x(i),y=grid.y(j),z=grid.z(ij);
         T distance=levelset_domain.Signed_Distance(VECTOR_3D<T>(x,y,z));
         T clamped_phi=levelset.Phi(levelset_grid.Clamp(VECTOR_3D<T>(x,y,z)));
@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
     std::cout<<"Fast marching"<<std::endl;
     LEVELSET_3D<T> output_levelset(grid,phi);
     output_levelset.Fast_Marching_Method();
-    for(int i=1;i<=grid.m;i++)for(int j=1;j<=grid.n;j++)for(int ij=1;ij<=grid.mn;ij++){
+    for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++)for(int ij=0;ij<grid.mn;ij++){
         T x=grid.x(i)*300;
         T z=grid.z(ij)*300;
         int x_node=(int)((x-deep_water_grid.xmin)*deep_water_grid.one_over_dx);

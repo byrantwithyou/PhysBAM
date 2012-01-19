@@ -104,12 +104,12 @@ public:
 
     std::string Load_Files(ARRAY<ARRAY<std::string> > filenames_of_sequences)
     {
-        for(int sequence_index=1;sequence_index<=filenames_of_sequences.m;sequence_index++){
+        for(int sequence_index=0;sequence_index<filenames_of_sequences.m;sequence_index++){
             LOG::cout<<"Loading Sequence "<<sequence_index<<std::endl;
             const ARRAY<std::string>& filenames=filenames_of_sequences(sequence_index);
             ARRAY<VIDEO_READER<float>*> videos;
             ARRAY<std::string> names;
-            for(int i=1;i<=filenames.m;i++){
+            for(int i=0;i<filenames.m;i++){
                 VIDEO_READER<float>* video=Open_Video(filenames(i));
                 if(video){
                     names.Append(filenames(i));
@@ -121,7 +121,7 @@ public:
             frame_rate=views(1)->Frame_Rate();
             if(filenames_of_sequences.m) selected=1;
             frame=in_frame=1;out_frame=views(1)->Frame_Count();
-            for(int i=1;i<=views.m;i++) Center_Video(i);
+            for(int i=0;i<views.m;i++) Center_Video(i);
             Frame(In());
             damage(1);}
         return Valid()?"Loaded":"[No Video Loaded]";}
@@ -137,7 +137,7 @@ public:
                 view_order.Append(num);
                 frame_rate=views(1)->Frame_Rate();
                 frame=in_frame=1;out_frame=views(1)->Frame_Count();
-                for(int i=1;i<=views.m;i++) Center_Video(i);
+                for(int i=0;i<views.m;i++) Center_Video(i);
                 Frame(In());
                 damage(1);}
             else return "Failed to open video";}
@@ -152,7 +152,7 @@ public:
     void Resize_Parent(Fl_Window* window)
     {int extra_w=window->w()-w(),extra_h=window->h()-h();
     window->resize(window->x(),window->y(),views(1)->Width()+extra_w,views(1)->Height()+extra_h);
-    for(int i=1;i<=views.m;i++){Zoom_Video(i);Center_Video(i);}}
+    for(int i=0;i<views.m;i++){Zoom_Video(i);Center_Video(i);}}
 
     void Center_Video(const int view_index)
     {views(view_index)->transform.Column(4)=(.5f*VECTOR<float,2>(w(),h())).Append(0).Append(1);damage(1);}
@@ -195,7 +195,7 @@ public:
     else if(event==FL_PUSH){
         origin=VECTOR<int,2>(Fl::event_x(),h()-Fl::event_y()-1);
         view=0;
-        for(int i=1;i<=view_order.m;i++){int v=view_order(i);LOG::cout<<"v is "<<v<<std::endl;
+        for(int i=0;i<view_order.m;i++){int v=view_order(i);LOG::cout<<"v is "<<v<<std::endl;
             if(views(v)->Inside(VECTOR<float,2>(origin))){
                 LOG::cout<<"i am inside"<<std::endl;
                 view=views(v);Select_View(v);update_ui_callback(update_ui_callback_data);break;}}
@@ -238,7 +238,7 @@ public:
             Frame(next_frame);}}}
 
     std::string Title() const
-    {std::string title="";for(int i=1;i<=views.m;i++) title+=" Seq: "+views(i)->Name(); return title;}
+    {std::string title="";for(int i=0;i<views.m;i++) title+=" Seq: "+views(i)->Name(); return title;}
 
 
     //#####################################################################
@@ -314,7 +314,7 @@ public:
 
     void Frame(int frame_number_input)
     {if(Valid()){
-         frame=clamp(frame_number_input,In(),Out());for(int i=1;i<=views.m;i++) views(i)->Set_Frame(frame);damage(1);next_frame=-1;}
+         frame=clamp(frame_number_input,In(),Out());for(int i=0;i<views.m;i++) views(i)->Set_Frame(frame);damage(1);next_frame=-1;}
     }
     
     void In(const int in_frame_input)

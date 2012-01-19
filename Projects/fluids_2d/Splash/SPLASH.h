@@ -89,7 +89,7 @@ void Update_Rigid_Bodies(const T time)
 void Initialize_Phi()
 {
     GRID<TV>& grid=fluids_parameters.grid;
-    for(int i=1;i<=grid.m;i++)for(int j=1;j<=grid.n;j++)
+    for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++)
         fluids_parameters.particle_levelset_evolution.phi(i,j)=grid.y(j)-(T).4;
 }
 //#####################################################################

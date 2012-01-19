@@ -40,7 +40,7 @@ Update_Advection_Equation_Face_Lookup(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z
     for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next())
     {
         TV_INT face=iterator.Face_Index();int axis=iterator.Axis();
-        for(int side=1;side<=2;side++)
+        for(int side=0;side<2;side++)
         {
             //body_list.side=side; // TODO: make this nicer/avoid
             if(!body_list.Occupied_Face_Center(iterator))
@@ -89,7 +89,7 @@ Update_Advection_Equation_Face_Lookup(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z
     }
     T_FACE_ARRAYS_SLIP_BOOL::Exchange_Arrays(face_velocities_valid_mask,face_velocities_valid_mask_next);
     // ghost values should always be valid
-    for(int side=1;side<=2;side++) for(int axis=1;axis<=TV::dimension;axis++) grid.Put_Ghost(true,face_velocities_valid_mask.Component(side,axis),3);
+    for(int side=0;side<2;side++) for(int axis=1;axis<=TV::dimension;axis++) grid.Put_Ghost(true,face_velocities_valid_mask.Component(side,axis),3);
 }
 //#####################################################################
 // Function Average_To_Invalidated_Face
@@ -108,7 +108,7 @@ Average_To_Invalidated_Face(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& face_values
         if(!face_velocities_valid_mask(2,iterator.Axis(),iterator.Face_Index()))
             face_invalid_indices[iterator.Axis()].Append(TRIPLE<int,TV_INT,bool>(2,iterator.Face_Index(),false));}
 
-    for(int side=1;side<=2;side++) for(int axis=1;axis<=TV::dimension;axis++) grid.Put_Ghost(false,face_velocities_valid_mask.Component(side,axis),3);
+    for(int side=0;side<2;side++) for(int axis=1;axis<=TV::dimension;axis++) grid.Put_Ghost(false,face_velocities_valid_mask.Component(side,axis),3);
 
     T_ARRAYS_BOOL_DIMENSION& cell_neighbors_visible=body_list.cell_neighbors_visible;
     int expensive_count=0;
@@ -122,7 +122,7 @@ Average_To_Invalidated_Face(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& face_values
 
         while(!done){
             done=true;
-            for(int k=1;k<=invalid_indices.m;k++){ 
+            for(int k=0;k<invalid_indices.m;k++){ 
                 if(invalid_indices(k).z || (faces_not_to_revalidate && (*faces_not_to_revalidate)(arrays_axis,invalid_indices(k).y))) continue; // if we're already valid just keep going
                 T sum=0;int count=0;
                 int side=invalid_indices(k).x; // across cell always visible, neighboring cell visible iff cells can see each other
@@ -163,7 +163,7 @@ Average_To_Invalidated_Face(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& face_values
         
         while(!done){
             done=true;
-            for(int k=1;k<=invalid_indices.m;k++){ 
+            for(int k=0;k<invalid_indices.m;k++){ 
                 T sum=0;int count=0;
                 int side=invalid_indices(k).x; // across cell always visible, neighboring cell visible iff cells can see each other
                 TV_INT face_index=invalid_indices(k).y;
@@ -193,7 +193,7 @@ Average_To_Invalidated_Face(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& face_values
                 face_velocities_valid_mask(invalid_indices(k).x,arrays_axis,invalid_indices(k).y)=true;invalid_indices.Remove_Index_Lazy(k);}}}
 
     // set valid for future advection
-    for(int side=1;side<=2;side++) for(int axis=1;axis<=TV::dimension;axis++) grid.Put_Ghost(true,face_velocities_valid_mask.Component(side,axis),3);
+    for(int side=0;side<2;side++) for(int axis=1;axis<=TV::dimension;axis++) grid.Put_Ghost(true,face_velocities_valid_mask.Component(side,axis),3);
     
     // deal with faces which may have become the same (e.g. an object moves away from them)
     /*for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){

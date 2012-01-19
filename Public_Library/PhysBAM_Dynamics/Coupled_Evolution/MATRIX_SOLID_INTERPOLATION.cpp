@@ -67,7 +67,7 @@ Compute(const int ghost_cells)
         RANGE<TV> dual_cell(iterator.Dual_Cell().Thickened((T)2*iterator_info.iterator_rasterization_thickness));
         ROW& row=rows(rows.Append(ROW()));
 
-        for(int s=1;s<=simplices.m;s++){
+        for(int s=0;s<simplices.m;s++){
             if(!simplices(s).y) PHYSBAM_NOT_IMPLEMENTED();
 
             COLLISION_GEOMETRY<TV>& body=*iterator_info.coupling_bodies(simplices(s).x);
@@ -79,15 +79,15 @@ Compute(const int ghost_cells)
             simplex.Clip_To_Box(dual_cell,clipped_simplices);
             if(DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>* deformable=dynamic_cast<DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>*>(&body)){
                 TV simplex_weight;
-                for(int c=1;c<=clipped_simplices.m;c++)
+                for(int c=0;c<clipped_simplices.m;c++)
                     simplex_weight+=simplex.Sum_Barycentric_Coordinates(clipped_simplices(c))*clipped_simplices(c).Size();
                 simplex_weight/=TV::dimension;
                 area=simplex_weight.Sum();
                 const TV_INT& element=deformable->object.mesh.elements(simplices(s).y);
-                for(int i=1;i<=element.m;i++)
+                for(int i=0;i<element.m;i++)
                     row.deformable_weights.Append(DEFORMABLE_WEIGHT(element(i),cosine*simplex_weight(i)));}
             else if(RIGID_COLLISION_GEOMETRY<TV>* rigid_body_wrapper=dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>*>(&body)){
-                for(int i=1;i<=clipped_simplices.m;i++) area+=clipped_simplices(i).Size();
+                for(int i=0;i<clipped_simplices.m;i++) area+=clipped_simplices(i).Size();
                 row.rigid_weights.Append(RIGID_WEIGHT(rigid_body_wrapper->rigid_geometry.particle_index,cosine*area,iterator.Location()-dynamic_cast<RIGID_BODY<TV>&>(rigid_body_wrapper->rigid_geometry).X()));}
             else PHYSBAM_FATAL_ERROR("OMGWTFBBQ");
 
@@ -98,12 +98,12 @@ Compute(const int ghost_cells)
         row.axis=iterator.Axis();
         if(accumulated_flux){
             T factor=1/accumulated_flux;
-            for(int i=1;i<=row.deformable_weights.m;i++) row.deformable_weights(i).weight*=factor;
-            for(int i=1;i<=row.rigid_weights.m;i++) row.rigid_weights(i).weight*=factor;}
+            for(int i=0;i<row.deformable_weights.m;i++) row.deformable_weights(i).weight*=factor;
+            for(int i=0;i<row.rigid_weights.m;i++) row.rigid_weights(i).weight*=factor;}
         else{
             T weight=(T)1/(row.deformable_weights.m+row.rigid_weights.m);
-            for(int i=1;i<=row.deformable_weights.m;i++) row.deformable_weights(i).weight=weight;
-            for(int i=1;i<=row.rigid_weights.m;i++) row.rigid_weights(i).weight=weight;}
+            for(int i=0;i<row.deformable_weights.m;i++) row.deformable_weights(i).weight=weight;
+            for(int i=0;i<row.rigid_weights.m;i++) row.rigid_weights(i).weight=weight;}
 
         row.deformable_weights.Coalesce();
         row.rigid_weights.Coalesce();}
@@ -120,9 +120,9 @@ Times_Add(const GENERALIZED_VELOCITY<TV>& solids,ARRAY<T,COUPLING_CONSTRAINT_ID>
         const int axis=rows(i).axis;
 
         T weighted_velocity_component=0;
-        for(int j=1;j<=deformable_weights.m;j++)
+        for(int j=0;j<deformable_weights.m;j++)
             weighted_velocity_component+=solids.V.array(deformable_weights(j).index)(axis)*deformable_weights(j).weight;
-        for(int j=1;j<=rigid_weights.m;j++){
+        for(int j=0;j<rigid_weights.m;j++){
             const TWIST<TV>& twist=solids.rigid_V.array(rigid_weights(j).index);
             weighted_velocity_component+=(twist.linear+TV::Cross_Product(twist.angular,rigid_weights(j).radius))(axis)*rigid_weights(j).weight;}
         constraints(i)+=weighted_velocity_component;}
@@ -137,9 +137,9 @@ Transpose_Times_Add(const ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints,GENERALIZ
         const ARRAY<DEFORMABLE_WEIGHT>& deformable_weights=rows(i).deformable_weights;
         const ARRAY<RIGID_WEIGHT>& rigid_weights=rows(i).rigid_weights;
         const int axis=rows(i).axis;
-        for(int j=1;j<=deformable_weights.m;j++)
+        for(int j=0;j<deformable_weights.m;j++)
             solids.V.array(deformable_weights(j).index)(axis)+=constraints(i)*deformable_weights(j).weight;
-        for(int j=1;j<=rigid_weights.m;j++){
+        for(int j=0;j<rigid_weights.m;j++){
             TWIST<TV>& twist=solids.rigid_V.array(rigid_weights(j).index);
             T linear_contribution=constraints(i)*rigid_weights(j).weight;
             twist.linear(axis)+=linear_contribution;
@@ -163,10 +163,10 @@ Print_Each_Matrix(int n,GENERALIZED_VELOCITY<TV>& G) const
         const ARRAY<RIGID_WEIGHT>& rigid_weights=rows(i).rigid_weights;
         const int axis=rows(i).axis;
 
-        for(int j=1;j<=deformable_weights.m;j++)
+        for(int j=0;j<deformable_weights.m;j++)
             oo.Add_Sparse_Entry(Value(i),(reverse_map_deformable(deformable_weights(j).index)-1)*TV::dimension+axis,deformable_weights(j).weight);
 
-        for(int j=1;j<=rigid_weights.m;j++) if(int index=reverse_map_rigid(rigid_weights(j).index)){ // Prune out static/kinematic
+        for(int j=0;j<rigid_weights.m;j++) if(int index=reverse_map_rigid(rigid_weights(j).index)){ // Prune out static/kinematic
             int base=G.V.Size()*TV::dimension+(index-1)*TWIST<TV>::dimension;
             oo.Add_Sparse_Entry(Value(i),base+axis,rigid_weights(j).weight);
             VECTOR<T,TV::SPIN::m> cpm=MATRIX<T,TV::SPIN::m,TV::m>::Cross_Product_Matrix(rigid_weights(j).radius).Column(axis)*rigid_weights(j).weight;
@@ -184,9 +184,9 @@ Add_Diagonal(ARRAY<T,COUPLING_CONSTRAINT_ID>& diagonal,const GENERALIZED_MASS<TV
         const ARRAY<DEFORMABLE_WEIGHT>& deformable_weights=rows(i).deformable_weights;
         const ARRAY<RIGID_WEIGHT>& rigid_weights=rows(i).rigid_weights;
         T diag=0;
-        for(int j=1;j<=deformable_weights.m;j++){
+        for(int j=0;j<deformable_weights.m;j++){
             diag+=sqr(deformable_weights(j).weight)*solid_mass.one_over_mass.array(deformable_weights(j).index);}
-        for(int j=1;j<=rigid_weights.m;j++){
+        for(int j=0;j<rigid_weights.m;j++){
             const RIGID_BODY_MASS<TV,true>& M=solid_mass.world_space_rigid_mass_inverse.array(rigid_weights(j).index);
             typename TV::SPIN r=TV::Cross_Product(rigid_weights(j).radius,TV::Axis_Vector(rows(i).axis));
             diag+=sqr(rigid_weights(j).weight)*(M.mass+TV::SPIN::Dot_Product(M.inertia_tensor*r,r));}
@@ -208,10 +208,10 @@ Add_Raw_Matrix(ARRAY<TRIPLE<int,int,T> >& data) const
         const ARRAY<RIGID_WEIGHT>& rigid_weights=rows(i).rigid_weights;
         const int axis=rows(i).axis;
 
-        for(int j=1;j<=deformable_weights.m;j++)
+        for(int j=0;j<deformable_weights.m;j++)
             data.Append(TRIPLE<int,int,T>(Value(i),(reverse_map_deformable(deformable_weights(j).index)-1)*TV::dimension+axis,deformable_weights(j).weight));
 
-        for(int j=1;j<=rigid_weights.m;j++) if(int index=reverse_map_rigid(rigid_weights(j).index)){ // Prune out static/kinematic
+        for(int j=0;j<rigid_weights.m;j++) if(int index=reverse_map_rigid(rigid_weights(j).index)){ // Prune out static/kinematic
             int base=this->V_indices->m*TV::dimension+(index-1)*TWIST<TV>::dimension;
             data.Append(TRIPLE<int,int,T>(Value(i),base+axis,rigid_weights(j).weight));
             VECTOR<T,TV::SPIN::m> cpm=MATRIX<T,TV::SPIN::m,TV::m>::Cross_Product_Matrix(rigid_weights(j).radius).Column(axis)*rigid_weights(j).weight;

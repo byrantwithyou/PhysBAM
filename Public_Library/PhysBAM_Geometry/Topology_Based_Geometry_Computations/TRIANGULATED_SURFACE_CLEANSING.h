@@ -47,7 +47,7 @@ Close_Surface(TRIANGULATED_SURFACE<T>& ts,const bool merge_coincident_vertices,c
         while(particle_spatial_partition.Get_Next_Particles_Potentially_Within_Interaction_Radius(index1,nearby_particle_indices)) if((*ts.mesh.node_on_boundary)(index1)){
             TV position1=ts.particles.X(index1);
             int closest_index2=0;T closest_distance_squared=FLT_MAX;
-            for(int k=1;k<=nearby_particle_indices.m;k++){
+            for(int k=0;k<nearby_particle_indices.m;k++){
                 int index2=nearby_particle_indices(k);if(!(*ts.mesh.node_on_boundary)(index2)) continue;
                 T distance_squared=(ts.particles.X(index2)-position1).Magnitude_Squared();
                 if(distance_squared < closest_distance_squared){closest_index2=index2;closest_distance_squared=distance_squared;}}
@@ -75,7 +75,7 @@ Close_Surface(TRIANGULATED_SURFACE<T>& ts,const bool merge_coincident_vertices,c
 #endif
         bool connected_segments_defined=(ts.mesh.boundary_mesh->connected_segments!=0);if(!connected_segments_defined) ts.mesh.boundary_mesh->Initialize_Connected_Segments();
         ARRAY<ARRAY<VECTOR<int,2> > >& connected_segments=*ts.mesh.boundary_mesh->connected_segments;
-        for(int i=1;i<=connected_segments.m;i++){
+        for(int i=0;i<connected_segments.m;i++){
             TV centroid;
             for(int j=1;j<=connected_segments(i).m;j++){int node1,node2;connected_segments(i)(j).Get(node1,node2);centroid+=ts.particles.X(node1)+ts.particles.X(node2);}
             centroid/=(T)(2*connected_segments(i).m); // assuming we count each node exactly twice, this gives us the average

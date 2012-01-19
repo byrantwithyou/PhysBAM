@@ -45,7 +45,7 @@ public:
     {}
 
     void Postprocess_Substep(const T time,const int substep)
-    {for(int o=1;o<=solids_parameters.deformable_body_parameters.list.deformable_objects.m;o++)
+    {for(int o=0;o<solids_parameters.deformable_body_parameters.list.deformable_objects.m;o++)
         std::cout<<"minimum volume for torus "<<o<<" = "<<solids_parameters.deformable_body_parameters.list(o).tetrahedralized_volume->Minimum_Signed_Volume()<<std::endl;}
 
 //#####################################################################
@@ -66,7 +66,7 @@ void Get_Initial_Data()
     GRID<TV> grid(m,n,mn,0,(m-1)*size,base_height,base_height+(n-1)*size,0,(mn-1)*size);
     RANDOM_NUMBERS random;random.Set_Seed(12321);
 
-    for(int i=1;i<=m;i++)for(int j=1;j<=n;j++)for(int ij=1;ij<=mn;ij++){
+    for(int i=0;i<m;i++)for(int j=0;j<n;j++)for(int ij=0;ij<mn;ij++){
         int index=solids_parameters.deformable_body_parameters.list.Add_Deformable_Tetrahedralized_Volume();
         TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=*solids_parameters.deformable_body_parameters.list(index).tetrahedralized_volume;
         TETRAHEDRON_MESH& tetrahedron_mesh=tetrahedralized_volume.tetrahedron_mesh;
@@ -99,7 +99,7 @@ void Get_Initial_Data()
 void Initialize_Bodies()
 {
     SOLIDS_3D_EXAMPLE<T,RW>::Initialize_Bodies();
-    for(int o=1;o<=solids_parameters.deformable_body_parameters.list.deformable_objects.m;o++){
+    for(int o=0;o<solids_parameters.deformable_body_parameters.list.deformable_objects.m;o++){
         TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=*solids_parameters.deformable_body_parameters.list(o).tetrahedralized_volume;
         solids_parameters.deformable_body_parameters.list(o).Add_Body_Forces(tetrahedralized_volume);
         solids_parameters.deformable_body_parameters.list(o).Add_Diagonalized_Neo_Hookean_Elasticity(tetrahedralized_volume,(T)2e5,(T).45,(T).01);}

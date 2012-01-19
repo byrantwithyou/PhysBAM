@@ -41,7 +41,7 @@ Locate_Photons(const TV& location,const T max_distance_squared,ARRAY<PHOTON<T>*>
     Locate_Photons_Helper(1,location,temp_max_distance,number_photons_found,photons_found,distance_squared_of_photons_found);
     if(number_photons_found<=photons_found.m){
         max_distance_squared_of_found_photons=0;
-        for(int i=1;i<=photons_found.m;i++) if(distance_squared_of_photons_found(i)>max_distance_squared_of_found_photons)
+        for(int i=0;i<photons_found.m;i++) if(distance_squared_of_photons_found(i)>max_distance_squared_of_found_photons)
             max_distance_squared_of_found_photons=distance_squared_of_photons_found(i);}
     else max_distance_squared_of_found_photons=temp_max_distance;
     number_photons_found=min(photons_found.m,number_photons_found);
@@ -143,12 +143,12 @@ Construct_Balanced_KD_Tree()
 {
     if(photons_stored<=0)return;
     ARRAY<int> permutation_array(photons.m),kdtree_array(photons.m);
-    for(int i=1;i<=photons.m;i++)permutation_array(i)=kdtree_array(i)=i;
+    for(int i=0;i<photons.m;i++)permutation_array(i)=kdtree_array(i)=i;
     Balance_Sub_KD_Tree(1,1,photons.m,permutation_array,kdtree_array,bounding_box);
     // reorder array (current_index position is always been saved so you can write new value there)
     int current_index=1;int index_of_photon_to_relocate=1;
     PHOTON<T> photon_to_relocate=photons(index_of_photon_to_relocate);
-    for(int dummy_counter=1;dummy_counter<=photons.m;dummy_counter++){
+    for(int dummy_counter=0;dummy_counter<photons.m;dummy_counter++){
         int swap_to=kdtree_array(current_index);kdtree_array(current_index)=-1;
         if(swap_to==index_of_photon_to_relocate){
             photons(current_index)=photon_to_relocate;
@@ -227,7 +227,7 @@ template<class T> void PHOTON_MAP<T>::
 Print_Photon_List()
 {
     LOG::cout<<"PHOTON LIST"<<std::endl;
-    for(int i=1;i<=photons.m;i++)LOG::cout<<"i="<<i<<" Photon "<<photons(i).location<<" Power "<<photons(i).power<<" Split on "<<photons(i).kdtree_split_axis<<std::endl;
+    for(int i=0;i<photons.m;i++)LOG::cout<<"i="<<i<<" Photon "<<photons(i).location<<" Power "<<photons(i).power<<" Split on "<<photons(i).kdtree_split_axis<<std::endl;
 }
 //#####################################################################
 // Function Print_Photon_Tree

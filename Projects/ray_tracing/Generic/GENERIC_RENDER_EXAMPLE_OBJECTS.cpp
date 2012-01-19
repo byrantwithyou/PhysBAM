@@ -514,12 +514,12 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         GRID<TV>* grid=new GRID<TV>;ARRAY<ARRAY<T,VECTOR<int,3> > >* phis=new ARRAY<ARRAY<T,VECTOR<int,3> > >(number_of_regions);
         RENDERING_LEVELSET_MULTIPLE_OBJECT<LEVELSET_MULTIPLE<GRID<TV> > >* rendering_levelset_multiple_object=new RENDERING_LEVELSET_MULTIPLE_OBJECT<LEVELSET_MULTIPLE<GRID<TV> > >(*grid,*phis);
         // read in the data
-        for(int i=1;i<=number_of_regions;i++){
+        for(int i=0;i<number_of_regions;i++){
             LOG::cout<<"Reading Region("<<i<<")"<<std::endl;
             std::string raw_filename=parameters.Get_Parameter(STRING_UTILITIES::string_sprintf("Filename%d",i), std::string("unknown"));
             FILE_UTILITIES::template Read_From_File<RW>(Animated_Filename(raw_filename,frame),*rendering_levelset_multiple_object->levelset_multiple.levelsets(i));
             *grid=rendering_levelset_multiple_object->levelset_multiple.levelsets(i)->grid;}
-        for(int i=1;i<=number_of_regions;i++){
+        for(int i=0;i<number_of_regions;i++){
             // setup shaders before the rendering_multiple_implicit_surface is casted to rendering_object;
             std::string shader_name=parameters.Get_Parameter(STRING_UTILITIES::string_sprintf("Shader%d",i),std::string("<unknown>"));
             std::string volume_shader_name=parameters.Get_Parameter(STRING_UTILITIES::string_sprintf("Volume_Shader%d",i),std::string("<unknown>"));
@@ -617,7 +617,7 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         std::string shader_name=parameters.Get_Parameter("Shader",std::string("<unknown>"));
         std::string volume_shader_name=parameters.Get_Parameter("Volume_Shader",std::string("<unknown>"));
         T index_of_refraction=parameters.Get_Parameter("Index_Of_Refraction",(T)1);
-        for(int i=1;i<=object_group.m;i++){
+        for(int i=0;i<object_group.m;i++){
             object_group(i)->index_of_refraction=index_of_refraction;
             object_group(i)->priority=priority;object_group(i)->support_transparent_overlapping_objects=support_transparent_overlapping_objects;}
         // check to make sure at least one shader specified
@@ -626,13 +626,13 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         if(shader_name!="<unknown>"){
             MATERIAL_SHADER<T>* material_shader=0;
             if(!shaders.Get(shader_name,material_shader)) PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Invalid shader '%s' specified for object %s\n",shader_name.c_str(),name.c_str()));
-            for(int i=1;i<=object_group.m;i++) object_group(i)->material_shader=material_shader;}
+            for(int i=0;i<object_group.m;i++) object_group(i)->material_shader=material_shader;}
         // volume shader
         if(volume_shader_name!="<unknown>"){
             VOLUMETRIC_SHADER<T>* volumetric_shader=0;
             if(!volume_shaders.Get(volume_shader_name,volumetric_shader)) PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Invalid volume shader '%s' specified for object %s\n",volume_shader_name.c_str(),name.c_str()));
-            for(int i=1;i<=object_group.m;i++){object_group(i)->volumetric_shader=volumetric_shader;object_group(i)->add_to_spatial_partition=false;}}
-        for(int i=1;i<=object_group.m;i++){
+            for(int i=0;i<object_group.m;i++){object_group(i)->volumetric_shader=volumetric_shader;object_group(i)->add_to_spatial_partition=false;}}
+        for(int i=0;i<object_group.m;i++){
             std::string instance_name=STRING_UTILITIES::string_sprintf("%s_%d",name.c_str(),i);
             object_group(i)->name=instance_name;object_group(i)->Update_Transform(current_transform);objects.Set(instance_name,object_group(i));}}
     if(object) GENERIC_RENDER_EXAMPLE<T,RW>::Add_Solid_Texture(object,parameters);

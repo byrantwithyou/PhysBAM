@@ -327,7 +327,7 @@ void Many_Sphere_Test()
     last_frame=300;
     typedef typename RIGID_BODY_POLICY<TV>::INERTIA_TENSOR T_INERTIA_TENSOR;    
      VECTOR<T,3> num_bodies=TV(40,200,40);
-     for(int i=1;i<=num_bodies.x;i++) for(int j=1;j<=num_bodies.y;j++) for(int k=1;k<=num_bodies.z;k++){
+     for(int i=0;i<num_bodies.x;i++) for(int j=0;j<num_bodies.y;j++) for(int k=0;k<num_bodies.z;k++){
         RIGID_BODY_PARTICLES<TV>& particles=rigid_body_collection.rigid_body_particle;    
         RIGID_BODY<TV>& rigid_body=*new RIGID_BODY<TV>(rigid_body_collection);
         T radius=1;TV center;

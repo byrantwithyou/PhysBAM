@@ -63,7 +63,7 @@ void Get_Initial_Data()
 
     if(use_single_mesh){
         SEGMENTED_CURVE<TV>& segmented_curve=*SEGMENTED_CURVE<TV>::Create(particles);deformable_body_collection.deformable_geometry.Add_Structure(&segmented_curve);
-        for(int i=1;i<=hair_layout_grid.counts.x;i++) for(int j=1;j<=hair_layout_grid.counts.y;j++){
+        for(int i=0;i<hair_layout_grid.counts.x;i++) for(int j=0;j<hair_layout_grid.counts.y;j++){
             for(int ij=1;ij<hair_layout_grid.counts.z;ij++){
                 particles.X(count)=hair_layout_grid.X(i,j,ij);
                 segmented_curve.mesh.elements.Append(VECTOR<int,2>(count,count+1));count++;}
@@ -71,7 +71,7 @@ void Get_Initial_Data()
         T density=TV::dimension==1?1:TV::dimension==2?100:1000;
         SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(segmented_curve,density);}
     else{
-        for(int i=1;i<=hair_layout_grid.counts.x;i++) for(int j=1;j<=hair_layout_grid.counts.y;j++){
+        for(int i=0;i<hair_layout_grid.counts.x;i++) for(int j=0;j<hair_layout_grid.counts.y;j++){
             SEGMENTED_CURVE<TV>& segmented_curve=*SEGMENTED_CURVE<TV>::Create(particles);deformable_body_collection.deformable_geometry.Add_Structure(&segmented_curve);
             for(int ij=1;ij<hair_layout_grid.counts.z;ij++){
                 particles.X(count)=hair_layout_grid.X(i,j,ij);
@@ -85,7 +85,7 @@ void Get_Initial_Data()
     solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
 
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     // correct mass
     binding_list.Distribute_Mass_To_Parents();
@@ -132,7 +132,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     Get_Initial_Data();
 
     // make forces
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++){
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++){
         if(SEGMENTED_CURVE<TV>* curve=dynamic_cast<SEGMENTED_CURVE<TV>*>(deformable_body_collection.deformable_geometry.structures(i))){
             ARRAY<int>& referenced_nodes=*new ARRAY<int>; // hey craig, look a memory leak.  hi, andy, fix this one, too.
             curve->mesh.elements.Flattened().Get_Unique(referenced_nodes);
@@ -145,7 +145,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 //#####################################################################
 void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time)
 {
-    for(int i=1;i<=hair_layout_grid.counts.x;i++) for(int j=1;j<=hair_layout_grid.counts.y;j++){
+    for(int i=0;i<hair_layout_grid.counts.x;i++) for(int j=0;j<hair_layout_grid.counts.y;j++){
         int index=hair_layout_grid.counts.z*(j-1+(i-1)*hair_layout_grid.counts.y)+1;
         V(index)=TV();}
 }
@@ -154,7 +154,7 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
 //#####################################################################
 void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time)
 {
-    for(int i=1;i<=hair_layout_grid.counts.x;i++) for(int j=1;j<=hair_layout_grid.counts.y;j++){
+    for(int i=0;i<hair_layout_grid.counts.x;i++) for(int j=0;j<hair_layout_grid.counts.y;j++){
         int index=hair_layout_grid.counts.z*(j-1+(i-1)*hair_layout_grid.counts.y)+1;
         V(index)=TV();}
 }

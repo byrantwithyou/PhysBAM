@@ -92,7 +92,7 @@ Normalize_Control_Points()
     PHYSBAM_FATAL_ERROR(); // TODO: This form of sort does not exist.
 //     ARRAY<T>::sort(control_points_times,control_points);
 //     T offset=Start_Time(),total=Range();
-//     for(int i=1;i<=control_points_times.m;i++) control_points_times(i)=(control_points_times(i)-offset)/total;
+//     for(int i=0;i<control_points_times.m;i++) control_points_times(i)=(control_points_times(i)-offset)/total;
 }
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 //#####################################################################
@@ -101,7 +101,7 @@ Normalize_Control_Points()
 template<class T,class T2> void BSPLINE<T,T2>::
 Print_Control_Points_And_Times()
 {
-    for(int i=1;i<=control_points.m;i++) LOG::cout<<"Time: "<<control_points_times(i)<<", Control Point: "<<control_points(i)<<std::endl;
+    for(int i=0;i<control_points.m;i++) LOG::cout<<"Time: "<<control_points_times(i)<<", Control Point: "<<control_points(i)<<std::endl;
 }
 #endif
 template class BSPLINE<float,VECTOR<float,3> >;

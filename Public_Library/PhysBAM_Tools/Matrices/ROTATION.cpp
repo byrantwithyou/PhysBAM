@@ -44,7 +44,7 @@ template<class T>  ROTATION<VECTOR<T,2> > ROTATION<VECTOR<T,2> >::
 Average_Rotation(const ARRAY<ROTATION<TV> >& rotations)
 {
     COMPLEX<T> sum;
-    for(int i=1;i<=rotations.m;i++) sum+=rotations(i).c;
+    for(int i=0;i<rotations.m;i++) sum+=rotations(i).c;
     return ROTATION<TV>(sum.Normalized());
 }
 //#####################################################################

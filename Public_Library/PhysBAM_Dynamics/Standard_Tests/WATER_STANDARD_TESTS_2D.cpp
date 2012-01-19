@@ -141,7 +141,7 @@ Initialize(const int test_number_input,const int resolution)
         MATRIX<T,3> translation=MATRIX<T,3>::Translation_Matrix(domain_center);
         source_to_world(1)=translation;
         source_to_world(2)=translation*rotation;
-        for(int i=1;i<=2;i++){source_velocity(i)=source_to_world(i).Extract_Rotation()*TV((T).5,0);world_to_source(i)=source_to_world(i).Inverse();}}
+        for(int i=0;i<2;i++){source_velocity(i)=source_to_world(i).Extract_Rotation()*TV((T).5,0);world_to_source(i)=source_to_world(i).Inverse();}}
     if(test_number==5){
         world_to_source.Append(MATRIX<T,3>::Rotation_Matrix_Z_Axis((T)pi/(T)4)*MATRIX<T,3>::Translation_Matrix(TV((T)-.03,(T)-.23)));
         sources.Append(BOX<TV>(-(T).010,(T).010,-(T).010,(T).010));
@@ -261,7 +261,7 @@ Initial_Phi(const TV& X) const
         static SPHERE<TV> circle((TV((T).5,(T)1)),(T).2);
         phi=circle.Signed_Distance(X);}
     else if(test_number==21) phi=X.y-(T).32424;
-    for(int s=1;s<=sources.m;s++) phi=min(phi,sources(s).Signed_Distance(world_to_source(s).Homogeneous_Times(X)));
+    for(int s=0;s<sources.m;s++) phi=min(phi,sources(s).Signed_Distance(world_to_source(s).Homogeneous_Times(X)));
     return phi;
 }
 //#####################################################################

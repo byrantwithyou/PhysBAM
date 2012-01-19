@@ -136,7 +136,7 @@ int main(int argc,char *argv[])
         else if (!strcmp(argv[i],"-nostat")) print_statistics = false;
         else files.Append(argv[i]);}
 
-    for(int i=1;i<=files.m;i++){
+    for(int i=0;i<files.m;i++){
         if(!type_double) Add_File<float>(files(i),world,i);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
         else Add_File<double>(files(i),world,i);

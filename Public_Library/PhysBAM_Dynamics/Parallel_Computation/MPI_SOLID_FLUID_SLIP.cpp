@@ -44,7 +44,7 @@ MPI_SOLID_FLUID_SLIP()
     for(int i=0;i<number_of_solid_processes;i++)solid_ranks(i)=i-1;
     solid_group=new MPI::Group(group->Incl(solid_ranks.n,&solid_ranks(1)));
     fluid_ranks.Resize(number_of_processes-number_of_solid_processes);
-    for(int i=1;i<=fluid_ranks.n;i++)fluid_ranks(i)=i+number_of_solid_processes-1;
+    for(int i=0;i<fluid_ranks.n;i++)fluid_ranks(i)=i+number_of_solid_processes-1;
     fluid_group=new MPI::Group(group->Incl(fluid_ranks.n,&fluid_ranks(1)));
 
 }
@@ -73,7 +73,7 @@ Exchange_Solid_Positions_And_Velocities(SOLID_BODY_COLLECTION<TV>& solid_body_co
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particle;
     if(Solid_Node()){
         ARRAY<ARRAY<char> > send_buffers(fluid_ranks.n);ARRAY<MPI::Request> requests;
-        for(int i=1;i<=fluid_ranks.n;i++){
+        for(int i=0;i<fluid_ranks.n;i++){
             int buffer_size=MPI_UTILITIES::Pack_Size(particles.X,rigid_body_particles.X,rigid_body_particles.rotation,particles.V,rigid_body_particles.twist,
                 rigid_body_particles.angular_momentum,*comm)+1;
             send_buffers(i).Resize(buffer_size);int position=0;
@@ -187,7 +187,7 @@ Exchange_Coupled_Deformable_Particle_List(ARRAY<int>* fluid_list,ARRAY<ARRAY<int
 {
     int tag=Get_Unique_Tag();
     if(Solid_Node()){
-        for(int i=1;i<=fluid_ranks.n;i++){
+        for(int i=0;i<fluid_ranks.n;i++){
             MPI::Status status;
             comm->Probe(MPI::ANY_SOURCE,tag,status);
             int source=status.Get_source();
@@ -324,7 +324,7 @@ Find_Matrix_Indices_In_Region(const GRID<TV>& local_grid,const T_ARRAYS_BOOL& va
     /*for(FACE_ITERATOR iterator(local_grid,0,region_type,side);iterator.Valid();iterator.Next()){
         int axis=iterator.Axis();
         TV_INT face_index=iterator.Face_Index();
-        for(int side=1;side<=2;side++){
+        for(int side=0;side<2;side++){
             TV_INT cell_index=face_index+(1-side)*TV_INT::Axis_Vector(axis);
             int ghost_cell_index=face_ghost_cell_index(side,axis,face_index);
             if(ghost_cell_index && region.Lazy_Inside(cell_index)){
@@ -334,7 +334,7 @@ Find_Matrix_Indices_In_Region(const GRID<TV>& local_grid,const T_ARRAYS_BOOL& va
     for(FACE_ITERATOR iterator(local_grid,0,region_type,side);iterator.Valid();iterator.Next()){
         int axis=iterator.Axis();
         TV_INT face_index=iterator.Face_Index();
-        for(int side=1;side<=2;side++){
+        for(int side=0;side<2;side++){
             TV_INT cell_index=face_index+(1-side)*TV_INT::Axis_Vector(axis);
             int ghost_cell_index=face_ghost_cell_index(side,axis,face_index);
             if(ghost_cell_index && region.Lazy_Inside(cell_index))
@@ -458,7 +458,7 @@ Find_Boundary_Indices_In_Region(const GRID<TV>& local_grid,const T_ARRAYS_BOOL& 
                 partition.boundary_indices(domain_side)(++boundary_cell_count)=face_ghost_cell_index(1,second_axis,cell_index);
             if(!poisson->psi_N(second_axis,cell_index+second_axis_vector) && face_ghost_cell_index(2,second_axis,cell_index+second_axis_vector) && domain_indices_shrink_axis.Lazy_Outside(cell_index+second_axis_vector))
             partition.boundary_indices(domain_side)(++boundary_cell_count)=face_ghost_cell_index(2,second_axis,cell_index+second_axis_vector);}}*/
-    for(int i=1;i<=boundary_ghost_cells.m;i++){
+    for(int i=0;i<boundary_ghost_cells.m;i++){
         partition.boundary_indices(domain_side)(++boundary_cell_count)=boundary_ghost_cells(i);
     }
 

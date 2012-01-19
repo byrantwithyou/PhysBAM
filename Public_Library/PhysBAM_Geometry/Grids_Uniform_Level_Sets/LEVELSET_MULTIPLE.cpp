@@ -24,7 +24,7 @@ LEVELSET_MULTIPLE(T_GRID& grid_input,ARRAY<T_ARRAYS_SCALAR>& phis_input,const bo
 template<class T_GRID> LEVELSET_MULTIPLE<T_GRID>::
 ~LEVELSET_MULTIPLE()
 {
-    if(!use_external_levelsets) for(int i=1;i<=levelsets.m;i++) delete levelsets(i);
+    if(!use_external_levelsets) for(int i=0;i<levelsets.m;i++) delete levelsets(i);
 }
 //#####################################################################
 // Function Recreate_Levelsets
@@ -33,9 +33,9 @@ template<class T_GRID> void LEVELSET_MULTIPLE<T_GRID>::
 Recreate_Levelsets() 
 {
     assert(!use_external_levelsets);
-    for(int i=1;i<=levelsets.m;i++) delete levelsets(i);
+    for(int i=0;i<levelsets.m;i++) delete levelsets(i);
     levelsets.Resize(phis.m);
-    for(int i=1;i<=levelsets.m;i++) levelsets(i)=new T_FAST_LEVELSET(grid,phis(i));
+    for(int i=0;i<levelsets.m;i++) levelsets(i)=new T_FAST_LEVELSET(grid,phis(i));
 }
 //#####################################################################
 // Function Fill_Ghost_Cells
@@ -43,7 +43,7 @@ Recreate_Levelsets()
 template<class T_GRID> void LEVELSET_MULTIPLE<T_GRID>::
 Fill_Ghost_Cells(ARRAY<T_ARRAYS_SCALAR >& phi_ghost,const T time,const int number_of_ghost_cells) 
 {
-    for(int i=1;i<=levelsets.m;i++) levelsets(i)->boundary->Fill_Ghost_Cells(grid,levelsets(i)->phi,phi_ghost(i),0,time,number_of_ghost_cells);
+    for(int i=0;i<levelsets.m;i++) levelsets(i)->boundary->Fill_Ghost_Cells(grid,levelsets(i)->phi,phi_ghost(i),0,time,number_of_ghost_cells);
 }
 //#####################################################################
 // Function Set_Custom_Boundary
@@ -52,7 +52,7 @@ template<class T_GRID> void LEVELSET_MULTIPLE<T_GRID>::
 Set_Custom_Boundary(BOUNDARY<TV,T>& boundary_input)
 {
     PHYSBAM_FATAL_ERROR(); // TODO: The next line does not compile.
-//    for(int i=1;i<=levelsets.m;i++) levelsets(i)->Set_Custom_Boundary(boundary_input);
+//    for(int i=0;i<levelsets.m;i++) levelsets(i)->Set_Custom_Boundary(boundary_input);
 }
 //#####################################################################
 // Function Set_Custom_Interpolation
@@ -60,7 +60,7 @@ Set_Custom_Boundary(BOUNDARY<TV,T>& boundary_input)
 template<class T_GRID> void LEVELSET_MULTIPLE<T_GRID>::
 Set_Custom_Interpolation(T_INTERPOLATION_SCALAR& interpolation_input)
 {
-    for(int i=1;i<=levelsets.m;i++) levelsets(i)->Set_Custom_Interpolation(interpolation_input);
+    for(int i=0;i<levelsets.m;i++) levelsets(i)->Set_Custom_Interpolation(interpolation_input);
 }
 //#####################################################################
 // Function Set_Custom_Secondary_Interpolation
@@ -68,7 +68,7 @@ Set_Custom_Interpolation(T_INTERPOLATION_SCALAR& interpolation_input)
 template<class T_GRID> void LEVELSET_MULTIPLE<T_GRID>::
 Set_Custom_Secondary_Interpolation(T_INTERPOLATION_SCALAR& interpolation_input)
 {
-    for(int i=1;i<=levelsets.m;i++) levelsets(i)->Set_Custom_Secondary_Interpolation(interpolation_input);
+    for(int i=0;i<levelsets.m;i++) levelsets(i)->Set_Custom_Secondary_Interpolation(interpolation_input);
 }
 //#####################################################################
 // Function Set_Custom_Normal_Interpolation
@@ -76,7 +76,7 @@ Set_Custom_Secondary_Interpolation(T_INTERPOLATION_SCALAR& interpolation_input)
 template<class T_GRID> void LEVELSET_MULTIPLE<T_GRID>::
 Set_Custom_Normal_Interpolation(T_INTERPOLATION_VECTOR& normal_interpolation_input)
 {
-    for(int i=1;i<=levelsets.m;i++) levelsets(i)->Set_Custom_Normal_Interpolation(normal_interpolation_input);
+    for(int i=0;i<levelsets.m;i++) levelsets(i)->Set_Custom_Normal_Interpolation(normal_interpolation_input);
 }
 //#####################################################################
 // Function Set_Custom_Normal_Computation
@@ -84,7 +84,7 @@ Set_Custom_Normal_Interpolation(T_INTERPOLATION_VECTOR& normal_interpolation_inp
 template<class T_GRID> void LEVELSET_MULTIPLE<T_GRID>::
 Set_Custom_Normal_Computation(LEVELSET_NORMAL_COMPUTATION<T_GRID>* normal_computation)
 {
-    for(int i=1;i<=levelsets.m;i++) levelsets(i)->Set_Custom_Normal_Computation(normal_computation);
+    for(int i=0;i<levelsets.m;i++) levelsets(i)->Set_Custom_Normal_Computation(normal_computation);
 }
 //#####################################################################
 // Function Set_Custom_Curvature_Interpolation
@@ -92,7 +92,7 @@ Set_Custom_Normal_Computation(LEVELSET_NORMAL_COMPUTATION<T_GRID>* normal_comput
 template<class T_GRID> void LEVELSET_MULTIPLE<T_GRID>::
 Set_Custom_Curvature_Interpolation(T_INTERPOLATION_SCALAR& curvature_interpolation_input)
 {
-    for(int i=1;i<=levelsets.m;i++) levelsets(i)->Set_Custom_Curvature_Interpolation(curvature_interpolation_input);
+    for(int i=0;i<levelsets.m;i++) levelsets(i)->Set_Custom_Curvature_Interpolation(curvature_interpolation_input);
 }
 //#####################################################################
 // Function Set_Levelset_Callbacks
@@ -101,7 +101,7 @@ template<class T_GRID> void LEVELSET_MULTIPLE<T_GRID>::
 Set_Levelset_Callbacks(LEVELSET_CALLBACKS<T_GRID>& levelset_callbacks_input)
 {
     levelset_callbacks=&levelset_callbacks_input;
-    for(int i=1;i<=levelsets.m;i++) levelsets(i)->Set_Levelset_Callbacks(levelset_callbacks_input);
+    for(int i=0;i<levelsets.m;i++) levelsets(i)->Set_Levelset_Callbacks(levelset_callbacks_input);
 }
 //#####################################################################
 // Function Inside_Region
@@ -224,7 +224,7 @@ template<class T_GRID> void LEVELSET_MULTIPLE<T_GRID>::
 Use_Level_Set_Advection_Method()
 {
     PHYSBAM_FATAL_ERROR(); // TODO: The next line does not compile.
-//    for(int i=1;i<=levelsets.m;i++) levelsets(i)->Use_Level_Set_Advection_Method();
+//    for(int i=0;i<levelsets.m;i++) levelsets(i)->Use_Level_Set_Advection_Method();
 }
 //#####################################################################
 // Function CFL
@@ -233,7 +233,7 @@ template<class T_GRID> typename T_GRID::VECTOR_T::SCALAR LEVELSET_MULTIPLE<T_GRI
 CFL(const T_FACE_ARRAYS_SCALAR& face_velocities) const
 {
     T minimum_cfl=FLT_MAX;
-    for(int i=1;i<=levelsets.m;i++) minimum_cfl=min(minimum_cfl,levelsets(i)->CFL(face_velocities));
+    for(int i=0;i<levelsets.m;i++) minimum_cfl=min(minimum_cfl,levelsets(i)->CFL(face_velocities));
     return minimum_cfl;
 }
 //#####################################################################
@@ -243,7 +243,7 @@ template<class T_GRID> typename T_GRID::VECTOR_T::SCALAR LEVELSET_MULTIPLE<T_GRI
 CFL(const T_ARRAYS_VECTOR& velocity) const
 {
     T minimum_cfl=FLT_MAX;
-    for(int i=1;i<=levelsets.m;i++) minimum_cfl=min(minimum_cfl,levelsets(i)->CFL(velocity));
+    for(int i=0;i<levelsets.m;i++) minimum_cfl=min(minimum_cfl,levelsets(i)->CFL(velocity));
     return minimum_cfl;
 }
 //#####################################################################
@@ -252,7 +252,7 @@ CFL(const T_ARRAYS_VECTOR& velocity) const
 template<class T_GRID> void LEVELSET_MULTIPLE<T_GRID>::
 Set_Collision_Body_List(T_GRID_BASED_COLLISION_GEOMETRY& collision_body_list_input)
 {
-    for(int i=1;i<=levelsets.m;i++) levelsets(i)->Set_Collision_Body_List(collision_body_list_input);
+    for(int i=0;i<levelsets.m;i++) levelsets(i)->Set_Collision_Body_List(collision_body_list_input);
 }
 //#####################################################################
 // Function Is_Projected_At_Nodes
@@ -262,7 +262,7 @@ Is_Projected_At_Nodes()
 {
     for(T_CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
         bool inside=0;
-        for(int i=1;i<=levelsets.m;i++) if(Phi(i,iterator.Cell_Index())<=0) inside++;
+        for(int i=0;i<levelsets.m;i++) if(Phi(i,iterator.Cell_Index())<=0) inside++;
         if(inside!=1) return false;}
     return true;
 }
@@ -272,7 +272,7 @@ Is_Projected_At_Nodes()
 template<class T_GRID> void LEVELSET_MULTIPLE<T_GRID>::
 Compute_Normals(const T time)
 {
-    for(int i=1;i<=levelsets.m;i++) levelsets(i)->Compute_Normals(time);
+    for(int i=0;i<levelsets.m;i++) levelsets(i)->Compute_Normals(time);
 }
 //#####################################################################
 // Function Compute_Curvature
@@ -280,7 +280,7 @@ Compute_Normals(const T time)
 template<class T_GRID> void LEVELSET_MULTIPLE<T_GRID>::
 Compute_Curvature(const T time)
 {
-    for(int i=1;i<=levelsets.m;i++) levelsets(i)->Compute_Curvature(time);
+    for(int i=0;i<levelsets.m;i++) levelsets(i)->Compute_Curvature(time);
 }
 //#####################################################################
 // Function Fast_Marching_Method
@@ -289,7 +289,7 @@ template<class T_GRID> void LEVELSET_MULTIPLE<T_GRID>::
 Fast_Marching_Method(const ARRAY<int>& local_advection_spatial_orders)
 {
     PHYSBAM_FATAL_ERROR();
-    // for(int i=1;i<=levelsets.m;i++) levelsets(i)->Fast_Marching_Method(local_advection_spatial_orders(i));
+    // for(int i=0;i<levelsets.m;i++) levelsets(i)->Fast_Marching_Method(local_advection_spatial_orders(i));
 }
 template class LEVELSET_MULTIPLE<GRID<VECTOR<float,1> > >;
 template class LEVELSET_MULTIPLE<GRID<VECTOR<float,2> > >;

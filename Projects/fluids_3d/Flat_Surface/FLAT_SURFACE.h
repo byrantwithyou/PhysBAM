@@ -101,7 +101,7 @@ void Construct_Levelsets_For_Objects(const T time)
         moving_objects=true;
         rigid_body_particles.Rigid_Body(1).position=VECTOR<T,3>(.5,.3,.5);
         rigid_body_particles.Rigid_Body(1).velocity=VECTOR<T,3>(0,1,0);
-        for(int r=1;r<=rigid_body_list.rigid_bodies.m;r++)rigid_body_particles.Rigid_Body(r).position+=time*rigid_body_particles.Rigid_Body(r).velocity;}
+        for(int r=0;r<rigid_body_list.rigid_bodies.m;r++)rigid_body_particles.Rigid_Body(r).position+=time*rigid_body_particles.Rigid_Body(r).velocity;}
 
     static bool initialized=false;if(!moving_objects && initialized) return;
 
@@ -112,7 +112,7 @@ void Construct_Levelsets_For_Objects(const T time)
     for(int i=-2;i<=grid.m+3;i++)for(int j=-2;j<=grid.n+3;j++)for(int ij=-2;ij<=grid.mn+3;ij++){
         VECTOR<T,3> X=grid.X(i,j,ij); 
         T min_phi=-cylinder.Signed_Distance(grid.X(i,j,ij));int min_r=0;
-        for(int r=1;r<=rigid_body_list.rigid_bodies.m;r++){
+        for(int r=0;r<rigid_body_list.rigid_bodies.m;r++){
             T phi=rigid_body_particles.Rigid_Body(r).Implicit_Surface_Value(X);
             if(min_phi>phi){min_phi=phi;min_r=r;}}
         phi_object(i,j,ij)=min_phi;
@@ -127,10 +127,10 @@ void Construct_Levelsets_For_Objects(const T time)
 void Initialize_Phi()
 {
     GRID<TV>& grid=fluids_parameters.grid;
-    for(int i=1;i<=grid.m;i++)for(int j=1;j<=grid.n;j++)for(int ij=1;ij<=grid.mn;ij++)
+    for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++)for(int ij=0;ij<grid.mn;ij++)
         fluids_parameters.particle_levelset_evolution.phi(i,j,ij)=grid.y(j)-water_level;
     if(example==3)
-        for(int i=1;i<=grid.m;i++)for(int j=1;j<=grid.n;j++)for(int ij=1;ij<=grid.mn;ij++)
+        for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++)for(int ij=0;ij<grid.mn;ij++)
             fluids_parameters.particle_levelset_evolution.phi(i,j,ij)=grid.z(ij)-water_level;
 }
 //#####################################################################

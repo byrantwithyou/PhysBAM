@@ -165,7 +165,7 @@ Initialize_Bodies()
     bending_edges.Update_Number_Nodes();
     torsion_edges.Update_Number_Nodes();
     assert(masses.m==particles.array_collection->Size());
-    for(int i=1;i<=masses.m;i++) {assert(masses(i));particles.mass(i)=masses(i);}
+    for(int i=0;i<masses.m;i++) {assert(masses(i));particles.mass(i)=masses(i);}
     //for(int i=1;i<=particles.array_collection->Size();i++) {particles.mass(i)=1.;}
     //for(int i=1;i<fixed_nodes.m+1;i++) particles.mass(fixed_nodes(i))=FLT_MAX;
     for(int i=1;i<fixed_nodes_start.m+1;i++) particles.mass(fixed_nodes_start(i))=FLT_MAX;
@@ -254,15 +254,15 @@ Initialize_Bodies()
         segment_adhesion->Write_State(stream_type,output_directory+"/adhesion.0");
         segment_adhesion->Update_Partitions(false,solid_body_collection.deformable_body_collection.mpi_solids,output_directory);}
 
-    for(int i=1;i<=fixed_nodes_start.m;i++) init_positions_start.Append(particles.X(fixed_nodes_start(i)));
-    for(int i=1;i<=fixed_nodes_end.m;i++) init_positions_end.Append(particles.X(fixed_nodes_end(i)));
+    for(int i=0;i<fixed_nodes_start.m;i++) init_positions_start.Append(particles.X(fixed_nodes_start(i)));
+    for(int i=0;i<fixed_nodes_end.m;i++) init_positions_end.Append(particles.X(fixed_nodes_end(i)));
 
     solid_body_collection.deformable_body_collection.collisions.collision_structures.Append(&edges);
     solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append(&edges);
 
     // initial projection rest lengths (needs to happen after MPI restriction)
     project_restlengths.Resize(project_mesh.elements.m);
-    for(int i=1;i<=project_mesh.elements.m;i++){
+    for(int i=0;i<project_mesh.elements.m;i++){
         const VECTOR<int,2>& nodes=project_mesh.elements(i);
         project_restlengths(i)=(deformable_body_collection.particles.X(nodes[1])-deformable_body_collection.particles.X(nodes[2])).Magnitude();}
 }
@@ -272,8 +272,8 @@ Initialize_Bodies()
 template<class T_input> void HAIR_STRAND_TESTS<T_input>::
 Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time)
 {
-    for(int i=1;i<=fixed_nodes_start.m;i++) V(fixed_nodes_start(i))=TV();
-    if(test_number!=4||velocity_time>(T)2.) for(int i=1;i<=fixed_nodes_end.m;i++) V(fixed_nodes_end(i))=TV();
+    for(int i=0;i<fixed_nodes_start.m;i++) V(fixed_nodes_start(i))=TV();
+    if(test_number!=4||velocity_time>(T)2.) for(int i=0;i<fixed_nodes_end.m;i++) V(fixed_nodes_end(i))=TV();
 }
 //#####################################################################
 // Function Set_External_Velocities
@@ -293,10 +293,10 @@ Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_p
             length=init_positions_end(1)[1]-init_positions_start(init_positions_start.m)[1];
             interp_start.Add_Control_Point(0,FRAME<TV>());
             interp_start.Add_Control_Point(duration,FRAME<TV>());
-            if(velocity_time<1.) for(int i=1;i<=fixed_nodes_end.m;i++) V(fixed_nodes_end(i))=TV((T)-.3*length,0,0);
-            else if(velocity_time<2.) for(int i=1;i<=fixed_nodes_end.m;i++) V(fixed_nodes_end(i))=TV();
+            if(velocity_time<1.) for(int i=0;i<fixed_nodes_end.m;i++) V(fixed_nodes_end(i))=TV((T)-.3*length,0,0);
+            else if(velocity_time<2.) for(int i=0;i<fixed_nodes_end.m;i++) V(fixed_nodes_end(i))=TV();
             else{
-                for(int i=1;i<=fixed_nodes_end.m;i++){
+                for(int i=0;i<fixed_nodes_end.m;i++){
                     TV rotation_axis=TV((T)1.,0,0);
                     V(fixed_nodes_end(i))=(T)pi*TV::Cross_Product(rotation_axis,particles.X(fixed_nodes_end(i))-TV(particles.X(fixed_nodes_end(i))(1),0,0));}}
             break;
@@ -359,9 +359,9 @@ Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_p
             break;
         default:
             break;}
-    if(test_number==5) for(int i=1;i<=fixed_nodes_start.m;i++){if(i==fixed_nodes_start.m) V(fixed_nodes_start(i))=interp_start.Derivative(velocity_time).linear; else V(fixed_nodes_start(i))=interp_start2.Derivative(velocity_time).linear;}
-    else for(int i=1;i<=fixed_nodes_start.m;i++) V(fixed_nodes_start(i))=interp_start.Derivative(velocity_time).linear;
-    if(test_number!=1&&(test_number!=4||velocity_time>(T)2.)) for(int i=1;i<=fixed_nodes_end.m;i++) V(fixed_nodes_end(i))=interp_end.Derivative(velocity_time).linear;
+    if(test_number==5) for(int i=0;i<fixed_nodes_start.m;i++){if(i==fixed_nodes_start.m) V(fixed_nodes_start(i))=interp_start.Derivative(velocity_time).linear; else V(fixed_nodes_start(i))=interp_start2.Derivative(velocity_time).linear;}
+    else for(int i=0;i<fixed_nodes_start.m;i++) V(fixed_nodes_start(i))=interp_start.Derivative(velocity_time).linear;
+    if(test_number!=1&&(test_number!=4||velocity_time>(T)2.)) for(int i=0;i<fixed_nodes_end.m;i++) V(fixed_nodes_end(i))=interp_end.Derivative(velocity_time).linear;
 }
 //#####################################################################
 // Function Set_External_Positions
@@ -388,7 +388,7 @@ Set_External_Positions(ARRAY_VIEW<TV> X,const T time)
                 interp_end.Add_Control_Point((T)2.,frame);}
             else{
                 if(!reset){
-                    for(int i=1;i<=fixed_nodes_end.m;i++) init_positions_end(i)+=TV((T)-.3*length,0,0);
+                    for(int i=0;i<fixed_nodes_end.m;i++) init_positions_end(i)+=TV((T)-.3*length,0,0);
                     reset=true;}
                 frame.r=ROTATION<TV>(interp_angle.Value(time),TV((T)1.,0,0));
                 interp_end.Add_Control_Point(0,frame);
@@ -439,9 +439,9 @@ Set_External_Positions(ARRAY_VIEW<TV> X,const T time)
             break;
         default:
             break;}
-    if(test_number==5) for(int i=1;i<=fixed_nodes_start.m;i++){if(i>fixed_nodes_start.m/2) X(fixed_nodes_start(i))=interp_start.Value(time)*init_positions_start(i); else X(fixed_nodes_start(i))=init_positions_start(i);}
-    else for(int i=1;i<=fixed_nodes_start.m;i++) X(fixed_nodes_start(i))=interp_start.Value(time)*init_positions_start(i);
-    for(int i=1;i<=fixed_nodes_end.m;i++) X(fixed_nodes_end(i))=interp_end.Value(time)*init_positions_end(i);
+    if(test_number==5) for(int i=0;i<fixed_nodes_start.m;i++){if(i>fixed_nodes_start.m/2) X(fixed_nodes_start(i))=interp_start.Value(time)*init_positions_start(i); else X(fixed_nodes_start(i))=init_positions_start(i);}
+    else for(int i=0;i<fixed_nodes_start.m;i++) X(fixed_nodes_start(i))=interp_start.Value(time)*init_positions_start(i);
+    for(int i=0;i<fixed_nodes_end.m;i++) X(fixed_nodes_end(i))=interp_end.Value(time)*init_positions_end(i);
 }
 //#####################################################################
 // Function Update_Time_Varying_Material_Properties
@@ -499,7 +499,7 @@ Add_External_Impulses_Helper(ARRAY_VIEW<TV> V,const T time,const T dt,bool use_m
     
     if(use_momentum_conserving){
         for(int iteration=0;iteration<momentum_conserving_projection_iterations;iteration++){
-            for(int i=1;i<=project_mesh.elements.m;i++){
+            for(int i=0;i<project_mesh.elements.m;i++){
                 int child,parent;project_mesh.elements(i).Get(child,parent);
                 T restlength=project_restlengths(i);
                 TV X_child_new=particles.X(child)+dt*V(child);
@@ -509,7 +509,7 @@ Add_External_Impulses_Helper(ARRAY_VIEW<TV> V,const T time,const T dt,bool use_m
                 V(parent)+=impulse*particles.one_over_mass(parent);
                 V(child)-=impulse*particles.one_over_mass(child);}
             //T max_error=0;
-            //for(int i=1;i<=project_mesh.elements.m;i++){
+            //for(int i=0;i<project_mesh.elements.m;i++){
             //    int child,parent;project_mesh.elements(i).Get(child,parent);
             //    T restlength=project_restlengths(i);
             //    TV X_child_new=particles.X(child)+dt*V(child);
@@ -521,7 +521,7 @@ Add_External_Impulses_Helper(ARRAY_VIEW<TV> V,const T time,const T dt,bool use_m
     }
 
     if(use_non_momentum_conserving){
-        for(int i=1;i<=project_mesh.elements.m;i++){
+        for(int i=0;i<project_mesh.elements.m;i++){
             int child,parent;project_mesh.elements(i).Get(child,parent);
             T restlength=project_restlengths(i);
             TV X_child_new=particles.X(child)+dt*V(child);

@@ -7,7 +7,7 @@ void Check_Allocatable_Memory()
     const int CHUNK_SIZE=1024*1024; // default 1MB
     const int MAX_NUMBER_OF_CHUNKS=32000; // default 32 GB
     char** temp_buffer=new char*[MAX_NUMBER_OF_CHUNKS];
-    for(int i=1;i<=MAX_NUMBER_OF_CHUNKS;i++){
+    for(int i=0;i<MAX_NUMBER_OF_CHUNKS;i++){
         temp_buffer[i]=new char[CHUNK_SIZE];
         printf("Allocated %d Megabytes.\n",i);
     }

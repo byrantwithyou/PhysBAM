@@ -48,15 +48,15 @@ INCOMPRESSIBLE_FINITE_VOLUME(STRAIN_MEASURE<TV,d>& strain_measure)
     if(!boundary_mesh.incident_elements) boundary_mesh.Initialize_Incident_Elements();
     if(!mesh.incident_elements) mesh.Initialize_Incident_Elements();
     boundary_to_element.Resize(boundary_mesh.elements.m);
-    for(int t=1;t<=mesh.elements.m;t++){VECTOR<int,d+1>& element=mesh.elements(t);
+    for(int t=0;t<mesh.elements.m;t++){VECTOR<int,d+1>& element=mesh.elements(t);
         if(VECTOR<bool,d+1>(mesh.node_on_boundary->Subset(element)).Number_True()>=element.m-1) // using Number_True directly on the subset hits a compiler bug in gcc 4.1.1
-            for(int i=1;i<=element.m;i++){
+            for(int i=0;i<element.m;i++){
                 int b=boundary_mesh.Simplex(element.Remove_Index(i));
                 if(b) boundary_to_element(b).Set(t,i);}}
 
     node_regions.Resize(particles.array_collection->Size());
     for(int p=1;p<=particles.array_collection->Size();p++){ARRAY<int>& incident=(*mesh.incident_elements)(p);
-        for(int j=1;j<=incident.m;j++) node_regions(p).Append_Unique_Elements(strain_measure.mesh.elements(incident(j)));}
+        for(int j=0;j<incident.m;j++) node_regions(p).Append_Unique_Elements(strain_measure.mesh.elements(incident(j)));}
 }
 //#####################################################################
 // Destructor
@@ -256,7 +256,7 @@ Make_Incompressible(const T dt,const bool correct_volume)
     Gradient(pressure_full,gradient_full);
     gradient_full.Subset(force_dynamic_particles_list)*=particles.one_over_mass.Subset(force_dynamic_particles_list);
     Project_Vector_Field(gradient_full);
-    for(int i=1;i<=force_dynamic_particles_list.m;i++){int p=force_dynamic_particles_list(i);particles.V(p)-=gradient_full(p);}
+    for(int i=0;i<force_dynamic_particles_list.m;i++){int p=force_dynamic_particles_list(i);particles.V(p)-=gradient_full(p);}
 }
 //#####################################################################
 // Function Test_System
@@ -282,12 +282,12 @@ Test_System()
     T dt=(T)1e-3;
     POISSON_SYSTEM<TV,d> system(*this);
 
-    for(int iteration=1;iteration<=10;iteration++){
-        for(int p=1;p<=fragment_dynamic_particles.m;p++){
+    for(int iteration=0;iteration<10;iteration++){
+        for(int p=0;p<fragment_dynamic_particles.m;p++){
             random.Set_Seed(fragment_dynamic_particles(p)*123+20+23*iteration);
             T scale=random.Get_Uniform_Number(-(T)10,(T)10);TV direction=random.template Get_Direction<TV>();
             V(p)=exp(scale)*direction;}
-        for(int i=1;i<=fragment_dynamic_particles.m;i++){int p=fragment_dynamic_particles(i);
+        for(int i=0;i<fragment_dynamic_particles.m;i++){int p=fragment_dynamic_particles(i);
             random.Set_Seed(p*123+21+23*iteration);
             pressure_full(p)=exp(random.Get_Uniform_Number(-(T)10,(T)10));}
         system.Project(pressure);
@@ -413,9 +413,9 @@ Project_Vector_Field(ARRAY_VIEW<TV> field) const
 template<class TV,int d> void INCOMPRESSIBLE_FINITE_VOLUME<TV,d>::
 Project_All_Clamping_Constraints(ARRAY_VIEW<TV> field,const PROJECTION_DATA& data) const
 {
-    for(int i=1;i<=data.neumann_boundary_nodes.m;i++){int p=data.neumann_boundary_nodes(i);
+    for(int i=0;i<data.neumann_boundary_nodes.m;i++){int p=data.neumann_boundary_nodes(i);
         field(p)-=TV::Dot_Product(field(p),data.neumann_boundary_normals(p))*data.neumann_boundary_normals(p);}
-    for(int i=1;i<=data.fixed_nodes.m;i++) field(data.fixed_nodes(i))=TV(); // TODO: generalize constructs
+    for(int i=0;i<data.fixed_nodes.m;i++) field(data.fixed_nodes(i))=TV(); // TODO: generalize constructs
 }
 //#####################################################################
 // Function Project_All_Isolated_Clamping_Constraints
@@ -423,7 +423,7 @@ Project_All_Clamping_Constraints(ARRAY_VIEW<TV> field,const PROJECTION_DATA& dat
 template<class TV,int d> void INCOMPRESSIBLE_FINITE_VOLUME<TV,d>::
 Project_All_Isolated_Clamping_Constraints(ARRAY_VIEW<TV> field,const PROJECTION_DATA& data) const
 {
-    for(int i=1;i<=data.neumann_boundary_nodes_isolated.m;i++){int p=data.neumann_boundary_nodes_isolated(i);
+    for(int i=0;i<data.neumann_boundary_nodes_isolated.m;i++){int p=data.neumann_boundary_nodes_isolated(i);
         field(p)-=TV::Dot_Product(field(p),data.neumann_boundary_normals(p))*data.neumann_boundary_normals(p);}
 }
 //#####################################################################
@@ -455,11 +455,11 @@ Set_Neumann_Boundary_Conditions(const ARRAY<COLLISION_PARTICLE_STATE<TV> >* part
 
     if(repulsions && use_self_moving_projection){
         repulsions->Set_Collision_Pairs(projection_data.point_face_precomputed,projection_data.edge_edge_precomputed,projection_data.point_face_pairs,projection_data.edge_edge_pairs,(T)2); // TODO: Fix me.
-        for(int i=1;i<=projection_data.point_face_pairs.m;i++) neumann_boundary_count.Subset(projection_data.point_face_pairs(i).nodes)+=1;
-        for(int i=1;i<=projection_data.edge_edge_pairs.m;i++) neumann_boundary_count.Subset(projection_data.edge_edge_pairs(i).nodes)+=1;}
+        for(int i=0;i<projection_data.point_face_pairs.m;i++) neumann_boundary_count.Subset(projection_data.point_face_pairs(i).nodes)+=1;
+        for(int i=0;i<projection_data.edge_edge_pairs.m;i++) neumann_boundary_count.Subset(projection_data.edge_edge_pairs(i).nodes)+=1;}
 
     int j=0;
-    for(int i=1;i<=projection_data.neumann_boundary_nodes.m;i++){int p=projection_data.neumann_boundary_nodes(i);
+    for(int i=0;i<projection_data.neumann_boundary_nodes.m;i++){int p=projection_data.neumann_boundary_nodes(i);
         if(neumann_boundary_count(p)==1) projection_data.neumann_boundary_nodes_isolated.Append(p);
         else projection_data.neumann_boundary_nodes(++j)=p;}
     projection_data.neumann_boundary_nodes.m=j;
@@ -475,7 +475,7 @@ Max_Relative_Velocity_Error()
     Update_Position_Based_State(0,true);
     T max_error=0;
     
-    for(int i=1;i<=force_dynamic_particles_list.m;i++){int p=force_dynamic_particles_list(i);
+    for(int i=0;i<force_dynamic_particles_list.m;i++){int p=force_dynamic_particles_list(i);
         if(rest_volumes_full(p)){T error=(volumes_full(p)-rest_volumes_full(p))/rest_volumes_full(p);max_error=max(max_error,abs(error));}}
     if(mpi_solids) max_error=mpi_solids->Reduce_Max_Global(max_error);
     return max_error;

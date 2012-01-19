@@ -58,7 +58,7 @@ public:
     {print_residuals=print_residuals_input;}
 
     void Set_CFL_Number(const T cfl_number_input=.5)
-    {cfl_number=cfl_number_input;for(int i=1;i<=solids_forces.m;i++) solids_forces(i)->Set_CFL_Number(cfl_number_input);
+    {cfl_number=cfl_number_input;for(int i=0;i<solids_forces.m;i++) solids_forces(i)->Set_CFL_Number(cfl_number_input);
     deformable_body_collection.Set_CFL_Number(cfl_number);}
 
     void Set_Implicit_Damping(const bool implicit_damping_input=true)

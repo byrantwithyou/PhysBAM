@@ -27,9 +27,9 @@ public:
     {return virtual_nodes.Append(VIRTUAL_NODE(corresponding_real_node));}
 
     void Initialize_Replicas()
-    {int max_real_node=0;for(int i=1;i<=virtual_nodes.m;i++) max_real_node=max(max_real_node,virtual_nodes(i).corresponding_real_node);
+    {int max_real_node=0;for(int i=0;i<virtual_nodes.m;i++) max_real_node=max(max_real_node,virtual_nodes(i).corresponding_real_node);
     replicas.Remove_All();replicas.Resize(max_real_node);
-    for(int i=1;i<=virtual_nodes.m;i++) replicas(virtual_nodes(i).corresponding_real_node).Append(i);}
+    for(int i=0;i<virtual_nodes.m;i++) replicas(virtual_nodes(i).corresponding_real_node).Append(i);}
 
     int Donor_Node(const int recipient,const int real_node) const
     {if(real_node<=replicas.m) for(int k=1;k<=replicas(real_node).m;k++){

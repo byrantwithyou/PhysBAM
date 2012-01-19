@@ -43,7 +43,7 @@ public:
     {if(ray.ray.semi_infinite||!object.Inside(ray.ray.Point(ray.ray.t_max/2))) return color;
     T absorption_coefficient;VECTOR<T,3> absorption_spectrum;Compute_Absorption(absorption_coefficient,absorption_spectrum,ray,object);
     VECTOR<T,3> attenuation_coefficient=-ray.ray.t_max*absorption_coefficient*absorption_spectrum;
-    for(int i=1;i<=3;i++) if(absorption_clamp && abs(attenuation_coefficient(i))>absorption_clamp) attenuation_coefficient(i)=sign(attenuation_coefficient(i))*absorption_clamp;
+    for(int i=0;i<3;i++) if(absorption_clamp && abs(attenuation_coefficient(i))>absorption_clamp) attenuation_coefficient(i)=sign(attenuation_coefficient(i))*absorption_clamp;
     VECTOR<T,3> attenuation(exp(attenuation_coefficient.x),exp(attenuation_coefficient.y),exp(attenuation_coefficient.z));
     if(ray.debug_ray) ray.debug_ray->Add_Comment(STRING_UTILITIES::string_sprintf("attenuation=%f %f %f\n",attenuation.x,attenuation.y,attenuation.z));
     return color*attenuation;}
@@ -51,7 +51,7 @@ public:
     VECTOR<T,3> Attenuate_Photon(const RENDERING_RAY<T>& ray, const RENDERING_OBJECT<T>& object, const VECTOR<T,3>& photon_power, bool& should_throw) PHYSBAM_OVERRIDE
     {T absorption_coefficient;VECTOR<T,3> absorption_spectrum;Compute_Absorption(absorption_coefficient,absorption_spectrum,ray,object);
     VECTOR<T,3> attenuation_coefficient=-ray.ray.t_max*absorption_coefficient*absorption_spectrum;
-    for(int i=1;i<=3;i++) if(absorption_clamp && abs(attenuation_coefficient(i))>absorption_clamp) attenuation_coefficient(i)=sign(attenuation_coefficient(i))*absorption_clamp;
+    for(int i=0;i<3;i++) if(absorption_clamp && abs(attenuation_coefficient(i))>absorption_clamp) attenuation_coefficient(i)=sign(attenuation_coefficient(i))*absorption_clamp;
     VECTOR<T,3> attenuation(exp(attenuation_coefficient.x),exp(attenuation_coefficient.y),exp(attenuation_coefficient.z));
     if(ray.debug_ray) ray.debug_ray->Add_Comment(STRING_UTILITIES::string_sprintf("photon attenuation=%f %f %f\n",attenuation.x,attenuation.y,attenuation.z));
     T average_probability=(T)((attenuation.x+attenuation.y+attenuation.z)/(T)3.0);

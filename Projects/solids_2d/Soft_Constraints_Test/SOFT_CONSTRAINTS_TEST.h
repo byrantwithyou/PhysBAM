@@ -77,11 +77,11 @@ void Get_Initial_Data()
     PARTICLES<TV>& curve_particles=segmented_curve.particles;
     segmented_curve.mesh.Initialize_Straight_Mesh(4);curve_particles.array_collection->Add_Elements(segmented_curve.mesh.number_nodes);
     curve_particles.Update_Velocity();curve_particles.Store_Mass();
-    for(int i=1;i<=4;i++) segmented_curve.particles.X(i)=VECTOR<T,2>(i,1); // TODO: remove
+    for(int i=0;i<4;i++) segmented_curve.particles.X(i)=VECTOR<T,2>(i,1); // TODO: remove
     deformable_object.Add_Structure(segmented_curve.Append_Particles_And_Create_Copy(deformable_object.particles));
 
     // correct number nodes
-    for(int i=1;i<=deformable_object.structures.m;i++) deformable_object.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_object.structures.m;i++) deformable_object.structures(i)->Update_Number_Nodes();
 
     // rigid bodies
     int index;
@@ -108,7 +108,7 @@ void Get_Initial_Data()
     solid_body_collection.deformable_body_collection.binding_list.Add_Binding(new RIGID_BODY_BINDING<TV>(deformable_object.particles,curve_offset+2,*solids_parameters.rigid_body_parameters.list(1),VECTOR<T,2>()));
     solid_body_collection.deformable_body_collection.binding_list.Add_Binding(new RIGID_BODY_BINDING<TV>(deformable_object.particles,curve_offset+3,*solids_parameters.rigid_body_parameters.list(2),VECTOR<T,2>()));
     solid_body_collection.deformable_body_collection.binding_list.Add_Binding(new LINEAR_BINDING<TV,3>(deformable_object.particles,curve_offset+4,triangulated_area.mesh.elements(1),VECTOR<T,3>(1,0,0)));
-    for(int i=1;i<=segmented_curve.mesh.number_nodes;i++){
+    for(int i=0;i<segmented_curve.mesh.number_nodes;i++){
         int p=curve_offset+i;
         deformable_object.particles.X(p)=solid_body_collection.deformable_body_collection.binding_list.Average_Target_Position(p);
         deformable_object.particles.V(p)=solid_body_collection.deformable_body_collection.binding_list.Average_Target_Velocity(p);
@@ -146,8 +146,8 @@ void Apply_Constraints(const T dt,const T time) PHYSBAM_OVERRIDE
 {
     DEFORMABLE_OBJECT<TV>& deformable_object=solid_body_collection.deformable_object;
     ARRAY<TV> F(deformable_object.particles.array_collection->Size());
-    for(int f=1;f<=deformable_object.particles_of_fragment.m;f++) solid_body_collection.deformable_object.Add_All_Forces(F,time,f);
-    for(int b=1;b<=solid_body_collection.deformable_body_collection.binding_list.bindings.m;b++){
+    for(int f=0;f<deformable_object.particles_of_fragment.m;f++) solid_body_collection.deformable_object.Add_All_Forces(F,time,f);
+    for(int b=0;b<solid_body_collection.deformable_body_collection.binding_list.bindings.m;b++){
         RIGID_BODY_BINDING<TV>* rigid_body_binding=dynamic_cast<RIGID_BODY_BINDING<TV>*>(solid_body_collection.deformable_body_collection.binding_list.bindings(b));
         if(rigid_body_binding) rigid_body_binding->Apply_Impulse_To_Parents_Based_On_Embedding(F(rigid_body_binding->particle_index)*dt);}
 }

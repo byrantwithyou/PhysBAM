@@ -112,7 +112,7 @@ void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
 {
-    for(int s=1;s<=tests.sources.m;s++)Adjust_Phi_With_Source(tests.sources(s),tests.world_to_source(s));
+    for(int s=0;s<tests.sources.m;s++)Adjust_Phi_With_Source(tests.sources(s),tests.world_to_source(s));
     return false;
 }
 //#####################################################################
@@ -121,14 +121,14 @@ bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
 void Get_Source_Reseed_Mask(ARRAY<bool,VECTOR<int,3> >*& cell_centered_mask,const T time) PHYSBAM_OVERRIDE
 {
     bool first=true;
-    for(int s=1;s<=tests.sources.m;s++){Get_Source_Reseed_Mask(tests.sources(s),tests.world_to_source(s),cell_centered_mask,first);first=false;}
+    for(int s=0;s<tests.sources.m;s++){Get_Source_Reseed_Mask(tests.sources(s),tests.world_to_source(s),cell_centered_mask,first);first=false;}
 }
 //#####################################################################
 // Function Get_Source_Velocities
 //#####################################################################
 void Get_Source_Velocities(const T time) PHYSBAM_OVERRIDE
 {
-    for(int s=1;s<=tests.sources.m;s++)Get_Source_Velocities(tests.sources(s),tests.world_to_source(s),tests.source_velocity(s));
+    for(int s=0;s<tests.sources.m;s++)Get_Source_Velocities(tests.sources(s),tests.world_to_source(s),tests.source_velocity(s));
 }
 //#####################################################################
 // Function Get_Variable_Viscosity

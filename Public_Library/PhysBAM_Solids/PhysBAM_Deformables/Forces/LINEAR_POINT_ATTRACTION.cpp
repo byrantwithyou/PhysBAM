@@ -30,7 +30,7 @@ template<class TV> void LINEAR_POINT_ATTRACTION<TV>::
 Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 {
     if(apply_explicit_forces)
-        for(int i=1;i<=referenced_particles.m;i++){int p=referenced_particles(i);
+        for(int i=0;i<referenced_particles.m;i++){int p=referenced_particles(i);
             F(p)+=coefficient*(point-surface.particles.X(p));}
 }
 //#####################################################################
@@ -47,7 +47,7 @@ template<class TV> void LINEAR_POINT_ATTRACTION<TV>::
 Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
 {
     if(apply_implicit_forces)
-        for(int i=1;i<=referenced_particles.m;i++){int p=referenced_particles(i);
+        for(int i=0;i<referenced_particles.m;i++){int p=referenced_particles(i);
             F(p)-=dt*coefficient*V(p);}
 }
 //#####################################################################
@@ -89,7 +89,7 @@ Add_Velocity_Dependent_Forces_First_Half(ARRAY_VIEW<const TV> V,ARRAY_VIEW<T> ag
 {
     T c=sqrt(dt*coefficient);
     if(apply_implicit_forces)
-        for(int i=1;i<=referenced_particles.m;i++){int p=referenced_particles(i);
+        for(int i=0;i<referenced_particles.m;i++){int p=referenced_particles(i);
             TV t=c*V(p);
             for(int a=1;a<=TV::m;a++) aggregate((i-1)*TV::m+a)=t(a);}
 }
@@ -101,7 +101,7 @@ Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T> aggregate,ARRAY_VI
 {
     T c=sqrt(dt*coefficient);
     if(apply_implicit_forces)
-        for(int i=1;i<=referenced_particles.m;i++){int p=referenced_particles(i);
+        for(int i=0;i<referenced_particles.m;i++){int p=referenced_particles(i);
             TV t;
             for(int a=1;a<=TV::m;a++) t(a)=aggregate((i-1)*TV::m+a);
             F(p)+=c*t;}
@@ -144,7 +144,7 @@ Potential_Energy(const T time) const
 {
     T pe=0;
     if(apply_explicit_forces)
-        for(int i=1;i<=referenced_particles.m;i++){int p=referenced_particles(i);
+        for(int i=0;i<referenced_particles.m;i++){int p=referenced_particles(i);
             pe+=coefficient/2*(surface.particles.X(p)-point).Magnitude_Squared();}
     return pe;
 }

@@ -157,14 +157,14 @@ virtual void Initialize_Bias_Stress_Constants(const EMBEDDED_TETRAHEDRALIZED_VOL
         //grain_boundaries->Fill_Node_Regions_With_Uniform_Vectors(number_of_regions);
         grain_boundaries->Fill_Regions_With_Uniform_Vectors(number_of_regions);
         grain_boundaries->Print_Number_In_Regions(number_of_regions);
-        for(int t=1;t<=rftv.fracture_bias_direction.m;t++)
+        for(int t=0;t<rftv.fracture_bias_direction.m;t++)
             std::cout << "rftv.fracture_bias_direction(" << t << ")=" << rftv.fracture_bias_direction(t) << std::endl;
 
         grain_boundaries->Smooth_Fracture_Bias_Directions(9);
         //grain_boundaries->Print_Number_In_Regions(number_of_regions);
 
         /*
-        for(int t=1;t<=rftv.fracture_bias_direction.m;t++){
+        for(int t=0;t<rftv.fracture_bias_direction.m;t++){
             if(grain_boundaries->Tetrahedron_Contains_Nodes_From_Different_Regions(t)){
                 rftv.fracture_bias_stress_scaling(t)=1000;}}
         */
@@ -175,18 +175,18 @@ virtual void Initialize_Bias_Stress_Constants(const EMBEDDED_TETRAHEDRALIZED_VOL
 //#####################################################################
 virtual void Set_External_Velocities(ARRAY<VECTOR_3D<T> ,VECTOR<int,1> >& V,const T time)
 {
-    for(int i=1;i<=constrained_nodes_set1.m;i++) V(constrained_nodes_set1(i))=VECTOR_3D<T>(0,0,arm_pull_velocity);
-    for(int i=1;i<=constrained_nodes_set2.m;i++) V(constrained_nodes_set2(i))=VECTOR_3D<T>(0,0,-arm_pull_velocity);
-    for(int i=1;i<=constrained_nodes_set3.m;i++) V(constrained_nodes_set3(i))=VECTOR_3D<T>(0,0,0);
+    for(int i=0;i<constrained_nodes_set1.m;i++) V(constrained_nodes_set1(i))=VECTOR_3D<T>(0,0,arm_pull_velocity);
+    for(int i=0;i<constrained_nodes_set2.m;i++) V(constrained_nodes_set2(i))=VECTOR_3D<T>(0,0,-arm_pull_velocity);
+    for(int i=0;i<constrained_nodes_set3.m;i++) V(constrained_nodes_set3(i))=VECTOR_3D<T>(0,0,0);
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes
 //#####################################################################
 virtual void Zero_Out_Enslaved_Velocity_Nodes(ARRAY<VECTOR_3D<T> ,VECTOR<int,1> >& V,const T time)
 {
-    for(int i=1;i<=constrained_nodes_set1.m;i++) V(constrained_nodes_set1(i))=VECTOR_3D<T>(0,0,0);
-    for(int i=1;i<=constrained_nodes_set2.m;i++) V(constrained_nodes_set2(i))=VECTOR_3D<T>(0,0,0);
-    for(int i=1;i<=constrained_nodes_set3.m;i++) V(constrained_nodes_set3(i)).y=(T)0;
+    for(int i=0;i<constrained_nodes_set1.m;i++) V(constrained_nodes_set1(i))=VECTOR_3D<T>(0,0,0);
+    for(int i=0;i<constrained_nodes_set2.m;i++) V(constrained_nodes_set2(i))=VECTOR_3D<T>(0,0,0);
+    for(int i=0;i<constrained_nodes_set3.m;i++) V(constrained_nodes_set3(i)).y=(T)0;
 } 
 };
 #endif

@@ -28,7 +28,7 @@ Parallel_Solve_Fluid_Part(FLUID_SYSTEM_MPI<TV>& fluid_system,KRYLOV_VECTOR_WRAPP
 
     ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array=fluid_system.A_array;
     // find an incomplete cholesky preconditioner - actually an LU that saves square roots, and an inverted diagonal to save on divides
-    for(int color=1;color<=A_array.m;color++){
+    for(int color=0;color<A_array.m;color++){
         SPARSE_MATRIX_FLAT_NXN<T>& A=A_array(color);
         if(incomplete_cholesky && (recompute_preconditioner || !A.C)){
             if(color<=partitions->m){
@@ -122,8 +122,8 @@ Fill_Ghost_Cells(KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& v_array)
         ARRAY<MPI::Datatype>& boundary_datatypes=boundary_datatypes_array(p);
         ARRAY<MPI::Datatype>& ghost_datatypes=ghost_datatypes_array(p);
         ARRAY<MPI::Request> requests;requests.Preallocate(2*partition.number_of_sides);
-        for(int s=1;s<=partition.number_of_sides;s++)if(boundary_datatypes(s)!=MPI::DATATYPE_NULL) requests.Append((*fluid_comm)(p).Isend(v.x-1,1,boundary_datatypes(s),partition.neighbor_ranks(s),s));
-        for(int s=1;s<=partition.number_of_sides;s++)if(ghost_datatypes(s)!=MPI::DATATYPE_NULL) requests.Append((*fluid_comm)(p).Irecv(v.x-1,1,ghost_datatypes(s),partition.neighbor_ranks(s),((s-1)^1)+1));
+        for(int s=0;s<partition.number_of_sides;s++)if(boundary_datatypes(s)!=MPI::DATATYPE_NULL) requests.Append((*fluid_comm)(p).Isend(v.x-1,1,boundary_datatypes(s),partition.neighbor_ranks(s),s));
+        for(int s=0;s<partition.number_of_sides;s++)if(ghost_datatypes(s)!=MPI::DATATYPE_NULL) requests.Append((*fluid_comm)(p).Irecv(v.x-1,1,ghost_datatypes(s),partition.neighbor_ranks(s),((s-1)^1)+1));
         MPI_UTILITIES::Wait_All(requests);}
 }
 //#####################################################################
@@ -140,7 +140,7 @@ Initialize_Datatypes()
         ARRAY<MPI::Datatype>& ghost_datatypes=ghost_datatypes_array(p);
         MPI_UTILITIES::Free_Elements_And_Clean_Memory(boundary_datatypes);MPI_UTILITIES::Free_Elements_And_Clean_Memory(ghost_datatypes);
         boundary_datatypes.Resize(partition.number_of_sides);ghost_datatypes.Resize(partition.number_of_sides);
-        for(int s=1;s<=partition.number_of_sides;s++) if(partition.neighbor_ranks(s)!=MPI::PROC_NULL){
+        for(int s=0;s<partition.number_of_sides;s++) if(partition.neighbor_ranks(s)!=MPI::PROC_NULL){
             if(partition.boundary_indices(s).m){
                 ARRAY<int>& displacements=partition.boundary_indices(s);
                 ARRAY<int> block_lengths(displacements.m,false);block_lengths.Fill(1);

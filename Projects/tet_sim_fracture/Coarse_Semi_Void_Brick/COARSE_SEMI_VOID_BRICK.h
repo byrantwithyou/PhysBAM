@@ -112,7 +112,7 @@ virtual void Initialize_Embedded_Tetrahedralized_Volume(EMBEDDED_TETRAHEDRALIZED
     embedded_tetrahedralized_volume.tetrahedralized_volume.tetrahedron_mesh.Initialize_Incident_Tetrahedrons();
     embedded_tetrahedralized_volume.tetrahedralized_volume.Update_Bounding_Box();
     VECTOR_3D<T> center(embedded_tetrahedralized_volume.tetrahedralized_volume.bounding_box->Center());T bottom=embedded_tetrahedralized_volume.tetrahedralized_volume.bounding_box->ymin;
-    for(int i=1;i<=embedded_tetrahedralized_volume.tetrahedralized_volume.particles.array_size;i++){
+    for(int i=0;i<embedded_tetrahedralized_volume.tetrahedralized_volume.particles.array_size;i++){
         embedded_tetrahedralized_volume.tetrahedralized_volume.particles.V(i)=initial_velocity+VECTOR_3D<T>::Cross_Product(initial_angular_velocity,embedded_tetrahedralized_volume.tetrahedralized_volume.particles.X(i)-center);
         embedded_tetrahedralized_volume.tetrahedralized_volume.particles.X(i)=center+initial_orientation.Rotate(embedded_tetrahedralized_volume.tetrahedralized_volume.particles.X(i)-center);
         embedded_tetrahedralized_volume.tetrahedralized_volume.particles.X(i).y+=initial_height-bottom;}
@@ -182,7 +182,7 @@ void Calculate_Orientation_Index_Baed_On_Embedded_Triangles(FRACTURE_TETRAHEDRAL
 {
     ARRAY<int>::copy(1,reference_orientation_index);
     reference_orientation_index.Resize(1,rftv.embedded_tetrahedralized_volume.tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.m);
-    for(int t=1;t<=rftv.embedded_tetrahedralized_volume.tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.m;t++){
+    for(int t=0;t<rftv.embedded_tetrahedralized_volume.tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.m;t++){
         int emb_tri1,emb_tri2,emb_tri3,emb_tri4,emb_tri_count;
         emb_tri_count=rftv.embedded_tetrahedralized_volume.Embedded_Triangles_In_Tetrahedron(t,emb_tri1,emb_tri2,emb_tri3,emb_tri4);
         int i,j,k,l;rftv.embedded_tetrahedralized_volume.tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.Get(t,i,j,k,l);
@@ -207,14 +207,14 @@ void Calculate_Orientation_Index_Baed_On_Embedded_Triangles(FRACTURE_TETRAHEDRAL
 //#####################################################################
 virtual void Set_External_Velocities(ARRAY<VECTOR_3D<T> ,VECTOR<int,1> >& V,const T time)
 {
-    for(int i=1;i<=constrained_nodes.m;i++) V(constrained_nodes(i))=VECTOR_3D<T>(0,0,0);
+    for(int i=0;i<constrained_nodes.m;i++) V(constrained_nodes(i))=VECTOR_3D<T>(0,0,0);
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes
 //#####################################################################
 virtual void Zero_Out_Enslaved_Velocity_Nodes(ARRAY<VECTOR_3D<T> ,VECTOR<int,1> >& V,const T time)
 {
-    for(int i=1;i<=constrained_nodes.m;i++) V(constrained_nodes(i))=VECTOR_3D<T>(0,0,0);
+    for(int i=0;i<constrained_nodes.m;i++) V(constrained_nodes(i))=VECTOR_3D<T>(0,0,0);
 } 
 //#####################################################################
 // Function Initialize_Bias_Stress_Constants

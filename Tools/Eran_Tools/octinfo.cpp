@@ -14,7 +14,7 @@ template<class T> void Print_Info(const std::string &filename,PARSE_ARGS &parse_
     OCTREE_GRID<T> octree_grid;
     FILE_UTILITIES::Read_From_File<T>(filename,octree_grid);
 
-    for(int i=1;i<=octree_grid.number_of_nodes;i++)
+    for(int i=0;i<octree_grid.number_of_nodes;i++)
         std::cout << "Node " << i << ": " << octree_grid.Node_Locations()(i) << std::endl;
 }
 

@@ -159,7 +159,7 @@ Initialize_Topologically_Sorted_Neighbor_Nodes()
 {
     delete topologically_sorted_neighbor_nodes;
     ARRAY<ARRAY<int> > neighbors(number_nodes),neighbor_links(number_nodes);
-    for(int t=1;t<=elements.m;t++){
+    for(int t=0;t<elements.m;t++){
         int i,j,k;elements(t).Get(i,j,k);
         Add_Ordered_Neighbors(neighbors(i),neighbor_links(i),j,k);
         Add_Ordered_Neighbors(neighbors(j),neighbor_links(j),k,i);
@@ -217,7 +217,7 @@ Initialize_Element_Edges()
     delete element_edges;element_edges=new ARRAY<VECTOR<int,3> >(elements.m);
     if(!segment_mesh) Initialize_Segment_Mesh(); // edges only makes sense when referring to a segment mesh
     bool incident_segments_defined=segment_mesh->incident_elements!=0;if(!incident_segments_defined) segment_mesh->Initialize_Incident_Elements();
-    for(int t=1;t<=elements.m;t++){
+    for(int t=0;t<elements.m;t++){
         int i,j,k;elements(t).Get(i,j,k);
         (*element_edges)(t).Set(segment_mesh->Segment(i,j),segment_mesh->Segment(j,k),segment_mesh->Segment(k,i));}
     if(!incident_segments_defined){delete segment_mesh->incident_elements;segment_mesh->incident_elements=0;}
@@ -232,7 +232,7 @@ Initialize_Edge_Triangles()
     if(!segment_mesh) Initialize_Segment_Mesh(); // edges only makes sense when referring to a segment mesh
     edge_triangles=new ARRAY<ARRAY<int> >(segment_mesh->elements.m);
     bool triangle_edges_defined=(element_edges!=0);if(!triangle_edges_defined) Initialize_Element_Edges();
-    for(int t=1;t<=elements.m;t++){
+    for(int t=0;t<elements.m;t++){
         int e1,e2,e3;(*element_edges)(t).Get(e1,e2,e3);
         (*edge_triangles)(e1).Append(t);(*edge_triangles)(e2).Append(t);(*edge_triangles)(e3).Append(t);}
     if(!triangle_edges_defined){delete element_edges;element_edges=0;}
@@ -405,10 +405,10 @@ Make_Orientations_Consistent()
 {
     bool adjacent_elements_defined=adjacent_elements!=0;if(!adjacent_elements_defined)Initialize_Adjacent_Elements();
     ARRAY<int> orientation(elements.m),component(1000);
-    for(int c=1;c<=elements.m;c++)if(!orientation(c)){
+    for(int c=0;c<elements.m;c++)if(!orientation(c)){
         int positive=0,negative=0;
         component.Remove_All();component.Append(c);orientation(c)=1;
-        for(int a=1;a<=component.m;a++){
+        for(int a=0;a<component.m;a++){
             int t=component(a),i,j,k;elements(t).Get(i,j,k);
             if(orientation(c)>0)positive++;else negative++;
             for(int b=1;b<=(*adjacent_elements)(t).m;b++){
@@ -417,7 +417,7 @@ Make_Orientations_Consistent()
                 if(i!=i2)cyclic_shift(i2,j2,k2);if(i!=i2)cyclic_shift(i2,j2,k2);
                 component.Append(t2);orientation(t2)=(j==k2||k==j2)?orientation(t):-orientation(t);}}
         int correct=positive>negative?1:-1;
-        for(int a=1;a<=component.m;a++)if(orientation(component(a))!=correct)
+        for(int a=0;a<component.m;a++)if(orientation(component(a))!=correct)
             exchange(elements(component(a))(2),elements(component(a))(3));}
     if(!adjacent_elements_defined){delete adjacent_elements;adjacent_elements=0;}
 }
@@ -428,7 +428,7 @@ bool TRIANGLE_MESH::
 Orientations_Consistent()
 {
     bool adjacent_elements_defined=adjacent_elements!=0;if(!adjacent_elements_defined)Initialize_Adjacent_Elements();
-    for(int t=1;t<=elements.m;t++){
+    for(int t=0;t<elements.m;t++){
         int i,j,k;elements(t).Get(i,j,k);
         for(int a=1;a<=(*adjacent_elements)(t).m;a++){
             int t2=(*adjacent_elements)(t)(a);if(t2<t)continue;
@@ -446,7 +446,7 @@ Identify_Connected_Components(ARRAY<int>& label)
 {
     bool adjacent_elements_defined=adjacent_elements!=0;if(!adjacent_elements_defined)Initialize_Adjacent_Elements();
     label.Resize(elements.m);label.Fill(0);
-    int id=0;for(int i=1;i<=label.m;i++) if(!label(i)) Label_Connected_Component_With_ID(label,i,++id);
+    int id=0;for(int i=0;i<label.m;i++) if(!label(i)) Label_Connected_Component_With_ID(label,i,++id);
     if(!adjacent_elements_defined){delete adjacent_elements;adjacent_elements=0;}
 }
 //#####################################################################

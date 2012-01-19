@@ -118,7 +118,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             if(j%2) tests.Make_Lathe_Chain(FRAME<TV>(TV((T)i*10,up_shift+j*10,k*4+rand))/*,"chains1"*/); // random x
             else tests.Make_Lathe_Chain(FRAME<TV>(TV(i*4+rand,up_shift+j*10,(T)k*10),ROTATION<TV>((T)pi/2,TV(0,1,0)))/*,"chains2"*/);} // random y
         // poles
-        for(int i=1;i<=num_poles;i++) for(int j=1;j<=num_poles;j++){
+        for(int i=0;i<num_poles;i++) for(int j=0;j<num_poles;j++){
             RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("Rings_Test/medium_cylinder",1,(T).6);
             rigid_body.is_static=true;
             rigid_body.Set_Name(STRING_UTILITIES::string_sprintf("pole %d %d",i,j));

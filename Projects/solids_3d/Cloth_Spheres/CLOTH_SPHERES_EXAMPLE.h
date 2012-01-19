@@ -91,14 +91,14 @@ virtual void Get_Initial_Data()
         EMBEDDING<TV>& embedding=*new EMBEDDING<TV>(particles);
         int particle_offset=particles.array_collection->Size();
         particles.array_collection->Add_Elements(number_of_master_particles);
-        for(int p=1;p<=number_of_master_particles;p++) particles.array_collection->Copy_Element(*particles.array_collection,p,p+particle_offset);
+        for(int p=0;p<number_of_master_particles;p++) particles.array_collection->Copy_Element(*particles.array_collection,p,p+particle_offset);
         embedding.material_surface_mesh.Initialize_Mesh_With_Particle_Offset(master_triangulated_surface.mesh,particle_offset);
-        if(i==3) for(int t=1;t<=embedding.material_surface_mesh.elements.m;t++){ // invert 2nd side of drifted surface
+        if(i==3) for(int t=0;t<embedding.material_surface_mesh.elements.m;t++){ // invert 2nd side of drifted surface
             VECTOR<int,3>& element=embedding.material_surface_mesh.elements(t);element=VECTOR<int,3>(element.y,element.x,element.z);}
         deformable_body_collection.deformable_geometry.Add_Structure(&embedding);
     }
 
-    for(int i=1;i<=2;i++){
+    for(int i=0;i<2;i++){
         RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("sphere",sphere_scale,(T).1);
         rigid_body.X()=TV::Axis_Vector(2)*(T)(2*i-3)*sphere_x_position;
         rigid_body.Is_Kinematic()=true;}
@@ -106,7 +106,7 @@ virtual void Get_Initial_Data()
     LOG::cout<<"deformable_body_collection.deformable_geometry.structures.m="<<deformable_body_collection.deformable_geometry.structures.m<<std::endl;
 
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     // add structures and rigid bodies to collisions
     deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
@@ -145,7 +145,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     solid_body_collection.Add_Force(Create_Altitude_Springs(master_triangulated_surface,(T)1e2,(T)2));
     solid_body_collection.Add_Force(Create_Bending_Elements(master_triangulated_surface,(T)3e-3));
 
-    for(int i=1;i<=number_of_master_particles;i++){
+    for(int i=0;i<number_of_master_particles;i++){
         soft_bindings.Add_Binding(VECTOR<int,2>(number_of_master_particles+i,i),false);
         soft_bindings.Add_Binding(VECTOR<int,2>(2*number_of_master_particles+i,i),false);}
     soft_bindings.Initialize_Binding_Mesh();
@@ -193,7 +193,7 @@ void Postprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE
 
     BINDING_SPRINGS<TV>& binding_springs=solid_body_collection.template Find_Force<BINDING_SPRINGS<TV>&>();
     binding_stiffness.Resize(soft_bindings.bindings.m);
-    for(int b=1;b<=soft_bindings.bindings.m;b++){
+    for(int b=0;b<soft_bindings.bindings.m;b++){
         TV& X1=particles.X(soft_bindings.bindings(b)(1));
         TV& X2=particles.X(soft_bindings.bindings(b)(2));
         T distance=(X1-X2).Magnitude();

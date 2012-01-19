@@ -175,16 +175,16 @@ void Initialize_Euler_State() PHYSBAM_OVERRIDE
     //initialize grid variables
     //1 == density, 2 == momentum, 3 == total energy
     if(test_number==1)
-        for(int i=1;i<=grid.counts.x;i++) {
+        for(int i=0;i<grid.counts.x;i++) {
             T rho=(T)0.,u=(T)0.,p=(T)0.;
             if(grid.Axis_X(i,1)<0) {rho=(T)1.;p=(T)1.;} else {rho=(T).125;p=(T).1;}
             U(i)(1)=rho; U(i)(2)=rho*u; U(i)(3)=rho*(tmp_eos->e_From_p_And_rho(p,rho)+sqr(u)/(T)2.);}
     else if(test_number==2 || test_number==3)
-        for(int i=1;i<=grid.counts.x;i++){
+        for(int i=0;i<grid.counts.x;i++){
             U(i)(1)=rho_initial;U(i)(2)=rho_initial*u_initial;U(i)(3)=rho_initial*(tmp_eos->e_From_T_And_rho(T_initial,rho_initial)+sqr(u_initial)/(T)2.);}
     else if(test_number==4){
         rho_initial=1;u_initial=3;p_initial=(T)1.;
-        for(int i=1;i<=grid.counts.x;i++){
+        for(int i=0;i<grid.counts.x;i++){
             TV_INT piston_face_index=grid.Cell(TV(piston_initial_position),0);
             if(i >=piston_face_index[1]) {rho_initial=(T)1.;p_initial=(T)1.;u_initial=(T)3.0;} else {rho_initial=(T)1.;p_initial=1.;u_initial=-(T)3.0;}
             U(i)(1)=rho_initial;U(i)(2)=rho_initial*u_initial;U(i)(3)=rho_initial*(tmp_eos->e_From_p_And_rho(p_initial,rho_initial)+sqr(u_initial)/(T)2.);}}

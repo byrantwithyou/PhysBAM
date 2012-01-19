@@ -58,7 +58,7 @@ public:
     {ARRAY<T>::Copy(youngs_modulus_input,youngs_modulus);Invalidate_CFL();}
 
     void Clamp_Restlength(const T clamped_restlength)
-    {for(int i=1;i<=restlength.m;i++) restlength(i)=max(visual_restlength(i),clamped_restlength);}
+    {for(int i=0;i<restlength.m;i++) restlength(i)=max(visual_restlength(i),clamped_restlength);}
 
     void Set_Damping(const T damping_input)
     {damping.Fill(damping_input);Invalidate_CFL();}

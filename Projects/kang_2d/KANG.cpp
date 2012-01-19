@@ -344,7 +344,7 @@ Initialize_Bodies()
     use_pls_evolution_for_structure=false;//use_massless_structure;
 
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents();
@@ -352,10 +352,10 @@ Initialize_Bodies()
     particles.Compute_Auxiliary_Attributes(solid_body_collection.deformable_body_collection.soft_bindings);
     solid_body_collection.deformable_body_collection.soft_bindings.Set_Mass_From_Effective_Mass();
 
-    for(int i=1;i<=solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->compute_half_forces=true;
-    for(int k=1;k<=solid_body_collection.deformable_body_collection.deformables_forces.m;k++)
+    for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->compute_half_forces=true;
+    for(int k=0;k<solid_body_collection.deformable_body_collection.deformables_forces.m;k++)
         solid_body_collection.deformable_body_collection.deformables_forces(k)->compute_half_forces=true;
-    for(int i=1;i<=solid_body_collection.rigid_body_collection.rigids_forces.m;i++) solid_body_collection.rigid_body_collection.rigids_forces(i)->compute_half_forces=true;
+    for(int i=0;i<solid_body_collection.rigid_body_collection.rigids_forces.m;i++) solid_body_collection.rigid_body_collection.rigids_forces(i)->compute_half_forces=true;
 }
 //#####################################################################
 // Function Kang_Circle
@@ -739,7 +739,7 @@ Set_Boundary_Conditions_Callback(ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX
                 psi_N_value(it.Full_Index())=it.Axis()==1?2*x.x:-2*x.y;}
             break;
         case 5:
-            for(int s=1;s<=2;s++)
+            for(int s=0;s<2;s++)
                 for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,1,GRID<TV>::GHOST_REGION,s);it.Valid();it.Next()){
                     Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));
                     psi_N(it.Full_Index())=true;

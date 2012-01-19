@@ -117,12 +117,12 @@ Initialize_Bodies()
     body.Initialize_Hierarchy();
     for(int p=1;p<=surface_original.particles.array_collection->Size();p++){
         tets.Remove_All();body.hierarchy->Intersection_List(surface_original.particles.X(p),tets,1e-4);bool got_bind=false;
-        for(int tt=1;tt<=tets.m;tt++){int t=tets(tt);
+        for(int tt=0;tt<tets.m;tt++){int t=tets(tt);
             TV bary=TETRAHEDRON<T>::First_Three_Barycentric_Coordinates(surface_original.particles.X(p),body.particles.X.Subset(body.mesh.elements(t)));
             if(bary.x>-tolerance && bary.y>-tolerance && bary.z>-tolerance && bary.x+bary.y+bary.z<(T)1+tolerance){bindings.Append(PAIR<int,TV>(t,bary));got_bind=true;break;}}
         if(!got_bind){LOG::cout<<"no binding on particle "<<p<<std::endl;bindings.Append(PAIR<int,TV>(0,TV(0,0,0)));}}
 
-    /*for(int i=1;i<=bindings.m;i++){int p=offset+i;
+    /*for(int i=0;i<bindings.m;i++){int p=offset+i;
         VECTOR<int,4> nodes=body.mesh.elements(bindings(i).x);
         binding_list.Add_Binding(new LINEAR_BINDING<TV,4>(particles,p,nodes,bindings(i).y));}*/
     particles.Store_Velocity();
@@ -152,9 +152,9 @@ Initialize_Bodies()
 template<class T_input> void MOCAP_FLESH<T_input>::
 Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time)
 {
-    for(int joint=1;joint<=attachments.m;joint++){
+    for(int joint=0;joint<attachments.m;joint++){
         const ARRAY<PAIR<int,TV> >& joint_attachment=attachments(joint);
-        for(int i=1;i<=joint_attachment.m;i++) V(joint_attachment(i).x)=TV();}
+        for(int i=0;i<joint_attachment.m;i++) V(joint_attachment(i).x)=TV();}
 }
 //#####################################################################
 // Function Set_External_Velocities
@@ -164,9 +164,9 @@ Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_p
 {
     T frame_float=(velocity_time*frame_rate+1);
     int frame_lower=(int)frame_float;
-    for(int joint=1;joint<=attachments.m;joint++){
+    for(int joint=0;joint<attachments.m;joint++){
         const ARRAY<PAIR<int,TV> >& joint_attachment=attachments(joint);
-        for(int i=1;i<=joint_attachment.m;i++){
+        for(int i=0;i<joint_attachment.m;i++){
             int p=joint_attachment(i).x;
             const TV& joint_relative_position=joint_attachment(i).y;
             V(p)=one_over_frame_rate*(body_motion.trajectories(joint)(frame_lower+1).targeted_transform*joint_relative_position-body_motion.trajectories(joint)(frame_lower).targeted_transform*joint_relative_position);}}   
@@ -177,9 +177,9 @@ Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_p
 template<class T_input> void MOCAP_FLESH<T_input>::
 Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time)
 {
-    for(int joint=1;joint<=attachments.m;joint++){
+    for(int joint=0;joint<attachments.m;joint++){
         const ARRAY<PAIR<int,TV> >& joint_attachment=attachments(joint);
-        for(int i=1;i<=joint_attachment.m;i++) X(joint_attachment(i).x)=TV();}
+        for(int i=0;i<joint_attachment.m;i++) X(joint_attachment(i).x)=TV();}
 }
 //#####################################################################
 // Function Set_External_Positions
@@ -190,9 +190,9 @@ Set_External_Positions(ARRAY_VIEW<TV> X,const T time)
     T frame_float=(time*frame_rate+1);
     int frame_lower=(int)frame_float;
     T alpha=frame_float-(T)frame_lower;
-    for(int joint=1;joint<=attachments.m;joint++){
+    for(int joint=0;joint<attachments.m;joint++){
         const ARRAY<PAIR<int,TV> >& joint_attachment=attachments(joint);
-        for(int i=1;i<=joint_attachment.m;i++){
+        for(int i=0;i<joint_attachment.m;i++){
             int p=joint_attachment(i).x;
             const TV& joint_relative_position=joint_attachment(i).y;
             X(p)=alpha*(body_motion.trajectories(joint)(frame_lower+1).targeted_transform*joint_relative_position)+(1-alpha)*(body_motion.trajectories(joint)(frame_lower).targeted_transform*joint_relative_position);}}   

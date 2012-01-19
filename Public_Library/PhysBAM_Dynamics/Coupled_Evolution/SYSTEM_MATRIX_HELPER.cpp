@@ -66,9 +66,9 @@ Set_Matrix(int m,int n,SPARSE_MATRIX_FLAT_MXN<T>& M) const
     M.m=m;
     M.A.Remove_All();
     M.offsets.Resize(m+1);
-    for(int i=1;i<=data.m;i++) M.offsets(data(i).x+1)++;
+    for(int i=0;i<data.m;i++) M.offsets(data(i).x+1)++;
     for(int i=1;i<M.offsets.m;i++) M.offsets(i+1)+=M.offsets(i);
-    for(int i=1;i<=data.m;i++) M.A.Append(SPARSE_MATRIX_ENTRY<T>(data(i).y,data(i).z));
+    for(int i=0;i<data.m;i++) M.A.Append(SPARSE_MATRIX_ENTRY<T>(data(i).y,data(i).z));
 }
 //#####################################################################
 // Function Set_Matrix
@@ -80,9 +80,9 @@ Set_Matrix(int n,SPARSE_MATRIX_FLAT_NXN<T>& M) const
     M.n=n;
     M.A.Remove_All();
     M.offsets.Resize(n+1);
-    for(int i=1;i<=data.m;i++) M.offsets(data(i).x+1)++;
+    for(int i=0;i<data.m;i++) M.offsets(data(i).x+1)++;
     for(int i=1;i<M.offsets.m;i++) M.offsets(i+1)+=M.offsets(i);
-    for(int i=1;i<=data.m;i++) M.A.Append(SPARSE_MATRIX_ENTRY<T>(data(i).y,data(i).z));
+    for(int i=0;i<data.m;i++) M.A.Append(SPARSE_MATRIX_ENTRY<T>(data(i).y,data(i).z));
 }
 //#####################################################################
 // Function Add
@@ -91,7 +91,7 @@ template<class T> void SYSTEM_MATRIX_HELPER<T>::
 Add_Matrix(const SPARSE_MATRIX_FLAT_MXN<T>& M,bool trans,int dr,int dc)
 {
     New_Block();
-    for(int i=1;i<=M.m;i++){
+    for(int i=0;i<M.m;i++){
         int s=M.offsets(i),e=M.offsets(i+1);
         for(int j=s;j<e;j++)
             data.Append(TRIPLE<int,int,T>(i,M.A(j).j,M.A(j).a));}

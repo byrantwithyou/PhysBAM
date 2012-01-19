@@ -32,7 +32,7 @@ int main(int argc,char *argv[])
   found:
     cout<<m<<" "<<n<<endl;
     ARRAYS<VECTOR<VECTOR_3D<float> ,2> > image(1,m,1,n);
-    for(int i=1;i<=m;i++)for(int j=1;j<=n;j++) image(i,j)=colors((j-1)*m+i);
+    for(int i=0;i<m;i++)for(int j=0;j<n;j++) image(i,j)=colors((j-1)*m+i);
     
     cout<<"Writing file..."<<endl;
     IMAGE<float>::Write("vertex_colors.bmp",image);

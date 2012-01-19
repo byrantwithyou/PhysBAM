@@ -44,7 +44,7 @@ Run_Parallel(const int number_of_partitions)
     u_dot_b_partial_results=new double[number_of_partitions];
  
     int number_of_x_blocks=x_size/x_block_size;
-    for(int partition=1;partition<=number_of_partitions;partition++){
+    for(int partition=0;partition<number_of_partitions;partition++){
         int first_block_of_partition=(number_of_x_blocks/number_of_partitions)*(partition-1)+std::min(number_of_x_blocks%number_of_partitions,partition-1)+1;
         int last_block_of_partition=(number_of_x_blocks/number_of_partitions)*partition+std::min(number_of_x_blocks%number_of_partitions,partition);
         int xmin=(first_block_of_partition-1)*x_block_size+1;
@@ -55,7 +55,7 @@ Run_Parallel(const int number_of_partitions)
     pthread_queue->Wait();
 
     int number_of_coarse_x_blocks=coarse_x_size/x_block_size;
-    for(int partition=1;partition<=number_of_partitions;partition++){
+    for(int partition=0;partition<number_of_partitions;partition++){
         int first_block_of_partition=(number_of_coarse_x_blocks/number_of_partitions)*(partition-1)+std::min(number_of_coarse_x_blocks%number_of_partitions,partition-1)+1;
         int last_block_of_partition=(number_of_coarse_x_blocks/number_of_partitions)*partition+std::min(number_of_coarse_x_blocks%number_of_partitions,partition);
         int xmin=(first_block_of_partition-1)*x_block_size+1;

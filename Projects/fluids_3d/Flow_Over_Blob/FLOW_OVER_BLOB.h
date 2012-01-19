@@ -74,7 +74,7 @@ void Construct_Levelsets_For_Objects(const T time)
 //#####################################################################
 void Initialize_Phi()
 {
-    for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++) for(int ij=1;ij<=grid.mn;ij++) phi(i,j,ij)=grid.dx;
+    for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++) for(int ij=0;ij<grid.mn;ij++) phi(i,j,ij)=grid.dx;
 }
 //#####################################################################
 // Function Extrapolate_Phi_Into_Objects
@@ -98,7 +98,7 @@ void Adjust_Phi_With_Objects(const T time)
 void Adjust_Phi_With_Sources(const T time)
 {
     if(!use_cylinder_source) return;
-    for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++) for(int ij=1;ij<=grid.mn;ij++){
+    for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++) for(int ij=0;ij<grid.mn;ij++){
         VECTOR<T,3> X(grid.X(i,j,ij));
         if(cylinder.Lazy_Inside(X)) phi(i,j,ij)=min(phi(i,j,ij),cylinder.Signed_Distance(X));}
 }
@@ -112,7 +112,7 @@ void Get_Source_Reseed_Mask(ARRAY<bool,VECTOR<int,3> >*& cell_centered_mask,cons
 
     T padding=3*grid.dx;
     RENDERING_CYLINDER<T> cylinder_mask=cylinder;cylinder_mask.cylinder.radius+=padding;cylinder_mask.cylinder.Set_Height(cylinder.cylinder.height+2*padding);
-    for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++) for(int ij=1;ij<=grid.mn;ij++) if(cylinder_mask.Lazy_Inside(grid.X(i,j,ij))) (*cell_centered_mask)(i,j,ij)=true;
+    for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++) for(int ij=0;ij<grid.mn;ij++) if(cylinder_mask.Lazy_Inside(grid.X(i,j,ij))) (*cell_centered_mask)(i,j,ij)=true;
 }
 //#####################################################################
 // Function Adjust_Particle_For_Objects
@@ -137,7 +137,7 @@ void Delete_Particles_Inside_Objects(PARTICLE_LEVELSET_PARTICLES<T,VECTOR<T,3> >
 //#####################################################################
 void Get_Variable_Viscosity(ARRAY<T,VECTOR<int,3> >& variable_viscosity,const T time)
 {
-    for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++) for(int ij=1;ij<=grid.mn;ij++) 
+    for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++) for(int ij=0;ij<grid.mn;ij++) 
         if(grid.x(i) > .5) variable_viscosity(i,j,ij)=1e6*.001137;
         else variable_viscosity(i,j,ij)=(T)(1e6*.001137*1e-6);
 }
@@ -148,9 +148,9 @@ void Get_Source_Velocities(const T time)
 {
     if(!use_cylinder_source) return;
     VECTOR<T,3> V_source(0,source_speed,0);
-    for(int i=1;i<=u_grid.m;i++) for(int j=1;j<=u_grid.n;j++) for(int ij=1;ij<=u_grid.mn;ij++) if(cylinder.Lazy_Inside(u_grid.X(i,j,ij))){psi_N_u(i,j,ij)=true;u_fixed(i,j,ij)=V_source.x;}
-    for(int i=1;i<=v_grid.m;i++) for(int j=1;j<=v_grid.n;j++) for(int ij=1;ij<=v_grid.mn;ij++) if(cylinder.Lazy_Inside(v_grid.X(i,j,ij))){psi_N_v(i,j,ij)=true;v_fixed(i,j,ij)=V_source.y;}
-    for(int i=1;i<=w_grid.m;i++) for(int j=1;j<=w_grid.n;j++) for(int ij=1;ij<=w_grid.mn;ij++) if(cylinder.Lazy_Inside(w_grid.X(i,j,ij))){psi_N_w(i,j,ij)=true;w_fixed(i,j,ij)=V_source.z;}
+    for(int i=0;i<u_grid.m;i++) for(int j=0;j<u_grid.n;j++) for(int ij=0;ij<u_grid.mn;ij++) if(cylinder.Lazy_Inside(u_grid.X(i,j,ij))){psi_N_u(i,j,ij)=true;u_fixed(i,j,ij)=V_source.x;}
+    for(int i=0;i<v_grid.m;i++) for(int j=0;j<v_grid.n;j++) for(int ij=0;ij<v_grid.mn;ij++) if(cylinder.Lazy_Inside(v_grid.X(i,j,ij))){psi_N_v(i,j,ij)=true;v_fixed(i,j,ij)=V_source.y;}
+    for(int i=0;i<w_grid.m;i++) for(int j=0;j<w_grid.n;j++) for(int ij=0;ij<w_grid.mn;ij++) if(cylinder.Lazy_Inside(w_grid.X(i,j,ij))){psi_N_w(i,j,ij)=true;w_fixed(i,j,ij)=V_source.z;}
 }
 //#####################################################################
 // Function Get_Object_Velocities

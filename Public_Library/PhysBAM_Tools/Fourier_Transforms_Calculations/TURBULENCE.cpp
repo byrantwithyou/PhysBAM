@@ -41,7 +41,7 @@ Generate_Random_Turbulence(const GRID<VECTOR<T,2> >& grid,ARRAY<T,VECTOR<int,2> 
     // rescale the final velocity
     if(rescaled_average_velocity){
         T average_velocity=0;
-        for(int i=1;i<=grid.counts.x;i++) for(int j=1;j<=grid.counts.y;j++) average_velocity+=sqrt(sqr(u(i,j))+sqr(v(i,j)));
+        for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) average_velocity+=sqrt(sqr(u(i,j))+sqr(v(i,j)));
         average_velocity/=(grid.counts.x*grid.counts.y);
         T scaling=rescaled_average_velocity/average_velocity;
         u*=scaling;v*=scaling;}
@@ -79,7 +79,7 @@ Generate_Random_Turbulence(const GRID<VECTOR<T,3> >& grid,ARRAY<T,VECTOR<int,3> 
     // rescale the final velocity
     if(rescaled_average_velocity){
         T average_velocity=0;
-        for(int i=1;i<=grid.counts.x;i++) for(int j=1;j<=grid.counts.y;j++) for(int ij=1;ij<=grid.counts.z;ij++)
+        for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int ij=0;ij<grid.counts.z;ij++)
             average_velocity+=sqrt(sqr(u(i,j,ij))+sqr(v(i,j,ij))+sqr(w(i,j,ij)));
         average_velocity/=(grid.counts.x*grid.counts.y*grid.counts.z);
         T scaling=rescaled_average_velocity/average_velocity;

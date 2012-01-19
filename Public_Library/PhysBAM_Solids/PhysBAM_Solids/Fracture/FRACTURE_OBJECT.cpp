@@ -126,8 +126,8 @@ Fracture_Where_High_Stress(ARRAY<T_SYMMETRIC_MATRIX>& sigma,ARRAY<TV>& spatial_f
     LOG::cout<<"smoothing sigma. Smoothing passes: "<<number_of_smoothing_passes<<std::endl;
     if(number_of_smoothing_passes){
         ARRAY<T> size(embedded_object.simplicial_object.mesh.elements.m);
-        for(int t=1;t<=embedded_object.simplicial_object.mesh.elements.m;t++) size(t)=embedded_object.simplicial_object.Element_Size(t);
-        for(int pass=0;pass<number_of_smoothing_passes;pass++) for(int t=1;t<=embedded_object.simplicial_object.mesh.elements.m;t++){
+        for(int t=0;t<embedded_object.simplicial_object.mesh.elements.m;t++) size(t)=embedded_object.simplicial_object.Element_Size(t);
+        for(int pass=0;pass<number_of_smoothing_passes;pass++) for(int t=0;t<embedded_object.simplicial_object.mesh.elements.m;t++){
             T total_size=size(t);
             sigma(t)*=size(t);
             for(int a=1;a<=(*embedded_object.simplicial_object.mesh.adjacent_elements)(t).m;a++){
@@ -138,7 +138,7 @@ Fracture_Where_High_Stress(ARRAY<T_SYMMETRIC_MATRIX>& sigma,ARRAY<TV>& spatial_f
     // bias stress
     LOG::cout<<"biasing stress: "<<bias_stress<<std::endl;
     ARRAY<TV> propagation_direction(embedded_object.simplicial_object.mesh.elements.m);
-    if(bias_stress) for(int t=1;t<=embedded_object.simplicial_object.mesh.elements.m;t++){
+    if(bias_stress) for(int t=0;t<embedded_object.simplicial_object.mesh.elements.m;t++){
         int ref_t=corresponding_simplex_in_reference(t);
         if(embedded_object.Number_Of_Embedded_Cuts(t)!=0)continue;
         if(fracture_bias_stress_scaling(ref_t)!=1) sigma(t)*=fracture_bias_stress_scaling(ref_t);
@@ -160,7 +160,7 @@ Fracture_Where_High_Stress(ARRAY<T_SYMMETRIC_MATRIX>& sigma,ARRAY<TV>& spatial_f
 
     // make cuts
     assert(max_number_of_cuts<=d);int count=0;
-    for(int t=1;t<=embedded_object.simplicial_object.mesh.elements.m;t++){
+    for(int t=0;t<embedded_object.simplicial_object.mesh.elements.m;t++){
         T_DIAGONAL_MATRIX eigenvalues=sigma(t).Fast_Eigenvalues();
         int number_of_cuts=embedded_object.Number_Of_Embedded_Cuts(t);
         if(number_of_cuts<max_number_of_cuts){ // room for more cuts
@@ -195,9 +195,9 @@ Set_Random_Fracture_Bias_Stress_Scaling_Constant(const T fracture_threshold,cons
     if(!adjacent_elements_defined) embedded_object.simplicial_object.mesh.Initialize_Adjacent_Elements();
 
     T fracture_threshold_over_two=(T).5*fracture_threshold;
-    for(int t=1;t<=embedded_object.simplicial_object.mesh.elements.m;t++)
+    for(int t=0;t<embedded_object.simplicial_object.mesh.elements.m;t++)
         fracture_bias_stress_scaling(t)=random_numbers.Get_Uniform_Number((T)-fracture_threshold_over_two,(T)fracture_threshold_over_two);
-    for(int iteration=0;iteration<averaging_iterations;iteration++) for(int t=1;t<=embedded_object.simplicial_object.mesh.elements.m;t++){
+    for(int iteration=0;iteration<averaging_iterations;iteration++) for(int t=0;t<embedded_object.simplicial_object.mesh.elements.m;t++){
         int number_of_adjacent_elements=(*embedded_object.simplicial_object.mesh.adjacent_elements)(t).m;
         T average=fracture_bias_stress_scaling(t);
         for(int i=0;i<number_of_adjacent_elements;i++){

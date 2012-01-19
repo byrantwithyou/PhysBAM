@@ -44,14 +44,14 @@ private:
     glColor3f(0,0,1);
     glLineWidth(1.0);
     glBegin(GL_LINE_STRIP);
-    if(spline.control_points.m>2) for(int i=1;i<=spline.segments;i++) for(int k=0;k<spline.samples_per_segment;k++){
+    if(spline.control_points.m>2) for(int i=0;i<spline.segments;i++) for(int k=0;k<spline.samples_per_segment;k++){
             VECTOR_2D<T> position=spline.f(i,k*spline.one_over_samples_per_segment);glVertex2f(position.x,position.y);}
     glEnd();
     
     glColor3f(1,0,0);
     glPointSize(5.0);
     
-    for(int s=1;s<=spline.segments;s++){
+    for(int s=0;s<spline.segments;s++){
         glBegin(GL_POINTS);
         int base_index=4*(s-1)+1;
         glColor3f(1,1,0);OpenGL_Vertex(spline.control_points(base_index));OpenGL_Vertex(spline.control_points(base_index+3));
@@ -82,7 +82,7 @@ private:
         return 1;}
     else if(Fl::event_button()==3){
         FILE* fp=fopen("cps.txt","w");
-        for(int i=1;i<=spline.control_points.m;i++){
+        for(int i=0;i<spline.control_points.m;i++){
             VECTOR_2D<T> cp=spline.control_points(i);
             fprintf(fp,"spline.Add_Point(VECTOR_2D<T>(%f,%f));\n",cp.x,cp.y);}
         fclose(fp);

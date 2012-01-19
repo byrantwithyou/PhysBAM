@@ -18,7 +18,7 @@ template<class TV>
 void Update_Segment_List(SEGMENTED_CURVE<TV>& sc) // updates the segments assuming the particle positions are already updated
 {
     if(!sc.segment_list) sc.segment_list=new ARRAY<typename BASIC_GEOMETRY_POLICY<TV>::SEGMENT>(sc.mesh.elements.m);
-    for(int s=1;s<=sc.mesh.elements.m;s++){
+    for(int s=0;s<sc.mesh.elements.m;s++){
         int i,j;sc.mesh.elements(s).Get(i,j);
         (*sc.segment_list)(s)=typename BASIC_GEOMETRY_POLICY<TV>::SEGMENT(sc.particles.X(i),sc.particles.X(j));}
 }
@@ -41,7 +41,7 @@ void Initialize_Straight_Mesh_And_Particles(SEGMENTED_CURVE<TV>& sc,const GRID<V
     sc.Clean_Memory();
     sc.mesh.Initialize_Straight_Mesh(grid.counts.x);
     sc.particles.array_collection->Preallocate(grid.counts.x);
-    for(int i=1;i<=grid.counts.x;i++) sc.particles.X(sc.particles.array_collection->Add_Element()).x=grid.X(VECTOR<int,1>(i)).x;
+    for(int i=0;i<grid.counts.x;i++) sc.particles.X(sc.particles.array_collection->Add_Element()).x=grid.X(VECTOR<int,1>(i)).x;
 }
 //#####################################################################
 // Function Initialize_Circle_Mesh_And_Particles

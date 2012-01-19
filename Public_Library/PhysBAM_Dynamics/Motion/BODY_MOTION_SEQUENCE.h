@@ -50,7 +50,7 @@ public:
     this->trajectories(bone)(frame+1).targeted_translation=ui_position(bone).targeted_translation*this->trajectories(bone)(frame+1).targeted_translation;}
 
     void Update_Base_Position()
-    {for(int i=1;i<=base_position.m;i++) Update_Base_Position(i);}
+    {for(int i=0;i<base_position.m;i++) Update_Base_Position(i);}
 
     void Update_Base_Position(int bone)
     {base_position(bone).transform=base_position(bone).targeted_transform;

@@ -138,21 +138,21 @@ namespace{
 
         const SEGMENT_MESH& cutting_mesh=cutting.cutting.mesh;
         ARRAY<int> tri_intersection_list;
-        for(int i=cutting.first_new_cut_element;i<=cutting_mesh.elements.m;i++) for(int j=1;j<=2;j++){
+        for(int i=cutting.first_new_cut_element;i<=cutting_mesh.elements.m;i++) for(int j=0;j<2;j++){
             int node=cutting_mesh.elements(i)(j);if((*cutting_mesh.incident_elements)(node).m==1){ // vertex has only the new cutting segment incident on it so add fake segment
                 // find intersections
                 ARRAY<int> intersecting_triangles;
                 TV cut_X(cutting.cutting.particles.X(node));
                 tri_intersection_list.Remove_All();
                 cutting.current_embedding->hierarchy->Intersection_List(cut_X,tri_intersection_list,cutting.intersection_thickness);
-                for(int i=1;i<=tri_intersection_list.m;i++){int embedding_tri=tri_intersection_list(i);
+                for(int i=0;i<tri_intersection_list.m;i++){int embedding_tri=tri_intersection_list(i);
                     VECTOR<TV,3> embedding_tri_X(cutting.current_embedding->particles.X.Subset(cutting.current_embedding->mesh.elements(embedding_tri)));
                     bool is_robust,intersects=robust_interactions.Intersection(embedding_tri_X,VECTOR<TV,1>(cut_X),&is_robust);if(!is_robust) PHYSBAM_FATAL_ERROR();
                     if(intersects) intersecting_triangles.Append(embedding_tri);}
                 // build simplices 
                 VECTOR<int,2> fake_segment_nodes(node,0); // TODO: ordering shouldn't matter here as we are combining with a point not with a segment like in 3D
                 int parent=cutting.cutting_simplices->Add_Simplex(-fake_segment_nodes,T_CUTTING_SIMPLEX::GLOBAL_CUT_FACE);
-                for(int i=1;i<=intersecting_triangles.m;i++){int tri=intersecting_triangles(i);
+                for(int i=0;i<intersecting_triangles.m;i++){int tri=intersecting_triangles(i);
                     VECTOR<TV,2> fake_segment_X(cut_X,TV());
                     VECTOR<TV,3> embedding_triangle_X(cutting.current_embedding->particles.X.Subset(cutting.current_embedding->mesh.elements(tri)));
                     VECTOR<VECTOR<T,2>,2> weights=Get_Cutting_Simplex_Weights_From_Embedding_Simplex(fake_segment_X,embedding_triangle_X);
@@ -170,13 +170,13 @@ namespace{
         const ARRAY<VECTOR<int,2> >& cutting_segments=cutting.cutting.mesh.segment_mesh->elements;
 
         ARRAY<int> tet_intersection_list;
-        for(int cseg=1;cseg<=cutting_segments.m;cseg++) if(cutting_edge_triangles(cseg).m==1 && cutting_edge_triangles(cseg)(1)>=cutting.first_new_cut_element){
+        for(int cseg=0;cseg<cutting_segments.m;cseg++) if(cutting_edge_triangles(cseg).m==1 && cutting_edge_triangles(cseg)(1)>=cutting.first_new_cut_element){
             // find intersections
             ARRAY<int> intersecting_tets;
             const VECTOR<int,2>& cut_nodes=cutting_segments(cseg);VECTOR<TV,2> cut_X(cutting.cutting.particles.X.Subset(cut_nodes));
             tet_intersection_list.Remove_All();
             cutting.current_embedding->hierarchy->Intersection_List(RANGE<VECTOR<T,3> >::Bounding_Box(cut_X),tet_intersection_list,cutting.intersection_thickness);
-            for(int i=1;i<=tet_intersection_list.m;i++){int embedding_tet=tet_intersection_list(i);
+            for(int i=0;i<tet_intersection_list.m;i++){int embedding_tet=tet_intersection_list(i);
                 VECTOR<TV,4> embedding_tet_X(cutting.current_embedding->particles.X.Subset(cutting.current_embedding->mesh.elements(embedding_tet)));
                 bool is_robust,intersects=robust_interactions.Intersection(embedding_tet_X,cut_X,&is_robust);if(!is_robust) PHYSBAM_FATAL_ERROR();
                 if(intersects) intersecting_tets.Append(embedding_tet);}
@@ -185,7 +185,7 @@ namespace{
             VECTOR<int,2> ordered_cut_nodes=T_CUTTING_MESH::Face_Reversed_In_Simplex(cut_nodes,real_bordering_triangle_nodes)?cut_nodes.Reversed():cut_nodes;
             VECTOR<int,3> fake_triangle_nodes=ordered_cut_nodes.Append(0);
             int parent=cutting.cutting_simplices->Add_Simplex(-fake_triangle_nodes,T_CUTTING_SIMPLEX::GLOBAL_CUT_FACE);
-            for(int i=1;i<=intersecting_tets.m;i++){int tet=intersecting_tets(i);
+            for(int i=0;i<intersecting_tets.m;i++){int tet=intersecting_tets(i);
                 VECTOR<TV,3> fake_triangle_X(VECTOR<TV,2>(cutting.cutting.particles.X.Subset(ordered_cut_nodes)).Append(TV()));
                 VECTOR<TV,4> embedding_tetrahedron_X(cutting.current_embedding->particles.X.Subset(cutting.current_embedding->mesh.elements(tet)));
                 VECTOR<VECTOR<T,3>,3> weights=Get_Cutting_Simplex_Weights_From_Embedding_Simplex(fake_triangle_X,embedding_tetrahedron_X);
@@ -214,7 +214,7 @@ Initialize_Original_Embedding(const T_EMBEDDING_OBJECT& original_embedding)
     // cutting simplices, fill polygon mesh and generate lists of cutting polygons
     HASHTABLE<int,int> embedding_face_to_simplex;
     ARRAY<int> embedding_simplices_on_face;
-    for(int face=1;face<=embedding_faces.elements.m;face++){const VECTOR<int,d_cut+1>& face_nodes=embedding_faces.elements(face); 
+    for(int face=0;face<embedding_faces.elements.m;face++){const VECTOR<int,d_cut+1>& face_nodes=embedding_faces.elements(face); 
         int parent=cutting_simplices->Add_Simplex(face_nodes,T_CUTTING_SIMPLEX::GLOBAL_EMBEDDING_FACE); // TODO: call this a boundary type???
         sorted_to_original_boundary_nodes.Insert(face_nodes.Sorted(),face_nodes);
         cutting_polygons_per_cutting_simplex.Append(ARRAY<int>());
@@ -222,7 +222,7 @@ Initialize_Original_Embedding(const T_EMBEDDING_OBJECT& original_embedding)
         embedding_simplices_on_face.Remove_All();
         current_embedding->mesh.Simplices_On_Subsimplex(face_nodes,embedding_simplices_on_face);
         CUTTING_POLYGON::POLYGON_TYPE polygon_type=(embedding_simplices_on_face.m==1?CUTTING_POLYGON::FACE_BOUNDARY:CUTTING_POLYGON::FACE_INTERIOR);
-        for(int i=1;i<=embedding_simplices_on_face.m;i++){int embedding_simplex=embedding_simplices_on_face(i);
+        for(int i=0;i<embedding_simplices_on_face.m;i++){int embedding_simplex=embedding_simplices_on_face(i);
             T_CUTTING_SIMPLEX_WEIGHTS weights=Get_Face_Weights_From_Embedding_Simplex(face_nodes,embedding_simplices(embedding_simplex));
             int simplex_index=cutting_simplices->Add_Simplex(face_nodes,T_CUTTING_SIMPLEX::LOCAL_EMBEDDING_FACE,weights,parent,embedding_simplex);
             simplices_per_current_embedding_simplex(embedding_simplex).Append(simplex_index);
@@ -241,7 +241,7 @@ Initialize_Original_Embedding(const T_EMBEDDING_OBJECT& original_embedding)
     const ARRAY<ARRAY<int> >& faces_on_vertices=*Face_Mesh(current_embedding->mesh).incident_elements;
     ARRAY<int> embedding_nodes;
     current_embedding->mesh.elements.Flattened().Get_Unique(embedding_nodes);
-    for(int i=1;i<=embedding_nodes.m;i++){int node=embedding_nodes(i);ARRAY<int> simplices;
+    for(int i=0;i<embedding_nodes.m;i++){int node=embedding_nodes(i);ARRAY<int> simplices;
         ARRAY<T_CUT_WEIGHTS> all_weights(faces_on_vertices(node).m);
         for(int i=1;i<=faces_on_vertices(node).m;i++){int face=faces_on_vertices(node)(i);
             int parent;bool found=embedding_face_to_simplex.Get(face,parent);if(!found) PHYSBAM_FATAL_ERROR("Could not find simplex");
@@ -276,7 +276,7 @@ namespace{
             VECTOR<TV,d_cut+1> cut_X(cutting.cutting.particles.X.Subset(cut_nodes));
             intersection_list.Remove_All();cutting.current_embedding->hierarchy->Intersection_List(
                 RANGE<TV>::Bounding_Box(cut_X),intersection_list,cutting.intersection_thickness);
-            for(int i=1;i<=intersection_list.m;i++){int embedding_simplex_index=intersection_list(i);
+            for(int i=0;i<intersection_list.m;i++){int embedding_simplex_index=intersection_list(i);
                 VECTOR<TV,d_embed+1> embedding_simplex_X(cutting.current_embedding->particles.X.Subset(cutting.current_embedding->mesh.elements(embedding_simplex_index)));
                 bool is_robust,intersects=robust_interactions.Intersection(embedding_simplex_X,cut_X,&is_robust);
                 if(!is_robust) PHYSBAM_FATAL_ERROR();
@@ -284,7 +284,7 @@ namespace{
             // build simplices
             int parent=cutting.cutting_simplices->Add_Simplex(-cut_nodes,T_CUTTING_SIMPLEX::GLOBAL_CUT_FACE);
             cut_to_simplex.Insert(cutting_simplex_index,parent);
-            for(int i=1;i<=intersecting_embedding_simplices.m;i++){int embedding_simplex=intersecting_embedding_simplices(i);
+            for(int i=0;i<intersecting_embedding_simplices.m;i++){int embedding_simplex=intersecting_embedding_simplices(i);
                 VECTOR<TV,d_embed+1> embedding_simplex_X(cutting.current_embedding->particles.X.Subset(cutting.current_embedding->mesh.elements(embedding_simplex)));
                 T_CUTTING_SIMPLEX_WEIGHTS weights=Get_Cutting_Simplex_Weights_From_Embedding_Simplex(cut_X,embedding_simplex_X);
                 int index=cutting.cutting_simplices->Add_Simplex(-cut_nodes,T_CUTTING_SIMPLEX::LOCAL_CUT_FACE,weights,parent,embedding_simplex);
@@ -306,7 +306,7 @@ Fill_Intersection_Registry_With_Cuts()
     intersection_registry->Resize_Simplices(cutting_simplices->simplices.m);
     intersection_registry->Set_Index_For_Last_Old_Intersection();
     const ARRAY<VECTOR<int,d_embed+1> >& current_embedding_simplices=current_embedding->mesh.elements;
-    for(int tet=1;tet<=current_embedding_simplices.m;tet++){
+    for(int tet=0;tet<current_embedding_simplices.m;tet++){
         STACK<int>& new_simplices=simplex_stack_per_current_embedding_simplex(tet);
         while(!new_simplices.Empty()){
             int new_simplex=new_simplices.Pop();
@@ -368,7 +368,7 @@ template<class TV,int d_input> void CUTTING_GEOMETRY<TV,d_input>::
 Get_Polygon_Edges(const int polygon_element_index,ARRAY<VECTOR<int,2> >& polygonal_segments) const
 {
     const ARRAY<ARRAY<int> >& polygon_particles=polygon_mesh.elements(polygon_element_index);
-    for(int i=1;i<=polygon_particles.m;i++){
+    for(int i=0;i<polygon_particles.m;i++){
         const ARRAY<int>& component=polygon_particles(i);
         for(int j=1;j<component.m;j++) polygonal_segments.Append(VECTOR<int,2>(component(j),component(j+1)));
         if(component.m) polygonal_segments.Append(VECTOR<int,2>(component.Last(),component(1)));}

@@ -182,7 +182,7 @@ Apply_Velocity_Update(const VECTOR_T& V,ARRAY<T,FACE_INDEX<TV::dimension> >& flu
     Dump_Substep(temporary_faces,"before pressure");
 //    INTERPOLATED_COLOR_MAP<T> color_map;
 //    color_map.Initialize_Colors(V.pressure.Min(),V.pressure.Max(),false,false,false);
-//    for(int i=1;i<=index_map.indexed_cells.m;i++){
+//    for(int i=0;i<index_map.indexed_cells.m;i++){
 //        Add_Debug_Particle(index_map.grid.X(index_map.indexed_cells(i)),color_map(V.pressure(i)));}
     Dump_Substep(temporary_faces,"pressure");
 
@@ -213,7 +213,7 @@ Apply_One_Sided_Interpolation_At_Coupling_Faces(const T_FACE_ARRAYS_BOOL& psi_N_
     constrained_beta_face.Resize(index_map.indexed_constraints.m);
     constrained_fluid_velocity.Resize(index_map.indexed_constraints.m);
 
-    for(int i=1;i<=index_map.indexed_faces.m;i++){
+    for(int i=0;i<index_map.indexed_faces.m;i++){
         FACE_INDEX<TV::dimension> face_index=index_map.indexed_faces(i);
         TV_INT first_cell_index=face_index.First_Cell_Index(),second_cell_index=face_index.Second_Cell_Index();
         beta_face(face_index)=Inverse((density(first_cell_index)+density(second_cell_index))*(T).5);}
@@ -267,7 +267,7 @@ Compute(int ghost_cells,const T dt_input,const T current_velocity_time,const T_F
 
         if(dt){T one_over_dt_squared=(T)1/(dt*dt);
             one_over_rho_c_squared_flat.Resize(index_map.Number_Cells());
-            for(int i=1;i<=index_map.indexed_cells.m;i++){
+            for(int i=0;i<index_map.indexed_cells.m;i++){
                 one_over_rho_c_squared_flat(i)=one_over_rho_c_squared(index_map.indexed_cells(i))*one_over_dt_squared*index_map.grid.Cell_Size();}}}
 
     if(!fluid_to_solid_interpolation) solid_interpolation->Compute(0);
@@ -410,7 +410,7 @@ Setup_Initial_Guess(const VECTOR_T& F,VECTOR_T& V,const ARRAY<T,TV_INT>& p_advec
         // Initial guess
         index_map.Collect(p_advected,V.pressure);
         V.pressure*=dt;
-        for(int i=1;i<=index_map.indexed_faces.m;i++){
+        for(int i=0;i<index_map.indexed_faces.m;i++){
             FACE_INDEX<TV::dimension> face_index=index_map.indexed_faces(i);
             T face_area=index_map.grid.Face_Size(face_index.axis);
             if(!(*index_map.iterator_info.outside_fluid)(face_index.First_Cell_Index())){
@@ -589,7 +589,7 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& bV,KRYLOV_VECTOR_BASE<T>& bF) const
     if(!leakproof_solve) F.force_coefficients+=V.force_coefficients;
     if(use_viscous_forces) F.viscous_force_coefficients+=V.viscous_force_coefficients;
 
-    for(int i=1;i<=one_over_rho_c_squared_flat.n;i++) F.pressure(i)+=one_over_rho_c_squared_flat(i)*V.pressure(i);
+    for(int i=0;i<one_over_rho_c_squared_flat.n;i++) F.pressure(i)+=one_over_rho_c_squared_flat(i)*V.pressure(i);
 }
 //#####################################################################
 // Function Project
@@ -606,13 +606,13 @@ Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& bV,KRYLOV_VECTOR_BASE<T>& bR) 
 {
     const VECTOR_T& V=debug_cast<const VECTOR_T&>(bV);VECTOR_T& R=debug_cast<VECTOR_T&>(bR);
     if(use_full_ic){
-        for(int i=1;i<=full_precondition_in.n;i++)
+        for(int i=0;i<full_precondition_in.n;i++)
             full_precondition_in(i)=const_cast<VECTOR_T&>(V).Raw_Get(i);
 
         full_matrix.C->Solve_Forward_Substitution(full_precondition_in,full_precondition_out,true);
         full_matrix.C->Solve_Backward_Substitution(full_precondition_out,full_precondition_in,false,true);
 
-        for(int i=1;i<=full_precondition_in.n;i++)
+        for(int i=0;i<full_precondition_in.n;i++)
             R.Raw_Get(i)=full_precondition_in(i);}
     else if(fluid_node){
         R.Copy(1,V);
@@ -669,7 +669,7 @@ Linf_Norm(const VECTOR_T& R) const
 {
     T fluid_convergence_norm=(T)0;
     TV_INT max_pressure_error_cell=TV_INT();
-    for(int i=1;i<=index_map.real_cell_indices.m;i++){
+    for(int i=0;i<index_map.real_cell_indices.m;i++){
         T pressure_error=abs(R.pressure(index_map.real_cell_indices(i)));
         if(pressure_error>fluid_convergence_norm){
             max_pressure_error_cell=index_map.indexed_cells(index_map.real_cell_indices(i));
@@ -869,7 +869,7 @@ Compute_Inverse_Mass_Matrix(SPARSE_MATRIX_FLAT_MXN<T>& inverse_mass)
 
     if(fluid_node) matrix_helper.Add_Matrix(*fluid_mass);
 
-    {int mx=0,my=0;for(int i=1;i<=matrix_helper.data.m;i++) mx=std::max(mx,matrix_helper.data(i).x),my=std::max(my,matrix_helper.data(i).y);LOG::cout<<"max: "<<mx<<"  "<<my<<"  vs "<<size_fluids+size_solids<<"  "<<size_fluids+size_solids<<std::endl;}
+    {int mx=0,my=0;for(int i=0;i<matrix_helper.data.m;i++) mx=std::max(mx,matrix_helper.data(i).x),my=std::max(my,matrix_helper.data(i).y);LOG::cout<<"max: "<<mx<<"  "<<my<<"  vs "<<size_fluids+size_solids<<"  "<<size_fluids+size_solids<<std::endl;}
 
     matrix_helper.Compact();
     matrix_helper.Set_Matrix(size_fluids+size_solids,size_fluids+size_solids,inverse_mass);
@@ -893,7 +893,7 @@ Compute_Full_Preconditioner()
 
     if(!leakproof_solve) for(int i=0;i<size_force;i++) full_matrix(offset_force+i,offset_force+i)+=1;
     if(use_viscous_forces) for(int i=0;i<size_viscous;i++) full_matrix(offset_viscous+i,offset_viscous+i)+=1;
-    for(int i=1;i<=one_over_rho_c_squared_flat.n;i++) full_matrix(i,i)+=one_over_rho_c_squared_flat(i);
+    for(int i=0;i<one_over_rho_c_squared_flat.n;i++) full_matrix(i,i)+=one_over_rho_c_squared_flat(i);
 
     full_matrix.Construct_Incomplete_Cholesky_Factorization();
     full_precondition_in.Resize(full_matrix.n);

@@ -63,7 +63,7 @@ Collect_Maxabs_Velocity(const VECTOR_ND<T>& faces,VECTOR_ND<T>& cells) const
 {
     cells.Fill(0);
     int index=gradient.offsets(1);
-    for(int i=1;i<=gradient.m;i++){
+    for(int i=0;i<gradient.m;i++){
         int end=gradient.offsets(i+1);T y=faces(i);
         for(;index<end;index++) cells(gradient.A(index).j)=max(cells(gradient.A(index).j),abs(y*gradient.A(index).a));}
 }
@@ -99,7 +99,7 @@ Print_Each_Matrix(int n) const
 template<class TV> void MATRIX_FLUID_GRADIENT_BASE<TV>::
 Add_Raw_Matrix(ARRAY<TRIPLE<int,int,T> >& data) const
 {
-    for(int i=1;i<=gradient.m;i++){
+    for(int i=0;i<gradient.m;i++){
         int s=gradient.offsets(i),e=gradient.offsets(i+1);
         for(int j=s;j<e;j++)
             data.Append(TRIPLE<int,int,T>(i,gradient.A(j).j,gradient.A(j).a));}

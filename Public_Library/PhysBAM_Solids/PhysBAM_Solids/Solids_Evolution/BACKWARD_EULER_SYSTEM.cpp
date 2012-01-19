@@ -116,9 +116,9 @@ Project(KRYLOV_VECTOR_BASE<T>& BV) const
     solids_evolution.Zero_Out_Enslaved_Velocity_Nodes(V.rigid_V.array,current_velocity_time+dt,current_position_time);
     if(NEWMARK_EVOLUTION<TV>* newmark=dynamic_cast<NEWMARK_EVOLUTION<TV>*>(&solids_evolution)){
         if(newmark->asynchronous_evolution){
-            for(int i=1;i<=solids_evolution.solids_parameters.implicit_solve_parameters.cg_projection_iterations;i++) newmark->asynchronous_evolution->Project(V);}}
+            for(int i=0;i<solids_evolution.solids_parameters.implicit_solve_parameters.cg_projection_iterations;i++) newmark->asynchronous_evolution->Project(V);}}
     if(!velocity_update){if(arb) arb->Poststabilization_Projection(V.rigid_V.array,true);return;}
-    for(int i=1;i<=solids_evolution.solids_parameters.implicit_solve_parameters.cg_projection_iterations;i++){
+    for(int i=0;i<solids_evolution.solids_parameters.implicit_solve_parameters.cg_projection_iterations;i++){
         int middle_projection=1;
         if(solids_evolution.solids_parameters.use_rigid_deformable_contact && solid_body_collection.deformable_body_collection.collisions.collisions_on){
             solids_evolution.rigid_deformable_collisions->Project_Contact_Pairs(V.V.array,V.rigid_V.array);middle_projection=2;}
@@ -204,7 +204,7 @@ Initialize_World_Space_Masses(const SOLID_BODY_COLLECTION<TV>& solid_body_collec
     world_space_rigid_mass.Resize(solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m,false,false);
     world_space_rigid_mass_inverse_full.Resize(rigid_mass.array.m,false,false);
 
-    for(int i=1;i<=solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m;i++){int p=solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles(i);
+    for(int i=0;i<solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m;i++){int p=solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles(i);
         RIGID_BODY_MASS<TV> rm(rigid_mass.array(i),rigid_inertia_tensor.array(i));
         world_space_rigid_mass(i)=solid_body_collection.rigid_body_collection.State(p).World_Space_Rigid_Mass(rm);
         world_space_rigid_mass_inverse(i)=solid_body_collection.rigid_body_collection.State(i).World_Space_Rigid_Mass_Inverse(rm);}

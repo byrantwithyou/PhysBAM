@@ -21,7 +21,7 @@ template<class T> bool Intersects(RAY<VECTOR<T,2> >& ray,const SEGMENTED_CURVE_2
     if(curve.bounding_box){RAY<VECTOR<T,2> > tmp_ray=ray;
         if(curve.bounding_box->Outside(ray.endpoint,3*thickness_over_two) && !INTERSECTION::Intersects(tmp_ray,*curve.bounding_box,2*thickness_over_two,thickness_over_two)) return false;}
     bool hit=false;
-    for(int i=1;i<=curve.mesh.elements.m;i++){
+    for(int i=0;i<curve.mesh.elements.m;i++){
         SEGMENT_2D<T> segment=(curve.segment_list)?(*curve.segment_list)(i):curve.Get_Element(i);
         if(INTERSECTION::Fuzzy_Intersects(ray,segment,thickness_over_two)){ray.aggregate_id=i;hit=true;}}
     return hit;
@@ -34,7 +34,7 @@ template<class T> bool Closest_Non_Intersecting_Point(RAY<VECTOR<T,2> >& ray,con
     if(curve.bounding_box){RAY<VECTOR<T,2> > tmp_ray=ray;
         if(curve.bounding_box->Outside(ray.endpoint,5*thickness_over_two) && !INTERSECTION::Intersects(tmp_ray,*curve.bounding_box,4*thickness_over_two,thickness_over_two)) return false;}
     bool hit=false;
-    for(int i=1;i<=curve.mesh.elements.m;i++){
+    for(int i=0;i<curve.mesh.elements.m;i++){
         SEGMENT_2D<T> segment=(curve.segment_list)?(*curve.segment_list)(i):curve.Get_Element(i);
         if(INTERSECTION::Closest_Non_Intersecting_Point(ray,segment,thickness_over_two)){ray.aggregate_id=i;hit=true;}}
     return hit;

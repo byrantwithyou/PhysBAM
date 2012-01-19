@@ -40,7 +40,7 @@ Rewind_Particle_Positions() const
     if(rewind_positions) particle_positions_rewound=true;
     else{particle_positions_rewound=false;return;}
 
-    for(int i=1;i<=rewind_to_time_n_particle_indices.m;i++){int p=rewind_to_time_n_particle_indices(i);
+    for(int i=0;i<rewind_to_time_n_particle_indices.m;i++){int p=rewind_to_time_n_particle_indices(i);
         X_rewind_particles_save(i)=particles.X(p);
         particles.X(p)=X_n(p);}
 }
@@ -53,7 +53,7 @@ Restore_Rewound_Particle_Positions() const
     if(!particle_positions_rewound) return;
     particle_positions_rewound=false;
 
-    for(int i=1;i<=rewind_to_time_n_particle_indices.m;i++){int p=rewind_to_time_n_particle_indices(i);
+    for(int i=0;i<rewind_to_time_n_particle_indices.m;i++){int p=rewind_to_time_n_particle_indices(i);
         particles.X(p)=X_rewind_particles_save(i);}
 }
 //#####################################################################
@@ -65,7 +65,7 @@ Rewind_Particle_Velocities() const
     if(rewind_velocities) particle_velocities_rewound=true;
     else{particle_velocities_rewound=false;return;}
 
-    for(int i=1;i<=rewind_to_time_n_particle_indices.m;i++){int p=rewind_to_time_n_particle_indices(i);
+    for(int i=0;i<rewind_to_time_n_particle_indices.m;i++){int p=rewind_to_time_n_particle_indices(i);
         V_rewind_particles_save(i)=particles.V(p);
         particles.V(p)=V_n(p);}
 }
@@ -78,7 +78,7 @@ Restore_Rewound_Particle_Velocities() const
     if(!particle_velocities_rewound) return;
     particle_velocities_rewound=false;
 
-    for(int i=1;i<=rewind_to_time_n_particle_indices.m;i++){int p=rewind_to_time_n_particle_indices(i);
+    for(int i=0;i<rewind_to_time_n_particle_indices.m;i++){int p=rewind_to_time_n_particle_indices(i);
         particles.V(p)=V_rewind_particles_save(i);}
 }
 //#####################################################################

@@ -48,11 +48,11 @@ public:
         VECTOR<T,3> attenuation(exponential_attenuation,exponential_attenuation,exponential_attenuation);
         attenuated_color*=attenuation;
         // Compute inscattering (only direct lighting i.e. signle bounce)
-        for(int light_index=1;light_index<=lights.m;light_index++){
+        for(int light_index=0;light_index<lights.m;light_index++){
             VECTOR<T,3> accumulated_radiance_samples(0,0,0);
             ARRAY<RAY<VECTOR<T,3> > > sample_array;
             lights(light_index)->Sample_Points(midpoint,VECTOR<T,3>(1,0,0),sample_array);
-            for(int sample=1;sample<=sample_array.m;sample++){
+            for(int sample=0;sample<sample_array.m;sample++){
                 RENDERING_RAY<T> ray_to_light(sample_array(sample),1,&object);
                 VECTOR<T,3> attenuated_light_radiance=world.Incident_Light(ray_to_light,*lights(light_index),ray_to_light,ray);
                 accumulated_radiance_samples+=attenuated_light_radiance*Phase(-ray_to_light.ray.direction,-ray.ray.direction);}

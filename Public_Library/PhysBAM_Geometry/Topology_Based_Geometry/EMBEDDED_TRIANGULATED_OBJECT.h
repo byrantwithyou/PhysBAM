@@ -50,7 +50,7 @@ public:
     bool Segment_Is_Broken(const int node1,const int node2) const
     {if(!Embedded_Particle_On_Segment(node1,node2)) return false;
     ARRAY<int> triangles_on_edge;simplicial_object.mesh.Triangles_On_Edge(node1,node2,&triangles_on_edge);
-    for(int t=1;t<=triangles_on_edge.m;t++) if(!Nodes_Are_Separated_In_Simplex(node1,node2,triangles_on_edge(t)))return false;
+    for(int t=0;t<triangles_on_edge.m;t++) if(!Nodes_Are_Separated_In_Simplex(node1,node2,triangles_on_edge(t)))return false;
     return true;}
 
     int Number_Of_Edges_With_Embedded_Particles(const int triangle)
@@ -76,7 +76,7 @@ public:
     return k;}
 
     T Fraction_Of_Triangles_With_N_Cuts(const int n)
-    {int count=0;for(int t=1;t<=simplicial_object.mesh.elements.m;t++) if(Number_Of_Embedded_Cuts(t) == n) count++;
+    {int count=0;for(int t=0;t<simplicial_object.mesh.elements.m;t++) if(Number_Of_Embedded_Cuts(t) == n) count++;
     return (T)count/(T)simplicial_object.mesh.elements.m;}
 
     int Add_Embedded_Segment(const int embedded_particle1,const int embedded_particle2)

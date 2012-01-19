@@ -52,7 +52,7 @@ void Initialize_Bodies()
 {
     MELTING_EXAMPLE_S3D<T,RW>::Initialize_Bodies();
     if(!initialized){initialized=true;
-        for(int object=1;object<=melting_parameters.levelsets.m;object++){
+        for(int object=0;object<melting_parameters.levelsets.m;object++){
             melting_parameters.temperature(object)=new ARRAY<T>(melting_parameters.levelsets(object)->grid.number_of_nodes);
             ARRAY<T>::copy(fluids_parameters.temperature_container.ambient_temperature,*melting_parameters.temperature(object));
             melting_parameters.reaction(object)=new ARRAY<T>(melting_parameters.levelsets(object)->grid.number_of_nodes);
@@ -67,17 +67,17 @@ void Melting_Substep(const T dt,const T time)
     GRID<TV>& grid=fluids_parameters.grid;
     ARRAY<T,VECTOR<int,3> > smoothed_temperature(fluids_parameters.temperature_container.array_3d);
     HEAT_3D<T>::Smooth(grid,smoothed_temperature,temperature_smoothing_steps);
-    for(int object=1;object<=melting_parameters.levelsets.m;object++){
+    for(int object=0;object<melting_parameters.levelsets.m;object++){
         LEVELSET_TRIANGULATED_OBJECT<T,VECTOR<T,3> >& levelset=*melting_parameters.levelsets(object);
         DEFORMABLE_OBJECT_3D<T>& deformable_object=solids_parameters.deformable_body_parameters.list(melting_parameters.body_index(object));
         PARTICLES<T,VECTOR<T,3> >& particles=deformable_object.particles;
         ARRAY<T>& temperature=*melting_parameters.temperature(object);ARRAY<T> old_temperature(temperature);
         ARRAY<T>& reaction=*melting_parameters.reaction(object);
-        for(int n=1;n<=temperature.m;n++){
+        for(int n=0;n<temperature.m;n++){
             int p=levelset.node_to_particle_mapping(n);if(!p)continue;
             temperature(n)-=dt*cloth_temperature_time_constant*(temperature(n)-interpolation.Clamped_To_Array(grid,smoothed_temperature,particles.X(p)));}
         LOG::cout<<"maximum cloth temperature = "<<temperature.Max()<<std::endl;
-        for(int n=1;n<=reaction.m;n++){
+        for(int n=0;n<reaction.m;n++){
             if(reaction(n)<=0){
                 if(temperature(n)>cloth_ignition_temperature) reaction(n)=dt*(temperature(n)-cloth_ignition_temperature)/(temperature(n)-old_temperature(n));
                 else reaction(n)=negative_reaction_coefficient_multiplier*(temperature(n)-cloth_ignition_temperature);}
@@ -92,10 +92,10 @@ void Melting_Levelset_Substep(const int object,const T dt,const T time)
 {
     ARRAY<T>& phi=melting_parameters.levelsets(object)->phi;
     ARRAY<T>& reaction=*melting_parameters.reaction(object);
-    for(int n=1;n<=reaction.m;n++)phi(n)=reaction(n)-reaction_stop;
+    for(int n=0;n<reaction.m;n++)phi(n)=reaction(n)-reaction_stop;
     if(inflammable_levelset){
         ARRAY<VECTOR_2D<T> >& node_locations=melting_parameters.levelsets(object)->grid.Node_Locations();
-        for(int n=1;n<=node_locations.m;n++)phi(n)=min(phi(n),inflammable_levelset->Phi(node_locations(n)));}
+        for(int n=0;n<node_locations.m;n++)phi(n)=min(phi(n),inflammable_levelset->Phi(node_locations(n)));}
 }
 //#####################################################################
 // Function Get_Divergence
@@ -106,7 +106,7 @@ void Get_Divergence(ARRAY<T,VECTOR<int,3> >& divergence,const T dt,const T time)
     GRID<TV>& p_grid=fluids_parameters.p_grid;
     T bandwidth=divergence_source_bandwidth*p_grid.max_dx_dy_dz;
     T divergence_max=dt*divergence_source_rate/p_grid.max_dx_dy_dz;
-    for(int object=1;object<=melting_parameters.levelsets.m;object++){
+    for(int object=0;object<melting_parameters.levelsets.m;object++){
         LEVELSET_TRIANGULATED_OBJECT<T,VECTOR<T,3> >& levelset=*melting_parameters.levelsets(object);
         DEFORMABLE_OBJECT_3D<T>& deformable_object=solids_parameters.deformable_body_parameters.list(melting_parameters.body_index(object));
         PARTICLES<T,VECTOR<T,3> >& particles=deformable_object.particles;
@@ -116,7 +116,7 @@ void Get_Divergence(ARRAY<T,VECTOR<int,3> >& divergence,const T dt,const T time)
         ARRAY<T>& reaction=*melting_parameters.reaction(object);
         // absurd hack: replace velocities with reactions and use Update_Particle_Velocities to interpolate them to the material surface
         ARRAY<VECTOR<T,3> > V_save(particles.array_collection->Size());ARRAY<VECTOR<T,3> >::Exchange_Arrays(V_save,particles.V.array);
-        for(int n=1;n<=reaction.m;n++)if(levelset.node_to_particle_mapping(n)){
+        for(int n=0;n<reaction.m;n++)if(levelset.node_to_particle_mapping(n)){
             particles.V(levelset.node_to_particle_mapping(n)).x=reaction(n);
             if(inflammable_levelset) particles.V(levelset.node_to_particle_mapping(n)).y=inflammable_levelset->Phi(node_locations(n));}
         deformable_object.triangles_of_material->Update_Particle_Velocities();
@@ -124,7 +124,7 @@ void Get_Divergence(ARRAY<T,VECTOR<int,3> >& divergence,const T dt,const T time)
         material_surface.Update_Triangle_List(); // inefficient if positions haven't changed
         if(!material_surface.triangle_hierarchy) material_surface.Initialize_Triangle_Hierarchy();else material_surface.triangle_hierarchy->Update_Boxes();
         ARRAY<bool,VECTOR<int,3> > occupied(p_grid);deformable_object.collisions.Compute_Occupied_Cells(p_grid,occupied,false,bandwidth,0);
-        for(int i=1;i<=p_grid.m;i++)for(int j=1;j<=p_grid.n;j++)for(int ij=1;ij<=p_grid.mn;ij++)if(occupied(i,j,ij)){
+        for(int i=0;i<p_grid.m;i++)for(int j=0;j<p_grid.n;j++)for(int ij=0;ij<p_grid.mn;ij++)if(occupied(i,j,ij)){
             int triangle;T distance;VECTOR<T,3> X=material_surface.Surface(p_grid.X(i,j,ij),bandwidth,1e-6,&triangle,&distance);
             if(distance>bandwidth) continue;
             int ti,tj,tk;material_surface.triangle_mesh.triangles.Get(triangle,ti,tj,tk);
@@ -151,7 +151,7 @@ void Adjust_Phi_With_Sources(const T time)
     T bandwidth=phi_source_bandwidth*grid.max_dx_dy_dz;
     T depth=phi_source_depth*grid.max_dx_dy_dz;
     int count=0;
-    for(int object=1;object<=melting_parameters.levelsets.m;object++){
+    for(int object=0;object<melting_parameters.levelsets.m;object++){
         LEVELSET_TRIANGULATED_OBJECT<T,VECTOR<T,3> >& levelset=*melting_parameters.levelsets(object);
         DEFORMABLE_OBJECT_3D<T>& deformable_object=solids_parameters.deformable_body_parameters.list(melting_parameters.body_index(object));
         PARTICLES<T,VECTOR<T,3> >& particles=deformable_object.particles;
@@ -161,7 +161,7 @@ void Adjust_Phi_With_Sources(const T time)
         ARRAY<T>& reaction=*melting_parameters.reaction(object);
         // absurd hack: replace velocities with reactions and use Update_Particle_Velocities to interpolate them to the material surface
         ARRAY<VECTOR<T,3> > V_save(particles.array_collection->Size());ARRAY<VECTOR<T,3> >::Exchange_Arrays(V_save,particles.V.array);
-        for(int n=1;n<=reaction.m;n++)if(levelset.node_to_particle_mapping(n)){
+        for(int n=0;n<reaction.m;n++)if(levelset.node_to_particle_mapping(n)){
             particles.V(levelset.node_to_particle_mapping(n)).x=reaction(n);
             if(inflammable_levelset) particles.V(levelset.node_to_particle_mapping(n)).y=inflammable_levelset->Phi(node_locations(n));}
         deformable_object.triangles_of_material->Update_Particle_Velocities();
@@ -169,7 +169,7 @@ void Adjust_Phi_With_Sources(const T time)
         material_surface.Update_Triangle_List(); // inefficient if positions haven't changed
         if(!material_surface.triangle_hierarchy) material_surface.Initialize_Triangle_Hierarchy();else material_surface.triangle_hierarchy->Update_Boxes();
         ARRAY<bool,VECTOR<int,3> > occupied(grid);deformable_object.collisions.Compute_Occupied_Cells(grid,occupied,false,bandwidth,0);
-        for(int i=1;i<=grid.m;i++)for(int j=1;j<=grid.n;j++)for(int ij=1;ij<=grid.mn;ij++)if(occupied(i,j,ij)){
+        for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++)for(int ij=0;ij<grid.mn;ij++)if(occupied(i,j,ij)){
             int triangle;T distance;VECTOR<T,3> X=material_surface.Surface(grid.X(i,j,ij),bandwidth,1e-6,&triangle,&distance);
             if(distance>bandwidth) continue;
             int ti,tj,tk;material_surface.triangle_mesh.triangles.Get(triangle,ti,tj,tk);
@@ -198,28 +198,28 @@ void Get_Object_Velocities(const T dt,const T time)
     if(fluids_parameters.use_solid_fluid_coupling) SOLIDS_FLUIDS_EXAMPLE_3D<RW>::Set_Fluid_Boundary_Conditions();
     else{
         GRID<TV>& p_grid=fluids_parameters.p_grid,&u_grid=fluids_parameters.u_grid,&v_grid=fluids_parameters.v_grid,&w_grid=fluids_parameters.w_grid;
-        for(int object=1;object<=melting_parameters.levelsets.m;object++){
+        for(int object=0;object<melting_parameters.levelsets.m;object++){
             DEFORMABLE_OBJECT_3D<T>& deformable_object=solids_parameters.deformable_body_parameters.list(melting_parameters.body_index(object));
             TRIANGULATED_SURFACE<T>& material_surface=*deformable_object.collisions.triangulated_surface;
             material_surface.Update_Triangle_List(); // inefficient if positions haven't changed
             if(!material_surface.triangle_hierarchy) material_surface.Initialize_Triangle_Hierarchy();else material_surface.triangle_hierarchy->Update_Boxes();
             ARRAY<bool,VECTOR<int,3> > occupied_cell(p_grid,1);deformable_object.collisions.Compute_Occupied_Cells(p_grid,occupied_cell,false,2*p_grid.max_dx_dy_dz,1);
             // calculate psi_N_u
-            for(int i=1;i<=u_grid.m;i++) for(int j=1;j<=u_grid.n;j++) for(int ij=1;ij<=u_grid.mn;ij++) if(occupied_cell(i-1,j,ij) || occupied_cell(i,j,ij)){
+            for(int i=0;i<u_grid.m;i++) for(int j=0;j<u_grid.n;j++) for(int ij=0;ij<u_grid.mn;ij++) if(occupied_cell(i-1,j,ij) || occupied_cell(i,j,ij)){
                 RAY<VECTOR<T,3> > ray(p_grid.X(i-1,j,ij),VECTOR<T,3>(1,0,0),true);ray.t_max=p_grid.dx;ray.semi_infinite=false;
                 if(deformable_object.collisions.Triangulated_Surface_Intersection(ray)){
                     fluids_parameters.incompressible.projection.u(i,j,ij)=deformable_object.collisions.Pointwise_Object_Velocity(ray.aggregate_id,ray.Point(ray.t_max)).x;
                     fluids_parameters.incompressible.projection.u_fuel(i,j,ij)=fluids_parameters.incompressible.projection.u(i,j,ij);
                     fluids_parameters.incompressible.projection.elliptic_solver->psi_N_u(i,j,ij)=true;}}
             // calculate psi_N_v
-            for(int i=1;i<=v_grid.m;i++) for(int j=1;j<=v_grid.n;j++) for(int ij=1;ij<=v_grid.mn;ij++) if(occupied_cell(i,j-1,ij) || occupied_cell(i,j,ij)){
+            for(int i=0;i<v_grid.m;i++) for(int j=0;j<v_grid.n;j++) for(int ij=0;ij<v_grid.mn;ij++) if(occupied_cell(i,j-1,ij) || occupied_cell(i,j,ij)){
                 RAY<VECTOR<T,3> > ray(p_grid.X(i,j-1,ij),VECTOR<T,3>(0,1,0),true);ray.t_max=p_grid.dy;ray.semi_infinite=false;
                 if(deformable_object.collisions.Triangulated_Surface_Intersection(ray)){
                     fluids_parameters.incompressible.projection.v(i,j,ij)=deformable_object.collisions.Pointwise_Object_Velocity(ray.aggregate_id,ray.Point(ray.t_max)).y;
                     fluids_parameters.incompressible.projection.v_fuel(i,j,ij)=fluids_parameters.incompressible.projection.v(i,j,ij);
                     fluids_parameters.incompressible.projection.elliptic_solver->psi_N_v(i,j,ij)=true;}}
             // calculate psi_N_w
-            for(int i=1;i<=w_grid.m;i++) for(int j=1;j<=w_grid.n;j++) for(int ij=1;ij<=w_grid.mn;ij++) if(occupied_cell(i,j,ij-1) || occupied_cell(i,j,ij)){
+            for(int i=0;i<w_grid.m;i++) for(int j=0;j<w_grid.n;j++) for(int ij=0;ij<w_grid.mn;ij++) if(occupied_cell(i,j,ij-1) || occupied_cell(i,j,ij)){
                 RAY<VECTOR<T,3> > ray(p_grid.X(i,j,ij-1),VECTOR<T,3>(0,0,1),true);ray.t_max=p_grid.dz;ray.semi_infinite=false;
                 if(deformable_object.collisions.Triangulated_Surface_Intersection(ray)){
                     fluids_parameters.incompressible.projection.w(i,j,ij)=deformable_object.collisions.Pointwise_Object_Velocity(ray.aggregate_id,ray.Point(ray.t_max)).z;

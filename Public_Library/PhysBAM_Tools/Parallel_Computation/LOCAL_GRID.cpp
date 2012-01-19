@@ -51,7 +51,7 @@ Initialize()
     mpi_grid.Find_Boundary_Regions(regions,RANGE<TV_INT>::Zero_Box(),true,RANGE<VECTOR<int,1> >(-5,-5),true);
     RANGE<TV_INT> global_region=global_grid.Domain_Indices();
     neighbor_overlaps.Resize(regions.m);
-    for(int n=1;n<=regions.m;n++) if(regions(n).Lazy_Intersection(global_region-offset)) neighbor_overlaps(n)=true;
+    for(int n=0;n<regions.m;n++) if(regions(n).Lazy_Intersection(global_region-offset)) neighbor_overlaps(n)=true;
 }
 //#####################################################################
 // Function Put
@@ -72,7 +72,7 @@ Put(const T_ARRAYS& local_data,T_ARRAYS& global_data,const RANGE<TV_INT>& sentin
     Put(local_data,Interior_Region(sentinels),global_data);
     ARRAY<RANGE<TV_INT> > regions;
     mpi_grid.Find_Boundary_Regions(regions,sentinels,true,RANGE<VECTOR<int,1> >(-3,-1),true);
-    for(int n=1;n<=regions.m;n++) if(!neighbor_overlaps(n)) Put(local_data,regions(n),global_data);
+    for(int n=0;n<regions.m;n++) if(!neighbor_overlaps(n)) Put(local_data,regions(n),global_data);
 }
 //#####################################################################
 // Function Get

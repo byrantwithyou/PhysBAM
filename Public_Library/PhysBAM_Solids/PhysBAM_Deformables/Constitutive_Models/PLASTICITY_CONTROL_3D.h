@@ -32,7 +32,7 @@ public:
         assert(yield_ratio>0);sqr_log_yield_ratio=sqr(log(yield_ratio));
         log_Fp.Exact_Resize(strain_measure.Dm_inverse.m);
         log_Fp_goal.Exact_Resize(strain_measure.Dm_inverse.m);
-        for(int t=1;t<=strain_measure.Dm_inverse.m;t++){
+        for(int t=0;t<strain_measure.Dm_inverse.m;t++){
             MATRIX<T,3> F=strain_measure.Ds(X_goal.array,t)*strain_measure.Dm_inverse(t);
             if(F.Determinant()<=0) PHYSBAM_FATAL_ERROR("Cannot control towards inverting elements");
             MATRIX<T,3> U,V;DIAGONAL_MATRIX<T,3> Fp_goal_hat;F.Fast_Singular_Value_Decomposition(U,Fp_goal_hat,V);
@@ -41,7 +41,7 @@ public:
     
     void Print_Extreme_Deformations()
     {T tension=-1e10,compression=1e10;
-    for(int t=1;t<=log_Fp_goal.m;t++){
+    for(int t=0;t<log_Fp_goal.m;t++){
         DIAGONAL_MATRIX<T,3> eigenvalues=log_Fp_goal(t).Fast_Eigenvalues();
         tension=max(tension,eigenvalues.x11);compression=min(compression,eigenvalues.x22);}
     LOG::cout<<"Maximum goal expansion = "<<exp(tension)<<", compression = "<<exp(compression)<<std::endl;}
@@ -62,7 +62,7 @@ public:
     
     void Read_State(TYPED_ISTREAM& input) PHYSBAM_OVERRIDE
     {PLASTICITY_MODEL<T,3>::Read_State(input);
-    for(int t=1;t<=Fp_inverse.m;t++)log_Fp(t)=-log(Fp_inverse(t));}
+    for(int t=0;t<Fp_inverse.m;t++)log_Fp(t)=-log(Fp_inverse(t));}
     
 //#####################################################################
 };

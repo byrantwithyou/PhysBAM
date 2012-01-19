@@ -231,9 +231,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     // normalize their mass
     if(parameter_list.Is_Defined("uniform_mass")){
         T mass=parameter_list.Get_Parameter("uniform_mass",(T)1);
-        for(int i=1;i<=rigid_bodies.m;i++) rigid_bodies(i)->Set_Mass(mass);}
+        for(int i=0;i<rigid_bodies.m;i++) rigid_bodies(i)->Set_Mass(mass);}
     else{
-        for(int i=1;i<=rigid_bodies.m;i++) rigid_bodies(i)->Set_Mass(1000*rigid_bodies(i)->Volume());}
+        for(int i=0;i<rigid_bodies.m;i++) rigid_bodies(i)->Set_Mass(1000*rigid_bodies(i)->Volume());}
 
     int num_joints=2*(num_cols*(num_rows+1)+num_rows*(num_cols+1));
     JOINT<TV>** joints;joints=new JOINT<TV>*[num_joints];
@@ -416,7 +416,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         arb->Update_With_Breadth_First_Directed_Graph(int(id-3));
 
         T k_p=parameter_list.Get_Parameter("k_p",(T)100);
-        for(int i=1;i<=3;i++){
+        for(int i=0;i<3;i++){
             JOINT_FUNCTION<TV>* joint_function=arb->Create_Joint_Function(JOINT_ID(first_joint_id+i-1));
             joint_function->Set_k_p(k_p);
             joint_function->Set_Target_Angle(joint_function->Angle());}}
@@ -459,7 +459,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             joint_function->muscle_control=true;
             joint_function->Set_k_p(k_p);
             joint_function->Set_Target_Angle(joint_function->Angle());}
-        for(int i=1;i<=fused_joints.m;i++){
+        for(int i=0;i<fused_joints.m;i++){
             assert(!arb->joint_mesh(fused_joints(i))->secondary_point_of_bend_joint);
             arb->Create_Joint_Function(fused_joints(i));JOINT_FUNCTION<TV>* joint_function=arb->joint_mesh(fused_joints(i))->joint_function;
             joint_function->muscle_control=true;
@@ -509,13 +509,13 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     // net gets ether drag
 /*    LOG::cout<<"Adding ether drag to net but not man"<<std::endl;
-    for(int i=1;i<=number_of_net_rigid_bodies;i++) if(!rigid_body_particles.Rigid_Body(i).is_static)
+    for(int i=0;i<number_of_net_rigid_bodies;i++) if(!rigid_body_particles.Rigid_Body(i).is_static)
         rigid_body_particles.Rigid_Body(i).Add_Basic_Forces(solids_parameters.gravity,solids_parameters.gravity_direction,ether_viscosity,ether_angular_viscosity);
 */
     tests.Add_Gravity();
 
     T coefficient_of_friction=parameter_list.Get_Parameter("coefficient_of_friction",(T)1);
-    for(int i=1;i<=rigid_bodies.m;i++)
+    for(int i=0;i<rigid_bodies.m;i++)
         rigid_bodies(i)->Set_Coefficient_Of_Friction(coefficient_of_friction);
 
     solids_parameters.collision_body_list.Add_Bodies(solids_parameters.rigid_body_parameters.list);
@@ -539,19 +539,19 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
 
         if(da_man && !parameter_list.Get_Parameter("skeleton_collisions",true)){
             LOG::cout<<"turning off self collisions for skeleton"<<std::endl;
-            for(int i=1;i<=man_bones.m;i++) for(int j=i+1;j<=man_bones.m;j++) if(man_bones(i)->particle_index && man_bones(j)->particle_index){
+            for(int i=0;i<man_bones.m;i++) for(int j=i+1;j<=man_bones.m;j++) if(man_bones(i)->particle_index && man_bones(j)->particle_index){
                 collision_manager.Set_Rigid_Body_Collides_With_Other_Rigid_Body(man_bones(i)->particle_index,man_bones(j)->particle_index,false);
                 collision_manager.Set_Rigid_Body_Collides_With_Other_Rigid_Body(man_bones(j)->particle_index,man_bones(i)->particle_index,false);}}
 
         if(parameter_list.Get_Parameter("no_net_collisions",false)){
-            for(int i=1;i<=rigid_bodies.m;i++){
+            for(int i=0;i<rigid_bodies.m;i++){
                 if(rigid_bodies(i)->name=="net" || rigid_bodies(i)->name=="net_joint"){
                     for(int j=i+1;j<=rigid_bodies.m;j++){
                         if(rigid_bodies(j)->name=="net" || rigid_bodies(j)->name=="net_joint"){
                             collision_manager.Set_Rigid_Body_Collides_With_Other_Rigid_Body(rigid_bodies(i)->particle_index,rigid_bodies(j)->particle_index,false);
                             collision_manager.Set_Rigid_Body_Collides_With_Other_Rigid_Body(rigid_bodies(j)->particle_index,rigid_bodies(i)->particle_index,false);}}}}}
         else if(parameter_list.Get_Parameter("no_collisions",false)){
-            for(int i=1;i<=rigid_bodies.m;i++) for(int j=i+1;j<=rigid_bodies.m;j++){
+            for(int i=0;i<rigid_bodies.m;i++) for(int j=i+1;j<=rigid_bodies.m;j++){
                 collision_manager.Set_Rigid_Body_Collides_With_Other_Rigid_Body(rigid_bodies(i)->particle_index,rigid_bodies(j)->particle_index,false);
                 collision_manager.Set_Rigid_Body_Collides_With_Other_Rigid_Body(rigid_bodies(j)->particle_index,rigid_bodies(i)->particle_index,false);}}
         else{
@@ -597,7 +597,7 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
 
     // Zero out some angular velocities for improved stability
     if(zero_angular_velocity_of_net_joints){
-        for(int i=1;i<=rigid_bodies.m;i++)
+        for(int i=0;i<rigid_bodies.m;i++)
             if(rigid_bodies(i)->name=="net_joint"){
                 rigid_bodies(i)->Twist().angular=rigid_bodies(i)->Angular_Momentum()=TV();}
             else if(rigid_bodies(i)->name=="net"){
@@ -659,10 +659,10 @@ void Apply_Constraints(const T dt,const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 void Set_Skeleton_Mass(const T new_mass)
 {
-    T old_mass=0;for(int i=1;i<=man_bones.m;i++) old_mass+=man_bones(i)->Mass();
+    T old_mass=0;for(int i=0;i<man_bones.m;i++) old_mass+=man_bones(i)->Mass();
     T scale=old_mass?new_mass/old_mass:0;
     LOG::cout<<"Setting skeleton mass to "<<new_mass<<" (old was "<<old_mass<<")"<<std::endl;
-    for(int i=1;i<=man_bones.m;i++) man_bones(i)->Set_Mass(scale*man_bones(i)->Mass());
+    for(int i=0;i<man_bones.m;i++) man_bones(i)->Set_Mass(scale*man_bones(i)->Mass());
 }
 //#####################################################################
 // Read_Output_Files_Solids
@@ -675,13 +675,13 @@ void Read_Output_Files_Solids(const int frame) PHYSBAM_OVERRIDE
     ARRAY<RIGID_BODY<TV>*>& rigid_bodies=rigid_body_list.rigid_bodies;
     if(parameter_list.Get_Parameter("zero_velocities_after_restart",false)){
         LOG::cout<<"Zeroing velocities after restart"<<std::endl;
-        for(int i=1;i<=rigid_bodies.m;i++){
+        for(int i=0;i<rigid_bodies.m;i++){
             rigid_bodies(i)->Twist().linear=rigid_bodies(i)->Twist().angular=TV();
             rigid_bodies(i)->Update_Angular_Momentum();}}
     if(parameter_list.Is_Defined("uniform_mass")){
         T mass=parameter_list.Get_Parameter("uniform_mass",(T)1);
         LOG::cout<<"Updating net mass after restart to "<<mass<<std::endl;
-        for(int i=1;i<=rigid_bodies.m;i++)
+        for(int i=0;i<rigid_bodies.m;i++)
             if(rigid_bodies(i)->name=="net" || rigid_bodies(i)->name=="net_joint")
                 rigid_bodies(i)->Set_Mass(mass);}
     if(parameter_list.Is_Defined("skeleton_mass")){

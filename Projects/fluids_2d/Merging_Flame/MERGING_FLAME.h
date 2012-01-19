@@ -48,13 +48,13 @@ public:
     return true;}
 
     virtual void Initialize_Velocities()
-    {for(int i=1;i<=fluids_parameters.grid.m;i++)for(int j=1;j<=fluids_parameters.grid.n;j++) fluids_parameters.incompressible.V(i,j)=VECTOR_2D<T>(0,0);}
+    {for(int i=0;i<fluids_parameters.grid.m;i++)for(int j=0;j<fluids_parameters.grid.n;j++) fluids_parameters.incompressible.V(i,j)=VECTOR_2D<T>(0,0);}
     
     void Get_Source_Velocities(const T time) PHYSBAM_OVERRIDE
     {}
 
     void Initialize_Phi()
-    {for(int i=1;i<=fluids_parameters.grid.m;i++)for(int j=1;j<=fluids_parameters.grid.n;j++)
+    {for(int i=0;i<fluids_parameters.grid.m;i++)for(int j=0;j<fluids_parameters.grid.n;j++)
         if(Is_Fuel(fluids_parameters.grid.X(i,j))) fluids_parameters.particle_levelset_evolution.particle_levelset.levelset.phi(i,j)=-fluids_parameters.grid.dx;
         else fluids_parameters.particle_levelset_evolution.particle_levelset.levelset.phi(i,j)=fluids_parameters.grid.dx;}
 

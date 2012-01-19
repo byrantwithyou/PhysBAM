@@ -172,7 +172,7 @@ template<class TV> void LINEAR_SPRINGS_SYSTEM_VECTOR<TV>::
 Print() const
 {
     // Flat print
-    for(int i=1;i<=X.n;i++)
+    for(int i=0;i<X.n;i++)
         LOG::cout<<X(i)<<" ";
 }
 template<class TV> int LINEAR_SPRINGS_SYSTEM_VECTOR<TV>::

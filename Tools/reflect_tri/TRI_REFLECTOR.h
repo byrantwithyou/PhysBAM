@@ -42,7 +42,7 @@ public:
         if(surfaces.m<1) return;
         if(*active_surface+1<=surfaces.m) *active_surface+=1;
         else *active_surface=1;
-        for(int i=1;i<=surfaces.m;i++)
+        for(int i=0;i<surfaces.m;i++)
         {
             surfaces(i)->Set_Front_Material(OPENGL_MATERIAL::Plastic(OPENGL_COLOR(float(.9), float(.9), float(.9))));
         }
@@ -343,7 +343,7 @@ public:
     {}
     void operator()()
     {
-        for(int i=1;i<=gl_surfaces.m;i++)
+        for(int i=0;i<gl_surfaces.m;i++)
             gl_surfaces(i)->visible = !(gl_surfaces(i)->visible);
     }
     void Print(std::ostream& out) { out << "Read and apply a transform from the file 'transform.txt'"; }
@@ -362,7 +362,7 @@ public:
     {}
     void operator()()
     {
-        for(int i=1;i<=gl_vols.m;i++)
+        for(int i=0;i<gl_vols.m;i++)
             gl_vols(i)->visible = !(gl_vols(i)->visible);
     }
     void Print(std::ostream& out) { out << "Read and apply a transform from the file 'transform.txt'"; }
@@ -386,7 +386,7 @@ public:
         if(gl_isurfs.m<1) return;
         if(*active_isurf+1<=gl_isurfs.m) *active_isurf+=1;
         else *active_isurf=1;
-        for(int i=1;i<=gl_isurfs.m;i++)
+        for(int i=0;i<gl_isurfs.m;i++)
         {
             gl_isurfs(i)->Set_Surface_Material(OPENGL_MATERIAL::Matte(OPENGL_COLOR(float(.7),float(.5),float(.3))),OPENGL_MATERIAL::Matte(OPENGL_COLOR(float(.8),float(.8),float(.1))));
         }
@@ -605,7 +605,7 @@ public:
     {}
     void operator()()
     {
-        for(int i=1;i<=gl_isurfs.m;i++)
+        for(int i=0;i<gl_isurfs.m;i++)
         {
             gl_isurfs(i)->visible = !(gl_isurfs(i)->visible);
             gl_reflected_isurfs(i)->visible = !(gl_reflected_isurfs(i)->visible);

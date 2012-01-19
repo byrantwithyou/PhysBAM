@@ -119,7 +119,7 @@ Restore_Position(ARRAY_VIEW<const TV> X,ARRAY_VIEW<const TV> rigid_X,ARRAY_VIEW<
     PHYSBAM_ASSERT(X.Size()==particles.array_collection->Size());PHYSBAM_ASSERT(rigid_X.Size()==rigid_body_collection.rigid_body_particle.array_collection->Size());
     PHYSBAM_ASSERT(rigid_rotation.Size()==rigid_body_collection.rigid_body_particle.array_collection->Size());
     particles.X.Subset(simulated_particles)=X.Subset(simulated_particles);
-    for(int i=1;i<=simulated_rigid_body_particles.m;i++) rigid_body_collection.Rigid_Body(simulated_rigid_body_particles(i)).Update_Angular_Velocity();
+    for(int i=0;i<simulated_rigid_body_particles.m;i++) rigid_body_collection.Rigid_Body(simulated_rigid_body_particles(i)).Update_Angular_Velocity();
     for(int i=1;i<=rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if(rigid_body_collection.Is_Active(i)){
         RIGID_BODY<TV>& body=rigid_body_collection.Rigid_Body(i);rigid_body_collection.rigid_body_particle.X(i)=rigid_X(i);
         rigid_body_collection.rigid_body_particle.rotation(i)=rigid_rotation(i);body.Update_Angular_Velocity();}
@@ -134,7 +134,7 @@ Save_Velocity(ARRAY<TV>& V,ARRAY<TV>& rigid_velocity,ARRAY<T_SPIN>& rigid_angula
     V.Resize(particles.array_collection->Size(),false,false);
     rigid_velocity.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size(),false,false);rigid_angular_momentum.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size(),false,false);
     V.Subset(solid_body_collection.deformable_body_collection.simulated_particles)=particles.V.Subset(solid_body_collection.deformable_body_collection.simulated_particles);
-    for(int i=1;i<=solid_body_collection.rigid_body_collection.simulated_rigid_body_particles.m;i++){int p=solid_body_collection.rigid_body_collection.simulated_rigid_body_particles(i);
+    for(int i=0;i<solid_body_collection.rigid_body_collection.simulated_rigid_body_particles.m;i++){int p=solid_body_collection.rigid_body_collection.simulated_rigid_body_particles(i);
         rigid_velocity(p)=rigid_body_collection.rigid_body_particle.twist(p).linear;rigid_angular_momentum(p)=rigid_body_collection.rigid_body_particle.angular_momentum(p);}
     for(int i=1;i<=rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if(rigid_body_collection.Is_Active(i)){RIGID_BODY<TV>& body=rigid_body_collection.Rigid_Body(i);
         if(!body.Is_Simulated()){rigid_velocity(i)=rigid_body_collection.rigid_body_particle.twist(i).linear;rigid_angular_momentum(i)=rigid_body_collection.rigid_body_particle.angular_momentum(i);}}
@@ -147,7 +147,7 @@ Restore_Velocity(ARRAY<TV>& V,ARRAY<TV>& rigid_velocity,ARRAY<T_SPIN>& rigid_ang
 {
     PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
     particles.V.Subset(solid_body_collection.deformable_body_collection.simulated_particles)=V.Subset(solid_body_collection.deformable_body_collection.simulated_particles);
-    for(int i=1;i<=solid_body_collection.rigid_body_collection.simulated_rigid_body_particles.m;i++){int p=solid_body_collection.rigid_body_collection.simulated_rigid_body_particles(i);
+    for(int i=0;i<solid_body_collection.rigid_body_collection.simulated_rigid_body_particles.m;i++){int p=solid_body_collection.rigid_body_collection.simulated_rigid_body_particles(i);
         rigid_body_collection.rigid_body_particle.twist(p).linear=rigid_velocity(p);
         rigid_body_collection.rigid_body_particle.angular_momentum(p)=rigid_angular_momentum(p);rigid_body_collection.Rigid_Body(p).Update_Angular_Velocity();}
     for(int i=1;i<=rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if(rigid_body_collection.Is_Active(i)){RIGID_BODY<TV>& body=rigid_body_collection.Rigid_Body(i);
@@ -277,7 +277,7 @@ template<class T_GRID> void SEARCH_CONTROLLER<T_GRID>::
 Propogate_Solid_Helper(ARRAY<int>& cluster_bodies,TV& cluster_translation,TWIST<TV>& cluster_twist)
 {
     RIGID_BODY_PARTICLES<TV>& rbp=solid_body_collection.rigid_body_collection.rigid_body_particle;
-    for(int i=1;i<=cluster_bodies.m;i++){
+    for(int i=0;i<cluster_bodies.m;i++){
         int child=cluster_bodies(i);
         rbp.twist(child).linear=cluster_twist.linear+TV::Cross_Product(cluster_twist.angular,rbp.X(child)-cluster_translation);
         //TODO(mlentine): change this to momentum not velocity
@@ -354,14 +354,14 @@ Project_Solid_Velocities(const T time)
     if(has_kinematic) return;
     //TODO (mlentine): This needs to be fixed for no kinematic bodies
     Make_Cluster_List(root_particle_index,cluster_list);
-    for(int i=1;i<=cluster_list.m;i++){
+    for(int i=0;i<cluster_list.m;i++){
         int child=cluster_list(i);
         cluster_mass+=rbp.mass(child);
         cluster_translation+=rbp.X(child)*rbp.mass(child);
         cluster_twist.linear+=rbp.twist(child).linear*rbp.mass(child);}
     cluster_translation/=cluster_mass;
     cluster_twist.linear/=cluster_mass;
-    for(int i=1;i<=cluster_list.m;i++){
+    for(int i=0;i<cluster_list.m;i++){
         int child=cluster_list(i);
         RIGID_BODY<TV>& child_body=solid_body_collection.rigid_body_collection.Rigid_Body(child);
         TV s=(child_body.X()-cluster_translation);
@@ -419,7 +419,7 @@ template<class TV> void SEARCH_CONTROLLER<TV>::
 Set_PD_Targets()
 {
     if(solid_body_collection.rigid_body_collection.articulated_rigid_body.Has_Actuators()){
-        if(current_joints.m>0) for(int i=1;i<=current_joints.m;i++){assert(joint_mesh.Is_Active(current_joints(i)));
+        if(current_joints.m>0) for(int i=0;i<current_joints.m;i++){assert(joint_mesh.Is_Active(current_joints(i)));
             JOINT<TV>& joint=*joint_mesh(current_joints(i));
             bool control=false;for(int j=1;j<=T_SPIN::dimension;j++) if(joint.control_dof(j)) control=true;
             if(!joint.joint_function || !control) continue;
@@ -457,7 +457,7 @@ Create_Clusters_From_Joint_List(const ARRAY<bool,JOINT_ID>& blocking_joint,ARRAY
     STACK<int> stack;
     for(JOINT_ID j(1);j<=blocking_joint.Size();j++) if(blocking_joint(j)){
         VECTOR<int,2> adjacent_list_j(adjacent_lists(j).x,adjacent_lists(j).y);
-        for(int k=1;k<=2;k++) if(int b=(k==1?graph.Edges(j).x:graph.Edges(j).y)){
+        for(int k=0;k<2;k++) if(int b=(k==1?graph.Edges(j).x:graph.Edges(j).y)){
             RIGID_BODY<TV>& rbody=solid_body_collection.rigid_body_collection.Rigid_Body(b);
             if(!rbody.Has_Infinite_Inertia() && done(b)){adjacent_list_j(k)=done(b);continue;}
             stack.Push(b);
@@ -552,7 +552,7 @@ Create_All_Clusters(RIGID_BODY_COLLISION_MANAGER_HASH* collision_manager)
                 collision_manager->hash.Insert(PAIR<int,int>(parent_cluster,child_cluster));
                 collision_manager->hash.Insert(PAIR<int,int>(child_cluster,parent_cluster));}}}
     //deactive new clusters
-    for(int i=1;i<=global_clusters.m;i++) rigid_bindings.Set_Binding_Active(global_clusters(i),false,(incorporate_fluids?fluids_parameters->collision_bodies_affecting_fluid:0));
+    for(int i=0;i<global_clusters.m;i++) rigid_bindings.Set_Binding_Active(global_clusters(i),false,(incorporate_fluids?fluids_parameters->collision_bodies_affecting_fluid:0));
 }
 //#####################################################################
 // Function Remove_Rigid
@@ -561,7 +561,7 @@ template<class T_GRID> void SEARCH_CONTROLLER<T_GRID>::
 Remove_Clusters()
 {
     RIGID_BODY_CLUSTER_BINDINGS<TV>& rigid_bindings=solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings;
-    for(int i=1;i<=global_clusters.m;i++) rigid_bindings.Delete_Binding(global_clusters(i));
+    for(int i=0;i<global_clusters.m;i++) rigid_bindings.Delete_Binding(global_clusters(i));
     global_clusters.Remove_All();
 }
 //#####################################################################
@@ -570,7 +570,7 @@ Remove_Clusters()
 template<class T_GRID> void SEARCH_CONTROLLER<T_GRID>::
 Add_Solid_Drag(const T time,ARRAY<TV> &F,ARRAY<TWIST<TV> > &rigid_F)
 {
-    for(int i=1;i<=solid_body_collection.solids_forces.m;i++){
+    for(int i=0;i<solid_body_collection.solids_forces.m;i++){
         if(dynamic_cast<WIND_DRAG<TV>*>(&*solid_body_collection.solids_forces(i))||dynamic_cast<ETHER_DRAG<T_GRID>*>(&*solid_body_collection.solids_forces(i))){
             solid_body_collection.solids_forces(i)->Update_Position_Based_State(time);
             solid_body_collection.solids_forces(i)->Add_Velocity_Independent_Forces(F,rigid_F,time);
@@ -678,7 +678,7 @@ Evaluate_Force_To_Stay_For_Joint(T_FACE_ARRAYS_SCALAR& face_velocities,const T d
     for(JOINT_ID i(1);i<=joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue;
         joint_mesh(i)->global_post_stabilization=false;
         joint_mesh(i)->joint_function->active=false;}
-    for(int i=1;i<=joints.m;i++){assert(joint_mesh.Is_Active(joints(i)));
+    for(int i=0;i<joints.m;i++){assert(joint_mesh.Is_Active(joints(i)));
         JOINT<TV>& joint=*joint_mesh(joints(i));
         joint.impulse_accumulator->Reset();
         joint.joint_function->active=true;joint.global_post_stabilization=true;}
@@ -694,7 +694,7 @@ Evaluate_Force_To_Stay_For_Joint(T_FACE_ARRAYS_SCALAR& face_velocities,const T d
     Restore_Nested_State(face_velocities);
     Restore_PD_State();current_joints.Remove_All();
     PHYSBAM_DEBUG_WRITE_SUBSTEP(STRING_UTILITIES::string_sprintf("Evaluate Force End (search_controller) time=%f",time),0,0);
-    for(int i=1;i<=joints.m;i++){assert(joint_mesh.Is_Active(joints(i)));
+    for(int i=0;i<joints.m;i++){assert(joint_mesh.Is_Active(joints(i)));
         F+=joint_mesh(joints(i))->impulse_accumulator->Energy();}
     return F/joints.m;
 }
@@ -827,7 +827,7 @@ Evaluate_Force_For_Joint(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const 
     if(!use_projection && incorporate_fluids) Take_Hypothetical_Fluids_Step(time+dt_hyp);
 
     ARRAY<JOINT_ID> force_list,drag_list;
-    for(int i=1;i<=strain_joints.m;i++) force_list.Append(strain_joints(i)); 
+    for(int i=0;i<strain_joints.m;i++) force_list.Append(strain_joints(i)); 
     if(objective(joint_id)==FORCE) force_list.Append_Unique(joint_id);
     if(objective(joint_id)==DRAG){drag_list.Append(joint_id);F=Evaluate_Drag_For_Joint(dt_hyp,time,drag_list);}
     if(force_list.m>0) F+=Evaluate_Force_To_Stay_For_Joint(face_velocities,dt,time,force_list);
@@ -854,7 +854,7 @@ Evaluate_Force(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,con
     ARRAY<int> active_clusters;
     if(use_clusters){
         rigid_bindings.Deactivate_And_Return_Clusters(active_clusters,(incorporate_fluids?fluids_parameters->collision_bodies_affecting_fluid:0));
-        for(int i=1;i<=global_clusters.m;i++) rigid_bindings.Set_Binding_Active(global_clusters(i),true);
+        for(int i=0;i<global_clusters.m;i++) rigid_bindings.Set_Binding_Active(global_clusters(i),true);
         solid_body_collection.rigid_body_collection.Update_Angular_Momentum();}
 
     Save_PD_State();
@@ -885,7 +885,7 @@ Evaluate_Force(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,con
     if(!use_projection && incorporate_fluids) Take_Hypothetical_Fluids_Step(time+dt_hyp);
 
     ARRAY<JOINT_ID> force_list,drag_list;
-    for(int i=1;i<=strain_joints.m;i++) force_list.Append(strain_joints(i)); 
+    for(int i=0;i<strain_joints.m;i++) force_list.Append(strain_joints(i)); 
     for(JOINT_ID i(1);i<=joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue;
         if(objective(i)==FORCE) force_list.Append_Unique(i);
         if(objective(i)==DRAG) drag_list.Append(i);}
@@ -1043,7 +1043,7 @@ Update_Position_Based_State(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,con
             for(CELL_ITERATOR iterator(*fluids_parameters->grid,1);iterator.Valid();iterator.Next()) current_state->pressures(iterator.Cell_Index())=p(iterator.Cell_Index());}
         else{
             ARRAY<TV> F(solid_body_collection.deformable_body_collection.particles.array_collection->Size());ARRAY<TWIST<TV> >rigid_F(solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size());
-            for(int i=1;i<=solid_body_collection.solids_forces.m;i++){
+            for(int i=0;i<solid_body_collection.solids_forces.m;i++){
                 solid_body_collection.solids_forces(i)->Add_Velocity_Independent_Forces(F,rigid_F,time);
                 solid_body_collection.solids_forces(i)->Add_Velocity_Dependent_Forces(solid_body_collection.deformable_body_collection.particles.V,
                     solid_body_collection.rigid_body_collection.rigid_body_particle.twist,F,rigid_F,time);}
@@ -1059,7 +1059,7 @@ Update_Position_Based_State(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,con
         
         if(collecting_data){
             ARRAY<JOINT_ID> force_list,drag_list;
-            for(int i=1;i<=strain_joints.m;i++) force_list.Append(strain_joints(i)); 
+            for(int i=0;i<strain_joints.m;i++) force_list.Append(strain_joints(i)); 
             for(JOINT_ID i(1);i<=joint_mesh.Size();i++){if(!joint_mesh.Is_Active(i)) continue;
                 if(objective(i)==FORCE) force_list.Append_Unique(i);
                 if(objective(i)==DRAG) drag_list.Append(i);}

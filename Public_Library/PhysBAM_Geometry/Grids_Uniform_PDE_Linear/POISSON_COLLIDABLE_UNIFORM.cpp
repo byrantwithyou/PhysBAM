@@ -51,7 +51,7 @@ Compute_beta_And_Add_Jumps_To_b(const T dt,const T time)
         ARRAY<T_ARRAYS_SCALAR> phis_ghost;
         if((!use_variable_beta && !beta_given_on_faces) || u_jumps || beta_un_jumps){assert(levelset_multiple);
             phis_ghost.Resize(levelset_multiple->phis.m);
-            for(int i=1;i<=phis_ghost.m;i++){phis_ghost(i).Resize(grid.Domain_Indices(ghost_cells),false);
+            for(int i=0;i<phis_ghost.m;i++){phis_ghost(i).Resize(grid.Domain_Indices(ghost_cells),false);
                 levelset_multiple->levelsets(i)->boundary->Fill_Ghost_Cells(grid,levelset_multiple->phis(i),phis_ghost(i),dt,time,ghost_cells);}}
         if(!beta_given_on_faces){if(use_variable_beta) Find_Variable_beta();else Find_Constant_beta_Multiphase(phis_ghost);}
         if(u_jumps) Add_Jump_To_b_Multiphase(phis_ghost);
@@ -109,7 +109,7 @@ Find_Constant_beta_Multiphase(ARRAY<T_ARRAYS_SCALAR>& phis_ghost)
             else if(psi_D(iterator.Second_Cell_Index())) beta_face.Component(iterator.Axis())(iterator.Face_Index())=levelset.Region_Value(iterator.First_Cell_Index(),beta_multiphase);
             else beta_face.Component(iterator.Axis())(iterator.Face_Index())=levelset.Heaviside(iterator.First_Cell_Index(),iterator.Second_Cell_Index(),beta_multiphase,half_width);}}
     else{ // smear 1/beta for the delta function method
-        ARRAY<T> rho_multiphase(beta_multiphase.m);for(int i=1;i<=rho_multiphase.m;i++)rho_multiphase(i)=1/beta_multiphase(i);
+        ARRAY<T> rho_multiphase(beta_multiphase.m);for(int i=0;i<rho_multiphase.m;i++)rho_multiphase(i)=1/beta_multiphase(i);
         for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
             // use the beta from the non dirichlet region for dirichlet boundary conditions
             if(psi_D(iterator.First_Cell_Index())) beta_face.Component(iterator.Axis())(iterator.Face_Index())=levelset.Region_Value(iterator.Second_Cell_Index(),beta_multiphase); 
@@ -254,14 +254,14 @@ Use_Internal_Level_Set(const int number_of_regions)
     assert(multiphase);
     assert(number_of_regions>=2);
     phis_default.Resize(number_of_regions);
-    for(int i=1;i<=phis_default.m;i++)phis_default(i).Resize(grid.Domain_Indices(3));
+    for(int i=0;i<phis_default.m;i++)phis_default(i).Resize(grid.Domain_Indices(3));
     levelset_multiple=&levelset_multiple_default;
     levelset_multiple->Recreate_Levelsets();
 }
 template<class T_GRID> void POISSON_COLLIDABLE_UNIFORM<T_GRID>::
 Update_Internal_Level_Set(LEVELSET_MULTIPLE_UNIFORM<T_GRID>& levelset_multiple_input)
 {
-    for(int k=1;k<=levelset_multiple_input.phis.m;k++) levelset_multiple->phis(k)=levelset_multiple_input.phis(k);
+    for(int k=0;k<levelset_multiple_input.phis.m;k++) levelset_multiple->phis(k)=levelset_multiple_input.phis(k);
 }
 template<class T_GRID> void POISSON_COLLIDABLE_UNIFORM<T_GRID>::
 Set_Up_Second_Order_Cut_Cell_Method(const bool use_second_order_cut_cell_method_input)

@@ -93,7 +93,7 @@ public:
         
         // make forces
         ARRAY<int> referenced_nodes;
-        for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++){
+        for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++){
             if(TRIANGULATED_SURFACE<T>* surface=dynamic_cast<TRIANGULATED_SURFACE<T>*>(deformable_body_collection.deformable_geometry.structures(i))){
             solid_body_collection.Add_Force(Create_Edge_Springs(*surface,(T)100,(T)3));
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));}}

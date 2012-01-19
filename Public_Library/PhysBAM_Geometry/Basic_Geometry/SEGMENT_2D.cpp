@@ -153,7 +153,7 @@ Segment_Segment_Collision(const SEGMENT_2D<T>& segment,const VECTOR<T,2>& v1,con
 
     // check the collision times
     T distance;
-    for(int roots=1;roots<=cubic.roots;roots++){
+    for(int roots=0;roots<cubic.roots;roots++){
         if(roots == 1) collision_time=dt*cubic.root1;else if(roots == 2) collision_time=dt*cubic.root2;else collision_time=dt*cubic.root3;
         SEGMENT_2D segment2(x1+collision_time*v1,x2+collision_time*v2);
         if(segment2.Segment_Segment_Interaction(SEGMENT_2D(segment.x1+collision_time*v3,segment.x2+collision_time*v4),v1,v2,v3,v4,collision_thickness,distance,normal,a,b,relative_speed,
@@ -268,9 +268,9 @@ Cut_With_Hyperplane_And_Discard_Outside_Simplices(const SEGMENT_2D<T>& segment,c
     VECTOR<VECTOR<T,2>,2> X_nodes;
     X_nodes(1)=segment.x1;
     X_nodes(2)=segment.x2;
-    for(int i=1;i<=2;i++){phi_nodes[i]=cutting_plane.Signed_Distance(X_nodes[i]);}
+    for(int i=0;i<2;i++){phi_nodes[i]=cutting_plane.Signed_Distance(X_nodes[i]);}
     int positive_count=0;
-    for(int i=1;i<=2;i++) if(phi_nodes[i]>0) positive_count++;
+    for(int i=0;i<2;i++) if(phi_nodes[i]>0) positive_count++;
     switch(positive_count){
         case 0: // in negative halfspace
             negative_segments.Append(segment);break;

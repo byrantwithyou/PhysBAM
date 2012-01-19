@@ -605,7 +605,7 @@ Consistent_Boundary_Conditions(T_FACE_ARRAYS_SCALAR& face_velocities) const
         T_ARRAYS_BOOL psi_D_ghost(projection.elliptic_solver->psi_D);
         T_FACE_ARRAYS_SCALAR face_velocities_ghost(face_velocities);T_FACE_ARRAYS_SCALAR psi_N_ghost(projection.p_grid);
         projection.elliptic_solver->mpi_grid->Exchange_Boundary_Cell_Data(psi_D_ghost,1);
-        for(int axis=1;axis<=T_GRID::dimension;axis++)for(int axis_side=1;axis_side<=2;axis_side++){int side=2*(axis-1)+axis_side;
+        for(int axis=1;axis<=T_GRID::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
             if(projection.elliptic_solver->mpi_grid->Neighbor(axis,axis_side)){TV_INT exterior_cell_offset=axis_side==1?-TV_INT::Axis_Vector(axis):TV_INT();
                 for(FACE_ITERATOR iterator(projection.p_grid,0,T_GRID::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
                     TV_INT face=iterator.Face_Index(),cell=face+exterior_cell_offset;int axis=iterator.Axis();

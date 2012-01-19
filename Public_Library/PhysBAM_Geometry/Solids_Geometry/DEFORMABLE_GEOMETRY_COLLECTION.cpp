@@ -67,10 +67,10 @@ Read_Static_Variables(const STREAM_TYPE stream_type,const std::string& prefix,co
     if(!structures.m){ // // create and read all structures from scratch
         structures.Resize(m);
         if(!stream_type.use_doubles)
-            for(int k=1;k<=structures.m;k++) structures(k)=Read_Write<STRUCTURE<TV>,float>::Create_Structure(*input_raw,particles);
+            for(int k=0;k<structures.m;k++) structures(k)=Read_Write<STRUCTURE<TV>,float>::Create_Structure(*input_raw,particles);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
         else
-            for(int k=1;k<=structures.m;k++) structures(k)=Read_Write<STRUCTURE<TV>,double>::Create_Structure(*input_raw,particles);
+            for(int k=0;k<structures.m;k++) structures(k)=Read_Write<STRUCTURE<TV>,double>::Create_Structure(*input_raw,particles);
 #endif
     }
     else if(structures.m<=m){
@@ -112,10 +112,10 @@ Write_Static_Variables(const STREAM_TYPE stream_type,const std::string& prefix,c
     TYPED_OSTREAM output(*output_raw,stream_type);
     Write_Binary(output,structures.m);
     if(!stream_type.use_doubles)
-        for(int k=1;k<=structures.m;k++) Read_Write<STRUCTURE<TV>,float>::Write_Structure(*output_raw,*structures(k));
+        for(int k=0;k<structures.m;k++) Read_Write<STRUCTURE<TV>,float>::Write_Structure(*output_raw,*structures(k));
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
     else
-        for(int k=1;k<=structures.m;k++) Read_Write<STRUCTURE<TV>,double>::Write_Structure(*output_raw,*structures(k));
+        for(int k=0;k<structures.m;k++) Read_Write<STRUCTURE<TV>,double>::Write_Structure(*output_raw,*structures(k));
 #endif
     delete output_raw;
 }

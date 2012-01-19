@@ -41,20 +41,20 @@ public:
     void Copy(const T c,const BASE& bv) PHYSBAM_OVERRIDE
     {const PRESSURE_VELOCITY_VECTOR& v=debug_cast<const PRESSURE_VELOCITY_VECTOR&>(bv);
     assert(v.pressure.m==pressure.m);
-    solid_velocity.Copy(c,v.solid_velocity);for(int i=1;i<=v.pressure.m;i++) VECTOR_ND<T>::Copy(c,v.pressure(i),pressure(i));}
+    solid_velocity.Copy(c,v.solid_velocity);for(int i=0;i<v.pressure.m;i++) VECTOR_ND<T>::Copy(c,v.pressure(i),pressure(i));}
 
     void Copy(const T c1,const BASE& bv1,const BASE& bv2) PHYSBAM_OVERRIDE
     {const PRESSURE_VELOCITY_VECTOR& v1=debug_cast<const PRESSURE_VELOCITY_VECTOR&>(bv1),&v2=debug_cast<const PRESSURE_VELOCITY_VECTOR&>(bv2);
     assert(v1.pressure.m==v2.pressure.m && pressure.m==v1.pressure.m);
     solid_velocity.Copy(c1,v1.solid_velocity,v2.solid_velocity);
-    for(int i=1;i<=v1.pressure.m;i++) VECTOR_ND<T>::Copy(c1,v1.pressure(i),v2.pressure(i),pressure(i));}
+    for(int i=0;i<v1.pressure.m;i++) VECTOR_ND<T>::Copy(c1,v1.pressure(i),v2.pressure(i),pressure(i));}
 
     int Raw_Size() const PHYSBAM_OVERRIDE
-    {int n=solid_velocity.Raw_Size();for(int i=1;i<=pressure.m;i++) n+=pressure(i).n;return n;}
+    {int n=solid_velocity.Raw_Size();for(int i=0;i<pressure.m;i++) n+=pressure(i).n;return n;}
 
     T& Raw_Get(int i) PHYSBAM_OVERRIDE
     {int n=solid_velocity.Raw_Size();if(i<=n) return solid_velocity.Raw_Get(i);i-=n;
-    for(int j=1;j<=pressure.m;j++){if(i<=pressure(j).n) return pressure(j)(i);i-=pressure(j).n;}
+    for(int j=0;j<pressure.m;j++){if(i<=pressure(j).n) return pressure(j)(i);i-=pressure(j).n;}
     PHYSBAM_FATAL_ERROR();}
 };
 }

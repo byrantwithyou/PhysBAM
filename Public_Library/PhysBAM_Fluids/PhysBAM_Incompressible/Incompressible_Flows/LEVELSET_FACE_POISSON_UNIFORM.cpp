@@ -34,7 +34,7 @@ Compute(int axis)
     b.Resize(index_map.index_to_face.m);
     b.Set_Zero();
     typedef BOUNDARY_CONDITIONS_CALLBACKS<TV> CB;
-    for(int i=1;i<=index_map.index_to_face.m;i++){FACE_INDEX<d> face=index_map.index_to_face(i);
+    for(int i=0;i<index_map.index_to_face.m;i++){FACE_INDEX<d> face=index_map.index_to_face(i);
         T middle_value=-2*one_over_dX2.Sum();
         for(int a=0;a<d;a++){
             for(int s=-1;s<=1;s+=2){

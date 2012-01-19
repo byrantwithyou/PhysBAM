@@ -851,7 +851,7 @@ Project_Fluid(const T dt_projection,const T time_projection,const int substep)
                 incompressible_multiphase->Extrapolate_Velocity_Across_Interface(example.fluid_collection.incompressible_fluid_collection.face_velocities,
                     incompressible_multiphase->levelset_for_dirichlet_regions->phi,fluids_parameters.enforce_divergence_free_extrapolation,(T)example.fluids_parameters.number_of_ghost_cells,0,TV(),
                     &collision_bodies_affecting_fluid.face_neighbors_visible);}
-            for(int i=1;i<=fluids_parameters.use_multiphase_strain.m;i++) if(fluids_parameters.use_multiphase_strain(i)){
+            for(int i=0;i<fluids_parameters.use_multiphase_strain.m;i++) if(fluids_parameters.use_multiphase_strain(i)){
                 incompressible_multiphase->strains(i)->Extrapolate_Strain_Across_Interface(particle_levelset_evolution_multiple->phis(i));}}
 
         if(fluids_parameters.move_grid){fluids_parameters.Move_Grid(fluid_collection.incompressible_fluid_collection.face_velocities,time_projection+dt_projection);Initialize_Fluids_Grids();}}
@@ -1055,7 +1055,7 @@ Advect_Fluid(const T dt,const int substep)
         RUNGEKUTTA<T_ARRAYS_DIMENSION_SCALAR> rungekutta_u(euler->U);
         rungekutta_u.Set_Grid_And_Boundary_Condition(euler->grid,*euler->boundary);
         rungekutta_u.Set_Order(fluids_parameters.compressible_rungekutta_order);rungekutta_u.Set_Time(time);rungekutta_u.Start(dt);T rk_time=time;
-        for(int rk_substep=1;rk_substep<=rungekutta_u.order;rk_substep++){
+        for(int rk_substep=0;rk_substep<rungekutta_u.order;rk_substep++){
             if(euler->timesplit && euler->thinshell) euler_solid_fluid_coupling_utilities->Revert_Cells_Near_Interface(rk_substep);
             euler->Fill_Ghost_Cells(dt,time,3);
             if(fluids_parameters.compressible_apply_cavitation_correction){
@@ -1274,7 +1274,7 @@ Advance_Fluid_One_Time_Step_Implicit_Part(const bool done,const T dt,const int s
                 incompressible_multiphase->Extrapolate_Velocity_Across_Interface(example.fluid_collection.incompressible_fluid_collection.face_velocities,incompressible_multiphase->levelset_for_dirichlet_regions->phi,
                     fluids_parameters.enforce_divergence_free_extrapolation,(T)example.fluids_parameters.number_of_ghost_cells,0,TV(),&collision_bodies_affecting_fluid.face_neighbors_visible);
                 incompressible_multiphase->boundary->Apply_Boundary_Condition_Face(incompressible->grid,example.fluid_collection.incompressible_fluid_collection.face_velocities,time+dt);}
-            for(int i=1;i<=fluids_parameters.use_multiphase_strain.m;i++) if(fluids_parameters.use_multiphase_strain(i)){
+            for(int i=0;i<fluids_parameters.use_multiphase_strain.m;i++) if(fluids_parameters.use_multiphase_strain(i)){
                 incompressible_multiphase->strains(i)->Extrapolate_Strain_Across_Interface(particle_levelset_evolution_multiple->phis(i));}}
 
         if(fluids_parameters.move_grid){fluids_parameters.Move_Grid(fluid_collection.incompressible_fluid_collection.face_velocities,time+dt);Initialize_Fluids_Grids();}}
@@ -1347,7 +1347,7 @@ Postprocess_Frame(const int frame)
             LOG::cout<<"Material = "<<mass_new<<" - change = "<<mass_new-example.fluids_parameters.mass<<std::endl;
             example.fluids_parameters.mass=mass_new;}
         else if(number_of_regions>=2){
-            for(int i=1;i<=example.fluids_parameters.number_of_regions;i++){
+            for(int i=0;i<example.fluids_parameters.number_of_regions;i++){
                 T mass_new=particle_levelset_evolution_multiple->Levelset_Advection(i).Approximate_Negative_Material();
                 LOG::cout<<"Region "<<i<<": Material = "<<mass_new<<", change = "<<mass_new-example.fluids_parameters.masses(i)<<std::endl;
                 example.fluids_parameters.masses(i)=mass_new;}}}
@@ -1375,7 +1375,7 @@ Compute_Dt(const T time,const T target_time,bool& done)
 
     T fluids_dt=FLT_MAX;
     if(fluids){
-        if(fluids_parameters.use_reacting_flow) for(int i=1;i<=fluids_parameters.number_of_regions;i++)
+        if(fluids_parameters.use_reacting_flow) for(int i=0;i<fluids_parameters.number_of_regions;i++)
             fluids_parameters.particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple.levelsets(i)->Compute_Normals(time);
         if((number_of_regions==0 && !fluids_parameters.sph && !fluids_parameters.compressible) || (fluids_parameters.incompressible && fluids_parameters.incompressible->strain))
             fluids_dt=fluids_parameters.cfl*fluids_parameters.incompressible->CFL(fluid_collection.incompressible_fluid_collection.face_velocities);

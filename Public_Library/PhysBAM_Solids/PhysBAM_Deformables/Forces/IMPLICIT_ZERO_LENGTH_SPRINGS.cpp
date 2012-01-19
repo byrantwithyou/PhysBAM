@@ -48,7 +48,7 @@ template<class TV> void IMPLICIT_ZERO_LENGTH_SPRINGS<TV>::
 Set_Stiffness_Based_On_Reduced_Mass(const T scaling_coefficient) // assumes mass is already defined
 {
     constant_stiffness=0;stiffness.Resize(segment_mesh.elements.m,false);
-    for(int i=1;i<=segment_mesh.elements.m;i++){
+    for(int i=0;i<segment_mesh.elements.m;i++){
         int end1,end2;segment_mesh.elements(i).Get(end1,end2);
         T reduced_mass=Pseudo_Inverse(particles.one_over_effective_mass(end1)+particles.one_over_effective_mass(end2));
         stiffness(i)=scaling_coefficient*reduced_mass;}
@@ -60,7 +60,7 @@ template<class TV> void IMPLICIT_ZERO_LENGTH_SPRINGS<TV>::
 Set_Overdamping_Fraction(const T overdamping_fraction) // 1 is critically damped
 {
     constant_damping=0;damping.Resize(segment_mesh.elements.m,false,false);
-    for(int i=1;i<=segment_mesh.elements.m;i++){
+    for(int i=0;i<segment_mesh.elements.m;i++){
         T harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(segment_mesh.elements(i)(1))+particles.one_over_effective_mass(segment_mesh.elements(i)(2)));
         T ym;if(!stiffness.m) ym=constant_stiffness;else ym=stiffness(i);
         damping(i)=overdamping_fraction*2*sqrt(ym*harmonic_mass);}
@@ -72,7 +72,7 @@ template<class TV> void IMPLICIT_ZERO_LENGTH_SPRINGS<TV>::
 Set_Overdamping_Fraction(ARRAY_VIEW<const T> overdamping_fraction) // 1 is critically damped
 {
     constant_damping=0;damping.Resize(segment_mesh.elements.m,false,false);
-    for(int i=1;i<=segment_mesh.elements.m;i++){
+    for(int i=0;i<segment_mesh.elements.m;i++){
         T harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(segment_mesh.elements(i)(1))+particles.one_over_effective_mass(segment_mesh.elements(i)(2)));
         T ym;if(!stiffness.m) ym=constant_stiffness;else ym=stiffness(i);
         damping(i)=overdamping_fraction(i)*2*sqrt(ym*harmonic_mass);}

@@ -499,7 +499,7 @@ template<class T,int d> void RC2_EXTRAPOLATED<T,d>::
 Test_Model() const
 {
     RANDOM_NUMBERS<T> rand;
-    for(int i=1;i<=20;i++){
+    for(int i=0;i<20;i++){
         TV f;
         rand.Fill_Uniform(f,0,2);
         T e=1e-5;

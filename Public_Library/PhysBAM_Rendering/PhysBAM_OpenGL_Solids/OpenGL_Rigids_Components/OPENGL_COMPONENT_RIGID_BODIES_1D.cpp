@@ -82,7 +82,7 @@ Reinitialize(const bool force)
         use_object_bounding_box.Resize(max_number_of_bodies);use_object_bounding_box.Fill(true);
 
         // Initialize bodies which have become active
-        for(int i=1;i<=needs_init.m;i++){
+        for(int i=0;i<needs_init.m;i++){
             int id=needs_init(i);PHYSBAM_ASSERT(rigid_body_collection.Is_Active(id));
             Create_Geometry(id);}
 

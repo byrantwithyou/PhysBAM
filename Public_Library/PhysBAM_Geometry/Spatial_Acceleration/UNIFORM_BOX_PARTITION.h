@@ -30,7 +30,7 @@ public:
     {}
 
     ~UNIFORM_BOX_PARTITION()
-    {for(int i=1;i<=cells.counts.x;i++) for(int j=1;j<=cells.counts.y;j++) for(int ij=1;ij<=cells.counts.z;ij++) delete cells(i,j,ij);}
+    {for(int i=0;i<cells.counts.x;i++) for(int j=0;j<cells.counts.y;j++) for(int ij=0;ij<cells.counts.z;ij++) delete cells(i,j,ij);}
 
     void Initialize(ARRAY<PAIR<RANGE<TV>,DATA_T> >& boxes_input,const T thickness_over_two=1e-6)
     {if(boxes_input.m==0){grid.Initialize(2,2,2,RANGE<TV>(0,1,0,1,0,1));cells.Resize(grid.Domain_Indices());return;}
@@ -45,9 +45,9 @@ public:
     dimensions[other_axis_2]=(int)(max_dimension*T(lengths[other_axis_2])/T(lengths[max_axis]));
     dimensions=clamp_min(dimensions,VECTOR<int,3>(1,1,1));
     grid.Initialize(dimensions[1]+1,dimensions[2]+1,dimensions[3]+1,bounding_box);
-    if(initialized) for(int i=1;i<=cells.counts.x;i++) for(int j=1;j<=cells.counts.y;j++) for(int ij=1;ij<=cells.counts.z;ij++) delete cells(i,j,ij);
+    if(initialized) for(int i=0;i<cells.counts.x;i++) for(int j=0;j<cells.counts.y;j++) for(int ij=0;ij<cells.counts.z;ij++) delete cells(i,j,ij);
     cells.Resize(grid.Get_MAC_Grid().Domain_Indices(),false,false);cells.Fill(0);initialized=true;
-    for(int k=1;k<=boxes_input.m;k++){
+    for(int k=0;k<boxes_input.m;k++){
         RANGE<TV_INT> domain;
         grid.Cell(boxes_input(k).x.Minimum_Corner(),domain.min_corner,0);
         grid.Cell(boxes_input(k).x.Maximum_Corner(),domain.max_corner,0);

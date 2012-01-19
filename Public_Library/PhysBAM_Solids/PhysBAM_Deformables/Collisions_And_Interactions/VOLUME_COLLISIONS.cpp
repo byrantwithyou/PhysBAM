@@ -47,8 +47,8 @@ Compute_Collision_Triangles()
     area=0;
     gradient.Remove_All();
     hessian.Remove_All();
-    for(int i=1;i<=objects.m;i++) objects(i)->Initialize_Hierarchy();
-    for(int i=1;i<=objects.m;i++)
+    for(int i=0;i<objects.m;i++) objects(i)->Initialize_Hierarchy();
+    for(int i=0;i<objects.m;i++)
         for(int j=i;j<=objects.m;j++)
             Compute_Collision_Triangles(*objects(i),*objects(j));
 }
@@ -62,7 +62,7 @@ static int Sort_Pair(VECTOR<int,4>& I)
     int sign=1;
     if(I(1)<I(2)){exchange(I(1),I(2));sign=-sign;}
     if(I(3)<I(4)){exchange(I(3),I(4));sign=-sign;}
-    if(I(1)<I(3)) for(int k=1;k<=2;k++) exchange(I(k),I(k+2));
+    if(I(1)<I(3)) for(int k=0;k<2;k++) exchange(I(k),I(k+2));
     return sign;
 }
 static int Sort_Pair(VECTOR<int,6>& I)
@@ -76,7 +76,7 @@ static int Sort_Pair(VECTOR<int,6>& I)
     if(I(4)<I(6)){exchange(I(4),I(6));sign=-sign;}
     if(I(5)<I(6)){exchange(I(5),I(6));sign=-sign;}
 
-    if(I(1)<I(4)) for(int k=1;k<=3;k++) exchange(I(k),I(k+3));
+    if(I(1)<I(4)) for(int k=0;k<3;k++) exchange(I(k),I(k+3));
     return sign;
 }
 //#####################################################################
@@ -94,7 +94,7 @@ Compute_Collision_Triangles(T_OBJECT& obj1,T_OBJECT& obj2)
     HASHTABLE<VECTOR<int,TV::m*2>,int> to_process;
     ARRAY_VIEW<TV> X(obj1.particles.X);
 
-    for(int m=1;m<=visitor.pairs.m;m++){
+    for(int m=0;m<visitor.pairs.m;m++){
         int a,b;visitor.pairs(m).Get(a,b);
         //if(TRIANGLE_2D<T>::Signed_Size(X.Subset(obj1.mesh.elements(a)))
         //  *TRIANGLE_2D<T>::Signed_Size(X.Subset(obj2.mesh.elements(b)))<=0)

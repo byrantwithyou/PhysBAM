@@ -58,7 +58,7 @@ template<class T>
 static int Depth(int triangle_id,const RANGE<VECTOR<T,3> >& box,void* data)
 {
     DEPTH_HELPER<T>& helper=*(DEPTH_HELPER<T>*)data;
-    for(int i=1;i<=helper.depths.m;i++) if(helper.depths(i).x.Intersection(box)) return helper.depths(i).y;
+    for(int i=0;i<helper.depths.m;i++) if(helper.depths(i).x.Intersection(box)) return helper.depths(i).y;
     return helper.default_depth;
 }
 

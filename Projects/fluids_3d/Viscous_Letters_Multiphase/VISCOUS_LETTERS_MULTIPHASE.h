@@ -99,7 +99,7 @@ public:
             fluids_parameters.viscosities(10)=0;}*/
 
         int air_region=10;
-        for(int i=1;i<=fluids_parameters.number_of_regions;i++){
+        for(int i=0;i<fluids_parameters.number_of_regions;i++){
             BOUNDARY_PHI_WATER<T,GRID<TV> >* boundary=new BOUNDARY_PHI_WATER<T,GRID<TV> >();
             boundary->Set_Velocity_Pointer(fluids_parameters.incompressible->projection.face_velocities);
             if(i==air_region)boundary->sign=-1;
@@ -108,8 +108,8 @@ public:
         LOG::cout<<"DENSITIES: "<<fluids_parameters.densities<<std::endl;
         LOG::cout<<"VISCOSITIES: "<<fluids_parameters.viscosities<<std::endl;
         LOG::cout<<"SURFACE TENSION: "<<std::endl;
-        for(int i=1;i<=fluids_parameters.number_of_regions;i++){
-            for(int j=1;j<=fluids_parameters.number_of_regions;j++) LOG::cout<<fluids_parameters.surface_tensions(i,j)<<" ";LOG::cout<<std::endl;}
+        for(int i=0;i<fluids_parameters.number_of_regions;i++){
+            for(int j=0;j<fluids_parameters.number_of_regions;j++) LOG::cout<<fluids_parameters.surface_tensions(i,j)<<" ";LOG::cout<<std::endl;}
     }
 
     virtual ~VISCOUS_LETTERS_MULTIPHASE()
@@ -147,14 +147,14 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
 
     std::cout<<"\nInitializing phis..."<<std::flush;
     ARRAY<ARRAY<T,VECTOR<int,3> > >& phis=fluids_parameters.particle_levelset_evolution_multiple->phis;
-    for(int i=1;i<=8;i++)ARRAY<T,VECTOR<int,3> >::copy(5*fluids_parameters.grid.dx,phis(i));
+    for(int i=0;i<8;i++)ARRAY<T,VECTOR<int,3> >::copy(5*fluids_parameters.grid.dx,phis(i));
     for(CELL_ITERATOR iterator(fluids_parameters.grid);iterator.Valid();iterator.Next()){
         VECTOR<int,3> cell_index=iterator.Cell_Index();VECTOR<T,3> X=iterator.Location();
         phis(9)(cell_index)=X.y-surface_height;phis(10)(cell_index)=-phis(9)(cell_index);
-        if(letters_bounding_box_y.Lazy_Inside(VECTOR<T,1>(X.y)))for(int i=1;i<=letters.rigid_bodies.m;i++){
+        if(letters_bounding_box_y.Lazy_Inside(VECTOR<T,1>(X.y)))for(int i=0;i<letters.rigid_bodies.m;i++){
             T phi=letters(i)->Implicit_Geometry_Extended_Value(X)-.25*letters_height;
             T bandwidth=3*fluids_parameters.grid.dx;
-            if(phi<bandwidth){phis(i)(cell_index)=phi;for(int j=1;j<=10;j++)if(i!=j)phis(j)(cell_index)=max(phis(j)(cell_index),-phi);}}}
+            if(phi<bandwidth){phis(i)(cell_index)=phi;for(int j=0;j<10;j++)if(i!=j)phis(j)(cell_index)=max(phis(j)(cell_index),-phi);}}}
     std::cout<<"DONE"<<std::endl;
 }
 //#####################################################################

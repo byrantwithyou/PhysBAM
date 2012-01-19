@@ -100,7 +100,7 @@ void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE
 
     // debugging output
     ARRAY<TV> spatial_fracture_bias_direction(fracture_object->embedded_object.simplicial_object.mesh.elements.m);
-    for(int t=1;t<=spatial_fracture_bias_direction.m;t++) spatial_fracture_bias_direction(t)=solids_parameters.fracture_evolution->Spatial_Fracture_Bias_Direction(t,(T)1e-4);
+    for(int t=0;t<spatial_fracture_bias_direction.m;t++) spatial_fracture_bias_direction(t)=solids_parameters.fracture_evolution->Spatial_Fracture_Bias_Direction(t,(T)1e-4);
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/fracture_bias_direction"+f,spatial_fracture_bias_direction);
 
     if(!fracture_object->embedded_object.embedded_subelements_in_parent_element) fracture_object->embedded_object.Initialize_Embedded_Subelements_In_Parent_Element();
@@ -113,7 +113,7 @@ void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE
     FINITE_VOLUME<TV,3>& finite_volume=solid_body_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
     ARRAY<VECTOR<T,2> > min_max_stress_eigenvalues(finite_volume.strain_measure.mesh_object.mesh.elements.m);
     ISOTROPIC_CONSTITUTIVE_MODEL<T,3>& isotropic_model=dynamic_cast<ISOTROPIC_CONSTITUTIVE_MODEL<T,3>&>(finite_volume.constitutive_model);
-    for(int t=1;t<=finite_volume.strain_measure.mesh_object.mesh.elements.m;t++){
+    for(int t=0;t<finite_volume.strain_measure.mesh_object.mesh.elements.m;t++){
         DIAGONAL_MATRIX<T,3> eigenvalues=isotropic_model.P_From_Strain(finite_volume.Fe_hat(t),(T)1,t); // scale for volume too?
         min_max_stress_eigenvalues(t)=VECTOR<T,2>(eigenvalues.Min(),eigenvalues.Max());}
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/min_max_stress_eigenvalue"+f,min_max_stress_eigenvalues);

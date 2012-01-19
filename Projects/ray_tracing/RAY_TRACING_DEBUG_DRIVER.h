@@ -64,7 +64,7 @@ public:
     scene_window->Initialize_Objects();
     if(object_list){
         object_list->clear();
-        for(int i=1;i<=world.standard_objects.m;i++)
+        for(int i=0;i<world.standard_objects.m;i++)
             object_list->add(world.standard_objects(i)->name.c_str(),world.standard_objects(i));}}
 
     void Create_Windows_And_Widgets()

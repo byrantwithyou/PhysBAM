@@ -144,7 +144,7 @@ Initialize_Bodies()
     solid_body_collection.collision_body_list.Add_Bodies(*solid_body_collection.rigid_body_collection.rigid_geometry_collection.collision_body_list);
 
     // number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
     
     // Forces
     switch(test_number){

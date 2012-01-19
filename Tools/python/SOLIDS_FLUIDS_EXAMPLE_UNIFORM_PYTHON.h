@@ -120,13 +120,13 @@ public:
     {for(int i=2;i<=particle_connectivity.particles_number;i++) particle_connectivity.Union(1,i);}
         
     void Zero_Nodes(const ARRAY<int>& indices,RAW_ARRAY<TV> V)
-    {for(int i=1;i<=indices.m;i++) V(indices(i))=TV();}
+    {for(int i=0;i<indices.m;i++) V(indices(i))=TV();}
 
     void Set_Rigid_Velocities(const ARRAY<int>& indices,const ARRAY<TV>& object_positions,const RIGID_BODY<TV>& rigid,RAW_ARRAY<TV> V)
-    {for(int i=1;i<=indices.m;i++) V(indices(i))=rigid.Pointwise_Object_Velocity(rigid.World_Space_Point(object_positions(i)));}
+    {for(int i=0;i<indices.m;i++) V(indices(i))=rigid.Pointwise_Object_Velocity(rigid.World_Space_Point(object_positions(i)));}
 
     void Set_Rigid_Positions(const ARRAY<int>& indices,const ARRAY<TV>& object_positions,const RIGID_BODY<TV>& rigid,RAW_ARRAY<TV> X)
-    {for(int i=1;i<=indices.m;i++) X(indices(i))=rigid.World_Space_Point(object_positions(i));}
+    {for(int i=0;i<indices.m;i++) X(indices(i))=rigid.World_Space_Point(object_positions(i));}
 
     // TODO: Do other callbacks for zero/set, etc.
     // TODO: Make not overriden case simpler

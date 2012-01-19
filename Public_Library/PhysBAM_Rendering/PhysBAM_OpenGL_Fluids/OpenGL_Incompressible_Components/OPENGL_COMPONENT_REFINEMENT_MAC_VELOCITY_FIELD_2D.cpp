@@ -97,7 +97,7 @@ Display(const int in_color) const
 {
     if(valid){
         if(draw){
-            //if(draw_all_levels) for(int i=1;i<=opengl_refinement_mac_velocity_fields.m;i++) opengl_refinement_mac_velocity_fields(i)->Display(in_color);
+            //if(draw_all_levels) for(int i=0;i<opengl_refinement_mac_velocity_fields.m;i++) opengl_refinement_mac_velocity_fields(i)->Display(in_color);
             //else opengl_refinement_mac_velocity_fields(level)->Display(in_color);}
             for(typename GRID<TV>::CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) opengl_refinement_mac_velocity_fields(iterator.Cell_Index())->Display(in_color);}}
 }

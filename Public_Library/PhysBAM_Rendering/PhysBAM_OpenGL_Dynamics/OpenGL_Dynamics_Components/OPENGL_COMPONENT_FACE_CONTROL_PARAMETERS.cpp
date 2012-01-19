@@ -33,7 +33,7 @@ OPENGL_COMPONENT_FACE_CONTROL_PARAMETERS(const std::string& basedir_input,const 
                 ACTIVATION_CONTROL_SET<T>* control_set=new ACTIVATION_CONTROL_SET<T>;
                 ARRAY<std::string> muscle_names;
                 FILE_UTILITIES::Read_From_File<RW>(STRING_UTILITIES::string_sprintf("%s/face_control_set_%d.muscle_names",basedir.c_str(),i),muscle_names);
-                for(int j=1;j<=muscle_names.m;j++){LOG::cout<<"Muscle Name "<<j<<" is "<<muscle_names(j)<<std::endl;control_set->Add_Activation(muscle_names(j));}
+                for(int j=0;j<muscle_names.m;j++){LOG::cout<<"Muscle Name "<<j<<" is "<<muscle_names(j)<<std::endl;control_set->Add_Activation(muscle_names(j));}
                 face_control_parameters.list.Append(control_set);}
             else if(control_set_type==FACE_CONTROL_SET<T>::ATTACHMENT_FRAME){
                 ARRAY<VECTOR<T,3> > X_dummy;ARRAY<ARRAY<int> > nodes_dummy;
@@ -49,7 +49,7 @@ OPENGL_COMPONENT_FACE_CONTROL_PARAMETERS(const std::string& basedir_input,const 
 template<class T,class RW> OPENGL_COMPONENT_FACE_CONTROL_PARAMETERS<T,RW>::
 ~OPENGL_COMPONENT_FACE_CONTROL_PARAMETERS()
 {
-    for(int i=1;i<=face_control_parameters.list.m;i++) delete face_control_parameters.list(i);
+    for(int i=0;i<face_control_parameters.list.m;i++) delete face_control_parameters.list(i);
 }
 //#####################################################################
 // Function Valid_Frame

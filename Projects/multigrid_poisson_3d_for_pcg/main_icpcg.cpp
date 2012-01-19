@@ -235,7 +235,7 @@ int main(int argc,char* argv[])
 	    
 	    FILE_UTILITIES::Write_To_File<RW>("output_rhs/density.0",rhs_as_density);
 	    
-	    for(int i=1;i<=30;i++){
+	    for(int i=0;i<30;i++){
 		x=x_save;
 		multigrid_poisson.b=b_save;
 		cg.Solve(multigrid_system,
@@ -340,10 +340,10 @@ int main(int argc,char* argv[])
 	}
 
 	ARRAY<int> row_lengths(interior_indices.m);
-	for(int equation_id=1;equation_id<=interior_indices.m;equation_id++){
+	for(int equation_id=0;equation_id<interior_indices.m;equation_id++){
 	    row_lengths(equation_id)=1; //diagonal_entry
 	    
-	    for(int axis=1;axis<=d;axis++){ //off-diag
+	    for(int axis=0;axis<d;axis++){ //off-diag
 		if(cell_type(interior_indices(equation_id)+T_INDEX::Axis_Vector(axis))==MULTIGRID_POISSON<T,3>::INTERIOR_CELL_TYPE)
 		    row_lengths(equation_id)++;
 		if(cell_type(interior_indices(equation_id)-T_INDEX::Axis_Vector(axis))==MULTIGRID_POISSON<T,3>::INTERIOR_CELL_TYPE)
@@ -352,9 +352,9 @@ int main(int argc,char* argv[])
 	}
 	
 	icpcg_matrix.Set_Row_Lengths(row_lengths);
-	for(int equation_id=1;equation_id<=interior_indices.m;equation_id++){
+	for(int equation_id=0;equation_id<interior_indices.m;equation_id++){
 	    const T_INDEX& equation_index=interior_indices(equation_id);
-	    for(int axis=1;axis<=3;axis++){
+	    for(int axis=0;axis<3;axis++){
 		const T_INDEX& neighbor_index=equation_index+T_INDEX::Axis_Vector(axis);
 		const int& neighbor_id=index_ids(neighbor_index);
 		if(cell_type(neighbor_index)!=MULTIGRID_POISSON<T,3>::NEUMANN_CELL_TYPE){
@@ -377,7 +377,7 @@ int main(int argc,char* argv[])
 	}
 	// set right hand side
 	b_icpcg.Resize(interior_indices.m);
-	for(int equation_id=1;equation_id<=interior_indices.m;equation_id++){
+	for(int equation_id=0;equation_id<interior_indices.m;equation_id++){
 	    TV X=grid.X(interior_indices(equation_id));
 	    b_icpcg(equation_id)=-sin(X(1)*2*pi)*cos(X(2)*2*pi)*sin(X(3)*2*pi);
 	}

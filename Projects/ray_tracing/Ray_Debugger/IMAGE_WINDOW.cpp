@@ -18,7 +18,7 @@ IMAGE_WINDOW(int x,int y,int width,int height,int picture_width,int picture_heig
 :Fl_Gl_Window(x,y,width,height,"Image Window"),view_x_offset(0),view_y_offset(0),view_scale(1),view_scale_power(0),user_callback(0),have_last_click(false),texture_initialized(false)
 {
     image.Resize(1,picture_width,1,picture_height);
-    for(int i=1;i<=image.m;i++)for(int j=1;j<=image.n;j++)image(i,j)=VECTOR<T,3>((T)0.5,(T)0.3,(T)0.3);
+    for(int i=0;i<image.m;i++)for(int j=0;j<image.n;j++)image(i,j)=VECTOR<T,3>((T)0.5,(T)0.3,(T)0.3);
 }
 //#####################################################################
 // Init_Gl
@@ -126,7 +126,7 @@ draw()
     if(!valid())Init_Gl();
     if(update_image){
         float *temp_image=new float[image.m*image.n*3];memset(temp_image,0,image.m*image.n*3);
-        for(int i=1;i<=image.m;i++)for(int j=1;j<=image.n;j++)for(int k=1;k<=3;k++)temp_image[3*((j-1)*image.m+(i-1))+k-1]=float(image(i,j)[k]);
+        for(int i=0;i<image.m;i++)for(int j=0;j<image.n;j++)for(int k=0;k<3;k++)temp_image[3*((j-1)*image.m+(i-1))+k-1]=float(image(i,j)[k]);
         glTexSubImage2D(GL_TEXTURE_2D,0,0,0,image.m,image.n,GL_RGB,GL_FLOAT,temp_image);
         delete temp_image;
         update_image=false;

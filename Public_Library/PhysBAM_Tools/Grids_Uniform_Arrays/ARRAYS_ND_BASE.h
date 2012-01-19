@@ -325,7 +325,7 @@ public:
 
     static void Extract_Dimension(const ARRAYS_ND_BASE& old_array,ARRAYS_ND_BASE<VECTOR<ELEMENT_OF_T,d> >& extracted_array,int dim)
     {STATIC_ASSERT(IS_VECTOR<T>::value);assert(Equal_Dimensions(old_array,extracted_array));//extracted_array.Resize(old_array.domain,false,false);
-    for(int i=1;i<=old_array.array.m;i++) extracted_array.array(i)=old_array.array(i)(dim);}
+    for(int i=0;i<old_array.array.m;i++) extracted_array.array(i)=old_array.array(i)(dim);}
 
     static void Get(ARRAYS_ND_BASE& new_copy,const ARRAYS_ND_BASE& old_copy)
     {if(&old_copy!=&new_copy) Put(old_copy,new_copy);}

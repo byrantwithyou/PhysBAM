@@ -59,7 +59,7 @@ virtual void Get_Initial_Data()
     GRID<TV> red_green_uniform_grid(4*m_input+1,4*n_input+1,circle.Bounding_Box());
     red_green_grid.Initialize(red_green_uniform_grid,1);
     red_green_grid.Build_Triangulated_Area(triangulated_area);
-    ARRAY<T> phi(particles.array_collection->Size());for(int p=1;p<=phi.m;p++) phi(p)=circle.Signed_Distance(particles.X(p));
+    ARRAY<T> phi(particles.array_collection->Size());for(int p=0;p<phi.m;p++) phi(p)=circle.Signed_Distance(particles.X(p));
     std::cout<<particles.X.array.m<<" "<<particles.V.array.m<<", s "<<particles.store_velocity<<"\n";
     embedded_triangulated_area.Calculate_Segmented_Curve_From_Levelset_On_Triangle_Nodes(phi);
     triangles_of_material.Create_Material_Area();

@@ -31,16 +31,16 @@ template<class T> void RED_GREEN_TETRAHEDRA<T>::
 Refine_Simplex_List(const ARRAY<int>& tetrahedron_list)
 {
     object.particles.array_collection->Preallocate(object.particles.array_collection->Size()+6*tetrahedron_list.m);
-    for(int level=1;level<=index_in_stack.m;level++) index_in_stack(level)->Fill(0);
-    for(int i=1;i<=tetrahedron_list.m;i++){
+    for(int level=0;level<index_in_stack.m;level++) index_in_stack(level)->Fill(0);
+    for(int i=0;i<tetrahedron_list.m;i++){
         int level=leaf_levels_and_indices(tetrahedron_list(i))(1),tet=leaf_levels_and_indices(tetrahedron_list(i))(2);
         if(Red(level,tet)){
             stack.Append(VECTOR<int,2>(level,tet));(*index_in_stack(level))(tet)=stack.m;
-            for(int j=1;j<=6;j++){int s=(*meshes(level)->element_edges)(tet)(j);if(!segment_midpoints(s)) Add_Midpoint(s,level,tet);}}
+            for(int j=0;j<6;j++){int s=(*meshes(level)->element_edges)(tet)(j);if(!segment_midpoints(s)) Add_Midpoint(s,level,tet);}}
         else{ // Green
             int parent_index=(*parent(level))(tet);
             stack.Append(VECTOR<int,2>(level-1,parent_index));(*index_in_stack(level-1))(parent_index)=stack.m;
-            for(int j=1;j<=6;j++){int s=(*meshes(level-1)->element_edges)(parent_index)(j);if(!segment_midpoints(s)) Add_Midpoint(s,level-1,parent_index);}}}
+            for(int j=0;j<6;j++){int s=(*meshes(level-1)->element_edges)(parent_index)(j);if(!segment_midpoints(s)) Add_Midpoint(s,level-1,parent_index);}}}
     Resolve_Stack();
     Rebuild_Object();
 }
@@ -51,8 +51,8 @@ template<class T> void RED_GREEN_TETRAHEDRA<T>::
 Subdivide_Segment_List(const ARRAY<VECTOR<int,2> >& segment_list)
 {
     object.particles.array_collection->Preallocate(object.particles.array_collection->Size()+4*segment_list.m);
-    for(int i=1;i<=index_in_stack.m;i++) index_in_stack(i)->Fill(0);
-    for(int i=1;i<=segment_list.m;i++){
+    for(int i=0;i<index_in_stack.m;i++) index_in_stack(i)->Fill(0);
+    for(int i=0;i<segment_list.m;i++){
         int node1,node2;segment_list(i).Get(node1,node2);
         int s,level,tet;
         if(Find_Edge_And_Test_If_Green(node1,node2,&s,&level,&tet)){
@@ -79,7 +79,7 @@ Subdivide_Segment_List(const ARRAY<VECTOR<int,2> >& segment_list)
                 (node2 == c && node1 == segment_midpoints(bd)) || (node1 == d && node2 == segment_midpoints(bc)) || (node2 == d && node1 == segment_midpoints(bc))){ // bisects face bcd
                 if(!segment_midpoints(bc)) Add_Midpoint(bc,level-1,parent_index);if(!segment_midpoints(cd)) Add_Midpoint(cd,level-1,parent_index);
                 if(!segment_midpoints(bd)) Add_Midpoint(bd,level-1,parent_index);}
-            else for(int j=1;j<=6;j++){ // this was an internal green edge, so subdivide all parent edges
+            else for(int j=0;j<6;j++){ // this was an internal green edge, so subdivide all parent edges
                 s=(*meshes(level-1)->element_edges)(parent_index)(j);if(!segment_midpoints(s)) Add_Midpoint(s,level-1,parent_index);}}
         else{PHYSBAM_ASSERT(s); // red edge
             stack.Append(VECTOR<int,2>(level,tet));(*index_in_stack(level))(tet)=stack.m;if(!segment_midpoints(s)) Add_Midpoint(s,level,tet);}}
@@ -97,9 +97,9 @@ Find_Edge_And_Test_If_Green(const int node1,const int node2,int* segment_output,
     
     // now find a tet that contains this segment!
     int level,tet;
-    for(int j=1;j<=meshes.m;j++) if(node1 <= meshes(j)->number_nodes && node2 <= meshes(j)->number_nodes){
+    for(int j=0;j<meshes.m;j++) if(node1 <= meshes(j)->number_nodes && node2 <= meshes(j)->number_nodes){
         ARRAY<int>& incident_tets=(*meshes(j)->incident_elements)(node1);
-        for(int k=1;k<=incident_tets.m;k++){
+        for(int k=0;k<incident_tets.m;k++){
             int a,b,c,d;meshes(j)->elements(incident_tets(k)).Get(a,b,c,d);
             if(a == node2 || b == node2 || c == node2 || d == node2){level=j;tet=incident_tets(k);goto found_tet;}}}
     PHYSBAM_FATAL_ERROR();
@@ -287,7 +287,7 @@ Regularly_Refine_Tet(const int level,const int tet)
     else if(refinement_target_segments.Contains(element_edges(tet)(2)) && refinement_target_segments.Contains(element_edges(tet)(4))){first_midpoint_index=2;second_midpoint_index=4;}
     else{first_midpoint_index=1;second_midpoint_index=6;}
 
-    for(int a=1;a<=6;a++) if(!midpoints(a)) midpoints(a)=Add_Midpoint((*meshes(level)->element_edges)(tet)(a),level,tet);
+    for(int a=0;a<6;a++) if(!midpoints(a)) midpoints(a)=Add_Midpoint((*meshes(level)->element_edges)(tet)(a),level,tet);
     int i,j,k,l;meshes(level)->elements(tet).Get(i,j,k,l);
     int ij=midpoints(1),jk=midpoints(2),ki=midpoints(3),il=midpoints(4),jl=midpoints(5),kl=midpoints(6);
     if(!subedges(1)) Add_Segment(free_edge_indices,i,ij);if(!subedges(2)) Add_Segment(free_edge_indices,i,ki);
@@ -325,7 +325,7 @@ template<class T> void RED_GREEN_TETRAHEDRA<T>::
 Get_Existing_Subindices(const int level,const int tet,ARRAY<int>& midpoints,ARRAY<int>& subedges)
 {
     PHYSBAM_ASSERT(midpoints.m == 6 && subedges.m == 24);
-    for(int e=1;e<=6;e++) midpoints(e)=segment_midpoints((*meshes(level)->element_edges)(tet)(e));
+    for(int e=0;e<6;e++) midpoints(e)=segment_midpoints((*meshes(level)->element_edges)(tet)(e));
     int i,j,k,l;meshes(level)->elements(tet).Get(i,j,k,l);
     int ij=midpoints(1),jk=midpoints(2),ki=midpoints(3),il=midpoints(4),jl=midpoints(5),kl=midpoints(6);
     if(ij){
@@ -378,7 +378,7 @@ Delete_Children(const int level,const int tet,ARRAY<int>& deleted_tet_indices,AR
     int p;for(p=1;p<=8&&(*children(level))(tet)(p);p++){deleted_tet_indices.Append((*children(level))(tet)(p));(*children(level))(tet)(p)=0;}
     // get a list of edges to delete (begin by finding all children edges, then filter the red ones out)
     ARRAY<int> children_edges;children_edges.Preallocate(25);
-    for(p=1;p<=deleted_tet_indices.m;p++) for(int q=1;q<=6;q++) // get a list of all children edges
+    for(p=1;p<=deleted_tet_indices.m;p++) for(int q=0;q<6;q++) // get a list of all children edges
         children_edges.Append_Unique((*meshes(level+1)->element_edges)(deleted_tet_indices(p))(q));
     for(p=1;p<=children_edges.m;p++){
         int q,r;segment_mesh.elements(children_edges(p)).Get(q,r);
@@ -394,11 +394,11 @@ Delete_Children(const int level,const int tet,ARRAY<int>& deleted_tet_indices,AR
             deleted_edge_indices.Append(children_edges(p));
             edge_owned_by_other_tet_so_break_out_of_loop_without_appending:;}}
     // now do the actual deletion
-    for(p=1;p<=deleted_tet_indices.m;p++) for(int q=1;q<=4;q++){ // remove deleted tets from incident_tets
+    for(p=1;p<=deleted_tet_indices.m;p++) for(int q=0;q<4;q++){ // remove deleted tets from incident_tets
         int node=meshes(level+1)->elements(deleted_tet_indices(p))(q),index=0;
         (*meshes(level+1)->incident_elements)(node).Find(deleted_tet_indices(p),index);PHYSBAM_ASSERT(index);
         (*meshes(level+1)->incident_elements)(node).Remove_Index_Lazy(index);}
-    for(p=1;p<=deleted_edge_indices.m;p++) for(int q=1;q<=2;q++){ // remove deleted edges from incident_segments
+    for(p=1;p<=deleted_edge_indices.m;p++) for(int q=0;q<2;q++){ // remove deleted edges from incident_segments
         int node=segment_mesh.elements(deleted_edge_indices(p))(q),index=0;
         (*segment_mesh.incident_elements)(node).Find(deleted_edge_indices(p),index);PHYSBAM_ASSERT(index);
         (*segment_mesh.incident_elements)(node).Remove_Index_Lazy(index);}
@@ -480,7 +480,7 @@ Add_Tetrahedron(ARRAY<int>& free_tet_indices,const int level,const int i,const i
         tet_mesh.element_edges->Resize(index);children(level)->Resize(index);index_in_stack(level)->Resize(index);}
     else{
         index=free_tet_indices.Pop();tet_mesh.elements(index).Set(i,j,k,l);
-        (*parent(level))(index)=parent_index;for(int a=1;a<=8;a++) (*children(level))(index)(a)=0;(*index_in_stack(level))(index)=0;}
+        (*parent(level))(index)=parent_index;for(int a=0;a<8;a++) (*children(level))(index)(a)=0;(*index_in_stack(level))(index)=0;}
     // create tet edges
     int ij=segment_mesh.Segment(i,j),jk=segment_mesh.Segment(j,k),ki=segment_mesh.Segment(k,i),il=segment_mesh.Segment(i,l),
          jl=segment_mesh.Segment(j,l),kl=segment_mesh.Segment(k,l);
@@ -506,7 +506,7 @@ Rebuild_Object()
     int index_into_tets=1;
     for(level=1;level<=meshes.m;level++) for(tet=1;tet<=meshes(level)->elements.m;tet++) 
         if(Leaf(level,tet)){
-            for(int i=1;i<=4;i++) object.mesh.elements(index_into_tets)(i)=meshes(level)->elements(tet)(i);
+            for(int i=0;i<4;i++) object.mesh.elements(index_into_tets)(i)=meshes(level)->elements(tet)(i);
             leaf_levels_and_indices(index_into_tets).Set(level,tet);(*leaf_number(level))(tet)=index_into_tets;index_into_tets++;}
         else (*leaf_number(level))(tet)=0;
     object.mesh.number_nodes=object.particles.array_collection->Size();
@@ -522,7 +522,7 @@ Coarsen_Green_Refinements(TETRAHEDRON_MESH& final_mesh,ARRAY<int>& t_junctions,A
     ARRAY<bool> parent_already_coarsened(object.mesh.elements.m);
     ARRAY<VECTOR<int,2> > coarse_parents;
     final_mesh.Clean_Memory();
-    for(int t=1;t<=object.mesh.elements.m;t++){
+    for(int t=0;t<object.mesh.elements.m;t++){
         int level,tet;leaf_levels_and_indices(t).Get(level,tet);
         if(Red(level,tet)) final_mesh.elements.Append(object.mesh.elements(t));
         else if(!parent_already_coarsened(t)){
@@ -530,15 +530,15 @@ Coarsen_Green_Refinements(TETRAHEDRON_MESH& final_mesh,ARRAY<int>& t_junctions,A
             final_mesh.elements.Append(meshes(level-1)->elements(parent_tet));
             coarse_parents.Append(VECTOR<int,2>(level-1,parent_tet));
             assert(!(*children(level-1))(parent_tet)(5));
-            for(int i=1;i<=4;i++){
+            for(int i=0;i<4;i++){
                 int child=(*children(level-1))(parent_tet)(i);if(!child) break;
                 parent_already_coarsened((*leaf_number(level))(child))=true;}}}
     ARRAY<bool> occurs_in_final_mesh(object.particles.array_collection->Size());final_mesh.Mark_Nodes_Referenced(occurs_in_final_mesh,true);
     ARRAY<bool> is_t_junction(object.particles.array_collection->Size());
     t_junctions.Clean_Memory();t_junction_parents.Clean_Memory();
-    for(int t=1;t<=coarse_parents.m;t++){
+    for(int t=0;t<coarse_parents.m;t++){
         int level,tet;coarse_parents(t).Get(level,tet);
-        for(int e=1;e<=6;e++){
+        for(int e=0;e<6;e++){
             int s=(*meshes(level)->element_edges)(tet)(e),midpoint=segment_midpoints(s);
             if(midpoint && occurs_in_final_mesh(midpoint) && !is_t_junction(midpoint)){
                 is_t_junction(midpoint)=true;
@@ -555,18 +555,18 @@ Coarsen_Complete_Refinements_Of_Subset(TETRAHEDRON_MESH& final_mesh,ARRAY<bool>&
     // Coarsen refinement steps for which all children are present in the subset
     TETRAHEDRON_MESH& mesh=object.mesh;
     ARRAY<ARRAY<bool> > tetrahedron_kept(meshes.m);
-    for(int level=1;level<=meshes.m;level++){tetrahedron_kept(level).Resize(meshes(level)->elements.m);tetrahedron_kept(level).Fill(true);}
-    for(int t=1;t<=mesh.elements.m;t++) if(!subset(t)){
+    for(int level=0;level<meshes.m;level++){tetrahedron_kept(level).Resize(meshes(level)->elements.m);tetrahedron_kept(level).Fill(true);}
+    for(int t=0;t<mesh.elements.m;t++) if(!subset(t)){
         int tet,level;leaf_levels_and_indices(t).Get(level,tet);
         tetrahedron_kept(level)(tet)=false;Unmark_Parents(tetrahedron_kept,level,tet);}
     if(!allow_red_coarsening) for(int level=meshes.m;level>=2;level--) for(int tet=1;tet<=meshes(level)->elements.m;tet++)
         if(tetrahedron_kept(level)(tet) && Red(level,tet)) Unmark_Parents(tetrahedron_kept,level,tet);
     // Prevent turning uncoarsenable nodes into T-junctions
     if(node_is_uncoarsenable) for(int level=meshes.m;level>=2;level--) for(int tet=1;tet<=meshes(level)->elements.m;tet++)
-        if(tetrahedron_kept(level)(tet)) for(int i=1;i<=4;i++){int node=meshes(level)->elements(tet)(i);
+        if(tetrahedron_kept(level)(tet)) for(int i=0;i<4;i++){int node=meshes(level)->elements(tet)(i);
             if((*node_is_uncoarsenable)(node) && !meshes(level-1)->elements((*parent(level))(tet)).Contains(node)) Unmark_Parents(tetrahedron_kept,level,tet);}
     final_mesh.Clean_Memory();
-    for(int level=1;level<=meshes.m;level++) for(int tet=1;tet<=meshes(level)->elements.m;tet++) if(tetrahedron_kept(level)(tet)){
+    for(int level=0;level<meshes.m;level++) for(int tet=1;tet<=meshes(level)->elements.m;tet++) if(tetrahedron_kept(level)(tet)){
         Unmark_Children(tetrahedron_kept,level,tet);final_mesh.elements.Append(meshes(level)->elements(tet));}
     final_mesh.number_nodes=mesh.number_nodes;
 
@@ -574,7 +574,7 @@ Coarsen_Complete_Refinements_Of_Subset(TETRAHEDRON_MESH& final_mesh,ARRAY<bool>&
     ARRAY<bool> is_t_junction(mesh.number_nodes);
     PHYSBAM_ASSERT(object.mesh.incident_elements);final_mesh.Initialize_Incident_Elements();
     OPERATION_HASH<> hash(mesh.elements.m);
-    for(int node=1;node<=mesh.number_nodes;node++){
+    for(int node=0;node<mesh.number_nodes;node++){
         int adjusted_incident_elements=0;
         for(int t=1;t<=(*mesh.incident_elements)(node).m;t++){
             int incident_tet=(*mesh.incident_elements)(node)(t);
@@ -591,7 +591,7 @@ Coarsen_Complete_Refinements_Of_Subset(TETRAHEDRON_MESH& final_mesh,ARRAY<bool>&
         PHYSBAM_ASSERT(!node_is_uncoarsenable || !is_t_junction(node) || !(*node_is_uncoarsenable)(node));
         hash.Next_Operation();}
     t_junctions.Clean_Memory();t_junction_parents.Clean_Memory();
-    for(int s=1;s<=segment_midpoints.m;s++) if(segment_midpoints(s) && is_t_junction(segment_midpoints(s))){
+    for(int s=0;s<segment_midpoints.m;s++) if(segment_midpoints(s) && is_t_junction(segment_midpoints(s))){
         t_junctions.Append(segment_midpoints(s));t_junction_parents.Append(segment_mesh.elements(s));}
 }
 //#####################################################################
@@ -608,7 +608,7 @@ Unmark_Parents(ARRAY<ARRAY<bool> >& tetrahedron_kept,int level,int tet) const
 template<class T> void RED_GREEN_TETRAHEDRA<T>::
 Unmark_Children(ARRAY<ARRAY<bool> >& tetrahedron_kept,int level,int tet) const
 {
-    if(children(level)) for(int i=1;i<=8;i++){
+    if(children(level)) for(int i=0;i<8;i++){
         int child=(*children(level))(tet)(i);if(!child) break;
         tetrahedron_kept(level+1)(child)=false;Unmark_Children(tetrahedron_kept,level+1,child);}
 }
@@ -622,7 +622,7 @@ Remove_Simplex_List(const ARRAY<int>& tetrahedron_list,ARRAY<HASHTABLE<int,int> 
 
     // build a list of all tetrahedrons on all levels to be deleted by going down the tree from each input tetrahedron
     ARRAY<ARRAY<int> > level_tetrahedron_list(meshes.m);
-    for(int i=1;i<=tetrahedron_list.m;i++){
+    for(int i=0;i<tetrahedron_list.m;i++){
         int level,tet;leaf_levels_and_indices(tetrahedron_list(i)).Get(level,tet);
         do{level_tetrahedron_list(level).Append_Unique(tet);
         }while(level>1 && (tet=(*parent(level--))(tet)));}
@@ -630,10 +630,10 @@ Remove_Simplex_List(const ARRAY<int>& tetrahedron_list,ARRAY<HASHTABLE<int,int> 
     ARRAY<HASHTABLE<int,int> > default_level_simplex_maps;if(!level_simplex_maps) level_simplex_maps=&default_level_simplex_maps;
     (*level_simplex_maps).Resize(meshes.m);
 
-    for(int level=1;level<=meshes.m;level++){
+    for(int level=0;level<meshes.m;level++){
         // remove tetrahedrons to be deleted from incident elements
         // TODO: is incident_elements special or not?
-        for(int i=1;i<=level_tetrahedron_list(level).m;i++) for(int j=1;j<=3;j++){int node=meshes(level)->elements(level_tetrahedron_list(level)(i))(j);
+        for(int i=1;i<=level_tetrahedron_list(level).m;i++) for(int j=0;j<3;j++){int node=meshes(level)->elements(level_tetrahedron_list(level)(i))(j);
             int index=0;(*meshes(level)->incident_elements)(node).Find(level_tetrahedron_list(level)(i),index);PHYSBAM_ASSERT(index);
             (*meshes(level)->incident_elements)(node).Remove_Index_Lazy(index);}
 
@@ -644,12 +644,12 @@ Remove_Simplex_List(const ARRAY<int>& tetrahedron_list,ARRAY<HASHTABLE<int,int> 
         meshes(level)->Delete_Sorted_Elements(level_tetrahedron_list(level),simplex_map);
         if(level<parent.m) for(int i=1;i<=(*parent(level+1)).m;i++) simplex_map.Get((*parent(level+1))(i),(*parent(level+1))(i));
         if(parent(level)) parent(level)->Remove_Sorted_Indices_Lazy(level_tetrahedron_list(level));
-        if(level>1) for(int i=1;i<=children(level-1)->m;i++){for(int j=1;j<=4;j++) simplex_map.Get((*children(level-1))(i)(j),(*children(level-1))(i)(j));
+        if(level>1) for(int i=1;i<=children(level-1)->m;i++){for(int j=0;j<4;j++) simplex_map.Get((*children(level-1))(i)(j),(*children(level-1))(i)(j));
             // really we just need the zeros at the end...bubble it?
             VECTOR<int,number_of_red_children>& child_list=(*children(level-1))(i);
             for(int i=0;i<number_of_red_children;i++) if(child_list(i)==0) for(int j=i+1;j<=number_of_red_children;j++) if(child_list(j)>0){exchange(child_list(j),child_list(i));break;}}
         children(level)->Remove_Sorted_Indices_Lazy(level_tetrahedron_list(level));
-        for(int i=1;i<=leaf_levels_and_indices.m;i++) if(leaf_levels_and_indices(i)(1)==level) simplex_map.Get(leaf_levels_and_indices(i)(2),leaf_levels_and_indices(i)(2));
+        for(int i=0;i<leaf_levels_and_indices.m;i++) if(leaf_levels_and_indices(i)(1)==level) simplex_map.Get(leaf_levels_and_indices(i)(2),leaf_levels_and_indices(i)(2));
         leaf_number(level)->Remove_Sorted_Indices_Lazy(level_tetrahedron_list(level));}
 
     Rebuild_Object();
@@ -693,12 +693,12 @@ Initialize_Segment_Index_From_Midpoint_Index() // TODO: check that this is corre
 {
     if(segment_index_from_midpoint_index) delete segment_index_from_midpoint_index;
     segment_index_from_midpoint_index=new ARRAY<int>(object.particles.array_collection->Size());
-    for(int s=1;s<=segment_midpoints.m;s++) if(segment_midpoints(s)) (*segment_index_from_midpoint_index)(segment_midpoints(s))=s;
+    for(int s=0;s<segment_midpoints.m;s++) if(segment_midpoints(s)) (*segment_index_from_midpoint_index)(segment_midpoints(s))=s;
 }
 template<class T> void RED_GREEN_TETRAHEDRA<T>::
 Print() const
 {
-    for(int level=1;level<=meshes.m;level++){
+    for(int level=0;level<meshes.m;level++){
         LOG::cout << "There are " << meshes(level)->elements.m << " elements at level " << level << std::endl;
         LOG::cout << "      and object.particles.array_collection->Size()=" << object.particles.array_collection->Size() << std::endl;
         LOG::cout << "      and meshes(level)->incident_elements->m="  << meshes(level)->incident_elements->m << std::endl;}

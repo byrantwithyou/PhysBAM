@@ -126,7 +126,7 @@ Debug_Write(const std::string& output_directory_input)
     FILE_UTILITIES::Write_To_File<T>(output_directory_axis+"/psi_D."+f,heat_poisson.psi_D);
     FILE_UTILITIES::Write_To_File<T>(output_directory_axis+"/colors."+f,heat_poisson.filled_region_colors);
     FILE_UTILITIES::Write_To_File<T>(output_directory_axis+"/beta_face."+f,heat_poisson.beta_face);
-    for(int i=1;i<=densities.m;i++){
+    for(int i=0;i<densities.m;i++){
         std::string filename=STRING_UTILITIES::string_sprintf("/levelset_%d.%s",i,f.c_str());
         FILE_UTILITIES::Write_To_File<T>(output_directory_axis+filename,*heat_poisson.levelset_multiple->levelsets(i));}
     FILE_UTILITIES::Write_To_Text_File(output_directory_axis+"/common/last_frame",frame[axis-1]);frame[axis-1]+=1;

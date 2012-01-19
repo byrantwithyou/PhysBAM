@@ -157,7 +157,7 @@ Display(const int in_color) const
             if(draw_articulation_points){
                 OPENGL_COLOR articulation_point_color(0.5,0.5,0.5),segment_color(0,0,1);
                 if(mode==GL_SELECT){glPushName(4);glPushAttrib(GL_POINT_BIT);glPointSize(OPENGL_PREFERENCES::selection_point_size);}
-                for(int i=1;i<=articulation_points.m;i++){
+                for(int i=0;i<articulation_points.m;i++){
                     glPushName(i);
                     OPENGL_SHAPES::Draw_Dot(articulation_points(i),articulation_point_color,5);
                     glPopName();}
@@ -178,7 +178,7 @@ Display(const int in_color) const
                     MUSCLE<TV>& muscle=*articulated_rigid_body->muscle_list->muscles(i);
                     glLoadName(i);OpenGL_Begin(GL_LINE_STRIP);
                     OpenGL_Vertex(muscle.attachment_point_1->Embedded_Position());
-                    for(int t=1;t<=muscle.via_points.m;t++) OpenGL_Vertex(muscle.via_points(t)->Embedded_Position());
+                    for(int t=0;t<muscle.via_points.m;t++) OpenGL_Vertex(muscle.via_points(t)->Embedded_Position());
                     OpenGL_Vertex(muscle.attachment_point_2->Embedded_Position());
                     OpenGL_End();}
                 glPopName();glPopName();
@@ -189,7 +189,7 @@ Display(const int in_color) const
                     glLineWidth(OPENGL_PREFERENCES::highlighted_line_width);OPENGL_PREFERENCES::selection_highlight_color.Send_To_GL_Pipeline();
                     OpenGL_Begin(GL_LINE_STRIP);
                     OpenGL_Vertex(muscle.attachment_point_1->Embedded_Position());
-                    for(int t=1;t<=muscle.via_points.m;t++) OpenGL_Vertex(muscle.via_points(t)->Embedded_Position());
+                    for(int t=0;t<muscle.via_points.m;t++) OpenGL_Vertex(muscle.via_points(t)->Embedded_Position());
                     OpenGL_Vertex(muscle.attachment_point_2->Embedded_Position());
                     OpenGL_End();}
                 glPopAttrib();}}
@@ -293,7 +293,7 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION *selection) co
         output_stream<<"Insertion = ("<<attachment_point_2->rigid_body.name<<", "<<attachment_point_2->object_space_position<<")"<<std::endl;
         if(muscle.via_points.m){
             output_stream<<"Via points: ";
-            for(int i=1;i<=muscle.via_points.m;i++)
+            for(int i=0;i<muscle.via_points.m;i++)
                 output_stream<<"("<<muscle.via_points(i)->rigid_body.name<<", "<<muscle.via_points(i)->object_space_position<<") ";
             output_stream<<std::endl;}
         output_stream<<std::endl;

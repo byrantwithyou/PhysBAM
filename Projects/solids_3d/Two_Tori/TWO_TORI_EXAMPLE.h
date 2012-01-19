@@ -74,7 +74,7 @@ public:
 //#####################################################################
 void Initialize_Tetrahedron_Collisions()
 {
-    for(int object=1;object<=number_of_objects;object++){
+    for(int object=0;object<number_of_objects;object++){
         ring_collision_body.Append(new TETRAHEDRON_COLLISION_BODY<T>(*ring(object)));
         ring(object)->Initialize_Triangulated_Surface();}
     undeformed_triangulated_surface=new TRIANGULATED_SURFACE<T>(ring(1)->triangulated_surface->triangle_mesh,undeformed_positions);
@@ -98,7 +98,7 @@ void Initialize_Tetrahedron_Collisions()
         SIGNED_DISTANCE::Calculate(*ring(1)->triangulated_surface,undeformed_levelset->levelset.grid,undeformed_levelset->levelset.phi,true);
         FILE_UTILITIES::Create_Directory(output_directory);FILE_UTILITIES::Write_To_File<RW>(output_directory+"/torus_implicit.phi",*undeformed_levelset);}
     undeformed_levelset->Update_Box();
-    for(int object=1;object<=number_of_objects;object++){
+    for(int object=0;object<number_of_objects;object++){
         ring_collision_body(object)->Set_Implicit_Geometry(undeformed_levelset);
         ring_collision_body(object)->Set_Undeformed_Triangulated_Surface(undeformed_triangulated_surface);
         solids_parameters.collision_body_list.Add_Body(ring_collision_body(object));}
@@ -113,7 +113,7 @@ void Get_Initial_Data()
     VECTOR_3D<T> initial_angular_velocity[2]={initial_angular_velocity1,initial_angular_velocity2};
     QUATERNION<T> initial_orientation[2]={initial_orientation1,initial_orientation2};
 
-    for(int object=1;object<=number_of_objects;object++){
+    for(int object=0;object<number_of_objects;object++){
         int index=solids_parameters.deformable_body_parameters.list.Add_Deformable_Tetrahedralized_Volume();
         solids_parameters.deformable_body_parameters.list.deformable_objects(index)->id_number=index;
         TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=*solids_parameters.deformable_body_parameters.list(index).tetrahedralized_volume;
@@ -127,8 +127,8 @@ void Get_Initial_Data()
 
         if(number_of_objects==1){
             int old_number_of_particles=particles.array_collection->Size();int old_number_of_tets=tetrahedron_mesh.tetrahedrons.m;
-            for(int p=1;p<=old_number_of_particles;p++){int p2=particles.array_collection->Add_Element();particles.X(p2)=particles.X(p);particles.X(p2).y+=initial_height2-initial_height1;}
-            for(int t=1;t<=old_number_of_tets;t++){
+            for(int p=0;p<old_number_of_particles;p++){int p2=particles.array_collection->Add_Element();particles.X(p2)=particles.X(p);particles.X(p2).y+=initial_height2-initial_height1;}
+            for(int t=0;t<old_number_of_tets;t++){
                 int i,j,k,l;tetrahedron_mesh.tetrahedrons.Get(t,i,j,k,l);
                 tetrahedron_mesh.tetrahedrons.Append(i+old_number_of_particles,j+old_number_of_particles,k+old_number_of_particles,l+old_number_of_particles);}
             tetrahedron_mesh.number_nodes=particles.array_collection->Size();}
@@ -170,7 +170,7 @@ void Create_Singleton_Geometry(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume
 void Initialize_Bodies() PHYSBAM_OVERRIDE
 {
     Get_Initial_Data();
-    for(int object=1;object<=number_of_objects;object++){
+    for(int object=0;object<number_of_objects;object++){
         if(use_tetrahedron_collisions)solids_parameters.deformable_body_parameters.list(object).collisions.collision_body_list_id=object+1;
         TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=*solids_parameters.deformable_body_parameters.list(object).tetrahedralized_volume;
         solids_parameters.deformable_body_parameters.list(object).Add_Force(Create_Body_Forces<T>(tetrahedralized_volume));

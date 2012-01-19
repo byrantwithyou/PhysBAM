@@ -418,13 +418,13 @@ void Get_Initial_Data()
             connections.Last()->X()=TV(0,13.5,-3);
             connections.Append(&tests.Add_Rigid_Body("subdivided_box",1,(T)0));
             connections.Last()->X()=TV(0,13.5,3);
-            for(int i=1;i<=2;i++){
+            for(int i=0;i<2;i++){
                 T y=i==1?10.5:16.5;
-                for(int j=1;j<=8;j++){
+                for(int j=0;j<8;j++){
                     T x=j<4?-3:j>5?3:0;T z=(j==3||j==5||j==8)?-3:(j==2||j==7)?0:3;
                     RIGID_BODY<TV>* box=&tests.Add_Rigid_Body("subdivided_box",1,(T)0);
                     box->X()=TV(x,y,z);
-                    for(int k=1;k<=connections.m;k++){
+                    for(int k=0;k<connections.m;k++){
                         JOINT<TV>* joint=new POINT_JOINT<TV>();
                         arb.joint_mesh.Add_Articulation(box->particle_index,connections(k)->particle_index,joint);
                         FRAME<TV> joint_frame;joint_frame.t=(box->X()+connections(k)->X())/2.;
@@ -451,7 +451,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     if(test_number!=28) tests.Add_Gravity();
 
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     // binding_list.Distribute_Mass_To_Parents(particles.mass.array);
     binding_list.Clear_Hard_Bound_Particles(particles.mass);
@@ -468,7 +468,7 @@ void Sphere_Mesh()
     SEGMENT_MESH& segment_mesh=pattern->mesh.Get_Segment_Mesh();
 
     T edge_length=10;
-    for(int i=1;i<=segment_mesh.elements.m;i++)
+    for(int i=0;i<segment_mesh.elements.m;i++)
         edge_length=min(edge_length,(pattern->particles.X(segment_mesh.elements(i).x)-pattern->particles.X(segment_mesh.elements(i).y)).Magnitude()*structure_scale);
     T sphere_size=edge_length*(T).18;
     T cylinder_size=edge_length*(T).15;
@@ -478,7 +478,7 @@ void Sphere_Mesh()
         RIGID_BODY<TV>& small_sphere=tests.Add_Rigid_Body("sphere",sphere_size,(T)0);
         small_sphere.X()=structure_scale*pattern->particles.X(i) + offset_scale*structure_scale*TV(0,1,0);}
 
-    for(int i=1;i<=segment_mesh.elements.m;i++){
+    for(int i=0;i<segment_mesh.elements.m;i++){
         RIGID_BODY<TV>& cylinder=tests.Add_Rigid_Body("cyllink",cylinder_size,(T)0);
         VECTOR<TV,2> endpoints(pattern->particles.X.Subset(segment_mesh.elements(i)));
         TV average=((T).5)*(endpoints.x + endpoints.y);
@@ -621,7 +621,7 @@ int Large_Cluster_Cube(FRAME<TV>shift_frame,T scale,const T friction)
     // CLUSTER 1
     ARRAY<RIGID_BODY<TV>*>& bodies=*new ARRAY<RIGID_BODY<TV>*>(8);
     int count=0;
-    for(int i=1;i<=8;i++){
+    for(int i=0;i<8;i++){
 //        bodies(i)->Set_Name(STRING_UTILITIES::string_sprintf("child::%d",bodies(i)));}
         bodies(i)=&tests.Add_Rigid_Body("subdivided_box",1,friction);
         bodies(i)->Set_Name(STRING_UTILITIES::string_sprintf("child::%d",bodies(i)));}
@@ -649,7 +649,7 @@ int Nested_Clusters_Test()
     // CLUSTER 2
     ARRAY<RIGID_BODY<TV>*>& bodies=*new ARRAY<RIGID_BODY<TV>*>(9);
     int count=0;FRAME<TV> shift_frame(TV(0,1,0));
-    for(int i=1;i<=8;i++){
+    for(int i=0;i<8;i++){
         bodies(i)=&tests.Add_Rigid_Body("subdivided_box",1,(T).5);
         bodies(i)->Set_Name(STRING_UTILITIES::string_sprintf("child_cluster2::%d",bodies(i)));
         solids_parameters.collision_body_list.Add_Body(bodies(i));}
@@ -682,7 +682,7 @@ int Spring_Cluster_Test(FRAME<TV> shift_frame,bool fracture)
     // CLUSTER 1
     ARRAY<RIGID_BODY<TV>*>& bodies=*new ARRAY<RIGID_BODY<TV>*>(8);
     int count=0;
-    for(int i=1;i<=8;i++){
+    for(int i=0;i<8;i++){
         bodies(i)=&tests.Add_Rigid_Body("subdivided_box",1,(T).5);
         bodies(i)->Set_Name(STRING_UTILITIES::string_sprintf("child_cluster2::%d",bodies(i)));
         solids_parameters.collision_body_list.Add_Body(bodies(i));}
@@ -835,7 +835,7 @@ void Test_System_Poststabilization()
     ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
     arb.Initialize_Poststabilization_Projection();
 
-    for(int i=1;i<=arb.joint_mesh.joints.m;i++){JOINT_ID joint_id=arb.joint_mesh.joints(i)->id_number;
+    for(int i=0;i<arb.joint_mesh.joints.m;i++){JOINT_ID joint_id=arb.joint_mesh.joints(i)->id_number;
         // check that the projection matrices are projections
         LOG::cout<<"--------------- JOINT = "<<joint_id<<"---------------"<<std::endl;
         MATRIX_MXN<T> P=-arb.lambda_to_delta_v(joint_id)*arb.v_to_lambda(joint_id)+1;
@@ -877,7 +877,7 @@ void Test_System_Prestabilization(const JOINT_ID joint_id)
     child->is_static=false;
 
     LOG::cout<<"Linear test"<<std::endl;
-    for(int i=1;i<=3;i++){
+    for(int i=0;i<3;i++){
         LOG::cout<<"--------------------------------------------------------------------------------"<<std::endl;
         TV j;j(i)=impulse_magnitude;
         LINEAR_CONSTRAINT_FUNCTION<TV> f_error(arb,joint_id,dt,epsilon_scale,location);
@@ -891,7 +891,7 @@ void Test_System_Prestabilization(const JOINT_ID joint_id)
         Test_System_Prestabilization_Print(f_error_result,f_error_2_result,jacobian,jacobian_2);}
 
     LOG::cout<<"Angular test"<<std::endl;
-    for(int i=1;i<=3;i++){
+    for(int i=0;i<3;i++){
         LOG::cout<<"@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"<<std::endl;
         TV j;j(i)=impulse_magnitude;
         ANGULAR_CONSTRAINT_FUNCTION<TV> f_error(arb,joint_id,dt,epsilon_scale);
@@ -908,7 +908,7 @@ void Test_System_Prestabilization(const JOINT_ID joint_id)
         Test_System_Prestabilization_Print(f_error_result,f_error_2_result,jacobian,jacobian_2);}
 
     LOG::cout<<"Combined test"<<std::endl;
-    for(int i=1;i<=6;i++){
+    for(int i=0;i<6;i++){
         LOG::cout<<"-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@"<<std::endl;
         VECTOR<T,6> j_combined;j_combined(i)=impulse_magnitude;
         TV j,j_tau;j_combined.Get_Subvector(1,j);j_combined.Get_Subvector(4,j_tau);
@@ -924,7 +924,7 @@ void Test_System_Prestabilization(const JOINT_ID joint_id)
         LOG::cout<<"Testing component "<<i<<std::endl;
         if(TV::Dot_Product(f_angular,f_angular_2)<0){
             LOG::cout<<"Flipping sign"<<std::endl;
-            f_error_2_result.Set_Subvector(4,-f_angular_2);for(int i=4;i<=6;i++) for(int j=1;j<=6;j++) jacobian_2(i,j)=-jacobian_2(i,j);}
+            f_error_2_result.Set_Subvector(4,-f_angular_2);for(int i=4;i<=6;i++) for(int j=0;j<6;j++) jacobian_2(i,j)=-jacobian_2(i,j);}
         Test_System_Prestabilization_Print(f_error_result,f_error_2_result,jacobian,jacobian_2);}
 
     LOG::cout<<"################################################################################"<<std::endl;
@@ -934,20 +934,20 @@ void Test_System_Prestabilization(const JOINT_ID joint_id)
 
     {LINEAR_CONSTRAINT_FUNCTION<TV> f_error(arb,joint_id,dt,epsilon_scale,location);
     MATRIX<T,3> jacobian(f_error.Jacobian(jn)),jacobian_2;
-    for(int i=1;i<=3;i++){TV j;j(i)=epsilon;jacobian_2.Column(i)=(f_error.F(jn+j)-f_error.F(jn-j))/(2*epsilon);}
+    for(int i=0;i<3;i++){TV j;j(i)=epsilon;jacobian_2.Column(i)=(f_error.F(jn+j)-f_error.F(jn-j))/(2*epsilon);}
     LOG::cout<<"Computed Linear Jacobian:\n"<<jacobian<<"Approximated Linear Jacobian:\n"<<jacobian_2;
     LOG::cout<<"Difference:\n"<<(jacobian-jacobian_2)<<std::endl;}
 
     {ANGULAR_CONSTRAINT_FUNCTION<TV> f_error(arb,joint_id,dt,epsilon_scale);
     MATRIX<T,3> jacobian(f_error.Jacobian(j_tau)),jacobian_2;
-    for(int i=1;i<=3;i++){TV j;j(i)=epsilon;jacobian_2.Column(i)=(f_error.F(j_tau+j)-f_error.F(j_tau-j))/(2*epsilon);}
+    for(int i=0;i<3;i++){TV j;j(i)=epsilon;jacobian_2.Column(i)=(f_error.F(j_tau+j)-f_error.F(j_tau-j))/(2*epsilon);}
     LOG::cout<<"Computed Angular Jacobian:\n"<<jacobian<<"Approximated Angular Jacobian:\n"<<jacobian_2;
     LOG::cout<<"Difference:\n"<<(jacobian-jacobian_2)<<std::endl;}
 
     {LINEAR_AND_ANGULAR_CONSTRAINT_FUNCTION<TV> f_error(arb,joint_id,dt,epsilon_scale,location);
     VECTOR<T,6> j_combined;j_combined.Set_Subvector(1,jn);j_combined.Set_Subvector(4,j_tau);
     MATRIX<T,6> jacobian(f_error.Jacobian(j_combined)),jacobian_2;
-    for(int i=1;i<=6;i++){VECTOR<T,6> j;j(i)=epsilon;jacobian_2.Set_Column(i,(f_error.F(j_combined+j)-f_error.F(j_combined-j))/(2*epsilon));}
+    for(int i=0;i<6;i++){VECTOR<T,6> j;j(i)=epsilon;jacobian_2.Set_Column(i,(f_error.F(j_combined+j)-f_error.F(j_combined-j))/(2*epsilon));}
     LOG::cout<<"Computed Combined Jacobian:\n"<<jacobian<<"Approximated Combined Jacobian:\n"<<jacobian_2;
     LOG::cout<<"Difference:\n"<<(jacobian-jacobian_2)<<std::endl;}
 

@@ -22,19 +22,19 @@ Negative_Material(const ARRAY<TV>& X,const ARRAY<T>& phis,const VECTOR<int,3>& i
     T area=Signed_Area(X(indices[1]),X(indices[2]),X(indices[3])); // doesn't matter what's inside; also avoids duplicate node case (which messes up theta)
     // special case: if two phis are zero, that's an interface 
     if(!area) return 0;
-    for(int i=1;i<=3;i++) positive_count+=((local_phi[i]=phis(indices[i]))>0);
+    for(int i=0;i<3;i++) positive_count+=((local_phi[i]=phis(indices[i]))>0);
     switch(positive_count){
         case 0: return area;
         case 1:
             // draw positive triangle. has correct positive/negative area based on whether triangle is backwards or not
-            for(int i=1;i<=3;i++)if(local_phi[i]>0){
+            for(int i=0;i<3;i++)if(local_phi[i]>0){
                 VECTOR<TV,2> interface_locations;int index=i%3+1;
                 for(int j=1;j<=2;j++,index=index%3+1)
                     interface_locations[j]=LINEAR_INTERPOLATION<T,TV>::Linear(X(indices[i]),X(indices[index]),LEVELSET_UTILITIES<T>::Theta(local_phi[i],local_phi[index]));
                 return area-TRIANGLE_2D<T>::Signed_Area(X(indices[i]),interface_locations[1],interface_locations[2]);}
         case 2:
             // draw negative triangle
-            for(int i=1;i<=3;i++)if(local_phi[i]<=0){
+            for(int i=0;i<3;i++)if(local_phi[i]<=0){
                 VECTOR<TV,2> interface_locations;int index=i%3+1;
                 for(int j=1;j<=2;j++,index=index%3+1)
                     interface_locations[j]=LINEAR_INTERPOLATION<T,TV>::Linear(X(indices[i]),X(indices[index]),LEVELSET_UTILITIES<T>::Theta(local_phi[i],local_phi[index]));
@@ -51,7 +51,7 @@ Cut_With_Hyperplane(ARRAY<TV>& X,const LINE_2D<T>& cutting_plane,const VECTOR<in
 {
     VECTOR<T,3> phis;
     VECTOR<TV,3> X_nodes;
-    for(int i=1;i<=3;i++){X_nodes[i]=X(indices[i]);phis[i]=cutting_plane.Signed_Distance(X_nodes[i]);}
+    for(int i=0;i<3;i++){X_nodes[i]=X(indices[i]);phis[i]=cutting_plane.Signed_Distance(X_nodes[i]);}
     Cut_Simplex(X,indices,X_nodes,phis,left_tris,right_tris);
 }
 //#####################################################################
@@ -65,13 +65,13 @@ template<class T> void TRIANGLE_2D<T>::
 Cut_Simplex(ARRAY<TV>& X,const VECTOR<int,3>& indices,const VECTOR<TV,3>& X_nodes,const VECTOR<T,3>& phi_nodes,ARRAY<VECTOR<int,3> >& left_tris,ARRAY<VECTOR<int,3> >& right_tris)
 {
     int positive_count=0;
-    for(int i=1;i<=3;i++) if(phi_nodes[i]>0) positive_count++;
+    for(int i=0;i<3;i++) if(phi_nodes[i]>0) positive_count++;
     switch(positive_count){
       case 0: // place in left list
         Add_Points_As_Triangle(X,left_tris,indices[1],indices[2],indices[3]);break;
       case 1:
         // draw positive triangle. has correct positive/negative area based on whether triangle is backwards or not
-        for(int i=1;i<=3;i++)if(phi_nodes[i]>0){
+        for(int i=0;i<3;i++)if(phi_nodes[i]>0){
             VECTOR<int,2> interface_locations;int index=i%3+1;
             VECTOR<int,2> other_locations;
             for(int j=1;j<=2;j++,index=index%3+1){
@@ -85,7 +85,7 @@ Cut_Simplex(ARRAY<TV>& X,const VECTOR<int,3>& indices,const VECTOR<TV,3>& X_node
             return;}
       case 2:
         // draw negative triangle
-        for(int i=1;i<=3;i++)if(phi_nodes[i]<=0){
+        for(int i=0;i<3;i++)if(phi_nodes[i]<=0){
             VECTOR<int,2> interface_locations;int index=i%3+1;
             VECTOR<int,2> other_locations;
             for(int j=1;j<=2;j++,index=index%3+1){
@@ -126,11 +126,11 @@ Cut_With_Hyperplane_And_Discard_Outside_Simplices(const TRIANGLE_2D<T>& triangle
 {
     VECTOR<T,3> phi_nodes;
     VECTOR<VECTOR<T,2>,3> X_nodes;X_nodes(1)=triangle.X[1];X_nodes(2)=triangle.X[2];X_nodes(3)=triangle.X[3];
-    for(int i=1;i<=3;i++){phi_nodes(i)=cutting_plane.Signed_Distance(X_nodes(i));}
+    for(int i=0;i<3;i++){phi_nodes(i)=cutting_plane.Signed_Distance(X_nodes(i));}
 
     // left simplices are in the negative halfspace, right simplices in the positive halfspace
     int positive_count=0,single_node_sign;
-    for(int i=1;i<=3;i++) if(phi_nodes(i)>0) positive_count++;
+    for(int i=0;i<3;i++) if(phi_nodes(i)>0) positive_count++;
     switch(positive_count){
         case 0: // in negative halfspace
             negative_triangles.Append(triangle);break;
@@ -138,7 +138,7 @@ Cut_With_Hyperplane_And_Discard_Outside_Simplices(const TRIANGLE_2D<T>& triangle
         case 2:
             single_node_sign=positive_count==1?1:-1;
             // draw positive triangle. has correct positive/negative area based on whether triangle is backwards or not
-            for(int i=1;i<=3;i++)if(LEVELSET_UTILITIES<T>::Sign(phi_nodes(i))==single_node_sign){
+            for(int i=0;i<3;i++)if(LEVELSET_UTILITIES<T>::Sign(phi_nodes(i))==single_node_sign){
                 VECTOR<VECTOR<T,2>,2> interface_locations;int index=i%3+1;
                 VECTOR<int,2> other_locations;
                 for(int j=1;j<=2;j++,index=index%3+1){

@@ -34,13 +34,13 @@ Initialize(SEGMENT_MESH& segment_mesh_input)
 {
    if(!segment_mesh_input.adjacent_elements) segment_mesh_input.Initialize_Adjacent_Elements();
     ARRAY<VECTOR<int,2> > segment_list;
-    for(int s1=1;s1<=segment_mesh_input.elements.m;s1++){
+    for(int s1=0;s1<segment_mesh_input.elements.m;s1++){
         VECTOR<int,2> s1_nodes=segment_mesh_input.elements(s1);
         const ARRAY<int>& adjacent=(*segment_mesh_input.adjacent_elements)(s1);
-        for(int a=1;a<=adjacent.m;a++){int s2=adjacent(a);
+        for(int a=0;a<adjacent.m;a++){int s2=adjacent(a);
             if(s2>s1){
                 VECTOR<int,2> s2_nodes=segment_mesh_input.elements(s2);
-                for(int i=1;i<=2;i++)
+                for(int i=0;i<2;i++)
                     if(int j=s2_nodes.Find(s1_nodes[i])) segment_list.Append(s1_nodes.Remove_Index(i).Append(s2_nodes.Remove_Index(j).x));}}}
     segment_mesh.Initialize_Mesh(segment_mesh_input.number_nodes,segment_list);
 }

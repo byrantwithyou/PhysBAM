@@ -18,9 +18,9 @@ template<class T,class TV> T PhysBAM::
 Triangle_Intersection_Area(const TRIANGLE_2D<T>& a,const TRIANGLE_2D<T>& b,VECTOR<TV,6>& G,VECTOR<VECTOR<MATRIX<T,2>,6>,6>& H)
 {
     T A=0;
-    for(int i=1;i<=3;i++){
+    for(int i=0;i<3;i++){
         int in=i%3+1;
-        for(int j=1;j<=3;j++){
+        for(int j=0;j<3;j++){
             int jn=j%3+1;
             VECTOR<int,4> I(i,in,j+3,jn+3);
 #if 1
@@ -29,14 +29,14 @@ Triangle_Intersection_Area(const TRIANGLE_2D<T>& a,const TRIANGLE_2D<T>& b,VECTO
             ORIGIN_AREAS::Volume_From_Simplices(data,TV(),X);
             A+=data.V;
 
-            for(int k=1;k<=4;k++) G(I(k))+=(const TV&)data.G[k-1];
-            for(int k=1;k<=4;k++) for(int m=1;m<=4;m++) H(I(k))(I(m))+=data.H[k-1][m-1];
+            for(int k=0;k<4;k++) G(I(k))+=(const TV&)data.G[k-1];
+            for(int k=0;k<4;k++) for(int m=0;m<4;m++) H(I(k))(I(m))+=data.H[k-1][m-1];
 #else // #if 0|1
             VECTOR<TV,4> tG;
             VECTOR<VECTOR<MATRIX<T,2>,4>,4> tH;
             A+=Trapezoid_Intersection_Area(a.X(i),a.X(in),b.X(j),b.X(jn),tG,tH);
-            for(int k=1;k<=4;k++) G(I(k))+=tG(k);
-            for(int k=1;k<=4;k++) for(int m=1;m<=4;m++) H(I(k))(I(m))+=tH(k)(m);
+            for(int k=0;k<4;k++) G(I(k))+=tG(k);
+            for(int k=0;k<4;k++) for(int m=0;m<4;m++) H(I(k))(I(m))+=tH(k)(m);
 #endif // #if 0|1
         }
     }

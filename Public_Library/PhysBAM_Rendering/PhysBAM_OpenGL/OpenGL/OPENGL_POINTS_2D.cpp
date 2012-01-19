@@ -117,7 +117,7 @@ template<class T,class T_ARRAY> void OPENGL_POINTS_2D<T,T_ARRAY>::
 Set_Point_Colors(const ARRAY<int> &indices,const OPENGL_COLOR &point_color)
 {
     Store_Point_Colors(true);
-    for(int i=1;i<=indices.m;i++) (*point_colors)(indices(i))=point_color;
+    for(int i=0;i<indices.m;i++) (*point_colors)(indices(i))=point_color;
 }
 //#####################################################################
 // Function Reset_Point_Colors

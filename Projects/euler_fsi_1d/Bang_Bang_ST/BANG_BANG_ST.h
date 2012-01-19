@@ -122,7 +122,7 @@ void Initialize_Euler_State() PHYSBAM_OVERRIDE
 
     //initialize grid variables
     //1 == density, 2 == momentum, 3 == total energy
-    for(int i=1;i<=grid.counts.x;i++) {
+    for(int i=0;i<grid.counts.x;i++) {
         T rho=(T)0.,u=(T)0.,p=(T)0.;
         if(grid.Axis_X(i,1)<(T).1){rho=(T)1.;p=(T)1000.;} else if(grid.Axis_X(i,1)<(T).9){rho=(T)1.;p=(T).01;} else{rho=(T)1.;p=(T)100.;}
         U(i)(1)=rho;U(i)(2)=rho*u;U(i)(3)=rho*(tmp_eos->e_From_p_And_rho(p,rho)+sqr(u)/(T)2.);}

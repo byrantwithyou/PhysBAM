@@ -162,7 +162,7 @@ Initialize_Interface(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,T_ARRAYS_B
     if(seed_indices){
         for(int i=1;i<=seed_indices->m;i++)Add_To_Initial(done,close_k,(*seed_indices)(i));
         if(add_seed_indices_for_ghost_cells){
-            for(int axis=1;axis<=TV::dimension;axis++) for(int side=1;side<=2;side++){
+            for(int axis=1;axis<=TV::dimension;axis++) for(int side=0;side<2;side++){
                 RANGE<TV_INT> ghost_domain=domain;if(side==1) ghost_domain.max_corner(axis)=interior_domain.min_corner(axis)-1;else ghost_domain.min_corner(axis)=interior_domain.max_corner(axis)+1;
                 for(CELL_ITERATOR iterator(cell_grid,ghost_domain);iterator.Valid();iterator.Next()){TV_INT index=iterator.Cell_Index();
                     for(int i=1;i<=T_GRID::number_of_neighbors_per_cell;i++){TV_INT neighbor_index(iterator.Cell_Neighbor(i));
@@ -250,7 +250,7 @@ Initialize_Interface_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,T
 
     T sqr_epsilon_cell_size=sqr(levelset.small_number*cell_grid.Cell_Size()),sqr_epsilon_face_size[3];
     if(T_GRID::dimension==2){sqr_epsilon_face_size[2]=sqr_epsilon_cell_size;}
-    else if(T_GRID::dimension==3) for(int axis=1;axis<=3;axis++) sqr_epsilon_face_size[axis-1]=sqr_epsilon_cell_size/sqr(cell_grid.dX[axis]);
+    else if(T_GRID::dimension==3) for(int axis=0;axis<3;axis++) sqr_epsilon_face_size[axis-1]=sqr_epsilon_cell_size/sqr(cell_grid.dX[axis]);
     
     T fmm_initialization_iterative_tolerance_absolute=levelset.fmm_initialization_iterative_tolerance*cell_grid.Minimum_Edge_Length();    
  
@@ -294,7 +294,7 @@ Initialize_Interface_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,T
                 if(d2 > sqr_epsilon_cell_size) phi_new(index)=value_xy*value[2]/sqrt(d2);else phi_new(index)=min(value[0],value[1],value[2]);}
             if(levelset.refine_fmm_initialization_with_iterative_solver){
                 TV vertex=location;T phi_value=phi_ghost(index);
-                for(int iterations=1;iterations<=levelset.fmm_initialization_iterations;iterations++){
+                for(int iterations=0;iterations<levelset.fmm_initialization_iterations;iterations++){
                     if(abs(phi_value)>10*cell_grid.Minimum_Edge_Length())break; // stop if it looks like it's blowing up
                     vertex-=phi_value*levelset_ghost.Normal(vertex);phi_value=levelset_ghost.Phi(vertex);
                     if(abs(phi_value)<=fmm_initialization_iterative_tolerance_absolute){
@@ -322,7 +322,7 @@ Initialize_Interface_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,T
                 if(d2 > sqr_epsilon_cell_size) phi_new(index)=value_xy*value[2]/sqrt(d2);else phi_new(index)=min(value[0],value[1],value[2]);}
             if(levelset.refine_fmm_initialization_with_iterative_solver){TV location=iterator.Location();
                 TV vertex=location;T phi_value=phi_ghost(index);
-                for(int iterations=1;iterations<=levelset.fmm_initialization_iterations;iterations++){
+                for(int iterations=0;iterations<levelset.fmm_initialization_iterations;iterations++){
                     if(abs(phi_value)>10*cell_grid.Minimum_Edge_Length())break; // stop if it looks like it's blowing up
                     vertex-=phi_value*levelset_ghost.Normal(vertex);phi_value=levelset_ghost.Phi(vertex);
                     if(abs(phi_value)<=fmm_initialization_iterative_tolerance_absolute){

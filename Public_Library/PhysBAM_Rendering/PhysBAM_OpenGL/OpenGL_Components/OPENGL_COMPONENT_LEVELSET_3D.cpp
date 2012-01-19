@@ -39,7 +39,7 @@ OPENGL_COMPONENT_LEVELSET_3D(const std::string& levelset_filename_input,
 
     opengl_levelset_multiviews.Resize(number_of_sets);
     OPENGL_INDEXED_COLOR_MAP* color_map=OPENGL_INDEXED_COLOR_MAP::Levelset_Multiple_Color_Map();
-    for(int i=1;i<=opengl_levelset_multiviews.m;i++){
+    for(int i=0;i<opengl_levelset_multiviews.m;i++){
         opengl_levelset_multiviews(i)=new OPENGL_LEVELSET_MULTIVIEW<T>();
         if(use_sets){
             OPENGL_COLOR color=color_map->Lookup(i);
@@ -58,21 +58,21 @@ template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_3D<T,RW>::
 Set_Surface_Material(const OPENGL_MATERIAL &front_surface_mat,
                      const OPENGL_MATERIAL &back_surface_mat)
 {
-    for(int i=1;i<=opengl_levelset_multiviews.m;i++)
+    for(int i=0;i<opengl_levelset_multiviews.m;i++)
         opengl_levelset_multiviews(i)->Set_Surface_Material(front_surface_mat, back_surface_mat);
 }
 
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_3D<T,RW>::
 Set_Overlayed_Surface_Material(const OPENGL_MATERIAL &overlayed_surface_mat)
 {
-    for(int i=1;i<=opengl_levelset_multiviews.m;i++)
+    for(int i=0;i<opengl_levelset_multiviews.m;i++)
         opengl_levelset_multiviews(i)->Set_Overlayed_Surface_Material(overlayed_surface_mat);
 }
 
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_3D<T,RW>::
 Set_Slice_Color(const OPENGL_COLOR &inside_slice_color, const OPENGL_COLOR &outside_slice_color)
 {
-    for(int i=1;i<=opengl_levelset_multiviews.m;i++)
+    for(int i=0;i<opengl_levelset_multiviews.m;i++)
         opengl_levelset_multiviews(i)->Set_Slice_Color(inside_slice_color, outside_slice_color);
 }
 
@@ -87,7 +87,7 @@ template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_3D<T,RW>::
 Display(const int in_color) const
 {
     if(draw){
-        if(draw_multiple_levelsets) for(int i=1;i<=opengl_levelset_multiviews.m;i++) opengl_levelset_multiviews(i)->Display(in_color);
+        if(draw_multiple_levelsets) for(int i=0;i<opengl_levelset_multiviews.m;i++) opengl_levelset_multiviews(i)->Display(in_color);
         else opengl_levelset_multiview->Display(in_color);}
 }
 
@@ -107,33 +107,33 @@ Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* current_selec
         if(current_selection && current_selection->type==OPENGL_SELECTION::GRID_CELL_3D && is_MAC){
             VECTOR<int,3> index=((OPENGL_SELECTION_GRID_CELL_3D<T>*)current_selection)->index;
             opengl_levelset_multiviews(1)->Levelset()->grid.Clamp(index,ghost_cells);
-            for(int i=1;i<=opengl_levelset_multiviews.m;i++){
+            for(int i=0;i<opengl_levelset_multiviews.m;i++){
                 const LEVELSET_3D<GRID<TV> >& levelset=*opengl_levelset_multiviews(i)->Levelset();
                 output_stream<<component_name<<": phi["<<i<<"]="<<levelset.phi(index)
                              <<" curvature["<<i<<"]="<<levelset.Compute_Curvature(levelset.grid.Center(index))<<std::endl;}}
         if(current_selection && current_selection->type==OPENGL_SELECTION::GRID_NODE_3D && !is_MAC){
             VECTOR<int,3> index=((OPENGL_SELECTION_GRID_NODE_3D<T>*)current_selection)->index;
             opengl_levelset_multiviews(1)->Levelset()->grid.Clamp(index,ghost_cells);
-            for(int i=1;i<=opengl_levelset_multiviews.m;i++)  if(opengl_levelset_multiviews(i)->Levelset())
+            for(int i=0;i<opengl_levelset_multiviews.m;i++)  if(opengl_levelset_multiviews(i)->Levelset())
                 output_stream<<component_name<<": phi["<<i<<"]="<<(*opengl_levelset_multiviews(i)->Levelset()).phi(index)<<std::endl;}
         if(current_selection && current_selection->type==OPENGL_SELECTION::COMPONENT_PARTICLES_3D){
             OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T> *selection=(OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T>*)current_selection;
             VECTOR<T,3> location=selection->location;
-            for(int i=1;i<=opengl_levelset_multiviews.m;i++) if(opengl_levelset_multiviews(i)->Levelset())
+            for(int i=0;i<opengl_levelset_multiviews.m;i++) if(opengl_levelset_multiviews(i)->Levelset())
                 output_stream<<component_name<<": phi["<<i<<"] @ particle="<<opengl_levelset_multiviews(i)->Levelset()->Phi(location)<<std::endl;}}
 }
 
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_3D<T,RW>::
 Turn_Smooth_Shading_On()
 {
-    for(int i=1;i<=opengl_levelset_multiviews.m;i++)
+    for(int i=0;i<opengl_levelset_multiviews.m;i++)
         opengl_levelset_multiviews(i)->Turn_Smooth_Shading_On();
 }
 
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_3D<T,RW>::
 Turn_Smooth_Shading_Off()
 {
-    for(int i=1;i<=opengl_levelset_multiviews.m;i++)
+    for(int i=0;i<opengl_levelset_multiviews.m;i++)
         opengl_levelset_multiviews(i)->Turn_Smooth_Shading_Off();
 }
 
@@ -143,7 +143,7 @@ Reinitialize()
     if(draw){
         if((is_animation && (frame_loaded != frame || set_loaded != set)) || (!is_animation && frame_loaded < 0)){
             if(use_sets){
-                for(int i=1;i<=opengl_levelset_multiviews.m;i++)
+                for(int i=0;i<opengl_levelset_multiviews.m;i++)
                     Reinitialize_Levelset(STRING_UTILITIES::string_sprintf(filename_set.c_str(),frame,i),STRING_UTILITIES::string_sprintf(filename_triangulated_surface_set.c_str(),frame,i),opengl_levelset_multiviews(i));
                 set_loaded=set;}
             else Reinitialize_Levelset(FILE_UTILITIES::Get_Frame_Filename(levelset_filename.c_str(),frame), FILE_UTILITIES::Get_Frame_Filename(triangulated_surface_filename.c_str(),frame), opengl_levelset_multiview);
@@ -181,21 +181,21 @@ Set_Draw(bool draw_input)
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_3D<T,RW>::
 Toggle_Display_Overlay()
 {
-    for(int i=1;i<=opengl_levelset_multiviews.m;i++)
+    for(int i=0;i<opengl_levelset_multiviews.m;i++)
         opengl_levelset_multiviews(i)->Toggle_Display_Overlay();
 }
 
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_3D<T,RW>::
 Toggle_Slice_Color_Mode()
 {
-    for(int i=1;i<=opengl_levelset_multiviews.m;i++)
+    for(int i=0;i<opengl_levelset_multiviews.m;i++)
         opengl_levelset_multiviews(i)->Toggle_Slice_Color_Mode();
 }
 
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_3D<T,RW>::
 Toggle_Smooth_Slice()
 {
-    for(int i=1;i<=opengl_levelset_multiviews.m;i++)
+    for(int i=0;i<opengl_levelset_multiviews.m;i++)
         opengl_levelset_multiviews(i)->Toggle_Smooth_Slice_Texture();
 }
 

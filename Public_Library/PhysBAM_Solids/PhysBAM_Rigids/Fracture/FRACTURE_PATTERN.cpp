@@ -47,7 +47,7 @@ Intersect_With_Rigid_Body(const RIGID_BODY<TV>& body,const TV& point_of_impact,A
     body_region.fracture_offset=body_region.implicit_object->levelset.grid.Closest_Node(body_region.levelset_RS.Inverse()*(point_of_impact-body_region.levelset_T))-TV_INT::All_Ones_Vector();
     T density=body.Mass()/body_region.Compute_Volume();
 
-    for(int r=1;r<=regions.m;r++){
+    for(int r=0;r<regions.m;r++){
         FRACTURE_REGION<T>& region=*regions(r);
         region.levelset_RS=region.object_RS=R_ed*DIAGONAL_MATRIX<T,3>(region.implicit_object->levelset.grid.dX).Inverse();
         region.levelset_T=region.object_T=R_ed*(-region.implicit_object->levelset.grid.domain.min_corner/region.implicit_object->levelset.grid.dX+
@@ -55,7 +55,7 @@ Intersect_With_Rigid_Body(const RIGID_BODY<TV>& body,const TV& point_of_impact,A
             body_region.levelset_T;
         ARRAY<FRACTURE_REGION<T>*> new_regions=body_region.Intersect_With_Rigid_Body(*regions(r),use_particle_optimization,generate_object_tessellation);
         if(!new_regions.m) continue;
-        for(int i=1;i<=new_regions.m;i++){
+        for(int i=0;i<new_regions.m;i++){
             RIGID_BODY<TV>* new_body=new RIGID_BODY<TV>(body.rigid_body_collection,true);
             // Initialize frame, mass, and inertia. coefficient of friction, coefficient of restitution
             new_body->Set_Coefficient_Of_Friction(body.coefficient_of_friction);new_body->Set_Coefficient_Of_Restitution(body.coefficient_of_restitution);
@@ -117,7 +117,7 @@ template<class T> void FRACTURE_PATTERN<T>::
 Write(TYPED_OSTREAM& output) const
 {
     Write_Binary(output,regions.m);
-    for(int r=1;r<=regions.m;r++) regions(r)->Write(output);
+    for(int r=0;r<regions.m;r++) regions(r)->Write(output);
 }
 //#####################################################################
 template class FRACTURE_PATTERN<float>;

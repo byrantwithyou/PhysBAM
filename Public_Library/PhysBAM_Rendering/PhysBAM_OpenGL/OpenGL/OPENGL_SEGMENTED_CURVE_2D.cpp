@@ -215,7 +215,7 @@ Draw_Segments_For_Selection() const
     glPushAttrib(GL_LINE_BIT);
     glLineWidth(OPENGL_PREFERENCES::selection_line_width);
     glPushName(0);
-    for(int i=1;i<=curve.mesh.elements.m;i++){
+    for(int i=0;i<curve.mesh.elements.m;i++){
         int node1,node2;curve.mesh.elements(i).Get(node1,node2);
         glLoadName(i);
         OpenGL_Begin(GL_LINES);

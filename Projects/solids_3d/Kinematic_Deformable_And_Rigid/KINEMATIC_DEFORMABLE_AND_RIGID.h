@@ -147,7 +147,7 @@ int Add_Deformable_Object(const GRID<TV>& cloth_grid,const MATRIX<T,4>& transfor
 
     triangle_mesh.Initialize_Herring_Bone_Mesh(cloth_grid.m,cloth_grid.n);
     particles.array_collection->Add_Elements(triangle_mesh.number_nodes);
-    for(int i=1;i<=cloth_grid.m;i++) for(int j=1;j<=cloth_grid.n;j++){
+    for(int i=0;i<cloth_grid.m;i++) for(int j=0;j<cloth_grid.n;j++){
         int node=i+cloth_grid.m*(j-1);particles.X(node)=transform*VECTOR_3D<T>(cloth_grid.X(i,j));particles.V(node)=VECTOR_3D<T>();}
 
     return index;
@@ -159,13 +159,13 @@ void Update_Deforming_Volume(const T time)
 {
     LEVELSET_3D<GRID<TV> >& levelset=((LEVELSET_IMPLICIT_SURFACE<T>*)stub_rigid_body->implicit_surface)->levelset;
 //    VECTOR_3D<T> center(0,0);T radius=0.4;
-//    for(int i=1;i<=levelset.grid.m;i++) for(int j=1;j<=levelset.grid.n;j++)
+//    for(int i=0;i<levelset.grid.m;i++) for(int j=0;j<levelset.grid.n;j++)
 //        levelset.phi(i,j)=(levelset.grid.X(i,j)-center).Magnitude()-radius;
     VECTOR_3D<T> velocity(0,0,0),corner=VECTOR_3D<T>(-4,-1,-1)+time*velocity,size(8,2,2);
     VECTOR_3D<T> angular_velocity(0,0,-0.3);
     BOX_3D<T> box(corner,corner+size);
     MATRIX<T,3> rotation_matrix=MATRIX<T,3>::Rotation_Matrix(-time*angular_velocity);
-    for(int i=1;i<=levelset.grid.m;i++) for(int j=1;j<=levelset.grid.n;j++) for(int k=1;k<=levelset.grid.mn;k++){
+    for(int i=0;i<levelset.grid.m;i++) for(int j=0;j<levelset.grid.n;j++) for(int k=0;k<levelset.grid.mn;k++){
         levelset.phi(i,j,k)=box.Signed_Distance(rotation_matrix*levelset.grid.X(i,j,k));
         if(stub_rigid_body->velocity_field) (*stub_rigid_body->velocity_field)(i,j,k)=velocity+VECTOR_3D<T>::Cross_Product(angular_velocity,levelset.grid.X(i,j,k));}
     stub_rigid_body->implicit_surface->Update_Box();
@@ -203,8 +203,8 @@ void Set_External_Velocities(ARRAY<VECTOR_3D<T> >& V,const T time) PHYSBAM_OVERR
 void Zero_Out_Enslaved_Velocity_Nodes(ARRAY<VECTOR_3D<T> >& V,const T time) PHYSBAM_OVERRIDE
 {
     if(example_number==1){
-        for(int i=1;i<=cloth_grid.m;i++){V(i)=V(i+cloth_grid.m*(cloth_grid.n-1))=VECTOR_3D<T>();}
-        for(int j=1;j<=cloth_grid.n;j++){V(1+cloth_grid.m*(j-1))=V(cloth_grid.m*j)=VECTOR_3D<T>();}}
+        for(int i=0;i<cloth_grid.m;i++){V(i)=V(i+cloth_grid.m*(cloth_grid.n-1))=VECTOR_3D<T>();}
+        for(int j=0;j<cloth_grid.n;j++){V(1+cloth_grid.m*(j-1))=V(cloth_grid.m*j)=VECTOR_3D<T>();}}
 }
 //#####################################################################
 // Function Update_Solids_Parameters

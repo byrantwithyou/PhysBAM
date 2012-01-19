@@ -103,13 +103,13 @@ virtual void Initialize_Attachment_Forces_And_Velocities(COLLISION_FORCES_AND_VE
     int constraint_type=3;
     int m=meshing_grid.m,n=meshing_grid.n,mn=meshing_grid.mn;
        if(constraint_type==3){
-        for(int i=1;i<=meshing_grid.m;i++)
-            for(int k=1;k<=meshing_grid.mn;k++){
+        for(int i=0;i<meshing_grid.m;i++)
+            for(int k=0;k<meshing_grid.mn;k++){
                 collision_forces_and_velocities.enslaved_nodes.Append((k-1)*m*n + m*(n -1) + i);
             }
     }
     else if(constraint_type==2){
-        //for(int i=1;i<=m_input;i++)
+        //for(int i=0;i<m_input;i++)
         //    attachment_constraints.enslaved_nodes.Append(i);
     }
     else if(constraint_type==1){
@@ -151,7 +151,7 @@ virtual void Fracture_Along_Level_Set(EMBEDDED_TETRAHEDRALIZED_VOLUME& embedded_
     int number_of_new_particles=0;
     for(t=1;t<=mesh.tetrahedrons.m;t++){
         if(tetrahedron_label(t) == 0){
-            for(int a=1;a<=4;a++){
+            for(int a=0;a<4;a++){
                 int node=mesh.tetrahedrons(a,t);
                 if(!particle_replicated(node)){
                     int new_index=particles.array_collection->Add_Element();assert(new_index == particles.array_collection->Size());particle_replicated(node)=new_index;number_of_new_particles++;

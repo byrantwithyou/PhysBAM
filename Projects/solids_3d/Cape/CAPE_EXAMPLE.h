@@ -169,9 +169,9 @@ public:
         if(fabs(VECTOR_3D<T>::Dot_Product(X(a)-X(p),X(b)-X(p)))<(X(a)-X(p)).Magnitude_Squared())corner.Append(p);*///}
     std::cout<<"Found "<<corner.m<<" corners.\n";
     std::cout<<corner(1)<<" "<<corner(2)<<" "<<corner(3)<<" "<<corner(4)<<"\n";
-    for(int a=1;a<=4;a++)std::cout<<neighbor_nodes(corner(a)).m<<" ";std::cout<<"\n";
+    for(int a=0;a<4;a++)std::cout<<neighbor_nodes(corner(a)).m<<" ";std::cout<<"\n";
     if(corner.m!=4){assert(false);exit(1);}
-    ARRAY<VECTOR_3D<T> > cx(1,4);for(int a=1;a<=4;a++)cx(a)=particles.X(corner(a));
+    ARRAY<VECTOR_3D<T> > cx(1,4);for(int a=0;a<4;a++)cx(a)=particles.X(corner(a));
     T d2=(cx(1)-cx(2)).Magnitude(),d3=(cx(1)-cx(3)).Magnitude(),d4=(cx(1)-cx(4)).Magnitude();
     T min_d=min(d2,d3,d4);
     if(d3==min_d){exchange(corner(2),corner(3));exchange(cx(2),cx(3));}
@@ -180,7 +180,7 @@ public:
     T dist[4][4];for(int a=0;a<4;a++)for(int b=0;b<4;b++)dist[a][b]=(cx(a+1)-cx(b+1)).Magnitude();
     ARRAY<bool> marks(1,particles.array_collection->Size());
     ARRAY<VECTOR_3D<T> > edge1,edge2;
-    for(int a=1;a<=4;a++)marks(corner(a))=true;
+    for(int a=0;a<4;a++)marks(corner(a))=true;
     bool result1=Corner_Search(boundary_neighbor_nodes,particles,edge1,marks,corner(1),corner(2));assert(result1);
     bool result2=Corner_Search(boundary_neighbor_nodes,particles,edge2,marks,corner(3),corner(4));assert(result2);
     edge1.Compact();edge2.Compact();
@@ -192,7 +192,7 @@ public:
     int m=resolution,n=2*m;
     triangle_mesh.Initialize_Herring_Bone_Mesh(m,n);
     particles.Increase_Array_Size(m*n);
-    for(int j=1;j<=n;j++)for(int i=1;i<=m;i++){
+    for(int j=0;j<n;j++)for(int i=0;i<m;i++){
         VECTOR_3D<T> x1=interpolation.Clamped_To_Array(edge1_grid,edge1.array,(T)(i-1)/m);
         VECTOR_3D<T> x2=interpolation.Clamped_To_Array(edge2_grid,edge2.array,(T)(i-1)/m);
         particles.X(particles.array_collection->Add_Element())=x1+T(j-1)/n*(x2-x1);}
@@ -218,7 +218,7 @@ public:
     for(int p=pmin;p<=pmax;p++){component.particles.X(component.particles.array_collection->Add_Element())=particles.X(p);}
     component.triangle_mesh.triangles.Append_Elements(triangle_mesh.triangles);
     component.triangle_mesh.number_nodes=count;
-    for(int t=1;t<=triangle_mesh.triangles.m;t++)for(int a=1;a<=3;a++){
+    for(int t=0;t<triangle_mesh.triangles.m;t++)for(int a=0;a<3;a++){
         int p=component.triangle_mesh.triangles(a,t);
         component.triangle_mesh.triangles(a,t)=p>=pmin&&p<=pmax?p-pmin+1:0;}
     component.triangle_mesh.Delete_Triangles_With_Missing_Nodes();}
@@ -252,7 +252,7 @@ void Get_Initial_Data(TRIANGULATED_SURFACE<T>& triangulated_surface)
     char filename[200];sprintf(filename,"%s/tetrahedron_mesh",buddha_directory);
     {std::ifstream input;input.open(filename,std::ios::binary);assert(input);buddha_mesh.Read(input);input.close();}
     buddha_particles.Increase_Array_Size(buddha_mesh.number_nodes);
-    for(int p=1;p<=buddha_mesh.number_nodes;p++)buddha_particles.array_collection->Add_Element();
+    for(int p=0;p<buddha_mesh.number_nodes;p++)buddha_particles.array_collection->Add_Element();
     buddha_mesh.number_nodes=buddha_particles.array_collection->Size();
     buddha_volume.Initialize_Triangulated_Surface();
 
@@ -280,7 +280,7 @@ void Get_Initial_Data(TRIANGULATED_SURFACE<T>& triangulated_surface)
     for(int p=1;p<=particles.array_collection->Size();p++)if((*cape_collisions->disabled)(p))
         attachment_box.Enlarge_To_Include_Point(particles.X(p));
     attachment_box.Scale_About_Center((T)1.1);
-    for(int t=1;t<=buddha_mesh.tetrahedrons.m;t++){
+    for(int t=0;t<buddha_mesh.tetrahedrons.m;t++){
         int i,j,k,l;buddha_mesh.tetrahedrons.Get(t,i,j,k,l);
         BOX_3D<T> box(buddha_particles.X(i));box.Enlarge_To_Include_Point(buddha_particles.X(j));
         box.Enlarge_To_Include_Point(buddha_particles.X(k));box.Enlarge_To_Include_Point(buddha_particles.X(l));
@@ -289,7 +289,7 @@ void Get_Initial_Data(TRIANGULATED_SURFACE<T>& triangulated_surface)
         VECTOR_3D<T> X=particles.X(p),w;
         attachments(p)=-1;
         std::cout<<".";
-        for(int a=1;a<=attachment_tets.m;a++){
+        for(int a=0;a<attachment_tets.m;a++){
             int t=attachment_tets(a);
             int i,j,k,l;buddha_mesh.tetrahedrons.Get(t,i,j,k,l);
             w=TETRAHEDRON<T>::Barycentric_Coordinates(X,buddha_particles.X(i),buddha_particles.X(j),buddha_particles.X(k),buddha_particles.X(l));
@@ -320,13 +320,13 @@ void Get_Initial_Data(TRIANGULATED_SURFACE<T>& triangulated_surface)
     std::cout<<"collision triangles: "<<collision_surface->triangle_mesh.triangles.m<<"\n";
     collision_surface->triangle_mesh.number_nodes=particles.array_collection->Size();
     
-    for(int t=1;t<=triangle_mesh.triangles.m;t++){
+    for(int t=0;t<triangle_mesh.triangles.m;t++){
         int i,j,k;triangle_mesh.triangles.Get(t,i,j,k);
         if(!attachments(i) && !attachments(j) && !attachments(k))exchange(triangle_mesh.triangles(1,t),triangle_mesh.triangles(2,t));}
 
     visual_mesh.triangles.Append_Elements(triangle_mesh.triangles);
     visual_mesh.triangles.Append_Elements(buddha_volume.triangulated_surface->triangle_mesh.triangles);
-    for(int t=1;t<=buddha_volume.triangulated_surface->triangle_mesh.triangles.m;t++)for(int a=1;a<=3;a++)
+    for(int t=1;t<=buddha_volume.triangulated_surface->triangle_mesh.triangles.m;t++)for(int a=0;a<3;a++)
         visual_mesh.triangles(a,t+triangle_mesh.triangles.m)+=particles.array_collection->Size();
     visual_mesh.number_nodes=particles.array_collection->Size()+buddha_particles.array_collection->Size();
     visual_particles.Initialize_Particles(particles);

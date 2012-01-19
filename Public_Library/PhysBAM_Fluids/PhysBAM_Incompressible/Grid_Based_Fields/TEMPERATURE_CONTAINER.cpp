@@ -57,7 +57,7 @@ template<class T,class T_GRID> static void Apply_Cooling_Helper(TEMPERATURE_CONT
 {
     if(!container.cooling_constant) return;
     T constant=3*container.cooling_constant*dt/sqr(sqr(container.hot_point-container.ambient_temperature));
-    for(int i=1;i<=container.grid.number_of_cells;i++)container.Apply_Individual_Cooling(container.temperature(i),constant);
+    for(int i=0;i<container.grid.number_of_cells;i++)container.Apply_Individual_Cooling(container.temperature(i),constant);
 }
 //#####################################################################
 // Function Apply_Individual_Cooling

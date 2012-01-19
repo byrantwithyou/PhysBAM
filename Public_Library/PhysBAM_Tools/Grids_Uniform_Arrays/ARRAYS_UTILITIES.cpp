@@ -19,7 +19,7 @@ Make_Ghost_Mask_From_Active_Mask(const T_GRID& grid,const T_ARRAYS_BOOL& input_m
     for(NODE_ITERATOR iterator(grid,number_of_ghost_cells);iterator.Valid();iterator.Next()){TV_INT node_index=iterator.Node_Index();temp_mask(node_index)=input_mask(node_index);}
     for(int i=0;i<stencil_width;i++)for(NODE_ITERATOR iterator(grid,number_of_ghost_cells);iterator.Valid();iterator.Next()){TV_INT node_index=iterator.Node_Index();
         if(temp_mask(node_index)) continue;
-        for(int neighbor=1;neighbor<=grid.number_of_neighbors_per_node;neighbor++){TV_INT neighbor_index=iterator.Node_Neighbor(neighbor);
+        for(int neighbor=0;neighbor<grid.number_of_neighbors_per_node;neighbor++){TV_INT neighbor_index=iterator.Node_Neighbor(neighbor);
             if(temp_mask(neighbor_index)==i){temp_mask(node_index)=i+1;break;}}}
     for(NODE_ITERATOR iterator(grid,number_of_ghost_cells);iterator.Valid();iterator.Next()){TV_INT node_index=iterator.Node_Index();
         output_mask(node_index)=temp_mask(node_index)>1;}

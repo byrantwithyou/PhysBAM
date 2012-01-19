@@ -157,7 +157,7 @@ Reinitialize(const bool force,const bool read_geometry)
 #endif
         }
 
-        if(has_init_destroy_information) for(int i=1;i<=needs_destroy.m;i++) Destroy_Geometry(needs_destroy(i));
+        if(has_init_destroy_information) for(int i=0;i<needs_destroy.m;i++) Destroy_Geometry(needs_destroy(i));
 
         // only enlarge array as we read in more geometry to memory
         int max_number_of_bodies=max(opengl_triangulated_surface.Size(),rigid_geometry_collection->particles.array_collection->Size());
@@ -168,7 +168,7 @@ Reinitialize(const bool force,const bool read_geometry)
         Resize_Structures(max_number_of_bodies);
 
         // Initialize bodies which have become active
-        if(has_init_destroy_information) for(int i=1;i<=needs_init.m;i++){
+        if(has_init_destroy_information) for(int i=0;i<needs_init.m;i++){
             int id=needs_init(i);PHYSBAM_ASSERT(rigid_geometry_collection->Is_Active(id));
             Create_Geometry(id);}
         else for(int i=0;i<max_number_of_bodies;i++){if(rigid_geometry_collection->Is_Active(i)) Create_Geometry(i);} // TODO: can we figure out what bodies need_init
@@ -833,7 +833,7 @@ template<class T,class RW> void OPENGL_COMPONENT_RIGID_GEOMETRY_COLLECTION_3D<T,
 Toggle_Draw_Particles()
 {
     draw_simplicial_object_particles=!draw_simplicial_object_particles;
-    for(int i=1;i<=opengl_triangulated_surface.m;i++)
+    for(int i=0;i<opengl_triangulated_surface.m;i++)
         if(opengl_triangulated_surface(i)) opengl_triangulated_surface(i)->draw_particles=draw_simplicial_object_particles;
     Reinitialize();
 }

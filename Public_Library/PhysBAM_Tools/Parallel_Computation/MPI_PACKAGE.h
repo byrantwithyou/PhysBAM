@@ -120,7 +120,7 @@ public:
     {int position=0;type.Unpack(buffer.Get_Array_Pointer(),buffer.m,data,count,position,comm);}
 
     static void Free_All(ARRAY<MPI_PACKAGE>& packages)
-    {for(int p=1;p<=packages.m;p++)packages(p).Free();packages.Clean_Memory();}
+    {for(int p=0;p<packages.m;p++)packages(p).Free();packages.Clean_Memory();}
 
     MPI::Request Isend(const MPI::Comm& comm,const int rank,const int tag) const
     {return comm.Isend(data,count,type,rank,tag);}

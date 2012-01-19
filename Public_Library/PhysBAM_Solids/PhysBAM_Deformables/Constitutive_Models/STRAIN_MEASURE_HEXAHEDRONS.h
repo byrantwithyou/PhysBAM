@@ -44,11 +44,11 @@ public:
 
     void Initialize_H_DmH_Inverse(ARRAY_VIEW<const TV> X)
     {H_DmH_inverse.Resize(8,mesh.elements.m);DmH_determinant.Resize(8,mesh.elements.m);DmH_minimum_altitude=FLT_MAX;
-    for(int h=1;h<=mesh.elements.m;h++)for(int g=1;g<=8;g++){
+    for(int h=0;h<mesh.elements.m;h++)for(int g=0;g<8;g++){
         H_DmH_inverse(g,h).Resize(8);
-        MATRIX<T,3> DmH;for(int k=1;k<=8;k++)DmH+=MATRIX<T,3>::Outer_Product(X(mesh.elements(h)(k)),H(g)(k));
+        MATRIX<T,3> DmH;for(int k=0;k<8;k++)DmH+=MATRIX<T,3>::Outer_Product(X(mesh.elements(h)(k)),H(g)(k));
         DmH_determinant(g,h)=DmH.Determinant();DmH_minimum_altitude=min(DmH_minimum_altitude,DmH.Tetrahedron_Minimum_Altitude());
-        MATRIX<T,3> DmH_inverse=DmH.Inverse();for(int k=1;k<=8;k++)H_DmH_inverse(g,h)(k)=H(g)(k)*DmH_inverse;}}
+        MATRIX<T,3> DmH_inverse=DmH.Inverse();for(int k=0;k<8;k++)H_DmH_inverse(g,h)(k)=H(g)(k)*DmH_inverse;}}
     
     void Initialize_H_DmH_Inverse_Save()
     {H_DmH_inverse_save=new ARRAY<VECTOR<TV,8> >(mesh.elements.m);
@@ -58,7 +58,7 @@ public:
     {H_DmH_inverse.Resize(map.m);ARRAY<VECTOR<ARRAY<TV>,8> >::permute(*H_DmH_inverse_save,H_DmH_inverse,map);}
 
     MATRIX<T,3> Gradient(ARRAY_VIEW<const TV> X,const ARRAY<VECTOR<ARRAY<TV>,8> >& De_inverse,const int gauss_index,const int hexahedron_index) const
-    {MATRIX<T,3> gradient;for(int k=1;k<=8;k++)gradient+=MATRIX<T,3>::Outer_Product(X(mesh.elements(hexahedron_index)(k)),De_inverse(hexahedron_index)(gauss_index)(k));return gradient;}
+    {MATRIX<T,3> gradient;for(int k=0;k<8;k++)gradient+=MATRIX<T,3>::Outer_Product(X(mesh.elements(hexahedron_index)(k)),De_inverse(hexahedron_index)(gauss_index)(k));return gradient;}
 
     MATRIX<T,3> F(const int gauss_index,const int hexahedron_index) const
     {return Gradient(particles.X,H_DmH_inverse,gauss_index,hexahedron_index);}

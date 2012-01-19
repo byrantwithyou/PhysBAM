@@ -52,7 +52,7 @@ void Apply_Options(TRIANGULATED_SURFACE<T>* ts, const HASHTABLE<std::string,std:
     if(const std::string* value=options.Get_Pointer("subdivide")){
         int n=atoi(value->c_str());
         if(!n) n=1;
-        for(int i=1;i<=n;i++) ts->Loop_Subdivide();
+        for(int i=0;i<n;i++) ts->Loop_Subdivide();
         ts->Refresh_Auxiliary_Structures();}
 
     if(const std::string* value=options.Get_Pointer("scale")){
@@ -135,8 +135,8 @@ void Emit_Rigid_Body_Frame(std::ofstream& fout,const HASHTABLE<std::string,std::
     MATRIX<T,3> rot=rigid_body.Rotation().Rotation_Matrix();
     TV X=rigid_body.X();
     fout<<"matrix < ";
-    for(int i=1;i<=3;i++)
-        for(int j=1;j<=3;j++)
+    for(int i=0;i<3;i++)
+        for(int j=0;j<3;j++)
             fout<<rot(j,i)<<" , ";
     fout<<X.x<<" , "<<X.y<<" , "<<X.z<<" >\n";
 }

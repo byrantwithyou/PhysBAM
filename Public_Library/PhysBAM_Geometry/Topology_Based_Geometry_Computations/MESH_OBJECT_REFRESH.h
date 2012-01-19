@@ -36,7 +36,7 @@ template<class TV,class T_MESH> void
 Initialize_Particle_Partition(MESH_OBJECT<TV,T_MESH>& mo,const VECTOR<int,TV::m>& counts)
 {
     PHYSBAM_ASSERT(mo.bounding_box);VECTOR<int,TV::m> counts_new;
-    for(int i=1;i<=counts.m;i++) counts_new[i]=mo.desired_particle_partition_counts[i]?mo.desired_particle_partition_counts[i]:counts[i];
+    for(int i=0;i<counts.m;i++) counts_new[i]=mo.desired_particle_partition_counts[i]?mo.desired_particle_partition_counts[i]:counts[i];
     PHYSBAM_ASSERT(counts_new.All_Greater(VECTOR<int,TV::m>()));
     delete mo.particle_partition;mo.particle_partition=new PARTICLE_PARTITION<TV>(*mo.bounding_box,counts_new,mo.particles);
 }

@@ -106,7 +106,7 @@ struct PRECOMPUTE_PROJECT_POINT_FACE
 
     void Project(INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,4>&> v) const
     {T s=TV::Dot_Product(v(1)-weights(1)*v(2)-weights(2)*v(3)-weights(3)*v(4),normal);
-    for(int i=1;i<=4;i++) v(i)+=s*v_scaled_normals(i);}
+    for(int i=0;i<4;i++) v(i)+=s*v_scaled_normals(i);}
 
     void Precompute(const INDIRECT_ARRAY<ARRAY_VIEW<T>,VECTOR<int,4>&> mass,const TV& weights_input,const TV& normal_input);
 };
@@ -123,7 +123,7 @@ struct PRECOMPUTE_PROJECT_EDGE_EDGE
 
     void Project(INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,4>&> v) const
     {T s=TV::Dot_Product(v(1)-v(3),normal_13)+TV::Dot_Product(v(2)-v(1),normal_12)+TV::Dot_Product(v(4)-v(3),normal_34);
-    for(int i=1;i<=4;i++) v(i)+=s*v_scaled_normals(i);}
+    for(int i=0;i<4;i++) v(i)+=s*v_scaled_normals(i);}
 
     void Precompute(const INDIRECT_ARRAY<ARRAY_VIEW<T>,VECTOR<int,4>&> mass,const VECTOR<T,2>& weights_input,const TV& normal_input);
 };
@@ -184,7 +184,7 @@ public:
 
     void Clamp_Repulsion_Thickness(ARRAY_VIEW<const T> max_value)
     {repulsion_thickness.Resize(geometry.deformable_body_collection.particles.array_collection->Size());
-    for(int k=1;k<=repulsion_thickness.m;k++) repulsion_thickness(k)=min(repulsion_thickness(k),max_value(k));}
+    for(int k=0;k<repulsion_thickness.m;k++) repulsion_thickness(k)=min(repulsion_thickness(k),max_value(k));}
 
     void Clamp_Repulsion_Thickness_With_Meshes(const T scale=(T).4)
     {Clamp_Repulsion_Thickness_With_Meshes(geometry.deformable_body_collection.particles.X,scale);}

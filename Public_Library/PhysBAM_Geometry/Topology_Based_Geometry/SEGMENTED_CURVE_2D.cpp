@@ -57,7 +57,7 @@ Inside(const TV& location,T thickness_over_two) const
 
     // Not totally robust yet
     T total_signed_angle=0;
-    for(int i=1;i<=mesh.elements.m;i++){
+    for(int i=0;i<mesh.elements.m;i++){
         SEGMENT_2D<T> segment=(segment_list)?(*segment_list)(i):Get_Element(i);
         TV v1=segment.x1-location;
         TV v2=segment.x2-location;
@@ -91,7 +91,7 @@ Boundary(const TV& location,T thickness_over_two) const
 template<class T> bool SEGMENTED_CURVE_2D<T>::  
 Inside_Any_Segment(const TV& point,int& segment_id,const T thickness_over_two) const
 {
-    for(int i=1;i<=mesh.elements.m;i++){
+    for(int i=0;i<mesh.elements.m;i++){
         SEGMENT_2D<T> segment=(segment_list)?(*segment_list)(i):Get_Element(i);
         if(segment.Inside(point,thickness_over_two)){segment_id=i;return true;}}
     return false;
@@ -140,7 +140,7 @@ Segment_Segment_Intersection(const SEGMENT_MESH& test_segment_mesh,ARRAY_VIEW<co
 {  
     bool intersection=false;
     ARRAY<ARRAY<int> > segments_near_segments(test_segment_mesh.elements.m);Get_Segments_Near_Segments(segments_near_segments,test_segment_mesh,X,thickness_over_2,update_bounding_boxes);
-    for(int s1=1;s1<=test_segment_mesh.elements.m;s1++){
+    for(int s1=0;s1<test_segment_mesh.elements.m;s1++){
         SEGMENT_2D<T> segment1(X(test_segment_mesh.elements(s1)(1)),X(test_segment_mesh.elements(s1)(2)));
         for(int k=1;k<=segments_near_segments(s1).m;k++){int s2=segments_near_segments(s1)(k);
             SEGMENT_2D<T> segment2(X(mesh.elements(s2)(1)),X(mesh.elements(s2)(2)));
@@ -158,12 +158,12 @@ Get_Segments_Near_Segments(ARRAY<ARRAY<int> >& segments_near_segments,const SEGM
     bool hierarchy_defined=hierarchy!=0;if(!hierarchy_defined) Initialize_Hierarchy(false);
     if(!hierarchy_defined || update_bounding_boxes) hierarchy->Update_Boxes(X);
 
-    for(int k=1;k<=test_segment_mesh.elements.m;k++){
+    for(int k=0;k<test_segment_mesh.elements.m;k++){
         int node1,node2;test_segment_mesh.elements(k).Get(node1,node2);
         RANGE<TV> box(X(node1));box.Enlarge_To_Include_Point(X(node2));
         hierarchy->Intersection_List(box,segments_near_segments(k),thickness_over_2);
         for(int kk=1;kk<=segments_near_segments(k).m;kk++){int s=segments_near_segments(k)(kk); // remove elements that contain a node of the segment being tested
-            for(int i=1;i<=2;i++) if(mesh.elements(s)(i) == node1 || mesh.elements(s)(i) == node2){segments_near_segments(k).Remove_Index_Lazy(kk);kk--;break;}}}
+            for(int i=0;i<2;i++) if(mesh.elements(s)(i) == node1 || mesh.elements(s)(i) == node2){segments_near_segments(k).Remove_Index_Lazy(kk);kk--;break;}}}
     
     if(!hierarchy_defined){delete hierarchy;hierarchy=0;}
 }

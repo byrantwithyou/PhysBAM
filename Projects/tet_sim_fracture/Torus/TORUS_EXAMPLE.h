@@ -80,7 +80,7 @@ void Initialize_Tetrahedralized_Volume(TETRAHEDRALIZED_VOLUME<T>& tetrahedralize
 
     tetrahedralized_volume.Update_Bounding_Box();
     VECTOR_3D<T> center(tetrahedralized_volume.bounding_box->Center());T bottom=tetrahedralized_volume.bounding_box->ymin;
-    for(int i=1;i<=tetrahedralized_volume.particles.array_size;i++){
+    for(int i=0;i<tetrahedralized_volume.particles.array_size;i++){
         tetrahedralized_volume.particles.V(i)=initial_velocity+VECTOR_3D<T>::Cross_Product(initial_angular_velocity,tetrahedralized_volume.particles.X(i)-center);
         tetrahedralized_volume.particles.X(i)=center+initial_orientation.Rotate(tetrahedralized_volume.particles.X(i)-center);
         tetrahedralized_volume.particles.X(i).y+=initial_height-bottom;}
@@ -97,7 +97,7 @@ void Initialize_Tetrahedralized_Volume(TETRAHEDRALIZED_VOLUME<T>& tetrahedralize
     T center_y=(tetrahedralized_volume.bounding_box->ymax+tetrahedralized_volume.bounding_box->ymin)/(T)2.0;
     T center_x=(tetrahedralized_volume.bounding_box->xmax+tetrahedralized_volume.bounding_box->xmin)/(T)2.0;
     T center_z=(tetrahedralized_volume.bounding_box->zmax+tetrahedralized_volume.bounding_box->zmin)/(T)2.0;
-    for(int i=1;i<=number_of_fracture_initiation_points;i++){
+    for(int i=0;i<number_of_fracture_initiation_points;i++){
         T theta=i*6.28/(number_of_fracture_initiation_points);
         (*initiation_point_reference_seed_positions)(i)=VECTOR_3D<T>(radius*sin(theta)+center_x,center_y,radius*cos(theta)+center_z);}
     initiation_point_radii=new ARRAY<T>(1,number_of_fracture_initiation_points);
@@ -129,10 +129,10 @@ virtual void Initialize_Bias_Stress_Constants(const EMBEDDED_TETRAHEDRALIZED_VOL
     grain_boundaries->seed_tet_index=new ARRAY<int>(1,0);
 
     // Assign Starting tets based on positions of initiation points.
-    for(int r=1;r<=number_of_regions;r++) {
+    for(int r=0;r<number_of_regions;r++) {
         T min_distance=1e10;
         int closest_tet=0;
-        for(int t=1;t<=etv.tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.m;t++) {
+        for(int t=0;t<etv.tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.m;t++) {
             VECTOR_3D<T> centroid=etv.tetrahedralized_volume.Centroid(t);
             if((centroid-(*initiation_point_positions)(r)).Magnitude()<min_distance) {
                 min_distance=(centroid-(*initiation_point_positions)(r)).Magnitude();
@@ -141,7 +141,7 @@ virtual void Initialize_Bias_Stress_Constants(const EMBEDDED_TETRAHEDRALIZED_VOL
     }
 
     // Seed Nodes
-    for(int r=1;r<=number_of_regions;r++) {
+    for(int r=0;r<number_of_regions;r++) {
         T min_distance=1e10;
         int closest_node=0;
         for(int n=1;n<=etv.particles.array_collection->Size();n++){
@@ -154,7 +154,7 @@ virtual void Initialize_Bias_Stress_Constants(const EMBEDDED_TETRAHEDRALIZED_VOL
     //grain_boundaries->Fill_Node_Regions_With_Uniform_Vectors(number_of_regions);
     grain_boundaries->Fill_Regions_With_Uniform_Vectors(number_of_regions);
     grain_boundaries->Print_Number_In_Regions(number_of_regions);
-    //for(int t=1;t<=rftv.fracture_bias_direction.m;t++)
+    //for(int t=0;t<rftv.fracture_bias_direction.m;t++)
     //    std::cout << "rftv.fracture_bias_direction(" << t << ")=" << rftv.fracture_bias_direction(t) << std::endl;
 
 
@@ -162,7 +162,7 @@ virtual void Initialize_Bias_Stress_Constants(const EMBEDDED_TETRAHEDRALIZED_VOL
     //grain_boundaries->Print_Number_In_Regions(number_of_regions);
 
     /*
-    for(int t=1;t<=rftv.fracture_bias_direction.m;t++){
+    for(int t=0;t<rftv.fracture_bias_direction.m;t++){
         if(grain_boundaries->Tetrahedron_Contains_Nodes_From_Different_Regions(t)){
             rftv.fracture_bias_stress_scaling(t)=1000;}}
     */

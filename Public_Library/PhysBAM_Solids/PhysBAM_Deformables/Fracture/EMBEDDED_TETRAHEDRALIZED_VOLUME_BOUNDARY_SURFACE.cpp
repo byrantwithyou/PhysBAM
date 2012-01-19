@@ -50,7 +50,7 @@ Create_Material_Surface_From_Manifold_Embedded_Surface(const bool verbose)
     material_surface_mesh.number_nodes=particles.array_collection->Size();
     material_surface_mesh.elements.Append_Elements(embedded_object.embedded_object.mesh.elements); // add embedded elements to boundary mesh
     ARRAY<bool> node_is_material(mesh.number_nodes);
-    for(int t=1;t<=mesh.elements.m;t++) node_is_material.Subset(mesh.elements(t))=embedded_object.node_in_simplex_is_material(t);
+    for(int t=0;t<mesh.elements.m;t++) node_is_material.Subset(mesh.elements(t))=embedded_object.node_in_simplex_is_material(t);
     bool boundary_mesh_defined=mesh.boundary_mesh!=0;if(!boundary_mesh_defined) mesh.Initialize_Boundary_Mesh();
     // TODO: the following loop only does something when part of the simulation boundary is real boundary, but this function doesn't handle that case correctly
     for(int t=1;t<=mesh.boundary_mesh->elements.m;t++){ // add pure material tetrahedron faces to boundary mesh
@@ -68,11 +68,11 @@ Conservative_Perturb_Nodes_For_Collision_Freeness(const T perturb_amount,const A
     embedded_object.Initialize_Orientation_Index_If_Necessary();
 
     // perturb those that have not been previously perturbed
-    for(int node=1;node<=embedded_object.embedded_particles.active_indices.m;node++) if(!previously_perturbed(node) && particle_on_surface(node)){
+    for(int node=0;node<embedded_object.embedded_particles.active_indices.m;node++) if(!previously_perturbed(node) && particle_on_surface(node)){
         const VECTOR<int,2>& parents=embedded_object.parent_particles(node);
         ARRAY<int> tetrahedrons_on_edge;embedded_object.simplicial_object.mesh.Tetrahedrons_On_Edge(parents,tetrahedrons_on_edge);
         bool parent1_ever_material_by_itself=false,parent2_ever_material_by_itself=false,more_than_one_other_node_on_boundary=false;int other_node_on_boundary1=0,other_node_on_boundary2=0;
-        for(int t=1;t<=tetrahedrons_on_edge.m;t++){
+        for(int t=0;t<tetrahedrons_on_edge.m;t++){
             int tetrahedron=tetrahedrons_on_edge(t);
             bool parent1_material_in_current_tetrahedron=embedded_object.Node_In_Simplex_Is_Material(parents[1],tetrahedron);
             bool parent2_material_in_current_tetrahedron=embedded_object.Node_In_Simplex_Is_Material(parents[2],tetrahedron);
@@ -111,10 +111,10 @@ Perturb_Nodes_For_Collision_Freeness(const T perturb_amount) // used to be calle
 {
     embedded_object.Initialize_Orientation_Index_If_Necessary();
 
-    for(int node=1;node<=embedded_particles.active_indices.m;node++){
+    for(int node=0;node<embedded_particles.active_indices.m;node++){
         const VECTOR<int,2>& parents=embedded_object.parent_particles(node);
         ARRAY<int> tetrahedrons_on_edge;embedded_object.simplicial_object.mesh.Tetrahedrons_On_Edge(parents,tetrahedrons_on_edge);
-        for(int t=1;t<=tetrahedrons_on_edge.m;t++){
+        for(int t=0;t<tetrahedrons_on_edge.m;t++){
             int tetrahedron=tetrahedrons_on_edge(t);
             bool parent1_material_in_current_tetrahedron=embedded_object.Node_In_Simplex_Is_Material(parents[1],tetrahedron);
             bool parent2_material_in_current_tetrahedron=embedded_object.Node_In_Simplex_Is_Material(parents[2],tetrahedron);
@@ -168,7 +168,7 @@ Construct_Material_Surface_Mesh()
     if(!embedded_object.simplicial_object.mesh.incident_elements) embedded_object.simplicial_object.mesh.Initialize_Incident_Elements();
     if(!embedded_object.embedded_object.mesh.incident_elements) embedded_object.embedded_object.mesh.Initialize_Incident_Elements();
     if(!embedded_object.embedded_subelements_in_parent_element) embedded_object.Initialize_Embedded_Subelements_In_Parent_Element();
-    for(int t=1;t<=embedded_object.simplicial_object.mesh.elements.m;t++){
+    for(int t=0;t<embedded_object.simplicial_object.mesh.elements.m;t++){
         bool i_is_material,j_is_material,k_is_material,l_is_material;
         embedded_object.node_in_simplex_is_material(t).Get(i_is_material,j_is_material,k_is_material,l_is_material);
         if(i_is_material && j_is_material && k_is_material && l_is_material){
@@ -197,7 +197,7 @@ template<class T> void EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE<T>::
 Merge_Or_Cancel_Duplicate_Triangles()
 {
     HASHTABLE<VECTOR<int,3>,int> surface_hash_table(60);
-    for(int t=1;t<=material_surface_mesh.elements.m;t++){
+    for(int t=0;t<material_surface_mesh.elements.m;t++){
         VECTOR<int,3>& triangle=material_surface_mesh.elements(t);
         VECTOR<int,3> sorted_triangle=triangle.Sorted();
         int t2;

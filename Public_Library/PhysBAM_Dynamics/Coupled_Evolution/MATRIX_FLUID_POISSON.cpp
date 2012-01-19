@@ -33,7 +33,7 @@ Compute(const SPARSE_MATRIX_FLAT_MXN<T>& gradient,const VECTOR_ND<T>& one_over_f
     poisson=negative_divergence.Times_Diagonal_Times(one_over_fluid_mass,gradient).Create_NXN_Matrix();
 
     if(dt){T one_over_dt_squared=(T)1/(dt*dt);
-        for(int i=1;i<=index_map.indexed_cells.m;i++){
+        for(int i=0;i<index_map.indexed_cells.m;i++){
             TV_INT cell_index=index_map.indexed_cells(i);
             poisson(i,i)+=one_over_rho_c_squared(cell_index)*one_over_dt_squared*index_map.grid.Cell_Size();}}
 
@@ -48,7 +48,7 @@ Compute_Preconditioner()
 {
 #if 1
     ARRAY<int> rmap(poisson.n);
-    for(int i=1;i<=poisson.n;i++)
+    for(int i=0;i<poisson.n;i++)
         if(poisson.offsets(i)!=poisson.offsets(i+1))
             rmap(i)=map.Append(i);
 
@@ -56,7 +56,7 @@ Compute_Preconditioner()
     poisson.C=new SPARSE_MATRIX_FLAT_NXN<T>;
     poisson.C->Reset();
     int index=poisson.offsets(1);
-    for(int i=1;i<=poisson.n;i++){
+    for(int i=0;i<poisson.n;i++){
         int end=poisson.offsets(i+1);
         if(index==end) continue;
         for(;index<end;index++)

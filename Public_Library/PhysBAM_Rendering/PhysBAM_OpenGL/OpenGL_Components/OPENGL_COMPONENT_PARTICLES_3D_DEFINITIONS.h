@@ -384,7 +384,7 @@ Select_Particle_By_Id(int id)
 template<class T,class T_PARTICLES,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,T_PARTICLES,RW>::
 Select_Particles_By_Ids(const ARRAY<int> &ids)
 {
-    for(int i=1;i<=ids.m;i++)selected_ids.Append(ids(i));
+    for(int i=0;i<ids.m;i++)selected_ids.Append(ids(i));
     Apply_Id_Selection();
 }
 //#####################################################################

@@ -47,7 +47,7 @@ public:
     }
 
     ~CAPE_DRIVER()
-    {delete triangle_collisions;for(int i=1;i<=rigid_bodies.m;i++) delete rigid_bodies(i);}
+    {delete triangle_collisions;for(int i=0;i<rigid_bodies.m;i++) delete rigid_bodies(i);}
 
 //#####################################################################
 // Function Initialize
@@ -83,7 +83,7 @@ void Initialize()
     
     // rigid bodies
     example.Initialize_Rigid_Bodies(rigid_bodies);
-    for(int k=1;k<=rigid_bodies.m;k++) rigid_bodies(k)->implicit_surface->Compute_Cell_Minimum_And_Maximum();
+    for(int k=0;k<rigid_bodies.m;k++) rigid_bodies(k)->implicit_surface->Compute_Cell_Minimum_And_Maximum();
     if(example.restart_step_number){example.Update_Rigid_Body_Positions(rigid_bodies,time);example.Update_Rigid_Body_Velocities(rigid_bodies,time);}
 
     // output
@@ -192,7 +192,7 @@ void Adjust_Nodes_For_Rigid_Body_Collisions(ARRAY<VECTOR_3D<T> >& X,ARRAY<VECTOR
 {
     // Should be accelerated by using the triangle_hierarchy to eliminate tests on parts of the surface that aren't close to rigid bodies.
     int interactions=0;T depth;
-    for(int p=1;p<=particles.array_collection->Size();p++) for(int r=1;r<=rigid_bodies.m;r++) if(rigid_bodies(r)->Implicit_Surface_Lazy_Inside_And_Value(X(p),depth)){
+    for(int p=1;p<=particles.array_collection->Size();p++) for(int r=0;r<rigid_bodies.m;r++) if(rigid_bodies(r)->Implicit_Surface_Lazy_Inside_And_Value(X(p),depth)){
         depth=max((T)0,-depth)+triangle_collisions->collision_thickness;
         rigid_bodies(r)->Adjust_Point_For_Rigid_Body_Collision(X(p),V(p),depth,dt);
         enforce_collision_velocity(p)=true; // for external forces and velocities
@@ -210,7 +210,7 @@ void Adjust_Nodes_For_Rigid_Body_Collisions(ARRAY<VECTOR_3D<T> >& X,ARRAY<VECTOR
 void Set_External_Velocities(ARRAY<VECTOR_3D<T> >& V,const T time=1)
 {
     if(collisions_on)
-        for(int i=1;i<=enforce_collision_velocity.m;i++) if(enforce_collision_velocity(i))
+        for(int i=0;i<enforce_collision_velocity.m;i++) if(enforce_collision_velocity(i))
             V(i)+=(collision_velocity(i)-VECTOR_3D<T>::Dot_Product(V(i),collision_normal(i)))*collision_normal(i);
     example.Set_External_Velocities(V,time);
 }
@@ -221,7 +221,7 @@ void Set_External_Velocities(ARRAY<VECTOR_3D<T> >& V,const T time=1)
 void Zero_Out_Enslaved_Velocity_Nodes(ARRAY<VECTOR_3D<T> >& V,const T time=1)
 {
     if(collisions_on)
-        for(int i=1;i<=enforce_collision_velocity.m;i++) if(enforce_collision_velocity(i))
+        for(int i=0;i<enforce_collision_velocity.m;i++) if(enforce_collision_velocity(i))
             V(i)-=VECTOR_3D<T>::Dot_Product(V(i),collision_normal(i))*collision_normal(i);
     example.Zero_Out_Enslaved_Velocity_Nodes(V,time);
 }

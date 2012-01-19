@@ -79,7 +79,7 @@ template<class T> void Print_Info(const char *filename)
     if (verify)
     {
         ARRAYS<VECTOR<bool,1> > node_is_referenced(1,tet_mesh.number_nodes);
-        for(int i=1;i<=tet_mesh.tetrahedrons.m;i++){
+        for(int i=0;i<tet_mesh.tetrahedrons.m;i++){
             int node1,node2,node3,node4;tet_mesh.tetrahedrons.Get(i,node1,node2,node3,node4);
             node_is_referenced(node1)=node_is_referenced(node2)=node_is_referenced(node3)=node_is_referenced(node4)=true;
         }

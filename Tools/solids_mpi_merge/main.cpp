@@ -48,11 +48,11 @@ public:
     if(!FILE_UTILITIES::File_Exists(output_filename)) return true;
     // check file times
     std::string prefix=input_directory+"/"+filename+".";
-    for(int i=1;i<=number_of_processes;i++)if(FILE_UTILITIES::Compare_File_Times(input_directory+STRING_UTILITIES::string_sprintf("/%d/",i)+filename,output_filename)>0) return true;
+    for(int i=0;i<number_of_processes;i++)if(FILE_UTILITIES::Compare_File_Times(input_directory+STRING_UTILITIES::string_sprintf("/%d/",i)+filename,output_filename)>0) return true;
     return false;}
 
     bool Source_Files_Exist(const int frame) const
-    {for(int i=1;i<=number_of_processes;i++)if(!FILE_UTILITIES::File_Exists(input_directory+"/"+STRING_UTILITIES::string_sprintf("%d/%d",i,frame)+"/time")) return false;
+    {for(int i=0;i<number_of_processes;i++)if(!FILE_UTILITIES::File_Exists(input_directory+"/"+STRING_UTILITIES::string_sprintf("%d/%d",i,frame)+"/time")) return false;
     return true;}
 
     void Merge_All_Frames(const int first_frame,const int last_frame)
@@ -87,7 +87,7 @@ Merge_Rigid_Data(const int frame)
 {    
     //int current_index=0;
     local_rigid_collections.Resize(number_of_processes);
-    for(int p=1;p<=number_of_processes;p++){
+    for(int p=0;p<number_of_processes;p++){
         local_rigid_collections(p)=new RIGID_BODY_COLLECTION<TV>(0,0);
         local_rigid_collections(p)->Read(STREAM_TYPE(RW()),STRING_UTILITIES::string_sprintf("%s/%d/",input_directory.c_str(),p),frame,&needs_init);
         local_rigid_collections(p)->rigid_geometry_collection.structure_list.Fill_Needs_Write();
@@ -110,13 +110,13 @@ Merge_Lists(const std::string& filename)
 {
     // read
     ARRAY<T_LIST_2*> local_data(number_of_processes);
-    for(int p=1;p<=number_of_processes;p++){std::string name=input_directory+STRING_UTILITIES::string_sprintf("/%d/",(p))+filename;
+    for(int p=0;p<number_of_processes;p++){std::string name=input_directory+STRING_UTILITIES::string_sprintf("/%d/",(p))+filename;
         if(!FILE_UTILITIES::File_Exists(name)){LOG::cout<<"Missing "<<name<<"; skipping merge"<<std::endl;return false;}
         local_data(p)=new T_LIST_2;
         FILE_UTILITIES::Read_From_File<RW>(name,*local_data(p));}
     // merge
     T_LIST_2 global_data;
-    for(int p=1;p<=number_of_processes;p++) global_data.Append_Elements(*local_data(p));
+    for(int p=0;p<number_of_processes;p++) global_data.Append_Elements(*local_data(p));
     // write
     FILE_UTILITIES::Write_To_File<RW>(output_directory+"/"+filename,global_data);
     local_data.Delete_Pointers_And_Clean_Memory();

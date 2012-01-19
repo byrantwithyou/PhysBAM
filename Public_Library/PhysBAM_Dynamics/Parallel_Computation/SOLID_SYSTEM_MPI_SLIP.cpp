@@ -34,7 +34,7 @@ SOLID_SYSTEM_MPI_SLIP(const bool use_preconditioner_input,BACKWARD_EULER_SYSTEM<
     recv_fluid_V_boundary_arrays.Resize(coupled_deformable_particle_indices.m);
     recv_fluid_rigid_V_boundary_arrays.Resize(coupled_deformable_particle_indices.m);
     solid_mass=&solid_system.projection_data.mass;
-    for(int i=1;i<=coupled_deformable_particle_indices.m;i++){
+    for(int i=0;i<coupled_deformable_particle_indices.m;i++){
         recv_fluid_V_boundary_arrays(i).Resize(coupled_deformable_particle_indices(i).m);
         recv_fluid_rigid_V_boundary_arrays(i).Resize(rigid_V_size);}
 }

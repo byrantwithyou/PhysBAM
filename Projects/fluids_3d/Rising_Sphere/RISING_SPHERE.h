@@ -50,7 +50,7 @@ public:
 void Initialize_Phi()
 {
     int m=grid.m,n=grid.n,mn=grid.mn;
-    for(int i=1;i<=m;i++) for(int j=1;j<=n;j++) for(int ij=1;ij<=mn;ij++) phi(i,j,ij)=grid.y(j)-.5;
+    for(int i=0;i<m;i++) for(int j=0;j<n;j++) for(int ij=0;ij<mn;ij++) phi(i,j,ij)=grid.y(j)-.5;
 }
 //#####################################################################
 // Function Adjust_Phi_And_Get_Velocities_For_Objects

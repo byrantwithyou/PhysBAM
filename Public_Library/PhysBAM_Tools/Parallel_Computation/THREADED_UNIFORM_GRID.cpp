@@ -25,7 +25,7 @@ using namespace PhysBAM;
 template<class T> static void Fill_Process_Ranks(GRID<VECTOR<T,1> >& process_grid,ARRAY<int,VECTOR<int,1> >& process_ranks,ARRAY<int>& axes)
 {
     VECTOR<int,1> extents=process_grid.Domain_Indices().Maximum_Corner();
-    for(int i=1;i<=extents.x;i++)process_ranks(i)=i-1;
+    for(int i=0;i<extents.x;i++)process_ranks(i)=i-1;
 }
 template<class T> static void Fill_Process_Ranks(GRID<VECTOR<T,2> >& process_grid,ARRAY<int,VECTOR<int,2> >& process_ranks,ARRAY<int>& axes)
 {
@@ -34,9 +34,9 @@ template<class T> static void Fill_Process_Ranks(GRID<VECTOR<T,2> >& process_gri
     for(int i=1;i<=half_extents[axes(1)];i++)for(int j=1;j<=half_extents[axes(2)];j++)
         for(int ii=0;ii<2;ii++)for(int jj=0;jj<2;jj++){
             VECTOR<int,2> permuted_index(2*i+ii-1,2*j+jj-1),index;
-            for(int a=1;a<=2;a++)index[axes(a)]=permuted_index[a];
+            for(int a=0;a<2;a++)index[axes(a)]=permuted_index[a];
             process_ranks(index)=next_rank++;}
-    for(int i=1;i<=extents.x;i++)for(int j=1;j<=extents.y;j++)if(process_ranks(i,j)==-1) process_ranks(i,j)=next_rank++;
+    for(int i=0;i<extents.x;i++)for(int j=0;j<extents.y;j++)if(process_ranks(i,j)==-1) process_ranks(i,j)=next_rank++;
 }
 template<class T> static void Fill_Process_Ranks(GRID<VECTOR<T,3> >& process_grid,ARRAY<int,VECTOR<int,3> >& process_ranks,ARRAY<int>& axes)
 {
@@ -45,9 +45,9 @@ template<class T> static void Fill_Process_Ranks(GRID<VECTOR<T,3> >& process_gri
     for(int i=1;i<=half_extents[axes(1)];i++)for(int j=1;j<=half_extents[axes(2)];j++)for(int ij=1;ij<=half_extents[axes(3)];ij++)
         for(int ii=0;ii<2;ii++)for(int jj=0;jj<2;jj++)for(int ijij=0;ijij<2;ijij++){
             VECTOR<int,3> permuted_index(2*i+ii-1,2*j+jj-1,2*ij+ijij-1),index;
-            for(int a=1;a<=3;a++)index[axes(a)]=permuted_index[a];
+            for(int a=0;a<3;a++)index[axes(a)]=permuted_index[a];
             process_ranks(index)=next_rank++;}
-    for(int i=1;i<=extents.x;i++)for(int j=1;j<=extents.y;j++)for(int ij=1;ij<=extents.z;ij++)if(process_ranks(i,j,ij)==-1) process_ranks(i,j,ij)=next_rank++;
+    for(int i=0;i<extents.x;i++)for(int j=0;j<extents.y;j++)for(int ij=0;ij<extents.z;ij++)if(process_ranks(i,j,ij)==-1) process_ranks(i,j,ij)=next_rank++;
 }
 template<class T_GRID> THREADED_UNIFORM_GRID<T_GRID>::
 THREADED_UNIFORM_GRID(ARRAY<THREAD_PACKAGE>& buffers_input,const int tid_input,const int number_of_threads,T_GRID& local_grid_input,const int number_of_ghost_cells_input,
@@ -134,7 +134,7 @@ THREADED_UNIFORM_GRID(ARRAY<THREAD_PACKAGE>& buffers_input,const int tid_input,c
     // initialize global column index boundaries
     global_column_index_boundaries.Resize(number_of_processes);
     int offset=0;
-    for(int proc=1;proc<=all_coordinates.m;proc++){
+    for(int proc=0;proc<all_coordinates.m;proc++){
         TV_INT proc_coordinates=all_coordinates(proc);
         for(int axis=1;axis<=T_GRID::dimension;axis++){
             start_index[axis]=boundaries(axis)(proc_coordinates[axis]);
@@ -151,7 +151,7 @@ THREADED_UNIFORM_GRID(ARRAY<THREAD_PACKAGE>& buffers_input,const int tid_input,c
         offset++;}
     // now go through each of the boundaries and do those
     for(int axis=1;axis<=T_GRID::dimension;axis++)
-        for(int axis_side=1;axis_side<=2;axis_side++){
+        for(int axis_side=0;axis_side<2;axis_side++){
             int side=2*axis-(2-axis_side);
             int neighbor_rank=side_neighbor_ranks(side);
             if(neighbor_rank>=0){
@@ -199,7 +199,7 @@ Synchronize_Dt(T& dt) const
     buffers.Append(pack);
     pthread_mutex_unlock(lock);
     pthread_barrier_wait(barr);
-    for(int i=1;i<=buffers.m;i++) dt=min(*(T*)(&buffers(i).buffer(1)),dt);
+    for(int i=0;i<buffers.m;i++) dt=min(*(T*)(&buffers(i).buffer(1)),dt);
     pthread_barrier_wait(barr);
     if(tid==1) buffers.m=0;
     pthread_barrier_wait(barr);
@@ -217,7 +217,7 @@ All_Reduce(bool& flag) const
     buffers.Append(pack);
     pthread_mutex_unlock(lock);
     pthread_barrier_wait(barr);
-    for(int i=1;i<=buffers.m;i++) flag|=*(bool*)(&buffers(i).buffer(1));
+    for(int i=0;i<buffers.m;i++) flag|=*(bool*)(&buffers(i).buffer(1));
     pthread_barrier_wait(barr);
     if(tid==1) buffers.m=0;
     pthread_barrier_wait(barr);
@@ -234,7 +234,7 @@ Exchange_Boundary_Cell_Data(ARRAYS_ND_BASE<VECTOR<T2,TV::dimension> >& data,cons
     const ARRAY<int>& neighbor_ranks=include_corners?all_neighbor_ranks:side_neighbor_ranks;
     // send
     ARRAY<RANGE<TV_INT> > send_regions;Find_Boundary_Regions(send_regions,sentinels,false,RANGE<VECTOR<int,1> >(0,bandwidth-1),include_corners,true,local_grid);
-    for(int n=1;n<=send_regions.m;n++)if(neighbor_ranks(n)!=-1){
+    for(int n=0;n<send_regions.m;n++)if(neighbor_ranks(n)!=-1){
         THREAD_PACKAGE pack=Package_Cell_Data(data,send_regions(n));pack.recv_tid=neighbor_ranks(n);
         pthread_mutex_lock(lock);
         buffers.Append(pack);
@@ -242,8 +242,8 @@ Exchange_Boundary_Cell_Data(ARRAYS_ND_BASE<VECTOR<T2,TV::dimension> >& data,cons
     // receive
     ARRAY<RANGE<TV_INT> > recv_regions;Find_Boundary_Regions(recv_regions,sentinels,false,RANGE<VECTOR<int,1> >(-bandwidth,-1),include_corners,true,local_grid);
     pthread_barrier_wait(barr);
-    for(int n=1;n<=recv_regions.m;n++)if(neighbor_ranks(n)!=-1){int index=0;
-        for(int i=1;i<=buffers.m;i++) if(buffers(i).send_tid==neighbor_ranks(n) && buffers(i).recv_tid==rank) index=i;
+    for(int n=0;n<recv_regions.m;n++)if(neighbor_ranks(n)!=-1){int index=0;
+        for(int i=0;i<buffers.m;i++) if(buffers(i).send_tid==neighbor_ranks(n) && buffers(i).recv_tid==rank) index=i;
         PHYSBAM_ASSERT(index);int position=0;
         for(CELL_ITERATOR iterator(local_grid,recv_regions(n));iterator.Valid();iterator.Next()) data.Unpack(buffers(index).buffer,position,iterator.Cell_Index());}
     pthread_barrier_wait(barr);
@@ -277,7 +277,7 @@ Exchange_Boundary_Face_Data(ARRAY<T2,FACE_INDEX<TV::dimension> >& data,const int
     pthread_barrier_wait(barr);
     for(int n=1;n<=recv_regions(1).m;n++)if(all_neighbor_ranks(n)!=-1){int index=0;
         ARRAY<RANGE<TV_INT> > recv_regions_n(T_GRID::dimension);for(int axis=1;axis<=T_GRID::dimension;axis++)recv_regions_n(axis)=recv_regions(axis)(n);
-        for(int i=1;i<=buffers.m;i++) if(buffers(i).send_tid==all_neighbor_ranks(n) && buffers(i).recv_tid==rank) index=i;
+        for(int i=0;i<buffers.m;i++) if(buffers(i).send_tid==all_neighbor_ranks(n) && buffers(i).recv_tid==rank) index=i;
         assert(index);int position=0;
         for(int axis=1;axis<=T_GRID::dimension;axis++) for(FACE_ITERATOR iterator(local_grid,recv_regions_n(axis),axis);iterator.Valid();iterator.Next())
             data.data(axis).Unpack(buffers(index).buffer,position,iterator.Face_Index());}
@@ -308,7 +308,7 @@ Average_Common_Face_Data(ARRAY<T2,FACE_INDEX<TV::dimension> >& data) const
     // average received data with local data (TODO: find a cleaner general way to do this)
     for(int n=1;n<=regions(1).m;n++)if(side_neighbor_ranks(n)!=-1){int axis=(n-1)/2+1;
         ARRAY<T2,FACE_INDEX<TV::dimension> > local_data;local_data.Resize(data.Domain_Indices(),false,false);
-        int index=0;for(int i=1;i<=buffers.m;i++) if(buffers(i).send_tid==side_neighbor_ranks(n) && buffers(i).recv_tid==rank) index=i;
+        int index=0;for(int i=0;i<buffers.m;i++) if(buffers(i).send_tid==side_neighbor_ranks(n) && buffers(i).recv_tid==rank) index=i;
         assert(index);int position=0;
         for(FACE_ITERATOR iterator(local_grid,regions(axis)(n),axis);iterator.Valid();iterator.Next()){
             local_data.data(axis).Unpack(buffers(index).buffer,position,iterator.Face_Index());
@@ -340,7 +340,7 @@ Assert_Common_Face_Data(ARRAY<T2,FACE_INDEX<TV::dimension> >& data,const T toler
     // average received data with local data (TODO: find a cleaner general way to do this)
     for(int n=1;n<=regions(1).m;n++)if(side_neighbor_ranks(n)!=-1){int axis=(n-1)/2+1;
         ARRAY<T2,FACE_INDEX<TV::dimension> > local_data;local_data.Resize(data.Domain_Indices(),false,false);
-        int index=0;for(int i=1;i<=buffers.m;i++) if(buffers(i).send_tid==side_neighbor_ranks(n) && buffers(i).recv_tid==rank) index=i;
+        int index=0;for(int i=0;i<buffers.m;i++) if(buffers(i).send_tid==side_neighbor_ranks(n) && buffers(i).recv_tid==rank) index=i;
         assert(index);int position=0;
         for(FACE_ITERATOR iterator(local_grid,regions(axis)(n),axis);iterator.Valid();iterator.Next()){
             local_data.data(axis).Unpack(buffers(index).buffer,position,iterator.Face_Index());
@@ -398,7 +398,7 @@ Allgather(ARRAY<int>& data) const
     buffers.Append(pack);
     pthread_mutex_unlock(lock);
     pthread_barrier_wait(barr);
-    for(int i=1;i<=buffers.m;i++) data(buffers(i).send_tid)=*(int*)(&buffers(i).buffer(1));
+    for(int i=0;i<buffers.m;i++) data(buffers(i).send_tid)=*(int*)(&buffers(i).buffer(1));
     pthread_barrier_wait(barr);
     if(tid==1) buffers.m=0;
     pthread_barrier_wait(barr);

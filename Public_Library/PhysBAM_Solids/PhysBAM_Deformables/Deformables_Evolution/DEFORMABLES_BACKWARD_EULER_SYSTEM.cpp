@@ -84,7 +84,7 @@ Project(KRYLOV_VECTOR_BASE<T>& BV) const
 {
     VECTOR_T& V=debug_cast<VECTOR_T&>(BV);
     deformables_evolution.Zero_Out_Enslaved_Velocity_Nodes(V.V.array,current_velocity_time+dt,current_position_time);
-    for(int i=1;i<=deformables_evolution.deformables_parameters.implicit_solve_parameters.cg_projection_iterations;i++){
+    for(int i=0;i<deformables_evolution.deformables_parameters.implicit_solve_parameters.cg_projection_iterations;i++){
         int middle_projection=1;
         if(projection_data.point_face_precomputed.m || projection_data.edge_edge_precomputed.m){
             TRIANGLE_REPULSIONS<TV>::Project_All_Moving_Constraints(projection_data.point_face_precomputed,projection_data.edge_edge_precomputed,V.V.array);middle_projection=4;}

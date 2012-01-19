@@ -143,7 +143,7 @@ public:
 //#####################################################################
 void Initialize_Deformable_And_Rigid_Bodies()
 {
-    for(int i=1;i<=number_of_objects;i++){
+    for(int i=0;i<number_of_objects;i++){
         int index=solids_parameters.deformable_body_parameters.list.Add_Deformable_Embedded_Triangulated_Area();
         Add_Melting_Object(melting_parameters.DEFORMABLE,index);}
 
@@ -169,7 +169,7 @@ void Initialize_Phi(const int object,ARRAY<T>& phi)
     RED_GREEN_GRID_2D<T>& grid=melting_parameters.levelsets(object)->grid;
     ARRAY<VECTOR_2D<T> >& node_locations=grid.Node_Locations();
     
-    for(int p=1;p<=phi.m;p++) phi(p)=circle(object).Signed_Distance(node_locations(p));    
+    for(int p=0;p<phi.m;p++) phi(p)=circle(object).Signed_Distance(node_locations(p));    
 }
 //#####################################################################
 // Function Initialize_Levelset_Velocity
@@ -180,9 +180,9 @@ void Initialize_Levelset_Velocity(const int object,ARRAY<VECTOR_2D<T> >& V)
     //ARRAY<VECTOR_2D<T> >& node_locations=grid.Node_Locations();
     
     VECTOR_2D<T> circle_center(grid.uniform_grid.xmin+(T).5*side_length,0);
-    for(int p=1;p<=V.m;p++) V(p)=VECTOR_2D<T>(0,0);    
-//    for(int p=1;p<=V.m;p++) V(p)=VECTOR_2D<T>(node_locations(p).y-circle.center.y,0);
-//    for(int p=1;p<=V.m;p++) V(p)=-node_locations(p)+circle.center;
+    for(int p=0;p<V.m;p++) V(p)=VECTOR_2D<T>(0,0);    
+//    for(int p=0;p<V.m;p++) V(p)=VECTOR_2D<T>(node_locations(p).y-circle.center.y,0);
+//    for(int p=0;p<V.m;p++) V(p)=-node_locations(p)+circle.center;
 }
 //#####################################################################
 // Function Initialize_Particle_Positions_And_Velocities
@@ -206,7 +206,7 @@ void Initialize_Particle_Positions_And_Velocities(const int object)
 //#####################################################################
 void Initialize_Forces()
 {
-    for(int i=1;i<=number_of_objects;i++){
+    for(int i=0;i<number_of_objects;i++){
         DEFORMABLE_OBJECT_2D<T>& deformable_object=solids_parameters.deformable_body_parameters.list(i);
         TRIANGULATED_AREA<T>& triangulated_area=deformable_object.embedded_triangulated_area->triangulated_area;
         
@@ -231,7 +231,7 @@ void Initialize_Phi()
     // Not so good to set up a heaviside function here because then the interface will
     // be exactly between the two nodes which can lead to roundoff issues when setting dirichlet cells, etc.
     GRID<TV>& grid=fluids_parameters.grid;
-    for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++)
+    for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++)
         fluids_parameters.particle_levelset_evolution.phi(i,j)=grid.y(j)-grid.ymin-initial_water_level;
 }
 
@@ -247,10 +247,10 @@ void Extrapolate_Phi_Into_Objects(const T time)
     
     GRID<TV>& grid=fluids_parameters.grid;
 
-    for(int object=1;object<=melting_parameters.levelsets.m;object++){
+    for(int object=0;object<melting_parameters.levelsets.m;object++){
         solids_parameters.deformable_body_parameters.list(object).triangles_of_material->material_area.Initialize_Triangle_Hierarchy();
         solids_parameters.deformable_body_parameters.list(object).triangles_of_material->material_area.Update_Bounding_Box();
-        for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++) if(solids_parameters.deformable_body_parameters.list(object).triangles_of_material->material_area.Inside(grid.X(i,j)))
+        for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++) if(solids_parameters.deformable_body_parameters.list(object).triangles_of_material->material_area.Inside(grid.X(i,j)))
             fluids_parameters.particle_levelset_evolution.phi(i,j)=grid.max_dx_dy;}
 }
 //#####################################################################
@@ -260,7 +260,7 @@ void Adjust_Phi_With_Sources(const T time)
 {
     if(!use_source) return;
     GRID<TV>& grid=fluids_parameters.grid;
-    for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++){
+    for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++){
         VECTOR_2D<T> source_X=world_to_source*grid.X(i,j);
         if(source.Lazy_Inside(source_X)) fluids_parameters.particle_levelset_evolution.phi(i,j)=min(fluids_parameters.particle_levelset_evolution.phi(i,j),source.Signed_Distance(source_X));}
 }
@@ -273,7 +273,7 @@ void Get_Source_Reseed_Mask(ARRAY<bool,VECTOR<int,2> >*& cell_centered_mask,cons
     GRID<TV>& grid=fluids_parameters.grid;
     if(cell_centered_mask) delete cell_centered_mask;cell_centered_mask=new ARRAY<bool,VECTOR<int,2> >(grid);
     T padding=3*grid.max_dx_dy;
-    for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++) if(!source.Outside(world_to_source*grid.X(i,j),padding)) (*cell_centered_mask)(i,j)=true;
+    for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++) if(!source.Outside(world_to_source*grid.X(i,j),padding)) (*cell_centered_mask)(i,j)=true;
 }
 //#####################################################################
 // Function Get_Source_Velocities
@@ -283,8 +283,8 @@ void Get_Source_Velocities(const T time)
     if(!use_source) return;
     GRID<TV> &u_grid=fluids_parameters.u_grid,&v_grid=fluids_parameters.v_grid;
     PROJECTION_2D<T>& projection=fluids_parameters.incompressible.projection;
-    for(int i=1;i<=u_grid.m;i++) for(int j=1;j<=u_grid.n;j++) if(source.Lazy_Inside(world_to_source*u_grid.X(i,j))){projection.elliptic_solver->psi_N_u(i,j)=true;projection.u(i,j)=source_velocity.x;}
-    for(int i=1;i<=v_grid.m;i++) for(int j=1;j<=v_grid.n;j++) if(source.Lazy_Inside(world_to_source*v_grid.X(i,j))){projection.elliptic_solver->psi_N_v(i,j)=true;projection.v(i,j)=source_velocity.y;}
+    for(int i=0;i<u_grid.m;i++) for(int j=0;j<u_grid.n;j++) if(source.Lazy_Inside(world_to_source*u_grid.X(i,j))){projection.elliptic_solver->psi_N_u(i,j)=true;projection.u(i,j)=source_velocity.x;}
+    for(int i=0;i<v_grid.m;i++) for(int j=0;j<v_grid.n;j++) if(source.Lazy_Inside(world_to_source*v_grid.X(i,j))){projection.elliptic_solver->psi_N_v(i,j)=true;projection.v(i,j)=source_velocity.y;}
 }
 //#####################################################################
 // Function Get_Object_Velocities

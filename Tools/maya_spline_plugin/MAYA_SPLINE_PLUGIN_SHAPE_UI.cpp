@@ -153,7 +153,7 @@ select(MSelectInfo &selectInfo, MSelectionList &selectionList,MPointArray &world
         RAY_3D<float> ray(VECTOR_3D<float>(origin.x,origin.y,origin.z),VECTOR_3D<float>(direction.x,direction.y,direction.z));
         MAYA_SPLINE_PLUGIN_SHAPE* shape=(MAYA_SPLINE_PLUGIN_SHAPE*)surfaceShape();
         TRIANGULATED_SURFACE<float>& surface=*shape->tetrahedralized_volume->triangulated_surface;
-        for(int t=1;t<=surface.triangle_mesh.triangles.m;t++){
+        for(int t=0;t<surface.triangle_mesh.triangles.m;t++){
             int p1,p2,p3;surface.triangle_mesh.triangles.Get(t,p1,p2,p3);
             TRIANGLE_3D<float> triangle(surface.particles.X(p1),surface.particles.X(p2),surface.particles.X(p3));
             if(triangle.Lazy_Intersection(ray)){
@@ -217,7 +217,7 @@ Draw_Shaded(const MDrawRequest & request,M3dView & view) const
     material.setMaterial(request.multiPath(),request.isTransparent());
     // draw triangles
     glBegin(GL_TRIANGLES);
-        for(int t=1;t<=triangles.m;t++){
+        for(int t=0;t<triangles.m;t++){
             int i,j,k;triangles.Get(t,i,j,k);
             OpenGL_Normal(TRIANGLE_3D<float>::Clockwise_Normal(surface.particles.X(i),surface.particles.X(j),surface.particles.X(k)));
             OpenGL_Vertex(surface.particles.X(i));OpenGL_Vertex(surface.particles.X(j));OpenGL_Vertex(surface.particles.X(k));}

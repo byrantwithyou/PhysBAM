@@ -18,7 +18,7 @@ Euler_Step(const T dt,const T time)
     int ghost_cells=3;
 
     // make sure things'll work in conservation law solver
-    for(int i=1;i<=grid.counts.x;i++) for(int j=1;j<=grid.counts.y;j++) if (U(i,j)(1) < min_height){U(i,j)(1)=min_height;U(i,j)(2)=U(i,j)(3)=0;}
+    for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) if (U(i,j)(1) < min_height){U(i,j)(1)=min_height;U(i,j)(2)=U(i,j)(3)=0;}
 
     ARRAY<TV_DIMENSION,VECTOR<int,2> > U_ghost(1-ghost_cells,m+ghost_cells,1-ghost_cells,n+ghost_cells);boundary->Fill_Ghost_Cells(grid,U,U_ghost,dt,time,ghost_cells);
 
@@ -37,7 +37,7 @@ template<class T> T SHALLOW_WATER_2D<T>::
 CFL()
 {
     T max_x_speed=0,max_y_speed=0;
-    for(int i=1;i<=grid.counts.x;i++) for(int j=1;j<=grid.counts.y;j++){
+    for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++){
         T one_over_h=1/U(i,j)(1);
         T u=U(i,j)(2)*one_over_h,v=U(i,j)(3)*one_over_h,celerity=sqrt(gravity*U(i,j)(1));
         max_x_speed=max(max_x_speed,abs(u)+celerity);

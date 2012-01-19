@@ -27,7 +27,7 @@ int main(int argc,char *argv[])
 
     ARRAY<VECTOR_3D<float> > vertex_colors(particle_colors.m);
 
-    for(int i=1;i<=vertex_colors.m;i++)vertex_colors(i)=(particle_colors(i)==1?VECTOR_3D<float>(.98,1.,.87):VECTOR_3D<float>(1,.37,.36));
+    for(int i=0;i<vertex_colors.m;i++)vertex_colors(i)=(particle_colors(i)==1?VECTOR_3D<float>(.98,1.,.87):VECTOR_3D<float>(1,.37,.36));
 
     FILE_UTILITIES::Write_To_File<float>("particle_vertex_colors.col.gz",vertex_colors);
     

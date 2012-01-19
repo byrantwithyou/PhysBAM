@@ -386,7 +386,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 10:{
             SEGMENTED_CURVE<TV>& segmented_curve=*SEGMENTED_CURVE<TV>::Create();segmented_curve.Clean_Memory();
             int num_particles=51;T scale_factor=(T).1;segmented_curve.mesh.Initialize_Straight_Mesh(num_particles,false);
-            for(int p=1;p<=num_particles;p++){
+            for(int p=0;p<num_particles;p++){
                 int index=segmented_curve.particles.array_collection->Add_Element();segment_ramp_particles.Append(index);
                 T x=(p-num_particles/2-1)*scale_factor;segmented_curve.particles.X(index)=VECTOR<T,2>((T)p,x*x*x);}
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(segmented_curve,100);
@@ -400,7 +400,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 11:{
             SEGMENTED_CURVE<TV>& segmented_curve=*SEGMENTED_CURVE<TV>::Create(*new PARTICLES<TV>);segmented_curve.Clean_Memory();
             int num_particles=500;segmented_curve.mesh.Initialize_Straight_Mesh(num_particles,false);segmented_curve.particles.array_collection->Add_Elements(num_particles);
-            for(int p=1;p<=num_particles;p++) segmented_curve.particles.X(p)=VECTOR<T,2>(0,(T)p/num_particles+(T).01);
+            for(int p=0;p<num_particles;p++) segmented_curve.particles.X(p)=VECTOR<T,2>(0,(T)p/num_particles+(T).01);
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(segmented_curve,1);
             tests.Set_Initial_Particle_Configuration(segmented_curve.particles,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T).5),ROTATION<TV>::From_Angle((T).01))),true);
             tests.Copy_And_Add_Structure(segmented_curve);
@@ -414,7 +414,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             tests.Add_Ground();
             break;}
         case 15:{
-            for(int i=1;i<=parameter;i++) tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)1.2*i))));
+            for(int i=0;i<parameter;i++) tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)1.2*i))));
             tests.Add_Ground();
             break;}
         case 16: {
@@ -484,7 +484,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(solid_body_collection.deformable_body_collection.deformable_geometry.structures);
 
     // correct number nodes
-    for(int i=1;i<=solid_body_collection.deformable_body_collection.deformable_geometry.structures.m;i++) solid_body_collection.deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<solid_body_collection.deformable_body_collection.deformable_geometry.structures.m;i++) solid_body_collection.deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents();
@@ -557,7 +557,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 15:{
             solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
             COLLISION_AREA_PENALTY_FORCE<TV>* penalty_force=new COLLISION_AREA_PENALTY_FORCE<TV>(particles);
-            for(int i=1;i<=parameter;i++){
+            for(int i=0;i<parameter;i++){
                 TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>(i);
                 penalty_force->Add_Mesh(triangulated_area);
                 Add_Constitutive_Model(triangulated_area,(T)1e4,(T).45,(T).01);}
@@ -617,10 +617,10 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     if(parse_args->Is_Value_Set("-solver_iterations")) solids_parameters.implicit_solve_parameters.cg_iterations=parse_args->Get_Integer_Value("-solver_iterations");
     if(parse_args->Is_Value_Set("-cgsolids")) solids_parameters.implicit_solve_parameters.cg_tolerance=(T)parse_args->Get_Double_Value("-cgsolids");
 
-    if(fully_implicit) for(int i=1;i<=solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->use_implicit_velocity_independent_forces=true;
-    if(fully_implicit) for(int i=1;i<=solid_body_collection.rigid_body_collection.rigids_forces.m;i++)
+    if(fully_implicit) for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->use_implicit_velocity_independent_forces=true;
+    if(fully_implicit) for(int i=0;i<solid_body_collection.rigid_body_collection.rigids_forces.m;i++)
         solid_body_collection.rigid_body_collection.rigids_forces(i)->use_implicit_velocity_independent_forces=true;
-    if(fully_implicit) for(int i=1;i<=solid_body_collection.deformable_body_collection.deformables_forces.m;i++) solid_body_collection.deformable_body_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=true;
+    if(fully_implicit) for(int i=0;i<solid_body_collection.deformable_body_collection.deformables_forces.m;i++) solid_body_collection.deformable_body_collection.deformables_forces(i)->use_implicit_velocity_independent_forces=true;
 
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >::Initialize_Bodies();
 }
@@ -659,7 +659,7 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
         int m=mattress_grid.counts.x;
 	int n=mattress_grid.counts.y;
         TV velocity=velocity_time<5.0?attachment_velocity:TV();
-        for(int j=1;j<=n;j++){V(1+m*(j-1))=-velocity;V(m+m*(j-1))=velocity;}}
+        for(int j=0;j<n;j++){V(1+m*(j-1))=-velocity;V(m+m*(j-1))=velocity;}}
     if(test_number==24){
         int m=mattress_grid.counts.x;
 	int n=mattress_grid.counts.y;
@@ -693,7 +693,7 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
         TV velocity_bot=velocity_time<final_time?TV((T)0,-velocity):TV();
         TV velocity_rig=velocity_time<final_time?TV(velocity,(T)0):TV();
         TV velocity_lef=velocity_time<final_time?TV(-velocity,(T)0):TV();
-        for(int j=1;j<=n;j++){V(1+m*(j-1))=velocity_lef;V(m+m*(j-1))=velocity_rig;}
+        for(int j=0;j<n;j++){V(1+m*(j-1))=velocity_lef;V(m+m*(j-1))=velocity_rig;}
         for(int i=2*m/5+1;i<=3*m/5+1;i++){V(i)=velocity_bot;V(m*(n-1)+i)=velocity_top;}}
     if(test_number==27){
         int m=mattress_grid.counts.x;
@@ -702,8 +702,8 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
         T final_time=50;
         TV velocity_rig=velocity_time<final_time?TV(-velocity,(T)0):TV();
         TV velocity_lef=velocity_time<final_time?TV(velocity,(T)0):TV();
-        for(int j=1;j<=n;j++){V(1+m*(j-1))=velocity_lef;V(m+m*(j-1))=velocity_rig;}}
-    if(test_number==10) for(int p=1;p<=segment_ramp_particles.m;p++) V(p)=TV();
+        for(int j=0;j<n;j++){V(1+m*(j-1))=velocity_lef;V(m+m*(j-1))=velocity_rig;}}
+    if(test_number==10) for(int p=0;p<segment_ramp_particles.m;p++) V(p)=TV();
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes
@@ -713,7 +713,7 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
     if(test_number==4||test_number==5||test_number==6||test_number==20){
         int m=mattress_grid.counts.x;
 	int n=mattress_grid.counts.y;
-        for(int j=1;j<=n;j++) V(1+m*(j-1))=V(m+m*(j-1))=TV();}
+        for(int j=0;j<n;j++) V(1+m*(j-1))=V(m+m*(j-1))=TV();}
     if(test_number==24){
         int m=mattress_grid.counts.x;
 	int n=mattress_grid.counts.y;
@@ -729,13 +729,13 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
     if(test_number==26){
         int m=mattress_grid.counts.x;
 	int n=mattress_grid.counts.y;
-        for(int j=1;j<=n;j++){V(1+m*(j-1))=TV();V(m+m*(j-1))=TV();}
+        for(int j=0;j<n;j++){V(1+m*(j-1))=TV();V(m+m*(j-1))=TV();}
         for(int i=2*m/5+1;i<=3*m/5+1;i++){V(i)=TV();V(m*(n-1)+i)=TV();}}
     if(test_number==27){
         int m=mattress_grid.counts.x;
 	int n=mattress_grid.counts.y;
-        for(int j=1;j<=n;j++){V(1+m*(j-1))=TV();V(m+m*(j-1))=TV();}}
-    if(test_number==10) for(int p=1;p<=segment_ramp_particles.m;p++) V(p)=TV();
+        for(int j=0;j<n;j++){V(1+m*(j-1))=TV();V(m+m*(j-1))=TV();}}
+    if(test_number==10) for(int p=0;p<segment_ramp_particles.m;p++) V(p)=TV();
 }
 //#####################################################################
 // Function Set_External_Positions
@@ -745,7 +745,7 @@ void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE
     if(test_number!=1 && test_number!=2 && test_number!=3) return;
     ARRAY<TV>& X_save=deformable_body_rest_positions;
     int m=mattress_grid.counts.x;
-    for(int j=1;j<=mattress_grid.counts.y;j++){
+    for(int j=0;j<mattress_grid.counts.y;j++){
         X(1+m*(j-1))=X_save(1+m*(j-1))-time*attachment_velocity;
         X(m+m*(j-1))=X_save(m+m*(j-1))+time*attachment_velocity;}
 }
@@ -755,7 +755,7 @@ void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE
 void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE
 {
     int m=mattress_grid.counts.x;
-    for(int j=1;j<=mattress_grid.counts.y;j++) X(1+m*(j-1))=X(m+m*(j-1))=TV(0,0);
+    for(int j=0;j<mattress_grid.counts.y;j++) X(1+m*(j-1))=X(m+m*(j-1))=TV(0,0);
 }
 //#####################################################################
 // Function Write_Output_Files

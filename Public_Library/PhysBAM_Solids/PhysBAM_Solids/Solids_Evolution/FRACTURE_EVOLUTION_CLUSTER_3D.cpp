@@ -34,10 +34,10 @@ Process_Cluster_Fracture(const T dt,const T time,SOLIDS_EVOLUTION<TV>* solids_ev
         
         if(clusters_to_check.m>0){
             LOG::cout<<"---------------- Max impulse above threshold!!"<<std::endl;
-            for(int c=1;c<=clusters_to_check.m;c++) clusters_to_check(c)->Save_Constituent_Bodies_State(COLLISION_BODY<TV>::SOLIDS_EVOLUTION_RIGID_BODY_NEW_STATE,time+dt);
+            for(int c=0;c<clusters_to_check.m;c++) clusters_to_check(c)->Save_Constituent_Bodies_State(COLLISION_BODY<TV>::SOLIDS_EVOLUTION_RIGID_BODY_NEW_STATE,time+dt);
             for(int i(1);i<=rigid_body_particles.array_collection->Size();i++) if(rigid_body_particles.Is_Active(i)) rigid_body_particles.Rigid_Body(i).Restore_State(COLLISION_BODY<TV>::SOLIDS_EVOLUTION_RIGID_BODY_OLD_STATE);
             // remove all tagged clusters -- ones that had a greater impulse
-            for(int c=1;c<=clusters_to_check.m;c++){
+            for(int c=0;c<clusters_to_check.m;c++){
                 clusters_to_check(c)->Save_Constituent_Bodies_State(COLLISION_BODY<TV>::SOLIDS_EVOLUTION_RIGID_BODY_OLD_STATE,time);
                 rigid_body_particles.Remove_Cluster_Body(clusters_to_check(c)->Id_Number(),false);
                 clusters_to_check(c)->Pre_Strain_Calculation();}
@@ -53,7 +53,7 @@ Process_Cluster_Fracture(const T dt,const T time,SOLIDS_EVOLUTION<TV>* solids_ev
             solids_parameters.rigid_body_collision_parameters.collision_iterations=old_collision_iterations;
             solids_evolution_callbacks->Post_Advance_Cluster_Fracture(dt,time);
         
-            for(int i=1;i<=clusters_to_check.m;i++){
+            for(int i=0;i<clusters_to_check.m;i++){
                 clusters_to_check(i)->Post_Strain_Calculation();
                 if(clusters_to_check(i)->Create_New_Clusters_Based_On_Strain(solids_parameters.collision_body_list,time,time-previous_time)) delete clusters_to_check(i);}
             solids_parameters.solid_body_collection.deformable_object.Update_Simulated_Particles();
@@ -82,7 +82,7 @@ Process_Cluster_Fracture(const T dt,const T time,SOLIDS_EVOLUTION<TV>* solids_ev
         
             for(int i(1);i<=rigid_body_particles.array_collection->Size();i++) if(rigid_body_particles.Is_Active(i)) rigid_body_particles.Rigid_Body(i).Save_State(COLLISION_BODY<TV>::SOLIDS_EVOLUTION_RIGID_BODY_OLD_STATE);
             // remove all tagged clusters -- ones that had a greater impulse
-            for(int c=1;c<=clusters_to_check.m;c++){
+            for(int c=0;c<clusters_to_check.m;c++){
                 clusters_to_check(c)->Save_Constituent_Bodies_State(COLLISION_BODY<TV>::SOLIDS_EVOLUTION_RIGID_BODY_OLD_STATE,time);
                 rigid_body_particles.Remove_Cluster_Body(clusters_to_check(c)->Id_Number(),false);
                 clusters_to_check(c)->Pre_Strain_Calculation();}
@@ -98,7 +98,7 @@ Process_Cluster_Fracture(const T dt,const T time,SOLIDS_EVOLUTION<TV>* solids_ev
             solids_parameters.rigid_body_collision_parameters.collision_iterations=old_collision_iterations;
             solids_evolution_callbacks->Post_Advance_Cluster_Fracture(dt,time);
         
-            for(int i=1;i<=clusters_to_check.m;i++){clusters_to_check(i)->Post_Strain_Calculation();if(clusters_to_check(i)->Create_New_Clusters_Based_On_Strain(solids_parameters.collision_body_list,time,time-previous_time)) delete clusters_to_check(i);}
+            for(int i=0;i<clusters_to_check.m;i++){clusters_to_check(i)->Post_Strain_Calculation();if(clusters_to_check(i)->Create_New_Clusters_Based_On_Strain(solids_parameters.collision_body_list,time,time-previous_time)) delete clusters_to_check(i);}
             
             // move all bodies back to old position so that we can evolve using new clusters
             for(int i(1);i<=rigid_body_particles.array_collection->Size();i++) if(rigid_body_particles.Is_Active(i)) rigid_body_particles.Rigid_Body(i).Restore_State(COLLISION_BODY<TV>::SOLIDS_EVOLUTION_RIGID_BODY_OLD_STATE);}

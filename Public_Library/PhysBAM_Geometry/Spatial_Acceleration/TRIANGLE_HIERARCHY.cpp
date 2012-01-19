@@ -45,7 +45,7 @@ Initialize_Hierarchy_Using_KD_Tree()
 {
     KD_TREE<VECTOR<T,3> > kd_tree(false);
     ARRAY<VECTOR<T,3> > centroids(triangle_mesh.elements.m);
-    for(int t=1;t<=triangle_mesh.elements.m;t++){int i,j,k;triangle_mesh.elements(t).Get(i,j,k);centroids(t)=TRIANGLE_3D<T>::Center(particles.X(i),particles.X(j),particles.X(k));}
+    for(int t=0;t<triangle_mesh.elements.m;t++){int i,j,k;triangle_mesh.elements(t).Get(i,j,k);centroids(t)=TRIANGLE_3D<T>::Center(particles.X(i),particles.X(j),particles.X(k));}
     if(triangles_per_group){
         triangles_in_group.Clean_Memory();
         kd_tree.Create_Left_Balanced_KD_Tree_With_Grouping(centroids,triangles_in_group,triangles_per_group);

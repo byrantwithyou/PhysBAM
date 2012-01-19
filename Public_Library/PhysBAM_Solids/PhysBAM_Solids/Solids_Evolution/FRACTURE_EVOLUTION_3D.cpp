@@ -77,7 +77,7 @@ Initialize_Self_Collision()
         solids_parameters.solid_body_collection.deformable_body_collection.triangle_collisions.geometry.structures.Remove_All();
         solids_parameters.Initialize_Triangle_Collisions(); // false - do not clamp repulsion thickness
         ARRAY<TV> rest_X(deformable_body_collection.particles.array_collection->Size());
-        for(int p=1;p<=rest_X.m;p++) if(particle_on_surface(p)) rest_X(p)=fracture_object->Rest_Position_Of_Material_Surface_Particle(p);
+        for(int p=0;p<rest_X.m;p++) if(particle_on_surface(p)) rest_X(p)=fracture_object->Rest_Position_Of_Material_Surface_Particle(p);
         solids_parameters.solid_body_collection.deformable_body_collection.triangle_repulsions.Clamp_Repulsion_Thickness_With_Meshes(rest_X,solids_parameters.collisions_repulsion_clamp_fraction);}
 #endif
 }
@@ -170,7 +170,7 @@ Fracture_Where_High_Stress(const T small_number)
     T max_eigenvalue_seen=0,min_eigenvalue_seen=0,max_sum=0,max_sum_sqr=0,min_sum=0,min_sum_sqr=0;
 
     ISOTROPIC_CONSTITUTIVE_MODEL<T,3>& isotropic_model=dynamic_cast<ISOTROPIC_CONSTITUTIVE_MODEL<T,3>&>(finite_volume.constitutive_model);
-    for(int t=1;t<=sigma.m;t++){
+    for(int t=0;t<sigma.m;t++){
         DIAGONAL_MATRIX<T,3> Fe_hat_clipped=finite_volume.Fe_hat(t).Clamp_Min(small_number);
         T one_over_clipped_J=1/Fe_hat_clipped.Determinant();
         DIAGONAL_MATRIX<T,3> P_hat=isotropic_model.P_From_Strain(finite_volume.Fe_hat(t),(T)1,t); // scale for volume too?
@@ -210,9 +210,9 @@ Rigid_Fracture_Where_High_Stress(const T small_number)
     T max_eigenvalue_seen=0,min_eigenvalue_seen=0,max_sum=0,max_sum_sqr=0,min_sum=0,min_sum_sqr=0;
 
     LINEAR_FINITE_VOLUME<TV,3> linear_finite_volume(fracture_object->embedded_object.simplicial_object,(T)1e5,(T).3,(T).02);
-    for(int i=1;i<=rigid_bodies_with_impulse.m;i++){
+    for(int i=0;i<rigid_bodies_with_impulse.m;i++){
         RIGID_BODY_FRACTURE_OBJECT_3D<T>& rigid_body_fracture_object=dynamic_cast<RIGID_BODY_FRACTURE_OBJECT_3D<T>&>(rigid_body_collection.Rigid_Body(rigid_bodies_with_impulse(i)));
-        for(int t=1;t<=sigma.m;t++){
+        for(int t=0;t<sigma.m;t++){
             // Compute Sigma From Quasistatics Computation
             sigma(t)=linear_finite_volume.Stress_Differential(rigid_body_fracture_object.average_dX,t);
             DIAGONAL_MATRIX<T,3> eigenvalues;MATRIX<T,3> eigenvectors;
@@ -233,13 +233,13 @@ Rigid_Fracture_Where_High_Stress(const T small_number)
     int initial_number_of_embedded_subelements=fracture_object->embedded_object.embedded_object.mesh.elements.m;
 
     /* This is stress based fracture... theoretically correct, but region based fracture below seems to work better.
-    for(int i=1;i<=rigid_bodies_with_impulse.m;i++){
+    for(int i=0;i<rigid_bodies_with_impulse.m;i++){
         if(!fracture_object->embedded_object.simplicial_object.mesh.incident_elements) fracture_object->embedded_object.simplicial_object.mesh.Initialize_Incident_Elements();
         RIGID_BODY_FRACTURE_OBJECT_3D<T>* rigid_body=dynamic_cast<RIGID_BODY_FRACTURE_OBJECT_3D<T>*>(&rigid_body_collection.Rigid_Body(rigid_bodies_with_impulse(i)));
         SIMPLEX_MESH<3>& mesh=rigid_body->template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>().mesh;
 
         if(rigid_body->levelset_grain_boundaries){
-            for(int t=1;t<=mesh.elements.m;t++){
+            for(int t=0;t<mesh.elements.m;t++){
                 int deformable_tet=rigid_body->rigid_to_deformable_tets(t);
                 int number_of_cuts=fracture_object->embedded_object.Number_Of_Embedded_Cuts(deformable_tet);
                 if(number_of_cuts<3){
@@ -254,20 +254,20 @@ Rigid_Fracture_Where_High_Stress(const T small_number)
                         fracture_object->Add_Cut_Based_On_Phi(rigid_body->rigid_to_deformable_tets(t),element_phi);}}}}}
     fracture_object->Fracture_Where_High_Stress(sigma,spatial_fracture_bias_direction);*/
 
-    for(int i=1;i<=rigid_bodies_with_impulse.m;i++){ // NOTE: this tries to make full cuts to break off full pieces
+    for(int i=0;i<rigid_bodies_with_impulse.m;i++){ // NOTE: this tries to make full cuts to break off full pieces
         if(!fracture_object->embedded_object.simplicial_object.mesh.incident_elements) fracture_object->embedded_object.simplicial_object.mesh.Initialize_Incident_Elements();
         RIGID_BODY_FRACTURE_OBJECT_3D<T>& rigid_body=dynamic_cast<RIGID_BODY_FRACTURE_OBJECT_3D<T>&>(rigid_body_collection.Rigid_Body(rigid_bodies_with_impulse(i)));
         SIMPLEX_MESH<3>& mesh=rigid_body.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>().mesh;
         if(rigid_body.grain_boundaries.m>0){
-            for(int grain_boundary=1;grain_boundary<=rigid_body.grain_boundaries.m;grain_boundary++){
+            for(int grain_boundary=0;grain_boundary<rigid_body.grain_boundaries.m;grain_boundary++){
                 ARRAY<TV> tet_centers(mesh.elements.m);
-                for(int t=1;t<=mesh.elements.m;t++){
+                for(int t=0;t<mesh.elements.m;t++){
                     const VECTOR<int,4>& nodes=mesh.elements(t);
                     tet_centers(t)=rigid_body.Frame()*TETRAHEDRON<T>::Center(rigid_body.particles.X(nodes[1]),rigid_body.particles.X(nodes[2]),rigid_body.particles.X(nodes[3]),rigid_body.particles.X(nodes[4]));}
                 rigid_body.grain_boundaries(grain_boundary)->Initialize_Element_Weakness_Multiplier(tet_centers);
                 ARRAY<T> accumulator(rigid_body.grain_boundaries(grain_boundary)->Number_Of_Regions());
                 ARRAY<int> number_of_nodes(rigid_body.grain_boundaries(grain_boundary)->Number_Of_Regions());
-                for(int t=1;t<=mesh.elements.m;t++){
+                for(int t=0;t<mesh.elements.m;t++){
                     int deformable_tet=rigid_body.rigid_to_deformable_tets(t);
                     int number_of_cuts=fracture_object->embedded_object.Number_Of_Embedded_Cuts(deformable_tet);
                     VECTOR<int,4> regions;
@@ -278,9 +278,9 @@ Rigid_Fracture_Where_High_Stress(const T small_number)
                     for(int region=0;region<number_of_regions;region++){
                         accumulator(regions(region))+=amt_over;number_of_nodes(regions(region))++;}}
                 //TODO: why iis this commented out?
-                //for(int region=1;region<=accumulator.m;region++)accumulator(region)/=number_of_nodes(region);
+                //for(int region=0;region<accumulator.m;region++)accumulator(region)/=number_of_nodes(region);
                 rigid_body.grain_boundaries(grain_boundary)->Initialize_Breakability(tet_centers);
-                for(int t=1;t<=mesh.elements.m;t++){
+                for(int t=0;t<mesh.elements.m;t++){
                     int deformable_tet=rigid_body.rigid_to_deformable_tets(t);
                     int number_of_cuts=fracture_object->embedded_object.Number_Of_Embedded_Cuts(deformable_tet);
                     if(number_of_cuts<3 && rigid_body.grain_boundaries(grain_boundary)->is_breakable(t)){
@@ -339,20 +339,20 @@ Adjust_Nodes_For_Segment_Triangle_Intersections(T threshhold)
 
     // loop through intersecting edge triangle pairs
     ARRAY<TRIPLE<int,int,T> > edge_triangle_perturbations(particles.array_collection->Size());
-    for(int pair=1;pair<=intersecting_segment_triangle_pairs.m;pair++){
+    for(int pair=0;pair<intersecting_segment_triangle_pairs.m;pair++){
         int e,t;intersecting_segment_triangle_pairs(pair).Get(e,t);
         VECTOR<int,2> segment=material_surface.mesh.segment_mesh->elements(e);
         int i,j,k;material_surface.mesh.elements(t).Get(i,j,k);
         TRIANGLE_3D<T> triangle(particles.X(i),particles.X(j),particles.X(k));
         T fraction;TV weights;
         if(INTERSECTION::Intersects(SEGMENT_3D<T>(particles.X(segment[1]),particles.X(segment[2])),triangle,fraction,weights,solids_parameters.solid_body_collection.deformable_body_collection.triangle_collisions.geometry.small_number)){
-            for(int a=1;a<=2;a++){
+            for(int a=0;a<2;a++){
                 T perturb_amount=triangle.Signed_Distance(particles.X(segment[a]))+(T)1.5*solids_parameters.solid_body_collection.deformable_body_collection.triangle_collisions.collision_thickness;
                 if(fraction<.5 && perturb_amount>0 && (!edge_triangle_perturbations(segment[a]).x || perturb_amount<edge_triangle_perturbations(segment[a]).z)){
                     edge_triangle_perturbations(segment[a])=TRIPLE<int,int,T>(e,t,perturb_amount);}}}}
 
     // sort by perturbation amount - always perturb with least amounts ones first - NOTE: testing with a VERY VERY primitive sort first.
-    ARRAY<int> permutation(particles.array_collection->Size());for(int i=1;i<=permutation.m;i++) permutation(i)=i;
+    ARRAY<int> permutation(particles.array_collection->Size());for(int i=0;i<permutation.m;i++) permutation(i)=i;
     Sort(permutation,Indirect_Comparison(edge_triangle_perturbations,Field_Comparison(&TRIPLE<int,int,T>::z))); // sort permutation by edge_triangle_perturbation.z
 
     // loop through edge_triangle_perturbation
@@ -427,7 +427,7 @@ Create_New_Rigid_Bodies_From_Fracture(ARRAY<int>& map_to_old_particles)
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solids_parameters.solid_body_collection.rigid_body_collection;
     particle_to_rigid_body_id.Resize(deformable_body_collection.particles.array_collection->Size());
     deformable_to_rigid_particles.Resize(deformable_body_collection.particles.array_collection->Size());
-    for(int i=1;i<=rigid_bodies_with_impulse.m;i++){
+    for(int i=0;i<rigid_bodies_with_impulse.m;i++){
         RIGID_BODY_FRACTURE_OBJECT_3D<T>& rigid_body=dynamic_cast<RIGID_BODY_FRACTURE_OBJECT_3D<T>&>(rigid_body_collection.Rigid_Body(rigid_bodies_with_impulse(i)));
 
         PHYSBAM_FATAL_ERROR("fix saved states, saved states are now driven through the fluid collision geometry");
@@ -440,9 +440,9 @@ Create_New_Rigid_Bodies_From_Fracture(ARRAY<int>& map_to_old_particles)
                 particle_to_rigid_body_id,deformable_to_rigid_particles,rigid_body_collection);
             new_rigid_body->Initialize_Rigid_Body_From_Fragment(density,uniform_levelset_cell_size,triangle_subdivision_loops,true,levels_of_octree); // may need to remove extra stuff
             if(rigid_body.grain_boundaries.m>0){
-                for(int grain_boundary=1;grain_boundary<=rigid_body.grain_boundaries.m;grain_boundary++){
+                for(int grain_boundary=0;grain_boundary<rigid_body.grain_boundaries.m;grain_boundary++){
                     ARRAY<TV> world_space_seed_positions(rigid_body.grain_boundaries(grain_boundary)->seed_positions.m);
-                    for(int seed=1;seed<=world_space_seed_positions.m;seed++)world_space_seed_positions(seed)=rigid_body.Frame()*rigid_body.grain_boundaries(grain_boundary)->seed_positions(seed);
+                    for(int seed=0;seed<world_space_seed_positions.m;seed++)world_space_seed_positions(seed)=rigid_body.Frame()*rigid_body.grain_boundaries(grain_boundary)->seed_positions(seed);
                     new_rigid_body->Initialize_Grain_Boundaries(world_space_seed_positions,rigid_body.grain_boundaries(grain_boundary)->seed_weakness_multipliers,
                         rigid_body.grain_boundaries(grain_boundary)->fracture_callbacks,rigid_body.grain_boundaries(grain_boundary)->is_levelset_grain_boundary);}}
             rigid_body_collection.Add_Rigid_Body_And_Geometry(new_rigid_body);
@@ -478,7 +478,7 @@ Substitute_Soft_Bindings_For_Embedded_Nodes(T_EMBEDDED_MATERIAL_SURFACE& object,
 #if 0
     ARRAY<int> nodes;object.material_surface.mesh.elements.Flattened().Get_Unique(nodes);
     ARRAY<int> map_to_new_particles(IDENTITY_ARRAY<>(object.material_surface.particles.array_collection->Size()));
-    for(int i=1;i<=nodes.m;i++) if(binding_list.Binding_Index_From_Particle_Index(nodes(i))){
+    for(int i=0;i<nodes.m;i++) if(binding_list.Binding_Index_From_Particle_Index(nodes(i))){
         int embedded_node=nodes(i),bound_node;
         if(persistent_soft_bindings && persistent_soft_bindings->Get(embedded_node,bound_node))
             persistent_soft_bindings->Delete(embedded_node);
@@ -487,7 +487,7 @@ Substitute_Soft_Bindings_For_Embedded_Nodes(T_EMBEDDED_MATERIAL_SURFACE& object,
             object.material_surface.particles.array_collection->Copy_Element(*object.material_surface.particles.array_collection,embedded_node,bound_node);}
         map_to_new_particles(embedded_node)=bound_node;
         soft_bindings.Add_Binding(VECTOR<int,2>(bound_node,embedded_node),true);}
-    for(int i=1;i<=object.material_surface.mesh.elements.m;i++) object.material_surface.mesh.elements(i)=VECTOR<int,3>::Map(map_to_new_particles,object.material_surface.mesh.elements(i));
+    for(int i=0;i<object.material_surface.mesh.elements.m;i++) object.material_surface.mesh.elements(i)=VECTOR<int,3>::Map(map_to_new_particles,object.material_surface.mesh.elements(i));
 #endif
 }
 //#####################################################################
@@ -513,7 +513,7 @@ Process_Rigid_Fracture(const T dt,const T time,SOLIDS_EVOLUTION<TV>* rigid_defor
         PHYSBAM_DEBUG_WRITE_SUBSTEP("Before restore state",1,0);
         PHYSBAM_FATAL_ERROR("fix saved states, saved states are now driven through the fluid collision geometry");
         PHYSBAM_DEBUG_WRITE_SUBSTEP("Before allign bodies",1,0);
-        for(int i=1;i<=rigid_bodies_with_impulse.m;i++) dynamic_cast<RIGID_BODY_FRACTURE_OBJECT_3D<T>&>(rigid_body_collection.Rigid_Body(rigid_bodies_with_impulse(i))).Align_Deformable_Object_With_Rigid_Body();
+        for(int i=0;i<rigid_bodies_with_impulse.m;i++) dynamic_cast<RIGID_BODY_FRACTURE_OBJECT_3D<T>&>(rigid_body_collection.Rigid_Body(rigid_bodies_with_impulse(i))).Align_Deformable_Object_With_Rigid_Body();
         PHYSBAM_DEBUG_WRITE_SUBSTEP("After allign bodies",1,0);
 
 
@@ -537,7 +537,7 @@ Run_Quasistatics_And_Fracture(const T time,const int max_number_of_fracture_iter
 #if 0
     // run quasistatics
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solids_parameters.solid_body_collection.rigid_body_collection;
-    for(int i=1;i<=rigid_bodies_with_impulse.m;i++){
+    for(int i=0;i<rigid_bodies_with_impulse.m;i++){
         RIGID_BODY_FRACTURE_OBJECT_3D<T>& rigid_body_fracture_object=dynamic_cast<RIGID_BODY_FRACTURE_OBJECT_3D<T>&>(rigid_body_collection.Rigid_Body(rigid_bodies_with_impulse(i)));
         COLLISION_GEOMETRY_IMPULSE_ACCUMULATOR<TV>* collision_body_impulse_accumulator=
             rigid_body_collection.collision_body_list->Get_Collision_Geometry(rigid_body_fracture_object.particle_index)->impulse_accumulator;
@@ -547,7 +547,7 @@ Run_Quasistatics_And_Fracture(const T time,const int max_number_of_fracture_iter
         assert(impulse_accumulator.accumulated_node_impulses->m==mesh.number_nodes && tetrahedralized_volume.particles.array_collection->Size()==mesh.number_nodes);
         ARRAY<int> distance_from_impulse(mesh.number_nodes);
         QUEUE<int> queue(mesh.number_nodes);
-        for(int i=1;i<=mesh.number_nodes;i++)if((*impulse_accumulator.accumulated_node_impulses)(i).Magnitude_Squared()>0){
+        for(int i=0;i<mesh.number_nodes;i++)if((*impulse_accumulator.accumulated_node_impulses)(i).Magnitude_Squared()>0){
             distance_from_impulse(i)=1;queue.Enqueue(i);}
         while(!queue.Empty()){
             int node=queue.Dequeue();
@@ -564,7 +564,7 @@ Run_Quasistatics_And_Fracture(const T time,const int max_number_of_fracture_iter
         else{max_node1=3;
             if(distance_from_impulse(1)>distance_from_impulse(2)){max_node2=1;max_node3=2;}else{max_node2=2;max_node3=1;}}
 
-        for(int i=1;i<=mesh.number_nodes;i++){
+        for(int i=0;i<mesh.number_nodes;i++){
             if(distance_from_impulse(i)>distance_from_impulse(max_node3)){
                 if(distance_from_impulse(i)>distance_from_impulse(max_node2)){
                     if(distance_from_impulse(i)>distance_from_impulse(max_node1)){max_node3=max_node2;max_node2=max_node1;max_node1=i;}

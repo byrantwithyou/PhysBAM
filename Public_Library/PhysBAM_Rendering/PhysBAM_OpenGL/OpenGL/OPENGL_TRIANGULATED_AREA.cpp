@@ -282,7 +282,7 @@ Draw_Triangles(const bool use_color_map) const
 {
     ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
     ARRAY<typename OPENGL_POLICY<T>::T_GL> inverted_vertices;
-    for(int i=1;i<=triangulated_area.mesh.elements.m;i++){
+    for(int i=0;i<triangulated_area.mesh.elements.m;i++){
         if(color_map && use_color_map) (*color_map)(i).Send_To_GL_Pipeline();
         int node1,node2,node3;triangulated_area.mesh.elements(i).Get(node1,node2,node3);
         OpenGL_Triangle(triangulated_area.particles.X(node1),triangulated_area.particles.X(node2),triangulated_area.particles.X(node3),vertices);
@@ -300,7 +300,7 @@ Draw_Triangles_For_Selection() const
 {
 #ifndef USE_OPENGLES
     glPushName(0);
-    for(int i=1;i<=triangulated_area.mesh.elements.m;i++){
+    for(int i=0;i<triangulated_area.mesh.elements.m;i++){
         int node1,node2,node3;triangulated_area.mesh.elements(i).Get(node1,node2,node3);
         glLoadName(i);
         ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;

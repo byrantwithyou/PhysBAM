@@ -82,7 +82,7 @@ public:
     {pairs.Remove_All();for(HASHTABLE_ITERATOR<ID,ID> iterator(parents);iterator.Valid();iterator.Next()) pairs.Append(PAIR<ID,ID>(iterator.Key(),iterator.Data()));}
 
     void Merge_Forest_Edges(const ARRAY<PAIR<ID,ID> >& pairs)
-    {for(int i=1;i<=pairs.m;i++) Union(pairs(i).x,pairs(i).y);}
+    {for(int i=0;i<pairs.m;i++) Union(pairs(i).x,pairs(i).y);}
 
 private:
     ID Find_Without_Path_Compression(const ID i) const

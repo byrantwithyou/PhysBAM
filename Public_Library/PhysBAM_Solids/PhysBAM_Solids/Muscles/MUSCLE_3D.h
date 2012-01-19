@@ -65,12 +65,12 @@ public:
 
     void Initialize_Fibers_Tendons_And_Motor_Units(ARRAY<TV>& fibers,ARRAY<bool>& tendon,ARRAY<int>& motor_units_input)
     {fiber_field=fibers.m;
-    material_numbers.Resize(fibers.m);for(int t=1;t<=tendon.m;t++) if(tendon(t)) material_numbers(t)=1;else material_numbers(t)=0;
+    material_numbers.Resize(fibers.m);for(int t=0;t<tendon.m;t++) if(tendon(t)) material_numbers(t)=1;else material_numbers(t)=0;
     if(motor_units_input.m) motor_units=motor_units_input;
     else{motor_units.Resize(fibers.m);motor_units.Fill(1);}}
 
     void Correct_Fiber_Field_For_QR(STRAIN_MEASURE<TV,3>& strain_measure)
-    {for(int t=1;t<=fiber_field.m;t++)fiber_field(t)=strain_measure.F(t).Transposed()*fiber_field(t);}
+    {for(int t=0;t<fiber_field.m;t++)fiber_field(t)=strain_measure.F(t).Transposed()*fiber_field(t);}
 
     T Fiber_Tension(const int tetrahedron,const T stretch) const
     {T pass_c1=inp_pass_c1,pass_c2=inp_pass_c2,pass_c3=muscle_pass_c3,pass_c4=muscle_pass_c4,pass_starlam=inp_pass_starlam,activation=inp_activation(motor_units(tetrahedron));

@@ -97,7 +97,7 @@ Make_Snake_Chain(VECTOR_3D<T> start_point,VECTOR_3D<T> direction,VECTOR_3D<T> sh
     int number_of_links=8;
 
     //1
-    for(int i=1;i<=number_of_links;i++){
+    for(int i=0;i<number_of_links;i++){
         id=solids_parameters.rigid_body_parameters.list.template Add_Rigid_Body<RW>(data_directory+"/Rigid_Bodies/"+"Rings_Test/cylinder_revolve",scale_factor);
         rigid_body=arb->rigid_bodies_list.rigid_bodies(id);
         rigid_body->frame.t=current_position+direction*((T).5*link_length);
@@ -112,7 +112,7 @@ Make_Snake_Chain(VECTOR_3D<T> start_point,VECTOR_3D<T> direction,VECTOR_3D<T> sh
 
     ANGLE_JOINT<TV>* joint;
     if(!this->restart){
-        for(int i=1;i<=number_of_links;i++) {
+        for(int i=0;i<number_of_links;i++) {
             if(i==1) {bend_function_joint=new BEND_FUNCTION_JOINT<TV>();joint=bend_function_joint;}
             else joint=new ANGLE_JOINT<TV>();
             arb->joint_mesh.Add_Joint(joint);

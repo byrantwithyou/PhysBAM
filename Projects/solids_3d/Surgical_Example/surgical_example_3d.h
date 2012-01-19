@@ -235,29 +235,29 @@ public:
 
         ARRAY<ARRAY<int> > embedding_map;
         FILE_UTILITIES::Read_From_File<RW>("../../Personal_Libraries/Joey_Library/data/Output_Dup/embedding_map",embedding_map);
-        for(int p=1;p<=embedding_map.m;p++){
+        for(int p=0;p<embedding_map.m;p++){
             ARRAY<int>& parents=embedding_map(p);
             if(parents.m==2){
                 VECTOR<T,2> weights=SEGMENT_3D<T>::Barycentric_Coordinates(particles.X(p),particles.X(parents(1)),particles.X(parents(2)));
                 if(weights.Min()<0) LOG::cout<<"Negative barycentric coordinates on particle "<<p<<" : "<<weights<<", parents : "<<parents<<std::endl;
-                for(int i=1;i<=weights.m;i++) weights(i)=max((T)0,min(weights(i),(T)1));
+                for(int i=0;i<weights.m;i++) weights(i)=max((T)0,min(weights(i),(T)1));
                 solid_body_collection.deformable_body_collection.binding_list.Add_Binding(new LINEAR_BINDING<T,TV,2>(particles,p,VECTOR<int,2>(parents(1),parents(2)),weights));}
             if(parents.m==3){
                 VECTOR<T,3> weights=TRIANGLE_3D<T>::Barycentric_Coordinates(particles.X(p),particles.X(parents(1)),particles.X(parents(2)),particles.X(parents(3)));
                 if(weights.Min()<0) LOG::cout<<"Negative barycentric coordinates on particle "<<p<<" : "<<weights<<", parents : "<<parents<<std::endl;
-                for(int i=1;i<=weights.m;i++) weights(i)=max((T)0,min(weights(i),(T)1));
+                for(int i=0;i<weights.m;i++) weights(i)=max((T)0,min(weights(i),(T)1));
                 solid_body_collection.deformable_body_collection.binding_list.Add_Binding(new LINEAR_BINDING<T,TV,3>(particles,p,VECTOR<int,3>(parents(1),parents(2),parents(3)),weights));}
             if(parents.m==4){
                 VECTOR<T,3> weights=TETRAHEDRON<T>::Barycentric_Coordinates(particles.X(p),particles.X(parents(1)),particles.X(parents(2)),particles.X(parents(3)),particles.X(parents(4)));
                 if(weights.Min()<0) LOG::cout<<"Negative barycentric coordinates on particle "<<p<<" : "<<weights<<", parents : "<<parents<<std::endl;
-                for(int i=1;i<=weights.m;i++) weights(i)=max((T)0,min(weights(i),(T)1));
+                for(int i=0;i<weights.m;i++) weights(i)=max((T)0,min(weights(i),(T)1));
                 solid_body_collection.deformable_body_collection.binding_list.Add_Binding(new LINEAR_BINDING<T,TV,4>(particles,p,VECTOR<int,4>(parents(1),parents(2),parents(3),parents(4)),weights));}}
         ////tests.Substitute_Soft_Bindings_For_Embedded_Nodes(boundary_surface,solid_body_collection.deformable_body_collection.soft_bindings);
         //tests.Add_Ground();
         //tests.Add_Rigid_Body("sphere",2,0.3);
 
         //// correct number nodes
-        ////for(int i=1;i<=deformable_object.structures.m;i++) deformable_object.structures(i)->Update_Number_Nodes();
+        ////for(int i=0;i<deformable_object.structures.m;i++) deformable_object.structures(i)->Update_Number_Nodes();
 
         // setup binding springs
         ////ARRAY<bool>::copy(false,solid_body_collection.deformable_body_collection.soft_bindings.use_impulses_for_collisions);
@@ -269,7 +269,7 @@ public:
         solids_parameters.collision_body_list.Add_Bodies(solids_parameters.rigid_body_parameters.list);
 
         // correct number nodes
-        for(int i=1;i<=deformable_object.structures.m;i++) deformable_object.structures(i)->Update_Number_Nodes();
+        for(int i=0;i<deformable_object.structures.m;i++) deformable_object.structures(i)->Update_Number_Nodes();
 
         // correct mass
         solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents(particles.mass.array);
@@ -307,12 +307,12 @@ public:
         if(frame>frame_delay_before_initializing_from_history && run_from_history_file && waiting_to_initialize)
             Initialize_From_History_After_Delay();
         else if(run_from_history_file){
-            for(int h=1;h<=hook_start_and_end_frame.m;h++){
+            for(int h=0;h<hook_start_and_end_frame.m;h++){
                 if(frame==hook_start_and_end_frame(1,h))
                     Reactivate_Hook(h);
                 else if(frame==hook_start_and_end_frame(2,h))
                     Delete_Hook(h);}
-            for(int s=1;s<=suture_start_and_end_frame.m;s++){
+            for(int s=0;s<suture_start_and_end_frame.m;s++){
                 if(frame==suture_start_and_end_frame(1,s))
                     Reactivate_Suture(s);
                 else if(frame==suture_start_and_end_frame(2,s))
@@ -324,13 +324,13 @@ public:
     void Initialize_From_History_After_Delay()
     {
         //add hooks
-        for(int h=1;h<=hook_material_positions.m;h++){
+        for(int h=0;h<hook_material_positions.m;h++){
             Add_Hook(hook_material_positions(h));
             Delete_Hook(h);//just setting the stiffness to zero until active
         }
 
         //add sutures
-        for(int s=1;s<=suture_material_positions.m;s++){
+        for(int s=0;s<suture_material_positions.m;s++){
             Add_Suture(suture_material_positions(1,s),suture_material_positions(2,s));
             Delete_Suture(s);//just setting the stiffness to zero until active
         }

@@ -23,20 +23,20 @@ Precompute_Light_Data(bool use_fast_precomputation,RENDER_WORLD<T>& world)
     RENDERING_RAY<T> parent_ray;
     ARRAY<VECTOR<T,3> > location_list;
     Get_Node_Locations(location_list);
-    ARRAY<int> node_indirection(location_list.m,false);for(int i=1;i<=location_list.m;i++)node_indirection(i)=i;
+    ARRAY<int> node_indirection(location_list.m,false);for(int i=0;i<location_list.m;i++)node_indirection(i)=i;
     ARRAY<T> distance_squared_to_light;if(use_fast_precomputation) distance_squared_to_light.Resize(location_list.m,false,false);
     const ARRAY<RENDERING_LIGHT<T> *>& lights=world.Lights();
     LOG::cout<<"have "<<lights.m<<" lights and "<<location_list.m<<" locations"<<std::endl;
-    for(int light_index=1;light_index<=lights.m;light_index++){
+    for(int light_index=0;light_index<lights.m;light_index++){
         PROGRESS_INDICATOR progress(location_list.m);LOG::cout<<"Light "<<light_index<<": ";
         ARRAY<RAY<VECTOR<T,3> > > sample_array;
         lights(light_index)->Sample_Points(location_list(1),VECTOR<T,3>(1,0,0),sample_array);
-        VECTOR<T,3> average_sample_point;for(int sample=1;sample<=sample_array.m;sample++)average_sample_point+=sample_array(sample).Point(sample_array(sample).t_max);
+        VECTOR<T,3> average_sample_point;for(int sample=0;sample<sample_array.m;sample++)average_sample_point+=sample_array(sample).Point(sample_array(sample).t_max);
         average_sample_point/=(T)sample_array.m;
         if(use_fast_precomputation){
-            for(int i=1;i<=location_list.m;i++)distance_squared_to_light(i)=(average_sample_point-location_list(i)).Magnitude_Squared();
+            for(int i=0;i<location_list.m;i++)distance_squared_to_light(i)=(average_sample_point-location_list(i)).Magnitude_Squared();
             Sort(node_indirection,Indirect_Comparison(distance_squared_to_light));}
-        for(int i=1;i<=location_list.m;i++){
+        for(int i=0;i<location_list.m;i++){
             SEGMENT_3D<T> s(location_list(node_indirection(i)),average_sample_point);
             RAY<VECTOR<T,3> > rr(s);
             RENDERING_RAY<T> ray_to_light(rr,1,this);
@@ -49,7 +49,7 @@ Precompute_Light_Data(bool use_fast_precomputation,RENDER_WORLD<T>& world)
     Postprocess_Light_Field();
 
     // Make sure subsequent shading uses precomputation
-    if(!use_fast_precomputation)for(int light=1;light<=lights.m;light++)for(int i=1;i<=location_list.m;i++)Set_Precomputed_Light_Valid(i,light,true);
+    if(!use_fast_precomputation)for(int light=0;light<lights.m;light++)for(int i=0;i<location_list.m;i++)Set_Precomputed_Light_Valid(i,light,true);
 }
 //#####################################################################
 template class RENDERING_VOXELS<float>;

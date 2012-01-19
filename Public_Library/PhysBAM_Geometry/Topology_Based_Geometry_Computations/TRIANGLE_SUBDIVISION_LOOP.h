@@ -26,7 +26,7 @@ void Apply_Loop_Subdivision(TRIANGLE_SUBDIVISION& ts,ARRAY_VIEW<const TV> base_v
     if(!ts.triangle_mesh.boundary_mesh->neighbor_nodes) ts.triangle_mesh.boundary_mesh->Initialize_Neighbor_Nodes();
     ARRAY<ARRAY<int> > &neighbors=*ts.triangle_mesh.topologically_sorted_neighbor_nodes,&boundary_neighbors=*ts.triangle_mesh.boundary_mesh->neighbor_nodes;
     // node values
-    for(int i=1;i<=ts.triangle_mesh.number_nodes;i++)if(neighbors(i).m){
+    for(int i=0;i<ts.triangle_mesh.number_nodes;i++)if(neighbors(i).m){
         if(ts.Node_Is_A_Corner(i) || boundary_neighbors(i).m>2 || boundary_neighbors(i).m==1)subdivided_values(i)=base_values(i);
         else if(boundary_neighbors(i).m==2) // if this is a regular boundary node
             subdivided_values(i)=(T).75*base_values(i)+(T).125*(base_values(boundary_neighbors(i)(1))+base_values(boundary_neighbors(i)(2)));

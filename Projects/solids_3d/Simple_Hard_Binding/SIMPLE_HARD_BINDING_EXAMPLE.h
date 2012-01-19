@@ -118,12 +118,12 @@ void Initialize_Redgreen()
     redgreen=new RED_GREEN_TRIANGLES<TV>(*surface);
     redgreen->object.Update_Number_Nodes();
     redgreen->Initialize();
-    for(int i=1;i<=refinement_level;i++) redgreen->Refine_Simplex_List(ARRAY<int>(IDENTITY_ARRAY<>(surface->mesh.elements.m)));
+    for(int i=0;i<refinement_level;i++) redgreen->Refine_Simplex_List(ARRAY<int>(IDENTITY_ARRAY<>(surface->mesh.elements.m)));
     redgreen->Initialize_Segment_Index_From_Midpoint_Index();
     triangle_free_particles.Resize(surface->mesh.elements.m,true);
 
     ARRAY<int> surface_particles;surface->mesh.elements.Flattened().Get_Unique(surface_particles);
-    for(int i=1;i<=surface_particles.m;i++){int p=surface_particles(i);
+    for(int i=0;i<surface_particles.m;i++){int p=surface_particles(i);
         ARRAY<int> parents_list;ARRAY<T> weights_list;
         redgreen->Unrefined_Parents(p,parents_list,weights_list);
         if(parents_list.m<1||parents_list.m>3) PHYSBAM_FATAL_ERROR();
@@ -193,7 +193,7 @@ void Get_Initial_Data()
     soft_bindings.use_gauss_seidel_for_impulse_based_collisions=true;
 
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Clear_Hard_Bound_Particles(particles.mass);
@@ -249,7 +249,7 @@ void Add_Subsamples(const int triangle,ARRAY<BINDING<TV>*>& new_binding_list,ARR
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     PARTICLES<TV>& particles=deformable_body_collection.particles;
 
-    for(int i=1;i<=subsamples;i++){
+    for(int i=0;i<subsamples;i++){
         VECTOR<T,3> weights;do{weights=random_numbers.Get_Uniform_Vector(TV(),TV(1,1,1));}while(weights.x+weights.y>=1);weights.z=(T)1-weights.x-weights.y;
         // add hard binding
         int hard_bound_particle=particles.array_collection->Add_Element_From_Deletion_List();
@@ -325,19 +325,19 @@ void Preprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE
 
     // clamp binding list and redgreen bindings
     binding_list.Clamp_Particles_To_Embedded_Positions();
-    for(int b=1;b<=redgreen_bindings.m;b++) redgreen_bindings(b)->Clamp_To_Embedded_Position();
+    for(int b=0;b<redgreen_bindings.m;b++) redgreen_bindings(b)->Clamp_To_Embedded_Position();
 
     // the minimum distance of each particle to a collision object
     ARRAY<ARRAY<T>,COLLISION_GEOMETRY_ID> particle_distances(collision_body_list.Size());
     for(COLLISION_GEOMETRY_ID i(1);i<=particle_distances.Size();i++){
         particle_distances(i).Resize(particles.array_collection->Size());
         INDIRECT_ARRAY<ARRAY<T>,ARRAY<int>&> subset=particle_distances(i).Subset(surface_particles);subset.Fill((T)FLT_MAX);}
-    for(int i=1;i<=surface_particles.m;i++){int p=surface_particles(i);
+    for(int i=0;i<surface_particles.m;i++){int p=surface_particles(i);
         for(COLLISION_GEOMETRY_ID body(1);body<=collision_body_list.Size();body++)
             particle_distances(body)(p)=PhysBAM::min(particle_distances(body)(p),collision_body_list(body).Implicit_Geometry_Extended_Value(particles.X(p)));}
 
     // iterate over surface elements
-    for(int t=1;t<=surface_elements.m;t++){
+    for(int t=0;t<surface_elements.m;t++){
         T triangle_distance1=particle_distances(COLLISION_GEOMETRY_ID(1)).Subset(surface_elements(t)).Min();
         T triangle_distance2=particle_distances(COLLISION_GEOMETRY_ID(2)).Subset(surface_elements(t)).Min();
         if(triangle_distance1<refinement_distance(1)||triangle_distance2<refinement_distance(2)) // triangle should be subsampled
@@ -347,18 +347,18 @@ void Preprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE
 
     // rebuild free particles
     free_particles.nodes.Clean_Memory();
-    for(int t=1;t<=triangle_free_particles.m;t++) free_particles.nodes.Append_Elements(triangle_free_particles(t));
+    for(int t=0;t<triangle_free_particles.m;t++) free_particles.nodes.Append_Elements(triangle_free_particles(t));
 
     // rebuild hard bindings
     binding_list.Clean_Memory();
-    for(int b=1;b<=new_binding_list.m;b++) binding_list.Add_Binding(new_binding_list(b));
+    for(int b=0;b<new_binding_list.m;b++) binding_list.Add_Binding(new_binding_list(b));
 
     // rebuild soft bindings
     soft_bindings.Clean_Memory();
-    for(int b=1;b<=new_soft_bindings.m;b++) soft_bindings.Add_Binding(new_soft_bindings(b),true);
+    for(int b=0;b<new_soft_bindings.m;b++) soft_bindings.Add_Binding(new_soft_bindings(b),true);
 
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
     
     // correct mass
     binding_list.Clear_Hard_Bound_Particles(particles.mass);

@@ -136,7 +136,7 @@ Reinitialize(bool force)
         opengl_component_rigid_body_collection.rigid_body_collection.rigid_body_particle.Resize(0);
         opengl_component_rigid_body_collection.rigid_body_collection.rigid_geometry_collection.always_create_structure=true;
         RIGID_BODY<TV> *rigid_body;
-        for(int i=1;i<=body_motion.names.m;i++){
+        for(int i=0;i<body_motion.names.m;i++){
             new RIGID_BODY<TV>(rigid_body_collection,true);
             //Assume length is invariant and ui is a scale which must be 1 on input
             int id;

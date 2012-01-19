@@ -32,7 +32,7 @@ template<class TV> void GENERALIZED_FLUID_MASS<TV>::
 Compute()
 {
     one_over_fluid_mass_at_faces.Resize(index_map.Number_Faces());
-    for(int i=1;i<=index_map.indexed_faces.m;i++)
+    for(int i=0;i<index_map.indexed_faces.m;i++)
         one_over_fluid_mass_at_faces(i)=beta(index_map.indexed_faces(i));
     for(int i=1;i<=index_map.indexed_constraints.m;++i)
         one_over_fluid_mass_at_faces(index_map.indexed_faces.m+i)=constrained_beta(i);
@@ -44,7 +44,7 @@ Compute()
 template<class TV> void GENERALIZED_FLUID_MASS<TV>::
 Second_Order_Mass_Correction(const ARRAY<T,TV_INT>& phi)
 {
-    for(int i=1;i<=index_map.indexed_faces.m;i++){
+    for(int i=0;i<index_map.indexed_faces.m;i++){
         FACE_INDEX<d> face=index_map.indexed_faces(i);
         T phi1=phi(face.First_Cell_Index()),phi2=phi(face.Second_Cell_Index());
         if((phi1>0)==(phi2>0)) continue;
@@ -60,7 +60,7 @@ template<class TV> void GENERALIZED_FLUID_MASS<TV>::
 Compute_For_Two_Phase_Pressure_Jump(const ARRAY<T,TV_INT>& phi,const ARRAY<T,TV_INT>& density)
 {
     one_over_fluid_mass_at_faces.Resize(index_map.Number_Faces());
-    for(int i=1;i<=index_map.indexed_faces.m;i++){
+    for(int i=0;i<index_map.indexed_faces.m;i++){
         FACE_INDEX<d> face=index_map.indexed_faces(i);
         T density1=density(face.First_Cell_Index()),density2=density(face.Second_Cell_Index());
         T phi1=phi(face.First_Cell_Index()),phi2=phi(face.Second_Cell_Index());
@@ -77,7 +77,7 @@ template<class TV> void GENERALIZED_FLUID_MASS<TV>::
 Inverse_Times(const VECTOR_ND<T>& faces_in,VECTOR_ND<T>& faces_out) const
 {
     assert(faces_in.n==faces_out.n && faces_in.n==one_over_fluid_mass_at_faces.n);
-    for(int i=1;i<=faces_out.n;i++) faces_out(i)=one_over_fluid_mass_at_faces(i)*faces_in(i);
+    for(int i=0;i<faces_out.n;i++) faces_out(i)=one_over_fluid_mass_at_faces(i)*faces_in(i);
 }
 //#####################################################################
 // Function Inverse_Times_Add
@@ -86,7 +86,7 @@ template<class TV> void GENERALIZED_FLUID_MASS<TV>::
 Inverse_Times_Add(const VECTOR_ND<T>& faces_in,VECTOR_ND<T>& faces_out) const
 {
     assert(faces_in.n==faces_out.n && faces_in.n==one_over_fluid_mass_at_faces.n);
-    for(int i=1;i<=faces_out.n;i++) faces_out(i)+=one_over_fluid_mass_at_faces(i)*faces_in(i);
+    for(int i=0;i<faces_out.n;i++) faces_out(i)+=one_over_fluid_mass_at_faces(i)*faces_in(i);
 }
 //#####################################################################
 // Function Print_Each_Matrix
@@ -102,7 +102,7 @@ Print_Each_Matrix(int n) const
 template<class TV> void GENERALIZED_FLUID_MASS<TV>::
 Add_Raw_Matrix(ARRAY<TRIPLE<int,int,T> >& data) const
 {
-    for(int i=1;i<=one_over_fluid_mass_at_faces.n;i++)
+    for(int i=0;i<one_over_fluid_mass_at_faces.n;i++)
         data.Append(TRIPLE<int,int,T>(i,i,one_over_fluid_mass_at_faces(i)));
 }
 //#####################################################################

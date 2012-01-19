@@ -56,7 +56,7 @@ VOF_ADVECTION(PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset_input,T_FA
     cells_valid.Resize(grid.Domain_Indices(3));
     // find domain edges which can be traversed (i.e. parallel boundaries or outflow walls)
     bool valid_edges[GRID<TV>::dimension][2]; // TODO: Add outflow walls below
-    for(int axis=1;axis<=GRID<TV>::dimension;axis++)for(int axis_side=1;axis_side<=2;axis_side++) valid_edges[axis-1][axis_side-1]=mpi_grid?mpi_grid->Neighbor(axis,axis_side):false;
+    for(int axis=1;axis<=GRID<TV>::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++) valid_edges[axis-1][axis_side-1]=mpi_grid?mpi_grid->Neighbor(axis,axis_side):false;
     RANGE<TV_INT> domain=grid.Domain_Indices();TV_INT domain_max=domain.Maximum_Corner(),domain_min=domain.Minimum_Corner();
     for(CELL_ITERATOR iterator(grid,3);iterator.Valid();iterator.Next()){
         TV_INT cell=iterator.Cell_Index();
@@ -119,7 +119,7 @@ Negative_Material(const TV_INT& cell_index,const bool force_full_refinement)
     if(maximum_material_refinement_depth>0 && cell_phis.m==unrefined_point_count) return minimum_phi<=0?full_cell_size:0;
     // compute material
     T negative_material=0;
-    for(int i=1;i<=cell_refinement_simplices.m;i++) negative_material+=T_SIMPLEX::Negative_Material(cell_particle_X,cell_phis,cell_refinement_simplices(i));
+    for(int i=0;i<cell_refinement_simplices.m;i++) negative_material+=T_SIMPLEX::Negative_Material(cell_particle_X,cell_phis,cell_refinement_simplices(i));
     for(int i=1;i<=removed_negative_particle_volumes_in_cell(cell_index).m;i++) negative_material+=removed_negative_particle_volumes_in_cell(cell_index)(i).z;
     // TODO: negative material should be strictly nonnegative - ought to be able to remove the clamp from below, but ought to check this.  Also, precompute the particle contributions.
     //negative_material+=Get_Unmodified_Particle_Volume_In_Cell(particle_levelset.negative_particles,cell_index)+Get_Particle_Volume_In_Cell(particle_levelset.removed_negative_particles,cell_index);
@@ -175,7 +175,7 @@ Create_Preimage_Particles_From_Old_Postimage_Simplices(const TV_INT& cell_index,
     ARRAY<TV> simplex_centers;
     ARRAY<T_ELEMENT> simplices_in_cell,junk_simplices;
     ARRAY<int>& cell_postimage_simplices=postimage_simplices_in_cells(cell_index);
-    for(int i=1;i<=cell_postimage_simplices.m;i++){
+    for(int i=0;i<cell_postimage_simplices.m;i++){
         T_ELEMENT& simplex=old_object_mesh.elements(cell_postimage_simplices(i));
 
         simplex_particles.Remove_All();
@@ -192,7 +192,7 @@ Create_Preimage_Particles_From_Old_Postimage_Simplices(const TV_INT& cell_index,
                 T_ELEMENT simplex=simplices_in_cell(t);simplices_in_cell.Remove_Index_Lazy(t);
                 if(node==0) T_SIMPLEX::Cut_With_Hyperplane(simplex_particles,cutting_surface,simplex,junk_simplices,simplices_in_cell);
                 else T_SIMPLEX::Cut_With_Hyperplane(simplex_particles,cutting_surface,simplex,simplices_in_cell,junk_simplices);}}
-        for(int j=1;j<=simplices_in_cell.m;j++) simplex_centers.Append(simplex_particles.Subset(simplices_in_cell(j)).Average());}
+        for(int j=0;j<simplices_in_cell.m;j++) simplex_centers.Append(simplex_particles.Subset(simplices_in_cell(j)).Average());}
 
     if(!simplex_centers.m){
         if(!cell_to_postimage_particle_map(cell_index)) PHYSBAM_FATAL_ERROR();
@@ -200,7 +200,7 @@ Create_Preimage_Particles_From_Old_Postimage_Simplices(const TV_INT& cell_index,
 
     const T volume_per_particle=cell_volume_of_material/simplex_centers.m;
     ARRAY_PLUS_SCALAR<int,IDENTITY_ARRAY<> > added_particles=object.particles.array_collection->Add_Elements(simplex_centers.m);
-    for(int i=1;i<=simplex_centers.m;i++){
+    for(int i=0;i<simplex_centers.m;i++){
         object.particles.X(added_particles(i))=simplex_centers(i);
         preimage_particle_material_volumes.Append(volume_per_particle);
         material_particles.Append(true);
@@ -260,7 +260,7 @@ Create_Geometry()
             fixed_particle_list.Append(borders_fixed_material_cell(node_index));
             nodes_to_particles_map(node_index)=particle_index;}}
 
-    for(int level=1;level<=level_simplex_cells.m;level++) level_simplex_cells(level).Remove_All();
+    for(int level=0;level<level_simplex_cells.m;level++) level_simplex_cells(level).Remove_All();
 
     level_simplex_cells.Resize(1);
     // create initial red refinement
@@ -276,7 +276,7 @@ Create_Geometry()
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after initial meshing",0,0);
     preimage.Initialize();
     fixed_segment_list.Resize(preimage.segment_mesh.elements.m);
-    for(int i=1;i<=preimage.segment_mesh.elements.m;i++){
+    for(int i=0;i<preimage.segment_mesh.elements.m;i++){
         const VECTOR<int,2>& segment=preimage.segment_mesh.elements(i);
         fixed_segment_list(i)=fixed_particle_list(segment[1]) && fixed_particle_list(segment[2]);}
 
@@ -347,7 +347,7 @@ Create_Geometry()
             T cell_material_volume=(T)0;
             T geometric_volume_in_cell=(T)0;
             ARRAY<int>& simplices_in_cell=simplices_in_cells(cell_index);
-            for(int i=1;i<=simplices_in_cell.m;i++){
+            for(int i=0;i<simplices_in_cell.m;i++){
                 int simplex_index=simplices_in_cell(i);
                 leaf_simplex_geometric_volumes(simplex_index)=T_SIMPLEX::Signed_Size(object.particles.X.Subset(object.mesh.elements(simplex_index)));
                 geometric_volume_in_cell+=leaf_simplex_geometric_volumes(simplex_index);}
@@ -365,7 +365,7 @@ Create_Geometry()
             simplex_preimage_volume.Resize(number_of_simplices);lower_dimensional_preimage_volume.Resize(number_of_simplices);
             lower_dimensional_preimage.Resize(number_of_simplices);lower_dimensional_preimage.Fill(false);
             for(int i=material_particles.m+1;i<=object.particles.array_collection->Size();i++) material_particles.Append(false);
-            for(int i=1;i<=simplices_in_cell.m;i++){
+            for(int i=0;i<simplices_in_cell.m;i++){
                 const T_ELEMENT& simplex=object.mesh.elements(simplices_in_cell(i));
                 for(int j=1;j<=TV::dimension+1;j++) material_particles(simplex[j])=true;
                 simplex_preimage_volume(i)=T_SIMPLEX::Signed_Size(object.particles.X.Subset(simplex));
@@ -434,7 +434,7 @@ Cut_Simplicial_Object_With_Zero_Isocontour()
     Clean_Refinement_Target_Segments(preimage);
 
     material_particles.Resize(object.particles.array_collection->Size(),false);
-    for(int i=1;i<=phis.m;i++) material_particles(i)=(phis(i)<=0);
+    for(int i=0;i<phis.m;i++) material_particles(i)=(phis(i)<=0);
     phis.Resize(object.particles.array_collection->Size(),false);fixed_particle_list.Resize(object.particles.array_collection->Size(),false);
     for(int p=number_of_particles+1;p<=object.particles.array_collection->Size();p++){
         VECTOR<int,2> segment=preimage.segment_mesh.elements((*preimage.segment_index_from_midpoint_index)(p));
@@ -447,7 +447,7 @@ Cut_Simplicial_Object_With_Zero_Isocontour()
     // TODO: do we need level_simplex_cells ?
     ARRAY<int> simplices_to_remove;
     level_simplex_cells.Resize(preimage.meshes.m);
-    for(int level=1;level<=level_simplex_cells.m;level++){
+    for(int level=0;level<level_simplex_cells.m;level++){
         level_simplex_cells(level).Resize(preimage.meshes(level)->elements.m);
         for(int t=1;t<=level_simplex_cells(level).m;t++)
             if(preimage.Leaf(level,t)){
@@ -460,18 +460,18 @@ Cut_Simplicial_Object_With_Zero_Isocontour()
     preimage.Remove_Simplex_List(simplices_to_remove,&level_simplex_maps);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after removal before adjustment",0,0);
     // adjust the positions of the relevant midpoints to lie on the interface
-    for(int s=1;s<=cut_segments.m;s++){
+    for(int s=0;s<cut_segments.m;s++){
         int i,j;cut_segments(s).Get(i,j);
         int midpoint=preimage.segment_midpoints(preimage.segment_mesh.Segment(i,j));
         object.particles.X(midpoint)=Iterative_Find_Interface(object.particles.X(i),object.particles.X(j));}
 
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after removal after adjustment",0,0);
 
-    for(int level=1;level<=level_simplex_cells.m;level++){
+    for(int level=0;level<level_simplex_cells.m;level++){
         // for each level, apply the map to the level_simplex_cells
         ARRAY<TV_INT>& simplex_cells=level_simplex_cells(level);
         HASHTABLE<int,int>& simplex_map=level_simplex_maps(level);
-        for(int i=1;i<=simplex_cells.m;i++){
+        for(int i=0;i<simplex_cells.m;i++){
             TV_INT& cell_index=simplex_cells(i);
             int index=i;
             simplex_map.Get(i,index);
@@ -594,7 +594,7 @@ Rasterize_Material_Postimages()
     for(CELL_ITERATOR iterator(grid,3);iterator.Valid();iterator.Next()) postimage_simplices_in_cells(iterator.Cell_Index()).Remove_All();
 
     PHYSBAM_DEBUG_WRITE_SUBSTEP("rasterize",0,0);
-    for(int i=1;i<=object.mesh.elements.m;i++){
+    for(int i=0;i<object.mesh.elements.m;i++){
         // prepare to dice material simplices with grid
         T_ELEMENT simplex=object.mesh.elements(i);
         simplex_particles.Remove_All();
@@ -636,7 +636,7 @@ Rasterize_Material_Postimages()
             ARRAY<T_ELEMENT>& simplices=simplex_lists(cell);
             ARRAY<T>& cut_material_simplex_postimage_volumes_cell=cut_material_simplex_postimage_volumes(cell);
             cut_material_simplex_postimage_volumes_cell.Resize(simplices.m);
-            for(int t=1;t<=simplices.m;t++){
+            for(int t=0;t<simplices.m;t++){
                 if(!lower_dimensional_postimage) cut_material_simplex_postimage_volumes_cell(t)=Signed_Size(simplices(t),simplex_particles);
                 else cut_material_simplex_postimage_volumes_cell(t)=Half_Boundary_Measure(simplices(t),simplex_particles);
                 simplex_postimage_volume+=cut_material_simplex_postimage_volumes_cell(t);}}
@@ -646,7 +646,7 @@ Rasterize_Material_Postimages()
             TV_INT cell=iterator.Cell_Index();
             ARRAY<T_ELEMENT>& simplices=simplex_lists(cell);
             ARRAY<T>& cut_material_simplex_postimage_volumes_cell=cut_material_simplex_postimage_volumes(cell);
-            for(int t=1;t<=simplices.m;t++) cut_material_simplex_postimage_volumes_cell(t)=(T)1;
+            for(int t=0;t<simplices.m;t++) cut_material_simplex_postimage_volumes_cell(t)=(T)1;
             simplex_postimage_volume+=(T)simplices.m;}
         
         T volume_of_material_density=simplex_preimage_material_volume(i)/simplex_postimage_volume;
@@ -659,7 +659,7 @@ Rasterize_Material_Postimages()
                 postimage_simplices_in_cells(cell).Append(i);
                 ARRAY<T>& cut_material_simplex_postimage_volumes_cell=cut_material_simplex_postimage_volumes(cell);
                 RANGE<TV> cell_domain=grid.Cell_Domain(cell);
-                for(int t=1;t<=simplices.m;t++){
+                for(int t=0;t<simplices.m;t++){
                     // TODO: add something here to flip/zero sign of simplex volumes if they don't match parent sign (above)
                     volume_of_material(cell)+=cut_material_simplex_postimage_volumes_cell(t)*volume_of_material_density;
                     geometric_volume(cell)+=cut_material_simplex_postimage_volumes_cell(t);}}}}
@@ -791,12 +791,12 @@ Refine_Or_Coarsen_Geometry()
     ARRAY<bool> excessive_edge_length(segment_mesh.elements.m);
     int number_of_particles=object.particles.array_collection->Size();
     const T threshold_length_squared=sqr((T)3.1*grid.Minimum_Edge_Length());
-    for(int i=1;i<=preimage.meshes.m;i++) level_material_volume(i).Resize(preimage.meshes(i)->elements.m);
-    for(int i=1;i<=excessive_edge_length.m;i++){
+    for(int i=0;i<preimage.meshes.m;i++) level_material_volume(i).Resize(preimage.meshes(i)->elements.m);
+    for(int i=0;i<excessive_edge_length.m;i++){
         int j,k;segment_mesh.elements(i).Get(j,k);
         excessive_edge_length(i)=((object.particles.X(j)-object.particles.X(k)).Magnitude_Squared()>threshold_length_squared);}
 
-    for(int level=1;level<=preimage.meshes.m;level++)for(int t=1;t<=(*preimage.meshes(level)).elements.m;t++){
+    for(int level=0;level<preimage.meshes.m;level++)for(int t=1;t<=(*preimage.meshes(level)).elements.m;t++){
         int leaf_number=(*preimage.leaf_number(level))(t);
         assert(!level_material_volume(level)(t));
         if(leaf_number){
@@ -827,10 +827,10 @@ Refine_Or_Coarsen_Geometry()
 
     simplex_preimage_material_volume.Resize(object.mesh.elements.m);
     level_material_volume.Resize(preimage.meshes.m);
-    for(int level=1;level<=level_material_volume.m;level++) level_material_volume(level).Resize((*preimage.meshes(level)).elements.m);
+    for(int level=0;level<level_material_volume.m;level++) level_material_volume(level).Resize((*preimage.meshes(level)).elements.m);
     
     simplex_preimage_material_volume.Fill((T)0);
-    for(int level=1;level<=level_material_volume.m;level++) for(int i=1;i<=level_material_volume(level).m;i++) if(level_material_volume(level)(i)){
+    for(int level=0;level<level_material_volume.m;level++) for(int i=1;i<=level_material_volume(level).m;i++) if(level_material_volume(level)(i)){
         if(preimage.Leaf(level,i)) simplex_preimage_material_volume((*preimage.leaf_number(level))(i))=level_material_volume(level)(i);
         else{
             T child_volume[T_RED_GREEN_SIMPLICES::number_of_red_children];T parent_volume=0;
@@ -961,7 +961,7 @@ Write(const STREAM_TYPE stream_type,const std::string& output_directory,const st
 #if 0
     if(!debugging && simplex_preimage_material_volume.m==object.mesh.elements.m){
         ARRAY<OPENGL_COLOR > color_map(object.mesh.elements.m);
-        for(int i=1;i<=object.mesh.elements.m;i++){
+        for(int i=0;i<object.mesh.elements.m;i++){
             T size=abs(T_SIMPLEX::Signed_Size(object.particles.X.Subset(object.mesh.elements(i))));
             if(size){
                 T ratio=simplex_preimage_material_volume(i)/size;
@@ -992,7 +992,7 @@ Create_Initial_Meshing_For_Cell(GRID<TV>& grid,TRIANGULATED_AREA<T>& object,cons
     VECTOR<T,2> center;
     for(int i=0;i<4;i++) center+=object.particles.X(nodes_to_particles_map(nodes_in_cell[i]));
     center*=(T).25;object.particles.X(particle_index)=center;
-    for(int i=1;i<=4;i++) simplex_cells.Append(cell_index);
+    for(int i=0;i<4;i++) simplex_cells.Append(cell_index);
     fixed_particle_list.Append(false);
     object.mesh.elements.Append(VECTOR<int,3>(nodes_to_particles_map(nodes_in_cell[0]),nodes_to_particles_map(nodes_in_cell[1]),particle_index));
     object.mesh.elements.Append(VECTOR<int,3>(nodes_to_particles_map(nodes_in_cell[1]),nodes_to_particles_map(nodes_in_cell[3]),particle_index));
@@ -1006,7 +1006,7 @@ template<class TV> void VOF_ADVECTION<TV>::
 Create_Initial_Meshing_For_Cell(GRID<TV>& grid,TETRAHEDRALIZED_VOLUME<T>& object,const VECTOR<int,3>& cell_index,const ARRAY<int,VECTOR<int,3> >& nodes_to_particles_map,ARRAY<VECTOR<int,3> >& simplex_cells)
 {
     VECTOR<int,3> nodes_in_cell[8];grid.Nodes_In_Cell_From_Minimum_Corner_Node(cell_index,nodes_in_cell);
-    for(int i=1;i<=5;i++) simplex_cells.Append(cell_index);
+    for(int i=0;i<5;i++) simplex_cells.Append(cell_index);
     if(cell_index.Sum()%2){
         // corner tets
         object.mesh.elements.Append(VECTOR<int,4>(nodes_to_particles_map(nodes_in_cell[1]),nodes_to_particles_map(nodes_in_cell[5]),nodes_to_particles_map(nodes_in_cell[3]),nodes_to_particles_map(nodes_in_cell[0])));

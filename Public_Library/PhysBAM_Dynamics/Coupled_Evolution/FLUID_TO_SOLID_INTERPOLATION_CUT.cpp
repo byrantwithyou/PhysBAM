@@ -70,11 +70,11 @@ template<class T> struct FLUID_TO_SOLID_INTERPOLATION_CUT_DISPATCH<VECTOR<T,2> >
         for(typename  HASHTABLE<TV_INT,CUT_CELL>::ITERATOR it(cut_cells);it.Valid();it.Next()){
             int number_cut=0;
             const ARRAY<CLIP_ENTRY>& cut_segments=it.Data().clipped_segments;
-            for(int i=1;i<=cut_segments.m;i++){const CLIP_ENTRY& e=cut_segments(i);number_cut+=(e.a!=0)+(e.b!=1);}
+            for(int i=0;i<cut_segments.m;i++){const CLIP_ENTRY& e=cut_segments(i);number_cut+=(e.a!=0)+(e.b!=1);}
             if(number_cut>2){
                 EPS_FILE<T> eps("fail-config.eps");
                 eps.Draw_Object(index_map.grid.Cell_Domain(it.Key()));
-                for(int i=1;i<=cut_segments.m;i++){
+                for(int i=0;i<cut_segments.m;i++){
                     const CLIP_ENTRY& e=cut_segments(i);
                     SEGMENT_2D<T> segment(X(curve.mesh.elements(e.i).x),X(curve.mesh.elements(e.i).y));
                     TV e1=segment.Point_From_Barycentric_Coordinates(e.a);
@@ -102,14 +102,14 @@ template<class T> struct FLUID_TO_SOLID_INTERPOLATION_CUT_DISPATCH<VECTOR<T,2> >
         const ARRAY_VIEW<TV> X(curve.particles.X);
         ARRAY<T> edge_length(curve.mesh.elements.m);
         ARRAY<T> particle_length(X.m);
-        for(int i=1;i<=curve.mesh.elements.m;i++){
+        for(int i=0;i<curve.mesh.elements.m;i++){
             T length=(X(curve.mesh.elements(i).x)-X(curve.mesh.elements(i).y)).Magnitude();
             edge_length(i)=length;
             particle_length(curve.mesh.elements(i).x)+=length/2;
             particle_length(curve.mesh.elements(i).y)+=length/2;}
 
         if(!index_map.two_phase){
-            for(int i=1;i<=index_map.indexed_faces.m;i++){
+            for(int i=0;i<index_map.indexed_faces.m;i++){
                 FACE_INDEX<TV::m> face=index_map.indexed_faces(i);
                 if(!index_map.cell_indices(face.First_Cell_Index()) || !index_map.cell_indices(face.Second_Cell_Index())){
                     unused_faces.Set(i);}}
@@ -123,7 +123,7 @@ template<class T> struct FLUID_TO_SOLID_INTERPOLATION_CUT_DISPATCH<VECTOR<T,2> >
             CUT_CELL& cc=it.Data();
             cc.other_cell=index_map.two_phase?++last_cell:0;
             cc.face=++last_face;
-            for(int i=1;i<=cc.clipped_segments.m;i++){const CLIP_ENTRY& e=cc.clipped_segments(i);
+            for(int i=0;i<cc.clipped_segments.m;i++){const CLIP_ENTRY& e=cc.clipped_segments(i);
                 SEGMENT_2D<T> segment(X(curve.mesh.elements(e.i).x),X(curve.mesh.elements(e.i).y));
                 TV n=(segment.x2-segment.x1).Rotate_Clockwise_90()*(e.b-e.a);
                 for(int a=1;a<=TV::m;a++)
@@ -132,7 +132,7 @@ template<class T> struct FLUID_TO_SOLID_INTERPOLATION_CUT_DISPATCH<VECTOR<T,2> >
                         f.index(a)+=k;
                         this_.Cut_Face(f,n,segment);}}
             TV N=(cc.segment.x2-cc.segment.x1).Normalized().Rotate_Clockwise_90();
-            for(int i=1;i<=cc.clipped_segments.m;i++){const CLIP_ENTRY& e=cc.clipped_segments(i);
+            for(int i=0;i<cc.clipped_segments.m;i++){const CLIP_ENTRY& e=cc.clipped_segments(i);
                 T len=(e.b-e.a)*edge_length(e.i);
                 T alpha=(e.a+e.b)/2;
                 T weight_a=(1-alpha)*len/particle_length(curve.mesh.elements(e.i).x);
@@ -279,7 +279,7 @@ Remove_Degeneracy()
     ARRAY<LOOP_ENTRY<TV> > list;
     for(typename HASHTABLE<TV_INT,CUT_CELL>::ITERATOR it(cut_cells);it.Valid();it.Next()){
         const ARRAY<CLIP_ENTRY>& cut_segments=it.Data().clipped_segments;
-        for(int i=1;i<=cut_segments.m;i++){
+        for(int i=0;i<cut_segments.m;i++){
             const CLIP_ENTRY& e=cut_segments(i);
             LOOP_ENTRY<TV> le;
             le.cell=it.Key();
@@ -287,7 +287,7 @@ Remove_Degeneracy()
             list.Append(le);}}
     Sort(list);
     LOOP_ENTRY<TV> * pa = &list(list.m);
-    for(int i=1;i<=list.m;i++) pa=pa->next=&list(i);
+    for(int i=0;i<list.m;i++) pa=pa->next=&list(i);
     for(int i=1;i<=list.m;i++,pa=pa->next){
         if(pa->cell==pa->next->cell) continue;
         LOOP_ENTRY<TV> *x=pa;
@@ -378,7 +378,7 @@ Compute_Beta()
     T dx=index_map.grid.dX(1),full_volume=dx*dx,imi=Inverse(full_volume*density),imo=index_map.two_phase?Inverse(full_volume*outside_density):FLT_MAX;
     VECTOR_ND<T>& beta_inverse=(*fluid_mass)->one_over_fluid_mass_at_faces;
     T in_length=0,length=index_map.grid.Face_Size(1);
-    for(int i=1;i<=index_map.indexed_faces.m;i++){
+    for(int i=0;i<index_map.indexed_faces.m;i++){
         FACE_INDEX<TV::m> face=index_map.indexed_faces(i);
         TV_INT cell1=face.index,cell2=cell1;cell1(face.axis)--;
         T volume1,volume2,inside_volume;
@@ -457,7 +457,7 @@ Compute_Gradient()
 {
     gradient->gradient.Reset(index_map.Number_Cells());
     TV face_areas(index_map.grid.Face_Sizes());
-    for(int i=1;i<=index_map.indexed_faces.m;i++){
+    for(int i=0;i<index_map.indexed_faces.m;i++){
         if((*psi_N)(index_map.indexed_faces(i))){
             gradient->gradient.Finish_Row();
             //Add_Debug_Particle(index_map.grid.Axis_X_Face(index_map.indexed_faces(i)),VECTOR<T,3>(1,.5,0));
@@ -495,8 +495,8 @@ Compute_Gradient()
 template<class TV> void FLUID_TO_SOLID_INTERPOLATION_CUT<TV>::
 Times_Add(const VECTOR_ND<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& solid_velocity) const
 {
-    for(int i=1;i<=entries.m;i++){const ARRAY<ENTRY>& array=entries(i);
-        for(int j=1;j<=array.m;j++){const ENTRY& e=array(j);
+    for(int i=0;i<entries.m;i++){const ARRAY<ENTRY>& array=entries(i);
+        for(int j=0;j<array.m;j++){const ENTRY& e=array(j);
             solid_velocity.V.array(i)+=e.w*fluid_velocity(e.i);}}
 }
 //#####################################################################
@@ -505,8 +505,8 @@ Times_Add(const VECTOR_ND<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& solid_vel
 template<class TV> void FLUID_TO_SOLID_INTERPOLATION_CUT<TV>::
 Transpose_Times_Add(const GENERALIZED_VELOCITY<TV>& solid_force,VECTOR_ND<T>& fluid_force) const
 {
-    for(int i=1;i<=entries.m;i++){const ARRAY<ENTRY>& array=entries(i);
-        for(int j=1;j<=array.m;j++){const ENTRY& e=array(j);
+    for(int i=0;i<entries.m;i++){const ARRAY<ENTRY>& array=entries(i);
+        for(int j=0;j<array.m;j++){const ENTRY& e=array(j);
             fluid_force(e.i)+=TV::Dot_Product(e.w,solid_force.V.array(i));}}
 }
 //#####################################################################
@@ -520,10 +520,10 @@ Print_Each_Matrix(int n,int fluid_faces,GENERALIZED_VELOCITY<TV>& G) const
     ARRAY<int> reverse_map_deformable(G.V.array.Size());
     reverse_map_deformable.Subset(G.V.indices)=IDENTITY_ARRAY<>(G.V.Size());
 
-    for(int i=1;i<=entries.m;i++){const ARRAY<ENTRY>& array=entries(i);
+    for(int i=0;i<entries.m;i++){const ARRAY<ENTRY>& array=entries(i);
         for(int a=1;a<=TV::m;a++){
             HASHTABLE<int,T> face_weights;
-            for(int j=1;j<=array.m;j++){const ENTRY& e=array(j);
+            for(int j=0;j<array.m;j++){const ENTRY& e=array(j);
                 if(face_weights.Contains(e.i)) face_weights.Get(e.i)+=e.w(a);
                 else face_weights.Insert(e.i,e.w(a));}
             for(typename HASHTABLE<int,T>::CONST_ITERATOR it(face_weights);it.Valid();it.Next())
@@ -544,10 +544,10 @@ Add_Raw_Matrix(ARRAY<TRIPLE<int,int,T> >& data) const
     ARRAY<int> reverse_map_deformable(this->V_size);
     reverse_map_deformable.Subset(*this->V_indices)=IDENTITY_ARRAY<>(this->V_size);
 
-    for(int i=1;i<=entries.m;i++){const ARRAY<ENTRY>& array=entries(i);
+    for(int i=0;i<entries.m;i++){const ARRAY<ENTRY>& array=entries(i);
         for(int a=1;a<=TV::m;a++){
             HASHTABLE<int,T> face_weights;
-            for(int j=1;j<=array.m;j++){const ENTRY& e=array(j);
+            for(int j=0;j<array.m;j++){const ENTRY& e=array(j);
                 if(face_weights.Contains(e.i)) face_weights.Get(e.i)+=e.w(a);
                 else face_weights.Insert(e.i,e.w(a));}
             for(typename HASHTABLE<int,T>::CONST_ITERATOR it(face_weights);it.Valid();it.Next())

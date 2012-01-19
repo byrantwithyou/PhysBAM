@@ -68,7 +68,7 @@ void Initialize_Cloth(TRIANGLE_MESH*& triangle_mesh,PARTICLE_3D*& particles,TRIA
     particles->Update_Position_And_Velocity();particles->Store_Mass();
     for(k=1;k<=triangle_mesh->number_nodes;k++) particles->array_collection->Add_Element();
     if(!restart_step_number){    
-        for(int i=1;i<=m;i++) for(int j=1;j<=n;j++){
+        for(int i=0;i<m;i++) for(int j=0;j<n;j++){
             int node=i+m*(j-1);
             particles->X(node)=VECTOR_3D((i-1)*dx-.5*aspect_ratio*side_length,1.1,(j-1)*dy-.5*side_length);
             particles->V(node)=VECTOR_3D(0,0,0);}}
@@ -240,19 +240,19 @@ void Initialize_Scripted_Objects(ARRAY<RIGID_BODY<TV>*>& scripted_objects,ARRAY<
     // second table leg
     leg2_particles.Store_Position();
     leg2_particles.Set_Array_Buffer_Size(12);
-    for(int i=1;i<=12;i++) {leg2_particles.array_collection->Add_Element(); leg2_particles.X(i)=leg1_particles.X(i)+VECTOR_3D(-.65,0,0);}
+    for(int i=0;i<12;i++) {leg2_particles.array_collection->Add_Element(); leg2_particles.X(i)=leg1_particles.X(i)+VECTOR_3D(-.65,0,0);}
     scripted_objects(3)=new RIGID_TRIANGULATED_SOLID(leg2_surf);
     scripted_objects_friction(3)=0;
     // third table leg
     leg3_particles.Store_Position();
     leg3_particles.Set_Array_Buffer_Size(12);
-    for(int i=1;i<=12;i++) {leg3_particles.array_collection->Add_Element(); leg3_particles.X(i)=leg2_particles.X(i)+VECTOR_3D(0,0,-.65);}
+    for(int i=0;i<12;i++) {leg3_particles.array_collection->Add_Element(); leg3_particles.X(i)=leg2_particles.X(i)+VECTOR_3D(0,0,-.65);}
     scripted_objects(4)=new RIGID_TRIANGULATED_SOLID(leg3_surf);
     scripted_objects_friction(4)=0;
     // fourth table leg
     leg4_particles.Store_Position();
     leg4_particles.Set_Array_Buffer_Size(12);
-    for(int i=1;i<=12;i++) {leg4_particles.array_collection->Add_Element(); leg4_particles.X(i)=leg3_particles.X(i)+VECTOR_3D(.65,0,0);}
+    for(int i=0;i<12;i++) {leg4_particles.array_collection->Add_Element(); leg4_particles.X(i)=leg3_particles.X(i)+VECTOR_3D(.65,0,0);}
     scripted_objects(5)=new RIGID_TRIANGULATED_SOLID(leg4_surf);
     scripted_objects_friction(5)=0;
     // sphere

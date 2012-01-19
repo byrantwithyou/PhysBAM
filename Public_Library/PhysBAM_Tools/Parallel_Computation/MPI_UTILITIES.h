@@ -215,7 +215,7 @@ inline bool Wait_Any(ARRAY<MPI::Request>& requests,MPI::Status& status)
 // Function Free_Elements_And_Clean_Memory
 //#####################################################################
 template<class T> inline void Free_Elements_And_Clean_Memory(ARRAY<T>& array)
-{for(int i=1;i<=array.m;i++) if(array(i)!=T()) array(i).Free();array.Clean_Memory();}
+{for(int i=0;i<array.m;i++) if(array(i)!=T()) array(i).Free();array.Clean_Memory();}
 //#####################################################################
 // Function Free_Elements_And_Clean_Memory
 //#####################################################################

@@ -88,7 +88,7 @@ Valid_Frame(int frame_input)
             int last_frame;
             if((last_frame_file>>last_frame) && frame_input>last_frame) return false;}}
     // It's valid if it's valid for any of our animated components...
-    for(int i=1;i<=component_list.m;i++)
+    for(int i=0;i<component_list.m;i++)
         if(component_list(i)->Is_Animated() && component_list(i)->Valid_Frame(frame_input)) return true;
     return false;
 }
@@ -164,7 +164,7 @@ Set_Frame(int frame_input)
 
     Pre_Frame_Extra();
 
-    for(int i=1;i<=component_list.m;i++){
+    for(int i=0;i<component_list.m;i++){
 #ifdef NDEBUG
         int attempts=0;
         bool done=false;
@@ -183,7 +183,7 @@ Set_Frame(int frame_input)
     }
 
     // Update/Invalidate selections
-    for(int i=1;i<=component_list.m;i++){
+    for(int i=0;i<component_list.m;i++){
         bool delete_selection=false;
         OPENGL_SELECTION* new_selection=component_list(i)->Create_Or_Destroy_Selection_After_Frame_Change(current_selection,delete_selection);
         if(new_selection){Set_Current_Selection(new_selection);break;}

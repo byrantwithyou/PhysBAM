@@ -94,30 +94,30 @@ template<class T> void Unpack(SPARSE_MATRIX_FLAT_MXN<T>& data,ARRAY_VIEW<const c
 //#####################################################################
 int Pack_Size(const SPARSE_MATRIX_PARTITION& data,const MPI::Comm& comm)
 {int size=Pack_Size(data.number_of_sides,data.interior_indices,data.ghost_indices,data.neighbor_ranks,comm);
-for(int s=1;s<=data.number_of_sides;s++)size+=Pack_Size(data.boundary_indices(s),comm);
+for(int s=0;s<data.number_of_sides;s++)size+=Pack_Size(data.boundary_indices(s),comm);
 return size;}
 
 void Pack(const SPARSE_MATRIX_PARTITION& data,ARRAY_VIEW<char> buffer,int& position,const MPI::Comm& comm)
 {Pack(data.number_of_sides,data.interior_indices,data.ghost_indices,data.neighbor_ranks,buffer,position,comm);
-for(int s=1;s<=data.number_of_sides;s++)Pack(data.boundary_indices(s),buffer,position,comm);}
+for(int s=0;s<data.number_of_sides;s++)Pack(data.boundary_indices(s),buffer,position,comm);}
 
 void Unpack(SPARSE_MATRIX_PARTITION& data,ARRAY_VIEW<const char> buffer,int& position,const MPI::Comm& comm)
 {Unpack(data.number_of_sides,data.interior_indices,data.ghost_indices,data.neighbor_ranks,buffer,position,comm);data.neighbors.Resize(data.number_of_sides);
-data.boundary_indices.Resize(data.number_of_sides);for(int s=1;s<=data.number_of_sides;s++)Unpack(data.boundary_indices(s),buffer,position,comm);}
+data.boundary_indices.Resize(data.number_of_sides);for(int s=0;s<data.number_of_sides;s++)Unpack(data.boundary_indices(s),buffer,position,comm);}
 //#####################################################################
 // Pack/Unpack for ARRAY<ARRAY<int> >
 //#####################################################################
 int Pack_Size(const ARRAY<ARRAY<int> >& data,const MPI::Comm& comm)
-{int size=Pack_Size<int>(comm);for(int i=1;i<=data.m;i++) size+=Pack_Size(data(i),comm);return size;}
+{int size=Pack_Size<int>(comm);for(int i=0;i<data.m;i++) size+=Pack_Size(data(i),comm);return size;}
 
 void Pack(const ARRAY<ARRAY<int> >& data,ARRAY_VIEW<char> buffer,int& position,const MPI::Comm& comm)
 {assert(Pack_Size(data,comm)<=buffer.Size()-position);
 Pack(data.m,buffer,position,comm);
-for(int i=1;i<=data.m;i++) Pack(data(i),buffer,position,comm);}
+for(int i=0;i<data.m;i++) Pack(data(i),buffer,position,comm);}
 
 void Unpack(ARRAY<ARRAY<int> >& data,ARRAY_VIEW<const char> buffer,int& position,const MPI::Comm& comm)
 {int m;Unpack(m,buffer,position,comm);data.Resize(m);
-for(int i=1;i<=data.m;i++) Unpack(data(i),buffer,position,comm);}
+for(int i=0;i<data.m;i++) Unpack(data(i),buffer,position,comm);}
 //#####################################################################
 // Pack/Unpack for UNION_FIND
 //#####################################################################

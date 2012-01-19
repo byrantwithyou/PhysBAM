@@ -58,7 +58,7 @@ Display(const int in_color) const
         T x_offset=0.4*mac_grid.dX.x,y_offset=0.4*mac_grid.dX.y;
         point_color.Send_To_GL_Pipeline();
         ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-        for(int i=1;i<=pseudo_dirichlet_cells.m;i++){
+        for(int i=0;i<pseudo_dirichlet_cells.m;i++){
             const VECTOR<int,2>& cell_index=pseudo_dirichlet_cells(i).x;char face_mask=pseudo_dirichlet_cells(i).z;
             VECTOR<T,2> pos=mac_grid.X(cell_index);
             if(face_mask&0x01) OpenGL_Vertex(VECTOR<T,2>(pos.x-x_offset,pos.y),vertices);
@@ -68,7 +68,7 @@ Display(const int in_color) const
         OpenGL_Draw_Arrays(GL_POINTS,2,vertices);
         vertices.Resize(0);
         velocity_color.Send_To_GL_Pipeline();
-        for(int i=1;i<=pseudo_dirichlet_cells.m;i++){
+        for(int i=0;i<pseudo_dirichlet_cells.m;i++){
             const VECTOR<int,2>& cell_index=pseudo_dirichlet_cells(i).x;const VECTOR<T,2>& velocity=pseudo_dirichlet_cells(i).y;
             VECTOR<T,2> pos=mac_grid.X(cell_index);
             OPENGL_SHAPES::Draw_Arrow(pos,pos+velocity_scale*velocity,vertices);}

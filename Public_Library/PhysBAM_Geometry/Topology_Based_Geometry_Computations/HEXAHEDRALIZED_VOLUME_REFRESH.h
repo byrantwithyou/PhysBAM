@@ -20,7 +20,7 @@ template<class T>
 void Update_Hexahedron_List(HEXAHEDRALIZED_VOLUME<T>& hv)
 {
     if(!hv.hexahedron_list) hv.hexahedron_list=new ARRAY<HEXAHEDRON<T> >(hv.mesh.elements.m);
-    for(int t=1;t<=hv.mesh.elements.m;t++){
+    for(int t=0;t<hv.mesh.elements.m;t++){
         int p1,p2,p3,p4,p5,p6,p7,p8;hv.mesh.elements(t).Get(p1,p2,p3,p4,p5,p6,p7,p8);
         (*hv.hexahedron_list)(t).x1=hv.particles.X(p1);(*hv.hexahedron_list)(t).x2=hv.particles.X(p2);
         (*hv.hexahedron_list)(t).x3=hv.particles.X(p3);(*hv.hexahedron_list)(t).x4=hv.particles.X(p4);
@@ -37,9 +37,9 @@ void Initialize_Tetrahedralized_Volume(HEXAHEDRALIZED_VOLUME<T>& hv)
     hv.mesh.Initialize_Faces();hv.mesh.Initialize_Face_Hexahedrons();
     ARRAY<int> face_particle_indices(hv.mesh.faces->m);ARRAY<int> hex_particle_indices(hv.mesh.elements.m);ARRAY<VECTOR<int,4> > tetrahedron_list;
     //add node in the center of each hex
-    for(int h=1;h<=hv.mesh.elements.m;h++){
+    for(int h=0;h<hv.mesh.elements.m;h++){
         ARRAY<int> p(8);hv.mesh.elements(h).Get(p(1),p(2),p(3),p(4),p(5),p(6),p(7),p(8));
-        TV hex_center;for(int i=1;i<=8;i++) hex_center+=hv.particles.X(p(i));hex_center*=(T).125;
+        TV hex_center;for(int i=0;i<8;i++) hex_center+=hv.particles.X(p(i));hex_center*=(T).125;
         hv.particles.X(hv.particles.array_collection->Add_Element())=hex_center;hex_particle_indices(h)=hv.particles.array_collection->Size();}
     //add node in the center of each boundary face
     for(int f=1;f<=hv.mesh.faces->m;f++){

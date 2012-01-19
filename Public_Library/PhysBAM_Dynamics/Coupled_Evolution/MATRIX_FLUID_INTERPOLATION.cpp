@@ -85,12 +85,12 @@ Transpose_Times_Add(const ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints,VECTOR_ND
 template<class TV> void MATRIX_FLUID_INTERPOLATION<TV>::
 Print() const
 {
-    for(int i=1;i<=index_map.indexed_faces.m;i++)
+    for(int i=0;i<index_map.indexed_faces.m;i++)
         LOG::cout<<i<<": "<<index_map.indexed_faces(i)<<std::endl;
 
     ARRAY<T,COUPLING_CONSTRAINT_ID> constraints(rows.m);
     VECTOR_ND<T> faces(index_map.Number_Faces());
-    for(int i=1;i<=faces.n;i++){
+    for(int i=0;i<faces.n;i++){
         faces(i)=1;
         Times(faces,constraints);
         LOG::cout<<constraints<<std::endl;

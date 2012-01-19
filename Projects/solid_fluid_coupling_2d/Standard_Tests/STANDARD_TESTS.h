@@ -407,7 +407,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 38:
         case 39:
             fluids_parameters.grid->Initialize(resolution+1,(int)(1.5*resolution)+1,0,1,0,1.5);
-            for(int axis=1;axis<=TV::dimension;axis++)for(int side=1;side<=2;side++) fluids_parameters.domain_walls[axis][side]=false;
+            for(int axis=1;axis<=TV::dimension;axis++)for(int side=0;side<2;side++) fluids_parameters.domain_walls[axis][side]=false;
             break;
         case 32:
             fluids_parameters.grid->Initialize(resolution,4*resolution,0,(T).04*scale_length,0,(T).16*scale_length,true);
@@ -434,7 +434,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             break;
         case 43:
             fluids_parameters.grid->Initialize(resolution+1,resolution+1,0,1,0,1);
-            for(int axis=1;axis<=TV::dimension;axis++)for(int side=1;side<=2;side++) fluids_parameters.domain_walls[axis][side]=false;
+            for(int axis=1;axis<=TV::dimension;axis++)for(int side=0;side<2;side++) fluids_parameters.domain_walls[axis][side]=false;
             break;
         case 44:
             fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[1][2]=false;fluids_parameters.domain_walls[2][1]=true;fluids_parameters.domain_walls[2][2]=true;
@@ -473,9 +473,9 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
     if(test_number==41){
         ARRAY<T,FACE_INDEX<TV::m> >& face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
         LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,T> interp;
-        for(int i=1;i<=sample_points.m;i++){
+        for(int i=0;i<sample_points.m;i++){
             TV X=sample_points(i),V;
-            for(int d=1;d<=V.m;d++)
+            for(int d=0;d<V.m;d++)
             V(d)=interp.Clamped_To_Array(fluids_parameters.grid->Get_Face_Grid(d),face_velocities.Component(d),X);
             LOG::cout<<"velocity at "<<X<<" : "<<V<<std::endl;}}
     if(test_number==43){
@@ -492,7 +492,7 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
                 VECTOR<T,3> barycentric_weights=TRIANGLE_2D<T>::Barycentric_Coordinates(iterator.Location(),triangle.X);
                 VECTOR<int,3> triangle_indices=test_43_triangulated_area->mesh.elements(simplex);
                 T scalar_velocity=0;
-                for(int i=1;i<=3;i++)
+                for(int i=0;i<3;i++)
                     scalar_velocity+=barycentric_weights(i)*particles.V(triangle_indices(i))(face_index.axis);
                 face_velocities_copy(face_index)=scalar_velocity;
             }
@@ -550,7 +550,7 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
 //#####################################################################
 void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE
 {
-    for(int i=1;i<=deformable_object_enslaved_nodes.m;i++) V(deformable_object_enslaved_nodes(i))=TV();
+    for(int i=0;i<deformable_object_enslaved_nodes.m;i++) V(deformable_object_enslaved_nodes(i))=TV();
 }
 //#####################################################################
 // Function Set_External_Positions
@@ -886,7 +886,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             rigid_body_cup.thin_shell=true;
             break;}
         case 7:{
-            for(int i=1;i<=rigid_body_count;i++){
+            for(int i=0;i<rigid_body_count;i++){
                 RIGID_BODY<TV>& rigid_body=solids_tests.Add_Rigid_Body("circle",(T).05,(T)0);
                 rigid_body.Set_Frame(FRAME<TV>(TV((T).1+i*(T).1,(T).2+i*(T).1)));
                 rigid_body.Set_Coefficient_Of_Restitution((T)0);
@@ -999,7 +999,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
 
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents();
@@ -1060,7 +1060,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             break;}
         case 7:{
             solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true,solid_gravity));
-            for(int i=1;i<=rigid_body_count;i++) Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.array_collection->Size()-i+1));
+            for(int i=0;i<rigid_body_count;i++) Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.array_collection->Size()-i+1));
             break;}
         case 8:{
             SEGMENTED_CURVE_2D<T>& segmented_curve=deformable_body_collection.deformable_geometry.template Find_Structure<SEGMENTED_CURVE_2D<T>&>(deformable_object_id);
@@ -1112,9 +1112,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 38: break;
         default:break;}
 
-    for(int i=1;i<=solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->compute_half_forces=true;
-    for(int k=1;k<=solid_body_collection.deformable_body_collection.deformables_forces.m;k++) solid_body_collection.deformable_body_collection.deformables_forces(k)->compute_half_forces=true;
-    for(int i=1;i<=solid_body_collection.rigid_body_collection.rigids_forces.m;i++) solid_body_collection.rigid_body_collection.rigids_forces(i)->compute_half_forces=true;
+    for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->compute_half_forces=true;
+    for(int k=0;k<solid_body_collection.deformable_body_collection.deformables_forces.m;k++) solid_body_collection.deformable_body_collection.deformables_forces(k)->compute_half_forces=true;
+    for(int i=0;i<solid_body_collection.rigid_body_collection.rigids_forces.m;i++) solid_body_collection.rigid_body_collection.rigids_forces(i)->compute_half_forces=true;
 }
 //#####################################################################
 // Function Uniform_Flow_Test
@@ -1171,11 +1171,11 @@ void Deformable_Uniform_Flow_Test()
     
     TRIANGULATED_AREA<T>& triangulated_area=solids_tests.Create_Triangulated_Object(data_directory+"/Triangulated_Areas/circle-216.tri2d",RIGID_BODY_STATE<TV>(),true,true,(T).25);
 
-    for(int i=1;i<=particles.V.m;i++)
+    for(int i=0;i<particles.V.m;i++)
         particles.V(i)=TV(0,.2);
 
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents();
@@ -1222,7 +1222,7 @@ void Falling_Rigid_Circle_Test()
     rigid_body.Mass()=(T)pi*sqr(radius)*(T)density;
     rigid_body.Inertia_Tensor()(1,1)=rigid_body.Mass()*sqr(radius)/2;
 
-    for(int b=1;b<=3;b++){
+    for(int b=0;b<3;b++){
         Add_Thin_Shell_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(b));
         rigid_body_collection.Rigid_Body(b).is_static=true;}
 
@@ -1259,7 +1259,7 @@ void Flexible_Beam_Test()
     fluids_parameters.use_body_force=false;
     velocity_multiplier=.25;
 
-//    for(int b=1;b<=2;b++){
+//    for(int b=0;b<2;b++){
 //        if(b==1) Add_Thin_Shell_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(b));
 //        rigid_body_collection.Rigid_Body(b).is_static=true;}
 
@@ -1276,7 +1276,7 @@ void Flexible_Beam_Test()
     solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
 
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents();
@@ -1324,7 +1324,7 @@ void Vibrating_Circle()
     solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
 
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents();
@@ -1340,7 +1340,7 @@ void Vibrating_Circle()
 
     MATRIX<T,2> mat((T)1.2,0,0,1/(T)1.2);
     TV shift(1,(T).5);
-    for(int i=1;i<=particles.X.m;i++) particles.X(i)=mat*particles.X(i)+shift;
+    for(int i=0;i<particles.X.m;i++) particles.X(i)=mat*particles.X(i)+shift;
 
     DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>& deformable_collisions=*new DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>(triangulated_area);//.Get_Boundary_Object());
     deformable_collisions.object.Initialize_Hierarchy();
@@ -1376,7 +1376,7 @@ void Refine_Circle()
     solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
 
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents();
@@ -1387,7 +1387,7 @@ void Refine_Circle()
     solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,new NEO_HOOKEAN<T,2>((T)1e3,(T).45,(T).01)));
 
     MATRIX<T,2> mat((T)1.2,0,0,1/(T)1.2);
-    for(int i=1;i<=particles.X.m;i++) particles.X(i)=mat*particles.X(i)+TV(1,(T).5);
+    for(int i=0;i<particles.X.m;i++) particles.X(i)=mat*particles.X(i)+TV(1,(T).5);
 
     DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>& deformable_collisions=*new DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>(triangulated_area);//.Get_Boundary_Object());
     deformable_collisions.object.Initialize_Hierarchy();
@@ -1418,7 +1418,7 @@ void Analytic_Test()
     PHYSBAM_ASSERT(fluids_parameters.use_slip);
     solid_body_collection.Set_CFL_Number(10);
 
-    for(int b=1;b<=2;b++){
+    for(int b=0;b<2;b++){
         Add_Thin_Shell_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(b));
         rigid_body_collection.Rigid_Body(b).is_static=true;}
 
@@ -1467,7 +1467,7 @@ void Flow_Past_Fixed_Cylinder()
 //    PHYSBAM_ASSERT(fluids_parameters.use_slip);
     solid_body_collection.Set_CFL_Number(10);
 
-//    for(int b=1;b<=2;b++){
+//    for(int b=0;b<2;b++){
 //        Add_Thin_Shell_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(b));
 //        rigid_body_collection.Rigid_Body(b).is_static=true;}
 
@@ -1559,7 +1559,7 @@ void Oscillating_Disk()
     solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
 
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents();
@@ -1568,7 +1568,7 @@ void Oscillating_Disk()
     solid_body_collection.deformable_body_collection.soft_bindings.Set_Mass_From_Effective_Mass();
 
     //TV shift((T).5,(T).5);
-    //for(int i=1;i<=particles.X.m;i++){
+    //for(int i=0;i<particles.X.m;i++){
     //    //particles.X(i)=/*mat*/particles.X(i)+shift;
     //    particles.mass(i)*=.01; // create_triangulated_object sets the density to 100 by default in 2d
     //}
@@ -1630,7 +1630,7 @@ void Flexible_Filament_Test()
     solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
 
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents();
@@ -1676,7 +1676,7 @@ void Simple_Fluid_Test()
     solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
 
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents();
@@ -1709,7 +1709,7 @@ void Coupled_Viscosity_Test()
     solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
 
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents();
@@ -1732,7 +1732,7 @@ void Sanity_Test_Stokes_No_Viscosity()
     fluids_parameters.viscosity=0;
     fluids_parameters.stokes_flow=true;
 
-    for(int b=1;b<=3;b++){
+    for(int b=0;b<3;b++){
         Add_Thin_Shell_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(b));
         rigid_body_collection.Rigid_Body(b).is_static=true;}
 

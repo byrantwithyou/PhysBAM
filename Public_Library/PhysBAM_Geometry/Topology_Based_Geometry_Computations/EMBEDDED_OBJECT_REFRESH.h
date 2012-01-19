@@ -24,7 +24,7 @@ Initialize_Parents_To_Embedded_Particles_Hash_Table(EMBEDDED_OBJECT<TV,d>& eo,co
     if(new_hashtable_multiplier) eo.hashtable_multiplier=new_hashtable_multiplier;
     if(eo.parents_to_embedded_particles_hash_table && eo.parents_to_embedded_particles_hash_table->Max_Size() >= eo.hashtable_multiplier*eo.particles.array_collection->Size()) return;
     delete eo.parents_to_embedded_particles_hash_table;eo.parents_to_embedded_particles_hash_table=new HASHTABLE<VECTOR<int,2>,int>(eo.hashtable_multiplier*eo.particles.array_collection->Size());
-    for(int p=1;p<=eo.embedded_particles.active_indices.m;p++)
+    for(int p=0;p<eo.embedded_particles.active_indices.m;p++)
         eo.parents_to_embedded_particles_hash_table->Insert(eo.parent_particles(p).Sorted(),p);
 }
 //#####################################################################
@@ -33,7 +33,7 @@ Initialize_Parents_To_Embedded_Particles_Hash_Table(EMBEDDED_OBJECT<TV,d>& eo,co
 template<class TV,int d> void
 Update_Embedded_Particle_Positions(EMBEDDED_OBJECT<TV,d>& eo)
 {
-    for(int p=1;p<=eo.embedded_particles.active_indices.m;p++){
+    for(int p=0;p<eo.embedded_particles.active_indices.m;p++){
         int i,j;eo.parent_particles(p).Get(i,j);
         eo.embedded_particles.X(p)=LINEAR_INTERPOLATION<typename TV::SCALAR,TV>::Linear(eo.particles.X(i),eo.particles.X(j),eo.interpolation_fraction(p));}
 }
@@ -45,7 +45,7 @@ Initialize_Embedded_Children(EMBEDDED_OBJECT<TV,d>& eo)
 {
     delete eo.embedded_children_index;delete eo.embedded_children;
     eo.embedded_children_index=new ARRAY<int>(eo.particles.array_collection->Size());eo.embedded_children=new ARRAY<ARRAY<int> >();
-    for(int p=1;p<=eo.embedded_particles.active_indices.m;p++) eo.Add_Embedded_Particle_To_Embedded_Children(p);
+    for(int p=0;p<eo.embedded_particles.active_indices.m;p++) eo.Add_Embedded_Particle_To_Embedded_Children(p);
 }
 //#####################################################################
 // Function Initialize_Embedded_Subelements_In_Parent_Element
@@ -57,7 +57,7 @@ Initialize_Embedded_Subelements_In_Parent_Element(EMBEDDED_OBJECT<TV,d>& eo)
     eo.embedded_subelements_in_parent_element_index=new ARRAY<int>(eo.simplicial_object.mesh.elements.m);
     eo.number_of_embedded_subelements_in_parent_element=new ARRAY<int>(0);
     eo.embedded_subelements_in_parent_element=new ARRAY<VECTOR<int,EMBEDDED_OBJECT<TV,d>::max_subelements_per_element> >();
-    for(int t=1;t<=eo.embedded_mesh.elements.m;t++) eo.Add_Embedded_Subelement_To_Embedded_Subelements_In_Element(t);
+    for(int t=0;t<eo.embedded_mesh.elements.m;t++) eo.Add_Embedded_Subelement_To_Embedded_Subelements_In_Element(t);
 }
 template<class TV> void Add_Levelset_Cuts(EMBEDDED_TRIANGULATED_OBJECT<TV>& embedded_object,const int positive_count,const VECTOR<int,3>& nodes)
 {
@@ -87,7 +87,7 @@ Calculate_Boundary_From_Levelset_On_Nodes(EMBEDDED_OBJECT<TV,d>& eo,ARRAY<T>& ph
             VECTOR<T,d+1> phi_t(phi.Subset(eo.simplicial_object.mesh.elements(t)));
             if(phi_t.Min()>0) eo.simplicial_object.mesh.elements.Remove_Index_Lazy(t);}
         ARRAY<int> condensation_mapping;eo.simplicial_object.Discard_Valence_Zero_Particles_And_Renumber(condensation_mapping);
-        ARRAY<T> phi_new(eo.particles.array_collection->Size());for(int k=1;k<=phi.m;k++) if(condensation_mapping(k)) phi_new(condensation_mapping(k))=phi(k);
+        ARRAY<T> phi_new(eo.particles.array_collection->Size());for(int k=0;k<phi.m;k++) if(condensation_mapping(k)) phi_new(condensation_mapping(k))=phi(k);
         phi.Exchange(phi_new);}
 
     if(eo.embedded_particles.active_indices.m){
@@ -112,17 +112,17 @@ Calculate_Boundary_From_Levelset_On_Nodes(EMBEDDED_OBJECT<TV,d>& eo,ARRAY<T>& ph
             eo.Add_Embedded_Particle(VECTOR<int,2>(inside,outside),theta);}}
 
     // calculate embedded simplices
-    for(int t=1;t<=eo.simplicial_object.mesh.elements.m;t++){
+    for(int t=0;t<eo.simplicial_object.mesh.elements.m;t++){
         VECTOR<int,d+1> nodes=eo.simplicial_object.mesh.elements(t);
         {int i=1,j=nodes.m;while(i<j){if(phi(nodes[i])>0) exchange(nodes[i],nodes[j--]);else i++;} // move inside nodes before outside nodes
         if((nodes.m-j)&1){if(phi(nodes[2])<=0) exchange(nodes[1],nodes[2]);else exchange(nodes[d],nodes[d+1]);}} // one final swap to ensure an even permutation
         for(int i=1;i<nodes.m;i++) assert((phi(nodes[i])>0) <= (phi(nodes[i+1])>0));
-        int positive_count=0;for(int i=1;i<=nodes.m;i++) if(phi(nodes[i])>0) positive_count++;
+        int positive_count=0;for(int i=0;i<nodes.m;i++) if(phi(nodes[i])>0) positive_count++;
         Add_Levelset_Cuts(dynamic_cast<typename EMBEDDING_POLICY<TV,d>::EMBEDDED_OBJECT&>(eo),positive_count,nodes);}
 
     eo.node_in_simplex_is_material.Resize(eo.simplicial_object.mesh.elements.m);
-    for(int t=1;t<=eo.simplicial_object.mesh.elements.m;t++){VECTOR<int,d+1>& element=eo.simplicial_object.mesh.elements(t);
-        for(int i=1;i<=element.m;i++) eo.node_in_simplex_is_material(t)(i)=phi(element[i])<=0;}
+    for(int t=0;t<eo.simplicial_object.mesh.elements.m;t++){VECTOR<int,d+1>& element=eo.simplicial_object.mesh.elements(t);
+        for(int i=0;i<element.m;i++) eo.node_in_simplex_is_material(t)(i)=phi(element[i])<=0;}
 
     if(!segment_mesh_defined){delete eo.simplicial_object.mesh.segment_mesh;eo.simplicial_object.mesh.segment_mesh=0;}
     if(!embedded_incident_elements_defined){delete eo.embedded_mesh.incident_elements;eo.embedded_mesh.incident_elements=0;}

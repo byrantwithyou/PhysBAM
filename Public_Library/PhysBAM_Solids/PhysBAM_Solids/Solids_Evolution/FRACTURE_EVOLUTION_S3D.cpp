@@ -66,7 +66,7 @@ Initialize_Self_Collision()
         solids_parameters.solid_body_collection.deformable_body_collection.triangle_collisions.geometry.structures.Remove_All();
         solids_parameters.Initialize_Triangle_Collisions(); // false - do not clamp repulsion thickness
         ARRAY<TV> rest_X(deformable_body_collection.particles.array_collection->Size());
-        for(int p=1;p<=rest_X.m;p++) if(particle_on_surface(p)) rest_X(p)=fracture_object->Rest_Position_Of_Material_Surface_Particle(p);
+        for(int p=0;p<rest_X.m;p++) if(particle_on_surface(p)) rest_X(p)=fracture_object->Rest_Position_Of_Material_Surface_Particle(p);
         solids_parameters.solid_body_collection.deformable_body_collection.triangle_repulsions.Clamp_Repulsion_Thickness_With_Meshes(rest_X,solids_parameters.collisions_repulsion_clamp_fraction);}
 #endif
 }
@@ -147,7 +147,7 @@ Fracture_Where_High_Stress(const T small_number)
     ARRAY<TV> spatial_fracture_bias_direction(fracture_object->embedded_object.simplicial_object.mesh.elements.m);
     T max_eigenvalue_seen=0,min_eigenvalue_seen=0,max_sum=0,max_sum_sqr=0,min_sum=0,min_sum_sqr=0;
     ISOTROPIC_CONSTITUTIVE_MODEL<T,2>& isotropic_model=dynamic_cast<ISOTROPIC_CONSTITUTIVE_MODEL<T,2>&>(finite_volume.constitutive_model);
-    for(int t=1;t<=sigma.m;t++){
+    for(int t=0;t<sigma.m;t++){
         DIAGONAL_MATRIX<T,2> Fe_hat_clipped=finite_volume.Fe_hat(t).Clamp_Min(small_number);
         T one_over_clipped_J=1/Fe_hat_clipped.Determinant();
         DIAGONAL_MATRIX<T,2> P_hat=isotropic_model.P_From_Strain(finite_volume.Fe_hat(t),(T)1,t); // scale for volume too?

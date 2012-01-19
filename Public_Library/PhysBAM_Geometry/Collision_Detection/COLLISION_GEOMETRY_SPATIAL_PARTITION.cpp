@@ -214,7 +214,7 @@ Get_Potential_Collisions(const ID index,const RANGE<TV_INT>& range,ARRAY<ID>& ob
             ID k=(*occupancy_list)(t);
             if(k>index || (!only_higher_index && k!=index))
                 if(!already_added.Is_Marked_Current(k)){already_added.Mark(k);object_indices.Append(k);}}}
-    for(int i=1;i<=bodies_not_in_partition.m;i++){ // add bodies that aren't in spatial partition - don't need append unique
+    for(int i=0;i<bodies_not_in_partition.m;i++){ // add bodies that aren't in spatial partition - don't need append unique
         ID k=bodies_not_in_partition(i);if(k>index || (!only_higher_index && k!=index)) object_indices.Append(k);}
 }
 //##################################################################### 

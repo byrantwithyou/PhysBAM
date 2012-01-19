@@ -121,7 +121,7 @@ public:
     {MATRIX<T,m,n> matrix;for(int j=0;j<n;j++) for(int i=0;i<m;i++) matrix(i,j)=(*this)(i,j)*A(j,j);return matrix;}
 
     MATRIX_MXN<T> operator*(const MATRIX_MXN<T>& A) const
-    {assert(n==A.m);MATRIX_MXN<T> matrix(m,A.n);for(int j=1;j<=A.n;j++) for(int i=0;i<m;i++) for(int k=0;k<n;k++) matrix(i,j)+=(*this)(i,k)*A(k,j);return matrix;}
+    {assert(n==A.m);MATRIX_MXN<T> matrix(m,A.n);for(int j=0;j<A.n;j++) for(int i=0;i<m;i++) for(int k=0;k<n;k++) matrix(i,j)+=(*this)(i,k)*A(k,j);return matrix;}
 
     MATRIX<T,n,m> Transposed() const
     {MATRIX<T,n,m> matrix;for(int i=0;i<m;i++) for(int j=0;j<n;j++) matrix(j,i)=(*this)(i,j);return matrix;}

@@ -129,7 +129,7 @@ Initialize_MPI()
 {
     fluids_parameters.mpi_grid->Initialize(fluids_parameters.domain_walls);
     if(fluids_parameters.number_of_regions==1)fluids_parameters.phi_boundary=new BOUNDARY_MPI<T_GRID>(fluids_parameters.mpi_grid,*fluids_parameters.phi_boundary);
-    else if(fluids_parameters.number_of_regions>=2)for(int i=1;i<=fluids_parameters.number_of_regions;i++)
+    else if(fluids_parameters.number_of_regions>=2)for(int i=0;i<fluids_parameters.number_of_regions;i++)
         fluids_parameters.phi_boundary_multiphase(i)=new BOUNDARY_MPI<T_GRID>(fluids_parameters.mpi_grid,*fluids_parameters.phi_boundary_multiphase(i));
     fluids_parameters.fluid_boundary=new BOUNDARY_MPI<T_GRID>(fluids_parameters.mpi_grid,*fluids_parameters.fluid_boundary);
     if(fluids_parameters.use_soot){
@@ -142,7 +142,7 @@ Initialize_MPI()
     if(fluids_parameters.use_temperature){
         if(fluids_parameters.temperature_boundary) fluids_parameters.temperature_boundary=new BOUNDARY_MPI<T_GRID>(fluids_parameters.mpi_grid,*fluids_parameters.temperature_boundary);
         fluids_parameters.temperature_container.Set_Custom_Boundary(*new BOUNDARY_MPI<T_GRID>(fluids_parameters.mpi_grid,*fluids_parameters.temperature_container.boundary));}
-    for(int i=1;i<=fluids_parameters.number_of_regions;i++) fluids_parameters.particle_levelset_evolution->Particle_Levelset(i).mpi_grid=fluids_parameters.mpi_grid;
+    for(int i=0;i<fluids_parameters.number_of_regions;i++) fluids_parameters.particle_levelset_evolution->Particle_Levelset(i).mpi_grid=fluids_parameters.mpi_grid;
     if(fluids_parameters.use_strain||fluids_parameters.use_multiphase_strain.Count_Matches(0)<fluids_parameters.number_of_regions)
         fluids_parameters.strain_boundary=new BOUNDARY_MPI<T_GRID,SYMMETRIC_MATRIX>(fluids_parameters.mpi_grid,*fluids_parameters.strain_boundary);
     if(fluids_parameters.incompressible){
@@ -154,7 +154,7 @@ Initialize_MPI()
         fluids_parameters.euler->mpi_grid=fluids_parameters.mpi_grid;
         fluids_parameters.euler->euler_projection.elliptic_solver->mpi_grid=fluids_parameters.mpi_grid;}
     if(!restart && fluids_parameters.store_particle_ids){ // TODO: this should be fixed so that id's are scalable
-        for(int i=1;i<=fluids_parameters.number_of_regions;i++)
+        for(int i=0;i<fluids_parameters.number_of_regions;i++)
             fluids_parameters.particle_levelset_evolution->Particle_Levelset(i).last_unique_particle_id=fluids_parameters.mpi_grid->rank*30000000;}       
 }
 //#####################################################################
@@ -303,7 +303,7 @@ Adjust_Phi_With_Source(const GEOMETRY& source,const int region,const T_TRANSFORM
         TV source_X=world_to_source.Homogeneous_Times(iterator.Location());
         if(source.Inside(source_X,-bandwidth)){
             T source_signed_distance=source.Signed_Distance(source_X);
-            for(int i=1;i<=fluids_parameters.number_of_regions;i++){
+            for(int i=0;i<fluids_parameters.number_of_regions;i++){
                 if(i==region) phis(i)(iterator.Cell_Index())=min(phis(i)(iterator.Cell_Index()),source_signed_distance);
                 else phis(i)(iterator.Cell_Index())=max(phis(i)(iterator.Cell_Index()),-source_signed_distance);}}}
 }
@@ -334,7 +334,7 @@ Adjust_Density_And_Temperature_With_Sources(const GEOMETRY& source,const T_TRANS
 template<class T_GRID> void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>::
 Revalidate_Fluid_Scalars()
 {
-    for(int i=1;i<=fluids_parameters.number_of_regions;i++){
+    for(int i=0;i<fluids_parameters.number_of_regions;i++){
         T_FAST_LEVELSET& levelset=fluids_parameters.particle_levelset_evolution->Levelset(i);
         T_FAST_LEVELSET_ADVECTION& levelset_advection=fluids_parameters.particle_levelset_evolution->Levelset_Advection(i);
         int sign=1;if(fluids_parameters.number_of_regions>=2&&fluids_parameters.dirichlet_regions(i))sign=-1;
@@ -355,7 +355,7 @@ Revalidate_Fluid_Scalars()
 template<class T_GRID> void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>::
 Revalidate_Phi_After_Modify_Levelset()
 {
-    for(int i=1;i<=fluids_parameters.number_of_regions;i++){
+    for(int i=0;i<fluids_parameters.number_of_regions;i++){
         T_FAST_LEVELSET& levelset=fluids_parameters.particle_levelset_evolution->Levelset(i);
         T_FAST_LEVELSET_ADVECTION& levelset_advection=fluids_parameters.particle_levelset_evolution->Levelset_Advection(i);
         int sign=1;if(fluids_parameters.number_of_regions>=2&&fluids_parameters.dirichlet_regions(i))sign=-1;
@@ -440,7 +440,7 @@ Initialize_Swept_Occupied_Blocks_For_Advection(const T dt,const T time,T maximum
                 fluids_parameters.particle_levelset_evolution_multiple->V,time);
             maximum_fluid_speed=max(maximum_fluid_speed,fluids_parameters.particle_levelset_evolution_multiple->V.Maxabs().Max());}}
     if(include_removed_particle_velocities){
-        for(int i=1;i<=fluids_parameters.number_of_regions;i++){
+        for(int i=0;i<fluids_parameters.number_of_regions;i++){
             PARTICLE_LEVELSET_UNIFORM<T_GRID>& particle_levelset=fluids_parameters.particle_levelset_evolution->Particle_Levelset(i);
             if(particle_levelset.use_removed_negative_particles) for(CELL_ITERATOR iterator(particle_levelset.levelset.grid);iterator.Valid();iterator.Next()){
                 PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>* particles=particle_levelset.removed_negative_particles(iterator.Cell_Index());
@@ -449,7 +449,7 @@ Initialize_Swept_Occupied_Blocks_For_Advection(const T dt,const T time,T maximum
                 PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>* particles=particle_levelset.removed_positive_particles(iterator.Cell_Index());
                 if(particles) maximum_particle_speed=max(maximum_particle_speed,ARRAYS_COMPUTATIONS::Maximum_Magnitude(particles->V));}}}
     T max_particle_collision_distance=0;
-    for(int i=1;i<=fluids_parameters.number_of_regions;i++)
+    for(int i=0;i<fluids_parameters.number_of_regions;i++)
         max_particle_collision_distance=max(max_particle_collision_distance,fluids_parameters.particle_levelset_evolution->Particle_Levelset(i).max_collision_distance_factor*grid.dX.Max());
     fluids_parameters.collision_bodies_affecting_fluid->Compute_Occupied_Blocks(true,
         dt*max(maximum_fluid_speed,maximum_particle_speed)+2*max_particle_collision_distance+(T).5*fluids_parameters.p_grid.dX.Max(),10);

@@ -90,7 +90,7 @@ Update_With_Breadth_First_Directed_Graph(const int root,const int node_to_propag
         int start_level=breadth_first_directed_graph->Level_Of_Node(node_to_propagate_from)+1;changed(start_level-1)=true;
         for(int k=start_level;k<=breadth_first_directed_graph->Number_Of_Levels();k++){
             int child=breadth_first_directed_graph->Nodes_In_Level(k)(1);ARRAY<int>& parents=breadth_first_directed_graph->Parents(child);
-            bool parent_changed=false;for(int i=1;i<=parents.m;i++) if(changed(Value(parents(i)))){parent_changed=true;break;} // TODO: this looks broken!
+            bool parent_changed=false;for(int i=0;i<parents.m;i++) if(changed(Value(parents(i)))){parent_changed=true;break;} // TODO: this looks broken!
             if(parent_changed) Update_Child_From_Parents(child,parents);}}
 }
 //#####################################################################
@@ -179,7 +179,7 @@ Update_From_Edge_In_Breadth_First_Directed_Graph(const int root,const JOINT_ID e
 template<class TV> void ARTICULATED_RIGID_BODY_BASE<TV>::
 Update_Joint_Frames()
 {
-    for(int i=1;i<=joint_mesh.joints.m;i++){
+    for(int i=0;i<joint_mesh.joints.m;i++){
         JOINT<TV>& joint=*joint_mesh.joints(i);
         joint.Set_Joint_Frame(joint.Compute_Current_Joint_Frame(*Parent(joint.id_number),*Child(joint.id_number)),false);}
 }
@@ -192,7 +192,7 @@ Store_Velocities_And_Momenta()
     ARRAY<int>& dynamic_rigid_body_particles=rigid_body_collection.dynamic_rigid_body_particles;
     linear_velocities_save.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size());angular_momenta_save.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size());
     angular_momenta_save.Subset(dynamic_rigid_body_particles)=rigid_body_collection.rigid_body_particle.angular_momentum.Subset(dynamic_rigid_body_particles);
-    for(int i=1;i<=dynamic_rigid_body_particles.m;i++){int p=dynamic_rigid_body_particles(i);
+    for(int i=0;i<dynamic_rigid_body_particles.m;i++){int p=dynamic_rigid_body_particles(i);
         linear_velocities_save(p)=rigid_body_collection.rigid_body_particle.twist(p).linear;}
 }
 //#####################################################################
@@ -203,7 +203,7 @@ Restore_Velocities_And_Momenta()
 {
     ARRAY<int>& dynamic_rigid_body_particles=rigid_body_collection.dynamic_rigid_body_particles;
     rigid_body_collection.rigid_body_particle.angular_momentum.Subset(dynamic_rigid_body_particles)=angular_momenta_save.Subset(dynamic_rigid_body_particles);
-    for(int i=1;i<=dynamic_rigid_body_particles.m;i++){int p=dynamic_rigid_body_particles(i);
+    for(int i=0;i<dynamic_rigid_body_particles.m;i++){int p=dynamic_rigid_body_particles(i);
         rigid_body_collection.rigid_body_particle.twist(p).linear=linear_velocities_save(p);}
     rigid_body_collection.Update_Angular_Velocity(dynamic_rigid_body_particles);
 }
@@ -215,7 +215,7 @@ Update_Child_From_Parents(const int child_id,const ARRAY<int>& parents)
 {
     if(!parents.m) return;TV F_wc_sum_t;ROTATION<TV> current_hemisphere;
     ARRAY<ROTATION<TV> > rotations;
-    for(int p=1;p<=parents.m;p++){
+    for(int p=0;p<parents.m;p++){
         JOINT_ID edge_id(0);
         for(int e=1;e<=joint_mesh.undirected_graph.Adjacent_Edges(child_id).m;e++){JOINT_ID edge=joint_mesh.undirected_graph.Adjacent_Edges(child_id)(e);
             if(Child_Id(edge)==parents(p) || Parent_Id(edge)==parents(p)){edge_id=edge;break;}}
@@ -232,7 +232,7 @@ template<class TV> void ARTICULATED_RIGID_BODY_BASE<TV>::
 Update_Parent_Joint_States(const int child_id,const ARRAY<int>& parents)
 {
     if(!parents.m) return;
-    for(int p=1;p<=parents.m;p++) for(int e=1;e<=joint_mesh.undirected_graph.Adjacent_Edges(child_id).m;e++){JOINT_ID edge=joint_mesh.undirected_graph.Adjacent_Edges(child_id)(e);
+    for(int p=0;p<parents.m;p++) for(int e=1;e<=joint_mesh.undirected_graph.Adjacent_Edges(child_id).m;e++){JOINT_ID edge=joint_mesh.undirected_graph.Adjacent_Edges(child_id)(e);
         // J = (F_wj)^-1*F_wc*(F_jc)^-1 = F_jw*F_wc*F_cj
         if(Child_Id(edge)==parents(p)){
             JOINT<TV>& joint=*joint_mesh(edge);
@@ -417,7 +417,7 @@ Initialize_Poststabilization_Projection()
     if(!use_poststab_in_cg) return;
     v_to_lambda.Remove_All();lambda_to_delta_v.Remove_All();
     v_to_lambda.Resize(joint_mesh.Size());lambda_to_delta_v.Resize(joint_mesh.Size());
-    for(int i=1;i<=joint_mesh.joints.m;i++){
+    for(int i=0;i<joint_mesh.joints.m;i++){
         JOINT<TV>& joint=*joint_mesh.joints(i);JOINT_ID joint_id=joint.id_number;RIGID_BODY<TV>* rigid_bodies[]={Parent(joint_id),Child(joint_id)};
         if(rigid_bodies[0]->Has_Infinite_Inertia() && rigid_bodies[1]->Has_Infinite_Inertia()){
             lambda_to_delta_v(joint_id).Resize(2*(s+d),0);v_to_lambda(joint_id).Resize(0,2*(s+d));continue;}
@@ -463,8 +463,8 @@ template<class TV> void ARTICULATED_RIGID_BODY_BASE<TV>::
 Generate_Process_List_Using_Contact_Graph(const RIGID_BODY_CONTACT_GRAPH<TV>& contact_graph)
 {
     process_list.Exact_Resize(contact_graph.Number_Of_Levels());
-    for(int level=1;level<=process_list.m;level++) process_list(level).Remove_All();
-    for(int joint=1;joint<=joint_mesh.joints.m;joint++){JOINT_ID joint_id=joint_mesh.joints(joint)->id_number;
+    for(int level=0;level<process_list.m;level++) process_list(level).Remove_All();
+    for(int joint=0;joint<joint_mesh.joints.m;joint++){JOINT_ID joint_id=joint_mesh.joints(joint)->id_number;
         const int parent_id=Parent_Id(joint_id),child_id=Child_Id(joint_id);
         const int level_of_joint=max(contact_graph.directed_graph.Level_Of_Node(parent_id),contact_graph.directed_graph.Level_Of_Node(child_id));
         process_list(level_of_joint).Append(joint_id);}
@@ -482,7 +482,7 @@ Apply_Poststabilization(bool test_system,bool print_matrix,const bool target_pd,
         Apply_Poststabilization_With_CG(0,false,test_system,print_matrix);
         return;}
 
-    for(int k=0;k<poststabilization_iterations;k++) for(int i=1;i<=joint_mesh.joints.m;i++){JOINT<TV>& joint=*joint_mesh.joints(i);
+    for(int k=0;k<poststabilization_iterations;k++) for(int i=0;i<joint_mesh.joints.m;i++){JOINT<TV>& joint=*joint_mesh.joints(i);
         if((angular_damping_only && !joint.angular_damping) || (skip_global_post_stabilized_joints && joint.global_post_stabilization)) continue;
         Apply_Poststabilization_To_Joint(joint.id_number,target_pd);}
 }

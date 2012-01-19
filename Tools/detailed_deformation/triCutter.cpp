@@ -45,7 +45,7 @@ int main(int argc,char *argv[])
     ARRAY<int> deletion_list;
     
     cout<<"Checking triangles..."<<endl;
-    for(int i=1;i<=tri_mesh.triangles.m;i++){
+    for(int i=0;i<tri_mesh.triangles.m;i++){
         int j,k,l;tri_mesh.triangles.Get(i,j,k,l);
         if(!box.Inside(tri_particles.X(j))||!box.Inside(tri_particles.X(k))||!box.Inside(tri_particles.X(l))) deletion_list.Append(i);}
 

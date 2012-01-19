@@ -151,10 +151,10 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     //                          809,810,818,819,970, 971,972,978,979,980, 1132,1133,1139,1140,1293, 1294,1295,1296,1298,1299, 1300,1301,1455,1456,1457,
     //                          1458,1459,1460,1461,1618, 1619,1620};
     if(hires){
-        for(int t=1;t<=number_of_tori;t++) for(int p=0;p<57;p++){
+        for(int t=0;t<number_of_tori;t++) for(int p=0;p<57;p++){
             int torus_particle_number=deformable_object.rigid_body_particles.id.array.Find(t);Add_Torus_Binding(torus_particle_number,particle_indices[p]+(t-1)*16);}}
     else{
-        for(int t=1;t<=number_of_tori;t++) for(int p=0;p<22;p++){
+        for(int t=0;t<number_of_tori;t++) for(int p=0;p<22;p++){
             int torus_particle_number=deformable_object.rigid_body_particles.id.array.Find(t);Add_Torus_Binding(torus_particle_number,particle_indices[p]+(t-1)*8);}}
     
     // remove the unwanted triangles
@@ -168,8 +168,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     //                          2247,2248,2249,2250,2251, 2252,2253,2254,2255,2256,2257,2564,2565,2566,2567, 2568,2569,2570,2571,2572, 2573,2574,2575,2576,2577, 2885,2886,2887,2888,2889,
     //                          2890,2891,2892,2893,2894, 2895,2896,3205,3206,3207, 3208,3209,3210,3211,3212, 3213,3214,3215,3530,3531, 3532};
     ARRAY<int> triangles_to_remove;
-    if(hires){for(int t=1;t<=number_of_tori;t++) for(int e=0;e<79;e++) triangles_to_remove.Append(triangle_indices[e]+(t-1)*5120);}
-    else{for(int t=1;t<=number_of_tori;t++) for(int e=0;e<24;e++) triangles_to_remove.Append(triangle_indices[e]+(t-1)*1280);}
+    if(hires){for(int t=0;t<number_of_tori;t++) for(int e=0;e<79;e++) triangles_to_remove.Append(triangle_indices[e]+(t-1)*5120);}
+    else{for(int t=0;t<number_of_tori;t++) for(int e=0;e<24;e++) triangles_to_remove.Append(triangle_indices[e]+(t-1)*1280);}
     Sort(triangles_to_remove);for(int i=triangles_to_remove.m;i>=1;i--) cloth_panel->mesh.elements.Remove_Index(triangles_to_remove(i));
  
     deformable_object.collisions.collision_structures.Append(cloth_panel);
@@ -187,7 +187,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     //tests.Add_Ground();
     //solids_parameters.rigid_body_parameters.list(number_of_tori+2)->frame.t.y=-13;
     // correct number nodes
-    for(int i=1;i<=deformable_object.structures.m;i++) deformable_object.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_object.structures.m;i++) deformable_object.structures(i)->Update_Number_Nodes();
 
     // make self_collision surface
     TRIANGULATED_SURFACE<T>* self_collision_surface=TRIANGULATED_SURFACE<T>::Create(particles);
@@ -254,9 +254,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 //#####################################################################
 void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE
 {
-//    if(current_position_time < 56 && current_position_time > 55) for(int i=1;i<=V.m;i++) V(i)=TV();
+//    if(current_position_time < 56 && current_position_time > 55) for(int i=0;i<V.m;i++) V(i)=TV();
 //    if(current_position_time > 17+55 && current_position_time < 11) V(6561)=TV(.5,.1,.2); // pulled 2 uses .5 for Y, pulled 3 uses .1 for Y
-    if(current_position_time<1) for(int i=1;i<=V.m;i++) V(i)=TV();
+    if(current_position_time<1) for(int i=0;i<V.m;i++) V(i)=TV();
     if(current_position_time>17 && current_position_time<56) V(6561)=TV(.5,.1,.2); // pulled 2 uses .5 for Y, pulled 3 uses .1 for Y
 }
 //#####################################################################
@@ -264,9 +264,9 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
 //#####################################################################
 void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE
 {
-    //if(current_position_time < 56 && current_position_time > 55) for(int i=1;i<=V.m;i++) V(i)=TV();
+    //if(current_position_time < 56 && current_position_time > 55) for(int i=0;i<V.m;i++) V(i)=TV();
     //if(current_position_time > 55+17) V(6561)=TV();
-    if(current_position_time < 1) for(int i=1;i<=V.m;i++) V(i)=TV();
+    if(current_position_time < 1) for(int i=0;i<V.m;i++) V(i)=TV();
     if(current_position_time > 17) V(6561)=TV();
 }
 //#####################################################################
@@ -276,8 +276,8 @@ void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,
 { 
     if(restart)    twist(number_of_tori+1)=TWIST<TV>();
     else{
-        for(int t=1;t<=number_of_tori;t++) twist(t).angular=TV(0,pow(-1.,t)*.1,0);
-        for(int t=1;t<=number_of_tori;t++) twist(t).linear=t<=number_of_tori/2?TV(.4,0,0):TV(-.4,0,0);}
+        for(int t=0;t<number_of_tori;t++) twist(t).angular=TV(0,pow(-1.,t)*.1,0);
+        for(int t=0;t<number_of_tori;t++) twist(t).linear=t<=number_of_tori/2?TV(.4,0,0):TV(-.4,0,0);}
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes
@@ -285,7 +285,7 @@ void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,
 void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE
 {
     if(restart) twist(number_of_tori+1)=TWIST<TV>();
-    else for(int t=1;t<=number_of_tori;t++) twist(t)=TWIST<TV>();
+    else for(int t=0;t<number_of_tori;t++) twist(t)=TWIST<TV>();
 }
 //#####################################################################
 // Preprocess_Frame
@@ -300,7 +300,7 @@ void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
         std::cout<<"adding gravity to particles"<<std::endl;}
     T change=(number_of_tori+1)/2;
     if(frame<12){
-        for(int t=1;t<=number_of_tori;t++){
+        for(int t=0;t<number_of_tori;t++){
             solids_parameters.rigid_body_parameters.list(t)->frame.t+=TV((change-t)*.05,0,0);
             solids_parameters.rigid_body_parameters.list(t)->frame.r=QUATERNION<T>(pow(-1.,t)*.1,VECTOR<T,3>(0,1,0))*solids_parameters.rigid_body_parameters.list(t)->frame.r;}}
 }
@@ -319,7 +319,7 @@ void Read_Output_Files_Solids(const int frame) PHYSBAM_OVERRIDE
     int count=1;
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T,GRID<TV>,RW>::Read_Output_Files_Solids(frame);
 
-    for(int i=1;i<=solid_body_collection.deformable_body_collection.binding_list.bindings.m;i++)
+    for(int i=0;i<solid_body_collection.deformable_body_collection.binding_list.bindings.m;i++)
         if(RIGID_BODY_BINDING<T,TV>* binding=dynamic_cast<RIGID_BODY_BINDING<T,TV>*>(solid_body_collection.deformable_body_collection.binding_list.bindings(i))){
             binding->rigid_body_particles=&solid_body_collection.deformable_object.rigid_body_particles;
             binding->particle_index=stored_bindings(count).x;

@@ -52,7 +52,7 @@ public:
         objects.Remove_All();
         ARRAY<ID>* occupancy_list=0;
         if(hashtable.Get(voxel,occupancy_list)) for(int t=1;t<=occupancy_list->m;t++) objects.Append((*occupancy_list)(t));
-        for(int i=1;i<=bodies_not_in_partition.m;i++) objects.Append(bodies_not_in_partition(i));
+        for(int i=0;i<bodies_not_in_partition.m;i++) objects.Append(bodies_not_in_partition(i));
     }
 
     template<class T_RETURN>

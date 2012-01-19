@@ -120,21 +120,21 @@ List_Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         if(range!="<unknown>"){
             STRING_UTILITIES::Parse_Integer_List(range,integer_list);
             id_list.Resize(integer_list.Size());
-            for(int i=1;i<=integer_list.m;i++) id_list(i)=int(integer_list(i));}
+            for(int i=0;i<integer_list.m;i++) id_list(i)=int(integer_list(i));}
         else if(type=="Rigid_Body_List") for(int i(1);i<=rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if(rigid_body_collection.Is_Active(i)) id_list.Append(i);
         else PHYSBAM_FATAL_ERROR("A Range is Required for a Rigid_Body_Instance.");
 
         if(type=="Rigid_Body_List" && parents.m){
-            for(int index=1;index<=id_list.m;index++){int id=id_list(index);
+            for(int index=0;index<id_list.m;index++){int id=id_list(index);
                 if(rigid_body_parents(index)){
                     int parent_number=0;
-                    for(int k=1;k<=parents.m;k++) if(rigid_body_parents(index)==parents(k)) parent_number++;
+                    for(int k=0;k<parents.m;k++) if(rigid_body_parents(index)==parents(k)) parent_number++;
                     if(parent_number==0){rigid_body_collection.rigid_body_particle.Remove_Body(id);}}}}
 
-        for(int index=1;index<=id_list.m;index++){int id=id_list(index);
+        for(int index=0;index<id_list.m;index++){int id=id_list(index);
             if(parents.m && rigid_body_parents(index)){
                 int parent_number=0;
-                for(int k=1;k<=parents.m;k++)
+                for(int k=0;k<parents.m;k++)
                     if(rigid_body_parents(index)==parents(k)) parent_number++;
                 if(parent_number==0) continue;}// rigid_body_parents(index)==0 for rigid bodies non 0 for deformable for breakable bodies.
             std::string render_object=parameters.Get_Parameter("Render_Object",std::string("Null")); // object to use instead of an extra object
@@ -195,7 +195,7 @@ List_Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
                 deformable_body_collection.structures.Remove_All();
                 ARRAY<int> label;volume->mesh.Identify_Edge_Connected_Components(label);
                 HASHTABLE<int> component_done;
-                for(int p=1;p<=label.m;p++) if(component_done.Set(label(p))){
+                for(int p=0;p<label.m;p++) if(component_done.Set(label(p))){
                     TETRAHEDRALIZED_VOLUME<T>* component_volume=TETRAHEDRALIZED_VOLUME<T>::Create(deformable_body_collection.particles);
                     for(int t=1;t<=volume->mesh.elements.m;t++) if(label.Subset(volume->mesh.elements(t)).Contains(label(p)))
                         component_volume->mesh.elements.Append(volume->mesh.elements(t));
@@ -206,7 +206,7 @@ List_Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
             else PHYSBAM_NOT_IMPLEMENTED("Split_Object for non-tetrahedralized volumes");}
         if(integer_list.Min()<1 || integer_list.Max()>deformable_body_collection.structures.m){
             LOG::cerr<<"Range out of bound for object "<<name<<std::endl;PHYSBAM_FATAL_ERROR();}
-        for(int index=1;index<=integer_list.m;index++){
+        for(int index=0;index<integer_list.m;index++){
             int i=integer_list(index);
             object=0;
             RENDERING_TRIANGULATED_SURFACE<T>* surface=0;
@@ -271,7 +271,7 @@ List_Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         if(object_name==std::string("<unknown>")){LOG::cout<<"Unknown Deformable Object"<<std::endl;PHYSBAM_FATAL_ERROR();}
         if(range!="<unknown>") STRING_UTILITIES::Parse_Integer_List(range,integer_list);
         else{LOG::cout<<"A Range is Required for a Deformable_Object_Instance."<<std::endl;PHYSBAM_FATAL_ERROR();}
-        for(int index=1;index<=integer_list.m;index++){
+        for(int index=0;index<integer_list.m;index++){
             int i=integer_list(index);
             std::string structure_name=object_name+"_"+STRING_UTILITIES::string_sprintf("%d",i);
             if(!objects.Get(structure_name,object)){LOG::cerr<<"Structure "<<structure_name<<" not found.  Check original range for object "<<name<<std::endl;PHYSBAM_FATAL_ERROR();}

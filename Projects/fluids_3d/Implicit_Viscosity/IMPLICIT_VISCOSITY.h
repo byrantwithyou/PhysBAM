@@ -46,7 +46,7 @@ public:
 //#####################################################################
 void Initialize_Phi()
 {
-    for(int i=1;i<=m;i++) for(int j=1;j<=n;j++) for(int ij=1;ij<=mn;ij++) 
+    for(int i=0;i<m;i++) for(int j=0;j<n;j++) for(int ij=0;ij<mn;ij++) 
         phi(i,j,ij)=minmag(grid.y(j)-(T).5,(T)sqrt(sqr(grid.x(i)-(T).5)+sqr(grid.y(j)-(T).75)+sqr(grid.z(ij)-(T).5))-(T).125);
 }
 //#####################################################################
@@ -54,7 +54,7 @@ void Initialize_Phi()
 //#####################################################################
 void Specify_Variable_Viscosity_Values(ARRAY<T,VECTOR<int,3> >& viscosity)
 {
-    for(int i=1;i<=m;i++) for(int j=1;j<=n;j++) for(int ij=1;ij<=n;ij++)
+    for(int i=0;i<m;i++) for(int j=0;j<n;j++) for(int ij=0;ij<n;ij++)
         if(grid.x(i) > .5) viscosity(i,j,ij)=1e6*.001137;
         else viscosity(i,j,ij)=(T)(1e6*.001137*1e-6);
 }

@@ -19,10 +19,10 @@ class Read_Write<SPARSE_MATRIX_NXN<T>,RW>
 public:
     static void Read(std::istream& input,SPARSE_MATRIX_NXN<T>& object)
     {object.Clean_Memory();Read_Binary<RW>(input,object.n);object.A.Resize(object.n);
-    for(int i=1;i<=object.n;i++){object.A(i)=new SPARSE_VECTOR_ND<T>(object.n);Read_Binary<RW>(input,*object.A(i));}}
+    for(int i=0;i<object.n;i++){object.A(i)=new SPARSE_VECTOR_ND<T>(object.n);Read_Binary<RW>(input,*object.A(i));}}
 
     static void Write(std::ostream& output,const SPARSE_MATRIX_NXN<T>& object)
-    {Write_Binary<RW>(output,object.n);for(int i=1;i<=object.n;i++)Write_Binary<RW>(output,*object.A(i));}
+    {Write_Binary<RW>(output,object.n);for(int i=0;i<object.n;i++)Write_Binary<RW>(output,*object.A(i));}
 };
 }
 #endif

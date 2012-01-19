@@ -122,7 +122,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     else if(use_be) solids_parameters.use_trapezoidal_rule_for_velocities=false;
     deformable_body_collection.particles.Compute_Auxiliary_Attributes(soft_bindings);
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     // add forces
     switch(test_number){
@@ -237,7 +237,7 @@ void Create_Spring_Chain(int count)
     int current_node=segmented_curve.particles.array_collection->Add_Element();
     static_cast<PARTICLES<TV>&>(segmented_curve.particles).mass(current_node)=1;
     segmented_curve.particles.X(current_node)=TV(0,(T)1,(T)current_endpoint_z);
-    for(int i=1;i<=count;i++){
+    for(int i=0;i<count;i++){
         int new_edge_node=segmented_curve.particles.array_collection->Add_Element();
         static_cast<PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node)=static_cast<PARTICLES<TV>&>(segmented_curve.particles).mass(current_node);
         segmented_curve.particles.X(new_edge_node)=TV(0,(T)1,(T)current_endpoint_z+1);

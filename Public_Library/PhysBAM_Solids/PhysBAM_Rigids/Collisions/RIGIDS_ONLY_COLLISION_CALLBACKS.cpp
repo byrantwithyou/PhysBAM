@@ -42,9 +42,9 @@ template<class TV> void RIGIDS_ONLY_COLLISION_CALLBACKS<TV>::
 Restore_Positions()
 {
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=evolution.rigid_body_collection;
-    for(int i=1;i<=rigid_body_collection.dynamic_rigid_body_particles.m;i++)
+    for(int i=0;i<rigid_body_collection.dynamic_rigid_body_particles.m;i++)
         Restore_Position(rigid_body_collection.dynamic_rigid_body_particles(i));
-    for(int i=1;i<=rigid_body_collection.static_and_kinematic_rigid_bodies.m;i++)
+    for(int i=0;i<rigid_body_collection.static_and_kinematic_rigid_bodies.m;i++)
         Restore_Position(rigid_body_collection.static_and_kinematic_rigid_bodies(i));
 }
 //#####################################################################
@@ -195,7 +195,7 @@ End_Fracture(const int body_id,ARRAY<int>& added_bodies)
     evolution.rigid_velocity_difference.Resize(new_size);
     evolution.rigid_angular_momentum_difference.Resize(new_size);
 
-    for(int j=1;j<=added_bodies.m;j++){
+    for(int j=0;j<added_bodies.m;j++){
         Save_Position(added_bodies(j));
         Save_Velocity(added_bodies(j));
         evolution.rigid_angular_momentum_difference(body_id)=old_stored_difference.angular;

@@ -307,7 +307,7 @@ Initialize_Components_And_Key_Bindings()
 
     // add scaling controls to scalar fields
     opengl_world.Set_Key_Binding_Category("Scaling");
-    for(int c=1;c<=component_list.m;c++){
+    for(int c=0;c<component_list.m;c++){
         if(OPENGL_COMPONENT_SCALAR_FIELD_1D<T,T,RW>* scalar_field_component=dynamic_cast<OPENGL_COMPONENT_SCALAR_FIELD_1D<T,T,RW>*>(component_list(c))){
             opengl_world.Append_Bind_Key('>',scalar_field_component->Increase_Scale_CB());
             opengl_world.Append_Bind_Key('<',scalar_field_component->Decrease_Scale_CB());}

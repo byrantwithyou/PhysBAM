@@ -517,8 +517,8 @@ void Ring_Test()
         rigid_body.Set_Mass(10);
         rigid_body.simplicial_object->Set_Desired_Particle_Partition_Size(VECTOR<int,3>(3,1,3));}
 
-    for(int i=1;i<=poles;i++)
-        for(int j=1;j<=poles;j++){
+    for(int i=0;i<poles;i++)
+        for(int j=0;j<poles;j++){
             // Poles
             RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("Rings_Test/medium_cylinder",1,mu);
             rigid_body.Set_Name(STRING_UTILITIES::string_sprintf("pole %d %d",i,j));
@@ -536,9 +536,9 @@ void Bone_Test()
     RIGID_BODY<TV>* rigid_body=0;
 
     ARRAY<std::string>filenames;
-    for(int i=1;i<=300;i++) filenames.Append("New_Bones/Cranium_1");
-    for(int i=1;i<=150;i++) filenames.Append("New_Bones/Pelvis_1");
-    for(int i=1;i<=50;i++) filenames.Append("New_Bones/Left_Femur_2");
+    for(int i=0;i<300;i++) filenames.Append("New_Bones/Cranium_1");
+    for(int i=0;i<150;i++) filenames.Append("New_Bones/Pelvis_1");
+    for(int i=0;i<50;i++) filenames.Append("New_Bones/Left_Femur_2");
 
     T mu=(T)0.4;
     T epsilon=(T)0.3;
@@ -1030,7 +1030,7 @@ void Removed_Bodies()
 {
     last_frame=240;
     ARRAY<RIGID_BODY<TV>*> bodies;
-    for(int i=1;i<=20;i++){
+    for(int i=0;i<20;i++){
         bodies.Append(&tests.Add_Rigid_Body("subdivided_box",(T)1,(T).5));
         bodies(i)->X()=TV(0,i,0);
         bodies(i)->Set_Coefficient_Of_Restitution((T).5);
@@ -1045,7 +1045,7 @@ void Kinematic_Collision()
 {
     last_frame=240;
     ARRAY<RIGID_BODY<TV>*> bodies;
-    for(int i=1;i<=2;i++){
+    for(int i=0;i<2;i++){
         bodies.Append(&tests.Add_Rigid_Body("subdivided_box",(T)1,(T).5));
         bodies(i)->X()=TV(0,2*i-1,0);
         bodies(i)->Set_Coefficient_Of_Restitution((T).5);
@@ -1157,7 +1157,7 @@ void Cluster_Fracture()
     //RIGID_BODY_CLUSTER_BINDINGS_SIMPLE_FRACTURE<TV>* cluster_fracture_callbacks=new RIGID_BODY_CLUSTER_BINDINGS_SIMPLE_FRACTURE<TV>(rigid_body_collection,rigid_bindings);
     //cluster_fracture_callbacks->allowed_compresive_strain=-.001;
     //rigid_bindings.callbacks=cluster_fracture_callbacks;
-    for(int i=1;i<=num_bodies;i++){
+    for(int i=0;i<num_bodies;i++){
         RIGID_BODY_PARTICLES<TV>& particles=solid_body_collection.rigid_body_collection.rigid_body_particle;    
         RIGID_BODY<TV>& rigid_body=*new RIGID_BODY<TV>(solid_body_collection.rigid_body_collection);
         children.Append(rigid_body.particle_index);
@@ -1193,7 +1193,7 @@ void Sphere_Sanity_Tests()
     last_frame=24;
     int n=3;
     if(parameter==2) n=0;
-    for(int i=1;i<=n;i++) tests.Add_Rigid_Body("sphere",1,1).X().x=(T)3*i;
+    for(int i=0;i<n;i++) tests.Add_Rigid_Body("sphere",1,1).X().x=(T)3*i;
     if(parameter==3) solid_body_collection.rigid_body_collection.rigid_body_particle.Remove_Body(3);
     if(parameter==4) solid_body_collection.rigid_body_collection.rigid_geometry_collection.Deactivate_Geometry(2);
 }

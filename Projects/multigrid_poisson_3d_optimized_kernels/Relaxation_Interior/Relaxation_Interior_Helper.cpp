@@ -42,7 +42,7 @@ Run_Parallel(const int number_of_partitions)
     if(x_size*y_size*z_size<=32*32*32) {Run();return;} // Run serially for small problems
 
     int number_of_x_blocks=coarse_x_size/x_block_size;
-    for(int partition=1;partition<=number_of_partitions;partition++){
+    for(int partition=0;partition<number_of_partitions;partition++){
         int first_block_of_partition=(number_of_x_blocks/number_of_partitions)*(partition-1)+std::min(number_of_x_blocks%number_of_partitions,partition-1)+1;
         int last_block_of_partition=(number_of_x_blocks/number_of_partitions)*partition+std::min(number_of_x_blocks%number_of_partitions,partition);
         int xmin=(first_block_of_partition-1)*x_block_size+1;
@@ -51,7 +51,7 @@ Run_Parallel(const int number_of_partitions)
         pthread_queue->Queue(task);}
     pthread_queue->Wait();
 
-    for(int partition=1;partition<=number_of_partitions;partition++){
+    for(int partition=0;partition<number_of_partitions;partition++){
         int first_block_of_partition=(number_of_x_blocks/number_of_partitions)*(partition-1)+std::min(number_of_x_blocks%number_of_partitions,partition-1)+1;
         int last_block_of_partition=(number_of_x_blocks/number_of_partitions)*partition+std::min(number_of_x_blocks%number_of_partitions,partition);
         int xmin=(first_block_of_partition-1)*x_block_size+1;
@@ -70,8 +70,8 @@ Run_Major_X_Range(const int xmin,const int xmax)
     const T two_thirds=2./3.;
 
     int i=xmin;
-    for(int j=1;j<=coarse_y_size;j++)
-    for(int k=1;k<=coarse_z_size;k++)
+    for(int j=0;j<coarse_y_size;j++)
+    for(int k=0;k<coarse_z_size;k++)
     {
         int index=2*(i*x_shift+j*y_shift+k*z_shift)-x_plus_one_y_plus_one_z_plus_one_shift;
 
@@ -157,8 +157,8 @@ Run_Major_X_Range(const int xmin,const int xmax)
     }
 
     for(int i=xmin+1;i<=xmax;i++)
-    for(int j=1;j<=coarse_y_size;j++)
-    for(int k=1;k<=coarse_z_size;k++)
+    for(int j=0;j<coarse_y_size;j++)
+    for(int k=0;k<coarse_z_size;k++)
     {
         int index=2*(i*x_shift+j*y_shift+k*z_shift)-x_plus_one_y_plus_one_z_plus_one_shift;
 

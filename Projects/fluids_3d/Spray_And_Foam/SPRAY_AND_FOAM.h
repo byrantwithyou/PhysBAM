@@ -589,7 +589,7 @@ void Find_Removed_Particles_That_Will_Appear_This_Frame(int particle_type,const 
         FILE_UTILITIES::Read_From_File<T>(STRING_UTILITIES::string_sprintf("%s/removed_particle_times.%d",input_water_directory.c_str(),frame),removed_particle_times);
 
         HASHTABLE<int,int> hashtable(removed_particle_times.m);
-        for(int i=1;i<=removed_particle_times.m;i++)
+        for(int i=0;i<removed_particle_times.m;i++)
             hashtable.Insert(removed_particle_times(i).x,i);
 
         // read in this frames particles

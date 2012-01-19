@@ -65,7 +65,7 @@ Compute(const T dt,const ARRAY<bool,FACE_INDEX<d> >& psi_N,T mu)
 template<class TV> void MATRIX_VISCOUS_FORCES<TV>::
 Times_Add(const VECTOR_ND<T>& velocities,ARRAY<T,VISCOUS_FORCE_ID>& viscous_force_coefficients) const
 {
-    for(int i=1;i<=entries.m;i++){
+    for(int i=0;i<entries.m;i++){
         const ENTRY& entry=entries(i);
         viscous_force_coefficients(entry.viscous_id)+=entry.weight*velocities(entry.face_index);}
 }
@@ -84,7 +84,7 @@ Times(const VECTOR_ND<T>& velocities,ARRAY<T,VISCOUS_FORCE_ID>& viscous_force_co
 template<class TV> void MATRIX_VISCOUS_FORCES<TV>::
 Transpose_Times_Add(const ARRAY<T,VISCOUS_FORCE_ID>& viscous_force_coefficients,VECTOR_ND<T>& velocities) const
 {
-    for(int i=1;i<=entries.m;i++){
+    for(int i=0;i<entries.m;i++){
         const ENTRY& entry=entries(i);
         velocities(entry.face_index)+=entry.weight*viscous_force_coefficients(entry.viscous_id);}
 }
@@ -133,7 +133,7 @@ Print_Each_Matrix(int n) const
 {
     OCTAVE_OUTPUT<T> oo(STRING_UTILITIES::string_sprintf("N-%i.txt",n).c_str());
     oo.Begin_Sparse_Matrix("N",Value(last_id),index_map.Number_Faces());
-    for(int i=1;i<=entries.m;i++){
+    for(int i=0;i<entries.m;i++){
         const ENTRY& entry=entries(i);
         oo.Add_Sparse_Entry(Value(entry.viscous_id),entry.face_index,entry.weight);}
     oo.End_Sparse_Matrix();
@@ -144,7 +144,7 @@ Print_Each_Matrix(int n) const
 template<class TV> void MATRIX_VISCOUS_FORCES<TV>::
 Add_Raw_Matrix(ARRAY<TRIPLE<int,int,T> >& data) const
 {
-    for(int i=1;i<=entries.m;i++){
+    for(int i=0;i<entries.m;i++){
         const ENTRY& entry=entries(i);
         data.Append(TRIPLE<int,int,T>(Value(entry.viscous_id),entry.face_index,entry.weight));}
 }

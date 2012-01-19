@@ -88,7 +88,7 @@ public:
         if(test_number==2){
             SEGMENT_MESH* sine_segment=new SEGMENT_MESH();sine_segment->Initialize_Straight_Mesh(horizontal_cells,false);
             PARTICLES<TV>* sine_particles=new PARTICLES<TV>();sine_particles->Increase_Array_Size(horizontal_cells);
-            for(int p=1;p<=horizontal_cells;p++){T t=(p-1)/(T)(horizontal_cells-1);sine_particles->X(p)=TV(1.5*t,.4+.25*sin(13*pi*t));}
+            for(int p=0;p<horizontal_cells;p++){T t=(p-1)/(T)(horizontal_cells-1);sine_particles->X(p)=TV(1.5*t,.4+.25*sin(13*pi*t));}
             sine_curve=new SEGMENTED_CURVE_2D<T>(*sine_segment,*sine_particles);}
 
         output_directory=STRING_UTILITIES::string_sprintf("Fluid_Control/Test_%d__Resolution_%d_%d",test_number,grid.m-1,grid.n-1);

@@ -48,7 +48,7 @@ Initialize_Grid(const T_GRID& mac_grid)
         int matrix_index;
         count++;cell_index_to_matrix_index(cell_index)=matrix_index=count;
         matrix_index_to_cell_index(matrix_index)=cell_index;}
-    for(int i=1;i<=row_counts.m;i++){
+    for(int i=0;i<row_counts.m;i++){
         int boundary=0;
         for(int j=1;j<=TV::dimension;j++) if(matrix_index_to_cell_index(i)(j)==1 || matrix_index_to_cell_index(i)(j)==mac_grid.Counts()(j)) boundary++;
         row_counts(i)=(2*TV::dimension+1)-boundary;}

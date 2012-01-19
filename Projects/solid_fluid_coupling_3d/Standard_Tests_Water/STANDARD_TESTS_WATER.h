@@ -490,7 +490,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
 //#####################################################################
 //void Clear_Constrained_Particles(ARRAY<bool>& particle_is_simulated) PHYSBAM_OVERRIDE
 //{
-//    for(int i=1;i<=constrained_node_positions.m;i++) particle_is_simulated(constrained_node_positions(i).x)=false;
+//    for(int i=0;i<constrained_node_positions.m;i++) particle_is_simulated(constrained_node_positions(i).x)=false;
 //}
 //#####################################################################
 // Function Update_Solids_Parameters
@@ -501,7 +501,7 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
         ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
         T desired_x=(T)two_pi/16;
         ROTATION<TV> desired_rotation=ROTATION<TV>(desired_x*sin(4*time),TV(0,1,0));
-        for(int i=1;i<=arb.joint_mesh.joints.m;i++){JOINT<TV>& joint=*arb.joint_mesh.joints(i);
+        for(int i=0;i<arb.joint_mesh.joints.m;i++){JOINT<TV>& joint=*arb.joint_mesh.joints(i);
             if(joint.joint_function) joint.joint_function->Set_Target_Angle(desired_rotation);}}
 }
 //#####################################################################
@@ -700,15 +700,15 @@ void Initialize_Velocities() PHYSBAM_OVERRIDE
 //#####################################################################
 void Get_Source_Velocities(ARRAY<T,FACE_INDEX<3> >& face_velocities,ARRAY<bool,FACE_INDEX<3> >& psi_N,const T time) PHYSBAM_OVERRIDE
 {
-    for(int i=1;i<=fountain_source.m;i++) BASE::Get_Source_Velocities(fountain_source(i),world_to_source,fountain_source_velocity(i));
-    for(int i=1;i<=fountain_source_boxes.m;i++) BASE::Get_Source_Velocities(fountain_source_boxes(i),world_to_source,fountain_source_velocity(i+fountain_source.m));
+    for(int i=0;i<fountain_source.m;i++) BASE::Get_Source_Velocities(fountain_source(i),world_to_source,fountain_source_velocity(i));
+    for(int i=0;i<fountain_source_boxes.m;i++) BASE::Get_Source_Velocities(fountain_source_boxes(i),world_to_source,fountain_source_velocity(i+fountain_source.m));
 }
 //#####################################################################
 // Function Find_Placement
 //#####################################################################
 FRAME<TV> Find_Placement(RANDOM_NUMBERS<T>& random,const BOX<TV>& bounding_box,ARRAY<ORIENTED_BOX<TV> >& bounding_boxes,const BOX<TV>& world,bool want_rotate)
 {
-    for(int i=1;i<=10000;i++){
+    for(int i=0;i<10000;i++){
         FRAME<TV> frame;
         if(want_rotate) frame.r=random.template Get_Rotation<TV>();
         ORIENTED_BOX<TV> oriented_box(bounding_box,frame.r);
@@ -716,7 +716,7 @@ FRAME<TV> Find_Placement(RANDOM_NUMBERS<T>& random,const BOX<TV>& bounding_box,A
         frame.t=random.Get_Uniform_Vector(world.min_corner-new_box.min_corner,world.max_corner-new_box.max_corner);
         oriented_box.corner+=frame.t;
         bool okay=true;
-        for(int j=1;j<=bounding_boxes.m;j++) if(oriented_box.Intersection(bounding_boxes(j))){okay=false;break;}
+        for(int j=0;j<bounding_boxes.m;j++) if(oriented_box.Intersection(bounding_boxes(j))){okay=false;break;}
         if(okay){
             bounding_boxes.Append(oriented_box);
             return frame;}}
@@ -788,14 +788,14 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
             RANDOM_NUMBERS<T> random;
 
-            for(int i=1;i<=num_spheres;i++){
+            for(int i=0;i<num_spheres;i++){
                 RIGID_BODY<TV>& rigid_body_sphere=solids_tests.Add_Rigid_Body("sphere",scale,(T)0,true,false);
                 rigid_body_sphere.Update_Bounding_Box();
                 rigid_body_sphere.Set_Frame(Find_Placement(random,rigid_body_sphere.axis_aligned_bounding_box,bounding_boxes,world,true));
                 rigid_body_sphere.Set_Mass(sphere_mass);///random.Get_Uniform_Number((T).1,(T)2));
                 rigid_bodies_to_simulate.Append(rigid_body_sphere.particle_index);}
 
-            for(int i=1;i<=num_blocks;i++){
+            for(int i=0;i<num_blocks;i++){
                 RIGID_BODY<TV>& rigid_body_block=solids_tests.Add_Rigid_Body("subdivided_box",scale,(T)0);
                 rigid_body_block.Update_Bounding_Box();
                 rigid_body_block.Set_Frame(Find_Placement(random,rigid_body_block.axis_aligned_bounding_box,bounding_boxes,world,true));
@@ -935,7 +935,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
             RANDOM_NUMBERS<T> random;
 
-            for(int i=1;i<=num_spheres;i++){
+            for(int i=0;i<num_spheres;i++){
                 RIGID_BODY<TV>& rigid_body_sphere=solids_tests.Add_Rigid_Body("sphere",scale,(T).15,true,false);
                 rigid_body_sphere.Update_Bounding_Box();
                 rigid_body_sphere.Set_Frame(Find_Placement(random,rigid_body_sphere.axis_aligned_bounding_box,bounding_boxes,world,true));
@@ -943,7 +943,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 rigid_body_sphere.Set_Mass(sphere_mass);///random.Get_Uniform_Number((T).1,(T)2));
                 rigid_bodies_to_simulate.Append(rigid_body_sphere.particle_index);}
 
-            for(int i=1;i<=num_blocks;i++){
+            for(int i=0;i<num_blocks;i++){
                 RIGID_BODY<TV>& rigid_body_block=solids_tests.Add_Rigid_Body("subdivided_box",scale,(T).15);
                 rigid_body_block.Update_Bounding_Box();
                 rigid_body_block.Set_Frame(Find_Placement(random,rigid_body_block.axis_aligned_bounding_box,bounding_boxes,world,true));
@@ -1008,7 +1008,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     solid_body_collection.collision_body_list.Add_Bodies(*rigid_body_collection.rigid_geometry_collection.collision_body_list);
 
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     // correct mass
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Mass_To_Parents();
@@ -1089,9 +1089,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     // collide structures with the ground and walls only
     if(test_number==9){
         deformable_body_collection.collisions.Use_Structure_Collide_Collision_Body(true);
-        for(int s=1;s<=deformable_body_collection.deformable_geometry.structures.m;s++) for(int r=1;r<=rigid_bodies_to_collide_against.m;r++)
+        for(int s=0;s<deformable_body_collection.deformable_geometry.structures.m;s++) for(int r=0;r<rigid_bodies_to_collide_against.m;r++)
             deformable_body_collection.collisions.structure_collide_collision_body(s).Set(rigid_body_collection.rigid_geometry_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(rigid_bodies_to_collide_against(r)));
-        for(int i=1;i<=solid_body_collection.solids_forces.m;i++)
+        for(int i=0;i<solid_body_collection.solids_forces.m;i++)
             solid_body_collection.solids_forces(i)->limit_time_step_by_strain_rate=false;}
 }
 //#####################################################################
@@ -1173,8 +1173,8 @@ void Balloon()
 //#####################################################################
 bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
 {
-    for(int i=1;i<=fountain_source.m;i++) Adjust_Phi_With_Source(fountain_source(i),world_to_source);
-    for(int i=1;i<=fountain_source_boxes.m;i++) Adjust_Phi_With_Source(fountain_source_boxes(i),world_to_source);
+    for(int i=0;i<fountain_source.m;i++) Adjust_Phi_With_Source(fountain_source(i),world_to_source);
+    for(int i=0;i<fountain_source_boxes.m;i++) Adjust_Phi_With_Source(fountain_source_boxes(i),world_to_source);
     return (fountain_source.m && fountain_source_boxes.m);
 }
 //#####################################################################
@@ -1190,7 +1190,7 @@ void Set_External_Positions(ARRAY_VIEW<TV> X,ARRAY_VIEW<ROTATION<TV> > rotation,
         if(time<heavy_sphere_drop_time) X(heavy_sphere_index).y=heavy_sphere_initial_height;}
     if(test_number==4){
         // slide all the rigid body walls down
-        for(int i=1;i<=4;i++) X(i).y=(T).75;
+        for(int i=0;i<4;i++) X(i).y=(T).75;
     }
 }
 //#####################################################################

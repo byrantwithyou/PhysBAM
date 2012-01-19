@@ -170,7 +170,7 @@ Compute_Binding_Velocities()
 {
     binding_velocities.Resize(bindings1_to_apply.m);
     max_binding_speed_squared=0;
-    for(int i=1;i<=binding_velocities.m;i++){
+    for(int i=0;i<binding_velocities.m;i++){
         binding_velocities(i)=(bindings2_to_apply(i)-bindings1_to_apply(i))*levelset_frequency;
         max_binding_speed_squared=max(binding_velocities(i).Magnitude_Squared(),max_binding_speed_squared);}
 }
@@ -280,12 +280,12 @@ Initialize_Bodies()
         guide_object2->Read(stream_type,guide_sim_folder+"/",1,-1,0,solids_parameters.write_from_every_process);
         SEGMENTED_CURVE<TV>& guide_edges=guide_object1->deformable_geometry.template Find_Structure<SEGMENTED_CURVE<TV>&>(1);
         particles.array_collection->Add_Elements(guide_edges.particles.array_collection->Size());
-        for(int i=1;i<=guide_edges.mesh.elements.m;i++){sim_guide_edges.mesh.elements.Append(guide_edges.mesh.elements(i)+VECTOR<int,2>(offset,offset));}
+        for(int i=0;i<guide_edges.mesh.elements.m;i++){sim_guide_edges.mesh.elements.Append(guide_edges.mesh.elements(i)+VECTOR<int,2>(offset,offset));}
         for(int i=1;i<=guide_edges.particles.array_collection->Size();i++){particles.X(offset+i)=guide_edges.particles.X(i);particles.V(offset+i)=static_cast<PARTICLES<TV>&>(guide_edges.particles).V(i);}
     }
 
     if(use_guide){
-        for(int i=1;i<=guide_tet_edges.mesh.elements.m;i++){
+        for(int i=0;i<guide_tet_edges.mesh.elements.m;i++){
             if(i%6<=3&&i%6>0) sim_guide_tet_edges.mesh.elements.Append(guide_tet_edges.mesh.elements(i)+VECTOR<int,2>(0,offset));
             else sim_guide_tet_edges.mesh.elements.Append(guide_tet_edges.mesh.elements(i)+VECTOR<int,2>(offset,offset));}
         for(int i=1;i<guide_volume->mesh.elements.m;i++) sim_guide_volume->mesh.elements.Append(guide_volume->mesh.elements(i)+VECTOR<int,4>(0,offset,offset,offset));}
@@ -302,8 +302,8 @@ Initialize_Bodies()
     sim_guide_edges.Update_Number_Nodes();
     sim_guide_tet_edges.Update_Number_Nodes();
     assert(masses.m==offset);
-    for(int i=1;i<=masses.m;i++) {assert(masses(i));particles.mass(i)=masses(i);}
-    //for(int i=1;i<=masses.m;i++) {assert(masses(i));particles.mass(i)=4.;}
+    for(int i=0;i<masses.m;i++) {assert(masses(i));particles.mass(i)=masses(i);}
+    //for(int i=0;i<masses.m;i++) {assert(masses(i));particles.mass(i)=4.;}
     for(int i=offset+1;i<=particles.array_collection->Size();i++) particles.mass(i)=FLT_MAX;
     for(int i=1;i<fixed_nodes.m+1;i++) particles.mass(fixed_nodes(i))=FLT_MAX;
 
@@ -316,16 +316,16 @@ Initialize_Bodies()
         edges.mesh.Initialize_Neighbor_Nodes();
         while(1){
             int marked=0;
-            for(int p=1;p<=distance_to_root.m;p++) if(distance_to_root(p)==0){
+            for(int p=0;p<distance_to_root.m;p++) if(distance_to_root(p)==0){
                 ARRAY<int>& neighbor_nodes=(*edges.mesh.neighbor_nodes)(p);
-                for(int j=1;j<=neighbor_nodes.m;j++){
+                for(int j=0;j<neighbor_nodes.m;j++){
                     int neighbor_p=neighbor_nodes(j);
                     if(distance_to_root(neighbor_p)!=0){
                         distance_to_root(p)=distance_to_root(neighbor_p)+1;marked++;break;}}}
             if(!marked) break;}
         if(use_progressive_collision_thickness){
             collision_tolerances.Resize(particles.array_collection->Size());
-            for(int p=1;p<=distance_to_root.m;p++){
+            for(int p=0;p<distance_to_root.m;p++){
                 collision_tolerances(p)=(T)2e-4*min((T)5,(T)distance_to_root(p));} // only do for the first 10 segments
             LOG::cout<<collision_tolerances<<std::endl;}
         solid_body_collection.deformable_body_collection.collisions.collision_tolerances=&collision_tolerances;}
@@ -406,7 +406,7 @@ Initialize_Bodies()
     number_of_hairs=next_segment_id;
 #endif
     spring_id_to_particle.Resize(number_of_hairs);
-    for(int i=1;i<=fixed_nodes.m;i++) spring_id_to_particle(particle_to_spring_id(fixed_nodes(i)))=fixed_nodes(i);
+    for(int i=0;i<fixed_nodes.m;i++) spring_id_to_particle(particle_to_spring_id(fixed_nodes(i)))=fixed_nodes(i);
     // adhesion forces
     if(use_adhesion){
         segment_adhesion=new SEGMENT_ADHESION<TV>(particles,edges.mesh,particle_to_spring_id,solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.intersecting_edge_edge_pairs);
@@ -476,11 +476,11 @@ Initialize_Bodies()
         implicit_rigid_body=head;}
 
     // ignore collisions on nodes that start inside
-    for(int i=1;i<=fixed_nodes.m;i++) deformable_body_collection.collisions.ignored_nodes.Append(fixed_nodes(i));
+    for(int i=0;i<fixed_nodes.m;i++) deformable_body_collection.collisions.ignored_nodes.Append(fixed_nodes(i));
     if(restart)
         FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/ignored_nodes",deformable_body_collection.collisions.ignored_nodes);
     else{
-        /*for(int i=1;i<=edges.mesh.elements.m;i++) {
+        /*for(int i=0;i<edges.mesh.elements.m;i++) {
             const VECTOR<int,2> &nodes=edges.mesh.elements(i);
             if(implicit_rigid_body->Implicit_Geometry_Lazy_Inside(particles.X(nodes[1]))||implicit_rigid_body->Implicit_Geometry_Lazy_Inside(particles.X(nodes[2]))){
                 deformable_body_collection.collisions.ignored_nodes.Append(nodes[1]);
@@ -496,7 +496,7 @@ Initialize_Bodies()
     if(test_number>6){
         ARRAY<int> tri_indicies;
         FILE_UTILITIES::Read_From_File(stream_type,data_directory+"/"+sim_folder+"/interpolation",tri_indicies);
-        for(int i=1;i<=tri_indicies.m;i++){
+        for(int i=0;i<tri_indicies.m;i++){
             if(tri_indicies(i)<0) continue;
             interp_points.Append(implicit_rigid_body->World_Space_Point(implicit_rigid_body->simplicial_object->Get_Element(tri_indicies(i)).Center()));
             interp_normals.Append(implicit_rigid_body->simplicial_object->Get_Element(tri_indicies(i)).Normal());}
@@ -536,9 +536,9 @@ Initialize_Bodies()
     if(use_deforming_levelsets){
         FILE_UTILITIES::Read_From_File<T>(STRING_UTILITIES::string_sprintf("%s/%s/fixed_positions.%d",data_directory.c_str(),sim_folder.c_str(),(current_levelset-1)),bindings1);
         FILE_UTILITIES::Read_From_File<T>(STRING_UTILITIES::string_sprintf("%s/%s/fixed_positions.%d",data_directory.c_str(),sim_folder.c_str(),current_levelset),bindings2);}
-    else for(int i=1;i<=fixed_nodes.m;i++){bindings1.Append(particles.X(fixed_nodes(i)));bindings2.Append(particles.X(fixed_nodes(i)));}
+    else for(int i=0;i<fixed_nodes.m;i++){bindings1.Append(particles.X(fixed_nodes(i)));bindings2.Append(particles.X(fixed_nodes(i)));}
     // transform all points into world space
-    for(int i=1;i<=offset;i++) {particles.X(i)=implicit_rigid_body->World_Space_Point(particles.X(i));}
+    for(int i=0;i<offset;i++) {particles.X(i)=implicit_rigid_body->World_Space_Point(particles.X(i));}
 
     // parallel
     if(solid_body_collection.deformable_body_collection.mpi_solids){
@@ -588,7 +588,7 @@ Initialize_Bodies()
         
     // initial projection rest lengths (needs to happen after MPI restriction)
     project_restlengths.Resize(project_mesh.elements.m);
-    for(int i=1;i<=project_mesh.elements.m;i++){
+    for(int i=0;i<project_mesh.elements.m;i++){
         const VECTOR<int,2>& nodes=project_mesh.elements(i);
         project_restlengths(i)=(deformable_body_collection.particles.X(nodes[1])-deformable_body_collection.particles.X(nodes[2])).Magnitude();}
 
@@ -652,7 +652,7 @@ Update_Keyframed_Parameters_For_Time_Update(const T time)
 template<class T_input> void HAIR_SIM_TESTS<T_input>::
 Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time)
 {
-    for(int i=1;i<=fixed_nodes_to_apply.m;i++) V(fixed_nodes_to_apply(i))=TV();
+    for(int i=0;i<fixed_nodes_to_apply.m;i++) V(fixed_nodes_to_apply(i))=TV();
     if(guide_object1) for (int i=1;i<=guide_object1->particles.array_collection->Size();i++) {V(offset+i)=TV();}
 }
 //#####################################################################
@@ -663,8 +663,8 @@ Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_p
 {
     if(use_deforming_levelsets){
         Update_Keyframed_Parameters_For_Time_Update(velocity_time);
-        for(int i=1;i<=fixed_nodes_to_apply.m;i++) if(velocity_time<start_time) V(fixed_nodes_to_apply(i))=TV(); else V(fixed_nodes_to_apply(i))=binding_velocities(i);}
-    else for(int i=1;i<=fixed_nodes_to_apply.m;i++){
+        for(int i=0;i<fixed_nodes_to_apply.m;i++) if(velocity_time<start_time) V(fixed_nodes_to_apply(i))=TV(); else V(fixed_nodes_to_apply(i))=binding_velocities(i);}
+    else for(int i=0;i<fixed_nodes_to_apply.m;i++){
         TV point=bindings1_to_apply(i);
         V(fixed_nodes_to_apply(i))=implicit_rigid_body->Pointwise_Object_Velocity(implicit_rigid_body->World_Space_Point(point));}
     if(guide_object1){
@@ -685,7 +685,7 @@ Set_External_Positions(ARRAY_VIEW<TV> X,const T time)
     T alpha=(pseudo_time-(T)(int)pseudo_time);
     if(time<start_time) alpha=0;
     if(use_deforming_levelsets) Update_Keyframed_Parameters_For_Time_Update(time);
-    for(int i=1;i<=fixed_nodes_to_apply.m;i++){
+    for(int i=0;i<fixed_nodes_to_apply.m;i++){
         TV point;
         if(use_deforming_levelsets) point=(1-alpha)*bindings1_to_apply(i)+alpha*bindings2_to_apply(i);
         else point=bindings1_to_apply(i);
@@ -763,7 +763,7 @@ Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id)
         INTERPOLATION_CURVE<T,TV> curve, normal;
         curve.Add_Control_Point(0,interp_points(1));
         normal.Add_Control_Point(0,interp_normals(1));
-        for(int i=1;i<=interp_points.m;i++) {
+        for(int i=0;i<interp_points.m;i++) {
             curve.Add_Control_Point(start_time+duration*(T)i/interp_points.m,interp_points(i));
             normal.Add_Control_Point(start_time+duration*(T)i/interp_normals.m,interp_normals(i));}
         curve.Add_Control_Point(last_frame/frame_rate,interp_points(interp_points.m)+TV(0,0,(T)-100));
@@ -799,7 +799,7 @@ Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id)
         INTERPOLATION_CURVE<T,TV> curve, normal;
         curve.Add_Control_Point(0,interp_points(1)+TV(0,0,(T)10.));
         normal.Add_Control_Point(0,interp_normals(1));
-        for(int i=1;i<=interp_points.m;i++) {
+        for(int i=0;i<interp_points.m;i++) {
             curve.Add_Control_Point(start_time+duration*(T)i/interp_points.m,interp_points(i));
             normal.Add_Control_Point(start_time+duration*(T)i/interp_normals.m,interp_normals(i));}
         curve.Add_Control_Point(last_frame/frame_rate,interp_points(interp_points.m)+TV(0,0,(T)-10.));
@@ -853,7 +853,7 @@ Add_External_Impulses_Helper(ARRAY_VIEW<TV> V,const T time,const T dt,bool use_m
     
     if(use_momentum_conserving){
         for(int iteration=0;iteration<momentum_conserving_projection_iterations;iteration++){
-            for(int i=1;i<=project_mesh.elements.m;i++){
+            for(int i=0;i<project_mesh.elements.m;i++){
                 int child,parent;project_mesh.elements(i).Get(child,parent);
                 T restlength=project_restlengths(i);
                 TV X_child_new=particles.X(child)+dt*V(child);
@@ -863,7 +863,7 @@ Add_External_Impulses_Helper(ARRAY_VIEW<TV> V,const T time,const T dt,bool use_m
                 V(parent)+=impulse*particles.one_over_mass(parent);
                 V(child)-=impulse*particles.one_over_mass(child);}
             //T max_error=0;
-            //for(int i=1;i<=project_mesh.elements.m;i++){
+            //for(int i=0;i<project_mesh.elements.m;i++){
             //    int child,parent;project_mesh.elements(i).Get(child,parent);
             //    T restlength=project_restlengths(i);
             //    TV X_child_new=particles.X(child)+dt*V(child);
@@ -875,7 +875,7 @@ Add_External_Impulses_Helper(ARRAY_VIEW<TV> V,const T time,const T dt,bool use_m
     }
 
     if(use_non_momentum_conserving){
-        for(int i=1;i<=project_mesh.elements.m;i++){
+        for(int i=0;i<project_mesh.elements.m;i++){
             int child,parent;project_mesh.elements(i).Get(child,parent);
             T restlength=project_restlengths(i);
             TV X_child_new=particles.X(child)+dt*V(child);
@@ -907,7 +907,7 @@ Write_Interpolated_Level_Set(const int frame,T_IMPLICIT_COMBINED& combined) cons
         LEVELSET_IMPLICIT_OBJECT<TV> *levelset=(LEVELSET_IMPLICIT_OBJECT<TV>*)combined.implicit_object1;
         GRID<TV> grid(levelset->levelset.grid.counts.x,levelset->levelset.grid.counts.y,levelset->levelset.grid.counts.z,combined.box);
         ARRAY<T,VECTOR<int,3> > phi(grid.Domain_Indices());
-        for(int i=1;i<=grid.counts.x;i++) for(int j=1;j<=grid.counts.y;j++) for(int ij=1;ij<=grid.counts.z;ij++) phi(i,j,ij)=combined(grid.X(i,j,ij));
+        for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int ij=0;ij<grid.counts.z;ij++) phi(i,j,ij)=combined(grid.X(i,j,ij));
         LEVELSET_3D<GRID<TV> > interpolated_levelset(grid,phi);
         FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/grid.%d",output_directory.c_str(),frame),grid);
         FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/levelset.%d",output_directory.c_str(),frame),interpolated_levelset);}

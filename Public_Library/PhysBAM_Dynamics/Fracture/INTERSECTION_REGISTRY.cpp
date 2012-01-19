@@ -59,7 +59,7 @@ Intersection_List_For_Cuts(const VECTOR<int,d2>& simplices,const VECTOR<int,d+1>
     for(int i=intersection_list.m;i>=1;i--){
         const ARRAY<int>& all_simplices=simplices_on_intersection(intersection_list(i));
         bool ok=false;
-        for(int j=1;j<=all_simplices.m;j++){ // TODO: why is this necessary?
+        for(int j=0;j<all_simplices.m;j++){ // TODO: why is this necessary?
             VECTOR<int,d> simplex_nodes=cutting_simplices.simplices(all_simplices(j)).nodes;
             if(element_nodes.Contains_All(simplex_nodes)){ok=true;break;}}
         if(!ok) intersection_list.Remove_Index(i);}
@@ -72,14 +72,14 @@ template<class T,int d> template<class T_ARRAY> void INTERSECTION_REGISTRY<T,d>:
 Register_Intersection(const T_ARRAY& simplices,const typename REBIND<T_ARRAY,VECTOR<T,d-1> >::TYPE& weights,const int particle)
 {
     if(particle>simplices_on_intersection.m) Resize_Intersections(particle);
-    int max_simplex=0;for(int i=1;i<=simplices.m;i++) max_simplex=max(max_simplex,simplices(i));
+    int max_simplex=0;for(int i=0;i<simplices.m;i++) max_simplex=max(max_simplex,simplices(i));
     if(max_simplex>intersections_on_simplex.m) Resize_Simplices(max_simplex);
     if(!simplices_on_intersection(particle).m){
         simplices_on_intersection(particle)=simplices;
         simplex_weights_on_intersection(particle)=weights;
-        for(int s=1;s<=simplices.m;s++) intersections_on_simplex(simplices(s)).Append(particle);
+        for(int s=0;s<simplices.m;s++) intersections_on_simplex(simplices(s)).Append(particle);
         return;}
-    for(int i=1;i<=simplices.m;i++){
+    for(int i=0;i<simplices.m;i++){
         if(!simplices_on_intersection(particle).Contains(simplices(i))){
             simplices_on_intersection(particle).Append(simplices(i));
             simplex_weights_on_intersection(particle).Append(weights(i));

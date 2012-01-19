@@ -163,7 +163,7 @@ void Initialize_Phi(const int object,ARRAY<T>& phi)
     RED_GREEN_GRID_2D<T>& grid=melting_parameters.levelsets(1)->grid;
     ARRAY<VECTOR_2D<T> >& node_locations=grid.Node_Locations();
     
-    for(int p=1;p<=phi.m;p++) phi(p)=circle.Phi(node_locations(p));    
+    for(int p=0;p<phi.m;p++) phi(p)=circle.Phi(node_locations(p));    
 }
 //#####################################################################
 // Function Initialize_Levelset_Velocity
@@ -174,7 +174,7 @@ void Initialize_Levelset_Velocity(const int object,ARRAY<VECTOR_2D<T> >& V)
     //RED_GREEN_GRID_2D<T>& grid=melting_parameters.levelsets(1)->grid;
     //ARRAY<VECTOR_2D<T> >& node_locations=grid.Node_Locations();
     
-    for(int p=1;p<=V.m;p++) V(p)=VECTOR_2D<T>(0,0);
+    for(int p=0;p<V.m;p++) V(p)=VECTOR_2D<T>(0,0);
 }
 //#####################################################################
 // Function Initialize_Particle_Positions_And_Velocities
@@ -253,7 +253,7 @@ void Update_Fluid_Parameters(const T dt,const T time)
 //#####################################################################
 template<class SOURCE> void Adjust_Density_And_Temperature_With_Sources(const SOURCE& source,const T time)
 {
-    for(int i=1;i<=fluids_parameters.grid.m;i++) for(int j=1;j<=fluids_parameters.grid.n;j++) for(int ij=1;ij<=fluids_parameters.grid.mn;ij++)
+    for(int i=0;i<fluids_parameters.grid.m;i++) for(int j=0;j<fluids_parameters.grid.n;j++) for(int ij=0;ij<fluids_parameters.grid.mn;ij++)
         if(source.Lazy_Inside(world_to_source*fluids_parameters.grid.X(i,j,ij))){
             if(fluids_parameters.use_density) fluids_parameters.density_container.density_3d(i,j,ij)=rho;
             if(fluids_parameters.use_temperature) fluids_parameters.temperature_container.temperature_3d(i,j,ij)=fluids_parameters.temperature_products;}
@@ -268,7 +268,7 @@ void Adjust_Density_And_Temperature_With_Sources(const T time)
         if(source_type==BOX_SOURCE) Adjust_Density_And_Temperature_With_Sources(box_source,time);
         else if(source_type==CYLINDER_SOURCE) Adjust_Density_And_Temperature_With_Sources(cylinder_source,time);}
     // keep density >= 0 and T >=ambient temperature
-    for(int i=1;i<=fluids_parameters.grid.m;i++)for(int j=1;j<=fluids_parameters.grid.n;j++)  for(int ij=1;ij<=fluids_parameters.grid.mn;ij++){
+    for(int i=0;i<fluids_parameters.grid.m;i++)for(int j=0;j<fluids_parameters.grid.n;j++)  for(int ij=0;ij<fluids_parameters.grid.mn;ij++){
         if(fluids_parameters.use_density) fluids_parameters.density_container.density_3d(i,j,ij)=max((T)0,fluids_parameters.density_container.density_3d(i,j,ij));
         if(fluids_parameters.use_temperature) fluids_parameters.temperature_container.temperature_3d(i,j,ij)=max((T)fluids_parameters.temperature_container.ambient_temperature,fluids_parameters.temperature_container.temperature_3d(i,j,ij));}
 }
@@ -279,11 +279,11 @@ template<class SOURCE> void Get_Source_Velocities(const SOURCE& source,const T t
 {
     GRID<TV> &u_grid=fluids_parameters.u_grid,&v_grid=fluids_parameters.v_grid,&w_grid=fluids_parameters.w_grid;
     PROJECTION_3D<T>& projection=fluids_parameters.incompressible.projection;
-    for(int i=1;i<=u_grid.m;i++) for(int j=1;j<=u_grid.n;j++) for(int ij=1;ij<=u_grid.mn;ij++) if(source.Lazy_Inside(world_to_source*u_grid.X(i,j,ij))){
+    for(int i=0;i<u_grid.m;i++) for(int j=0;j<u_grid.n;j++) for(int ij=0;ij<u_grid.mn;ij++) if(source.Lazy_Inside(world_to_source*u_grid.X(i,j,ij))){
         projection.elliptic_solver->psi_N_u(i,j,ij)=true;projection.u(i,j,ij)=source_velocity.x;if(fluids_parameters.fire)projection.u_fuel(i,j,ij)=source_velocity.x;}
-    for(int i=1;i<=v_grid.m;i++) for(int j=1;j<=v_grid.n;j++) for(int ij=1;ij<=v_grid.mn;ij++) if(source.Lazy_Inside(world_to_source*v_grid.X(i,j,ij))){
+    for(int i=0;i<v_grid.m;i++) for(int j=0;j<v_grid.n;j++) for(int ij=0;ij<v_grid.mn;ij++) if(source.Lazy_Inside(world_to_source*v_grid.X(i,j,ij))){
         projection.elliptic_solver->psi_N_v(i,j,ij)=true;projection.v(i,j,ij)=source_velocity.y;if(fluids_parameters.fire)projection.v_fuel(i,j,ij)=source_velocity.y;}
-    for(int i=1;i<=w_grid.m;i++) for(int j=1;j<=w_grid.n;j++) for(int ij=1;ij<=w_grid.mn;ij++) if(source.Lazy_Inside(world_to_source*w_grid.X(i,j,ij))){
+    for(int i=0;i<w_grid.m;i++) for(int j=0;j<w_grid.n;j++) for(int ij=0;ij<w_grid.mn;ij++) if(source.Lazy_Inside(world_to_source*w_grid.X(i,j,ij))){
         projection.elliptic_solver->psi_N_w(i,j,ij)=true;projection.w(i,j,ij)=source_velocity.z;if(fluids_parameters.fire)projection.w_fuel(i,j,ij)=source_velocity.z;}
 }
 //#####################################################################
@@ -307,7 +307,7 @@ void Get_Object_Velocities(const T dt,const T time)
 //#####################################################################
 template<class SOURCE> void Initialize_Phi(const SOURCE& source)
 {
-    for(int i=1;i<=fluids_parameters.grid.m;i++) for(int j=1;j<=fluids_parameters.grid.n;j++) for(int ij=1;ij<=fluids_parameters.grid.mn;ij++) 
+    for(int i=0;i<fluids_parameters.grid.m;i++) for(int j=0;j<fluids_parameters.grid.n;j++) for(int ij=0;ij<fluids_parameters.grid.mn;ij++) 
         if(source.Lazy_Inside(world_to_source*fluids_parameters.grid.X(i,j,ij)))
             fluids_parameters.particle_levelset_evolution.particle_levelset.levelset.phi(i,j,ij)=fluids_parameters.grid.dx;
         else
@@ -327,7 +327,7 @@ void Initialize_Phi()
 //#####################################################################
 template<class SOURCE> void Adjust_Phi_With_Sources(const SOURCE& source,const T time)
 {
-    for(int i=1;i<=fluids_parameters.grid.m;i++) for(int j=1;j<=fluids_parameters.grid.n;j++) for(int ij=1;ij<=fluids_parameters.grid.mn;ij++) 
+    for(int i=0;i<fluids_parameters.grid.m;i++) for(int j=0;j<fluids_parameters.grid.n;j++) for(int ij=0;ij<fluids_parameters.grid.mn;ij++) 
 //        if(source.Lazy_Inside(world_to_source*fluids_parameters.grid.X(i,j,ij)))
         if(source.Lazy_Inside(world_to_source*fluids_parameters.grid.X(i,j,ij))&&fluids_parameters.particle_levelset_evolution.particle_levelset.levelset.phi(i,j,ij)<0)
             fluids_parameters.particle_levelset_evolution.particle_levelset.levelset.phi(i,j,ij)=fluids_parameters.grid.dx;

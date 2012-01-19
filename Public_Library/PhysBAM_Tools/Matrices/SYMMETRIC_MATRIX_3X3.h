@@ -139,7 +139,7 @@ public:
                         x11*A.x31+x21*A.x32+x31*A.x33,x21*A.x31+x22*A.x32+x32*A.x33,x31*A.x31+x32*A.x32+x33*A.x33);}
 
     MATRIX_MXN<T> operator*(const MATRIX_MXN<T>& A) const
-    {assert(3==A.m);MATRIX_MXN<T> matrix(3,A.n);for(int j=1;j<=A.n;j++) matrix.Set_Column(j,(*this)*VECTOR<T,3>(A(1,j),A(2,j),A(3,j)));return matrix;}
+    {assert(3==A.m);MATRIX_MXN<T> matrix(3,A.n);for(int j=0;j<A.n;j++) matrix.Set_Column(j,(*this)*VECTOR<T,3>(A(1,j),A(2,j),A(3,j)));return matrix;}
 
     template<class T_MATRIX>
     typename PRODUCT<SYMMETRIC_MATRIX,T_MATRIX>::TYPE Transpose_Times(const T_MATRIX& M) const

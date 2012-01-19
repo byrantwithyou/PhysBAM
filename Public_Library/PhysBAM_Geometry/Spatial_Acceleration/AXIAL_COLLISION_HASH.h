@@ -34,7 +34,7 @@ public:
 
     void Initialize(const int primitives_input,const int axis_clusters_input)
     {primitives=primitives_input;axis_clusters=axis_clusters_input;
-    for(int axis=1;axis<=3;axis++){
+    for(int axis=0;axis<3;axis++){
         axial_primitive_centroids[axis].Resize(primitives,false);
         axial_primitive_bounding_boxes[axis].Resize(primitives,false);
         axial_intervals[axis].Resize(axis_clusters,false);}
@@ -47,7 +47,7 @@ public:
 
     void Update_Grid_Hash()
     {ARRAY<int> primitive_indices(primitives,false);
-    for(int axis=1;axis<=3;axis++){
+    for(int axis=0;axis<3;axis++){
         for(int i=0;i<primitives;i++) primitive_indices(i)=i;
         Sort(primitive_indices,Indirect_Comparison(axial_primitive_centroids[axis]));
         ARRAY<RANGE<VECTOR<T,1> > >::Copy(RANGE<VECTOR<T,1> >(FLT_MAX,-FLT_MAX),axial_intervals[axis]);

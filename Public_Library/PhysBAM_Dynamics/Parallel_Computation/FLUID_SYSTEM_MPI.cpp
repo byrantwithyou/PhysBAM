@@ -41,7 +41,7 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& bx,KRYLOV_VECTOR_BASE<T>& bresult) const
     // get x values from solid
     Get_Generalized_Velocity_From_Solid(solid_velocity); // MPI
     temp.V.Fill(TV());temp.rigid_V.Fill(TWIST<TV>());
-    for(int i=1;i<=A_array.m;i++){
+    for(int i=0;i<A_array.m;i++){
         const SPARSE_MATRIX_FLAT_NXN<T>& A=A_array(i);
         const SPARSE_MATRIX_FLAT_MXN<T>& J_deformable=J_deformable_array(i);
         const SPARSE_MATRIX_FLAT_MXN<T>& J_rigid=J_rigid_array(i);
@@ -63,7 +63,7 @@ template<class TV> void FLUID_SYSTEM_MPI<TV>::
 Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& bx,KRYLOV_VECTOR_BASE<T>& bresult) const // solve MR=V
 {
     const KRYLOV_VECTOR_T& x=debug_cast<const KRYLOV_VECTOR_T&>(bx);KRYLOV_VECTOR_T& result=debug_cast<KRYLOV_VECTOR_T&>(bresult);
-    for(int i=1;i<=A_array.m;i++){
+    for(int i=0;i<A_array.m;i++){
         const SPARSE_MATRIX_FLAT_NXN<T>& A=A_array(i);
         VECTOR_T x_i,result_i;
         x_i.Set_Subvector_View(x.v(i),interior_regions(i));
@@ -79,7 +79,7 @@ template<class TV> double FLUID_SYSTEM_MPI<TV>::
 Inner_Product(const KRYLOV_VECTOR_BASE<T>& BV1,const KRYLOV_VECTOR_BASE<T>& BV2) const
 {
     const KRYLOV_VECTOR_T& V1=debug_cast<const KRYLOV_VECTOR_T&>(BV1),&V2=debug_cast<const KRYLOV_VECTOR_T&>(BV2);
-    double product=0.0;for(int i=1;i<=V1.v.m;i++){VECTOR_T V1_i,V2_i;V1_i.Set_Subvector_View(V1.v(i),interior_regions(i));V2_i.Set_Subvector_View(V2.v(i),interior_regions(i));
+    double product=0.0;for(int i=0;i<V1.v.m;i++){VECTOR_T V1_i,V2_i;V1_i.Set_Subvector_View(V1.v(i),interior_regions(i));V2_i.Set_Subvector_View(V2.v(i),interior_regions(i));
         product+=Dot_Product_Double_Precision(V1_i,V2_i);}
     return product;
 }
@@ -91,7 +91,7 @@ Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& bx) const
 {
     const KRYLOV_VECTOR_T& x=debug_cast<const KRYLOV_VECTOR_T&>(bx);
     T fluid_convergence_norm=(T)0;
-    for(int i=1;i<=A_array.m;i++){VECTOR_T x_i;x_i.Set_Subvector_View(x.v(i),interior_regions(i));fluid_convergence_norm=max(fluid_convergence_norm,x_i.Maximum_Magnitude());}
+    for(int i=0;i<A_array.m;i++){VECTOR_T x_i;x_i.Set_Subvector_View(x.v(i),interior_regions(i));fluid_convergence_norm=max(fluid_convergence_norm,x_i.Maximum_Magnitude());}
     return tolerance_ratio*fluid_convergence_norm;
 }
 //#####################################################################
@@ -103,7 +103,7 @@ Add_J_Deformable_Transpose_Times_Velocity(const SPARSE_MATRIX_FLAT_MXN<T>& J_def
     assert(pressure.n==J_deformable.n && J_deformable.m==V.V.indices.Size()*TV::dimension);
     // computes pressure+=J*V.V
     int index=J_deformable.offsets(1);
-    for(int i=1;i<=J_deformable.m;i++){
+    for(int i=0;i<J_deformable.m;i++){
         const int end=J_deformable.offsets(i+1);
         for(;index<end;index++){
             int dynamic_particle_index=(i-1)/TV::dimension+1;int axis=i-(dynamic_particle_index-1)*TV::dimension;
@@ -118,7 +118,7 @@ Add_J_Rigid_Transpose_Times_Velocity(const SPARSE_MATRIX_FLAT_MXN<T>& J_rigid,co
     assert(pressure.n==J_rigid.n && J_rigid.m==V.rigid_V.indices.Size()*rows_per_rigid_body);
     // computes pressure+=J*V.V
     int index=J_rigid.offsets(1);
-    for(int i=1;i<=J_rigid.m;i++){
+    for(int i=0;i<J_rigid.m;i++){
         const int end=J_rigid.offsets(i+1);
         for(;index<end;index++){
             int rigid_particle_index=(i-1)/rows_per_rigid_body+1;int component=i-(rigid_particle_index-1)*rows_per_rigid_body;
@@ -133,7 +133,7 @@ Add_J_Deformable_Times_Pressure(const SPARSE_MATRIX_FLAT_MXN<T>& J_deformable,co
 {
     assert(pressure.n==J_deformable.n && J_deformable.m==V.V.indices.Size()*TV::dimension);
     int index=J_deformable.offsets(1);
-    for(int i=1;i<=J_deformable.m;i++){
+    for(int i=0;i<J_deformable.m;i++){
         const int end=J_deformable.offsets(i+1);
         for(;index<end;index++){
             int dynamic_particle_index=(i-1)/TV::dimension+1;int axis=i-(dynamic_particle_index-1)*TV::dimension;
@@ -148,7 +148,7 @@ Add_J_Rigid_Times_Pressure(const SPARSE_MATRIX_FLAT_MXN<T>& J_rigid,const VECTOR
     assert(pressure.n==J_rigid.n && J_rigid.m==V.rigid_V.indices.Size()*rows_per_rigid_body);
     // computes pressure+=J*V.V
     int index=J_rigid.offsets(1);
-    for(int i=1;i<=J_rigid.m;i++){
+    for(int i=0;i<J_rigid.m;i++){
         const int end=J_rigid.offsets(i+1);
         for(;index<end;index++){
             int rigid_particle_index=(i-1)/rows_per_rigid_body+1;int component=i-(rigid_particle_index-1)*rows_per_rigid_body;

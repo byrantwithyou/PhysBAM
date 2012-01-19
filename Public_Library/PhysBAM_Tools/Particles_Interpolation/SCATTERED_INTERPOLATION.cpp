@@ -61,7 +61,7 @@ Transfer_With_Distance_Averaged_Weights(ARRAY_VIEW<const TV> domain,ARRAY_VIEW<c
         bool found_data=false;ARRAY<T> weights(count);int weight_index=0;T product=(T)1;
         for(CELL_ITERATOR cell_iterator(grid,index_box);cell_iterator.Valid();cell_iterator.Next()){TV_INT cell=cell_iterator.Cell_Index();
             const ARRAY<int>& point_indices=points_in_cell(cell);
-            for(int indirect_index=1;indirect_index<=point_indices.m;indirect_index++){
+            for(int indirect_index=0;indirect_index<point_indices.m;indirect_index++){
                 weight_index++;int k=point_indices(indirect_index);
                 T distance_squared=(domain(k)-X).Magnitude_Squared();
                 if(distance_squared<=radius_of_influence_squared){
@@ -70,7 +70,7 @@ Transfer_With_Distance_Averaged_Weights(ARRAY_VIEW<const TV> domain,ARRAY_VIEW<c
             weight_index=0;T normalization=(T)0;
             for(CELL_ITERATOR cell_iterator(grid,index_box);cell_iterator.Valid();cell_iterator.Next()){TV_INT cell=cell_iterator.Cell_Index();
                 const ARRAY<int>& point_indices=points_in_cell(cell);
-                for(int indirect_index=1;indirect_index<=point_indices.m;indirect_index++) if(weights(++weight_index) > 0){
+                for(int indirect_index=0;indirect_index<point_indices.m;indirect_index++) if(weights(++weight_index) > 0){
                     int k=point_indices(indirect_index);grid_data(node)+=weights(weight_index)*range(k);normalization+=weights(weight_index);}}
             grid_data(node)/=normalization;}}
 }
@@ -89,7 +89,7 @@ Transfer_With_Tent_Weights(ARRAY_VIEW<const TV> domain,ARRAY_VIEW<const typename
         RANGE<TV_INT> index_box=Grid_Influence_Bounds(grid,X);
         for(CELL_ITERATOR cell_iterator(grid,index_box);cell_iterator.Valid();cell_iterator.Next()){TV_INT cell=cell_iterator.Cell_Index();
             const ARRAY<int>& point_indices=points_in_cell(cell);
-            for(int indirect_index=1;indirect_index<=point_indices.m;indirect_index++){
+            for(int indirect_index=0;indirect_index<point_indices.m;indirect_index++){
                 int k=point_indices(indirect_index);
                 T distance_squared=(TV(domain(k))-X).Magnitude_Squared();
                 if(distance_squared<=radius_of_influence_squared){

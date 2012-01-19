@@ -40,7 +40,7 @@ public:
     template<class T_MATRIX>
     explicit MATRIX(const MATRIX_BASE<T,T_MATRIX>& A)
     {
-        assert(A.Rows()==4 && A.Columns()==4);for(int j=1;j<=4;j++) for(int i=1;i<=4;i++) (*this)(i,j)=A(i,j);
+        assert(A.Rows()==4 && A.Columns()==4);for(int j=0;j<4;j++) for(int i=0;i<4;i++) (*this)(i,j)=A(i,j);
     }
 
     template<class T2> explicit

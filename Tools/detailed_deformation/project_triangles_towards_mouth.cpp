@@ -65,22 +65,22 @@ int main(int argc,char *argv[])
     //int smallest_i=ARRAY<ARRAY<int> >::argcomp(*tri_mesh.boundary_mesh->ordered_loop_nodes,compare_array_min_m<ARRAY<ARRAY<int> > >);
     //int smallest_m=(*tri_mesh.boundary_mesh->ordered_loop_nodes)(smallest_i).m;
 
-    for(int smallest_i=1;smallest_i<=2;smallest_i++){
+    for(int smallest_i=0;smallest_i<2;smallest_i++){
     
         int smallest_m=(*tri_mesh.boundary_mesh->ordered_loop_nodes)(smallest_i).m;
         
         ARRAY<int> curr_level_nodes,next_level_nodes,visited_nodes;
         
-        for(int i=1;i<=smallest_m;i++) curr_level_nodes.Append((*tri_mesh.boundary_mesh->ordered_loop_nodes)(smallest_i)(i));
+        for(int i=0;i<smallest_m;i++) curr_level_nodes.Append((*tri_mesh.boundary_mesh->ordered_loop_nodes)(smallest_i)(i));
 
         ARRAY<float> weights;
         weights.Append(0);weights.Append(0.5);weights.Append(0.75);weights.Append(0.95);
         if(levels!=weights.m){cout<<"Bad weights..."<<endl;exit(-1);}
 
-        for(int i=1;i<=levels;i++){
+        for(int i=0;i<levels;i++){
             cout<<"Level "<<i<<" with "<<curr_level_nodes.m<<" nodes"<<endl;
             visited_nodes.Append_Elements(curr_level_nodes);
-            for(int j=1;j<=curr_level_nodes.m;j++){
+            for(int j=0;j<curr_level_nodes.m;j++){
                 for(int k=1;k<=(*tri_mesh.neighbor_nodes)(curr_level_nodes(j)).m;k++)
                     if(!visited_nodes.Find((*tri_mesh.neighbor_nodes)(curr_level_nodes(j))(k)))next_level_nodes.Append((*tri_mesh.neighbor_nodes)(curr_level_nodes(j))(k));
                 tri_particles.X(curr_level_nodes(j))=(float)weights(i)*tri_particles.X(curr_level_nodes(j))+(float)(1.0-weights(i))*

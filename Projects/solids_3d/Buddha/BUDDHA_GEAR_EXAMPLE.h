@@ -82,7 +82,7 @@ void Get_Initial_Data()
     tetrahedralized_volume.Set_Density(1000);tetrahedralized_volume.Set_Mass_Of_Particles(solids_parameters.use_constant_mass);
     tetrahedralized_volume.Update_Bounding_Box();
     VECTOR_3D<T> center(tetrahedralized_volume.bounding_box->Center());
-    for(int i=1;i<=particles.array_size;i++){
+    for(int i=0;i<particles.array_size;i++){
         particles.V(i)=initial_velocity+VECTOR_3D<T>::Cross_Product(initial_angular_velocity,particles.X(i)-center);
         particles.X(i)=center+initial_orientation.Rotate(particles.X(i)-center);
         particles.X(i).y+=initial_height;}
@@ -159,12 +159,12 @@ void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE
     if(!fvm.Fe_hat.m)return;
     static ARRAY<int> timeout;timeout.Resize(fvm.Fe_hat.m);
     ARRAY<bool>::copy(false,check_collision);
-    for(int t=1;t<=fvm.Fe_hat.m;t++){
+    for(int t=0;t<fvm.Fe_hat.m;t++){
         if(fvm.Fe_hat(t).x11<3){ // && timeout(t)--<=0){
             int i,j,k,l;fvm.strain_measure.tetrahedron_mesh.tetrahedrons.Get(t,i,j,k,l);
             check_collision(i)=check_collision(j)=check_collision(k)=check_collision(l)=true;}
         else{timeout(t)=10;/*std::cout<<"############ tetrahedron "<<t<<": "<<fvm.Fe_hat(t)<<"\n";*/}}
-    for(int p=1;p<=check_collision.m;p++)if(!check_collision(p))std::cout<<"########### disabling collisions for particle "<<p<<"\n";
+    for(int p=0;p<check_collision.m;p++)if(!check_collision(p))std::cout<<"########### disabling collisions for particle "<<p<<"\n";
 }
 //#####################################################################
 };

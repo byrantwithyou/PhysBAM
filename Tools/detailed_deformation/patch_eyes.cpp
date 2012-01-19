@@ -44,7 +44,7 @@ int main(int argc,char *argv[])
     cout<<"Update vertex normals...."<<endl;
     tri_surf.Update_Vertex_Normals();
 
-    for(int i=1;i<=4;i++)
+    for(int i=0;i<4;i++)
         cout<<"Boundary loop ("<<i<<") has "<<(*tri_mesh.boundary_mesh->ordered_loop_nodes)(i).m<<" segments..."<<endl;
 
     TETRAHEDRON_MESH tet_mesh;
@@ -126,12 +126,12 @@ int main(int argc,char *argv[])
     tet_vol.triangulated_surface->triangle_mesh.boundary_mesh->Initialize_Connected_Segments();
     
     nodes.Clean_Memory();
-    for(int i=1;i<=(*tet_vol.triangulated_surface->triangle_mesh.boundary_mesh->connected_segments)(largest_i).m;i++)for(int j=1;j<=2;j++)
+    for(int i=1;i<=(*tet_vol.triangulated_surface->triangle_mesh.boundary_mesh->connected_segments)(largest_i).m;i++)for(int j=0;j<2;j++)
         nodes.Append_Unique((*tet_vol.triangulated_surface->triangle_mesh.boundary_mesh->connected_segments)(largest_i)(j,i));
     
     deletion_list.Clean_Memory();
     cout<<"Processing nodes..."<<endl;
-    for(int i=1;i<=nodes.m;i++)for(int j=1;j<=(*tet_vol.triangulated_surface->triangle_mesh.incident_triangles)(nodes(i)).m;j++)
+    for(int i=0;i<nodes.m;i++)for(int j=1;j<=(*tet_vol.triangulated_surface->triangle_mesh.incident_triangles)(nodes(i)).m;j++)
         deletion_list.Append((*tet_vol.triangulated_surface->triangle_mesh.incident_triangles)(nodes(i))(j));
     
     cout<<"Deleting..."<<endl;
@@ -156,7 +156,7 @@ int main(int argc,char *argv[])
         tri_mesh.triangles.Append(particle_map(j),particle_map(k),particle_map(l));}
 
     ARRAY<VECTOR_3D<float> > vertex_append(tri_particles.number-vertex_colors.m);
-    for(int i=1;i<=vertex_append.m;i++)vertex_append(i)=interior_color;
+    for(int i=0;i<vertex_append.m;i++)vertex_append(i)=interior_color;
     
     vertex_colors.Append_Elements(vertex_append);
 
@@ -239,16 +239,16 @@ int main(int argc,char *argv[])
     tri_mesh.Initialize_Neighbor_Nodes();
     nodes.Clean_Memory();
     cout<<"Getting new nodes for triangle old boundary"<<endl;
-    for(int i=1;i<=old_nodes.m;i++)nodes.Append(condensation(old_nodes(i)));
+    for(int i=0;i<old_nodes.m;i++)nodes.Append(condensation(old_nodes(i)));
     int start=1,end=nodes.m;
-    for(int j=1;j<=levels;j++){
+    for(int j=0;j<levels;j++){
         for(int i=start;i<=end;i++)nodes.Append_Unique_Elements((*tri_mesh.neighbor_nodes)(nodes(i)));
         start=end;end=nodes.m;}
 
     cout<<"Smoothing geometry and colors..."<<endl; 
     ARRAY<VECTOR_3D<float> > new_positions(nodes.m);
     ARRAY<VECTOR_3D<float> > new_colors(nodes.m);
-    for(int k=1;k<=iterations;k++){
+    for(int k=0;k<iterations;k++){
         cout<<"Iteration "<<k<<endl;
         for(int i=1;i<nodes.m;i++){
             new_colors(i)=VECTOR_3D<float>();new_positions(i)=VECTOR_3D<float>();float total_weight=0;

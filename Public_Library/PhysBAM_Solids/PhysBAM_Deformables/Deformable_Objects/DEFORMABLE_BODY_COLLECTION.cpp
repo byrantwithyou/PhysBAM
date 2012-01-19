@@ -115,7 +115,7 @@ Adjust_Mesh_For_Self_Repulsion()
 template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::
 Update_Collision_Penalty_Forces_And_Derivatives()
 {
-    for(int i=1;i<=collision_penalty_forces.m;i++) collision_penalty_forces(i)->Update_Forces_And_Derivatives();
+    for(int i=0;i<collision_penalty_forces.m;i++) collision_penalty_forces(i)->Update_Forces_And_Derivatives();
 }
 //#####################################################################
 // Function Read_Dynamic_Variables
@@ -235,7 +235,7 @@ Update_Simulated_Particles(DEFORMABLES_EXAMPLE_FORCES_AND_VELOCITIES<TV>& exampl
         dependency_mesh_binding.number_nodes=particles_number;
         dependency_mesh_binding.Initialize_Incident_Elements();
 
-        for(int i=1;i<=deformables_forces.m;i++) deformables_forces(i)->Add_Dependencies(dependency_mesh_force);
+        for(int i=0;i<deformables_forces.m;i++) deformables_forces(i)->Add_Dependencies(dependency_mesh_force);
 
         binding_list.Add_Dependencies(dependency_mesh_binding);
         soft_bindings.Add_Dependencies(dependency_mesh_binding);
@@ -254,7 +254,7 @@ Update_Simulated_Particles(DEFORMABLES_EXAMPLE_FORCES_AND_VELOCITIES<TV>& exampl
     ARRAY<bool> particle_is_simulated_actual(particles_number);
     INDIRECT_ARRAY<ARRAY<bool>,ARRAY<int>&> simulated_subset=particle_is_simulated_actual.Subset(simulated_particles);
     simulated_subset.Fill(true);
-    for(int i=1;i<=deformables_forces.m;i++) deformables_forces(i)->Update_Mpi(particle_is_simulated_actual,mpi_solids);
+    for(int i=0;i<deformables_forces.m;i++) deformables_forces(i)->Update_Mpi(particle_is_simulated_actual,mpi_solids);
 
     if(mpi_solids){
         simulated_particles=dynamic_particles;
@@ -286,16 +286,16 @@ Update_CFL()
 {
     bool cfl_valid=true;
     if(deformables_forces.m){
-        for(int i=1;i<=deformables_forces.m;i++){if(!deformables_forces(i)->CFL_Valid()){cfl_valid=false;break;}}}
+        for(int i=0;i<deformables_forces.m;i++){if(!deformables_forces(i)->CFL_Valid()){cfl_valid=false;break;}}}
     else cfl_valid=false;
     if(!cfl_valid){
         frequency.Resize(particles.array_collection->Size(),false,false);
         INDIRECT_ARRAY<ARRAY<T_FREQUENCY_DEFORMABLE>,ARRAY<int>&> frequency_subset=frequency.Subset(simulated_particles);
         frequency_subset.Fill(T_FREQUENCY_DEFORMABLE());
 
-        for(int i=1;i<=deformables_forces.m;i++){deformables_forces(i)->Initialize_CFL(frequency);deformables_forces(i)->Validate_CFL();}
+        for(int i=0;i<deformables_forces.m;i++){deformables_forces(i)->Initialize_CFL(frequency);deformables_forces(i)->Validate_CFL();}
         cfl_elastic=FLT_MAX;cfl_damping=FLT_MAX;
-        for(int i=1;i<=simulated_particles.m;i++){int p=simulated_particles(i);
+        for(int i=0;i<simulated_particles.m;i++){int p=simulated_particles(i);
             cfl_elastic=min(cfl_elastic,Robust_Inverse(sqrt(frequency(p).elastic_squared)));
             cfl_damping=min(cfl_damping,Robust_Inverse(frequency(p).damping));}}
 }
@@ -348,7 +348,7 @@ template<class TV> typename TV::SCALAR DEFORMABLE_BODY_COLLECTION<TV>::
 CFL_Strain_Rate()
 {
     T dt_strain=FLT_MAX;
-    for(int k=1;k<=deformables_forces.m;k++) if(deformables_forces(k)->limit_time_step_by_strain_rate) dt_strain=min(dt_strain,deformables_forces(k)->CFL_Strain_Rate()); // otherwise not included
+    for(int k=0;k<deformables_forces.m;k++) if(deformables_forces(k)->limit_time_step_by_strain_rate) dt_strain=min(dt_strain,deformables_forces(k)->CFL_Strain_Rate()); // otherwise not included
     return dt_strain;
 }
 //#####################################################################
@@ -357,7 +357,7 @@ CFL_Strain_Rate()
 template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::
 Update_Position_Based_State(const T time,const bool is_position_update)
 {
-    for(int k=1;k<=deformables_forces.m;k++) if(deformables_forces(k)->use_position_based_state) deformables_forces(k)->Update_Position_Based_State(time,is_position_update);
+    for(int k=0;k<deformables_forces.m;k++) if(deformables_forces(k)->use_position_based_state) deformables_forces(k)->Update_Position_Based_State(time,is_position_update);
 }
 //#####################################################################
 // Function Add_Velocity_Independent_Forces
@@ -366,7 +366,7 @@ template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::
 Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F_full,const T time) const
 {
     assert(F_full.Size()==particles.array_collection->Size());
-    for(int k=1;k<=deformables_forces.m;k++) if(deformables_forces(k)->use_velocity_independent_forces) deformables_forces(k)->Add_Velocity_Independent_Forces(F_full,time);
+    for(int k=0;k<deformables_forces.m;k++) if(deformables_forces(k)->use_velocity_independent_forces) deformables_forces(k)->Add_Velocity_Independent_Forces(F_full,time);
 }
 //#####################################################################
 // Function Add_Velocity_Dependent_Forces
@@ -376,7 +376,7 @@ template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::
 Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V_full,ARRAY_VIEW<TV> F_full,const T time) const
 {
     assert(F_full.Size()==particles.array_collection->Size());
-    for(int k=1;k<=deformables_forces.m;k++) if(deformables_forces(k)->use_velocity_dependent_forces) deformables_forces(k)->Add_Velocity_Dependent_Forces(V_full,F_full,time);
+    for(int k=0;k<deformables_forces.m;k++) if(deformables_forces(k)->use_velocity_dependent_forces) deformables_forces(k)->Add_Velocity_Dependent_Forces(V_full,F_full,time);
 }
 //#####################################################################
 // Function Implicit_Velocity_Independent_Forces
@@ -388,7 +388,7 @@ Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V_full,ARRAY_VIEW<TV> 
     INDIRECT_ARRAY<ARRAY_VIEW<TV>,ARRAY<int>&> F_subset=F_full.Subset(dynamic_particles);
     F_subset.Fill(TV()); // note we zero here because we will scale the forces below
     bool added=false;
-    for(int k=1;k<=deformables_forces.m;k++) if(deformables_forces(k)->use_implicit_velocity_independent_forces){
+    for(int k=0;k<deformables_forces.m;k++) if(deformables_forces(k)->use_implicit_velocity_independent_forces){
         deformables_forces(k)->Add_Implicit_Velocity_Independent_Forces(V_full,F_full,time);added=true;}
     if(added) F_full.Subset(simulated_particles)*=scale;
 }
@@ -406,7 +406,7 @@ template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::
 Set_CFL_Number(const T cfl_number_input)
 {
     cfl_number=cfl_number_input;
-    for(int i=1;i<=deformables_forces.m;i++) deformables_forces(i)->Set_CFL_Number(cfl_number_input);
+    for(int i=0;i<deformables_forces.m;i++) deformables_forces(i)->Set_CFL_Number(cfl_number_input);
 }
 template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::
 Read(const STREAM_TYPE stream_type,const std::string& prefix,const int frame,const int static_frame,const bool include_static_variables,const bool read_from_every_process)
@@ -431,7 +431,7 @@ Test_Energy(const T time)
     random.Fill_Uniform(dX,-e,e);
     ARRAY<TV> X2a(particles.X+dX);
     ARRAY_VIEW<TV> X2(X2a);
-    for(int i=1;i<=deformables_forces.m;i++){
+    for(int i=0;i<deformables_forces.m;i++){
         ARRAY<TV> F(particles.X.m);
         deformables_forces(i)->Update_Position_Based_State(time,true);
         deformables_forces(i)->Add_Velocity_Independent_Forces(F,time);
@@ -460,7 +460,7 @@ Test_Force_Derivatives(const T time)
     random.Fill_Uniform(dX,-e,e);
     ARRAY<TV> X2a(particles.X+dX);
     ARRAY_VIEW<TV> X2(X2a);
-    for(int i=1;i<=deformables_forces.m;i++){
+    for(int i=0;i<deformables_forces.m;i++){
         ARRAY<TV> F(particles.X.m),G(particles.X.m);
         deformables_forces(i)->Update_Position_Based_State(time,true);
         deformables_forces(i)->Add_Velocity_Independent_Forces(F,time);

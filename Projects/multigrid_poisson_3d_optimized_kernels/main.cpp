@@ -44,7 +44,7 @@ public:
             if(!on_first_coefficient) output<<"+";else on_first_coefficient=false;
             output<<"=(T)"<<iterator.Key()<<"*(";
             const ARRAY<T_INDEX>& indices=iterator.Data();
-            for(int i=1;i<=indices.m;i++){
+            for(int i=0;i<indices.m;i++){
                 output<<std::endl<<"        ";
                 if(i>1) output<<"+input[index"; else output<<"input[index";
                 if(indices(i)!=T_INDEX()) output<<"+"<<Shift_Name_From_Index(indices(i));
@@ -79,7 +79,7 @@ private:
     static std::string Shift_Name_From_Index(const T_INDEX& index)
     {
         std::string shift_name;
-        for(int i=1;i<=d;i++){
+        for(int i=0;i<d;i++){
             int j=index(i);
             if(j==0) continue;
             if(shift_name!="") shift_name+="_";
@@ -91,7 +91,7 @@ private:
     static std::string Shift_Value_From_Index(const T_INDEX& index)
     {
         std::string shift_value;
-        for(int i=1;i<=d;i++){
+        for(int i=0;i<d;i++){
             int j=index(i);
             if(j==0) continue;
             if(shift_value!="" && j>0) shift_value+="+";
@@ -111,7 +111,7 @@ int main(int argc,char *argv[])
     typedef STENCIL_ITERATOR<T,d> T_STENCIL_ITERATOR;
 
     T_STENCIL residual;
-    for(int v=1;v<=d;v++){
+    for(int v=0;v<d;v++){
         residual.Insert(T_INDEX::Axis_Vector(v),1);
         residual.Insert(-T_INDEX::Axis_Vector(v),1);}
     residual.Insert(T_INDEX(),3);

@@ -83,17 +83,17 @@ void Get_Initial_Data()
     deformable_body_collection.deformable_geometry.Add_Structure(&volume);
 
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     if(use_bindings){
         // compute the embedding
         volume.Initialize_Hierarchy();
         ARRAY<int> tri_nodes;surface.mesh.elements.Flattened().Get_Unique(tri_nodes);
         ARRAY<int> list;
-        for(int i=1;i<=tri_nodes.m;i++){int p=tri_nodes(i);
+        for(int i=0;i<tri_nodes.m;i++){int p=tri_nodes(i);
             list.Remove_All();
             volume.hierarchy->Intersection_List(particles.X(p),list);
-            for(int j=1;j<=list.m;j++){int t=list(j);const VECTOR<int,4>& tet_nodes=volume.mesh.elements(t);
+            for(int j=0;j<list.m;j++){int t=list(j);const VECTOR<int,4>& tet_nodes=volume.mesh.elements(t);
                 TETRAHEDRON<T> tet(particles.X.Subset(tet_nodes));
                 if(!tet.Outside(particles.X(p),(T)1e-3)){
                     //tets_with_embeddings.Set(t);
@@ -103,21 +103,21 @@ void Get_Initial_Data()
             // soft bindings
             particles.array_collection->Preallocate(tri_nodes.m);
             HASHTABLE<int,int> hard_to_soft;
-            for(int i=1;i<=tri_nodes.m;i++){int hard=tri_nodes(i);
+            for(int i=0;i<tri_nodes.m;i++){int hard=tri_nodes(i);
             int soft=particles.array_collection->Add_Element();
             hard_to_soft.Insert(hard,soft);
             particles.X(soft)=particles.X(hard);
             soft_bindings.Add_Binding(VECTOR<int,2>(soft,hard),use_impulses);}
-            for(int i=1;i<=surface.mesh.elements.m;i++){
+            for(int i=0;i<surface.mesh.elements.m;i++){
                 VECTOR<int,3>& nodes=surface.mesh.elements(i);
-                for(int k=1;k<=nodes.m;k++) nodes[k]=hard_to_soft.Get(nodes[k]);}}}
+                for(int k=0;k<nodes.m;k++) nodes[k]=hard_to_soft.Get(nodes[k]);}}}
 
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
         
     // set constrained nodes
     ARRAY<int> tet_nodes;volume.mesh.elements.Flattened().Get_Unique(tet_nodes);
-    for(int i=1;i<=tet_nodes.m;i++) if(particles.X(tet_nodes(i)).y<(T).17) constrained_nodes.Insert(tet_nodes(i));
+    for(int i=0;i<tet_nodes.m;i++) if(particles.X(tet_nodes(i)).y<(T).17) constrained_nodes.Insert(tet_nodes(i));
 
     // tet mass
     T density=TV::dimension==1?1:TV::dimension==2?100:1000;
@@ -182,7 +182,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     Get_Initial_Data();
 
     // make forces
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++){
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++){
         if(TETRAHEDRALIZED_VOLUME<T>* volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.deformable_geometry.structures(i))){
             ARRAY<int>& referenced_nodes=*new ARRAY<int>; // hey craig, look a memory leak.  cool andy, why don't you fix it?
             volume->mesh.elements.Flattened().Get_Unique(referenced_nodes);

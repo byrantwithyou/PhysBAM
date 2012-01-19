@@ -54,9 +54,9 @@ Create_Hard_Bound_Boundary_Surface(TRIANGULATED_SURFACE<T>& boundary_surface)
     TRIANGULATED_SURFACE<T>& hard_bound_boundary_surface=*TRIANGULATED_SURFACE<T>::Create(boundary_surface.particles);
     ARRAY<int> particle_map(IDENTITY_ARRAY<>(boundary_surface.particles.array_collection->Size()));
 #if 0 // TODO: Fix me
-    for(int b=1;b<=deformable_body_collection.soft_bindings.bindings.m;b++){VECTOR<int,2>& binding=deformable_body_collection.soft_bindings.bindings(b);particle_map(binding.x)=binding.y;}
+    for(int b=0;b<deformable_body_collection.soft_bindings.bindings.m;b++){VECTOR<int,2>& binding=deformable_body_collection.soft_bindings.bindings(b);particle_map(binding.x)=binding.y;}
 #endif
-    for(int t=1;t<=boundary_surface.mesh.elements.m;t++) hard_bound_boundary_surface.mesh.elements.Append(VECTOR<int,3>::Map(particle_map,boundary_surface.mesh.elements(t)));
+    for(int t=0;t<boundary_surface.mesh.elements.m;t++) hard_bound_boundary_surface.mesh.elements.Append(VECTOR<int,3>::Map(particle_map,boundary_surface.mesh.elements(t)));
     return hard_bound_boundary_surface;
 }
 //#####################################################################
@@ -118,14 +118,14 @@ Reinitialize(bool force,bool read_geometry)
                 hard_bound_boundary_surface_objects(i)=new OPENGL_TRIANGULATED_SURFACE<T>(Create_Hard_Bound_Boundary_Surface(embedding->material_surface),false,
                     OPENGL_MATERIAL::Matte(OPENGL_COLOR::Magenta(.5f)));}
             else{if(first_time) LOG::cout<<"object "<<i<<": object unrecognized at body level\n";}}}
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++){
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++){
 #if 0 // TODO: Fix me
         if(deformable_body_collection.soft_bindings.bindings.m) has_soft_bindings=true;
 #endif
         if(boundary_surface_objects(i)) has_embedded_objects=true;}
     if(smooth_shading){
-        for(int i=1;i<=boundary_surface_objects.m;i++) if(boundary_surface_objects(i))boundary_surface_objects(i)->Initialize_Vertex_Normals();
-        for(int i=1;i<=embedded_surface_objects.m;i++) if(embedded_surface_objects(i))embedded_surface_objects(i)->Initialize_Vertex_Normals();}
+        for(int i=0;i<boundary_surface_objects.m;i++) if(boundary_surface_objects(i))boundary_surface_objects(i)->Initialize_Vertex_Normals();
+        for(int i=0;i<embedded_surface_objects.m;i++) if(embedded_surface_objects(i))embedded_surface_objects(i)->Initialize_Vertex_Normals();}
 
     first_time=false;
 }
@@ -183,7 +183,7 @@ Display(const int in_color) const
     Set_Display_Modes(display_triangulated_surface_objects,display_tetrahedralized_volume_objects,
             display_hexahedralized_volume_objects,display_boundary_surface_objects,display_hard_bound_boundary_surface_objects,display_free_particles_objects);
 
-    for(int i=1;i<=boundary_surface_objects.m;i++){
+    for(int i=0;i<boundary_surface_objects.m;i++){
         if(!active_list(i)) continue;
         glPushName(i);
         //if(embedded_surface_objects(i) && display_mode==3){glPushName(3);embedded_surface_objects(i)->Display(in_color);glPopName();}
@@ -284,7 +284,7 @@ Bounding_Box() const
 {
     RANGE<VECTOR<float,3> > box=BASE::Bounding_Box();
     if(draw && valid && deformable_body_collection.deformable_geometry.structures.m>0){
-        for(int i=1;i<=boundary_surface_objects.m;i++) if(boundary_surface_objects(i))box.Enlarge_To_Include_Box(boundary_surface_objects(i)->Bounding_Box());}
+        for(int i=0;i<boundary_surface_objects.m;i++) if(boundary_surface_objects(i))box.Enlarge_To_Include_Box(boundary_surface_objects(i)->Bounding_Box());}
     return box;
 }
 //#####################################################################
@@ -329,9 +329,9 @@ template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T
 Clear_Highlight()
 {
     BASE::Clear_Highlight();
-   for(int i=1;i<=boundary_surface_objects.m;i++) if(boundary_surface_objects(i) && active_list(i))boundary_surface_objects(i)->Clear_Highlight();
-    for(int i=1;i<=embedded_surface_objects.m;i++) if(embedded_surface_objects(i) && active_list(i)) embedded_surface_objects(i)->Clear_Highlight();
-    for(int i=1;i<=hard_bound_boundary_surface_objects.m;i++) if(hard_bound_boundary_surface_objects(i) && active_list(i))hard_bound_boundary_surface_objects(i)->Clear_Highlight();
+   for(int i=0;i<boundary_surface_objects.m;i++) if(boundary_surface_objects(i) && active_list(i))boundary_surface_objects(i)->Clear_Highlight();
+    for(int i=0;i<embedded_surface_objects.m;i++) if(embedded_surface_objects(i) && active_list(i)) embedded_surface_objects(i)->Clear_Highlight();
+    for(int i=0;i<hard_bound_boundary_surface_objects.m;i++) if(hard_bound_boundary_surface_objects(i) && active_list(i))hard_bound_boundary_surface_objects(i)->Clear_Highlight();
 }
 //#####################################################################
 template class OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<float,float>;

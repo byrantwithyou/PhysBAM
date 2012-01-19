@@ -140,7 +140,7 @@ Display(const int in_color) const
                 OpenGL_Draw_Arrays(GL_POINTS,2,vertices);
 
 #ifndef USE_OPENGLES
-                for(int i=1;i<=grid.counts.x;i++)
+                for(int i=0;i<grid.counts.x;i++)
                     OpenGL_String(VECTOR<T,2>(grid.Axis_X(i,1),scale*height(i)),STRING_UTILITIES::string_sprintf("%d",i));
 #endif
 
@@ -241,7 +241,7 @@ Reinitialize(bool force)
                 if(FILE_UTILITIES::File_Exists(filename)){
                     FILE_UTILITIES::Read_From_File<RW>(filename,*u);
                     if (height.counts.x != u->counts.x) success = false;
-                    else for(int i=1;i<=grid.counts.x;i++){
+                    else for(int i=0;i<grid.counts.x;i++){
                             vector_field(i) = VECTOR<T,2>((*u)(i),0);
                             vector_locations(i) = VECTOR<T,2>(grid.Axis_X(i,1), scale*height(i));}}
                 else success=false;}

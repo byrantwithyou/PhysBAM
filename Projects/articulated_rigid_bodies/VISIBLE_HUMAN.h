@@ -104,21 +104,21 @@ public:
 //#####################################################################
 static ARRAY<bool> Filter_Union(const ARRAY<bool>& f1,const ARRAY<bool>& f2)
 {
-    ARRAY<bool> filter(num_bones);for(int i=1;i<=num_bones;i++) filter(i)=f1(i) || f2(i);return filter;
+    ARRAY<bool> filter(num_bones);for(int i=0;i<num_bones;i++) filter(i)=f1(i) || f2(i);return filter;
 }
 //#####################################################################
 // Function Reflected_Bones_Filter
 //#####################################################################
 static ARRAY<bool> Reflected_Bones_Filter(const ARRAY<bool>& filter)
 {
-    ARRAY<bool> reflected_filter(num_bones);for(int i=1;i<=filter.m;i++) if(filter(i)) reflected_filter(Reflected_Bone(i))=true;return reflected_filter;
+    ARRAY<bool> reflected_filter(num_bones);for(int i=0;i<filter.m;i++) if(filter(i)) reflected_filter(Reflected_Bone(i))=true;return reflected_filter;
 }
 //#####################################################################
 // Function Add_Reflected_Bones_To_Filter
 //#####################################################################
 static void Add_Reflected_Bones_To_Filter(ARRAY<bool>& filter)
 {
-    for(int i=1;i<=filter.m;i++) if(filter(i)) filter(Reflected_Bone(i))=true;
+    for(int i=0;i<filter.m;i++) if(filter(i)) filter(Reflected_Bone(i))=true;
 }
 //#####################################################################
 // Function Right_Hand_Filter
@@ -193,7 +193,7 @@ static ARRAY<bool> Upper_Body_Filter()
 static ARRAY<bool> Full_Body_Filter()
 {
     ARRAY<bool> filter(num_bones);
-    for(int i=1;i<=num_bones;i++) filter(i)=true;
+    for(int i=0;i<num_bones;i++) filter(i)=true;
     return filter;
 }
 //#####################################################################
@@ -257,7 +257,7 @@ static INTERPOLATION_CURVE<T,ROTATION<TV> >* Rotated_Track(const INTERPOLATION_C
     INTERPOLATION_CURVE<T,ROTATION<TV> >* rotated_track=new INTERPOLATION_CURVE<T,ROTATION<TV> >(frame_track.trajectory.m,frame_track.time_grid.xmin,frame_track.time_grid.xmax);
     rotated_track->name=frame_track.name+"_rotated";
     rotated_track->periodic=frame_track.periodic;
-    for(int i=1;i<=frame_track.trajectory.m;i++){
+    for(int i=0;i<frame_track.trajectory.m;i++){
         FRAME<TV> f=frame_track.trajectory(i);TV euler;f.r.Euler_Angles(euler.x,euler.y,euler.z);
         rotated_track->trajectory(i)=FRAME<TV>(TV(f.t.x,-f.t.y,-f.t.z),ROTATION<TV>::From_Euler_Angles(euler.x,-euler.y,-euler.z));}
 #endif
@@ -314,7 +314,7 @@ void Add_Joints_To_ARB()
     // Add joints to articulated rigid body (build local_joint_id_to_arb_joint_id)
     local_joint_index_to_arb_joint_id.Clean_Memory();
     local_joint_index_to_arb_joint_id.Resize(joint.m);
-    for(int i=1;i<=joint.m;i++) if(joint(i) && bones(joint_parent_and_child(i).x) && bones(joint_parent_and_child(i).y)){
+    for(int i=0;i<joint.m;i++) if(joint(i) && bones(joint_parent_and_child(i).x) && bones(joint_parent_and_child(i).y)){
         if(!bones(joint_parent_and_child(i).x)->particle_index || !bones(joint_parent_and_child(i).y)->particle_index){
             if(verbose) LOG::cout<<"Skipping joint "<<joint(i)->name<<std::endl;
             delete joint(i);joint(i)=0;}
@@ -334,7 +334,7 @@ void Initialize_Bodies(const ARRAY<bool>& bone_filter=ARRAY<bool>())
     Add_Joints_To_ARB();
 
     // Add muscles to muscle list
-    for(int i=1;i<=muscles.m;i++){
+    for(int i=0;i<muscles.m;i++){
         bool has_all_rigid_bodies=true;
 //         if(!muscles(i)->attachment_point_1 || !((muscles(i)->attachment_point_1))->particle_index) has_all_rigid_bodies=false;
 //         if(!muscles(i)->attachment_point_2 || !((muscles(i)->attachment_point_2))->particle_index) has_all_rigid_bodies=false;
@@ -387,7 +387,7 @@ void Make_Bones(const ARRAY<bool>& bone_filter=ARRAY<bool>())
     anatomical_frame_in_rigid_body_frame(BONE_R_ULNA)=FRAME<TV>(TV((T)0.047721587,(T)0.24119507,(T)1.2628108),ROTATION<TV>::From_Components((T)-0.3545996,(T)-0.049906723,(T)0.39113101,(T)0.84781182));
     anatomical_frame_in_rigid_body_frame(BONE_R_RADIUS)=FRAME<TV>(TV((T)0.030011594,(T)0.22594509,(T)1.267401),ROTATION<TV>::From_Components((T)0.84402317,(T)-0.21794307,(T)-0.38632673,(T)-0.30145824));
 
-    for(int i=1;i<=num_bones;i++){
+    for(int i=0;i<num_bones;i++){
         RIGID_BODY<TV>* rigid_body=0;
         std::string filename=data_directory+"/Rigid_Bodies/New_Visible_Human_Bones/"+bone_files[i-1];
         if(!the_filter.Valid_Index(i) || the_filter(i)){
@@ -807,7 +807,7 @@ void Make_Joints()
         joint(JOINT_R_TOE_5)->Set_Joint_To_Parent_Frame(toe_5_frame_in_parent);
         joint(JOINT_R_TOE_5)->Set_Joint_To_Child_Frame(bones(BONE_R_TOE_5)->Frame().Inverse()*bones(BONE_R_ANKLE)->Frame()*toe_5_frame_in_parent);}
 
-    for(int i=1;i<=num_joints;i++) if(joint(i)) joint(i)->Set_Name(joint_names[i-1]);
+    for(int i=0;i<num_joints;i++) if(joint(i)) joint(i)->Set_Name(joint_names[i-1]);
 
     std::istream* input=FILE_UTILITIES::Safe_Open_Input(data_directory+"/SIMM_Data/hand_joints",false);
     std::string next;
@@ -951,8 +951,8 @@ void Make_Muscles()
 
     // parameters for now
     ARRAY<T> parameters;
-    parameters.Resize(5);for(int p=1;p<=5;p++) parameters(p)=0;
-    for(int m=1;m<=num_muscles;m++){
+    parameters.Resize(5);for(int p=0;p<5;p++) parameters(p)=0;
+    for(int m=0;m<num_muscles;m++){
         ARRAY<T_MUSCLE_SEGMENT_DATA>* segment_data=new ARRAY<T_MUSCLE_SEGMENT_DATA>();
         MUSCLE<TV>* muscle=new MUSCLE<TV>(arb->muscle_list->muscle_force_curve);
         muscle->Set_Name(muscle_files[m-1]);
@@ -962,7 +962,7 @@ void Make_Muscles()
         int num_points;float x,y,z;std::string bone_name,attached,st;
         *input>>num_points;
         bool success=true;
-        for(int i=1;i<=num_points;i++){
+        for(int i=0;i<num_points;i++){
             *input>>x>>y>>z>>bone_name>>attached;
             if (i!=1){
                 *input>>st;
@@ -1022,7 +1022,7 @@ void Replace_Bones_With_Fused_Bone(const std::string& merge_filename,RIGID_BODY<
     ARRAY<RIGID_BODY<TV>*> replaced_bones(n);
     ARRAY<FRAME<TV> > original_to_fused_world_transform(n);
     FRAME<TV> subtract_frame,align_frame;
-    for(int i=1;i<=n;i++){
+    for(int i=0;i<n;i++){
         std::string bone_name;T scale;
         input>>bone_name>>scale>>original_to_fused_world_transform(i);
         if(verbose) LOG::cout<<"BONE "<<bone_name<<" got frame "<<original_to_fused_world_transform(i)<<std::endl;
@@ -1035,7 +1035,7 @@ void Replace_Bones_With_Fused_Bone(const std::string& merge_filename,RIGID_BODY<
     Replace_Bones_With_Fused_Bone(replaced_bones,original_to_fused_world_transform,new_bone);
 
     if(new_reflected_bone){
-        for(int i=1;i<=n;i++){int index=0;
+        for(int i=0;i<n;i++){int index=0;
             bones.Find(replaced_bones(i),index);
             if(!index || !bones(Reflected_Bone(index))){LOG::cerr<<"could not replace fused reflected bone"<<std::endl;return;}
             replaced_bones(i)=bones(Reflected_Bone(index));
@@ -1049,12 +1049,12 @@ void Replace_Bones_With_Fused_Bone(const std::string& merge_filename,RIGID_BODY<
 //#####################################################################
 void Replace_Bones_With_Fused_Bone(const ARRAY<RIGID_BODY<TV>*>& replaced_bones,const ARRAY<FRAME<TV> >& original_to_fused_world_transform,RIGID_BODY<TV>* new_bone)
 {
-    for(int i=1;i<=muscles.m;i++){
+    for(int i=0;i<muscles.m;i++){
         bool add_muscle=false;int index=0;
         for(int j=0;j<=muscles(i)->via_points.m+1;j++){
             ATTACHMENT_POINT<TV>* constrained_point=(j==0)?muscles(i)->attachment_point_1:((j<=muscles(i)->via_points.m)?muscles(i)->via_points(j):muscles(i)->attachment_point_2);
 
-            for(int b=1;b<=replaced_bones.m;b++) if(replaced_bones(b)->particle_index==constrained_point->particle_index) index=b;
+            for(int b=0;b<replaced_bones.m;b++) if(replaced_bones(b)->particle_index==constrained_point->particle_index) index=b;
             if(constrained_point && index){
                 TV old_object_space_position=(constrained_point)->object_space_position;
                 TV new_object_space_position=new_bone->Frame().Inverse()*original_to_fused_world_transform(index)*replaced_bones(index)->Frame()*old_object_space_position;
@@ -1133,7 +1133,7 @@ void Make_Wrapping_Objects()
 /* code for updating hte points of the triangulated surface . . may need to use to update the via_points on the wrapping surfaces
         for(int i=1;i<=triangulated_surface.particles.array_collection->Size();i++)
             triangulated_surface.particles.X(i)=Current_World_Space_Position(original_particle_positions(i));
-        for(int j=1;j<=points.m;j++)
+        for(int j=0;j<points.m;j++)
         points(j)=Current_World_Space_Position(original_points_positions(j));*/
     }
     delete input;
@@ -1181,14 +1181,14 @@ static void Load_Splines(const std::string& filename,ARRAY<PAIR<std::string,BSPL
     int number_of_keyframes,number_of_joints;
     *input>>number_of_keyframes;
     keyframe_times.Resize(number_of_keyframes);
-    for(int i=1;i<=keyframe_times.m;i++) (*input)>>keyframe_times(i);;
+    for(int i=0;i<keyframe_times.m;i++) (*input)>>keyframe_times(i);;
 
     *input>>number_of_joints;
     motion_splines.Resize(number_of_joints);
-    for(int i=1;i<=motion_splines.m;i++){
+    for(int i=0;i<motion_splines.m;i++){
         (*input)>>motion_splines(i).x;
         ARRAY<ROTATION<TV> > control_points;control_points.Resize(number_of_keyframes);
-        for(int j=1;j<=control_points.m;j++){FRAME<TV> frame;(*input)>>frame;control_points(j)=frame.r;}
+        for(int j=0;j<control_points.m;j++){FRAME<TV> frame;(*input)>>frame;control_points(j)=frame.r;}
         motion_splines(i).y=new BSPLINE_QUATERNION<T>(keyframe_times,control_points,spline_order);
         if(quaternion_check) motion_splines(i).y->Quaternion_Check();
         motion_splines(i).y->Create_Closed_Points();}
@@ -1199,7 +1199,7 @@ static void Load_Splines(const std::string& filename,ARRAY<PAIR<std::string,BSPL
 //#####################################################################
 static void Print_Splines(ARRAY<PAIR<std::string,BSPLINE_QUATERNION<T>* > >*& motion_splines)
 {
-    for(int i=1;i<=motion_splines.m;i++){
+    for(int i=0;i<motion_splines.m;i++){
         std::cout<<"Joint: "<<motion_splines(i).x<<std::endl;
         motion_splines(i).y->Print_Control_Points_And_Times();}
 }
@@ -1212,7 +1212,7 @@ static INTERPOLATION_CURVE<T,ROTATION<TV> >* Read_Frame_Track_From_Spline(ARRAY<
     PHYSBAM_FATAL_ERROR();
 #if 0
     T tmin=0;int index=0;
-    for(int i=1;i<=motion_splines.m;i++) if(motion_splines(i).x==jointname) index=i;
+    for(int i=0;i<motion_splines.m;i++) if(motion_splines(i).x==jointname) index=i;
     if(!index) return 0;
     FRAME_TRACK_3D<T>* frame_track=new FRAME_TRACK_3D<T>(samples,tmin,track_speedup_factor);
     T time_increment=(1/(T)(samples-1))*motion_splines(index).y->Range();

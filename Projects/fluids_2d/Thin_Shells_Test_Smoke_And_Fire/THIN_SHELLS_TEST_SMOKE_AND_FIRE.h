@@ -289,7 +289,7 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY<VECTOR_2D<T> >& V,const T time)
 {
     if(example_number==0) V(1)=VECTOR_2D<T>(0,0);
     else if(example_number==1) for(int i=-5;i<=5;i++) V(((i+V.m)%V.m)+1)=VECTOR_2D<T>(0,0);
-    else if(example_number==2) for(int i=1;i<=body_grid.m;i++) V(i*body_grid.n)=VECTOR_2D<T>(0,0);
+    else if(example_number==2) for(int i=0;i<body_grid.m;i++) V(i*body_grid.n)=VECTOR_2D<T>(0,0);
     else if(example_number==3){V(1)=V(V.m)=VECTOR_2D<T>(0,0);}
     else if(example_number==6){V(1)=VECTOR_2D<T>(0,0);}
     else if(example_number==101){V(1)=VECTOR_2D<T>();if(time<1)V(V.m)=VECTOR_2D<T>();}
@@ -340,7 +340,7 @@ void Initialize_Phi()
 {
     assert(fluids_parameters.fire);
     if(!use_source) return;
-    for(int i=1;i<=fluids_parameters.grid.m;i++)for(int j=1;j<=fluids_parameters.grid.n;j++)
+    for(int i=0;i<fluids_parameters.grid.m;i++)for(int j=0;j<fluids_parameters.grid.n;j++)
         if(source_domain.Lazy_Inside(fluids_parameters.grid.X(i,j))) fluids_parameters.particle_levelset_evolution.particle_levelset.levelset.phi(i,j)=-fluids_parameters.grid.dx;
         else fluids_parameters.particle_levelset_evolution.particle_levelset.levelset.phi(i,j)=fluids_parameters.grid.dx;
 }
@@ -351,7 +351,7 @@ void Adjust_Phi_With_Sources(const T time)
 {
     assert(fluids_parameters.fire);
     if(!use_source) return;
-    for(int i=1;i<=fluids_parameters.grid.m;i++)for(int j=1;j<=fluids_parameters.grid.n;j++)
+    for(int i=0;i<fluids_parameters.grid.m;i++)for(int j=0;j<fluids_parameters.grid.n;j++)
         if(source_domain.Lazy_Inside(fluids_parameters.grid.X(i,j))&&fluids_parameters.particle_levelset_evolution.particle_levelset.levelset.phi(i,j)>0)
             fluids_parameters.particle_levelset_evolution.particle_levelset.levelset.phi(i,j)=-fluids_parameters.grid.dx;
 }

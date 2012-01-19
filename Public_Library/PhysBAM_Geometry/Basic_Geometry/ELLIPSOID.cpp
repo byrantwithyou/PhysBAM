@@ -71,7 +71,7 @@ Covariance_Ellipsoid(const T_ARRAY_TV& points)
 {
     TV average=points.Average();
     SYMMETRIC_MATRIX<T,3> covariance;DIAGONAL_MATRIX<T,3> eigenvalues;MATRIX<T,3> eigenvectors;
-    for(int p=1;p<=points.m;p++){
+    for(int p=0;p<points.m;p++){
         TV variance=points(p)-average;
         covariance.x11+=variance.x*variance.x;covariance.x21+=variance.y*variance.x;covariance.x31+=variance.z*variance.x;
         covariance.x22+=variance.y*variance.y;covariance.x32+=variance.z*variance.y;covariance.x33+=variance.z*variance.z;}

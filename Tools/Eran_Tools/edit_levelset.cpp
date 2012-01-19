@@ -30,10 +30,10 @@ template<class T> void Do_It(const std::string& filename,PARSE_ARGS& parse_args)
 #if 0
     T domain_scale=10;
     CYLINDER<T> cylinder(domain_scale*VECTOR<T,3>(.55,.9,.5),domain_scale*VECTOR<T,3>(.55,1,.5),domain_scale*.05);
-    for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++) for(int k=1;k<=grid.mn;k++)
+    for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++) for(int k=0;k<grid.mn;k++)
         if(cylinder.Inside(grid.X(i,j,k),3*grid.min_dx_dy_dz)) phi(i,j,k)=min(phi(i,j,k),cylinder.Signed_Distance(grid.X(i,j,k)));
 #endif
-    for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++) for(int k=1;k<=grid.mn;k++)
+    for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++) for(int k=0;k<grid.mn;k++)
         if(grid.y(j)>8) phi(i,j,k)=reference_phi(i,j,k);
 
     FILE_UTILITIES::Write_To_File<T>(filename+".out",*implicit_surface);

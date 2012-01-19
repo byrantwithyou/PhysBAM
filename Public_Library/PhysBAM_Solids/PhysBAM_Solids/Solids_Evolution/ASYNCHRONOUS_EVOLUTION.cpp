@@ -121,7 +121,7 @@ Setup_Coarsescale_Simulation(const T dt,const T time)
 template<class TV> void ASYNCHRONOUS_EVOLUTION<TV>::
 Disable_Forces(const ARRAY<int>& disable_forces_indices,ARRAY<VECTOR<bool,3> >& saved_force_settings)
 {
-    for(int i=1;i<=disable_forces_indices.m;i++){int index=disable_forces_indices(i);
+    for(int i=0;i<disable_forces_indices.m;i++){int index=disable_forces_indices(i);
         DEFORMABLES_FORCES<TV>& force=*solid_body_collection.deformable_body_collection.deformables_forces(index);
         // Don't disable if already disabled. Prevents saved_force_settings to be overwritten for consecutive calls.
         if(!(force.use_velocity_independent_forces || force.use_velocity_dependent_forces || force.use_implicit_velocity_independent_forces)) continue;
@@ -140,7 +140,7 @@ Disable_Forces(const ARRAY<int>& disable_forces_indices,ARRAY<VECTOR<bool,3> >& 
 template<class TV> void ASYNCHRONOUS_EVOLUTION<TV>::
 Enable_Forces(const ARRAY<int>& enable_forces_indices,const ARRAY<VECTOR<bool,3> >& saved_force_settings)
 {
-    for(int i=1;i<=enable_forces_indices.m;i++){int index=enable_forces_indices(i);
+    for(int i=0;i<enable_forces_indices.m;i++){int index=enable_forces_indices(i);
         solid_body_collection.deformable_body_collection.deformables_forces(index)->use_velocity_independent_forces=saved_force_settings(index)[1];
         solid_body_collection.deformable_body_collection.deformables_forces(index)->use_velocity_dependent_forces=saved_force_settings(index)[2];
         solid_body_collection.deformable_body_collection.deformables_forces(index)->use_implicit_velocity_independent_forces=saved_force_settings(index)[3];}
@@ -274,7 +274,7 @@ Setup_Scaled_Forces_Rewind_Particles()
     ARRAY<int> rewind_to_time_n_particle_indices=both_forces_particles_indices;
     rewind_to_time_n_particle_indices.Append_Elements(coarsescale_particle_indices);
 
-    for(int i=1;i<=scaled_coarsescale_forces_indices.m;i++){int index=scaled_coarsescale_forces_indices(i);
+    for(int i=0;i<scaled_coarsescale_forces_indices.m;i++){int index=scaled_coarsescale_forces_indices(i);
         SCALED_DEFORMABLES_FORCES<TV>* scaled_force=dynamic_cast<SCALED_DEFORMABLES_FORCES<TV>* >(solid_body_collection.deformable_body_collection.deformables_forces(index));
         scaled_force->Set_Rewind_To_Time_n_Particle_Indices(rewind_to_time_n_particle_indices);}
 }
@@ -288,7 +288,7 @@ Set_Scaled_Coarsescale_Forces_Scale(const T dt_partial,const T dt_full,const boo
     T scale=ratio;
     if(position_update) scale=(T)2.*ratio-(T)1.;
     T scale_implicit=use_squared_ratio_for_implicit_velocity_independent_scale?scale*scale:scale;
-    for(int i=1;i<=scaled_coarsescale_forces_indices.m;i++){int index=scaled_coarsescale_forces_indices(i);
+    for(int i=0;i<scaled_coarsescale_forces_indices.m;i++){int index=scaled_coarsescale_forces_indices(i);
         dynamic_cast<SCALED_DEFORMABLES_FORCES<TV>*>(solid_body_collection.deformable_body_collection.deformables_forces(index))->Set_Scale(scale,scale,scale_implicit);}
 }
 //#####################################################################
@@ -297,7 +297,7 @@ Set_Scaled_Coarsescale_Forces_Scale(const T dt_partial,const T dt_full,const boo
 template<class TV> void ASYNCHRONOUS_EVOLUTION<TV>::
 Set_Scaled_Coarsescale_Forces_Rewind_State(const bool rewind_positions,const bool rewind_velocities)
 {
-    for(int i=1;i<=scaled_coarsescale_forces_indices.m;i++){int index=scaled_coarsescale_forces_indices(i);
+    for(int i=0;i<scaled_coarsescale_forces_indices.m;i++){int index=scaled_coarsescale_forces_indices(i);
         dynamic_cast<SCALED_DEFORMABLES_FORCES<TV>* >(solid_body_collection.deformable_body_collection.deformables_forces(index))->Set_Rewind_State(rewind_positions,rewind_velocities);}
 }
 //#####################################################################
@@ -331,7 +331,7 @@ Set_External_Positions(ARRAY_VIEW<TV> X,const T time)
     if(use_projection || !use_velocity_averaging || asynchronous_mode==FINE_SCALE || time!=time_np1) return;
     PHYSBAM_DEBUG_WRITE_SUBSTEP(STRING_UTILITIES::string_sprintf("Set_External_Positions (before). time=%f, time_np1=%f, time_n=%f (ASYNCHRONOUS_EVOLUTION)",time,time_np1,time_n),0,1);
 
-    for(int i=1;i<=coarsescale_particle_indices.m;i++){int p=coarsescale_particle_indices(i);
+    for(int i=0;i<coarsescale_particle_indices.m;i++){int p=coarsescale_particle_indices(i);
         solid_body_collection.deformable_body_collection.particles.X(p)=X_n(p);}
     solid_body_collection.deformable_body_collection.particles.Euler_Step_Position(coarsescale_particle_indices,time_np1-time_n);
 
@@ -344,7 +344,7 @@ template<class TV> void ASYNCHRONOUS_EVOLUTION<TV>::
 Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time)
 {
     if(!treat_mixed_particles_kinematic_in_finescale || asynchronous_mode==COARSE_SCALE) return;
-    for(int i=1;i<=both_forces_particles_indices.m;i++){int p=both_forces_particles_indices(i);
+    for(int i=0;i<both_forces_particles_indices.m;i++){int p=both_forces_particles_indices(i);
         V(p)=V_n(p);}
 }
 //#####################################################################
@@ -354,7 +354,7 @@ template<class TV> void ASYNCHRONOUS_EVOLUTION<TV>::
 Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time)
 {
     if(!treat_mixed_particles_kinematic_in_finescale || asynchronous_mode==COARSE_SCALE) return;
-    for(int i=1;i<=both_forces_particles_indices.m;i++){int p=both_forces_particles_indices(i);
+    for(int i=0;i<both_forces_particles_indices.m;i++){int p=both_forces_particles_indices(i);
         V(p)=TV();}
 }
 //#####################################################################
@@ -459,7 +459,7 @@ Accumulate_Finescale_Impulse_On_Mixed_Particles(const T dt, const T time)
 template<class TV> void ASYNCHRONOUS_EVOLUTION<TV>::
 Apply_Accumulated_Finescale_Impulse_To_Mixed_Particles()
 {
-    for(int i=1;i<=both_forces_particles_indices.m;i++){int p=both_forces_particles_indices(i);
+    for(int i=0;i<both_forces_particles_indices.m;i++){int p=both_forces_particles_indices(i);
         solid_body_collection.deformable_body_collection.particles.V(p)+=accumulated_finescale_impulse_on_mixed_particles(i);}
     accumulated_finescale_impulse_on_mixed_particles.Fill(TV());
 }
@@ -474,7 +474,7 @@ Set_Force_Active_Particles(DEFORMABLES_FORCES<TV>* force,const ARRAY<bool>& fine
     if(LINEAR_SPRINGS<TV>* spring=dynamic_cast<LINEAR_SPRINGS<TV>*>(force)){
         for(int i=1;i<=spring->segment_mesh.elements.m;i++) if(fine_list.Subset(spring->segment_mesh.elements(i)).Contains(false)!=is_fine) list.Append(i);
         fe=&spring->force_segments;
-        if(!is_fine) for(int i=1;i<=list.m;i++) for(int j=1;j<=2;j++) coarsescale_forces_particles_map.Set(spring->segment_mesh.elements(list(i))(j));}
+        if(!is_fine) for(int i=0;i<list.m;i++) for(int j=0;j<2;j++) coarsescale_forces_particles_map.Set(spring->segment_mesh.elements(list(i))(j));}
     else if(GRAVITY<TV>* gravity=dynamic_cast<GRAVITY<TV>*>(force)){
         for(int i=1;i<=gravity->influenced_particles->m;i++) if(fine_list((*gravity->influenced_particles)(i))==is_fine) list.Append((*gravity->influenced_particles)(i));
         fe=&gravity->force_particles;
@@ -482,7 +482,7 @@ Set_Force_Active_Particles(DEFORMABLES_FORCES<TV>* force,const ARRAY<bool>& fine
     else if(LINEAR_ALTITUDE_SPRINGS<TV,3>* spring=dynamic_cast<LINEAR_ALTITUDE_SPRINGS<TV,3>*>(force)){
         for(int i=1;i<=spring->mesh.elements.m;i++) if(fine_list.Subset(spring->mesh.elements(i)).Contains(false)!=is_fine) list.Append(i);
         fe=&spring->force_elements;
-        if(!is_fine) for(int i=1;i<=list.m;i++) for(int j=1;j<=4;j++) coarsescale_forces_particles_map.Set(spring->mesh.elements(list(i))(j));}
+        if(!is_fine) for(int i=0;i<list.m;i++) for(int j=0;j<4;j++) coarsescale_forces_particles_map.Set(spring->mesh.elements(list(i))(j));}
     else if(SCALED_DEFORMABLES_FORCES<TV>* scaled_force=dynamic_cast<SCALED_DEFORMABLES_FORCES<TV>*>(force)){
         Set_Force_Active_Particles(scaled_force->base_force,fine_list,is_fine);}
     else PHYSBAM_FATAL_ERROR("Don't know how to handle this force");
@@ -497,8 +497,8 @@ Set_Asynchronous_Particles(const ARRAY<int>& async_list)
     ARRAY<bool> fine_list(solid_body_collection.deformable_body_collection.particles.array_collection->Size());
     fine_list.Subset(async_list).Fill(true);
     coarsescale_forces_particles_map.Remove_All();
-    for(int i=1;i<=scaled_coarsescale_forces_indices.m;i++) Set_Force_Active_Particles(solid_body_collection.deformable_body_collection.deformables_forces(scaled_coarsescale_forces_indices(i)),fine_list,false);
-    for(int i=1;i<=finescale_forces_indices.m;i++) Set_Force_Active_Particles(solid_body_collection.deformable_body_collection.deformables_forces(finescale_forces_indices(i)),fine_list,true);
+    for(int i=0;i<scaled_coarsescale_forces_indices.m;i++) Set_Force_Active_Particles(solid_body_collection.deformable_body_collection.deformables_forces(scaled_coarsescale_forces_indices(i)),fine_list,false);
+    for(int i=0;i<finescale_forces_indices.m;i++) Set_Force_Active_Particles(solid_body_collection.deformable_body_collection.deformables_forces(finescale_forces_indices(i)),fine_list,true);
 
     // update particle maps and lists
     finescale_forces_particles_map.Remove_All();
@@ -523,7 +523,7 @@ Set_Asynchronous_Within_Distance(const T distance)
             if(body.Implicit_Geometry_Lazy_Inside(solid_body_collection.deformable_body_collection.particles.X(i),distance))
             async_map.Set(i);}
         /* // choose from boundary-one-ring particles
-        for(int i=1;i<=coarsescale_particles_pool.m;i++){int p=coarsescale_particles_pool(i);
+        for(int i=0;i<coarsescale_particles_pool.m;i++){int p=coarsescale_particles_pool(i);
             if(body.Implicit_Geometry_Lazy_Inside(solid_body_collection.deformable_body_collection.particles.X(p),distance))
             async_map.Set(p);}}*/
     // add boundary-one-ring particles if adaptive
@@ -548,7 +548,7 @@ Add_Blob_From_Particles(const ARRAY<int>& blob_particles)
 template<class TV> void ASYNCHRONOUS_EVOLUTION<TV>::
 Compute_Blob_Properties()
 {
-    for(int i=1;i<=blobs.m;i++){
+    for(int i=0;i<blobs.m;i++){
         blobs(i).mass=0;
         blobs(i).inertia=T_SYMMETRIC_MATRIX();
         blobs(i).center=TV();
@@ -569,7 +569,7 @@ template<class TV> void ASYNCHRONOUS_EVOLUTION<TV>::
 Project(GENERALIZED_VELOCITY<TV>& V) const
 {
     if(!use_projection || !asynchronous_mode==FINE_SCALE) return;
-    for(int i=1;i<=blobs.m;i++){
+    for(int i=0;i<blobs.m;i++){
         TV impulse;T_SPIN torque;
         for(int j=1;j<=blobs(i).blob_particles.m;j++){int p=blobs(i).blob_particles(j);
             impulse+=V.V.array(p);

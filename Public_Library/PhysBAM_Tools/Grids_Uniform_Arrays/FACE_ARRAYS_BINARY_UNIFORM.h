@@ -58,13 +58,13 @@ public:
 
     template<class T2>
     ARRAY& operator*=(const T2 a)
-    {for(int side=1;side<=2;side++)for(int i=0;i<dimension;i++) Component(side,i)*=a;return *this;}
+    {for(int side=0;side<2;side++)for(int i=0;i<dimension;i++) Component(side,i)*=a;return *this;}
 
     ARRAY& operator+=(const ARRAY& a)
-    {for(int side=1;side<=2;side++)for(int i=0;i<dimension;i++) Component(side,i)+=a.Component(side,i);return *this;}
+    {for(int side=0;side<2;side++)for(int i=0;i<dimension;i++) Component(side,i)+=a.Component(side,i);return *this;}
 
     ARRAY& operator-=(const ARRAY& a)
-    {for(int side=1;side<=2;side++)for(int i=0;i<dimension;i++) Component(side,i)-=a.Component(side,i);return *this;}
+    {for(int side=0;side<2;side++)for(int i=0;i<dimension;i++) Component(side,i)-=a.Component(side,i);return *this;}
 
     void Resize(const RANGE<TV_INT>& domain,const bool initialize_new_elements=true,const bool copy_existing_elements=true,const T& initialization_value=T())
     {BASE::Resize(domain,initialize_new_elements,copy_existing_elements,initialization_value);u2.Resize(domain,initialize_new_elements,copy_existing_elements,initialization_value);}
@@ -74,10 +74,10 @@ public:
     {Resize(grid.Domain_Indices(ghost_cells),initialize_new_elements,copy_existing_elements,initialization_value);}
 
     void Clean_Memory()
-    {for(int side=1;side<=2;side++)for(int i=0;i<dimension;i++) Component(side,i).Clean_Memory();}
+    {for(int side=0;side<2;side++)for(int i=0;i<dimension;i++) Component(side,i).Clean_Memory();}
 
     void Delete_Pointers_And_Clean_Memory()
-    {for(int side=1;side<=2;side++)for(int i=0;i<dimension;i++) Component(side,i).Delete_Pointers_And_Clean_Memory();}
+    {for(int side=0;side<2;side++)for(int i=0;i<dimension;i++) Component(side,i).Delete_Pointers_And_Clean_Memory();}
 
     int Number_Of_Ghost_Cells() const
     {return 1-domain_indices.min_corner.x;}
@@ -107,31 +107,31 @@ public:
     {for(int axis=0;axis<dimension;axis++) Component(2,axis)(cell_index)=Component(1,axis)(cell_index+TV_INT::Axis_Vector(axis))=value;}
 
     static void Extract_Dimension(const ARRAY& old_array,ARRAY<ELEMENT_OF_T,SIDED_FACE_INDEX<dimension> >& extracted_array,const TV_INT& dimensions_to_extract)
-    {for(int side=1;side<=2;side++)for(int i=0;i<dimension;i++) T_ARRAY_VIEW::Extract_Dimension(old_array.Component(side,i),extracted_array.Component(side,i),dimensions_to_extract(i));}
+    {for(int side=0;side<2;side++)for(int i=0;i<dimension;i++) T_ARRAY_VIEW::Extract_Dimension(old_array.Component(side,i),extracted_array.Component(side,i),dimensions_to_extract(i));}
 
     void Fill(const T& constant)
-    {for(int side=1;side<=2;side++)for(int i=0;i<dimension;i++) Component(side,i).Fill(constant);}
+    {for(int side=0;side<2;side++)for(int i=0;i<dimension;i++) Component(side,i).Fill(constant);}
 
     static void Copy(const ARRAY& old_copy,ARRAY& new_copy)
-    {for(int side=1;side<=2;side++)for(int i=0;i<dimension;i++) T_ARRAY_VIEW::Copy(old_copy.Component(side,i),new_copy.Component(side,i));}
+    {for(int side=0;side<2;side++)for(int i=0;i<dimension;i++) T_ARRAY_VIEW::Copy(old_copy.Component(side,i),new_copy.Component(side,i));}
 
     template<class T2>
     static void Copy(const T2 c,const ARRAY& old,ARRAY& result)
-    {for(int side=1;side<=2;side++)for(int i=0;i<dimension;i++) T_ARRAY_VIEW::Copy(c,old.Component(side,i),result.Component(side,i));}
+    {for(int side=0;side<2;side++)for(int i=0;i<dimension;i++) T_ARRAY_VIEW::Copy(c,old.Component(side,i),result.Component(side,i));}
 
     void Fill(const TV& value)
-    {for(int side=1;side<=2;side++)for(int i=0;i<dimension;i++) Component(side,i).Fill(value(i));}
+    {for(int side=0;side<2;side++)for(int i=0;i<dimension;i++) Component(side,i).Fill(value(i));}
 
     template<class T2>
     static void Copy(const T2 c1,const ARRAY& v1,const T2 c2,const ARRAY& v2,ARRAY& result)
-    {for(int side=1;side<=2;side++)for(int i=0;i<dimension;i++) T_ARRAY_VIEW::Copy(c1,v1.Component(side,i),c2,v2.Component(side,i),result.Component(side,i));}
+    {for(int side=0;side<2;side++)for(int i=0;i<dimension;i++) T_ARRAY_VIEW::Copy(c1,v1.Component(side,i),c2,v2.Component(side,i),result.Component(side,i));}
 
     static void Put(const ARRAY& old_copy,ARRAY& new_copy)
-    {for(int side=1;side<=2;side++)for(int i=0;i<dimension;i++) T_ARRAY_VIEW::Put(old_copy.Component(side,i),new_copy.Component(side,i));}
+    {for(int side=0;side<2;side++)for(int i=0;i<dimension;i++) T_ARRAY_VIEW::Put(old_copy.Component(side,i),new_copy.Component(side,i));}
 
     template<class T_GRID>
     static void Put_Ghost(const T constant,ARRAY& x,const T_GRID& grid,const int ghost_cells)
-    {for(int side=1;side<=2;side++)for(int i=0;i<dimension;i++) T_ARRAY_VIEW::Put_Ghost(constant,x.Component(side,i),grid,ghost_cells);}
+    {for(int side=0;side<2;side++)for(int i=0;i<dimension;i++) T_ARRAY_VIEW::Put_Ghost(constant,x.Component(side,i),grid,ghost_cells);}
 
     TV Maxabs() const
     {TV maxabs_values;for(int i=0;i<dimension;i++) maxabs_values(i)=max(Component(1,i).Maxabs(),Component(2,i).Maxabs());return maxabs_values;}

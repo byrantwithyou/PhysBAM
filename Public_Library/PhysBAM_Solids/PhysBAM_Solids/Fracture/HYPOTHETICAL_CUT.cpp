@@ -13,7 +13,7 @@ using namespace PhysBAM;
 template<class TV,int d> bool HYPOTHETICAL_CUT<TV,d>::
 Contains_Embedded_Particle(const EMBEDDED_OBJECT<TV,d>& embedded_object,const int emb_particle) const
 {
-    for(int hp=1;hp<=hypothetical_nodes.m;hp++)
+    for(int hp=0;hp<hypothetical_nodes.m;hp++)
         if(embedded_object.Are_Parents(hypothetical_nodes(hp).parents,emb_particle)) return true;
     return false;
 }
@@ -32,7 +32,7 @@ Position(const int hypothetical_node_index) const
 template<class TV,int d> void HYPOTHETICAL_CUT<TV,d>::
 Add_Hypothetical_Nodes_To_Embedded_Object(EMBEDDED_OBJECT<TV,d>& embedded_object)
 {
-    for(int n=1;n<=hypothetical_nodes.m;n++)
+    for(int n=0;n<hypothetical_nodes.m;n++)
         hypothetical_nodes(n).index_in_embedded_particles=embedded_object.Add_Embedded_Particle_If_Not_Already_There(hypothetical_nodes(n).parents,hypothetical_nodes(n).interpolation_fraction);
 }
 //#####################################################################

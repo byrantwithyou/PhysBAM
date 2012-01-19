@@ -118,7 +118,7 @@ Initialize_Prismatic_Cube_Mesh_And_Particles(const GRID<TV>& grid)
 template<class T> void TETRAHEDRALIZED_VOLUME<T>::
 Check_Signed_Volumes_And_Make_Consistent(bool verbose)
 {
-    for(int t=1;t<=mesh.elements.m;t++){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
+    for(int t=0;t<mesh.elements.m;t++){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
         TV x1(particles.X(i)),x2(particles.X(j)),x3(particles.X(k)),x4(particles.X(l));
         T sign_of_volume=TV::Dot_Product(TV::Cross_Product(x2-x1,x3-x1),x4-x1); // left out division by 6
         if(sign_of_volume < 0){
@@ -143,8 +143,8 @@ template<class T> T TETRAHEDRALIZED_VOLUME<T>::
 Minimum_Volume(int* index) const
 {
     int t_save=0;T minimum=FLT_MAX;
-    if(tetrahedron_list) for(int t=1;t<=mesh.elements.m;t++){T temp=(*tetrahedron_list)(t).Volume();if(temp < minimum){minimum=temp;t_save=t;}}
-    else for(int t=1;t<=mesh.elements.m;t++){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
+    if(tetrahedron_list) for(int t=0;t<mesh.elements.m;t++){T temp=(*tetrahedron_list)(t).Volume();if(temp < minimum){minimum=temp;t_save=t;}}
+    else for(int t=0;t<mesh.elements.m;t++){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
         T temp=TETRAHEDRON<T>::Volume(particles.X(i),particles.X(j),particles.X(k),particles.X(l));if(temp < minimum){minimum=temp;t_save=t;}}
     if(index) *index=t_save;
     return minimum;
@@ -156,8 +156,8 @@ template<class T> T TETRAHEDRALIZED_VOLUME<T>::
 Minimum_Signed_Volume(int* index) const
 {
     int t_save=0;T minimum=FLT_MAX;
-    if(tetrahedron_list) for(int t=1;t<=mesh.elements.m;t++){T temp=(*tetrahedron_list)(t).Signed_Volume();if(temp < minimum){minimum=temp;t_save=t;}}
-    else for(int t=1;t<=mesh.elements.m;t++){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
+    if(tetrahedron_list) for(int t=0;t<mesh.elements.m;t++){T temp=(*tetrahedron_list)(t).Signed_Volume();if(temp < minimum){minimum=temp;t_save=t;}}
+    else for(int t=0;t<mesh.elements.m;t++){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
         T temp=TETRAHEDRON<T>::Signed_Volume(particles.X(i),particles.X(j),particles.X(k),particles.X(l));if(temp < minimum){minimum=temp;t_save=t;}}
     if(index) *index=t_save;
     return minimum;
@@ -169,7 +169,7 @@ template<class T> T TETRAHEDRALIZED_VOLUME<T>::
 Total_Volume() const
 {
     T volume=0;
-    for(int t=1;t<=mesh.elements.m;t++){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
+    for(int t=0;t<mesh.elements.m;t++){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
         volume+=TETRAHEDRON<T>::Volume(particles.X(i),particles.X(j),particles.X(k),particles.X(l));}
     return volume;
 }
@@ -180,8 +180,8 @@ template<class T> T TETRAHEDRALIZED_VOLUME<T>::
 Minimum_Angle(int* index) const
 {
     int t_save=0;T minimum=FLT_MAX;
-    if(tetrahedron_list) for(int t=1;t<=mesh.elements.m;t++){T temp=(*tetrahedron_list)(t).Minimum_Angle();if(temp < minimum){minimum=temp;t_save=t;}}
-    else for(int t=1;t<=mesh.elements.m;t++){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
+    if(tetrahedron_list) for(int t=0;t<mesh.elements.m;t++){T temp=(*tetrahedron_list)(t).Minimum_Angle();if(temp < minimum){minimum=temp;t_save=t;}}
+    else for(int t=0;t<mesh.elements.m;t++){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
         T temp=TETRAHEDRON<T>(particles.X(i),particles.X(j),particles.X(k),particles.X(l)).Minimum_Angle();if(temp < minimum){minimum=temp;t_save=t;}}
     if(index) *index=t_save;
     return minimum;
@@ -193,8 +193,8 @@ template<class T> T TETRAHEDRALIZED_VOLUME<T>::
 Maximum_Angle(int* index) const
 {
     int t_save=0;T maximum=0;
-    if(tetrahedron_list) for(int t=1;t<=mesh.elements.m;t++){T temp=(*tetrahedron_list)(t).Maximum_Angle();if(temp > maximum){maximum=temp;t_save=t;}}
-    else for(int t=1;t<=mesh.elements.m;t++){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
+    if(tetrahedron_list) for(int t=0;t<mesh.elements.m;t++){T temp=(*tetrahedron_list)(t).Maximum_Angle();if(temp > maximum){maximum=temp;t_save=t;}}
+    else for(int t=0;t<mesh.elements.m;t++){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
         T temp=TETRAHEDRON<T>(particles.X(i),particles.X(j),particles.X(k),particles.X(l)).Maximum_Angle();if(temp > maximum){maximum=temp;t_save=t;}}
     if(index) *index=t_save;
     return maximum;
@@ -206,8 +206,8 @@ template<class T> T TETRAHEDRALIZED_VOLUME<T>::
 Minimum_Altitude(int* index) const
 {
     int t_save=0;T minimum=FLT_MAX;
-    if(tetrahedron_list) for(int t=1;t<=mesh.elements.m;t++){T temp=(*tetrahedron_list)(t).Minimum_Altitude();if(temp < minimum){minimum=temp;t_save=t;}}
-    else for(int t=1;t<=mesh.elements.m;t++){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
+    if(tetrahedron_list) for(int t=0;t<mesh.elements.m;t++){T temp=(*tetrahedron_list)(t).Minimum_Altitude();if(temp < minimum){minimum=temp;t_save=t;}}
+    else for(int t=0;t<mesh.elements.m;t++){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
         T temp=TETRAHEDRON<T>(particles.X(i),particles.X(j),particles.X(k),particles.X(l)).Minimum_Altitude();if(temp < minimum){minimum=temp;t_save=t;}}
     if(index) *index=t_save;
     return minimum;
@@ -219,7 +219,7 @@ template<class T> T TETRAHEDRALIZED_VOLUME<T>::
 Minimum_Edge_Length(int* index) const
 {
     int t_save=0;T minimum_squared=FLT_MAX;
-    for(int t=1;t<=mesh.elements.m;t++){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
+    for(int t=0;t<mesh.elements.m;t++){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
         T temp=TETRAHEDRON<T>::Minimum_Edge_Length_Squared(particles.X(i),particles.X(j),particles.X(k),particles.X(l));if(temp < minimum_squared){minimum_squared=temp;t_save=t;}}
     if(index) *index=t_save;
     return sqrt(minimum_squared);
@@ -231,7 +231,7 @@ template<class T> T TETRAHEDRALIZED_VOLUME<T>::
 Maximum_Edge_Length(int* index) const
 {
     int t_save=0;T maximum_squared=0;
-    for(int t=1;t<=mesh.elements.m;t++){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
+    for(int t=0;t<mesh.elements.m;t++){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
         T temp=TETRAHEDRON<T>::Maximum_Edge_Length_Squared(particles.X(i),particles.X(j),particles.X(k),particles.X(l));if(temp > maximum_squared){maximum_squared=temp;t_save=t;}}
     if(index) *index=t_save;
     return sqrt(maximum_squared);
@@ -243,8 +243,8 @@ template<class T> T TETRAHEDRALIZED_VOLUME<T>::
 Maximum_Aspect_Ratio(int* index) const
 {
     int t_save=0;T maximum=0;
-    if(tetrahedron_list) for(int t=1;t<=mesh.elements.m;t++){T temp=(*tetrahedron_list)(t).Aspect_Ratio();if(temp > maximum){maximum=temp;t_save=t;}}
-    else for(int t=1;t<=mesh.elements.m;t++){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
+    if(tetrahedron_list) for(int t=0;t<mesh.elements.m;t++){T temp=(*tetrahedron_list)(t).Aspect_Ratio();if(temp > maximum){maximum=temp;t_save=t;}}
+    else for(int t=0;t<mesh.elements.m;t++){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
         T temp=TETRAHEDRON<T>(particles.X(i),particles.X(j),particles.X(k),particles.X(l)).Aspect_Ratio();if(temp > maximum){maximum=temp;t_save=t;}}
     if(index) *index=t_save;
     return maximum;
@@ -258,9 +258,9 @@ Maximum_Interior_Aspect_Ratio(int* index)
     if(mesh.number_nodes!=particles.array_collection->Size()) PHYSBAM_FATAL_ERROR();
     bool adjacent_elements_defined=mesh.adjacent_elements!=0;if(!adjacent_elements_defined) mesh.Initialize_Adjacent_Elements();
     int t_save=0;T maximum=0;
-    if(tetrahedron_list) for(int t=1;t<=mesh.elements.m;t++){if((*mesh.adjacent_elements)(t).m == 4){
+    if(tetrahedron_list) for(int t=0;t<mesh.elements.m;t++){if((*mesh.adjacent_elements)(t).m == 4){
         T temp=(*tetrahedron_list)(t).Aspect_Ratio();if(temp > maximum){maximum=temp;t_save=t;}}}
-    else for(int t=1;t<=mesh.elements.m;t++) if((*mesh.adjacent_elements)(t).m == 4){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
+    else for(int t=0;t<mesh.elements.m;t++) if((*mesh.adjacent_elements)(t).m == 4){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
         T temp=TETRAHEDRON<T>(particles.X(i),particles.X(j),particles.X(k),particles.X(l)).Aspect_Ratio();if(temp > maximum){maximum=temp;t_save=t;}}
     if(!adjacent_elements_defined){delete mesh.adjacent_elements;mesh.adjacent_elements=0;}
     if(index) *index=t_save;
@@ -275,9 +275,9 @@ Maximum_Boundary_Aspect_Ratio(int* index)
     if(mesh.number_nodes!=particles.array_collection->Size()) PHYSBAM_FATAL_ERROR();
     bool adjacent_elements_defined=mesh.adjacent_elements!=0;if(!adjacent_elements_defined) mesh.Initialize_Adjacent_Elements();
     int t_save=0;T maximum=0;
-    if(tetrahedron_list) for(int t=1;t<=mesh.elements.m;t++){if((*mesh.adjacent_elements)(t).m != 4){
+    if(tetrahedron_list) for(int t=0;t<mesh.elements.m;t++){if((*mesh.adjacent_elements)(t).m != 4){
         T temp=(*tetrahedron_list)(t).Aspect_Ratio();if(temp > maximum){maximum=temp;t_save=t;}}}
-    else for(int t=1;t<=mesh.elements.m;t++) if((*mesh.adjacent_elements)(t).m != 4){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
+    else for(int t=0;t<mesh.elements.m;t++) if((*mesh.adjacent_elements)(t).m != 4){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
         T temp=TETRAHEDRON<T>(particles.X(i),particles.X(j),particles.X(k),particles.X(l)).Aspect_Ratio();if(temp > maximum){maximum=temp;t_save=t;}}
     if(!adjacent_elements_defined){delete mesh.adjacent_elements;mesh.adjacent_elements=0;}
     if(index) *index=t_save;
@@ -290,8 +290,8 @@ template<class T> T TETRAHEDRALIZED_VOLUME<T>::
 Average_Aspect_Ratio()
 {
     int total=0;T sum=0;
-    if(tetrahedron_list) for(int t=1;t<=mesh.elements.m;t++){total++;sum+=(*tetrahedron_list)(t).Aspect_Ratio();}
-    else for(int t=1;t<=mesh.elements.m;t++){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
+    if(tetrahedron_list) for(int t=0;t<mesh.elements.m;t++){total++;sum+=(*tetrahedron_list)(t).Aspect_Ratio();}
+    else for(int t=0;t<mesh.elements.m;t++){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
         total++;sum+=TETRAHEDRON<T>(particles.X(i),particles.X(j),particles.X(k),particles.X(l)).Aspect_Ratio();}
     if(total != 0) sum/=total;
     return sum;
@@ -305,8 +305,8 @@ Average_Interior_Aspect_Ratio()
     if(mesh.number_nodes!=particles.array_collection->Size()) PHYSBAM_FATAL_ERROR();
     bool adjacent_elements_defined=mesh.adjacent_elements!=0;if(!adjacent_elements_defined) mesh.Initialize_Adjacent_Elements();
     int total=0;T sum=0;
-    if(tetrahedron_list) for(int t=1;t<=mesh.elements.m;t++){if((*mesh.adjacent_elements)(t).m == 4){total++;sum+=(*tetrahedron_list)(t).Aspect_Ratio();}}
-    else for(int t=1;t<=mesh.elements.m;t++) if((*mesh.adjacent_elements)(t).m == 4){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
+    if(tetrahedron_list) for(int t=0;t<mesh.elements.m;t++){if((*mesh.adjacent_elements)(t).m == 4){total++;sum+=(*tetrahedron_list)(t).Aspect_Ratio();}}
+    else for(int t=0;t<mesh.elements.m;t++) if((*mesh.adjacent_elements)(t).m == 4){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
         total++;sum+=TETRAHEDRON<T>(particles.X(i),particles.X(j),particles.X(k),particles.X(l)).Aspect_Ratio();}
     if(!adjacent_elements_defined){delete mesh.adjacent_elements;mesh.adjacent_elements=0;}
     if(total != 0) sum/=total;
@@ -321,8 +321,8 @@ Average_Boundary_Aspect_Ratio()
     if(mesh.number_nodes!=particles.array_collection->Size()) PHYSBAM_FATAL_ERROR();
     bool adjacent_elements_defined=mesh.adjacent_elements!=0;if(!adjacent_elements_defined) mesh.Initialize_Adjacent_Elements();
     int total=0;T sum=0;
-    if(tetrahedron_list) for(int t=1;t<=mesh.elements.m;t++){if((*mesh.adjacent_elements)(t).m != 4){total++;sum+=(*tetrahedron_list)(t).Aspect_Ratio();}}
-    else for(int t=1;t<=mesh.elements.m;t++) if((*mesh.adjacent_elements)(t).m != 4){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
+    if(tetrahedron_list) for(int t=0;t<mesh.elements.m;t++){if((*mesh.adjacent_elements)(t).m != 4){total++;sum+=(*tetrahedron_list)(t).Aspect_Ratio();}}
+    else for(int t=0;t<mesh.elements.m;t++) if((*mesh.adjacent_elements)(t).m != 4){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
         total++;sum+=TETRAHEDRON<T>(particles.X(i),particles.X(j),particles.X(k),particles.X(l)).Aspect_Ratio();}
     if(!adjacent_elements_defined){delete mesh.adjacent_elements;mesh.adjacent_elements=0;}
     if(total != 0) sum/=total;
@@ -335,8 +335,8 @@ template<class T> T TETRAHEDRALIZED_VOLUME<T>::
 Minimum_Dihedral_Angle(int* index) const
 {
     int t_save=0;T minimum=FLT_MAX;
-    if(tetrahedron_list) for(int t=1;t<=mesh.elements.m;t++){T temp=(*tetrahedron_list)(t).Minimum_Dihedral_Angle();if(temp < minimum){minimum=temp;t_save=t;}}
-    else for(int t=1;t<=mesh.elements.m;t++){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
+    if(tetrahedron_list) for(int t=0;t<mesh.elements.m;t++){T temp=(*tetrahedron_list)(t).Minimum_Dihedral_Angle();if(temp < minimum){minimum=temp;t_save=t;}}
+    else for(int t=0;t<mesh.elements.m;t++){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
         T temp=TETRAHEDRON<T>(particles.X(i),particles.X(j),particles.X(k),particles.X(l)).Minimum_Dihedral_Angle();if(temp < minimum){minimum=temp;t_save=t;}}
     if(index) *index=t_save;
     return minimum;
@@ -348,8 +348,8 @@ template<class T> T TETRAHEDRALIZED_VOLUME<T>::
 Maximum_Dihedral_Angle(int* index) const
 {
     int t_save=0;T maximum=0;
-    if(tetrahedron_list) for(int t=1;t<=mesh.elements.m;t++){T temp=(*tetrahedron_list)(t).Maximum_Dihedral_Angle();if(temp > maximum){maximum=temp;t_save=t;}}
-    else for(int t=1;t<=mesh.elements.m;t++){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
+    if(tetrahedron_list) for(int t=0;t<mesh.elements.m;t++){T temp=(*tetrahedron_list)(t).Maximum_Dihedral_Angle();if(temp > maximum){maximum=temp;t_save=t;}}
+    else for(int t=0;t<mesh.elements.m;t++){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
         T temp=TETRAHEDRON<T>(particles.X(i),particles.X(j),particles.X(k),particles.X(l)).Maximum_Dihedral_Angle();if(temp > maximum){maximum=temp;t_save=t;}}
     if(index) *index=t_save;
     return maximum;
@@ -499,7 +499,7 @@ template<class T> void TETRAHEDRALIZED_VOLUME<T>::
 Inverted_Tetrahedrons(ARRAY<int>& inverted_tetrahedrons) const
 {
     inverted_tetrahedrons.Resize(0);
-    for(int t=1;t<=mesh.elements.m;t++){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
+    for(int t=0;t<mesh.elements.m;t++){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
         TV x1(particles.X(i)),x2(particles.X(j)),x3(particles.X(k)),x4(particles.X(l));
         T sign_of_volume=TV::Dot_Product(TV::Cross_Product(x2-x1,x3-x1),x4-x1); // left out division by 6
         if(sign_of_volume < 0) inverted_tetrahedrons.Append(t);}
@@ -514,9 +514,9 @@ Inside(const TV& location,const T thickness_over_two) const
     if(!hierarchy) PHYSBAM_FATAL_ERROR();
     if(hierarchy->box_hierarchy(hierarchy->root).Outside(location,thickness_over_two)) return 0;
     ARRAY<int> tetrahedrons_to_check;hierarchy->Intersection_List(location,tetrahedrons_to_check,thickness_over_two);
-    if(tetrahedron_list) for(int p=1;p<=tetrahedrons_to_check.m;p++){
+    if(tetrahedron_list) for(int p=0;p<tetrahedrons_to_check.m;p++){
         int t=tetrahedrons_to_check(p);if(!(*tetrahedron_list)(t).Outside(location,thickness_over_two)) return t;}
-    else for(int p=1;p<=tetrahedrons_to_check.m;p++){
+    else for(int p=0;p<tetrahedrons_to_check.m;p++){
         int t=tetrahedrons_to_check(p);int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
         TETRAHEDRON<T> tetrahedron_to_check(particles.X(i),particles.X(j),particles.X(k),particles.X(l));
         if(!tetrahedron_to_check.Outside(location,thickness_over_two)) return t;}
@@ -541,8 +541,8 @@ Find(const TV& location,const T thickness_over_two,ARRAY<int>& scratch) const
 {
     if(!tetrahedron_list || !hierarchy) PHYSBAM_FATAL_ERROR();
     hierarchy->Intersection_List(location,scratch,thickness_over_two);
-    for(int p=1;p<=scratch.m;p++){int t=scratch(p);if(!(*tetrahedron_list)(t).Outside(location,0)) return t;}
-    for(int p=1;p<=scratch.m;p++){int t=scratch(p);if(!(*tetrahedron_list)(t).Outside(location,thickness_over_two)) return t;}
+    for(int p=0;p<scratch.m;p++){int t=scratch(p);if(!(*tetrahedron_list)(t).Outside(location,0)) return t;}
+    for(int p=0;p<scratch.m;p++){int t=scratch(p);if(!(*tetrahedron_list)(t).Outside(location,thickness_over_two)) return t;}
     return 0;
 }
 //#####################################################################

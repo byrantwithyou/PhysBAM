@@ -47,7 +47,7 @@ bool Update_Levelset_Contact_Pair(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisio
         // revert to the saved positions & save the proposed positions in rigid_frame_save - restore rigid_frame_save below
         collision_callbacks.Swap_States(id_1,id_2);
         T smallest_value=FLT_MAX;int smallest_index=0;TV collision_location,collision_normal,collision_relative_velocity;
-        for(int i=1;i<=particle_intersections.m;i++){
+        for(int i=0;i<particle_intersections.m;i++){
             const RIGID_BODY_PARTICLE_INTERSECTION<TV>& intersection=particle_intersections(i);
             FRAME<TV> saved_transform=collision_callbacks.Saved_Particle_To_Levelset_Body_Transform(intersection.levelset_body,intersection.particle_body);
             T phi=(*rigid_body_collection.Rigid_Body(intersection.levelset_body).implicit_object->object_space_implicit_object)(saved_transform*intersection.particle_location);

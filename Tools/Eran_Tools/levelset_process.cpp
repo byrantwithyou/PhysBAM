@@ -12,13 +12,13 @@ typedef float T;
 void Keep_Only_Largest_Negative_Region(GRID_3D<T>& grid,ARRAYS<VECTOR<T,3> >& phi)
 {
     ARRAYS<VECTOR<int,3> > colors(grid);ARRAYS<VECTOR<bool,3> > null_edge_is_blocked(grid,1);
-    for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++) for(int k=1;k<=grid.mn;k++) if(phi(i,j,k)>0) colors(i,j,k)=-1; // make outside regions uncolorable
+    for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++) for(int k=0;k<grid.mn;k++) if(phi(i,j,k)>0) colors(i,j,k)=-1; // make outside regions uncolorable
     FLOOD_FILL_3D flood_fill;flood_fill.Optimize_Fill_For_Single_Cell_Regions(true);
     int number_of_colors=flood_fill.Flood_Fill(colors,null_edge_is_blocked,null_edge_is_blocked,null_edge_is_blocked);
     ARRAY<int> region_size(number_of_colors);
-    for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++) for(int k=1;k<=grid.mn;k++) if(colors(i,j,k)>0) region_size(colors(i,j,k))++;
+    for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++) for(int k=0;k<grid.mn;k++) if(colors(i,j,k)>0) region_size(colors(i,j,k))++;
     int max_region_size=ARRAY<int>::max(region_size);
-    for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++) for(int k=1;k<=grid.mn;k++) if(colors(i,j,k)>0 && region_size(colors(i,j,k))<max_region_size) phi(i,j,k)*=-1;
+    for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++) for(int k=0;k<grid.mn;k++) if(colors(i,j,k)>0 && region_size(colors(i,j,k))<max_region_size) phi(i,j,k)*=-1;
 }
 
 int main(int argc, char *argv[])

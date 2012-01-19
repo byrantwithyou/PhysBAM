@@ -382,7 +382,7 @@ void USER_INTERFACE::Update_Sequence_UI() {
   timeline->Init_Sequence(video_window->Video_Sequences(),video_window->Video_Names());
 sequence_list->clear();
 const PhysBAM::ARRAY<std::string>& view_names=video_window->View_Names();
-for(int i=1;i<=view_names.m;i++){sequence_list->add(view_names(i).c_str());}
+for(int i=0;i<view_names.m;i++){sequence_list->add(view_names(i).c_str());}
 int selected_view_index=video_window->Selected_View();
 if(selected_view_index) sequence_list->select(selected_view_index);
 }

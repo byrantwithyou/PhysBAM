@@ -133,19 +133,19 @@ void Get_Initial_Data()
     for(int p=1;p<=particles.array_collection->Size();p++) if((particles.X(p)-TV(0,0,.18)).Magnitude()<(T).18) particle_is_included(p)=true;
 
     ARRAY<bool> particle_on_simulation_boundary(number_of_original_particles);ARRAY<int> map_to_old_elements;
-    for(int t=1;t<=tetrahedralized_volume.mesh.elements.m;t++){VECTOR<int,4>& element=tetrahedralized_volume.mesh.elements(t);
+    for(int t=0;t<tetrahedralized_volume.mesh.elements.m;t++){VECTOR<int,4>& element=tetrahedralized_volume.mesh.elements(t);
         if(!particle_is_included.Subset(element).Contains(false)) map_to_old_elements.Append(t);
-        else for(int i=1;i<=4;i++) if(particle_is_included(element(i))) particle_on_simulation_boundary(element(i))=true;}
+        else for(int i=0;i<4;i++) if(particle_is_included(element(i))) particle_on_simulation_boundary(element(i))=true;}
 
     ARRAY<int> map_to_new_elements(tetrahedralized_volume.mesh.elements.m);map_to_new_elements.Subset(map_to_old_elements)=IDENTITY_ARRAY<>(map_to_old_elements.m);
-    for(int p=1;p<=number_of_original_particles;p++) if(particle_on_simulation_boundary(p)) boundary_nodes.Append(p);
+    for(int p=0;p<number_of_original_particles;p++) if(particle_on_simulation_boundary(p)) boundary_nodes.Append(p);
     ARRAY<VECTOR<int,4> > old_elements=tetrahedralized_volume.mesh.elements;
     tetrahedralized_volume.mesh.elements=old_elements.Subset(map_to_old_elements);
 
     // initialize embedding volume bindings (T-junctions)
     ARRAY<int> bound_particles;ARRAY<ARRAY<int> > bound_particle_parents;ARRAY<ARRAY<T> > bound_particle_weights;
     FILE_UTILITIES::Read_From_File(stream_type,model_directory+"/face_embedding_volume_bindings",bound_particles,bound_particle_parents,bound_particle_weights);
-    for(int i=1;i<=bound_particles.m;i++)
+    for(int i=0;i<bound_particles.m;i++)
         if(particle_is_included.Subset(bound_particle_parents(i)).Contains(false)){
             if(particle_is_included.Subset(bound_particle_parents(i)).Contains(true)){            
                 particle_on_simulation_boundary(bound_particles(i))=true;boundary_nodes.Append(bound_particles(i));}}
@@ -176,13 +176,13 @@ void Get_Initial_Data()
     FILE_UTILITIES::Read_From_File(stream_type,model_directory+"/face_embedded_surface_bindings",embedding_parents,embedding_weights);
     int particle_offset=particles.array_collection->Size();particles.array_collection->Add_Elements(embedding_parents.m);
     tetrahedralized_volume.Update_Number_Nodes();
-    for(int i=1;i<=embedding_parents.m;i++){
+    for(int i=0;i<embedding_parents.m;i++){
         LINEAR_BINDING_DYNAMIC<TV>* binding=new LINEAR_BINDING_DYNAMIC<TV>(particles,particle_offset+i,embedding_parents(i).m);
         binding->parents=embedding_parents(i);binding->weights=embedding_weights(i);
         binding->Clamp_To_Embedded_Position();binding->Clamp_To_Embedded_Velocity();
         if(!particle_is_included.Subset(embedding_parents(i)).Contains(false)) binding_list.Add_Binding(binding);}
     FILE_UTILITIES::Read_From_File(stream_type,model_directory+"/face_embedded_surface_mesh",embedding.material_surface_mesh);
-    for(int t=1;t<=embedding.material_surface_mesh.elements.m;t++) embedding.material_surface_mesh.elements(t)+=particle_offset*VECTOR<int,3>::All_Ones_Vector();
+    for(int t=0;t<embedding.material_surface_mesh.elements.m;t++) embedding.material_surface_mesh.elements(t)+=particle_offset*VECTOR<int,3>::All_Ones_Vector();
     embedding.Update_Number_Nodes();
     deformable_object.Add_Structure(&embedding);
 
@@ -196,7 +196,7 @@ void Get_Initial_Data()
     (*input)>>number_of_muscles;LOG::cout<<"muscles = "<<number_of_muscles<<std::endl;
     muscle_tets.Resize(number_of_muscles);muscle_fibers.Resize(number_of_muscles);muscle_densities.Resize(number_of_muscles);
     muscle_names.Resize(number_of_muscles),peak_isometric_stress.Resize(number_of_muscles);
-    for(int i=1;i<=number_of_muscles;i++){
+    for(int i=0;i<number_of_muscles;i++){
         (*input)>>muscle_names(i);input_file=model_directory+"/"+muscle_names(i)+".constitutive_data";
         if(solids_parameters.verbose) LOG::cout<<"Reading muscle data : "<<muscle_names(i)<<".constitutive_data"<<std::endl;
         std::istream *muscle_input=FILE_UTILITIES::Safe_Open_Input(input_file);TYPED_ISTREAM typed_input(*muscle_input,stream_type);
@@ -212,11 +212,11 @@ void Get_Initial_Data()
     peak_isometric_stress.Fill((T)3e5);
     input_file=model_directory+"/peak_isometric_stress_list.txt";input=FILE_UTILITIES::Safe_Open_Input(input_file,false);
     int peak_isometric_stress_entries;(*input)>>peak_isometric_stress_entries;
-    for(int i=1;i<=peak_isometric_stress_entries;i++){
+    for(int i=0;i<peak_isometric_stress_entries;i++){
         std::string muscle_name;T peak_isometric_stress_value;(*input)>>muscle_name>>peak_isometric_stress_value;
         int index;if(muscle_names.Find(muscle_name,index)) peak_isometric_stress(index)=peak_isometric_stress_value;}
     delete input;
-    if(solids_parameters.verbose) for(int i=1;i<=number_of_muscles;i++) LOG::cout<<muscle_names(i)<<" : Peak isometric stress = "<<peak_isometric_stress(i)<<std::endl;
+    if(solids_parameters.verbose) for(int i=0;i<number_of_muscles;i++) LOG::cout<<muscle_names(i)<<" : Peak isometric stress = "<<peak_isometric_stress(i)<<std::endl;
 
     // initialize attachments
     ARRAY<ARRAY<int> > input_attached_nodes;
@@ -224,7 +224,7 @@ void Get_Initial_Data()
     (*input)>>number_of_attachments;LOG::cout<<"attachments = "<<number_of_attachments<<std::endl;
     input_attached_nodes.Resize(number_of_attachments);
     jaw_attachment_index=0;
-    for(int i=1;i<=number_of_attachments;i++){
+    for(int i=0;i<number_of_attachments;i++){
         std::string attachment_name;(*input)>>attachment_name;input_file=model_directory+"/"+attachment_name+".attached_nodes";
         if(solids_parameters.verbose) LOG::cout<<"Reading attachment data : "<<attachment_name<<".attached_nodes"<<std::endl;
         std::istream *attachment_input=FILE_UTILITIES::Safe_Open_Input(input_file);TYPED_ISTREAM typed_input(*attachment_input,stream_type);
@@ -235,9 +235,9 @@ void Get_Initial_Data()
     // remap attachments to soft bindings, and create collision particles
     ARRAY<int> binding_attachments(embedding_parents.m);
     FREE_PARTICLES<TV>& free_particles=*FREE_PARTICLES<TV>::Create(particles);
-    for(int i=1;i<=input_attached_nodes.m;i++) binding_attachments.Subset(input_attached_nodes(i)).Fill(i);
+    for(int i=0;i<input_attached_nodes.m;i++) binding_attachments.Subset(input_attached_nodes(i)).Fill(i);
     attached_nodes.Resize(input_attached_nodes.m);
-    for(int b=1;b<=soft_bindings.bindings.m;b++){
+    for(int b=0;b<soft_bindings.bindings.m;b++){
         int particle_index,parent_index;soft_bindings.bindings(b).Get(particle_index,parent_index);
         if(int attachment=binding_attachments(parent_index-number_of_original_particles)){
             attached_nodes(attachment).Append(particle_index);
@@ -250,7 +250,7 @@ void Get_Initial_Data()
     soft_bindings.Initialize_Binding_Mesh(true);binding_mesh.Initialize_Mesh(*soft_bindings.binding_mesh);
 
     // correct number nodes (one last time)
-    for(int i=1;i<=deformable_object.structures.m;i++) deformable_object.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_object.structures.m;i++) deformable_object.structures(i)->Update_Number_Nodes();
 
     // add structures and rigid bodies to collisions
     solids_parameters.rigid_body_parameters.list.template Add_Rigid_Body(stream_type,model_directory+"/eftychis_cranium_collision_surface");
@@ -281,7 +281,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     // initialize controls
 
-    activation_controls=new ACTIVATION_CONTROL_SET<T>;for(int i=1;i<=number_of_muscles;i++) activation_controls->Add_Activation(muscle_names(i));
+    activation_controls=new ACTIVATION_CONTROL_SET<T>;for(int i=0;i<number_of_muscles;i++) activation_controls->Add_Activation(muscle_names(i));
     control_parameters.list.Append(activation_controls);
     FILE_UTILITIES::Write_To_File<T>(output_directory+"/face_control_set_1.muscle_names",muscle_names);
     attachment_frame_controls=new ATTACHMENT_FRAME_CONTROL_SET<T>(deformable_object.particles.X.array,attached_nodes,jaw_attachment_index);
@@ -356,7 +356,7 @@ void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE
     ARRAY<TV> X_initial(number_of_particles),X_final(number_of_particles);effective_V.Resize(number_of_particles,false,false);
     Read_Controls(control_directory+"/",previous_control_frame);attachment_frame_controls->Set_Attachment_Positions(X_initial);control_parameters.Save_Controls();
     Read_Controls(control_directory+"/",previous_control_frame+1);attachment_frame_controls->Set_Attachment_Positions(X_final);control_parameters.Interpolate(interpolation_fraction);
-    for(int i=1;i<=attached_nodes.m;i++) for(int j=1;j<=attached_nodes(i).m;j++)
+    for(int i=0;i<attached_nodes.m;i++) for(int j=1;j<=attached_nodes(i).m;j++)
         effective_V(attached_nodes(i)(j))=(T)control_frame_rate*(X_final(attached_nodes(i)(j))-X_initial(attached_nodes(i)(j)));
     if(print_controls) control_parameters.Print_Diagnostics();
 }
@@ -365,8 +365,8 @@ void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE
 {
-    for(int i=1;i<=boundary_nodes.m;i++) V(boundary_nodes(i))=TV();
-    for(int i=1;i<=attached_nodes.m;i++) for(int j=1;j<=attached_nodes(i).m;j++) V(attached_nodes(i)(j))=effective_V(attached_nodes(i)(j));
+    for(int i=0;i<boundary_nodes.m;i++) V(boundary_nodes(i))=TV();
+    for(int i=0;i<attached_nodes.m;i++) for(int j=1;j<=attached_nodes(i).m;j++) V(attached_nodes(i)(j))=effective_V(attached_nodes(i)(j));
 }
 //#####################################################################
 // Function Set_External_Positions
@@ -380,8 +380,8 @@ void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_velocity_time) PHYSBAM_OVERRIDE
 {
-    for(int i=1;i<=boundary_nodes.m;i++) V(boundary_nodes(i))=TV();
-    for(int i=1;i<=attached_nodes.m;i++) for(int j=1;j<=attached_nodes(i).m;j++) V(attached_nodes(i)(j))=TV();
+    for(int i=0;i<boundary_nodes.m;i++) V(boundary_nodes(i))=TV();
+    for(int i=0;i<attached_nodes.m;i++) for(int j=1;j<=attached_nodes(i).m;j++) V(attached_nodes(i)(j))=TV();
 }
 //#####################################################################
 // Function Update_Collision_Body_Positions_And_Velocities

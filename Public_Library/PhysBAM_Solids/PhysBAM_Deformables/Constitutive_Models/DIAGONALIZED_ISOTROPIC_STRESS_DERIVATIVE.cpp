@@ -41,7 +41,7 @@ Enforce_Definiteness(const T eigenvalue_clamp_percentage,const T epsilon)
     VECTOR<T,9> eigenvalues;
     eigenvalues(1)=abs(D1.x11);eigenvalues(2)=abs(D1.x22);eigenvalues(3)=abs(D1.x33);
     eigenvalues(4)=abs(D2.x11);eigenvalues(5)=abs(D2.x22);eigenvalues(6)=abs(D3.x11);eigenvalues(7)=abs(D3.x22);eigenvalues(8)=abs(D4.x11);eigenvalues(9)=abs(D4.x22);
-    Sort(eigenvalues);T min_nonzero_absolute_eigenvalue=epsilon;for(int i=1;i<=9;i++) if(min_nonzero_absolute_eigenvalue<eigenvalues(i)){min_nonzero_absolute_eigenvalue=eigenvalues(i);break;}
+    Sort(eigenvalues);T min_nonzero_absolute_eigenvalue=epsilon;for(int i=0;i<9;i++) if(min_nonzero_absolute_eigenvalue<eigenvalues(i)){min_nonzero_absolute_eigenvalue=eigenvalues(i);break;}
     if(D1.x11<-epsilon) D1.x11=eigenvalue_clamp_percentage*min_nonzero_absolute_eigenvalue;else if (D1.x11<(T)0) D1.x11=(T)0;
     if(D1.x22<-epsilon) D1.x22=eigenvalue_clamp_percentage*min_nonzero_absolute_eigenvalue;else if (D1.x22<(T)0) D1.x22=(T)0;
     if(D1.x33<-epsilon) D1.x33=eigenvalue_clamp_percentage*min_nonzero_absolute_eigenvalue;else if (D1.x33<(T)0) D1.x33=(T)0;

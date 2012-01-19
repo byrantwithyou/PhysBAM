@@ -53,10 +53,10 @@ public:
 //#####################################################################
 void Update_Sources(const GRID<TV>& grid,ARRAY<VECTOR_2D<T> ,VECTOR<int,2> >& V,ARRAY<T,VECTOR<int,2> >& density,ARRAY<T,VECTOR<int,2> >& temperature,const T time)
 {
-    for(int i=1;i<=grid.m;i++)for(int j=1;j<=grid.n;j++)if(source_domain.Lazy_Inside(grid.X(i,j))){
+    for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++)if(source_domain.Lazy_Inside(grid.X(i,j))){
         density(i,j)=rho;temperature(i,j)=T_burnt;V(i,j).x=T(-1.3);}
     // keep density >= 0 and T >=0
-    for(int i=1;i<=grid.m;i++)for(int j=1;j<=grid.n;j++){if(density(i,j)<0)density(i,j)=0;if(temperature(i,j)<T_air) temperature(i,j)=T_air;}
+    for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++){if(density(i,j)<0)density(i,j)=0;if(temperature(i,j)<T_air) temperature(i,j)=T_air;}
 }
 //#####################################################################
 // Function Set_Boundary_Conditions
@@ -67,7 +67,7 @@ void Set_Boundary_Conditions(const GRID<TV>& p_grid,const GRID<TV>& u_grid,const
     // Set up wall boundary conditions
     SMOKE_2D_EXAMPLE<T>::Set_Boundary_Conditions(p_grid,u_grid,v_grid,psi_N_u,psi_N_v,u_fixed,v_fixed,psi_D,p,time);
 
-    for(int i=1;i<=u_grid.m;i++)for(int j=1;j<=u_grid.n;j++)if(source_domain.Lazy_Inside(u_grid.X(i,j))){
+    for(int i=0;i<u_grid.m;i++)for(int j=0;j<u_grid.n;j++)if(source_domain.Lazy_Inside(u_grid.X(i,j))){
         psi_N_u(i,j)=true;u_fixed(i,j)=(T)-1.3;}
 }
 //#####################################################################
@@ -77,7 +77,7 @@ void Update_Forces(const GRID<TV>& grid, const ARRAY<VECTOR_3D<T> ,VECTOR<int,2>
                    const T time)
 {
     if(time >= 0)
-        for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++){ // y-direction forces only
+        for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++){ // y-direction forces only
             T rho_atm=rho_bottom+(rho_top-rho_bottom)*(grid.y(j)-ymin)/(ymax-ymin);
             if(density_ghost(i,j)>.5){T difference=density_ghost(i,j)-rho_atm;if(difference>0)force(i,j).y=-buoyancy_constant*difference;}}
 }    

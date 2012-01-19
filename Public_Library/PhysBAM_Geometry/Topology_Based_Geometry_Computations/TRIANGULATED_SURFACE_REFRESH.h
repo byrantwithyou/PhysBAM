@@ -41,7 +41,7 @@ void Update_Triangle_List(TRIANGULATED_SURFACE<T>& ts,ARRAY_VIEW<const VECTOR<T,
 {
     if(!ts.triangle_list) ts.triangle_list=new ARRAY<TRIANGLE_3D<T> >;
     ts.triangle_list->Resize(ts.mesh.elements.m);
-    for(int t=1;t<=ts.mesh.elements.m;t++)
+    for(int t=0;t<ts.mesh.elements.m;t++)
         (*ts.triangle_list)(t)=TRIANGLE_3D<T>(X.Subset(ts.mesh.elements(t)));
 }
 //#####################################################################

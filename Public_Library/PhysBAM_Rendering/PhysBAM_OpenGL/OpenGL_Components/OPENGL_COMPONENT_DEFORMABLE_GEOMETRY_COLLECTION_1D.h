@@ -69,11 +69,11 @@ public:
     
     void Turn_Smooth_Shading_On() PHYSBAM_OVERRIDE
     {smooth_shading=true;
-    for(int i=1;i<=point_simplices_1d_objects.m;i++)if(point_simplices_1d_objects(i))point_simplices_1d_objects(i)->Turn_Smooth_Shading_On();}
+    for(int i=0;i<point_simplices_1d_objects.m;i++)if(point_simplices_1d_objects(i))point_simplices_1d_objects(i)->Turn_Smooth_Shading_On();}
     
     void Turn_Smooth_Shading_Off() PHYSBAM_OVERRIDE
     {smooth_shading=false;
-    for(int i=1;i<=point_simplices_1d_objects.m;i++)if(point_simplices_1d_objects(i))point_simplices_1d_objects(i)->Turn_Smooth_Shading_Off();}
+    for(int i=0;i<point_simplices_1d_objects.m;i++)if(point_simplices_1d_objects(i))point_simplices_1d_objects(i)->Turn_Smooth_Shading_Off();}
 
     OPENGL_SELECTION* Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION* old_selection,bool& delete_selection) PHYSBAM_OVERRIDE;
 

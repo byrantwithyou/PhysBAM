@@ -176,7 +176,7 @@ Advect_Fluid(const T dt,const int substep)
         rungekutta_p_advected.Set_Order(example.rungekutta_order);
         rungekutta_p_advected.Set_Time(time);
         rungekutta_p_advected.Start(dt);}
-    for(int rk_substep=1;rk_substep<=rungekutta_u.order;rk_substep++){
+    for(int rk_substep=0;rk_substep<rungekutta_u.order;rk_substep++){
         euler.Advance_One_Time_Step_Explicit_Part(dt,rk_time,rk_substep,rungekutta_u.order);
         if(euler.timesplit && euler.perform_rungekutta_for_implicit_part){
             euler.Get_Dirichlet_Boundary_Conditions(dt,time);

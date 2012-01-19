@@ -96,17 +96,17 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     particles.X.array+=TV(1.5*scale,(T)15*scale,0);
 
-    for(int i=1;i<=deformable_object.structures.m;i++) deformable_object.structures(i)->Update_Number_Nodes();
-    for(int i=1;i<=noodles.m;i++) noodles(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_object.structures.m;i++) deformable_object.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<noodles.m;i++) noodles(i)->Update_Number_Nodes();
 
-    for(int n=1;n<=noodles.m;n++){
+    for(int n=0;n<noodles.m;n++){
         TRIANGULATED_SURFACE<T>& colliding_surface=tests.Create_Drifted_Surface(*noodles(n),solid_body_collection.deformable_body_collection.soft_bindings,true);
         colliding_surface.Update_Number_Nodes();
         deformable_object.Add_Structure(&colliding_surface);
         deformable_object.collisions.collision_structures.Append(&colliding_surface);}
 
     // correct number nodes
-    for(int i=1;i<=deformable_object.structures.m;i++) deformable_object.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_object.structures.m;i++) deformable_object.structures(i)->Update_Number_Nodes();
 
     tests.Add_Ground(.3,20);
 
@@ -123,7 +123,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     particles.Compute_Auxiliary_Attributes(solid_body_collection.deformable_body_collection.soft_bindings);
 
     // add forces
-    for(int n=1;n<=noodles.m;n++){
+    for(int n=0;n<noodles.m;n++){
         TRIANGULATED_SURFACE<T>& noodle=*noodles(n);
         solid_body_collection.Add_Force(Create_Edge_Springs<T>(noodle,(T)1e4,1));
         TRIANGLE_BENDING_ELEMENTS<T>* bend=Create_Bending_Elements(noodle,(T)1e3);
@@ -142,7 +142,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 int Get_Intersecting_Tetrahedron(const PARTICLES<T,TV>& particles,const TV& location,const TETRAHEDRALIZED_VOLUME<T>& dynamic_volume)
 {
     ARRAY<int> intersection_list;dynamic_volume.tetrahedron_hierarchy->Intersection_List(location,intersection_list);
-    for(int i=1;i<=intersection_list.m;i++) if(TETRAHEDRON<T>(particles.X.Subset(dynamic_volume.mesh.elements(intersection_list(i)))).Inside(location)) return intersection_list(i);
+    for(int i=0;i<intersection_list.m;i++) if(TETRAHEDRON<T>(particles.X.Subset(dynamic_volume.mesh.elements(intersection_list(i)))).Inside(location)) return intersection_list(i);
     return 0;
 }
 //#####################################################################

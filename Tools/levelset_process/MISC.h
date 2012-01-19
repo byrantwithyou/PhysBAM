@@ -54,7 +54,7 @@ struct LEVELSET_CSG
             Add_Domain(grid_temp);}
         Finish_Domain();
 
-        for(int i=1;i<=files.m;i++){
+        for(int i=0;i<files.m;i++){
             FILE_UTILITIES::Read_From_File<T>(files(i),levelset_temp);
             Union(levelset_temp);}
         return true;
@@ -162,7 +162,7 @@ struct LEVELSET_CSG
         }
         else {
             VECTOR<T,3> pos;
-            for(int i=1;i<=grid_full.counts.x;i++) { for(int j=1;j<=grid_full.counts.y;j++) { for(int k=1;k<=grid_full.counts.z;k++) {
+            for(int i=0;i<grid_full.counts.x;i++) { for(int j=0;j<grid_full.counts.y;j++) { for(int k=0;k<grid_full.counts.z;k++) {
                 pos=grid_full.X(i,j,k);
                 T phi1 = unioned.Extended_Phi(pos);
                 T phi2 = levelset_full.phi(i,j,k);

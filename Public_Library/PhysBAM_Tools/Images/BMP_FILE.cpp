@@ -28,8 +28,8 @@ Read(const std::string& filename,ARRAY<VECTOR<T,3> ,VECTOR<int,2> >& image)
     int line_width=header.w*3,line_padding=((line_width+3)&~3)-line_width;
     input->seekg(header.offset,std::ios::beg);
     VECTOR<unsigned char,3> color_byte;
-    for(int j=1;j<=header.h;j++){
-        for(int i=1;i<=header.w;i++){Read_Binary<T>(*input,color_byte);image(i,j)=IMAGE<T>::Byte_Color_To_Scalar_Color(VECTOR<unsigned char,3>(color_byte.z,color_byte.y,color_byte.x));}
+    for(int j=0;j<header.h;j++){
+        for(int i=0;i<header.w;i++){Read_Binary<T>(*input,color_byte);image(i,j)=IMAGE<T>::Byte_Color_To_Scalar_Color(VECTOR<unsigned char,3>(color_byte.z,color_byte.y,color_byte.x));}
         input->seekg(line_padding,std::ios::cur);}
     delete input;
 }
@@ -43,8 +43,8 @@ Write(const std::string& filename,const ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& imag
     std::ostream* output=FILE_UTILITIES::Safe_Open_Output(filename,true,false); // no compression
     BMP_HEADER header;header.Initialize(image.counts.x,image.counts.y);Write_Binary<T>(*output,header);
     int line_width=header.w*3,line_padding=((line_width+3)&~3)-line_width;
-    for(int j=1;j<=header.h;j++){
-        for(int i=1;i<=header.w;i++){VECTOR<unsigned char,d> byte=IMAGE<T>::Scalar_Color_To_Byte_Color(image(i,j));Write_Binary<T>(*output,VECTOR<unsigned char,3>(byte[3],byte[2],byte[1]));}
+    for(int j=0;j<header.h;j++){
+        for(int i=0;i<header.w;i++){VECTOR<unsigned char,d> byte=IMAGE<T>::Scalar_Color_To_Byte_Color(image(i,j));Write_Binary<T>(*output,VECTOR<unsigned char,3>(byte[3],byte[2],byte[1]));}
         for(int i=0;i<line_padding;i++) Write_Binary<T>(*output,(unsigned char)0);}
     delete output;
 }

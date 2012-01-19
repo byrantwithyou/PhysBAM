@@ -204,7 +204,7 @@ void Preprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE
 
     T max_change_delta=5,min_change_delta=-5;
 
-    for(int t=1;t<=muscle_tets.m;t++){
+    for(int t=0;t<muscle_tets.m;t++){
 
         // calculate elongation
         MATRIX<T,3> F=finite_volume->strain_measure.F(muscle_tets(t)(1));
@@ -248,7 +248,7 @@ void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 {
     //TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
 /*    if(finite_volume->rest_volumes.m>0 && frame < 2)
-        for(int e=1;e<=enlarge_nodes.m;e++){
+        for(int e=0;e<enlarge_nodes.m;e++){
             finite_volume->rest_volumes(e)*=1.1;
         }
 */
@@ -278,13 +278,13 @@ void Add_Skin_Mesh()
 
     // compute muscle tets
     ANALYTIC_SURFACE_MUSCLE_SEGMENT<T>& muscle_segment=*static_cast<ANALYTIC_SURFACE_MUSCLE_SEGMENT<T>*>(muscle->muscle_segments(1));
-    for(int t=1;t<=tetrahedralized_volume.mesh.elements.m;t++) for(int v=1;v<=4;v++){
+    for(int t=0;t<tetrahedralized_volume.mesh.elements.m;t++) for(int v=0;v<4;v++){
         if(muscle_segment.Analytic_Inside_Test(muscle_segment.frame.Inverse()*particles.X(tetrahedralized_volume.mesh.elements(v,t)))){
             muscle_tets.Resize(muscle_tets.m+1);muscle_tets.Last().Append(t);break;}}
     muscle_fibers.Resize(muscle_tets.m);muscle_densities.Resize(muscle_tets.m);tet_activations.Resize(muscle_tets.m);peak_isometric_stress.Resize(muscle_tets.m);
     activation_delta.Resize(muscle_tets.m);activation_delta.Fill(.1);previous_elongation.Resize(muscle_tets.m);
     // TODO: each muscle should contain each of these arrays; then muscles can set activations based on their own calculations
-    for(int t=1;t<=muscle_tets.m;t++){
+    for(int t=0;t<muscle_tets.m;t++){
         // SET FIBER DIRECTION
         muscle_fibers(t).Append(TV(0,1,0)); // just for testing--Should be specified in the muscle, perhaps based on pennation angle?
         muscle_densities(t).Append(1);tet_activations(t)=0;peak_isometric_stress(t)=(T)10e6;}
@@ -301,7 +301,7 @@ void Add_Skin_Mesh()
 //#####################################################################
 void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE
 {
-    for(int p=1;p<=num_planks;p++){
+    for(int p=0;p<num_planks;p++){
         //if(p==1) continue;
         RIGID_BODY<TV>& plank_rigid_body=*arb->rigid_body_list.rigid_bodies(plank_ids(p));
         for(int i=1;i<=enslaved_nodes(p).m;i++){
@@ -313,7 +313,7 @@ void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE
 {
-    for(int p=1;p<=num_planks;p++){
+    for(int p=0;p<num_planks;p++){
         //if(p==1) continue;
         RIGID_BODY<TV>& plank_rigid_body=*arb->rigid_body_list.rigid_bodies(plank_ids(p));
         for(int i=1;i<=enslaved_nodes(p).m;i++){
@@ -325,7 +325,7 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
 //#####################################################################
 void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE
 {
-    for(int p=1;p<=num_planks;p++){
+    for(int p=0;p<num_planks;p++){
         //if(p==1) continue;
         for(int i=1;i<=enslaved_nodes(p).m;i++){
             V(enslaved_nodes(p)(i))=TV();}}
@@ -341,7 +341,7 @@ void Get_Constrained_Particle_Data()
     positions_relative_to_plank_frames.Resize(num_planks);
 
     for(int i=1;i<=mattress_grid.m*mattress_grid.n*mattress_grid.mn;i++){
-        for(int p=1;p<=num_planks;p++){
+        for(int p=0;p<num_planks;p++){
             RIGID_BODY<TV>& plank_rigid_body=*arb->rigid_body_list.rigid_bodies(plank_ids(p));
             if (!plank_rigid_body.Implicit_Geometry_Lazy_Outside(particles.X(i))) {
                 enslaved_nodes(p).Append(i);
@@ -367,7 +367,7 @@ void Simple_Muscle_Across_Joint()
     T initial_angle=parameter_list.Get_Parameter("initial_angle",0);
     T k_p=parameter_list.Get_Parameter("k_p",(T)100000);
 
-    for(int i=1;i<=num_bodies;i++){
+    for(int i=0;i<num_bodies;i++){
         int id=plank_ids(i)=solids_parameters.rigid_body_parameters.list.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies/plank",(T).2);
         RIGID_BODY<TV>* rigid_body=&rigid_body_particles.Rigid_Body(id);
         rigid_body->simplicial_object->Rescale(plank_rescale.x,plank_rescale.y,plank_rescale.z);
@@ -420,8 +420,8 @@ void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE
     std::ostream* output=FILE_UTILITIES::Safe_Open_Output(STRING_UTILITIES::string_sprintf("%s/%d/muscle_info",output_directory.c_str(),frame));
     TYPED_OSTREAM typed_output(*output,stream_type);
     Write_Binary(typed_output,muscle_segment_particle_ids.m+tet_particle_ids.m);
-    for(int i=1;i<=muscle_segment_particle_ids.m;i++) Write_Binary(typed_output,solid_body_collection.deformable_body_collection.particles.X(muscle_segment_particle_ids(i)));
-    for(int i=1;i<=tet_particle_ids.m;i++) Write_Binary(typed_output,solid_body_collection.deformable_body_collection.particles.X(tet_particle_ids(i)));
+    for(int i=0;i<muscle_segment_particle_ids.m;i++) Write_Binary(typed_output,solid_body_collection.deformable_body_collection.particles.X(muscle_segment_particle_ids(i)));
+    for(int i=0;i<tet_particle_ids.m;i++) Write_Binary(typed_output,solid_body_collection.deformable_body_collection.particles.X(tet_particle_ids(i)));
     delete output;
 }
 };

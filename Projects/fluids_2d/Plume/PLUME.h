@@ -94,8 +94,8 @@ void Get_Source_Velocities(const T time) PHYSBAM_OVERRIDE
 #if 0
     GRID<TV> &u_grid=fluids_parameters.u_grid,&v_grid=fluids_parameters.v_grid;
     PROJECTION_2D<T>& projection=fluids_parameters.incompressible.projection;LAPLACE_2D<T>& elliptic_solver=*projection.elliptic_solver;
-    for(int i=1;i<=u_grid.m;i++)for(int j=1;j<=u_grid.n;j++)if(source_domain.Lazy_Inside(u_grid.X(i,j))) projection.u(i,j)=0;
-    for(int i=1;i<=v_grid.m;i++)for(int j=1;j<=v_grid.n;j++)if(source_domain.Lazy_Inside(v_grid.X(i,j))){projection.v(i,j)=(T).5;elliptic_solver.psi_N_v(i,j)=true;}
+    for(int i=0;i<u_grid.m;i++)for(int j=0;j<u_grid.n;j++)if(source_domain.Lazy_Inside(u_grid.X(i,j))) projection.u(i,j)=0;
+    for(int i=0;i<v_grid.m;i++)for(int j=0;j<v_grid.n;j++)if(source_domain.Lazy_Inside(v_grid.X(i,j))){projection.v(i,j)=(T).5;elliptic_solver.psi_N_v(i,j)=true;}
 #endif
 }
 //#####################################################################
@@ -105,7 +105,7 @@ void Get_Body_Force(ARRAY<VECTOR<T,2> ,VECTOR<int,2> >& force,const T dt,const T
 {
     return;
 #if 0
-    for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++){ // y-direction forces only
+    for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++){ // y-direction forces only
         T rho_atm=rho_bottom+(rho_top-rho_bottom)*(grid.y(j)-grid.ymin)/(grid.ymax-grid.ymin);
         if(density(i,j)>.5){T difference=density(i,j)-rho_atm;if(difference>0)force(i,j).y=-buoyancy_constant*difference;}}
 #endif

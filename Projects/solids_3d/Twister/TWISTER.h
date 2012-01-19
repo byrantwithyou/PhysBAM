@@ -66,7 +66,7 @@ void Initialize_Cloth_State(TRIANGLE_MESH*& triangle_mesh,PARTICLE_3D*& particle
         for(int k=1;k<=triangle_mesh->number_nodes;k++) particles->array_collection->Add_Element();
         double mass_node=aspect_ratio*sqr(side_length)/(m*n);
         copy(mass_node,particles->mass);
-        for(int i=1;i<=m;i++) for(int j=1;j<=n;j++){
+        for(int i=0;i<m;i++) for(int j=0;j<n;j++){
             int node=i+m*(j-1);
             particles->X(node)=VECTOR_3D(.5*(i-1)*dx,4*sqr((i-1)/(double)(m-1)-.5),(j-1)*dy);
             particles->V(node)=VECTOR_3D(0,0,0);}}

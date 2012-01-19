@@ -61,13 +61,13 @@ void Initialize_Bodies()
     //set up muscle related arrays
     ARRAY<ARRAY<VECTOR_3D<T> > > fiber_directions(1);fiber_directions(1).Resize(tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.m);
     //initialize fiber direction
-    for(int t=1;t<=tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.m;t++) fiber_directions(1)(t)=fiber_direction;
+    for(int t=0;t<tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.m;t++) fiber_directions(1)(t)=fiber_direction;
     ARRAY<ARRAY<int> > muscle_tets(1);ARRAY<ARRAY<T> > muscle_densities(1);
     muscle_tets(1).Resize(tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.m);
     muscle_densities(1).Resize(tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.m);
     muscle_activations.Resize(1);muscle_activations(1)=(T)0;
     //set up densities for one activation region
-    for(int t=1;t<=tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.m;t++){muscle_tets(1)(t)=t;muscle_densities(1)(t)=(T)1;}
+    for(int t=0;t<tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.m;t++){muscle_tets(1)(t)=t;muscle_densities(1)(t)=(T)1;}
     solids_parameters.deformable_body_parameters.list.deformable_objects(1)->Add_Diagonalized_Fiber_Tension(tetrahedralized_volume,muscle_tets,fiber_directions,muscle_densities,muscle_activations,use_force_length);
 
     SOLIDS_FLUIDS_EXAMPLE_3D<RW>::Initialize_Bodies();

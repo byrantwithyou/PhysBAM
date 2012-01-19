@@ -148,7 +148,7 @@ public:
         if(thread_queue) delete thread_queue;
         if(interpolation) delete interpolation;
         if(phi_interpolation) delete phi_interpolation;
-        for(int i=1;i<=binary_refinement_levels;i++){
+        for(int i=0;i<binary_refinement_levels;i++){
             delete local_face_velocities_array(i);
             delete local_face_velocities_save_array(i);
             delete local_projection_array(i);}
@@ -194,10 +194,10 @@ public:
     {PHYSBAM_NOT_IMPLEMENTED();}
     
     void Initialize_Weights(ARRAY<T,VECTOR<int,1> >& weights,const int sub_scale)
-    {for(int i=1;i<=sub_scale;i++) weights(TV_INT2(i))=1/(T)sub_scale;}
+    {for(int i=0;i<sub_scale;i++) weights(TV_INT2(i))=1/(T)sub_scale;}
     
     void Initialize_Weights(ARRAY<T,VECTOR<int,2> >& weights,const int sub_scale)
-    {for(int i=1;i<=sub_scale;i++) for(int j=1;j<=sub_scale;j++) weights(TV_INT2(i,j))=1/(T)(sub_scale*sub_scale);}
+    {for(int i=0;i<sub_scale;i++) for(int j=0;j<sub_scale;j++) weights(TV_INT2(i,j))=1/(T)(sub_scale*sub_scale);}
 
     void Write_Output_Files(const int frame)
     {BASE::Write_Output_Files(frame);
@@ -208,7 +208,7 @@ public:
 
     void Set_Boundary_Conditions_For_Coarse_Only(const T time)
     {projection.elliptic_solver->psi_D.Fill(false);projection.elliptic_solver->psi_N.Fill(false);
-    for(int axis=1;axis<=TV::dimension;axis++) for(int axis_side=1;axis_side<=2;axis_side++){int side=2*(axis-1)+axis_side;
+    for(int axis=1;axis<=TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
         TV_INT interior_cell_offset=axis_side==1?TV_INT():-TV_INT::Axis_Vector(axis);
         TV_INT exterior_cell_offset=axis_side==1?-TV_INT::Axis_Vector(axis):TV_INT();
         TV_INT boundary_face_offset=axis_side==1?TV_INT::Axis_Vector(axis):-TV_INT::Axis_Vector(axis);
@@ -218,7 +218,7 @@ public:
                 TV local_offset=TV::All_Ones_Vector()*.5*coarse_mac_grid.DX();
                 GRID<TV> local_mac_grid(TV_INT::All_Ones_Vector()*sub_scale,RANGE<TV>(iterator.Location()-local_offset,iterator.Location()+local_offset),true);
                 bool inside=false;
-                for(int i=1;i<=sub_scale;i++){TV_INT offset=TV_INT::All_Ones_Vector()*(i-1);offset(iterator.Axis())=0;
+                for(int i=0;i<sub_scale;i++){TV_INT offset=TV_INT::All_Ones_Vector()*(i-1);offset(iterator.Axis())=0;
                     TV_INT coarse_face=face+interior_cell_offset;
                     TV_INT fine_face=sub_scale*(coarse_face-TV_INT::All_Ones_Vector())+TV_INT::All_Ones_Vector()+offset;
                     if(particle_levelset_evolution.particle_levelset.levelset.phi(fine_face)<=0){inside=true;break;}}
@@ -260,7 +260,7 @@ public:
     int ghost=max(3,sub_scale);
     ARRAY<T,TV_INT> phi_ghost(fine_mac_grid.Domain_Indices(ghost));
     phi_boundary->Fill_Ghost_Cells(fine_mac_grid,particle_levelset_evolution.phi,phi_ghost,0,time,ghost);
-    for(int axis=1;axis<=TV::dimension;axis++) for(int axis_side=1;axis_side<=2;axis_side++){int side=2*(axis-1)+axis_side;
+    for(int axis=1;axis<=TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
         TV_INT interior_cell_offset=axis_side==1?TV_INT():-TV_INT::Axis_Vector(axis);
         TV_INT exterior_cell_offset=axis_side==1?-TV_INT::Axis_Vector(axis):TV_INT();
         TV_INT boundary_face_offset=axis_side==1?TV_INT::Axis_Vector(axis):-TV_INT::Axis_Vector(axis);
@@ -288,7 +288,7 @@ public:
     void Set_Coarse_Boundary_Conditions_Only()
     {
         ARRAY<bool,TV_INT>& psi_D=projection.elliptic_solver->psi_D;ARRAY<bool,FACE_INDEX<TV::dimension> >& psi_N=projection.elliptic_solver->psi_N;
-        for(int axis=1;axis<=GRID<TV>::dimension;axis++) for(int axis_side=1;axis_side<=2;axis_side++){
+        for(int axis=1;axis<=GRID<TV>::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){
             int side=2*(axis-1)+axis_side;
             TV_INT interior_cell_offset=axis_side==1?TV_INT():-TV_INT::Axis_Vector(axis);
             TV_INT exterior_cell_offset=axis_side==1?-TV_INT::Axis_Vector(axis):TV_INT();
@@ -307,7 +307,7 @@ public:
     }
 
     void Set_Fine_Boundary_Conditions(GRID<TV>& local_mac_grid,ARRAY<T,FACE_INDEX<TV::dimension> >& local_face_velocities,ARRAY<bool,FACE_INDEX<TV::dimension> >& psi_N,const T time)
-    {for(int axis=1;axis<=TV::dimension;axis++) for(int axis_side=1;axis_side<=2;axis_side++){int side=2*(axis-1)+axis_side;
+    {for(int axis=1;axis<=TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
         TV_INT interior_cell_offset=axis_side==1?TV_INT():-TV_INT::Axis_Vector(axis);
         TV_INT exterior_cell_offset=axis_side==1?-TV_INT::Axis_Vector(axis):TV_INT();
         TV_INT boundary_face_offset=axis_side==1?TV_INT::Axis_Vector(axis):-TV_INT::Axis_Vector(axis);
@@ -366,7 +366,7 @@ public:
 
     void Set_Levelset_Boundary_Conditions(const GRID<TV>& levelset_grid,ARRAY<T,FACE_INDEX<TV::dimension> >& levelset_velocities,const ARRAY<T,TV_INT>& levelset_phi,const T time)
     {levelset_projection.elliptic_solver->psi_D.Fill(false);levelset_projection.elliptic_solver->psi_N.Fill(false);
-    for(int axis=1;axis<=TV::dimension;axis++) for(int axis_side=1;axis_side<=2;axis_side++){int side=2*(axis-1)+axis_side;
+    for(int axis=1;axis<=TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
         TV_INT interior_cell_offset=axis_side==1?TV_INT():-TV_INT::Axis_Vector(axis);
         TV_INT exterior_cell_offset=axis_side==1?-TV_INT::Axis_Vector(axis):TV_INT();
         TV_INT boundary_face_offset=axis_side==1?TV_INT::Axis_Vector(axis):-TV_INT::Axis_Vector(axis);
@@ -388,7 +388,7 @@ public:
             if(iterator.Axis()==2) levelset_velocities(iterator.Full_Index())=-1;
             else levelset_velocities(iterator.Full_Index())=0;}}
     for(typename GRID<TV>::CELL_ITERATOR iterator(coarse_mac_grid);iterator.Valid();iterator.Next()){ 
-        if(!Contains_Outside(iterator.Cell_Index(),levelset_phi,buffer)) for(int axis=1;axis<=TV::dimension;axis++) for(int axis_side=1;axis_side<=2;axis_side++){
+        if(!Contains_Outside(iterator.Cell_Index(),levelset_phi,buffer)) for(int axis=1;axis<=TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){
             TV_INT offset=(axis_side==1?-TV_INT::Axis_Vector(axis):TV_INT::Axis_Vector(axis));
             TV_INT face=iterator.Cell_Index()+(axis_side==1?TV_INT():TV_INT::Axis_Vector(axis));
             if(non_mpi_boundary(axis)(axis_side) && ((iterator.Cell_Index()(axis)+offset(axis))<1 || (iterator.Cell_Index()(axis)+offset(axis))>coarse_mac_grid.Counts()(axis))) continue;
@@ -737,7 +737,7 @@ public:
             int matrix_index;
             count++;cell_index_to_matrix_index(cell_index)=matrix_index=count;
             matrix_index_to_cell_index(matrix_index)=cell_index;}
-        for(int i=1;i<=row_counts.m;i++){
+        for(int i=0;i<row_counts.m;i++){
             int boundary=0;
             for(int j=1;j<=TV::dimension;j++) if(matrix_index_to_cell_index(i)(j)==1 || matrix_index_to_cell_index(i)(j)==local_mac_grid.Counts()(j)) boundary++;
             row_counts(i)=(2*TV::dimension+1)-boundary;}
@@ -874,7 +874,7 @@ public:
         local_face_velocities_array.Resize(binary_refinement_levels);
         local_face_velocities_save_array.Resize(binary_refinement_levels);
         local_projection_array.Resize(binary_refinement_levels);
-        for(int i=1;i<=binary_refinement_levels;i++){
+        for(int i=0;i<binary_refinement_levels;i++){
             local_face_velocities_array(i)=new ARRAY<T,FACE_INDEX<TV::dimension> >(local_mac_grid);
             local_face_velocities_save_array(i)=new ARRAY<T,FACE_INDEX<TV::dimension> >(local_mac_grid);
             local_projection_array(i)=new PROJECTION_UNIFORM<GRID<TV> >(local_mac_grid,true,true);

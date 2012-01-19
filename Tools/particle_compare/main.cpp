@@ -54,7 +54,7 @@ Compare_Attribute(ARRAY_VIEW<T2>& attr1,ARRAY_VIEW<T2>& attr2)
 {
     if(attr1.m!=attr2.m){LOG::cout<<"WARNING: Number of particles differ"<<std::endl;return false;}
     My_Sort(attr1);My_Sort(attr2);
-    for(int i=1;i<=attr1.m;i++) if(attr1(i)!=attr2(i)){LOG::cout<<"WARNING: Particles differ starting at "<<i<<" of "<<attr1.m<<std::endl;return false;}
+    for(int i=0;i<attr1.m;i++) if(attr1(i)!=attr2(i)){LOG::cout<<"WARNING: Particles differ starting at "<<i<<" of "<<attr1.m<<std::endl;return false;}
     return true;
 }
 //#####################################################################
@@ -133,7 +133,7 @@ Compare_Particles(std::string& input_directory_1,std::string& input_directory_2,
     
     if(type==-1){
         bool success=true;
-        for(int i=1;i<=4;i++){
+        for(int i=0;i<4;i++){
             bool local_success=Compare_Particles(input_directory_1,input_directory_2,grid,frame,i);
             if(local_success) LOG::cout<<" ....Passed"<<std::endl;
             else{std::cout<<"FAILED"<<std::endl;success=false;}}
@@ -144,7 +144,7 @@ Compare_Particles(std::string& input_directory_1,std::string& input_directory_2,
     else if(type==3){filename="removed_positive_particles";if(verbose) LOG::cout<<"Positive Removed Particles";}
     else if(type==4){filename="removed_negative_particles";if(verbose) LOG::cout<<"Negative Removed Particles";}
 
-    if(frame==-1){int last_frame=0;FILE_UTILITIES::Read_From_Text_File(input_directory_1+"/common/last_frame",last_frame);bool success=true;for(int i=1;i<=last_frame;i++) success&=Compare_Particles(input_directory_1,input_directory_2,grid,i,type,false);return success;}
+    if(frame==-1){int last_frame=0;FILE_UTILITIES::Read_From_Text_File(input_directory_1+"/common/last_frame",last_frame);bool success=true;for(int i=0;i<last_frame;i++) success&=Compare_Particles(input_directory_1,input_directory_2,grid,i,type,false);return success;}
 
     std::string f=STRING_UTILITIES::string_sprintf("%d/",frame);
     bool success=false;
@@ -162,7 +162,7 @@ Compare_Levelsets(std::string& input_directory_1,std::string& input_directory_2,
     typedef typename LEVELSET_POLICY<GRID<TV> >::FAST_LEVELSET_T T_FAST_LEVELSET;
     typedef VECTOR<int,TV::dimension> TV_INT;
 
-    if(frame==-1){int last_frame=0;FILE_UTILITIES::Read_From_Text_File(input_directory_1+"/common/last_frame",last_frame);bool success=true;for(int i=1;i<=last_frame;i++){success&=Compare_Levelsets(input_directory_1,input_directory_2,grid,i);if(!success){LOG::cout<<"Failed at Frame "<<i<<std::endl;break;}}return success;}
+    if(frame==-1){int last_frame=0;FILE_UTILITIES::Read_From_Text_File(input_directory_1+"/common/last_frame",last_frame);bool success=true;for(int i=0;i<last_frame;i++){success&=Compare_Levelsets(input_directory_1,input_directory_2,grid,i);if(!success){LOG::cout<<"Failed at Frame "<<i<<std::endl;break;}}return success;}
 
     std::string f=STRING_UTILITIES::string_sprintf("%d/",frame);
     bool success=true;ARRAY<T,TV_INT> phi1,phi2;
@@ -180,7 +180,7 @@ Compare_Velocities(std::string& input_directory_1,std::string& input_directory_2
 {
     typedef typename TV::SCALAR T;
     
-    if(frame==-1){int last_frame=0;FILE_UTILITIES::Read_From_Text_File(input_directory_1+"/common/last_frame",last_frame);bool success=true;for(int i=1;i<=last_frame;i++){success&=Compare_Velocities(input_directory_1,input_directory_2,grid,i);if(!success){LOG::cout<<"Failed at Frame "<<i<<std::endl;break;}}return success;}
+    if(frame==-1){int last_frame=0;FILE_UTILITIES::Read_From_Text_File(input_directory_1+"/common/last_frame",last_frame);bool success=true;for(int i=0;i<last_frame;i++){success&=Compare_Velocities(input_directory_1,input_directory_2,grid,i);if(!success){LOG::cout<<"Failed at Frame "<<i<<std::endl;break;}}return success;}
 
     std::string f=STRING_UTILITIES::string_sprintf("%d/",frame);
     bool success=true;

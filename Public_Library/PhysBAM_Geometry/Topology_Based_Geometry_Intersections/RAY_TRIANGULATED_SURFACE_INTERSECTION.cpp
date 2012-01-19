@@ -30,7 +30,7 @@ template<class T> bool Closest_Non_Intersecting_Point(RAY<VECTOR<T,3> >& ray,con
     bool hit=false;T start_t,end_t;if(!INTERSECTION::Get_Intersection_Range(ray,*surface.bounding_box,start_t,end_t))return false;
     RANGE<VECTOR<T,3> > ray_box(ray.Point(start_t));ray_box.Enlarge_To_Include_Point(ray.Point(end_t));
     ARRAY<int> triangles_to_check;surface.hierarchy->Intersection_List(ray_box,triangles_to_check,4*thickness_over_two);
-    for(int i=1;i<=triangles_to_check.m;i++){int k=triangles_to_check(i);if(INTERSECTION::Closest_Non_Intersecting_Point(ray,(*surface.triangle_list)(k),thickness_over_two)){ray.aggregate_id=k;hit=true;}}
+    for(int i=0;i<triangles_to_check.m;i++){int k=triangles_to_check(i);if(INTERSECTION::Closest_Non_Intersecting_Point(ray,(*surface.triangle_list)(k),thickness_over_two)){ray.aggregate_id=k;hit=true;}}
     return hit;
 }
 //#####################################################################

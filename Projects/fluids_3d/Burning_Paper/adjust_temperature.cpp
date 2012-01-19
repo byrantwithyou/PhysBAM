@@ -59,8 +59,8 @@ template<class T,class RW> void Process(int argc,char* argv[])
     ARRAY<T,VECTOR<int,3> > temperature,density;
     FILE_UTILITIES::Read_From_File<RW>("temperature"+f,temperature);
     FILE_UTILITIES::Read_From_File<RW>("density"+f,density);
-    for(int i=1;i<=grid.m;i++)for(int j=1;j<=grid.n;j++)for(int ij=1;ij<=grid.mn;ij++)temperature(i,j,ij)=Adjust_Temperature<T>(temperature(i,j,ij),frame,grid.y(j));
-    for(int i=1;i<=grid.m;i++)for(int j=1;j<=grid.n;j++)for(int ij=1;ij<=grid.mn;ij++)density(i,j,ij)=Adjust_Density<T>(density(i,j,ij),frame,grid.X(i,j,ij));
+    for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++)for(int ij=0;ij<grid.mn;ij++)temperature(i,j,ij)=Adjust_Temperature<T>(temperature(i,j,ij),frame,grid.y(j));
+    for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++)for(int ij=0;ij<grid.mn;ij++)density(i,j,ij)=Adjust_Density<T>(density(i,j,ij),frame,grid.X(i,j,ij));
     FILE_UTILITIES::Write_To_File<RW>("adjusted_temperature"+f,temperature);
     FILE_UTILITIES::Write_To_File<RW>("adjusted_density"+f,density);
 }

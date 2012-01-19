@@ -52,7 +52,7 @@ void Initialize_Bodies()
     if(!initialized){initialized=true;
         objects_particles.Resize(melting_parameters.levelsets.m);
         objects_particles_collision_distance.Resize(melting_parameters.levelsets.m);
-        if(!restart)for(int object=1;object<=melting_parameters.levelsets.m;object++){
+        if(!restart)for(int object=0;object<melting_parameters.levelsets.m;object++){
             Seed_Particles_Inside_Object(objects_particles(object),objects_particles_collision_distance(object),object);}}
 }
 //#####################################################################
@@ -102,13 +102,13 @@ void Modify_Fluid_For_Melting(const T dt,const T time)
 /*
     ARRAY<bool,VECTOR<int,3> > nodes_inside_objects_new(grid,0);
     Mark_Nodes_Inside_Objects(nodes_inside_objects_new);
-    for(int i=1;i<=grid.m;i++)for(int j=1;j<=grid.n;j++)for(int ij=1;ij<=grid.mn;ij++) if((*nodes_inside_objects)(i,j,ij)&&!nodes_inside_objects_new(i,j,ij)) 
+    for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++)for(int ij=0;ij<grid.mn;ij++) if((*nodes_inside_objects)(i,j,ij)&&!nodes_inside_objects_new(i,j,ij)) 
         fluids_parameters.particle_levelset_evolution.phi(i,j,ij)=-grid.max_dx_dy_dz;
     ARRAY<bool,VECTOR<int,3> >::Exchange_Arrays(nodes_inside_objects_new,*nodes_inside_objects);
 */
     // remove all the air particles that are in/next to the object
     PARTICLE_LEVELSET_3D<GRID<TV> >& particle_levelset=fluids_parameters.particle_levelset_evolution.particle_levelset;
-    for(int i=1;i<=grid.number_of_cells_x;i++)for(int j=1;j<=grid.number_of_cells_y;j++)for(int ij=1;ij<=grid.number_of_cells_z;ij++){
+    for(int i=0;i<grid.number_of_cells_x;i++)for(int j=0;j<grid.number_of_cells_y;j++)for(int ij=0;ij<grid.number_of_cells_z;ij++){
         if(particle_levelset.positive_particles(i,j,ij))
             for(int ii=i;ii<=i+1;ii++)for(int jj=j;jj<=j+1;jj++)for(int iijj=ij;iijj<=ij+1;iijj++)
                 if(phi_objects(ii,jj,iijj)<0){
@@ -117,7 +117,7 @@ void Modify_Fluid_For_Melting(const T dt,const T time)
         HERE:;
     }
     // add new water particles from the melting of the object
-    for(int object=1;object<=melting_parameters.levelsets.m;object++){
+    for(int object=0;object<melting_parameters.levelsets.m;object++){
         int index=melting_parameters.body_index(object);
         if(!index)continue;
         if(melting_parameters.body_type(object)==melting_parameters.DEFORMABLE){
@@ -127,23 +127,23 @@ void Modify_Fluid_For_Melting(const T dt,const T time)
             PARTICLES<T,VECTOR_3D<T> >& particles=embedded_tetrahedralized_volume.particles;
             ARRAY<VECTOR_3D<T> > cell_based_X(grid.number_of_nodes);
             ARRAY<VECTOR_3D<T> > cell_based_V(grid.number_of_nodes);
-            for(int i=1;i<=grid.number_of_nodes;i++)if(levelset.node_to_particle_mapping(i)){
+            for(int i=0;i<grid.number_of_nodes;i++)if(levelset.node_to_particle_mapping(i)){
                 cell_based_X(i)=particles.X.array(levelset.node_to_particle_mapping(i));
                 cell_based_V(i)=particles.V.array(levelset.node_to_particle_mapping(i));}
             ARRAY<VECTOR_3D<T> > escaped_particles;ARRAY<unsigned short> escaped_particles_collision_distance;
             Find_Escaped_Particles(objects_particles(object),objects_particles_collision_distance(object),object,escaped_particles,escaped_particles_collision_distance);
-            for(int i=1;i<=escaped_particles.m;i++)
+            for(int i=0;i<escaped_particles.m;i++)
                 fluids_parameters.particle_levelset_evolution.particle_levelset.Add_Negative_Particle(grid.Interpolate_Nodes(cell_based_X,escaped_particles(i)),grid.Interpolate_Nodes(cell_based_V,escaped_particles(i)),escaped_particles_collision_distance(i));}
         else if(melting_parameters.body_type(object)==melting_parameters.RIGID){
             RIGID_BODY<TV>& rigid_body=*solids_parameters.rigid_body_parameters.list(index);
             ARRAY<VECTOR_3D<T> > escaped_particles;ARRAY<unsigned short> escaped_particles_collision_distance;
             Find_Escaped_Particles(objects_particles(object),objects_particles_collision_distance(object),object,escaped_particles,escaped_particles_collision_distance);
             FRAME<T> frame=rigid_body.Frame()*melting_parameters.rigid_body_grid_frames(object).Inverse();
-            for(int i=1;i<=escaped_particles.m;i++)
+            for(int i=0;i<escaped_particles.m;i++)
                 fluids_parameters.particle_levelset_evolution.particle_levelset.Add_Negative_Particle(frame*escaped_particles(i),VECTOR_3D<T>(0,0,0),escaped_particles_collision_distance(i));}}
 
     Update_Solids_Topology_For_Melting_Part2(dt,time);
-    for(int object=1;object<=melting_parameters.levelsets.m;object++){
+    for(int object=0;object<melting_parameters.levelsets.m;object++){
         ARRAY<VECTOR_3D<T> > escaped_particles;ARRAY<unsigned short> escaped_particles_collision_distance;
         Find_Escaped_Particles(objects_particles(object),objects_particles_collision_distance(object),object,escaped_particles,escaped_particles_collision_distance);}
 
@@ -182,7 +182,7 @@ virtual void Read_Output_Files_Solids(const int frame)
 //    std::string prefix=output_directory+"/";
 //    FILE_UTILITIES::Read_From_File<RW>(prefix+STRING_UTILITIES::string_sprintf("object_particles.%d",frame),objects_particles);
 
-    for(int object=1;object<=melting_parameters.levelsets.m;object++){
+    for(int object=0;object<melting_parameters.levelsets.m;object++){
         Seed_Particles_Inside_Object(objects_particles(object),objects_particles_collision_distance(object),object);}
 }
 //#####################################################################

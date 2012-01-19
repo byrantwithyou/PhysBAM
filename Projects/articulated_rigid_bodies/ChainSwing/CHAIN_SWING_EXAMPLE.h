@@ -111,7 +111,7 @@ FRAME_TRACK_3D<T>* Read_Frame_Track(const std::string& filename,const bool perio
     std::istream* input=FILE_UTILITIES::Safe_Open_Input(filename,false);
     *input>>samples>>tmin>>tmax;
     FRAME_TRACK_3D<T>* frame_track=new FRAME_TRACK_3D<T>(samples,tmin,tmin+(tmax-tmin)/track_speedup_factor);
-    for(int i=1;i<=samples;i++) *input>>frame_track->trajectory(i);
+    for(int i=0;i<samples;i++) *input>>frame_track->trajectory(i);
     delete input;
     frame_track->periodic=periodic;
     return frame_track;
@@ -127,24 +127,24 @@ FRAME_TRACK_3D<T>* Read_Frame_Track_From_Function(const std::string& jointname,c
     frame_track->name=jointname+"_track";
     T increment=1/((float)samples-1);
     if(jointname=="joint_r_glenohumeral"){
-        for(int i=1;i<=samples;i++){
+        for(int i=0;i<samples;i++){
 //                frame_track->trajectory(i)=FRAME<TV>(QUATERNION<T>::From_Euler_Angles((T)pi/2,(T)pi/4*cos(2*(T)pi*i*increment),0));}
             frame_track->trajectory(i)=FRAME<TV>(QUATERNION<T>::From_Euler_Angles(3*(T)pi/8,0,(T)pi/8)*QUATERNION<T>::From_Euler_Angles(0,0,(T)pi/4*cos(2*(T)pi*i*increment)));}
 //                frame_track->trajectory(i)=FRAME<TV>(QUATERNION<T>::From_Euler_Angles((T)pi/2,0,3*(T)pi/8)*QUATERNION<T>::From_Euler_Angles(0,0,(T)pi/4*cos(2*(T)pi*i*increment)));}
     }
     else if(jointname=="joint_r_humeroulnar"){
-        for(int i=1;i<=samples;i++){
+        for(int i=0;i<samples;i++){
 //                frame_track->trajectory(i)=FRAME<TV>(QUATERNION<T>::From_Euler_Angles(sin(2*(T)pi*i*increment),0,0));}
 //                frame_track->trajectory(i)=FRAME<TV>(QUATERNION<T>::From_Euler_Angles((T)pi/2+((T)pi/6)*sin(2*(T)pi*i*increment),0,0));}
             frame_track->trajectory(i)=FRAME<TV>(QUATERNION<T>::From_Euler_Angles((T)pi/2+((T)pi/4)*sin(2*(T)pi*i*increment),0,0));}
     }
     else if(jointname=="joint_r_radioulnar"){
-        for(int i=1;i<=samples;i++){
+        for(int i=0;i<samples;i++){
             frame_track->trajectory(i)=FRAME<TV>(QUATERNION<T>::From_Euler_Angles((T)pi/2,0,0));}
 //                frame_track->trajectory(i)=FRAME<TV>(QUATERNION<T>::From_Euler_Angles(cos(2*(T)pi*i*increment),0,0));}
     }
     else if(jointname=="joint_r_wrist"){
-        for(int i=1;i<=samples;i++){
+        for(int i=0;i<samples;i++){
             frame_track->trajectory(i)=FRAME<TV>(QUATERNION<T>::From_Euler_Angles(-1,0,1));}
     }
     else std::cout<<"oops, can't find that joint\n";
@@ -156,7 +156,7 @@ FRAME_TRACK_3D<T>* Read_Frame_Track_From_Function(const std::string& jointname,c
 FRAME_TRACK_3D<T>* Read_Frame_Track_From_Spline(const std::string& jointname,const bool periodic=true,const int samples=1000)
 {
     T tmin=0;int index=0;
-    for(int i=1;i<=motion_splines.m;i++) if(motion_splines(i).x==jointname) index=i;
+    for(int i=0;i<motion_splines.m;i++) if(motion_splines(i).x==jointname) index=i;
     FRAME_TRACK_3D<T>* frame_track=new FRAME_TRACK_3D<T>(samples,tmin,parameter_list.Get_Parameter("track_speedup_factor",10));
     T time_increment=((T)1./(T)(samples-1))*motion_splines(index).y->Range();
     for(int i=0;i<samples-1;i++) frame_track->trajectory(i+1)=FRAME<TV>(motion_splines(index).y->Evaluate(motion_splines(index).y->Start_Time()+i*time_increment));
@@ -248,7 +248,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         Update_Joints(0);}
 
     RIGID_BODY_LIST<TV>& rigid_body_list=solids_parameters.rigid_body_parameters.list;
-    if(static_hand) for(int i=1;i<=rigid_body_list.rigid_bodies.m;i++)
+    if(static_hand) for(int i=0;i<rigid_body_list.rigid_bodies.m;i++)
         if(rigid_body_list.rigid_bodies(i)->name!="mace" && rigid_body_list.rigid_bodies(i)->name!="cyllink") rigid_body_list.rigid_bodies(i)->is_static=true;
 }
 //#####################################################################
@@ -284,7 +284,7 @@ void Make_Mace(const int length,const T& scale_factor=(T)1,const TV & shift,cons
 
     if(parameter_list.Get_Parameter("no_mace",false)) return;
     
-    for(int i=1;i<=length;i++){
+    for(int i=0;i<length;i++){
         rigid_body=&tests.Add_Rigid_Body(data_directory+"/Rigid_Bodies/cyllink",(T).25*scale_factor,0);
         rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
         rigid_body->Set_Frame(FRAME<TV>(shift,orient)*FRAME<TV>(scale_factor*TV(0,-(T).5+i,0)));
@@ -376,7 +376,7 @@ void Add_Wrist_Joint(VISIBLE_HUMAN<T>* man)
 
     int samples=1000;T period=5;
     FRAME_TRACK_3D<T>* wrist_track=new FRAME_TRACK_3D<T>(samples,0,period);shoulder_track->periodic=true;
-    for(int i=1;i<=samples;i++){
+    for(int i=0;i<samples;i++){
         wrist_track->trajectory(i)=FRAME<TV>(QUATERNION<T>((T)pi/4+((T)pi/4)*(T)0.5*(1-cos(2*(T)pi*(i-1)/(samples-1))),TV(1,0,0)));}
 #endif
 
@@ -384,7 +384,7 @@ void Add_Wrist_Joint(VISIBLE_HUMAN<T>* man)
     std::istream* sample_set=FILE_UTILITIES::Safe_Open_Input("../joint_ik/motion_track1",false);
     int samples=700;
     FRAME_TRACK_3D<T>* frame_track=new FRAME_TRACK_3D<T>(samples,(T)0,(T)1);
-    for(int i=1;i<=samples;i++) {
+    for(int i=0;i<samples;i++) {
         (*sample_set)>>frame_track->trajectory(i);
         frame_track->trajectory(i).r.Invert();
     }
@@ -465,7 +465,7 @@ void Articulate_Mace()
     T angle_magnitude=parameter_list.Get_Parameter("chain_swing_magnitude",(T).5);
     FRAME_TRACK_3D<T>* frame_track=new FRAME_TRACK_3D<T>(samples,0,parameter_list.Get_Parameter("chain_swing_period",(T)1));
     frame_track->periodic=true;
-    for(int i=1;i<=samples;i++) 
+    for(int i=0;i<samples;i++) 
         frame_track->trajectory(i)=FRAME<TV>(QUATERNION<T>(-(T)pi/2+(T).5*sin(2*(T)pi*(i-1)/(samples-1)),TV(0,1,0)));
     //frame_track->trajectory(i)=FRAME<TV>(QUATERNION<T>::From_Euler_Angles(-(T)pi/2+angle_magnitude*sin(2*(T)pi*(i-1)/(samples-1)),0,angle_magnitude*cos(2*(T)pi*(i-1)/(samples-1))));
     joint_mesh(last_joint)->joint_function->track=frame_track;
@@ -478,7 +478,7 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
     //T mace_magnitude=(mace)?mace->Twist().angular.Magnitude():0;
     //if(mace_magnitude>parameter_list.Get_Parameter("max_mace_angular_velocity",(T))
     solids_evolution->rigid_body_collisions->collision_manager.Use_Collision_Matrix();
-/*    for(int i=1;i<=mace_joints;i++){
+/*    for(int i=0;i<mace_joints;i++){
         solids_evolution->rigid_body_collisions->collision_manager.Set_Rigid_Body_Collides_With_Other_Rigid_Body(i,i+1,false);
         solids_evolution->rigid_body_collisions->collision_manager.Set_Rigid_Body_Collides_With_Other_Rigid_Body(i+1,i,false);}
 */
@@ -506,7 +506,7 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
     std::string outputfile="tri_transform"+frame;
 
     std::ostream* output=FILE_UTILITIES::Safe_Open_Output(outputfile,false);
-    for(int i=1;i<=tri_transform_list.m;i++){
+    for(int i=0;i<tri_transform_list.m;i++){
         (*output)<<data_directory<<"/Rigid_Bodies/";
         if(tri_transform_list(i)>mace_joints+1)(*output)<<"New_Visible_Human_Bones/";
         (*output)<<rigid_body_list(tri_transform_list(i))->name<<"\n"<<rigid_body_list(tri_transform_list(i))->Frame()<<std::endl;
@@ -545,14 +545,14 @@ void Load_Splines()
     int number_of_keyframes,number_of_joints;
     *input>>number_of_keyframes;
     keyframe_times.Resize(number_of_keyframes);
-    for(int i=1;i<=keyframe_times.m;i++) (*input)>>keyframe_times(i);;
+    for(int i=0;i<keyframe_times.m;i++) (*input)>>keyframe_times(i);;
 
     *input>>number_of_joints;
     motion_splines.Resize(number_of_joints);
-    for(int i=1;i<=motion_splines.m;i++){
+    for(int i=0;i<motion_splines.m;i++){
         (*input)>>motion_splines(i).x;
         ARRAY<QUATERNION<T> > control_points;control_points.Resize(number_of_keyframes);
-        for(int j=1;j<=control_points.m;j++){FRAME<TV> frame;(*input)>>frame;control_points(j)=frame.r;}
+        for(int j=0;j<control_points.m;j++){FRAME<TV> frame;(*input)>>frame;control_points(j)=frame.r;}
         motion_splines(i).y=new BSPLINE_QUATERNION<T>(keyframe_times,control_points,parameter_list.Get_Parameter("spline_order",3));
         if(parameter_list.Get_Parameter("perform_quaternion_check",true)) motion_splines(i).y->Quaternion_Check();
         motion_splines(i).y->Create_Closed_Points();}
@@ -562,7 +562,7 @@ void Load_Splines()
 //#####################################################################
 void Print_Splines()
 {
-    for(int i=1;i<=motion_splines.m;i++){
+    for(int i=0;i<motion_splines.m;i++){
         std::cout<<"Joint: "<<motion_splines(i).x<<std::endl;
         motion_splines(i).y->Print_Control_Points_And_Times();}
 }

@@ -37,7 +37,7 @@ public:
     {}
 
     ~RENDERING_RAY_DEBUG()
-    {for(int i=1;i<=children.m;i++)delete children(i);}
+    {for(int i=0;i<children.m;i++)delete children(i);}
 
     void Add_Child(RENDERING_RAY<T>& ray_to_add)
     {RENDERING_RAY_DEBUG* child=new RENDERING_RAY_DEBUG(ray_to_add);
@@ -57,7 +57,7 @@ public:
         case RENDERING_RAY<T>::SHADOW_RAY:ray_type_str="SHADOW";break;
         case RENDERING_RAY<T>::UNKNOWN_RAY:ray_type_str="UNKNOWN";break;}
     output<<"RAY "<<ray_type_str<<" endpoint: "<<ray.ray.endpoint<<" direction: "<<ray.ray.direction<<std::endl;
-    for(int i=1;i<=children.m;i++)children(i)->Print(spaces+5);}
+    for(int i=0;i<children.m;i++)children(i)->Print(spaces+5);}
 
 //#####################################################################
 };

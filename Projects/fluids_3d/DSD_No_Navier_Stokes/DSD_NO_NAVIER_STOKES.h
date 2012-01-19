@@ -131,7 +131,7 @@ void Initialize_Velocities() PHYSBAM_OVERRIDE
     T_GRID& grid=*fluids_parameters.grid;
     for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
         const TV location=iterator.Location();
-        for(int s=1;s<=sources.m;s++) if(sources(s).Lazy_Inside(location)){
+        for(int s=0;s<sources.m;s++) if(sources(s).Lazy_Inside(location)){
             const int axis=iterator.Axis();const TV_INT face_index=iterator.Face_Index();
             fluid_collection.incompressible_fluid_collection.face_velocities.Component(axis)(face_index)=sources(s).Normal(location)[axis]*normal_velocity;}}
 
@@ -153,7 +153,7 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
     for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
         TV X=iterator.Location();
         initial_phi=1;
-        for(int s=1;s<=sources.m;s++) initial_phi=min(initial_phi,sources(s).Signed_Distance(X));
+        for(int s=0;s<sources.m;s++) initial_phi=min(initial_phi,sources(s).Signed_Distance(X));
         phi(iterator.Cell_Index())=initial_phi;}
     PHYSBAM_DEBUG_WRITE_SUBSTEP("After Initialize_Phi",1,0);
 }

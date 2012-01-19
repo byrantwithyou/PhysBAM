@@ -55,7 +55,7 @@ void COMMAND_BASE::Print_Detailed_Description(ostream& out)
 {
     out<<"-"<<Name()<<":"<<endl;
     out<<"Args:"<<endl;
-    for(int i=1;i<=args.m;i++) {
+    for(int i=0;i<args.m;i++) {
         switch(args(i).type) {
         case Bool:
             out<<"\tbool "<<args(i).name<<" (default "<<(*(bool*)(args(i).data) ? "true":"false")<<")"<<endl;

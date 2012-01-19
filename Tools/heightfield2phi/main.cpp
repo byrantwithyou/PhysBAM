@@ -41,7 +41,7 @@ template<class T> void Triangulate(const GRID<VECTOR<T,2> >& image_grid,const AR
         T thickness_over_2=image_grid.dX.x/2;
         T multiplier=extension_distance/image_grid.dX.x;
         BOX<VECTOR<T,2> > domain=image_grid.Domain();
-        for(int p=1;p<=particles.number;p++){
+        for(int p=0;p<particles.number;p++){
             VECTOR<T,2> horizontal_X=particles.X(p).Horizontal_Vector();
             if(domain.Outside(horizontal_X,thickness_over_2)){
                 VECTOR<T,2> dX=multiplier*(horizontal_X-domain.Surface(horizontal_X));
@@ -55,10 +55,10 @@ template<class T> void Rasterize_Uniform(const GRID<VECTOR<T,2> >& image_grid,co
     LOG::Time("rasterizing");
     LINEAR_INTERPOLATION_UNIFORM<GRID<VECTOR<T,2> >,T> interpolation;
     levelset.phi.Resize(levelset.grid.Domain_Indices(),false,false);
-    for(int i=1;i<=levelset.phi.m;i++)for(int ij=1;ij<=levelset.phi.mn;ij++){
+    for(int i=0;i<levelset.phi.m;i++)for(int ij=0;ij<levelset.phi.mn;ij++){
         VECTOR<T,3> X=levelset.grid.Center(i,1,ij);
         T height=interpolation.Clamped_To_Array(image_grid,heights_ghost,X.Horizontal_Vector());
-        for(int j=1;j<=levelset.phi.n;j++) levelset.phi(i,j,ij)=levelset.grid.Axis_X(j,2)-height;}
+        for(int j=0;j<levelset.phi.n;j++) levelset.phi(i,j,ij)=levelset.grid.Axis_X(j,2)-height;}
     LOG::Time("reinitializing");
     levelset.Fast_Marching_Method();
 }

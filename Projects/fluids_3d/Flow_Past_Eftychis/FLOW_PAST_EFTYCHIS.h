@@ -183,11 +183,11 @@ void Get_Source_Velocities(const T time) PHYSBAM_OVERRIDE
 
     if(test_number==1){
         if(!fluids_parameters.mpi_grid || !fluids_parameters.mpi_grid->Neighbor(3,1))
-            for(int i=1;i<=w_grid.counts.x;i++) for(int j=1;j<=w_grid.counts.y;j++){
+            for(int i=0;i<w_grid.counts.x;i++) for(int j=0;j<w_grid.counts.y;j++){
                 fluid_collection.incompressible_fluid_collection.face_velocities.Component(3)(i,j,2)=-flow_speed;
                 elliptic_solver.psi_N.Component(3)(i,j,2)=true;}
         if(!fluids_parameters.mpi_grid || !fluids_parameters.mpi_grid->Neighbor(3,2))
-            for(int i=1;i<=w_grid.counts.x;i++) for(int j=1;j<=w_grid.counts.y;j++){
+            for(int i=0;i<w_grid.counts.x;i++) for(int j=0;j<w_grid.counts.y;j++){
                 fluid_collection.incompressible_fluid_collection.face_velocities.Component(3)(i,j,w_grid.counts.z-1)=-flow_speed;
                 elliptic_solver.psi_N.Component(3)(i,j,w_grid.counts.z-1)=true;}
     }

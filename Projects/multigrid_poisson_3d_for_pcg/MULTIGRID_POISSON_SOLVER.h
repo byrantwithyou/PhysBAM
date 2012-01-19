@@ -109,11 +109,11 @@ public:
             
         {//LOG::SCOPE scope("V-cycle bottom","V-cycle bottom");
         discretizations(levels)->u.Fill(0);
-        for(int coarse_loop=1;coarse_loop<=50;coarse_loop++)
+        for(int coarse_loop=0;coarse_loop<50;coarse_loop++)
             discretizations(levels)->Relaxation_Sweep(true,boundary_sweeps_at_coarsest_level,1,boundary_sweeps_at_coarsest_level,false,false);}
 
         {//LOG::SCOPE scope("V-cycle bottom","V-cycle bottom");
-        for(int coarse_loop=1;coarse_loop<=50;coarse_loop++)
+        for(int coarse_loop=0;coarse_loop<50;coarse_loop++)
             discretizations(levels)->Relaxation_Sweep(false,boundary_sweeps_at_coarsest_level,1,boundary_sweeps_at_coarsest_level,false,false);}
 
         {//LOG::SCOPE scope("V-cycle ascent","V-cycle ascent");

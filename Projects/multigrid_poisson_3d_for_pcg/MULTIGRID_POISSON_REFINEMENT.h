@@ -41,7 +41,7 @@ public:
 
     static MULTIGRID_POISSON<T,d>* Coarsened_Discretization(const MULTIGRID_POISSON<T,d>& fine_discretization)
     {
-	for(int v=1;v<=d;v++) if(fine_discretization.n(v)%2!=0) PHYSBAM_FATAL_ERROR("Number of cells in fine grid must be a multiple of two");
+	for(int v=0;v<d;v++) if(fine_discretization.n(v)%2!=0) PHYSBAM_FATAL_ERROR("Number of cells in fine grid must be a multiple of two");
 	MULTIGRID_POISSON<T,d>& coarse_discretization=*new MULTIGRID_POISSON<T,d>(fine_discretization.n/2,fine_discretization.h*2,fine_discretization.number_of_threads);
 
 	// do boundary separately

@@ -189,7 +189,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
         if(solid_body_collection.deformable_body_collection.soft_bindings.Need_Bindings_Mapped()){
             solid_body_collection.deformable_body_collection.soft_bindings.Map_Forces_From_Parents(B.V.array,B.rigid_V.array);
             solid_body_collection.deformable_body_collection.binding_list.Clear_Hard_Bound_Particles(B.V.array);
-            for(int k=1;k<=solid_body_collection.solids_forces.m;k++){
+            for(int k=0;k<solid_body_collection.solids_forces.m;k++){
                 if(dynamic_cast<BINDING_SPRINGS<TV>*>(solid_body_collection.solids_forces(k)))
                     solid_body_collection.solids_forces(k)->Add_Force_Differential(particles.X,B.V.array,current_velocity_time+dt);}
             solid_body_collection.deformable_body_collection.binding_list.Distribute_Force_To_Parents(B.V.array);}
@@ -307,7 +307,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
             J_deformable*=-grid.Cell_Size();J_rigid*=-grid.Cell_Size();
             if(solids_fluids_parameters.mpi_solid_fluid){  // in MPI, fluid nodes don't need these...
                 B.V.Fill(TV());B.rigid_V.Fill(TWIST<TV>());}}
-        if(solids) for(int i=1;i<=solid_body_collection.rigid_body_collection.simulated_rigid_body_particles.m;i++){  // Update angular momentum for modified center of mass
+        if(solids) for(int i=0;i<solid_body_collection.rigid_body_collection.simulated_rigid_body_particles.m;i++){  // Update angular momentum for modified center of mass
             // TODO(kwatra): do we need to this for compressible case, as there is no mass lumping there?
             RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(solid_body_collection.rigid_body_collection.simulated_rigid_body_particles(i));
             B.rigid_V(i).angular+=TV::Cross_Product((rigid_body_updated_center_of_mass(i)-rigid_body.X()),B.rigid_V(i).linear);}}
@@ -327,10 +327,10 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
                 TV momentum_chunk=axis_vector*dual_cell_fluid_volume(axis,face_index)*Get_Density_At_Face(axis,face_index)*face_velocities(axis,face_index);
                 if(dual_cell_weights(axis,face_index) && dual_cell_fluid_volume(axis,face_index)){
                     FACE_WEIGHT_ELEMENTS& weights=*dual_cell_weights(axis,face_index);
-                    for(int i=1;i<=weights.m;i++) B.V(weights(i).x)+=weights(i).y*momentum_chunk;}
+                    for(int i=0;i<weights.m;i++) B.V(weights(i).x)+=weights(i).y*momentum_chunk;}
                     if(rigid_body_dual_cell_weights(axis,face_index) && dual_cell_fluid_volume(axis,face_index)){
                         FACE_WEIGHT_ELEMENTS& weights=*rigid_body_dual_cell_weights(axis,face_index);
-                        for(int i=1;i<=weights.m;i++){
+                        for(int i=0;i<weights.m;i++){
                             int rigid_body_id=weights(i).x;T weight=weights(i).y;
                             int rigid_body_index=rigid_body_particles_to_dynamic_rigid_body_particles_map(rigid_body_id);
                             if(rigid_body_index!=0){
@@ -361,7 +361,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
                             for(int node=2;node<=deformable->object.mesh.dimension;node++) simplex_bounding_box.Enlarge_To_Include_Point(particles.X(deformable->object.mesh.elements(simplex)(node)));
                             if(grid_domain.Lazy_Intersection(simplex_bounding_box)){
                                 boundary_particles.Subset(deformable->object.mesh.elements(simplex)).Fill(1);}}} // TODO(jontg): Check this
-            for(int i=1;i<=boundary_particles.m;i++) if(boundary_particles(i)) coupled_deformable_particle_indices.Append(i);
+            for(int i=0;i<boundary_particles.m;i++) if(boundary_particles(i)) coupled_deformable_particle_indices.Append(i);
             solids_fluids_parameters.mpi_solid_fluid->Exchange_Coupled_Deformable_Particle_List(&coupled_deformable_particle_indices,0);
             fluid_system_mpi=new FLUID_SYSTEM_MPI<TV>(J_deformable,J_rigid,A_array,interior_regions,
                 solids_parameters.implicit_solve_parameters.cg_tolerance/Get_Poisson()->tolerance,solids_fluids_parameters.mpi_solid_fluid,F,R,coupled_deformable_particle_indices,preconditioned);
@@ -380,14 +380,14 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
     x_array.v.Resize(A_array.m);p_array.v.Resize(A_array.m);ap_array.v.Resize(A_array.m);ar_array.v.Resize(A_array.m);
     r_array.v.Resize(A_array.m);z_array.v.Resize(A_array.m);zaq_array.v.Resize(A_array.m);
     if(fluids){
-        for(int i=1;i<=A_array.m;i++){int n=A_array(i).n;
+        for(int i=0;i<A_array.m;i++){int n=A_array(i).n;
             x_array.v(i).Resize(n);p_array.v(i).Resize(n);ap_array.v(i).Resize(n);
             ar_array.v(i).Resize(n);r_array.v(i).Resize(n);z_array.v(i).Resize(n);zaq_array.v(i).Resize(n);}
 
         T_ARRAYS_SCALAR& p=Get_Pressure();
-        for(int i=1;i<=A_array.m;i++){
+        for(int i=0;i<A_array.m;i++){
             const SPARSE_MATRIX_FLAT_NXN<T>& A=A_array(i);
-            for(int j=1;j<=A.n;j++) x_array.v(i)(j)=p(matrix_index_to_cell_index_array(i)(j));}}
+            for(int j=0;j<A.n;j++) x_array.v(i)(j)=p(matrix_index_to_cell_index_array(i)(j));}}
 
     if(solids_fluids_parameters.mpi_solid_fluid){
         LOG::Time("conjugate residual parallel");
@@ -447,7 +447,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
 
             // compute the preconditioner
             POISSON_COLLIDABLE_UNIFORM<GRID<TV> >& poisson=*Get_Poisson();
-            for(int i=1;i<=A_array.m;i++)
+            for(int i=0;i<A_array.m;i++)
                 A_array(i).Construct_Incomplete_Cholesky_Factorization(poisson.pcg.modified_incomplete_cholesky,poisson.pcg.modified_incomplete_cholesky_coefficient,
                     poisson.pcg.preconditioner_zero_tolerance,poisson.pcg.preconditioner_zero_replacement); // check to see if the blocks can be preconditioned even though the whole
 
@@ -491,14 +491,14 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
     if(fluids){
         T_ARRAYS_SCALAR& p=Get_Pressure();
         // Copy pressures back into pressure array
-        for(int i=1;i<=x_array.v.m;i++) for(int j=1;j<=x_array.v(i).n;j++) p(matrix_index_to_cell_index_array(i)(j))=x_array.v(i)(j);
+        for(int i=0;i<x_array.v.m;i++) for(int j=1;j<=x_array.v(i).n;j++) p(matrix_index_to_cell_index_array(i)(j))=x_array.v(i)(j);
         PHYSBAM_DEBUG_WRITE_SUBSTEP("unscaled final pressures (sf coupled evolution)",0,1);
 
         // scale pressure back to get a real pressure
         if(dt && !fluids_parameters.compressible) p*=1/dt;
         if(dt && fluids_parameters.compressible) fluids_parameters.euler->euler_projection.Unscale_Pressure_By_Dt(dt);}
     if(solids && Simulate_Fluids()){
-        for(int i=1;i<=solid_body_collection.rigid_body_collection.simulated_rigid_body_particles.m;i++){
+        for(int i=0;i<solid_body_collection.rigid_body_collection.simulated_rigid_body_particles.m;i++){
             RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(solid_body_collection.rigid_body_collection.simulated_rigid_body_particles(i));
             V.rigid_V(i).linear-=TV::Cross_Product(V.rigid_V(i).angular,rigid_body_updated_center_of_mass(i)-rigid_body.X());}}
 
@@ -549,7 +549,7 @@ Transfer_Momentum_And_Set_Boundary_Conditions(const T time,GENERALIZED_VELOCITY<
         // TODO: add F to B appropriately
         ARRAY<T_THIN_SHELL_SIMPLEX> velocity_lines;
         ARRAY<TV> jet_velocities;
-        for(int rigid_simplex=1;rigid_simplex<=rigid_simplices.m;rigid_simplex++){
+        for(int rigid_simplex=0;rigid_simplex<rigid_simplices.m;rigid_simplex++){
             int rigid_body_id=rigid_simplices(rigid_simplex).x;
             int rigid_simplex_index=rigid_simplices(rigid_simplex).y;
             RIGID_BODY<TV>& rigid_body=rigid_body_collection.Rigid_Body(rigid_body_id);
@@ -565,12 +565,12 @@ Transfer_Momentum_And_Set_Boundary_Conditions(const T time,GENERALIZED_VELOCITY<
         for(COLLISION_GEOMETRY_ID i(1);i<=fluids_parameters.collision_bodies_affecting_fluid->collision_geometry_collection.bodies.m;i++)
             if(fluids_parameters.collision_bodies_affecting_fluid->collision_geometry_collection.Is_Active(i)){
                 collisions=dynamic_cast<DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>*>(fluids_parameters.collision_bodies_affecting_fluid->collision_geometry_collection.bodies(i));if(collisions) break;}
-        for(int deformable_simplex=1;deformable_simplex<=deformable_simplices.m;deformable_simplex++){
+        for(int deformable_simplex=0;deformable_simplex<deformable_simplices.m;deformable_simplex++){
             T_THIN_SHELL_SIMPLEX velocity_line(collisions->object.Get_Element(deformable_simplices(deformable_simplex)));velocity_lines.Append(velocity_line);
             jet_velocities.Append(deformable_simplex_forces(deformable_simplex)*orientation);}
 
         assert(velocity_lines.m==jet_velocities.m);
-        for(int i=1;i<=velocity_lines.m;i++){
+        for(int i=0;i<velocity_lines.m;i++){
             T_THIN_SHELL_SIMPLEX velocity_line=velocity_lines(i);
             TV jet_velocity=jet_velocities(i);
             RANGE<TV> box=velocity_line.Bounding_Box();
@@ -587,7 +587,7 @@ Transfer_Momentum_And_Set_Boundary_Conditions(const T time,GENERALIZED_VELOCITY<
                     ARRAY<T_THIN_SHELL_SIMPLEX> clipped_simplices;
                     velocity_line.Clip_To_Box(dual_cell,clipped_simplices);
                     T total_length=0;
-                    for(int i=1;i<=clipped_simplices.m;i++)
+                    for(int i=0;i<clipped_simplices.m;i++)
                         total_length+=clipped_simplices(i).Size();
                     if(total_length){
                         if(!modified_face(axis,face_index)){
@@ -751,7 +751,7 @@ Compute_W(const T current_position_time)
         FACE_WEIGHT_ELEMENTS& rigid_dual_cell_weights=*rigid_body_dual_cell_weights(axis,face_index);
 
         bool only_kinematic=true;
-        for(int s=1;s<=dual_cell_structure_simplex_list.m;s++){
+        for(int s=0;s<dual_cell_structure_simplex_list.m;s++){
             const COLLISION_GEOMETRY_ID object_id=dual_cell_structure_simplex_list(s).x;
             const int object_simplex_index=dual_cell_structure_simplex_list(s).y;
             
@@ -761,7 +761,7 @@ Compute_W(const T current_position_time)
                 simplex.Clip_To_Box(dual_cell,clipped_simplices_thin_shell); // TODO: don't clip against every plane twice
                 if(DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>* deformable=dynamic_cast<DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>*>(&body)){
                     TV total_weight;
-                    for(int i=1;i<=clipped_simplices_thin_shell.m;i++){
+                    for(int i=0;i<clipped_simplices_thin_shell.m;i++){
                         const T_THIN_SHELL_SIMPLEX& clipped_simplex=clipped_simplices_thin_shell(i);
                         total_weight+=simplex.Sum_Barycentric_Coordinates(clipped_simplex)*clipped_simplex.Size()*one_over_number_nodes_thin_shell;}
                     const T_THIN_SHELL_ELEMENT& simplex_indices=deformable->object.mesh.elements(object_simplex_index);
@@ -769,12 +769,12 @@ Compute_W(const T current_position_time)
                     overall_weight+=sum_total_weight;
                     if(sum_total_weight){
                         if(fluids_parameters.fluid_affects_solid) only_kinematic=false;
-                        for(int p=1;p<=simplex_indices.m;p++){
+                        for(int p=0;p<simplex_indices.m;p++){
                             int dynamic_particle_index=particles_to_dynamic_particles_map(simplex_indices(p)); // TODO: make this work for embedded particles
                             if(dynamic_particle_index) deformable_face_weights.Append(PAIR<int,T>(dynamic_particle_index,total_weight(p)));}}}
                 else if(RIGID_COLLISION_GEOMETRY<TV>* rigid_collision_geometry=dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>*>(&body)){
                     T total_weight=(T)0;
-                    for(int i=1;i<=clipped_simplices_thin_shell.m;i++) total_weight+=clipped_simplices_thin_shell(i).Size();
+                    for(int i=0;i<clipped_simplices_thin_shell.m;i++) total_weight+=clipped_simplices_thin_shell(i).Size();
                     overall_weight+=total_weight;
                     if(total_weight){
                         const RIGID_GEOMETRY<TV>& rigid_geometry=rigid_collision_geometry->rigid_geometry;
@@ -812,10 +812,10 @@ Compute_W(const T current_position_time)
                 velocity=(T)0;
                 if(dual_cell_weights(axis,face_index)){
                     FACE_WEIGHT_ELEMENTS& face_weights=*dual_cell_weights(axis,face_index);
-                    for(int i=1;i<=face_weights.m;i++) velocity+=face_weights(i).y*V.V(face_weights(i).x)(axis);}
+                    for(int i=0;i<face_weights.m;i++) velocity+=face_weights(i).y*V.V(face_weights(i).x)(axis);}
                 if(rigid_body_dual_cell_weights(axis,face_index)){
                     FACE_WEIGHT_ELEMENTS& face_weights=*rigid_body_dual_cell_weights(axis,face_index);
-                    for(int i=1;i<=face_weights.m;i++) velocity+=face_weights(i).y*solid_body_collection.rigid_body_collection.Rigid_Body(face_weights(i).x).Pointwise_Object_Velocity(iterator.Location())(axis);}}}}
+                    for(int i=0;i<face_weights.m;i++) velocity+=face_weights(i).y*solid_body_collection.rigid_body_collection.Rigid_Body(face_weights(i).x).Pointwise_Object_Velocity(iterator.Location())(axis);}}}}
 }
 //#####################################################################
 // Function Compute_Coupling_Terms_Deformable
@@ -848,7 +848,7 @@ Compute_Coupling_Terms_Deformable(const T_ARRAYS_INT& cell_index_to_matrix_index
                 left_column_index=cell_index_to_matrix_index(first_cell_index);
             if(right_column_color>0 && second_cell_index(axis)<=domain_indices.max_corner(axis))
                 right_column_index=cell_index_to_matrix_index(second_cell_index);
-            for(int i=1;i<=dual_cell_weight.m;i++){
+            for(int i=0;i<dual_cell_weight.m;i++){
                 int j_row=TV::dimension*(dual_cell_weight(i).x-1)+axis;
                 if(left_column_index>0) row_counts(left_column_color)(j_row)++;
                 if(right_column_index>0) row_counts(right_column_color)(j_row)++;
@@ -867,9 +867,9 @@ Compute_Coupling_Terms_Deformable(const T_ARRAYS_INT& cell_index_to_matrix_index
 
     if(!fluids_parameters.compressible && solids_fluids_parameters.mpi_solid_fluid){ // TODO see if we can change this to a single direction send
         ARRAY<T> serial_nodal_fluid_mass(nodal_fluid_mass.m*TV::m),global_nodal_fluid_mass(nodal_fluid_mass.m*TV::m);
-        for(int node=1;node<=nodal_fluid_mass.m;node++) for(int axis=1;axis<=TV::m;axis++) serial_nodal_fluid_mass((node-1)*TV::m+axis)=nodal_fluid_mass(node)(axis);
+        for(int node=0;node<nodal_fluid_mass.m;node++) for(int axis=1;axis<=TV::m;axis++) serial_nodal_fluid_mass((node-1)*TV::m+axis)=nodal_fluid_mass(node)(axis);
         solids_fluids_parameters.mpi_solid_fluid->Reduce_Add(serial_nodal_fluid_mass,global_nodal_fluid_mass);
-        for(int node=1;node<=nodal_fluid_mass.m;node++) for(int axis=1;axis<=TV::m;axis++) nodal_fluid_mass(node)(axis)=global_nodal_fluid_mass((node-1)*TV::m+axis);}
+        for(int node=0;node<nodal_fluid_mass.m;node++) for(int axis=1;axis<=TV::m;axis++) nodal_fluid_mass(node)(axis)=global_nodal_fluid_mass((node-1)*TV::m+axis);}
 
     // populate the entries of J
     if(!solids_fluids_parameters.mpi_solid_fluid || solids_fluids_parameters.mpi_solid_fluid->Fluid_Node()){
@@ -888,7 +888,7 @@ Compute_Coupling_Terms_Deformable(const T_ARRAYS_INT& cell_index_to_matrix_index
                 left_column_weight=(T)-one_over_dx(axis);left_column_index=cell_index_to_matrix_index(first_cell_index);}
             if(right_column_color>0 && second_cell_index(axis)<=domain_indices.max_corner(axis)){
                 right_column_weight=(T)one_over_dx(axis);right_column_index=cell_index_to_matrix_index(second_cell_index);}
-            for(int i=1;i<=dual_cell_weight.m;i++){
+            for(int i=0;i<dual_cell_weight.m;i++){
                 int j_row=TV::dimension*(dual_cell_weight(i).x-1)+axis;T weight=dual_cell_weight(i).y;
                 if(left_column_index>0) J_deformable(left_column_color).Add_Element(j_row,left_column_index,weight*left_column_weight);
                 if(right_column_index>0) J_deformable(right_column_color).Add_Element(j_row,right_column_index,weight*right_column_weight);}}
@@ -932,7 +932,7 @@ Compute_Coupling_Terms_Rigid(const T_ARRAYS_INT& cell_index_to_matrix_index,cons
             if((right_column_color=poisson->filled_region_colors(second_cell_index))>0 && second_cell_index(axis)<=domain_indices.max_corner(axis))
                 right_column_index=cell_index_to_matrix_index(second_cell_index);
             // each one goes into four rows in 3d (with nonzero weight)
-            for(int i=1;i<=dual_cell_weight.m;i++){
+            for(int i=0;i<dual_cell_weight.m;i++){
                 int rigid_body_id=dual_cell_weight(i).x;
                 RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(rigid_body_id);
                 const int base_row=rows_per_rigid_body*(rigid_body_particles_to_dynamic_rigid_body_particles_map(rigid_body_id)-1);
@@ -960,10 +960,10 @@ Compute_Coupling_Terms_Rigid(const T_ARRAYS_INT& cell_index_to_matrix_index,cons
                         for(int j=1;j<=T_SPIN::dimension;j++){
                             row_counts(right_column_color)(base_row+TV::dimension+j)++;kinematic_row_counts(right_column_color)(base_row+axis)++;}}}}}
 
-        for(int i=1;i<=J_rigid_kinematic.m;i++){
+        for(int i=0;i<J_rigid_kinematic.m;i++){
             J_rigid_kinematic(i).n=interior_regions(i).Size()+1;J_rigid_kinematic(i).Set_Row_Lengths(kinematic_row_counts(i));
             PROJECTED_ARRAY<ARRAY<SPARSE_MATRIX_ENTRY<T> >,T_PROJECTED_INDEX> J_rigidiAj=J_rigid_kinematic(i).A.template Project<int,&SPARSE_MATRIX_ENTRY<T>::j>();J_rigidiAj.Fill(0);}
-        for(int i=1;i<=J_rigid.m;i++){
+        for(int i=0;i<J_rigid.m;i++){
             J_rigid(i).n=interior_regions(i).Size()+1;J_rigid(i).Set_Row_Lengths(row_counts(i));
             PROJECTED_ARRAY<ARRAY<SPARSE_MATRIX_ENTRY<T> >,T_PROJECTED_VALUE> J_rigidiAa=J_rigid(i).A.template Project<T,&SPARSE_MATRIX_ENTRY<T>::a>();
             J_rigidiAa.Fill(0);}}
@@ -971,13 +971,13 @@ Compute_Coupling_Terms_Rigid(const T_ARRAYS_INT& cell_index_to_matrix_index,cons
     if(!fluids_parameters.compressible && solids_fluids_parameters.mpi_solid_fluid){ // TODO see if we can change this to a single direction send
         ARRAY<T> serial_rigid_body_updated_center_of_mass(rigid_body_updated_center_of_mass.m*TV::m),global_rigid_body_updated_center_of_mass(rigid_body_updated_center_of_mass.m*TV::m);
         ARRAY<T> serial_rigid_body_fluid_mass(rigid_body_fluid_mass.m*TV::m),global_rigid_body_fluid_mass(rigid_body_fluid_mass.m*TV::m);
-        for(int rigid_body=1;rigid_body<=rigid_body_updated_center_of_mass.m;rigid_body++)
+        for(int rigid_body=0;rigid_body<rigid_body_updated_center_of_mass.m;rigid_body++)
             for(int axis=1;axis<=TV::m;axis++){
                 serial_rigid_body_updated_center_of_mass((rigid_body-1)*TV::m+axis)=rigid_body_updated_center_of_mass(rigid_body)(axis);
                 serial_rigid_body_fluid_mass((rigid_body-1)*TV::m+axis)=rigid_body_fluid_mass(rigid_body)(axis);}
         solids_fluids_parameters.mpi_solid_fluid->Reduce_Add(serial_rigid_body_updated_center_of_mass,global_rigid_body_updated_center_of_mass);
         solids_fluids_parameters.mpi_solid_fluid->Reduce_Add(serial_rigid_body_fluid_mass,global_rigid_body_fluid_mass);
-        for(int rigid_body=1;rigid_body<=rigid_body_updated_center_of_mass.m;rigid_body++)
+        for(int rigid_body=0;rigid_body<rigid_body_updated_center_of_mass.m;rigid_body++)
             for(int axis=1;axis<=TV::m;axis++){
                 rigid_body_updated_center_of_mass(rigid_body)(axis)=global_rigid_body_updated_center_of_mass((rigid_body-1)*TV::m+axis);
                 rigid_body_fluid_mass(rigid_body)(axis)=global_rigid_body_fluid_mass((rigid_body-1)*TV::m+axis);}}
@@ -985,7 +985,7 @@ Compute_Coupling_Terms_Rigid(const T_ARRAYS_INT& cell_index_to_matrix_index,cons
     if(fluids_parameters.fluid_affects_solid){
         rigid_body_fluid_inertia.Resize(solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m);
         // get updated center of mass for each rigid body, compute modified inertia tensor<
-        for(int i=1;i<=solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m;i++){
+        for(int i=0;i<solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m;i++){
             RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles(i));
             if(fluids_parameters.compressible) rigid_body_updated_center_of_mass(i)=rigid_body.X();
             else rigid_body_updated_center_of_mass(i)=(rigid_body_fluid_mass(i)+rigid_body.Mass()).Solve_Linear_System(
@@ -1012,7 +1012,7 @@ Compute_Coupling_Terms_Rigid(const T_ARRAYS_INT& cell_index_to_matrix_index,cons
             if((right_column_color=poisson->filled_region_colors(second_cell_index))>0 && second_cell_index(axis)<=domain_indices.max_corner(axis)){
                 right_column_weight=(T)one_over_dx(axis);right_column_index=cell_index_to_matrix_index(second_cell_index);}
             // each one goes into four rows in 3d (with nonzero weight)
-            for(int i=1;i<=dual_cell_weight.m;i++){
+            for(int i=0;i<dual_cell_weight.m;i++){
                 int rigid_body_id=dual_cell_weight(i).x;T weight=dual_cell_weight(i).y;
                 RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(rigid_body_id);
                 TV center_of_mass=((!fluids_parameters.fluid_affects_solid || rigid_body.Has_Infinite_Inertia()) ? rigid_body.X() : rigid_body_updated_center_of_mass(rigid_body_particles_to_dynamic_rigid_body_particles_map(rigid_body_id)));
@@ -1044,24 +1044,24 @@ Compute_Coupling_Terms_Rigid(const T_ARRAYS_INT& cell_index_to_matrix_index,cons
     if(!fluids_parameters.compressible && solids_fluids_parameters.mpi_solid_fluid){ // TODO see if we can change this to a single direction send
         int inertia_tensor_size=T_INERTIA_TENSOR::m*T_INERTIA_TENSOR::n;
         ARRAY<T> serial_rigid_body_fluid_inertia(rigid_body_fluid_inertia.m*inertia_tensor_size),global_rigid_body_fluid_inertia(rigid_body_fluid_inertia.m*inertia_tensor_size);
-        for(int rigid_body=1;rigid_body<=rigid_body_fluid_inertia.m;rigid_body++)
+        for(int rigid_body=0;rigid_body<rigid_body_fluid_inertia.m;rigid_body++)
             for(int row=1;row<=T_INERTIA_TENSOR::m;row++)
                 for(int col=1;col<=T_INERTIA_TENSOR::n;col++)
                     serial_rigid_body_fluid_inertia((rigid_body-1)*inertia_tensor_size+(row-1)*T_INERTIA_TENSOR::m+col)=rigid_body_fluid_inertia(rigid_body)(row,col);
         solids_fluids_parameters.mpi_solid_fluid->Reduce_Add(serial_rigid_body_fluid_inertia,global_rigid_body_fluid_inertia);
-        for(int rigid_body=1;rigid_body<=rigid_body_fluid_inertia.m;rigid_body++)
+        for(int rigid_body=0;rigid_body<rigid_body_fluid_inertia.m;rigid_body++)
             for(int row=1;row<=T_INERTIA_TENSOR::m;row++)
                 for(int col=1;col<=T_INERTIA_TENSOR::n;col++)
                     rigid_body_fluid_inertia(rigid_body)(row,col)=global_rigid_body_fluid_inertia((rigid_body-1)*inertia_tensor_size+(row-1)*T_INERTIA_TENSOR::m+col);}
     if(fluids_parameters.fluid_affects_solid){
-        for(int i=1;i<=solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m;i++){
+        for(int i=0;i<solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m;i++){
             RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles(i));
             rigid_body_fluid_inertia(i)+=rigid_body.World_Space_Inertia_Tensor(rigid_body_updated_center_of_mass(i));}}
 
     if(!solids_fluids_parameters.mpi_solid_fluid || solids_fluids_parameters.mpi_solid_fluid->Fluid_Node()){
         // Go through and eliminate empty elements
-        for(int i=1;i<=J_rigid.m;i++){SPARSE_MATRIX_FLAT_MXN<T> temp(J_rigid(i));temp.Compress(J_rigid(i));}
-        for(int i=1;i<=J_rigid_kinematic.m;i++){SPARSE_MATRIX_FLAT_MXN<T> temp(J_rigid_kinematic(i));temp.Compress(J_rigid_kinematic(i));}}
+        for(int i=0;i<J_rigid.m;i++){SPARSE_MATRIX_FLAT_MXN<T> temp(J_rigid(i));temp.Compress(J_rigid(i));}
+        for(int i=0;i<J_rigid_kinematic.m;i++){SPARSE_MATRIX_FLAT_MXN<T> temp(J_rigid_kinematic(i));temp.Compress(J_rigid_kinematic(i));}}
 }
 //#####################################################################
 // Function Apply_Pressure
@@ -1139,10 +1139,10 @@ Apply_Solid_Boundary_Conditions(const T time,const bool use_pseudo_velocities,T_
                 if(dual_cell_weights(axis,face_index) && dual_cell_weights(axis,face_index)->m){
                     assert(collisions);
                     FACE_WEIGHT_ELEMENTS& face_weights=*dual_cell_weights(axis,face_index);
-                    for(int i=1;i<=face_weights.m;i++) velocity+=face_weights(i).y*collisions->Pointwise_Node_Pseudo_Velocity(solid_body_collection.deformable_body_collection.dynamic_particles(face_weights(i).x),state1,state2)(axis);}
+                    for(int i=0;i<face_weights.m;i++) velocity+=face_weights(i).y*collisions->Pointwise_Node_Pseudo_Velocity(solid_body_collection.deformable_body_collection.dynamic_particles(face_weights(i).x),state1,state2)(axis);}
                 if(rigid_body_dual_cell_weights(axis,face_index)){
                     FACE_WEIGHT_ELEMENTS& face_weights=*rigid_body_dual_cell_weights(axis,face_index);
-                    for(int i=1;i<=face_weights.m;i++){
+                    for(int i=0;i<face_weights.m;i++){
                         COLLISION_GEOMETRY<TV>& collision_geometry=*fluids_parameters.collision_bodies_affecting_fluid->collision_geometry_collection.Get_Collision_Geometry(face_weights(i).x);
                         velocity+=face_weights(i).y*collision_geometry.Pointwise_Object_Pseudo_Velocity(0,iterator.Location(),state1,state2)(axis);}}}}}
     else{
@@ -1155,10 +1155,10 @@ Apply_Solid_Boundary_Conditions(const T time,const bool use_pseudo_velocities,T_
                 if(dual_cell_weights(axis,face_index)){
                     FACE_WEIGHT_ELEMENTS& face_weights=*dual_cell_weights(axis,face_index);
                     GENERALIZED_VELOCITY<TV> V(particles.V,rigid_body_particles.twist,solid_body_collection);
-                    for(int i=1;i<=face_weights.m;i++) velocity+=face_weights(i).y*V.V(face_weights(i).x)(axis);}
+                    for(int i=0;i<face_weights.m;i++) velocity+=face_weights(i).y*V.V(face_weights(i).x)(axis);}
                 if(rigid_body_dual_cell_weights(axis,face_index)){
                     FACE_WEIGHT_ELEMENTS& face_weights=*rigid_body_dual_cell_weights(axis,face_index);
-                    for(int i=1;i<=face_weights.m;i++) velocity+=face_weights(i).y*solid_body_collection.rigid_body_collection.Rigid_Body(face_weights(i).x).Pointwise_Object_Velocity(iterator.Location())(axis);}}}}
+                    for(int i=0;i<face_weights.m;i++) velocity+=face_weights(i).y*solid_body_collection.rigid_body_collection.Rigid_Body(face_weights(i).x).Pointwise_Object_Velocity(iterator.Location())(axis);}}}}
 
     // add after
     Transfer_Momentum_And_Set_Boundary_Conditions(time,0);

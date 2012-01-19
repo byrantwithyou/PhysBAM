@@ -106,10 +106,10 @@ void Initialize_Velocities() PHYSBAM_OVERRIDE
 void Adjust_Density_And_Temperature_With_Sources(const T time) PHYSBAM_OVERRIDE
 {
     GRID<TV>& grid=fluids_parameters.grid;
-    if(time<=explosion_end_time) for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++) for(int ij=1;ij<=grid.mn;ij++) if(source_domain.Lazy_Inside(grid.X(i,j,ij))){
+    if(time<=explosion_end_time) for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++) for(int ij=0;ij<grid.mn;ij++) if(source_domain.Lazy_Inside(grid.X(i,j,ij))){
             fluids_parameters.density_container.density(i,j,ij)=rho;fluids_parameters.temperature_container.temperature(i,j,ij)=fluids_parameters.temperature_products;}
     // keep density >= 0 and T >=0
-    for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++) for(int ij=1;ij<=grid.mn;ij++){
+    for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++) for(int ij=0;ij<grid.mn;ij++){
         fluids_parameters.density_container.density(i,j,ij)=max((T)0,fluids_parameters.density_container.density(i,j,ij));
         fluids_parameters.temperature_container.temperature(i,j,ij)=max((T)fluids_parameters.temperature_container.ambient_temperature,fluids_parameters.temperature_container.temperature(i,j,ij));}
 }
@@ -120,7 +120,7 @@ void Get_Divergence(ARRAY<T,VECTOR<int,3> >& divergence,const T dt,const T time)
 {
     GRID<TV>& grid=fluids_parameters.grid;
     T expansion=2*explosion_divergence*sin(2*time/explosion_end_time)/exp(2*time/explosion_end_time);
-    for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++) for(int ij=1;ij<=grid.mn;ij++) if(source_domain.Lazy_Inside(grid.X(i,j,ij))) divergence(i,j,ij)=expansion;
+    for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++) for(int ij=0;ij<grid.mn;ij++) if(source_domain.Lazy_Inside(grid.X(i,j,ij))) divergence(i,j,ij)=expansion;
 }
 //#####################################################################
 // Function Get_Body_Force
@@ -139,7 +139,7 @@ void Get_Body_Force(T_FACE_ARRAYS_SCALAR& force,const T dt,const T time) PHYSBAM
     temperature.boundary->Fill_Ghost_Cells_Cell(grid,temperature.temperature,temperature_ghost,time);
 
     GRID<TV> v_grid=grid.Get_Y_Face_Grid();
-    for(int i=1;i<=v_grid.m;i++) for(int j=1;j<=v_grid.n;j++) for(int ij=1;ij<=v_grid.mn;ij++){ // y-direction forces only
+    for(int i=0;i<v_grid.m;i++) for(int j=0;j<v_grid.n;j++) for(int ij=0;ij<v_grid.mn;ij++){ // y-direction forces only
         T rho_atm=rho_bottom+(rho_top-rho_bottom)*(grid.y(j)-grid.ymin)/(grid.ymax-grid.ymin);
         if(density_ghost(i,j,ij)>.05){
             T density_difference=(T).5*(density_ghost(i,j-1,ij)+density_ghost(i,j,ij))-rho_atm;
@@ -156,7 +156,7 @@ void Get_Body_Force(T_FACE_ARRAYS_SCALAR& force,const T dt,const T time) PHYSBAM
         if(time <= explosion_end_time){
             int add_count=0;VORTICITY_PARTICLES<T,VECTOR<T,3> >& vorticity_particles=vortex_particle_evolution.vorticity_particles;
             VECTOR<T,3> cell_upper=(T).5*VECTOR<T,3>(grid.dx,grid.dy,grid.dz),cell_lower=-cell_upper;
-            for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++) for(int ij=1;ij<=grid.mn;ij++)
+            for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++) for(int ij=0;ij<grid.mn;ij++)
                 if(source_domain.Lazy_Inside(grid.X(i,j,ij)) && time>(T)1/24 && random.Get_Uniform_Number((T)0,(T)1)<(T).005){
                     add_count++;
                     int particle_id=vorticity_particles.array_collection->Add_Element(); 

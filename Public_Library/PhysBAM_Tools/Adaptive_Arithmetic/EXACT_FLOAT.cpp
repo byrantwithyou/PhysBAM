@@ -24,7 +24,7 @@ EXACT_FLOAT<T> EXACT_FLOAT<T>::
 operator*(const EXACT_FLOAT& exact_float) const
 {
     EXACT_FLOAT result;
-    for(int i=1;i<=exact_float.expansion.m;i++) result+=(*this)*exact_float.expansion(i);
+    for(int i=0;i<exact_float.expansion.m;i++) result+=(*this)*exact_float.expansion(i);
     return result;
 }
 //#####################################################################

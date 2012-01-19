@@ -149,7 +149,7 @@ public:
     {
         if(!thread_queue){(my_class.*func)(domains(1));return;}
 #ifdef USE_PTHREADS
-        for(int i=1;i<=domains.m;i++){
+        for(int i=0;i<domains.m;i++){
             ITERATOR_TASK_0<TYPE,RANGE<TV_INT> >* task=new ITERATOR_TASK_0<TYPE,RANGE<TV_INT> >(my_class,func,domains(i));
             thread_queue->Queue(task);}
         if(do_wait)thread_queue->Wait();
@@ -162,7 +162,7 @@ public:
     {
         if(!thread_queue){(my_class.*func)(domains(1),arg1);return;}
 #ifdef USE_PTHREADS
-        for(int i=1;i<=domains.m;i++){
+        for(int i=0;i<domains.m;i++){
             ITERATOR_TASK_1<TYPE,RANGE<TV_INT>,T1>* task=new ITERATOR_TASK_1<TYPE,RANGE<TV_INT>,T1>(my_class,func,domains(i),arg1);
             thread_queue->Queue(task);}
         if(do_wait)thread_queue->Wait();
@@ -175,7 +175,7 @@ public:
     {
         if(!thread_queue){(my_class.*func)(domains(1),arg1,arg2);return;}
 #ifdef USE_PTHREADS
-        for(int i=1;i<=domains.m;i++){
+        for(int i=0;i<domains.m;i++){
             ITERATOR_TASK_2<TYPE,RANGE<TV_INT>,T1,T2>* task=new ITERATOR_TASK_2<TYPE,RANGE<TV_INT>,T1,T2>(my_class,func,domains(i),arg1,arg2);
             thread_queue->Queue(task);}
         if(do_wait)thread_queue->Wait();
@@ -188,7 +188,7 @@ public:
     {
         if(!thread_queue){(my_class.*func)(domains(1),arg1,arg2,arg3);return;}
 #ifdef USE_PTHREADS
-        for(int i=1;i<=domains.m;i++){
+        for(int i=0;i<domains.m;i++){
             ITERATOR_TASK_3<TYPE,RANGE<TV_INT>,T1,T2,T3>* task=new ITERATOR_TASK_3<TYPE,RANGE<TV_INT>,T1,T2,T3>(my_class,func,domains(i),arg1,arg2,arg3);
             thread_queue->Queue(task);}
         if(do_wait)thread_queue->Wait();
@@ -201,7 +201,7 @@ public:
     {
         if(!thread_queue){(my_class.*func)(domains(1),arg1,arg2,arg3,arg4);return;}
 #ifdef USE_PTHREADS
-        for(int i=1;i<=domains.m;i++){
+        for(int i=0;i<domains.m;i++){
             ITERATOR_TASK_4<TYPE,RANGE<TV_INT>,T1,T2,T3,T4>* task=new ITERATOR_TASK_4<TYPE,RANGE<TV_INT>,T1,T2,T3,T4>(my_class,func,domains(i),arg1,arg2,arg3,arg4);
             thread_queue->Queue(task);}
         if(do_wait)thread_queue->Wait();
@@ -214,7 +214,7 @@ public:
     {
         if(!thread_queue){(my_class.*func)(domains(1),arg1,arg2,arg3,arg4,arg5);return;}
 #ifdef USE_PTHREADS
-        for(int i=1;i<=domains.m;i++){
+        for(int i=0;i<domains.m;i++){
             ITERATOR_TASK_5<TYPE,RANGE<TV_INT>,T1,T2,T3,T4,T5>* task=new ITERATOR_TASK_5<TYPE,RANGE<TV_INT>,T1,T2,T3,T4,T5>(my_class,func,domains(i),arg1,arg2,arg3,arg4,arg5);
             thread_queue->Queue(task);}
         if(do_wait)thread_queue->Wait();
@@ -227,7 +227,7 @@ public:
     {
         if(!thread_queue){(my_class.*func)(domains(1),arg1,arg2,arg3,arg4,arg5,arg6);return;}
 #ifdef USE_PTHREADS
-        for(int i=1;i<=domains.m;i++){
+        for(int i=0;i<domains.m;i++){
             ITERATOR_TASK_6<TYPE,RANGE<TV_INT>,T1,T2,T3,T4,T5,T6>* task=new ITERATOR_TASK_6<TYPE,RANGE<TV_INT>,T1,T2,T3,T4,T5,T6>(my_class,func,domains(i),arg1,arg2,arg3,arg4,arg5,arg6);
             thread_queue->Queue(task);}
         if(do_wait)thread_queue->Wait();
@@ -240,7 +240,7 @@ public:
     {
         if(!thread_queue){(my_class.*func)(domains(1),arg1,arg2,arg3,arg4,arg5,arg6,arg7);return;}
 #ifdef USE_PTHREADS
-        for(int i=1;i<=domains.m;i++){
+        for(int i=0;i<domains.m;i++){
             ITERATOR_TASK_7<TYPE,RANGE<TV_INT>,T1,T2,T3,T4,T5,T6,T7>* task=new ITERATOR_TASK_7<TYPE,RANGE<TV_INT>,T1,T2,T3,T4,T5,T6,T7>(my_class,func,domains(i),arg1,arg2,arg3,arg4,arg5,arg6,arg7);
             thread_queue->Queue(task);}
         if(do_wait)thread_queue->Wait();
@@ -253,7 +253,7 @@ public:
     {
         if(!thread_queue){(my_class.*func)(domains(1),arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8);return;}
 #ifdef USE_PTHREADS
-        for(int i=1;i<=domains.m;i++){
+        for(int i=0;i<domains.m;i++){
             ITERATOR_TASK_8<TYPE,RANGE<TV_INT>,T1,T2,T3,T4,T5,T6,T7,T8>* task=new ITERATOR_TASK_8<TYPE,RANGE<TV_INT>,T1,T2,T3,T4,T5,T6,T7,T8>(my_class,func,domains(i),arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8);
             thread_queue->Queue(task);}
         thread_queue->Wait();
@@ -266,7 +266,7 @@ public:
     {
         if(!thread_queue){(my_class.*func)(domains(1),arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9);return;}
 #ifdef USE_PTHREADS
-        for(int i=1;i<=domains.m;i++){
+        for(int i=0;i<domains.m;i++){
             ITERATOR_TASK_9<TYPE,RANGE<TV_INT>,T1,T2,T3,T4,T5,T6,T7,T8,T9>* task=new ITERATOR_TASK_9<TYPE,RANGE<TV_INT>,T1,T2,T3,T4,T5,T6,T7,T8,T9>(my_class,func,domains(i),arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9);
             thread_queue->Queue(task);}
         if(do_wait)thread_queue->Wait();
@@ -279,7 +279,7 @@ public:
     {
         if(!thread_queue){(my_class.*func)(domains(1),arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11);return;}
 #ifdef USE_PTHREADS
-        for(int i=1;i<=domains.m;i++){
+        for(int i=0;i<domains.m;i++){
             ITERATOR_TASK_11<TYPE,RANGE<TV_INT>,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11>* task=new ITERATOR_TASK_11<TYPE,RANGE<TV_INT>,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11>(my_class,func,domains(i),arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11);
             thread_queue->Queue(task);}
         if(do_wait)thread_queue->Wait();
@@ -292,7 +292,7 @@ public:
     {
         if(!thread_queue){(my_class.*func)(domains(1),arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12);return;}
 #ifdef USE_PTHREADS
-        for(int i=1;i<=domains.m;i++){
+        for(int i=0;i<domains.m;i++){
             ITERATOR_TASK_12<TYPE,RANGE<TV_INT>,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12>* task=new ITERATOR_TASK_12<TYPE,RANGE<TV_INT>,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12>(my_class,func,domains(i),arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12);
             thread_queue->Queue(task);}
         if(do_wait)thread_queue->Wait();
@@ -305,7 +305,7 @@ public:
     {
         if(!thread_queue){(my_class.*func)(domains(1),arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13);return;}
 #ifdef USE_PTHREADS
-        for(int i=1;i<=domains.m;i++){
+        for(int i=0;i<domains.m;i++){
             ITERATOR_TASK_13<TYPE,RANGE<TV_INT>,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13>* task=new ITERATOR_TASK_13<TYPE,RANGE<TV_INT>,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13>(my_class,func,domains(i),arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13);
             thread_queue->Queue(task);}
         if(do_wait)thread_queue->Wait();
@@ -318,7 +318,7 @@ public:
     {
         if(!thread_queue){(my_class.*func)(domains(1),arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13,arg14);return;}
 #ifdef USE_PTHREADS
-        for(int i=1;i<=domains.m;i++){
+        for(int i=0;i<domains.m;i++){
             ITERATOR_TASK_14<TYPE,RANGE<TV_INT>,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14>* task=new ITERATOR_TASK_14<TYPE,RANGE<TV_INT>,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14>(my_class,func,domains(i),arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13,arg14);
             thread_queue->Queue(task);}
         if(do_wait)thread_queue->Wait();

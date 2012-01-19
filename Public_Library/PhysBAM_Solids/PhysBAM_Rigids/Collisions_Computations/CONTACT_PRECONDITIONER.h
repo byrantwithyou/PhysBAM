@@ -180,7 +180,7 @@ public:
     void Build_Fine_Problem(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,ARRAY<SOLVE_CONTACT::CONTACT<TV> >& contacts_input)
     {
         fine_to_coarse_bodies_map.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size());
-        for(int i=1;i<=fine_to_coarse_bodies_map.m;i++)
+        for(int i=0;i<fine_to_coarse_bodies_map.m;i++)
             if(rigid_body_collection.Is_Active(i))
             {
                 RIGID_BODY<TV>& body=rigid_body_collection.Rigid_Body(i);
@@ -196,7 +196,7 @@ public:
             }
         
         fine_to_coarse_contacts_map.Resize(contacts_input.m);
-        for(int i=1;i<=contacts_input.m;i++)
+        for(int i=0;i<contacts_input.m;i++)
         {
             SOLVE_CONTACT::CONTACT<TV> contact=contacts_input(i);
             if(fine_to_coarse_bodies_map(contact.id(1)) && fine_to_coarse_bodies_map(contact.id(2)))
@@ -219,7 +219,7 @@ public:
 
     void Update_Fine_Velocities(RIGID_BODY_COLLECTION<TV>& rigid_body_collection)
     {
-        for(int i=1;i<=coarse_to_fine_bodies_map.m;i++)
+        for(int i=0;i<coarse_to_fine_bodies_map.m;i++)
             rigid_body_collection.Rigid_Body(coarse_to_fine_bodies_map(i)(1)).Twist()=velocities(i);
         //LOG::cout << "lambda_normal " << lambda_normal << std::endl;
         LOG::cout << "velocities " << velocities << std::endl;
@@ -227,13 +227,13 @@ public:
 
     bool Build_Coarse_Problem(const ARRAY<PRECONDITIONER_RIGID_BODY<TV> >& fine_bodies,const ARRAY<bool>& fine_has_infinite_inertia,const ARRAY<SOLVE_CONTACT::CONTACT<TV> >& fine_contacts)
     {
-        //for(int i=1;i<=fine_bodies.m;i++)
+        //for(int i=0;i<fine_bodies.m;i++)
         //    LOG::cout << "fine body inertia " << fine_bodies(i).mass.mass << std::endl;
 
         bool merged=false;
 
         fine_to_coarse_bodies_map.Resize(fine_bodies.m);
-        for(int i=1;i<=fine_contacts.m;i++)
+        for(int i=0;i<fine_contacts.m;i++)
         {
             SOLVE_CONTACT::CONTACT<TV> contact=fine_contacts(i);
             int id0=contact.id(1);
@@ -250,7 +250,7 @@ public:
 //    LOG::cout << "body inertia " << bodies(bodies.m).mass.mass << std::endl;
             }
         }
-        for(int i=1;i<=fine_bodies.m;i++)
+        for(int i=0;i<fine_bodies.m;i++)
         {
             if(!fine_to_coarse_bodies_map(i))
             {
@@ -263,7 +263,7 @@ public:
         }
 
         fine_to_coarse_contacts_map.Resize(fine_contacts.m);
-        for(int i=1;i<=fine_contacts.m;i++)
+        for(int i=0;i<fine_contacts.m;i++)
         {
             const SOLVE_CONTACT::CONTACT<TV>& old_contact=fine_contacts(i);
             int id0=fine_to_coarse_bodies_map(old_contact.id(1));
@@ -292,7 +292,7 @@ public:
     {
         lambda_normal.Fill(0);
         //lambda_tangent.Fill(VECTOR<T,d-1>((T)0));
-        for(int i=1;i<=fine_contacts.m;i++)
+        for(int i=0;i<fine_contacts.m;i++)
         {
             int id=fine_to_coarse_contacts_map(i);
             if(id)
@@ -309,7 +309,7 @@ public:
     T Residual(ARRAY<TWIST<TV> >& velocities,ARRAY<SOLVE_CONTACT::CONTACT<TV> >& contacts,ARRAY<T>& lambda_normal)
     {
         T maximum_residual=0;
-        for(int i=1;i<=contacts.m;i++)
+        for(int i=0;i<contacts.m;i++)
         {
             SOLVE_CONTACT::CONTACT<TV>& contact=contacts(i);
             T violation=TWIST<TV>::Dot_Product(contact.normal_constraint(1),velocities(contact.id(1)))+TWIST<TV>::Dot_Product(contact.normal_constraint(2),velocities(contact.id(2)))-contact.normal_relative_velocity;
@@ -335,7 +335,7 @@ public:
 
         //LOG::cout << "fine_to_coarse_contacts_map " << fine_to_coarse_contacts_map << std::endl;
 
-        /*for(int i=1;i<=contacts.m;i++)
+        /*for(int i=0;i<contacts.m;i++)
         {
             SOLVE_CONTACT::CONTACT<TV>& contact=contacts(i);
             T residual=TWIST<TV>::Dot_Product(contact.normal_constraint(1),velocities(contact.id(1)))+TWIST<TV>::Dot_Product(contact.normal_constraint(2),velocities(contact.id(2)))-contact.normal_relative_velocity;
@@ -349,7 +349,7 @@ public:
 
         //HASHTABLE<VECTOR<int,2>,VECTOR<TWIST<TV>,2> > pair_wrenches;
 
-        for(int i=1;i<=fine_contacts.m;i++)
+        for(int i=0;i<fine_contacts.m;i++)
         {
             int id=fine_to_coarse_contacts_map(i);
             if(id)
@@ -390,7 +390,7 @@ public:
         ARRAY<SOLVE_CONTACT::CONTACT<TV> > subset_contacts(indices.m);
         ARRAY<T> subset_lambda_normal(indices.m);
         ARRAY<VECTOR<T,d-1> > subset_lambda_tangent(indices.m);
-        for(int i=1;i<=indices.m;i++)
+        for(int i=0;i<indices.m;i++)
         {
             int index=indices(i);
             subset_contacts(i)=contacts(index);
@@ -406,7 +406,7 @@ public:
 
         PROJECTED_GAUSS_SEIDEL::Solve(velocities,has_infinite_inertia,subset_contacts,subset_lambda_normal,subset_lambda_tangent,tolerance,iteration_maximum,false);
 
-        for(int i=1;i<=indices.m;i++)
+        for(int i=0;i<indices.m;i++)
         {
             int index=indices(i);
             lambda_normal(index)=subset_lambda_normal(i);
@@ -416,7 +416,7 @@ public:
 
     void Solve(T tolerance,int iteration_maximum,bool recursive=true)
     {
-        for(int i=1;i<=contacts.m;i++)
+        for(int i=0;i<contacts.m;i++)
           LOG::cout << "contact " << i << " " << contacts(i).normal << std::endl;
 
         if(bodies.m<2 || contacts.m<1 || !recursive)
@@ -440,7 +440,7 @@ public:
             if(merged)
             {
                 ARRAY<int> removed_indices;
-                for(int i=1;i<=contacts.m;i++)
+                for(int i=0;i<contacts.m;i++)
                     if(!preconditioner.fine_to_coarse_contacts_map(i))
                         removed_indices.Append(i);
                 
@@ -473,7 +473,7 @@ public:
         //LOG::cout << "velocities " << velocities << std::endl;
         LOG::cout << "residual 0 " << Residual(velocities,contacts,lambda_normal) << std::endl;
 
-        /*for(int i=1;i<=bodies.m;i++)
+        /*for(int i=0;i<bodies.m;i++)
         {
             LOG::cout << "mass " << i << " " << bodies(i).mass << std::endl;
             }*/
@@ -481,7 +481,7 @@ public:
 //print out force sums per interaction pair
         /*HASHTABLE<VECTOR<int,2>,T> pair_forces;
         HASHTABLE<VECTOR<int,2>,VECTOR<TWIST<TV>,2> > pair_wrenches;
-        for(int i=1;i<=contacts.m;i++)
+        for(int i=0;i<contacts.m;i++)
         {
             //LOG::cout << contacts(i).inverse_mass_times_normal_constraint << std::endl;
             VECTOR<int,2> pair=contacts(i).id.Sorted();

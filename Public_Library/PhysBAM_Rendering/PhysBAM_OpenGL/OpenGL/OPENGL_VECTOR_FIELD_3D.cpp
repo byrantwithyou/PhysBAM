@@ -34,7 +34,7 @@ Display(const int in_color) const
         vector_color.Send_To_GL_Pipeline();
         glLineWidth(1);glDisable(GL_LIGHTING);glDisable(GL_TEXTURE_2D);
         ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-        for(int i=1;i<=vector_locations.m;i++){
+        for(int i=0;i<vector_locations.m;i++){
             head=vector_locations(i)+(T)size*vector_field(i);
             OpenGL_Line(vector_locations(i),head,vertices);
             if(draw_arrowhead){
@@ -51,7 +51,7 @@ Display(const int in_color) const
             glGetFloatv(GL_POINT_SIZE,&old_point_size);
             glPointSize(2.0);
             vertices.Resize(0);
-            for(int i=1;i<=vector_locations.m;i++)
+            for(int i=0;i<vector_locations.m;i++)
                 if(vector_field(i).Magnitude_Squared()>0) OpenGL_Vertex(vector_locations(i),vertices);
             OpenGL_Draw_Arrays(GL_POINTS,3,vertices);
             vector_color.Send_To_GL_Pipeline();
@@ -60,7 +60,7 @@ Display(const int in_color) const
         if(draw_value){
             glDisable(GL_DEPTH_TEST);
             (vector_color+OPENGL_COLOR(0.8,0.8,0.8)).Send_To_GL_Pipeline();
-            for(int i=1;i<=vector_locations.m;i++)
+            for(int i=0;i<vector_locations.m;i++)
                 OpenGL_String(vector_locations(i)+(T)1.1*(T)size*vector_field(i),STRING_UTILITIES::string_sprintf("%.3f %.3f %.3f",vector_field(i).x,vector_field(i).y,vector_field(i).z));
             vector_color.Send_To_GL_Pipeline();
             glEnable(GL_DEPTH_TEST);}
@@ -72,7 +72,7 @@ Display(const int in_color) const
         if(!vector_hat) vector_hat=gluNewQuadric();
         glDisable(GL_CULL_FACE);
         OPENGL_MATERIAL(vector_color).Send_To_GL_Pipeline(); // arrowhead needs material
-        for(int i=1;i<=vector_locations.m;i++){
+        for(int i=0;i<vector_locations.m;i++){
             T len_squared=vector_field(i).Magnitude_Squared();
             if(len_squared>0){
                 VECTOR<T,3> orthogonal_vector=vector_field(i).Orthogonal_Vector();

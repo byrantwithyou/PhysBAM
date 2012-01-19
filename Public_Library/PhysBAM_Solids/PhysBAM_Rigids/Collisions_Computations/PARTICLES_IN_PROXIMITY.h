@@ -62,7 +62,7 @@ ARRAY<int> Convex_Hull(ARRAY<VECTOR<T,2> >& points)
     angles(1).x=(T)(-pi);
     angles(1).y=1;
 
-    /*for(int i=1;i<=angles.m;i++)
+    /*for(int i=0;i<angles.m;i++)
         LOG::cout << "angle " << i << " " << angles(i).x << " " << angles(i).y << std::endl;*/
 
     for(int i=2;i<=points.m;i++)
@@ -74,7 +74,7 @@ ARRAY<int> Convex_Hull(ARRAY<VECTOR<T,2> >& points)
     CONVEX_HULL_COMPARATOR<T> comparator;
     Sort(angles,comparator);
 
-    /*for(int i=1;i<=angles.m;i++)
+    /*for(int i=0;i<angles.m;i++)
       LOG::cout << "angle " << i << " " << angles(i).x << " " << angles(i).y << std::endl;*/
 
     hull.Append(corner);
@@ -135,7 +135,7 @@ bool Normal_Is_Admissible(RIGID_BODY<VECTOR<T,3> >& body,int particle,VECTOR<T,3
 
     TV normal_residual=body.Rotation().Inverse_Rotate(normal);
 
-    for(int i=1;i<=incident_elements.m;i++)
+    for(int i=0;i<incident_elements.m;i++)
     {
         TV element_normal=surface->Face_Normal(incident_elements(i));
         T dot=TV::Dot_Product(element_normal,normal_residual);
@@ -245,7 +245,7 @@ void Aggregate_And_Stagger_Convex_Regions(ARRAY<TV>& locations, ARRAY<TV>& norma
         {
             T min_distance=FLT_MAX;
             int min_index=0;
-            for(int j=1;j<=candidates.m;j++)
+            for(int j=0;j<candidates.m;j++)
             {
                 if(candidates(j)!=i)
                 {
@@ -331,7 +331,7 @@ ARRAY<int> Eliminate_Redundant_Contact_Points(ARRAY<VECTOR<T,3> >& locations,ARR
             ARRAY<int> candidates;
             partition.Proximity_List(normals(i),distance_threshold,candidates);
             //LOG::cout << "candidates " << i << " " << candidates << std::endl;
-            for(int j=1;j<=candidates.m;j++)
+            for(int j=0;j<candidates.m;j++)
                 if(TV::Dot_Product(normals(i),normals(candidates(j)))>normal_threshold)
                     regions_union.Union(i,candidates(j));
         }
@@ -357,7 +357,7 @@ ARRAY<int> Eliminate_Redundant_Contact_Points(ARRAY<VECTOR<T,3> >& locations,ARR
             normal.Normalize();
             VECTOR<TV,TV::dimension-1> tangents=Tangent_Space(normal);
             ARRAY<VECTOR<T,2> > projected_offsets(region.m);
-            for(int k=1;k<=region.m;k++)
+            for(int k=0;k<region.m;k++)
             {
                 TV offset=locations(region(k))-locations(region(1));
                 for(int c=1;c<TV::dimension;c++)
@@ -370,7 +370,7 @@ ARRAY<int> Eliminate_Redundant_Contact_Points(ARRAY<VECTOR<T,3> >& locations,ARR
                 if(distances(region(k))<distances(region(deepest)))
                     deepest=k;
             bool deepest_in_hull=false;
-            for(int k=1;k<=convex_hull.m;k++)
+            for(int k=0;k<convex_hull.m;k++)
             {
                 points.Append(region(convex_hull(k)));
                 if(convex_hull(k)==deepest)
@@ -414,7 +414,7 @@ void All_Particles_In_Proximity(RIGID_BODY<TV>& body_1,RIGID_BODY<TV>& body_2,AR
                 region_threshold_1=Get_Maximum_Edge_Length(*body_1.simplicial_object);
                 Aggregate_And_Stagger_Convex_Regions(locations_1,normals_1,distances_1,region_threshold_1);
             }
-            for(int i=1;i<=normals_1.m;i++)
+            for(int i=0;i<normals_1.m;i++)
                 normals_1(i)=-normals_1(i);
         }
     }
@@ -443,7 +443,7 @@ void All_Particles_In_Proximity(RIGID_BODY<TV>& body_1,RIGID_BODY<TV>& body_2,AR
     distances_merged.Append_Elements(distances_2);
 
     ARRAY<int> pruned_set=Eliminate_Redundant_Contact_Points(locations_merged,normals_merged,distances_merged);
-    for(int i=1;i<=pruned_set.m;i++)
+    for(int i=0;i<pruned_set.m;i++)
     {
         locations.Append(locations_merged(pruned_set(i)));
         normals.Append(normals_merged(pruned_set(i)));
@@ -458,7 +458,7 @@ void All_Particles_In_Proximity(RIGID_BODY<TV>& body_1,RIGID_BODY<TV>& body_2,AR
     //if(locations.m)
     //    Smooth_Nearby_Outlying_Normals(locations,normals,distances,max(region_threshold_1,region_threshold_2));
 
-    //for(int i=1;i<=distances.m;i++)
+    //for(int i=0;i<distances.m;i++)
     //{
     //    LOG::cout << "contact " << i << " " << normals(i) << " " << distances(i) << std::endl;
     //}

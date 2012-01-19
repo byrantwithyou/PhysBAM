@@ -33,7 +33,7 @@ Earliest_Simplex_Crossover(const VECTOR<T,3>& start_X,const VECTOR<T,3>& end_X,c
         ARRAY<int> triangles_to_check;
         if(start_X==end_X){rigid_geometry.moving_simplex_hierarchy->Intersection_List(start_X,triangles_to_check,collision_thickness);}
         else rigid_geometry.moving_simplex_hierarchy->Intersection_List(RANGE<TV>::Bounding_Box(start_X,end_X),triangles_to_check,collision_thickness);
-        for(int i=1;i<=triangles_to_check.m;i++){
+        for(int i=0;i<triangles_to_check.m;i++){
             int t=triangles_to_check(i);
             TRIANGLE_3D<T> initial_triangle=World_Space_Simplex(t),final_triangle=World_Space_Simplex(t,saved_states(1).x);
             POINT_SIMPLEX_COLLISION_TYPE collision_type=TRIANGLE_3D<T>::Robust_Point_Triangle_Collision(initial_triangle,final_triangle,start_X,end_X,dt,collision_thickness_over_two,current_hit_time,
@@ -64,7 +64,7 @@ Latest_Simplex_Crossover(const VECTOR<T,3>& start_X,const VECTOR<T,3>& end_X,con
         ARRAY<int> triangles_to_check;
         if(start_X==end_X){rigid_geometry.moving_simplex_hierarchy->Intersection_List(start_X,triangles_to_check,collision_thickness);}
         else rigid_geometry.moving_simplex_hierarchy->Intersection_List(RANGE<TV>::Bounding_Box(start_X,end_X),triangles_to_check,collision_thickness);
-        for(int i=1;i<=triangles_to_check.m;i++){
+        for(int i=0;i<triangles_to_check.m;i++){
             int t=triangles_to_check(i);
             TRIANGLE_3D<T> initial_triangle=World_Space_Simplex(t),final_triangle=World_Space_Simplex(t,saved_states(1).x);
             POINT_SIMPLEX_COLLISION_TYPE collision_type=TRIANGLE_3D<T>::Robust_Point_Triangle_Collision(initial_triangle,final_triangle,start_X,end_X,dt,collision_thickness_over_two,current_hit_time,
@@ -93,7 +93,7 @@ Any_Simplex_Crossover(const VECTOR<T,3>& start_X,const VECTOR<T,3>& end_X,const 
         ARRAY<int> triangles_to_check;
         if(start_X==end_X){rigid_geometry.moving_simplex_hierarchy->Intersection_List(start_X,triangles_to_check,collision_thickness);}
         else rigid_geometry.moving_simplex_hierarchy->Intersection_List(RANGE<TV>::Bounding_Box(start_X,end_X),triangles_to_check,collision_thickness);
-        for(int i=1;i<=triangles_to_check.m;i++){
+        for(int i=0;i<triangles_to_check.m;i++){
             int t=triangles_to_check(i);
             TRIANGLE_3D<T> initial_triangle=World_Space_Simplex(t),final_triangle=World_Space_Simplex(t,saved_states(1).x);
             POINT_SIMPLEX_COLLISION_TYPE collision_type=TRIANGLE_3D<T>::Robust_Point_Triangle_Collision(initial_triangle,final_triangle,start_X,end_X,dt,collision_thickness_over_two,hit_time,normal,

@@ -92,7 +92,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     deformable_body_collection.deformable_geometry.Add_Structure(new SEGMENTED_CURVE<TV>(segment_mesh,particles));
 
     // correct number nodes
-    for(int i=1;i<=deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
+    for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     // correct mass
     particles.Compute_Auxiliary_Attributes(solid_body_collection.deformable_body_collection.soft_bindings);
@@ -104,7 +104,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     }
 
     LOG::cout<<"checking bound particle effective  MASS"<<std::endl;
-    for(int b=1;b<=solid_body_collection.deformable_body_collection.binding_list.bindings.m;b++){
+    for(int b=0;b<solid_body_collection.deformable_body_collection.binding_list.bindings.m;b++){
         int particle_index=solid_body_collection.deformable_body_collection.binding_list.bindings(b)->particle_index;
         LOG::cout<<"particles.mass.effective_mass("<<particle_index<<")="<<particles.effective_mass(particle_index)<<std::endl;
     }
@@ -128,7 +128,7 @@ void Rigid_Particle_Segment()
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     PARTICLES<TV>& particles=deformable_body_collection.particles;
     // add two rigid spheres
-    for(int i=1;i<=2;i++){
+    for(int i=0;i<2;i++){
         RIGID_BODY<TV>& sphere=tests.Add_Rigid_Body("sphere",1,0);
         T sign=(T)(2*i-3);sphere.X()+=TV::Axis_Vector(1)*(sign*2);
         segment_mesh.elements(1)(i)=particles.array_collection->Add_Element();
@@ -141,7 +141,7 @@ void Deformable_Segment()
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     PARTICLES<TV>& particles=deformable_body_collection.particles;
-    for(int i=1;i<=2;i++){
+    for(int i=0;i<2;i++){
         T sign=(T)(2*i-3);
         int particle=particles.array_collection->Add_Element();
         particles.X(particle)=TV::Axis_Vector(1)*(sign*2);

@@ -80,7 +80,7 @@ void Solve(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,RIGIDS_COLLISION_CAL
                 bool need_another_level_iteration=true;int level_iteration=0;
                 while(need_another_level_iteration && ++level_iteration<=rigid_body_collisions.contact_level_iterations){need_another_level_iteration=false;
                     if(parameters.use_epsilon_scaling_for_level) epsilon_scale=(T)iteration*level_iteration/(parameters.contact_iterations*rigid_body_collisions.contact_level_iterations);
-                    for(int i=1;i<=pairs.m;i++){int id_1=pairs(i)(1),id_2=pairs(i)(2);
+                    for(int i=0;i<pairs.m;i++){int id_1=pairs(i)(1),id_2=pairs(i)(2);
                         if(rigid_body_collisions.skip_collision_check.Skip_Pair(id_1,id_2)) continue;
                         if(rigid_body_collisions.prune_contact_using_velocity){
                             TRIPLE<int,int,int>& pair_scale=rigid_body_collisions.pairs_scale.Get(pairs(i).Sorted());
@@ -268,7 +268,7 @@ bool Solve_Projected_Gauss_Seidel(RIGID_BODY_COLLECTION<TV>& rigid_body_collecti
     Get_Contact_Points(rigid_body_collection,collision_callbacks,pairs,contacts,contact_proximity,dt,true,true);
     
     pairs_processed_by_contact.Remove_All();
-    for(int i=1;i<=contacts.m;i++)
+    for(int i=0;i<contacts.m;i++)
         pairs_processed_by_contact.Set(contacts(i).id.Sorted());
     
     if(contacts.m==0)
@@ -302,7 +302,7 @@ void Get_Contact_Points(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,RIGIDS_
     {
         LOG::SCOPE scope_tn("restoring tn states");
         //restore tn states
-        for(int i=1;i<=rigid_body_collection.simulated_rigid_body_particles.m;i++)
+        for(int i=0;i<rigid_body_collection.simulated_rigid_body_particles.m;i++)
             collision_callbacks.Swap_State(rigid_body_collection.simulated_rigid_body_particles(i));
         scope_tn.Pop();
     }
@@ -310,7 +310,7 @@ void Get_Contact_Points(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,RIGIDS_
     //HASHTABLE<VECTOR<int,2> > found_pairs;
 
     LOG::SCOPE scope_contacts("creating contacts");
-    for(int i=1;i<=pairs.m;i++)
+    for(int i=0;i<pairs.m;i++)
     {
         int id_1=pairs(i)(1),id_2=pairs(i)(2);
         ARRAY<TV> locations,normals;
@@ -321,7 +321,7 @@ void Get_Contact_Points(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,RIGIDS_
         PARTICLES_IN_PROXIMITY::All_Particles_In_Proximity(body_1,body_2,locations,normals,distances,contact_proximity,stagger_points);
         //scope_apip.Pop();
 
-        for(int j=1;j<=locations.m;j++)
+        for(int j=0;j<locations.m;j++)
             contacts.Append(CONTACT<TV>(body_1,body_2,locations(j),normals(j),distances(j),dt));
 
         //if(locations.m)
@@ -339,7 +339,7 @@ void Get_Contact_Points(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,RIGIDS_
     {
         LOG::SCOPE scope_tn1("restoring tn+1 states");
         //restore tn+1 states
-        for(int i=1;i<=rigid_body_collection.simulated_rigid_body_particles.m;i++)
+        for(int i=0;i<rigid_body_collection.simulated_rigid_body_particles.m;i++)
             collision_callbacks.Swap_State(rigid_body_collection.simulated_rigid_body_particles(i));
         scope_tn1.Pop();
     }
@@ -367,7 +367,7 @@ void Push_Out(RIGIDS_COLLISION_CALLBACKS<TV>& collision_callbacks,RIGID_BODY_COL
     //store linear velocity/update rotational momentum
     //set velocity to 0
     ARRAY<TV> linear_velocities(rigid_body_collection.simulated_rigid_body_particles.m);
-    for(int i=1;i<=rigid_body_collection.simulated_rigid_body_particles.m;i++)
+    for(int i=0;i<rigid_body_collection.simulated_rigid_body_particles.m;i++)
     {
         RIGID_BODY<TV>& body=rigid_body_collection.Rigid_Body(rigid_body_collection.simulated_rigid_body_particles(i));
         linear_velocities(i)=body.Twist().linear;
@@ -380,12 +380,12 @@ void Push_Out(RIGIDS_COLLISION_CALLBACKS<TV>& collision_callbacks,RIGID_BODY_COL
 
     PROJECTED_GAUSS_SEIDEL::Solve(rigid_body_collection,contacts,tolerance,iteration_maximum);
 
-    for(int i=1;i<=rigid_body_collection.simulated_rigid_body_particles.m;i++)
+    for(int i=0;i<rigid_body_collection.simulated_rigid_body_particles.m;i++)
         if(!rigid_body_collection.rigid_body_particle.kinematic(rigid_body_collection.simulated_rigid_body_particles(i)))
             collision_callbacks.Euler_Step_Position(i,1,0); //should pass the actual time.
 
     //restore linear velocity/update rotational velocity
-    for(int i=1;i<=rigid_body_collection.simulated_rigid_body_particles.m;i++)
+    for(int i=0;i<rigid_body_collection.simulated_rigid_body_particles.m;i++)
     {
         RIGID_BODY<TV>& body=rigid_body_collection.Rigid_Body(rigid_body_collection.simulated_rigid_body_particles(i));
         body.Twist().linear=linear_velocities(i);

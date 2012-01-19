@@ -166,7 +166,7 @@ Update_Partitions(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,
             int position=0;
             ARRAY<ARRAY<int> > moved_bodies(number_of_processors);
             MPI_UTILITIES::Unpack(moved_bodies,recv_buffers(i),position,*comm);
-            for(int new_proc=1;new_proc<=moved_bodies.m;new_proc++){
+            for(int new_proc=0;new_proc<moved_bodies.m;new_proc++){
                 for(int body=1;body<=moved_bodies(new_proc).m;body++){
                     partition_id_from_particle_index(moved_bodies(new_proc)(body))=PARTITION_ID(new_proc);
                     for(int b=1;b<=particles_of_partition(PARTITION_ID(i)).m;b++){ // TODO faster way to do this?
@@ -175,7 +175,7 @@ Update_Partitions(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,
                             break;}}
                     particles_of_partition(PARTITION_ID(new_proc)).Append(moved_bodies(new_proc)(body));}}}
         else{
-            for(int new_proc=1;new_proc<=bodies_to_send.m;new_proc++){
+            for(int new_proc=0;new_proc<bodies_to_send.m;new_proc++){
                 for(int body=1;body<=bodies_to_send(new_proc).m;body++){
                     partition_id_from_particle_index(bodies_to_send(new_proc)(body))=PARTITION_ID(new_proc);
                     for(int b=1;b<=particles_of_partition(PARTITION_ID(rank+1)).m;b++){ // TODO faster way to do this?
@@ -290,18 +290,18 @@ Simple_Partition(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,
     ARRAY<COLLISION_GEOMETRY_ID> object_indices;spatial_partition.Get_Potential_Collisions(local_domain,object_indices);
     // Determine which bodies belong on which processors
     PARTITION_ID id(rank+1);
-    for(int i=1;i<=partition_id_from_particle_index.m;i++) partition_id_from_particle_index(i)=PARTITION_ID(-1);
+    for(int i=0;i<partition_id_from_particle_index.m;i++) partition_id_from_particle_index(i)=PARTITION_ID(-1);
     for(int i=1;i<=rigid_body_collection_input.rigid_body_particle.array_collection->Size();i++){
         int p=rigid_body_collection_input.rigid_body_particle.id(i);
         if(local_domain.Lazy_Inside(rigid_body_collection_input.rigid_body_particle.X(p)))
             partition_id_from_particle_index(p)=id;}
 
     //Add bodies not in partition to final extra partition
-    for(int i=1;i<=spatial_partition.bodies_not_in_partition.m;i++){
+    for(int i=0;i<spatial_partition.bodies_not_in_partition.m;i++){
         int p=rigid_body_collection_input.rigid_geometry_collection.collision_body_list->collision_geometry_id_to_geometry_id.Get(spatial_partition.bodies_not_in_partition(i));
         partition_id_from_particle_index(p)=particles_of_partition.Size();}
 
-    for(int i=1;i<=partition_id_from_particle_index.m;i++){
+    for(int i=0;i<partition_id_from_particle_index.m;i++){
         partition_id_from_particle_index(i)=PARTITION_ID(Reduce_Max(Value(partition_id_from_particle_index(i))));
         particles_of_partition(partition_id_from_particle_index(i)).Append(i);}
 }
@@ -400,7 +400,7 @@ Prune_And_Exchange_Impulses(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,ARR
         MPI_UTILITIES::Datatype<T_SPIN>().Pack_size(accumulators_to_send.m,*comm)+1;
     send_buffer.Resize(buffer_size);int position=0;
     MPI_UTILITIES::Pack(accumulators_to_send.m,send_buffer,position,*comm);
-    for(int b=1;b<=accumulators_to_send.m;b++){
+    for(int b=0;b<accumulators_to_send.m;b++){
         RIGID_BODY<TV>& rigid_body=rigid_body_collection.Rigid_Body(accumulators_to_send(b));
         RIGID_BODY_IMPULSE_ACCUMULATOR<TV,TV::dimension-1> *impulse_accumulator=dynamic_cast<RIGID_BODY_IMPULSE_ACCUMULATOR<TV,TV::dimension-1>*>(rigid_body.impulse_accumulator);
         MPI_UTILITIES::Pack(accumulators_to_send(b),impulse_accumulator->accumulated_impulse.linear,impulse_accumulator->accumulated_impulse.angular,send_buffer,position,*comm);}

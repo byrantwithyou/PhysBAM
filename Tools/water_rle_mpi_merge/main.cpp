@@ -51,7 +51,7 @@ public:
     ARRAY<RANGE<TV_HORIZONTAL_INT> > regions;mpi_grid.Find_Boundary_Regions(regions,RANGE<TV_HORIZONTAL_INT>::Zero_Box(),true,RANGE<VECTOR<int,1> >(-5,-5),true);
     RANGE<TV_HORIZONTAL_INT> global_region=global_uniform_grid.Get_Horizontal_Grid().Domain_Indices();
     neighbor_overlaps.Resize(regions.m);
-    for(int n=1;n<=regions.m;n++)if(regions(n).Lazy_Intersection(global_region-offset)) neighbor_overlaps(n)=true;}
+    for(int n=0;n<regions.m;n++)if(regions(n).Lazy_Intersection(global_region-offset)) neighbor_overlaps(n)=true;}
 
     template<class RW>
     void Read(std::istream& input)
@@ -67,7 +67,7 @@ public:
     template<class T_ITERATOR,class T2> void Put(const ARRAY<T2>& local_data,ARRAY<T2>& global_data) const
     {Put<T_ITERATOR>(local_data,Interior_Region(T_ITERATOR::Sentinels()),global_data);
     ARRAY<RANGE<TV_HORIZONTAL_INT> > regions;mpi_grid.Find_Boundary_Regions(regions,T_ITERATOR::Sentinels(),true,RANGE<VECTOR<int,1> >(-grid.number_of_ghost_cells,-1),true);
-    for(int n=1;n<=regions.m;n++)if(!neighbor_overlaps(n)) Put<T_ITERATOR>(local_data,regions(n),global_data);}
+    for(int n=0;n<regions.m;n++)if(!neighbor_overlaps(n)) Put<T_ITERATOR>(local_data,regions(n),global_data);}
 
     template<class T2> struct Put_Component{template<class T_FACE> static void Apply(const LOCAL_GRID& local_grid,const ARRAY<T2>& local_data,ARRAY<T2>& global_data)
     {local_grid.Put<T_FACE>(local_data,global_data);}};
@@ -155,12 +155,12 @@ public:
     if(!FILE_UTILITIES::File_Exists(output_filename)) return true;
     // check file times
     std::string prefix=input_directory+"/"+filename+".";
-    for(int i=1;i<=number_of_processes;i++)if(FILE_UTILITIES::Compare_File_Times(input_directory+STRING_UTILITIES::string_sprintf("/%d/",i)+filename,output_filename)>0) return true;
+    for(int i=0;i<number_of_processes;i++)if(FILE_UTILITIES::Compare_File_Times(input_directory+STRING_UTILITIES::string_sprintf("/%d/",i)+filename,output_filename)>0) return true;
     return false;}
 
     bool Source_Files_Exist(const int frame) const
     {std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
-        for(int i=1;i<=number_of_processes;i++)if(!FILE_UTILITIES::File_Exists(input_directory+"/"+STRING_UTILITIES::string_sprintf("%d",i)+"/rle_grid."+f)) return false;
+        for(int i=0;i<number_of_processes;i++)if(!FILE_UTILITIES::File_Exists(input_directory+"/"+STRING_UTILITIES::string_sprintf("%d",i)+"/rle_grid."+f)) return false;
     return true;}
 
     static bool Grid_Parameters_Match(const T_GRID& grid1,const T_GRID& grid2)
@@ -227,7 +227,7 @@ Merge_Grids(const std::string& filename)
 {
     local_grids.Resize(number_of_processes);
     if(merge){
-        for(int p=1;p<=number_of_processes;p++){
+        for(int p=0;p<number_of_processes;p++){
             local_grids(p)=new LOCAL_GRID<T_GRID>(grid,global_uniform_grid);
             FILE_UTILITIES::Read_From_File<RW>(input_directory+STRING_UTILITIES::string_sprintf("/%d/",p)+filename,*local_grids(p));}
 
@@ -241,20 +241,20 @@ Merge_Grids(const std::string& filename)
 
         // sanity check
         int global_column_count=grid.horizontal_grid.Domain_Indices().Size(),total_local_column_count=0;
-        for(int p=1;p<=number_of_processes;p++) total_local_column_count+=local_grids(p)->grid.horizontal_grid.Domain_Indices().Size();
+        for(int p=0;p<number_of_processes;p++) total_local_column_count+=local_grids(p)->grid.horizontal_grid.Domain_Indices().Size();
         if(global_column_count!=total_local_column_count){
             LOG::cout<<"Column mismatch:"<<std::endl;
             LOG::cout<<"  global horizontal grid = "<<grid.horizontal_grid<<", columns = "<<global_column_count<<std::endl;
-            for(int p=1;p<=number_of_processes;p++)
+            for(int p=0;p<number_of_processes;p++)
                 LOG::cout<<"  local horizontal grid "<<p<<" = "<<local_grids(p)->grid.horizontal_grid<<", columns = "<<local_grids(p)->grid.horizontal_grid.Domain_Indices().Size()<<std::endl;
             exit(1);}
 
         // copying columns
         grid.columns.Resize(grid.horizontal_grid.Get_MAC_Grid().Domain_Indices(grid.number_of_ghost_cells+1),false,false);
-        for(int p=1;p<=number_of_processes;p++)T_GRID::ARRAYS_HORIZONTAL::template REBIND<ARRAY<T_RUN> >::TYPE::Shifted_Put(local_grids(p)->grid.columns,grid.columns,local_grids(p)->offset);
+        for(int p=0;p<number_of_processes;p++)T_GRID::ARRAYS_HORIZONTAL::template REBIND<ARRAY<T_RUN> >::TYPE::Shifted_Put(local_grids(p)->grid.columns,grid.columns,local_grids(p)->offset);
         grid.Topology_Changed();grid.Compute_Auxiliary_Information();
         // verifying column equality
-        for(int p=1;p<=number_of_processes;p++){
+        for(int p=0;p<number_of_processes;p++){
             TV_HORIZONTAL_INT offset=local_grids(p)->offset;
             typename T_ARRAYS_HORIZONTAL::template REBIND<ARRAY<T_RUN> >::TYPE& local_columns=local_grids(p)->grid.columns;
             for(HORIZONTAL_CELL_ITERATOR iterator(local_grids(p)->grid.horizontal_grid,grid.number_of_ghost_cells);iterator.Valid();iterator.Next()){
@@ -295,14 +295,14 @@ Merge_Cell_Data(const std::string& filename,const int verify_bandwidth)
     if(merge){
         // read
         ARRAY<ARRAY<T2> > local_data(number_of_processes);
-        for(int p=1;p<=number_of_processes;p++){std::string name=input_directory+STRING_UTILITIES::string_sprintf("/%d/",p)+filename;
+        for(int p=0;p<number_of_processes;p++){std::string name=input_directory+STRING_UTILITIES::string_sprintf("/%d/",p)+filename;
             if(!FILE_UTILITIES::File_Exists(name)){LOG::cout<<"Missing "<<name<<"; skipping merge"<<std::endl;return;}
             FILE_UTILITIES::Read_From_File<RW>(name,local_data(p));}
         // merge
         ARRAY<T2> global_data(grid.number_of_cells);
-        for(int p=1;p<=number_of_processes;p++)local_grids(p)->template Put<CELL_ITERATOR>(local_data(p),global_data);
+        for(int p=0;p<number_of_processes;p++)local_grids(p)->template Put<CELL_ITERATOR>(local_data(p),global_data);
         // verify
-        for(int p=1;p<=number_of_processes;p++){int index=0;
+        for(int p=0;p<number_of_processes;p++){int index=0;
             T max_error=local_grids(p)->template Maximum_Error<CELL_ITERATOR>(local_data(p),global_data,verify_bandwidth,index);
             if(max_error>0){LOG::cout<<filename<<": max error on process "<<p<<" = "<<max_error<<" ("<<index<<" = "<<local_data(p)(index)<<")"<<std::endl;}}
         // write
@@ -311,7 +311,7 @@ Merge_Cell_Data(const std::string& filename,const int verify_bandwidth)
         std::string name=output_directory+"/"+filename;
         if(!FILE_UTILITIES::File_Exists(name)){LOG::cout<<"Missing "<<name<<"; skipping split"<<std::endl;return;}
         ARRAY<T2> global_data;FILE_UTILITIES::Read_From_File<RW>(name,global_data);
-        for(int p=1;p<=number_of_processes;p++){
+        for(int p=0;p<number_of_processes;p++){
             ARRAY<T2> local_data(local_grids(p)->grid.number_of_cells);
             local_grids(p)->template Get<CELL_ITERATOR>(local_data,global_data);
             FILE_UTILITIES::Write_To_File<RW>(input_directory+STRING_UTILITIES::string_sprintf("/%d/",p)+filename,local_data);}}
@@ -325,14 +325,14 @@ Merge_Face_Data(const std::string& filename,const int verify_bandwidth)
     if(merge){
         // read
         ARRAY<ARRAY<T2> > local_data(number_of_processes);
-        for(int p=1;p<=number_of_processes;p++){std::string name=input_directory+STRING_UTILITIES::string_sprintf("/%d/",p)+filename;
+        for(int p=0;p<number_of_processes;p++){std::string name=input_directory+STRING_UTILITIES::string_sprintf("/%d/",p)+filename;
             if(!FILE_UTILITIES::File_Exists(name)){LOG::cout<<"Missing "<<name<<"; skipping merge"<<std::endl;return;}
             FILE_UTILITIES::Read_From_File<RW>(name,local_data(p));}
         // merge
         ARRAY<T2> global_data(grid.number_of_faces);
-        for(int p=1;p<=number_of_processes;p++)T_GRID::template Face_Loop<typename LOCAL_GRID<T_GRID>::template Put_Component<T2> >(*local_grids(p),local_data(p),global_data);
+        for(int p=0;p<number_of_processes;p++)T_GRID::template Face_Loop<typename LOCAL_GRID<T_GRID>::template Put_Component<T2> >(*local_grids(p),local_data(p),global_data);
         // verify
-        for(int p=1;p<=number_of_processes;p++){
+        for(int p=0;p<number_of_processes;p++){
             std::string prefix=filename+": max error on process "+STRING_UTILITIES::string_sprintf("%d",p);
             T_GRID::template Horizontal_Face_Loop<Horizontal_Maximum_Error<T2> >(prefix,*local_grids(p),local_data(p),global_data,verify_bandwidth);
             Vertical_Maximum_Error<T2>(prefix,*local_grids(p),local_data(p),global_data,verify_bandwidth);}
@@ -342,7 +342,7 @@ Merge_Face_Data(const std::string& filename,const int verify_bandwidth)
         std::string name=output_directory+"/"+filename;
         if(!FILE_UTILITIES::File_Exists(name)){LOG::cout<<"Missing "<<name<<"; skipping split"<<std::endl;return;}
         ARRAY<T2> global_data;FILE_UTILITIES::Read_From_File<RW>(name,global_data);
-        for(int p=1;p<=number_of_processes;p++){
+        for(int p=0;p<number_of_processes;p++){
             ARRAY<T2> local_data(local_grids(p)->grid.number_of_cells);
             T_GRID::template Face_Loop<typename LOCAL_GRID<T_GRID>::template Get_Component<T2> >(*local_grids(p),local_data,global_data);
             FILE_UTILITIES::Write_To_File<RW>(input_directory+STRING_UTILITIES::string_sprintf("/%d/",p)+filename,local_data);}}
@@ -358,7 +358,7 @@ Merge_Particles(const std::string& filename)
         int process_without_particles=0;
         bool particles_in_long_cells=false;
         ARRAY<ARRAY<T_PARTICLES*> > local_data(number_of_processes);
-        for(int p=1;p<=number_of_processes;p++){std::string name=input_directory+STRING_UTILITIES::string_sprintf("/%d/",p)+filename;
+        for(int p=0;p<number_of_processes;p++){std::string name=input_directory+STRING_UTILITIES::string_sprintf("/%d/",p)+filename;
             if(!FILE_UTILITIES::File_Exists(name)){LOG::cout<<"Missing "<<name<<"; skipping merge"<<std::endl;return;}
             FILE_UTILITIES::Read_From_File<RW>(name,local_data(p));
             if(local_data(p).m!=local_grids(p)->grid.number_of_blocks && local_data(p).m!=local_grids(p)->grid.number_of_blocks+1){
@@ -367,12 +367,12 @@ Merge_Particles(const std::string& filename)
             if(local_data(p).m==local_grids(p)->grid.number_of_blocks+1) particles_in_long_cells=true;}
         // check for zero size
         if(process_without_particles){
-            for(int p=1;p<=number_of_processes;p++)if(local_data(p).m){
+            for(int p=0;p<number_of_processes;p++)if(local_data(p).m){
                 LOG::cerr<<filename<<": process "<<p<<" has particles but process "<<process_without_particles<<" does not."<<std::endl;exit(1);}
             FILE_UTILITIES::Write_To_File<RW>(output_directory+"/"+filename,ARRAY<T_PARTICLES*>());return;}
         // merge
         ARRAY<T_PARTICLES*> global_data(grid.number_of_blocks+particles_in_long_cells);
-        for(int p=1;p<=number_of_processes;p++){
+        for(int p=0;p<number_of_processes;p++){
             RANGE<TV_HORIZONTAL_INT> region=local_grids(p)->Interior_Region(BLOCK_ITERATOR::Sentinels()),interior_region=region.Thickened(-1);
             // copy interior particles
             {BLOCK_ITERATOR local(local_grids(p)->grid,interior_region),global(grid,interior_region+local_grids(p)->offset);
@@ -391,7 +391,7 @@ Merge_Particles(const std::string& filename)
         // write
         FILE_UTILITIES::Write_To_File<RW>(output_directory+"/"+filename,global_data);
         // free memory
-        for(int p=1;p<=number_of_processes;p++)local_data(p).Delete_Pointers_And_Clean_Memory();
+        for(int p=0;p<number_of_processes;p++)local_data(p).Delete_Pointers_And_Clean_Memory();
         global_data.Delete_Pointers_And_Clean_Memory();}
     else{
         std::string name=output_directory+"/"+filename;
@@ -399,7 +399,7 @@ Merge_Particles(const std::string& filename)
         ARRAY<T_PARTICLES*> global_data;FILE_UTILITIES::Read_From_File<RW>(name,global_data);
         if(!global_data.m) return;
         bool particles_in_long_cells=global_data.m==grid.number_of_blocks+1;
-        for(int p=1;p<=number_of_processes;p++){
+        for(int p=0;p<number_of_processes;p++){
             ARRAY<T_PARTICLES*> local_data(local_grids(p)->grid.number_of_blocks+particles_in_long_cells);
             RANGE<TV_HORIZONTAL_INT> region=local_grids(p)->Interior_Region(BLOCK_ITERATOR::Sentinels()),interior_region=region.Thickened(-1);
             // copy interior particles

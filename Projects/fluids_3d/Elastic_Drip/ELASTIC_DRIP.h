@@ -118,7 +118,7 @@ void Construct_Levelsets_For_Objects(const T time)
         rigid_body_particles.Rigid_Body(2).position=VECTOR<T,3>(1.1,.7,1);
         rigid_body_particles.Rigid_Body(1).velocity=VECTOR<T,3>(0,-.1,0);
         rigid_body_particles.Rigid_Body(2).velocity=VECTOR<T,3>(0,.1,0);
-        for(int r=1;r<=rigid_body_list.rigid_bodies.m;r++)rigid_body_particles.Rigid_Body(r).position+=time*rigid_body_particles.Rigid_Body(r).velocity;}
+        for(int r=0;r<rigid_body_list.rigid_bodies.m;r++)rigid_body_particles.Rigid_Body(r).position+=time*rigid_body_particles.Rigid_Body(r).velocity;}
 
     static bool initialized=false;
     GRID<TV>& grid=fluids_parameters.grid;
@@ -128,7 +128,7 @@ void Construct_Levelsets_For_Objects(const T time)
     V_object.Resize(grid,3,false,false);
     for(int i=-2;i<=grid.m+3;i++)for(int j=-2;j<=grid.n+3;j++)for(int ij=-2;ij<=grid.mn+3;ij++){
         T min_phi=1;int min_r=1;VECTOR<T,3> X=grid.X(i,j,ij);
-        for(int r=1;r<=rigid_body_list.rigid_bodies.m;r++){
+        for(int r=0;r<rigid_body_list.rigid_bodies.m;r++){
             T phi=rigid_body_particles.Rigid_Body(r).Implicit_Surface_Value(X);
             if(min_phi>phi){min_phi=phi;min_r=r;}}
         phi_object(i,j,ij)=min_phi;
@@ -167,7 +167,7 @@ void Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
 {
     GRID<TV>& grid=fluids_parameters.grid;
     ARRAY<T,VECTOR<int,3> >& phi=fluids_parameters.particle_levelset_evolution.phi;
-    for(int i=1;i<=grid.m;i++)for(int j=1;j<=grid.n;j++)for(int ij=1;ij<=grid.mn;ij++){
+    for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++)for(int ij=0;ij<grid.mn;ij++){
         VECTOR<T,3> X=grid.X(i,j,ij);
         if(source.Lazy_Inside(X))phi(i,j,ij)=min(phi(i,j,ij),source.Signed_Distance(X));}
 }
@@ -178,7 +178,7 @@ void Get_Source_Reseed_Mask(ARRAY<bool,VECTOR<int,3> >*& cell_centered_mask,cons
 {
     GRID<TV>& grid=fluids_parameters.grid;
     delete cell_centered_mask;cell_centered_mask=new ARRAY<bool,VECTOR<int,3> >(grid);
-    for(int i=1;i<=grid.m;i++)for(int j=1;j<=grid.n;j++)for(int ij=1;ij<=grid.mn;ij++)if(source.Lazy_Inside(grid.X(i,j,ij)))(*cell_centered_mask)(i,j,ij)=true;
+    for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++)for(int ij=0;ij<grid.mn;ij++)if(source.Lazy_Inside(grid.X(i,j,ij)))(*cell_centered_mask)(i,j,ij)=true;
 }
 //#####################################################################
 // Function Adjust_Particle_For_Objects
@@ -205,10 +205,10 @@ void Get_Source_Velocities(const T time) PHYSBAM_OVERRIDE
 {
     GRID<TV> &grid=fluids_parameters.grid,&u_grid=fluids_parameters.u_grid,&v_grid=fluids_parameters.v_grid,&w_grid=fluids_parameters.w_grid;
     PROJECTION_3D<T>& projection=fluids_parameters.incompressible.projection;
-    for(int i=1;i<=u_grid.m;i++)for(int j=1;j<=u_grid.n;j++)for(int ij=1;ij<=u_grid.mn;ij++)if(source.Lazy_Inside(u_grid.X(i,j,ij))){projection.elliptic_solver->psi_N_u(i,j,ij)=true;projection.u(i,j,ij)=source_velocity.x;}
-    for(int i=1;i<=v_grid.m;i++)for(int j=1;j<=v_grid.n;j++)for(int ij=1;ij<=v_grid.mn;ij++)if(source.Lazy_Inside(v_grid.X(i,j,ij))){projection.elliptic_solver->psi_N_v(i,j,ij)=true;projection.v(i,j,ij)=source_velocity.y;}
-    for(int i=1;i<=w_grid.m;i++)for(int j=1;j<=w_grid.n;j++)for(int ij=1;ij<=w_grid.mn;ij++)if(source.Lazy_Inside(w_grid.X(i,j,ij))){projection.elliptic_solver->psi_N_w(i,j,ij)=true;projection.w(i,j,ij)=source_velocity.z;}
-    if(fluids_parameters.use_strain)for(int i=1;i<=grid.m;i++)for(int j=1;j<=grid.n;j++)for(int ij=1;ij<=grid.mn;ij++)if(source.Lazy_Inside(grid.X(i,j,ij)))fluids_parameters.e(i,j,ij)=SYMMETRIC_MATRIX<T,3>();
+    for(int i=0;i<u_grid.m;i++)for(int j=0;j<u_grid.n;j++)for(int ij=0;ij<u_grid.mn;ij++)if(source.Lazy_Inside(u_grid.X(i,j,ij))){projection.elliptic_solver->psi_N_u(i,j,ij)=true;projection.u(i,j,ij)=source_velocity.x;}
+    for(int i=0;i<v_grid.m;i++)for(int j=0;j<v_grid.n;j++)for(int ij=0;ij<v_grid.mn;ij++)if(source.Lazy_Inside(v_grid.X(i,j,ij))){projection.elliptic_solver->psi_N_v(i,j,ij)=true;projection.v(i,j,ij)=source_velocity.y;}
+    for(int i=0;i<w_grid.m;i++)for(int j=0;j<w_grid.n;j++)for(int ij=0;ij<w_grid.mn;ij++)if(source.Lazy_Inside(w_grid.X(i,j,ij))){projection.elliptic_solver->psi_N_w(i,j,ij)=true;projection.w(i,j,ij)=source_velocity.z;}
+    if(fluids_parameters.use_strain)for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++)for(int ij=0;ij<grid.mn;ij++)if(source.Lazy_Inside(grid.X(i,j,ij)))fluids_parameters.e(i,j,ij)=SYMMETRIC_MATRIX<T,3>();
 }
 //#####################################################################
 // Function Get_Object_Velocities

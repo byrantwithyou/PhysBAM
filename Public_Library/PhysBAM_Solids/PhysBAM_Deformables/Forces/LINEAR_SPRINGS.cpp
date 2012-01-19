@@ -64,7 +64,7 @@ template<class TV> void LINEAR_SPRINGS<TV>::
 Set_Restlength_From_Material_Coordinates(ARRAY_VIEW<TV> material_coordinates)
 {
     restlength.Resize(segment_mesh.elements.m,false);Invalidate_CFL();
-    for(int i=1;i<=segment_mesh.elements.m;i++) restlength(i)=(material_coordinates(segment_mesh.elements(i)(1))-material_coordinates(segment_mesh.elements(i)(2))).Magnitude();
+    for(int i=0;i<segment_mesh.elements.m;i++) restlength(i)=(material_coordinates(segment_mesh.elements(i)(1))-material_coordinates(segment_mesh.elements(i)(2))).Magnitude();
     visual_restlength=restlength;
 }
 //#####################################################################
@@ -74,7 +74,7 @@ template<class TV> void LINEAR_SPRINGS<TV>::
 Clamp_Restlength(const T clamped_restlength)
 {
     Invalidate_CFL();
-    for(int i=1;i<=restlength.m;i++) restlength(i)=max(visual_restlength(i),clamped_restlength);
+    for(int i=0;i<restlength.m;i++) restlength(i)=max(visual_restlength(i),clamped_restlength);
 }
 //#####################################################################
 // Function Enable_Plasticity
@@ -111,7 +111,7 @@ template<class TV> void LINEAR_SPRINGS<TV>::
 Set_Stiffness_Based_On_Reduced_Mass(const T scaling_coefficient)
 {
     constant_youngs_modulus=0;youngs_modulus.Resize(segment_mesh.elements.m,false);Invalidate_CFL();
-    for(int i=1;i<=segment_mesh.elements.m;i++){
+    for(int i=0;i<segment_mesh.elements.m;i++){
         int end1,end2;segment_mesh.elements(i).Get(end1,end2);T reduced_mass=Pseudo_Inverse(particles.one_over_effective_mass(end1)+particles.one_over_effective_mass(end2));
         youngs_modulus(i)=scaling_coefficient*reduced_mass/restlength(i);}
 }
@@ -123,7 +123,7 @@ Set_Stiffness_Based_On_Reduced_Mass(ARRAY_VIEW<const T> scaling_coefficient)
 {
     PHYSBAM_ASSERT(scaling_coefficient.Size()==segment_mesh.elements.m);
     constant_youngs_modulus=0;youngs_modulus.Resize(segment_mesh.elements.m,false);Invalidate_CFL();
-    for(int i=1;i<=segment_mesh.elements.m;i++){
+    for(int i=0;i<segment_mesh.elements.m;i++){
         int end1,end2;segment_mesh.elements(i).Get(end1,end2);T reduced_mass=Pseudo_Inverse(particles.one_over_effective_mass(end1)+particles.one_over_effective_mass(end2));
         youngs_modulus(i)=scaling_coefficient(i)*reduced_mass/restlength(i);}
 }
@@ -134,7 +134,7 @@ template<class TV> void LINEAR_SPRINGS<TV>::
 Set_Overdamping_Fraction(const T overdamping_fraction) // 1 is critically damped
 {
     constant_damping=0;damping.Resize(segment_mesh.elements.m,false,false);Invalidate_CFL();
-    for(int i=1;i<=segment_mesh.elements.m;i++){
+    for(int i=0;i<segment_mesh.elements.m;i++){
         T harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(segment_mesh.elements(i)(1))+particles.one_over_effective_mass(segment_mesh.elements(i)(2)));
         T ym;if(!youngs_modulus.m) ym=constant_youngs_modulus;else ym=youngs_modulus(i);
         damping(i)=overdamping_fraction*2*sqrt(ym*restlength(i)*harmonic_mass);}
@@ -146,7 +146,7 @@ template<class TV> void LINEAR_SPRINGS<TV>::
 Set_Overdamping_Fraction(ARRAY_VIEW<const T> overdamping_fraction) // 1 is critically damped
 {
     constant_damping=0;damping.Resize(segment_mesh.elements.m,false,false);Invalidate_CFL();
-    for(int i=1;i<=segment_mesh.elements.m;i++){
+    for(int i=0;i<segment_mesh.elements.m;i++){
         T harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(segment_mesh.elements(i)(1))+particles.one_over_effective_mass(segment_mesh.elements(i)(2)));
         T ym;if(!youngs_modulus.m) ym=constant_youngs_modulus;else ym=youngs_modulus(i);
         damping(i)=overdamping_fraction(i)*2*sqrt(ym*restlength(i)*harmonic_mass);}
@@ -159,7 +159,7 @@ Ensure_Minimum_Overdamping_Fraction(const T overdamping_fraction) // 1 is critic
 {
     constant_damping=0;damping.Resize(segment_mesh.elements.m);Invalidate_CFL();
     ARRAY<T> save_damping(damping);Set_Overdamping_Fraction(overdamping_fraction);
-    for(int k=1;k<=damping.m;k++) damping(k)=max(damping(k),save_damping(k));
+    for(int k=0;k<damping.m;k++) damping(k)=max(damping(k),save_damping(k));
 }
 //#####################################################################
 // Function Clamp_Restlength_With_Fraction_Of_Springs
@@ -202,7 +202,7 @@ Update_Position_Based_State(const T time,const bool is_position_update)
                 plastic_visual_restlength(s)*plasticity_clamp_ratio);
             //visual_restlength(s)=clamp(optimization_current_length(s)-strain_sign*plastic_yield_strain(s)*restlength(s),restlength(s)/plasticity_clamp_ratio,restlength(s)*plasticity_clamp_ratio);
             plastic_yield_strain(s)+=plastic_hardening(s)*(strain_magnitude-plastic_yield_strain(s));}}
-    if(compute_half_forces) for(int i=1;i<=states.m;i++) states(i).sqrt_coefficient=sqrt(states(i).coefficient);
+    if(compute_half_forces) for(int i=0;i<states.m;i++) states(i).sqrt_coefficient=sqrt(states(i).coefficient);
     if(!segment_mesh.incident_elements) segment_mesh.Initialize_Incident_Elements();
 }
 //#####################################################################
@@ -320,7 +320,7 @@ Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> frequency)
         const VECTOR<int,2>& nodes=segment_mesh.elements(s);
         T ym=youngs_modulus.m?youngs_modulus(s):constant_youngs_modulus;
         T d=damping.m?damping(s):constant_damping;
-        for(int k=1;k<=2;k++){
+        for(int k=0;k<2;k++){
             frequency(nodes[k]).elastic_squared+=particles.one_over_effective_mass(nodes[k])/restlength(s)*4*ym*one_over_cfl_number_squared;
             frequency(nodes[k]).damping+=particles.one_over_effective_mass(nodes[k])/restlength(s)*2*d*one_over_cfl_number;}}
 }
@@ -377,7 +377,7 @@ Print_Deformation_Statistics() const
 {
     LOG::SCOPE scope("linear spring deformation","linear spring deformation");
     ARRAY<T> deformation(segment_mesh.elements.m,false);
-    for(int s=1;s<=segment_mesh.elements.m;s++){
+    for(int s=0;s<segment_mesh.elements.m;s++){
         int i,j;segment_mesh.elements(s).Get(i,j);
         T length=(particles.X(i)-particles.X(j)).Magnitude(),rl=visual_restlength(s);
         deformation(s)=rl?abs(length-rl)/rl:length==0?0:FLT_MAX;}
@@ -395,7 +395,7 @@ template<class TV> typename TV::SCALAR LINEAR_SPRINGS<TV>::
 Maximum_Compression_Or_Expansion_Fraction(int* index) const
 {
     T max_compression=0;int max_index=1;
-    for(int s=1;s<=segment_mesh.elements.m;s++){
+    for(int s=0;s<segment_mesh.elements.m;s++){
         int i,j;segment_mesh.elements(s).Get(i,j);
         T length=(particles.X(i)-particles.X(j)).Magnitude();
         T rl=visual_restlength(s);

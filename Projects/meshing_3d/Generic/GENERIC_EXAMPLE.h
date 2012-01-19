@@ -53,7 +53,7 @@ public:
     {PHYSBAM_ASSERT(field_volume.tetrahedron_list && field_volume.triangulated_surface);
     // first search for tetrahedron containing X
     ARRAY<int> intersection_list;field_volume.hierarchy->Intersection_List(X,intersection_list,thickness);
-    for(int i=1;i<=intersection_list.m;i++){int t=intersection_list(i);
+    for(int i=0;i<intersection_list.m;i++){int t=intersection_list(i);
         if((*field_volume.tetrahedron_list)(t).Inside(X,thickness)){
             const VECTOR<int,4>& nodes=field_volume.mesh.elements(t);
             TV w=(*field_volume.tetrahedron_list)(t).First_Three_Barycentric_Coordinates(X);

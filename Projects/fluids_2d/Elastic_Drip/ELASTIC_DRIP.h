@@ -64,7 +64,7 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
 {
     GRID<TV>& grid=fluids_parameters.grid;
     ARRAY<T,VECTOR<int,2> >& phi=fluids_parameters.particle_levelset_evolution->phi;
-    for(int i=1;i<=grid.m;i++)for(int j=1;j<=grid.n;j++)
+    for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++)
         phi(i,j)=1;
 }
 //#####################################################################
@@ -74,7 +74,7 @@ void Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
 {
     GRID<TV>& grid=fluids_parameters.grid;
     ARRAY<T,VECTOR<int,2> >& phi=fluids_parameters.particle_levelset_evolution->phi;
-    for(int i=1;i<=grid.m;i++)for(int j=1;j<=grid.n;j++){
+    for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++){
         VECTOR<T,2> X=grid.X(i,j);
         if(source.Lazy_Inside(X))phi(i,j)=min(phi(i,j),source.Signed_Distance(X));}
 }
@@ -87,7 +87,7 @@ void Get_Source_Reseed_Mask(ARRAY<bool,VECTOR<int,2> >*& cell_centered_mask,cons
     delete cell_centered_mask;cell_centered_mask=new ARRAY<bool,VECTOR<int,2> >(grid);
 
     T padding=3*grid.max_dx_dy;
-    for(int i=1;i<=grid.m;i++)for(int j=1;j<=grid.n;j++)if(!source.Outside(grid.X(i,j),padding))(*cell_centered_mask)(i,j)=true;
+    for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++)if(!source.Outside(grid.X(i,j),padding))(*cell_centered_mask)(i,j)=true;
 }
 //#####################################################################
 // Function Get_Source_Velocities

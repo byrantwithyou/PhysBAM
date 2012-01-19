@@ -59,11 +59,11 @@ Initialize()
     bool adjacent_triangles_defined=(triangle_mesh.adjacent_elements!=0);if(!adjacent_triangles_defined) triangle_mesh.Initialize_Adjacent_Elements();
 
     int number_quadruples=0;
-    for(int t=1;t<=triangle_mesh.elements.m;t++) for(int a=1;a<=(*triangle_mesh.adjacent_elements)(t).m;a++) if((*triangle_mesh.adjacent_elements)(t)(a)>t) number_quadruples++;
+    for(int t=0;t<triangle_mesh.elements.m;t++) for(int a=1;a<=(*triangle_mesh.adjacent_elements)(t).m;a++) if((*triangle_mesh.adjacent_elements)(t)(a)>t) number_quadruples++;
     spring_particles.Resize(number_quadruples,false);youngs_modulus.Resize(number_quadruples);restlength.Resize(number_quadruples);
     visual_restlength.Resize(number_quadruples);damping.Resize(number_quadruples);attached_edge_length.Resize(number_quadruples);attached_edge_restlength.Resize(number_quadruples);
     int index=0; // reset number
-    for(int t=1;t<=triangle_mesh.elements.m;t++){
+    for(int t=0;t<triangle_mesh.elements.m;t++){
         int t1,t2,t3;triangle_mesh.elements(t).Get(t1,t2,t3);
         for(int a=1;a<=(*triangle_mesh.adjacent_elements)(t).m;a++){
             int s=(*triangle_mesh.adjacent_elements)(t)(a);
@@ -80,7 +80,7 @@ Initialize()
 template<class T> void AXIAL_BENDING_SPRINGS<T>::
 Set_Restlength_From_Particles()
 {
-    for(int s=1;s<=spring_particles.m;s++){const VECTOR<int,4>& nodes=spring_particles(s);
+    for(int s=0;s<spring_particles.m;s++){const VECTOR<int,4>& nodes=spring_particles(s);
         TV axial_direction;VECTOR<T,2> weights;
         Axial_Vector(nodes,visual_restlength(s),axial_direction,weights,attached_edge_restlength(s));
         restlength(s)=visual_restlength(s);}
@@ -92,7 +92,7 @@ template<class T> void AXIAL_BENDING_SPRINGS<T>::
 Set_Overdamping_Fraction(const T overdamping_fraction) // 1 is critically damped
 {
     Invalidate_CFL();
-    for(int s=1;s<=spring_particles.m;s++){
+    for(int s=0;s<spring_particles.m;s++){
         T harmonic_mass=Pseudo_Divide((T)4,particles.one_over_effective_mass.Subset(spring_particles(s)).Sum());
         damping(s)=overdamping_fraction*2*sqrt(youngs_modulus(s)*restlength(s)*harmonic_mass);}
 }
@@ -103,7 +103,7 @@ template<class T> void AXIAL_BENDING_SPRINGS<T>::
 Set_Overdamping_Fraction(ARRAY_VIEW<const T> overdamping_fraction) // 1 is critically damped
 {
     Invalidate_CFL();
-    for(int s=1;s<=spring_particles.m;s++){
+    for(int s=0;s<spring_particles.m;s++){
         T harmonic_mass=Pseudo_Divide((T)4,particles.one_over_effective_mass.Subset(spring_particles(s)).Sum());
         damping(s)=overdamping_fraction(s)*2*sqrt(youngs_modulus(s)*restlength(s)*harmonic_mass);}
 }
@@ -115,7 +115,7 @@ Ensure_Minimum_Overdamping_Fraction(const T overdamping_fraction) // 1 is critic
 {
     Invalidate_CFL();
     ARRAY<T> save_damping(damping);Set_Overdamping_Fraction(overdamping_fraction);
-    for(int k=1;k<=damping.m;k++) damping(k)=max(damping(k),save_damping(k));
+    for(int k=0;k<damping.m;k++) damping(k)=max(damping(k),save_damping(k));
 }
 //#####################################################################
 // Function Update_Position_Based_State
@@ -182,7 +182,7 @@ Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> frequency)
         T one_over_mass_times_restlength=(T).25/restlength(s)*particles.one_over_effective_mass.Subset(nodes).Sum();
         T elastic_hertz_squared=4*youngs_modulus(s)*one_over_mass_times_restlength*one_over_cfl_number_squared;
         T damping_hertz=2*damping(s)*one_over_mass_times_restlength*one_over_cfl_number;
-        for(int k=1;k<=4;k++){frequency(nodes[k]).elastic_squared+=elastic_hertz_squared;frequency(nodes[k]).damping+=damping_hertz;}}
+        for(int k=0;k<4;k++){frequency(nodes[k]).elastic_squared+=elastic_hertz_squared;frequency(nodes[k]).damping+=damping_hertz;}}
 }
 //#####################################################################
 // Function CFL_Strain_Rate
@@ -213,7 +213,7 @@ CFL_Strain_Rate() const
 template<class T> void AXIAL_BENDING_SPRINGS<T>::
 Set_Stiffness_Based_On_Reduced_Mass(const T scaling_coefficient)
 {
-    for(int s=1;s<=spring_particles.m;s++){
+    for(int s=0;s<spring_particles.m;s++){
         T harmonic_mass=Pseudo_Divide((T)4,particles.one_over_effective_mass.Subset(spring_particles(s)).Sum());
         youngs_modulus(s)=scaling_coefficient*harmonic_mass/restlength(s);}
 }

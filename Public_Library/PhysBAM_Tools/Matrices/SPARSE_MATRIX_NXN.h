@@ -89,7 +89,7 @@ public:
     {if(!diagonal_index) diagonal_index=new VECTOR_ND<int>(n);else if(diagonal_index->n!=n)diagonal_index->Resize(n);
     for(int i=0;i<n;i++){
         SPARSE_VECTOR_ND<T>& row=*A(i);
-        for(int j=1;j<=row.number_of_active_indices;j++) if(row.indices[j]==i){(*diagonal_index)(i)=j;continue;}}}
+        for(int j=0;j<row.number_of_active_indices;j++) if(row.indices[j]==i){(*diagonal_index)(i)=j;continue;}}}
 
     void Multiply(const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const
     {for(int i=0;i<n;i++) result(i)=A(i)->Dot_Product(x);}
@@ -106,7 +106,7 @@ public:
     bool Symmetric(const T tolerance=1e-7)
     {for(int i=0;i<n;i++){
         SPARSE_VECTOR_ND<T>& row=*A(i);
-        for(int j=1;j<=row.number_of_active_indices;j++) if(abs((*this)(row.indices[j],i)-row.x[j])>tolerance) return false;}
+        for(int j=0;j<row.number_of_active_indices;j++) if(abs((*this)(row.indices[j],i)-row.x[j])>tolerance) return false;}
     return true;}
 
     bool Positive_Diagonal_And_Nonnegative_Row_Sum(T tolerance=1e-7)
@@ -118,7 +118,7 @@ public:
             LOG::cout<<"Diagonal Entry "<<i<<" Contains Non Positive Element: "<<row(i)<<std::endl<<row;
 #endif
             return false;}
-        T sum=0;for(int j=1;j<=row.number_of_active_indices;j++) sum+=row.x[j];
+        T sum=0;for(int j=0;j<row.number_of_active_indices;j++) sum+=row.x[j];
         if(sum<-tolerance){
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
             LOG::cout<<"Sum Of Row "<<i<<" Is Negative: "<<sum<<std::endl<<row;
@@ -205,6 +205,6 @@ public:
 //#####################################################################
 };
 template<class T> inline std::ostream& operator<<(std::ostream& output_stream,const SPARSE_MATRIX_NXN<T>& A)
-{for(int i=1;i<=A.n;i++){for(int j=1;j<=A.n;j++)output_stream<<A(i,j)<<" ";output_stream<<std::endl;}return output_stream;}
+{for(int i=0;i<A.n;i++){for(int j=0;j<A.n;j++)output_stream<<A(i,j)<<" ";output_stream<<std::endl;}return output_stream;}
 }
 #endif

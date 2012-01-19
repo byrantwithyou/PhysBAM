@@ -161,7 +161,7 @@ Update_Angular_Momentum()
 template<class TV> void RIGID_BODY_COLLECTION<TV>::
 Update_Angular_Velocity(const ARRAY<int>& rigid_body_particles)
 {
-    for(int i=1;i<=rigid_body_particles.m;i++) Rigid_Body(rigid_body_particles(i)).Update_Angular_Velocity();
+    for(int i=0;i<rigid_body_particles.m;i++) Rigid_Body(rigid_body_particles(i)).Update_Angular_Velocity();
 }
 //#####################################################################
 // Function Update_Angular_Momentum
@@ -169,7 +169,7 @@ Update_Angular_Velocity(const ARRAY<int>& rigid_body_particles)
 template<class TV> void RIGID_BODY_COLLECTION<TV>::
 Update_Angular_Momentum(const ARRAY<int>& rigid_body_particles)
 {
-    for(int i=1;i<=rigid_body_particles.m;i++) Rigid_Body(rigid_body_particles(i)).Update_Angular_Momentum();
+    for(int i=0;i<rigid_body_particles.m;i++) Rigid_Body(rigid_body_particles(i)).Update_Angular_Momentum();
 }
 //#####################################################################
 // Function Read
@@ -238,7 +238,7 @@ Update_Simulated_Particles()
 
     ARRAY<bool> rigid_particle_is_simulated(rigid_particles_number);
     rigid_particle_is_simulated.Subset(simulated_rigid_body_particles).Fill(true);
-    for(int i=1;i<=rigids_forces.m;i++) rigids_forces(i)->Update_Mpi(rigid_particle_is_simulated);
+    for(int i=0;i<rigids_forces.m;i++) rigids_forces(i)->Update_Mpi(rigid_particle_is_simulated);
 }
 //#####################################################################
 // Function Add_Velocity_Independent_Forces
@@ -246,7 +246,7 @@ Update_Simulated_Particles()
 template<class TV> void RIGID_BODY_COLLECTION<TV>::
 Add_Velocity_Independent_Forces(ARRAY_VIEW<TWIST<TV> > rigid_F_full,const T time) const
 {
-    for(int k=1;k<=rigids_forces.m;k++)
+    for(int k=0;k<rigids_forces.m;k++)
         if(rigids_forces(k)->use_velocity_independent_forces) rigids_forces(k)->Add_Velocity_Independent_Forces(rigid_F_full,time);
 }
 //#####################################################################
@@ -256,7 +256,7 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TWIST<TV> > rigid_F_full,const T time
 template<class TV> void RIGID_BODY_COLLECTION<TV>::
 Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V_full,ARRAY_VIEW<TWIST<TV> > rigid_F_full,const T time) const
 {
-    for(int k=1;k<=rigids_forces.m;k++)
+    for(int k=0;k<rigids_forces.m;k++)
         if(rigids_forces(k)->use_velocity_dependent_forces) rigids_forces(k)->Add_Velocity_Dependent_Forces(rigid_V_full,rigid_F_full,time);
 }
 //#####################################################################
@@ -268,7 +268,7 @@ Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V_full,A
     assert(rigid_F_full.Size()==rigid_body_particle.array_collection->Size());
     rigid_F_full.Subset(dynamic_rigid_body_particles).Fill(TWIST<TV>()); // note we zero here because we will scale the forces below
     bool added=false;
-    for(int k=1;k<=rigids_forces.m;k++) if(rigids_forces(k)->use_implicit_velocity_independent_forces){
+    for(int k=0;k<rigids_forces.m;k++) if(rigids_forces(k)->use_implicit_velocity_independent_forces){
         rigids_forces(k)->Add_Implicit_Velocity_Independent_Forces(rigid_V_full,rigid_F_full,time);added=true;}
     if(added) rigid_F_full.Subset(simulated_rigid_body_particles)*=scale;
 }
@@ -278,7 +278,7 @@ Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V_full,A
 template<class TV> void RIGID_BODY_COLLECTION<TV>::
 Update_Position_Based_State(const T time)
 {
-    for(int k=1;k<=rigids_forces.m;k++)
+    for(int k=0;k<rigids_forces.m;k++)
         if(rigids_forces(k)->use_position_based_state) rigids_forces(k)->Update_Position_Based_State(time);
 }
 //#####################################################################
@@ -289,8 +289,8 @@ Compute_Energy(const T time,T& kinetic_energy,T& potential_energy) const
 {
     potential_energy=0;
     kinetic_energy=0;
-    for(int i=1;i<=rigids_forces.m;i++) potential_energy+=rigids_forces(i)->Potential_Energy(time);
-    for(int i=1;i<=dynamic_rigid_body_particles.m;i++){int p=dynamic_rigid_body_particles(i);
+    for(int i=0;i<rigids_forces.m;i++) potential_energy+=rigids_forces(i)->Potential_Energy(time);
+    for(int i=0;i<dynamic_rigid_body_particles.m;i++){int p=dynamic_rigid_body_particles(i);
         kinetic_energy+=Rigid_Body(p).Kinetic_Energy();}
 }
 //#####################################################################

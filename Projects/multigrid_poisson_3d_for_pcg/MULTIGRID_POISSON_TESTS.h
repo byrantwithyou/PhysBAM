@@ -165,7 +165,7 @@ public:
     {
 	Initialize();
 	Write_Frame(0);
-	for(int frame=1;frame<=frames;frame++){
+	for(int frame=0;frame<frames;frame++){
 	    if(frame>1){
 		Set_Cell_Type(frame);
 		multigrid_poisson_solver->Reinitialize_Multigrid_Hierarchy();
@@ -181,7 +181,7 @@ public:
 	    if(write_substeps){
 		Write_Substep(0,frame);
 		ARRAY<T,TV_INT> x_save(x);
-		for(int i=1;i<=100;i++){
+		for(int i=0;i<100;i++){
 		    x=x_save;
 		    multigrid_poisson_solver->Discretization().b=b;
 		    bool converged=cg.Solve(multigrid_system,x,multigrid_poisson_solver->Discretization().b,multigrid_poisson_solver->Discretization().u,tmp,1e-7,1,i);
@@ -346,7 +346,7 @@ public:
 
 		b(index)=0;
 		if(multigrid_poisson.cell_type(index)==MULTIGRID_POISSON<T,d>::INTERIOR_CELL_TYPE){
-		    for(int v=1;v<=d;v++){
+		    for(int v=0;v<d;v++){
 			const T_INDEX& axis_vector=T_INDEX::Axis_Vector(v);
 			if(multigrid_poisson.cell_type(index+axis_vector)==MULTIGRID_POISSON<T,d>::DIRICHLET_CELL_TYPE)
 			    b(index)-=(T)1/sqr(multigrid_poisson.h);

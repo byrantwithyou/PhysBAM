@@ -15,9 +15,9 @@ template<class T,class T2> void Make_River_From_Splines(GRID_2D<T>& grid,LEVELSE
     ARRAYS<VECTOR<int,2> > colors(grid,1);ARRAYS<VECTOR<int,2> >::copy(0,colors);ARRAYS<VECTOR<int,2> >::put_ghost(-1,colors,grid,1);
     ARRAYS<VECTOR<VECTOR_2D<T> ,2> > tangents(grid,0);
     // rasterize the tangents, and arclength and the spline
-    for(int segment=1;segment<=spline.segments;segment++){
+    for(int segment=0;segment<spline.segments;segment++){
         ARRAY<T>& spline_distances=spline.arclength_table(segment);
-        for(int k=1;k<=spline.samples_per_segment;k++){
+        for(int k=0;k<spline.samples_per_segment;k++){
             T t=(k-1)*spline.one_over_samples_per_segment;
             VECTOR_2D<T> location=spline.f(segment,t);VECTOR_2D<T> tangent=spline.f_prime(segment,t);
             int i,j;grid.Closest_Node(location,i,j);
@@ -27,7 +27,7 @@ template<class T,class T2> void Make_River_From_Splines(GRID_2D<T>& grid,LEVELSE
     // flood fill to choose signs for each side of the river
     FLOOD_FILL_2D().Flood_Fill(colors,edge_is_blocked,edge_is_blocked);
     std::cout<<"colors.m="<<colors.m<<std::endl;
-    for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++) if(colors(i,j)==1) levelset.phi(i,j)=grid.dx;else levelset.phi(i,j)=-grid.dx;
+    for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++) if(colors(i,j)==1) levelset.phi(i,j)=grid.dx;else levelset.phi(i,j)=-grid.dx;
 
     // extrapolate tangents and arclength
     levelset.Fast_Marching_Method();
@@ -38,19 +38,19 @@ template<class T,class T2> void Make_River_From_Splines(GRID_2D<T>& grid,LEVELSE
 
     // Rasterize the profile spline for easy interpolation
     GRID<VECTOR<T,1> > profile_grid(100,0,1);ARRAYS<VECTOR<T,1> > profile(profile_grid,0);
-    for(int segment=1;segment<=bed_spline.segments;segment++){
-        for(int k=1;k<=bed_spline.samples_per_segment;k++){
+    for(int segment=0;segment<bed_spline.segments;segment++){
+        for(int k=0;k<bed_spline.samples_per_segment;k++){
             T t=(k-1)*bed_spline.one_over_samples_per_segment;
             VECTOR_2D<T> location=bed_spline.f(segment,t);
             int i;profile_grid.Clamped_Index(VECTOR_1D<T>(location.x/4),i);profile(i)=location.y;}}
     
     // choose height for spline.
     LINEAR_INTERPOLATION<T,T> profile_interpolation;
-    for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++) height(i,j)=(T).4*(spline.total_length-distances(i,j))/spline.total_length+profile_interpolation.Clamped_To_Array(profile_grid,profile,VECTOR_1D<T>(fabs(levelset.phi(i,j))));
+    for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++) height(i,j)=(T).4*(spline.total_length-distances(i,j))/spline.total_length+profile_interpolation.Clamped_To_Array(profile_grid,profile,VECTOR_1D<T>(fabs(levelset.phi(i,j))));
 
     // adjust based on arclength (make river slope downward)
     ARRAYS<VECTOR<T,2> > river_bed_height(grid,0);
-    for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++) river_bed_height(i,j)=(T).4*(spline.total_length-distances(i,j))/spline.total_length+profile_interpolation.Clamped_To_Array(profile_grid,profile,VECTOR_1D<T>(0));
+    for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++) river_bed_height(i,j)=(T).4*(spline.total_length-distances(i,j))/spline.total_length+profile_interpolation.Clamped_To_Array(profile_grid,profile,VECTOR_1D<T>(0));
     
     FILE_UTILITIES::Write_To_File<T>("river_bed_height.gz",river_bed_height);
     FILE_UTILITIES::Write_To_File<T>("river_bed_grid.gz",grid);
@@ -61,7 +61,7 @@ template<class T,class T2> void Make_River_From_Splines(GRID_2D<T>& grid,LEVELSE
     FILE_UTILITIES::Write_To_File<T>("density.0.gz",distances);
     FILE_UTILITIES::Write_To_File<T>("temperature.0.gz",height);
     // write heightfield for photoshopping
-    ARRAYS<VECTOR<VECTOR_3D<T> ,2> > image_out(grid,0);for(int i=1;i<=grid.m;i++) for(int j=1;j<=grid.n;j++) image_out(i,j)=(T)height(i,j)*VECTOR_3D<T>(1,1,1);
+    ARRAYS<VECTOR<VECTOR_3D<T> ,2> > image_out(grid,0);for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++) image_out(i,j)=(T)height(i,j)*VECTOR_3D<T>(1,1,1);
     BMP_FILE().Write("image.bmp",image_out);
 }
 

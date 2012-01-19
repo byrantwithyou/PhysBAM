@@ -166,8 +166,8 @@ Initialize_Inside_Particles(const TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_vol
 {
     GEOMETRY_PARTICLES<TV>& particles=tetrahedralized_volume.particles;
     inside_particle_rest_positions.Resize(particles.array_collection->Size());inside_particle_segments.Resize(particles.array_collection->Size());
-    for(int t=1;t<=tetrahedralized_volume.mesh.elements.m;t++){
-        for(int v=1;v<=4;v++){int node=tetrahedralized_volume.mesh.elements(t)(v);
+    for(int t=0;t<tetrahedralized_volume.mesh.elements.m;t++){
+        for(int v=0;v<4;v++){int node=tetrahedralized_volume.mesh.elements(t)(v);
             inside_particle_rest_positions(node)=frame.Inverse()*particles.X(node);
             inside_particle_segments(node)=(int)((2*(inside_particle_rest_positions(node)(1)-tendon_fraction_1*Length())*num_segments_over_2)/Curve_Length()+1);
             if(!Analytic_Inside_Test(inside_particle_rest_positions(node))) break;}}

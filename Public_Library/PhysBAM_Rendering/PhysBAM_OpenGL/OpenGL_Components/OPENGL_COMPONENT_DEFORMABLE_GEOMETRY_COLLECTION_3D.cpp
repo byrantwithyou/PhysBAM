@@ -164,9 +164,9 @@ Reinitialize(bool force,bool read_geometry)
             filename=STRING_UTILITIES::string_sprintf("%s/%d/directions_%d",prefix.c_str(),frame,i);
             if(FILE_UTILITIES::File_Exists(filename))FILE_UTILITIES::Read_From_File<RW>(filename,hexahedralized_volume_objects(i)->vectors_at_hex_centers);}}
     if(smooth_shading){
-        for(int i=1;i<=triangulated_surface_objects.m;i++) if(triangulated_surface_objects(i)) triangulated_surface_objects(i)->Initialize_Vertex_Normals();
-        for(int i=1;i<=tetrahedralized_volume_objects.m;i++) if(tetrahedralized_volume_objects(i))tetrahedralized_volume_objects(i)->Initialize_Vertex_Normals();}
-    for(int i=1;i<=free_particles_indirect_arrays.m;i++) if(free_particles_indirect_arrays(i)){
+        for(int i=0;i<triangulated_surface_objects.m;i++) if(triangulated_surface_objects(i)) triangulated_surface_objects(i)->Initialize_Vertex_Normals();
+        for(int i=0;i<tetrahedralized_volume_objects.m;i++) if(tetrahedralized_volume_objects(i))tetrahedralized_volume_objects(i)->Initialize_Vertex_Normals();}
+    for(int i=0;i<free_particles_indirect_arrays.m;i++) if(free_particles_indirect_arrays(i)){
         ARRAY_VIEW<TV> tmp(deformable_geometry->particles.X);
         free_particles_indirect_arrays(i)->array.Exchange(tmp);}
 
@@ -238,7 +238,7 @@ Display(const int in_color) const
     Set_Display_Modes_For_Geometry_Collection(display_triangulated_surface_objects,display_tetrahedralized_volume_objects,display_hexahedralized_volume_objects,
             display_free_particles_objects);
 #ifndef USE_OPENGLES
-    for(int i=1;i<=segmented_curve_objects.m;i++){
+    for(int i=0;i<segmented_curve_objects.m;i++){
         if(!active_list(i)) continue;
         glPushName(i);
         if(segmented_curve_objects(i)){
@@ -257,7 +257,7 @@ Display(const int in_color) const
         if(free_particles_objects(i) && display_free_particles_objects){glPushName(6);free_particles_objects(i)->Display(in_color);glPopName();}
         glPopName();}
 #else
-    for(int i=1;i<=segmented_curve_objects.m;i++){
+    for(int i=0;i<segmented_curve_objects.m;i++){
         if(!active_list(i)) continue;
         if(segmented_curve_objects(i)){
             segmented_curve_objects(i)->parent_curve=0;
@@ -309,7 +309,7 @@ Cycle_Display_Mode()
 template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_3D<T,RW>::
 Cycle_Cutaway_Mode()
 {
-    for(int i=1;i<=tetrahedralized_volume_objects.m;i++) if(tetrahedralized_volume_objects(i) && active_list(i))tetrahedralized_volume_objects(i)->Cycle_Cutaway_Mode();
+    for(int i=0;i<tetrahedralized_volume_objects.m;i++) if(tetrahedralized_volume_objects(i) && active_list(i))tetrahedralized_volume_objects(i)->Cycle_Cutaway_Mode();
 }
 //#####################################################################
 // Function Show_Only_First
@@ -326,7 +326,7 @@ Show_Only_First()
 template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_3D<T,RW>::
 Decrease_Cutaway_Fraction()
 {
-    for(int i=1;i<=tetrahedralized_volume_objects.m;i++) if(tetrahedralized_volume_objects(i) && active_list(i))tetrahedralized_volume_objects(i)->Decrease_Cutaway_Fraction();
+    for(int i=0;i<tetrahedralized_volume_objects.m;i++) if(tetrahedralized_volume_objects(i) && active_list(i))tetrahedralized_volume_objects(i)->Decrease_Cutaway_Fraction();
 }
 //#####################################################################
 // Function Increase_Cutaway_Fraction
@@ -334,7 +334,7 @@ Decrease_Cutaway_Fraction()
 template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_3D<T,RW>::
 Increase_Cutaway_Fraction()
 {
-    for(int i=1;i<=tetrahedralized_volume_objects.m;i++) if(tetrahedralized_volume_objects(i) && active_list(i))tetrahedralized_volume_objects(i)->Increase_Cutaway_Fraction();
+    for(int i=0;i<tetrahedralized_volume_objects.m;i++) if(tetrahedralized_volume_objects(i) && active_list(i))tetrahedralized_volume_objects(i)->Increase_Cutaway_Fraction();
 }
 //#####################################################################
 // Function Create_One_Big_Triangulated_Surface_And_Write_To_File
@@ -371,11 +371,11 @@ Bounding_Box() const
 {
     RANGE<VECTOR<float,3> > box=RANGE<VECTOR<float,3> >::Empty_Box();
     if(draw && valid && deformable_geometry->structures.m>0){
-        for(int i=1;i<=segmented_curve_objects.m;i++) if(segmented_curve_objects(i))box.Enlarge_To_Include_Box(segmented_curve_objects(i)->Bounding_Box());
-        for(int i=1;i<=triangulated_surface_objects.m;i++) if(triangulated_surface_objects(i))box.Enlarge_To_Include_Box(triangulated_surface_objects(i)->Bounding_Box());
-        for(int i=1;i<=tetrahedralized_volume_objects.m;i++) if(tetrahedralized_volume_objects(i))box.Enlarge_To_Include_Box(tetrahedralized_volume_objects(i)->Bounding_Box());
-        for(int i=1;i<=hexahedralized_volume_objects.m;i++) if(hexahedralized_volume_objects(i))box.Enlarge_To_Include_Box(hexahedralized_volume_objects(i)->Bounding_Box());        
-        for(int i=1;i<=free_particles_objects.m;i++) if(free_particles_objects(i)) box.Enlarge_To_Include_Box(free_particles_objects(i)->Bounding_Box());}
+        for(int i=0;i<segmented_curve_objects.m;i++) if(segmented_curve_objects(i))box.Enlarge_To_Include_Box(segmented_curve_objects(i)->Bounding_Box());
+        for(int i=0;i<triangulated_surface_objects.m;i++) if(triangulated_surface_objects(i))box.Enlarge_To_Include_Box(triangulated_surface_objects(i)->Bounding_Box());
+        for(int i=0;i<tetrahedralized_volume_objects.m;i++) if(tetrahedralized_volume_objects(i))box.Enlarge_To_Include_Box(tetrahedralized_volume_objects(i)->Bounding_Box());
+        for(int i=0;i<hexahedralized_volume_objects.m;i++) if(hexahedralized_volume_objects(i))box.Enlarge_To_Include_Box(hexahedralized_volume_objects(i)->Bounding_Box());        
+        for(int i=0;i<free_particles_objects.m;i++) if(free_particles_objects(i)) box.Enlarge_To_Include_Box(free_particles_objects(i)->Bounding_Box());}
     return box;
 }
 //#####################################################################
@@ -408,8 +408,8 @@ Toggle_Hide_Unselected()
 template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_3D<T,RW>::
 Toggle_Draw_Interior()
 {
-    for(int i=1;i<=tetrahedralized_volume_objects.m;i++) if(tetrahedralized_volume_objects(i) && active_list(i)) tetrahedralized_volume_objects(i)->Toggle_Boundary_Only();
-    for(int i=1;i<=hexahedralized_volume_objects.m;i++) if(hexahedralized_volume_objects(i) && active_list(i)) hexahedralized_volume_objects(i)->Toggle_Boundary_Only();
+    for(int i=0;i<tetrahedralized_volume_objects.m;i++) if(tetrahedralized_volume_objects(i) && active_list(i)) tetrahedralized_volume_objects(i)->Toggle_Boundary_Only();
+    for(int i=0;i<hexahedralized_volume_objects.m;i++) if(hexahedralized_volume_objects(i) && active_list(i)) hexahedralized_volume_objects(i)->Toggle_Boundary_Only();
 }
 //#####################################################################
 // Function Toggle_Draw_Subsets
@@ -417,9 +417,9 @@ Toggle_Draw_Interior()
 template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_3D<T,RW>::
 Toggle_Draw_Subsets()
 {
-    for(int i=1;i<=tetrahedralized_volume_objects.m;i++) if(tetrahedralized_volume_objects(i) && active_list(i))
+    for(int i=0;i<tetrahedralized_volume_objects.m;i++) if(tetrahedralized_volume_objects(i) && active_list(i))
         tetrahedralized_volume_objects(i)->draw_subsets=!tetrahedralized_volume_objects(i)->draw_subsets;
-    for(int i=1;i<=hexahedralized_volume_objects.m;i++) if(hexahedralized_volume_objects(i) && active_list(i))
+    for(int i=0;i<hexahedralized_volume_objects.m;i++) if(hexahedralized_volume_objects(i) && active_list(i))
         hexahedralized_volume_objects(i)->draw_subsets=!hexahedralized_volume_objects(i)->draw_subsets;
 }
 //#####################################################################
@@ -510,11 +510,11 @@ Highlight_Selection(OPENGL_SELECTION *selection)
 template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_3D<T,RW>::
 Clear_Highlight()
 {
-    for(int i=1;i<=segmented_curve_objects.m;i++) if(segmented_curve_objects(i) && active_list(i)) segmented_curve_objects(i)->Clear_Highlight();
-    for(int i=1;i<=triangulated_surface_objects.m;i++) if(triangulated_surface_objects(i) && active_list(i)) triangulated_surface_objects(i)->Clear_Highlight();
-    for(int i=1;i<=tetrahedralized_volume_objects.m;i++) if(tetrahedralized_volume_objects(i) && active_list(i)) tetrahedralized_volume_objects(i)->Clear_Highlight();
-    for(int i=1;i<=hexahedralized_volume_objects.m;i++) if(hexahedralized_volume_objects(i) && active_list(i)) hexahedralized_volume_objects(i)->Clear_Highlight();
-    for(int i=1;i<=free_particles_objects.m;i++) if(free_particles_objects(i) && active_list(i))free_particles_objects(i)->Clear_Highlight();
+    for(int i=0;i<segmented_curve_objects.m;i++) if(segmented_curve_objects(i) && active_list(i)) segmented_curve_objects(i)->Clear_Highlight();
+    for(int i=0;i<triangulated_surface_objects.m;i++) if(triangulated_surface_objects(i) && active_list(i)) triangulated_surface_objects(i)->Clear_Highlight();
+    for(int i=0;i<tetrahedralized_volume_objects.m;i++) if(tetrahedralized_volume_objects(i) && active_list(i)) tetrahedralized_volume_objects(i)->Clear_Highlight();
+    for(int i=0;i<hexahedralized_volume_objects.m;i++) if(hexahedralized_volume_objects(i) && active_list(i)) hexahedralized_volume_objects(i)->Clear_Highlight();
+    for(int i=0;i<free_particles_objects.m;i++) if(free_particles_objects(i) && active_list(i))free_particles_objects(i)->Clear_Highlight();
     if(hide_unselected) hide_unselected=false;
     real_selection=0;
 }
@@ -631,8 +631,8 @@ Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION* old_selection,b
 template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_3D<T,RW>::
 Toggle_Differentiate_Inverted()
 {
-    for(int i=1;i<=tetrahedralized_volume_objects.m;i++) if(tetrahedralized_volume_objects(i) && active_list(i)) tetrahedralized_volume_objects(i)->Toggle_Differentiate_Inverted();
-    for(int i=1;i<=hexahedralized_volume_objects.m;i++) if(hexahedralized_volume_objects(i) && active_list(i)) hexahedralized_volume_objects(i)->Toggle_Differentiate_Inverted();
+    for(int i=0;i<tetrahedralized_volume_objects.m;i++) if(tetrahedralized_volume_objects(i) && active_list(i)) tetrahedralized_volume_objects(i)->Toggle_Differentiate_Inverted();
+    for(int i=0;i<hexahedralized_volume_objects.m;i++) if(hexahedralized_volume_objects(i) && active_list(i)) hexahedralized_volume_objects(i)->Toggle_Differentiate_Inverted();
 }
 //#####################################################################
 template class OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_3D<float,float>;

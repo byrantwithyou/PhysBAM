@@ -59,7 +59,7 @@ public:
     template<class T_MATRIX>
     explicit MATRIX(const MATRIX_BASE<T,T_MATRIX>& A)
     {
-        assert(A.Rows()==3 && A.Columns()==2);for(int j=1;j<=2;j++) for(int i=1;i<=3;i++) (*this)(i,j)=A(i,j);
+        assert(A.Rows()==3 && A.Columns()==2);for(int j=0;j<2;j++) for(int i=0;i<3;i++) (*this)(i,j)=A(i,j);
     }
 
     MATRIX& operator=(const MATRIX& matrix_input)
@@ -125,7 +125,7 @@ public:
     {return MATRIX(x[0]*A.x[0]+x[3]*A.x[1],x[1]*A.x[0]+x[4]*A.x[1],x[2]*A.x[0]+x[5]*A.x[1],x[0]*A.x[2]+x[3]*A.x[3],x[1]*A.x[2]+x[4]*A.x[3],x[2]*A.x[2]+x[5]*A.x[3]);}
 
     MATRIX_MXN<T> operator*(const MATRIX_MXN<T>& A) const
-    {assert(2==A.m);MATRIX_MXN<T> matrix(3,A.n);for(int j=1;j<=A.n;j++) for(int i=1;i<=3;i++) for(int k=1;k<=2;k++) matrix(i,j)+=(*this)(i,k)*A(k,j);return matrix;}
+    {assert(2==A.m);MATRIX_MXN<T> matrix(3,A.n);for(int j=0;j<A.n;j++) for(int i=0;i<3;i++) for(int k=0;k<2;k++) matrix(i,j)+=(*this)(i,k)*A(k,j);return matrix;}
 
     MATRIX Times_Transpose(const UPPER_TRIANGULAR_MATRIX<T,2>& A) const // 9 mults, 3 adds
     {return MATRIX(x[0]*A.x11+x[3]*A.x12,x[1]*A.x11+x[4]*A.x12,x[2]*A.x11+x[5]*A.x12,x[3]*A.x22,x[4]*A.x22,x[5]*A.x22);}
@@ -210,7 +210,7 @@ public:
     {return MATRIX<T,2,3>::Transposed(*this);}
 
     static MATRIX Outer_Product(const VECTOR<T,3>& u,const VECTOR<T,2>& v)
-    {MATRIX result;for(int i=1;i<=3;i++) for(int j=1;j<=2;j++) result(i,j)=u(i)*v(j);return result;}
+    {MATRIX result;for(int i=0;i<3;i++) for(int j=0;j<2;j++) result(i,j)=u(i)*v(j);return result;}
 
 //#####################################################################
     void Fast_Singular_Value_Decomposition(MATRIX& U,DIAGONAL_MATRIX<T,2>& singular_values,MATRIX<T,2>& V) const;

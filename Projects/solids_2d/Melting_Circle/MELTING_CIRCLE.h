@@ -88,7 +88,7 @@ void Initialize_Phi(const int object,ARRAY<T>& phi)
     RED_GREEN_GRID_2D<T>& grid=melting_parameters.levelsets(1)->grid;
     ARRAY<VECTOR_2D<T> >& node_locations=grid.Node_Locations();
     
-    for(int p=1;p<=phi.m;p++) phi(p)=circle.Signed_Distance(node_locations(p));    
+    for(int p=0;p<phi.m;p++) phi(p)=circle.Signed_Distance(node_locations(p));    
 }
 //#####################################################################
 // Function Initialize_Levelset_Velocity
@@ -99,8 +99,8 @@ void Initialize_Levelset_Velocity(const int object,ARRAY<VECTOR_2D<T> >& V)
     RED_GREEN_GRID_2D<T>& grid=melting_parameters.levelsets(1)->grid;
     ARRAY<VECTOR_2D<T> >& node_locations=grid.Node_Locations();
     
-    //for(int p=1;p<=V.m;p++) V(p)=VECTOR_2D<T>(1,0);    
-    for(int p=1;p<=V.m;p++) V(p)=VECTOR_2D<T>(node_locations(p).y-circle.center.y,0);
+    //for(int p=0;p<V.m;p++) V(p)=VECTOR_2D<T>(1,0);    
+    for(int p=0;p<V.m;p++) V(p)=VECTOR_2D<T>(node_locations(p).y-circle.center.y,0);
 }
 //#####################################################################
 // Function Initialize_Particle_Positions_And_Velocities

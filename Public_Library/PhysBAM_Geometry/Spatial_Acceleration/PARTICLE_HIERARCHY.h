@@ -45,35 +45,35 @@ public:
     {if(particles_per_group){
         ARRAY<int> group_list;group_list.Preallocate(10);
         BASE::Intersection_List(root,point,group_list,thickness_over_two);
-        for(int i=1;i<=group_list.m;i++) intersection_list.Append_Elements(particles_in_group(group_list(i)));}
+        for(int i=0;i<group_list.m;i++) intersection_list.Append_Elements(particles_in_group(group_list(i)));}
     else BASE::Intersection_List(root,point,intersection_list,thickness_over_two);}
 
     void Intersection_List(const RANGE<TV>& test_box,ARRAY<int>& intersection_list,const T thickness_over_two=0) const PHYSBAM_OVERRIDE
     {if(particles_per_group){
         ARRAY<int> group_list;group_list.Preallocate(10);
         BASE::Intersection_List(root,test_box,group_list,thickness_over_two);
-        for(int i=1;i<=group_list.m;i++) intersection_list.Append_Elements(particles_in_group(group_list(i)));}
+        for(int i=0;i<group_list.m;i++) intersection_list.Append_Elements(particles_in_group(group_list(i)));}
     else BASE::Intersection_List(root,test_box,intersection_list,thickness_over_two);}
 
     void Intersection_List(const ORIENTED_BOX<TV>& test_box,ARRAY<int>& intersection_list) const PHYSBAM_OVERRIDE
     {if(particles_per_group){
         ARRAY<int> group_list;group_list.Preallocate(10);
         BASE::Intersection_List(root,test_box,group_list);
-        for(int i=1;i<=group_list.m;i++) intersection_list.Append_Elements(particles_in_group(group_list(i)));}
+        for(int i=0;i<group_list.m;i++) intersection_list.Append_Elements(particles_in_group(group_list(i)));}
     else BASE::Intersection_List(root,test_box,intersection_list);}
 
     void Intersection_List(const T_HYPERPLANE& test_plane,ARRAY<int>& intersection_list,const T thickness_over_two=0) const PHYSBAM_OVERRIDE
     {if(particles_per_group){
         ARRAY<int> group_list;group_list.Preallocate(10);
         BASE::Intersection_List(root,test_plane,group_list,thickness_over_two);
-        for(int i=1;i<=group_list.m;i++) intersection_list.Append_Elements(particles_in_group(group_list(i)));}
+        for(int i=0;i<group_list.m;i++) intersection_list.Append_Elements(particles_in_group(group_list(i)));}
     else BASE::Intersection_List(root,test_plane,intersection_list,thickness_over_two);}
 
     void Intersection_List(const IMPLICIT_OBJECT<TV>& implicit_object,const MATRIX<T,TV::dimension>& rotation,const TV& translation,ARRAY<int>& intersection_list,const T contour_value=0) const PHYSBAM_OVERRIDE
     {if(particles_per_group){
         ARRAY<int> group_list;group_list.Preallocate(10);
         BASE::Intersection_List(root,implicit_object,rotation,translation,group_list,contour_value);
-        for(int i=1;i<=group_list.m;i++) intersection_list.Append_Elements(particles_in_group(group_list(i)));}
+        for(int i=0;i<group_list.m;i++) intersection_list.Append_Elements(particles_in_group(group_list(i)));}
     else BASE::Intersection_List(root,implicit_object,rotation,translation,intersection_list,contour_value);}
 
 //#####################################################################

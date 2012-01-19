@@ -246,7 +246,7 @@ void Add_SPH_Particles_For_Sources(const T dt,const T time)
         BOX<TV> source_box((T).2,(T).3,(T).8,(T).9);
         int particles_per_second=2000;
         int particles_to_add=max(1,(int)((T)particles_per_second*dt));
-        for(int i=1;i<=particles_to_add;i++) sph_particles.X(sph_particles.array_collection->Add_Element())=random.Get_Uniform_Vector(source_box);}
+        for(int i=0;i<particles_to_add;i++) sph_particles.X(sph_particles.array_collection->Add_Element())=random.Get_Uniform_Vector(source_box);}
 }
 //#####################################################################
 // Function Set_Kinematic_Velocities

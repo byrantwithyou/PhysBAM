@@ -186,7 +186,7 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
         TV X=iterator.Location();
         phi(iterator.Cell_Index())=X.y-depth-Get_Wave_Attenuation(X)*Get_Wave_Height(X,iterator.Cell_Index());}
     
-    for(int i=1;i<=grid.counts.x;i++) for(int j=1;j<=grid.counts.y;j++) for(int ij=1;ij<=grid.counts.z;ij++){
+    for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int ij=0;ij<grid.counts.z;ij++){
         TV X=grid.X(i,j,ij);
         fluids_parameters.particle_levelset_evolution->phi(i,j,ij)=max(fluids_parameters.particle_levelset_evolution->phi(i,j,ij),-rigid_body_collection.Rigid_Body(lighthouse).Implicit_Geometry_Extended_Value(X),-rigid_body_collection.Rigid_Body(cove).Implicit_Geometry_Extended_Value(X));}
 }
@@ -203,7 +203,7 @@ void Set_Dirichlet_Boundary_Conditions(const T time) PHYSBAM_OVERRIDE
     T_FACE_ARRAYS_SCALAR& face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
 
     RANGE<VECTOR<int,3> > right_grid_cells=RANGE<VECTOR<int,3> >(TV_INT(fluids_parameters.grid->counts.x-2,1,1),fluids_parameters.grid->Numbers_Of_Cells());
-    for(int axis=1;axis<=3;axis++){
+    for(int axis=0;axis<3;axis++){
         RANGE<VECTOR<int,3> > right_grid_faces=right_grid_cells+RANGE<VECTOR<int,3> >(TV_INT(),TV_INT::Axis_Vector(axis));
         for(FACE_ITERATOR iterator(*fluids_parameters.grid,right_grid_faces,axis);iterator.Valid();iterator.Next()){TV_INT face=iterator.Face_Index();
             psi_N.Component(axis)(face)=true;face_velocities.Component(axis)(face)=Get_Wave_Velocity(iterator.Location(),axis,time);}}

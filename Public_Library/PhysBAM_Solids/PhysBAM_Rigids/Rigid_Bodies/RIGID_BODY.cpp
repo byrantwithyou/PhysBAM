@@ -76,7 +76,7 @@ template<class TV> void RIGID_BODY<TV>::
 Print_Pairs(const RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const ARRAY<VECTOR<int,2> >& pairs)
 {
     LOG::cout<<"{";
-    for(int i=1;i<=pairs.m;i++){
+    for(int i=0;i<pairs.m;i++){
         LOG::cout<<"(\""<<rigid_body_collection.Rigid_Body(pairs(i)(1)).name<<"\", \""<<rigid_body_collection.Rigid_Body(pairs(i)(2)).name<<"\")";if(i<pairs.m) LOG::cout<<", ";}
     LOG::cout<<"}";
 }

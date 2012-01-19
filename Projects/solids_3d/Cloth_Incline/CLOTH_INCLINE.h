@@ -69,7 +69,7 @@ public:
     GRID<TV> cloth_grid(number_side_panels+1,(int)(aspect_ratio*number_side_panels)+1,0,1,0,aspect_ratio);
     triangle_mesh.Initialize_Herring_Bone_Mesh(cloth_grid.m,cloth_grid.n);
     particles.array_collection->Add_Elements(triangle_mesh.number_nodes);
-    for(int i=1;i<=cloth_grid.m;i++) for(int j=1;j<=cloth_grid.n;j++){
+    for(int i=0;i<cloth_grid.m;i++) for(int j=0;j<cloth_grid.n;j++){
         int node=i+cloth_grid.m*(j-1);
         particles.X(node)=VECTOR_3D<T>(cloth_grid.x(i),initial_cloth_height,cloth_grid.y(j));
         particles.V(node)=VECTOR_3D<T>();}

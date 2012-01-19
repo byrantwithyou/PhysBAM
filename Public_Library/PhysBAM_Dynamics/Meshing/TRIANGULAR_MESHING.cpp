@@ -50,7 +50,7 @@ Initialize_Optimization(const bool verbose)
         layers.Append(new ARRAY<int>);
         for(int i=1;i<=layers(l-1)->m;i++){
             j=(*layers(l-1))(i);
-            for(k=1;k<=(*triangle_mesh.incident_elements)(j).m;k++) for(int a=1;a<=3;a++){
+            for(k=1;k<=(*triangle_mesh.incident_elements)(j).m;k++) for(int a=0;a<3;a++){
                 int b=triangle_mesh.elements((*triangle_mesh.incident_elements)(j)(k))(a);
                 if(!marked(b)){layers(l)->Append(b);marked(b)=true;}}}
         if(layers(l)->m == 0){delete layers(l);layers.Remove_End();break;}
@@ -135,7 +135,7 @@ Search_For_Best_Position(const int node,const ARRAY<VECTOR<T,2> >& directions,bo
     int strikes=0,last_direction=1;
     while(strikes<=3){
         T localbest_quality=best_quality;VECTOR<T,2> localbest_x=best_x;
-        for(int d=1;d<=directions.m;d++){
+        for(int d=0;d<directions.m;d++){
             int this_direction;if(d%2) this_direction=last_direction+d/2;else this_direction=last_direction-d/2;
             this_direction=(this_direction+directions.m-1)%directions.m+1;
             particles.X(node)=best_x+alpha*directions(this_direction);
@@ -175,7 +175,7 @@ Compute_Boundary_Mesh_Normals()
         boundary_mesh_normals(map_from_nodes_to_boundary_list(i))+=normal;
         boundary_mesh_normals(map_from_nodes_to_boundary_list(j))+=normal;
     }
-    for(int i=1;i<=boundary_mesh_normals.counts.x;i++) boundary_mesh_normals(i).Normalize();
+    for(int i=0;i<boundary_mesh_normals.counts.x;i++) boundary_mesh_normals(i).Normalize();
 }
 //#####################################################################
 // Function Create_Initial_Mesh

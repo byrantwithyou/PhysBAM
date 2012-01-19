@@ -49,7 +49,7 @@ public:
 
     TV Frequency() const
     {TV_INT counts=grid.counts;TV k;
-    for(int i=1;i<=k.m;i++) k[i]=coefficients[i]*(index[i]<=counts[i]/2?index[i]:index[i]-counts[i]);
+    for(int i=0;i<k.m;i++) k[i]=coefficients[i]*(index[i]<=counts[i]/2?index[i]:index[i]-counts[i]);
     return k;}
 };
 //#####################################################################
