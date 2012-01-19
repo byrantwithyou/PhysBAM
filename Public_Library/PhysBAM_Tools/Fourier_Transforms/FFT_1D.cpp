@@ -133,7 +133,7 @@ First_Derivatives(const ARRAY<COMPLEX<T> ,VECTOR<int,1> >& u_hat,ARRAY<COMPLEX<T
 template<class T> void FFT_1D<T>::
 Make_Divergence_Free(ARRAY<COMPLEX<T> ,VECTOR<int,1> >& u_hat) const
 {
-    for(int i=1;i<=grid.counts.x/2;i++) u_hat(i)=COMPLEX<T>(0,0);
+    for(int i=0;i<grid.counts.x/2;i++) u_hat(i)=COMPLEX<T>(0,0);
     Enforce_Real_Valued_Symmetry(u_hat);
 }
 //#####################################################################
@@ -144,7 +144,7 @@ template<class T> void FFT_1D<T>::
 Filter_High_Frequencies(ARRAY<COMPLEX<T> ,VECTOR<int,1> >& u_hat,T scale) const
 {
     T coefficient=2*(T)pi/grid.counts.x;
-    for(int i=1;i<=grid.counts.x/2;i++){
+    for(int i=0;i<grid.counts.x/2;i++){
         T temp=scale*coefficient*i,damping=sinc(temp);
         u_hat(i)*=damping;}
     Enforce_Real_Valued_Symmetry(u_hat);

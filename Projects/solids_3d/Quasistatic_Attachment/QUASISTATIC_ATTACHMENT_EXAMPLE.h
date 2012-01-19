@@ -99,7 +99,7 @@ void Update_Time_Varying_Material_Properties(const T time){
     if(time>next_frame_time){
         current_frame++;
         for(int i=0;i<solids_parameters.deformable_body_parameters.list.deformable_objects.m;i++){
-            for(int p=1;p<=solids_parameters.deformable_body_parameters.list(1).tetrahedralized_volume->particles.array_collection->Size()/2;p++)
+            for(int p=0;p<solids_parameters.deformable_body_parameters.list(1).tetrahedralized_volume->particles.array_collection->Size()/2;p++)
         previous_positions(i)(p)=solids_parameters.deformable_body_parameters.list(1).tetrahedralized_volume->particles.X(p);
         previous_velocities(i)(p)=solids_parameters.deformable_body_parameters.list(1).tetrahedralized_volume->particles.V(p);}
     }

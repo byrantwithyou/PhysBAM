@@ -164,7 +164,7 @@ void Initialize_Bodies()
     PARTICLES<T,VECTOR_3D<T> >& particles=deformable_object->triangulated_surface->particles;
 #if 0
     MATRIX<T,4> rotation=MATRIX<T,4>::Rotation_Matrix_Z_Axis(-2*pi/3);
-    for(int i=1;i<=cloth_grid.m/2;i++) for(int j=0;j<cloth_grid.n;j++){
+    for(int i=0;i<cloth_grid.m/2;i++) for(int j=0;j<cloth_grid.n;j++){
         int node=i+cloth_grid.m*(j-1);particles.X(node)=rotation*particles.X(node);}
 #endif
     particles.X.array+=VECTOR_3D<T>(0,cloth_height,0);

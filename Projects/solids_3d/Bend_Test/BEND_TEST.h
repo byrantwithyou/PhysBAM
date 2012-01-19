@@ -141,7 +141,7 @@ void Set_External_Velocities(ARRAY<VECTOR_3D<T> >& V,const T time)
 void Zero_Out_Enslaved_Velocity_Nodes(ARRAY<VECTOR_3D<T> >& V,const T time)
 {
     int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;
-    for(int i=1;i<=m/2+1;i++) for(int j=0;j<n;j++) V(i+m*(j-1))=VECTOR_3D<T>(0,0,0);
+    for(int i=0;i<m/2+1;i++) for(int j=0;j<n;j++) V(i+m*(j-1))=VECTOR_3D<T>(0,0,0);
 }
 //#####################################################################
 };

@@ -115,7 +115,7 @@ Enforce_Real_Valued_Symmetry(ARRAY<COMPLEX<T> ,VECTOR<int,2> >& u_hat) const
     // imaginary part of the constant and cosine only terms are identically zero
     u_hat(0,0).im=u_hat(grid.counts.x/2,0).im=u_hat(0,grid.counts.y/2).im=u_hat(grid.counts.x/2,grid.counts.y/2).im=0;
     // enforce appropriate complex conjugates
-    for(int i=1;i<=grid.counts.x/2-1;i++){
+    for(int i=0;i<grid.counts.x/2-1;i++){
         u_hat(grid.counts.x-i,0)=u_hat(i,0).Conjugated(); // reflect y=0 line
         u_hat(grid.counts.x-i,grid.counts.y/2)=u_hat(i,grid.counts.y/2).Conjugated();} // reflect y=grid.counts.y/2 line
 }
@@ -141,10 +141,10 @@ Make_Divergence_Free(ARRAY<COMPLEX<T> ,VECTOR<int,2> >& u_hat,ARRAY<COMPLEX<T> ,
 {
     VECTOR<T,2> coefficients=(T)(2*pi)/grid.domain.Edge_Lengths();
     // u=0 on the bottom
-    for(int i=1;i<=grid.counts.x/2;i++) u_hat(i,0)=COMPLEX<T>(0,0);
+    for(int i=0;i<grid.counts.x/2;i++) u_hat(i,0)=COMPLEX<T>(0,0);
     // area
     for(int i=0;i<=grid.counts.x-1;i++){T k1=coefficients.x*(i<=grid.counts.x/2?i:i-grid.counts.x);
-        for(int j=1;j<=grid.counts.y/2;j++){T k2=coefficients.y*j,one_over_k_squared=1/(sqr(k1)+sqr(k2));
+        for(int j=0;j<grid.counts.y/2;j++){T k2=coefficients.y*j,one_over_k_squared=1/(sqr(k1)+sqr(k2));
             COMPLEX<T> correction=(k1*u_hat(i,j)+k2*v_hat(i,j))*one_over_k_squared;
             u_hat(i,j)-=correction*k1;v_hat(i,j)-=correction*k2;}}
     Enforce_Real_Valued_Symmetry(u_hat);Enforce_Real_Valued_Symmetry(v_hat);
@@ -157,11 +157,11 @@ template<class T> void FFT_2D<T>::
 Filter_High_Frequencies(ARRAY<COMPLEX<T> ,VECTOR<int,2> >& u_hat,T scale) const
 {
     T coefficient=2*T(pi)/sqrt((T)(sqr(grid.counts.x)+sqr(grid.counts.y)));
-    for(int i=1;i<=grid.counts.x/2;i++){ // skip the (0,0) case
+    for(int i=0;i<grid.counts.x/2;i++){ // skip the (0,0) case
         T temp=scale*coefficient*i,damping=sinc(temp);
         u_hat(i,0)*=damping;}
     for(int i=0;i<=grid.counts.x-1;i++){T i_frequency=T(i<=grid.counts.x/2 ? i:i-grid.counts.x);
-        for(int j=1;j<=grid.counts.y/2;j++){T j_frequency=T(j);
+        for(int j=0;j<grid.counts.y/2;j++){T j_frequency=T(j);
             T temp=scale*coefficient*sqrt(sqr(i_frequency)+sqr(j_frequency)),damping=sinc(temp);
             u_hat(i,j)*=damping;}}
     Enforce_Real_Valued_Symmetry(u_hat);
