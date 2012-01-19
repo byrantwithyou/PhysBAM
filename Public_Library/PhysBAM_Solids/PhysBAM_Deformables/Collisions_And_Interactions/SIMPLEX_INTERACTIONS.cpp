@@ -21,7 +21,7 @@ Intersection(const VECTOR<VECTOR<T,2>,2>& segment_1,const VECTOR<VECTOR<T,2>,2>&
 
     points[0][0]=segment_1[1].x;points[0][1]=segment_1[1].y;points[1][0]=segment_1[2].x;points[1][1]=segment_1[2].y;
     points[2][0]=segment_2[1].x;points[2][1]=segment_2[1].y;points[3][0]=segment_2[2].x;points[3][1]=segment_2[2].y;
-    for(unsigned int i=0;i<=2;i++) for(unsigned int j=i+1;j<3;j++) m2p[(1<<i)|(1<<j)]=points[i][0]*points[j][1]-points[i][1]*points[j][0];
+    for(unsigned int i=0;i<3;i++) for(unsigned int j=i+1;j<3;j++) m2p[(1<<i)|(1<<j)]=points[i][0]*points[j][1]-points[i][1]*points[j][0];
     // Compute signed areas for all triangles formed by three input points
     for(unsigned int i=0;i<=1;i++) for(unsigned int j=i+1;j<2;j++) for(unsigned int k=j+1;k<3;k++) 
         d3p[(1<<i)|(1<<j)|(1<<k)]=m2p[(1<<j)|(1<<k)]-m2p[(1<<i)|(1<<k)]+m2p[(1<<i)|(1<<j)]; 
@@ -59,15 +59,15 @@ Intersection(const VECTOR<VECTOR<T,2>,3>& triangle,const VECTOR<T,2>& point)
 
     points[0][0]=triangle[1].x;points[0][1]=triangle[1].y;points[1][0]=triangle[2].x;points[1][1]=triangle[2].y;points[2][0]=triangle[3].x;points[2][1]=triangle[3].y;
     points[3][0]=point.x;points[3][1]=point.y;
-    for(unsigned int i=0;i<=2;i++) for(unsigned int j=i+1;j<3;j++) m2p[(1<<i)|(1<<j)]=points[i][0]*points[j][1]-points[i][1]*points[j][0];
+    for(unsigned int i=0;i<3;i++) for(unsigned int j=i+1;j<3;j++) m2p[(1<<i)|(1<<j)]=points[i][0]*points[j][1]-points[i][1]*points[j][0];
     // Compute signed areas for all triangles formed by three input points
     for(unsigned int i=0;i<=1;i++) for(unsigned int j=i+1;j<2;j++) for(unsigned int k=j+1;k<3;k++) 
         d3p[(1<<i)|(1<<j)|(1<<k)]=m2p[(1<<j)|(1<<k)]-m2p[(1<<i)|(1<<k)]+m2p[(1<<i)|(1<<j)];
     // Separator line must contain the lone point
-    for(unsigned int i=0;i<=2;i++){
+    for(unsigned int i=0;i<3;i++){
         plus=minus=0;mask=(1<<i|1<<3);
         for(unsigned int k=0;k<i;k++)    if(d3p[(1<<k)|mask]>(T)0) plus++;  else if(d3p[(1<<k)|mask]<(T)0) minus++;
-        for(unsigned int k=i+1;k<=2;k++) if(d3p[(1<<k)|mask]>(T)0) minus++; else if(d3p[(1<<k)|mask]<(T)0) plus++;
+        for(unsigned int k=i+1;k<3;k++) if(d3p[(1<<k)|mask]>(T)0) minus++; else if(d3p[(1<<k)|mask]<(T)0) plus++;
         if (plus==0||minus==0) return false;}
     // No separator line found, objects are intersecting
     return true;
@@ -84,17 +84,17 @@ Intersection(const VECTOR<VECTOR<T,2>,3>& triangle,const VECTOR<VECTOR<T,2>,2>& 
 
     points[0][0]=triangle[1].x;points[0][1]=triangle[1].y;points[1][0]=triangle[2].x;points[1][1]=triangle[2].y;points[2][0]=triangle[3].x;points[2][1]=triangle[3].y;
     points[3][0]=segment[1].x;points[3][1]=segment[1].y;points[4][0]=segment[2].x;points[4][1]=segment[2].y;
-    for(unsigned int i=0;i<=3;i++) for(unsigned int j=i+1;j<=4;j++) m2p[(1<<i)|(1<<j)]=points[i][0]*points[j][1]-points[i][1]*points[j][0];
+    for(unsigned int i=0;i<4;i++) for(unsigned int j=i+1;j<4;j++) m2p[(1<<i)|(1<<j)]=points[i][0]*points[j][1]-points[i][1]*points[j][0];
     // Compute signed areas for all triangles formed by three input points
-    for(unsigned int i=0;i<=2;i++) for(unsigned int j=i+1;j<=3;j++) for(unsigned int k=j+1;k<=4;k++) 
+    for(unsigned int i=0;i<3;i++) for(unsigned int j=i+1;j<3;j++) for(unsigned int k=j+1;k<4;k++) 
         d3p[(1<<i)|(1<<j)|(1<<k)]=m2p[(1<<j)|(1<<k)]-m2p[(1<<i)|(1<<k)]+m2p[(1<<i)|(1<<j)]; 
     // Separator line must contain a vertex from the triangle and the segment
-    for(unsigned int i=0;i<=2;i++) for(unsigned int j=3;j<=4;j++){
+    for(unsigned int i=0;i<3;i++) for(unsigned int j=3;j<4;j++){
         plus=minus=0;mask=(1<<i)|(1<<j);
         for(unsigned int k=0;k<i;k++)    if(d3p[(1<<k)|mask]>(T)0) plus++;  else if(d3p[(1<<k)|mask]<(T)0) minus++;
-        for(unsigned int k=i+1;k<=2;k++) if(d3p[(1<<k)|mask]>(T)0) minus++; else if(d3p[(1<<k)|mask]<(T)0) plus++;
+        for(unsigned int k=i+1;k<2;k++) if(d3p[(1<<k)|mask]>(T)0) minus++; else if(d3p[(1<<k)|mask]<(T)0) plus++;
         for(unsigned int k=3;k<j;k++)    if(d3p[(1<<k)|mask]>(T)0) plus++;  else if(d3p[(1<<k)|mask]<(T)0) minus++;
-        for(unsigned int k=j+1;k<=4;k++) if(d3p[(1<<k)|mask]>(T)0) minus++; else if(d3p[(1<<k)|mask]<(T)0) plus++;
+        for(unsigned int k=j+1;k<4;k++) if(d3p[(1<<k)|mask]>(T)0) minus++; else if(d3p[(1<<k)|mask]<(T)0) plus++;
         if (plus==0||minus==0) return false;}
     // No separator line found, objects are intersecting
     return true;

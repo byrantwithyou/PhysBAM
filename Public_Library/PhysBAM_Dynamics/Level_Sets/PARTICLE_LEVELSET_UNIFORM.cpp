@@ -475,7 +475,7 @@ template<class T_GRID> template<class T_ARRAYS_PARTICLES> void PARTICLE_LEVELSET
 Update_Particle_Cells(T_ARRAYS_PARTICLES& particles)
 {
     typedef typename REMOVE_POINTER<typename T_ARRAYS_PARTICLES::ELEMENT>::TYPE T_PARTICLES;
-    const T_PARTICLES& template_particles=choice<(2-IS_SAME<T_PARTICLES,PARTICLE_LEVELSET_PARTICLES<TV> >::value)>(this->template_particles,this->template_removed_particles);
+    const T_PARTICLES& template_particles=choice<(1-IS_SAME<T_PARTICLES,PARTICLE_LEVELSET_PARTICLES<TV> >::value)>(this->template_particles,this->template_removed_particles);
     RANGE<TV_INT> domain(levelset.grid.Domain_Indices());domain.max_corner+=TV_INT::All_Ones_Vector();
     Consistency_Check(domain,particles);
     if(mpi_grid){
