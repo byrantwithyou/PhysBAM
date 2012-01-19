@@ -463,7 +463,7 @@ Revert_Cells_Near_Interface(const int iteration_number)
         for(CELL_ITERATOR iterator(euler.grid,1);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
             near_interface(cell_index) = (cut_cells_n(cell_index)!=0 || cut_cells_n_p_half(cell_index)!=0 || cut_cells_np1(cell_index)!=0);}
         for(CELL_ITERATOR iterator(euler.grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
-            for(int dim=1;dim<=TV::dimension;++dim) for(int n=-1;n<=1;n+=2){
+            for(int dim=0;dim<TV::dimension;dim++) for(int n=-1;n<=1;n+=2){
                 TV_INT neighbor_index=cell_index+n*TV_INT::Axis_Vector(dim);
                 if((cut_cells_n(cell_index) && (!cut_cells_n(cell_index)->dominant_element ||
                                                 !cut_cells_n(cell_index)->visibility(cut_cells_n(cell_index)->dominant_element).Contains(neighbor_index)))
@@ -513,7 +513,7 @@ template<class TV> void Advect_Near_Interface_Data(const GRID<TV>& grid,const ty
         if((near_interface(first_cell_index) ^ near_interface(second_cell_index)) && psi_np1(first_cell_index) && psi_np1(second_cell_index))
             hybrid_boundary_flux.Append(TRIPLE<FACE_INDEX<TV::dimension>,TV_INT,TV_INT>(iterator.Full_Index(),first_cell_index,second_cell_index));}
 
-    for(int variable_index=1;variable_index<=TV_DIMENSION::dimension;++variable_index){
+    for(int variable_index=0;variable_index<TV_DIMENSION::dimension;variable_index++){
         ARRAY<PAIR<T,TV_INT> > weights;
         ARRAY<ARRAY<int>,TV_INT> donors(grid.Domain_Indices(1));
         ARRAY<ARRAY<int>,TV_INT> receivers(grid.Domain_Indices(1));

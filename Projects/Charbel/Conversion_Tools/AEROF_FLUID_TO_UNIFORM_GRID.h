@@ -39,7 +39,7 @@ Convert_To_Uniform_Grid(const TETRAHEDRALIZED_VOLUME<T>& ale_fluid_mesh,const CO
     LOG::Time("Compute which ale fluid nodes have valid data"); // TODO(jontg): Is this data already available somewhere?
 
     ARRAY<bool> particle_not_inside_solid(tet_volume.particles.array_collection->Size());
-    for(int i=1;i<=particle_not_inside_solid.m;++i)
+    for(int i=0;i<particle_not_inside_solid.m;i++)
         particle_not_inside_solid(i)=interpolation.Clamped_To_Array(grid,phi,tet_volume.particles.X(i))<0;
 
     LOG::Time("Computing bounding tet id");
@@ -49,10 +49,10 @@ Convert_To_Uniform_Grid(const TETRAHEDRALIZED_VOLUME<T>& ale_fluid_mesh,const CO
         TV_INT cell_index=iterator.Cell_Index();TV position=current_grid.X(cell_index);T phi_value=phi(cell_index);
         if(phi_value > 0 && phi_value < conversion_thickness){
             ARRAY<int> intersection_list;ale_fluid_mesh.hierarchy->Intersection_List(position,intersection_list);
-            for(int i=1;i<=intersection_list.m;++i){
+            for(int i=0;i<intersection_list.m;i++){
                 TETRAHEDRON<T>& current_tet=(*ale_fluid_mesh.tetrahedron_list)(intersection_list(i));
                 VECTOR<int,4>& current_tet_nodes=ale_fluid_mesh.mesh.elements(intersection_list(i));
-                bool tet_has_no_ghost_nodes=true;for(int j=1;j<=4;++j) tet_has_no_ghost_nodes&=particle_not_inside_solid(current_tet_nodes(j));
+                bool tet_has_no_ghost_nodes=true;for(int j=0;j<4;j++) tet_has_no_ghost_nodes&=particle_not_inside_solid(current_tet_nodes(j));
                 if(tet_has_no_ghost_nodes && current_tet.Inside(position)){bounding_tet_id(cell_index)=intersection_list(i);break;}
                 else phi_correction_term=max(phi_correction_term,phi_value);}}}
 
@@ -69,7 +69,7 @@ Convert_To_Uniform_Grid(const TETRAHEDRALIZED_VOLUME<T>& ale_fluid_mesh,const CO
             TV weights=current_tet.Barycentric_Coordinates(position);
 
             U(cell_index)(1)=Point_From_Barycentric_Coordinates(weights,ale_fluid_data.rho(corners(1)),ale_fluid_data.rho(corners(2)),ale_fluid_data.rho(corners(3)),ale_fluid_data.rho(corners(4)));
-            for(int j=1;j<=d;++j)
+            for(int j=0;j<d;j++)
                 U(cell_index)(j+1)=Point_From_Barycentric_Coordinates(weights,ale_fluid_data.V(corners(1))(j),ale_fluid_data.V(corners(2))(j),ale_fluid_data.V(corners(3))(j),ale_fluid_data.V(corners(4))(j));
             U(cell_index)(d+2)=Point_From_Barycentric_Coordinates(weights,ale_fluid_data.E(corners(1)),ale_fluid_data.E(corners(2)),ale_fluid_data.E(corners(3)),ale_fluid_data.E(corners(4)));
             done(cell_index)=true;}

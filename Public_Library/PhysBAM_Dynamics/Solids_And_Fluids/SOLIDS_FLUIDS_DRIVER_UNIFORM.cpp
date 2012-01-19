@@ -347,7 +347,7 @@ Initialize()
         example.solid_body_collection.Compute_Linear_Momentum(solid_momentum);
         example.solid_body_collection.Compute_Energy(time,solid_kinetic_energy,solid_potential_energy);
 
-        for(int i=1;i<=T_GRID::dimension;++i) euler->initial_total_conserved_quantity[i+1]+=solid_momentum[i];
+        for(int i=0;i<T_GRID::dimension;i++) euler->initial_total_conserved_quantity[i+1]+=solid_momentum[i];
         euler->initial_total_conserved_quantity[T_GRID::dimension+2]+=(solid_kinetic_energy+solid_potential_energy);}
 
     if(Simulate_Fluids()){
@@ -1289,7 +1289,7 @@ Advance_Fluid_One_Time_Step_Implicit_Part(const bool done,const T dt,const int s
             example.solid_body_collection.Compute_Linear_Momentum(solid_momentum);
             example.solid_body_collection.Compute_Energy(time,solid_kinetic_energy,solid_potential_energy);
 
-            for(int i=1;i<=T_GRID::dimension;++i) new_total_conserved_quantity[i+1]+=solid_momentum[i];
+            for(int i=0;i<T_GRID::dimension;i++) new_total_conserved_quantity[i+1]+=solid_momentum[i];
             new_total_conserved_quantity[T_GRID::dimension+2]+=(solid_kinetic_energy+solid_potential_energy);
             LOG::cout<<"solid_momentum="<<solid_momentum<<", solid_energy="<<solid_kinetic_energy+solid_potential_energy<<std::endl;
 

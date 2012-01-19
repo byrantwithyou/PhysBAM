@@ -416,10 +416,10 @@ Embed_Particles_In_Tetrahedralized_Volume(BINDING_LIST<VECTOR<T,3> >& binding_li
         while(!candidate_tets.m){
             tetrahedralized_volume.hierarchy->Intersection_List(X,candidate_tets,current_thickness_over_two);
             if(candidate_tets.m || thickness_over_two==0) break;current_thickness_over_two*=2;}
-        for(int t=1;t<=candidate_tets.m;++t) if(tetrahedron_list(candidate_tets(t)).Inside(X)){embedding_tet=candidate_tets(t);break;}
+        for(int t=0;t<candidate_tets.m;t++) if(tetrahedron_list(candidate_tets(t)).Inside(X)){embedding_tet=candidate_tets(t);break;}
         if(!embedding_tet && candidate_tets.m){ // find closest tet
             T rho_min=FLT_MAX;
-            for(int t=1;t<=candidate_tets.m;++t){
+            for(int t=0;t<candidate_tets.m;t++){
                 T rho=(tetrahedron_list(candidate_tets(t)).Surface(X)-X).Magnitude_Squared();if(rho<rho_min){rho_min=rho;embedding_tet=candidate_tets(t);}}}
         // add binding
         VECTOR<int,4> vertices=tetrahedralized_volume.mesh.elements(embedding_tet);

@@ -259,7 +259,7 @@ void Initialize_Scripted_Objects(ARRAY<RIGID_BODY<TV>*>& scripted_objects,ARRAY<
     scripted_objects(6)=new RIGID_SPHERE(VECTOR_3D(0,3,0),.2);
     scripted_objects_friction(6)=.3;
     // since we're scripting the objects, make inertia tensor identity to make angular_velocity=angular_momentum
-    for(int i=1;i<=scripted_objects.m;++i)scripted_objects(i)->moments_of_inertia=VECTOR_3D(1,1,1);
+    for(int i=0;i<scripted_objects.m;i++)scripted_objects(i)->moments_of_inertia=VECTOR_3D(1,1,1);
 }
 //#####################################################################
 // Function Update_Object_Positions

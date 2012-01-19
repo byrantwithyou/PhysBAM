@@ -55,7 +55,7 @@ draw()
     Draw_Photons();
     Draw_Irradiance_Cache();
     // Draw Subsurface Scattering samples
-    for(int i=1;i<=world.standard_objects.m;++i)if(world.standard_objects(i)->bssrdf_shader) Draw_Subsurface_Scattering_Samples(world.standard_objects(i)->bssrdf_tree);
+    for(int i=0;i<world.standard_objects.m;i++)if(world.standard_objects(i)->bssrdf_shader) Draw_Subsurface_Scattering_Samples(world.standard_objects(i)->bssrdf_tree);
     Draw_Subsurface_Candidate_List();
     Draw_Camera();
 }
@@ -109,7 +109,7 @@ template<class T> void SCENE_WINDOW<T>::Draw_Subsurface_Scattering_Samples(SUBSU
 template<class T> void SCENE_WINDOW<T>::Draw_Subsurface_Candidate_List()
 {
     if(selected_ray){
-        for(int i=1;i<=world.standard_objects.m;++i)
+        for(int i=0;i<world.standard_objects.m;i++)
             if(world.standard_objects(i)->bssrdf_shader){
                 T totalArea=0,position_magnitude=0;VECTOR<T,3>totalIrradiance(0,0,0);
                 ARRAY<SUBSURFACE_SCATTERING_IRRADIANCE_SAMPLE<T> > sample_list;
@@ -119,7 +119,7 @@ template<class T> void SCENE_WINDOW<T>::Draw_Subsurface_Candidate_List()
                 glPointSize(3.0f);
                 glDisable(GL_DEPTH_TEST);
                 glBegin(GL_POINTS);
-                for(int i=1;i<=sample_list.m;++i){
+                for(int i=0;i<sample_list.m;i++){
 //                VECTOR<T,3> curval=sample_list(i).transmitted_irradiance;
 //                glColor3f(curval.x, curval.y, curval.z);
                     glColor3f(0.0, 1.0, 0.0);

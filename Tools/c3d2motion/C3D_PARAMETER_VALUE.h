@@ -85,7 +85,7 @@ public:
     {if(this==0) return;
         assert(dimension==2 && type==C3D_PARAM_TYPE_CHAR);
     const int number_strings=lengths[1],string_length=lengths[0];array.Resize(number_strings);
-    for(int i=1;i<=number_strings;++i) array(i)=std::string(data.dat_char+(i-1)*string_length,data.dat_char+i*string_length);}
+    for(int i=0;i<number_strings;i++) array(i)=std::string(data.dat_char+(i-1)*string_length,data.dat_char+i*string_length);}
     
 //##########################################################################################
     void Read_Data_Part(FILE *fp,const C3D_BYTE original_machine_code);

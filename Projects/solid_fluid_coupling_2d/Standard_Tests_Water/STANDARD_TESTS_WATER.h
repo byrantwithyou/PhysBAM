@@ -770,7 +770,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             solids_tests.Add_Ground();
             break;}
         case 10:{
-            for(int i=1;i<=rigid_bodies_to_simulate.m;++i){
+            for(int i=0;i<rigid_bodies_to_simulate.m;i++){
                 RIGID_BODY<TV>& rigid_body_to_add=rigid_body_collection.Rigid_Body(rigid_bodies_to_simulate(i));
                 if(rigid_body_to_add.thin_shell) Add_Thin_Shell_To_Fluid_Simulation(rigid_body_to_add); else Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_to_add);}
             break;}

@@ -20,7 +20,7 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(const ORIENTED_BOX
 {
     typedef VECTOR<T,3> TV;
     MATRIX<T,3> directions=box.edges;TV lengths;
-    for(int i=1;i<=3;++i) lengths[i]=directions.Column(i).Normalize();
+    for(int i=0;i<3;i++) lengths[i]=directions.Column(i).Normalize();
     BOX<TV> aligned_box(TV(),lengths);
     TRIANGULATED_SURFACE<T>* surface=Generate_Triangles(aligned_box);
     GEOMETRY_PARTICLES<TV>& particles=surface->particles;

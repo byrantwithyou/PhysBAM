@@ -53,7 +53,7 @@ template<class T> bool Intersects(RAY<VECTOR<T,3> >& ray,const RANGE<VECTOR<T,3>
     VECTOR<T,3> min_thickened=box.min_corner-thickness_over_two,max_thickened=box.max_corner+thickness_over_two;
     VECTOR<T,3> corners[2]={box.min_corner,box.max_corner};
 
-    for(int i=1;i<=3;++i){
+    for(int i=0;i<3;i++){
         PLANE<T> plane(VECTOR<T,3>::Axis_Vector(i),VECTOR<T,3>());
         T rate_of_approach=-ray.direction(i);
         for(int j=0;j<=1;++j){

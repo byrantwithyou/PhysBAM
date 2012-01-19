@@ -421,7 +421,7 @@ T Initial_Phi(const TV& X) const
         default:
             phi=water_tests.Initial_Phi(X);}
 
-    for(int i=1;i<=rigid_bodies_to_simulate.m;++i)
+    for(int i=0;i<rigid_bodies_to_simulate.m;i++)
         phi=max(phi,-solid_body_collection.rigid_body_collection.Rigid_Body(rigid_bodies_to_simulate(i)).Implicit_Geometry_Extended_Value(X));
     return phi;
 }
@@ -489,11 +489,11 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     // Add everything to the simulation
     solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
-    for(int i=1;i<=deformable_objects_to_simulate.m;++i){
+    for(int i=0;i<deformable_objects_to_simulate.m;i++){
         DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>& collision_structure=*deformable_objects_to_simulate(i);
         collision_structure.object.Initialize_Hierarchy();
         Add_To_Fluid_Simulation(collision_structure);}
-    for(int i=1;i<=rigid_bodies_to_simulate.m;++i){
+    for(int i=0;i<rigid_bodies_to_simulate.m;i++){
         RIGID_BODY<TV>& rigid_body_to_add=rigid_body_collection.Rigid_Body(rigid_bodies_to_simulate(i));
         if(rigid_body_to_add.thin_shell) Add_Thin_Shell_To_Fluid_Simulation(rigid_body_to_add); else Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_to_add);}
 

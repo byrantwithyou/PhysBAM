@@ -844,7 +844,7 @@ void Add_Room()
 {
     if(fracture_walls) FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),fp),fracture_pattern);
 
-    for(int i=1;i<=4;++i){
+    for(int i=0;i<4;i++){
         TV edge_lengths((T)1,(T).2,(T)1);
         TV_INT dimensions(31,3,21);BOX<TV> box((T)-.5*edge_lengths,(T).5*edge_lengths);TV dx=edge_lengths/TV(dimensions-1);
         TV_INT levelset_resolution(151,11,101);TV levelset_dx=edge_lengths/TV(levelset_resolution-1);int ghost_cells=2;
@@ -879,7 +879,7 @@ void Add_Enclosed_Room()
     if(!fp) fp = 7; // This one looks the best.
     if(fracture_walls) FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),fp),fracture_pattern);
 
-    for(int i=1;i<=4;++i){
+    for(int i=0;i<4;i++){
         TV edge_lengths((T)1,(T).2,(T)1);
         TV_INT dimensions(31,3,31);BOX<TV> box((T)-.5*edge_lengths,(T).5*edge_lengths);TV dx=edge_lengths/TV(dimensions-1);
         TV_INT levelset_resolution(101,21,101);TV levelset_dx=edge_lengths/TV(levelset_resolution-1);int ghost_cells=2;
@@ -942,7 +942,7 @@ void Post_Initialization() PHYSBAM_OVERRIDE
 
     if(test_number==13 || test_number==19){ // HACK -- adds fluid_collision_bodies after they've been read in from file.
         LOG::cout<<"Adding bodies to the simulation"<<std::endl;
-        for(int i=1;i<=deformable_objects_to_simulate.m;++i){
+        for(int i=0;i<deformable_objects_to_simulate.m;i++){
             LOG::cout<<"\tadded DEFORMABLE body "<<i<<std::endl;
             DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>& collision_structure=*deformable_objects_to_simulate(i);
             collision_structure.object.Initialize_Hierarchy();

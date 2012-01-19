@@ -66,7 +66,7 @@ Compute_Preconditioner()
     poisson.C->In_Place_Incomplete_Cholesky_Factorization();
 #else
     ARRAY<int> row_lengths(index_map.real_cell_indices.m);
-    for(int row=1;row<=index_map.real_cell_indices.m;++row){int row_index=index_map.real_cell_indices(row);
+    for(int row=0;row<index_map.real_cell_indices.m;row++){int row_index=index_map.real_cell_indices(row);
         for(int index=poisson.offsets(row_index);index<poisson.offsets(row_index+1);++index){
             int col_index=poisson.A(index).j,col=index_map.real_cell_indices_reverse_map(col_index);
             if(col >= 0){row_lengths(col)++;}}}
@@ -74,7 +74,7 @@ Compute_Preconditioner()
     delete poisson.C;poisson.C=new SPARSE_MATRIX_FLAT_NXN<T>;
     poisson.C->Set_Row_Lengths(row_lengths);
 
-    for(int row=1;row<=index_map.real_cell_indices.m;++row){int row_index=index_map.real_cell_indices(row);
+    for(int row=0;row<index_map.real_cell_indices.m;row++){int row_index=index_map.real_cell_indices(row);
         for(int index=poisson.offsets(row_index);index<poisson.offsets(row_index+1);++index){
             int col_index=poisson.A(index).j,col=index_map.real_cell_indices_reverse_map(col_index);
             if(col >= 0) poisson.C->Set_Element(row,col,poisson.A(index).a);}}
@@ -90,20 +90,20 @@ Apply_Preconditioner(VECTOR_ND<T>& pressure) const
 {
 #if 1
     VECTOR_ND<T> sub_vector(map.m),temp_vector(map.m);
-    for(int i=1;i<=map.m;++i) sub_vector(i)=pressure(map(i));
+    for(int i=0;i<map.m;i++) sub_vector(i)=pressure(map(i));
 
     poisson.C->Solve_Forward_Substitution(sub_vector,temp_vector,true);
     poisson.C->Solve_Backward_Substitution(temp_vector,sub_vector,false,true);
 
-    for(int i=1;i<=map.m;++i) pressure(map(i))=sub_vector(i);
+    for(int i=0;i<map.m;i++) pressure(map(i))=sub_vector(i);
 #else
     VECTOR_ND<T> sub_vector(index_map.real_cell_indices.m),temp_vector(index_map.real_cell_indices.m);
-    for(int i=1;i<=index_map.real_cell_indices.m;++i) sub_vector(i)=pressure(index_map.real_cell_indices(i));
+    for(int i=0;i<index_map.real_cell_indices.m;i++) sub_vector(i)=pressure(index_map.real_cell_indices(i));
 
     poisson.C->Solve_Forward_Substitution(sub_vector,temp_vector,true);
     poisson.C->Solve_Backward_Substitution(temp_vector,sub_vector,false,true);
 
-    for(int i=1;i<=index_map.real_cell_indices.m;++i) pressure(index_map.real_cell_indices(i))=sub_vector(i);
+    for(int i=0;i<index_map.real_cell_indices.m;i++) pressure(index_map.real_cell_indices(i))=sub_vector(i);
 #endif
 }
 //#####################################################################

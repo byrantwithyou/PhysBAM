@@ -275,7 +275,7 @@ Output_Subsample(LEVELSET_3D<GRID<VECTOR<T,3> > >& subsample,const int x_stride,
     printf("new_zmax = grid.zmax + %g cells\n",(new_zmax-grid.domain.max_corner.z)/grid.dX.z);
     subsample.grid=GRID<VECTOR<T,3> >(m,n,mn,grid.domain.min_corner.x,new_xmax,grid.domain.min_corner.y,new_ymax,grid.domain.min_corner.z,new_zmax);
     subsample.phi.Resize(1,m,1,n,1,mn);
-    for(int i=1;i<=m;++i)for(int j=1;j<=n;++j)for(int k=1;k<=mn;++k){
+    for(int i=0;i<m;i++)for(int j=0;j<n;j++)for(int k=0;k<mn;k++){
         int i1=1+(i-1)*x_stride,j1=1+(j-1)*y_stride,k1=1+(k-1)*z_stride;
         if(i1<=phi.domain.max_corner.x && j1<=phi.domain.max_corner.y && k1<=phi.domain.max_corner.z) subsample.phi(i,j,k)=phi(i1,j1,k1);//a necessary check because output.grid may well be larger
         else subsample.phi(i,j,k)=levelset.Extended_Phi(subsample.grid.X(i,j,k));}

@@ -39,13 +39,13 @@ Update_Conservation_Law(T_GRID& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS
         LOG::SCOPE scope("Regular Update for Hybrid scheme.");
         for(CELL_ITERATOR iterator(grid,3);iterator.Valid();iterator.Next()){
             if(regular_cell(iterator.Cell_Index())){
-                bool compute_self_weight=true;for(int dim=1;dim<=TV::dimension;++dim) compute_self_weight &= flux_face(iterator.Full_First_Face_Index(dim)) & flux_face(iterator.Full_Second_Face_Index(dim));
+                bool compute_self_weight=true;for(int dim=0;dim<TV::dimension;dim++) compute_self_weight &= flux_face(iterator.Full_First_Face_Index(dim)) & flux_face(iterator.Full_Second_Face_Index(dim));
                 regular_cell(iterator.Cell_Index())=compute_self_weight;
                 cell_near_interface_tmp(iterator.Cell_Index())=!compute_self_weight;}}
         for(CELL_ITERATOR iterator(grid,2);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
             cell_near_interface(cell_index)=cell_near_interface_tmp(cell_index);
             if(cell_near_interface_tmp(cell_index)){
-                for(int dim=1;dim<=TV::dimension;++dim) {
+                for(int dim=0;dim<TV::dimension;dim++) {
                     if(psi(cell_index+TV_INT::Axis_Vector(dim))) cell_near_interface(cell_index+TV_INT::Axis_Vector(dim))=true;
                     if(psi(cell_index-TV_INT::Axis_Vector(dim))) cell_near_interface(cell_index-TV_INT::Axis_Vector(dim))=true;}
 #if 0
@@ -68,7 +68,7 @@ Update_Conservation_Law(T_GRID& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS
     {
         LOG::SCOPE scope("Irregular update for hybrid scheme (no collision bodies present).");
         U.Fill(TV_DIMENSION());
-        for(int dim=1;dim<=TV_DIMENSION::dimension;++dim){
+        for(int dim=0;dim<TV_DIMENSION::dimension;dim++){
             ARRAY<PAIR<T,INDEX> > weights;
             ARRAY<ARRAY<int>,INDEX> donors;donors.Resize(grid.Domain_Indices(3));
             ARRAY<ARRAY<int>,INDEX> receivers;receivers.Resize(grid.Domain_Indices(3));

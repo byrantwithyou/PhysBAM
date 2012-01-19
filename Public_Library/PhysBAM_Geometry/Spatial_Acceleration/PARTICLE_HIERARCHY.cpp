@@ -47,9 +47,9 @@ Initialize_Hierarchy_Using_KD_Tree()
 template<class TV,class T_ARRAY> void PARTICLE_HIERARCHY<TV,T_ARRAY>::
 Calculate_Bounding_Boxes(ARRAY<RANGE<TV> >& bounding_boxes) const
 {
-    if(particles_per_group) for(int k=1;k<=leaves;++k){
+    if(particles_per_group) for(int k=0;k<leaves;k++){
         bounding_boxes(k)=RANGE<TV>::Bounding_Box(X.Subset(particles_in_group(k)));}
-    else for(int k=1;k<=leaves;++k) bounding_boxes(k)=RANGE<TV>(X(k),X(k));
+    else for(int k=0;k<leaves;k++) bounding_boxes(k)=RANGE<TV>(X(k),X(k));
 }
 //#####################################################################
 // Function Calculate_Bounding_Box_Radii

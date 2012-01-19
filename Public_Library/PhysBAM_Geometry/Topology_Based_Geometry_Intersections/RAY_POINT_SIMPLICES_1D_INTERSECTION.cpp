@@ -17,7 +17,7 @@ namespace INTERSECTION{
 template<class T> bool Intersects(RAY<VECTOR<T,1> >& ray,const POINT_SIMPLICES_1D<T>& simplices, const T thickness_over_two)
 {
     bool hit=false;
-    for(int i=1;i<=simplices.mesh.elements.m;++i){
+    for(int i=0;i<simplices.mesh.elements.m;i++){
         POINT_SIMPLEX_1D<T> point_simplex=simplices.point_simplex_list?(*simplices.point_simplex_list)(i):simplices.Get_Element(i);
         if(INTERSECTION::Intersects(ray,point_simplex,thickness_over_two)){ray.aggregate_id=i;hit=true;}}
     return hit;
@@ -28,7 +28,7 @@ template<class T> bool Intersects(RAY<VECTOR<T,1> >& ray,const POINT_SIMPLICES_1
 template<class T> bool Closest_Non_Intersecting_Point(RAY<VECTOR<T,1> >& ray,const POINT_SIMPLICES_1D<T>& simplices,const T thickness_over_two)
 {
     bool hit=false;
-    for(int i=1;i<=simplices.mesh.elements.m;++i){
+    for(int i=0;i<simplices.mesh.elements.m;i++){
         POINT_SIMPLEX_1D<T> point_simplex=simplices.point_simplex_list?(*simplices.point_simplex_list)(i):simplices.Get_Element(i);
         if(INTERSECTION::Closest_Non_Intersecting_Point(ray,point_simplex,thickness_over_two)){ray.aggregate_id=i;hit=true;}}
     return hit;

@@ -357,7 +357,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         gnuplot_surface_stream.open(gnuplot_file.c_str());
         boundary->mesh.Initialize_Ordered_Loop_Nodes();assert(boundary->mesh.ordered_loop_nodes->m==1);
         ARRAY<int>& segmented_curve=(*boundary->mesh.ordered_loop_nodes)(1);
-        for(int i=1;i<=segmented_curve.m;++i){
+        for(int i=0;i<segmented_curve.m;i++){
             LOG::cout<<boundary->particles.X(segmented_curve(i))(1)<<"\t"<<boundary->particles.X(segmented_curve(i))(2)<<std::endl;
             gnuplot_surface_stream<<boundary->particles.X(segmented_curve(i))(1)<<"\t"<<boundary->particles.X(segmented_curve(i))(2)<<std::endl;}
         gnuplot_surface_stream.flush();
@@ -422,7 +422,7 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 
     boundary->mesh.Initialize_Ordered_Loop_Nodes();assert(boundary->mesh.ordered_loop_nodes->m==1);
     ARRAY<int>& segmented_curve=(*boundary->mesh.ordered_loop_nodes)(1);
-    for(int i=1;i<=segmented_curve.m;++i){
+    for(int i=0;i<segmented_curve.m;i++){
         LOG::cout<<boundary->particles.X(segmented_curve(i))(1)<<"\t"<<boundary->particles.X(segmented_curve(i))(2)<<std::endl;
         gnuplot_surface_stream<<boundary->particles.X(segmented_curve(i))(1)<<"\t"<<boundary->particles.X(segmented_curve(i))(2)<<std::endl;}
 

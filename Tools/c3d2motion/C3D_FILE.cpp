@@ -123,9 +123,9 @@ Read_Point_Section(FILE *fp)
     // Put the data in our structure (convert everything to floats,while we're at it)
     if(scale<0){//It is in float format
         point_float_format *temp_pts=new point_float_format[number_channels];
-        for(int i=1;i<=number_frames;++i){//Read a frame
+        for(int i=0;i<number_frames;i++){//Read a frame
             fread(temp_pts,sizeof(temp_pts[0]),number_channels,fp);
-            for(int j=1;j<=number_channels;++j){//copy a channel
+            for(int j=0;j<number_channels;j++){//copy a channel
                 const point_float_format& temp=temp_pts[j-1];C3D_POINT& frame=frames(i,j);
                 frame.x=temp.x;
                 frame.y=temp.y;
@@ -135,9 +135,9 @@ Read_Point_Section(FILE *fp)
         delete[] temp_pts;}
     else{//It is in int format
         point_int_format *temp_pts=new point_int_format[number_channels];
-        for(int i=1;i<=number_frames;++i){//Read a frame
+        for(int i=0;i<number_frames;i++){//Read a frame
             fread(temp_pts,sizeof(temp_pts[0]),number_channels,fp);
-            for(int j=1;j<=number_channels;++j){//copy a channel
+            for(int j=0;j<number_channels;j++){//copy a channel
                 const point_int_format& temp=temp_pts[j-1];C3D_POINT& frame=frames(i,j);
                 frame.x=temp.x*scale;
                 frame.y=temp.y*scale;

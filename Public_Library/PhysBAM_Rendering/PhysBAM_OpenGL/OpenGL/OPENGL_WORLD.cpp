@@ -452,7 +452,7 @@ void OPENGL_WORLD::Render_World(bool selecting,bool swap_buffers)
 #endif
         glEnable(GL_POLYGON_OFFSET_FILL);
         glPolygonOffset(1.0,1.0);
-        for(int i=1;i<=object_list.m;++i) if((!selecting && object_list(i)->visible) || object_list(i)->selectable) object_list(i)->Display();
+        for(int i=0;i<object_list.m;i++) if((!selecting && object_list(i)->visible) || object_list(i)->selectable) object_list(i)->Display();
         glDisable(GL_POLYGON_OFFSET_FILL);
 #ifndef USE_OPENGLES
         glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
@@ -465,7 +465,7 @@ void OPENGL_WORLD::Render_World(bool selecting,bool swap_buffers)
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
         glTranslatef(-stereo_offset*camera_distance,0,0);
-        for(int i=1;i<=object_list.m;++i) if((!selecting && object_list(i)->visible) || object_list(i)->selectable) object_list(i)->Display(0); // draw everything in greyscale
+        for(int i=0;i<object_list.m;i++) if((!selecting && object_list(i)->visible) || object_list(i)->selectable) object_list(i)->Display(0); // draw everything in greyscale
         if(view_target_timer>0) opengl_world->Display_Target(0);
         glPopMatrix();
         glClear(GL_DEPTH_BUFFER_BIT); // leave the blue image but clear Z (NOTE: may need to clear alpha as well for transparency effects!)
@@ -473,12 +473,12 @@ void OPENGL_WORLD::Render_World(bool selecting,bool swap_buffers)
         glMatrixMode(GL_PROJECTION);
         glPushMatrix();
         glTranslatef(stereo_offset*camera_distance,0,0);
-        for(int i=1;i<=object_list.m;++i) if((!selecting && object_list(i)->visible) || object_list(i)->selectable) object_list(i)->Display(0); // draw everything in greyscale
+        for(int i=0;i<object_list.m;i++) if((!selecting && object_list(i)->visible) || object_list(i)->selectable) object_list(i)->Display(0); // draw everything in greyscale
         if(view_target_timer>0) opengl_world->Display_Target(0);
         glPopMatrix();
         glColorMask(GL_TRUE,GL_TRUE,GL_TRUE,GL_TRUE);}
     else{
-        for(int i=1;i<=object_list.m;++i)
+        for(int i=0;i<object_list.m;i++)
             if((!selecting && object_list(i)->visible) || object_list(i)->selectable){
 #ifndef USE_OPENGLES
                 if(load_names_for_selection) glLoadName(i);

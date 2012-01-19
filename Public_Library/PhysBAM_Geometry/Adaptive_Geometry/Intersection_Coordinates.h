@@ -112,7 +112,7 @@ void Convert_And_Ensure_Abs_Tol(const VECTOR<T_ADAPTIVE,N>& adaptive_coordinates
 {
     STATIC_ASSERT((IS_ADAPTIVE<T_ADAPTIVE>::value));
     typedef typename T_ADAPTIVE::FP_TYPE FP_TYPE;
-    for(int i=1;i<=N;++i){
+    for(int i=0;i<N;i++){
         FP_TYPE estimate,error;
         adaptive_coordinates[i].Estimate_And_Error().Get(estimate,error);
         if(error>abs_tol) estimate=adaptive_coordinates[i].Refined_Estimate();
@@ -222,7 +222,7 @@ Intersection_Coordinates(const VECTOR<VECTOR<T,N>,N+1>& simplex,const VECTOR<T,N
     ADAPTIVE_TYPE2 common_denominator(Adaptive_Signed_Volume<T_EXACT>(simplex));
     VECTOR<ADAPTIVE_TYPE1,N+1> simplex_coordinates_numerator;
     Intersection_Coordinates_Helper<T_EXACT>(simplex,point,simplex_coordinates_numerator);
-    for(int i=1;i<=N+1;++i) simplex_coordinates[i]=simplex_coordinates_numerator[i]/common_denominator;
+    for(int i=0;i<N+1;i++) simplex_coordinates[i]=simplex_coordinates_numerator[i]/common_denominator;
 }
 
 template<class T_EXACT,class T,class T_ADAPTIVE> void

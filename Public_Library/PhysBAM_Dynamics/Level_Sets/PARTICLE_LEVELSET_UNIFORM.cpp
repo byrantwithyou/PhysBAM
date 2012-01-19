@@ -755,7 +755,7 @@ Reseed_Add_Particles_Threaded_Part_Two(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLE_L
     RANDOM_NUMBERS<T> local_random;
     for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block_index=iterator.Node_Index();
         if(!number_of_particles_to_add(block_index)) continue;
-        VECTOR<T,TV::dimension+1> h;for(int axis=1;axis<=TV::dimension;++axis) h(axis)=(T)block_index(axis);h(TV::dimension+1) = time;
+        VECTOR<T,TV::dimension+1> h;for(int axis=0;axis<TV::dimension;axis++) h(axis)=(T)block_index(axis);h(TV::dimension+1) = time;
         local_random.Set_Seed(Hash(h));
         BLOCK_UNIFORM<T_GRID> block(levelset.grid,block_index);
         PARTICLE_LEVELSET_PARTICLES<TV>* cell_particles=particles(block_index);
@@ -1193,7 +1193,7 @@ Reincorporate_Removed_Particles(const BLOCK_UNIFORM<T_GRID>& block,PARTICLE_LEVE
             TV half_impulse;
             if(material_volume) half_impulse=removed_particles.V(k)*mass_scaling*(T).5*(*material_volume)(k);
             else half_impulse = removed_particles.V(k)*mass_scaling*pow<TV::dimension>(r)*half_unit_sphere_size_over_cell_size;
-            for(int i=1;i<=T_GRID::dimension;++i){
+            for(int i=0;i<T_GRID::dimension;i++){
                 TV_INT face_index(cell_index);
                 typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE &face_velocity=V->Component(i);
 #ifdef USE_PTHREADS

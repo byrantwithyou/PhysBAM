@@ -283,10 +283,10 @@ Triangulate_Nonconvex_Simple_Polygon(const VECTORT2_ARRAY& coordinates,const INT
     // assumption: the polygon is positively oriented consecutive vertices are distinct all segments are either pairwise non-intersecting or share 1 or 2 vertices
 #ifndef NDEBUG
     assert(Polygon_Orientation(coordinates.Subset(polygon_input))>=0);
-    for(int i=1;i<=polygon_input.m;++i){
+    for(int i=0;i<polygon_input.m;i++){
         int inext=i%polygon_input.m+1,v=polygon_input(i),vnext=polygon_input(inext);
         assert(v!=vnext);assert(coordinates(v)!=coordinates(vnext));}
-    for(int i=1;i<=polygon_input.m-2;++i) for(int j=i+2;j<=polygon_input.m;++j){
+    for(int i=0;i<polygon_input.m-2;i++) for(int j=i+2;j<=polygon_input.m;++j){
         int v1=polygon_input(i),v2=polygon_input(i+1),u1=polygon_input(j),u2=polygon_input(j%polygon_input.m+1);
         if(v1==u1||v1==u2||v2==u1||v2==u2) continue;
         const VECTOR<T,2> &x1=coordinates(v1),&x2=coordinates(v2),&y1=coordinates(u1),&y2=coordinates(u2);
@@ -303,9 +303,9 @@ Triangulate_Nonconvex_Simple_Polygon(const VECTORT2_ARRAY& coordinates,const INT
         if(infinite_loop_detector>polygon.m){
             LOG::cerr<<std::endl;
             LOG::cerr<<"coordinates (input) = "<<std::endl;
-            for(int j=1;j<=polygon_input.m;++j) LOG::cerr<<coordinates(polygon_input(j))<<std::endl;
+            for(int j=0;j<polygon_input.m;j++) LOG::cerr<<coordinates(polygon_input(j))<<std::endl;
             LOG::cerr<<"polygon_input = "<<polygon_input<<std::endl;
-            for(int j=1;j<=polygon.m;++j) LOG::cerr<<coordinates(polygon(j))<<std::endl;
+            for(int j=0;j<polygon.m;j++) LOG::cerr<<coordinates(polygon(j))<<std::endl;
             LOG::cerr<<"polygon = "<<polygon<<std::endl;
             PHYSBAM_FATAL_ERROR("infinite loop");}
         infinite_loop_detector++;
@@ -347,7 +347,7 @@ Triangulate_Nonconvex_Nonsimple_Polygon(const VECTORT2_ARRAY& coordinates,const 
     if(polygon_input.m==0) return 0;
     if(polygon_input.m==1) return Triangulate_Nonconvex_Simple_Polygon(coordinates,polygon_input(1),triangles,keep_degenerate_triangles);
     ARRAY< ARRAY<int> > polygon(polygon_input.m);
-    for(int ell=1;ell<=polygon.m;++ell) polygon(ell)=polygon_input(ell);
+    for(int ell=0;ell<polygon.m;ell++) polygon(ell)=polygon_input(ell);
     int infinite_loop_detector=0;
     for(int ell=polygon.m;polygon.m>1;ell=(ell+polygon.m-2)%polygon.m+1){
         if(ell==1) continue;
@@ -378,9 +378,9 @@ Triangulate_Nonconvex_Nonsimple_Polygon(const VECTORT2_ARRAY& coordinates,const 
                 // trial segment is good; splice loop_ell into loop_1
                 ARRAY<int> temp_loop_1;
                 temp_loop_1.Preallocate(loop_1.m+loop_ell.m+2);
-                for(int k=1;k<=i;++k) temp_loop_1.Append(loop_1(k));
+                for(int k=0;k<i;k++) temp_loop_1.Append(loop_1(k));
                 for(int k=j;k<=loop_ell.m;++k) temp_loop_1.Append(loop_ell(k));
-                for(int k=1;k<=j;++k) temp_loop_1.Append(loop_ell(k));
+                for(int k=0;k<j;k++) temp_loop_1.Append(loop_ell(k));
                 for(int k=i;k<=loop_1.m;++k) temp_loop_1.Append(loop_1(k));
                 loop_1.Exchange(temp_loop_1);
                 spliced=true;}}
@@ -393,7 +393,7 @@ Triangulate_Nonconvex_Nonsimple_Polygon(const VECTORT2_ARRAY& coordinates,const 
     // unknot vertices, if necessary
     HASHTABLE<int,int> num_paths_through(polygon1.m);
     HASHTABLE<int,int> knotted_vertices;
-    for(int i=1;i<=polygon1.m;++i){
+    for(int i=0;i<polygon1.m;i++){
         int v=polygon1(i);int& n=num_paths_through.Get_Or_Insert(v,0);
         if(++n>=3) knotted_vertices.Set(v,n);}
     for(HASHTABLE_ITERATOR<int,int> it(knotted_vertices);it.Valid();it.Next()){
@@ -402,7 +402,7 @@ Triangulate_Nonconvex_Nonsimple_Polygon(const VECTORT2_ARRAY& coordinates,const 
         // mark where all the loops through v begin
         ARRAY<PAIR<int,int> > vnexts;
         vnexts.Preallocate(n);
-        for(int i=1;i<=polygon1.m;++i) if(polygon1(i)==v){int inext=i%polygon1.m+1;vnexts.Append(Tuple(polygon1(inext),inext));}
+        for(int i=0;i<polygon1.m;i++) if(polygon1(i)==v){int inext=i%polygon1.m+1;vnexts.Append(Tuple(polygon1(inext),inext));}
         assert(vnexts.m==n);
         // (insertion) sort the loops in counter-clockwise order
         const VECTOR<T,2>& x=coordinates(v);
@@ -420,7 +420,7 @@ Triangulate_Nonconvex_Nonsimple_Polygon(const VECTORT2_ARRAY& coordinates,const 
         // rearrange the loops in polygon1
         ARRAY<int> new_polygon1;
         new_polygon1.Preallocate(polygon1.m);
-        for(int j=1;j<=n;++j){
+        for(int j=0;j<n;j++){
             new_polygon1.Append(v);
             int i=vnexts(j).y;
             for(int u;(u=polygon1(i))!=v;i=i%polygon1.m+1) new_polygon1.Append(u);}

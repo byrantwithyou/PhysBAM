@@ -91,7 +91,7 @@ public:
     {if(surface.vertex_normals==0) PHYSBAM_FATAL_ERROR("Need vertex_normals to initialize radii_of_curvature");
     radii_of_curvature.Resize(surface.mesh.elements.m);
     ARRAY_VIEW<const TV> X(surface.particles.X),normals(*surface.vertex_normals);
-    for(int t=1;t<=surface.mesh.elements.m;++t){
+    for(int t=0;t<surface.mesh.elements.m;t++){
         int i,j,k;surface.mesh.elements(t).Get(i,j,k);
         TV position=(T)one_third*(X(i)+X(j)+X(k)), normal=(T)one_third*(normals(i)+normals(j)+normals(k));
         radii_of_curvature(t)=min(Radius_Of_Curvature_Estimate(position,normal,X(i),normals(i)),
@@ -99,7 +99,7 @@ public:
             Radius_Of_Curvature_Estimate(position,normal,X(k),normals(k)));}}
 
     T Number_Points_From_Repulsion_Radii() const
-    {T reference_number=0;for(int t=1;t<=surface.mesh.elements.m;++t) reference_number+=(T)3.6276*surface.Area(t)/((T)pi*sqr(Repulsion_Radius(t)));
+    {T reference_number=0;for(int t=0;t<surface.mesh.elements.m;t++) reference_number+=(T)3.6276*surface.Area(t)/((T)pi*sqr(Repulsion_Radius(t)));
     return overpopulation_fraction*reference_number;}
 
     void Set_Standard_Repulsion_Radius(const T radius){standard_repulsion_radius=radius;number_points=(int)(number_points_float=Number_Points_From_Repulsion_Radii());}
@@ -137,9 +137,9 @@ public:
     void Initialize_Sampling()
     {T sum=0;
     if(use_curvature_based_repulsion_radius_restriction)
-        for(int t=1;t<=surface.mesh.elements.m;++t){sum+=surface.Area(t)/sqr(Repulsion_Radius(t));sample_pdf(t)=sum;}
+        for(int t=0;t<surface.mesh.elements.m;t++){sum+=surface.Area(t)/sqr(Repulsion_Radius(t));sample_pdf(t)=sum;}
     else
-        for(int t=1;t<=surface.mesh.elements.m;++t){sum+=surface.Area(t);sample_pdf(t)=sum;}
+        for(int t=0;t<surface.mesh.elements.m;t++){sum+=surface.Area(t);sample_pdf(t)=sum;}
     sample_pdf/=sample_pdf.Last();}
 
     int Triangle(const T fraction) const
@@ -152,13 +152,13 @@ public:
 
     void Update_Points_In_Triangle()
     {points_in_triangle.Resize(surface.mesh.elements.m);
-    for(int t=1;t<=points_in_triangle.m;++t)points_in_triangle(t).Resize(0);
-    for(int i=1;i<=points.m;++i)points_in_triangle(points(i).triangle).Append(i);}
+    for(int t=0;t<points_in_triangle.m;t++)points_in_triangle(t).Resize(0);
+    for(int i=0;i<points.m;i++)points_in_triangle(points(i).triangle).Append(i);}
 
     void Seed_Points()
     {points.Resize(number_points);
     ARRAY_VIEW<const TV> X(surface.particles.X);
-    for(int q=1;q<=number_points;++q){
+    for(int q=0;q<number_points;q++){
         int triangle=Triangle((q-(T).5)/number_points);
         T a=random.Get_Uniform_Number(0,1);
         T b=random.Get_Uniform_Number(0,1);
@@ -179,7 +179,7 @@ public:
     {int number_of_points=Get_Subdivide_Particles_Number(level,surface.mesh.elements.m),particle_index=1;
     Set_Standard_Number_Points(number_of_points);Set_Number_Points(number_of_points);
     points.Resize(0);points.Resize(number_of_points);
-    for(int triangle=1;triangle<=surface.mesh.elements.m;++triangle){
+    for(int triangle=0;triangle<surface.mesh.elements.m;triangle++){
         int i,j,k;surface.mesh.elements(triangle).Get(i,j,k);
         Set_Subdivided_Points(surface.particles.X(i),surface.particles.X(j),surface.particles.X(k),triangle,particle_index,level);}
     Update_Points_In_Triangle();Update_Neighbor_Points();Update_Stats();}
@@ -190,14 +190,14 @@ public:
     Update_Neighbor_Points();Update_Stats();}
 
     bool Intersection_With_Triangles(RAY<TV>& ray,const ARRAY<int>& triangles,int& new_triangle)
-    {for(int i=1;i<=triangles.m;++i) if(INTERSECTION::Intersects(ray,(*surface.triangle_list)(triangles(i)))){new_triangle=triangles(i);return true;}
+    {for(int i=0;i<triangles.m;i++) if(INTERSECTION::Intersects(ray,(*surface.triangle_list)(triangles(i)))){new_triangle=triangles(i);return true;}
     return false;}
 
     void Get_Points(ARRAY<TV>& position) const
-    {position.Resize(points.m);for(int i=1;i<=position.m;++i)position(i)=points(i).position;}
+    {position.Resize(points.m);for(int i=0;i<position.m;i++)position(i)=points(i).position;}
 
     void Get_Triangles(ARRAY<int>& triangles) const
-    {triangles.Resize(points.m);for(int i=1;i<=triangles.m;++i) triangles(i)=points(i).triangle;}
+    {triangles.Resize(points.m);for(int i=0;i<triangles.m;i++) triangles(i)=points(i).triangle;}
 
     void Set_Points(ARRAY_VIEW<const TV> X)
     {points.Resize(X.Size());
@@ -210,7 +210,7 @@ public:
     ARRAY<T> triangle_areas(surface.triangle_list->m);
     for(int i=1;i<=surface.triangle_list->m;++i){
         triangle_areas(i)=(*surface.triangle_list)(i).Area();}
-    for(int i=1;i<=points.m;++i){
+    for(int i=0;i<points.m;i++){
         triangle_correspondences(i)=points(i).triangle;
         point_weights(i)=(*surface.triangle_list)(triangle_correspondences(i)).Barycentric_Coordinates(points(i).position);}
     Write_Binary<RW>(output,point_weights,triangle_correspondences,triangle_areas);}

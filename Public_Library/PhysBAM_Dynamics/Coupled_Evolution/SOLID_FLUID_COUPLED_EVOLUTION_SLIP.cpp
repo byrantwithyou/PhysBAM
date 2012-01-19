@@ -166,7 +166,7 @@ Process_Collisions(const T dt,const T time,const bool advance_rigid_bodies)
                     LOG::cout<<"Added "<<added_bodies.m<<" to the simulation"<<std::endl;
                     removed_bodies.Append(solid_body_collection.rigid_body_collection.rigid_geometry_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(rigid_particle_index));
                     solid_body_collection.rigid_body_collection.rigid_body_particle.Remove_Body(rigid_particle_index);
-                    for(int i=1;i<=added_bodies.m;++i){
+                    for(int i=0;i<added_bodies.m;i++){
                         COLLISION_GEOMETRY<TV>* collision_body=&(*solid_body_collection.rigid_body_collection.rigid_geometry_collection.collision_body_list)(
                                 solid_body_collection.rigid_body_collection.rigid_geometry_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(added_bodies(i)));
                         fluids_parameters.collision_bodies_affecting_fluid->collision_geometry_collection.Add_Body(collision_body,added_bodies(i),false);
@@ -174,7 +174,7 @@ Process_Collisions(const T dt,const T time,const bool advance_rigid_bodies)
 
                     if(!solids_fluids_parameters.mpi_solid_fluid || solids_fluids_parameters.mpi_solid_fluid->Solid_Node())
                         rigids_evolution_callbacks.End_Fracture(rigid_particle_index,added_bodies);
-                    for(int i=1;i<=added_bodies.m;++i){
+                    for(int i=0;i<added_bodies.m;i++){
                         COLLISION_GEOMETRY<TV>* collision_body=&(*solid_body_collection.rigid_body_collection.rigid_geometry_collection.collision_body_list)(
                                 solid_body_collection.rigid_body_collection.rigid_geometry_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(added_bodies(i)));
                         collision_body->Save_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_OLD_STATE,time);}
@@ -182,7 +182,7 @@ Process_Collisions(const T dt,const T time,const bool advance_rigid_bodies)
                     all_added_bodies.Append_Elements(added_bodies);}}}
 
         if(all_added_bodies.m){
-            for(int i=1;i<=removed_bodies.m;++i)
+            for(int i=0;i<removed_bodies.m;i++)
                 fluids_parameters.collision_bodies_affecting_fluid->Remove_Body(removed_bodies(i));
 
             solid_body_collection.rigid_body_collection.rigid_geometry_collection.Destroy_Unreferenced_Geometry();
@@ -677,7 +677,7 @@ template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>::
 Setup_Boundary_Condition_Collection()
 {
     VECTOR<VECTOR<bool,2>,TV::dimension> mpi_boundaries;mpi_boundaries.Fill(VECTOR<bool,2>(false,false));
-    if(fluids_parameters.mpi_grid) for(int axis=1;axis<=TV::dimension;++axis) for(int axis_side=1;axis_side<=2;++axis_side)
+    if(fluids_parameters.mpi_grid) for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++)
         if(fluids_parameters.mpi_grid->side_neighbor_ranks(2*(axis-1)+axis_side)>=0) mpi_boundaries(axis)(axis_side)=true;
 
     if(Simulate_Incompressible_Fluids()){

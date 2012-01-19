@@ -50,7 +50,7 @@ public:
     
     void Display_Data()
     {printf("Parameter Data: %d groups\n",groups.m);printf("--------------\n");
-    for(int i=1;i<=groups.m;++i){printf("Group 0x%02x \"%s\"\n",i,groups(i).Get_Name());groups(i).Display_Data();printf("\n");}}
+    for(int i=0;i<groups.m;i++){printf("Group 0x%02x \"%s\"\n",i,groups(i).Get_Name());groups(i).Display_Data();printf("\n");}}
     
     bool Valid_Frame_Index(const int i) const
     {return frames.m_start<=i && i<=frames.m_end;}
@@ -59,7 +59,7 @@ public:
     {return frames.n_start<=j && j<=frames.n_end;}
     
     void Get_Frame_Data(const int frame,PhysBAM::ARRAY<C3D_POINT>& data_array)
-    {int channels=Number_Channels();data_array.Resize(channels);for(int j=1;j<=channels;++j) data_array(j)=frames(frame,j);}
+    {int channels=Number_Channels();data_array.Resize(channels);for(int j=0;j<channels;j++) data_array(j)=frames(frame,j);}
     
     int Number_Visible_Markers(const int frame) const
     {if(!Valid_Frame_Index(frame)) return 0;

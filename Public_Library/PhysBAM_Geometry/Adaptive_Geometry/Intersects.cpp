@@ -131,7 +131,7 @@ namespace GEOMETRIC_PREDICATES_DETAIL{
         typedef VECTOR<T,d> TV;
         VECTOR<TV,m+n> all_vertices=simplex1.Append_Elements(simplex2);
         VECTOR<TV,d> matrix;
-        for(int i=1;i<=d;++i) matrix[i]=all_vertices[i];
+        for(int i=0;i<d;i++) matrix[i]=all_vertices[i];
         for(int i=d+1;i<=m+n;++i) if(Adaptive_Signed_Volume<T_EXACT>(all_vertices[i],matrix).Sign()!=0) return false;
         return true;
     }
@@ -145,8 +145,8 @@ namespace GEOMETRIC_PREDICATES_DETAIL{
         VECTOR<VECTOR<T,d-1>,n> simplex2_proj;
         bool intersects=false,is_degenerate=true;
         for(int k=1;k<=d&&is_degenerate;++k){
-            for(int i=1;i<=m;++i) simplex1_proj[i]=simplex1[i].Remove_Index(k);
-            for(int i=1;i<=n;++i) simplex2_proj[i]=simplex2[i].Remove_Index(k);
+            for(int i=0;i<m;i++) simplex1_proj[i]=simplex1[i].Remove_Index(k);
+            for(int i=0;i<n;i++) simplex2_proj[i]=simplex2[i].Remove_Index(k);
             intersects=Intersects<T_EXACT>(simplex1_proj,simplex2_proj,&is_degenerate);}
         return (intersects||is_degenerate);
     }
@@ -157,7 +157,7 @@ namespace GEOMETRIC_PREDICATES_DETAIL{
     template<class T_EXACT,class T,int d,int n> bool
     Is_Any_Inside_Helper(const VECTOR<VECTOR<T,d>,d+1>& simplex1,const VECTOR<VECTOR<T,d>,n>& simplex2)
     {bool is_degenerate;
-    for(int i=1;i<=n;++i) if(Intersects<T_EXACT>(simplex1,simplex2[i],&is_degenerate)&&!is_degenerate) return true;
+    for(int i=0;i<n;i++) if(Intersects<T_EXACT>(simplex1,simplex2[i],&is_degenerate)&&!is_degenerate) return true;
     return false;}
 
 template<class T_EXACT,class T,int d> bool
@@ -168,7 +168,7 @@ Intersects(const VECTOR<VECTOR<T,d>,d+1>& simplex,const VECTOR<T,d>& point,bool*
     bool is_possibly_degenerate=false;
     if(is_degenerate_p) *is_degenerate_p=false;
     // compute the signed volumes obtained by replacing each simplex vertex in turn with point if 2 such signed volumes have opposite sign, point cannot lie in simplex
-    for(int i=1;i<=d+1;++i){
+    for(int i=0;i<d+1;i++){
         test_simplex[i]=point;
         int next_sign=Adaptive_Signed_Volume<T_EXACT>(test_simplex).Sign();
         if(next_sign==0) is_possibly_degenerate=true;
@@ -204,7 +204,7 @@ Intersects(const VECTOR<VECTOR<T,d>,m>& simplex1,const VECTOR<VECTOR<T,d>,n>& si
     if(!is_degenerate) return intersects;
     // check if coplanar, and if so, perform intersection check on one dimension lower
     if(Is_Cohyperplanar<T_EXACT>(simplex1,simplex2)){if(!Intersects_Or_Is_Degenerate_After_Projection<T_EXACT>(simplex1,simplex2)) return false;}
-    else for(int i=1;i<=m;++i) if(Intersects<T_EXACT>(simplex1.Remove_Index(i),simplex2,&is_degenerate)&&!is_degenerate) return true; // check if a subsimplex of simplex1 intersects simplex2
+    else for(int i=0;i<m;i++) if(Intersects<T_EXACT>(simplex1.Remove_Index(i),simplex2,&is_degenerate)&&!is_degenerate) return true; // check if a subsimplex of simplex1 intersects simplex2
     // do not pursue this further, for now
     if(is_degenerate_p==0) throw GEOMETRIC_DEGENERACY();
     *is_degenerate_p=true;
@@ -222,7 +222,7 @@ Intersects(const VECTOR<VECTOR<T,d>,d+1>& simplex1,const VECTOR<VECTOR<T,d>,n>& 
     // check if a point from either simplex lies strictly inside the other
     if(Is_Any_Inside<T_EXACT>(simplex1,simplex2)) return true;
     // check if a subsimplex of simplex1 intersects simplex2
-    for(int i=1;i<=d+1;++i) if(Intersects<T_EXACT>(simplex1.Remove_Index(i),simplex2,&is_degenerate)&&!is_degenerate) return true;
+    for(int i=0;i<d+1;i++) if(Intersects<T_EXACT>(simplex1.Remove_Index(i),simplex2,&is_degenerate)&&!is_degenerate) return true;
     // do not pursue this further, for now
     if(is_degenerate_p==0) throw GEOMETRIC_DEGENERACY();
     *is_degenerate_p=true;

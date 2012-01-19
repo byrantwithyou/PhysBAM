@@ -332,7 +332,7 @@ template<class T_GRID> void EULER_UNIFORM<T_GRID>::
 Clamp_Internal_Energy_Ghost(T_ARRAYS_DIMENSION_SCALAR& U_ghost,const int number_of_ghost_cells) const
 {
     if(apply_cavitation_correction) return;
-    for(int axis=1;axis<=TV::dimension;++axis) for(int axis_side=1;axis_side<=2;++axis_side) if(!mpi_grid || !mpi_grid->Neighbor(axis,axis_side)){
+    for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++) if(!mpi_grid || !mpi_grid->Neighbor(axis,axis_side)){
         for(CELL_ITERATOR iterator(grid,number_of_ghost_cells,T_GRID::GHOST_REGION,2*axis-(2-axis_side));iterator.Valid();iterator.Next()){
             TV_DIMENSION U_cell=U_ghost(iterator.Cell_Index());
             T e=EULER<T_GRID>::e(U_cell);

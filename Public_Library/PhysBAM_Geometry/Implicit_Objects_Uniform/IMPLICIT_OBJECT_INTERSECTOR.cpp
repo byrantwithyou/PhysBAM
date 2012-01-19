@@ -138,7 +138,7 @@ Negative_Material_In_Box_Excluding_Object(const RANGE<TV>& box,const ARRAY<IMPLI
     for(int i=0;i<last_node;i++){T& phi=cell_phis(i);
         phi=Extended_Phi(cell_particle_X(i));
         // TODO This is the slow way to do it...
-        for(int j=1;j<=excluded_implicit_objects.m;++j) phi=max(phi,-excluded_implicit_objects(j)->Extended_Phi(cell_particle_X(i)));
+        for(int j=0;j<excluded_implicit_objects.m;j++) phi=max(phi,-excluded_implicit_objects(j)->Extended_Phi(cell_particle_X(i)));
         if(phi<minimum_phi) minimum_phi=phi;
         if(phi>maximum_phi) maximum_phi=phi;}
 
@@ -159,7 +159,7 @@ Negative_Material_In_Box_Excluding_Object(const RANGE<TV>& box,const ARRAY<IMPLI
         // compute phis for extant nodes
         for(int i=last_node+1;i<=cell_phis.m;i++){T& phi=cell_phis(i);
             phi=Extended_Phi(cell_particle_X(i));
-            for(int j=1;j<=excluded_implicit_objects.m;++j) phi=max(phi,-excluded_implicit_objects(j)->Extended_Phi(cell_particle_X(i)));}
+            for(int j=0;j<excluded_implicit_objects.m;j++) phi=max(phi,-excluded_implicit_objects(j)->Extended_Phi(cell_particle_X(i)));}
         last_node=cell_phis.m;}
 
     if(maximum_refinement_depth>0 && cell_phis.m==unrefined_point_count) return minimum_phi<=0?box.Size():0;

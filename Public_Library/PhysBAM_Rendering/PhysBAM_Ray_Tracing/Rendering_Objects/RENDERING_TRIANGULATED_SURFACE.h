@@ -136,7 +136,7 @@ public:
     {assert(texture_coordinates&&triangulated_surface.vertex_normals);assert(!tangent_vectors);
     tangent_vectors=new ARRAY<TV>;
     tangent_vectors->Resize(triangulated_surface.mesh.number_nodes);
-    for(int i=1;i<=triangulated_surface.mesh.elements.m;++i){
+    for(int i=0;i<triangulated_surface.mesh.elements.m;i++){
         int index1,index2,index3;triangulated_surface.mesh.elements(i).Get(index1,index2,index3);
         int uv1,uv2,uv3;(*triangle_texture_coordinates)(i).Get(uv1,uv2,uv3);
         TV p1=triangulated_surface.particles.X(index1),p2=triangulated_surface.particles.X(index2),p3=triangulated_surface.particles.X(index3);
@@ -169,7 +169,7 @@ public:
     {LOG::cerr<<"Doing per vertex displacement..." << std::endl;
     // TODO: fix to average all vertex uv's
     assert(texture_coordinates->m==triangulated_surface.particles.array_collection->Size());
-    for(int i=1;i<=triangulated_surface.mesh.number_nodes;++i){
+    for(int i=0;i<triangulated_surface.mesh.number_nodes;i++){
         TV current_perturbation=interpolation.Clamped_To_Array_Cell(grid,bump_map_pixels,VECTOR<T,2>((*texture_coordinates)(i).x,(*texture_coordinates)(i).y));
         current_perturbation=(current_perturbation-TV(0.5,0.5,0.5))*(T)2;
         T current_perturbation_sum=current_perturbation.x+current_perturbation.y+current_perturbation.z;

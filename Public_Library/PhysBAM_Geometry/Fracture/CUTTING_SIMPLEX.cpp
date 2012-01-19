@@ -37,7 +37,7 @@ CUTTING_SIMPLEX(const VECTOR<int,d>& nodes,const SIMPLEX_TYPE type,const VECTOR<
     :type(type),parent(parent),element_owner(element_owner),nodes(nodes),weights(weights),abs_tol(0)
 {
     assert(type==LOCAL_EMBEDDING_FACE);
-    for(int i=1;i<=d;++i){assert(nodes[i]!=0);for(int j=1;j<=d;++j) assert(weights[i][j]==0||weights[i][j]==1);}
+    for(int i=0;i<d;i++){assert(nodes[i]!=0);for(int j=0;j<d;j++) assert(weights[i][j]==0||weights[i][j]==1);}
 }
 //#####################################################################
 // Constructor
@@ -58,7 +58,7 @@ CUTTING_SIMPLEX(const VECTOR<int,d>& nodes,SIMPLEX_TYPE type,T abs_tol,int paren
     if(nodes[d]!=0){
         VECTOR<VECTOR<T,d+1>,d> temp_weights;
         Barycentric_Coordinates<EXACT_FLOAT<T> >(element_original_coordinates,simplex_original_coordinates,temp_weights,abs_tol);
-        for(int i=1;i<=d;++i) for(int j=1;j<=d;++j) weights[i][j]=temp_weights[i][j];}
+        for(int i=0;i<d;i++) for(int j=0;j<d;j++) weights[i][j]=temp_weights[i][j];}
     else{
         VECTOR<VECTOR<T,d>,d-1> simplex2;
         for(int i=1;i<d;++i) simplex2[i]=simplex_original_coordinates[i];
@@ -67,13 +67,13 @@ CUTTING_SIMPLEX(const VECTOR<int,d>& nodes,SIMPLEX_TYPE type,T abs_tol,int paren
         // set the fake node's weights to be at the center of the real nodes
         weights[d].Fill(0);
         for(int i=1;i<d;++i){
-            for(int j=1;j<=d;++j) weights[i][j]=temp_weights[i][j];
+            for(int j=0;j<d;j++) weights[i][j]=temp_weights[i][j];
             weights[d]+=weights[i];}
         weights[d]/=(T)(d-1);}
     // determine whether each node is inside the embedding element
     VECTOR<VECTOR<GET_ADAPTIVE_WEIGHTS_RESULT_TYPE,d>,d> adaptive_weights;
     Get_Adaptive_Weights(adaptive_weights);
-    for(int i=1;i<=d;++i){
+    for(int i=0;i<d;i++){
         bool& inside=node_in_embedded_simplex[i];
         inside=true;
         for(int j=1;j<=d&&inside;++j) {
@@ -92,7 +92,7 @@ template<class T,int d> void CUTTING_SIMPLEX<T,d>::
 Get_Adaptive_Weights(VECTOR<VECTOR<GET_ADAPTIVE_WEIGHTS_RESULT_TYPE,d>,d>& adaptive_weights) const
 {
     VECTOR<int,d> node_indices;
-    for(int i=1;i<=d;++i) node_indices[i]=i;
+    for(int i=0;i<d;i++) node_indices[i]=i;
     Get_Adaptive_Weights(adaptive_weights,node_indices);
 }
 //#####################################################################
@@ -105,7 +105,7 @@ Get_Adaptive_Weights(VECTOR<VECTOR<GET_ADAPTIVE_WEIGHTS_RESULT_TYPE,d>,N>& adapt
     assert(type==LOCAL_EMBEDDING_FACE||type==LOCAL_CUT_FACE);
     // by non-const reference to allow updating of weights
     CUTTING_SIMPLEX_COORDINATE_SHARED<T,d>* shared=new CUTTING_SIMPLEX_COORDINATE_SHARED<T,d>(*const_cast<CUTTING_SIMPLEX<T,d>*>(this));shared->Add_Ref();
-    for(int i=1;i<=N;++i) Get_Adaptive_Weights(adaptive_weights[i],node_indices[i],shared);
+    for(int i=0;i<N;i++) Get_Adaptive_Weights(adaptive_weights[i],node_indices[i],shared);
     assert((shared->Ref_Count()-1)%d==0);
     if(shared->Release()==0) delete shared;
 }
@@ -131,7 +131,7 @@ Get_Adaptive_Weights(VECTOR<GET_ADAPTIVE_WEIGHTS_RESULT_TYPE,d>& adaptive_weight
     assert((unsigned)node_index<d);
     // for a fake node, we shouldn't be using the coordinate, so no need to resort to exact arithmetic
     T error=(nodes[node_index]!=0?abs_tol:0);
-    for(int j=1;j<=d;++j){
+    for(int j=0;j<d;j++){
         T local_weight=weights[node_index][j],local_error=(error>0?max(error,ulp(local_weight)/2):0);
         adaptive_weights[j].Set(node_index,j,local_weight,local_error,shared);}
 }

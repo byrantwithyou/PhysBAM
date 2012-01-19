@@ -267,7 +267,7 @@ void Set_External_Positions(ARRAY_VIEW<TV> X,ARRAY_VIEW<ROTATION<TV> > rotation,
 void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE
 {
     if(test_number==4 && time<heavy_sphere_drop_time)
-        for(int i=1;i<=constrained_node_positions.m;++i){
+        for(int i=0;i<constrained_node_positions.m;i++){
             PAIR<int,TV>& node_pair=constrained_node_positions(i);
             X(node_pair.x)=node_pair.y;}
 }
@@ -282,7 +282,7 @@ void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,
 void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE
 {
     if(test_number==4 && velocity_time<heavy_sphere_drop_time)
-        for(int i=1;i<=constrained_node_positions.m;++i){
+        for(int i=0;i<constrained_node_positions.m;i++){
             PAIR<int,TV>& node_pair=constrained_node_positions(i);
             V(node_pair.x)=TV();}
 }
@@ -374,7 +374,7 @@ void Balloon()
     is_constrained.Resize(triangulated_surface.particles.array_collection->Size());
     is_constrained.Fill(false);
 
-    for(int i=1;i<=triangulated_surface.mesh.elements.m;++i){
+    for(int i=0;i<triangulated_surface.mesh.elements.m;i++){
         const TRIANGLE_3D<T>& triangle=triangulated_surface.Get_Element(i);
         int node1,node2,node3;triangulated_surface.mesh.elements(i).Get(node1,node2,node3);
         if(analytic_cut_sphere.Lazy_Inside(triangle.x1) || analytic_cut_sphere.Lazy_Inside(triangle.x2) || analytic_cut_sphere.Lazy_Inside(triangle.x3)){
@@ -394,7 +394,7 @@ void Balloon()
     if(test_number==4) frame=FRAME<TV>(TV((T)0,(T)0,(T)0),ROTATION<TV>((T)0,TV((T)0,(T)0,(T)1)));
     else if(test_number==5) frame=FRAME<TV>(TV((T)0,(T)0,(T)0),ROTATION<TV>((T)pi/4,TV((T)0,(T)0,(T)1)));
     else PHYSBAM_NOT_IMPLEMENTED();
-    for(int i=1;i<=is_constrained.m;++i){
+    for(int i=0;i<is_constrained.m;i++){
         if(is_constrained(i)){
             TV& position=triangulated_surface.particles.X(condensation_mapping(i));
             T angle=atan2(position(3)-balloon_initial_position.z,position(1)-balloon_initial_position.x);
@@ -504,7 +504,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>& deformable_collisions=*new DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>(triangulated_surface);
         deformable_collisions.object.Initialize_Hierarchy();
         Add_To_Fluid_Simulation(deformable_collisions);
-        for(int i=1;i<=rigid_bodies_to_simulate.m;++i){
+        for(int i=0;i<rigid_bodies_to_simulate.m;i++){
             RIGID_BODY<TV>& rigid_body_to_add=rigid_body_collection.Rigid_Body(rigid_bodies_to_simulate(i));
             if(rigid_body_to_add.thin_shell) Add_Thin_Shell_To_Fluid_Simulation(rigid_body_to_add); else Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_to_add);}
         //Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(heavy_sphere_index));

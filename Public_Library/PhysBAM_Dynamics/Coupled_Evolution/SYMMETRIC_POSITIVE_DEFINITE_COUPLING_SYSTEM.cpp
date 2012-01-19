@@ -384,7 +384,7 @@ Setup_Tolerances(const VECTOR_T& F,const VECTOR_ND<T>& fluid_velocity,const GENE
         T eps_velocity=eps*index_map.grid.Face_Sizes()[1];
         T scaling_factor=(T)1e-5;
         tolerances.pressure*=scaling_factor;
-        for(int i=1;i<=index_map.real_cell_indices.m;++i){int index=index_map.real_cell_indices(i);
+        for(int i=0;i<index_map.real_cell_indices.m;i++){int index=index_map.real_cell_indices(i);
             if(tolerances.pressure(index)<eps_velocity) tolerances.pressure(index)=eps_velocity;}
 
         for(COUPLING_CONSTRAINT_ID i(1);i<=F.lambda.Size();i++)
@@ -647,7 +647,7 @@ Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& bR) const
 {
     const VECTOR_T& R=debug_cast<const VECTOR_T&>(bR);
     bool pressure_converged=true;
-    for(int i=1;i<=index_map.real_cell_indices.m;++i){int index=index_map.real_cell_indices(i);
+    for(int i=0;i<index_map.real_cell_indices.m;i++){int index=index_map.real_cell_indices(i);
         if(abs(R.pressure(index))>tolerances.pressure(index)) pressure_converged=false;}
     bool lambda_converged=true;
     for(COUPLING_CONSTRAINT_ID i(1);i<=tolerances.lambda.Size();i++)

@@ -18,8 +18,8 @@ namespace INTERSECTION{
 template<class T> bool Fuzzy_Intersects(RAY<VECTOR<T,2> >& ray,const ORIENTED_BOX<VECTOR<T,2> >& box,const T segment_intersect_epsilon)
 {
     bool intersects=false;
-    for(int i=1;i<=2;++i) if(INTERSECTION::Fuzzy_Intersects(ray,SEGMENT_2D<T>(box.corner,box.corner+box.edges.Column(i)),segment_intersect_epsilon)) intersects=true;
-    for(int i=1;i<=2;++i) if(INTERSECTION::Fuzzy_Intersects(ray,SEGMENT_2D<T>(box.corner+box.edges.Column(i),box.corner+box.edges.Column_Sum()),segment_intersect_epsilon)) intersects=true;
+    for(int i=0;i<2;i++) if(INTERSECTION::Fuzzy_Intersects(ray,SEGMENT_2D<T>(box.corner,box.corner+box.edges.Column(i)),segment_intersect_epsilon)) intersects=true;
+    for(int i=0;i<2;i++) if(INTERSECTION::Fuzzy_Intersects(ray,SEGMENT_2D<T>(box.corner+box.edges.Column(i),box.corner+box.edges.Column_Sum()),segment_intersect_epsilon)) intersects=true;
     return intersects;
 }
 //#####################################################################

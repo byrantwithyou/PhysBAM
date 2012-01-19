@@ -239,7 +239,7 @@ Aggregate_Lists_To_Solid_Node(GENERALIZED_VELOCITY<TV>& F)
     ARRAY<TV> F_buffer;F_buffer.Resize(F.V.array.m);
     ARRAY<TWIST<TV> > rigid_F_buffer;rigid_F_buffer.Resize(F.rigid_V.array.m);
     if(Solid_Node()){
-        for(int i=1;i<=fluid_ranks.n;++i){
+        for(int i=0;i<fluid_ranks.n;i++){
             { // Receive F_buffer
                 MPI::Status status;
                 comm->Probe(MPI::ANY_SOURCE,F_tag,status);
@@ -254,8 +254,8 @@ Aggregate_Lists_To_Solid_Node(GENERALIZED_VELOCITY<TV>& F)
                 ARRAY<char> buffer(status.Get_count(MPI::PACKED));int position=0;
                 comm->Recv(&buffer(1),buffer.m,MPI::PACKED,source,rigid_F_tag);
                 MPI_UTILITIES::Unpack(rigid_F_buffer,buffer,position,*comm);}
-            for(int j=1;j<=F.V.array.m;++j) F.V.array(j)+=F_buffer(j);
-            for(int j=1;j<=F.rigid_V.array.m;++j) F.rigid_V.array(j)+=rigid_F_buffer(j);}}
+            for(int j=0;j<F.V.array.m;j++) F.V.array(j)+=F_buffer(j);
+            for(int j=0;j<F.rigid_V.array.m;j++) F.rigid_V.array(j)+=rigid_F_buffer(j);}}
     else{
         { // Send F_buffer
             int buffer_size=MPI_UTILITIES::Pack_Size(F.V.array,*comm)+1;

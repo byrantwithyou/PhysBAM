@@ -11,10 +11,10 @@ template<class T> void Remove_Degenerate_Triangles(const char* input_filename,co
     ARRAY<int>& triangles = surface->triangle_mesh.triangles;
     int number_of_triangles=triangles.m;
     const ARRAYS<VECTOR<VECTOR_3D<T> ,1> >& X = surface->particles.X;
-    for(int t=1;t<=triangles.m;++t){
+    for(int t=0;t<triangles.m;t++){
         if(TRIANGLE_3D<T>::Area(X(triangles(1,t)),X(triangles(2,t)),X(triangles(3,t)))>threshold)nondegenerate_triangle_indices.Append(t);}
     ARRAY<int> new_triangles(3,1,nondegenerate_triangle_indices.m);
-    for(int t=1;t<=new_triangles.m;++t)for(int k=1;k<=3;++k)
+    for(int t=0;t<new_triangles.m;t++)for(int k=0;k<3;k++)
         new_triangles(k,t)=triangles(k,nondegenerate_triangle_indices(t));
     ARRAY<int>::exchange_arrays(triangles,new_triangles);
     surface->triangle_mesh.number_nodes=ARRAY<int>::max(triangles);

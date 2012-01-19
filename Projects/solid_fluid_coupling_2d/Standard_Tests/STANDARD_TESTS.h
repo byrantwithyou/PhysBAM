@@ -541,7 +541,7 @@ void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE
 {
-    for(int i=1;i<=constrained_node_positions.m;++i){
+    for(int i=0;i<constrained_node_positions.m;i++){
         PAIR<int,TV>& node_pair=constrained_node_positions(i);
         V(node_pair.x)=TV();}
 }
@@ -557,7 +557,7 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
 //#####################################################################
 void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE
 {
-    for(int i=1;i<=constrained_node_positions.m;++i){
+    for(int i=0;i<constrained_node_positions.m;i++){
         PAIR<int,TV>& node_pair=constrained_node_positions(i);
         X(node_pair.x)=node_pair.y;}
 }
@@ -795,7 +795,7 @@ void Balloon()
     is_constrained.Resize(segmented_curve.particles.array_collection->Size());
     is_constrained.Fill(false);
 
-    for(int i=1;i<=segmented_curve.mesh.elements.m;++i){
+    for(int i=0;i<segmented_curve.mesh.elements.m;i++){
         const SEGMENT_2D<T>& segment=segmented_curve.Get_Element(i);
         int node1,node2;segmented_curve.mesh.elements(i).Get(node1,node2);
         if(analytic_cut_sphere.Lazy_Inside(segment.x1) || analytic_cut_sphere.Lazy_Inside(segment.x2)){
@@ -813,7 +813,7 @@ void Balloon()
     FRAME<TV> frame;
     if(test_number==8) frame=FRAME<TV>(TV(),ROTATION<TV>::From_Angle((T)0));
     else PHYSBAM_NOT_IMPLEMENTED();
-    for(int i=1;i<=is_constrained.m;++i){
+    for(int i=0;i<is_constrained.m;i++){
         if(is_constrained(i)){
             TV& position=segmented_curve.particles.X(condensation_mapping(i));
             position=TV(balloon_initial_position.x+(position.x>balloon_initial_position.x?dist:-dist),height);

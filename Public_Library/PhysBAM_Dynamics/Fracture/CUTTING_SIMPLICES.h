@@ -76,7 +76,7 @@ public:
     {index_for_last_old_cutting_simplex=simplices.m;}
 
     void Print() const
-    {for(int i=1;i<=simplices.m;++i){
+    {for(int i=0;i<simplices.m;i++){
         const CUTTING_SIMPLEX<T,d>& simplex=simplices(i);
          LOG::cout<<"Simplex "<<i<<": element owner="<<simplex.element_owner<<", vertices="<<simplex.nodes
              <<", type ="<<(simplex.type==CUTTING_SIMPLEX<T,d>::GLOBAL_EMBEDDING_FACE?"global_embedding_face":

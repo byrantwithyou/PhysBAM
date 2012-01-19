@@ -67,7 +67,7 @@ Write_Output_File(const std::string& file_name,const ARRAY_VIEW<VECTOR<T,d> >& X
 {
     std::ofstream Matlab_Output;
     Matlab_Output.open(STRING_UTILITIES::string_sprintf("%s.%d",file_name.c_str(),stepnumber).c_str());
-    for(int i=1;i<=X.Size();++i){for(int a=1;a<=d;++a){
+    for(int i=1;i<=X.Size();++i){for(int a=0;a<d;a++){
         Matlab_Output<<X(i)[a];if(a!=d) Matlab_Output<<"\t";}
         Matlab_Output<<std::endl;}
     Matlab_Output.close();

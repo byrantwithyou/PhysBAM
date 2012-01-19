@@ -59,7 +59,7 @@ void Initialize_Cloth_State(TRIANGLE_MESH*& triangle_mesh,PARTICLE_3D*& particle
         particles->X(1)=VECTOR_3D(0,.71,0);
         particles->X(2)=VECTOR_3D(2,.71,0);
         particles->X(3)=VECTOR_3D(1,.71,sqrt(3));
-        for(int l=1;l<=number_subdivisions;++l) triangulated_surface->Linearly_Subdivide();
+        for(int l=0;l<number_subdivisions;l++) triangulated_surface->Linearly_Subdivide();
         particles->Store_Mass();
         double mass_node=1./particles->number;
         copy(mass_node,particles->mass);}

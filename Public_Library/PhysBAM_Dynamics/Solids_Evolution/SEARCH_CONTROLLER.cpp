@@ -388,7 +388,7 @@ Project_Velocities(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time
         ARRAY<TRIPLE<int,bool,bool> > saved_rigid_body_state(0);
 
         ARRAY<int> cluster_bodies;Make_Cluster_List(root_particle_index,cluster_bodies);
-        for(int i=1;i<=cluster_bodies.m;++i){
+        for(int i=0;i<cluster_bodies.m;i++){
             RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(cluster_bodies(i));rigid_body.Twist()=TWIST<TV>();
             saved_rigid_body_state.Append(TRIPLE<int,bool,bool>(rigid_body.particle_index,rigid_body.is_static,!not_affected_by_fluid.Contains(rigid_body.particle_index)));
             rigid_body.is_static=true;not_affected_by_fluid.Set(rigid_body.particle_index);}
@@ -399,7 +399,7 @@ Project_Velocities(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time
         driver->Advance_To_Target_Time(target_time);
         driver->example.write_output_files=write_output_files;fluids_parameters->fluid_affects_solid=fluid_affects_solid;
         driver->Set_Time(time);
-        for(int i=1;i<=saved_rigid_body_state.m;++i){
+        for(int i=0;i<saved_rigid_body_state.m;i++){
             RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(saved_rigid_body_state(i).x);
             rigid_body.is_static=saved_rigid_body_state(i).y;
             if(saved_rigid_body_state(i).z) not_affected_by_fluid.Delete(rigid_body.particle_index);
@@ -630,7 +630,7 @@ Add_Fluid_Drag(const T dt,const T time,ARRAY<TV> &F,ARRAY<TWIST<TV> > &rigid_F)
                 SOLID_FLUID_SYSTEM<TV,SPARSE_MATRIX_FLAT_NXN<T> >::Add_J_Rigid_Times_Pressure(solid_fluid_coupled_evolution->J_rigid_kinematic(i),x_array_i,V_with_kinematic_rigid);
                 if(i <= solid_fluid_coupled_evolution->J_rigid.m) SOLID_FLUID_SYSTEM<TV,SPARSE_MATRIX_FLAT_NXN<T> >::Add_J_Rigid_Times_Pressure(solid_fluid_coupled_evolution->J_rigid(i),x_array_i,V);
                 if(i <= solid_fluid_coupled_evolution->J_deformable.m) SOLID_FLUID_SYSTEM<TV,SPARSE_MATRIX_FLAT_NXN<T> >::Add_J_Deformable_Times_Pressure(solid_fluid_coupled_evolution->J_deformable(i),x_array_i,V);}
-            for(int i=1;i<=kinematic_rigid_bodies.m;++i) rigid_F_neg(i)+=kinematic_rigid_bodies(i);}
+            for(int i=0;i<kinematic_rigid_bodies.m;i++) rigid_F_neg(i)+=kinematic_rigid_bodies(i);}
 
         if(driver->example.solids_fluids_parameters.mpi_solid_fluid) driver->example.solids_fluids_parameters.mpi_solid_fluid->Aggregate_Lists_To_Solid_Node(V);}
     else PHYSBAM_FATAL_ERROR("Cannot find the coupled driver!");
@@ -772,7 +772,7 @@ Take_Hypothetical_Fluids_Step(const T time)
         rigid_body.is_static=true;not_affected_by_fluid.Set(rigid_body.particle_index);}
     driver->project_at_frame_boundaries=true;drag_step=true;
     driver->Advance_To_Target_Time(time);
-    for(int i=1;i<=saved_rigid_body_state.m;++i){
+    for(int i=0;i<saved_rigid_body_state.m;i++){
         RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(saved_rigid_body_state(i).x);
         if(saved_rigid_body_state(i).z) not_affected_by_fluid.Delete(rigid_body.particle_index);
         else not_affected_by_fluid.Set(rigid_body.particle_index);

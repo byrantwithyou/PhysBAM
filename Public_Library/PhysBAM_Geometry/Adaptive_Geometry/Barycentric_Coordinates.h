@@ -28,9 +28,9 @@ void Barycentric_Coordinates(const VECTOR<VECTOR<T,D>,D+1>& simplex,const VECTOR
     typedef typename T_RESULT::ADAPTIVE_TYPE2 ADAPTIVE_TYPE2;
     ADAPTIVE_TYPE2 common_denominator(Adaptive_Signed_Volume<T_EXACT>(simplex));
     VECTOR<ADAPTIVE_TYPE1,D+1> barycentric_coordinates_numerator;
-    for(int i=1;i<=N;++i){
+    for(int i=0;i<N;i++){
         Intersection_Coordinates_Helper<T_EXACT>(simplex,point_vector[i],barycentric_coordinates_numerator);
-        for(int j=1;j<=D+1;++j)
+        for(int j=0;j<D+1;j++)
             barycentric_coordinates_vector[i][j]=barycentric_coordinates_numerator[j]/common_denominator;}
 }
 //#################################################################
@@ -46,7 +46,7 @@ void Barycentric_Coordinates(const VECTOR<VECTOR<T,D>,D+1>& simplex,const VECTOR
     typedef typename T_RESULT::TYPE ADAPTIVE;
     VECTOR<VECTOR<ADAPTIVE,D+1>,N> adaptive_coordinates_vector;
     Barycentric_Coordinates<T_EXACT>(simplex,point_vector,adaptive_coordinates_vector);
-    for(int i=1;i<=N;++i)
+    for(int i=0;i<N;i++)
         Convert_And_Ensure_Abs_Tol(adaptive_coordinates_vector[i],barycentric_coordinates_vector[i],abs_tol);
 }
 //#################################################################

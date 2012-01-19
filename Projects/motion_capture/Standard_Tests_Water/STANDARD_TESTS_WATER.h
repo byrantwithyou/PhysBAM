@@ -678,7 +678,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             for(int j=0;j<source_rigid_particles->m;j++) if(solid_body_collection.rigid_body_collection.Rigid_Body((*source_rigid_particles)(j)).implicit_object->Inside(particles.X(i))) source_particles->Append(i);
         }
 
-        for(int i=1;i<=deformable_objects_to_simulate.m;++i){
+        for(int i=0;i<deformable_objects_to_simulate.m;i++){
             DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>& collision_structure=*deformable_objects_to_simulate(i);
             collision_structure.object.Initialize_Hierarchy();
             Add_To_Fluid_Simulation(collision_structure);}
@@ -759,7 +759,7 @@ void Squirrel(SEARCH_CONTROLLER<T_GRID>* controller)
     collision_manager=new RIGID_BODY_COLLISION_MANAGER_HASH;
     referenced_rigid_particles=new ARRAY<int>;
     referenced_rigid_particles->Append(kinematic_body.particle_index);
-    for(int i=1;i<=4;++i){
+    for(int i=0;i<4;i++){
         const T radius=(T)1;
         const T angle=(((T)i+(T).5)/(T)2)*(T)pi;
         RIGID_BODY<TV>& dynamic_body=tests.Add_Rigid_Body("cyllink",(T).45,friction);
@@ -812,7 +812,7 @@ void Driven_Bird()
     collision_manager=new RIGID_BODY_COLLISION_MANAGER_HASH;
     referenced_rigid_particles=new ARRAY<int>;
     referenced_rigid_particles->Append(kinematic_body.particle_index);
-    for(int i=1;i<=2;++i){
+    for(int i=0;i<2;i++){
         ROTATION<TV> joint_rotation=ROTATION<TV>::From_Euler_Angles(0,0,(T)(2*i-3)*(T)pi/2);
         FRAME<TV> object_center_to_wing_center(joint_rotation.Rotate(TV(0,(T)1,(T)0)),joint_rotation);
         RIGID_BODY<TV>& driven_wing=tests.Add_Analytic_Box(TV((T).25,(T)1,(T)2));
@@ -868,7 +868,7 @@ void Driven_Bird()
                 controller->objective.Resize(controlled_joint->id_number);
                 controller->objective(controlled_joint->id_number)=DRAG;
                 controlled_joint->global_post_stabilization=false;controlled_joint->joint_function->active=false;
-                for(int i=1;i<=T_SPIN::dimension;++i){controlled_joint->control_dof(i)=true;}}
+                for(int i=0;i<T_SPIN::dimension;i++){controlled_joint->control_dof(i)=true;}}
             if(test_number==6){
                 if(i==1) controlled_joint->Set_Angle_Constraints(true,(T)-pi/2,(T)pi*3/8);
                 else controlled_joint->Set_Angle_Constraints(true,(T)-pi*3/8,(T)pi/2);}
@@ -915,13 +915,13 @@ void Octosquid()
     source_rigid_particles=new ARRAY<int>;
     source_rigid_particles->Append(kinematic_body.particle_index);
 
-    for(int i=1;i<=num_legs;++i){
+    for(int i=0;i<num_legs;i++){
         T offset=radius-(T).1767767;
         //offset+=.2;
         offset-=(T).45;
         RIGID_BODY<TV>* prev_link=&kinematic_body;
         TV direction=ROTATION<TV>::From_Euler_Angles(0,2*(T)pi/num_legs*(i-1),0).Rotate(TV(0,0,1));
-        for(int j=1;j<=num_segments_per_leg;++j){
+        for(int j=0;j<num_segments_per_leg;j++){
             RIGID_BODY<TV>& tail_link=tests.Add_Analytic_Cylinder(length,width);
             tail_link.Set_Frame(kinematic_body.Frame());tail_link.X().y-=radius/2+(T).3;tail_link.X()+=(offset+length)*direction;offset+=length+(T).1767767;
             tail_link.Rotation()=ROTATION<TV>::From_Rotated_Vector(TV(0,0,1),direction);
@@ -963,7 +963,7 @@ void Octosquid()
                 joint->Set_Child_To_Joint_Frame(J.Inverse_Times(tail_link.Frame()));
                 controller->objective.Resize(joint->id_number);
                 controller->objective(joint->id_number)=DRAG;
-                for(int i=1;i<=T_SPIN::dimension;++i) joint->control_dof(i)=true;
+                for(int i=0;i<T_SPIN::dimension;i++) joint->control_dof(i)=true;
                 JOINT_FUNCTION<TV>* joint_function=arb.Create_Joint_Function(joint->id_number);
                 joint->global_post_stabilization=false;joint->joint_function->active=false;
                 joint_function->Set_k_p(750);joint_function->Set_Target_Angle(ROTATION<TV>());

@@ -255,9 +255,9 @@ Initialize_Boundary_Mesh()
     ARRAY< VECTOR<int,dimension> >& boundary_elements=boundary_mesh->elements;
     bool incident_elements_defined=incident_elements!=0;
     if(!incident_elements_defined) Initialize_Incident_Elements();
-    for(int e=1;e<=elements.m;++e){
+    for(int e=0;e<elements.m;e++){
         const VECTOR<int,dimension+1>& element=elements(e);
-        for(int i=1;i<=dimension+1;++i){
+        for(int i=0;i<dimension+1;i++){
             VECTOR<int,dimension> face=element.Remove_Index(i);
             if(i==2) exchange(face.x,face.y); // ensure cyclic order
             const ARRAY<int>& incident_elements_to_face1=(*incident_elements)(face[1]);
@@ -280,9 +280,9 @@ Initialize_Node_On_Boundary()
     node_on_boundary=new ARRAY<bool>(number_nodes); // init'ed to false
     bool incident_elements_defined=incident_elements!=0;
     if(!incident_elements_defined) Initialize_Incident_Elements();
-    for(int e=1;e<=elements.m;++e){
+    for(int e=0;e<elements.m;e++){
         const VECTOR<int,dimension+1>& element=elements(e);
-        for(int i=1;i<=dimension+1;++i){
+        for(int i=0;i<dimension+1;i++){
             VECTOR<int,dimension> face=element.Remove_Index(i);
             const ARRAY<int>& incident_elements_to_face1=(*incident_elements)(face[1]);
             bool another_element_on_face=false;

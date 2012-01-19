@@ -216,7 +216,7 @@ int main(int argc,const char *argv[])
         int tet=frontier_tets.Dequeue();
         int color=tet_color(tet);
         const ARRAY<int>& adj_tets=adjacent_elements(tet);
-        for(int t=1;t<=adj_tets.m;++t){
+        for(int t=0;t<adj_tets.m;t++){
             int adj_tet=adj_tets(t);
             int& adj_color=tet_color(adj_tet);
             if(adj_color==0){
@@ -237,7 +237,7 @@ int main(int argc,const char *argv[])
     }
 
     // debug check that all tets are colored
-    for(int t=1;t<=fracturing_geom_mesh.elements.m;++t)
+    for(int t=0;t<fracturing_geom_mesh.elements.m;t++)
         assert(tet_color(t)>0);
 
 
@@ -252,7 +252,7 @@ int main(int argc,const char *argv[])
         const ARRAY<int>& adj_tets=adjacent_elements(tet);
         // associating each face of the tet with the color of its adjacent tet,
         //  total the face area of each color
-        for(int t=1;t<=adj_tets.m;++t){
+        for(int t=0;t<adj_tets.m;t++){
             int adj_tet=adj_tets(t);
             int adj_color=tet_color(adj_tet);
             T face_area=TRIANGLE_3D<T>(fracturing_geom_particles.X.Subset(triangle_mesh.elements(tetrahedron_faces(tet)(t)))).Area();
@@ -282,7 +282,7 @@ int main(int argc,const char *argv[])
             //  between regions
             // also enqueue tets newly exposed to the interface
             color=max_area_color;
-            for(int t=1;t<=adj_tets.m;++t){
+            for(int t=0;t<adj_tets.m;t++){
                 int adj_tet=adj_tets(t);
                 int adj_color=tet_color(adj_tet);
                 if(adj_color!=color && !interface_tets_contains(adj_tet)){
@@ -297,11 +297,11 @@ int main(int argc,const char *argv[])
 
     std::cout<<"building interface mesh..."<<std::endl;
     ARRAY<VECTOR<int,3> > interface_tris;
-    for(int tet=1;tet<=fracturing_geom_mesh.elements.m;++tet){
+    for(int tet=0;tet<fracturing_geom_mesh.elements.m;tet++){
         const VECTOR<int,4>& tet_vertices=fracturing_geom_mesh.elements(tet);
         int color=tet_color(tet);
         const ARRAY<int>& adj_tets=adjacent_elements(tet);
-        for(int t=1;t<=adj_tets.m;++t){
+        for(int t=0;t<adj_tets.m;t++){
             int adj_tet=adj_tets(t);
             int adj_color=tet_color(adj_tet);
             if(adj_color<=color) // "<=" to prevent double-counting tris
@@ -321,7 +321,7 @@ int main(int argc,const char *argv[])
             assert(i<=4);
             // pull the other 3 vertices (not including i) from tet
             VECTOR<int,3> tri_vertices;
-            for(int j=1;j<=4;++j){
+            for(int j=0;j<4;j++){
                 if(j<i)
                     tri_vertices(j)=tet_vertices(j);
                 else if(j>i)

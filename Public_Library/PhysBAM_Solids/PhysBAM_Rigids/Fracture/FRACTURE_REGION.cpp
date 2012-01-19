@@ -136,10 +136,10 @@ Intersect_With_Rigid_Body(const FRACTURE_REGION<T>& body,const bool use_particle
 
         int number_of_particles_to_swap=min(initial_number_of_particles,region_triangulated_surface->particles.array_collection->Size()-initial_number_of_particles);
         ARRAY<int> particle_map(region_triangulated_surface->particles.array_collection->Size());
-        for(int i=1;i<=particle_map.m;++i) particle_map(i)=i;
-        for(int index_to_swap=1;index_to_swap<=number_of_particles_to_swap;++index_to_swap)
+        for(int i=0;i<particle_map.m;i++) particle_map(i)=i;
+        for(int index_to_swap=0;index_to_swap<number_of_particles_to_swap;index_to_swap++)
             exchange(particle_map(index_to_swap),particle_map(particle_map.m-index_to_swap+1));
-        for(int index=1;index<=number_of_particles_to_swap;++index)
+        for(int index=0;index<number_of_particles_to_swap;index++)
             exchange(region_triangulated_surface->particles.X(index),region_triangulated_surface->particles.X(particle_map(index)));
         for(int t=0;t<region_triangulated_surface->mesh.elements.m;t++)
             region_triangulated_surface->mesh.elements(t)=particle_map.Subset(region_triangulated_surface->mesh.elements(t));

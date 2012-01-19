@@ -670,9 +670,9 @@ T Initial_Phi(const TV& X) const
         default:
             phi=water_tests.Initial_Phi(X);}
 
-    for(int i=1;i<=rigid_bodies_to_simulate.m;++i)
+    for(int i=0;i<rigid_bodies_to_simulate.m;i++)
         phi=max(phi,-solid_body_collection.rigid_body_collection.Rigid_Body(rigid_bodies_to_simulate(i)).Implicit_Geometry_Extended_Value(X));
-    for(int i=1;i<=fountain_source.m;++i) phi=min(phi,fountain_source(i).Signed_Distance(X));
+    for(int i=0;i<fountain_source.m;i++) phi=min(phi,fountain_source(i).Signed_Distance(X));
     return phi;
 }
 //#####################################################################
@@ -1068,11 +1068,11 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     // Add everything to the simulation
     solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
-    for(int i=1;i<=deformable_objects_to_simulate.m;++i){
+    for(int i=0;i<deformable_objects_to_simulate.m;i++){
         DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>& collision_structure=*deformable_objects_to_simulate(i);
         collision_structure.object.Initialize_Hierarchy();
         Add_To_Fluid_Simulation(collision_structure);}
-    for(int i=1;i<=rigid_bodies_to_simulate.m;++i){
+    for(int i=0;i<rigid_bodies_to_simulate.m;i++){
         RIGID_BODY<TV>& rigid_body_to_add=rigid_body_collection.Rigid_Body(rigid_bodies_to_simulate(i));
         if(rigid_body_to_add.thin_shell) Add_Thin_Shell_To_Fluid_Simulation(rigid_body_to_add); else Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_to_add);}
 
@@ -1146,7 +1146,7 @@ void Balloon()
     is_constrained.Resize(triangulated_surface.particles.array_collection->Size());
     is_constrained.Fill(false);
 
-    for(int i=1;i<=triangulated_surface.mesh.elements.m;++i){
+    for(int i=0;i<triangulated_surface.mesh.elements.m;i++){
         const TRIANGLE_3D<T>& triangle=triangulated_surface.Get_Element(i);
         int node1,node2,node3;triangulated_surface.mesh.elements(i).Get(node1,node2,node3);
         if(analytic_cut_sphere.Lazy_Inside(triangle.x1) || analytic_cut_sphere.Lazy_Inside(triangle.x2) || analytic_cut_sphere.Lazy_Inside(triangle.x3)){
@@ -1161,7 +1161,7 @@ void Balloon()
     ARRAY<int> condensation_mapping;
     triangulated_surface.Discard_Valence_Zero_Particles_And_Renumber(condensation_mapping);
 
-    for(int i=1;i<=is_constrained.m;++i)
+    for(int i=0;i<is_constrained.m;i++)
         if(is_constrained(i)){
             TV& position=triangulated_surface.particles.X(condensation_mapping(i));
             T angle=atan2(position(3),position(1));
@@ -1183,7 +1183,7 @@ bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
 void Set_External_Positions(ARRAY_VIEW<TV> X,ARRAY_VIEW<ROTATION<TV> > rotation,const T time) PHYSBAM_OVERRIDE
 {
     if(test_number==21)
-        for(int i=1;i<=constrained_nodes.m;++i)
+        for(int i=0;i<constrained_nodes.m;i++)
             if(time<constrained_nodes(i).y) X(constrained_nodes(i).x)=constrained_nodes(i).z;
     if(test_number==6){
         if(time<light_sphere_drop_time) X(light_sphere_index).y=light_sphere_initial_height;
@@ -1199,19 +1199,19 @@ void Set_External_Positions(ARRAY_VIEW<TV> X,ARRAY_VIEW<ROTATION<TV> > rotation,
 void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE
 {
     if(test_number==8 && time<heavy_sphere_drop_time)
-        for(int i=1;i<=constrained_node_positions.m;++i){
+        for(int i=0;i<constrained_node_positions.m;i++){
             PAIR<int,TV>& node_pair=constrained_node_positions(i);
             X(node_pair.x)=node_pair.y;}
     if(test_number==11)
-        for(int i=1;i<=constrained_node_positions.m;++i){
+        for(int i=0;i<constrained_node_positions.m;i++){
             PAIR<int,TV>& node_pair=constrained_node_positions(i);
             X(node_pair.x)=node_pair.y;X(node_pair.x).y+=bag_curve.Value(time);}
     if(test_number==18)
-        for(int i=1;i<=constrained_node_positions.m;++i){
+        for(int i=0;i<constrained_node_positions.m;i++){
             PAIR<int,TV>& node_pair=constrained_node_positions(i);
             X(node_pair.x)=node_pair.y;}
     if(test_number==20){
-        for(int i=1;i<=constrained_node_positions.m;++i){
+        for(int i=0;i<constrained_node_positions.m;i++){
             PAIR<int,TV>& node_pair=constrained_node_positions(i);
             X(node_pair.x)=curve.Value(time);
             X(node_pair.x)(3)=node_pair.y(3);}}
@@ -1225,7 +1225,7 @@ void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,
         if(velocity_time<light_sphere_drop_time) twist(light_sphere_index).linear.y=(T)0;
         if(velocity_time<heavy_sphere_drop_time) twist(heavy_sphere_index).linear.y=(T)0;}
    if(test_number==21)
-        for(int i=1;i<=constrained_nodes.m;++i) if(velocity_time<constrained_nodes(i).y) twist(constrained_nodes(i).x).linear=TV();
+        for(int i=0;i<constrained_nodes.m;i++) if(velocity_time<constrained_nodes(i).y) twist(constrained_nodes(i).x).linear=TV();
  }
 //#####################################################################
 // Function Set_External_Velocities
@@ -1233,19 +1233,19 @@ void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,
 void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE
 {
     if(test_number==8 && velocity_time<heavy_sphere_drop_time)
-        for(int i=1;i<=constrained_node_positions.m;++i){
+        for(int i=0;i<constrained_node_positions.m;i++){
             PAIR<int,TV>& node_pair=constrained_node_positions(i);
             V(node_pair.x)=TV();}
     if(test_number==11)
-        for(int i=1;i<=constrained_node_positions.m;++i){
+        for(int i=0;i<constrained_node_positions.m;i++){
             PAIR<int,TV>& node_pair=constrained_node_positions(i);
             V(node_pair.x)=TV((T)0,bag_curve.Derivative(velocity_time),(T)0);}
     if(test_number==18)
-        for(int i=1;i<=constrained_node_positions.m;++i){
+        for(int i=0;i<constrained_node_positions.m;i++){
             PAIR<int,TV>& node_pair=constrained_node_positions(i);
             V(node_pair.x)=TV();}
     if(test_number==20)
-        for(int i=1;i<=constrained_node_positions.m;++i)
+        for(int i=0;i<constrained_node_positions.m;i++)
             V(constrained_node_positions(i).x)=curve.Derivative(velocity_time);
 }
 //#####################################################################
@@ -1254,11 +1254,11 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
 void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE
 {
     if(test_number==18)
-        for(int i=1;i<=constrained_node_positions.m;++i){
+        for(int i=0;i<constrained_node_positions.m;i++){
             PAIR<int,TV>& node_pair=constrained_node_positions(i);
             V(node_pair.x)=TV();}
     if(test_number==20)
-        for(int i=1;i<=constrained_node_positions.m;++i)
+        for(int i=0;i<constrained_node_positions.m;i++)
             V(constrained_node_positions(i).x)=TV();
 }
 //#####################################################################

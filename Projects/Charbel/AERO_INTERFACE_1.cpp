@@ -161,7 +161,7 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,COMPRESSIBLE_FLU
 
             ARRAY<bool,VECTOR<int,1> > have_checked_color(1,number_of_regions);have_checked_color.Fill(false);
             for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(mpi_grid->local_grid);iterator.Valid();iterator.Next()){bool touches_solid=false;TV_INT cell_index=iterator.Cell_Index();
-                for(int axis=1;axis<=TV::dimension;++axis) touches_solid=touches_solid || psi_N(axis,iterator.First_Face_Index(axis)) || psi_N(axis,iterator.Second_Face_Index(axis));
+                for(int axis=0;axis<TV::dimension;axis++) touches_solid=touches_solid || psi_N(axis,iterator.First_Face_Index(axis)) || psi_N(axis,iterator.Second_Face_Index(axis));
                 if(touches_solid){done(cell_index)=true;phi(cell_index)=triangulated_surface.Calculate_Signed_Distance(iterator.Location());initialized_indices.Append(cell_index);}}
         }
 
@@ -239,7 +239,7 @@ Initialize_Acceleration_Structures(TETRAHEDRALIZED_VOLUME<T>& tet_volume,T depth
 
     LOG::Time("Updating bounding tets");
     ARRAY<bool> particle_not_inside_solid(tet_volume.particles.array_collection->Size());
-    for(int i=1;i<=particle_not_inside_solid.m;++i)
+    for(int i=0;i<particle_not_inside_solid.m;i++)
         particle_not_inside_solid(i)=!Inside_Solid(tet_volume.particles.X(i));
 
     T_GRID& current_grid(mpi_grid?mpi_grid->local_grid:grid);
@@ -250,10 +250,10 @@ Initialize_Acceleration_Structures(TETRAHEDRALIZED_VOLUME<T>& tet_volume,T depth
         TV_INT cell_index=iterator.Cell_Index();TV position=current_grid.X(cell_index);
         if(Cell_Should_Be_Populated(position,depth+grid.DX().Max())){
             ARRAY<int> intersection_list;tet_volume.hierarchy->Intersection_List(position,intersection_list);
-            for(int i=1;i<=intersection_list.m;++i){
+            for(int i=0;i<intersection_list.m;i++){
                 TETRAHEDRON<T>& current_tet=(*tet_volume.tetrahedron_list)(intersection_list(i));
                 VECTOR<int,4>& current_tet_nodes=tet_volume.mesh.elements(intersection_list(i));
-                bool tet_has_no_ghost_nodes=true;for(int j=1;j<=4;++j) tet_has_no_ghost_nodes&=particle_not_inside_solid(current_tet_nodes(j));
+                bool tet_has_no_ghost_nodes=true;for(int j=0;j<4;j++) tet_has_no_ghost_nodes&=particle_not_inside_solid(current_tet_nodes(j));
                 if(tet_has_no_ghost_nodes && current_tet.Inside(position)){
                     bounding_tet_id(cell_index)=intersection_list(i);break;}}
             if(!bounding_tet_id(cell_index))
@@ -307,10 +307,10 @@ Compute_Ghost_Cells(TETRAHEDRALIZED_VOLUME<T>& tet_volume_aerof,COMPRESSIBLE_FLU
         if(bounding_tet_id(cell_index)){
             VECTOR<int,4>& corners=tet_volume->mesh.elements(bounding_tet_id(cell_index));
             VECTOR<VECTOR<T,T_GRID::dimension+2>,4>& current_cell_stored_values=stored_values(cell_index);
-            for(int i=1;i<=4;++i){
+            for(int i=0;i<4;i++){
                 VECTOR<T,T_GRID::dimension+2>& current_node_stored_value=current_cell_stored_values(i);
                 current_node_stored_value(1)=particles->rho(corners(i));
-                for(int j=1;j<=T_GRID::dimension;++j) current_node_stored_value(j+1)=particles->V(corners(i))(j);
+                for(int j=0;j<T_GRID::dimension;j++) current_node_stored_value(j+1)=particles->V(corners(i))(j);
                 current_node_stored_value(T_GRID::dimension+2)=particles->E(corners(i));}}}
 
     LOG::Time("Interpolating particle data to the Eulerian grid");
@@ -322,7 +322,7 @@ Compute_Ghost_Cells(TETRAHEDRALIZED_VOLUME<T>& tet_volume_aerof,COMPRESSIBLE_FLU
             TETRAHEDRON<T>& current_tet=(*tet_volume->tetrahedron_list)(bounding_tet_id(cell_index));
             TV weights=current_tet.Barycentric_Coordinates(position);
             VECTOR<VECTOR<T,T_GRID::dimension+2>,4>& current_tet_values=stored_values(cell_index);
-            for(int j=1;j<=T_GRID::dimension+2;++j)
+            for(int j=0;j<T_GRID::dimension+2;j++)
                 euler.U(cell_index)(j)=Point_From_Barycentric_Coordinates(weights,current_tet_values(1)(j),current_tet_values(2)(j),current_tet_values(3)(j),current_tet_values(4)(j));
             done(cell_index)=true;}
         else if(phi_all_solids(cell_index)<min_phi) done(cell_index)=true;}
@@ -376,7 +376,7 @@ Compute_Ghost_Cells(TETRAHEDRALIZED_VOLUME<T>& tet_volume_aerof,COMPRESSIBLE_FLU
             euler.conservation->object_boundary->Apply_Neumann_Boundary_Condition(values,normal_direction,object_velocity_normal_component);
 
             particles->rho(i)=values(1);
-            TV& velocity=particles->V(i);for(int j=1;j<=TV::dimension;++j) velocity(j)=values(j+1);
+            TV& velocity=particles->V(i);for(int j=0;j<TV::dimension;j++) velocity(j)=values(j+1);
             particles->E(i)=values(2+T_GRID::dimension);}}
 
     if(mpi_grid){

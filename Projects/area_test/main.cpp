@@ -338,7 +338,7 @@ void Volume_From_Simplices_Test_Gradient(
     PhysBAM::ORIGIN_AREAS::VOL_DATA<T,2,4> vol_data_dx0;
     PhysBAM::ORIGIN_AREAS::VOL_DATA<T,2,4> vol_data_dx1;
     for(int i=0;i!=4;++i){
-        for(int d=1;d<=2;++d){
+        for(int d=0;d<2;d++){
             X[i](d)+=dx;
             PhysBAM::ORIGIN_AREAS::Clear(vol_data_dx1);
             PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(vol_data_dx1,TV(),X);
@@ -368,8 +368,8 @@ void Volume_From_Simplices_Test_Hessian(
     PhysBAM::ORIGIN_AREAS::VOL_DATA<T,2,4> vol_data_dx11;
     for(int i=0;i!=4;++i){
         for(int j=0;j!=4;++j){
-            for(int d=1;d<=2;++d){
-                for(int e=1;e<=2;++e){
+            for(int d=0;d<2;d++){
+                for(int e=0;e<2;e++){
                     const T Hijdea=vol_data.H[i][j](d,e);
                     T Hijdeb;
                     if(i==j&&d==e){

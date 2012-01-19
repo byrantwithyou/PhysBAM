@@ -129,11 +129,11 @@ template<class T> void PhysBAMInterface<T>::
 Intersect(const ARRAY<TV>& node_positions,ARRAY<bool>& occluded_node,ARRAY<TRIPLE<VECTOR<int,3>,IntersectionResult<T>,IntersectionResult<T> > >& edges_and_results,const T thickness) const
 {
     // Detect occluded nodes as a separate pass
-    int triangle_id; for(int i=1;i<=node_positions.m;++i) occluded_node(i)=triangulated_surface->Inside_Any_Triangle(node_positions(i),triangle_id,thickness*(T).5);
+    int triangle_id; for(int i=0;i<node_positions.m;i++) occluded_node(i)=triangulated_surface->Inside_Any_Triangle(node_positions(i),triangle_id,thickness*(T).5);
 
     const int PERMITTED_ATTEMPTS=10;
     int retryAttempts=0;
-    for(int i=1;i<=edges_and_results.m;++i){
+    for(int i=0;i<edges_and_results.m;i++){
         VECTOR<int,3>& edge_nodes=edges_and_results(i).x;
         bool left_node_occluded=occluded_node(edge_nodes(1)),right_node_occluded=occluded_node(edge_nodes(2));
         IntersectionResult<T>& current_working_result=edges_and_results(i).y;
@@ -191,7 +191,7 @@ computeSweptNodes(const ARRAY<TV>& node_positions,ARRAY<bool>& swept_node,const 
     // TODO(jontg): In order to work, we need to...
     //   1. Initialize and keep around collision_geometry of type DEFORMABLE_OBJECT_FLUID_COLLISIONS
     //   2. Keep the saved states updated properly
-    // for(int i=1;i<=node_positions.m;++i)
+    // for(int i=0;i<node_positions.m;i++)
     //     swept_node(i)=collision_geometry.Any_Simplex_Crossover(node_positions(i),node_positions(i),dt);
 }
 //#####################################################################

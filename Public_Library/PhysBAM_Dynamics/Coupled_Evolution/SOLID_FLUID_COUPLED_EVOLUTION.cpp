@@ -1094,7 +1094,7 @@ Add_Nondynamic_Solids_To_Right_Hand_Side(ARRAY<VECTOR_ND<T> >& right_hand_side,c
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particle;
     PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     GENERALIZED_VELOCITY<TV> V(particles.V,rigid_body_particles.twist,solid_body_collection);
-    for(int i=1;i<=colors;++i){
+    for(int i=0;i<colors;i++){
         if(poisson->filled_region_touches_dirichlet(i)||poisson->solve_neumann_regions){
             VECTOR_ND<T> right_hand_side_i;right_hand_side_i.Set_Subvector_View(right_hand_side(i),interior_regions(i));
             SOLID_FLUID_SYSTEM<TV,SPARSE_MATRIX_FLAT_NXN<T> >::Add_J_Rigid_Transpose_Times_Velocity(J_rigid_kinematic(i),V,right_hand_side_i);}}

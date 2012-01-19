@@ -34,7 +34,7 @@ Compute()
     one_over_fluid_mass_at_faces.Resize(index_map.Number_Faces());
     for(int i=0;i<index_map.indexed_faces.m;i++)
         one_over_fluid_mass_at_faces(i)=beta(index_map.indexed_faces(i));
-    for(int i=1;i<=index_map.indexed_constraints.m;++i)
+    for(int i=0;i<index_map.indexed_constraints.m;i++)
         one_over_fluid_mass_at_faces(index_map.indexed_faces.m+i)=constrained_beta(i);
     one_over_fluid_mass_at_faces*=index_map.grid.One_Over_Cell_Size();
 }

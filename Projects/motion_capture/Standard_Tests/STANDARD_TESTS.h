@@ -1137,13 +1137,13 @@ void Octosquid()
     referenced_rigid_particles=new ARRAY<int>;
     referenced_rigid_particles->Append(kinematic_body.particle_index);
 
-    for(int i=1;i<=num_legs;++i){
+    for(int i=0;i<num_legs;i++){
         T offset=radius-(T).1767767;
         //offset+=.2;
         offset-=(T).45;
         RIGID_BODY<TV>* prev_link=&kinematic_body;
         TV direction=ROTATION<TV>::From_Euler_Angles(0,2*(T)pi/num_legs*(i-1),0).Rotate(TV(0,0,1));
-        for(int j=1;j<=num_segments_per_leg;++j){
+        for(int j=0;j<num_segments_per_leg;j++){
             RIGID_BODY<TV>& tail_link=tests.Add_Analytic_Cylinder(length,width);
             tail_link.Set_Frame(kinematic_body.Frame());tail_link.X().y-=radius/2+(T).3;tail_link.X()+=(offset+length)*direction;offset+=length+(T).1767767;
             tail_link.Rotation()=ROTATION<TV>::From_Rotated_Vector(TV(0,0,1),direction);
@@ -1185,7 +1185,7 @@ void Octosquid()
                 joint->Set_Child_To_Joint_Frame(J.Inverse_Times(tail_link.Frame()));
                 controller->objective.Resize(joint->id_number);
                 controller->objective(joint->id_number)=DRAG;
-                for(int i=1;i<=T_SPIN::dimension;++i) joint->control_dof(i)=true;
+                for(int i=0;i<T_SPIN::dimension;i++) joint->control_dof(i)=true;
                 JOINT_FUNCTION<TV>* joint_function=arb.Create_Joint_Function(joint->id_number);
                 joint_function->Set_k_p(750);joint_function->Set_Target_Angle(ROTATION<TV>());
                 joint->global_post_stabilization=false;joint->joint_function->active=false;

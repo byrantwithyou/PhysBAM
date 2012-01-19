@@ -82,7 +82,7 @@ Outside(const TV& location,T thickness_over_two) const
 template<class T> bool POINT_SIMPLICES_1D<T>::
 Inside_Any_Simplex(const TV& point,int& point_simplex_id,const T thickness_over_two) const
 {
-    for(int i=1;i<=mesh.elements.m;++i){
+    for(int i=0;i<mesh.elements.m;i++){
         POINT_SIMPLEX_1D<T> point_simplex=point_simplex_list?(*point_simplex_list)(i):Get_Element(i);
         if(point_simplex.x1.x-thickness_over_two <= point.x && point_simplex.x1.x+thickness_over_two >= point.x) return true;}
     return false;

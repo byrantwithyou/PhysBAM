@@ -57,7 +57,7 @@ Construct_Indices(const int ghost_cells)
 
     real_cell_indices_reverse_map.Resize(indexed_cells.m);
     real_cell_indices_reverse_map.Fill(-1);
-    for(int i=1;i<=real_cell_indices.m;++i) real_cell_indices_reverse_map(real_cell_indices(i))=i;
+    for(int i=0;i<real_cell_indices.m;i++) real_cell_indices_reverse_map(real_cell_indices(i))=i;
     for(int axis=0;axis<d;axis++){
         if(boundary_condition_collection.periodic_boundary[axis]){
             for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,1,GRID<TV>::GHOST_REGION,2*axis);iterator.Valid();iterator.Next()){
@@ -126,7 +126,7 @@ Collect(const ARRAY<T,FACE_INDEX<d> >& faces,const ARRAY<T>& constrained_faces,V
     flattened_faces.Resize(Number_Faces());
     for(int i=0;i<indexed_faces.m;i++)
         flattened_faces(i)=faces(indexed_faces(i));
-    for(int i=1;i<=indexed_constraints.m;++i)
+    for(int i=0;i<indexed_constraints.m;i++)
         flattened_faces(indexed_faces.m+i)=constrained_faces(i);
 }
 //#####################################################################
@@ -158,7 +158,7 @@ Distribute(const VECTOR_ND<T>& flattened_faces,ARRAY<T,FACE_INDEX<d> >& faces,AR
 {
     for(int i=0;i<indexed_faces.m;i++)
         faces(indexed_faces(i))=flattened_faces(i);
-    for(int i=1;i<=indexed_constraints.m;++i){
+    for(int i=0;i<indexed_constraints.m;i++){
         faces(indexed_constraints(i).Face_Index())=flattened_faces(indexed_faces.m+i); // HACK: Send these back to the incompressible guys.
         constrained_faces(i)=flattened_faces(indexed_faces.m+i);}
 }

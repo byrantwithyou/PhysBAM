@@ -667,7 +667,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             for(int j=0;j<source_rigid_particles->m;j++) if(solid_body_collection.rigid_body_collection.Rigid_Body((*source_rigid_particles)(j)).implicit_object->Inside(particles.X(i))) source_particles->Append(i);
         }
 
-        for(int i=1;i<=deformable_objects_to_simulate.m;++i){
+        for(int i=0;i<deformable_objects_to_simulate.m;i++){
             DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>& collision_structure=*deformable_objects_to_simulate(i);
             collision_structure.object.Initialize_Hierarchy();
             Add_To_Fluid_Simulation(collision_structure);}
@@ -766,7 +766,7 @@ void Driven_Bird()
     collision_manager=new RIGID_BODY_COLLISION_MANAGER_HASH;
     referenced_rigid_particles=new ARRAY<int>;
     referenced_rigid_particles->Append(kinematic_body.particle_index);
-    for(int i=1;i<=2;++i){
+    for(int i=0;i<2;i++){
         ROTATION<TV> joint_rotation=ROTATION<TV>::From_Angle((T)(2*i-3)*(T)pi/8);
         FRAME<TV> object_center_to_wing_center(joint_rotation.Rotate(TV(0,(T).875)),joint_rotation);
 
@@ -834,7 +834,7 @@ void Driven_Bird()
                 controller->objective.Resize(controlled_joint->id_number);
                 controller->objective(controlled_joint->id_number)=DRAG;
                 controlled_joint->global_post_stabilization=false;controlled_joint->joint_function->active=false;
-                for(int i=1;i<=T_SPIN::dimension;++i){controlled_joint->control_dof(i)=true;}}
+                for(int i=0;i<T_SPIN::dimension;i++){controlled_joint->control_dof(i)=true;}}
             if(i==1) controlled_joint->Use_Rotation_Constraint((T)-pi/2,(T)0);
             else controlled_joint->Use_Rotation_Constraint((T)0,(T)pi/2);
         }
@@ -875,7 +875,7 @@ void Controlled_Fish()
     source_rigid_particles->Append(kinematic_body.particle_index);
     T offset=radius-(T).1767767;
     RIGID_BODY<TV>* prev_link=&kinematic_body;
-    for(int i=1;i<=4;++i){
+    for(int i=0;i<4;i++){
         RIGID_BODY<TV>& tail_link=tests.Add_Analytic_Box(TV(length,(T).15));
         tail_link.Set_Frame(kinematic_body.Frame());tail_link.X()+=TV(offset+length,0);offset+=length+(T).1767767;
         FRAME<TV> J;
@@ -913,7 +913,7 @@ void Controlled_Fish()
                 controller->objective.Resize(joint->id_number);
                 controller->objective(joint->id_number)=DRAG;
                 joint->global_post_stabilization=false;joint->joint_function->active=false;
-                for(int i=1;i<=T_SPIN::dimension;++i){joint->control_dof(i)=true;}}
+                for(int i=0;i<T_SPIN::dimension;i++){joint->control_dof(i)=true;}}
             JOINT_FUNCTION<TV>* joint_function=arb.Create_Joint_Function(joint->id_number);
             joint_function->Set_k_p(100000);joint_function->Set_Target_Angle(ROTATION<TV>());
         }
@@ -994,7 +994,7 @@ void Three_Link_Fish()
     else{
         left_wing->global_post_stabilization=false;left_wing->joint_function->active=false;
         right_wing->global_post_stabilization=false;right_wing->joint_function->active=false;
-        for(int i=1;i<=T_SPIN::dimension;++i){left_wing->control_dof(i)=true;right_wing->control_dof(i)=true;}}
+        for(int i=0;i<T_SPIN::dimension;i++){left_wing->control_dof(i)=true;right_wing->control_dof(i)=true;}}
 }
 //#####################################################################
 // Function Octosquid
@@ -1033,13 +1033,13 @@ void Octosquid()
     source_rigid_particles=new ARRAY<int>;
     source_rigid_particles->Append(kinematic_body.particle_index);
 
-    for(int i=1;i<=num_legs;++i){
+    for(int i=0;i<num_legs;i++){
         T offset=radius-(T).1767767;
         //offset+=(T).2;
         offset-=(T).4;
         RIGID_BODY<TV>* prev_link=&kinematic_body;
         TV direction=ROTATION<TV>::From_Angle(i==1?-(T)pi:0).Rotate(TV(1,0));
-        for(int j=1;j<=num_segments_per_leg;++j){
+        for(int j=0;j<num_segments_per_leg;j++){
             RIGID_BODY<TV>& tail_link=tests.Add_Analytic_Box(TV(length,width));
             tail_link.Set_Frame(kinematic_body.Frame());tail_link.X().y-=radius/2;tail_link.X()+=(offset+length)*direction;offset+=length+.1767767;
             tail_link.Rotation()=ROTATION<TV>::From_Rotated_Vector(TV(1,0),direction); // TODO: hmm
@@ -1084,7 +1084,7 @@ void Octosquid()
                 controller->objective.Resize(joint->id_number);
                 controller->objective(joint->id_number)=DRAG;
                 joint->global_post_stabilization=false;joint->joint_function->active=false;
-                for(int i=1;i<=T_SPIN::dimension;++i) joint->control_dof(i)=true;
+                for(int i=0;i<T_SPIN::dimension;i++) joint->control_dof(i)=true;
                 JOINT_FUNCTION<TV>* joint_function=arb.Create_Joint_Function(joint->id_number);
                 //joint_function->Set_k_p(10000);joint_function->Set_Target_Angle(ROTATION<TV>::From_Rotated_Vector(direction,TV(0,-1)));
                 joint_function->Set_k_p(10000);joint_function->Set_Target_Angle(ROTATION<TV>());

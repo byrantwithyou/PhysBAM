@@ -303,7 +303,7 @@ void Woodward_Collela_Fix(bool fix_entropy,bool fix_enthalpy)
     const T internal_energy_a=euler.e(euler.U(reference_cell));LOG::cout<<internal_energy_a<<std::endl;
     const T P_a=euler.p(euler.eos,euler.U(reference_cell));  assert(P_a>0);
     const T q_a_2=euler.Get_Velocity(euler.U(reference_cell)).Magnitude_Squared();
-    for(int i=1;i<=4;++i){TV_INT cell_index=reference_cell+TV_INT(i,1);
+    for(int i=0;i<4;i++){TV_INT cell_index=reference_cell+TV_INT(i,1);
         const T internal_energy_b=euler.e(euler.U(cell_index));LOG::cout<<internal_energy_b<<std::endl;
         const T gamma=gamma_law->gamma;const T P_b=euler.p(euler.eos,euler.U(cell_index));  assert(P_b>0);
         const TV q_b=euler.Get_Velocity(euler.U(cell_index));
@@ -318,7 +318,7 @@ void Woodward_Collela_Fix(bool fix_entropy,bool fix_enthalpy)
 
         euler.Set_Euler_State_From_rho_velocity_And_internal_energy(euler.U,cell_index,rho_b,sqrt(alpha)*q_b,P_b/(rho_b*(gamma-(T)1)));
         assert(euler.p(euler.eos,euler.U(cell_index))>0);}
-    for(int i=1;i<=2;++i){TV_INT cell_index=reference_cell+TV_INT(i,2);
+    for(int i=0;i<2;i++){TV_INT cell_index=reference_cell+TV_INT(i,2);
         const T internal_energy_b=euler.e(euler.U(cell_index));LOG::cout<<internal_energy_b<<std::endl;
         const T gamma=gamma_law->gamma;const T P_b=euler.p(euler.eos,euler.U(cell_index));  assert(P_b>0);
         const TV q_b=euler.Get_Velocity(euler.U(cell_index));
@@ -345,7 +345,7 @@ void Fedkiw_Isobaric_Fix(bool fix_only_6_cells)
     // Could do the one-ring and two-ring calculations somewhere before we begin...
     ARRAY<VECTOR<int,1> ,VECTOR<int,2> > ring(euler.grid.Domain_Indices());ring.Fill(VECTOR<int,1>(-1));
     for(CELL_ITERATOR iterator(euler.grid);iterator.Valid();iterator.Next()){bool is_one_ring=false;
-        for(int axis=1;axis<=TV::dimension;++axis) is_one_ring=is_one_ring || psi_N(axis,iterator.First_Face_Index(axis)) || psi_N(axis,iterator.Second_Face_Index(axis));
+        for(int axis=0;axis<TV::dimension;axis++) is_one_ring=is_one_ring || psi_N(axis,iterator.First_Face_Index(axis)) || psi_N(axis,iterator.Second_Face_Index(axis));
         if(is_one_ring) ring(iterator.Cell_Index())(1)=1;}
     for(CELL_ITERATOR iterator(euler.grid);iterator.Valid();iterator.Next()){if(ring(iterator.Cell_Index())(1)==1) break;
         bool is_two_ring=false;for(int axis=1;axis<=2*TV::dimension;++axis) is_two_ring=is_two_ring || (ring.Valid_Index(iterator.Cell_Neighbor(axis)) && ring(iterator.Cell_Neighbor(axis))(1)==1);
