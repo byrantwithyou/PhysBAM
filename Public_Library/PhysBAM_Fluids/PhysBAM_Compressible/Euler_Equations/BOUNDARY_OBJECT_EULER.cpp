@@ -12,7 +12,7 @@ using namespace PhysBAM;
 template<class T_GRID> void BOUNDARY_OBJECT_EULER<T_GRID>::
 Apply_Neumann_Boundary_Condition(TV_DIMENSION& u_1d,const T neumann_face_velocity,const int axis)
 {
-    T rho=u_1d(1);
+    T rho=u_1d(0);
     if(rho){
         TV velocity=EULER<T_GRID>::Get_Velocity(u_1d);velocity(axis)=(T)2*neumann_face_velocity-velocity(axis);
         T internal_energy=EULER<T_GRID>::e(u_1d);
@@ -21,7 +21,7 @@ Apply_Neumann_Boundary_Condition(TV_DIMENSION& u_1d,const T neumann_face_velocit
 template<class T_GRID> void BOUNDARY_OBJECT_EULER<T_GRID>::
 Apply_Neumann_Boundary_Condition(T_ARRAYS_ELEMENT& u_1d,const TV& normal,const T object_velocity_normal_component)
 {
-    T rho=u_1d(1);
+    T rho=u_1d(0);
     if(rho){
         TV velocity=EULER<T_GRID>::Get_Velocity(u_1d);
         T velocity_normal_component=TV::Dot_Product(velocity,normal);

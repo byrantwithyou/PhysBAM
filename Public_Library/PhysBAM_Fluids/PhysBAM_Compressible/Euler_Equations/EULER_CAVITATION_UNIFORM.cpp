@@ -84,13 +84,13 @@ Compute_Clamped_Momentum_Divergence(const T dt)
         clamped_momentum_divergence(cell_index)=0;
         if(elliptic_solver->psi_D(cell_index)) continue;
         sufficient_density_cells(cell_index)=false;
-        if(euler.U(cell_index)(1)>5*epsilon){
+        if(euler.U(cell_index)(0)>5*epsilon){
             sufficient_density_cells(cell_index)=true;
-            total_donor_density+=(euler.U(cell_index)(1)-5*epsilon);}
-        else if(euler.U(cell_index)(1)<epsilon){
-            clamped_momentum_divergence(cell_index)=min((T)0,(euler.U(cell_index)(1) - epsilon)*one_over_dt);
-            LOG::cout<<"clamping density at cell_index="<<cell_index<<", density="<<euler.U(cell_index)(1)<<", epsilon="<<epsilon<<std::endl;
-            total_deficient_density+=(epsilon-euler.U(cell_index)(1));}}
+            total_donor_density+=(euler.U(cell_index)(0)-5*epsilon);}
+        else if(euler.U(cell_index)(0)<epsilon){
+            clamped_momentum_divergence(cell_index)=min((T)0,(euler.U(cell_index)(0) - epsilon)*one_over_dt);
+            LOG::cout<<"clamping density at cell_index="<<cell_index<<", density="<<euler.U(cell_index)(0)<<", epsilon="<<epsilon<<std::endl;
+            total_deficient_density+=(epsilon-euler.U(cell_index)(0));}}
 
     T fractional_contribution_from_each_cell=total_deficient_density/total_donor_density;
     LOG::cout<<"Fractional contribution from each cell:"<<fractional_contribution_from_each_cell<<std::endl;
@@ -100,7 +100,7 @@ Compute_Clamped_Momentum_Divergence(const T dt)
     for(CELL_ITERATOR iterator(euler.grid,0);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();
         if(sufficient_density_cells(cell_index))
-            clamped_momentum_divergence(cell_index)=fractional_contribution_from_each_cell*(euler.U(cell_index)(1)-5*epsilon)*one_over_dt;}
+            clamped_momentum_divergence(cell_index)=fractional_contribution_from_each_cell*(euler.U(cell_index)(0)-5*epsilon)*one_over_dt;}
 }
 //#####################################################################
 // Compute_Clamped_Internal_Energy_Divergence
@@ -120,13 +120,13 @@ Compute_Clamped_Internal_Energy_Divergence(const T dt)
         clamped_internal_energy_divergence(cell_index)=0;
         if(elliptic_solver->psi_D(cell_index)) continue;
         sufficient_internal_energy_cells(cell_index)=false;
-        if(euler.U(cell_index)(1)*EULER<T_GRID>::e(euler.U,cell_index)>5*epsilon){
+        if(euler.U(cell_index)(0)*EULER<T_GRID>::e(euler.U,cell_index)>5*epsilon){
             sufficient_internal_energy_cells(cell_index)=true;
-            total_donor_energy+=(euler.U(cell_index)(1)*EULER<T_GRID>::e(euler.U,cell_index)-5*epsilon);}
-        else if(euler.U(cell_index)(1)*EULER<T_GRID>::e(euler.U,cell_index)<epsilon){
-            clamped_internal_energy_divergence(cell_index)=min((T)0,(euler.U(cell_index)(1)*EULER<T_GRID>::e(euler.U,cell_index)-epsilon)*one_over_dt);
-            LOG::cout<<"clamping energy at cell_index="<<cell_index<<", internal energy="<<euler.U(cell_index)(1)*EULER<T_GRID>::e(euler.U,cell_index)<<", epsilon="<<epsilon<<std::endl;
-            total_deficient_energy+=(epsilon-euler.U(cell_index)(1)*EULER<T_GRID>::e(euler.U,cell_index));}}
+            total_donor_energy+=(euler.U(cell_index)(0)*EULER<T_GRID>::e(euler.U,cell_index)-5*epsilon);}
+        else if(euler.U(cell_index)(0)*EULER<T_GRID>::e(euler.U,cell_index)<epsilon){
+            clamped_internal_energy_divergence(cell_index)=min((T)0,(euler.U(cell_index)(0)*EULER<T_GRID>::e(euler.U,cell_index)-epsilon)*one_over_dt);
+            LOG::cout<<"clamping energy at cell_index="<<cell_index<<", internal energy="<<euler.U(cell_index)(0)*EULER<T_GRID>::e(euler.U,cell_index)<<", epsilon="<<epsilon<<std::endl;
+            total_deficient_energy+=(epsilon-euler.U(cell_index)(0)*EULER<T_GRID>::e(euler.U,cell_index));}}
 
     T fractional_contribution_from_each_cell=total_deficient_energy/total_donor_energy;
     LOG::cout<<"Fractional contribution from each cell:"<<fractional_contribution_from_each_cell<<std::endl;
@@ -136,7 +136,7 @@ Compute_Clamped_Internal_Energy_Divergence(const T dt)
     for(CELL_ITERATOR iterator(euler.grid,0);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();
         if(sufficient_internal_energy_cells(cell_index))
-            clamped_internal_energy_divergence(cell_index)=fractional_contribution_from_each_cell*(euler.U(cell_index)(1)*EULER<T_GRID>::e(euler.U,cell_index)-5*epsilon)*one_over_dt;}
+            clamped_internal_energy_divergence(cell_index)=fractional_contribution_from_each_cell*(euler.U(cell_index)(0)*EULER<T_GRID>::e(euler.U,cell_index)-5*epsilon)*one_over_dt;}
 }
 //#####################################################################
 // Compute_Right_Hand_Side
@@ -182,7 +182,7 @@ Apply_Pressure_To_Density(const T dt)
 
     for(CELL_ITERATOR iterator(euler.grid);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();
-        euler.U(cell_index)(1) += laplacian_p_cavitation_cell(cell_index)*dt;}
+        euler.U(cell_index)(0) += laplacian_p_cavitation_cell(cell_index)*dt;}
 
     euler.Invalidate_Ghost_Cells();
 }
@@ -231,7 +231,7 @@ Apply_Pressure(const T dt,const T time, T_FACE_ARRAYS_SCALAR& face_velocities)
         // Store time star density values
         T_ARRAYS_SCALAR rho_star(euler.grid.Domain_Indices(0));
         for(CELL_ITERATOR iterator(euler.grid,0);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
-            rho_star(cell_index)=euler.U_ghost(cell_index)(1);}
+            rho_star(cell_index)=euler.U_ghost(cell_index)(0);}
 
         Apply_Pressure_To_Density(dt);
 
@@ -246,7 +246,7 @@ Apply_Pressure(const T dt,const T time, T_FACE_ARRAYS_SCALAR& face_velocities)
         for(FACE_ITERATOR iterator(euler.grid);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> face_index=iterator.Full_Index();
             TV_INT first_cell_index=iterator.First_Cell_Index(), second_cell_index=iterator.Second_Cell_Index();
             T rho_star_face=(T).5*(rho_star(first_cell_index)+rho_star(second_cell_index));
-            T rho_np1_face=(T).5*(euler.U_ghost(first_cell_index)(1)+euler.U_ghost(second_cell_index)(1));
+            T rho_np1_face=(T).5*(euler.U_ghost(first_cell_index)(0)+euler.U_ghost(second_cell_index)(0));
             face_velocities(face_index)=(rho_star_face*face_velocities(face_index) - dt*grad_p_cavitation_face(face_index))/rho_np1_face;}
 
 

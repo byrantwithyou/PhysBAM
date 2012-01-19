@@ -222,11 +222,11 @@ Advance_One_Time_Step_Forces(const T dt,const T time)
     // update gravity
     if(gravity) for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         for(int axis=0;axis<T_GRID::dimension;axis++){
-            if(downward_direction[axis]) U(cell_index)(axis+1)+=dt*U(cell_index)(1)*gravity*downward_direction[axis];}}
+            if(downward_direction[axis]) U(cell_index)(axis+1)+=dt*U(cell_index)(0)*gravity*downward_direction[axis];}}
 
     // update body force
     if(use_force) for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
-        for(int axis=0;axis<T_GRID::dimension;axis++) U(cell_index)(axis+1)+=dt*U(cell_index)(1)*force.Component(axis)(cell_index);}
+        for(int axis=0;axis<T_GRID::dimension;axis++) U(cell_index)(axis+1)+=dt*U(cell_index)(0)*force.Component(axis)(cell_index);}
 
     //TODO: Is this necessary?
     boundary->Apply_Boundary_Condition(grid,U,time+dt);
@@ -242,7 +242,7 @@ Compute_Cavitation_Velocity(T_ARRAYS_SCALAR& rho_n, T_FACE_ARRAYS_SCALAR& face_v
         if(!euler_projection.elliptic_solver->psi_N.Component(axis)(face_index)){
             TV_INT first_cell_index=iterator.First_Cell_Index(),second_cell_index=iterator.Second_Cell_Index();
             T rho_face_n=(T).5*(rho_n(first_cell_index)+rho_n(second_cell_index));T one_over_rho_face_n=1/rho_face_n;
-            T rho_star = (T).5*(U_ghost(first_cell_index)(1)+U_ghost(second_cell_index)(1));
+            T rho_star = (T).5*(U_ghost(first_cell_index)(0)+U_ghost(second_cell_index)(0));
             T momentum_star=(T).5*(U_ghost(first_cell_index)(axis+1)+U_ghost(second_cell_index)(axis+1));
             T momentum_face_n=(T).5*(momentum_n(first_cell_index)(axis)+momentum_n(second_cell_index)(axis));
             face_velocities_n.Component(axis)(face_index)-=one_over_rho_face_n*(rho_star*face_velocities_n.Component(axis)(face_index)+momentum_star-2*momentum_face_n);}}
@@ -259,7 +259,7 @@ Advance_One_Time_Step_Explicit_Part(const T dt,const T time,const int rk_substep
     T_ARRAYS_SCALAR rho_n(grid.Domain_Indices(0));T_ARRAYS_DIMENSION_SCALAR momentum_n(grid.Domain_Indices(0));T_FACE_ARRAYS_SCALAR face_velocities_n(grid);
     if(apply_cavitation_correction){
         for(CELL_ITERATOR iterator(grid,0);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
-            rho_n(cell_index)=U_ghost(cell_index)(1);}
+            rho_n(cell_index)=U_ghost(cell_index)(0);}
 
         // Store time n velocities
         euler_projection.Compute_Density_Weighted_Face_Velocities(dt,time,euler_projection.elliptic_solver->psi_N);
@@ -278,7 +278,7 @@ Advance_One_Time_Step_Explicit_Part(const T dt,const T time,const int rk_substep
             open_boundaries);}
 
     for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
-        if(U_ghost(cell_index)(1)<=0){LOG::cout<<"Density at cell "<<cell_index<<" is: "<<U_ghost(cell_index)(1)<<std::endl;
+        if(U_ghost(cell_index)(0)<=0){LOG::cout<<"Density at cell "<<cell_index<<" is: "<<U_ghost(cell_index)(0)<<std::endl;
             PHYSBAM_FATAL_ERROR("Density should not be zero or negative");}}
 
     boundary->Apply_Boundary_Condition(grid,U,time+dt);
@@ -321,7 +321,7 @@ Clamp_Internal_Energy(const T dt,const T time)
         if(e<e_min){
             PHYSBAM_FATAL_ERROR("Do not clamp internal energy");
             LOG::cout<<"Warning: Clamping internal energy at cell "<<cell_index<<" with e="<<e<<", state="<<U_cell<<std::endl;
-            EULER<T_GRID>::Set_Euler_State_From_rho_velocity_And_internal_energy(U,cell_index,U_cell(1),EULER<T_GRID>::Get_Velocity(U_cell),e_min);
+            EULER<T_GRID>::Set_Euler_State_From_rho_velocity_And_internal_energy(U,cell_index,U_cell(0),EULER<T_GRID>::Get_Velocity(U_cell),e_min);
             added_internal_energy(cell_index)=e_min-e;}}
     Invalidate_Ghost_Cells();
 }
@@ -333,13 +333,13 @@ Clamp_Internal_Energy_Ghost(T_ARRAYS_DIMENSION_SCALAR& U_ghost,const int number_
 {
     if(apply_cavitation_correction) return;
     for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++) if(!mpi_grid || !mpi_grid->Neighbor(axis,axis_side)){
-        for(CELL_ITERATOR iterator(grid,number_of_ghost_cells,T_GRID::GHOST_REGION,2*axis-(2-axis_side));iterator.Valid();iterator.Next()){
+        for(CELL_ITERATOR iterator(grid,number_of_ghost_cells,T_GRID::GHOST_REGION,2*axis-(1-axis_side));iterator.Valid();iterator.Next()){
             TV_DIMENSION U_cell=U_ghost(iterator.Cell_Index());
             T e=EULER<T_GRID>::e(U_cell);
             if(e<e_min){
                 PHYSBAM_FATAL_ERROR("Do not clamp internal energy e2");
                 LOG::cout<<"Warning: Clamping internal energy at ghost cell "<<iterator.Cell_Index()<<" with e="<<e<<", state="<<U_cell<<std::endl;
-                EULER<T_GRID>::Set_Euler_State_From_rho_velocity_And_internal_energy(U_ghost,iterator.Cell_Index(),U_cell(1),EULER<T_GRID>::Get_Velocity(U_cell),e_min);}}}
+                EULER<T_GRID>::Set_Euler_State_From_rho_velocity_And_internal_energy(U_ghost,iterator.Cell_Index(),U_cell(0),EULER<T_GRID>::Get_Velocity(U_cell),e_min);}}}
 }
 //#####################################################################
 // Function Remove_Added_Internal_Energy
@@ -358,7 +358,7 @@ Remove_Added_Internal_Energy(const T dt,const T time)
             PHYSBAM_FATAL_ERROR("Did not clamp internal energy");
             TV_DIMENSION U_cell=U(cell_index);
             T e=EULER<T_GRID>::e(U_cell);
-            EULER<T_GRID>::Set_Euler_State_From_rho_velocity_And_internal_energy(U,cell_index,U_cell(1),EULER<T_GRID>::Get_Velocity(U_cell),e-added_e);}}
+            EULER<T_GRID>::Set_Euler_State_From_rho_velocity_And_internal_energy(U,cell_index,U_cell(0),EULER<T_GRID>::Get_Velocity(U_cell),e-added_e);}}
     Invalidate_Ghost_Cells();
 }
 //#####################################################################
@@ -384,7 +384,7 @@ CFL_Using_Sound_Speed() const
         TV_INT cell_index=iterator.Cell_Index();
         if(psi(cell_index)){
             TV velocity_cell=Get_Velocity(U,cell_index);
-            T sound_speed=eos->c(U(cell_index)(1),e(U,cell_index));
+            T sound_speed=eos->c(U(cell_index)(0),e(U,cell_index));
             max_sound_speed=max(max_sound_speed,sound_speed);
             velocity(cell_index)=velocity_cell;
             velocity_minus_c(cell_index)=velocity_cell-sound_speed*TV::All_Ones_Vector();velocity_plus_c(cell_index)=velocity_cell+sound_speed*TV::All_Ones_Vector();}}
@@ -410,9 +410,9 @@ CFL(const T time) const
         TV max_lambdas;TV max_grad_p_over_rho,max_grad_p;
 
         Fill_Ghost_Cells(last_dt,time,3);
-        T_ARRAYS_SCALAR p_approx(grid.Domain_Indices(1));
+        T_ARRAYS_SCALAR p_approx(grid.Domain_Indices(0));
         for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next())
-            p_approx(iterator.Cell_Index())=eos->p(U_ghost(iterator.Cell_Index())(1),e(U_ghost,iterator.Cell_Index()));
+            p_approx(iterator.Cell_Index())=eos->p(U_ghost(iterator.Cell_Index())(0),e(U_ghost,iterator.Cell_Index()));
         T_FACE_ARRAYS_SCALAR p_approx_face(grid);
         euler_projection.Compute_Face_Pressure_From_Cell_Pressures(grid,U_ghost,psi,p_approx_face,p_approx);
         T_ARRAYS_VECTOR grad_p_approx(grid.Domain_Indices());ARRAYS_UTILITIES<T_GRID,T>::Compute_Gradient_At_Cells_From_Face_Data(grid,grad_p_approx,p_approx_face);
@@ -421,7 +421,7 @@ CFL(const T time) const
             if(psi(cell_index)) for(int axis=0;axis<T_GRID::dimension;axis++){
                 max_lambdas[axis]=max(max_lambdas[axis],eigensystems[axis]->Maximum_Magnitude_Eigenvalue(U(cell_index)));
                 max_grad_p[axis]=maxabs(max_grad_p[axis],grad_p_approx(cell_index)[axis]);
-                max_grad_p_over_rho[axis]=maxabs(max_grad_p_over_rho[axis],grad_p_approx(cell_index)[axis]/U(cell_index)(1));}}
+                max_grad_p_over_rho[axis]=maxabs(max_grad_p_over_rho[axis],grad_p_approx(cell_index)[axis]/U(cell_index)(0));}}
 
         T dt_convect=0;for(int axis=0;axis<T_GRID::dimension;axis++){
             T max_u_over_dx=max_lambdas[axis]*one_over_dx[axis];

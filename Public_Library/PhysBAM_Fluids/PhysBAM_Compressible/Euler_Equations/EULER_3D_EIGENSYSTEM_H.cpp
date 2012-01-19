@@ -15,33 +15,33 @@ template<class T> void EULER_3D_EIGENSYSTEM_H<T>::
 Flux(const int mn,const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,ARRAY<TV_DIMENSION,VECTOR<int,1> >& H,ARRAY<TV_DIMENSION,VECTOR<int,1> >* U_clamped)       
 {
     if(only_pressure_flux){
-        for(int ij=-2;ij<=mn+3;ij++){
-            T p=eos->p(U(ij)(1),e(U(ij)(1),U(ij)(2),U(ij)(3),U(ij)(4),U(ij)(5)));
+        for(int ij=-3;ij<mn+3;ij++){
+            T p=eos->p(U(ij)(0),e(U(ij)(0),U(ij)(1),U(ij)(2),U(ij)(3),U(ij)(4)));
+            H(ij)(0)=0;
             H(ij)(1)=0;
             H(ij)(2)=0;
-            H(ij)(3)=0;
-            H(ij)(4)=p;
-            H(ij)(5)=0;}
+            H(ij)(3)=p;
+            H(ij)(4)=0;}
         return;}
 
     if(U_clamped){
-        for(int ij=-2;ij<=mn+3;ij++){
-            T u=U(ij)(2)/U(ij)(1),v=U(ij)(3)/U(ij)(1),w=U(ij)(4)/U(ij)(1);
-            T p=eos->p(U(ij)(1),e(U(ij)(1),U(ij)(2),U(ij)(3),U(ij)(4),U(ij)(5)));
-            H(ij)(1)=(*U_clamped)(ij)(4);         // rho_clamped*w
-            H(ij)(2)=(*U_clamped)(ij)(4)*u;       // rho_clamped*u*w
-            H(ij)(3)=(*U_clamped)(ij)(4)*v;       // rho_clamped*v*w
-            H(ij)(4)=(*U_clamped)(ij)(4)*w+p;     // rho_clamped*w^2+p
-            H(ij)(5)=((*U_clamped)(ij)(5)+p)*w;}} // (E_from_rho_clamped+p)*w
+        for(int ij=-3;ij<mn+3;ij++){
+            T u=U(ij)(1)/U(ij)(0),v=U(ij)(2)/U(ij)(0),w=U(ij)(3)/U(ij)(0);
+            T p=eos->p(U(ij)(0),e(U(ij)(0),U(ij)(1),U(ij)(2),U(ij)(3),U(ij)(4)));
+            H(ij)(0)=(*U_clamped)(ij)(3);         // rho_clamped*w
+            H(ij)(1)=(*U_clamped)(ij)(3)*u;       // rho_clamped*u*w
+            H(ij)(2)=(*U_clamped)(ij)(3)*v;       // rho_clamped*v*w
+            H(ij)(3)=(*U_clamped)(ij)(3)*w+p;     // rho_clamped*w^2+p
+            H(ij)(4)=((*U_clamped)(ij)(4)+p)*w;}} // (E_from_rho_clamped+p)*w
     else{
-        for(int ij=-2;ij<=mn+3;ij++){
-            T u=U(ij)(2)/U(ij)(1),v=U(ij)(3)/U(ij)(1),w=U(ij)(4)/U(ij)(1);
-            T p=eos->p(U(ij)(1),e(U(ij)(1),U(ij)(2),U(ij)(3),U(ij)(4),U(ij)(5)));
-            H(ij)(1)=U(ij)(4);         // rho*w
-            H(ij)(2)=U(ij)(4)*u;       // rho*u*w
-            H(ij)(3)=U(ij)(4)*v;       // rho*v*w
-            H(ij)(4)=U(ij)(4)*w+p;     // rho*w^2+p
-            H(ij)(5)=(U(ij)(5)+p)*w;}} // (E+p)*w
+        for(int ij=-3;ij<mn+3;ij++){
+            T u=U(ij)(1)/U(ij)(0),v=U(ij)(2)/U(ij)(0),w=U(ij)(3)/U(ij)(0);
+            T p=eos->p(U(ij)(0),e(U(ij)(0),U(ij)(1),U(ij)(2),U(ij)(3),U(ij)(4)));
+            H(ij)(0)=U(ij)(3);         // rho*w
+            H(ij)(1)=U(ij)(3)*u;       // rho*u*w
+            H(ij)(2)=U(ij)(3)*v;       // rho*v*w
+            H(ij)(3)=U(ij)(3)*w+p;     // rho*w^2+p
+            H(ij)(4)=(U(ij)(4)+p)*w;}} // (E+p)*w
 }
 //#####################################################################
 // Function Flux_Using_Face_Velocity
@@ -50,35 +50,35 @@ template<class T> void EULER_3D_EIGENSYSTEM_H<T>::
 Flux_Using_Face_Velocity(VECTOR<int,2> range,const int face_index,const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,ARRAY<TV_DIMENSION,VECTOR<int,1> >& H,const bool use_standard_average,ARRAY<TV_DIMENSION,VECTOR<int,1> >* U_clamped)
 {
     if(only_pressure_flux){
-        for(int ij=range.x;ij<=range.y;ij++){
-            T p=eos->p(U(ij)(1),e(U(ij)(1),U(ij)(2),U(ij)(3),U(ij)(4),U(ij)(5)));
+        for(int ij=range.x;ij<range.y;ij++){
+            T p=eos->p(U(ij)(0),e(U(ij)(0),U(ij)(1),U(ij)(2),U(ij)(3),U(ij)(4)));
+            H(ij)(0)=0;
             H(ij)(1)=0;
             H(ij)(2)=0;
-            H(ij)(3)=0;
-            H(ij)(4)=p;
-            H(ij)(5)=0;}
+            H(ij)(3)=p;
+            H(ij)(4)=0;}
         return;}
 
     T average_w;
-    if(use_standard_average) average_w=(U(face_index)(4)/U(face_index)(1)+U(face_index+1)(4)/U(face_index+1)(1))*(T).5;
-    else average_w=(U(face_index)(4)+U(face_index+1)(4))/(U(face_index)(1)+U(face_index+1)(1));
+    if(use_standard_average) average_w=(U(face_index)(3)/U(face_index)(0)+U(face_index+1)(3)/U(face_index+1)(0))*(T).5;
+    else average_w=(U(face_index)(3)+U(face_index+1)(3))/(U(face_index)(0)+U(face_index+1)(0));
 
     if(U_clamped){
-        for(int ij=range.x;ij<=range.y;ij++){
-            T p=eos->p(U(ij)(1),e(U(ij)(1),U(ij)(2),U(ij)(3),U(ij)(4),U(ij)(5)));
+        for(int ij=range.x;ij<range.y;ij++){
+            T p=eos->p(U(ij)(0),e(U(ij)(0),U(ij)(1),U(ij)(2),U(ij)(3),U(ij)(4)));
+            H(ij)(0)=(*U_clamped)(ij)(0)*average_w;
             H(ij)(1)=(*U_clamped)(ij)(1)*average_w;
             H(ij)(2)=(*U_clamped)(ij)(2)*average_w;
-            H(ij)(3)=(*U_clamped)(ij)(3)*average_w;
-            H(ij)(4)=(*U_clamped)(ij)(4)*average_w+p;
-            H(ij)(5)=((*U_clamped)(ij)(5)+p)*average_w;}}
+            H(ij)(3)=(*U_clamped)(ij)(3)*average_w+p;
+            H(ij)(4)=((*U_clamped)(ij)(4)+p)*average_w;}}
     else{
-        for(int ij=range.x;ij<=range.y;ij++){
-            T p=eos->p(U(ij)(1),e(U(ij)(1),U(ij)(2),U(ij)(3),U(ij)(4),U(ij)(5)));
+        for(int ij=range.x;ij<range.y;ij++){
+            T p=eos->p(U(ij)(0),e(U(ij)(0),U(ij)(1),U(ij)(2),U(ij)(3),U(ij)(4)));
+            H(ij)(0)=U(ij)(0)*average_w;
             H(ij)(1)=U(ij)(1)*average_w;
             H(ij)(2)=U(ij)(2)*average_w;
-            H(ij)(3)=U(ij)(3)*average_w;
-            H(ij)(4)=U(ij)(4)*average_w+p;
-            H(ij)(5)=(U(ij)(5)+p)*average_w;}}
+            H(ij)(3)=U(ij)(3)*average_w+p;
+            H(ij)(4)=(U(ij)(4)+p)*average_w;}}
 }
 //#####################################################################
 // Function Maximum_Magnitude_Eigenvalue
@@ -87,8 +87,8 @@ Flux_Using_Face_Velocity(VECTOR<int,2> range,const int face_index,const ARRAY<TV
 template<class T> T EULER_3D_EIGENSYSTEM_H<T>::
 Maximum_Magnitude_Eigenvalue(const TV_DIMENSION& U_cell)
 {
-    T w=U_cell(4)/U_cell(1);
-    T sound_speed=eos->c(U_cell(1),e(U_cell(1),U_cell(2),U_cell(3),U_cell(4),U_cell(5)));
+    T w=U_cell(3)/U_cell(0);
+    T sound_speed=eos->c(U_cell(0),e(U_cell(0),U_cell(1),U_cell(2),U_cell(3),U_cell(4)));
     return maxabs(w-sound_speed,w+sound_speed);
 }
 //#####################################################################
@@ -101,34 +101,34 @@ Eigenvalues(const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,const int ij,ARRAY<T,VEC
     int cavitation=0;
 
     // eigenvalues on the left - at point ij
-    T w=U(ij)(4)/U(ij)(1);
-    T sound_speed=eos->c(U(ij)(1),e(U(ij)(1),U(ij)(2),U(ij)(3),U(ij)(4),U(ij)(5)));
+    T w=U(ij)(3)/U(ij)(0);
+    T sound_speed=eos->c(U(ij)(0),e(U(ij)(0),U(ij)(1),U(ij)(2),U(ij)(3),U(ij)(4)));
     if(sound_speed == 0) cavitation=1;
-    lambda_left(1)=w-sound_speed;
-    lambda_left(2)=lambda_left(3)=lambda_left(4)=w;
-    lambda_left(5)=w+sound_speed;
+    lambda_left(0)=w-sound_speed;
+    lambda_left(1)=lambda_left(2)=lambda_left(3)=w;
+    lambda_left(4)=w+sound_speed;
         
     // eigenvalues on the right - at point ij+1
-    w=U(ij+1)(4)/U(ij+1)(1);
-    sound_speed=eos->c(U(ij+1)(1),e(U(ij+1)(1),U(ij+1)(2),U(ij+1)(3),U(ij+1)(4),U(ij+1)(5)));
+    w=U(ij+1)(3)/U(ij+1)(0);
+    sound_speed=eos->c(U(ij+1)(0),e(U(ij+1)(0),U(ij+1)(1),U(ij+1)(2),U(ij+1)(3),U(ij+1)(4)));
     if(sound_speed == 0) cavitation=1;
-    lambda_right(1)=w-sound_speed;
-    lambda_right(2)=lambda_right(3)=lambda_right(4)=w;
-    lambda_right(5)=w+sound_speed;
+    lambda_right(0)=w-sound_speed;
+    lambda_right(1)=lambda_right(2)=lambda_right(3)=w;
+    lambda_right(4)=w+sound_speed;
         
     // eigenvalues in the center - at flux ij
-    T rho=(U(ij)(1)+U(ij+1)(1))/2;
-    T rho_u=(U(ij)(2)+U(ij+1)(2))/2;
-    T rho_v=(U(ij)(3)+U(ij+1)(3))/2;
-    T rho_w=(U(ij)(4)+U(ij+1)(4))/2;
-    T E=(U(ij)(5)+U(ij+1)(5))/2;
+    T rho=(U(ij)(0)+U(ij+1)(0))/2;
+    T rho_u=(U(ij)(1)+U(ij+1)(1))/2;
+    T rho_v=(U(ij)(2)+U(ij+1)(2))/2;
+    T rho_w=(U(ij)(3)+U(ij+1)(3))/2;
+    T E=(U(ij)(4)+U(ij+1)(4))/2;
     w=rho_w/rho;
     T internal_energy=e(rho,rho_u,rho_v,rho_w,E);
     sound_speed=eos->c(rho,internal_energy);
     if(sound_speed == 0) cavitation=1;
-    lambda(1)=w-sound_speed;
-    lambda(2)=lambda(3)=lambda(4)=w;
-    lambda(5)=w+sound_speed;
+    lambda(0)=w-sound_speed;
+    lambda(1)=lambda(2)=lambda(3)=w;
+    lambda(4)=w+sound_speed;
 
     if(cavitation) return 0; // loss of hyperbolicity
     else return 1; // eigensystem is well defined
@@ -141,11 +141,11 @@ template<class T> void EULER_3D_EIGENSYSTEM_H<T>::
 Eigenvectors(const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,const int ij,MATRIX<T,d,d>& L,MATRIX<T,d,d>& R)
 {
     // eigensystem in the center - at flux ij
-    T rho=(U(ij)(1)+U(ij+1)(1))/2;
-    T rho_u=(U(ij)(2)+U(ij+1)(2))/2;
-    T rho_v=(U(ij)(3)+U(ij+1)(3))/2;
-    T rho_w=(U(ij)(4)+U(ij+1)(4))/2;
-    T E=(U(ij)(5)+U(ij+1)(5))/2;
+    T rho=(U(ij)(0)+U(ij+1)(0))/2;
+    T rho_u=(U(ij)(1)+U(ij+1)(1))/2;
+    T rho_v=(U(ij)(2)+U(ij+1)(2))/2;
+    T rho_w=(U(ij)(3)+U(ij+1)(3))/2;
+    T E=(U(ij)(4)+U(ij+1)(4))/2;
     T internal_energy=e(rho,rho_u,rho_v,rho_w,E);
     T sound_speed=eos->c(rho,internal_energy);
     T p=eos->p(rho,internal_energy);
@@ -168,57 +168,57 @@ Eigenvectors(const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,const int ij,MATRIX<T,d
     T b1_over_2_times_w=b1_over_2*w;
     T w_times_c=w*sound_speed;
                     
-    L(1,1)=b2_over_2+w_over_2c;
-    L(1,2)=-b1_over_2_times_u;
-    L(1,3)=-b1_over_2_times_v;
-    L(1,4)=-b1_over_2_times_w-one_over_2c;
-    L(1,5)=b1_over_2;
-    L(2,1)=h-q2;
-    L(2,2)=u;
-    L(2,3)=v;
-    L(2,4)=w;
-    L(2,5)=-1;
-    L(3,1)=u;
+    L(0,0)=b2_over_2+w_over_2c;
+    L(0,1)=-b1_over_2_times_u;
+    L(0,2)=-b1_over_2_times_v;
+    L(0,3)=-b1_over_2_times_w-one_over_2c;
+    L(0,4)=b1_over_2;
+    L(1,0)=h-q2;
+    L(1,1)=u;
+    L(1,2)=v;
+    L(1,3)=w;
+    L(1,4)=-1;
+    L(2,0)=u;
+    L(2,1)=-1;
+    L(2,2)=0;
+    L(2,3)=0;
+    L(2,4)=0;
+    L(3,0)=v;
+    L(3,1)=0;
     L(3,2)=-1;
     L(3,3)=0;
     L(3,4)=0;
-    L(3,5)=0;
-    L(4,1)=v;
-    L(4,2)=0;
-    L(4,3)=-1;
-    L(4,4)=0;
-    L(4,5)=0;
-    L(5,1)=b2_over_2-w_over_2c;
-    L(5,2)=-b1_over_2_times_u;
-    L(5,3)=-b1_over_2_times_v;
-    L(5,4)=-b1_over_2_times_w+one_over_2c;
-    L(5,5)=b1_over_2;
+    L(4,0)=b2_over_2-w_over_2c;
+    L(4,1)=-b1_over_2_times_u;
+    L(4,2)=-b1_over_2_times_v;
+    L(4,3)=-b1_over_2_times_w+one_over_2c;
+    L(4,4)=b1_over_2;
     
-    R(1,1)=1;
-    R(1,2)=u;
-    R(1,3)=v;
-    R(1,4)=w-sound_speed;
-    R(1,5)=h-w_times_c;
-    R(2,1)=b1;
-    R(2,2)=b1*u;
-    R(2,3)=b1*v;
-    R(2,4)=b1*w;
-    R(2,5)=b1*h-1;
+    R(0,0)=1;
+    R(0,1)=u;
+    R(0,2)=v;
+    R(0,3)=w-sound_speed;
+    R(0,4)=h-w_times_c;
+    R(1,0)=b1;
+    R(1,1)=b1*u;
+    R(1,2)=b1*v;
+    R(1,3)=b1*w;
+    R(1,4)=b1*h-1;
+    R(2,0)=0;
+    R(2,1)=-1;
+    R(2,2)=0;
+    R(2,3)=0;
+    R(2,4)=-u;
+    R(3,0)=0;
     R(3,1)=0;
     R(3,2)=-1;
     R(3,3)=0;
-    R(3,4)=0;
-    R(3,5)=-u;
-    R(4,1)=0;
-    R(4,2)=0;
-    R(4,3)=-1;
-    R(4,4)=0;
-    R(5,5)=-v;
-    R(5,1)=1;
-    R(5,2)=u;
-    R(5,3)=v;
-    R(5,4)=w+sound_speed;
-    R(5,5)=h+w_times_c;
+    R(4,4)=-v;
+    R(4,0)=1;
+    R(4,1)=u;
+    R(4,2)=v;
+    R(4,3)=w+sound_speed;
+    R(4,4)=h+w_times_c;
 }  
 //#####################################################################
 template class EULER_3D_EIGENSYSTEM_H<float>;

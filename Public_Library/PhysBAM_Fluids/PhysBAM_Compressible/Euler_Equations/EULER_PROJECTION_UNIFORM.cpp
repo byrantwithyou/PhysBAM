@@ -67,7 +67,7 @@ Get_Pressure(T_ARRAYS_SCALAR& pressure) const
             pressure(cell_index)=p(cell_index)*scaling;}}
     else{ 
         for(CELL_ITERATOR iterator(euler->grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
-            pressure(cell_index)=euler->eos->p(euler->U(cell_index)(1),euler->e(euler->U,cell_index));}}
+            pressure(cell_index)=euler->eos->p(euler->U(cell_index)(0),euler->e(euler->U,cell_index));}}
 }
 //#####################################################################
 // Function Fill_Face_Weights_For_Projection
@@ -77,7 +77,7 @@ Fill_Face_Weights_For_Projection(const T dt,const T time,T_FACE_ARRAYS_SCALAR& b
 {
     euler->Fill_Ghost_Cells(dt,time,1);
     for(FACE_ITERATOR iterator(euler->grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();
-        T rho_first_cell=euler->U_ghost(iterator.First_Cell_Index())(1),rho_second_cell=euler->U_ghost(iterator.Second_Cell_Index())(1);
+        T rho_first_cell=euler->U_ghost(iterator.First_Cell_Index())(0),rho_second_cell=euler->U_ghost(iterator.Second_Cell_Index())(0);
         T rho_face=(rho_first_cell+rho_second_cell)*(T).5;
         beta_face.Component(axis)(face_index)=(T)1/rho_face;}
 
@@ -93,7 +93,7 @@ Get_Ghost_Density(const T dt,const T time,const int number_of_ghost_cells,T_ARRA
     euler->Fill_Ghost_Cells(dt,time,number_of_ghost_cells);
     for(CELL_ITERATOR iterator(euler->grid,number_of_ghost_cells);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();
-        density_ghost(cell_index)=euler->U_ghost(cell_index)(1);}
+        density_ghost(cell_index)=euler->U_ghost(cell_index)(0);}
 }
 //#####################################################################
 // Function Get_Ghost_Density
@@ -165,7 +165,7 @@ Get_Dirichlet_Boundary_Conditions(const T_ARRAYS_DIMENSION_SCALAR& U_dirichlet)
     TV_INT cell_index;
     for(CELL_ITERATOR iterator(euler->grid,1,T_GRID::GHOST_REGION);iterator.Valid();iterator.Next()){
         cell_index=iterator.Cell_Index();
-        p_dirichlet(cell_index)=euler->eos->p(U_dirichlet(cell_index)(1),euler->e(U_dirichlet,cell_index));}
+        p_dirichlet(cell_index)=euler->eos->p(U_dirichlet(cell_index)(0),euler->e(U_dirichlet,cell_index));}
 }
 //#####################################################################
 // Function Set_Dirichlet_Boundary_Conditions
@@ -225,22 +225,22 @@ Compute_Advected_Pressure(const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const T_FACE_
         GRID<VECTOR<T,1> > grid_1d=euler->grid.Get_1D_Grid(axis);
         p_1d.Resize(grid_1d.Domain_Indices(3));u.Resize(grid_1d.Domain_Indices(3));u_px.Resize(grid_1d.Domain_Indices(3));
         T_GRID_LOWER_DIM lower_dimension_grid=euler->grid.Remove_Dimension(axis);
-        ARRAY<int,VECTOR<int,1> > colors(1,grid_1d.counts.x);
-        ARRAY<bool,VECTOR<int,1> > psi_N_axis(1,grid_1d.counts.x+1);
+        ARRAY<int,VECTOR<int,1> > colors(0,grid_1d.counts.x);
+        ARRAY<bool,VECTOR<int,1> > psi_N_axis(0,grid_1d.counts.x+1);
         VECTOR<int,2> region_boundary;
         for(CELL_ITERATOR_LOWER_DIM iterator(lower_dimension_grid);iterator.Valid();iterator.Next()){TV_INT_LOWER_DIM cell_index=iterator.Cell_Index();
-            for(int i=-2;i<=grid_1d.counts.x+3;i++) u(i)=v_cell(cell_index.Insert(i,axis))[axis];
+            for(int i=-3;i<grid_1d.counts.x+3;i++) u(i)=v_cell(cell_index.Insert(i,axis))[axis];
             for(int i=0;i<grid_1d.counts.x;i++) colors(i)=euler->psi(cell_index.Insert(i,axis))?0:-1;
             for(int i=0;i<grid_1d.counts.x+1;i++) psi_N_axis(i)=elliptic_solver->psi_N(axis,cell_index.Insert(i,axis));
             int number_of_regions=find_connected_components.Flood_Fill(colors,psi_N_axis);
             for(int color=0;color<number_of_regions;color++){
-                for(int i=-2;i<=grid_1d.counts.x+3;i++) p_1d(i)=p_ghost(cell_index.Insert(i,axis));
+                for(int i=-3;i<grid_1d.counts.x+3;i++) p_1d(i)=p_ghost(cell_index.Insert(i,axis));
                 region_boundary=find_connected_components.region_boundaries(color);
                 VECTOR<bool,2> psi_N_boundary=VECTOR<bool,2>(psi_N_axis(region_boundary.x),psi_N_axis(region_boundary.y+1));
                 pressure_object_boundary.Fill_Ghost_Cells_Neumann(grid_1d,p_1d,face_velocities_for_solid_faces,cell_index,axis,hj_eno_order,
-                    use_exact_neumann_face_location,VECTOR<int,2>(1,grid_1d.counts.x),region_boundary,psi_N_boundary,0);
+                    use_exact_neumann_face_location,VECTOR<int,2>(0,grid_1d.counts.x),region_boundary,psi_N_boundary,0);
                 pressure_advection_HJ.Advection_Solver(region_boundary.x,region_boundary.y,grid_1d.dX.x,p_1d,u,u_px);
-                for(int k=region_boundary.x;k<=region_boundary.y;k++) rhs(cell_index.Insert(k,axis))+=u_px(k);}}}
+                for(int k=region_boundary.x;k<region_boundary.y;k++) rhs(cell_index.Insert(k,axis))+=u_px(k);}}}
     for(CELL_ITERATOR iterator(euler->grid);iterator.Valid();iterator.Next())
         p_advected(iterator.Cell_Index())=p_ghost(iterator.Cell_Index())-dt*rhs(iterator.Cell_Index());
 #else
@@ -266,8 +266,8 @@ Compute_One_Over_rho_c_Squared()
 {
     for(CELL_ITERATOR iterator(euler->grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         if(euler->psi(cell_index)){
-            T rho=euler->U_ghost(cell_index)(1);
-            T one_over_c=euler->eos->one_over_c(euler->U_ghost(cell_index)(1),euler->e(euler->U_ghost,cell_index));
+            T rho=euler->U_ghost(cell_index)(0);
+            T one_over_c=euler->eos->one_over_c(euler->U_ghost(cell_index)(0),euler->e(euler->U_ghost,cell_index));
             one_over_rho_c_squared(cell_index)=(one_over_c*one_over_c)/rho;}
         else one_over_rho_c_squared(cell_index)=0;}
 }
@@ -287,7 +287,7 @@ Compute_Density_Weighted_Face_Velocities(const T_GRID& face_grid,T_FACE_ARRAYS_S
     for(FACE_ITERATOR iterator(face_grid);iterator.Valid();iterator.Next()){
         first_cell_index=iterator.First_Cell_Index();second_cell_index=iterator.Second_Cell_Index();axis=iterator.Axis();
         if(!psi_N.Component(axis)(iterator.Face_Index()) && ((!psi.Valid_Index(first_cell_index) || psi(first_cell_index)) && (!psi.Valid_Index(second_cell_index) || psi(second_cell_index)))){
-            T rho_first_cell=U_ghost(first_cell_index)(1),rho_second_cell=U_ghost(second_cell_index)(1);
+            T rho_first_cell=U_ghost(first_cell_index)(0),rho_second_cell=U_ghost(second_cell_index)(0);
             face_velocities.Component(axis)(iterator.Face_Index())=(rho_first_cell*EULER<T_GRID>::Get_Velocity_Component(U_ghost,first_cell_index,axis)+
                     rho_second_cell*EULER<T_GRID>::Get_Velocity_Component(U_ghost,second_cell_index,axis))/(rho_first_cell+rho_second_cell);}
         else face_velocities(iterator.Full_Index())=(T)0;}
@@ -302,7 +302,7 @@ Compute_Face_Pressure_From_Cell_Pressures(const T_GRID& face_grid,const T_ARRAYS
     for(FACE_ITERATOR iterator(face_grid);iterator.Valid();iterator.Next()){
         first_cell_index=iterator.First_Cell_Index();second_cell_index=iterator.Second_Cell_Index();axis=iterator.Axis();
         if((!psi.Valid_Index(first_cell_index) || psi(first_cell_index)) && (!psi.Valid_Index(second_cell_index) || psi(second_cell_index))){
-            T rho_first_cell=U_ghost(first_cell_index)(1),rho_second_cell=U_ghost(second_cell_index)(1);
+            T rho_first_cell=U_ghost(first_cell_index)(0),rho_second_cell=U_ghost(second_cell_index)(0);
             p_face.Component(axis)(iterator.Face_Index())=(rho_second_cell*p_cell(first_cell_index)+rho_first_cell*p_cell(second_cell_index))/(rho_first_cell+rho_second_cell);}
         else if(!psi.Valid_Index(first_cell_index) || psi(first_cell_index))
             p_face(iterator.Full_Index()) = p_cell(first_cell_index);
@@ -394,7 +394,7 @@ Apply_Pressure(const T_ARRAYS_SCALAR& p_ghost,const T_FACE_ARRAYS_SCALAR& p_face
         for(FACE_ITERATOR iterator(euler->grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();
             TV_INT first_cell_index=iterator.First_Cell_Index(),second_cell_index=iterator.Second_Cell_Index();
             if(!psi_N.Component(axis)(face_index) && (!euler->psi.Valid_Index(first_cell_index) || euler->psi(first_cell_index)) && (!euler->psi.Valid_Index(second_cell_index) || euler->psi(second_cell_index))){
-                T rho_face=(euler->U_ghost(first_cell_index)(1)+euler->U_ghost(second_cell_index)(1))*(T).5;
+                T rho_face=(euler->U_ghost(first_cell_index)(0)+euler->U_ghost(second_cell_index)(0))*(T).5;
                 face_velocities_np1.Component(axis)(face_index)-=grad_p_hat_face.Component(axis)(face_index)/rho_face;}}}
 
    // update energy

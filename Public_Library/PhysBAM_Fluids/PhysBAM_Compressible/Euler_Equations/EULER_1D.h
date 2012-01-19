@@ -68,7 +68,7 @@ Euler_Step(const T dt,const T time)
     
     if(cut_out_grid) conservation->Update_Conservation_Law(grid,U,U_ghost,*psi_pointer,dt,eigensystem_F);   
     else{ // not a cut out grid
-        ARRAY<bool,VECTOR<int,1> > psi(1,m);psi.Fill(true);
+        ARRAY<bool,VECTOR<int,1> > psi(0,m);psi.Fill(true);
         conservation->Update_Conservation_Law(grid,U,U_ghost,psi,dt,eigensystem_F);}
 
     boundary->Apply_Boundary_Condition(grid,U,time+dt); 
@@ -81,11 +81,11 @@ CFL()
 {
     int m=grid.m;T dx=grid.dx;
     
-    ARRAY<T,VECTOR<int,1> > u_minus_c(1,m),u_plus_c(1,m);
+    ARRAY<T,VECTOR<int,1> > u_minus_c(0,m),u_plus_c(0,m);
     for(int i=0;i<m;i++){
         if(!cut_out_grid || (cut_out_grid && (*psi_pointer)(i))){
-            T u=U(i)(2)/U(i)(1);
-            T sound_speed=eos->c(U(i)(1),e(U(i)(1),U(i)(2),U(i)(3)));
+            T u=U(i)(1)/U(i)(0);
+            T sound_speed=eos->c(U(i)(0),e(U(i)(0),U(i)(1),U(i)(2)));
             u_minus_c(i)=u-sound_speed;u_plus_c(i)=u+sound_speed;}}
     T dt_convect=max(u_minus_c.Maxabs(),u_plus_c.Maxabs())/dx;
     dt_convect=max(dt_convect,1/max_time_step);

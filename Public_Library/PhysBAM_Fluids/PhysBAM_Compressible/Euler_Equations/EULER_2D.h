@@ -7,9 +7,9 @@
 //
 // Input an EOS class, that is a class that inherits the virtual base class EOS.
 // Input a GRID_2D class.
-// Input U as 4 by (1,m) by (1,n) for mass, momentum, and energy.
+// Input U as 4 by (0,m) by (0,n) for mass, momentum, and energy.
 //
-// Use Set_Up_Cut_Out_Grid(psi) to define a cut out grid with psi as (1,m) by (1,n).
+// Use Set_Up_Cut_Out_Grid(psi) to define a cut out grid with psi as (0,m) by (0,n).
 // When psi=true, solve the equaitions. 
 // When psi=false, do NOT solve the equations.
 //
@@ -69,7 +69,7 @@ Euler_Step(const T dt,const T time)
     
     if(cut_out_grid) conservation->Update_Conservation_Law(grid,U,U_ghost,*psi_pointer,dt,eigensystem_F,eigensystem_G);  
     else{ // not a cut out grid
-        ARRAY<bool,VECTOR<int,2> > psi(1,m,1,n);psi.Fill(true);
+        ARRAY<bool,VECTOR<int,2> > psi(0,m,0,n);psi.Fill(true);
         conservation->Update_Conservation_Law(grid,U,U_ghost,psi,dt,eigensystem_F,eigensystem_G);}
 
     boundary->Apply_Boundary_Condition(grid,U,time+dt); 
@@ -82,11 +82,11 @@ CFL()
 {
     int m=grid.m,n=grid.n;T dx=grid.dx,dy=grid.dy;
     
-    ARRAY<T,VECTOR<int,2> > u_minus_c(1,m,1,n),u_plus_c(1,m,1,n),v_minus_c(1,m,1,n),v_plus_c(1,m,1,n);
+    ARRAY<T,VECTOR<int,2> > u_minus_c(0,m,0,n),u_plus_c(0,m,0,n),v_minus_c(0,m,0,n),v_plus_c(0,m,0,n);
     for(int i=0;i<m;i++) for(int j=0;j<n;j++){
         if(!cut_out_grid || (cut_out_grid && (*psi_pointer)(i,j))){
-            T u=U(2,i,j)/U(1,i,j),v=U(3,i,j)/U(1,i,j);
-            T sound_speed=eos->c(U(1,i,j),e(U(1,i,j),U(2,i,j),U(3,i,j),U(4,i,j)));
+            T u=U(1,i,j)/U(0,i,j),v=U(2,i,j)/U(0,i,j);
+            T sound_speed=eos->c(U(0,i,j),e(U(0,i,j),U(1,i,j),U(2,i,j),U(3,i,j)));
             u_minus_c(i,j)=u-sound_speed;u_plus_c(i,j)=u+sound_speed;
             v_minus_c(i,j)=v-sound_speed;v_plus_c(i,j)=v+sound_speed;}}
     T dt_convect=max(u_minus_c.Maxabs(),u_plus_c.Maxabs())/dx+max(v_minus_c.Maxabs(),v_plus_c.Maxabs())/dy;
