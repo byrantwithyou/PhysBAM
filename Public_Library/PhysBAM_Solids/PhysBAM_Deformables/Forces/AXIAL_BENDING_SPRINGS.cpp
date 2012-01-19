@@ -196,13 +196,13 @@ CFL_Strain_Rate() const
         const VECTOR<int,4>& nodes=spring_particles(s);
         TV dx;VECTOR<T,2> weights;T current_length;T current_edge_length;
         Axial_Vector(nodes,current_length,dx,weights,current_edge_length); // dx is normalized
-        T strain_rate=TV::Dot_Product((1-weights.x)*V(nodes[1])+weights.x*V(nodes[2])-(1-weights.y)*V(nodes[3])-weights.y*V(nodes[4]),dx)/restlength(s);
+        T strain_rate=TV::Dot_Product((1-weights.x)*V(nodes[0])+weights.x*V(nodes[1])-(1-weights.y)*V(nodes[2])-weights.y*V(nodes[3]),dx)/restlength(s);
         max_strain_rate=max(max_strain_rate,abs(strain_rate));}
     else for(SPRING_ITERATOR iterator(force_springs);iterator.Valid();iterator.Next()){int s=iterator.Data();
         const VECTOR<int,4>& nodes=spring_particles(s);
         TV dx;VECTOR<T,2> weights;T current_length;T current_edge_length;
         Axial_Vector(nodes,current_length,dx,weights,current_edge_length); // dx is normalized
-        T strain_rate=TV::Dot_Product((1-weights.x)*V(nodes[1])+weights.x*V(nodes[2])-(1-weights.y)*V(nodes[3])-weights.y*V(nodes[4]),dx)/current_length;
+        T strain_rate=TV::Dot_Product((1-weights.x)*V(nodes[0])+weights.x*V(nodes[1])-(1-weights.y)*V(nodes[2])-weights.y*V(nodes[3]),dx)/current_length;
         max_strain_rate=max(max_strain_rate,abs(strain_rate));}
     return Robust_Divide(max_strain_per_time_step,max_strain_rate);
 }
@@ -224,14 +224,14 @@ Set_Stiffness_Based_On_Reduced_Mass(const T scaling_coefficient)
 template<class T> void AXIAL_BENDING_SPRINGS<T>::
 Axial_Vector(const VECTOR<int,4>& nodes,T& axial_length,TV& axial_direction,VECTOR<T,2>& weights,T& attached_edge_length) const
 {
-    axial_direction=SEGMENT_3D<T>(particles.X(nodes[1]),particles.X(nodes[2])).Shortest_Vector_Between_Segments(SEGMENT_3D<T>(particles.X(nodes[3]),particles.X(nodes[4])),weights);
+    axial_direction=SEGMENT_3D<T>(particles.X(nodes[0]),particles.X(nodes[1])).Shortest_Vector_Between_Segments(SEGMENT_3D<T>(particles.X(nodes[2]),particles.X(nodes[3])),weights);
     axial_length=axial_direction.Normalize();
     // TODO: How do we choose the sign of axial_direction?
-    if(!axial_length) axial_direction=TV::Cross_Product(particles.X(nodes[2])-particles.X(nodes[1]),particles.X(nodes[4])-particles.X(nodes[3])).Normalized();
-    attached_edge_length=(particles.X(nodes[1])-particles.X(nodes[3])).Magnitude()+
-        (particles.X(nodes[1])-particles.X(nodes[4])).Magnitude()+
-        (particles.X(nodes[2])-particles.X(nodes[3])).Magnitude()+
-        (particles.X(nodes[2])-particles.X(nodes[4])).Magnitude();
+    if(!axial_length) axial_direction=TV::Cross_Product(particles.X(nodes[1])-particles.X(nodes[0]),particles.X(nodes[3])-particles.X(nodes[2])).Normalized();
+    attached_edge_length=(particles.X(nodes[0])-particles.X(nodes[2])).Magnitude()+
+        (particles.X(nodes[0])-particles.X(nodes[3])).Magnitude()+
+        (particles.X(nodes[1])-particles.X(nodes[2])).Magnitude()+
+        (particles.X(nodes[1])-particles.X(nodes[3])).Magnitude();
 }
 //#####################################################################
 // Function Potential_Energy
@@ -241,7 +241,7 @@ Potential_Energy(int s,const T time) const
 {
     const VECTOR<int,4>& nodes=spring_particles(s);
     VECTOR<T,2> weights;
-    TV axial_direction=SEGMENT_3D<T>(particles.X(nodes[1]),particles.X(nodes[2])).Shortest_Vector_Between_Segments(SEGMENT_3D<T>(particles.X(nodes[3]),particles.X(nodes[4])),weights);
+    TV axial_direction=SEGMENT_3D<T>(particles.X(nodes[0]),particles.X(nodes[1])).Shortest_Vector_Between_Segments(SEGMENT_3D<T>(particles.X(nodes[2]),particles.X(nodes[3])),weights);
     T axial_length=axial_direction.Normalize();
     return (T).5*youngs_modulus(s)/restlength(s)*sqr(axial_length-visual_restlength(s));
 }
@@ -264,9 +264,9 @@ Endpoint_Mass(int s,int b) const
 {
     switch(b){
         case 1:
-            return particles.mass(spring_particles(s)(1))*optimization_weights(s)(1)+particles.mass(spring_particles(s)(2))*optimization_weights(s)(2);
+            return particles.mass(spring_particles(s)(0))*optimization_weights(s)(0)+particles.mass(spring_particles(s)(1))*optimization_weights(s)(1);
         case 2:
-            return particles.mass(spring_particles(s)(3))*optimization_weights(s)(3)+particles.mass(spring_particles(s)(4))*optimization_weights(s)(4);
+            return particles.mass(spring_particles(s)(2))*optimization_weights(s)(2)+particles.mass(spring_particles(s)(3))*optimization_weights(s)(3);
         default:
             PHYSBAM_FATAL_ERROR("Invalid endpoint");}
 }
@@ -286,11 +286,11 @@ Endpoint_Velocity(ARRAY_VIEW<const TV> velocity,int s,int b) const
 {
     switch(b){
         case 1:{
-            int node1=spring_particles(s)(1),node2=spring_particles(s)(2);
-            return velocity(node1)*optimization_weights(s)(1)+velocity(node2)*optimization_weights(s)(2);}
+            int node1=spring_particles(s)(0),node2=spring_particles(s)(1);
+            return velocity(node1)*optimization_weights(s)(0)+velocity(node2)*optimization_weights(s)(1);}
         case 2:{
-            int node3=spring_particles(s)(3),node4=spring_particles(s)(4);
-            return velocity(node3)*optimization_weights(s)(3)+velocity(node4)*optimization_weights(s)(4);}
+            int node3=spring_particles(s)(2),node4=spring_particles(s)(3);
+            return velocity(node3)*optimization_weights(s)(2)+velocity(node4)*optimization_weights(s)(3);}
         default:
             PHYSBAM_FATAL_ERROR("Invalid endpoint");}
 }

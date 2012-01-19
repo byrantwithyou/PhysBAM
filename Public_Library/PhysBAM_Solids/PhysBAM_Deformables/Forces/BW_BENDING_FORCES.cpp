@@ -28,8 +28,8 @@ BW_BENDING_FORCES(PARTICLES<TV>& particles,TRIANGLE_MESH& triangle_mesh_input,co
     // constant matrices
     VECTOR<VECTOR<T,3>,3> pos=VECTOR<VECTOR<T,3>,3>(VECTOR<T,3>(1,0,0),VECTOR<T,3>(0,1,0),VECTOR<T,3>(0,0,1));
     VECTOR<VECTOR<T,3>,3> neg=VECTOR<VECTOR<T,3>,3>(VECTOR<T,3>(-1,0,0),VECTOR<T,3>(0,-1,0),VECTOR<T,3>(0,0,-1));
-    dq_a_i_j_t(1,2)=neg;dq_a_i_j_t(1,3)=pos;dq_a_i_j_t(2,3)=neg;dq_a_i_j_t(2,1)=pos;dq_a_i_j_t(3,1)=neg;dq_a_i_j_t(3,2)=pos;
-    dq_b_i_j_t(2,4)=neg;dq_b_i_j_t(2,3)=pos;dq_b_i_j_t(3,2)=neg;dq_b_i_j_t(3,4)=pos;dq_b_i_j_t(4,3)=neg;dq_b_i_j_t(4,2)=pos;
+    dq_a_i_j_t(0,1)=neg;dq_a_i_j_t(0,2)=pos;dq_a_i_j_t(1,2)=neg;dq_a_i_j_t(1,0)=pos;dq_a_i_j_t(2,0)=neg;dq_a_i_j_t(2,1)=pos;
+    dq_b_i_j_t(1,3)=neg;dq_b_i_j_t(1,2)=pos;dq_b_i_j_t(2,1)=neg;dq_b_i_j_t(2,3)=pos;dq_b_i_j_t(3,2)=neg;dq_b_i_j_t(3,1)=pos;
 
 
     bool adjacent_triangles_defined=(triangle_mesh.adjacent_elements!=0);if(!adjacent_triangles_defined) triangle_mesh.Initialize_Adjacent_Elements();
@@ -91,8 +91,8 @@ Update_Position_Based_State(const T time,const bool is_position_update)
     for(CONSTRAINT_ITERATOR iterator(force_simplices);iterator.Valid();iterator.Next()){int q=iterator.Data();
         typename BASE::STATE& state=states(q);
         BENDING_STATE& bending_state=bending_states(q);
-        TV x31=particles.X(state.nodes(3))-particles.X(state.nodes(1)),x21=particles.X(state.nodes(2))-particles.X(state.nodes(1));
-        TV x24=particles.X(state.nodes(2))-particles.X(state.nodes(4)),x34=particles.X(state.nodes(3))-particles.X(state.nodes(4));
+        TV x31=particles.X(state.nodes(2))-particles.X(state.nodes(0)),x21=particles.X(state.nodes(1))-particles.X(state.nodes(0));
+        TV x24=particles.X(state.nodes(1))-particles.X(state.nodes(3)),x34=particles.X(state.nodes(2))-particles.X(state.nodes(3));
         bending_state.n_a=TV::Cross_Product(x31,x21);
         bending_state.n_b=TV::Cross_Product(x24,x34);
         bending_state.e=particles.X(state.nodes(2))-particles.X(state.nodes(3));
@@ -105,10 +105,10 @@ Update_Position_Based_State(const T time,const bool is_position_update)
         state.C=VECTOR<T,1>(atan2(sin_theta,cos_theta));
         state.C_dot=VECTOR<T,1>();
 
-        VECTOR<VECTOR<T,3>,4> q_a=VECTOR<VECTOR<T,3>,4>(particles.X(state.nodes(3))-particles.X(state.nodes(2)),
-            particles.X(state.nodes(1))-particles.X(state.nodes(3)),particles.X(state.nodes(2))-particles.X(state.nodes(1)),VECTOR<T,3>());
-        VECTOR<VECTOR<T,3>,4> q_b=VECTOR<VECTOR<T,3>,4>(VECTOR<T,3>(),particles.X(state.nodes(3))-particles.X(state.nodes(4)),
-            particles.X(state.nodes(4))-particles.X(state.nodes(2)),particles.X(state.nodes(2))-particles.X(state.nodes(3)));
+        VECTOR<VECTOR<T,3>,4> q_a=VECTOR<VECTOR<T,3>,4>(particles.X(state.nodes(2))-particles.X(state.nodes(1)),
+            particles.X(state.nodes(0))-particles.X(state.nodes(2)),particles.X(state.nodes(1))-particles.X(state.nodes(0)),VECTOR<T,3>());
+        VECTOR<VECTOR<T,3>,4> q_b=VECTOR<VECTOR<T,3>,4>(VECTOR<T,3>(),particles.X(state.nodes(2))-particles.X(state.nodes(3)),
+            particles.X(state.nodes(3))-particles.X(state.nodes(1)),particles.X(state.nodes(1))-particles.X(state.nodes(2)));
         VECTOR<T,4> q_e=VECTOR<T,4>(0,1,-1,0);
 
         VECTOR<VECTOR<T,3>,4> dsin_theta_dx;
@@ -173,8 +173,8 @@ Update_Position_Based_State(const T time,const bool is_position_update)
                 MATRIX<T,3> dC_dxi_dxj;
                 for(int s=0;s<3;s++) for(int t=0;t<3;t++)
                     dC_dxi_dxj(s,t)=dcos_theta_dx(j)(t)*dsin_theta_dx(i)(s)+cos_theta*d2sin_theta_dx_dy(i,j)(s,t)-dsin_theta_dx(j)(t)*dcos_theta_dx(i)(s)-sin_theta*d2cos_theta_dx_dy(i,j)(s,t);
-                state.dC_dxi_dxj_times_C(i,j)=dC_dxi_dxj*state.C(1);
-                state.dC_dxi_dxj_times_C_dot(i,j)=dC_dxi_dxj*state.C_dot(1);}}}
+                state.dC_dxi_dxj_times_C(i,j)=dC_dxi_dxj*state.C(0);
+                state.dC_dxi_dxj_times_C_dot(i,j)=dC_dxi_dxj*state.C_dot(0);}}}
 }
 //#####################################################################
 // Function Potential_Energy

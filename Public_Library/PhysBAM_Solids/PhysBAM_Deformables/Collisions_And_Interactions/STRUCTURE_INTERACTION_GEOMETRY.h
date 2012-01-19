@@ -62,10 +62,10 @@ public:
     particle_hierarchy.Initialize_Hierarchy_Using_KD_Tree();}
 
     const typename IF<d==2,ARRAY<int>,typename IF<d==3,ARRAY<VECTOR<int,2> >,UNUSABLE>::TYPE>::TYPE& Edges() const
-    {return choice<d>(unusable,collision_particles.active_indices,segmented_curve->mesh.elements);}
+    {return choice<d-1>(unusable,collision_particles.active_indices,segmented_curve->mesh.elements);}
 
     const typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,d-1>::OBJECT* Face_Mesh_Object() const
-    {return choice<d>(point_simplices,segmented_curve,triangulated_surface);}
+    {return choice<d-1>(point_simplices,segmented_curve,triangulated_surface);}
 
     const ARRAY<bool>& Edge_Modified() const
     {return d==2?point_modified:segmented_curve_modified;}
@@ -80,7 +80,7 @@ public:
     {return d==2 || segmented_curve!=0;}
 
     const typename IF<(d<2),UNUSABLE,typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,d<2?0:d-2>::HIERARCHY>::TYPE& Edge_Hierarchy() const
-    {return choice<d>(unusable,particle_hierarchy,*segmented_curve->hierarchy);}
+    {return choice<d-1>(unusable,particle_hierarchy,*segmented_curve->hierarchy);}
 
     const ARRAY<char>& Edge_Processor_Masks() const
     {return d==2?point_processor_masks:segmented_curve_processor_masks;}

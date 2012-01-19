@@ -31,7 +31,7 @@ struct POINT_FACE_REPULSION_PAIR
     TV normal;
 
     static T Total_Repulsion_Thickness(ARRAY_VIEW<const T> repulsion_thickness,const VECTOR<int,d+1>& nodes)
-    {return max(repulsion_thickness(nodes[1]),repulsion_thickness.Subset(nodes.Remove_Index(1)).Min());}
+    {return max(repulsion_thickness(nodes[1]),repulsion_thickness.Subset(nodes.Remove_Index(0)).Min());}
 
     T Total_Repulsion_Thickness(ARRAY_VIEW<const T> repulsion_thickness) const
     {return Total_Repulsion_Thickness(repulsion_thickness,nodes);}
@@ -105,7 +105,7 @@ struct PRECOMPUTE_PROJECT_POINT_FACE
     VECTOR<int,4> nodes;
 
     void Project(INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,4>&> v) const
-    {T s=TV::Dot_Product(v(1)-weights(1)*v(2)-weights(2)*v(3)-weights(3)*v(4),normal);
+    {T s=TV::Dot_Product(v(0)-weights(0)*v(1)-weights(1)*v(2)-weights(2)*v(3),normal);
     for(int i=0;i<4;i++) v(i)+=s*v_scaled_normals(i);}
 
     void Precompute(const INDIRECT_ARRAY<ARRAY_VIEW<T>,VECTOR<int,4>&> mass,const TV& weights_input,const TV& normal_input);
@@ -122,7 +122,7 @@ struct PRECOMPUTE_PROJECT_EDGE_EDGE
     VECTOR<T,2-(TV::m==1)> weights;
 
     void Project(INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,4>&> v) const
-    {T s=TV::Dot_Product(v(1)-v(3),normal_13)+TV::Dot_Product(v(2)-v(1),normal_12)+TV::Dot_Product(v(4)-v(3),normal_34);
+    {T s=TV::Dot_Product(v(0)-v(2),normal_13)+TV::Dot_Product(v(1)-v(0),normal_12)+TV::Dot_Product(v(3)-v(2),normal_34);
     for(int i=0;i<4;i++) v(i)+=s*v_scaled_normals(i);}
 
     void Precompute(const INDIRECT_ARRAY<ARRAY_VIEW<T>,VECTOR<int,4>&> mass,const VECTOR<T,2>& weights_input,const TV& normal_input);

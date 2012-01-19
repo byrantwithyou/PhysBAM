@@ -369,7 +369,7 @@ Set_Mass_Of_Particles(const T_OBJECT& object,const T density,const bool use_cons
         particles.mass.Subset(nodes).Fill(mass_per_node);}
     else{
         particles.mass.Subset(nodes).Fill((T)0);
-        int nodes_per_element=object.mesh.elements(1).m;
+        int nodes_per_element=object.mesh.elements(0).m;
         T density_scaled=density/(T)nodes_per_element;
         for(int t=0;t<object.mesh.elements.m;t++){
             T mass_scaled=density_scaled*object.Signed_Size(t);
@@ -520,7 +520,7 @@ Embed_Surface_In_Tetrahedralized_Volume(BINDING_LIST<TV>& binding_list,SOFT_BIND
     ARRAY<int> todo;
     for(int i=0;i<volume.mesh.elements.m;i++){
         if(tet_color(i)) continue;
-        int color=TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Outside(surface,volume.particles.X(volume.mesh.elements(i)(1)),thickness_over_two)?3:2;
+        int color=TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Outside(surface,volume.particles.X(volume.mesh.elements(i)(0)),thickness_over_two)?3:2;
         tet_color(i)=color;
         todo.Append(i);
         while(todo.m){

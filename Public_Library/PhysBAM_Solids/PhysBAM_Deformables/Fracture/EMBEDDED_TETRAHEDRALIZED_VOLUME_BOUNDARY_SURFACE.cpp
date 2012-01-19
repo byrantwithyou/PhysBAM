@@ -74,22 +74,22 @@ Conservative_Perturb_Nodes_For_Collision_Freeness(const T perturb_amount,const A
         bool parent1_ever_material_by_itself=false,parent2_ever_material_by_itself=false,more_than_one_other_node_on_boundary=false;int other_node_on_boundary1=0,other_node_on_boundary2=0;
         for(int t=0;t<tetrahedrons_on_edge.m;t++){
             int tetrahedron=tetrahedrons_on_edge(t);
-            bool parent1_material_in_current_tetrahedron=embedded_object.Node_In_Simplex_Is_Material(parents[1],tetrahedron);
-            bool parent2_material_in_current_tetrahedron=embedded_object.Node_In_Simplex_Is_Material(parents[2],tetrahedron);
+            bool parent1_material_in_current_tetrahedron=embedded_object.Node_In_Simplex_Is_Material(parents[0],tetrahedron);
+            bool parent2_material_in_current_tetrahedron=embedded_object.Node_In_Simplex_Is_Material(parents[1],tetrahedron);
             if(!parent1_material_in_current_tetrahedron || !parent2_material_in_current_tetrahedron){
                 parent1_ever_material_by_itself=parent1_ever_material_by_itself || parent1_material_in_current_tetrahedron;
                 parent2_ever_material_by_itself=parent2_ever_material_by_itself || parent2_material_in_current_tetrahedron;
-                int other_node1,other_node2;embedded_object.simplicial_object.mesh.Other_Two_Nodes(parents[1],parents[2],tetrahedron,other_node1,other_node2);
+                int other_node1,other_node2;embedded_object.simplicial_object.mesh.Other_Two_Nodes(parents[0],parents[1],tetrahedron,other_node1,other_node2);
                 if((embedded_object.Node_In_Simplex_Is_Material(other_node1,tetrahedron) || embedded_object.Node_In_Simplex_Is_Material(other_node2,tetrahedron))
                         && Center_Octahedron_In_Material(t)){
                     if(!other_node_on_boundary1 && !other_node_on_boundary2){other_node_on_boundary1=other_node1;other_node_on_boundary2=other_node2;}
                     else more_than_one_other_node_on_boundary=true;}}}
         if(parent1_ever_material_by_itself){
             if(!parent2_ever_material_by_itself){
-                VECTOR<T,3> perturb_direction=(particles.X(parents[1])-embedded_particles.X(node)).Normalized();
+                VECTOR<T,3> perturb_direction=(particles.X(parents[0])-embedded_particles.X(node)).Normalized();
                 embedded_particles.X(node)+=perturb_amount*perturb_direction;previously_perturbed(node)=true;}}
         else if(parent2_ever_material_by_itself){
-            VECTOR<T,3> perturb_direction=(particles.X(parents[2])-embedded_particles.X(node)).Normalized();
+            VECTOR<T,3> perturb_direction=(particles.X(parents[1])-embedded_particles.X(node)).Normalized();
             embedded_particles.X(node)+=perturb_amount*perturb_direction;previously_perturbed(node)=true;}
         else if(!more_than_one_other_node_on_boundary){
             if(other_node_on_boundary1 && other_node_on_boundary2){
@@ -116,17 +116,17 @@ Perturb_Nodes_For_Collision_Freeness(const T perturb_amount) // used to be calle
         ARRAY<int> tetrahedrons_on_edge;embedded_object.simplicial_object.mesh.Tetrahedrons_On_Edge(parents,tetrahedrons_on_edge);
         for(int t=0;t<tetrahedrons_on_edge.m;t++){
             int tetrahedron=tetrahedrons_on_edge(t);
-            bool parent1_material_in_current_tetrahedron=embedded_object.Node_In_Simplex_Is_Material(parents[1],tetrahedron);
-            bool parent2_material_in_current_tetrahedron=embedded_object.Node_In_Simplex_Is_Material(parents[2],tetrahedron);
-            int other_node1,other_node2;embedded_object.simplicial_object.mesh.Other_Two_Nodes(parents[1],parents[2],tetrahedron,other_node1,other_node2);
+            bool parent1_material_in_current_tetrahedron=embedded_object.Node_In_Simplex_Is_Material(parents[0],tetrahedron);
+            bool parent2_material_in_current_tetrahedron=embedded_object.Node_In_Simplex_Is_Material(parents[1],tetrahedron);
+            int other_node1,other_node2;embedded_object.simplicial_object.mesh.Other_Two_Nodes(parents[0],parents[1],tetrahedron,other_node1,other_node2);
             bool other_node1_material_in_current_tetrahedron=embedded_object.Node_In_Simplex_Is_Material(other_node1,tetrahedron);
             bool other_node2_material_in_current_tetrahedron=embedded_object.Node_In_Simplex_Is_Material(other_node2,tetrahedron);
             if(parent1_material_in_current_tetrahedron){
                     if(!parent2_material_in_current_tetrahedron){
-                        VECTOR<T,3> perturb_direction=(particles.X(parents[1])-embedded_particles.X(node)).Normalized();
+                        VECTOR<T,3> perturb_direction=(particles.X(parents[0])-embedded_particles.X(node)).Normalized();
                         embedded_particles.X(node)+=perturb_amount*perturb_direction;previously_perturbed(node)=true;}}
             else if(parent2_material_in_current_tetrahedron){
-                    VECTOR<T,3> perturb_direction=(particles.X(parents[2])-embedded_particles.X(node)).Normalized();
+                    VECTOR<T,3> perturb_direction=(particles.X(parents[1])-embedded_particles.X(node)).Normalized();
                     embedded_particles.X(node)+=perturb_amount*perturb_direction;previously_perturbed(node)=true;}
             else if(other_node1_material_in_current_tetrahedron && other_node2_material_in_current_tetrahedron){
                         VECTOR<T,3> opposite_midpoint((T).5*(particles.X(other_node1)+particles.X(other_node2)));
@@ -150,12 +150,12 @@ Center_Octahedron_In_Material(const int tetrahedron)
     int i,j,k,l;permute_four(embedded_object.simplicial_object.mesh.elements(tetrahedron),embedded_object.orientation_index(tetrahedron)).Get(i,j,k,l);
     int ij=embedded_object.Particle_Embedded_On_Segment(i,j),ik=embedded_object.Particle_Embedded_On_Segment(i,k),il=embedded_object.Particle_Embedded_On_Segment(i,l),
         jk=embedded_object.Particle_Embedded_On_Segment(j,k),jl=embedded_object.Particle_Embedded_On_Segment(j,l),kl=embedded_object.Particle_Embedded_On_Segment(k,l);
-    if(emb_tris[1] && emb_tris[2] && !emb_tris[3] && embedded_object.embedded_object.mesh.Node_In_Triangle(ij,emb_tris[1])) return true;
-    else if(emb_tris[1] && emb_tris[2] && emb_tris[3] && !emb_tris[4] && embedded_object.Node_Separated_By_Embedded_Subelement(emb_tris[1])
-        && embedded_object.Node_Separated_By_Embedded_Subelement(emb_tris[2]) && embedded_object.Node_Separated_By_Embedded_Subelement(emb_tris[3])
-        && ((is_material[3] && is_material[4])
-            || (is_material[4] && embedded_object.embedded_object.mesh.Triangle(kl,ik,jk))
-            || (is_material[3] && embedded_object.embedded_object.mesh.Triangle(kl,jl,il)))) return true;
+    if(emb_tris[0] && emb_tris[1] && !emb_tris[2] && embedded_object.embedded_object.mesh.Node_In_Triangle(ij,emb_tris[0])) return true;
+    else if(emb_tris[0] && emb_tris[1] && emb_tris[2] && !emb_tris[3] && embedded_object.Node_Separated_By_Embedded_Subelement(emb_tris[0])
+        && embedded_object.Node_Separated_By_Embedded_Subelement(emb_tris[1]) && embedded_object.Node_Separated_By_Embedded_Subelement(emb_tris[2])
+        && ((is_material[2] && is_material[3])
+            || (is_material[3] && embedded_object.embedded_object.mesh.Triangle(kl,ik,jk))
+            || (is_material[2] && embedded_object.embedded_object.mesh.Triangle(kl,jl,il)))) return true;
     return false;
 }
 //#####################################################################
@@ -176,18 +176,18 @@ Construct_Material_Surface_Mesh()
             Add_To_Material_Surface_Tetrahedron(i,j,k,l);continue;}
         VECTOR<int,4> emb_tris=embedded_object.Embedded_Subelements_In_Element(t);
         int i,j,k,l;permute_four(embedded_object.simplicial_object.mesh.elements(t),embedded_object.orientation_index(t)).Get(i,j,k,l);
-        if(emb_tris[1] && !emb_tris[2]) Add_To_Material_Surface_Subtetrahedron_And_Subprism(t,emb_tris[1],i,j,k,l);
-        else if(emb_tris[1] && emb_tris[2] && !emb_tris[3]){
-            if(embedded_object.embedded_object.mesh.Node_In_Triangle(embedded_object.Particle_Embedded_On_Segment(i,j),emb_tris[1]))
-                Add_To_Material_Surface_Subtetrahedrons_And_Wrick(t,emb_tris[1],emb_tris[2],i,j,k,l);
-            else Add_To_Material_Surface_Wedge_On_Either_Side(t,emb_tris[1],emb_tris[2],i,j,k,l);}
-        else if(emb_tris[1] && emb_tris[2] && emb_tris[3] && !emb_tris[4]){
-            int isolated_node1=embedded_object.Node_Separated_By_Embedded_Subelement(emb_tris[1]);
-            int isolated_node2=embedded_object.Node_Separated_By_Embedded_Subelement(emb_tris[2]);
-            int isolated_node3=embedded_object.Node_Separated_By_Embedded_Subelement(emb_tris[3]);
+        if(emb_tris[0] && !emb_tris[1]) Add_To_Material_Surface_Subtetrahedron_And_Subprism(t,emb_tris[0],i,j,k,l);
+        else if(emb_tris[0] && emb_tris[1] && !emb_tris[2]){
+            if(embedded_object.embedded_object.mesh.Node_In_Triangle(embedded_object.Particle_Embedded_On_Segment(i,j),emb_tris[0]))
+                Add_To_Material_Surface_Subtetrahedrons_And_Wrick(t,emb_tris[0],emb_tris[1],i,j,k,l);
+            else Add_To_Material_Surface_Wedge_On_Either_Side(t,emb_tris[0],emb_tris[1],i,j,k,l);}
+        else if(emb_tris[0] && emb_tris[1] && emb_tris[2] && !emb_tris[3]){
+            int isolated_node1=embedded_object.Node_Separated_By_Embedded_Subelement(emb_tris[0]);
+            int isolated_node2=embedded_object.Node_Separated_By_Embedded_Subelement(emb_tris[1]);
+            int isolated_node3=embedded_object.Node_Separated_By_Embedded_Subelement(emb_tris[2]);
             if(isolated_node1 && isolated_node2 && isolated_node3)Add_To_Material_Surface_Subtetrahedron_Tets_And_Oct_Plus_Tet(t,i,j,k,l);
             else Add_To_Material_Surface_Subtetrahedron_And_Wedge_And_Half_Oct_Plus_Tet(t,i,j,k,l);}
-        else if(emb_tris[1] && emb_tris[2] && emb_tris[3] && emb_tris[4])Add_To_Material_Surface_Subtetrahedron_And_Wedge_And_Half_Oct_Plus_Tet(t,i,j,k,l);}
+        else if(emb_tris[0] && emb_tris[1] && emb_tris[2] && emb_tris[3])Add_To_Material_Surface_Subtetrahedron_And_Wedge_And_Half_Oct_Plus_Tet(t,i,j,k,l);}
     Merge_Or_Cancel_Duplicate_Triangles();
 }  
 //#####################################################################
@@ -339,8 +339,8 @@ template<class T> void EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE<T>::
 Add_To_Material_Surface_Wedge_On_Either_Side(const int tetrahedron,const int embedded_triangle1,const int embedded_triangle2,const int i,const int j,const int k,const int l) 
 {
     VECTOR<int,4> surface_particles;
-    embedded_object.embedded_object.mesh.elements(embedded_triangle1).Get(surface_particles[1],surface_particles[2],surface_particles[3]);
-    embedded_object.embedded_object.mesh.elements(embedded_triangle2).Get(surface_particles[3],surface_particles[4],surface_particles[1]);
+    embedded_object.embedded_object.mesh.elements(embedded_triangle1).Get(surface_particles[0],surface_particles[1],surface_particles[2]);
+    embedded_object.embedded_object.mesh.elements(embedded_triangle2).Get(surface_particles[2],surface_particles[3],surface_particles[0]);
     assert((surface_particles==VECTOR<int,4>(embedded_object.Particle_Embedded_On_Segment(i,k),embedded_object.Particle_Embedded_On_Segment(k,j),
         embedded_object.Particle_Embedded_On_Segment(j,l),embedded_object.Particle_Embedded_On_Segment(l,i))));
     bool is_clockwise=permutation_of_four_is_even(embedded_object.orientation_index(tetrahedron));

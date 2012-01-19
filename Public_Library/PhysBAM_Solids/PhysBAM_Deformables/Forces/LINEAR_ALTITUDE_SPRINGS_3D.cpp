@@ -53,14 +53,14 @@ Set_Restlength_From_Material_Coordinates(ARRAY_VIEW<const TV> material_coordinat
         int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
         // TODO: use a for loop instead
         TV barycentric=TRIANGLE_3D<T>::Clamped_Barycentric_Coordinates(material_coordinates(i),material_coordinates(j),material_coordinates(l),material_coordinates(k));
-        parameters(t)(1).restlength=(material_coordinates(i)-barycentric.x*material_coordinates(j)-barycentric.y*material_coordinates(l)-barycentric.z*material_coordinates(k)).Normalize();
+        parameters(t)(0).restlength=(material_coordinates(i)-barycentric.x*material_coordinates(j)-barycentric.y*material_coordinates(l)-barycentric.z*material_coordinates(k)).Normalize();
         barycentric=TRIANGLE_3D<T>::Clamped_Barycentric_Coordinates(material_coordinates(j),material_coordinates(i),material_coordinates(k),material_coordinates(l));
-        parameters(t)(2).restlength=(material_coordinates(j)-barycentric.x*material_coordinates(i)-barycentric.y*material_coordinates(k)-barycentric.z*material_coordinates(l)).Normalize();
+        parameters(t)(1).restlength=(material_coordinates(j)-barycentric.x*material_coordinates(i)-barycentric.y*material_coordinates(k)-barycentric.z*material_coordinates(l)).Normalize();
         barycentric=TRIANGLE_3D<T>::Clamped_Barycentric_Coordinates(material_coordinates(k),material_coordinates(i),material_coordinates(l),material_coordinates(j));
-        parameters(t)(3).restlength=(material_coordinates(k)-barycentric.x*material_coordinates(i)-barycentric.y*material_coordinates(l)-barycentric.z*material_coordinates(j)).Normalize();
+        parameters(t)(2).restlength=(material_coordinates(k)-barycentric.x*material_coordinates(i)-barycentric.y*material_coordinates(l)-barycentric.z*material_coordinates(j)).Normalize();
         barycentric=TRIANGLE_3D<T>::Clamped_Barycentric_Coordinates(material_coordinates(l),material_coordinates(i),material_coordinates(j),material_coordinates(k));
-        parameters(t)(4).restlength=(material_coordinates(l)-barycentric.x*material_coordinates(i)-barycentric.y*material_coordinates(j)-barycentric.z*material_coordinates(k)).Normalize();
-        assert(parameters(t)(1).restlength>0);assert(parameters(t)(2).restlength>0);assert(parameters(t)(3).restlength>0);assert(parameters(t)(4).restlength>0);
+        parameters(t)(3).restlength=(material_coordinates(l)-barycentric.x*material_coordinates(i)-barycentric.y*material_coordinates(j)-barycentric.z*material_coordinates(k)).Normalize();
+        assert(parameters(t)(0).restlength>0);assert(parameters(t)(1).restlength>0);assert(parameters(t)(2).restlength>0);assert(parameters(t)(3).restlength>0);
         for(int k=0;k<4;k++) parameters(t)(k).visual_restlength=parameters(t)(k).restlength;}
 }
 //#####################################################################
@@ -73,13 +73,13 @@ Set_Overdamping_Fraction(const T overdamping_fraction) // 1 is critically damped
         int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
         // TODO: use a for loop instead
         T harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(i)+(T)one_ninth*(particles.one_over_effective_mass(j)+particles.one_over_effective_mass(k)+particles.one_over_effective_mass(l)));
-        parameters(t)(1).damping=overdamping_fraction*2*sqrt(parameters(t)(1).youngs_modulus*parameters(t)(1).restlength*harmonic_mass);
+        parameters(t)(0).damping=overdamping_fraction*2*sqrt(parameters(t)(0).youngs_modulus*parameters(t)(0).restlength*harmonic_mass);
         harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(j)+(T)one_ninth*(particles.one_over_effective_mass(i)+particles.one_over_effective_mass(k)+particles.one_over_effective_mass(l)));
-        parameters(t)(2).damping=overdamping_fraction*2*sqrt(parameters(t)(2).youngs_modulus*parameters(t)(2).restlength*harmonic_mass);
+        parameters(t)(1).damping=overdamping_fraction*2*sqrt(parameters(t)(1).youngs_modulus*parameters(t)(1).restlength*harmonic_mass);
         harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(k)+(T)one_ninth*(particles.one_over_effective_mass(j)+particles.one_over_effective_mass(i)+particles.one_over_effective_mass(l)));
-        parameters(t)(3).damping=overdamping_fraction*2*sqrt(parameters(t)(3).youngs_modulus*parameters(t)(3).restlength*harmonic_mass);
+        parameters(t)(2).damping=overdamping_fraction*2*sqrt(parameters(t)(2).youngs_modulus*parameters(t)(2).restlength*harmonic_mass);
         harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(l)+(T)one_ninth*(particles.one_over_effective_mass(j)+particles.one_over_effective_mass(k)+particles.one_over_effective_mass(i)));
-        parameters(t)(4).damping=overdamping_fraction*2*sqrt(parameters(t)(4).youngs_modulus*parameters(t)(4).restlength*harmonic_mass);}
+        parameters(t)(3).damping=overdamping_fraction*2*sqrt(parameters(t)(3).youngs_modulus*parameters(t)(3).restlength*harmonic_mass);}
     Invalidate_CFL();
 }
 //#####################################################################
@@ -92,13 +92,13 @@ Set_Overdamping_Fraction(const ARRAY<VECTOR<T,4> >& overdamping_fraction) // 1 i
         int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
         // TODO: use a for loop instead
         T harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(i)+(T)one_ninth*(particles.one_over_effective_mass(j)+particles.one_over_effective_mass(k)+particles.one_over_effective_mass(l)));
-        parameters(t)(1).damping=overdamping_fraction(t)(1)*2*sqrt(parameters(t)(1).youngs_modulus*parameters(t)(1).restlength*harmonic_mass);
+        parameters(t)(0).damping=overdamping_fraction(t)(0)*2*sqrt(parameters(t)(0).youngs_modulus*parameters(t)(0).restlength*harmonic_mass);
         harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(j)+(T)one_ninth*(particles.one_over_effective_mass(i)+particles.one_over_effective_mass(k)+particles.one_over_effective_mass(l)));
-        parameters(t)(2).damping=overdamping_fraction(t)(2)*2*sqrt(parameters(t)(2).youngs_modulus*parameters(t)(2).restlength*harmonic_mass);
+        parameters(t)(1).damping=overdamping_fraction(t)(1)*2*sqrt(parameters(t)(1).youngs_modulus*parameters(t)(1).restlength*harmonic_mass);
         harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(k)+(T)one_ninth*(particles.one_over_effective_mass(j)+particles.one_over_effective_mass(i)+particles.one_over_effective_mass(l)));
-        parameters(t)(3).damping=overdamping_fraction(t)(3)*2*sqrt(parameters(t)(3).youngs_modulus*parameters(t)(3).restlength*harmonic_mass);
+        parameters(t)(2).damping=overdamping_fraction(t)(2)*2*sqrt(parameters(t)(2).youngs_modulus*parameters(t)(2).restlength*harmonic_mass);
         harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(l)+(T)one_ninth*(particles.one_over_effective_mass(j)+particles.one_over_effective_mass(k)+particles.one_over_effective_mass(i)));
-        parameters(t)(4).damping=overdamping_fraction(t)(4)*2*sqrt(parameters(t)(4).youngs_modulus*parameters(t)(4).restlength*harmonic_mass);}
+        parameters(t)(3).damping=overdamping_fraction(t)(3)*2*sqrt(parameters(t)(3).youngs_modulus*parameters(t)(3).restlength*harmonic_mass);}
     Invalidate_CFL();
 }
 //#####################################################################
@@ -252,7 +252,7 @@ Velocity_Dependent_Forces_Size() const
 template<class T> void LINEAR_ALTITUDE_SPRINGS_3D<T>::
 Add_Velocity_Dependent_Forces_First_Half(ARRAY_VIEW<const TV> V,ARRAY_VIEW<T> aggregate,const T time) const
 {
-    int aggregate_id=1;
+    int aggregate_id=0;
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
         int total_springs=use_shortest_spring_only?1:4;
         for(int spring_index=0;spring_index<total_springs;spring_index++){
@@ -272,7 +272,7 @@ Add_Velocity_Dependent_Forces_First_Half(ARRAY_VIEW<const TV> V,ARRAY_VIEW<T> ag
 template<class T> void LINEAR_ALTITUDE_SPRINGS_3D<T>::
 Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T> aggregate,ARRAY_VIEW<TV> F,const T time) const
 {
-    int aggregate_id=1;
+    int aggregate_id=0;
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
         int total_springs=use_shortest_spring_only?1:4;
         for(int spring_index=0;spring_index<total_springs;spring_index++){

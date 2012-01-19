@@ -98,11 +98,11 @@ template<> void TRIANGLE_REPULSIONS<VECTOR<double,1> >::Clamp_Repulsion_Thicknes
 //#####################################################################
 static inline VECTOR<int,2> Flip_Edges(const VECTOR<int,2>& nodes)
 {
-    return VECTOR<int,2>(nodes[2],nodes[1]);
+    return VECTOR<int,2>(nodes[1],nodes[0]);
 }
 static inline VECTOR<int,4> Flip_Edges(const VECTOR<int,4>& nodes)
 {
-    return VECTOR<int,4>(nodes[3],nodes[4],nodes[1],nodes[2]);
+    return VECTOR<int,4>(nodes[2],nodes[3],nodes[0],nodes[1]);
 }
 template<class TV> void TRIANGLE_REPULSIONS<TV>::
 Turn_Off_Repulsions_Based_On_Current_Proximity(const T extra_factor_on_distance)
@@ -116,8 +116,8 @@ Turn_Off_Repulsions_Based_On_Current_Proximity(const T extra_factor_on_distance)
     point_face_interaction_pairs.Remove_All();edge_edge_interaction_pairs.Remove_All();
     // TODO: consider checking cross-structure interactions as well
     for(int a=0;a<geometry.interacting_structure_pairs.m;a++){VECTOR<int,2>& pair=geometry.interacting_structure_pairs(a);
-        if(pair[1]!=pair[2]) continue;
-        STRUCTURE_INTERACTION_GEOMETRY<TV>& structure=*geometry.structure_geometries(pair[1]);
+        if(pair[0]!=pair[1]) continue;
+        STRUCTURE_INTERACTION_GEOMETRY<TV>& structure=*geometry.structure_geometries(pair[0]);
         Get_Faces_Near_Points(structure,structure,X_self_collision_free,false);
         Get_Edges_Near_Edges(structure,structure,X_self_collision_free,false);}
     // construct omit hashtables
@@ -157,11 +157,11 @@ Compute_Interaction_Pairs(ARRAY_VIEW<const TV> X_other)
     LOG::SCOPE scope("computing repulsion pairs", "computing repulsion pairs");
     point_face_interaction_pairs.Remove_All();edge_edge_interaction_pairs.Remove_All();
     for(int pair_i=0;pair_i<geometry.interacting_structure_pairs.m;pair_i++){VECTOR<int,2>& pair=geometry.interacting_structure_pairs(pair_i);
-        for(int i=0;i<2;i++){if(i==2 && pair[1]==pair[2]) break;
+        for(int i=0;i<2;i++){if(i==2 && pair[0]==pair[1]) break;
             if(compute_point_face_friction || compute_point_face_inelastic_collision_repulsion || compute_point_face_repulsion){
-                Get_Faces_Near_Points(*geometry.structure_geometries(pair[i]),*geometry.structure_geometries(pair[3-i]),X_other,true);}}
+                Get_Faces_Near_Points(*geometry.structure_geometries(pair[i]),*geometry.structure_geometries(pair[2-i]),X_other,true);}}
         if(compute_edge_edge_friction || compute_edge_edge_inelastic_collision_repulsion || compute_edge_edge_repulsion){
-            Get_Edges_Near_Edges(*geometry.structure_geometries(pair[1]),*geometry.structure_geometries(pair[2]),X_other,true);}}
+            Get_Edges_Near_Edges(*geometry.structure_geometries(pair[0]),*geometry.structure_geometries(pair[1]),X_other,true);}}
 
     if(mpi_solids){
         mpi_solids->Gather_Interaction_Pairs(point_face_interaction_pairs,edge_edge_interaction_pairs);
@@ -176,12 +176,12 @@ Compute_Interaction_Pairs(ARRAY_VIEW<const TV> X_other)
 template<class T,class TV,class T_ARRAY> void
 Edge_Edge_Interaction_Data_Helper(ARRAY_VIEW<const VECTOR<T,2> > X,EDGE_EDGE_REPULSION_PAIR<TV>& pair,const INDIRECT_ARRAY<T_ARRAY,VECTOR<int,2>&> V_edges,const T& small_number)
 {
-    pair.normal=(X(pair.nodes[1])-X(pair.nodes[2])).Normalized();
+    pair.normal=(X(pair.nodes[0])-X(pair.nodes[1])).Normalized();
 }
 template<class T,class TV,class T_ARRAY> void
 Edge_Edge_Interaction_Data_Helper(ARRAY_VIEW<const VECTOR<T,3> > X,EDGE_EDGE_REPULSION_PAIR<TV>& pair,const INDIRECT_ARRAY<T_ARRAY,VECTOR<int,4>&> V_edges,const T& small_number)
 {
-    SEGMENT_3D<T> segment1(X.Subset(VECTOR<int,2>(pair.nodes[1],pair.nodes[2]))),segment2(X.Subset(VECTOR<int,2>(pair.nodes[3],pair.nodes[4])));
+    SEGMENT_3D<T> segment1(X.Subset(VECTOR<int,2>(pair.nodes[0],pair.nodes[1]))),segment2(X.Subset(VECTOR<int,2>(pair.nodes[2],pair.nodes[3])));
     segment1.Edge_Edge_Interaction_Data(segment2,V_edges,pair.distance,pair.normal,pair.weights,small_number);
 }
 template<class TV> int TRIANGLE_REPULSIONS<TV>::
@@ -196,8 +196,8 @@ Adjust_Velocity_For_Self_Repulsion(const T dt,bool use_saved_pairs)
 
     for(int pair_index=0;pair_index<point_face_pairs.m;pair_index++){
         POINT_FACE_REPULSION_PAIR<TV>& pair=point_face_pairs(pair_index);
-        T_FACE face(X_self_collision_free.Subset(pair.nodes.Remove_Index(1)));
-        face.Point_Face_Interaction_Data(X_self_collision_free(pair.nodes[1]),pair.distance,pair.normal,pair.weights,perform_attractions);
+        T_FACE face(X_self_collision_free.Subset(pair.nodes.Remove_Index(0)));
+        face.Point_Face_Interaction_Data(X_self_collision_free(pair.nodes[0]),pair.distance,pair.normal,pair.weights,perform_attractions);
         modified_full.Subset(pair.nodes).Fill(true);}
 
     // TODO: do we need update binding here?
@@ -227,7 +227,7 @@ template<> int TRIANGLE_REPULSIONS<VECTOR<double,1> >::Adjust_Velocity_For_Self_
 //#####################################################################
 template<class TV> bool Pair_Is_Separating(POINT_FACE_REPULSION_PAIR<TV>& pair,ARRAY_VIEW<const TV> V)
 {
-    TV relative_velocity=V(pair.nodes(1));for(int i=0;i<TV::dimension;i++) relative_velocity-=V(pair.nodes(i+1))*pair.weights(i);
+    TV relative_velocity=V(pair.nodes(0));for(int i=0;i<TV::dimension;i++) relative_velocity-=V(pair.nodes(i+1))*pair.weights(i);
     return TV::Dot_Product(relative_velocity,pair.normal)>=0;
 }
 template<class T> bool Pair_Is_Separating(EDGE_EDGE_REPULSION_PAIR<VECTOR<T,1> >& pair,ARRAY_VIEW<const VECTOR<T,1> > V)
@@ -236,12 +236,12 @@ template<class T> bool Pair_Is_Separating(EDGE_EDGE_REPULSION_PAIR<VECTOR<T,1> >
 }
 template<class T> bool Pair_Is_Separating(EDGE_EDGE_REPULSION_PAIR<VECTOR<T,2> >& pair,ARRAY_VIEW<const VECTOR<T,2> > V)
 {
-    VECTOR<T,2> relative_velocity=V(pair.nodes(1))-V(pair.nodes(2));
+    VECTOR<T,2> relative_velocity=V(pair.nodes(0))-V(pair.nodes(1));
     return VECTOR<T,2>::Dot_Product(relative_velocity,pair.normal)>=0;
 }
 template<class T> bool Pair_Is_Separating(EDGE_EDGE_REPULSION_PAIR<VECTOR<T,3> >& pair,ARRAY_VIEW<const VECTOR<T,3> > V)
 {
-    VECTOR<T,3> relative_velocity=V(pair.nodes(1))*(1-pair.weights(1))+V(pair.nodes(2))*pair.weights(1)-V(pair.nodes(3))*(1-pair.weights(2))-V(pair.nodes(4))*pair.weights(2);
+    VECTOR<T,3> relative_velocity=V(pair.nodes(0))*(1-pair.weights(0))+V(pair.nodes(1))*pair.weights(0)-V(pair.nodes(2))*(1-pair.weights(1))-V(pair.nodes(3))*pair.weights(1);
     return VECTOR<T,3>::Dot_Product(relative_velocity,pair.normal)>=0;
 }
 //#####################################################################
@@ -250,7 +250,7 @@ template<class T> bool Pair_Is_Separating(EDGE_EDGE_REPULSION_PAIR<VECTOR<T,3> >
 template<class T,class TV> bool Edge_Edge_Interaction_Helper(ARRAY_VIEW<const VECTOR<T,2> > X,EDGE_EDGE_REPULSION_PAIR<TV>& pair,const ARRAY<T>& repulsion_thickness,
     const T repulsion_thickness_detection_multiplier)
 {
-    pair.normal=X(pair.nodes[1])-X(pair.nodes[2]);
+    pair.normal=X(pair.nodes[0])-X(pair.nodes[1]);
     pair.distance=pair.normal.Magnitude();
     T total_repulsion_thickness=repulsion_thickness_detection_multiplier*pair.Total_Repulsion_Thickness(repulsion_thickness);
     return pair.distance<=total_repulsion_thickness;
@@ -258,21 +258,21 @@ template<class T,class TV> bool Edge_Edge_Interaction_Helper(ARRAY_VIEW<const VE
 template<class T,class TV> bool Edge_Edge_Interaction_Helper(ARRAY_VIEW<const VECTOR<T,3> > X,EDGE_EDGE_REPULSION_PAIR<TV>& pair,const ARRAY<T>& repulsion_thickness,
     const T repulsion_thickness_detection_multiplier)
 {
-    SEGMENT_3D<T> segment(X.Subset(VECTOR<int,2>(pair.nodes[1],pair.nodes[2])));
+    SEGMENT_3D<T> segment(X.Subset(VECTOR<int,2>(pair.nodes[0],pair.nodes[1])));
     T total_repulsion_thickness=repulsion_thickness_detection_multiplier*pair.Total_Repulsion_Thickness(repulsion_thickness);
-    return segment.Edge_Edge_Interaction(SEGMENT_3D<T>(X(pair.nodes[3]),X(pair.nodes[4])),total_repulsion_thickness,pair.distance,pair.normal,pair.weights,false);
+    return segment.Edge_Edge_Interaction(SEGMENT_3D<T>(X(pair.nodes[2]),X(pair.nodes[3])),total_repulsion_thickness,pair.distance,pair.normal,pair.weights,false);
 }
 template<class TV> template<class T_ARRAY1,class T_ARRAY2> void TRIANGLE_REPULSIONS<TV>::
 Update_Repulsion_Pairs_Using_History(T_ARRAY1& point_face_pairs,T_ARRAY2& edge_edge_pairs,bool prune_separating)
 {
     ARRAY_VIEW<const TV> X(geometry.deformable_body_collection.particles.X),V(geometry.deformable_body_collection.particles.V);
     for(int pair_index=point_face_pairs.Size();pair_index>=1;pair_index--){
-        POINT_FACE_REPULSION_PAIR<TV>& pair=point_face_pairs(pair_index);VECTOR<int,d> face_nodes=pair.nodes.Remove_Index(1);
+        POINT_FACE_REPULSION_PAIR<TV>& pair=point_face_pairs(pair_index);VECTOR<int,d> face_nodes=pair.nodes.Remove_Index(0);
         T_FACE face(X.Subset(face_nodes));
-        if(!face.Point_Face_Interaction(X(pair.nodes(1)),repulsion_thickness_detection_multiplier*pair.Total_Repulsion_Thickness(repulsion_thickness),false,pair.distance) ||
+        if(!face.Point_Face_Interaction(X(pair.nodes(0)),repulsion_thickness_detection_multiplier*pair.Total_Repulsion_Thickness(repulsion_thickness),false,pair.distance) ||
             (prune_separating && Pair_Is_Separating(pair,V))){
             point_face_pairs.Remove_Index_Lazy(pair_index);}
-        else face.Point_Face_Interaction_Data(X(pair.nodes[1]),pair.distance,pair.normal,pair.weights,perform_attractions);}
+        else face.Point_Face_Interaction_Data(X(pair.nodes[0]),pair.distance,pair.normal,pair.weights,perform_attractions);}
 
     // TODO: do we need update binding here? (what about the other fragments?)
     geometry.deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Velocities();
@@ -511,7 +511,7 @@ Repulsion_Impulse(TV& direction,const T dt,const T_PAIR& pair,const TV& relative
 //#####################################################################
 template<class TV,class T_ARRAY,class T_MASS_ARRAY> inline void Update_Velocity_Helper(const TV& impulse,const TV& weights,INDIRECT_ARRAY<T_MASS_ARRAY,VECTOR<int,TV::m+1>&> one_over_m,INDIRECT_ARRAY<T_ARRAY,VECTOR<int,TV::m+1>&> V)
 {
-    V(1)+=one_over_m(1)*impulse;
+    V(0)+=one_over_m(0)*impulse;
     for(int i=0;i<TV::m;i++) V(i+1)-=weights(i)*one_over_m(i+1)*impulse;
 }
 template<class TV> template<class T_ARRAY> void TRIANGLE_REPULSIONS<TV>::
@@ -531,7 +531,7 @@ Adjust_Velocity_For_Point_Face_Repulsion(const T dt,const T_ARRAY& pairs,const b
 
         for(int pair_index=0;pair_index<pairs.Size();pair_index++){
             const POINT_FACE_REPULSION_PAIR<TV>& pair=pairs(pair_index);
-            int p=pair.nodes[1];VECTOR<int,d> face_nodes=pair.nodes.Remove_Index(1);
+            int p=pair.nodes[0];VECTOR<int,d> face_nodes=pair.nodes.Remove_Index(0);
             if(pair.distance<0) inverted_pairs++;
 
             TV relative_velocity=V(p)-V.Subset(face_nodes).Weighted_Sum(pair.weights);
@@ -563,33 +563,33 @@ Adjust_Velocity_For_Point_Face_Repulsion(const T dt,const T_ARRAY& pairs,const b
 template<class T,class T_ARRAY,class T_MASS_ARRAY> inline void Edge_Edge_Update_Velocity_Helper(const VECTOR<T,3>& impulse,const VECTOR<T,2>& weights,INDIRECT_ARRAY<T_MASS_ARRAY,VECTOR<int,4>&> one_over_effective_mass,
     INDIRECT_ARRAY<T_ARRAY,VECTOR<int,4>&> V)
 {
-    V(1)+=(1-weights[1])*one_over_effective_mass(1)*impulse;
-    V(2)+=weights[1]*one_over_effective_mass(2)*impulse;
-    V(3)-=(1-weights[2])*one_over_effective_mass(3)*impulse;
-    V(4)-=weights[2]*one_over_effective_mass(4)*impulse;
+    V(0)+=(1-weights[0])*one_over_effective_mass(0)*impulse;
+    V(1)+=weights[0]*one_over_effective_mass(1)*impulse;
+    V(2)-=(1-weights[1])*one_over_effective_mass(2)*impulse;
+    V(3)-=weights[1]*one_over_effective_mass(3)*impulse;
 }
 template<class T,class T_ARRAY,class T_MASS_ARRAY> inline void Edge_Edge_Update_Velocity_Helper(const VECTOR<T,2>& impulse,const VECTOR<T,2>& weights,INDIRECT_ARRAY<T_MASS_ARRAY,VECTOR<int,2>&> one_over_effective_mass,
     INDIRECT_ARRAY<T_ARRAY,VECTOR<int,2>&> V)
 {
-    V(1)+=one_over_effective_mass(1)*impulse;
-    V(2)-=one_over_effective_mass(2)*impulse;
+    V(0)+=one_over_effective_mass(0)*impulse;
+    V(1)-=one_over_effective_mass(1)*impulse;
 }
 template<class T,class T_ARRAY> VECTOR<T,3> Edge_Edge_Relative_Velocity_Helper(const VECTOR<T,2>& weights,INDIRECT_ARRAY<T_ARRAY,VECTOR<int,4>&> V)
 {
-    return (1-weights[1])*V(1)+weights[1]*V(2)-(1-weights[2])*V(3)-weights[2]*V(4);
+    return (1-weights[0])*V(0)+weights[0]*V(1)-(1-weights[1])*V(2)-weights[1]*V(3);
 }
 template<class T,class T_ARRAY> VECTOR<T,2> Edge_Edge_Relative_Velocity_Helper(const VECTOR<T,2>& weights,INDIRECT_ARRAY<T_ARRAY,VECTOR<int,2>&> V)
 {
-    return V(1)-V(2);
+    return V(0)-V(1);
 }
 template<class T,class T_MASS_ARRAY> T Edge_Edge_One_Over_Mass_Helper(const VECTOR<T,2>& weights,INDIRECT_ARRAY<T_MASS_ARRAY,VECTOR<int,4>&> one_over_effective_mass)
 {
-    return sqr(1-weights[1])*one_over_effective_mass(1)+sqr(weights[1])*one_over_effective_mass(2)
-        +sqr(1-weights[2])*one_over_effective_mass(3)+sqr(weights[2])*one_over_effective_mass(4);
+    return sqr(1-weights[0])*one_over_effective_mass(0)+sqr(weights[0])*one_over_effective_mass(1)
+        +sqr(1-weights[1])*one_over_effective_mass(2)+sqr(weights[1])*one_over_effective_mass(3);
 }
 template<class T,class T_MASS_ARRAY> T Edge_Edge_One_Over_Mass_Helper(const VECTOR<T,2>& weights,INDIRECT_ARRAY<T_MASS_ARRAY,VECTOR<int,2>&> one_over_effective_mass)
 {
-    return one_over_effective_mass(1)+one_over_effective_mass(2);
+    return one_over_effective_mass(0)+one_over_effective_mass(1);
 }
 template<class TV> template<class T_ARRAY,class S> void TRIANGLE_REPULSIONS<TV>::
 Adjust_Velocity_For_Edge_Edge_Repulsion_Helper(const T dt,const T_ARRAY& pairs,const bool elastic_repulsion,const bool friction,const VECTOR<S,2>&,const bool use_repulsions)
@@ -691,7 +691,7 @@ Scale_And_Apply_Point_Face_Impulses(const T_ARRAY& pairs)
         const POINT_FACE_REPULSION_PAIR<TV>& pair=pairs(i);
         const VECTOR<int,d+1>& nodes=pair.nodes;
         // Compute actual new relative_speed
-        int p=nodes[1];VECTOR<int,d> face_nodes=nodes.Remove_Index(1);
+        int p=nodes[0];VECTOR<int,d> face_nodes=nodes.Remove_Index(0);
         T relative_speed=TV::Dot_Product(impulse_velocities(p)-impulse_velocities.Subset(face_nodes).Weighted_Sum(pair.weights),pf_normals(i));
         if(relative_speed*pf_old_speeds(i)<0){
             T new_scale=-(relative_speed-pf_old_speeds(i))/pf_old_speeds(i);
@@ -735,11 +735,11 @@ template<class TV> void PRECOMPUTE_PROJECT_POINT_FACE<TV>::
 Precompute(const INDIRECT_ARRAY<ARRAY_VIEW<T>,VECTOR<int,4>&> mass,const TV& weights_input,const TV& normal_input)
 {
     weights=weights_input;normal=normal_input;
-    T tau=1/(1/mass(1)+weights(1)*weights(1)/mass(2)+weights(2)*weights(2)/mass(3)+weights(3)*weights(3)/mass(4));
-    v_scaled_normals(1)=-tau/mass(1)*normal;
+    T tau=1/(1/mass(0)+weights(0)*weights(0)/mass(1)+weights(1)*weights(1)/mass(2)+weights(2)*weights(2)/mass(3));
+    v_scaled_normals(0)=-tau/mass(0)*normal;
+    v_scaled_normals(1)=tau*weights(0)/mass(1)*normal;
     v_scaled_normals(2)=tau*weights(1)/mass(2)*normal;
     v_scaled_normals(3)=tau*weights(2)/mass(3)*normal;
-    v_scaled_normals(4)=tau*weights(3)/mass(4)*normal;
     nodes=mass.indices;
 }
 //#####################################################################
@@ -749,12 +749,12 @@ template<class TV> void PRECOMPUTE_PROJECT_EDGE_EDGE<TV>::
 Precompute(const INDIRECT_ARRAY<ARRAY_VIEW<T>,VECTOR<int,4>&> mass,const VECTOR<T,2>& weights_input,const TV& normal_input)
 {
     weights=weights_input;normal=normal_input;
-    T tau=1/(sqr(1-weights(1))/mass(1)+sqr(weights(1))/mass(2)+sqr(1-weights(2))/mass(3)+sqr(weights(2))/mass(4));
-    v_scaled_normals(1)=-tau/mass(1)*(1-weights(1))*normal;
-    v_scaled_normals(2)=-tau/mass(2)*weights(1)*normal;
-    v_scaled_normals(3)=tau/mass(3)*(1-weights(2))*normal;
-    v_scaled_normals(4)=tau/mass(4)*weights(2)*normal;
-    normal_13=normal;normal_12=weights(1)*normal;normal_34=-weights(2)*normal;
+    T tau=1/(sqr(1-weights(0))/mass(0)+sqr(weights(0))/mass(1)+sqr(1-weights(1))/mass(2)+sqr(weights(1))/mass(3));
+    v_scaled_normals(0)=-tau/mass(0)*(1-weights(0))*normal;
+    v_scaled_normals(1)=-tau/mass(1)*weights(0)*normal;
+    v_scaled_normals(2)=tau/mass(2)*(1-weights(1))*normal;
+    v_scaled_normals(3)=tau/mass(3)*weights(1)*normal;
+    normal_13=normal;normal_12=weights(0)*normal;normal_34=-weights(1)*normal;
     nodes=mass.indices;
 }
 //####################################################################
