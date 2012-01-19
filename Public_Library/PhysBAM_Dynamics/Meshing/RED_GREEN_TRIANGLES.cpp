@@ -82,7 +82,7 @@ Refine_If_Necessary(const int level,const int tri)
     // first check if we're already consistent, and don't need to refine at all.
     ARRAY<int> midpoints(3),subedges(9);Get_Existing_Subindices(level,tri,midpoints,subedges);
     int number_midpoints=3-midpoints.Count_Matches(0);if(number_midpoints==0) return;
-    int number_children=0;while(number_children<4 && (*children(level))(tri)(number_children+1)) number_children++;
+    int number_children=0;while(number_children<4 && (*children(level))(tri)(number_children)) number_children++;
     if((number_midpoints==1 && number_children==2) || (number_midpoints==3 && number_children==4)) return;
 
     if(!Red(level,tri)) return Regularly_Refine_Triangle(level-1,(*parent(level))(tri)); //Green case: refine parent

@@ -150,7 +150,7 @@ Refine_If_Necessary(const int level,const int tet)
     ARRAY<int> midpoints(6),subedges(24);Get_Existing_Subindices(level,tet,midpoints,subedges);
     int number_midpoints=(midpoints(0)!=0)+(midpoints(1)!=0)+(midpoints(2)!=0)+(midpoints(3)!=0)+(midpoints(4)!=0)+(midpoints(5)!=0);
     if(number_midpoints == 0) return;
-    int number_children=0;while(number_children < 8 && (*children(level))(tet)(number_children+1)) number_children++;
+    int number_children=0;while(number_children < 8 && (*children(level))(tet)(number_children)) number_children++;
     switch(number_midpoints){
         case 1:if(number_children == 2) return;break;
         case 2:if(number_children == 4) return;break;
@@ -161,10 +161,10 @@ Refine_If_Necessary(const int level,const int tet)
 
     if(!Red(level,tet)){ // Green case - most likely refine parent unless we get lucky and can upgrade Green from 2 to 4
         int p=(*parent(level))(tet);
-        int number_children=0;while(number_children < 8 && (*children(level-1))(p)(number_children+1)) number_children++;
+        int number_children=0;while(number_children < 8 && (*children(level-1))(p)(number_children)) number_children++;
         if(number_children < 4){ // try to update Green from 2 to 4
             Refine_If_Necessary(level-1,p); // re-refine the parent
-            int new_number_children=0;while(new_number_children < 8 && (*children(level-1))(p)(new_number_children+1)) new_number_children++;
+            int new_number_children=0;while(new_number_children < 8 && (*children(level-1))(p)(new_number_children)) new_number_children++;
             if(new_number_children == number_children) Regularly_Refine_Tet(level-1,p);} // irregular refinement doesn't do anything, try regular
         else Regularly_Refine_Tet(level-1,p); // refine parent
         return;}
