@@ -56,7 +56,7 @@ int main(int argc,char* argv[])
     rays_to_intersect(3).x=VECTOR<int,2>(3,1);
 
     interface.Intersect(nodes_for_rays,rays_to_intersect,tolerance);
-    for(int i=1;i<=rays_to_intersect.Size();++i)
+    for(int i=0;i<rays_to_intersect.Size();i++)
         LOG::cout<<rays_to_intersect(i).y.triangleID<<": "
             <<10*rays_to_intersect(i).y.alpha<<" ("<<rays_to_intersect(i).y.zeta[0]<<", "
             <<rays_to_intersect(i).y.zeta[1]<<", "<<rays_to_intersect(i).y.zeta[2]<<")"<<std::endl;

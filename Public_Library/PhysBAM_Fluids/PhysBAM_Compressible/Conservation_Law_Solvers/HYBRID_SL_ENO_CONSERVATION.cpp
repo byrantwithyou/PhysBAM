@@ -127,7 +127,7 @@ Update_Conservation_Law(T_GRID& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS
                             int index=weights.Append(PAIR<T,INDEX>(weight,receiver_cell));
                             donors(cell_index).Append(index); receivers(receiver_cell).Append(index);}}}}
 
-            for(int i=1;i<=weights.Size();++i){
+            for(int i=0;i<weights.Size();i++){
                 PAIR<T,INDEX>& weight_pair(weights(i));
                 if(U.Valid_Index(weight_pair.y)) U(weight_pair.y)(dim) += weight_pair.x;}}
     }

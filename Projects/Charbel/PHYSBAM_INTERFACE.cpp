@@ -96,7 +96,7 @@ GetClosestTriangle(const TV position,const TV min_corner,const TV max_corner,T* 
 
     triangle_hierarchy->Intersection_List(bounding_box,candidates,1e-5);
     T dist=(T)FLT_MAX;int closest_triangle=-1;
-    for(int i=1;i<=candidates.Size();++i){
+    for(int i=0;i<candidates.Size();i++){
         T local_dist=triangulated_surface->Get_Element(candidates(i)).Distance_To_Triangle(position);
         if(local_dist < dist){
             dist=local_dist;closest_triangle=candidates(i);}}

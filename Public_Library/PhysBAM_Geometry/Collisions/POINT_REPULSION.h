@@ -201,7 +201,7 @@ public:
 
     void Set_Points(ARRAY_VIEW<const TV> X)
     {points.Resize(X.Size());
-    for(int i=1;i<=X.Size();++i){points(i).position=X(i);points(i).triangle=0;points(i).neighbors.Resize(0);}}
+    for(int i=0;i<X.Size();i++){points(i).position=X(i);points(i).triangle=0;points(i).neighbors.Resize(0);}}
 
     template<class RW>
     void Write(std::ostream& output) const

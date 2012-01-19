@@ -641,7 +641,7 @@ Add_Polygons_On_New_Simplices()
                 VECTOR<int,2> reversed_segment(unoriented_segment(2),unoriented_segment(1));
                 int any_valid_cutting_polygon=-1;
                 int count=0;
-                for(int k=1;k<=polygons_per_element(tet).m;++k){
+                for(int k=0;k<polygons_per_element(tet).m;k++){
                     int cutting_polygon_index=polygons_per_element(tet)(k);
                     int polygon_element_index=current_cutting_polygons(cutting_polygon_index).polygon_index;
                     ARRAY<VECTOR<int,2> > polygon_segments;
@@ -703,7 +703,7 @@ Add_Polygons_On_New_Simplices()
             ARRAY<ARRAY<ARRAY<int> > > final_final_polygon_element_particles;
             for(int j=0;j<final_polygon_element_particles.m;j++){
                 ARRAY<VECTOR<int,2> > all_final_segments;
-                for(int k=1;k<=final_polygon_element_particles(j).m;++k) for(int ell=1;ell<=final_polygon_element_particles(j)(k).m;++ell){
+                for(int k=0;k<final_polygon_element_particles(j).m;k++) for(int ell=0;ell<final_polygon_element_particles(j)(k).m;ell++){
                     int next_ell=ell%final_polygon_element_particles(j)(k).m+1;
                     all_final_segments.Append(VECTOR<int,2>(final_polygon_element_particles(j)(k)(ell),final_polygon_element_particles(j)(k)(next_ell)));}
                 ARRAY<ARRAY<ARRAY<int> > > new_polygon_element_particles_for_this_polygon;
@@ -713,7 +713,7 @@ Add_Polygons_On_New_Simplices()
             // make new polygons
             for(int k=0;k<final_final_polygon_element_particles.m;k++){
                 ARRAY<ARRAY<int> > reversed_polygon_particles(final_final_polygon_element_particles(k).m);
-                for(int p=1;p<=final_final_polygon_element_particles(k).m;++p)
+                for(int p=0;p<final_final_polygon_element_particles(k).m;p++)
                     for(int q=final_final_polygon_element_particles(k)(p).m;q>=1;--q)
                         reversed_polygon_particles(p).Append(final_final_polygon_element_particles(k)(p)(q));
                 int polygon_element_index_1=polygon_mesh.elements.Append(final_final_polygon_element_particles(k));

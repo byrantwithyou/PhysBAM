@@ -61,7 +61,7 @@ Reset_Axis(const int axis_input)
             break;}
         case GRID<TV>::GHOST_REGION:{
             if(!side){ // TODO(jontg): Beware of duplicates!
-                for(int side_iterator=1;side_iterator<=TV::dimension*2;++side_iterator){
+                for(int side_iterator=0;side_iterator<TV::dimension*2;side_iterator++){
                     int axis_of_side=(side_iterator+1)/2;
                     if(side_iterator&1){
                         RANGE<TV_INT> domain_copy(domain); domain_copy.max_corner(axis)++;

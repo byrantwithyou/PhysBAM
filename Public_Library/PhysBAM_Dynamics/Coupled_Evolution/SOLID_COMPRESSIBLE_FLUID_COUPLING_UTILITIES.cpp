@@ -352,7 +352,7 @@ Initialize_Collision_Data()
                 if(poly==cut_cells_np1(cell_index)->dominant_element){
                     cell_volumes_np1(cell_index)=volume;continue;}
                 if(!cut_cells_np1(cell_index)->visibility(poly).Size()){
-                    LOG::cout<<"No visible neighbors for cut cell ";for(int i=1;i<=polygon.X.Size();++i) LOG::cout<<polygon.X(i)<<", ";LOG::cout<<"discarding "<<volume<<" volume"<<std::endl;
+                    LOG::cout<<"No visible neighbors for cut cell ";for(int i=0;i<polygon.X.Size();i++) LOG::cout<<polygon.X(i)<<", ";LOG::cout<<"discarding "<<volume<<" volume"<<std::endl;
                     continue;}
                 volume /= cut_cells_np1(cell_index)->visibility(poly).Size();
                 for(int n=1;n<=cut_cells_np1(cell_index)->visibility(poly).Size();++n)
@@ -392,7 +392,7 @@ Update_Np1_Collision_Data(const T dt)
                 T volume=polygon.Area();
                 if(poly==cut_cells_np1(cell_index)->dominant_element){cell_volumes_np1(cell_index)=volume;continue;}
                 if(!cut_cells_np1(cell_index)->visibility(poly).Size()){
-                    LOG::cout<<"No visible neighbors for cut cell ";for(int i=1;i<=polygon.X.Size();++i) LOG::cout<<polygon.X(i)<<", ";LOG::cout<<"discarding "<<volume<<" volume"<<std::endl;
+                    LOG::cout<<"No visible neighbors for cut cell ";for(int i=0;i<polygon.X.Size();i++) LOG::cout<<polygon.X(i)<<", ";LOG::cout<<"discarding "<<volume<<" volume"<<std::endl;
                     continue;}
                 volume /= cut_cells_np1(cell_index)->visibility(poly).Size();
                 for(int n=1;n<=cut_cells_np1(cell_index)->visibility(poly).Size();++n) cell_volumes_np1(cut_cells_np1(cell_index)->visibility(poly)(n)) += volume;}}
@@ -437,7 +437,7 @@ Compute_Intermediate_Solid_Position_Data(const T dt)
                 T volume=polygon.Area();
                 if(poly==cut_cells_n_p_half(cell_index)->dominant_element){cell_volumes_n_p_half(cell_index)=volume;continue;}
                 if(!cut_cells_n_p_half(cell_index)->visibility(poly).Size()){
-                    LOG::cout<<"No visible neighbors for cut cell ";for(int i=1;i<=polygon.X.Size();++i) LOG::cout<<polygon.X(i)<<", ";LOG::cout<<"discarding "<<volume<<" volume"<<std::endl;
+                    LOG::cout<<"No visible neighbors for cut cell ";for(int i=0;i<polygon.X.Size();i++) LOG::cout<<polygon.X(i)<<", ";LOG::cout<<"discarding "<<volume<<" volume"<<std::endl;
                     continue;}
                 volume /= cut_cells_n_p_half(cell_index)->visibility(poly).Size();
                 for(int n=1;n<=cut_cells_n_p_half(cell_index)->visibility(poly).Size();++n) cell_volumes_n_p_half(cut_cells_n_p_half(cell_index)->visibility(poly)(n)) += volume;}}
@@ -521,7 +521,7 @@ template<class TV> void Advect_Near_Interface_Data(const GRID<TV>& grid,const ty
 
         {
             LOG::SCOPE scope("Converting Flux into weights.");
-            for(int i=1;i<=hybrid_boundary_flux.Size();++i){
+            for(int i=0;i<hybrid_boundary_flux.Size();i++){
                 TV_INT first_cell_index=hybrid_boundary_flux(i).y,second_cell_index=hybrid_boundary_flux(i).z;
                 T weight=dt*flux_boundary_conditions(hybrid_boundary_flux(i).x)(variable_index);
                 Add_Weight_To_Advection(abs(weight), (weight >= 0 ? first_cell_index : second_cell_index), (weight >= 0 ? second_cell_index : first_cell_index), weights, donors, receivers, sigma);}
@@ -606,12 +606,12 @@ template<class TV> void Advect_Near_Interface_Data(const GRID<TV>& grid,const ty
                 T cell_stuff = U_n(donor_cell)(variable_index) * cell_volumes_n(donor_cell);
                 T sigma_cell=sigma(donor_cell);
                 if(abs(sigma_cell) > abs(cell_stuff)){
-                    for(int i=1;i<=donors(donor_cell).Size();++i) if(!near_interface(weights(donors(donor_cell)(i)).y)){cell_stuff -= weights(donors(donor_cell)(i)).x; sigma_cell -= weights(donors(donor_cell)(i)).x;}
+                    for(int i=0;i<donors(donor_cell).Size();i++) if(!near_interface(weights(donors(donor_cell)(i)).y)){cell_stuff -= weights(donors(donor_cell)(i)).x; sigma_cell -= weights(donors(donor_cell)(i)).x;}
                     if(sigma_cell <= (T)1e-10) LOG::cout<<"Not clamping for tiny sigma "<<sigma_cell<<" from "<<sigma(donor_cell)<<" total cell stuff (minus boundary conditions) = "<<cell_stuff<<std::endl;
                     else{
                         T one_over_sigma = cell_stuff / sigma_cell;
                         // LOG::cout<<"Clamping weights leaving "<<donor_cell<<" by factor "<<one_over_sigma<<" from "<<sigma(donor_cell)<<" total cell stuff (minus boundary conditions) = "<<cell_stuff<<std::endl;
-                        for(int i=1;i<=donors(donor_cell).Size();++i) if(near_interface(weights(donors(donor_cell)(i)).y)) weights(donors(donor_cell)(i)).x *= one_over_sigma;}}
+                        for(int i=0;i<donors(donor_cell).Size();i++) if(near_interface(weights(donors(donor_cell)(i)).y)) weights(donors(donor_cell)(i)).x *= one_over_sigma;}}
                 else{
                     T remainder = (cell_stuff - sigma_cell);
                     TV cell_postimage_center=iterator.Location()+dt*advection_velocity(donor_cell);
@@ -646,10 +646,10 @@ template<class TV> void Advect_Near_Interface_Data(const GRID<TV>& grid,const ty
                     if(distributed_volume <= (T)1e-4*cell_volumes_n(donor_cell)){LOG::cout<<"Forward-cast failed to distribute a significant fraction of its volume..."<<std::endl;assert(false);} // TODO(jontg): Handle this case somehow...
                     T dilation_factor=remainder / distributed_volume;
 
-                    for(int i=1;i<=forward_weights.Size();++i) Add_Weight_To_Advection(dilation_factor*forward_weights(i).y, donor_cell, forward_weights(i).x, weights, donors, receivers, sigma);}}}
+                    for(int i=0;i<forward_weights.Size();i++) Add_Weight_To_Advection(dilation_factor*forward_weights(i).y, donor_cell, forward_weights(i).x, weights, donors, receivers, sigma);}}}
         }
 
-        for(int i=1;i<=weights.Size();++i){
+        for(int i=0;i<weights.Size();i++){
             PAIR<T,TV_INT>& weight_pair=weights(i);
             if(near_interface(weight_pair.y)) U_np1(weight_pair.y)(variable_index) += weight_pair.x;}}
 

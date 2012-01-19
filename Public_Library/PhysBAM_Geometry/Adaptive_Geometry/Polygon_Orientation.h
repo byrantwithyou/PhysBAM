@@ -21,7 +21,7 @@ int Polygon_Orientation(const T_ARRAY_TV2& polygon_coordinates)
     typedef ADAPTIVE_ATOM<T,T_EXACT> ATOM_TYPE;
     if(polygon_coordinates.Size()<3) return 0;
     ADAPTIVE_OBJECT<T_EXACT> signed_area_x2(ATOM_TYPE(0.0));
-    for(int p=1;p<=polygon_coordinates.Size();++p){
+    for(int p=0;p<polygon_coordinates.Size();p++){
         int q=p%polygon_coordinates.Size()+1;
         const TV2 &xp=polygon_coordinates(p),&xq=polygon_coordinates(q);
         signed_area_x2+=(ATOM_TYPE(xp[1])*ATOM_TYPE(xq[2])-ATOM_TYPE(xp[2])*ATOM_TYPE(xq[1]));}

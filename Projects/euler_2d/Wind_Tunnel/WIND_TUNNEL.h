@@ -348,7 +348,7 @@ void Fedkiw_Isobaric_Fix(bool fix_only_6_cells)
         for(int axis=0;axis<TV::dimension;axis++) is_one_ring=is_one_ring || psi_N(axis,iterator.First_Face_Index(axis)) || psi_N(axis,iterator.Second_Face_Index(axis));
         if(is_one_ring) ring(iterator.Cell_Index())(1)=1;}
     for(CELL_ITERATOR iterator(euler.grid);iterator.Valid();iterator.Next()){if(ring(iterator.Cell_Index())(1)==1) break;
-        bool is_two_ring=false;for(int axis=1;axis<=2*TV::dimension;++axis) is_two_ring=is_two_ring || (ring.Valid_Index(iterator.Cell_Neighbor(axis)) && ring(iterator.Cell_Neighbor(axis))(1)==1);
+        bool is_two_ring=false;for(int axis=0;axis<2*TV::dimension;axis++) is_two_ring=is_two_ring || (ring.Valid_Index(iterator.Cell_Neighbor(axis)) && ring(iterator.Cell_Neighbor(axis))(1)==1);
         if(is_two_ring) ring(iterator.Cell_Index())(1)=2;}
 
     static TV_INT reference_cell=fluids_parameters.grid->Closest_Node(TV((T).6-fluids_parameters.grid->dX.x,(T).2-fluids_parameters.grid->dX.y));
@@ -358,7 +358,7 @@ void Fedkiw_Isobaric_Fix(bool fix_only_6_cells)
         if(fix_only_6_cells){
             TV_INT delta=cell_index-reference_cell;
             if(!(delta.y==2 && (delta.x==1 || delta.x==2))) continue;}
-        for(int axis=1;axis<=2*TV::dimension;++axis){if(!ring.Valid_Index(iterator.Cell_Neighbor(axis)) || ring(iterator.Cell_Neighbor(axis))(1)!=-1) continue;
+        for(int axis=0;axis<2*TV::dimension;axis++){if(!ring.Valid_Index(iterator.Cell_Neighbor(axis)) || ring(iterator.Cell_Neighbor(axis))(1)!=-1) continue;
             const TV_INT& reference_index=iterator.Cell_Neighbor(axis);
             const T new_rho=euler.U(cell_index)(1)*pow(euler.p(euler.eos,euler.U(reference_index))/euler.p(euler.eos,euler.U(cell_index)),(T)1/gamma);
             euler.Set_Euler_State_From_rho_velocity_And_internal_energy(euler.U,cell_index,new_rho,euler.Get_Velocity(euler.U(cell_index)),
@@ -371,7 +371,7 @@ void Fedkiw_Isobaric_Fix(bool fix_only_6_cells)
         if(fix_only_6_cells){
             TV_INT delta=cell_index-reference_cell;
             if(!(delta.y==1 && (delta.x>=1 && delta.x<=4))) continue;}
-        for(int axis=1;axis<=2*TV::dimension;++axis){if(!ring.Valid_Index(iterator.Cell_Neighbor(axis)) || ring(iterator.Cell_Neighbor(axis))(1)!=2) continue;
+        for(int axis=0;axis<2*TV::dimension;axis++){if(!ring.Valid_Index(iterator.Cell_Neighbor(axis)) || ring(iterator.Cell_Neighbor(axis))(1)!=2) continue;
             const TV_INT& reference_index=iterator.Cell_Neighbor(axis);
             const T new_rho=euler.U(cell_index)(1)*pow(euler.p(euler.eos,euler.U(reference_index))/euler.p(euler.eos,euler.U(cell_index)),(T)1/gamma);
             euler.Set_Euler_State_From_rho_velocity_And_internal_energy(euler.U,cell_index,new_rho,euler.Get_Velocity(euler.U(cell_index)),

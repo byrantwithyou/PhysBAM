@@ -31,7 +31,7 @@ template<class T> T Intersection_Area_Helper(const RANGE<VECTOR<T,2> >& box, con
 {
     POLYGON<VECTOR<T,2> > box_polygon(box);
     POLYGON<VECTOR<T,2> > modified_polygon(polygon.X.Size());
-    for(int i=1;i<=polygon.X.Size();++i) modified_polygon.X(i) = polygon.X(i);
+    for(int i=0;i<polygon.X.Size();i++) modified_polygon.X(i) = polygon.X(i);
 
     int offset=1;int side;
     T t_start,t_end;

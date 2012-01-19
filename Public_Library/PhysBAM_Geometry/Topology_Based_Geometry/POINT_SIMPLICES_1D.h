@@ -82,7 +82,7 @@ public:
     bool Inside_Any_Simplex(const TV& point,int& point_simplex_id,const T thickness_over_two=0) const;
     void Initialize_Hierarchy(const bool update_boxes=true,const int elements_per_group=0)
     {
-        indices.Resize(particles.X.Size()); for(int i=1;i<=particles.X.Size();++i) indices(i)=i;
+        indices.Resize(particles.X.Size()); for(int i=0;i<particles.X.Size();i++) indices(i)=i;
         delete hierarchy; hierarchy=new PARTICLE_HIERARCHY<TV,INDIRECT_ARRAY<ARRAY_VIEW<TV> > >(INDIRECT_ARRAY<ARRAY_VIEW<TV> >(particles.X,indices),update_boxes,elements_per_group);
     }
     void Initialize_Particle_Partition(const VECTOR<int,1>& counts){PHYSBAM_NOT_IMPLEMENTED();}
