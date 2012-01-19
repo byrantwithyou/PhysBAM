@@ -371,7 +371,8 @@ template<class T> VECTOR<T,6> LINEAR_AND_ANGULAR_CONSTRAINT_FUNCTION<VECTOR<T,3>
 F(const T_IMPULSE& j) const
 {
     TV jn,j_tau;j.Get_Subvector(0,jn);j.Get_Subvector(3,j_tau);
-        TV f_linear[2];ROTATION<TV> f_angular[2];T_CONSTRAINT_ERROR f_of_j;
+    TV f_linear[2];ROTATION<TV> f_angular[2];
+    T_CONSTRAINT_ERROR f_of_j;
     for(int i=0;i<2;i++){
         TV j_total=TV::Cross_Product(rhat[i],jn)+j_tau;
         f_linear[i]=F_Linear_Helper(j_total,i);

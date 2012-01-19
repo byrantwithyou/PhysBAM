@@ -138,16 +138,16 @@ public:
     {MATRIX<T,m,p> matrix;for(int j=0;j<p;j++) for(int i=0;i<m;i++) for(int k=0;k<n;k++) matrix(i,j)+=(*this)(i,k)*A(j,k);return matrix;}
 
     MATRIX Times_Cross_Product_Matrix(const VECTOR<T,3>& v) const
-    {STATIC_ASSERT(n==3);MATRIX matrix;for(int i=0;i<m;i++) matrix.Set_Row(i,VECTOR<T,3>::Cross_Product(VECTOR<T,3>((*this)(i,1),(*this)(i,2),(*this)(i,3)),v));return matrix;}
+    {STATIC_ASSERT(n==3);MATRIX matrix;for(int i=0;i<m;i++) matrix.Set_Row(i,VECTOR<T,3>::Cross_Product(VECTOR<T,3>((*this)(i,0),(*this)(i,1),(*this)(i,2)),v));return matrix;}
 
     MATRIX Times_Cross_Product_Matrix_Transpose(const VECTOR<T,3>& v) const
-    {STATIC_ASSERT(n==3);MATRIX matrix;for(int i=0;i<m;i++) matrix.Set_Row(i,VECTOR<T,3>::Cross_Product(v,VECTOR<T,3>((*this)(i,1),(*this)(i,2),(*this)(i,3))));return matrix;}
+    {STATIC_ASSERT(n==3);MATRIX matrix;for(int i=0;i<m;i++) matrix.Set_Row(i,VECTOR<T,3>::Cross_Product(v,VECTOR<T,3>((*this)(i,0),(*this)(i,1),(*this)(i,2))));return matrix;}
 
     MATRIX Cross_Product_Matrix_Times(const VECTOR<T,3>& v) const
-    {STATIC_ASSERT(m==3);MATRIX matrix;for(int i=0;i<n;i++) matrix.Set_Column(i,VECTOR<T,3>::Cross_Product(v,VECTOR<T,3>((*this)(1,i),(*this)(2,i),(*this)(3,i))));return matrix;}
+    {STATIC_ASSERT(m==3);MATRIX matrix;for(int i=0;i<n;i++) matrix.Set_Column(i,VECTOR<T,3>::Cross_Product(v,VECTOR<T,3>((*this)(0,i),(*this)(1,i),(*this)(2,i))));return matrix;}
 
     MATRIX Cross_Product_Matrix_Transpose_Times(const VECTOR<T,3>& v) const
-    {STATIC_ASSERT(m==3);MATRIX matrix;for(int i=0;i<n;i++) matrix.Set_Column(i,VECTOR<T,3>::Cross_Product(VECTOR<T,3>((*this)(1,i),(*this)(2,i),(*this)(3,i)),v));return matrix;}
+    {STATIC_ASSERT(m==3);MATRIX matrix;for(int i=0;i<n;i++) matrix.Set_Column(i,VECTOR<T,3>::Cross_Product(VECTOR<T,3>((*this)(0,i),(*this)(1,i),(*this)(2,i)),v));return matrix;}
 
     MATRIX<T,m,2> Times_Cross_Product_Matrix(const VECTOR<T,2>& v) const
     {STATIC_ASSERT(n==1);return (*this)*MATRIX<T,1,2>::Cross_Product_Matrix(v);}
@@ -162,7 +162,7 @@ public:
     {STATIC_ASSERT(m==1);return MATRIX<T,1,2>::Cross_Product_Matrix(v).Transpose_Times(*this);}
 
     static MATRIX<T,1,2> Cross_Product_Matrix(const VECTOR<T,2>& v)
-    {STATIC_ASSERT(m==1 && n==2);MATRIX<T,1,2> M;M(1,1)=-v.y;M(1,2)=v.x;return M;}
+    {STATIC_ASSERT(m==1 && n==2);MATRIX<T,1,2> M;M(0,0)=-v.y;M(0,1)=v.x;return M;}
 
     MATRIX<T,1> Times_Cross_Product_Matrix_Transpose_With_Symmetric_Result(const VECTOR<T,2>& v) const
     {STATIC_ASSERT((m==1 && n==2));return Times_Cross_Product_Matrix_Transpose(v);}
