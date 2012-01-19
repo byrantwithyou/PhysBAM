@@ -298,7 +298,7 @@ public:
 
     template<class T_MATRIX2>
     void Set_Submatrix(const int istart,const int jstart,const MATRIX_BASE<T,T_MATRIX2>& a)
-    {for(int i=0;i<a.Rows();i++) for(int j=0;j<a.Columns();j++) (*this)(istart+i-1,jstart+j-1)=a(i,j);}
+    {for(int i=0;i<a.Rows();i++) for(int j=0;j<a.Columns();j++) (*this)(istart+i,jstart+j)=a(i,j);}
 
     void Set_Submatrix(const int istart,const int jstart,const SYMMETRIC_MATRIX<T,3>& a)
     {(*this)(istart,jstart)=a.x11;(*this)(istart,jstart+1)=a.x21;(*this)(istart+1,jstart)=a.x21;(*this)(istart,jstart+2)=a.x31;(*this)(istart+2,jstart)=a.x31;
@@ -309,14 +309,14 @@ public:
 
     template<class T_VECTOR>
     void Set_Submatrix(const int istart,const int jstart,const VECTOR_BASE<T,T_VECTOR>& a)
-    {for(int i=0;i<a.Size();i++) (*this)(istart+i-1,jstart)=a(i);}
+    {for(int i=0;i<a.Size();i++) (*this)(istart+i,jstart)=a(i);}
 
     void Set_Submatrix(const int istart,const int jstart,const SYMMETRIC_MATRIX<T,2>& a)
     {(*this)(istart,jstart)=a.x11;(*this)(istart,jstart+1)=a.x21;(*this)(istart+1,jstart)=a.x21;(*this)(istart+1,jstart+1)=a.x22;}
 
     template<class T_MATRIX2>
     void Add_To_Submatrix(const int istart,const int jstart,const MATRIX_BASE<T,T_MATRIX2>& a)
-    {for(int i=0;i<a.Rows();i++) for(int j=0;j<a.Columns();j++) (*this)(istart+i-1,jstart+j-1)+=a(i,j);}
+    {for(int i=0;i<a.Rows();i++) for(int j=0;j<a.Columns();j++) (*this)(istart+i,jstart+j)+=a(i,j);}
 
     void Add_To_Submatrix(const int istart,const int jstart,const SYMMETRIC_MATRIX<T,3>& a)
     {(*this)(istart,jstart)+=a.x11;(*this)(istart,jstart+1)+=a.x21;(*this)(istart+1,jstart)+=a.x21;(*this)(istart,jstart+2)+=a.x31;(*this)(istart+2,jstart)+=a.x31;
@@ -330,15 +330,15 @@ public:
 
     template<class T_VECTOR>
     void Add_To_Submatrix(const int istart,const int jstart,const VECTOR_BASE<T,T_VECTOR>& a)
-    {for(int i=0;i<a.Size();i++) (*this)(istart+i-1,jstart)+=a(i);}
+    {for(int i=0;i<a.Size();i++) (*this)(istart+i,jstart)+=a(i);}
 
     template<class T_MATRIX2>
     void Subtract_From_Submatrix(const int istart,const int jstart,const MATRIX_BASE<T,T_MATRIX2>& a)
-    {for(int i=0;i<a.Rows();i++) for(int j=0;j<a.Columns();j++) (*this)(istart+i-1,jstart+j-1)-=a(i,j);}
+    {for(int i=0;i<a.Rows();i++) for(int j=0;j<a.Columns();j++) (*this)(istart+i,jstart+j)-=a(i,j);}
 
     template<class T_MATRIX2>
     void Get_Submatrix(const int istart,const int jstart,MATRIX_BASE<T,T_MATRIX2>& a) const
-    {for(int i=0;i<a.Rows();i++) for(int j=0;j<a.Columns();j++) a(i,j)=(*this)(istart+i-1,jstart+j-1);}
+    {for(int i=0;i<a.Rows();i++) for(int j=0;j<a.Columns();j++) a(i,j)=(*this)(istart+i,jstart+j);}
 
     void Get_Submatrix(const int istart,const int jstart,SYMMETRIC_MATRIX<T,3>& a) const
     {a.x11=(*this)(istart,jstart);a.x21=(*this)(istart,jstart+1);a.x21=(*this)(istart+1,jstart);a.x31=(*this)(istart,jstart+2);a.x31=(*this)(istart+2,jstart);

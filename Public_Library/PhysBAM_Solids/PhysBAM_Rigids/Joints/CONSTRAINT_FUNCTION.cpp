@@ -56,7 +56,7 @@ Jacobian_Helper(const T_IMPULSE& j,const int i) const
     if(rigid_body[i]->Has_Infinite_Inertia()) return MATRIX<T,2>();
     T sign=(T)(1-2*i);
     // rotate by d/dt e^{it} = i e^{it} = e^{i(t+pi/2)}
-    return MATRIX<T,2,1>(ROTATION<TV>::From_Rotation_Vector(dt_angular_velocity[i]+(sign*inverse_inertia_rhat_star[i]*j)(1)+(T)half_pi).Rotate(r[i]))*inverse_inertia_rhat_star[i];
+    return MATRIX<T,2,1>(ROTATION<TV>::From_Rotation_Vector(dt_angular_velocity[i]+(sign*inverse_inertia_rhat_star[i]*j)(0)+(T)half_pi).Rotate(r[i]))*inverse_inertia_rhat_star[i];
 }
 //#####################################################################
 // Function Initialize
@@ -65,7 +65,7 @@ template<class T> void LINEAR_CONSTRAINT_FUNCTION<VECTOR<T,2> >::
 Initialize()
 {
     FRAME<TV> projected_frame[2];
-    for(int i=0;i<=1;i++){
+    for(int i=0;i<2;i++){
         p[i]=rigid_body[i]->X();
         dt_angular_velocity[i]=dt*rigid_body[i]->Twist().angular;
         projected_frame[i]=FRAME<TV>(p[i]+dt*rigid_body[i]->Twist().linear,ROTATION<TV>::From_Rotation_Vector(dt_angular_velocity[i])*rigid_body[i]->Rotation());}
@@ -74,7 +74,7 @@ Initialize()
     TV ap[2]={rigid_body[0]->World_Space_Point(joint.F_pj()*desired_translation),rigid_body[1]->World_Space_Point(joint.F_cj().t)};
     location=(T).5*(ap[0]+ap[1]);
     one_over_m=0;
-    for(int i=0;i<=1;i++){
+    for(int i=0;i<2;i++){
         r[i]=ap[i]-p[i];
         if(!rigid_body[i]->Has_Infinite_Inertia()){
             MATRIX<T,1> inverse_inertia=rigid_body[i]->World_Space_Inertia_Tensor_Inverse();TV rhat=location-p[i];
@@ -108,7 +108,7 @@ template<class T> void ANGULAR_CONSTRAINT_FUNCTION<VECTOR<T,2> >::
 Initialize()
 {
     T_SPIN q_projected_body[2];
-    for(int i=0;i<=1;i++){
+    for(int i=0;i<2;i++){
         if(!rigid_body[i]->Has_Infinite_Inertia()) inverse_inertia[i]=rigid_body[i]->World_Space_Inertia_Tensor_Inverse();
         dt_angular_velocity[i]=dt*rigid_body[i]->Twist().angular;
         q_projected_body[i]=dt_angular_velocity[i]+rigid_body[i]->Rotation().Angle();}
@@ -145,7 +145,7 @@ F(const T_IMPULSE& j) const
 {
     TV jn;j.Get_Subvector(0,jn);T j_tau=j(3);
     TV f_linear[2];T_SPIN f_angular[2];T_CONSTRAINT_ERROR f_of_j;
-    for(int i=0;i<=1;i++){
+    for(int i=0;i<2;i++){
         T_SPIN j_total=TV::Cross_Product(rhat[i],jn)+j_tau;
         f_linear[i]=F_Linear_Helper(j_total,i);
         f_angular[i]=angular.F_Helper(j_total,i);}
@@ -163,7 +163,7 @@ Jacobian(const T_IMPULSE& j) const
     MATRIX<T,3> A;
     A.Add_To_Submatrix(0,0,one_over_m_matrix);
     T_SPIN j_total[2]={TV::Cross_Product(rhat[0],jn)+j_tau,TV::Cross_Product(rhat[1],jn)+j_tau};
-    for(int i=0;i<=1;i++){
+    for(int i=0;i<2;i++){
         MATRIX<T,3,1> A_angular;
         A_angular.Add_To_Submatrix(0,0,Jacobian_Linear_Helper(j_total[i],i));
         A_angular(2,0)=angular.Jacobian_Helper(i).x11;
@@ -265,7 +265,7 @@ template<class T> void LINEAR_CONSTRAINT_FUNCTION<VECTOR<T,3> >::
 Initialize()
 {
     FRAME<TV> projected_frame[2];
-    for(int i=0;i<=1;i++){
+    for(int i=0;i<2;i++){
         p[i]=rigid_body[i]->X();q[i]=rigid_body[i]->Rotation();
         dt_angular_velocity[i]=dt*rigid_body[i]->Twist().angular;
         projected_frame[i]=FRAME<TV>(p[i]+dt*rigid_body[i]->Twist().linear,ROTATION<TV>::From_Rotation_Vector(dt_angular_velocity[i])*q[i]);}
@@ -274,7 +274,7 @@ Initialize()
     TV ap[2]={rigid_body[0]->World_Space_Point(joint.F_pj()*desired_translation),rigid_body[1]->World_Space_Point(joint.F_cj().t)};
     location=(T).5*(ap[0]+ap[1]);
     one_over_m=0;
-    for(int i=0;i<=1;i++){
+    for(int i=0;i<2;i++){
         r[i]=ap[i]-p[i];
         if(!rigid_body[i]->Has_Infinite_Inertia()){
             one_over_m+=(T)1/rigid_body[i]->Mass();
@@ -342,7 +342,7 @@ template<class T> void ANGULAR_CONSTRAINT_FUNCTION<VECTOR<T,3> >::
 Initialize()
 {
     ROTATION<TV> q_projected_body[2];
-    for(int i=0;i<=1;i++){
+    for(int i=0;i<2;i++){
         if(!rigid_body[i]->Has_Infinite_Inertia()) inverse_inertia[i]=rigid_body[i]->World_Space_Inertia_Tensor_Inverse();
         dt_angular_velocity[i]=dt*rigid_body[i]->Twist().angular;
         q_projected_body[i]=ROTATION<TV>::From_Rotation_Vector(dt_angular_velocity[i])*rigid_body[i]->Rotation();}
@@ -351,7 +351,7 @@ Initialize()
     joint.Constrain_Angles(desired_angles);
     ROTATION<TV> q_target=ROTATION<TV>::From_Euler_Angles(desired_angles).Normalized();
     q_w_old[0]=(rigid_body[0]->Rotation()*joint.F_pj().r*q_target).Normalized();q_w_old[1]=(rigid_body[1]->Rotation()*joint.F_cj().r).Normalized();
-    for(int i=0;i<=1;i++) modified_b_star[i]=q_w_old[i].Quaternion().s-MATRIX<T,3>::Cross_Product_Matrix(q_w_old[i].Quaternion().v);
+    for(int i=0;i<2;i++) modified_b_star[i]=q_w_old[i].Quaternion().s-MATRIX<T,3>::Cross_Product_Matrix(q_w_old[i].Quaternion().v);
     metric_tensor=inverse_inertia[0]+inverse_inertia[1];
     length_scale_squared=max(rigid_body[0]->Length_Scale_Squared(),rigid_body[1]->Length_Scale_Squared());
 }
@@ -386,11 +386,11 @@ F(const T_IMPULSE& j) const
 template<class T> MATRIX<T,6> LINEAR_AND_ANGULAR_CONSTRAINT_FUNCTION<VECTOR<T,3> >::
 Jacobian(const T_IMPULSE& j) const
 {
-    TV jn,j_tau;j.Get_Subvector(1,jn);j.Get_Subvector(4,j_tau);
+    TV jn,j_tau;j.Get_Subvector(0,jn);j.Get_Subvector(3,j_tau);
     MATRIX<T,6> A;MATRIX<T,6,3> A_angular;
     A.Add_To_Submatrix(0,0,one_over_m_matrix);
     TV j_total[2]={TV::Cross_Product(rhat[0],jn)+j_tau,TV::Cross_Product(rhat[1],jn)+j_tau};
-    for(int i=0;i<=1;i++){
+    for(int i=0;i<2;i++){
         int sign=1-2*i;
         A_angular.Set_Zero_Matrix();
         A_angular.Add_To_Submatrix(0,0,Jacobian_Linear_Helper(j_total[i],i));
@@ -405,7 +405,7 @@ Jacobian(const T_IMPULSE& j) const
 template<class T> void LINEAR_AND_ANGULAR_CONSTRAINT_FUNCTION<VECTOR<T,3> >::
 Initialize()
 {
-    for(int i=0;i<=1;i++) rhat[i]=linear.location-linear.p[i];
+    for(int i=0;i<2;i++) rhat[i]=linear.location-linear.p[i];
     one_over_m_matrix=linear.one_over_m*DIAGONAL_MATRIX<T,3>::Identity_Matrix();
     // compute the metric tensor
     MATRIX<T,3> cross_term=linear.inverse_inertia_rhat_star[0]+linear.inverse_inertia_rhat_star[1];

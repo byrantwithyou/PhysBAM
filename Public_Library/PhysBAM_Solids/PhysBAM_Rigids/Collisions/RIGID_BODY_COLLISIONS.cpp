@@ -178,46 +178,46 @@ Update_Collision_Pair_Helper(RIGID_BODY<TV>& body1,RIGID_BODY<TV>& body2,const T
         if(!body1.Has_Infinite_Inertia() && impulse.linear.Magnitude()>=body1.fracture_threshold){
             TV object_space_collision_location=body1.Object_Space_Point(collision_location);
             collision_callbacks.Begin_Fracture(body1.particle_index);
-            fracture_pattern->Intersect_With_Rigid_Body(body1,body1.World_Space_Point(object_space_collision_location),added_bodies(1),parameters.allow_refracturing,
+            fracture_pattern->Intersect_With_Rigid_Body(body1,body1.World_Space_Point(object_space_collision_location),added_bodies(0),parameters.allow_refracturing,
                 parameters.use_fracture_particle_optimization);
-            fractured_bodies(1)=body1.particle_index;
+            fractured_bodies(0)=body1.particle_index;
             rigid_body_collection.rigid_body_particle.Remove_Body(body1.particle_index);
             rigid_body_collection.rigid_geometry_collection.Destroy_Unreferenced_Geometry();
-            collision_callbacks.End_Fracture(body1.particle_index,added_bodies(1));}
+            collision_callbacks.End_Fracture(body1.particle_index,added_bodies(0));}
         else body1.Apply_Impulse_To_Body(collision_location,impulse.linear,impulse.angular,mpi_one_ghost);
         if(!body2.Has_Infinite_Inertia() && impulse.linear.Magnitude()>=body2.fracture_threshold){
             TV object_space_collision_location=body2.Object_Space_Point(collision_location);
             collision_callbacks.Begin_Fracture(body2.particle_index);
-            fracture_pattern->Intersect_With_Rigid_Body(body2,body2.World_Space_Point(object_space_collision_location),added_bodies(2),parameters.allow_refracturing,
+            fracture_pattern->Intersect_With_Rigid_Body(body2,body2.World_Space_Point(object_space_collision_location),added_bodies(1),parameters.allow_refracturing,
                 parameters.use_fracture_particle_optimization);
-            fractured_bodies(2)=body2.particle_index;
+            fractured_bodies(1)=body2.particle_index;
             rigid_body_collection.rigid_body_particle.Remove_Body(body2.particle_index);
             rigid_body_collection.rigid_geometry_collection.Destroy_Unreferenced_Geometry();
-            collision_callbacks.End_Fracture(body2.particle_index,added_bodies(2));}
+            collision_callbacks.End_Fracture(body2.particle_index,added_bodies(1));}
         else body2.Apply_Impulse_To_Body(collision_location,-impulse.linear,-impulse.angular,mpi_one_ghost);
-        if(fractured_bodies(1) || fractured_bodies(2)){
+        if(fractured_bodies(0) || fractured_bodies(1)){
             rigid_body_collection.Update_Simulated_Particles();
             Initialize_Data_Structures(false);
+            for(int i=0;i<added_bodies(0).m;i++){
+                collision_callbacks.Euler_Step_Position_With_New_Velocity(added_bodies(0)(i),dt,time);
+                skip_collision_check.Set_Last_Moved(added_bodies(0)(i));}
             for(int i=0;i<added_bodies(1).m;i++){
                 collision_callbacks.Euler_Step_Position_With_New_Velocity(added_bodies(1)(i),dt,time);
-                skip_collision_check.Set_Last_Moved(added_bodies(1)(i));}
-            for(int i=0;i<added_bodies(2).m;i++){
-                collision_callbacks.Euler_Step_Position_With_New_Velocity(added_bodies(2)(i),dt,time);
-                skip_collision_check.Set_Last_Moved(added_bodies(2)(i));}}}
+                skip_collision_check.Set_Last_Moved(added_bodies(1)(i));}}}
     else RIGID_BODY<TV>::Apply_Impulse(body_parent1,body_parent2,collision_location,impulse.linear,impulse.angular,mpi_one_ghost);
-    if(!fractured_bodies(1)){
+    if(!fractured_bodies(0)){
         body_parent1.is_temporarily_static=false;
         int parent_id_1=body_parent1.particle_index;
         if(!body_parent1.Has_Infinite_Inertia()){
             collision_callbacks.Euler_Step_Position_With_New_Velocity(parent_id_1,dt,time);
             skip_collision_check.Set_Last_Moved(parent_id_1);}}
-    if(!fractured_bodies(2)){
+    if(!fractured_bodies(1)){
         body_parent2.is_temporarily_static=false;
         int parent_id_2=body_parent2.particle_index;
         if(!body_parent2.Has_Infinite_Inertia()){
             collision_callbacks.Euler_Step_Position_With_New_Velocity(parent_id_2,dt,time);
             skip_collision_check.Set_Last_Moved(parent_id_2);}}
-    return fractured_bodies(1)||fractured_bodies(2);
+    return fractured_bodies(0)||fractured_bodies(1);
 }
 //#####################################################################
 // Function Update_Analytic_Multibody_Collision
@@ -333,16 +333,16 @@ Update_Box_Plane_Collision(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,cons
     ARRAY<TV> points;bool intersect=false;
     for(int i=0;i<8;i++){
         TV point=box.min_corner;
-        if(i>4) point(1)=box.max_corner(1);
-        if(i%4==0||i%4==3) point(2)=box.max_corner(2);
-        if(i%2==0) point(3)=box.max_corner(3);
+        if(i>4) point(0)=box.max_corner(0);
+        if(i%4==0||i%4==3) point(1)=box.max_corner(1);
+        if(i%2==0) point(2)=box.max_corner(2);
         TV transformed_point=body1->Frame().Inverse()*body2->Frame()*point;
-        if(transformed_point(2)<0){
+        if(transformed_point(1)<0){
             intersect=true;
-            transformed_point(2)*=.5;
+            transformed_point(1)*=.5;
             points.Append(transformed_point);}}
 
-    TV collision_normal=-body1->Rotation().Rotated_Axis(2);
+    TV collision_normal=-body1->Rotation().Rotated_Axis(1);
     if(!intersect){rigid_body_collisions.skip_collision_check.Set_Last_Checked(i1,i2);return false;}
     rigid_body_collisions.pairs_processed_by_collisions.Set(VECTOR<int,2>(i1,i2).Sorted());
     if(TV::Dot_Product(body1->Twist().linear-body2->Twist().linear,collision_normal)>=0) return false;
@@ -375,7 +375,7 @@ Update_Sphere_Plane_Collision(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,c
     SPHERE<TV>& sphere=implicit_sphere->analytic;
 
     TV sphere_center=(body2->Frame()*transform).t;
-    TV collision_normal=-body1->Rotation().Rotated_Axis(2);
+    TV collision_normal=-body1->Rotation().Rotated_Axis(1);
     T separation=TV::Dot_Product(body1->X()-sphere_center,collision_normal);
     if(separation>=sphere.radius){rigid_body_collisions.skip_collision_check.Set_Last_Checked(i1,i2);return false;}
     rigid_body_collisions.pairs_processed_by_collisions.Set(VECTOR<int,2>(i1,i2).Sorted());
@@ -508,9 +508,9 @@ Compute_Contact_Graph(const T dt,const T time,ARTICULATED_RIGID_BODY<TV>* articu
 
         for(int i=0;i<edge_pairs.m;i++){
             VECTOR<int,2> state(body_stack.Subset(edge_pairs(i)));
-            if(state(1)==state(2)) continue;
-            if(state(1)==-2 && stack_static_bodies.Contains(PAIR<int,int>(state(2),edge_pairs(i)(1)))) continue;
-            if(state(2)==-2 && stack_static_bodies.Contains(PAIR<int,int>(state(1),edge_pairs(i)(2)))) continue;
+            if(state(0)==state(1)) continue;
+            if(state(0)==-2 && stack_static_bodies.Contains(PAIR<int,int>(state(1),edge_pairs(i)(0)))) continue;
+            if(state(1)==-2 && stack_static_bodies.Contains(PAIR<int,int>(state(0),edge_pairs(i)(1)))) continue;
             for(int j=0;j<2;j++){int& stack_value=body_stack(edge_pairs(i)(j));if(stack_value!=-2) stack_value=-1;}}
         for(int i=contact_stack.m;i>=1;i--) if(body_stack.Subset(contact_stack(i)).Find(-1)){
             for(int j=0;j<contact_stack(i).m;j++) if(body_stack(contact_stack(i)(j))!=-2) body_stack(contact_stack(i)(j))=-1;
@@ -522,7 +522,7 @@ Compute_Contact_Graph(const T dt,const T time,ARTICULATED_RIGID_BODY<TV>* articu
         for(int i=0;i<edge_pairs.m;i++)
             if(!pairs_scale.Contains(edge_pairs(i).Sorted()))
                 pairs_scale.Set(edge_pairs(i).Sorted(),TRIPLE<int,int,int>(parameters.contact_iterations,contact_level_iterations,1));
-    for(int i=0;i<edge_pairs.m;i++) if(rigid_body_collection.Is_Active(edge_pairs(i)(1)) && rigid_body_collection.Is_Active(edge_pairs(i)(2))) contact_graph.Add_Edge(edge_pairs(i)(1),edge_pairs(i)(2));
+    for(int i=0;i<edge_pairs.m;i++) if(rigid_body_collection.Is_Active(edge_pairs(i)(0)) && rigid_body_collection.Is_Active(edge_pairs(i)(1))) contact_graph.Add_Edge(edge_pairs(i)(0),edge_pairs(i)(1));
 
     collision_callbacks.Restore_Positions(); // Get X_n
 
@@ -578,7 +578,7 @@ Process_Push_Out_Legacy()
             int iterations=0;bool need_more_iterations=true;T move_fraction=1;
             while(need_more_iterations && ++iterations<=push_out_level_iterations){need_more_iterations=false;
                 if(use_gradual_push_out) move_fraction=(T)iterations/push_out_level_iterations;
-                for(int i=0;i<pairs.m;i++){int id_1=pairs(i)(1),id_2=pairs(i)(2);
+                for(int i=0;i<pairs.m;i++){int id_1=pairs(i)(0),id_2=pairs(i)(1);
                     if(parameters.use_projected_gauss_seidel && !pairs_processed_by_contact.Contains(pairs(i).Sorted()))
                         continue;
                     int parent_id_1=rigid_body_cluster_bindings.Get_Parent(rigid_body_collection.Rigid_Body(id_1)).particle_index;
@@ -686,8 +686,8 @@ Get_Rigid_Bodies_Intersecting_Rigid_Body(const int particle_index,ARRAY<int>& ri
     const int rigid_body_level=contact_graph.directed_graph.Level_Of_Node(rigid_body_id);
 
     const ARRAY<VECTOR<int,2> >& level_contact_pairs=precomputed_contact_pairs_for_level(rigid_body_level);
-    for(int i=0;i<level_contact_pairs.m;i++) if(level_contact_pairs(i)(1)==rigid_body_id || level_contact_pairs(i)(2)==rigid_body_id){
-        const int other_body_id=level_contact_pairs(i)(1)==rigid_body_id?level_contact_pairs(i)(2):level_contact_pairs(i)(1);
+    for(int i=0;i<level_contact_pairs.m;i++) if(level_contact_pairs(i)(0)==rigid_body_id || level_contact_pairs(i)(1)==rigid_body_id){
+        const int other_body_id=level_contact_pairs(i)(0)==rigid_body_id?level_contact_pairs(i)(1):level_contact_pairs(i)(0);
         const RIGID_BODY<TV>& other_rigid_body=rigid_body_collection.Rigid_Body(other_body_id);
         if(skip_collision_check.Skip_Pair(rigid_body_id,other_body_id)
             || (collision_manager && !collision_manager->Either_Body_Collides_With_The_Other(other_rigid_body.particle_index,rigid_body.particle_index))) continue;
@@ -767,7 +767,7 @@ Push_Out_From_Rigid_Body(RIGID_BODY<TV>& rigid_body,ARRAY<RIGID_BODY_PARTICLE_IN
             else equation_type=3;} // full constrained by static bodies
 
         MATRIX<T,TV::dimension+T_SPIN::dimension> M[2];
-        for(int i=0;i<=1;i++) if(equation_type!=(i?0:3)){
+        for(int i=0;i<2;i++) if(equation_type!=(i?0:3)){
             M[i].Set_Submatrix(0,0,K_inverse_sum[i]);
                 M[i].Set_Submatrix(TV::dimension,0,mr[i]);
             M[i].Set_Submatrix(0,TV::dimension,mr[i].Transposed());
@@ -807,7 +807,7 @@ Push_Out_From_Rigid_Body(RIGID_BODY<TV>& rigid_body,ARRAY<RIGID_BODY_PARTICLE_IN
         VECTOR<T,TV::dimension+T_SPIN::dimension> delta_twist;
         if(equation_type==0 || equation_type==3) delta_twist=A.In_Place_Cholesky_Solve(b);
         else delta_twist=A.Solve_Linear_System(b);
-        delta_twist.Get_Subvector(0,velocity);delta_twist.Get_Subvector(TV::dimension+1,angular_velocity);}
+        delta_twist.Get_Subvector(0,velocity);delta_twist.Get_Subvector(TV::dimension,angular_velocity);}
 
     // apply push to other rigid bodies
     for(int i=0;i<rigid_body_interactions.m;i++) if(!rigid_body_collection.Rigid_Body(rigid_body_interactions(i)).Has_Infinite_Inertia()){
@@ -918,10 +918,10 @@ Construct_Stacks()
                 visited(adj(j)(k))=i;
                 stack.Push(adj(j)(k));}}
         if(!has_infinite_inertia_body || list.m<=1) continue;
-        for(int j=2;j<=list.m;j++) if(rigid_body_collection.Rigid_Body(list(j)).Has_Infinite_Inertia()){exchange(list(j),list(1));break;}
-        const TWIST<TV>& base_twist=rigid_body_collection.rigid_body_particle.twist(list(1));
+        for(int j=1;j<list.m;j++) if(rigid_body_collection.Rigid_Body(list(j)).Has_Infinite_Inertia()){exchange(list(j),list(0));break;}
+        const TWIST<TV>& base_twist=rigid_body_collection.rigid_body_particle.twist(list(0));
         bool same_velocity=true;
-        for(int j=2;j<=list.m;j++){
+        for(int j=1;j<list.m;j++){
             TWIST<TV> relative_twist=rigid_body_collection.rigid_body_particle.twist(list(j))-base_twist;
             if(relative_twist.linear.Magnitude_Squared() > linear_threshold_squared || relative_twist.angular.Magnitude_Squared() > angular_threshold_squared){
                 same_velocity=false;break;}}
@@ -1079,8 +1079,8 @@ template<class TV> void RIGID_BODY_COLLISIONS<TV>::
 Apply_Stacking_Contact()
 {
     for(int i=0;i<contact_stack.m;i++){
-        TWIST<TV>& static_twist=rigid_body_collection.rigid_body_particle.twist(contact_stack(i)(1));
-        for(int j=2;j<=contact_stack(i).m;j++){
+        TWIST<TV>& static_twist=rigid_body_collection.rigid_body_particle.twist(contact_stack(i)(0));
+        for(int j=1;j<contact_stack(i).m;j++){
             RIGID_BODY<TV>& rigid_body=rigid_body_collection.Rigid_Body(contact_stack(i)(j));
             collision_callbacks.Restore_Position(rigid_body.particle_index);
             rigid_body.Twist()=static_twist;rigid_body.Update_Angular_Momentum();}}
@@ -1108,7 +1108,7 @@ Add_Elastic_Collisions(const T dt,const T time)
 
         need_another_iteration=false;Get_Bounding_Box_Collision_Pairs(dt,time,pairs,i==parameters.collision_iterations,i==1);
         for(int j=0;j<pairs.m;j++){
-            int id_1=pairs(j)(1),id_2=pairs(j)(2);
+            int id_1=pairs(j)(0),id_2=pairs(j)(1);
             if(Update_Collision_Pair(id_1,id_2,dt,time,(mpi_rigids && (mpi_rigids->Is_Dynamic_Ghost_Body(rigid_body_collection.Rigid_Body(id_1)) || 
                             mpi_rigids->Is_Dynamic_Ghost_Body(rigid_body_collection.Rigid_Body(id_2)))))){
                 spatial_partition->Update_Body(rigid_body_collection.rigid_geometry_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(id_1));
@@ -1163,7 +1163,7 @@ Shock_Propagation_Using_Graph(const T dt,const T time,ARTICULATED_RIGID_BODY<TV>
             bool need_another_level_iteration=true;int level_iteration=0;
             while(need_another_level_iteration && ++level_iteration<=shock_propagation_level_iterations){need_another_level_iteration=false;
                 if(parameters.use_epsilon_scaling_for_level) epsilon_scale=(T)level_iteration/shock_propagation_level_iterations;
-                for(int i=0;i<pairs.m;i++){int id_1=pairs(i)(1),id_2=pairs(i)(2);
+                for(int i=0;i<pairs.m;i++){int id_1=pairs(i)(0),id_2=pairs(i)(1);
                     if(skip_collision_check.Skip_Pair(id_1,id_2)) continue;
                     if(!parameters.use_projected_gauss_seidel || pairs_processed_by_contact.Contains(pairs(i).Sorted()))
                         if(SOLVE_CONTACT::Update_Contact_Pair(*this,collision_callbacks,analytic_contact_registry,id_1,id_2,false,shock_propagation_pair_iterations,epsilon_scale,dt,time,
@@ -1267,26 +1267,26 @@ Clear_Temporarily_Static()
 template<class TV> void RIGID_BODY_COLLISIONS<TV>::
 Clean_Up_Fractured_Items_From_Lists(ARRAY<VECTOR<int,2> >& pairs,const int current_pair,const bool called_from_contact)
 {
-    if(added_bodies(1).m+added_bodies(2).m>0){
+    if(added_bodies(0).m+added_bodies(1).m>0){
         // Go through the remaining pairs, and remove any pairs that contain either of the removed fractured bodies
         for(int k=pairs.m;k>=current_pair+1;k--){
-            if(pairs(k)(1)==fractured_bodies(1) || pairs(k)(2)==fractured_bodies(1) || 
-                pairs(k)(1)==fractured_bodies(2) || pairs(k)(2)==fractured_bodies(2))
+            if(pairs(k)(0)==fractured_bodies(0) || pairs(k)(1)==fractured_bodies(0) || 
+                pairs(k)(0)==fractured_bodies(1) || pairs(k)(1)==fractured_bodies(1))
                 pairs.Remove_Index_Lazy(k);}
         // Go through the pairs processed by collisions, and add the cartesian product
         ARRAY<VECTOR<int,2> > keys;pairs_processed_by_collisions.Get_Keys(keys);
         for(int k=0;k<keys.m;k++){
             ARRAY<int> first_ids,second_ids;
-            if(keys(k)(1)==fractured_bodies(1)) first_ids=added_bodies(1);
-            else if(keys(k)(1)==fractured_bodies(2)) first_ids=added_bodies(2);
-            if(keys(k)(2)==fractured_bodies(1)) second_ids=added_bodies(1);
-            else if(keys(k)(2)==fractured_bodies(2)) second_ids=added_bodies(2);
+            if(keys(k)(0)==fractured_bodies(0)) first_ids=added_bodies(0);
+            else if(keys(k)(0)==fractured_bodies(1)) first_ids=added_bodies(1);
+            if(keys(k)(1)==fractured_bodies(0)) second_ids=added_bodies(0);
+            else if(keys(k)(1)==fractured_bodies(1)) second_ids=added_bodies(1);
             if(!first_ids.m && !second_ids.m) continue;
             pairs_processed_by_collisions.Delete(keys(k));
             if(!first_ids.m && second_ids.m) 
-                for(int body=0;body<second_ids.m;body++) pairs_processed_by_collisions.Set(VECTOR<int,2>(keys(k)(1),second_ids(body)).Sorted());
+                for(int body=0;body<second_ids.m;body++) pairs_processed_by_collisions.Set(VECTOR<int,2>(keys(k)(0),second_ids(body)).Sorted());
             else if(first_ids.m && !second_ids.m)
-                for(int body=0;body<first_ids.m;body++) pairs_processed_by_collisions.Set(VECTOR<int,2>(keys(k)(2),first_ids(body)).Sorted());
+                for(int body=0;body<first_ids.m;body++) pairs_processed_by_collisions.Set(VECTOR<int,2>(keys(k)(1),first_ids(body)).Sorted());
             else
                 for(int body1=0;body1<first_ids.m;body1++)
                     for(int body2=0;body2<second_ids.m;body2++)
