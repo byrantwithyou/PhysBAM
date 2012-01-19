@@ -10,15 +10,15 @@ using namespace PhysBAM;
 //#####################################################################
 // Function Artificial_Viscosity
 //#####################################################################
-// Q is (1,m-1) at the cell centers with the pressure
+// Q is (0,m-1) at the cell centers with the pressure
 template<class T> void ARTIFICIAL_VISCOSITY_VNR_1D<T>::
 Get_Artificial_Viscosity(EOS<T>& eos,GRID_LAGRANGE_1D<T>& grid,const ARRAY<T,VECTOR<int,1> >& mass,const ARRAY<T,VECTOR<int,1> >& velocity,const ARRAY<T,VECTOR<int,1> >& energy,ARRAY<T,VECTOR<int,1> >& Q)
 {
     int i;
     int m=grid.m;   
     
-    ARRAY<T,VECTOR<int,1> > length(1,m-1);grid.Get_Lengths(length);  
-    ARRAY<T,VECTOR<int,1> > u_jump(1,m-1);for(i=0;i<m-1;i++) u_jump(i)=velocity(i+1)-velocity(i);
+    ARRAY<T,VECTOR<int,1> > length(0,m-1);grid.Get_Lengths(length);  
+    ARRAY<T,VECTOR<int,1> > u_jump(0,m-1);for(i=0;i<m-1;i++) u_jump(i)=velocity(i+1)-velocity(i);
     
     for(i=0;i<m-1;i++){
         if(u_jump(i) >= 0) Q(i)=0;
@@ -31,7 +31,7 @@ Get_Artificial_Viscosity(EOS<T>& eos,GRID_LAGRANGE_1D<T>& grid,const ARRAY<T,VEC
                     if(i != 1) r_left=(u_jump(i-1)/length(i-1))/ux_center;
                     if(i != m-1) r_right=(u_jump(i+1)/length(i+1))/ux_center;}
                 T psi=max((T)0,min((r_left+r_right)/2,2*r_left,2*r_right,(T)1));
-                Q(i)=(1-psi)*Q(i);}}}
+                Q(i)=(0-psi)*Q(i);}}}
 }
 //#####################################################################
 template class ARTIFICIAL_VISCOSITY_VNR_1D<float>;

@@ -19,7 +19,7 @@ Euler_Step(const ARRAY<T,VECTOR<int,2> >& u,const ARRAY<T,VECTOR<int,2> >& v,con
 //#####################################################################
 // Function Get_Lengths
 //#####################################################################
-// L1 is (1,m-1) by (1,n) while L2 is (1,m) by (1,n-1)
+// L1 is (0,m-1) by (0,n) while L2 is (0,m) by (0,n-1)
 template<class T> void GRID_LAGRANGE_2D<T>::
 Get_Lengths(ARRAY<T,VECTOR<int,2> >& L1,ARRAY<T,VECTOR<int,2> >& L2)
 {
@@ -30,7 +30,7 @@ Get_Lengths(ARRAY<T,VECTOR<int,2> >& L1,ARRAY<T,VECTOR<int,2> >& L2)
 //#####################################################################
 // Function Get_Areas
 //#####################################################################
-// A is (1,m-1) by (1,n-1)
+// A is (0,m-1) by (0,n-1)
 // points listed counter clockwise
 template<class T> void GRID_LAGRANGE_2D<T>::
 Get_Areas(ARRAY<T,VECTOR<int,2> >& A)
@@ -38,29 +38,29 @@ Get_Areas(ARRAY<T,VECTOR<int,2> >& A)
     POLYGON<VECTOR<T,2> > quadrilateral(4);
 
     for(int i=0;i<m-1;i++) for(int j=0;j<n-1;j++){
-        quadrilateral.X(1)=VECTOR<T,2>(x(i,j),y(i,j));
-        quadrilateral.X(2)=VECTOR<T,2>(x(i+1,j),y(i+1,j));
-        quadrilateral.X(3)=VECTOR<T,2>(x(i+1,j+1),y(i+1,j+1));
-        quadrilateral.X(4)=VECTOR<T,2>(x(i,j+1),y(i,j+1));
+        quadrilateral.X(0)=VECTOR<T,2>(x(i,j),y(i,j));
+        quadrilateral.X(1)=VECTOR<T,2>(x(i+1,j),y(i+1,j));
+        quadrilateral.X(2)=VECTOR<T,2>(x(i+1,j+1),y(i+1,j+1));
+        quadrilateral.X(3)=VECTOR<T,2>(x(i,j+1),y(i,j+1));
         A(i,j)=quadrilateral.Area();}  
 }
 //#####################################################################
 // Function Get_Normals
 //#####################################################################
 // located at the midpoints, defined as (-y,x)/length or (y,-x)/length
-// N1 points up as (1,m-1) by (1,n), N2 points right as (1,m) by (1,n-1)
+// N1 points up as (0,m-1) by (0,n), N2 points right as (0,m) by (0,n-1)
 template<class T> void GRID_LAGRANGE_2D<T>::
 Get_Normals(ARRAY<T,VECTOR<int,2> >& N1_x,ARRAY<T,VECTOR<int,2> >& N1_y,ARRAY<T,VECTOR<int,2> >& N2_x,ARRAY<T,VECTOR<int,2> >& N2_y)
 {
     int i,j;
-    ARRAY<T,VECTOR<int,2> > L1(1,m-1,1,n),L2(1,m,1,n-1);Get_Lengths(L1,L2);
-    for(i=0;i<m-1;i++) for(j=0;j<n;j++){N1_x(i,j)=-(y(i+1,j)-y(i,j))/L1(i,j);N1_y(i,j)=(x(i+1,j)-x(i,j))/L1(1,j);}
+    ARRAY<T,VECTOR<int,2> > L1(0,m-1,1,n),L2(0,m,1,n-1);Get_Lengths(L1,L2);
+    for(i=0;i<m-1;i++) for(j=0;j<n;j++){N1_x(i,j)=-(y(i+1,j)-y(i,j))/L1(i,j);N1_y(i,j)=(x(i+1,j)-x(i,j))/L1(0,j);}
     for(i=0;i<m;i++) for(j=0;j<n-1;j++){N2_x(i,j)=(y(i,j+1)-y(i,j))/L2(i,j);N2_y(i,j)=-(x(i,j+1)-x(i,j))/L2(i,j);}
 }
 //#####################################################################
 // Function Get_Centers
 //#####################################################################
-// C is (1,m-1) by (1,n-1)
+// C is (0,m-1) by (0,n-1)
 template<class T> void GRID_LAGRANGE_2D<T>::
 Get_Centers(ARRAY<T,VECTOR<int,2> >& C_x,ARRAY<T,VECTOR<int,2> >& C_y)
 {
@@ -70,7 +70,7 @@ Get_Centers(ARRAY<T,VECTOR<int,2> >& C_x,ARRAY<T,VECTOR<int,2> >& C_y)
 //#####################################################################
 // Function Get_Midpoints
 //#####################################################################
-// M1 is (1,m-1) by (1,n) and M2 is (1,m) by (1,n-1)
+// M1 is (0,m-1) by (0,n) and M2 is (0,m) by (0,n-1)
 template<class T> void GRID_LAGRANGE_2D<T>::
 Get_Midpoints(ARRAY<T,VECTOR<int,2> >& M1_x,ARRAY<T,VECTOR<int,2> >& M1_y,ARRAY<T,VECTOR<int,2> >& M2_x,ARRAY<T,VECTOR<int,2> >& M2_y)
 {
@@ -81,12 +81,12 @@ Get_Midpoints(ARRAY<T,VECTOR<int,2> >& M1_x,ARRAY<T,VECTOR<int,2> >& M1_y,ARRAY<
 //#####################################################################
 // Function Get_Sub_Zone_Lengths
 //#####################################################################
-// LL1 left, LL2 right, LL3 bottom, LL4 top: all (1,m-1) by (1,n-1)
+// LL1 left, LL2 right, LL3 bottom, LL4 top: all (0,m-1) by (0,n-1)
 template<class T> void GRID_LAGRANGE_2D<T>::
 Get_Sub_Zone_Lengths(ARRAY<T,VECTOR<int,2> >& LL1,ARRAY<T,VECTOR<int,2> >& LL2,ARRAY<T,VECTOR<int,2> >& LL3,ARRAY<T,VECTOR<int,2> >& LL4)
 {
-    ARRAY<T,VECTOR<int,2> > C_x(1,m-1,1,n-1),C_y(1,m-1,1,n-1);Get_Centers(C_x,C_y);
-    ARRAY<T,VECTOR<int,2> > M1_x(1,m-1,1,n),M1_y(1,m-1,1,n),M2_x(1,m,1,n-1),M2_y(1,m,1,n-1);Get_Midpoints(M1_x,M1_y,M2_x,M2_y);  
+    ARRAY<T,VECTOR<int,2> > C_x(0,m-1,1,n-1),C_y(0,m-1,1,n-1);Get_Centers(C_x,C_y);
+    ARRAY<T,VECTOR<int,2> > M1_x(0,m-1,1,n),M1_y(0,m-1,1,n),M2_x(0,m,1,n-1),M2_y(0,m,1,n-1);Get_Midpoints(M1_x,M1_y,M2_x,M2_y);  
     
     for(int i=0;i<m-1;i++) for(int j=0;j<n-1;j++){
         VECTOR<T,3> v1(M2_x(i,j),M2_y(i,j),0),v2(C_x(i,j),C_y(i,j),0),v3=v2-v1;LL1(i,j)=v3.Magnitude();
@@ -97,48 +97,48 @@ Get_Sub_Zone_Lengths(ARRAY<T,VECTOR<int,2> >& LL1,ARRAY<T,VECTOR<int,2> >& LL2,A
 //#####################################################################
 // Function Get_Sub_Zone_Areas
 //#####################################################################
-// AA1 lower left, AA2 lower right, AA3 upper left, AA4 upper right: all (1,m-1) by (1,n-1)
+// AA1 lower left, AA2 lower right, AA3 upper left, AA4 upper right: all (0,m-1) by (0,n-1)
 // points listed counter clockwise
 template<class T> void GRID_LAGRANGE_2D<T>::
 Get_Sub_Zone_Areas(ARRAY<T,VECTOR<int,2> >& AA1,ARRAY<T,VECTOR<int,2> >& AA2,ARRAY<T,VECTOR<int,2> >& AA3,ARRAY<T,VECTOR<int,2> >& AA4)
 {
     POLYGON<VECTOR<T,2> > quadrilateral(4);
     
-    ARRAY<T,VECTOR<int,2> > C_x(1,m-1,1,n-1),C_y(1,m-1,1,n-1);Get_Centers(C_x,C_y);
-    ARRAY<T,VECTOR<int,2> > M1_x(1,m-1,1,n),M1_y(1,m-1,1,n),M2_x(1,m,1,n-1),M2_y(1,m,1,n-1);Get_Midpoints(M1_x,M1_y,M2_x,M2_y);
+    ARRAY<T,VECTOR<int,2> > C_x(0,m-1,1,n-1),C_y(0,m-1,1,n-1);Get_Centers(C_x,C_y);
+    ARRAY<T,VECTOR<int,2> > M1_x(0,m-1,1,n),M1_y(0,m-1,1,n),M2_x(0,m,1,n-1),M2_y(0,m,1,n-1);Get_Midpoints(M1_x,M1_y,M2_x,M2_y);
     for(int i=0;i<m-1;i++) for(int j=0;j<n-1;j++){
-        quadrilateral.X(1)=VECTOR<T,2>(x(i,j),y(i,j));
-        quadrilateral.X(2)=VECTOR<T,2>(M1_x(i,j),M1_y(i,j));
-        quadrilateral.X(3)=VECTOR<T,2>(C_x(i,j),C_y(i,j));
-        quadrilateral.X(4)=VECTOR<T,2>(M2_x(i,j),M2_y(i,j));
-        AA1(i,j)=quadrilateral.Area();
+        quadrilateral.X(0)=VECTOR<T,2>(x(i,j),y(i,j));
         quadrilateral.X(1)=VECTOR<T,2>(M1_x(i,j),M1_y(i,j));
-        quadrilateral.X(2)=VECTOR<T,2>(x(i+1,j),y(i+1,j));
-        quadrilateral.X(3)=VECTOR<T,2>(M2_x(i+1,j),M2_y(i+1,j));
-        quadrilateral.X(4)=VECTOR<T,2>(C_x(i,j),C_y(i,j));
-        AA2(i,j)=quadrilateral.Area();
-        quadrilateral.X(1)=VECTOR<T,2>(M2_x(i,j),M2_y(i,j));
         quadrilateral.X(2)=VECTOR<T,2>(C_x(i,j),C_y(i,j));
-        quadrilateral.X(3)=VECTOR<T,2>(M1_x(i,j+1),M1_y(i,j+1));
-        quadrilateral.X(4)=VECTOR<T,2>(x(i,j+1),y(i,j+1));
-        AA3(i,j)=quadrilateral.Area();
-        quadrilateral.X(1)=VECTOR<T,2>(C_x(i,j),C_y(i,j));
+        quadrilateral.X(3)=VECTOR<T,2>(M2_x(i,j),M2_y(i,j));
+        AA1(i,j)=quadrilateral.Area();
+        quadrilateral.X(0)=VECTOR<T,2>(M1_x(i,j),M1_y(i,j));
+        quadrilateral.X(1)=VECTOR<T,2>(x(i+1,j),y(i+1,j));
         quadrilateral.X(2)=VECTOR<T,2>(M2_x(i+1,j),M2_y(i+1,j));
-        quadrilateral.X(3)=VECTOR<T,2>(x(i+1,j+1),y(i+1,j+1));
-        quadrilateral.X(4)=VECTOR<T,2>(M1_x(i,j+1),M1_y(i,j+1));
+        quadrilateral.X(3)=VECTOR<T,2>(C_x(i,j),C_y(i,j));
+        AA2(i,j)=quadrilateral.Area();
+        quadrilateral.X(0)=VECTOR<T,2>(M2_x(i,j),M2_y(i,j));
+        quadrilateral.X(1)=VECTOR<T,2>(C_x(i,j),C_y(i,j));
+        quadrilateral.X(2)=VECTOR<T,2>(M1_x(i,j+1),M1_y(i,j+1));
+        quadrilateral.X(3)=VECTOR<T,2>(x(i,j+1),y(i,j+1));
+        AA3(i,j)=quadrilateral.Area();
+        quadrilateral.X(0)=VECTOR<T,2>(C_x(i,j),C_y(i,j));
+        quadrilateral.X(1)=VECTOR<T,2>(M2_x(i+1,j),M2_y(i+1,j));
+        quadrilateral.X(2)=VECTOR<T,2>(x(i+1,j+1),y(i+1,j+1));
+        quadrilateral.X(3)=VECTOR<T,2>(M1_x(i,j+1),M1_y(i,j+1));
         AA4(i,j)=quadrilateral.Area();}  
 }
 //#####################################################################
 // Function Get_Sub_Zone_Normals
 //#####################################################################
-// NN1 left, NN2 right, NN3 bottom, NN4 top: all (1,m-1) by (1,n-1)
+// NN1 left, NN2 right, NN3 bottom, NN4 top: all (0,m-1) by (0,n-1)
 // NN1 and NN2 point up, NN3 and NN4 point right
 template<class T> void GRID_LAGRANGE_2D<T>::
 Get_Sub_Zone_Normals(ARRAY<T,VECTOR<int,2> >& NN1_x,ARRAY<T,VECTOR<int,2> >& NN1_y,ARRAY<T,VECTOR<int,2> >& NN2_x,ARRAY<T,VECTOR<int,2> >& NN2_y,ARRAY<T,VECTOR<int,2> >& NN3_x,ARRAY<T,VECTOR<int,2> >& NN3_y,ARRAY<T,VECTOR<int,2> >& NN4_x,ARRAY<T,VECTOR<int,2> >& NN4_y)
 {
-    ARRAY<T,VECTOR<int,2> > C_x(1,m-1,1,n-1),C_y(1,m-1,1,n-1);Get_Centers(C_x,C_y);
-    ARRAY<T,VECTOR<int,2> > M1_x(1,m-1,1,n),M1_y(1,m-1,1,n),M2_x(1,m,1,n-1),M2_y(1,m,1,n-1);Get_Midpoints(M1_x,M1_y,M2_x,M2_y);
-    ARRAY<T,VECTOR<int,2> > L1(1,m-1,1,n-1),L2(1,m-1,1,n-1),L3(1,m-1,1,n-1),L4(1,m-1,1,n-1);Get_Sub_Zone_Lengths(L1,L2,L3,L4);
+    ARRAY<T,VECTOR<int,2> > C_x(0,m-1,1,n-1),C_y(0,m-1,1,n-1);Get_Centers(C_x,C_y);
+    ARRAY<T,VECTOR<int,2> > M1_x(0,m-1,1,n),M1_y(0,m-1,1,n),M2_x(0,m,1,n-1),M2_y(0,m,1,n-1);Get_Midpoints(M1_x,M1_y,M2_x,M2_y);
+    ARRAY<T,VECTOR<int,2> > L1(0,m-1,1,n-1),L2(0,m-1,1,n-1),L3(0,m-1,1,n-1),L4(0,m-1,1,n-1);Get_Sub_Zone_Lengths(L1,L2,L3,L4);
     for(int i=0;i<m-1;i++) for(int j=0;j<n-1;j++){
         NN1_x(i,j)=-(C_y(i,j)-M2_y(i,j))/L1(i,j);NN1_y(i,j)=(C_x(i,j)-M2_x(i,j))/L1(i,j);
         NN2_x(i,j)=-(M2_y(i+1,j)-C_y(i,j))/L2(i,j);NN2_y(i,j)=(M2_x(i+1,j)-C_x(i,j))/L2(i,j);
