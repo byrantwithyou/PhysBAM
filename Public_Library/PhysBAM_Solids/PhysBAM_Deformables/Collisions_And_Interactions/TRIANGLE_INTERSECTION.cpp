@@ -19,9 +19,9 @@ Triangle_Intersection_Area(const TRIANGLE_2D<T>& a,const TRIANGLE_2D<T>& b,VECTO
 {
     T A=0;
     for(int i=0;i<3;i++){
-        int in=i%3+1;
+        int in=(i+1)%3;
         for(int j=0;j<3;j++){
-            int jn=j%3+1;
+            int jn=(j+1)%3;
             VECTOR<int,4> I(i,in,j+3,jn+3);
 #if 1
             ORIGIN_AREAS::VOL_DATA<T,2,4> data;
@@ -49,7 +49,7 @@ template<class TV> bool PhysBAM::
 Topology_Aware_Intersection_Test(VECTOR<int,3> a,VECTOR<int,3> b,ARRAY_VIEW<const TV> X)
 {
     typedef typename TV::SCALAR T;
-    bool b1=a.Contains(b(1)),b2=a.Contains(b(2)),b3=a.Contains(b(3));
+    bool b1=a.Contains(b(0)),b2=a.Contains(b(1)),b3=a.Contains(b(2));
     int c=b1+b2+b3;
     if(c==0) return SIMPLEX_INTERACTIONS<T>::Intersection(VECTOR<TV,3>(X.Subset(a)),VECTOR<TV,3>(X.Subset(b)));
     if(c>2) return false;
@@ -66,9 +66,9 @@ Topology_Aware_Intersection_Test(VECTOR<int,3> a,VECTOR<int,3> b,ARRAY_VIEW<cons
     TV C(X(a.x));
     MATRIX<T,2> M1(X(a.y)-C,X(a.z)-C),M2(X(b.y)-C,X(b.z)-C);
     MATRIX<T,2> R=M1.Inverse()*M2;
-    if(R.Column(1).All_Greater(TV()) || R.Column(2).All_Greater(TV())) return true;
+    if(R.Column(0).All_Greater(TV()) || R.Column(1).All_Greater(TV())) return true;
     MATRIX<T,2> S=M2.Inverse()*M1;
-    if(S.Column(1).All_Greater(TV()) || S.Column(2).All_Greater(TV())) return true;
+    if(S.Column(0).All_Greater(TV()) || S.Column(1).All_Greater(TV())) return true;
 	return false;
 }
 //#####################################################################
@@ -78,12 +78,12 @@ template<class TV> bool PhysBAM::
 Topology_Aware_Intersection_Test(VECTOR<int,4> a,VECTOR<int,4> b,ARRAY_VIEW<const TV> X)
 {
     typedef typename TV::SCALAR T;
-    bool b1=a.Contains(b(1)),b2=a.Contains(b(2)),b3=a.Contains(b(3)),b4=a.Contains(b(4));
+    bool b1=a.Contains(b(0)),b2=a.Contains(b(1)),b3=a.Contains(b(2)),b4=a.Contains(b(3));
     int c=b1+b2+b3+b4;
     if(c==0) return SIMPLEX_INTERACTIONS<T>::Intersection(VECTOR<TV,4>(X.Subset(a)),VECTOR<TV,4>(X.Subset(b)));
     if(c>3) return false;
 
-    T a1=TETRAHEDRON<T>::Signed_Volume(X(a(1)),X(a(2)),X(a(3)),X(a(4))),a2=TETRAHEDRON<T>::Signed_Volume(X(b(1)),X(b(2)),X(b(3)),X(b(4)));
+    T a1=TETRAHEDRON<T>::Signed_Volume(X(a(0)),X(a(1)),X(a(2)),X(a(3))),a2=TETRAHEDRON<T>::Signed_Volume(X(b(0)),X(b(1)),X(b(2)),X(b(3)));
     if(!a1 || !a2) return false;
     if(c==3) return (a1>0)!=(a2>0);
 

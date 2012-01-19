@@ -51,18 +51,18 @@ Set_Restlength_From_Material_Coordinates(ARRAY_VIEW<const TV> material_coordinat
             const VECTOR<int,4> spring_nodes=Spring_Nodes(s,element_nodes);
             SPRING_PARAMETER& param=spring_parameters(t)(s);
             param.restlength=param.visual_restlength=
-                PLANE<T>(material_coordinates(spring_nodes[2]),material_coordinates(spring_nodes[3]),material_coordinates(spring_nodes[4])).Signed_Distance(material_coordinates(spring_nodes[1]));
+                PLANE<T>(material_coordinates(spring_nodes[1]),material_coordinates(spring_nodes[2]),material_coordinates(spring_nodes[3])).Signed_Distance(material_coordinates(spring_nodes[0]));
             assert(param.restlength);}
-        for(int s=5;s<=7;s++){
+        for(int s=4;s<7;s++){
             SPRING_PARAMETER& param=spring_parameters(t)(s);
             const VECTOR<int,4> spring_nodes=Spring_Nodes(s,element_nodes);
-            SEGMENT_3D<T> segment_1(material_coordinates(spring_nodes[1]),material_coordinates(spring_nodes[2])),
-                segment_2(material_coordinates(spring_nodes[3]),material_coordinates(spring_nodes[4]));
+            SEGMENT_3D<T> segment_1(material_coordinates(spring_nodes[0]),material_coordinates(spring_nodes[1])),
+                segment_2(material_coordinates(spring_nodes[2]),material_coordinates(spring_nodes[3]));
             VECTOR<T,2> weights;
             TV normal=segment_1.Shortest_Vector_Between_Lines(segment_2,weights);
             param.visual_restlength=param.restlength=normal.Magnitude();}
         int count=0;
-        for(int i=0;i<3;i++) for(int j=i+1;j<=4;j++) edge_restlength_squared(t)(++count)=(material_coordinates(element_nodes[j])-material_coordinates(element_nodes[i])).Magnitude_Squared();}
+        for(int i=0;i<3;i++) for(int j=i+1;j<4;j++) edge_restlength_squared(t)(++count)=(material_coordinates(element_nodes[j])-material_coordinates(element_nodes[i])).Magnitude_Squared();}
 }
 //#####################################################################
 // Function CFL_Strain_Rate
@@ -83,11 +83,11 @@ CFL_Strain_Rate() const
             T length;if(use_rest_state_for_strain_rate) length=minimum_signed_distance;else length=dx;
             if(length-params.restlength>-spring_compression_fraction_threshold*params.restlength) continue;}
         if(min_spring_index<5){
-            T strain_rate=TV::Dot_Product(V(spring_nodes[1])-(weights.x*V(spring_nodes[2])+weights.y*V(spring_nodes[3])+weights.z*V(spring_nodes[4])),minimum_normal)/dx;
+            T strain_rate=TV::Dot_Product(V(spring_nodes[0])-(weights.x*V(spring_nodes[1])+weights.y*V(spring_nodes[2])+weights.z*V(spring_nodes[3])),minimum_normal)/dx;
             max_strain_rate=max(max_strain_rate,abs(strain_rate));}
         else{
-            T strain_rate=TV::Dot_Product((1-weights.x)*V(spring_nodes[1])+weights.x*V(spring_nodes[2])-
-                (1-weights.y)*V(spring_nodes[3])-weights.y*V(spring_nodes[4]),minimum_normal)/dx;
+            T strain_rate=TV::Dot_Product((1-weights.x)*V(spring_nodes[0])+weights.x*V(spring_nodes[1])-
+                (1-weights.y)*V(spring_nodes[2])-weights.y*V(spring_nodes[3]),minimum_normal)/dx;
             max_strain_rate=max(max_strain_rate,abs(strain_rate));}}
     return Robust_Divide(max_strain_per_time_step,max_strain_rate);
 }
@@ -104,14 +104,14 @@ Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> frequency)
         FREQUENCY_DATA element_frequency;
         for(int s=0;s<4;s++){ // point face
             const VECTOR<int,4> spring_nodes=Spring_Nodes(s,element_nodes);const SPRING_PARAMETER& param=spring_parameters(t)(s);
-            T one_over_mass_times_restlength=particles.one_over_effective_mass(spring_nodes[1]);
-            for(int j=2;j<=4;j++) one_over_mass_times_restlength+=(T)one_ninth*particles.one_over_effective_mass(spring_nodes[j]);
+            T one_over_mass_times_restlength=particles.one_over_effective_mass(spring_nodes[0]);
+            for(int j=1;j<4;j++) one_over_mass_times_restlength+=(T)one_ninth*particles.one_over_effective_mass(spring_nodes[j]);
             one_over_mass_times_restlength/=param.restlength;
             T elastic_squared=4*param.youngs_modulus*one_over_mass_times_restlength*one_over_cfl_number_squared;
             T damping=2*param.damping*one_over_mass_times_restlength*one_over_cfl_number;
             if(elastic_squared>element_frequency.elastic_squared) element_frequency.elastic_squared=elastic_squared;
             if(damping>element_frequency.damping) element_frequency.damping=damping;}
-        for(int s=5;s<=7;s++){ // edge edge
+        for(int s=4;s<7;s++){ // edge edge
             const VECTOR<int,4> spring_nodes=Spring_Nodes(s,element_nodes);const SPRING_PARAMETER& param=spring_parameters(t)(s);
             T one_over_mass_times_restlength=(T).25*VECTOR<T,4>(particles.one_over_effective_mass.Subset(spring_nodes)).Sum()/param.restlength; // VECTOR<T,4> dodges a gcc 4.1.1 bug
             T elastic_squared=4*param.youngs_modulus*one_over_mass_times_restlength*one_over_cfl_number_squared;
@@ -170,11 +170,11 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
             
             TV force=spring_param.youngs_modulus/spring_param.restlength*(spring_state.current_length-spring_param.visual_restlength)*spring_state.direction;
             if(spring_state.id<5){
-                F(spring_nodes[1])-=force;
-                F(spring_nodes[2])+=spring_state.weights.x*force;F(spring_nodes[3])+=spring_state.weights.y*force;F(spring_nodes[4])+=spring_state.weights.z*force;}
+                F(spring_nodes[0])-=force;
+                F(spring_nodes[1])+=spring_state.weights.x*force;F(spring_nodes[2])+=spring_state.weights.y*force;F(spring_nodes[3])+=spring_state.weights.z*force;}
             else if(spring_state.id<8){
-                F(spring_nodes[1])-=(1-spring_state.weights.x)*force;F(spring_nodes[2])-=spring_state.weights.x*force;
-                F(spring_nodes[3])+=(1-spring_state.weights.y)*force;F(spring_nodes[4])+=spring_state.weights.y*force;}}}
+                F(spring_nodes[0])-=(1-spring_state.weights.x)*force;F(spring_nodes[1])-=spring_state.weights.x*force;
+                F(spring_nodes[2])+=(1-spring_state.weights.y)*force;F(spring_nodes[3])+=spring_state.weights.y*force;}}}
 }
 //#####################################################################
 // Function Add_Velocity_Dependent_Forces
@@ -188,15 +188,15 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
 
             const VECTOR<int,4>& spring_nodes=spring_state.spring_nodes;
             if(spring_state.id<5){
-                TV force=(spring_state.coefficient*TV::Dot_Product(V(spring_nodes[1])
-                        -spring_state.weights.x*V(spring_nodes[2])-spring_state.weights.y*V(spring_nodes[3])-spring_state.weights.z*V(spring_nodes[4]),spring_state.direction))*spring_state.direction;
-                F(spring_nodes[1])-=force;
-                F(spring_nodes[2])+=spring_state.weights.x*force;F(spring_nodes[3])+=spring_state.weights.y*force;F(spring_nodes[4])+=spring_state.weights.z*force;}
+                TV force=(spring_state.coefficient*TV::Dot_Product(V(spring_nodes[0])
+                        -spring_state.weights.x*V(spring_nodes[1])-spring_state.weights.y*V(spring_nodes[2])-spring_state.weights.z*V(spring_nodes[3]),spring_state.direction))*spring_state.direction;
+                F(spring_nodes[0])-=force;
+                F(spring_nodes[1])+=spring_state.weights.x*force;F(spring_nodes[2])+=spring_state.weights.y*force;F(spring_nodes[3])+=spring_state.weights.z*force;}
             else if(spring_state.id<8){
-                TV force=(spring_state.coefficient*TV::Dot_Product((1-spring_state.weights.x)*V(spring_nodes[1])+spring_state.weights.x*V(spring_nodes[2])
-                        -(1-spring_state.weights.y)*V(spring_nodes[3])-spring_state.weights.y*V(spring_nodes[4]),spring_state.direction))*spring_state.direction;
-                F(spring_nodes[1])-=(1-spring_state.weights.x)*force;F(spring_nodes[2])-=spring_state.weights.x*force;
-                F(spring_nodes[3])+=(1-spring_state.weights.y)*force;F(spring_nodes[4])+=spring_state.weights.y*force;}}}
+                TV force=(spring_state.coefficient*TV::Dot_Product((1-spring_state.weights.x)*V(spring_nodes[0])+spring_state.weights.x*V(spring_nodes[1])
+                        -(1-spring_state.weights.y)*V(spring_nodes[2])-spring_state.weights.y*V(spring_nodes[3]),spring_state.direction))*spring_state.direction;
+                F(spring_nodes[0])-=(1-spring_state.weights.x)*force;F(spring_nodes[1])-=spring_state.weights.x*force;
+                F(spring_nodes[2])+=(1-spring_state.weights.y)*force;F(spring_nodes[3])+=spring_state.weights.y*force;}}}
 }
 //#####################################################################
 // Function Add_Implicit_Velocity_Independent_Forces
@@ -210,15 +210,15 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F
             const SPRING_PARAMETER& spring_param=spring_parameters(t)(spring_state.id);
             const VECTOR<int,4>& spring_nodes=spring_state.spring_nodes;
             if(spring_state.id<5){
-                TV force=(spring_param.youngs_modulus/spring_param.restlength*TV::Dot_Product(V(spring_nodes[1])
-                        -spring_state.weights.x*V(spring_nodes[2])-spring_state.weights.y*V(spring_nodes[3])-spring_state.weights.z*V(spring_nodes[4]),spring_state.direction))*spring_state.direction;
-                F(spring_nodes[1])-=force;
-                F(spring_nodes[2])+=spring_state.weights.x*force;F(spring_nodes[3])+=spring_state.weights.y*force;F(spring_nodes[4])+=spring_state.weights.z*force;}
+                TV force=(spring_param.youngs_modulus/spring_param.restlength*TV::Dot_Product(V(spring_nodes[0])
+                        -spring_state.weights.x*V(spring_nodes[1])-spring_state.weights.y*V(spring_nodes[2])-spring_state.weights.z*V(spring_nodes[3]),spring_state.direction))*spring_state.direction;
+                F(spring_nodes[0])-=force;
+                F(spring_nodes[1])+=spring_state.weights.x*force;F(spring_nodes[2])+=spring_state.weights.y*force;F(spring_nodes[3])+=spring_state.weights.z*force;}
             else if(spring_state.id<8){
-                TV force=(spring_param.youngs_modulus/spring_param.restlength*TV::Dot_Product((1-spring_state.weights.x)*V(spring_nodes[1])+spring_state.weights.x*V(spring_nodes[2])
-                        -(1-spring_state.weights.y)*V(spring_nodes[3])-spring_state.weights.y*V(spring_nodes[4]),spring_state.direction))*spring_state.direction;
-                F(spring_nodes[1])-=(1-spring_state.weights.x)*force;F(spring_nodes[2])-=spring_state.weights.x*force;
-                F(spring_nodes[3])+=(1-spring_state.weights.y)*force;F(spring_nodes[4])+=spring_state.weights.y*force;}}}
+                TV force=(spring_param.youngs_modulus/spring_param.restlength*TV::Dot_Product((1-spring_state.weights.x)*V(spring_nodes[0])+spring_state.weights.x*V(spring_nodes[1])
+                        -(1-spring_state.weights.y)*V(spring_nodes[2])-spring_state.weights.y*V(spring_nodes[3]),spring_state.direction))*spring_state.direction;
+                F(spring_nodes[0])-=(1-spring_state.weights.x)*force;F(spring_nodes[1])-=spring_state.weights.x*force;
+                F(spring_nodes[2])+=(1-spring_state.weights.y)*force;F(spring_nodes[3])+=spring_state.weights.y*force;}}}
 }
 //#####################################################################
 // Function Use_Springs_Compressed_Beyond_Threshold_Only
@@ -240,14 +240,14 @@ Set_Overdamping_Fraction(const T overdamping_fraction) // 1 is critically damped
         for(int s=0;s<4;s++){
             VECTOR<int,4> spring_nodes=Spring_Nodes(s,element_nodes);
             SPRING_PARAMETER& spring_param=spring_parameters(t)(s);
-            T harmonic_mass=Pseudo_Inverse(one_over_effective_mass(spring_nodes[1])
-                +(T)one_ninth*(one_over_effective_mass(spring_nodes[2])+one_over_effective_mass(spring_nodes[3])+one_over_effective_mass(spring_nodes[4])));
+            T harmonic_mass=Pseudo_Inverse(one_over_effective_mass(spring_nodes[0])
+                +(T)one_ninth*(one_over_effective_mass(spring_nodes[1])+one_over_effective_mass(spring_nodes[2])+one_over_effective_mass(spring_nodes[3])));
             spring_param.damping=overdamping_fraction*2*sqrt(spring_param.youngs_modulus*spring_param.restlength*harmonic_mass);}
-        for(int s=5;s<=7;s++){
+        for(int s=4;s<7;s++){
             VECTOR<int,4> spring_nodes=Spring_Nodes(s,element_nodes);
             SPRING_PARAMETER& spring_param=spring_parameters(t)(s);
-            T harmonic_mass=Pseudo_Inverse((T).25*(one_over_effective_mass(spring_nodes[1])+one_over_effective_mass(spring_nodes[2])
-                    +one_over_effective_mass(spring_nodes[3])+one_over_effective_mass(spring_nodes[4])));
+            T harmonic_mass=Pseudo_Inverse((T).25*(one_over_effective_mass(spring_nodes[0])+one_over_effective_mass(spring_nodes[1])
+                    +one_over_effective_mass(spring_nodes[2])+one_over_effective_mass(spring_nodes[3])));
             spring_param.damping=overdamping_fraction*2*sqrt(spring_param.youngs_modulus*spring_param.restlength*harmonic_mass);}}
     Invalidate_CFL();
 }
@@ -278,8 +278,8 @@ Print_Restlength_Statistics()
     for(int s=0;s<spring_parameters.m;s++) for(int k=0;k<spring_count;k++){
             length(spring_count*(s-1)+k)=spring_parameters(s)(k).restlength;visual_restlength(spring_count*(s-1)+k)=spring_parameters(s)(k).visual_restlength;}
     Sort(length);Sort(visual_restlength);
-    int one_percent=(int)(.01*length.m)+1,ten_percent=(int)(.1*length.m)+1,median=(int)(.5*length.m)+1;
-    LOG::cout<<"Tetrahedron Springs - Smallest Restlength = "<<length(1)<<", Visual Restlength = "<<visual_restlength(1)<<std::endl;
+    int one_percent=(int)(.01*length.m),ten_percent=(int)(.1*length.m),median=(int)(.5*length.m);
+    LOG::cout<<"Tetrahedron Springs - Smallest Restlength = "<<length(0)<<", Visual Restlength = "<<visual_restlength(0)<<std::endl;
     LOG::cout<<"Tetrahedron Springs - One Percent Restlength = "<<length(one_percent)<<", Visual Restlength = "<<visual_restlength(one_percent)<<std::endl;
     LOG::cout<<"Tetrahedron Springs - Ten Percent Restlength = "<<length(ten_percent)<<", Visual Restlength = "<<visual_restlength(ten_percent)<<std::endl;
     LOG::cout<<"Tetrahedron Springs - Median Restlength = "<<length(median)<<", Visual Restlength = "<<visual_restlength(median)<<std::endl;
@@ -295,51 +295,51 @@ Find_Shortest_Spring(const int tet,const VECTOR<int,4> element_nodes,VECTOR<int,
     int maximum_cross_squared_index=0;T maximum_cross_squared=(T)-FLT_MAX;TV maximum_cross;
     for(unsigned char h=0;h<4;h++){
         VECTOR<int,4> spring_nodes=Spring_Nodes(h,element_nodes);
-        TV u_cross_v=TV::Cross_Product(X(spring_nodes[3])-X(spring_nodes[2]),X(spring_nodes[4])-X(spring_nodes[2]));
+        TV u_cross_v=TV::Cross_Product(X(spring_nodes[2])-X(spring_nodes[1]),X(spring_nodes[3])-X(spring_nodes[1]));
         T u_cross_v_squared=u_cross_v.Magnitude_Squared();
         if(u_cross_v_squared>maximum_cross_squared){maximum_cross_squared_index=h;maximum_cross_squared=u_cross_v_squared;maximum_cross=u_cross_v;}}
     for(unsigned char h=4;h<7;h++){
         VECTOR<int,4> spring_nodes=Spring_Nodes(h,element_nodes);
-        TV u_cross_v=TV::Cross_Product(X(spring_nodes[2])-X(spring_nodes[1]),X(spring_nodes[4])-X(spring_nodes[3]));
+        TV u_cross_v=TV::Cross_Product(X(spring_nodes[1])-X(spring_nodes[0]),X(spring_nodes[3])-X(spring_nodes[2]));
         T u_cross_v_squared=u_cross_v.Magnitude_Squared();
         if(u_cross_v_squared>maximum_cross_squared){maximum_cross_squared_index=h;maximum_cross_squared=u_cross_v_squared;maximum_cross=u_cross_v;}}
     // check robustness
     TV u,v;
     VECTOR<int,4> spring_nodes=Spring_Nodes(maximum_cross_squared_index,element_nodes);
     VECTOR<int,2> edge_indices=Edge_Indices(maximum_cross_squared_index);
-    if(maximum_cross_squared_index<5){u=X(spring_nodes[3])-X(spring_nodes[2]);v=X(spring_nodes[4])-X(spring_nodes[2]);}
-    else{u=X(spring_nodes[2])-X(spring_nodes[1]);v=X(spring_nodes[4])-X(spring_nodes[3]);}
+    if(maximum_cross_squared_index<5){u=X(spring_nodes[2])-X(spring_nodes[1]);v=X(spring_nodes[3])-X(spring_nodes[1]);}
+    else{u=X(spring_nodes[1])-X(spring_nodes[0]);v=X(spring_nodes[3])-X(spring_nodes[2]);}
     T u_length_squared=u.Magnitude_Squared(),v_length_squared=v.Magnitude_Squared();
-    if(u_length_squared<minimum_edge_compression_squared*edge_restlength_squared(tet)(edge_indices[1])
-        || v_length_squared<minimum_edge_compression_squared*edge_restlength_squared(tet)(edge_indices[2])) return 0;
+    if(u_length_squared<minimum_edge_compression_squared*edge_restlength_squared(tet)(edge_indices[0])
+        || v_length_squared<minimum_edge_compression_squared*edge_restlength_squared(tet)(edge_indices[1])) return 0;
     if(abs(maximum_cross_squared)<minimum_sin*u_length_squared*v_length_squared){
         VECTOR<int,2> edge_index;T max_distance_squared=0;
-        for(int i=0;i<3;i++) for(int j=i+1;j<=4;j++){
+        for(int i=0;i<3;i++) for(int j=i+1;j<4;j++){
             T distance_squared=(X(element_nodes[i])-X(element_nodes[j])).Magnitude_Squared();
             if(distance_squared>max_distance_squared){edge_index=VECTOR<int,2>(i,j);max_distance_squared=distance_squared;}}
-        VECTOR<int,2> other_nodes=element_nodes.Remove_Index(edge_index[2]).Remove_Index(edge_index[1]);
-        if((X(element_nodes[edge_index[1]])-X(other_nodes[2])).Magnitude_Squared()<(X(element_nodes[edge_index[1]])-X(other_nodes[1])).Magnitude_Squared())
+        VECTOR<int,2> other_nodes=element_nodes.Remove_Index(edge_index[1]).Remove_Index(edge_index[0]);
+        if((X(element_nodes[edge_index[0]])-X(other_nodes[1])).Magnitude_Squared()<(X(element_nodes[edge_index[0]])-X(other_nodes[0])).Magnitude_Squared())
             other_nodes=other_nodes.Reversed();
-        VECTOR<int,2> edge1(element_nodes[edge_index[1]],other_nodes[2]),edge2(other_nodes[1],element_nodes[edge_index[2]]);
+        VECTOR<int,2> edge1(element_nodes[edge_index[0]],other_nodes[1]),edge2(other_nodes[0],element_nodes[edge_index[1]]);
         bool found=false;
-        for(maximum_cross_squared_index=5;maximum_cross_squared_index<=7;maximum_cross_squared_index++){
+        for(maximum_cross_squared_index=4;maximum_cross_squared_index<7;maximum_cross_squared_index++){
             spring_nodes=Spring_Nodes(maximum_cross_squared_index,element_nodes);
             if(spring_nodes.Slice<1,2>()==edge1 || spring_nodes.Slice<3,4>()==edge1 || spring_nodes.Slice<1,2>().Reversed()==edge1 || spring_nodes.Slice<3,4>().Reversed()==edge1){
                 found=true;break;}}
         PHYSBAM_ASSERT(found);
-        minimum_normal=(X(edge1[1])-X(edge2[2])).Orthogonal_Vector().Normalized();
+        minimum_normal=(X(edge1[0])-X(edge2[1])).Orthogonal_Vector().Normalized();
         minimum_signed_distance=0;
-        TV midpoint=(T).5*(X(edge1[2])+X(edge2[1]));
-        weights=VECTOR<T,3>(SEGMENT_3D<T>(X(spring_nodes[1]),X(spring_nodes[2])).Interpolation_Fraction(midpoint),
-            SEGMENT_3D<T>(X(spring_nodes[3]),X(spring_nodes[4])).Interpolation_Fraction(midpoint),0);}
+        TV midpoint=(T).5*(X(edge1[1])+X(edge2[0]));
+        weights=VECTOR<T,3>(SEGMENT_3D<T>(X(spring_nodes[0]),X(spring_nodes[1])).Interpolation_Fraction(midpoint),
+            SEGMENT_3D<T>(X(spring_nodes[2]),X(spring_nodes[3])).Interpolation_Fraction(midpoint),0);}
     else{
         minimum_normal=maximum_cross.Normalized();
-        minimum_signed_distance=TV::Dot_Product(minimum_normal,X(spring_nodes[1])-X(spring_nodes[3]));
+        minimum_signed_distance=TV::Dot_Product(minimum_normal,X(spring_nodes[0])-X(spring_nodes[2]));
         if(maximum_cross_squared_index<5){
-            weights=TRIANGLE_3D<T>::Clamped_Barycentric_Coordinates(X(spring_nodes[1]),X(spring_nodes[2]),X(spring_nodes[3]),X(spring_nodes[4]));}
+            weights=TRIANGLE_3D<T>::Clamped_Barycentric_Coordinates(X(spring_nodes[0]),X(spring_nodes[1]),X(spring_nodes[2]),X(spring_nodes[3]));}
         else if(maximum_cross_squared_index<8){
             VECTOR<T,2> dummy_weights;
-            SEGMENT_3D<T>(X(spring_nodes[1]),X(spring_nodes[2])).Shortest_Vector_Between_Segments(SEGMENT_3D<T>(X(spring_nodes[3]),X(spring_nodes[4])),dummy_weights);
+            SEGMENT_3D<T>(X(spring_nodes[0]),X(spring_nodes[1])).Shortest_Vector_Between_Segments(SEGMENT_3D<T>(X(spring_nodes[2]),X(spring_nodes[3])),dummy_weights);
             weights=dummy_weights.Append(0);}}
     // finish
     spring_nodes_output=spring_nodes;
@@ -349,17 +349,17 @@ template<class T> VECTOR<int,4> LINEAR_TET_SPRINGS<T>::
 Spring_Nodes(unsigned char pair_id,const VECTOR<int,4>& n)
 {
     switch(pair_id){
-        case 1: return VECTOR<int,4>(n[1],n[2],n[4],n[3]);case 2: return VECTOR<int,4>(n[2],n[1],n[3],n[4]); // point face
-        case 3: return VECTOR<int,4>(n[3],n[1],n[4],n[2]);case 4: return VECTOR<int,4>(n[4],n[1],n[2],n[3]); // point face
-        case 5: return VECTOR<int,4>(n[1],n[2],n[3],n[4]);case 6: return VECTOR<int,4>(n[2],n[3],n[1],n[4]);case 7: return VECTOR<int,4>(n[1],n[3],n[4],n[2]); // edge edge
+        case 0: return VECTOR<int,4>(n[0],n[1],n[3],n[2]);case 1: return VECTOR<int,4>(n[1],n[0],n[2],n[3]); // point face
+        case 2: return VECTOR<int,4>(n[2],n[0],n[3],n[1]);case 3: return VECTOR<int,4>(n[3],n[0],n[1],n[2]); // point face
+        case 4: return VECTOR<int,4>(n[0],n[1],n[2],n[3]);case 5: return VECTOR<int,4>(n[1],n[2],n[0],n[3]);case 6: return VECTOR<int,4>(n[0],n[2],n[3],n[1]); // edge edge
         default: PHYSBAM_FATAL_ERROR();}
 }
 template<class T> VECTOR<int,2> LINEAR_TET_SPRINGS<T>::
 Edge_Indices(unsigned char pair_id)
 {
     switch(pair_id){
-        case 1: return VECTOR<int,2>(5,4);case 2: return VECTOR<int,2>(2,3);case 3: return VECTOR<int,2>(3,1);case 4: return VECTOR<int,2>(1,2);
-        case 5: return VECTOR<int,2>(1,6);case 6: return VECTOR<int,2>(4,3);case 7:return VECTOR<int,2>(2,5);
+        case 0: return VECTOR<int,2>(5,4);case 1: return VECTOR<int,2>(2,3);case 2: return VECTOR<int,2>(3,1);case 3: return VECTOR<int,2>(1,2);
+        case 4: return VECTOR<int,2>(1,6);case 5: return VECTOR<int,2>(4,3);case 6:return VECTOR<int,2>(2,5);
         default: PHYSBAM_FATAL_ERROR();}
 }
 template<class T> LINEAR_TET_SPRINGS<T>* PhysBAM::
