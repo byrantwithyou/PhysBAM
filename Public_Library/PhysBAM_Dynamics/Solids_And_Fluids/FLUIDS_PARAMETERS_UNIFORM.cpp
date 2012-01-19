@@ -543,7 +543,7 @@ Combustion(const T dt,const T time)
     for(CELL_ITERATOR iterator(*grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         T fuel_fraction=soot_fuel_container.density(cell_index);
         T cell_temperature=euler->Get_Temperature(cell_index);
-        T rho=euler->U(cell_index)(1);
+        T rho=euler->U(cell_index)(0);
         T fuel_burnt=0;
         if(cell_temperature>burn_temperature_threshold && fuel_fraction>0){
             if(rho*fuel_fraction>burn_rate*dt) fuel_burnt=burn_rate*dt;
@@ -554,7 +554,7 @@ Combustion(const T dt,const T time)
 
             soot_fuel_container.density(cell_index)-=fuel_fraction_burnt;
             soot_container.density(cell_index)+=fuel_fraction_burnt;
-            euler->U(cell_index)(T_GRID::dimension+2)+=energy_generated;}}
+            euler->U(cell_index)(T_GRID::dimension+1)+=energy_generated;}}
     euler->Invalidate_Ghost_Cells();
     PHYSBAM_DEBUG_WRITE_SUBSTEP("After Combustion",0,1);
 }

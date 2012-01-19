@@ -52,10 +52,10 @@ public:
     {Clean_Memory();delete free_segment_midpoints;}
 
     bool Leaf(const int level,const int tri) const
-    {return !(*children(level))(tri)(1);}
+    {return !(*children(level))(tri)(0);}
 
     bool Regularly_Refined(const int level,const int tri) const
-    {return (*children(level))(tri)(4) != 0;}
+    {return (*children(level))(tri)(3) != 0;}
 
     bool Red(const int level,const int tri) const
     {return level == 1 || Regularly_Refined(level-1,(*parent(level))(tri));}

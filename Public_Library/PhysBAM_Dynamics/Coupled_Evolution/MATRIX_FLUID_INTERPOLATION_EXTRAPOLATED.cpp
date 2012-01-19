@@ -65,13 +65,13 @@ Compute(int ghost_cells)
         T face_X=index_map.grid.Axis_X_Face(face)(face.axis),X=entries(i).X(face.axis),cell_X=index_map.grid.X(cell)(face.axis);
         T alpha=(X-face_X)*sign/index_map.grid.dX(face.axis);
         PHYSBAM_ASSERT(index_map.face_indices(face));
-        stencils(i).s(face.axis)(1)=PAIR<int,T>(index_map.face_indices(face),1-alpha);
+        stencils(i).s(face.axis)(0)=PAIR<int,T>(index_map.face_indices(face),1-alpha);
         face.index(face.axis)+=sign;
         int face_index=index_map.face_indices(face);
         PHYSBAM_ASSERT(face_index);
-        stencils(i).s(face.axis)(2)=PAIR<int,T>(face_index,alpha);
-        stencils(i).s(face.axis)(3)=PAIR<int,T>(face_index,0);
-        stencils(i).s(face.axis)(4)=PAIR<int,T>(face_index,0);        
+        stencils(i).s(face.axis)(1)=PAIR<int,T>(face_index,alpha);
+        stencils(i).s(face.axis)(2)=PAIR<int,T>(face_index,0);
+        stencils(i).s(face.axis)(3)=PAIR<int,T>(face_index,0);        
 
         alpha=(X-cell_X)*sign/index_map.grid.dX(face.axis);
         T ia[2]={(T)(0.5*(1-alpha)),(T)(0.5*alpha)};

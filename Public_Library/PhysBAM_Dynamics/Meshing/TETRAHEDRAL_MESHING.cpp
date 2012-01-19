@@ -101,10 +101,10 @@ Initialize_Optimization(const bool verbose)
     mesh.Initialize_Boundary_Nodes(); // assumes that Initialize_Boundary_Nodes will use boundary_mesh
     map_from_nodes_to_boundary_list.Resize(mesh.number_nodes);
     for(int i=0;i<mesh.boundary_nodes->m;i++) map_from_nodes_to_boundary_list((*mesh.boundary_nodes)(i))=i;
-    for(int i=0;i<layers.m;i++) delete layers(i);layers.Resize(1);layers(1)=mesh.boundary_nodes;
+    for(int i=0;i<layers.m;i++) delete layers(i);layers.Resize(1);layers(0)=mesh.boundary_nodes;
     mesh.boundary_nodes=0; // we don't need it hanging off the mesh object any more
-    if(verbose) LOG::cout<<"boundary layer has "<<layers(1)->m<<" nodes"<<std::endl;
-    ARRAY<bool,VECTOR<int,1> > marked(1,mesh.number_nodes);for(int i=0;i<layers(1)->m;i++) marked((*layers(1))(i))=true;
+    if(verbose) LOG::cout<<"boundary layer has "<<layers(0)->m<<" nodes"<<std::endl;
+    ARRAY<bool,VECTOR<int,1> > marked(0,mesh.number_nodes);for(int i=0;i<layers(0)->m;i++) marked((*layers(0))(i))=true;
     for(int l=2;;l++){
         layers.Append(new ARRAY<int>);
         for(int i=0;i<layers(l-1)->m;i++){
@@ -114,7 +114,7 @@ Initialize_Optimization(const bool verbose)
                 if(!marked(b)){layers(l)->Append(b);marked(b)=true;}}}
         if(layers(l)->m==0){delete layers(l);layers.Remove_End();break;}
         if(verbose) LOG::cout<<"layer "<<l<<" has "<<layers(l)->m<<" nodes"<<std::endl;}
-    boundary_mesh_normals.Resize(layers(1)->m);
+    boundary_mesh_normals.Resize(layers(0)->m);
     if(replace_green_refinement_with_embedded_t_junctions)
         for(int i=0;i<layers.m;i++) for(int j=layers(i)->m;j>=1;j--) if(!(*mesh.incident_elements)((*layers(i))(j)).m) layers(i)->Remove_Index_Lazy(j);
     Compute_Boundary_Mesh_Normals();
@@ -132,7 +132,7 @@ Create_Final_Mesh_With_Optimization(const int number_of_initial_steps,const int 
         Write_Output_Files(++frame);}
     for(int i=0;i<number_of_final_steps;i++){
         if(verbose) LOG::cout<<"Working on iteration "<<i<<" of "<<number_of_final_steps<<" (full step towards boundary)"<<std::endl;
-        Optimization_Sweep(1,verbose);
+        Optimization_Sweep(0,verbose);
         Write_Output_Files(++frame);}
 }
 //#####################################################################
@@ -157,7 +157,7 @@ Optimize_Boundary_Layer(const T compression_fraction,const bool reverse)
 {
     Check_For_Interrupts();
     PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
-    ARRAY<TV> directions(5);ARRAY<int>& nodes=*layers(1);
+    ARRAY<TV> directions(4);ARRAY<int>& nodes=*layers(0);
     for(int i=0;i<nodes.m;i++){
         particles.X(nodes(i))-=compression_fraction*(*implicit_surface)(particles.X(nodes(i)))*boundary_mesh_normals(map_from_nodes_to_boundary_list(nodes(i)));
         Update_Dependent_Nodes(nodes(i));}
@@ -165,14 +165,14 @@ Optimize_Boundary_Layer(const T compression_fraction,const bool reverse)
     for(int i=0;i<nodes.m;i++){
         int p=nodes(reverse?nodes.m+1-i:i);
         TV normal=boundary_mesh_normals(map_from_nodes_to_boundary_list(p));
-        if(abs(normal.x)>abs(normal.z) || abs(normal.y)>abs(normal.z)) directions(1)=TV(normal.y,-normal.x,0);
-        else directions(1)=TV(normal.z,0,-normal.x);
-        directions(1).Normalize();
-        TV b=TV::Cross_Product(normal,directions(1));
-        directions(2)=(T).30901699437494742410229341718282*directions(1)+(T).95105651629515357211643933337938*b;
-        directions(3)=(T)-.80901699437494742410229341718282*directions(1)+(T).58778525229247312916870595463907*b;
-        directions(4)=(T)-.80901699437494742410229341718282*directions(1)-(T).58778525229247312916870595463907*b;
-        directions(5)=(T).30901699437494742410229341718282*directions(1)-(T).95105651629515357211643933337938*b;
+        if(abs(normal.x)>abs(normal.z) || abs(normal.y)>abs(normal.z)) directions(0)=TV(normal.y,-normal.x,0);
+        else directions(0)=TV(normal.z,0,-normal.x);
+        directions(0).Normalize();
+        TV b=TV::Cross_Product(normal,directions(0));
+        directions(1)=(T).30901699437494742410229341718282*directions(0)+(T).95105651629515357211643933337938*b;
+        directions(2)=(T)-.80901699437494742410229341718282*directions(0)+(T).58778525229247312916870595463907*b;
+        directions(3)=(T)-.80901699437494742410229341718282*directions(0)-(T).58778525229247312916870595463907*b;
+        directions(4)=(T).30901699437494742410229341718282*directions(0)-(T).95105651629515357211643933337938*b;
         Search_For_Best_Position(p,directions,true);}
 }
 //#####################################################################
@@ -183,13 +183,13 @@ Optimize_Interior_Layer(const int layer,const bool reverse)
 {
     Check_For_Interrupts();
     ARRAY<TV> directions(7);
-    directions(1)=TV(1,0,0);
-    directions(2)=TV((T).21884275609895,(T).97576013861144,0);
-    directions(3)=TV((T).21884282342443,-(T).59716303919821,-(T).77168913640869);
-    directions(4)=TV(-(T).05406424975064,(T).23640431413810,(T).97014950247670);
-    directions(5)=TV(-(T).90174918437566,-(T).34565929710323,(T).25955357597988);
-    directions(6)=TV((T).21863854196520,-(T).86642677947325,(T).44888954518784);
-    directions(7)=TV(-(T).58820534751966,(T).35620151622547,-(T).72604059734147);
+    directions(0)=TV(1,0,0);
+    directions(1)=TV((T).21884275609895,(T).97576013861144,0);
+    directions(2)=TV((T).21884282342443,-(T).59716303919821,-(T).77168913640869);
+    directions(3)=TV(-(T).05406424975064,(T).23640431413810,(T).97014950247670);
+    directions(4)=TV(-(T).90174918437566,-(T).34565929710323,(T).25955357597988);
+    directions(5)=TV((T).21863854196520,-(T).86642677947325,(T).44888954518784);
+    directions(6)=TV(-(T).58820534751966,(T).35620151622547,-(T).72604059734147);
     for(int i=0;i<layers(layer)->m;i++){int j;if(reverse) j=(*layers(layer))(layers(layer)->m+1-i);else j=(*layers(layer))(i);Search_For_Best_Position(j,directions);}
 }
 //#####################################################################
@@ -514,8 +514,8 @@ Create_Initial_Mesh(const T bcc_lattice_cell_size,const bool use_adaptive_refine
         for(int p=0;p<particles.array_collection->Size();p++) if(particle_to_t_junction(p)){
             ARRAY<int> parents;ARRAY<T> weights;
             int t_junction=particle_to_t_junction(p);
+            parents.Append(t_junction_parents(t_junction)(0));weights.Append((T).5);
             parents.Append(t_junction_parents(t_junction)(1));weights.Append((T).5);
-            parents.Append(t_junction_parents(t_junction)(2));weights.Append((T).5);
             for(int i=0;i<parents.m;){
                 if(!particle_to_t_junction(parents(i))){i++;continue;}
                 T old_weight=weights(i);t_junction=particle_to_t_junction(parents(i));
@@ -525,10 +525,10 @@ Create_Initial_Mesh(const T bcc_lattice_cell_size,const bool use_adaptive_refine
                     int index=parents.Find(new_parent);if(!index){index=parents.Append(new_parent);weights.Append((T)0);}
                     weights(index)+=(T).5*old_weight;}}
             switch(parents.m){
-              case 2: binding_list.Add_Binding(new LINEAR_BINDING<TV,2>(particles,p,VECTOR<int,2>(parents(1),parents(2)),VECTOR<T,2>(weights(1),weights(2))));break;
-              case 3: binding_list.Add_Binding(new LINEAR_BINDING<TV,3>(particles,p,VECTOR<int,3>(parents(1),parents(2),parents(3)),TV(weights(1),weights(2),weights(3))));break;
-              case 4: binding_list.Add_Binding(new LINEAR_BINDING<TV,4>(particles,p,VECTOR<int,4>(parents(1),parents(2),parents(3),parents(4)),
-                VECTOR<T,4>(weights(1),weights(2),weights(3),weights(4))));break;
+              case 2: binding_list.Add_Binding(new LINEAR_BINDING<TV,2>(particles,p,VECTOR<int,2>(parents(0),parents(1)),VECTOR<T,2>(weights(0),weights(1))));break;
+              case 3: binding_list.Add_Binding(new LINEAR_BINDING<TV,3>(particles,p,VECTOR<int,3>(parents(0),parents(1),parents(2)),TV(weights(0),weights(1),weights(2))));break;
+              case 4: binding_list.Add_Binding(new LINEAR_BINDING<TV,4>(particles,p,VECTOR<int,4>(parents(0),parents(1),parents(2),parents(3)),
+                VECTOR<T,4>(weights(0),weights(1),weights(2),weights(3))));break;
               default: PHYSBAM_FATAL_ERROR();}}
         ARRAY<int> condensation_mapping;
         Discard_Valence_Zero_Particles_And_Renumber(particles,mesh,*boundary_mesh,condensation_mapping);
@@ -582,9 +582,9 @@ Tetrahedron_Refinement_Criteria(const int index) const
             if(phi>=0) seen_positive=true;if(phi<=0) seen_negative=true;
             if(!seen_big_error){ // figure out linear interpolation of phi through the corners of the tet
                 MATRIX<T,4> A(1,1,1,1,xi.x,xj.x,xk.x,xl.x,xi.y,xj.y,xk.y,xl.y,xi.z,xj.z,xk.z,xl.z);A.Invert();
-                T phi0=A(1,1)*phi_i+A(1,2)*phi_j+A(1,3)*phi_k+A(1,4)*phi_l;
-                TV average_normal(A(2,1)*phi_i+A(2,2)*phi_j+A(2,3)*phi_k+A(2,4)*phi_l,A(3,1)*phi_i+A(3,2)*phi_j+A(3,3)*phi_k+A(3,4)*phi_l,
-                                            A(4,1)*phi_i+A(4,2)*phi_j+A(4,3)*phi_k+A(4,4)*phi_l);
+                T phi0=A(0,0)*phi_i+A(0,1)*phi_j+A(0,2)*phi_k+A(0,3)*phi_l;
+                TV average_normal(A(1,0)*phi_i+A(1,1)*phi_j+A(1,2)*phi_k+A(1,3)*phi_l,A(2,0)*phi_i+A(2,1)*phi_j+A(2,2)*phi_k+A(2,3)*phi_l,
+                                            A(3,0)*phi_i+A(3,1)*phi_j+A(3,2)*phi_k+A(3,3)*phi_l);
                 if(abs(phi-(phi0+TV::Dot_Product(average_normal,x)))>interpolation_error_subdivision_threshold*max_length) seen_big_error=true;}
             if((seen_big_error || max_length>maximum_boundary_edge_length) && seen_positive && seen_negative) return true;}}}}
 

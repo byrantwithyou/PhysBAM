@@ -41,10 +41,10 @@ public:
 
 
     bool Leaf(const int level,const int tet) const
-    {return !(*children(level))(tet)(1);}
+    {return !(*children(level))(tet)(0);}
 
     bool Regularly_Refined(const int level,const int tet) const
-    {return (*children(level))(tet)(8) != 0;}
+    {return (*children(level))(tet)(7) != 0;}
 
     bool Red(const int level,const int tet) const
     {return level == 1 || Regularly_Refined(level-1,(*parent(level))(tet));}

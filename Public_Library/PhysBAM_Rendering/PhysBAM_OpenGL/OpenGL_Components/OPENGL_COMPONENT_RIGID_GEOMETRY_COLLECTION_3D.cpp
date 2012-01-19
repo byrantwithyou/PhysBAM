@@ -856,7 +856,7 @@ Turn_Off_Individual_Smooth_Shading_Prompt()
     if(!OPENGL_WORLD::Singleton()->prompt_response.empty()){
         int object_id;
         STRING_UTILITIES::String_To_Value(OPENGL_WORLD::Singleton()->prompt_response,object_id);
-        if((unsigned)object_id<rigid_geometry_collection->particles.array_collection->Size() && opengl_triangulated_surface(object_id))
+        if((unsigned)object_id<(unsigned)rigid_geometry_collection->particles.array_collection->Size() && opengl_triangulated_surface(object_id))
             opengl_triangulated_surface(object_id)->Turn_Smooth_Shading_Off();}
 }
 //#####################################################################
@@ -879,7 +879,7 @@ Manipulate_Individual_Body_Prompt()
         std::istringstream sstream(OPENGL_WORLD::Singleton()->prompt_response);
         sstream>>command;
         sstream>>object_id;
-        if((unsigned)object_id<rigid_geometry_collection->particles.array_collection->Size() && opengl_triangulated_surface(object_id)){
+        if((unsigned)object_id<(unsigned)rigid_geometry_collection->particles.array_collection->Size() && opengl_triangulated_surface(object_id)){
             if(command=="s"){
                 VECTOR<T,3> scale;
                 sstream>>scale;

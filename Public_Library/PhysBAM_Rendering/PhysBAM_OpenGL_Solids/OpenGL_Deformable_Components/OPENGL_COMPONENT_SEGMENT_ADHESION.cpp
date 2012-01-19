@@ -93,8 +93,8 @@ Reinitialize(bool force)
         for(HASHTABLE_ITERATOR<VECTOR<int,2>,const typename SEGMENT_ADHESION<TV>::SPRING_STATE> iterator(springs);iterator.Valid();iterator.Next()){
             const typename SEGMENT_ADHESION<TV>::SPRING_STATE& state=iterator.Data();
             int i=particles.array_collection->Add_Element(),j=particles.array_collection->Add_Element();
-            particles.X(i)=(1-state.weights[1])*real_particles.X(state.nodes[1])+state.weights[1]*real_particles.X(state.nodes[2]);
-            particles.X(j)=(1-state.weights[2])*real_particles.X(state.nodes[3])+state.weights[2]*real_particles.X(state.nodes[4]);
+            particles.X(i)=(1-state.weights[0])*real_particles.X(state.nodes[0])+state.weights[0]*real_particles.X(state.nodes[1]);
+            particles.X(j)=(1-state.weights[1])*real_particles.X(state.nodes[2])+state.weights[1]*real_particles.X(state.nodes[3]);
             segment_mesh.elements.Append(VECTOR<int,2>(i,j));
             pairs++;
         }

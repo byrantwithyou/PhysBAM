@@ -53,64 +53,64 @@ protected:
 
 public:
     static VECTOR<T,1> Get_Velocity(const ARRAYS_ND_BASE<VECTOR<VECTOR<T,3>,1> >& U,const VECTOR<int,1>& cell)
-    {return VECTOR<T,1>(U(cell)(2))/U(cell)(1);}
+    {return VECTOR<T,1>(U(cell)(1))/U(cell)(0);}
 
     static VECTOR<T,2> Get_Velocity(const ARRAYS_ND_BASE<VECTOR<VECTOR<T,4>,2> >& U,const VECTOR<int,2>& cell)
-    {return VECTOR<T,2>(U(cell)(2),U(cell)(3))/U(cell)(1);}
+    {return VECTOR<T,2>(U(cell)(1),U(cell)(2))/U(cell)(0);}
 
     static VECTOR<T,3> Get_Velocity(const ARRAYS_ND_BASE<VECTOR<VECTOR<T,5>,3> >& U,const VECTOR<int,3>& cell)
-    {return VECTOR<T,3>(U(cell)(2),U(cell)(3),U(cell)(4))/U(cell)(1);}
+    {return VECTOR<T,3>(U(cell)(1),U(cell)(2),U(cell)(3))/U(cell)(0);}
 
     static VECTOR<T,1> Get_Velocity(const VECTOR<T,3>& u)
-    {return VECTOR<T,1>(u(2))/u(1);}
+    {return VECTOR<T,1>(u(1))/u(0);}
 
     static VECTOR<T,2> Get_Velocity(const VECTOR<T,4>& u)
-    {return VECTOR<T,2>(u(2),u(3))/u(1);}
+    {return VECTOR<T,2>(u(1),u(2))/u(0);}
 
     static VECTOR<T,3> Get_Velocity(const VECTOR<T,5>& u)
-    {return VECTOR<T,3>(u(2),u(3),u(4))/u(1);}
+    {return VECTOR<T,3>(u(1),u(2),u(3))/u(0);}
 
     static T Get_Velocity_Component(const T_ARRAYS_DIMENSION_BASE& U,const TV_INT& cell,const int axis)
-    {assert(axis>=1 && axis<=T_GRID::dimension);return U(cell)(axis+1)/U(cell)(1);}
+    {assert((unsigned)axis<T_GRID::dimension);return U(cell)(axis+1)/U(cell)(0);}
 
     static T Get_Velocity_Component(const TV_DIMENSION& U,const int axis)
-    {assert(axis>=1 && axis<=T_GRID::dimension);return U(axis+1)/U(1);}
+    {assert((unsigned)axis<T_GRID::dimension);return U(axis+1)/U(0);}
 
     static T Get_Density(const T_ARRAYS_DIMENSION_BASE& U,const TV_INT& cell)
-    {return U(cell)(1);}
+    {return U(cell)(0);}
 
     static T Get_Total_Energy(const T_ARRAYS_DIMENSION_BASE& U,const TV_INT& cell)
-    {return U(cell)(T_GRID::dimension+2);}
+    {return U(cell)(T_GRID::dimension+1);}
 
     static void Set_Euler_State_From_rho_velocity_And_internal_energy(T_ARRAYS_DIMENSION_BASE& U,const TV_INT& cell,const T rho,const TV& velocity,const T e)
-    {U(cell)(1)=rho;
+    {U(cell)(0)=rho;
     for(int k=0;k<T_GRID::dimension;k++) U(cell)(k+1)=rho*velocity[k];
-    U(cell)(T_GRID::dimension+2)=rho*(e+velocity.Magnitude_Squared()*(T).5);}
+    U(cell)(T_GRID::dimension+1)=rho*(e+velocity.Magnitude_Squared()*(T).5);}
 
     static VECTOR<T,T_GRID::dimension+2> Get_Euler_State_From_rho_velocity_And_internal_energy(const T rho,const TV& velocity,const T e)
     {VECTOR<T,T_GRID::dimension+2> U;
-     U(1)=rho;
+     U(0)=rho;
      for(int k=0;k<T_GRID::dimension;k++) U(k+1)=rho*velocity[k];
-     U(T_GRID::dimension+2)=rho*(e+(T).5*velocity.Magnitude_Squared());
+     U(T_GRID::dimension+1)=rho*(e+(T).5*velocity.Magnitude_Squared());
      return U;}
 
     static T e(const ARRAYS_ND_BASE<VECTOR<VECTOR<T,3>,1> >& U,const VECTOR<int,1>& cell)
-    {return e(U(cell)(1),U(cell)(2),U(cell)(3));}
+    {return e(U(cell)(0),U(cell)(1),U(cell)(2));}
 
     static T e(const ARRAYS_ND_BASE<VECTOR<VECTOR<T,4>,2> >& U,const VECTOR<int,2>& cell)
-    {return e(U(cell)(1),U(cell)(2),U(cell)(3),U(cell)(4));}
+    {return e(U(cell)(0),U(cell)(1),U(cell)(2),U(cell)(3));}
 
     static T e(const ARRAYS_ND_BASE<VECTOR<VECTOR<T,5>,3> >& U,const VECTOR<int,3>& cell)
-    {return e(U(cell)(1),U(cell)(2),U(cell)(3),U(cell)(4),U(cell)(5));}
+    {return e(U(cell)(0),U(cell)(1),U(cell)(2),U(cell)(3),U(cell)(4));}
 
     static T e(const VECTOR<T,3>& u)
-    {return e(u(1),u(2),u(3));}
+    {return e(u(0),u(1),u(2));}
 
     static T e(const VECTOR<T,4>& u)
-    {return e(u(1),u(2),u(3),u(4));}
+    {return e(u(0),u(1),u(2),u(3));}
 
     static T e(const VECTOR<T,5>& u)
-    {return e(u(1),u(2),u(3),u(4),u(5));}
+    {return e(u(0),u(1),u(2),u(3),u(4));}
 
     static T e(const T rho,const T rho_u,const T E)
     {return E/rho-sqr(rho_u/rho)/2;}
@@ -122,19 +122,19 @@ public:
     {return E/rho-(sqr(rho_u/rho)+sqr(rho_v/rho)+sqr(rho_w/rho))/2;}
 
     static T p(EOS<T>* eos_input,const TV_DIMENSION& u)
-    {return eos_input->p(u(1),e(u));}
+    {return eos_input->p(u(0),e(u));}
 
     static T enthalpy(const EOS<T>& eos,const VECTOR<T,T_GRID::dimension+2>& u)
-    {T internal_energy=e(u);T rho=u(1);T p=eos.p(rho,internal_energy);return internal_energy+p/rho;}
+    {T internal_energy=e(u);T rho=u(0);T p=eos.p(rho,internal_energy);return internal_energy+p/rho;}
 
     T enthalpy(const VECTOR<T,T_GRID::dimension+2>& u) const
-    {T internal_energy=e(u);T rho=u(1);T p=eos->p(rho,internal_energy);return internal_energy+p/rho;}
+    {T internal_energy=e(u);T rho=u(0);T p=eos->p(rho,internal_energy);return internal_energy+p/rho;}
 
     void Set_Custom_Boundary(BOUNDARY_UNIFORM<T_GRID,TV_DIMENSION>& boundary_input)
     {boundary=&boundary_input;
     for(int axis=0;axis<T_GRID::dimension;axis++){
-        open_boundaries(2*axis-1)=boundary->Constant_Extrapolation(2*axis-1);
-        open_boundaries(2*axis)=boundary->Constant_Extrapolation(2*axis);}}
+        open_boundaries(2*axis)=boundary->Constant_Extrapolation(2*axis);
+        open_boundaries(2*axis+1)=boundary->Constant_Extrapolation(2*axis+1);}}
     
     void Set_Custom_Conservation(CONSERVATION<T_GRID,d>& conservation_input)
     {conservation=&conservation_input;
@@ -148,7 +148,7 @@ public:
     {max_time_step=max_time_step_input;}
 
     void Set_Gravity(const T gravity_input=9.8)
-    {gravity=gravity_input;downward_direction=T_GRID::dimension>1?-TV::Axis_Vector(2):TV();}
+    {gravity=gravity_input;downward_direction=T_GRID::dimension>1?-TV::Axis_Vector(1):TV();}
 
     void Set_Gravity(const T gravity_input,const TV& downward_direction_input)
     {gravity=gravity_input;downward_direction=downward_direction_input;}

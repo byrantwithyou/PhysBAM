@@ -195,7 +195,7 @@ public:
 
     static VECTOR<int,2> Face_Neighbors(const TRIANGULATED_AREA<T>& object,const int index)
     {VECTOR<int,2> face;ARRAY<int>& neighbors=(*object.mesh.edge_triangles)(index);
-    face[1]=neighbors(1);face[2]=(neighbors.m>1?neighbors(2):0);return face;}
+    face[0]=neighbors(1);face[1]=(neighbors.m>1?neighbors(2):0);return face;}
 
     static VECTOR<int,2> Face_Neighbors(const TETRAHEDRALIZED_VOLUME<T>& object,const int index)
     {return (*object.mesh.triangle_tetrahedrons)(index);}
@@ -223,27 +223,27 @@ public:
     {T maximum_edge_length_magnitude_squared=0; 
     for(int i=0;i<GRID<TV>::dimension;i++)for(int j=i+1;j<=GRID<TV>::dimension+1;j++)
         maximum_edge_length_magnitude_squared=max(maximum_edge_length_magnitude_squared,(X(indices[i])-X(indices[j])).Magnitude_Squared());
-    T result=sqr(phis(indices[1]));for(int i=2;i<=GRID<TV>::dimension+1;i++) result=min(result,sqr(phis(indices[i])));
+    T result=sqr(phis(indices[0]));for(int i=2;i<=GRID<TV>::dimension+1;i++) result=min(result,sqr(phis(indices[i])));
     return result<=maximum_edge_length_magnitude_squared;}
 
     static T Signed_Size(const VECTOR<int,4>& tet,const ARRAY<VECTOR<T,3> >& node_locations)
-    {return TETRAHEDRON<T>::Signed_Volume(node_locations(tet[1]),node_locations(tet[2]),node_locations(tet[3]),node_locations(tet[4]));}
+    {return TETRAHEDRON<T>::Signed_Volume(node_locations(tet[0]),node_locations(tet[1]),node_locations(tet[2]),node_locations(tet[3]));}
 
     static T Signed_Size(const VECTOR<int,3>& tri,const ARRAY<VECTOR<T,2> >& node_locations)
-    {return TRIANGLE_2D<T>::Signed_Area(node_locations(tri[1]),node_locations(tri[2]),node_locations(tri[3]));}
+    {return TRIANGLE_2D<T>::Signed_Area(node_locations(tri[0]),node_locations(tri[1]),node_locations(tri[2]));}
 
     static TRIANGLE_3D<T> Simplex_From_Nodes(const VECTOR<int,3>& triangle,const ARRAY<VECTOR<T,3> >& node_locations)
-    {return TRIANGLE_3D<T>(node_locations(triangle[1]),node_locations(triangle[2]),node_locations(triangle[3]));}
+    {return TRIANGLE_3D<T>(node_locations(triangle[0]),node_locations(triangle[1]),node_locations(triangle[2]));}
 
     static SEGMENT_2D<T> Simplex_From_Nodes(const VECTOR<int,2>& segment,const ARRAY<VECTOR<T,2> >& node_locations)
-    {return SEGMENT_2D<T>(node_locations(segment[1]),node_locations(segment[2]));}
+    {return SEGMENT_2D<T>(node_locations(segment[0]),node_locations(segment[1]));}
 
     static T Half_Boundary_Measure(const VECTOR<int,4>& tet,const ARRAY<VECTOR<T,3> >& node_locations)
-    {return (T).5*(TRIANGLE_3D<T>::Area(node_locations(tet[1]),node_locations(tet[2]),node_locations(tet[3]))+TRIANGLE_3D<T>::Area(node_locations(tet[1]),node_locations(tet[4]),node_locations(tet[2]))+
-    TRIANGLE_3D<T>::Area(node_locations(tet[1]),node_locations(tet[3]),node_locations(tet[4]))+TRIANGLE_3D<T>::Area(node_locations(tet[2]),node_locations(tet[4]),node_locations(tet[3])));}
+    {return (T).5*(TRIANGLE_3D<T>::Area(node_locations(tet[0]),node_locations(tet[1]),node_locations(tet[2]))+TRIANGLE_3D<T>::Area(node_locations(tet[0]),node_locations(tet[3]),node_locations(tet[1]))+
+    TRIANGLE_3D<T>::Area(node_locations(tet[0]),node_locations(tet[2]),node_locations(tet[3]))+TRIANGLE_3D<T>::Area(node_locations(tet[1]),node_locations(tet[3]),node_locations(tet[2])));}
 
     static T Half_Boundary_Measure(const VECTOR<int,3>& tris,const ARRAY<VECTOR<T,2> >& node_locations)
-    {return (T).5*((node_locations(tris[1])-node_locations(tris[2])).Magnitude()+(node_locations(tris[2])-node_locations(tris[3])).Magnitude()+(node_locations(tris[3])-node_locations(tris[1])).Magnitude());}
+    {return (T).5*((node_locations(tris[0])-node_locations(tris[1])).Magnitude()+(node_locations(tris[1])-node_locations(tris[2])).Magnitude()+(node_locations(tris[2])-node_locations(tris[0])).Magnitude());}
 
     void Set_Full_Cell_Size(const T full_cell_size_input)
     {full_cell_size=full_cell_size_input;}

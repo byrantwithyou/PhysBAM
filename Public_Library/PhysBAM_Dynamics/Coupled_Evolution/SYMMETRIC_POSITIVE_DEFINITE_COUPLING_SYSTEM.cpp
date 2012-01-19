@@ -124,7 +124,7 @@ Apply_Lambda_To_Euler_State(const VECTOR_T& V,const ARRAY<T,COUPLING_CONSTRAINT_
         T impulse=impulse_at_coupling_faces(index_map.indexed_faces.m+index_map.constraint_indices.Get(SIDED_FACE_INDEX<TV::dimension>(iterator.side,iterator.Full_Index())));
 
         U(fluid_cell_index)(iterator.Axis()+1)+=impulse; // momentum update
-        U(fluid_cell_index)(TV::dimension+2)+=impulse*solid_interpolated_velocity_average;} // energy update
+        U(fluid_cell_index)(TV::dimension+1)+=impulse*solid_interpolated_velocity_average;} // energy update
 }
 //#####################################################################
 // Function Test_Viscosity

@@ -56,13 +56,13 @@ VOF_ADVECTION(PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset_input,T_FA
     cells_valid.Resize(grid.Domain_Indices(3));
     // find domain edges which can be traversed (i.e. parallel boundaries or outflow walls)
     bool valid_edges[GRID<TV>::dimension][2]; // TODO: Add outflow walls below
-    for(int axis=0;axis<GRID<TV>::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++) valid_edges[axis-1][axis_side-1]=mpi_grid?mpi_grid->Neighbor(axis,axis_side):false;
+    for(int axis=0;axis<GRID<TV>::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++) valid_edges[axis][axis_side]=mpi_grid?mpi_grid->Neighbor(axis,axis_side):false;
     RANGE<TV_INT> domain=grid.Domain_Indices();TV_INT domain_max=domain.Maximum_Corner(),domain_min=domain.Minimum_Corner();
     for(CELL_ITERATOR iterator(grid,3);iterator.Valid();iterator.Next()){
         TV_INT cell=iterator.Cell_Index();
         bool valid=true;
         for(int axis=0;axis<GRID<TV>::dimension;axis++)
-            if((cell(axis)>domain_max(axis) && !valid_edges[axis-1][1]) || (cell(axis)<domain_min(axis) && !valid_edges[axis-1][0])){valid=false;break;}
+            if((cell(axis)>domain_max(axis) && !valid_edges[axis][1]) || (cell(axis)<domain_min(axis) && !valid_edges[axis][0])){valid=false;break;}
         cells_valid(cell)=valid;}
 }
 //#####################################################################
@@ -85,7 +85,7 @@ Negative_Material(const TV_INT& cell_index,const bool force_full_refinement)
     static TV_INT phi_indices[GRID<TV>::number_of_nodes_per_cell];grid.Nodes_In_Cell_From_Minimum_Corner_Node(cell_index,phi_indices);
 
     cell_particle_X.Resize(GRID<TV>::number_of_nodes_per_cell);
-    for(int i=0;i<GRID<TV>::number_of_nodes_per_cell;i++) cell_particle_X(i)=grid.Node(phi_indices[i-1]);
+    for(int i=0;i<GRID<TV>::number_of_nodes_per_cell;i++) cell_particle_X(i)=grid.Node(phi_indices[i]);
     cell_refinement_simplices.Remove_All();Refined_Object_Initialization_Helper(cell_refinement_simplices);
 
     int last_node=cell_particle_X.m;
@@ -94,7 +94,7 @@ Negative_Material(const TV_INT& cell_index,const bool force_full_refinement)
     T minimum_phi=FLT_MAX,maximum_phi=-FLT_MAX;
 
     for(int i=0;i<last_node;i++){T& phi=cell_phis(i);
-        phi=grid_nodal_phis(phi_indices[i-1]);
+        phi=grid_nodal_phis(phi_indices[i]);
         if(phi<minimum_phi) minimum_phi=phi;
         if(phi>maximum_phi) maximum_phi=phi;}
 
@@ -837,16 +837,16 @@ Refine_Or_Coarsen_Geometry()
             T actual_parent_volume=T_SIMPLEX::Signed_Size(object.particles.X.Subset((*preimage.meshes(level)).elements(i)));
             for(int j=0;j<T_RED_GREEN_SIMPLICES::number_of_red_children && (*preimage.children(level))(i)(j);j++){
                 int child=(*preimage.children(level))(i)(j);
-                child_volume[j-1]=T_SIMPLEX::Signed_Size(object.particles.X.Subset((*preimage.meshes(level+1)).elements(child)));
-                if(child_volume[j-1]*actual_parent_volume<0) child_volume[j-1]*=-1; // should only happen for slivers...
-                parent_volume+=child_volume[j-1];}
+                child_volume[j]=T_SIMPLEX::Signed_Size(object.particles.X.Subset((*preimage.meshes(level+1)).elements(child)));
+                if(child_volume[j]*actual_parent_volume<0) child_volume[j]*=-1; // should only happen for slivers...
+                parent_volume+=child_volume[j];}
             T one_over_parent_volume;
             T parent_material_volume=level_material_volume(level)(i);
             if(parent_volume==0) one_over_parent_volume=(T)1;
             else one_over_parent_volume=(T)1/parent_volume;
             for(int j=0;j<T_RED_GREEN_SIMPLICES::number_of_red_children && (*preimage.children(level))(i)(j);j++){
                 int child=(*preimage.children(level))(i)(j);
-                T child_material_volume=parent_material_volume*child_volume[j-1]*one_over_parent_volume;
+                T child_material_volume=parent_material_volume*child_volume[j]*one_over_parent_volume;
                 level_material_volume(level+1)(child)=child_material_volume;}}
         }
 }

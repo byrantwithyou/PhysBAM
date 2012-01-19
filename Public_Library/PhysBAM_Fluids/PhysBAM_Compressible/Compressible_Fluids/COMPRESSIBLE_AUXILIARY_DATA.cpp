@@ -62,9 +62,9 @@ void Write_Auxiliary_Files(const STREAM_TYPE stream_type,const std::string& outp
         for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
             TV_INT face_index=iterator.Face_Index();
             if(fluxes->Valid_Index(iterator.Full_Index())){int axis=iterator.Axis();
-                density_flux.Component(axis)(face_index)=fluxes->Component(axis)(face_index)(1);
-                momentum_flux.Component(axis)(face_index)=fluxes->Component(axis)(face_index)(2);
-                energy_flux.Component(axis)(face_index)=fluxes->Component(axis)(face_index)(T_GRID::dimension+2);}}}
+                density_flux.Component(axis)(face_index)=fluxes->Component(axis)(face_index)(0);
+                momentum_flux.Component(axis)(face_index)=fluxes->Component(axis)(face_index)(1);
+                energy_flux.Component(axis)(face_index)=fluxes->Component(axis)(face_index)(T_GRID::dimension+1);}}}
 
     std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
     if(write_debug_data){

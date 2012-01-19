@@ -21,13 +21,13 @@ namespace{
 static VECTOR<int,4> Spring_Nodes(unsigned char pair_id,const VECTOR<int,4>& n)
 {
     switch(pair_id){
-        case 1: return VECTOR<int,4>(n[1],n[2],n[4],n[3]); // point face
-        case 2: return VECTOR<int,4>(n[2],n[1],n[3],n[4]); // point face
-        case 3: return VECTOR<int,4>(n[3],n[1],n[4],n[2]); // point face
-        case 4: return VECTOR<int,4>(n[4],n[1],n[2],n[3]); // point face
-        case 5: return VECTOR<int,4>(n[1],n[2],n[3],n[4]); // edge edge
-        case 6: return VECTOR<int,4>(n[2],n[3],n[1],n[4]); // edge edge
-        case 7: return VECTOR<int,4>(n[1],n[3],n[4],n[2]); // edge edge
+        case 1: return VECTOR<int,4>(n[0],n[1],n[3],n[2]); // point face
+        case 2: return VECTOR<int,4>(n[1],n[0],n[2],n[3]); // point face
+        case 3: return VECTOR<int,4>(n[2],n[0],n[3],n[1]); // point face
+        case 4: return VECTOR<int,4>(n[3],n[0],n[1],n[2]); // point face
+        case 5: return VECTOR<int,4>(n[0],n[1],n[2],n[3]); // edge edge
+        case 6: return VECTOR<int,4>(n[1],n[2],n[0],n[3]); // edge edge
+        case 7: return VECTOR<int,4>(n[0],n[2],n[3],n[1]); // edge edge
         default: PHYSBAM_FATAL_ERROR();}
 }
 }
@@ -110,7 +110,7 @@ Display(const int in_color) const
                 int index=((OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_TETRAHEDRON<T>*)current_selection)->index;
                 const VECTOR<int,4>& element_nodes=mesh->elements(index);
                 ARRAY_VIEW<const TV> X(particles->X);
-                OPENGL_SELECTION::Draw_Highlighted_Tetrahedron_Boundary(X(element_nodes[1]),X(element_nodes[2]),X(element_nodes[3]),X(element_nodes[4]),index);
+                OPENGL_SELECTION::Draw_Highlighted_Tetrahedron_Boundary(X(element_nodes[0]),X(element_nodes[1]),X(element_nodes[2]),X(element_nodes[3]),index);
                 T distance;TV min_normal,weights;
                 int spring=Find_Shortest_Spring(element_nodes,distance,min_normal,weights);
                 VECTOR<int,4> spring_nodes;
@@ -124,8 +124,8 @@ Display(const int in_color) const
                 if(spring>0){
                     colors[spring-1].Send_To_GL_Pipeline();
                     ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-                    if(spring<=4) OpenGL_Line(X(spring_nodes[1]),TRIANGLE_3D<T>(X.Subset(spring_nodes.Remove_Index(1))).Point_From_Barycentric_Coordinates(weights),vertices);
-                    else if(spring<=7) OpenGL_Line((1-weights.x)*X(spring_nodes[1])+weights.x*X(spring_nodes[2]),(1-weights.y)*X(spring_nodes[3])+weights.y*X(spring_nodes[4]),vertices);
+                    if(spring<=4) OpenGL_Line(X(spring_nodes[0]),TRIANGLE_3D<T>(X.Subset(spring_nodes.Remove_Index(1))).Point_From_Barycentric_Coordinates(weights),vertices);
+                    else if(spring<=7) OpenGL_Line((1-weights.x)*X(spring_nodes[0])+weights.x*X(spring_nodes[1]),(1-weights.y)*X(spring_nodes[2])+weights.y*X(spring_nodes[3]),vertices);
                     OpenGL_Draw_Arrays(GL_LINES,3,vertices);
                     glPopAttrib();}}}}
     glPopMatrix();
@@ -144,46 +144,46 @@ Find_Shortest_Spring(const VECTOR<int,4>& element_nodes,T& minimum_signed_distan
     int maximum_cross_squared_index=0;T maximum_cross_squared=(T)-FLT_MAX;TV maximum_cross;
     for(unsigned char h=0;h<4;h++){
         VECTOR<int,4> spring_nodes=Spring_Nodes(h,element_nodes);
-        TV u_cross_v=TV::Cross_Product(X(spring_nodes[3])-X(spring_nodes[2]),X(spring_nodes[4])-X(spring_nodes[2]));
+        TV u_cross_v=TV::Cross_Product(X(spring_nodes[2])-X(spring_nodes[1]),X(spring_nodes[3])-X(spring_nodes[1]));
         T u_cross_v_squared=u_cross_v.Magnitude_Squared();
         if(u_cross_v_squared>maximum_cross_squared){maximum_cross_squared_index=h;maximum_cross_squared=u_cross_v_squared;maximum_cross=u_cross_v;}}
     for(unsigned char h=4;h<7;h++){
         VECTOR<int,4> spring_nodes=Spring_Nodes(h,element_nodes);
-        TV u_cross_v=TV::Cross_Product(X(spring_nodes[2])-X(spring_nodes[1]),X(spring_nodes[4])-X(spring_nodes[3]));
+        TV u_cross_v=TV::Cross_Product(X(spring_nodes[1])-X(spring_nodes[0]),X(spring_nodes[3])-X(spring_nodes[2]));
         T u_cross_v_squared=u_cross_v.Magnitude_Squared();
         if(u_cross_v_squared>maximum_cross_squared){maximum_cross_squared_index=h;maximum_cross_squared=u_cross_v_squared;maximum_cross=u_cross_v;}}
     TV u,v;VECTOR<int,4> spring_nodes=Spring_Nodes(maximum_cross_squared_index,element_nodes);
-    if(maximum_cross_squared_index<5){u=X(spring_nodes[3])-X(spring_nodes[2]);v=X(spring_nodes[4])-X(spring_nodes[2]);}
-    else{u=X(spring_nodes[2])-X(spring_nodes[1]);v=X(spring_nodes[4])-X(spring_nodes[3]);}
+    if(maximum_cross_squared_index<5){u=X(spring_nodes[2])-X(spring_nodes[1]);v=X(spring_nodes[3])-X(spring_nodes[1]);}
+    else{u=X(spring_nodes[1])-X(spring_nodes[0]);v=X(spring_nodes[3])-X(spring_nodes[2]);}
     T u_length_squared=u.Magnitude_Squared(),v_length_squared=v.Magnitude_Squared();
     if(abs(maximum_cross_squared)<sqr(sin((T)pi/(T)180))*u_length_squared*v_length_squared){
         VECTOR<int,2> edge_index;T max_distance_squared=0;
         for(int i=0;i<3;i++) for(int j=i+1;j<=4;j++){
             T distance_squared=(X(element_nodes[i])-X(element_nodes[j])).Magnitude_Squared();
             if(distance_squared>max_distance_squared){edge_index=VECTOR<int,2>(i,j);max_distance_squared=distance_squared;}}
-            VECTOR<int,2> other_nodes=element_nodes.Remove_Index(edge_index[2]).Remove_Index(edge_index[1]);
-            if((X(element_nodes[edge_index[1]])-X(other_nodes[2])).Magnitude_Squared()<(X(element_nodes[edge_index[1]])-X(other_nodes[1])).Magnitude_Squared())
+            VECTOR<int,2> other_nodes=element_nodes.Remove_Index(edge_index[1]).Remove_Index(edge_index[0]);
+            if((X(element_nodes[edge_index[0]])-X(other_nodes[1])).Magnitude_Squared()<(X(element_nodes[edge_index[0]])-X(other_nodes[0])).Magnitude_Squared())
                 other_nodes=other_nodes.Reversed();
-            VECTOR<int,2> edge1(element_nodes[edge_index[1]],other_nodes[2]),edge2(other_nodes[1],element_nodes[edge_index[2]]);
+            VECTOR<int,2> edge1(element_nodes[edge_index[0]],other_nodes[1]),edge2(other_nodes[0],element_nodes[edge_index[1]]);
             bool found=false;VECTOR<int,4> spring_nodes;
             for(maximum_cross_squared_index=5;maximum_cross_squared_index<=7;maximum_cross_squared_index++){
                 spring_nodes=Spring_Nodes(maximum_cross_squared_index,element_nodes);
                 if(spring_nodes.Slice<1,2>()==edge1 || spring_nodes.Slice<3,4>()==edge1 || spring_nodes.Slice<1,2>().Reversed()==edge1 || spring_nodes.Slice<3,4>().Reversed()==edge1){
                     found=true;break;}}
             PHYSBAM_ASSERT(found);
-            minimum_normal=(X(edge1[1])-X(edge2[2])).Orthogonal_Vector().Normalized();
+            minimum_normal=(X(edge1[0])-X(edge2[1])).Orthogonal_Vector().Normalized();
             minimum_signed_distance=0;
-            TV midpoint=(T).5*(X(edge1[2])+X(edge2[1]));
-            weights=VECTOR<T,3>(SEGMENT_3D<T>(X(spring_nodes[1]),X(spring_nodes[2])).Interpolation_Fraction(midpoint),
-                SEGMENT_3D<T>(X(spring_nodes[3]),X(spring_nodes[4])).Interpolation_Fraction(midpoint),0);}
+            TV midpoint=(T).5*(X(edge1[1])+X(edge2[0]));
+            weights=VECTOR<T,3>(SEGMENT_3D<T>(X(spring_nodes[0]),X(spring_nodes[1])).Interpolation_Fraction(midpoint),
+                SEGMENT_3D<T>(X(spring_nodes[2]),X(spring_nodes[3])).Interpolation_Fraction(midpoint),0);}
     else{
         minimum_normal=maximum_cross.Normalized();
-        minimum_signed_distance=TV::Dot_Product(minimum_normal,X(spring_nodes[1])-X(spring_nodes[3]));
+        minimum_signed_distance=TV::Dot_Product(minimum_normal,X(spring_nodes[0])-X(spring_nodes[2]));
         if(maximum_cross_squared_index<5){
-            weights=TRIANGLE_3D<T>::Clamped_Barycentric_Coordinates(X(spring_nodes[1]),X(spring_nodes[2]),X(spring_nodes[3]),X(spring_nodes[4]));}
+            weights=TRIANGLE_3D<T>::Clamped_Barycentric_Coordinates(X(spring_nodes[0]),X(spring_nodes[1]),X(spring_nodes[2]),X(spring_nodes[3]));}
         else if(maximum_cross_squared_index<8){
             VECTOR<T,2> dummy_weights;
-            SEGMENT_3D<T>(X(spring_nodes[1]),X(spring_nodes[2])).Shortest_Vector_Between_Segments(SEGMENT_3D<T>(X(spring_nodes[3]),X(spring_nodes[4])),dummy_weights);
+            SEGMENT_3D<T>(X(spring_nodes[0]),X(spring_nodes[1])).Shortest_Vector_Between_Segments(SEGMENT_3D<T>(X(spring_nodes[2]),X(spring_nodes[3])),dummy_weights);
             weights=dummy_weights.Append(0);}}
     return maximum_cross_squared_index;
 
@@ -597,10 +597,14 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection,MAT
     else if(selection->type==OPENGL_SELECTION::TETRAHEDRALIZED_VOLUME_TETRAHEDRON){
         int index=((OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_TETRAHEDRON<T>*)selection)->index;
         const VECTOR<int,4>& nodes=mesh->elements(index);
-        output_stream<<"Tetrahedron "<<index<<" ("<<nodes[1]<<", "<<nodes[2]<<", "<<nodes[3]<<", "<<nodes[4]<<")"<<std::endl;
+        output_stream<<"Tetrahedron "<<index<<" ("<<nodes[0]<<", "<<nodes[1]<<", "<<nodes[2]<<", "<<nodes[3]<<")"<<std::endl;
         output_stream<<"Signed Volume = "<<TETRAHEDRON<T>(particles->X.Subset(nodes)).Signed_Volume()<<std::endl;
         output_stream<<std::endl;
-        output_stream<<"Vertex"<<nodes[1]<<std::endl;
+        output_stream<<"Vertex"<<nodes[0]<<std::endl;
+        if(transform){output_stream<<"WORLD Position "<<transform->Homogeneous_Times(particles->X(nodes[0]))<<std::endl;}
+        Read_Write<GEOMETRY_PARTICLES<VECTOR<T,3> >,T>::Print(output_stream,*particles,nodes[0]);
+        output_stream<<std::endl;
+        output_stream<<"Vertex "<<nodes[1]<<std::endl;
         if(transform){output_stream<<"WORLD Position "<<transform->Homogeneous_Times(particles->X(nodes[1]))<<std::endl;}
         Read_Write<GEOMETRY_PARTICLES<VECTOR<T,3> >,T>::Print(output_stream,*particles,nodes[1]);
         output_stream<<std::endl;
@@ -611,10 +615,6 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection,MAT
         output_stream<<"Vertex "<<nodes[3]<<std::endl;
         if(transform){output_stream<<"WORLD Position "<<transform->Homogeneous_Times(particles->X(nodes[3]))<<std::endl;}
         Read_Write<GEOMETRY_PARTICLES<VECTOR<T,3> >,T>::Print(output_stream,*particles,nodes[3]);
-        output_stream<<std::endl;
-        output_stream<<"Vertex "<<nodes[4]<<std::endl;
-        if(transform){output_stream<<"WORLD Position "<<transform->Homogeneous_Times(particles->X(nodes[4]))<<std::endl;}
-        Read_Write<GEOMETRY_PARTICLES<VECTOR<T,3> >,T>::Print(output_stream,*particles,nodes[4]);
 
         T distance;TV min_normal,weights;
         int spring=Find_Shortest_Spring(nodes,distance,min_normal,weights);
