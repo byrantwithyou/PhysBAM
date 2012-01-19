@@ -222,17 +222,17 @@ Refine_If_Necessary(const int level,const int tet)
         if(!midpoints(1) && !midpoints(4) && !segment_mesh.Segment(midpoints(5),j)) Add_Segment(free_edge_indices,midpoints(5),j);}
     // go ahead and create any missing edges along with the tets
     if(midpoints(0) && midpoints(1) && midpoints(2)){ // if face ijk is subdivided but the other faces aren't
-        if(!subedges(03)) Add_Segment(free_edge_indices,midpoints(0),midpoints(1));if(!subedges(04)) Add_Segment(free_edge_indices,midpoints(1),midpoints(2));
-        if(!subedges(05)) Add_Segment(free_edge_indices,midpoints(2),midpoints(0));
+        if(!subedges(3)) Add_Segment(free_edge_indices,midpoints(0),midpoints(1));if(!subedges(04)) Add_Segment(free_edge_indices,midpoints(1),midpoints(2));
+        if(!subedges(5)) Add_Segment(free_edge_indices,midpoints(2),midpoints(0));
         Add_Tetrahedron(free_tet_indices,level+1,i,midpoints(0),midpoints(2),l,tet);Add_Tetrahedron(free_tet_indices,level+1,j,midpoints(1),midpoints(0),l,tet);
         Add_Tetrahedron(free_tet_indices,level+1,k,midpoints(2),midpoints(1),l,tet);Add_Tetrahedron(free_tet_indices,level+1,midpoints(0),midpoints(1),midpoints(2),l,tet);}
     else if(midpoints(0) && midpoints(3) && midpoints(4)){ // if face ilj is subdivided but the other faces aren't
-        if(!subedges(06)) Add_Segment(free_edge_indices,midpoints(0),midpoints(4));if(!subedges(07)) Add_Segment(free_edge_indices,midpoints(4),midpoints(3));
-        if(!subedges(08)) Add_Segment(free_edge_indices,midpoints(3),midpoints(0));
+        if(!subedges(6)) Add_Segment(free_edge_indices,midpoints(0),midpoints(4));if(!subedges(07)) Add_Segment(free_edge_indices,midpoints(4),midpoints(3));
+        if(!subedges(8)) Add_Segment(free_edge_indices,midpoints(3),midpoints(0));
         Add_Tetrahedron(free_tet_indices,level+1,i,midpoints(3),midpoints(0),k,tet);Add_Tetrahedron(free_tet_indices,level+1,l,midpoints(4),midpoints(3),k,tet);
         Add_Tetrahedron(free_tet_indices,level+1,j,midpoints(0),midpoints(4),k,tet);Add_Tetrahedron(free_tet_indices,level+1,midpoints(0),midpoints(3),midpoints(4),k,tet);}
     else if(midpoints(2) && midpoints(3) && midpoints(5)){ // if face ikl is subdivided but the other faces aren't
-        if(!subedges(09)) Add_Segment(free_edge_indices,midpoints(2),midpoints(5));if(!subedges(20)) Add_Segment(free_edge_indices,midpoints(5),midpoints(3));
+        if(!subedges(9)) Add_Segment(free_edge_indices,midpoints(2),midpoints(5));if(!subedges(20)) Add_Segment(free_edge_indices,midpoints(5),midpoints(3));
         if(!subedges(21)) Add_Segment(free_edge_indices,midpoints(3),midpoints(2));
         Add_Tetrahedron(free_tet_indices,level+1,i,midpoints(2),midpoints(3),j,tet);Add_Tetrahedron(free_tet_indices,level+1,midpoints(3),midpoints(2),midpoints(5),j,tet);
         Add_Tetrahedron(free_tet_indices,level+1,midpoints(5),midpoints(2),k,j,tet);Add_Tetrahedron(free_tet_indices,level+1,l,midpoints(3),midpoints(5),j,tet);}
