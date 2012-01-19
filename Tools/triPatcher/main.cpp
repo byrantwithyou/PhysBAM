@@ -33,11 +33,11 @@ template<class T> void PatchTogether(std::string old_filename,std::string old_co
     number_vertices_in_new = new_triangulated_surface->particles.number;
     std::cout<<"number of new particles = "<<number_vertices_in_new<<std::endl;
     /*std::cout<<"old --- new "<<std::endl;
-    for(int i=1; i<=old_size; i++){
+    for(int i=0;i<old_size;i++){
         std::cout<<"i = "<<i<<" ";
         std::cout<<old_triangulated_surface->particles.X(i)<<" --- "<<new_triangulated_surface->particles.X(i)<<std::endl;
     }*/
-    for(int i=1; i<=condensation_mapping.m; i++){
+    for(int i=0;i<condensation_mapping.m;i++){
         if(condensation_mapping(i)>mapping_count){
             mapping_count = condensation_mapping(i);}}
     std::cout<<std::endl;
@@ -50,11 +50,11 @@ template<class T> void PatchTogether(std::string old_filename,std::string old_co
         old_vertex_color_array.Resize(original_size+number_new_vertices_needed);
         old_triangulated_surface->particles.Add_Particles(number_new_vertices_needed);
         old_triangulated_surface->triangle_mesh.number_nodes = old_triangulated_surface->particles.number;
-        for(int j=1; j<=number_new_vertices_needed; j++){
+        for(int j=0;j<number_new_vertices_needed;j++){
             //std::cout<<" j = "<<j<<std::endl;
             condensation_mapping(original_size+j) = mapping_count+j;
             old_vertex_color_array(original_size+j) = new_vertex_color_array(mapping_count+j);}}
-    for(int i=1; i<=condensation_mapping.m; i++){
+    for(int i=0;i<condensation_mapping.m;i++){
         int new_vertex_index = condensation_mapping(i);
         if(new_vertex_index!=0){
             old_triangulated_surface->particles.X(i) = new_triangulated_surface->particles.X(new_vertex_index);}}
@@ -62,7 +62,7 @@ template<class T> void PatchTogether(std::string old_filename,std::string old_co
     int triangle_count = old_triangulated_surface->triangle_mesh.triangles.m;
     std::cout<<"number of triangles = " <<triangle_count<<std::endl;
     int number_of_new_triangles = 0;
-    for(int i=1; i<=new_triangulated_surface->triangle_mesh.triangles.m; i++){
+    for(int i=0;i<new_triangulated_surface->triangle_mesh.triangles.m;i++){
         int v1,v2,v3;
         new_triangulated_surface->triangle_mesh.triangles.Get(i,v1,v2,v3);
         if((v1>mapping_count)||(v2>mapping_count)||(v3>mapping_count)){number_of_new_triangles++;}}
@@ -70,7 +70,7 @@ template<class T> void PatchTogether(std::string old_filename,std::string old_co
     old_triangulated_surface->triangle_mesh.triangles.Exact_Resize(3,triangle_count+number_of_new_triangles);
     triangle_count++;
     
-    for(int i=1; i<=new_triangulated_surface->triangle_mesh.triangles.m; i++){
+    for(int i=0;i<new_triangulated_surface->triangle_mesh.triangles.m;i++){
         int v1,v2,v3;
         new_triangulated_surface->triangle_mesh.triangles.Get(i,v1,v2,v3);
         if((v1>mapping_count)||(v2>mapping_count)||(v3>mapping_count)){

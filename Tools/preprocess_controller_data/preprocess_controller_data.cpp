@@ -44,7 +44,7 @@ public:
     {
         FILE_UTILITIES::Read_From_File<float>(file,states);
         //assert(states(1)->angles.Size()!=0); //
-        for(int i=1; i<=states.Size(); i++) {for(int j=i+1; j<=states.Size(); j++) {
+        for(int i=0;i<states.Size();i++) {for(int j=i+1; j<=states.Size(); j++) {
             int current_index, next_index;
             if(!(current_index=graph_index_to_state.Find(states(i)))){
                 graph_index_to_state.Resize(next_hash_number);

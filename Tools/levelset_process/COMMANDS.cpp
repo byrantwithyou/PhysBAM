@@ -45,7 +45,7 @@ const int String = 5;
 void COMMAND_BASE::Print_Description(std::ostream& out)
 {
     out<<"-"<<Name();
-    for(int i=1; i<=args.m; i++) {
+    for(int i=0;i<args.m;i++) {
         out << " " << args(i).name;
     }
     out<<": "<<Description()<<endl;

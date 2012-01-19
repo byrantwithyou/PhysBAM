@@ -52,7 +52,7 @@ Display(const int in_color) const
 #ifndef USE_OPENGLES
     if (draw_vertex_positions) {
         vertex_position_color.Send_To_GL_Pipeline();
-        for(int t=1; t<=simplices.particles.array_collection->Size(); t++){
+        for(int t=0;t<simplices.particles.array_collection->Size();t++){
             VECTOR<float,3> world_space_pos=World_Space_Point(VECTOR<float,2>(simplices.particles.X(t)));
             OpenGL_String(simplices.particles.X(t),STRING_UTILITIES::string_sprintf("<%f>",world_space_pos.x));}}
 #endif
@@ -68,7 +68,7 @@ Bounding_Box() const
 {
     float xmin,xmax;
     xmin=xmax=simplices.particles.X(1).x;
-    for(int i=1; i<=simplices.particles.array_collection->Size(); i++){
+    for(int i=0;i<simplices.particles.array_collection->Size();i++){
         xmin=min(xmin,(float)simplices.particles.X(i).x);xmax=max(xmax,(float)simplices.particles.X(i).x);}
     return World_Space_Box(RANGE<VECTOR<float,3> >(xmin,xmax,0,0,0,0));
 }

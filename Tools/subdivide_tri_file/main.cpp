@@ -49,7 +49,7 @@ int main(int argc,char *argv[])
     TRIANGULATED_SURFACE<float> &surface=*TRIANGULATED_SURFACE<float>::Create();
         FILE_UTILITIES::Read_From_File<float>(input_filename,surface);
 
-    for(int i=1; i<=levels; i++) surface.Loop_Subdivide();
+    for(int i=0;i<levels;i++) surface.Loop_Subdivide();
 
         FILE_UTILITIES::Write_To_File<float>(output_filename,surface);
 }

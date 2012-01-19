@@ -63,7 +63,7 @@ public:
         glRotated(elevateangle, 0, 1, 0);
 
 
-        for(int t=1; t<=dk.currentmesh->triangles.m; t++)
+        for(int t=0;t<dk.currentmesh->triangles.m;t++)
         {
             int ti,tj,tk;
             dk.currentmesh->triangles.Get(t,ti,tj,tk);
@@ -80,7 +80,7 @@ public:
 
             if(ShowBlue==true || ShowRed==true)
             {
-                for(int i=1; i<=dk.vertices_info(t).m; i++)
+                for(int i=0;i<dk.vertices_info(t).m;i++)
                 {
                     int index=dk.vertices_info(t)(i);
                     VECTOR_3D<double> pi=dk.emb_boundary_particles.X(dk.vertices_info(t)(i));
@@ -105,7 +105,7 @@ public:
         }
          ARRAY <DK_VERTEX <double> *> *vertices=dk.vlist->vertex_sequence;
 
-        for(int i=1; i<=vertices->m; i++)
+        for(int i=0;i<vertices->m;i++)
         {
             if( vertexpointer==i)
             {

@@ -116,7 +116,7 @@ void Postprocess_Frame(const int frame){
     //Find the closest point on muscle for each particle in the inner layer, read in the muscles at the next frame,
     //and project the inner layer particles by the amount that their closest muscle point moves. (don't change)
     muscle_tris_old.Resize(muscle_tris.m);
-    for(int i=1; i<=muscle_tris.m; i++) {muscle_tris_old(i) = muscle_tris(i);}
+    for(int i=0;i<muscle_tris.m;i++) {muscle_tris_old(i) = muscle_tris(i);}
     Find_Spring_Endpoints();
     Read_Muscle_Tris_From_Quasistatic_Simm_Data(frame);    
     Project_Skin_Particles();
@@ -132,7 +132,7 @@ void Postprocess_Frame(const int frame){
     Reset_Velocities();
 
     //Other cleanup stuff (don't change)
-    for(int i=1; i<=muscle_tris_old.m;i++) {delete (muscle_tris_old(i));}
+    for(int i=0;i<muscle_tris_old.m;i++) {delete (muscle_tris_old(i));}
     std::cout<<"Frame number "<<frame-1<<" completed"<<std::endl;
 }
 
@@ -142,13 +142,13 @@ void Postprocess_Frame(const int frame){
 // Those nodes that have ls_inside set are constrained to the plane of the levelset
 //#######################################################################
 void Set_External_Velocities(ARRAY<VECTOR_3D<T> >& V,const T time) {
-    for(int c=1; c<=V.m; c++) {
+    for(int c=0;c<V.m;c++) {
         if(ls_inside(c)) { 
             V(c)-=VECTOR_3D<T>::Dot_Product(V(c),ls_normal(c))*ls_normal(c); 
         }}
 }
 void Zero_Out_Enslaved_Velocity_Nodes(ARRAY<VECTOR_3D<T> >& V,const T time) {    
-    for(int c=1; c<=V.m; c++) {
+    for(int c=0;c<V.m;c++) {
         if(ls_inside(c)) { 
             V(c)-=VECTOR_3D<T>::Dot_Product(V(c),ls_normal(c))*ls_normal(c); 
         }}
@@ -192,14 +192,14 @@ void Snap_To_Levelset(){
 //#####################################################################
 void Modify_LS_Inside(){
     ARRAY<bool >ls_inside_new; ls_inside_new.Resize(ls_inside.m);
-    for(int i=1; i<=ls_inside_new.m; i++) {
+    for(int i=0;i<ls_inside_new.m;i++) {
         ARRAY<int> neighbors = (*(my_skin->triangulated_surface->triangle_mesh.neighbor_nodes))(i);
         ls_inside_new(i) = ls_inside(i); 
-        for(int n=1; n<=neighbors.m; n++) {
+        for(int n=0;n<neighbors.m;n++) {
             if(!ls_inside(neighbors(n))) ls_inside_new(i) = false;
         }
     }
-    for(int i=1; i<=ls_inside_new.m; i++) ls_inside(i) = ls_inside_new(i);
+    for(int i=0;i<ls_inside_new.m;i++) ls_inside(i) = ls_inside_new(i);
 }
 
 ////////////////////////////////////////Stuff you probably don't need to mess with////////////////////////////////////////////////
@@ -288,10 +288,10 @@ void Get_Initial_Data()
     triangulated_surface.Update_Bounding_Box();    triangulated_surface.triangle_mesh.Initialize_Neighbor_Nodes();
 
     //Resize Arrays
-    num_skin_particles = particles.array_collection->Size(); for(int p=1; p<=num_skin_particles; p++) {particles.mass(p) = 0.0;}
-    closest_muscle_arr.Resize(num_skin_particles); for(int p=1; p<=num_skin_particles; p++) {closest_muscle_arr(p) = 0.0;}
-    closest_triangle_arr.Resize(num_skin_particles); for(int p=1; p<=num_skin_particles; p++) {closest_triangle_arr(p) = 0.0;}
-    barycentric_coordinate_arr.Resize(num_skin_particles); for(int p=1; p<=num_skin_particles; p++) {barycentric_coordinate_arr(p) = VECTOR_3D<T>(0,0,0);}
+    num_skin_particles = particles.array_collection->Size(); for(int p=0;p<num_skin_particles;p++) {particles.mass(p) = 0.0;}
+    closest_muscle_arr.Resize(num_skin_particles); for(int p=0;p<num_skin_particles;p++) {closest_muscle_arr(p) = 0.0;}
+    closest_triangle_arr.Resize(num_skin_particles); for(int p=0;p<num_skin_particles;p++) {closest_triangle_arr(p) = 0.0;}
+    barycentric_coordinate_arr.Resize(num_skin_particles); for(int p=0;p<num_skin_particles;p++) {barycentric_coordinate_arr(p) = VECTOR_3D<T>(0,0,0);}
     ls_inside.Resize(num_skin_particles); ls_normal.Resize(num_skin_particles);
 
     //Muscle Levleset
@@ -337,7 +337,7 @@ void Read_Muscle_Tris_From_Quasistatic_Simm_Data(int frame){
         for(int p=0;p<muscle_tris(i)->particles.array_collection->Size();p++) {
             if(passive) muscle_tris(i)->particles.X(p)=current_frame*first_frame.Inverse()*muscle_tris(i)->particles.X(p);
             else muscle_tris(i)->particles.X(p)=current_frame*muscle_tris(i)->particles.X(p);}}
-    for(int i=1; i<=muscle_tris.m; i++) {
+    for(int i=0;i<muscle_tris.m;i++) {
         muscle_tris(i)->Refresh_Auxiliary_Structures();
         muscle_tris(i)->Initialize_Triangle_Hierarchy();
         muscle_tris(i)->Update_Bounding_Box();
@@ -349,7 +349,7 @@ void Read_Muscle_Tris_From_Quasistatic_Simm_Data(int frame){
 //#####################################################################
 void Project_Skin_Particles(){
     VECTOR_3D<T> old_loc, new_loc;
-    for(int i=1; i<=num_skin_particles; i++) {
+    for(int i=0;i<num_skin_particles;i++) {
         old_loc = (*((muscle_tris_old(closest_muscle_arr(i)))->triangle_list))(closest_triangle_arr(i)).Point_From_Barycentric_Coordinates(VECTOR_3D<T>(barycentric_coordinate_arr(i)));
         new_loc = (*((muscle_tris(closest_muscle_arr(i)))->triangle_list))(closest_triangle_arr(i)).Point_From_Barycentric_Coordinates(VECTOR_3D<T>(barycentric_coordinate_arr(i)));
         my_skin->particles.X(i) += (new_loc - old_loc);
@@ -365,7 +365,7 @@ void Reset_Restlengths(){
 }
 void Reset_Velocities(){
     TRIANGULATED_SURFACE<T> *my_skin = solids_parameters.deformable_body_parameters.list(1).triangulated_surface;
-    for(int c=1; c<=my_skin->particles.array_collection->Size(); c++) {my_skin->particles.V(c) = VECTOR_3D<T>(0,0,0);}
+    for(int c=0;c<my_skin->particles.array_collection->Size();c++) {my_skin->particles.V(c) = VECTOR_3D<T>(0,0,0);}
 }
 void Reset_Bending(const bool set_rest_angle_to_zero){
     if(set_rest_angle_to_zero) solids_parameters.deformable_body_parameters.list(1).bending_elements(1)->Set_Sine_Half_Rest_Angle(0.0);

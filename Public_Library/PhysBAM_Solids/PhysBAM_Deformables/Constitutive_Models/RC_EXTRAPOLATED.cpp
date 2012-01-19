@@ -291,31 +291,31 @@ Compute_ddE(const GENERAL_ENERGY<T>& base,T k,const TV& f,const int simplex)
     TV fm1=f-1;
     T m2=sqr(m),m3=m*m2;
     dds.From_Matrix(-xi*MATRIX<T,d>::Outer_Product((T)1/Q,ds)-MATRIX<T,d>::Outer_Product(s/Q,dxi)+DIAGONAL_MATRIX<T,d>((T)s*xi/sqr(Q))*dQ);
-    for(int i=1; i<=d; i++){
+    for(int i=0;i<d;i++){
         MATRIX<T,d> t;
-        for(int j=1; j<=d; j++){t(i,j)+=ds(j);t(j,i)+=ds(j);}
+        for(int j=0;j<d;j++){t(i,j)+=ds(j);t(j,i)+=ds(j);}
         ddQ(i)=fm1(i)*dds+t.Symmetric_Part();}
     ddz+=SYMMETRIC_MATRIX<T,d>::Conjugate_With_Transpose(dQ,DIAGONAL_MATRIX<T,d>((T)2*fm1/cube(Q)));
     ddz-=(DIAGONAL_MATRIX<T,d>((T)2/sqr(Q))*dQ).Symmetric_Part();
-    for(int i=1; i<=d; i++) ddz-=fm1(i)/sqr(Q(i))*ddQ(i);
+    for(int i=0;i<d;i++) ddz-=fm1(i)/sqr(Q(i))*ddQ(i);
     ddxi=2*cube(xi)*SYMMETRIC_MATRIX<T,d>::Outer_Product(dz)-sqr(xi)*ddz;
     base.dddE(Q,simplex,&TT(1));
     ddphi=SYMMETRIC_MATRIX<T,d>::Transpose_Times_With_Symmetric_Result(dg,dQ);
     for(int i=0;i<d;i++) ddphi+=g(i)*ddQ(i);
     ddm=3*m2*m3*SYMMETRIC_MATRIX<T,d>::Outer_Product(fm1)-m3;
-    for(int i=1; i<=d; i++){
+    for(int i=0;i<d;i++){
         MATRIX<T,d> t;
-        for(int j=1; j<=d; j++){t(i,j)+=dm(j);t(j,i)+=dm(j);}
+        for(int j=0;j<d;j++){t(i,j)+=dm(j);t(j,i)+=dm(j);}
         ddu(i)=fm1(i)*ddm+t.Symmetric_Part();}
-    for(int i=1; i<=d; i++){
+    for(int i=0;i<d;i++){
         ddg(i)=SYMMETRIC_MATRIX<T,d>::Conjugate_With_Transpose(dQ,TT(i));
-        for(int j=1; j<=d; j++) ddg(i)+=H(i,j)*ddQ(j);}
+        for(int j=0;j<d;j++) ddg(i)+=H(i,j)*ddQ(j);}
     ddh=((T)1-dQ).Transpose_Times(du*2).Symmetric_Part();
-    for(int i=1; i<=d; i++) ddh+=(f(i)-Q(i))*ddu(i)-ddQ(i)*u(i);
+    for(int i=0;i<d;i++) ddh+=(f(i)-Q(i))*ddu(i)-ddQ(i)*u(i);
     ddE=ddphi+TV::Dot_Product(g,u)*ddh+MATRIX<T,d>::Outer_Product(dh*2,dg.Transpose_Times(u)).Symmetric_Part();
     ddE+=MATRIX<T,d>::Outer_Product(dh*2,du.Transpose_Times(g)).Symmetric_Part();
     ddE+=2*h*dg.Transpose_Times(du).Symmetric_Part()+k*SYMMETRIC_MATRIX<T,d>::Outer_Product(dh)+k*h*ddh;
-    for(int i=1; i<=d; i++) ddE+=h*g(i)*ddu(i)+h*ddg(i)*u(i);
+    for(int i=0;i<d;i++) ddE+=h*g(i)*ddu(i)+h*ddg(i)*u(i);
 }
 template class RC_EXTRAPOLATED<float,2>;
 template class RC_EXTRAPOLATED<float,3>;

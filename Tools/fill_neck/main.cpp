@@ -38,7 +38,7 @@ template<class T> void FillNeck(std::string tri_filename,std::string new_filenam
     triangulated_surface->particles.Increase_Array_Size(1);
     int center_index = triangulated_surface->particles.Add_Particle();
     triangulated_surface->particles.X(center_index) = center_point;
-    for(int i=1; i<=largest_segment_array.m; i++){
+    for(int i=0;i<largest_segment_array.m;i++){
         int j,k;
         largest_segment_array.Get(i,j,k);
         triangle_count++;

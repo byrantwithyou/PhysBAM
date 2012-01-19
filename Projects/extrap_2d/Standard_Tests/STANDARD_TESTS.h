@@ -193,7 +193,7 @@ public:
         if(scatter_plot) Update_Scatter_Plot();
         if(energy_profile_plot){
             FINITE_VOLUME<TV,2>& force_field=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,2>&>();
-            for(int i=1; i<=force_field.Fe_hat.m; i++) Add_Debug_Particle(force_field.Fe_hat(i).To_Vector(),VECTOR<T,3>(1,1,0));}
+            for(int i=0;i<force_field.Fe_hat.m;i++) Add_Debug_Particle(force_field.Fe_hat(i).To_Vector(),VECTOR<T,3>(1,1,0));}
     }
 
     void Align_Deformable_Bodies_With_Rigid_Bodies() PHYSBAM_OVERRIDE {}

@@ -50,7 +50,7 @@ int main(int argc,char *argv[])
     TRIANGULATED_SURFACE<T> *surface=0;
     FILE_UTILITIES::Create_From_File<T>(input_filename,surface);
 
-    for(int i=1; i<=levels; i++) surface->Linearly_Subdivide();
+    for(int i=0;i<levels;i++) surface->Linearly_Subdivide();
 
     ofstream output(output_filename, std::ios::binary);
     surface->Write<T>(output);

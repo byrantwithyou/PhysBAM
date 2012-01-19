@@ -38,7 +38,7 @@ template<class T> void MakeCuts(std::string tri_filename,std::string new_tri_fil
     int largest_array = 1, largest_size = 0;
     std::cout<<"largest array = "<<largest_array<<" size = "<<largest_size<<std::endl;
     std::cout<<"size of connected_segments = "<<connected_segments->Max_Size()<<std::endl;
-    for(int i=1; i<=connected_segments->m; i++){
+    for(int i=0;i<connected_segments->m;i++){
         ARRAYS<int> segment_array;
         connected_segments->Get(i,segment_array);
         std::cout<<"i = "<<i<<" size = "<<segment_array.m<<std::endl;
@@ -153,11 +153,11 @@ template<class T> void MakeCuts(std::string tri_filename,std::string new_tri_fil
 
     int number_of_particles = triangulated_surface->particles.number;
     ARRAY<bool> Particle_Inside_Box = ARRAY<bool>(number_of_particles+1);
-    for(int i=1; i<=number_of_particles; i++){
+    for(int i=0;i<number_of_particles;i++){
         bool flag = box.Inside(triangulated_surface->particles.X(i),0);
         Particle_Inside_Box.Set(i,flag);}
     std::cout<<"total polygons = "<<triangulated_surface->triangle_mesh.triangles.m<<std::endl;
-    for(int j=1; j<=triangulated_surface->triangle_mesh.triangles.m; j++){
+    for(int j=0;j<triangulated_surface->triangle_mesh.triangles.m;j++){
         int v1, v2, v3;
         triangulated_surface->triangle_mesh.triangles.Get(j,v1,v2,v3);
         if(!(Particle_Inside_Box(v1)&&Particle_Inside_Box(v2)&&Particle_Inside_Box(v3))){
@@ -175,7 +175,7 @@ template<class T> void MakeCuts(std::string tri_filename,std::string new_tri_fil
     std::cout<<"new color array size ="<<new_vertex_color_array.m<<std::endl;
     //std::cout<<"GOT HERE."<<std::endl;
     int highest_mapping_count = 0;
-    for(int i=1; i<=condensation_mapping.m; i++){
+    for(int i=0;i<condensation_mapping.m;i++){
         int new_vertex = condensation_mapping(i);
         //std::cout<<i<<" "<<new_vertex;
         if(new_vertex!=0){

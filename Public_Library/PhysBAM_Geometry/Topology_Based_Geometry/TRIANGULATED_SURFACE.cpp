@@ -389,7 +389,7 @@ template<class T> T TRIANGULATED_SURFACE<T>::
 Average_Minimum_Angle() const
 {
     TV u,v,w;T total_min_angle=0;
-    for(int t=1; t<=mesh.elements.m;t++){
+    for(int t=0;t<mesh.elements.m;t++){
         int i,j,k;mesh.elements(t).Get(i,j,k);
         u=(particles.X(i)-particles.X(j)).Normalized();v=(particles.X(j)-particles.X(k)).Normalized();w=(particles.X(k)-particles.X(i)).Normalized();
         total_min_angle+=acos(max(-min(TV::Dot_Product(u,v),TV::Dot_Product(v,w),TV::Dot_Product(w,u)),(T)-1));}

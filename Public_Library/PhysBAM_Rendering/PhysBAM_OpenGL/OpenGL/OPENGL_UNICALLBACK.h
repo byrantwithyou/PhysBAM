@@ -217,11 +217,11 @@ public:
     {
         if(smooth_shading){
             smooth_shading=false;
-            for(int i=1; i<=world.object_list.m; i++) if(world.can_toggle_smooth_shading(i))
+            for(int i=0;i<world.object_list.m;i++) if(world.can_toggle_smooth_shading(i))
                 world.object_list(i)->Turn_Smooth_Shading_Off();}
         else{
             smooth_shading=true;
-            for(int i=1; i<=world.object_list.m; i++) if(world.can_toggle_smooth_shading(i))
+            for(int i=0;i<world.object_list.m;i++) if(world.can_toggle_smooth_shading(i))
                 world.object_list(i)->Turn_Smooth_Shading_On();}
     }
     void Print(std::ostream& out) { out << "Toggle smooth shading"; }

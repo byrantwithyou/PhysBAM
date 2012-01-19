@@ -98,7 +98,7 @@ void Reset_Restlengths(){
     (*(solids_parameters.deformable_body_parameters.list(1).linear_altitude_springs_s3d(1))).Set_Restlength_From_Particles();}
 void Reset_Velocities(){
     TRIANGULATED_SURFACE<T> *my_skin = solids_parameters.deformable_body_parameters.list(1).triangulated_surface;
-    for(int c=1; c<=my_skin->particles.array_collection->Size(); c++) {my_skin->particles.V(c) = VECTOR_3D<T>(0,0,0);}}
+    for(int c=0;c<my_skin->particles.array_collection->Size();c++) {my_skin->particles.V(c) = VECTOR_3D<T>(0,0,0);}}
 void Set_Bending(){
     (*(solids_parameters.deformable_body_parameters.list(1).bending_elements(1))).Set_Sine_Half_Rest_Angle(0.0);}
 
@@ -106,11 +106,11 @@ void Set_Bending(){
 // Function Ever_Inside Stuff 
 //#####################################################################
 void Reset_Ever_Inside(){
-    for(int i=1; i<=ever_inside.m; i++) {ever_inside(i) = false; ls_normal(i) = VECTOR_3D<T>(0.0,0.0,0.0);}}
+    for(int i=0;i<ever_inside.m;i++) {ever_inside(i) = false; ls_normal(i) = VECTOR_3D<T>(0.0,0.0,0.0);}}
 void Update_Ever_Inside() {
     std::cout<<"Updating Ever Inside"<<std::endl;
     ARRAY<bool> is_inside = solids_parameters.deformable_body_parameters.list(1).collisions.enforce_collision;
-    for(int i=1; i<=is_inside.m; i++) {
+    for(int i=0;i<is_inside.m;i++) {
         if(is_inside(i)) {
             ever_inside(i) = true;
             ls_normal(i) = solids_parameters.deformable_body_parameters.list(1).collisions.collision_normal(i);}}
@@ -128,7 +128,7 @@ void Shrink(){
     DEFORMABLE_OBJECT_3D<T> *my_def_obj = &(solids_parameters.deformable_body_parameters.list(1));
     LINEAR_SPRINGS<T,VECTOR_3D<T> > *ls = my_def_obj->linear_springs(1);
     LINEAR_ALTITUDE_SPRINGS_3D<T> *las = my_def_obj->linear_altitude_springs_3d(1);
-    for(int u=1; u<=ls->restlength.m; u++) {
+    for(int u=0;u<ls->restlength.m;u++) {
         int node1=ls->segment_mesh.segments(1,u);
         int node2=ls->segment_mesh.segments(2,u);
         if(ever_inside(node1)&&ever_inside(node2)) { //both nodes are on the levelset
@@ -146,14 +146,14 @@ void Shrink(){
 //#####################################################################
 void Set_External_Velocities(ARRAY<VECTOR_3D<T> >& V,const T time) {
     if(mode > 1) {   //Constrain direction normal to levelset to be 0
-        for(int c=1; c<=V.m; c++) {
+        for(int c=0;c<V.m;c++) {
             if(ever_inside(c)) { //nodes on levelset stay there...
                 V(c)-=VECTOR_3D<T>::Dot_Product(V(c),ls_normal(c))*ls_normal(c); 
             }}
 }}
 void Zero_Out_Enslaved_Velocity_Nodes(ARRAY<VECTOR_3D<T> >& V,const T time) {    
     if(mode > 1) {   //Constrain direction normal to levelset to be 0
-        for(int c=1; c<=V.m; c++) {
+        for(int c=0;c<V.m;c++) {
             if(ever_inside(c)) { 
                 V(c)-=VECTOR_3D<T>::Dot_Product(V(c),ls_normal(c))*ls_normal(c); 
             }}
@@ -164,7 +164,7 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY<VECTOR_3D<T> >& V,const T time) {
 void Add_External_Forces(ARRAY<VECTOR_3D<T> >& F,const T time) PHYSBAM_OVERRIDE {
     if(mode!= 2) return;
     IMPLICIT_SURFACE<T> *levelset1 = solids_parameters.rigid_body_parameters.list.rigid_bodies(1)->implicit_surface;
-    for(int p=1; p<=F.m; p++) {
+    for(int p=0;p<F.m;p++) {
         VECTOR_3D<T> current_location = solids_parameters.deformable_body_parameters.list(1).triangulated_surface->particles.X(p);
         VECTOR_3D<T> n = levelset1->Extended_Normal(current_location);
         T depth; levelset1->Lazy_Outside_Extended_Levelset_And_Value(current_location, depth); 
@@ -189,7 +189,7 @@ void Get_Initial_Data() {
     std::cout << "total vertices = " << particles.array_size << std::endl;std::cout << "total triangles = " << triangle_mesh.triangles.m << std::endl;
     particles.store_velocity = false; particles.Update_Velocity();  // forcing velocity resize - not sure why this is needed
     particles.store_mass = false; particles.Store_Mass(); // forcing mass resize - not sure why
-    for(int p=1; p<=particles.array_collection->Size(); p++) {particles.mass(p) = 0.0;}
+    for(int p=0;p<particles.array_collection->Size();p++) {particles.mass(p) = 0.0;}
     triangulated_surface.Set_Density(1);triangulated_surface.Set_Mass_Of_Particles(solids_parameters.use_constant_mass);
     triangulated_surface.Update_Bounding_Box();
     ever_inside.Resize(solids_parameters.deformable_body_parameters.list(index).triangulated_surface->particles.array_collection->Size());

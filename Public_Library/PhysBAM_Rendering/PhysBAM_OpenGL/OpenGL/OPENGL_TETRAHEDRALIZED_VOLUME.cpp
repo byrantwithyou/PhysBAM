@@ -519,7 +519,7 @@ Display_Subset()
     material.Send_To_GL_Pipeline();
     glColor3f((float).7,(float).7,(float).7);
     ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> normals;
-    for(int tet_index=1; tet_index<=subset.m; tet_index++){
+    for(int tet_index=0;tet_index<subset.m;tet_index++){
         int t=subset(tet_index);
         int i,j,k,l;mesh->elements(t).Get(i,j,k,l);
         VECTOR<T,3> xi=particles->X(i),xj=particles->X(j),xk=particles->X(k),xl=particles->X(l);

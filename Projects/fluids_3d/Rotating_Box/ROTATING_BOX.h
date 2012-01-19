@@ -89,7 +89,7 @@ void Update_Geometry_Old()
 
 void Update_Geometry()//ARRAY<RIGID_BODY<TV>*>& rigid_bodies)
 {
-    for(int index=1; index<=rigid_bodies.m; index++) {
+    for(int index=0;index<rigid_bodies.m;index++) {
         for(int i=0;i<m;i++) for(int j=0;j<n;j++) for(int ij=0;ij<mn;ij++)
         if(rigid_bodies(index)->Implicit_Surface_Inside(VECTOR_3D(grid->x(i),grid->y(j),grid->z(ij)))){
             (*density)(i,j,ij)=1;(*T)(i,j,ij)=1;

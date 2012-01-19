@@ -219,7 +219,7 @@ public:
     void Output(DK &dk)
     {
         ARRAY <DK_VERTEX <double> *> &vertex_sequence=*dk.vlist->vertex_sequence;
-        for(int i=1; i<=vertex_sequence.m; i++)
+        for(int i=0;i<vertex_sequence.m;i++)
         {
             int newindex=FindVertex(vertex_sequence(i)->index);
             //printf("newindex %d\n", newindex);

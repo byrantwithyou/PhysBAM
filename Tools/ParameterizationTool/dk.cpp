@@ -4,7 +4,7 @@
 VECTOR_3D<double> DK::GetPosition(int p0, CYCLIC_ARRAY <DK_VERTEX <double> *> &maps, int target)
 {
     if( target==p0)        return VECTOR_3D<double> (0, 0, 0);
-    for(int i=1; i<=maps.m; i++)
+    for(int i=0;i<maps.m;i++)
     {
         if( maps(i)->index==target)    return maps(i)->temp_P;
     }
@@ -32,15 +32,15 @@ bool DK::Is_Covered( CYCLIC_ARRAY <DK_VERTEX <double> *> &maps, int except)
 {
     int test=0;
     except=maps(except)->index;
-    for(int i=1; i<=maps.m; i++)
+    for(int i=0;i<maps.m;i++)
     {
         int index=maps(i)->index;
         if(index==except)    continue;
-        for(int j=1; j<=(*currentmesh->neighbor_nodes)(index).m; j++)
+        for(int j=0;j<(*currentmesh->neighbor_nodes)(index).m;j++)
         {
             int neighbor=(*currentmesh->neighbor_nodes)(index)(j);
             if( neighbor==except)    continue;
-            for(int k=1; k<=maps.m; k++)
+            for(int k=0;k<maps.m;k++)
                 if( maps(k)->index == neighbor)
                     test++;
         }
@@ -55,7 +55,7 @@ void DK::Build(int p0, DK_VERTEX_LIST<float, double> &vlist)
 
     double angles[13];
     double sumofangles=0;
-    for(int i=1; i<=indices.m; i++)
+    for(int i=0;i<indices.m;i++)
     {
         angles[i]=sumofangles;
         VECTOR_3D<double> e1, e2; 
@@ -148,7 +148,7 @@ void DK::Build(int p0, DK_VERTEX_LIST<float, double> &vlist)
         }
 
         //find the smallest angle.
-        for(int i=1; i<=maps.m; i++)
+        for(int i=0;i<maps.m;i++)
         {
             if(minangle > maps(i)->weight && maps(i)->weight>=0)
             {
@@ -188,7 +188,7 @@ bool DK::Output(char *filename)
     if(!f)    return false;
 
 
-    for(int i=1; i<=vlist->vertex_sequence->m; i++)
+    for(int i=0;i<vlist->vertex_sequence->m;i++)
     {
         if( (*vlist->vertex_sequence)(i)->real_u<0 ||
             (*vlist->vertex_sequence)(i)->real_v<0)

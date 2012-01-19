@@ -605,14 +605,14 @@ void Compute_Sample_Points()
 {
     PHYSBAM_ASSERT(resolution%base_resolution==0 && resolution/base_resolution%2==1);
     int m=resolution/base_resolution,n=m/2;
-    for(int y=1; y<=base_resolution; y++)
+    for(int y=0;y<base_resolution;y++)
         for(int x=2; x<=base_resolution; x++)
             face_samples.Append(FACE_INDEX<TV::m>(1,TV_INT((x-1)*(m-1)+x,y*m-n+extra_cells)));
     for(int y=2; y<=base_resolution; y++)
-        for(int x=1; x<=base_resolution; x++)
+        for(int x=0;x<base_resolution;x++)
             face_samples.Append(FACE_INDEX<TV::m>(2,TV_INT(x*m-n,(y-1)*(m-1)+y+extra_cells)));
-    for(int y=1; y<=base_resolution; y++)
-        for(int x=1; x<=base_resolution; x++)
+    for(int y=0;y<base_resolution;y++)
+        for(int x=0;x<base_resolution;x++)
             cell_samples.Append(TV_INT(x*m-n,y*m-n+extra_cells));
 
     global_face_samples=&face_samples;

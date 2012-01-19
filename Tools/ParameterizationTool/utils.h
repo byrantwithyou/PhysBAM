@@ -65,7 +65,7 @@ public:
         vlist=vl;
         mesh=currentmesh;
         particles=emb_boundary_particles;
-        for(int i=1; i<=mesh->triangles.m; i++)
+        for(int i=0;i<mesh->triangles.m;i++)
         {
             DK_TRIANGLE<T1> *t=new DK_TRIANGLE<T1>;
             t->ti=mesh->triangles(1, i);
@@ -98,7 +98,7 @@ public:
     }
     
     ~DK_TRIANGLE_LIST() 
-    {for(int i=1; i<=old_triangles_info.m; i++) delete old_triangles_info(i);for( i=1; i<=new_triangles_info.m; i++) delete new_triangles_info(i);}
+    {for(int i=0;i<old_triangles_info.m;i++) delete old_triangles_info(i);for( i=1; i<=new_triangles_info.m; i++) delete new_triangles_info(i);}
     
     ARRAY <int> *remove(int i, int &ri, int &rj, int &rk)
     {
@@ -126,7 +126,7 @@ public:
         DK_TRIANGLE<T1> *t=new     DK_TRIANGLE<T1>;
         t->ti=ti; t->tj=tj; t->tk=tk;
     
-        for(int i=1; i<=free_vlist->m; i++)
+        for(int i=0;i<free_vlist->m;i++)
         {
             if( (*free_vlist)(i)->tag==true)
             {
@@ -159,7 +159,7 @@ public:
 
     void Getlist( ARRAYS<int> &ret, ARRAY< ARRAY <int> > &vertices_info)
     {
-        for(int i=1; i<=old_triangles_info.m; i++)
+        for(int i=0;i<old_triangles_info.m;i++)
         {
             if( old_triangles_info(i)->flag!=FLAG_REMOVED )
             {
@@ -305,7 +305,7 @@ public:
         MAX_area=0;
         MAX_curvature=0;
         //First, compute the area and the curvature of each vertex.
-        for(int i=1; i<=nVertices; i++)
+        for(int i=0;i<nVertices;i++)
             if(vertices[i].flag!=FLAG_REMOVED)
             {
                 vertices[i].flag=FLAG_ACTIVE;
@@ -314,7 +314,7 @@ public:
                 vertices[i].area=0;
                 VECTOR mean_K=VECTOR(0, 0, 0);
                 double Gaussian_K=0;
-                for(int j=1; j<=(*mesh->incident_triangles)(i).m; j++)
+                for(int j=0;j<(*mesh->incident_triangles)(i).m;j++)
                 {
                     int t=(*mesh->incident_triangles)(i)(j);
                     DK_TRIANGLE<T1> *info=tl->GetInfo(t);

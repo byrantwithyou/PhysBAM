@@ -48,7 +48,7 @@ public:
         emb_boundary_surf.Clean_Up_Memory();
         emb_boundary_surf.Read<float>(input);   
 
-        for(int t=1; t<=emb_boundary_surf.particles.number; t++)
+        for(int t=0;t<emb_boundary_surf.particles.number;t++)
         {
               VECTOR_3D<double> P=emb_boundary_particles.X(t);
             aveX+=P.x/emb_boundary_particles.number;
@@ -160,7 +160,7 @@ public:
         vertices_info(t0).Clean_Up_Memory();
         vertices_info(t1).Clean_Up_Memory();
 
-        for(int i=1; i<=free_vlist.m; i++)
+        for(int i=0;i<free_vlist.m;i++)
         {
             double u, v;
             if( Compute_Barycentric(P0, P3, P2, free_vlist(i)->temp_P, u, v)==true)

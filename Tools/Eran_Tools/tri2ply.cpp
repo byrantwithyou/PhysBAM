@@ -34,7 +34,7 @@ template<class T> void Convert(const char *input_filename, const char *output_fi
     polygonal_surface.polygons.Resize(triangulated_surface->triangle_mesh.triangles.m);
     for (int i=1; i<=triangulated_surface->triangle_mesh.triangles.m; i++) {
         polygonal_surface.polygons(i).Exact_Resize(3);
-        for(int j=1; j<=3; j++) polygonal_surface.polygons(i)(j)=triangulated_surface->triangle_mesh.triangles(j,i);
+        for(int j=0;j<3;j++) polygonal_surface.polygons(i)(j)=triangulated_surface->triangle_mesh.triangles(j,i);
     }
 
     ofstream output(output_filename);

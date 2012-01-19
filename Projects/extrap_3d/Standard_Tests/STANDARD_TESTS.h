@@ -1672,7 +1672,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
             Add_Constitutive_Model(tetrahedralized_volume,(T)1e5,(T).45,(T).01);
-            for(int i=1; i<=deformable_body_collection.particles.X.m; i++) deformable_body_collection.particles.X(i).y=3;
+            for(int i=0;i<deformable_body_collection.particles.X.m;i++) deformable_body_collection.particles.X(i).y=3;
             break;}
         case 9: case 56:{break;}
         case 10:{
@@ -1740,7 +1740,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             Add_Constitutive_Model(tetrahedralized_volume,(T)1e6,(T).40,(T).01);
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
-            for(int i=1; i<=deformable_body_collection.particles.X.m; i++){ deformable_body_collection.particles.V(i).x=(T)60;deformable_body_collection.particles.V(i).y=0;deformable_body_collection.particles.V(i).z=0;}
+            for(int i=0;i<deformable_body_collection.particles.X.m;i++){ deformable_body_collection.particles.V(i).x=(T)60;deformable_body_collection.particles.V(i).y=0;deformable_body_collection.particles.V(i).z=0;}
             break;}
         case 31:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
@@ -2439,7 +2439,7 @@ void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
         ARRAY<DIAGONAL_MATRIX<T,3> >& sv = force_field.Fe_hat;
         T Jmin = (T)1; T s1=(T)0; T s2=(T)0; T s3=(T)0;
 
-        for(int i=1; i<=sv.m; i++){
+        for(int i=0;i<sv.m;i++){
             if (Jmin > sv(i).x11*sv(i).x22*sv(i).x33){ s1=sv(i).x11; s2=sv(i).x22; s3=sv(i).x33; Jmin = sv(i).x11*sv(i).x22*sv(i).x33;}}
     LOG::cout<<"Minimum determinant "<<Jmin << " " << s1 << " " << s2 << " " << s3 <<std::endl;
     //}
@@ -2455,7 +2455,7 @@ void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
     if(dump_sv){
         for(int f=1;FINITE_VOLUME<TV,3>* force_field=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>*>(f);f++){
             ARRAY<DIAGONAL_MATRIX<T,3> >& sv = force_field->Fe_hat;
-            for(int i=1; i<=sv.m; i++){
+            for(int i=0;i<sv.m;i++){
                 svout << sv(i).x11 << " " << sv(i).x22 << " " << sv(i).x33 << std::endl;
                 Add_Debug_Particle(sv(i).To_Vector(),TV(1,1,0));
                 Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,-force_field->isotropic_model->P_From_Strain(sv(i),1,i).To_Vector());}}}
@@ -2565,7 +2565,7 @@ void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) PHYSBAM_OVERRIDE
         PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
         ARRAY<bool> use(particles.X.m);
         use.Subset(externally_forced).Fill(true);
-        for(int p=1; p<=particles.X.m; p++)
+        for(int p=0;p<particles.X.m;p++)
         {
             T height=particles.X(p).x;
             if(!use(p) && height<10) continue;

@@ -49,7 +49,7 @@ Display(const int in_color) const
 #endif
     {
         ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-        for(int t=1; t<=curve.mesh.elements.m; t++){
+        for(int t=0;t<curve.mesh.elements.m;t++){
             int i=curve.mesh.elements(t)(1),j=curve.mesh.elements(t)(2);
             OpenGL_Line(curve.particles.X(i),curve.particles.X(j),vertices);}
         OpenGL_Draw_Arrays(GL_LINES,2,vertices);
@@ -71,7 +71,7 @@ Display(const int in_color) const
         vertex_color.Send_To_GL_Pipeline();
         glPointSize(5.0f);
         ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-        for(int t=1; t<=curve.particles.array_collection->Size(); t++){
+        for(int t=0;t<curve.particles.array_collection->Size();t++){
             OpenGL_Vertex(curve.particles.X(t),vertices);
         }
         OpenGL_Draw_Arrays(GL_POINTS,2,vertices);
@@ -80,7 +80,7 @@ Display(const int in_color) const
 #ifndef USE_OPENGLES
     if (draw_vertex_positions) {
         vertex_position_color.Send_To_GL_Pipeline();
-        for(int t=1; t<=curve.particles.array_collection->Size(); t++){
+        for(int t=0;t<curve.particles.array_collection->Size();t++){
             VECTOR<float,3> world_space_pos=World_Space_Point(VECTOR<float,2>(curve.particles.X(t)));
             OpenGL_String(curve.particles.X(t),STRING_UTILITIES::string_sprintf("<%f %f>",world_space_pos.x,world_space_pos.y));
         }
@@ -107,7 +107,7 @@ Bounding_Box() const
     float xmin,xmax,ymin,ymax;
     xmin=xmax=curve.particles.X(1).x;
     ymin=ymax=curve.particles.X(1).y;
-    for(int i=1; i<=curve.particles.array_collection->Size(); i++){
+    for(int i=0;i<curve.particles.array_collection->Size();i++){
         xmin=min(xmin,(float)curve.particles.X(i).x);xmax=max(xmax,(float)curve.particles.X(i).x);
         ymin=min(ymin,(float)curve.particles.X(i).y);ymax=max(ymax,(float)curve.particles.X(i).y);}
     return World_Space_Box(RANGE<VECTOR<float,3> >(xmin,xmax,ymin,ymax,0,0));

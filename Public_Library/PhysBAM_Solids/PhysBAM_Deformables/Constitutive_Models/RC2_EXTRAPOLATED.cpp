@@ -294,7 +294,7 @@ Compute_dE(const GENERAL_ENERGY<T>& base,const TV& f,const int simplex)
     dh=((T)1-dq).Transpose_Times(u)+du.Transpose_Times(f-q);
     db=dg.Transpose_Times(u)+du.Transpose_Times(g);
     base.dddE(q,simplex,&TT(1));
-    for(int i=1; i<=d; i++) Tu+=u(i)*TT(i);
+    for(int i=0;i<d;i++) Tu+=u(i)*TT(i);
     uTu=Tu*u;
     dc=dq.Transpose_Times(uTu)+(T)2*du.Transpose_Times(Hu);
     dE=dphi+dh*(b+h*c)+h*db+(T)0.5*sqr(h)*dc;
@@ -345,32 +345,32 @@ Compute_ddE(const GENERAL_ENERGY<T>& base,const TV& f,const int simplex)
     TV fm1=f-1;
     T m2=sqr(m),m3=m*m2;
     dds.From_Matrix(-xi*MATRIX<T,d>::Outer_Product((T)1/q,ds)-MATRIX<T,d>::Outer_Product(s/q,dxi)+DIAGONAL_MATRIX<T,d>((T)s*xi/sqr(q))*dq);
-    for(int i=1; i<=d; i++){
+    for(int i=0;i<d;i++){
         MATRIX<T,d> t;
-        for(int j=1; j<=d; j++){t(i,j)+=ds(j);t(j,i)+=ds(j);}
+        for(int j=0;j<d;j++){t(i,j)+=ds(j);t(j,i)+=ds(j);}
         ddq(i)=fm1(i)*dds+t.Symmetric_Part();}
     ddz+=SYMMETRIC_MATRIX<T,d>::Conjugate_With_Transpose(dq,DIAGONAL_MATRIX<T,d>((T)2*fm1/cube(q)));
     ddz-=(DIAGONAL_MATRIX<T,d>((T)2/sqr(q))*dq).Symmetric_Part();
-    for(int i=1; i<=d; i++) ddz-=fm1(i)/sqr(q(i))*ddq(i);
+    for(int i=0;i<d;i++) ddz-=fm1(i)/sqr(q(i))*ddq(i);
     ddxi=2*cube(xi)*SYMMETRIC_MATRIX<T,d>::Outer_Product(dz)-sqr(xi)*ddz;
     ddphi=SYMMETRIC_MATRIX<T,d>::Transpose_Times_With_Symmetric_Result(dg,dq);
     for(int i=0;i<d;i++) ddphi+=g(i)*ddq(i);
     ddm=3*m2*m3*SYMMETRIC_MATRIX<T,d>::Outer_Product(fm1)-m3;
-    for(int i=1; i<=d; i++){
+    for(int i=0;i<d;i++){
         MATRIX<T,d> t;
-        for(int j=1; j<=d; j++){t(i,j)+=dm(j);t(j,i)+=dm(j);}
+        for(int j=0;j<d;j++){t(i,j)+=dm(j);t(j,i)+=dm(j);}
         ddu(i)=fm1(i)*ddm+t.Symmetric_Part();}
-    for(int i=1; i<=d; i++){
+    for(int i=0;i<d;i++){
         ddg(i)=SYMMETRIC_MATRIX<T,d>::Conjugate_With_Transpose(dq,TT(i));
-        for(int j=1; j<=d; j++) ddg(i)+=H(i,j)*ddq(j);}
+        for(int j=0;j<d;j++) ddg(i)+=H(i,j)*ddq(j);}
     ddh=((T)1-dq).Transpose_Times(du*2).Symmetric_Part();
-    for(int i=1; i<=d; i++) ddh+=(f(i)-q(i))*ddu(i)-ddq(i)*u(i);
+    for(int i=0;i<d;i++) ddh+=(f(i)-q(i))*ddu(i)-ddq(i)*u(i);
     ddb=(T)2*dg.Transpose_Times(du).Symmetric_Part();
-    for(int i=1; i<=d; i++) ddb+=g(i)*ddu(i)+ddg(i)*u(i);
+    for(int i=0;i<d;i++) ddb+=g(i)*ddu(i)+ddg(i)*u(i);
     base.ddddE(q,simplex,&A(1)(1));
     ddc=(T)4*dq.Transpose_Times(Tu*du).Symmetric_Part()+(T)2*SYMMETRIC_MATRIX<T,d>::Conjugate_With_Transpose(du,H);
-    for(int i=1; i<=d; i++) for(int j=1; j<=d; j++) ddc+=u(i)*u(j)*SYMMETRIC_MATRIX<T,d>::Conjugate_With_Transpose(dq,A(i)(j));
-    for(int i=1; i<=d; i++) ddc+=uTu(i)*ddq(i)+(T)2*Hu(i)*ddu(i);
+    for(int i=0;i<d;i++) for(int j=0;j<d;j++) ddc+=u(i)*u(j)*SYMMETRIC_MATRIX<T,d>::Conjugate_With_Transpose(dq,A(i)(j));
+    for(int i=0;i<d;i++) ddc+=uTu(i)*ddq(i)+(T)2*Hu(i)*ddu(i);
     ddE=ddphi+(b+c*h)*ddh+h*ddb+(T).5*sqr(h)*ddc+MATRIX<T,d>::Outer_Product(dh*2,db+h*dc).Symmetric_Part()+c*SYMMETRIC_MATRIX<T,d>::Outer_Product(dh);
 
     base.Compute_it(q,simplex,g_it,H_xit,H_iitt,T_xxit,T_xiitt,T_iiittt,T_itit);
