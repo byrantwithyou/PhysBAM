@@ -36,7 +36,7 @@ Update(const ARRAY_BASE<VECTOR<int,d>,T_ARRAY>& base_elements,const ARRAY<bool>&
 {
     const T_ARRAY& elements=base_elements.Derived();
     indices.Remove_All();
-    for(int i=1;i<=elements.Size();i++)
+    for(int i=0;i<elements.Size();i++)
         if(particle_is_simulated.Subset(elements(i)).Contains(true))
             indices.Append(i);
 }
@@ -49,7 +49,7 @@ Update(const ARRAY_BASE<int,T_ARRAY>& base_elements,const ARRAY<bool>& particle_
     HASHTABLE<int> found;
     const T_ARRAY& elements=base_elements.Derived();
     indices.Remove_All();
-    for(int i=1;i<=elements.Size();i++)
+    for(int i=0;i<elements.Size();i++)
         if(particle_is_simulated(elements(i)))
             if(found.Set(elements(i)))
                 indices.Append(elements(i));
@@ -63,7 +63,7 @@ Update(const ARRAY_BASE<int,T_ARRAY>& base_elements)
     HASHTABLE<int> found;
     const T_ARRAY& elements=base_elements.Derived();
     indices.Remove_All();
-    for(int i=1;i<=elements.Size();i++)
+    for(int i=0;i<elements.Size();i++)
         if(found.Set(elements(i)))
             indices.Append(elements(i));
 }

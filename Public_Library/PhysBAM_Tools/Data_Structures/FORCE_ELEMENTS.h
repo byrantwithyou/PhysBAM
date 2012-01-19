@@ -32,14 +32,14 @@ public:
         int index;
 
         ITERATOR(const FORCE_ELEMENTS& force_elements)
-            :indices(force_elements.indices),index(1)
+            :indices(force_elements.indices),index(0)
         {}
 
         void Next()
         {index++;}
 
         bool Valid() const
-        {return index<=indices.m;}
+        {return index<indices.m;}
 
         int Data() const
         {return indices(index);}

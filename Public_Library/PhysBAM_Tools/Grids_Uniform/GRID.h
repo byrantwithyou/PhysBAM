@@ -202,22 +202,22 @@ public:
     {return domain.max_corner;}
 
     T Axis_X(const int i,const int axis) const // axis component of position at the i=1 to i=counts(axis) grid points
-    {return domain.min_corner(axis)+(i-1+MAC_offset)*dX(axis);}
+    {return domain.min_corner(axis)+(i+MAC_offset)*dX(axis);}
 
     T Axis_X_plus_half(const int i,const int axis) const
-    {return domain.min_corner(axis)+(i-(T).5+MAC_offset)*dX(axis);}
+    {return domain.min_corner(axis)+(i+(T).5+MAC_offset)*dX(axis);}
 
     T Axis_X_minus_half(const int i,const int axis) const
-    {return domain.min_corner(axis)+(i-(T)1.5+MAC_offset)*dX(axis);}
+    {return domain.min_corner(axis)+(i-(T).5+MAC_offset)*dX(axis);}
 
     TV X_plus_half(const TV_INT& index) const
-    {return domain.min_corner+(TV(index)-((T).5+MAC_offset))*dX;}
+    {return domain.min_corner+(TV(index)-(-(T).5+MAC_offset))*dX;}
 
     TV X_minus_half(const TV_INT& index) const
-    {return domain.min_corner+(TV(index)-((T)1.5+MAC_offset))*dX;}
+    {return domain.min_corner+(TV(index)-((T).5+MAC_offset))*dX;}
 
     TV X(const TV_INT& index) const
-    {return domain.min_corner+(TV(index)+(MAC_offset-1))*dX;}
+    {return domain.min_corner+(TV(index)+MAC_offset)*dX;}
 
     TV X(const int i,const int j,const int ij) const
     {STATIC_ASSERT(dimension==3);return X(TV_INT(i,j,ij));}
@@ -238,7 +238,7 @@ public:
     {STATIC_ASSERT(dimension==1);return Node(TV_INT(i));}
 
     TV Node(const TV_INT& index) const
-    {return domain.min_corner+TV(index-1)*dX;}
+    {return domain.min_corner+TV(index)*dX;}
 
     TV Center(const int i,const int j,const int ij) const
     {STATIC_ASSERT(dimension==3);return Center(TV_INT(i,j,ij));}
@@ -250,13 +250,13 @@ public:
     {STATIC_ASSERT(dimension==1);return Center(TV_INT(i));}
 
     TV Center(const TV_INT& index) const
-    {return domain.min_corner+(TV(index)-(T).5)*dX;}
+    {return domain.min_corner+(TV(index)+(T).5)*dX;}
 
     TV Axis_X_Face(const INDEX_FACE& face) const
     {return Axis_X_Face(face.index,face.axis);}
 
     TV Axis_X_Face(const TV_INT& index,const int axis) const
-    {TV adjusted=TV(index)-(T).5;adjusted(axis)-=(T).5;return domain.min_corner+adjusted*dX;}
+    {TV adjusted=TV(index)+(T).5;adjusted(axis)-=(T).5;return domain.min_corner+adjusted*dX;}
 
     TV X_Face(const int i,const int j,const int ij) const
     {STATIC_ASSERT(dimension==3);return X_Face(TV_INT(i,j,ij));}
@@ -286,7 +286,7 @@ public:
     {return Axis_X_Face(index,3);}
 
     TV Face(const int axis,const TV_INT& index) const
-    {TV shifted_index(TV(index)-(T).5);shifted_index(axis)-=(T).5;return domain.min_corner+shifted_index*dX;}
+    {TV shifted_index(TV(index)+(T).5);shifted_index(axis)-=(T).5;return domain.min_corner+shifted_index*dX;}
 
     RANGE<TV> Face_Domain(const int axis,const TV_INT& index,const T thickness_over_two=0) const
     {TV dimensions=(T).5*dX;dimensions[axis]=thickness_over_two;RANGE<TV> domain(Face(axis,index));domain.Change_Size(dimensions);return domain;}
@@ -346,7 +346,7 @@ public:
     {TV face_dimensions=dX;face_dimensions[axis]=0;return face_dimensions.Magnitude();}
 
     TV_INT Index(const TV& location) const // returns the left, bottom and front indices on a regular grid
-    {return TV_INT(floor((location-domain.min_corner)*one_over_dX+(1-MAC_offset)));} // note that "floor" is expensive
+    {return TV_INT(floor((location-domain.min_corner)*one_over_dX-MAC_offset));} // note that "floor" is expensive
 
     void Cell(const TV& location,TV_INT& index,const int number_of_ghost_cells) const // returns the left, bottom and front
     {int number_of_ghost_cells_plus_one=number_of_ghost_cells+1; // Add before casting to avoid negatives rounding up to zero
@@ -383,22 +383,22 @@ public:
     {index=clamp(index,TV_INT()-(number_of_ghost_cells-1),counts+number_of_ghost_cells);}
 
     TV_INT Clamped_Index(const TV& location) const
-    {return clamp(1+TV_INT(((location-domain.min_corner)*one_over_dX-MAC_offset)),1+TV_INT(),counts);}
+    {return clamp(TV_INT(((location-domain.min_corner)*one_over_dX-MAC_offset)),TV_INT(),counts);}
     
     TV_INT Clamped_Face_Index(const TV& location) const
-    {return clamp(1+TV_INT(((location-domain.min_corner)*one_over_dX-MAC_offset)),1+TV_INT(),counts+1);}
+    {return clamp(TV_INT(((location-domain.min_corner)*one_over_dX-MAC_offset)),TV_INT(),counts+1);}
 
     TV_INT Clamped_Index_End_Minus_One(const TV& location) const
-    {return clamp(1+TV_INT(((location-domain.min_corner)*one_over_dX-MAC_offset)),1+TV_INT(),counts-1);}
+    {return clamp(TV_INT(((location-domain.min_corner)*one_over_dX-MAC_offset)),TV_INT(),counts-1);}
         
     TV_INT Clamped_Index_End_Minus_One(const TV& location,const int number_of_ghost_cells) const
-    {return clamp(1+TV_INT((location-domain.min_corner)*one_over_dX-MAC_offset+(T)number_of_ghost_cells)-number_of_ghost_cells,TV_INT()-(number_of_ghost_cells-1),counts+(number_of_ghost_cells-1));}
+    {return clamp(TV_INT((location-domain.min_corner)*one_over_dX-MAC_offset+(T)number_of_ghost_cells)-number_of_ghost_cells,TV_INT()-number_of_ghost_cells,counts+number_of_ghost_cells);}
 
     TV_INT Clamp_To_Cell(const TV& location) const
-    {return clamp(1+TV_INT((location-domain.min_corner)*one_over_dX),TV_INT::All_Ones_Vector(),numbers_of_cells);}
+    {return clamp(TV_INT((location-domain.min_corner)*one_over_dX),TV_INT(),numbers_of_cells);}
 
     TV_INT Clamp_To_Cell(const TV& location,const int number_of_ghost_cells) const
-    {return clamp(1+TV_INT((location-domain.min_corner)*one_over_dX+(T)number_of_ghost_cells)-number_of_ghost_cells,TV_INT::All_Ones_Vector()-number_of_ghost_cells,numbers_of_cells+number_of_ghost_cells);}
+    {return clamp(TV_INT((location-domain.min_corner)*one_over_dX+(T)number_of_ghost_cells)-number_of_ghost_cells,TV_INT()-number_of_ghost_cells,numbers_of_cells+number_of_ghost_cells);}
 
     RANGE<TV_INT> Clamp_To_Cell(const RANGE<TV>& box,const int number_of_ghost_cells) const
     {return RANGE<TV_INT>(Clamp_To_Cell(box.Minimum_Corner(),number_of_ghost_cells),Clamp_To_Cell(box.Maximum_Corner(),number_of_ghost_cells));}
@@ -407,7 +407,7 @@ public:
     {assert(Is_MAC_Grid());return Clamped_Index_End_Minus_One(X,number_of_ghost_cells)+TV_INT::All_Ones_Vector();}
 
     TV_INT Closest_Node(const TV& location) const
-    {return clamp(TV_INT((location-domain.min_corner)*one_over_dX+(T)1.5),TV_INT::All_Ones_Vector(),counts);}
+    {return clamp(TV_INT((location-domain.min_corner)*one_over_dX+(T).5),TV_INT(),counts);}
 
     const RANGE<TV>& Domain() const
     {return domain;}
