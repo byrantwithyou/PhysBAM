@@ -19,12 +19,12 @@ template<class T> struct choice_helper<0,T,void,void>
     T& operator()(const int i,T& a,T& b,T& c){assert((unsigned)i<3);T* choices[]={&a,&b,&c};return *choices[i];}
 };
 
-template<class T1,class T2> struct choice_helper<1,T1,T2,void> {static T1& helper(T1& a,T2& b){return a;}};
-template<class T1,class T2> struct choice_helper<2,T1,T2,void> {static T2& helper(T1& a,T2& b){return b;}};
+template<class T1,class T2> struct choice_helper<0,T1,T2,void> {static T1& helper(T1& a,T2& b){return a;}};
+template<class T1,class T2> struct choice_helper<1,T1,T2,void> {static T2& helper(T1& a,T2& b){return b;}};
 
-template<class T1,class T2,class T3> struct choice_helper<1,T1,T2,T3> {static T1& helper(T1& a,T2& b,T3& c){return a;}};
-template<class T1,class T2,class T3> struct choice_helper<2,T1,T2,T3> {static T2& helper(T1& a,T2& b,T3& c){return b;}};
-template<class T1,class T2,class T3> struct choice_helper<3,T1,T2,T3> {static T3& helper(T1& a,T2& b,T3& c){return c;}};
+template<class T1,class T2,class T3> struct choice_helper<0,T1,T2,T3> {static T1& helper(T1& a,T2& b,T3& c){return a;}};
+template<class T1,class T2,class T3> struct choice_helper<1,T1,T2,T3> {static T2& helper(T1& a,T2& b,T3& c){return b;}};
+template<class T1,class T2,class T3> struct choice_helper<2,T1,T2,T3> {static T3& helper(T1& a,T2& b,T3& c){return c;}};
 
 template<int i,class T1,class T2>
 inline typename IF<i==0,T1&,T2&>::TYPE choice(T1& a,T2& b)
