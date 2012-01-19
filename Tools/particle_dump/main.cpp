@@ -15,7 +15,7 @@ void Read_Particles(const STREAM_TYPE& stream_type,const std::string& file)
 {
     POINT_CLOUD<TV> particles;
     FILE_UTILITIES::Read_From_File(stream_type,file,particles);
-    for(int i=1;i<=particles.array_collection->Size();i++)
+    for(int i=0;i<particles.array_collection->Size();i++)
         Read_Write<POINT_CLOUD<TV>,typename TV::SCALAR>::Print(std::cout,particles,i);
 }
 

@@ -138,7 +138,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     // ------TEST
 /*    LOG::cout<<"Effective masses="<<std::endl;
-    for(int p=1;p<=particles.array_collection->Size();p++) LOG::cout<<"\teffective mass("<<p<<")="<<particles.mass.effective_mass(p)<<std::endl;
+    for(int p=0;p<particles.array_collection->Size();p++) LOG::cout<<"\teffective mass("<<p<<")="<<particles.mass.effective_mass(p)<<std::endl;
 
     // try a different effective mass
     ARRAY<TV> F(particles.array_collection->Size());
@@ -150,7 +150,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         particles.mass.one_over_effective_mass(binding.x)=particles.mass.one_over_mass(binding.x)=(T)1/particles.mass.array(binding.x);}
 
     LOG::cout<<"Effective masses="<<std::endl;
-    for(int p=1;p<=particles.array_collection->Size();p++) LOG::cout<<"\teffective mass("<<p<<")="<<particles.mass.effective_mass(p)<<std::endl;
+    for(int p=0;p<particles.array_collection->Size();p++) LOG::cout<<"\teffective mass("<<p<<")="<<particles.mass.effective_mass(p)<<std::endl;
 
     // recompute damping
     ((IMPLICIT_ZERO_LENGTH_SPRINGS<T,TV>*)spring_force)->Set_Overdamping_Fraction(overdamping_fraction);
@@ -178,7 +178,7 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 
 /*    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     LOG::cout<<"Frame "<<frame<<std::endl;
-      for(int p=1;p<=particles.array_collection->Size();p++) LOG::cout<<"X("<<p<<")="<<particles.X(p)<<std::endl;*/
+      for(int p=0;p<particles.array_collection->Size();p++) LOG::cout<<"X("<<p<<")="<<particles.X(p)<<std::endl;*/
 }
 //#####################################################################
 // Function Stability_Test

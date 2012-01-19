@@ -68,7 +68,7 @@ virtual void Get_Initial_Data()
     triangulated_area.Set_Density(1000);triangulated_area.Set_Mass_Of_Particles(solids_parameters.use_constant_mass);   
     triangulated_area.Update_Bounding_Box();
     VECTOR_2D<T> center(triangulated_area.bounding_box->Center());T bottom=triangulated_area.bounding_box->ymin;
-    for(int i=1;i<=particles.array_collection->Size();i++){
+    for(int i=0;i<particles.array_collection->Size();i++){
         particles.V(i)=initial_velocity+initial_angular_velocity*(particles.X(i)-center).Rotate_Counterclockwise_90();
         particles.X(i).y+=initial_height-bottom;}
 

@@ -130,7 +130,7 @@ void Get_Initial_Data()
 
     // determine simulation subset
     ARRAY<bool> particle_is_included(number_of_original_particles);
-    for(int p=1;p<=particles.array_collection->Size();p++)
+    for(int p=0;p<particles.array_collection->Size();p++)
         if(true) // change this to simulate a given subset
             particle_is_included(p)=true;
 

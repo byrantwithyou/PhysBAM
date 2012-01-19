@@ -99,7 +99,7 @@ Initialize_MPI(TETRAHEDRALIZED_VOLUME<T>& tet_volume,ARRAY<int>& local_to_global
         start_index[axis]=mpi_grid->boundaries(axis)(mpi_grid->coordinates[axis]);
 
     ARRAY<BOX<TV> > local_grids;
-    for(int proc=1;proc<=mpi_grid->Number_Of_Processors();proc++){
+    for(int proc=0;proc<mpi_grid->Number_Of_Processors();proc++){
         TV_INT proc_coordinates=mpi_grid->all_coordinates(proc);
         for(int axis=0;axis<T_GRID::dimension;axis++){
             start_index[axis]=mpi_grid->boundaries(axis)(proc_coordinates[axis]);
@@ -108,7 +108,7 @@ Initialize_MPI(TETRAHEDRALIZED_VOLUME<T>& tet_volume,ARRAY<int>& local_to_global
     ARRAY<ARRAY<int> > tets_to_send(mpi_grid->Number_Of_Processors());
     tet_volume.Update_Tetrahedron_List();
     tet_volume.Initialize_Hierarchy();
-    for(int proc=1;proc<=mpi_grid->Number_Of_Processors();proc++) tet_volume.hierarchy->Intersection_List(local_grids(proc),tets_to_send(proc));
+    for(int proc=0;proc<mpi_grid->Number_Of_Processors();proc++) tet_volume.hierarchy->Intersection_List(local_grids(proc),tets_to_send(proc));
     delete tet_volume.hierarchy;tet_volume.hierarchy=0;
     delete tet_volume.tetrahedron_list;tet_volume.tetrahedron_list=0;
     // Exchange

@@ -80,7 +80,7 @@ template<class TV> void ARTICULATED_RIGID_BODY_BASE<TV>::
 Update_With_Breadth_First_Directed_Graph(const int root,const int node_to_propagate_from)
 {
     if(!breadth_first_directed_graph || root!=breadth_first_directed_graph->Nodes_In_Level(1)(1)) Initialize_Breadth_First_Directed_Graph(root);
-    if(!node_to_propagate_from) for(int k=1;k<=breadth_first_directed_graph->Number_Of_Levels();k++){
+    if(!node_to_propagate_from) for(int k=0;k<breadth_first_directed_graph->Number_Of_Levels();k++){
         int child=breadth_first_directed_graph->Nodes_In_Level(k)(1);
         Update_Child_From_Parents(child,breadth_first_directed_graph->Parents(child));}
     else{

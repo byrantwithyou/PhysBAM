@@ -124,7 +124,7 @@ public:
         mass_properties.Set_Density(density);Mass()=mass_properties.Mass();
         FRAME<TV> frame_local;mass_properties.Transform_To_Object_Frame(frame_local,Inertia_Tensor());Set_Frame(frame_local);
         FRAME<TV> inverse_frame=Frame().Inverse();
-        for(int i=1;i<=particles.array_collection->Size();i++) particles.X(i)=inverse_frame*particles.X(i);
+        for(int i=0;i<particles.array_collection->Size();i++) particles.X(i)=inverse_frame*particles.X(i);
 
         RANGE<TV> box=RANGE<TV>::Empty_Box();for(int i=1; i <= particles.array_collection->Size(); i++) box.Enlarge_To_Include_Point(particles.X(i));
         T uniform_levelset_cell_size=box.Edge_Lengths().Max_Abs()/30; // 30 chosen based on average, don't think this actually used so wanted something reasonable        LOG::cout<<"Bounding box: "<<box<<std::endl;

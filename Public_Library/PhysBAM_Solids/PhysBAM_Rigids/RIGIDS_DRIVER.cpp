@@ -156,7 +156,7 @@ Initialize()
     example.Initialize_Bodies();
     example.Parse_Late_Options();
     rigids_evolution.time=time;
-    if(example.mpi_rigids) for(int j=1;j<=example.rigid_body_collection.rigid_body_particle.array_collection->Size();j++) if(example.rigid_body_collection.rigid_geometry_collection.Is_Active(j))
+    if(example.mpi_rigids) for(int j=0;j<example.rigid_body_collection.rigid_body_particle.array_collection->Size();j++) if(example.rigid_body_collection.rigid_geometry_collection.Is_Active(j))
         example.rigid_body_collection.Rigid_Body(j).impulse_accumulator=new RIGID_BODY_IMPULSE_ACCUMULATOR<TV,TV::dimension-1>(example.rigid_body_collection.Rigid_Body(j));
 
     if(example.restart){

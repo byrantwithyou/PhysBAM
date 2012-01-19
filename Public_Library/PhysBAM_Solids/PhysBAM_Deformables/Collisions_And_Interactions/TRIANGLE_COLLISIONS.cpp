@@ -156,7 +156,7 @@ Adjust_Velocity_For_Self_Collisions(const T dt,const T time,const bool exit_earl
         int exited_early=1;
 
         // Make a copy of the particles
-        impulse_velocities.Resize(full_particles.array_collection->Size());for(int i=1;i<=full_particles.array_collection->Size();i++) impulse_velocities(i)=full_particles.V(i);
+        impulse_velocities.Resize(full_particles.array_collection->Size());for(int i=0;i<full_particles.array_collection->Size();i++) impulse_velocities(i)=full_particles.V(i);
         pf_target_impulses.Resize(point_face_pairs_internal.Size());pf_target_impulses.Fill(TV());
         ee_target_impulses.Resize(edge_edge_pairs_internal.Size());ee_target_impulses.Fill(TV());
         pf_target_weights.Resize(point_face_pairs_internal.Size());pf_target_weights.Fill(VECTOR<T,d+1>());
@@ -213,7 +213,7 @@ Adjust_Velocity_For_Self_Collisions(const T dt,const T time,const bool exit_earl
         if(rigid && collisions_in_attempt && (!mpi_solids || mpi_solids->rank==0)) Apply_Rigid_Body_Motions(dt,rigid_lists);
         // Update positions
         if(collisions_in_attempt){
-            for(int p=1;p<=full_particles.array_collection->Size();p++) if(modified_full(p)) full_particles.X(p)=X_self_collision_free(p)+dt*full_particles.V(p);}
+            for(int p=0;p<full_particles.array_collection->Size();p++) if(modified_full(p)) full_particles.X(p)=X_self_collision_free(p)+dt*full_particles.V(p);}
 
         exited_early=0;
         EXIT_EARLY_AND_COMMUNICATE:;

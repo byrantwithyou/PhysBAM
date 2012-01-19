@@ -618,7 +618,7 @@ void Initialize_Velocities() PHYSBAM_OVERRIDE
 
         // structure velocities
         PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
-        for(int i=1;i<=particles.array_collection->Size();i++)
+        for(int i=0;i<particles.array_collection->Size();i++)
             particles.V(i)=Oscillating_Disk_Domain_Velocity_Sample(particles.X(i));
     }
 }
@@ -1267,7 +1267,7 @@ void Flexible_Beam_Test()
     
     mattress_grid=GRID<TV>(5,20,(T).95,(T)1.05,(T)0,(T).5);
     TRIANGULATED_AREA<T>& triangulated_area=solids_tests.Create_Mattress(mattress_grid,true,0,200);
-    for(int i=1;i<=particles.array_collection->Size();i++)
+    for(int i=0;i<particles.array_collection->Size();i++)
         if(particles.X(i).y<.0001)
             particles.mass(i)=FLT_MAX;
 
@@ -1621,7 +1621,7 @@ void Flexible_Filament_Test()
     //state.frame.t.x=1;
     //state.frame.t.y=.5;
     //SEGMENTED_CURVE_2D<T>& segmented_curve=solids_tests.Create_Segmented_Curve(filament_grid,state,200);
-    for(int i=1;i<=particles.array_collection->Size();i++)
+    for(int i=0;i<particles.array_collection->Size();i++)
         if(particles.X(i).x<.501)
             particles.mass(i)=FLT_MAX;
 

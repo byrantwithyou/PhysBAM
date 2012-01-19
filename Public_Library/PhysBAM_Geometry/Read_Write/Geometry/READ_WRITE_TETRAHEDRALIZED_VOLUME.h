@@ -30,7 +30,7 @@ public:
 
     output<<"tetrahedrons = "<<object.mesh.elements.m<<std::endl;
     output<<"particles = "<<object.particles.array_collection->Size()<<std::endl;
-    {int particles_touched=0;for(int p=1;p<=object.particles.array_collection->Size();p++) if((*object.mesh.incident_elements)(p).m) particles_touched++;
+    {int particles_touched=0;for(int p=0;p<object.particles.array_collection->Size();p++) if((*object.mesh.incident_elements)(p).m) particles_touched++;
     output<<"particles touched = "<<particles_touched<<std::endl;}
     output<<"bounding box = "<<*object.bounding_box<<std::endl;
     if(object.particles.store_velocity){

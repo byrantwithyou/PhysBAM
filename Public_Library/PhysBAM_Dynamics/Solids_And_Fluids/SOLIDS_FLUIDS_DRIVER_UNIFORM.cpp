@@ -990,14 +990,14 @@ Advect_Fluid(const T dt,const int substep)
         LINEAR_INTERPOLATION_UNIFORM<T_GRID,TV> interpolation;
         if(pls.use_removed_positive_particles) for(NODE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) if(pls.removed_positive_particles(iterator.Node_Index())){
             PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles=*pls.removed_positive_particles(iterator.Node_Index());
-            for(int p=1;p<=particles.array_collection->Size();p++){
+            for(int p=0;p<particles.array_collection->Size();p++){
                 TV X=particles.X(p),V=interpolation.Clamped_To_Array_Face(grid,*advection_face_velocities_ghost,X);
                 if(-pls.levelset.Phi(X)>1.5*particles.radius(p)) V-=fluids_parameters.removed_positive_particle_buoyancy_constant*fluids_parameters.gravity_direction; // buoyancy
                 particles.V(p)=V;}}
         if(pls.use_removed_negative_particles) for(NODE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) if(pls.removed_negative_particles(iterator.Node_Index())){
             PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles=*pls.removed_negative_particles(iterator.Node_Index());
-            for(int p=1;p<=particles.array_collection->Size();p++) particles.V(p)+=dt*fluids_parameters.gravity*fluids_parameters.gravity_direction; // ballistic
-            if(fluids_parameters.use_body_force) for(int p=1;p<=particles.array_collection->Size();p++)
+            for(int p=0;p<particles.array_collection->Size();p++) particles.V(p)+=dt*fluids_parameters.gravity*fluids_parameters.gravity_direction; // ballistic
+            if(fluids_parameters.use_body_force) for(int p=0;p<particles.array_collection->Size();p++)
                 particles.V(p)+=dt*interpolation.Clamped_To_Array_Face(grid,incompressible->force,particles.X(p));}} // external forces
     if(fluids_parameters.sph) fluids_parameters.sph_evolution->sph_particles.V+=dt*incompressible->gravity*incompressible->downward_direction; // ballistic
     if(fluids_parameters.use_soot){

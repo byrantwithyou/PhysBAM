@@ -741,7 +741,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             solids_tests.Add_Ground();
             break;}
         case 6:{
-            for(int p=1;p<=rigid_body_collection.rigid_body_particle.array_collection->Size();p++) Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(p));
+            for(int p=0;p<rigid_body_collection.rigid_body_particle.array_collection->Size();p++) Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(p));
             solids_tests.Add_Ground();
             break;}
         case 7:{

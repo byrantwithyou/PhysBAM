@@ -249,10 +249,10 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
                 TV_INT block=iterator.Node_Index();
                 if(fluids_parameters.particle_levelset_evolution->particle_levelset.negative_particles(block)){
                     PARTICLE_LEVELSET_PARTICLES<TV>& block_particles=*fluids_parameters.particle_levelset_evolution->particle_levelset.negative_particles(block);
-                    for(int k=1;k<=block_particles.array_collection->Size();k++) block_particles.X(k)+=position_offset;}
+                    for(int k=0;k<block_particles.array_collection->Size();k++) block_particles.X(k)+=position_offset;}
                 if(fluids_parameters.particle_levelset_evolution->particle_levelset.positive_particles(block)){
                     PARTICLE_LEVELSET_PARTICLES<TV>& block_particles=*fluids_parameters.particle_levelset_evolution->particle_levelset.positive_particles(block);
-                    for(int k=1;k<=block_particles.array_collection->Size();k++) block_particles.X(k)+=position_offset;}}}
+                    for(int k=0;k<block_particles.array_collection->Size();k++) block_particles.X(k)+=position_offset;}}}
         else if(test_number==12){
             TV_INT offset=TV_INT(0,-50);
             for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
@@ -266,10 +266,10 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
                 TV_INT block=iterator.Node_Index();
                 if(fluids_parameters.particle_levelset_evolution->particle_levelset.negative_particles(block)){
                     PARTICLE_LEVELSET_PARTICLES<TV>& block_particles=*fluids_parameters.particle_levelset_evolution->particle_levelset.negative_particles(block);
-                    for(int k=1;k<=block_particles.array_collection->Size();k++) block_particles.X(k)+=position_offset;}
+                    for(int k=0;k<block_particles.array_collection->Size();k++) block_particles.X(k)+=position_offset;}
                 if(fluids_parameters.particle_levelset_evolution->particle_levelset.positive_particles(block)){
                     PARTICLE_LEVELSET_PARTICLES<TV>& block_particles=*fluids_parameters.particle_levelset_evolution->particle_levelset.positive_particles(block);
-                    for(int k=1;k<=block_particles.array_collection->Size();k++) block_particles.X(k)+=position_offset;}}}
+                    for(int k=0;k<block_particles.array_collection->Size();k++) block_particles.X(k)+=position_offset;}}}
         
         fluids_parameters.particle_levelset_evolution->particle_levelset.Update_Particle_Cells(fluids_parameters.particle_levelset_evolution->particle_levelset.negative_particles);
         fluids_parameters.particle_levelset_evolution->particle_levelset.Update_Particle_Cells(fluids_parameters.particle_levelset_evolution->particle_levelset.positive_particles);
@@ -363,10 +363,10 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
             TV_INT block=iterator.Node_Index();
             if(fluids_parameters.particle_levelset_evolution->particle_levelset.negative_particles(block)){
                 PARTICLE_LEVELSET_PARTICLES<TV>& block_particles=*fluids_parameters.particle_levelset_evolution->particle_levelset.negative_particles(block);
-                for(int k=1;k<=block_particles.array_collection->Size();k++) block_particles.X(k).y=(T)100-block_particles.X(k).y;}
+                for(int k=0;k<block_particles.array_collection->Size();k++) block_particles.X(k).y=(T)100-block_particles.X(k).y;}
             if(fluids_parameters.particle_levelset_evolution->particle_levelset.positive_particles(block)){
                 PARTICLE_LEVELSET_PARTICLES<TV>& block_particles=*fluids_parameters.particle_levelset_evolution->particle_levelset.positive_particles(block);
-                for(int k=1;k<=block_particles.array_collection->Size();k++) block_particles.X(k).y=(T)100-block_particles.X(k).y;}}}
+                for(int k=0;k<block_particles.array_collection->Size();k++) block_particles.X(k).y=(T)100-block_particles.X(k).y;}}}
 
     PHYSBAM_DEBUG_WRITE_SUBSTEP("initialized phi",0,0);
 }

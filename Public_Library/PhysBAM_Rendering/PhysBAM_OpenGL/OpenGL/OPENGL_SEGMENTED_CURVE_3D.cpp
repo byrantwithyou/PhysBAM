@@ -111,13 +111,13 @@ Display(const int in_color) const
         vertex_color.Send_To_GL_Pipeline();
         glPointSize(5.0f);
         vertices.Resize(0);
-        for(int t=1;t<=curve.particles.array_collection->Size();t++) OpenGL_Vertex(curve.particles.X(t),vertices);
+        for(int t=0;t<curve.particles.array_collection->Size();t++) OpenGL_Vertex(curve.particles.X(t),vertices);
         OpenGL_Draw_Arrays(GL_POINTS,3,vertices);}
 
 #ifndef USE_OPENGLES
     if(draw_vertex_positions){
         vertex_position_color.Send_To_GL_Pipeline();
-        for(int t=1;t<=curve.particles.array_collection->Size();t++){
+        for(int t=0;t<curve.particles.array_collection->Size();t++){
             VECTOR<float,3> world_space_pos=World_Space_Point(VECTOR<float,3>(curve.particles.X(t)));
             OpenGL_String(curve.particles.X(t),STRING_UTILITIES::string_sprintf("<%f %f>",world_space_pos.x,world_space_pos.y));}}
 #endif
@@ -168,7 +168,7 @@ template<class T> RANGE<VECTOR<float,3> > OPENGL_SEGMENTED_CURVE_3D<T>::
 Bounding_Box() const
 {
     RANGE<TV> box;
-    for(int i=1;i<=curve.particles.array_collection->Size();i++) box.Enlarge_To_Include_Point(curve.particles.X(i));
+    for(int i=0;i<curve.particles.array_collection->Size();i++) box.Enlarge_To_Include_Point(curve.particles.X(i));
     return World_Space_Box(box);
 }
 //#####################################################################

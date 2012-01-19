@@ -73,17 +73,17 @@ void Get_Initial_Data(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume)
     if(use_control){
         plastic_goal.Resize(1,particles.array_collection->Size());
         T cube_volume=tetrahedralized_volume.Total_Volume();
-        for(int p=1;p<=particles.array_collection->Size();p++){
+        for(int p=0;p<particles.array_collection->Size();p++){
             T scale=particles.X(p).Lp_Norm(6)/(particles.X(p).Magnitude()+(T)1e-10);
             plastic_goal(p)=scale*particles.X(p);}
         ARRAY<VECTOR_3D<T> ,VECTOR<int,1> >::Exchange_Arrays(particles.X,plastic_goal.array);
         T new_volume=tetrahedralized_volume.Total_Volume(),scale=pow(cube_volume/new_volume,(T)one_third);
         ARRAY<VECTOR_3D<T> ,VECTOR<int,1> >::Exchange_Arrays(particles.X,plastic_goal.array);
-        for(int p=1;p<=particles.array_collection->Size();p++)plastic_goal(p)*=scale;}
+        for(int p=0;p<particles.array_collection->Size();p++)plastic_goal(p)*=scale;}
 
     tetrahedralized_volume.Update_Bounding_Box();
     VECTOR_3D<T> center(tetrahedralized_volume.bounding_box->Center());T bottom=tetrahedralized_volume.bounding_box->ymin;
-    for(int i=1;i<=particles.array_collection->Size();i++){
+    for(int i=0;i<particles.array_collection->Size();i++){
         particles.V(i)=initial_velocity+VECTOR_3D<T>::Cross_Product(initial_angular_velocity,particles.X(i)-center);
         particles.X(i)=center+initial_orientation.Rotate(particles.X(i)-center);
         particles.X(i).y+=initial_height-bottom;}

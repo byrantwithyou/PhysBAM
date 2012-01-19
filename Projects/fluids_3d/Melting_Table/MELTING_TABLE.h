@@ -253,7 +253,7 @@ void Initialize_Particle_Positions_And_Velocities(const int object)
     particles.Update_Velocity();
     tetrahedralized_volume.Update_Bounding_Box();
     VECTOR<T,3> center(tetrahedralized_volume.bounding_box->Center());
-    for(int i=1;i<=particles.array_collection->Size();i++){
+    for(int i=0;i<particles.array_collection->Size();i++){
         particles.X(i)=center+initial_orientation(object).Rotate(particles.X(i)-center);
         particles.V(i)=initial_velocity(object)+VECTOR<T,3>::Cross_Product(initial_angular_velocity(object),particles.X(i)-center);
         particles.X(i)+=initial_position(object);}

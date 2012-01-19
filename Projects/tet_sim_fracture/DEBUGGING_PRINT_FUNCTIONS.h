@@ -155,7 +155,7 @@ static bool Verify_Child_Structure(EMBEDDED_TETRAHEDRALIZED_VOLUME<T>& etv)
     if(etv.embedded_children_index->m != etv.tetrahedralized_volume.tetrahedron_mesh.number_nodes){assert(false);return false;}
     if(etv.tetrahedralized_volume.particles.array_collection->Size() != etv.tetrahedralized_volume.tetrahedron_mesh.number_nodes){assert(false);return false;}
     int total_number_of_children=0;
-    for(int tet_node=1;tet_node<=etv.tetrahedralized_volume.particles.array_collection->Size();tet_node++){
+    for(int tet_node=0;tet_node<etv.tetrahedralized_volume.particles.array_collection->Size();tet_node++){
         if(!Verify_Children_Of_This_Node(etv,tet_node)){assert(false);return false;}
         total_number_of_children+=etv.Number_Of_Children(tet_node);
     }

@@ -144,7 +144,7 @@ Initialize_Vertex_Normals()
         int i,j,k;surface.mesh.elements(t).Get(i,j,k);
         VECTOR<T,3> normal=TRIANGLE_3D<T>::Normal(surface.particles.X(i),surface.particles.X(j),surface.particles.X(k));
         (*vertex_normals)(i)+=normal;(*vertex_normals)(j)+=normal;(*vertex_normals)(k)+=normal;}
-    for(int p=1;p<=surface.particles.array_collection->Size();p++)(*vertex_normals)(p).Normalize();
+    for(int p=0;p<surface.particles.array_collection->Size();p++)(*vertex_normals)(p).Normalize();
 }
 //#####################################################################
 // Function Delete_Vertex_Normals
@@ -174,7 +174,7 @@ Display(const int in_color) const
     glPushMatrix();
     Send_Transform_To_GL_Pipeline();
 
-    if(draw_particles) for(int i=1;i<=surface.particles.array_collection->Size();i++) OPENGL_SHAPES::Draw_Dot(surface.particles.X(i),OPENGL_COLOR(1,0,1),7);
+    if(draw_particles) for(int i=0;i<surface.particles.array_collection->Size();i++) OPENGL_SHAPES::Draw_Dot(surface.particles.X(i),OPENGL_COLOR(1,0,1),7);
 
     GLint mode=0;
 #ifndef USE_OPENGLES
@@ -275,7 +275,7 @@ template<class T> RANGE<VECTOR<float,3> > OPENGL_TRIANGULATED_SURFACE<T>::
 Bounding_Box() const
 {
     RANGE<VECTOR<float,3> > box=RANGE<VECTOR<float,3> >::Empty_Box();
-    for(int i=1;i<=surface.particles.array_collection->Size();i++) box.Enlarge_To_Include_Point(World_Space_Point(VECTOR<float,3>(surface.particles.X(i))));
+    for(int i=0;i<surface.particles.array_collection->Size();i++) box.Enlarge_To_Include_Point(World_Space_Point(VECTOR<float,3>(surface.particles.X(i))));
     return box;
 }
 //#####################################################################

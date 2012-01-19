@@ -109,7 +109,7 @@ void Initialize_Tetrahedralized_Volume(TETRAHEDRALIZED_VOLUME<T>& tetrahedralize
     tetrahedralized_volume.tetrahedron_mesh.Initialize_Incident_Tetrahedrons();
 
     phi_on_tet_nodes.Resize(1,tetrahedralized_volume.particles.array_collection->Size());
-    for(int t=1;t<=tetrahedralized_volume.particles.array_collection->Size();t++)phi_on_tet_nodes(t)=(*implicit_surface)(tetrahedralized_volume.particles.X(t));
+    for(int t=0;t<tetrahedralized_volume.particles.array_collection->Size();t++)phi_on_tet_nodes(t)=(*implicit_surface)(tetrahedralized_volume.particles.X(t));
 
     tetrahedralized_volume.Update_Bounding_Box();
     VECTOR_3D<T> center(tetrahedralized_volume.bounding_box->Center());T bottom=tetrahedralized_volume.bounding_box->ymin;

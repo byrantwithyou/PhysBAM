@@ -99,7 +99,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
 
     LOG::cout<<"checking rigid body particle MASS"<<std::endl;
-    for(int i=1;i<=solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size();i++){
+    for(int i=0;i<solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size();i++){
         LOG::cout<<"solid_body_collection.rigid_body_collection.rigid_body_particle.mass("<<i<<")="<<solid_body_collection.rigid_body_collection.rigid_body_particle.mass(i)<<std::endl;
     }
 

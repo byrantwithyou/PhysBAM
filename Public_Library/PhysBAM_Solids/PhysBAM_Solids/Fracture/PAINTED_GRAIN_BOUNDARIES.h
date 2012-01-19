@@ -39,7 +39,7 @@ public:
         :FRACTURE_GRAIN_BOUNDARIES<TV,d>(particles,mesh_input,seed_positions_input,seed_weakness_multipliers_input,frame,fracture_callbacks_input),total_number_of_regions(0)
     {
         particle_positions.Resize(particles.array_collection->Size());
-        for(int i=1;i<=particles.array_collection->Size();i++) particle_positions(i)=frame*particles.X(i);
+        for(int i=0;i<particles.array_collection->Size();i++) particle_positions(i)=frame*particles.X(i);
         Calculate_Grain_Boundaries(particles.X,frame,node_smallest_distance,node_region,total_number_of_regions,fracture_callbacks);
     }
 

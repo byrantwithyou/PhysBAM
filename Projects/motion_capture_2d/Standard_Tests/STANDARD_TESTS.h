@@ -307,7 +307,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         solid_body_collection.Add_Force(Create_Finite_Volume(volume,new NEO_HOOKEAN<T,3>(stiffness,(T).45,damping,(T).25),true,(T).1));
         
         // binding the deformable particles to the rigid bodies
-        for(int p=1;p<=solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size();p++) tests.Bind_Particles_In_Rigid_Body(solid_body_collection.rigid_body_collection.Rigid_Body(p));
+        for(int p=0;p<solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size();p++) tests.Bind_Particles_In_Rigid_Body(solid_body_collection.rigid_body_collection.Rigid_Body(p));
     }
 #endif
 

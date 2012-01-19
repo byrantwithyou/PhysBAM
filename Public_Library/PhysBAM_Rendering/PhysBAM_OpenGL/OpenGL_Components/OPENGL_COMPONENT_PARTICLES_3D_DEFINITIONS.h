@@ -289,7 +289,7 @@ Reinitialize(bool force)
         if(draw_velocities && particles->store_velocity){
             have_velocities=true;
             opengl_vector_field.vector_field.Resize(particles->Size());
-            for(int i=1;i<=particles->Size();i++)opengl_vector_field.vector_field(i)=particles->V(i);}
+            for(int i=0;i<particles->Size();i++)opengl_vector_field.vector_field(i)=particles->V(i);}
 #endif
     if(use_ids) Apply_Id_Selection();
 }

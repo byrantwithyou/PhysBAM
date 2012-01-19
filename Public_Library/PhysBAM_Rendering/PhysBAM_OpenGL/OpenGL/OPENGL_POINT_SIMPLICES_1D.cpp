@@ -39,13 +39,13 @@ Display(const int in_color) const
         segment_color.Send_To_GL_Pipeline();
         glPointSize(5.0f);
         vertices.Resize(0);
-        for(int t=1;t<=simplices.particles.array_collection->Size();t++){
+        for(int t=0;t<simplices.particles.array_collection->Size();t++){
             OpenGL_Vertex(simplices.particles.X(t),vertices);}
         OpenGL_Draw_Arrays(GL_LINES,2,vertices);
         vertex_color.Send_To_GL_Pipeline();
         glPointSize(10.0f);
         vertices.Resize(0);
-        for(int t=1;t<=simplices.particles.array_collection->Size();t++){
+        for(int t=0;t<simplices.particles.array_collection->Size();t++){
             OpenGL_Vertex(simplices.particles.X(t),vertices);}
         OpenGL_Draw_Arrays(GL_POINTS,2,vertices);}
 

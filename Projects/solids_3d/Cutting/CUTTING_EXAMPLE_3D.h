@@ -64,7 +64,7 @@ void Initialize_Bodies_Without_Embedding()
 
     TETRAHEDRALIZED_VOLUME<T>& tet_volume=tests.Create_Tetrahedralized_Volume("../cutting_better_3d/Output_Orig/embedding_volume.tet",RIGID_BODY_STATE<TV>(FRAME_3D<T>(TV(0,0.5,0))),false,true);
     tet_volume.Update_Bounding_Box();
-    //for(int p=1;p<=particles.array_collection->Size();p++) if(particles.X(p).y<tet_volume.bounding_box->ymin+(T).01) attached_nodes.Append(p);
+    //for(int p=0;p<particles.array_collection->Size();p++) if(particles.X(p).y<tet_volume.bounding_box->ymin+(T).01) attached_nodes.Append(p);
     tests.Add_Ground();
 
     tests.Create_Triangulated_Object("../cutting_better_3d/Output_Orig/cutting_surface.tri",RIGID_BODY_STATE<TV>(FRAME_3D<T>(TV(0,0.5,0))),false,true);
@@ -109,7 +109,7 @@ void Initialize_Bodies_With_Embedding()
     boundary_surface.Set_Mass_Of_Particles(true);
     boundary_surface.Update_Bounding_Box();
     solid_body_collection.deformable_object.Add_Structure(&boundary_surface);
-    //for(int p=1;p<=particles.array_collection->Size();p++) if(particles.X(p).y>tet_volume.bounding_box->ymax-(T).01) attached_nodes.Append(p);
+    //for(int p=0;p<particles.array_collection->Size();p++) if(particles.X(p).y>tet_volume.bounding_box->ymax-(T).01) attached_nodes.Append(p);
 
     ARRAY<ARRAY<int> > embedding_map;
     FILE_UTILITIES::Read_From_File<RW>("../cutting_3d/Output_Dup/embedding_map",embedding_map);

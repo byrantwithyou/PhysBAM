@@ -139,9 +139,9 @@ Add_Deformable_Object_From_File(const STREAM_TYPE stream_type,DEFORMABLE_BODY_CO
     FILE_UTILITIES::Read_From_File(stream_type,filename,triangulated_surface);
     particles.Store_Velocity(true);particles.Store_Mass(true);
 
-    if(enslaved_halfplane){for(int i=1;i<=particles.array_collection->Size();i++) if(enslaved_halfplane->Lazy_Inside(particles.X(i))) deformable_body_collection_enslaved_nodes.Append(i);}
+    if(enslaved_halfplane){for(int i=0;i<particles.array_collection->Size();i++) if(enslaved_halfplane->Lazy_Inside(particles.X(i))) deformable_body_collection_enslaved_nodes.Append(i);}
 
-    for(int i=1;i<=particles.array_collection->Size();i++){particles.X(i)=transform.Homogeneous_Times(particles.X(i));particles.V(i)=VECTOR<T,3>();}
+    for(int i=0;i<particles.array_collection->Size();i++){particles.X(i)=transform.Homogeneous_Times(particles.X(i));particles.V(i)=VECTOR<T,3>();}
     triangulated_surface.Refresh_Auxiliary_Structures();
 
     return index;

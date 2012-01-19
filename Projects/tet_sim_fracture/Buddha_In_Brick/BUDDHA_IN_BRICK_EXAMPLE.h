@@ -150,7 +150,7 @@ virtual void Constrain_Nodes(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume)
 
 
     // Constrain Nodes
-    for(int p=1;p<=tetrahedralized_volume.particles.array_collection->Size();p++){
+    for(int p=0;p<tetrahedralized_volume.particles.array_collection->Size();p++){
         if(box.Lazy_Outside(tetrahedralized_volume.particles.X(p)))constrained_nodes.Append(p);
     }
 }

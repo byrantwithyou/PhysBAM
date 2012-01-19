@@ -136,7 +136,7 @@ void Get_Initial_Data()
         tetrahedralized_volume.Set_Density(1000);tetrahedralized_volume.Set_Mass_Of_Particles(solids_parameters.use_constant_mass);
         tetrahedralized_volume.Update_Bounding_Box();
         VECTOR_3D<T> center(tetrahedralized_volume.bounding_box->Center());T bottom=tetrahedralized_volume.bounding_box->ymin;
-        for(int i=1;i<=particles.array_collection->Size();i++){
+        for(int i=0;i<particles.array_collection->Size();i++){
             particles.V(i)=initial_velocity[object-1]+VECTOR_3D<T>::Cross_Product(initial_angular_velocity[object-1],particles.X(i)-center);
             particles.X(i)=center+initial_orientation[object-1].Rotate(particles.X(i)-center);
             particles.X(i).y+=initial_height[object-1]-bottom;

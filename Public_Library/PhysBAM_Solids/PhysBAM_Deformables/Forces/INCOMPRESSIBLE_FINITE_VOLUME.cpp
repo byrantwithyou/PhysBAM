@@ -55,7 +55,7 @@ INCOMPRESSIBLE_FINITE_VOLUME(STRAIN_MEASURE<TV,d>& strain_measure)
                 if(b) boundary_to_element(b).Set(t,i);}}
 
     node_regions.Resize(particles.array_collection->Size());
-    for(int p=1;p<=particles.array_collection->Size();p++){ARRAY<int>& incident=(*mesh.incident_elements)(p);
+    for(int p=0;p<particles.array_collection->Size();p++){ARRAY<int>& incident=(*mesh.incident_elements)(p);
         for(int j=0;j<incident.m;j++) node_regions(p).Append_Unique_Elements(strain_measure.mesh.elements(incident(j)));}
 }
 //#####################################################################

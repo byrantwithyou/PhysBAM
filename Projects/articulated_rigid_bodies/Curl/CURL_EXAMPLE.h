@@ -572,7 +572,7 @@ void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particle;
 
     TV total_linear_momentum,total_angular_momentum;
-    for(int i=1;i<=rigid_body_particles.array_collection->Size();i++){
+    for(int i=0;i<rigid_body_particles.array_collection->Size();i++){
         LOG::cout<<i<<": "<<rigid_body_particles.angular_momentum(i)<<std::endl;
         total_linear_momentum+=rigid_body_particles.mass(i)*rigid_body_particles.twist(i).linear;
         total_angular_momentum+=TV::Cross_Product(rigid_body_particles.X(i),rigid_body_particles.mass(i)*rigid_body_particles.twist(i).linear)+rigid_body_particles.angular_momentum(i);}

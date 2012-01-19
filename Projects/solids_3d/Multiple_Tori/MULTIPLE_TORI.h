@@ -82,7 +82,7 @@ void Get_Initial_Data()
         do{orientation.s=random.Get_Uniform_Number(0,1);orientation.v=random.Get_Uniform_Vector(VECTOR_3D<T>(-1,-1,-1),VECTOR_3D<T>(1,1,1));}while(orientation.Magnitude()>1);
         orientation.Normalize();
         std::cout<<"Adding torus "<<index<<" at center "<<new_center<<", orientation "<<orientation<<", angular velocity "<<angular_velocity<<"\n";
-        for(int p=1;p<=particles.array_collection->Size();p++){
+        for(int p=0;p<particles.array_collection->Size();p++){
             VECTOR_3D<T> dX=particles.X(p)-center;
             particles.V(p)=VECTOR_3D<T>::Cross_Product(angular_velocity,dX);
             particles.X(p)=new_center+orientation.Rotate(dX);}}

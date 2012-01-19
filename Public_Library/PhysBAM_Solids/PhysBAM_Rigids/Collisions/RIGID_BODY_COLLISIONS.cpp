@@ -563,7 +563,7 @@ Process_Push_Out_Legacy()
             mpi_rigids->Clear_Impulse_Accumulators(rigid_body_collection);
             mpi_rigid_X_save.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size(),false,false);
             mpi_rigid_rotation_save.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size(),false,false);
-            for(int p=1;p<=rigid_body_collection.rigid_body_particle.array_collection->Size();p++) {
+            for(int p=0;p<rigid_body_collection.rigid_body_particle.array_collection->Size();p++) {
                 mpi_rigid_X_save(p)=rigid_body_collection.rigid_body_particle.X(p);
                 mpi_rigid_rotation_save(p)=rigid_body_collection.rigid_body_particle.rotation(p);}}
 
@@ -1102,7 +1102,7 @@ Add_Elastic_Collisions(const T dt,const T time)
             mpi_rigids->Clear_Impulse_Accumulators(rigid_body_collection);
             mpi_rigid_velocity_save.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size(),false,false);
             mpi_rigid_angular_momentum_save.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size(),false,false);
-            for(int p=1;p<=rigid_body_collection.rigid_body_particle.array_collection->Size();p++) {
+            for(int p=0;p<rigid_body_collection.rigid_body_particle.array_collection->Size();p++) {
                 mpi_rigid_velocity_save(p)=rigid_body_collection.rigid_body_particle.twist(p);
                 mpi_rigid_angular_momentum_save(p)=rigid_body_collection.rigid_body_particle.angular_momentum(p);}}
 
@@ -1152,7 +1152,7 @@ Shock_Propagation_Using_Graph(const T dt,const T time,ARTICULATED_RIGID_BODY<TV>
             mpi_rigids->Clear_Impulse_Accumulators(rigid_body_collection);
             mpi_rigid_velocity_save.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size(),false,false);
             mpi_rigid_angular_momentum_save.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size(),false,false);
-            for(int p=1;p<=rigid_body_collection.rigid_body_particle.array_collection->Size();p++) {
+            for(int p=0;p<rigid_body_collection.rigid_body_particle.array_collection->Size();p++) {
                 mpi_rigid_velocity_save(p)=rigid_body_collection.rigid_body_particle.twist(p);
                 mpi_rigid_angular_momentum_save(p)=rigid_body_collection.rigid_body_particle.angular_momentum(p);}}
         

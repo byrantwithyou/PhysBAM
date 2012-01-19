@@ -575,7 +575,7 @@ void Floppy_Fish()
         fish=&solids_tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/fish_42K.tet",fish_state,true,false,flesh_density,scale);}
 
     // binding the deformable particles to the rigid bodies
-    for(int p=1;p<=rigid_body_collection.rigid_body_particle.array_collection->Size();p++) solids_tests.Bind_Particles_In_Rigid_Body(rigid_body_collection.Rigid_Body(p));
+    for(int p=0;p<rigid_body_collection.rigid_body_particle.array_collection->Size();p++) solids_tests.Bind_Particles_In_Rigid_Body(rigid_body_collection.Rigid_Body(p));
 
     if(fish){
         fish->Update_Number_Nodes();fish->Initialize_Triangulated_Surface();
@@ -743,7 +743,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             solids_tests.Copy_And_Add_Structure(tetrahedralized_volume);
             //int frames=16;
             //T initial_velocity=-(T)9.8*(T)frames/24;
-            //for(int i=1;i<=particles.array_collection->Size();i++) particles.V(i)=TV((T)0,initial_velocity,(T)0);
+            //for(int i=0;i<particles.array_collection->Size();i++) particles.V(i)=TV((T)0,initial_velocity,(T)0);
             break;}
         case 15:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=solids_tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_44K.tet",
@@ -931,7 +931,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             BOX<TV> world(grid.domain.min_corner.x,grid.domain.max_corner.x,grid.domain.min_corner.y,grid.domain.min_corner.y+(T).04,grid.domain.min_corner.z,grid.domain.max_corner.z);
 
             // slide all the rigid body walls down
-            for(int i=1;i<=rigid_body_collection.rigid_body_particle.array_collection->Size();i++) rigid_body_collection.rigid_body_particle.X(i).y-=(T).75;
+            for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++) rigid_body_collection.rigid_body_particle.X(i).y-=(T).75;
 
             RANDOM_NUMBERS<T> random;
 

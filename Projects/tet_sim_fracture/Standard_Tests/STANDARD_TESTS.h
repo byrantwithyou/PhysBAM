@@ -227,7 +227,7 @@ void Plastic_Mattress(int nx,int ny,int nz,const ROTATION<TV>& rot,const BOX<TV>
 
     tetrahedralized_volume.Update_Bounding_Box();
     TV center(tetrahedralized_volume.bounding_box->Center());T bottom=tetrahedralized_volume.bounding_box->min_corner.y;
-    for(int i=1;i<=particles.array_collection->Size();i++){
+    for(int i=0;i<particles.array_collection->Size();i++){
         particles.V(i)=initial_velocity+TV::Cross_Product(initial_angular_velocity,particles.X(i)-center);
         particles.X(i)=center+initial_orientation.Rotate(particles.X(i)-center);
         particles.X(i).y+=initial_height-bottom;}

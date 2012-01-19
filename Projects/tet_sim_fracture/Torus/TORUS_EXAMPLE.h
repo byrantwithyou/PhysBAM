@@ -144,7 +144,7 @@ virtual void Initialize_Bias_Stress_Constants(const EMBEDDED_TETRAHEDRALIZED_VOL
     for(int r=0;r<number_of_regions;r++) {
         T min_distance=1e10;
         int closest_node=0;
-        for(int n=1;n<=etv.particles.array_collection->Size();n++){
+        for(int n=0;n<etv.particles.array_collection->Size();n++){
             if((etv.particles.X(n)-(*initiation_point_positions)(r)).Magnitude()<min_distance){
                 min_distance=(etv.particles.X(n)-(*initiation_point_positions)(r)).Magnitude();
                 closest_node=n;}}

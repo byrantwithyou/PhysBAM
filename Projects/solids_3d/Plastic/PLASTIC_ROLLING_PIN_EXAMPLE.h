@@ -81,19 +81,19 @@ void Get_Initial_Data()
         plastic_goal.Exact_Resize(1,particles.array_collection->Size());
         T goal_thickness=(T).125,threshold=(T).9;
         MATRIX<T,3> Q=MATRIX<T,3>::Rotation_Matrix(VECTOR_3D<T>(1,0,0),VECTOR_3D<T>(1,0,0));
-        for(int p=1;p<=particles.array_collection->Size();p++)plastic_goal(p)=Pancake_Map(particles.X(p),goal_thickness,threshold,Q);
+        for(int p=0;p<particles.array_collection->Size();p++)plastic_goal(p)=Pancake_Map(particles.X(p),goal_thickness,threshold,Q);
         if(preserve_volume){
             T volume=tetrahedralized_volume.Total_Volume();
             ARRAY<VECTOR_3D<T> ,VECTOR<int,1> >::Exchange_Arrays(particles.X,plastic_goal.array);
             T scale=pow(volume/tetrahedralized_volume.Total_Volume(),(T)one_third);
-            for(int p=1;p<=particles.array_collection->Size();p++)particles.X(p)*=scale;
+            for(int p=0;p<particles.array_collection->Size();p++)particles.X(p)*=scale;
             ARRAY<VECTOR_3D<T> ,VECTOR<int,1> >::Exchange_Arrays(particles.X,plastic_goal.array);}
         if(show_goal){ARRAY<VECTOR_3D<T> ,VECTOR<int,1> >::Exchange_Arrays(particles.X,plastic_goal.array);use_control=false;}}
 
-    for(int p=1;p<=particles.array_collection->Size();p++)particles.X(p)*=(T).5;
+    for(int p=0;p<particles.array_collection->Size();p++)particles.X(p)*=(T).5;
     tetrahedralized_volume.Update_Bounding_Box();
     VECTOR_3D<T> center(tetrahedralized_volume.bounding_box->Center());T bottom=tetrahedralized_volume.bounding_box->ymin;
-    for(int i=1;i<=particles.array_collection->Size();i++){
+    for(int i=0;i<particles.array_collection->Size();i++){
         particles.V(i)=initial_velocity+VECTOR_3D<T>::Cross_Product(initial_angular_velocity,particles.X(i)-center);
         particles.X(i)=center+initial_orientation.Rotate(particles.X(i)-center);
         particles.X(i).y+=initial_height-bottom;}

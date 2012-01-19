@@ -52,7 +52,7 @@ void Rescale(TRIANGULATED_SURFACE<T>& ts,const T scaling_x,const T scaling_y,con
 {
     typedef VECTOR<T,3> TV;
     if(scaling_x*scaling_y*scaling_z<=0) PHYSBAM_FATAL_ERROR();
-    for(int k=1;k<=ts.particles.array_collection->Size();k++) ts.particles.X(k)*=TV(scaling_x,scaling_y,scaling_z);
+    for(int k=0;k<ts.particles.array_collection->Size();k++) ts.particles.X(k)*=TV(scaling_x,scaling_y,scaling_z);
     if(ts.triangle_list) ts.Update_Triangle_List();if(ts.hierarchy) ts.hierarchy->Update_Boxes();if(ts.bounding_box) ts.Update_Bounding_Box();
 }
 //#####################################################################

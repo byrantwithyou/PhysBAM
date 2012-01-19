@@ -188,8 +188,8 @@ void Delete_Particles_Inside_Objects(PARTICLE_LEVELSET_PARTICLES<T,VECTOR_2D<T> 
     GRID<TV>& grid=fluids_parameters.grid;
     if(solids_parameters.rigid_body_parameters.list.rigid_bodies.m<1) return;
     if(particle_type == PARTICLE_LEVELSET<T,VECTOR_2D<T> >::NEGATIVE || particle_type == PARTICLE_LEVELSET<T,VECTOR_2D<T> >::REMOVED_NEGATIVE){
-        for(int k=1;k<=particles.array_collection->Size();k++) if(solids_parameters.rigid_body_parameters.list.rigid_bodies(1)->Implicit_Curve_Lazy_Inside_Extended_Levelset(particles.X(k),-grid.dx)) particles.array_collection->Add_To_Deletion_List(k);}
-   else for(int k=1;k<=particles.array_collection->Size();k++) if(solids_parameters.rigid_body_parameters.list.rigid_bodies(1)->Implicit_Curve_Lazy_Inside_Extended_Levelset(particles.X(k))) particles.array_collection->Add_To_Deletion_List(k);
+        for(int k=0;k<particles.array_collection->Size();k++) if(solids_parameters.rigid_body_parameters.list.rigid_bodies(1)->Implicit_Curve_Lazy_Inside_Extended_Levelset(particles.X(k),-grid.dx)) particles.array_collection->Add_To_Deletion_List(k);}
+   else for(int k=0;k<particles.array_collection->Size();k++) if(solids_parameters.rigid_body_parameters.list.rigid_bodies(1)->Implicit_Curve_Lazy_Inside_Extended_Levelset(particles.X(k))) particles.array_collection->Add_To_Deletion_List(k);
    particles.array_collection->Delete_Elements_On_Deletion_List(false,true); // already sorted
 }
 //#####################################################################

@@ -219,7 +219,7 @@ void Test_Example()
 {
     RECTANGULAR_RANDOM_PLACEMENT<TV> random_placement(BOX<TV>(-20,20,1,100));
     Random_Scene_Generator("circle", 100, 1234, random_placement,rigid_body_collection,tests);
-    for(int i=1;i<=rigid_body_collection.rigid_body_particle.array_collection->Size();i++)
+    for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++)
         rigid_body_collection.Rigid_Body(i).Set_Coefficient_Of_Restitution((T)0.5);
 
     RIGID_BODY<TV>* rigid_body1=&tests.Add_Rigid_Body("circle",(T)1,(T).1);
@@ -392,7 +392,7 @@ void Cluster()
     referenced_rigid_particles->Append(rigid_body_cluster_test->particle_index);
     rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(rigid_body_collection,referenced_rigid_particles));
 
-    for(int i=1;i<=rigid_body_collection.rigid_body_particle.array_collection->Size();i++){
+    for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++){
         LOG::cout<<"Rigid body index "<<i<<rigid_body_collection.Rigid_Body(i).name<<std::endl;
         LOG::cout<<"    FRAME  "<<rigid_body_collection.Rigid_Body(i).Frame()<<std::endl;
         LOG::cout<<"    MASS  "<<rigid_body_collection.rigid_body_particle.mass(i)<<std::endl;

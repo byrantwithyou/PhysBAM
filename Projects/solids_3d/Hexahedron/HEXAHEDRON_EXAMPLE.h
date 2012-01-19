@@ -73,7 +73,7 @@ void Get_Initial_Data()
     hexahedralized_volume.Set_Density(1000);hexahedralized_volume.Set_Mass_Of_Particles(solids_parameters.use_constant_mass);
     hexahedralized_volume.Update_Bounding_Box();
     VECTOR_3D<T> center(hexahedralized_volume.bounding_box->Center());T bottom=hexahedralized_volume.bounding_box->ymin;
-    for(int i=1;i<=hex_particles.array_collection->Size();i++){
+    for(int i=0;i<hex_particles.array_collection->Size();i++){
         hex_particles.V(i)=initial_velocity+VECTOR_3D<T>::Cross_Product(initial_angular_velocity,hex_particles.X(i)-center);
         hex_particles.X(i)=center+initial_orientation.Rotate(hex_particles.X(i)-center);
         hex_particles.X(i).y+=initial_height-bottom;}

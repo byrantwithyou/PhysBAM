@@ -59,20 +59,20 @@ template<class T,class RW> void Process(int argc,char* argv[])
 
     for(int n=0;n<levelset.grid.number_of_nodes;n++)if(levelset.node_to_particle_mapping(n)) particles.V(levelset.node_to_particle_mapping(n))=VECTOR<T,3>(node_locations(n));
     deformable_object.triangles_of_material->Update_Particle_Velocities();
-    for(int p=1;p<=material_particles.array_collection->Size();p++)texture_coordinates(p)=(VECTOR_2D<T>(material_particles.V(p).x,material_particles.V(p).y)-box.Minimum_Corner())/box.Size();
+    for(int p=0;p<material_particles.array_collection->Size();p++)texture_coordinates(p)=(VECTOR_2D<T>(material_particles.V(p).x,material_particles.V(p).y)-box.Minimum_Corner())/box.Size();
 
     for(int n=0;n<levelset.grid.number_of_nodes;n++)if(levelset.node_to_particle_mapping(n)) particles.V(levelset.node_to_particle_mapping(n)).x=(*temperature(1))(n);
     deformable_object.triangles_of_material->Update_Particle_Velocities();
-    for(int p=1;p<=material_particles.array_collection->Size();p++)material_temperature(p)=material_particles.V(p).x;
+    for(int p=0;p<material_particles.array_collection->Size();p++)material_temperature(p)=material_particles.V(p).x;
     
     for(int n=0;n<levelset.grid.number_of_nodes;n++)if(levelset.node_to_particle_mapping(n)) particles.V(levelset.node_to_particle_mapping(n)).x=(*reaction(1))(n);
     deformable_object.triangles_of_material->Update_Particle_Velocities();
-    for(int p=1;p<=material_particles.array_collection->Size();p++)material_reaction(p)=material_particles.V(p).x;
+    for(int p=0;p<material_particles.array_collection->Size();p++)material_reaction(p)=material_particles.V(p).x;
     
     for(int n=0;n<levelset.grid.number_of_nodes;n++)maximum_temperature(n)=max(maximum_temperature(n),(*temperature(1))(n));
     for(int n=0;n<levelset.grid.number_of_nodes;n++)if(levelset.node_to_particle_mapping(n)) particles.V(levelset.node_to_particle_mapping(n)).x=maximum_temperature(n);
     deformable_object.triangles_of_material->Update_Particle_Velocities();
-    for(int p=1;p<=material_particles.array_collection->Size();p++)material_maximum_temperature(p)=material_particles.V(p).x;
+    for(int p=0;p<material_particles.array_collection->Size();p++)material_maximum_temperature(p)=material_particles.V(p).x;
     
     FILE_UTILITIES::Write_To_File<RW>(prefix+"rendering_texture_coordinates"+f,texture_coordinates);
     FILE_UTILITIES::Write_To_File<RW>(prefix+"rendering_melting_temperature"+f,material_temperature);

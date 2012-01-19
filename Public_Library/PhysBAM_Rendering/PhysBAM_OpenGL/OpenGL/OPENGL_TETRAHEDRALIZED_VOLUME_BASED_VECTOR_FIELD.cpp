@@ -31,7 +31,7 @@ Update()
     V.Resize(tetrahedralized_volume.particles.array_collection->Size());
     vector_field.Resize(V.m);
     vector_locations.Resize(V.m);
-    for(int i=1;i<=tetrahedralized_volume.particles.array_collection->Size();i++){
+    for(int i=0;i<tetrahedralized_volume.particles.array_collection->Size();i++){
         vector_field(i)=V(i);vector_locations(i)=tetrahedralized_volume.particles.X(i);}
 }
 //#####################################################################

@@ -148,7 +148,7 @@ void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
                 (face_velocities(1,cell_index)+face_velocities(1,TV_INT(cell_index.x,cell_index.y+1,cell_index.z)))/(T)2,
                 (face_velocities(1,cell_index)+face_velocities(1,TV_INT(cell_index.x,cell_index.y,cell_index.z+1)))/(T)2);
         }
-        for(int id=1;id<=rigid_body_particles.array_collection->Size();id++) frame_start(id)=solid_body_collection.rigid_body_collection.Rigid_Body(id).Frame();}
+        for(int id=0;id<rigid_body_particles.array_collection->Size();id++) frame_start(id)=solid_body_collection.rigid_body_collection.Rigid_Body(id).Frame();}
     else if (test_number==2){
         FILE_UTILITIES::Read_From_File(stream_type,input_directory+"/removed_positive_particles."+f,particle_array);
         int index=1;
@@ -166,7 +166,7 @@ void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE 
 {
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particle;
-    if(test_number==1) for(int id=1;id<=rigid_body_particles.array_collection->Size();id++) rigid_body_particles.X(id)=frame_start(id).t+v_array(grid.Clamp_To_Cell(frame_start(id).t))*(1./frame_rate);
+    if(test_number==1) for(int id=0;id<rigid_body_particles.array_collection->Size();id++) rigid_body_particles.X(id)=frame_start(id).t+v_array(grid.Clamp_To_Cell(frame_start(id).t))*(1./frame_rate);
 }
 //#####################################################################
 // Function Initialize_Bodies

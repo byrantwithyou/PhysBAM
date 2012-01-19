@@ -811,7 +811,7 @@ Identify_Escaped_Particles(const BLOCK_UNIFORM<T_GRID>& block,PARTICLE_LEVELSET_
     if(near_objects && !enable_collision_aware_already) {
         levelset.Enable_Collision_Aware_Interpolation(sign);}
     escaped.Resize(particles.array_collection->Size());escaped.Fill(false);T one_over_radius_multiplier=-sign/outside_particle_distance_multiplier;
-    for(int k=1;k<=particles.array_collection->Size();k++) if(one_over_radius_multiplier*levelset.Phi(particles.X(k))>particles.radius(k)) escaped(k)=true;
+    for(int k=0;k<particles.array_collection->Size();k++) if(one_over_radius_multiplier*levelset.Phi(particles.X(k))>particles.radius(k)) escaped(k)=true;
     if(near_objects && !enable_collision_aware_already) {
         levelset.Disable_Collision_Aware_Interpolation();}
 }

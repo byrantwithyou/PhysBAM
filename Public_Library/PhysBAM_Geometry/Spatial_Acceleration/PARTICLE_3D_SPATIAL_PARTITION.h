@@ -54,7 +54,7 @@ public:
     void Reinitialize() // ensures that each hashtable entry is a list of indices in increasing order
     {if(reinitialize_counter%10 == 0){hashtable.Delete_Pointers_Stored_In_Table();hashtable.Remove_All();}else hashtable.Reset_List_Arrays_Stored_In_Table();
     reinitialize_counter++;
-    for(int k=1;k<=particles.array_collection->Size();k++){
+    for(int k=0;k<particles.array_collection->Size();k++){
         VECTOR<int,3> voxel=Voxel(k);
         ARRAY<int>* occupancy_list=0;
         if(!hashtable.Get(voxel,occupancy_list)){occupancy_list=new ARRAY<int>();occupancy_list->Preallocate(5);hashtable.Insert(voxel,occupancy_list);}

@@ -126,7 +126,7 @@ void Get_Initial_Data()
         LOG::cout<<"particles.array_collection->Size() "<<particles.array_collection->Size()<<std::endl;
         TETRAHEDRALIZED_VOLUME<T>* volume=(TETRAHEDRALIZED_VOLUME<T>*)temporary_volume.Append_Particles_And_Create_Copy(particles);
         
-        for(int i=1;i<=particles.array_collection->Size();i++) particles.mass(i)=0;
+        for(int i=0;i<particles.array_collection->Size();i++) particles.mass(i)=0;
         //volume->density=float(1)/volume->Total_Volume();
         T density=TV::dimension==1?1:TV::dimension==2?100:1000;
         SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(*surface,density);

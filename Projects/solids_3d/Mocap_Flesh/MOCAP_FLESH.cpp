@@ -115,7 +115,7 @@ Initialize_Bodies()
 
     ARRAY<int> tets;ARRAY<PAIR<int,TV> > bindings;const T tolerance=1;
     body.Initialize_Hierarchy();
-    for(int p=1;p<=surface_original.particles.array_collection->Size();p++){
+    for(int p=0;p<surface_original.particles.array_collection->Size();p++){
         tets.Remove_All();body.hierarchy->Intersection_List(surface_original.particles.X(p),tets,1e-4);bool got_bind=false;
         for(int tt=0;tt<tets.m;tt++){int t=tets(tt);
             TV bary=TETRAHEDRON<T>::First_Three_Barycentric_Coordinates(surface_original.particles.X(p),body.particles.X.Subset(body.mesh.elements(t)));

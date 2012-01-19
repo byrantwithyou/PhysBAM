@@ -93,7 +93,7 @@ template<class T>
 void Rescale(TETRAHEDRALIZED_VOLUME<T>& tv,const T scaling_x,const T scaling_y,const T scaling_z)
 {
     typedef VECTOR<T,3> TV;
-    for(int k=1;k<=tv.particles.array_collection->Size();k++) tv.particles.X(k)*=TV(scaling_x,scaling_y,scaling_z);
+    for(int k=0;k<tv.particles.array_collection->Size();k++) tv.particles.X(k)*=TV(scaling_x,scaling_y,scaling_z);
 }
 //#####################################################################
 // Function Compute_Tetrahedron_Volumes

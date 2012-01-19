@@ -139,7 +139,7 @@ Precompute_Particle_Volumes_In_Cells(T_ARRAYS_ARRAY_PARTICLE_VOLUME_REFERENCE& p
     for(NODE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();
         if(particles(block)){
             PARTICLE_LEVELSET_PARTICLES<TV>& cell_particles=*particles(block);grid.Cells_Neighboring_Node(block,cells);
-            for(int k=1;k<=cell_particles.array_collection->Size();k++){
+            for(int k=0;k<cell_particles.array_collection->Size();k++){
                 if(one_over_radius_multiplier*particle_levelset.levelset.Phi(cell_particles.X(k))>cell_particles.radius(k)){
                     SPHERE<TV>(cell_particles.X(k),cell_particles.radius(k)).Sector_Volumes(grid.Node(block),volumes,epsilon);
                     for(int i=0;i<GRID<TV>::number_of_cells_per_node;i++)
@@ -405,7 +405,7 @@ Create_Geometry()
         if(particle_levelset.removed_negative_particles(block)){
             PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& cell_particles=*particle_levelset.removed_negative_particles(block);
             ARRAY_VIEW<T>* material_volume=cell_particles.array_collection->template Get_Array<T>(ATTRIBUTE_ID_MATERIAL_VOLUME);
-            for(int k=1;k<=cell_particles.array_collection->Size();k++)
+            for(int k=0;k<cell_particles.array_collection->Size();k++)
                 cell_particles.radius(k)=max(particle_levelset.minimum_particle_radius,(T)pow<1,TV::dimension>((*material_volume)(k)*one_over_unit_sphere_size));}}
 
     preimage.Initialize(); // recreate the preimage after all the surgery has been done
@@ -893,7 +893,7 @@ Second_Order_Runge_Kutta_Step_Particles(const T_FACE_LOOKUP& V_lookup,T_ARRAYS_P
         PARTICLE_LEVELSET_PARTICLES<TV>& cell_particles=*particles(block_index);
         BLOCK_UNIFORM<GRID<TV> > block(particle_levelset.levelset.grid,block_index);
         T_LINEAR_INTERPOLATION_MAC_HELPER linear_interpolation_mac_helper(block,V_lookup.V_face);
-        for(int k=1;k<=cell_particles.array_collection->Size();k++){
+        for(int k=0;k<cell_particles.array_collection->Size();k++){
             TV velocity=linear_interpolation_mac_helper.Interpolate_Face(cell_particles.X(k));
             TV X_new=cell_particles.X(k)+dt*velocity;
             velocity=(T).5*(velocity+linear_interpolation.Clamped_To_Array_Face(particle_levelset.levelset.grid,V_lookup,X_new));
@@ -911,7 +911,7 @@ Second_Order_Runge_Kutta_Step_Particles(const T_FACE_ARRAYS_SCALAR& V,T_ARRAYS_P
 
     for(NODE_ITERATOR iterator(particle_levelset.levelset.grid);iterator.Valid();iterator.Next()){TV_INT block_index=iterator.Node_Index();if(particles(block_index)){
         PARTICLE_LEVELSET_PARTICLES<TV>& cell_particles=*particles(block_index);
-        for(int k=1;k<=cell_particles.array_collection->Size();k++){
+        for(int k=0;k<cell_particles.array_collection->Size();k++){
             TV velocity=linear_interpolation.Clamped_To_Array(grid,center_velocities,cell_particles.X(k));
             TV X_new=cell_particles.X(k)+dt*velocity;
             velocity=(T).5*(velocity+linear_interpolation.Clamped_To_Array(grid,center_velocities,X_new));

@@ -29,7 +29,7 @@ Update()
     V.Resize(triangulated_area.particles.array_collection->Size());
     vector_field.Resize(V.m);
     vector_locations.Resize(V.m);
-    for(int i=1;i<=triangulated_area.particles.array_collection->Size();i++){
+    for(int i=0;i<triangulated_area.particles.array_collection->Size();i++){
         vector_field(i)=V(i);vector_locations(i)=triangulated_area.particles.X(i);}
 }
 //#####################################################################

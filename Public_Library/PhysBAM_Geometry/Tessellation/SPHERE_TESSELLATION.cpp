@@ -29,7 +29,7 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(const SPHERE<VECTO
     surface->mesh.number_nodes=6;
     surface->mesh.Initialize_Neighbor_Nodes();
     for(int i=0;i<levels;i++) surface->Root_Three_Subdivide();
-    for(int p=1;p<=particles.array_collection->Size();p++) particles.X(p)=sphere.center+sphere.radius*particles.X(p).Normalized();
+    for(int p=0;p<particles.array_collection->Size();p++) particles.X(p)=sphere.center+sphere.radius*particles.X(p).Normalized();
     return surface;
 }
 template<class T> TRIANGULATED_AREA<T>* Generate_Triangles(const SPHERE<VECTOR<T,2> >& circle,int levels)

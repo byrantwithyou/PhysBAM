@@ -1131,7 +1131,7 @@ void Make_Wrapping_Objects()
             rigid_body->Set_Name(object_name);
 
 /* code for updating hte points of the triangulated surface . . may need to use to update the via_points on the wrapping surfaces
-        for(int i=1;i<=triangulated_surface.particles.array_collection->Size();i++)
+        for(int i=0;i<triangulated_surface.particles.array_collection->Size();i++)
             triangulated_surface.particles.X(i)=Current_World_Space_Position(original_particle_positions(i));
         for(int j=0;j<points.m;j++)
         points(j)=Current_World_Space_Position(original_points_positions(j));*/

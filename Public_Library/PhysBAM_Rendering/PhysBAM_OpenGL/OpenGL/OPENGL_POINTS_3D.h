@@ -37,7 +37,7 @@ public:
     //Store_Point_Ids(use_ids && particles.store_id);
     Store_Point_Colors(false);
     if(use_draw_mask) Store_Draw_Mask(true);
-    for(int i=1;i<=particles.array_collection->Size();i++){
+    for(int i=0;i<particles.array_collection->Size();i++){
         if(draw_mask) (*draw_mask)(i)=true;
         points(i)=particles.X(i);}}
 

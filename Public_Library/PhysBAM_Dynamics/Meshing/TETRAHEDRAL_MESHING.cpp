@@ -511,7 +511,7 @@ Create_Initial_Mesh(const T bcc_lattice_cell_size,const bool use_adaptive_refine
         BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
         ARRAY<int> particle_to_t_junction(particles.array_collection->Size());
         for(int i=0;i<t_junctions.m;i++) if((*mesh.incident_elements)(t_junctions(i)).m || (*boundary_mesh->incident_elements)(t_junctions(i)).m) particle_to_t_junction(t_junctions(i))=i;
-        for(int p=1;p<=particles.array_collection->Size();p++) if(particle_to_t_junction(p)){
+        for(int p=0;p<particles.array_collection->Size();p++) if(particle_to_t_junction(p)){
             ARRAY<int> parents;ARRAY<T> weights;
             int t_junction=particle_to_t_junction(p);
             parents.Append(t_junction_parents(t_junction)(1));weights.Append((T).5);
@@ -606,7 +606,7 @@ Discard_To_Get_Nice_Topology(RED_GREEN_TETRAHEDRA<T>& redgreen,ARRAY<bool>& keep
     boundary_mesh.Initialize_Segment_Mesh();boundary_mesh.Initialize_Neighbor_Nodes();
 
     ARRAY<VECTOR<int,2> > edges_to_refine;
-    for(int i=1;i<=particles.array_collection->Size();i++) if((*boundary_mesh.neighbor_nodes)(i).m==3) for(int j=0;j<3;j++) // refine degree 3 nodes
+    for(int i=0;i<particles.array_collection->Size();i++) if((*boundary_mesh.neighbor_nodes)(i).m==3) for(int j=0;j<3;j++) // refine degree 3 nodes
         edges_to_refine.Append(VECTOR<int,2>(i,(*boundary_mesh.neighbor_nodes)(i)(j)));
     if(verbose) LOG::cout<<"Subdividing "<<edges_to_refine.m<<" undesirable surface edges."<<std::endl;
     redgreen.Subdivide_Segment_List(edges_to_refine);edges_to_refine.Clean_Memory();

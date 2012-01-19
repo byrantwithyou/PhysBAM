@@ -765,7 +765,7 @@ Save_Velocity()
     V_save.Subset(solid_body_collection.deformable_body_collection.simulated_particles)=particles.V.Subset(solid_body_collection.deformable_body_collection.simulated_particles);
     for(int i=0;i<solid_body_collection.rigid_body_collection.simulated_rigid_body_particles.m;i++){int p=solid_body_collection.rigid_body_collection.simulated_rigid_body_particles(i);
         rigid_velocity_save(p)=rigid_body_collection.rigid_body_particle.twist(p);rigid_angular_momentum_save(p)=rigid_body_collection.rigid_body_particle.angular_momentum(p);}
-    for(int i=1;i<=rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if(rigid_body_collection.Is_Active(i)){RIGID_BODY<TV>& body=rigid_body_collection.Rigid_Body(i);
+    for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if(rigid_body_collection.Is_Active(i)){RIGID_BODY<TV>& body=rigid_body_collection.Rigid_Body(i);
         if(!body.Is_Simulated()){rigid_velocity_save(i)=rigid_body_collection.rigid_body_particle.twist(i);rigid_angular_momentum_save(i)=rigid_body_collection.rigid_body_particle.angular_momentum(i);}}
 }
 //#####################################################################
@@ -780,7 +780,7 @@ Restore_Velocity() const
     for(int i=0;i<solid_body_collection.rigid_body_collection.simulated_rigid_body_particles.m;i++){int p=solid_body_collection.rigid_body_collection.simulated_rigid_body_particles(i);
         rigid_body_collection.rigid_body_particle.twist(p).linear=rigid_velocity_save(p).linear;
         rigid_body_collection.rigid_body_particle.angular_momentum(p)=rigid_angular_momentum_save(p);rigid_body_collection.Rigid_Body(p).Update_Angular_Velocity();}
-    for(int i=1;i<=rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if(rigid_body_collection.Is_Active(i)){RIGID_BODY<TV>& body=rigid_body_collection.Rigid_Body(i);
+    for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if(rigid_body_collection.Is_Active(i)){RIGID_BODY<TV>& body=rigid_body_collection.Rigid_Body(i);
         if(!body.Is_Simulated()){
             rigid_body_collection.rigid_body_particle.twist(i).linear=rigid_velocity_save(i).linear;rigid_body_collection.rigid_body_particle.angular_momentum(i)=rigid_angular_momentum_save(i);body.Update_Angular_Velocity();}}
 }
@@ -800,7 +800,7 @@ Exchange_Velocity()
     for(int i=0;i<solid_body_collection.rigid_body_collection.simulated_rigid_body_particles.m;i++){int p=solid_body_collection.rigid_body_collection.simulated_rigid_body_particles(i);
         exchange(rigid_velocity_save(p),rigid_body_particles.twist(p));
         exchange(rigid_angular_momentum_save(p),rigid_body_particles.angular_momentum(p));}
-    for(int i=1;i<=rigid_body_particles.array_collection->Size();i++) if(solid_body_collection.rigid_body_collection.Is_Active(i)){RIGID_BODY<TV>& body=solid_body_collection.rigid_body_collection.Rigid_Body(i);
+    for(int i=0;i<rigid_body_particles.array_collection->Size();i++) if(solid_body_collection.rigid_body_collection.Is_Active(i)){RIGID_BODY<TV>& body=solid_body_collection.rigid_body_collection.Rigid_Body(i);
         if(!body.Is_Simulated()){
             exchange(rigid_velocity_save(i),rigid_body_particles.twist(i));
             exchange(rigid_angular_momentum_save(i),rigid_body_particles.angular_momentum(i));}}

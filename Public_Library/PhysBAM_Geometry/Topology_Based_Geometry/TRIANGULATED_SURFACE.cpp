@@ -509,7 +509,7 @@ template<class T> T TRIANGULATED_SURFACE<T>::
 Maximum_Magnitude_Phi(const IMPLICIT_OBJECT<TV>& implicit_surface,int* index)
 {
     T phi=0,max_phi=0;int k=0;
-    for(int i=1;i<=particles.array_collection->Size();i++){phi=abs(implicit_surface(particles.X(i)));if(phi > max_phi){max_phi=phi;k=i;}}
+    for(int i=0;i<particles.array_collection->Size();i++){phi=abs(implicit_surface(particles.X(i)));if(phi > max_phi){max_phi=phi;k=i;}}
     if(index)*index=k;return max_phi;
 }
 //#####################################################################

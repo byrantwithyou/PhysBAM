@@ -175,8 +175,8 @@ void Adjust_Particle_For_Objects(VECTOR<T,3>& X,VECTOR<T,3>& V,T& radius,PARTICL
 void Delete_Particles_Inside_Objects(HEAVY_PARTICLES<T,VECTOR<T,3> >& particles,const typename WATER_FREE_SURFACE_3D_EXAMPLE<T,RW>::PARTICLE_TYPE particle_type,const T time)
 {
     if(particle_type == NEGATIVE || particle_type == REMOVED_NEGATIVE){
-        for(int k=1;k<=particles.array_collection->Size();k++) if(rigid_bodies(1)->Implicit_Surface_Lazy_Inside_Extended_Levelset(particles.X(k),-grid_3d.dx)) particles.array_collection->Add_To_Deletion_List(k);}
-   else for(int k=1;k<=particles.array_collection->Size();k++) if(rigid_bodies(1)->Implicit_Surface_Lazy_Inside_Extended_Levelset(particles.X(k))) particles.array_collection->Add_To_Deletion_List(k);
+        for(int k=0;k<particles.array_collection->Size();k++) if(rigid_bodies(1)->Implicit_Surface_Lazy_Inside_Extended_Levelset(particles.X(k),-grid_3d.dx)) particles.array_collection->Add_To_Deletion_List(k);}
+   else for(int k=0;k<particles.array_collection->Size();k++) if(rigid_bodies(1)->Implicit_Surface_Lazy_Inside_Extended_Levelset(particles.X(k))) particles.array_collection->Add_To_Deletion_List(k);
    particles.array_collection->Delete_Elements_On_Deletion_List(false,true); // already sorted
 }
 //#####################################################################

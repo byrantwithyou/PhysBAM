@@ -60,7 +60,7 @@ Append_Particles_And_Create_Copy(GEOMETRY_PARTICLES<TV>& new_particles,ARRAY<int
     typename EMBEDDING_POLICY<TV,d>::EMBEDDING* embedding=Create(new_particles);
     int offset=new_particles.array_collection->Size();
     new_particles.array_collection->Append(*particles.array_collection);
-    if(particle_indices) for(int p=1;p<=particles.array_collection->Size();p++) particle_indices->Append(p+offset);
+    if(particle_indices) for(int p=0;p<particles.array_collection->Size();p++) particle_indices->Append(p+offset);
     embedding->embedded_object.embedded_particles.active_indices=embedded_object.embedded_particles.active_indices;
     embedding->embedded_object.embedded_particles.active_indices+=offset;
     embedding->embedded_object.embedded_particles.Update_Subset_Index_From_Element_Index();

@@ -130,7 +130,7 @@ void Get_Initial_Data()
 
     // determine simulation subset
     ARRAY<bool> particle_is_included(number_of_original_particles);
-    for(int p=1;p<=particles.array_collection->Size();p++) if((particles.X(p)-TV(0,0,.18)).Magnitude()<(T).18) particle_is_included(p)=true;
+    for(int p=0;p<particles.array_collection->Size();p++) if((particles.X(p)-TV(0,0,.18)).Magnitude()<(T).18) particle_is_included(p)=true;
 
     ARRAY<bool> particle_on_simulation_boundary(number_of_original_particles);ARRAY<int> map_to_old_elements;
     for(int t=0;t<tetrahedralized_volume.mesh.elements.m;t++){VECTOR<int,4>& element=tetrahedralized_volume.mesh.elements(t);

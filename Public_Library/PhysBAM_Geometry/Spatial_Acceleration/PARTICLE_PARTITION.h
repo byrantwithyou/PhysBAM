@@ -35,7 +35,7 @@ public:
         :grid(counts,box,is_mac_grid),partition(grid.Domain_Indices()),use_radius(use_radius)
     {
         if(use_radius) radius.Resize(grid.Domain_Indices());
-        for(int p=1;p<=particles.array_collection->Size();p++) Add_To_Partition(particles.X(p),p);
+        for(int p=0;p<particles.array_collection->Size();p++) Add_To_Partition(particles.X(p),p);
     }
 
     void Add_To_Partition(const TV& location,const int particle_id)

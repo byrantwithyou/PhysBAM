@@ -624,7 +624,7 @@ void Sphere_Fall()
             TETRAHEDRALIZED_VOLUME<T>& volume=*primary_tetrahedralized_volumes(i);
             volume.mesh.Initialize_Node_On_Boundary();
             ARRAY<int> blob_particles;
-            for(int i=1;i<=deformable_body_collection.particles.array_collection->Size();i++) if(!(*volume.mesh.node_on_boundary)(i)) blob_particles.Append(i);
+            for(int i=0;i<deformable_body_collection.particles.array_collection->Size();i++) if(!(*volume.mesh.node_on_boundary)(i)) blob_particles.Append(i);
             asynchronous_evolution->Add_Blob_From_Particles(blob_particles);}}
 }
 //#####################################################################
@@ -1000,7 +1000,7 @@ void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
         RANDOM_NUMBERS<T> random;random.Set_Seed(1823);
         T perturbation_size=side_length/number_side_panels*4;
         PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
-        for(int p=1;p<=particles.array_collection->Size();p++) particles.X(p).y+=random.Get_Uniform_Number((T)0,perturbation_size);}
+        for(int p=0;p<particles.array_collection->Size();p++) particles.X(p).y+=random.Get_Uniform_Number((T)0,perturbation_size);}
     if((test_number==10 || test_number==12) && frame<=sim_length+1)
         for(int i=0;i<num_controlled_particles;i++){
             saved_V(i).Add_Control_Point(Time_At_Frame(frame-1),deformable_body_collection.particles.V(i));
@@ -1498,7 +1498,7 @@ void Asynchronous_Sphere()
         for(int i=0;i<number_of_spheres;i++){
             ARRAY_VIEW<int> boundary_particle_index=boundary_tetrahedralized_volumes(i)->mesh.elements.Flattened();
             for(int j=1;j<=boundary_particle_index.Size();j++) temp_particle_map.Set(boundary_particle_index(j));}
-        for(int i=1;i<=deformable_body_collection.particles.array_collection->Size();i++) if(!temp_particle_map.Contains(i))
+        for(int i=0;i<deformable_body_collection.particles.array_collection->Size();i++) if(!temp_particle_map.Contains(i))
             gravity_particles.Append(i);}
 
     if(parameter==2){
@@ -1629,7 +1629,7 @@ void Asynchronous_Layered_Box()
     for(int i=0;i<number_of_boxes;i++){
         ARRAY_VIEW<int> boundary_particle_index=boundary_tetrahedralized_volumes(i)->mesh.elements.Flattened();
         for(int j=1;j<=boundary_particle_index.Size();j++) temp_particle_map.Set(boundary_particle_index(j));}
-    for(int i=1;i<=deformable_body_collection.particles.array_collection->Size();i++) if(!temp_particle_map.Contains(i))
+    for(int i=0;i<deformable_body_collection.particles.array_collection->Size();i++) if(!temp_particle_map.Contains(i))
         gravity_particles.Append(i);
 
     // correct number nodes
@@ -2411,19 +2411,19 @@ void Asynchronous_Projected_Sphere()
             if(treat_bottom_async){
                 PARTICLES<TV>& particles=deformable_body_collection.particles;
                 T top=-FLT_MAX,bottom=FLT_MAX;
-                for(int i=1;i<=particles.array_collection->Size();i++){int p=i;
+                for(int i=0;i<particles.array_collection->Size();i++){int p=i;
                     if(particles.X(p)(2)>top) top=particles.X(p)(2);
                     if(particles.X(p)(2)<bottom) bottom=particles.X(p)(2);}
-                for(int i=1;i<=particles.array_collection->Size();i++){int p=i;
+                for(int i=0;i<particles.array_collection->Size();i++){int p=i;
                     if(particles.X(p)(2)<=(top-bottom)*coverage_percent+bottom)
                         particle_map.Set(p,p);}}
             else if(treat_left_async){
                 PARTICLES<TV>& particles=deformable_body_collection.particles;
                 T right=-FLT_MAX,left=FLT_MAX;
-                for(int i=1;i<=particles.array_collection->Size();i++){int p=i;
+                for(int i=0;i<particles.array_collection->Size();i++){int p=i;
                     if(particles.X(p)(1)>right) right=particles.X(p)(1);
                     if(particles.X(p)(1)<left) left=particles.X(p)(1);}
-                for(int i=1;i<=particles.array_collection->Size();i++){int p=i;
+                for(int i=0;i<particles.array_collection->Size();i++){int p=i;
                     if(particles.X(p)(1)<=(right-left)*coverage_percent+left)
                         particle_map.Set(p,p);}}
             else{

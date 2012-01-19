@@ -240,7 +240,7 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
 #else
         DEFORMABLE_OBJECT_2D<T>& deformable_object=solids_parameters.deformable_body_parameters.list(1);
         PARTICLES<T,VECTOR_2D<T> >& particles=deformable_object.particles;
-        for(int i=1;i<=particles.array_collection->Size();i++){
+        for(int i=0;i<particles.array_collection->Size();i++){
             particles.X(i)=center+radius*particles.V(i).Normalized()+particles.V(i)*time;}
 
         SEGMENTED_CURVE_2D<T>* segmented_curve=solids_parameters.deformable_body_parameters.list(1).segmented_curve;

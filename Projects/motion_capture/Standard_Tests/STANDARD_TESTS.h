@@ -527,7 +527,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         T cfl_strain_rate=(T).1;
         bool use_implicit=true,strain_limit=false;
 
-        for(int i=1;i<=particles.array_collection->Size();i++){particles.mass(i)=fluids_parameters.density/particles.array_collection->Size()/10;}
+        for(int i=0;i<particles.array_collection->Size();i++){particles.mass(i)=fluids_parameters.density/particles.array_collection->Size()/10;}
         particles.Compute_Auxiliary_Attributes(soft_bindings);soft_bindings.Set_Mass_From_Effective_Mass();
         T linear_stiffness=stiffness,linear_damping=damping;
         LINEAR_SPRINGS<TV>* edge_springs;
@@ -542,7 +542,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
         // binding the deformable particles to the rigid bodies
         ARRAY<int> particle_array;volume->mesh.elements.Flattened().Get_Unique(particle_array);
-        for(int p=1;p<=solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size();p++) tests.Bind_Unbound_Particles_In_Rigid_Body(solid_body_collection.rigid_body_collection.Rigid_Body(p),particle_array);
+        for(int p=0;p<solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size();p++) tests.Bind_Unbound_Particles_In_Rigid_Body(solid_body_collection.rigid_body_collection.Rigid_Body(p),particle_array);
     }
 
     //set up joints

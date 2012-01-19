@@ -62,7 +62,7 @@ void Get_Initial_Data()
     triangulated_area.Set_Density(10);triangulated_area.Set_Mass_Of_Particles(false);
     triangulated_area.Update_Bounding_Box();
     VECTOR<T,2> center(triangulated_area.bounding_box->Center());T bottom=triangulated_area.bounding_box->ymin;
-    for(int i=1;i<=area_particles.array_collection->Size();i++){
+    for(int i=0;i<area_particles.array_collection->Size();i++){
         area_particles.X(i)=center+MATRIX<T,2>::Rotation_Matrix(initial_orientation)*(area_particles.X(i)-center);
         VECTOR<T,2> radial=area_particles.X(i)-center;
         T temp=radial.y;radial.y=-radial.x;radial.x=temp;

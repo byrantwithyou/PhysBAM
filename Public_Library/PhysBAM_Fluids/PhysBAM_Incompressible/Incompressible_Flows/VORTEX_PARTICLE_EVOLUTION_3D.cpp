@@ -51,7 +51,7 @@ Compute_Body_Force(const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,ARRAY<VECTO
         VORTICITY_PARTICLES<VECTOR<T,3> > missing_vorticity_particles;missing_vorticity_particles.array_collection->Add_Elements(vorticity_particles.array_collection->Size());
         LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,VECTOR<T,3> > vorticity_interpolation;
 
-        for(int p=1;p<=vorticity_particles.array_collection->Size();p++){
+        for(int p=0;p<vorticity_particles.array_collection->Size();p++){
             // find missing vorticity
             VECTOR<T,3> local_grid_vorticity=vorticity_interpolation.Clamped_To_Array(grid,grid_vorticity,vorticity_particles.X(p));
             VECTOR<T,3> missing_vorticity=vorticity_particles.vorticity(p)-local_grid_vorticity;
@@ -67,7 +67,7 @@ Compute_Body_Force(const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,ARRAY<VECTO
             Exchange_Boundary_Particles_Flat(*mpi_grid,missing_vorticity_particles,max_radius);}
 
         T small_number=(T)1e-4*grid.min_dX;
-        for(int p=1;p<=missing_vorticity_particles.array_collection->Size();p++){
+        for(int p=0;p<missing_vorticity_particles.array_collection->Size();p++){
             T radius=missing_vorticity_particles.radius(p);
             VECTOR<int,3> box_radius((int)(radius/grid.dX.x)+1,(int)(radius/grid.dX.y)+1,(int)(radius/grid.dX.z)+1);
             VECTOR<int,3> index=grid.Clamped_Index(missing_vorticity_particles.X(p));
@@ -139,11 +139,11 @@ Euler_Step(const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,const T dt,const T 
                                  one_over_four_dy*(two_times_V_ghost(i,j+1,ij)-two_times_V_ghost(i,j-1,ij)),
                                  one_over_four_dz*(two_times_V_ghost(i,j,ij+1)-two_times_V_ghost(i,j,ij-1)));
 
-    if(renormalize_vorticity_after_stretching_tilting) for(int p=1;p<=vorticity_particles.array_collection->Size();p++){
+    if(renormalize_vorticity_after_stretching_tilting) for(int p=0;p<vorticity_particles.array_collection->Size();p++){
         T old_magnitude=vorticity_particles.vorticity(p).Magnitude();
         vorticity_particles.vorticity(p)+=dt*VX_interpolation.Clamped_To_Array(grid,VX,vorticity_particles.X(p))*vorticity_particles.vorticity(p);
         vorticity_particles.vorticity(p).Normalize();vorticity_particles.vorticity(p)*=old_magnitude;}
-    else for(int p=1;p<=vorticity_particles.array_collection->Size();p++){
+    else for(int p=0;p<vorticity_particles.array_collection->Size();p++){
         vorticity_particles.vorticity(p)+=dt*VX_interpolation.Clamped_To_Array(grid,VX,vorticity_particles.X(p))*vorticity_particles.vorticity(p);}
     // advance vortex particle position
     EULER_STEP_PARTICLES<GRID<TV> >::Euler_Step_Face(vorticity_particles.X,grid,face_velocities_ghost,dt);

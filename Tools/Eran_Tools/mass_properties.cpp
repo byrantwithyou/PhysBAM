@@ -51,7 +51,7 @@ Get_Mass_Properties(const std::string& filename,PARSE_ARGS& parse_args)
 
     if(parse_args.Get_Option_Value("-generate")){
         {LOG::SCOPE scope("transforming surface","transforming surface");
-        for(int p=1;p<=surface.particles.array_collection->Size();p++) surface.particles.X(p)=rigid_body.Frame().Inverse_Times(surface.particles.X(p));
+        for(int p=0;p<surface.particles.array_collection->Size();p++) surface.particles.X(p)=rigid_body.Frame().Inverse_Times(surface.particles.X(p));
         FILE_UTILITIES::Write_To_File<RW>(filename,surface);}
 
         if(parse_args.Is_Value_Set("-secondary_surface")){
@@ -59,7 +59,7 @@ Get_Mass_Properties(const std::string& filename,PARSE_ARGS& parse_args)
             std::string secondary_filename=parse_args.Get_String_Value("-secondary_surface");
             LOG::cout<<"filename = "<<secondary_filename<<std::endl;
             FILE_UTILITIES::Read_From_File<RW>(secondary_filename,surface);
-            for(int p=1;p<=surface.particles.array_collection->Size();p++) surface.particles.X(p)=rigid_body.Frame().Inverse_Times(surface.particles.X(p));
+            for(int p=0;p<surface.particles.array_collection->Size();p++) surface.particles.X(p)=rigid_body.Frame().Inverse_Times(surface.particles.X(p));
             FILE_UTILITIES::Write_To_File<RW>(secondary_filename,surface);}
 
         LOG::SCOPE scope("generating rgd file","generating rgd file");

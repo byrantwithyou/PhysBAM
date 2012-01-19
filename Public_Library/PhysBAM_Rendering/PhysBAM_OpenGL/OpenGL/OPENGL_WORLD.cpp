@@ -1327,7 +1327,7 @@ Get_Image(ARRAY<VECTOR<T,d> ,VECTOR<int,2> > &image,const bool use_back_buffer)
     glReadBuffer(use_back_buffer?GL_BACK:GL_FRONT);
 #endif
     glReadPixels(0,0,window->Width(),window->Height(),d==3?GL_RGB:GL_RGBA,GL_FLOAT,temporary_image.array.Get_Array_Pointer());
-    for(int i=1;i<=window->Width();i++) for(int j=1;j<=window->Height();j++) image(i,j)=temporary_image(j,i); // swap to column major
+    for(int i=0;i<window->Width();i++) for(int j=0;j<window->Height();j++) image(i,j)=temporary_image(j,i); // swap to column major
 }
 //#####################################################################
 // Function Display_Prompt_Strings

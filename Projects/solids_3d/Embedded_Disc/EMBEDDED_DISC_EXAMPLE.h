@@ -66,7 +66,7 @@ void Get_Initial_Data()
     
     triangulated_surface.Update_Bounding_Box();
     T mass_node=100;ARRAY<T>::copy(mass_node,particles.mass.array);
-    for(int i=1;i<=particles.array_collection->Size();i++){
+    for(int i=0;i<particles.array_collection->Size();i++){
         particles.X(i)+=VECTOR_3D<T>(0,initial_height,0);
         particles.V(i)=VECTOR_3D<T>();}
 
@@ -76,7 +76,7 @@ void Get_Initial_Data()
     center.x+=(T).5*triangulated_surface.bounding_box->Size().x;
     SPHERE<T> sphere(center,radius);
     ARRAY<T> phi(particles.array_collection->Size());
-    for(int p=1;p<=particles.array_collection->Size();p++)phi(p)=sphere.Signed_Distance(particles.X(p));
+    for(int p=0;p<particles.array_collection->Size();p++)phi(p)=sphere.Signed_Distance(particles.X(p));
     embedded_triangulated_surface.Calculate_Segmented_Curve_From_Levelset_On_Triangle_Nodes(phi);
     triangles_of_material.Create_Material_Surface();
     

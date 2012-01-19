@@ -582,7 +582,7 @@ Maximum_Magnitude_Phi_On_Boundary(const IMPLICIT_OBJECT<TV>& implicit_surface,in
     if(mesh.number_nodes!=particles.array_collection->Size()) PHYSBAM_FATAL_ERROR();
     bool node_on_boundary_defined=mesh.node_on_boundary!=0;if(!node_on_boundary_defined) mesh.Initialize_Node_On_Boundary();
     T phi=0,max_phi=0;int p_save=0;
-    for(int p=1;p<=particles.array_collection->Size();p++) if((*mesh.node_on_boundary)(p)){phi=abs(implicit_surface(particles.X(p)));if(phi > max_phi){max_phi=phi;p_save=p;}}
+    for(int p=0;p<particles.array_collection->Size();p++) if((*mesh.node_on_boundary)(p)){phi=abs(implicit_surface(particles.X(p)));if(phi > max_phi){max_phi=phi;p_save=p;}}
     if(index) *index=p_save;
     if(!node_on_boundary_defined){delete mesh.node_on_boundary;mesh.node_on_boundary=0;}
     return max_phi;

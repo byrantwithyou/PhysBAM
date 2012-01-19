@@ -195,7 +195,7 @@ void Initialize_Particle_Positions_And_Velocities(const int object)
     particles.Update_Velocity();
     triangulated_area.Update_Bounding_Box();
     VECTOR_2D<T> center(triangulated_area.bounding_box->Center());
-    for(int i=1;i<=particles.array_collection->Size();i++){
+    for(int i=0;i<particles.array_collection->Size();i++){
         particles.X(i)=center+MATRIX<T,2>::Rotation_Matrix(initial_orientation(object))*(particles.X(i)-center);
         VECTOR_2D<T> radial = particles.X(i)-center;
         particles.V(i)=initial_velocity(object)+initial_angular_velocity(object)*radial.Rotate_Counterclockwise_90();

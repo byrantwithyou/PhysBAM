@@ -720,7 +720,7 @@ void Get_Initial_Data()
             if(test_number==45){
                 body.is_static=true;body.X()=TV(.75,.2,.5);
                 deformable_body_collection.collisions.thickness_table=new HASHTABLE<int,T>();
-                for(int i=1;i<=particles.array_collection->Size();i++) deformable_body_collection.collisions.thickness_table->Insert(i,.1);}
+                for(int i=0;i<particles.array_collection->Size();i++) deformable_body_collection.collisions.thickness_table->Insert(i,.1);}
             break;}
         case 6:
         case 7:
@@ -876,7 +876,7 @@ void Get_Initial_Data()
                 TRIANGULATED_SURFACE<T>& old_surface=*body.simplicial_object;TRIANGULATED_SURFACE<T>& surface=*TRIANGULATED_SURFACE<T>::Create(particles);
                 int offset=particles.array_collection->Size();particles.array_collection->Add_Elements(old_surface.particles.array_collection->Size());
                 surface.mesh.Initialize_Mesh_With_Particle_Offset(old_surface.mesh,offset);
-                for(int p=1;p<=old_surface.particles.array_collection->Size();p++){
+                for(int p=0;p<old_surface.particles.array_collection->Size();p++){
                     particles.X(offset+p)=old_surface.particles.X(p);particles.mass(offset+p)=(T)0;
                     binding_list.Add_Binding(new RIGID_BODY_BINDING<TV>(particles,offset+p,rigid_body_collection,body.particle_index,particles.X(offset+p)));}
                 surface.Update_Number_Nodes();//surface.density=body.Mass()/surface.Total_Area();
@@ -1091,7 +1091,7 @@ void Get_Initial_Data()
             break;}
         case 36:
             {TRIANGULATED_SURFACE<T>& surface=tests.Create_Cloth_Panel(number_side_panels,side_length,aspect_ratio,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0,0),ROTATION<TV>(-(T)pi/2,TV(0,0,1)))));
-            for(int i=1;i<=deformable_body_collection.particles.array_collection->Size();i++) deformable_body_collection.particles.X(i).y*=(T).5;
+            for(int i=0;i<deformable_body_collection.particles.array_collection->Size();i++) deformable_body_collection.particles.X(i).y*=(T).5;
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(surface,(T)10);}
             break;
         case 37:{
@@ -1670,7 +1670,7 @@ void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
         RANDOM_NUMBERS<T> random;random.Set_Seed(1823);
         T perturbation_size=side_length/number_side_panels*4;
         PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
-        for(int p=1;p<=particles.array_collection->Size();p++) particles.X(p).y+=random.Get_Uniform_Number((T)0,perturbation_size);}
+        for(int p=0;p<particles.array_collection->Size();p++) particles.X(p).y+=random.Get_Uniform_Number((T)0,perturbation_size);}
 }
 //#####################################################################
 // Function Postprocess_Frame

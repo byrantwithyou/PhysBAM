@@ -30,7 +30,7 @@ Remove_Geometry(const int p)
 template<class TV> void RIGID_GEOMETRY_PARTICLES<TV>::
 Clean_Memory()
 {
-    for(int p=1;p<=array_collection->Size();p++) if(rigid_geometry(p)) Remove_Geometry(p);
+    for(int p=0;p<array_collection->Size();p++) if(rigid_geometry(p)) Remove_Geometry(p);
     array_collection->Clean_Memory();
 }
 //#####################################################################
@@ -39,7 +39,7 @@ Clean_Memory()
 template<class TV> void RIGID_GEOMETRY_PARTICLES<TV>::
 Delete_All_Particles()
 {
-    for(int p=1;p<=array_collection->Size();p++) if(rigid_geometry(p)) Remove_Geometry(p);
+    for(int p=0;p<array_collection->Size();p++) if(rigid_geometry(p)) Remove_Geometry(p);
     array_collection->Delete_All_Elements();
 }
 template class RIGID_GEOMETRY_PARTICLES<VECTOR<float,1> >;

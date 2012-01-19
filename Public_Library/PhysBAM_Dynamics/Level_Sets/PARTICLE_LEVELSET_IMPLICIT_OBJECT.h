@@ -60,7 +60,7 @@ public:
         if(particles(block_index)){
             PARTICLE_LEVELSET_PARTICLES<TV>& block_particles=*particles(block_index);
             influence.Resize(block_particles.array_collection->Size());
-            for(int k=1;k<=block_particles.array_collection->Size();k++){
+            for(int k=0;k<block_particles.array_collection->Size();k++){
                 if(levelset.Phi(block_particles.X(k))*one_over_radius_multiplier>block_particles.radius(k)){
                     influence(k)=true;
                     for(int cell=1;cell<=GRID<TV>::number_of_cells_per_node;cell++)
@@ -69,7 +69,7 @@ public:
         else influence.Resize(0);}}
 
     void Particle_Phi_Value(const PARTICLE_LEVELSET_PARTICLES<TV>& cell_particles,const ARRAY<bool>& influence,int sign,const TV& location,T& phi) const
-    {for(int k=1;k<=cell_particles.array_collection->Size();k++){
+    {for(int k=0;k<cell_particles.array_collection->Size();k++){
         if(!influence(k)) continue;
         T radius_minus_sign_phi=cell_particles.radius(k)-sign*phi;
         if(radius_minus_sign_phi > 0){

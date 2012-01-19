@@ -92,7 +92,7 @@ public:
         std::cout<<"Using triangle collisions"<<std::endl;
         plane_particles.Update_Velocity();plane_particles.Store_Mass();
         plane_particles.array_collection->Add_Elements(solids_parameters.rigid_body_parameters.list.rigid_bodies(rigid_index)->triangulated_surface->particles.array_collection->Size());
-        for(int p=1;p<=plane_particles.array_collection->Size();p++) plane_particles.mass(p)=(T)1e6;
+        for(int p=0;p<plane_particles.array_collection->Size();p++) plane_particles.mass(p)=(T)1e6;
         plane_surface=new TRIANGULATED_SURFACE<T>(solids_parameters.rigid_body_parameters.list.rigid_bodies(rigid_index)->triangulated_surface->triangle_mesh,plane_particles);
         Update_Collision_Body_Positions_And_Velocities(initial_time);
         solids_parameters.extra_collision_surfaces.Append(plane_surface);}}
@@ -112,7 +112,7 @@ public:
     void Update_Collision_Body_Positions_And_Velocities(const T time) PHYSBAM_OVERRIDE
     {if(collision_object_type==COARSE_TRIANGULATED_SURFACE || collision_object_type==DENSE_TRIANGULATED_SURFACE){
         const RIGID_BODY<TV>& body=*solids_parameters.rigid_body_parameters.list.rigid_bodies(1);
-        for(int p=1;p<=plane_particles.array_collection->Size();p++){
+        for(int p=0;p<plane_particles.array_collection->Size();p++){
             plane_particles.X(p)=body.World_Space_Point(body.triangulated_surface->particles.X(p));
             plane_particles.V(p)=body.Pointwise_Object_Velocity(plane_particles.X(p));}}}
 

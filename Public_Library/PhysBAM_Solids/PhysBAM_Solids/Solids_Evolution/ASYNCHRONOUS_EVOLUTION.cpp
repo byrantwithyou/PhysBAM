@@ -151,9 +151,9 @@ Enable_Forces(const ARRAY<int>& enable_forces_indices,const ARRAY<VECTOR<bool,3>
 template<class TV> void ASYNCHRONOUS_EVOLUTION<TV>::
 Rewind_Coarsescale_Particle_Positions()
 {
-    for(int i=1;i<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();i++) if (!finescale_forces_particles_map.Contains(i)){
+    for(int i=0;i<solid_body_collection.deformable_body_collection.particles.array_collection->Size();i++) if (!finescale_forces_particles_map.Contains(i)){
         solid_body_collection.deformable_body_collection.particles.X(i)=X_n(i);}
-    for(int i=1;i<=solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if (!finescale_forces_rigid_body_particles_map.Contains(i)){
+    for(int i=0;i<solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if (!finescale_forces_rigid_body_particles_map.Contains(i)){
         solid_body_collection.rigid_body_collection.rigid_body_particle.X(i)=rigid_X_n(i);
         solid_body_collection.rigid_body_collection.rigid_body_particle.rotation(i)=rigid_rotation_n(i);}
 }
@@ -435,9 +435,9 @@ Position_Velocity_Update(const T dt,const T time)
     Enable_Forces(finescale_forces_indices,saved_force_settings);
 
     T ratio=(time_np1-time_n)/dt;
-    for(int p=1;p<=particles.array_collection->Size();p++){T one_over_mass=particles.one_over_mass(p);
+    for(int p=0;p<particles.array_collection->Size();p++){T one_over_mass=particles.one_over_mass(p);
         particles.V(p)=V_last_finescale(p)+(T).5*dt*one_over_mass*(finescale_force_on_particles(p)+ratio*coarsescale_force_on_particles(p));}
-    for(int p=1;p<=rigid_body_particles.array_collection->Size();p++){
+    for(int p=0;p<rigid_body_particles.array_collection->Size();p++){
         RIGID_BODY_MASS<TV,true>world_space_rigid_mass_inverse=solids_evolution->world_space_rigid_mass_inverse(p);
         rigid_body_particles.twist(p)=twist_last_finescale(p)+
             (T).5*dt*(world_space_rigid_mass_inverse*(finescale_force_on_rigid_body_particles(p)+ratio*coarsescale_force_on_rigid_body_particles(p)));}
@@ -516,10 +516,10 @@ Set_Asynchronous_Within_Distance(const T distance)
 {
     HASHTABLE<int> async_map;
     ARRAY<int> async_list;
-    for(int j=1;j<=solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size();j++){
+    for(int j=0;j<solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size();j++){
         RIGID_BODY<TV>& body=solid_body_collection.rigid_body_collection.Rigid_Body(j);
         // choose from all particles
-        for(int i=1;i<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();i++)
+        for(int i=0;i<solid_body_collection.deformable_body_collection.particles.array_collection->Size();i++)
             if(body.Implicit_Geometry_Lazy_Inside(solid_body_collection.deformable_body_collection.particles.X(i),distance))
             async_map.Set(i);}
         /* // choose from boundary-one-ring particles

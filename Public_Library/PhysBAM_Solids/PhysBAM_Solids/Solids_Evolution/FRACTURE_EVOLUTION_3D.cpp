@@ -356,7 +356,7 @@ Adjust_Nodes_For_Segment_Triangle_Intersections(T threshhold)
     Sort(permutation,Indirect_Comparison(edge_triangle_perturbations,Field_Comparison(&TRIPLE<int,int,T>::z))); // sort permutation by edge_triangle_perturbation.z
 
     // loop through edge_triangle_perturbation
-    for(int i=1;i<=particles.array_collection->Size();i++){
+    for(int i=0;i<particles.array_collection->Size();i++){
         int p=permutation(i);
         TRIPLE<int,int,T>& edge_triangle_perturbation=edge_triangle_perturbations(p);
         if(edge_triangle_perturbation.x){

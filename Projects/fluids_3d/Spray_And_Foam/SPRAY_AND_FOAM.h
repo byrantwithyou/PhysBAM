@@ -266,7 +266,7 @@ void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
 
     T density_conversion_speed=(T).29;
     LOG::Time(STRING_UTILITIES::string_sprintf("adding density from %d spray particles",spray_particles.array_collection->Size()));
-    for(int k=1;k<=spray_particles.array_collection->Size();k++){
+    for(int k=0;k<spray_particles.array_collection->Size();k++){
         T b=dt*density_conversion_speed;
         T_GRID &grid=*fluids_parameters.grid;
         T one_over_total_particle_cell_weight=0;
@@ -304,7 +304,7 @@ void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
     int particle_number_amplification_low=0;
     int particle_number_amplification_high=7;
     ARRAY<int> new_removed_particles_amplification_factor(new_removed_particles.array_collection->Size());
-    for(int i=1;i<=new_removed_particles.array_collection->Size();i++)
+    for(int i=0;i<new_removed_particles.array_collection->Size();i++)
         if(new_removed_particles_spawn_time(i)<=time+dt&&new_removed_particles_spawn_time(i)>time && !kill_particle_box.Lazy_Inside(new_removed_particles.X(i))){
             T particle_velcocity_magnitude=new_removed_particles.V(i).Magnitude();
             particle_velcocity_magnitude=clamp(particle_velcocity_magnitude,particle_velocity_low,particle_velocity_high);
@@ -316,7 +316,7 @@ void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
     int particle_to_add=spray_particles.array_collection->Size()+1;
     LOG::cout<<"spawning "<<number_of_particles_to_add<<" new particles"<<"of "<<new_removed_particles.array_collection->Size()*particle_number_amplification<<std::endl;
     spray_particles.array_collection->Add_Elements(number_of_particles_to_add);
-    for(int i=1;i<=new_removed_particles.array_collection->Size();i++)if(new_removed_particles_spawn_time(i)<=time+dt&&new_removed_particles_spawn_time(i)>time  && !kill_particle_box.Lazy_Inside(new_removed_particles.X(i))){
+    for(int i=0;i<new_removed_particles.array_collection->Size();i++)if(new_removed_particles_spawn_time(i)<=time+dt&&new_removed_particles_spawn_time(i)>time  && !kill_particle_box.Lazy_Inside(new_removed_particles.X(i))){
         for(int k=0;k<new_removed_particles_amplification_factor(i);k++){
             int index=particle_to_add++;
             spray_particles.X(index)=new_removed_particles.X(i)+random.Get_Uniform_Vector(TV(-(T).1,-(T).1,-(T).1)*fluids_parameters.grid->dX.Max(),TV((T).1,(T).1,(T).1)*fluids_parameters.grid->dX.Max());
@@ -336,7 +336,7 @@ void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
     T particle_phi_high=2;
     int particle_number_spawn_low=0;
     int particle_number_spawn_high=1;
-    for(int i=1;i<=last_frame_removed_particles.array_collection->Size();i++)
+    for(int i=0;i<last_frame_removed_particles.array_collection->Size();i++)
         if(!kill_particle_box.Lazy_Inside(last_frame_removed_particles.X(i))){
             T particle_phi=interpolated_water_levelset.Phi(last_frame_removed_particles.X(i));
             particle_phi=clamp(particle_phi,particle_phi_low,particle_phi_high);
@@ -349,7 +349,7 @@ void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
     //spawn dependent on velocities
     T particle_number_spawn_low=0;
     T particle_number_spawn_high=(T).5;
-    for(int i=1;i<=last_frame_removed_particles.array_collection->Size();i++)
+    for(int i=0;i<last_frame_removed_particles.array_collection->Size();i++)
         if(!kill_particle_box.Lazy_Inside(last_frame_removed_particles.X(i))){
             T particle_velcocity_magnitude=last_frame_removed_particles.V(i).Magnitude();
             particle_velcocity_magnitude=clamp(particle_velcocity_magnitude,particle_velocity_low,particle_velocity_high);
@@ -365,7 +365,7 @@ void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
 
     particle_to_add=spray_particles.array_collection->Size()+1;
     spray_particles.array_collection->Add_Elements(number_of_particles_to_add);
-    for(int i=1;i<=last_frame_removed_particles.array_collection->Size();i++)if(!kill_particle_box.Lazy_Inside(last_frame_removed_particles.X(i))){
+    for(int i=0;i<last_frame_removed_particles.array_collection->Size();i++)if(!kill_particle_box.Lazy_Inside(last_frame_removed_particles.X(i))){
         for(int k=0;k<removed_particles_amplification_factor(i);k++){
             int index=particle_to_add++;
             spray_particles.X(index)=last_frame_removed_particles.X(i)+random.Get_Uniform_Vector(TV(-(T).1,-(T).1,-(T).1)*fluids_parameters.grid->dX.Max(),TV((T).1,(T).1,(T).1)*fluids_parameters.grid->dX.Max());
@@ -394,7 +394,7 @@ void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
     LOG::Time(STRING_UTILITIES::string_sprintf("simulating %d spray particles",spray_particles.array_collection->Size()));
     LINEAR_INTERPOLATION_UNIFORM<T_GRID,T> interpolation;
     LEVELSET_3D<GRID<TV> > object_levelset(*fluids_parameters.grid,object_phi);
-    for(int i=1;i<=spray_particles.array_collection->Size();i++){
+    for(int i=0;i<spray_particles.array_collection->Size();i++){
         T b=(T)1-(T)std::pow((T)max(spray_particles.radius(i),(T)0),dt);
         spray_particles.V(i)=(b)*interpolation.Clamped_To_Array_Face(*fluids_parameters.grid,fluid_collection.incompressible_fluid_collection.face_velocities,spray_particles.X(i))+(1-b)*spray_particles.V(i);
         spray_particles.V(i).y-=dt*(T)9.8;
@@ -403,7 +403,7 @@ void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
         spray_particles.X(i)+=spray_particles.V(i)*dt;
         spray_particles.age(i)+=dt;}
     LOG::Time(STRING_UTILITIES::string_sprintf("simulating %d foam particles",foam_particles.array_collection->Size()));
-    for(int i=1;i<=foam_particles.array_collection->Size();i++){
+    for(int i=0;i<foam_particles.array_collection->Size();i++){
         T b=(T)1-(T)std::pow((T)max(foam_particles.radius(i),(T)0),dt);// TODO: because radius doesn't change, should we change this?
         foam_particles.V(i)=(b)*interpolation.Clamped_To_Array_Face(*fluids_parameters.grid,interpolated_water_V,foam_particles.X(i))+(1-b)*foam_particles.V(i);
         b=(T).25;
@@ -551,7 +551,7 @@ void Find_Removed_Particles_That_Will_Appear_This_Frame(int particle_type,const 
                 delete particles_array(i,j,ij);}}
 
         HASHTABLE<int,int> hashtable(last_frame_removed_particles.array_collection->Size());
-        for(int i=1;i<=last_frame_removed_particles.array_collection->Size();i++){
+        for(int i=0;i<last_frame_removed_particles.array_collection->Size();i++){
             hashtable.Insert(last_frame_removed_particles.id(i),i);}
 
         // read in this frames particles
@@ -571,7 +571,7 @@ void Find_Removed_Particles_That_Will_Appear_This_Frame(int particle_type,const 
         LEVELSET_3D<GRID<TV> > high_frame_levelset(high_frame_grid,high_frame_phi);
         LINEAR_INTERPOLATION_UNIFORM<T_GRID,T> interpolation;
 
-        for(int i=1;i<=new_removed_particles.array_collection->Size();i++){
+        for(int i=0;i<new_removed_particles.array_collection->Size();i++){
             TV X=new_removed_particles.X(i);
             T phi=high_frame_levelset.Phi(X);
             TV particle_V=new_removed_particles.V(i);

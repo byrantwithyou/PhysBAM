@@ -67,8 +67,8 @@ virtual void Get_Initial_Data(TRIANGULATED_SURFACE<T>& triangulated_surface)
     T scale=(T).01;
     T velocity=0;//sqrt(2*9.8*height);
     T miny=1e10;
-    for(int p=1;p<=particles.array_collection->Size();p++) if(particles.X(p).y<miny) miny=particles.X(p).y;
-    for(int p=1;p<=particles.array_collection->Size();p++){
+    for(int p=0;p<particles.array_collection->Size();p++) if(particles.X(p).y<miny) miny=particles.X(p).y;
+    for(int p=0;p<particles.array_collection->Size();p++){
         particles.X(p)=center+initial_orientation.Rotate(particles.X(p)-center);
         particles.X(p)=scale*(particles.X(p)-VECTOR_3D<T>(0,miny,0));
         particles.V(p)=VECTOR_3D<T>(0,-velocity,0);}

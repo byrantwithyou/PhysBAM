@@ -46,7 +46,7 @@ Write(const std::string& filename,const ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& imag
         corrected_image=new ARRAY<VECTOR<T,d> ,VECTOR<int,2> >(1,image.counts.x,1,image.counts.y,false);
         ARRAY<VECTOR<T,d> ,VECTOR<int,2> >::Shifted_Get(*corrected_image,image,VECTOR<int,2>(image.domain.min_corner.x-1,image.domain.min_corner.y-1));
         T one_over_gamma=1/gamma;
-        for(int t=1;t<=corrected_image->array.Size();t++){
+        for(int t=0;t<corrected_image->array.Size();t++){
             VECTOR<T,d> color=corrected_image->array(t);
             for(int channel=0;channel<d;channel++) corrected_image->array(t)[channel]=pow(color[channel],one_over_gamma);
             if(dither_amplitude){

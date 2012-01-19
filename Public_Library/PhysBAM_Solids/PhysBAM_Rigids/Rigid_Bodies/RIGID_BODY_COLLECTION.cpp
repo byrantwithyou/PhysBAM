@@ -135,7 +135,7 @@ Add_Rigid_Body(const STREAM_TYPE stream_type,const bool thin_shell,const std::st
 template<class TV> void RIGID_BODY_COLLECTION<TV>::
 Reset_Impulse_Accumulators()
 {
-    for(int i=1;i<=rigid_body_particle.array_collection->Size();i++)
+    for(int i=0;i<rigid_body_particle.array_collection->Size();i++)
         if(Is_Active(i) && rigid_geometry_collection.collision_body_list->geometry_id_to_collision_geometry_id.Contains(i) && rigid_geometry_collection.collision_body_list->bodies(rigid_geometry_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(i))->impulse_accumulator)
             rigid_geometry_collection.collision_body_list->bodies(rigid_geometry_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(i))->impulse_accumulator->Reset();
 }
@@ -145,7 +145,7 @@ Reset_Impulse_Accumulators()
 template<class TV> void RIGID_BODY_COLLECTION<TV>::
 Update_Angular_Velocity()
 {
-    for(int p=1;p<=rigid_body_particle.array_collection->Size();p++) if(Is_Active(p)) Rigid_Body(p).Update_Angular_Velocity();
+    for(int p=0;p<rigid_body_particle.array_collection->Size();p++) if(Is_Active(p)) Rigid_Body(p).Update_Angular_Velocity();
 }
 //#####################################################################
 // Function Update_Angular_Momentum
@@ -153,7 +153,7 @@ Update_Angular_Velocity()
 template<class TV> void RIGID_BODY_COLLECTION<TV>::
 Update_Angular_Momentum()
 {
-    for(int p=1;p<=rigid_body_particle.array_collection->Size();p++) if(Is_Active(p)) Rigid_Body(p).Update_Angular_Momentum();
+    for(int p=0;p<rigid_body_particle.array_collection->Size();p++) if(Is_Active(p)) Rigid_Body(p).Update_Angular_Momentum();
 }
 //#####################################################################
 // Function Update_Angular_Velocity
@@ -322,7 +322,7 @@ CFL_Rigid(const RIGID_BODY_EVOLUTION_PARAMETERS<TV>& rigid_body_evolution_parame
     T max_distance_per_time_step=rigid_body_evolution_parameters.max_rigid_body_linear_movement_fraction_per_time_step*min_bounding_box_width;
     T dt=FLT_MAX;
     bool no_active_bodies=true;
-    for(int p=1;p<=rigid_body_particle.array_collection->Size();p++) if(Is_Active(p)){
+    for(int p=0;p<rigid_body_particle.array_collection->Size();p++) if(Is_Active(p)){
         dt=min(dt,Rigid_Body(p).CFL(max_distance_per_time_step,rigid_body_evolution_parameters.max_rigid_body_rotation_per_time_step,verbose_dt));
         no_active_bodies=false;}
     if(no_active_bodies) return FLT_MAX; // don't apply rigid dt bounds if there aren't any active rigid bodies

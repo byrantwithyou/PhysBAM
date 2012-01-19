@@ -105,13 +105,13 @@ void Initialize_Tetrahedralized_Volume(TETRAHEDRALIZED_VOLUME<T>& tetrahedralize
     T width=tetrahedralized_volume.bounding_box->zmax-tetrahedralized_volume.bounding_box->zmin;
 
     // Angular velocity and orientation
-    for(int p=1;p<=tetrahedralized_volume.particles.array_collection->Size();p++){
+    for(int p=0;p<tetrahedralized_volume.particles.array_collection->Size();p++){
         tetrahedralized_volume.particles.V(p)=VECTOR_3D<T>::Cross_Product(initial_angular_velocity,tetrahedralized_volume.particles.X(p)-center);
         tetrahedralized_volume.particles.X(p)=center+initial_orientation.Rotate(tetrahedralized_volume.particles.X(p)-center);}
 
     // Move to ground instead of dropping
-    for(int p=1;p<=tetrahedralized_volume.particles.array_collection->Size();p++) if(tetrahedralized_volume.particles.X(p).y<miny) miny=tetrahedralized_volume.particles.X(p).y;
-    for(int p=1;p<=tetrahedralized_volume.particles.array_collection->Size();p++){
+    for(int p=0;p<tetrahedralized_volume.particles.array_collection->Size();p++) if(tetrahedralized_volume.particles.X(p).y<miny) miny=tetrahedralized_volume.particles.X(p).y;
+    for(int p=0;p<tetrahedralized_volume.particles.array_collection->Size();p++){
         tetrahedralized_volume.particles.X(p)=scale*(tetrahedralized_volume.particles.X(p)-VECTOR_3D<T>(0,miny,0));
         tetrahedralized_volume.particles.V(p)+=VECTOR_3D<T>(0,-velocity,0);}
 
@@ -122,7 +122,7 @@ void Initialize_Tetrahedralized_Volume(TETRAHEDRALIZED_VOLUME<T>& tetrahedralize
     width=tetrahedralized_volume.bounding_box->zmax-tetrahedralized_volume.bounding_box->zmin;
 
     // Constrain Nodes
-    for(int p=1;p<=tetrahedralized_volume.particles.array_collection->Size();p++){
+    for(int p=0;p<tetrahedralized_volume.particles.array_collection->Size();p++){
         if(tetrahedralized_volume.particles.X(p).y>center.y){
             if(tetrahedralized_volume.particles.X(p).z>center.z+width*0.3) constrained_nodes_set1.Append(p);
             else if(tetrahedralized_volume.particles.X(p).z<center.z-width*0.3) constrained_nodes_set2.Append(p);

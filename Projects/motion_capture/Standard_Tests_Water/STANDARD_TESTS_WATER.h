@@ -609,7 +609,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             volume->Update_Number_Nodes();}
 
         // correct mass
-        for(int i=1;i<=particles.array_collection->Size();i++){particles.mass(i)=fluids_parameters.density/particles.array_collection->Size()/100;}
+        for(int i=0;i<particles.array_collection->Size();i++){particles.mass(i)=fluids_parameters.density/particles.array_collection->Size()/100;}
         binding_list.Distribute_Mass_To_Parents();
         binding_list.Clear_Hard_Bound_Particles(particles.mass);
         particles.Compute_Auxiliary_Attributes(soft_bindings);soft_bindings.Set_Mass_From_Effective_Mass();
@@ -624,7 +624,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             FINITE_VOLUME<TV,3>* finite_volume=Create_Finite_Volume(*volume,new NEO_HOOKEAN<T,3>(stiffness,(T).45,damping,(T).25),true,(T).1);
             solid_body_collection.Add_Force(finite_volume);}
         else{
-            for(int i=1;i<=particles.array_collection->Size();i++){particles.mass(i)=fluids_parameters.density/particles.array_collection->Size()/10;}
+            for(int i=0;i<particles.array_collection->Size();i++){particles.mass(i)=fluids_parameters.density/particles.array_collection->Size()/10;}
             particles.Compute_Auxiliary_Attributes(soft_bindings);soft_bindings.Set_Mass_From_Effective_Mass();
             T linear_stiffness=stiffness,linear_damping=damping;
             LINEAR_SPRINGS<TV>* edge_springs;
@@ -638,7 +638,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             solid_body_collection.Add_Force(tet_springs);}
 
         // correct mass
-        for(int i=1;i<=particles.array_collection->Size();i++){particles.mass(i)=fluids_parameters.density/particles.array_collection->Size()/10;}
+        for(int i=0;i<particles.array_collection->Size();i++){particles.mass(i)=fluids_parameters.density/particles.array_collection->Size()/10;}
         binding_list.Distribute_Mass_To_Parents();
         binding_list.Clear_Hard_Bound_Particles(particles.mass);
         particles.Compute_Auxiliary_Attributes(soft_bindings);soft_bindings.Set_Mass_From_Effective_Mass();
@@ -653,7 +653,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         // binding the deformable particles to the rigid bodies
         ARRAY<int> particle_array;volume->mesh.elements.Flattened().Get_Unique(particle_array);
         source_elements=new ARRAY<int>();
-        for(int p=1;p<=solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size();p++) tests.Bind_Unbound_Particles_In_Rigid_Body(solid_body_collection.rigid_body_collection.Rigid_Body(p),particle_array);
+        for(int p=0;p<solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size();p++) tests.Bind_Unbound_Particles_In_Rigid_Body(solid_body_collection.rigid_body_collection.Rigid_Body(p),particle_array);
         
         //for(int i=0;i<soft_bound_surface->mesh.elements.m;i++){int j,k,l;soft_bound_surface->mesh.elements(i).Get(j,k,l);
         /*for(int i=1;i<=volume->Get_Boundary_Object().mesh.elements.m;i++){int j,k,l;volume->Get_Boundary_Object().mesh.elements(i).Get(j,k,l);
@@ -673,7 +673,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
         referenced_particles=new ARRAY<int>();source_particles=new ARRAY<int>();
         //for(int i=0;i<particle_array.m;i++){
-        for(int i=1;i<=particles.array_collection->Size();i++){
+        for(int i=0;i<particles.array_collection->Size();i++){
             referenced_particles->Append(i);
             for(int j=0;j<source_rigid_particles->m;j++) if(solid_body_collection.rigid_body_collection.Rigid_Body((*source_rigid_particles)(j)).implicit_object->Inside(particles.X(i))) source_particles->Append(i);
         }

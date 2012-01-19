@@ -77,7 +77,7 @@ Initialize(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,TV_INT process
             rigid_body_collection_input.rigid_body_particle.id.m=id->m;}
         else{
             rigid_body_collection_input.rigid_body_particle.Store_Id();
-            for(int i=1;i<=rigid_body_collection_input.rigid_body_particle.array_collection->Size();i++){
+            for(int i=0;i<rigid_body_collection_input.rigid_body_particle.array_collection->Size();i++){
                 rigid_body_collection_input.rigid_body_particle.id(i)=i;}}}
 
     global_domain=spatial_partition.Scene_Bounding_Box();
@@ -291,7 +291,7 @@ Simple_Partition(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,
     // Determine which bodies belong on which processors
     PARTITION_ID id(rank+1);
     for(int i=0;i<partition_id_from_particle_index.m;i++) partition_id_from_particle_index(i)=PARTITION_ID(-1);
-    for(int i=1;i<=rigid_body_collection_input.rigid_body_particle.array_collection->Size();i++){
+    for(int i=0;i<rigid_body_collection_input.rigid_body_particle.array_collection->Size();i++){
         int p=rigid_body_collection_input.rigid_body_particle.id(i);
         if(local_domain.Lazy_Inside(rigid_body_collection_input.rigid_body_particle.X(p)))
             partition_id_from_particle_index(p)=id;}
@@ -311,7 +311,7 @@ Simple_Partition(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,
 template<class TV> void MPI_RIGIDS<TV>::
 Clear_Impulse_Accumulators(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input)
 {
-    for(int j=1;j<=rigid_body_collection_input.rigid_body_particle.array_collection->Size();j++) rigid_body_collection_input.Rigid_Body(j).impulse_accumulator->Reset();
+    for(int j=0;j<rigid_body_collection_input.rigid_body_particle.array_collection->Size();j++) rigid_body_collection_input.Rigid_Body(j).impulse_accumulator->Reset();
 }
 //#####################################################################
 // Function Exchange_All_Impulses
@@ -323,7 +323,7 @@ Exchange_All_Impulses(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,ARRAY<TWI
     ARRAY<bool> need_to_reevolve(rigid_body_collection.rigid_body_particle.array_collection->Size());
     Prune_And_Exchange_Impulses(rigid_body_collection,need_to_reevolve);
 
-    for(int i=1;i<=rigid_body_collection.rigid_body_particle.array_collection->Size();i++){
+    for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++){
         if(need_to_reevolve(i)){
             int p=rigid_body_collection.rigid_body_particle.id(i);
             RIGID_BODY<TV>& rigid_body=rigid_body_collection.Rigid_Body(p);
@@ -354,7 +354,7 @@ Exchange_All_Pushes(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,ARRAY<TV>& 
     ARRAY<bool> need_to_reevolve(rigid_body_collection.rigid_body_particle.array_collection->Size());
     Prune_And_Exchange_Impulses(rigid_body_collection,need_to_reevolve);
 
-    for(int i=1;i<=rigid_body_collection.rigid_body_particle.array_collection->Size();i++){
+    for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++){
         if(need_to_reevolve(i)){
             int p=rigid_body_collection.rigid_body_particle.id(i);
             RIGID_BODY<TV>& rigid_body=rigid_body_collection.Rigid_Body(p);
@@ -386,7 +386,7 @@ Prune_And_Exchange_Impulses(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,ARR
     // Figure out what impulse_accumulators this node needs to send
     need_to_reevolve.Fill(false);
     ARRAY<int> accumulators_to_send;
-    for(int i=1;i<=rigid_body_collection.rigid_body_particle.array_collection->Size();i++){
+    for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++){
         int p=rigid_body_collection.rigid_body_particle.id(i);
         RIGID_BODY<TV>& rigid_body=rigid_body_collection.Rigid_Body(p);
         RIGID_BODY_IMPULSE_ACCUMULATOR<TV,TV::dimension-1> *impulse_accumulator=dynamic_cast<RIGID_BODY_IMPULSE_ACCUMULATOR<TV,TV::dimension-1>*>(rigid_body.impulse_accumulator);

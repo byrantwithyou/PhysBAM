@@ -170,7 +170,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 2:
         case 3:
             Triangulated_Surface_Forces(true,false,false);
-            for(int i=1;i<=deformable_body_collection.particles.array_collection->Size();i++)
+            for(int i=0;i<deformable_body_collection.particles.array_collection->Size();i++)
                 deformable_body_collection.particles.X(i)*=1.2;
             break;
         case 4:{
@@ -306,7 +306,7 @@ void Cloth_Table_Test()
     T density=.1;
 
     TRIANGULATED_SURFACE<T>& ts=tests.Create_Cloth_Panel(number_side_panels,side_length,aspect_ratio,0);
-    for(int i=1;i<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();i++){
+    for(int i=0;i<solid_body_collection.deformable_body_collection.particles.array_collection->Size();i++){
         solid_body_collection.deformable_body_collection.particles.mass(i)=0;}
     for(int i=0;i<ts.mesh.elements.m;i++){
         int node1,node2,node3;ts.mesh.elements(i).Get(node1,node2,node3);
@@ -319,7 +319,7 @@ void Cloth_Table_Test()
         solid_body_collection.deformable_body_collection.particles.mass(node2)+=m;
         solid_body_collection.deformable_body_collection.particles.mass(node3)+=m;}
     T total_mass=0;
-    for(int i=1;i<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();i++){
+    for(int i=0;i<solid_body_collection.deformable_body_collection.particles.array_collection->Size();i++){
         total_mass+=solid_body_collection.deformable_body_collection.particles.mass(i);}
     LOG::cout << "total mass " << total_mass << std::endl;
 }

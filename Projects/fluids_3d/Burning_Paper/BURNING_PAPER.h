@@ -348,7 +348,7 @@ void Initialize_Particle_Positions_And_Velocities(const int object)
 
     particles.Update_Velocity();
     triangulated_surface.Update_Bounding_Box();
-    for(int i=1;i<=particles.array_collection->Size();i++){
+    for(int i=0;i<particles.array_collection->Size();i++){
         particles.X(i)=initial_orientation.Rotate(particles.X(i));
         particles.V(i)=initial_velocity+VECTOR<T,3>::Cross_Product(initial_angular_velocity,particles.X(i));
         particles.X(i)+=initial_position;}
@@ -405,7 +405,7 @@ void Initialize_Forces()
     constrained_nodes.Resize(0);ARRAY<VECTOR<T,3> > corners(4);
     corners(1)=VECTOR<T,3>(box.xmin,box.ymin,0);corners(2)=VECTOR<T,3>(box.xmin,box.ymax,0);corners(3)=VECTOR<T,3>(box.xmax,box.ymin,0);corners(4)=VECTOR<T,3>(box.xmax,box.ymax,0);
     T lower_edge=box.xmin;
-    for(int p=1;p<=particles.array_collection->Size();p++)for(int c=0;c<4;c++){
+    for(int p=0;p<particles.array_collection->Size();p++)for(int c=0;c<4;c++){
         VECTOR<T,3>& X=particles.X(p);
         if((corners(c)-X).Magnitude()<1e-5 || fabs(X.x-lower_edge)<1e-5){constrained_nodes.Append(p);break;}}
 }

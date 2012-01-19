@@ -89,7 +89,7 @@ Set_Initial_Particle_Configuration(GEOMETRY_PARTICLES<TV>& particles,const RIGID
     particles.Store_Velocity();
     if(relative_to_box_center){
         particles.X-=RANGE<TV>::Bounding_Box(particles.X).Center();}
-    for(int p=1;p<=particles.array_collection->Size();p++){
+    for(int p=0;p<particles.array_collection->Size();p++){
         particles.X(p)=state.frame*(particles.X(p));
         particles.V(p)=state.Pointwise_Object_Velocity(particles.X(p));}
 }

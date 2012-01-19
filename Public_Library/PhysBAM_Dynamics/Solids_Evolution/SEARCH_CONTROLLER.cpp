@@ -104,7 +104,7 @@ Save_Position(ARRAY<TV>& X,ARRAY<TV>& rigid_X,ARRAY<ROTATION<TV> >& rigid_rotati
     X.Subset(simulated_particles)=particles.X.Subset(simulated_particles);
     rigid_X.Resize(rigid_body_particles.array_collection->Size(),false,false);
     rigid_rotation.Resize(rigid_body_particles.array_collection->Size(),false,false);
-    for(int i=1;i<=rigid_body_particles.array_collection->Size();i++) if(solid_body_collection.rigid_body_collection.Is_Active(i)){rigid_X(i)=rigid_body_particles.X(i);rigid_rotation(i)=rigid_body_particles.rotation(i);}
+    for(int i=0;i<rigid_body_particles.array_collection->Size();i++) if(solid_body_collection.rigid_body_collection.Is_Active(i)){rigid_X(i)=rigid_body_particles.X(i);rigid_rotation(i)=rigid_body_particles.rotation(i);}
 }
 //#####################################################################
 // Function Restore_Position
@@ -120,7 +120,7 @@ Restore_Position(ARRAY_VIEW<const TV> X,ARRAY_VIEW<const TV> rigid_X,ARRAY_VIEW<
     PHYSBAM_ASSERT(rigid_rotation.Size()==rigid_body_collection.rigid_body_particle.array_collection->Size());
     particles.X.Subset(simulated_particles)=X.Subset(simulated_particles);
     for(int i=0;i<simulated_rigid_body_particles.m;i++) rigid_body_collection.Rigid_Body(simulated_rigid_body_particles(i)).Update_Angular_Velocity();
-    for(int i=1;i<=rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if(rigid_body_collection.Is_Active(i)){
+    for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if(rigid_body_collection.Is_Active(i)){
         RIGID_BODY<TV>& body=rigid_body_collection.Rigid_Body(i);rigid_body_collection.rigid_body_particle.X(i)=rigid_X(i);
         rigid_body_collection.rigid_body_particle.rotation(i)=rigid_rotation(i);body.Update_Angular_Velocity();}
 }
@@ -136,7 +136,7 @@ Save_Velocity(ARRAY<TV>& V,ARRAY<TV>& rigid_velocity,ARRAY<T_SPIN>& rigid_angula
     V.Subset(solid_body_collection.deformable_body_collection.simulated_particles)=particles.V.Subset(solid_body_collection.deformable_body_collection.simulated_particles);
     for(int i=0;i<solid_body_collection.rigid_body_collection.simulated_rigid_body_particles.m;i++){int p=solid_body_collection.rigid_body_collection.simulated_rigid_body_particles(i);
         rigid_velocity(p)=rigid_body_collection.rigid_body_particle.twist(p).linear;rigid_angular_momentum(p)=rigid_body_collection.rigid_body_particle.angular_momentum(p);}
-    for(int i=1;i<=rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if(rigid_body_collection.Is_Active(i)){RIGID_BODY<TV>& body=rigid_body_collection.Rigid_Body(i);
+    for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if(rigid_body_collection.Is_Active(i)){RIGID_BODY<TV>& body=rigid_body_collection.Rigid_Body(i);
         if(!body.Is_Simulated()){rigid_velocity(i)=rigid_body_collection.rigid_body_particle.twist(i).linear;rigid_angular_momentum(i)=rigid_body_collection.rigid_body_particle.angular_momentum(i);}}
 }
 //#####################################################################
@@ -150,7 +150,7 @@ Restore_Velocity(ARRAY<TV>& V,ARRAY<TV>& rigid_velocity,ARRAY<T_SPIN>& rigid_ang
     for(int i=0;i<solid_body_collection.rigid_body_collection.simulated_rigid_body_particles.m;i++){int p=solid_body_collection.rigid_body_collection.simulated_rigid_body_particles(i);
         rigid_body_collection.rigid_body_particle.twist(p).linear=rigid_velocity(p);
         rigid_body_collection.rigid_body_particle.angular_momentum(p)=rigid_angular_momentum(p);rigid_body_collection.Rigid_Body(p).Update_Angular_Velocity();}
-    for(int i=1;i<=rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if(rigid_body_collection.Is_Active(i)){RIGID_BODY<TV>& body=rigid_body_collection.Rigid_Body(i);
+    for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if(rigid_body_collection.Is_Active(i)){RIGID_BODY<TV>& body=rigid_body_collection.Rigid_Body(i);
         if(!body.Is_Simulated()){
             rigid_body_collection.rigid_body_particle.twist(i).linear=rigid_velocity(i);rigid_body_collection.rigid_body_particle.angular_momentum(i)=rigid_angular_momentum(i);body.Update_Angular_Velocity();}}
 }

@@ -173,7 +173,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     if(test_number!=4 && test_number!=5) solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
     else if(test_number==5) solid_body_collection.Add_Force(new DEFORMABLE_GRAVITY<TV>(deformable_body_collection.particles,true));
 
-    if(test_number==4) for(int i=1;i<=deformable_body_collection.particles.array_collection->Size();i++) deformable_body_collection.particles.X(i)*=1.2;
+    if(test_number==4) for(int i=0;i<deformable_body_collection.particles.array_collection->Size();i++) deformable_body_collection.particles.X(i)*=1.2;
 
     // add structures and rigid bodies to collisions
     deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);

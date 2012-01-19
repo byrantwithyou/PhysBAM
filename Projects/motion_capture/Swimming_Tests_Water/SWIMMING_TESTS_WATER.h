@@ -320,7 +320,7 @@ void Floppy_Human()
     TETRAHEDRALIZED_VOLUME<T>* human=&solids_tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/body_150_scaled_10.tet",human_state,false,false,1000,(T)1);
 
     // binding the deformable particles to the rigid bodies
-    for(int p=1;p<=rigid_body_collection.rigid_body_particle.array_collection->Size();p++) solids_tests.Bind_Particles_In_Rigid_Body(rigid_body_collection.Rigid_Body(p));
+    for(int p=0;p<rigid_body_collection.rigid_body_particle.array_collection->Size();p++) solids_tests.Bind_Particles_In_Rigid_Body(rigid_body_collection.Rigid_Body(p));
 
     arb.Use_PD_Actuators();
     arb.global_post_stabilization=true;
@@ -388,7 +388,7 @@ void Floppy_Fish()
         fish=&solids_tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/fish_42K.tet",fish_state,true,false,flesh_density,scale);}
 
     // binding the deformable particles to the rigid bodies
-    for(int p=1;p<=rigid_body_collection.rigid_body_particle.array_collection->Size();p++) solids_tests.Bind_Particles_In_Rigid_Body(rigid_body_collection.Rigid_Body(p));
+    for(int p=0;p<rigid_body_collection.rigid_body_particle.array_collection->Size();p++) solids_tests.Bind_Particles_In_Rigid_Body(rigid_body_collection.Rigid_Body(p));
 
     if(fish){
         fish->Update_Number_Nodes();fish->Initialize_Triangulated_Surface();

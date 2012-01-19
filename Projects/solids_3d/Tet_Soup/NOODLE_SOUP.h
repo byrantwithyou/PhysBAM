@@ -72,7 +72,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     // read coarse sphere to get the dynamic particles
     TETRAHEDRALIZED_VOLUME<T>& dynamic_volume=tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",
         RIGID_BODY_STATE<TV>(FRAME_3D<T>(TV(0,0,0))),true,true);
-    T radius=0;for(int p=1;p<=particles.array_collection->Size();p++) radius=max(radius,particles.X(p).Magnitude());
+    T radius=0;for(int p=0;p<particles.array_collection->Size();p++) radius=max(radius,particles.X(p).Magnitude());
     ARRAY<T>::copy(0,particles.mass.array);
 
     // add the noodles and compute their bounding box
@@ -152,7 +152,7 @@ void Read_Noodle_Triangulated_Surface(const int frame_number,const FRAME_3D<T>& 
 {
     DEFORMABLE_OBJECT<T,TV>& deformable_object=solid_body_collection.deformable_object;
     noodle_deformable_object.Read(stream_type,noodle_data_directory,noodle_data_directory,frame_number,-1,read_static_variables);
-    for(int p=1;p<=noodle_deformable_object.particles.array_collection->Size();p++) noodle_deformable_object.particles.X(p)=frame*noodle_deformable_object.particles.X(p);
+    for(int p=0;p<noodle_deformable_object.particles.array_collection->Size();p++) noodle_deformable_object.particles.X(p)=frame*noodle_deformable_object.particles.X(p);
     noodles.Append((TRIANGULATED_SURFACE<T>*)noodle_deformable_object.structures(1)->Append_Particles_And_Create_Copy(deformable_object.particles));
 }
 //#####################################################################

@@ -458,10 +458,10 @@ Print_Each_Matrix(int n) const
          OCTAVE_OUTPUT<T> oo(STRING_UTILITIES::string_sprintf("Mi-%i.txt",solve_id).c_str());
          oo.Begin_Sparse_Matrix("Mi",temporary_solids_velocity.Raw_Size(),temporary_solids_velocity.Raw_Size());
 
-         for(int i=1;i<=solid_mass->one_over_mass.Size();i++)
+         for(int i=0;i<solid_mass->one_over_mass.Size();i++)
              for(int j=0;j<TV::m;j++)
                  oo.Append_Sparse_Diagonal_Block(solid_mass->one_over_mass(i));
-         for(int i=1;i<=solid_mass->world_space_rigid_mass_inverse.Size();i++){
+         for(int i=0;i<solid_mass->world_space_rigid_mass_inverse.Size();i++){
              for(int j=0;j<TV::m;j++)
                  oo.Append_Sparse_Diagonal_Block(solid_mass->world_space_rigid_mass_inverse(i).mass);
              oo.Append_Sparse_Diagonal_Block(solid_mass->world_space_rigid_mass_inverse(i).inertia_tensor);}
@@ -854,10 +854,10 @@ Compute_Inverse_Mass_Matrix(SPARSE_MATRIX_FLAT_MXN<T>& inverse_mass)
     if(!leakproof_solve && solid_node && !fluid_to_solid_interpolation){
         matrix_helper.New_Block();
         int k=1;
-        for(int i=1;i<=solid_mass->one_over_mass.Size();i++)
+        for(int i=0;i<solid_mass->one_over_mass.Size();i++)
             for(int j=1;j<=TV::m;j++,k++)
                 matrix_helper.data.Append(TRIPLE<int,int,T>(k,k,solid_mass->one_over_mass(i)));
-        for(int i=1;i<=solid_mass->world_space_rigid_mass_inverse.Size();i++){
+        for(int i=0;i<solid_mass->world_space_rigid_mass_inverse.Size();i++){
             for(int j=1;j<=TV::m;j++,k++)
                 matrix_helper.data.Append(TRIPLE<int,int,T>(k,k,solid_mass->world_space_rigid_mass_inverse(i).mass));
             for(int j=0;j<TV::SPIN::m;j++)

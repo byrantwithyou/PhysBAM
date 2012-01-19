@@ -162,7 +162,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         rigid_body->add_to_spatial_partition=false;
     }
 
-    for(int i=1;i<=arb->rigid_body_list.Number_Of_Elements();i++) arb->rigid_body_particles.Rigid_Body(i).Set_Coefficient_Of_Friction(1);
+    for(int i=0;i<arb->rigid_body_list.Number_Of_Elements();i++) arb->rigid_body_particles.Rigid_Body(i).Set_Coefficient_Of_Friction(1);
 
     RIGID_BODY_LIST<T,TV>& rigid_body_list=solids_parameters.rigid_body_parameters.list;
     for(int i=1;i<=rigid_body_list.Number_Of_Elements();i++) {if(!rigid_body_particles.Rigid_Body(i).is_static)

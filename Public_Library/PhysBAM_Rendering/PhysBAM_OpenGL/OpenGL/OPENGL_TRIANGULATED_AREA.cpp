@@ -90,7 +90,7 @@ Display(const int in_color) const
         glDisable(GL_LIGHTING);
         velocity_color.Send_To_GL_Pipeline();
         ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-        for(int t=1;t<=triangulated_area.particles.array_collection->Size();t++)
+        for(int t=0;t<triangulated_area.particles.array_collection->Size();t++)
             OPENGL_SHAPES::Draw_Arrow(triangulated_area.particles.X(t),triangulated_area.particles.X(t)+velocity_scale*triangulated_area.particles.V(t),vertices);
         OpenGL_Draw_Arrays(GL_LINES,2,vertices);
         glPopAttrib();}
@@ -104,7 +104,7 @@ template<class T> RANGE<VECTOR<float,3> > OPENGL_TRIANGULATED_AREA<T>::
 Bounding_Box() const
 {
     RANGE<VECTOR<float,3> > box=RANGE<VECTOR<float,3> >::Empty_Box();
-    for(int i=1;i<=triangulated_area.particles.array_collection->Size();i++)box.Enlarge_To_Include_Point(World_Space_Point(VECTOR<float,2>(triangulated_area.particles.X(i))));
+    for(int i=0;i<triangulated_area.particles.array_collection->Size();i++)box.Enlarge_To_Include_Point(World_Space_Point(VECTOR<float,2>(triangulated_area.particles.X(i))));
     return box;
 }
 //#####################################################################
@@ -226,7 +226,7 @@ Draw_Vertices() const
         vertex_color.Send_To_GL_Pipeline();
         ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
         if(!triangulated_area.mesh.neighbor_nodes) triangulated_area.mesh.Initialize_Neighbor_Nodes();
-        for(int i=1;i<=triangulated_area.particles.array_collection->Size();i++) if((*triangulated_area.mesh.neighbor_nodes)(i).m)
+        for(int i=0;i<triangulated_area.particles.array_collection->Size();i++) if((*triangulated_area.mesh.neighbor_nodes)(i).m)
             OpenGL_Vertex(triangulated_area.particles.X(i),vertices);
         OpenGL_Draw_Arrays(GL_POINTS,2,vertices);}
 }

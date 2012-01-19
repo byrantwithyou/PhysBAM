@@ -45,7 +45,7 @@ int main(int argc,char* argv[])
             volumes(root)+=TETRAHEDRON<T>::Signed_Volume(particles.X(nodes[1]),particles.X(nodes[2]),particles.X(nodes[3]),particles.X(nodes[4]));}
         // print volumes
         BOX<VECTOR<T,1> > fragment_volume_box=BOX<VECTOR<T,1> >(FLT_MAX,-FLT_MAX);
-        for(int p=1;p<=particles.array_collection->Size();p++)if(union_find.Is_Root(p)){
+        for(int p=0;p<particles.array_collection->Size();p++)if(union_find.Is_Root(p)){
             if(frame==0) rest_volume=volumes(p);
             fragment_volume_box.Enlarge_To_Include_Point(VECTOR<T,1>(volumes(p)/rest_volume-1));
             volume_box.Enlarge_To_Include_Point(VECTOR<T,1>(volumes(p)/rest_volume-1));}

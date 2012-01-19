@@ -50,7 +50,7 @@ void Get_Initial_Data()
     
     triangulated_surface.Update_Bounding_Box();
     T mass_node=100;ARRAY<T>::copy(mass_node,particles.mass.array);
-    for(int i=1;i<=particles.array_collection->Size();i++){
+    for(int i=0;i<particles.array_collection->Size();i++){
         particles.X(i)+=VECTOR_3D<T>(0,height,0);
         particles.V(i)=VECTOR_3D<T>(0,0,0);}
     

@@ -71,7 +71,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     // create the cloth ribbon
     RIGID_BODY_STATE<TV> state(FRAME_3D<T>(TV(0,.7*ribbon_length,0),QUATERNION<T>::From_Euler_Angles(-.5*pi,0,0)));
     TRIANGULATED_SURFACE<T>& cloth_panel=tests.Create_Cloth_Panel((int)ribbon_length*2,ribbon_length,ribbon_width/ribbon_length,&state);
-    TV X=particles.X(1);for(int p=1;p<=particles.array_collection->Size();p++){particles.X(p)-=X;particles.V(p)=TV(0,-10,0);}
+    TV X=particles.X(1);for(int p=0;p<particles.array_collection->Size();p++){particles.X(p)-=X;particles.V(p)=TV(0,-10,0);}
 
     // correct number nodes
     for(int i=0;i<deformable_object.structures.m;i++) deformable_object.structures(i)->Update_Number_Nodes();

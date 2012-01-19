@@ -90,7 +90,7 @@ Display(const int in_color) const
     if (draw_velocities && curve.particles.store_velocity){
         velocity_color.Send_To_GL_Pipeline();
         ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-        for(int t=1;t<=curve.particles.array_collection->Size();t++)
+        for(int t=0;t<curve.particles.array_collection->Size();t++)
             OPENGL_SHAPES::Draw_Arrow(curve.particles.X(t),curve.particles.X(t)+velocity_scale*curve.particles.V(t),vertices);
         OpenGL_Draw_Arrays(GL_LINES,2,vertices);}
 

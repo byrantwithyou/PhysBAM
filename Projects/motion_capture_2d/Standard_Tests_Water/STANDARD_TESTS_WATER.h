@@ -284,8 +284,8 @@ bool Get_Solid_Source_Velocities(ARRAY<int>& deformable_simplices,ARRAY<T>& defo
 void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE
 {
     if(source_hack && use_deformable && test_number==6 && (((int)velocity_time)%4==2||(int)velocity_time%4==0)){
-        //for(int i=1;i<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();i++){V(i)=TV();}
-        for(int i=1;i<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();i++){if(solid_body_collection.deformable_body_collection.particles.X(i).x<(T).8 && solid_body_collection.deformable_body_collection.particles.X(i).x>-(T).8) V(i)=TV();}
+        //for(int i=0;i<solid_body_collection.deformable_body_collection.particles.array_collection->Size();i++){V(i)=TV();}
+        for(int i=0;i<solid_body_collection.deformable_body_collection.particles.array_collection->Size();i++){if(solid_body_collection.deformable_body_collection.particles.X(i).x<(T).8 && solid_body_collection.deformable_body_collection.particles.X(i).x>-(T).8) V(i)=TV();}
         V(2)=TV();
         V(3)=TV();
         V(4)=TV();
@@ -312,8 +312,8 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
         else if ((int)time%4==0) force_magnitude*=-1;
         else force_magnitude=0;
         TV force_vector=TV(0,force_magnitude);
-        //for(int i=1;i<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();i++){V(i)=force_vector;}
-        for(int i=1;i<=solid_body_collection.deformable_body_collection.particles.array_collection->Size();i++){if(solid_body_collection.deformable_body_collection.particles.X(i).x<(T).8 && solid_body_collection.deformable_body_collection.particles.X(i).x>-(T).8) V(i)=force_vector;}
+        //for(int i=0;i<solid_body_collection.deformable_body_collection.particles.array_collection->Size();i++){V(i)=force_vector;}
+        for(int i=0;i<solid_body_collection.deformable_body_collection.particles.array_collection->Size();i++){if(solid_body_collection.deformable_body_collection.particles.X(i).x<(T).8 && solid_body_collection.deformable_body_collection.particles.X(i).x>-(T).8) V(i)=force_vector;}
         V(2)=force_vector;
         V(3)=force_vector;
         V(4)=force_vector;
@@ -636,7 +636,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             volume->Update_Number_Nodes();}
 
         // correct mass
-        for(int i=1;i<=particles.array_collection->Size();i++){particles.mass(i)=fluids_parameters.density/particles.array_collection->Size();}
+        for(int i=0;i<particles.array_collection->Size();i++){particles.mass(i)=fluids_parameters.density/particles.array_collection->Size();}
         binding_list.Distribute_Mass_To_Parents();
         binding_list.Clear_Hard_Bound_Particles(particles.mass);
         particles.Compute_Auxiliary_Attributes(soft_bindings);soft_bindings.Set_Mass_From_Effective_Mass();
@@ -655,14 +655,14 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
         // binding the deformable particles to the rigid bodies
         ARRAY<int> particle_array;volume->mesh.elements.Flattened().Get_Unique(particle_array);
-        for(int p=1;p<=solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size();p++) tests.Bind_Unbound_Particles_In_Rigid_Body(solid_body_collection.rigid_body_collection.Rigid_Body(p),particle_array);
+        for(int p=0;p<solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size();p++) tests.Bind_Unbound_Particles_In_Rigid_Body(solid_body_collection.rigid_body_collection.Rigid_Body(p),particle_array);
         for(int i=1;i<=volume->Get_Boundary_Object().mesh.elements.m;i++){int j,k;volume->Get_Boundary_Object().mesh.elements(i).Get(j,k);
             if(particles.X(j).y<=6.8&&particles.X(k).y<=6.8) LOG::cout<<"M_DEBUG Found elem "<<i<<" with positions "<<particles.X(j)<<" and "<<particles.X(k)<<" and indices "<<j<<" and "<<k<<std::endl;}
         LOG::cout<<"M_DEBUG volume number "<<volume->Get_Boundary_Object().mesh.elements.m<<std::endl;
 
         referenced_particles=new ARRAY<int>();source_particles=new ARRAY<int>();
         //for(int i=0;i<particle_array.m;i++){
-        for(int i=1;i<=particles.array_collection->Size();i++){
+        for(int i=0;i<particles.array_collection->Size();i++){
             referenced_particles->Append(i);
             for(int j=0;j<source_rigid_particles->m;j++) if(solid_body_collection.rigid_body_collection.Rigid_Body((*source_rigid_particles)(j)).implicit_object->Inside(particles.X(i))) source_particles->Append(i);
         }

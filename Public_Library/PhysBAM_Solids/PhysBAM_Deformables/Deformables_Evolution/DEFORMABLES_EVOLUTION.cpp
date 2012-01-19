@@ -419,7 +419,7 @@ Save_Velocity()
     V_save.Resize(particles.array_collection->Size(),false,false);
     rigid_velocity_save.Resize(rigid_geometry_collection.particles.array_collection->Size(),false,false);
     V_save.Subset(deformable_body_collection.simulated_particles)=particles.V.Subset(deformable_body_collection.simulated_particles);
-    for(int i=1;i<=rigid_geometry_collection.particles.array_collection->Size();i++) if(rigid_geometry_collection.Is_Active(i)){
+    for(int i=0;i<rigid_geometry_collection.particles.array_collection->Size();i++) if(rigid_geometry_collection.Is_Active(i)){
         rigid_velocity_save(i)=rigid_geometry_collection.particles.twist(i).linear;}
 }
 //#####################################################################
@@ -431,7 +431,7 @@ Restore_Velocity() const
 
     PARTICLES<TV>& particles=deformable_body_collection.particles;
     particles.V.Subset(deformable_body_collection.simulated_particles)=V_save.Subset(deformable_body_collection.simulated_particles);
-    for(int i=1;i<=rigid_geometry_collection.particles.array_collection->Size();i++) if(rigid_geometry_collection.Is_Active(i)){
+    for(int i=0;i<rigid_geometry_collection.particles.array_collection->Size();i++) if(rigid_geometry_collection.Is_Active(i)){
         rigid_geometry_collection.particles.twist(i).linear=rigid_velocity_save(i);}
 }
 //#####################################################################
@@ -446,7 +446,7 @@ Exchange_Velocity()
     rigid_velocity_save.Resize(rigid_geometry_particles.array_collection->Size(),false,false);
     for(int i=0;i<deformable_body_collection.simulated_particles.m;i++){int p=deformable_body_collection.simulated_particles(i);
         exchange(V_save(p),deformable_body_collection.particles.V(p));}
-    for(int i=1;i<=rigid_geometry_particles.array_collection->Size();i++) if(rigid_geometry_collection.Is_Active(i)){
+    for(int i=0;i<rigid_geometry_particles.array_collection->Size();i++) if(rigid_geometry_collection.Is_Active(i)){
         exchange(rigid_velocity_save(i),rigid_geometry_particles.twist(i).linear);}
 }
 //#####################################################################
@@ -530,7 +530,7 @@ Save_Position(ARRAY<TV>& X,ARRAY<TV>& rigid_X,ARRAY<ROTATION<TV> >& rigid_rotati
     X.Subset(simulated_particles)=particles.X.Subset(simulated_particles);
     rigid_X.Resize(rigid_geometry_collection.particles.array_collection->Size(),false,false);
     rigid_rotation.Resize(rigid_geometry_collection.particles.array_collection->Size(),false,false);
-    for(int i=1;i<=rigid_geometry_collection.particles.array_collection->Size();i++) if(rigid_geometry_collection.Is_Active(i)){
+    for(int i=0;i<rigid_geometry_collection.particles.array_collection->Size();i++) if(rigid_geometry_collection.Is_Active(i)){
         rigid_X(i)=rigid_geometry_collection.particles.X(i);rigid_rotation(i)=rigid_geometry_collection.particles.rotation(i);}
 }
 //#####################################################################
@@ -544,7 +544,7 @@ Restore_Position(ARRAY_VIEW<const TV> X,ARRAY_VIEW<const TV> rigid_X,ARRAY_VIEW<
     PHYSBAM_ASSERT(X.Size()==particles.array_collection->Size());PHYSBAM_ASSERT(rigid_X.Size()==rigid_geometry_collection.particles.array_collection->Size());
     PHYSBAM_ASSERT(rigid_rotation.Size()==rigid_geometry_collection.particles.array_collection->Size());
     particles.X.Subset(simulated_particles)=X.Subset(simulated_particles);
-    for(int i=1;i<=rigid_geometry_collection.particles.array_collection->Size();i++) if(rigid_geometry_collection.Is_Active(i)){
+    for(int i=0;i<rigid_geometry_collection.particles.array_collection->Size();i++) if(rigid_geometry_collection.Is_Active(i)){
         rigid_geometry_collection.particles.X(i)=rigid_X(i);rigid_geometry_collection.particles.rotation(i)=rigid_rotation(i);}
 }
 //#####################################################################
@@ -594,9 +594,9 @@ Adjust_Velocity_For_Self_Repulsion_And_Self_Collisions(const T dt,const T time,i
         PHYSBAM_NOT_IMPLEMENTED("exit_early=true");
     else if(collisions_found>0){ // restore unmodified velocities
         if(deformable_body_collection.triangle_repulsions_and_collisions_geometry.mass_modifier) particles.V=V_save;
-        else for(int p=1;p<=particles.array_collection->Size();p++) if(!modified(p)) particles.V(p)=V_save(p);}
+        else for(int p=0;p<particles.array_collection->Size();p++) if(!modified(p)) particles.V(p)=V_save(p);}
     else if(repulsions_found){ // repulsions only, restore velocities for unmodified and apply velocity delta otherwise
-        for(int p=1;p<=particles.array_collection->Size();p++) particles.V(p)=modified(p)?V_save(p)+particles.V(p)-V_averaged(p):V_save(p);}
+        for(int p=0;p<particles.array_collection->Size();p++) particles.V(p)=modified(p)?V_save(p)+particles.V(p)-V_averaged(p):V_save(p);}
     else{particles.V=V_save;return false;} // restore all the unmodified velocities
 
     // propagate any changes from soft bound particles to parents

@@ -89,7 +89,7 @@ template<class TV> void RIGID_GEOMETRY_COLLECTION<TV>::
 Update_Kinematic_Particles()
 {
     static_rigid_geometry.Remove_All();kinematic_rigid_geometry.Remove_All();
-    for(int p=1;p<=particles.array_collection->Size();p++) if(Is_Active(p)){RIGID_GEOMETRY<TV>& rigid_geometry=Rigid_Geometry(p);
+    for(int p=0;p<particles.array_collection->Size();p++) if(Is_Active(p)){RIGID_GEOMETRY<TV>& rigid_geometry=Rigid_Geometry(p);
         if(rigid_geometry.is_static) static_rigid_geometry.Append(p); else kinematic_rigid_geometry.Append(p);}
 }
 //#####################################################################
@@ -192,7 +192,7 @@ template<class TV> void RIGID_GEOMETRY_COLLECTION<TV>::
 Destroy_Unreferenced_Geometry() 
 {
     ARRAY<bool> referenced(structure_list.Number_Of_Active_Elements());
-    for(int i=1;i<=particles.array_collection->Size();i++) for(int j=1;j<=particles.structure_ids(i).m;j++) if(particles.structure_ids(i)(j))
+    for(int i=0;i<particles.array_collection->Size();i++) for(int j=1;j<=particles.structure_ids(i).m;j++) if(particles.structure_ids(i)(j))
         referenced(structure_list.Element_Index(particles.structure_ids(i)(j)))=true;
     for(int i=structure_list.Number_Of_Active_Elements();i>=1;i--) if(!referenced(i)) structure_list.Remove_Element(structure_list.Active_Element_Id(i));
 }

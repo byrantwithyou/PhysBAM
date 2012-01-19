@@ -406,7 +406,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             TETRAHEDRALIZED_VOLUME<T>& buddha=tests.Create_Tetrahedralized_Volume(buddha_filename,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0,0))),true,false,1000);
             buddha.Update_Bounding_Box();
             TV center(buddha.bounding_box->Center());
-            for(int i=1;i<=particles.array_collection->Size();i++){
+            for(int i=0;i<particles.array_collection->Size();i++){
                 particles.V(i)=initial_velocity+TV::Cross_Product(initial_angular_velocity,particles.X(i)-center);
                 particles.X(i)=center+initial_orientation.Rotate(particles.X(i)-center)*buddha_resize;
                 particles.X(i).y+=(T)2.234;}
@@ -426,7 +426,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             TETRAHEDRALIZED_VOLUME<T>& buddha=tests.Create_Tetrahedralized_Volume(buddha_filename,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0,0))),true,false,1000);
             buddha.Update_Bounding_Box();
             TV center(buddha.bounding_box->Center());
-            for(int i=1;i<=particles.array_collection->Size();i++){
+            for(int i=0;i<particles.array_collection->Size();i++){
                 particles.X(i).y+=(T)2.234;}
 
             use_gravity=true;

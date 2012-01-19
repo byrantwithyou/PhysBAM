@@ -347,7 +347,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             finite_volume=Create_Finite_Volume(*tetrahedralized_volume,new NEO_HOOKEAN<T,3>(stiffness,(T).45,damping,(T).25),true,(T).1);
             solid_body_collection.Add_Force(finite_volume);}
         else{
-            for(int i=1;i<=particles.array_collection->Size();i++){particles.mass(i)=(T)1;}
+            for(int i=0;i<particles.array_collection->Size();i++){particles.mass(i)=(T)1;}
             T linear_stiffness=stiffness,linear_damping=damping;
             edge_springs=Create_Edge_Springs(*tetrahedralized_volume,linear_stiffness,linear_damping,strain_limit,cfl_strain_rate,true,(T)0,true,use_implicit);
             edge_springs->Clamp_Restlength(restlength_clamp); 
@@ -399,7 +399,7 @@ void Set_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated)
             LOG::cout<<"DEBUG number of particles in the deletion list="<<particles.array_collection->deletion_list.m<<std::endl;
             first_time=false;}
         particle_is_simulated.Subset(particles.array_collection->deletion_list).Fill(false);
-        for(int p=1;p<=rigid_body_collection.rigid_body_particle.array_collection->Size();p++){
+        for(int p=0;p<rigid_body_collection.rigid_body_particle.array_collection->Size();p++){
             int particle_to_exclude=particles.array_collection->Size()+p;
             bool exclude;
             if(particle_to_exclude<=deformable_body_collection.particles.array_collection->Size()) exclude=false;
@@ -517,7 +517,7 @@ void Floppy_Human()
         else{
             ARRAY<int> tets;ARRAY<PAIR<int,TV> > bindings;const T tolerance=(T)1e-4;
             volume.Initialize_Hierarchy();
-            for(int p=1;p<=surface_original.particles.array_collection->Size();p++){
+            for(int p=0;p<surface_original.particles.array_collection->Size();p++){
                 tets.Remove_All();volume.hierarchy->Intersection_List(surface_original.particles.X(p),tets,tolerance);bool got_bind=false;
                 for(int tt=0;tt<tets.m;tt++){int t=tets(tt);
                     TV bary=TETRAHEDRON<T>::First_Three_Barycentric_Coordinates(surface_original.particles.X(p),volume.particles.X.Subset(volume.mesh.elements(t)));
@@ -535,7 +535,7 @@ void Floppy_Human()
         deformable_body_collection.deformable_geometry.Add_Structure(&surface);}
     
     // binding the deformable particles to the rigid bodies
-    for(int p=1;p<=rigid_body_collection.rigid_body_particle.array_collection->Size();p++) tests.Bind_Particles_In_Rigid_Body(rigid_body_collection.Rigid_Body(p));
+    for(int p=0;p<rigid_body_collection.rigid_body_particle.array_collection->Size();p++) tests.Bind_Particles_In_Rigid_Body(rigid_body_collection.Rigid_Body(p));
 
     arb.Use_PD_Actuators();
     arb.global_post_stabilization=true;
@@ -643,7 +643,7 @@ void Floppy_Fish()
     else tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/fish_42K.tet",fish_state,true,false,1000,(T)1);
 
     // binding the deformable particles to the rigid bodies
-    for(int p=1;p<=rigid_body_collection.rigid_body_particle.array_collection->Size();p++) tests.Bind_Particles_In_Rigid_Body(rigid_body_collection.Rigid_Body(p));
+    for(int p=0;p<rigid_body_collection.rigid_body_particle.array_collection->Size();p++) tests.Bind_Particles_In_Rigid_Body(rigid_body_collection.Rigid_Body(p));
 
     ground=&tests.Add_Ground(friction,0,0);
 
@@ -730,7 +730,7 @@ void Sidewinding()
     tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/snake_8K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(center,snake_rotation)),false,false,1000,(T).5);
 
     // binding the deformable particles to the rigid bodies
-    for(int p=1;p<=rigid_body_collection.rigid_body_particle.array_collection->Size();p++) tests.Bind_Particles_In_Rigid_Body(rigid_body_collection.Rigid_Body(p));
+    for(int p=0;p<rigid_body_collection.rigid_body_particle.array_collection->Size();p++) tests.Bind_Particles_In_Rigid_Body(rigid_body_collection.Rigid_Body(p));
 
 //     {RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("subdivided_box",(T).3,friction);
 //     rigid_body.X()=TV((T)0,(T).3,-10);
