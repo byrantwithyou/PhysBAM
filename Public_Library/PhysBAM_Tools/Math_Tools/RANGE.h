@@ -277,7 +277,7 @@ public:
     static RANGE<TV> Bounding_Box(const T_ARRAY& points)
     {STATIC_ASSERT((IS_SAME<typename T_ARRAY::ELEMENT,TV>::value));
     if(!points.Size()) return Empty_Box();
-    RANGE<TV> box(points(1));for(int i=2;i<=points.Size();i++) box.Enlarge_Nonempty_Box_To_Include_Point(points(i));return box;}
+    RANGE<TV> box(points(0));for(int i=1;i<points.Size();i++) box.Enlarge_Nonempty_Box_To_Include_Point(points(i));return box;}
 
     RANGE<VECTOR<T,d-1> > Get_Horizontal_Box() const
     {return RANGE<VECTOR<T,d-1> >(min_corner.Horizontal_Vector(),max_corner.Horizontal_Vector());}

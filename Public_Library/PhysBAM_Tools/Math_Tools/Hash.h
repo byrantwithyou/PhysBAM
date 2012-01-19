@@ -67,8 +67,8 @@ public:
     HASH(const T_ARRAY& array)
     {
         typedef typename T_ARRAY::ELEMENT T_ELEMENT;
-        int i=1;int hash=array.Size()%2==0?missing_element_hash:Value(array(i++));
-        for(;i<=array.Size()-1;i+=2) hash=triple_int_hash(hash,Value(array(i)),Value(array(i+1)));
+        int i=0;int hash=array.Size()%2==0?missing_element_hash:Value(array(i++));
+        for(;i<array.Size()-1;i+=2) hash=triple_int_hash(hash,Value(array(i)),Value(array(i+1)));
         value=array.Size()==1?int_hash(hash):hash;
     }
 
@@ -128,11 +128,11 @@ template<class T> inline HASH Hash_Reduce(const VECTOR<T,0>& key){return HASH();
 template<class T> inline HASH Hash_Reduce(const VECTOR<T,1>& key){return HASH(Hash_Reduce(key.x));}
 template<class T> inline HASH Hash_Reduce(const VECTOR<T,2>& key){return HASH(key.x,key.y);}
 template<class T> inline HASH Hash_Reduce(const VECTOR<T,3>& key){return HASH(key.x,key.y,key.z);}
-template<class T> inline HASH Hash_Reduce(const VECTOR<T,4>& key){return HASH(key[1],key[2],key[3],key[4]);}
+template<class T> inline HASH Hash_Reduce(const VECTOR<T,4>& key){return HASH(key[0],key[1],key[2],key[3]);}
 template<class T,int n> inline HASH Hash_Reduce(const VECTOR<T,n>& key)
 {
-    int i=1;int hash=key.Size()%2==0?HASH::missing_element_hash:Value(key(i++));
-    for(;i<=n-1;i+=2) hash=HASH::triple_int_hash(hash,key(i),key(i+1));
+    int i=0;int hash=key.Size()%2==0?HASH::missing_element_hash:Value(key(i++));
+    for(;i<n-1;i+=2) hash=HASH::triple_int_hash(hash,key(i),key(i+1));
     return HASH(hash);
 }
 template<class T1,class T2> inline HASH Hash_Reduce(const PAIR<T1,T2>& key){return HASH(key.x,key.y);}
@@ -167,9 +167,9 @@ template<class T,class T_ARRAY> inline HASH Hash_Reduce(const ARRAY_BASE<T,T_ARR
 template<class T,class T_ARRAY,int d> inline HASH Hash_Reduce(const ARRAY_BASE<T,T_ARRAY,VECTOR<int,d> >& key)
 {return HASH(key.Derived().Domain_Indices(),key.array);}
 
-template<class T,int length> inline HASH Hash_Reduce(const ARRAY<VECTOR<T,length>,FACE_INDEX<1> >& key){return Hash_Reduce(key.Component(1));}
-template<class T,int length> inline HASH Hash_Reduce(const ARRAY<VECTOR<T,length>,FACE_INDEX<2> >& key){return HASH(key.Component(1),key.Component(2));}
-template<class T,int length> inline HASH Hash_Reduce(const ARRAY<VECTOR<T,length>,FACE_INDEX<3> >& key){return HASH(key.Component(1),key.Component(2),key.Component(3));}
+template<class T,int length> inline HASH Hash_Reduce(const ARRAY<VECTOR<T,length>,FACE_INDEX<1> >& key){return Hash_Reduce(key.Component(0));}
+template<class T,int length> inline HASH Hash_Reduce(const ARRAY<VECTOR<T,length>,FACE_INDEX<2> >& key){return HASH(key.Component(0),key.Component(1));}
+template<class T,int length> inline HASH Hash_Reduce(const ARRAY<VECTOR<T,length>,FACE_INDEX<3> >& key){return HASH(key.Component(0),key.Component(1),key.Component(2));}
 
 template<class ID,class T,int flags> inline HASH Hash_Reduce(const ELEMENT_ID<ID,T,flags>& id){return HASH(id.Value());}
 

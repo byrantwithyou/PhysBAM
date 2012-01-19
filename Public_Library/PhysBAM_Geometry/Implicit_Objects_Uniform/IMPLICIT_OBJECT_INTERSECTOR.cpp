@@ -97,20 +97,20 @@ Negative_Material_In_Box(const RANGE<TV>& box,const bool force_full_refinement)
     if(minimum_phi*maximum_phi>0 && min(abs(minimum_phi),abs(maximum_phi))>minimum_edge_length) return minimum_phi<=0?box.Size():0;
 
     int unrefined_point_count=last_node;
-    int last_parent_simplex=0,first_parent_simplex=1;
+    int last_parent_simplex=0,first_parent_simplex=0;
     for(int depth=0;depth<maximum_refinement_depth;depth++){
-        first_parent_simplex=last_parent_simplex+1;
-        last_parent_simplex=cell_refinement_simplices.m;
-        for(int s=last_parent_simplex;s>=first_parent_simplex;s--){
-            const T_ELEMENT simplex=cell_refinement_simplices(s);
-            if(depth < minimum_refinement_depth || Refinement_Condition(cell_particle_X,cell_phis,simplex) || force_full_refinement){
-                last_parent_simplex--;
-                cell_refinement_simplices.Remove_Index_Lazy(s);
-                Refine_Simplex(*this,cell_refinement_simplices,cell_particle_X,simplex);}}
-        cell_phis.Resize(cell_particle_X.m);
-        // compute phis for extant nodes
-        for(int i=last_node+1;i<=cell_phis.m;i++) cell_phis(i)=Extended_Phi(cell_particle_X(i));
-        last_node=cell_phis.m;}
+    first_parent_simplex=last_parent_simplex;
+    last_parent_simplex=cell_refinement_simplices.m;
+    for(int s=last_parent_simplex-1;s>=first_parent_simplex;s--){
+        const T_ELEMENT simplex=cell_refinement_simplices(s);
+        if(depth < minimum_refinement_depth || Refinement_Condition(cell_particle_X,cell_phis,simplex) || force_full_refinement){
+            last_parent_simplex--;
+            cell_refinement_simplices.Remove_Index_Lazy(s);
+            Refine_Simplex(*this,cell_refinement_simplices,cell_particle_X,simplex);}}
+    cell_phis.Resize(cell_particle_X.m);
+    // compute phis for extant nodes
+    for(int i=last_node;i<cell_phis.m;i++) cell_phis(i)=Extended_Phi(cell_particle_X(i));
+    last_node=cell_phis.m-1;}
 
     if(maximum_refinement_depth>0 && cell_phis.m==unrefined_point_count) return minimum_phi<=0?box.Size():0;
     // compute material

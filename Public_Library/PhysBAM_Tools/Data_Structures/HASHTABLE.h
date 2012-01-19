@@ -79,10 +79,10 @@ public:
 
 private:
     int Next_Index(const int h) const // linear probing
-    {return (h&(table.m-1))+1;} // power of two so mod is dropping high order bits
+    {return (h&(table.m-1));} // power of two so mod is dropping high order bits
 
     int Hash_Index(const TK& v) const
-    {return (Hash(v)&(table.m-1))+1;} // power of two so mod is dropping high order bits
+    {return (Hash(v)&(table.m-1));} // power of two so mod is dropping high order bits
 
     bool Contains(const TK& v,const int h) const
     {for(int i=h;;i=Next_Index(i))
@@ -170,7 +170,7 @@ public:
     template<class T_ARRAY>
     void Set_All(const T_ARRAY& array)
     {STATIC_ASSERT(IS_SAME<typename T_ARRAY::ELEMENT,TK>::value);
-    for(typename T_ARRAY::INDEX i(1);i<=array.Size();i++) Set(array(i));}
+    for(typename T_ARRAY::INDEX i(0);i<array.Size();i++) Set(array(i));}
 
     bool Delete_If_Present(const TK& v)
     {for(int h=Hash_Index(v);table(h).state!=ENTRY_FREE;h=Next_Index(h)) // reduce as still are using entries for deletions
@@ -212,7 +212,7 @@ public:
     void Get_Complementary_Keys(const T_ARRAY1& keys_universe,T_ARRAY2& keys_complementary) const
     {STATIC_ASSERT(IS_SAME<typename T_ARRAY1::ELEMENT,TK>::value && IS_SAME<typename T_ARRAY2::ELEMENT,TK>::value);
     keys_complementary.Remove_All();keys_complementary.Preallocate(keys_universe.Size()-Size());
-    for(typename T_ARRAY1::INDEX i(1);i<=keys_universe.Size();i++) if(!Contains(keys_universe(i))) keys_complementary.Append(keys_universe(i));}
+    for(typename T_ARRAY1::INDEX i(0);i<keys_universe.Size();i++) if(!Contains(keys_universe(i))) keys_complementary.Append(keys_universe(i));}
 
     void Get_Data(ARRAY<T_UNLESS_VOID>& data) const
     {data.Remove_All();data.Preallocate(Size());for(int h=0;h<table.m;h++) if(table(h).state==ENTRY_ACTIVE) data.Append(table(h).data);}

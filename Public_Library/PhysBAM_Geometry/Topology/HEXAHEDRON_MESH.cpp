@@ -16,8 +16,8 @@
 #include <PhysBAM_Geometry/Topology/TRIANGLE_MESH.h>
 using namespace PhysBAM;
 //#####################################################################
-const int HEXAHEDRON_MESH::face_indices[6][4]={{1,2,4,3},{5,7,8,6},{3,4,8,7},{1,5,6,2},{2,6,8,4},{1,3,7,5}};
-const int HEXAHEDRON_MESH::edge_indices[12][2]={{1,2},{2,4},{4,3},{3,1},{1,5},{2,6},{4,8},{3,7},{5,6},{6,8},{8,7},{7,5}};
+const int HEXAHEDRON_MESH::face_indices[6][4]={{0,1,3,2},{4,6,7,5},{2,3,7,6},{0,4,5,1},{1,5,7,3},{0,2,6,4}};
+const int HEXAHEDRON_MESH::edge_indices[12][2]={{0,1},{1,3},{3,2},{2,0},{0,4},{1,5},{3,7},{2,6},{4,5},{5,7},{7,6},{6,4}};
 //#####################################################################
 // Constructor
 //#####################################################################
@@ -195,10 +195,12 @@ Initialize_Boundary_Mesh()
 {
     delete boundary_mesh;ARRAY<VECTOR<int,3> > triangle_list;
     bool incident_elements_defined=incident_elements!=0;if(!incident_elements) Initialize_Incident_Elements();
-    for(int h=0;h<elements.m;h++)for(int f=0;f<6;f++){
-        int p[4];for(int k=0;k<4;k++)p[k]=elements(h)(face_indices[f][k]);
-        if(Number_Of_Hexahedrons_Across_Face(h,p[0],p[1],p[2],p[3]) == 0){
-            triangle_list.Append(VECTOR<int,3>(p[0],p[1],p[2]));triangle_list.Append(VECTOR<int,3>(p[0],p[2],p[3]));}}
+    for(int h=0;h<elements.m;h++)
+        for(int f=0;f<6;f++){
+            int p[4];
+            for(int k=0;k<4;k++) p[k]=elements(h)(face_indices[f][k]);
+            if(Number_Of_Hexahedrons_Across_Face(h,p[0],p[1],p[2],p[3]) == 0){
+                triangle_list.Append(VECTOR<int,3>(p[0],p[1],p[2]));triangle_list.Append(VECTOR<int,3>(p[0],p[2],p[3]));}}
     boundary_mesh=new TRIANGLE_MESH(number_nodes,triangle_list);
     if(!incident_elements_defined){delete incident_elements;incident_elements=0;}
 }

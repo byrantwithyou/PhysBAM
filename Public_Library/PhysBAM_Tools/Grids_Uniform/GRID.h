@@ -538,7 +538,7 @@ public:
     {return Node_Neighbor(index,i);}
 
     static void Neighboring_Faces(VECTOR<INDEX_FACE,number_of_faces_per_cell>& n,const TV_INT& index)
-    {for(int a=0;a<TV::m;a++){INDEX_FACE fi(a,index);n(a*2-1)=fi;fi.index(a)++;n(a*2)=fi;}}
+    {for(int a=0;a<TV::m;a++){INDEX_FACE fi(a,index);n(a*2)=fi;fi.index(a)++;n(a*2+1)=fi;}}
 
     template<class T2> void Put_Ghost(const T2& constant,ARRAYS_ND_BASE<VECTOR<T2,3> >& array,const int ghost_cells) const
     {for(int j=-ghost_cells;j<counts.y+ghost_cells;j++) for(int ij=-ghost_cells;ij<counts.z+ghost_cells;ij++) for(int s=0;s<ghost_cells;s++) array(1-s,j,ij)=array(counts.x+s,j,ij)=constant;
