@@ -82,7 +82,7 @@ Union_Phi(ARRAY<T,VECTOR<int,3> >& result) const
     assert((ARRAY<T,VECTOR<int,3> >::Equal_Dimensions(water_phi,particle_phi)));
     result.Resize(grid.Domain_Indices(3),false);
     T offset=grid.dX.Max()*blending_parameter*particle_power;
-    for(int i=1;i<=water_phi.array.Size();i++) result.array(i)=min(particle_phi.array(i)+offset,water_phi.array(i));
+    for(int i=0;i<water_phi.array.Size();i++) result.array(i)=min(particle_phi.array(i)+offset,water_phi.array(i));
 }
 //#####################################################################
 // Function Blend_Phi
@@ -94,7 +94,7 @@ Blend_Phi(ARRAY<T,VECTOR<int,3> >& result,const T blend_cells) const
     result.Resize(grid.Domain_Indices(3),false);
     T offset=grid.dX.Max()*blending_parameter*particle_power;
     T scale=1/(blend_cells*grid.dX.Max());
-    for(int i=1;i<=water_phi.array.Size();i++){
+    for(int i=0;i<water_phi.array.Size();i++){
         T alpha=clamp(scale*water_phi.array(i),(T)0,(T)1);
         result.array(i)=(1-alpha)*(water_phi.array(i)+particle_phi.array(i))+alpha*(particle_phi.array(i)+offset);}
 }

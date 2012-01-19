@@ -165,7 +165,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     for(int i=0;i<arb->rigid_body_list.Number_Of_Elements();i++) arb->rigid_body_particles.Rigid_Body(i).Set_Coefficient_Of_Friction(1);
 
     RIGID_BODY_LIST<T,TV>& rigid_body_list=solids_parameters.rigid_body_parameters.list;
-    for(int i=1;i<=rigid_body_list.Number_Of_Elements();i++) {if(!rigid_body_particles.Rigid_Body(i).is_static)
+    for(int i=0;i<rigid_body_list.Number_Of_Elements();i++) {if(!rigid_body_particles.Rigid_Body(i).is_static)
         rigid_body_particles.Rigid_Body(i).Add_Basic_Forces(solids_parameters.gravity,solids_parameters.gravity_direction,solids_parameters.rigid_body_evolution_parameters.rigid_body_ether_viscosity,0);}
 
     solids_parameters.collision_body_list.Add_Bodies(solids_parameters.rigid_body_parameters.list);
@@ -200,7 +200,7 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
     const RIGID_BODY_LIST<T,TV>& rigid_body_list=solids_parameters.rigid_body_parameters.list;
 
     std::ostream* output=FILE_UTILITIES::Safe_Open_Output("handtransform_"+STRING_UTILITIES::string_sprintf("%d",frame),false);
-    for(int i=1;i<=rigid_body_list.Number_Of_Elements();i++){
+    for(int i=0;i<rigid_body_list.Number_Of_Elements();i++){
         (*output)<<data_directory<<"/Rigid_Bodies/New_Visible_Human_Bones/";
         (*output)<<rigid_body_particles.Rigid_Body(i).name<<"\n"<<rigid_body_particles.Rigid_Body(i).frame<<std::endl;
     }

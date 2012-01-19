@@ -166,7 +166,7 @@ template<class T> void SCENE_WINDOW<T>::Draw_Photons(const PHOTON_MAP<T>& photon
 {
     glPointSize(1.0f);
     glBegin(GL_POINTS);
-    for(int i=1;i<=photon_map.Max_Number_Of_Photons();i++){
+    for(int i=0;i<photon_map.Max_Number_Of_Photons();i++){
         VECTOR<T,3> color=(photon_map.Photon_Power(i)).Normalized();
         glColor3f(color.x,color.y,color.z);
         //printf("Drawing photon %d at %f %f %f\n",i,world.global_photon_map.Photon_Position(i).x,world.global_photon_map.Photon_Position(i).y,world.global_photon_map.Photon_Position(i).z);

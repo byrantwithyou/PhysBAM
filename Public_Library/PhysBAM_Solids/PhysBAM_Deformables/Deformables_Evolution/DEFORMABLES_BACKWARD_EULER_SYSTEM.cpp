@@ -62,7 +62,7 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
 {
     const VECTOR_T& V=debug_cast<const VECTOR_T&>(BV);VECTOR_T& F=debug_cast<VECTOR_T&>(BF);
     Force(V,F);
-    for(int i=1;i<=V.V.Size();i++) F.V(i)=V.V(i)-dt*projection_data.mass.one_over_mass(i)*F.V(i);    
+    for(int i=0;i<V.V.Size();i++) F.V(i)=V.V(i)-dt*projection_data.mass.one_over_mass(i)*F.V(i);    
 }
 //#####################################################################
 // Function Set_Global_Boundary_Conditions

@@ -382,7 +382,7 @@ ZIP_FILE_WRITER::
 {
     // Write all file headers
     std::ios::streampos final_position=ostream.tellp();
-    for(int i=1;i<=files.Size();i++){files(i)->Write(ostream,true);delete files(i);}
+    for(int i=0;i<files.Size();i++){files(i)->Write(ostream,true);delete files(i);}
     std::ios::streampos central_end=ostream.tellp();
     // Write end of central
     Write_Primitive(ostream,(unsigned int)0x06054b50); // end of central

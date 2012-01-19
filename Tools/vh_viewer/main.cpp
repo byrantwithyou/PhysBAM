@@ -39,7 +39,7 @@ int main(int argc,char *argv[])
     if(offscreen){
         VH_LEVELSET_BUILDER<float> visible_human(data_directory);
         ARRAY<int> tissues;visible_human.All_Tissues_Array(tissues);
-        for(int i=1;i<=parse_args.Num_Extra_Args();i++) tissues.Remove_Index(atoi(parse_args.Extra_Arg(i).c_str()));
+        for(int i=0;i<parse_args.Num_Extra_Args();i++) tissues.Remove_Index(atoi(parse_args.Extra_Arg(i).c_str()));
         RANGE<VECTOR<int,3> > box(visible_human.Get_Bounding_Box(tissues));
         if(box_min.x){box.min_corner.x=(int)box_min.x;}if(box_min.y){box.min_corner.y=(int)box_min.y;}if(box_min.z){box.min_corner.z=(int)box_min.z;}
         if(box_max.x){box.max_corner.x=(int)box_max.x;}if(box_max.y){box.max_corner.y=(int)box_max.y;}if(box_max.z){box.max_corner.z=(int)box_max.z;}

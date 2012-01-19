@@ -90,7 +90,7 @@ public:
     {Resize(RANGE<TV_INT>(TV_INT::All_Ones_Vector(),TV_INT()),false,false);}
 
     void Delete_Pointers_And_Clean_Memory() // only valid if T is a pointer type
-    {for(int i=1;i<=array.Size();i++) delete array(i);Clean_Memory();}
+    {for(int i=0;i<array.Size();i++) delete array(i);Clean_Memory();}
 
     ARRAY& operator=(const ARRAY& source)
     {if(array.Size()!=source.array.Size()){

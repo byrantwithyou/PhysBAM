@@ -76,14 +76,14 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
     const VECTOR_T& V=debug_cast<const VECTOR_T&>(BV);VECTOR_T& F=debug_cast<VECTOR_T&>(BF);
     Send_Generalized_Velocity_To_Fluid(V); // MPI
     solid_system.Force(V,F);
-    for(int i=1;i<=V.V.Size();i++) F.V(i)=Solid_Sign()*(modified_mass(i)*V.V(i)-solid_system.dt*F.V(i));
-    for(int i=1;i<=V.rigid_V.Size();i++){
+    for(int i=0;i<V.V.Size();i++) F.V(i)=Solid_Sign()*(modified_mass(i)*V.V(i)-solid_system.dt*F.V(i));
+    for(int i=0;i<V.rigid_V.Size();i++){
         F.rigid_V(i).linear=Solid_Sign()*(modified_world_space_rigid_mass(i)*V.rigid_V(i).linear-solid_system.dt*F.rigid_V(i).linear);
         F.rigid_V(i).angular=Solid_Sign()*(modified_world_space_rigid_inertia_tensor(i)*V.rigid_V(i).angular-solid_system.dt*F.rigid_V(i).angular);}
 
     Get_Generalized_Velocity_From_Fluid(F);
-    for(int i=1;i<=V.V.Size();i++) F.V(i)=one_over_modified_mass(i)*F.V(i);
-    for(int i=1;i<=V.rigid_V.Size();i++){
+    for(int i=0;i<V.V.Size();i++) F.V(i)=one_over_modified_mass(i)*F.V(i);
+    for(int i=0;i<V.rigid_V.Size();i++){
         F.rigid_V(i).linear=modified_world_space_rigid_mass_inverse(i)*F.rigid_V(i).linear;
         F.rigid_V(i).angular=modified_world_space_rigid_inertia_tensor_inverse(i)*F.rigid_V(i).angular;}
 }
@@ -95,7 +95,7 @@ Inner_Product(const KRYLOV_VECTOR_BASE<T>& BV1,const KRYLOV_VECTOR_BASE<T>& BV2)
 {
     const VECTOR_T& V1=debug_cast<const VECTOR_T&>(BV1),&V2=debug_cast<const VECTOR_T&>(BV2);
     double inner_product=V1.V.Inner_Product_Double_Precision(modified_mass,V2.V);
-    for(int i=1;i<=V1.rigid_V.Size();i++){
+    for(int i=0;i<V1.rigid_V.Size();i++){
         inner_product+=TV::Dot_Product(V1.rigid_V(i).linear,modified_world_space_rigid_mass(i)*V2.rigid_V(i).linear);
         inner_product+=TV::SPIN::Dot_Product(V1.rigid_V(i).angular,modified_world_space_rigid_inertia_tensor(i)*V2.rigid_V(i).angular);}
     return inner_product;

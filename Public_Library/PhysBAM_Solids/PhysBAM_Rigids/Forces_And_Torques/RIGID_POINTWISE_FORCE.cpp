@@ -15,7 +15,7 @@ Get_Rigid_Body_Particle_List(const T_ARRAY& array)
 {
     LOG::cout<<"attempting to add "<<array.Size()<<" rigid body particles"<<std::endl;
     ARRAY<int> list;
-    for(int i=1;i<=array.Size();i++){
+    for(int i=0;i<array.Size();i++){
         int p=array(i);if(rigid_body_collection.Is_Active(p) && !rigid_body_collection.Rigid_Body(p).Has_Infinite_Inertia()) list.Append(p);}
     return list;
 }

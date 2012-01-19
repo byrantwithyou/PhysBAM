@@ -648,7 +648,7 @@ void Set_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated)
         // make free particles simulated
         DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
         FREE_PARTICLES<TV>& free_particles=deformable_body_collection.deformable_geometry.template Find_Structure<FREE_PARTICLES<TV>&>();
-        for(int i=1;i<=free_particles.nodes.Size();i++) particle_is_simulated(free_particles.nodes(i))=true;}
+        for(int i=0;i<free_particles.nodes.Size();i++) particle_is_simulated(free_particles.nodes(i))=true;}
 }
 //#####################################################################
 // Function Set_External_Velocities

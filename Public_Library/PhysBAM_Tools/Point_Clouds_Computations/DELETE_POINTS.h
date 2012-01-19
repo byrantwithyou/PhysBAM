@@ -19,7 +19,7 @@ namespace POINT_CLOUD_COMPUTATIONS{
     {
         ARRAY<int> array;ARRAYS_COMPUTATIONS::Find_Elements_Outside_Range(points.X,range,array);
         int old_count=points.array_collection->Size();
-        for(int i=1;i<=array.Size();i++) points.array_collection->Delete_Element(array(i));
+        for(int i=0;i<array.Size();i++) points.array_collection->Delete_Element(array(i));
         return old_count-points.array_collection->Size();
     }
 }

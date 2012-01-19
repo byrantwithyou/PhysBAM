@@ -126,7 +126,7 @@ public:
     image.Resize(1,Width(),1,Height(),false,false);
     image.Fill(VECTOR<T,3>());
     unsigned char* img=frame_buffer;
-    for(int j=1;j<=Height();j++) for(int i=1;i<=Width();i++){
+    for(int j=0;j<Height();j++) for(int i=0;i<Width();i++){
         image(i,j)=VECTOR<T,3>(IMAGE<T>::Byte_Color_To_Scalar_Color(img[0]),IMAGE<T>::Byte_Color_To_Scalar_Color(img[1]),IMAGE<T>::Byte_Color_To_Scalar_Color(img[2]));img+=3;}
 
     delete[] frame_buffer;}

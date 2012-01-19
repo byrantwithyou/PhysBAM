@@ -529,7 +529,7 @@ Adjust_Velocity_For_Point_Face_Repulsion(const T dt,const T_ARRAY& pairs,const b
         pf_old_speeds.Resize(pairs.Size());pf_old_speeds.Fill(T());
         LOG::cout<<"Repulsion application step "<<attempts<<std::endl;
 
-        for(int pair_index=1;pair_index<=pairs.Size();pair_index++){
+        for(int pair_index=0;pair_index<pairs.Size();pair_index++){
             const POINT_FACE_REPULSION_PAIR<TV>& pair=pairs(pair_index);
             int p=pair.nodes[1];VECTOR<int,d> face_nodes=pair.nodes.Remove_Index(1);
             if(pair.distance<0) inverted_pairs++;
@@ -610,7 +610,7 @@ Adjust_Velocity_For_Edge_Edge_Repulsion_Helper(const T dt,const T_ARRAY& pairs,c
         ee_normals.Resize(pairs.Size());ee_normals.Fill(TV());
         ee_old_speeds.Resize(pairs.Size());ee_old_speeds.Fill(T());
 
-        for(int pair_index=1;pair_index<=pairs.Size();pair_index++){
+        for(int pair_index=0;pair_index<pairs.Size();pair_index++){
             const EDGE_EDGE_REPULSION_PAIR<TV>& pair=pairs(pair_index);
             const VECTOR<int,2*d-2>& nodes=pair.nodes;const VECTOR<T,2>& w=pair.weights;
             if(pair.distance<0) inverted_pairs++;

@@ -75,7 +75,7 @@ void Solve(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,RIGIDS_COLLISION_CAL
 
             need_another_iteration=false;
             if(parameters.use_epsilon_scaling) epsilon_scale=(T)iteration/parameters.contact_iterations;
-            for(int level=1;level<=rigid_body_collisions.contact_graph.Number_Of_Levels();level++){
+            for(int level=0;level<rigid_body_collisions.contact_graph.Number_Of_Levels();level++){
                 ARRAY<VECTOR<int,2> >& pairs=contact_pairs_for_level(level);
                 bool need_another_level_iteration=true;int level_iteration=0;
                 while(need_another_level_iteration && ++level_iteration<=rigid_body_collisions.contact_level_iterations){need_another_level_iteration=false;
@@ -111,7 +111,7 @@ void Solve(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,RIGIDS_COLLISION_CAL
         if(!use_saved_pairs) rigid_body_collisions.saved_contact_pairs_for_level=contact_pairs_for_level;
 
         ARRAY<VECTOR<int,2> > pairs;
-        for(int level=1;level<=rigid_body_collisions.contact_graph.Number_Of_Levels();level++)
+        for(int level=0;level<rigid_body_collisions.contact_graph.Number_Of_Levels();level++)
             pairs.Append_Unique_Elements(contact_pairs_for_level(level));
         
         int iteration_maximum=parameters.contact_iterations*rigid_body_collisions.contact_level_iterations*rigid_body_collisions.contact_pair_iterations;

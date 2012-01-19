@@ -186,11 +186,11 @@ public:
 
     template<class T_MATRIX>
     void Get_Submatrix(const int istart,const int jstart,T_MATRIX& a) const
-    {for(int i=1;i<=a.Rows();i++) for(int j=1;j<=a.Columns();j++) a(i,j)=(*this)(istart+i-1,jstart+j-1);}
+    {for(int i=0;i<a.Rows();i++) for(int j=0;j<a.Columns();j++) a(i,j)=(*this)(istart+i-1,jstart+j-1);}
 
     template<class T_MATRIX>
     void Set_Submatrix(const int istart,const int jstart,const T_MATRIX& a)
-    {for(int i=1;i<=a.Rows();i++) for(int j=1;j<=a.Columns();j++) (*this)(istart+i-1,jstart+j-1)=a(i,j);}
+    {for(int i=0;i<a.Rows();i++) for(int j=0;j<a.Columns();j++) (*this)(istart+i-1,jstart+j-1)=a(i,j);}
 
 //#####################################################################
     MATRIX operator*(const MATRIX& A) const;

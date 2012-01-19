@@ -35,10 +35,10 @@ template<class T> void Annotate(const QUANTITY<T>& x,const SIMPLE_UNIT& unit)
 {Unify(x.unit,unit);}
 
 template<class T_ARRAY> void Annotate(const T_ARRAY& array)
-{for(int i=1;i<=array.Size();i++) Annotate(array(i));}
+{for(int i=0;i<array.Size();i++) Annotate(array(i));}
 
 template<class T_ARRAY> void Annotate(const T_ARRAY& array,const SIMPLE_UNIT& unit)
-{for(int i=1;i<=array.Size();i++) Annotate(array(i),unit);}
+{for(int i=0;i<array.Size();i++) Annotate(array(i),unit);}
 
 template<class T> void Annotate(const DIAGONAL_MATRIX<T,2>& matrix,const SIMPLE_UNIT& unit)
 {Annotate(matrix.x11,unit);Annotate(matrix.x22,unit);}

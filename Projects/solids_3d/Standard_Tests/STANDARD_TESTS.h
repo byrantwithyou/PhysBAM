@@ -1649,7 +1649,7 @@ void Set_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated) PHYSBAM_OVERR
     if(test_number==25 || test_number==28 || test_number==33){
         // make free particles simulated
         FREE_PARTICLES<TV>& free_particles=deformable_body_collection.deformable_geometry.template Find_Structure<FREE_PARTICLES<TV>&>();
-        for(int i=1;i<=free_particles.nodes.Size();i++) particle_is_simulated(free_particles.nodes(i))=true;}
+        for(int i=0;i<free_particles.nodes.Size();i++) particle_is_simulated(free_particles.nodes(i))=true;}
 }
 //#####################################################################
 // Function Read_Output_Files_Solids
@@ -1833,7 +1833,7 @@ void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE
     if(test_number!=6 && test_number!=7 && test_number!=8 && test_number!=9 && test_number!=44) return;
     if(test_number==44){
         ARRAY<TV>& X_save=deformable_body_rest_positions_array;
-        for(int i=1;i<=X_save.Size();i++) X(fixed_particles(i))=X_save(i);
+        for(int i=0;i<X_save.Size();i++) X(fixed_particles(i))=X_save(i);
         return;}
     ARRAY<TV>& X_save=deformable_body_rest_positions;
     for(int j=1,index=0;j<=mattress_grid.counts.y;j++) for(int k=0;k<mattress_grid.counts.x;k++){

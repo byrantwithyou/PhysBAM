@@ -290,7 +290,7 @@ public:
     {const T_ARRAY& self=Derived();HASHTABLE<T> hash(Value(self.Size())*3/2);hash.Set_All(self);hash.Get_Keys(array);}
 
     void Prune_Duplicates()
-    {T_ARRAY& self=Derived();HASHTABLE<T> hash(Value(self.Size())*3/2);int j=0;for(int i=1;i<=self.Size();i++) if(hash.Set(self(i))) self(++j)=self(i);self.Resize(j);}
+    {T_ARRAY& self=Derived();HASHTABLE<T> hash(Value(self.Size())*3/2);int j=0;for(int i=0;i<self.Size();i++) if(hash.Set(self(i))) self(++j)=self(i);self.Resize(j);}
 
     void Coalesce()
     {Sort(*this);T_ARRAY& self=Derived();int j=0;if(self.Size()>0) j=1;for(int i=2;i<=self.Size();i++){if(!(self(j)<self(i))) self(j).Merge(self(i));else self(++j)=self(i);}self.Resize(j);}

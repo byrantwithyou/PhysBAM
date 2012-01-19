@@ -529,7 +529,7 @@ Compute_Contact_Graph(const T dt,const T time,ARTICULATED_RIGID_BODY<TV>* articu
     contact_graph.directed_graph.Generate_Levels();
 
     precomputed_contact_pairs_for_level.Resize(contact_graph.Number_Of_Levels());saved_contact_pairs_for_level.Resize(contact_graph.Number_Of_Levels());
-    for(int level=1;level<=contact_graph.Number_Of_Levels();level++){
+    for(int level=0;level<contact_graph.Number_Of_Levels();level++){
         ARRAY<VECTOR<int,2> >& pairs=precomputed_contact_pairs_for_level(level);pairs.Resize(0);saved_contact_pairs_for_level(level).Resize(0);
         for(int i=1;i<=contact_graph.directed_graph.Nodes_In_Level(level).m;i++){
             int body_id=contact_graph.directed_graph.Nodes_In_Level(level)(i);
@@ -573,7 +573,7 @@ Process_Push_Out_Legacy()
                 RIGID_COLLISION_GEOMETRY<TV>* rigid_collision_geometry=dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>*>(rigid_body_collection.rigid_geometry_collection.collision_body_list->bodies(i));
                 if(rigid_collision_geometry){RIGID_BODY<TV>* rigid_body=dynamic_cast<RIGID_BODY<TV>*>(&rigid_collision_geometry->rigid_geometry);
                     if(rigid_body) if(rigid_body_collection.Is_Active(rigid_body->particle_index)) rigid_body_collection.Rigid_Body(rigid_body->particle_index).is_temporarily_static=false;}}
-        for(int level=1;level<=contact_graph.Number_Of_Levels();level++){
+        for(int level=0;level<contact_graph.Number_Of_Levels();level++){
             ARRAY<VECTOR<int,2> > pairs=precomputed_contact_pairs_for_level(level);
             int iterations=0;bool need_more_iterations=true;T move_fraction=1;
             while(need_more_iterations && ++iterations<=push_out_level_iterations){need_more_iterations=false;
@@ -653,7 +653,7 @@ Process_Push_Out(const bool perform_collision_body_collisions,const T residual_p
     while(need_another_iteration && ++iteration<=push_out_iterations){need_another_iteration=false;
         if(!kinematic_rigid_bodies_only){
             if(use_freezing_with_push_out) Clear_Temporarily_Static();
-            for(int level=1;level<=contact_graph.Number_Of_Levels();level++){
+            for(int level=0;level<contact_graph.Number_Of_Levels();level++){
                 const ARRAY<int>& rigid_bodies_in_level=contact_graph.directed_graph.Nodes_In_Level(level);
                 int level_iteration=0;bool need_more_level_iterations=true;T move_fraction=1;
                 while(need_more_level_iterations && ++level_iteration<=push_out_level_iterations){need_more_level_iterations=false;
@@ -1158,7 +1158,7 @@ Shock_Propagation_Using_Graph(const T dt,const T time,ARTICULATED_RIGID_BODY<TV>
         
         need_another_iteration=false;
         Clear_Temporarily_Static();
-        for(int level=1;level<=contact_graph.Number_Of_Levels();level++){
+        for(int level=0;level<contact_graph.Number_Of_Levels();level++){
             ARRAY<VECTOR<int,2> >& pairs=contact_pairs_for_level(level);
             bool need_another_level_iteration=true;int level_iteration=0;
             while(need_another_level_iteration && ++level_iteration<=shock_propagation_level_iterations){need_another_level_iteration=false;
@@ -1193,7 +1193,7 @@ Shock_Propagation_Using_Graph(const T dt,const T time,ARTICULATED_RIGID_BODY<TV>
     if(articulated_rigid_body && !articulated_rigid_body->use_shock_propagation && articulated_rigid_body->do_final_pass){
         articulated_rigid_body->Store_Velocities_And_Momenta();
         for(int i=0;i<articulated_rigid_body->shock_propagation_level_iterations;i++)
-            for(int level=1;level<=contact_graph.Number_Of_Levels();level++) for(int j=1;j<=articulated_rigid_body->process_list(level).m;j++)
+            for(int level=0;level<contact_graph.Number_Of_Levels();level++) for(int j=1;j<=articulated_rigid_body->process_list(level).m;j++)
                Apply_Prestabilization_To_Joint(dt,time,*articulated_rigid_body,articulated_rigid_body->process_list(level)(j),epsilon_scale);
         articulated_rigid_body->Restore_Velocities_And_Momenta();}
     if(prune_stacks_from_contact) Apply_Stacking_Contact();

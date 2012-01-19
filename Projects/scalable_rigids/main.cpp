@@ -19,7 +19,7 @@ VECTOR_ND<T> operator-(const VECTOR_ND<T>& v0,const VECTOR_ND<T>& v1)
 {
     assert(v0.Size()==v1.Size());
     VECTOR_ND<T> r(v0.Size());
-    for(int i=1;i<=r.Size();i++)
+    for(int i=0;i<r.Size();i++)
         r(i)=v0(i)-v1(i);
     return r;
 }

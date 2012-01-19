@@ -37,11 +37,11 @@ Store(const int box) const
     TV center=rotation*box_hierarchy(box).Center()+translation; // in a perfect world, CSE would merge this with center from Cull
     ARRAY_VIEW<const int> group(particles_in_group(box));
     if(object_space_implicit_object.box.Inside(center,box_radius(box))){ // if box is entirely inside implicit object box, we can use Lazy_Inside
-        for(int i=1;i<=group.Size();i++){int p=group(i);
+        for(int i=0;i<group.Size();i++){int p=group(i);
             if(object_space_implicit_object.Lazy_Inside(rotation*X(p)+translation,contour_value))
                 particle_intersections.Append(RIGID_BODY_PARTICLE_INTERSECTION<TV>(X(p),p,particle_body_id,levelset_body_id));}}
     else{
-        for(int i=1;i<=group.Size();i++){int p=group(i);
+        for(int i=0;i<group.Size();i++){int p=group(i);
             if(object_space_implicit_object.Lazy_Inside_Extended_Levelset(rotation*X(p)+translation,contour_value))
                 particle_intersections.Append(RIGID_BODY_PARTICLE_INTERSECTION<TV>(X(p),p,particle_body_id,levelset_body_id));}}
 }

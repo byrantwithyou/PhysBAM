@@ -43,11 +43,11 @@ void ARRAY_COLLECTION::
 Initialize(ARRAY_VIEW<const ARRAY_COLLECTION* const> elements_per_cell)
 {
     Clean_Memory();
-    int total_number=0;for(int c=1;c<=elements_per_cell.Size();c++) if(elements_per_cell(c)){
+    int total_number=0;for(int c=0;c<elements_per_cell.Size();c++) if(elements_per_cell(c)){
         total_number+=elements_per_cell(c)->number;
         Add_Arrays(*elements_per_cell(c));} // include arrays that occur on any of the cell elements
     Preallocate(total_number);
-    for(int c=1;c<=elements_per_cell.Size();c++) if(elements_per_cell(c)) Append(*elements_per_cell(c));
+    for(int c=0;c<elements_per_cell.Size();c++) if(elements_per_cell(c)) Append(*elements_per_cell(c));
 }
 //#####################################################################
 // Function Add_Arrays

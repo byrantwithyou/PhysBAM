@@ -657,11 +657,11 @@ Evaluate_Drag(const T dt,const T time)
     solid_body_collection.rigid_body_collection.articulated_rigid_body.Initialize_Poststabilization_Projection();
     solid_body_collection.rigid_body_collection.articulated_rigid_body.Poststabilization_Projection(rigid_F,true);
     if(use_drag_direction){
-        for(int i=1;i<=F.Size();i++) Force+=TV::Dot_Product(F(i),drag_direction);
-        for(int i=1;i<=rigid_F.Size();i++) Force+=TV::Dot_Product(rigid_F(i).linear,drag_direction);}
+        for(int i=0;i<F.Size();i++) Force+=TV::Dot_Product(F(i),drag_direction);
+        for(int i=0;i<rigid_F.Size();i++) Force+=TV::Dot_Product(rigid_F(i).linear,drag_direction);}
     else{
-        for(int i=1;i<=F.Size();i++) Force+=F(i).Magnitude();
-        for(int i=1;i<=rigid_F.Size();i++) Force+=rigid_F(i).linear.Magnitude();}
+        for(int i=0;i<F.Size();i++) Force+=F(i).Magnitude();
+        for(int i=0;i<rigid_F.Size();i++) Force+=rigid_F(i).linear.Magnitude();}
     PHYSBAM_DEBUG_WRITE_SUBSTEP(STRING_UTILITIES::string_sprintf("Evaluate Drag End (search_controller) time=%f force felt=%f",time,Force),0,0);
     return Force;
 }
@@ -960,12 +960,12 @@ Compute_Gradient_From_Graph(ENVIRONMENTAL_STATE<T_GRID>* current_state)
     //TODO: Read these from the example
     //if(FILE_UTILITIES::File_Exists("/disk2/bvuong/PhysBAM/Tools/preprocess_controller_data/test_graph")) FILE_UTILITIES::Read_From_File<float>("/disk2/bvuong/PhysBAM/Tools/preprocess_controller_data/test_graph",states_graph);
     //if(FILE_UTILITIES::File_Exists("/disk2/bvuong/PhysBAM/Tools/preprocess_controller_data/test_hashtable")) FILE_UTILITIES::Read_From_File<float>("/disk2/bvuong/PhysBAM/Tools/preprocess_controller_data/test_hashtable",hashtable);
-    for(int i=1;i<=graph_index_to_state_map.Size();i++){assert(graph_index_to_state_map(i)->incorporate_fluids==incorporate_fluids);} //sanity check
-    int hash_number=0;for(int i=1;i<=graph_index_to_state_map.Size();i++){if(*graph_index_to_state_map(i)==*current_state) hash_number=i;}
+    for(int i=0;i<graph_index_to_state_map.Size();i++){assert(graph_index_to_state_map(i)->incorporate_fluids==incorporate_fluids);} //sanity check
+    int hash_number=0;for(int i=0;i<graph_index_to_state_map.Size();i++){if(*graph_index_to_state_map(i)==*current_state) hash_number=i;}
     if(hash_number==0) return false;
     ARRAY<int>& next_possible_states=states_graph->Children(hash_number);
     T minimized_force=0;ENVIRONMENTAL_STATE<T_GRID>* next_state=NULL;
-    for(int i=1;i<=next_possible_states.Size();i++){
+    for(int i=0;i<next_possible_states.Size();i++){
         next_possible_states.Append_Elements(states_graph->Children(next_possible_states(i)));
         ENVIRONMENTAL_STATE<T_GRID>* possible_next_state=graph_index_to_state_map(next_possible_states(i));
         if(minimized_force==0 || possible_next_state->force_to_stay<minimized_force){
@@ -1047,8 +1047,8 @@ Update_Position_Based_State(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,con
                 solid_body_collection.solids_forces(i)->Add_Velocity_Independent_Forces(F,rigid_F,time);
                 solid_body_collection.solids_forces(i)->Add_Velocity_Dependent_Forces(solid_body_collection.deformable_body_collection.particles.V,
                     solid_body_collection.rigid_body_collection.rigid_body_particle.twist,F,rigid_F,time);}
-            for(int i=1;i<=F.Size();i++) current_state->external_force_dir+=F(i);
-            for(int i=1;i<=rigid_F.Size();i++) current_state->external_force_dir+=rigid_F(i).linear;
+            for(int i=0;i<F.Size();i++) current_state->external_force_dir+=F(i);
+            for(int i=0;i<rigid_F.Size();i++) current_state->external_force_dir+=rigid_F(i).linear;
             current_state->external_force_mag=current_state->external_force_dir.Magnitude();
             current_state->external_force_dir.Normalize();}
        

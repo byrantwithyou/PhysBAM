@@ -162,7 +162,7 @@ void Particles_In_Proximity(RIGID_BODY<TV>& particle_body,RIGID_BODY<TV>& levels
 
     ARRAY_VIEW<TV>& particles_X=particle_body.simplicial_object->particles.X;
     IMPLICIT_OBJECT<VECTOR<T,d> >& object_space_implicit_object=*levelset_body.implicit_object->object_space_implicit_object;
-    for(int p=1;p<=particles_X.Size();p++)
+    for(int p=0;p<particles_X.Size();p++)
     {
         TV body_2_location=rotation*particles_X(p)+translation;
 

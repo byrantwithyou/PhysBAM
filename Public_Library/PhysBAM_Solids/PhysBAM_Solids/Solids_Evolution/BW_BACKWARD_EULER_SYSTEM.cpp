@@ -68,8 +68,8 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
 {
     const VECTOR_T& V=debug_cast<const VECTOR_T&>(BV);VECTOR_T& F=debug_cast<VECTOR_T&>(BF);
     Force(V,F);
-    for(int i=1;i<=V.V.Size();i++) F.V(i)=V.V(i)-dt*solid_body_collection.deformable_body_collection.particles.one_over_mass(i)*F.V(i);
-/*    for(int i=1;i<=V.rigid_V.Size();i++) F.rigid_V(i)=V.rigid_V(i)-dt*(projection_data.mass.world_space_rigid_mass_inverse(i)*F.rigid_V(i));*/
+    for(int i=0;i<V.V.Size();i++) F.V(i)=V.V(i)-dt*solid_body_collection.deformable_body_collection.particles.one_over_mass(i)*F.V(i);
+/*    for(int i=0;i<V.rigid_V.Size();i++) F.rigid_V(i)=V.rigid_V(i)-dt*(projection_data.mass.world_space_rigid_mass_inverse(i)*F.rigid_V(i));*/
 }
 //#####################################################################
 // Function Project_Helper
@@ -122,7 +122,7 @@ Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& BR) const
 {
     const VECTOR_T& R=debug_cast<const VECTOR_T&>(BR);
     T convergence_norm_squared=sqr(ARRAYS_COMPUTATIONS::Maximum_Magnitude(R.V));
-/*    for(int p=1;p<=R.rigid_V.Size();p++){
+/*    for(int p=0;p<R.rigid_V.Size();p++){
         const TWIST<TV>& twist=R.rigid_V(p);
         const RIGID_BODY_MASS<TV,true> &rigid_mass=projection_data.mass.world_space_rigid_mass(p),&rigid_mass_inverse=projection_data.mass.world_space_rigid_mass_inverse(p);
         convergence_norm_squared=max(convergence_norm_squared,

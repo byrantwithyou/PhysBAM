@@ -146,7 +146,7 @@ Add_Force(const T scale,ARRAY_VIEW<const TV> X,ARRAY_VIEW<TV> F) const
 
     T twice_scale=2*scale;
     // diagonal
-    for(int p=1;p<=X.Size();p++) F(p)-=twice_scale*stiffness_matrix_diagonal(p)*X(p);
+    for(int p=0;p<X.Size();p++) F(p)-=twice_scale*stiffness_matrix_diagonal(p)*X(p);
     // offdiagonal
     const ARRAY<int>& offsets=stiffness_matrix_upper.offsets;
     const ARRAY<SPARSE_MATRIX_ENTRY<T> >& A=stiffness_matrix_upper.A;
@@ -185,7 +185,7 @@ Compute_Energy() const
     T energy=0;
     ARRAY_VIEW<const TV> X(particles.X);
     // diagonal
-    for(int p=1;p<=X.Size();p++) energy+=stiffness*stiffness_matrix_diagonal(p)*X(p).Magnitude_Squared();
+    for(int p=0;p<X.Size();p++) energy+=stiffness*stiffness_matrix_diagonal(p)*X(p).Magnitude_Squared();
     // offdiagonal
     const ARRAY<int>& offsets=stiffness_matrix_upper.offsets;
     const ARRAY<SPARSE_MATRIX_ENTRY<T> >& A=stiffness_matrix_upper.A;

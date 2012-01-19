@@ -64,9 +64,9 @@ Compute_Auxiliary_Attributes(const SOFT_BINDINGS<TV>& soft_bindings,const T_INDI
     if(array_collection->template Get_Array<T>(ATTRIBUTE_ID_ONE_OVER_EFFECTIVE_MASS))
         array_collection->Remove_Array_Using_Index(array_collection->Get_Attribute_Index(ATTRIBUTE_ID_ONE_OVER_EFFECTIVE_MASS));
     array_collection->template Add_Array<T>(ATTRIBUTE_ID_ONE_OVER_EFFECTIVE_MASS,&one_over_effective_mass);
-    for(int i=1;i<=indices.Size();i++){int p=indices(i);
+    for(int i=0;i<indices.Size();i++){int p=indices(i);
         one_over_mass(p)=Robust_Inverse(mass(p));}
-    for(int i=1;i<=indices.Size();i++){int p=indices(i);
+    for(int i=0;i<indices.Size();i++){int p=indices(i);
         one_over_effective_mass(p)=soft_bindings.One_Over_Effective_Mass(p);
         effective_mass(p)=Robust_Inverse(one_over_effective_mass(p));}
 }

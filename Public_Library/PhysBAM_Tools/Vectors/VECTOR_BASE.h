@@ -90,55 +90,55 @@ public:
     {Assert_Same_Size_Helper(u.Derived(),v.Derived());}
 
     void Set_Zero()
-    {for(int i=1;i<=Size();i++) (*this)(i)=T();}
+    {for(int i=0;i<Size();i++) (*this)(i)=T();}
 
     void Fill(const T& constant)
-    {Static_Assert_Not_Small();for(int i=1;i<=Size();i++) (*this)(i)=constant;}
+    {Static_Assert_Not_Small();for(int i=0;i<Size();i++) (*this)(i)=constant;}
 
     void Negate()
-    {for(int i=1;i<=Size();i++) (*this)(i)=-(*this)(i);}
+    {for(int i=0;i<Size();i++) (*this)(i)=-(*this)(i);}
 
     T Magnitude_Squared() const
-    {Static_Assert_Not_Small();T norm_squared=0;for(int i=1;i<=Size();i++) norm_squared+=sqr((*this)(i));return norm_squared;}
+    {Static_Assert_Not_Small();T norm_squared=0;for(int i=0;i<Size();i++) norm_squared+=sqr((*this)(i));return norm_squared;}
 
     T Magnitude() const
     {Static_Assert_Not_Small();return sqrt(Magnitude_Squared());}
 
     T Lp_Norm(const T& p) const
-    {T sum=0;for(int i=1;i<=Size();i++) sum+=pow((*this)(i),p);return pow(sum,1/p);}
+    {T sum=0;for(int i=0;i<Size();i++) sum+=pow((*this)(i),p);return pow(sum,1/p);}
 
     T L1_Norm() const
-    {T sum=0;for(int i=1;i<=Size();i++) sum+=abs((*this)(i));return sum;}
+    {T sum=0;for(int i=0;i<Size();i++) sum+=abs((*this)(i));return sum;}
 
     template<class T_VECTOR1,class T_VECTOR2>
     static T Dot_Product(const VECTOR_BASE<T,T_VECTOR1>& v1,const VECTOR_BASE<T,T_VECTOR2>& v2)
-    {v1.Static_Assert_Not_Small();Assert_Same_Size(v1,v2);T sum=0;for(int i=1;i<=v1.Size();i++) sum+=v1(i)*v2(i);return sum;}
+    {v1.Static_Assert_Not_Small();Assert_Same_Size(v1,v2);T sum=0;for(int i=0;i<v1.Size();i++) sum+=v1(i)*v2(i);return sum;}
 
     template<class T_VECTOR1,class T_VECTOR2>
     static double Dot_Product_Double_Precision(const VECTOR_BASE<T,T_VECTOR1>& v1,const VECTOR_BASE<T,T_VECTOR2>& v2)
-    {v1.Static_Assert_Not_Small();Assert_Same_Size(v1,v2);double sum=0;for(int i=1;i<=v1.Size();i++) sum+=(double)v1(i)*(double)v2(i);return sum;}
+    {v1.Static_Assert_Not_Small();Assert_Same_Size(v1,v2);double sum=0;for(int i=0;i<v1.Size();i++) sum+=(double)v1(i)*(double)v2(i);return sum;}
 
     template<class T_VECTOR1,class T_VECTOR2>
     static double Dot_Product_Double_Precision(const VECTOR_BASE<T,T_VECTOR1>& v1,const VECTOR_BASE<T,T_VECTOR2>& v2,const int start_index,const int end_index)
     {v1.Static_Assert_Not_Small();Assert_Same_Size(v1,v2);double sum=0;for(int i=start_index;i<=end_index;i++) sum+=(double)v1(i)*(double)v2(i);return sum;}
 
     T Sum() const
-    {Static_Assert_Not_Small();T result=0;for(int i=1;i<=Size();i++) result+=(*this)(i);return result;}
+    {Static_Assert_Not_Small();T result=0;for(int i=0;i<Size();i++) result+=(*this)(i);return result;}
 
     T Average() const
     {Static_Assert_Not_Small();return Sum()/Size();}
 
     T Product() const
-    {Static_Assert_Not_Small();T result=1;for(int i=1;i<=Size();i++) result*=(*this)(i);return result;}
+    {Static_Assert_Not_Small();T result=1;for(int i=0;i<Size();i++) result*=(*this)(i);return result;}
 
     double Sum_Double_Precision() const
-    {Static_Assert_Not_Small();double result=0;for(int i=1;i<=Size();i++) result+=(*this)(i);return result;}
+    {Static_Assert_Not_Small();double result=0;for(int i=0;i<Size();i++) result+=(*this)(i);return result;}
     
     double Sum_Double_Precision(int start_index,int end_index) const
     {Static_Assert_Not_Small();double result=0;for(int i=start_index;i<=end_index;i++) result+=(*this)(i);return result;}
 
     T Maximum_Magnitude() const
-    {T result=0;for(int i=1;i<=Size();i++) result=PhysBAM::max(result,abs((*this)(i)));return result;}
+    {T result=0;for(int i=0;i<Size();i++) result=PhysBAM::max(result,abs((*this)(i)));return result;}
 
     template<class T2,class T_VECTOR1,class T_VECTOR2>
     static void Copy(const T2 c,const T_VECTOR1& v,T_VECTOR2& result)
@@ -150,21 +150,21 @@ public:
 
     template<class T_VECTOR2>
     void Set_Subvector(const int istart,const VECTOR_BASE<T,T_VECTOR2>& v)
-    {for(int i=1;i<=v.Size();i++) (*this)(istart+i-1)=v(i);}
+    {for(int i=0;i<v.Size();i++) (*this)(istart+i-1)=v(i);}
 
     template<class T_VECTOR2>
     void Add_Subvector(const int istart,const VECTOR_BASE<T,T_VECTOR2>& v)
-    {for(int i=1;i<=v.Size();i++) (*this)(istart+i-1)+=v(i);}
+    {for(int i=0;i<v.Size();i++) (*this)(istart+i-1)+=v(i);}
     
     template<class T_VECTOR2>
     void Get_Subvector(const int istart,VECTOR_BASE<T,T_VECTOR2>& v) const
-    {for(int i=1;i<=v.Size();i++) v(i)=(*this)(istart+i-1);}
+    {for(int i=0;i<v.Size();i++) v(i)=(*this)(istart+i-1);}
 
     T Sup_Norm() const
     {return Max_Abs();}
 
     T Max_Abs() const
-    {T result=0;for(int i=1;i<=Size();i++) result=PhysBAM::max(result,abs((*this)(i)));return result;}
+    {T result=0;for(int i=0;i<Size();i++) result=PhysBAM::max(result,abs((*this)(i)));return result;}
 
     T Max_Abs(int start_index,int end_index) const
     {T result=0;for(int i=start_index;i<=end_index;i++) result=PhysBAM::max(result,abs((*this)(i)));return result;}
@@ -177,15 +177,15 @@ public:
 
     template<class T_VECTOR1,class T_VECTOR2>
     static T_VECTOR Interpolate(const T_VECTOR1& p1,const T_VECTOR2& p2,const T alpha)
-    {Assert_Same_Size(p1,p2);T_VECTOR x((INITIAL_SIZE)p1.Size());for(int i=1;i<=p1.Size();i++) x(i)=(1-alpha)*p1(i)+alpha*p2(i);return x;}
+    {Assert_Same_Size(p1,p2);T_VECTOR x((INITIAL_SIZE)p1.Size());for(int i=0;i<p1.Size();i++) x(i)=(1-alpha)*p1(i)+alpha*p2(i);return x;}
 
     template<class T_VECTOR2>
     T_VECTOR Permute(const VECTOR_BASE<int,T_VECTOR2>& p) const
-    {Assert_Same_Size(*this,p);T_VECTOR x((INITIAL_SIZE)Size());for(int i=1;i<=Size();i++) x(i)=(*this)(p(i));return x;}
+    {Assert_Same_Size(*this,p);T_VECTOR x((INITIAL_SIZE)Size());for(int i=0;i<Size();i++) x(i)=(*this)(p(i));return x;}
 
     template<class T_VECTOR2>
     T_VECTOR Unpermute(const VECTOR_BASE<int,T_VECTOR2>& p) const
-    {Assert_Same_Size(*this,p);T_VECTOR x((INITIAL_SIZE)Size());for(int i=1;i<=Size();i++) x(p(i))=(*this)(i);return x;}
+    {Assert_Same_Size(*this,p);T_VECTOR x((INITIAL_SIZE)Size());for(int i=0;i<Size();i++) x(p(i))=(*this)(i);return x;}
 
     T_VECTOR Householder_Vector(const int k) const
     {T_VECTOR v((INITIAL_SIZE)Size());T v_dot_v=0;for(int i=k;i<=Size();i++){v(i)=(*this)(i);v_dot_v+=sqr(v(i));}
@@ -195,7 +195,7 @@ public:
     template<class T_VECTOR2>
     VECTOR_DIFFERENCE<T_VECTOR,VECTOR_SCALE<T,T_VECTOR2> > Householder_Transform(const VECTOR_BASE<T,T_VECTOR2>& v) const
     {Assert_Same_Size(*this,v);
-    T v_dot_a=0,v_dot_v=0;for(int i=1;i<=Size();i++){v_dot_a+=v(i)*(*this)(i);v_dot_v+=sqr(v(i));}
+    T v_dot_a=0,v_dot_v=0;for(int i=0;i<Size();i++){v_dot_a+=v(i)*(*this)(i);v_dot_v+=sqr(v(i));}
     return *this-2*v_dot_a/v_dot_v*v;}
 
     void Givens_Rotate(const int i,const int j,const T c,const T s)
@@ -223,38 +223,38 @@ public:
 
     template<class T_VECTOR1,class T_VECTOR2>
     static typename T_VECTOR1::template REBIND<bool>::TYPE Componentwise_Greater_Equal(const VECTOR_BASE<T,T_VECTOR1>& u,const VECTOR_BASE<T,T_VECTOR2>& v)
-    {Assert_Same_Size(u,v);typename T_VECTOR1::template REBIND<bool>::TYPE result(INITIAL_SIZE(u.Size()));for(int i=1;i<=u.Size();i++) result(i)=u(i)>=v(i);return result;}
+    {Assert_Same_Size(u,v);typename T_VECTOR1::template REBIND<bool>::TYPE result(INITIAL_SIZE(u.Size()));for(int i=0;i<u.Size();i++) result(i)=u(i)>=v(i);return result;}
 
     template<class T_VECTOR1,class T_VECTOR2>
     static T_VECTOR1 Componentwise_And(const VECTOR_BASE<bool,T_VECTOR1>& u,const VECTOR_BASE<bool,T_VECTOR2>& v)
-    {Assert_Same_Size(u,v);T_VECTOR1 result(INITIAL_SIZE(u.Size()));for(int i=1;i<=u.Size();i++) result(i)=(u(i) && v(i));return result;}
+    {Assert_Same_Size(u,v);T_VECTOR1 result(INITIAL_SIZE(u.Size()));for(int i=0;i<u.Size();i++) result(i)=(u(i) && v(i));return result;}
 
 //#####################################################################
 };
 
 template<class T,class T_VECTOR,class T_VECTOR2> T_VECTOR& operator+=(VECTOR_BASE<T,T_VECTOR>& v,const VECTOR_BASE<T,T_VECTOR2>& w)
-{v.Static_Assert_Not_Small();v.Assert_Same_Size(v,w);for(int i=1;i<=v.Size();i++) v(i)+=w(i);return v.Derived();}
+{v.Static_Assert_Not_Small();v.Assert_Same_Size(v,w);for(int i=0;i<v.Size();i++) v(i)+=w(i);return v.Derived();}
 
 template<class T,class T_VECTOR,class T_VECTOR2> T_VECTOR& operator-=(VECTOR_BASE<T,T_VECTOR>& v,const VECTOR_BASE<T,T_VECTOR2>& w)
-{v.Static_Assert_Not_Small();v.Assert_Same_Size(v,w);for(int i=1;i<=v.Size();i++) v(i)-=w(i);return v.Derived();}
+{v.Static_Assert_Not_Small();v.Assert_Same_Size(v,w);for(int i=0;i<v.Size();i++) v(i)-=w(i);return v.Derived();}
 
 template<class T,class T_VECTOR,class T_VECTOR2> T_VECTOR& operator*=(VECTOR_BASE<T,T_VECTOR>& v,const VECTOR_BASE<T,T_VECTOR2>& w)
-{v.Static_Assert_Not_Small();v.Assert_Same_Size(v,w);for(int i=1;i<=v.Size();i++) v(i)*=w(i);return v.Derived();}
+{v.Static_Assert_Not_Small();v.Assert_Same_Size(v,w);for(int i=0;i<v.Size();i++) v(i)*=w(i);return v.Derived();}
 
 template<class T,class T_VECTOR,class T_VECTOR2> T_VECTOR& operator/=(VECTOR_BASE<T,T_VECTOR>& v,const VECTOR_BASE<T,T_VECTOR2>& w)
-{v.Static_Assert_Not_Small();v.Assert_Same_Size(v,w);for(int i=1;i<=v.Size();i++) v(i)/=w(i);return v.Derived();}
+{v.Static_Assert_Not_Small();v.Assert_Same_Size(v,w);for(int i=0;i<v.Size();i++) v(i)/=w(i);return v.Derived();}
 
 template<class T,class T_VECTOR> T_VECTOR& operator*=(VECTOR_BASE<T,T_VECTOR>& v,const T& a)
-{v.Static_Assert_Not_Small();for(int i=1;i<=v.Size();i++) v(i)*=a;return v.Derived();}
+{v.Static_Assert_Not_Small();for(int i=0;i<v.Size();i++) v(i)*=a;return v.Derived();}
 
 template<class T,class T_VECTOR> T_VECTOR& operator*=(VECTOR_BASE<T,T_VECTOR>& v,const INT_INVERSE& a)
-{v.Static_Assert_Not_Small();for(int i=1;i<=v.Size();i++) v(i)*=a;return v.Derived();}
+{v.Static_Assert_Not_Small();for(int i=0;i<v.Size();i++) v(i)*=a;return v.Derived();}
 
 template<class T,class T_VECTOR> T_VECTOR& operator+=(VECTOR_BASE<T,T_VECTOR>& v,const T& a)
-{v.Static_Assert_Not_Small();for(int i=1;i<=v.Size();i++) v(i)+=a;return v.Derived();}
+{v.Static_Assert_Not_Small();for(int i=0;i<v.Size();i++) v(i)+=a;return v.Derived();}
 
 template<class T,class T_VECTOR> T_VECTOR& operator-=(VECTOR_BASE<T,T_VECTOR>& v,const T& a)
-{v.Static_Assert_Not_Small();for(int i=1;i<=v.Size();i++) v(i)-=a;return v.Derived();}
+{v.Static_Assert_Not_Small();for(int i=0;i<v.Size();i++) v(i)-=a;return v.Derived();}
 
 template<class T,class T_VECTOR> T_VECTOR& operator/=(VECTOR_BASE<T,T_VECTOR>& v,const T& a)
 {return v*=Inverse(a);}

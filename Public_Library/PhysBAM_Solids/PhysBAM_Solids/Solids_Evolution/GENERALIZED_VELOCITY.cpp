@@ -91,10 +91,10 @@ Pack(VECTOR_ND<T> &velocities) const
 {
     PHYSBAM_ASSERT(velocities.Size()==Raw_Size());
     int index=0;
-    for(int i=1;i<=V.Size();i++)
+    for(int i=0;i<V.Size();i++)
         for(int j=0;j<TV::dimension;j++)
             velocities(++index)=V.array(i)(j);
-    for(int i=1;i<=rigid_V.Size();i++){
+    for(int i=0;i<rigid_V.Size();i++){
         for(int j=0;j<TV::dimension;j++)
             velocities(++index)=rigid_V(i).linear(j);
         for(int j=0;j<T_SPIN::dimension;j++)
@@ -108,10 +108,10 @@ Unpack(VECTOR_ND<T> &velocities)
 {
     PHYSBAM_ASSERT(velocities.Size()==Raw_Size());
     int index=0;
-    for(int i=1;i<=V.Size();i++)
+    for(int i=0;i<V.Size();i++)
         for(int j=0;j<TV::dimension;j++)
             V.array(i)(j)=velocities(++index);
-    for(int i=1;i<=rigid_V.Size();i++){
+    for(int i=0;i<rigid_V.Size();i++){
         for(int j=0;j<TV::dimension;j++)
             rigid_V(i).linear(j)=velocities(++index);
         for(int j=0;j<T_SPIN::dimension;j++)
@@ -125,10 +125,10 @@ Unpack_And_Add(VECTOR_ND<T> &velocities)
 {
     PHYSBAM_ASSERT(velocities.Size()==Raw_Size());
     int index=0;
-    for(int i=1;i<=V.Size();i++)
+    for(int i=0;i<V.Size();i++)
         for(int j=0;j<TV::dimension;j++)
             V.array(i)(j)+=velocities(++index);
-    for(int i=1;i<=rigid_V.Size();i++){
+    for(int i=0;i<rigid_V.Size();i++){
         for(int j=0;j<TV::dimension;j++)
             rigid_V(i).linear(j)+=velocities(++index);
         for(int j=0;j<T_SPIN::dimension;j++)

@@ -781,7 +781,7 @@ void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 template<class T_VECTOR> void
 Test_System_Prestabilization_Print(const T_VECTOR& j)
 {
-    for(int i=1;i<=j.Size();i++) LOG::cout<<(i>1?" ":"")<<j(i);
+    for(int i=0;i<j.Size();i++) LOG::cout<<(i>1?" ":"")<<j(i);
 }
 //#####################################################################
 // Function Test_System_Prestabilization_Print

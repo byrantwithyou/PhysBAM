@@ -432,7 +432,7 @@ void Advance_One_Time_Step_End_Callback(const T dt,const T time)
 
         for(int i=0;i<structure_clamp_time.m;i++) if(structure_clamp_time(i).y>=time){TETRAHEDRALIZED_VOLUME<T>& volume=*structure_clamp_time(i).x;
             for(int j=0;j<volume.mesh.elements.m;j++){const VECTOR<int,4>& e=volume.mesh.elements(j);
-                for(int k=1;k<=e.Size();k++){
+                for(int k=0;k<e.Size();k++){
                     T speed=deformable_body_collection.particles.V(e(k)).Magnitude();
                     if(speed>maximum_fall_speed) deformable_body_collection.particles.V(e(k))*=maximum_fall_speed/speed;}}}}
 }

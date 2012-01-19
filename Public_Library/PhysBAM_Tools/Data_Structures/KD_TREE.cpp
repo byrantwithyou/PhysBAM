@@ -84,7 +84,7 @@ Create_Left_Balanced_KD_Tree_With_Grouping(ARRAY_VIEW<const TV> points_to_balanc
     int number_of_groups=point_group.Max();
     ARRAY<int> group_size(number_of_groups);for(int i=0;i<point_group.m;i++) group_size(point_group(i))++;
     points_in_group.Resize(number_of_groups);for(int i=0;i<points_in_group.m;i++) points_in_group(i).Resize(group_size(i));
-    for(int i=1;i<=points_to_balance.Size();i++) points_in_group(point_group(i))(group_size(point_group(i))--)=i;
+    for(int i=0;i<points_to_balance.Size();i++) points_in_group(point_group(i))(group_size(point_group(i))--)=i;
 }
 //#####################################################################
 // Function Balance_Sub_KD_Tree_Using_Internal_Nodes

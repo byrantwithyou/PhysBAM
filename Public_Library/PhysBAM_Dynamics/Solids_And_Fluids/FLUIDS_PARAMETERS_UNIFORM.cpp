@@ -646,7 +646,7 @@ Read_Particles(const STREAM_TYPE stream_type,const T_PARTICLES& template_particl
     STATIC_ASSERT((IS_SAME<T_PARTICLES,typename REMOVE_POINTER<typename T_ARRAYS_PARTICLES::ELEMENT>::TYPE>::value)); 
     FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/%s",output_directory.c_str(),frame,prefix.c_str()),particles);
     if(typeid(template_particles)!=typeid(T_PARTICLES)) // swap in clones of template_particle for pure T_PARTICLESs
-        for(int i=1;i<=particles.array.Size();i++) if(particles.array(i)){
+        for(int i=0;i<particles.array.Size();i++) if(particles.array(i)){
             T_PARTICLES* replacement=template_particles.Clone();
             replacement->array_collection->Initialize(*particles.array(i)->array_collection);
             delete particles.array(i);

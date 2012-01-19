@@ -84,7 +84,7 @@ public:
 
     template<class T_MATRIX>
     MATRIX& operator=(const MATRIX_BASE<T,T_MATRIX>& A)
-    {assert(Rows()==A.Rows() && Columns()==A.Columns());for(int j=1;j<=Columns();j++) for(int i=1;i<=Rows();i++) (*this)(i,j)=A(i,j);return *this;}
+    {assert(Rows()==A.Rows() && Columns()==A.Columns());for(int j=0;j<Columns();j++) for(int i=0;i<Rows();i++) (*this)(i,j)=A(i,j);return *this;}
 
     MATRIX& operator*=(const T a)
     {for(int i=0;i<size;i++) x[i]*=a;return *this;}

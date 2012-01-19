@@ -141,7 +141,7 @@ Rebuild_Topology()
     if(rigid_fracture && fractured_after_rebuild_topology && create_new_rigid_bodies){ // TODO: add this parameter for one time fracture.
         Create_New_Rigid_Bodies_From_Fracture(map_to_old_particles);
         solids_parameters.solid_body_collection.rigid_body_collection.rigid_geometry_collection.Destroy_Unreferenced_Geometry();
-        //for(int i=1;i<=structure_list.Number_Of_Active_Elements();i++) structure_list.Element(structure_list.Active_Element_Id(i))->Update_Number_Nodes();
+        //for(int i=0;i<structure_list.Number_Of_Active_Elements();i++) structure_list.Element(structure_list.Active_Element_Id(i))->Update_Number_Nodes();
     }
 
     if(fracture_object->embedded_object.simplicial_object.Minimum_Signed_Volume(&index)<0)

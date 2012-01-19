@@ -53,7 +53,7 @@ template<class T> T Intersection_Area_Helper(const RANGE<VECTOR<T,2> >& box, con
         else return (T)0;}
 
     POLYGON<VECTOR<T,2> > new_polygon;
-    for(int curr_intersection_node=1;curr_intersection_node<=added_nodes.Size();curr_intersection_node++){
+    for(int curr_intersection_node=0;curr_intersection_node<added_nodes.Size();curr_intersection_node++){
         int next_intersection_node = (curr_intersection_node % added_nodes.Size()) + 1;
         int curr_node=added_nodes(curr_intersection_node).x;
         new_polygon.X.Append(modified_polygon.X(curr_node));

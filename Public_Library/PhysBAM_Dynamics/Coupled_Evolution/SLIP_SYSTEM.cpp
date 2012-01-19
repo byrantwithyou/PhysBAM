@@ -84,17 +84,17 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& bV,KRYLOV_VECTOR_BASE<T>& bF) const
 
         solid_system->Force(V.solid_velocity,F.solid_velocity);
 
-        for(int i=1;i<=V.solid_velocity.V.Size();i++)
+        for(int i=0;i<V.solid_velocity.V.Size();i++)
             F.solid_velocity.V(i)=F.solid_velocity.V(i)*dt-solid_mass->mass(i)*V.solid_velocity.V(i);
-        for(int i=1;i<=V.solid_velocity.rigid_V.Size();i++)
+        for(int i=0;i<V.solid_velocity.rigid_V.Size();i++)
             F.solid_velocity.rigid_V(i)=F.solid_velocity.rigid_V(i)*dt-solid_mass->world_space_rigid_mass(i)*V.solid_velocity.rigid_V(i);
 
         C_s_transpose.Times(V.lagrange_multipliers,solid_velocities_size_vector);
         F.solid_velocity.Unpack_And_Add(solid_velocities_size_vector);
         
-        for(int i=1;i<=V.solid_velocity.V.Size();i++)
+        for(int i=0;i<V.solid_velocity.V.Size();i++)
             F.solid_velocity.V(i)=solid_mass->one_over_mass(i)*F.solid_velocity.V(i);
-        for(int i=1;i<=V.solid_velocity.rigid_V.Size();i++)
+        for(int i=0;i<V.solid_velocity.rigid_V.Size();i++)
             F.solid_velocity.rigid_V(i)=solid_mass->world_space_rigid_mass_inverse(i)*F.solid_velocity.rigid_V(i);
     }
 }

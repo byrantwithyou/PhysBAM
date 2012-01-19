@@ -282,7 +282,7 @@ void Get_Initial_Data()
     BASE::Write_Output_Files(frame);
 
     std::ostream* output=FILE_UTILITIES::Safe_Open_Output("handtransform_"+STRING_UTILITIES::string_sprintf("%d",frame),false);
-    for(int i=1;i<=rigid_body_list.Number_Of_Elements();i++){
+    for(int i=0;i<rigid_body_list.Number_Of_Elements();i++){
         (*output)<<data_directory<<"/Rigid_Bodies/New_Visible_Human_Bones/";
         (*output)<<rigid_body_particles.Rigid_Body(i).name<<"\n"<<rigid_body_particles.Rigid_Body(i).frame<<std::endl;
     }
@@ -363,7 +363,7 @@ void Skeleton_In_Flesh()
         LOG::cout << "Joints with only muscle control"<<std::endl;
         for(int i=0;i<arb->joint_mesh.joints.m;i++) if(arb->joint_mesh.joints(i)->joint_function && arb->joint_mesh.joints(i)->joint_function->muscle_control)
             LOG::cout << "\t" << arb->joint_mesh.joints(i)->name << std::endl;}
-    for(int i=1;i<=rigid_body_list.Number_Of_Elements();i++) rigid_body_particles.Rigid_Body(i).Set_Coefficient_Of_Friction(1);
+    for(int i=0;i<rigid_body_list.Number_Of_Elements();i++) rigid_body_particles.Rigid_Body(i).Set_Coefficient_Of_Friction(1);
 }
 //#####################################################################
 // Function Adjust_Joints_For_Skeleton_In_Flesh

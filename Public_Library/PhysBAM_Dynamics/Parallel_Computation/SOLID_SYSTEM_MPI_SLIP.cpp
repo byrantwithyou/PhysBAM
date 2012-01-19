@@ -65,9 +65,9 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
     const VECTOR_T& V=debug_cast<const VECTOR_T&>(BV);VECTOR_T& F=debug_cast<VECTOR_T&>(BF);
     solid_system.Force(V,F);
     Send_Generalized_Velocity_To_Fluid(V); // MPI
-    for(int i=1;i<=V.V.Size();i++)
+    for(int i=0;i<V.V.Size();i++)
         F.V(i)=F.V(i)*solid_system.dt-(*solid_mass).mass(i)*V.V(i);
-    for(int i=1;i<=V.rigid_V.Size();i++)
+    for(int i=0;i<V.rigid_V.Size();i++)
         F.rigid_V(i)=F.rigid_V(i)*solid_system.dt-(*solid_mass).world_space_rigid_mass(i)*V.rigid_V(i);
 
     Get_Generalized_Velocity_From_Fluid(F);
@@ -80,8 +80,8 @@ Inner_Product(const KRYLOV_VECTOR_BASE<T>& BV1,const KRYLOV_VECTOR_BASE<T>& BV2)
 {
     const VECTOR_T& V1=debug_cast<const VECTOR_T&>(BV1);const VECTOR_T& V2=debug_cast<const VECTOR_T&>(BV2);
     double inner_product_solid_velocities=0;
-    for(int i=1;i<=V1.V.Size();i++) inner_product_solid_velocities+=Dot_Product(V1.V(i),V2.V(i));
-    for(int i=1;i<=V1.rigid_V.Size();i++){
+    for(int i=0;i<V1.V.Size();i++) inner_product_solid_velocities+=Dot_Product(V1.V(i),V2.V(i));
+    for(int i=0;i<V1.rigid_V.Size();i++){
         inner_product_solid_velocities+=Dot_Product(V1.rigid_V(i).linear,V2.rigid_V(i).linear);
         inner_product_solid_velocities+=Dot_Product(V1.rigid_V(i).angular,V2.rigid_V(i).angular);}
     return inner_product_solid_velocities;

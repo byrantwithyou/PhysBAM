@@ -93,7 +93,7 @@ Datatype<T>().Pack(data.Get_Array_Pointer(),data.Size(),&buffer(1),buffer.Size()
 template<class T_ARRAY,class T_INDICES> inline void Pack(const INDIRECT_ARRAY<T_ARRAY,T_INDICES>& data,ARRAY_VIEW<char> buffer,int& position,const MPI::Comm& comm)
 {assert(Pack_Size(data,comm)<=buffer.Size()-position);
 Pack(data.Size(),buffer,position,comm);MPI::Datatype type=Datatype<typename T_ARRAY::ELEMENT>();
-for(int i=1;i<=data.Size();i++) type.Pack(&data(i),1,&buffer(1),buffer.Size(),position,comm);}
+for(int i=0;i<data.Size();i++) type.Pack(&data(i),1,&buffer(1),buffer.Size(),position,comm);}
 
 template<class T> inline void Pack(const ARRAY<T>& data,ARRAY_VIEW<char> buffer,int& position,const MPI::Comm& comm)
 {Pack(ARRAY_VIEW<const T>(data),buffer,position,comm);}
@@ -116,7 +116,7 @@ Datatype<T>().Unpack(&buffer(1),buffer.Size(),data.Get_Array_Pointer(),Value(dat
 template<class T_ARRAY,class T_INDICES> inline void Unpack(INDIRECT_ARRAY<T_ARRAY,T_INDICES>& data,ARRAY_VIEW<const char> buffer,int& position,const MPI::Comm& comm)
 {int m;Unpack(m,buffer,position,comm);PHYSBAM_ASSERT(m==data.Size());
 MPI::Datatype type=Datatype<typename T_ARRAY::ELEMENT>();
-for(int i=1;i<=data.Size();i++) type.Unpack(&buffer(1),buffer.Size(),&data(i),1,position,comm);}
+for(int i=0;i<data.Size();i++) type.Unpack(&buffer(1),buffer.Size(),&data(i),1,position,comm);}
 //#####################################################################
 // Pack/Unpack for particles
 //#####################################################################

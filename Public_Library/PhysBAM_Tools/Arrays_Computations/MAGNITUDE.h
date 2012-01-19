@@ -35,11 +35,11 @@ namespace ARRAYS_COMPUTATIONS
 
     template<class T,class T_ARRAY,class ID> typename ENABLE_IF<IS_SCALAR<T>::value,T>::TYPE
     Maximum_Magnitude(const ARRAY_BASE<T,T_ARRAY,ID>& a)
-    {T result=(T)0;for(int i=1;i<=a.Size();i++) result=PhysBAM::max(result,abs(a(i)));return result;}
+    {T result=(T)0;for(int i=0;i<a.Size();i++) result=PhysBAM::max(result,abs(a(i)));return result;}
 
     template<class T,class T_ARRAY,class ID> typename T::SCALAR
     Maximum_Magnitude(const ARRAY_BASE<T,T_ARRAY,ID>& a)
-    {typename T::SCALAR result(0);for(int i=1;i<=a.Size();i++) result=PhysBAM::max(result,Magnitude_Squared(a(i)));return sqrt(result);}
+    {typename T::SCALAR result(0);for(int i=0;i<a.Size();i++) result=PhysBAM::max(result,Magnitude_Squared(a(i)));return sqrt(result);}
 
     template<class T,class T_ARRAY,class ID> typename ENABLE_IF<IS_SCALAR<T>::value,ID>::TYPE
     Arg_Maximum_Magnitude(const ARRAY_BASE<T,T_ARRAY,ID>& a)

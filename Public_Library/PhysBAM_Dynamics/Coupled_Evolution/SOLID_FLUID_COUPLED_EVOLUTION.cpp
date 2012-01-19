@@ -174,7 +174,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
 
         // compute solid momentum before
         /*TV dimensionwise_solid_momentum;
-        for(int i=1;i<=V.V.Size();i++){
+        for(int i=0;i<V.V.Size();i++){
             dimensionwise_solid_momentum+=mass.mass(i)*V.V(i);
         }
         LOG::cout<<"Deformable solid momentum before explicit forces: "<<dimensionwise_solid_momentum<<std::endl;*/
@@ -200,16 +200,16 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
             &solid_body_collection.rigid_body_collection.articulated_rigid_body,(velocity_update && solids_parameters.enforce_repulsions_in_cg)?repulsions:0,mpi_solids,velocity_update);
         
         if(solid_system->arb->constrain_pd_directions){
-            for(int i=1;i<=B.rigid_V.Size();i++) B.rigid_V(i)=mass.world_space_rigid_mass_inverse(i)*B.rigid_V(i);
+            for(int i=0;i<B.rigid_V.Size();i++) B.rigid_V(i)=mass.world_space_rigid_mass_inverse(i)*B.rigid_V(i);
             solid_system->arb->Poststabilization_Projection(B.rigid_V.array,true);
-            for(int i=1;i<=B.rigid_V.Size();i++) B.rigid_V(i)=mass.world_space_rigid_mass(i)*B.rigid_V(i);}
+            for(int i=0;i<B.rigid_V.Size();i++) B.rigid_V(i)=mass.world_space_rigid_mass(i)*B.rigid_V(i);}
 
         if(Simulate_Fluids()){
-            for(int i=1;i<=V.V.Size();i++) B.V(i)=mass.mass(i)*V.V(i)+dt*B.V(i);
-            for(int i=1;i<=V.rigid_V.Size();i++) B.rigid_V(i)=mass.world_space_rigid_mass(i)*V.rigid_V(i)+dt*B.rigid_V(i);}
+            for(int i=0;i<V.V.Size();i++) B.V(i)=mass.mass(i)*V.V(i)+dt*B.V(i);
+            for(int i=0;i<V.rigid_V.Size();i++) B.rigid_V(i)=mass.world_space_rigid_mass(i)*V.rigid_V(i)+dt*B.rigid_V(i);}
         else{
-            for(int i=1;i<=V.V.Size();i++) B.V(i)=V.V(i)+dt*mass.one_over_mass(i)*B.V(i);
-            for(int i=1;i<=V.rigid_V.Size();i++) B.rigid_V(i)=V.rigid_V(i)+dt*(mass.world_space_rigid_mass_inverse(i)*B.rigid_V(i));}
+            for(int i=0;i<V.V.Size();i++) B.V(i)=V.V(i)+dt*mass.one_over_mass(i)*B.V(i);
+            for(int i=0;i<V.rigid_V.Size();i++) B.rigid_V(i)=V.rigid_V(i)+dt*(mass.world_space_rigid_mass_inverse(i)*B.rigid_V(i));}
 
         if(solids_fluids_parameters.mpi_solid_fluid) solids_fluids_parameters.mpi_solid_fluid->Exchange_Solid_Positions_And_Velocities(solid_body_collection); // TODO: only need to exchange velocities
         }
@@ -241,8 +241,8 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
 
         // For energy calculation, get solids' V* velocity and project it to fluid-solid faces using the weights just computed
         if(fluids_parameters.compressible && velocity_update){
-            for(int i=1;i<=V.V.Size();i++) V.V(i)=mass.one_over_mass(i)*B.V(i);
-            for(int i=1;i<=V.rigid_V.Size();i++) V.rigid_V(i)=mass.world_space_rigid_mass_inverse(i)*B.rigid_V(i);
+            for(int i=0;i<V.V.Size();i++) V.V(i)=mass.one_over_mass(i)*B.V(i);
+            for(int i=0;i<V.rigid_V.Size();i++) V.rigid_V(i)=mass.world_space_rigid_mass_inverse(i)*B.rigid_V(i);
             solid_projected_face_velocities_star.Resize(Get_Grid(),true,false);
             Apply_Solid_Boundary_Conditions(current_velocity_time,false,solid_projected_face_velocities_star);}
 
@@ -397,8 +397,8 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
                 1,solids_parameters.implicit_solve_parameters.cg_iterations,solids_parameters.implicit_solve_parameters.cg_tolerance,true,poisson.laplace_mpi->communicators,&poisson.laplace_mpi->partitions);}
         else{
             // TODO: unify with single proc case
-            for(int i=1;i<=V.V.Size();i++) B.V(i)=solid_system_mpi->one_over_modified_mass(i)*B.V(i);
-            for(int i=1;i<=V.rigid_V.Size();i++){B.rigid_V(i).linear=solid_system_mpi->modified_world_space_rigid_mass_inverse(i)*B.rigid_V(i).linear;
+            for(int i=0;i<V.V.Size();i++) B.V(i)=solid_system_mpi->one_over_modified_mass(i)*B.V(i);
+            for(int i=0;i<V.rigid_V.Size();i++){B.rigid_V(i).linear=solid_system_mpi->modified_world_space_rigid_mass_inverse(i)*B.rigid_V(i).linear;
                 B.rigid_V(i).angular=solid_system_mpi->modified_world_space_rigid_inertia_tensor_inverse(i)*B.rigid_V(i).angular;}
             V.V=B.V;V.rigid_V=B.rigid_V;
             V.V*=(T)-1;V.rigid_V*=(T)-1;
@@ -416,8 +416,8 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
 
         if(fluids){
             // correct RHS for solids
-            for(int i=1;i<=V.V.Size();i++) B.V(i)=solid_fluid_system.one_over_modified_mass(i)*B.V(i);
-            for(int i=1;i<=V.rigid_V.Size();i++){B.rigid_V(i).linear=solid_fluid_system.modified_world_space_rigid_mass_inverse(i)*B.rigid_V(i).linear;
+            for(int i=0;i<V.V.Size();i++) B.V(i)=solid_fluid_system.one_over_modified_mass(i)*B.V(i);
+            for(int i=0;i<V.rigid_V.Size();i++){B.rigid_V(i).linear=solid_fluid_system.modified_world_space_rigid_mass_inverse(i)*B.rigid_V(i).linear;
                 B.rigid_V(i).angular=solid_fluid_system.modified_world_space_rigid_inertia_tensor_inverse(i)*B.rigid_V(i).angular;}}
 
         V.V=B.V;V.rigid_V=B.rigid_V;
@@ -505,10 +505,10 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
     if(solids && velocity_update && solids_parameters.use_post_cg_constraints){ // save final force for friction calculation
         solid_system->Force(V,F);
         if(Simulate_Fluids()){ // TODO(jontg): Ask Craig if what is done here makes any sense...
-            for(int i=1;i<=F.V.Size();i++) F.V(i)*=dt*mass.one_over_mass(i);} // save final force for friction calculation
+            for(int i=0;i<F.V.Size();i++) F.V(i)*=dt*mass.one_over_mass(i);} // save final force for friction calculation
         else{
-            for(int i=1;i<=F.V.Size();i++) V.V(i)=B.V(i)+dt*mass.one_over_mass(i)*F.V(i);
-            for(int i=1;i<=F.rigid_V.Size();i++) V.rigid_V(i)=B.rigid_V(i)+mass.world_space_rigid_mass_inverse(i)*F.rigid_V(i)*dt;}}
+            for(int i=0;i<F.V.Size();i++) V.V(i)=B.V(i)+dt*mass.one_over_mass(i)*F.V(i);
+            for(int i=0;i<F.rigid_V.Size();i++) V.rigid_V(i)=B.rigid_V(i)+mass.world_space_rigid_mass_inverse(i)*F.rigid_V(i)*dt;}}
 
     if(solids){
         solid_body_collection.deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Velocities();

@@ -77,7 +77,7 @@ Parse_Arguments(PARSE_ARGS &parse_args)
     animation_enabled=false;
     use_rgd_frames=parse_args.Is_Value_Set("-use_rgd");
     if (!parse_args.Num_Extra_Args()) parse_args.Print_Usage(true);
-    else{for(int i=1;i<=parse_args.Num_Extra_Args();i++){
+    else{for(int i=0;i<parse_args.Num_Extra_Args();i++){
         animation_enabled=animation_enabled||FILE_UTILITIES::Is_Animated(parse_args.Extra_Arg(i));
         filenames.Append(parse_args.Extra_Arg(i));}}
 }

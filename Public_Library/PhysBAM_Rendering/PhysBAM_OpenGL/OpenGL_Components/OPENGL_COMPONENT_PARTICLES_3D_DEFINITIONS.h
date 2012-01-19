@@ -267,7 +267,7 @@ Reinitialize(bool force)
                 ARRAY<T_PARTICLES*,VECTOR<int,3> > particles_per_cell;
                 Read_Binary<RW>(*input_file,particles_per_cell);
                 ARRAY<ARRAY_COLLECTION*> initialization_array(particles_per_cell.array.Size());
-                for(int j=1;j<=particles_per_cell.array.Size();j++){
+                for(int j=0;j<particles_per_cell.array.Size();j++){
                     if(particles_per_cell.array(j)) initialization_array(j)=particles_per_cell.array(j)->array_collection;
                     else initialization_array(j)=0;}
                 ARRAY_VIEW<const ARRAY_COLLECTION* const> initialization_array_view(initialization_array.Size(),initialization_array.Get_Array_Pointer());

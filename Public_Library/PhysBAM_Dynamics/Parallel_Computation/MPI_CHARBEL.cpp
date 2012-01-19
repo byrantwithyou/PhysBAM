@@ -68,7 +68,7 @@ Setup_AEROF_PhysBAM_Mapping(TETRAHEDRALIZED_VOLUME<T>& tet_volume,ARRAY<ARRAY<in
     for(int i=0;i<number_of_processes;i++){
         INDIRECT_ARRAY<ARRAY<VECTOR<int,4> > > proc_tets=tet_volume.mesh.elements.Subset(tets_to_send(i));
         ARRAY<int> local_indices,global_indices;
-        for(int t=1;t<=proc_tets.Size();t++){
+        for(int t=0;t<proc_tets.Size();t++){
             global_indices.Append_Elements(local_to_global_map.Subset(proc_tets(t)));
             local_indices.Append_Elements(proc_tets(t));}
         INDIRECT_ARRAY<ARRAY_VIEW<TV> > positions=tet_volume.particles.X.Subset(local_indices);

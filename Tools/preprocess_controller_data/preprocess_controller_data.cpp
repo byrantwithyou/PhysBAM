@@ -54,7 +54,7 @@ public:
                 next_index=next_hash_number;graph_index_to_state(next_hash_number++)=states(j);number_nodes++;}
             if(number_nodes>=states_graph.Number_Nodes()) states_graph.Resize(states_graph.Number_Nodes()*2);
             states_graph.Add_Edge(current_index,next_index);}}
-        //for(int i=1;i<=graph_index_to_state.Size();i++) assert(graph_index_to_state(i)->angles.Size()!=0); //
+        //for(int i=0;i<graph_index_to_state.Size();i++) assert(graph_index_to_state(i)->angles.Size()!=0); //
     }
 };
 //#####################################################################

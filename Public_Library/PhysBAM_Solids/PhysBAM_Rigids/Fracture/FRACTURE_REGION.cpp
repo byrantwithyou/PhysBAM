@@ -160,7 +160,7 @@ Compute_Volume() const
 {
     ARRAY_VIEW<T>& phi_array=implicit_object->levelset.phi.array;
     int num_inside=0;
-    for(int i=1;i<=phi_array.Size();i++) if(phi_array(i)<=0) num_inside++;
+    for(int i=0;i<phi_array.Size();i++) if(phi_array(i)<=0) num_inside++;
     return num_inside*implicit_object->levelset.grid.Cell_Size();
 }
 //#####################################################################

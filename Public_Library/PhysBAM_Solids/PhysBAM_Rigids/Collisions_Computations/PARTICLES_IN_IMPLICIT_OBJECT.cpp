@@ -259,7 +259,7 @@ void Particles_In_Implicit_Object(RIGID_BODY<TV>& particle_body,RIGID_BODY<TV>& 
 
     ARRAY_VIEW<TV>& particles_X=particle_body.simplicial_object->particles.X;
     IMPLICIT_OBJECT<VECTOR<T,d> >& object_space_implicit_object=*levelset_body.implicit_object->object_space_implicit_object;
-    for(int p=1;p<=particles_X.Size();p++)
+    for(int p=0;p<particles_X.Size();p++)
         if((!collidable || (*collidable)(p)) && bounding_box2_in_body1_coordinates.Lazy_Inside(particles_X(p)) && 
             object_space_implicit_object.Lazy_Inside(Transform_From_Body1_To_Body2_Coordinates<TV>(particles_X(p),rotation,translation),contour_value)){
             particle_intersections.Append(RIGID_BODY_PARTICLE_INTERSECTION<TV>(particles_X(p),p,particle_body.particle_index,levelset_body.particle_index));

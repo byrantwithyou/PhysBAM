@@ -112,7 +112,7 @@ Eigenvalues(ARRAY<T>& eigenvalues) const
     BANDED_SYMMETRIC_MATRIX D(*this);
     D.Diagonalize();
     eigenvalues.Resize(Size(),false,false);
-    for(int i=1;i<=Size();i++) eigenvalues(i)=D.A(i)[1];
+    for(int i=0;i<Size();i++) eigenvalues(i)=D.A(i)[1];
 }
 //#####################################################################
 // Function Print_Spectral_Information

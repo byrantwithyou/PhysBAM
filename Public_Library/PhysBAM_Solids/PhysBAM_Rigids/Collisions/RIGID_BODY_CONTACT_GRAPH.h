@@ -45,7 +45,7 @@ public:
         if(directed_graph.Parents(i).m>0){LOG::cout<<" IS ABOVE=";RIGID_BODY<TV>::Print_Names(rigid_body_particles,directed_graph.Parents(i));}
         if(directed_graph.Children(i).m>0){LOG::cout<<" IS BELOW=";RIGID_BODY<TV>::Print_Names(rigid_body_particles,directed_graph.Children(i));}
         LOG::cout<<std::endl;}LOG::cout<<std::endl;
-    for(int i=1;i<=directed_graph.Number_Of_Levels();i++){
+    for(int i=0;i<directed_graph.Number_Of_Levels();i++){
         LOG::cout<<"CONTACT_GRAPH Level "<<i<<": ";RIGID_BODY<TV>::Print_Names(rigid_body_particles,directed_graph.Nodes_In_Level(i));LOG::cout<<std::endl;}LOG::cout<<std::endl;}
 
     void Print_Statistics(const ARRAY<ARRAY<int> >& contact_pairs_for_level,const bool verbose=false)

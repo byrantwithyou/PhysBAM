@@ -28,7 +28,7 @@ inline double wrap(const double value,const double lower,const double upper)
 
 template<class T,int d>
 inline VECTOR<T,d> wrap(const VECTOR<T,d>& value,const VECTOR<T,d>& lower,const VECTOR<T,d>& upper)
-{VECTOR<T,d> result;for(int i=1;i<=result.Size();i++) result(i)=wrap(value(i),lower(i),upper(i));return result;}
+{VECTOR<T,d> result;for(int i=0;i<result.Size();i++) result(i)=wrap(value(i),lower(i),upper(i));return result;}
 
 }
 #endif

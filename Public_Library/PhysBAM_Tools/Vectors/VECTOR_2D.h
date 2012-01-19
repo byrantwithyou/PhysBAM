@@ -357,13 +357,13 @@ public:
     template<class T_ARRAY>
     bool Contains_All(const T_ARRAY& elements) const
     {STATIC_ASSERT((IS_SAME<typename T_ARRAY::ELEMENT,T>::value));
-    for(int i=1;i<=elements.Size();i++) if(!Contains(elements(i))) return false;
+    for(int i=0;i<elements.Size();i++) if(!Contains(elements(i))) return false;
     return true;}
 
     template<class T_ARRAY>
     bool Contains_Any(const T_ARRAY& elements) const
     {STATIC_ASSERT((IS_SAME<typename T_ARRAY::ELEMENT,T>::value));
-    for(int i=1;i<=elements.Size();i++) if(Contains(elements(i))) return true;
+    for(int i=0;i<elements.Size();i++) if(Contains(elements(i))) return true;
     return false;}
 
     VECTOR<T,1> Remove_Index(const int index) const
@@ -394,15 +394,15 @@ public:
 
     template<class T_VECTOR>
     void Set_Subvector(const int istart,const T_VECTOR& v)
-    {for(int i=1;i<=v.Size();i++) (*this)(istart+i-1)=v(i);}
+    {for(int i=0;i<v.Size();i++) (*this)(istart+i-1)=v(i);}
 
     template<class T_VECTOR>
     void Add_Subvector(const int istart,const T_VECTOR& v)
-    {for(int i=1;i<=v.Size();i++) (*this)(istart+i-1)+=v(i);}
+    {for(int i=0;i<v.Size();i++) (*this)(istart+i-1)+=v(i);}
     
     template<class T_VECTOR>
     void Get_Subvector(const int istart,T_VECTOR& v) const
-    {for(int i=1;i<=v.Size();i++) v(i)=(*this)(istart+i-1);}
+    {for(int i=0;i<v.Size();i++) v(i)=(*this)(istart+i-1);}
 
     T* begin() // for stl
     {return &x;}

@@ -43,7 +43,7 @@ template<class T_GRID> void SCATTERED_INTERPOLATION<T_GRID>::
 Bin_Domain_Values(ARRAY_VIEW<const TV> domain_values,const T_GRID& grid,T_ARRAYS_ARRAY_INT& points_in_cell)
 {
     points_in_cell.Resize(grid.Get_MAC_Grid().Domain_Indices());
-    for(int k=1;k<=domain_values.Size();k++)points_in_cell(grid.Clamp_To_Cell(domain_values(k))).Append(k);
+    for(int k=0;k<domain_values.Size();k++)points_in_cell(grid.Clamp_To_Cell(domain_values(k))).Append(k);
 }
 //#####################################################################
 // Function Transfer_With_Distance_Averaged_Weights

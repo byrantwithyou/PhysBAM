@@ -49,7 +49,7 @@ template<class TV,class T_GRID> void Rasterize_Object_Generic(const COLLISION_GE
     rigid_collision_geometry=dynamic_cast<const RIGID_COLLISION_GEOMETRY<TV>*>(&collision_geometry);
     if(rigid_collision_geometry) Prepare_For_World_Space_Simplex_Bounding_Box(rigid_collision_geometry->rigid_geometry);
     if(collision_geometry.Number_Of_Simplices())
-        for(int t=1;t<=collision_geometry.Number_Of_Simplices();t++){
+        for(int t=0;t<collision_geometry.Number_Of_Simplices();t++){
             typedef typename BASIC_SIMPLEX_POLICY<TV,TV::m-1>::SIMPLEX T_SIMPLEX;
             T_SIMPLEX simplex=collision_geometry.World_Space_Simplex(t);
             VECTOR<TV,TV::dimension> pts;
@@ -78,7 +78,7 @@ Compute_Occupied_Blocks_Generic(const COLLISION_GEOMETRY<TV>& collision_geometry
     const RIGID_COLLISION_GEOMETRY<TV>* rigid_collision_geometry;
     rigid_collision_geometry=dynamic_cast<const RIGID_COLLISION_GEOMETRY<TV>*>(&collision_geometry);
     if(rigid_collision_geometry) Prepare_For_World_Space_Simplex_Bounding_Box(rigid_collision_geometry->rigid_geometry);
-    for(int t=1;t<=collision_geometry.Number_Of_Simplices();t++){
+    for(int t=0;t<collision_geometry.Number_Of_Simplices();t++){
         typedef typename BASIC_SIMPLEX_POLICY<TV,TV::m-1>::SIMPLEX T_SIMPLEX;
         T_SIMPLEX simplex=collision_geometry.World_Space_Simplex(t);
         VECTOR<TV,TV::dimension> pts;

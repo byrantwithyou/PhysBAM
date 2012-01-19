@@ -283,11 +283,11 @@ Write_Footer()
                             Write(fp,(uint)0); // version and flags
                             Write(fp,(uint)0); // sample size (non-uniform so zero and table follows)
                             Write(fp,(uint)frames); // one entry per frame
-                            for(int i=1;i<=sample_lengths.Size();i++) Write(fp,(uint)sample_lengths(i));}
+                            for(int i=0;i<sample_lengths.Size();i++) Write(fp,(uint)sample_lengths(i));}
                         {QT_ATOM a(fp,"stco");
                             Write(fp,(uint)0); // version and flags
                             Write(fp,(uint)frames); // one entry per frame
-                            for(int i=1;i<=sample_offsets.Size();i++) Write(fp,(uint)sample_offsets(i));}}}}} // offset from begin of file
+                            for(int i=0;i<sample_offsets.Size();i++) Write(fp,(uint)sample_offsets(i));}}}}} // offset from begin of file
 }
 //#####################################################################
 // Function Enabled

@@ -152,7 +152,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     rigid_body_particles.Rigid_Body(id).add_to_spatial_partition=false;
     rigid_body_particles.Rigid_Body(id).Set_Coefficient_Of_Restitution(1);
 
-    for(int i=1;i<=rigid_body_list.Number_Of_Elements();i++) if(!rigid_body_particles.Rigid_Body(i).is_static)
+    for(int i=0;i<rigid_body_list.Number_Of_Elements();i++) if(!rigid_body_particles.Rigid_Body(i).is_static)
         rigid_body_particles.Rigid_Body(i).Add_Basic_Forces(solids_parameters.gravity,solids_parameters.gravity_direction,solids_parameters.rigid_body_evolution_parameters.rigid_body_ether_viscosity,0);
 
     solids_parameters.collision_body_list.Add_Bodies(solids_parameters.rigid_body_parameters.list);

@@ -22,7 +22,7 @@ template<class T_GRID> void EULER_STEP_PARTICLES<T_GRID>::
 Euler_Step_Node(ARRAY_VIEW<TV> X,const T_GRID& grid,const T_ARRAYS_TV& U,const T dt)
 {
     typename INTERPOLATION_POLICY<T_GRID>::LINEAR_INTERPOLATION_SCALAR::template REBIND<TV>::TYPE interpolation;
-    for(int k=1;k<=X.Size();k++) X(k)+=dt*Clamped_To_Array(interpolation,grid,U,X(k));
+    for(int k=0;k<X.Size();k++) X(k)+=dt*Clamped_To_Array(interpolation,grid,U,X(k));
 }
 //#####################################################################
 // Function Euler_Step_Face
@@ -31,7 +31,7 @@ template<class T_GRID> void EULER_STEP_PARTICLES<T_GRID>::
 Euler_Step_Face(ARRAY_VIEW<TV> X,const T_GRID& grid,const T_FACE_ARRAYS& face_velocities,const T dt)
 {
     typename INTERPOLATION_POLICY<T_GRID>::FACE_LOOKUP lookup(face_velocities);
-    for(int k=1;k<=X.Size();k++){
+    for(int k=0;k<X.Size();k++){
         typename T_GRID::BLOCK block(grid,X(k),1);X(k)+=dt*INTERPOLATION_POLICY<T_GRID>::LINEAR_INTERPOLATION_MAC_HELPER::Interpolate_Face(block,lookup,X(k));}
 }
 //#####################################################################
@@ -41,7 +41,7 @@ template<class T_GRID> void EULER_STEP_PARTICLES<T_GRID>::
 Second_Order_Runge_Kutta_Step(ARRAY_VIEW<TV> X,const T_GRID& grid,const T_ARRAYS_TV& U,const T dt)
 {
     typename INTERPOLATION_POLICY<T_GRID>::LINEAR_INTERPOLATION_SCALAR::template REBIND<TV>::TYPE interpolation;
-    for(int k=1;k<=X.Size();k++){
+    for(int k=0;k<X.Size();k++){
         TV velocity=Clamped_To_Array(interpolation,grid,U,X(k));
         TV X_new=X(k)+dt*velocity;
         X(k)+=(T).5*dt*(velocity+Clamped_To_Array(interpolation,grid,U,X_new));}

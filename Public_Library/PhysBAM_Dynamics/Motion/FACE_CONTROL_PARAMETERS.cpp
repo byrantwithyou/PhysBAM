@@ -112,7 +112,7 @@ Active_Subset() const
 {
     ARRAY<int> result(Active_Size());
     int n=0;
-    for(int i=1;i<=Size();i++) if(Active(i)) result(++n)=i;
+    for(int i=0;i<Size();i++) if(Active(i)) result(++n)=i;
     return result;
 }
 template<class T> ARRAY<int> FACE_CONTROL_PARAMETERS<T>::
@@ -120,7 +120,7 @@ Active_Kinematic_Subset() const
 {
     ARRAY<int> result(Active_Kinematic_Size());
     int n=0;
-    for(int i=1;i<=Size();i++) if(Active_Kinematic(i)) result(++n)=i;
+    for(int i=0;i<Size();i++) if(Active_Kinematic(i)) result(++n)=i;
     return result;
 }
 template<class T> ARRAY<int> FACE_CONTROL_PARAMETERS<T>::
@@ -128,14 +128,14 @@ Active_Nonkinematic_Subset() const
 {
     ARRAY<int> result(Active_Nonkinematic_Size());
     int n=0;
-    for(int i=1;i<=Size();i++) if(Active_Nonkinematic(i)) result(++n)=i;
+    for(int i=0;i<Size();i++) if(Active_Nonkinematic(i)) result(++n)=i;
     return result;
 }
 template<class T> void FACE_CONTROL_PARAMETERS<T>::
 Get(VECTOR_ND<T>& values) const
 {
     values=VECTOR_ND<T>(Size());
-    for(int i=1;i<=Size();i++) values(i)=(*this)(i);
+    for(int i=0;i<Size();i++) values(i)=(*this)(i);
 }
 template<class T> void FACE_CONTROL_PARAMETERS<T>::
 Get(VECTOR_ND<T>& values,const ARRAY<int>& subset) const
@@ -147,7 +147,7 @@ template<class T> void FACE_CONTROL_PARAMETERS<T>::
 Get_Active(ARRAY<bool>& active) const
 {
     active.Resize(Size());
-    for(int i=1;i<=Size();i++) active(i)=Active(i);
+    for(int i=0;i<Size();i++) active(i)=Active(i);
 }
 template<class T> void FACE_CONTROL_PARAMETERS<T>::
 Get_Active(ARRAY<bool>& active,const ARRAY<int>& subset) const
@@ -159,7 +159,7 @@ template<class T> void FACE_CONTROL_PARAMETERS<T>::
 Set(const VECTOR_ND<T>& values)
 {
     assert(values.n==Size());
-    for(int i=1;i<=Size();i++) (*this)(i)=values(i);
+    for(int i=0;i<Size();i++) (*this)(i)=values(i);
 }
 template<class T> void FACE_CONTROL_PARAMETERS<T>::
 Set(const VECTOR_ND<T>& values,const ARRAY<int>& subset)
@@ -176,7 +176,7 @@ template<class T> void FACE_CONTROL_PARAMETERS<T>::
 Set_Active(const ARRAY<bool>& active)
 {
     assert(active.m==Size());
-    for(int i=1;i<=Size();i++) Active(i)=active(i);
+    for(int i=0;i<Size();i++) Active(i)=active(i);
 }
 template<class T> void FACE_CONTROL_PARAMETERS<T>::
 Set_Active(const ARRAY<bool>& active,const ARRAY<int>& subset)
@@ -290,7 +290,7 @@ template<class T> void FACE_CONTROL_PARAMETERS<T>::
 Identity_Controls(VECTOR_ND<T>& values) const
 {
     values=VECTOR_ND<T>(Size());
-    for(int i=1;i<=Size();i++) values(i)=Identity(i);
+    for(int i=0;i<Size();i++) values(i)=Identity(i);
 }
 template<class T> void FACE_CONTROL_PARAMETERS<T>::
 Maximal_Controls()

@@ -608,7 +608,7 @@ Rasterize_Material_Postimages()
         TV_INT cell_base=low_node-TV_INT::All_Ones_Vector();
         GRID<TV> box_grid(high_node-low_node,RANGE<TV>::Centered_Box(),true);
 
-        for(int j=1;j<=simplex_lists.array.Size();j++) simplex_lists.array(j).Remove_All(); // TODO: this will likely be more expensive than necessary
+        for(int j=0;j<simplex_lists.array.Size();j++) simplex_lists.array(j).Remove_All(); // TODO: this will likely be more expensive than necessary
         simplex_lists.Resize_In_Place(grid_cells);
         simplex_lists(low_node).Remove_All();
         simplex_lists(low_node).Append(local_simplex);

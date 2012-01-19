@@ -225,7 +225,7 @@ public:
     template<class T_MATRIX>
     typename PRODUCT_TRANSPOSE<DIAGONAL_MATRIX,T_MATRIX>::TYPE Times_Transpose(const MATRIX_BASE<T,T_MATRIX>& B) const
     {WARN_IF_NOT_EFFICIENT(T_MATRIX);assert(B.Columns()==2);typename PRODUCT_TRANSPOSE<DIAGONAL_MATRIX,T_MATRIX>::TYPE M((INITIAL_SIZE)B.Columns(),(INITIAL_SIZE)B.Rows());
-    for(int k=1;k<=B.Rows();k++) for(int i=1;i<=B.Columns();i++) M(i,k)=(*this)(i,i)*B(k,i);return M;}
+    for(int k=0;k<B.Rows();k++) for(int i=0;i<B.Columns();i++) M(i,k)=(*this)(i,i)*B(k,i);return M;}
 
     DIAGONAL_MATRIX Times_Transpose(const DIAGONAL_MATRIX& M) const
     {return *this*M;}

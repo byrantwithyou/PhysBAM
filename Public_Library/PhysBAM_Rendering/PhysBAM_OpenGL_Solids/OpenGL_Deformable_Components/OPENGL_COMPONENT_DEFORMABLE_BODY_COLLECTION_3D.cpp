@@ -202,7 +202,7 @@ Display(const int in_color) const
         // visualize point face interactions
         if(interaction_pair_display_mode==1 || interaction_pair_display_mode==2){
             OpenGL_Begin(GL_LINES);
-            for(int k=1;k<=point_triangle_interaction_pairs.Size();k++){
+            for(int k=0;k<point_triangle_interaction_pairs.Size();k++){
                 const POINT_FACE_REPULSION_PAIR<TV>& pair=point_triangle_interaction_pairs(k);
                 INDIRECT_ARRAY<const ARRAY_VIEW<TV>,VECTOR<int,4>&> X(deformable_body_collection.particles.X,pair.nodes);
                 glColor3f(.5f,1,.5f);
@@ -211,7 +211,7 @@ Display(const int in_color) const
                 OpenGL_Line(X(1),X(2));OpenGL_Line(X(1),X(3));OpenGL_Line(X(1),X(4));}
             OpenGL_End();
             OpenGL_Begin(GL_TRIANGLES);
-            for(int k=1;k<=point_triangle_interaction_pairs.Size();k++){
+            for(int k=0;k<point_triangle_interaction_pairs.Size();k++){
                 const POINT_FACE_REPULSION_PAIR<TV>& pair=point_triangle_interaction_pairs(k);
                 INDIRECT_ARRAY<const ARRAY_VIEW<TV>,VECTOR<int,4>&> X(deformable_body_collection.particles.X,pair.nodes);
                 glColor4f(0,.6f,.8f,.5f);
@@ -223,7 +223,7 @@ Display(const int in_color) const
         // visualize edge edge interactions
         if(interaction_pair_display_mode==1 || interaction_pair_display_mode==3){
             OpenGL_Begin(GL_LINES);
-            for(int k=1;k<=edge_edge_interaction_pairs.Size();k++){
+            for(int k=0;k<edge_edge_interaction_pairs.Size();k++){
                 const EDGE_EDGE_REPULSION_PAIR<TV>& pair=edge_edge_interaction_pairs(k);
                 INDIRECT_ARRAY<const ARRAY_VIEW<TV>,VECTOR<int,4>&> X(deformable_body_collection.particles.X,pair.nodes);
                 glColor3f(1,1,0);
@@ -241,7 +241,7 @@ Display(const int in_color) const
         glEnable(GL_BLEND);
         glDisable(GL_LIGHTING);
         OpenGL_Begin(GL_LINES);
-        for(int k=1;k<=force_data_list.Size();k++){
+        for(int k=0;k<force_data_list.Size();k++){
             const FORCE_DATA<TV>& force_data=force_data_list(k);
             if(display_forces_mode==1 && force_data.name!="LINEAR_SPRINGS") continue;
             else if(display_forces_mode==2 && force_data.name!="TRIANGLE_BENDING_SPRINGS") continue;

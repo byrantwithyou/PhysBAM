@@ -388,9 +388,9 @@ Get_Active_Forces_Contributions(const T dt,const T time,ARRAY<TV>& force_on_part
     solid_body_collection.Implicit_Velocity_Independent_Forces(V.V.array,V.rigid_V.array,F.V.array,F.rigid_V.array,dt,time+dt);
     solid_body_collection.Add_Velocity_Dependent_Forces(V.V.array,V.rigid_V.array,F.V.array,F.rigid_V.array,time+dt);
         
-    for(int i=1;i<=F.V.Size();i++){int p=F.V.indices(i);
+    for(int i=0;i<F.V.Size();i++){int p=F.V.indices(i);
         force_on_particles(p)=F.V(i)+B.V(i);}
-    for(int i=1;i<=F.rigid_V.Size();i++){int p=F.rigid_V.indices(i);
+    for(int i=0;i<F.rigid_V.Size();i++){int p=F.rigid_V.indices(i);
         force_on_rigid_body_particles(p)=F.rigid_V(i)+B.rigid_V(i);}
 }
 //#####################################################################
@@ -589,9 +589,9 @@ template<class TV> void ASYNCHRONOUS_EVOLUTION<TV>::
 Boundary_Conditions(GENERALIZED_VELOCITY<TV>& V) const
 {
     if(!use_projection || !asynchronous_mode==FINE_SCALE) return;
-    for(int i=1;i<=V.V.Size();i++) V.V(i)*=solid_body_collection.deformable_body_collection.particles.mass(i);
+    for(int i=0;i<V.V.Size();i++) V.V(i)*=solid_body_collection.deformable_body_collection.particles.mass(i);
     Project(V);
-    for(int i=1;i<=V.V.Size();i++) V.V(i)*=solid_body_collection.deformable_body_collection.particles.one_over_mass(i);
+    for(int i=0;i<V.V.Size();i++) V.V(i)*=solid_body_collection.deformable_body_collection.particles.one_over_mass(i);
 }
 //#####################################################################
 template class ASYNCHRONOUS_EVOLUTION<VECTOR<float,1> >;

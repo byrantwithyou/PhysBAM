@@ -20,10 +20,10 @@ namespace ARRAYS_COMPUTATIONS
     return range;}
 
     template<class T_ARRAY> static void Find_Elements_Inside_Range(const T_ARRAY& array,const RANGE<typename T_ARRAY::ELEMENT>& range,ARRAY<typename T_ARRAY::INDEX>& inside)
-    {for(int i=1;i<=array.Size();i++) if(range.Lazy_Inside(array(i))) inside.Append(i);}
+    {for(int i=0;i<array.Size();i++) if(range.Lazy_Inside(array(i))) inside.Append(i);}
 
     template<class T_ARRAY> static void Find_Elements_Outside_Range(const T_ARRAY& array,const RANGE<typename T_ARRAY::ELEMENT>& range,ARRAY<typename T_ARRAY::INDEX>& outside)
-    {for(int i=1;i<=array.Size();i++) if(range.Lazy_Inside(array(i))) outside.Append(i);}
+    {for(int i=0;i<array.Size();i++) if(range.Lazy_Inside(array(i))) outside.Append(i);}
 }
 }
 #endif

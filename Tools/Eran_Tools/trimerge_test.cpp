@@ -21,7 +21,7 @@ void Do_It()
 
     FRAME_3D<T> main_frame;
 
-    for(int i=1;i<=parse_args.Num_Extra_Args();i++){
+    for(int i=0;i<parse_args.Num_Extra_Args();i++){
         std::cout << "Reading " << parse_args.Extra_Arg(i) << std::endl;
         std::string filename=parse_args.Extra_Arg(i);
         TRIANGULATED_SURFACE<T> *surface=0;FILE_UTILITIES::Create_From_File<T>(filename,surface);

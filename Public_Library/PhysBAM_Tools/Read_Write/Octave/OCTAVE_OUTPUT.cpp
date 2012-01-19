@@ -40,7 +40,7 @@ template<class T> template<class T2,class T_VECTOR> void OCTAVE_OUTPUT<T>::
 Write(const char* name,const VECTOR_BASE<T2,T_VECTOR>& v)
 {
     out<<"# name: "<<name<<"\n# type: matrix\n# rows: "<<v.Size()<<"\n# columns: "<<sizeof(v(1))/sizeof(typename SCALAR_POLICY<T2>::TYPE)<<"\n";
-    for(int i=1;i<=v.Size();i++)
+    for(int i=0;i<v.Size();i++)
         Write_Entry(v(i));
 }
 //#####################################################################
@@ -50,8 +50,8 @@ template<class T> template<class T2,class T_MATRIX> void OCTAVE_OUTPUT<T>::
 Write(const char* name,const MATRIX_BASE<T2,T_MATRIX>& m)
 {
     out<<"# name: "<<name<<"\n# type: matrix\n# rows: "<<m.Rows()<<"\n# columns: "<<m.Columns()<<"\n";
-    for(int i=1;i<=m.Rows();i++){
-        for(int j=1;j<=m.Columns();j++)
+    for(int i=0;i<m.Rows();i++){
+        for(int j=0;j<m.Columns();j++)
             out<<m(i,j)<<" ";
         out<<std::endl;}
 }
@@ -244,7 +244,7 @@ template<class T> template<class T2,class T_ARRAY> void OCTAVE_OUTPUT<T>::
 Append_Sparse_Column(const ARRAY_BASE<T2,T_ARRAY>& v)
 {
     current_column++;
-    for(int j=1;j<=v.Size();j++)
+    for(int j=0;j<v.Size();j++)
         if(T x=v(j)){
             out<<j<<" "<<current_column<<" "<<x<<std::endl;
             nnz++;}
@@ -274,8 +274,8 @@ template<class T> template<class T2,class T_MATRIX> void OCTAVE_OUTPUT<T>::
 Append_Sparse_Diagonal_Block(const MATRIX_BASE<T2,T_MATRIX>& m)
 {
     assert(m.Rows()==m.Columns());
-    for(int i=1;i<=m.Rows();i++)
-        for(int j=1;j<=m.Columns();j++)
+    for(int i=0;i<m.Rows();i++)
+        for(int j=0;j<m.Columns();j++)
             if(T x=m(i,j)){
                 out<<(i+current_column)<<" "<<(j+current_column)<<" "<<x<<std::endl;
                 nnz++;}
@@ -344,7 +344,7 @@ template<class T> template<class T2,class T_ARRAY> void OCTAVE_OUTPUT<T>::
 Write(const char* name,const ARRAY_BASE<T2,T_ARRAY>& v,int)
 {
     out<<"# name: "<<name<<"\n# type: matrix\n# rows: "<<v.Size()<<"\n# columns: "<<sizeof(v(1))/sizeof(typename SCALAR_POLICY<T2>::TYPE)<<"\n";
-    for(int i=1;i<=v.Size();i++)
+    for(int i=0;i<v.Size();i++)
         Write_Entry(v(i));
 }
 //#####################################################################

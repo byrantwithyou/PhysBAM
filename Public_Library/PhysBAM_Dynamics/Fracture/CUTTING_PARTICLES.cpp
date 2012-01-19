@@ -88,6 +88,6 @@ Particle_Id_From_Intersection(const int intersection) const
 void CUTTING_PARTICLES::
 Print() const
 {
-    for(int i=1;i<=Number();i++) LOG::cout<<"Particle id "<<i<<(particle_ids_types(i)==TET_NODE_ID?"(tet node)":(particle_ids_types(i)==INTERSECTION_ID?"(intersection)":"(both)"))
+    for(int i=0;i<Number();i++) LOG::cout<<"Particle id "<<i<<(particle_ids_types(i)==TET_NODE_ID?"(tet node)":(particle_ids_types(i)==INTERSECTION_ID?"(intersection)":"(both)"))
         <<" has tet node id "<<tet_node_indices(i)<<", intersection id "<<intersection_indices(i)<<std::endl;
 }

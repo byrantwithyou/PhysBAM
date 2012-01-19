@@ -56,7 +56,7 @@ public:
     }
 
     void Print_Parameters()
-    {for(int i=1;i<=data.Size();i++){
+    {for(int i=0;i<data.Size();i++){
         LOG::cout<<"data_scale("<<i<<")="<<data_scale(i)<<" data_offset("<<i<<")="<<data_offset(i)<<std::endl;
         LOG::cout<<"data_clamp_low_value("<<i<<")="<<data_clamp_low_value(i)<<" data_lowest_value("<<i<<")="<<data_lowest_value(i)<<std::endl;
         LOG::cout<<"data_clamp_high_value("<<i<<")="<<data_clamp_high_value(i)<<" data_highest_value("<<i<<")="<<data_highest_value(i)<<std::endl;

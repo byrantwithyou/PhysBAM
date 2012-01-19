@@ -78,7 +78,7 @@ public:
     {if(n<1 || n>Number_Of_Tests()){if(verbose) Report_Out_Of_Range(n);return out_of_range;}TEST_RESULT result=Run_Test(n);if(verbose) Report_Test_Result(result,n);return result;}
 
     TEST_RESULT Run_All_Suite_Tests(bool verbose=true)
-    {TEST_RESULT result=success;for(int i=1;i<=Number_Of_Tests();i++) result=Merge_Results(result,Run_Suite_Test(i,verbose));return result;}
+    {TEST_RESULT result=success;for(int i=0;i<Number_Of_Tests();i++) result=Merge_Results(result,Run_Suite_Test(i,verbose));return result;}
 
     static TEST_RESULT Run_Test(std::string test_name,int n,bool verbose=true)
     {if(TEST_BASE* test=Lookup_Test_Suite(test_name)) return test->Run_Suite_Test(n,verbose);if(verbose) Report_Registry_Failure(test_name);return registry_failure;}

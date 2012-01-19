@@ -131,7 +131,7 @@ template<class T>
 void Discard_Tetrahedrons_Outside_Implicit_Surface_Aggressive(TETRAHEDRALIZED_VOLUME<T>& tv,IMPLICIT_OBJECT<VECTOR<T,3> >& implicit_surface,const ARRAY<RANGE<VECTOR<T,3> > >& bounding_boxes)
 {
     typedef VECTOR<T,3> TV;
-    for(int b=1;b<=bounding_boxes.Size();b++){const RANGE<TV>& box=bounding_boxes(b);
+    for(int b=0;b<bounding_boxes.Size();b++){const RANGE<TV>& box=bounding_boxes(b);
         for(int t=tv.mesh.elements.m;t>=1;t--){
             int i,j,k,l;tv.mesh.elements(t).Get(i,j,k,l);
             TV xi=tv.particles.X(i),xj=tv.particles.X(j),xk=tv.particles.X(k),xl=tv.particles.X(l);

@@ -468,7 +468,7 @@ void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE
 #if 0
     const RIGID_BODY_LIST<T,VECTOR<T,3> >& rigid_body_list=solids_parameters.rigid_body_parameters.list;
     VECTOR<T,3> total_linear_momentum,total_angular_momentum;
-    for(int i=1;i<=rigid_body_list.Number_Of_Elements();i++){
+    for(int i=0;i<rigid_body_list.Number_Of_Elements();i++){
         LOG::cout << i << ": " << rigid_body_particles.Rigid_Body(i).Angular_Momentum() << std::endl;
         total_linear_momentum+=rigid_body_particles.Rigid_Body(i).mass*rigid_body_particles.Rigid_Body(i).velocity;
         total_angular_momentum+=VECTOR<T,3>::Cross_Product(rigid_body_particles.Rigid_Body(i).frame.t,rigid_body_particles.Rigid_Body(i).mass*rigid_body_particles.Rigid_Body(i).velocity)+rigid_body_particles.Rigid_Body(i).Angular_Momentum();}

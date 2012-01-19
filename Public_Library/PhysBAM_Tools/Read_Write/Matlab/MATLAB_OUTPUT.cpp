@@ -163,7 +163,7 @@ Write_Output_File(const std::string& file_name,const ARRAY_VIEW<VECTOR<T,d> >& X
     std::ofstream Matlab_Output;
     Matlab_Output.open(STRING_UTILITIES::string_sprintf("%s.%d",file_name.c_str(),stepnumber).c_str(),std::ios::out|std::ios::binary);
     int data_int=X.Size();if(!little_endian) Convert_Bytes(data_int);Matlab_Output.write((const char*)&data_int,4);
-    for(int a=0;a<d;a++) for(int k=1;k<=X.Size();k++){
+    for(int a=0;a<d;a++) for(int k=0;k<X.Size();k++){
         double data_double=X(k)[a];if(!little_endian) Convert_Bytes(data_double);Matlab_Output.write((const char*)&data_double,8);}
     Matlab_Output.close();
 }

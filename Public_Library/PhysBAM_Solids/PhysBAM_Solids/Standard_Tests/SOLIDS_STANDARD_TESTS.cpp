@@ -58,7 +58,7 @@ Bind_Unbound_Particles_In_Rigid_Body(RIGID_BODY<TV>& rigid_body,const T_ARRAY& p
     HASHTABLE<int> exempt_particles;
     ARRAY<int> binding_candidates;
     for(int i=0;i<binding_list.bindings.m;i++) if(!dynamic_cast<RIGID_BODY_BINDING<TV>*>(binding_list.bindings(i))) exempt_particles.Set_All(binding_list.bindings(i)->Parents());
-    for(int i=1;i<=particle_array.Size();i++) if(exempt_particles.Set(particle_array(i))) binding_candidates.Append(particle_array(i));  // Ignore duplicates
+    for(int i=0;i<particle_array.Size();i++) if(exempt_particles.Set(particle_array(i))) binding_candidates.Append(particle_array(i));  // Ignore duplicates
     Bind_Particles_In_Rigid_Body(rigid_body,binding_candidates);
 }
 //#####################################################################

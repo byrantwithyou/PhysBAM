@@ -184,7 +184,7 @@ Average_And_Exchange_Position()
     assert(rigid_X_save.m==rigid_body_collection.rigid_body_particle.array_collection->Size() && rigid_rotation_save.m==rigid_body_collection.rigid_body_particle.array_collection->Size());
     const ARRAY<int>& simulated_rigid_body_particles=rigid_body_collection.simulated_rigid_body_particles;
     ARRAY<int> rigid_body_indices(simulated_rigid_body_particles);rigid_body_indices.Append_Elements(rigid_body_collection.kinematic_rigid_bodies);
-    for(int i=1;i<=rigid_body_indices.Size();i++){int p=rigid_body_indices(i);
+    for(int i=0;i<rigid_body_indices.Size();i++){int p=rigid_body_indices(i);
         TV tmp_X=TV::Interpolate(rigid_body_collection.rigid_body_particle.X(p),rigid_X_save(p),(T).5);
         rigid_X_save(p)=rigid_body_collection.rigid_body_particle.X(p);
         rigid_body_collection.rigid_body_particle.X(p)=tmp_X;

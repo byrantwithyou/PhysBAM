@@ -79,7 +79,7 @@ void Update_Rigid_Bodies(const T time)
     motion_curve.Add_Control_Point(0,VECTOR_2D<T>((T)1.25,(T).55));
     motion_curve.Add_Control_Point(.2,VECTOR_2D<T>((T).8,(T).1)); // .03 was old
     motion_curve.Add_Control_Point(3,VECTOR_2D<T>((T).8,(T).1));
-    for(int i=1;i<=solids_parameters.rigid_body_parameters.list.Number_Of_Elements();i++){
+    for(int i=0;i<solids_parameters.rigid_body_parameters.list.Number_Of_Elements();i++){
         solids_parameters.rigid_body_parameters.list(i)->position=motion_curve.Value(time);
         solids_parameters.rigid_body_parameters.list(i)->velocity=motion_curve.Derivative(time);}
 }

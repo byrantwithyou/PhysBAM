@@ -544,7 +544,7 @@ void Write_Output_Files(const int frame) const
     const LEVELSET_2D<T> levelset_objects((GRID_2D<T>&)fluids_parameters.grid,(ARRAY<T,VECTOR<int,2> >&)phi_objects);
     FILE_UTILITIES::Write_To_File<RW>(STRING_UTILITIES::string_sprintf("%s/phi_objects.%d",output_directory.c_str(),frame),levelset_objects);
     ARRAY<PAIR<VECTOR_2D<T>,T> > rigid_body_forces_and_torques(solids_parameters.rigid_body_parameters.list.Number_Of_Elements());
-    for(int i=1;i<=solids_parameters.rigid_body_parameters.list.Number_Of_Elements();i++){const RIGID_BODY<TV>& rigid_body=*solids_parameters.rigid_body_parameters.list(i);
+    for(int i=0;i<solids_parameters.rigid_body_parameters.list.Number_Of_Elements();i++){const RIGID_BODY<TV>& rigid_body=*solids_parameters.rigid_body_parameters.list(i);
         if(rigid_body.fluid_forces.m){rigid_body_forces_and_torques(i).x=rigid_body.fluid_forces(1)->last_computed_force;rigid_body_forces_and_torques(i).y=rigid_body.fluid_forces(1)->last_computed_torque;}}
     FILE_UTILITIES::Write_To_File<RW>(STRING_UTILITIES::string_sprintf("%s/rigid_body_forces_and_torques.%d",output_directory.c_str(),frame),rigid_body_forces_and_torques);
     SOLIDS_FLUIDS_EXAMPLE_2D<RW>::Write_Output_Files(frame);

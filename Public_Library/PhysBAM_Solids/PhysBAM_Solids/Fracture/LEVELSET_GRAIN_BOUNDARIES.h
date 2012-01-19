@@ -40,7 +40,7 @@ public:
     int number_of_positions=positions.Size();
     ARRAY<ARRAY<T> > distances(seed_positions.Size());
     ARRAY<TV> perturbation(number_of_positions);if(fracture_callbacks) fracture_callbacks->Perturb(positions,perturbation,frame);
-    for(int i=1;i<=seed_positions.Size();i++){
+    for(int i=0;i<seed_positions.Size();i++){
         distances(i).Resize(number_of_positions);
         for(int node=0;node<number_of_positions;node++){
             distances(i)(node)=(perturbation(node)+seed_positions(i)-positions(node)).Magnitude();}}

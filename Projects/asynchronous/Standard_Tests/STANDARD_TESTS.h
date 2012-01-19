@@ -1383,7 +1383,7 @@ void Asynchronous_Sphere()
         volume->mesh.Initialize_Segment_Mesh();
         ARRAY_VIEW<int> flattened_volume=volume->mesh.elements.Flattened();
         HASHTABLE<int> volume_particle_map;
-        for(int i=1;i<=flattened_volume.Size();i++) volume_particle_map.Set(flattened_volume(i));
+        for(int i=0;i<flattened_volume.Size();i++) volume_particle_map.Set(flattened_volume(i));
         ARRAY<int> all_particles;
         volume_particle_map.Get_Keys(all_particles);
         
@@ -1395,22 +1395,22 @@ void Asynchronous_Sphere()
                     ARRAY_VIEW<int> flattened(surface.mesh.elements.Flattened());
                     PARTICLES<TV>& particles=deformable_body_collection.particles;
                     T top=-FLT_MAX,bottom=FLT_MAX;
-                    for(int i=1;i<=flattened.Size();i++){int p=flattened(i);
+                    for(int i=0;i<flattened.Size();i++){int p=flattened(i);
                         if(particles.X(p)(2)>top) top=particles.X(p)(2);
                         if(particles.X(p)(2)<bottom) bottom=particles.X(p)(2);}
-                    for(int i=1;i<=flattened.Size();i++){int p=flattened(i);
+                    for(int i=0;i<flattened.Size();i++){int p=flattened(i);
                         if(particles.X(p)(2)<=(top-bottom)*coverage_percent+bottom)
                             particle_map.Set(p,p);}
                     HASHTABLE<int,int> frontier_particle_map=particle_map;
                     Expand_N_Rings(number_of_rings-1,volume->mesh.segment_mesh->elements,particle_map,frontier_particle_map);}
                 else if(number_of_rings<0){
                     ARRAY_VIEW<int> flattened(volume->mesh.elements.Flattened());
-                    for(int i=1;i<=flattened.Size();i++) particle_map.Set(flattened(i),flattened(i));}
+                    for(int i=0;i<flattened.Size();i++) particle_map.Set(flattened(i),flattened(i));}
                 else if(number_of_rings==0){
                     particle_map.Clean_Memory();}
                 break;
             case 2: //left
-                for(int i=1;i<=all_particles.Size();i++) center+=deformable_body_collection.particles.X(all_particles(i));
+                for(int i=0;i<all_particles.Size();i++) center+=deformable_body_collection.particles.X(all_particles(i));
                 center/=(T)all_particles.m;
                 for(int i=0;i<all_particles.m;i++) if(deformable_body_collection.particles.X(all_particles(i))(1)<center(1))
                     particle_map.Set(i,i);
@@ -1497,7 +1497,7 @@ void Asynchronous_Sphere()
         HASHTABLE<int> temp_particle_map;
         for(int i=0;i<number_of_spheres;i++){
             ARRAY_VIEW<int> boundary_particle_index=boundary_tetrahedralized_volumes(i)->mesh.elements.Flattened();
-            for(int j=1;j<=boundary_particle_index.Size();j++) temp_particle_map.Set(boundary_particle_index(j));}
+            for(int j=0;j<boundary_particle_index.Size();j++) temp_particle_map.Set(boundary_particle_index(j));}
         for(int i=0;i<deformable_body_collection.particles.array_collection->Size();i++) if(!temp_particle_map.Contains(i))
             gravity_particles.Append(i);}
 
@@ -1628,7 +1628,7 @@ void Asynchronous_Layered_Box()
     HASHTABLE<int> temp_particle_map;
     for(int i=0;i<number_of_boxes;i++){
         ARRAY_VIEW<int> boundary_particle_index=boundary_tetrahedralized_volumes(i)->mesh.elements.Flattened();
-        for(int j=1;j<=boundary_particle_index.Size();j++) temp_particle_map.Set(boundary_particle_index(j));}
+        for(int j=0;j<boundary_particle_index.Size();j++) temp_particle_map.Set(boundary_particle_index(j));}
     for(int i=0;i<deformable_body_collection.particles.array_collection->Size();i++) if(!temp_particle_map.Contains(i))
         gravity_particles.Append(i);
 
@@ -2273,7 +2273,7 @@ void Adaptive_Asynchronous()
         volume->mesh.Initialize_Segment_Mesh();
         ARRAY_VIEW<int> flattened_volume=volume->mesh.elements.Flattened();
         HASHTABLE<int> volume_particle_map;
-        for(int i=1;i<=flattened_volume.Size();i++) volume_particle_map.Set(flattened_volume(i));
+        for(int i=0;i<flattened_volume.Size();i++) volume_particle_map.Set(flattened_volume(i));
         ARRAY<int> all_particles;
         volume_particle_map.Get_Keys(all_particles);
  
@@ -2307,7 +2307,7 @@ void Adaptive_Asynchronous()
         // boundary particles
         TRIANGULATED_SURFACE<T>& surface=volume->Get_Boundary_Object();
         ARRAY_VIEW<int> flattened(surface.mesh.elements.Flattened());
-        for(int i=1;i<=flattened.Size();i++){int p=flattened(i); particle_map.Set(p,p);}
+        for(int i=0;i<flattened.Size();i++){int p=flattened(i); particle_map.Set(p,p);}
         HASHTABLE<int,int> frontier_particle_map=particle_map;
         Expand_N_Rings(1,volume->mesh.segment_mesh->elements,particle_map,frontier_particle_map);
         particle_map.Get_Keys(asynchronous_evolution->coarsescale_particles_pool);}
@@ -2429,7 +2429,7 @@ void Asynchronous_Projected_Sphere()
             else{
                 TRIANGULATED_SURFACE<T>& surface=volume->Get_Boundary_Object();
                 ARRAY_VIEW<int> flattened(surface.mesh.elements.Flattened());
-                for(int i=1;i<=flattened.Size();i++){int p=flattened(i); particle_map.Set(p,p);}}
+                for(int i=0;i<flattened.Size();i++){int p=flattened(i); particle_map.Set(p,p);}}
             
             HASHTABLE<int,int> frontier_particle_map=particle_map;
             Expand_N_Rings(number_of_rings-1,volume->mesh.segment_mesh->elements,particle_map,frontier_particle_map);

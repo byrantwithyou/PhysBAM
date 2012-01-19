@@ -253,13 +253,13 @@ public:
     template<class T_ARRAY>
     bool Contains_All(const T_ARRAY& elements) const
     {STATIC_ASSERT((IS_SAME<typename T_ARRAY::ELEMENT,T>::value));
-    for(int i=1;i<=elements.Size();i++) if(!Contains(elements(i))) return false;
+    for(int i=0;i<elements.Size();i++) if(!Contains(elements(i))) return false;
     return true;}
 
     template<class T_ARRAY>
     bool Contains_Any(const T_ARRAY& elements) const
     {STATIC_ASSERT((IS_SAME<typename T_ARRAY::ELEMENT,T>::value));
-    for(int i=1;i<=elements.Size();i++) if(Contains(elements(i))) return true;
+    for(int i=0;i<elements.Size();i++) if(Contains(elements(i))) return true;
     return false;}
 
     VECTOR<T,d-1> Remove_Index(const int index) const

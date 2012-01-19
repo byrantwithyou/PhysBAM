@@ -157,7 +157,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     // Load the test and set static for now
     Load_Motion_Test();
-    for(int i=1;i<=rigid_body_list.Number_Of_Elements();i++) rigid_body_particles.Rigid_Body(i).is_static = true;
+    for(int i=0;i<rigid_body_list.Number_Of_Elements();i++) rigid_body_particles.Rigid_Body(i).is_static = true;
     int offset = arb->joint_mesh.joints.m;    
 
     // Load visible human
@@ -166,7 +166,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     // Now walk hierarchy by using topological sort and set joint frames            
     arb->Update_With_Breadth_First_Directed_Graph(da_man->bones(VISIBLE_HUMAN<T,RW>::BONE_CRANIUM)->id_number);
-    //for(int i=1;i<=rigid_body_list.Number_Of_Elements();i++) rigid_body_particles.Rigid_Body(i).is_static = true;
+    //for(int i=0;i<rigid_body_list.Number_Of_Elements();i++) rigid_body_particles.Rigid_Body(i).is_static = true;
 
     /*id=solids_parameters.rigid_body_parameters.list.template Add_Rigid_Body<RW>(data_directory+"/Rigid_Bodies/"+"ground");
     rigid_body=arb->rigid_bodies_list.rigid_bodies(id);
@@ -287,7 +287,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     std::cout<<"First body is: "<<rigid_body_list.rigid_bodies(1)->name<<"\n";
     arb->Update_With_Breadth_First_Directed_Graph(1);    
     
-    for(int i=1;i<=rigid_body_list.Number_Of_Elements();i++) if(!rigid_body_particles.Rigid_Body(i).is_static)
+    for(int i=0;i<rigid_body_list.Number_Of_Elements();i++) if(!rigid_body_particles.Rigid_Body(i).is_static)
         rigid_body_particles.Rigid_Body(i).Add_Basic_Forces(solids_parameters.gravity,solids_parameters.gravity_direction,solids_parameters.rigid_body_evolution_parameters.rigid_body_ether_viscosity,0);
 
     solids_parameters.collision_body_list.Add_Bodies(solids_parameters.rigid_body_parameters.list);

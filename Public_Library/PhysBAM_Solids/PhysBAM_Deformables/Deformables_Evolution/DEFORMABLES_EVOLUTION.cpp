@@ -176,8 +176,8 @@ Average_And_Exchange_Position()
     const ARRAY<int>& simulated_particles=deformable_body_collection.simulated_particles;
     INDIRECT_ARRAY<ARRAY<TV> > X_save_fragment(X_save,simulated_particles);
     INDIRECT_ARRAY<ARRAY_VIEW<TV> > X_fragment(particles.X,simulated_particles);
-    for(int i=1;i<=X_fragment.Size();i++){TV X_average=(T).5*(X_fragment(i)+X_save_fragment(i));X_save_fragment(i)=X_fragment(i);X_fragment(i)=X_average;}
-    for(int i=1;i<=rigid_geometry_collection.kinematic_rigid_geometry.Size();i++){int p=rigid_geometry_collection.kinematic_rigid_geometry(i); //this needs to be the kinematic bodies
+    for(int i=0;i<X_fragment.Size();i++){TV X_average=(T).5*(X_fragment(i)+X_save_fragment(i));X_save_fragment(i)=X_fragment(i);X_fragment(i)=X_average;}
+    for(int i=0;i<rigid_geometry_collection.kinematic_rigid_geometry.Size();i++){int p=rigid_geometry_collection.kinematic_rigid_geometry(i); //this needs to be the kinematic bodies
         TV tmp_X=TV::Interpolate(rigid_geometry_collection.particles.X(p),rigid_X_save(p),(T).5);
         rigid_X_save(p)=rigid_geometry_collection.particles.X(p);
         rigid_geometry_collection.particles.X(p)=tmp_X;
@@ -349,7 +349,7 @@ Print_Maximum_Velocities(const T time) const
     LOG::cout<<"time = "<<time<<std::endl;
     PARTICLES<TV>& particles=deformable_body_collection.particles;
     int max_index=0;T max_magnitude_squared=-FLT_MAX;const INDIRECT_ARRAY<ARRAY_VIEW<TV>,ARRAY<int>&>& V=particles.V.Subset(deformable_body_collection.dynamic_particles);
-    for(int i=1;i<=V.Size();i++){T magnitude_squared=V(i).Magnitude_Squared();if(magnitude_squared>max_magnitude_squared){max_magnitude_squared=magnitude_squared;max_index=i;}}
+    for(int i=0;i<V.Size();i++){T magnitude_squared=V(i).Magnitude_Squared();if(magnitude_squared>max_magnitude_squared){max_magnitude_squared=magnitude_squared;max_index=i;}}
     if(max_index){
         int p=deformable_body_collection.dynamic_particles(max_index);T max_magnitude=sqrt(max_magnitude_squared),max_magnitude_global=max_magnitude;
         if(deformable_body_collection.mpi_solids) max_magnitude_global=deformable_body_collection.mpi_solids->Reduce_Max_Global(max_magnitude_global);

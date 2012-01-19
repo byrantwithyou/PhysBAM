@@ -236,7 +236,7 @@ Broadcast_Collision_Modified_Data(ARRAY_VIEW<bool> modified,ARRAY_VIEW<bool> rec
         INDIRECT_ARRAY<ARRAY_VIEW<TV> > X_modified(X,recently_modified_indices),V_modified(V,recently_modified_indices);
         MPI_UTILITIES::Unpack(X_modified,V_modified,buffer,position,*comm);}
     else{
-        for(int i=1;i<=recently_modified.Size();i++) if(recently_modified(i)) recently_modified_indices.Append(i);
+        for(int i=0;i<recently_modified.Size();i++) if(recently_modified(i)) recently_modified_indices.Append(i);
         // TODO: remove +1 when LAM fixes assert
         ARRAY<char> buffer(1+MPI_UTILITIES::Pack_Size(recently_modified_indices,X.Subset(recently_modified_indices),V.Subset(recently_modified_indices),*comm),false);int position=0;
         MPI_UTILITIES::Pack(recently_modified_indices,X.Subset(recently_modified_indices),V.Subset(recently_modified_indices),buffer,position,*comm);
@@ -261,7 +261,7 @@ Gather_Collision_Modified_Data(ARRAY_VIEW<bool> modified,ARRAY_VIEW<bool> recent
             INDIRECT_ARRAY<ARRAY_VIEW<TV> > X_modified(X,recently_modified_indices),V_modified(V,recently_modified_indices);
             MPI_UTILITIES::Unpack(X_modified,V_modified,buffer,position,*comm);}}
     else{
-        for(int i=1;i<=recently_modified.Size();i++) if(recently_modified(i) && partition_id_from_particle_index(i)==Partition()) recently_modified_indices.Append(i);
+        for(int i=0;i<recently_modified.Size();i++) if(recently_modified(i) && partition_id_from_particle_index(i)==Partition()) recently_modified_indices.Append(i);
         // TODO: remove +1 when LAM fixes assert
         ARRAY<char> buffer(1+MPI_UTILITIES::Pack_Size(recently_modified_indices,X.Subset(recently_modified_indices),V.Subset(recently_modified_indices),*comm),false);int position=0;
         MPI_UTILITIES::Pack(recently_modified_indices,X.Subset(recently_modified_indices),V.Subset(recently_modified_indices),buffer,position,*comm);
@@ -299,7 +299,7 @@ All_Gather_Intersecting_Pairs(HASHTABLE<VECTOR<int,d1> >& intersecting_point_fac
         comm->Allgatherv(local_point_face_pairs.Get_Array_Pointer(),local_point_face_pairs.Size(),point_face_type,
             global_point_face_pairs.Get_Array_Pointer(),point_face_counts.Get_Array_Pointer(),point_face_displacements.Get_Array_Pointer(),point_face_type);
         // fill hash table
-        for(int i=1;i<=global_point_face_pairs.Size();i++) intersecting_point_face_pairs.Set(global_point_face_pairs(i));}}
+        for(int i=0;i<global_point_face_pairs.Size();i++) intersecting_point_face_pairs.Set(global_point_face_pairs(i));}}
 
     // gather edge edge pairs
     {int total_edge_edge_count=0;
@@ -314,7 +314,7 @@ All_Gather_Intersecting_Pairs(HASHTABLE<VECTOR<int,d1> >& intersecting_point_fac
         comm->Allgatherv(local_edge_edge_pairs.Get_Array_Pointer(),local_edge_edge_pairs.Size(),edge_edge_type,
             global_edge_edge_pairs.Get_Array_Pointer(),edge_edge_counts.Get_Array_Pointer(),edge_edge_displacements.Get_Array_Pointer(),edge_edge_type);
         // fill hash table
-        for(int i=1;i<=global_edge_edge_pairs.Size();i++) intersecting_edge_edge_pairs.Set(global_edge_edge_pairs(i));}}
+        for(int i=0;i<global_edge_edge_pairs.Size();i++) intersecting_edge_edge_pairs.Set(global_edge_edge_pairs(i));}}
 }
 //#####################################################################
 // Function All_Scatter_Adhesion_Pairs
@@ -537,7 +537,7 @@ Simple_Partition(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection_inpu
     RANGE<TV> box=RANGE<TV>::Bounding_Box(X);box.Change_Size(1e-6);GRID<TV> grid(counts+1,box);
     partition_id_from_particle_index.Remove_All();
     partition_id_from_particle_index.Resize(deformable_body_collection_input.particles.array_collection->Size()+rigid_geometry_collection_input.particles.array_collection->Size());
-    for(int p=1;p<=X.Size();p++){
+    for(int p=0;p<X.Size();p++){
         VECTOR<int,TV::m> cell=grid.Clamp_To_Cell(X(p));
         int cell_number=cell[1]-1;for(int i=2;i<=TV::m;i++) cell_number=cell_number*counts[i]+cell[i]-1;
         partition_id_from_particle_index(p)=Rank_To_Partition(cell_number);
@@ -620,7 +620,7 @@ template<class TV,class T_ARRAY_PAIR> void Distribute_Repulsion_Pairs_Helper(con
         int boundary_count=0;
         for(int i=0;i<pairs.m;i++){const T_PAIR& pair=pairs(i);
             PROCESSOR_VECTOR processors(mpi_solids.partition_id_from_particle_index.Subset(pair.nodes));
-            processor_masks(i)=0;for(int j=1;j<=processors.Size();j++) processor_masks(i)|=1<<(mpi_solids.Partition_To_Rank(processors[j]));
+            processor_masks(i)=0;for(int j=0;j<processors.Size();j++) processor_masks(i)|=1<<(mpi_solids.Partition_To_Rank(processors[j]));
             if(!power_of_two(processor_masks(i))){union_find.Union(pair.nodes);boundary_count++;}else internal_pairs(processors[1]).Append(i);}
         // Build connected components
         ARRAY<ARRAY<int> > components;ARRAY<unsigned int> component_processors;

@@ -69,7 +69,7 @@ Print_Matrix(VECTOR_T& V,VECTOR_T& F)
             V.solid_velocity*=0;
             V.solid_velocity.V(dynamic_particle_index)(axis)=(T)1;
             solid_system.Force(V.solid_velocity,F.solid_velocity);
-            for(int k=1;k<=V.solid_velocity.V.Size();k++) F.solid_velocity.V(k)=Solid_Sign()*(modified_mass(k)*V.solid_velocity.V(k)-solid_system.dt*F.solid_velocity.V(k));
+            for(int k=0;k<V.solid_velocity.V.Size();k++) F.solid_velocity.V(k)=Solid_Sign()*(modified_mass(k)*V.solid_velocity.V(k)-solid_system.dt*F.solid_velocity.V(k));
 
             LOG::cout<<F.solid_velocity.V(our_dynamic_particle_index)(our_axis)<<"\t";}
         LOG::cout<<std::endl;
@@ -87,7 +87,7 @@ Print_Matrix(VECTOR_T& V,VECTOR_T& F)
             else V.solid_velocity.rigid_V(rigid_particle_index).angular(component-TV::dimension)=(T)1;
 
             solid_system.Force(V.solid_velocity,F.solid_velocity);
-            for(int k=1;k<=F.solid_velocity.rigid_V.Size();k++){
+            for(int k=0;k<F.solid_velocity.rigid_V.Size();k++){
                 F.solid_velocity.rigid_V(k).linear=Solid_Sign()*(modified_world_space_rigid_mass(k)*V.solid_velocity.rigid_V(k).linear-solid_system.dt*F.solid_velocity.rigid_V(k).linear);
                 F.solid_velocity.rigid_V(k).angular=Solid_Sign()*(modified_world_space_rigid_inertia_tensor(k)*V.solid_velocity.rigid_V(k).angular-solid_system.dt*F.solid_velocity.rigid_V(k).angular);}
             
@@ -106,8 +106,8 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& bV,KRYLOV_VECTOR_BASE<T>& bF) const
     const VECTOR_T& V=debug_cast<const VECTOR_T&>(bV);VECTOR_T& F=debug_cast<VECTOR_T&>(bF);
     solid_system.Force(V.solid_velocity,F.solid_velocity);
     // fluid_mass has components as vectors; need to scale velocities by each mass separately.
-    for(int i=1;i<=V.solid_velocity.V.Size();i++) F.solid_velocity.V(i)=Solid_Sign()*(modified_mass(i)*V.solid_velocity.V(i)-solid_system.dt*F.solid_velocity.V(i));
-    for(int i=1;i<=V.solid_velocity.rigid_V.Size();i++){
+    for(int i=0;i<V.solid_velocity.V.Size();i++) F.solid_velocity.V(i)=Solid_Sign()*(modified_mass(i)*V.solid_velocity.V(i)-solid_system.dt*F.solid_velocity.V(i));
+    for(int i=0;i<V.solid_velocity.rigid_V.Size();i++){
         F.solid_velocity.rigid_V(i).linear=Solid_Sign()*(modified_world_space_rigid_mass(i)*V.solid_velocity.rigid_V(i).linear-solid_system.dt*F.solid_velocity.rigid_V(i).linear);
         F.solid_velocity.rigid_V(i).angular=Solid_Sign()*(modified_world_space_rigid_inertia_tensor(i)*V.solid_velocity.rigid_V(i).angular-solid_system.dt*F.solid_velocity.rigid_V(i).angular);}
 
@@ -123,8 +123,8 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& bV,KRYLOV_VECTOR_BASE<T>& bF) const
         Add_J_Rigid_Times_Pressure(J_rigid,V.pressure(i),F.solid_velocity);
         Add_J_Deformable_Times_Pressure(J_deformable,V.pressure(i),F.solid_velocity);}
 
-    for(int i=1;i<=V.solid_velocity.V.Size();i++) F.solid_velocity.V(i)=one_over_modified_mass(i)*F.solid_velocity.V(i);
-    for(int i=1;i<=V.solid_velocity.rigid_V.Size();i++){
+    for(int i=0;i<V.solid_velocity.V.Size();i++) F.solid_velocity.V(i)=one_over_modified_mass(i)*F.solid_velocity.V(i);
+    for(int i=0;i<V.solid_velocity.rigid_V.Size();i++){
         F.solid_velocity.rigid_V(i).linear=modified_world_space_rigid_mass_inverse(i)*F.solid_velocity.rigid_V(i).linear;
         F.solid_velocity.rigid_V(i).angular=modified_world_space_rigid_inertia_tensor_inverse(i)*F.solid_velocity.rigid_V(i).angular;}
 }
@@ -169,8 +169,8 @@ Inner_Product(const KRYLOV_VECTOR_BASE<T>& bV1,const KRYLOV_VECTOR_BASE<T>& bV2)
     const VECTOR_T& V1=debug_cast<const VECTOR_T&>(bV1),&V2=debug_cast<const VECTOR_T&>(bV2);
     double fluid_inner_product=0.0;for(int i=0;i<V1.pressure.m;i++) fluid_inner_product+=Dot_Product_Double_Precision(V1.pressure(i),V2.pressure(i));
     double solid_inner_product=0.0;
-    for(int i=1;i<=V1.solid_velocity.V.Size();i++) solid_inner_product+=Dot_Product(V1.solid_velocity.V(i),modified_mass(i)*V2.solid_velocity.V(i));
-    for(int i=1;i<=V1.solid_velocity.rigid_V.Size();i++){
+    for(int i=0;i<V1.solid_velocity.V.Size();i++) solid_inner_product+=Dot_Product(V1.solid_velocity.V(i),modified_mass(i)*V2.solid_velocity.V(i));
+    for(int i=0;i<V1.solid_velocity.rigid_V.Size();i++){
         solid_inner_product+=Dot_Product(V1.solid_velocity.rigid_V(i).linear,modified_world_space_rigid_mass(i)*V2.solid_velocity.rigid_V(i).linear);
         solid_inner_product+=Dot_Product(V1.solid_velocity.rigid_V(i).angular,modified_world_space_rigid_inertia_tensor(i)*V2.solid_velocity.rigid_V(i).angular);}
     //LOG::cout<<"Inner product: solid: "<<solid_inner_product<<" fluid: "<<fluid_inner_product<<std::endl;

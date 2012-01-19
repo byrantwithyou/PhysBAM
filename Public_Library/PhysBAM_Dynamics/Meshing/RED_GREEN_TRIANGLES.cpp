@@ -55,7 +55,7 @@ Refine_Simplex_List(const T_ARRAY& triangle_list)
     STATIC_ASSERT((IS_SAME<int,typename T_ARRAY::ELEMENT>::value));
     object.particles.array_collection->Preallocate(object.particles.array_collection->Size()+3*triangle_list.Size());
     for(int level=0;level<index_in_stack.m;level++) index_in_stack(level)->Fill(0);
-    for(int i=1;i<=triangle_list.Size();i++){
+    for(int i=0;i<triangle_list.Size();i++){
         int level,tri;leaf_levels_and_indices(triangle_list(i)).Get(level,tri);
         if(!Red(level,tri)){tri=(*parent(level))(tri);level-=1;}
         stack.Append(VECTOR<int,2>(level,tri));(*index_in_stack(level))(tri)=stack.m;

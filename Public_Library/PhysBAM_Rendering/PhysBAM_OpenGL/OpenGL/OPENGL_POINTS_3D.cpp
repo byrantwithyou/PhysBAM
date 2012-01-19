@@ -55,7 +55,7 @@ Display(const int in_color) const
     if(mode==GL_SELECT){
         glPushName(0);
         color.Send_To_GL_Pipeline();
-        for(int i=1;i<=points.Size();i++)if(!draw_mask || (*draw_mask)(i)){
+        for(int i=0;i<points.Size();i++)if(!draw_mask || (*draw_mask)(i)){
             glLoadName(i);
             ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
             OpenGL_Vertex(points(i),vertices);
@@ -67,14 +67,14 @@ Display(const int in_color) const
         color.Send_To_GL_Pipeline(); // set color outside OpenGL_Begin/OpenGL_End to work around apparent driver bug
         ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
         if(draw_mask){
-            if(point_colors){for(int i=1;i<=points.Size();i++)if((*draw_mask)(i)){(*point_colors)(i).Send_To_GL_Pipeline();OpenGL_Vertex(points(i), vertices);}}
-            else{color.Send_To_GL_Pipeline();for(int i=1;i<=points.Size();i++)if((*draw_mask)(i)) OpenGL_Vertex(points(i), vertices);}}
-        else if(point_colors) for(int i=1;i<=points.Size();i++){(*point_colors)(i).Send_To_GL_Pipeline();OpenGL_Vertex(points(i), vertices);}
-        else{color.Send_To_GL_Pipeline();for(int i=1;i<=points.Size();i++)OpenGL_Vertex(points(i),vertices);}
+            if(point_colors){for(int i=0;i<points.Size();i++)if((*draw_mask)(i)){(*point_colors)(i).Send_To_GL_Pipeline();OpenGL_Vertex(points(i), vertices);}}
+            else{color.Send_To_GL_Pipeline();for(int i=0;i<points.Size();i++)if((*draw_mask)(i)) OpenGL_Vertex(points(i), vertices);}}
+        else if(point_colors) for(int i=0;i<points.Size();i++){(*point_colors)(i).Send_To_GL_Pipeline();OpenGL_Vertex(points(i), vertices);}
+        else{color.Send_To_GL_Pipeline();for(int i=0;i<points.Size();i++)OpenGL_Vertex(points(i),vertices);}
         OpenGL_Draw_Arrays(GL_POINTS,3,vertices);
 #ifndef USE_OPENGLES
         if(draw_point_numbers)
-            for(int i=1;i<=points.Size();i++)if(!draw_mask || (*draw_mask)(i)){
+            for(int i=0;i<points.Size();i++)if(!draw_mask || (*draw_mask)(i)){
                 OPENGL_COLOR label_color=(point_colors)?((*point_colors)(i)*0.8):(color*0.8);
                 label_color.Send_To_GL_Pipeline();
                 OpenGL_String(points(i),point_ids?STRING_UTILITIES::string_sprintf("%d [id=%d] [%g %g]",i,(*point_ids)(i),points(i).x,points(i).y):STRING_UTILITIES::string_sprintf("%d",i));}
@@ -147,7 +147,7 @@ template<class T,class T_ARRAY> void OPENGL_POINTS_3D<T,T_ARRAY>::
 Filter_By_Slice_Planes(const PLANE<T> &leftplane, const PLANE<T> &rightplane)
 {
     Store_Draw_Mask(true);
-    for(int i=1;i<=points.Size();i++) (*draw_mask)(i)=leftplane.Lazy_Inside(points(i)) && rightplane.Lazy_Inside(points(i));
+    for(int i=0;i<points.Size();i++) (*draw_mask)(i)=leftplane.Lazy_Inside(points(i)) && rightplane.Lazy_Inside(points(i));
 }
 //#####################################################################
 // Function Clear_Filter

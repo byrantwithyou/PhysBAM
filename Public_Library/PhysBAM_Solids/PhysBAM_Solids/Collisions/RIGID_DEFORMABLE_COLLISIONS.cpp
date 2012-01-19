@@ -610,7 +610,7 @@ Process_Contact(const T dt,const T time,ARTICULATED_RIGID_BODY<TV>* articulated_
     ARRAY<ARRAY<VECTOR<int,2> > >& contact_pairs_for_level=use_saved_pairs?rigid_body_collisions.saved_contact_pairs_for_level:rigid_body_collisions.precomputed_contact_pairs_for_level;
     while(need_another_iteration && ++iteration<=solids_parameters.rigid_body_collision_parameters.contact_iterations){need_another_iteration=false;
         if(solids_parameters.rigid_body_collision_parameters.use_epsilon_scaling) epsilon_scale=(T)iteration/solids_parameters.rigid_body_collision_parameters.contact_iterations;
-        for(int level=1;level<=rigid_body_collisions.contact_graph.Number_Of_Levels();level++){
+        for(int level=0;level<rigid_body_collisions.contact_graph.Number_Of_Levels();level++){
             ARRAY<VECTOR<int,2> >& pairs=contact_pairs_for_level(level);
             const ARRAY<int>& rigid_bodies_in_level=rigid_body_collisions.contact_graph.directed_graph.Nodes_In_Level(level);
             bool need_another_level_iteration=true;int level_iteration=0;
@@ -1222,7 +1222,7 @@ Process_Push_Out()
     while(need_another_iteration && ++iteration<=rigid_body_collisions.push_out_iterations){need_another_iteration=false;
         if(!kinematic_rigid_bodies_only){
             if(rigid_body_collisions.use_freezing_with_push_out) rigid_body_collisions.Clear_Temporarily_Static();
-            for(int level=1;level<=rigid_body_collisions.contact_graph.Number_Of_Levels();level++){
+            for(int level=0;level<rigid_body_collisions.contact_graph.Number_Of_Levels();level++){
                 const ARRAY<int>& rigid_bodies_in_level=rigid_body_collisions.contact_graph.directed_graph.Nodes_In_Level(level);
                 int level_iteration=0;bool need_more_level_iterations=true;T move_fraction=1;
                 while(need_more_level_iterations && ++level_iteration<=rigid_body_collisions.push_out_level_iterations){need_more_level_iterations=false;

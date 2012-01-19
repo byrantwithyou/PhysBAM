@@ -33,7 +33,7 @@ public:
     {
         const T_ARRAY& elements=base_elements.Derived();
         elements_of_container.Remove_All();
-        for(int t=1;t<=elements.Size();t++) if(ID id=element_to_container_id(elements(t))) elements_of_container.Get_Or_Insert(id).Append(elements(t));
+        for(int t=0;t<elements.Size();t++) if(ID id=element_to_container_id(elements(t))) elements_of_container.Get_Or_Insert(id).Append(elements(t));
         if(remove_duplicates)
             for(HASHTABLE_ITERATOR<ID,ARRAY<int> > iterator(elements_of_container);iterator.Valid();iterator.Next())
                 iterator.Data().Prune_Duplicates();

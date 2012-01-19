@@ -17,7 +17,7 @@ void Do_It()
 
     TRIANGULATED_SURFACE<T>* merged_surface=TRIANGULATED_SURFACE<T>::Create();
 
-    for(int i=1;i<=parse_args.Num_Extra_Args();i++){
+    for(int i=0;i<parse_args.Num_Extra_Args();i++){
         std::cout << "Reading " << parse_args.Extra_Arg(i) << std::endl;
         TRIANGULATED_SURFACE<T> *surface=0;FILE_UTILITIES::Create_From_File<T>(parse_args.Extra_Arg(i),surface);
         surface->Discard_Valence_Zero_Particles_And_Renumber();

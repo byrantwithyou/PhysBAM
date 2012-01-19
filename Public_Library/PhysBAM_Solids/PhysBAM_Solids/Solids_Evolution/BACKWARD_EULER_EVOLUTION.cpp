@@ -52,7 +52,7 @@ public:
     dF.v*=dt; // include embedded particles
     solid_body_collection.Add_Velocity_Dependent_Forces(dV.v.array,rigid_dV,dF.v.array,rigid_dF,time);
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Force_To_Parents(dF.v.array);
-    for(int p=1;p<=dV.v.Size();p++) dF.v(p)=dV.v(p)-dt*one_over_mass(p)*dF.v(p);}
+    for(int p=0;p<dV.v.Size();p++) dF.v(p)=dV.v(p)-dt*one_over_mass(p)*dF.v(p);}
 
     void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& dV) const PHYSBAM_OVERRIDE
     {Project(dV);}
@@ -99,7 +99,7 @@ One_Newton_Step_Backward_Euler(const T dt,const T time,ARRAY_VIEW<const TV> V_sa
     solid_body_collection.deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Velocities();
     solid_body_collection.Add_All_Forces(F_full,rigid_F_full,time);example_forces_and_velocities.Add_External_Forces(F_full,time);
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Force_To_Parents(F_full);
-    for(int p=1;p<=B.v.Size();p++) B.v(p)=V_save(p)-V.v(p)+dt*one_over_mass(p)*F.v(p);
+    for(int p=0;p<B.v.Size();p++) B.v(p)=V_save(p)-V.v(p)+dt*one_over_mass(p)*F.v(p);
 
     BACKWARD_EULER_SYSTEM<TV> system(solid_body_collection,dt,time);
     CONJUGATE_GRADIENT<T> cg;
@@ -136,7 +136,7 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids) // TOD
         INDIRECT_ARRAY<ARRAY_VIEW<TV> > X(particles.X,solid_body_collection.deformable_body_collection.dynamic_particles),V(particles.V,solid_body_collection.deformable_body_collection.dynamic_particles),
             dV(dV_full,solid_body_collection.deformable_body_collection.dynamic_particles),R(R_full,solid_body_collection.deformable_body_collection.dynamic_particles);
         V+=dV;
-        for(int p=1;p<=X.Size();p++) X(p)+=dt*dV(p);
+        for(int p=0;p<X.Size();p++) X(p)+=dt*dV(p);
         binding_list.Clamp_Particles_To_Embedded_Positions();
         solid_body_collection.Update_Position_Based_State(time+dt,false);
         // compute residual
@@ -144,7 +144,7 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids) // TOD
         solid_body_collection.Add_All_Forces(R_full,rigid_R_full,time+dt);example_forces_and_velocities.Add_External_Forces(R_full,time+dt);
         binding_list.Distribute_Force_To_Parents(R_full);
         INDIRECT_ARRAY<ARRAY_VIEW<T> > one_over_mass(particles.one_over_mass,solid_body_collection.deformable_body_collection.dynamic_particles);
-        for(int p=1;p<=R.Size();p++) R(p)=V_save(p)-V(p)+dt*one_over_mass(p)*R(p);
+        for(int p=0;p<R.Size();p++) R(p)=V_save(p)-V(p)+dt*one_over_mass(p)*R(p);
         example_forces_and_velocities.Zero_Out_Enslaved_Velocity_Nodes(R_full,time+dt,time+dt);
         supnorm=ARRAYS_COMPUTATIONS::Maximum_Magnitude(R);
         if(solid_body_collection.print_residuals) LOG::cout<<"Newton iteration residual after "<<iteration+1<<" iterations = "<<supnorm<<std::endl;

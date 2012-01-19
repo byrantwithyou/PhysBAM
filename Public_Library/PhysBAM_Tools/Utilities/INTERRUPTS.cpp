@@ -16,7 +16,7 @@ ARRAY<void(*)()> interrupt_checkers;
 //#####################################################################
 void Check_For_Interrupts()
 {
-    for(int i=1;i<=interrupt_checkers.Size();i++)
+    for(int i=0;i<interrupt_checkers.Size();i++)
         interrupt_checkers(i)();
 }
 //#####################################################################

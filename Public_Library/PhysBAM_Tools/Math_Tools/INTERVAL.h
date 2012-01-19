@@ -112,7 +112,7 @@ public:
     template<class T_ARRAY>
     void Enlarge_Nonempty_Box_To_Include_Points(const T_ARRAY& points)
     {STATIC_ASSERT((IS_SAME<typename T_ARRAY::ELEMENT,T>::value));
-    for(int i=1;i<=points.Size();i++) Enlarge_Nonempty_Box_To_Include_Point(points(i));}
+    for(int i=0;i<points.Size();i++) Enlarge_Nonempty_Box_To_Include_Point(points(i));}
 
     void Enlarge_To_Include_Box(const INTERVAL& interval)
     {min_corner=min(min_corner,interval.min_corner);max_corner=max(max_corner,interval.max_corner);}

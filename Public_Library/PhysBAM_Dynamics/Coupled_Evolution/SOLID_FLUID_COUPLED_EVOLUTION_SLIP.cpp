@@ -235,9 +235,9 @@ Setup_Solids(const T dt,const T current_velocity_time,const T current_position_t
 
     // TODO: make sure that V.V.Size() is in fact indexed only over the dynamic particles
     int state1=COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_OLD_STATE;int state2=COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_NEW_STATE;
-    if(collisions) for(int i=1;i<=B.V.Size();i++)
+    if(collisions) for(int i=0;i<B.V.Size();i++)
         B.V(i)=collisions->Pointwise_Node_Pseudo_Velocity(B.V.indices(i),state1,state2);
-    for(int i=1;i<=B.rigid_V.Size();i++){
+    for(int i=0;i<B.rigid_V.Size();i++){
         RIGID_COLLISION_GEOMETRY<TV>* collision_geometry=
             dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>*>(fluids_parameters.collision_bodies_affecting_fluid->collision_geometry_collection.Get_Collision_Geometry(B.rigid_V.indices(i)));
         assert(collision_geometry);

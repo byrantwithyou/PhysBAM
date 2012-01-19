@@ -508,7 +508,7 @@ Check_Improvement()
     if(mpi_solids) old_total_volume=mpi_solids->Reduce_Add_Global(old_total_volume);
     old_total_volume_accumulated+=old_total_volume;
     if(volumes.Size()!=rest_volumes.Size() || volumes.Size()!=saved_volumes.Size()){LOG::cout<<"Volume arrays have different sizes!"<<std::endl;PHYSBAM_FATAL_ERROR();}
-    for(int i=1;i<=volumes.Size();i++) if(rest_volumes(i)){
+    for(int i=0;i<volumes.Size();i++) if(rest_volumes(i)){
         T old_v=abs((saved_volumes(i)-rest_volumes(i))/rest_volumes(i)),new_v=abs((volumes(i)-rest_volumes(i))/rest_volumes(i)),diff=new_v-old_v;
         ave_improve+=diff;
         max_improve=max(max_improve,diff);

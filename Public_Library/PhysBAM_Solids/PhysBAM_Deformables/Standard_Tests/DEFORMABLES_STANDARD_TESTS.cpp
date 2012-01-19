@@ -409,7 +409,7 @@ Embed_Particles_In_Tetrahedralized_Volume(BINDING_LIST<VECTOR<T,3> >& binding_li
     bool hierarchy_initialized=tetrahedralized_volume.hierarchy!=0;if(!hierarchy_initialized) tetrahedralized_volume.Initialize_Hierarchy();
     const ARRAY<TETRAHEDRON<T> >& tetrahedron_list=*tetrahedralized_volume.tetrahedron_list;
     ARRAY<int> candidate_tets;
-    for(int p=1;p<=particles_to_embed.Size();p++){
+    for(int p=0;p<particles_to_embed.Size();p++){
         VECTOR<T,3> X=particles_to_embed.X(p);T current_thickness_over_two=thickness_over_two;candidate_tets.Resize(0);
         // find tetrahedron
         int embedding_tet=0;

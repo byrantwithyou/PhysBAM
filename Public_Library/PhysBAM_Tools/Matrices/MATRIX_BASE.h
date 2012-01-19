@@ -104,27 +104,27 @@ protected:
     // Logic only; no type or bounds checking; requires all arguments to be distinct
     template<class T_MATRIX1,class T_MATRIX2,class T_MATRIX3>
     static void Add_Times_Matrix_Helper(const T_MATRIX1& A,const T_MATRIX2& B,T_MATRIX3& C)
-    {for(int j=1;j<=B.Columns();j++) for(int k=1;k<=A.Columns();k++) for(int i=1;i<=A.Rows();i++) C(i,j)+=A(i,k)*B(k,j);}
+    {for(int j=0;j<B.Columns();j++) for(int k=0;k<A.Columns();k++) for(int i=0;i<A.Rows();i++) C(i,j)+=A(i,k)*B(k,j);}
 
     template<class T_MATRIX1,class T_MATRIX2,class T_MATRIX3>
     static void Add_Transpose_Times_Matrix_Helper(const T_MATRIX1& A,const T_MATRIX2& B,T_MATRIX3& C)
-    {for(int j=1;j<=B.Columns();j++) for(int i=1;i<=A.Columns();i++) for(int k=1;k<=A.Rows();k++) C(i,j)+=A(k,i)*B(k,j);}
+    {for(int j=0;j<B.Columns();j++) for(int i=0;i<A.Columns();i++) for(int k=0;k<A.Rows();k++) C(i,j)+=A(k,i)*B(k,j);}
 
     template<class T_MATRIX1,class T_MATRIX2,class T_MATRIX3>
     static void Add_Times_Transpose_Matrix_Helper(const T_MATRIX1& A,const T_MATRIX2& B,T_MATRIX3& C)
-    {for(int k=1;k<=A.Columns();k++) for(int j=1;j<=B.Rows();j++) for(int i=1;i<=A.Rows();i++) C(i,j)+=A(i,k)*B(j,k);}
+    {for(int k=0;k<A.Columns();k++) for(int j=0;j<B.Rows();j++) for(int i=0;i<A.Rows();i++) C(i,j)+=A(i,k)*B(j,k);}
 
     template<class T_MATRIX1,class T_VECTOR,class T_VECTOR2>
     static void Add_Transpose_Times_Vector_Helper(const T_MATRIX1& A,const VECTOR_BASE<T,T_VECTOR>& v,VECTOR_BASE<T,T_VECTOR2>& y)
-    {for(int i=1;i<=y.Size();i++) for(int j=1;j<=v.Size();j++) y(i)+=A(j,i)*v(j);}
+    {for(int i=0;i<y.Size();i++) for(int j=0;j<v.Size();j++) y(i)+=A(j,i)*v(j);}
 
     template<class T_MATRIX1,class T_VECTOR,class T_VECTOR2>
     static void Add_Times_Vector_Helper(const T_MATRIX1& A,const VECTOR_BASE<T,T_VECTOR>& v,VECTOR_BASE<T,T_VECTOR2>& y)
-    {for(int j=1;j<=v.Size();j++) for(int i=1;i<=y.Size();i++) y(i)+=A(i,j)*v(j);}
+    {for(int j=0;j<v.Size();j++) for(int i=0;i<y.Size();i++) y(i)+=A(i,j)*v(j);}
 
     template<class T_MATRIX1,class T_VECTOR,class T_VECTOR2>
     static void Subtract_Times_Vector_Helper(const T_MATRIX1& A,const VECTOR_BASE<T,T_VECTOR>& v,VECTOR_BASE<T,T_VECTOR2>& y)
-    {for(int j=1;j<=v.Size();j++) for(int i=1;i<=y.Size();i++) y(i)-=A(i,j)*v(j);}
+    {for(int j=0;j<v.Size();j++) for(int i=0;i<y.Size();i++) y(i)-=A(i,j)*v(j);}
 
     template<class T_MATRIX1,class T_MATRIX2>
     static bool Test_Aliased(const T_MATRIX1& A,const T_MATRIX2& B)
@@ -192,7 +192,7 @@ public:
     template<int d>
     typename TRANSPOSE_PRODUCT<T_MATRIX,DIAGONAL_MATRIX<T,d> >::TYPE Transpose_Times(const DIAGONAL_MATRIX<T,d>& A) const
     {WARN_IF_NOT_EFFICIENT(T_MATRIX);typename TRANSPOSE_PRODUCT<T_MATRIX,DIAGONAL_MATRIX<T,d> >::TYPE M((INITIAL_SIZE)Columns(),(INITIAL_SIZE)d);
-    for(int i=1;i<=Columns();i++) for(int k=1;k<=Rows();k++) M(i,k)=(*this)(k,i)*A(k,k);return M;}
+    for(int i=0;i<Columns();i++) for(int k=0;k<Rows();k++) M(i,k)=(*this)(k,i)*A(k,k);return M;}
 
     template<class T_MATRIX1>
     typename PRODUCT_TRANSPOSE<T_MATRIX,T_MATRIX1>::TYPE Times_Transpose(const MATRIX_BASE<T,T_MATRIX1>& A) const
@@ -223,7 +223,7 @@ public:
     template<int d>
     typename PRODUCT<T_MATRIX,DIAGONAL_MATRIX<T,d> >::TYPE operator*(const DIAGONAL_MATRIX<T,d>& A) const
     {WARN_IF_NOT_EFFICIENT(T_MATRIX);typename PRODUCT<T_MATRIX,DIAGONAL_MATRIX<T,d> >::TYPE M((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());
-    for(int k=1;k<=Columns();k++) for(int i=1;i<=Rows();i++) M(i,k)=(*this)(i,k)*A(k,k);return M;}
+    for(int k=0;k<Columns();k++) for(int i=0;i<Rows();i++) M(i,k)=(*this)(i,k)*A(k,k);return M;}
 
     template<int d>
     typename PRODUCT<T_MATRIX,SYMMETRIC_MATRIX<T,d> >::TYPE operator*(const SYMMETRIC_MATRIX<T,d>& A) const
@@ -233,23 +233,23 @@ public:
     T_MATRIX operator*(const UPPER_TRIANGULAR_MATRIX<T,d>& A) const
     {WARN_IF_NOT_EFFICIENT(T_MATRIX);assert(Columns()==d);
     T_MATRIX M((INITIAL_SIZE)Rows(),(INITIAL_SIZE)d);
-    for(int j=0;j<d;j++) for(int k=0;k<j;k++) for(int i=1;i<=Rows();i++) M(i,j)+=(*this)(i,k)*A(k,j);return M;}
+    for(int j=0;j<d;j++) for(int k=0;k<j;k++) for(int i=0;i<Rows();i++) M(i,j)+=(*this)(i,k)*A(k,j);return M;}
 
     T_MATRIX& operator*=(const T a)
-    {WARN_IF_NOT_EFFICIENT(T_MATRIX);for(int j=1;j<=Columns();j++) for(int i=1;i<=Rows();i++) (*this)(i,j)*=a;return Derived();}
+    {WARN_IF_NOT_EFFICIENT(T_MATRIX);for(int j=0;j<Columns();j++) for(int i=0;i<Rows();i++) (*this)(i,j)*=a;return Derived();}
 
     T_MATRIX& operator/=(const T a)
     {WARN_IF_NOT_EFFICIENT(T_MATRIX);return Derived()*=(1/a);}
 
     T_MATRIX operator*(const T a) const
     {WARN_IF_NOT_EFFICIENT(T_MATRIX);T_MATRIX matrix((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());
-    for(int j=1;j<=Columns();j++) for(int i=1;i<=Rows();i++) matrix(i,j)=(*this)(i,j)*a;return matrix;}
+    for(int j=0;j<Columns();j++) for(int i=0;i<Rows();i++) matrix(i,j)=(*this)(i,j)*a;return matrix;}
 
     T_MATRIX operator/(const T a) const
     {WARN_IF_NOT_EFFICIENT(T_MATRIX);return Derived()*(1/a);}
 
     T_MATRIX& operator+=(const T a)
-    {WARN_IF_NOT_EFFICIENT(T_MATRIX);assert(Rows()==Columns());for(int i=1;i<=Rows();i++) (*this)(i,i)+=a;return Derived();}
+    {WARN_IF_NOT_EFFICIENT(T_MATRIX);assert(Rows()==Columns());for(int i=0;i<Rows();i++) (*this)(i,i)+=a;return Derived();}
 
     T_MATRIX operator+(const T a) const
     {WARN_IF_NOT_EFFICIENT(T_MATRIX);return T_MATRIX(Derived())+=a;}
@@ -257,48 +257,48 @@ public:
     template<class T_MATRIX1>
     T_MATRIX& operator+=(const MATRIX_BASE<T,T_MATRIX1>& A)
     {WARN_IF_NOT_EFFICIENT(T_MATRIX,T_MATRIX1);assert(Rows()==A.Rows() && Columns()==A.Columns());
-    for(int j=1;j<=Columns();j++) for(int i=1;i<=Rows();i++) (*this)(i,j)+=A(i,j);return Derived();}
+    for(int j=0;j<Columns();j++) for(int i=0;i<Rows();i++) (*this)(i,j)+=A(i,j);return Derived();}
 
     template<int d>
     T_MATRIX& operator+=(const SYMMETRIC_MATRIX<T,d>& A)
     {WARN_IF_NOT_EFFICIENT(T_MATRIX,SYMMETRIC_MATRIX<T,d>);assert(Rows()==A.Rows() && Columns()==A.Columns());
-    for(int j=1;j<=Columns();j++){for(int i=j+1;i<=Rows();i++){T element=A.Element_Lower(i,j);(*this)(i,j)+=element;(*this)(j,i)+=element;}(*this)(j,j)+=A.Element_Lower(j,j);}
+    for(int j=0;j<Columns();j++){for(int i=j+1;i<=Rows();i++){T element=A.Element_Lower(i,j);(*this)(i,j)+=element;(*this)(j,i)+=element;}(*this)(j,j)+=A.Element_Lower(j,j);}
     return Derived();}
 
     template<class T_MATRIX1>
     T_MATRIX& operator-=(const MATRIX_BASE<T,T_MATRIX1>& A)
     {WARN_IF_NOT_EFFICIENT(T_MATRIX,T_MATRIX1);assert(Rows()==A.Rows() && Columns()==A.Columns());
-    for(int j=1;j<=Columns();j++) for(int i=1;i<=Rows();i++) (*this)(i,j)-=A(i,j);return Derived();}
+    for(int j=0;j<Columns();j++) for(int i=0;i<Rows();i++) (*this)(i,j)-=A(i,j);return Derived();}
 
     template<class T_MATRIX1>
     T_MATRIX operator+(const MATRIX_BASE<T,T_MATRIX1>& A) const
     {WARN_IF_NOT_EFFICIENT(T_MATRIX,T_MATRIX1);assert(Rows()==A.Rows() && Columns()==A.Columns());T_MATRIX matrix((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());
-    for(int j=1;j<=Columns();j++) for(int i=1;i<=Rows();i++) matrix(i,j)=(*this)(i,j)+A(i,j);return matrix;}
+    for(int j=0;j<Columns();j++) for(int i=0;i<Rows();i++) matrix(i,j)=(*this)(i,j)+A(i,j);return matrix;}
 
     template<class T_MATRIX1>
     T_MATRIX operator-(const MATRIX_BASE<T,T_MATRIX1>& A) const
     {WARN_IF_NOT_EFFICIENT(T_MATRIX,T_MATRIX1);assert(Rows()==A.Rows() && Columns()==A.Columns());T_MATRIX matrix((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());
-    for(int j=1;j<=Columns();j++) for(int i=1;i<=Rows();i++) matrix(i,j)=(*this)(i,j)-A(i,j);return matrix;}
+    for(int j=0;j<Columns();j++) for(int i=0;i<Rows();i++) matrix(i,j)=(*this)(i,j)-A(i,j);return matrix;}
 
     T_MATRIX operator-() const
     {WARN_IF_NOT_EFFICIENT(T_MATRIX);T_MATRIX matrix((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());
-    for(int j=1;j<=Columns();j++) for(int i=1;i<=Rows();i++) matrix(i,j)=-(*this)(i,j);return matrix;}
+    for(int j=0;j<Columns();j++) for(int i=0;i<Rows();i++) matrix(i,j)=-(*this)(i,j);return matrix;}
 
     T Max_Abs() const
-    {T max_abs=0;for(int j=1;j<=Columns();j++) for(int i=1;i<=Rows();i++) max_abs=max(max_abs,abs((*this)(i,j)));return max_abs;}
+    {T max_abs=0;for(int j=0;j<Columns();j++) for(int i=0;i<Rows();i++) max_abs=max(max_abs,abs((*this)(i,j)));return max_abs;}
 
     T Infinity_Norm() const
-    {T max_sum=0;for(int j=1;j<=Columns();j++){T sum=0;for(int i=1;i<=Rows();i++) sum+=abs((*this)(i,j));max_sum=max(sum,max_sum);}return max_sum;}
+    {T max_sum=0;for(int j=0;j<Columns();j++){T sum=0;for(int i=0;i<Rows();i++) sum+=abs((*this)(i,j));max_sum=max(sum,max_sum);}return max_sum;}
 
     T Frobenius_Norm() const
     {return sqrt(Derived().Frobenius_Norm_Squared());}
 
     T Frobenius_Norm_Squared() const
-    {WARN_IF_NOT_EFFICIENT(T_MATRIX);T sum=0;for(int j=1;j<=Columns();j++) for(int i=1;i<=Rows();i++) sum+=sqr((*this)(i,j));return sum;}
+    {WARN_IF_NOT_EFFICIENT(T_MATRIX);T sum=0;for(int j=0;j<Columns();j++) for(int i=0;i<Rows();i++) sum+=sqr((*this)(i,j));return sum;}
 
     template<class T_MATRIX2>
     void Set_Submatrix(const int istart,const int jstart,const MATRIX_BASE<T,T_MATRIX2>& a)
-    {for(int i=1;i<=a.Rows();i++) for(int j=1;j<=a.Columns();j++) (*this)(istart+i-1,jstart+j-1)=a(i,j);}
+    {for(int i=0;i<a.Rows();i++) for(int j=0;j<a.Columns();j++) (*this)(istart+i-1,jstart+j-1)=a(i,j);}
 
     void Set_Submatrix(const int istart,const int jstart,const SYMMETRIC_MATRIX<T,3>& a)
     {(*this)(istart,jstart)=a.x11;(*this)(istart,jstart+1)=a.x21;(*this)(istart+1,jstart)=a.x21;(*this)(istart,jstart+2)=a.x31;(*this)(istart+2,jstart)=a.x31;
@@ -309,14 +309,14 @@ public:
 
     template<class T_VECTOR>
     void Set_Submatrix(const int istart,const int jstart,const VECTOR_BASE<T,T_VECTOR>& a)
-    {for(int i=1;i<=a.Size();i++) (*this)(istart+i-1,jstart)=a(i);}
+    {for(int i=0;i<a.Size();i++) (*this)(istart+i-1,jstart)=a(i);}
 
     void Set_Submatrix(const int istart,const int jstart,const SYMMETRIC_MATRIX<T,2>& a)
     {(*this)(istart,jstart)=a.x11;(*this)(istart,jstart+1)=a.x21;(*this)(istart+1,jstart)=a.x21;(*this)(istart+1,jstart+1)=a.x22;}
 
     template<class T_MATRIX2>
     void Add_To_Submatrix(const int istart,const int jstart,const MATRIX_BASE<T,T_MATRIX2>& a)
-    {for(int i=1;i<=a.Rows();i++) for(int j=1;j<=a.Columns();j++) (*this)(istart+i-1,jstart+j-1)+=a(i,j);}
+    {for(int i=0;i<a.Rows();i++) for(int j=0;j<a.Columns();j++) (*this)(istart+i-1,jstart+j-1)+=a(i,j);}
 
     void Add_To_Submatrix(const int istart,const int jstart,const SYMMETRIC_MATRIX<T,3>& a)
     {(*this)(istart,jstart)+=a.x11;(*this)(istart,jstart+1)+=a.x21;(*this)(istart+1,jstart)+=a.x21;(*this)(istart,jstart+2)+=a.x31;(*this)(istart+2,jstart)+=a.x31;
@@ -330,15 +330,15 @@ public:
 
     template<class T_VECTOR>
     void Add_To_Submatrix(const int istart,const int jstart,const VECTOR_BASE<T,T_VECTOR>& a)
-    {for(int i=1;i<=a.Size();i++) (*this)(istart+i-1,jstart)+=a(i);}
+    {for(int i=0;i<a.Size();i++) (*this)(istart+i-1,jstart)+=a(i);}
 
     template<class T_MATRIX2>
     void Subtract_From_Submatrix(const int istart,const int jstart,const MATRIX_BASE<T,T_MATRIX2>& a)
-    {for(int i=1;i<=a.Rows();i++) for(int j=1;j<=a.Columns();j++) (*this)(istart+i-1,jstart+j-1)-=a(i,j);}
+    {for(int i=0;i<a.Rows();i++) for(int j=0;j<a.Columns();j++) (*this)(istart+i-1,jstart+j-1)-=a(i,j);}
 
     template<class T_MATRIX2>
     void Get_Submatrix(const int istart,const int jstart,MATRIX_BASE<T,T_MATRIX2>& a) const
-    {for(int i=1;i<=a.Rows();i++) for(int j=1;j<=a.Columns();j++) a(i,j)=(*this)(istart+i-1,jstart+j-1);}
+    {for(int i=0;i<a.Rows();i++) for(int j=0;j<a.Columns();j++) a(i,j)=(*this)(istart+i-1,jstart+j-1);}
 
     void Get_Submatrix(const int istart,const int jstart,SYMMETRIC_MATRIX<T,3>& a) const
     {a.x11=(*this)(istart,jstart);a.x21=(*this)(istart,jstart+1);a.x21=(*this)(istart+1,jstart);a.x31=(*this)(istart,jstart+2);a.x31=(*this)(istart+2,jstart);
@@ -349,25 +349,25 @@ public:
 
     template<class T_VECTOR>
     void Set_Column(const int j,const VECTOR_BASE<T,T_VECTOR>& a)
-    {for(int i=1;i<=Rows();i++) (*this)(i,j)=a(i);}
+    {for(int i=0;i<Rows();i++) (*this)(i,j)=a(i);}
 
     template<class T_VECTOR>
     void Get_Column(const int j,VECTOR_BASE<T,T_VECTOR>& a) const
-    {for(int i=1;i<=Rows();i++) a(i)=(*this)(i,j);}
+    {for(int i=0;i<Rows();i++) a(i)=(*this)(i,j);}
 
     template<class T_VECTOR>
     void Set_Row(const int i,const VECTOR_BASE<T,T_VECTOR>& a)
-    {for(int j=1;j<=Columns();j++) (*this)(i,j)=a(j);}
+    {for(int j=0;j<Columns();j++) (*this)(i,j)=a(j);}
 
     template<class T_VECTOR>
     void Get_Row(const int i,VECTOR_BASE<T,T_VECTOR>& a) const
-    {for(int j=1;j<=Columns();j++) a(j)=(*this)(i,j);}
+    {for(int j=0;j<Columns();j++) a(j)=(*this)(i,j);}
 
     void Set_Zero_Matrix()
-    {for(int i=1;i<=Rows();i++) for(int j=1;j<=Columns();j++) (*this)(i,j)=0;}
+    {for(int i=0;i<Rows();i++) for(int j=0;j<Columns();j++) (*this)(i,j)=0;}
 
     void Add_Identity_Matrix()
-    {assert(Rows()==Columns());for(int i=1;i<=Columns();i++) (*this)(i,i)+=1;}
+    {assert(Rows()==Columns());for(int i=0;i<Columns();i++) (*this)(i,i)+=1;}
 
     void Set_Identity_Matrix()
     {Set_Zero_Matrix();Add_Identity_Matrix();}
@@ -377,18 +377,18 @@ public:
 
     template<class T_VECTOR>
     T Symmetric_Conjugate(const VECTOR_BASE<T,T_VECTOR>& v) const
-    {assert(Rows()==Columns());T r=0;for(int j=1;j<=Columns();j++){T a=0;for(int i=1;i<j;i++) a+=v(i)*(*this)(i,j);r+=(a+a+v(j)*(*this)(j,j))*v(j);}return r;}
+    {assert(Rows()==Columns());T r=0;for(int j=0;j<Columns();j++){T a=0;for(int i=1;i<j;i++) a+=v(i)*(*this)(i,j);r+=(a+a+v(j)*(*this)(j,j))*v(j);}return r;}
 
     template<class T_VECTOR>
     RIGHT_VECTOR Lower_Triangular_Solve(const VECTOR_BASE<T,T_VECTOR>& b) const
     {assert(Rows()==Columns() && Columns()==b.Size());RIGHT_VECTOR x(INITIAL_SIZE(b.Size()));
-    for(int i=1;i<=Columns();i++){x(i)=b(i);for(int j=0;j<i-1;j++) x(i)-=(*this)(i,j)*x(j);x(i)/=(*this)(i,i);}
+    for(int i=0;i<Columns();i++){x(i)=b(i);for(int j=0;j<i-1;j++) x(i)-=(*this)(i,j)*x(j);x(i)/=(*this)(i,i);}
     return x;}
 
     template<class T_VECTOR>
     LEFT_VECTOR Transpose_Lower_Triangular_Solve(const VECTOR_BASE<T,T_VECTOR>& b) const
     {assert(Rows()==Columns() && Columns()==b.Size());LEFT_VECTOR x(b);
-    for(int i=1;i<=Columns();i++){x(i)/=(*this)(i,i);for(int j=i+1;j<=Columns();j++) x(j)-=(*this)(i,j)*x(i);}
+    for(int i=0;i<Columns();i++){x(i)/=(*this)(i,i);for(int j=i+1;j<=Columns();j++) x(j)-=(*this)(i,j)*x(i);}
     return x;}
 
     template<class T_VECTOR>
@@ -406,7 +406,7 @@ public:
     template<class T_MATRIX2>
     T_MATRIX2 Upper_Triangular_Solve(const MATRIX_BASE<T,T_MATRIX2>& b) const
     {assert(Rows()==Columns() && Columns()==b.Rows());T_MATRIX2 x(INITIAL_SIZE(b.Rows()),INITIAL_SIZE(b.Columns()));
-    for(int bcol=1;bcol<=b.Columns();bcol++) for(int i=Columns();i>=1;i--){
+    for(int bcol=0;bcol<b.Columns();bcol++) for(int i=Columns();i>=1;i--){
         x(i,bcol)=b(i,bcol);for(int j=Columns();j>=i+1;j--) x(i,bcol)-=(*this)(i,j)*x(j,bcol);x(i,bcol)/=(*this)(i,i);}
     return x;}
 
@@ -425,7 +425,7 @@ public:
     void In_Place_Cholesky_Inverse(MATRIX_BASE<T,T_MATRIX2>& inverse)
     {assert(Rows()==Columns());inverse.Derived()=T_MATRIX2((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());LEFT_VECTOR b((INITIAL_SIZE)Rows()); // holds piece of the identity matrix
     In_Place_Cholesky_Factorization();
-    for(int j=1;j<=Columns();j++){b(j)=1;inverse.Set_Column(j,Transpose_Upper_Triangular_Solve(Lower_Triangular_Solve(b)));b(j)=0;}}
+    for(int j=0;j<Columns();j++){b(j)=1;inverse.Set_Column(j,Transpose_Upper_Triangular_Solve(Lower_Triangular_Solve(b)));b(j)=0;}}
 
     template<class T_MATRIX2>
     void Cholesky_Inverse(MATRIX_BASE<T,T_MATRIX2>& inverse) const
@@ -442,12 +442,12 @@ public:
     template<class T_VECTOR,class T_MATRIX2>
     static VECTOR_ND<T> Householder_Transform(const VECTOR_BASE<T,T_VECTOR>& b,const MATRIX_BASE<T,T_MATRIX2>& V) // TODO: don't assume VECTOR_ND
     {assert(V.Rows()==b.Size());VECTOR_ND<T> result(b);
-    for(int j=1;j<=V.Columns();j++){VECTOR_ND<T> v(V.Rows());for(int i=1;i<=V.Rows();i++) v(i)=V(i,j);result=result.Householder_Transform(v);}
+    for(int j=0;j<V.Columns();j++){VECTOR_ND<T> v(V.Rows());for(int i=0;i<V.Rows();i++) v(i)=V(i,j);result=result.Householder_Transform(v);}
     return result;}
 
     template<class T_VECTOR>
     RIGHT_VECTOR Householder_QR_Solve(const VECTOR_BASE<T,T_VECTOR>& b)
-    {T_MATRIX V,R;Householder_QR_Factorization(V,R);VECTOR_ND<T> c=Householder_Transform(b,V),c_short(Columns());for(int i=1;i<=Columns();i++) c_short(i)=c(i); // TODO: don't assume VECTOR_ND
+    {T_MATRIX V,R;Householder_QR_Factorization(V,R);VECTOR_ND<T> c=Householder_Transform(b,V),c_short(Columns());for(int i=0;i<Columns();i++) c_short(i)=c(i); // TODO: don't assume VECTOR_ND
     return R.Upper_Triangular_Solve(c_short);}
 
     T Condition_Number() const
@@ -467,7 +467,7 @@ public:
     {assert(Rows()==Columns());inverse.Derived()=T_MATRIX2((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());COLUMN_PERMUTATION p;T_MATRIX L;
     In_Place_PLU_Factorization(L,p);
     RIGHT_VECTOR b((INITIAL_SIZE)Columns()); // used for piece of the identity matrix
-    for(int j=1;j<=Columns();j++){b(j)=0;inverse.Set_Column(j,Upper_Triangular_Solve(L.Lower_Triangular_Solve(b.Permute(p))));b(j)=0;}}
+    for(int j=0;j<Columns();j++){b(j)=0;inverse.Set_Column(j,Upper_Triangular_Solve(L.Lower_Triangular_Solve(b.Permute(p))));b(j)=0;}}
 
     template<class T_MATRIX2>
     void PLU_Inverse(MATRIX_BASE<T,T_MATRIX2>& inverse) const
@@ -485,7 +485,7 @@ public:
     void In_Place_LU_Inverse(MATRIX_BASE<T,T_MATRIX2>& inverse) // don't assume VECTOR_ND
     {assert(Rows()==Columns());inverse.Derived()=T_MATRIX2((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());T_MATRIX L;VECTOR_ND<T> b(Columns()); // used forpiece of the identity matrix
     In_Place_LU_Factorization(L);
-    for(int j=1;j<=Columns();j++){b(j)=1;inverse.Set_Column(j,Upper_Triangular_Solve(L.Lower_Triangular_Solve(b)));b(j)=0;}}
+    for(int j=0;j<Columns();j++){b(j)=1;inverse.Set_Column(j,Upper_Triangular_Solve(L.Lower_Triangular_Solve(b)));b(j)=0;}}
 
     template<class T_MATRIX2>
     void LU_Inverse(MATRIX_BASE<T,T_MATRIX2>& inverse) const
@@ -502,12 +502,12 @@ public:
 //#####################################################################
 };
 template<class T,class T_MATRIX> inline std::ostream& operator<<(std::ostream& output_stream,const MATRIX_BASE<T,T_MATRIX>& A)
-{output_stream<<"[";for(int i=1;i<=A.Rows();i++){for(int j=1;j<=A.Columns();j++){output_stream<<A(i,j);if(j<A.Columns()) output_stream<<" ";}if(i<A.Rows()) output_stream<<"; ";}output_stream<<"]";return output_stream;}
+{output_stream<<"[";for(int i=0;i<A.Rows();i++){for(int j=0;j<A.Columns();j++){output_stream<<A(i,j);if(j<A.Columns()) output_stream<<" ";}if(i<A.Rows()) output_stream<<"; ";}output_stream<<"]";return output_stream;}
 
 template<class T,class T_MATRIX,int d>
 typename PRODUCT<DIAGONAL_MATRIX<T,d>,T_MATRIX>::TYPE operator*(const DIAGONAL_MATRIX<T,d>& A,const MATRIX_BASE<T,T_MATRIX>& B)
 {assert(d==B.Rows());typename PRODUCT<DIAGONAL_MATRIX<T,d>,T_MATRIX>::TYPE M((INITIAL_SIZE)B.Rows(),(INITIAL_SIZE)B.Columns());
-for(int i=1;i<=B.Rows();i++){T a=A(i,i);for(int k=1;k<=B.Columns();k++) M(i,k)=a*B(i,k);}return M;}
+for(int i=0;i<B.Rows();i++){T a=A(i,i);for(int k=0;k<B.Columns();k++) M(i,k)=a*B(i,k);}return M;}
 
 template<class T,class T_MATRIX,int d>
 typename PRODUCT<SYMMETRIC_MATRIX<T,d>,T_MATRIX>::TYPE operator*(const SYMMETRIC_MATRIX<T,d>& A,const MATRIX_BASE<T,T_MATRIX>& B)

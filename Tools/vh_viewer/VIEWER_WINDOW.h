@@ -80,7 +80,7 @@ public:
 
     void Update_Tissues()
     {tissues.Remove_All();tissues_hash.Delete_All_Entries();
-    for(int i=1;i<=tissue_browser.size();i++){tissues.Append((int)(unsigned long long int)tissue_browser.data(i));tissues_hash.Insert((int)(unsigned long int)tissue_browser.data(i),0);}
+    for(int i=0;i<tissue_browser.size();i++){tissues.Append((int)(unsigned long long int)tissue_browser.data(i));tissues_hash.Insert((int)(unsigned long int)tissue_browser.data(i),0);}
     gl.Update_Image();}
 
 private:

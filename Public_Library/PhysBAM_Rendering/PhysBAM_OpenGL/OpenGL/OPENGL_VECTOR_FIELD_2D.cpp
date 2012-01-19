@@ -23,15 +23,15 @@ Display(const int in_color) const
 
     ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
     if(draw_arrowhead) 
-        for(int i=1;i<=vector_locations.Size();i++){OPENGL_SHAPES::Draw_Arrow(vector_locations(i),vector_locations(i)+(T)size*vector_field(i),vertices);}
+        for(int i=0;i<vector_locations.Size();i++){OPENGL_SHAPES::Draw_Arrow(vector_locations(i),vector_locations(i)+(T)size*vector_field(i),vertices);}
     else 
-        for(int i=1;i<=vector_locations.Size();i++){OpenGL_Line(vector_locations(i),vector_locations(i)+(T)size*vector_field(i),vertices);}
+        for(int i=0;i<vector_locations.Size();i++){OpenGL_Line(vector_locations(i),vector_locations(i)+(T)size*vector_field(i),vertices);}
     OpenGL_Draw_Arrays(GL_LINES,2,vertices);
 
 #ifndef USE_OPENGLES
     if(draw_value){
         (vector_color+OPENGL_COLOR(.8f,.8f,.8f)).Send_To_GL_Pipeline();
-        for(int i=1;i<=vector_locations.Size();i++)
+        for(int i=0;i<vector_locations.Size();i++)
             OpenGL_String(vector_locations(i)+(T)1.1*(T)size*vector_field(i),STRING_UTILITIES::string_sprintf("%.3f %.3f",vector_field(i).x,vector_field(i).y));}
 #endif
 
@@ -45,7 +45,7 @@ template<class T> RANGE<VECTOR<float,3> > OPENGL_VECTOR_FIELD_2D<T>::
 Bounding_Box() const
 {
     RANGE<VECTOR<float,3> > box(World_Space_Point(VECTOR<float,2>(vector_locations(1))));
-    for(int i=1;i<=vector_locations.Size();i++) box.Enlarge_Nonempty_Box_To_Include_Point(World_Space_Point(VECTOR<float,2>(vector_locations(i))));
+    for(int i=0;i<vector_locations.Size();i++) box.Enlarge_Nonempty_Box_To_Include_Point(World_Space_Point(VECTOR<float,2>(vector_locations(i))));
     return box;
 }
 //#####################################################################
