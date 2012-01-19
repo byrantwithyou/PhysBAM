@@ -76,9 +76,9 @@ Find_Optimal_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& S,MATRIX_MXN<T>& N,VECTOR_
 #endif
 
         // update permute and full x vector
-        permute.Set_Subvector(1,permute_B);permute.Set_Subvector(B.n+1,permute_S);permute.Set_Subvector(B.n+S.n+1,permute_N);
+        permute.Set_Subvector(0,permute_B);permute.Set_Subvector(B.n,permute_S);permute.Set_Subvector(B.n+S.n,permute_N);
         D=D_unpermuted.Permute_Columns(permute);epsilon_hat=epsilon_hat_unpermuted.Permute_Columns(permute);
-        x.Set_Subvector(1,x_B);x.Set_Subvector(B.n+1,x_S);x.Set_Subvector(B.n+S.n+1,b_N); // note that b_N==x_N
+        x.Set_Subvector(0,x_B);x.Set_Subvector(B.n,x_S);x.Set_Subvector(B.n+S.n,b_N); // note that b_N==x_N
 
         // find search direction
         VECTOR_ND<T> p_S,p_B;
@@ -121,13 +121,13 @@ Find_Optimal_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& S,MATRIX_MXN<T>& N,VECTOR_
             x_B+=alpha*p_B;x_S+=alpha*p_S;
 
             // reconstruct (permuted) x vector (note that b_N==x_N)
-            x.Set_Subvector(1,x_B);x.Set_Subvector(B.n+1,x_S);x.Set_Subvector(B.n+S.n+1,b_N);}
+            x.Set_Subvector(0,x_B);x.Set_Subvector(B.n,x_S);x.Set_Subvector(B.n+S.n,b_N);}
 
         if(!limiting_index){assert(alpha==1); // check lagrange multipliers
             VECTOR_ND<T> gradient(D.Transpose_Times(D)*x+epsilon_hat.Transpose_Times(epsilon_hat*x-f_hat));
 
             // decompose gradient
-            VECTOR_ND<T> gradient_B(B.n),gradient_N(N.n);gradient.Get_Subvector(1,gradient_B);gradient.Get_Subvector(B.n+S.n+1,gradient_N);
+            VECTOR_ND<T> gradient_B(B.n),gradient_N(N.n);gradient.Get_Subvector(0,gradient_B);gradient.Get_Subvector(B.n+S.n,gradient_N);
             VECTOR_ND<T> pi=B.Transpose_Lower_Triangular_Solve(gradient_B);
             VECTOR_ND<T> sigma(gradient_N-N.Transpose_Times(pi));
 
@@ -206,8 +206,8 @@ Find_Optimal_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& S,MATRIX_MXN<T>& N,VECTOR_
         }
     }
 
-    x.Set_Subvector(1,x_B);x.Set_Subvector(B.n+1,x_S);x.Set_Subvector(B.n+S.n+1,b_N); // note that b_N==x_N
-    permute.Set_Subvector(1,permute_B);permute.Set_Subvector(B.n+1,permute_S);permute.Set_Subvector(B.n+S.n+1,permute_N);
+    x.Set_Subvector(0,x_B);x.Set_Subvector(B.n,x_S);x.Set_Subvector(B.n+S.n,b_N); // note that b_N==x_N
+    permute.Set_Subvector(0,permute_B);permute.Set_Subvector(B.n,permute_S);permute.Set_Subvector(B.n+S.n,permute_N);
     x_unpermuted=x.Unpermute(permute);
 
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
