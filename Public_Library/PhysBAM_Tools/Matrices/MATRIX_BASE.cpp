@@ -21,7 +21,7 @@ In_Place_Gram_Schmidt_QR_Factorization(MATRIX_BASE<T,T_MATRIX2>& R)
         for(int i=0;i<Rows();i++) R(j,j)+=sqr((*this)(i,j));R(j,j)=sqrt(R(j,j)); // compute the L2 norm
         T one_over_Rjj=1/R(j,j);
         for(int i=0;i<Rows();i++) (*this)(i,j)*=one_over_Rjj; // orthogonalize the column
-        for(int k=j+1;k<=Columns();k++){ // subtract this columns contributution from the rest of the columns
+        for(int k=j+1;k<Columns();k++){ // subtract this columns contributution from the rest of the columns
             for(int i=0;i<Rows();i++) R(j,k)+=(*this)(i,j)*(*this)(i,k);
             for(int i=0;i<Rows();i++) (*this)(i,k)-=R(j,k)*(*this)(i,j);}}
 }
@@ -35,7 +35,7 @@ Householder_QR_Factorization(MATRIX_BASE<T,T_MATRIX2>& V,MATRIX_BASE<T,T_MATRIX3
     for(int j=0;j<Columns();j++){ // for each column
         for(int i=0;i<Rows();i++) a(i)=temp(i,j);
         v=a.Householder_Vector(j);for(int i=0;i<Rows();i++) V(i,j)=v(i); // store the v's in V
-        for(int k=j;k<=Columns();k++){ // Householder transform each column
+        for(int k=j;k<Columns();k++){ // Householder transform each column
             for(int i=0;i<Rows();i++) a(i)=temp(i,k);
             new_a=a.Householder_Transform(v);for(int i=0;i<Rows();i++) temp(i,k)=new_a(i);}}
     for(int i=0;i<Columns();i++) for(int j=0;j<Columns();j++) R(i,j)=temp(i,j); // store R
@@ -50,16 +50,16 @@ In_Place_Robust_Householder_QR_Solve(VECTOR_BASE<T,T_VECTOR1>& b,VECTOR_BASE<int
     VECTOR_ND<T> a((INITIAL_SIZE)Rows());for(int i=0;i<Columns();i++) p(i)=i; // TODO: This should not assume VECTOR_ND.
     VECTOR_ND<T> column_norm(Columns());for(int j=0;j<Columns();j++) for(int i=0;i<Rows();i++) column_norm(j)+=sqr((*this)(i,j));
     for(int j=0;j<Columns();j++){
-        int max_column=0;T max_column_norm=0;for(int k=j;k<=Columns();k++) if(column_norm(k)>max_column_norm){max_column_norm=column_norm(k);max_column=k;}
+        int max_column=0;T max_column_norm=0;for(int k=j;k<Columns();k++) if(column_norm(k)>max_column_norm){max_column_norm=column_norm(k);max_column=k;}
         if(max_column_norm<FLT_MIN) return;
         if(max_column!=j){exchange(column_norm(j),column_norm(max_column));exchange(p(j),p(max_column));for(int i=0;i<Rows();i++) exchange((*this)(i,j),(*this)(i,max_column));}
         if(j==Rows()) return;
         Get_Column(j,a);VECTOR_ND<T> v=a.Householder_Vector(j);T two_over_v_dot_v=(T)2/v.Magnitude_Squared();
-        if((*this)(j,j)>=0)(*this)(j,j)=-sqrt(max_column_norm);else (*this)(j,j)=sqrt(max_column_norm);for(int i=j+1;i<=Rows();i++)(*this)(i,j)=(T)0;
-        for(int k=j+1;k<=Columns();k++){
-            T v_dot_a=0;for(int i=j;i<=Rows();i++) v_dot_a+=v(i)*(*this)(i,k);T coefficient=v_dot_a*two_over_v_dot_v;for(int i=j;i<=Rows();i++) (*this)(i,k)-=coefficient*v(i);}
-        T v_dot_b=0;for(int i=j;i<=Rows();i++) v_dot_b+=v(i)*b(i);T coefficient=v_dot_b*two_over_v_dot_v;for(int i=j;i<=Rows();i++) b(i)-=coefficient*v(i);
-        for(int k=j+1;k<=Columns();k++) column_norm(k)-=sqr((*this)(j,k));}
+        if((*this)(j,j)>=0)(*this)(j,j)=-sqrt(max_column_norm);else (*this)(j,j)=sqrt(max_column_norm);for(int i=j+1;i<Rows();i++)(*this)(i,j)=(T)0;
+        for(int k=j+1;k<Columns();k++){
+            T v_dot_a=0;for(int i=j;i<Rows();i++) v_dot_a+=v(i)*(*this)(i,k);T coefficient=v_dot_a*two_over_v_dot_v;for(int i=j;i<Rows();i++) (*this)(i,k)-=coefficient*v(i);}
+        T v_dot_b=0;for(int i=j;i<Rows();i++) v_dot_b+=v(i)*b(i);T coefficient=v_dot_b*two_over_v_dot_v;for(int i=j;i<Rows();i++) b(i)-=coefficient*v(i);
+        for(int k=j+1;k<Columns();k++) column_norm(k)-=sqr((*this)(j,k));}
 }
 //#####################################################################
 // Function Robust_Householder_QR_Solve
@@ -73,14 +73,14 @@ In_Place_PLU_Factorization(MATRIX_BASE<T,T_MATRIX2>& L,COLUMN_PERMUTATION& p)
     for(int j=0;j<Columns();j++){ // for each column
         // find the largest element and switch rows
         int row=j;T value=abs((*this)(j,j));
-        for(int i=j+1;i<=Columns();i++) if(abs((*this)(i,j))>value){row=i;value=abs((*this)(i,j));}
+        for(int i=j+1;i<Columns();i++) if(abs((*this)(i,j))>value){row=i;value=abs((*this)(i,j));}
         if(row!=j){ // need to switch rows
             exchange(p(j),p(row)); // update permutation matrix
             for(int k=0;k<j-1;k++) exchange(L(j,k),L(row,k)); // update L
-            for(int k=j;k<=Columns();k++) exchange((*this)(j,k),(*this)(row,k));} // update U
+            for(int k=j;k<Columns();k++) exchange((*this)(j,k),(*this)(row,k));} // update U
         // standard LU factorization steps
-        T diagonal_inverse=1/(*this)(j,j);for(int i=j;i<=Columns();i++) L(i,j)=(*this)(i,j)*diagonal_inverse; // fill in the column for L
-        for(int i=j+1;i<=Columns();i++) for(int k=j;k<=Columns();k++) (*this)(i,k)-=L(i,j)*(*this)(j,k);} // sweep across each row below row j  TODO: can order be changed?
+        T diagonal_inverse=1/(*this)(j,j);for(int i=j;i<Columns();i++) L(i,j)=(*this)(i,j)*diagonal_inverse; // fill in the column for L
+        for(int i=j+1;i<Columns();i++) for(int k=j;k<Columns();k++) (*this)(i,k)-=L(i,j)*(*this)(j,k);} // sweep across each row below row j  TODO: can order be changed?
 }
 //#####################################################################
 // Function In_Place_Cholesky_Factorization
@@ -90,9 +90,9 @@ In_Place_Cholesky_Factorization()
 {
     assert(Rows()==Columns());
     for(int j=0;j<Columns();j++){ // for each column
-        for(int k=0;k<j-1;k++) for(int i=j;i<=Rows();i++) (*this)(i,j)-=(*this)(j,k)*(*this)(i,k); // subtract off the known stuff in previous columns
-        (*this)(j,j)=sqrt((*this)(j,j));T diagonal_inverse=1/(*this)(j,j);for(int i=j+1;i<=Columns();i++) (*this)(i,j)*=diagonal_inverse;} // update L
-    for(int i=0;i<Rows();i++) for(int j=i+1;j<=Columns();j++) (*this)(i,j)=0; // zero out upper triangular part  TODO: Loop the other way around
+        for(int k=0;k<j-1;k++) for(int i=j;i<Rows();i++) (*this)(i,j)-=(*this)(j,k)*(*this)(i,k); // subtract off the known stuff in previous columns
+        (*this)(j,j)=sqrt((*this)(j,j));T diagonal_inverse=1/(*this)(j,j);for(int i=j+1;i<Columns();i++) (*this)(i,j)*=diagonal_inverse;} // update L
+    for(int i=0;i<Rows();i++) for(int j=i+1;j<Columns();j++) (*this)(i,j)=0; // zero out upper triangular part  TODO: Loop the other way around
 }
 //#####################################################################
 // Function In_Place_Cholesky_Factorization
@@ -103,8 +103,8 @@ In_Place_LU_Factorization(MATRIX_BASE<T,T_MATRIX2>& L)
     assert(Rows()==Columns());
     L.Derived()=T_MATRIX2((INITIAL_SIZE)Rows(),(INITIAL_SIZE)Columns());
     for(int j=0;j<Columns();j++){ // for each column
-        T diagonal_inverse=1/(*this)(j,j);for(int i=j;i<=Columns();i++) L(i,j)=(*this)(i,j)*diagonal_inverse; // fill in the column for L
-        for(int i=j+1;i<=Columns();i++) for(int k=j;k<=Columns();k++) (*this)(i,k)-=L(i,j)*(*this)(j,k);} // sweep across each row below row j  TODO: can the order of these loops be swapped?
+        T diagonal_inverse=1/(*this)(j,j);for(int i=j;i<Columns();i++) L(i,j)=(*this)(i,j)*diagonal_inverse; // fill in the column for L
+        for(int i=j+1;i<Columns();i++) for(int k=j;k<Columns();k++) (*this)(i,k)-=L(i,j)*(*this)(j,k);} // sweep across each row below row j  TODO: can the order of these loops be swapped?
 }
 //####################################################################################
 // Function Number_Of_Nonzero_Rows

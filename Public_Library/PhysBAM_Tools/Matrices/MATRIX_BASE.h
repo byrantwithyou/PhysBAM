@@ -377,7 +377,7 @@ public:
 
     template<class T_VECTOR>
     T Symmetric_Conjugate(const VECTOR_BASE<T,T_VECTOR>& v) const
-    {assert(Rows()==Columns());T r=0;for(int j=0;j<Columns();j++){T a=0;for(int i=1;i<j;i++) a+=v(i)*(*this)(i,j);r+=(a+a+v(j)*(*this)(j,j))*v(j);}return r;}
+    {assert(Rows()==Columns());T r=0;for(int j=0;j<Columns();j++){T a=0;for(int i=0;i<j;i++) a+=v(i)*(*this)(i,j);r+=(a+a+v(j)*(*this)(j,j))*v(j);}return r;}
 
     template<class T_VECTOR>
     RIGHT_VECTOR Lower_Triangular_Solve(const VECTOR_BASE<T,T_VECTOR>& b) const
@@ -394,19 +394,19 @@ public:
     template<class T_VECTOR>
     RIGHT_VECTOR Upper_Triangular_Solve(const VECTOR_BASE<T,T_VECTOR>& b) const
     {assert(Rows()==Columns() && Columns()==b.Size());RIGHT_VECTOR x(INITIAL_SIZE(b.Size()));
-    for(int i=Columns();i>=1;i--){x(i)=b(i);for(int j=Columns();j>=i+1;j--) x(i)-=(*this)(i,j)*x(j);x(i)/=(*this)(i,i);}
+    for(int i=Columns()-1;i>=0;i--){x(i)=b(i);for(int j=Columns();j>=i+1;j--) x(i)-=(*this)(i,j)*x(j);x(i)/=(*this)(i,i);}
     return x;}
 
     template<class T_VECTOR>
     LEFT_VECTOR Transpose_Upper_Triangular_Solve(const VECTOR_BASE<T,T_VECTOR>& b) const
     {assert(Rows()==Columns() && Columns()==b.Size());LEFT_VECTOR x(b);
-    for(int i=Columns();i>=1;i--){x(i)/=(*this)(i,i);for(int j=i-1;j>=1;j--) x(j)-=(*this)(i,j)*x(i);}
+    for(int i=Columns()-1;i>=0;i--){x(i)/=(*this)(i,i);for(int j=i-1;j>=0;j--) x(j)-=(*this)(i,j)*x(i);}
     return x;}
 
     template<class T_MATRIX2>
     T_MATRIX2 Upper_Triangular_Solve(const MATRIX_BASE<T,T_MATRIX2>& b) const
     {assert(Rows()==Columns() && Columns()==b.Rows());T_MATRIX2 x(INITIAL_SIZE(b.Rows()),INITIAL_SIZE(b.Columns()));
-    for(int bcol=0;bcol<b.Columns();bcol++) for(int i=Columns();i>=1;i--){
+    for(int bcol=0;bcol<b.Columns();bcol++) for(int i=Columns()-1;i>=0;i--){
         x(i,bcol)=b(i,bcol);for(int j=Columns();j>=i+1;j--) x(i,bcol)-=(*this)(i,j)*x(j,bcol);x(i,bcol)/=(*this)(i,i);}
     return x;}
 
