@@ -255,10 +255,10 @@ Find_Solution_Regions()
     filled_region_touches_dirichlet.Remove_All();
     // do the fill
     if(mpi_grid){
-        for(int axis=0;axis<T_GRID::dimension;axis++) for(int side=0;side<=1;side++) for(CELL_ITERATOR iterator(grid,1,T_GRID::GHOST_REGION,2*axis-1+side);iterator.Valid();iterator.Next()){
+        for(int axis=0;axis<T_GRID::dimension;axis++) for(int side=0;side<=1;side++) for(CELL_ITERATOR iterator(grid,1,T_GRID::GHOST_REGION,2*axis+side);iterator.Valid();iterator.Next()){
             for(int face=0;face<T_GRID::dimension;face++)if(face!=axis){
                 psi_N.Component(face)(iterator.Cell_Index())=true;psi_N.Component(face)(iterator.Cell_Index()+TV_INT::Axis_Vector(face))=true;}}
-        for(int axis=0;axis<T_GRID::dimension;axis++) for(int side=0;side<=1;side++) for(CELL_ITERATOR iterator(grid,1,T_GRID::GHOST_REGION,2*axis-1+side);iterator.Valid();iterator.Next()){
+        for(int axis=0;axis<T_GRID::dimension;axis++) for(int side=0;side<=1;side++) for(CELL_ITERATOR iterator(grid,1,T_GRID::GHOST_REGION,2*axis+side);iterator.Valid();iterator.Next()){
             if(!psi_N.Component(axis)(iterator.Cell_Index()+(1-side)*TV_INT::Axis_Vector(axis))&&!psi_D(iterator.Cell_Index()))filled_region_colors(iterator.Cell_Index())=0;}}
     number_of_regions=flood_fill.Flood_Fill(filled_region_colors,psi_N,&filled_region_touches_dirichlet);
     // correct flood fill for distributed grids

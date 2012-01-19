@@ -591,7 +591,7 @@ Warn_For_Exposed_Dirichlet_Cell(const T_ARRAYS_BOOL& psi_D,const T_FACE_ARRAYS_B
     for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         if(!psi_D(cell_index)) continue;
         for(int axis=0;axis<TV::dimension;axis++){
-            TV_INT first_cell_index=iterator.Cell_Neighbor(2*axis-1),second_cell_index=iterator.Cell_Neighbor(2*axis);
+            TV_INT first_cell_index=iterator.Cell_Neighbor(2*axis),second_cell_index=iterator.Cell_Neighbor(2*axis+1);
             TV_INT first_face_index=iterator.First_Face_Index(axis),second_face_index=iterator.Second_Face_Index(axis);
             if((grid.Inside_Domain(first_cell_index) && !psi_D(first_cell_index) && !psi_N.Component(axis)(first_face_index)) || 
                 (grid.Inside_Domain(second_cell_index) && !psi_D(second_cell_index) && !psi_N.Component(axis)(second_face_index))){

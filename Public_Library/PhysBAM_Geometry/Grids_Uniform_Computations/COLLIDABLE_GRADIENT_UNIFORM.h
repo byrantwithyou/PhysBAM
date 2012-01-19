@@ -37,11 +37,11 @@ void Collidable_Gradient_Magnitude(const typename COLLISION_GEOMETRY_COLLECTION_
         for(int axis=0;axis<d;axis++){T partial=0;
             bool left_cell_visible=!occluded_faces(iterator.Full_First_Face_Index(axis)),right_cell_visible=!occluded_faces(iterator.Full_Second_Face_Index(axis));
             if(left_cell_visible && right_cell_visible)
-                partial=(values(iterator.Cell_Neighbor(2*axis))-values(iterator.Cell_Neighbor(2*axis-1)))*(T).5*one_over_dx[axis];
+                partial=(values(iterator.Cell_Neighbor(2*axis+1))-values(iterator.Cell_Neighbor(2*axis)))*(T).5*one_over_dx[axis];
             else if(left_cell_visible)
-                partial=(values(iterator.Cell_Index())-values(iterator.Cell_Neighbor(2*axis-1)))*one_over_dx[axis];
+                partial=(values(iterator.Cell_Index())-values(iterator.Cell_Neighbor(2*axis)))*one_over_dx[axis];
             else if(right_cell_visible)
-                partial=(values(iterator.Cell_Neighbor(2*axis))-values(iterator.Cell_Index()))*one_over_dx[axis];
+                partial=(values(iterator.Cell_Neighbor(2*axis+1))-values(iterator.Cell_Index()))*one_over_dx[axis];
             else continue;
             sum_of_partials+=partial*partial;}
         gradient(cell_index)=sqrt(sum_of_partials);}

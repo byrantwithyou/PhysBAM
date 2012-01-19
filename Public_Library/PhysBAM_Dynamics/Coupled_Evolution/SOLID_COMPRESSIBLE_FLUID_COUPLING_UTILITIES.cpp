@@ -269,9 +269,9 @@ Apply_Isobaric_Fix(const T dt,const T time)
                 if(euler.euler_projection.elliptic_solver->psi_N.Component(axis)(first_face_index) &&
                         euler.euler_projection.elliptic_solver->psi_N.Component(axis)(second_face_index)) continue; // cant get a reference point
                 else if(euler.euler_projection.elliptic_solver->psi_N.Component(axis)(first_face_index)){
-                    encountered_neumann_face=true;reference_point=iterator.Cell_Neighbor(2*axis);}
+                    encountered_neumann_face=true;reference_point=iterator.Cell_Neighbor(2*axis+1);}
                 else if(euler.euler_projection.elliptic_solver->psi_N.Component(axis)(second_face_index)){
-                    encountered_neumann_face=true;reference_point=iterator.Cell_Neighbor(2*axis-1);}}
+                    encountered_neumann_face=true;reference_point=iterator.Cell_Neighbor(2*axis);}}
             if(encountered_neumann_face){
                 LOG::cout<<"ISOBARIC FIX: fixing cell "<<cell_index<<" with reference cell "<<reference_point<<std::endl;
                 T rho=euler.U(cell_index)(1);
