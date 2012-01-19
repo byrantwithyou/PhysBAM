@@ -380,15 +380,15 @@ public:
 
     template<class T_VECTOR>
     void Set_Subvector(const int istart,const T_VECTOR& v)
-    {for(int i=0;i<v.Size();i++) (*this)(istart+i-1)=v(i);}
+    {for(int i=0;i<v.Size();i++) (*this)(istart+i)=v(i);}
 
     template<class T_VECTOR>
     void Add_Subvector(const int istart,const T_VECTOR& v)
-    {for(int i=0;i<v.Size();i++) (*this)(istart+i-1)+=v(i);}
+    {for(int i=0;i<v.Size();i++) (*this)(istart+i)+=v(i);}
     
     template<class T_VECTOR>
     void Get_Subvector(const int istart,T_VECTOR& v) const
-    {for(int i=0;i<v.Size();i++) v(i)=(*this)(istart+i-1);}
+    {for(int i=0;i<v.Size();i++) v(i)=(*this)(istart+i);}
 
     T* begin() // for stl
     {return &x;}

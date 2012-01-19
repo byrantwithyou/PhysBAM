@@ -150,15 +150,15 @@ public:
 
     template<class T_VECTOR2>
     void Set_Subvector(const int istart,const VECTOR_BASE<T,T_VECTOR2>& v)
-    {for(int i=0;i<v.Size();i++) (*this)(istart+i-1)=v(i);}
+    {for(int i=0;i<v.Size();i++) (*this)(istart+i)=v(i);}
 
     template<class T_VECTOR2>
     void Add_Subvector(const int istart,const VECTOR_BASE<T,T_VECTOR2>& v)
-    {for(int i=0;i<v.Size();i++) (*this)(istart+i-1)+=v(i);}
+    {for(int i=0;i<v.Size();i++) (*this)(istart+i)+=v(i);}
     
     template<class T_VECTOR2>
     void Get_Subvector(const int istart,VECTOR_BASE<T,T_VECTOR2>& v) const
-    {for(int i=0;i<v.Size();i++) v(i)=(*this)(istart+i-1);}
+    {for(int i=0;i<v.Size();i++) v(i)=(*this)(istart+i);}
 
     T Sup_Norm() const
     {return Max_Abs();}
