@@ -69,7 +69,7 @@ public:
             touched_particles(k-start_particles+1)=true;}
 
         if(element==1) LOG::cout<<"vert ("<<i<<","<<j<<","<<k<<")"<<std::endl;
-        for(int index=1;index<=(*surface.mesh.adjacent_elements)(element).m;index++){
+        for(int index=0;index<(*surface.mesh.adjacent_elements)(element).m;index++){
             int next_element=(*surface.mesh.adjacent_elements)(element)(index);
             if(element==1||next_element==1) LOG::cout<<"Found element: "<<element<<" next element: "<<next_element<<std::endl;
             if(touched_elements(next_element)) continue;
@@ -110,7 +110,7 @@ public:
 
         for(int i=0;i<number_particles;i++){
             surface_laplacian.Set_Element(i,i,0);
-            for(int j=1;j<=(*surface.mesh.neighbor_nodes)(i).m;j++){surface_laplacian.Set_Symmetric_Elements(i,(*surface.mesh.neighbor_nodes)(i)(j),0);}}
+            for(int j=0;j<(*surface.mesh.neighbor_nodes)(i).m;j++){surface_laplacian.Set_Symmetric_Elements(i,(*surface.mesh.neighbor_nodes)(i)(j),0);}}
 
         assert(surface.mesh.elements.m>1);
         for(int i=0;i<surface.mesh.elements.m;i++) Calculate_Weights_Helper(i,frame+1,sanity_check);

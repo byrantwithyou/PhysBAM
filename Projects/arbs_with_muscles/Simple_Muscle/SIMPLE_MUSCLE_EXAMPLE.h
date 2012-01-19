@@ -612,7 +612,7 @@ void Get_Constrained_Particle_Data()
     enslaved_nodes.Resize(num_planks);
     positions_relative_to_plank_frames.Resize(num_planks);
 
-    for(int i=1;i<=mattress_dimensions.x*mattress_dimensions.y*mattress_dimensions.z;i++){
+    for(int i=0;i<mattress_dimensions.x*mattress_dimensions.y*mattress_dimensions.z;i++){
         for(int p=0;p<num_planks;p++){
             RIGID_BODY<TV>& plank_rigid_body=*arb->rigid_bodies_list.rigid_bodies(plank_ids(p));
             if (!plank_rigid_body.Implicit_Geometry_Lazy_Outside(particles.X(i))) {

@@ -88,7 +88,7 @@ Simplex(const VECTOR<int,d+1>& nodes) const
     int short_list=nodes[1];VECTOR<int,d> check=nodes.Remove_Index(1);
     for(int i=0;i<d;i++)if((*incident_elements)(check[i]).m < (*incident_elements)(short_list).m) exchange(short_list,check[i]);
     // search short list for other nodes
-    for(int k=1;k<=(*incident_elements)(short_list).m;k++){int t=(*incident_elements)(short_list)(k);
+    for(int k=0;k<(*incident_elements)(short_list).m;k++){int t=(*incident_elements)(short_list)(k);
         if(Nodes_In_Simplex(check,t)) return t;}
     return 0;
 }
@@ -136,7 +136,7 @@ template<int d> void SIMPLEX_MESH<d>::
 Find_And_Append_Adjacent_Elements(const int simplex,const VECTOR<int,d>& face)
 {
     int first_node=face[1];VECTOR<int,d-1> other_nodes=face.Remove_Index(1);
-    for(int t=1;t<=(*incident_elements)(first_node).m;t++){
+    for(int t=0;t<(*incident_elements)(first_node).m;t++){
         int simplex2=(*incident_elements)(first_node)(t);
         if(simplex2!=simplex && Nodes_In_Simplex(other_nodes,simplex2))
             (*adjacent_elements)(simplex).Append_Unique(simplex2);}
@@ -269,7 +269,7 @@ Update_Adjacent_Elements_From_Incident_Elements(const int node)
 {
     if(!adjacent_elements){Initialize_Adjacent_Elements();return;}
     bool incident_elements_defined=incident_elements!=0;if(!incident_elements) Initialize_Incident_Elements();
-    for(int a=1;a<=(*incident_elements)(node).m;a++){
+    for(int a=0;a<(*incident_elements)(node).m;a++){
         int t=(*incident_elements)(node)(a);VECTOR<int,d+1>& element=elements(t);
         (*adjacent_elements)(t).Remove_All();
         for(int i=0;i<element.m;i++) Find_And_Append_Adjacent_Elements(t,element.Remove_Index(i));
@@ -285,7 +285,7 @@ Update_Neighbor_Nodes_From_Incident_Elements(const int node)
     if(!neighbor_nodes){Initialize_Neighbor_Nodes();return;}
     bool incident_elements_defined=incident_elements!=0;if(!incident_elements) Initialize_Incident_Elements();
     (*neighbor_nodes)(node).Remove_All();
-    for(int t=1;t<=(*incident_elements)(node).m;t++){
+    for(int t=0;t<(*incident_elements)(node).m;t++){
         VECTOR<int,d+1>& element=elements((*incident_elements)(node)(t));assert(element.Contains(node));
         for(int i=0;i<element.m;i++)if(element[i]!=node) (*neighbor_nodes)(node).Append_Unique(element[i]);}
     (*neighbor_nodes)(node).Compact();

@@ -26,7 +26,7 @@ BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP(EULER_UNIFORM<T_GRID>* euler_input,cons
     linear_attenuation_faces=linear_attenuation_faces_input;
 
     T gamma=dynamic_cast<EOS_GAMMA<T>*>(euler->eos)->gamma;
-    for(int side=1;side<=2*T_GRID::dimension;side++){
+    for(int side=0;side<2*T_GRID::dimension;side++){
         T e_far_field=euler->eos->e_From_p_And_rho(p_far_field(side),rho_far_field(side));
         T c_far_field=euler->eos->c(rho_far_field(side),e_far_field);
         S_far_field(side)=euler->eos->S(rho_far_field(side),e_far_field);
@@ -162,7 +162,7 @@ Fill_Ghost_Cells(const T_GRID& grid,const T_ARRAYS_DIMENSION_BASE& u,T_ARRAYS_DI
 {
     T_ARRAYS_DIMENSION_BASE::Put(u,u_ghost); // interior
     ARRAY<RANGE<TV_INT> > regions;Find_Ghost_Regions(grid,regions,number_of_ghost_cells);
-    for(int side=1;side<=2*T_GRID::dimension;side++){
+    for(int side=0;side<2*T_GRID::dimension;side++){
         Fill_Single_Ghost_Region(grid,u_ghost,regions(side),side,dt,time,number_of_ghost_cells);}
 }
 //#####################################################################
@@ -190,7 +190,7 @@ template<class T_GRID> void BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<T_GRID>::
 Apply_Boundary_Condition(const T_GRID& grid,T_ARRAYS_DIMENSION_BASE& u,const T time)
 {
     if(grid.Is_MAC_Grid()) return;
-    for(int side=1;side<=2*T_GRID::dimension;side++) Apply_Boundary_Condition_Single_Side(grid,u,side,time);
+    for(int side=0;side<2*T_GRID::dimension;side++) Apply_Boundary_Condition_Single_Side(grid,u,side,time);
 }
 //#####################################################################
 template class BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<GRID<VECTOR<float,1> > >;

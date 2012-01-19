@@ -243,7 +243,7 @@ for(STENCIL_ITERATOR<const T,2> iterator(stencil);iterator.Valid();iterator.Next
 output<<prefix;for(int i=0;i<index_width;i++) output<<" ";
 for(int i=imin;i<=imax;i++) output<<" | "<<std::setw(max_width)<<i;
 output<<std::endl;
-output<<prefix;for(int i=1;i<=(imax-imin+1)*(max_width+3)+index_width;i++) output<<"-";
+output<<prefix;for(int i=0;i<(imax-imin+1)*(max_width+3)+index_width;i++) output<<"-";
 output<<std::endl;
 for(int j=jmax;j>=jmin;j--){
     output<<prefix<<std::setw(index_width)<<j;

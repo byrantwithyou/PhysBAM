@@ -368,7 +368,7 @@ Remove_Simplex_List(const ARRAY<int>& triangle_list,ARRAY<HASHTABLE<int,int> >* 
         HASHTABLE<int,int>& simplex_map=(*level_simplex_maps)(level);simplex_map.Remove_All();
         
         meshes(level)->Delete_Sorted_Elements(level_triangle_list(level),simplex_map);
-        if(level<parent.m) for(int i=1;i<=(*parent(level+1)).m;i++) simplex_map.Get((*parent(level+1))(i),(*parent(level+1))(i));
+        if(level<parent.m) for(int i=0;i<(*parent(level+1)).m;i++) simplex_map.Get((*parent(level+1))(i),(*parent(level+1))(i));
         if(parent(level)) parent(level)->Remove_Sorted_Indices_Lazy(level_triangle_list(level));
         if(level>1) for(int i=1;i<=children(level-1)->m;i++){for(int j=0;j<4;j++) simplex_map.Get((*children(level-1))(i)(j),(*children(level-1))(i)(j));
             (*children(level-1))(i)=(*children(level-1))(i).Sorted().Reversed();}

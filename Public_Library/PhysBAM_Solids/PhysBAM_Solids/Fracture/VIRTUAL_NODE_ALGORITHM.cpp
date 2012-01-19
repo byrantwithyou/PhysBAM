@@ -36,7 +36,7 @@ Add_Element_If_Necessary(EMBEDDED_OBJECT<TV,d>& embedded_object,const VECTOR<int
 template<int d> static inline int
 Unmarked_Neighbor_Node(const SIMPLEX_MESH<d>& mesh,const int center_node,const ARRAY<short>& marked)
 {
-    for(int n=1;n<=(*mesh.neighbor_nodes)(center_node).m;n++){
+    for(int n=0;n<(*mesh.neighbor_nodes)(center_node).m;n++){
         int node=(*mesh.neighbor_nodes)(center_node)(n);
         if(!marked(node)) return node;}
     return 0;
@@ -49,7 +49,7 @@ Mark_Disconnected_Components_In_One_Ring_Helper(const EMBEDDED_TRIANGULATED_OBJE
 {
     TRIANGLE_MESH& mesh=embedded_object.simplicial_object.mesh;
     bool changed=false;
-    for(int t=1;t<=(*mesh.incident_elements)(center_node).m;t++){
+    for(int t=0;t<(*mesh.incident_elements)(center_node).m;t++){
         int triangle=(*mesh.incident_elements)(center_node)(t);
         int a,b;mesh.Other_Two_Nodes(center_node,triangle,a,b);
         if(marked(a)==component && !marked(b) && embedded_object.Nodes_Are_Materially_Connected_In_Simplex(a,b,triangle)){marked(b)=component;changed=true;}
@@ -61,7 +61,7 @@ Mark_Disconnected_Components_In_One_Ring_Helper(const EMBEDDED_TETRAHEDRALIZED_V
 {
     TETRAHEDRON_MESH& mesh=embedded_object.simplicial_object.mesh;
     bool changed=false;
-    for(int t=1;t<=(*mesh.incident_elements)(center_node).m;t++){
+    for(int t=0;t<(*mesh.incident_elements)(center_node).m;t++){
         int tetrahedron=(*mesh.incident_elements)(center_node)(t);
         int a,b,c;mesh.Other_Three_Nodes(center_node,tetrahedron,a,b,c);
         if(marked(a)==component){
@@ -83,11 +83,11 @@ Mark_Disconnected_Components_In_One_Ring(const EMBEDDED_OBJECT<TV,d>& embedded_o
 
     // flood fill only nodes that are material in some element in the 1-ring
     marked.Subset((*mesh.neighbor_nodes)(center_node)).Fill(-2);
-    for(int i=1;i<=(*mesh.incident_elements)(center_node).m;i++){int t=(*mesh.incident_elements)(center_node)(i);
+    for(int i=0;i<(*mesh.incident_elements)(center_node).m;i++){int t=(*mesh.incident_elements)(center_node)(i);
         const VECTOR<int,d+1>& element=mesh.elements(t);
         for(int n=0;n<element.m;n++) if(embedded_object.node_in_simplex_is_material(t)(n)) marked(element[n])=0;}
     // mark component connected to the center node with -1
-    for(int n=1;n<=(*mesh.neighbor_nodes)(center_node).m;n++){
+    for(int n=0;n<(*mesh.neighbor_nodes)(center_node).m;n++){
         int node=(*mesh.neighbor_nodes)(center_node)(n);
         if(!embedded_object.Segment_Is_Broken(center_node,node)) marked(node)=-1;}
 
@@ -117,7 +117,7 @@ Construct_Virtual_Nodes(EMBEDDED_OBJECT<TV,d>& embedded_object,ARRAY<int>& map_t
         // make a virtual_node for each component disconnected from the center node
         ARRAY<int> virtual_node_index(components);
         for(int component_index=0;component_index<components;component_index++) virtual_node_index(component_index)=virtual_nodes.Add_Virtual_Node(node);
-        for(int i=1;i<=(*mesh.neighbor_nodes)(node).m;i++){
+        for(int i=0;i<(*mesh.neighbor_nodes)(node).m;i++){
             int neighbor_node=(*mesh.neighbor_nodes)(node)(i);
             if(marked(neighbor_node)>0) virtual_nodes(virtual_node_index(marked(neighbor_node))).recipients.Append(neighbor_node);}}
     virtual_nodes.Initialize_Replicas();
@@ -197,7 +197,7 @@ Rebuild_Embedded_Object(EMBEDDED_OBJECT<TV,d>& embedded_object,ARRAY<int>& map_t
     embedded_object.Initialize_Embedded_Subelements_In_Parent_Element();
 
     mesh.incident_elements=new ARRAY<ARRAY<int> >(mesh.number_nodes);
-    for(int node=0;node<old_mesh.number_nodes;node++) for(int i=1;i<=(*old_mesh.incident_elements)(node).m;i++){
+    for(int node=0;node<old_mesh.number_nodes;node++) for(int i=0;i<(*old_mesh.incident_elements)(node).m;i++){
         int element=(*old_mesh.incident_elements)(node)(i);
         VECTOR<int,d+1> nodes=old_mesh.elements(element);int center_node=nodes.Find(node);
         if(old_embedded_object.node_in_simplex_is_material(element)(center_node)){

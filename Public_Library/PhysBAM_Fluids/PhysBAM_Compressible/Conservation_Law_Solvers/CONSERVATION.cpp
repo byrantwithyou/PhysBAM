@@ -60,7 +60,7 @@ Compute_Delta_Flux_For_Clamping_Variable(const T_GRID& grid,const int number_of_
     VECTOR<bool,T_GRID::dimension*2> clamp_flux;
     for(CELL_ITERATOR iterator(grid,number_of_ghost_cells);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         T outgoing_flux=0;overshoot_percentages(cell_index)=0;
-        for(int i=1;i<=T_GRID::dimension*2;i++) clamp_flux(i)=false;
+        for(int i=0;i<T_GRID::dimension*2;i++) clamp_flux(i)=false;
         for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT first_face_index=iterator.First_Face_Index(axis),second_face_index=iterator.Second_Face_Index(axis);
             if(flux.Component(axis)(first_face_index)(clamped_variable_index)<0){clamp_flux(2*axis-1)=true;
                 outgoing_flux-=dt*flux.Component(axis)(first_face_index)(clamped_variable_index)*one_over_dx[axis];}

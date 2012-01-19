@@ -195,7 +195,7 @@ Initialize()
     initial_volume=Compute_Volume();initial_length=Length();initial_curve_length=Curve_Length();
     T subst=0;num_segments_over_2=100;
     initial_segment_volumes.Resize(2*num_segments_over_2);fractional_segment_endpoints.Resize(2*num_segments_over_2);
-    for(int i=1;i<=2*num_segments_over_2;i++){subst+=(T)pi/num_segments_over_2;fractional_segment_endpoints(i)=subst;initial_segment_volumes(i)=Scaled_Volume(subst);}
+    for(int i=0;i<2*num_segments_over_2;i++){subst+=(T)pi/num_segments_over_2;fractional_segment_endpoints(i)=subst;initial_segment_volumes(i)=Scaled_Volume(subst);}
 }
 //#####################################################################
 // Function Read_And_Set_Parameters

@@ -156,7 +156,7 @@ Initialize_Segment_Mesh()
     segment_mesh=new SEGMENT_MESH();
     segment_mesh->number_nodes=number_nodes;
     segment_mesh->elements.Preallocate((total_degree+1)/2); // add one for subtle optimization purposes
-    for(int node=0;node<neighbor_nodes->m;node++) for(int k=1;k<=(*neighbor_nodes)(node).m;k++) // do nodes in ascending order so that no edges are counted more than once
+    for(int node=0;node<neighbor_nodes->m;node++) for(int k=0;k<(*neighbor_nodes)(node).m;k++) // do nodes in ascending order so that no edges are counted more than once
         if(node<=(*neighbor_nodes)(node)(k)) segment_mesh->elements.Append(VECTOR<int,2>(node,(*neighbor_nodes)(node)(k))); 
     if(!neighbor_nodes_defined){delete neighbor_nodes;neighbor_nodes=0;}
 }
@@ -240,7 +240,7 @@ int TETRAHEDRON_MESH::
 Number_Of_Tetrahedrons_Across_Face(const int tetrahedron,const int node1,const int node2,const int node3) const
 {
     int count=0;
-    for(int t=1;t<=(*incident_elements)(node1).m;t++){
+    for(int t=0;t<(*incident_elements)(node1).m;t++){
         int tetrahedron2=(*incident_elements)(node1)(t); // tetrahedron in question
         int i,j,k,l;elements(tetrahedron2).Get(i,j,k,l);
         if(tetrahedron2 != tetrahedron){
@@ -322,7 +322,7 @@ Initialize_Triangle_Tetrahedrons()
     bool incident_elements_defined=incident_elements!=0;if(!incident_elements_defined) Initialize_Incident_Elements();
     for(int t=0;t<triangle_mesh->elements.m;t++){
         const VECTOR<int,3>& triangle_nodes=triangle_mesh->elements(t);int i=triangle_nodes[1];
-        for(int tet=1;tet<=(*incident_elements)(i).m;tet++){
+        for(int tet=0;tet<(*incident_elements)(i).m;tet++){
             const VECTOR<int,4>& original_nodes=elements((*incident_elements)(i)(tet));
             VECTOR<int,4> nodes;
             int p=1;for(;p<=24;p++){
@@ -374,7 +374,7 @@ Number_Of_Edge_Neighbors(const int segment) const
     else{
         assert(incident_elements);
         int count=0,node1,node2;segment_mesh->elements(segment).Get(node1,node2);
-        for(int t=1;t<=(*incident_elements)(node1).m;t++) if(Node_In_Tetrahedron(node2,(*incident_elements)(node1)(t))) count++; 
+        for(int t=0;t<(*incident_elements)(node1).m;t++) if(Node_In_Tetrahedron(node2,(*incident_elements)(node1)(t))) count++; 
         return count;}
 }
 //#####################################################################
@@ -411,7 +411,7 @@ Initialize_Boundary_Mesh_Of_Subset(TRIANGLE_MESH& boundary_mesh_of_subset,const 
     for(int t=0;t<elements.m;t++) if(subset(t)){
         int i,j,k,l;elements(t).Get(i,j,k,l);
         ARRAY<ARRAY<int> > adjacent_tets_per_face(4);
-        for(int p=1;p<=(*adjacent_elements)(t).m;p++)
+        for(int p=0;p<(*adjacent_elements)(t).m;p++)
             if(!Node_In_Tetrahedron(i,(*adjacent_elements)(t)(p))) adjacent_tets_per_face(1).Append((*adjacent_elements)(t)(p));
             else if(!Node_In_Tetrahedron(j,(*adjacent_elements)(t)(p))) adjacent_tets_per_face(2).Append((*adjacent_elements)(t)(p));
             else if(!Node_In_Tetrahedron(k,(*adjacent_elements)(t)(p))) adjacent_tets_per_face(3).Append((*adjacent_elements)(t)(p));
@@ -513,7 +513,7 @@ Initialize_Bending_Tetrahedrons(TRIANGLE_MESH& triangle_mesh)
     
     for(int t=0;t<triangle_mesh.elements.m;t++){
         VECTOR<int,3> nodes=triangle_mesh.elements(t);
-        for(int a=1;a<=(*triangle_mesh.adjacent_elements)(t).m;a++){
+        for(int a=0;a<(*triangle_mesh.adjacent_elements)(t).m;a++){
             int s=(*triangle_mesh.adjacent_elements)(t)(a);
             if(s>t){
                 const VECTOR<int,3>& other_nodes=triangle_mesh.elements(s);
@@ -534,7 +534,7 @@ Mark_Face_Connected_Component_Incident_On_A_Node(const int node,const int tetrah
     int tetrahedron=(*incident_elements)(node)(tetrahedron_index_in_incident_elements);
     if(marked.m != (*incident_elements)(node).m) marked.Resize((*incident_elements)(node).m);
     marked(tetrahedron_index_in_incident_elements)=true;
-    for(int i=1;i<=(*adjacent_elements)(tetrahedron).m;i++){
+    for(int i=0;i<(*adjacent_elements)(tetrahedron).m;i++){
         int adjacent_tetrahedron=(*adjacent_elements)(tetrahedron)(i);
         if(Node_In_Tetrahedron(node,adjacent_tetrahedron)){int index;
             if((*incident_elements)(node).Find(adjacent_tetrahedron,index) && !marked(index)) Mark_Face_Connected_Component_Incident_On_A_Node(node,index,marked);}}
@@ -546,7 +546,7 @@ int TETRAHEDRON_MESH::
 Tetrahedrons_Across_Face(const int tetrahedron,const int node1,const int node2,const int node3,ARRAY<int>& tetrahedrons_across_face) const
 {
     assert(incident_elements);
-    for(int k=1;k<=(*incident_elements)(node1).m;k++){
+    for(int k=0;k<(*incident_elements)(node1).m;k++){
         int tetrahedron2=(*incident_elements)(node1)(k); // tetrahedron in question
         if(tetrahedron2 != tetrahedron){
             int i,j,k,l;elements(tetrahedron2).Get(i,j,k,l);
@@ -570,7 +570,7 @@ Identify_Face_Connected_Components(ARRAY<int>& label)
         id++;label(t)=id;flood_fill_stack.Push(t);
         while(!flood_fill_stack.Empty()){
             int top=flood_fill_stack.Pop();
-            for(int i=1;i<=(*adjacent_elements)(top).m;i++){
+            for(int i=0;i<(*adjacent_elements)(top).m;i++){
                 int current_tetrahedron=(*adjacent_elements)(top)(i);
                 if(!label(current_tetrahedron)){label(current_tetrahedron)=id;flood_fill_stack.Push(current_tetrahedron);}}}}
     if(!adjacent_elements_defined){delete adjacent_elements;adjacent_elements=0;}
@@ -589,7 +589,7 @@ Identify_Edge_Connected_Components(ARRAY<int>& label)
         id++;label(p)=id;flood_fill_stack.Push(p);
         while(!flood_fill_stack.Empty()){
             int top=flood_fill_stack.Pop();
-            for(int n=1;n<=(*neighbor_nodes)(top).m;n++){
+            for(int n=0;n<(*neighbor_nodes)(top).m;n++){
                 int current_node=(*neighbor_nodes)(top)(n);
                 if(!label(current_node)){label(current_node)=id;flood_fill_stack.Push(current_node);}}}}  
     if(!neighbor_nodes_defined){delete neighbor_nodes;neighbor_nodes=0;}

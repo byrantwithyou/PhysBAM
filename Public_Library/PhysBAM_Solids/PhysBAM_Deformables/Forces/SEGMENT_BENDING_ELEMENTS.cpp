@@ -40,14 +40,14 @@ Set_Triples_From_Segment_Mesh(SEGMENT_MESH& mesh)
 
     // allocate proper array sizes
     int number_triples=0;
-    for(int t=0;t<mesh.elements.m;t++) for(int a=1;a<=(*mesh.adjacent_elements)(t).m;a++) if((*mesh.adjacent_elements)(t)(a)>t) number_triples++;
+    for(int t=0;t<mesh.elements.m;t++) for(int a=0;a<(*mesh.adjacent_elements)(t).m;a++) if((*mesh.adjacent_elements)(t)(a)>t) number_triples++;
     bending_triples.Resize(number_triples);length_scale.Resize(number_triples);stiffness.Resize(number_triples);
     sine_half_rest_angle.Resize(number_triples);damping.Resize(number_triples);
 
     int index=0; // reset number
     for(int t=0;t<mesh.elements.m;t++){
         VECTOR<int,2> segment1=mesh.elements(t);
-        for(int a=1;a<=(*mesh.adjacent_elements)(t).m;a++){
+        for(int a=0;a<(*mesh.adjacent_elements)(t).m;a++){
             int s=(*mesh.adjacent_elements)(t)(a);
             if(s>t){
                 VECTOR<int,2> segment2=mesh.elements(s);

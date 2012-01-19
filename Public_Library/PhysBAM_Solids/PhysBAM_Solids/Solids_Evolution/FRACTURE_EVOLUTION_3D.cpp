@@ -551,7 +551,7 @@ Run_Quasistatics_And_Fracture(const T time,const int max_number_of_fracture_iter
             distance_from_impulse(i)=1;queue.Enqueue(i);}
         while(!queue.Empty()){
             int node=queue.Dequeue();
-            for(int neighbor=1;neighbor<=(*mesh.neighbor_nodes)(node).m;neighbor++){
+            for(int neighbor=0;neighbor<(*mesh.neighbor_nodes)(node).m;neighbor++){
                 int neighbor_node=(*mesh.neighbor_nodes)(node)(neighbor);
                 if(distance_from_impulse(neighbor_node)==0){distance_from_impulse(neighbor_node)=distance_from_impulse(node)+1;queue.Enqueue(neighbor_node);}}}
 

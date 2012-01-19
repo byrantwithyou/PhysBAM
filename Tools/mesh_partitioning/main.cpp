@@ -84,7 +84,7 @@ int Flood_Fill_Mesh(const ARRAY<int>& centers,ARRAY<int>& labels,ARRAY<int>& dis
     for(int c=0;c<centers.m;c++){labels(centers(c))=c;distances(centers(c))=0;queue.Enqueue(centers(c));}
     while(!queue.Empty()){
         int node=queue.Dequeue();
-        for(int i=1;i<=(*segment_mesh.neighbor_nodes)(node).m;i++){
+        for(int i=0;i<(*segment_mesh.neighbor_nodes)(node).m;i++){
             int neighbor=(*segment_mesh.neighbor_nodes)(node)(i);
             if(!labels(neighbor)){
                 labels(neighbor)=labels(node);
@@ -116,7 +116,7 @@ void Compute_Initial_Clustering()
     for(int partition=1,last_optimized_partition=0;partition!=last_optimized_partition;partition=partition%partitions+1){
         for(;;){
             int old_center=centers(partition);
-            for(int i=1;i<=(*segment_mesh.neighbor_nodes)(old_center).m;i++){
+            for(int i=0;i<(*segment_mesh.neighbor_nodes)(old_center).m;i++){
                 centers(partition)=(*segment_mesh.neighbor_nodes)(old_center)(i);
                 int new_functional=Flood_Fill_Mesh(centers,node_labels,distances);
                 if(new_functional<functional){functional=new_functional;last_optimized_partition=partition;break;} else centers(partition)=old_center;}
@@ -131,7 +131,7 @@ void Compute_Initial_Clustering()
 void Update_Boundary_Node(ARRAY<int>& boundary_nodes,ARRAY<int>& boundary_node_index,ARRAY<int>& removed_boundary_nodes,const int node)
 {
     bool is_boundary_node=false;
-    for(int i=1;i<=(*segment_mesh.neighbor_nodes)(node).m;i++)
+    for(int i=0;i<(*segment_mesh.neighbor_nodes)(node).m;i++)
         if(node_labels((*segment_mesh.neighbor_nodes)(node)(i))!=node_labels(node)){is_boundary_node=true;break;}
     if(is_boundary_node){
         if(boundary_node_index(node)) return;
@@ -179,20 +179,20 @@ void Optimize_Clustering()
             int node;do{node=boundary_nodes(random_numbers.Get_Uniform_Integer(1,boundary_nodes.m));}while(!boundary_node_index(node));
             int old_label=node_labels(node);
             ARRAY<int> candidate_labels;
-            for(int i=1;i<=(*segment_mesh.neighbor_nodes)(node).m;i++)
+            for(int i=0;i<(*segment_mesh.neighbor_nodes)(node).m;i++)
                 if(node_labels((*segment_mesh.neighbor_nodes)(node)(i))!=old_label)
                     candidate_labels.Append_Unique(node_labels((*segment_mesh.neighbor_nodes)(node)(i)));
             if(!candidate_labels.m) continue;
             int new_label=candidate_labels(random_numbers.Get_Uniform_Integer(1,candidate_labels.m)),new_total_functional=total_functional,new_cross_edges=cross_edges;
             new_total_functional+=2*cluster_sizes.m*(cluster_sizes(new_label)-cluster_sizes(old_label)+1);
-            for(int i=1;i<=(*segment_mesh.neighbor_nodes)(node).m;i++)
+            for(int i=0;i<(*segment_mesh.neighbor_nodes)(node).m;i++)
                 if(node_labels((*segment_mesh.neighbor_nodes)(node)(i))==old_label){new_total_functional+=cross_edge_factor;new_cross_edges++;}
                 else if(node_labels((*segment_mesh.neighbor_nodes)(node)(i))==new_label){new_total_functional-=cross_edge_factor;new_cross_edges--;}
             double threshold=exp((total_functional-new_total_functional)/temperature);
             if(new_total_functional<total_functional || threshold>random_numbers.Get_Number()){
                 node_labels(node)=new_label;cluster_sizes(old_label)--;cluster_sizes(new_label)++;total_functional=new_total_functional;cross_edges=new_cross_edges;
                 Update_Boundary_Node(boundary_nodes,boundary_node_index,removed_boundary_nodes,node);
-                for(int i=1;i<=(*segment_mesh.neighbor_nodes)(node).m;i++)
+                for(int i=0;i<(*segment_mesh.neighbor_nodes)(node).m;i++)
                     Update_Boundary_Node(boundary_nodes,boundary_node_index,removed_boundary_nodes,(*segment_mesh.neighbor_nodes)(node)(i));}}
         temperature*=annealing_factor;
 

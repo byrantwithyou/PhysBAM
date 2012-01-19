@@ -138,15 +138,15 @@ public:
     void Solve_Forward_Substitution(const VECTOR_ND<T>& b,VECTOR_ND<T>& x,const bool diagonal_is_identity=false,const bool diagonal_is_inverted=false)
     {if(diagonal_is_identity) for(int i=0;i<n;i++){
         SPARSE_VECTOR_ND<T>& row=*A(i);
-        T sum=0;for(int j=1;j<=(*diagonal_index)(i)-1;j++){sum+=row.x[j]*x(row.indices[j]);}
+        T sum=0;for(int j=0;j<(*diagonal_index)(i)-1;j++){sum+=row.x[j]*x(row.indices[j]);}
         x(i)=b(i)-sum;}
     else if(!diagonal_is_inverted) for(int i=0;i<n;i++){
         SPARSE_VECTOR_ND<T>& row=*A(i);
-        T sum=0;for(int j=1;j<=(*diagonal_index)(i)-1;j++){sum+=row.x[j]*x(row.indices[j]);}
+        T sum=0;for(int j=0;j<(*diagonal_index)(i)-1;j++){sum+=row.x[j]*x(row.indices[j]);}
         x(i)=(b(i)-sum)/row.x[(*diagonal_index)(i)];}
     else for(int i=0;i<n;i++){
         SPARSE_VECTOR_ND<T>& row=*A(i);
-        T sum=0;for(int j=1;j<=(*diagonal_index)(i)-1;j++){sum+=row.x[j]*x(row.indices[j]);}
+        T sum=0;for(int j=0;j<(*diagonal_index)(i)-1;j++){sum+=row.x[j]*x(row.indices[j]);}
         x(i)=(b(i)-sum)*row.x[(*diagonal_index)(i)];}}
 
     void Solve_Backward_Substitution(const VECTOR_ND<T>& b,VECTOR_ND<T>& x,const bool diagonal_is_identity=false,const bool diagonal_is_inverted=false)

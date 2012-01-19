@@ -68,7 +68,7 @@ public:
     bool neighbor_nodes_defined=triangle_mesh_1.neighbor_nodes!=0;if(!neighbor_nodes_defined)triangle_mesh_1.Initialize_Neighbor_Nodes();
     for(int i=0;i<queue.m;i++){
         int p=queue(i);
-        for(int a=1;a<=(*triangle_mesh_1.neighbor_nodes)(p).m;a++){
+        for(int a=0;a<(*triangle_mesh_1.neighbor_nodes)(p).m;a++){
             int q=(*triangle_mesh_1.neighbor_nodes)(p)(a);
             if(!(*disabled)(q) && !close_triangles(q)){
                 queue.Append(q);(*disabled)(q)=true;}}}

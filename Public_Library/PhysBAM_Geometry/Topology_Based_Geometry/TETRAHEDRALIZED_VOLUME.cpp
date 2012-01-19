@@ -397,7 +397,7 @@ Advance_Interior_Laplacian_Smoothing()
     // compute the centroid of the neighbors - if on the boundary, just use boundary neighbors
     for(int i=0;i<mesh.neighbor_nodes->m;i++){
         int number=0;TV target;
-        for(int j=1;j<=(*mesh.neighbor_nodes)(i).m;j++){
+        for(int j=0;j<(*mesh.neighbor_nodes)(i).m;j++){
             int node=(*mesh.neighbor_nodes)(i)(j);
             if(!(*mesh.node_on_boundary)(i) || (*mesh.node_on_boundary)(node)){number++;target+=particles.X(node);}}
         if(number != 0){target/=(T)number;particles.X(i)=target;}}
@@ -596,7 +596,7 @@ Volume_Incident_On_A_Particle(const int particle_index)
     if(mesh.number_nodes!=particles.array_collection->Size()) PHYSBAM_FATAL_ERROR();
     bool incident_elements_defined=mesh.incident_elements!=0;if(!incident_elements_defined) mesh.Initialize_Incident_Elements();
     T total_incident_volume=0;
-    for(int t=1;t<=(*mesh.incident_elements)(particle_index).m;t++){int i,j,k,l;mesh.elements((*mesh.incident_elements)(particle_index)(t)).Get(i,j,k,l);
+    for(int t=0;t<(*mesh.incident_elements)(particle_index).m;t++){int i,j,k,l;mesh.elements((*mesh.incident_elements)(particle_index)(t)).Get(i,j,k,l);
         total_incident_volume+=TETRAHEDRON<T>::Volume(particles.X(i),particles.X(j),particles.X(k),particles.X(l));}
     if(!incident_elements_defined){delete mesh.incident_elements;mesh.incident_elements=0;}
     return total_incident_volume;

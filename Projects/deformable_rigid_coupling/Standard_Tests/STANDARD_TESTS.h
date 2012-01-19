@@ -875,7 +875,7 @@ void Twisting_Chain(bool apply_twist)
     solids_parameters.cfl=(T)1;
     int n=3;
     RIGID_BODY<TV>* rigid_body=0;
-    for(int i=1;i<=3*n+1;i++){
+    for(int i=0;i<3*n+1;i++){
         FRAME<TV> frame(TV((T)1.3*i,6,0),ROTATION<TV>(i*(T)pi/2,TV(1,0,0)));
         if(i%3==1){
             rigid_body=&tests.Add_Rigid_Body("torus",1,(T).5);

@@ -246,7 +246,7 @@ Signed_Solid_Angle_Of_Triangle_Web(const TV& location,int web_root_node) const
 {
     assert(mesh.incident_elements);
     T signed_solid_angle=0;
-    for(int i=1;i<=(*mesh.incident_elements)(web_root_node).m;i++){
+    for(int i=0;i<(*mesh.incident_elements)(web_root_node).m;i++){
         int t=(*mesh.incident_elements)(web_root_node)(i);
         int node1,node2,node3;mesh.elements(t).Get(node1,node2,node3);
         TV x1=particles.X(node1),x2=particles.X(node2),x3=particles.X(node3);

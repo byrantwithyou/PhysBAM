@@ -204,7 +204,7 @@ Initialize_Segment_Mesh()
     segment_mesh=new SEGMENT_MESH();
     segment_mesh->number_nodes=number_nodes;
     segment_mesh->elements.Preallocate((total_degree+1)/2); // add one for subtle optimization purposes
-    for(int node=0;node<neighbor_nodes->m;node++) for(int k=1;k<=(*neighbor_nodes)(node).m;k++) // do nodes in ascending order so that no edges are counted more than once
+    for(int node=0;node<neighbor_nodes->m;node++) for(int k=0;k<(*neighbor_nodes)(node).m;k++) // do nodes in ascending order so that no edges are counted more than once
         if(node<=(*neighbor_nodes)(node)(k)) segment_mesh->elements.Append(VECTOR<int,2>(node,(*neighbor_nodes)(node)(k)));
     if(!neighbor_nodes_defined){delete neighbor_nodes;neighbor_nodes=0;}
 }
@@ -323,7 +323,7 @@ Non_Manifold_Nodes(ARRAY<int>& node_list)
             bool found_neighbor=true;
             while(found_neighbor){found_neighbor=false;
                 int k=ordered_neighbors(ordered_neighbors.m); // looking for a new neighbor of node k
-                for(int j=1;j<=(*incident_elements)(i).m;j++){
+                for(int j=0;j<(*incident_elements)(i).m;j++){
                     int a,b,c;elements((*incident_elements)(i)(j)).Get(a,b,c);
                     if(a == k || b == k || c == k){int index;
                         if(a != i && !ordered_neighbors.Find(a,index)){ordered_neighbors.Append(a);found_neighbor=true;break;}
@@ -346,7 +346,7 @@ Mark_Edge_Connected_Component_Incident_On_A_Node(const int node,const int triang
     int triangle=(*incident_elements)(node)(triangle_index_in_incident_elements);
     if(marked.m != (*incident_elements)(node).m) marked.Resize((*incident_elements)(node).m);
     marked(triangle_index_in_incident_elements)=true;
-    for(int i=1;i<=(*adjacent_elements)(triangle).m;i++){
+    for(int i=0;i<(*adjacent_elements)(triangle).m;i++){
         int adjacent_triangle=(*adjacent_elements)(triangle)(i);
         if(Node_In_Triangle(node,adjacent_triangle)){int index;
             if((*incident_elements)(node).Find(adjacent_triangle,index) && !marked(index)) Mark_Edge_Connected_Component_Incident_On_A_Node(node,index,marked);}}
@@ -358,7 +358,7 @@ int TRIANGLE_MESH::
 Adjacent_Triangle(const int triangle,const int node1,const int node2) const
 {
     assert(Node_In_Triangle(node1,triangle) && Node_In_Triangle(node2,triangle) && adjacent_elements);
-    for(int a=1;a<=(*adjacent_elements)(triangle).m;a++){
+    for(int a=0;a<(*adjacent_elements)(triangle).m;a++){
         int t=(*adjacent_elements)(triangle)(a);if(Node_In_Triangle(node1,t) && Node_In_Triangle(node2,t))return t;}
     return 0;
 }
@@ -370,7 +370,7 @@ Triangles_On_Edge(const int node1,const int node2,ARRAY<int>* triangles_on_edge)
 {
     assert(incident_elements);
     int triangle_count=0;
-    for(int t=1;t<=(*incident_elements)(node1).m;t++){
+    for(int t=0;t<(*incident_elements)(node1).m;t++){
         int triangle=(*incident_elements)(node1)(t);
         if(Node_In_Triangle(node2,triangle)){triangle_count++;if(triangles_on_edge) (*triangles_on_edge).Append(triangle);}}
     return triangle_count;
@@ -382,7 +382,7 @@ bool TRIANGLE_MESH::
 Triangle_On_Edge(const int node1,const int node2) const
 {
     assert(incident_elements);
-    for(int t=1;t<=(*incident_elements)(node1).m;t++) if(Node_In_Triangle(node2,(*incident_elements)(node1)(t)))return true;
+    for(int t=0;t<(*incident_elements)(node1).m;t++) if(Node_In_Triangle(node2,(*incident_elements)(node1)(t)))return true;
     return false;
 }
 //#####################################################################
@@ -392,7 +392,7 @@ int TRIANGLE_MESH::
 Triangles_Across_Edge(const int triangle,const int node1,const int node2,ARRAY<int>& triangles_across_edge) const
 {
     assert(incident_elements);
-    for(int k=1;k<=(*incident_elements)(node1).m;k++){
+    for(int k=0;k<(*incident_elements)(node1).m;k++){
         int triangle2=(*incident_elements)(node1)(k); // triangle in question
         if(triangle2 != triangle && Node_In_Triangle(node2,triangle2))triangles_across_edge.Append(triangle2);}
     return triangles_across_edge.m;
@@ -411,7 +411,7 @@ Make_Orientations_Consistent()
         for(int a=0;a<component.m;a++){
             int t=component(a),i,j,k;elements(t).Get(i,j,k);
             if(orientation(c)>0)positive++;else negative++;
-            for(int b=1;b<=(*adjacent_elements)(t).m;b++){
+            for(int b=0;b<(*adjacent_elements)(t).m;b++){
                 int t2=(*adjacent_elements)(t)(b);if(orientation(t2))continue;
                 int i2,j2,k2;elements(t2).Get(i2,j2,k2);if(i!=i2&&i!=j2&&i!=k2)cyclic_shift(i,j,k);
                 if(i!=i2)cyclic_shift(i2,j2,k2);if(i!=i2)cyclic_shift(i2,j2,k2);
@@ -430,7 +430,7 @@ Orientations_Consistent()
     bool adjacent_elements_defined=adjacent_elements!=0;if(!adjacent_elements_defined)Initialize_Adjacent_Elements();
     for(int t=0;t<elements.m;t++){
         int i,j,k;elements(t).Get(i,j,k);
-        for(int a=1;a<=(*adjacent_elements)(t).m;a++){
+        for(int a=0;a<(*adjacent_elements)(t).m;a++){
             int t2=(*adjacent_elements)(t)(a);if(t2<t)continue;
             int i2,j2,k2;elements(t2).Get(i2,j2,k2);if(i!=i2&&i!=j2&&i!=k2)cyclic_shift(i,j,k);
             if(i!=i2)cyclic_shift(i2,j2,k2);if(i!=i2)cyclic_shift(i2,j2,k2);
@@ -458,7 +458,7 @@ Label_Connected_Component_With_ID(ARRAY<int>& label,const int triangle,const int
 {
     assert(adjacent_elements);assert(label.m==elements.m);
     label(triangle)=id;
-    for(int i=1;i<=(*adjacent_elements)(triangle).m;i++){
+    for(int i=0;i<(*adjacent_elements)(triangle).m;i++){
         int adjacent_triangle=(*adjacent_elements)(triangle)(i);
         if(!label(adjacent_triangle)) Label_Connected_Component_With_ID(label,adjacent_triangle,id);}
 }

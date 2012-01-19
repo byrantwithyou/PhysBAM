@@ -262,7 +262,7 @@ int main(int argc,char *argv[])
         cout<<"Iteration "<<k<<endl;
         for(int i=1;i<nodes.m;i++){
             new_colors(i)=VECTOR_3D<float>();new_positions(i)=VECTOR_3D<float>();float total_weight=0;
-            for(int j=1;j<=(*tri_mesh.neighbor_nodes)(nodes(i)).m;j++){
+            for(int j=0;j<(*tri_mesh.neighbor_nodes)(nodes(i)).m;j++){
                 new_positions(i)+=tri_particles.X((*tri_mesh.neighbor_nodes)(nodes(i))(j));
                 float weight=(tri_particles.X((*tri_mesh.neighbor_nodes)(nodes(i))(j))-tri_particles.X(nodes(i))).Magnitude();
                 new_colors(i)+=weight*vertex_colors((*tri_mesh.neighbor_nodes)(nodes(i))(j));total_weight+=weight;}

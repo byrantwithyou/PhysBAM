@@ -54,7 +54,7 @@ void Interior_Edges_With_Boundary_Nodes(TETRAHEDRALIZED_VOLUME<T>& tv,ARRAY<VECT
     deletion_list->Resize(0);
     for(int t=0;t<tv.mesh.boundary_nodes->m;t++){
         int node1=(*tv.mesh.boundary_nodes)(t);
-        for(int i=1;i<=(*tv.mesh.neighbor_nodes)(node1).m;i++){
+        for(int i=0;i<(*tv.mesh.neighbor_nodes)(node1).m;i++){
             int node2=(*tv.mesh.neighbor_nodes)(node1)(i);
             if(node1 <node2 && (*tv.mesh.node_on_boundary)(node2) && !tv.mesh.boundary_mesh->segment_mesh->Segment(node1,node2))
                 deletion_list->Append(VECTOR<int,2>(node1,node2));}}

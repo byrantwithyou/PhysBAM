@@ -88,7 +88,7 @@ Initialize_Adjacent_Elements()
 void HEXAHEDRON_MESH::
 Find_And_Append_Adjacent_Elements(const int hexahedron,const int node1,const int node2,const int node3,const int node4)
 {
-    for(int h=1;h<=(*incident_elements)(node1).m;h++){
+    for(int h=0;h<(*incident_elements)(node1).m;h++){
         int hexahedron2=(*incident_elements)(node1)(h);
         if(hexahedron2!=hexahedron && Node_In_Hexahedron(node2,hexahedron2) && Node_In_Hexahedron(node3,hexahedron2) && Node_In_Hexahedron(node4,hexahedron2))
             (*adjacent_elements)(hexahedron).Append_Unique(hexahedron2);}
@@ -148,7 +148,7 @@ Number_Of_Hexahedrons_Across_Face(const int hexahedron,const int node1,const int
 {
     assert(incident_elements);int count=0;ARRAY<int> p(8);
     int n1=node1,n2=node2,n3=node3,n4=node4;exchange_sort(n1,n2,n3,n4);
-    for(int h=1;h<=(*incident_elements)(n1).m;h++){
+    for(int h=0;h<(*incident_elements)(n1).m;h++){
         int hexahedron2=(*incident_elements)(n1)(h);if(hexahedron==hexahedron2) continue; // hexahedron in question
         elements(hexahedron2).Get(p(1),p(2),p(3),p(4),p(5),p(6),p(7),p(8));
         for(int f=0;f<6;f++){
@@ -213,7 +213,7 @@ Initialize_Face_Hexahedrons()
     delete face_hexahedrons;face_hexahedrons=new ARRAY<VECTOR<int,2> >(faces->m);
     for(int f=0;f<faces->m;f++){
         int node1=(*faces)(f)(1),node2=(*faces)(f)(2),node3=(*faces)(f)(3),node4=(*faces)(f)(4),count=0;exchange_sort(node1,node2,node3,node4);
-        for(int h=1;h<=(*incident_elements)(node1).m;h++){
+        for(int h=0;h<(*incident_elements)(node1).m;h++){
             for(int hf=0;hf<6;hf++){
                 ARRAY<int> p(4);for(int k=0;k<4;k++)p(k+1)=elements((*incident_elements)(node1)(h))(face_indices[hf][k]);exchange_sort(p(1),p(2),p(3),p(4));
                 if(node1==p(1) && node2==p(2) && node3==p(3) && node4==p(4)){(*face_hexahedrons)(f)(++count)=(*incident_elements)(node1)(h);break;}}

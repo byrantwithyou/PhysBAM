@@ -46,7 +46,7 @@ public:
     void Smooth_Fracture_Bias_Directions(const int passes)
     {for(int iteration=0;iteration<passes;iteration++) for(int t=0;t<mesh.elements.m;t++){
         VECTOR<T,d> average=fracture_object.fracture_bias_direction(t);
-        for(int i=1;i<=(*mesh.adjacent_elements)(t).m;i++) average+=fracture_object.fracture_bias_direction((*mesh.adjacent_elements)(t)(i));
+        for(int i=0;i<(*mesh.adjacent_elements)(t).m;i++) average+=fracture_object.fracture_bias_direction((*mesh.adjacent_elements)(t)(i));
         fracture_object.fracture_bias_direction(t)=average.Normalized();}}
 
     void Seed_Regions(const int number_of_regions)
@@ -66,7 +66,7 @@ public:
     int Mark_All_Neigbors_Of_Region(const int region,const T coin_flip_threshold=(T)0)
     {assert(regions.m==mesh.elements.m);
     ARRAY<bool> to_be_marked(mesh.elements.m);
-    for(int t=0;t<mesh.elements.m;t++) if(regions(t)==region) for(int a=1;a<=(*mesh.adjacent_elements)(t).m;a++){ // mark neighbors of t
+    for(int t=0;t<mesh.elements.m;t++) if(regions(t)==region) for(int a=0;a<(*mesh.adjacent_elements)(t).m;a++){ // mark neighbors of t
         int adj_t=(*mesh.adjacent_elements)(t)(a);
         if(!coin_flip_threshold) to_be_marked(adj_t)=true;
         else if(random_numbers.Get_Uniform_Number((T)0,(T)1) > coin_flip_threshold)to_be_marked(adj_t)=true;}
@@ -77,7 +77,7 @@ public:
     int Mark_All_Node_Neighbors_Of_Region(const int node_region,const T coin_flip_threshold=(T)0)
     {assert(node_regions.m==mesh.number_nodes);
     ARRAY<bool> to_be_marked(mesh.number_nodes);
-    for(int n=0;n<mesh.number_nodes;n++) if(node_regions(n)==node_region) for(int nbr=1;nbr<=(*mesh.neighbor_nodes)(n).m;nbr++){
+    for(int n=0;n<mesh.number_nodes;n++) if(node_regions(n)==node_region) for(int nbr=0;nbr<(*mesh.neighbor_nodes)(n).m;nbr++){
         int nbr_node=(*mesh.neighbor_nodes)(n)(nbr);
         if(!coin_flip_threshold)to_be_marked(nbr_node)=true;
         else if(random_numbers.Get_Uniform_Number((T)0,(T)1) > coin_flip_threshold)to_be_marked(nbr_node)=true;}
@@ -122,7 +122,7 @@ public:
 
     bool Is_On_Border_With_Another_Region(const int element)
     {int region=regions(element);
-    for(int a=1;a<=(*mesh.adjacent_elements)(element).m;a++) if(regions((*mesh.adjacent_elements)(element)(a)) != region) return true;
+    for(int a=0;a<(*mesh.adjacent_elements)(element).m;a++) if(regions((*mesh.adjacent_elements)(element)(a)) != region) return true;
     return false;}
 
     bool Element_Contains_Nodes_From_Different_Regions(const int element)

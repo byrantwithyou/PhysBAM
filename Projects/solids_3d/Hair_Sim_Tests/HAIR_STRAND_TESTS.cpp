@@ -315,7 +315,7 @@ Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_p
             break;
         case 3:
             interp_start.Add_Control_Point(0,FRAME<TV>());
-            for(int i=1;i<=duration*factor;i++){
+            for(int i=0;i<duration*factor;i++){
                 frame.t=TV(0,(i%2==1)*(T)-1.*init_positions_start(1)[2],0);
                 interp_start.Add_Control_Point((T)i/factor,frame);
             }

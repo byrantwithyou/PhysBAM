@@ -42,9 +42,9 @@ Gather_Phoneme_Statistics_Helper(PHONEME_CORPUS<T>* phoneme_corpus,ARRAY<PHONEME
     per_attribute_mean/=(T)frame_length;
     errors->Resize(means(1).n);
     // get deviations
-    for(int i=0;i<phonemes.m;i++)for(int t=0;t<frame_length;t++){VECTOR_ND<T> controls=phonemes(i)->Controls(t/(T)120);for(int j=1;j<=(*errors).n;j++)(*errors)(j)+=pow(controls(j)-means(t+1)(j),2);}
+    for(int i=0;i<phonemes.m;i++)for(int t=0;t<frame_length;t++){VECTOR_ND<T> controls=phonemes(i)->Controls(t/(T)120);for(int j=0;j<(*errors).n;j++)(*errors)(j)+=pow(controls(j)-means(t+1)(j),2);}
     LOG::cout<<"Stiffnesses for phoneme "<<phonemes(1)->phoneme_sample->name<<std::endl;
-    for(int i=1;i<=(*errors).n;i++){(*errors)(i)=sqrt((*errors)(i)/phonemes.m)/abs(per_attribute_mean(i));LOG::cout<<i<<": "<<(*errors)(i)<<std::endl;}
+    for(int i=0;i<(*errors).n;i++){(*errors)(i)=sqrt((*errors)(i)/phonemes.m)/abs(per_attribute_mean(i));LOG::cout<<i<<": "<<(*errors)(i)<<std::endl;}
     phoneme_corpus->phoneme_stiffness.Set(phonemes(1)->phoneme_sample->name,errors);
 }
 //#####################################################################

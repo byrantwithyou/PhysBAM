@@ -86,7 +86,7 @@ Initialize_Ordered_Loop_Nodes()
     if(!connected_segments){Initialize_Connected_Segments();created_connected_segments=true;}
 
     for(int i=0;i<connected_segments->m;i++){
-        for(int j=1;j<=(*connected_segments)(i).m;j++)for(int k=0;k<2;k++)if((*neighbor_nodes)((*connected_segments)(i)(j)(k)).m!=2) goto not_closed;
+        for(int j=0;j<(*connected_segments)(i).m;j++)for(int k=0;k<2;k++)if((*neighbor_nodes)((*connected_segments)(i)(j)(k)).m!=2) goto not_closed;
         ordered_loop_nodes->Append(ARRAY<int>());
         {int start_node=(*connected_segments)(i)(1)(1),curr_node=(*connected_segments)(i)(1)(2);
         ordered_loop_nodes->Last().Append(start_node);

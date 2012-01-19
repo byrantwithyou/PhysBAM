@@ -81,7 +81,7 @@ int main(int argc,char *argv[])
             cout<<"Level "<<i<<" with "<<curr_level_nodes.m<<" nodes"<<endl;
             visited_nodes.Append_Elements(curr_level_nodes);
             for(int j=0;j<curr_level_nodes.m;j++){
-                for(int k=1;k<=(*tri_mesh.neighbor_nodes)(curr_level_nodes(j)).m;k++)
+                for(int k=0;k<(*tri_mesh.neighbor_nodes)(curr_level_nodes(j)).m;k++)
                     if(!visited_nodes.Find((*tri_mesh.neighbor_nodes)(curr_level_nodes(j))(k)))next_level_nodes.Append((*tri_mesh.neighbor_nodes)(curr_level_nodes(j))(k));
                 tri_particles.X(curr_level_nodes(j))=(float)weights(i)*tri_particles.X(curr_level_nodes(j))+(float)(1.0-weights(i))*
                     tet_vol.triangulated_surface->Oriented_Surface(tri_particles.X(curr_level_nodes(j)),(*tri_surf.vertex_normals)(1,curr_level_nodes(j)),0.001,0.001,0,0);}

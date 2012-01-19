@@ -130,7 +130,7 @@ Fracture_Where_High_Stress(ARRAY<T_SYMMETRIC_MATRIX>& sigma,ARRAY<TV>& spatial_f
         for(int pass=0;pass<number_of_smoothing_passes;pass++) for(int t=0;t<embedded_object.simplicial_object.mesh.elements.m;t++){
             T total_size=size(t);
             sigma(t)*=size(t);
-            for(int a=1;a<=(*embedded_object.simplicial_object.mesh.adjacent_elements)(t).m;a++){
+            for(int a=0;a<(*embedded_object.simplicial_object.mesh.adjacent_elements)(t).m;a++){
                 int adj_t=(*embedded_object.simplicial_object.mesh.adjacent_elements)(t)(a);
                 sigma(t)+=size(adj_t)*sigma(adj_t);total_size+=size(adj_t);}
             sigma(t)/=total_size;}}
@@ -145,7 +145,7 @@ Fracture_Where_High_Stress(ARRAY<T_SYMMETRIC_MATRIX>& sigma,ARRAY<TV>& spatial_f
         if(fracture_bias_magnitude(ref_t) && fracture_bias_direction(ref_t)!=VECTOR<T,d>())
             sigma(t)+=fracture_bias_magnitude(ref_t)*T_SYMMETRIC_MATRIX::Outer_Product(spatial_fracture_bias_direction(t));
         if(fracture_bias_propagation){ // bias stress based on cuts in adjacent elements
-            for(int a=1;a<=(*embedded_object.simplicial_object.mesh.adjacent_elements)(t).m;a++){
+            for(int a=0;a<(*embedded_object.simplicial_object.mesh.adjacent_elements)(t).m;a++){
                 int adj_t=(*embedded_object.simplicial_object.mesh.adjacent_elements)(t)(a);
                 VECTOR<int,2*d-2> emb_elements=embedded_object.Embedded_Subelements_In_Element(adj_t);
                 for(int i=1;i<=emb_elements.m && emb_elements[i];i++){

@@ -58,7 +58,7 @@ Close_Surface(TRIANGULATED_SURFACE<T>& ts,const bool merge_coincident_vertices,c
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
                     if(verbose) LOG::cout<<index1<<"->"<<closest_index2<<" "<<std::flush;
 #endif
-                    for(int j=1;j<=(*ts.mesh.incident_elements)(index1).m;j++){
+                    for(int j=0;j<(*ts.mesh.incident_elements)(index1).m;j++){
                         int t=(*ts.mesh.incident_elements)(index1)(j);
                         if(ts.mesh.elements(t)(1)==index1)ts.mesh.elements(t)(1)=closest_index2;
                         else if(ts.mesh.elements(t)(2)==index1)ts.mesh.elements(t)(2)=closest_index2;

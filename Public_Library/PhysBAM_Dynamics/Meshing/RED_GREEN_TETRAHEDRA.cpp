@@ -576,7 +576,7 @@ Coarsen_Complete_Refinements_Of_Subset(TETRAHEDRON_MESH& final_mesh,ARRAY<bool>&
     OPERATION_HASH<> hash(mesh.elements.m);
     for(int node=0;node<mesh.number_nodes;node++){
         int adjusted_incident_elements=0;
-        for(int t=1;t<=(*mesh.incident_elements)(node).m;t++){
+        for(int t=0;t<(*mesh.incident_elements)(node).m;t++){
             int incident_tet=(*mesh.incident_elements)(node)(t);
             if(!subset(incident_tet) || hash.Is_Marked_Current(incident_tet)) continue;
             int tet,level;leaf_levels_and_indices(incident_tet).Get(level,tet);
@@ -642,7 +642,7 @@ Remove_Simplex_List(const ARRAY<int>& tetrahedron_list,ARRAY<HASHTABLE<int,int> 
         HASHTABLE<int,int>& simplex_map=(*level_simplex_maps)(level);simplex_map.Remove_All();
         
         meshes(level)->Delete_Sorted_Elements(level_tetrahedron_list(level),simplex_map);
-        if(level<parent.m) for(int i=1;i<=(*parent(level+1)).m;i++) simplex_map.Get((*parent(level+1))(i),(*parent(level+1))(i));
+        if(level<parent.m) for(int i=0;i<(*parent(level+1)).m;i++) simplex_map.Get((*parent(level+1))(i),(*parent(level+1))(i));
         if(parent(level)) parent(level)->Remove_Sorted_Indices_Lazy(level_tetrahedron_list(level));
         if(level>1) for(int i=1;i<=children(level-1)->m;i++){for(int j=0;j<4;j++) simplex_map.Get((*children(level-1))(i)(j),(*children(level-1))(i)(j));
             // really we just need the zeros at the end...bubble it?

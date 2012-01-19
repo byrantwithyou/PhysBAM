@@ -285,7 +285,7 @@ Area_Incident_On_A_Particle(const int particle_index)
 {
     int incident_elements_defined=mesh.incident_elements!=0;if(!incident_elements_defined) mesh.Initialize_Incident_Elements();
     T total_incident_area=0;
-    for(int t=1;t<=(*mesh.incident_elements)(particle_index).m;t++){
+    for(int t=0;t<(*mesh.incident_elements)(particle_index).m;t++){
         int i,j,k;mesh.elements((*mesh.incident_elements)(particle_index)(t)).Get(i,j,k);
         total_incident_area+=TRIANGLE_2D<T>::Area(particles.X(i),particles.X(j),particles.X(k));}
     if(!incident_elements_defined){delete mesh.incident_elements;mesh.incident_elements=0;}

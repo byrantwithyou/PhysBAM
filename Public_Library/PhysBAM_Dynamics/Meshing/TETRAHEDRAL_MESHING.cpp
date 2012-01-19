@@ -109,7 +109,7 @@ Initialize_Optimization(const bool verbose)
         layers.Append(new ARRAY<int>);
         for(int i=1;i<=layers(l-1)->m;i++){
             int j=(*layers(l-1))(i);
-            for(int k=1;k<=(*mesh.incident_elements)(j).m;k++) for(int a=0;a<4;a++){
+            for(int k=0;k<(*mesh.incident_elements)(j).m;k++) for(int a=0;a<4;a++){
                 int b=mesh.elements((*mesh.incident_elements)(j)(k))(a);
                 if(!marked(b)){layers(l)->Append(b);marked(b)=true;}}}
         if(layers(l)->m==0){delete layers(l);layers.Remove_End();break;}
@@ -209,7 +209,7 @@ Search_For_Best_Position(const int node,const ARRAY<TV>& directions,bool include
             if(best_quality<worst_interior_quality) worst_interior_quality=best_quality;
             else if(best_quality>worst_interior_quality+.1) return;}} // early exit if good enough relative to rest of mesh
     TV best_x(particles.X(node)),xi,xj,xk,xl;T alpha=FLT_MAX;PLANE<T> p;
-    for(int s=1;s<=(*mesh.incident_elements)(node).m;s++){
+    for(int s=0;s<(*mesh.incident_elements)(node).m;s++){
         int t=(*mesh.incident_elements)(node)(s);
         int i,j,k,l;mesh.elements(t).Get(i,j,k,l);xi=particles.X(i);xj=particles.X(j);xk=particles.X(k);xl=particles.X(l);
         if(i==node){p.Specify_Three_Points(xj,xl,xk);alpha=min(alpha,TV::Dot_Product(xi-xj,p.normal));}
@@ -239,7 +239,7 @@ Quality_Of_Worst_Incident_Tetrahedron(const int node)
     TETRAHEDRON_MESH& mesh=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>().mesh;
     PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     PLANE<T> p;TV xi,xj,xk,xl,n1,n2,n3,n4;T worst_quality=1;
-    for(int s=1;s<=(*mesh.incident_elements)(node).m;s++){
+    for(int s=0;s<(*mesh.incident_elements)(node).m;s++){
         int t=(*mesh.incident_elements)(node)(s);
         int i,j,k,l;mesh.elements(t).Get(i,j,k,l);xi=particles.X(i);xj=particles.X(j);xk=particles.X(k);xl=particles.X(l);
         T max_edge_length=max((xi-xj).Magnitude(),(xj-xk).Magnitude(),(xk-xi).Magnitude(),(xi-xl).Magnitude(),(xj-xl).Magnitude(),(xk-xl).Magnitude());
@@ -275,7 +275,7 @@ template<class T> T TETRAHEDRAL_MESHING<T>::
 Quality_Of_Worst_Dependent_Tetrahedron(const int node)
 {
     T worst_quality=Quality_Of_Worst_Incident_Tetrahedron(node);
-    if(replace_green_refinement_with_embedded_t_junctions) for(int i=1;i<=(*dependent_nodes)(node).m;i++){
+    if(replace_green_refinement_with_embedded_t_junctions) for(int i=0;i<(*dependent_nodes)(node).m;i++){
         int dependent_node=(*dependent_nodes)(node)(i);
         worst_quality=min(worst_quality,Quality_Of_Worst_Incident_Tetrahedron(dependent_node));}
     return worst_quality;
@@ -287,7 +287,7 @@ template<class T> T TETRAHEDRAL_MESHING<T>::
 Quality_Of_Worst_Dependent_Boundary_Triangle(const int node)
 {
     T worst_quality=Quality_Of_Worst_Incident_Boundary_Triangle(node);
-    if(replace_green_refinement_with_embedded_t_junctions) for(int i=1;i<=(*dependent_nodes)(node).m;i++){
+    if(replace_green_refinement_with_embedded_t_junctions) for(int i=0;i<(*dependent_nodes)(node).m;i++){
         int dependent_node=(*dependent_nodes)(node)(i);
         worst_quality=min(worst_quality,Quality_Of_Worst_Incident_Boundary_Triangle(dependent_node));}
     return worst_quality;
@@ -318,7 +318,7 @@ Update_Dependent_Nodes(const int node)
     if(!replace_green_refinement_with_embedded_t_junctions) return;
     PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
-    for(int i=1;i<=(*dependent_nodes)(node).m;i++)
+    for(int i=0;i<(*dependent_nodes)(node).m;i++)
         particles.X((*dependent_nodes)(node)(i))=binding_list.Embedded_Position((*dependent_nodes)(node)(i));
 }
 //#####################################################################
@@ -624,7 +624,7 @@ Discard_To_Get_Nice_Topology(RED_GREEN_TETRAHEDRA<T>& redgreen,ARRAY<bool>& keep
     ARRAY<VECTOR<int,2> > bad_segment_list;
     for(int i=0;i<boundary_nodes.m;i++){
         int node1=boundary_nodes(i);
-        for(int j=1;j<=(*subset_segment_mesh.neighbor_nodes)(node1).m;j++){
+        for(int j=0;j<(*subset_segment_mesh.neighbor_nodes)(node1).m;j++){
             int node2=(*subset_segment_mesh.neighbor_nodes)(node1)(j);
             if(node1<node2 && node_on_boundary(node2) && !boundary_mesh.segment_mesh->Segment(node1,node2)) bad_segment_list.Append(VECTOR<int,2>(node1,node2));}}
     int number_bad_elements=bad_segment_list.m;
@@ -639,7 +639,7 @@ Discard_To_Get_Nice_Topology(RED_GREEN_TETRAHEDRA<T>& redgreen,ARRAY<bool>& keep
     number_bad_elements+=non_manifold_nodes.m;
     if(non_manifold_nodes.m){
         ARRAY<int> tets_to_refine;tets_to_refine.Preallocate(25*non_manifold_nodes.m);
-        for(int i=0;i<non_manifold_nodes.m;i++) for(int j=1;j<=(*mesh.incident_elements)(non_manifold_nodes(i)).m;j++)
+        for(int i=0;i<non_manifold_nodes.m;i++) for(int j=0;j<(*mesh.incident_elements)(non_manifold_nodes(i)).m;j++)
             tets_to_refine.Append((*mesh.incident_elements)(non_manifold_nodes(i))(j));
         redgreen.Refine_Simplex_List(tets_to_refine);Envelope_Interior_Nodes(keep_tet_flag);}
 
@@ -655,26 +655,26 @@ Discard_To_Get_Nice_Topology(RED_GREEN_TETRAHEDRA<T>& redgreen,ARRAY<bool>& keep
         bad_segment_list.Resize(0);
         for(int i=0;i<boundary_nodes.m;i++){
             int node1=boundary_nodes(i);
-            for(int j=1;j<=(*subset_segment_mesh.neighbor_nodes)(node1).m;j++){
+            for(int j=0;j<(*subset_segment_mesh.neighbor_nodes)(node1).m;j++){
                 int node2=(*subset_segment_mesh.neighbor_nodes)(node1)(j);
                 if(node1<node2 && node_on_boundary(node2) && !boundary_mesh.segment_mesh->Segment(node1,node2)) bad_segment_list.Append(VECTOR<int,2>(node1,node2));}}
         if(verbose) LOG::cout<<"Enveloping "<<bad_segment_list.m<<" bad interior edges."<<std::endl;
         number_bad_elements=bad_segment_list.m;
         for(int i=0;i<bad_segment_list.m;i++){
             int node1,node2;bad_segment_list(i).Get(node1,node2);T maxphi1=-(T)FLT_MAX,maxphi2=-(T)FLT_MAX;
-            for(int j=1;j<=(*mesh.incident_elements)(node1).m;j++) if(!keep_tet_flag((*mesh.incident_elements)(node1)(j))){
+            for(int j=0;j<(*mesh.incident_elements)(node1).m;j++) if(!keep_tet_flag((*mesh.incident_elements)(node1)(j))){
                 int a,b,c,d;mesh.elements((*mesh.incident_elements)(node1)(j)).Get(a,b,c,d);
                 maxphi1=max(maxphi1,implicit_surface->Extended_Phi((T).25*(particles.X(a)+particles.X(b)+particles.X(c)+particles.X(d))));}
-            for(int j=1;j<=(*mesh.incident_elements)(node2).m;j++) if(!keep_tet_flag((*mesh.incident_elements)(node2)(j))){
+            for(int j=0;j<(*mesh.incident_elements)(node2).m;j++) if(!keep_tet_flag((*mesh.incident_elements)(node2)(j))){
                 int a,b,c,d;mesh.elements((*mesh.incident_elements)(node2)(j)).Get(a,b,c,d);
                 maxphi2=max(maxphi2,implicit_surface->Extended_Phi((T).25*(particles.X(a)+particles.X(b)+particles.X(c)+particles.X(d))));}
-            if(maxphi1<maxphi2) for(int j=1;j<=(*mesh.incident_elements)(node1).m;j++) keep_tet_flag((*mesh.incident_elements)(node1)(j))=true;
-            else for(int j=1;j<=(*mesh.incident_elements)(node2).m;j++) keep_tet_flag((*mesh.incident_elements)(node2)(j))=true;}
+            if(maxphi1<maxphi2) for(int j=0;j<(*mesh.incident_elements)(node1).m;j++) keep_tet_flag((*mesh.incident_elements)(node1)(j))=true;
+            else for(int j=0;j<(*mesh.incident_elements)(node2).m;j++) keep_tet_flag((*mesh.incident_elements)(node2)(j))=true;}
         if(number_bad_elements) mesh.Initialize_Boundary_Mesh_Of_Subset(boundary_mesh,keep_tet_flag);
         boundary_mesh.Non_Manifold_Nodes(non_manifold_nodes);
         if(verbose) LOG::cout<<"Fixing "<<non_manifold_nodes.m<<" bad nodes."<<std::endl;
         number_bad_elements+=non_manifold_nodes.m;
-        for(int i=0;i<non_manifold_nodes.m;i++) for(int j=1;j<=(*mesh.incident_elements)(non_manifold_nodes(i)).m;j++)
+        for(int i=0;i<non_manifold_nodes.m;i++) for(int j=0;j<(*mesh.incident_elements)(non_manifold_nodes(i)).m;j++)
             keep_tet_flag((*mesh.incident_elements)(non_manifold_nodes(i))(j))=true;}
 }
 //##############################################################################
@@ -691,9 +691,9 @@ Envelope_Interior_Nodes(ARRAY<bool>& keep_tet_flag)
     for(int i=0;i<mesh.number_nodes;i++){
         T phi=implicit_surface->Extended_Phi(particles.X(i));
         if(phi<0){bool envelope_node=true;
-            for(int j=1;j<=(*mesh.neighbor_nodes)(i).m;j++) if(implicit_surface->Extended_Phi(particles.X((*mesh.neighbor_nodes)(i)(j)))>-3*phi){
+            for(int j=0;j<(*mesh.neighbor_nodes)(i).m;j++) if(implicit_surface->Extended_Phi(particles.X((*mesh.neighbor_nodes)(i)(j)))>-3*phi){
                 envelope_node=false;break;}
-            if(envelope_node) for(int j=1;j<=(*mesh.incident_elements)(i).m;j++) keep_tet_flag((*mesh.incident_elements)(i)(j))=true;}}
+            if(envelope_node) for(int j=0;j<(*mesh.incident_elements)(i).m;j++) keep_tet_flag((*mesh.incident_elements)(i)(j))=true;}}
 }
 //#####################################################################
 // Function Write_Output_Files

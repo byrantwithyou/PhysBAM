@@ -70,7 +70,7 @@ template<class T,class TV> void Compute_Stiffness_Matrix_Helper(TRIANGLE_MESH& m
     ARRAY<VECTOR<int,4> > bending_quadruples;
     for(int t=0;t<mesh.elements.m;t++){
         int t1,t2,t3;mesh.elements(t).Get(t1,t2,t3);
-        for(int a=1;a<=(*mesh.adjacent_elements)(t).m;a++){
+        for(int a=0;a<(*mesh.adjacent_elements)(t).m;a++){
             int s=(*mesh.adjacent_elements)(t)(a);
             if(s>t){
                 int s1,s2,s3;mesh.elements(s).Get(s1,s2,s3);

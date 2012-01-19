@@ -106,13 +106,13 @@ Fill_Ghost_Cells(KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T>&>& v)
 {
     ARRAY<MPI::Request> requests;requests.Preallocate(2*(*partition).number_of_sides);
 #ifdef BRICK
-    for(int s=1;s<=(*partition).number_of_sides;s++){
+    for(int s=0;s<(*partition).number_of_sides;s++){
         LOG::cout<<"Boundary index length "<<s<<": "<<(*partition).boundary_indices(s).m<<std::endl;
         LOG::cout<<"Ghost region "<<s<<": "<<(*partition).ghost_indices(s)<<std::endl;
     }
 #endif
-    for(int s=1;s<=(*partition).number_of_sides;s++)if(boundary_datatypes(s)!=MPI::DATATYPE_NULL) requests.Append((*fluid_comm).Isend(v.v.x-1,1,boundary_datatypes(s),(*partition).neighbor_ranks(s),s));
-    for(int s=1;s<=(*partition).number_of_sides;s++)if(ghost_datatypes(s)!=MPI::DATATYPE_NULL) requests.Append((*fluid_comm).Irecv(v.v.x-1,1,ghost_datatypes(s),(*partition).neighbor_ranks(s),((s-1)^1)+1));
+    for(int s=0;s<(*partition).number_of_sides;s++)if(boundary_datatypes(s)!=MPI::DATATYPE_NULL) requests.Append((*fluid_comm).Isend(v.v.x-1,1,boundary_datatypes(s),(*partition).neighbor_ranks(s),s));
+    for(int s=0;s<(*partition).number_of_sides;s++)if(ghost_datatypes(s)!=MPI::DATATYPE_NULL) requests.Append((*fluid_comm).Irecv(v.v.x-1,1,ghost_datatypes(s),(*partition).neighbor_ranks(s),((s-1)^1)+1));
     MPI_UTILITIES::Wait_All(requests);
 }
 //#####################################################################
@@ -123,7 +123,7 @@ Initialize_Datatypes()
 {
     MPI_UTILITIES::Free_Elements_And_Clean_Memory(boundary_datatypes);MPI_UTILITIES::Free_Elements_And_Clean_Memory(ghost_datatypes);
     boundary_datatypes.Resize((*partition).number_of_sides);ghost_datatypes.Resize((*partition).number_of_sides);
-    for(int s=1;s<=(*partition).number_of_sides;s++) if((*partition).neighbor_ranks(s)!=MPI::PROC_NULL){
+    for(int s=0;s<(*partition).number_of_sides;s++) if((*partition).neighbor_ranks(s)!=MPI::PROC_NULL){
         if((*partition).boundary_indices(s).m){
             ARRAY<int>& displacements=(*partition).boundary_indices(s);
             ARRAY<int> block_lengths(displacements.m,false);block_lengths.Fill(1);

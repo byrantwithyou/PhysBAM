@@ -64,7 +64,7 @@ Print_Matrix(VECTOR_T& V,VECTOR_T& F)
         // need to get solid terms
         int our_dynamic_particle_index=(i-1)/TV::dimension+1;int our_axis=i-(our_dynamic_particle_index-1)*TV::dimension;
 
-        for(int j=1;j<=TV::dimension*V.solid_velocity.V.Size();j++){
+        for(int j=0;j<TV::dimension*V.solid_velocity.V.Size();j++){
             int dynamic_particle_index=(j-1)/TV::dimension+1;int axis=j-(dynamic_particle_index-1)*TV::dimension;
             V.solid_velocity*=0;
             V.solid_velocity.V(dynamic_particle_index)(axis)=(T)1;
@@ -79,7 +79,7 @@ Print_Matrix(VECTOR_T& V,VECTOR_T& F)
         // need to get solid terms
         int our_rigid_particle_index=(i-1)/rows_per_rigid_body+1;int our_component=i-(our_rigid_particle_index-1)*rows_per_rigid_body;
 
-        for(int j=1;j<=rows_per_rigid_body*V.solid_velocity.rigid_V.Size();j++){
+        for(int j=0;j<rows_per_rigid_body*V.solid_velocity.rigid_V.Size();j++){
             int rigid_particle_index=(j-1)/rows_per_rigid_body+1;int component=j-(rigid_particle_index-1)*rows_per_rigid_body;
 
             V.solid_velocity*=0;

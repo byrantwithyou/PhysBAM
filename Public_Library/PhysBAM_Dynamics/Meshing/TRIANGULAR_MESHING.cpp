@@ -123,7 +123,7 @@ Search_For_Best_Position(const int node,const ARRAY<VECTOR<T,2> >& directions,bo
     T best_quality=Quality_Of_Worst_Incident_Triangle(node);
     if(best_quality<=worst_interior_quality) worst_interior_quality=best_quality;
     VECTOR<T,2> best_x(particles.X(node)),xi,xj,xk;T alpha=FLT_MAX;
-    for(int s=1;s<=(*triangle_mesh.incident_elements)(node).m;s++){
+    for(int s=0;s<(*triangle_mesh.incident_elements)(node).m;s++){
         int t=(*triangle_mesh.incident_elements)(node)(s);
         int i,j,k;triangle_mesh.elements(t).Get(i,j,k);xi=particles.X(i);xj=particles.X(j);xk=particles.X(k);
         T area=TRIANGLE_2D<T>::Area(xi,xj,xk);
@@ -151,7 +151,7 @@ template<class T> T TRIANGULAR_MESHING<T>::
 Quality_Of_Worst_Incident_Triangle(const int node)
 {
     TRIANGLE_2D<T> triangle;T worst_quality=1;
-    for(int s=1;s<=(*triangle_mesh.incident_elements)(node).m;s++){
+    for(int s=0;s<(*triangle_mesh.incident_elements)(node).m;s++){
         int t=(*triangle_mesh.incident_elements)(node)(s);
         int i,j,k;triangle_mesh.elements(t).Get(i,j,k);
         VECTOR<T,2> xi(particles.X(i).x,particles.X(i).y),xj(particles.X(j).x,particles.X(j).y),

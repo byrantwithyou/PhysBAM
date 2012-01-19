@@ -83,7 +83,7 @@ static void Print_Tetrahedrons_Corresponding_To_Tetrahehdron_In_Reference(int te
 static void Print_Marked(const int center,ARRAY<int> &marked)
 {
     std::cout << "center=" << center << std::endl;
-    for(int p=1;p<=(*reference_mesh.neighbor_nodes)(center).m;p++){
+    for(int p=0;p<(*reference_mesh.neighbor_nodes)(center).m;p++){
         int node=(*reference_mesh.neighbor_nodes)(center)(p);
         std::cout << "(node,marked(node))=(" << node << "," << marked(node) << ")" << std::endl;}
 }

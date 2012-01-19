@@ -206,7 +206,7 @@ public:
     stack.Append(seed);mark(seed)=++count;
     while(stack.m){
         int p;stack.Pop(p);
-        for(int a=1;a<=(*triangle_mesh.neighbor_nodes)(p).m;a++){
+        for(int a=0;a<(*triangle_mesh.neighbor_nodes)(p).m;a++){
             int q=(*triangle_mesh.neighbor_nodes)(p)(a);
             if(!mark(q)){stack.Append(q);mark(q)=++count;}}}
     int pmin=particles.array_collection->Size(),pmax=1;
@@ -304,11 +304,11 @@ void Get_Initial_Data(TRIANGULATED_SURFACE<T>& triangulated_surface)
     ARRAY<int> disabled2(1,particles.array_collection->Size());
     ARRAY<int>::copy(attachments,disabled1);
     for(int p=0;p<particles.array_collection->Size();p++)if(disabled1(p)>0)
-        for(int a=1;a<=(*triangle_mesh.neighbor_nodes)(p).m;a++){
+        for(int a=0;a<(*triangle_mesh.neighbor_nodes)(p).m;a++){
             disabled2((*triangle_mesh.neighbor_nodes)(p)(a))=1;}
     ARRAY<int>::copy(0,disabled1);
     for(int p=0;p<particles.array_collection->Size();p++)if(disabled2(p)>0)
-        for(int a=1;a<=(*triangle_mesh.neighbor_nodes)(p).m;a++){
+        for(int a=0;a<(*triangle_mesh.neighbor_nodes)(p).m;a++){
             disabled1((*triangle_mesh.neighbor_nodes)(p)(a))=1;}
     if(!neighbor_nodes_defined){delete triangle_mesh.neighbor_nodes;triangle_mesh.neighbor_nodes=0;}
     

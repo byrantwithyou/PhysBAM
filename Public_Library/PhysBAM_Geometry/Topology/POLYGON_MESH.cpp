@@ -161,7 +161,7 @@ Oriented_Edge_In_Element(const int node1,const int node2,const int element) cons
     if(!segment_mesh || !element_oriented_edges) PHYSBAM_FATAL_ERROR();
     int s=segment_mesh->Segment(node1,node2);if(!s) return false;
     PAIR<int,bool> oriented_edge(s,segment_mesh->elements(s)==VECTOR<int,2>(node1,node2));
-    for(int c=1;c<=(*element_oriented_edges)(element).m;c++)
+    for(int c=0;c<(*element_oriented_edges)(element).m;c++)
         if((*element_oriented_edges)(element)(c).Contains(oriented_edge)) return true;
     return false;
 }
@@ -189,15 +189,15 @@ Opposite_Oriented_Element(const int element) const
 {
     if(!segment_mesh || !element_oriented_edges) PHYSBAM_FATAL_ERROR();
     ARRAY<int> candidate_elements=(*edge_elements)((*element_oriented_edges)(element)(1)(1).x);
-    for(int c=1;c<=(*element_oriented_edges)(element).m;c++){
+    for(int c=0;c<(*element_oriented_edges)(element).m;c++){
         for(int s=(c==1)?2:1;s<=(*element_oriented_edges)(element)(c).m;s++){
             PAIR<int,bool>& oriented_edge=(*element_oriented_edges)(element)(c)(s);
             int node1,node2;segment_mesh->elements(oriented_edge.x).Get(node1,node2);
             if(oriented_edge.y) exchange(node1,node2);
             for(int i=candidate_elements.m;i>=1;i--) if(!Oriented_Edge_In_Element(node1,node2,candidate_elements(i))) candidate_elements.Remove_Index_Lazy(i);}}
     for(int candidate=candidate_elements.m;candidate>=1;candidate--){
-        for(int c=1;c<=(*element_oriented_edges)(candidate_elements(candidate)).m;c++)
-            for(int s=1;s<=(*element_oriented_edges)(candidate_elements(candidate))(c).m;s++){
+        for(int c=0;c<(*element_oriented_edges)(candidate_elements(candidate)).m;c++)
+            for(int s=0;s<(*element_oriented_edges)(candidate_elements(candidate))(c).m;s++){
                 PAIR<int,bool>& oriented_edge=(*element_oriented_edges)(candidate_elements(candidate))(c)(s);
                 int node1,node2;segment_mesh->elements(oriented_edge.x).Get(node1,node2);
                 if(oriented_edge.y) exchange(node1,node2);
@@ -236,8 +236,8 @@ Split_Polygon_Edge(const int node1,const int node2,const int new_node)
     ARRAY<int> elements_on_edge=(*edge_elements)(first_edge_index);edge_elements->Append(elements_on_edge);
     // update elements_on_unoriented_edge
     for(int e=0;e<elements_on_unoriented_edge.m;e++){int element=elements_on_unoriented_edge(e);
-        for(int c=1;c<=(*element_oriented_edges)(element).m;c++){
-            for(int i=1;i<=(*element_oriented_edges)(element)(c).m;i++){
+        for(int c=0;c<(*element_oriented_edges)(element).m;c++){
+            for(int i=0;i<(*element_oriented_edges)(element)(c).m;i++){
                 PAIR<int,bool>& oriented_edge=(*element_oriented_edges)(element)(c)(i);
                 if(oriented_edge.x==first_edge_index){
                     if(oriented_edge.y){

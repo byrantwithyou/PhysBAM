@@ -550,7 +550,7 @@ Process_Precomputed_Contact_With_Rigid_Bodies()
     for(int j=0;j<precompute_contact_projections.m;j++){if(precompute_contact_projections(j)->rigid_body.Has_Infinite_Inertia()) has_infinite=true;else has_finite=true;}
 
     if(has_finite)
-        for(int iteration=1;iteration<=solids_parameters.rigid_body_collision_parameters.contact_iterations*rigid_body_collisions.contact_level_iterations;iteration++){
+        for(int iteration=0;iteration<solids_parameters.rigid_body_collision_parameters.contact_iterations*rigid_body_collisions.contact_level_iterations;iteration++){
             T epsilon_scale=1;
             if(solids_parameters.rigid_body_collision_parameters.use_epsilon_scaling || solids_parameters.rigid_body_collision_parameters.use_epsilon_scaling_for_level)
                 epsilon_scale=(T)iteration/(solids_parameters.rigid_body_collision_parameters.contact_iterations*rigid_body_collisions.contact_level_iterations);

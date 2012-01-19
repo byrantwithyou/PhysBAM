@@ -796,13 +796,13 @@ Refine_Or_Coarsen_Geometry()
         int j,k;segment_mesh.elements(i).Get(j,k);
         excessive_edge_length(i)=((object.particles.X(j)-object.particles.X(k)).Magnitude_Squared()>threshold_length_squared);}
 
-    for(int level=0;level<preimage.meshes.m;level++)for(int t=1;t<=(*preimage.meshes(level)).elements.m;t++){
+    for(int level=0;level<preimage.meshes.m;level++)for(int t=0;t<(*preimage.meshes(level)).elements.m;t++){
         int leaf_number=(*preimage.leaf_number(level))(t);
         assert(!level_material_volume(level)(t));
         if(leaf_number){
             if(level<maximum_refinement_depth){
                 bool excessive_edge=false;
-                for(int j=1;j<=(*object.mesh.element_edges)(leaf_number).Size();j++) excessive_edge|=excessive_edge_length((*object.mesh.element_edges)(leaf_number)(j));
+                for(int j=0;j<(*object.mesh.element_edges)(leaf_number).Size();j++) excessive_edge|=excessive_edge_length((*object.mesh.element_edges)(leaf_number)(j));
                 if(excessive_edge) triangle_list.Append(leaf_number);}
             if(!preimage.Red(level,t)){
                 int parent=(*preimage.parent(level))(t);T parent_material_volume=(T)0;

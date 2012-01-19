@@ -271,7 +271,7 @@ Scale_And_Apply_Impulses()
         if(ee_target_impulses(i) == TV()) continue;
         const VECTOR<int,2*d-2>& nodes=edge_edge_pairs_internal(i);
         VECTOR<T,2*d-2> one_over_m(one_over_mass.Subset(nodes));
-        for(int j=1;j<=2*d-2;j++) V(nodes(j))+=ee_target_weights(i)(j)*one_over_m[j]*ee_target_impulses(i);}
+        for(int j=0;j<2*d-2;j++) V(nodes(j))+=ee_target_weights(i)(j)*one_over_m[j]*ee_target_impulses(i);}
 }
 template<> void TRIANGLE_COLLISIONS<VECTOR<float,1> >::Scale_And_Apply_Impulses(){PHYSBAM_NOT_IMPLEMENTED();}
 template<> void TRIANGLE_COLLISIONS<VECTOR<double,1> >::Scale_And_Apply_Impulses(){PHYSBAM_NOT_IMPLEMENTED();}

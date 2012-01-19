@@ -78,7 +78,7 @@ template<class T,class T2> void BSPLINE<T,T2>::
 Create_Closed_Points()
 {
     control_points.Resize(control_points.m+2*(k-1));control_points_times.Resize(control_points_times.m+2*(k-1));
-    for(int i=1;i<=2*(k-1);i++){
+    for(int i=0;i<2*(k-1);i++){
         control_points(control_points.m-2*(k-1)+i)=control_points(i+1);
         control_points_times(control_points_times.m-2*(k-1)+i)=(control_points_times(i+1)-control_points_times(i)+control_points_times(control_points_times.m-2*(k-1)+i-1));}
     closed=true;

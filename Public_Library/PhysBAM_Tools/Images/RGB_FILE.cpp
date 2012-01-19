@@ -29,8 +29,8 @@ Read(const std::string& filename,ARRAY<VECTOR<T,3> ,VECTOR<int,2> >& image)
     else{
         unsigned char pixel,count;ARRAY<unsigned int> offset(header.height*header.channels),length(header.height*header.channels);
         unsigned int max_offset=0,max_offset_index=0;
-        for(int k=1;k<=image.counts.y*header.channels;k++){Read_Binary<T>(*input,offset(k));Swap_Endianity(offset(k));if(offset(k)>max_offset){max_offset=offset(k);max_offset_index=k;}}
-        for(int k=1;k<=image.counts.y*header.channels;k++){Read_Binary<T>(*input,length(k));Swap_Endianity(length(k));}
+        for(int k=0;k<image.counts.y*header.channels;k++){Read_Binary<T>(*input,offset(k));Swap_Endianity(offset(k));if(offset(k)>max_offset){max_offset=offset(k);max_offset_index=k;}}
+        for(int k=0;k<image.counts.y*header.channels;k++){Read_Binary<T>(*input,length(k));Swap_Endianity(length(k));}
         // read the rest of the file into memory...
         ARRAY<unsigned char> data(offset(max_offset_index)+image.counts.y*2);
         int current_byte=512+image.counts.y*header.channels*2*4;

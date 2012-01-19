@@ -57,7 +57,7 @@ Highlight_Current_Node() const
     OPENGL_SHAPES::Draw_Dot(surface.particles.X(node),OPENGL_COLOR(1,0,1),7);
     if(highlight_neighbors_of_current_node){
         if(!surface.mesh.neighbor_nodes) surface.mesh.Initialize_Neighbor_Nodes();
-        for(int t=1;t<=(*surface.mesh.neighbor_nodes)(node).m;t++){
+        for(int t=0;t<(*surface.mesh.neighbor_nodes)(node).m;t++){
             int nbr=(*surface.mesh.neighbor_nodes)(node)(t);
             OPENGL_SHAPES::Draw_Dot(surface.particles.X(nbr),OPENGL_COLOR(1,1,0),5);}}
 }
@@ -70,7 +70,7 @@ Print_Triangles_Incident_On_Current_Node()
     int node=(current_node-1)%surface.particles.array_collection->Size()+1;
     if(!surface.mesh.incident_elements) surface.mesh.Initialize_Incident_Elements();
     LOG::cout<<"number of incident triangles to node "<<node<<"="<<(*surface.mesh.incident_elements)(node).m<<std::endl;
-    for(int t=1;t<=(*surface.mesh.incident_elements)(node).m;t++){
+    for(int t=0;t<(*surface.mesh.incident_elements)(node).m;t++){
         int triangle=(*surface.mesh.incident_elements)(node)(t);
         int i,j,k;surface.mesh.elements(triangle).Get(i,j,k);
         LOG::cout<<"triangle "<<triangle<<"=("<<i<<","<<j<<","<<k<<")"<<std::endl;}
@@ -85,7 +85,7 @@ Print_Neighbor_Nodes_Of_Current_Node()
     if(!surface.mesh.neighbor_nodes) surface.mesh.Initialize_Neighbor_Nodes();
     LOG::cout<<"number of neighbors of node "<<node<<"="<<(*surface.mesh.neighbor_nodes)(node).m<<std::endl;
     LOG::cout<<"neighbors of node "<<node<<"={";
-    for(int t=1;t<=(*surface.mesh.neighbor_nodes)(node).m;t++) LOG::cout<<(*surface.mesh.neighbor_nodes)(node)(t)<<",";
+    for(int t=0;t<(*surface.mesh.neighbor_nodes)(node).m;t++) LOG::cout<<(*surface.mesh.neighbor_nodes)(node)(t)<<",";
     LOG::cout<<"}"<<std::endl;
 }
 //#####################################################################
@@ -104,7 +104,7 @@ Draw_Triangles_Incident_On_Current_Node() const
     front_material.Send_To_GL_Pipeline();
     back_material.Send_To_GL_Pipeline();
     //glColor3f(1.0,0,0);
-    for(int t=1;t<=(*surface.mesh.incident_elements)(node).m;t++){
+    for(int t=0;t<(*surface.mesh.incident_elements)(node).m;t++){
         int triangle=(*surface.mesh.incident_elements)(node)(t);
         int i,j,k;surface.mesh.elements(triangle).Get(i,j,k);
         ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> normals;

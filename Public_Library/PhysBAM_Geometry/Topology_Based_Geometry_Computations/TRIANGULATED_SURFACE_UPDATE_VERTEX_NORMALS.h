@@ -27,7 +27,7 @@ Update_Vertex_Normals(TRIANGULATED_SURFACE<T>& ts)
             face_normal=ts.Face_Normal(t);
             for(int i=0;i<3;i++){
                 normal=zero_vector;int node=ts.mesh.elements(t)(i); 
-                for(int k=1;k<=(*ts.mesh.incident_elements)(node).m;k++){
+                for(int k=0;k<(*ts.mesh.incident_elements)(node).m;k++){
                     TRIANGLE_3D<T>& triangle=(*ts.triangle_list)((*ts.mesh.incident_elements)(node)(k));
                     TV local_normal=triangle.normal;
                     if((face_normal-local_normal).Magnitude_Squared() < ts.normal_variance_threshold) normal+=triangle.Area()*local_normal;}
@@ -39,7 +39,7 @@ Update_Vertex_Normals(TRIANGULATED_SURFACE<T>& ts)
         else ts.vertex_normals->Resize(ts.mesh.number_nodes);
         for(int k=0;k<ts.vertex_normals->m;k++){
             (*ts.vertex_normals)(k)=TV(); // initialize to zero
-            for(int kk=1;kk<=(*ts.mesh.incident_elements)(k).m;kk++) 
+            for(int kk=0;kk<(*ts.mesh.incident_elements)(k).m;kk++) 
                 (*ts.vertex_normals)(k)+=(*ts.triangle_list)((*ts.mesh.incident_elements)(k)(kk)).Area()*(*ts.triangle_list)((*ts.mesh.incident_elements)(k)(kk)).normal;
             if((*ts.vertex_normals)(k) != TV()) (*ts.vertex_normals)(k).Normalize();}}
 

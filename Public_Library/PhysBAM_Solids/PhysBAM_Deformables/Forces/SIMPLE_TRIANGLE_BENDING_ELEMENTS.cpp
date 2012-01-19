@@ -72,14 +72,14 @@ Set_Quadruples_From_Triangle_Mesh(TRIANGLE_MESH& mesh)
 
     // allocate proper array sizes
     int number_quadruples=0;
-    for(int t=0;t<mesh.elements.m;t++) for(int a=1;a<=(*mesh.adjacent_elements)(t).m;a++) if((*mesh.adjacent_elements)(t)(a)>t) number_quadruples++;
+    for(int t=0;t<mesh.elements.m;t++) for(int a=0;a<(*mesh.adjacent_elements)(t).m;a++) if((*mesh.adjacent_elements)(t)(a)>t) number_quadruples++;
     bending_quadruples.Resize(number_quadruples);bending_stiffness.Resize(number_quadruples);
     damping.Resize(number_quadruples);
 
     int index=0; // reset number
     for(int t=0;t<mesh.elements.m;t++){
         int t1,t2,t3;mesh.elements(t).Get(t1,t2,t3);
-        for(int a=1;a<=(*mesh.adjacent_elements)(t).m;a++){
+        for(int a=0;a<(*mesh.adjacent_elements)(t).m;a++){
             int s=(*mesh.adjacent_elements)(t)(a);
             if(s>t){
                 int s1,s2,s3;mesh.elements(s).Get(s1,s2,s3);

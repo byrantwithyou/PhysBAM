@@ -57,12 +57,12 @@ int main(int argc,char *argv[])
     if(argc==3){
     for(int i=(x_max_i==smallest_m?1:x_max_i+1);i!=x_min_i;i=i%smallest_m+1){
         int node=(*tri_mesh.boundary_mesh->ordered_loop_nodes)(smallest_i)(i);
-        for(int j=1;j<=(*tri_mesh.incident_triangles)(node).m;j++){int index=deletion_list.Find((*tri_mesh.incident_triangles)(node)(j));
+        for(int j=0;j<(*tri_mesh.incident_triangles)(node).m;j++){int index=deletion_list.Find((*tri_mesh.incident_triangles)(node)(j));
         if(index)deletion_list.Remove_Index(index);}}out_name+="bot";}
     else{cout<<"Processing top edge from left to right..."<<endl;
     for(int i=(x_min_i==smallest_m?1:x_min_i+1);i!=x_max_i;i=i%smallest_m+1){
         int node=(*tri_mesh.boundary_mesh->ordered_loop_nodes)(smallest_i)(i);
-        for(int j=1;j<=(*tri_mesh.incident_triangles)(node).m;j++){int index=deletion_list.Find((*tri_mesh.incident_triangles)(node)(j));
+        for(int j=0;j<(*tri_mesh.incident_triangles)(node).m;j++){int index=deletion_list.Find((*tri_mesh.incident_triangles)(node)(j));
         if(index)deletion_list.Remove_Index(index);}}out_name+="top";}
 
     tri_mesh.Delete_Triangles(deletion_list);

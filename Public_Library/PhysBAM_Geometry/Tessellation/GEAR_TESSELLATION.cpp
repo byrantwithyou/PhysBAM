@@ -28,7 +28,7 @@ template<class T> void Boundary_Points(ARRAY<VECTOR<T,2> >& pts,const SMOOTH_GEA
     T ds=2*(hai+hao)/n;
     for(;i<m;i++){T a=i*ds-hai;pts.Append(gear.Ci+gear.s*TV(cos(a),sin(a)));}
     for(;i<n;i++){T a=pi+gear.den/2-(i*ds-2*hai-hao);pts.Append(gear.Co+gear.s*TV(cos(a),sin(a)));}
-    for(int j=1;j<=(gear.n-1)*n;j++) pts.Append(R*pts(j));
+    for(int j=0;j<(gear.n-1)*n;j++) pts.Append(R*pts(j));
 }
 
 template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(const SMOOTH_GEAR<VECTOR<T,3> >& gear,int n)
