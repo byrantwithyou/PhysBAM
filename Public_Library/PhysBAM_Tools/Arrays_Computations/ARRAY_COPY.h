@@ -18,7 +18,7 @@ namespace ARRAYS_COMPUTATIONS
     void Copy_With_Offset(const ARRAY_BASE<T,T_ARRAY1,ID>& old_copy,ARRAY_BASE<T2,T_ARRAY2,ID>& new_copy,const ID offset)
     {STATIC_ASSERT(CAN_ASSIGN<T,T2>::value);
     ID m=old_copy.Size();assert(m+offset<=new_copy.Size());
-    for(ID i(1);i<=m;i++) new_copy(i+offset)=old_copy(i);}
+    for(ID i(0);i<m;i++) new_copy(i+offset)=old_copy(i);}
 }
 }
 #endif

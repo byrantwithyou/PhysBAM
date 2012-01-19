@@ -45,7 +45,7 @@ template<class T_COLLISION_GEOMETRY,class T_ARRAY,class ID> RANGE<typename T_COL
 Scene_Bounding_Box()
 {
     RANGE<TV> scene_bounding_box;
-    for(ID i(1);i<=collision_bodies.Size();i++){
+    for(ID i(0);i<collision_bodies.Size();i++){
         if(RIGID_COLLISION_GEOMETRY<TV>* rigid_collision_geometry=dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>*>(collision_bodies(i)))
             if(!rigid_collision_geometry->rigid_geometry.rigid_geometry_collection.Is_Active(rigid_collision_geometry->rigid_geometry.particle_index)) continue;
         if(collision_bodies(i) && collision_bodies(i)->add_to_spatial_partition)
@@ -59,7 +59,7 @@ template<class T_COLLISION_GEOMETRY,class T_ARRAY,class ID> typename T_COLLISION
 Average_Bounding_Box_Size()
 {
     T average_size=0;int count=0;
-    for(ID i(1);i<=collision_bodies.Size();i++) if(collision_bodies(i)){
+    for(ID i(0);i<collision_bodies.Size();i++) if(collision_bodies(i)){
         if(RIGID_COLLISION_GEOMETRY<TV>* rigid_collision_geometry=dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>*>(collision_bodies(i)))
             if(!rigid_collision_geometry->rigid_geometry.rigid_geometry_collection.Is_Active(rigid_collision_geometry->rigid_geometry.particle_index)) continue;
         if(collision_bodies(i)->add_to_spatial_partition){count++;TV size=collision_bodies(i)->Axis_Aligned_Bounding_Box().Edge_Lengths();average_size+=size.Sum();}}
@@ -73,7 +73,7 @@ template<class T_COLLISION_GEOMETRY,class T_ARRAY,class ID> typename T_COLLISION
 Maximum_Bounding_Box_Size()
 {
     T max_size=0;
-    for(ID i(1);i<=collision_bodies.Size();i++) if(collision_bodies(i)){
+    for(ID i(0);i<collision_bodies.Size();i++) if(collision_bodies(i)){
         if(RIGID_COLLISION_GEOMETRY<TV>* rigid_collision_geometry=dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>*>(collision_bodies(i)))
             if(!rigid_collision_geometry->rigid_geometry.rigid_geometry_collection.Is_Active(rigid_collision_geometry->rigid_geometry.particle_index)) continue;
         if(collision_bodies(i)->add_to_spatial_partition){TV size=collision_bodies(i)->Axis_Aligned_Bounding_Box().Edge_Lengths();max_size=max(max_size,size.Max());}}
@@ -86,7 +86,7 @@ template<class T_COLLISION_GEOMETRY,class T_ARRAY,class ID> void COLLISION_GEOME
 Compute_Voxel_Size(const SPATIAL_PARTITION_VOXEL_SIZE_HEURISTIC heuristic,const int number_of_boxes,const T voxel_size_scale_factor)
 {
     reinitialize_counter=max(reinitialize_counter,0);
-    for(ID i(1);i<=collision_bodies.Size();i++) if(collision_bodies(i)){
+    for(ID i(0);i<collision_bodies.Size();i++) if(collision_bodies(i)){
         if(RIGID_COLLISION_GEOMETRY<TV>* rigid_collision_geometry=dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>*>(collision_bodies(i)))
             if(!rigid_collision_geometry->rigid_geometry.rigid_geometry_collection.Is_Active(rigid_collision_geometry->rigid_geometry.particle_index)) continue;
         collision_bodies(i)->Update_Bounding_Box();}
@@ -113,7 +113,7 @@ Reinitialize()
     reinitialize_counter++;
     voxel_range.Resize(collision_bodies.Size());
     bodies_not_in_partition.Remove_All();
-    for(ID i(1);i<=collision_bodies.Size();i++) if(collision_bodies(i)){
+    for(ID i(0);i<collision_bodies.Size();i++) if(collision_bodies(i)){
         if(RIGID_COLLISION_GEOMETRY<TV>* rigid_collision_geometry=dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>*>(collision_bodies(i)))
             if(!rigid_collision_geometry->rigid_geometry.rigid_geometry_collection.Is_Active(rigid_collision_geometry->rigid_geometry.particle_index)) continue;
         if(collision_bodies(i)->add_to_spatial_partition){
@@ -129,7 +129,7 @@ template<class T_COLLISION_GEOMETRY,class T_ARRAY,class ID> void COLLISION_GEOME
 Print_Initial_Statistics() const
 {
     int min_size=INT_MAX,max_size=0,number=0;T average_size=0;
-    for(ID i(1);i<=collision_bodies.Size();i++) if(collision_bodies(i) && collision_bodies(i)->add_to_spatial_partition){number++;
+    for(ID i(0);i<collision_bodies.Size();i++) if(collision_bodies(i) && collision_bodies(i)->add_to_spatial_partition){number++;
         int size=Number_Of_Voxels_Occupied(i);min_size=min(min_size,size);max_size=max(max_size,size);average_size+=size;}
     average_size/=number;
     PHYSBAM_DEBUG_PRINT("Spatial partition statistics",voxel_size,min_size,average_size,max_size);

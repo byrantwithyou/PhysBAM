@@ -349,7 +349,7 @@ public:
     {return VECTOR(f(v.x),f(v.y));}
 
     int Find(const T& element) const
-    {return x==element?1:y==element?2:0;}
+    {return x==element?0:y==element?1:-1;}
 
     bool Contains(const T& element) const
     {return x==element || y==element;}

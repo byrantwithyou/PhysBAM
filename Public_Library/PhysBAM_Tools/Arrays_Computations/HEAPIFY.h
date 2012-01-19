@@ -38,7 +38,7 @@ namespace ARRAYS_COMPUTATIONS
 
     template<class T_ARRAY>
     void Reverse_In_Place(T_ARRAY& input)
-    {typedef typename T_ARRAY::INDEX ID;for(ID i(1);i<=ID(Value(input.m)/2);i++) exchange(input(i),input(input.m+1-i));}
+    {typedef typename T_ARRAY::INDEX ID;for(ID i(0);i<ID(Value(input.m)/2);i++) exchange(input(i),input(input.m+1-i));}
 
     template<class T_ARRAY>
     void Heapify(T_ARRAY& a) // largest on top
@@ -52,7 +52,7 @@ namespace ARRAYS_COMPUTATIONS
     void Compact_Array_Using_Compaction_Array(ARRAY<T,ID>& array,const ARRAY<ID,ID>& compaction_array,ARRAY<T,ID>* temporary_array=0)
     {ID compaction_array_m=compaction_array.Size();
     bool temporary_array_defined=temporary_array!=0;if(!temporary_array_defined) temporary_array=new ARRAY<T,ID>(compaction_array_m,false);
-    ARRAY<T,ID>::Put(array,*temporary_array);for(ID i(1);i<=compaction_array_m;i++) if(compaction_array(i)>0) array(compaction_array(i))=(*temporary_array)(i);
+    ARRAY<T,ID>::Put(array,*temporary_array);for(ID i(0);i<compaction_array_m;i++) if(compaction_array(i)>0) array(compaction_array(i))=(*temporary_array)(i);
     if(!temporary_array_defined){delete temporary_array;temporary_array=0;}}
 
 //#####################################################################

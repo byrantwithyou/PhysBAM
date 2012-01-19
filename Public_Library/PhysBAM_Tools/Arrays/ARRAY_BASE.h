@@ -82,14 +82,14 @@ public:
 protected:
     T_ARRAY& operator=(const ARRAY_BASE& source)
     {T_ARRAY& self=Derived();ID m=self.Size();const T_ARRAY& source_=source.Derived();assert(m==source_.Size());
-    if(!T_ARRAY::Same_Array(self,source_)) for(ID i(1);i<=m;i++) self(i)=source_(i);
+    if(!T_ARRAY::Same_Array(self,source_)) for(ID i(0);i<m;i++) self(i)=source_(i);
     return self;}
 
     template<class T_ARRAY1>
     T_ARRAY& operator=(const T_ARRAY1& source)
     {STATIC_ASSERT(CAN_ASSIGN<T,typename T_ARRAY1::ELEMENT>::value);
     T_ARRAY& self=Derived();ID m=self.Size();assert(m==source.Size());
-    if(!T_ARRAY::Same_Array(self,source)) for(ID i(1);i<=m;i++) self(i)=source(i);
+    if(!T_ARRAY::Same_Array(self,source)) for(ID i(0);i<m;i++) self(i)=source(i);
     return self;}
 public:
 
@@ -157,7 +157,7 @@ public:
     bool operator==(const T_ARRAY1& v) const
     {STATIC_ASSERT_SAME(T,typename T_ARRAY1::ELEMENT);
     const T_ARRAY& self=Derived();ID m=self.Size();
-    if(m!=v.Size()) return false;for(ID i(1);i<=m;i++) if(self(i)!=v(i)) return false;return true;}
+    if(m!=v.Size()) return false;for(ID i(0);i<m;i++) if(self(i)!=v(i)) return false;return true;}
 
     template<class T_ARRAY1>
     bool operator!=(const T_ARRAY1& v) const
@@ -165,28 +165,28 @@ public:
 
     template<class T_ARRAY1>
     T_ARRAY& operator+=(const ARRAY_BASE<T,T_ARRAY1,ID>& v)
-    {T_ARRAY& self=Derived();ID m=self.Size();const T_ARRAY1& v_=v.Derived();assert(m==v_.Size());for(ID i(1);i<=m;i++) self(i)+=v_(i);return self;}
+    {T_ARRAY& self=Derived();ID m=self.Size();const T_ARRAY1& v_=v.Derived();assert(m==v_.Size());for(ID i(0);i<m;i++) self(i)+=v_(i);return self;}
 
     T_ARRAY& operator+=(const T& a)
-    {T_ARRAY& self=Derived();ID m=self.Size();for(ID i(1);i<=m;i++) self(i)+=a;return self;}
+    {T_ARRAY& self=Derived();ID m=self.Size();for(ID i(0);i<m;i++) self(i)+=a;return self;}
 
     template<class T_ARRAY1>
     T_ARRAY& operator-=(const ARRAY_BASE<T,T_ARRAY1,ID>& v)
-    {T_ARRAY& self=Derived();ID m=self.Size();const T_ARRAY1& v_=v.Derived();assert(m==v_.Size());for(ID i(1);i<=m;i++) self(i)-=v_(i);return self;}
+    {T_ARRAY& self=Derived();ID m=self.Size();const T_ARRAY1& v_=v.Derived();assert(m==v_.Size());for(ID i(0);i<m;i++) self(i)-=v_(i);return self;}
 
     T_ARRAY& operator-=(const T& a)
-    {T_ARRAY& self=Derived();ID m=self.Size();for(ID i(1);i<=m;i++) self(i)-=a;return self;}
+    {T_ARRAY& self=Derived();ID m=self.Size();for(ID i(0);i<m;i++) self(i)-=a;return self;}
 
     template<class T2,class T_ARRAY_T2>
     T_ARRAY& operator*=(const ARRAY_BASE<T2,T_ARRAY_T2,ID>& v)
-    {T_ARRAY& self=Derived();ID m=self.Size();const T_ARRAY_T2& v_=v.Derived();assert(m==v_.Size());for(ID i(1);i<=m;i++) self(i)*=v_(i);return self;}
+    {T_ARRAY& self=Derived();ID m=self.Size();const T_ARRAY_T2& v_=v.Derived();assert(m==v_.Size());for(ID i(0);i<m;i++) self(i)*=v_(i);return self;}
 
     T_ARRAY& operator*=(const SCALAR& a)
-    {T_ARRAY& self=Derived();ID m=self.Size();for(ID i(1);i<=m;i++) self(i)*=a;return self;}
+    {T_ARRAY& self=Derived();ID m=self.Size();for(ID i(0);i<m;i++) self(i)*=a;return self;}
 
     template<class T2,class T_ARRAY_T2>
     T_ARRAY& operator/=(const ARRAY_BASE<T2,T_ARRAY_T2,ID>& v)
-    {T_ARRAY& self=Derived();ID m=self.Size();const T_ARRAY_T2& v_=v.Derived();assert(m==v_.Size());for(ID i(1);i<=m;i++){assert(v_(i));self(i)/=v_(i);}return self;}
+    {T_ARRAY& self=Derived();ID m=self.Size();const T_ARRAY_T2& v_=v.Derived();assert(m==v_.Size());for(ID i(0);i<m;i++){assert(v_(i));self(i)/=v_(i);}return self;}
 
     T_ARRAY& operator/=(const SCALAR& a)
     {return *this*=Inverse(a);}
@@ -206,7 +206,7 @@ public:
 
     template<class T2,class T_ARRAY2> typename DISABLE_IF<IS_SCALAR<T2>::value,SCALAR>::TYPE
     Inner_Product(const ARRAY_BASE<T2,T_ARRAY2,ID>& m,const ARRAY_BASE<T,T_ARRAY,ID>& a2) const
-    {assert(Size()==a2.Size());typename T_ARRAY2::SCALAR result(0);ID size=Size();for(ID i(1);i<=size;i++) result+=m(i).Inner_Product((*this)(i),a2(i));return result;}
+    {assert(Size()==a2.Size());typename T_ARRAY2::SCALAR result(0);ID size=Size();for(ID i(0);i<size;i++) result+=m(i).Inner_Product((*this)(i),a2(i));return result;}
 
     template<class T_ARRAY2> double
     Inner_Product_Double_Precision(const ARRAY_BASE<SCALAR,T_ARRAY2,ID>& m,const ARRAY_BASE<T,T_ARRAY,ID>& a2) const
@@ -214,16 +214,16 @@ public:
 
     template<class T2,class T_ARRAY2> typename DISABLE_IF<IS_SCALAR<T2>::value,double>::TYPE
     Inner_Product_Double_Precision(const ARRAY_BASE<T2,T_ARRAY2,ID>& m,const ARRAY_BASE<T,T_ARRAY,ID>& a2) const
-    {assert(Size()==a2.Size());double result(0);ID size=Size();for(ID i(1);i<=size;i++) result+=m(i).Inner_Product((*this)(i),a2(i));return result;}
+    {assert(Size()==a2.Size());double result(0);ID size=Size();for(ID i(0);i<size;i++) result+=m(i).Inner_Product((*this)(i),a2(i));return result;}
 
     T Max() const
     {const T_ARRAY& self=Derived();T result=self(ID(1));ID m=self.Size();for(ID i(2);i<=m;i++) result=PhysBAM::max(result,self(i));return result;}
 
     T Maxabs() const
-    {const T_ARRAY& self=Derived();T result=T();;ID m=self.Size();for(ID i(1);i<=m;i++) result=PhysBAM::max(result,abs(self(i)));return result;}
+    {const T_ARRAY& self=Derived();T result=T();;ID m=self.Size();for(ID i(0);i<m;i++) result=PhysBAM::max(result,abs(self(i)));return result;}
 
     T Maxmag() const
-    {const T_ARRAY& self=Derived();T result=T();ID m=self.Size();for(ID i(1);i<=m;i++) result=PhysBAM::maxmag(result,self(i));return result;}
+    {const T_ARRAY& self=Derived();T result=T();ID m=self.Size();for(ID i(0);i<m;i++) result=PhysBAM::maxmag(result,self(i));return result;}
 
     ID Argmax() const
     {const T_ARRAY& self=Derived();ID result(1),m=self.Size();for(ID i(2);i<=m;i++) if(self(i)>self(result)) result=i;return result;}
@@ -238,16 +238,16 @@ public:
     {const T_ARRAY& self=Derived();ID result(1),m=self.Size();for(ID i(2);i<=m;i++) if(self(i)<self(result)) result=i;return result;}
 
     T Componentwise_Maxabs() const
-    {const T_ARRAY& self=Derived();T result=T();ID m=self.Size();for(ID i(1);i<=m;i++) result=T::Componentwise_Max(result,abs(self(i)));return result;}
+    {const T_ARRAY& self=Derived();T result=T();ID m=self.Size();for(ID i(0);i<m;i++) result=T::Componentwise_Max(result,abs(self(i)));return result;}
 
     T Sum() const
-    {const T_ARRAY& self=Derived();T result=T();ID m=self.Size();for(ID i(1);i<=m;i++) result+=self(i);return result;}
+    {const T_ARRAY& self=Derived();T result=T();ID m=self.Size();for(ID i(0);i<m;i++) result+=self(i);return result;}
 
     double Sum_Double_Precision() const
-    {const T_ARRAY& self=Derived();double result=0;ID m=self.Size();for(ID i(1);i<=m;i++) result+=self(i);return result;}
+    {const T_ARRAY& self=Derived();double result=0;ID m=self.Size();for(ID i(0);i<m;i++) result+=self(i);return result;}
 
     T Sumabs() const
-    {const T_ARRAY& self=Derived();T result=T();ID m=self.Size();for(ID i(1);i<=m;i++) result+=abs(self(i));return result;}
+    {const T_ARRAY& self=Derived();T result=T();ID m=self.Size();for(ID i(0);i<m;i++) result+=abs(self(i));return result;}
     
     T Average() const
     {const T_ARRAY& self=Derived();return self.Size()?Sum()/typename ARRAY_BASE<T,T_ARRAY,ID>::SCALAR(self.Size()):T();}
@@ -259,26 +259,26 @@ public:
 
     ID Find(const T& element) const
     {const T_ARRAY& self=Derived();ID m=self.Size();
-    for(ID i(1);i<=m;i++) if(self(i)==element) return i;return 0;}
+    for(ID i(0);i<m;i++) if(self(i)==element) return i;return -1;}
 
     bool Find(const T& element,ID& index) const // returns the first occurence of an element in an array
-    {return Find(element,1,index);}
+    {return Find(element,0,index);}
 
     bool Find(const T& element,const ID start_index,ID& index) const // returns the first occurence after start_index of an element in an array
     {const T_ARRAY& self=Derived();ID m=self.Size();
-    for(ID i=start_index;i<=m;i++) if(self(i)==element){index=i;return true;}return false;}
+    for(ID i=start_index;i<m;i++) if(self(i)==element){index=i;return true;}return false;}
 
     bool Contains(const T& element) const
     {const T_ARRAY& self=Derived();ID m=self.Size();
-    for(ID i(1);i<=m;i++) if(self(i)==element) return true;return false;}
+    for(ID i(0);i<m;i++) if(self(i)==element) return true;return false;}
 
     bool Contains_Only(const T& element) const
     {const T_ARRAY& self=Derived();ID m=self.Size();
-    for(ID i(1);i<=m;i++) if(self(i)!=element) return false;return true;}
+    for(ID i(0);i<m;i++) if(self(i)!=element) return false;return true;}
 
     int Count_Matches(const T& value) const
     {const T_ARRAY& self=Derived();ID m=self.Size();
-    int count=0;for(ID i(1);i<=m;i++) if(self(i)==value) count++;return count;}
+    int count=0;for(ID i(0);i<m;i++) if(self(i)==value) count++;return count;}
 
     int Number_True() const
     {STATIC_ASSERT_SAME(T,bool);return Count_Matches(true);}
@@ -296,7 +296,7 @@ public:
     {Sort(*this);T_ARRAY& self=Derived();int j=0;if(self.Size()>0) j=1;for(int i=2;i<=self.Size();i++){if(!(self(j)<self(i))) self(j).Merge(self(i));else self(++j)=self(i);}self.Resize(j);}
 
     void Fill(T value)
-    {T_ARRAY& self=Derived();ID m=self.Size();for(ID i(1);i<=m;i++) self(i)=value;}
+    {T_ARRAY& self=Derived();ID m=self.Size();for(ID i(0);i<m;i++) self(i)=value;}
 
     template<class T_ARRAY1,class T_ARRAY2>
     static void Copy(const T_ARRAY1& old_copy,T_ARRAY2& new_copy)
@@ -336,11 +336,11 @@ public:
     {new_copy.Prefix(old_copy.Size())=constant*old_copy;}
 
     void Clamp_Below(const T& value)
-    {T_ARRAY& self=Derived();ID m=self.Size();for(ID i(1);i<=m;i++) self(i)=clamp_min(self(i),value);}
+    {T_ARRAY& self=Derived();ID m=self.Size();for(ID i(0);i<m;i++) self(i)=clamp_min(self(i),value);}
 
     static void Find_Common_Elements(const T_ARRAY& a,const T_ARRAY& b,T_ARRAY& result)
     {assert(&a!=&result);assert(&b!=&result);result.Remove_All();
-    ID m=a.Size();for(ID i(1);i<=m;i++) if(b.Contains(a(i))) result.Append(a(i));}
+    ID m=a.Size();for(ID i(0);i<m;i++) if(b.Contains(a(i))) result.Append(a(i));}
 
     template<class T_ARRAY1,class T_ARRAY2>
     static bool Equal_Dimensions(const T_ARRAY1& a,const T_ARRAY2& b)
@@ -350,20 +350,20 @@ public:
     static void Permute(const T_ARRAY1& source,T_ARRAY1& destination,const T_ARRAY_INT& permutation)
     {STATIC_ASSERT_SAME(T,typename T_ARRAY1::ELEMENT);
     STATIC_ASSERT_SAME(ID,typename T_ARRAY_INT::ELEMENT);
-    ID m=permutation.Size();for(ID i(1);i<=m;i++) destination(i)=source(permutation(i));}
+    ID m=permutation.Size();for(ID i(0);i<m;i++) destination(i)=source(permutation(i));}
 
     template<class T_ARRAY1,class T_ARRAY_INT>
     static void Unpermute(const T_ARRAY1& source,T_ARRAY1& destination,const T_ARRAY_INT& permutation)
     {STATIC_ASSERT_SAME(T,typename T_ARRAY1::ELEMENT);
     STATIC_ASSERT_SAME(ID,typename T_ARRAY_INT::ELEMENT);
-    ID m=permutation.Size();for(ID i(1);i<=m;i++) destination(permutation(i))=source(i);}
+    ID m=permutation.Size();for(ID i(0);i<m;i++) destination(permutation(i))=source(i);}
 
     template<class T_ARRAY1>
     void Remove_Sorted_Indices(const T_ARRAY1& index)
     {STATIC_ASSERT_SAME(ID,typename T_ARRAY1::ELEMENT);
     T_ARRAY& self=Derived();ID m=self.Size(),index_m=index.Size();
     if(index_m==0) return;
-    for(ID kk(1);kk<=index_m-1;kk++){
+    for(ID kk(0);kk<index_m-1;kk++){
         assert((unsigned)index(kk)<m);
         for(ID i=index(kk)+1-kk;i<=index(kk+1)-1-kk;i++) self(i)=self(i+kk);}
     for(ID i=index(index_m)+1-index_m;i<=m-index_m;i++) self(i)=self(i+index_m);
@@ -420,7 +420,7 @@ inline std::ostream& operator<<(std::ostream& output,const ARRAY_BASE<T,T_ARRAY,
 {output<<"(";
 const T_ARRAY& a_=a.Derived();
 ID m=a_.Size();
-for(ID i(1);i<=m;i++){
+for(ID i(0);i<m;i++){
     output<<a_(i);
     if(i<m) output<<" ";}
 output<<")";

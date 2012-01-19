@@ -63,7 +63,7 @@ public:
 
     void Merge(const UNION_FIND<ID>& union_find)
     {assert(Size()==union_find.Size());
-    for(ID i(1);i<=Size();i++){ID j=union_find.parents(i);if(j) Union(i,j);}}
+    for(ID i(0);i<Size();i++){ID j=union_find.parents(i);if(j) Union(i,j);}}
 
     // Okay for map to yield invalid indices for isolated elements
     template<class ID2,class T_ARRAY>
@@ -71,7 +71,7 @@ public:
     {for(ID2 i(1);i<=union_find.Size();i++){ID2 root=union_find.Find(i);if(i!=root) Union(map(i),map(root));}}
 
     void Forest_Edges(ARRAY<PAIR<ID,ID> >& pairs) const
-    {pairs.Remove_All();for(ID i(1);i<=Size();i++){ID j=Find(i);if(i!=j) pairs.Append(PAIR<ID,ID>(i,j));}}
+    {pairs.Remove_All();for(ID i(0);i<Size();i++){ID j=Find(i);if(i!=j) pairs.Append(PAIR<ID,ID>(i,j));}}
 
     void Merge_Forest_Edges(const ARRAY<PAIR<ID,ID> >& pairs)
     {for(int i=0;i<pairs.m;i++) Union(pairs(i).x,pairs(i).y);}

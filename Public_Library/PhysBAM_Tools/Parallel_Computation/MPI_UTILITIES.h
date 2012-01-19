@@ -220,7 +220,7 @@ template<class T> inline void Free_Elements_And_Clean_Memory(ARRAY<T>& array)
 // Function Free_Elements_And_Clean_Memory
 //#####################################################################
 template<class T,class ID> inline void Free_Elements_And_Clean_Memory(ARRAY<T,ID>& array)
-{for(ID i(1);i<=array.Size();i++) if(array(i)!=T()) array(i).Free();array.Clean_Memory();}
+{for(ID i(0);i<array.Size();i++) if(array(i)!=T()) array(i).Free();array.Clean_Memory();}
 //#####################################################################
 // Function Reduce
 //#####################################################################

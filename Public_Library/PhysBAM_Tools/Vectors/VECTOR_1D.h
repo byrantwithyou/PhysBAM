@@ -296,7 +296,7 @@ public:
     {return VECTOR(f(v.x));}
 
     int Find(const T& element) const
-    {return x==element?1:0;}
+    {return x==element?0:-1;}
 
     bool Contains(const T& element) const
     {return x==element;}

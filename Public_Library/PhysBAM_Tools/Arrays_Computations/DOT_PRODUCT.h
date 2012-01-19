@@ -18,12 +18,12 @@ namespace ARRAYS_COMPUTATIONS
     template<class T,class T_ARRAY,class T_ARRAY2,class ID> typename SCALAR_POLICY<T>::TYPE
     Dot_Product(const ARRAY_BASE<T,T_ARRAY,ID>& a1,const ARRAY_BASE<T,T_ARRAY2,ID>& a2)
     {assert(a1.Size()==a2.Size());
-    typename SCALAR_POLICY<T>::TYPE result(0);ID m=a1.Size();for(ID i(1);i<=m;i++) result+=PhysBAM::Dot_Product(a1(i),a2(i));return result;}
+    typename SCALAR_POLICY<T>::TYPE result(0);ID m=a1.Size();for(ID i(0);i<m;i++) result+=PhysBAM::Dot_Product(a1(i),a2(i));return result;}
 
     template<class T,class T_ARRAY,class T_ARRAY2,class ID> double
     Dot_Product_Double_Precision(const ARRAY_BASE<T,T_ARRAY,ID>& a1,const ARRAY_BASE<T,T_ARRAY2,ID>& a2)
     {assert(a1.Size()==a2.Size());
-    double result(0);ID m=a1.Size();for(ID i(1);i<=m;i++) result+=PhysBAM::Dot_Product(a1(i),a2(i));return result;}
+    double result(0);ID m=a1.Size();for(ID i(0);i<m;i++) result+=PhysBAM::Dot_Product(a1(i),a2(i));return result;}
 }
 }
 #endif

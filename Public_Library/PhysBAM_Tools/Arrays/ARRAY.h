@@ -44,7 +44,7 @@ public:
         :base_pointer(0),buffer_size(m_input),m(m_input)
     {
         assert(m>=ID());base_pointer=new T[Value(m)];
-        if(!IS_CLASS<T>::value && initialize_using_default_constructor){ID m=Size();for(ID i(1);i<=m;i++) (*this)(i)=T();}
+        if(!IS_CLASS<T>::value && initialize_using_default_constructor){ID m=Size();for(ID i(0);i<m;i++) (*this)(i)=T();}
     }
 
     ARRAY(const ARRAY& array)
@@ -59,7 +59,7 @@ public:
         :base_pointer(0),buffer_size(array.Size()),m(array.Size())
     {
         base_pointer=new T[Value(m)];
-        for(ID i(1);i<=m;i++) (*this)(i)=array(i);
+        for(ID i(0);i<m;i++) (*this)(i)=array(i);
     }
 
     ~ARRAY()
@@ -72,7 +72,7 @@ public:
     if(buffer_size<source_m) Resize_Helper(source_m,false,false);
     else if(Same_Array(*this,source)) return *this;
     m=source_m;
-    for(ID i(1);i<=source_m;i++) (*this)(i)=source(i);
+    for(ID i(0);i<source_m;i++) (*this)(i)=source(i);
     return *this;}
 
     template<class T_ARRAY>
@@ -82,7 +82,7 @@ public:
     if(buffer_size<source_m) Resize_Helper(source_m,false,false);
     else if(Same_Array(*this,source)) return *this;
     m=source_m;
-    for(ID i(1);i<=source_m;i++) (*this)(i)=source(i);
+    for(ID i(0);i<source_m;i++) (*this)(i)=source(i);
     return *this;}
 
     ID Size() const
@@ -157,7 +157,7 @@ public:
     for(typename T_ARRAY::INDEX i(1);i<=append_array.Size();i++) (*this)(m-Value(append_array.Size())+Value(i))=append_array(i);}
 
     void Append_Unique(const T& element)
-    {for(ID i(1);i<=m;i++) if((*this)(i)==element) return;Append(element);}
+    {for(ID i(0);i<m;i++) if((*this)(i)==element) return;Append(element);}
 
     template<class T_ARRAY>
     void Append_Unique_Elements(const T_ARRAY& append_array)
@@ -182,7 +182,7 @@ public:
     {Exact_Resize(ID());}
 
     void Delete_Pointers_And_Clean_Memory() // only valid if T is a pointer type
-    {for(ID i(1);i<=m;i++) delete (*this)(i);Clean_Memory();}
+    {for(ID i(0);i<m;i++) delete (*this)(i);Clean_Memory();}
 
     void Insert(const T& element,const ID index)
     {Ensure_Enough_Space(m+1);m++;for(ID i=m;i>index;i--) (*this)(i)=(*this)(i-1);(*this)(index)=element;}
@@ -200,7 +200,7 @@ public:
     static void Compact_Array_Using_Compaction_Array(ARRAY<T2,ID>& array,const ARRAY<ID,ID>& compaction_array,ARRAY<T2,ID>* temporary_array=0)
     {ID compaction_array_m=compaction_array.Size();
     bool temporary_array_defined=temporary_array!=0;if(!temporary_array_defined) temporary_array=new ARRAY<T2,ID>(compaction_array_m,false);
-    ARRAY<T2,ID>::Put(array,*temporary_array);for(ID i(1);i<=compaction_array_m;i++) if(compaction_array(i)>0) array(compaction_array(i))=(*temporary_array)(i);
+    ARRAY<T2,ID>::Put(array,*temporary_array);for(ID i(0);i<compaction_array_m;i++) if(compaction_array(i)>0) array(compaction_array(i))=(*temporary_array)(i);
     if(!temporary_array_defined){delete temporary_array;temporary_array=0;}}
 
 private:

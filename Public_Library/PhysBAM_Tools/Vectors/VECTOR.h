@@ -245,7 +245,7 @@ public:
     {VECTOR r;for(int i=0;i<d;i++) r.array[i]=f(v.array[i]);return r;}
 
     int Find(const T& element) const
-    {for(int i=0;i<d;i++) if(array[i]==element) return i+1;return 0;}
+    {for(int i=0;i<d;i++) if(array[i]==element) return i;return -1;}
 
     bool Contains(const T& element) const
     {for(int i=0;i<d;i++) if(array[i]==element) return true;return false;}

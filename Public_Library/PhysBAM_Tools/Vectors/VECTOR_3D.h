@@ -335,7 +335,7 @@ public:
     {return VECTOR(f(v.x),f(v.y),f(v.z));}
 
     int Find(const T& element) const
-    {return x==element?1:y==element?2:z==element?3:0;}
+    {return x==element?0:y==element?1:z==element?2:-1;}
 
     bool Contains(const T& element) const
     {return x==element || y==element || z==element;}

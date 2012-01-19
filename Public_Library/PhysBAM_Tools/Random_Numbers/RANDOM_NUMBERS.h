@@ -42,7 +42,7 @@ public:
     virtual ~RANDOM_NUMBERS();
 
     template<class T2,class T_ARRAY,class ID> void Fill_Uniform(ARRAY_BASE<T2,T_ARRAY,ID>& array,const T a,const T b)
-    {T_ARRAY& derived=array.Derived();for(ID i(1);i<=derived.Size();i++) Fill_Uniform(derived(i),a,b);}
+    {T_ARRAY& derived=array.Derived();for(ID i(0);i<derived.Size();i++) Fill_Uniform(derived(i),a,b);}
 
 //#####################################################################
     void Set_Seed(const unsigned int seed_input=time(0));
