@@ -137,7 +137,7 @@ public:
     {return Derived()(i);}
 
     bool Valid_Index(const ID i) const
-    {return ID(1)<=i && i<=Size();}
+    {return (unsigned)i.Value<Value(Size());}
 
     ARRAY_VIEW<ELEMENT_OF_T> Flattened() // valid only for contiguous arrays of VECTOR<T,d>
     {T_ARRAY& self=Derived();return ARRAY_VIEW<typename T::ELEMENT>(T::m*self.Size(),self.Get_Array_Pointer()->begin());}

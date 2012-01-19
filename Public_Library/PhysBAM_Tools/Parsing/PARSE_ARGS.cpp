@@ -218,7 +218,7 @@ Num_Extra_Args() const
 const std::string& PARSE_ARGS::
 Extra_Arg(int i) const
 {
-    PHYSBAM_ASSERT(1<=i && i<=extra_arg_list.m);
+    PHYSBAM_ASSERT((unsigned)i<extra_arg_list.m);
     return extra_arg_list(i);
 }
 //#####################################################################

@@ -206,9 +206,9 @@ Penalty_Hessian(const int control_id1,const int control_id2) const
 {
     assert((unsigned)control_id1<24 && (unsigned)control_id2<24);
     T penalty_hessian=0;
-    if(control_id1<=12 && control_id2<=12) penalty_hessian+=rigidity_penalty_coefficient*cranium_transform.Ridigity_Penalty_Hessian_Definite_Part(control_id1,control_id2);
-    if(control_id1>=13 && control_id2>=13) penalty_hessian+=rigidity_penalty_coefficient*jaw_transform.Ridigity_Penalty_Hessian_Definite_Part(control_id1-12,control_id2-12);
-    if(control_id1>=13 && control_id2>=13) penalty_hessian+=jaw_constraint_penalty_coefficient*Jaw_Constraint_Penalty_Hessian(control_id1-12,control_id2-12);
+    if(control_id1<12 && control_id2<12) penalty_hessian+=rigidity_penalty_coefficient*cranium_transform.Ridigity_Penalty_Hessian_Definite_Part(control_id1,control_id2);
+    if(control_id1>=12 && control_id2>=12) penalty_hessian+=rigidity_penalty_coefficient*jaw_transform.Ridigity_Penalty_Hessian_Definite_Part(control_id1-12,control_id2-12);
+    if(control_id1>=12 && control_id2>=12) penalty_hessian+=jaw_constraint_penalty_coefficient*Jaw_Constraint_Penalty_Hessian(control_id1-12,control_id2-12);
     return penalty_hessian;
 }
 //#####################################################################
@@ -274,10 +274,10 @@ Jaw_Constraint_Penalty_Hessian(const int control_id1,const int control_id2) cons
     T penalty_hessian=0;
     MATRIX<T,3> affine_transform1_differential,affine_transform2_differential;
     TV translation1_differential,translation2_differential;
-    if(control_id1<=9) affine_transform1_differential.x[control_id1-1]=(T)1;
-    if(control_id2<=9) affine_transform2_differential.x[control_id2-1]=(T)1;
-    if(control_id1>=10) translation1_differential[control_id1-9]=(T)1;
-    if(control_id2>=10) translation2_differential[control_id2-9]=(T)1;
+    if(control_id1<9) affine_transform1_differential.x[control_id1-1]=(T)1;
+    if(control_id2<9) affine_transform2_differential.x[control_id2-1]=(T)1;
+    if(control_id1>=9) translation1_differential[control_id1-9]=(T)1;
+    if(control_id2>=9) translation2_differential[control_id2-9]=(T)1;
     penalty_hessian+=(T)2*TV::Dot_Product(jaw_normal,affine_transform1_differential*jaw_axis)
                          *TV::Dot_Product(jaw_normal,affine_transform2_differential*jaw_axis);
     penalty_hessian+=(T)2*TV::Dot_Product(jaw_normal,affine_transform1_differential*jaw_midpoint+translation1_differential)
