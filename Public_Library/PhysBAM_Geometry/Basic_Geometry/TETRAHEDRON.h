@@ -39,10 +39,10 @@ public:
     {return T(one_sixth)*TV::Triple_Product(x2-x1,x3-x1,x4-x1);} 
 
     TV First_Three_Barycentric_Coordinates(const TV& location) const
-    {return First_Three_Barycentric_Coordinates(location,X[1],X[2],X[3],X[4]);}
+    {return First_Three_Barycentric_Coordinates(location,X[0],X[1],X[2],X[3]);}
 
     VECTOR<T,4> Barycentric_Coordinates(const TV& location) const
-    {return Barycentric_Coordinates(location,X[1],X[2],X[3],X[4]);}
+    {return Barycentric_Coordinates(location,X[0],X[1],X[2],X[3]);}
 
     static TV First_Three_Barycentric_Coordinates(const TV& location,const TV& x1,const TV& x2,const TV& x3,const TV& x4)
     {return MATRIX<T,3>(x1-x4,x2-x4,x3-x4).Robust_Solve_Linear_System(location-x4);}
@@ -52,41 +52,41 @@ public:
 
     template<class T_ARRAY>
     static TV First_Three_Barycentric_Coordinates(const TV& location,const T_ARRAY& X)
-    {STATIC_ASSERT(T_ARRAY::m==4);return First_Three_Barycentric_Coordinates(location,X(1),X(2),X(3),X(4));}
+    {STATIC_ASSERT(T_ARRAY::m==4);return First_Three_Barycentric_Coordinates(location,X(0),X(1),X(2),X(3));}
 
     template<class T_ARRAY>
     static VECTOR<T,4> Barycentric_Coordinates(const TV& location,const T_ARRAY& X)
-    {STATIC_ASSERT(T_ARRAY::m==4);return Barycentric_Coordinates(location,X(1),X(2),X(3),X(4));}
+    {STATIC_ASSERT(T_ARRAY::m==4);return Barycentric_Coordinates(location,X(0),X(1),X(2),X(3));}
 
     TV Point_From_Barycentric_Coordinates(const TV& weights) const
-    {return Point_From_Barycentric_Coordinates(weights,X[1],X[2],X[3],X[4]);}
+    {return Point_From_Barycentric_Coordinates(weights,X[0],X[1],X[2],X[3]);}
 
     TV Point_From_Barycentric_Coordinates(const VECTOR<T,4>& weights) const
-    {return Point_From_Barycentric_Coordinates(weights,X[1],X[2],X[3],X[4]);}
+    {return Point_From_Barycentric_Coordinates(weights,X[0],X[1],X[2],X[3]);}
 
     static TV Point_From_Barycentric_Coordinates(const TV& weights,const TV& x1,const TV& x2,const TV& x3,const TV& x4)
     {return weights.x*x1+weights.y*x2+weights.z*x3+((T)1-weights.x-weights.y-weights.z)*x4;}
 
     static TV Point_From_Barycentric_Coordinates(const VECTOR<T,4>& weights,const TV& x1,const TV& x2,const TV& x3,const TV& x4)
-    {return weights[1]*x1+weights[2]*x2+weights[3]*x3+weights[4]*x4;}
+    {return weights[0]*x1+weights[1]*x2+weights[2]*x3+weights[3]*x4;}
 
     template<class T_ARRAY>
     static TV Point_From_Barycentric_Coordinates(const VECTOR<T,4>& weights,const T_ARRAY& X)
-    {STATIC_ASSERT(T_ARRAY::m==4);return Point_From_Barycentric_Coordinates(weights,X(1),X(2),X(3),X(4));}
+    {STATIC_ASSERT(T_ARRAY::m==4);return Point_From_Barycentric_Coordinates(weights,X(0),X(1),X(2),X(3));}
 
     static bool Barycentric_Inside(const TV& location,const TV& x1,const TV& x2,const TV& x3,const TV& x4,const T tolerance=0)
     {TV w=First_Three_Barycentric_Coordinates(location,x1,x2,x3,x4);
     return w.x>=-tolerance && w.y>=-tolerance && w.z>=-tolerance && w.x+w.y+w.z<=1+tolerance;}
 
     VECTOR<T,4> Sum_Barycentric_Coordinates(const TETRAHEDRON<T>& embedded_tetrahedron) const
-    {VECTOR<T,4> coordinates(Barycentric_Coordinates(embedded_tetrahedron.X[1])+Barycentric_Coordinates(embedded_tetrahedron.X[2])+Barycentric_Coordinates(embedded_tetrahedron.X[3])+Barycentric_Coordinates(embedded_tetrahedron.X[4]));
+    {VECTOR<T,4> coordinates(Barycentric_Coordinates(embedded_tetrahedron.X[0])+Barycentric_Coordinates(embedded_tetrahedron.X[1])+Barycentric_Coordinates(embedded_tetrahedron.X[2])+Barycentric_Coordinates(embedded_tetrahedron.X[3]));
     return coordinates;}
 
     static TV Center(const TV& x1,const TV& x2,const TV& x3,const TV& x4) // centroid
     {return (T).25*(x1+x2+x3+x4);}
 
     TV Center() const // centroid
-    {return Center(X[1],X[2],X[3],X[4]);}
+    {return Center(X[0],X[1],X[2],X[3]);}
 
     static TV Circumcenter(const TV& x1,const TV& x2,const TV& x3,const TV& x4)
     {TV u=x2-x1,v=x3-x1,w=x4-x1,cross_uv=TV::Cross_Product(u,v),cross_wu=TV::Cross_Product(w,u),
@@ -101,7 +101,7 @@ public:
     {return sqrt(Minimum_Edge_Length_Squared(x1,x2,x3,x4));}
 
     T Minimum_Edge_Length() const
-    {return Minimum_Edge_Length(X[1],X[2],X[3],X[4]);}
+    {return Minimum_Edge_Length(X[0],X[1],X[2],X[3]);}
 
     static T Maximum_Edge_Length_Squared(const TV& x1,const TV& x2,const TV& x3,const TV& x4)
     {return max((x1-x2).Magnitude_Squared(),(x2-x3).Magnitude_Squared(),(x3-x1).Magnitude_Squared(),(x1-x4).Magnitude_Squared(),(x2-x4).Magnitude_Squared(),(x3-x4).Magnitude_Squared());}
@@ -110,7 +110,7 @@ public:
     {return sqrt(Maximum_Edge_Length_Squared(x1,x2,x3,x4));}
 
     T Maximum_Edge_Length() const
-    {return Maximum_Edge_Length(X[1],X[2],X[3],X[4]);}
+    {return Maximum_Edge_Length(X[0],X[1],X[2],X[3]);}
 
     T Size() const
     {return Volume();}
@@ -120,7 +120,7 @@ public:
 
     template<class T_ARRAY>
     static T Signed_Size(const T_ARRAY& X)
-    {STATIC_ASSERT(T_ARRAY::m==4);return Signed_Volume(X(1),X(2),X(3),X(4));}
+    {STATIC_ASSERT(T_ARRAY::m==4);return Signed_Volume(X(0),X(1),X(2),X(3));}
 
     template<class T_ARRAY>
     static T Size(const T_ARRAY& X)
@@ -128,7 +128,7 @@ public:
 
     template<class T_ARRAY>
     static T Half_Boundary_Measure(const T_ARRAY& X)
-    {STATIC_ASSERT(T_ARRAY::m==4);return (T).5*(TRIANGLE_3D<T>::Area(X(1),X(2),X(3))+TRIANGLE_3D<T>::Area(X(1),X(4),X(2))+TRIANGLE_3D<T>::Area(X(1),X(3),X(4))+TRIANGLE_3D<T>::Area(X(2),X(4),X(3)));}
+    {STATIC_ASSERT(T_ARRAY::m==4);return (T).5*(TRIANGLE_3D<T>::Area(X(0),X(1),X(2))+TRIANGLE_3D<T>::Area(X(0),X(3),X(1))+TRIANGLE_3D<T>::Area(X(0),X(2),X(3))+TRIANGLE_3D<T>::Area(X(1),X(3),X(2)));}
 
 //#####################################################################
     void Create_Triangles();

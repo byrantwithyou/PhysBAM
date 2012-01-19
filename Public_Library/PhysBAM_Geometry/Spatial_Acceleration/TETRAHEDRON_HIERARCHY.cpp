@@ -73,8 +73,8 @@ Calculate_Bounding_Boxes(ARRAY<RANGE<TV> >& bounding_boxes,const FRAME<TV>& star
 {
     for(int k=0;k<leaves;k++){const VECTOR<int,4>& nodes=tetrahedron_mesh.elements(k);
         bounding_boxes(k)=RANGE<TV>::Combine(
-            RANGE<TV>::Bounding_Box(start_frame*particles.X(nodes[1]),start_frame*particles.X(nodes[2]),start_frame*particles.X(nodes[3]),start_frame*particles.X(nodes[4])),
-            RANGE<TV>::Bounding_Box(end_frame*particles.X(nodes[1]),end_frame*particles.X(nodes[2]),end_frame*particles.X(nodes[3]),end_frame*particles.X(nodes[4])));}
+            RANGE<TV>::Bounding_Box(start_frame*particles.X(nodes[0]),start_frame*particles.X(nodes[1]),start_frame*particles.X(nodes[2]),start_frame*particles.X(nodes[3])),
+            RANGE<TV>::Bounding_Box(end_frame*particles.X(nodes[0]),end_frame*particles.X(nodes[1]),end_frame*particles.X(nodes[2]),end_frame*particles.X(nodes[3])));}
 }
 //#####################################################################
 // Function Calculate_Bounding_Box_Radii

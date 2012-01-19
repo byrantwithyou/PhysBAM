@@ -38,12 +38,12 @@ TETRAHEDRON(const TV& x1_input,const TV& x2_input,const TV& x3_input,const TV& x
 template<class T> void TETRAHEDRON<T>::
 Create_Triangles()
 {
-    if(TV::Dot_Product(TV::Cross_Product(X[2]-X[1],X[3]-X[1]),X[4]-X[1]) <= 0){
-        triangle1.Specify_Three_Points(X[1],X[2],X[3]);triangle2.Specify_Three_Points(X[1],X[4],X[2]);
-        triangle3.Specify_Three_Points(X[1],X[3],X[4]);triangle4.Specify_Three_Points(X[2],X[4],X[3]);}
+    if(TV::Dot_Product(TV::Cross_Product(X[1]-X[0],X[2]-X[0]),X[3]-X[0]) <= 0){
+        triangle1.Specify_Three_Points(X[0],X[1],X[2]);triangle2.Specify_Three_Points(X[0],X[3],X[1]);
+        triangle3.Specify_Three_Points(X[0],X[2],X[3]);triangle4.Specify_Three_Points(X[1],X[3],X[2]);}
     else{
-        triangle1.Specify_Three_Points(X[1],X[3],X[2]);triangle2.Specify_Three_Points(X[1],X[2],X[4]);
-        triangle3.Specify_Three_Points(X[1],X[4],X[3]);triangle4.Specify_Three_Points(X[2],X[3],X[4]);}
+        triangle1.Specify_Three_Points(X[0],X[2],X[1]);triangle2.Specify_Three_Points(X[0],X[1],X[3]);
+        triangle3.Specify_Three_Points(X[0],X[3],X[2]);triangle4.Specify_Three_Points(X[1],X[2],X[3]);}
 }
 //#####################################################################
 // Function Normal
@@ -91,7 +91,7 @@ template<class T> TETRAHEDRON<T> TETRAHEDRON<T>::
 Thickened(const T thickness_over_two) const
 {
     assert(Signed_Volume()>0);
-    T m1=thickness_over_two/triangle4.Signed_Distance(X[1]),m2=thickness_over_two/triangle3.Signed_Distance(X[2]),m3=thickness_over_two/triangle2.Signed_Distance(X[3]),m4=thickness_over_two/triangle1.Signed_Distance(X[4]);
+    T m1=thickness_over_two/triangle4.Signed_Distance(X[0]),m2=thickness_over_two/triangle3.Signed_Distance(X[1]),m3=thickness_over_two/triangle2.Signed_Distance(X[2]),m4=thickness_over_two/triangle1.Signed_Distance(X[3]);
     return TETRAHEDRON<T>(Point_From_Barycentric_Coordinates(VECTOR<T,3>(m1,m2,m3)),Point_From_Barycentric_Coordinates(VECTOR<T,3>((T)1-m2-m3-(T)root_three*m4,m2,m3)),
                           Point_From_Barycentric_Coordinates(VECTOR<T,3>(m1,(T)1-m1-m3-(T)root_three*m4,m3)),Point_From_Barycentric_Coordinates(VECTOR<T,3>(m1,m2,(T)1-m1-m2-(T)root_three*m4)));
 }
@@ -139,19 +139,19 @@ Closest_Point(const VECTOR<T,3>& location,VECTOR<T,3>& weights) const
 {      
     if(Inside(location)){weights=First_Three_Barycentric_Coordinates(location);return location;}
     
-    VECTOR<T,3> triangle_weights,triangle_closest_point=TRIANGLE_3D<T>(X[1],X[2],X[3]).Closest_Point(location,triangle_weights),closest_point=triangle_closest_point;
+    VECTOR<T,3> triangle_weights,triangle_closest_point=TRIANGLE_3D<T>(X[0],X[1],X[2]).Closest_Point(location,triangle_weights),closest_point=triangle_closest_point;
     weights=VECTOR<T,3>(triangle_weights.x,triangle_weights.y,triangle_weights.z);
     T triangle_distance_squared=(closest_point-location).Magnitude_Squared(),distance_squared=triangle_distance_squared;
     
-    triangle_closest_point=TRIANGLE_3D<T>(X[1],X[2],X[4]).Closest_Point(location,triangle_weights);triangle_distance_squared=(triangle_closest_point-location).Magnitude_Squared();
+    triangle_closest_point=TRIANGLE_3D<T>(X[0],X[1],X[3]).Closest_Point(location,triangle_weights);triangle_distance_squared=(triangle_closest_point-location).Magnitude_Squared();
     if(triangle_distance_squared<distance_squared){
         weights=VECTOR<T,3>(triangle_weights.x,triangle_weights.y,0);closest_point=triangle_closest_point;distance_squared=triangle_distance_squared;}
     
-    triangle_closest_point=TRIANGLE_3D<T>(X[1],X[3],X[4]).Closest_Point(location,triangle_weights);triangle_distance_squared=(triangle_closest_point-location).Magnitude_Squared();
+    triangle_closest_point=TRIANGLE_3D<T>(X[0],X[2],X[3]).Closest_Point(location,triangle_weights);triangle_distance_squared=(triangle_closest_point-location).Magnitude_Squared();
     if(triangle_distance_squared<distance_squared){
         weights=VECTOR<T,3>(triangle_weights.x,0,triangle_weights.y);closest_point=triangle_closest_point;distance_squared=triangle_distance_squared;}
     
-    triangle_closest_point=TRIANGLE_3D<T>(X[2],X[3],X[4]).Closest_Point(location,triangle_weights);triangle_distance_squared=(triangle_closest_point-location).Magnitude_Squared();
+    triangle_closest_point=TRIANGLE_3D<T>(X[1],X[2],X[3]).Closest_Point(location,triangle_weights);triangle_distance_squared=(triangle_closest_point-location).Magnitude_Squared();
     if(triangle_distance_squared<distance_squared){
         weights=VECTOR<T,3>(0,triangle_weights.x,triangle_weights.y);return triangle_closest_point;}
         
@@ -163,7 +163,7 @@ Closest_Point(const VECTOR<T,3>& location,VECTOR<T,3>& weights) const
 template<class T> T TETRAHEDRON<T>::
 Volume() const
 {
-    return (T)one_sixth*abs(VECTOR<T,3>::Dot_Product(VECTOR<T,3>::Cross_Product(X[2]-X[1],X[3]-X[1]),X[4]-X[1]));
+    return (T)one_sixth*abs(VECTOR<T,3>::Dot_Product(VECTOR<T,3>::Cross_Product(X[1]-X[0],X[2]-X[0]),X[3]-X[0]));
 }
 //#####################################################################
 // Function Signed_Volume
@@ -171,7 +171,7 @@ Volume() const
 template<class T> T TETRAHEDRON<T>::
 Signed_Volume() const
 {  
-    return (T)one_sixth*VECTOR<T,3>::Dot_Product(VECTOR<T,3>::Cross_Product(X[2]-X[1],X[3]-X[1]),X[4]-X[1]); 
+    return (T)one_sixth*VECTOR<T,3>::Dot_Product(VECTOR<T,3>::Cross_Product(X[1]-X[0],X[2]-X[0]),X[3]-X[0]); 
 }
 //#####################################################################
 // Function Minimum_Angle
@@ -195,7 +195,7 @@ Maximum_Angle() const
 template<class T> T TETRAHEDRON<T>::
 Minimum_Altitude() const
 {  
-    return min(abs(triangle1.Signed_Distance(X[4])),abs(triangle2.Signed_Distance(X[3])),abs(triangle3.Signed_Distance(X[2])),abs(triangle4.Signed_Distance(X[1])));
+    return min(abs(triangle1.Signed_Distance(X[3])),abs(triangle2.Signed_Distance(X[2])),abs(triangle3.Signed_Distance(X[1])),abs(triangle4.Signed_Distance(X[0])));
 }
 //#####################################################################
 // Function Aspect_Ratio
@@ -244,14 +244,14 @@ Negative_Material(const ARRAY<VECTOR<T,3> >& X,const ARRAY<T>& phis,const VECTOR
     VECTOR<T,4> local_phi;
     int positive_count=0;for(int i=0;i<4;i++) positive_count+=((local_phi[i]=phis(indices[i]))>0);
     switch(positive_count){
-      case 0: return Signed_Volume(X(indices[1]),X(indices[2]),X(indices[3]),X(indices[4]));
+      case 0: return Signed_Volume(X(indices[0]),X(indices[1]),X(indices[2]),X(indices[3]));
       case 1:
         for(int i=0;i<4;i++)if(local_phi[i]>0){
             VECTOR<VECTOR<T,3>,3> interface_locations;int index=i%4+1;
             for(int j=0;j<3;j++,index=(index+1)%4)
                 interface_locations[j]=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(X(indices[i]),X(indices[index]),LEVELSET_UTILITIES<T>::Theta(local_phi[i],local_phi[index]));
-            if(i%2 == 1) exchange(interface_locations[1],interface_locations[3]);
-            return Signed_Volume(X(indices[1]),X(indices[2]),X(indices[3]),X(indices[4]))+TETRAHEDRON<T>::Signed_Volume(X(indices[i]),interface_locations[1],interface_locations[2],interface_locations[3]);}
+            if(i%2 == 0) exchange(interface_locations[0],interface_locations[2]);
+            return Signed_Volume(X(indices[0]),X(indices[1]),X(indices[2]),X(indices[3]))+TETRAHEDRON<T>::Signed_Volume(X(indices[i]),interface_locations[0],interface_locations[1],interface_locations[2]);}
       case 2:{
         positive_count=0;int negative_count=0;int negative_indices[2],positive_indices[2];
         for(int i=0;i<4;i++){if(local_phi[i]<=0) negative_indices[negative_count++]=i;else positive_indices[positive_count++]=i;}
@@ -270,8 +270,8 @@ Negative_Material(const ARRAY<VECTOR<T,3> >& X,const ARRAY<T>& phis,const VECTOR
             VECTOR<VECTOR<T,3>,3> interface_locations;int index=i%4+1;
             for(int j=0;j<3;j++,index=(index+1)%4)
                 interface_locations[j]=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(X(indices[i]),X(indices[index]),LEVELSET_UTILITIES<T>::Theta(local_phi[i],local_phi[index]));
-            if(i%2 == 1) exchange(interface_locations[1],interface_locations[3]);
-            return -TETRAHEDRON<T>::Signed_Volume(X(indices[i]),interface_locations[1],interface_locations[2],interface_locations[3]);}
+            if(i%2 == 0) exchange(interface_locations[0],interface_locations[2]);
+            return -TETRAHEDRON<T>::Signed_Volume(X(indices[i]),interface_locations[0],interface_locations[2],interface_locations[3]);}
       default:return 0;}
 
     PHYSBAM_FATAL_ERROR();
@@ -313,7 +313,7 @@ Cut_With_Hyperplane_And_Discard_Outside_Simplices(const TETRAHEDRON<T>& tetrahed
 {
     // left simplices are in the negative halfspace, right simplices in the positive halfspace
     VECTOR<T,4> phi_nodes;
-    VECTOR<VECTOR<T,3>,4> X_nodes;X_nodes(1)=tetrahedron.X[1];X_nodes(2)=tetrahedron.X[2];X_nodes(3)=tetrahedron.X[3];X_nodes(4)=tetrahedron.X[4];
+    VECTOR<VECTOR<T,3>,4> X_nodes;X_nodes(0)=tetrahedron.X[0];X_nodes(1)=tetrahedron.X[1];X_nodes(2)=tetrahedron.X[2];X_nodes(3)=tetrahedron.X[3];
     for(int i=0;i<4;i++){phi_nodes(i)=cutting_plane.Signed_Distance(X_nodes(i));}
 
     int positive_count=0;
@@ -329,16 +329,16 @@ Cut_With_Hyperplane_And_Discard_Outside_Simplices(const TETRAHEDRON<T>& tetrahed
                 for(int j=0;j<3;j++,index=(index+1)%4){
                     other_indices[j]=index;
                     interface_locations[j]=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(X_nodes[i],X_nodes[index],LEVELSET_UTILITIES<T>::Theta(phi_nodes[i],phi_nodes[index]));}
-                if(i%2 == 0){exchange(interface_locations[1],interface_locations[3]);exchange(other_indices[1],other_indices[3]);}
+                if(i%2 == 0){exchange(interface_locations[0],interface_locations[2]);exchange(other_indices[1],other_indices[3]);}
                 // (i1,o1,o2,o3), (i2,i1,o2,o3), (i3,i1,i2,o3)
-                negative_tetrahedra.Append(TETRAHEDRON<T>(interface_locations[1],X_nodes(other_indices[1]),X_nodes(other_indices[2]),X_nodes(other_indices[3])));
-                negative_tetrahedra.Append(TETRAHEDRON<T>(interface_locations[2],interface_locations[1],X_nodes(other_indices[2]),X_nodes(other_indices[3])));
-                negative_tetrahedra.Append(TETRAHEDRON<T>(interface_locations[3],interface_locations[1],interface_locations[2],X_nodes(other_indices[3])));
+                negative_tetrahedra.Append(TETRAHEDRON<T>(interface_locations[0],X_nodes(other_indices[0]),X_nodes(other_indices[1]),X_nodes(other_indices[2])));
+                negative_tetrahedra.Append(TETRAHEDRON<T>(interface_locations[1],interface_locations[0],X_nodes(other_indices[1]),X_nodes(other_indices[2])));
+                negative_tetrahedra.Append(TETRAHEDRON<T>(interface_locations[2],interface_locations[0],interface_locations[1],X_nodes(other_indices[2])));
                 return;}
         case 2:{ // three tets in each halfspace
             positive_count=0;int negative_count=0;int negative_indices[2],positive_indices[2];
             for(int i=0;i<4;i++){if(phi_nodes[i]<=0) negative_indices[negative_count++]=i;else positive_indices[positive_count++]=i;}
-            if((negative_indices[1]-negative_indices[0])%2 == 1) exchange(positive_indices[0],positive_indices[1]);  // odd wrong, even right (odd=swap)
+            if((negative_indices[1]-negative_indices[0])%2 == 0) exchange(positive_indices[0],positive_indices[1]);  // odd wrong, even right (odd=swap)
             VECTOR<T,3> interface_locations[2][2];
             for(int j=0;j<2;j++)for(int k=0;k<2;k++){
                 int n=negative_indices[j],p=positive_indices[k];
@@ -356,8 +356,8 @@ Cut_With_Hyperplane_And_Discard_Outside_Simplices(const TETRAHEDRON<T>& tetrahed
                 for(int j=0;j<3;j++,index=(index+1)%4){
                     other_indices[j]=index;
                     interface_locations[j]=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(X_nodes[i],X_nodes[index],LEVELSET_UTILITIES<T>::Theta(phi_nodes[i],phi_nodes[index]));}
-                if(i%2 == 0){exchange(interface_locations[1],interface_locations[3]);exchange(other_indices[1],other_indices[3]);}
-                negative_tetrahedra.Append(TETRAHEDRON<T>(X_nodes(i),interface_locations[1],interface_locations[2],interface_locations[3]));
+                if(i%2 == 0){exchange(interface_locations[0],interface_locations[2]);exchange(other_indices[0],other_indices[2]);}
+                negative_tetrahedra.Append(TETRAHEDRON<T>(X_nodes(i),interface_locations[0],interface_locations[1],interface_locations[2]));
                 return;}
         case 4:
             break;}
@@ -378,7 +378,7 @@ Cut_Simplex(ARRAY<VECTOR<T,3> >& X,const VECTOR<int,4>& indices,const VECTOR<VEC
     for(int i=0;i<4;i++) if(phi_nodes[i]>0) positive_count++;
     switch(positive_count){
       case 0: // we are in the negative halfspace
-        Add_Points_As_Tetrahedron(X,left_simplices,indices[1],indices[2],indices[3],indices[4]);
+        Add_Points_As_Tetrahedron(X,left_simplices,indices[0],indices[1],indices[2],indices[3]);
         break;
       case 1: // tet in positive halfspace, three tets in negative
         for(int i=0;i<4;i++)if(phi_nodes[i]>0){
@@ -387,13 +387,13 @@ Cut_Simplex(ARRAY<VECTOR<T,3> >& X,const VECTOR<int,4>& indices,const VECTOR<VEC
             for(int j=0;j<3;j++,index=(index+1)%4){
                 other_indices[j]=indices[index];
                 interface_locations[j]=X.Append(LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(X_nodes[i],X_nodes[index],LEVELSET_UTILITIES<T>::Theta(phi_nodes[i],phi_nodes[index])));}
-            if(i%2 == 0){exchange(interface_locations[1],interface_locations[3]);exchange(other_indices[1],other_indices[3]);}
-            Add_Points_As_Tetrahedron(X,right_simplices,indices[i],interface_locations[1],interface_locations[2],interface_locations[3]);
+            if(i%2 == 0){exchange(interface_locations[0],interface_locations[2]);exchange(other_indices[0],other_indices[2]);}
+            Add_Points_As_Tetrahedron(X,right_simplices,indices[i],interface_locations[0],interface_locations[1],interface_locations[2]);
             // other three in left simplices
             // (i1,o1,o2,o3), (i2,i1,o2,o3), (i3,i1,i2,o3)
-            Add_Points_As_Tetrahedron(X,left_simplices,interface_locations[1],other_indices[1],other_indices[2],other_indices[3]);
-            Add_Points_As_Tetrahedron(X,left_simplices,interface_locations[2],interface_locations[1],other_indices[2],other_indices[3]);
-            Add_Points_As_Tetrahedron(X,left_simplices,interface_locations[3],interface_locations[1],interface_locations[2],other_indices[3]);
+            Add_Points_As_Tetrahedron(X,left_simplices,interface_locations[0],other_indices[0],other_indices[1],other_indices[2]);
+            Add_Points_As_Tetrahedron(X,left_simplices,interface_locations[1],interface_locations[0],other_indices[1],other_indices[2]);
+            Add_Points_As_Tetrahedron(X,left_simplices,interface_locations[2],interface_locations[0],interface_locations[1],other_indices[2]);
             return;}
       case 2:{ // three tets in each halfspace
         positive_count=0;int negative_count=0;int negative_indices[2],positive_indices[2];
@@ -403,7 +403,7 @@ Cut_Simplex(ARRAY<VECTOR<T,3> >& X,const VECTOR<int,4>& indices,const VECTOR<VEC
         for(int j=0;j<2;j++)for(int k=0;k<2;k++){
             int n=negative_indices[j],p=positive_indices[k];
             interface_locations[j][k]=X.Append(LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(X_nodes[n],X_nodes[p],LEVELSET_UTILITIES<T>::Theta(phi_nodes[n],phi_nodes[p])));}
-        // the tets are: (1-,1+2-,2+2-,1-2+) and (1-,1-1+,1+2-,1-2+), and (1-,1+2-,2-,2-2+)
+        // the tets are: (1-,1+2-,2+2-,1-2+) and (1-,0+,1+2-,1-2+), and (1-,1+2-,2-,2-2+)
         // the tets are: (1+,1-2+,2-2+,1+2-) and (1+,1+1-,1-2+,1+2-), and (1+,1-2+,2+,2+2-)
         int n0=indices[negative_indices[0]];int p0=indices[positive_indices[0]];
         Add_Points_As_Tetrahedron(X,left_simplices,n0,interface_locations[1][0],indices[negative_indices[1]],interface_locations[1][1]);
@@ -420,14 +420,14 @@ Cut_Simplex(ARRAY<VECTOR<T,3> >& X,const VECTOR<int,4>& indices,const VECTOR<VEC
             for(int j=0;j<3;j++,index=(index+1)%4){
                 other_indices[j]=indices[index];
                 interface_locations[j]=X.Append(LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(X_nodes[i],X_nodes[index],LEVELSET_UTILITIES<T>::Theta(phi_nodes[i],phi_nodes[index])));}
-            if(i%2 == 0){exchange(interface_locations[1],interface_locations[3]);exchange(other_indices[1],other_indices[3]);}
-            Add_Points_As_Tetrahedron(X,left_simplices,indices[i],interface_locations[1],interface_locations[2],interface_locations[3]);
-            Add_Points_As_Tetrahedron(X,right_simplices,interface_locations[1],other_indices[1],other_indices[2],other_indices[3]);
-            Add_Points_As_Tetrahedron(X,right_simplices,interface_locations[2],interface_locations[1],other_indices[2],other_indices[3]);
-            Add_Points_As_Tetrahedron(X,right_simplices,interface_locations[3],interface_locations[1],interface_locations[2],other_indices[3]);
+            if(i%2 == 0){exchange(interface_locations[0],interface_locations[2]);exchange(other_indices[0],other_indices[2]);}
+            Add_Points_As_Tetrahedron(X,left_simplices,indices[i],interface_locations[0],interface_locations[1],interface_locations[2]);
+            Add_Points_As_Tetrahedron(X,right_simplices,interface_locations[0],other_indices[0],other_indices[1],other_indices[2]);
+            Add_Points_As_Tetrahedron(X,right_simplices,interface_locations[1],interface_locations[0],other_indices[1],other_indices[2]);
+            Add_Points_As_Tetrahedron(X,right_simplices,interface_locations[2],interface_locations[0],interface_locations[1],other_indices[2]);
             return;}
       case 4:
-        Add_Points_As_Tetrahedron(X,right_simplices,indices[1],indices[2],indices[3],indices[4]);
+        Add_Points_As_Tetrahedron(X,right_simplices,indices[0],indices[1],indices[2],indices[3]);
         break;}
 }
 //#####################################################################

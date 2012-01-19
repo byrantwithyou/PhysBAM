@@ -114,8 +114,8 @@ Calculate_Boundary_From_Levelset_On_Nodes(EMBEDDED_OBJECT<TV,d>& eo,ARRAY<T>& ph
     // calculate embedded simplices
     for(int t=0;t<eo.simplicial_object.mesh.elements.m;t++){
         VECTOR<int,d+1> nodes=eo.simplicial_object.mesh.elements(t);
-        {int i=1,j=nodes.m;while(i<j){if(phi(nodes[i])>0) exchange(nodes[i],nodes[j--]);else i++;} // move inside nodes before outside nodes
-        if((nodes.m-j)&1){if(phi(nodes[2])<=0) exchange(nodes[1],nodes[2]);else exchange(nodes[d],nodes[d+1]);}} // one final swap to ensure an even permutation
+        {int i=0,j=nodes.m-1;while(i<j){if(phi(nodes[i])>0) exchange(nodes[i],nodes[j--]);else i++;} // move inside nodes before outside nodes
+        if((nodes.m-j)&1){if(phi(nodes[1])<=0) exchange(nodes[0],nodes[1]);else exchange(nodes[d-1],nodes[d]);}} // one final swap to ensure an even permutation
         for(int i=0;i<nodes.m-1;i++) assert((phi(nodes[i])>0) <= (phi(nodes[i+1])>0));
         int positive_count=0;for(int i=0;i<nodes.m;i++) if(phi(nodes[i])>0) positive_count++;
         Add_Levelset_Cuts(dynamic_cast<typename EMBEDDING_POLICY<TV,d>::EMBEDDED_OBJECT&>(eo),positive_count,nodes);}

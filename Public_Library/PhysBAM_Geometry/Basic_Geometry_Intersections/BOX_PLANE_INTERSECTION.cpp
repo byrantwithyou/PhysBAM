@@ -43,7 +43,7 @@ template<class T> T Halfspace_Intersection_Size(const RANGE<VECTOR<T,3> >& box,c
     // Normalize input and remember how.  After normalization: box is a unit box, normal.z>=normal.y>=normal.x>=0.
     bool flip[3]={false},exchange_xz=false,exchange_yz=false,exchange_xy=false,complement=false;
     T z00=VECTOR<T,3>::Dot_Product(halfspace.x1-box.min_corner,halfspace.normal);VECTOR<T,3> scaling=box.Edge_Lengths(),normal=halfspace.normal*scaling;
-    for(int i=0;i<3;i++) if(normal(i)<0){normal(i)=-normal(i);z00+=normal(i);flip[i-1]=true;}
+    for(int i=0;i<3;i++) if(normal(i)<0){normal(i)=-normal(i);z00+=normal(i);flip[i]=true;}
     if(normal.z<normal.x){exchange(normal.z,normal.x);exchange_xz=true;}
     if(normal.z<normal.y){exchange(normal.z,normal.y);exchange_yz=true;}
     if(normal.y<normal.x){exchange(normal.y,normal.x);exchange_xy=true;}
@@ -61,7 +61,7 @@ template<class T> T Halfspace_Intersection_Size(const RANGE<VECTOR<T,3> >& box,c
     if(complement){volume=1-volume;if(centroid) *centroid=-((volume-1)**centroid+(T).5)/volume+1;}
     if(centroid){
         if(exchange_xy) exchange(centroid->y,centroid->x);if(exchange_yz) exchange(centroid->z,centroid->y);if(exchange_xz) exchange(centroid->z,centroid->x);
-        for(int i=0;i<3;i++) if(flip[i-1]) (*centroid)(i)=1-(*centroid)(i);
+        for(int i=0;i<3;i++) if(flip[i]) (*centroid)(i)=1-(*centroid)(i);
         *centroid=*centroid*scaling+box.min_corner;}
     return volume*box.Size();
 }

@@ -125,7 +125,7 @@ Check_Signed_Volumes_And_Make_Consistent(bool verbose)
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
             if(verbose) LOG::cout<<"tetrahedron number "<<t<<" is oriented improperly."<<std::endl;
 #endif
-            exchange(mesh.elements(t)(3),mesh.elements(t)(4));}}
+            exchange(mesh.elements(t)(2),mesh.elements(t)(3));}}
     if(tetrahedron_list) Update_Tetrahedron_List();
 }
 //#####################################################################

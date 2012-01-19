@@ -33,7 +33,7 @@ bool Intersects_And_Intersection_Coordinates_Helper(const VECTOR<VECTOR<T,3>,3>&
     if(Dx1.Sign()!=0 && Dx2.Sign()!=0 && Dx3.Sign()!=0 && Dx.Sign()!=0){
         // barycentric coordinates for intersection are non-degenerate, so see if they are all the same sign
         if(Dx1.Sign()!=Dx2.Sign() || Dx1.Sign()!=Dx3.Sign()) return false;
-        triangle1_coordinates[1]=Dx1/Dx;triangle1_coordinates[2]=Dx2/Dx;triangle1_coordinates[3]=Dx3/Dx;
+        triangle1_coordinates[0]=Dx1/Dx;triangle1_coordinates[1]=Dx2/Dx;triangle1_coordinates[2]=Dx3/Dx;
         return true;}
     // barycentric coordinates are degenerate, but perhaps we can determine that the 3 triangles couldn't intersect anyway...
     bool is_degenerate;

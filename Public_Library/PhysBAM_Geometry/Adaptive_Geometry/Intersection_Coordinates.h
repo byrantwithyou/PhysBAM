@@ -133,9 +133,9 @@ void Intersection_Coordinates_Helper(const VECTOR<VECTOR<T,2>,3>& triangle,const
     // Da1 = [ q p2 p3 ]
     // Da2 = [ p1 q p3 ]
     // Da3 = [ p1 p2 q ]
-    triangle_coordinates_numerator[1]=Adaptive_Signed_Volume<T_EXACT>(point,triangle[2],triangle[3]);
-    triangle_coordinates_numerator[2]=Adaptive_Signed_Volume<T_EXACT>(triangle[1],point,triangle[3]);
-    triangle_coordinates_numerator[3]=Adaptive_Signed_Volume<T_EXACT>(triangle[1],triangle[2],point);
+    triangle_coordinates_numerator[0]=Adaptive_Signed_Volume<T_EXACT>(point,triangle[1],triangle[2]);
+    triangle_coordinates_numerator[1]=Adaptive_Signed_Volume<T_EXACT>(triangle[0],point,triangle[2]);
+    triangle_coordinates_numerator[2]=Adaptive_Signed_Volume<T_EXACT>(triangle[0],triangle[1],point);
     // Da  = [ p1 p2 p3 ]
     // a1  = Da1 / Da
     // a2  = Da2 / Da
@@ -155,10 +155,10 @@ void Intersection_Coordinates_Helper(const VECTOR<VECTOR<T,3>,4>& tetrahedron,co
     // Da2 = [ p1 q p3 p4 ]
     // Da3 = [ p1 p2 q p4 ]
     // Da4 = [ p1 p2 p3 q ]
-    tetrahedron_coordinates_numerator[1]=Adaptive_Signed_Volume<T_EXACT>(point,tetrahedron[2],tetrahedron[3],tetrahedron[4]);
-    tetrahedron_coordinates_numerator[2]=Adaptive_Signed_Volume<T_EXACT>(tetrahedron[1],point,tetrahedron[3],tetrahedron[4]);
-    tetrahedron_coordinates_numerator[3]=Adaptive_Signed_Volume<T_EXACT>(tetrahedron[1],tetrahedron[2],point,tetrahedron[4]);
-    tetrahedron_coordinates_numerator[4]=Adaptive_Signed_Volume<T_EXACT>(tetrahedron[1],tetrahedron[2],tetrahedron[3],point);
+    tetrahedron_coordinates_numerator[0]=Adaptive_Signed_Volume<T_EXACT>(point,tetrahedron[1],tetrahedron[2],tetrahedron[3]);
+    tetrahedron_coordinates_numerator[1]=Adaptive_Signed_Volume<T_EXACT>(tetrahedron[0],point,tetrahedron[2],tetrahedron[3]);
+    tetrahedron_coordinates_numerator[2]=Adaptive_Signed_Volume<T_EXACT>(tetrahedron[0],tetrahedron[1],point,tetrahedron[3]);
+    tetrahedron_coordinates_numerator[3]=Adaptive_Signed_Volume<T_EXACT>(tetrahedron[0],tetrahedron[1],tetrahedron[2],point);
     // Da  = [ p1 p2 p3 p4 ]
     // a1  = Da1 / Da
     // a2  = Da2 / Da
@@ -186,12 +186,12 @@ void Intersection_Coordinates_Helper(const VECTOR<VECTOR<T,3>,3>& triangle1,cons
     // A11 = 1       A12 = 1       A13 = 1
     // A21 = [p1 q]  A22 = [p2 q]  A23 = [p3 q]
     // A31 = [p1 r]  A32 = [p2 r]  A33 = [p3 r]
-    T_ADAPTIVE1 A21(Adaptive_Signed_Volume<T_EXACT>(triangle1[1],triangle2));
-    T_ADAPTIVE1 A22(Adaptive_Signed_Volume<T_EXACT>(triangle1[2],triangle2));
-    T_ADAPTIVE1 A23(Adaptive_Signed_Volume<T_EXACT>(triangle1[3],triangle2));
-    T_ADAPTIVE1 A31(Adaptive_Signed_Volume<T_EXACT>(triangle1[1],triangle3));
-    T_ADAPTIVE1 A32(Adaptive_Signed_Volume<T_EXACT>(triangle1[2],triangle3));
-    T_ADAPTIVE1 A33(Adaptive_Signed_Volume<T_EXACT>(triangle1[3],triangle3));
+    T_ADAPTIVE1 A21(Adaptive_Signed_Volume<T_EXACT>(triangle1[0],triangle2));
+    T_ADAPTIVE1 A22(Adaptive_Signed_Volume<T_EXACT>(triangle1[1],triangle2));
+    T_ADAPTIVE1 A23(Adaptive_Signed_Volume<T_EXACT>(triangle1[2],triangle2));
+    T_ADAPTIVE1 A31(Adaptive_Signed_Volume<T_EXACT>(triangle1[0],triangle3));
+    T_ADAPTIVE1 A32(Adaptive_Signed_Volume<T_EXACT>(triangle1[1],triangle3));
+    T_ADAPTIVE1 A33(Adaptive_Signed_Volume<T_EXACT>(triangle1[2],triangle3));
     Da1=Adaptive_Determinant<void>(A22,A23,A32,A33);
     Da2=Adaptive_Determinant<void>(A23,A21,A33,A31);
     Da3=Adaptive_Determinant<void>(A21,A22,A31,A32);
@@ -248,11 +248,11 @@ Intersection_Coordinates(const VECTOR<VECTOR<T,2>,2>& segment1,const VECTOR<VECT
     //   = b1 + b2
     // A11 = 1       A12 = 1
     // A21 = [p1 q]  A22 = [p2 q]
-    ADAPTIVE_TYPE1 Da1(Adaptive_Signed_Volume<T_EXACT>(segment1[2],segment2[1],segment2[2]));
-    ADAPTIVE_TYPE1 Da2(Adaptive_Signed_Volume<T_EXACT>(segment1[1],segment2[2],segment2[1]));
+    ADAPTIVE_TYPE1 Da1(Adaptive_Signed_Volume<T_EXACT>(segment1[1],segment2[0],segment2[1]));
+    ADAPTIVE_TYPE1 Da2(Adaptive_Signed_Volume<T_EXACT>(segment1[0],segment2[1],segment2[0]));
     ADAPTIVE_TYPE2 Da=Da1+Da2;
-    segment1_coordinates[1]=Da1/Da;
-    segment1_coordinates[2]=Da2/Da;
+    segment1_coordinates[0]=Da1/Da;
+    segment1_coordinates[1]=Da2/Da;
 }
 
 template<class T_EXACT,class T,class T_ADAPTIVE> void
@@ -281,17 +281,17 @@ Intersection_Coordinates(const VECTOR<VECTOR<T,3>,3>& triangle,const VECTOR<VECT
     // Db1 =  [p1 p2 p3 q2]
     // Db2 = -[p1 p2 p3 q1] = [p1 p3 p2 q1]
     // Dab =  [p1 p2 p3 q2] - [p1 p2 p3 q1] = Db1 + Db2
-    ADAPTIVE_TYPE1 Da1(Adaptive_Signed_Volume<T_EXACT>(triangle[2],triangle[3],segment[1],segment[2]));
-    ADAPTIVE_TYPE1 Da2(Adaptive_Signed_Volume<T_EXACT>(triangle[3],triangle[1],segment[1],segment[2]));
-    ADAPTIVE_TYPE1 Da3(Adaptive_Signed_Volume<T_EXACT>(triangle[1],triangle[2],segment[1],segment[2]));
-    ADAPTIVE_TYPE1 Db1(Adaptive_Signed_Volume<T_EXACT>(triangle[1],triangle[2],triangle[3],segment[2]));
-    ADAPTIVE_TYPE1 Db2(Adaptive_Signed_Volume<T_EXACT>(triangle[1],triangle[3],triangle[2],segment[1]));
+    ADAPTIVE_TYPE1 Da1(Adaptive_Signed_Volume<T_EXACT>(triangle[1],triangle[2],segment[0],segment[1]));
+    ADAPTIVE_TYPE1 Da2(Adaptive_Signed_Volume<T_EXACT>(triangle[2],triangle[0],segment[0],segment[1]));
+    ADAPTIVE_TYPE1 Da3(Adaptive_Signed_Volume<T_EXACT>(triangle[0],triangle[1],segment[0],segment[1]));
+    ADAPTIVE_TYPE1 Db1(Adaptive_Signed_Volume<T_EXACT>(triangle[0],triangle[1],triangle[2],segment[1]));
+    ADAPTIVE_TYPE1 Db2(Adaptive_Signed_Volume<T_EXACT>(triangle[0],triangle[2],triangle[1],segment[0]));
     ADAPTIVE_TYPE2 Dab(Db1+Db2);
-    triangle_coordinates[1]=Da1/Dab;
-    triangle_coordinates[2]=Da2/Dab;
-    triangle_coordinates[3]=Da3/Dab;
-    segment_coordinates[1]=Db1/Dab;
-    segment_coordinates[2]=Db2/Dab;
+    triangle_coordinates[0]=Da1/Dab;
+    triangle_coordinates[1]=Da2/Dab;
+    triangle_coordinates[2]=Da3/Dab;
+    segment_coordinates[0]=Db1/Dab;
+    segment_coordinates[1]=Db2/Dab;
 }
 
 template<class T_EXACT,class T,class T_ADAPTIVE> void
@@ -314,9 +314,9 @@ Intersection_Coordinates(VECTOR<VECTOR<T,3>,3>& triangle1,const VECTOR<VECTOR<T,
     ADAPTIVE_TYPE1 Da1,Da2,Da3;
     ADAPTIVE_TYPE2 Da;
     Intersection_Coordinates_Helper<T_EXACT>(triangle1,triangle2,triangle3,Da1,Da2,Da3,Da);
-    triangle1_coordinates[1]=Da1/Da;
-    triangle1_coordinates[2]=Da2/Da;
-    triangle1_coordinates[3]=Da3/Da;
+    triangle1_coordinates[0]=Da1/Da;
+    triangle1_coordinates[1]=Da2/Da;
+    triangle1_coordinates[2]=Da3/Da;
 }
 
 //#################################################################
