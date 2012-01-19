@@ -42,7 +42,7 @@ public:
     {}
 
     explicit QUATERNION(const VECTOR<T,4>& q)
-        :s(q[1]),v(q[2],q[3],q[4])
+        :s(q[0]),v(q[1],q[2],q[3])
     {}
 
     VECTOR<T,4> Vector() const
