@@ -157,10 +157,10 @@ public:
 
         keys.Remove_All();
         k.Get_Keys(keys);
-        TEST(keys.m==3);
+        TEST(keys.m==2);
 
         k.Get_Data(data);
-        TEST(data.m==3);
+        TEST(data.m==2);
     }
 
     TEST_RESULT Run_Test(int n)
