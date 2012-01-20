@@ -39,10 +39,10 @@ public:
     {for(int j=0;j<image.n/2;j++)for(int i=0;i<image.m;i++)exchange(image(i,j),image(i,image.n-j+1));}
 
     template<int d> static void Invert(ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& image)
-    {for(int i=image.domain.min_corner.x;i<=image.domain.max_corner.x;i++) for(int j=image.domain.min_corner.y;j<=image.domain.max_corner.y;j++) image(i,j)=VECTOR<T,d>::All_Ones_Vector()-image(i,j);}
+    {for(int i=image.domain.min_corner.x;i<image.domain.max_corner.x;i++) for(int j=image.domain.min_corner.y;j<image.domain.max_corner.y;j++) image(i,j)=VECTOR<T,d>::All_Ones_Vector()-image(i,j);}
 
     static void Threshold(ARRAY<VECTOR<T,3> ,VECTOR<int,2> >& image,const T threshold,const VECTOR<T,3>& low_color,const VECTOR<T,3>& high_color)
-    {for(int i=image.domain.min_corner.x;i<=image.domain.max_corner.x;i++) for(int j=image.domain.min_corner.y;j<=image.domain.max_corner.y;j++) if(image(i,j).Magnitude()<threshold) image(i,j)=low_color;else image(i,j)=high_color;}
+    {for(int i=image.domain.min_corner.x;i<image.domain.max_corner.x;i++) for(int j=image.domain.min_corner.y;j<image.domain.max_corner.y;j++) if(image(i,j).Magnitude()<threshold) image(i,j)=low_color;else image(i,j)=high_color;}
 
 //#####################################################################
     template<int d> static void Read(const std::string& filename,ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& image);

@@ -34,14 +34,14 @@ Flood_Fill(ARRAYS_ND_BASE<TV_INT>& colors,const ARRAYS_ND_BASE<VECTOR<bool,2> >&
 void FLOOD_FILL_2D::
 Fill_Single_Cell_Regions(ARRAYS_ND_BASE<TV_INT>& colors,const ARRAYS_ND_BASE<VECTOR<bool,2> >& edge_is_blocked_x,const ARRAYS_ND_BASE<VECTOR<bool,2> >& edge_is_blocked_y,int& fill_color)
 {
-    for(int i=colors.domain.min_corner.x;i<=colors.domain.max_corner.x;i++) for(int j=colors.domain.min_corner.y;j<=colors.domain.max_corner.y;j++) if(colors(i,j)==0)
+    for(int i=colors.domain.min_corner.x;i<colors.domain.max_corner.x;i++) for(int j=colors.domain.min_corner.y;j<colors.domain.max_corner.y;j++) if(colors(i,j)==0)
         if((i==colors.domain.min_corner.x || edge_is_blocked_x(i,j)) && (i==colors.domain.max_corner.x || edge_is_blocked_x(i+1,j)) &&
            (j==colors.domain.min_corner.y || edge_is_blocked_y(i,j)) && (j==colors.domain.max_corner.y || edge_is_blocked_y(i,j+1))) colors(i,j)=++fill_color;
 }
 bool  FLOOD_FILL_2D::
 Find_Uncolored_Node(const ARRAYS_ND_BASE<TV_INT>& colors,TV_INT& node_index)
 {
-    for(int i=colors.domain.min_corner.x;i<=colors.domain.max_corner.x;i++) for(int j=colors.domain.min_corner.y;j<=colors.domain.max_corner.y;j++)
+    for(int i=colors.domain.min_corner.x;i<colors.domain.max_corner.x;i++) for(int j=colors.domain.min_corner.y;j<colors.domain.max_corner.y;j++)
         if(colors(i,j)==0){node_index=TV_INT(i,j);return true;}
     return false;
 }
@@ -73,11 +73,11 @@ Identify_Colors_Touching_Boundary(const int number_of_colors,const ARRAYS_ND_BAS
 {
     color_touches_boundary.Resize(number_of_colors);
     color_touches_boundary.Fill(false);
-    for(int j=colors.domain.min_corner.y;j<=colors.domain.max_corner.y;j++){ // left and right faces
+    for(int j=colors.domain.min_corner.y;j<colors.domain.max_corner.y;j++){ // left and right faces
         int left_color=colors(colors.domain.min_corner.x,j),right_color=colors(colors.domain.max_corner.x,j);
         if(left_color>0) color_touches_boundary(left_color)=true;
         if(right_color>0) color_touches_boundary(right_color)=true;}
-    for(int i=colors.domain.min_corner.x;i<=colors.domain.max_corner.x;i++){ // bottom and top faces
+    for(int i=colors.domain.min_corner.x;i<colors.domain.max_corner.x;i++){ // bottom and top faces
         int bottom_color=colors(i,colors.domain.min_corner.y),top_color=colors(i,colors.domain.max_corner.y);
         if(bottom_color>0) color_touches_boundary(bottom_color)=true;
         if(top_color>0) color_touches_boundary(top_color)=true;}
@@ -88,7 +88,7 @@ Identify_Colors_Touching_Color(const int color,const int number_of_colors,const 
 {
     color_touches_color.Resize(number_of_colors);
     color_touches_color.Fill(false);
-    for(int i=colors.domain.min_corner.x;i<=colors.domain.max_corner.x;i++) for(int j=colors.domain.min_corner.y;j<=colors.domain.max_corner.y;j++) if(colors(i,j)==color){
+    for(int i=colors.domain.min_corner.x;i<colors.domain.max_corner.x;i++) for(int j=colors.domain.min_corner.y;j<colors.domain.max_corner.y;j++) if(colors(i,j)==color){
         if(i>colors.domain.min_corner.x&&!edge_is_blocked_x(i,j)&&colors(i-1,j)>0) color_touches_color(colors(i-1,j))=true;
         if(i<colors.domain.max_corner.x&&!edge_is_blocked_x(i+1,j)&&colors(i+1,j)>0) color_touches_color(colors(i+1,j))=true;
         if(j>colors.domain.min_corner.y&&!edge_is_blocked_y(i,j)&&colors(i,j-1)>0) color_touches_color(colors(i,j-1))=true;

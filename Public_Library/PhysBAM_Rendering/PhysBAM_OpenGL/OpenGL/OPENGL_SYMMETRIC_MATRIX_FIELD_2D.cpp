@@ -15,7 +15,7 @@ Display(const int in_color) const
     glPushAttrib(GL_LIGHTING_BIT|GL_TEXTURE_BIT|GL_LINE_BIT);
     glLineWidth(1);glDisable(GL_LIGHTING);glDisable(GL_TEXTURE_2D);
     ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-    for(int i=lines.domain.min_corner.x;i<=lines.domain.max_corner.x;i++)for(int j=lines.domain.min_corner.y;j<=lines.domain.max_corner.y;j++){
+    for(int i=lines.domain.min_corner.x;i<lines.domain.max_corner.x;i++)for(int j=lines.domain.min_corner.y;j<lines.domain.max_corner.y;j++){
         VECTOR<T,2> node=grid.Node(i,j);MATRIX<T,2> line=size*lines(i,j);
         (positive(i,j).x?positive_color:negative_color).Send_To_GL_Pipeline();
         OpenGL_Line(node-line.Column(0),node+line.Column(0),vertices);
@@ -32,7 +32,7 @@ Update()
 {
     lines.Resize(grid.Domain_Indices(1-field.domain.min_corner.x));positive.Resize(grid.Domain_Indices(1-field.domain.min_corner.x));
     DIAGONAL_MATRIX<T,2> D;MATRIX<T,2> U;
-    for(int i=lines.domain.min_corner.x;i<=lines.domain.max_corner.x;i++)for(int j=lines.domain.min_corner.y;j<=lines.domain.max_corner.y;j++){
+    for(int i=lines.domain.min_corner.x;i<lines.domain.max_corner.x;i++)for(int j=lines.domain.min_corner.y;j<lines.domain.max_corner.y;j++){
         field(i,j).Solve_Eigenproblem(D,U);lines(i,j)=U*D;positive(i,j)=PAIR<bool,bool>(D.x11>0,D.x22>0);}
 }
 //#####################################################################

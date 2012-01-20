@@ -37,7 +37,7 @@ OPENGL_COMPONENT_HEIGHTFIELD_2D(const GRID<TV> &grid_input,
     opengl_triangulated_surface.Set_Back_Material(OPENGL_MATERIAL::Plastic(OPENGL_COLOR((float)0.8,(float)0,0)));
 
     triangulated_surface.mesh.Initialize_Square_Mesh(counts.x,counts.y);
-    for (int i=domain.min_corner.x;i<=domain.max_corner.x;i++) for(int j=domain.min_corner.y;j<=domain.max_corner.y;j++)
+    for (int i=domain.min_corner.x;i<domain.max_corner.x;i++) for(int j=domain.min_corner.y;j<domain.max_corner.y;j++)
     {
         triangulated_surface.particles.array_collection->Add_Element();
     }
@@ -181,7 +181,7 @@ Reinitialize(bool force)
                         success = false;
                     else{
                         int idx = 1;
-                        for(int i=domain.min_corner.x;i<=domain.max_corner.x;i++)for(int j=domain.min_corner.y;j<=domain.max_corner.y;j++){
+                        for(int i=domain.min_corner.x;i<domain.max_corner.x;i++)for(int j=domain.min_corner.y;j<domain.max_corner.y;j++){
                             vector_field(idx) = VECTOR<T,3>((*uv)(i,j).x,0,(*uv)(i,j).y);
                             vector_locations(idx) = VECTOR<T,3>(grid.Axis_X(i,1), scale*(height(i,j)+vertical_offset), grid.Axis_X(j,2));
                             idx++;}}}

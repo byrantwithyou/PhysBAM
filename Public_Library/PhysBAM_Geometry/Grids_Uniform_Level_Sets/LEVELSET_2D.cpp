@@ -64,7 +64,7 @@ Compute_Normals(const T time)
     ARRAY<T,VECTOR<int,2> > phi_ghost(grid.Domain_Indices(ghost_cells));boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
         
     if(!normals) normals=new ARRAY<VECTOR<T,2> ,VECTOR<int,2> >(grid.Domain_Indices(ghost_cells-1));
-    for(int i=normals->domain.min_corner.x;i<=normals->domain.max_corner.x;i++) for(int j=normals->domain.min_corner.y;j<=normals->domain.max_corner.y;j++){
+    for(int i=normals->domain.min_corner.x;i<normals->domain.max_corner.x;i++) for(int j=normals->domain.min_corner.y;j<normals->domain.max_corner.y;j++){
         (*normals)(i,j)=VECTOR<T,2>((phi_ghost(i+1,j)-phi_ghost(i-1,j))*one_over_two_dx,(phi_ghost(i,j+1)-phi_ghost(i,j-1))*one_over_two_dy).Normalized();}
 }
 //#####################################################################
@@ -126,7 +126,7 @@ Compute_Cell_Minimum_And_Maximum(const bool recompute_if_exists)
 {
     if(!recompute_if_exists && cell_range) return;
     if(!cell_range) cell_range=new ARRAY<RANGE<VECTOR<T,1> >,VECTOR<int,2> >(phi.domain.min_corner.x,phi.domain.max_corner.x-1,phi.domain.min_corner.y,phi.domain.max_corner.y-1);
-    for(int i=phi.domain.min_corner.x;i<=phi.domain.max_corner.x-1;i++) for(int j=phi.domain.min_corner.y;j<=phi.domain.max_corner.y-1;j++){
+    for(int i=phi.domain.min_corner.x;i<phi.domain.max_corner.x-1;i++) for(int j=phi.domain.min_corner.y;j<phi.domain.max_corner.y-1;j++){
         T phi1=phi(i,j),phi2=phi(i,j+1),phi3=phi(i+1,j),phi4=phi(i+1,j+1);
         (*cell_range)(i,j)=RANGE<VECTOR<T,1> >(min(phi1,phi2,phi3,phi4),max(phi1,phi2,phi3,phi4));}
 }

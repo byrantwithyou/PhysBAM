@@ -79,7 +79,7 @@ template<class TV> void MULTILINEAR_SPRINGS<TV>::
 Set_Overdamping_Fraction(const T overdamping_fraction) // 1 is critically damped
 {
     springs_damping.Resize(intervals.domain.min_corner.x,intervals.domain.max_corner.x,false,false);
-    for(int i=springs_damping.domain.min_corner.x;i<=springs_damping.domain.max_corner.x;i++){
+    for(int i=springs_damping.domain.min_corner.x;i<springs_damping.domain.max_corner.x;i++){
         Set_All_Springs_To_Phase(i);
         LINEAR_SPRINGS<TV>::Set_Overdamping_Fraction(overdamping_fraction);
         springs_damping(i)=damping;}
@@ -91,7 +91,7 @@ template<class TV> void MULTILINEAR_SPRINGS<TV>::
 Set_Damping(const T constant_damping_input)
 {
     springs_damping.Resize(intervals.domain.min_corner.x,intervals.domain.max_corner.x,false,false);
-    for(int i=springs_damping.domain.min_corner.x;i<=springs_damping.domain.max_corner.x;i++){
+    for(int i=springs_damping.domain.min_corner.x;i<springs_damping.domain.max_corner.x;i++){
         springs_damping(i).Resize(segment_mesh.elements.m,false,false);
         springs_damping(i).Fill(constant_damping_input);}
 }
@@ -102,7 +102,7 @@ template<class TV> void MULTILINEAR_SPRINGS<TV>::
 Set_Damping(ARRAY_VIEW<const T> damping_input)
 {
     springs_damping.Resize(intervals.domain.min_corner.x,intervals.domain.max_corner.x,false,false);
-    for(int i=springs_damping.domain.min_corner.x;i<=springs_damping.domain.max_corner.x;i++) springs_damping(i)=damping_input;
+    for(int i=springs_damping.domain.min_corner.x;i<springs_damping.domain.max_corner.x;i++) springs_damping(i)=damping_input;
 }
 //#####################################################################
 // Function Set_Overdamping_Fraction
@@ -111,7 +111,7 @@ template<class TV> void MULTILINEAR_SPRINGS<TV>::
 Set_Overdamping_Fraction(ARRAY_VIEW<const T> overdamping_fraction) // 1 is critically damped
 {
     springs_damping.Resize(intervals.domain.min_corner.x,intervals.domain.max_corner.x,false,false);
-    for(int i=springs_damping.domain.min_corner.x;i<=springs_damping.domain.max_corner.x;i++){
+    for(int i=springs_damping.domain.min_corner.x;i<springs_damping.domain.max_corner.x;i++){
         Set_All_Springs_To_Phase(i);
         LINEAR_SPRINGS<TV>::Set_Overdamping_Fraction(overdamping_fraction);
         springs_damping(i)=damping;}
@@ -122,7 +122,7 @@ Set_Overdamping_Fraction(ARRAY_VIEW<const T> overdamping_fraction) // 1 is criti
 template<class TV> void MULTILINEAR_SPRINGS<TV>::
 Ensure_Minimum_Overdamping_Fraction(const T overdamping_fraction) // 1 is critically damped
 {
-    for(int i=springs_damping.domain.min_corner.x;i<=springs_damping.domain.max_corner.x;i++){
+    for(int i=springs_damping.domain.min_corner.x;i<springs_damping.domain.max_corner.x;i++){
         Set_All_Springs_To_Phase(i);
         LINEAR_SPRINGS<TV>::Set_Overdamping_Fraction(overdamping_fraction);
         for(int k=0;k<damping.m;k++) springs_damping(i)(k)=max(springs_damping(i)(k),damping(k));}

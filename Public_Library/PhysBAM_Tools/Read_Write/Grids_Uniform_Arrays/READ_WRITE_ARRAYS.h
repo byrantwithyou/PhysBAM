@@ -54,13 +54,13 @@ public:
 };
 
 template<class T> inline std::ostream& operator<<(std::ostream& output_stream,const ARRAYS_ND_BASE<VECTOR<T,1> >& a)
-{for(int i=a.domain.min_corner.x;i<=a.domain.max_corner.x;i++) output_stream<<a(i)<<" ";output_stream<<std::endl;return output_stream;}
+{for(int i=a.domain.min_corner.x;i<a.domain.max_corner.x;i++) output_stream<<a(i)<<" ";output_stream<<std::endl;return output_stream;}
 
 template<class T> inline std::ostream& operator<<(std::ostream& output,const ARRAYS_ND_BASE<VECTOR<T,2> >& a)
-{for(int i=a.domain.min_corner.x;i<=a.domain.max_corner.x;i++){for(int j=a.domain.min_corner.y;j<=a.domain.max_corner.y;j++) output<<a(i,j)<<" ";output<<std::endl;}return output;}
+{for(int i=a.domain.min_corner.x;i<a.domain.max_corner.x;i++){for(int j=a.domain.min_corner.y;j<a.domain.max_corner.y;j++) output<<a(i,j)<<" ";output<<std::endl;}return output;}
 
 template<class T> inline std::ostream& operator<<(std::ostream& output,const ARRAYS_ND_BASE<VECTOR<T,3> >& a)
-{for(int i=a.domain.min_corner.x;i<=a.domain.max_corner.x;i++){for(int j=a.domain.min_corner.y;j<=a.domain.max_corner.y;j++){for(int ij=a.domain.min_corner.z;ij<=a.domain.max_corner.z;ij++)output<<a(i,j,ij)<<" ";output<<std::endl;}
+{for(int i=a.domain.min_corner.x;i<a.domain.max_corner.x;i++){for(int j=a.domain.min_corner.y;j<a.domain.max_corner.y;j++){for(int ij=a.domain.min_corner.z;ij<a.domain.max_corner.z;ij++)output<<a(i,j,ij)<<" ";output<<std::endl;}
     output<<"------------------------------------------"<<std::endl;}
 return output;}
 }

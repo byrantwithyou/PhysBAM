@@ -85,15 +85,15 @@ Identify_Colors_Touching_Boundary(const int number_of_colors,const ARRAYS_ND_BAS
     const ARRAYS_ND_BASE<VECTOR<bool,3> >& edge_is_blocked_y,const ARRAYS_ND_BASE<VECTOR<bool,3> >& edge_is_blocked_z,ARRAY<bool>& color_touches_boundary)
 {
     color_touches_boundary.Resize(number_of_colors);color_touches_boundary.Fill(false);
-    for(int j=colors.domain.min_corner.y;j<=colors.domain.max_corner.y;j++) for(int k=colors.domain.min_corner.z;k<=colors.domain.max_corner.z;k++){ // left and right faces
+    for(int j=colors.domain.min_corner.y;j<colors.domain.max_corner.y;j++) for(int k=colors.domain.min_corner.z;k<colors.domain.max_corner.z;k++){ // left and right faces
         int left_color=colors(colors.domain.min_corner.x ,j,k),right_color=colors(colors.domain.max_corner.x,j,k);
         if(left_color>0) color_touches_boundary(left_color)=true;
         if(right_color>0) color_touches_boundary(right_color)=true;}
-    for(int i=colors.domain.min_corner.x ;i<=colors.domain.max_corner.x;i++) for(int k=colors.domain.min_corner.z;k<=colors.domain.max_corner.z;k++){ // bottom and top faces
+    for(int i=colors.domain.min_corner.x ;i<colors.domain.max_corner.x;i++) for(int k=colors.domain.min_corner.z;k<colors.domain.max_corner.z;k++){ // bottom and top faces
         int bottom_color=colors(i,colors.domain.min_corner.y,k),top_color=colors(i,colors.domain.max_corner.y,k);
         if(bottom_color>0) color_touches_boundary(bottom_color)=true;
         if(top_color>0) color_touches_boundary(top_color)=true;}
-    for(int i=colors.domain.min_corner.x ;i<=colors.domain.max_corner.x;i++) for(int j=colors.domain.min_corner.y;j<=colors.domain.max_corner.y;j++){ // front and back faces
+    for(int i=colors.domain.min_corner.x ;i<colors.domain.max_corner.x;i++) for(int j=colors.domain.min_corner.y;j<colors.domain.max_corner.y;j++){ // front and back faces
         int front_color=colors(i,j,colors.domain.min_corner.z),back_color=colors(i,j,colors.domain.max_corner.z);
         if(front_color>0) color_touches_boundary(front_color)=true;
         if(back_color>0) color_touches_boundary(back_color)=true;}
@@ -104,8 +104,8 @@ Identify_Colors_Touching_Color(const int color,const int number_of_colors,const 
 {
     color_touches_color.Resize(number_of_colors);
     color_touches_color.Fill(false);
-    for(int i=colors.domain.min_corner.x ;i<=colors.domain.max_corner.x;i++) for(int j=colors.domain.min_corner.y;j<=colors.domain.max_corner.y;j++)
-        for(int k=colors.domain.min_corner.z;k<=colors.domain.max_corner.z;k++) if(colors(i,j,k)==color){
+    for(int i=colors.domain.min_corner.x ;i<colors.domain.max_corner.x;i++) for(int j=colors.domain.min_corner.y;j<colors.domain.max_corner.y;j++)
+        for(int k=colors.domain.min_corner.z;k<colors.domain.max_corner.z;k++) if(colors(i,j,k)==color){
             if(i>colors.domain.min_corner.x &&!edge_is_blocked_x(i,j,k)&&colors(i-1,j,k)>0) color_touches_color(colors(i-1,j,k))=true;
             if(i<colors.domain.max_corner.x&&!edge_is_blocked_x(i+1,j,k)&&colors(i+1,j,k)>0) color_touches_color(colors(i+1,j,k))=true;
             if(j>colors.domain.min_corner.y&&!edge_is_blocked_y(i,j,k)&&colors(i,j-1,k)>0) color_touches_color(colors(i,j-1,k))=true;

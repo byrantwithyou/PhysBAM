@@ -61,7 +61,7 @@ OPENGL_INDEXED_COLOR_MAP* OPENGL_INDEXED_COLOR_MAP::
 Particle_Multiple_Color_Map()
 {
     OPENGL_INDEXED_COLOR_MAP* map=Levelset_Multiple_Color_Map();
-    for(int i=map->color_map.domain.min_corner.x;i<=map->color_map.domain.max_corner.x;i++){for(int j=0;j<=2;j++) map->color_map(i).rgba[j]+=.35;map->color_map(i).rgba[3]=1;}
+    for(int i=map->color_map.domain.min_corner.x;i<map->color_map.domain.max_corner.x;i++){for(int j=0;j<=2;j++) map->color_map(i).rgba[j]+=.35;map->color_map(i).rgba[3]=1;}
     return map;
 }
 OPENGL_INDEXED_COLOR_MAP* OPENGL_INDEXED_COLOR_MAP::
@@ -86,6 +86,6 @@ OPENGL_INDEXED_COLOR_MAP* OPENGL_INDEXED_COLOR_MAP::
 Rigid_Body_Back_Color_Map()
 {
     OPENGL_INDEXED_COLOR_MAP* map=Rigid_Body_Color_Map();
-    for(int i=map->color_map.domain.min_corner.x;i<=map->color_map.domain.max_corner.x;i++){for(int j=0;j<=2;j++) map->color_map(i).rgba[j]+=.35;map->color_map(i).rgba[3]=1;}
+    for(int i=map->color_map.domain.min_corner.x;i<map->color_map.domain.max_corner.x;i++){for(int j=0;j<=2;j++) map->color_map(i).rgba[j]+=.35;map->color_map(i).rgba[3]=1;}
     return map;
 }

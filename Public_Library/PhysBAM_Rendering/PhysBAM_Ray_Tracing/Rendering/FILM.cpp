@@ -621,7 +621,7 @@ template<class T> void FILM<T>::
 Print_Film_Clipped(const std::string& filename,const T gamma,const RANGE<VECTOR<int,2> >& box) const
 {
     ARRAY<VECTOR<T,4> ,VECTOR<int,2> > clipped(box.min_corner.x,box.max_corner.x,box.min_corner.y,box.max_corner.y);
-        for(int i=box.min_corner.x;i<=box.max_corner.x;i++) for(int j=box.min_corner.y;j<=box.max_corner.y;j++) clipped(i,j)=colors(i,j).Append(alphas(i,j))/weights(i,j);
+        for(int i=box.min_corner.x;i<box.max_corner.x;i++) for(int j=box.min_corner.y;j<box.max_corner.y;j++) clipped(i,j)=colors(i,j).Append(alphas(i,j))/weights(i,j);
     IMAGE<T>::Write(filename,clipped,gamma,dither_amplitude);
 }
 template<class T> void FILM<T>::
@@ -673,7 +673,7 @@ template<class T> void FILM<T>::
 Add_Sample(const SAMPLE& sample)
 {
     RANGE<VECTOR<int,2> > box(grid.Clamp_To_Cell(sample.film_position-effective_filter_width),grid.Clamp_To_Cell(sample.film_position+effective_filter_width));
-    for(int i=box.min_corner.x;i<=box.max_corner.x;i++) for(int j=box.min_corner.y;j<=box.max_corner.y;j++){
+    for(int i=box.min_corner.x;i<box.max_corner.x;i++) for(int j=box.min_corner.y;j<box.max_corner.y;j++){
         T weight=filter(sample.film_position-grid.X(i,j),effective_filter_width);
         colors(i,j)+=weight*sample.radiance;weights(i,j)+=weight;alphas(i,j)+=weight*sample.alpha;}
 }

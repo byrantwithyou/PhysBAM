@@ -30,7 +30,7 @@ public:
     int Flood_Fill(ARRAYS_ND_BASE<TV_INT>& colors,const ARRAYS_ND_BASE<VECTOR<bool,1> >& edge_is_blocked_x,ARRAY<bool>* color_touches_uncolorable_node=0)
     {int fill_color=1,number_of_regions=0;if(color_touches_uncolorable_node) color_touches_uncolorable_node->Remove_All();region_boundaries.Clean_Memory();
     bool touches_uncolorable_node=false;
-    for(int i=colors.domain.min_corner.x;i<=colors.domain.max_corner.x;i++){
+    for(int i=colors.domain.min_corner.x;i<colors.domain.max_corner.x;i++){
         if(colors(i)!=-1){
             colors(i)=fill_color;
             if(number_of_regions!=fill_color){
@@ -39,7 +39,7 @@ public:
             if(edge_is_blocked_x(i+1)||i==colors.domain.max_corner.x||colors(i+1)==-1){
                 region_boundaries(fill_color).y=i;fill_color++;
                 if(color_touches_uncolorable_node)
-                    color_touches_uncolorable_node->Append(touches_uncolorable_node||(i+1<=colors.domain.max_corner.x&&colors(i+1)==-1&&!edge_is_blocked_x(i+1)));}}}
+                    color_touches_uncolorable_node->Append(touches_uncolorable_node||(i+1<colors.domain.max_corner.x&&colors(i+1)==-1&&!edge_is_blocked_x(i+1)));}}}
     return region_boundaries.m;}
 
     void Identify_Colors_Touching_Boundary(const int number_of_colors,const ARRAYS_ND_BASE<TV_INT>& colors,const ARRAYS_ND_BASE<VECTOR<bool,1> >& edge_is_blocked_x,ARRAY<bool>& color_touches_boundary)

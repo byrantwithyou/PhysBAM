@@ -51,7 +51,7 @@ Compute_Normals(const T time)
     ARRAY<T,VECTOR<int,1> > phi_ghost(grid.Domain_Indices(ghost_cells),false);boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
         
     if(!normals) normals=new ARRAY<VECTOR<T,1> ,VECTOR<int,1> >(grid.Domain_Indices(ghost_cells-1));
-    for(int i=normals->domain.min_corner.x;i<=normals->domain.max_corner.x;i++)(*normals)(i)=VECTOR<T,1>((phi_ghost(i+1)-phi_ghost(i-1))*one_over_two_dx).Normalized();
+    for(int i=normals->domain.min_corner.x;i<normals->domain.max_corner.x;i++)(*normals)(i)=VECTOR<T,1>((phi_ghost(i+1)-phi_ghost(i-1))*one_over_two_dx).Normalized();
 }
 //#####################################################################
 // Function Compute_Curvature
@@ -69,7 +69,7 @@ Compute_Cell_Minimum_And_Maximum(const bool recompute_if_exists)
 {
     if(!recompute_if_exists && cell_range) return;
     if(!cell_range) cell_range=new ARRAY<RANGE<VECTOR<T,1> >,VECTOR<int,1> >(phi.domain.min_corner.x,phi.domain.max_corner.x-1);
-    for(int i=phi.domain.min_corner.x;i<=phi.domain.max_corner.x-1;i++){
+    for(int i=phi.domain.min_corner.x;i<phi.domain.max_corner.x-1;i++){
         T phi1=phi(i),phi2=phi(i+1);
         (*cell_range)(i)=RANGE<VECTOR<T,1> >(min(phi1,phi2),max(phi1,phi2));}
 }

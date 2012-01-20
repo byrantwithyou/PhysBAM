@@ -155,7 +155,7 @@ Compute_Cell_Minimum_And_Maximum(const bool recompute_if_exists)
     if(!recompute_if_exists && cell_range) return;
     if(!cell_range) cell_range=new ARRAY<RANGE<VECTOR<T,1> >,VECTOR<int,3> >(phi.domain.min_corner.x,phi.domain.max_corner.x-1,phi.domain.min_corner.y,phi.domain.max_corner.y-1,phi.domain.min_corner.z,phi.domain.max_corner.z-1);
     TV_INT i;
-    for(i.x=phi.domain.min_corner.x;i.x<=phi.domain.max_corner.x-1;i.x++) for(i.y=phi.domain.min_corner.y;i.y<=phi.domain.max_corner.y-1;i.y++) for(i.z=phi.domain.min_corner.z;i.z<=phi.domain.max_corner.z-1;i.z++){
+    for(i.x=phi.domain.min_corner.x;i.x<phi.domain.max_corner.x-1;i.x++) for(i.y=phi.domain.min_corner.y;i.y<phi.domain.max_corner.y-1;i.y++) for(i.z=phi.domain.min_corner.z;i.z<phi.domain.max_corner.z-1;i.z++){
         int index=phi.Standard_Index(i);
         int z=phi.counts.z,yz=index+phi.counts.y*z;
         T phi1=phi.array(index),phi2=phi.array(yz),phi3=phi.array(index+z),phi4=phi.array(index+1),

@@ -53,9 +53,9 @@ Update()
     if(velocity_mode == FACE_CENTERED){
         vector_field.Resize(u.counts.x*u.counts.y + v.counts.x*v.counts.y);
         vector_locations.Resize(u.counts.x*u.counts.y + v.counts.x*v.counts.y);
-        for(int i=u.domain.min_corner.x;i<=u.domain.max_corner.x;i++) for(int j=u.domain.min_corner.y;j<=u.domain.max_corner.y;j++) if(!active_faces||(active_faces->Component(1))(i,j)){
+        for(int i=u.domain.min_corner.x;i<u.domain.max_corner.x;i++) for(int j=u.domain.min_corner.y;j<u.domain.max_corner.y;j++) if(!active_faces||(active_faces->Component(1))(i,j)){
             vector_field(idx)=VECTOR<T,2>(u(i,j),0);vector_locations(idx)=grid.X_Face(i,j);idx++;}
-        for(int i=v.domain.min_corner.x;i<=v.domain.max_corner.x;i++) for(int j=v.domain.min_corner.y;j<=v.domain.max_corner.y;j++) if(!active_faces||(active_faces->Component(2))(i,j)){
+        for(int i=v.domain.min_corner.x;i<v.domain.max_corner.x;i++) for(int j=v.domain.min_corner.y;j<v.domain.max_corner.y;j++) if(!active_faces||(active_faces->Component(2))(i,j)){
             vector_field(idx)=VECTOR<T,2>(0,v(i,j));vector_locations(idx)=grid.Y_Face(i,j);idx++;}
         vector_field.Resize(idx-1);
         vector_locations.Resize(idx-1);}
@@ -63,7 +63,7 @@ Update()
         int number_of_cells=(u.counts.x-1)*(v.counts.y-1);
         vector_field.Resize(number_of_cells);
         vector_locations.Resize(number_of_cells);
-        for(int i=u.domain.min_corner.x;i<=u.domain.max_corner.x-1;i++) for(int j=v.domain.min_corner.y;j<=v.domain.max_corner.y-1;j++) if(!active_cells||(*active_cells)(i,j)){
+        for(int i=u.domain.min_corner.x;i<u.domain.max_corner.x-1;i++) for(int j=v.domain.min_corner.y;j<v.domain.max_corner.y-1;j++) if(!active_cells||(*active_cells)(i,j)){
             vector_field(idx)=VECTOR<T,2>((T).5*(u(i,j)+u(i+1,j)),(T).5*(v(i,j)+v(i,j+1)));vector_locations(idx)=grid.Center(i,j);idx++;}
         vector_field.Resize(idx-1);
         vector_locations.Resize(idx-1);}

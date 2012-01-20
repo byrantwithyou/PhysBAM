@@ -40,7 +40,7 @@ public:
         int i=-1;for(;i>=intervals.domain.min_corner.x && relative_deformation<intervals(i);i--);
         return i+1;}
     else if(relative_deformation>0){
-        int i=1;for(;i<=intervals.domain.max_corner.x && relative_deformation>intervals(i);i++);
+        int i=1;for(;i<intervals.domain.max_corner.x && relative_deformation>intervals(i);i++);
         return i-1;}
     else return 0;}
 

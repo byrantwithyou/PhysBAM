@@ -72,19 +72,19 @@ Display(const int in_color) const
                 face_corners_not_visible_from_face_center_color.Send_To_GL_Pipeline();
                 glLineWidth(1);
                 vertices.Resize(0);
-                for(int i=face_corners_visible_from_face_center_u.domain.min_corner.x;i<=face_corners_visible_from_face_center_u.domain.max_corner.x;i++) for(int j=face_corners_visible_from_face_center_u.domain.min_corner.y;j<=face_corners_visible_from_face_center_u.domain.max_corner.y;j++) for(int k=face_corners_visible_from_face_center_u.domain.min_corner.z;k<=face_corners_visible_from_face_center_u.domain.max_corner.z;k++){
+                for(int i=face_corners_visible_from_face_center_u.domain.min_corner.x;i<face_corners_visible_from_face_center_u.domain.max_corner.x;i++) for(int j=face_corners_visible_from_face_center_u.domain.min_corner.y;j<face_corners_visible_from_face_center_u.domain.max_corner.y;j++) for(int k=face_corners_visible_from_face_center_u.domain.min_corner.z;k<face_corners_visible_from_face_center_u.domain.max_corner.z;k++){
                     if(!face_corners_visible_from_face_center_u(i,j,k)(0).x){OpenGL_Line(u_grid.X(i,j,k),grid.X(i,j,k),vertices);}
                     if(!face_corners_visible_from_face_center_u(i,j,k)(1).x){OpenGL_Line(u_grid.X(i,j,k),grid.X(i,j+1,k),vertices);}
                     if(!face_corners_visible_from_face_center_u(i,j,k)(2).x){OpenGL_Line(u_grid.X(i,j,k),grid.X(i,j,k+1),vertices);}
                     if(!face_corners_visible_from_face_center_u(i,j,k)(3).x){OpenGL_Line(u_grid.X(i,j,k),grid.X(i,j+1,k+1),vertices);}
                 }
-                for(int i=face_corners_visible_from_face_center_v.domain.min_corner.x;i<=face_corners_visible_from_face_center_v.domain.max_corner.x;i++) for(int j=face_corners_visible_from_face_center_v.domain.min_corner.y;j<=face_corners_visible_from_face_center_v.domain.max_corner.y;j++) for(int k=face_corners_visible_from_face_center_v.domain.min_corner.z;k<=face_corners_visible_from_face_center_v.domain.max_corner.z;k++){
+                for(int i=face_corners_visible_from_face_center_v.domain.min_corner.x;i<face_corners_visible_from_face_center_v.domain.max_corner.x;i++) for(int j=face_corners_visible_from_face_center_v.domain.min_corner.y;j<face_corners_visible_from_face_center_v.domain.max_corner.y;j++) for(int k=face_corners_visible_from_face_center_v.domain.min_corner.z;k<face_corners_visible_from_face_center_v.domain.max_corner.z;k++){
                     if(!face_corners_visible_from_face_center_v(i,j,k)(0).x){OpenGL_Line(v_grid.X(i,j,k),grid.X(i,j,k),vertices);}
                     if(!face_corners_visible_from_face_center_v(i,j,k)(1).x){OpenGL_Line(v_grid.X(i,j,k),grid.X(i+1,j,k),vertices);}
                     if(!face_corners_visible_from_face_center_v(i,j,k)(2).x){OpenGL_Line(v_grid.X(i,j,k),grid.X(i,j,k+1),vertices);}
                     if(!face_corners_visible_from_face_center_v(i,j,k)(3).x){OpenGL_Line(v_grid.X(i,j,k),grid.X(i+1,j,k+1),vertices);}
                 }
-                for(int i=face_corners_visible_from_face_center_w.domain.min_corner.x;i<=face_corners_visible_from_face_center_w.domain.max_corner.x;i++) for(int j=face_corners_visible_from_face_center_w.domain.min_corner.y;j<=face_corners_visible_from_face_center_w.domain.max_corner.y;j++) for(int k=face_corners_visible_from_face_center_w.domain.min_corner.z;k<=face_corners_visible_from_face_center_w.domain.max_corner.z;k++){
+                for(int i=face_corners_visible_from_face_center_w.domain.min_corner.x;i<face_corners_visible_from_face_center_w.domain.max_corner.x;i++) for(int j=face_corners_visible_from_face_center_w.domain.min_corner.y;j<face_corners_visible_from_face_center_w.domain.max_corner.y;j++) for(int k=face_corners_visible_from_face_center_w.domain.min_corner.z;k<face_corners_visible_from_face_center_w.domain.max_corner.z;k++){
                     if(!face_corners_visible_from_face_center_w(i,j,k)(0).x){OpenGL_Line(w_grid.X(i,j,k),grid.X(i,j,k),vertices);}
                     if(!face_corners_visible_from_face_center_w(i,j,k)(1).x){OpenGL_Line(w_grid.X(i,j,k),grid.X(i+1,j,k),vertices);}
                     if(!face_corners_visible_from_face_center_w(i,j,k)(2).x){OpenGL_Line(w_grid.X(i,j,k),grid.X(i,j+1,k),vertices);}
@@ -97,7 +97,7 @@ Display(const int in_color) const
                 node_neighbor_not_visible_color.Send_To_GL_Pipeline();
                 glLineWidth(5);
                 vertices.Resize(0);
-                for(int i=node_neighbors_visible.domain.min_corner.x;i<=node_neighbors_visible.domain.max_corner.x;i++) for(int j=node_neighbors_visible.domain.min_corner.y;j<=node_neighbors_visible.domain.max_corner.y;j++) for(int k=node_neighbors_visible.domain.min_corner.z;k<=node_neighbors_visible.domain.max_corner.z;k++){
+                for(int i=node_neighbors_visible.domain.min_corner.x;i<node_neighbors_visible.domain.max_corner.x;i++) for(int j=node_neighbors_visible.domain.min_corner.y;j<node_neighbors_visible.domain.max_corner.y;j++) for(int k=node_neighbors_visible.domain.min_corner.z;k<node_neighbors_visible.domain.max_corner.z;k++){
                     if(!node_neighbors_visible(i,j,k)(0)){OpenGL_Line(grid.X(i,j,k),grid.X(i+1,j,k),vertices);}
                     if(!node_neighbors_visible(i,j,k)(1)){OpenGL_Line(grid.X(i,j,k),grid.X(i,j+1,k),vertices);}
                     if(!node_neighbors_visible(i,j,k)(2)){OpenGL_Line(grid.X(i,j,k),grid.X(i,j,k+1),vertices); }
@@ -132,7 +132,7 @@ Reinitialize(bool force)
             std::string tmp_filename = FILE_UTILITIES::Get_Frame_Filename(directory+"/%d/density_valid_mask",frame);
             if (FILE_UTILITIES::File_Exists(tmp_filename)){
                 FILE_UTILITIES::Read_From_File<RW>(tmp_filename,density_valid_mask);
-                for(int i=density_valid_mask.domain.min_corner.x;i<=density_valid_mask.domain.max_corner.x;i++) for(int j=density_valid_mask.domain.min_corner.y;j<=density_valid_mask.domain.max_corner.y;j++) for(int k=density_valid_mask.domain.min_corner.z;k<=density_valid_mask.domain.max_corner.z;k++)
+                for(int i=density_valid_mask.domain.min_corner.x;i<density_valid_mask.domain.max_corner.x;i++) for(int j=density_valid_mask.domain.min_corner.y;j<density_valid_mask.domain.max_corner.y;j++) for(int k=density_valid_mask.domain.min_corner.z;k<density_valid_mask.domain.max_corner.z;k++)
                     density_valid_mask(i,j,k)=!density_valid_mask(i,j,k); // negate
                 opengl_density_valid_mask.Update();}
             else density_valid_mask.Clean_Memory();

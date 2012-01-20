@@ -42,7 +42,7 @@ public:
     bool Intersection(RAY<TV>& ray) const PHYSBAM_OVERRIDE
     {RAY<TV> object_space_ray=Object_Space_Ray(ray);
     bool intersection=false;
-    for(int i=particles_array.domain.min_corner.x;i<=particles_array.domain.max_corner.x;i++) for(int j=particles_array.domain.min_corner.y;j<=particles_array.domain.max_corner.y;j++) for(int ij=particles_array.domain.min_corner.z;ij<=particles_array.domain.max_corner.z;ij++) {POINT_CLOUD<TV>* particles=particles_array(i,j,ij);
+    for(int i=particles_array.domain.min_corner.x;i<particles_array.domain.max_corner.x;i++) for(int j=particles_array.domain.min_corner.y;j<particles_array.domain.max_corner.y;j++) for(int ij=particles_array.domain.min_corner.z;ij<particles_array.domain.max_corner.z;ij++) {POINT_CLOUD<TV>* particles=particles_array(i,j,ij);
         if(particles){
             ARRAY_VIEW<T> radius=*particles->array_collection->template Get_Array<T>(ATTRIBUTE_ID(15)); // radius is attribute 15
             for(int p=0;p<particles->array_collection->Size();p++) if(INTERSECTION::Intersects(object_space_ray,SPHERE<TV>(particles->X(p),scale*radius(p)),small_number)) {
@@ -59,7 +59,7 @@ public:
     return intersection;}
 
     bool Inside(const TV& location) const  PHYSBAM_OVERRIDE
-    {for(int i=particles_array.domain.min_corner.x;i<=particles_array.domain.max_corner.x;i++) for(int j=particles_array.domain.min_corner.y;j<=particles_array.domain.max_corner.y;j++) for(int ij=particles_array.domain.min_corner.z;ij<=particles_array.domain.max_corner.z;ij++) {
+    {for(int i=particles_array.domain.min_corner.x;i<particles_array.domain.max_corner.x;i++) for(int j=particles_array.domain.min_corner.y;j<particles_array.domain.max_corner.y;j++) for(int ij=particles_array.domain.min_corner.z;ij<particles_array.domain.max_corner.z;ij++) {
         POINT_CLOUD<TV>* particles=particles_array(i,j,ij);
         if(particles){
             ARRAY_VIEW<T> radius=*particles->array_collection->template Get_Array<T>(ATTRIBUTE_ID(15)); // radius is attribute 15
@@ -72,7 +72,7 @@ public:
     return (SPHERE<TV>(particles->X(p),scale*radius(p))).Normal(location);}
 
     void Get_Aggregate_World_Space_Bounding_Boxes(ARRAY<RENDERING_OBJECT_ACCELERATION_PRIMITIVE<T> >& primitives)const PHYSBAM_OVERRIDE
-    {for(int i=particles_array.domain.min_corner.x;i<=particles_array.domain.max_corner.x;i++) for(int j=particles_array.domain.min_corner.y;j<=particles_array.domain.max_corner.y;j++) for(int ij=particles_array.domain.min_corner.z;ij<=particles_array.domain.max_corner.z;ij++) {
+    {for(int i=particles_array.domain.min_corner.x;i<particles_array.domain.max_corner.x;i++) for(int j=particles_array.domain.min_corner.y;j<particles_array.domain.max_corner.y;j++) for(int ij=particles_array.domain.min_corner.z;ij<particles_array.domain.max_corner.z;ij++) {
         POINT_CLOUD<TV>* particles=particles_array(i,j,ij);
         if(particles){
             ARRAY_VIEW<T> radius=*particles->array_collection->template Get_Array<T>(ATTRIBUTE_ID(15)); // radius is attribute 15
@@ -85,7 +85,7 @@ public:
 private:
     void Create_Aggregate_Ids()
     {int index=1;
-    for(int i=particles_array.domain.min_corner.x;i<=particles_array.domain.max_corner.x;i++) for(int j=particles_array.domain.min_corner.y;j<=particles_array.domain.max_corner.y;j++) for(int ij=particles_array.domain.min_corner.z;ij<=particles_array.domain.max_corner.z;ij++){
+    for(int i=particles_array.domain.min_corner.x;i<particles_array.domain.max_corner.x;i++) for(int j=particles_array.domain.min_corner.y;j<particles_array.domain.max_corner.y;j++) for(int ij=particles_array.domain.min_corner.z;ij<particles_array.domain.max_corner.z;ij++){
         POINT_CLOUD<TV>* particles=particles_array(i,j,ij);
         if(particles)
             for(int p=0;p<particles->array_collection->Size();p++){

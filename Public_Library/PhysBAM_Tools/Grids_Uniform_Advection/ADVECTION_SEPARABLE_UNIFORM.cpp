@@ -26,7 +26,7 @@ template<> struct UPDATE_ADVECTION_EQUATION_HELPER<1>
 
         ARRAY<T2,VECTOR<int,1> > Z_1d_x(-2,m+3);ARRAY<T,VECTOR<int,1> > u_1d(V.domain.min_corner.x,V.domain.max_corner.x);
         for(i=-2;i<=m+3;i++) Z_1d_x(i)=Z_ghost(i);
-        for(i=V.domain.min_corner.x;i<=V.domain.max_corner.x;i++) u_1d(i)=V(i).x;
+        for(i=V.domain.min_corner.x;i<V.domain.max_corner.x;i++) u_1d(i)=V(i).x;
         advection.Advection_Solver(m,dx,Z_1d_x,u_1d,rhs);
 
         for(i=0;i<m;i++) Z(i)-=dt*rhs(i);
@@ -46,14 +46,14 @@ template<> struct UPDATE_ADVECTION_EQUATION_HELPER<2>
         {ARRAY<T2,VECTOR<int,1> > Z_1d_x(-2,m+3),u_Zx_1d(1,m);ARRAY<T,VECTOR<int,1> > u_1d(V.domain.min_corner.x,V.domain.max_corner.x);
         for(j=0;j<n;j++){
             for(i=-2;i<=m+3;i++) Z_1d_x(i)=Z_ghost(i,j);
-            for(i=V.domain.min_corner.x;i<=V.domain.max_corner.x;i++) u_1d(i)=V(i,j).x;
+            for(i=V.domain.min_corner.x;i<V.domain.max_corner.x;i++) u_1d(i)=V(i,j).x;
             advection.Advection_Solver(m,dx,Z_1d_x,u_1d,u_Zx_1d);
             for(i=0;i<m;i++) rhs(i,j)=u_Zx_1d(i);}}
 
         {ARRAY<T2,VECTOR<int,1> > Z_1d_y(-2,n+3),v_Zy_1d(1,n);ARRAY<T,VECTOR<int,1> > v_1d(V.domain.min_corner.y,V.domain.max_corner.y);
         for(i=0;i<m;i++){
             for(j=-2;j<=n+3;j++) Z_1d_y(j)=Z_ghost(i,j);
-            for(j=V.domain.min_corner.y;j<=V.domain.max_corner.y;j++) v_1d(j)=V(i,j).y;
+            for(j=V.domain.min_corner.y;j<V.domain.max_corner.y;j++) v_1d(j)=V(i,j).y;
             advection.Advection_Solver(n,dy,Z_1d_y,v_1d,v_Zy_1d);
             for(j=0;j<n;j++) rhs(i,j)+=v_Zy_1d(j);}}
 
@@ -74,21 +74,21 @@ template<> struct UPDATE_ADVECTION_EQUATION_HELPER<3>
         {ARRAY<T2,VECTOR<int,1> > Z_1d_x(-2,m+3),u_Zx_1d(1,m);ARRAY<T,VECTOR<int,1> > u_1d(V.domain.min_corner.x,V.domain.max_corner.x);
         for(j=0;j<n;j++) for(ij=0;ij<mn;ij++){
             for(i=-2;i<=m+3;i++) Z_1d_x(i)=Z_ghost(i,j,ij);
-            for(i=V.domain.min_corner.x;i<=V.domain.max_corner.x;i++) u_1d(i)=V(i,j,ij).x;
+            for(i=V.domain.min_corner.x;i<V.domain.max_corner.x;i++) u_1d(i)=V(i,j,ij).x;
             advection.Advection_Solver(m,dx,Z_1d_x,u_1d,u_Zx_1d);
             for(i=0;i<m;i++) rhs(i,j,ij)=u_Zx_1d(i);}}
 
         {ARRAY<T2,VECTOR<int,1> > Z_1d_y(-2,n+3),v_Zy_1d(1,n);ARRAY<T,VECTOR<int,1> > v_1d(V.domain.min_corner.y,V.domain.max_corner.y);
         for(i=0;i<m;i++) for(ij=0;ij<mn;ij++){
             for(j=-2;j<=n+3;j++) Z_1d_y(j)=Z_ghost(i,j,ij);
-            for(j=V.domain.min_corner.y;j<=V.domain.max_corner.y;j++) v_1d(j)=V(i,j,ij).y;
+            for(j=V.domain.min_corner.y;j<V.domain.max_corner.y;j++) v_1d(j)=V(i,j,ij).y;
             advection.Advection_Solver(n,dy,Z_1d_y,v_1d,v_Zy_1d);
             for(j=0;j<n;j++) rhs(i,j,ij)+=v_Zy_1d(j);}}
 
         {ARRAY<T2,VECTOR<int,1> > Z_1d_z(-2,mn+3),w_Zz_1d(1,mn);ARRAY<T,VECTOR<int,1> > w_1d(V.domain.min_corner.z,V.domain.max_corner.z);
         for(i=0;i<m;i++) for(j=0;j<n;j++){
             for(ij=-2;ij<=mn+3;ij++) Z_1d_z(ij)=Z_ghost(i,j,ij);
-            for(ij=V.domain.min_corner.z;ij<=V.domain.max_corner.z;ij++) w_1d(ij)=V(i,j,ij).z;
+            for(ij=V.domain.min_corner.z;ij<V.domain.max_corner.z;ij++) w_1d(ij)=V(i,j,ij).z;
             advection.Advection_Solver(mn,dz,Z_1d_z,w_1d,w_Zz_1d);
             for(ij=0;ij<mn;ij++) rhs(i,j,ij)+=w_Zz_1d(ij);}}
 

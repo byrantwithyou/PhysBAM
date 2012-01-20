@@ -338,9 +338,9 @@ public:
     RANGE<TV_INT> new_domain=new_copy.Domain_Indices(),old_domain=old_copy.Domain_Indices();
     RANGE<TV_INT> box(TV_INT::Componentwise_Max(new_domain.min_corner,old_domain.min_corner-shift),TV_INT::Componentwise_Min(new_domain.max_corner,old_domain.max_corner-shift));
     TV_INT i;
-    for(i.x=box.min_corner.x;i.x<=box.max_corner.x;i.x++)
-        for(i.y=box.min_corner.y;i.y<=box.max_corner.y;i.y++)
-            for(i.z=box.min_corner.z;i.z<=box.max_corner.z;i.z++)
+    for(i.x=box.min_corner.x;i.x<box.max_corner.x;i.x++)
+        for(i.y=box.min_corner.y;i.y<box.max_corner.y;i.y++)
+            for(i.z=box.min_corner.z;i.z<box.max_corner.z;i.z++)
                 new_copy(i)=old_copy(i+shift);}
 
     static void Limited_Shifted_Get(ARRAYS_ND_BASE& new_copy,const ARRAYS_ND_BASE& old_copy,const VECTOR<int,2>& shift)
@@ -348,8 +348,8 @@ public:
     RANGE<TV_INT> new_domain=new_copy.Domain_Indices(),old_domain=old_copy.Domain_Indices();
     RANGE<TV_INT> box(TV_INT::Componentwise_Max(new_domain.min_corner,old_domain.min_corner-shift),TV_INT::Componentwise_Min(new_domain.max_corner,old_domain.max_corner-shift));
     TV_INT i;
-    for(i.x=box.min_corner.x;i.x<=box.max_corner.x;i.x++)
-        for(i.y=box.min_corner.y;i.y<=box.max_corner.y;i.y++)
+    for(i.x=box.min_corner.x;i.x<box.max_corner.x;i.x++)
+        for(i.y=box.min_corner.y;i.y<box.max_corner.y;i.y++)
             new_copy(i)=old_copy(i+shift);}
 
     static void Limited_Shifted_Get(ARRAYS_ND_BASE& new_copy,const ARRAYS_ND_BASE& old_copy,const VECTOR<int,1>& shift)
@@ -357,7 +357,7 @@ public:
     RANGE<TV_INT> new_domain=new_copy.Domain_Indices(),old_domain=old_copy.Domain_Indices();
     RANGE<TV_INT> box(TV_INT::Componentwise_Max(new_domain.min_corner,old_domain.min_corner-shift),TV_INT::Componentwise_Min(new_domain.max_corner,old_domain.max_corner-shift));
     TV_INT i;
-    for(i.x=box.min_corner.x;i.x<=box.max_corner.x;i.x++)
+    for(i.x=box.min_corner.x;i.x<box.max_corner.x;i.x++)
         new_copy(i)=old_copy(i+shift);}
 
     static void Put(const ARRAYS_ND_BASE& old_copy,ARRAYS_ND_BASE& new_copy)
@@ -371,9 +371,9 @@ public:
     else{
         TV_INT i;
         RANGE<TV_INT> new_domain=new_copy.Domain_Indices(),old_domain=old_copy.Domain_Indices();
-        for(i.x=new_domain.min_corner.x;i.x<=new_domain.max_corner.x;i.x++)
-            for(i.y=new_domain.min_corner.y;i.y<=new_domain.max_corner.y;i.y++)
-                for(i.z=new_domain.min_corner.z;i.z<=new_domain.max_corner.z;i.z++)
+        for(i.x=new_domain.min_corner.x;i.x<new_domain.max_corner.x;i.x++)
+            for(i.y=new_domain.min_corner.y;i.y<new_domain.max_corner.y;i.y++)
+                for(i.z=new_domain.min_corner.z;i.z<new_domain.max_corner.z;i.z++)
                     new_copy(i)=old_copy(i+shift);}}
 
     static void Shifted_Put(const ARRAYS_ND_BASE& old_copy,ARRAYS_ND_BASE& new_copy,const VECTOR<int,2>& shift)
@@ -381,8 +381,8 @@ public:
     else{
         TV_INT i;
         RANGE<TV_INT> new_domain=new_copy.Domain_Indices(),old_domain=old_copy.Domain_Indices();
-        for(i.x=new_domain.min_corner.x;i.x<=new_domain.max_corner.x;i.x++)
-            for(i.y=new_domain.min_corner.y;i.y<=new_domain.max_corner.y;i.y++)
+        for(i.x=new_domain.min_corner.x;i.x<new_domain.max_corner.x;i.x++)
+            for(i.y=new_domain.min_corner.y;i.y<new_domain.max_corner.y;i.y++)
                 new_copy(i)=old_copy(i+shift);}}
 
     static void Shifted_Put(const ARRAYS_ND_BASE& old_copy,ARRAYS_ND_BASE& new_copy,const VECTOR<int,1>& shift)
@@ -390,7 +390,7 @@ public:
     else{
         TV_INT i;
         RANGE<TV_INT> new_domain=new_copy.Domain_Indices(),old_domain=old_copy.Domain_Indices();
-        for(i.x=new_domain.min_corner.x;i.x<=new_domain.max_corner.x;i.x++)
+        for(i.x=new_domain.min_corner.x;i.x<new_domain.max_corner.x;i.x++)
             new_copy(i)=old_copy(i+shift);}}
 
     template<class T2>
@@ -402,24 +402,24 @@ private:
     static void Put(const T2 constant,const ARRAYS_ND_BASE& old_copy,ARRAYS_ND_BASE& new_copy,const RANGE<VECTOR<int,3> >& box)
     {assert(old_copy.Domain_Indices().Contains(box));assert(new_copy.Domain_Indices().Contains(box));
     TV_INT i;
-    for(i.x=box.min_corner.x;i.x<=box.max_corner.x;i.x++)
-        for(i.y=box.min_corner.y;i.y<=box.max_corner.y;i.y++)
-            for(i.z=box.min_corner.z;i.z<=box.max_corner.z;i.z++)
+    for(i.x=box.min_corner.x;i.x<box.max_corner.x;i.x++)
+        for(i.y=box.min_corner.y;i.y<box.max_corner.y;i.y++)
+            for(i.z=box.min_corner.z;i.z<box.max_corner.z;i.z++)
                 new_copy(i)=constant*old_copy(i);}
 
     template<class T2>
     static void Put(const T2 constant,const ARRAYS_ND_BASE& old_copy,ARRAYS_ND_BASE& new_copy,const RANGE<VECTOR<int,2> >& box)
     {assert(old_copy.Domain_Indices().Contains(box));assert(new_copy.Domain_Indices().Contains(box));
     TV_INT i;
-    for(i.x=box.min_corner.x;i.x<=box.max_corner.x;i.x++)
-        for(i.y=box.min_corner.y;i.y<=box.max_corner.y;i.y++)
+    for(i.x=box.min_corner.x;i.x<box.max_corner.x;i.x++)
+        for(i.y=box.min_corner.y;i.y<box.max_corner.y;i.y++)
             new_copy(i)=constant*old_copy(i);}
 
     template<class T2>
     static void Put(const T2 constant,const ARRAYS_ND_BASE& old_copy,ARRAYS_ND_BASE& new_copy,const RANGE<VECTOR<int,1> >& box)
     {assert(old_copy.Domain_Indices().Contains(box));assert(new_copy.Domain_Indices().Contains(box));
     TV_INT i;
-    for(i.x=box.min_corner.x;i.x<=box.max_corner.x;i.x++)
+    for(i.x=box.min_corner.x;i.x<box.max_corner.x;i.x++)
         new_copy(i)=constant*old_copy(i);}
 
     static void Put(const ARRAYS_ND_BASE& old_copy,ARRAYS_ND_BASE& new_copy,const RANGE<TV_INT>& box)

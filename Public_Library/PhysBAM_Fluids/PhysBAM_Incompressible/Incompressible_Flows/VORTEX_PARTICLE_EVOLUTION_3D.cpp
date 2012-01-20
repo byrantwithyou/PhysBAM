@@ -88,14 +88,14 @@ Compute_Body_Force(const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,ARRAY<VECTO
             grid_vorticity_particles(i,j,ij)-=grid_vorticity(i,j,ij);
     
         // find vorticity magnitudes
-        for(int i=grid_vorticity.domain.min_corner.x;i<=grid_vorticity.domain.max_corner.x;i++)for(int j=grid_vorticity.domain.min_corner.y;j<=grid_vorticity.domain.max_corner.y;j++)for(int ij=grid_vorticity.domain.min_corner.z;ij<=grid_vorticity.domain.max_corner.z;ij++)
+        for(int i=grid_vorticity.domain.min_corner.x;i<grid_vorticity.domain.max_corner.x;i++)for(int j=grid_vorticity.domain.min_corner.y;j<grid_vorticity.domain.max_corner.y;j++)for(int ij=grid_vorticity.domain.min_corner.z;ij<grid_vorticity.domain.max_corner.z;ij++)
             grid_vorticity_magnitude(i,j,ij)=grid_vorticity(i,j,ij).Magnitude();
         for(int i=0;i<=grid.counts.x+1;i++) for(int j=0;j<=grid.counts.y+1;j++) for(int ij=0;ij<=grid.counts.z+1;ij++)
             grid_vorticity_particles_magnitude(i,j,ij)=grid_vorticity_particles(i,j,ij).Magnitude();
     
         // compute confinement force
         T one_over_two_dx=1/(2*grid.dX.x),one_over_two_dy=1/(2*grid.dX.y),one_over_two_dz=1/(2*grid.dX.z);
-        for(int i=force.domain.min_corner.x;i<=force.domain.max_corner.x;i++) for(int j=force.domain.min_corner.y;j<=force.domain.max_corner.y;j++) for(int ij=force.domain.min_corner.z;ij<=force.domain.max_corner.z;ij++){
+        for(int i=force.domain.min_corner.x;i<force.domain.max_corner.x;i++) for(int j=force.domain.min_corner.y;j<force.domain.max_corner.y;j++) for(int ij=force.domain.min_corner.z;ij<force.domain.max_corner.z;ij++){
             VECTOR<T,3> vortex_normal_vector((grid_vorticity_magnitude(i+1,j,ij)-grid_vorticity_magnitude(i-1,j,ij))*one_over_two_dx,
                                               (grid_vorticity_magnitude(i,j+1,ij)-grid_vorticity_magnitude(i,j-1,ij))*one_over_two_dy,
                                               (grid_vorticity_magnitude(i,j,ij+1)-grid_vorticity_magnitude(i,j,ij-1))*one_over_two_dz);

@@ -53,7 +53,7 @@ void Display_Bool_Helper(const OPENGL_SCALAR_FIELD_1D<T,bool>& self,const int in
     glPointSize(8.0);
     self.point_color.Send_To_GL_Pipeline();
     ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-    for(int i=self.values.domain.min_corner.x;i<=self.values.domain.max_corner.x;i++) if(self.values(i)) OpenGL_Vertex(VECTOR<T,3>(self.grid.Axis_X(i,1),(T)0,(T)0),vertices);
+    for(int i=self.values.domain.min_corner.x;i<self.values.domain.max_corner.x;i++) if(self.values(i)) OpenGL_Vertex(VECTOR<T,3>(self.grid.Axis_X(i,1),(T)0,(T)0),vertices);
     OpenGL_Draw_Arrays(GL_POINTS,3,vertices);
     glPopAttrib();
 }

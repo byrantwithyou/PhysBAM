@@ -78,7 +78,7 @@ Display(const int in_color) const
         glPointSize(OPENGL_PREFERENCES::selection_point_size);
         glPushName(1); // vertices
         glPushName(0);
-        for(int i=x.domain.min_corner.x;i<=x.domain.max_corner.x;i++){
+        for(int i=x.domain.min_corner.x;i<x.domain.max_corner.x;i++){
             glLoadName(i);
             vertices.Resize(0);
             OpenGL_Vertex(VECTOR<T,2>(x(i),u(i)),vertices);
@@ -87,7 +87,7 @@ Display(const int in_color) const
 
         glLoadName(2); // segments
         glPushName(0);
-        for(int i=x.domain.min_corner.x;i<=x.domain.max_corner.x-1;i++){
+        for(int i=x.domain.min_corner.x;i<x.domain.max_corner.x-1;i++){
             glLoadName(i);
             vertices.Resize(0);
             OpenGL_Line(VECTOR<T,2>(x(i),u(i)),VECTOR<T,2>(x(i+1),u(i+1)),vertices);
@@ -110,7 +110,7 @@ Display(const int in_color) const
 
         if(draw_piecewise_constant){
             vertices.Resize(0);
-            for(int i=x.domain.min_corner.x+1;i<=x.domain.max_corner.x-1;i++){
+            for(int i=x.domain.min_corner.x+1;i<x.domain.max_corner.x-1;i++){
                 T dx=(T).5*(x(i+1)-x(i-1));
                 if(sign(dx)>0) positive_segment_color.Send_To_GL_Pipeline(); else negative_segment_color.Send_To_GL_Pipeline();
                 OpenGL_Line(VECTOR<T,2>((T).5*(x(i-1)+x(i)),u(i)),VECTOR<T,2>((T).5*(x(i)+x(i+1)),u(i)),vertices);}
@@ -118,7 +118,7 @@ Display(const int in_color) const
 
             glPointSize(5);
             vertices.Resize(0);
-            for(int i=x.domain.min_corner.x+1;i<=x.domain.max_corner.x-1;i++){
+            for(int i=x.domain.min_corner.x+1;i<x.domain.max_corner.x-1;i++){
                 T dx=(T).5*(x(i+1)-x(i-1));
                 if(sign(dx)>0) positive_point_color.Send_To_GL_Pipeline(); else negative_point_color.Send_To_GL_Pipeline();
                 OpenGL_Vertex(VECTOR<T,2>(x(i),u(i)),vertices);}
@@ -127,7 +127,7 @@ Display(const int in_color) const
             if(draw_flux && flux.counts.x){
                 flux_color.Send_To_GL_Pipeline();
                 vertices.Resize(0);
-                for(int i=x.domain.min_corner.x;i<=x.domain.max_corner.x-1;i++){
+                for(int i=x.domain.min_corner.x;i<x.domain.max_corner.x-1;i++){
                     T dx=x(i+1)-x(i);
                     VECTOR<T,2> start_point((T).5*(x(i)+x(i+1)),(T).5*(u(i)+u(i+1)));
                     OPENGL_SHAPES::Draw_Arrow(start_point,start_point+VECTOR<T,2>(sign(dx)*flux_scale*flux(i),0),vertices);}
@@ -138,7 +138,7 @@ Display(const int in_color) const
                 glLineWidth(2);
                 vertices.Resize(0);
                 T arrowhead_size=.3,sin_angle=sin(0.5),cos_angle=cos(0.5);
-                for(int i=x.domain.min_corner.x;i<=x.domain.max_corner.x-1;i++){
+                for(int i=x.domain.min_corner.x;i<x.domain.max_corner.x-1;i++){
                     T dx=x(i+1)-x(i);T alpha=sign(flux(i)*dx)>0?(T).9:(T).1;
                     VECTOR<T,2> startpt((T).5*(x(i)+x(i+1)),(T).5*(u(i)+u(i+1)));
                     VECTOR<T,2> endpt(x(i)+alpha*(x(i+1)-x(i)),u(i)+alpha*(u(i+1)-u(i)));
@@ -151,7 +151,7 @@ Display(const int in_color) const
         }
         else{
             vertices.Resize(0);
-            for(int i=x.domain.min_corner.x;i<=x.domain.max_corner.x;i++){
+            for(int i=x.domain.min_corner.x;i<x.domain.max_corner.x;i++){
                 if(i>x.domain.min_corner.x && x(i)<x(i-1)) negative_segment_color.Send_To_GL_Pipeline();
                 else positive_segment_color.Send_To_GL_Pipeline();
                 OpenGL_Vertex(VECTOR<T,2>(x(i),u(i)),vertices);}
@@ -159,7 +159,7 @@ Display(const int in_color) const
 
             glPointSize(5);
             vertices.Resize(0);
-            for(int i=x.domain.min_corner.x;i<=x.domain.max_corner.x;i++){
+            for(int i=x.domain.min_corner.x;i<x.domain.max_corner.x;i++){
                 T dx=(i==x.domain.min_corner.x)?x(i+1)-x(i):(i==x.domain.max_corner.x)?x(i)-x(i-1):(T).5*(x(i+1)-x(i-1));
                 if(sign(dx)>0) positive_point_color.Send_To_GL_Pipeline();
                 else negative_point_color.Send_To_GL_Pipeline();
@@ -170,7 +170,7 @@ Display(const int in_color) const
             if(draw_flux && flux.counts.x){
                 flux_color.Send_To_GL_Pipeline();
                 vertices.Resize(0);
-                for(int i=x.domain.min_corner.x;i<=x.domain.max_corner.x-1;i++){
+                for(int i=x.domain.min_corner.x;i<x.domain.max_corner.x-1;i++){
                     T dx=x(i+1)-x(i);
                     VECTOR<T,2> start_point((T).5*(x(i)+x(i+1)),(T).5*(u(i)+u(i+1)));
                     OPENGL_SHAPES::Draw_Arrow(start_point,start_point+VECTOR<T,2>(sign(dx)*flux_scale*flux(i),0),vertices);}
@@ -181,7 +181,7 @@ Display(const int in_color) const
                 glLineWidth(2);
                 vertices.Resize(0);
                 T arrowhead_size=.3,sin_angle=sin(0.5),cos_angle=cos(0.5);
-                for(int i=x.domain.min_corner.x;i<=x.domain.max_corner.x-1;i++){
+                for(int i=x.domain.min_corner.x;i<x.domain.max_corner.x-1;i++){
                     T dx=x(i+1)-x(i);T alpha=sign(flux(i)*dx)>0?(T).9:(T).1;
                     VECTOR<T,2> startpt((T).5*(x(i)+x(i+1)),(T).5*(u(i)+u(i+1)));
                     VECTOR<T,2> endpt(x(i)+alpha*(x(i+1)-x(i)),u(i)+alpha*(u(i+1)-u(i)));
@@ -195,7 +195,7 @@ Display(const int in_color) const
             if(draw_du && flux.counts.x){
                 du_color.Send_To_GL_Pipeline();
                 vertices.Resize(0);
-                for(int i=x.domain.min_corner.x+1;i<=x.domain.max_corner.x-1;i++){
+                for(int i=x.domain.min_corner.x+1;i<x.domain.max_corner.x-1;i++){
                     T dx=x(i+1)-x(i),du=(flux(i-1)-flux(i))/dx;
                     VECTOR<T,2> start_point(x(i),u(i));
                     OPENGL_SHAPES::Draw_Arrow(start_point,start_point+VECTOR<T,2>(0,flux_scale*du),vertices);}
@@ -326,7 +326,7 @@ template<class T,class RW> T OPENGL_COMPONENT_CURVE_2D<T,RW>::
 Area_Under_Curve() const
 {
     T area=0;
-    for(int i=0;i<=x.domain.max_corner.x-1-ghost_nodes;i++) area+=0.5*(u(i)+u(i+1))*(x(i+1)-x(i));
+    for(int i=0;i<x.domain.max_corner.x-1-ghost_nodes;i++) area+=0.5*(u(i)+u(i+1))*(x(i+1)-x(i));
     return area;
 }
 //#####################################################################

@@ -526,7 +526,7 @@ Update_Points()
     PHYSBAM_ASSERT(opengl_points);
     opengl_points->points.Resize(values.counts.Product());
     int index=1;
-    for(int i=values.domain.min_corner.x;i<=values.domain.max_corner.x;i++) for(int j=values.domain.min_corner.y;j<=values.domain.max_corner.y;j++) for(int k=values.domain.min_corner.z;k<=values.domain.max_corner.z;k++){
+    for(int i=values.domain.min_corner.x;i<values.domain.max_corner.x;i++) for(int j=values.domain.min_corner.y;j<values.domain.max_corner.y;j++) for(int k=values.domain.min_corner.z;k<values.domain.max_corner.z;k++){
         opengl_points->points(index)=grid.X(i,j,k);
         opengl_points->Set_Point_Color(index,color_maps(current_color_map)->Lookup(values(i,j,k)));
         index++;}
@@ -542,7 +542,7 @@ Update_Points()
     opengl_points->color=color_maps(current_color_map)->Lookup(true);
     opengl_points->points.Resize(values.counts.Product());
     int index=1;
-    for(int i=values.domain.min_corner.x;i<=values.domain.max_corner.x;i++) for(int j=values.domain.min_corner.y;j<=values.domain.max_corner.y;j++) for(int k=values.domain.min_corner.z;k<=values.domain.max_corner.z;k++)
+    for(int i=values.domain.min_corner.x;i<values.domain.max_corner.x;i++) for(int j=values.domain.min_corner.y;j<values.domain.max_corner.y;j++) for(int k=values.domain.min_corner.z;k<values.domain.max_corner.z;k++)
         if(values(i,j,k)) opengl_points->points(index++)=grid.X(i,j,k);
     opengl_points->points.Resize(index-1);
 }
@@ -554,7 +554,7 @@ Update_Points()
     opengl_points->color=color_maps(current_color_map)->Lookup(true);
     opengl_points->points.Resize(values.counts.Product());
     int index=1;
-    for(int i=values.domain.min_corner.x;i<=values.domain.max_corner.x;i++) for(int j=values.domain.min_corner.y;j<=values.domain.max_corner.y;j++) for(int k=values.domain.min_corner.z;k<=values.domain.max_corner.z;k++)
+    for(int i=values.domain.min_corner.x;i<values.domain.max_corner.x;i++) for(int j=values.domain.min_corner.y;j<values.domain.max_corner.y;j++) for(int k=values.domain.min_corner.z;k<values.domain.max_corner.z;k++)
         if(values(i,j,k)) opengl_points->points(index++)=grid.X(i,j,k);
     opengl_points->points.Resize(index-1);
 }
