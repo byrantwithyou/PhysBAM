@@ -17,7 +17,6 @@
 #include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY.h>
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_BINARY_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/FAST_LEVELSET.h>
