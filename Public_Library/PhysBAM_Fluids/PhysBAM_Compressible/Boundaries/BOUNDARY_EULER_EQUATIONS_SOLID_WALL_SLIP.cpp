@@ -30,8 +30,8 @@ BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP(EULER_UNIFORM<T_GRID>* euler_input,cons
         T e_far_field=euler->eos->e_From_p_And_rho(p_far_field(side),rho_far_field(side));
         T c_far_field=euler->eos->c(rho_far_field(side),e_far_field);
         S_far_field(side)=euler->eos->S(rho_far_field(side),e_far_field);
-        iL_far_field(side)=-velocity_far_field(side)[1]+2*c_far_field/(gamma-1);
-        iR_far_field(side)=velocity_far_field(side)[1]+2*c_far_field/(gamma-1);    
+        iL_far_field(side)=-velocity_far_field(side)[0]+2*c_far_field/(gamma-1);
+        iR_far_field(side)=velocity_far_field(side)[0]+2*c_far_field/(gamma-1);    
         U_far_field(side)=EULER<T_GRID>::Get_Euler_State_From_rho_velocity_And_internal_energy(rho_far_field(side),velocity_far_field(side),e_far_field);}
 }
 //#####################################################################
@@ -63,9 +63,9 @@ Attenuate_To_Far_Field_Values_Using_Riemann_Invariants(const T_ARRAYS_DIMENSION_
     rho=pow(sqr(c)/(gamma*S),1/(gamma-1));
     e=euler->eos->e_From_S_And_rho(S,rho);
 
-    U[1]=rho;
-    U[2]=rho*u_velocity;
-    U[3]=rho*(e+sqr(u_velocity)/2);
+    U[0]=rho;
+    U[1]=rho*u_velocity;
+    U[2]=rho*(e+sqr(u_velocity)/2);
 }
 //#####################################################################
 // Function Attenuate_To_Far_Field_Values_Using_Characteristics

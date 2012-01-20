@@ -35,7 +35,7 @@ Update_Position_Based_State(const T time)
     for(int s=0;s<mesh.elements.m;s++){
         int parent,child;mesh.elements(s).Get(parent,child);
         const ROTATION<TV> &q_world_parent=rigid_body_collection.rigid_body_particle.rotation(parent),&q_world_child=rigid_body_collection.rigid_body_particle.rotation(child); // q_a_b means rotation from b to a
-        const ROTATION<TV> &q_joint_parent=object_to_joint_rotations(s)[1],&q_joint_child=object_to_joint_rotations(s)[2];
+        const ROTATION<TV> &q_joint_parent=object_to_joint_rotations(s)[0],&q_joint_child=object_to_joint_rotations(s)[1];
         QUATERNION<T> q1=(q_world_parent*q_joint_parent.Inverse()).Quaternion(); // parent joint to world
         QUATERNION<T> q2=(q_world_child*q_joint_child.Inverse()).Quaternion(); // child joint to world
         QUATERNION<T> q=q2.Conjugate()*q1; // parent joint to child joint (note conjugate instead of inverse, since we have raw quaternions now)
@@ -58,8 +58,8 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) con
 
     for(int i=0;i<states.m;i++){const STATE& state=states(i);
         const VECTOR<int,2>& nodes=mesh.elements(state.edge);
-        rigid_F(nodes[1]).angular+=state.torque;
-        rigid_F(nodes[2]).angular-=state.torque;}
+        rigid_F(nodes[0]).angular+=state.torque;
+        rigid_F(nodes[1]).angular-=state.torque;}
 }
 //#####################################################################
 // Function Add_Velocity_Dependent_Forces
@@ -71,9 +71,9 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TW
 
     for(int i=0;i<states.m;i++){const STATE& state=states(i);
         const VECTOR<int,2>& nodes=mesh.elements(state.edge);
-        T_SPIN torque=damping(state.edge)*(rigid_V(nodes[2]).angular-rigid_V(nodes[1]).angular);
-        rigid_F(nodes[1]).angular+=torque;
-        rigid_F(nodes[2]).angular-=torque;}
+        T_SPIN torque=damping(state.edge)*(rigid_V(nodes[1]).angular-rigid_V(nodes[0]).angular);
+        rigid_F(nodes[0]).angular+=torque;
+        rigid_F(nodes[1]).angular-=torque;}
 }
 //#####################################################################
 template class ROTATION_SPRINGS<VECTOR<float,3> >;

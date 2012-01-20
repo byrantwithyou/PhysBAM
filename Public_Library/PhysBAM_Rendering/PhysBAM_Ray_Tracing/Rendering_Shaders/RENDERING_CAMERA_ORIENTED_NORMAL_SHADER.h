@@ -24,7 +24,7 @@ public:
     VECTOR<T,3> Rotate_Normal_Toward_Camera(const int aggregate_id,const RENDERING_OBJECT<T>& intersection_object,const VECTOR<T,3> &intersection_point, const VECTOR<T,3> &normal) const
     {if(const RENDERING_SEGMENTED_CURVE<T> *rendering_segmented_curve=dynamic_cast<const RENDERING_SEGMENTED_CURVE<T>*>(&intersection_object)){
         const VECTOR<int,2>& nodes=rendering_segmented_curve->segmented_curve.mesh.elements(aggregate_id);
-        VECTOR<T,3> hair_direction=rendering_segmented_curve->World_Space_Vector(rendering_segmented_curve->segmented_curve.particles.X(nodes[2])-rendering_segmented_curve->segmented_curve.particles.X(nodes[1]));
+        VECTOR<T,3> hair_direction=rendering_segmented_curve->World_Space_Vector(rendering_segmented_curve->segmented_curve.particles.X(nodes[1])-rendering_segmented_curve->segmented_curve.particles.X(nodes[0]));
         return (world.camera.position-intersection_point).Projected_Orthogonal_To_Unit_Direction(hair_direction.Normalized()).Normalized();}
     else{LOG::cout<<"camera-oriented normal shader only can be used on segmented curves"<<std::endl;PHYSBAM_FATAL_ERROR();}}
     

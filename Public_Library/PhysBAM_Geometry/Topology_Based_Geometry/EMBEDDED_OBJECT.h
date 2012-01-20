@@ -92,7 +92,7 @@ public:
     {return parent_particles(embedded_node).Find(parent_node);}
 
     bool Are_Parents(const VECTOR<int,2>& parents,const int embedded_node) const
-    {return Is_Parent(parents[1],embedded_node) && Is_Parent(parents[2],embedded_node);}
+    {return Is_Parent(parents[0],embedded_node) && Is_Parent(parents[1],embedded_node);}
 
     int Other_Parent(const int parent,const int embedded_node) const
     {int index=Which_Parent(parent,embedded_node);if(index == 1) return parent_particles(embedded_node)(1);else if(index == 2) return parent_particles(embedded_node)(0);else return 0;}

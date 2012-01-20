@@ -24,7 +24,7 @@ int Polygon_Orientation(const T_ARRAY_TV2& polygon_coordinates)
     for(int p=0;p<polygon_coordinates.Size();p++){
         int q=p%polygon_coordinates.Size()+1;
         const TV2 &xp=polygon_coordinates(p),&xq=polygon_coordinates(q);
-        signed_area_x2+=(ATOM_TYPE(xp[1])*ATOM_TYPE(xq[2])-ATOM_TYPE(xp[2])*ATOM_TYPE(xq[1]));}
+        signed_area_x2+=(ATOM_TYPE(xp[0])*ATOM_TYPE(xq[1])-ATOM_TYPE(xp[1])*ATOM_TYPE(xq[0]));}
     return signed_area_x2.Sign();
 //##################################################################### 
 }

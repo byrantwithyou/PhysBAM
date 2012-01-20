@@ -43,13 +43,13 @@ public:
     bool intersected=false;
     for(int t=0;t<segmented_curve.mesh.elements.m;t++){ // TODO: make this more efficient using hierarchy.
         const VECTOR<int,2>& nodes=segmented_curve.mesh.elements(t);
-        if(INTERSECTION::Intersects(ray,CYLINDER<T>(segmented_curve.particles.X(nodes[1]),segmented_curve.particles.X(nodes[2]),thickness))) {
+        if(INTERSECTION::Intersects(ray,CYLINDER<T>(segmented_curve.particles.X(nodes[0]),segmented_curve.particles.X(nodes[1]),thickness))) {
             ray.aggregate_id=t;intersected=true;}}
     return intersected;}
 
     TV Normal(const TV& location,const int aggregate=0) const PHYSBAM_OVERRIDE
     {const VECTOR<int,2>& nodes=segmented_curve.mesh.elements(aggregate);
-    return World_Space_Vector(CYLINDER<T>(segmented_curve.particles.X(nodes[1]),segmented_curve.particles.X(nodes[2]),thickness).Normal(Object_Space_Point(location),1));}
+    return World_Space_Vector(CYLINDER<T>(segmented_curve.particles.X(nodes[0]),segmented_curve.particles.X(nodes[1]),thickness).Normal(Object_Space_Point(location),1));}
 
     bool Inside(const TV& location) const PHYSBAM_OVERRIDE
     {return false;} // segmented curves have no inside
@@ -64,7 +64,7 @@ public:
     bool Intersection(RAY<TV>& ray,const int aggregate) const PHYSBAM_OVERRIDE
     {if(!add_segments_to_acceleration_structure) return Intersection(ray);
     const VECTOR<int,2>& nodes=segmented_curve.mesh.elements(aggregate);
-    if(INTERSECTION::Intersects(ray,CYLINDER<T>(segmented_curve.particles.X(nodes[1]),segmented_curve.particles.X(nodes[2]),thickness))){
+    if(INTERSECTION::Intersects(ray,CYLINDER<T>(segmented_curve.particles.X(nodes[0]),segmented_curve.particles.X(nodes[1]),thickness))){
         ray.aggregate_id=aggregate;return true;}
     return false;}
 
@@ -72,7 +72,7 @@ public:
     {if(add_segments_to_acceleration_structure){
         for(int t=0;t<segmented_curve.mesh.elements.m;t++){
             const VECTOR<int,2>& nodes=segmented_curve.mesh.elements(t);
-            RANGE<TV> bounding_box=RANGE<TV>::Bounding_Box(World_Space_Point(segmented_curve.particles.X(nodes[1])),World_Space_Point(segmented_curve.particles.X(nodes[2])));
+            RANGE<TV> bounding_box=RANGE<TV>::Bounding_Box(World_Space_Point(segmented_curve.particles.X(nodes[0])),World_Space_Point(segmented_curve.particles.X(nodes[1])));
             bounding_box.Change_Size(thickness);
             primitives.Append(RENDERING_OBJECT_ACCELERATION_PRIMITIVE<T>(bounding_box,this,t));}}
     else{
@@ -89,12 +89,12 @@ public:
 
     void Get_Object_Space_Tangent_And_Bitangent(const TV& object_space_point,const TV& object_space_normal,const int aggregate,TV& object_tangent,TV& object_bitangent) const PHYSBAM_OVERRIDE
     {const VECTOR<int,2>& nodes=segmented_curve.mesh.elements(aggregate);
-    object_tangent=segmented_curve.particles.X(nodes[1])-segmented_curve.particles.X(nodes[2]).Normalized();
+    object_tangent=segmented_curve.particles.X(nodes[0])-segmented_curve.particles.X(nodes[1]).Normalized();
     object_bitangent=TV::Cross_Product(object_tangent,object_space_normal).Normalized();}
 
     void Get_World_Space_Tangent_And_Bitangent(const TV& world_space_point,const TV& world_space_normal,const int aggregate,TV& world_tangent,TV& world_bitangent) const PHYSBAM_OVERRIDE
     {const VECTOR<int,2>& nodes=segmented_curve.mesh.elements(aggregate);
-    world_tangent=World_Space_Vector(segmented_curve.particles.X(nodes[1])-segmented_curve.particles.X(nodes[2])).Normalized();
+    world_tangent=World_Space_Vector(segmented_curve.particles.X(nodes[0])-segmented_curve.particles.X(nodes[1])).Normalized();
     world_bitangent=TV::Cross_Product(world_tangent,world_space_normal).Normalized();}
 
 //#####################################################################

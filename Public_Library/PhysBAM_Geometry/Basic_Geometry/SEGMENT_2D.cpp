@@ -276,8 +276,8 @@ Cut_With_Hyperplane_And_Discard_Outside_Simplices(const SEGMENT_2D<T>& segment,c
             negative_segments.Append(segment);break;
         case 1:{
             // draw positive triangle. has correct positive/negative area based on whether triangle is backwards or not
-            TV interface_location=LINEAR_INTERPOLATION<T,VECTOR<T,2> >::Linear(X_nodes[1],X_nodes[2],LEVELSET_UTILITIES<T>::Theta(phi_nodes[1],phi_nodes[2]));
-            if(phi_nodes[1]>0) negative_segments.Append(SEGMENT_2D<T>(interface_location,segment.x2));
+            TV interface_location=LINEAR_INTERPOLATION<T,VECTOR<T,2> >::Linear(X_nodes[0],X_nodes[1],LEVELSET_UTILITIES<T>::Theta(phi_nodes[0],phi_nodes[1]));
+            if(phi_nodes[0]>0) negative_segments.Append(SEGMENT_2D<T>(interface_location,segment.x2));
             else negative_segments.Append(SEGMENT_2D<T>(segment.x1,interface_location));
             break;}
         case 2: // in positive halfspace

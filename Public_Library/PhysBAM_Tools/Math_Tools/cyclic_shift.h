@@ -36,7 +36,7 @@ cyclic_shift(VECTOR<T,3>& v)
 
 template<class T> inline void
 cyclic_shift(VECTOR<T,4>& v)
-{cyclic_shift(v[1],v[2],v[3],v[4]);}
+{cyclic_shift(v[0],v[1],v[2],v[3]);}
 
 }
 #endif

@@ -29,8 +29,8 @@ Write(const std::string& filename,const ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& imag
     assert(image.domain.min_corner.x==1&&image.domain.min_corner.y==1&&image.length==1);
     Rgba* pixels=new Rgba[image.counts.Product()];
     int t=0;
-    if(d==3) for(int i=0;i<image.counts.x;i++) for(int j=image.counts.y;j>=1;j--){pixels[t].r=(float)image(i,j)[1];pixels[t].g=(float)image(i,j)[2];pixels[t].b=(float)image(i,j)[3];pixels[t].a=(float)1;t++;}
-    else if (d==4) for(int i=0;i<image.counts.x;i++) for(int j=image.counts.y;j>=1;j--){pixels[t].r=(float)image(i,j)[1];pixels[t].g=(float)image(i,j)[2];pixels[t].b=(float)image(i,j)[3];pixels[t].a=(float)image(i,j)[4];t++;}
+    if(d==3) for(int i=0;i<image.counts.x;i++) for(int j=image.counts.y;j>=1;j--){pixels[t].r=(float)image(i,j)[0];pixels[t].g=(float)image(i,j)[1];pixels[t].b=(float)image(i,j)[2];pixels[t].a=(float)1;t++;}
+    else if (d==4) for(int i=0;i<image.counts.x;i++) for(int j=image.counts.y;j>=1;j--){pixels[t].r=(float)image(i,j)[0];pixels[t].g=(float)image(i,j)[1];pixels[t].b=(float)image(i,j)[2];pixels[t].a=(float)image(i,j)[3];t++;}
     try{RgbaOutputFile file(filename.c_str(),image.counts.x,image.counts.y,WRITE_RGBA);file.setFrameBuffer(pixels,image.counts.y,1);file.writePixels(image.counts.y);}
     catch(...){LOG::cerr<<"Cannot write exr image to "<<filename<<std::endl;PHYSBAM_FATAL_ERROR();}
     delete[] pixels;

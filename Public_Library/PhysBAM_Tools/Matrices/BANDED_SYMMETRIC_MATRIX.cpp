@@ -23,11 +23,11 @@ Multiply(const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const
     STATIC_ASSERT(bandwidth==3); // TODO: implement for non-tridiagonal matrices
     assert(A.Size()==Size() && x.Size()==Size());
     T x_previous=x(1);
-    result(1)=A(1)[1]*x_previous;
+    result(1)=A(1)[0]*x_previous;
     for(int i=2;i<=Size();i++){
         T x_i=x(i);
-        result(i-1)+=A(i-1)[2]*x_i;
-        result(i)=A(i-1)[2]*x_previous+A(i)[1]*x_i;
+        result(i-1)+=A(i-1)[1]*x_i;
+        result(i)=A(i-1)[1]*x_previous+A(i)[0]*x_i;
         x_previous=x_i;}
 }
 //#####################################################################
@@ -71,11 +71,11 @@ template<class T,int bandwidth> void BANDED_SYMMETRIC_MATRIX<T,bandwidth>::
 Implicit_QR_Step(const int start,const T shift)
 {
     // see Golub and Van Loan, 8.3.2, p. 420
-    T x=A(start)[1]-shift,z=A(start)[2];
+    T x=A(start)[0]-shift,z=A(start)[1];
     for(int k=start;;k++){ // chase offdiagonal element z into oblivion
         T c,s;Givens(x,z,c,s);
-        if(k>start){T& b=A(k-1)[2];b=c*b-s*z;}
-        T &ap=A(k)[1],&bp=A(k)[2],&aq=A(k+1)[1],&bq=A(k+1)[2]; // p,q = k,k+1
+        if(k>start){T& b=A(k-1)[1];b=c*b-s*z;}
+        T &ap=A(k)[0],&bp=A(k)[1],&aq=A(k+1)[0],&bq=A(k+1)[1]; // p,q = k,k+1
         T cc=c*c,cs=c*s,ss=s*s,ccap=cc*ap,csbp=cs*bp,ssaq=ss*aq,csap=cs*ap,ccbp=cc*bp,ssbp=ss*bp,csaq=cs*aq,ssap=ss*ap,ccaq=cc*aq;
         ap=ccap-2*csbp+ssaq;bp=csap+ccbp-ssbp-csaq;aq=ssap+2*csbp+ccaq; // TODO: save 7 flops somehow
         if(!bq) return; // stop if matrix decouples
@@ -89,17 +89,17 @@ Diagonalize()
 {
     static const T tolerance=10*std::numeric_limits<T>::epsilon();
     int m=Size();if(m<2) return;
-    A(m)[2]=0; // use a_m,m+1 as a sentinel
+    A(m)[1]=0; // use a_m,m+1 as a sentinel
     int start=1;
     for(;;){
         // find unreduced section
-        while(!A(start)[2] || abs(A(start)[2])<=tolerance*maxabs(A(start)[1],A(start)[2])){
-            A(start)[2]=0;if(++start==m) return;}
+        while(!A(start)[1] || abs(A(start)[1])<=tolerance*maxabs(A(start)[0],A(start)[1])){
+            A(start)[1]=0;if(++start==m) return;}
         int end=start+1;
-        while(A(end)[2] && abs(A(end)[2])>tolerance*maxabs(A(end)[1],A(end)[2])) end++;
-        A(end)[2]=0;
+        while(A(end)[1] && abs(A(end)[1])>tolerance*maxabs(A(end)[0],A(end)[1])) end++;
+        A(end)[1]=0;
         // compute shift
-        T ap=A(end-1)[1],bp=A(end-1)[2],aq=A(end)[1],d=(ap-aq)/2;
+        T ap=A(end-1)[0],bp=A(end-1)[1],aq=A(end)[0],d=(ap-aq)/2;
         T shift=d?aq-bp*bp/(d+sign(d)*sqrt(d*d+bp*bp)):aq-bp;
         Implicit_QR_Step(start,shift);}
 }
@@ -112,7 +112,7 @@ Eigenvalues(ARRAY<T>& eigenvalues) const
     BANDED_SYMMETRIC_MATRIX D(*this);
     D.Diagonalize();
     eigenvalues.Resize(Size(),false,false);
-    for(int i=0;i<Size();i++) eigenvalues(i)=D.A(i)[1];
+    for(int i=0;i<Size();i++) eigenvalues(i)=D.A(i)[0];
 }
 //#####################################################################
 // Function Print_Spectral_Information

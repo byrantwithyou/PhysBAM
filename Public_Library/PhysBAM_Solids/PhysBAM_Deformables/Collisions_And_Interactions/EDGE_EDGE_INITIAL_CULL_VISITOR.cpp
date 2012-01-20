@@ -18,11 +18,11 @@ Store(const int segment1_local_index,const int segment2_local_index)
 {
     int segment1_index=mesh1_indices(segment1_local_index),segment2_index=mesh2_indices(segment2_local_index);
     VECTOR<int,2> segment_indices=VECTOR<int,2>(segment1_index,segment2_index).Sorted();
-    const VECTOR<int,2> &segment1_nodes=adhesion.curve.mesh.elements(segment_indices[1]),&segment2_nodes=adhesion.curve.mesh.elements(segment_indices[2]);
+    const VECTOR<int,2> &segment1_nodes=adhesion.curve.mesh.elements(segment_indices[0]),&segment2_nodes=adhesion.curve.mesh.elements(segment_indices[1]);
     SEGMENT_3D<T> segment1(adhesion.curve.particles.X.Subset(segment1_nodes)),segment2(adhesion.curve.particles.X.Subset(segment2_nodes));
 
-    HAIR_ID segment1_hair_index=adhesion.particle_to_spring_id(segment1_nodes[1]),segment2_hair_index=adhesion.particle_to_spring_id(segment2_nodes[1]);
-    assert(segment1_hair_index==adhesion.particle_to_spring_id(segment1_nodes[2]) && segment2_hair_index==adhesion.particle_to_spring_id(segment2_nodes[2]));
+    HAIR_ID segment1_hair_index=adhesion.particle_to_spring_id(segment1_nodes[0]),segment2_hair_index=adhesion.particle_to_spring_id(segment2_nodes[0]);
+    assert(segment1_hair_index==adhesion.particle_to_spring_id(segment1_nodes[1]) && segment2_hair_index==adhesion.particle_to_spring_id(segment2_nodes[1]));
     if(segment1_hair_index==segment2_hair_index) adhesion.existing_pairs.Set(segment_indices);
 }
 //####################################################################

@@ -29,7 +29,7 @@ public:
     {
         if((index_in_embedded_particles=embedded_object.Embedded_Particle_On_Segment(parents))){
             interpolation_fraction=embedded_object.interpolation_fraction(index_in_embedded_particles);
-            if(embedded_object.parent_particles(index_in_embedded_particles)!=parents) exchange(parents[1],parents[2]);}
+            if(embedded_object.parent_particles(index_in_embedded_particles)!=parents) exchange(parents[0],parents[1]);}
         else interpolation_fraction=embedded_object.Clamp_Interpolation_Fraction(interpolation_fraction_input);
     }
 

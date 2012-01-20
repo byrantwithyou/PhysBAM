@@ -36,7 +36,7 @@ Write(const std::string& filename,const ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& imag
     *output<<"# Generated using PPM_FILE::Write"<<std::endl;
     *output<<image.counts.x<<" "<<image.counts.y<<std::endl;
     *output<<255<<std::endl;
-    for(int j=image.counts.y;j>=1;j--)for(int i=0;i<image.counts.x;i++){VECTOR<unsigned char,d> pixel=IMAGE<T>::Scalar_Color_To_Byte_Color(image(i,j));Write_Binary<T>(*output,pixel[1],pixel[2],pixel[3]);}
+    for(int j=image.counts.y;j>=1;j--)for(int i=0;i<image.counts.x;i++){VECTOR<unsigned char,d> pixel=IMAGE<T>::Scalar_Color_To_Byte_Color(image(i,j));Write_Binary<T>(*output,pixel[0],pixel[1],pixel[2]);}
     delete output;
 }
 //#####################################################################

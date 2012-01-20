@@ -44,7 +44,7 @@ public:
     dimensions[other_axis_1]=(int)(max_dimension*T(lengths[other_axis_1])/T(lengths[max_axis]));
     dimensions[other_axis_2]=(int)(max_dimension*T(lengths[other_axis_2])/T(lengths[max_axis]));
     dimensions=clamp_min(dimensions,VECTOR<int,3>(1,1,1));
-    grid.Initialize(dimensions[1]+1,dimensions[2]+1,dimensions[3]+1,bounding_box);
+    grid.Initialize(dimensions[0]+1,dimensions[1]+1,dimensions[2]+1,bounding_box);
     if(initialized) for(int i=0;i<cells.counts.x;i++) for(int j=0;j<cells.counts.y;j++) for(int ij=0;ij<cells.counts.z;ij++) delete cells(i,j,ij);
     cells.Resize(grid.Get_MAC_Grid().Domain_Indices(),false,false);cells.Fill(0);initialized=true;
     for(int k=0;k<boxes_input.m;k++){
@@ -84,7 +84,7 @@ bool Map_Intersection(RAY<VECTOR<T,3> >& ray,HELPER_T pointer) const
         else{cross.z=t_start+(grid.Axis_X(index.z,3)-point.z)*one_over_direction_z;dt.z=-grid.dX.z*one_over_direction_z;step.z=-1;end.z=0;}}
     bool intersection=false;
     for(;;){
-        int compare_bits=((cross[1]<cross[2])<<2)+((cross[1]<cross[3])<<1)+((cross[2]<cross[3]));
+        int compare_bits=((cross[0]<cross[1])<<2)+((cross[0]<cross[2])<<1)+((cross[1]<cross[2]));
         const int compare_bits_to_axis[8]={3,2,3,2,3,3,1,1};int axis=compare_bits_to_axis[compare_bits];
         if(cells(index)&&pointer->Callback(ray,*cells(index),cross[axis]))return true;
         if(!ray.semi_infinite&&ray.t_max<cross[axis])break;

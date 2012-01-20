@@ -164,7 +164,7 @@ public:
         T b=random.Get_Uniform_Number(0,1);
         if(a+b>1){a=1-a;b=1-b;}
         const VECTOR<int,3>& nodes=surface.mesh.elements(triangle);
-        points(q).position=(1-a-b)*X(nodes[1])+a*X(nodes[2])+b*X(nodes[3]);points(q).triangle=triangle;}
+        points(q).position=(1-a-b)*X(nodes[0])+a*X(nodes[1])+b*X(nodes[2]);points(q).triangle=triangle;}
     attenuation_factor=1;Update_Points_In_Triangle();Update_Neighbor_Points();Update_Stats();}
 
     int Get_Subdivide_Particles_Number(int level,int triangle_number){return (int)(0.5*(pow(3.0,level)-1))*triangle_number;}

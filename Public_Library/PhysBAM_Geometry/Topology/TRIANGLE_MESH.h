@@ -80,8 +80,8 @@ public:
     links(index1)=index2;}
 
     static bool Face_Reversed_In_Simplex(const VECTOR<int,2>& segment_nodes,const VECTOR<int,3>& triangle_nodes)
-    {int i=triangle_nodes.Find(segment_nodes[1]);if(triangle_nodes[(i+1)%3]==segment_nodes[2]) return false;
-    assert(triangle_nodes[(i+2)%3]==segment_nodes[2]);return true;}
+    {int i=triangle_nodes.Find(segment_nodes[0]);if(triangle_nodes[(i+1)%3]==segment_nodes[1]) return false;
+    assert(triangle_nodes[(i+2)%3]==segment_nodes[1]);return true;}
 
     SEGMENT_MESH& Get_Segment_Mesh()
     {if(!segment_mesh) Initialize_Segment_Mesh();return *segment_mesh;}

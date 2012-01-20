@@ -31,7 +31,7 @@ public:
     {(*stream)<<"gsave ";Line_Color(color);Draw_Object(object);(*stream)<<"grestore"<<std::endl;}
 
     void Draw_Object(const TRIANGLE_2D<T>& tri)
-    {(*stream)<<tri.X[1]<<" moveto "<<tri.X[2]<<" lineto "<<tri.X[3]<<" lineto closepath stroke"<<std::endl;Bound(tri.X);}
+    {(*stream)<<tri.X[0]<<" moveto "<<tri.X[1]<<" lineto "<<tri.X[2]<<" lineto closepath stroke"<<std::endl;Bound(tri.X);}
 
     void Draw_Object(const SPHERE<TV>& circle)
     {(*stream)<<circle.center<<" "<<circle.radius<<" 0 360 arc stroke"<<std::endl;Bound(circle.center-circle.radius);Bound(circle.center+circle.radius);}

@@ -284,15 +284,15 @@ All_Gather_Intersecting_Pairs(HASHTABLE<VECTOR<int,d1> >& intersecting_point_fac
     // gather counts
     VECTOR<int,2> local_counts(intersecting_point_face_pairs.Size(),intersecting_edge_edge_pairs.Size());
     ARRAY<VECTOR<int,2> > global_counts(number_of_ranks,false);
-    comm->Allgather(&local_counts[1],2,MPI::INT,global_counts.Get_Array_Pointer(),2,MPI::INT);
+    comm->Allgather(&local_counts[0],2,MPI::INT,global_counts.Get_Array_Pointer(),2,MPI::INT);
 
     // gather point face pairs
     {int total_point_face_count=0;
     ARRAY<int> point_face_counts(number_of_ranks,false),point_face_displacements(number_of_ranks,false);
     for(int k=0;k<number_of_ranks;k++){
         point_face_displacements(k)=total_point_face_count;
-        point_face_counts(k)=global_counts(k)[1];
-        total_point_face_count+=global_counts(k)[1];}
+        point_face_counts(k)=global_counts(k)[0];
+        total_point_face_count+=global_counts(k)[0];}
     if(total_point_face_count){
         MPI::Datatype point_face_type=MPI_UTILITIES::Datatype<VECTOR<int,d1> >();
         ARRAY<VECTOR<int,d1> > global_point_face_pairs(total_point_face_count,false);
@@ -306,8 +306,8 @@ All_Gather_Intersecting_Pairs(HASHTABLE<VECTOR<int,d1> >& intersecting_point_fac
     ARRAY<int> edge_edge_counts(number_of_ranks,false),edge_edge_displacements(number_of_ranks,false);
     for(int k=0;k<number_of_ranks;k++){
         edge_edge_displacements(k)=total_edge_edge_count;
-        edge_edge_counts(k)=global_counts(k)[2];
-        total_edge_edge_count+=global_counts(k)[2];}
+        edge_edge_counts(k)=global_counts(k)[1];
+        total_edge_edge_count+=global_counts(k)[1];}
     if(total_edge_edge_count){
         MPI::Datatype edge_edge_type=MPI_UTILITIES::Datatype<VECTOR<int,d2> >();
         ARRAY<VECTOR<int,d2> > global_edge_edge_pairs(total_edge_edge_count,false);
@@ -539,7 +539,7 @@ Simple_Partition(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection_inpu
     partition_id_from_particle_index.Resize(deformable_body_collection_input.particles.array_collection->Size()+rigid_geometry_collection_input.particles.array_collection->Size());
     for(int p=0;p<X.Size();p++){
         VECTOR<int,TV::m> cell=grid.Clamp_To_Cell(X(p));
-        int cell_number=cell[1]-1;for(int i=2;i<=TV::m;i++) cell_number=cell_number*counts[i]+cell[i]-1;
+        int cell_number=cell[0]-1;for(int i=2;i<=TV::m;i++) cell_number=cell_number*counts[i]+cell[i]-1;
         partition_id_from_particle_index(p)=Rank_To_Partition(cell_number);
         particles_of_partition(Rank_To_Partition(cell_number)).Append(p);}
 }
@@ -621,13 +621,13 @@ template<class TV,class T_ARRAY_PAIR> void Distribute_Repulsion_Pairs_Helper(con
         for(int i=0;i<pairs.m;i++){const T_PAIR& pair=pairs(i);
             PROCESSOR_VECTOR processors(mpi_solids.partition_id_from_particle_index.Subset(pair.nodes));
             processor_masks(i)=0;for(int j=0;j<processors.Size();j++) processor_masks(i)|=1<<(mpi_solids.Partition_To_Rank(processors[j]));
-            if(!power_of_two(processor_masks(i))){union_find.Union(pair.nodes);boundary_count++;}else internal_pairs(processors[1]).Append(i);}
+            if(!power_of_two(processor_masks(i))){union_find.Union(pair.nodes);boundary_count++;}else internal_pairs(processors[0]).Append(i);}
         // Build connected components
         ARRAY<ARRAY<int> > components;ARRAY<unsigned int> component_processors;
         ARRAY<int> particle_to_component(mpi_solids.partition_id_from_particle_index.m);
         for(int i=0;i<pairs.m;i++){const T_PAIR& pair=pairs(i);unsigned int processor_mask=processor_masks(i);
             if(!power_of_two(processor_mask)){
-                int root=union_find.Find(pair.nodes[1]);
+                int root=union_find.Find(pair.nodes[0]);
                 if(!particle_to_component(root)){particle_to_component(root)=components.Append(ARRAY<int>());component_processors.Append(0);}
                 int component_id=particle_to_component(root);
                 INDIRECT_ARRAY<ARRAY<int>,VECTOR<int,T_PAIR::count>&> particle_subset(particle_to_component,pair.nodes);

@@ -126,9 +126,9 @@ Disable_Forces(const ARRAY<int>& disable_forces_indices,ARRAY<VECTOR<bool,3> >& 
         // Don't disable if already disabled. Prevents saved_force_settings to be overwritten for consecutive calls.
         if(!(force.use_velocity_independent_forces || force.use_velocity_dependent_forces || force.use_implicit_velocity_independent_forces)) continue;
 
-        saved_force_settings(index)[1]=force.use_velocity_independent_forces;
-        saved_force_settings(index)[2]=force.use_velocity_dependent_forces;
-        saved_force_settings(index)[3]=force.use_implicit_velocity_independent_forces;
+        saved_force_settings(index)[0]=force.use_velocity_independent_forces;
+        saved_force_settings(index)[1]=force.use_velocity_dependent_forces;
+        saved_force_settings(index)[2]=force.use_implicit_velocity_independent_forces;
 
         force.use_velocity_independent_forces=false;
         force.use_velocity_dependent_forces=false;
@@ -141,9 +141,9 @@ template<class TV> void ASYNCHRONOUS_EVOLUTION<TV>::
 Enable_Forces(const ARRAY<int>& enable_forces_indices,const ARRAY<VECTOR<bool,3> >& saved_force_settings)
 {
     for(int i=0;i<enable_forces_indices.m;i++){int index=enable_forces_indices(i);
-        solid_body_collection.deformable_body_collection.deformables_forces(index)->use_velocity_independent_forces=saved_force_settings(index)[1];
-        solid_body_collection.deformable_body_collection.deformables_forces(index)->use_velocity_dependent_forces=saved_force_settings(index)[2];
-        solid_body_collection.deformable_body_collection.deformables_forces(index)->use_implicit_velocity_independent_forces=saved_force_settings(index)[3];}
+        solid_body_collection.deformable_body_collection.deformables_forces(index)->use_velocity_independent_forces=saved_force_settings(index)[0];
+        solid_body_collection.deformable_body_collection.deformables_forces(index)->use_velocity_dependent_forces=saved_force_settings(index)[1];
+        solid_body_collection.deformable_body_collection.deformables_forces(index)->use_implicit_velocity_independent_forces=saved_force_settings(index)[2];}
 }
 //#####################################################################
 // Function Rewind_Coarsescale_Particle_Positions

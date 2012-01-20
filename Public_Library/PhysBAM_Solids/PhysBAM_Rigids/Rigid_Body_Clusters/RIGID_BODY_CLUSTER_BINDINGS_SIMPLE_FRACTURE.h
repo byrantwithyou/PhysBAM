@@ -81,16 +81,16 @@ public:
         for(int i=data.connections.m;i>=1;i--){
             const VECTOR<RIGID_CLUSTER_CONSTITUENT_ID,2>& edge=data.connections(i);
             T rl=data.restlengths(i);
-            RIGID_BODY<TV> &child_1=rigid_body_collection.Rigid_Body(cluster.children(edge[1])),&child_2=rigid_body_collection.Rigid_Body(cluster.children(edge[2]));
-            VECTOR<int,2> hash_index=VECTOR<int,2>(cluster.children(edge[1]),cluster.children(edge[2])).Sorted();
+            RIGID_BODY<TV> &child_1=rigid_body_collection.Rigid_Body(cluster.children(edge[0])),&child_2=rigid_body_collection.Rigid_Body(cluster.children(edge[1]));
+            VECTOR<int,2> hash_index=VECTOR<int,2>(cluster.children(edge[0]),cluster.children(edge[1])).Sorted();
             T strain=abs((child_2.Frame().t-child_1.Frame().t).Magnitude()/rl-(T)1);
             T& local_decay=decay.Get_Or_Insert(hash_index,0);local_decay+=local_dt*decay_rate.Get_Or_Insert(hash_index,0);
             strain+=local_decay;
-            LOG::cout<<"strain between "<<cluster.children(edge[1])<<","<<cluster.children(edge[2])<<" is "<<strain<<std::endl;
-            T allowed_strain_local=allowed_strains.Get_Default(VECTOR<int,2>(cluster.children(edge[1]),cluster.children(edge[2])).Sorted(),allowed_strain);
+            LOG::cout<<"strain between "<<cluster.children(edge[0])<<","<<cluster.children(edge[1])<<" is "<<strain<<std::endl;
+            T allowed_strain_local=allowed_strains.Get_Default(VECTOR<int,2>(cluster.children(edge[0]),cluster.children(edge[1])).Sorted(),allowed_strain);
             if(strain>allowed_strain_local){need_rebuild=true;
                 if(graph){
-                    ARRAY<int> break_connections;int root=cluster.children(edge[1]);
+                    ARRAY<int> break_connections;int root=cluster.children(edge[0]);
                     if(!visited.Contains(root)){
                         Find_Weakest_Links(root,allowed_strain_local,visited,break_connections);
                         for(int i=0;i<break_connections.m;i++){

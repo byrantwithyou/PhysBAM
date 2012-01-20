@@ -23,8 +23,8 @@ Contains_Embedded_Particle(const EMBEDDED_OBJECT<TV,d>& embedded_object,const in
 template<class TV,int d> TV HYPOTHETICAL_CUT<TV,d>::
 Position(const int hypothetical_node_index) const
 {
-    return LINEAR_INTERPOLATION<T,TV>::Linear(embedded_object.particles.X(hypothetical_nodes(hypothetical_node_index).parents[1]),
-        embedded_object.particles.X(hypothetical_nodes(hypothetical_node_index).parents[2]),hypothetical_nodes(hypothetical_node_index).interpolation_fraction);
+    return LINEAR_INTERPOLATION<T,TV>::Linear(embedded_object.particles.X(hypothetical_nodes(hypothetical_node_index).parents[0]),
+        embedded_object.particles.X(hypothetical_nodes(hypothetical_node_index).parents[1]),hypothetical_nodes(hypothetical_node_index).interpolation_fraction);
 }
 //#####################################################################
 // Function Add_Hypothetical_Nodes_To_Embedded_Object

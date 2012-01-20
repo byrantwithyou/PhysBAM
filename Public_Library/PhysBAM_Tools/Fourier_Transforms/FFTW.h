@@ -45,29 +45,29 @@ public:
     {if(plan) T_FFTW##_destroy_plan(plan);} \
     \
     template<> inline FFTW_POLICY<T>::PLAN FFTW<T,d>::Plan_R2C(const VECTOR<int,d>& counts,const T_ARRAYS_T& u,const T_ARRAYS_COMPLEX& u_hat) \
-    {return T_FFTW##_plan_dft_r2c(d,&counts[1],const_cast<T_ARRAYS_T&>(u).array.Get_Array_Pointer(),(T(*)[2])const_cast<T_ARRAYS_COMPLEX&>(u_hat).array.Get_Array_Pointer(),plan_flags);} \
+    {return T_FFTW##_plan_dft_r2c(d,&counts[0],const_cast<T_ARRAYS_T&>(u).array.Get_Array_Pointer(),(T(*)[1])const_cast<T_ARRAYS_COMPLEX&>(u_hat).array.Get_Array_Pointer(),plan_flags);} \
     \
     template<> inline FFTW_POLICY<T>::PLAN FFTW<T,d>::Plan_C2R(const VECTOR<int,d>& counts,const T_ARRAYS_COMPLEX& u_hat,const T_ARRAYS_T& u) \
-    {return T_FFTW##_plan_dft_c2r(d,&counts[1],(T(*)[2])const_cast<T_ARRAYS_COMPLEX&>(u_hat).array.Get_Array_Pointer(),const_cast<T_ARRAYS_T&>(u).array.Get_Array_Pointer(),plan_flags);} \
+    {return T_FFTW##_plan_dft_c2r(d,&counts[0],(T(*)[1])const_cast<T_ARRAYS_COMPLEX&>(u_hat).array.Get_Array_Pointer(),const_cast<T_ARRAYS_T&>(u).array.Get_Array_Pointer(),plan_flags);} \
     \
     template<> inline void FFTW<T,d>::Execute_R2C(const T_PLAN plan,const T_ARRAYS_T& u,T_ARRAYS_COMPLEX& u_hat) \
-    {return T_FFTW##_execute_dft_r2c(plan,const_cast<T_ARRAYS_T&>(u).array.Get_Array_Pointer(),(T(*)[2])u_hat.array.Get_Array_Pointer());} \
+    {return T_FFTW##_execute_dft_r2c(plan,const_cast<T_ARRAYS_T&>(u).array.Get_Array_Pointer(),(T(*)[1])u_hat.array.Get_Array_Pointer());} \
     \
     template<> inline void FFTW<T,d>::Execute_C2R(const T_PLAN plan,T_ARRAYS_COMPLEX& u_hat,T_ARRAYS_T& u) \
-    {return T_FFTW##_execute_dft_c2r(plan,(T(*)[2])u_hat.array.Get_Array_Pointer(),u.array.Get_Array_Pointer());}
+    {return T_FFTW##_execute_dft_c2r(plan,(T(*)[1])u_hat.array.Get_Array_Pointer(),u.array.Get_Array_Pointer());}
 #else
 
-// MSVC does not understand "float(*)[2]" as a legitimate type, so we must express it in terms
+// MSVC does not understand "float(*)[1]" as a legitimate type, so we must express it in terms
 //   of derived classes (in this case: "fftwf_complex *")
 #define SPECIALIZE_FFTW_d(T_FFTW,T,d) \
     template<> inline void FFTW<T,d>::Destroy_Plan(const T_PLAN plan) \
     {if(plan) T_FFTW##_destroy_plan(plan);} \
     \
     template<> inline FFTW_POLICY<T>::PLAN FFTW<T,d>::Plan_R2C(const VECTOR<int,d>& counts,const T_ARRAYS_T& u,const T_ARRAYS_COMPLEX& u_hat) \
-    {return T_FFTW##_plan_dft_r2c(d,&counts[1],const_cast<T_ARRAYS_T&>(u).array.Get_Array_Pointer(),(T_FFTW##_complex *)const_cast<T_ARRAYS_COMPLEX&>(u_hat).array.Get_Array_Pointer(),plan_flags);} \
+    {return T_FFTW##_plan_dft_r2c(d,&counts[0],const_cast<T_ARRAYS_T&>(u).array.Get_Array_Pointer(),(T_FFTW##_complex *)const_cast<T_ARRAYS_COMPLEX&>(u_hat).array.Get_Array_Pointer(),plan_flags);} \
     \
     template<> inline FFTW_POLICY<T>::PLAN FFTW<T,d>::Plan_C2R(const VECTOR<int,d>& counts,const T_ARRAYS_COMPLEX& u_hat,const T_ARRAYS_T& u) \
-    {return T_FFTW##_plan_dft_c2r(d,&counts[1],(T_FFTW##_complex *)const_cast<T_ARRAYS_COMPLEX&>(u_hat).array.Get_Array_Pointer(),const_cast<T_ARRAYS_T&>(u).array.Get_Array_Pointer(),plan_flags);} \
+    {return T_FFTW##_plan_dft_c2r(d,&counts[0],(T_FFTW##_complex *)const_cast<T_ARRAYS_COMPLEX&>(u_hat).array.Get_Array_Pointer(),const_cast<T_ARRAYS_T&>(u).array.Get_Array_Pointer(),plan_flags);} \
     \
     template<> inline void FFTW<T,d>::Execute_R2C(const T_PLAN plan,const T_ARRAYS_T& u,T_ARRAYS_COMPLEX& u_hat) \
     {return T_FFTW##_execute_dft_r2c(plan,const_cast<T_ARRAYS_T&>(u).array.Get_Array_Pointer(),(T_FFTW##_complex *)u_hat.array.Get_Array_Pointer());} \

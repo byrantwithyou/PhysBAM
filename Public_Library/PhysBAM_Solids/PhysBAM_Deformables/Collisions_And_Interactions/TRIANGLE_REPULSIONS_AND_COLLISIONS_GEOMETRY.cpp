@@ -106,8 +106,8 @@ template<class T,class TV> bool Check_For_Intersection_Helper(const ARRAY<STRUCT
 template<class T,class TV> bool Check_For_Intersection_Helper(const ARRAY<STRUCTURE_INTERACTION_GEOMETRY<TV>*>& structure_geometries,const VECTOR<int,2>& pair,
     ARRAY_VIEW<const VECTOR<T,2> > X,const bool grow_thickness_to_find_first_self_intersection,const T threshold)
 {
-    SEGMENTED_CURVE_2D<T>* segmented_curve1=structure_geometries(pair[1])->segmented_curve;
-    SEGMENTED_CURVE_2D<T>* segmented_curve2=structure_geometries(pair[2])->segmented_curve;
+    SEGMENTED_CURVE_2D<T>* segmented_curve1=structure_geometries(pair[0])->segmented_curve;
+    SEGMENTED_CURVE_2D<T>* segmented_curve2=structure_geometries(pair[1])->segmented_curve;
     if(segmented_curve1 && segmented_curve2){
         if(segmented_curve1->Segment_Segment_Intersection(segmented_curve2->mesh,X,threshold)){
             LOG::cout<<"intersections found, pair = "<<pair<<", threshold = "<<threshold<<std::endl;return true;}
@@ -118,9 +118,9 @@ template<class T,class TV> bool Check_For_Intersection_Helper(const ARRAY<STRUCT
     ARRAY_VIEW<const VECTOR<T,3> > X,const bool grow_thickness_to_find_first_self_intersection,const T threshold)
 {
     ARRAY<VECTOR<int,2> > intersecting_segment_triangle_pairs;
-    for(int i=0;i<2;i++){if(i==2 && pair[1]==pair[2]) break;
+    for(int i=0;i<2;i++){if(i==2 && pair[0]==pair[1]) break;
         SEGMENTED_CURVE<TV>* segmented_curve=structure_geometries(pair[i])->segmented_curve;
-        TRIANGULATED_SURFACE<T>* triangulated_surface=structure_geometries(pair[3-i])->triangulated_surface;
+        TRIANGULATED_SURFACE<T>* triangulated_surface=structure_geometries(pair[1-i])->triangulated_surface;
         if(segmented_curve && triangulated_surface){
             if(triangulated_surface->Segment_Triangle_Intersection(segmented_curve->mesh,X,threshold,true,&intersecting_segment_triangle_pairs)){
                 LOG::cout<<"intersections found, pair = "<<pair<<", threshold = "<<threshold<<std::endl;
@@ -199,9 +199,9 @@ Compute_Intersecting_Pairs_Helper(COMPUTE_INTERSECTING_PAIRS_HELPER_INPUT_WHEN_D
 
     // find intersecting pairs
     for(int pair_index=0;pair_index<interacting_structure_pairs.m;pair_index++){const VECTOR<int,2>& pair=interacting_structure_pairs(pair_index);
-        for(int i=0;i<2;i++){if(i==2 && (d==2 || pair[1]==pair[2])) break;
+        for(int i=0;i<2;i++){if(i==2 && (d==2 || pair[0]==pair[1])) break;
             STRUCTURE_INTERACTION_GEOMETRY<TV>& segment_structure=*structure_geometries(pair[i]);
-            STRUCTURE_INTERACTION_GEOMETRY<TV>& face_structure=*structure_geometries(pair[3-i]);
+            STRUCTURE_INTERACTION_GEOMETRY<TV>& face_structure=*structure_geometries(pair[1-i]);
             if(!segment_structure.segmented_curve || !face_structure.Face_Mesh_Object()) continue;
 
             int count=0;

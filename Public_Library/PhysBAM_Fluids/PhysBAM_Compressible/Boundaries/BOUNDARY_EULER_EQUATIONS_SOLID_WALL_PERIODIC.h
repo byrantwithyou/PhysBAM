@@ -87,7 +87,7 @@ Fill_Ghost_Cells_Helper(const GRID<TV>& grid,const ARRAY<VECTOR<T,4> ,VECTOR<int
 
     ARRAY<VECTOR<T,4> ,VECTOR<int,2> >::Put(u,u_ghost); // interior
 
-    if(constant_extrapolation[1][1]) Fill_Left_Ghost_Cells(grid,u_ghost,time);
+    if(constant_extrapolation[0][0]) Fill_Left_Ghost_Cells(grid,u_ghost,time);
     else
         for(j=0;j<n;j++) for(i=-3;i<0;i++){ // left
             T rho=u_ghost(0,2-i,j);
@@ -98,7 +98,7 @@ Fill_Ghost_Cells_Helper(const GRID<TV>& grid,const ARRAY<VECTOR<T,4> ,VECTOR<int
             u_ghost(1,i,j)=rho*u_velocity;
             u_ghost(2,i,j)=rho*v_velocity;
             u_ghost(3,i,j)=rho*(e+(sqr(u_velocity)+sqr(v_velocity))/2);}
-    if(constant_extrapolation[1][2]) Fill_Right_Ghost_Cells(grid,u_ghost,time);
+    if(constant_extrapolation[0][1]) Fill_Right_Ghost_Cells(grid,u_ghost,time);
     else for(j=0;j<n;j++) for(i=m;i<m+3;i++){ // right
             T rho=u_ghost(0,2*m-i,j);
             T u_velocity=-u_ghost(1,2*m-i,j)/u_ghost(0,2*m-i,j);
@@ -139,7 +139,7 @@ Apply_Boundary_Condition_Helper(const GRID<TV>& grid,ARRAY<VECTOR<T,3> ,VECTOR<i
 {
     int m=grid.m;
 
-    if(!constant_extrapolation[1][1]){ // left wall
+    if(!constant_extrapolation[0][0]){ // left wall
         T rho=u(0,1);
         T u_velocity=u(1,1)/u(0,1);
         T e=u(2,1)/u(0,1)-sqr(u_velocity)/2;
@@ -148,7 +148,7 @@ Apply_Boundary_Condition_Helper(const GRID<TV>& grid,ARRAY<VECTOR<T,3> ,VECTOR<i
         u(1,1)=rho*u_velocity;
         u(2,1)=rho*(e+sqr(u_velocity)/2);}
 
-    if(!constant_extrapolation[1][2]){ // right wall
+    if(!constant_extrapolation[0][1]){ // right wall
         T rho=u(0,m);
         T u_velocity=u(1,m)/u(0,m);
         T e=u(2,m)/u(0,m)-sqr(u_velocity)/2;
@@ -163,7 +163,7 @@ Apply_Boundary_Condition_Helper(const GRID<TV>& grid,ARRAY<VECTOR<T,4> ,VECTOR<i
     int m=grid.m,n=grid.n;
     int i,j,k;
 
-    if(!constant_extrapolation[1][1])
+    if(!constant_extrapolation[0][0])
         for(j=0;j<n;j++){
             // left wall
             T rho=u(0,0,j);
@@ -176,7 +176,7 @@ Apply_Boundary_Condition_Helper(const GRID<TV>& grid,ARRAY<VECTOR<T,4> ,VECTOR<i
             u(2,0,j)=rho*v_velocity;
             u(3,0,j)=rho*(e+(sqr(u_velocity)+sqr(v_velocity))/2);}
 
-    if(!constant_extrapolation[1][2])
+    if(!constant_extrapolation[0][1])
         for(j=0;j<n;j++){
             // right wall
             T rho=u(0,m,j);

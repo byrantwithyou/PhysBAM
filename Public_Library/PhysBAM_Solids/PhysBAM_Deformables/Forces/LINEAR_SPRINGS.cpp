@@ -214,11 +214,11 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
     if(!youngs_modulus.m) for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
         const STATE& state=states(s);
         TV force=constant_youngs_modulus/restlength(s)*(current_lengths(s)-visual_restlength(s))*state.direction;
-        F(state.nodes[1])+=force;F(state.nodes[2])-=force;}
+        F(state.nodes[0])+=force;F(state.nodes[1])-=force;}
     else for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
         const STATE& state=states(s);
         TV force=youngs_modulus(s)/restlength(s)*(current_lengths(s)-visual_restlength(s))*state.direction;
-        F(state.nodes[1])+=force;F(state.nodes[2])-=force;}
+        F(state.nodes[0])+=force;F(state.nodes[1])-=force;}
 }
 //#####################################################################
 // Function Add_Velocity_Dependent_Forces
@@ -231,8 +231,8 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
     for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
         const STATE& state=states(s);
         //springs_processed++;
-        TV force=(state.coefficient*TV::Dot_Product(V(state.nodes[1])-V(state.nodes[2]),state.direction))*state.direction;
-        F(state.nodes[1])-=force;F(state.nodes[2])+=force;}
+        TV force=(state.coefficient*TV::Dot_Product(V(state.nodes[0])-V(state.nodes[1]),state.direction))*state.direction;
+        F(state.nodes[0])-=force;F(state.nodes[1])+=force;}
 }
 //#####################################################################
 // Function Add_Implicit_Velocity_Independent_Forces
@@ -272,7 +272,7 @@ Add_Velocity_Dependent_Forces_First_Half(ARRAY_VIEW<const TV> V,ARRAY_VIEW<T> ag
     int aggregate_id=1;
     for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
         const STATE& state=states(s);
-        aggregate(aggregate_id++)+=state.sqrt_coefficient*TV::Dot_Product(V(state.nodes[1])-V(state.nodes[2]),state.direction);}
+        aggregate(aggregate_id++)+=state.sqrt_coefficient*TV::Dot_Product(V(state.nodes[0])-V(state.nodes[1]),state.direction);}
 }
 //#####################################################################
 // Function Add_Velocity_Dependent_Forces_Second_Half
@@ -284,7 +284,7 @@ Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T> aggregate,ARRAY_VI
     for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
         const STATE& state=states(s);
         TV force=state.sqrt_coefficient*aggregate(aggregate_id++)*state.direction;
-        F(state.nodes[1])+=force;F(state.nodes[2])-=force;}
+        F(state.nodes[0])+=force;F(state.nodes[1])-=force;}
 }
 //#####################################################################
 // Function Add_Force_Differential

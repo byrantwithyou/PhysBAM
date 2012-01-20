@@ -101,14 +101,14 @@ Calculate_Bounding_Boxes(ARRAY<RANGE<TV> >& bounding_boxes,const FRAME<TV>& star
 {
     if(triangles_per_group) for(int k=0;k<leaves;k++){
         if(triangles_in_group(k).m){const VECTOR<int,3>& nodes=triangle_mesh.elements(triangles_in_group(k)(1));
-            bounding_boxes(k)=RANGE<TV>::Bounding_Box(start_frame*particles.X(nodes[1]),start_frame*particles.X(nodes[2]),start_frame*particles.X(nodes[3]));
-            bounding_boxes(k).Enlarge_Nonempty_Box_To_Include_Points(end_frame*particles.X(nodes[1]),end_frame*particles.X(nodes[2]),end_frame*particles.X(nodes[3]));}
+            bounding_boxes(k)=RANGE<TV>::Bounding_Box(start_frame*particles.X(nodes[0]),start_frame*particles.X(nodes[1]),start_frame*particles.X(nodes[2]));
+            bounding_boxes(k).Enlarge_Nonempty_Box_To_Include_Points(end_frame*particles.X(nodes[0]),end_frame*particles.X(nodes[1]),end_frame*particles.X(nodes[2]));}
         for(int i=2;i<=triangles_in_group(k).m;i++){const VECTOR<int,3>& nodes=triangle_mesh.elements(triangles_in_group(k)(i));
-            bounding_boxes(k)=RANGE<TV>::Bounding_Box(start_frame*particles.X(nodes[1]),start_frame*particles.X(nodes[2]),start_frame*particles.X(nodes[3]));
-            bounding_boxes(k).Enlarge_Nonempty_Box_To_Include_Points(end_frame*particles.X(nodes[1]),end_frame*particles.X(nodes[2]),end_frame*particles.X(nodes[3]));}}
+            bounding_boxes(k)=RANGE<TV>::Bounding_Box(start_frame*particles.X(nodes[0]),start_frame*particles.X(nodes[1]),start_frame*particles.X(nodes[2]));
+            bounding_boxes(k).Enlarge_Nonempty_Box_To_Include_Points(end_frame*particles.X(nodes[0]),end_frame*particles.X(nodes[1]),end_frame*particles.X(nodes[2]));}}
     else for(int k=0;k<leaves;k++){const VECTOR<int,3>& nodes=triangle_mesh.elements(k);
-        bounding_boxes(k)=RANGE<TV>::Bounding_Box(start_frame*particles.X(nodes[1]),start_frame*particles.X(nodes[2]),start_frame*particles.X(nodes[3]));
-        bounding_boxes(k).Enlarge_Nonempty_Box_To_Include_Points(end_frame*particles.X(nodes[1]),end_frame*particles.X(nodes[2]),end_frame*particles.X(nodes[3]));}
+        bounding_boxes(k)=RANGE<TV>::Bounding_Box(start_frame*particles.X(nodes[0]),start_frame*particles.X(nodes[1]),start_frame*particles.X(nodes[2]));
+        bounding_boxes(k).Enlarge_Nonempty_Box_To_Include_Points(end_frame*particles.X(nodes[0]),end_frame*particles.X(nodes[1]),end_frame*particles.X(nodes[2]));}
 }
 //#####################################################################
 // Function Calculate_Bounding_Box_Radii

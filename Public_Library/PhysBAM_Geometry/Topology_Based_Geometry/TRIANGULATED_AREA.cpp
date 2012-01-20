@@ -122,11 +122,11 @@ template<class T> void TRIANGULATED_AREA<T>::
 Check_Signed_Area_And_Make_Consistent(const int triangle,const bool verbose)
 {
     VECTOR<int,3>& nodes=mesh.elements(triangle);
-    if(TRIANGLE_2D<T>::Signed_Area(particles.X(nodes[1]),particles.X(nodes[2]),particles.X(nodes[3])) < 0){
+    if(TRIANGLE_2D<T>::Signed_Area(particles.X(nodes[0]),particles.X(nodes[1]),particles.X(nodes[2])) < 0){
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         if(verbose) LOG::cout<<"triangle number "<<triangle<<" is oriented improperly."<<std::endl;
 #endif
-        exchange(nodes[2],nodes[3]);}
+        exchange(nodes[1],nodes[2]);}
 }
 //#####################################################################
 // Function Check_Signed_Areas_And_Make_Consistent

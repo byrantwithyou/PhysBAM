@@ -157,7 +157,7 @@ Add_Second_Cut(const int tetrahedron,const TV& fracture_normal,const VECTOR<T,4>
 {
     VECTOR<int,4> nodes=embedded_object.simplicial_object.mesh.elements(tetrahedron);
     VECTOR<int,4> emb_triangles=embedded_object.Embedded_Subelements_In_Element(tetrahedron);
-    int emb_triangle1=emb_triangles[1],emb_triangle2=emb_triangles[2];assert(emb_triangles[3]==0 && emb_triangles[4]==0);
+    int emb_triangle1=emb_triangles[0],emb_triangle2=emb_triangles[1];assert(emb_triangles[2]==0 && emb_triangles[3]==0);
     if(emb_triangle1 && !emb_triangle2){
         int isolated_node=embedded_object.Node_Separated_By_Embedded_Subelement(emb_triangle1);
         int other_node1,other_node2,other_node3;embedded_object.simplicial_object.mesh.Other_Three_Nodes(isolated_node,tetrahedron,other_node1,other_node2,other_node3);
@@ -293,12 +293,12 @@ Add_Third_Cut(const int tetrahedron,const TV& fracture_normal,const VECTOR<T,4>*
 {
     VECTOR<int,4> nodes=embedded_object.simplicial_object.mesh.elements(tetrahedron);
     VECTOR<int,4> emb_triangles=embedded_object.Embedded_Subelements_In_Element(tetrahedron);
-    int emb_triangle1=emb_triangles[1],emb_triangle3=emb_triangles[3];assert(emb_triangles[4]==0);
+    int emb_triangle1=emb_triangles[0],emb_triangle3=emb_triangles[2];assert(emb_triangles[3]==0);
     HYPOTHETICAL_CUT_TETRAHEDRONS<T> hypothetical_cut(embedded_object);
     if(emb_triangle3){
         assert(embedded_object.Cut_By_Quad(tetrahedron) 
             && (embedded_object.Node_Separated_By_Embedded_Subelement(emb_triangle1) 
-                || embedded_object.Node_Separated_By_Embedded_Subelement(emb_triangles[2])
+                || embedded_object.Node_Separated_By_Embedded_Subelement(emb_triangles[1])
                 || embedded_object.Node_Separated_By_Embedded_Subelement(emb_triangle3)));
         Add_Best_Embedded_Triangle_With_Quad_And_Triangle(fracture_normal,tetrahedron,tetrahedron_phi);}
     else if(int segments_intersected=Add_Best_Embedded_Triangle_Or_Quad_With_Two_Triangles(fracture_normal,tetrahedron,hypothetical_cut)){

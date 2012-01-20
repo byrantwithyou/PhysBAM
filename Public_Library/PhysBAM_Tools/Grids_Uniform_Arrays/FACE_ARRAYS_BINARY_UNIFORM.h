@@ -50,7 +50,7 @@ public:
     {}
 
     void Initialize()
-    {for(int i=0;i<dimension;i++){sided_data[1](i)=&BASE::Component(i);sided_data[2](i)=&u2.Component(i);}}
+    {for(int i=0;i<dimension;i++){sided_data[0](i)=&BASE::Component(i);sided_data[1](i)=&u2.Component(i);}}
 
     template<class T2_GRID>
     ARRAY(const T2_GRID& grid,const int ghost_cells=0,const bool initialize_using_default_constructor=true)

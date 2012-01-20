@@ -66,7 +66,7 @@ Store_Helper_Helper(const int segment1,const int segment2)
     RANGE<TV> box1=RANGE<TV>::Bounding_Box(X_self_collision_free.Subset(segment1_nodes))+dX_average;box1.Enlarge_Nonempty_Box_To_Include_Points(X.Subset(segment1_nodes));
     RANGE<TV> box2=RANGE<TV>::Bounding_Box(X_self_collision_free.Subset(segment2_nodes))+dX_average;box2.Enlarge_Nonempty_Box_To_Include_Points(X.Subset(segment2_nodes));
     if(!box1.Intersection(box2,collision_thickness)) return;
-    VECTOR<int,4> nodes(segment1_nodes[1],segment1_nodes[2],segment2_nodes[1],segment2_nodes[2]);
+    VECTOR<int,4> nodes(segment1_nodes[0],segment1_nodes[1],segment2_nodes[0],segment2_nodes[1]);
     if(intersecting_edge_edge_pairs.Size() && intersecting_edge_edge_pairs.Contains(nodes)) return;
     if (mpi_solids){
         VECTOR<PARTITION_ID,4> processors(mpi_solids->partition_id_from_particle_index.Subset(nodes));

@@ -102,14 +102,14 @@ public:
 
         ARRAY<VECTOR<int,3> > tri_elements;tri_elements.Preallocate(embedding.material_surface.mesh.elements.m);
         for(int t=0;t<embedding.material_surface_mesh.elements.m;t++){
-            int index1=embedding.material_surface_mesh.elements(t)[1];
-            int index2=embedding.material_surface_mesh.elements(t)[2],index3=embedding.material_surface_mesh.elements(t)[3];
+            int index1=embedding.material_surface_mesh.elements(t)[0];
+            int index2=embedding.material_surface_mesh.elements(t)[1],index3=embedding.material_surface_mesh.elements(t)[2];
             tri_elements.Append(VECTOR<int,3>(deformable_to_rigid_particles(index1),deformable_to_rigid_particles(index2),deformable_to_rigid_particles(index3)));}
 
         ARRAY<VECTOR<int,4> > tet_elements;tet_elements.Preallocate(deformable_tetrahedralized_volume.mesh.elements.m);rigid_to_deformable_tets.Preallocate(deformable_tetrahedralized_volume.mesh.elements.m);
         for(int t=0;t<deformable_tetrahedralized_volume.mesh.elements.m;t++){
-            int index1=deformable_tetrahedralized_volume.mesh.elements(t)[1];
-            int index2=deformable_tetrahedralized_volume.mesh.elements(t)[2],index3=deformable_tetrahedralized_volume.mesh.elements(t)[3],index4=deformable_tetrahedralized_volume.mesh.elements(t)[4];
+            int index1=deformable_tetrahedralized_volume.mesh.elements(t)[0];
+            int index2=deformable_tetrahedralized_volume.mesh.elements(t)[1],index3=deformable_tetrahedralized_volume.mesh.elements(t)[2],index4=deformable_tetrahedralized_volume.mesh.elements(t)[3];
             tet_elements.Append(VECTOR<int,4>(deformable_to_rigid_particles(index1),deformable_to_rigid_particles(index2),deformable_to_rigid_particles(index3),deformable_to_rigid_particles(index4)));
             rigid_to_deformable_tets.Append(t);}
 

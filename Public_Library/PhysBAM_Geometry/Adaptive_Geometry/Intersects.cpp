@@ -37,8 +37,8 @@ namespace GEOMETRIC_PREDICATES_DETAIL{
                 if(sign[i]==0) sign[i]=next_sign;
                 could_be_a_separator=(next_sign!=0&&sign[i]==next_sign);}
             if(could_be_a_separator){
-                assert(sign[1]!=0||sign[2]!=0);
-                if(sign[1]!=sign[2]) return true;}
+                assert(sign[0]!=0||sign[1]!=0);
+                if(sign[0]!=sign[1]) return true;}
             else if(next_sign==0) is_possibly_degenerate=true;}
         if(is_possibly_degenerate){
             if(is_degenerate_p==0) throw GEOMETRIC_DEGENERACY();
@@ -73,8 +73,8 @@ namespace GEOMETRIC_PREDICATES_DETAIL{
                     if(sign[i]==0) sign[i]=next_sign;
                     could_be_a_separator=(next_sign!=0&&sign[i]==next_sign);}
                 if(could_be_a_separator){
-                    assert(sign[1]!=0||sign[2]!=0);
-                    if(sign[1]!=sign[2]) return true;}
+                    assert(sign[0]!=0||sign[1]!=0);
+                    if(sign[0]!=sign[1]) return true;}
                 else if(next_sign==0) is_possibly_degenerate=true;}}
         if(is_possibly_degenerate){
             if(is_degenerate_p==0) throw GEOMETRIC_DEGENERACY();
@@ -112,8 +112,8 @@ namespace GEOMETRIC_PREDICATES_DETAIL{
                         if(sign[i]==0) sign[i]=next_sign;
                         could_be_a_separator=(next_sign!=0&&sign[i]==next_sign);}
                     if(could_be_a_separator){
-                        assert(sign[1]!=0||sign[2]!=0);
-                        if(sign[1]!=sign[2]) return true;}
+                        assert(sign[0]!=0||sign[1]!=0);
+                        if(sign[0]!=sign[1]) return true;}
                     else if(next_sign==0) is_possibly_degenerate=true;}}}
         if(is_possibly_degenerate){
             if(is_degenerate_p==0) throw GEOMETRIC_DEGENERACY();

@@ -87,12 +87,12 @@ Adaptive_Determinant(const T& t11)
 template<class T_EXACT,class T>
 ADAPTIVE_DETERMINANT<typename ADAPTIVE_POLICY<T_EXACT,T>::ADAPTIVE,1>
 Adaptive_Determinant(const VECTOR<T,1>& t1)
-{return Adaptive_Determinant<T_EXACT>(t1[1]);}
+{return Adaptive_Determinant<T_EXACT>(t1[0]);}
 
 template<class T_EXACT,class T>
 ADAPTIVE_DETERMINANT<typename ADAPTIVE_POLICY<T_EXACT,T>::ADAPTIVE,1>
 Adaptive_Determinant(const VECTOR<VECTOR<T,1>,1>& t)
-{return Adaptive_Determinant<T_EXACT>(t[1]);}
+{return Adaptive_Determinant<T_EXACT>(t[0]);}
 
 template<class T_EXACT,class T>
 ADAPTIVE_DETERMINANT<typename ADAPTIVE_POLICY<T_EXACT,T>::ADAPTIVE,2>
@@ -102,12 +102,12 @@ Adaptive_Determinant(const T& t11,const T& t12,const T& t21,const T& t22)
 template<class T_EXACT,class T>
 ADAPTIVE_DETERMINANT<typename ADAPTIVE_POLICY<T_EXACT,T>::ADAPTIVE,2>
 Adaptive_Determinant(const VECTOR<T,2>& t1,const VECTOR<T,2>& t2)
-{return Adaptive_Determinant<T_EXACT>(t1[1],t2[1],t1[2],t2[2]);}
+{return Adaptive_Determinant<T_EXACT>(t1[0],t2[0],t1[1],t2[1]);}
 
 template<class T_EXACT,class T>
 ADAPTIVE_DETERMINANT<typename ADAPTIVE_POLICY<T_EXACT,T>::ADAPTIVE,2>
 Adaptive_Determinant(const VECTOR<VECTOR<T,2>,2>& t)
-{return Adaptive_Determinant<T_EXACT>(t[1],t[2]);}
+{return Adaptive_Determinant<T_EXACT>(t[0],t[1]);}
 
 template<class T_EXACT,class T>
 ADAPTIVE_DETERMINANT<typename ADAPTIVE_POLICY<T_EXACT,T>::ADAPTIVE,3>
@@ -117,12 +117,12 @@ Adaptive_Determinant(const T& t11,const T& t12,const T& t13,const T& t21,const T
 template<class T_EXACT,class T>
 ADAPTIVE_DETERMINANT<typename ADAPTIVE_POLICY<T_EXACT,T>::ADAPTIVE,3>
 Adaptive_Determinant(const VECTOR<T,3>& t1,const VECTOR<T,3>& t2,const VECTOR<T,3>& t3)
-{return Adaptive_Determinant<T_EXACT>(t1[1],t2[1],t3[1],t1[2],t2[2],t3[2],t1[3],t2[3],t3[3]);}
+{return Adaptive_Determinant<T_EXACT>(t1[0],t2[0],t3[0],t1[1],t2[1],t3[1],t1[2],t2[2],t3[2]);}
 
 template<class T_EXACT,class T>
 ADAPTIVE_DETERMINANT<typename ADAPTIVE_POLICY<T_EXACT,T>::ADAPTIVE,3>
 Adaptive_Determinant(const VECTOR<VECTOR<T,3>,3>& t)
-{return Adaptive_Determinant<T_EXACT>(t[1],t[2],t[3]);}
+{return Adaptive_Determinant<T_EXACT>(t[0],t[1],t[2]);}
 
 }
 using ADAPTIVE_DETAIL::ADAPTIVE_DETERMINANT;

@@ -77,34 +77,34 @@ Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAY<TV,VECTOR<int,3> >& V,ARRAY<TV
 
     if(left_constant_extrapolation) Fill_Left_Ghost_Cells(grid,V_ghost,time);
     else for(j=0;j<n;j++) for(ij=0;ij<mn;ij++){
-        V_ghost(0,j,ij)[1]=-V_ghost(2,j,ij)[1];V_ghost(-1,j,ij)[1]=-V_ghost(3,j,ij)[1];V_ghost(-2,j,ij)[1]=-V_ghost(4,j,ij)[1];
-        V_ghost(0,j,ij)[2]=V_ghost(2,j,ij)[2];V_ghost(-1,j,ij)[2]=V_ghost(3,j,ij)[2];V_ghost(-2,j,ij)[2]=V_ghost(4,j,ij)[2];
-        V_ghost(0,j,ij)[3]=V_ghost(2,j,ij)[3];V_ghost(-1,j,ij)[3]=V_ghost(3,j,ij)[3];V_ghost(-2,j,ij)[3]=V_ghost(4,j,ij)[3];}  
+        V_ghost(0,j,ij)[0]=-V_ghost(2,j,ij)[0];V_ghost(-1,j,ij)[0]=-V_ghost(3,j,ij)[0];V_ghost(-2,j,ij)[0]=-V_ghost(4,j,ij)[0];
+        V_ghost(0,j,ij)[1]=V_ghost(2,j,ij)[1];V_ghost(-1,j,ij)[1]=V_ghost(3,j,ij)[1];V_ghost(-2,j,ij)[1]=V_ghost(4,j,ij)[1];
+        V_ghost(0,j,ij)[2]=V_ghost(2,j,ij)[2];V_ghost(-1,j,ij)[2]=V_ghost(3,j,ij)[2];V_ghost(-2,j,ij)[2]=V_ghost(4,j,ij)[2];}  
     if(right_constant_extrapolation) Fill_Right_Ghost_Cells(grid,V_ghost,time);
     else for(j=0;j<n;j++) for(ij=0;ij<mn;ij++){
-        V_ghost(m+1,j,ij)[1]=-V_ghost(m-1,j,ij)[1];V_ghost(m+2,j,ij)[1]=-V_ghost(m-2,j,ij)[1];V_ghost(m+3,j,ij)[1]=-V_ghost(m-3,j,ij)[1];
-        V_ghost(m+1,j,ij)[2]=V_ghost(m-1,j,ij)[2];V_ghost(m+2,j,ij)[2]=V_ghost(m-2,j,ij)[2];V_ghost(m+3,j,ij)[2]=V_ghost(m-3,j,ij)[2];
-        V_ghost(m+1,j,ij)[3]=V_ghost(m-1,j,ij)[3];V_ghost(m+2,j,ij)[3]=V_ghost(m-2,j,ij)[3];V_ghost(m+3,j,ij)[3]=V_ghost(m-3,j,ij)[3];}  
+        V_ghost(m+1,j,ij)[0]=-V_ghost(m-1,j,ij)[0];V_ghost(m+2,j,ij)[0]=-V_ghost(m-2,j,ij)[0];V_ghost(m+3,j,ij)[0]=-V_ghost(m-3,j,ij)[0];
+        V_ghost(m+1,j,ij)[1]=V_ghost(m-1,j,ij)[1];V_ghost(m+2,j,ij)[1]=V_ghost(m-2,j,ij)[1];V_ghost(m+3,j,ij)[1]=V_ghost(m-3,j,ij)[1];
+        V_ghost(m+1,j,ij)[2]=V_ghost(m-1,j,ij)[2];V_ghost(m+2,j,ij)[2]=V_ghost(m-2,j,ij)[2];V_ghost(m+3,j,ij)[2]=V_ghost(m-3,j,ij)[2];}  
     if(bottom_constant_extrapolation) Fill_Bottom_Ghost_Cells(grid,V_ghost,time);
     else for(i=-2;i<=m+3;i++) for(ij=0;ij<mn;ij++){
-        V_ghost(i,0,ij)[1]=V_ghost(i,2,ij)[1];V_ghost(i,-1,ij)[1]=V_ghost(i,3,ij)[1];V_ghost(i,-2,ij)[1]=V_ghost(i,4,ij)[1];
-        V_ghost(i,0,ij)[2]=-V_ghost(i,2,ij)[2];V_ghost(i,-1,ij)[2]=-V_ghost(i,3,ij)[2];V_ghost(i,-2,ij)[2]=-V_ghost(i,4,ij)[2];
-        V_ghost(i,0,ij)[3]=V_ghost(i,2,ij)[3];V_ghost(i,-1,ij)[3]=V_ghost(i,3,ij)[3];V_ghost(i,-2,ij)[3]=V_ghost(i,4,ij)[3];}
+        V_ghost(i,0,ij)[0]=V_ghost(i,2,ij)[0];V_ghost(i,-1,ij)[0]=V_ghost(i,3,ij)[0];V_ghost(i,-2,ij)[0]=V_ghost(i,4,ij)[0];
+        V_ghost(i,0,ij)[1]=-V_ghost(i,2,ij)[1];V_ghost(i,-1,ij)[1]=-V_ghost(i,3,ij)[1];V_ghost(i,-2,ij)[1]=-V_ghost(i,4,ij)[1];
+        V_ghost(i,0,ij)[2]=V_ghost(i,2,ij)[2];V_ghost(i,-1,ij)[2]=V_ghost(i,3,ij)[2];V_ghost(i,-2,ij)[2]=V_ghost(i,4,ij)[2];}
     if(top_constant_extrapolation) Fill_Top_Ghost_Cells(grid,V_ghost,time);
     else for(i=-2;i<=m+3;i++) for(ij=0;ij<mn;ij++){
-        V_ghost(i,n+1,ij)[1]=V_ghost(i,n-1,ij)[1];V_ghost(i,n+2,ij)[1]=V_ghost(i,n-2,ij)[1];V_ghost(i,n+3,ij)[1]=V_ghost(i,n-3,ij)[1];
-        V_ghost(i,n+1,ij)[2]=-V_ghost(i,n-1,ij)[2];V_ghost(i,n+2,ij)[2]=-V_ghost(i,n-2,ij)[2];V_ghost(i,n+3,ij)[2]=-V_ghost(i,n-3,ij)[2];
-        V_ghost(i,n+1,ij)[3]=V_ghost(i,n-1,ij)[3];V_ghost(i,n+2,ij)[3]=V_ghost(i,n-2,ij)[3];V_ghost(i,n+3,ij)[3]=V_ghost(i,n-3,ij)[3];}
+        V_ghost(i,n+1,ij)[0]=V_ghost(i,n-1,ij)[0];V_ghost(i,n+2,ij)[0]=V_ghost(i,n-2,ij)[0];V_ghost(i,n+3,ij)[0]=V_ghost(i,n-3,ij)[0];
+        V_ghost(i,n+1,ij)[1]=-V_ghost(i,n-1,ij)[1];V_ghost(i,n+2,ij)[1]=-V_ghost(i,n-2,ij)[1];V_ghost(i,n+3,ij)[1]=-V_ghost(i,n-3,ij)[1];
+        V_ghost(i,n+1,ij)[2]=V_ghost(i,n-1,ij)[2];V_ghost(i,n+2,ij)[2]=V_ghost(i,n-2,ij)[2];V_ghost(i,n+3,ij)[2]=V_ghost(i,n-3,ij)[2];}
     if(front_constant_extrapolation) Fill_Front_Ghost_Cells(grid,V_ghost,time);
     else for(i=-2;i<=m+3;i++) for(j=-2;j<=n+3;j++){
+        V_ghost(i,j,0)[0]=V_ghost(i,j,2)[0];V_ghost(i,j,-1)[0]=V_ghost(i,j,3)[0];V_ghost(i,j,-2)[0]=V_ghost(i,j,4)[0];
         V_ghost(i,j,0)[1]=V_ghost(i,j,2)[1];V_ghost(i,j,-1)[1]=V_ghost(i,j,3)[1];V_ghost(i,j,-2)[1]=V_ghost(i,j,4)[1];
-        V_ghost(i,j,0)[2]=V_ghost(i,j,2)[2];V_ghost(i,j,-1)[2]=V_ghost(i,j,3)[2];V_ghost(i,j,-2)[2]=V_ghost(i,j,4)[2];
-        V_ghost(i,j,0)[3]=-V_ghost(i,j,2)[3];V_ghost(i,j,-1)[3]=-V_ghost(i,j,3)[3];V_ghost(i,j,-2)[3]=-V_ghost(i,j,4)[3];}
+        V_ghost(i,j,0)[2]=-V_ghost(i,j,2)[2];V_ghost(i,j,-1)[2]=-V_ghost(i,j,3)[2];V_ghost(i,j,-2)[2]=-V_ghost(i,j,4)[2];}
     if(back_constant_extrapolation) Fill_Back_Ghost_Cells(grid,V_ghost,time);
     else for(i=-2;i<=m+3;i++) for(j=-2;j<=n+3;j++){
+        V_ghost(i,j,mn+1)[0]=V_ghost(i,j,mn-1)[0];V_ghost(i,j,mn+2)[0]=V_ghost(i,j,mn-2)[0];V_ghost(i,j,mn+3)[0]=V_ghost(i,j,mn-3)[0];
         V_ghost(i,j,mn+1)[1]=V_ghost(i,j,mn-1)[1];V_ghost(i,j,mn+2)[1]=V_ghost(i,j,mn-2)[1];V_ghost(i,j,mn+3)[1]=V_ghost(i,j,mn-3)[1];
-        V_ghost(i,j,mn+1)[2]=V_ghost(i,j,mn-1)[2];V_ghost(i,j,mn+2)[2]=V_ghost(i,j,mn-2)[2];V_ghost(i,j,mn+3)[2]=V_ghost(i,j,mn-3)[2];
-        V_ghost(i,j,mn+1)[3]=-V_ghost(i,j,mn-1)[3];V_ghost(i,j,mn+2)[3]=-V_ghost(i,j,mn-2)[3];V_ghost(i,j,mn+3)[3]=-V_ghost(i,j,mn-3)[3];}
+        V_ghost(i,j,mn+1)[2]=-V_ghost(i,j,mn-1)[2];V_ghost(i,j,mn+2)[2]=-V_ghost(i,j,mn-2)[2];V_ghost(i,j,mn+3)[2]=-V_ghost(i,j,mn-3)[2];}
 }
 //#####################################################################
 // Function Apply_Boundary_Condition
@@ -114,10 +114,10 @@ Apply_Boundary_Condition(const GRID<TV>& grid,ARRAY<TV,VECTOR<int,3> >& V,const 
 {
     if(V.length != 1) PHYSBAM_FUNCTION_IS_NOT_DEFINED();
     int i,j,ij,m=grid.m,n=grid.n,mn=grid.mn;
-    if(!left_constant_extrapolation)for(j=0;j<n;j++)for(ij=0;ij<mn;ij++)V(1,j,ij)[1]=0;
-    if(!right_constant_extrapolation)for(j=0;j<n;j++)for(ij=0;ij<mn;ij++)V(m,j,ij)[1]=0;
-    if(!bottom_constant_extrapolation)for(i=0;i<m;i++)for(ij=0;ij<mn;ij++)V(i,1,ij)[2]=0;
-    if(!top_constant_extrapolation)for(i=0;i<m;i++)for(ij=0;ij<mn;ij++)V(i,n,ij)[2]=0;
-    if(!front_constant_extrapolation)for(i=0;i<m;i++)for(j=0;j<n;j++)V(i,j,1)[3]=0;
-    if(!back_constant_extrapolation)for(i=0;i<m;i++)for(j=0;j<n;j++)V(i,j,mn)[3]=0;
+    if(!left_constant_extrapolation)for(j=0;j<n;j++)for(ij=0;ij<mn;ij++)V(1,j,ij)[0]=0;
+    if(!right_constant_extrapolation)for(j=0;j<n;j++)for(ij=0;ij<mn;ij++)V(m,j,ij)[0]=0;
+    if(!bottom_constant_extrapolation)for(i=0;i<m;i++)for(ij=0;ij<mn;ij++)V(i,1,ij)[1]=0;
+    if(!top_constant_extrapolation)for(i=0;i<m;i++)for(ij=0;ij<mn;ij++)V(i,n,ij)[1]=0;
+    if(!front_constant_extrapolation)for(i=0;i<m;i++)for(j=0;j<n;j++)V(i,j,1)[2]=0;
+    if(!back_constant_extrapolation)for(i=0;i<m;i++)for(j=0;j<n;j++)V(i,j,mn)[2]=0;
 }

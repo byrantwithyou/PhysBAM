@@ -26,19 +26,19 @@ template<class T_EXACT,class T> typename ADAPTIVE_VECTOR_OPERATION_POLICY<T_EXAC
 Adaptive_Vector_Sum(const VECTOR<T,2>& v)
 {
     typedef typename ADAPTIVE_DETAIL::ADAPTIVE_POLICY<T_EXACT,T>::ADAPTIVE T_ADAPTIVE;
-    return T_ADAPTIVE(v[1])+T_ADAPTIVE(v[2]);
+    return T_ADAPTIVE(v[0])+T_ADAPTIVE(v[1]);
 }
 template<class T_EXACT,class T> typename ADAPTIVE_VECTOR_OPERATION_POLICY<T_EXACT,T,3>::SUM
 Adaptive_Vector_Sum(const VECTOR<T,3>& v)
 {
     typedef typename ADAPTIVE_DETAIL::ADAPTIVE_POLICY<T_EXACT,T>::ADAPTIVE T_ADAPTIVE;
-    return T_ADAPTIVE(v[1])+T_ADAPTIVE(v[2])+T_ADAPTIVE(v[3]);
+    return T_ADAPTIVE(v[0])+T_ADAPTIVE(v[1])+T_ADAPTIVE(v[2]);
 }
 template<class T_EXACT,class T> typename ADAPTIVE_VECTOR_OPERATION_POLICY<T_EXACT,T,4>::SUM
 Adaptive_Vector_Sum(const VECTOR<T,4>& v)
 {
     typedef typename ADAPTIVE_DETAIL::ADAPTIVE_POLICY<T_EXACT,T>::ADAPTIVE T_ADAPTIVE;
-    return T_ADAPTIVE(v[1])+T_ADAPTIVE(v[2])+T_ADAPTIVE(v[3])+T_ADAPTIVE(v[4]);
+    return T_ADAPTIVE(v[0])+T_ADAPTIVE(v[1])+T_ADAPTIVE(v[2])+T_ADAPTIVE(v[3]);
 }
 //#####################################################################
 // operator-

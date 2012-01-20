@@ -101,8 +101,8 @@ Update_Modified_Nonleaf_Boxes(ARRAY<bool>& modified)
 {
     for(int k=leaves+1;k<=box_hierarchy.m;k++){
         const VECTOR<int,2>& child=children(k-leaves);
-        modified(k)=modified(child[1]) || modified(child[2]);
-        if(modified(k)) box_hierarchy(k)=RANGE<TV>::Combine(box_hierarchy(child[1]),box_hierarchy(child[2]));}
+        modified(k)=modified(child[0]) || modified(child[1]);
+        if(modified(k)) box_hierarchy(k)=RANGE<TV>::Combine(box_hierarchy(child[0]),box_hierarchy(child[1]));}
 }
 //#####################################################################
 // Function Calculate_Bounding_Box_Radii

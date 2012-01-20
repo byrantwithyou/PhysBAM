@@ -22,10 +22,10 @@ Set_Spring_Phases(const ARRAY<VECTOR<T,2> >& compression_intervals_input,const A
     correction_force_over_youngs_modulus.Resize(-compression_intervals_input.m,stretching_intervals_input.m,false,false);
     intervals(0)=0;youngs_modulus_scaling(0)=1;correction_force_over_youngs_modulus(0)=0;
     for(int i=0;i<stretching_intervals_input.m;i++){ // stretching phases
-        intervals(i)=stretching_intervals_input(i)[1];youngs_modulus_scaling(i)=stretching_intervals_input(i)[2];
+        intervals(i)=stretching_intervals_input(i)[0];youngs_modulus_scaling(i)=stretching_intervals_input(i)[1];
         correction_force_over_youngs_modulus(i)=correction_force_over_youngs_modulus(i-1)+intervals(i)*(youngs_modulus_scaling(i-1)-youngs_modulus_scaling(i));}
     for(int i=0;i<compression_intervals_input.m;i++){ // compression phases
-        intervals(-i)=compression_intervals_input(i)[1];youngs_modulus_scaling(-i)=compression_intervals_input(i)[2];
+        intervals(-i)=compression_intervals_input(i)[0];youngs_modulus_scaling(-i)=compression_intervals_input(i)[1];
         correction_force_over_youngs_modulus(-i)=correction_force_over_youngs_modulus(1-i)+intervals(-i)*(youngs_modulus_scaling(1-i)-youngs_modulus_scaling(-i));}
 
     if(constant_youngs_modulus){
@@ -49,7 +49,7 @@ Update_Position_Based_State(const T time,const bool is_position_update)
         typename BASE::STATE& state=states(s);
         const VECTOR<int,2>& nodes=segment_mesh.elements(s);
         state.nodes=nodes;
-        state.direction=X(nodes[2])-X(nodes[1]);
+        state.direction=X(nodes[1])-X(nodes[0]);
         current_lengths(s)=state.direction.Normalize();
         T relative_deformation=(current_lengths(s)-visual_restlength(s))/restlength(s);
         int index=Find_Interval(relative_deformation);
@@ -70,7 +70,7 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
     for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
         const VECTOR<int,2>& nodes=segment_mesh.elements(s);
         TV force=correction_force(s)*states(s).direction;
-        F(nodes[1])+=force;F(nodes[2])-=force;}
+        F(nodes[0])+=force;F(nodes[1])-=force;}
 }
 //#####################################################################
 // Function Set_Overdamping_Fraction

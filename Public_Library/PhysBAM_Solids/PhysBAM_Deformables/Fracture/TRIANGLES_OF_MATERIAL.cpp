@@ -74,10 +74,10 @@ Construct_Material_Surface_Mesh()
         if(i_is_material && j_is_material && k_is_material){
             Add_To_Material_Surface_Mesh_Face_Triangle(t);continue;}
         VECTOR<int,2> emb_segs=embedded_object.Embedded_Subelements_In_Element(t);
-        if(emb_segs[2]){
+        if(emb_segs[1]){
             Add_To_Material_Surface_Mesh_Subquadrilateral_Containg_Diamond_Node(t);
             Add_To_Material_Surface_Mesh_Corner_Triangles(t);} 
-        else if(emb_segs[1]){
+        else if(emb_segs[0]){
             Add_To_Material_Surface_Mesh_Isolated_Node_Subtriangle(t);
             Add_To_Material_Surface_Mesh_Subquadrilateral_Opposite_Isolated_Node(t);}}
     if(!embedded_segments_in_triangle_defined){
@@ -182,8 +182,8 @@ Add_To_Material_Surface_Mesh_Isolated_Node_Subtriangle(const int triangle)
     if(!embedded_object.Node_In_Simplex_Is_Material(isolated_node,triangle)) return;
     int i,j,k;embedded_object.simplicial_object.mesh.elements(triangle).Get(i,j,k);
     VECTOR<int,2> emb_segments=embedded_object.Embedded_Subelements_In_Element(triangle);
-    assert(emb_segments[1] && !emb_segments[2]);
-    int curve_particle1,curve_particle2;embedded_object.embedded_mesh.elements(emb_segments[1]).Get(curve_particle1,curve_particle2);
+    assert(emb_segments[0] && !emb_segments[1]);
+    int curve_particle1,curve_particle2;embedded_object.embedded_mesh.elements(emb_segments[0]).Get(curve_particle1,curve_particle2);
     int embedded_curve_particle1=embedded_object.embedded_particles.subset_index_from_point_cloud_index(curve_particle1);
     if(isolated_node == i){
         if(embedded_object.Is_Parent(j,embedded_curve_particle1)) Add_To_Material_Surface_Mesh_Subtriangle(curve_particle1,curve_particle2,i);
@@ -211,8 +211,8 @@ Add_To_Material_Surface_Mesh_Subquadrilateral_Opposite_Isolated_Node(const int t
 {
     int i,j,k,isolated_node=embedded_object.Isolated_Node(triangle);embedded_object.simplicial_object.mesh.elements(triangle).Get(i,j,k);
     VECTOR<int,2> emb_segments=embedded_object.Embedded_Subelements_In_Element(triangle);
-    assert(emb_segments[1] && !emb_segments[2]);
-    int curve_particle1,curve_particle2;embedded_object.embedded_mesh.elements(emb_segments[1]).Get(curve_particle1,curve_particle2);
+    assert(emb_segments[0] && !emb_segments[1]);
+    int curve_particle1,curve_particle2;embedded_object.embedded_mesh.elements(emb_segments[0]).Get(curve_particle1,curve_particle2);
     int embedded_curve_particle1=embedded_object.embedded_particles.subset_index_from_point_cloud_index(curve_particle1);
     if(isolated_node == i){
         if(!embedded_object.Node_In_Simplex_Is_Material(j,triangle)) return;

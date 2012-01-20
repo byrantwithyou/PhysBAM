@@ -263,7 +263,7 @@ Rigid_Fracture_Where_High_Stress(const T small_number)
                 ARRAY<TV> tet_centers(mesh.elements.m);
                 for(int t=0;t<mesh.elements.m;t++){
                     const VECTOR<int,4>& nodes=mesh.elements(t);
-                    tet_centers(t)=rigid_body.Frame()*TETRAHEDRON<T>::Center(rigid_body.particles.X(nodes[1]),rigid_body.particles.X(nodes[2]),rigid_body.particles.X(nodes[3]),rigid_body.particles.X(nodes[4]));}
+                    tet_centers(t)=rigid_body.Frame()*TETRAHEDRON<T>::Center(rigid_body.particles.X(nodes[0]),rigid_body.particles.X(nodes[1]),rigid_body.particles.X(nodes[2]),rigid_body.particles.X(nodes[3]));}
                 rigid_body.grain_boundaries(grain_boundary)->Initialize_Element_Weakness_Multiplier(tet_centers);
                 ARRAY<T> accumulator(rigid_body.grain_boundaries(grain_boundary)->Number_Of_Regions());
                 ARRAY<int> number_of_nodes(rigid_body.grain_boundaries(grain_boundary)->Number_Of_Regions());
@@ -345,7 +345,7 @@ Adjust_Nodes_For_Segment_Triangle_Intersections(T threshhold)
         int i,j,k;material_surface.mesh.elements(t).Get(i,j,k);
         TRIANGLE_3D<T> triangle(particles.X(i),particles.X(j),particles.X(k));
         T fraction;TV weights;
-        if(INTERSECTION::Intersects(SEGMENT_3D<T>(particles.X(segment[1]),particles.X(segment[2])),triangle,fraction,weights,solids_parameters.solid_body_collection.deformable_body_collection.triangle_collisions.geometry.small_number)){
+        if(INTERSECTION::Intersects(SEGMENT_3D<T>(particles.X(segment[0]),particles.X(segment[1])),triangle,fraction,weights,solids_parameters.solid_body_collection.deformable_body_collection.triangle_collisions.geometry.small_number)){
             for(int a=0;a<2;a++){
                 T perturb_amount=triangle.Signed_Distance(particles.X(segment[a]))+(T)1.5*solids_parameters.solid_body_collection.deformable_body_collection.triangle_collisions.collision_thickness;
                 if(fraction<.5 && perturb_amount>0 && (!edge_triangle_perturbations(segment[a]).x || perturb_amount<edge_triangle_perturbations(segment[a]).z)){

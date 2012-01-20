@@ -36,10 +36,10 @@ template<class TV> void INTERSECTING_PAIRS_VISITOR<TV>::
 Store_Helper(const int segment1,const int segment2,const VECTOR<T,2>* dimension)
 {
     const VECTOR<VECTOR<int,2>,2> nodes(segments(segment1),faces(segment2));
-    if(INTERSECTION::Intersects(SEGMENT_2D<T>(X_self_collision_free.Subset(nodes[1])),SEGMENT_2D<T>(X_self_collision_free.Subset(nodes[2])),thickness_over_2)) return;
+    if(INTERSECTION::Intersects(SEGMENT_2D<T>(X_self_collision_free.Subset(nodes[0])),SEGMENT_2D<T>(X_self_collision_free.Subset(nodes[1])),thickness_over_2)) return;
     for(int i=0;i<2;i++){int j=3-i;
         for(int a=0;a<2;a++){
-            intersecting_point_face_pairs.Set(VECTOR<int,3>(nodes[i][a],nodes[j][1],nodes[j][2]));
+            intersecting_point_face_pairs.Set(VECTOR<int,3>(nodes[i][a],nodes[j][0],nodes[j][1]));
             for(int b=0;b<2;b++) intersecting_edge_edge_pairs.Set(VECTOR<int,2>(nodes[i][a],nodes[j][b]));}}
     count++;
 }
@@ -54,11 +54,11 @@ Store_Helper(const int segment,const int triangle,const VECTOR<T,3>* dimension)
         return;
     if(!face_structure.triangulated_surface->mesh.element_edges) face_structure.triangulated_surface->mesh.Initialize_Element_Edges();
     const VECTOR<int,3>& triangle_edges=(*face_structure.triangulated_surface->mesh.element_edges)(triangle);
-    for(int a=0;a<2;a++) intersecting_point_face_pairs.Set(VECTOR<int,4>(segment_nodes[a],triangle_nodes[1],triangle_nodes[2],triangle_nodes[3]));
+    for(int a=0;a<2;a++) intersecting_point_face_pairs.Set(VECTOR<int,4>(segment_nodes[a],triangle_nodes[0],triangle_nodes[1],triangle_nodes[2]));
     for(int a=0;a<3;a++){
         const VECTOR<int,2> other_segment_nodes=segments(triangle_edges[a]); // need to use triangle_edges to get the correct segment orientation
-        intersecting_edge_edge_pairs.Set(VECTOR<int,4>(segment_nodes[1],segment_nodes[2],other_segment_nodes[1],other_segment_nodes[2]));
-        intersecting_edge_edge_pairs.Set(VECTOR<int,4>(other_segment_nodes[1],other_segment_nodes[2],segment_nodes[1],segment_nodes[2]));}
+        intersecting_edge_edge_pairs.Set(VECTOR<int,4>(segment_nodes[0],segment_nodes[1],other_segment_nodes[0],other_segment_nodes[1]));
+        intersecting_edge_edge_pairs.Set(VECTOR<int,4>(other_segment_nodes[0],other_segment_nodes[1],segment_nodes[0],segment_nodes[1]));}
     count++;
 }
 //####################################################################

@@ -362,7 +362,7 @@ public:
     {return VECTOR<T,4>(x,y,z,element);}
 
     template<int d2> VECTOR<T,3+d2> Append_Elements(const VECTOR<T,d2>& elements) const
-    {VECTOR<T,3+d2> r;r[1]=x;r[2]=y;r[3]=z;for(int i=0;i<d2;i++) r[i+3]=elements[i];return r;}
+    {VECTOR<T,3+d2> r;r[0]=x;r[1]=y;r[2]=z;for(int i=0;i<d2;i++) r[i+3]=elements[i];return r;}
 
     VECTOR<T,3> Sorted() const
     {VECTOR<T,3> r(*this);exchange_sort(r.x,r.y,r.z);return r;}

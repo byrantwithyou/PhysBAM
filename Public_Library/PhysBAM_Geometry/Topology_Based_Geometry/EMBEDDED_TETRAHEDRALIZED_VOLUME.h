@@ -51,9 +51,9 @@ public:
     {int triangle_count=Number_Of_Embedded_Subelements_In_Element(tetrahedron);
     if(triangle_count <= 1) return false;
     VECTOR<int,4> triangles=Embedded_Subelements_In_Element(tetrahedron);
-    if(triangle_count == 2) return !Node_Separated_By_Embedded_Subelement(triangles[1]);
-    if(triangle_count == 3) return !Node_Separated_By_Embedded_Subelement(triangles[1]) || !Node_Separated_By_Embedded_Subelement(triangles[2])
-        || !Node_Separated_By_Embedded_Subelement(triangles[3]);
+    if(triangle_count == 2) return !Node_Separated_By_Embedded_Subelement(triangles[0]);
+    if(triangle_count == 3) return !Node_Separated_By_Embedded_Subelement(triangles[0]) || !Node_Separated_By_Embedded_Subelement(triangles[1])
+        || !Node_Separated_By_Embedded_Subelement(triangles[2]);
     return true;} // if four embedded triangles, there must be a quad
  
     bool Segment_Is_Broken(const int node1,const int node2) const

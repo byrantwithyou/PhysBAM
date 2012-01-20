@@ -180,7 +180,7 @@ Display_3D() const
     int dominant_axis=1;
 
     if(dominant_axis==1){
-        if(view_forward[1]>0){
+        if(view_forward[0]>0){
             ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> colors;
             for(int i=grid.counts.x;i>=1;i--) for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++){
                 for(int t=0;t<4;t++) OpenGL_Color(Do_Color(i,j,k).rgba,colors);
@@ -201,7 +201,7 @@ Display_3D() const
                 OpenGL_Vertex(VECTOR<T,3>(pos.x,pos.y+0.5*grid.dX.y,pos.z-0.5*grid.dX.z),vertices);
                 OpenGL_Draw_Arrays(GL_TRIANGLE_STRIP,3,vertices,colors);vertices.Resize(0);colors.Resize(0);}}}
     else if(dominant_axis==2){
-        if(view_forward[2]>0){
+        if(view_forward[1]>0){
             ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> colors;
             for(int j=grid.counts.y;j>=1;j--) for(int i=0;i<grid.counts.x;i++) for(int k=0;k<grid.counts.z;k++){
                 for(int t=0;t<4;t++) OpenGL_Color(Do_Color(i,j,k).rgba,colors);
@@ -222,7 +222,7 @@ Display_3D() const
                 OpenGL_Vertex(VECTOR<T,3>(pos.x+0.5*grid.dX.x,pos.y,pos.z-0.5*grid.dX.z),vertices);
                 OpenGL_Draw_Arrays(GL_TRIANGLE_STRIP,3,vertices,colors);vertices.Resize(0);colors.Resize(0);}}}
     else if(dominant_axis==3){
-        if(view_forward[3]>0){
+        if(view_forward[2]>0){
             ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> colors;
             for(int k=grid.counts.z;k>=1;k--) for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++){
                 for(int t=0;t<4;t++) OpenGL_Color(Do_Color(i,j,k).rgba,colors);

@@ -578,7 +578,7 @@ Tetrahedron_Refinement_Criteria(const int index) const
             TV x=a*xi+b*xj+c*xk+(1-a-b-c)*xl;T phi=implicit_surface->Extended_Phi(x); // sample point
             if(abs(phi)<minimum_cell_size_in_tetrahedron){ // close to the interface
                 VECTOR<T,2> curvatures=implicit_surface->Principal_Curvatures(x);
-                if(max_length*(abs(curvatures[1])+abs(curvatures[2]))>curvature_subdivision_threshold) return true;}
+                if(max_length*(abs(curvatures[0])+abs(curvatures[1]))>curvature_subdivision_threshold) return true;}
             if(phi>=0) seen_positive=true;if(phi<=0) seen_negative=true;
             if(!seen_big_error){ // figure out linear interpolation of phi through the corners of the tet
                 MATRIX<T,4> A(1,1,1,1,xi.x,xj.x,xk.x,xl.x,xi.y,xj.y,xk.y,xl.y,xi.z,xj.z,xk.z,xl.z);A.Invert();

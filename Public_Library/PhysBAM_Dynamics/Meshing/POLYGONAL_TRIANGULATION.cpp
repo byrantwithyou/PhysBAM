@@ -45,7 +45,7 @@ Triangulate_Convex_Planar_Polygon(const ARRAY<VECTOR<T,2> >& positions,ARRAY<VEC
                 if(!used(incoming_segs_to_1(i))&&!used(outgoing_segs_from_2(j))&&segments(incoming_segs_to_1(i))(0)==segments(outgoing_segs_from_2(j))(1)){
                     int segment_2_id=outgoing_segs_from_2(j);int segment_3_id=incoming_segs_to_1(i);int node_3=segments(segment_3_id)(0);
                     VECTOR<int,3> nodes(node_1,node_2,node_3);VECTOR<VECTOR<T,2>,3> triangle_X(positions.Subset(nodes));
-                    if(TRIANGLE_2D<T>::Signed_Area(triangle_X[1],triangle_X[2],triangle_X[3])<0) continue;
+                    if(TRIANGLE_2D<T>::Signed_Area(triangle_X[0],triangle_X[1],triangle_X[2])<0) continue;
                     // ensure no points lie inside the triangle
                     bool point_inside=false;
                     for(int k=0;k<positions.m;k++) if(!nodes.Contains(k))
@@ -103,8 +103,8 @@ Triangulate_Nonconvex_Planar_Connected_Polygon(const ARRAY<VECTOR<T,2> >& positi
     const ARRAY<VECTOR<int,2> >& segments=segments_input(0);
     ARRAY<int> vertices;
     for(int s=0;s<segments.m;s++){
-        if(segments(s)[2]!=segments(s%segments.m+1)[1]) PHYSBAM_FATAL_ERROR();
-        vertices.Append(segments(s)[1]);}
+        if(segments(s)[1]!=segments(s%segments.m+1)[0]) PHYSBAM_FATAL_ERROR();
+        vertices.Append(segments(s)[0]);}
     if(vertices.m<3) PHYSBAM_FATAL_ERROR();
     for(int s=0;s<segments.m-2;s++)
         triangles.Append(VECTOR<int,3>(vertices(0),vertices(s+1),vertices(s+2)));

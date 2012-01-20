@@ -452,48 +452,48 @@ CFL(const T time) const
 template<class T_GRID,class T> void Set_Eigensystems_Helper(VECTOR<EIGENSYSTEM<T,VECTOR<T,3> >*,1>& eigensystems_default,VECTOR<EIGENSYSTEM<T,VECTOR<T,3> >*,1>& eigensystems,VECTOR<EIGENSYSTEM<T,VECTOR<T,3> >*,1>& eigensystems_pressureonly,
     const EULER_PROJECTION_UNIFORM<T_GRID>& euler_projection,const bool advection_only)
 {
-    if(eigensystems_default[1]) delete eigensystems_default[1];eigensystems_default[1]=new EULER_1D_EIGENSYSTEM_F<T>();
-    if(eigensystems_pressureonly[1]) delete eigensystems_pressureonly[1];eigensystems_pressureonly[1]=new EULER_1D_EIGENSYSTEM_F<T>(true);
-    if(eigensystems[1]) delete eigensystems[1];
-    if(advection_only) eigensystems[1]=new EULER_1D_EIGENSYSTEM_F_ADVECTION_ONLY<T>();
-    else eigensystems[1]=new EULER_1D_EIGENSYSTEM_F<T>();
+    if(eigensystems_default[0]) delete eigensystems_default[0];eigensystems_default[0]=new EULER_1D_EIGENSYSTEM_F<T>();
+    if(eigensystems_pressureonly[0]) delete eigensystems_pressureonly[0];eigensystems_pressureonly[0]=new EULER_1D_EIGENSYSTEM_F<T>(true);
+    if(eigensystems[0]) delete eigensystems[0];
+    if(advection_only) eigensystems[0]=new EULER_1D_EIGENSYSTEM_F_ADVECTION_ONLY<T>();
+    else eigensystems[0]=new EULER_1D_EIGENSYSTEM_F<T>();
 }
 template<class T_GRID,class T> void Set_Eigensystems_Helper(VECTOR<EIGENSYSTEM<T,VECTOR<T,4> >*,2>& eigensystems_default,VECTOR<EIGENSYSTEM<T,VECTOR<T,4> >*,2>& eigensystems,VECTOR<EIGENSYSTEM<T,VECTOR<T,4> >*,2>& eigensystems_pressureonly,
     const EULER_PROJECTION_UNIFORM<T_GRID>& euler_projection,const bool advection_only)
 {
-    if(eigensystems_default[1]) delete eigensystems_default[1];eigensystems_default[1]=new EULER_2D_EIGENSYSTEM_F<T>();
-    if(eigensystems_default[2]) delete eigensystems_default[2];eigensystems_default[2]=new EULER_2D_EIGENSYSTEM_G<T>();
-    if(eigensystems_pressureonly[1]) delete eigensystems_pressureonly[1];eigensystems_pressureonly[1]=new EULER_2D_EIGENSYSTEM_F<T>(true);
-    if(eigensystems_pressureonly[2]) delete eigensystems_pressureonly[2];eigensystems_pressureonly[2]=new EULER_2D_EIGENSYSTEM_G<T>(true);
+    if(eigensystems_default[0]) delete eigensystems_default[0];eigensystems_default[0]=new EULER_2D_EIGENSYSTEM_F<T>();
+    if(eigensystems_default[1]) delete eigensystems_default[1];eigensystems_default[1]=new EULER_2D_EIGENSYSTEM_G<T>();
+    if(eigensystems_pressureonly[0]) delete eigensystems_pressureonly[0];eigensystems_pressureonly[0]=new EULER_2D_EIGENSYSTEM_F<T>(true);
+    if(eigensystems_pressureonly[1]) delete eigensystems_pressureonly[1];eigensystems_pressureonly[1]=new EULER_2D_EIGENSYSTEM_G<T>(true);
+    if(eigensystems[0]) delete eigensystems[0];
     if(eigensystems[1]) delete eigensystems[1];
-    if(eigensystems[2]) delete eigensystems[2];
     if(advection_only){
-        eigensystems[1]=new EULER_2D_EIGENSYSTEM_F_ADVECTION_ONLY<T>();
-        eigensystems[2]=new EULER_2D_EIGENSYSTEM_G_ADVECTION_ONLY<T>();}
+        eigensystems[0]=new EULER_2D_EIGENSYSTEM_F_ADVECTION_ONLY<T>();
+        eigensystems[1]=new EULER_2D_EIGENSYSTEM_G_ADVECTION_ONLY<T>();}
     else{
-        eigensystems[1]=new EULER_2D_EIGENSYSTEM_F<T>();
-        eigensystems[2]=new EULER_2D_EIGENSYSTEM_G<T>();}
+        eigensystems[0]=new EULER_2D_EIGENSYSTEM_F<T>();
+        eigensystems[1]=new EULER_2D_EIGENSYSTEM_G<T>();}
 }
 template<class T_GRID,class T> void Set_Eigensystems_Helper(VECTOR<EIGENSYSTEM<T,VECTOR<T,5> >*,3>& eigensystems_default,VECTOR<EIGENSYSTEM<T,VECTOR<T,5> >*,3>& eigensystems,VECTOR<EIGENSYSTEM<T,VECTOR<T,5> >*,3>& eigensystems_pressureonly,
     const EULER_PROJECTION_UNIFORM<T_GRID>& euler_projection,const bool advection_only)
 {
-    if(eigensystems_default[1]) delete eigensystems_default[1];eigensystems_default[1]=new EULER_3D_EIGENSYSTEM_F<T>();
-    if(eigensystems_default[2]) delete eigensystems_default[2];eigensystems_default[2]=new EULER_3D_EIGENSYSTEM_G<T>();
-    if(eigensystems_default[3]) delete eigensystems_default[3];eigensystems_default[3]=new EULER_3D_EIGENSYSTEM_H<T>();
-    if(eigensystems_pressureonly[1]) delete eigensystems_pressureonly[1];eigensystems_pressureonly[1]=new EULER_3D_EIGENSYSTEM_F<T>(true);
-    if(eigensystems_pressureonly[2]) delete eigensystems_pressureonly[2];eigensystems_pressureonly[2]=new EULER_3D_EIGENSYSTEM_G<T>(true);
-    if(eigensystems_pressureonly[3]) delete eigensystems_pressureonly[3];eigensystems_pressureonly[3]=new EULER_3D_EIGENSYSTEM_H<T>(true);
+    if(eigensystems_default[0]) delete eigensystems_default[0];eigensystems_default[0]=new EULER_3D_EIGENSYSTEM_F<T>();
+    if(eigensystems_default[1]) delete eigensystems_default[1];eigensystems_default[1]=new EULER_3D_EIGENSYSTEM_G<T>();
+    if(eigensystems_default[2]) delete eigensystems_default[2];eigensystems_default[2]=new EULER_3D_EIGENSYSTEM_H<T>();
+    if(eigensystems_pressureonly[0]) delete eigensystems_pressureonly[0];eigensystems_pressureonly[0]=new EULER_3D_EIGENSYSTEM_F<T>(true);
+    if(eigensystems_pressureonly[1]) delete eigensystems_pressureonly[1];eigensystems_pressureonly[1]=new EULER_3D_EIGENSYSTEM_G<T>(true);
+    if(eigensystems_pressureonly[2]) delete eigensystems_pressureonly[2];eigensystems_pressureonly[2]=new EULER_3D_EIGENSYSTEM_H<T>(true);
+    if(eigensystems[0]) delete eigensystems[0];
     if(eigensystems[1]) delete eigensystems[1];
     if(eigensystems[2]) delete eigensystems[2];
-    if(eigensystems[3]) delete eigensystems[3];
     if(advection_only){
-        eigensystems[1]=new EULER_3D_EIGENSYSTEM_F_ADVECTION_ONLY<T>();
-        eigensystems[2]=new EULER_3D_EIGENSYSTEM_G_ADVECTION_ONLY<T>();
-        eigensystems[3]=new EULER_3D_EIGENSYSTEM_H_ADVECTION_ONLY<T>();}
+        eigensystems[0]=new EULER_3D_EIGENSYSTEM_F_ADVECTION_ONLY<T>();
+        eigensystems[1]=new EULER_3D_EIGENSYSTEM_G_ADVECTION_ONLY<T>();
+        eigensystems[2]=new EULER_3D_EIGENSYSTEM_H_ADVECTION_ONLY<T>();}
     else{
-        eigensystems[1]=new EULER_3D_EIGENSYSTEM_F<T>();
-        eigensystems[2]=new EULER_3D_EIGENSYSTEM_G<T>();
-        eigensystems[3]=new EULER_3D_EIGENSYSTEM_H<T>();}
+        eigensystems[0]=new EULER_3D_EIGENSYSTEM_F<T>();
+        eigensystems[1]=new EULER_3D_EIGENSYSTEM_G<T>();
+        eigensystems[2]=new EULER_3D_EIGENSYSTEM_H<T>();}
 }
 
 template<class T_GRID> void EULER_UNIFORM<T_GRID>::

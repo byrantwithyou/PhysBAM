@@ -37,8 +37,8 @@ public:
     {int embedded_node=Embedded_Particle_On_Segment(node1,node2);if(!embedded_node) return false;
     VECTOR<int,2> segments=Embedded_Subelements_In_Element(triangle);
     int global_embedded_node=embedded_particles.active_indices(embedded_node);
+    if(!segments[0]) return false;else if(embedded_mesh.Node_In_Segment(global_embedded_node,segments[0])) return true;
     if(!segments[1]) return false;else if(embedded_mesh.Node_In_Segment(global_embedded_node,segments[1])) return true;
-    if(!segments[2]) return false;else if(embedded_mesh.Node_In_Segment(global_embedded_node,segments[2])) return true;
     return false;}
 
     bool Nodes_Are_Materially_Connected_In_Simplex(const int node1,const int node2,const int simplex) const
@@ -59,13 +59,13 @@ public:
     return (ij>0)+(ik>0)+(jk>0);}
 
     int Embedded_Node_Common_To_Both_Segments_In_Triangle(const int triangle)
-    {VECTOR<int,2> emb_segments=Embedded_Subelements_In_Element(triangle);assert(emb_segments[1] && emb_segments[2]);
-    int global_a,global_b,global_c,global_d;embedded_mesh.elements(emb_segments[1]).Get(global_a,global_b);embedded_mesh.elements(emb_segments[2]).Get(global_c,global_d);
+    {VECTOR<int,2> emb_segments=Embedded_Subelements_In_Element(triangle);assert(emb_segments[0] && emb_segments[1]);
+    int global_a,global_b,global_c,global_d;embedded_mesh.elements(emb_segments[0]).Get(global_a,global_b);embedded_mesh.elements(emb_segments[1]).Get(global_c,global_d);
     return embedded_particles.subset_index_from_point_cloud_index((global_a==global_c || global_a==global_d)?global_a:global_b);}
 
     int Isolated_Node(const int triangle)
-    {VECTOR<int,2> emb_segments=Embedded_Subelements_In_Element(triangle);assert(emb_segments[1] && !emb_segments[2]);
-    return Node_Separated_By_Embedded_Subelement(emb_segments[1]);}
+    {VECTOR<int,2> emb_segments=Embedded_Subelements_In_Element(triangle);assert(emb_segments[0] && !emb_segments[1]);
+    return Node_Separated_By_Embedded_Subelement(emb_segments[0]);}
     
     int Diamond_Node(const int triangle)
     {if(Number_Of_Embedded_Subelements_In_Element(triangle)<2) return 0;

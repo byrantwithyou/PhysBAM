@@ -45,7 +45,7 @@ Add_Embedded_Particle(EMBEDDED_OBJECT<TV,d>& eo,const VECTOR<int,2>& nodes,const
     if(reinitialize_hash_table) eo.Initialize_Parents_To_Embedded_Particles_Hash_Table();
     if(eo.embedded_children_index) eo.Add_Embedded_Particle_To_Embedded_Children(new_embedded_particle);
     T lambda=eo.interpolation_fraction(new_embedded_particle);
-    eo.embedded_particles.X(new_embedded_particle)=LINEAR_INTERPOLATION<T,TV>::Linear(eo.particles.X(nodes[1]),eo.particles.X(nodes[2]),lambda);
+    eo.embedded_particles.X(new_embedded_particle)=LINEAR_INTERPOLATION<T,TV>::Linear(eo.particles.X(nodes[0]),eo.particles.X(nodes[1]),lambda);
     return new_embedded_particle;
 }
 //#####################################################################
@@ -69,7 +69,7 @@ Add_Embedded_Subelement_To_Embedded_Subelements_In_Element(EMBEDDED_OBJECT<TV,d>
         int embedded_subelement_number=++(*eo.number_of_embedded_subelements_in_parent_element)(index);
         (*eo.embedded_subelements_in_parent_element)(index)(embedded_subelement_number)=subelement;}
     else{
-        VECTOR<int,EMBEDDED_OBJECT<TV,d>::max_subelements_per_element> subelements;subelements[1]=subelement;
+        VECTOR<int,EMBEDDED_OBJECT<TV,d>::max_subelements_per_element> subelements;subelements[0]=subelement;
         eo.embedded_subelements_in_parent_element->Append(subelements);
         eo.number_of_embedded_subelements_in_parent_element->Append(1);
         (*eo.embedded_subelements_in_parent_element_index)(element)=eo.embedded_subelements_in_parent_element->m;}
