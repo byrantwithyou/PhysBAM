@@ -78,7 +78,7 @@ FLUIDS_PARAMETERS(const TYPE type)
     collision_bodies_affecting_fluid(new T_GRID_BASED_COLLISION_GEOMETRY(*grid)),need_destroy_collision_bodies_affecting_fluid(true),
     collidable_contour_value(0),collidable_phi_replacement_value((T)1e-5),flood_fill_for_bubbles(false),
     use_maccormack_semi_lagrangian_advection(false),use_maccormack_compute_mask(true),use_maccormack_for_level_set(true),use_maccormack_for_incompressible(true),
-    bandwidth_without_maccormack_near_interface(0),mass_conservation(false),mass_conservation_minimum_refinement_depth(1),mass_conservation_maximum_refinement_depth(0),analytic_test(false),
+    bandwidth_without_maccormack_near_interface(0),analytic_test(false),
     compressible_boundary(0),compressible_pressure_boundary(0),compressible_eos(0),compressible_conservation_method(0),
     compressible_set_max_time_step(false),compressible_max_time_step((T)1.e8),compressible_spatial_order(3),compressible_rungekutta_order(3),compressible_tolerance((T)1e-8),
     compressible_iterations(0),compressible_timesplit(false),compressible_apply_isobaric_fix(false),compressible_monitor_conservation_error(false),

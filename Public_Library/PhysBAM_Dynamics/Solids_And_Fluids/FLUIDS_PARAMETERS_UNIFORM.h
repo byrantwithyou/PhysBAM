@@ -73,7 +73,7 @@ public:
     using BASE::phi_boundary_reflection;using BASE::phi_boundary_multiphase;using BASE::flood_fill_for_bubbles;using BASE::adhesion_half_bandwidth;using BASE::sph;
     using BASE::use_maccormack_semi_lagrangian_advection;using BASE::use_maccormack_for_incompressible;using BASE::use_maccormack_for_level_set;using BASE::number_of_ghost_cells;
     using BASE::cfl;using BASE::density_buoyancy_constant;using BASE::rho_top;using BASE::rho_bottom;using BASE::density_buoyancy_threshold;using BASE::use_sph_for_removed_negative_particles;
-    using BASE::mass_conservation;using BASE::analytic_test;using BASE::hamilton_jacobi_weno;using BASE::compressible;using BASE::compressible_boundary;using BASE::compressible_pressure_boundary;
+    using BASE::analytic_test;using BASE::hamilton_jacobi_weno;using BASE::compressible;using BASE::compressible_boundary;using BASE::compressible_pressure_boundary;
     using BASE::compressible_eos;using BASE::compressible_conservation_method;using BASE::compressible_set_max_time_step;using BASE::compressible_max_time_step;
     using BASE::compressible_spatial_order;using BASE::compressible_rungekutta_order;using BASE::compressible_timesplit;using BASE::compressible_apply_isobaric_fix;using BASE::compressible_apply_cavitation_correction;using BASE::compressible_adaptive_time_step;
     using BASE::write_flattened_particles;using BASE::use_poisson;using BASE::simulate;using BASE::use_slip;using BASE::thread_queue;using BASE::number_of_threads;using BASE::removed_positive_particle_buoyancy_constant;

@@ -167,12 +167,6 @@ Initialize()
     if(!example.fluids_parameters.compressible) example.Initialize_Advection();
     Initialize_Fluids_Grids(); // initialize the valid masks
 
-    if(example.fluids_parameters.mass_conservation){
-        for(int i=0;i<number_of_regions;i++){
-            PARTICLE_LEVELSET_UNIFORM<T_GRID>& pls=example.fluids_parameters.particle_levelset_evolution->Particle_Levelset(i);
-            pls.template_particles.array_collection->template Add_Array<T>(ATTRIBUTE_ID_MATERIAL_VOLUME);
-            pls.template_removed_particles.array_collection->template Add_Array<T>(ATTRIBUTE_ID_MATERIAL_VOLUME);}}
-
     // initialize levelset
     if(number_of_regions>=1){
         particle_levelset_evolution->Set_Number_Particles_Per_Cell(example.fluids_parameters.number_particles_per_cell);
@@ -723,10 +717,6 @@ Project_Fluid(const T dt_projection,const T time_projection,const int substep)
             fluids_parameters.sph_evolution->Make_Incompressible(particle_levelset_evolution->Particle_Levelset(1).removed_negative_particles,example.fluid_collection.incompressible_fluid_collection.face_velocities,dt_projection,time_projection);
             Write_Substep("after one-way coupled sph solve",substep,1);
             incompressible->projection.Restore_After_SPH(example.fluid_collection.incompressible_fluid_collection.face_velocities,fluids_parameters.sph_evolution->use_variable_density_solve,true);}
-
-        if(fluids_parameters.mass_conservation){
-            example.Extrapolate_Phi_Into_Objects(time);
-            Write_Substep("phis used for pressure sourcing",0,1);}
 
         LOG::Time("solving for the pressure and viscosity");
         Write_Substep("before laplace solve (Project_Fluid)",substep,1);

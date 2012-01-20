@@ -157,9 +157,6 @@ public:
     bool use_maccormack_for_level_set;
     bool use_maccormack_for_incompressible;
     T bandwidth_without_maccormack_near_interface;
-    bool mass_conservation;
-    int mass_conservation_minimum_refinement_depth;
-    int mass_conservation_maximum_refinement_depth;
     bool analytic_test;
     T_BOUNDARY_DIMENSION_SCALAR* compressible_boundary;
     T_BOUNDARY_SCALAR* compressible_pressure_boundary;
