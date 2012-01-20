@@ -317,7 +317,7 @@ public:
     {assert(1==index);return VECTOR<T,0>();}
 
     VECTOR<T,2> Insert(const T& element,const int index) const
-    {VECTOR<T,2> r;r[index]=element;r[3-index]=x;return r;}
+    {VECTOR<T,2> r;r[index]=element;r[1-index]=x;return r;}
 
     VECTOR<T,2> Append(const T& element) const
     {return VECTOR<T,2>(x,element);}

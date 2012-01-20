@@ -268,7 +268,7 @@ public:
     {STATIC_ASSERT(dimension==1);return X_Face(TV_INT(i));}
 
     TV X_Face(const TV_INT& index) const
-    {return Axis_X_Face(index,1);}
+    {return Axis_X_Face(index,0);}
 
     TV Y_Face(const int i,const int j,const int ij) const
     {STATIC_ASSERT(dimension==3);return Y_Face(TV_INT(i,j,ij));}
@@ -277,13 +277,13 @@ public:
     {STATIC_ASSERT(dimension==2);return Y_Face(TV_INT(i,j));}
 
     TV Y_Face(const TV_INT& index) const
-    {return Axis_X_Face(index,2);}
+    {return Axis_X_Face(index,1);}
 
     TV Z_Face(const int i,const int j,const int ij) const
     {STATIC_ASSERT(dimension==3);return Z_Face(TV_INT(i,j,ij));}
 
     TV Z_Face(const TV_INT& index) const
-    {return Axis_X_Face(index,3);}
+    {return Axis_X_Face(index,2);}
 
     TV Face(const int axis,const TV_INT& index) const
     {TV shifted_index(TV(index)+(T).5);shifted_index(axis)-=(T).5;return domain.min_corner+shifted_index*dX;}
@@ -314,7 +314,7 @@ public:
     assert((unsigned)axis<3&&(unsigned)node<4);return face_index+corner_from_face_offset[axis][node];}
 
     static TV_INT Face_Node_Index(const int axis,const VECTOR<int,2>& face_index,const int node)
-    {assert((unsigned)node<2);TV_INT index=face_index;index[3-axis]+=node-1;return index;}
+    {assert((unsigned)node<2);TV_INT index=face_index;index[1-axis]+=node-1;return index;}
 
     static TV_INT Face_Node_Index(const int axis,const VECTOR<int,1>& face_index,const int node)
     {assert(axis==1&&node==1);return face_index;}
@@ -327,7 +327,7 @@ public:
     assert((unsigned)face<4&&(unsigned)axis<3);return node_index+face_from_node_offset[axis][face];}
 
     static TV_INT Node_Face_Index(const int axis,const VECTOR<int,2>& node_index,const int face)
-    {assert((unsigned)face<2);TV_INT index=node_index;index[3-axis]+=face-2;return index;}
+    {assert((unsigned)face<2);TV_INT index=node_index;index[1-axis]+=face-2;return index;}
 
     static TV_INT Node_Face_Index(const int axis,const VECTOR<int,1>& node_index,const int face)
     {assert(axis==1&&face==1);return node_index;}
