@@ -51,7 +51,7 @@ template<class T,class TV> void Compute_Stiffness_Matrix_Helper(SEGMENT_MESH& me
     for(int p=0;p<mesh.number_nodes;p++){const ARRAY<int>& neighbors=(*mesh.neighbor_nodes)(p);
         for(int i=0;i<neighbors.m;i++) for(int j=i+1;j<neighbors.m;j++){
             const VECTOR<int,3> nodes(neighbors(i),p,neighbors(j));
-            TV X1=X(nodes[1]),X2=X(nodes[2]),X3=X(nodes[3]);
+            TV X1=X(nodes[0]),X2=X(nodes[1]),X3=X(nodes[2]);
             TV e12=X2-X1,e23=X3-X2;
             T length12=e12.Magnitude(),length23=e23.Magnitude();
             // If edge lengths remain constant, we have |sin psi/2| = |(X1-X2)/length12 + (X3-X2)/length23|.
@@ -81,7 +81,7 @@ template<class T,class TV> void Compute_Stiffness_Matrix_Helper(TRIANGLE_MESH& m
     SEGMENT_MESH& segment_mesh=mesh.Get_Segment_Mesh();
     ARRAY<int> row_lengths(mesh.number_nodes);
     for(int s=0;s<segment_mesh.elements.m;s++) row_lengths(segment_mesh.elements(s).Min())++;
-    for(int q=0;q<bending_quadruples.m;q++) row_lengths(min(bending_quadruples(q)[1],bending_quadruples(q)[4]))++;
+    for(int q=0;q<bending_quadruples.m;q++) row_lengths(min(bending_quadruples(q)[0],bending_quadruples(q)[3]))++;
 
     // ensure no empty rows
     ARRAY<int> empty_rows;for(int p=0;p<mesh.number_nodes;p++) if(!row_lengths(p)) empty_rows.Append(p);
@@ -93,7 +93,7 @@ template<class T,class TV> void Compute_Stiffness_Matrix_Helper(TRIANGLE_MESH& m
     // for details see Wardetzky et al., "Discrete Quadratic Curvature Energies", Computer Aided Geometric Design, 2007
     stiffness_matrix_diagonal=CONSTANT_ARRAY<T>(mesh.number_nodes,0);
     for(int q=0;q<bending_quadruples.m;q++){const VECTOR<int,4>& nodes=bending_quadruples(q);
-        TV X1=X(nodes[1]),X2=X(nodes[2]),X3=X(nodes[3]),X4=X(nodes[4]);
+        TV X1=X(nodes[0]),X2=X(nodes[1]),X3=X(nodes[2]),X4=X(nodes[3]);
         TV e0=X3-X2,e1=X4-X2,e2=X1-X2,e3=X4-X3,e4=X1-X3; // edge numbering matches Wardetzky et al. p. 16
         T cross01=TV::Cross_Product(e0,e1).Magnitude(),cross02=TV::Cross_Product(e0,e2).Magnitude(),
             cross03=TV::Cross_Product(e0,e3).Magnitude(),cross04=TV::Cross_Product(e0,e4).Magnitude();
@@ -102,7 +102,7 @@ template<class T,class TV> void Compute_Stiffness_Matrix_Helper(TRIANGLE_MESH& m
         T max_cot=max(cot01,cot02,cot03,cot04);
         T scale=3/(cross01+cross02);
         if(max_cot>5) scale*=25/sqr(max_cot);
-        VECTOR<T,4> c;c[2]=cot03+cot04;c[3]=cot01+cot02;c[4]=-cot01-cot03;c[1]=-cot02-cot04; // node numbering matches bending quadruple
+        VECTOR<T,4> c;c[1]=cot03+cot04;c[2]=cot01+cot02;c[3]=-cot01-cot03;c[0]=-cot02-cot04; // node numbering matches bending quadruple
         for(int i=0;i<nodes.m;i++){
             stiffness_matrix_diagonal(nodes[i])+=scale*sqr(c[i]);
             for(int j=i+1;j<=nodes.m;j++){int a=nodes[i],b=nodes[j];exchange_sort(a,b);

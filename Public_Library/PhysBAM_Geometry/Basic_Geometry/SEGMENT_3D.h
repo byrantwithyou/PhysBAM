@@ -28,7 +28,7 @@ public:
 
     template<class T_ARRAY>
     SEGMENT_3D(const T_ARRAY& X_input)
-        :x1(X_input(1)),x2(X_input(2))
+        :x1(X_input(0)),x2(X_input(1))
     {
         STATIC_ASSERT(T_ARRAY::m==2);
     }
@@ -44,7 +44,7 @@ public:
 
     template<class T_ARRAY>
     static T Signed_Size(const T_ARRAY& X)
-    {STATIC_ASSERT(T_ARRAY::m==2);return Size(X(1),X(2));}
+    {STATIC_ASSERT(T_ARRAY::m==2);return Size(X(0),X(1));}
 
     template<class T_ARRAY>
     static T Size(const T_ARRAY& X)
@@ -61,17 +61,17 @@ public:
     template<class T_ARRAY>
     void Edge_Edge_Interaction_Data(const SEGMENT_3D<T>& segment,const INDIRECT_ARRAY<T_ARRAY,VECTOR<int,4>&> V_edges,const T& distance,VECTOR<T,3>& normal,const VECTOR<T,2>& weights,
         const T small_number=0,const bool verbose=true) const
-    {Edge_Edge_Interaction_Data(segment,V_edges(1),V_edges(2),V_edges(3),V_edges(4),distance,normal,weights,small_number,verbose);}
+    {Edge_Edge_Interaction_Data(segment,V_edges(0),V_edges(1),V_edges(2),V_edges(3),distance,normal,weights,small_number,verbose);}
 
     template<class T_ARRAY>
     bool Edge_Edge_Interaction(const SEGMENT_3D<T>& segment,const INDIRECT_ARRAY<T_ARRAY,VECTOR<int,4>&> V_edges,const T interaction_distance,T& distance,VECTOR<T,3>& normal,
         VECTOR<T,2>& weights,T& relative_speed,bool allow_negative_weights,const T small_number=0,const bool exit_early=false,const bool verbose=true) const
-    {return Edge_Edge_Interaction(segment,V_edges(1),V_edges(2),V_edges(3),V_edges(4),interaction_distance,distance,normal,weights,relative_speed,allow_negative_weights,small_number,exit_early,verbose);}
+    {return Edge_Edge_Interaction(segment,V_edges(0),V_edges(1),V_edges(2),V_edges(3),interaction_distance,distance,normal,weights,relative_speed,allow_negative_weights,small_number,exit_early,verbose);}
 
     template<class T_ARRAY>
     bool Edge_Edge_Collision(const SEGMENT_3D<T>& segment,const INDIRECT_ARRAY<T_ARRAY,VECTOR<int,4>&> V_edges,const T dt,const T collision_thickness,T& collision_time,
         VECTOR<T,3>& normal,VECTOR<T,2>& weights,T& relative_speed,const T small_number=0,const bool exit_early=false) const
-    {return Edge_Edge_Collision(segment,V_edges(1),V_edges(2),V_edges(3),V_edges(4),dt,collision_thickness,collision_time,normal,weights,relative_speed,small_number,exit_early);}
+    {return Edge_Edge_Collision(segment,V_edges(0),V_edges(1),V_edges(2),V_edges(3),dt,collision_thickness,collision_time,normal,weights,relative_speed,small_number,exit_early);}
 
 //#####################################################################
     VECTOR<T,3> Closest_Point_On_Segment(const VECTOR<T,3>& point) const;

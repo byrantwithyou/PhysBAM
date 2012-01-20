@@ -24,7 +24,7 @@ template<class T,class T_ARRAY> bool PhysBAM::CONTINUOUS_COLLISION_DETECTION_COM
 Edge_Edge_Collision(const POINT_2D<T>& pt,const POINT_2D<T>& point,const INDIRECT_ARRAY<T_ARRAY,VECTOR<int,2>&> V_edges,const T dt,const T collision_thickness,T& collision_time,
     VECTOR<T,2>& normal,VECTOR<T,2>& weights,T& relative_speed,bool allow_negative_weights,const T small_number,const bool exit_early)
 {
-    VECTOR<T,2> x2_minus_x1=point-pt,v2_minus_v1=V_edges(2)-V_edges(1);
+    VECTOR<T,2> x2_minus_x1=point-pt,v2_minus_v1=V_edges(1)-V_edges(0);
     QUADRATIC<double> quadratic(v2_minus_v1.Magnitude_Squared(),2*VECTOR<T,2>::Dot_Product(x2_minus_x1,v2_minus_v1),x2_minus_x1.Magnitude_Squared()-sqr(collision_thickness));
     quadratic.Compute_Roots_In_Interval(0,dt);
     if(quadratic.roots==0)return false;
@@ -35,9 +35,9 @@ Edge_Edge_Collision(const POINT_2D<T>& pt,const POINT_2D<T>& point,const INDIREC
         collision_time=0;}
     else if(quadratic.roots==1)collision_time=(T)quadratic.root1;
     else collision_time=min((T)quadratic.root1,(T)quadratic.root2);
-    POINT_2D<T> new_point(pt+collision_time*V_edges(1));
+    POINT_2D<T> new_point(pt+collision_time*V_edges(0));
     T distance;
-    return new_point.Edge_Edge_Interaction(POINT_2D<T>(point+collision_time*V_edges(2)),V_edges,collision_thickness,distance,normal,weights,relative_speed,true,small_number,exit_early);
+    return new_point.Edge_Edge_Interaction(POINT_2D<T>(point+collision_time*V_edges(1)),V_edges,collision_thickness,distance,normal,weights,relative_speed,true,small_number,exit_early);
 }
 //#####################################################################
 // Function Edge_Edge_Collision
@@ -55,7 +55,7 @@ Edge_Edge_Collision(const SEGMENT_3D<T>& seg_fault,const SEGMENT_3D<T>& segment,
                                        (double)VECTOR<T,3>::Dot_Product(No,APv)+VECTOR<T,3>::Dot_Product(Nv,APo),(double)VECTOR<T,3>::Dot_Product(No,APo));
     double xmin=0,xmax=1.000001;
     int num_intervals=0;VECTOR<INTERVAL<double>,3> intervals;
-    cubic.Compute_Intervals(xmin,xmax,num_intervals,intervals(1),intervals(2),intervals(3));
+    cubic.Compute_Intervals(xmin,xmax,num_intervals,intervals(0),intervals(1),intervals(2));
     if(!num_intervals) return false;
 
     // find and check roots

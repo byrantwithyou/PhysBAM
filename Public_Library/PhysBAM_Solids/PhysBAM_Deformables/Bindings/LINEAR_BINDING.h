@@ -35,7 +35,7 @@ public:
         :BINDING<TV>(particles_input,particle_index_input),parents(parents_input),weights(weights_input)
     {
         STATIC_ASSERT(d>2); // this would be confusing in the segment case because interpolation fractions refer to the other vertex
-        weights[d]=1-weights_input.Sum(); 
+        weights[d-1]=1-weights_input.Sum(); 
     }
 
     static LINEAR_BINDING* Create(GEOMETRY_PARTICLES<TV>& particles)

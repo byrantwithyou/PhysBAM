@@ -40,8 +40,8 @@ public:
         T& distance,VECTOR<T,2>& normal,VECTOR<T,2>& weights,T& relative_speed,bool allow_negaqtive_weights,const T small_number,const bool exit_early=false) const
     {if(!Edge_Edge_Interaction(point,interaction_distance,distance,normal)) return false;
     if(!exit_early){
-        Edge_Edge_Interaction_Data(point,V_edges(1),V_edges(2),distance,normal,small_number);
-        relative_speed=VECTOR<T,2>::Dot_Product(V_edges(1)-V_edges(2),normal);} // relative speed is in the normal direction
+        Edge_Edge_Interaction_Data(point,V_edges(0),V_edges(1),distance,normal,small_number);
+        relative_speed=VECTOR<T,2>::Dot_Product(V_edges(0)-V_edges(1),normal);} // relative speed is in the normal direction
     return true;}
 
     template<class T_ARRAY>

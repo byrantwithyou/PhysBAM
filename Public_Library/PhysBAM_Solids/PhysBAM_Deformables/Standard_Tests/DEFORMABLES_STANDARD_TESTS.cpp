@@ -503,7 +503,7 @@ Embed_Surface_In_Tetrahedralized_Volume(BINDING_LIST<TV>& binding_list,SOFT_BIND
     Find_Intersected_Segments_Triangles(surface_segments,volume_triangles,0,&triangle_intersected,thickness_over_two,0,0);
     HASHTABLE<VECTOR<int,3> > marked_triangles;
     for(int i=0;i<triangle_intersected.m;i++) if(triangle_intersected(i)) marked_triangles.Set(volume_triangles.mesh.elements(i).Sorted());
-    
+
     for(int i=0;i<volume.mesh.elements.m;i++){
         int a,b,c,d;volume.mesh.elements(i).Get(a,b,c,d);
         if(marked_triangles.Contains(VECTOR<int,3>(a,b,c).Sorted())){tet_color(i)=1;continue;}

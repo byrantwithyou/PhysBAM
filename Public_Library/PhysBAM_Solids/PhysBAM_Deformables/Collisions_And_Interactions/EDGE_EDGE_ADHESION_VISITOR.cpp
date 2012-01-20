@@ -27,8 +27,8 @@ Find_Place_For_Spring(const int reference_segment_index,const int other_segment_
             adhesion.springs->Delete(VECTOR<int,2>(reference_segment_index,heap(1).y).Sorted());
 
             const VECTOR<int,2>& segment1_nodes=adhesion.curve.mesh.elements(reference_segment_index),&segment2_nodes=adhesion.curve.mesh.elements(heap(1).y);
-            adhesion.intersecting_edge_edge_pairs.Delete_If_Present(VECTOR<int,4>(segment1_nodes[1],segment1_nodes[2],segment2_nodes[1],segment2_nodes[2]));
-            adhesion.intersecting_edge_edge_pairs.Delete_If_Present(VECTOR<int,4>(segment2_nodes[1],segment2_nodes[2],segment1_nodes[1],segment1_nodes[2]));
+            adhesion.intersecting_edge_edge_pairs.Delete_If_Present(VECTOR<int,4>(segment1_nodes[0],segment1_nodes[1],segment2_nodes[0],segment2_nodes[1]));
+            adhesion.intersecting_edge_edge_pairs.Delete_If_Present(VECTOR<int,4>(segment2_nodes[0],segment2_nodes[1],segment1_nodes[0],segment1_nodes[1]));
 
             heap(1)=PAIR<T,int>(distance,other_segment_index);ARRAYS_COMPUTATIONS::Heapify(heap,1,heap.m);
             return true;}}
@@ -45,11 +45,11 @@ Store(const int segment1_local_index,const int segment2_local_index)
     typedef typename SEGMENT_ADHESION<TV>::SPRING_STATE T_SPRING_STATE;
     int segment1_index=mesh1_indices(segment1_local_index),segment2_index=mesh2_indices(segment2_local_index);
     VECTOR<int,2> segment_indices=VECTOR<int,2>(segment1_index,segment2_index).Sorted();
-    const VECTOR<int,2> &segment1_nodes=adhesion.curve.mesh.elements(segment_indices[1]),&segment2_nodes=adhesion.curve.mesh.elements(segment_indices[2]);
+    const VECTOR<int,2> &segment1_nodes=adhesion.curve.mesh.elements(segment_indices[0]),&segment2_nodes=adhesion.curve.mesh.elements(segment_indices[1]);
 
     if(adhesion.existing_pairs.Contains(segment_indices)) return; // cull initially close pairs
     if(!local && segment1_index>segment2_index) return; // processor that has the lowest segment # owns it
-    if(segment1_nodes.Contains(segment2_nodes[1]) || segment1_nodes.Contains(segment2_nodes[2])) return; // neighbor segments
+    if(segment1_nodes.Contains(segment2_nodes[0]) || segment1_nodes.Contains(segment2_nodes[1])) return; // neighbor segments
     if(adhesion.springs->Contains(segment_indices)) return; // already have adhesion pair
 
     // check for interaction
@@ -57,28 +57,28 @@ Store(const int segment1_local_index,const int segment2_local_index)
     SEGMENT_3D<T> segment1(adhesion.curve.particles.X.Subset(segment1_nodes)),segment2(adhesion.curve.particles.X.Subset(segment2_nodes));
     if(!segment1.Edge_Edge_Interaction(segment2,adhesion.on_distance,state.distance,state.normal,state.weights,true)) return;
 
-    // TODO: this branch should be unnecessary, we should always be able to use segment_indices[1] as the reference.
-    PHYSBAM_ASSERT(local || segment_indices[1]==segment1_index); // TODO: make this a assert()
+    // TODO: this branch should be unnecessary, we should always be able to use segment_indices[0] as the reference.
+    PHYSBAM_ASSERT(local || segment_indices[0]==segment1_index); // TODO: make this a assert()
     //int reference_segment_index,other_segment_index;
     //if(!local){reference_segment_index=segment1_index;other_segment_index=segment2_index;} // if this pair strides processors, use local segment to decide room
-    //else{reference_segment_index=segment_indices[1];other_segment_index=segment_indices[2];}
+    //else{reference_segment_index=segment_indices[0];other_segment_index=segment_indices[1];}
         
     //T distance=state.distance;
-    T distance=state.distance*(2-abs(TV::Dot_Product((adhesion.curve.particles.X(segment1_nodes[2])-adhesion.curve.particles.X(segment1_nodes[1])).Normalized(),
-                                                         (adhesion.curve.particles.X(segment2_nodes[2])-adhesion.curve.particles.X(segment2_nodes[1])).Normalized())));
+    T distance=state.distance*(2-abs(TV::Dot_Product((adhesion.curve.particles.X(segment1_nodes[1])-adhesion.curve.particles.X(segment1_nodes[0])).Normalized(),
+                                                         (adhesion.curve.particles.X(segment2_nodes[1])-adhesion.curve.particles.X(segment2_nodes[0])).Normalized())));
     LOG::cout<<"FOUND SPRING "<<segment1_index<<" segment2 "<<segment2_index<<std::endl;
     //if(Find_Place_For_Spring(reference_segment_index,other_segment_index,state.distance)){
-    if(Find_Place_For_Spring(segment_indices[1],segment_indices[2],distance)){
+    if(Find_Place_For_Spring(segment_indices[0],segment_indices[1],distance)){
         // compute rest of spring parameters
         state.external=!local;
         state.nodes=segment1_nodes.Append_Elements(segment2_nodes);
-        T harmonic_mass=Pseudo_Inverse((T).25*(one_over_effective_mass(state.nodes[1])+one_over_effective_mass(state.nodes[2])
-                +one_over_effective_mass(state.nodes[3])+one_over_effective_mass(state.nodes[4])));
+        T harmonic_mass=Pseudo_Inverse((T).25*(one_over_effective_mass(state.nodes[0])+one_over_effective_mass(state.nodes[1])
+                +one_over_effective_mass(state.nodes[2])+one_over_effective_mass(state.nodes[3])));
         state.damping=adhesion.overdamping_fraction*2*sqrt(adhesion.youngs_modulus*adhesion.restlength*harmonic_mass);
         adhesion.springs->Insert(segment_indices,state);
         // add to collision ignore
-        adhesion.intersecting_edge_edge_pairs.Set(VECTOR<int,4>(segment1_nodes[1],segment1_nodes[2],segment2_nodes[1],segment2_nodes[2]));
-        adhesion.intersecting_edge_edge_pairs.Set(VECTOR<int,4>(segment2_nodes[1],segment2_nodes[2],segment1_nodes[1],segment1_nodes[2]));
+        adhesion.intersecting_edge_edge_pairs.Set(VECTOR<int,4>(segment1_nodes[0],segment1_nodes[1],segment2_nodes[0],segment2_nodes[1]));
+        adhesion.intersecting_edge_edge_pairs.Set(VECTOR<int,4>(segment2_nodes[0],segment2_nodes[1],segment1_nodes[0],segment1_nodes[1]));
     }
 }
 //####################################################################

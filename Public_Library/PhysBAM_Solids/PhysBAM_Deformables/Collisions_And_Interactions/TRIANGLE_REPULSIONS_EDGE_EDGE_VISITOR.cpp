@@ -58,7 +58,7 @@ template<class TV> void TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR<TV>::
 Store_Helper_Helper(const int segment1_index,const int segment2_index)
 {
     const VECTOR<int,2> &segment1_nodes=edges1(segment1_index),&segment2_nodes=edges2(segment2_index);
-    EDGE_EDGE_REPULSION_PAIR<TV> pair;pair.nodes=VECTOR<int,4>(segment1_nodes[1],segment1_nodes[2],segment2_nodes[1],segment2_nodes[2]);
+    EDGE_EDGE_REPULSION_PAIR<TV> pair;pair.nodes=VECTOR<int,4>(segment1_nodes[0],segment1_nodes[1],segment2_nodes[0],segment2_nodes[1]);
     SEGMENT_3D<T> segment1(X_other.Subset(segment1_nodes)),segment2(X_other.Subset(segment2_nodes));
     T total_repulsion_thickness=thickness_multiplier*pair.Total_Repulsion_Thickness(repulsion_thickness);
     if(!segment1.Edge_Edge_Interaction(segment2,total_repulsion_thickness,pair.distance,pair.normal,pair.weights,false)) pruned++;
