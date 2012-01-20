@@ -69,7 +69,7 @@ Initialize()
     if(example.mpi_grid) example.mpi_grid->Initialize(example.domain_boundary);
     ADVECTION_CONSERVATIVE_UNIFORM<GRID<TV>,T>* advection_conservative=dynamic_cast<ADVECTION_CONSERVATIVE_UNIFORM<GRID<TV>,T>*>(example.incompressible.advection);
     if(advection_conservative){
-        for(int i=0;i<TV::dimension;i++){advection_conservative->mpi_boundary(i)(1)=!example.domain_boundary(i)(1);advection_conservative->mpi_boundary(i)(2)=!example.domain_boundary(i)(2);}
+        for(int i=0;i<TV::dimension;i++){advection_conservative->mpi_boundary(i)(0)=!example.domain_boundary(i)(0);advection_conservative->mpi_boundary(i)(1)=!example.domain_boundary(i)(1);}
         if(example.mpi_grid) example.mpi_grid->Initialize(advection_conservative->solid_walls_hack_axis);}
     example.incompressible.mpi_grid=example.mpi_grid;
     example.projection.elliptic_solver->mpi_grid=example.mpi_grid;

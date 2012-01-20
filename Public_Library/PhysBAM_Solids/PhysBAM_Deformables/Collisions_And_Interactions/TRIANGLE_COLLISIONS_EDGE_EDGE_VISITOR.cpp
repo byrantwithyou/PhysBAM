@@ -47,7 +47,7 @@ Store_Helper(const int point1,const int point2,VECTOR<T,2>)
     if(intersecting_edge_edge_pairs.Size() && intersecting_edge_edge_pairs.Contains(nodes)) return;
     if (mpi_solids){
         VECTOR<PARTITION_ID,2> processors(mpi_solids->partition_id_from_particle_index.Subset(nodes));
-        if (processors(1)!=processors(2)) pairs_external.Append(nodes);
+        if (processors(0)!=processors(1)) pairs_external.Append(nodes);
         else pairs_internal.Append(nodes);}
     else pairs_internal.Append(nodes);
 }

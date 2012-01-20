@@ -41,21 +41,21 @@ public:
 
     void Update_Positions_And_Radii()
     {
-        if(!via_points.m)ellipsoid_list(1)->center=(attachment_point_1->Position()+attachment_point_2->Position())/2.0;
+        if(!via_points.m)ellipsoid_list(0)->center=(attachment_point_1->Position()+attachment_point_2->Position())/2.0;
         else{
-            ellipsoid_list(1)->center=(attachment_point_1->Position()+via_points(1)->Position())/2.0;
+            ellipsoid_list(0)->center=(attachment_point_1->Position()+via_points(0)->Position())/2.0;
             for(int i=1;i<via_points.m;i++)ellipsoid_list(i+1)->center=(via_points(i)->Position()+via_points(i+1)->Position())/2.0;
             ellipsoid_list(ellipsoid_list.m)->center=(via_points(via_points.m)->Position()+attachment_point_2->Position())/2.0;}
 
         T radius_x,radius_yz;
         if(!via_points.m){
             radius_x=((attachment_point_1->Position()-attachment_point_2->Position()).Magnitude())/2.0;
-            radius_yz=sqrt(three_fourths_div_pi*volume_list(1)*(1/radius_x));
-            ellipsoid_list(1)->radii=DIAGONAL_MATRIX<T,3>(radius_x,radius_yz,radius_yz);}
+            radius_yz=sqrt(three_fourths_div_pi*volume_list(0)*(1/radius_x));
+            ellipsoid_list(0)->radii=DIAGONAL_MATRIX<T,3>(radius_x,radius_yz,radius_yz);}
         else{
-            radius_x=((attachment_point_1->Position()-via_points(1)->Position()).Magnitude())/2.0;
-            radius_yz=sqrt(three_fourths_div_pi*volume_list(1)*(1/radius_x));
-            ellipsoid_list(1)->radii=DIAGONAL_MATRIX<T,3>(radius_x,radius_yz,radius_yz);
+            radius_x=((attachment_point_1->Position()-via_points(0)->Position()).Magnitude())/2.0;
+            radius_yz=sqrt(three_fourths_div_pi*volume_list(0)*(1/radius_x));
+            ellipsoid_list(0)->radii=DIAGONAL_MATRIX<T,3>(radius_x,radius_yz,radius_yz);
             for(int i=1;i<via_points.m;i++){
                 radius_x=((via_points(i)->Position()-via_points(i+1)->Position()).Magnitude())/2.0;
                 radius_yz=sqrt(three_fourths_div_pi*volume_list(i+1)*(1/radius_x));
@@ -70,9 +70,9 @@ public:
         ARRAY<ROTATION<TV> > orientations;
         orientations.Resize(ellipsoid_list.m);
         VECTOR<T,3> rotation_vector(1,0,0);
-        if(!via_points.m)orientations(1)=ROTATION<TV>::Rotation_Quaternion(rotation_vector,attachment_point_1->Position()-attachment_point_2->Position());
+        if(!via_points.m)orientations(0)=ROTATION<TV>::Rotation_Quaternion(rotation_vector,attachment_point_1->Position()-attachment_point_2->Position());
         else{
-            orientations(1)=ROTATION<TV>::Rotation_Quaternion(rotation_vector,attachment_point_1->Position()-via_points(1)->Position());
+            orientations(0)=ROTATION<TV>::Rotation_Quaternion(rotation_vector,attachment_point_1->Position()-via_points(0)->Position());
             for(int i=1;i<via_points.m;i++)orientations(i+1)=ROTATION<TV>::Rotation_Quaternion(rotation_vector,via_points(i)->Position()-via_points(i+1)->Position());
             orientations(via_points.m+1)=ROTATION<TV>::Rotation_Quaternion(rotation_vector,via_points(via_points.m)->Position()-attachment_point_2->Position());}
         return orientations;
@@ -100,17 +100,17 @@ public:
 
     bool Inside_Ellipsoid_Test(VECTOR<T,3>& position)
     {
-        LOG::cout<<"POS 1: "<<position(1)<<std::endl;
-        LOG::cout<<"POS 2: "<<position(2)<<std::endl;
-        LOG::cout<<"POS 3: "<<position(3)<<std::endl;
+        LOG::cout<<"POS 1: "<<position(0)<<std::endl;
+        LOG::cout<<"POS 2: "<<position(1)<<std::endl;
+        LOG::cout<<"POS 3: "<<position(2)<<std::endl;
 
         ARRAY<ROTATION<TV> > orientations=Update_Orientations();
         VECTOR<T,3> inv_rot_pos;
         for(int i=0;i<ellipsoid_list.m;i++){
             inv_rot_pos=orientations(i).Inverse()*position;
-            T result=sqr(inv_rot_pos(1)-(ellipsoid_list(i)->center)(1))/sqr((ellipsoid_list(i)->radius)(1))+
-                sqr(inv_rot_pos(2)-(ellipsoid_list(i)->center)(2))/sqr((ellipsoid_list(i)->radius)(2))+
-                sqr(inv_rot_pos(3)-(ellipsoid_list(i)->center)(3))/sqr((ellipsoid_list(i)->radius)(3));
+            T result=sqr(inv_rot_pos(0)-(ellipsoid_list(i)->center)(0))/sqr((ellipsoid_list(i)->radius)(0))+
+                sqr(inv_rot_pos(1)-(ellipsoid_list(i)->center)(1))/sqr((ellipsoid_list(i)->radius)(1))+
+                sqr(inv_rot_pos(2)-(ellipsoid_list(i)->center)(2))/sqr((ellipsoid_list(i)->radius)(2));
             if(result<=1)return true;}
         return false;
     }
@@ -131,10 +131,10 @@ public:
 
         if (!via_points.m){
             radius_x=((attachment_point_1->Position()-attachment_point_2->Position()).Magnitude())/2.0;
-            volume_list(1)=four_thirds_pi_times_shorter_radii_squared*radius_x;}
+            volume_list(0)=four_thirds_pi_times_shorter_radii_squared*radius_x;}
         else{
-            radius_x=((attachment_point_1->Position()-via_points(1)->Position()).Magnitude())/2.0;
-            volume_list(1)=four_thirds_pi_times_shorter_radii_squared*radius_x;
+            radius_x=((attachment_point_1->Position()-via_points(0)->Position()).Magnitude())/2.0;
+            volume_list(0)=four_thirds_pi_times_shorter_radii_squared*radius_x;
             for(int i=1;i<via_points.m;i++){
                 radius_x=((via_points(i)->Position()-via_points(i+1)->Position()).Magnitude())/2.0;
                 volume_list(i+1)=four_thirds_pi_times_shorter_radii_squared*radius_x;}
@@ -175,7 +175,7 @@ public:
         LOG::cout<<"THE FOLLOWING INFO WAS READ IN\n";
         LOG::cout<<"Shorter_Radii: "<<shorter_radii<<std::endl;
         LOG::cout<<"ELLIPSOID LIST SIZE: "<<ellipsoid_list.m<<std::endl;
-        LOG::cout<<"FIRST ELLIPSOID: "<<ellipsoid_list(1)->center<<" "<<ellipsoid_list(1)->radii<<std::endl;
+        LOG::cout<<"FIRST ELLIPSOID: "<<ellipsoid_list(0)->center<<" "<<ellipsoid_list(0)->radii<<std::endl;
     }
 
     void Write(TYPED_OSTREAM& output_stream) const PHYSBAM_OVERRIDE

@@ -33,7 +33,7 @@ public:
     ~SEGMENT_MESH();
     
     int Get_Opposite_Endpoint(const int segment,const int node)
-    {assert(Node_In_Segment(node,segment));if(elements(segment)(1) == node) return elements(segment)(2);else return elements(segment)(1);}
+    {assert(Node_In_Segment(node,segment));if(elements(segment)(0) == node) return elements(segment)(1);else return elements(segment)(0);}
 
     int Segment(const int node1,const int node2) const
     {return Simplex(VECTOR<int,2>(node1,node2));}

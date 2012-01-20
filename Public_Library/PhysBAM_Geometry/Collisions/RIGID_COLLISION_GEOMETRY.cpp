@@ -181,9 +181,9 @@ template<class T> VECTOR<T,2> Simplex_World_Space_Point_From_Barycentric_Coordin
 template<class T> VECTOR<T,3> Simplex_World_Space_Point_From_Barycentric_Coordinates_Helper(RIGID_GEOMETRY<VECTOR<T,3> >& rigid_geometry,const int triangle_id,const VECTOR<T,3>& weights)
 {
     return TRIANGLE_3D<T>::Point_From_Barycentric_Coordinates(weights,
+        rigid_geometry.World_Space_Point(rigid_geometry.simplicial_object->particles.X(rigid_geometry.simplicial_object->mesh.elements(triangle_id)(0))),
         rigid_geometry.World_Space_Point(rigid_geometry.simplicial_object->particles.X(rigid_geometry.simplicial_object->mesh.elements(triangle_id)(1))),
-        rigid_geometry.World_Space_Point(rigid_geometry.simplicial_object->particles.X(rigid_geometry.simplicial_object->mesh.elements(triangle_id)(2))),
-        rigid_geometry.World_Space_Point(rigid_geometry.simplicial_object->particles.X(rigid_geometry.simplicial_object->mesh.elements(triangle_id)(3))));
+        rigid_geometry.World_Space_Point(rigid_geometry.simplicial_object->particles.X(rigid_geometry.simplicial_object->mesh.elements(triangle_id)(2))));
 }
 template<class TV> TV RIGID_COLLISION_GEOMETRY_BASE<TV>::
 Simplex_World_Space_Point_From_Barycentric_Coordinates(const int simplex_id,const T_WEIGHTS& weights) const

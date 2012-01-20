@@ -54,7 +54,7 @@ void Compute_Cut_Geometries(const GRID<VECTOR<T,1> >& grid,const int num_ghost_c
                             cut_cells(index)->dominant_element=poly_index;
                             cut_cells(index)->visibility(poly_index).Append(index);}
 
-                TV_INT neighbor_cell_index=index-TV_INT::Axis_Vector(1);
+                TV_INT neighbor_cell_index=index-TV_INT::Axis_Vector(0);
                 if(!Is_Occluded_Cell<T,1>(centroid,grid.Center(neighbor_cell_index),collision_bodies_affecting_fluid.objects_in_cell,collision_bodies_affecting_fluid.collision_geometry_collection,index,neighbor_cell_index))
                     cut_cells(index)->visibility(poly_index).Append(neighbor_cell_index);}
             if(collision_bodies_affecting_fluid.Intersection_With_Any_Simplicial_Object(r_to_l_ray,body_id,&collision_objects)){
@@ -71,7 +71,7 @@ void Compute_Cut_Geometries(const GRID<VECTOR<T,1> >& grid,const int num_ghost_c
                             cut_cells(index)->dominant_element=poly_index;
                             cut_cells(index)->visibility(poly_index).Append(index);}
 
-                TV_INT neighbor_cell_index=index+TV_INT::Axis_Vector(1);
+                TV_INT neighbor_cell_index=index+TV_INT::Axis_Vector(0);
                 if(!Is_Occluded_Cell<T,1>(centroid,grid.Center(neighbor_cell_index),collision_bodies_affecting_fluid.objects_in_cell,collision_bodies_affecting_fluid.collision_geometry_collection,index,neighbor_cell_index))
                     cut_cells(index)->visibility(poly_index).Append(neighbor_cell_index);}
             if(!cut_cells(index)->geometry.Size()){delete cut_cells(index);cut_cells(index)=0;}}}
@@ -84,9 +84,9 @@ void Compute_Cut_Geometries(const GRID<VECTOR<T,2> >& grid,const int num_ghost_c
 {
     PHYSBAM_NOT_IMPLEMENTED();
     // ARRAY<TV_INT> neighbor_offsets(8);
-    // neighbor_offsets(1)=TV_INT( 1,-1); neighbor_offsets(2)=TV_INT( 1, 0); neighbor_offsets(3)=TV_INT( 1, 1);
-    // neighbor_offsets(4)=TV_INT( 0,-1);                                    neighbor_offsets(5)=TV_INT( 0, 1);
-    // neighbor_offsets(6)=TV_INT(-1,-1); neighbor_offsets(7)=TV_INT(-1, 0); neighbor_offsets(8)=TV_INT(-1, 1);
+    // neighbor_offsets(0)=TV_INT( 1,-1); neighbor_offsets(1)=TV_INT( 1, 0); neighbor_offsets(2)=TV_INT( 1, 1);
+    // neighbor_offsets(3)=TV_INT( 0,-1);                                    neighbor_offsets(4)=TV_INT( 0, 1);
+    // neighbor_offsets(5)=TV_INT(-1,-1); neighbor_offsets(6)=TV_INT(-1, 0); neighbor_offsets(7)=TV_INT(-1, 1);
 
     // typedef VECTOR<T,1> TV;
     // typedef VECTOR<int,1> TV_INT;

@@ -37,15 +37,15 @@ Initialize_Optimization(const bool verbose)
     triangle_mesh.Initialize_Boundary_Nodes();
 
     int i,j,k;VECTOR<T,2> xi,xj,xk;
-    triangle_mesh.elements(1).Get(i,j,k);xi=particles.X(i);xj=particles.X(j);xk=particles.X(k);
+    triangle_mesh.elements(0).Get(i,j,k);xi=particles.X(i);xj=particles.X(j);xk=particles.X(k);
     initial_min_altitude=TRIANGLE_2D<T>::Minimum_Altitude(xi,xj,xk);
     initial_area=TRIANGLE_2D<T>::Area(xi,xj,xk);
     map_from_nodes_to_boundary_list.Resize(1,triangle_mesh.number_nodes);
     for(i=0;i<triangle_mesh.boundary_nodes->m;i++) map_from_nodes_to_boundary_list((*triangle_mesh.boundary_nodes)(i))=i;
-    for(i=0;i<layers.m;i++) delete layers(i);layers.Resize(1);layers(1)=triangle_mesh.boundary_nodes;
+    for(i=0;i<layers.m;i++) delete layers(i);layers.Resize(1);layers(0)=triangle_mesh.boundary_nodes;
     triangle_mesh.boundary_nodes=0; // we don't need it hanging off the mesh object any more
-    if(verbose) LOG::cout<<"boundary layer has "<<layers(1)->m<<" nodes"<<std::endl;
-    ARRAY<bool,VECTOR<int,1> > marked(1,triangle_mesh.number_nodes);for(i=0;i<layers(1)->m;i++) marked((*layers(1))(i))=true;
+    if(verbose) LOG::cout<<"boundary layer has "<<layers(0)->m<<" nodes"<<std::endl;
+    ARRAY<bool,VECTOR<int,1> > marked(1,triangle_mesh.number_nodes);for(i=0;i<layers(0)->m;i++) marked((*layers(0))(i))=true;
     for(int l=2;;l++){
         layers.Append(new ARRAY<int>);
         for(int i=0;i<layers(l-1)->m;i++){
@@ -55,7 +55,7 @@ Initialize_Optimization(const bool verbose)
                 if(!marked(b)){layers(l)->Append(b);marked(b)=true;}}}
         if(layers(l)->m == 0){delete layers(l);layers.Remove_End();break;}
         if(verbose) LOG::cout<<"layer "<<l<<" has "<<layers(l)->m<<" nodes"<<std::endl;}
-    boundary_mesh_normals.Resize(1,layers(1)->m);
+    boundary_mesh_normals.Resize(1,layers(0)->m);
     Compute_Boundary_Mesh_Normals();
 }
 //#####################################################################
@@ -88,16 +88,16 @@ Create_Final_Mesh_With_Optimization(const int number_of_initial_steps,const int 
 template<class T> void TRIANGULAR_MESHING<T>::
 Optimize_Boundary_Layer(const T compression_fraction,const bool reverse)
 {
-    ARRAY<VECTOR<T,2> > directions(2);ARRAY<int>& nodes=*layers(1);
+    ARRAY<VECTOR<T,2> > directions(2);ARRAY<int>& nodes=*layers(0);
     int i;for(i=0;i<nodes.m;i++) 
         particles.X(nodes(i))-=compression_fraction*implicit_curve(particles.X(nodes(i)))*boundary_mesh_normals(map_from_nodes_to_boundary_list(nodes(i)));
     Compute_Boundary_Mesh_Normals();
     for(i=0;i<nodes.m;i++){
         int j;if(reverse) j=nodes(nodes.m+1-i);else j=nodes(i);
         VECTOR<T,2> normal=boundary_mesh_normals(map_from_nodes_to_boundary_list(j));
-        directions(1)=VECTOR<T,2>(normal.y,-normal.x);
-        directions(1).Normalize();
-        directions(2)=-directions(1);
+        directions(0)=VECTOR<T,2>(normal.y,-normal.x);
+        directions(0).Normalize();
+        directions(1)=-directions(0);
         Search_For_Best_Position(j,directions,true);} 
 }
 //#####################################################################
@@ -107,11 +107,11 @@ template<class T> void TRIANGULAR_MESHING<T>::
 Optimize_Interior_Layer(const int layer,const bool reverse)
 {
     ARRAY<VECTOR<T,2> > directions(5);
-    directions(1)=VECTOR<T,2>(1,0);
-    directions(2)=VECTOR<T,2>((T).30901699437494742410229341718282,(T).95105651629515357211643933337938);
-    directions(3)=VECTOR<T,2>((T)-.80901699437494742410229341718282,(T).58778525229247312916870595463907);
-    directions(4)=VECTOR<T,2>((T)-.80901699437494742410229341718282,(T)-.58778525229247312916870595463907);
-    directions(5)=VECTOR<T,2>((T).30901699437494742410229341718282,(T)-.95105651629515357211643933337938);
+    directions(0)=VECTOR<T,2>(1,0);
+    directions(1)=VECTOR<T,2>((T).30901699437494742410229341718282,(T).95105651629515357211643933337938);
+    directions(2)=VECTOR<T,2>((T)-.80901699437494742410229341718282,(T).58778525229247312916870595463907);
+    directions(3)=VECTOR<T,2>((T)-.80901699437494742410229341718282,(T)-.58778525229247312916870595463907);
+    directions(4)=VECTOR<T,2>((T).30901699437494742410229341718282,(T)-.95105651629515357211643933337938);
     for(int i=0;i<layers(layer)->m;i++){int j;if(reverse) j=(*layers(layer))(layers(layer)->m+1-i);else j=(*layers(layer))(i);Search_For_Best_Position(j,directions);}
 }
 //#####################################################################

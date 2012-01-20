@@ -51,16 +51,16 @@ bool Update_Box_Plane_Contact_Pair(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisi
     ARRAY<TV> points;bool intersect=false;
     for(int i=0;i<8;i++){
         TV point=box.min_corner;
-        if(i>4) point(1)=box.max_corner(1);
-        if(i%4==0||i%4==3) point(2)=box.max_corner(2);
-        if(i%2==0) point(3)=box.max_corner(3);
+        if(i>4) point(0)=box.max_corner(0);
+        if(i%4==0||i%4==3) point(1)=box.max_corner(1);
+        if(i%2==0) point(2)=box.max_corner(2);
         TV transformed_point=body1->Frame().Inverse()*body2->Frame()*point;
-        if(transformed_point(2)<0){
+        if(transformed_point(1)<0){
             intersect=true;
-            transformed_point(2)*=.5;
+            transformed_point(1)*=.5;
             points.Append(transformed_point);}}
 
-    TV collision_normal=-body1->Rotation().Rotated_Axis(2);
+    TV collision_normal=-body1->Rotation().Rotated_Axis(1);
     if(!intersect){rigid_body_collisions.skip_collision_check.Set_Last_Checked(i1,i2);return false;}  
     if(TV::Dot_Product(body1->Twist().linear-body2->Twist().linear,collision_normal)>=0) return false;
 

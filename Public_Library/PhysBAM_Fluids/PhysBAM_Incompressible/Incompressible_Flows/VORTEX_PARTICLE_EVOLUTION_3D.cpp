@@ -127,9 +127,9 @@ Euler_Step(const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,const T dt,const T 
     
     ARRAY<VECTOR<T,3> ,VECTOR<int,3> > two_times_V_ghost(grid.Domain_Indices(2));
     for(int i=-1;i<=grid.counts.x+2;i++) for(int j=-1;j<=grid.counts.y+2;j++) for(int ij=-1;ij<=grid.counts.z+2;ij++){
-        two_times_V_ghost(i,j,ij).x=face_velocities_ghost.Component(1)(i,j,ij)+face_velocities_ghost.Component(1)(i+1,j,ij);
-        two_times_V_ghost(i,j,ij).y=face_velocities_ghost.Component(2)(i,j,ij)+face_velocities_ghost.Component(2)(i,j+1,ij);
-        two_times_V_ghost(i,j,ij).z=face_velocities_ghost.Component(3)(i,j,ij)+face_velocities_ghost.Component(3)(i,j,ij+1);}
+        two_times_V_ghost(i,j,ij).x=face_velocities_ghost.Component(0)(i,j,ij)+face_velocities_ghost.Component(0)(i+1,j,ij);
+        two_times_V_ghost(i,j,ij).y=face_velocities_ghost.Component(1)(i,j,ij)+face_velocities_ghost.Component(1)(i,j+1,ij);
+        two_times_V_ghost(i,j,ij).z=face_velocities_ghost.Component(2)(i,j,ij)+face_velocities_ghost.Component(2)(i,j,ij+1);}
     
     // vortex stretching/tilting term  - omega dot grad V
     ARRAY<MATRIX<T,3> ,VECTOR<int,3> > VX(grid.Domain_Indices(1),false);LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,MATRIX<T,3> > VX_interpolation;

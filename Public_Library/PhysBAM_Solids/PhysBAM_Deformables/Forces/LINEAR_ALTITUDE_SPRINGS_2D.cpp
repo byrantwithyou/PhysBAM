@@ -39,9 +39,9 @@ Set_Restlength_From_Material_Coordinates(ARRAY_VIEW<TV> material_coordinates)
 {
     for(int t=0;t<mesh.elements.m;t++){
         int i,j,k;mesh.elements(t).Get(i,j,k);
-        parameters(t)(1).restlength=SEGMENT_2D<T>(material_coordinates(j),material_coordinates(k)).Distance_From_Point_To_Line(material_coordinates(i));
-        parameters(t)(2).restlength=SEGMENT_2D<T>(material_coordinates(i),material_coordinates(k)).Distance_From_Point_To_Line(material_coordinates(j));
-        parameters(t)(3).restlength=SEGMENT_2D<T>(material_coordinates(i),material_coordinates(j)).Distance_From_Point_To_Line(material_coordinates(k));
+        parameters(t)(0).restlength=SEGMENT_2D<T>(material_coordinates(j),material_coordinates(k)).Distance_From_Point_To_Line(material_coordinates(i));
+        parameters(t)(1).restlength=SEGMENT_2D<T>(material_coordinates(i),material_coordinates(k)).Distance_From_Point_To_Line(material_coordinates(j));
+        parameters(t)(2).restlength=SEGMENT_2D<T>(material_coordinates(i),material_coordinates(j)).Distance_From_Point_To_Line(material_coordinates(k));
         for(int k=0;k<3;k++) parameters(t)(k).visual_restlength=parameters(t)(k).restlength;}
 }
 //#####################################################################
@@ -53,11 +53,11 @@ Set_Overdamping_Fraction(const T overdamping_fraction) // 1 is critically damped
     for(int t=0;t<mesh.elements.m;t++){
         int i,j,k;mesh.elements(t).Get(i,j,k);
         T harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(i)+(T).25*(particles.one_over_effective_mass(j)+particles.one_over_effective_mass(k)));
-        parameters(t)(1).damping=overdamping_fraction*2*sqrt(parameters(t)(1).youngs_modulus*parameters(t)(1).restlength*harmonic_mass);
+        parameters(t)(0).damping=overdamping_fraction*2*sqrt(parameters(t)(0).youngs_modulus*parameters(t)(0).restlength*harmonic_mass);
         harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(j)+(T).25*(particles.one_over_effective_mass(i)+particles.one_over_effective_mass(k)));
-        parameters(t)(2).damping=overdamping_fraction*2*sqrt(parameters(t)(2).youngs_modulus*parameters(t)(2).restlength*harmonic_mass);
+        parameters(t)(1).damping=overdamping_fraction*2*sqrt(parameters(t)(1).youngs_modulus*parameters(t)(1).restlength*harmonic_mass);
         harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(k)+(T).25*(particles.one_over_effective_mass(j)+particles.one_over_effective_mass(i)));
-        parameters(t)(3).damping=overdamping_fraction*2*sqrt(parameters(t)(3).youngs_modulus*parameters(t)(3).restlength*harmonic_mass);}
+        parameters(t)(2).damping=overdamping_fraction*2*sqrt(parameters(t)(2).youngs_modulus*parameters(t)(2).restlength*harmonic_mass);}
     Invalidate_CFL();
 }
 //#####################################################################

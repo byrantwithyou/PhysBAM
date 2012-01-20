@@ -156,9 +156,9 @@ Add_Analytic_Box(const VECTOR<T,1>& scaling_factor)
     POINT_SIMPLICES_1D<T>& simplicial_object=*POINT_SIMPLICES_1D<T>::Create(particles);
     particles.array_collection->Add_Elements(2);
     POINT_SIMPLEX_MESH& segment_mesh=simplicial_object.mesh;segment_mesh.number_nodes=2;segment_mesh.elements.Preallocate(1);
-    particles.X(1)=VECTOR<T,1>(box.min_corner.x);particles.X(2)=VECTOR<T,1>(box.max_corner.x);
-    simplicial_object.mesh.elements.Append(VECTOR<int,1>(1));simplicial_object.mesh.directions.Append(false);
-    simplicial_object.mesh.elements.Append(VECTOR<int,1>(2));simplicial_object.mesh.directions.Append(true);
+    particles.X(0)=VECTOR<T,1>(box.min_corner.x);particles.X(1)=VECTOR<T,1>(box.max_corner.x);
+    simplicial_object.mesh.elements.Append(VECTOR<int,1>(0));simplicial_object.mesh.directions.Append(false);
+    simplicial_object.mesh.elements.Append(VECTOR<int,1>(1));simplicial_object.mesh.directions.Append(true);
     rigid_body.Add_Structure(simplicial_object);
     simplicial_object.Update_Point_Simplex_List();
     assert(simplicial_object.point_simplex_list);

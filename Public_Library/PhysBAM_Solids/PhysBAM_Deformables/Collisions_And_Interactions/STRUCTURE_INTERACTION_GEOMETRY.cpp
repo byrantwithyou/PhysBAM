@@ -111,7 +111,7 @@ Update_Processor_Masks_Helper(T_OBJECT& object,T_HIERARCHY& hierarchy,const PART
         PARTITION_ID simplex_owner=processors.Min();
         masks(e)=0;if(simplex_owner==processor) masks(e)|=2;else if(simplex_owner>processor) masks(e)|=1;}
     // update up the tree
-    for(int k=hierarchy.leaves+1;k<=masks.m;k++) masks(k)=masks(hierarchy.children(k-hierarchy.leaves)(1)) | masks(hierarchy.children(k-hierarchy.leaves)(2));
+    for(int k=hierarchy.leaves+1;k<=masks.m;k++) masks(k)=masks(hierarchy.children(k-hierarchy.leaves)(0)) | masks(hierarchy.children(k-hierarchy.leaves)(1));
 }
 //#####################################################################
 // Function Update_Processor_Masks
@@ -127,8 +127,8 @@ Update_Processor_Masks(const PARTITION_ID processor,const ARRAY<PARTITION_ID>& p
     for(int e=0;e<collision_particles.active_indices.m;e++){
         int p=collision_particles.active_indices(e);PARTITION_ID particle_processor=partition_id_from_particle_index(p);
         point_processor_masks(e)=0;if(particle_processor==processor) point_processor_masks(e)|=2;else if(particle_processor>processor) point_processor_masks(e)|=1;}
-    for(int k=particle_hierarchy.leaves+1;k<=point_processor_masks.m;k++) point_processor_masks(k)=point_processor_masks(particle_hierarchy.children(k-particle_hierarchy.leaves)(1))
-        | point_processor_masks(particle_hierarchy.children(k-particle_hierarchy.leaves)(2));
+    for(int k=particle_hierarchy.leaves+1;k<=point_processor_masks.m;k++) point_processor_masks(k)=point_processor_masks(particle_hierarchy.children(k-particle_hierarchy.leaves)(0))
+        | point_processor_masks(particle_hierarchy.children(k-particle_hierarchy.leaves)(1));
 }
 //####################################################################
 template class STRUCTURE_INTERACTION_GEOMETRY<VECTOR<float,1> >;

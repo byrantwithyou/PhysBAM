@@ -28,7 +28,7 @@ template<class TV> void HYPOTHETICAL_CUT_TRIANGLES<TV>::
 Initialize_Quality_Metric()
 {
     if(!Valid_Cut()){cut_quality_metric=0;return;}
-    TV hypothetical_cut_direction=(Position(2)-Position(1)).Normalized();
+    TV hypothetical_cut_direction=(Position(1)-Position(0)).Normalized();
     cut_quality_metric=TV::Cross_Product(hyperplane.normal,hypothetical_cut_direction).Magnitude();
 }
 template<class TV> bool HYPOTHETICAL_CUT_TRIANGLES<TV>::
@@ -50,8 +50,8 @@ Initialize_Hypothetical_Cut(const T_HYPERPLANE& hyperplane_input,const int trian
 template<class TV> bool HYPOTHETICAL_CUT_TRIANGLES<TV>::
 Segment_Cut_Already_In_Embedded_Triangulated_Object()
 {
-    int emb_node1=embedded_object.Embedded_Particle_On_Segment(hypothetical_nodes(1).parents);
-    int emb_node2=embedded_object.Embedded_Particle_On_Segment(hypothetical_nodes(2).parents);  
+    int emb_node1=embedded_object.Embedded_Particle_On_Segment(hypothetical_nodes(0).parents);
+    int emb_node2=embedded_object.Embedded_Particle_On_Segment(hypothetical_nodes(1).parents);  
     const ARRAY<int>& active_indices=embedded_object.embedded_particles.active_indices;
     return embedded_object.embedded_mesh.Segment(active_indices(emb_node1),active_indices(emb_node2))!=0;
 }
@@ -62,7 +62,7 @@ template<class TV> int HYPOTHETICAL_CUT_TRIANGLES<TV>::
 Number_Of_Nodes_Shared_With_Existing_Embedded_Curve()
 {
     int number_of_nodes_shared=0;
-    int i=hypothetical_nodes(1).index_in_embedded_particles,j=hypothetical_nodes(2).index_in_embedded_particles;
+    int i=hypothetical_nodes(0).index_in_embedded_particles,j=hypothetical_nodes(1).index_in_embedded_particles;
     const ARRAY<int>& active_indices=embedded_object.embedded_particles.active_indices;
     if(i && (*embedded_object.embedded_mesh.incident_elements)(active_indices(i)).m) number_of_nodes_shared++;
     if(j && (*embedded_object.embedded_mesh.incident_elements)(active_indices(j)).m) number_of_nodes_shared++;

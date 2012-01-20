@@ -138,7 +138,7 @@ template<class T> VECTOR<T,3> TETRAHEDRON_COLLISION_BODY<T>::
 Implicit_Geometry_Normal(const TV& location,T& phi_value,const int aggregate,const int location_particle_index) const
 {
     TRIANGLE_MESH& triangle_mesh=triangulated_surface.mesh;
-    ARRAY<int> particles_to_ignore(1);particles_to_ignore(1)=location_particle_index;
+    ARRAY<int> particles_to_ignore(1);particles_to_ignore(0)=location_particle_index;
     TV tet_weights;int tet_nearest_point=Get_Tetrahedron_Near_Point(location,tet_weights,particles_to_ignore);
     if(tet_nearest_point){
         bool inside;TV tri_weights;int triangle_nearest_point=Get_Surface_Triangle(tet_nearest_point,tet_weights,tri_weights,false,false,&inside);

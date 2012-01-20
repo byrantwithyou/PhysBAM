@@ -74,18 +74,18 @@ Compute_UV_Deformation(const int c)
 {
     typename BASE::STATE& state=states(c);
     MATERIAL_FORCE_STATE& material_force_state=material_force_states(c);
-    material_force_state.denom=(material_force_state.delta_u(1)*material_force_state.delta_v(2)-material_force_state.delta_u(2)*material_force_state.delta_v(1));
-    material_force_state.w_u=((particles.X(state.nodes(2))-particles.X(state.nodes(1)))*material_force_state.delta_v(2)-
-        (particles.X(state.nodes(3))-particles.X(state.nodes(1)))*material_force_state.delta_v(1))/material_force_state.denom;
+    material_force_state.denom=(material_force_state.delta_u(0)*material_force_state.delta_v(1)-material_force_state.delta_u(1)*material_force_state.delta_v(0));
+    material_force_state.w_u=((particles.X(state.nodes(1))-particles.X(state.nodes(0)))*material_force_state.delta_v(1)-
+        (particles.X(state.nodes(2))-particles.X(state.nodes(0)))*material_force_state.delta_v(0))/material_force_state.denom;
     material_force_state.w_u_magnitude=material_force_state.w_u.Normalize();
-    material_force_state.w_v=(-(particles.X(state.nodes(2))-particles.X(state.nodes(1)))*material_force_state.delta_u(2)+
-        (particles.X(state.nodes(3))-particles.X(state.nodes(1)))*material_force_state.delta_u(1))/material_force_state.denom;
+    material_force_state.w_v=(-(particles.X(state.nodes(1))-particles.X(state.nodes(0)))*material_force_state.delta_u(1)+
+        (particles.X(state.nodes(2))-particles.X(state.nodes(0)))*material_force_state.delta_u(0))/material_force_state.denom;
     material_force_state.w_v_magnitude=material_force_state.w_v.Normalize();
 
-    material_force_state.dwu_dx=VECTOR<T,3>((material_force_state.delta_v(1)-material_force_state.delta_v(2))/material_force_state.denom,
-        material_force_state.delta_v(2)/material_force_state.denom,-material_force_state.delta_v(1)/material_force_state.denom);
-    material_force_state.dwv_dx=VECTOR<T,3>((material_force_state.delta_u(2)-material_force_state.delta_u(1))/material_force_state.denom,
-        -material_force_state.delta_u(2)/material_force_state.denom,material_force_state.delta_u(1)/material_force_state.denom);
+    material_force_state.dwu_dx=VECTOR<T,3>((material_force_state.delta_v(0)-material_force_state.delta_v(1))/material_force_state.denom,
+        material_force_state.delta_v(1)/material_force_state.denom,-material_force_state.delta_v(0)/material_force_state.denom);
+    material_force_state.dwv_dx=VECTOR<T,3>((material_force_state.delta_u(1)-material_force_state.delta_u(0))/material_force_state.denom,
+        -material_force_state.delta_u(1)/material_force_state.denom,material_force_state.delta_u(0)/material_force_state.denom);
 }
 //#####################################################################
 #define INSTANTIATION_HELPER(T,d) \

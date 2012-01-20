@@ -31,7 +31,7 @@ public:
     {optimize_fill_for_single_cell_regions=optimize;}
 
     int Flood_Fill(ARRAYS_ND_BASE<TV_INT>& colors,const ARRAY<bool,FACE_INDEX<3> >& edge_is_blocked,ARRAY<bool>* color_touches_uncolorable_node=0)
-    {return Flood_Fill(colors,edge_is_blocked.Component(1),edge_is_blocked.Component(2),edge_is_blocked.Component(3),color_touches_uncolorable_node);}
+    {return Flood_Fill(colors,edge_is_blocked.Component(0),edge_is_blocked.Component(1),edge_is_blocked.Component(2),color_touches_uncolorable_node);}
 
     // colors should be initialized by the user with 0's where colors will be filled and negative values for nodes which will not be colored.
     // -1 is the distinguished uncolorable node (which color_touches_uncolorable_node refers to)

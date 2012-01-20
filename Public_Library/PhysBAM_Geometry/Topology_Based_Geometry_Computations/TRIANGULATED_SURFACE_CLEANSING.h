@@ -60,9 +60,9 @@ Close_Surface(TRIANGULATED_SURFACE<T>& ts,const bool merge_coincident_vertices,c
 #endif
                     for(int j=0;j<(*ts.mesh.incident_elements)(index1).m;j++){
                         int t=(*ts.mesh.incident_elements)(index1)(j);
-                        if(ts.mesh.elements(t)(1)==index1)ts.mesh.elements(t)(1)=closest_index2;
-                        else if(ts.mesh.elements(t)(2)==index1)ts.mesh.elements(t)(2)=closest_index2;
-                        else if(ts.mesh.elements(t)(3)==index1)ts.mesh.elements(t)(3)=closest_index2;}
+                        if(ts.mesh.elements(t)(0)==index1)ts.mesh.elements(t)(0)=closest_index2;
+                        else if(ts.mesh.elements(t)(1)==index1)ts.mesh.elements(t)(1)=closest_index2;
+                        else if(ts.mesh.elements(t)(2)==index1)ts.mesh.elements(t)(2)=closest_index2;}
                     (*ts.mesh.incident_elements)(closest_index2).Append_Elements((*ts.mesh.incident_elements)(index1));}}} // dynamically update the incident triangles list
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         if(verbose) LOG::cout<<std::endl<<number_merged<<" vertices merged"<<std::endl<<std::endl;

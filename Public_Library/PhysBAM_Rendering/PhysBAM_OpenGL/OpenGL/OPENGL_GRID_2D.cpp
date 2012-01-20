@@ -95,14 +95,14 @@ Display(const int in_color) const
             int mask_m_start,mask_n_start;
             glPushAttrib(GL_ALL_ATTRIB_BITS);glLineWidth(4*OPENGL_PREFERENCES::line_width);OPENGL_COLOR::Cyan().Send_To_GL_Pipeline();
             ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-            mask_m_start=face_mask->Component(1).domain.min_corner.x,mask_n_start=face_mask->Component(1).domain.min_corner.y;
+            mask_m_start=face_mask->Component(0).domain.min_corner.x,mask_n_start=face_mask->Component(0).domain.min_corner.y;
             for(i=-ghost_cells,x=min_corner.x,i_mask=1;i<grid.numbers_of_cells.x+ghost_cells+1;i++,x+=grid.dX.x,i_mask++)
                 for(j=-ghost_cells,y=min_corner.y,j_mask=1;j<grid.numbers_of_cells.y+ghost_cells;j++,y+=grid.dX.y,j_mask++)
-                    if((face_mask->Component(1))(mask_m_start+i_mask-1,mask_n_start+j_mask-1)){OpenGL_Line(VECTOR<T,2>(x,y),VECTOR<T,2>(x,y+grid.dX.y),vertices);}
-            mask_m_start=face_mask->Component(2).domain.min_corner.x,mask_n_start=face_mask->Component(2).domain.min_corner.y;
+                    if((face_mask->Component(0))(mask_m_start+i_mask-1,mask_n_start+j_mask-1)){OpenGL_Line(VECTOR<T,2>(x,y),VECTOR<T,2>(x,y+grid.dX.y),vertices);}
+            mask_m_start=face_mask->Component(1).domain.min_corner.x,mask_n_start=face_mask->Component(1).domain.min_corner.y;
             for(i=-ghost_cells,x=min_corner.x,i_mask=1;i<grid.numbers_of_cells.x+ghost_cells;i++,x+=grid.dX.x,i_mask++)
                 for(j=-ghost_cells,y=min_corner.y,j_mask=1;j<grid.numbers_of_cells.y+ghost_cells+1;j++,y+=grid.dX.y,j_mask++)
-                    if((face_mask->Component(2))(mask_m_start+i_mask-1,mask_n_start+j_mask-1)){OpenGL_Line(VECTOR<T,2>(x,y),VECTOR<T,2>(x+grid.dX.x,y),vertices);}
+                    if((face_mask->Component(1))(mask_m_start+i_mask-1,mask_n_start+j_mask-1)){OpenGL_Line(VECTOR<T,2>(x,y),VECTOR<T,2>(x+grid.dX.x,y),vertices);}
             OpenGL_Draw_Arrays(GL_LINES,2,vertices);
             glPopAttrib();}
 
@@ -122,14 +122,14 @@ Display(const int in_color) const
             face_mask=active_face_mask;
             int mask_m_start,mask_n_start;
             ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-            mask_m_start=face_mask->Component(1).domain.min_corner.x,mask_n_start=face_mask->Component(1).domain.min_corner.y;
+            mask_m_start=face_mask->Component(0).domain.min_corner.x,mask_n_start=face_mask->Component(0).domain.min_corner.y;
             for(i=-ghost_cells,x=min_corner.x,i_mask=1;i<grid.numbers_of_cells.x+ghost_cells+1;i++,x+=grid.dX.x,i_mask++)
                 for(j=-ghost_cells,y=min_corner.y,j_mask=1;j<grid.numbers_of_cells.y+ghost_cells;j++,y+=grid.dX.y,j_mask++)
-                    if((face_mask->Component(1))(mask_m_start+i_mask-1,mask_n_start+j_mask-1)){OpenGL_Line(VECTOR<T,2>(x,y),VECTOR<T,2>(x,y+grid.dX.y),vertices);}
-            mask_m_start=face_mask->Component(2).domain.min_corner.x,mask_n_start=face_mask->Component(2).domain.min_corner.y;
+                    if((face_mask->Component(0))(mask_m_start+i_mask-1,mask_n_start+j_mask-1)){OpenGL_Line(VECTOR<T,2>(x,y),VECTOR<T,2>(x,y+grid.dX.y),vertices);}
+            mask_m_start=face_mask->Component(1).domain.min_corner.x,mask_n_start=face_mask->Component(1).domain.min_corner.y;
             for(i=-ghost_cells,x=min_corner.x,i_mask=1;i<grid.numbers_of_cells.x+ghost_cells;i++,x+=grid.dX.x,i_mask++)
                 for(j=-ghost_cells,y=min_corner.y,j_mask=1;j<grid.numbers_of_cells.y+ghost_cells+1;j++,y+=grid.dX.y,j_mask++)
-                    if((face_mask->Component(2))(mask_m_start+i_mask-1,mask_n_start+j_mask-1)){OpenGL_Line(VECTOR<T,2>(x,y),VECTOR<T,2>(x+grid.dX.x,y),vertices);}
+                    if((face_mask->Component(1))(mask_m_start+i_mask-1,mask_n_start+j_mask-1)){OpenGL_Line(VECTOR<T,2>(x,y),VECTOR<T,2>(x+grid.dX.x,y),vertices);}
             OpenGL_Draw_Arrays(GL_LINES,2,vertices);}
         else{
             if(draw_mask_type&&ghost_cells==3){ghost_cells=4;min_corner=min_corner-VECTOR<T,2>(grid.dX.x,grid.dX.y);max_corner=max_corner+VECTOR<T,2>(grid.dX.x,grid.dX.y);}

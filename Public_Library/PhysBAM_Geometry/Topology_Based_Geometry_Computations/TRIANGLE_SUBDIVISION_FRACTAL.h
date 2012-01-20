@@ -30,8 +30,8 @@ void Apply_Fractal_Subdivision(TRIANGLE_SUBDIVISION& ts,ARRAY_VIEW<const TV> bas
     // interpolate values on edges
     RANDOM_NUMBERS<T> random;
     for(int k=0;k<ts.triangle_mesh.segment_mesh->elements.m;k++){
-        int node1=ts.triangle_mesh.segment_mesh->elements(k)(1);
-        int node2=ts.triangle_mesh.segment_mesh->elements(k)(2);
+        int node1=ts.triangle_mesh.segment_mesh->elements(k)(0);
+        int node2=ts.triangle_mesh.segment_mesh->elements(k)(1);
         TV midpoint=(T).5*(base_values(node1)+base_values(node2));
         TV offset=base_values(node1)-base_values(node2);
         T modulus=(T)power*random.Get_Gaussian();

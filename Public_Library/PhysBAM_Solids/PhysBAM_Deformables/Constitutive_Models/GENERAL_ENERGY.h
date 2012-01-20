@@ -180,35 +180,35 @@ public:
 
     void Compute_it(const VECTOR<T,2>& f,int simplex,VECTOR<T,1>& g_it,VECTOR<T,0>& H_xit,VECTOR<T,1>& H_iitt,VECTOR<T,0>& T_xxit,VECTOR<T,0>& T_xiitt,VECTOR<T,1>& T_iiittt,VECTOR<T,1>& T_itit) const
     {
-        g_it(1)=Ex_Ey_x_y(f.x,f.y,simplex);
-        H_iitt(1)=Exx_Eyy_x_y(f.x,f.y,simplex);
-        T_iiittt(1)=Exxx_Eyyy_x_y(f.x,f.y,simplex);
-        T_itit(1)=Exxy_Exyy_x_y(f.x,f.y,simplex);
+        g_it(0)=Ex_Ey_x_y(f.x,f.y,simplex);
+        H_iitt(0)=Exx_Eyy_x_y(f.x,f.y,simplex);
+        T_iiittt(0)=Exxx_Eyyy_x_y(f.x,f.y,simplex);
+        T_itit(0)=Exxy_Exyy_x_y(f.x,f.y,simplex);
     }
 
     void Compute_it(const VECTOR<T,3>& f,int simplex,VECTOR<T,3>& g_it,VECTOR<T,3>& H_xit,VECTOR<T,3>& H_iitt,VECTOR<T,3>& T_xxit,VECTOR<T,3>& T_xiitt,VECTOR<T,3>& T_iiittt,VECTOR<T,3>& T_itit) const
     {
-        g_it(1)=Ey_Ez_y_z(f.x,f.y,f.z,simplex);
-        g_it(2)=Ex_Ez_x_z(f.x,f.y,f.z,simplex);
-        g_it(3)=Ex_Ey_x_y(f.x,f.y,f.z,simplex);
-        H_iitt(1)=Eyy_Ezz_y_z(f.x,f.y,f.z,simplex);
-        H_iitt(2)=Exx_Ezz_x_z(f.x,f.y,f.z,simplex);
-        H_iitt(3)=Exx_Eyy_x_y(f.x,f.y,f.z,simplex);
-        H_xit(1)=Exy_Exz_y_z(f.x,f.y,f.z,simplex);
-        H_xit(2)=Exy_Eyz_x_z(f.x,f.y,f.z,simplex);
-        H_xit(3)=Exz_Eyz_x_y(f.x,f.y,f.z,simplex);
-        T_xxit(1)=Exxy_Exxz_y_z(f.x,f.y,f.z,simplex);
-        T_xxit(2)=Exyy_Eyyz_x_z(f.x,f.y,f.z,simplex);
-        T_xxit(3)=Exzz_Eyzz_x_y(f.x,f.y,f.z,simplex);
-        T_xiitt(1)=Exyy_Exzz_y_z(f.x,f.y,f.z,simplex);
-        T_xiitt(2)=Exxy_Eyzz_x_z(f.x,f.y,f.z,simplex);
-        T_xiitt(3)=Exxz_Eyyz_x_y(f.x,f.y,f.z,simplex);
-        T_iiittt(1)=Eyyy_Ezzz_y_z(f.x,f.y,f.z,simplex);
-        T_iiittt(2)=Exxx_Ezzz_x_z(f.x,f.y,f.z,simplex);
-        T_iiittt(3)=Exxx_Eyyy_x_y(f.x,f.y,f.z,simplex);
-        T_itit(1)=Eyyz_Eyzz_y_z(f.x,f.y,f.z,simplex);
-        T_itit(2)=Exxz_Exzz_x_z(f.x,f.y,f.z,simplex);
-        T_itit(3)=Exxy_Exyy_x_y(f.x,f.y,f.z,simplex);
+        g_it(0)=Ey_Ez_y_z(f.x,f.y,f.z,simplex);
+        g_it(1)=Ex_Ez_x_z(f.x,f.y,f.z,simplex);
+        g_it(2)=Ex_Ey_x_y(f.x,f.y,f.z,simplex);
+        H_iitt(0)=Eyy_Ezz_y_z(f.x,f.y,f.z,simplex);
+        H_iitt(1)=Exx_Ezz_x_z(f.x,f.y,f.z,simplex);
+        H_iitt(2)=Exx_Eyy_x_y(f.x,f.y,f.z,simplex);
+        H_xit(0)=Exy_Exz_y_z(f.x,f.y,f.z,simplex);
+        H_xit(1)=Exy_Eyz_x_z(f.x,f.y,f.z,simplex);
+        H_xit(2)=Exz_Eyz_x_y(f.x,f.y,f.z,simplex);
+        T_xxit(0)=Exxy_Exxz_y_z(f.x,f.y,f.z,simplex);
+        T_xxit(1)=Exyy_Eyyz_x_z(f.x,f.y,f.z,simplex);
+        T_xxit(2)=Exzz_Eyzz_x_y(f.x,f.y,f.z,simplex);
+        T_xiitt(0)=Exyy_Exzz_y_z(f.x,f.y,f.z,simplex);
+        T_xiitt(1)=Exxy_Eyzz_x_z(f.x,f.y,f.z,simplex);
+        T_xiitt(2)=Exxz_Eyyz_x_y(f.x,f.y,f.z,simplex);
+        T_iiittt(0)=Eyyy_Ezzz_y_z(f.x,f.y,f.z,simplex);
+        T_iiittt(1)=Exxx_Ezzz_x_z(f.x,f.y,f.z,simplex);
+        T_iiittt(2)=Exxx_Eyyy_x_y(f.x,f.y,f.z,simplex);
+        T_itit(0)=Eyyz_Eyzz_y_z(f.x,f.y,f.z,simplex);
+        T_itit(1)=Exxz_Exzz_x_z(f.x,f.y,f.z,simplex);
+        T_itit(2)=Exxy_Exyy_x_y(f.x,f.y,f.z,simplex);
     }
 };
 }

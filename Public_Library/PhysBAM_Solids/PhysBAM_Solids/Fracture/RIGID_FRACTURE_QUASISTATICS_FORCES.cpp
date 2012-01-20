@@ -28,12 +28,12 @@ Initialize(const RIGID_BODY_FRACTURE_OBJECT_3D<T>& fracture_object_input,const V
     const PARTICLES<TV>& particles=fracture_object->particles;
     null_space_nodes=null_space_nodes_input;
 
-    null_space_position=fracture_object->Frame()*particles.X(null_space_nodes(1));
-    TV x1_x2_direction=fracture_object->Frame()*particles.X(null_space_nodes(2))-null_space_position,x1_x3_direction=fracture_object->Frame()*particles.X(null_space_nodes(3))-null_space_position;
+    null_space_position=fracture_object->Frame()*particles.X(null_space_nodes(0));
+    TV x1_x2_direction=fracture_object->Frame()*particles.X(null_space_nodes(1))-null_space_position,x1_x3_direction=fracture_object->Frame()*particles.X(null_space_nodes(2))-null_space_position;
     direction1=x1_x2_direction.Normalized();
 
     //make sure x1_x2 and x1_x3 are not collinear
-    while(direction1==x1_x3_direction.Normalized()&& null_space_nodes(3)<particles.array_collection->Size()){null_space_nodes(3)++;x1_x3_direction=fracture_object->Frame()*particles.X(null_space_nodes(3))-null_space_position;}
+    while(direction1==x1_x3_direction.Normalized()&& null_space_nodes(2)<particles.array_collection->Size()){null_space_nodes(2)++;x1_x3_direction=fracture_object->Frame()*particles.X(null_space_nodes(2))-null_space_position;}
     direction2=TV::Cross_Product(x1_x2_direction,x1_x3_direction).Normalized();
 
     // New way of removing null space
@@ -50,9 +50,9 @@ template<class T> void RIGID_FRACTURE_QUASISTATICS_FORCES<T>::
 Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> dX,const T time)
 {
     if(!initialized) return;
-    dX(null_space_nodes(1))=TV();
-    dX(null_space_nodes(2)).Projected_On_Unit_Direction(direction2);
-    dX(null_space_nodes(3)).Projected_Orthogonal_To_Unit_Direction(direction1);
+    dX(null_space_nodes(0))=TV();
+    dX(null_space_nodes(1)).Projected_On_Unit_Direction(direction2);
+    dX(null_space_nodes(2)).Projected_Orthogonal_To_Unit_Direction(direction1);
 }
 //#####################################################################
 // Function Add_External_Forces

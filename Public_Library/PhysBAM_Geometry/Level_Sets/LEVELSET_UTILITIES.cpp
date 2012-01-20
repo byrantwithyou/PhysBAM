@@ -49,32 +49,32 @@ Negative_Cell_Fraction(const T phi_lower_left,const T phi_lower_right,const T ph
             T diagonal=Theta(phi_lower_left,phi_upper_right)*dxy,x_diagonal=diagonal/dxy,y_diagonal=diagonal*dy/dxy;
             T y_left=Theta(phi_lower_left,phi_upper_left)*dy;
             POLYGON<VECTOR<T,2> > quadrilateral(4);
-            quadrilateral.X(1)=VECTOR<T,2>(0,0);quadrilateral.X(2)=VECTOR<T,2>(x_bottom,0);
-            quadrilateral.X(3)=VECTOR<T,2>(x_diagonal,y_diagonal);quadrilateral.X(4)=VECTOR<T,2>(0,y_left);
+            quadrilateral.X(0)=VECTOR<T,2>(0,0);quadrilateral.X(1)=VECTOR<T,2>(x_bottom,0);
+            quadrilateral.X(2)=VECTOR<T,2>(x_diagonal,y_diagonal);quadrilateral.X(3)=VECTOR<T,2>(0,y_left);
             return quadrilateral.Area()/area;}
         else if(phi_lower_left > 0 && phi_lower_right <= 0 && phi_upper_left > 0 && phi_upper_right > 0){
             T y_right=Theta(phi_lower_right,phi_upper_right)*dy;
             T diagonal=Theta(phi_upper_left,phi_lower_right)*dxy,x_diagonal=diagonal/dxy,y_diagonal=dy-diagonal*dy/dxy;
             T x_bottom=Theta(phi_lower_left,phi_lower_right);
             POLYGON<VECTOR<T,2> > quadrilateral(4);
-            quadrilateral.X(1)=VECTOR<T,2>(1,0);quadrilateral.X(2)=VECTOR<T,2>(1,y_right);
-            quadrilateral.X(3)=VECTOR<T,2>(x_diagonal,y_diagonal);quadrilateral.X(4)=VECTOR<T,2>(x_bottom,0);
+            quadrilateral.X(0)=VECTOR<T,2>(1,0);quadrilateral.X(1)=VECTOR<T,2>(1,y_right);
+            quadrilateral.X(2)=VECTOR<T,2>(x_diagonal,y_diagonal);quadrilateral.X(3)=VECTOR<T,2>(x_bottom,0);
             return quadrilateral.Area()/area;}
         else if(phi_lower_left > 0 && phi_lower_right > 0 && phi_upper_left <= 0 && phi_upper_right > 0){
             T y_left=Theta(phi_lower_left,phi_upper_left)*dy;
             T diagonal=Theta(phi_upper_left,phi_lower_right)*dxy,x_diagonal=diagonal/dxy,y_diagonal=dy-diagonal*dy/dxy;
             T x_top=Theta(phi_upper_left,phi_upper_right);
             POLYGON<VECTOR<T,2> > quadrilateral(4);
-            quadrilateral.X(1)=VECTOR<T,2>(0,dy);quadrilateral.X(2)=VECTOR<T,2>(0,y_left);
-            quadrilateral.X(3)=VECTOR<T,2>(x_diagonal,y_diagonal);quadrilateral.X(4)=VECTOR<T,2>(x_top,dy);
+            quadrilateral.X(0)=VECTOR<T,2>(0,dy);quadrilateral.X(1)=VECTOR<T,2>(0,y_left);
+            quadrilateral.X(2)=VECTOR<T,2>(x_diagonal,y_diagonal);quadrilateral.X(3)=VECTOR<T,2>(x_top,dy);
             return quadrilateral.Area()/area;}
         else if(phi_lower_left > 0 && phi_lower_right > 0 && phi_upper_left > 0 && phi_upper_right <= 0){
             T x_top=Theta(phi_upper_left,phi_upper_right);
             T diagonal=Theta(phi_lower_left,phi_upper_right)*dxy,x_diagonal=diagonal/dxy,y_diagonal=diagonal*dy/dxy;
             T y_right=Theta(phi_lower_right,phi_upper_right)*dy;
             POLYGON<VECTOR<T,2> > quadrilateral(4);
-            quadrilateral.X(1)=VECTOR<T,2>(1,dy);quadrilateral.X(2)=VECTOR<T,2>(x_top,dy);
-            quadrilateral.X(3)=VECTOR<T,2>(x_diagonal,y_diagonal);quadrilateral.X(4)=VECTOR<T,2>(1,y_right);
+            quadrilateral.X(0)=VECTOR<T,2>(1,dy);quadrilateral.X(1)=VECTOR<T,2>(x_top,dy);
+            quadrilateral.X(2)=VECTOR<T,2>(x_diagonal,y_diagonal);quadrilateral.X(3)=VECTOR<T,2>(1,y_right);
             return quadrilateral.Area()/area;}
         // two corners negative - opposite corners
         else if(phi_lower_left <= 0 && phi_lower_right > 0 && phi_upper_left > 0 && phi_upper_right <= 0){
@@ -84,11 +84,11 @@ Negative_Cell_Fraction(const T phi_lower_left,const T phi_lower_right,const T ph
             T y_right=Theta(phi_lower_right,phi_upper_right)*dy;
             T x_center=(x_bottom+x_top+1)/4,y_center=(y_left+y_right+dy)/4; // average of the four points
             POLYGON<VECTOR<T,2> > quadrilateral(4);
-            quadrilateral.X(1)=VECTOR<T,2>(0,0);quadrilateral.X(2)=VECTOR<T,2>(x_bottom,0);
-            quadrilateral.X(3)=VECTOR<T,2>(x_center,y_center);quadrilateral.X(4)=VECTOR<T,2>(0,y_left);
+            quadrilateral.X(0)=VECTOR<T,2>(0,0);quadrilateral.X(1)=VECTOR<T,2>(x_bottom,0);
+            quadrilateral.X(2)=VECTOR<T,2>(x_center,y_center);quadrilateral.X(3)=VECTOR<T,2>(0,y_left);
             T area1=quadrilateral.Area();
-            quadrilateral.X(1)=VECTOR<T,2>(1,dy);quadrilateral.X(2)=VECTOR<T,2>(x_top,dy);
-            quadrilateral.X(3)=VECTOR<T,2>(x_center,y_center);quadrilateral.X(4)=VECTOR<T,2>(1,y_right);
+            quadrilateral.X(0)=VECTOR<T,2>(1,dy);quadrilateral.X(1)=VECTOR<T,2>(x_top,dy);
+            quadrilateral.X(2)=VECTOR<T,2>(x_center,y_center);quadrilateral.X(3)=VECTOR<T,2>(1,y_right);
             return (area1+quadrilateral.Area())/area;}
         else if(phi_lower_left > 0 && phi_lower_right <= 0 && phi_upper_left <= 0 && phi_upper_right > 0){
             T x_bottom=Theta(phi_lower_left,phi_lower_right);
@@ -97,11 +97,11 @@ Negative_Cell_Fraction(const T phi_lower_left,const T phi_lower_right,const T ph
             T y_right=Theta(phi_lower_right,phi_upper_right)*dy;
             T x_center=(x_bottom+x_top+1)/4,y_center=(y_left+y_right+dy)/4; // average of the four points
             POLYGON<VECTOR<T,2> > quadrilateral(4);
-            quadrilateral.X(1)=VECTOR<T,2>(1,0);quadrilateral.X(2)=VECTOR<T,2>(1,y_right);
-            quadrilateral.X(3)=VECTOR<T,2>(x_center,y_center);quadrilateral.X(4)=VECTOR<T,2>(x_bottom,0);
+            quadrilateral.X(0)=VECTOR<T,2>(1,0);quadrilateral.X(1)=VECTOR<T,2>(1,y_right);
+            quadrilateral.X(2)=VECTOR<T,2>(x_center,y_center);quadrilateral.X(3)=VECTOR<T,2>(x_bottom,0);
             T area1=quadrilateral.Area();
-            quadrilateral.X(1)=VECTOR<T,2>(0,dy);quadrilateral.X(2)=VECTOR<T,2>(0,y_left);
-            quadrilateral.X(3)=VECTOR<T,2>(x_center,y_center);quadrilateral.X(4)=VECTOR<T,2>(x_top,dy);
+            quadrilateral.X(0)=VECTOR<T,2>(0,dy);quadrilateral.X(1)=VECTOR<T,2>(0,y_left);
+            quadrilateral.X(2)=VECTOR<T,2>(x_center,y_center);quadrilateral.X(3)=VECTOR<T,2>(x_top,dy);
             return (area1+quadrilateral.Area())/area;}
         // two corners negative - adjacent corners
         else if(phi_lower_left <= 0 && phi_lower_right <= 0 && phi_upper_left > 0 && phi_upper_right > 0){
@@ -111,9 +111,9 @@ Negative_Cell_Fraction(const T phi_lower_left,const T phi_lower_right,const T ph
             T diagonal_2=Theta(phi_upper_left,phi_lower_right)*dxy,x_diagonal_2=diagonal_2/dxy,y_diagonal_2=dy-diagonal_2*dy/dxy;
             T x_diagonal=(x_diagonal_1+x_diagonal_2)/2,y_diagonal=(y_diagonal_1+y_diagonal_2)/2;
             POLYGON<VECTOR<T,2> > pentagon(5);
-            pentagon.X(1)=VECTOR<T,2>(0,0);pentagon.X(2)=VECTOR<T,2>(1,0);
-            pentagon.X(3)=VECTOR<T,2>(1,y_right);pentagon.X(4)=VECTOR<T,2>(x_diagonal,y_diagonal);
-            pentagon.X(5)=VECTOR<T,2>(0,y_left);
+            pentagon.X(0)=VECTOR<T,2>(0,0);pentagon.X(1)=VECTOR<T,2>(1,0);
+            pentagon.X(2)=VECTOR<T,2>(1,y_right);pentagon.X(3)=VECTOR<T,2>(x_diagonal,y_diagonal);
+            pentagon.X(4)=VECTOR<T,2>(0,y_left);
             return pentagon.Area()/area;}
         else if(phi_lower_left <= 0 && phi_lower_right > 0 && phi_upper_left <= 0 && phi_upper_right > 0){
             T x_bottom=Theta(phi_lower_left,phi_lower_right);
@@ -122,9 +122,9 @@ Negative_Cell_Fraction(const T phi_lower_left,const T phi_lower_right,const T ph
             T diagonal_2=Theta(phi_upper_left,phi_lower_right)*dxy,x_diagonal_2=diagonal_2/dxy,y_diagonal_2=dy-diagonal_2*dy/dxy;
             T x_diagonal=(x_diagonal_1+x_diagonal_2)/2,y_diagonal=(y_diagonal_1+y_diagonal_2)/2;
             POLYGON<VECTOR<T,2> > pentagon(5);
-            pentagon.X(1)=VECTOR<T,2>(0,0);pentagon.X(2)=VECTOR<T,2>(x_bottom,0);
-            pentagon.X(3)=VECTOR<T,2>(x_diagonal,y_diagonal);pentagon.X(4)=VECTOR<T,2>(x_top,dy);
-            pentagon.X(5)=VECTOR<T,2>(0,dy);
+            pentagon.X(0)=VECTOR<T,2>(0,0);pentagon.X(1)=VECTOR<T,2>(x_bottom,0);
+            pentagon.X(2)=VECTOR<T,2>(x_diagonal,y_diagonal);pentagon.X(3)=VECTOR<T,2>(x_top,dy);
+            pentagon.X(4)=VECTOR<T,2>(0,dy);
             return pentagon.Area()/area;}
         else if(phi_lower_left > 0 && phi_lower_right <= 0 && phi_upper_left > 0 && phi_upper_right <= 0){
             T x_bottom=Theta(phi_lower_left,phi_lower_right);
@@ -133,9 +133,9 @@ Negative_Cell_Fraction(const T phi_lower_left,const T phi_lower_right,const T ph
             T diagonal_2=Theta(phi_upper_left,phi_lower_right)*dxy,x_diagonal_2=diagonal_2/dxy,y_diagonal_2=dy-diagonal_2*dy/dxy;
             T x_diagonal=(x_diagonal_1+x_diagonal_2)/2,y_diagonal=(y_diagonal_1+y_diagonal_2)/2;
             POLYGON<VECTOR<T,2> > pentagon(5);
-            pentagon.X(1)=VECTOR<T,2>(1,0);pentagon.X(2)=VECTOR<T,2>(1,dy);
-            pentagon.X(3)=VECTOR<T,2>(x_top,dy);pentagon.X(4)=VECTOR<T,2>(x_diagonal,y_diagonal);
-            pentagon.X(5)=VECTOR<T,2>(x_bottom,0);
+            pentagon.X(0)=VECTOR<T,2>(1,0);pentagon.X(1)=VECTOR<T,2>(1,dy);
+            pentagon.X(2)=VECTOR<T,2>(x_top,dy);pentagon.X(3)=VECTOR<T,2>(x_diagonal,y_diagonal);
+            pentagon.X(4)=VECTOR<T,2>(x_bottom,0);
             return pentagon.Area()/area;}
         else if(phi_lower_left > 0 && phi_lower_right > 0 && phi_upper_left <= 0 && phi_upper_right <= 0){
             T y_left=Theta(phi_lower_left,phi_upper_left)*dy;
@@ -144,9 +144,9 @@ Negative_Cell_Fraction(const T phi_lower_left,const T phi_lower_right,const T ph
             T diagonal_2=Theta(phi_upper_left,phi_lower_right)*dxy,x_diagonal_2=diagonal_2/dxy,y_diagonal_2=dy-diagonal_2*dy/dxy;
             T x_diagonal=(x_diagonal_1+x_diagonal_2)/2,y_diagonal=(y_diagonal_1+y_diagonal_2)/2;
             POLYGON<VECTOR<T,2> > pentagon(5);
-            pentagon.X(1)=VECTOR<T,2>(0,dy);pentagon.X(2)=VECTOR<T,2>(0,y_left);
-            pentagon.X(3)=VECTOR<T,2>(x_diagonal,y_diagonal);pentagon.X(4)=VECTOR<T,2>(1,y_right);
-            pentagon.X(5)=VECTOR<T,2>(1,dy);
+            pentagon.X(0)=VECTOR<T,2>(0,dy);pentagon.X(1)=VECTOR<T,2>(0,y_left);
+            pentagon.X(2)=VECTOR<T,2>(x_diagonal,y_diagonal);pentagon.X(3)=VECTOR<T,2>(1,y_right);
+            pentagon.X(4)=VECTOR<T,2>(1,dy);
             return pentagon.Area()/area;}
         // three corners negative
         else if(phi_lower_left > 0 && phi_lower_right <= 0 && phi_upper_left <= 0 && phi_upper_right <= 0){
@@ -154,32 +154,32 @@ Negative_Cell_Fraction(const T phi_lower_left,const T phi_lower_right,const T ph
             T diagonal=Theta(phi_lower_left,phi_upper_right)*dxy,x_diagonal=diagonal/dxy,y_diagonal=diagonal*dy/dxy;
             T y_left=Theta(phi_lower_left,phi_upper_left)*dy;
             POLYGON<VECTOR<T,2> > quadrilateral(4);
-            quadrilateral.X(1)=VECTOR<T,2>(0,0);quadrilateral.X(2)=VECTOR<T,2>(x_bottom,0);
-            quadrilateral.X(3)=VECTOR<T,2>(x_diagonal,y_diagonal);quadrilateral.X(4)=VECTOR<T,2>(0,y_left);
+            quadrilateral.X(0)=VECTOR<T,2>(0,0);quadrilateral.X(1)=VECTOR<T,2>(x_bottom,0);
+            quadrilateral.X(2)=VECTOR<T,2>(x_diagonal,y_diagonal);quadrilateral.X(3)=VECTOR<T,2>(0,y_left);
             return (dy-quadrilateral.Area())/area;}
         else if(phi_lower_left <= 0 && phi_lower_right > 0 && phi_upper_left <= 0 && phi_upper_right <= 0){
             T y_right=Theta(phi_lower_right,phi_upper_right)*dy;
             T diagonal=Theta(phi_upper_left,phi_lower_right)*dxy,x_diagonal=diagonal/dxy,y_diagonal=dy-diagonal*dy/dxy;
             T x_bottom=Theta(phi_lower_left,phi_lower_right);
             POLYGON<VECTOR<T,2> > quadrilateral(4);
-            quadrilateral.X(1)=VECTOR<T,2>(1,0);quadrilateral.X(2)=VECTOR<T,2>(1,y_right);
-            quadrilateral.X(3)=VECTOR<T,2>(x_diagonal,y_diagonal);quadrilateral.X(4)=VECTOR<T,2>(x_bottom,0);
+            quadrilateral.X(0)=VECTOR<T,2>(1,0);quadrilateral.X(1)=VECTOR<T,2>(1,y_right);
+            quadrilateral.X(2)=VECTOR<T,2>(x_diagonal,y_diagonal);quadrilateral.X(3)=VECTOR<T,2>(x_bottom,0);
             return (dy-quadrilateral.Area())/area;}
         else if(phi_lower_left <= 0 && phi_lower_right <= 0 && phi_upper_left > 0 && phi_upper_right <= 0){
             T y_left=Theta(phi_lower_left,phi_upper_left)*dy;
             T diagonal=Theta(phi_upper_left,phi_lower_right)*dxy,x_diagonal=diagonal/dxy,y_diagonal=dy-diagonal*dy/dxy;
             T x_top=Theta(phi_upper_left,phi_upper_right);
             POLYGON<VECTOR<T,2> > quadrilateral(4);
-            quadrilateral.X(1)=VECTOR<T,2>(0,dy);quadrilateral.X(2)=VECTOR<T,2>(0,y_left);
-            quadrilateral.X(3)=VECTOR<T,2>(x_diagonal,y_diagonal);quadrilateral.X(4)=VECTOR<T,2>(x_top,dy);
+            quadrilateral.X(0)=VECTOR<T,2>(0,dy);quadrilateral.X(1)=VECTOR<T,2>(0,y_left);
+            quadrilateral.X(2)=VECTOR<T,2>(x_diagonal,y_diagonal);quadrilateral.X(3)=VECTOR<T,2>(x_top,dy);
             return (dy-quadrilateral.Area())/area;}
         else if(phi_lower_left <= 0 && phi_lower_right <= 0 && phi_upper_left <= 0 && phi_upper_right > 0){
             T x_top=Theta(phi_upper_left,phi_upper_right);
             T diagonal=Theta(phi_lower_left,phi_upper_right)*dxy,x_diagonal=diagonal/dxy,y_diagonal=diagonal*dy/dxy;
             T y_right=Theta(phi_lower_right,phi_upper_right)*dy;
             POLYGON<VECTOR<T,2> > quadrilateral(4);
-            quadrilateral.X(1)=VECTOR<T,2>(1,dy);quadrilateral.X(2)=VECTOR<T,2>(x_top,dy);
-            quadrilateral.X(3)=VECTOR<T,2>(x_diagonal,y_diagonal);quadrilateral.X(4)=VECTOR<T,2>(1,y_right);
+            quadrilateral.X(0)=VECTOR<T,2>(1,dy);quadrilateral.X(1)=VECTOR<T,2>(x_top,dy);
+            quadrilateral.X(2)=VECTOR<T,2>(x_diagonal,y_diagonal);quadrilateral.X(3)=VECTOR<T,2>(1,y_right);
             return (dy-quadrilateral.Area())/area;}}
 
     return 0; // should never be called

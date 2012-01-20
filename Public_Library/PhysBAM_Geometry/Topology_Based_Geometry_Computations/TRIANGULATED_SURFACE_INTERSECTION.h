@@ -56,9 +56,9 @@ bool Segment_Triangle_Intersection(TRIANGULATED_SURFACE<T>& ts,const SEGMENT_MES
     bool intersection=false;
     ARRAY<ARRAY<int> > triangles_near_edges(test_segment_mesh.elements.m);ts.Get_Triangles_Near_Edges(triangles_near_edges,test_segment_mesh,X,thickness_over_2,update_bounding_boxes);
     for(int e=0;e<test_segment_mesh.elements.m;e++){
-        SEGMENT_3D<T> segment(X(test_segment_mesh.elements(e)(1)),X(test_segment_mesh.elements(e)(2)));
+        SEGMENT_3D<T> segment(X(test_segment_mesh.elements(e)(0)),X(test_segment_mesh.elements(e)(1)));
         for(int k=0;k<triangles_near_edges(e).m;k++){int t=triangles_near_edges(e)(k);
-            TRIANGLE_3D<T> triangle(X(ts.mesh.elements(t)(1)),X(ts.mesh.elements(t)(2)),X(ts.mesh.elements(t)(3)));
+            TRIANGLE_3D<T> triangle(X(ts.mesh.elements(t)(0)),X(ts.mesh.elements(t)(1)),X(ts.mesh.elements(t)(2)));
             if(INTERSECTION::Intersects(segment,triangle,thickness_over_2)){intersection=true;
                 if(intersecting_segment_triangle_pairs) intersecting_segment_triangle_pairs->Append(VECTOR<int,2>(e,t));else return true;}}}
     return intersection;

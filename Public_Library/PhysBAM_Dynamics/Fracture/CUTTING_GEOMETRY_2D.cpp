@@ -35,12 +35,12 @@ Intersect_Simplex_With_Old_Simplices_In_Embedding(const int tri,const int new_si
         // Case 1 - Sharing of 1 or more nodes
         ARRAY<int> points_all_shared;cutting_simplices->Shared_Nodes_On_Simplices(converted_simplices,points_all_shared);
         if(points_all_shared.m>=2) continue; // multiple nodes means no intersection at a point
-        else if(points_all_shared.m==1){int shared_node=points_all_shared(1);
+        else if(points_all_shared.m==1){int shared_node=points_all_shared(0);
             assert(simplices==converted_simplices);
             VECTOR<VECTOR<T,1>,2> all_weights;for(int i=0;i<2;i++) all_weights(i)=Get_Node_Weights_From_Face(shared_node,cutting_simplices->simplices(simplices(i)).nodes);
             // skip intersection if it is outside the tet
-            const VECTOR<VECTOR<T,2>,2>& simplex_weights_in_embedding=cutting_simplices->simplices(simplices(1)).weights;
-            VECTOR<T,2> shared_node_weights_in_embedding=simplex_weights_in_embedding(1)*all_weights(1)[1]+simplex_weights_in_embedding(2)*(1-all_weights(1)[1]);
+            const VECTOR<VECTOR<T,2>,2>& simplex_weights_in_embedding=cutting_simplices->simplices(simplices(0)).weights;
+            VECTOR<T,2> shared_node_weights_in_embedding=simplex_weights_in_embedding(0)*all_weights(0)[0]+simplex_weights_in_embedding(1)*(1-all_weights(0)[0]);
             if(shared_node_weights_in_embedding.Min()<0 || shared_node_weights_in_embedding.Sum()>(T)1) goto NEXT_OLD_SIMPLEX;
             // skip intersection if already added under a different name
             for(int i=0;i<old_simplices.m;i++) if(cutting_simplices->simplices(old_simplices(i)).nodes.Contains(shared_node))
@@ -57,8 +57,8 @@ Intersect_Simplex_With_Old_Simplices_In_Embedding(const int tri,const int new_si
         {VECTOR<VECTOR<VECTOR<T,2>,2>,2> weights_for_simplices;
         for(int i=0;i<2;i++) weights_for_simplices[i]=cutting_simplices->simplices(simplices[i]).weights;
         VECTOR<VECTOR<T,1>,2> intersection_weights_in_segments;
-        if(SIMPLEX_INTERACTIONS<T>::Two_Segment_Intersection_Barycentric_Coordinates(weights_for_simplices[1],weights_for_simplices[2],
-                intersection_weights_in_segments[1],intersection_weights_in_segments[2]))
+        if(SIMPLEX_INTERACTIONS<T>::Two_Segment_Intersection_Barycentric_Coordinates(weights_for_simplices[0],weights_for_simplices[1],
+                intersection_weights_in_segments[0],intersection_weights_in_segments[1]))
             Register_Cut_Intersection(converted_simplices,intersection_weights_in_segments,0);}
       NEXT_OLD_SIMPLEX:;   
     }
@@ -101,12 +101,12 @@ Split_Existing_Polygons()
                 for(int run=0;run<polygon_mesh.elements(cutting_polygon.polygon_index).m;run++){
                     ARRAY<int>& pair=polygon_mesh.elements(cutting_polygon.polygon_index)(run);
                     assert(pair.m==2);
-                    all_polygonal_segments_on_simplex.Append(VECTOR<int,2>(pair(1),pair(2)));}
+                    all_polygonal_segments_on_simplex.Append(VECTOR<int,2>(pair(0),pair(1)));}
                 ARRAY<ARRAY<ARRAY<int > > > final_polygon_element_particles;
                 Divide_Polygon_Particles_With_New_Segments(all_polygonal_segments_on_simplex,new_particles_on_simplex,
                     polygon_mesh.elements(cutting_polygon.polygon_index),i,cutting_polygon.flipped,final_polygon_element_particles);
                 // replace old one with first new
-                polygon_mesh.elements(cutting_polygon.polygon_index)=final_polygon_element_particles(1);
+                polygon_mesh.elements(cutting_polygon.polygon_index)=final_polygon_element_particles(0);
                 polygons_per_element(tet_owner).Append(cutting_polygon_index);
                 // make all the rest
                 for(int k=2;k<=final_polygon_element_particles.m;k++){
@@ -131,21 +131,21 @@ Divide_Polygon_Particles_With_New_Segments(ARRAY<VECTOR<int,2> >& all_segments,c
     for(int k=0;k<possible_particles_to_add.m;k++){const int possible_particle_to_add=possible_particles_to_add(k);
         for(int i=0;i<all_segments.m;i++){
             if(all_segments(i).Contains(possible_particle_to_add)) goto NEXT_POSSIBLE_PARTICLES;
-            int node1=all_segments(i)(1),node2=all_segments(i)(2);
+            int node1=all_segments(i)(0),node2=all_segments(i)(1);
             T X=intersection_registry->Get_Simplex_Weights_Of_Intersection(possible_particle_to_add,cutting_simplex).x,
                 X1=intersection_registry->Get_Simplex_Weights_Of_Intersection(node1,cutting_simplex).x,
                 X2=intersection_registry->Get_Simplex_Weights_Of_Intersection(node2,cutting_simplex).x;
             if(verbose) PHYSBAM_DEBUG_PRINT("   trying to split ",flipped,possible_particle_to_add,node1,node2,X,X1,X2);
             if(flipped ? X>X1 && X<X2 : X<X1 && X>X2){
-                all_segments(i)(2)=possible_particle_to_add;all_segments.Append(VECTOR<int,2>(possible_particle_to_add,node2));}}
+                all_segments(i)(1)=possible_particle_to_add;all_segments.Append(VECTOR<int,2>(possible_particle_to_add,node2));}}
       NEXT_POSSIBLE_PARTICLES:;
     }
     if(verbose){LOG::cout<<"All particles on simplex "<<cutting_simplex<<" after adding new ";for(int j=0;j<all_segments.m;j++) LOG::cout<<all_segments(j)<<"; ";LOG::cout<<std::endl;}
     for(int i=0;i<all_segments.m;i++){
         int polygon=final_polygon_element_particles.Append(ARRAY<ARRAY<int> >());
         int component=final_polygon_element_particles(polygon).Append(ARRAY<int>());
-        final_polygon_element_particles(polygon)(component).Append(all_segments(i)(1));
-        final_polygon_element_particles(polygon)(component).Append(all_segments(i)(2));}
+        final_polygon_element_particles(polygon)(component).Append(all_segments(i)(0));
+        final_polygon_element_particles(polygon)(component).Append(all_segments(i)(1));}
 }
 //#####################################################################
 template class CUTTING_GEOMETRY_2D<VECTOR<float,2>,2>;

@@ -229,7 +229,7 @@ public:
     magnitude=sqrt(sqr(x[6])+sqr(x[7])+sqr(x[8]));assert(magnitude!=0);s=1/magnitude;x[6]*=s;x[7]*=s;x[8]*=s;}
 
     VECTOR<T,3> Column_Magnitudes() const
-    {return VECTOR<T,3>(Column(1).Magnitude(),Column(2).Magnitude(),Column(3).Magnitude());}
+    {return VECTOR<T,3>(Column(0).Magnitude(),Column(1).Magnitude(),Column(2).Magnitude());}
 
     VECTOR<T,3> Largest_Normalized_Column() const
     {T scale1=sqr(x[0])+sqr(x[1])+sqr(x[2]),scale2=sqr(x[3])+sqr(x[4])+sqr(x[5]),scale3=sqr(x[6])+sqr(x[7])+sqr(x[8]);

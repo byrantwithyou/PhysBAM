@@ -18,9 +18,9 @@ Display(const int in_color) const
     for(int i=lines.domain.min_corner.x;i<=lines.domain.max_corner.x;i++)for(int j=lines.domain.min_corner.y;j<=lines.domain.max_corner.y;j++){
         VECTOR<T,2> node=grid.Node(i,j);MATRIX<T,2> line=size*lines(i,j);
         (positive(i,j).x?positive_color:negative_color).Send_To_GL_Pipeline();
-        OpenGL_Line(node-line.Column(1),node+line.Column(1),vertices);
+        OpenGL_Line(node-line.Column(0),node+line.Column(0),vertices);
         (positive(i,j).y?positive_color:negative_color).Send_To_GL_Pipeline();
-        OpenGL_Line(node-line.Column(2),node+line.Column(2),vertices);}
+        OpenGL_Line(node-line.Column(1),node+line.Column(1),vertices);}
     OpenGL_Draw_Arrays(GL_LINES,2,vertices);
     glPopAttrib();
 }

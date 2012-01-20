@@ -156,7 +156,7 @@ Add_Rigid_Body_Walls(T_EXAMPLE& example,const GRID<VECTOR<T,2> >& fluid_grid,con
     VECTOR<T,2> center=fluid_grid.domain.Center(),size=fluid_grid.domain.Edge_Lengths();
     int id;
 
-    if(example.fluids_parameters.domain_walls(1)(1)){
+    if(example.fluids_parameters.domain_walls(0)(0)){
         id=rigid_body_collection.Add_Rigid_Body(example.stream_type,example.data_directory+"/Rigid_Bodies_2D/ground",size.y*(T).00501);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Restitution(coefficient_of_restitution);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Friction(coefficient_of_friction);
@@ -166,7 +166,7 @@ Add_Rigid_Body_Walls(T_EXAMPLE& example,const GRID<VECTOR<T,2> >& fluid_grid,con
         rigid_body_collection.Rigid_Body(id).is_static=true;
         if(walls_added) walls_added->Append(id);}
 
-    if(example.fluids_parameters.domain_walls(1)(2)){
+    if(example.fluids_parameters.domain_walls(0)(1)){
         id=rigid_body_collection.Add_Rigid_Body(example.stream_type,example.data_directory+"/Rigid_Bodies_2D/ground",size.y*(T).00501);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Restitution(coefficient_of_restitution);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Friction(coefficient_of_friction);
@@ -176,7 +176,7 @@ Add_Rigid_Body_Walls(T_EXAMPLE& example,const GRID<VECTOR<T,2> >& fluid_grid,con
         rigid_body_collection.Rigid_Body(id).is_static=true;
         if(walls_added) walls_added->Append(id);}
 
-    if(example.fluids_parameters.domain_walls(2)(1)){
+    if(example.fluids_parameters.domain_walls(1)(0)){
         id=rigid_body_collection.Add_Rigid_Body(example.stream_type,example.data_directory+"/Rigid_Bodies_2D/ground",size.x*(T).00501);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Restitution(coefficient_of_restitution);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Friction(coefficient_of_friction);
@@ -185,7 +185,7 @@ Add_Rigid_Body_Walls(T_EXAMPLE& example,const GRID<VECTOR<T,2> >& fluid_grid,con
         rigid_body_collection.Rigid_Body(id).is_static=true;
         if(walls_added) walls_added->Append(id);}
 
-    if(example.fluids_parameters.domain_walls(2)(2)){
+    if(example.fluids_parameters.domain_walls(1)(1)){
         id=rigid_body_collection.Add_Rigid_Body(example.stream_type,example.data_directory+"/Rigid_Bodies_2D/ground",size.x*(T).00501);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Restitution(coefficient_of_restitution);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Friction(coefficient_of_friction);
@@ -205,7 +205,7 @@ Add_Rigid_Body_Walls(T_EXAMPLE& example,const GRID<VECTOR<T,3> >& fluid_grid,con
     VECTOR<T,3> center=fluid_grid.domain.Center(),size=fluid_grid.domain.Edge_Lengths();
     int id;
 
-    if(example.fluids_parameters.domain_walls(1)(1)){
+    if(example.fluids_parameters.domain_walls(0)(0)){
         id=rigid_body_collection.Add_Rigid_Body(example.stream_type,example.data_directory+"/Rigid_Bodies/ground",max(size.y,size.z)*(T).00501);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Restitution(coefficient_of_restitution);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Friction(coefficient_of_friction);
@@ -215,7 +215,7 @@ Add_Rigid_Body_Walls(T_EXAMPLE& example,const GRID<VECTOR<T,3> >& fluid_grid,con
         rigid_body_collection.Rigid_Body(id).is_static=true;
         if(walls_added) walls_added->Append(id);}
 
-    if(example.fluids_parameters.domain_walls(1)(2)){
+    if(example.fluids_parameters.domain_walls(0)(1)){
         id=rigid_body_collection.Add_Rigid_Body(example.stream_type,example.data_directory+"/Rigid_Bodies/ground",max(size.y,size.z)*(T).00501);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Restitution(coefficient_of_restitution);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Friction(coefficient_of_friction);
@@ -225,7 +225,7 @@ Add_Rigid_Body_Walls(T_EXAMPLE& example,const GRID<VECTOR<T,3> >& fluid_grid,con
         rigid_body_collection.Rigid_Body(id).is_static=true;
         if(walls_added) walls_added->Append(id);}
 
-    if(example.fluids_parameters.domain_walls(2)(1)){
+    if(example.fluids_parameters.domain_walls(1)(0)){
         id=rigid_body_collection.Add_Rigid_Body(example.stream_type,example.data_directory+"/Rigid_Bodies/ground",max(size.x,size.z)*(T).00501);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Restitution(coefficient_of_restitution);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Friction(coefficient_of_friction);
@@ -234,7 +234,7 @@ Add_Rigid_Body_Walls(T_EXAMPLE& example,const GRID<VECTOR<T,3> >& fluid_grid,con
         rigid_body_collection.Rigid_Body(id).is_static=true;
         if(walls_added) walls_added->Append(id);}
 
-    if(example.fluids_parameters.domain_walls(2)(2)){
+    if(example.fluids_parameters.domain_walls(1)(1)){
         id=rigid_body_collection.Add_Rigid_Body(example.stream_type,example.data_directory+"/Rigid_Bodies/ground",max(size.x,size.z)*(T).00501);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Restitution(coefficient_of_restitution);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Friction(coefficient_of_friction);
@@ -244,7 +244,7 @@ Add_Rigid_Body_Walls(T_EXAMPLE& example,const GRID<VECTOR<T,3> >& fluid_grid,con
         rigid_body_collection.Rigid_Body(id).is_static=true;
         if(walls_added) walls_added->Append(id);}
 
-    if(example.fluids_parameters.domain_walls(3)(1)){
+    if(example.fluids_parameters.domain_walls(2)(0)){
         id=rigid_body_collection.Add_Rigid_Body(example.stream_type,example.data_directory+"/Rigid_Bodies/ground",max(size.x,size.y)*(T).00501);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Restitution(coefficient_of_restitution);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Friction(coefficient_of_friction);
@@ -254,7 +254,7 @@ Add_Rigid_Body_Walls(T_EXAMPLE& example,const GRID<VECTOR<T,3> >& fluid_grid,con
         rigid_body_collection.Rigid_Body(id).is_static=true;
         if(walls_added) walls_added->Append(id);}
 
-    if(example.fluids_parameters.domain_walls(3)(2)){
+    if(example.fluids_parameters.domain_walls(2)(1)){
         id=rigid_body_collection.Add_Rigid_Body(example.stream_type,example.data_directory+"/Rigid_Bodies/ground",max(size.x,size.y)*(T).00501);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Restitution(coefficient_of_restitution);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Friction(coefficient_of_friction);
@@ -398,12 +398,12 @@ template<class TV> static void Set_Parameters_From_Parameter_List(FLUIDS_PARAMET
     parameter_list.Get_Parameter_In_Place("fluids_parameters.refine_fmm_initialization_with_iterative_solver",fluids_parameters.refine_fmm_initialization_with_iterative_solver);
     parameter_list.Get_Parameter_In_Place("fluids_parameters.modify_wall_tangential_velocities",fluids_parameters.modify_wall_tangential_velocities);
 
+    parameter_list.Get_Parameter_In_Place("fluids_parameters.domain_walls(0)(0)",fluids_parameters.domain_walls(0)(0));
+    parameter_list.Get_Parameter_In_Place("fluids_parameters.domain_walls(0)(1)",fluids_parameters.domain_walls(0)(1));
+    parameter_list.Get_Parameter_In_Place("fluids_parameters.domain_walls(1)(0)",fluids_parameters.domain_walls(1)(0));
     parameter_list.Get_Parameter_In_Place("fluids_parameters.domain_walls(1)(1)",fluids_parameters.domain_walls(1)(1));
-    parameter_list.Get_Parameter_In_Place("fluids_parameters.domain_walls(1)(2)",fluids_parameters.domain_walls(1)(2));
+    parameter_list.Get_Parameter_In_Place("fluids_parameters.domain_walls(2)(0)",fluids_parameters.domain_walls(2)(0));
     parameter_list.Get_Parameter_In_Place("fluids_parameters.domain_walls(2)(1)",fluids_parameters.domain_walls(2)(1));
-    parameter_list.Get_Parameter_In_Place("fluids_parameters.domain_walls(2)(2)",fluids_parameters.domain_walls(2)(2));
-    parameter_list.Get_Parameter_In_Place("fluids_parameters.domain_walls(3)(1)",fluids_parameters.domain_walls(3)(1));
-    parameter_list.Get_Parameter_In_Place("fluids_parameters.domain_walls(3)(2)",fluids_parameters.domain_walls(3)(2));
 
     if(parameter_list.Is_Defined("fluids_parameters.levelset_substeps")) PHYSBAM_FATAL_ERROR("levelset_substeps has been renamed to scalar_substeps -- update your param file!");
 

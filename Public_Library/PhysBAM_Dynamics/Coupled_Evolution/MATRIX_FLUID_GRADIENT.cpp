@@ -43,15 +43,15 @@ Compute(const ARRAY<bool,FACE_INDEX<d> >& psi_N)
     for(int i=0;i<index_map.indexed_faces.m;i++){
         const FACE_INDEX<d>& face_index=index_map.indexed_faces(i);
         if(!psi_N(face_index)){
-            Add_Cell(i,face_index.axis,face_index.First_Cell_Index(),face_areas(1)(face_index.axis));
-            Add_Cell(i,face_index.axis,face_index.Second_Cell_Index(),face_areas(2)(face_index.axis));
-            Add_Interface(i,face_index,face_areas(1)(face_index.axis));}
+            Add_Cell(i,face_index.axis,face_index.First_Cell_Index(),face_areas(0)(face_index.axis));
+            Add_Cell(i,face_index.axis,face_index.Second_Cell_Index(),face_areas(1)(face_index.axis));
+            Add_Interface(i,face_index,face_areas(0)(face_index.axis));}
 
         gradient.Finish_Row();}
     for(int i=0;i<index_map.indexed_constraints.m;i++){
         const SIDED_FACE_INDEX<d>& face_index=index_map.indexed_constraints(i);
         Add_Cell(index_map.indexed_faces.m+i,face_index.axis,face_index.Real_Cell_Index(),face_areas(face_index.side)(face_index.axis));
-        Add_Interface(index_map.indexed_faces.m+i,index_map.indexed_constraints(i),face_areas(1)(face_index.axis));
+        Add_Interface(index_map.indexed_faces.m+i,index_map.indexed_constraints(i),face_areas(0)(face_index.axis));
 
         gradient.Finish_Row();}
     gradient.Sort_Entries();

@@ -148,7 +148,7 @@ public:
     {return VECTOR<T,3>(x[0]*v.x+x[3]*v.y,x[1]*v.x+x[4]*v.y,x[2]*v.x+x[5]*v.y);}
 
     UPPER_TRIANGULAR_MATRIX<T,2> R_From_QR_Factorization() const // Gram Schmidt
-    {T x_dot_x=Column(1).Magnitude_Squared(),x_dot_y=VECTOR<T,3>::Dot_Product(Column(1),Column(2)),y_dot_y=Column(2).Magnitude_Squared();
+    {T x_dot_x=Column(0).Magnitude_Squared(),x_dot_y=VECTOR<T,3>::Dot_Product(Column(0),Column(1)),y_dot_y=Column(1).Magnitude_Squared();
     T r11=sqrt(x_dot_x),r12=r11?x_dot_y/r11:0,r22=sqrt(max((T)0,y_dot_y-r12*r12));
     return UPPER_TRIANGULAR_MATRIX<T,2>(r11,r12,r22);}
 
@@ -197,11 +197,11 @@ public:
     {return A.x[0]*B.x[0]+A.x[1]*B.x[1]+A.x[2]*B.x[2]+A.x[3]*B.x[3]+A.x[4]*B.x[4]+A.x[5]*B.x[5];}
 
     VECTOR<T,3> Weighted_Normal() const
-    {return VECTOR<T,3>::Cross_Product(Column(1),Column(2));}
+    {return VECTOR<T,3>::Cross_Product(Column(0),Column(1));}
 
     MATRIX Cofactor_Matrix() const
     {VECTOR<T,3> normal=Weighted_Normal().Normalized();
-    return MATRIX(VECTOR<T,3>::Cross_Product(Column(2),normal),VECTOR<T,3>::Cross_Product(normal,Column(1)));}
+    return MATRIX(VECTOR<T,3>::Cross_Product(Column(1),normal),VECTOR<T,3>::Cross_Product(normal,Column(0)));}
 
     T Parallelepiped_Measure() const
     {return Weighted_Normal().Magnitude();}

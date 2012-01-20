@@ -34,7 +34,7 @@ public:
     virtual ~SEGMENTED_CURVE();
 
     T_SEGMENT Get_Element(const int aggregate_id) const
-    {return T_SEGMENT(particles.X(mesh.elements(aggregate_id)(1)),particles.X(mesh.elements(aggregate_id)(2)));}
+    {return T_SEGMENT(particles.X(mesh.elements(aggregate_id)(0)),particles.X(mesh.elements(aggregate_id)(1)));}
 
     void Rescale(const T scaling_factor) PHYSBAM_OVERRIDE
     {Rescale(scaling_factor*TV::All_Ones_Vector());}
@@ -57,7 +57,7 @@ public:
     {return Total_Length(); }
 
     T Size(const int segment) const
-    {int node1=mesh.elements(segment)(1),node2=mesh.elements(segment)(2);
+    {int node1=mesh.elements(segment)(0),node2=mesh.elements(segment)(1);
     return (particles.X(node1)-particles.X(node2)).Magnitude();}
 
     T Signed_Size(const int segment) const

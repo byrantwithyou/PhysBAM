@@ -75,13 +75,13 @@ public:
 
     template<class T_VECTOR>
     explicit VECTOR(const T_VECTOR& v)
-        :x(v(1)),y(v(2))
+        :x(v(0)),y(v(1))
     {
         STATIC_ASSERT((IS_SAME<T,typename T_VECTOR::ELEMENT>::value && T_VECTOR::m==2));
     }
 
     explicit VECTOR(const ARRAY<T>& v)
-        :x(v(1)),y(v(2))
+        :x(v(0)),y(v(1))
     {
         assert(2==v.Size());
     }
@@ -91,18 +91,18 @@ public:
     {
         const T_ARRAY& v_=v.Derived();
         assert(2==v_.Size());
-        x=v_(1);y=v_(2); // doing this here instead of as initializers dodges a bug in 4.1.1
+        x=v_(0);y=v_(1); // doing this here instead of as initializers dodges a bug in 4.1.1
     }
 
     template<class T_VECTOR>
     explicit VECTOR(const VECTOR_BASE<T,T_VECTOR>& v)
-        :x(v(1)),y(v(2))
+        :x(v(0)),y(v(1))
     {
         assert(2==v.Size());
     }
 
     VECTOR(const VECTOR_ND<T>& vector_input)
-        :x(vector_input(1)),y(vector_input(2))
+        :x(vector_input(0)),y(vector_input(1))
     {
         assert(vector_input.n==2);
     }
@@ -110,12 +110,12 @@ public:
     template<class T_VECTOR> typename ENABLE_IF<AND<IS_SAME<T,typename T_VECTOR::ELEMENT>::value,INTS_EQUAL<T_VECTOR::m,2>::value>::value,VECTOR&>::TYPE
     operator=(const T_VECTOR& v)
     {
-        x=v(1);y=v(2);return *this;
+        x=v(0);y=v(1);return *this;
     }
 
     VECTOR& operator=(const VECTOR& v)
     {
-        x=v(1);y=v(2);return *this;
+        x=v(0);y=v(1);return *this;
     }
 
     int Size() const
@@ -376,7 +376,7 @@ public:
     {return VECTOR<T,3>(x,y,element);}
 
     template<int d2> VECTOR<T,2+d2> Append_Elements(const VECTOR<T,d2>& elements) const
-    {VECTOR<T,2+d2> r;r[1]=x;r[2]=y;for(int i=0;i<d2;i++) r[i+2]=elements[i];return r;}
+    {VECTOR<T,2+d2> r;r[0]=x;r[1]=y;for(int i=0;i<d2;i++) r[i+2]=elements[i];return r;}
 
     VECTOR<T,2> Sorted() const
     {VECTOR<T,2> r(*this);exchange_sort(r.x,r.y);return r;}
@@ -390,7 +390,7 @@ public:
 
     template<int n> void Split(VECTOR<T,n>& v1,VECTOR<T,2-n>& v2) const
     {for(int i=0;i<n;i++) v1(i)=(*this)(i);
-    for(int i=n+1;i<=2;i++) v2(i-n)=(*this)(i);}
+    for(int i=n+1;i<2;i++) v2(i-n)=(*this)(i);}
 
     template<class T_VECTOR>
     void Set_Subvector(const int istart,const T_VECTOR& v)

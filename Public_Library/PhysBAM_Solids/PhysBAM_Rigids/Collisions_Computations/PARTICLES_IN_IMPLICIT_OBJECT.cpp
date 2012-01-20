@@ -196,7 +196,7 @@ void Intersections_Using_Hierarchy_And_Edges_Helper(RIGID_BODY<VECTOR<T,3> >& bo
     for(int t=0;t<triangle_list1.m;t++) for(int i=0;i<3;i++){
         int edge=(*mesh.element_edges)(triangle_list1(t))(i);
         if(!segment_checked(edge)){
-            int node1=mesh.segment_mesh->elements(edge)(1);
+            int node1=mesh.segment_mesh->elements(edge)(0);
             if(!checked(node1) && (!collidable || (*collidable)(node1))){
                 if(!body2.implicit_object->object_space_implicit_object->Lazy_Outside_Extended_Levelset_And_Value(
                        Transform_From_Body1_To_Body2_Coordinates<TV>(body1.simplicial_object->particles.X(node1),rotation,translation),value,contour_value)){
@@ -205,7 +205,7 @@ void Intersections_Using_Hierarchy_And_Edges_Helper(RIGID_BODY<VECTOR<T,3> >& bo
                     for(int j=0;j<(*mesh.segment_mesh->incident_elements)(node1).m;j++) // mark incident edges as checked
                         segment_checked((*mesh.segment_mesh->incident_elements)(node1)(j))=true;}
                 else phi_value(node1)=value;}
-            int node2=mesh.segment_mesh->elements(edge)(2);
+            int node2=mesh.segment_mesh->elements(edge)(1);
             if(!checked(node2) && (!collidable || (*collidable)(node1))){
                 if(!body2.implicit_object->object_space_implicit_object->Lazy_Outside_Extended_Levelset_And_Value(
                        Transform_From_Body1_To_Body2_Coordinates<TV>(body1.simplicial_object->particles.X(node2),rotation,translation),value,contour_value)){

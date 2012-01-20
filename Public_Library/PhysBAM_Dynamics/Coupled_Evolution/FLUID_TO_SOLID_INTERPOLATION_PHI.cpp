@@ -66,7 +66,7 @@ Setup_Mesh()
     HASHTABLE<TV_INT,ARRAY<FACE_INDEX<TV::m> > > cut_faces;
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(index_map.grid);it.Valid();it.Next()){
         FACE_INDEX<TV::m> face=it.Full_Index();
-        TV_INT a=TV_INT::Axis_Vector(3-it.Axis()),node0=it.index-a,node1=it.index,node2=it.index+a,node3=it.index+2*a;
+        TV_INT a=TV_INT::Axis_Vector(1-it.Axis()),node0=it.index-a,node1=it.index,node2=it.index+a,node3=it.index+2*a;
         T phi1=dual_phi(node1),phi2=dual_phi(node2);
         if((phi1>0)==(phi2>0)) continue;
         T theta=0;
@@ -86,7 +86,7 @@ Setup_Mesh()
     HASHTABLE_ITERATOR<FACE_INDEX<TV::m>,TV> it(HX);
     if(!it.Valid()) return;
     FACE_INDEX<TV::m> prev_face(it.Key());
-    TV_INT node1=prev_face.index,node2=prev_face.index+TV_INT::Axis_Vector(3-prev_face.axis);
+    TV_INT node1=prev_face.index,node2=prev_face.index+TV_INT::Axis_Vector(1-prev_face.axis);
     T phi1=dual_phi(node1),phi2=dual_phi(node2);
     int first_side=phi1<phi2?prev_face.axis:3-prev_face.axis;
     int next=0;
@@ -98,7 +98,7 @@ Setup_Mesh()
         const ARRAY<FACE_INDEX<TV::m> >& array=cut_faces.Get(cell);
         if(array.m!=2 && !index_map.grid.Domain_Indices().Lazy_Inside(cell)) PHYSBAM_FATAL_ERROR("Level set extends outside of domain");
         PHYSBAM_ASSERT(array.m==2);
-        FACE_INDEX<TV::m> next_face=(array(1)==prev_face)?array(2):array(1);
+        FACE_INDEX<TV::m> next_face=(array(0)==prev_face)?array(1):array(0);
         if(next_face==it.Key()) break;
         TV next_X=HX.Get(next_face);
         if((next_X-X(next)).Magnitude()>min_length){
@@ -108,12 +108,12 @@ Setup_Mesh()
         else LOG::cout<<"PRUNE SEGMENT  "<<(next_X-X(next)).Magnitude()<<"  "<<min_length<<"   "<<next<<std::endl;
         cell=(cell==next_face.First_Cell_Index())?next_face.Second_Cell_Index():next_face.First_Cell_Index();
         prev_face=next_face;}
-    if((X(1)-X(next)).Magnitude()>min_length){
+    if((X(0)-X(next)).Magnitude()>min_length){
         ce.i=curve.mesh.elements.Append(VECTOR<int,2>(next,1));
         cut_cells.Get_Or_Insert(cell).clipped_segments.Append(ce);}
     else{
         curve.mesh.elements.Last().y=1;
-        LOG::cout<<"PRUNE SEGMENT  "<<(X(1)-X(next)).Magnitude()<<"  "<<min_length<<"   "<<next<<std::endl;}
+        LOG::cout<<"PRUNE SEGMENT  "<<(X(0)-X(next)).Magnitude()<<"  "<<min_length<<"   "<<next<<std::endl;}
 
     Remove_Degeneracy();
 }
@@ -166,9 +166,9 @@ template<class TV> typename TV::SCALAR FLUID_TO_SOLID_INTERPOLATION_PHI<TV>::
 Compute_Cut4(const FACE_INDEX<TV::m>& face,T phi0,T phi1)
 {
     FACE_INDEX<TV::m> tface=face;
-    tface.index(3-tface.axis)--;
+    tface.index(1-tface.axis)--;
     T phia=Linear_Average(tface);
-    tface.index(3-tface.axis)+=2;
+    tface.index(1-tface.axis)+=2;
     T phib=Linear_Average(tface);
     CUBIC<T> c(0,0,0,0);
     T mxabs=maxabs(phia,phi0,phi1,phib);

@@ -33,7 +33,7 @@ public:
         :light_index(-1),position(position_input),color(color_input),brightness(brightness_input),world(world_input),supports_global_photon_mapping(supports_global_photons),
         supports_caustic_photon_mapping(supports_caustic_photons),supports_volume_photon_mapping(supports_volume_photons),photon_source_only(photon_source),casts_shadows(true)
     {
-        global_photon_random.Set_Seed(1);caustic_photon_random.Set_Seed(2);volume_photon_random.Set_Seed(3);sample_points_random.Set_Seed(4);
+        global_photon_random.Set_Seed(0);caustic_photon_random.Set_Seed(1);volume_photon_random.Set_Seed(2);sample_points_random.Set_Seed(3);
     }
 
     virtual ~RENDERING_LIGHT()

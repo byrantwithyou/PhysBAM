@@ -19,8 +19,8 @@ Add_First_Embedded_Segment(const int triangle,const TV& fracture_normal)
     else{
         HYPOTHETICAL_CUT_TRIANGLES<TV> hypothetical_cut(embedded_object);
         if(Add_Intersected_Points_To_Embedded_Triangulated_Object(triangle,fracture_normal,hypothetical_cut))
-            embedded_object.Add_Embedded_Segment(hypothetical_cut.hypothetical_nodes(1).index_in_embedded_particles,
-                hypothetical_cut.hypothetical_nodes(2).index_in_embedded_particles);}
+            embedded_object.Add_Embedded_Segment(hypothetical_cut.hypothetical_nodes(0).index_in_embedded_particles,
+                hypothetical_cut.hypothetical_nodes(1).index_in_embedded_particles);}
 }
 //#####################################################################
 // Function Add_First_Cut_Based_On_Phi
@@ -73,25 +73,25 @@ Add_Second_Embedded_Segment(const int triangle,const TV& fracture_normal)
     ARRAY<int>& active_indices=embedded_object.embedded_particles.active_indices;
     HYPOTHETICAL_CUT_TRIANGLES<TV> hypothetical_cut(embedded_object);
     if(Add_Intersected_Points_To_Embedded_Triangulated_Object(triangle,fracture_normal,hypothetical_cut)){
-        int embedded_particle_1=embedded_object.Embedded_Particle_On_Segment(hypothetical_cut.hypothetical_nodes(1).parents),
-            embedded_particle_2=embedded_object.Embedded_Particle_On_Segment(hypothetical_cut.hypothetical_nodes(2).parents);
+        int embedded_particle_1=embedded_object.Embedded_Particle_On_Segment(hypothetical_cut.hypothetical_nodes(0).parents),
+            embedded_particle_2=embedded_object.Embedded_Particle_On_Segment(hypothetical_cut.hypothetical_nodes(1).parents);
         if(embedded_particle_1 && embedded_particle_2 && embedded_object.embedded_mesh.Segment(active_indices(embedded_particle_1),active_indices(embedded_particle_2))){
             int embedded_particle_3=0;
-            if(embedded_object.Is_Parent(hypothetical_cut.hypothetical_nodes(1).parents[1],embedded_particle_2)){
-                int node_3=embedded_object.Other_Parent(hypothetical_cut.hypothetical_nodes(1).parents[1],embedded_particle_2);
-                embedded_particle_3=embedded_object.Embedded_Particle_On_Segment(hypothetical_cut.hypothetical_nodes(1).parents[2],node_3);}
+            if(embedded_object.Is_Parent(hypothetical_cut.hypothetical_nodes(0).parents[0],embedded_particle_2)){
+                int node_3=embedded_object.Other_Parent(hypothetical_cut.hypothetical_nodes(0).parents[0],embedded_particle_2);
+                embedded_particle_3=embedded_object.Embedded_Particle_On_Segment(hypothetical_cut.hypothetical_nodes(0).parents[1],node_3);}
             else{
-                int node_3=embedded_object.Other_Parent(hypothetical_cut.hypothetical_nodes(1).parents[2],embedded_particle_2);
-                embedded_particle_3=embedded_object.Embedded_Particle_On_Segment(hypothetical_cut.hypothetical_nodes(1).parents[1],node_3);}
+                int node_3=embedded_object.Other_Parent(hypothetical_cut.hypothetical_nodes(0).parents[1],embedded_particle_2);
+                embedded_particle_3=embedded_object.Embedded_Particle_On_Segment(hypothetical_cut.hypothetical_nodes(0).parents[0],node_3);}
             if(embedded_particle_3){
                 assert(!embedded_object.embedded_mesh.Segment(active_indices(embedded_particle_3),active_indices(embedded_particle_1))
                     && !embedded_object.embedded_mesh.Segment(active_indices(embedded_particle_3),active_indices(embedded_particle_2)));
                 if(Cut_31_Better_Than_Cut_32(embedded_object.Position_Of_Embedded_Particle(embedded_particle_1),embedded_object.Position_Of_Embedded_Particle(embedded_particle_2),
                     embedded_object.Position_Of_Embedded_Particle(embedded_particle_3),fracture_normal))
-                    embedded_object.Add_Embedded_Segment(embedded_particle_3,hypothetical_cut.hypothetical_nodes(1).index_in_embedded_particles);
-                else embedded_object.Add_Embedded_Segment(embedded_particle_3,hypothetical_cut.hypothetical_nodes(2).index_in_embedded_particles);}}
-        else embedded_object.Add_Embedded_Segment(hypothetical_cut.hypothetical_nodes(1).index_in_embedded_particles,
-            hypothetical_cut.hypothetical_nodes(2).index_in_embedded_particles);}
+                    embedded_object.Add_Embedded_Segment(embedded_particle_3,hypothetical_cut.hypothetical_nodes(0).index_in_embedded_particles);
+                else embedded_object.Add_Embedded_Segment(embedded_particle_3,hypothetical_cut.hypothetical_nodes(1).index_in_embedded_particles);}}
+        else embedded_object.Add_Embedded_Segment(hypothetical_cut.hypothetical_nodes(0).index_in_embedded_particles,
+            hypothetical_cut.hypothetical_nodes(1).index_in_embedded_particles);}
 }
 //#####################################################################
 // Function Add_Intersected_Points_To_Embedded_Triangulated_Object

@@ -68,17 +68,17 @@ Initialize_Triangle_Cut(const int isolated_node)
     else if(ep1&&ep2&&!ep3){
         Add_Hypothetical_Node(isolated_node,on1,embedded_object.interpolation_fraction(ep1));
         Add_Hypothetical_Node(isolated_node,on2,embedded_object.interpolation_fraction(ep2));
-        T interpolation_fraction3=Interpolation_Fraction_For_Best_Normal(Position(1),Position(2),isolated_node,on3);
+        T interpolation_fraction3=Interpolation_Fraction_For_Best_Normal(Position(0),Position(1),isolated_node,on3);
         Add_Hypothetical_Node(isolated_node,on3,interpolation_fraction3);}
     else if(ep1&&!ep2&&ep3){
         Add_Hypothetical_Node(isolated_node,on1,embedded_object.interpolation_fraction(ep1));
         Add_Hypothetical_Node(isolated_node,on3,embedded_object.interpolation_fraction(ep3));
-        T interpolation_fraction2=Interpolation_Fraction_For_Best_Normal(Position(1),Position(2),isolated_node,on2);
+        T interpolation_fraction2=Interpolation_Fraction_For_Best_Normal(Position(0),Position(1),isolated_node,on2);
         Add_Hypothetical_Node(isolated_node,on2,interpolation_fraction2);}
     else if(!ep1&&ep2&&ep3){
         Add_Hypothetical_Node(isolated_node,on2,embedded_object.interpolation_fraction(ep2));
         Add_Hypothetical_Node(isolated_node,on3,embedded_object.interpolation_fraction(ep3));
-        T interpolation_fraction1=Interpolation_Fraction_For_Best_Normal(Position(1),Position(2),isolated_node,on1);
+        T interpolation_fraction1=Interpolation_Fraction_For_Best_Normal(Position(0),Position(1),isolated_node,on1);
         Add_Hypothetical_Node(isolated_node,on1,interpolation_fraction1);}
 }
 //#####################################################################
@@ -98,7 +98,7 @@ Initialize_Quad_Cut(const int i,const int j)
         Add_Hypothetical_Node(i,l,embedded_object.interpolation_fraction(ep1));
         Add_Hypothetical_Node(l,j,embedded_object.interpolation_fraction(ep2));
         T interpolation_fraction_kj,interpolation_fraction_ki;
-        Interpolation_Fractions_For_Best_Normal(Position(1),Position(2),k,j,i,interpolation_fraction_kj,interpolation_fraction_ki);
+        Interpolation_Fractions_For_Best_Normal(Position(0),Position(1),k,j,i,interpolation_fraction_kj,interpolation_fraction_ki);
         Add_Hypothetical_Node(k,j,interpolation_fraction_kj);
         Add_Hypothetical_Node(k,i,interpolation_fraction_ki);} 
     if(ep1&&!ep2&&ep3&&!ep4){} // do nothing -- no way it could be edge connected  
@@ -106,14 +106,14 @@ Initialize_Quad_Cut(const int i,const int j)
         Add_Hypothetical_Node(i,l,embedded_object.interpolation_fraction(ep1));
         Add_Hypothetical_Node(k,i,embedded_object.interpolation_fraction(ep4));
         T interpolation_fraction_jk,interpolation_fraction_jl;
-        Interpolation_Fractions_For_Best_Normal(Position(1),Position(2),j,k,l,interpolation_fraction_jk,interpolation_fraction_jl);
+        Interpolation_Fractions_For_Best_Normal(Position(0),Position(1),j,k,l,interpolation_fraction_jk,interpolation_fraction_jl);
         Add_Hypothetical_Node(j,k,interpolation_fraction_jk);
         Add_Hypothetical_Node(j,l,interpolation_fraction_jl);}
     if(!ep1&&!ep2&&ep3&&ep4){
         Add_Hypothetical_Node(j,k,embedded_object.interpolation_fraction(ep3));
         Add_Hypothetical_Node(k,i,embedded_object.interpolation_fraction(ep4));
         T interpolation_fraction_li,interpolation_fraction_lj;
-        Interpolation_Fractions_For_Best_Normal(Position(1),Position(2),l,i,j,interpolation_fraction_li,interpolation_fraction_lj);
+        Interpolation_Fractions_For_Best_Normal(Position(0),Position(1),l,i,j,interpolation_fraction_li,interpolation_fraction_lj);
         Add_Hypothetical_Node(l,i,interpolation_fraction_li);
         Add_Hypothetical_Node(l,j,interpolation_fraction_lj);}
     if(!ep1&&ep2&&!ep3&&ep4){} // do nothing -- no way it could be edge connected    
@@ -121,15 +121,15 @@ Initialize_Quad_Cut(const int i,const int j)
         Add_Hypothetical_Node(l,j,embedded_object.interpolation_fraction(ep2));
         Add_Hypothetical_Node(k,j,embedded_object.interpolation_fraction(ep3));
         T interpolation_fraction_il,interpolation_fraction_ik;
-        Interpolation_Fractions_For_Best_Normal(Position(1),Position(2),i,l,k,interpolation_fraction_il,interpolation_fraction_ik);
+        Interpolation_Fractions_For_Best_Normal(Position(0),Position(1),i,l,k,interpolation_fraction_il,interpolation_fraction_ik);
         Add_Hypothetical_Node(i,k,interpolation_fraction_ik);
         Add_Hypothetical_Node(i,l,interpolation_fraction_il);}
     if(!ep1&&ep2&&ep3&&ep4){    
         Add_Hypothetical_Node(l,j,embedded_object.interpolation_fraction(ep2));
         Add_Hypothetical_Node(k,j,embedded_object.interpolation_fraction(ep3));
         Add_Hypothetical_Node(k,i,embedded_object.interpolation_fraction(ep4));
-        VECTOR<T,3> normal=TRIANGLE_3D<T>::Normal(Position(1),Position(2),Position(3));
-        PLANE<T> plane(normal,Position(1));
+        VECTOR<T,3> normal=TRIANGLE_3D<T>::Normal(Position(0),Position(1),Position(2));
+        PLANE<T> plane(normal,Position(0));
         T interpolation_fraction_il;
         plane.Segment_Plane_Intersection(particles.X(i),particles.X(l),interpolation_fraction_il);
         Add_Hypothetical_Node(i,l,interpolation_fraction_il);}
@@ -137,8 +137,8 @@ Initialize_Quad_Cut(const int i,const int j)
         Add_Hypothetical_Node(k,j,embedded_object.interpolation_fraction(ep3));
         Add_Hypothetical_Node(k,i,embedded_object.interpolation_fraction(ep4));
         Add_Hypothetical_Node(i,l,embedded_object.interpolation_fraction(ep1));
-        VECTOR<T,3> normal=TRIANGLE_3D<T>::Normal(Position(1),Position(2),Position(3));
-        PLANE<T> plane(normal,Position(1));
+        VECTOR<T,3> normal=TRIANGLE_3D<T>::Normal(Position(0),Position(1),Position(2));
+        PLANE<T> plane(normal,Position(0));
         T interpolation_fraction_jl;
         plane.Segment_Plane_Intersection(particles.X(j),particles.X(l),interpolation_fraction_jl);
         Add_Hypothetical_Node(j,l,interpolation_fraction_jl);}
@@ -146,8 +146,8 @@ Initialize_Quad_Cut(const int i,const int j)
         Add_Hypothetical_Node(k,i,embedded_object.interpolation_fraction(ep4));
         Add_Hypothetical_Node(i,l,embedded_object.interpolation_fraction(ep1));
         Add_Hypothetical_Node(l,j,embedded_object.interpolation_fraction(ep2));
-        VECTOR<T,3> normal=TRIANGLE_3D<T>::Normal(Position(1),Position(2),Position(3));
-        PLANE<T> plane(normal,Position(1));
+        VECTOR<T,3> normal=TRIANGLE_3D<T>::Normal(Position(0),Position(1),Position(2));
+        PLANE<T> plane(normal,Position(0));
         T interpolation_fraction_jk;
         plane.Segment_Plane_Intersection(particles.X(j),particles.X(k),interpolation_fraction_jk);
         Add_Hypothetical_Node(j,k,interpolation_fraction_jk);}
@@ -155,8 +155,8 @@ Initialize_Quad_Cut(const int i,const int j)
         Add_Hypothetical_Node(i,l,embedded_object.interpolation_fraction(ep1));
         Add_Hypothetical_Node(l,j,embedded_object.interpolation_fraction(ep2));
         Add_Hypothetical_Node(k,j,embedded_object.interpolation_fraction(ep3));
-        VECTOR<T,3> normal=TRIANGLE_3D<T>::Normal(Position(1),Position(2),Position(3));
-        PLANE<T> plane(normal,Position(1));
+        VECTOR<T,3> normal=TRIANGLE_3D<T>::Normal(Position(0),Position(1),Position(2));
+        PLANE<T> plane(normal,Position(0));
         T interpolation_fraction_ki;
         plane.Segment_Plane_Intersection(particles.X(k),particles.X(i),interpolation_fraction_ki);
         Add_Hypothetical_Node(k,i,interpolation_fraction_ki);}
@@ -196,9 +196,9 @@ template<class T> bool HYPOTHETICAL_CUT_TETRAHEDRONS<T>::
 Valid_Cut(const bool cuts_ij,const bool cuts_ik,const bool cuts_il,const bool cuts_jk,const bool cuts_jl,const bool cuts_kl) const
 {
     if(hypothetical_nodes.m==3){ 
-        VECTOR<int,2> parents=hypothetical_nodes(1).parents;
-        if(hypothetical_nodes(2).Is_Parent(parents[1]) && hypothetical_nodes(3).Is_Parent(parents[1])) return true;
-        else if(hypothetical_nodes(2).Is_Parent(parents[2]) && hypothetical_nodes(3).Is_Parent(parents[2])) return true;
+        VECTOR<int,2> parents=hypothetical_nodes(0).parents;
+        if(hypothetical_nodes(1).Is_Parent(parents[0]) && hypothetical_nodes(2).Is_Parent(parents[0])) return true;
+        else if(hypothetical_nodes(1).Is_Parent(parents[1]) && hypothetical_nodes(2).Is_Parent(parents[1])) return true;
         else return false;}
     else if(hypothetical_nodes.m==4){// note in all cases quad diagonal is either 14 or 23
         if(!cuts_ij && !cuts_kl)return true; // 1 = ik, 2 = il, 3 = jk, 4 = jl
@@ -261,11 +261,11 @@ template<class T> void HYPOTHETICAL_CUT_TETRAHEDRONS<T>::
 Initialize_Quality_Metric_And_Quad_Diagonal_Indices_For_Initiation_Point()
 {
     if(hypothetical_nodes.m==3){
-        VECTOR<T,3> position1=Position(1);
-        VECTOR<T,3> hypothetical_cut_normal=VECTOR<T,3>::Cross_Product(Position(2)-position1,Position(3)-position1).Normalized();
+        VECTOR<T,3> position1=Position(0);
+        VECTOR<T,3> hypothetical_cut_normal=VECTOR<T,3>::Cross_Product(Position(1)-position1,Position(2)-position1).Normalized();
         cut_quality_metric=abs(VECTOR<T,3>::Dot_Product(fracture_normal,hypothetical_cut_normal));}
     else if(hypothetical_nodes.m==4){ 
-        VECTOR<T,3> position1=Position(1),position2=Position(2),position3=Position(3),position4=Position(4);
+        VECTOR<T,3> position1=Position(0),position2=Position(1),position3=Position(2),position4=Position(3);
         VECTOR<T,3> n123=VECTOR<T,3>::Cross_Product(position2-position1,position3-position1).Normalized(),
                      n234=VECTOR<T,3>::Cross_Product(position2-position4,position3-position4).Normalized(),
                      n124=VECTOR<T,3>::Cross_Product(position2-position1,position4-position1).Normalized(),
@@ -282,11 +282,11 @@ template<class T> void HYPOTHETICAL_CUT_TETRAHEDRONS<T>::
 Initialize_Quality_Metric_And_Quad_Diagonal_Indices()
 {
     if(hypothetical_nodes.m==3){
-        VECTOR<T,3> position1=Position(1);
-        VECTOR<T,3> hypothetical_cut_normal=VECTOR<T,3>::Cross_Product(Position(2)-position1,Position(3)-position1).Normalized();
+        VECTOR<T,3> position1=Position(0);
+        VECTOR<T,3> hypothetical_cut_normal=VECTOR<T,3>::Cross_Product(Position(1)-position1,Position(2)-position1).Normalized();
         cut_quality_metric=abs(VECTOR<T,3>::Dot_Product(fracture_normal,hypothetical_cut_normal));}
     else if(hypothetical_nodes.m==4){ 
-        VECTOR<T,3> position1=Position(1),position2=Position(2),position3=Position(3),position4=Position(4);
+        VECTOR<T,3> position1=Position(0),position2=Position(1),position3=Position(2),position4=Position(3);
         VECTOR<T,3> n123=VECTOR<T,3>::Cross_Product(position2-position1,position3-position1).Normalized(),
                      n134=VECTOR<T,3>::Cross_Product(position3-position1,position4-position1).Normalized(),
                      n234=VECTOR<T,3>::Cross_Product(position2-position4,position3-position4).Normalized(),
@@ -313,9 +313,9 @@ template<class T> bool HYPOTHETICAL_CUT_TETRAHEDRONS<T>::
 Triangle_Cut_Already_In_Embedded_Tetrahedralized_Volume()
 {
     assert(hypothetical_nodes.m==3);
-    int emb_node1=embedded_object.Embedded_Particle_On_Segment(hypothetical_nodes(1).parents);
-    int emb_node2=embedded_object.Embedded_Particle_On_Segment(hypothetical_nodes(2).parents);
-    int emb_node3=embedded_object.Embedded_Particle_On_Segment(hypothetical_nodes(3).parents);
+    int emb_node1=embedded_object.Embedded_Particle_On_Segment(hypothetical_nodes(0).parents);
+    int emb_node2=embedded_object.Embedded_Particle_On_Segment(hypothetical_nodes(1).parents);
+    int emb_node3=embedded_object.Embedded_Particle_On_Segment(hypothetical_nodes(2).parents);
     if(!emb_node1 || !emb_node2 || !emb_node3) return false;
     const ARRAY<int>& active_indices=embedded_object.embedded_particles.active_indices;
     return embedded_object.embedded_mesh.Triangle(active_indices(emb_node1),active_indices(emb_node2),active_indices(emb_node3))!=0;
@@ -327,10 +327,10 @@ template<class T> bool HYPOTHETICAL_CUT_TETRAHEDRONS<T>::
 Quad_Cut_Already_In_Embedded_Tetrahedralized_Volume()
 {
     assert(hypothetical_nodes.m==4);
-    int emb_node1=embedded_object.Embedded_Particle_On_Segment(hypothetical_nodes(1).parents);
-    int emb_node2=embedded_object.Embedded_Particle_On_Segment(hypothetical_nodes(2).parents);
-    int emb_node3=embedded_object.Embedded_Particle_On_Segment(hypothetical_nodes(3).parents);  
-    int emb_node4=embedded_object.Embedded_Particle_On_Segment(hypothetical_nodes(4).parents);
+    int emb_node1=embedded_object.Embedded_Particle_On_Segment(hypothetical_nodes(0).parents);
+    int emb_node2=embedded_object.Embedded_Particle_On_Segment(hypothetical_nodes(1).parents);
+    int emb_node3=embedded_object.Embedded_Particle_On_Segment(hypothetical_nodes(2).parents);  
+    int emb_node4=embedded_object.Embedded_Particle_On_Segment(hypothetical_nodes(3).parents);
     if(!emb_node1 || !emb_node2 || !emb_node3 || !emb_node4) return false;
     const ARRAY<int>& active_indices=embedded_object.embedded_particles.active_indices;
     int global_node1=active_indices(emb_node1),global_node2=active_indices(emb_node2),global_node3=active_indices(emb_node3),global_node4=active_indices(emb_node4);
@@ -355,15 +355,15 @@ Edges_Shared_With_Existing_Embedded_Surface()
     const TRIANGLE_MESH& embedded_mesh=embedded_object.embedded_mesh;
     const ARRAY<int>& active_indices=embedded_object.embedded_particles.active_indices;  
     if(hypothetical_nodes.m==3){
-        int ri=hypothetical_nodes(1).index_in_embedded_particles,rj=hypothetical_nodes(2).index_in_embedded_particles,
-            rk=hypothetical_nodes(3).index_in_embedded_particles;
+        int ri=hypothetical_nodes(0).index_in_embedded_particles,rj=hypothetical_nodes(1).index_in_embedded_particles,
+            rk=hypothetical_nodes(2).index_in_embedded_particles;
         if(ri&&rj&&embedded_mesh.Triangle_On_Edge(active_indices(ri),active_indices(rj)))return true;
         if(ri&&rk&&embedded_mesh.Triangle_On_Edge(active_indices(ri),active_indices(rk)))return true;
         if(rj&&rk&&embedded_mesh.Triangle_On_Edge(active_indices(rj),active_indices(rk)))return true;}
     else{
         assert(hypothetical_nodes.m==4);
-        int ri=hypothetical_nodes(1).index_in_embedded_particles,rj=hypothetical_nodes(2).index_in_embedded_particles,
-            rk=hypothetical_nodes(3).index_in_embedded_particles,rl=hypothetical_nodes(4).index_in_embedded_particles;
+        int ri=hypothetical_nodes(0).index_in_embedded_particles,rj=hypothetical_nodes(1).index_in_embedded_particles,
+            rk=hypothetical_nodes(2).index_in_embedded_particles,rl=hypothetical_nodes(3).index_in_embedded_particles;
         if(ri&&rj&&embedded_mesh.Triangle_On_Edge(active_indices(ri),active_indices(rj)))return true; 
         assert(!(ri&&rk&&embedded_mesh.Triangle_On_Edge(active_indices(ri),active_indices(rk)))); 
         if(ri&&rl&&embedded_mesh.Triangle_On_Edge(active_indices(ri),active_indices(rl)))return true;
@@ -382,9 +382,9 @@ Would_Orphan_Half_Oct()
     assert(!embedded_object.Cut_By_Quad(tetrahedron));
     assert(embedded_object.Number_Of_Embedded_Cuts(tetrahedron)==2);
     VECTOR<int,4> emb_tris=embedded_object.Embedded_Subelements_In_Element(tetrahedron);
-    assert(emb_tris[1]&&emb_tris[2]&&!emb_tris[3]&&!emb_tris[4]);
-    int isolated1=embedded_object.Node_Separated_By_Embedded_Subelement(emb_tris[1]);
-    int isolated2=embedded_object.Node_Separated_By_Embedded_Subelement(emb_tris[2]);
+    assert(emb_tris[0]&&emb_tris[1]&&!emb_tris[2]&&!emb_tris[3]);
+    int isolated1=embedded_object.Node_Separated_By_Embedded_Subelement(emb_tris[0]);
+    int isolated2=embedded_object.Node_Separated_By_Embedded_Subelement(emb_tris[1]);
     int i,j,k,l;embedded_object.simplicial_object.mesh.elements(tetrahedron).Get(i,j,k,l);
     if(cut_index==5){
         if(i==isolated1 && j==isolated2) return true;

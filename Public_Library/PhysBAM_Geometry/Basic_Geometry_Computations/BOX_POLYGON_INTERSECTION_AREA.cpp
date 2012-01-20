@@ -22,7 +22,7 @@ namespace INTERSECTION{
 namespace {
 template<class T> T Intersection_Area_Helper(const RANGE<VECTOR<T,1> >& box, const POLYGON<VECTOR<T,1> >& polygon)
 {
-    RANGE<VECTOR<T,1> > polygon_as_range(polygon.X(1),polygon.X(2));
+    RANGE<VECTOR<T,1> > polygon_as_range(polygon.X(0),polygon.X(1));
     if(polygon_as_range.min_corner.x >= polygon_as_range.max_corner.x) exchange(polygon_as_range.min_corner,polygon_as_range.max_corner);
     return INTERSECTION::Intersection_Area(box,polygon_as_range);
 }
@@ -42,13 +42,13 @@ template<class T> T Intersection_Area_Helper(const RANGE<VECTOR<T,2> >& box, con
             if(t_start != 0){modified_polygon.X.Insert(box_polygon.Find_Closest_Point_On_Polygon(edge_ray.Point(t_start),side),s+offset);added_nodes.Append(PAIR<int,int>(s+offset++,side));}
             if(t_end != edge_ray.t_max){modified_polygon.X.Insert(box_polygon.Find_Closest_Point_On_Polygon(edge_ray.Point(t_end),side),s+offset);added_nodes.Append(PAIR<int,int>(s+offset++,side));}}}
 
-    RAY<VECTOR<T,2> > edge_ray(SEGMENT_2D<T>(polygon.X(polygon.X.Size()),polygon.X(1))); // Final edge, to close the polygon
+    RAY<VECTOR<T,2> > edge_ray(SEGMENT_2D<T>(polygon.X(polygon.X.Size()),polygon.X(0))); // Final edge, to close the polygon
     if(INTERSECTION::Get_Intersection_Range(edge_ray,box,t_start,t_end)){
         if(t_start != 0){modified_polygon.X.Append(box_polygon.Find_Closest_Point_On_Polygon(edge_ray.Point(t_start),side));added_nodes.Append(PAIR<int,int>(modified_polygon.X.Size(),side));offset++;}
         if(t_end != edge_ray.t_max){modified_polygon.X.Append(box_polygon.Find_Closest_Point_On_Polygon(edge_ray.Point(t_end),side));added_nodes.Append(PAIR<int,int>(modified_polygon.X.Size(),side));offset++;}}
 
     if(offset==1) { // entirely outside, or entirely inside
-        if(box.Inside(polygon.X(1),0)) return modified_polygon.Area();
+        if(box.Inside(polygon.X(0),0)) return modified_polygon.Area();
         else if(modified_polygon.Inside_Polygon(box.min_corner)) return box.Robust_Size();
         else return (T)0;}
 

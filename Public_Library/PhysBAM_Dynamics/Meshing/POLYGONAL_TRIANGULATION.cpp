@@ -33,17 +33,17 @@ Triangulate_Convex_Planar_Polygon(const ARRAY<VECTOR<T,2> >& positions,ARRAY<VEC
     // initiailize: add existing segments
     ARRAY<bool> used(segments.m);
     for(int i=0;i<segments.m;i++){segment_hash.Insert(segments(i)); // TODO: probably insert sorted
-        outgoing_segments(segments(i)(1)).Append(i);incoming_segments(segments(i)(2)).Append(i);
-        all_outgoing_segments(segments(i)(1)).Append(i);all_incoming_segments(segments(i)(2)).Append(i);}
+        outgoing_segments(segments(i)(0)).Append(i);incoming_segments(segments(i)(1)).Append(i);
+        all_outgoing_segments(segments(i)(0)).Append(i);all_incoming_segments(segments(i)(1)).Append(i);}
     while(used.Contains(false)){assert(used.m==segments.m);
         // make all possible triangles
         for(int segment_id_1=0;segment_id_1<segments.m;segment_id_1++) if(!used(segment_id_1)){
-            VECTOR<int,2> segment_1=segments(segment_id_1);int node_1=segment_1(1);int node_2=segment_1(2);
+            VECTOR<int,2> segment_1=segments(segment_id_1);int node_1=segment_1(0);int node_2=segment_1(1);
             ARRAY<int>& incoming_segs_to_1=incoming_segments(node_1);ARRAY<int>& outgoing_segs_from_2=outgoing_segments(node_2);
             bool stop=false;
             for(int i=0;i<incoming_segs_to_1.m;i++) if(!stop) for(int j=0;j<outgoing_segs_from_2.m;j++)
-                if(!used(incoming_segs_to_1(i))&&!used(outgoing_segs_from_2(j))&&segments(incoming_segs_to_1(i))(1)==segments(outgoing_segs_from_2(j))(2)){
-                    int segment_2_id=outgoing_segs_from_2(j);int segment_3_id=incoming_segs_to_1(i);int node_3=segments(segment_3_id)(1);
+                if(!used(incoming_segs_to_1(i))&&!used(outgoing_segs_from_2(j))&&segments(incoming_segs_to_1(i))(0)==segments(outgoing_segs_from_2(j))(1)){
+                    int segment_2_id=outgoing_segs_from_2(j);int segment_3_id=incoming_segs_to_1(i);int node_3=segments(segment_3_id)(0);
                     VECTOR<int,3> nodes(node_1,node_2,node_3);VECTOR<VECTOR<T,2>,3> triangle_X(positions.Subset(nodes));
                     if(TRIANGLE_2D<T>::Signed_Area(triangle_X[1],triangle_X[2],triangle_X[3])<0) continue;
                     // ensure no points lie inside the triangle
@@ -66,7 +66,7 @@ Triangulate_Convex_Planar_Polygon(const ARRAY<VECTOR<T,2> >& positions,ARRAY<VEC
             bool safe=true;
             for(HASHTABLE_ITERATOR<VECTOR<int,2> > segment_hash_iterator(segment_hash);segment_hash_iterator.Valid();segment_hash_iterator.Next()){
                 const VECTOR<int,2>& existing_segment=segment_hash_iterator.Key();
-                if(existing_segment(1)==p||existing_segment(2)==p||existing_segment(1)==q||existing_segment(2)==q) continue;
+                if(existing_segment(0)==p||existing_segment(1)==p||existing_segment(0)==q||existing_segment(1)==q) continue;
                 if(SIMPLEX_INTERACTIONS<T>::Intersection(VECTOR<VECTOR<T,2>,2>(positions.Subset(existing_segment)),VECTOR<VECTOR<T,2>,2>(positions(p),positions(q)))){
                     safe=false;break;}}
             if(!safe) continue;
@@ -100,14 +100,14 @@ Triangulate_Nonconvex_Planar_Connected_Polygon(const ARRAY<VECTOR<T,2> >& positi
     typedef VECTOR<float,2> TV_float;
 
     // TODO: Fix the triangulation (this triangulates as if the polygon was simple and convex)
-    const ARRAY<VECTOR<int,2> >& segments=segments_input(1);
+    const ARRAY<VECTOR<int,2> >& segments=segments_input(0);
     ARRAY<int> vertices;
     for(int s=0;s<segments.m;s++){
         if(segments(s)[2]!=segments(s%segments.m+1)[1]) PHYSBAM_FATAL_ERROR();
         vertices.Append(segments(s)[1]);}
     if(vertices.m<3) PHYSBAM_FATAL_ERROR();
     for(int s=0;s<segments.m-2;s++)
-        triangles.Append(VECTOR<int,3>(vertices(1),vertices(s+1),vertices(s+2)));
+        triangles.Append(VECTOR<int,3>(vertices(0),vertices(s+1),vertices(s+2)));
 
 #if 0
     return;
@@ -125,16 +125,16 @@ Triangulate_Nonconvex_Planar_Connected_Polygon(const ARRAY<VECTOR<T,2> >& positi
     ARRAY<ARRAY<int> > outgoing_segments(positions.m);ARRAY<ARRAY<int> > incoming_segments(positions.m);
     for(int i=0;i<segments_input.m;i++) for(int j=0;j<segments_input(i).m;j++){
         int segment_index=all_segments.Append(segments_input(i)(j));segments_used.Append(false);
-        outgoing_segments(segments_input(i)(j)(1)).Append(segment_index);
-        incoming_segments(segments_input(i)(j)(2)).Append(segment_index);}
+        outgoing_segments(segments_input(i)(j)(0)).Append(segment_index);
+        incoming_segments(segments_input(i)(j)(1)).Append(segment_index);}
     // make segments to connect holes
     HASHTABLE<VECTOR<int,2> > already_connected_holes;
     for(int hole=2;hole<=segments_input.m;hole++){
         for(int j=0;j<segments_input(hole).m;j++){
-            int first_node_on_hole_segment=segments_input(hole)(j)(1);
+            int first_node_on_hole_segment=segments_input(hole)(j)(0);
             // find other node on a different component
             for(int comp=0;comp<segments_input.m;comp++) if(hole!=comp&&!already_connected_holes.Contains(VECTOR<int,2>(hole,comp).Sorted())){
-                for(int k=0;k<segments_input(comp).m;k++){int candidate_node=segments_input(comp)(k)(1);
+                for(int k=0;k<segments_input(comp).m;k++){int candidate_node=segments_input(comp)(k)(0);
                 if(!Segment_Intersects(VECTOR<int,2>(first_node_on_hole_segment,candidate_node),all_segments,positions)){
                     int segment_index=all_segments.Append(VECTOR<int,2>(first_node_on_hole_segment,candidate_node));segments_used.Append(false);
                     outgoing_segments(first_node_on_hole_segment).Append(segment_index);
@@ -154,7 +154,7 @@ Triangulate_Nonconvex_Planar_Connected_Polygon(const ARRAY<VECTOR<T,2> >& positi
         for(int i=0;i<segments_used.m;i++)
             if(!segments_used(i)){
                 const VECTOR<int,2> first_segment=all_segments(i);
-                ARRAY<int>& continuing_segments=outgoing_segments(first_segment(2));
+                ARRAY<int>& continuing_segments=outgoing_segments(first_segment(1));
                 T min_value_found=1e2;
                 int best_second_segment=-1;
                 // check angle of the ear
@@ -162,11 +162,11 @@ Triangulate_Nonconvex_Planar_Connected_Polygon(const ARRAY<VECTOR<T,2> >& positi
                     if(!segments_used(continuing_segments(j))){
                         const VECTOR<int,2> second_segment=all_segments(continuing_segments(j));
                         T angle=0;
-                        if(first_segment(1)==second_segment(2))
+                        if(first_segment(0)==second_segment(1))
                             angle=99.;
                         else
-                            angle=VECTOR<T,2>::Oriented_Angle_Between(positions(second_segment(2))-positions(second_segment(1)),
-                                                                      positions(first_segment(2))-positions(first_segment(1)));
+                            angle=VECTOR<T,2>::Oriented_Angle_Between(positions(second_segment(1))-positions(second_segment(0)),
+                                                                      positions(first_segment(1))-positions(first_segment(0)));
                         if(angle<min_value_found){
                             min_value_found=angle;
                             best_second_segment=continuing_segments(j);
@@ -177,16 +177,16 @@ Triangulate_Nonconvex_Planar_Connected_Polygon(const ARRAY<VECTOR<T,2> >& positi
                     continue;
                 const VECTOR<int,2> second_segment=all_segments(best_second_segment);
                 min_value_found=abs(min_value_found+(T)pi); // converting to the positive angle for the ear
-                ARRAY<int> segments_to_check(outgoing_segments(first_segment(1)));
-                segments_to_check.Append_Elements(incoming_segments(first_segment(1)));
-                segments_to_check.Append_Elements(outgoing_segments(second_segment(2)));
-                segments_to_check.Append_Elements(incoming_segments(second_segment(2)));
-                min_value_found=min(min_value_found,Find_Sharpest_Angle(positions,all_segments,VECTOR<int,2>(second_segment(2),first_segment(1)),segments_to_check));
+                ARRAY<int> segments_to_check(outgoing_segments(first_segment(0)));
+                segments_to_check.Append_Elements(incoming_segments(first_segment(0)));
+                segments_to_check.Append_Elements(outgoing_segments(second_segment(1)));
+                segments_to_check.Append_Elements(incoming_segments(second_segment(1)));
+                min_value_found=min(min_value_found,Find_Sharpest_Angle(positions,all_segments,VECTOR<int,2>(second_segment(1),first_segment(0)),segments_to_check));
                 // check no points are inside the triangle to be formed
                 bool is_an_ear=true;
                 for(int j=0;j<positions.m;j++)
-                    if(!first_segment.Contains(j)&&j!=second_segment(2))
-                        if(SIMPLEX_INTERACTIONS<T>::Intersection(VECTOR<VECTOR<T,2>,3>(positions(first_segment(1)),positions(first_segment(2)),positions(second_segment(2))),positions(j))){
+                    if(!first_segment.Contains(j)&&j!=second_segment(1))
+                        if(SIMPLEX_INTERACTIONS<T>::Intersection(VECTOR<VECTOR<T,2>,3>(positions(first_segment(0)),positions(first_segment(1)),positions(second_segment(1))),positions(j))){
                             is_an_ear=false;
                             break;
                         }
@@ -201,14 +201,14 @@ Triangulate_Nonconvex_Planar_Connected_Polygon(const ARRAY<VECTOR<T,2> >& positi
             assert(found);
             VECTOR<int,2> first_segment=all_segments(globally_best_first_segment_index);
             VECTOR<int,2> second_segment=all_segments(globally_best_second_segment_index);
-            int third_segment_index=all_segments.Find(VECTOR<int,2>(second_segment(2),first_segment(1)));
+            int third_segment_index=all_segments.Find(VECTOR<int,2>(second_segment(1),first_segment(0)));
             if(!third_segment_index){
-                int segment_index=all_segments.Append(VECTOR<int,2>(first_segment(1),second_segment(2)));segments_used.Append(false);
-                outgoing_segments(first_segment(1)).Append(segment_index);
-                incoming_segments(second_segment(2)).Append(segment_index);
-                segment_index=all_segments.Append(VECTOR<int,2>(second_segment(2),first_segment(1)));segments_used.Append(true);
-                outgoing_segments(second_segment(2)).Append(segment_index);
-                incoming_segments(first_segment(1)).Append(segment_index);
+                int segment_index=all_segments.Append(VECTOR<int,2>(first_segment(0),second_segment(1)));segments_used.Append(false);
+                outgoing_segments(first_segment(0)).Append(segment_index);
+                incoming_segments(second_segment(1)).Append(segment_index);
+                segment_index=all_segments.Append(VECTOR<int,2>(second_segment(1),first_segment(0)));segments_used.Append(true);
+                outgoing_segments(second_segment(1)).Append(segment_index);
+                incoming_segments(first_segment(0)).Append(segment_index);
             }
             else{
                 segments_used(third_segment_index)=true;
@@ -216,7 +216,7 @@ Triangulate_Nonconvex_Planar_Connected_Polygon(const ARRAY<VECTOR<T,2> >& positi
             segments_used(globally_best_first_segment_index)=true;
             segments_used(globally_best_second_segment_index)=true;
             count+=3;
-            triangles.Append(VECTOR<int,3>(first_segment(1),first_segment(2),second_segment(2)));
+            triangles.Append(VECTOR<int,3>(first_segment(0),first_segment(1),second_segment(1)));
     }
 #endif
 }
@@ -228,7 +228,7 @@ Segment_Intersects(const VECTOR<int,2>& candidate_segment,const ARRAY<VECTOR<int
 {
     bool any_intersects=false;
     for(int i=0;i<all_segments.m;i++){const VECTOR<int,2>& test_segment=all_segments(i);
-    if(test_segment.Contains(candidate_segment(1))||test_segment.Contains(candidate_segment(2))) continue;
+    if(test_segment.Contains(candidate_segment(0))||test_segment.Contains(candidate_segment(1))) continue;
     bool intersects=SIMPLEX_INTERACTIONS<T>::Intersection(VECTOR<VECTOR<T,2>,2>(positions.Subset(candidate_segment)),VECTOR<VECTOR<T,2>,2>(positions.Subset(test_segment)));
     if(intersects){any_intersects=true;break;}}
     return any_intersects;
@@ -242,9 +242,9 @@ Find_Sharpest_Angle(const ARRAY<VECTOR<T,2> >& positions,const ARRAY<VECTOR<int,
     T min_value_found=(T)two_pi;
     for(int j=0;j<test_segments.m;j++){
         const VECTOR<int,2>& test_segment=all_segments(test_segments(j));
-        if(test_segment==given_segment||(test_segment(1)==given_segment(2)&&test_segment(2)&&given_segment(1))) continue;
-        T angle=abs(VECTOR<T,2>::Oriented_Angle_Between(positions(given_segment(2))-positions(given_segment(1)),
-            positions(test_segment(2))-positions(test_segment(1))));
+        if(test_segment==given_segment||(test_segment(0)==given_segment(1)&&test_segment(1)&&given_segment(0))) continue;
+        T angle=abs(VECTOR<T,2>::Oriented_Angle_Between(positions(given_segment(1))-positions(given_segment(0)),
+            positions(test_segment(1))-positions(test_segment(0))));
         if(angle>(T)pi*.5) angle=(T)pi-angle;if(angle<min_value_found) min_value_found=angle;}
     return min_value_found;
 }
@@ -293,7 +293,7 @@ Triangulate_Nonconvex_Simple_Polygon(const VECTORT2_ARRAY& coordinates,const INT
         assert(!Segment_Segment_Intersects(x1,x2,y1,y2));}
 #endif
     if(polygon_input.m<3) return 0;
-    if(polygon_input.m==3){triangles.Append(VECTOR<int,3>(polygon_input(1),polygon_input(2),polygon_input(3)));return 1;}
+    if(polygon_input.m==3){triangles.Append(VECTOR<int,3>(polygon_input(0),polygon_input(1),polygon_input(2)));return 1;}
     ARRAY<int> polygon(polygon_input);
     int num_triangles_added=0;
     HASHTABLE<VECTOR<int,3>,int> triple_to_orientation;
@@ -345,7 +345,7 @@ Triangulate_Nonconvex_Nonsimple_Polygon(const VECTORT2_ARRAY& coordinates,const 
 {
     // assumption: outer loop is positively oriented, inner loops are negatively oriented, loops are simple and pairwise non-intersecting
     if(polygon_input.m==0) return 0;
-    if(polygon_input.m==1) return Triangulate_Nonconvex_Simple_Polygon(coordinates,polygon_input(1),triangles,keep_degenerate_triangles);
+    if(polygon_input.m==1) return Triangulate_Nonconvex_Simple_Polygon(coordinates,polygon_input(0),triangles,keep_degenerate_triangles);
     ARRAY< ARRAY<int> > polygon(polygon_input.m);
     for(int ell=0;ell<polygon.m;ell++) polygon(ell)=polygon_input(ell);
     int infinite_loop_detector=0;
@@ -353,7 +353,7 @@ Triangulate_Nonconvex_Nonsimple_Polygon(const VECTORT2_ARRAY& coordinates,const 
         if(ell==1) continue;
         if(++infinite_loop_detector>polygon.m) PHYSBAM_FATAL_ERROR();
         // attempt to find a non-intersecting segment between loop ell and loop 1
-        ARRAY<int>& loop_1=polygon(1);
+        ARRAY<int>& loop_1=polygon(0);
         const ARRAY<int>& loop_ell=polygon(ell);
         bool spliced=false;
         for(int i=0;i<loop_1.m&&!spliced;++i){
@@ -388,7 +388,7 @@ Triangulate_Nonconvex_Nonsimple_Polygon(const VECTORT2_ARRAY& coordinates,const 
             polygon(ell).Exchange(polygon.Last());
             polygon.Remove_Index(polygon.m);ell++;infinite_loop_detector=0;}}
     assert(polygon.m==1);
-    ARRAY<int>& polygon1=polygon(1);
+    ARRAY<int>& polygon1=polygon(0);
 
     // unknot vertices, if necessary
     HASHTABLE<int,int> num_paths_through(polygon1.m);
@@ -410,7 +410,7 @@ Triangulate_Nonconvex_Nonsimple_Polygon(const VECTORT2_ARRAY& coordinates,const 
             PAIR<int,int> vnextj_pair=vnexts(j);
             const VECTOR<T,2>& xj=coordinates(vnextj_pair.x);
             int k;
-            if(Orientation(coordinates(vnexts(1).x),x,xj)>=0){
+            if(Orientation(coordinates(vnexts(0).x),x,xj)>=0){
                 for(k=2;k<j&&Orientation(coordinates(vnexts(k).x),x,xj)>0;++k);}
             else{
                 for(k=j-1;k>=2&&Orientation(coordinates(vnexts(k).x),x,xj)<0;--k);

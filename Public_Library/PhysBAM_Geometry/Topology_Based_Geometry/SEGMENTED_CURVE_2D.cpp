@@ -141,9 +141,9 @@ Segment_Segment_Intersection(const SEGMENT_MESH& test_segment_mesh,ARRAY_VIEW<co
     bool intersection=false;
     ARRAY<ARRAY<int> > segments_near_segments(test_segment_mesh.elements.m);Get_Segments_Near_Segments(segments_near_segments,test_segment_mesh,X,thickness_over_2,update_bounding_boxes);
     for(int s1=0;s1<test_segment_mesh.elements.m;s1++){
-        SEGMENT_2D<T> segment1(X(test_segment_mesh.elements(s1)(1)),X(test_segment_mesh.elements(s1)(2)));
+        SEGMENT_2D<T> segment1(X(test_segment_mesh.elements(s1)(0)),X(test_segment_mesh.elements(s1)(1)));
         for(int k=0;k<segments_near_segments(s1).m;k++){int s2=segments_near_segments(s1)(k);
-            SEGMENT_2D<T> segment2(X(mesh.elements(s2)(1)),X(mesh.elements(s2)(2)));
+            SEGMENT_2D<T> segment2(X(mesh.elements(s2)(0)),X(mesh.elements(s2)(1)));
             if(INTERSECTION::Intersects(segment1,segment2,thickness_over_2)){intersection=true;
                 if(intersecting_segment_segment_pairs) intersecting_segment_segment_pairs->Append(VECTOR<int,2>(s1,s2));else return true;}}}
     return intersection;

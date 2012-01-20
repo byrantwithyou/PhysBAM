@@ -39,7 +39,7 @@ template<class T> OCTAVE_OUTPUT<T>::
 template<class T> template<class T2,class T_VECTOR> void OCTAVE_OUTPUT<T>::
 Write(const char* name,const VECTOR_BASE<T2,T_VECTOR>& v)
 {
-    out<<"# name: "<<name<<"\n# type: matrix\n# rows: "<<v.Size()<<"\n# columns: "<<sizeof(v(1))/sizeof(typename SCALAR_POLICY<T2>::TYPE)<<"\n";
+    out<<"# name: "<<name<<"\n# type: matrix\n# rows: "<<v.Size()<<"\n# columns: "<<sizeof(v(0))/sizeof(typename SCALAR_POLICY<T2>::TYPE)<<"\n";
     for(int i=0;i<v.Size();i++)
         Write_Entry(v(i));
 }
@@ -324,7 +324,7 @@ Write(const char* name,const ARRAY<T2,VECTOR<int,2> >& m)
     out<<"# name: "<<name<<"\n# type: matrix\n# rows: "<<m.counts.y<<"\n# columns: "<<m.counts.x<<"\n";
     for(UNIFORM_ARRAY_ITERATOR<2> it(m.domain);it.Valid();it.Next()){
         out<<m(it.Index())<<" ";
-        if(it.index(2)>=it.domain.max_corner(2)) out<<"\n";}
+        if(it.index(1)>=it.domain.max_corner(1)) out<<"\n";}
 }
 //#####################################################################
 // Function Write
@@ -343,7 +343,7 @@ Write(const char* name,const ARRAY<VECTOR<T2,d>,VECTOR<int,2> >& m)
 template<class T> template<class T2,class T_ARRAY> void OCTAVE_OUTPUT<T>::
 Write(const char* name,const ARRAY_BASE<T2,T_ARRAY>& v,int)
 {
-    out<<"# name: "<<name<<"\n# type: matrix\n# rows: "<<v.Size()<<"\n# columns: "<<sizeof(v(1))/sizeof(typename SCALAR_POLICY<T2>::TYPE)<<"\n";
+    out<<"# name: "<<name<<"\n# type: matrix\n# rows: "<<v.Size()<<"\n# columns: "<<sizeof(v(0))/sizeof(typename SCALAR_POLICY<T2>::TYPE)<<"\n";
     for(int i=0;i<v.Size();i++)
         Write_Entry(v(i));
 }

@@ -19,12 +19,12 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(const PLANE<T>& pl
     TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
     surface->particles.array_collection->Add_Elements(4);
     TV u=(T)1000*plane.normal.Unit_Orthogonal_Vector(),v=TV::Cross_Product(plane.normal,u);
-    surface->particles.X(1)=plane.x1+u+v;
-    surface->particles.X(2)=plane.x1-u+v;
-    surface->particles.X(3)=plane.x1-u-v;
-    surface->particles.X(4)=plane.x1+u-v;
-    surface->mesh.elements.Append(VECTOR<int,3>(1,2,3));
-    surface->mesh.elements.Append(VECTOR<int,3>(1,3,4));
+    surface->particles.X(0)=plane.x1+u+v;
+    surface->particles.X(1)=plane.x1-u+v;
+    surface->particles.X(2)=plane.x1-u-v;
+    surface->particles.X(3)=plane.x1+u-v;
+    surface->mesh.elements.Append(VECTOR<int,3>(0,1,2));
+    surface->mesh.elements.Append(VECTOR<int,3>(0,2,3));
     surface->Update_Number_Nodes();
     return surface;
 }

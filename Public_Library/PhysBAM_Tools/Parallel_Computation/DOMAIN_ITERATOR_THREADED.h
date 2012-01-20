@@ -69,7 +69,7 @@ public:
                         domains(count).min_corner(axis)=max(domains(count).min_corner(axis),domain.min_corner(axis));
                         domains(count).max_corner(axis)=min(domains(count).max_corner(axis),domain.max_corner(axis));}}}
             else PHYSBAM_FATAL_ERROR();}
-        else{domains.Resize(1);domains(1)=domain;number_of_domains=1;}
+        else{domains.Resize(1);domains(0)=domain;number_of_domains=1;}
     }
 
     TV_INT Split_Range_Wrapper(TV_INT& processes_per_dimension,const RANGE<TV_INT>& global_range,ARRAY<ARRAY<int> >& boundaries)
@@ -92,7 +92,7 @@ public:
     {
         PHYSBAM_ASSERT(!processes_per_dimension.x || processes_per_dimension.x==number_of_domains);
         boundaries.Resize(1);
-        Split_Dimension(global_range.x,number_of_domains,boundaries(1));
+        Split_Dimension(global_range.x,number_of_domains,boundaries(0));
         return VECTOR<int,1>(number_of_domains);
     }
 
@@ -106,8 +106,8 @@ public:
             count.y=number_of_domains/count.x;}
         PHYSBAM_ASSERT(count.x*count.y==number_of_domains);
         boundaries.Resize(2);
-        Split_Dimension(x,count.x,boundaries(1));
-        Split_Dimension(y,count.y,boundaries(2));
+        Split_Dimension(x,count.x,boundaries(0));
+        Split_Dimension(y,count.y,boundaries(1));
         return count;
     }
 
@@ -129,9 +129,9 @@ public:
             if(minimum_surface_area==INT_MAX){LOG::cerr<<"Don't know how to divide domain in all directions."<<std::endl;PHYSBAM_NOT_IMPLEMENTED();}}
         PHYSBAM_ASSERT(count.x*count.y*count.z==number_of_domains);
         boundaries.Resize(3);
-        Split_Dimension(x,count.x,boundaries(1));
-        Split_Dimension(y,count.y,boundaries(2));
-        Split_Dimension(z,count.z,boundaries(3));
+        Split_Dimension(x,count.x,boundaries(0));
+        Split_Dimension(y,count.y,boundaries(1));
+        Split_Dimension(z,count.z,boundaries(2));
         return count;
     }
 
@@ -139,7 +139,7 @@ public:
     {
         int range_over_processes=(x+1)/processes;
         int remainder=(x+1)%processes;
-        boundaries.Resize(processes+1);boundaries(1)=-1;
+        boundaries.Resize(processes+1);boundaries(0)=-1;
         for(int p=0;p<processes;p++){
             boundaries(p+1)=boundaries(p)+range_over_processes;
             if(p<=remainder)boundaries(p+1)+=1;}
@@ -147,7 +147,7 @@ public:
 
     void Run(TYPE& my_class,void (TYPE::*func)(RANGE<TV_INT>&))
     {
-        if(!thread_queue){(my_class.*func)(domains(1));return;}
+        if(!thread_queue){(my_class.*func)(domains(0));return;}
 #ifdef USE_PTHREADS
         for(int i=0;i<domains.m;i++){
             ITERATOR_TASK_0<TYPE,RANGE<TV_INT> >* task=new ITERATOR_TASK_0<TYPE,RANGE<TV_INT> >(my_class,func,domains(i));
@@ -160,7 +160,7 @@ public:
 
     template<class T1> void Run(TYPE& my_class,void (TYPE::*func)(RANGE<TV_INT>&,T1),T1 arg1)
     {
-        if(!thread_queue){(my_class.*func)(domains(1),arg1);return;}
+        if(!thread_queue){(my_class.*func)(domains(0),arg1);return;}
 #ifdef USE_PTHREADS
         for(int i=0;i<domains.m;i++){
             ITERATOR_TASK_1<TYPE,RANGE<TV_INT>,T1>* task=new ITERATOR_TASK_1<TYPE,RANGE<TV_INT>,T1>(my_class,func,domains(i),arg1);
@@ -173,7 +173,7 @@ public:
 
     template<class T1,class T2> void Run(TYPE& my_class,void (TYPE::*func)(RANGE<TV_INT>&,T1,T2),T1 arg1,T2 arg2)
     {
-        if(!thread_queue){(my_class.*func)(domains(1),arg1,arg2);return;}
+        if(!thread_queue){(my_class.*func)(domains(0),arg1,arg2);return;}
 #ifdef USE_PTHREADS
         for(int i=0;i<domains.m;i++){
             ITERATOR_TASK_2<TYPE,RANGE<TV_INT>,T1,T2>* task=new ITERATOR_TASK_2<TYPE,RANGE<TV_INT>,T1,T2>(my_class,func,domains(i),arg1,arg2);
@@ -186,7 +186,7 @@ public:
 
     template<class T1,class T2,class T3> void Run(TYPE& my_class,void (TYPE::*func)(RANGE<TV_INT>&,T1,T2,T3),T1 arg1,T2 arg2,T3 arg3)
     {
-        if(!thread_queue){(my_class.*func)(domains(1),arg1,arg2,arg3);return;}
+        if(!thread_queue){(my_class.*func)(domains(0),arg1,arg2,arg3);return;}
 #ifdef USE_PTHREADS
         for(int i=0;i<domains.m;i++){
             ITERATOR_TASK_3<TYPE,RANGE<TV_INT>,T1,T2,T3>* task=new ITERATOR_TASK_3<TYPE,RANGE<TV_INT>,T1,T2,T3>(my_class,func,domains(i),arg1,arg2,arg3);
@@ -199,7 +199,7 @@ public:
  
     template<class T1,class T2,class T3,class T4> void Run(TYPE& my_class,void (TYPE::*func)(RANGE<TV_INT>&,T1,T2,T3,T4),T1 arg1,T2 arg2,T3 arg3,T4 arg4)
     {
-        if(!thread_queue){(my_class.*func)(domains(1),arg1,arg2,arg3,arg4);return;}
+        if(!thread_queue){(my_class.*func)(domains(0),arg1,arg2,arg3,arg4);return;}
 #ifdef USE_PTHREADS
         for(int i=0;i<domains.m;i++){
             ITERATOR_TASK_4<TYPE,RANGE<TV_INT>,T1,T2,T3,T4>* task=new ITERATOR_TASK_4<TYPE,RANGE<TV_INT>,T1,T2,T3,T4>(my_class,func,domains(i),arg1,arg2,arg3,arg4);
@@ -212,7 +212,7 @@ public:
 
     template<class T1,class T2,class T3,class T4,class T5> void Run(TYPE& my_class,void (TYPE::*func)(RANGE<TV_INT>&,T1,T2,T3,T4,T5),T1 arg1,T2 arg2,T3 arg3,T4 arg4,T5 arg5)
     {
-        if(!thread_queue){(my_class.*func)(domains(1),arg1,arg2,arg3,arg4,arg5);return;}
+        if(!thread_queue){(my_class.*func)(domains(0),arg1,arg2,arg3,arg4,arg5);return;}
 #ifdef USE_PTHREADS
         for(int i=0;i<domains.m;i++){
             ITERATOR_TASK_5<TYPE,RANGE<TV_INT>,T1,T2,T3,T4,T5>* task=new ITERATOR_TASK_5<TYPE,RANGE<TV_INT>,T1,T2,T3,T4,T5>(my_class,func,domains(i),arg1,arg2,arg3,arg4,arg5);
@@ -225,7 +225,7 @@ public:
 
     template<class T1,class T2,class T3,class T4,class T5,class T6> void Run(TYPE& my_class,void (TYPE::*func)(RANGE<TV_INT>&,T1,T2,T3,T4,T5,T6),T1 arg1,T2 arg2,T3 arg3,T4 arg4,T5 arg5,T6 arg6)
     {
-        if(!thread_queue){(my_class.*func)(domains(1),arg1,arg2,arg3,arg4,arg5,arg6);return;}
+        if(!thread_queue){(my_class.*func)(domains(0),arg1,arg2,arg3,arg4,arg5,arg6);return;}
 #ifdef USE_PTHREADS
         for(int i=0;i<domains.m;i++){
             ITERATOR_TASK_6<TYPE,RANGE<TV_INT>,T1,T2,T3,T4,T5,T6>* task=new ITERATOR_TASK_6<TYPE,RANGE<TV_INT>,T1,T2,T3,T4,T5,T6>(my_class,func,domains(i),arg1,arg2,arg3,arg4,arg5,arg6);
@@ -238,7 +238,7 @@ public:
 
     template<class T1,class T2,class T3,class T4,class T5,class T6,class T7> void Run(TYPE& my_class,void (TYPE::*func)(RANGE<TV_INT>&,T1,T2,T3,T4,T5,T6,T7),T1 arg1,T2 arg2,T3 arg3,T4 arg4,T5 arg5,T6 arg6,T7 arg7)
     {
-        if(!thread_queue){(my_class.*func)(domains(1),arg1,arg2,arg3,arg4,arg5,arg6,arg7);return;}
+        if(!thread_queue){(my_class.*func)(domains(0),arg1,arg2,arg3,arg4,arg5,arg6,arg7);return;}
 #ifdef USE_PTHREADS
         for(int i=0;i<domains.m;i++){
             ITERATOR_TASK_7<TYPE,RANGE<TV_INT>,T1,T2,T3,T4,T5,T6,T7>* task=new ITERATOR_TASK_7<TYPE,RANGE<TV_INT>,T1,T2,T3,T4,T5,T6,T7>(my_class,func,domains(i),arg1,arg2,arg3,arg4,arg5,arg6,arg7);
@@ -251,7 +251,7 @@ public:
 
     template<class T1,class T2,class T3,class T4,class T5,class T6,class T7,class T8> void Run(TYPE& my_class,void (TYPE::*func)(RANGE<TV_INT>&,T1,T2,T3,T4,T5,T6,T7,T8),T1 arg1,T2 arg2,T3 arg3,T4 arg4,T5 arg5,T6 arg6,T7 arg7,T8 arg8)
     {
-        if(!thread_queue){(my_class.*func)(domains(1),arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8);return;}
+        if(!thread_queue){(my_class.*func)(domains(0),arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8);return;}
 #ifdef USE_PTHREADS
         for(int i=0;i<domains.m;i++){
             ITERATOR_TASK_8<TYPE,RANGE<TV_INT>,T1,T2,T3,T4,T5,T6,T7,T8>* task=new ITERATOR_TASK_8<TYPE,RANGE<TV_INT>,T1,T2,T3,T4,T5,T6,T7,T8>(my_class,func,domains(i),arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8);
@@ -264,7 +264,7 @@ public:
 
     template<class T1,class T2,class T3,class T4,class T5,class T6,class T7,class T8,class T9> void Run(TYPE& my_class,void (TYPE::*func)(RANGE<TV_INT>&,T1,T2,T3,T4,T5,T6,T7,T8,T9),T1 arg1,T2 arg2,T3 arg3,T4 arg4,T5 arg5,T6 arg6,T7 arg7,T8 arg8,T9 arg9)
     {
-        if(!thread_queue){(my_class.*func)(domains(1),arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9);return;}
+        if(!thread_queue){(my_class.*func)(domains(0),arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9);return;}
 #ifdef USE_PTHREADS
         for(int i=0;i<domains.m;i++){
             ITERATOR_TASK_9<TYPE,RANGE<TV_INT>,T1,T2,T3,T4,T5,T6,T7,T8,T9>* task=new ITERATOR_TASK_9<TYPE,RANGE<TV_INT>,T1,T2,T3,T4,T5,T6,T7,T8,T9>(my_class,func,domains(i),arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9);
@@ -277,7 +277,7 @@ public:
 
     template<class T1,class T2,class T3,class T4,class T5,class T6,class T7,class T8,class T9,class T10,class T11> void Run(TYPE& my_class,void (TYPE::*func)(RANGE<TV_INT>&,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11),T1 arg1,T2 arg2,T3 arg3,T4 arg4,T5 arg5,T6 arg6,T7 arg7,T8 arg8,T9 arg9,T10 arg10,T11 arg11)
     {
-        if(!thread_queue){(my_class.*func)(domains(1),arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11);return;}
+        if(!thread_queue){(my_class.*func)(domains(0),arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11);return;}
 #ifdef USE_PTHREADS
         for(int i=0;i<domains.m;i++){
             ITERATOR_TASK_11<TYPE,RANGE<TV_INT>,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11>* task=new ITERATOR_TASK_11<TYPE,RANGE<TV_INT>,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11>(my_class,func,domains(i),arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11);
@@ -290,7 +290,7 @@ public:
 
     template<class T1,class T2,class T3,class T4,class T5,class T6,class T7,class T8,class T9,class T10,class T11,class T12> void Run(TYPE& my_class,void (TYPE::*func)(RANGE<TV_INT>&,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12),T1 arg1,T2 arg2,T3 arg3,T4 arg4,T5 arg5,T6 arg6,T7 arg7,T8 arg8,T9 arg9,T10 arg10,T11 arg11,T12 arg12)
     {
-        if(!thread_queue){(my_class.*func)(domains(1),arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12);return;}
+        if(!thread_queue){(my_class.*func)(domains(0),arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12);return;}
 #ifdef USE_PTHREADS
         for(int i=0;i<domains.m;i++){
             ITERATOR_TASK_12<TYPE,RANGE<TV_INT>,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12>* task=new ITERATOR_TASK_12<TYPE,RANGE<TV_INT>,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12>(my_class,func,domains(i),arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12);
@@ -303,7 +303,7 @@ public:
 
     template<class T1,class T2,class T3,class T4,class T5,class T6,class T7,class T8,class T9,class T10,class T11,class T12,class T13> void Run(TYPE& my_class,void (TYPE::*func)(RANGE<TV_INT>&,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13),T1 arg1,T2 arg2,T3 arg3,T4 arg4,T5 arg5,T6 arg6,T7 arg7,T8 arg8,T9 arg9,T10 arg10,T11 arg11,T12 arg12,T13 arg13)
     {
-        if(!thread_queue){(my_class.*func)(domains(1),arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13);return;}
+        if(!thread_queue){(my_class.*func)(domains(0),arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13);return;}
 #ifdef USE_PTHREADS
         for(int i=0;i<domains.m;i++){
             ITERATOR_TASK_13<TYPE,RANGE<TV_INT>,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13>* task=new ITERATOR_TASK_13<TYPE,RANGE<TV_INT>,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13>(my_class,func,domains(i),arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13);
@@ -316,7 +316,7 @@ public:
 
     template<class T1,class T2,class T3,class T4,class T5,class T6,class T7,class T8,class T9,class T10,class T11,class T12,class T13,class T14> void Run(TYPE& my_class,void (TYPE::*func)(RANGE<TV_INT>&,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14),T1 arg1,T2 arg2,T3 arg3,T4 arg4,T5 arg5,T6 arg6,T7 arg7,T8 arg8,T9 arg9,T10 arg10,T11 arg11,T12 arg12,T13 arg13,T14 arg14)
     {
-        if(!thread_queue){(my_class.*func)(domains(1),arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13,arg14);return;}
+        if(!thread_queue){(my_class.*func)(domains(0),arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13,arg14);return;}
 #ifdef USE_PTHREADS
         for(int i=0;i<domains.m;i++){
             ITERATOR_TASK_14<TYPE,RANGE<TV_INT>,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14>* task=new ITERATOR_TASK_14<TYPE,RANGE<TV_INT>,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10,T11,T12,T13,T14>(my_class,func,domains(i),arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12,arg13,arg14);

@@ -49,7 +49,12 @@ public:
 
     void Set_Open_Boundary(const bool left_open_boundary_input=false,const bool right_open_boundary_input=false,const bool bottom_open_boundary_input=false,const bool top_open_boundary_input=false,const bool front_open_boundary_input=false,const bool back_open_boundary_input=false)
     {
-        open_boundary(1)=left_open_boundary_input;open_boundary(2)=right_open_boundary_input;open_boundary(3)=bottom_open_boundary_input;open_boundary(4)=top_open_boundary_input;open_boundary(5)=front_open_boundary_input;open_boundary(6)=back_open_boundary_input;
+        open_boundary(0)=left_open_boundary_input;
+        open_boundary(1)=right_open_boundary_input;
+        open_boundary(2)=bottom_open_boundary_input;
+        open_boundary(3)=top_open_boundary_input;
+        open_boundary(4)=front_open_boundary_input;
+        open_boundary(5)=back_open_boundary_input;
     }
 
     void Use_Open_Boundary_Mode(const bool use=true)

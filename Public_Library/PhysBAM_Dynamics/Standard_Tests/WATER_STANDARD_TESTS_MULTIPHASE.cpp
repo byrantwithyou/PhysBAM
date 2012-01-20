@@ -42,49 +42,49 @@ Initialize(const int test_number_input,const int resolution,const int restart_fr
     FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters_input=static_cast<FLUIDS_PARAMETERS_UNIFORM<T_GRID>&>(fluids_parameters);
 
     if(test_number<10){
-        fluids_parameters_input.densities(1)=1000;fluids_parameters_input.densities(2)=1;
+        fluids_parameters_input.densities(0)=1000;fluids_parameters_input.densities(1)=1;
         source_region.Resize(sources.m);source_region.Fill(1);
-        fluids_parameters_input.pseudo_dirichlet_regions(2)=true;
+        fluids_parameters_input.pseudo_dirichlet_regions(1)=true;
         fluids_parameters_input.second_order_cut_cell_method=false;}
     else if(test_number==11){
-        fluids_parameters_input.densities(1)=1000;fluids_parameters_input.densities(2)=500;fluids_parameters_input.densities(3)=2000;
+        fluids_parameters_input.densities(0)=1000;fluids_parameters_input.densities(1)=500;fluids_parameters_input.densities(2)=2000;
         fluids_parameters_input.surface_tensions(1,2)=fluids_parameters_input.surface_tensions(2,1)=(T).1;
         fluids_parameters_input.surface_tensions(1,3)=fluids_parameters_input.surface_tensions(3,1)=(T).1;
         fluids_parameters_input.surface_tensions(2,3)=fluids_parameters_input.surface_tensions(3,2)=(T).1;}
     else if(test_number==12){
-        fluids_parameters_input.dirichlet_regions(1)=true;use_open_wall=true;air_region=1;
-        fluids_parameters_input.densities(1)=1;fluids_parameters_input.densities(2)=800;fluids_parameters_input.densities(3)=1000;fluids_parameters_input.densities(4)=3000;}
+        fluids_parameters_input.dirichlet_regions(0)=true;use_open_wall=true;air_region=1;
+        fluids_parameters_input.densities(0)=1;fluids_parameters_input.densities(1)=800;fluids_parameters_input.densities(2)=1000;fluids_parameters_input.densities(3)=3000;}
     else if(test_number==13){
-        fluids_parameters_input.densities(1)=1400;fluids_parameters_input.densities(2)=500;fluids_parameters_input.densities(3)=1000;fluids_parameters_input.densities(4)=1;}
+        fluids_parameters_input.densities(0)=1400;fluids_parameters_input.densities(1)=500;fluids_parameters_input.densities(2)=1000;fluids_parameters_input.densities(3)=1;}
     else if(test_number==14){
-        fluids_parameters_input.densities(1)=(T)1.226;fluids_parameters_input.densities(2)=1000; 
+        fluids_parameters_input.densities(0)=(T)1.226;fluids_parameters_input.densities(1)=1000; 
         fluids_parameters_input.surface_tensions(1,2)=fluids_parameters_input.surface_tensions(2,1)=(T).0728;
-        fluids_parameters_input.viscosities(1)=(T).0000178;
-        fluids_parameters_input.viscosities(2)=(T).001137;
+        fluids_parameters_input.viscosities(0)=(T).0000178;
+        fluids_parameters_input.viscosities(1)=(T).001137;
         fluids_parameters_input.implicit_viscosity=false;
         fluids_parameters_input.incompressible_iterations=200;
         fluids_parameters_input.implicit_viscosity_iterations=200;}
     else if(test_number==15){
+        fluids_parameters_input.densities(0)=1000;
+        fluids_parameters_input.viscosities(0)=(T)500;           
+        //fluids_parameters_input.viscosities(0)=(T)50;           
+        //fluids_parameters_input.use_multiphase_strain(0)=true;
+        //fluids_parameters_input.elastic_moduli(0)=20000;
+        //fluids_parameters_input.plasticity_alphas(0)=0;
+
         fluids_parameters_input.densities(1)=1000;
-        fluids_parameters_input.viscosities(1)=(T)500;           
-        //fluids_parameters_input.viscosities(1)=(T)50;           
-        //fluids_parameters_input.use_multiphase_strain(1)=true;
-        //fluids_parameters_input.elastic_moduli(1)=20000;
-        //fluids_parameters_input.plasticity_alphas(1)=0;
-
+        fluids_parameters_input.viscosities(1)=(T)60;
+            
         fluids_parameters_input.densities(2)=1000;
-        fluids_parameters_input.viscosities(2)=(T)60;
-            
-        fluids_parameters_input.densities(3)=1000;
-        fluids_parameters_input.viscosities(3)=10;
+        fluids_parameters_input.viscosities(2)=10;
         // SOURCE SET IN DERIVED EXAMPLE
 
-        fluids_parameters_input.densities(4)=1000;
-        fluids_parameters_input.viscosities(4)=0;           
+        fluids_parameters_input.densities(3)=1000;
+        fluids_parameters_input.viscosities(3)=0;           
         // SOURCE SET IN DERIVED EXAMPLE
             
-        fluids_parameters_input.densities(5)=1;
-        fluids_parameters_input.dirichlet_regions(5)=true;//use_open_wall=true;air_region=6;
+        fluids_parameters_input.densities(4)=1;
+        fluids_parameters_input.dirichlet_regions(4)=true;//use_open_wall=true;air_region=6;
         //fluids_parameters_input.cfl/=8;
 
         fluids_parameters_input.implicit_viscosity_iterations=50;
@@ -93,44 +93,44 @@ Initialize(const int test_number_input,const int resolution,const int restart_fr
     }
     else if(test_number==16){
         if(restart_frame>=500){
-            fluids_parameters_input.densities(1)=500;        
-            fluids_parameters_input.use_multiphase_strain(1)=true;
-            fluids_parameters_input.elastic_moduli(1)=15000;
-            fluids_parameters_input.plasticity_alphas(1)=0;                
+            fluids_parameters_input.densities(0)=500;        
+            fluids_parameters_input.use_multiphase_strain(0)=true;
+            fluids_parameters_input.elastic_moduli(0)=15000;
+            fluids_parameters_input.plasticity_alphas(0)=0;                
             fluids_parameters_input.implicit_viscosity_iterations=50;
             fluids_parameters_input.implicit_viscosity=true;
-            fluids_parameters_input.viscosities(1)=(T)200;
+            fluids_parameters_input.viscosities(0)=(T)200;
 
-            fluids_parameters_input.densities(4)=1000;          
-            fluids_parameters_input.use_multiphase_strain(4)=true;
-            fluids_parameters_input.elastic_moduli(4)=15000;
-            fluids_parameters_input.plasticity_alphas(4)=0;
-            fluids_parameters_input.viscosities(4)=(T)200;}
-        else if(restart_frame>=296) fluids_parameters_input.densities(1)=500;         
+            fluids_parameters_input.densities(3)=1000;          
+            fluids_parameters_input.use_multiphase_strain(3)=true;
+            fluids_parameters_input.elastic_moduli(3)=15000;
+            fluids_parameters_input.plasticity_alphas(3)=0;
+            fluids_parameters_input.viscosities(3)=(T)200;}
+        else if(restart_frame>=296) fluids_parameters_input.densities(0)=500;         
         else if(restart_frame>=68){
-            fluids_parameters_input.densities(1)=1500;   
+            fluids_parameters_input.densities(0)=1500;   
             fluids_parameters_input.implicit_viscosity_iterations=50;
             fluids_parameters_input.implicit_viscosity=false;
-            fluids_parameters_input.viscosities(1)=0;           
+            fluids_parameters_input.viscosities(0)=0;           
         }      
         else{
-            fluids_parameters_input.densities(1)=500;        
-            fluids_parameters_input.use_multiphase_strain(1)=true;
-            fluids_parameters_input.elastic_moduli(1)=15000;
-            fluids_parameters_input.plasticity_alphas(1)=0;                
+            fluids_parameters_input.densities(0)=500;        
+            fluids_parameters_input.use_multiphase_strain(0)=true;
+            fluids_parameters_input.elastic_moduli(0)=15000;
+            fluids_parameters_input.plasticity_alphas(0)=0;                
             fluids_parameters_input.implicit_viscosity_iterations=50;
             fluids_parameters_input.implicit_viscosity=true;
-            fluids_parameters_input.viscosities(1)=(T)200;           
+            fluids_parameters_input.viscosities(0)=(T)200;           
         }
-        fluids_parameters_input.densities(2)=1000;
-        fluids_parameters_input.densities(3)=1;
-        fluids_parameters_input.dirichlet_regions(3)=true;
+        fluids_parameters_input.densities(1)=1000;
+        fluids_parameters_input.densities(2)=1;
+        fluids_parameters_input.dirichlet_regions(2)=true;
         fluids_parameters_input.reseeding_frame_rate=10;
         fluids_parameters_input.cfl/=2;
     }
     else if(test_number==17){
-        fluids_parameters_input.densities(1)=1000;
-        fluids_parameters_input.densities(2)=(T)1.226;
+        fluids_parameters_input.densities(0)=1000;
+        fluids_parameters_input.densities(1)=(T)1.226;
         //fluids_parameters_input.surface_tensions(1,2)=fluids_parameters_input.surface_tensions(2,1)=(T)2;
         //fluids_parameters_input.surface_tensions(1,2)=fluids_parameters_input.surface_tensions(2,1)=(T)2;
         fluids_parameters_input.cfl/=2;
@@ -171,7 +171,7 @@ Initialize_Bodies()
         ARRAY<T,VECTOR<int,3> > armadillo_temp_phi;
         LEVELSET_3D<GRID<VECTOR<T,3> > > armadillo_temp(armadillo_temp_grid,armadillo_temp_phi);
         FILE_UTILITIES::Read_From_File<float>(example.data_directory+"/Rigid_Bodies/armadillo_high_res.phi",armadillo_temp);
-        armadillo=new T_LEVELSET(*(new T_GRID(*fluids_parameters.grid)),*(new T_ARRAYS_SCALAR(fluids_parameters.grid->Domain_Indices(1))));
+        armadillo=new T_LEVELSET(*(new T_GRID(*fluids_parameters.grid)),*(new T_ARRAYS_SCALAR(fluids_parameters.grid->Domain_Indices(0))));
         for(CELL_ITERATOR iterator(*fluids_parameters.grid,1);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
             VECTOR<T,3> vec=VECTOR<T,3>(iterator.Location());exchange(vec.x,vec.z);
             if(T_GRID::dimension==3){armadillo->phi(cell)=armadillo_temp.Extended_Phi((vec-VECTOR<T,3>((T).5,(T).35,(T).5+(T).07*vec.y))*(T)145)/(T)145;}
@@ -228,52 +228,52 @@ Initial_Phi(const int region,const TV& X) const
     // two drops test
     if(test_number==11){
         TV center1=TV(VECTOR<T,2>((T).055,(T).03)),center2=TV(VECTOR<T,2>((T).05,(T).07));
-        if(T_GRID::dimension==3){center1[3]=(T).055;center2[3]=(T).05;}
+        if(T_GRID::dimension==3){center1[2]=(T).055;center2[2]=(T).05;}
         T radius=(T).015;
-        phis(2)=(X-center1).Magnitude()-radius;
-        phis(3)=(X-center2).Magnitude()-radius;
-        phis(1)=-min(phis(2),phis(3));}
+        phis(1)=(X-center1).Magnitude()-radius;
+        phis(2)=(X-center2).Magnitude()-radius;
+        phis(0)=-min(phis(1),phis(2));}
     // splash
     if(test_number==12){
-        phis(2)=abs(X.y-(T).30)-(T).10;
-        phis(3)=abs(X.y-(T).10)-(T).10;
-        phis(4)=abs(X.y+(T).25)-(T).25;
-        phis(1)=-min(phis(2),phis(3),phis(4));}
+        phis(1)=abs(X.y-(T).30)-(T).10;
+        phis(2)=abs(X.y-(T).10)-(T).10;
+        phis(3)=abs(X.y+(T).25)-(T).25;
+        phis(0)=-min(phis(1),phis(2),phis(3));}
     // RT
     if(test_number==13){
         VECTOR<double,3> vec=VECTOR<double,3>(VECTOR<T,3>(X*(T)10));
-        if(T_GRID::dimension==3) vec[3]=X[3]*10;
+        if(T_GRID::dimension==3) vec[2]=X[2]*10;
         T y_pos=X.y-(T)NOISE<double>::Noise1(vec,5,(T).5)*(T)0.002;
-        phis(1)=abs(y_pos-(T).25)-(T).25;
-        phis(2)=abs(y_pos-(T).75)-(T).25;
-        phis(3)=abs(y_pos-(T)1.25)-(T).25;
-        phis(4)=abs(y_pos-(T)1.75)-(T).25;}
+        phis(0)=abs(y_pos-(T).25)-(T).25;
+        phis(1)=abs(y_pos-(T).75)-(T).25;
+        phis(2)=abs(y_pos-(T)1.25)-(T).25;
+        phis(3)=abs(y_pos-(T)1.75)-(T).25;}
     // rising bubble
     if(test_number==14){
         T radius=(T)1/(T)300;
-        phis(2)=radius-X.Magnitude(); // center is at 0,0,0
-        phis(1)=-phis(2);}
+        phis(1)=radius-X.Magnitude(); // center is at 0,0,0
+        phis(0)=-phis(1);}
     // incline plane
     if(test_number==15){
         SPHERE<VECTOR<T,3> > sphere1((VECTOR<T,3>((T).4,(T).35,(T).35)),(T).1);if(T_GRID::dimension==2)sphere1.center.z=0;
         SPHERE<VECTOR<T,3> > sphere2((VECTOR<T,3>((T).4,(T).35,(T).65)),(T).1);if(T_GRID::dimension==2){sphere2.center.z=0;sphere2.center.x=(T).15;}
-        phis(1)=sphere1.Signed_Distance(VECTOR<T,3>(X));
-        phis(2)=sphere2.Signed_Distance(VECTOR<T,3>(X));
+        phis(0)=sphere1.Signed_Distance(VECTOR<T,3>(X));
+        phis(1)=sphere2.Signed_Distance(VECTOR<T,3>(X));
+        phis(2)=1;
         phis(3)=1;
-        phis(4)=1;
-        phis(5)=-min(phis(1),phis(2),phis(3),phis(4));}
+        phis(4)=-min(phis(0),phis(1),phis(2),phis(3));}
     // viscoelastic armadillo
     if(test_number==16){
-        phis(1)=armadillo->Extended_Phi(X);
-        phis(2)=max(X.y-(T).3,-phis(1));
-        phis(3)=-min(phis(1),phis(2));
-        phis(4)=1;}
+        phis(0)=armadillo->Extended_Phi(X);
+        phis(1)=max(X.y-(T).3,-phis(0));
+        phis(2)=-min(phis(0),phis(1));
+        phis(3)=1;}
     // milk crown
     if(test_number==17){
-        TV center1=TV(VECTOR<T,2>((T).05,(T).03));if(T_GRID::dimension==3)center1[3]=(T).05;
+        TV center1=TV(VECTOR<T,2>((T).05,(T).03));if(T_GRID::dimension==3)center1[2]=(T).05;
         T radius=(T).01;
-        phis(1)=min((X-center1).Magnitude()-radius,X.y-(T).01);
-        phis(2)=-phis(1);}
+        phis(0)=min((X-center1).Magnitude()-radius,X.y-(T).01);
+        phis(1)=-phis(0);}
     return phis(region);
 }
 //#####################################################################
@@ -284,9 +284,9 @@ Initial_Velocity(const TV& X) const
 {
     // milk crown
     if(test_number==17){
-        TV center1=TV(VECTOR<T,2>((T).05,(T).03));if(T_GRID::dimension==3)center1[3]=(T).05;
+        TV center1=TV(VECTOR<T,2>((T).05,(T).03));if(T_GRID::dimension==3)center1[2]=(T).05;
         T radius=(T).011;
-        if((X-center1).Magnitude()-radius<=0) return -TV::Axis_Vector(2);}
+        if((X-center1).Magnitude()-radius<=0) return -TV::Axis_Vector(1);}
     return TV();
 }
 //#####################################################################
@@ -296,9 +296,9 @@ template<class T_GRID,class T_WATER_STANDARD_TESTS> void WATER_STANDARD_TESTS_MU
 Update_Sources(const T time)
 {
     if(test_number==15){
-//        if(time>(T)1.15) source_velocity(2)=TV(VECTOR<T,2>(0,(T)-.6));
-        if(time>(T)1.15){source_region(1)=5;}
-        if(time>(T)1.5){source_region(1)=4;}
+//        if(time>(T)1.15) source_velocity(1)=TV(VECTOR<T,2>(0,(T)-.6));
+        if(time>(T)1.15){source_region(0)=5;}
+        if(time>(T)1.5){source_region(0)=4;}
     }
 }
 template class WATER_STANDARD_TESTS_MULTIPHASE<GRID<VECTOR<float,2> >,WATER_STANDARD_TESTS_2D<GRID<VECTOR<float,2> > > >;

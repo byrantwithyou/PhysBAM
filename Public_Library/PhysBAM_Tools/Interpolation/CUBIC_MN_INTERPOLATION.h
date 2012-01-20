@@ -22,22 +22,6 @@ public:
     void Set_Parameters(const T b=1./3,const T c=1./3);
     T2 Cubic_MN(const T2& u_0,const T2& u_1,const T2& u_2,const T2& u_3,const T alpha) const;
 
-    /*T2 Cubic_MN(const T2& u_0,const T2& u_1,const T2& u_2,const T2& u_3,const T alpha) const
-    {T alpha2=alpha*alpha;T alpha3=alpha2*alpha;
-    ARRAY<T> weights;weights.Append(-alpha3/2.+alpha2-.5*alpha); //f_k-1
-    weights.Append(alpha3/2.-5*alpha2/2.+1); //f_k
-    weights.Append(-alpha3/2.+2*alpha2+alpha/2.); //f_k+1
-    weights.Append(alpha3/2.-alpha2/2.);  //f_k+2
-    return weights(1)*u_0+weights(2)*u_1+weights(3)*u_2+weights(4)*u_3;}*/
-
-    /*ARRAY<T> Cubic_MN_Weights(const T alpha) const
-    {T temp=abs(1+alpha);ARRAY<T> weights;weights.Append(((n0*temp+n1)*temp+n2)*temp+n3);
-    temp=abs(alpha);weights.Append((m0*temp+m1)*temp*temp+m3);
-    temp=abs(1-alpha);weights.Append((m0*temp+m1)*temp*temp+m3);
-    temp=abs(2-alpha);weights.Append(((n0*temp+n1)*temp+n2)*temp+n3);
-    for(int i=0;i<weights.m;i++) weights(i)=max((T)0.,min((T)1.,weights(i)));
-    return weights;}*/
-
     ARRAY<T> Cubic_MN_Weights(const T alpha) const;
 
 //#####################################################################

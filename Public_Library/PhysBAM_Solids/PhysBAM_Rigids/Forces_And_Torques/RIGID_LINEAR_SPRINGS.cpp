@@ -98,8 +98,8 @@ Update_Position_Based_State(const T time)
         state.direction=X2-X1;
         current_lengths(s)=state.direction.Normalize();
         state.coefficient=damping(s)/restlength(s);
-        state.r(1)=X1-Body(s,1).X();
-        state.r(2)=X2-Body(s,2).X();}
+        state.r(0)=X1-Body(s,1).X();
+        state.r(1)=X2-Body(s,2).X();}
 }
 //#####################################################################
 // Function Add_Force
@@ -107,12 +107,12 @@ Update_Position_Based_State(const T time)
 template<class TV> void RIGID_LINEAR_SPRINGS<TV>::
 Add_Force(ARRAY_VIEW<TWIST<TV> > rigid_F,const STATE& state,const TV& force) const
 {
+    if(!rigid_body_collection.Rigid_Body(state.nodes(0)).Has_Infinite_Inertia()){
+        rigid_F(state.nodes(0)).linear+=force;
+        rigid_F(state.nodes(0)).angular+=TV::Cross_Product(state.r(0),force);}
     if(!rigid_body_collection.Rigid_Body(state.nodes(1)).Has_Infinite_Inertia()){
-        rigid_F(state.nodes(1)).linear+=force;
-        rigid_F(state.nodes(1)).angular+=TV::Cross_Product(state.r(1),force);}
-    if(!rigid_body_collection.Rigid_Body(state.nodes(2)).Has_Infinite_Inertia()){
-        rigid_F(state.nodes(2)).linear-=force;
-        rigid_F(state.nodes(2)).angular-=TV::Cross_Product(state.r(2),force);}
+        rigid_F(state.nodes(1)).linear-=force;
+        rigid_F(state.nodes(1)).angular-=TV::Cross_Product(state.r(1),force);}
 }
 //#####################################################################
 // Function Add_Velocity_Independent_Forces
@@ -138,7 +138,7 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TW
         for(int i=0;i<2;i++){
             const TWIST<TV>& twist=rigid_V(segment_mesh.elements(s)(i));
             V(i)=twist.linear+TV::Cross_Product(twist.angular,state.r(i));}
-        TV force=(state.coefficient*TV::Dot_Product(V(2)-V(1),state.direction))*state.direction;
+        TV force=(state.coefficient*TV::Dot_Product(V(1)-V(0),state.direction))*state.direction;
         Add_Force(rigid_F,state,force);}
 }
 //#####################################################################
@@ -153,7 +153,7 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V,AR
         for(int i=0;i<2;i++){
             const TWIST<TV>& twist=rigid_V(segment_mesh.elements(s)(i));
             V(i)=twist.linear+TV::Cross_Product(twist.angular,state.r(i));}
-        TV dl=V(2)-V(1),dl_projected=dl.Projected_On_Unit_Direction(state.direction);
+        TV dl=V(1)-V(0),dl_projected=dl.Projected_On_Unit_Direction(state.direction);
         TV force=youngs_modulus(s)/restlength(s)*dl_projected;
         Add_Force(rigid_F,state,force);}
 }
@@ -211,7 +211,7 @@ Print_Restlength_Statistics() const
     ARRAY<T> length(restlength);Sort(length);
     ARRAY<T> visual_length(visual_restlength);Sort(visual_length);
     if(length.m){
-        LOG::Stat("smallest restlength",length(1));LOG::Stat("smallest visual restlength",visual_length(1));
+        LOG::Stat("smallest restlength",length(0));LOG::Stat("smallest visual restlength",visual_length(0));
         LOG::Stat("one percent restlength",length((int)(.01*length.m)+1));LOG::Stat("one percent visual restlength",visual_length((int)(.01*length.m)+1));
         LOG::Stat("ten percent restlength",length((int)(.1*length.m)+1));LOG::Stat("ten percent visual restlength",visual_length((int)(.1*length.m)+1));
         LOG::Stat("median restlength",length((int)(.5*length.m)+1));LOG::Stat("median visual restlength",visual_length((int)(.5*length.m)+1));}

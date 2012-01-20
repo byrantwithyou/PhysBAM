@@ -64,7 +64,7 @@ void Initialize_Segment_Lengths(TRIANGULATED_SURFACE<T>& ts)
     bool segment_mesh_defined=ts.mesh.segment_mesh!=0;if(!segment_mesh_defined) ts.mesh.Initialize_Segment_Mesh();
     delete ts.segment_lengths;ts.segment_lengths=new ARRAY<T>(ts.mesh.segment_mesh->elements.m);
     for(int t=0;t<ts.mesh.segment_mesh->elements.m;t++) 
-        (*ts.segment_lengths)(t)=(ts.particles.X(ts.mesh.segment_mesh->elements(t)(1))-ts.particles.X(ts.mesh.segment_mesh->elements(t)(2))).Magnitude();
+        (*ts.segment_lengths)(t)=(ts.particles.X(ts.mesh.segment_mesh->elements(t)(0))-ts.particles.X(ts.mesh.segment_mesh->elements(t)(1))).Magnitude();
     if(!segment_mesh_defined){delete ts.mesh.segment_mesh;ts.mesh.segment_mesh=0;}
 }
 //#####################################################################

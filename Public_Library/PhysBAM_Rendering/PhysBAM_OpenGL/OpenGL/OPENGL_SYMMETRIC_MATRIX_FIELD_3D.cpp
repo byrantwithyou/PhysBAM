@@ -19,11 +19,11 @@ Display(const int in_color) const
     for(int i=0;i<entries.m;i++){
         VECTOR<T,3> node=entries(i).x;MATRIX<T,3> line=size*entries(i).y;VECTOR<bool,3> p=entries(i).z;
         (p.x?positive_color:negative_color).Send_To_GL_Pipeline();
-        OpenGL_Line(node-line.Column(1),node+line.Column(1),vertices);
+        OpenGL_Line(node-line.Column(0),node+line.Column(0),vertices);
         (p.y?positive_color:negative_color).Send_To_GL_Pipeline();
-        OpenGL_Line(node-line.Column(2),node+line.Column(2),vertices);
+        OpenGL_Line(node-line.Column(1),node+line.Column(1),vertices);
         (p.z?positive_color:negative_color).Send_To_GL_Pipeline();
-        OpenGL_Line(node-line.Column(3),node+line.Column(3),vertices);}
+        OpenGL_Line(node-line.Column(2),node+line.Column(2),vertices);}
     OpenGL_Draw_Arrays(GL_LINES,3,vertices);
     glPopAttrib();
 }

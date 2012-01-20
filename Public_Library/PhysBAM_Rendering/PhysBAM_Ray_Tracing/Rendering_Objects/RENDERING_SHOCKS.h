@@ -137,9 +137,9 @@ public:
 
     TV dX=grid.DX();
     TV object_space_normal=TV(
+    (Medium_For_Intersection(object_space_location+dX(0)*TV::Axis_Vector(0))-Medium_For_Intersection(object_space_location-dX(0)*TV::Axis_Vector(0)))/(2*dX(0)),
     (Medium_For_Intersection(object_space_location+dX(1)*TV::Axis_Vector(1))-Medium_For_Intersection(object_space_location-dX(1)*TV::Axis_Vector(1)))/(2*dX(1)),
-    (Medium_For_Intersection(object_space_location+dX(2)*TV::Axis_Vector(2))-Medium_For_Intersection(object_space_location-dX(2)*TV::Axis_Vector(2)))/(2*dX(2)),
-    (Medium_For_Intersection(object_space_location+dX(3)*TV::Axis_Vector(3))-Medium_For_Intersection(object_space_location-dX(3)*TV::Axis_Vector(3)))/(2*dX(3))).Normalized();
+    (Medium_For_Intersection(object_space_location+dX(2)*TV::Axis_Vector(2))-Medium_For_Intersection(object_space_location-dX(2)*TV::Axis_Vector(2)))/(2*dX(2))).Normalized();
 
     return World_Space_Vector(object_space_normal);}
 

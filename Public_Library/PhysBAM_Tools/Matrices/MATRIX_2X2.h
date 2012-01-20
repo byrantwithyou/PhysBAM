@@ -103,7 +103,7 @@ public:
     {return VECTOR<T,2>(x[0]+x[2],x[1]+x[3]);}
 
     VECTOR<T,2> Column_Magnitudes() const
-    {return VECTOR<T,2>(Column(1).Magnitude(),Column(2).Magnitude());}
+    {return VECTOR<T,2>(Column(0).Magnitude(),Column(1).Magnitude());}
 
     MATRIX operator-() const
     {return MATRIX(-x[0],-x[1],-x[2],-x[3]);}
@@ -282,7 +282,7 @@ public:
     {return dA.Cofactor_Matrix();}
 
     T Simplex_Minimum_Altitude() const
-    {return Determinant()/sqrt(max(Column(1).Magnitude_Squared(),Column(2).Magnitude_Squared(),(Column(1)-Column(2)).Magnitude_Squared()));}
+    {return Determinant()/sqrt(max(Column(0).Magnitude_Squared(),Column(1).Magnitude_Squared(),(Column(0)-Column(1)).Magnitude_Squared()));}
 
 //#####################################################################
 };

@@ -29,12 +29,12 @@ void Apply_Loop_Subdivision(TRIANGLE_SUBDIVISION& ts,ARRAY_VIEW<const TV> base_v
     for(int i=0;i<ts.triangle_mesh.number_nodes;i++)if(neighbors(i).m){
         if(ts.Node_Is_A_Corner(i) || boundary_neighbors(i).m>2 || boundary_neighbors(i).m==1)subdivided_values(i)=base_values(i);
         else if(boundary_neighbors(i).m==2) // if this is a regular boundary node
-            subdivided_values(i)=(T).75*base_values(i)+(T).125*(base_values(boundary_neighbors(i)(1))+base_values(boundary_neighbors(i)(2)));
+            subdivided_values(i)=(T).75*base_values(i)+(T).125*(base_values(boundary_neighbors(i)(0))+base_values(boundary_neighbors(i)(1)));
         else{ // interior node
             T alpha;switch(neighbors(i).m){
                 case 3:alpha=(T).4375;break;case 4:alpha=(T).5;break;case 5:alpha=(T).54546609462891;break;case 6:alpha=(T).625;break;
                 default:{T lambda=(T).375+(T).25*cos(T(2*pi)/neighbors(i).m);alpha=1-lambda*(4+lambda*(5*lambda-8))/(2*(1-lambda))+sqr(lambda);}}
-            VECTOR<T,3> neighbor_sum=base_values(neighbors(i)(1));for(int j=2;j<=neighbors(i).m;j++)neighbor_sum+=base_values(neighbors(i)(j));
+            VECTOR<T,3> neighbor_sum=base_values(neighbors(i)(0));for(int j=2;j<=neighbors(i).m;j++)neighbor_sum+=base_values(neighbors(i)(j));
             subdivided_values(i)=alpha*base_values(i)+(1-alpha)/neighbors(i).m*neighbor_sum;}}
     // edge values
     for(int i=0;i<ts.triangle_mesh.segment_mesh->elements.m;i++){

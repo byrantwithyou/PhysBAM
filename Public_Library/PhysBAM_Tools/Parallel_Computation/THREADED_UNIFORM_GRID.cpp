@@ -31,7 +31,7 @@ template<class T> static void Fill_Process_Ranks(GRID<VECTOR<T,2> >& process_gri
 {
     int next_rank=0;
     VECTOR<int,2> extents=process_grid.Domain_Indices().Maximum_Corner(),half_extents=extents/2;
-    for(int i=0;i<half_extents[axes(1)];i++)for(int j=0;j<half_extents[axes(2)];j++)
+    for(int i=0;i<half_extents[axes(0)];i++)for(int j=0;j<half_extents[axes(1)];j++)
         for(int ii=0;ii<2;ii++)for(int jj=0;jj<2;jj++){
             VECTOR<int,2> permuted_index(2*i+ii-1,2*j+jj-1),index;
             for(int a=0;a<2;a++)index[axes(a)]=permuted_index[a];
@@ -42,7 +42,7 @@ template<class T> static void Fill_Process_Ranks(GRID<VECTOR<T,3> >& process_gri
 {
     int next_rank=0;
     VECTOR<int,3> extents=process_grid.Domain_Indices().Maximum_Corner(),half_extents=extents/2;
-    for(int i=0;i<half_extents[axes(1)];i++)for(int j=0;j<half_extents[axes(2)];j++)for(int ij=0;ij<half_extents[axes(3)];ij++)
+    for(int i=0;i<half_extents[axes(0)];i++)for(int j=0;j<half_extents[axes(1)];j++)for(int ij=0;ij<half_extents[axes(2)];ij++)
         for(int ii=0;ii<2;ii++)for(int jj=0;jj<2;jj++)for(int ijij=0;ijij<2;ijij++){
             VECTOR<int,3> permuted_index(2*i+ii-1,2*j+jj-1,2*ij+ijij-1),index;
             for(int a=0;a<3;a++)index[axes(a)]=permuted_index[a];
@@ -67,20 +67,20 @@ THREADED_UNIFORM_GRID(ARRAY<THREAD_PACKAGE>& buffers_input,const int tid_input,c
         lock=new pthread_mutex_t;
         pthread_mutex_init(lock,NULL);
         THREAD_PACKAGE pack(sizeof(pthread_mutex_t*));
-        *(pthread_mutex_t**)(&pack.buffer(1))=lock;
+        *(pthread_mutex_t**)(&pack.buffer(0))=lock;
         buffers.Append(pack);}
     else{
         while(buffers.m==0) sleep(1);
-        lock=*(pthread_mutex_t**)(&buffers(1).buffer(1));}
+        lock=*(pthread_mutex_t**)(&buffers(0).buffer(0));}
     if(tid==1){
         barr=new pthread_barrier_t;
         pthread_barrier_init(barr,NULL,number_of_processes);
         THREAD_PACKAGE pack(sizeof(pthread_barrier_t*));
-        *(pthread_barrier_t**)(&pack.buffer(1))=barr;
+        *(pthread_barrier_t**)(&pack.buffer(0))=barr;
         buffers.Append(pack);}
     else{
         while(buffers.m<=1) sleep(1);
-        barr=*(pthread_barrier_t**)(&buffers(2).buffer(1));}
+        barr=*(pthread_barrier_t**)(&buffers(1).buffer(0));}
     pthread_barrier_wait(barr);
     if(tid==1) buffers.m=0;
     pthread_barrier_wait(barr);
@@ -194,12 +194,12 @@ template<class T_GRID> void THREADED_UNIFORM_GRID<T_GRID>::
 Synchronize_Dt(T& dt) const
 {
 #ifdef USE_PTHREADS
-    THREAD_PACKAGE pack(sizeof(T));*(T*)(&pack.buffer(1))=dt;
+    THREAD_PACKAGE pack(sizeof(T));*(T*)(&pack.buffer(0))=dt;
     pthread_mutex_lock(lock);
     buffers.Append(pack);
     pthread_mutex_unlock(lock);
     pthread_barrier_wait(barr);
-    for(int i=0;i<buffers.m;i++) dt=min(*(T*)(&buffers(i).buffer(1)),dt);
+    for(int i=0;i<buffers.m;i++) dt=min(*(T*)(&buffers(i).buffer(0)),dt);
     pthread_barrier_wait(barr);
     if(tid==1) buffers.m=0;
     pthread_barrier_wait(barr);
@@ -212,12 +212,12 @@ template<class T_GRID> void THREADED_UNIFORM_GRID<T_GRID>::
 All_Reduce(bool& flag) const
 {
 #ifdef USE_PTHREADS
-    THREAD_PACKAGE pack(sizeof(bool));*(bool*)(&pack.buffer(1))=flag;
+    THREAD_PACKAGE pack(sizeof(bool));*(bool*)(&pack.buffer(0))=flag;
     pthread_mutex_lock(lock);
     buffers.Append(pack);
     pthread_mutex_unlock(lock);
     pthread_barrier_wait(barr);
-    for(int i=0;i<buffers.m;i++) flag|=*(bool*)(&buffers(i).buffer(1));
+    for(int i=0;i<buffers.m;i++) flag|=*(bool*)(&buffers(i).buffer(0));
     pthread_barrier_wait(barr);
     if(tid==1) buffers.m=0;
     pthread_barrier_wait(barr);
@@ -262,7 +262,7 @@ Exchange_Boundary_Face_Data(ARRAY<T2,FACE_INDEX<TV::dimension> >& data,const int
     // send
     ARRAY<ARRAY<RANGE<TV_INT> > > send_regions(T_GRID::dimension);
     for(int axis=0;axis<T_GRID::dimension;axis++)Find_Boundary_Regions(send_regions(axis),Face_Sentinels(axis),true,boundary_band,true);
-    for(int n=0;n<send_regions(1).m;n++)if(all_neighbor_ranks(n)!=-1){
+    for(int n=0;n<send_regions(0).m;n++)if(all_neighbor_ranks(n)!=-1){
         ARRAY<RANGE<TV_INT> > send_regions_n(T_GRID::dimension);for(int axis=0;axis<T_GRID::dimension;axis++)send_regions_n(axis)=send_regions(axis)(n);
         int size=0;for(int axis=0;axis<T_GRID::dimension;axis++) for(FACE_ITERATOR iterator(local_grid,send_regions_n(axis),axis);iterator.Valid();iterator.Next()) size+=data.data(axis).Pack_Size();
         int position=0;THREAD_PACKAGE pack(size);pack.send_tid=rank;pack.recv_tid=all_neighbor_ranks(n);
@@ -275,7 +275,7 @@ Exchange_Boundary_Face_Data(ARRAY<T2,FACE_INDEX<TV::dimension> >& data,const int
     ARRAY<ARRAY<RANGE<TV_INT> > > recv_regions(T_GRID::dimension);
     for(int axis=0;axis<T_GRID::dimension;axis++)Find_Boundary_Regions(recv_regions(axis),Face_Sentinels(axis),true,ghost_band,true);
     pthread_barrier_wait(barr);
-    for(int n=0;n<recv_regions(1).m;n++)if(all_neighbor_ranks(n)!=-1){int index=0;
+    for(int n=0;n<recv_regions(0).m;n++)if(all_neighbor_ranks(n)!=-1){int index=0;
         ARRAY<RANGE<TV_INT> > recv_regions_n(T_GRID::dimension);for(int axis=0;axis<T_GRID::dimension;axis++)recv_regions_n(axis)=recv_regions(axis)(n);
         for(int i=0;i<buffers.m;i++) if(buffers(i).send_tid==all_neighbor_ranks(n) && buffers(i).recv_tid==rank) index=i;
         assert(index);int position=0;
@@ -296,7 +296,7 @@ Average_Common_Face_Data(ARRAY<T2,FACE_INDEX<TV::dimension> >& data) const
     ARRAY<ARRAY<RANGE<TV_INT> > > regions(T_GRID::dimension);
     for(int axis=0;axis<T_GRID::dimension;axis++)Find_Boundary_Regions(regions(axis),Face_Sentinels(axis),false,RANGE<VECTOR<int,1> >(0,0),false);
     // send and receive into temporary buffers
-    for(int n=0;n<regions(1).m;n++)if(side_neighbor_ranks(n)!=-1){int axis=(n-1)/2+1;
+    for(int n=0;n<regions(0).m;n++)if(side_neighbor_ranks(n)!=-1){int axis=(n-1)/2+1;
         int size=0;for(FACE_ITERATOR iterator(local_grid,regions(axis)(n),axis);iterator.Valid();iterator.Next()) size+=data.data(axis).Pack_Size();
         int position=0;THREAD_PACKAGE pack(size);pack.send_tid=rank;pack.recv_tid=side_neighbor_ranks(n);
         for(FACE_ITERATOR iterator(local_grid,regions(axis)(n),axis);iterator.Valid();iterator.Next()) data.data(axis).Pack(pack.buffer,position,iterator.Face_Index());
@@ -306,7 +306,7 @@ Average_Common_Face_Data(ARRAY<T2,FACE_INDEX<TV::dimension> >& data) const
     // wait
     pthread_barrier_wait(barr);
     // average received data with local data (TODO: find a cleaner general way to do this)
-    for(int n=0;n<regions(1).m;n++)if(side_neighbor_ranks(n)!=-1){int axis=(n-1)/2+1;
+    for(int n=0;n<regions(0).m;n++)if(side_neighbor_ranks(n)!=-1){int axis=(n-1)/2+1;
         ARRAY<T2,FACE_INDEX<TV::dimension> > local_data;local_data.Resize(data.Domain_Indices(),false,false);
         int index=0;for(int i=0;i<buffers.m;i++) if(buffers(i).send_tid==side_neighbor_ranks(n) && buffers(i).recv_tid==rank) index=i;
         assert(index);int position=0;
@@ -328,7 +328,7 @@ Assert_Common_Face_Data(ARRAY<T2,FACE_INDEX<TV::dimension> >& data,const T toler
     ARRAY<ARRAY<RANGE<TV_INT> > > regions(T_GRID::dimension);
     for(int axis=0;axis<T_GRID::dimension;axis++)Find_Boundary_Regions(regions(axis),Face_Sentinels(axis),false,RANGE<VECTOR<int,1> >(0,0),false);
     // send and receive into temporary buffers
-    for(int n=0;n<regions(1).m;n++)if(side_neighbor_ranks(n)!=-1){int axis=(n-1)/2+1;
+    for(int n=0;n<regions(0).m;n++)if(side_neighbor_ranks(n)!=-1){int axis=(n-1)/2+1;
         int size=0;for(FACE_ITERATOR iterator(local_grid,regions(axis)(n),axis);iterator.Valid();iterator.Next()) size+=data.data(axis).Pack_Size();
         int position=0;THREAD_PACKAGE pack(size);pack.send_tid=rank;pack.recv_tid=side_neighbor_ranks(n);
         for(FACE_ITERATOR iterator(local_grid,regions(axis)(n),axis);iterator.Valid();iterator.Next()) data.data(axis).Pack(pack.buffer,position,iterator.Face_Index());
@@ -338,7 +338,7 @@ Assert_Common_Face_Data(ARRAY<T2,FACE_INDEX<TV::dimension> >& data,const T toler
     // wait
     pthread_barrier_wait(barr);
     // average received data with local data (TODO: find a cleaner general way to do this)
-    for(int n=0;n<regions(1).m;n++)if(side_neighbor_ranks(n)!=-1){int axis=(n-1)/2+1;
+    for(int n=0;n<regions(0).m;n++)if(side_neighbor_ranks(n)!=-1){int axis=(n-1)/2+1;
         ARRAY<T2,FACE_INDEX<TV::dimension> > local_data;local_data.Resize(data.Domain_Indices(),false,false);
         int index=0;for(int i=0;i<buffers.m;i++) if(buffers(i).send_tid==side_neighbor_ranks(n) && buffers(i).recv_tid==rank) index=i;
         assert(index);int position=0;
@@ -393,12 +393,12 @@ template<class T_GRID> void THREADED_UNIFORM_GRID<T_GRID>::
 Allgather(ARRAY<int>& data) const
 {
 #ifdef USE_PTHREADS
-    THREAD_PACKAGE pack(sizeof(int));*(int*)(&pack.buffer(1))=data(tid);pack.send_tid=tid;
+    THREAD_PACKAGE pack(sizeof(int));*(int*)(&pack.buffer(0))=data(tid);pack.send_tid=tid;
     pthread_mutex_lock(lock);
     buffers.Append(pack);
     pthread_mutex_unlock(lock);
     pthread_barrier_wait(barr);
-    for(int i=0;i<buffers.m;i++) data(buffers(i).send_tid)=*(int*)(&buffers(i).buffer(1));
+    for(int i=0;i<buffers.m;i++) data(buffers(i).send_tid)=*(int*)(&buffers(i).buffer(0));
     pthread_barrier_wait(barr);
     if(tid==1) buffers.m=0;
     pthread_barrier_wait(barr);

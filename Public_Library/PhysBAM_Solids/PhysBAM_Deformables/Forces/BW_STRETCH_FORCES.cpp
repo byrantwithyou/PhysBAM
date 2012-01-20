@@ -52,8 +52,8 @@ Update_Position_Based_State(const T time,const bool is_position_update)
                 material_force_state.dwu_dx(j)*(MATRIX<T,3>::Identity_Matrix()-MATRIX<T,3>::Outer_Product(material_force_state.w_u,material_force_state.w_u));
             MATRIX<T,3> dCv_dxi_dxj=(material_force_state.rest_state_triangle_area/material_force_state.w_v_magnitude)*material_force_state.dwv_dx(i)*
                 material_force_state.dwv_dx(j)*(MATRIX<T,3>::Identity_Matrix()-MATRIX<T,3>::Outer_Product(material_force_state.w_v,material_force_state.w_v));
-            state.dC_dxi_dxj_times_C(i,j)=dCu_dxi_dxj*state.C(1)+dCv_dxi_dxj*state.C(2);
-            state.dC_dxi_dxj_times_C_dot(i,j)=dCu_dxi_dxj*state.C_dot(1)+dCv_dxi_dxj*state.C_dot(2);}}
+            state.dC_dxi_dxj_times_C(i,j)=dCu_dxi_dxj*state.C(0)+dCv_dxi_dxj*state.C(1);
+            state.dC_dxi_dxj_times_C_dot(i,j)=dCu_dxi_dxj*state.C_dot(0)+dCv_dxi_dxj*state.C_dot(1);}}
 }
 //#####################################################################
 // Function Potential_Energy
