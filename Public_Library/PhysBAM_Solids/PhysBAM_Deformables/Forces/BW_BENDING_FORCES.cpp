@@ -129,15 +129,12 @@ Update_Position_Based_State(const T time,const bool is_position_update)
                     dn_a_dx(i)(j) -= (bending_state.n_a/bending_state.n_a_magnitude)*TV::Dot_Product(bending_state.n_a,-S_q_a.Column(j));
                     dn_b_dx(i)(j) -= (bending_state.n_b/bending_state.n_b_magnitude)*TV::Dot_Product(bending_state.n_b,-S_q_b.Column(j));
                     de_dx(i)(j) -= (bending_state.e/bending_state.e_magnitude)*TV::Dot_Product(bending_state.e,(q_e(i)*TV::Axis_Vector(j)));}
-                // dcos_theta_dx(i)(j)=TV::Dot_Product(dn_a_dx(i)(j),bending_state.n_b)+TV::Dot_Product(bending_state.n_a,dn_b_dx(i)(j));                
-                // dsin_theta_dx(i)(j)=TV::Dot_Product(TV::Cross_Product(dn_a_dx(i)(j),bending_state.n_b)+TV::Cross_Product(bending_state.n_a,dn_b_dx(i)(j)),bending_state.e)+
-                //     TV::Dot_Product(TV::Cross_Product(bending_state.n_a,bending_state.n_b),de_dx(i)(j));
-                // state.dC_dx(i)(j,1)=cos_theta*dsin_theta_dx(i)(j)-sin_theta*dcos_theta_dx(i)(j);
-}
+                dcos_theta_dx(i)(j)=TV::Dot_Product(dn_a_dx(i)(j),bending_state.n_b)+TV::Dot_Product(bending_state.n_a,dn_b_dx(i)(j));                
+                dsin_theta_dx(i)(j)=TV::Dot_Product(TV::Cross_Product(dn_a_dx(i)(j),bending_state.n_b)+TV::Cross_Product(bending_state.n_a,dn_b_dx(i)(j)),bending_state.e)+
+                    TV::Dot_Product(TV::Cross_Product(bending_state.n_a,bending_state.n_b),de_dx(i)(j));
+                state.dC_dx(i)(j,0)=cos_theta*dsin_theta_dx(i)(j)-sin_theta*dcos_theta_dx(i)(j);}
             state.C_dot+=state.dC_dx(i).Transposed()*particles.V(state.nodes[i]);}
-    }
 
-/*
         for(int i=0;i<4;i++){
             for(int j=0;j<4;j++){
                 for(int s=0;s<3;s++) for(int t=0;t<3;t++){
@@ -179,7 +176,6 @@ Update_Position_Based_State(const T time,const bool is_position_update)
                     dC_dxi_dxj(s,t)=dcos_theta_dx(j)(t)*dsin_theta_dx(i)(s)+cos_theta*d2sin_theta_dx_dy(i,j)(s,t)-dsin_theta_dx(j)(t)*dcos_theta_dx(i)(s)-sin_theta*d2cos_theta_dx_dy(i,j)(s,t);
                 state.dC_dxi_dxj_times_C(i,j)=dC_dxi_dxj*state.C(0);
                 state.dC_dxi_dxj_times_C_dot(i,j)=dC_dxi_dxj*state.C_dot(0);}}}
-*/
 }
 //#####################################################################
 // Function Potential_Energy

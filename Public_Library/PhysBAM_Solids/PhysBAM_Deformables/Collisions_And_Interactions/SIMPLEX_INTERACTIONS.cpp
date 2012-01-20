@@ -19,8 +19,8 @@ Intersection(const VECTOR<VECTOR<T,2>,2>& segment_1,const VECTOR<VECTOR<T,2>,2>&
     int plus,minus;
     unsigned int mask;
 
-    points[0][0]=segment_1[1].x;points[0][1]=segment_1[1].y;points[1][0]=segment_1[2].x;points[1][1]=segment_1[2].y;
-    points[2][0]=segment_2[1].x;points[2][1]=segment_2[1].y;points[3][0]=segment_2[2].x;points[3][1]=segment_2[2].y;
+    points[0][0]=segment_1[0].x;points[0][1]=segment_1[0].y;points[1][0]=segment_1[1].x;points[1][1]=segment_1[1].y;
+    points[2][0]=segment_2[0].x;points[2][1]=segment_2[0].y;points[3][0]=segment_2[1].x;points[3][1]=segment_2[1].y;
     for(unsigned int i=0;i<3;i++) for(unsigned int j=i+1;j<3;j++) m2p[(1<<i)|(1<<j)]=points[i][0]*points[j][1]-points[i][1]*points[j][0];
     // Compute signed areas for all triangles formed by three input points
     for(unsigned int i=0;i<2;i++) for(unsigned int j=i+1;j<2;j++) for(unsigned int k=j+1;k<3;k++) 
@@ -42,9 +42,9 @@ Intersection(const VECTOR<VECTOR<T,2>,2>& segment_1,const VECTOR<VECTOR<T,2>,2>&
 template<class T> bool SIMPLEX_INTERACTIONS<T>::
 Two_Segment_Intersection_Barycentric_Coordinates(const VECTOR<VECTOR<T,2>,2>& segment1,const VECTOR<VECTOR<T,2>,2>& segment2,VECTOR<T,1>& weights1,VECTOR<T,1>& weights2)
 {
-    MATRIX<T,2> A(segment1[2]-segment1[1],segment2[1]-segment2[2]);if(A.Determinant()==0) return false;
-    VECTOR<T,2> weights=A.Solve_Linear_System(segment2[1]-segment1[1]);
-    weights1.x=weights[1];weights2.x=weights[2];
+    MATRIX<T,2> A(segment1[1]-segment1[0],segment2[0]-segment2[1]);if(A.Determinant()==0) return false;
+    VECTOR<T,2> weights=A.Solve_Linear_System(segment2[0]-segment1[0]);
+    weights1.x=weights[0];weights2.x=weights[1];
     return weights1.x>=0 && weights2.x>=0 && weights1.x<2 && weights2.x<2;
 }
 //#####################################################################
@@ -57,7 +57,7 @@ Intersection(const VECTOR<VECTOR<T,2>,3>& triangle,const VECTOR<T,2>& point)
     int plus,minus;
     unsigned int mask;
 
-    points[0][0]=triangle[1].x;points[0][1]=triangle[1].y;points[1][0]=triangle[2].x;points[1][1]=triangle[2].y;points[2][0]=triangle[3].x;points[2][1]=triangle[3].y;
+    points[0][0]=triangle[0].x;points[0][1]=triangle[0].y;points[1][0]=triangle[1].x;points[1][1]=triangle[1].y;points[2][0]=triangle[2].x;points[2][1]=triangle[2].y;
     points[3][0]=point.x;points[3][1]=point.y;
     for(unsigned int i=0;i<3;i++) for(unsigned int j=i+1;j<3;j++) m2p[(1<<i)|(1<<j)]=points[i][0]*points[j][1]-points[i][1]*points[j][0];
     // Compute signed areas for all triangles formed by three input points
@@ -82,8 +82,8 @@ Intersection(const VECTOR<VECTOR<T,2>,3>& triangle,const VECTOR<VECTOR<T,2>,2>& 
     int plus,minus;
     unsigned int mask;
 
-    points[0][0]=triangle[1].x;points[0][1]=triangle[1].y;points[1][0]=triangle[2].x;points[1][1]=triangle[2].y;points[2][0]=triangle[3].x;points[2][1]=triangle[3].y;
-    points[3][0]=segment[1].x;points[3][1]=segment[1].y;points[4][0]=segment[2].x;points[4][1]=segment[2].y;
+    points[0][0]=triangle[0].x;points[0][1]=triangle[0].y;points[1][0]=triangle[1].x;points[1][1]=triangle[1].y;points[2][0]=triangle[2].x;points[2][1]=triangle[2].y;
+    points[3][0]=segment[0].x;points[3][1]=segment[0].y;points[4][0]=segment[1].x;points[4][1]=segment[1].y;
     for(unsigned int i=0;i<4;i++) for(unsigned int j=i+1;j<4;j++) m2p[(1<<i)|(1<<j)]=points[i][0]*points[j][1]-points[i][1]*points[j][0];
     // Compute signed areas for all triangles formed by three input points
     for(unsigned int i=0;i<3;i++) for(unsigned int j=i+1;j<3;j++) for(unsigned int k=j+1;k<4;k++) 
@@ -109,8 +109,8 @@ Intersection(const VECTOR<VECTOR<T,2>,3>& triangle_1,const VECTOR<VECTOR<T,2>,3>
     int plus,minus;
     unsigned int mask;
 
-    points[0][0]=triangle_1[1].x;points[0][1]=triangle_1[1].y;points[1][0]=triangle_1[2].x;points[1][1]=triangle_1[2].y;points[2][0]=triangle_1[3].x;points[2][1]=triangle_1[3].y;
-    points[3][0]=triangle_2[1].x;points[3][1]=triangle_2[1].y;points[4][0]=triangle_2[2].x;points[4][1]=triangle_2[2].y;points[5][0]=triangle_2[3].x;points[5][1]=triangle_2[3].y;
+    points[0][0]=triangle_1[0].x;points[0][1]=triangle_1[0].y;points[1][0]=triangle_1[1].x;points[1][1]=triangle_1[1].y;points[2][0]=triangle_1[2].x;points[2][1]=triangle_1[2].y;
+    points[3][0]=triangle_2[0].x;points[3][1]=triangle_2[0].y;points[4][0]=triangle_2[1].x;points[4][1]=triangle_2[1].y;points[5][0]=triangle_2[2].x;points[5][1]=triangle_2[2].y;
     for(unsigned int i=0;i<5;i++) for(unsigned int j=i+1;j<6;j++) m2p[(1<<i)|(1<<j)]=points[i][0]*points[j][1]-points[i][1]*points[j][0];
     // Compute signed areas for all triangles formed by three input points
     for(unsigned int i=0;i<4;i++) for(unsigned int j=i+1;j<5;j++) for(unsigned int k=j+1;k<6;k++) 
@@ -136,10 +136,10 @@ Intersection(const VECTOR<VECTOR<T,3>,3>& triangle_1,const VECTOR<VECTOR<T,3>,3>
     int plus,minus;
     unsigned int mask;
 
-    points[0][0]=triangle_1[1].x;points[0][1]=triangle_1[1].y;points[0][2]=triangle_1[1].z;points[1][0]=triangle_1[2].x;points[1][1]=triangle_1[2].y;points[1][2]=triangle_1[2].z;
-    points[2][0]=triangle_1[3].x;points[2][1]=triangle_1[3].y;points[2][2]=triangle_1[3].z;
-    points[3][0]=triangle_2[1].x;points[3][1]=triangle_2[1].y;points[3][2]=triangle_2[1].z;points[4][0]=triangle_2[2].x;points[4][1]=triangle_2[2].y;points[4][2]=triangle_2[2].z;
-    points[5][0]=triangle_2[3].x;points[5][1]=triangle_2[3].y;points[5][2]=triangle_2[3].z;
+    points[0][0]=triangle_1[0].x;points[0][1]=triangle_1[0].y;points[0][2]=triangle_1[0].z;points[1][0]=triangle_1[1].x;points[1][1]=triangle_1[1].y;points[1][2]=triangle_1[1].z;
+    points[2][0]=triangle_1[2].x;points[2][1]=triangle_1[2].y;points[2][2]=triangle_1[2].z;
+    points[3][0]=triangle_2[0].x;points[3][1]=triangle_2[0].y;points[3][2]=triangle_2[0].z;points[4][0]=triangle_2[1].x;points[4][1]=triangle_2[1].y;points[4][2]=triangle_2[1].z;
+    points[5][0]=triangle_2[2].x;points[5][1]=triangle_2[2].y;points[5][2]=triangle_2[2].z;
     for (unsigned int i=0;i<4;i++) for (unsigned int j=i+1;j<5;j++) for (unsigned int k=j+1;k<6;k++)
         m3p[(1<<i)|(1<<j)|(1<<k)]=
             +points[i][0]*points[j][1]*points[k][2]+points[i][1]*points[j][2]*points[k][0]+points[i][2]*points[j][0]*points[k][1]
@@ -184,9 +184,9 @@ Intersection(const VECTOR<VECTOR<T,3>,3>& triangle,const VECTOR<VECTOR<T,3>,2>& 
     int plus,minus;
     unsigned int mask;
 
-    points[0][0]=triangle[1].x;points[0][1]=triangle[1].y;points[0][2]=triangle[1].z;points[1][0]=triangle[2].x;points[1][1]=triangle[2].y;points[1][2]=triangle[2].z;
-    points[2][0]=triangle[3].x;points[2][1]=triangle[3].y;points[2][2]=triangle[3].z;
-    points[3][0]=segment[1].x;points[3][1]=segment[1].y;points[3][2]=segment[1].z;points[4][0]=segment[2].x;points[4][1]=segment[2].y;points[4][2]=segment[2].z;
+    points[0][0]=triangle[0].x;points[0][1]=triangle[0].y;points[0][2]=triangle[0].z;points[1][0]=triangle[1].x;points[1][1]=triangle[1].y;points[1][2]=triangle[1].z;
+    points[2][0]=triangle[2].x;points[2][1]=triangle[2].y;points[2][2]=triangle[2].z;
+    points[3][0]=segment[0].x;points[3][1]=segment[0].y;points[3][2]=segment[0].z;points[4][0]=segment[1].x;points[4][1]=segment[1].y;points[4][2]=segment[1].z;
     for (unsigned int i=0;i<3;i++) for (unsigned int j=i+1;j<4;j++) for (unsigned int k=j+1;k<5;k++)
         m3p[(1<<i)|(1<<j)|(1<<k)]=
             +points[i][0]*points[j][1]*points[k][2]+points[i][1]*points[j][2]*points[k][0]+points[i][2]*points[j][0]*points[k][1]
@@ -218,7 +218,7 @@ template <class T> T SIMPLEX_INTERACTIONS<T>::
 Intersection_Fraction(const VECTOR<VECTOR<T,3>,3>& triangle,const VECTOR<VECTOR<T,3>,2>& segment)
 {
     assert(segment[1]!=segment[2]);
-    T volume1=TETRAHEDRON<T>(triangle[1],triangle[2],triangle[3],segment[1]).Signed_Volume(),volume2=TETRAHEDRON<T>(triangle[1],triangle[2],triangle[3],segment[2]).Signed_Volume();
+    T volume1=TETRAHEDRON<T>(triangle[0],triangle[1],triangle[2],segment[0]).Signed_Volume(),volume2=TETRAHEDRON<T>(triangle[0],triangle[1],triangle[2],segment[1]).Signed_Volume();
     return volume1/(volume1-volume2);
 }
 //#####################################################################
@@ -231,9 +231,9 @@ Intersection(const VECTOR<VECTOR<T,3>,4>& tet,const VECTOR<VECTOR<T,3>,2>& segme
     int plus,minus;
     unsigned int mask;
 
-    points[0][0]=tet[1].x;points[0][1]=tet[1].y;points[0][2]=tet[1].z;points[1][0]=tet[2].x;points[1][1]=tet[2].y;points[1][2]=tet[2].z;
-    points[2][0]=tet[3].x;points[2][1]=tet[3].y;points[2][2]=tet[3].z;points[3][0]=tet[4].x;points[3][1]=tet[4].y;points[3][2]=tet[4].z;
-    points[4][0]=segment[1].x;points[4][1]=segment[1].y;points[4][2]=segment[1].z;points[5][0]=segment[2].x;points[5][1]=segment[2].y;points[5][2]=segment[2].z;
+    points[0][0]=tet[0].x;points[0][1]=tet[0].y;points[0][2]=tet[0].z;points[1][0]=tet[1].x;points[1][1]=tet[1].y;points[1][2]=tet[1].z;
+    points[2][0]=tet[2].x;points[2][1]=tet[2].y;points[2][2]=tet[2].z;points[3][0]=tet[3].x;points[3][1]=tet[3].y;points[3][2]=tet[3].z;
+    points[4][0]=segment[0].x;points[4][1]=segment[0].y;points[4][2]=segment[0].z;points[5][0]=segment[1].x;points[5][1]=segment[1].y;points[5][2]=segment[1].z;
     for (unsigned int i=0;i<4;i++) for (unsigned int j=i+1;j<5;j++) for (unsigned int k=j+1;k<6;k++)
         m3p[(1<<i)|(1<<j)|(1<<k)]=
             +points[i][0]*points[j][1]*points[k][2]+points[i][1]*points[j][2]*points[k][0]+points[i][2]*points[j][0]*points[k][1]
@@ -268,10 +268,10 @@ Intersection(const VECTOR<VECTOR<T,3>,4>& tet,const VECTOR<VECTOR<T,3>,3>& trian
     int plus,minus;
     unsigned int mask;
 
-    points[0][0]=tet[1].x;points[0][1]=tet[1].y;points[0][2]=tet[1].z;points[1][0]=tet[2].x;points[1][1]=tet[2].y;points[1][2]=tet[2].z;
-    points[2][0]=tet[3].x;points[2][1]=tet[3].y;points[2][2]=tet[3].z;points[3][0]=tet[4].x;points[3][1]=tet[4].y;points[3][2]=tet[4].z;
-    points[4][0]=triangle[1].x;points[4][1]=triangle[1].y;points[4][2]=triangle[1].z;points[5][0]=triangle[2].x;points[5][1]=triangle[2].y;points[5][2]=triangle[2].z;
-    points[6][0]=triangle[3].x;points[6][1]=triangle[3].y;points[6][2]=triangle[3].z;
+    points[0][0]=tet[0].x;points[0][1]=tet[0].y;points[0][2]=tet[0].z;points[1][0]=tet[1].x;points[1][1]=tet[1].y;points[1][2]=tet[1].z;
+    points[2][0]=tet[2].x;points[2][1]=tet[2].y;points[2][2]=tet[2].z;points[3][0]=tet[3].x;points[3][1]=tet[3].y;points[3][2]=tet[3].z;
+    points[4][0]=triangle[0].x;points[4][1]=triangle[0].y;points[4][2]=triangle[0].z;points[5][0]=triangle[1].x;points[5][1]=triangle[1].y;points[5][2]=triangle[1].z;
+    points[6][0]=triangle[2].x;points[6][1]=triangle[2].y;points[6][2]=triangle[2].z;
     for (unsigned int i=0;i<5;i++) for (unsigned int j=i+1;j<6;j++) for (unsigned int k=j+1;k<7;k++)
         m3p[(1<<i)|(1<<j)|(1<<k)]=
             +points[i][0]*points[j][1]*points[k][2]+points[i][1]*points[j][2]*points[k][0]+points[i][2]*points[j][0]*points[k][1]
@@ -318,10 +318,10 @@ template <class T> bool SIMPLEX_INTERACTIONS<T>::
 Intersection(const VECTOR<VECTOR<T,3>,4>& tetrahedron_1,const VECTOR<VECTOR<T,3>,4>& tetrahedron_2)
 {
     TETRAHEDRON<T> tet(tetrahedron_1);
-    if (tet.Inside(tetrahedron_2[1])||tet.Inside(tetrahedron_2[2])||tet.Inside(tetrahedron_2[3])||tet.Inside(tetrahedron_2[4])) return true;
-    if (Intersection(tetrahedron_2,tetrahedron_1.Remove_Index(4)) || Intersection(tetrahedron_2,tetrahedron_1.Remove_Index(1)) 
-        || Intersection(tetrahedron_2,VECTOR<VECTOR<T,3>,3>(tetrahedron_1[3],tetrahedron_1[4],tetrahedron_1[1])) 
-        || Intersection(tetrahedron_2,VECTOR<VECTOR<T,3>,3>(tetrahedron_1[4],tetrahedron_1[1],tetrahedron_1[2]))) return true;
+    if (tet.Inside(tetrahedron_2[0])||tet.Inside(tetrahedron_2[1])||tet.Inside(tetrahedron_2[2])||tet.Inside(tetrahedron_2[3])) return true;
+    if (Intersection(tetrahedron_2,tetrahedron_1.Remove_Index(3)) || Intersection(tetrahedron_2,tetrahedron_1.Remove_Index(0)) 
+        || Intersection(tetrahedron_2,VECTOR<VECTOR<T,3>,3>(tetrahedron_1[2],tetrahedron_1[3],tetrahedron_1[0])) 
+        || Intersection(tetrahedron_2,VECTOR<VECTOR<T,3>,3>(tetrahedron_1[3],tetrahedron_1[0],tetrahedron_1[1]))) return true;
     return false;
 }
 //#####################################################################
