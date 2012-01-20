@@ -39,7 +39,6 @@
 #include <PhysBAM_Dynamics/Incompressible_Flows/INCOMPRESSIBLE_MULTIPHASE_UNIFORM.h>
 #include <PhysBAM_Dynamics/Incompressible_Flows/SPH_EVOLUTION_UNIFORM.h>
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM.h>
-#include <PhysBAM_Dynamics/Level_Sets/VOF_ADVECTION.h>
 #include <PhysBAM_Dynamics/Parallel_Computation/MPI_SOLID_FLUID.h>
 #include <PhysBAM_Dynamics/Parallel_Computation/MPI_UNIFORM_PARTICLES.h>
 #include <PhysBAM_Dynamics/Particles/PARTICLE_LEVELSET_REMOVED_PARTICLES.h>
@@ -95,8 +94,6 @@ Initialize()
     // this needs to be before Initialize_Fluids_Grids
     if(example.fluids_parameters.use_sph_for_removed_negative_particles){
         PARTICLE_LEVELSET_UNIFORM<T_GRID>& pls=example.fluids_parameters.particle_levelset_evolution->particle_levelset;
-        pls.vof_advection=new VOF_ADVECTION<TV>(pls,example.fluids_parameters.particle_levelset_evolution->levelset_advection,&example.fluids_parameters);
-        example.fluids_parameters.particle_levelset_evolution->levelset_advection.Set_VOF_Advection(*pls.vof_advection);
         pls.template_particles.array_collection->template Add_Array<T>(ATTRIBUTE_ID_MATERIAL_VOLUME);
         pls.template_removed_particles.array_collection->template Add_Array<T>(ATTRIBUTE_ID_MATERIAL_VOLUME);
         example.fluids_parameters.sph_evolution=new SPH_EVOLUTION_UNIFORM<T_GRID>(grid,*incompressible,example.fluids_parameters,particle_levelset_evolution);
@@ -173,12 +170,6 @@ Initialize()
     if(example.fluids_parameters.mass_conservation){
         for(int i=0;i<number_of_regions;i++){
             PARTICLE_LEVELSET_UNIFORM<T_GRID>& pls=example.fluids_parameters.particle_levelset_evolution->Particle_Levelset(i);
-            pls.vof_advection=new VOF_ADVECTION<TV>(pls,example.fluids_parameters.particle_levelset_evolution->levelset_advection,&example.fluids_parameters);
-            pls.vof_advection->Set_Runge_Kutta_Order_Particles(example.fluids_parameters.particle_levelset_evolution->runge_kutta_order_particles);
-            pls.vof_advection->Use_Frozen_Velocity(example.fluids_parameters.particle_levelset_evolution->use_frozen_velocity);
-            pls.vof_advection->Set_Maximum_Refinement_Depth(example.fluids_parameters.mass_conservation_maximum_refinement_depth);
-            pls.vof_advection->Set_Minimum_Refinement_Depth(example.fluids_parameters.mass_conservation_minimum_refinement_depth);
-            example.fluids_parameters.particle_levelset_evolution->levelset_advection.Set_VOF_Advection(*pls.vof_advection);
             pls.template_particles.array_collection->template Add_Array<T>(ATTRIBUTE_ID_MATERIAL_VOLUME);
             pls.template_removed_particles.array_collection->template Add_Array<T>(ATTRIBUTE_ID_MATERIAL_VOLUME);}}
 

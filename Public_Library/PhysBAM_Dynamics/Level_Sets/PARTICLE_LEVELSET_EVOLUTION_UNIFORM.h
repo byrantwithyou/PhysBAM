@@ -117,9 +117,6 @@ public:
     virtual T Advance_Particles(T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T input_time);
     virtual void Modify_Levelset_And_Particles(T_FACE_ARRAYS_SCALAR* face_velocities);
     virtual void Reseed_Particles(const T time,const int time_step=0,T_ARRAYS_BOOL* cell_centered_mask=0,const bool verbose=true);
-    void Apply_Mass_Conservation(const int number_of_regions,const T time,const T dt,T_FACE_ARRAYS_SCALAR& face_velocities);
-    void Reinitialize_Geometry(const int number_of_regions);
-    void Perform_Conservative_Advection(const int number_of_regions,const T time,const T dt,T_FACE_ARRAYS_SCALAR& face_velocities);
 //#####################################################################
 };
 }

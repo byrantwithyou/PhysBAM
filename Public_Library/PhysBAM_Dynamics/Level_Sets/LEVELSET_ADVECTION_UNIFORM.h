@@ -39,21 +39,15 @@ public:
     using BASE::levelset;
     using BASE::reinitialization_cfl;using BASE::reinitialization_runge_kutta_order;using BASE::reinitialization_spatial_order;using BASE::Set_Custom_Advection;
 
-    VOF_ADVECTION<TV>* vof_advection;
     ADVECTION_MACCORMACK_UNIFORM<T_GRID,SCALAR,ADVECTION<T_GRID,SCALAR> >* advection_maccormack;
 
     LEVELSET_ADVECTION_UNIFORM(T_LEVELSET* _levelset):
-        BASE(_levelset),vof_advection(0),advection_maccormack(0)
+        BASE(_levelset),advection_maccormack(0)
     {};
 
     void Use_Maccormack_Advection(const T_ARRAYS_BOOL& cell_mask);
-    void Set_VOF_Advection(VOF_ADVECTION<TV>& vof_advection_input);
     SCALAR Approximate_Negative_Material(const SCALAR interface_thickness=3,const SCALAR time=0) const;
     SCALAR Approximate_Positive_Material(const SCALAR interface_thickness=3,const SCALAR time=0) const;
-    SCALAR Negative_Cell_Fraction(const TV_INT& cell) const;
-    void Negative_Material(T_ARRAYS_SCALAR& masses) const;
-    SCALAR Negative_Material() const;
-    SCALAR Positive_Material() const;
 };
 
 }

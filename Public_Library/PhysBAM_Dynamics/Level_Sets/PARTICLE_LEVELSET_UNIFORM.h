@@ -57,7 +57,6 @@ public:
 
     MPI_UNIFORM_GRID<T_GRID>* mpi_grid;
 
-    VOF_ADVECTION<TV>* vof_advection;
     T_ARRAYS_ARRAY_TV positive_particle_positions,negative_particle_positions;
 
     THREAD_QUEUE* thread_queue;

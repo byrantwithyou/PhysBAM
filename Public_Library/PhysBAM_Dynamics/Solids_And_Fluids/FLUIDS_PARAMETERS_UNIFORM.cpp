@@ -56,7 +56,6 @@
 #include <PhysBAM_Dynamics/Incompressible_Flows/SPH_EVOLUTION_UNIFORM.h>
 #include <PhysBAM_Dynamics/Level_Sets/LEVELSET_CALLBACKS.h>
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM.h>
-#include <PhysBAM_Dynamics/Level_Sets/VOF_ADVECTION.h>
 #include <PhysBAM_Dynamics/Particles/PARTICLE_LEVELSET_PARTICLES.h>
 #include <PhysBAM_Dynamics/Particles/PARTICLE_LEVELSET_REMOVED_PARTICLES.h>
 #include <PhysBAM_Dynamics/Solids_And_Fluids/FLUIDS_PARAMETERS_CALLBACKS.h>
@@ -713,22 +712,6 @@ Read_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direct
         if(FILE_UTILITIES::File_Exists(filename)){LOG::cout<<"Reading pressure "<<filename<<std::endl;
             FILE_UTILITIES::Read_From_File(stream_type,filename,incompressible->projection.p);}
 
-        // mass conservation
-        if(mass_conservation){
-            if(number_of_regions==1){
-                T_PARTICLE_LEVELSET& particle_levelset=particle_levelset_evolution->particle_levelset;
-                FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/"+f+"/negative_material",particle_levelset.vof_advection->volume_of_material);
-                particle_levelset.vof_advection->Read(stream_type,output_directory,f);
-                particle_levelset.vof_advection->volume_of_material_initialized=true;}
-            else if(number_of_regions>=2){
-                for(int i=0;i<number_of_regions;i++){
-                    std::string i_dot_f=STRING_UTILITIES::string_sprintf("%d.%s",i,f.c_str());
-                    T_PARTICLE_LEVELSET& particle_levelset=*particle_levelset_evolution_multiple->particle_levelset_multiple.particle_levelsets(i);
-                    FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/negative_material_"+i_dot_f,particle_levelset.vof_advection->volume_of_material);
-                    particle_levelset.vof_advection->volume_of_material_initialized=true;}}}
-        if(particle_levelset_evolution && particle_levelset_evolution->particle_levelset.vof_advection && number_of_regions==1){
-            FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/"+f+"/negative_material",particle_levelset_evolution->particle_levelset.vof_advection->volume_of_material);
-            particle_levelset_evolution->particle_levelset.vof_advection->volume_of_material_initialized=true;}}
     else if(compressible){
         FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/"+f+"/euler_U",euler->U);
         FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/"+f+"/euler_psi",euler->psi);}
@@ -815,19 +798,6 @@ Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direc
                             T_ARRAYS_SYMMETRIC_MATRIX e_ghost(grid->Domain_Indices(number_of_ghost_cells),false);
                             incompressible_multiphase->strains(i)->e_boundary->Fill_Ghost_Cells(*grid,incompressible_multiphase->strains(i)->e,e_ghost,0,0,number_of_ghost_cells); // TODO: use real dt/time
                             FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/strain_"+i_dot_f,e_ghost);}}}}
-
-        // mass conservation
-        if(mass_conservation){
-            if(number_of_regions==1){
-                FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/negative_material",particle_levelset_evolution->particle_levelset.vof_advection->volume_of_material);
-                particle_levelset_evolution->particle_levelset.vof_advection->Write(stream_type,output_directory,f);
-                if(write_debug_data) FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/mass_fluxes",
-                    particle_levelset_evolution->particle_levelset.vof_advection->volume_fluxes);}
-            else if(number_of_regions>=2){
-                for(int i=0;i<number_of_regions;i++){
-                    std::string i_dot_f=STRING_UTILITIES::string_sprintf("%d.%s",i,f.c_str()); // TODO(jontg): ...
-                    T_PARTICLE_LEVELSET& particle_levelset=*particle_levelset_evolution_multiple->particle_levelset_multiple.particle_levelsets(i);
-                    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/negative_material_"+i_dot_f,particle_levelset.vof_advection->volume_of_material);}}}
 
         // sph
         if(sph_evolution) FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/sph_cell_weights",sph_evolution->cell_weight);

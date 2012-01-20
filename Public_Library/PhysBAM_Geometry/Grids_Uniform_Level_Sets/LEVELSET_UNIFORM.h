@@ -16,8 +16,6 @@
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 namespace PhysBAM{
 
-template<class TV> class VOF_ADVECTION;
-
 template<class T_GRID_input>
 class LEVELSET_UNIFORM:public LEVELSET<typename T_GRID_input::SCALAR,T_GRID_input>
 {

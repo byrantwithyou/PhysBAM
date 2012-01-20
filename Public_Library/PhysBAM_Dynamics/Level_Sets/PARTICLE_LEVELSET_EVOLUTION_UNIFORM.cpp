@@ -10,7 +10,6 @@
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/FAST_LEVELSET.h>
 #include <PhysBAM_Dynamics/Level_Sets/LEVELSET_CALLBACKS.h>
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_UNIFORM.h>
-#include <PhysBAM_Dynamics/Level_Sets/VOF_ADVECTION.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
@@ -186,16 +185,12 @@ Modify_Levelset_And_Particles(T_FACE_ARRAYS_SCALAR* face_velocities)
     // TODO: a call for creating particles from the geometry if necessary
     if(use_particle_levelset){
         LOG::Time("modifying levelset");
-        particle_levelset.Modify_Levelset_Using_Escaped_Particles(face_velocities);
-        if(particle_levelset.vof_advection){
-            particle_levelset.vof_advection->Rasterize_Material_Postimages();
-            particle_levelset.vof_advection->Adjust_Levelset_With_Material_Volumes();}}
+        particle_levelset.Modify_Levelset_Using_Escaped_Particles(face_velocities);}
     LOG::Time("reinitializing levelset");
     Make_Signed_Distance();
     if(use_particle_levelset){
         LOG::Time("modifying levelset");        
         particle_levelset.Modify_Levelset_Using_Escaped_Particles(face_velocities);
-        if(particle_levelset.vof_advection) particle_levelset.vof_advection->Adjust_Levelset_With_Material_Volumes();
         LOG::Time("adjusting particle radii");
         particle_levelset.Adjust_Particle_Radii();
         LOG::Stop_Time();}
@@ -210,35 +205,6 @@ Reseed_Particles(const T time,const int time_step,T_ARRAYS_BOOL* cell_centered_m
         int new_particles=particle_levelset.Reseed_Particles(time,cell_centered_mask);
         if(verbose) LOG::cout << "Reseeding... " << new_particles << " new particles" << std::endl;
         Initialize_Runge_Kutta();} // need to reset based on new number of particles
-}
-//#####################################################################
-// Function Apply_Mass_Conservation
-//#####################################################################
-template<class T_GRID> void PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>::
-Apply_Mass_Conservation(const int number_of_regions,const T time,const T dt,T_FACE_ARRAYS_SCALAR& face_velocities)
-{
-    // TODO: determine conditions for when to perform this correction
-    for(int i=0;i<number_of_regions;i++){
-        Particle_Levelset(i).vof_advection->Make_Approximately_Incompressible(face_velocities,dt,time);
-        Particle_Levelset(i).vof_advection->Refine_Or_Coarsen_Geometry();}
-}
-//#####################################################################
-// Function Reinitialize_Geometry
-//#####################################################################
-template<class T_GRID> void PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>::
-Reinitialize_Geometry(const int number_of_regions)
-{
-    // precondition: rasterize must have been called
-    for(int i=0;i<number_of_regions;i++) Particle_Levelset(i).vof_advection->Create_Geometry();
-}
-//#####################################################################
-// Function Perform_Conservative_Advection
-//#####################################################################
-template<class T_GRID> void PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID>::
-Perform_Conservative_Advection(const int number_of_regions,const T time,const T dt,T_FACE_ARRAYS_SCALAR& face_velocities)
-{
-    typename INTERPOLATION_POLICY<GRID<TV> >::FACE_LOOKUP V_lookup(face_velocities);
-    for(int i=0;i<number_of_regions;i++) Particle_Levelset(i).vof_advection->Perform_Conservative_Advection(V_lookup,dt,time);
 }
 //#####################################################################
 template class PARTICLE_LEVELSET_EVOLUTION_UNIFORM<GRID<VECTOR<float,1> > >;

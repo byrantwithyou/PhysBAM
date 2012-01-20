@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Arrays_Computations/HEAPIFY.h>
+#include <PhysBAM_Tools/Data_Structures/TRIPLE.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Tools/Math_Tools/pow.h>
@@ -15,7 +16,6 @@
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 #include <PhysBAM_Dynamics/Level_Sets/LEVELSET_CALLBACKS.h>
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_UNIFORM.h>
-#include <PhysBAM_Dynamics/Level_Sets/VOF_ADVECTION.h>
 #include <PhysBAM_Dynamics/Parallel_Computation/MPI_UNIFORM_PARTICLES.h>
 #include <PhysBAM_Dynamics/Particles/PARTICLE_LEVELSET_PARTICLES.h>
 #include <PhysBAM_Dynamics/Particles/PARTICLE_LEVELSET_REMOVED_PARTICLES.h>
@@ -31,7 +31,7 @@ using namespace __gnu_cxx;
 //##################################################################### 
 template<class T_GRID> PARTICLE_LEVELSET_UNIFORM<T_GRID>::
 PARTICLE_LEVELSET_UNIFORM(T_GRID& grid_input,T_ARRAYS_SCALAR& phi_input,const int number_of_ghost_cells_input)
-    :PARTICLE_LEVELSET<T_GRID>(grid_input,phi_input,number_of_ghost_cells_input),mpi_grid(0),vof_advection(0),thread_queue(0)
+    :PARTICLE_LEVELSET<T_GRID>(grid_input,phi_input,number_of_ghost_cells_input),mpi_grid(0),thread_queue(0)
 {
 #ifdef USE_PTHREADS
     pthread_mutex_init(&cell_lock,0);
@@ -46,7 +46,6 @@ template<class T_GRID> PARTICLE_LEVELSET_UNIFORM<T_GRID>::
 #ifdef USE_PTHREADS
     pthread_mutex_destroy(&cell_lock);
 #endif
-    delete vof_advection;
     for(NODE_ITERATOR iterator(levelset.grid,positive_particles.Domain_Indices());iterator.Valid();iterator.Next()) Delete_All_Particles_In_Cell(iterator.Node_Index());
 }
 //#####################################################################
@@ -763,15 +762,13 @@ Reseed_Add_Particles_Threaded_Part_Two(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLE_L
         RANGE<TV> block_bounding_box=block.Bounding_Box();
         int attempts=0;
         ARRAY_VIEW<int>* id=store_unique_particle_id?cell_particles->array_collection->template Get_Array<int>(ATTRIBUTE_ID_ID):0;
-        ARRAY_VIEW<T>* material_volume=vof_advection?cell_particles->array_collection->template Get_Array<T>(ATTRIBUTE_ID_MATERIAL_VOLUME):0;
         for(int k=0;k<number_of_particles_to_add(block_index);k++){
             PARTICLE_LEVELSET_PARTICLES<TV>* local_cell_particles=cell_particles;
             //if(mutexes && thread_queue) pthread_mutex_lock(&(*mutexes)((*domain_index)(block_index)));
             int index=Add_Particle(cell_particles);
             //if(mutexes && thread_queue) pthread_mutex_unlock(&(*mutexes)((*domain_index)(block_index)));
             if(local_cell_particles!=cell_particles){
-                if(store_unique_particle_id) id=cell_particles->array_collection->template Get_Array<int>(ATTRIBUTE_ID_ID);
-                if(vof_advection) material_volume=cell_particles->array_collection->template Get_Array<T>(ATTRIBUTE_ID_MATERIAL_VOLUME);}
+                if(store_unique_particle_id) id=cell_particles->array_collection->template Get_Array<int>(ATTRIBUTE_ID_ID);}
             if(id) {
 #ifdef USE_PTHREADS
                 (*id)(index)= __exchange_and_add(&last_unique_particle_id,1);
@@ -779,7 +776,6 @@ Reseed_Add_Particles_Threaded_Part_Two(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLE_L
                 (*id)(index)=last_unique_particle_id++;
 #endif
             }
-            if(material_volume) (*material_volume)(index)=0;
             cell_particles->quantized_collision_distance(index)=(unsigned short)(local_random.Get_Number()*USHRT_MAX);
             cell_particles->X(index)=local_random.Get_Uniform_Vector(block_bounding_box);
             cell_particles->radius(index)=1;//Default value
@@ -1183,7 +1179,6 @@ Reincorporate_Removed_Particles(const BLOCK_UNIFORM<T_GRID>& block,PARTICLE_LEVE
     bool near_objects=levelset.collision_body_list?levelset.collision_body_list->Occupied_Block(block):false;if(near_objects) levelset.Enable_Collision_Aware_Interpolation(sign);
     T one_over_radius_multiplier=-sign/radius_fraction;
     T half_unit_sphere_size_over_cell_size=(T).5*(T)unit_sphere_size<TV::dimension>::value/levelset.grid.Cell_Size();
-    ARRAY_VIEW<T>* material_volume=vof_advection?removed_particles.array_collection->template Get_Array<T>(ATTRIBUTE_ID_MATERIAL_VOLUME):0;
     for(int k=removed_particles.array_collection->Size();k>=1;k--) if(reincorporate_removed_particles_everywhere || (one_over_radius_multiplier*levelset.Phi(removed_particles.X(k))<removed_particles.radius(k))){
         if(!particles) particles=Allocate_Particles(template_particles);
         // rasterize the velocity onto the velocity field
@@ -1191,8 +1186,7 @@ Reincorporate_Removed_Particles(const BLOCK_UNIFORM<T_GRID>& block,PARTICLE_LEVE
             TV_INT cell_index=levelset.grid.Cell(removed_particles.X(k),0);
             T r=removed_particles.radius(k);
             TV half_impulse;
-            if(material_volume) half_impulse=removed_particles.V(k)*mass_scaling*(T).5*(*material_volume)(k);
-            else half_impulse = removed_particles.V(k)*mass_scaling*pow<TV::dimension>(r)*half_unit_sphere_size_over_cell_size;
+            half_impulse = removed_particles.V(k)*mass_scaling*pow<TV::dimension>(r)*half_unit_sphere_size_over_cell_size;
             for(int i=0;i<T_GRID::dimension;i++){
                 TV_INT face_index(cell_index);
                 typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE &face_velocity=V->Component(i);
@@ -1293,11 +1287,7 @@ Add_Negative_Particle(const TV& location,const TV& particle_velocity,const unsig
 #else
             (*id)(index)=last_unique_particle_id++;
 #endif
-        }
-        if(vof_advection){
-            ARRAY_VIEW<T>* material_volume=cell_particles->array_collection->template Get_Array<T>(ATTRIBUTE_ID_MATERIAL_VOLUME);
-            PHYSBAM_ASSERT(material_volume);
-            (*material_volume)(index)=0;}}
+        }}
     else{
         if(!removed_negative_particles(block)) removed_negative_particles(block)=Allocate_Particles(template_removed_particles);
         int index=Add_Particle(removed_negative_particles(block));
