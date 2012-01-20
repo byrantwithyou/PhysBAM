@@ -113,7 +113,7 @@ Negative_Material(const TV_INT& cell_index,const bool force_full_refinement)
                 Refine_Simplex(cell_refinement_simplices,cell_particle_X,simplex);}}
         cell_phis.Resize(cell_particle_X.m);
         // compute phis for extant nodes
-        for(int i=last_node+1;i<=cell_phis.m;i++) cell_phis(i)=Phi(cell_particle_X(i));
+        for(int i=last_node;i<cell_phis.m;i++) cell_phis(i)=Phi(cell_particle_X(i));
         last_node=cell_phis.m;}
 
     if(maximum_material_refinement_depth>0 && cell_phis.m==unrefined_point_count) return minimum_phi<=0?full_cell_size:0;
@@ -184,11 +184,11 @@ Create_Preimage_Particles_From_Old_Postimage_Simplices(const TV_INT& cell_index,
 
         // dice material simplex
         simplices_in_cell.Remove_All();junk_simplices.Remove_All();simplices_in_cell.Append(local_simplex);
-        for(int axis=0;axis<GRID<TV>::dimension;axis++) for(int node=0;node<=1;node++){
+        for(int axis=0;axis<GRID<TV>::dimension;axis++) for(int node=0;node<2;node++){
             TV_INT right_cell=cell_index+node*TV_INT::Axis_Vector(axis);
             // cut away outside bits
             T_HYPERPLANE cutting_surface(TV::Axis_Vector(axis),grid.Face(axis,right_cell));
-            for(int t=simplices_in_cell.m;t>=1;t--){
+            for(int t=simplices_in_cell.m-1;t>=0;t--){
                 T_ELEMENT simplex=simplices_in_cell(t);simplices_in_cell.Remove_Index_Lazy(t);
                 if(node==0) T_SIMPLEX::Cut_With_Hyperplane(simplex_particles,cutting_surface,simplex,junk_simplices,simplices_in_cell);
                 else T_SIMPLEX::Cut_With_Hyperplane(simplex_particles,cutting_surface,simplex,simplices_in_cell,junk_simplices);}}
@@ -267,7 +267,7 @@ Create_Geometry()
     cell_preimage_material_volume.Fill((T)0);
     for(CELL_ITERATOR iterator(grid,3);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         if(fixed_cells(cell_index)) cell_preimage_material_volume(cell_index)=volume_of_material(cell_index);
-        else if (volume_of_material(cell_index)>0 && cells_valid(cell_index)) Create_Initial_Meshing_For_Cell(grid,object,cell_index,nodes_to_particles_map,level_simplex_cells(1));}
+        else if (volume_of_material(cell_index)>0 && cells_valid(cell_index)) Create_Initial_Meshing_For_Cell(grid,object,cell_index,nodes_to_particles_map,level_simplex_cells(0));}
 
     accumulated_material_volume+=cell_preimage_material_volume.Sum();
 
@@ -283,7 +283,7 @@ Create_Geometry()
     // red green refine
     int last_particle_index=0,last_segment_index=fixed_segment_list.m;
     phis.Resize(object.particles.array_collection->Size());
-    for(int i=last_particle_index+1;i<=object.particles.array_collection->Size();i++) phis(i)=Phi(object.particles.X(i));
+    for(int i=last_particle_index;i<object.particles.array_collection->Size();i++) phis(i)=Phi(object.particles.X(i));
     last_particle_index=object.particles.array_collection->Size();
     for(int depth=0;depth<minimum_refinement_depth;depth++){
         simplex_list.Remove_All();
@@ -296,15 +296,15 @@ Create_Geometry()
         preimage.Initialize_Segment_Index_From_Midpoint_Index(); // TODO: may not want to keep calling this
 
         phis.Resize(object.particles.array_collection->Size());fixed_particle_list.Resize(object.particles.array_collection->Size());
-        for(int i=last_particle_index+1;i<=object.particles.array_collection->Size();i++){
+        for(int i=last_particle_index;i<object.particles.array_collection->Size();i++){
             phis(i)=Phi(object.particles.X(i));
             fixed_particle_list(i)=fixed_segment_list((*preimage.segment_index_from_midpoint_index)(i));}
         last_particle_index=object.particles.array_collection->Size();
         
         // update fixed segment list
         fixed_segment_list.Resize(preimage.segment_mesh.elements.m);
-        for(int s=last_segment_index+1;s<=preimage.segment_mesh.elements.m;s++)
-            fixed_segment_list(s)=fixed_particle_list(preimage.segment_mesh.elements(s)(1)) && fixed_particle_list(preimage.segment_mesh.elements(s)(2));
+        for(int s=last_segment_index;s<preimage.segment_mesh.elements.m;s++)
+            fixed_segment_list(s)=fixed_particle_list(preimage.segment_mesh.elements(s)(0)) && fixed_particle_list(preimage.segment_mesh.elements(s)(1));
         last_segment_index=preimage.segment_mesh.elements.m;
 
         // hah hah hah, sucks to be you if you have to debug this!
@@ -358,13 +358,13 @@ Create_Geometry()
                 accumulated_material_volume+=cell_material_volume;
                 continue;}
 
-            for(int i=fixed_particle_list.m+1;i<=object.particles.array_collection->Size();i++) fixed_particle_list.Append(false);
+            for(int i=fixed_particle_list.m;i<object.particles.array_collection->Size();i++) fixed_particle_list.Append(false);
             
             // compute simplex negative material and label used nodes
             int number_of_simplices=simplices_in_cell.m;
             simplex_preimage_volume.Resize(number_of_simplices);lower_dimensional_preimage_volume.Resize(number_of_simplices);
             lower_dimensional_preimage.Resize(number_of_simplices);lower_dimensional_preimage.Fill(false);
-            for(int i=material_particles.m+1;i<=object.particles.array_collection->Size();i++) material_particles.Append(false);
+            for(int i=material_particles.m;i<object.particles.array_collection->Size();i++) material_particles.Append(false);
             for(int i=0;i<simplices_in_cell.m;i++){
                 const T_ELEMENT& simplex=object.mesh.elements(simplices_in_cell(i));
                 for(int j=0;j<TV::dimension+1;j++) material_particles(simplex[j])=true;
@@ -436,9 +436,9 @@ Cut_Simplicial_Object_With_Zero_Isocontour()
     material_particles.Resize(object.particles.array_collection->Size(),false);
     for(int i=0;i<phis.m;i++) material_particles(i)=(phis(i)<=0);
     phis.Resize(object.particles.array_collection->Size(),false);fixed_particle_list.Resize(object.particles.array_collection->Size(),false);
-    for(int p=number_of_particles+1;p<=object.particles.array_collection->Size();p++){
+    for(int p=number_of_particles;p<object.particles.array_collection->Size();p++){
         VECTOR<int,2> segment=preimage.segment_mesh.elements((*preimage.segment_index_from_midpoint_index)(p));
-        int i=segment(1),j=segment(2);
+        int i=segment(0),j=segment(1);
         if(phis(i)*phis(j)<0){phis(p)=0;material_particles(p)=true;}
         else{phis(p)=(T).5*(phis(i)+phis(j));material_particles(p)=(material_particles(i) && material_particles(j));}
         fixed_particle_list(p)=(fixed_particle_list(i) && fixed_particle_list(j));}
@@ -600,8 +600,8 @@ Rasterize_Material_Postimages()
         simplex_particles.Remove_All();
         T_ELEMENT local_simplex;
         for(int j=0;j<T_ELEMENT::dimension;j++){simplex_particles.Append(object.particles.X(simplex[j]));local_simplex[j]=j;}
-        TV minimum_node=simplex_particles(1),maximum_node=simplex_particles(1);
-        for(int j=2;j<=T_ELEMENT::dimension;j++){minimum_node=TV::Componentwise_Min(minimum_node,simplex_particles(j));maximum_node=TV::Componentwise_Max(maximum_node,simplex_particles(j));}
+        TV minimum_node=simplex_particles(0),maximum_node=simplex_particles(0);
+        for(int j=1;j<T_ELEMENT::dimension;j++){minimum_node=TV::Componentwise_Min(minimum_node,simplex_particles(j));maximum_node=TV::Componentwise_Max(maximum_node,simplex_particles(j));}
         RANGE<TV_INT> grid_cells(grid.Clamp_To_Cell(minimum_node),grid.Clamp_To_Cell(maximum_node)); // TOOD: for parallel, this will need to allow border regions.  Also for outflow walls.
         RANGE<TV_INT> grid_nodes=grid_cells+RANGE<TV_INT>::Unit_Box();
         const TV_INT &low_node=grid_nodes.Minimum_Corner(),&high_node=grid_nodes.Maximum_Corner();
@@ -618,13 +618,13 @@ Rasterize_Material_Postimages()
 
         // dice material simplices
         for(int axis=0;axis<GRID<TV>::dimension;axis++){
-            for(int node=1;node<high_node(axis)-low_node(axis);node++){ // only need to cut in-between nodes
+            for(int node=0;node<high_node(axis)-low_node(axis);node++){ // only need to cut in-between nodes
                 for(FACE_ITERATOR iterator(box_grid,0,GRID<TV>::INTERIOR_REGION,0,axis);iterator.Valid();iterator.Next()){ // TODO: is this set of loops doing more work than necessary?
                     // for all tets in left, cut them and place pieces into right/left, then move to next cell
                     TV_INT left_cell=cell_base+iterator.First_Cell_Index(),right_cell=cell_base+iterator.Second_Cell_Index();
                     T_HYPERPLANE cutting_surface(TV::Axis_Vector(axis),grid.Face(axis,right_cell));
                     ARRAY<T_ELEMENT > &left_list=simplex_lists(left_cell),&right_list=simplex_lists(right_cell);
-                    for(int t=left_list.m;t>=1;t--){
+                    for(int t=left_list.m-1;t>=0;t--){
                         T_ELEMENT simplex=left_list(t);left_list.Remove_Index_Lazy(t);
                         T_SIMPLEX::Cut_With_Hyperplane(simplex_particles,cutting_surface,simplex,left_list,right_list);}}}}
 
@@ -668,7 +668,7 @@ Rasterize_Material_Postimages()
     for(CELL_ITERATOR iterator(grid,3);iterator.Valid();iterator.Next()){delete cell_to_postimage_particle_map(iterator.Cell_Index());
         cell_to_postimage_particle_map(iterator.Cell_Index())=0;}
 #if 0
-    for(int i=last_simplex_particle+1;i<=object_particles.array_collection->Size();i++){
+    for(int i=last_simplex_particle;i<object_particles.array_collection->Size();i++){
         const TV_INT cell=grid.Clamp_To_Cell(object_particles.X(i),3);
         const T material_volume=preimage_particle_material_volumes(i-last_simplex_particle);
         volume_of_material(cell)+=material_volume;
@@ -688,8 +688,8 @@ Adjust_Node_For_Domain_Boundaries(TV& node)
     assert(fluids_parameters);
     TV min_corner=fluids_parameters->grid->domain.Minimum_Corner(),max_corner=fluids_parameters->grid->domain.Maximum_Corner();
     for(int axis=0;axis<GRID<TV>::dimension;axis++){
-        if(fluids_parameters->domain_walls(axis)(1) && node[axis] < min_corner[axis]) node[axis]=min_corner[axis];
-        if(fluids_parameters->domain_walls(axis)(2) && node[axis] > max_corner[axis]) node[axis]=max_corner[axis];}
+        if(fluids_parameters->domain_walls(axis)(0) && node[axis] < min_corner[axis]) node[axis]=min_corner[axis];
+        if(fluids_parameters->domain_walls(axis)(1) && node[axis] > max_corner[axis]) node[axis]=max_corner[axis];}
 }
 //#####################################################################
 // Function Make_Approximately_Incompressible
@@ -818,7 +818,7 @@ Refine_Or_Coarsen_Geometry()
     if(triangle_list.m){preimage.Refine_Simplex_List(triangle_list);preimage.Initialize_Segment_Index_From_Midpoint_Index();} // TODO: may not want to keep calling this
     
     material_particles.Resize(object.particles.array_collection->Size());fixed_particle_list.Resize(object.particles.array_collection->Size());phis.Resize(object.particles.array_collection->Size());
-    for(int p=number_of_particles+1;p<=object.particles.array_collection->Size();p++){
+    for(int p=number_of_particles;p<object.particles.array_collection->Size();p++){
         VECTOR<int,2> segment=preimage.segment_mesh.elements((*preimage.segment_index_from_midpoint_index)(p));int i,j;segment.Get(i,j);
         if(phis(i)*phis(j)<0) phis(p)=0;
         else phis(p)=(T).5*(phis(i)+phis(j));
@@ -860,7 +860,7 @@ Adjust_Levelset_With_Material_Volumes()
     //T tolerance=(T)5e-2*grid.Cell_Size(),dtau=(T).1,max_error=0;iteration=1,max_iterations=200;
     //T tolerance=(T)5e-2*grid.Cell_Size(),dtau=(T).1,max_error=0;int iteration=1,max_iterations=10;
     const T dtau=(T).5;
-    const T one_over_mean_face_size=(T).5/grid.Face_Size(1); // TODO: make this general and/or base the estimate of face size on the actual interface in cell
+    const T one_over_mean_face_size=(T).5/grid.Face_Size(0); // TODO: make this general and/or base the estimate of face size on the actual interface in cell
     const T max_curvature=1/grid.Minimum_Edge_Length();
     const T half_band_width=particle_levelset.half_band_width;
     Set_Full_Cell_Size(grid.Cell_Size());
