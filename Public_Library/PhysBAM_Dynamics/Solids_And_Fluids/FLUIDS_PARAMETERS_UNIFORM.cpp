@@ -710,7 +710,7 @@ Read_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direct
         std::string filename;
         filename=output_directory+"/"+f+"/pressure";
         if(FILE_UTILITIES::File_Exists(filename)){LOG::cout<<"Reading pressure "<<filename<<std::endl;
-            FILE_UTILITIES::Read_From_File(stream_type,filename,incompressible->projection.p);}
+            FILE_UTILITIES::Read_From_File(stream_type,filename,incompressible->projection.p);}}
 
     else if(compressible){
         FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/"+f+"/euler_U",euler->U);

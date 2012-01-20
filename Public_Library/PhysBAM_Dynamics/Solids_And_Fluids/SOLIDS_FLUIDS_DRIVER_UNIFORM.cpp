@@ -953,8 +953,6 @@ Advect_Fluid(const T dt,const int substep)
                 incompressible->boundary->Fill_Ghost_Cells_Face(grid,face_velocities_ghost,face_velocities_ghost,time+dt,example.fluids_parameters.number_of_ghost_cells);
                 advection_face_velocities_ghost=&face_velocities_ghost;}}}
 
-    if(fluids_parameters.mass_conservation) particle_levelset_evolution->Perform_Conservative_Advection(number_of_regions,time,dt,*advection_face_velocities_ghost);
-
     if(number_of_regions){
         if(number_of_regions==1) fluids_parameters.phi_boundary_water.Use_Extrapolation_Mode(false);
         example.Adjust_Phi_With_Objects(time);
@@ -1099,11 +1097,6 @@ Advect_Fluid(const T dt,const int substep)
         if(fluids_parameters.use_reacting_flow){
             particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple.Project_Levelset();
             example.Set_Ghost_Density_And_Temperature_Inside_Flame_Core();}
-
-        // TODO: check that this is using the correct velocities.
-        if(fluids_parameters.mass_conservation){
-            PHYSBAM_FATAL_ERROR("check that time+dt is the correct time to pass in here");
-            particle_levelset_evolution->Apply_Mass_Conservation(number_of_regions,time+dt,dt,example.fluid_collection.incompressible_fluid_collection.face_velocities);}
 
         LOG::Time("modifying levelset");
         particle_levelset_evolution->Fill_Levelset_Ghost_Cells(time+dt);
@@ -1322,9 +1315,6 @@ Postprocess_Frame(const int frame)
     if(number_of_regions>=1){
         example.Postprocess_Phi(time); // actually changes phi !!!
 
-        if(example.fluids_parameters.mass_conservation && (frame-example.first_frame)%example.fluids_parameters.reinitialize_geometry_frame_rate==0){
-            LOG::Time("Reinitializing VOF geometry...");
-            particle_levelset_evolution->Reinitialize_Geometry(number_of_regions);}
         if(particle_levelset_evolution->use_particle_levelset && (frame-example.first_frame)%example.fluids_parameters.reseeding_frame_rate==0){
             LOG::Time("Reseeding... ");
             particle_levelset_evolution->Reseed_Particles(time);
