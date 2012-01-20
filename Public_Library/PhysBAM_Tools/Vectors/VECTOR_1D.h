@@ -71,13 +71,13 @@ public:
 
     template<class T_VECTOR>
     explicit VECTOR(const VECTOR_BASE<T,T_VECTOR>& v)
-        :x(v(1))
+        :x(v(0))
     {
         assert(1==v.Size());
     }
 
     VECTOR(const VECTOR_ND<T>& vector_input)
-        :x(vector_input(1))
+        :x(vector_input(0))
     {
         assert(vector_input.n==1);
     }
@@ -91,12 +91,12 @@ public:
     template<class T_VECTOR> typename ENABLE_IF<AND<IS_SAME<T,typename T_VECTOR::ELEMENT>::value,INTS_EQUAL<T_VECTOR::m,1>::value>::value,VECTOR&>::TYPE
     operator=(const T_VECTOR& v)
     {
-        x=v(1);return *this;
+        x=v(0);return *this;
     }
 
     VECTOR& operator=(const VECTOR& v)
     {
-        x=v(1);return *this;
+        x=v(0);return *this;
     }
 
     int Size() const
@@ -274,7 +274,7 @@ public:
     {STATIC_ASSERT((IS_SAME<T,bool>::value));return x;}
 
     static VECTOR Axis_Vector(const int axis)
-    {assert(axis==1);return VECTOR((T)1);}
+    {assert(axis==0);return VECTOR((T)1);}
 
     static VECTOR Constant_Vector(const T& constant)
     {return VECTOR(constant);}
