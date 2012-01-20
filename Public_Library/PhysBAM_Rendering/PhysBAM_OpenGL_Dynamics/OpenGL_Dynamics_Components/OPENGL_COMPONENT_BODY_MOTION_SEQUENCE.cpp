@@ -154,7 +154,7 @@ Reinitialize(bool force)
             opengl_component_rigid_body_collection.rigid_body_collection.Rigid_Body(id).Update_Bounding_Box();
             id_to_index.Insert(id,i);
             opengl_component_rigid_body_collection.Initialize_One_Body(id,true);}}
-    for(int id(1);id<=opengl_component_rigid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size();id++){
+    for(int id=0;id<opengl_component_rigid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size();id++){
         FRAME<TV> rigid_base_transform_i=rigid_body_base_transform;
         T new_length=body_motion.trajectories(id_to_index.Get(id))(frame+1).length;
         rigid_base_transform_i.t*=new_length/default_length;

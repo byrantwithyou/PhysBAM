@@ -40,7 +40,7 @@ public:
 
     void Print() const
     {LOG::cout<<"CONTACT_GRAPH:"<<std::endl;
-    for(int i(1);i<=rigid_body_particles.array_collection->Size();i++){
+    for(int i=0;i<rigid_body_particles.array_collection->Size();i++){
         LOG::cout<<"CONTACT_GRAPH\""<<rigid_body_particles.Rigid_Body(i).name<<"\" (LEVEL = "<<directed_graph.Level_Of_Node(i)<<"): ";
         if(directed_graph.Parents(i).m>0){LOG::cout<<" IS ABOVE=";RIGID_BODY<TV>::Print_Names(rigid_body_particles,directed_graph.Parents(i));}
         if(directed_graph.Children(i).m>0){LOG::cout<<" IS BELOW=";RIGID_BODY<TV>::Print_Names(rigid_body_particles,directed_graph.Children(i));}

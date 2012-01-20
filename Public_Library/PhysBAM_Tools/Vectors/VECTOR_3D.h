@@ -71,26 +71,26 @@ public:
 
     template<class T_VECTOR,class T_INDICES>
     explicit VECTOR(const INDIRECT_ARRAY<T_VECTOR,T_INDICES>& v)
-        :x(v(1)),y(v(2)),z(v(3))
+        :x(v(0)),y(v(1)),z(v(2))
     {
         STATIC_ASSERT((IS_SAME<T,typename INDIRECT_ARRAY<T_VECTOR,T_INDICES>::ELEMENT>::value && INDIRECT_ARRAY<T_VECTOR,T_INDICES>::m==3));
     }
 
     explicit VECTOR(const ARRAY<T>& v)
-        :x(v(1)),y(v(2)),z(v(3))
+        :x(v(0)),y(v(1)),z(v(2))
     {
-        assert(3==v.Size());
+        assert(2==v.Size());
     }
 
     template<class T_VECTOR>
     explicit VECTOR(const VECTOR_BASE<T,T_VECTOR>& v)
-        :x(v(1)),y(v(2)),z(v(3))
+        :x(v(0)),y(v(1)),z(v(2))
     {
-        assert(3==v.Size());
+        assert(2==v.Size());
     }
 
     VECTOR(const VECTOR_ND<T>& vector_input)
-        :x(vector_input(1)),y(vector_input(2)),z(vector_input(3))
+        :x(vector_input(0)),y(vector_input(1)),z(vector_input(2))
     {
         assert(vector_input.n==3);
     }
@@ -104,12 +104,12 @@ public:
     template<class T_VECTOR> typename ENABLE_IF<AND<IS_SAME<T,typename T_VECTOR::ELEMENT>::value,INTS_EQUAL<T_VECTOR::m,3>::value>::value,VECTOR&>::TYPE
     operator=(const T_VECTOR& v)
     {
-        x=v(1);y=v(2);z=v(3);return *this;
+        x=v(0);y=v(1);z=v(2);return *this;
     }
 
     VECTOR& operator=(const VECTOR& v)
     {
-        x=v(1);y=v(2);z=v(3);return *this;
+        x=v(0);y=v(1);z=v(2);return *this;
     }
 
     int Size() const

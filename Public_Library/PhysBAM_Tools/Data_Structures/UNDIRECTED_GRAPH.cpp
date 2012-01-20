@@ -26,7 +26,7 @@ void UNDIRECTED_GRAPH_CORE::
 Reset()
 {
     edges.Remove_All();
-    for(int i(1);i<=adjacent_edges.m;i++) adjacent_edges(i).Remove_All();adjacent_edges.Remove_All();
+    for(int i(0);i<adjacent_edges.m;i++) adjacent_edges(i).Remove_All();adjacent_edges.Remove_All();
 }
 //#####################################################################
 // Function Add_Edge
@@ -86,7 +86,7 @@ Connected_Components(ARRAY<int,int>& component_id) // returns total number of co
 {
     component_id.Resize(adjacent_edges.Size(),false,false);component_id.Fill(0);
     int component=0;
-    for(int seed(1);seed<=component_id.Size();seed++) if(!component_id(seed)){
+    for(int seed=0;seed<component_id.Size();seed++) if(!component_id(seed)){
         STACK<int> stack;stack.Push(seed);
         component_id(seed)=++component;
         while(!stack.Empty()){

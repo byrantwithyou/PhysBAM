@@ -81,17 +81,17 @@ Initialize()
     ADVECTION_CONSERVATIVE_UNIFORM<GRID<TV>,T>* advection_conservative=dynamic_cast<ADVECTION_CONSERVATIVE_UNIFORM<GRID<TV>,T>*>(example.incompressible.advection);
     if(advection_conservative){
         VECTOR<VECTOR<bool,2>,TV::dimension> domain_boundary_local;
-        for(int i=0;i<TV::dimension;i++){domain_boundary_local(i)(1)=true;domain_boundary_local(i)(2)=true;}        
+        for(int i=0;i<TV::dimension;i++){domain_boundary_local(i)(0)=true;domain_boundary_local(i)(1)=true;}        
         if(example.mpi_grid) example.mpi_grid->Initialize(domain_boundary_local);
         if(example.mpi_grid) example.mpi_grid->Initialize(advection_conservative->solid_walls_hack_axis);
-        for(int i=0;i<TV::dimension;i++){advection_conservative->mpi_boundary(i)(1)=!domain_boundary_local(i)(1);advection_conservative->mpi_boundary(i)(2)=!domain_boundary_local(i)(2);}}
+        for(int i=0;i<TV::dimension;i++){advection_conservative->mpi_boundary(i)(0)=!domain_boundary_local(i)(0);advection_conservative->mpi_boundary(i)(1)=!domain_boundary_local(i)(1);}}
     example.incompressible.mpi_grid=example.mpi_grid;
     example.projection.elliptic_solver->mpi_grid=example.mpi_grid;
-    example.particle_levelset_evolution.Particle_Levelset(1).mpi_grid=example.mpi_grid;
+    example.particle_levelset_evolution.Particle_Levelset(0).mpi_grid=example.mpi_grid;
     if(example.mpi_grid){
         example.boundary=new BOUNDARY_MPI<GRID<TV> >(example.mpi_grid,example.boundary_scalar);
         example.phi_boundary=new BOUNDARY_MPI<GRID<TV> >(example.mpi_grid,example.phi_boundary_water);
-        example.particle_levelset_evolution.Particle_Levelset(1).last_unique_particle_id=example.mpi_grid->rank*30000000;}
+        example.particle_levelset_evolution.Particle_Levelset(0).last_unique_particle_id=example.mpi_grid->rank*30000000;}
     else{
         example.boundary=&example.boundary_scalar;
         example.phi_boundary=&example.phi_boundary_water;}
@@ -103,7 +103,7 @@ Initialize()
     VECTOR<VECTOR<bool,2>,TV::dimension> domain_open_boundaries=VECTOR_UTILITIES::Complement(example.domain_boundary);
     example.phi_boundary->Set_Constant_Extrapolation(domain_open_boundaries);
     example.boundary->Set_Constant_Extrapolation(domain_open_boundaries);
-    example.particle_levelset_evolution.Levelset_Advection(1).Set_Custom_Advection(example.advection_scalar);
+    example.particle_levelset_evolution.Levelset_Advection(0).Set_Custom_Advection(example.advection_scalar);
     //example.incompressible.Set_Custom_Advection(example.advection_scalar);
 
     {
@@ -114,16 +114,16 @@ Initialize()
         example.collision_bodies_affecting_fluid.Initialize_Grids();
     }
     
-    example.particle_levelset_evolution.Particle_Levelset(1).number_of_ghost_cells=example.number_of_ghost_cells;
+    example.particle_levelset_evolution.Particle_Levelset(0).number_of_ghost_cells=example.number_of_ghost_cells;
     example.particle_levelset_evolution.Set_Number_Particles_Per_Cell(16);
     example.particle_levelset_evolution.Set_Levelset_Callbacks(example);
     example.particle_levelset_evolution.Initialize_FMM_Initialization_Iterative_Solver(true);
 
     example.particle_levelset_evolution.particle_levelset.levelset.Set_Custom_Boundary(*example.phi_boundary);
     example.particle_levelset_evolution.Bias_Towards_Negative_Particles(false);
-    example.particle_levelset_evolution.Particle_Levelset(1).Use_Removed_Positive_Particles();
-    example.particle_levelset_evolution.Particle_Levelset(1).Use_Removed_Negative_Particles();
-    example.particle_levelset_evolution.Particle_Levelset(1).Store_Unique_Particle_Id();
+    example.particle_levelset_evolution.Particle_Levelset(0).Use_Removed_Positive_Particles();
+    example.particle_levelset_evolution.Particle_Levelset(0).Use_Removed_Negative_Particles();
+    example.particle_levelset_evolution.Particle_Levelset(0).Store_Unique_Particle_Id();
     example.particle_levelset_evolution.Use_Particle_Levelset(true);
     example.particle_levelset_evolution.particle_levelset.levelset.Set_Collision_Body_List(example.collision_bodies_affecting_fluid);
     example.particle_levelset_evolution.particle_levelset.levelset.Set_Face_Velocities_Valid_Mask(&example.incompressible.valid_mask);
@@ -205,7 +205,7 @@ Advance_To_Target_Time(const T target_time)
         if(advection_conservative){advection_conservative->cfl=example.incompressible.Real_CFL(example.face_velocities,false,false,dt);}
 
         T maximum_fluid_speed=example.face_velocities.Maxabs().Max();
-        T max_particle_collision_distance=example.particle_levelset_evolution.Particle_Levelset(1).max_collision_distance_factor*example.mac_grid.dX.Max();
+        T max_particle_collision_distance=example.particle_levelset_evolution.Particle_Levelset(0).max_collision_distance_factor*example.mac_grid.dX.Max();
         example.collision_bodies_affecting_fluid.Compute_Occupied_Blocks(true,dt*maximum_fluid_speed+2*max_particle_collision_distance+(T).5*example.mac_grid.dX.Max(),10);
 
         LOG::Time("Fill ghost");
@@ -214,7 +214,7 @@ PHYSBAM_DEBUG_WRITE_SUBSTEP("before advection",0,1);
         example.incompressible.boundary->Fill_Ghost_Cells_Face(example.mac_grid,example.face_velocities,face_velocities_ghost,time+dt,example.number_of_ghost_cells);
 
         T_ARRAYS_SCALAR phi_back(example.mac_grid.Domain_Indices(example.number_of_ghost_cells));
-        example.phi_boundary->Fill_Ghost_Cells(example.mac_grid,example.particle_levelset_evolution.Particle_Levelset(1).levelset.phi,phi_back,dt,time,example.number_of_ghost_cells);
+        example.phi_boundary->Fill_Ghost_Cells(example.mac_grid,example.particle_levelset_evolution.Particle_Levelset(0).levelset.phi,phi_back,dt,time,example.number_of_ghost_cells);
         LOG::Time("Advect Levelset");
         PHYSBAM_DEBUG_WRITE_SUBSTEP("before phi",0,1);
         example.phi_boundary_water.Use_Extrapolation_Mode(false);
@@ -225,23 +225,23 @@ PHYSBAM_DEBUG_WRITE_SUBSTEP("before advection",0,1);
         example.phi_boundary_water.Use_Extrapolation_Mode(true);
         PHYSBAM_DEBUG_WRITE_SUBSTEP("after phi",0,1);
         LOG::Time("advecting particles");
-        example.particle_levelset_evolution.Particle_Levelset(1).Euler_Step_Particles(face_velocities_ghost,dt,time,true,true,false,false);
+        example.particle_levelset_evolution.Particle_Levelset(0).Euler_Step_Particles(face_velocities_ghost,dt,time,true,true,false,false);
         PHYSBAM_DEBUG_WRITE_SUBSTEP("after advection",0,1);
         
         LOG::Time("updating removed particle velocities");
         example.phi_boundary_water.Use_Extrapolation_Mode(true);
         example.particle_levelset_evolution.Fill_Levelset_Ghost_Cells(time);
-        PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& pls=example.particle_levelset_evolution.Particle_Levelset(1);
+        PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& pls=example.particle_levelset_evolution.Particle_Levelset(0);
         LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,TV> interpolation;
         if(pls.use_removed_positive_particles) for(typename GRID<TV>::NODE_ITERATOR iterator(example.mac_grid);iterator.Valid();iterator.Next()) if(pls.removed_positive_particles(iterator.Node_Index())){
             PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles=*pls.removed_positive_particles(iterator.Node_Index());
             for(int p=0;p<particles.array_collection->Size();p++){
                 TV X=particles.X(p),V=interpolation.Clamped_To_Array_Face(example.mac_grid,face_velocities_ghost,X);
-                if(-pls.levelset.Phi(X)>1.5*particles.radius(p)) V-=-TV::Axis_Vector(2)*.3; // buoyancy
+                if(-pls.levelset.Phi(X)>1.5*particles.radius(p)) V-=-TV::Axis_Vector(1)*.3; // buoyancy
                 particles.V(p)=V;}}
         if(pls.use_removed_negative_particles) for(typename GRID<TV>::NODE_ITERATOR iterator(example.mac_grid);iterator.Valid();iterator.Next()) if(pls.removed_negative_particles(iterator.Node_Index())){
             PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles=*pls.removed_negative_particles(iterator.Node_Index());
-            for(int p=0;p<particles.array_collection->Size();p++) particles.V(p)+=-TV::Axis_Vector(2)*dt*9.8; // ballistic
+            for(int p=0;p<particles.array_collection->Size();p++) particles.V(p)+=-TV::Axis_Vector(1)*dt*9.8; // ballistic
             for(int p=0;p<particles.array_collection->Size();p++) particles.V(p)+=dt*interpolation.Clamped_To_Array_Face(example.mac_grid,example.incompressible.force,particles.X(p));} // external forces
         PHYSBAM_DEBUG_WRITE_SUBSTEP("after particles",0,1);
 
@@ -263,7 +263,7 @@ PHYSBAM_DEBUG_WRITE_SUBSTEP("before advection",0,1);
 
         LOG::Time("modifying levelset");
         example.particle_levelset_evolution.Fill_Levelset_Ghost_Cells(time+dt);
-        example.particle_levelset_evolution.Particle_Levelset(1).Exchange_Overlap_Particles();
+        example.particle_levelset_evolution.Particle_Levelset(0).Exchange_Overlap_Particles();
         example.particle_levelset_evolution.Modify_Levelset_And_Particles(&face_velocities_ghost);
         example.particle_levelset_evolution.Make_Signed_Distance();
         PHYSBAM_DEBUG_WRITE_SUBSTEP("after particles",0,1);
@@ -277,19 +277,19 @@ PHYSBAM_DEBUG_WRITE_SUBSTEP("before advection",0,1);
         example.particle_levelset_evolution.Delete_Particles_Outside_Grid();
         PHYSBAM_DEBUG_WRITE_SUBSTEP("after delete 1",0,1);
         LOG::Time("deleting particles in local maxima");
-        example.particle_levelset_evolution.particle_levelset.Delete_Particles_In_Local_Maximum_Phi_Cells(1);
+        example.particle_levelset_evolution.particle_levelset.Delete_Particles_In_Local_Maximum_Phi_Cells(0);
         PHYSBAM_DEBUG_WRITE_SUBSTEP("after delete 2",0,1);
         LOG::Time("deleting particles far from interface");
-        example.particle_levelset_evolution.Particle_Levelset(1).Delete_Particles_Far_From_Interface(); // uses visibility
+        example.particle_levelset_evolution.Particle_Levelset(0).Delete_Particles_Far_From_Interface(); // uses visibility
         PHYSBAM_DEBUG_WRITE_SUBSTEP("after delete 3",0,1);
 
         LOG::Time("re-incorporating removed particles");
-        example.particle_levelset_evolution.Particle_Levelset(1).Identify_And_Remove_Escaped_Particles(face_velocities_ghost,1.5,time+dt);
+        example.particle_levelset_evolution.Particle_Levelset(0).Identify_And_Remove_Escaped_Particles(face_velocities_ghost,1.5,time+dt);
         if(advection_conservative){
-            example.particle_levelset_evolution.Particle_Levelset(1).Fix_Momentum_With_Escaped_Particles(face_velocities_ghost,advection_conservative->momentum_lost,1.5,1,time+dt);}
+            example.particle_levelset_evolution.Particle_Levelset(0).Fix_Momentum_With_Escaped_Particles(face_velocities_ghost,advection_conservative->momentum_lost,1.5,1,time+dt);}
         PHYSBAM_DEBUG_WRITE_SUBSTEP("after remove",0,1);
-        if(example.particle_levelset_evolution.Particle_Levelset(1).use_removed_positive_particles || example.particle_levelset_evolution.Particle_Levelset(1).use_removed_negative_particles)
-            example.particle_levelset_evolution.Particle_Levelset(1).Reincorporate_Removed_Particles(1,1,0,true);
+        if(example.particle_levelset_evolution.Particle_Levelset(0).use_removed_positive_particles || example.particle_levelset_evolution.Particle_Levelset(0).use_removed_negative_particles)
+            example.particle_levelset_evolution.Particle_Levelset(0).Reincorporate_Removed_Particles(1,1,0,true);
         PHYSBAM_DEBUG_WRITE_SUBSTEP("after reincorporate",0,1);
 
         // update ghost phi values

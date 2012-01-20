@@ -37,7 +37,7 @@ template<class T> SPARSE_MATRIX_FLAT_NXN<T>* SPARSE_MATRIX_FLAT_MXN<T>::
 Create_Submatrix(const INTERVAL<int>& rows)
 {
     assert(rows.Size()+1==m);
-    int entries=0;for(int index=offsets(1);index<offsets(m+1);index++)if(rows.Lazy_Inside(A(index).j)) entries++;
+    int entries=0;for(int index=offsets(0);index<offsets(m+1);index++)if(rows.Lazy_Inside(A(index).j)) entries++;
     SPARSE_MATRIX_FLAT_NXN<T>* submatrix=new SPARSE_MATRIX_FLAT_NXN<T>();
     submatrix->n=rows.Size()+1;
     submatrix->offsets.Resize(submatrix->n+1);
@@ -56,7 +56,7 @@ Create_Submatrix(const INTERVAL<int>& rows)
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
 Set_Row_Lengths(ARRAY_VIEW<int> lengths)
 {
-    m=lengths.m;offsets.Resize(m+1,false,false);offsets(1)=1;
+    m=lengths.m;offsets.Resize(m+1,false,false);offsets(0)=1;
     for(int i=0;i<m;i++){offsets(i+1)=offsets(i)+lengths(i);}
     A.Resize(offsets(m+1)-1);
 }
@@ -113,7 +113,7 @@ Element_Present(const int i,const int j) const
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
 Times_Add(const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const
 {
-    int index=offsets(1);
+    int index=offsets(0);
     for(int i=0;i<m;i++){
         int end=offsets(i+1);T sum=(T)0;
         for(;index<end;index++) sum+=A(index).a*x(A(index).j);
@@ -125,7 +125,7 @@ Times_Add(const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
 Times_Subtract(const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const
 {
-    int index=offsets(1);
+    int index=offsets(0);
     for(int i=0;i<m;i++){
         int end=offsets(i+1);T sum=(T)0;
         for(;index<end;index++) sum+=A(index).a*x(A(index).j);
@@ -146,7 +146,7 @@ Times(const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
 Transpose_Times_Add(const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const
 {
-    int index=offsets(1);
+    int index=offsets(0);
     for(int i=0;i<m;i++){
         int end=offsets(i+1);T y=x(i);
         for(;index<end;index++) result(A(index).j)+=A(index).a*y;}
@@ -157,7 +157,7 @@ Transpose_Times_Add(const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
 Transpose_Times_Subtract(const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const
 {
-    int index=offsets(1);
+    int index=offsets(0);
     for(int i=0;i<m;i++){
         int end=offsets(i+1);T y=x(i);
         for(;index<end;index++) result(A(index).j)-=A(index).a*y;}
@@ -202,7 +202,7 @@ operator/=(const T a)
 template<class T> SPARSE_MATRIX_FLAT_MXN<T>& SPARSE_MATRIX_FLAT_MXN<T>::
 operator+=(const T a)
 {
-    int index=offsets(1);
+    int index=offsets(0);
     for(int i=0;i<m;i++){
         int end=offsets(i+1),found=0;
         for(;index<end;index++){if(A(index).j==i){found=1;A(index).a+=a;}}
@@ -224,14 +224,14 @@ template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
 Compress(SPARSE_MATRIX_FLAT_MXN<T>& compressed)
 {
     ARRAY<int> row_lengths(m);
-    int index=offsets(1);
+    int index=offsets(0);
     for(int i=0;i<m;i++){
         int end=offsets(i+1);
         while(index<end){if(!A(index).j) break;
             index++;row_lengths(i)++;}
         index=end;}
     compressed.Set_Row_Lengths(row_lengths);
-    index=offsets(1);
+    index=offsets(0);
     int compressed_index=1;
     for(int i=0;i<m;i++){
         int end=offsets(i+1);
@@ -341,7 +341,7 @@ operator+(const SPARSE_MATRIX_FLAT_NXN<T>& A_rhs) const
 {
     assert(m==n && n==A_rhs.n);
     ARRAY<int> row_lengths(m);
-    int left_index=offsets(1),right_index=A_rhs.offsets(1);
+    int left_index=offsets(0),right_index=A_rhs.offsets(0);
     for(int i=0;i<m;i++){
         int left_end=offsets(i+1),right_end=A_rhs.offsets(i+1);
         while(left_index<left_end && right_index<right_end){
@@ -353,11 +353,11 @@ operator+(const SPARSE_MATRIX_FLAT_NXN<T>& A_rhs) const
     SPARSE_MATRIX_FLAT_NXN<T> result;
     result.Set_Row_Lengths(row_lengths);
 
-    int index=offsets(1);
+    int index=offsets(0);
     for(int i=0;i<m;i++){int end=offsets(i+1);
         for(;index<end;index++) result(i,A(index).j)=A(index).a;}
 
-    index=A_rhs.offsets(1);
+    index=A_rhs.offsets(0);
     for(int i=0;i<m;i++){int end=A_rhs.offsets(i+1);
         for(;index<end;index++) result(i,A_rhs.A(index).j)+=A_rhs.A(index).a;}
     return result;
@@ -370,7 +370,7 @@ operator+(const SPARSE_MATRIX_FLAT_MXN& A_rhs) const
 {
     assert(m==A_rhs.m && n==A_rhs.n);
     ARRAY<int> row_lengths(m);
-    int left_index=offsets(1),right_index=A_rhs.offsets(1);
+    int left_index=offsets(0),right_index=A_rhs.offsets(0);
     for(int i=0;i<m;i++){
         int left_end=offsets(i+1),right_end=A_rhs.offsets(i+1);
         while(left_index<left_end && right_index<right_end){
@@ -382,11 +382,11 @@ operator+(const SPARSE_MATRIX_FLAT_MXN& A_rhs) const
     SPARSE_MATRIX_FLAT_MXN<T> result;
     result.Set_Row_Lengths(row_lengths);result.n=n;
 
-    int index=offsets(1);
+    int index=offsets(0);
     for(int i=0;i<m;i++){int end=offsets(i+1);
         for(;index<end;index++) result(i,A(index).j)=A(index).a;}
 
-    index=A_rhs.offsets(1);
+    index=A_rhs.offsets(0);
     for(int i=0;i<m;i++){int end=A_rhs.offsets(i+1);
         for(;index<end;index++) result(i,A_rhs.A(index).j)+=A_rhs.A(index).a;}
     return result;
@@ -399,7 +399,7 @@ operator-(const SPARSE_MATRIX_FLAT_MXN& A_rhs) const
 {
     assert(m==A_rhs.m && n==A_rhs.n);
     ARRAY<int> row_lengths(m);
-    int left_index=offsets(1),right_index=A_rhs.offsets(1);
+    int left_index=offsets(0),right_index=A_rhs.offsets(0);
     for(int i=0;i<m;i++){
         int left_end=offsets(i+1),right_end=A_rhs.offsets(i+1);
         while(left_index<left_end && right_index<right_end){
@@ -411,11 +411,11 @@ operator-(const SPARSE_MATRIX_FLAT_MXN& A_rhs) const
     SPARSE_MATRIX_FLAT_MXN<T> result;
     result.Set_Row_Lengths(row_lengths);result.n=n;
 
-    int index=offsets(1);
+    int index=offsets(0);
     for(int i=0;i<m;i++){int end=offsets(i+1);
         for(;index<end;index++) result(i,A(index).j)=A(index).a;}
 
-    index=A_rhs.offsets(1);
+    index=A_rhs.offsets(0);
     for(int i=0;i<m;i++){int end=A_rhs.offsets(i+1);
         for(;index<end;index++) result(i,A_rhs.A(index).j)-=A_rhs.A(index).a;}
     return result;

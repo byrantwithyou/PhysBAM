@@ -111,7 +111,7 @@ public:
 
 private:
     void Resize_Helper(const ID buffer_new,const bool initialize_new_elements=true,const bool copy_existing_elements=true)
-    {if(buffer_size==buffer_new) return;assert(m<buffer_size);
+    {if(buffer_size==buffer_new) return;assert(m<=buffer_size);
     T* p=new T[Value(buffer_new)];
     int m_end=Value(PhysBAM::min(m,buffer_new));
     if(copy_existing_elements) for(int i=0;i<m_end;i++) p[i]=base_pointer[i];
@@ -149,7 +149,7 @@ public:
     {Resize_Helper(m_new,initialize_new_elements);m=buffer_size;}
 
     ID Append(const T& element) PHYSBAM_ALWAYS_INLINE
-    {Ensure_Enough_Space(m+1);(*this)(m)=element;return m++;}
+    {Ensure_Enough_Space(m+1);ID s=m++;(*this)(s)=element;return s;}
 
     template<class T_ARRAY>
     void Append_Elements(const T_ARRAY& append_array)
@@ -185,7 +185,7 @@ public:
     {for(ID i(0);i<m;i++) delete (*this)(i);Clean_Memory();}
 
     void Insert(const T& element,const ID index)
-    {Ensure_Enough_Space(m+1);m++;for(ID i=m;i>index;i--) (*this)(i)=(*this)(i-1);(*this)(index)=element;}
+    {Ensure_Enough_Space(m+1);m++;for(ID i=m-1;i>index;i--) (*this)(i)=(*this)(i-1);(*this)(index)=element;}
 
     T Pop()
     {Remove_End();return base_pointer[Value(m)];}

@@ -70,7 +70,7 @@ Bind_Particles_In_Rigid_Body(RIGID_BODY<TV>& rigid_body,const T_ARRAY& particle_
     PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
     BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
-    for(typename T_ARRAY::ELEMENT i(1);i<=particle_array.Size();i++){int p=particle_array(i);
+    for(typename T_ARRAY::ELEMENT i=0;i<particle_array.Size();i++){int p=particle_array(i);
         if(rigid_body.implicit_object->Inside(particles.X(p)))
             binding_list.Add_Binding(new RIGID_BODY_BINDING<TV>(particles,p,rigid_body_collection,rigid_body.particle_index,rigid_body.Object_Space_Point(particles.X(p))));}
 }

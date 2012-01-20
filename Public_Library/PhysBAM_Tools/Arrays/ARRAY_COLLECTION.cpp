@@ -24,7 +24,7 @@ ARRAY_COLLECTION()
 ARRAY_COLLECTION::
 ~ARRAY_COLLECTION()
 {
-    if(delete_data) for(ATTRIBUTE_INDEX i(1);i<=arrays.m;i++) delete arrays(i);
+    if(delete_data) for(ATTRIBUTE_INDEX i(0);i<arrays.m;i++) delete arrays(i);
 }
 //#####################################################################
 // Function Initialize
@@ -55,12 +55,12 @@ Initialize(ARRAY_VIEW<const ARRAY_COLLECTION* const> elements_per_cell)
 void ARRAY_COLLECTION::
 Add_Arrays(const ARRAY_COLLECTION& collection)
 {
-    ATTRIBUTE_INDEX i(1),j(1);
-    for(;i<=arrays.m && j<=collection.arrays.m;i++){
+    ATTRIBUTE_INDEX i(0),j(0);
+    for(;i<arrays.m && j<collection.arrays.m;i++){
         if(arrays(i)->id<collection.arrays(j)->id) continue;
         if(arrays(i)->id>collection.arrays(j)->id) Add_Array(collection.arrays(j)->id,collection.arrays(j)->Clone_Default());
         j++;}
-    for(;j<=collection.arrays.m;j++)
+    for(;j<collection.arrays.m;j++)
         Add_Array(collection.arrays(j)->id,collection.arrays(j)->Clone_Default());
 }
 //#####################################################################
@@ -98,12 +98,12 @@ Delete_Elements_On_Deletion_List(const bool preserve_order)
 void ARRAY_COLLECTION::
 Copy_Element(const ARRAY_COLLECTION& from_collection,const int from,const int to)
 {
-    ATTRIBUTE_INDEX i(1),j(1);
-    while(i<=arrays.m && j<=from_collection.arrays.m){
+    ATTRIBUTE_INDEX i(0),j(0);
+    while(i<arrays.m && j<from_collection.arrays.m){
         if(arrays(i)->id<from_collection.arrays(j)->id) arrays(i++)->Clear(to);
         else if(arrays(i)->id>from_collection.arrays(j)->id) j++;
         else arrays(i++)->Copy_Element(*from_collection.arrays(j++),from,to);}
-    for(;i<=arrays.m;i++) arrays(i)->Clear(to);
+    for(;i<arrays.m;i++) arrays(i)->Clear(to);
 }
 //#####################################################################
 // Function Copy_All_Elements_Helper
@@ -112,12 +112,12 @@ void ARRAY_COLLECTION::
 Copy_All_Elements_Helper(const ARRAY_COLLECTION& from_collection,const int offset)
 {
     PHYSBAM_ASSERT(this!=&from_collection);
-    ATTRIBUTE_INDEX i(1),j(1);
-    while(i<=arrays.m && j<=from_collection.arrays.m){
+    ATTRIBUTE_INDEX i(0),j(0);
+    while(i<arrays.m && j<from_collection.arrays.m){
         if(arrays(i)->id<from_collection.arrays(j)->id) arrays(i++)->Clear_Range(offset+1,offset+from_collection.number);
         else if(arrays(i)->id>from_collection.arrays(j)->id) j++;
         else arrays(i++)->Copy_With_Offset(*from_collection.arrays(j++),offset);}
-    for(;i<=arrays.m;i++) arrays(i)->Clear_Range(offset+1,offset+from_collection.number);
+    for(;i<arrays.m;i++) arrays(i)->Clear_Range(offset+1,offset+from_collection.number);
 }
 //#####################################################################
 // Function Get_Attribute_Index
@@ -125,7 +125,7 @@ Copy_All_Elements_Helper(const ARRAY_COLLECTION& from_collection,const int offse
 ATTRIBUTE_INDEX ARRAY_COLLECTION::
 Find_Attribute_Index(const ATTRIBUTE_ID attribute_id) const
 {
-    ATTRIBUTE_INDEX first(1),last(arrays.m+1);
+    ATTRIBUTE_INDEX first(0),last(arrays.m);
     while(first<last){
         ATTRIBUTE_INDEX middle((Value(first)+Value(last))/2);
         if(arrays(middle)->id<attribute_id) first=middle+1;
@@ -139,7 +139,7 @@ void ARRAY_COLLECTION::
 Clean_Memory()
 {
     number=buffer_size=0;
-    for(ATTRIBUTE_INDEX i(1);i<=arrays.m;i++)
+    for(ATTRIBUTE_INDEX i(0);i<arrays.m;i++)
         arrays(i)->Clean_Memory();
 }
 //#####################################################################
@@ -150,7 +150,7 @@ operator==(const ARRAY_COLLECTION& collection) const
 {
     if(this==&collection) return true;
     if(arrays.m!=collection.arrays.m) return false;
-    for(ATTRIBUTE_INDEX i(1);i<=arrays.m;i++){
+    for(ATTRIBUTE_INDEX i(0);i<arrays.m;i++){
         if(arrays(i)->id!=collection.arrays(i)->id) return false;
         assert(typeid(arrays(i))==typeid(collection.arrays(i)));
         if(arrays(i)!=collection.arrays(i)) return false;}
@@ -164,7 +164,7 @@ Resize(const int new_size)
 {
     if(buffer_size<new_size) Reallocate_Buffer(max(4*number/3+2,new_size));
     number=new_size;
-    for(ATTRIBUTE_INDEX i(1);i<=arrays.m;i++) arrays(i)->Set_Size(number);
+    for(ATTRIBUTE_INDEX i(0);i<arrays.m;i++) arrays(i)->Set_Size(number);
 }
 //#####################################################################
 // Function Add_Array
@@ -173,7 +173,7 @@ ATTRIBUTE_INDEX ARRAY_COLLECTION::
 Add_Array(const ATTRIBUTE_ID attribute_id,ARRAY_COLLECTION_ELEMENT_BASE* array)
 {
     ATTRIBUTE_INDEX index=Find_Attribute_Index(attribute_id);
-    if(index<=arrays.m && arrays(index)->id==attribute_id){
+    if(index<arrays.m && arrays(index)->id==attribute_id){
         PHYSBAM_ASSERT(array==arrays(index));
         return index;}
     array->id=attribute_id;
@@ -189,7 +189,7 @@ int ARRAY_COLLECTION::
 Pack_Size() const
 {
     int pack_size=0;
-    for(ATTRIBUTE_INDEX i(1);i<=arrays.m;i++)
+    for(ATTRIBUTE_INDEX i(0);i<arrays.m;i++)
         pack_size+=arrays(i)->Pack_Size();
     return pack_size;
 }
@@ -200,7 +200,7 @@ void ARRAY_COLLECTION::
 Pack(ARRAY_VIEW<char> buffer,int& position,const int p) const
 {
     assert((unsigned)p<(unsigned)number);
-    for(ATTRIBUTE_INDEX i(1);i<=arrays.m;i++)
+    for(ATTRIBUTE_INDEX i(0);i<arrays.m;i++)
         arrays(i)->Pack(buffer,position,p);
 }
 //#####################################################################
@@ -210,7 +210,7 @@ void ARRAY_COLLECTION::
 Unpack(ARRAY_VIEW<const char> buffer,int& position,const int p)
 {
     assert((unsigned)p<(unsigned)number);
-    for(ATTRIBUTE_INDEX i(1);i<=arrays.m;i++)
+    for(ATTRIBUTE_INDEX i(0);i<arrays.m;i++)
         arrays(i)->Unpack(buffer,position,p);
 }
 //#####################################################################
@@ -219,7 +219,7 @@ Unpack(ARRAY_VIEW<const char> buffer,int& position,const int p)
 void ARRAY_COLLECTION::
 Copy_Element_Helper(const int from,const int to)
 {
-    for(ATTRIBUTE_INDEX i(1);i<=arrays.m;i++)
+    for(ATTRIBUTE_INDEX i(0);i<arrays.m;i++)
         arrays(i)->Copy_Element(from,to);
 }
 //#####################################################################
@@ -229,7 +229,7 @@ void ARRAY_COLLECTION::
 Reallocate_Buffer(int new_size)
 {
     buffer_size=new_size;
-    for(ATTRIBUTE_INDEX i(1);i<=arrays.m;i++)
+    for(ATTRIBUTE_INDEX i(0);i<arrays.m;i++)
         arrays(i)->Reallocate(buffer_size);
 }
 //#####################################################################

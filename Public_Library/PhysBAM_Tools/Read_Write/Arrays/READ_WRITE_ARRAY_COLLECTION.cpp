@@ -56,7 +56,7 @@ Read_Arrays(std::istream& input,ARRAY_COLLECTION& object)
     Read_Binary<RW>(input,size,num_attributes);
     object.Resize(size);
 
-    for(ATTRIBUTE_INDEX i(1);i<=num_attributes;i++){
+    for(ATTRIBUTE_INDEX i(0);i<num_attributes;i++){
         ATTRIBUTE_ID hashed_id;int read_size;
         Read_Binary<RW>(input,hashed_id,read_size);
 
@@ -79,7 +79,7 @@ template<class RW> void Read_Write<ARRAY_COLLECTION,RW>::
 Write_Arrays(std::ostream& output,const ARRAY_COLLECTION& object)
 {
     Write_Binary<RW>(output,object.number,object.arrays.m);
-    for(ATTRIBUTE_INDEX i(1);i<=object.arrays.m;i++){
+    for(ATTRIBUTE_INDEX i(0);i<object.arrays.m;i++){
         const ARRAY_COLLECTION_ELEMENT_BASE* entry=object.arrays(i);
         const READ_WRITE_ARRAY_COLLECTION_FUNCTIONS* read_write_functions=Read_Write_Array_Collection_Registry().Get_Pointer(Type_Only(entry->Hashed_Id()));
         if(!read_write_functions || !read_write_functions->Write || !read_write_functions->Write_Size)
@@ -96,7 +96,7 @@ template<class RW> void Read_Write<ARRAY_COLLECTION,RW>::
 Print(std::ostream& output,const ARRAY_COLLECTION& object,const int p)
 {
     if(p<1 || p>object.number) throw INDEX_ERROR("Index out of range");
-    for(ATTRIBUTE_INDEX i(1);i<=object.arrays.m;i++){
+    for(ATTRIBUTE_INDEX i(0);i<object.arrays.m;i++){
         const ARRAY_COLLECTION_ELEMENT_BASE* entry=object.arrays(i);
         const READ_WRITE_ARRAY_COLLECTION_FUNCTIONS* read_write_functions=Read_Write_Array_Collection_Registry().Get_Pointer(Type_Only(entry->Hashed_Id()));
         if(!read_write_functions || !read_write_functions->Print)

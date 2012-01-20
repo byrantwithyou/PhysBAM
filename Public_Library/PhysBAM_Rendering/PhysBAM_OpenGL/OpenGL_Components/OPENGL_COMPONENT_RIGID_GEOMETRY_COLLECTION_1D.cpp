@@ -51,7 +51,7 @@ Read_Hints(const std::string& filename)
     std::istream* input=FILE_UTILITIES::Safe_Open_Input(filename);
     Read_Binary<RW>(*input,opengl_hints);delete input;
 
-    for(int i(1);i<=opengl_point_simplices.Size();i++) if(opengl_point_simplices(i) && i<=opengl_hints.Size()){
+    for(int i=0;i<opengl_point_simplices.Size();i++) if(opengl_point_simplices(i) && i<=opengl_hints.Size()){
         opengl_point_simplices(i)->color=opengl_hints(i).material.diffuse;
         use_object_bounding_box(i)=opengl_hints(i).include_bounding_box;}
 }
@@ -91,7 +91,7 @@ Reinitialize(const bool force,const bool read_geometry)
         else for(int i=0;i<max_number_of_bodies;i++){if(rigid_geometry_collection->Is_Active(i)) Create_Geometry(i);} // TODO: can we figure out what bodies need_init
 
         // Update active bodies / remove inactive bodies
-        for(int id(1);id<=rigid_geometry_collection->particles.array_collection->Size();id++){
+        for(int id=0;id<rigid_geometry_collection->particles.array_collection->Size();id++){
             if(rigid_geometry_collection->Is_Active(id)) Update_Geometry(id);
             else Destroy_Geometry(id);}
         for(int id=rigid_geometry_collection->particles.array_collection->Size()+1;id<=opengl_point_simplices.Size();id++){
@@ -140,7 +140,7 @@ Destroy_Geometry(const int id)
 template<class T,class RW> void OPENGL_COMPONENT_RIGID_GEOMETRY_COLLECTION_1D<T,RW>::
 Update_Object_Labels()
 {
-    for(int i(1);i<=rigid_geometry_collection->particles.array_collection->Size();i++){
+    for(int i=0;i<rigid_geometry_collection->particles.array_collection->Size();i++){
         if(draw_object(i)){
             if(opengl_point_simplices(i)){
                 if(output_positions){
@@ -185,13 +185,13 @@ Display(const int in_color) const
         glDisable(GL_LIGHTING);
 
         if(draw_point_simplices){
-            for(int i(1);i<=rigid_geometry_collection->particles.array_collection->Size();i++){
+            for(int i=0;i<rigid_geometry_collection->particles.array_collection->Size();i++){
                 if(draw_object(i) && opengl_point_simplices(i)) opengl_point_simplices(i)->Display(in_color);}}
 
 #ifndef USE_OPENGLES
         if(show_object_names){
             glColor3f(1,1,1);
-            for(int i(1);i<=rigid_geometry_collection->particles.array_collection->Size();i++){
+            for(int i=0;i<rigid_geometry_collection->particles.array_collection->Size();i++){
                 if(draw_object(i) && rigid_geometry_collection->Rigid_Geometry(i).name.length()){
                     OpenGL_String(rigid_geometry_collection->particles.X(i),STRING_UTILITIES::string_sprintf("%s %f",rigid_geometry_collection->Rigid_Geometry(i).name.c_str(),rigid_geometry_collection->particles.twist(i).linear.x));}}}
 #endif
@@ -204,7 +204,7 @@ template<class T,class RW> bool OPENGL_COMPONENT_RIGID_GEOMETRY_COLLECTION_1D<T,
 Use_Bounding_Box() const
 {
     int num_drawable_objects=0;
-    for(int i(1);i<=opengl_point_simplices.Size();i++)
+    for(int i=0;i<opengl_point_simplices.Size();i++)
         if(draw_object(i) && use_object_bounding_box(i))
             num_drawable_objects++;
     return (draw && num_drawable_objects>0);
@@ -218,7 +218,7 @@ Bounding_Box() const
     RANGE<VECTOR<float,3> > box;
     if(draw){
         bool first=true;
-        for(int i(1);i<=opengl_point_simplices.Size();i++)
+        for(int i=0;i<opengl_point_simplices.Size();i++)
             if(draw_object(i) && use_object_bounding_box(i) && opengl_point_simplices(i)){
                 if(first){
                     box=opengl_point_simplices(i)->Bounding_Box();

@@ -199,7 +199,7 @@ Add_J_Deformable_Transpose_Times_Velocity(const SPARSE_MATRIX_FLAT_MXN<T>& J_def
 {
     assert(pressure.n==J_deformable.n && J_deformable.m==V.V.indices.Size()*TV::dimension);
     // computes pressure+=J*V.V
-    int index=J_deformable.offsets(1);
+    int index=J_deformable.offsets(0);
     for(int i=0;i<J_deformable.m;i++){
         const int end=J_deformable.offsets(i+1);
         for(;index<end;index++){
@@ -229,7 +229,7 @@ template<class TV,class T_MATRIX> void SOLID_FLUID_SYSTEM<TV,T_MATRIX>::
 Add_J_Deformable_Times_Pressure(const SPARSE_MATRIX_FLAT_MXN<T>& J_deformable,const VECTOR_ND<T>& pressure,GENERALIZED_VELOCITY<TV>& V)
 {
     assert(pressure.n==J_deformable.n && J_deformable.m==V.V.indices.Size()*TV::dimension);
-    int index=J_deformable.offsets(1);
+    int index=J_deformable.offsets(0);
     for(int i=0;i<J_deformable.m;i++){
         const int end=J_deformable.offsets(i+1);
         for(;index<end;index++){

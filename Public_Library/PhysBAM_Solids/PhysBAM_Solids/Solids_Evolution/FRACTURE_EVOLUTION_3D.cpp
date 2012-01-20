@@ -500,7 +500,7 @@ Process_Rigid_Fracture(const T dt,const T time,SOLIDS_EVOLUTION<TV>* rigid_defor
     rigid_bodies_with_impulse.Resize(0);
 
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solids_parameters.solid_body_collection.rigid_body_collection;
-    for(int i(1);i<=rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if(rigid_body_collection.Is_Active(i))
+    for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if(rigid_body_collection.Is_Active(i))
         if(RIGID_BODY_FRACTURE_OBJECT_3D<T>* rigid_body_fracture_object=dynamic_cast<RIGID_BODY_FRACTURE_OBJECT_3D<T>*>(&rigid_body_collection.Rigid_Body(i))){
             T threshold_squared=rigid_body_fracture_object->fracture_threshold*rigid_body_fracture_object->fracture_threshold;
             COLLISION_GEOMETRY_IMPULSE_ACCUMULATOR<TV>* collision_body_impulse_accumulator=

@@ -23,7 +23,7 @@ EXTERNAL_ARRAY_COLLECTION()
 EXTERNAL_ARRAY_COLLECTION::
 ~EXTERNAL_ARRAY_COLLECTION()
 {
-    for(ATTRIBUTE_INDEX i(1);i<=arrays.m;i++) if(Owns_Element_From_Index(i)) delete arrays(i);
+    for(ATTRIBUTE_INDEX i(0);i<arrays.m;i++) if(Owns_Element_From_Index(i)) delete arrays(i);
 }
 //#####################################################################
 // Function Clean_Memory
@@ -32,7 +32,7 @@ void EXTERNAL_ARRAY_COLLECTION::
 Clean_Memory()
 {
     number=buffer_size=0;
-    for(ATTRIBUTE_INDEX i(1);i<=arrays.m;i++) if(Owns_Element_From_Index(i)) arrays(i)->Clean_Memory();
+    for(ATTRIBUTE_INDEX i(0);i<arrays.m;i++) if(Owns_Element_From_Index(i)) arrays(i)->Clean_Memory();
 }
 //#####################################################################
 // Function Add_Array
@@ -57,7 +57,7 @@ void EXTERNAL_ARRAY_COLLECTION::
 Reallocate_Buffer(int new_size)
 {
     buffer_size=new_size;
-    for(ATTRIBUTE_INDEX i(1);i<=arrays.m;i++) if(Owns_Element_From_Index(i)) arrays(i)->Reallocate(buffer_size);
+    for(ATTRIBUTE_INDEX i(0);i<arrays.m;i++) if(Owns_Element_From_Index(i)) arrays(i)->Reallocate(buffer_size);
 }
 //#####################################################################
 // Function Resize
@@ -67,7 +67,7 @@ Resize(const int new_size)
 {
     if(buffer_size<new_size) Reallocate_Buffer(max(4*number/3+2,new_size));
     number=new_size;
-    for(ATTRIBUTE_INDEX i(1);i<=arrays.m;i++) if(Owns_Element_From_Index(i)) arrays(i)->Set_Size(number);
+    for(ATTRIBUTE_INDEX i(0);i<arrays.m;i++) if(Owns_Element_From_Index(i)) arrays(i)->Set_Size(number);
 }
 //#####################################################################
 }

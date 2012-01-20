@@ -67,7 +67,7 @@ template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODY_COLLECTION_1D<T,RW>:
 Update_Object_Labels()
 {
     BASE::Update_Object_Labels();
-    for(int i(1);i<=rigid_body_collection.rigid_body_particle.array_collection->Size();i++){
+    for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++){
         if(draw_object(i)){
             if(opengl_point_simplices(i)){
                 if(output_positions){

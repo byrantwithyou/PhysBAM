@@ -50,7 +50,7 @@ public:
     void Set_Collision_Body_Thickness(T collision_body_thickness_input)
     {
         collision_body_thickness=collision_body_thickness_input;if(spatial_partition) spatial_partition->Set_Collision_Body_Thickness(collision_body_thickness);
-        for(COLLISION_GEOMETRY_ID id(1);id<=bodies.Size();++id) bodies(id)->Set_Collision_Thickness(collision_body_thickness);
+        for(COLLISION_GEOMETRY_ID id(0);id<bodies.Size();++id) bodies(id)->Set_Collision_Thickness(collision_body_thickness);
     }
 
     COLLISION_GEOMETRY<TV>* Get_Collision_Geometry(int geometry_id)

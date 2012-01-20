@@ -766,7 +766,7 @@ Take_Hypothetical_Fluids_Step(const T time)
     assert(fluids_parameters->solid_affects_fluid);
     bool write_frame_boundaries=driver->project_at_frame_boundaries;
     //TODO(jontg): Remove affected_by_fluid flag
-    for(int i(1);i<=solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size();++i){
+    for(int i=0;i<solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size();++i){
         RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(i);rigid_body.Twist()=TWIST<TV>();
         saved_rigid_body_state.Append(TRIPLE<int,bool,bool>(rigid_body.particle_index,rigid_body.is_static,!not_affected_by_fluid.Contains(rigid_body.particle_index)));
         rigid_body.is_static=true;not_affected_by_fluid.Set(rigid_body.particle_index);}

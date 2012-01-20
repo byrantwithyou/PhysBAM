@@ -65,13 +65,13 @@ public:
     {assert((unsigned)p<(unsigned)number);deletion_list.Append(p);}
 
     ATTRIBUTE_INDEX Get_Attribute_Index(const ATTRIBUTE_ID attribute_id) const
-    {ATTRIBUTE_INDEX index=Find_Attribute_Index(attribute_id);if(index<=arrays.m && arrays(index)->id==attribute_id) return index;return ATTRIBUTE_INDEX();}
+    {ATTRIBUTE_INDEX index=Find_Attribute_Index(attribute_id);if(index<arrays.m && arrays(index)->id==attribute_id) return index;return ATTRIBUTE_INDEX(-1);}
 
     template<class T> ARRAY_VIEW<T>* Get_Array(const ATTRIBUTE_ID attribute_id)
-    {if(ATTRIBUTE_INDEX index=Get_Attribute_Index(attribute_id)) return Get_Array_From_Index<T>(index);return 0;}
+    {ATTRIBUTE_INDEX index=Get_Attribute_Index(attribute_id); if(index!=ATTRIBUTE_INDEX(-1)) return Get_Array_From_Index<T>(index);return 0;}
 
     template<class T> const ARRAY_VIEW<T>* Get_Array(const ATTRIBUTE_ID attribute_id) const
-    {if(ATTRIBUTE_INDEX index=Get_Attribute_Index(attribute_id)) return Get_Array_From_Index<T>(index);return 0;}
+    {ATTRIBUTE_INDEX index=Get_Attribute_Index(attribute_id); if(index!=ATTRIBUTE_INDEX(-1)) return Get_Array_From_Index<T>(index);return 0;}
 
     template<class T> ARRAY_VIEW<T>* Get_Array_From_Index(const ATTRIBUTE_INDEX attribute_index)
     {return dynamic_cast<ARRAY_COLLECTION_ELEMENT<T>*>(arrays(attribute_index))->array;}
@@ -84,14 +84,15 @@ public:
     return Add_Array(attribute_id,new ARRAY_COLLECTION_ELEMENT<T>(array));}
 
     template<class T> ATTRIBUTE_INDEX Add_Array(const ATTRIBUTE_ID attribute_id)
-    {if(ATTRIBUTE_INDEX index=Get_Attribute_Index(attribute_id)) return index;
+    {ATTRIBUTE_INDEX index=Get_Attribute_Index(attribute_id);
+    if(index!=ATTRIBUTE_INDEX(-1)) return index;
     return Add_Array(attribute_id,new ARRAY_COLLECTION_ELEMENT<T>);}
 
     virtual void Remove_Array_Using_Index(const ATTRIBUTE_INDEX attribute_index)
     {delete arrays(attribute_index);arrays.Remove_Index(attribute_index);}
 
     void Remove_Array(const ATTRIBUTE_ID attribute_id)
-    {if(ATTRIBUTE_INDEX index=Get_Attribute_Index(attribute_id)) Remove_Array_Using_Index(index);}
+    {ATTRIBUTE_INDEX index=Get_Attribute_Index(attribute_id);if(index!=ATTRIBUTE_INDEX(-1)) Remove_Array_Using_Index(index);}
 
     ATTRIBUTE_INDEX Number_Of_Arrays() const
     {return arrays.m;}

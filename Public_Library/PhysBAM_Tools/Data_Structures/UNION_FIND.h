@@ -68,7 +68,7 @@ public:
     // Okay for map to yield invalid indices for isolated elements
     template<class ID2,class T_ARRAY>
     void Mapped_Merge(const UNION_FIND<ID2>& union_find,const T_ARRAY& map)
-    {for(ID2 i(1);i<=union_find.Size();i++){ID2 root=union_find.Find(i);if(i!=root) Union(map(i),map(root));}}
+    {for(ID2 i(0);i<union_find.Size();i++){ID2 root=union_find.Find(i);if(i!=root) Union(map(i),map(root));}}
 
     void Forest_Edges(ARRAY<PAIR<ID,ID> >& pairs) const
     {pairs.Remove_All();for(ID i(0);i<Size();i++){ID j=Find(i);if(i!=j) pairs.Append(PAIR<ID,ID>(i,j));}}

@@ -14,7 +14,7 @@ template<class TV> void MUSCLE_LIST<TV>::
 Initialize_Muscle_Attachments_On_Rigid_Body()
 {
     muscle_attachments_on_rigid_body.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size());
-    for(int i(1);i<=rigid_body_collection.rigid_body_particle.array_collection->Size();i++) muscle_attachments_on_rigid_body(i).Remove_All();
+    for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++) muscle_attachments_on_rigid_body(i).Remove_All();
     for(int i=0;i<muscles.m;i++){
         ATTACHMENT_POINT<TV>* attachment_1=muscles(i)->attachment_point_1;
         for(int j=0;j<muscles(i)->via_points.m+1;j++){

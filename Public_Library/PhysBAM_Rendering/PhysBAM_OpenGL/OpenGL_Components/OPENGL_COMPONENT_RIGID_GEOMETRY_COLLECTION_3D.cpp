@@ -110,7 +110,7 @@ Read_Hints(const std::string& filename)
 {
     ARRAY<OPENGL_RIGID_BODY_HINTS,int> opengl_hints;
     FILE_UTILITIES::Read_From_File<RW>(filename,opengl_hints);
-    for(int i(1);i<=opengl_triangulated_surface.Size();i++) if(opengl_triangulated_surface(i) && i<=opengl_hints.Size()){
+    for(int i=0;i<opengl_triangulated_surface.Size();i++) if(opengl_triangulated_surface(i) && i<=opengl_hints.Size()){
         opengl_triangulated_surface(i)->Set_Front_Material(opengl_hints(i).material);
         use_object_bounding_box(i)=opengl_hints(i).include_bounding_box;}
 }
@@ -177,13 +177,13 @@ Reinitialize(const bool force,const bool read_geometry)
         if (FILE_UTILITIES::File_Exists(STRING_UTILITIES::string_sprintf("%s/%d/partition",basedir.c_str(),frame))) {
             ARRAY<int> particles_of_this_partition;
             FILE_UTILITIES::template Read_From_File<RW>(STRING_UTILITIES::string_sprintf("%s/%d/partition",basedir.c_str(),frame),particles_of_this_partition);
-            for (int i(1);i<=max_number_of_bodies;i++)
+            for (int i=0;i<max_number_of_bodies;i++)
                 draw_object(i)=false;
-            for (int i(1);i<=particles_of_this_partition.Size();i++)
+            for (int i=0;i<particles_of_this_partition.Size();i++)
                 draw_object(particles_of_this_partition(i))=true;}
 
         // Update active bodies / remove inactive bodies
-        for(int id(1);id<=rigid_geometry_collection->particles.array_collection->Size();id++){
+        for(int id=0;id<rigid_geometry_collection->particles.array_collection->Size();id++){
             if(rigid_geometry_collection->Is_Active(id)){
                 Update_Geometry(id);
                 RIGID_GEOMETRY<TV>& body=rigid_geometry_collection->Rigid_Geometry(id);
@@ -218,7 +218,7 @@ Reinitialize_Without_Files(const bool force)
         Resize_Structures(max_number_of_bodies);
         
         // Update active bodies / remove inactive bodies
-        for(int id(1);id<=rigid_geometry_collection->particles.array_collection->Size();id++){
+        for(int id=0;id<rigid_geometry_collection->particles.array_collection->Size();id++){
             if(rigid_geometry_collection->Is_Active(id)) Update_Geometry(id);
             else Destroy_Geometry(id);}
         for(int id=rigid_geometry_collection->particles.array_collection->Size()+1;id<=opengl_triangulated_surface.Size();id++) Destroy_Geometry(id);
@@ -256,7 +256,7 @@ Initialize_One_Body(const int body_id,const bool force)
         Create_Geometry(body_id);
 
         // Update active bodies / remove inactive bodies
-        for(int id(1);id<=rigid_geometry_collection->particles.array_collection->Size();id++){
+        for(int id=0;id<rigid_geometry_collection->particles.array_collection->Size();id++){
             if(rigid_geometry_collection->Is_Active(id)) Update_Geometry(id);
             else Destroy_Geometry(id);}
         for(int id=rigid_geometry_collection->particles.array_collection->Size()+1;id<=opengl_triangulated_surface.Size();id++) Destroy_Geometry(id);
@@ -274,7 +274,7 @@ template<class T,class RW> void OPENGL_COMPONENT_RIGID_GEOMETRY_COLLECTION_3D<T,
 Update_Bodies(const bool update_arb_points)
 {
     // Update active bodies / remove inactive bodies
-    for(int id(1);id<=rigid_geometry_collection->particles.array_collection->Size();id++){
+    for(int id=0;id<rigid_geometry_collection->particles.array_collection->Size();id++){
         if(rigid_geometry_collection->Is_Active(id)) Update_Geometry(id);
         else Destroy_Geometry(id);}
     for(int id=rigid_geometry_collection->particles.array_collection->Size()+1;id<=opengl_triangulated_surface.Size();id++) Destroy_Geometry(id);
@@ -423,7 +423,7 @@ Update_Object_Labels()
     if(draw_angular_velocity_vectors) angular_velocity_vectors.Resize(number_of_drawn_bodies);
 
     int idx=0;
-    for(int i(1);i<=rigid_geometry_collection->particles.array_collection->Size();i++) if(draw_object(i)){
+    for(int i=0;i<rigid_geometry_collection->particles.array_collection->Size();i++) if(draw_object(i)){
         if(draw_velocity_vectors || draw_angular_velocity_vectors){idx++;
             positions(idx)=rigid_geometry_collection->particles.X(i);
             if(draw_velocity_vectors)
@@ -489,18 +489,18 @@ Display(const int in_color) const
 #ifndef USE_OPENGLES
     if(draw_triangulated_surface){
         glPushName(1);
-        for(int i(1);i<=opengl_triangulated_surface.Size();i++) if(draw_object(i) && opengl_triangulated_surface(i)){
+        for(int i=0;i<opengl_triangulated_surface.Size();i++) if(draw_object(i) && opengl_triangulated_surface(i)){
             glPushName(Value(i));opengl_triangulated_surface(i)->Display(in_color);glPopName();}
         glPopName();}
     if(draw_tetrahedralized_volume){
         glPushName(2);
-        for(int i(1);i<=opengl_tetrahedralized_volume.Size();i++) if(draw_object(i) && opengl_tetrahedralized_volume(i)){
+        for(int i=0;i<opengl_tetrahedralized_volume.Size();i++) if(draw_object(i) && opengl_tetrahedralized_volume(i)){
             glPushName(Value(i));opengl_tetrahedralized_volume(i)->Display(in_color);glPopName();}
         glPopName();}
     if(draw_implicit_surface){
         glPushName(3);
         int levelset_count=0;
-        for(int i(1);i<=opengl_levelset.Size();i++) if(draw_object(i)){
+        for(int i=0;i<opengl_levelset.Size();i++) if(draw_object(i)){
             glPushName(Value(i));
             if(opengl_levelset(i)){
                 if(++levelset_count>50){
@@ -513,13 +513,13 @@ Display(const int in_color) const
             glPopName();}
         glPopName();}
 #else
-    if(draw_triangulated_surface) for(int i(1);i<=opengl_triangulated_surface.Size();i++) if(draw_object(i) && opengl_triangulated_surface(i)){
+    if(draw_triangulated_surface) for(int i=0;i<opengl_triangulated_surface.Size();i++) if(draw_object(i) && opengl_triangulated_surface(i)){
         opengl_triangulated_surface(i)->Display(in_color);}
-    if(draw_tetrahedralized_volume) for(int i(1);i<=opengl_tetrahedralized_volume.Size();i++) if(draw_object(i) && opengl_tetrahedralized_volume(i)){
+    if(draw_tetrahedralized_volume) for(int i=0;i<opengl_tetrahedralized_volume.Size();i++) if(draw_object(i) && opengl_tetrahedralized_volume(i)){
         opengl_tetrahedralized_volume(i)->Display(in_color);}
     if(draw_implicit_surface){
         int levelset_count=0;
-        for(int i(1);i<=opengl_levelset.Size();i++) if(draw_object(i)){
+        for(int i=0;i<opengl_levelset.Size();i++) if(draw_object(i)){
             if(opengl_levelset(i)){
                 if(++levelset_count>50){
                     PHYSBAM_WARNING("Refusing to draw more than 10 levelsets to save memory.");
@@ -530,7 +530,7 @@ Display(const int in_color) const
             if(opengl_octree_levelset_surface(i)) opengl_octree_levelset_surface(i)->Display(in_color);}}
 #endif
     if(draw_individual_axes)
-        for(int i(1);i<=opengl_axes.Size();i++){
+        for(int i=0;i<opengl_axes.Size();i++){
             if(draw_object(i) && opengl_axes(i)){
                 opengl_axes(i)->box.max_corner.x=opengl_axes(i)->box.max_corner.y=opengl_axes(i)->box.max_corner.z=2*rigid_geometry_collection->Rigid_Geometry(i).Object_Space_Bounding_Box().Edge_Lengths().Min();
                 opengl_axes(i)->Display(in_color);}}
@@ -543,7 +543,7 @@ Display(const int in_color) const
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_LIGHTING);
         glColor3f(1,1,1);
-        for(int i(1);i<=opengl_triangulated_surface.Size();i++)
+        for(int i=0;i<opengl_triangulated_surface.Size();i++)
             if(draw_object(i) && rigid_geometry_collection->Rigid_Geometry(i).name.length())
                 OpenGL_String(rigid_geometry_collection->particles.X(i),rigid_geometry_collection->Rigid_Geometry(i).name);
         glPopAttrib();}
@@ -557,7 +557,7 @@ template<class T,class RW> bool OPENGL_COMPONENT_RIGID_GEOMETRY_COLLECTION_3D<T,
 Use_Bounding_Box() const
 {
     int num_drawable_objects=0;
-    for(int i(1);i<=opengl_triangulated_surface.Size();i++)
+    for(int i=0;i<opengl_triangulated_surface.Size();i++)
         if(draw_object(i) && use_object_bounding_box(i))
             num_drawable_objects++;
     return draw && num_drawable_objects>0;
@@ -570,7 +570,7 @@ Bounding_Box() const
 {
     RANGE<VECTOR<float,3> > box=RANGE<VECTOR<float,3> >::Empty_Box();
     if(draw)
-        for(int i(1);i<=opengl_triangulated_surface.Size();i++)
+        for(int i=0;i<opengl_triangulated_surface.Size();i++)
             if(rigid_geometry_collection->Is_Active(i) && rigid_geometry_collection->Rigid_Geometry(i).name!="ground")
                 if(draw_object(i) && use_object_bounding_box(i) && opengl_triangulated_surface(i))
                     box=RANGE<VECTOR<float,3> >::Combine(box,opengl_triangulated_surface(i)->Bounding_Box());
@@ -621,9 +621,9 @@ Highlight_Selection(OPENGL_SELECTION *selection)
 template<class T,class RW> void OPENGL_COMPONENT_RIGID_GEOMETRY_COLLECTION_3D<T,RW>::
 Clear_Highlight()
 {
-    for(int i(1);i<=opengl_triangulated_surface.Size();i++)
+    for(int i=0;i<opengl_triangulated_surface.Size();i++)
         if(opengl_triangulated_surface(i)) opengl_triangulated_surface(i)->Clear_Highlight();
-    for(int i(1);i<=opengl_tetrahedralized_volume.Size();i++)
+    for(int i=0;i<opengl_tetrahedralized_volume.Size();i++)
         if(opengl_tetrahedralized_volume(i)) opengl_tetrahedralized_volume(i)->Clear_Highlight();
 }
 //#####################################################################
@@ -670,7 +670,7 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION *selection) co
 template<class T,class RW> void OPENGL_COMPONENT_RIGID_GEOMETRY_COLLECTION_3D<T,RW>::
 Turn_Smooth_Shading_On()
 {
-    for(int i(1);i<=opengl_triangulated_surface.Size();i++)
+    for(int i=0;i<opengl_triangulated_surface.Size();i++)
         if(opengl_triangulated_surface(i)) opengl_triangulated_surface(i)->Turn_Smooth_Shading_On();
 }
 //#####################################################################
@@ -679,7 +679,7 @@ Turn_Smooth_Shading_On()
 template<class T,class RW> void OPENGL_COMPONENT_RIGID_GEOMETRY_COLLECTION_3D<T,RW>::
 Turn_Smooth_Shading_Off()
 {
-    for(int i(1);i<=opengl_triangulated_surface.Size();i++)
+    for(int i=0;i<opengl_triangulated_surface.Size();i++)
         if(opengl_triangulated_surface(i)) opengl_triangulated_surface(i)->Turn_Smooth_Shading_Off();
 }
 //#####################################################################
@@ -688,7 +688,7 @@ Turn_Smooth_Shading_Off()
 template<class T,class RW> void OPENGL_COMPONENT_RIGID_GEOMETRY_COLLECTION_3D<T,RW>::
 Slice_Has_Changed()
 {
-    for(int i(1);i<=opengl_levelset.Size();i++){
+    for(int i=0;i<opengl_levelset.Size();i++){
         if(opengl_levelset(i)) opengl_levelset(i)->Set_Slice(slice);
         if(opengl_levelset(i)) opengl_levelset(i)->Slice_Has_Changed();}
 }

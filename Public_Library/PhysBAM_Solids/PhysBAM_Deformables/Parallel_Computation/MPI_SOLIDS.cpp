@@ -583,7 +583,7 @@ KD_Tree_Partition_Subset(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collect
         throw std::runtime_error("KD_Tree_Partition requires number of processors to be a power of two");
     particles_of_partition.Resize(Number_Of_Partitions());
     ARRAY<TV> X_nodes(Value(nodes.Size()),false);
-    for(typename ARRAY<int,ID>::INDEX i(1);i<=nodes.Size();i++) X_nodes(Value(i))=X(nodes(i));
+    for(typename ARRAY<int,ID>::INDEX i(0);i<nodes.Size();i++) X_nodes(Value(i))=X(nodes(i));
     KD_TREE<TV> kd_tree(false);kd_tree.Create_KD_Tree(X_nodes);PARTITION_ID partition;
     KD_Tree_Partition_Helper(nodes,*kd_tree.root_node,0,height,partition,particles_of_partition);
     LOG::cout<<"Partition Statistics: ";

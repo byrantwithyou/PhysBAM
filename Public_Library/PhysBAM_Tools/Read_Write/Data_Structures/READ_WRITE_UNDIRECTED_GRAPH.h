@@ -22,11 +22,11 @@ public:
     Read_Binary<RW>(input,parent_node_index,child_node_index,object.adjacent_edges);
     if(parent_node_index.Size()!=child_node_index.Size()) PHYSBAM_FATAL_ERROR();
     object.edges.Resize(parent_node_index.Size(),false,false);
-    for(int e(1);e<=object.edges.m;e++){object.edges(e).x=parent_node_index(e);object.edges(e).y=child_node_index(e);}}
+    for(int e(0);e<object.edges.m;e++){object.edges(e).x=parent_node_index(e);object.edges(e).y=child_node_index(e);}}
 
     static void Write(std::ostream& output,const UNDIRECTED_GRAPH_CORE& object)
     {ARRAY<int,int> parent_node_index(object.edges.m,false),child_node_index(object.edges.m,false);
-    for(int e(1);e<=object.edges.m;e++){parent_node_index(e)=object.edges(e).x;child_node_index(e)=object.edges(e).y;}
+    for(int e(0);e<object.edges.m;e++){parent_node_index(e)=object.edges(e).x;child_node_index(e)=object.edges(e).y;}
     Write_Binary<RW>(output,parent_node_index,child_node_index,object.adjacent_edges);}
 };
 

@@ -50,7 +50,7 @@ public:
     void Initialize_Strain(const int parent,FRACTURE_DATA& data)
     {typename RIGID_BODY_CLUSTER_BINDINGS<TV>::CLUSTER& cluster=*bindings.reverse_bindings.Get(parent);
     // compute restlengths  
-    for(RIGID_CLUSTER_CONSTITUENT_ID i(0);i<cluster.children.Size();i++) for(RIGID_CLUSTER_CONSTITUENT_ID j(1);j<i;j++){
+    for(RIGID_CLUSTER_CONSTITUENT_ID i(0);i<cluster.children.Size();i++) for(RIGID_CLUSTER_CONSTITUENT_ID j(0);j<i;j++){
         RIGID_BODY<TV> &child_1=rigid_body_collection.Rigid_Body(cluster.children(i)),&child_2=rigid_body_collection.Rigid_Body(cluster.children(j));
         data.connections.Append(VECTOR<RIGID_CLUSTER_CONSTITUENT_ID,2>(i,j));
         data.restlengths.Append((child_2.Frame().t-child_1.Frame().t).Magnitude());

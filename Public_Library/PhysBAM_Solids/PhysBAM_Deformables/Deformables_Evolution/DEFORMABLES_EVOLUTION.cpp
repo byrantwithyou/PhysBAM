@@ -460,7 +460,7 @@ Initialize_Rigid_Bodies(const T frame_rate, const bool restart)
         kinematic_evolution.Get_Current_Kinematic_Keyframes(1/frame_rate,time);
         kinematic_evolution.Set_External_Positions(rigid_geometry_collection.particles.X,rigid_geometry_collection.particles.rotation,time);
         kinematic_evolution.Set_External_Velocities(rigid_geometry_collection.particles.twist,time,time);
-        for(int i(1);i<=rigid_geometry_collection.particles.array_collection->Size();i++) if(rigid_geometry_collection.Is_Active(i)){rigid_geometry_collection.particles.rotation(i).Normalize();}}
+        for(int i=0;i<rigid_geometry_collection.particles.array_collection->Size();i++) if(rigid_geometry_collection.Is_Active(i)){rigid_geometry_collection.particles.rotation(i).Normalize();}}
 }
 //#####################################################################
 // Function Set_External_Positions

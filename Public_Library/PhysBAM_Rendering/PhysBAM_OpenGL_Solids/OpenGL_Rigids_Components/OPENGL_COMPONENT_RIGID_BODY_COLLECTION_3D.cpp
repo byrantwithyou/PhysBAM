@@ -164,7 +164,7 @@ Reinitialize_Without_Files(const bool force)
         valid=false;
 
         ARRAY<int> needs_init;
-        for(int i(1);i<=articulated_rigid_body->rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if(articulated_rigid_body->rigid_body_collection.Is_Active(i)) needs_init.Append(i);
+        for(int i=0;i<articulated_rigid_body->rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if(articulated_rigid_body->rigid_body_collection.Is_Active(i)) needs_init.Append(i);
 
         // only enlarge array as we read in more geometry to memory
         int max_number_of_bodies=max(extra_components.Size(),rigid_body_collection.rigid_body_particle.array_collection->Size());
@@ -286,10 +286,10 @@ Display(const int in_color) const
         T scale=(T)velocity_field.size/24;
         OPENGL_COLOR::Yellow().Send_To_GL_Pipeline();
         OpenGL_Begin(GL_LINES);
-        for(int i(1);i<=forces_and_torques.Size();i++) if(rigid_body_collection.Is_Active(i)){
+        for(int i=0;i<forces_and_torques.Size();i++) if(rigid_body_collection.Is_Active(i)){
             OpenGL_Line(rigid_body_collection.rigid_body_particle.X(i),rigid_body_collection.rigid_body_particle.X(i)+scale*forces_and_torques(i).x);}
         OpenGL_End();
-        for(int i(1);i<=forces_and_torques.Size();i++) if(rigid_body_collection.Is_Active(i)){
+        for(int i=0;i<forces_and_torques.Size();i++) if(rigid_body_collection.Is_Active(i)){
             std::string label=STRING_UTILITIES::string_sprintf("F=%.3f %.3f %.3f, T=%.3f %.3f %.3f",forces_and_torques(i).x.x,forces_and_torques(i).x.y,forces_and_torques(i).x.z,forces_and_torques(i).y.x,forces_and_torques(i).y.y,forces_and_torques(i).y.z);
             OpenGL_String(rigid_body_collection.rigid_body_particle.X(i)+scale*forces_and_torques(i).x,label);}
         glPopAttrib();}

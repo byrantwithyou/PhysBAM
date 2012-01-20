@@ -589,7 +589,7 @@ Initialize_Rigid_Bodies(const T frame_rate, const bool restart)
         kinematic_evolution.Set_External_Positions(rigid_body_collection.rigid_body_particle.X,rigid_body_collection.rigid_body_particle.rotation,time);
         kinematic_evolution.Set_External_Velocities(rigid_body_collection.rigid_body_particle.twist,time,time);
         rigid_body_collection.Update_Angular_Momentum();
-        for(int i(1);i<=rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if(rigid_body_collection.Is_Active(i)){rigid_body_collection.rigid_body_particle.rotation(i).Normalize();}}
+        for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if(rigid_body_collection.Is_Active(i)){rigid_body_collection.rigid_body_particle.rotation(i).Normalize();}}
 
     RIGID_BODY_COLLISIONS<TV>::Adjust_Bounding_Boxes(rigid_body_collection);
     // rigid body collisions

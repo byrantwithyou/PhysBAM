@@ -312,7 +312,7 @@ CFL_Rigid(const RIGID_BODY_EVOLUTION_PARAMETERS<TV>& rigid_body_evolution_parame
 {
     static T static_min_bounding_box_width=FLT_MAX;
     T min_bounding_box_width=FLT_MAX;
-    for(int i(1);i<=rigid_body_particle.array_collection->Size();i++) if(Is_Active(i)){
+    for(int i=0;i<rigid_body_particle.array_collection->Size();i++) if(Is_Active(i)){
             const RANGE<TV>& box=Rigid_Body(i).Object_Space_Bounding_Box();
             TV edge_lengths=box.Edge_Lengths();min_bounding_box_width=min(min_bounding_box_width,edge_lengths.Min());}
     if(min_bounding_box_width!=static_min_bounding_box_width){

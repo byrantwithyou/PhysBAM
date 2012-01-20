@@ -138,7 +138,7 @@ Process_Collisions(const T dt,const T time,const bool advance_rigid_bodies)
     ARRAY<int> all_added_bodies(0),remove_body_particle_ids(0);
     ARRAY<COLLISION_GEOMETRY_ID> removed_bodies(0);
     if(solids_fluids_parameters.use_fluid_rigid_fracture){
-        for(COLLISION_GEOMETRY_ID p(1);p<=fluids_parameters.collision_bodies_affecting_fluid->collision_geometry_collection.Size();++p){
+        for(COLLISION_GEOMETRY_ID p(0);p<fluids_parameters.collision_bodies_affecting_fluid->collision_geometry_collection.Size();++p){
             ARRAY<int> added_bodies(0);
             if(RIGID_COLLISION_GEOMETRY<TV>* rigid_body_wrapper=dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>*>(fluids_parameters.collision_bodies_affecting_fluid->collision_geometry_collection.bodies(p))){
                 int rigid_particle_index=rigid_body_wrapper->rigid_geometry.particle_index;

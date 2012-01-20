@@ -79,7 +79,7 @@ public:
 
 private:
     int Next_Index(const int h) const // linear probing
-    {return (h&(table.m-1));} // power of two so mod is dropping high order bits
+    {return ((h+1)&(table.m-1));} // power of two so mod is dropping high order bits
 
     int Hash_Index(const TK& v) const
     {return (Hash(v)&(table.m-1));} // power of two so mod is dropping high order bits

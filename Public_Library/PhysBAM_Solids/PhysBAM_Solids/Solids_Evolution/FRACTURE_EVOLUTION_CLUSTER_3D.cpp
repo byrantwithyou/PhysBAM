@@ -24,7 +24,7 @@ Process_Cluster_Fracture(const T dt,const T time,SOLIDS_EVOLUTION<TV>* solids_ev
     if(force){
         LOG::cout<<"Preprocessing CLUSTER fracture"<<std::endl;
         
-        for(int i(1);i<=rigid_body_particles.array_collection->Size();i++) if(rigid_body_particles.Is_Active(i)){
+        for(int i=0;i<rigid_body_particles.array_collection->Size();i++) if(rigid_body_particles.Is_Active(i)){
             if(RIGID_BODY_CLUSTER_3D<T>* rigid_body_cluster=dynamic_cast<RIGID_BODY_CLUSTER_3D<T>*>(&rigid_body_particles.Rigid_Body(i))){
                 if(rigid_body_cluster->perform_cluster_breaks){
                     RIGID_BODY_IMPULSE_ACCUMULATOR<TV,3>& impulse_accumulator=dynamic_cast<RIGID_BODY_IMPULSE_ACCUMULATOR<TV,3>&>(*rigid_body_cluster->impulse_accumulator);
@@ -35,7 +35,7 @@ Process_Cluster_Fracture(const T dt,const T time,SOLIDS_EVOLUTION<TV>* solids_ev
         if(clusters_to_check.m>0){
             LOG::cout<<"---------------- Max impulse above threshold!!"<<std::endl;
             for(int c=0;c<clusters_to_check.m;c++) clusters_to_check(c)->Save_Constituent_Bodies_State(COLLISION_BODY<TV>::SOLIDS_EVOLUTION_RIGID_BODY_NEW_STATE,time+dt);
-            for(int i(1);i<=rigid_body_particles.array_collection->Size();i++) if(rigid_body_particles.Is_Active(i)) rigid_body_particles.Rigid_Body(i).Restore_State(COLLISION_BODY<TV>::SOLIDS_EVOLUTION_RIGID_BODY_OLD_STATE);
+            for(int i=0;i<rigid_body_particles.array_collection->Size();i++) if(rigid_body_particles.Is_Active(i)) rigid_body_particles.Rigid_Body(i).Restore_State(COLLISION_BODY<TV>::SOLIDS_EVOLUTION_RIGID_BODY_OLD_STATE);
             // remove all tagged clusters -- ones that had a greater impulse
             for(int c=0;c<clusters_to_check.m;c++){
                 clusters_to_check(c)->Save_Constituent_Bodies_State(COLLISION_BODY<TV>::SOLIDS_EVOLUTION_RIGID_BODY_OLD_STATE,time);
@@ -59,17 +59,17 @@ Process_Cluster_Fracture(const T dt,const T time,SOLIDS_EVOLUTION<TV>* solids_ev
             solids_parameters.solid_body_collection.deformable_object.Update_Simulated_Particles();
             
             // move all bodies back to old position so that we can evolve using new clusters
-            for(int i(1);i<=rigid_body_particles.array_collection->Size();i++) if(rigid_body_particles.Is_Active(i)) rigid_body_particles.Rigid_Body(i).Restore_State(COLLISION_BODY<TV>::SOLIDS_EVOLUTION_RIGID_BODY_OLD_STATE);
+            for(int i=0;i<rigid_body_particles.array_collection->Size();i++) if(rigid_body_particles.Is_Active(i)) rigid_body_particles.Rigid_Body(i).Restore_State(COLLISION_BODY<TV>::SOLIDS_EVOLUTION_RIGID_BODY_OLD_STATE);
             solids_parameters.solids_evolution->Get_Current_Kinematic_Keyframes(dt,time);
             rigid_body_particles.Reset_Impulse_Accumulators();
             PHYSBAM_FATAL_ERROR("RIGID_DEFORMABLE_EVOLUTION_OLD is gone.");
-            for(int i(1);i<=rigid_body_particles.array_collection->Size();i++) if(rigid_body_particles.Is_Active(i))
+            for(int i=0;i<rigid_body_particles.array_collection->Size();i++) if(rigid_body_particles.Is_Active(i))
                 rigid_body_particles.Rigid_Body(i).Save_State(COLLISION_BODY<TV>::SOLIDS_EVOLUTION_RIGID_BODY_NEW_STATE,time+dt);}
         clusters_to_check.Remove_All();
         previous_time=time;}
     else{
         LOG::cout<<"Preprocessing CLUSTER fracture"<<std::endl;
-        for(int i(1);i<=rigid_body_particles.array_collection->Size();i++) if(rigid_body_particles.Is_Active(i)){
+        for(int i=0;i<rigid_body_particles.array_collection->Size();i++) if(rigid_body_particles.Is_Active(i)){
             if(RIGID_BODY_CLUSTER_3D<T>* rigid_body_cluster=dynamic_cast<RIGID_BODY_CLUSTER_3D<T>*>(&rigid_body_particles.Rigid_Body(i))){
                 if(rigid_body_cluster->perform_cluster_breaks){
                     RIGID_BODY_IMPULSE_ACCUMULATOR<TV,3>& impulse_accumulator=dynamic_cast<RIGID_BODY_IMPULSE_ACCUMULATOR<TV,3>&>(*rigid_body_cluster->impulse_accumulator);
@@ -80,7 +80,7 @@ Process_Cluster_Fracture(const T dt,const T time,SOLIDS_EVOLUTION<TV>* solids_ev
         if(clusters_to_check.m>0){
             LOG::cout<<"---------------- Max impulse above threshold!!"<<std::endl;
         
-            for(int i(1);i<=rigid_body_particles.array_collection->Size();i++) if(rigid_body_particles.Is_Active(i)) rigid_body_particles.Rigid_Body(i).Save_State(COLLISION_BODY<TV>::SOLIDS_EVOLUTION_RIGID_BODY_OLD_STATE);
+            for(int i=0;i<rigid_body_particles.array_collection->Size();i++) if(rigid_body_particles.Is_Active(i)) rigid_body_particles.Rigid_Body(i).Save_State(COLLISION_BODY<TV>::SOLIDS_EVOLUTION_RIGID_BODY_OLD_STATE);
             // remove all tagged clusters -- ones that had a greater impulse
             for(int c=0;c<clusters_to_check.m;c++){
                 clusters_to_check(c)->Save_Constituent_Bodies_State(COLLISION_BODY<TV>::SOLIDS_EVOLUTION_RIGID_BODY_OLD_STATE,time);
@@ -101,7 +101,7 @@ Process_Cluster_Fracture(const T dt,const T time,SOLIDS_EVOLUTION<TV>* solids_ev
             for(int i=0;i<clusters_to_check.m;i++){clusters_to_check(i)->Post_Strain_Calculation();if(clusters_to_check(i)->Create_New_Clusters_Based_On_Strain(solids_parameters.collision_body_list,time,time-previous_time)) delete clusters_to_check(i);}
             
             // move all bodies back to old position so that we can evolve using new clusters
-            for(int i(1);i<=rigid_body_particles.array_collection->Size();i++) if(rigid_body_particles.Is_Active(i)) rigid_body_particles.Rigid_Body(i).Restore_State(COLLISION_BODY<TV>::SOLIDS_EVOLUTION_RIGID_BODY_OLD_STATE);}
+            for(int i=0;i<rigid_body_particles.array_collection->Size();i++) if(rigid_body_particles.Is_Active(i)) rigid_body_particles.Rigid_Body(i).Restore_State(COLLISION_BODY<TV>::SOLIDS_EVOLUTION_RIGID_BODY_OLD_STATE);}
         clusters_to_check.Remove_All();
         previous_time=time;}
 #endif

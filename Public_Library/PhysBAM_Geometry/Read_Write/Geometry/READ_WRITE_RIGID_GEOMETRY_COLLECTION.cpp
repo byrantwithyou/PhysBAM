@@ -37,7 +37,7 @@ Read(const STREAM_TYPE stream_type,const std::string& directory,const int frame,
         object.last_read_active=local_frame;PHYSBAM_ASSERT(version==1);
         if(needs_destroy) for(int i=last_id+1;i<=object.particles.array_collection->Size();i++) if(!object.particles.rigid_geometry(i)) needs_destroy->Append(i);
         object.particles.Resize(last_id);}
-    else for(int id(1);id<=object.particles.array_collection->Size();id++) if(object.Is_Active(id)){active_ids.Append(id);}
+    else for(int id=0;id<object.particles.array_collection->Size();id++) if(object.Is_Active(id)){active_ids.Append(id);}
     if(object.particles.rigid_geometry.Subset(active_ids).Contains(0)){ // don't need to re-read these things if we will not be initializing any newly-active bodies
         std::string key_file_list=STRING_UTILITIES::string_sprintf("%s/common/rigid_body_key_list",directory.c_str());
         std::string key_file=STRING_UTILITIES::string_sprintf("%s/%d/rigid_body_key",directory.c_str(),frame);
@@ -53,7 +53,7 @@ Read(const STREAM_TYPE stream_type,const std::string& directory,const int frame,
             std::istream* input=FILE_UTILITIES::Safe_Open_Input(directory+"/common/rigid_body_names",false);
             int num;*input>>num;input->ignore(INT_MAX,'\n');
             object.rigid_body_names.Resize(num);
-            for(int i(1);i<=object.rigid_body_names.Size();i++) std::getline(*input,object.rigid_body_names(i));
+            for(int i=0;i<object.rigid_body_names.Size();i++) std::getline(*input,object.rigid_body_names(i));
             delete input;}
         catch(FILESYSTEM_ERROR&){
             LOG::cerr<<"Did not find rigid body names."<<std::endl;
@@ -85,7 +85,7 @@ Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame
     // update names
     object.rigid_body_names.Resize(object.particles.array_collection->Size());
     ARRAY<int> active_ids;
-    for(int id(1);id<=object.particles.array_collection->Size();id++) if(object.Is_Active(id)){active_ids.Append(id);object.rigid_body_names(id)=object.Rigid_Geometry(id).name;}
+    for(int id=0;id<object.particles.array_collection->Size();id++) if(object.Is_Active(id)){active_ids.Append(id);object.rigid_body_names(id)=object.Rigid_Geometry(id).name;}
     if(active_ids.m>0 && !(object.check_stale && object.is_stale_active)){
         if(object.check_stale){
             if(!object.frame_list_active) object.frame_list_active=new ARRAY<int>;object.frame_list_active->Append(frame);
@@ -94,7 +94,7 @@ Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame
         FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/rigid_body_active_ids",directory.c_str(),frame),(char)1,object.particles.array_collection->Size(),active_ids);}
     std::ostream* output=FILE_UTILITIES::Safe_Open_Output(directory+"/common/rigid_body_names",false);
     *output<<object.rigid_body_names.Size()<<std::endl;
-    for(int i(1);i<=object.rigid_body_names.Size();i++) *output<<object.rigid_body_names(i)<<std::endl;
+    for(int i=0;i<object.rigid_body_names.Size();i++) *output<<object.rigid_body_names(i)<<std::endl;
     delete output;
     char version=3;
     if(object.particles.structure_ids.m>0 && !(object.check_stale && object.is_stale_key)){
