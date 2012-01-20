@@ -40,7 +40,7 @@ Signed_Volume_Times_Six(const VECTOR<TV,4>& locations)
     for(int i=0;i<24;i++) if(signed_volumes_times_six.Get(permute_four(locations,i),result)){if(!permutation_of_four_is_even(i)) result.x=-result.x;return result;}
     VECTOR<T,2> determinant=Triple_Product(VECTOR<TV,3>(locations[1],locations[2],locations[3]))+Triple_Product(VECTOR<TV,3>(locations[0],locations[3],locations[2]))+
         Triple_Product(VECTOR<TV,3>(locations[0],locations[1],locations[3]))+Triple_Product(VECTOR<TV,3>(locations[0],locations[2],locations[1]));
-    result.x=TV::Triple_Product(locations(2)-locations(1),locations(3)-locations(1),locations(4)-locations(1));
+    result.x=TV::Triple_Product(locations(1)-locations(0),locations(2)-locations(0),locations(3)-locations(0));
     if(abs(determinant.x-determinant.y)<tolerance*(determinant.x+determinant.y)) result.y=false;
     else{result.y=true;
         bool positive1=(determinant.x-determinant.y>0),positive2=(result.x>0);
@@ -54,9 +54,9 @@ Signed_Volume_Times_Six(const VECTOR<TV,4>& locations)
 template<class T> void ROBUST_SIMPLEX_INTERACTIONS<VECTOR<T,3> >::    
 Triangle_Segment_Intersection_Weights(const VECTOR<TV,3>& triangle,const VECTOR<TV,2>& segment,VECTOR<T,2>& triangle_weights,T& segment_weight,bool *is_robust_input)
 {
-    MATRIX<T,3> matrix(triangle(1)-triangle(3),triangle(2)-triangle(3),segment(2)-segment(1));
-    VECTOR<T,3> weights=matrix.Robust_Solve_Linear_System(segment(2)-triangle(3));
-    for(int i=0;i<2;i++) triangle_weights(i)=weights(i);segment_weight=weights(3);
+    MATRIX<T,3> matrix(triangle(0)-triangle(2),triangle(1)-triangle(2),segment(1)-segment(0));
+    VECTOR<T,3> weights=matrix.Robust_Solve_Linear_System(segment(1)-triangle(2));
+    for(int i=0;i<2;i++) triangle_weights(i)=weights(i);segment_weight=weights(2);
 }
 //#####################################################################
 // Function Intersection
@@ -67,7 +67,7 @@ Intersection(const VECTOR<TV,4>& tetrahedron,const VECTOR<TV,2>& segment,bool *i
     bool is_robust=true;
     // Separator plane must contain two tetrahedron vertices and one segment vertex
     for(int i=0;i<3;i++) for(int j=i+1;j<4;j++) for(int k=0;k<2;k++){
-        PAIR<T,bool> volume1=Signed_Volume_Times_Six(VECTOR<TV,4>(tetrahedron(i),tetrahedron(j),segment(k),segment(3-k)));
+        PAIR<T,bool> volume1=Signed_Volume_Times_Six(VECTOR<TV,4>(tetrahedron(i),tetrahedron(j),segment(k),segment(1-k)));
         if(!volume1.y){is_robust=false;continue;}
         for(int l=0;l<4;l++) if(l!=i && l!=j){
             PAIR<T,bool> volume2=Signed_Volume_Times_Six(VECTOR<TV,4>(tetrahedron(i),tetrahedron(j),segment(k),tetrahedron(l)));
@@ -88,10 +88,10 @@ Intersection(const VECTOR<TV,4>& tetrahedron,const VECTOR<TV,3>& triangle,bool *
     bool is_robust=true;
     PAIR<T,bool> volume1,volume2;
     // Case 1 : Entire tetrahedron on same half-space of triangle plane
-    volume1=Signed_Volume_Times_Six(VECTOR<TV,4>(triangle(1),triangle(2),triangle(3),tetrahedron(1)));
+    volume1=Signed_Volume_Times_Six(VECTOR<TV,4>(triangle(0),triangle(1),triangle(2),tetrahedron(0)));
     if(!volume1.y) is_robust=false;
     else for(int i=1;i<4;i++){
-        volume2=Signed_Volume_Times_Six(VECTOR<TV,4>(triangle(1),triangle(2),triangle(3),tetrahedron(i)));if(!volume2.y){is_robust=false;break;}
+        volume2=Signed_Volume_Times_Six(VECTOR<TV,4>(triangle(0),triangle(1),triangle(2),tetrahedron(i)));if(!volume2.y){is_robust=false;break;}
         if((volume1.x>0)^(volume2.x>0)) break;
         if(i==4){if(is_robust_input) *is_robust_input=true;return false;}}
     // Case 2 : Separator plane contains two triangle vertices
@@ -105,9 +105,9 @@ Intersection(const VECTOR<TV,4>& tetrahedron,const VECTOR<TV,3>& triangle,bool *
         Next_Plane1:;}
     // Case 3 : Separator plane contains two tetraherdon vertices
     for(int i=0;i<3;i++) for(int j=i+1;j<4;j++) for(int k=0;k<3;k++){
-        VECTOR<int,2> indices=VECTOR<int,4>(1,2,3,4).Remove_Index(j).Remove_Index(i);
-        volume1=Signed_Volume_Times_Six(VECTOR<TV,4>(tetrahedron(i),tetrahedron(j),triangle(k),tetrahedron(indices(1))));if(!volume1.y){is_robust=false;continue;}
-        volume2=Signed_Volume_Times_Six(VECTOR<TV,4>(tetrahedron(i),tetrahedron(j),triangle(k),tetrahedron(indices(2))));if(!volume2.y){is_robust=false;continue;}
+        VECTOR<int,2> indices=VECTOR<int,4>(0,1,2,3).Remove_Index(j).Remove_Index(i);
+        volume1=Signed_Volume_Times_Six(VECTOR<TV,4>(tetrahedron(i),tetrahedron(j),triangle(k),tetrahedron(indices(0))));if(!volume1.y){is_robust=false;continue;}
+        volume2=Signed_Volume_Times_Six(VECTOR<TV,4>(tetrahedron(i),tetrahedron(j),triangle(k),tetrahedron(indices(1))));if(!volume2.y){is_robust=false;continue;}
         if((volume1.x>0)^(volume2.x>0)) continue;
         for(int l=0;l<3;l++) if(l!=k){
             volume2=Signed_Volume_Times_Six(VECTOR<TV,4>(tetrahedron(i),tetrahedron(j),triangle(k),triangle(l)));if(!volume2.y){is_robust=false;goto Next_Plane2;}
@@ -159,10 +159,10 @@ Intersection(const VECTOR<TV,3>& triangle,const VECTOR<TV,2>& segment,bool *is_r
     bool is_robust=true;
     PAIR<T,bool> area1,area2;
     // Case 1 : Entire triangle on same half-space of segment line
-    area1=Signed_Area_Times_Two(VECTOR<TV,3>(segment(1),segment(2),triangle(1)));
+    area1=Signed_Area_Times_Two(VECTOR<TV,3>(segment(0),segment(1),triangle(0)));
     if(!area1.y) is_robust=false;
     else for(int i=1;i<3;i++){
-        area2=Signed_Area_Times_Two(VECTOR<TV,3>(segment(1),segment(2),triangle(i)));if(!area2.y){is_robust=false;break;}
+        area2=Signed_Area_Times_Two(VECTOR<TV,3>(segment(0),segment(1),triangle(i)));if(!area2.y){is_robust=false;break;}
         if((area1.x>0)^(area2.x>0)) break;
         if(i==4){if(is_robust_input) *is_robust_input=true;return false;}}
     // Case 2 : try combinations of one point on triangle and one point on segment
@@ -188,8 +188,8 @@ Intersection(const VECTOR<TV,3>& triangle,const VECTOR<TV,1>& point,bool *is_rob
     PAIR<T,bool> area1,area2;
     // Iterate over all edges
     for(int triangle_1=0;triangle_1<2;triangle_1++) for(int triangle_2=triangle_1+1;triangle_2<3;triangle_2++){
-        area1=Signed_Area_Times_Two(VECTOR<TV,3>(triangle(triangle_1),triangle(triangle_2),point(1)));if(!area1.y){is_robust=false;continue;}
-        int other_triangle_index=VECTOR<int,3>(1,2,3).Remove_Index(triangle_2).Remove_Index(triangle_1)[0];
+        area1=Signed_Area_Times_Two(VECTOR<TV,3>(triangle(triangle_1),triangle(triangle_2),point(0)));if(!area1.y){is_robust=false;continue;}
+        int other_triangle_index=VECTOR<int,3>(0,1,2).Remove_Index(triangle_2).Remove_Index(triangle_1)[0];
         area2=Signed_Area_Times_Two(VECTOR<TV,3>(triangle(triangle_1),triangle(triangle_2),triangle(other_triangle_index)));if(!area2.y){is_robust=false;continue;}
         if((area1.x>0)^(area2.x<0)) continue;
         if(is_robust_input) *is_robust_input=true;return false;}

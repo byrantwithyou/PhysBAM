@@ -54,7 +54,7 @@ public:
     {return 2;}
 
     VECTOR<T,2> Column(const int axis) const
-    {assert((unsigned)axis<2);return axis==1?VECTOR<T,2>(x11,x21):VECTOR<T,2>(x21,x22);}
+    {assert((unsigned)axis<2);return axis==0?VECTOR<T,2>(x11,x21):VECTOR<T,2>(x21,x22);}
 
     T& operator()(int i,int j)
     {return i<j?Element_Upper(i,j):Element_Lower(i,j);}

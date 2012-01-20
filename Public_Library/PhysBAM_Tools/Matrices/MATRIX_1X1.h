@@ -87,10 +87,10 @@ public:
     {return !(*this==A);}
 
     VECTOR<T,1> Column_Sum() const
-    {return Column(1);}
+    {return Column(0);}
 
     VECTOR<T,1> Column_Magnitudes() const
-    {return VECTOR<T,1>(Column(1).Magnitude());}
+    {return VECTOR<T,1>(Column(0).Magnitude());}
 
     MATRIX Inverse() const
     {assert(x11);return MATRIX(1/x11);}
