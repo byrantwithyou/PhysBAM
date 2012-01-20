@@ -40,16 +40,16 @@ Store(const int point_index,const int face_index)
     POINT_FACE_REPULSION_PAIR<TV> pair;pair.nodes=face_nodes.Insert(p,1);
     T total_repulsion_thickness=thickness_multiplier*pair.Total_Repulsion_Thickness(repulsion_thickness);
     T_FACE face(X_other.Subset(face_nodes));
-    if(!face.Point_Face_Interaction(X_other(pair.nodes[1]),total_repulsion_thickness,false,pair.distance)) pruned++;
+    if(!face.Point_Face_Interaction(X_other(pair.nodes[0]),total_repulsion_thickness,false,pair.distance)) pruned++;
     else{
         if(omit_point_face_repulsion_pairs.Size() && omit_point_face_repulsion_pairs.Contains(pair.nodes)) return;
         if(intersecting_point_face_pairs.Size() && intersecting_point_face_pairs.Contains(pair.nodes)) return;
         T distance;
         if(&X_other!=&X_self_collision_free && perform_attractions){
             T_FACE face(X_self_collision_free.Subset(face_nodes));
-            face.Point_Face_Interaction(X_self_collision_free(pair.nodes[1]),total_repulsion_thickness,false,distance);}
+            face.Point_Face_Interaction(X_self_collision_free(pair.nodes[0]),total_repulsion_thickness,false,distance);}
         else distance=pair.distance;
-        if(distance<0){exchange(pair.nodes[d],pair.nodes[d+1]);pair.distance=-pair.distance;}
+        if(distance<0){exchange(pair.nodes[d-1],pair.nodes[d]);pair.distance=-pair.distance;}
         pairs.Append(pair);}
 }
 //####################################################################

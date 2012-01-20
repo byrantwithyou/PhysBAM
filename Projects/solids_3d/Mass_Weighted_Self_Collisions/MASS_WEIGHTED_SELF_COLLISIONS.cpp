@@ -70,57 +70,57 @@ Initialize_Bodies()
     switch(test_number){
         case 1:{
             particles.array_collection->Add_Elements(4);
-            particles.X(1)=TV(0,0,0);particles.mass(1)=(T).00333333;particles.V(1)=TV(0,-(T).1,0);
-            particles.X(2)=TV((T)0.01,0,0);particles.mass(2)=(T).00333333;particles.V(2)=TV(0,-(T).1,0);
-            particles.X(3)=TV(0,0,(T)0.01);particles.mass(3)=(T).00333333;particles.V(3)=TV(0,-(T).1,0);
-            //particles.X(4)=TV((T).0025,-(T).01,(T).0025);// THIS IS SET BELOW
-            particles.mass(4)=(T).01;particles.V(4)=TV(0,(T).1,0); 
+            particles.X(0)=TV(0,0,0);particles.mass(0)=(T).00333333;particles.V(0)=TV(0,-(T).1,0);
+            particles.X(1)=TV((T)0.01,0,0);particles.mass(1)=(T).00333333;particles.V(1)=TV(0,-(T).1,0);
+            particles.X(2)=TV(0,0,(T)0.01);particles.mass(2)=(T).00333333;particles.V(2)=TV(0,-(T).1,0);
+            //particles.X(3)=TV((T).0025,-(T).01,(T).0025);// THIS IS SET BELOW
+            particles.mass(3)=(T).01;particles.V(3)=TV(0,(T).1,0); 
             TRIANGULATED_SURFACE<T>& surface=*TRIANGULATED_SURFACE<T>::Create(particles);
-            surface.mesh.elements.Append(VECTOR<int,3>(1,2,3));
+            surface.mesh.elements.Append(VECTOR<int,3>(0,1,2));
             FREE_PARTICLES<TV>& free_particles=*FREE_PARTICLES<TV>::Create(particles);
-            particles.X(4)=surface.Get_Element(1).Center()+TV(0,(T)-.01,0);
-            free_particles.nodes.Append(4);
+            particles.X(3)=surface.Get_Element(0).Center()+TV(0,(T)-.01,0);
+            free_particles.nodes.Append(3);
             deformable_body_collection.deformable_geometry.Add_Structure(&surface);
             deformable_body_collection.deformable_geometry.Add_Structure(&free_particles);
         }break;
         case 2:{
             particles.array_collection->Add_Elements(4);
-            particles.X(1)=TV(0,0,(T).005);particles.mass(1)=(T).00333333;particles.V(1)=TV(0,(T).1,0);
-            particles.X(2)=TV((T)0.01,0,(T).005);particles.mass(2)=(T).00333333;particles.V(2)=TV(0,(T).1,0);
-            particles.X(3)=TV((T).005,(T).01,0);particles.mass(3)=(T).00333333;particles.V(3)=TV(0,-(T).1,0);
-            particles.X(4)=TV((T).005,(T).01,(T).01);particles.mass(4)=(T).00333333;particles.V(4)=TV(0,-(T).1,0); 
+            particles.X(0)=TV(0,0,(T).005);particles.mass(0)=(T).00333333;particles.V(0)=TV(0,(T).1,0);
+            particles.X(1)=TV((T)0.01,0,(T).005);particles.mass(1)=(T).00333333;particles.V(1)=TV(0,(T).1,0);
+            particles.X(2)=TV((T).005,(T).01,0);particles.mass(2)=(T).00333333;particles.V(2)=TV(0,-(T).1,0);
+            particles.X(3)=TV((T).005,(T).01,(T).01);particles.mass(3)=(T).00333333;particles.V(3)=TV(0,-(T).1,0); 
             SEGMENTED_CURVE<TV>& curve=*SEGMENTED_CURVE<TV>::Create(particles);
-            curve.mesh.elements.Append(VECTOR<int,2>(1,2));
-            curve.mesh.elements.Append(VECTOR<int,2>(3,4));
+            curve.mesh.elements.Append(VECTOR<int,2>(0,1));
+            curve.mesh.elements.Append(VECTOR<int,2>(2,3));
             deformable_body_collection.deformable_geometry.Add_Structure(&curve);
         }break;
         case 3:{
             particles.array_collection->Add_Elements(4);
-            particles.X(1)=TV((T).1,(T).1,0);particles.mass(1)=(T).00333333;particles.V(1)=TV(0,0,0);
-            particles.X(2)=TV(0,(T).1,0);particles.mass(2)=(T).00333333;particles.V(2)=TV(0,0,0);
-            particles.X(3)=TV((T).1,(T).15,(T).1);particles.mass(3)=(T).00333333;particles.V(3)=TV(0,0,-(T).1);
-            particles.X(4)=TV(0,(T).09,(T).1);particles.mass(4)=(T).00333333;particles.V(4)=TV(0,0,-(T).1); 
+            particles.X(0)=TV((T).1,(T).1,0);particles.mass(0)=(T).00333333;particles.V(0)=TV(0,0,0);
+            particles.X(1)=TV(0,(T).1,0);particles.mass(1)=(T).00333333;particles.V(1)=TV(0,0,0);
+            particles.X(2)=TV((T).1,(T).15,(T).1);particles.mass(2)=(T).00333333;particles.V(2)=TV(0,0,-(T).1);
+            particles.X(3)=TV(0,(T).09,(T).1);particles.mass(3)=(T).00333333;particles.V(3)=TV(0,0,-(T).1); 
             SEGMENTED_CURVE<TV>& curve=*SEGMENTED_CURVE<TV>::Create(particles);
-            curve.mesh.elements.Append(VECTOR<int,2>(1,2));
-            curve.mesh.elements.Append(VECTOR<int,2>(3,4));
+            curve.mesh.elements.Append(VECTOR<int,2>(0,1));
+            curve.mesh.elements.Append(VECTOR<int,2>(2,3));
             deformable_body_collection.deformable_geometry.Add_Structure(&curve);
         }break;
         case 4:{
             int max=5;
             particles.array_collection->Add_Elements(4*max);
             for (int i=0;i<max;i++) {
-                particles.X(4*i+1)=TV(0,(T).02*i,0);particles.mass(4*i+1)=(T).00333333;particles.V(4*i+1)=TV(0,-(T).1,0);
-                particles.X(4*i+2)=TV((T)0.01,(T).02*i,0);particles.mass(4*i+2)=(T).00333333;particles.V(4*i+2)=TV(0,-(T).1,0);
-                particles.X(4*i+3)=TV(0,(T).02*i,(T)0.01);particles.mass(4*i+3)=(T).00333333;particles.V(4*i+3)=TV(0,-(T).1,0);
-                particles.mass(4*i+4)=(T).01;particles.V(4*i+4)=TV(0,-(T).1,0); 
+                particles.X(4*i)=TV(0,(T).02*i,0);particles.mass(4*i)=(T).00333333;particles.V(4*i)=TV(0,-(T).1,0);
+                particles.X(4*i+1)=TV((T)0.01,(T).02*i,0);particles.mass(4*i+1)=(T).00333333;particles.V(4*i+1)=TV(0,-(T).1,0);
+                particles.X(4*i+2)=TV(0,(T).02*i,(T)0.01);particles.mass(4*i+2)=(T).00333333;particles.V(4*i+2)=TV(0,-(T).1,0);
+                particles.mass(4*i+3)=(T).01;particles.V(4*i+3)=TV(0,-(T).1,0); 
             }
-            particles.V(1)=TV(0,(T).1,0);particles.V(2)=TV(0,(T).1,0);particles.V(3)=TV(0,(T).1,0);
+            particles.V(0)=TV(0,(T).1,0);particles.V(1)=TV(0,(T).1,0);particles.V(2)=TV(0,(T).1,0);
             TRIANGULATED_SURFACE<T>& surface=*TRIANGULATED_SURFACE<T>::Create(particles);
-            for (int i=0;i<max;i++) surface.mesh.elements.Append(VECTOR<int,3>(4*i+1,4*i+2,4*i+3));
+            for (int i=0;i<max;i++) surface.mesh.elements.Append(VECTOR<int,3>(4*i,4*i+1,4*i+2));
             FREE_PARTICLES<TV>& free_particles=*FREE_PARTICLES<TV>::Create(particles);
             for (int i=0;i<max;i++) {
-                particles.X(4*i+4)=surface.Get_Element(i+1).Center()+TV(0,(T).01,0);
-                free_particles.nodes.Append(4*i+4);
+                particles.X(4*i+3)=surface.Get_Element(i+1).Center()+TV(0,(T).01,0);
+                free_particles.nodes.Append(4*i+3);
             }
             deformable_body_collection.deformable_geometry.Add_Structure(&surface);
             deformable_body_collection.deformable_geometry.Add_Structure(&free_particles);
@@ -149,20 +149,20 @@ Initialize_Bodies()
     // Forces
     switch(test_number){
         case 1:{
-            TRIANGULATED_SURFACE<T>& surface=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>&>(1);
+            TRIANGULATED_SURFACE<T>& surface=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>&>(0);
             //solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,false));
             solid_body_collection.Add_Force(Create_Edge_Springs(surface,(T)1000,(T)2)); // were *2 and *10
         }break;
         case 2:{
-            SEGMENTED_CURVE<TV>& curve=deformable_body_collection.deformable_geometry.template Find_Structure<SEGMENTED_CURVE<TV>&>(1);
+            SEGMENTED_CURVE<TV>& curve=deformable_body_collection.deformable_geometry.template Find_Structure<SEGMENTED_CURVE<TV>&>(0);
             solid_body_collection.Add_Force(Create_Edge_Springs(curve,(T)1000,(T)2)); // were *2 and *10
         }break;
         case 3:{
-            SEGMENTED_CURVE<TV>& curve=deformable_body_collection.deformable_geometry.template Find_Structure<SEGMENTED_CURVE<TV>&>(1);
+            SEGMENTED_CURVE<TV>& curve=deformable_body_collection.deformable_geometry.template Find_Structure<SEGMENTED_CURVE<TV>&>(0);
             solid_body_collection.Add_Force(Create_Edge_Springs(curve,(T)1000,(T)2)); // were *2 and *10
         }break;
         case 4:{
-            TRIANGULATED_SURFACE<T>& surface=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>&>(1);
+            TRIANGULATED_SURFACE<T>& surface=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>&>(0);
             //solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,false));
             solid_body_collection.Add_Force(Create_Edge_Springs(surface,(T)1000,(T)2)); // were *2 and *10
         }break;
@@ -177,9 +177,9 @@ Point_Face_Mass(const T attempt_ratio,const VECTOR<int,4>& nodes,const VECTOR<T,
     T factor = (T)0.5-sqr(attempt_ratio)/(T)2.;    
     TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY<TV>& geometry=solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry;
     const ARRAY<TV>& X=geometry.X_self_collision_free;
-    VECTOR<T,3> X_embedded=weights[1]*X(nodes[2])+weights[2]*X(nodes[3])+weights[3]*X(nodes[4]);
-    if(X_embedded.y<X(nodes[1]).y) {one_over_mass[2]*=factor;one_over_mass[3]*=factor;one_over_mass[4]*=factor;}
-    else one_over_mass[1]*=factor;
+    VECTOR<T,3> X_embedded=weights[0]*X(nodes[1])+weights[1]*X(nodes[2])+weights[2]*X(nodes[3]);
+    if(X_embedded.y<X(nodes[0]).y) {one_over_mass[1]*=factor;one_over_mass[2]*=factor;one_over_mass[3]*=factor;}
+    else one_over_mass[0]*=factor;
 }
 //#####################################################################
 // Function Point_Face_Mass
@@ -191,16 +191,16 @@ Point_Face_Mass(const T attempt_ratio,const VECTOR<int,4>& nodes,const VECTOR<T,
     saved_mass=one_over_mass.Subset(nodes);
     TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY<TV>& geometry=solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry;
     const ARRAY<TV>& X=geometry.X_self_collision_free;
-    VECTOR<T,3> X_embedded=weights[1]*X(nodes[2])+weights[2]*X(nodes[3])+weights[3]*X(nodes[4]);
-    if(X_embedded.y<X(nodes[1]).y) {one_over_mass(nodes[2])*=factor;one_over_mass(nodes[3])*=factor;one_over_mass(nodes[4])*=factor;}
-    else one_over_mass(nodes[1])*=factor;
+    VECTOR<T,3> X_embedded=weights[0]*X(nodes[1])+weights[1]*X(nodes[2])+weights[2]*X(nodes[3]);
+    if(X_embedded.y<X(nodes[0]).y) {one_over_mass(nodes[1])*=factor;one_over_mass(nodes[2])*=factor;one_over_mass(nodes[3])*=factor;}
+    else one_over_mass(nodes[0])*=factor;
 }
 //#####################################################################
 // Function Point_Face_Mass_Revert
 //#####################################################################
 template<class T_input> void MASS_WEIGHTED_SELF_COLLISIONS<T_input>::
 Point_Face_Mass_Revert(const VECTOR<int,4>& nodes,ARRAY_VIEW<T>& one_over_mass)
-{one_over_mass(nodes[1])=saved_mass[1];one_over_mass(nodes[2])=saved_mass[2];one_over_mass(nodes[3])=saved_mass[3];one_over_mass(nodes[4])=saved_mass[4];}
+{one_over_mass(nodes[0])=saved_mass[0];one_over_mass(nodes[1])=saved_mass[1];one_over_mass(nodes[2])=saved_mass[2];one_over_mass(nodes[3])=saved_mass[3];}
 //#####################################################################
 // Function Edge_Edge_Mass
 //#####################################################################
@@ -210,9 +210,9 @@ Edge_Edge_Mass(const T attempt_ratio,const VECTOR<int,4>& nodes,const VECTOR<T,2
     T factor = (T)0.5-sqr(attempt_ratio)/(T)2.;    
     TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY<TV>& geometry=solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry;
     const ARRAY<TV>& X=geometry.X_self_collision_free;
-    VECTOR<T,3> X_embedded1=(1-weights[1])*X(nodes[1])+weights[1]*X(nodes[2]),X_embedded2=(1-weights[2])*X(nodes[3])+weights[2]*X(nodes[4]);
-    if(X_embedded1.y<X_embedded2.y){one_over_mass[1]*=factor;one_over_mass[2]*=factor;}
-    else{one_over_mass[3]*=factor;one_over_mass[4]*=factor;}
+    VECTOR<T,3> X_embedded1=(1-weights[0])*X(nodes[0])+weights[0]*X(nodes[1]),X_embedded2=(1-weights[1])*X(nodes[2])+weights[1]*X(nodes[3]);
+    if(X_embedded1.y<X_embedded2.y){one_over_mass[0]*=factor;one_over_mass[1]*=factor;}
+    else{one_over_mass[2]*=factor;one_over_mass[3]*=factor;}
 }
 //#####################################################################
 // Function Edge_Edge_Mass
@@ -224,16 +224,16 @@ Edge_Edge_Mass(const T attempt_ratio,const VECTOR<int,4>& nodes,const VECTOR<T,2
     saved_mass=one_over_mass.Subset(nodes);
     TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY<TV>& geometry=solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry;
     const ARRAY<TV>& X=geometry.X_self_collision_free;
-    VECTOR<T,3> X_embedded1=(1-weights[1])*X(nodes[1])+weights[1]*X(nodes[2]),X_embedded2=(1-weights[2])*X(nodes[3])+weights[2]*X(nodes[4]);
-    if(X_embedded1.y<X_embedded2.y){one_over_mass(nodes[1])*=factor;one_over_mass(nodes[2])*=factor;}
-    else{one_over_mass(nodes[3])*=factor;one_over_mass(nodes[4])*=factor;}
+    VECTOR<T,3> X_embedded1=(1-weights[0])*X(nodes[0])+weights[0]*X(nodes[1]),X_embedded2=(1-weights[1])*X(nodes[2])+weights[1]*X(nodes[3]);
+    if(X_embedded1.y<X_embedded2.y){one_over_mass(nodes[0])*=factor;one_over_mass(nodes[1])*=factor;}
+    else{one_over_mass(nodes[2])*=factor;one_over_mass(nodes[3])*=factor;}
 }
 //#####################################################################
 // Function Edge_Edge_Mass_Revert
 //#####################################################################
 template<class T_input> void MASS_WEIGHTED_SELF_COLLISIONS<T_input>::
 Edge_Edge_Mass_Revert(const VECTOR<int,4>& nodes,ARRAY_VIEW<T>& one_over_mass)
-{one_over_mass(nodes[1])=saved_mass[1];one_over_mass(nodes[2])=saved_mass[2];one_over_mass(nodes[3])=saved_mass[3];one_over_mass(nodes[4])=saved_mass[4];}
+{one_over_mass(nodes[0])=saved_mass[0];one_over_mass(nodes[1])=saved_mass[1];one_over_mass(nodes[2])=saved_mass[2];one_over_mass(nodes[3])=saved_mass[3];}
 //#####################################################################
 // Function Reorder_Pairs
 //#####################################################################

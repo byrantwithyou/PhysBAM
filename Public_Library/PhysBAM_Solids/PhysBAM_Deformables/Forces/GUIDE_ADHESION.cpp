@@ -66,16 +66,16 @@ Update_Springs(const bool search_hierarchy)
     ARRAY<VECTOR<int,2> > deletion_list;
     T_SPRING_HASH* new_springs=search_hierarchy?new T_SPRING_HASH():0; // many deletes can hurt open addressed hash table, use "generational" garbage collection
     for(typename HASHTABLE<VECTOR<int,2>,SPRING_STATE>::ITERATOR i(*springs);i.Valid();i.Next()){
-        const VECTOR<int,2> &segment1_nodes=guide_curve.mesh.elements(i.Key()[1]),&segment2_nodes=curve.mesh.elements(i.Key()[2]);
+        const VECTOR<int,2> &segment1_nodes=guide_curve.mesh.elements(i.Key()[0]),&segment2_nodes=curve.mesh.elements(i.Key()[1]);
         SPRING_STATE& state=i.Data();
         SEGMENT_3D<T> segment1(guide_curve.particles.X.Subset(segment1_nodes)),segment2(curve.particles.X.Subset(segment2_nodes));
-        TV X1=(1-state.weights[1])*segment1.x1+state.weights[1]*segment1.x2;
-        TV X2=(1-state.weights[2])*segment2.x1+state.weights[2]*segment2.x2;
+        TV X1=(1-state.weights[0])*segment1.x1+state.weights[0]*segment1.x2;
+        TV X2=(1-state.weights[1])*segment2.x1+state.weights[1]*segment2.x2;
         state.normal=X1-X2; 
         state.distance=state.normal.Normalize();
         if(state.distance>thickness){
             deletion_list.Append(i.Key());
-            segments_with_springs(i.Key()[1])--;}}
+            segments_with_springs(i.Key()[0])--;}}
     //if(!new_springs) for(int i=0;i<deletion_list.m;i++)springs->Delete(deletion_list(i));
 
     if(search_hierarchy){ 
@@ -108,18 +108,18 @@ Update_Springs(const bool search_hierarchy)
             if(min_index==-1) continue;
             const VECTOR<int,2> &segment1_nodes=guide_curve.mesh.elements(min_index),&segment2_nodes=curve.mesh.elements(i);
             SEGMENT_3D<T> segment1(guide_curve.particles.X.Subset(segment1_nodes)),segment2(curve.particles.X.Subset(segment2_nodes));
-            TV X1=(1-state.weights[1])*segment1.x1+state.weights[1]*segment1.x2;
-            TV X2=(1-state.weights[2])*segment2.x1+state.weights[2]*segment2.x2;
-            assert(particle_to_spring_id(segment1_nodes[1])==particle_to_spring_id(segment1_nodes[2]));
-            assert(particle_to_spring_id(segment2_nodes[1])==particle_to_spring_id(segment2_nodes[2]));
-            TV guide_root=guide_curve.particles.X(roots(particle_to_spring_id(segment1_nodes[1])));
-            TV curve_root=curve.particles.X(roots(particle_to_spring_id(segment2_nodes[1])));
+            TV X1=(1-state.weights[0])*segment1.x1+state.weights[0]*segment1.x2;
+            TV X2=(1-state.weights[1])*segment2.x1+state.weights[1]*segment2.x2;
+            assert(particle_to_spring_id(segment1_nodes[0])==particle_to_spring_id(segment1_nodes[1]));
+            assert(particle_to_spring_id(segment2_nodes[0])==particle_to_spring_id(segment2_nodes[1]));
+            TV guide_root=guide_curve.particles.X(roots(particle_to_spring_id(segment1_nodes[0])));
+            TV curve_root=curve.particles.X(roots(particle_to_spring_id(segment2_nodes[0])));
             state.normal=X1-X2;
             state.distance=state.normal.Normalize();
             state.restlength=(guide_root-curve_root).Magnitude();
             state.nodes=guide_curve.mesh.elements(min_index).Append_Elements(segment_nodes);
-            T harmonic_mass=Pseudo_Inverse((T).25*(one_over_effective_mass(state.nodes[1])+one_over_effective_mass(state.nodes[2])
-                +one_over_effective_mass(state.nodes[3])+one_over_effective_mass(state.nodes[4])));
+            T harmonic_mass=Pseudo_Inverse((T).25*(one_over_effective_mass(state.nodes[0])+one_over_effective_mass(state.nodes[1])
+                +one_over_effective_mass(state.nodes[2])+one_over_effective_mass(state.nodes[3])));
             state.damping=overdamping_fraction*2*sqrt(youngs_modulus*state.restlength*harmonic_mass);
             new_springs->Insert(VECTOR<int,2>(min_index,i),state);
             segments_with_springs(min_index)++;
@@ -151,8 +151,8 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
     for(HASHTABLE_ITERATOR<VECTOR<int,2>,const SPRING_STATE> i(*springs);i.Valid();i.Next()){
         const SPRING_STATE& state=i.Data();
         TV force=youngs_modulus*(state.distance/state.restlength-(T)1)*state.normal;
-        F(state.nodes[1])-=((T)1-state.weights[1])*force;F(state.nodes[2])-=state.weights[1]*force;
-        F(state.nodes[3])+=((T)1-state.weights[2])*force;F(state.nodes[4])+=state.weights[2]*force;
+        F(state.nodes[0])-=((T)1-state.weights[0])*force;F(state.nodes[1])-=state.weights[0]*force;
+        F(state.nodes[2])+=((T)1-state.weights[1])*force;F(state.nodes[3])+=state.weights[1]*force;
     }
 }
 //#####################################################################
@@ -163,10 +163,10 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
 {
     for(HASHTABLE_ITERATOR<VECTOR<int,2>,const SPRING_STATE> i(*springs);i.Valid();i.Next()){
         const SPRING_STATE& state=i.Data();
-        TV force=state.damping/state.restlength*TV::Dot_Product(((T)1-state.weights[1])*V(state.nodes[1])+state.weights[1]*V(state.nodes[2])
-                                       -((T)1-state.weights[2])*V(state.nodes[3])-state.weights[2]*V(state.nodes[4]),state.normal)*state.normal;
-        F(state.nodes[1])-=((T)1-state.weights[1])*force;F(state.nodes[2])-=state.weights[1]*force;
-        F(state.nodes[3])+=((T)1-state.weights[2])*force;F(state.nodes[4])+=state.weights[2]*force;
+        TV force=state.damping/state.restlength*TV::Dot_Product(((T)1-state.weights[0])*V(state.nodes[0])+state.weights[0]*V(state.nodes[1])
+                                       -((T)1-state.weights[1])*V(state.nodes[2])-state.weights[1]*V(state.nodes[3]),state.normal)*state.normal;
+        F(state.nodes[0])-=((T)1-state.weights[0])*force;F(state.nodes[1])-=state.weights[0]*force;
+        F(state.nodes[2])+=((T)1-state.weights[1])*force;F(state.nodes[3])+=state.weights[1]*force;
     }
 }
 //#####################################################################
