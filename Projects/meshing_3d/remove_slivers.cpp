@@ -22,8 +22,8 @@ int main(int argc,char **argv)
     parse_args.Set_Extra_Arguments(2,"<input.tet> <output.tet>");
     parse_args.Parse(argc,argv);
 
-    std::string input_file=parse_args.Extra_Arg(1);
-    std::string output_file=parse_args.Extra_Arg(2);
+    std::string input_file=parse_args.Extra_Arg(0);
+    std::string output_file=parse_args.Extra_Arg(1);
     T aspect_ratio=parse_args.Get_Double_Value("-aspect_ratio"); 
 
     TETRAHEDRON_MESH tetrahedron_mesh;

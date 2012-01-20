@@ -26,7 +26,7 @@ int main(int argc,char **argv)
     parse_args.Set_Extra_Arguments(1,"<parameter file>");
     parse_args.Parse(argc,argv);
 
-    std::string parameter_file=parse_args.Extra_Arg(1);
+    std::string parameter_file=parse_args.Extra_Arg(0);
     Initialize_Particles();
     Initialize_Read_Write_General_Structures();
     GENERIC_EXAMPLE<T> example(stream_type,parameter_file);

@@ -13,9 +13,9 @@ using namespace PhysBAM;
 template<class TV> TV BOX<TV>::
 Normal(const int aggregate) const
 {
-    assert(aggregate>=1 && aggregate<=d*2);
-    TV direction=TV::Axis_Vector((aggregate+1)>>1);
-    return (aggregate&1)?-direction:direction;
+    assert(aggregate>=0 && aggregate<d*2);
+    TV direction=TV::Axis_Vector(aggregate>>1);
+    return (aggregate&1)?direction:-direction;
 }
 //#####################################################################
 // Function Surface

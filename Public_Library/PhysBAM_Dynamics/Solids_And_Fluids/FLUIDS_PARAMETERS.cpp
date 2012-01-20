@@ -28,7 +28,7 @@ using namespace PhysBAM;
 template<class T_GRID> FLUIDS_PARAMETERS<T_GRID>::
 FLUIDS_PARAMETERS(const TYPE type)
     :smoke(type==SMOKE),fire(type==FIRE),water(type==WATER),sph(type==SPH),compressible(type==COMPRESSIBLE),quadtree(false),octree(false),
-    number_of_ghost_cells(3),cfl((T).9),gravity((T)9.8),gravity_direction(-TV::Axis_Vector(TV::m==1?1:2)),grid(new T_GRID()),need_destroy_grid(true),maximum_tree_depth(1),
+    number_of_ghost_cells(3),cfl((T).9),gravity((T)9.8),gravity_direction(-TV::Axis_Vector(TV::m==1?0:1)),grid(new T_GRID()),need_destroy_grid(true),maximum_tree_depth(1),
     levelset_refinement_bandwidth(6),minimal_air_bandwidth(false),
     phi_boundary_reflection(*new T_BOUNDARY_REFLECTION(VECTOR_UTILITIES::Complement(domain_walls))),phi_boundary_water(*new T_BOUNDARY_PHI_WATER),
     particle_half_bandwidth(3),reseeding_frame_rate(20),reinitialize_geometry_frame_rate(1),bias_towards_negative_particles(false),
@@ -106,7 +106,7 @@ FLUIDS_PARAMETERS(const TYPE type)
     turbulence_grid=Default_Turbulence_Grid();
 
     domain_walls.Fill(VECTOR<bool,2>::Constant_Vector(true));
-    domain_walls(TV::m==1?1:2)(2)=false;
+    domain_walls(TV::m==1?0:1)(1)=false;
 }
 //#####################################################################
 // Destructor

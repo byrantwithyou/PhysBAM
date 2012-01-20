@@ -222,9 +222,9 @@ int main(int argc, char *argv[])
     parse_args.Set_Extra_Arguments(-1, "<scene file> <output scene file> <frame number>");
     parse_args.Parse(argc,argv);
     if(parse_args.Num_Extra_Args() != 3){parse_args.Print_Usage();exit(0);}
-    std::string scene_filename=parse_args.Extra_Arg(1);
-    std::string output_filename=parse_args.Extra_Arg(2);
-    int frame_number=atoi(parse_args.Extra_Arg(3).c_str());
+    std::string scene_filename=parse_args.Extra_Arg(0);
+    std::string output_filename=parse_args.Extra_Arg(1);
+    int frame_number=atoi(parse_args.Extra_Arg(2).c_str());
 
     std::ifstream fin(scene_filename.c_str());
     std::ofstream fout(output_filename.c_str());

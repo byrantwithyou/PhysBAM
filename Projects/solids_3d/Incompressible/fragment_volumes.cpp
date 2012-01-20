@@ -22,7 +22,7 @@ int main(int argc,char* argv[])
     parse_args.Parse(argc,argv);
 
     int start_frame=0,last_frame=0;
-    if(parse_args.Num_Extra_Args()>=1) start_frame=last_frame=atoi(parse_args.Extra_Arg(1).c_str());
+    if(parse_args.Num_Extra_Args()>=1) start_frame=last_frame=atoi(parse_args.Extra_Arg(0).c_str());
     else FILE_UTILITIES::Read_From_Text_File("last_frame",last_frame);
 
     BOX<VECTOR<T,1> > volume_box=BOX<VECTOR<T,1> >(FLT_MAX,-FLT_MAX);T rest_volume=(T)4.85889;

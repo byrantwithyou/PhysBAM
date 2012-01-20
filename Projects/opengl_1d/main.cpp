@@ -102,7 +102,7 @@ Parse_Arguments(PARSE_ARGS& parse_args)
     if(parse_args.Num_Extra_Args()>1)
         parse_args.Print_Usage(true);
     else if(parse_args.Num_Extra_Args()==1)
-        basedir=parse_args.Extra_Arg(1);
+        basedir=parse_args.Extra_Arg(0);
 
     last_frame_filename=basedir+"/common/last_frame";
 

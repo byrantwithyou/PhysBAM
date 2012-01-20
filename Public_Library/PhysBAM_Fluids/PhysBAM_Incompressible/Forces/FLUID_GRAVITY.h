@@ -20,7 +20,7 @@ public:
     T gravity;
     TV gravity_direction;
 
-    FLUID_GRAVITY(T gravity=(T)9.8,TV gravity_direction=-TV::Axis_Vector(TV::m==1?1:2))
+    FLUID_GRAVITY(T gravity=(T)9.8,TV gravity_direction=-TV::Axis_Vector(TV::m==1?0:1))
         :gravity(gravity),gravity_direction(gravity_direction)
     {}
 

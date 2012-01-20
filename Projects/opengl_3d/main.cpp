@@ -158,7 +158,7 @@ Parse_Arguments(PARSE_ARGS &parse_args)
     if(parse_args.Num_Extra_Args() > 1)
         parse_args.Print_Usage(true);
     else if(parse_args.Num_Extra_Args()==1)
-        basedir=parse_args.Extra_Arg(1);
+        basedir=parse_args.Extra_Arg(0);
 
     if(parse_args.Is_Value_Set("-rigid_bodies_no_draw")){ARRAY<int> int_list;
         STRING_UTILITIES::Parse_Integer_List(parse_args.Get_String_Value("-rigid_bodies_no_draw"),int_list);

@@ -184,7 +184,7 @@ Subexample(const int default_example) const
 {
     if(parse_args->Num_Extra_Args()<1) return default_example;
     int parsed_value;
-    if(STRING_UTILITIES::String_To_Value(parse_args->Extra_Arg(1),parsed_value)) return parsed_value;
+    if(STRING_UTILITIES::String_To_Value(parse_args->Extra_Arg(0),parsed_value)) return parsed_value;
     throw VALUE_ERROR("The argument is not an integer.");
 }
 //#####################################################################

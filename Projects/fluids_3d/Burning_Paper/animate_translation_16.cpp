@@ -26,7 +26,7 @@ template<class T,class RW> void Process(int argc,char* argv[])
     parse_args.Parse(argc,argv);
 
     int frame=-10;
-    if(parse_args.Num_Extra_Args() >= 1) frame=atoi(parse_args.Extra_Arg(1).c_str());
+    if(parse_args.Num_Extra_Args() >= 1) frame=atoi(parse_args.Extra_Arg(0).c_str());
     else{LOG::cout<<"Incorrect.\n";exit(1);}
 
     std::string f=STRING_UTILITIES::string_sprintf(".%d",frame);
