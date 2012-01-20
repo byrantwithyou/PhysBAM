@@ -31,7 +31,7 @@ struct POINT_FACE_REPULSION_PAIR
     TV normal;
 
     static T Total_Repulsion_Thickness(ARRAY_VIEW<const T> repulsion_thickness,const VECTOR<int,d+1>& nodes)
-    {return max(repulsion_thickness(nodes[1]),repulsion_thickness.Subset(nodes.Remove_Index(0)).Min());}
+    {return max(repulsion_thickness(nodes[0]),repulsion_thickness.Subset(nodes.Remove_Index(0)).Min());}
 
     T Total_Repulsion_Thickness(ARRAY_VIEW<const T> repulsion_thickness) const
     {return Total_Repulsion_Thickness(repulsion_thickness,nodes);}
@@ -49,7 +49,7 @@ struct EDGE_EDGE_REPULSION_PAIR<VECTOR<T,1> >
     T distance;
 
     static T Total_Repulsion_Thickness(ARRAY_VIEW<const T> repulsion_thickness,const VECTOR<int,1>& nodes)
-    {return repulsion_thickness(nodes[1]);}
+    {return repulsion_thickness(nodes[0]);}
 
     T Total_Repulsion_Thickness(ARRAY_VIEW<const T> repulsion_thickness) const
     {return 0;}
@@ -69,7 +69,7 @@ struct EDGE_EDGE_REPULSION_PAIR<VECTOR<T,2> >
     TV normal;
 
     static T Total_Repulsion_Thickness(ARRAY_VIEW<const T> repulsion_thickness,const VECTOR<int,2>& nodes)
-    {return max(repulsion_thickness(nodes[1]),repulsion_thickness(nodes[2]));}
+    {return max(repulsion_thickness(nodes[0]),repulsion_thickness(nodes[1]));}
 
     T Total_Repulsion_Thickness(ARRAY_VIEW<const T> repulsion_thickness) const
     {return Total_Repulsion_Thickness(repulsion_thickness,nodes);}
@@ -89,7 +89,7 @@ struct EDGE_EDGE_REPULSION_PAIR<VECTOR<T,3> >
     TV normal;
 
     static T Total_Repulsion_Thickness(ARRAY_VIEW<const T> repulsion_thickness,const VECTOR<int,4>& nodes)
-    {return max(min(repulsion_thickness(nodes[1]),repulsion_thickness(nodes[2])),min(repulsion_thickness(nodes[3]),repulsion_thickness(nodes[4])));}
+    {return max(min(repulsion_thickness(nodes[0]),repulsion_thickness(nodes[1])),min(repulsion_thickness(nodes[2]),repulsion_thickness(nodes[3])));}
 
     T Total_Repulsion_Thickness(ARRAY_VIEW<const T> repulsion_thickness) const
     {return Total_Repulsion_Thickness(repulsion_thickness,nodes);}
