@@ -47,7 +47,7 @@ public:
     ELLIPSOID(const TV& center_input,const DIAGONAL_MATRIX<T,3>& radii_input,const MATRIX<T,3>& axes) // assumes axes are orthonormal
         :center(center_input),radii(radii_input)
     {
-        Initialize(axes.Column(1).Normalized(),axes.Column(2).Normalized(),axes.Column(3).Normalized());
+        Initialize(axes.Column(0).Normalized(),axes.Column(1).Normalized(),axes.Column(2).Normalized());
     }
 
 private:
@@ -56,7 +56,7 @@ private:
 public:
 
     ORIENTED_BOX<TV> Oriented_Bounding_Box() const
-    {MATRIX<T,3> axes(orientation.Rotation_Matrix()*radii);return ORIENTED_BOX<TV>(center-axes.Column_Sum(),(T)2*axes.Column(1),(T)2*axes.Column(2),(T)2*axes.Column(3));}
+    {MATRIX<T,3> axes(orientation.Rotation_Matrix()*radii);return ORIENTED_BOX<TV>(center-axes.Column_Sum(),(T)2*axes.Column(0),(T)2*axes.Column(1),(T)2*axes.Column(2));}
 
     RANGE<TV> Bounding_Box() const
     {return Oriented_Bounding_Box().Axis_Aligned_Bounding_Box();}

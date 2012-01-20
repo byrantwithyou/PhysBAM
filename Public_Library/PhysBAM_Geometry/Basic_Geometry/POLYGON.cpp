@@ -27,22 +27,22 @@ POLYGON(const int number_of_vertices)
 namespace {
 template<class T>
 void Constructor_Helper(POLYGON<VECTOR<T,1> >& p, const RANGE<VECTOR<T,1> >& range)
-{p.X(1)=VECTOR<T,1>(range.min_corner.x);p.X(2)=VECTOR<T,1>(range.max_corner.x);}
+{p.X(0)=VECTOR<T,1>(range.min_corner.x);p.X(1)=VECTOR<T,1>(range.max_corner.x);}
 
 template<class T>
 void Constructor_Helper(POLYGON<VECTOR<T,2> >& p, const RANGE<VECTOR<T,2> >& range)
 {
-    p.X(1)=VECTOR<T,2>(range.min_corner.x,range.min_corner.y); p.X(2)=VECTOR<T,2>(range.max_corner.x,range.min_corner.y);
-    p.X(3)=VECTOR<T,2>(range.max_corner.x,range.max_corner.y); p.X(4)=VECTOR<T,2>(range.min_corner.x,range.max_corner.y);
+    p.X(0)=VECTOR<T,2>(range.min_corner.x,range.min_corner.y); p.X(1)=VECTOR<T,2>(range.max_corner.x,range.min_corner.y);
+    p.X(2)=VECTOR<T,2>(range.max_corner.x,range.max_corner.y); p.X(3)=VECTOR<T,2>(range.min_corner.x,range.max_corner.y);
 }
 
 template<class T>
 void Constructor_Helper(POLYGON<VECTOR<T,3> >& p, const RANGE<VECTOR<T,3> >& range)
 {
-    p.X(1)=VECTOR<T,3>(range.min_corner.x,range.min_corner.y, range.min_corner.z); p.X(2)=VECTOR<T,3>(range.max_corner.x,range.min_corner.y, range.min_corner.z);
-    p.X(3)=VECTOR<T,3>(range.max_corner.x,range.max_corner.y, range.min_corner.z); p.X(4)=VECTOR<T,3>(range.min_corner.x,range.max_corner.y, range.min_corner.z);
-    p.X(5)=VECTOR<T,3>(range.min_corner.x,range.max_corner.y, range.max_corner.z); p.X(6)=VECTOR<T,3>(range.max_corner.x,range.max_corner.y, range.max_corner.z);
-    p.X(7)=VECTOR<T,3>(range.max_corner.x,range.min_corner.y, range.max_corner.z); p.X(8)=VECTOR<T,3>(range.min_corner.x,range.min_corner.y, range.max_corner.z);
+    p.X(0)=VECTOR<T,3>(range.min_corner.x,range.min_corner.y, range.min_corner.z); p.X(1)=VECTOR<T,3>(range.max_corner.x,range.min_corner.y, range.min_corner.z);
+    p.X(2)=VECTOR<T,3>(range.max_corner.x,range.max_corner.y, range.min_corner.z); p.X(3)=VECTOR<T,3>(range.min_corner.x,range.max_corner.y, range.min_corner.z);
+    p.X(4)=VECTOR<T,3>(range.min_corner.x,range.max_corner.y, range.max_corner.z); p.X(5)=VECTOR<T,3>(range.max_corner.x,range.max_corner.y, range.max_corner.z);
+    p.X(6)=VECTOR<T,3>(range.max_corner.x,range.min_corner.y, range.max_corner.z); p.X(7)=VECTOR<T,3>(range.min_corner.x,range.min_corner.y, range.max_corner.z);
 }
 };
 template<class TV> POLYGON<TV>::
@@ -60,8 +60,8 @@ template <class T> T Area_Helper(const POLYGON<VECTOR<T,1> >& p)
 template <class T> T Area_Helper(const POLYGON<VECTOR<T,2> >& p)
 {
     T area=0;
-    for(int k=1;k<p.X.m;k++) area+=(p.X(k).y+p.X(k+1).y)*(p.X(k+1).x-p.X(k).x);
-    area+=(p.X(p.X.m).y+p.X(1).y)*(p.X(1).x-p.X(p.X.m).x); // last edge
+    for(int k=0;k<p.X.m-1;k++) area+=(p.X(k).y+p.X(k+1).y)*(p.X(k+1).x-p.X(k).x);
+    area+=(p.X(p.X.m-1).y+p.X(0).y)*(p.X(0).x-p.X(p.X.m-1).x); // last edge
     return abs(area)/2; // should have done ((*y)(k)+(*y)(k+1))/2 above
 }
 
@@ -80,8 +80,8 @@ namespace {
 template<class T> VECTOR<T,1> Find_Closest_Point_On_Polygon_Helper(const POLYGON<VECTOR<T,1> >& p,const VECTOR<T,1>& X_point,int& side)
 {
     assert(p.X.Size()==2);
-    if((p.X(1)-X_point).Magnitude_Squared() < (p.X(2)-X_point).Magnitude_Squared()){side=1;return p.X(1);}
-    else{side=2;return p.X(2);}
+    if((p.X(0)-X_point).Magnitude_Squared() < (p.X(1)-X_point).Magnitude_Squared()){side=0;return p.X(0);}
+    else{side=1;return p.X(1);}
 }
 
 template<class T> VECTOR<T,2> Find_Closest_Point_On_Polygon_Helper(const POLYGON<VECTOR<T,2> >& p,const VECTOR<T,2>& X_point,int& side)
@@ -89,12 +89,12 @@ template<class T> VECTOR<T,2> Find_Closest_Point_On_Polygon_Helper(const POLYGON
     T distance_squared=FLT_MAX;side=0;VECTOR<T,2> result;
 
     // all sides except for the last one
-    for(int k=1;k<p.X.m;k++){
+    for(int k=0;k<p.X.m-1;k++){
         VECTOR<T,2> closest=SEGMENT_2D<T>(p.X(k),p.X(k+1)).Closest_Point_On_Segment(X_point);T d=(closest-X_point).Magnitude_Squared();
         if(distance_squared > d){distance_squared=d;result=closest;side=k;}}
 
     // last side - if the polygon is closed
-    VECTOR<T,2> closest=SEGMENT_2D<T>(p.X(p.X.m),p.X(1)).Closest_Point_On_Segment(X_point);T d=(closest-X_point).Magnitude_Squared();
+    VECTOR<T,2> closest=SEGMENT_2D<T>(p.X(p.X.m-1),p.X(0)).Closest_Point_On_Segment(X_point);T d=(closest-X_point).Magnitude_Squared();
     if(distance_squared > d){result=closest;side=p.X.m;}
     return result;
 }
@@ -120,8 +120,8 @@ namespace {
 template<class T> bool Inside_Polygon_Helper(const POLYGON<VECTOR<T,1> >& p, const VECTOR<T,1>& X_point)
 {
     assert(p.X.Size()==2);
-    return (p.X(1).x <= p.X(2).x && p.X(1).x <= X_point.x && X_point.x <= p.X(2).x) ||
-           (p.X(1).x >= p.X(2).x && p.X(1).x >= X_point.x && X_point.x >= p.X(2).x);
+    return (p.X(0).x <= p.X(1).x && p.X(0).x <= X_point.x && X_point.x <= p.X(1).x) ||
+           (p.X(0).x >= p.X(1).x && p.X(0).x >= X_point.x && X_point.x >= p.X(1).x);
 }
 
 template<class T> bool Inside_Polygon_Helper(const POLYGON<VECTOR<T,2> >& p, const VECTOR<T,2>& X_point)
@@ -140,7 +140,7 @@ template<class T> bool Inside_Polygon_Helper(const POLYGON<VECTOR<T,2> >& p, con
         theta_total+=theta;}
 
     // last side
-    VECTOR<T,2> X1=p.X(p.X.m)-X_point,X2=p.X(1)-X_point;
+    VECTOR<T,2> X1=p.X(p.X.m-1)-X_point,X2=p.X(0)-X_point;
     if(X1==VECTOR<T,2>() || X2==VECTOR<T,2>()) return true; // (x,y) lies on the polygon
     T theta1=atan2(X1.y,X1.x),theta2=atan2(X2.y,X2.x); // atan2 returns values between -pi and pi, if (x,y) != (0,0)
     T theta=theta2-theta1;

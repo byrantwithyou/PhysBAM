@@ -70,7 +70,7 @@ public:
     {assert((unsigned)i<(unsigned)m);return base_pointer[Value(i)];}
 
     bool Valid_Index(const ID i) const
-    {return ID(1)<=i && i<=m;}
+    {return (unsigned)i<(unsigned)m;}
 
     ARRAY_VIEW& operator=(const ARRAY_VIEW& source)
     {return BASE::operator=(source);}

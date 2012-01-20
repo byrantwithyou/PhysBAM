@@ -30,8 +30,8 @@ Add_Object_To_Cell(const T_INDEX& cell_index,const ID object_id)
     else if(object_in_cell(cell_index)<ID()) object_list(ID(-Value(object_in_cell(cell_index)))).Append_Unique(object_id);
     else if(object_in_cell(cell_index)!=object_id){
         object_list.Resize(object_list.m+1);object_list.Last().Resize(2);
-        object_list.Last()(1)=object_in_cell(cell_index);
-        object_list.Last()(2)=object_id;
+        object_list.Last()(0)=object_in_cell(cell_index);
+        object_list.Last()(1)=object_id;
         object_in_cell(cell_index)=ID(-Value(object_list.m));}
 }
 template <class T_GRID,class ID> void OBJECTS_IN_CELL<T_GRID,ID>::

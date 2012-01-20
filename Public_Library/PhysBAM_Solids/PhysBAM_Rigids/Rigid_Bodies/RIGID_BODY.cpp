@@ -392,7 +392,7 @@ Apply_Push(RIGID_BODY<TV>& body1,RIGID_BODY<TV>& body2,const TV& location,const 
     if(body1.Has_Infinite_Inertia() && body2.Has_Infinite_Inertia()) return;
     TV impulse=Impulse_Factor(body1,body2,location).Inverse()*(distance*normal);
     RIGID_BODY<TV>* body[]={&body1,&body2};
-    for(int i=0;i<=1;i++) if(!body[i]->Has_Infinite_Inertia()){
+    for(int i=0;i<2;i++) if(!body[i]->Has_Infinite_Inertia()){
         T sign=(T)1-2*i;
         TV velocity=impulse/(body[i]->Mass()*sign);
         T_SPIN angular_velocity=body[i]->World_Space_Inertia_Tensor_Inverse()*TV::Cross_Product(location-body[i]->X(),sign*impulse);

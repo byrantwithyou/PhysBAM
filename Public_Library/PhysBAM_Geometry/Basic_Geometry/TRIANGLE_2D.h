@@ -39,13 +39,13 @@ public:
     }
 
     void Specify_Three_Points(const TV& x1_input,const TV& x2_input,const TV& x3_input)
-    {X[1]=x1_input;X[2]=x2_input;X[3]=x3_input;}
+    {X[0]=x1_input;X[1]=x2_input;X[2]=x3_input;}
 
     static T Signed_Area(const TV& x1,const TV& x2,const TV& x3)
     {return (T).5*TV::Cross_Product(x2-x1,x3-x1).x;}
 
     T Signed_Area() const
-    {return Signed_Area(X[1],X[2],X[3]);}
+    {return Signed_Area(X[0],X[1],X[2]);}
 
     static T Area(const TV& x1,const TV& x2,const TV& x3)
     {return abs(Signed_Area(x1,x2,x3));}
@@ -61,7 +61,7 @@ public:
 
     template<class T_ARRAY>
     static T Signed_Size(const T_ARRAY& X)
-    {STATIC_ASSERT(T_ARRAY::m==3);return Signed_Area(X(1),X(2),X(3));}
+    {STATIC_ASSERT(T_ARRAY::m==3);return Signed_Area(X(0),X(1),X(2));}
 
     template<class T_ARRAY>
     static T Size(const T_ARRAY& X)
@@ -74,14 +74,14 @@ public:
     {return Signed_Area()>=0;}
 
     bool Fix_Orientation()
-    {if(Check_Orientation()) return false;exchange(X[2],X[3]);return true;}
+    {if(Check_Orientation()) return false;exchange(X[1],X[2]);return true;}
 
     template<class T_ARRAY>
     static T Half_Boundary_Measure(const T_ARRAY& X)
-    {STATIC_ASSERT(T_ARRAY::m==3);return (T).5*((X(1)-X(2)).Magnitude()+(X(2)-X(3)).Magnitude()+(X(3)-X(1)).Magnitude());}
+    {STATIC_ASSERT(T_ARRAY::m==3);return (T).5*((X(0)-X(1)).Magnitude()+(X(1)-X(2)).Magnitude()+(X(2)-X(0)).Magnitude());}
 
     T Aspect_Ratio() const
-    {return Aspect_Ratio(X[1],X[2],X[3]);}
+    {return Aspect_Ratio(X[0],X[1],X[2]);}
 
     static T Aspect_Ratio(const TV& x1_input,const TV& x2_input,const TV& x3_input)
     {TV u=x1_input-x2_input,v=x2_input-x3_input,w=x3_input-x1_input;
@@ -101,7 +101,7 @@ public:
     {return max((x2-x1).Magnitude_Squared(),(x3-x1).Magnitude_Squared(),(x3-x2).Magnitude_Squared());}
 
     T Minimum_Altitude() const
-    {return Minimum_Altitude(X[1],X[2],X[3]);}
+    {return Minimum_Altitude(X[0],X[1],X[2]);}
 
     static T Minimum_Altitude(const TV& x1,const TV& x2,const TV& x3)
     {return 2*Area(x1,x2,x3)/Maximum_Edge_Length(x1,x2,x3);}
@@ -114,7 +114,7 @@ public:
 
     template<class T_ARRAY>
     static VECTOR<T,3> Barycentric_Coordinates(const TV& location,const T_ARRAY& X)
-    {STATIC_ASSERT(T_ARRAY::m==3);return Barycentric_Coordinates(location,X(1),X(2),X(3));}
+    {STATIC_ASSERT(T_ARRAY::m==3);return Barycentric_Coordinates(location,X(0),X(1),X(2));}
 
     static TV Point_From_Barycentric_Coordinates(const VECTOR<T,3>& weights,const TV& x1,const TV& x2,const TV& x3)
     {return weights.x*x1+weights.y*x2+weights.z*x3;}
@@ -123,23 +123,23 @@ public:
     {return weights.x*x1+weights.y*x2+(1-weights.x-weights.y)*x3;}
 
     TV Point_From_Barycentric_Coordinates(const VECTOR<T,3>& weights) const
-    {return Point_From_Barycentric_Coordinates(weights,X[1],X[2],X[3]);}
+    {return Point_From_Barycentric_Coordinates(weights,X[0],X[1],X[2]);}
 
     template<class T_ARRAY>
     static TV Point_From_Barycentric_Coordinates(const VECTOR<T,3>& weights,const T_ARRAY& X)
-    {STATIC_ASSERT(T_ARRAY::m==3);return Point_From_Barycentric_Coordinates(weights,X(1),X(2),X(3));}
+    {STATIC_ASSERT(T_ARRAY::m==3);return Point_From_Barycentric_Coordinates(weights,X(0),X(1),X(2));}
 
     VECTOR<T,3> Sum_Barycentric_Coordinates(const TRIANGLE_2D<T>& embedded_triangle) const
-    {return Barycentric_Coordinates(embedded_triangle.X[1],X)+Barycentric_Coordinates(embedded_triangle.X[2],X)+Barycentric_Coordinates(embedded_triangle.X[3],X);}
+    {return Barycentric_Coordinates(embedded_triangle.X[0],X)+Barycentric_Coordinates(embedded_triangle.X[1],X)+Barycentric_Coordinates(embedded_triangle.X[2],X);}
 
     static TV Center(const TV& x1,const TV& x2,const TV& x3) // centroid
     {return (T)one_third*(x1+x2+x3);}
 
     TV Center() const // centroid
-    {return Center(X[1],X[2],X[3]);}
+    {return Center(X[0],X[1],X[2]);}
 
     TV Incenter() const // intersection of angle bisectors
-    {VECTOR<T,3> edge_lengths((X[3]-X[2]).Magnitude(),(X[1]-X[3]).Magnitude(),(X[2]-X[1]).Magnitude());T perimeter=edge_lengths.x+edge_lengths.y+edge_lengths.z;assert(perimeter>0);
+    {VECTOR<T,3> edge_lengths((X[2]-X[1]).Magnitude(),(X[0]-X[2]).Magnitude(),(X[1]-X[0]).Magnitude());T perimeter=edge_lengths.x+edge_lengths.y+edge_lengths.z;assert(perimeter>0);
     return Point_From_Barycentric_Coordinates(edge_lengths/perimeter);}
 
     static TV Circumcenter(const TV& x1,const TV& x2,const TV& x3)
@@ -151,15 +151,15 @@ public:
     VECTOR<T,3> weights(aa*(bb+cc-aa),bb*(cc+aa-bb),cc*(aa+bb-cc));return weights/(weights.x+weights.y+weights.z);}
 
     T Minimum_Angle() const
-    {TV s1=(X[1]-X[2]).Normalized(),s2=(X[2]-X[3]).Normalized(),s3=(X[3]-X[1]).Normalized();
+    {TV s1=(X[0]-X[1]).Normalized(),s2=(X[1]-X[2]).Normalized(),s3=(X[2]-X[0]).Normalized();
     return acos(max(TV::Dot_Product(s1,-s2),TV::Dot_Product(-s1,s3),TV::Dot_Product(s2,-s3)));}
 
     T Maximum_Angle() const
-    {TV s1=(X[1]-X[2]).Normalized(),s2=(X[2]-X[3]).Normalized(),s3=(X[3]-X[1]).Normalized();
+    {TV s1=(X[0]-X[1]).Normalized(),s2=(X[1]-X[2]).Normalized(),s3=(X[2]-X[0]).Normalized();
     return acos(min(TV::Dot_Product(s1,-s2),TV::Dot_Product(-s1,s3),TV::Dot_Product(s2,-s3)));}
 
     bool Outside(const TV& location,const T thickness_over_2=0) const
-    {return Outside(location,X[1],X[2],X[3],thickness_over_2);}
+    {return Outside(location,X[0],X[1],X[2],thickness_over_2);}
 
     static bool Outside(const TV& location,const TV& x1,const TV& x2,const TV& x3,const T thickness_over_2=0)
     {assert(Check_Orientation(x1,x2,x3));TV location_minus_x1=location-x1;
@@ -172,7 +172,7 @@ public:
     {return !Outside(location,thickness_over_2);}
 
     RANGE<TV> Bounding_Box() const
-    {return RANGE<TV>::Bounding_Box(X[1],X[2],X[3]);}
+    {return RANGE<TV>::Bounding_Box(X[0],X[1],X[2]);}
 
     static bool Check_Delaunay_Criterion(TV a,TV b,TV c,TV d)
     {assert(Check_Orientation(a,b,c) && Check_Orientation(d,c,b));b-=a;c-=a;d-=a;

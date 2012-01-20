@@ -195,7 +195,7 @@ Set_Up_For_Projection(T_FACE_ARRAYS_SCALAR& face_velocities,const T time)
     projection.divergence_multiplier.Fill(0);projection.divergence.Fill(0);
     T_ARRAYS_BOOL cells_valid(grid.Domain_Indices(1));cells_valid.Fill(true); 
     for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
-        if(projection.elliptic_solver->psi_D(cell)) for(int axis=0;axis<T_GRID::dimension;axis++) for(int k=0;k<=1;k++){
+        if(projection.elliptic_solver->psi_D(cell)) for(int axis=0;axis<T_GRID::dimension;axis++) for(int k=0;k<2;k++){
             TV_INT face(cell);face[axis]+=k;if(!face_weight(axis,face)) cells_valid(cell)=false;}}
     for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
         if(cells_valid(cell) && cell_weight(cell)>ballistic_particles_per_cell) projection.elliptic_solver->psi_D(cell)=false;

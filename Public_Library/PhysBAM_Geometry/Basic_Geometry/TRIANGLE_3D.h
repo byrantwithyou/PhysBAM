@@ -37,7 +37,7 @@ public:
     TRIANGLE_3D(const T_ARRAY& X_input)
     {
         STATIC_ASSERT(T_ARRAY::m==3);
-        Specify_Three_Points(X_input(1),X_input(2),X_input(3));
+        Specify_Three_Points(X_input(0),X_input(1),X_input(2));
     }
 
     void Specify_Three_Points(const TV& x1_input,const TV& x2_input,const TV& x3_input)
@@ -57,7 +57,7 @@ public:
 
     template<class T_ARRAY>
     static T Size(const T_ARRAY& X)
-    {STATIC_ASSERT(T_ARRAY::m==3);return Area(X(1),X(2),X(3));}
+    {STATIC_ASSERT(T_ARRAY::m==3);return Area(X(0),X(1),X(2));}
 
     template<class T_ARRAY>
     static T Signed_Size(const T_ARRAY& X)
@@ -112,11 +112,11 @@ public:
 
     template<class T_ARRAY>
     static TV Barycentric_Coordinates(const TV& location,const T_ARRAY& X)
-    {STATIC_ASSERT(T_ARRAY::m==3);return Barycentric_Coordinates(location,X(1),X(2),X(3));}
+    {STATIC_ASSERT(T_ARRAY::m==3);return Barycentric_Coordinates(location,X(0),X(1),X(2));}
 
     template<class T_ARRAY>
     static TV Clamped_Barycentric_Coordinates(const TV& location,const T_ARRAY& X)
-    {STATIC_ASSERT(T_ARRAY::m==3);return Clamped_Barycentric_Coordinates(location,X(1),X(2),X(3));}
+    {STATIC_ASSERT(T_ARRAY::m==3);return Clamped_Barycentric_Coordinates(location,X(0),X(1),X(2));}
 
     TV Sum_Barycentric_Coordinates(const TRIANGLE_3D<T>& embedded_triangle) const
     {return Barycentric_Coordinates(embedded_triangle.x1)+Barycentric_Coordinates(embedded_triangle.x2)+Barycentric_Coordinates(embedded_triangle.x3);}
@@ -129,7 +129,7 @@ public:
 
     template<class T_ARRAY>
     static TV Point_From_Barycentric_Coordinates(const TV& weights,const T_ARRAY& X) // clockwise vertices
-    {STATIC_ASSERT(T_ARRAY::m==3);return weights.x*X(1)+weights.y*X(2)+weights.z*X(3);}
+    {STATIC_ASSERT(T_ARRAY::m==3);return weights.x*X(0)+weights.y*X(1)+weights.z*X(2);}
 
     TV Point_From_Barycentric_Coordinates(const TV& weights) const
     {return Point_From_Barycentric_Coordinates(weights,x1,x2,x3);}
@@ -146,11 +146,11 @@ public:
 
     bool Point_Face_Interaction(const TV& x,const TV& v,const INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,3>&> V_face,const T interaction_distance,T& distance,
         TV& interaction_normal,TV& weights,T& relative_speed,const bool allow_negative_weights,const bool exit_early) const
-    {return Point_Face_Interaction(x,v,V_face(1),V_face(2),V_face(3),interaction_distance,distance,interaction_normal,weights,relative_speed,allow_negative_weights,exit_early);}
+    {return Point_Face_Interaction(x,v,V_face(0),V_face(1),V_face(2),interaction_distance,distance,interaction_normal,weights,relative_speed,allow_negative_weights,exit_early);}
 
     bool Point_Face_Collision(const TV& x,const TV& v,const INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,3>&> V_face,const T dt,const T collision_thickness,T& collision_time,TV& normal,
         TV& weights,T& relative_speed,const bool exit_early) const
-    {return Point_Face_Collision(x,v,V_face(1),V_face(2),V_face(3),dt,collision_thickness,collision_time,normal,weights,relative_speed,exit_early);}
+    {return Point_Face_Collision(x,v,V_face(0),V_face(1),V_face(2),dt,collision_thickness,collision_time,normal,weights,relative_speed,exit_early);}
 
     RANGE<TV> Bounding_Box() const
     {return RANGE<TV>::Bounding_Box(x1,x2,x3);}

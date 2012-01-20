@@ -20,16 +20,16 @@ Exact_Segment_Intersection(const VECTOR<float,2>& p1,const VECTOR<float,2>& p2,c
     unsigned int mask;
 
     // Compute disambiguated signed areas for all triangles formed by three input points
-    for(unsigned int i=0;i<=1;i++) for(unsigned int j=i+1;j<2;j++) for(unsigned int k=j+1;k<3;k++)
+    for(unsigned int i=0;i<2;i++) for(unsigned int j=i+1;j<2;j++) for(unsigned int k=j+1;k<3;k++)
         psa[(1<<i)|(1<<j)|(1<<k)]=Positive_Signed_Area(points(i+1),points(j+1),points(k+1),ranks(i+1),ranks(j+1),ranks(k+1));
 
     // Separator line must contain a vertex from each segment
-    for(unsigned int i=0;i<=1;i++) for(unsigned int j=1;j<3;j++){
+    for(unsigned int i=0;i<2;i++) for(unsigned int j=1;j<3;j++){
         plus=minus=0;mask=(1<<i)|(1<<j);
         for(unsigned int k=0;k<i;k++)    if(psa[(1<<k)|mask]) plus++;  else minus++;
-        for(unsigned int k=i+1;k<=1;k++) if(psa[(1<<k)|mask]) minus++; else plus++;
+        for(unsigned int k=i+1;k<2;k++) if(psa[(1<<k)|mask]) minus++; else plus++;
         for(unsigned int k=2;k<j;k++)    if(psa[(1<<k)|mask]) plus++;  else minus++;
-        for(unsigned int k=j+1;k<=3;k++) if(psa[(1<<k)|mask]) minus++; else plus++;
+        for(unsigned int k=j+1;k<4;k++) if(psa[(1<<k)|mask]) minus++; else plus++;
         if (plus==0||minus==0) return false;}
     // No separator line found, objects are intersecting
     return true;
@@ -53,9 +53,9 @@ Exact_Segment_Intersection(const VECTOR<float,2>& p1,const VECTOR<float,2>& p2,c
     for(unsigned int i=0;i<2;i++) for(unsigned int j=1;j<3;j++){
         plus=minus=0;mask=(1<<i)|(1<<j);
         for(unsigned int k=0;k<i;k++)    if(psa[(1<<k)|mask]) plus++;  else minus++;
-        for(unsigned int k=i+1;k<=1;k++) if(psa[(1<<k)|mask]) minus++; else plus++;
+        for(unsigned int k=i+1;k<2;k++) if(psa[(1<<k)|mask]) minus++; else plus++;
         for(unsigned int k=2;k<j;k++)    if(psa[(1<<k)|mask]) plus++;  else minus++;
-        for(unsigned int k=j+1;k<=3;k++) if(psa[(1<<k)|mask]) minus++; else plus++;
+        for(unsigned int k=j+1;k<4;k++) if(psa[(1<<k)|mask]) minus++; else plus++;
         if (plus==0||minus==0) return false;}
     // No separator line found, objects are intersecting
     return true;

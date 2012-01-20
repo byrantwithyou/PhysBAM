@@ -32,7 +32,7 @@ public:
 
     template<class T_ARRAY>
     explicit SEGMENT_1D(const T_ARRAY& X_input)
-        :x1(X_input(1)),x2(X_input(2))
+        :x1(X_input(0)),x2(X_input(1))
     {
         STATIC_ASSERT(T_ARRAY::m==2);
     }
@@ -54,7 +54,7 @@ public:
 
     template<class T_ARRAY>
     static VECTOR<T,2> Barycentric_Coordinates(const TV& location,const T_ARRAY& X)
-    {STATIC_ASSERT(T_ARRAY::m==2);return Barycentric_Coordinates(location,X(1),X(2));}
+    {STATIC_ASSERT(T_ARRAY::m==2);return Barycentric_Coordinates(location,X(0),X(1));}
 
     static TV Point_From_Barycentric_Coordinates(const VECTOR<T,2>& weights,const TV& x1,const TV& x2)
     {return weights.x*x1+weights.y*x2;}
@@ -67,7 +67,7 @@ public:
 
     template<class T_ARRAY>
     static TV Point_From_Barycentric_Coordinates(const VECTOR<T,2>& weights,const T_ARRAY& X)
-    {STATIC_ASSERT(T_ARRAY::m==2);return Point_From_Barycentric_Coordinates(weights,X(1),X(2));}
+    {STATIC_ASSERT(T_ARRAY::m==2);return Point_From_Barycentric_Coordinates(weights,X(0),X(1));}
 
     VECTOR<T,1> Center() const
     {return (T).5*(x1+x2);}

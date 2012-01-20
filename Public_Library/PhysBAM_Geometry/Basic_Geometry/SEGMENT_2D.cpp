@@ -266,8 +266,8 @@ Cut_With_Hyperplane_And_Discard_Outside_Simplices(const SEGMENT_2D<T>& segment,c
 {
     VECTOR<T,2> phi_nodes;
     VECTOR<VECTOR<T,2>,2> X_nodes;
-    X_nodes(1)=segment.x1;
-    X_nodes(2)=segment.x2;
+    X_nodes(0)=segment.x1;
+    X_nodes(1)=segment.x2;
     for(int i=0;i<2;i++){phi_nodes[i]=cutting_plane.Signed_Distance(X_nodes[i]);}
     int positive_count=0;
     for(int i=0;i<2;i++) if(phi_nodes[i]>0) positive_count++;

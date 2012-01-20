@@ -42,7 +42,7 @@ public:
 
     template<class T_ARRAY>
     static TV Normal(const T_ARRAY& X)
-    {STATIC_ASSERT(T_ARRAY::m==3);return Normal(X(1),X(2),X(3));}
+    {STATIC_ASSERT(T_ARRAY::m==3);return Normal(X(0),X(1),X(2));}
 
     TV Normal() const
     {return normal;}
@@ -55,7 +55,7 @@ public:
 
     template<class T_ARRAY>
     static TV Normal_Direction(const T_ARRAY& X)
-    {STATIC_ASSERT(T_ARRAY::m==3);return Normal_Direction(X(1),X(2),X(3));}
+    {STATIC_ASSERT(T_ARRAY::m==3);return Normal_Direction(X(0),X(1),X(2));}
 
     T Signed_Distance(const TV& location) const
     {return TV::Dot_Product(normal,location-x1);}

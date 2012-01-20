@@ -983,7 +983,7 @@ Push_Out_From_Rigid_Body(RIGID_BODY<TV>& rigid_body,ARRAY<RIGID_BODY_PARTICLE_IN
             else equation_type=3;} // full constrained by static bodies
 
         MATRIX<T,TV::dimension+T_SPIN::dimension> M[2];
-        for(int i=0;i<=1;i++) if(equation_type!=(i?0:3)){
+        for(int i=0;i<2;i++) if(equation_type!=(i?0:3)){
             M[i].Set_Submatrix(0,0,K_inverse_sum[i]);
                 M[i].Set_Submatrix(TV::dimension,0,mr[i]);
             M[i].Set_Submatrix(0,TV::dimension,mr[i].Transposed());

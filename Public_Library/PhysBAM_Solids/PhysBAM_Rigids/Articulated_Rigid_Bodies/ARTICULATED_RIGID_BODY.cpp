@@ -433,7 +433,7 @@ Initialize_Poststabilization_Projection()
 
         MATRIX_MXN<T> R_D[2],M_inverse_R_D[2];
         TV location=joint.Location(*rigid_bodies[0],*rigid_bodies[1]);
-        for(int j=0;j<=1;j++){
+        for(int j=0;j<2;j++){
             MATRIX_MXN<T> r_star_p=prismatic_constraints.Cross_Product_Matrix_Times(location-rigid_bodies[j]->X());
             R_D[j].Resize(d+s,p+a);
             R_D[j].Set_Submatrix(0,0,prismatic_constraints);

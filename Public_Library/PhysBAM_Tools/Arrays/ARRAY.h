@@ -95,7 +95,7 @@ public:
     {assert((unsigned)Value(i)<(unsigned)Value(m));return base_pointer[Value(i)];}
 
     bool Valid_Index(const ID i) const
-    {return ID(1)<=i && i<=m;}
+    {return (unsigned)i<(unsigned)m;}
 
     T* Get_Array_Pointer()
     {return base_pointer;}
@@ -168,10 +168,10 @@ public:
     {assert(m>ID());m--;}
 
     void Remove_Index(const ID index) // preserves ordering of remaining elements
-    {assert(ID(1)<=index && index<=m);for(ID i=index;i<m;i++) (*this)(i)=(*this)(i+1);Remove_End();}
+    {assert((unsigned)index<(unsigned)m);for(ID i=index;i<m;i++) (*this)(i)=(*this)(i+1);Remove_End();}
 
     void Remove_Index_Lazy(const ID index)
-    {assert(ID(1)<=index && index<=m);
+    {assert((unsigned)index<(unsigned)m);
     if(index<m) (*this)(index)=(*this)(m);
     Remove_End();}
 
