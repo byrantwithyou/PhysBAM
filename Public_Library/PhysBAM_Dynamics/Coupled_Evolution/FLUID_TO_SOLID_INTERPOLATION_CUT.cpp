@@ -240,14 +240,14 @@ Cut_Face(FACE_INDEX<TV::m>& f,const TV& normal,const SEGMENT_2D<T>& segment)
     if(!face_index || unused_faces.Contains(face_index)) return;
     if(!cut_cells.Contains(f.First_Cell_Index()) || !cut_cells.Contains(f.Second_Cell_Index())) return;
 
-    T dx=index_map.grid.dX(3-f.axis);
-    TV face_center(index_map.grid.Axis_X_Face(f)),dir=TV::Axis_Vector(3-f.axis);
+    T dx=index_map.grid.dX(1-f.axis);
+    TV face_center(index_map.grid.Axis_X_Face(f)),dir=TV::Axis_Vector(1-f.axis);
     RAY<TV> ray(face_center-(T).5*dx*dir,dir);
     ray.semi_infinite=false;
     ray.t_max=dx;
     if(!INTERSECTION::Intersects(ray,segment,(T)1e-6*dx)) return;
     T length=clamp(ray.t_max,(T)1e-8*dx,dx);
-    if(normal(3-f.axis)<0) length=dx-length;
+    if(normal(1-f.axis)<0) length=dx-length;
     face_lengths.Set(f,length);
 }
 namespace{
@@ -425,7 +425,7 @@ Add_Gradient_Entry(int fi,const FACE_INDEX<TV::m>& f,int side,bool outside)
         if(CUT_CELL* cc=cut_cells.Get_Pointer(cell))
             cell_index=cc->other_cell;
 
-    T value=index_map.grid.Face_Sizes()(3-f.axis)*(side==1?-1:1);
+    T value=index_map.grid.Face_Sizes()(1-f.axis)*(side==0?-1:1);
     gradient->gradient.Append_Entry_To_Current_Row(cell_index,value);
     //Add_Debug_Particle(DX,outside?VECTOR<T,3>(0,1,0):VECTOR<T,3>(0,0,1));
 }

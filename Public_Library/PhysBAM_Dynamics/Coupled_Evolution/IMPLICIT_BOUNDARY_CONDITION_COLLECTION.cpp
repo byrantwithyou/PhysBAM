@@ -66,7 +66,7 @@ Compute_Boundary_Condition_Info(const GRID<TV>& grid,const ARRAY<T,TV_INT>& p,co
 template<class TV> void IMPLICIT_BOUNDARY_CONDITION_COLLECTION<TV>::
 Compute_Boundary_Condition_Info(const ARRAY<T,TV_INT>& p,const ARRAY<T,FACE_INDEX<TV::dimension> >& face_velocities,const FACE_INDEX<TV::m>& f,int in_side)
 {
-    TV_INT a=f.Cell_Index(in_side),b=f.Cell_Index(3-in_side);
+    TV_INT a=f.Cell_Index(in_side),b=f.Cell_Index(1-in_side);
     if(psi_D(a) || !psi_D(b)) return;
     BOUNDARY_CONDITION_INFO<TV> bci;
     bci.in_side=in_side;

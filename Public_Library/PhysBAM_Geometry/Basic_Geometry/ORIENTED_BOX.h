@@ -101,10 +101,10 @@ public:
     {v=VECTOR<T,1>(edges(1,1)<0?-1:1);}
 
     void Generate_Unit_Direction(VECTOR<T,2>& v,int i) const
-    {v=edges.Column(i);if(!v.Normalize()) v=edges.Column(3-i).Perpendicular().Normalized();}
+    {v=edges.Column(i);if(!v.Normalize()) v=edges.Column(1-i).Perpendicular().Normalized();}
 
     void Generate_Unit_Direction(VECTOR<T,3>& v,int i) const
-    {v=edges.Column(i);if(!v.Normalize()) v=VECTOR<T,3>::Cross_Product(edges.Column(i==1?2:1),edges.Column(i==3?2:3)).Normalized();}
+    {v=edges.Column(i);if(!v.Normalize()) v=VECTOR<T,3>::Cross_Product(edges.Column(i==0?1:0),edges.Column(i==2?1:2)).Normalized();}
 
     // Handles a zero-length edge
     ORIENTED_BOX Thickened(const T thickness) const
