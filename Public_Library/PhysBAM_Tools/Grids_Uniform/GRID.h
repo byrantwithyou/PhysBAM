@@ -330,7 +330,7 @@ public:
     {assert((unsigned)face<2);TV_INT index=node_index;index[1-axis]+=face-2;return index;}
 
     static TV_INT Node_Face_Index(const int axis,const VECTOR<int,1>& node_index,const int face)
-    {assert(axis==1&&face==1);return node_index;}
+    {assert(axis==0&&face==0);return node_index;}
 
     void Face_Corner_To_Opposite_Corner_Vectors(const int axis,VECTOR<T,3> vectors[4])
     {static const TV multipliers[3][3]={
@@ -340,7 +340,7 @@ public:
     assert((unsigned)axis<3);vectors[3]=dX;vectors[3][axis]=0;for(int i=0;i<3;i++) vectors[i]=vectors[3]*multipliers[axis][i];}
 
     void Face_Corner_To_Opposite_Corner_Vectors(const int axis,VECTOR<T,2> vectors[2])
-    {vectors[1]=dX;vectors[1][axis]=0;vectors[0]=(T)-1*vectors[1];}
+    {vectors[1]=dX;vectors[1][axis]=0;vectors[0]=-vectors[1];}
 
     T Face_Corner_To_Opposite_Corner_Length(const int axis) const
     {TV face_dimensions=dX;face_dimensions[axis]=0;return face_dimensions.Magnitude();}
@@ -349,17 +349,16 @@ public:
     {return TV_INT(floor((location-domain.min_corner)*one_over_dX-MAC_offset));} // note that "floor" is expensive
 
     void Cell(const TV& location,TV_INT& index,const int number_of_ghost_cells) const // returns the left, bottom and front
-    {int number_of_ghost_cells_plus_one=number_of_ghost_cells+1; // Add before casting to avoid negatives rounding up to zero
-    index=TV_INT((location-domain.min_corner)*one_over_dX+(T)number_of_ghost_cells_plus_one)-number_of_ghost_cells;}
+    {index=TV_INT((location-domain.min_corner)*one_over_dX+(T)number_of_ghost_cells)-number_of_ghost_cells;}
 
     TV_INT Cell(const TV& location,const int number_of_ghost_cells) const // returns the left, bottom and front
     {TV_INT index;Cell(location,index,number_of_ghost_cells);return index;}
 
     RANGE<TV> Cell_Domain(const TV_INT& index) const
-    {TV corner=domain.min_corner+TV(index)*dX;return RANGE<TV>(corner-dX,corner);}
+    {TV corner=domain.min_corner+TV(index+1)*dX;return RANGE<TV>(corner-dX,corner);}
 
     static void Cells_Touching_Face(const int axis,const TV_INT& face_index,TV_INT& cell1,TV_INT& cell2)
-    {cell2=face_index;cell1=face_index;cell1[axis]-=1;}
+    {cell2=face_index;cell1=face_index;cell1[axis]--;}
 
     TV Clamp(const TV& location) const
     {return domain.Clamp(location);}
@@ -371,16 +370,16 @@ public:
     {TV extra=(T)number_of_ghost_cells*dX;return clamp(location,domain.min_corner-extra,domain.max_corner+extra);}
 
     TV_INT Clamp_Min(const TV_INT& index) const
-    {return clamp_min(index,TV_INT::All_Ones_Vector());}
+    {return clamp_min(index,TV_INT());}
 
     TV_INT Clamp_Max(const TV_INT& index) const
-    {return clamp_max(index,counts);}
+    {return clamp_max(index,counts-1);}
 
     void Clamp(TV_INT& index) const
-    {index=clamp(index,TV_INT::All_Ones_Vector(),counts);}
+    {index=clamp(index,TV_INT(),counts);}
     
     void Clamp(TV_INT& index,const int number_of_ghost_cells) const
-    {index=clamp(index,TV_INT()-(number_of_ghost_cells-1),counts+number_of_ghost_cells);}
+    {index=clamp(index,TV_INT()-number_of_ghost_cells,counts+number_of_ghost_cells-1);}
 
     TV_INT Clamped_Index(const TV& location) const
     {return clamp(TV_INT(((location-domain.min_corner)*one_over_dX-MAC_offset)),TV_INT(),counts);}
@@ -398,13 +397,13 @@ public:
     {return clamp(TV_INT((location-domain.min_corner)*one_over_dX),TV_INT(),numbers_of_cells);}
 
     TV_INT Clamp_To_Cell(const TV& location,const int number_of_ghost_cells) const
-    {return clamp(TV_INT((location-domain.min_corner)*one_over_dX+(T)number_of_ghost_cells)-number_of_ghost_cells,TV_INT()-number_of_ghost_cells,numbers_of_cells+number_of_ghost_cells);}
+    {return clamp(TV_INT((location-domain.min_corner)*one_over_dX+(T)number_of_ghost_cells)-number_of_ghost_cells,TV_INT()-number_of_ghost_cells,numbers_of_cells+number_of_ghost_cells-1);}
 
     RANGE<TV_INT> Clamp_To_Cell(const RANGE<TV>& box,const int number_of_ghost_cells) const
-    {return RANGE<TV_INT>(Clamp_To_Cell(box.Minimum_Corner(),number_of_ghost_cells),Clamp_To_Cell(box.Maximum_Corner(),number_of_ghost_cells));}
+    {return RANGE<TV_INT>(Clamp_To_Cell(box.Minimum_Corner(),number_of_ghost_cells),Clamp_To_Cell(box.Maximum_Corner(),number_of_ghost_cells)+1);}
 
     TV_INT Block_Index(const TV& X,const int number_of_ghost_cells) const // index of node at center of block
-    {assert(Is_MAC_Grid());return Clamped_Index_End_Minus_One(X,number_of_ghost_cells)+TV_INT::All_Ones_Vector();}
+    {assert(Is_MAC_Grid());return Clamped_Index_End_Minus_One(X,number_of_ghost_cells)+1;}
 
     TV_INT Closest_Node(const TV& location) const
     {return clamp(TV_INT((location-domain.min_corner)*one_over_dX+(T).5),TV_INT(),counts);}
@@ -419,13 +418,13 @@ public:
     {return counts;}
 
     RANGE<TV_INT> Domain_Indices(const int ghost_cells=0) const
-    {return RANGE<TV_INT>(TV_INT::All_Ones_Vector()-ghost_cells,counts+ghost_cells);}
+    {return RANGE<TV_INT>(TV_INT()-ghost_cells,counts+ghost_cells);}
 
     RANGE<TV_INT> Node_Indices(const int ghost_cells=0) const
-    {return RANGE<TV_INT>(TV_INT()+1,Numbers_Of_Nodes()).Thickened(ghost_cells);}
+    {return RANGE<TV_INT>(TV_INT(),Numbers_Of_Nodes()).Thickened(ghost_cells);}
 
     RANGE<TV_INT> Cell_Indices(const int ghost_cells=0) const
-    {return RANGE<TV_INT>(TV_INT()+1,numbers_of_cells).Thickened(ghost_cells);}
+    {return RANGE<TV_INT>(TV_INT(),numbers_of_cells).Thickened(ghost_cells);}
 
     RANGE<TV_INT> Block_Indices(const int ghost_cells=0) const
     {return Node_Indices(ghost_cells);}
@@ -450,13 +449,13 @@ public:
     return GRID<TV>(TV_INT::Componentwise_Max(TV_INT(),numbers),RANGE<TV>(domain.min_corner+offset,domain.max_corner-offset));}
 
     GRID<TV> Get_X_Face_Grid() const
-    {return Get_Face_Grid(1);}
+    {return Get_Face_Grid(0);}
 
     GRID<TV> Get_Y_Face_Grid() const
-    {return Get_Face_Grid(2);}
+    {return Get_Face_Grid(1);}
 
     GRID<TV> Get_Z_Face_Grid() const
-    {return Get_Face_Grid(3);}
+    {return Get_Face_Grid(2);}
 
     GRID<TV> Get_Regular_Grid_At_MAC_Positions() const
     {assert(Is_MAC_Grid());TV expansion=(T).5*dX;return GRID<TV>(counts,RANGE<TV>(domain.min_corner+expansion,domain.max_corner-expansion));}
@@ -468,7 +467,7 @@ public:
     {return GRID<VECTOR<T,TV::dimension-1> >(counts.Remove_Index(dimension),domain.Remove_Dimension(dimension),Is_MAC_Grid());}
 
     GRID<VECTOR<T,TV::dimension-1> > Get_Horizontal_Grid() const
-    {return Remove_Dimension(2);}
+    {return Remove_Dimension(1);}
 
     GRID<VECTOR<T,1> > Get_1D_Grid(const int axis) const
     {return GRID<VECTOR<T,1> >(counts[axis],domain.Minimum_Corner()[axis],domain.Maximum_Corner()[axis],Is_MAC_Grid());}
@@ -486,7 +485,7 @@ public:
     assert((unsigned)i<2);return index+neighbor_offset[i];}
 
     static VECTOR<int,0> Node_Neighbor(const VECTOR<int,0>& index,const int i) // i=1
-    {assert(1==i);return index;}
+    {assert(0==i);return index;}
 
     void Cells_Neighboring_Node(const VECTOR<int,3>& node,VECTOR<int,3> cells[8]) const
     {cells[0]=VECTOR<int,3>(node.x-1,node.y-1,node.z-1);cells[1]=VECTOR<int,3>(node.x,node.y-1,node.z-1);cells[2]=VECTOR<int,3>(node.x-1,node.y,node.z-1);
@@ -541,16 +540,16 @@ public:
     {for(int a=0;a<TV::m;a++){INDEX_FACE fi(a,index);n(a*2)=fi;fi.index(a)++;n(a*2+1)=fi;}}
 
     template<class T2> void Put_Ghost(const T2& constant,ARRAYS_ND_BASE<VECTOR<T2,3> >& array,const int ghost_cells) const
-    {for(int j=-ghost_cells;j<counts.y+ghost_cells;j++) for(int ij=-ghost_cells;ij<counts.z+ghost_cells;ij++) for(int s=0;s<ghost_cells;s++) array(1-s,j,ij)=array(counts.x+s,j,ij)=constant;
-    for(int i=0;i<counts.x;i++) for(int ij=-ghost_cells;ij<counts.z+ghost_cells;ij++) for(int s=0;s<ghost_cells;s++) array(i,1-s,ij)=array(i,counts.y+s,ij)=constant;
-    for(int i=0;i<counts.x;i++) for(int j=0;j<counts.y;j++) for(int s=0;s<ghost_cells;s++) array(i,j,1-s)=array(i,j,counts.z+s)=constant;}
+    {for(int j=-ghost_cells;j<counts.y+ghost_cells;j++) for(int ij=-ghost_cells;ij<counts.z+ghost_cells;ij++) for(int s=0;s<ghost_cells;s++) array(-s,j,ij)=array(counts.x+s-1,j,ij)=constant;
+    for(int i=0;i<counts.x;i++) for(int ij=-ghost_cells;ij<counts.z+ghost_cells;ij++) for(int s=0;s<ghost_cells;s++) array(i,-s,ij)=array(i,counts.y+s-1,ij)=constant;
+    for(int i=0;i<counts.x;i++) for(int j=0;j<counts.y;j++) for(int s=0;s<ghost_cells;s++) array(i,j,-s)=array(i,j,counts.z+s-1)=constant;}
 
     template<class T2> void Put_Ghost(const T2& constant,ARRAYS_ND_BASE<VECTOR<T2,2> >& array,const int ghost_cells) const
-    {for(int j=-ghost_cells;j<counts.y+ghost_cells;j++) for(int s=0;s<ghost_cells;s++) array(1-s,j)=array(counts.x+s,j)=constant;
-    for(int i=0;i<counts.x;i++) for(int s=0;s<ghost_cells;s++) array(i,1-s)=array(i,counts.y+s)=constant;}
+    {for(int j=-ghost_cells;j<counts.y+ghost_cells;j++) for(int s=0;s<ghost_cells;s++) array(-s,j)=array(counts.x+s-1,j)=constant;
+    for(int i=0;i<counts.x;i++) for(int s=0;s<ghost_cells;s++) array(i,-s)=array(i,counts.y+s-1)=constant;}
 
     template<class T2> void Put_Ghost(const T2& constant,ARRAYS_ND_BASE<VECTOR<T2,1> >& array,const int ghost_cells) const
-    {for(int s=0;s<ghost_cells;s++) array(1-s)=array(counts.x+s)=constant;}
+    {for(int s=0;s<ghost_cells;s++) array(-s)=array(counts.x+s-1)=constant;}
     
 //#####################################################################
     void Initialize(const TV_INT& counts_input,const RANGE<TV>& box,const bool MAC_grid=false);
