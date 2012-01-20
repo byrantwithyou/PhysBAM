@@ -54,7 +54,7 @@ Active_Nonkinematic_Size() const
 template<class T> void FACE_CONTROL_PARAMETERS<T>::
 Seek(const int control_index,int& set_subindex,int& control_subindex) const
 {
-    assert((unsigned)control_index<Size());
+    assert((unsigned)control_index<(unsigned)Size());
     control_subindex=control_index;
     for(set_subindex=1;control_subindex>list(set_subindex)->Size();set_subindex++) control_subindex-=list(set_subindex)->Size();
 }

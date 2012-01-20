@@ -64,13 +64,13 @@ public:
     {return m;}
 
     T& operator()(const ID i)
-    {assert((unsigned)i<(unsigned)m);return base_pointer[Value(i)];}
+    {assert((unsigned)Value(i)<(unsigned)Value(m));return base_pointer[Value(i)];}
 
     const T& operator()(const ID i) const
-    {assert((unsigned)i<(unsigned)m);return base_pointer[Value(i)];}
+    {assert((unsigned)Value(i)<(unsigned)Value(m));return base_pointer[Value(i)];}
 
     bool Valid_Index(const ID i) const
-    {return (unsigned)i<(unsigned)m;}
+    {return (unsigned)Value(i)<(unsigned)Value(m);}
 
     ARRAY_VIEW& operator=(const ARRAY_VIEW& source)
     {return BASE::operator=(source);}

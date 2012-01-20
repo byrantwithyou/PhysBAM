@@ -72,10 +72,10 @@ public:
     {return Element_Lower(j,i);}
 
     T& Element_Lower(int i,int j)
-    {assert((unsigned)i<2 && (unsigned)j<=i);return ((T*)this)[((3-j)*j>>1)+i];}
+    {assert((unsigned)i<(unsigned)2 && (unsigned)j<=(unsigned)i);return ((T*)this)[((3-j)*j>>1)+i];}
 
     const T& Element_Lower(int i,int j) const
-    {assert((unsigned)i<2 && (unsigned)j<=i);return ((const T*)this)[((3-j)*j>>1)+i];}
+    {assert((unsigned)i<(unsigned)2 && (unsigned)j<=(unsigned)i);return ((const T*)this)[((3-j)*j>>1)+i];}
 
     bool operator==(const SYMMETRIC_MATRIX& A) const
     {return x11==A.x11 && x21==A.x21 && x22==A.x22;}

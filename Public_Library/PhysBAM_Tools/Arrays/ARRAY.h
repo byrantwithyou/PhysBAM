@@ -111,7 +111,7 @@ public:
 
 private:
     void Resize_Helper(const ID buffer_new,const bool initialize_new_elements=true,const bool copy_existing_elements=true)
-    {if(buffer_size==buffer_new) return;assert(m<=buffer_size);
+    {if(buffer_size==buffer_new) return;assert(m<buffer_size);
     T* p=new T[Value(buffer_new)];
     int m_end=Value(PhysBAM::min(m,buffer_new));
     if(copy_existing_elements) for(int i=0;i<m_end;i++) p[i]=base_pointer[i];
@@ -121,7 +121,7 @@ private:
     buffer_size=buffer_new;}
 
     void Resize_Helper(const ID buffer_new,const bool initialize_new_elements,const bool copy_existing_elements,const T& initialization_value)
-    {if(buffer_size==buffer_new) return;assert(m<=buffer_size);
+    {if(buffer_size==buffer_new) return;assert(m<buffer_size);
     T* p=new T[Value(buffer_new)];
     int m_end=Value(PhysBAM::min(m,buffer_new));
     if(copy_existing_elements) for(int i=0;i<m_end;i++) p[i]=base_pointer[i];
@@ -154,7 +154,7 @@ public:
     template<class T_ARRAY>
     void Append_Elements(const T_ARRAY& append_array)
     {STATIC_ASSERT_SAME(ELEMENT,typename T_ARRAY::ELEMENT);ID m_new=m+Value(append_array.Size());Ensure_Enough_Space(m_new);m=m_new;
-    for(typename T_ARRAY::INDEX i(1);i<=append_array.Size();i++) (*this)(m-Value(append_array.Size())+Value(i))=append_array(i);}
+    for(typename T_ARRAY::INDEX i(0);i<append_array.Size();i++) (*this)(m-Value(append_array.Size())+Value(i))=append_array(i);}
 
     void Append_Unique(const T& element)
     {for(ID i(0);i<m;i++) if((*this)(i)==element) return;Append(element);}
@@ -162,16 +162,16 @@ public:
     template<class T_ARRAY>
     void Append_Unique_Elements(const T_ARRAY& append_array)
     {STATIC_ASSERT_SAME(T,typename T_ARRAY::ELEMENT);
-    typename T_ARRAY::INDEX append_m=append_array.Size();for(typename T_ARRAY::INDEX i(1);i<=append_m;i++) Append_Unique(append_array(i));}
+    typename T_ARRAY::INDEX append_m=append_array.Size();for(typename T_ARRAY::INDEX i(0);i<append_m;i++) Append_Unique(append_array(i));}
 
     void Remove_End()
     {assert(m>ID());m--;}
 
     void Remove_Index(const ID index) // preserves ordering of remaining elements
-    {assert((unsigned)index<(unsigned)m);for(ID i=index;i<m;i++) (*this)(i)=(*this)(i+1);Remove_End();}
+    {assert((unsigned)Value(index)<(unsigned)Value(m));for(ID i=index;i<m;i++) (*this)(i)=(*this)(i+1);Remove_End();}
 
     void Remove_Index_Lazy(const ID index)
-    {assert((unsigned)index<(unsigned)m);
+    {assert((unsigned)Value(index)<(unsigned)Value(m));
     if(index<m) (*this)(index)=(*this)(m);
     Remove_End();}
 

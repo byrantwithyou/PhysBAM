@@ -71,10 +71,10 @@ public:
     {return VECTOR<T,3>(u(1),u(2),u(3))/u(0);}
 
     static T Get_Velocity_Component(const T_ARRAYS_DIMENSION_BASE& U,const TV_INT& cell,const int axis)
-    {assert((unsigned)axis<T_GRID::dimension);return U(cell)(axis+1)/U(cell)(0);}
+    {assert((unsigned)axis<(unsigned)T_GRID::dimension);return U(cell)(axis+1)/U(cell)(0);}
 
     static T Get_Velocity_Component(const TV_DIMENSION& U,const int axis)
-    {assert((unsigned)axis<T_GRID::dimension);return U(axis+1)/U(0);}
+    {assert((unsigned)axis<(unsigned)T_GRID::dimension);return U(axis+1)/U(0);}
 
     static T Get_Density(const T_ARRAYS_DIMENSION_BASE& U,const TV_INT& cell)
     {return U(cell)(0);}

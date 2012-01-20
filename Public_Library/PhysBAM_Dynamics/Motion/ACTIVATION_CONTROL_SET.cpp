@@ -99,14 +99,14 @@ Penalty() const
 template<class T> T ACTIVATION_CONTROL_SET<T>::
 Penalty_Gradient(const int control_id) const
 {
-    assert((unsigned)control_id<Size());
+    assert((unsigned)control_id<(unsigned)Size());
     return activation_penalty_coefficient*Piecewise_Quadratic_Penalty_Prime(activations(control_id),clamp<T>(activations_save(control_id)-max_optimization_step_length,0,activation_cutoff),
         clamp<T>(activations_save(control_id)+max_optimization_step_length,0,activation_cutoff));
 }
 template<class T> T ACTIVATION_CONTROL_SET<T>::
 Penalty_Hessian(const int control_id1,const int control_id2) const
 {
-    assert((unsigned)control_id1<Size() && (unsigned)control_id2<Size());
+    assert((unsigned)control_id1<(unsigned)Size() && (unsigned)control_id2<(unsigned)Size());
     if(control_id1!=control_id2) return 0;
     return activation_penalty_coefficient*Piecewise_Quadratic_Penalty_Double_Prime(activations(control_id1),
         clamp<T>(activations_save(control_id1)-max_optimization_step_length,0,activation_cutoff),

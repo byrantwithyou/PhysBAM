@@ -364,7 +364,7 @@ public:
     T_ARRAY& self=Derived();ID m=self.Size(),index_m=index.Size();
     if(index_m==0) return;
     for(ID kk(0);kk<index_m-1;kk++){
-        assert((unsigned)index(kk)<m);
+        assert((unsigned)index(kk)<(unsigned)m);
         for(ID i=index(kk)+1-kk;i<=index(kk+1)-1-kk;i++) self(i)=self(i+kk);}
     for(ID i=index(index_m)+1-index_m;i<=m-index_m;i++) self(i)=self(i+index_m);
     self.Resize(m-index_m);}
