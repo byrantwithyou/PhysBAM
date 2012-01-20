@@ -3,14 +3,14 @@
 //      Andrew Selle, Jerry Talton, Joseph Teran.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Parsing/STRING_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
-#include <PhysBAM_Geometry/Basic_Geometry/BOX.h>
 using namespace PhysBAM;
 //#####################################################################
 // Function Normal
 //#####################################################################
-template<class TV> TV BOX<TV>::
+template<class TV> TV RANGE<TV>::
 Normal(const int aggregate) const
 {
     assert(aggregate>=0 && aggregate<d*2);
@@ -20,7 +20,7 @@ Normal(const int aggregate) const
 //#####################################################################
 // Function Surface
 //#####################################################################
-template<class TV> TV BOX<TV>::
+template<class TV> TV RANGE<TV>::
 Surface(const TV& X) const
 {
     if(!Lazy_Inside(X)) return clamp(X,min_corner,max_corner);
@@ -33,7 +33,7 @@ Surface(const TV& X) const
 //#####################################################################
 // Function Signed_Distance
 //#####################################################################
-template<class TV> typename TV::SCALAR BOX<TV>::
+template<class TV> typename TV::SCALAR RANGE<TV>::
 Signed_Distance(const TV& X) const
 {
     TV lengths=Edge_Lengths();
@@ -45,7 +45,7 @@ Signed_Distance(const TV& X) const
 //#####################################################################
 // Function Normal
 //#####################################################################
-template<class TV> TV BOX<TV>::
+template<class TV> TV RANGE<TV>::
 Normal(const TV& X) const
 {
     if(Lazy_Inside(X)){
@@ -63,18 +63,18 @@ Normal(const TV& X) const
 //#####################################################################
 // Function Name
 //#####################################################################
-template<class TV> std::string BOX<TV>::
+template<class TV> std::string RANGE<TV>::
 Name()
 {
-    return STRING_UTILITIES::string_sprintf("BOX<VECTOR<T,%d>",d);
+    return STRING_UTILITIES::string_sprintf("RANGE<VECTOR<T,%d>",d);
 }
 //#####################################################################
 #define INSTANTIATION_HELPER(T,d) \
-    template std::string BOX<VECTOR<T,d> >::Name(); \
-    template VECTOR<T,d> BOX<VECTOR<T,d> >::Normal(const int) const; \
-    template VECTOR<T,d> BOX<VECTOR<T,d> >::Normal(const VECTOR<T,d>&) const; \
-    template VECTOR<T,d> BOX<VECTOR<T,d> >::Surface(const VECTOR<T,d>&) const; \
-    template VECTOR<T,d>::SCALAR BOX<VECTOR<T,d> >::Signed_Distance(const VECTOR<T,d>&) const;
+    template std::string RANGE<VECTOR<T,d> >::Name(); \
+    template VECTOR<T,d> RANGE<VECTOR<T,d> >::Normal(const int) const; \
+    template VECTOR<T,d> RANGE<VECTOR<T,d> >::Normal(const VECTOR<T,d>&) const; \
+    template VECTOR<T,d> RANGE<VECTOR<T,d> >::Surface(const VECTOR<T,d>&) const; \
+    template VECTOR<T,d>::SCALAR RANGE<VECTOR<T,d> >::Signed_Distance(const VECTOR<T,d>&) const;
 
 INSTANTIATION_HELPER(float,1);
 INSTANTIATION_HELPER(float,2);

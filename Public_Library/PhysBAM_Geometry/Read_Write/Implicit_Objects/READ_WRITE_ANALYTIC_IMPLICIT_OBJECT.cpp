@@ -13,14 +13,14 @@ void Register_Read_Write_Analytic_Implicit_Object()
 {
 #define DIMENSION_READ_WRITE_HELPER(T,RW) \
     Read_Write<STRUCTURE<VECTOR<T,1> >,RW>::Register_Read_Write<ANALYTIC_IMPLICIT_OBJECT<POINT_SIMPLEX_1D<T> > >(); \
-    Read_Write<STRUCTURE<VECTOR<T,1> >,RW>::Register_Read_Write<ANALYTIC_IMPLICIT_OBJECT<BOX<VECTOR<T,1> > > >(); \
+    Read_Write<STRUCTURE<VECTOR<T,1> >,RW>::Register_Read_Write<ANALYTIC_IMPLICIT_OBJECT<RANGE<VECTOR<T,1> > > >(); \
     Read_Write<STRUCTURE<VECTOR<T,2> >,RW>::Register_Read_Write<ANALYTIC_IMPLICIT_OBJECT<BOUNDED_HORIZONTAL_PLANE<VECTOR<T,2> > > >(); \
-    Read_Write<STRUCTURE<VECTOR<T,2> >,RW>::Register_Read_Write<ANALYTIC_IMPLICIT_OBJECT<BOX<VECTOR<T,2> > > >(); \
+    Read_Write<STRUCTURE<VECTOR<T,2> >,RW>::Register_Read_Write<ANALYTIC_IMPLICIT_OBJECT<RANGE<VECTOR<T,2> > > >(); \
     Read_Write<STRUCTURE<VECTOR<T,2> >,RW>::Register_Read_Write<ANALYTIC_IMPLICIT_OBJECT<LINE_2D<T> > >(); \
     Read_Write<STRUCTURE<VECTOR<T,2> >,RW>::Register_Read_Write<ANALYTIC_IMPLICIT_OBJECT<ORIENTED_BOX<VECTOR<T,2> > > >(); \
     Read_Write<STRUCTURE<VECTOR<T,2> >,RW>::Register_Read_Write<ANALYTIC_IMPLICIT_OBJECT<SPHERE<VECTOR<T,2> > > >(); \
     Read_Write<STRUCTURE<VECTOR<T,2> >,RW>::Register_Read_Write<ANALYTIC_IMPLICIT_OBJECT<SMOOTH_GEAR<VECTOR<T,2> > > >(); \
-    Read_Write<STRUCTURE<VECTOR<T,3> >,RW>::Register_Read_Write<ANALYTIC_IMPLICIT_OBJECT<BOX<VECTOR<T,3> > > >(); \
+    Read_Write<STRUCTURE<VECTOR<T,3> >,RW>::Register_Read_Write<ANALYTIC_IMPLICIT_OBJECT<RANGE<VECTOR<T,3> > > >(); \
     Read_Write<STRUCTURE<VECTOR<T,3> >,RW>::Register_Read_Write<ANALYTIC_IMPLICIT_OBJECT<ORIENTED_BOX<VECTOR<T,3> > > >(); \
     Read_Write<STRUCTURE<VECTOR<T,3> >,RW>::Register_Read_Write<ANALYTIC_IMPLICIT_OBJECT<PLANE<T> > >(); \
     Read_Write<STRUCTURE<VECTOR<T,3> >,RW>::Register_Read_Write<ANALYTIC_IMPLICIT_OBJECT<BOUNDED_HORIZONTAL_PLANE<VECTOR<T,3> > > >(); \

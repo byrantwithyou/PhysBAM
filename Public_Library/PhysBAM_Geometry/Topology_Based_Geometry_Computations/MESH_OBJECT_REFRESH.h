@@ -12,7 +12,7 @@
 
 namespace PhysBAM{
 template<class TV,class T_MESH> class MESH_OBJECT;
-template<class TV> class BOX;
+template<class TV> class RANGE;
 template<class TV> class RANGE;
 
 namespace TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS
@@ -23,7 +23,7 @@ namespace TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS
 template<class TV,class T_MESH> void
 Update_Bounding_Box(MESH_OBJECT<TV,T_MESH>& mo)
 {
-    if(!mo.bounding_box) mo.bounding_box=new BOX<TV>();
+    if(!mo.bounding_box) mo.bounding_box=new RANGE<TV>();
     const BOX_HIERARCHY<TV>* hierarchy=&*debug_cast<const typename MESH_TO_OBJECT<TV,T_MESH>::TYPE&>(mo).hierarchy;
     if(!mo.mesh.elements.m) *mo.bounding_box=RANGE<TV>::Bounding_Box(mo.particles.X);
     else if(hierarchy) *mo.bounding_box=hierarchy->box_hierarchy(hierarchy->root);

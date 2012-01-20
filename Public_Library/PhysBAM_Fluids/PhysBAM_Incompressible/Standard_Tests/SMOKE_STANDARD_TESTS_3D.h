@@ -19,7 +19,7 @@
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 namespace PhysBAM{
 
-template<class TV> class BOX;
+template<class TV> class RANGE;
 template<class TV> class GRID;
 template<class TV> class SOLIDS_FLUIDS_EXAMPLE;
 template<class TV> class RIGID_BODY_COLLECTION;
@@ -41,7 +41,7 @@ public:
 
     int test_number;
     GRID<TV> grid;
-    BOX<TV> source;
+    RANGE<TV> source;
     MATRIX<T,4> world_to_source;
     TV source_velocity;
     T rho;

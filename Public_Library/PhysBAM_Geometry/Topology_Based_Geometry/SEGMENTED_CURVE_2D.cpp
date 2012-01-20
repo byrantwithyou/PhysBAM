@@ -6,7 +6,7 @@
 //##################################################################### 
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/constants.h>
-#include <PhysBAM_Geometry/Basic_Geometry/BOX.h>
+#include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry_Intersections/SEGMENT_2D_SEGMENT_2D_INTERSECTION.h>
 #include <PhysBAM_Geometry/Registry/STRUCTURE_REGISTRY.h>

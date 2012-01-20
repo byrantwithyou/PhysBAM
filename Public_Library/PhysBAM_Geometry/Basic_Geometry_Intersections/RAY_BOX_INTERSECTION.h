@@ -14,7 +14,6 @@ template<class T> bool Intersects(RAY<VECTOR<T,1> >& ray,const RANGE<VECTOR<T,1>
 template<class T> bool Intersects(RAY<VECTOR<T,2> >& ray,const RANGE<VECTOR<T,2> >& box, const T thickness_over_two=0,const T segment_intersect_epsilon=0);
 template<class T> bool Intersects(RAY<VECTOR<T,3> >& ray,const RANGE<VECTOR<T,3> >& box, const T thickness_over_two=0);
 template<class T> bool Lazy_Outside(RAY<VECTOR<T,3> >& ray,const RANGE<VECTOR<T,3> >& box);
-template<class T> bool Get_Intersection_Range(const RAY<VECTOR<T,3> >& ray,const BOX<VECTOR<T,3> >& box,T& start_t,T& end_t);
 template<class TV> bool Get_Intersection_Range(const RAY<TV>& ray,const RANGE<TV>& box,typename TV::SCALAR& start_t,typename TV::SCALAR& end_t);
 template<class T> bool Lazy_Intersects(RAY<VECTOR<T,3> >& ray,const RANGE<VECTOR<T,3> >& box, const T thickness_over_two=0);
 //#####################################################################

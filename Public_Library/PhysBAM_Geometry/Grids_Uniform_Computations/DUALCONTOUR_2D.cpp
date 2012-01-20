@@ -4,8 +4,8 @@
 //#####################################################################
 // Class DUALCONTOUR_2D
 //#####################################################################
+#include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Math_Tools/sign.h>
-#include <PhysBAM_Geometry/Basic_Geometry/BOX.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/DUALCONTOUR_2D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
@@ -86,7 +86,7 @@ Ensure_Vertices_In_Correct_Cells()
         ++vertex;TV_INT v=grid.Cell(geometry(vertex),0);
         if(i!=v){
             TV cell_center=grid.Center(i);TV offset=(T).5*grid.dX;
-            geometry(vertex)=BOX<TV>(cell_center-offset,cell_center+offset).Surface(geometry(vertex));}}
+            geometry(vertex)=RANGE<TV>(cell_center-offset,cell_center+offset).Surface(geometry(vertex));}}
 }
 //#####################################################################
 // Function Get_Segmented_Curve

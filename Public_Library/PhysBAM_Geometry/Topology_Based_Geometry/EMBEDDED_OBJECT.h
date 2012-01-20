@@ -57,7 +57,7 @@ public:
     T_BOUNDARY_OBJECT embedded_object;
     ARRAY<VECTOR<bool,d+1> > node_in_simplex_is_material;
     ARRAY<int> orientation_index; // currently only used sometimes in 3d
-    BOX<TV>* bounding_box;
+    RANGE<TV>* bounding_box;
 protected:
     bool need_destroy_simplicial_object;
 public:

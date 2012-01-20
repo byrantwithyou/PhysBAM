@@ -112,7 +112,7 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(IMPLICIT_OBJECT<VE
     else if(const ANALYTIC_IMPLICIT_OBJECT<SMOOTH_GEAR<TV> >* implicit=dynamic_cast<const ANALYTIC_IMPLICIT_OBJECT<SMOOTH_GEAR<TV> >*>(&implicit_input)) return Generate_Triangles(implicit->analytic);
     else if(const ANALYTIC_IMPLICIT_OBJECT<BOUNDED_HORIZONTAL_PLANE<TV> >* implicit=dynamic_cast<const ANALYTIC_IMPLICIT_OBJECT<BOUNDED_HORIZONTAL_PLANE<TV> >*>(&implicit_input)) return Generate_Triangles(implicit->analytic);
     else if(const ANALYTIC_IMPLICIT_OBJECT<ORIENTED_BOX<TV> >* implicit=dynamic_cast<const ANALYTIC_IMPLICIT_OBJECT<ORIENTED_BOX<TV> >*>(&implicit_input)) return Generate_Triangles(implicit->analytic);
-    else if(const ANALYTIC_IMPLICIT_OBJECT<BOX<TV> >* implicit=dynamic_cast<const ANALYTIC_IMPLICIT_OBJECT<BOX<TV> >*>(&implicit_input)) return Generate_Triangles(implicit->analytic);
+    else if(const ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >* implicit=dynamic_cast<const ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >*>(&implicit_input)) return Generate_Triangles(implicit->analytic);
     else if(const ANALYTIC_IMPLICIT_OBJECT<TORUS<T> >* implicit=dynamic_cast<const ANALYTIC_IMPLICIT_OBJECT<TORUS<T> >*>(&implicit_input)) return Generate_Triangles(implicit->analytic);
     else if(const ANALYTIC_IMPLICIT_OBJECT<CYLINDER<T> >* implicit=dynamic_cast<const ANALYTIC_IMPLICIT_OBJECT<CYLINDER<T> >*>(&implicit_input)) return Generate_Triangles(implicit->analytic);
     else{

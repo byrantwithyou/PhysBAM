@@ -246,7 +246,7 @@ void Register_Analytic_Contacts(HASHTABLE<VECTOR<std::string,2>,typename ANALYTI
 {
     const char* sphere=typeid(ANALYTIC_IMPLICIT_OBJECT<SPHERE<TV> >).name();
     const char* plane=typeid(ANALYTIC_IMPLICIT_OBJECT<BOUNDED_HORIZONTAL_PLANE<TV> >).name();
-    const char* box=typeid(ANALYTIC_IMPLICIT_OBJECT<BOX<TV> >).name();
+    const char* box=typeid(ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >).name();
     analytic_contact_registry.Set(VECTOR<std::string,2>(sphere,sphere),CONTACT_PAIRS::Update_Sphere_Sphere_Contact_Pair<TV>);
     analytic_contact_registry.Set(VECTOR<std::string,2>(box,box),CONTACT_PAIRS::Update_Box_Box_Contact_Pair<TV>);
     analytic_contact_registry.Set(VECTOR<std::string,2>(sphere,plane).Sorted(),CONTACT_PAIRS::Update_Sphere_Plane_Contact_Pair<TV>);

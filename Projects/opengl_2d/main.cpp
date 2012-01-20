@@ -38,13 +38,13 @@
 #include <PhysBAM_Rendering/PhysBAM_OpenGL_Solids/OpenGL_Rigids_Components/OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D.h>
 #include <PhysBAM_Dynamics/Geometry/GENERAL_GEOMETRY_FORWARD.h>
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_UNIFORM.h>
-#include <PhysBAM_Dynamics/Level_Sets/VOF_ADVECTION.h>
 #include <PhysBAM_Dynamics/Particles/PARTICLE_LEVELSET_PARTICLES.h>
 #include <PhysBAM_Dynamics/Particles/PARTICLE_LEVELSET_REMOVED_PARTICLES.h>
 #include <PhysBAM_Dynamics/Particles/PARTICLES_FORWARD.h>
 #include <PhysBAM_Dynamics/Particles/SPH_PARTICLES.h>
 #include <fstream>
 #include <sstream>
+#include <PhysBAM_Dynamics/Level_Sets/VOF_ADVECTION.h>
 #include <string.h>
 using namespace PhysBAM;
 using namespace std;

@@ -26,7 +26,7 @@ template<class T>
 struct BASIC_GEOMETRY_POLICY<VECTOR<T,1> >
 {
     typedef VECTOR<T,1> POINT;
-    typedef BOX<VECTOR<T,1> > ORIENTED_BOX;
+    typedef RANGE<VECTOR<T,1> > ORIENTED_BOX;
     typedef POINT_SIMPLEX_1D<T> HYPERPLANE;
     typedef POINT_SIMPLEX_1D<T> POINT_SIMPLEX;
     typedef SEGMENT_1D<T> SEGMENT;

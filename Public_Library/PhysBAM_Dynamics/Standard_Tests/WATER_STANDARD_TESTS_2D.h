@@ -57,7 +57,7 @@ public:
 
     int test_number;
     GRID<TV> grid;
-    ARRAY<BOX<TV> > sources;
+    ARRAY<RANGE<TV> > sources;
     ARRAY<MATRIX<T,3> > world_to_source;
     ARRAY<TV> source_velocity;
     int sphere;

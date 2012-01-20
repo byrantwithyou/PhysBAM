@@ -8,8 +8,8 @@
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FLOOD_FILL_3D.h>
 #include <PhysBAM_Tools/Log/LOG.h>
+#include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_3D.h>
-#include <PhysBAM_Geometry/Basic_Geometry/BOX.h>
 #include <PhysBAM_Geometry/Basic_Geometry_Intersections/SEGMENT_3D_TRIANGLE_3D_INTERSECTION.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/LEVELSET_MAKER_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/EXTRAPOLATION_UNIFORM.h>
@@ -79,7 +79,7 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
 
     const T surface_thickness_over_two=Surface_Thickness_Over_Two(grid),surface_padding_for_flood_fill=Surface_Padding_For_Flood_Fill(grid);
 
-    const BOX<TV>& grid_domain=grid.domain;
+    const RANGE<TV>& grid_domain=grid.domain;
     if(verbose) LOG::Time("Rasterizing Triangles");
     for(int t=0;t<triangulated_surface.mesh.elements.m;t++){
         const TRIANGLE_3D<T>& triangle=(*triangulated_surface.triangle_list)(t);

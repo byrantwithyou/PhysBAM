@@ -7,7 +7,7 @@
 #ifndef __RENDERING_VOXELS__
 #define __RENDERING_VOXELS__
 
-#include <PhysBAM_Geometry/Basic_Geometry/BOX.h>
+#include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Geometry/Basic_Geometry_Intersections/RAY_BOX_INTERSECTION.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_OBJECT.h>
 namespace PhysBAM{
@@ -20,7 +20,7 @@ public:
     using RENDERING_OBJECT<T>::small_number;using RENDERING_OBJECT<T>::Intersection;using RENDERING_OBJECT<T>::Object_Space_Ray;using RENDERING_OBJECT<T>::Object_Space_Point;
     using RENDERING_OBJECT<T>::World_Space_Vector;
 
-    BOX<VECTOR<T,3> > box; // box containing the voxelized data
+    RANGE<VECTOR<T,3> > box; // box containing the voxelized data
     bool precompute_single_scattering;
 
     RENDERING_VOXELS()

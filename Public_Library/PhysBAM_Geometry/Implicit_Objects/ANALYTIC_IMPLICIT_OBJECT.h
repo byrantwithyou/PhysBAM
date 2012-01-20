@@ -14,7 +14,6 @@ class ANALYTIC_IMPLICIT_OBJECT:public IMPLICIT_OBJECT<typename T_ANALYTIC::VECTO
 {
     typedef typename T_ANALYTIC::VECTOR_T TV;
     typedef typename TV::SCALAR T;
-    STATIC_ASSERT((!IS_SAME<RANGE<TV>,T_ANALYTIC>::value)); // use BOX<TV> instead
 public:
     using IMPLICIT_OBJECT<TV>::box;
     T_ANALYTIC analytic;

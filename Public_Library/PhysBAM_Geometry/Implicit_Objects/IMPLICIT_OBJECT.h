@@ -7,9 +7,10 @@
 #ifndef __IMPLICIT_OBJECT__
 #define __IMPLICIT_OBJECT__
 
+#include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_POLICY.h>
 #include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
-#include <PhysBAM_Geometry/Basic_Geometry/BOX.h>
+#include <PhysBAM_Geometry/Basic_Geometry/RAY.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/STRUCTURE.h>
 namespace PhysBAM{
 
@@ -23,7 +24,7 @@ class IMPLICIT_OBJECT:public STRUCTURE<TV>
 public:
     typedef TV VECTOR_T;
 
-    BOX<TV> box; // box containing the voxelized implicit surface
+    RANGE<TV> box; // box containing the voxelized implicit surface
     bool use_secondary_interpolation;
 
     IMPLICIT_OBJECT();

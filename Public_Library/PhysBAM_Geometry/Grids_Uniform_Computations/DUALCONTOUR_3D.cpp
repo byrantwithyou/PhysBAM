@@ -4,7 +4,7 @@
 //#####################################################################
 // Class DUALCONTOUR_3D
 //#####################################################################
-#include <PhysBAM_Geometry/Basic_Geometry/BOX.h>
+#include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/DUALCONTOUR_3D.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_3D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
@@ -76,7 +76,7 @@ Ensure_Vertices_In_Correct_Cells()
         vertex++;TV_INT v=grid.Clamp_To_Cell(geometry(vertex));
         if(i!=v){
             TV cell_center=grid.Center(i);TV offset((T).5*grid.dX);
-            geometry(vertex)=BOX<TV>(cell_center-offset,cell_center+offset).Surface(geometry(vertex));}}
+            geometry(vertex)=RANGE<TV>(cell_center-offset,cell_center+offset).Surface(geometry(vertex));}}
 }
 //#####################################################################
 // Function Get_Triangulated_Surface

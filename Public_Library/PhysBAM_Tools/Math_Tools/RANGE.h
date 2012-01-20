@@ -17,6 +17,7 @@
 #include <cassert>
 #include <cfloat>
 #include <limits>
+#include <string>
 namespace PhysBAM{
 
 template<class TV> class RANGE;
@@ -68,6 +69,10 @@ public:
 
     RANGE(const TV& point)
         :min_corner(point),max_corner(point)
+    {}
+
+    RANGE(const RANGE<TV>& range,const FRAME<VECTOR<T,1> >& frame) // allow 1d ranges to be used as oriented boxes
+        :min_corner(frame*range.min_corner),max_corner(frame*range.max_corner)
     {}
 
     static RANGE<TV> Unit_Box()
@@ -288,6 +293,21 @@ public:
     RANGE<VECTOR<T,d-1> > Remove_Dimension(int dimension) const
     {return RANGE<VECTOR<T,d-1> >(min_corner.Remove_Index(dimension),max_corner.Remove_Index(dimension));}
 
+    VECTOR<T,TV::dimension-1> Principal_Curvatures(const TV& X) const
+    {return VECTOR<T,TV::dimension-1>();}
+
+    const RANGE<TV>& Bounding_Box() const
+    {return *this;}
+
+    RANGE<TV> Axis_Aligned_Bounding_Box() const
+    {return *this;}
+
+//#####################################################################
+    TV Normal(const int aggregate) const;
+    TV Normal(const TV& X) const;
+    TV Surface(const TV& X) const;
+    T Signed_Distance(const TV& X) const;
+    static std::string Name();
 //#####################################################################
 };
 template<class TV>

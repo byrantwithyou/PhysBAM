@@ -8,8 +8,8 @@
 #define __BOUNDARY_VELOCITY_TESTS__
 
 #include <PhysBAM_Tools/Interpolation/INTERPOLATION_CURVE.h>
+#include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Parsing/PARAMETER_LIST.h>
-#include <PhysBAM_Geometry/Basic_Geometry/BOX.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Standard_Tests/THIN_SHELLS_FLUID_COUPLING_UTILITIES.h>
 #include <Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_2D.h>

@@ -4,7 +4,7 @@
 //#####################################################################
 // Namespace CONTACT_PAIRS
 //##################################################################### 
-#include <PhysBAM_Geometry/Basic_Geometry/BOX.h>
+#include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/PLANE.h>
 #include <PhysBAM_Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
@@ -38,15 +38,15 @@ bool Update_Box_Plane_Contact_Pair(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisi
     RIGID_BODY<TV>* body2=&rigid_body_collection.Rigid_Body(i2);
     if(IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >* object_transformed=dynamic_cast<IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >*>(object2)){
         transform=*object_transformed->transform;object2=object_transformed->object_space_implicit_object;}
-    ANALYTIC_IMPLICIT_OBJECT<BOX<TV> >* implicit_box=dynamic_cast<ANALYTIC_IMPLICIT_OBJECT<BOX<TV> >*>(object2);
+    ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >* implicit_box=dynamic_cast<ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >*>(object2);
     if(!implicit_box){
         if(IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >* object_transformed=dynamic_cast<IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >*>(object1)){
             transform=*object_transformed->transform;object1=object_transformed->object_space_implicit_object;}
         exchange(object1,object2);
         exchange(i1,i2);
         exchange(body1,body2);
-        implicit_box=dynamic_cast<ANALYTIC_IMPLICIT_OBJECT<BOX<TV> >*>(object2);}
-    BOX<TV>& box=implicit_box->analytic;
+        implicit_box=dynamic_cast<ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >*>(object2);}
+    RANGE<TV>& box=implicit_box->analytic;
 
     ARRAY<TV> points;bool intersect=false;
     for(int i=0;i<8;i++){

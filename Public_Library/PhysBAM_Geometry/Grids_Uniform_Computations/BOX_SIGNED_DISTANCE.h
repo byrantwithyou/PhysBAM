@@ -10,7 +10,7 @@
 
 namespace PhysBAM{
 namespace SIGNED_DISTANCE{
-template<class TV,class T_GRID,class T_ARRAY> void Calculate(BOX<TV>& box,const T_GRID& grid,T_ARRAY& array);
+template<class TV,class T_GRID,class T_ARRAY> void Calculate(RANGE<TV>& box,const T_GRID& grid,T_ARRAY& array);
 };
 };
 #endif

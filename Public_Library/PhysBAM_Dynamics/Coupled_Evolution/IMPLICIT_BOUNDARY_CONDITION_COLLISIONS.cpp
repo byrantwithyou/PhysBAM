@@ -54,7 +54,7 @@ Update_Boundary_Conditions(const GRID<TV>& grid,ARRAY<bool,TV_INT>& psi_D,ARRAY<
             if(!object->volume_object){
                 object->object.Update_Bounding_Box();
                 object->object.Refresh_Auxiliary_Structures();
-                BOX<TV>& box(*(object->object.bounding_box));
+                RANGE<TV>& box(*(object->object.bounding_box));
                 TV_INT min_index=grid.Clamp_To_Cell(box.Minimum_Corner(),1);
                 TV_INT max_index=grid.Clamp_To_Cell(box.Maximum_Corner(),1);
                 for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,RANGE<TV_INT>(min_index,max_index));iterator.Valid();iterator.Next())

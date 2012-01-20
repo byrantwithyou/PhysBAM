@@ -16,7 +16,7 @@
 
 #ifdef SUPPORT_FORMATTED_STENCIL_OUTPUT
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
-#include <PhysBAM_Geometry/Basic_Geometry/BOX.h>
+#include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <iomanip>
 #endif
 

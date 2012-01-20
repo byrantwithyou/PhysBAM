@@ -6,7 +6,6 @@
 //##################################################################### 
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
-#include <PhysBAM_Geometry/Basic_Geometry/BOX.h>
 #include <PhysBAM_Geometry/Basic_Geometry/PLANE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/RAY.h>
 #include <PhysBAM_Geometry/Basic_Geometry_Intersections/RAY_BOX_INTERSECTION.h>
@@ -121,29 +120,6 @@ template<class T> bool Lazy_Intersects(RAY<VECTOR<T,3> >& ray,const RANGE<VECTOR
 //#####################################################################
 // Function Get_Intersection_Range
 //#####################################################################
-template<class T> bool Get_Intersection_Range(const RAY<VECTOR<T,3> >& ray,const BOX<VECTOR<T,3> >& box,T& start_t,T& end_t)
-{
-    if(box.Lazy_Inside(ray.endpoint)) start_t=0;
-    else{
-        RAY<VECTOR<T,3> > ray_copy(ray);
-        if(INTERSECTION::Lazy_Intersects(ray_copy,box)) start_t=ray_copy.t_max;
-        else return false;}
-
-    if(!ray.semi_infinite && box.Lazy_Inside(ray.Point(ray.t_max))) end_t=ray.t_max;
-    else{
-        RAY<VECTOR<T,3> > ray_copy(ray);
-        if(ray_copy.semi_infinite){ray_copy.semi_infinite=false;ray_copy.t_max=start_t+2*box.Edge_Lengths().Max();}
-        end_t=ray_copy.t_max; // save this
-        ray_copy.endpoint=ray_copy.Point(ray_copy.t_max);ray_copy.direction*=-1; // flip ray
-        if(INTERSECTION::Lazy_Intersects(ray_copy,box)) end_t-=ray_copy.t_max;
-        else return false;}
-
-    return true;
-}
-//#####################################################################
-// Function Get_Intersection_Range
-//#####################################################################
-// template<class T> bool Get_Intersection_Range(const RAY<VECTOR<T,3> >& ray,const BOX<VECTOR<T,3> >& box,T& start_t,T& end_t)
 template<class TV> bool Get_Intersection_Range(const RAY<TV>& ray,const RANGE<TV>& box,typename TV::SCALAR& start_t,typename TV::SCALAR& end_t)
 {
     if(box.Lazy_Inside(ray.endpoint)) start_t=0;
@@ -169,7 +145,6 @@ template bool Intersects(RAY<VECTOR<float,2> >&,const RANGE<VECTOR<float,2> >&,c
 template bool Intersects(RAY<VECTOR<float,3> >&,const RANGE<VECTOR<float,3> >&,const float);
 template bool Lazy_Outside(RAY<VECTOR<float,3> >&,const RANGE<VECTOR<float,3> >&);
 template bool Lazy_Intersects(RAY<VECTOR<float,3> >&,const RANGE<VECTOR<float,3> >&,const float);
-template bool Get_Intersection_Range(const RAY<VECTOR<float,3> >&,const BOX<VECTOR<float,3> >&,float&,float&);
 template bool Get_Intersection_Range(const RAY<VECTOR<float,1> >&,const RANGE<VECTOR<float,1> >&,float&,float&);
 template bool Get_Intersection_Range(const RAY<VECTOR<float,2> >&,const RANGE<VECTOR<float,2> >&,float&,float&);
 template bool Get_Intersection_Range(const RAY<VECTOR<float,3> >&,const RANGE<VECTOR<float,3> >&,float&,float&);
@@ -179,7 +154,6 @@ template bool Intersects(RAY<VECTOR<double,2> >&,const RANGE<VECTOR<double,2> >&
 template bool Intersects(RAY<VECTOR<double,3> >&,const RANGE<VECTOR<double,3> >&,const double);
 template bool Lazy_Outside(RAY<VECTOR<double,3> >&,const RANGE<VECTOR<double,3> >&);
 template bool Lazy_Intersects(RAY<VECTOR<double,3> >&,const RANGE<VECTOR<double,3> >&,const double);
-template bool Get_Intersection_Range(const RAY<VECTOR<double,3> >&,const BOX<VECTOR<double,3> >&,double&,double&);
 template bool Get_Intersection_Range(const RAY<VECTOR<double,1> >&,const RANGE<VECTOR<double,1> >&,double&,double&);
 template bool Get_Intersection_Range(const RAY<VECTOR<double,2> >&,const RANGE<VECTOR<double,2> >&,double&,double&);
 template bool Get_Intersection_Range(const RAY<VECTOR<double,3> >&,const RANGE<VECTOR<double,3> >&,double&,double&);

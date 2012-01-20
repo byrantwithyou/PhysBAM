@@ -22,7 +22,7 @@ public:
     using RENDERING_OBJECT<T>::Inside;using RENDERING_OBJECT<T>::Intersection;using RENDERING_OBJECT<T>::Object_Space_Vector;
     using RENDERING_OBJECT<T>::Object_Space_Ray;using RENDERING_OBJECT<T>::World_Space_Point;
 
-    BOX<TV> box;
+    RANGE<TV> box;
 
     RENDERING_BOX()
     {}

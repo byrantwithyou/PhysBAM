@@ -15,8 +15,8 @@
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/QUADRATIC_INTERPOLATION_UNIFORM.h>
 #include <PhysBAM_Tools/Log/DEBUG_PRINT.h>
+#include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
-#include <PhysBAM_Geometry/Basic_Geometry/BOX.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_POLICY_UNIFORM.h>
 #include <PhysBAM_Dynamics/Advection_Equations/ADVECTION_CONSERVATIVE_UNIFORM_FORWARD.h>
@@ -45,7 +45,7 @@ public:
     T2 total_mass_gained;
     T2 total_potential_lost;
     T2 total_potential_gained;
-    BOX<TV> ghost_box;
+    RANGE<TV> ghost_box;
     SPHERE<TV> collision_object;
     VECTOR<VECTOR<bool,2>,TV::dimension> solid_walls_hack_axis;
     ARRAY<T,TV_INT> momentum_lost;

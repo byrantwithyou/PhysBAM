@@ -33,7 +33,7 @@ public:
 
     T_MESH& mesh;
     GEOMETRY_PARTICLES<TV>& particles;
-    BOX<TV>* bounding_box;
+    RANGE<TV>* bounding_box;
     PARTICLE_PARTITION<TV>* particle_partition;
     TV_INT desired_particle_partition_counts;
 private:

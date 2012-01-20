@@ -56,7 +56,7 @@ static IMPLICIT_OBJECT<TV>* Add_Analytic_Sphere(const TV&,const T scaling_factor
 template<class T>
 static IMPLICIT_OBJECT<VECTOR<T,2> >* Add_Analytic_Cylinder(const VECTOR<T,2>&,const T scaling_factor)
 {
-    return new ANALYTIC_IMPLICIT_OBJECT<BOX<VECTOR<T,2> > >(BOX<VECTOR<T,2> >(VECTOR<T,2>(-scaling_factor/2,-scaling_factor/2),VECTOR<T,2>(scaling_factor/2,scaling_factor/2)));
+    return new ANALYTIC_IMPLICIT_OBJECT<RANGE<VECTOR<T,2> > >(RANGE<VECTOR<T,2> >(VECTOR<T,2>(-scaling_factor/2,-scaling_factor/2),VECTOR<T,2>(scaling_factor/2,scaling_factor/2)));
 }
 template<class T>
 static IMPLICIT_OBJECT<VECTOR<T,3> >* Add_Analytic_Cylinder(const VECTOR<T,3>&,const T scaling_factor)
@@ -150,8 +150,8 @@ template<class TV> RIGID_BODY<TV>& RIGIDS_STANDARD_TESTS<TV>::
 Add_Analytic_Box(const VECTOR<T,1>& scaling_factor)
 {
     RIGID_BODY<TV>& rigid_body=*new RIGID_BODY<TV>(rigid_body_collection,true);
-    BOX<TV> box((T)-.5*scaling_factor,(T).5*scaling_factor);
-    rigid_body.Add_Structure(*new ANALYTIC_IMPLICIT_OBJECT<BOX<TV> >(box));
+    RANGE<TV> box((T)-.5*scaling_factor,(T).5*scaling_factor);
+    rigid_body.Add_Structure(*new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(box));
     GEOMETRY_PARTICLES<TV>& particles=*new GEOMETRY_PARTICLES<TV>;
     POINT_SIMPLICES_1D<T>& simplicial_object=*POINT_SIMPLICES_1D<T>::Create(particles);
     particles.array_collection->Add_Elements(2);
@@ -172,8 +172,8 @@ template<class TV> RIGID_BODY<TV>& RIGIDS_STANDARD_TESTS<TV>::
 Add_Analytic_Box(const VECTOR<T,2>& scaling_factor,int segments_per_side)
 {
     RIGID_BODY<TV>& rigid_body=*new RIGID_BODY<TV>(rigid_body_collection,true);
-    BOX<TV> box((T)-.5*scaling_factor,(T).5*scaling_factor);
-    rigid_body.Add_Structure(*new ANALYTIC_IMPLICIT_OBJECT<BOX<TV> >(box));
+    RANGE<TV> box((T)-.5*scaling_factor,(T).5*scaling_factor);
+    rigid_body.Add_Structure(*new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(box));
     GEOMETRY_PARTICLES<TV>& particles=*new GEOMETRY_PARTICLES<TV>;
     SEGMENTED_CURVE_2D<T>& simplicial_object=*SEGMENTED_CURVE_2D<T>::Create(particles);
     particles.array_collection->Add_Elements(4*segments_per_side);
@@ -198,8 +198,8 @@ template<class TV> RIGID_BODY<TV>& RIGIDS_STANDARD_TESTS<TV>::
 Add_Analytic_Box(const VECTOR<T,3>& scaling_factor)
 {
     RIGID_BODY<TV>& rigid_body=*new RIGID_BODY<TV>(rigid_body_collection,true);
-    BOX<TV> box((T)-.5*scaling_factor,(T).5*scaling_factor);
-    rigid_body.Add_Structure(*new ANALYTIC_IMPLICIT_OBJECT<BOX<TV> >(box));
+    RANGE<TV> box((T)-.5*scaling_factor,(T).5*scaling_factor);
+    rigid_body.Add_Structure(*new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(box));
     rigid_body.Add_Structure(*TESSELLATION::Generate_Triangles(box));
     rigid_body_collection.Add_Rigid_Body_And_Geometry(&rigid_body);
     return rigid_body;

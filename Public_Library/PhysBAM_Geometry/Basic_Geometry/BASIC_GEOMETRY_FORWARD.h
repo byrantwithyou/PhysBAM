@@ -9,7 +9,7 @@
 
 namespace PhysBAM{
 
-template<class TV> class BOX;
+template<class TV> class RANGE;
 template<class TV> class RANGE;
 template<class TV> class RAY;
 template<class T,int d> class VECTOR;

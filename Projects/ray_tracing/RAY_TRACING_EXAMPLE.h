@@ -8,9 +8,9 @@
 #define __RAY_TRACING_EXAMPLE__
 
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
+#include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
-#include <PhysBAM_Geometry/Basic_Geometry/BOX.h>
 namespace PhysBAM{
 
 template<class T> class RENDER_WORLD;

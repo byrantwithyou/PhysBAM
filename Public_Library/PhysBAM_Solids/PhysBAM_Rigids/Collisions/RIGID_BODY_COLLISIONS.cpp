@@ -265,8 +265,8 @@ Update_Box_Box_Collision(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,const 
         transform1=*object_transformed->transform;object1=object_transformed->object_space_implicit_object;}
     if(IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >* object_transformed=dynamic_cast<IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >*>(object2)){
         transform2=*object_transformed->transform;object2=object_transformed->object_space_implicit_object;}
-    BOX<TV>& box1=dynamic_cast<ANALYTIC_IMPLICIT_OBJECT<BOX<TV> >&>(*object1).analytic;
-    BOX<TV>& box2=dynamic_cast<ANALYTIC_IMPLICIT_OBJECT<BOX<TV> >&>(*object2).analytic;
+    RANGE<TV>& box1=dynamic_cast<ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >&>(*object1).analytic;
+    RANGE<TV>& box2=dynamic_cast<ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >&>(*object2).analytic;
     ORIENTED_BOX<TV> box1_transformed(box1,body1.Frame());
     ORIENTED_BOX<TV> box2_transformed(box2,body2.Frame());
 
@@ -321,14 +321,14 @@ Update_Box_Plane_Collision(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,cons
     RIGID_BODY<TV>* body2=&rigid_body_collisions.rigid_body_collection.Rigid_Body(i2);
     if(IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >* object_transformed=dynamic_cast<IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >*>(object2)){
         transform=*object_transformed->transform;object2=object_transformed->object_space_implicit_object;}
-    ANALYTIC_IMPLICIT_OBJECT<BOX<TV> >* implicit_box=dynamic_cast<ANALYTIC_IMPLICIT_OBJECT<BOX<TV> >*>(object2);
+    ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >* implicit_box=dynamic_cast<ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >*>(object2);
     if(!implicit_box){
         if(IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >* object_transformed=dynamic_cast<IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >*>(object1)){
             transform=*object_transformed->transform;object1=object_transformed->object_space_implicit_object;}
         exchange(object1,object2);
         exchange(body1,body2);
-        implicit_box=dynamic_cast<ANALYTIC_IMPLICIT_OBJECT<BOX<TV> >*>(object2);}
-    BOX<TV>& box=implicit_box->analytic;
+        implicit_box=dynamic_cast<ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >*>(object2);}
+    RANGE<TV>& box=implicit_box->analytic;
 
     ARRAY<TV> points;bool intersect=false;
     for(int i=0;i<8;i++){
@@ -1064,7 +1064,7 @@ template<class TV> void RIGID_BODY_COLLISIONS<TV>::
 Register_Analytic_Collisions()
 {
     const char* sphere=typeid(ANALYTIC_IMPLICIT_OBJECT<SPHERE<TV> >).name();
-    const char* box=typeid(ANALYTIC_IMPLICIT_OBJECT<BOX<TV> >).name();
+    const char* box=typeid(ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >).name();
     const char* plane=typeid(ANALYTIC_IMPLICIT_OBJECT<BOUNDED_HORIZONTAL_PLANE<TV> >).name();
     analytic_collision_registry.Set(VECTOR<std::string,2>(sphere,sphere),Update_Sphere_Sphere_Collision);
     analytic_collision_registry.Set(VECTOR<std::string,2>(sphere,plane).Sorted(),Update_Sphere_Plane_Collision);

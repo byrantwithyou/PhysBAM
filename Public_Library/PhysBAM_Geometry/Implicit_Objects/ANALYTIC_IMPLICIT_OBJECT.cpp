@@ -4,9 +4,9 @@
 //#####################################################################
 // Class ANALYTIC_IMPLICIT_OBJECT
 //#####################################################################
+#include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/BOUNDED_HORIZONTAL_PLANE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/BOWL.h>
-#include <PhysBAM_Geometry/Basic_Geometry/BOX.h>
 #include <PhysBAM_Geometry/Basic_Geometry/CYLINDER.h>
 #include <PhysBAM_Geometry/Basic_Geometry/LINE_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/ORIENTED_BOX.h>
@@ -25,15 +25,15 @@ using namespace PhysBAM;
 namespace PhysBAM{
 bool Register_Analytic_Implicit_Object(){
     static bool done=false;if(done) return true;done=true;
-    STRUCTURE_REGISTRY<VECTOR<float,1> >::Register<ANALYTIC_IMPLICIT_OBJECT<BOX<VECTOR<float,1> > > >();
+    STRUCTURE_REGISTRY<VECTOR<float,1> >::Register<ANALYTIC_IMPLICIT_OBJECT<RANGE<VECTOR<float,1> > > >();
     STRUCTURE_REGISTRY<VECTOR<float,1> >::Register<ANALYTIC_IMPLICIT_OBJECT<POINT_SIMPLEX_1D<float> > >();
     STRUCTURE_REGISTRY<VECTOR<float,2> >::Register<ANALYTIC_IMPLICIT_OBJECT<BOUNDED_HORIZONTAL_PLANE<VECTOR<float,2> > > >();
-    STRUCTURE_REGISTRY<VECTOR<float,2> >::Register<ANALYTIC_IMPLICIT_OBJECT<BOX<VECTOR<float,2> > > >();
+    STRUCTURE_REGISTRY<VECTOR<float,2> >::Register<ANALYTIC_IMPLICIT_OBJECT<RANGE<VECTOR<float,2> > > >();
     STRUCTURE_REGISTRY<VECTOR<float,2> >::Register<ANALYTIC_IMPLICIT_OBJECT<LINE_2D<float> > >();
     STRUCTURE_REGISTRY<VECTOR<float,2> >::Register<ANALYTIC_IMPLICIT_OBJECT<ORIENTED_BOX<VECTOR<float,2> > > >();
     STRUCTURE_REGISTRY<VECTOR<float,2> >::Register<ANALYTIC_IMPLICIT_OBJECT<SPHERE<VECTOR<float,2> > > >();
     STRUCTURE_REGISTRY<VECTOR<float,2> >::Register<ANALYTIC_IMPLICIT_OBJECT<SMOOTH_GEAR<VECTOR<float,2> > > >();
-    STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<ANALYTIC_IMPLICIT_OBJECT<BOX<VECTOR<float,3> > > >();
+    STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<ANALYTIC_IMPLICIT_OBJECT<RANGE<VECTOR<float,3> > > >();
     STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<ANALYTIC_IMPLICIT_OBJECT<ORIENTED_BOX<VECTOR<float,3> > > >();
     STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<ANALYTIC_IMPLICIT_OBJECT<PLANE<float> > >();
     STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<ANALYTIC_IMPLICIT_OBJECT<BOUNDED_HORIZONTAL_PLANE<VECTOR<float,3> > > >();
@@ -44,15 +44,15 @@ bool Register_Analytic_Implicit_Object(){
     STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<ANALYTIC_IMPLICIT_OBJECT<SMOOTH_GEAR<VECTOR<float,3> > > >();
     STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<ANALYTIC_IMPLICIT_OBJECT<TORUS<float> > >();
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-    STRUCTURE_REGISTRY<VECTOR<double,1> >::Register<ANALYTIC_IMPLICIT_OBJECT<BOX<VECTOR<double,1> > > >();
+    STRUCTURE_REGISTRY<VECTOR<double,1> >::Register<ANALYTIC_IMPLICIT_OBJECT<RANGE<VECTOR<double,1> > > >();
     STRUCTURE_REGISTRY<VECTOR<double,1> >::Register<ANALYTIC_IMPLICIT_OBJECT<POINT_SIMPLEX_1D<double> > >();
     STRUCTURE_REGISTRY<VECTOR<double,2> >::Register<ANALYTIC_IMPLICIT_OBJECT<BOUNDED_HORIZONTAL_PLANE<VECTOR<double,2> > > >();
-    STRUCTURE_REGISTRY<VECTOR<double,2> >::Register<ANALYTIC_IMPLICIT_OBJECT<BOX<VECTOR<double,2> > > >();
+    STRUCTURE_REGISTRY<VECTOR<double,2> >::Register<ANALYTIC_IMPLICIT_OBJECT<RANGE<VECTOR<double,2> > > >();
     STRUCTURE_REGISTRY<VECTOR<double,2> >::Register<ANALYTIC_IMPLICIT_OBJECT<LINE_2D<double> > >();
     STRUCTURE_REGISTRY<VECTOR<double,2> >::Register<ANALYTIC_IMPLICIT_OBJECT<ORIENTED_BOX<VECTOR<double,2> > > >();
     STRUCTURE_REGISTRY<VECTOR<double,2> >::Register<ANALYTIC_IMPLICIT_OBJECT<SPHERE<VECTOR<double,2> > > >();
     STRUCTURE_REGISTRY<VECTOR<double,2> >::Register<ANALYTIC_IMPLICIT_OBJECT<SMOOTH_GEAR<VECTOR<double,2> > > >();
-    STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<ANALYTIC_IMPLICIT_OBJECT<BOX<VECTOR<double,3> > > >();
+    STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<ANALYTIC_IMPLICIT_OBJECT<RANGE<VECTOR<double,3> > > >();
     STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<ANALYTIC_IMPLICIT_OBJECT<ORIENTED_BOX<VECTOR<double,3> > > >();
     STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<ANALYTIC_IMPLICIT_OBJECT<PLANE<double> > >();
     STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<ANALYTIC_IMPLICIT_OBJECT<BOUNDED_HORIZONTAL_PLANE<VECTOR<double,3> > > >();

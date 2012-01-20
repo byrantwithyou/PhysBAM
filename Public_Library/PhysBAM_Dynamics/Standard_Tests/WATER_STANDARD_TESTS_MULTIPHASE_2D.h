@@ -60,11 +60,11 @@ void Initialize(const int test_number_input,const int resolution,const int resta
         example.first_frame=0;example.last_frame=500;example.frame_rate=60;
         grid.Initialize(20*cells+1,10*cells+1,0,1,0,(T).5);
         world_to_source.Append(MATRIX<T,3>::Identity_Matrix());
-        sources.Append(BOX<TV>(TV((T).75,(T).45),TV((T).875,(T).6)));
+        sources.Append(RANGE<TV>(TV((T).75,(T).45),TV((T).875,(T).6)));
         source_velocity.Append(TV(0,(T)-.6));
         source_region.Append(3);
         world_to_source.Append(MATRIX<T,3>::Identity_Matrix());
-        sources.Append(BOX<TV>(TV((T).6,(T).45),TV((T).725,(T).6)));
+        sources.Append(RANGE<TV>(TV((T).6,(T).45),TV((T).725,(T).6)));
         source_velocity.Append(TV(0,0));
         source_region.Append(4);}
     if(test_number==16){

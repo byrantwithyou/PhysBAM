@@ -4,7 +4,7 @@
 //#####################################################################
 // Class POINT_REPULSION
 //##################################################################### 
-#include <PhysBAM_Geometry/Basic_Geometry/BOX.h>
+#include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/RAY.h>
 #include <PhysBAM_Geometry/Collisions/POINT_REPULSION.h>
 using namespace PhysBAM; 

@@ -3,10 +3,10 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
+#include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_4X4.h>
 #include <PhysBAM_Tools/Read_Write/Point_Clouds/READ_WRITE_POINT_CLOUD.h>
 #include <PhysBAM_Tools/Read_Write/Vectors/READ_WRITE_VECTOR.h>
-#include <PhysBAM_Geometry/Basic_Geometry/BOX.h>
 #include <PhysBAM_Geometry/Basic_Geometry/PLANE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
@@ -494,7 +494,7 @@ Update_Cutaway_Plane()
 {
     TETRAHEDRALIZED_VOLUME<T> tetrahedralized_volume(*mesh,*particles);
     tetrahedralized_volume.Update_Bounding_Box();
-    BOX<VECTOR<T,3> > box=*tetrahedralized_volume.bounding_box;
+    RANGE<VECTOR<T,3> > box=*tetrahedralized_volume.bounding_box;
     ARRAY<bool> inside(particles->array_collection->Size());T threshold;
     switch(cutaway_mode){
         case 1:threshold=box.min_corner.x+cutaway_fraction*(box.max_corner.x-box.min_corner.x);for(int p=0;p<particles->array_collection->Size();p++)inside(p)=particles->X(p).x<threshold;break;

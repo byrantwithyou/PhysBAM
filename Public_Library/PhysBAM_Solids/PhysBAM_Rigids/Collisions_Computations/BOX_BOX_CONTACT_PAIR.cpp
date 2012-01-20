@@ -4,7 +4,7 @@
 //#####################################################################
 // Namespace CONTACT_PAIRS
 //##################################################################### 
-#include <PhysBAM_Geometry/Basic_Geometry/BOX.h>
+#include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_BODY_COLLISIONS.h>
@@ -37,8 +37,8 @@ bool Update_Box_Box_Contact_Pair(RIGID_BODY_COLLISIONS<TV>& rigid_body_collision
         transform1=*object_transformed->transform;object1=object_transformed->object_space_implicit_object;}
     if(IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >* object_transformed=dynamic_cast<IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >*>(object2)){
         transform2=*object_transformed->transform;object2=object_transformed->object_space_implicit_object;}
-    BOX<TV>& box1=dynamic_cast<ANALYTIC_IMPLICIT_OBJECT<BOX<TV> >&>(*object1).analytic;
-    BOX<TV>& box2=dynamic_cast<ANALYTIC_IMPLICIT_OBJECT<BOX<TV> >&>(*object2).analytic;
+    RANGE<TV>& box1=dynamic_cast<ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >&>(*object1).analytic;
+    RANGE<TV>& box2=dynamic_cast<ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >&>(*object2).analytic;
     ORIENTED_BOX<TV> box1_transformed(box1,body1.Frame());
     ORIENTED_BOX<TV> box2_transformed(box2,body2.Frame());
 

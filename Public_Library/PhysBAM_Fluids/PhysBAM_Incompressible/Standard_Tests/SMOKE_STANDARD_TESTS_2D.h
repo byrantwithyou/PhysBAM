@@ -15,8 +15,8 @@
 #define __SMOKE_STANDARD_TESTS_2D__
 
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
+#include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Matrices/FRAME.h>
-#include <PhysBAM_Geometry/Basic_Geometry/BOX.h>
 namespace PhysBAM{
 
 template<class TV> class SOLIDS_FLUIDS_EXAMPLE;
@@ -39,7 +39,7 @@ public:
 
     int test_number;
     T_GRID grid;
-    BOX<TV> source;
+    RANGE<TV> source;
     MATRIX<T,3> world_to_source;
     VECTOR<T,2> source_velocity;
     T rho;

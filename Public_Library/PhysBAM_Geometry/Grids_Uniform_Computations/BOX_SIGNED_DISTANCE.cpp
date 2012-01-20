@@ -6,14 +6,14 @@
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
-#include <PhysBAM_Geometry/Basic_Geometry/BOX.h>
+#include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/BOX_SIGNED_DISTANCE.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/SIGNED_DISTANCE.h>
 
 namespace PhysBAM{
 namespace SIGNED_DISTANCE{
 #define BOX_SIGNED_DISTANCE_HELPER_d(T,d) \
-    template void Calculate(BOX<VECTOR<T,d> >&,const GRID<VECTOR<T,d> >&,GRID_ARRAYS_POLICY<GRID<VECTOR<T,d> > >::ARRAYS_SCALAR&,bool);
+    template void Calculate(RANGE<VECTOR<T,d> >&,const GRID<VECTOR<T,d> >&,GRID_ARRAYS_POLICY<GRID<VECTOR<T,d> > >::ARRAYS_SCALAR&,bool);
 
 BOX_SIGNED_DISTANCE_HELPER_d(float,1);
 BOX_SIGNED_DISTANCE_HELPER_d(float,2);

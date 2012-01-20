@@ -4,8 +4,8 @@
 //#####################################################################
 // namespace TESSELLATION
 //##################################################################### 
+#include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Matrices/FRAME.h>
-#include <PhysBAM_Geometry/Basic_Geometry/BOX.h>
 #include <PhysBAM_Geometry/Basic_Geometry/ORIENTED_BOX.h>
 #include <PhysBAM_Geometry/Tessellation/ORIENTED_BOX_TESSELLATION.h>
 #include <PhysBAM_Geometry/Tessellation/RANGE_TESSELLATION.h>
@@ -21,7 +21,7 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(const ORIENTED_BOX
     typedef VECTOR<T,3> TV;
     MATRIX<T,3> directions=box.edges;TV lengths;
     for(int i=0;i<3;i++) lengths[i]=directions.Column(i).Normalize();
-    BOX<TV> aligned_box(TV(),lengths);
+    RANGE<TV> aligned_box(TV(),lengths);
     TRIANGULATED_SURFACE<T>* surface=Generate_Triangles(aligned_box);
     GEOMETRY_PARTICLES<TV>& particles=surface->particles;
     FRAME<TV> frame(box.corner,ROTATION<TV>(directions));

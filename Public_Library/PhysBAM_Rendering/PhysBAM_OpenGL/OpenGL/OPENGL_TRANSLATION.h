@@ -6,7 +6,7 @@
 #define __H_OPENGL_TRANSLATION__
 
 #include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Geometry/Basic_Geometry/BOX.h>
+#include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Geometry/Basic_Geometry_Intersections/RAY_BOX_INTERSECTION.h>
 #include <PhysBAM_Geometry/Basic_Geometry_Intersections/RAY_PLANE_INTERSECTION.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_BOX_3D.h>
@@ -109,7 +109,7 @@ private:
             RAY<TV> &ray_x=translations.x;T scale=(ray_x.endpoint-world->Get_Camera_Position()).Magnitude();
             TV center=down+ray_x.Point(ray_x.t_max)+ray_x.direction*scale*ray_x.t_max;TV end=down+ray_x.Point((1-FACTOR)*ray_x.t_max)+ray_x.direction*scale*ray_x.t_max;
             T distance=(ray_x.Point(ray_x.t_max)-ray_x.Point(FACTOR*ray_x.t_max)).Magnitude()*scale;center+=distance*ray_x.direction;
-            BOX<TV> box(end-TV(distance,distance,distance),center+TV(distance,distance,distance));
+            RANGE<TV> box(end-TV(distance,distance,distance),center+TV(distance,distance,distance));
             if(INTERSECTION::Intersects(camera_ray,box)){
                 LOG::cout<<"X axis"<<std::endl;
                 translation_axis=0;
@@ -118,7 +118,7 @@ private:
             RAY<TV> &ray_y=translations.y;scale=(ray_y.endpoint-world->Get_Camera_Position()).Magnitude();
             center=down+ray_y.Point(ray_y.t_max)+ray_y.direction*scale*ray_y.t_max;end=down+ray_y.Point((1-FACTOR)*ray_y.t_max)+ray_y.direction*scale*ray_y.t_max;
             distance=(ray_y.Point(ray_y.t_max)-ray_y.Point(FACTOR*ray_y.t_max)).Magnitude()*scale;center+=distance*ray_y.direction;
-            box=BOX<TV>(end-TV(distance,distance,distance),center+TV(distance,distance,distance));
+            box=RANGE<TV>(end-TV(distance,distance,distance),center+TV(distance,distance,distance));
             if(INTERSECTION::Intersects(camera_ray,box)){
                 LOG::cout<<"Y axis"<<std::endl;
                 translation_axis=1;
@@ -127,7 +127,7 @@ private:
             RAY<TV> &ray_z=translations.z;scale=(ray_z.endpoint-world->Get_Camera_Position()).Magnitude();
             center=down+ray_z.Point(ray_z.t_max)+ray_z.direction*scale*ray_z.t_max;end=down+ray_z.Point((1-FACTOR)*ray_z.t_max)+ray_z.direction*scale*ray_z.t_max;
             distance=(ray_z.Point(ray_z.t_max)-ray_z.Point(FACTOR*ray_z.t_max)).Magnitude()*scale;center+=distance*ray_z.direction;
-            box=BOX<TV>(end-TV(distance,distance,distance),center+TV(distance,distance,distance));
+            box=RANGE<TV>(end-TV(distance,distance,distance),center+TV(distance,distance,distance));
             if(INTERSECTION::Intersects(camera_ray,box)){
                 LOG::cout<<"Z axis"<<std::endl;
                 translation_axis=2;

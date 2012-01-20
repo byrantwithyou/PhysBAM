@@ -7,8 +7,8 @@
 #ifndef __ANALYTIC_TORUS__
 #define __ANALYTIC_TORUS__
 
+#include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_3D.h>
-#include <PhysBAM_Geometry/Basic_Geometry/BOX.h>
 namespace PhysBAM{
 
 template <class T>

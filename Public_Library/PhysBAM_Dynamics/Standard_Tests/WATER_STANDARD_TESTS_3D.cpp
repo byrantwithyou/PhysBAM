@@ -265,7 +265,7 @@ Initial_Phi(const TV& X) const
         static SPHERE<TV> sphere((TV((T).5,(T).5,(T).5)),(T).2);
         phi=sphere.Signed_Distance(X);}
     else if(test_number==9){
-        static BOX<TV> box((TV((T)3.4,1,(T).9)),(TV((T)3.6,(T)1.3,(T)1.1)));
+        static RANGE<TV> box((TV((T)3.4,1,(T).9)),(TV((T)3.6,(T)1.3,(T)1.1)));
         phi=min(box.Signed_Distance(X),X.y-(T).4);} 
     else if(test_number==11){
         static TV normal((T)1,(T)1,0),location((T).5,(T).75,(T).5);
@@ -419,7 +419,7 @@ Initialize_SPH_Particles_Helper(int test_number,WATER_STANDARD_TESTS_3D<GRID<VEC
 
     // TODO:  Make examples 8-9 work with MPI
     if(test_number==8){
-        BOX<TV> particle_region((TV((T).2,1,(T).2)),TV((T).3,(T)1.2,(T).3));
+        RANGE<TV> particle_region((TV((T).2,1,(T).2)),TV((T).3,(T)1.2,(T).3));
         number_of_sph_particles=int(particle_region.Size()*sph_evolution.target_particles_per_unit_volume);
         ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,VECTOR<int,3> >& removed_negative_particles=particle_levelset.removed_negative_particles;
         RANDOM_NUMBERS<T> random;
@@ -436,7 +436,7 @@ Initialize_SPH_Particles_Helper(int test_number,WATER_STANDARD_TESTS_3D<GRID<VEC
         ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,VECTOR<int,3> >& removed_negative_particles=particle_levelset.removed_negative_particles;
         RANDOM_NUMBERS<T> random;
         random.Set_Seed(1);
-        BOX<TV> particle_region((TV((T).4,1,(T).9)),TV((T).6,(T)1.3,(T)1.1));
+        RANGE<TV> particle_region((TV((T).4,1,(T).9)),TV((T).6,(T)1.3,(T)1.1));
         T particle_multiplier=3;
         number_of_sph_particles=int(particle_region.Size()*sph_evolution.target_particles_per_unit_volume/particle_multiplier);
         for(int region=0;region<3;region++){
@@ -457,8 +457,8 @@ Initialize_SPH_Particles_Helper(int test_number,WATER_STANDARD_TESTS_3D<GRID<VEC
         GRID<TV>  *grid_global;
         if(fluids_parameters_uniform.mpi_grid) grid_global=&fluids_parameters_uniform.mpi_grid->global_grid;
         else grid_global=&grid;
-        //BOX<TV> particle_region(TV(fluids_parameters_uniform.mpi_grid->global_grid.xmin,fluids_parameters_uniform.mpi_grid->global_grid.ymin,fluids_parameters_uniform.mpi_grid->global_grid.zmin),TV(fluids_parameters_uniform.mpi_grid->global_grid.xmax,fluids_parameters_uniform.mpi_grid->global_grid.ymax/3,fluids_parameters_uniform.mpi_grid->global_grid.zmax));
-        BOX<TV> particle_region(BOX<TV>::Intersect(grid_global->domain,grid.domain));
+        //RANGE<TV> particle_region(TV(fluids_parameters_uniform.mpi_grid->global_grid.xmin,fluids_parameters_uniform.mpi_grid->global_grid.ymin,fluids_parameters_uniform.mpi_grid->global_grid.zmin),TV(fluids_parameters_uniform.mpi_grid->global_grid.xmax,fluids_parameters_uniform.mpi_grid->global_grid.ymax/3,fluids_parameters_uniform.mpi_grid->global_grid.zmax));
+        RANGE<TV> particle_region(RANGE<TV>::Intersect(grid_global->domain,grid.domain));
         T particle_multiplier=(T).5;//to start compressed
         number_of_sph_particles=int(particle_region.Size()*sph_evolution.target_particles_per_unit_volume/particle_multiplier);
         for(int i=0;i<number_of_sph_particles;i++){

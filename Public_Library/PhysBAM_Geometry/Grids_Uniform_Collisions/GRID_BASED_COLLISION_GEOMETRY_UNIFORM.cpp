@@ -135,7 +135,7 @@ Compute_Simplices_In_Cell(ARRAY<ARRAY<PAIR<COLLISION_GEOMETRY_ID,int> >,TV_INT>&
         COLLISION_GEOMETRY<TV>* body=bodies(i);
         int n=body->Number_Of_Simplices();
         for(int e=0;e<n;e++){
-            BOX<TV> box=body->World_Space_Simplex(e).Bounding_Box().Thickened(thickness);
+            RANGE<TV> box=body->World_Space_Simplex(e).Bounding_Box().Thickened(thickness);
             RANGE<TV_INT> bounding_grid_cells(grid.Clamp_To_Cell(box.min_corner,ghost_cells+1),grid.Clamp_To_Cell(box.max_corner,ghost_cells+1));
             for(CELL_ITERATOR iterator(grid,bounding_grid_cells);iterator.Valid();iterator.Next())
                 simplices_in_cell(iterator.Cell_Index()).Append(PAIR<COLLISION_GEOMETRY_ID,int>(i,e));}}

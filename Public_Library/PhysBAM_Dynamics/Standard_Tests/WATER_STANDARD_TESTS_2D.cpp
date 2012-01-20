@@ -135,7 +135,7 @@ Initialize(const int test_number_input,const int resolution)
     if(test_number==3){
         TV domain_center=grid.domain.Center();domain_center.y=(T)1;
         sources.Resize(2);source_velocity.Resize(2);world_to_source.Resize(2);
-        sources(1)=sources(2)=BOX<TV>((T).10787,(T).2714532,-(T).10787,(T).10787);
+        sources(1)=sources(2)=RANGE<TV>((T).10787,(T).2714532,-(T).10787,(T).10787);
         ARRAY<MATRIX<T,3> > source_to_world(2);
         MATRIX<T,3> rotation=MATRIX<T,3>::Rotation_Matrix_Z_Axis((T)pi);
         MATRIX<T,3> translation=MATRIX<T,3>::Translation_Matrix(domain_center);
@@ -144,12 +144,12 @@ Initialize(const int test_number_input,const int resolution)
         for(int i=0;i<2;i++){source_velocity(i)=source_to_world(i).Extract_Rotation()*TV((T).5,0);world_to_source(i)=source_to_world(i).Inverse();}}
     if(test_number==5){
         world_to_source.Append(MATRIX<T,3>::Rotation_Matrix_Z_Axis((T)pi/(T)4)*MATRIX<T,3>::Translation_Matrix(TV((T)-.03,(T)-.23)));
-        sources.Append(BOX<TV>(-(T).010,(T).010,-(T).010,(T).010));
+        sources.Append(RANGE<TV>(-(T).010,(T).010,-(T).010,(T).010));
         source_velocity.Append((T).3*TV(-1,-1).Normalized());}
     if(test_number==8){
         TV domain_center=grid.domain.Center();domain_center.y=(T)1;
         sources.Resize(1);source_velocity.Resize(1);world_to_source.Resize(1);
-        sources(1)=BOX<TV>(0,(T).1,0,(T).2);
+        sources(1)=RANGE<TV>(0,(T).1,0,(T).2);
         ARRAY<MATRIX<T,3> > source_to_world(1);
         MATRIX<T,3> translation=MATRIX<T,3>::Translation_Matrix(domain_center);
         source_to_world(1)=translation;world_to_source(1)=source_to_world(1).Inverse();
@@ -245,7 +245,7 @@ Initial_Phi(const TV& X) const
         static SPHERE<TV> circle((TV((T).5,(T).5)),(T).2);
         phi=circle.Signed_Distance(X);}
     else if(test_number==9){
-        static BOX<TV> box((TV((T)3.4,1)),(TV((T)3.6,(T)1.3)));
+        static RANGE<TV> box((TV((T)3.4,1)),(TV((T)3.6,(T)1.3)));
         phi=min(box.Signed_Distance(X),X.y-(T).4);}
     else if(test_number==11){
         static TV normal((T)1,(T)1),location((T).5,(T).75);
@@ -255,7 +255,7 @@ Initial_Phi(const TV& X) const
         static SPHERE<TV> circle((TV((T).5,(T).75)),(T).2);
         phi=circle.Signed_Distance(X);}
     else if(test_number==14){
-        static BOX<TV> box((TV((T).25,(T).75)),(TV((T)0,(T).5)));
+        static RANGE<TV> box((TV((T).25,(T).75)),(TV((T)0,(T).5)));
         phi=box.Signed_Distance(X);}
     else if(test_number==15){
         static SPHERE<TV> circle((TV((T).5,(T)1)),(T).2);
@@ -355,7 +355,7 @@ Initialize_SPH_Particles()
         ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,VECTOR<int,2> >& removed_negative_particles=particle_levelset.removed_negative_particles;
         RANDOM_NUMBERS<T> random;
         random.Set_Seed(1);
-        BOX<TV> particle_region((TV((T).2,1)),TV((T).3,(T)1.2));
+        RANGE<TV> particle_region((TV((T).2,1)),TV((T).3,(T)1.2));
         number_of_sph_particles=int(particle_region.Size()*sph_evolution.target_particles_per_unit_volume);
         for(int i=0;i<number_of_sph_particles;i++){
             TV X=random.Get_Uniform_Vector(particle_region);
@@ -368,7 +368,7 @@ Initialize_SPH_Particles()
         ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,VECTOR<int,2> >& removed_negative_particles=particle_levelset.removed_negative_particles;
         RANDOM_NUMBERS<T> random;
         random.Set_Seed(1);
-        BOX<TV> particle_region((TV((T).4,1)),TV((T).6,(T)1.3));
+        RANGE<TV> particle_region((TV((T).4,1)),TV((T).6,(T)1.3));
         T particle_multiplier=3;
         number_of_sph_particles=int(particle_region.Size()*sph_evolution.target_particles_per_unit_volume/particle_multiplier);
         for(int region=0;region<3;region++){
@@ -386,7 +386,7 @@ Initialize_SPH_Particles()
         ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,VECTOR<int,2> >& removed_negative_particles=particle_levelset.removed_negative_particles;
         RANDOM_NUMBERS<T> random;
         random.Set_Seed(1);
-        BOX<TV> particle_region(TV(grid.domain.min_corner.x,grid.domain.min_corner.y),TV(grid.domain.max_corner.x,grid.domain.max_corner.y/3));
+        RANGE<TV> particle_region(TV(grid.domain.min_corner.x,grid.domain.min_corner.y),TV(grid.domain.max_corner.x,grid.domain.max_corner.y/3));
         T particle_multiplier=1;
         number_of_sph_particles=int(particle_region.Size()*sph_evolution.target_particles_per_unit_volume/particle_multiplier);
         for(int i=0;i<number_of_sph_particles;i++){
@@ -416,7 +416,7 @@ Initial_Phi_Object(const TV& X) const
 {
     if(test_number==4||test_number==20) return rigid_body_collection.Rigid_Body(sphere).Implicit_Geometry_Extended_Value(X);
     else if(test_number==5){
-        static BOX<TV> glass((T).005,(T).095,(T)-.1,1);
+        static RANGE<TV> glass((T).005,(T).095,(T)-.1,1);
         return -glass.Signed_Distance(X);}
     else if(test_number==6){
         static LINE_2D<T> line((TV((T)-.2,1)).Normalized(),TV());
