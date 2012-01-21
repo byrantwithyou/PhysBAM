@@ -172,7 +172,7 @@ public:
 
     void Remove_Index_Lazy(const ID index)
     {assert((unsigned)Value(index)<(unsigned)Value(m));
-    if(index<m) (*this)(index)=(*this)(m);
+    if(index<m) (*this)(index)=(*this)(m-1);
     Remove_End();}
 
     void Remove_All() // if elements are non-primitive this may waste memory
