@@ -39,7 +39,7 @@ void Discard_Valence_Zero_Particles_And_Renumber(MESH_OBJECT<TV,T_MESH>& mo,ARRA
     
     // do particles same way
     for(int p=0;p<condensation_mapping.m;p++) if(!condensation_mapping(p)) mo.particles.array_collection->Add_To_Deletion_List(p);
-    for(int p=condensation_mapping.m+1;p<=mo.particles.array_collection->Size();p++) mo.particles.array_collection->Add_To_Deletion_List(p);
+    for(int p=condensation_mapping.m;p<mo.particles.array_collection->Size();p++) mo.particles.array_collection->Add_To_Deletion_List(p);
     mo.particles.array_collection->Delete_Elements_On_Deletion_List(true);mo.particles.array_collection->Compact();
 
     mo.Refresh_Auxiliary_Structures();

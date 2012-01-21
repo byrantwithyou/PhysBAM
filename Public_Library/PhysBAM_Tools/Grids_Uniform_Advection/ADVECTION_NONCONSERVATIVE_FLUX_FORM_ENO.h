@@ -38,9 +38,9 @@ Advection_Solver(const int m,const T dx,const ARRAY<T2,VECTOR<int,1> >& Z,const 
 {
     T one_over_dx=1/dx,one_over_two_dx=.5*one_over_dx,one_over_three_dx=one_third*one_over_dx;
     ARRAY<T2,VECTOR<int,1> > D1(-2,m+3),D2(-2,m+2),D3(-2,m+1); // divided differences
-    for(int i=-2;i<=m+3;i++) D1(i)=Z(i); 
-    if(order >= 2) for(int i=-2;i<=m+2;i++) D2(i)=(D1(i+1)-D1(i))*one_over_two_dx;     
-    if(order == 3) for(int i=-2;i<=m+1;i++) D3(i)=(D2(i+1)-D2(i))*one_over_three_dx;
+    for(int i=-3;i<m+3;i++) D1(i)=Z(i); 
+    if(order >= 2) for(int i=-3;i<m+2;i++) D2(i)=(D1(i+1)-D1(i))*one_over_two_dx;     
+    if(order == 3) for(int i=-3;i<m+1;i++) D3(i)=(D2(i+1)-D2(i))*one_over_three_dx;
 
     T2 flux_left,flux_right; 
     if(order == 1) for(int i=0;i<m;i++){

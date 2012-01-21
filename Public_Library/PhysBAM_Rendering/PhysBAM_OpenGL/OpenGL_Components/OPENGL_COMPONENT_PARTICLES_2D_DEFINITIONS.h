@@ -187,7 +187,7 @@ Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION *selection) c
             if(!ids || !ids->Find(real_selection->id,current_index))
                 output_stream<<"  Doesn't exist"<<std::endl;}
         else{
-            if(real_selection->index <= particles_multiple(real_selection->particle_set)->array_collection->Size()){
+            if(real_selection->index<particles_multiple(real_selection->particle_set)->array_collection->Size()){
                 output_stream<<"  Selected by index "<<real_selection->index<<std::endl;
                 current_index = real_selection->index;}}
 
@@ -230,7 +230,7 @@ Get_Current_Index_Of_Selection(OPENGL_SELECTION *selection) const
     if (real_selection->has_id){
         ARRAY_VIEW<int>* ids=Get_Particles_Id_Array(real_selection->particle_set);
         if(ids) ids->Find(real_selection->id,current_index);}
-    else if (real_selection->index <= particles_multiple(real_selection->particle_set)->array_collection->Size()) current_index = real_selection->index;
+    else if (real_selection->index<particles_multiple(real_selection->particle_set)->array_collection->Size()) current_index = real_selection->index;
 
     return current_index;
 }
@@ -389,8 +389,8 @@ Apply_Id_Selection()
         {
             ARRAY_VIEW<int>* ids=Get_Particles_Id_Array(current_set);
             if(!ids) continue;
-            int idx = 1;
-            for (int i = 1; i <= particles_multiple(current_set)->array_collection->Size(); i++){
+            int idx = 0;
+            for (int i = 0;i<particles_multiple(current_set)->array_collection->Size(); i++){
                 int dummy;
                 if(selected_ids(current_set).Find((*ids)(i),dummy)) opengl_points_multiple(current_set)->Select_Point(idx); 
                 idx++;}

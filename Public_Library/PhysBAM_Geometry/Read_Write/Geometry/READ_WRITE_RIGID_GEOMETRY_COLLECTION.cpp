@@ -35,7 +35,7 @@ Read(const STREAM_TYPE stream_type,const std::string& directory,const int frame,
     if(object.last_read_active!=local_frame && FILE_UTILITIES::File_Exists(active_name)){
         FILE_UTILITIES::Read_From_File(stream_type,active_name,version,last_id,active_ids);
         object.last_read_active=local_frame;PHYSBAM_ASSERT(version==1);
-        if(needs_destroy) for(int i=last_id+1;i<=object.particles.array_collection->Size();i++) if(!object.particles.rigid_geometry(i)) needs_destroy->Append(i);
+        if(needs_destroy) for(int i=last_id;i<object.particles.array_collection->Size();i++) if(!object.particles.rigid_geometry(i)) needs_destroy->Append(i);
         object.particles.Resize(last_id);}
     else for(int id=0;id<object.particles.array_collection->Size();id++) if(object.Is_Active(id)){active_ids.Append(id);}
     if(object.particles.rigid_geometry.Subset(active_ids).Contains(0)){ // don't need to re-read these things if we will not be initializing any newly-active bodies
@@ -67,7 +67,7 @@ Read(const STREAM_TYPE stream_type,const std::string& directory,const int frame,
             if(!object.particles.rigid_geometry(p)){
                 if(needs_init) needs_init->Append(p);
                 RIGID_GEOMETRY<TV>* rigid_geometry=object.New_Body(p);
-                if(p<=object.rigid_body_names.Size()) rigid_geometry->Set_Name(object.rigid_body_names(p));
+                if(p<object.rigid_body_names.Size()) rigid_geometry->Set_Name(object.rigid_body_names(p));
                 for(int s=0;s<object.particles.structure_ids(p).m;s++)
                     if(object.particles.structure_ids(p)(s))
                         rigid_geometry->Add_Structure(*object.structure_list.Element(object.particles.structure_ids(p)(s)));}

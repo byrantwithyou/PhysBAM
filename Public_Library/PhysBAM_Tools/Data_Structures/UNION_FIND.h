@@ -27,19 +27,19 @@ public:
     {}
 
     void Initialize(const ID entries)
-    {parents=CONSTANT_ARRAY<ID,ID>(entries,ID());ranks=CONSTANT_ARRAY<T_RANK,ID>(entries,0);}
+    {parents=CONSTANT_ARRAY<ID,ID>(entries,ID(-1));ranks=CONSTANT_ARRAY<T_RANK,ID>(entries,0);}
 
     ID Size() const
     {return parents.Size();}
 
     void Clear_Connectivity()
-    {parents.Fill(ID());ranks.Fill(0);}
+    {parents.Fill(ID(-1));ranks.Fill(0);}
 
     ID Add_Entry()
     {parents.Append(ID());ranks.Append(0);return Size();}
 
     bool Is_Root(const ID i) const
-    {return !parents(i);}
+    {return parents(i)==-1;}
 
     ID Find(const ID i) const
     {ID root=Find_Without_Path_Compression(i);Path_Compress(i,root);return root;}
@@ -53,7 +53,7 @@ public:
 
     template<int d>
     ID Union(const VECTOR<ID,d>& indices)
-    {ID root=Find_Without_Path_Compression(indices[1]);T_RANK max_rank=ranks(root);bool max_tie=false;
+    {ID root=Find_Without_Path_Compression(indices[0]);T_RANK max_rank=ranks(root);bool max_tie=false;
     for(int i=2;i<=d;i++){
         ID root_i=Find_Without_Path_Compression(indices[i]);
         if(max_rank<ranks(root_i)){max_rank=ranks(root_i);root=root_i;max_tie=false;}
@@ -78,10 +78,10 @@ public:
 
 private:
     ID Find_Without_Path_Compression(const ID i) const
-    {ID j=i;while(parents(j)) j=parents(j);return j;}
+    {ID j=i;while(parents(j)!=ID(-1)) j=parents(j);return j;}
 
     void Path_Compress(const ID i,const ID root) const
-    {ID j=i;while(j!=root){ID parent=parents(j);parents(j)=root;j=parent;if(!j) break;}}
+    {ID j=i;while(j!=root){ID parent=parents(j);parents(j)=root;j=parent;if(j==ID(-1)) break;}}
 
 //#####################################################################
 };

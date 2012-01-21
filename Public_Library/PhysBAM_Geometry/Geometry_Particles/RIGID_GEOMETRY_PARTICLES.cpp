@@ -12,7 +12,7 @@ namespace PhysBAM{
 template<class TV> void RIGID_GEOMETRY_PARTICLES<TV>::
 Resize(const int new_size)
 {
-    for(int p=new_size+1;p<=array_collection->Size();p++)
+    for(int p=new_size;p<array_collection->Size();p++)
         if(rigid_geometry(p)) Remove_Geometry(p);
     array_collection->Resize(new_size);
 }

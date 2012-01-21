@@ -46,8 +46,8 @@ public:
 
     template<class T_ARRAY>
     int Union(const T_ARRAY& array)
-    {int root=0;typename T_ARRAY::ELEMENT i(1);for(;i<=array.Size();i++) if(!Exclude_Particle(array(i))){root=Find(array(i));break;}if(!root) return 0;
-    for(;i<=array.Size();i++) if(!Exclude_Particle(array(i))) union_find.Union(root,array(i));return union_find.Find(root);}
+    {int root=0;typename T_ARRAY::ELEMENT i(0);for(;i<array.Size();i++) if(!Exclude_Particle(array(i))){root=Find(array(i));break;}if(!root) return 0;
+    for(;i<array.Size();i++) if(!Exclude_Particle(array(i))) union_find.Union(root,array(i));return union_find.Find(root);}
 
     void Merge(const PARTICLE_CONNECTIVITY<TV>& particle_connectivity)
     {union_find.Merge(particle_connectivity.union_find);}

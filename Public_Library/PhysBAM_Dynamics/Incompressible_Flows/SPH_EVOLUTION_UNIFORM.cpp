@@ -298,8 +298,8 @@ Postprocess_Particles(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T t
         T halfway_between_restlength_and_radius=(T).5*(attraction_restlength+radius);
         const RANGE<TV>& domain=grid.domain;
         ARRAY<TV> forces(sph_particles.array_collection->Size());
-        int skip_offset=random.Get_Uniform_Integer(1,skip_number);
-        for(int p=skip_offset;p<=sph_particles.array_collection->Size();p+=skip_number){
+        int skip_offset=random.Get_Uniform_Integer(0,skip_number-1);
+        for(int p=skip_offset;p<sph_particles.array_collection->Size();p+=skip_number){
             TV& X=sph_particles.X(p);if(!domain.Inside(X,(T)1e-8)) continue;
             TV_INT cell=grid.Clamp_To_Cell(sph_particles.X(p));
             T particles_in_cell_ratio=0;

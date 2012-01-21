@@ -97,7 +97,7 @@ Deactivate_Element(const int id,const bool delete_element)
     pointer_to_id_map.Delete(array(index));
     if(delete_element) Delete_And_Clear(array(index));
     id_to_index_map(id)=0;array.Remove_Index_Lazy(index);index_to_id_map.Remove_Index_Lazy(index);
-    if(index<=array.Size()) id_to_index_map(index_to_id_map(index))=index;
+    if(index<array.Size()) id_to_index_map(index_to_id_map(index))=index;
 }
 //#####################################################################
 // Function Swap_Elements

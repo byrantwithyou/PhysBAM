@@ -72,7 +72,7 @@ template<class TV> RIGID_GEOMETRY_COLLECTION<TV>::
 template<class TV> bool RIGID_GEOMETRY_COLLECTION<TV>::
 Exists(const int particle) const
 {
-    return particle>0 && particle<=particles.array_collection->Size() && particles.rigid_geometry(particle);
+    return particle>=0 && particle<particles.array_collection->Size() && particles.rigid_geometry(particle);
 }
 //#####################################################################
 // Function Exists

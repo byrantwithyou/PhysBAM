@@ -1236,7 +1236,7 @@ Duplicate_And_Merge_Elements()
         new_particles.X(particle_index)=Compute_World_Space_Position_Of_Uncollapsed_Particle(i);
         current_particle_id_per_collapsed_new_particle.Append(current_particle_id_for_this_new_particle);
         // assign old particle per new particle, if the old partiele existed (some point ids were just made, but old point ids correspond to particles)
-        if(current_particle_id_for_this_new_particle<=current_tetrahedralized_volume->particles.array_collection->Size()){
+        if(current_particle_id_for_this_new_particle<current_tetrahedralized_volume->particles.array_collection->Size()){
             // the current particle index is either the tet node or the intersection, or both
             int old_tet_node=cutting_particles.tet_node_indices(current_particle_id_for_this_new_particle);
             old_particle_per_new_collapsed_particle.Append(old_tet_node);
@@ -1261,13 +1261,13 @@ Duplicate_And_Merge_Elements()
                 int particle_id=cutting_particles.Particle_Id_From_Tet_Node(original_node(k));
                 bool found=hash_all_new_uncollapsed_particles.Get(PAIR<int,int>(dtet_1,particle_id),particle_index);if(!found) PHYSBAM_FATAL_ERROR();
                 collapsed_dup_particles_1(k)=new_particle_indices(union_vertices.Find(particle_index));
-                assert(collapsed_dup_particles_1(k)>0 && collapsed_dup_particles_1(k)<=new_particles.array_collection->Size());}
+                assert(collapsed_dup_particles_1(k)>0 && collapsed_dup_particles_1(k)<new_particles.array_collection->Size());}
             bool create=true;
             for(int j=i-1;j>=1;j--){int dtet_2=new_tets_per_current(otet)(j);VECTOR<int,4> collapsed_dup_particles_2;
                 for(int k=0;k<4;k++){int particle_index=-1;int poind_id=cutting_particles.Particle_Id_From_Tet_Node(original_node(k));
                     bool found=hash_all_new_uncollapsed_particles.Get(PAIR<int,int>(dtet_2,poind_id),particle_index);if(!found) PHYSBAM_FATAL_ERROR();
                     collapsed_dup_particles_2(k)=new_particle_indices(union_vertices.Find(particle_index));
-                    assert(collapsed_dup_particles_2(k)>0 && collapsed_dup_particles_2(k)<=new_particles.array_collection->Size());}
+                    assert(collapsed_dup_particles_2(k)>0 && collapsed_dup_particles_2(k)<new_particles.array_collection->Size());}
                 if(collapsed_dup_particles_1==collapsed_dup_particles_2){create=false;
                     for(int p=0;p<regions_per_tet(otet)(i).m;p++){int polygon_element_index=Cutting_Polygon_To_Element(regions_per_tet(otet)(i)(p));
                         const ARRAY<ARRAY<int> >& polygon_nodes=polygon_mesh.elements(polygon_element_index);
@@ -1291,7 +1291,7 @@ Duplicate_And_Merge_Elements()
     for(int pcdup=0;pcdup<new_parents_per_new_particle.m;pcdup++){
         if(union_vertices.Is_Root(pcdup)){ARRAY<int>& parents=new_parents_per_new_particle(pcdup);ARRAY<int> final_parents(parents.m);
             for(int i=0;i<parents.m;i++){
-                final_parents(i)=new_particle_indices(union_vertices.Find(parents(i)));assert(final_parents(i)<=next_tetrahedralized_volume->particles.array_collection->Size());}
+                final_parents(i)=new_particle_indices(union_vertices.Find(parents(i)));assert(final_parents(i)<next_tetrahedralized_volume->particles.array_collection->Size());}
             final_parents_per_new_particle.Append(final_parents);
             final_parent_weights_per_new_particle.Append(new_parent_weights_per_new_particle(pcdup));}}
     // fix dup tet numbers
@@ -1314,7 +1314,7 @@ Compute_World_Space_Position_Of_Uncollapsed_Particle(const int uncollapsed_parti
         int original_particle_id=current_particle_id_per_uncollapsed_new_particle(uncollapsed_parents(i));
         assert(cutting_particles.particle_ids_types(original_particle_id)!=CUTTING_PARTICLES::INTERSECTION_ID);
         int original_tet_node=cutting_particles.tet_node_indices(original_particle_id);
-        assert(original_tet_node>=0 && original_tet_node<=current_embedding_particles.array_collection->Size());
+        assert(original_tet_node>=0 && original_tet_node<current_embedding_particles.array_collection->Size());
         position+=current_embedding_particles.X(original_tet_node)*uncollapsed_parent_weights(i);}
     return position;
 }

@@ -101,7 +101,7 @@ Parse(int argc,char* argv[])
     while(current_arg<argc){
         if(use_help_option && !strcmp(argv[current_arg],"--help"))Print_Usage(true); // print help
         int match=Find_Match(argv[current_arg]);
-        if(!match){
+        if(match==-1){
             if(argv[current_arg][0]=='-') Print_Usage(true);
             else extra_arg_list.Append(argv[current_arg++]);}
         else if(!arg_data_list(match).Parse_Value(argc,argv,current_arg))
@@ -173,7 +173,7 @@ bool PARSE_ARGS::
 Is_Value_Set(const std::string& arg_str) const
 {
     int match=Find_Match(arg_str);
-    if(!match){LOG::cout<<"Argument "<<arg_str<<" undeclared"<<std::endl;PHYSBAM_FATAL_ERROR();}
+    if(match==-1){LOG::cout<<"Argument "<<arg_str<<" undeclared"<<std::endl;PHYSBAM_FATAL_ERROR();}
     return arg_data_list(match).value_set;
 }
 //#####################################################################
@@ -191,7 +191,7 @@ int PARSE_ARGS::
 Find_Match(const std::string& str) const
 {
     for(int i=0;i<arg_data_list.m;i++)if(arg_data_list(i).str==str)return i;
-    return 0;
+    return -1;
 }
 //#####################################################################
 // Function Find_Match
@@ -200,7 +200,7 @@ int PARSE_ARGS::
 Find_Match(const std::string& str,const ARG_DATA::TYPE& type) const
 {
     int match=Find_Match(str);
-    if(!match){LOG::cout<<"Argument "<<str<<" undeclared"<<std::endl;PHYSBAM_FATAL_ERROR();}
+    if(match==-1){LOG::cout<<"Argument "<<str<<" undeclared"<<std::endl;PHYSBAM_FATAL_ERROR();}
     if(arg_data_list(match).type!=type){LOG::cout<<"Type mismatch in Find_Match("<<str<<")"<<std::endl;PHYSBAM_FATAL_ERROR();}
     return match;
 }

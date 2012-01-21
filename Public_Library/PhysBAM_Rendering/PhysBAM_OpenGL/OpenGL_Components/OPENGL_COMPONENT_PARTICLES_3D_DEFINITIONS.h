@@ -195,7 +195,7 @@ Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* selection) co
             output_stream<<"   Selected by id "<<real_selection->id<<std::endl;
             ARRAY_VIEW<int>* ids=Get_Particles_Id_Array();
             if(!ids || !ids->Find(real_selection->id,current_index)) output_stream<<"   Doesn't exist"<<std::endl;}
-        else if(real_selection->index <= particles->array_collection->Size()){
+        else if(real_selection->index<particles->array_collection->Size()){
             output_stream<<"   Selected by index "<<real_selection->index<<std::endl;
             current_index=real_selection->index;}
         
@@ -244,7 +244,7 @@ Get_Current_Index_Of_Selection(OPENGL_SELECTION* selection) const
     if(real_selection->has_id){
         ARRAY_VIEW<int>* ids=Get_Particles_Id_Array();
         if(ids) ids->Find(real_selection->id,current_index);}
-    else if(real_selection->index <= particles->array_collection->Size()) current_index=real_selection->index;
+    else if(real_selection->index<particles->array_collection->Size()) current_index=real_selection->index;
     return current_index;
 }
 //#####################################################################

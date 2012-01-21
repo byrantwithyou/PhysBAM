@@ -14,7 +14,7 @@ using namespace PhysBAM;
 template<class T> void SHALLOW_WATER_2D_EIGENSYSTEM_F<T>::
 Flux(const int m,const ARRAY<VECTOR<T,3> ,VECTOR<int,1> >& U,ARRAY<VECTOR<T,3> ,VECTOR<int,1> >& F,ARRAY<VECTOR<T,3> ,VECTOR<int,1> >* U_clamped)       
 {
-    for(int i=-2;i<=m+3;i++){
+    for(int i=-3;i<m+3;i++){
         T one_over_h=1/U(i)(0),u=U(i)(1)*one_over_h;
         F(i)(0)=U(i)(1);                                            // h*u
         F(i)(1)=U(i)(1)*u+(T).5*gravity*sqr(U(i)(0));  // h*u^2+.5*g*h^2

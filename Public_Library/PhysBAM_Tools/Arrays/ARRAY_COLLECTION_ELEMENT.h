@@ -44,10 +44,10 @@ public:
     {(*array)(p)=T();}
 
     void Clear_Range(const int start,const int end)
-    {for(int i=start;i<=end;i++) (*array)(i)=T();}
+    {for(int i=start;i<end;i++) (*array)(i)=T();}
 
     void Set_Size(const int new_size)
-    {assert(buffer_size>=new_size);int n=array->m;array->m=new_size;Clear_Range(n+1,array->m);}
+    {assert(buffer_size>=new_size);int n=array->m;array->m=new_size;Clear_Range(n,array->m);}
 
     void Reallocate(const int new_size)
     {if(new_size<array->m) array->m=new_size;

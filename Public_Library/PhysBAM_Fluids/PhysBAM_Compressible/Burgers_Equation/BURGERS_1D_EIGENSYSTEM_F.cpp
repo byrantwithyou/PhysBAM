@@ -15,7 +15,7 @@ using namespace PhysBAM;
 template<class T> void BURGERS_1D_EIGENSYSTEM_F<T>::
 Flux(const int m,const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U,ARRAY<TV_DIMENSION,VECTOR<int,1> >& F,ARRAY<TV_DIMENSION,VECTOR<int,1> >* U_clamped)       
 {
-    for(int i=-2;i<=m+3;i++) F(i)(0)=sqr(U(i)(0)); // u^2
+    for(int i=-3;i<m+3;i++) F(i)(0)=sqr(U(i)(0)); // u^2
 }
 //#####################################################################
 // Function Eigenvalues

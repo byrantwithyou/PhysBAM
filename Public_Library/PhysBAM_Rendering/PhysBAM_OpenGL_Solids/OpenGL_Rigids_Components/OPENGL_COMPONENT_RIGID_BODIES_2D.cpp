@@ -89,7 +89,7 @@ Read_Hints(const std::string& filename)
     std::istream* input=FILE_UTILITIES::Safe_Open_Input(filename);
     Read_Binary<RW>(*input,opengl_hints);delete input;
 
-    for(int i=0;i<opengl_segmented_curve.Size();i++) if(opengl_segmented_curve(i) && i<=opengl_hints.Size()){
+    for(int i=0;i<opengl_segmented_curve.Size();i++) if(opengl_segmented_curve(i) && i<opengl_hints.Size()){
         opengl_segmented_curve(i)->color=opengl_hints(i).material.diffuse;
         use_object_bounding_box(i)=opengl_hints(i).include_bounding_box;}
 }
@@ -145,7 +145,7 @@ Reinitialize(const bool force)
         for(int id=0;id<rigid_body_collection.rigid_body_particle.array_collection->Size();id++){
             if(rigid_body_collection.Is_Active(id)) Update_Geometry(id);
             else Destroy_Geometry(id);}
-        for(int id=rigid_body_collection.rigid_body_particle.array_collection->Size()+1;id<=opengl_segmented_curve.Size();id++) Destroy_Geometry(id);
+        for(int id=rigid_body_collection.rigid_body_particle.array_collection->Size();id<opengl_segmented_curve.Size();id++) Destroy_Geometry(id);
 
         frame_loaded=frame;
         valid=true;

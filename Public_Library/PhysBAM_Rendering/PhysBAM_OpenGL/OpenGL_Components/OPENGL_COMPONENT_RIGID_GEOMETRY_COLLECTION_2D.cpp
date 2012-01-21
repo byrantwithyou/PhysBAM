@@ -86,7 +86,7 @@ Read_Hints(const std::string& filename)
     std::istream* input=FILE_UTILITIES::Safe_Open_Input(filename);
     Read_Binary<RW>(*input,opengl_hints);delete input;
 
-    for(int i=0;i<opengl_segmented_curve.Size();i++) if(opengl_segmented_curve(i) && i<=opengl_hints.Size()){
+    for(int i=0;i<opengl_segmented_curve.Size();i++) if(opengl_segmented_curve(i) && i<opengl_hints.Size()){
         opengl_segmented_curve(i)->color=opengl_hints(i).material.diffuse;
         use_object_bounding_box(i)=opengl_hints(i).include_bounding_box;}
 }
@@ -140,7 +140,7 @@ Reinitialize(const bool force,const bool read_geometry)
         for(int id=0;id<rigid_geometry_collection->particles.array_collection->Size();id++){
             if(rigid_geometry_collection->Is_Active(id)) Update_Geometry(id);
             else Destroy_Geometry(id);}
-        for(int id=rigid_geometry_collection->particles.array_collection->Size()+1;id<=opengl_segmented_curve.Size();id++) Destroy_Geometry(id);
+        for(int id=rigid_geometry_collection->particles.array_collection->Size();id<opengl_segmented_curve.Size();id++) Destroy_Geometry(id);
         if(FILE_UTILITIES::File_Exists(STRING_UTILITIES::string_sprintf("%s/%d/colors",basedir.c_str(),frame)))
             FILE_UTILITIES::template Read_From_File<RW>(STRING_UTILITIES::string_sprintf("%s/%d/colors",basedir.c_str(),frame),colors);
         for(int id=0;id<colors.m;id++){

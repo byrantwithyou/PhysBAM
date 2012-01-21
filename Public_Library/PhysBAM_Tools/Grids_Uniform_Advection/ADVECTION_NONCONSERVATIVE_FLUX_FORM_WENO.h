@@ -43,7 +43,7 @@ Advection_Solver(const int m,const T dx,const ARRAY<T2,VECTOR<int,1> >& Z,const 
 {
     T one_over_dx=1/dx;
     ARRAY<T2,VECTOR<int,1> > D1(-2,m+3); // 1st divided difference
-    for(int i=-2;i<=m+3;i++) D1(i)=Z(i);
+    for(int i=-3;i<m+3;i++) D1(i)=Z(i);
 
     if(compute_epsilon){
         epsilon=1e-6*sqr(maxabs(D1)); 

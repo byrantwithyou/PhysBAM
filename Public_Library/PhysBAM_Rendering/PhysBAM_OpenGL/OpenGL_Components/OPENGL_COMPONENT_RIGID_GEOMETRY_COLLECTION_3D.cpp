@@ -110,7 +110,7 @@ Read_Hints(const std::string& filename)
 {
     ARRAY<OPENGL_RIGID_BODY_HINTS,int> opengl_hints;
     FILE_UTILITIES::Read_From_File<RW>(filename,opengl_hints);
-    for(int i=0;i<opengl_triangulated_surface.Size();i++) if(opengl_triangulated_surface(i) && i<=opengl_hints.Size()){
+    for(int i=0;i<opengl_triangulated_surface.Size();i++) if(opengl_triangulated_surface(i) && i<opengl_hints.Size()){
         opengl_triangulated_surface(i)->Set_Front_Material(opengl_hints(i).material);
         use_object_bounding_box(i)=opengl_hints(i).include_bounding_box;}
 }
@@ -194,7 +194,7 @@ Reinitialize(const bool force,const bool read_geometry)
                     if(one_sided) Set_Object_Material(id,front_color_map->Lookup(Value(id)-1));
                     else Set_Object_Material(id,front_color_map->Lookup(Value(id)-1),back_color_map->Lookup(Value(id)-1));}}
             else Destroy_Geometry(id);}
-        for(int id=rigid_geometry_collection->particles.array_collection->Size()+1;id<=opengl_triangulated_surface.Size();id++) Destroy_Geometry(id);
+        for(int id=rigid_geometry_collection->particles.array_collection->Size();id<opengl_triangulated_surface.Size();id++) Destroy_Geometry(id);
 
         frame_loaded=frame;
         valid=true;}
@@ -221,7 +221,7 @@ Reinitialize_Without_Files(const bool force)
         for(int id=0;id<rigid_geometry_collection->particles.array_collection->Size();id++){
             if(rigid_geometry_collection->Is_Active(id)) Update_Geometry(id);
             else Destroy_Geometry(id);}
-        for(int id=rigid_geometry_collection->particles.array_collection->Size()+1;id<=opengl_triangulated_surface.Size();id++) Destroy_Geometry(id);
+        for(int id=rigid_geometry_collection->particles.array_collection->Size();id<opengl_triangulated_surface.Size();id++) Destroy_Geometry(id);
 
         valid=true;}
 
@@ -259,7 +259,7 @@ Initialize_One_Body(const int body_id,const bool force)
         for(int id=0;id<rigid_geometry_collection->particles.array_collection->Size();id++){
             if(rigid_geometry_collection->Is_Active(id)) Update_Geometry(id);
             else Destroy_Geometry(id);}
-        for(int id=rigid_geometry_collection->particles.array_collection->Size()+1;id<=opengl_triangulated_surface.Size();id++) Destroy_Geometry(id);
+        for(int id=rigid_geometry_collection->particles.array_collection->Size();id<opengl_triangulated_surface.Size();id++) Destroy_Geometry(id);
 
         valid=true;}
 
@@ -277,7 +277,7 @@ Update_Bodies(const bool update_arb_points)
     for(int id=0;id<rigid_geometry_collection->particles.array_collection->Size();id++){
         if(rigid_geometry_collection->Is_Active(id)) Update_Geometry(id);
         else Destroy_Geometry(id);}
-    for(int id=rigid_geometry_collection->particles.array_collection->Size()+1;id<=opengl_triangulated_surface.Size();id++) Destroy_Geometry(id);
+    for(int id=rigid_geometry_collection->particles.array_collection->Size();id<opengl_triangulated_surface.Size();id++) Destroy_Geometry(id);
     Update_Object_Labels();
 }
 //#####################################################################

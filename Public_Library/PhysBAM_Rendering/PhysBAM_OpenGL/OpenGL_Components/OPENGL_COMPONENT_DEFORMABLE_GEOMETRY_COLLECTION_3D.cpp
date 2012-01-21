@@ -552,7 +552,7 @@ Highlight_Particle_Response()
 {
     if(!OPENGL_WORLD::Singleton()->prompt_response.empty()){
         int index=0;std::istringstream sstream(OPENGL_WORLD::Singleton()->prompt_response);sstream>>index;
-        if(index>0 && index<=deformable_geometry->particles.array_collection->Size()) selected_vertex=index;}
+        if(index>=0 && index<deformable_geometry->particles.array_collection->Size()) selected_vertex=index;}
     Reinitialize(true);
 }
 //#####################################################################

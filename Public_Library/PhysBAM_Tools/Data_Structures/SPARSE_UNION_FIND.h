@@ -55,13 +55,13 @@ public:
 
     template<class T_ARRAY>
     int Union(const T_ARRAY& array)
-    {int root=0;typename T_ARRAY::ELEMENT i(1);for(;i<=array.Size();i++){root=Find(array(i));break;}if(!root) return 0;
-    for(;i<=array.Size();i++) Union(root,array(i));return Find(root);}
+    {int root=0;typename T_ARRAY::ELEMENT i(0);for(;i<array.Size();i++){root=Find(array(i));break;}if(!root) return 0;
+    for(;i<array.Size();i++) Union(root,array(i));return Find(root);}
 
     template<int d>
     ID Union(const VECTOR<ID,d>& indices)
-    {T_RANK max_rank(0);ID root=Find_Without_Path_Compression(indices[1]);bool max_tie=false;ranks.Get(root,max_rank);
-    for(int i=2;i<=d;i++) {
+    {T_RANK max_rank(0);ID root=Find_Without_Path_Compression(indices[0]);bool max_tie=false;ranks.Get(root,max_rank);
+    for(int i=1;i<d;i++) {
         ID root_i=Find_Without_Path_Compression(indices[i]);
         T_RANK tmp_rank(0);ranks.Get(root_i,tmp_rank);
         if(max_rank<tmp_rank){max_rank=tmp_rank;root=root_i;max_tie=false;}

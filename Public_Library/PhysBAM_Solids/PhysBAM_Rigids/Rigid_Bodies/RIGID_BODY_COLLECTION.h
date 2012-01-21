@@ -53,7 +53,7 @@ public:
     {rigid_body_particle.X(particle)=state.frame.t;rigid_body_particle.rotation(particle)=state.frame.r;rigid_body_particle.twist(particle)=state.twist;}
 
     bool Exists(const int particle) const
-    {return particle>0 && particle<=rigid_body_particle.array_collection->Size() && rigid_body_particle.rigid_geometry(particle);}
+    {return particle>=0 && particle<rigid_body_particle.array_collection->Size() && rigid_body_particle.rigid_geometry(particle);}
 
     bool Is_Active(const int particle) const
     {return Exists(particle) && Rigid_Body(particle).particle_index>0;}

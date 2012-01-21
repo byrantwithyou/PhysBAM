@@ -82,12 +82,12 @@ public:
     {
         ARRAY<int> touching_particle_indices;
         VECTOR<T,3> curr_position;
-        for (int i=1;i<=tet_vol->particles.array_collection->Size();i++){
+        for (int i=0;i<tet_vol->particles.array_collection->Size();i++){
             curr_position=tet_vol->particles.X(i);
             if(Inside_Ellipsoid_Test(curr_position))touching_particle_indices.Append(i);}
 
         ARRAY<bool> tet_indices;tet_indices.Resize(tet_vol->tetrahedron_list.m);
-        for(int i=1;i<tet_indices.m;i++)tet_indices(i)=false;
+        for(int i=0;i<tet_indices.m;i++) tet_indices(i)=false;
 
         for(int i=0;i<touching_particle_indices.m;i++)
             for(int j=0;j<(tet_vol->mesh->incident_elements(i)).m;j++)tet_indices((tet_vol->mesh->incident_elements(i))(j))=true;

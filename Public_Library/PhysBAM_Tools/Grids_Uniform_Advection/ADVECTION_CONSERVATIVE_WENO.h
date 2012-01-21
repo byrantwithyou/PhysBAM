@@ -43,9 +43,9 @@ template<class T,class T2> void ADVECTION_CONSERVATIVE_WENO<T,T2>::
 Advection_Solver(const int m,const T dx,const ARRAY<T2,VECTOR<int,1> >& Z,const ARRAY<T,VECTOR<int,1> >& u,ARRAY<T2,VECTOR<int,1> >& u_Zx)
 {
     ARRAY<T2,VECTOR<int,1> > DZ1(-2,m+3); // 1st divided difference
-    for(int i=-2;i<=m+3;i++) DZ1(i)=Z(i);
+    for(int i=-3;i<m+3;i++) DZ1(i)=Z(i);
     ARRAY<T2,VECTOR<int,1> > DUZ1(-2,m+3); // 1st divided difference
-    for(int i=-2;i<=m+3;i++) DUZ1(i)=u(i)*Z(i);
+    for(int i=-3;i<m+3;i++) DUZ1(i)=u(i)*Z(i);
 
     if(compute_epsilon){
         epsilon=1e-6*sqr(maxabs(DUZ1)); // only DUZ used to find epsilon 

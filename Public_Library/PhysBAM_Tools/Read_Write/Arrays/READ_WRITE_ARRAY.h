@@ -31,7 +31,7 @@ public:
     {Write_Prefix(output,object,object.m);}
 
     static void Write_Prefix(std::ostream& output,const ARRAY<T,ID>& object,const ID prefix)
-    {PHYSBAM_ASSERT(ID()<=prefix && prefix<=object.Size());
+    {PHYSBAM_ASSERT(ID(-1)<=prefix && prefix<object.Size());
     Write_Binary<RW>(output,Value(prefix));Write_Binary_Array<RW>(output,object.Get_Array_Pointer(),Value(prefix));}
 };
 }

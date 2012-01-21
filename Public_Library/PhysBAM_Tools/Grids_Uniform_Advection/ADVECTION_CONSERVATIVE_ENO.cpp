@@ -37,13 +37,13 @@ Advection_Solver(const int m,const T dx,const ARRAY<T2,VECTOR<int,1> >& Z,const 
 {
     T one_over_dx=1/dx,one_over_two_dx=(T)(.5*one_over_dx),one_over_three_dx=(T)(one_third*one_over_dx);
     ARRAY<T2,VECTOR<int,1> > DZ1(-2,m+3),DZ2(-2,m+2),DZ3(-2,m+1); // divided differences
-    for(int i=-2;i<=m+3;i++) DZ1(i)=Z(i); 
-    if(order >= 2) for(int i=-2;i<=m+2;i++) DZ2(i)=(DZ1(i+1)-DZ1(i))*one_over_two_dx;     
-    if(order == 3) for(int i=-2;i<=m+1;i++) DZ3(i)=(DZ2(i+1)-DZ2(i))*one_over_three_dx;
+    for(int i=-3;i<m+3;i++) DZ1(i)=Z(i); 
+    if(order >= 2) for(int i=-3;i<m+2;i++) DZ2(i)=(DZ1(i+1)-DZ1(i))*one_over_two_dx;     
+    if(order == 3) for(int i=-3;i<m+1;i++) DZ3(i)=(DZ2(i+1)-DZ2(i))*one_over_three_dx;
     ARRAY<T2,VECTOR<int,1> > DUZ1(-2,m+3),DUZ2(-2,m+2),DUZ3(-2,m+1); // divided differences
-    for(int i=-2;i<=m+3;i++) DUZ1(i)=u(i)*Z(i); 
-    if(order >= 2) for(int i=-2;i<=m+2;i++) DUZ2(i)=(DUZ1(i+1)-DUZ1(i))*one_over_two_dx;     
-    if(order == 3) for(int i=-2;i<=m+1;i++) DUZ3(i)=(DUZ2(i+1)-DUZ2(i))*one_over_three_dx;
+    for(int i=-3;i<m+3;i++) DUZ1(i)=u(i)*Z(i); 
+    if(order >= 2) for(int i=-3;i<m+2;i++) DUZ2(i)=(DUZ1(i+1)-DUZ1(i))*one_over_two_dx;     
+    if(order == 3) for(int i=-3;i<m+1;i++) DUZ3(i)=(DUZ2(i+1)-DUZ2(i))*one_over_three_dx;
 
     ARRAY<T2,VECTOR<int,1> > flux(0,m); // flux is to the right of each point 
     if(order == 1) for(int i=0;i<=m;i++){

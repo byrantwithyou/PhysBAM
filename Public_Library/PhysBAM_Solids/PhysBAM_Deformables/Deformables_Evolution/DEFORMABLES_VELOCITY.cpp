@@ -125,10 +125,10 @@ Raw_Size() const
 template<class TV> typename TV::SCALAR& DEFORMABLES_VELOCITY<TV>::
 Raw_Get(int i)
 {
-    if(i<=V.Size()*TV::dimension) return V((i-1)/TV::dimension+1)((i-1)%TV::dimension+1);
+    if(i<V.Size()*TV::dimension) return V(i/TV::dimension)(i%TV::dimension);
     i-=V.Size()*TV::dimension;
-    int o=(i-1)%TWIST<TV>::dimension+1,n=(i-1)/TWIST<TV>::dimension+1;
-    if(o<=TV::dimension) return rigid_V(n).linear(o);
+    int o=i%TWIST<TV>::dimension,n=i/TWIST<TV>::dimension;
+    if(o<TV::dimension) return rigid_V(n).linear(o);
     return rigid_V(n).angular(o-TV::dimension);
 }
 //#####################################################################

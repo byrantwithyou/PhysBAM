@@ -76,7 +76,7 @@ public:
         }
 
         bool Valid() const
-        {return current_list_index<=current_list.Size();} // it's important for performance that this condition is the same as the first line of Next
+        {return current_list_index<current_list.Size();} // it's important for performance that this condition is the same as the first line of Next
 
         int Data() const
         {return current_list(current_list_index);}

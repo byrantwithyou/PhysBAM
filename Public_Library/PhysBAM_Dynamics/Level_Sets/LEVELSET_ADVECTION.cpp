@@ -47,7 +47,7 @@ HJ_WENO(const int m,const SCALAR dx,const ARRAY<SCALAR,VECTOR<int,1> >& phi,ARRA
 {
     SCALAR epsilon=(SCALAR)1e-6; // works only because phi is a distance function
     SCALAR one_over_dx=1/dx;
-    ARRAY<SCALAR,VECTOR<int,1> > D1(-2,m+2);for(int i=-2;i<=m+2;i++) D1(i)=(phi(i+1)-phi(i))*one_over_dx; // 1st divided difference
+    ARRAY<SCALAR,VECTOR<int,1> > D1(-2,m+2);for(int i=-3;i<m+2;i++) D1(i)=(phi(i+1)-phi(i))*one_over_dx; // 1st divided difference
     for(int i=0;i<m;i++){
         phix_minus(i)=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,SCALAR>::WENO(D1(i-3),D1(i-2),D1(i-1),D1(i),D1(i+1),epsilon);
         phix_plus(i)=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,SCALAR>::WENO(D1(i+2),D1(i+1),D1(i),D1(i-1),D1(i-2),epsilon);}
@@ -61,9 +61,9 @@ HJ_ENO(const int order,const int m,const SCALAR dx,const ARRAY<SCALAR,VECTOR<int
 {
     SCALAR one_over_dx=1/dx,one_over_two_dx=(SCALAR).5*one_over_dx,one_over_three_dx=(SCALAR)one_third*one_over_dx;
     ARRAY<SCALAR,VECTOR<int,1> > D1(-2,m+2),D2(-2,m+1),D3(-2,m); // divided differences
-    for(int i=-2;i<=m+2;i++) D1(i)=(phi(i+1)-phi(i))*one_over_dx;
-    if(order >= 2) for(int i=-2;i<=m+1;i++) D2(i)=(D1(i+1)-D1(i))*one_over_two_dx;
-    if(order == 3) for(int i=-2;i<=m;i++) D3(i)=(D2(i+1)-D2(i))*one_over_three_dx;
+    for(int i=-3;i<m+2;i++) D1(i)=(phi(i+1)-phi(i))*one_over_dx;
+    if(order >= 2) for(int i=-3;i<m+1;i++) D2(i)=(D1(i+1)-D1(i))*one_over_two_dx;
+    if(order == 3) for(int i=-3;i<m;i++) D3(i)=(D2(i+1)-D2(i))*one_over_three_dx;
 
     if(order == 1) for(int i=0;i<m;i++){phix_minus(i)=D1(i-1);phix_plus(i)=D1(i);}
     else if(order == 2) for(int i=0;i<m;i++){

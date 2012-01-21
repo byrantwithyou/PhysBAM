@@ -23,8 +23,8 @@ Multiply(const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const
     STATIC_ASSERT(bandwidth==3); // TODO: implement for non-tridiagonal matrices
     assert(A.Size()==Size() && x.Size()==Size());
     T x_previous=x(1);
-    result(1)=A(1)[0]*x_previous;
-    for(int i=2;i<=Size();i++){
+    result(0)=A(0)[1]*x_previous;
+    for(int i=1;i<Size();i++){
         T x_i=x(i);
         result(i-1)+=A(i-1)[1]*x_i;
         result(i)=A(i-1)[1]*x_previous+A(i)[0]*x_i;

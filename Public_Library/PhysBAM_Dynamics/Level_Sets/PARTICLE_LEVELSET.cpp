@@ -122,7 +122,7 @@ Add_Particle_To_Deletion_List(ARRAY<PAIR<PARTICLE_LEVELSET_PARTICLES<TV>*,int> >
 {
     assert(!dynamic_cast<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>(&particles));
     deletion_list.Append(PAIR<PARTICLE_LEVELSET_PARTICLES<TV>*,int>(&particles,index));
-    assert(index<=particles.array_collection->Size());
+    assert(index<particles.array_collection->Size());
 }
 //#####################################################################
 // Function Add_Particle_To_Deletion_List
@@ -219,7 +219,7 @@ Get_Particle_Link(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int absolute_
     while(index_in_link>particle_pool.number_particles_per_cell){
         assert(particles_link->next);assert(particles_link->array_collection->Size()==particle_pool.number_particles_per_cell);
         particles_link=particles_link->next;index_in_link-=particle_pool.number_particles_per_cell;}
-    assert(index_in_link<=particles_link->array_collection->Size());
+    assert(index_in_link<particles_link->array_collection->Size());
     return *particles_link;
 }
 //#####################################################################

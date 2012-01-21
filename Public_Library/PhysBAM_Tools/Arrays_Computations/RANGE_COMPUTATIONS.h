@@ -15,8 +15,8 @@ namespace ARRAYS_COMPUTATIONS
 {
     template<class T_ARRAY> static RANGE<typename T_ARRAY::ELEMENT> Compute_Range(const T_ARRAY& array)
     {typedef typename T_ARRAY::ELEMENT T;
-    RANGE<T> range;range.min_corner=array(1);range.max_corner=array(1);
-    for(int i=2;i<=array.Size();i++){if(array(i)<range.min_corner) range.min_corner=array(i);if(array(i)>range.max_corner) range.max_corner=array(i);}
+    RANGE<T> range;range.min_corner=array(0);range.max_corner=array(0);
+    for(int i=1;i<array.Size();i++){if(array(i)<range.min_corner) range.min_corner=array(i);if(array(i)>range.max_corner) range.max_corner=array(i);}
     return range;}
 
     template<class T_ARRAY> static void Find_Elements_Inside_Range(const T_ARRAY& array,const RANGE<typename T_ARRAY::ELEMENT>& range,ARRAY<typename T_ARRAY::INDEX>& inside)

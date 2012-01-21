@@ -139,7 +139,7 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION *selection) co
         output_stream<<"Selected particle in ["<<component_name<<"("<<1<<")] (total number = "<<particles.array_collection->Size()<<")"<<std::endl;
     
         int current_index = -1;
-        if(real_selection->index <= particles.array_collection->Size()){
+        if(real_selection->index<particles.array_collection->Size()){
             output_stream<<"  Selected by index "<<real_selection->index<<std::endl;
             current_index = real_selection->index;}
 

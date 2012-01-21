@@ -170,10 +170,10 @@ public:
     {T result=0;for(int i=start_index;i<=end_index;i++) result=PhysBAM::max(result,abs((*this)(i)));return result;}
 
     T Normalize()
-    {Static_Assert_Not_Small();T magnitude=Magnitude();if(magnitude) Derived()*=1/magnitude;else{Set_Zero();(*this)(1)=(T)1;}return magnitude;}
+    {Static_Assert_Not_Small();T magnitude=Magnitude();if(magnitude) Derived()*=1/magnitude;else{Set_Zero();(*this)(0)=(T)1;}return magnitude;}
 
     T_VECTOR Normalized() const
-    {Static_Assert_Not_Small();T magnitude=Magnitude();if(magnitude) return Derived()*(1/magnitude);T_VECTOR v((INITIAL_SIZE(Size())));v(1)=(T)1;return v;}
+    {Static_Assert_Not_Small();T magnitude=Magnitude();if(magnitude) return Derived()*(1/magnitude);T_VECTOR v((INITIAL_SIZE(Size())));v(0)=(T)1;return v;}
 
     template<class T_VECTOR1,class T_VECTOR2>
     static T_VECTOR Interpolate(const T_VECTOR1& p1,const T_VECTOR2& p2,const T alpha)
@@ -188,7 +188,7 @@ public:
     {Assert_Same_Size(*this,p);T_VECTOR x((INITIAL_SIZE)Size());for(int i=0;i<Size();i++) x(p(i))=(*this)(i);return x;}
 
     T_VECTOR Householder_Vector(const int k) const
-    {T_VECTOR v((INITIAL_SIZE)Size());T v_dot_v=0;for(int i=k;i<=Size();i++){v(i)=(*this)(i);v_dot_v+=sqr(v(i));}
+    {T_VECTOR v((INITIAL_SIZE)Size());T v_dot_v=0;for(int i=k;i<Size();i++){v(i)=(*this)(i);v_dot_v+=sqr(v(i));}
     if((*this)(k)>=0) v(k)+=sqrt(v_dot_v);else v(k)-=sqrt(v_dot_v);
     return v;}
 
@@ -202,9 +202,9 @@ public:
     {if(i>j){Givens_Rotate(j,i,c,-s);return;}assert(0<=i && i<j && j<Size());T u=(*this)(i),v=(*this)(j);(*this)(i)=c*u-s*v;(*this)(j)=s*u+c*v;}
 
     void Set_To_Orthogonal_Vector() // result isn't normalized
-    {assert(Size()>=2);int m1=1,m2=2;
+    {assert(Size()>=2);int m1=0,m2=1;
     if(abs((*this)(m1))>abs((*this)(m2))) exchange(m1,m2);
-    for(int i=3;i<=Size();i++) if(abs((*this)(i))>abs((*this)(m1))){
+    for(int i=2;i<Size();i++) if(abs((*this)(i))>abs((*this)(m1))){
         m1=i;if(abs((*this)(m1))>abs((*this)(m2))) exchange(m1,m2);}
     T x1=(*this)(m1),x2=(*this)(m2);
     Set_Zero();
@@ -218,8 +218,8 @@ public:
 
     template<class T_VECTOR1,class T_VECTOR2>
     static T Angle_Between(const VECTOR_BASE<T,T_VECTOR1>& u,const VECTOR_BASE<T,T_VECTOR2>& v) // 0 .. pi
-    {Assert_Same_Size(u,v);T u2=0,u1=u(1),v1=v(1),uv=0;for(int i=2;i<=u.Size();i++){T ui=u(i);u2+=sqr(ui);uv+=ui*v(i);}u1+=sign_nonzero(u1)*sqrt(u2+sqr(u1));
-    T factor=2*(uv+u1*v1)/(u2+sqr(u1)),R12=v1-factor*u1,R22=0;for(int i=2;i<=u.Size();i++) R22+=sqr(v(i)-factor*u(i));return atan2(sqrt(R22),-R12*sign_nonzero(u1));}
+    {Assert_Same_Size(u,v);T u2=0,u1=u(0),v1=v(0),uv=0;for(int i=1;i<u.Size();i++){T ui=u(i);u2+=sqr(ui);uv+=ui*v(i);}u1+=sign_nonzero(u1)*sqrt(u2+sqr(u1));
+    T factor=2*(uv+u1*v1)/(u2+sqr(u1)),R12=v1-factor*u1,R22=0;for(int i=1;i<u.Size();i++) R22+=sqr(v(i)-factor*u(i));return atan2(sqrt(R22),-R12*sign_nonzero(u1));}
 
     template<class T_VECTOR1,class T_VECTOR2>
     static typename T_VECTOR1::template REBIND<bool>::TYPE Componentwise_Greater_Equal(const VECTOR_BASE<T,T_VECTOR1>& u,const VECTOR_BASE<T,T_VECTOR2>& v)

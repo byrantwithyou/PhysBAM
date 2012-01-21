@@ -47,7 +47,7 @@ public:
     node_smallest_distance.Resize(number_of_positions);node_region.Resize(number_of_positions);
     for(int node=0;node<number_of_positions;node++){
         int smallest=1;int second_smallest=2;
-        for(int i=2;i<=seed_positions.Size();i++){
+        for(int i=1;i<seed_positions.Size();i++){
             if(distances(i)(node)<distances(smallest)(node)){second_smallest=smallest;smallest=i;}
             else if(distances(i)(node)<distances(second_smallest)(node)){second_smallest=i;}}
         node_smallest_distance(node)=max((T)1e-6,distances(second_smallest)(node)-(distances(second_smallest)(node)+distances(smallest)(node))/2);

@@ -36,7 +36,7 @@ Next_Helper()
     for(int c;(c=Compare_Collision_Index())<=0;collision_index++) if(!c) BASE::Next();
 
     scan_end=grid.counts(TV::dimension)+(TV::dimension==axis)+number_of_ghost_cells+(region_type==GRID<TV>::WHOLE_REGION?1:0);
-    if(collision_index<=collision_face_info.Size()){
+    if(collision_index<collision_face_info.Size()){
         const COLLISION_FACE_INFO<TV>& cfi=collision_face_info(collision_index);
         if(axis==cfi.axis && index.Remove_Index(TV::dimension)==cfi.index.Remove_Index(TV::dimension))
             scan_end=cfi.index(TV::dimension);}

@@ -86,7 +86,7 @@ Compute_Mpi_Partition(MPI_PARTITION& mpi_partition,const SEGMENT_MESH& connectiv
     ARRAY<bool> done(partition_id_from_particle_index.Size());
     HASHTABLE<PAIR<int,PARTITION_ID> > pair_done;
     for(int j=0;j<particles_of_partition(Partition()).m;j++){int p=particles_of_partition(Partition())(j);
-        if(p<=deformable_body_collection->particles.array_collection->Size()){
+        if(p<deformable_body_collection->particles.array_collection->Size()){
             const ARRAY<int>& neighbor_particles=(*connectivity.neighbor_nodes)(p);
             for(int i=0;i<neighbor_particles.m;i++){int n=neighbor_particles(i);
                 PARTITION_ID np=partition_id_from_particle_index(n);
@@ -329,9 +329,9 @@ All_Scatter_Adhesion_Pairs(ARRAY<ARRAY<PAIR<VECTOR<int,2>,VECTOR<typename TV::SC
         if(partition!=Partition()){
             send_buffers(partition).Resize(1+MPI_UTILITIES::Pack_Size(pairs_to_scatter(partition),*comm));int position=0;
             MPI_UTILITIES::Pack(pairs_to_scatter(partition),send_buffers(partition),position,*comm);
-            requests.Append(comm->Isend(&send_buffers(partition)(1),position,MPI::PACKED,Partition_To_Rank(partition),tag));}}
+            requests.Append(comm->Isend(&send_buffers(partition)(0),position,MPI::PACKED,Partition_To_Rank(partition),tag));}}
     pairs_received.Resize(Number_Of_Partitions());
-    for(PARTITION_ID dummy_partition(2);dummy_partition<=pairs_received.Size();dummy_partition++){ // n-1 dummy indices
+    for(PARTITION_ID dummy_partition(1);dummy_partition<pairs_received.Size();dummy_partition++){ // n-1 dummy indices
         MPI::Status probe_status;comm->Probe(MPI::ANY_SOURCE,tag,probe_status);
         ARRAY<char> buffer(probe_status.Get_count(MPI::PACKED));int position=0;
         comm->Recv(buffer.Get_Array_Pointer(),buffer.m,MPI::PACKED,probe_status.Get_source(),probe_status.Get_tag());
@@ -649,7 +649,7 @@ template<class TV,class T_ARRAY_PAIR> void Distribute_Repulsion_Pairs_Helper(con
                 if(source!=destination){send_matrix(source)(destination).Append(p);receive_matrix(destination)(source).Append(p);}}}
         // send pairs
         ARRAY<MPI::Request> requests;ARRAY<ARRAY<char>,PARTITION_ID> buffers(mpi_solids.particles_of_partition.Size());
-        for(PARTITION_ID processor(2);processor<=mpi_solids.particles_of_partition.Size();processor++){
+        for(PARTITION_ID processor(1);processor<mpi_solids.particles_of_partition.Size();processor++){
             INDIRECT_ARRAY<const T_ARRAY_PAIR> boundary(pairs,processor_pair_indices(processor)),internal(pairs,internal_pairs(processor));
             buffers(processor).Resize(1+MPI_UTILITIES::Pack_Size(send_matrix(processor),receive_matrix(processor),boundary,internal,*mpi_solids.comm)); // TODO: remove +1 when LAM fixes assert
             int position=0;
