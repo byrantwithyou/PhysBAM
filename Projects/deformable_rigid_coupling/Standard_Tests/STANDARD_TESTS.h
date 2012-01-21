@@ -529,7 +529,7 @@ void Coupled_Stack()
             rigid_body.X()=TV(0,(T)(2*i-1),0);
             rigid_body.Set_Mass(6000);}
         else{
-            tests.Create_Mattress(GRID<TV>(VECTOR<int,3>(7,7,7),BOX<TV>(TV(-(T)1,(T)(2*i-2),-(T)1),TV((T)1,(T)(2*i),(T)1))),1000);}}
+            tests.Create_Mattress(GRID<TV>(VECTOR<int,3>(7,7,7),RANGE<TV>(TV(-(T)1,(T)(2*i-2),-(T)1),TV((T)1,(T)(2*i),(T)1))),1000);}}
  
     maximum_fall_speed=105;
 //    T v=maximum_fall_speed,g=solids_parameters.gravity,t=4;
@@ -544,13 +544,13 @@ void Coupled_Stack()
 //#####################################################################
 // Function Find_Placement
 //#####################################################################
-FRAME<TV> Find_Placement(RANDOM_NUMBERS<T>& random,const BOX<TV>& bounding_box,ARRAY<ORIENTED_BOX<TV> >& bounding_boxes,const BOX<TV>& world,bool want_rotate)
+FRAME<TV> Find_Placement(RANDOM_NUMBERS<T>& random,const RANGE<TV>& bounding_box,ARRAY<ORIENTED_BOX<TV> >& bounding_boxes,const RANGE<TV>& world,bool want_rotate)
 {
     for(int i=0;i<10000;i++){
         FRAME<TV> frame;
         if(want_rotate) frame.r=random.template Get_Rotation<TV>();
         ORIENTED_BOX<TV> oriented_box(bounding_box,frame.r);
-        BOX<TV> new_box(oriented_box.Bounding_Box());
+        RANGE<TV> new_box(oriented_box.Bounding_Box());
         frame.t=random.Get_Uniform_Vector(world.min_corner-new_box.min_corner,world.max_corner-new_box.max_corner);
         oriented_box.corner+=frame.t;
         bool okay=true;
@@ -625,7 +625,7 @@ void Trampoline()
     tests.Bind_Particles_In_Rigid_Body(torus);
 
     ARRAY<ORIENTED_BOX<TV> > bounding_boxes;
-    BOX<TV> world(TV(-2*separation,4,-2*separation),TV(2*separation,15,2*separation));
+    RANGE<TV> world(TV(-2*separation,4,-2*separation),TV(2*separation,15,2*separation));
 
      for(int i=0;i<3;i++){
          RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("sphere",(T).6,(T).2);
@@ -633,7 +633,7 @@ void Trampoline()
          rigid_body.Set_Frame(Find_Placement(random,rigid_body.axis_aligned_bounding_box,bounding_boxes,world,false));
          rigid_body.Set_Mass(1);}
      for(int i=0;i<3;i++){
-         BOX<TV> box(-TV((T)3,(T)3,(T)1),TV((T)3,(T)3,(T)1));
+         RANGE<TV> box(-TV((T)3,(T)3,(T)1),TV((T)3,(T)3,(T)1));
          RIGID_BODY_STATE<TV> state(Find_Placement(random,box*(T).6,bounding_boxes,world,true));
          TETRAHEDRALIZED_VOLUME<T>& object=tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_1K.tet",state,false,false,1000,(T).6);
          SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(object,(T)10);}
@@ -759,7 +759,7 @@ void Torsion_Spring()
     rigid_body4.Set_Mass(30);
 
     solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-    tests.Create_Mattress(GRID<TV>(VECTOR<int,3>(33,5,5),BOX<TV>(TV(-8,(T)1.5,-.5),TV(0,(T)2.5,.5))),1000);
+    tests.Create_Mattress(GRID<TV>(VECTOR<int,3>(33,5,5),RANGE<TV>(TV(-8,(T)1.5,-.5),TV(0,(T)2.5,.5))),1000);
 
     tests.Bind_Particles_In_Rigid_Body(rigid_body1);
     tests.Bind_Particles_In_Rigid_Body(rigid_body3);
@@ -845,7 +845,7 @@ void Floppy_Fish()
     // add the fish
     RIGID_BODY_STATE<TV> fish_state(FRAME<TV>(TV(0,3,0),ROTATION<TV>((T)half_pi,TV(1,0,0))));
     if(fish_mattress){
-        BOX<TV> box(-TV((T)3.93278,(T)1.07277,(T)0.384066),TV((T)2.68344,(T)1.1747,(T)0.384353));VECTOR<int,3> counts(20,15,5);
+        RANGE<TV> box(-TV((T)3.93278,(T)1.07277,(T)0.384066),TV((T)2.68344,(T)1.1747,(T)0.384353));VECTOR<int,3> counts(20,15,5);
         GRID<TV> mattress_grid=GRID<TV>(counts,box);
         tests.Create_Mattress(mattress_grid,true,&fish_state,1000);}
     else tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/fish_42K.tet",fish_state,true,false,1000,(T)1);
@@ -920,7 +920,7 @@ void Brush_And_Wheel()
     kinematic_id=box.particle_index;
 
     solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-    tests.Create_Mattress(GRID<TV>(VECTOR<int,3>(33,5,5),BOX<TV>(TV(-1,(T)3.1,-(T).5),TV((T)4.5,(T)4.1,(T).5))),1000);
+    tests.Create_Mattress(GRID<TV>(VECTOR<int,3>(33,5,5),RANGE<TV>(TV(-1,(T)3.1,-(T).5),TV((T)4.5,(T)4.1,(T).5))),1000);
     tests.Bind_Particles_In_Rigid_Body(box);
     tests.Add_Ground((T).5,-2,1);
 }
@@ -969,8 +969,8 @@ void Ring_Drop()
     random.Set_Seed(1236);
 
     ARRAY<ORIENTED_BOX<TV> > bounding_boxes;
-    BOX<TV> world(TV(-(T)14,(T)30,-(T)14),TV((T)14,(T)(30+(int)(52*num_objects_multiplier)),(T)14));
-//    BOX<TV> world(TV(-(T)5,(T)30,-(T)5),TV((T)5,(T)(30+(int)(300*num_objects_multiplier)),(T)5));
+    RANGE<TV> world(TV(-(T)14,(T)30,-(T)14),TV((T)14,(T)(30+(int)(52*num_objects_multiplier)),(T)14));
+//    RANGE<TV> world(TV(-(T)5,(T)30,-(T)5),TV((T)5,(T)(30+(int)(300*num_objects_multiplier)),(T)5));
 
     T g=(T)9.8,h=world.min_corner.y,base_t=sqrt(2*h/g);
     maximum_fall_speed=sqrt(2*g*h);
@@ -1010,7 +1010,7 @@ void Ring_Drop()
     // Articulated lathe chains
     for(int i=0;i<num_objects;i++){
         T scale=(T).65;
-        BOX<TV> box(-TV((T)4.5,(T)4.5,(T)1),TV((T)4.5,(T)4.5,(T)1));
+        RANGE<TV> box(-TV((T)4.5,(T)4.5,(T)1),TV((T)4.5,(T)4.5,(T)1));
         FRAME<TV> frame=Find_Placement(random,box*scale,bounding_boxes,world,true);
         tests.Make_Lathe_Chain(frame,scale,mu);
         int last=solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size();
@@ -1024,20 +1024,20 @@ void Ring_Drop()
     for(int i=0;i<num_objects;i++){
         if(parameter==1 || parameter==2){
             T scale=(T)1;
-            BOX<TV> box(-TV((T)2.5,(T)2.5,(T).5),TV((T)2.5,(T)2.5,(T).5));
+            RANGE<TV> box(-TV((T)2.5,(T)2.5,(T).5),TV((T)2.5,(T)2.5,(T).5));
             RIGID_BODY_STATE<TV> state(Find_Placement(random,box*scale,bounding_boxes,world,true));
             if(parameter==1) object=&tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_thin_1K.tet",state,false,false,1000,scale);
             else if(parameter==2) object=&tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_thin_3K.tet",state,false,false,1000,scale);}
         else if(parameter>=3 && parameter<=5){
             T scale=(T)1;
-            BOX<TV> box(-TV((T)3,(T)3,(T)1),TV((T)3,(T)3,(T)1));
+            RANGE<TV> box(-TV((T)3,(T)3,(T)1),TV((T)3,(T)3,(T)1));
             RIGID_BODY_STATE<TV> state(Find_Placement(random,box*scale,bounding_boxes,world,true));
             if(parameter==3) object=&tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_3788.tet",state,false,false,1000,scale);
             else if(parameter==4) object=&tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_4474.tet",state,false,false,1000,scale);
             else if(parameter==5) object=&tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_5428.tet",state,false,false,1000,scale);}
         else if(parameter==6){
             T scale=(T)8;
-            BOX<TV> box(-TV((T)0.375547,(T)0.375547,(T)0.12588),TV((T)0.375547,(T)0.375547,(T)0.12588));
+            RANGE<TV> box(-TV((T)0.375547,(T)0.375547,(T)0.12588),TV((T)0.375547,(T)0.375547,(T)0.12588));
             RIGID_BODY_STATE<TV> state(Find_Placement(random,box*scale,bounding_boxes,world,true));
             object=&tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus.tet",state,false,false,1000,scale);}
 
@@ -1052,7 +1052,7 @@ void Ring_Drop()
     // Deformable spheres
     for(int i=0;i<num_objects;i++){
         T scale=(T)1.75;
-        BOX<TV> box(-TV((T)1,(T)1,(T)1),TV((T)1,(T)1,(T)1));
+        RANGE<TV> box(-TV((T)1,(T)1,(T)1),TV((T)1,(T)1,(T)1));
         RIGID_BODY_STATE<TV> state(Find_Placement(random,box*scale,bounding_boxes,world,true));
         if(parameter==1) object=&tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",state,false,false,1000,scale);
         else if(parameter==2) object=&tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere_2544.tet",state,false,false,1000,scale);
@@ -1098,7 +1098,7 @@ void Cubes_Friction()
 
     frame.t.z+=(T).2;
     RIGID_BODY_STATE<TV> state(frame,twist);
-    tests.Create_Mattress(GRID<TV>(VECTOR<int,3>(5,5,5),BOX<TV>(TV(-(T)1,-(T)1,-(T)1),TV((T)1,(T)1,(T)1))*box_size),false,&state);
+    tests.Create_Mattress(GRID<TV>(VECTOR<int,3>(5,5,5),RANGE<TV>(TV(-(T)1,-(T)1,-(T)1),TV((T)1,(T)1,(T)1))*box_size),false,&state);
 
     FREE_PARTICLES<TV>& free_particles=*FREE_PARTICLES<TV>::Create();solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(&free_particles);
     int particle_rest=solid_body_collection.deformable_body_collection.particles.array_collection->Add_Element();
@@ -1376,10 +1376,10 @@ void Bowl_Of_Maggots(bool use_blocks)
 
     random_numbers.Set_Seed(1225);
     ARRAY<ORIENTED_BOX<TV> > bounding_boxes;
-    BOX<TV> maggot_box(-TV((T)1.5,(T).5,(T).5),TV((T)1.5,(T).5,(T).5));
-    BOX<TV> block_box(-TV(1,1,1),TV(1,1,1));
-    BOX<TV> torus_box(-TV((T)1.25,(T).25,(T)1.25),TV((T)1.25,(T).25,(T)1.25));
-    BOX<TV> world(TV(-(T)3.5,(T)2,-(T)3.5),TV((T)3.5,(use_blocks?(T)8:(T)6),(T)3.5));
+    RANGE<TV> maggot_box(-TV((T)1.5,(T).5,(T).5),TV((T)1.5,(T).5,(T).5));
+    RANGE<TV> block_box(-TV(1,1,1),TV(1,1,1));
+    RANGE<TV> torus_box(-TV((T)1.25,(T).25,(T)1.25),TV((T)1.25,(T).25,(T)1.25));
+    RANGE<TV> world(TV(-(T)3.5,(T)2,-(T)3.5),TV((T)3.5,(use_blocks?(T)8:(T)6),(T)3.5));
     T scale=(T).65;
     T block_scale=(T).2;
     T torus_scale=(T).7;

@@ -317,7 +317,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         Add_To_Fluid_Simulation(deformable_collisions);}
     else{
         T_GRID& grid=*fluids_parameters.grid;
-        BOX<TV> domain=grid.Domain();TV grid_size=domain.Edge_Lengths();
+        RANGE<TV> domain=grid.Domain();TV grid_size=domain.Edge_Lengths();
         TV scaling_factor=TV(grid_size.x/(T)6);
         RIGID_BODY<TV>& rect=tests.Add_Analytic_Box(scaling_factor);
         rect.Set_Name("bullet");

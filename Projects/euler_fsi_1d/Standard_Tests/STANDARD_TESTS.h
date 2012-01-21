@@ -420,7 +420,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         Add_To_Fluid_Simulation(deformable_collisions);}
     else if(simulate_rigids){
         T_GRID& grid=*fluids_parameters.grid;
-        BOX<TV> domain=grid.Domain();TV grid_size=domain.Edge_Lengths();
+        RANGE<TV> domain=grid.Domain();TV grid_size=domain.Edge_Lengths();
         TV scaling_factor=grid.DX();
         LOG::cout<<"Setting solid size to "<<scaling_factor<<std::endl;
         RIGID_BODY<TV>& rect=tests.Add_Analytic_Box(scaling_factor);

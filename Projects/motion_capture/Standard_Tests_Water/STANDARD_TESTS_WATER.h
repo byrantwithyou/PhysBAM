@@ -76,7 +76,7 @@ public:
     //fluids
     SMOKE_STANDARD_TESTS_3D<T_GRID> smoke_tests;
     TV source_velocity;
-    BOX<TV> source;
+    RANGE<TV> source;
     MATRIX<T,4> world_to_source;
     RIGID_BODY<TV>* octosquid_body;
     ARRAY<DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>*> deformable_objects_to_simulate;
@@ -525,7 +525,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         PHYSBAM_ASSERT(!build_tri); // Make baby jesus cry
 
         if(build_tri || build_tet){
-            BOX<TV> grid_domain;
+            RANGE<TV> grid_domain;
             T thickness=(T).2;
             for(int id(1);id<=solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size();id++)
                 grid_domain.Enlarge_To_Include_Box(solid_body_collection.rigid_body_collection.Rigid_Body(id).implicit_object->Box());
@@ -1066,18 +1066,18 @@ void Left_Source()
         case 2:
         case 3:
         case 4:
-            source=BOX<TV>((T)-5,(T)5,(T)0,(T)15,(T)-8,(T)-7);
+            source=RANGE<TV>((T)-5,(T)5,(T)0,(T)15,(T)-8,(T)-7);
             world_to_source=MATRIX<T,4>::Identity_Matrix();
             source_velocity=TV((T)0,(T)0,source_velocity_magnitude);
             break;
         case 5:
-            source=BOX<TV>((T)-5,(T)5,(T)4.5,(T)5.5,(T)-5,(T)5);
+            source=RANGE<TV>((T)-5,(T)5,(T)4.5,(T)5.5,(T)-5,(T)5);
             world_to_source=MATRIX<T,4>::Identity_Matrix();
             source_velocity=TV((T)0,source_velocity_magnitude,(T)0);
             break;
         case 6:
         case 8:
-            source=BOX<TV>((T)-100,(T)100,(T)-.5,(T)2.5,(T)-100,(T)100);
+            source=RANGE<TV>((T)-100,(T)100,(T)-.5,(T)2.5,(T)-100,(T)100);
             world_to_source=MATRIX<T,4>::Identity_Matrix();
             source_velocity=TV((T)0,source_velocity_magnitude,(T)0);
             break;}

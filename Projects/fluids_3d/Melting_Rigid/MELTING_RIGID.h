@@ -333,7 +333,7 @@ void Initialize_Grid(const int object,RED_GREEN_GRID_3D<T>& grid)
     GRID<TV>& levelset_grid=icecube_levelset->grid;
     levelset_center=levelset_grid.Domain().Center();
     T radius=scaling*.55*levelset_grid.Domain().Size().Max();
-    grid.Initialize(GRID_3D<T>(4*m+1,4*n+1,4*mn+1,BOX<T>(levelset_center).Thickened(radius)),melting_parameters.maximum_depth);
+    grid.Initialize(GRID_3D<T>(4*m+1,4*n+1,4*mn+1,RANGE<T>(levelset_center).Thickened(radius)),melting_parameters.maximum_depth);
     sphere.center=grid.uniform_grid.Domain().Center();
     sphere.radius=.2;
 }

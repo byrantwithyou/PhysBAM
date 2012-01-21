@@ -35,16 +35,16 @@ public:
     GRID<TV> grid_image;
 
     RANDOM_NUMBERS<T> random;
-    ARRAY<BOX<TV> > sources;
+    ARRAY<RANGE<TV> > sources;
     ARRAY<ORIENTED_BOX<TV> > sph_sources;
     ARRAY<MATRIX<T,3> > world_to_source;
     ARRAY<VECTOR<T,2> > sph_sources_velocity,sources_velocity;
-    ARRAY<BOX<TV> > sph_sources_bounding_box,sources_bounding_box;
+    ARRAY<RANGE<TV> > sph_sources_bounding_box,sources_bounding_box;
 
-    BOX<TV> source1,source4;
+    RANGE<TV> source1,source4;
     ORIENTED_BOX<TV> source2,source3;
     VECTOR<T,2> source1_velocity,source2_velocity,source3_velocity,source4_velocity;
-    BOX<TV> source1_bounding_box,source2_bounding_box,source3_bounding_box,source4_bounding_box;
+    RANGE<TV> source1_bounding_box,source2_bounding_box,source3_bounding_box,source4_bounding_box;
     MATRIX<T,3> world_to_source1,world_to_source4;
 
     T time_pour_start_sph,time_pour_end_sph,time_pour_end_pls;
@@ -150,7 +150,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     time_pour_start_sph=(T).7;
     time_pour_end_sph=1000;
     time_pour_end_pls=1000;
-    source1=BOX<TV>(TV((T)-.01,(T)-.0075),TV((T).01,(T).0075));
+    source1=RANGE<TV>(TV((T)-.01,(T)-.0075),TV((T).01,(T).0075));
     MATRIX<T,3> rotation=MATRIX<T,3>::Rotation_Matrix_Z_Axis(-(T)pi/4);
     MATRIX<T,3> translation=MATRIX<T,3>::Translation_Matrix(TV((T)-.01,(T).175));
     MATRIX<T,3> source1_to_world=translation*rotation;
@@ -342,20 +342,20 @@ void Add_SPH_Particles_For_Sources(const T dt,const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Add_SPH_Particles_For_Sources
 //#####################################################################
-void Add_SPH_Particles_For_Sources(const ARRAY<ORIENTED_BOX<TV> > &sph_sources,const ARRAY<BOX<TV> > sph_sources_bounding_box,const ARRAY<VECTOR<T,2> > sources_velocity,
+void Add_SPH_Particles_For_Sources(const ARRAY<ORIENTED_BOX<TV> > &sph_sources,const ARRAY<RANGE<TV> > sph_sources_bounding_box,const ARRAY<VECTOR<T,2> > sources_velocity,
         bool use_initial_targetting=false)
 {
     GRID<TV> & grid=fluids_parameters.particle_levelset_evolution->grid;
     ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,VECTOR<int,2> >& removed_negative_particles=fluids_parameters.particle_levelset_evolution->particle_levelset.removed_negative_particles;
     for(int s=0;s<sph_sources.m;s++){
-        BOX<TV> source_bounding_box=sph_sources_bounding_box(s);
+        RANGE<TV> source_bounding_box=sph_sources_bounding_box(s);
         RANGE<TV_INT> source_bounding_box_int=RANGE<TV_INT>(grid.Block_Index(TV(source_bounding_box.min_corner.x,source_bounding_box.min_corner.y),1),
                 grid.Block_Index(TV(source_bounding_box.max_corner.x,source_bounding_box.max_corner.y),1));
         for(NODE_ITERATOR node_iterator(grid,source_bounding_box_int);node_iterator.Valid();node_iterator.Next()){
             TV location=node_iterator.Location();TV_INT block=grid.Block_Index(location,1);
             T target_density_factor=1;
             BLOCK_UNIFORM<GRID<TV> > block_uniform(grid,block);
-            BOX<TV> block_bounding_box=block_uniform.Bounding_Box();
+            RANGE<TV> block_bounding_box=block_uniform.Bounding_Box();
             if(sph_sources(s).Lazy_Inside(location)){
                 if(!removed_negative_particles(block)) removed_negative_particles(block)=new PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>();
                 while(removed_negative_particles(block)->array_collection->Size()<target_density_factor*fraction_of_particles_for_sph*fluids_parameters.number_particles_per_cell){

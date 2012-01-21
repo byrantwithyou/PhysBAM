@@ -159,7 +159,7 @@ public:
         TEST(ar1==ar2);
         ar1.Append(11);
         ar1.Append(12);
-        ar2.Append_Elements(VECTOR<int,5>(11,7,8,9,12));
+        ar2.Append_Unique_Elements(VECTOR<int,5>(11,7,8,9,12));
         TEST(ar1==ar2);
 
         ar1.Remove_Index_Lazy(3);

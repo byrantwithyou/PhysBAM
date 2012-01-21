@@ -266,7 +266,7 @@ Initialize_Components_And_Key_Bindings()
     if(slice_manager.slice) slice_manager.Set_Slice_Has_Changed_Callback(Slice_Has_Changed_CB());
 
     if(has_valid_grid){
-        OPENGL_BOX_3D<T>* opengl_box=new OPENGL_BOX_3D<T>(*(new BOX<TV>(grid.Domain())),OPENGL_COLOR::Gray(0.5));
+        OPENGL_BOX_3D<T>* opengl_box=new OPENGL_BOX_3D<T>(*(new RANGE<TV>(grid.Domain())),OPENGL_COLOR::Gray(0.5));
         OPENGL_COMPONENT_BASIC<OPENGL_BOX_3D<T> >* domain_box_component=new OPENGL_COMPONENT_BASIC<OPENGL_BOX_3D<T> >(*opengl_box);
         Add_Component(domain_box_component,"Domain box",'6',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);}
 

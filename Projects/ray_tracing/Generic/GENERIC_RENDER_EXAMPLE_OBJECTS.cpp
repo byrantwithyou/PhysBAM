@@ -90,23 +90,23 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         bool ymin_wall=parameters.Get_Parameter("Show_Ymin", true); bool ymax_wall=parameters.Get_Parameter("Show_Ymax",true);
         bool zmin_wall=parameters.Get_Parameter("Show_Zmin", true); bool zmax_wall=parameters.Get_Parameter("Show_Zmax",true);
         bool just_frame=parameters.Get_Parameter("Just_Frame", false);
-        BOX<TV>* box=0;
+        RANGE<TV>* box=0;
         if (control=="Null"||control=="Free"){
             T xmin=parameters.Get_Parameter("Xmin",(T)-1);T xmax=parameters.Get_Parameter("Xmax",(T)1);
             T ymin=parameters.Get_Parameter("Ymin",(T)-1);T ymax=parameters.Get_Parameter("Ymax",(T)1);
             T zmin=parameters.Get_Parameter("Zmin",(T)-1);T zmax=parameters.Get_Parameter("Zmax",(T)1);
-            box=new BOX<TV>(xmin,xmax,ymin,ymax,zmin,zmax);}
+            box=new RANGE<TV>(xmin,xmax,ymin,ymax,zmin,zmax);}
         else if(control=="Object"){ // any object has a bounding box so just use it...
             std::string object_name=parameters.Get_Parameter("Object",std::string("Null"));
             RENDERING_OBJECT<T>* object=0;
             if(!objects.Get(object_name,object)){LOG::cout<<"Unknown rendering object '"<<object_name<<"'specified for Wall"<<std::endl;exit(1);}
-            box=new BOX<TV>(object->World_Space_Bounding_Box());}
+            box=new RANGE<TV>(object->World_Space_Bounding_Box());}
         T shrink=parameters.Get_Parameter("Shrink", (T)0);
         box->Change_Size(-shrink);
         T thickness=parameters.Get_Parameter("Thickness",(T)0);
         if(thickness){
             // thick walls are just a group of rendering boxes
-            BOX<TV> outer_box=*box;
+            RANGE<TV> outer_box=*box;
             T perturb_value=(T)0.0005;
             if(xmin_wall){
                 outer_box.min_corner.x=box->min_corner.x-thickness;outer_box.max_corner.x=box->min_corner.x+thickness;

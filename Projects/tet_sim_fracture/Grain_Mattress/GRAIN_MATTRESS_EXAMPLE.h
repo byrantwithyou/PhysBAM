@@ -35,7 +35,7 @@ public:
     
     GRAIN_MATTRESS_EXAMPLE(const STREAM_TYPE stream_type)
         :BASE(stream_type),initial_height((T)1.2),initial_orientation((T).5*(T)pi,TV(1,0,0)),initial_velocity(0,(T)-10,0),initial_angular_velocity(0,0,0),
-        mattress_grid(8,8,2,BOX<TV>(-(T).5,(T).5,-(T).5,(T).5,-(T)1/14,(T)1/14)),cube_mesh(true)
+        mattress_grid(8,8,2,RANGE<TV>(-(T).5,(T).5,-(T).5,(T).5,-(T)1/14,(T)1/14)),cube_mesh(true)
     {
         frame_rate=50;
         last_frame=(int)(5*frame_rate);

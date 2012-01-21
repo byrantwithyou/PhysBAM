@@ -98,13 +98,13 @@ Initialize_MPI(TETRAHEDRALIZED_VOLUME<T>& tet_volume,ARRAY<int>& local_to_global
     for(int axis=0;axis<T_GRID::dimension;axis++)
         start_index[axis]=mpi_grid->boundaries(axis)(mpi_grid->coordinates[axis]);
 
-    ARRAY<BOX<TV> > local_grids;
+    ARRAY<RANGE<TV> > local_grids;
     for(int proc=0;proc<mpi_grid->Number_Of_Processors();proc++){
         TV_INT proc_coordinates=mpi_grid->all_coordinates(proc);
         for(int axis=0;axis<T_GRID::dimension;axis++){
             start_index[axis]=mpi_grid->boundaries(axis)(proc_coordinates[axis]);
             end_index[axis]=mpi_grid->boundaries(axis)(proc_coordinates[axis]+1);}
-        local_grids.Append(BOX<TV>(mpi_grid->global_grid.X(start_index),mpi_grid->global_grid.X(end_index)).Thickened(tet_volume.Maximum_Edge_Length(0)));}
+        local_grids.Append(RANGE<TV>(mpi_grid->global_grid.X(start_index),mpi_grid->global_grid.X(end_index)).Thickened(tet_volume.Maximum_Edge_Length(0)));}
     ARRAY<ARRAY<int> > tets_to_send(mpi_grid->Number_Of_Processors());
     tet_volume.Update_Tetrahedron_List();
     tet_volume.Initialize_Hierarchy();
@@ -358,7 +358,7 @@ Compute_Ghost_Cells(TETRAHEDRALIZED_VOLUME<T>& tet_volume_aerof,COMPRESSIBLE_FLU
 
     T_LINEAR_INTERPOLATION_DIMENSION interpolation_dimension;
     T max_distance,object_velocity_normal_component;TV location,normal_direction,reflected_point;
-    BOX<TV> domain=grid.Domain();
+    RANGE<TV> domain=grid.Domain();
     for(int i=0;i<particles->number;i++){
         TV& location=particles->X(i);
         if(domain.Inside(location,(T)0) && Inside_Solid(location) && abs(inaccurate_union->levelset(location)) <= solid_extrapolation_bandwidth){
@@ -369,7 +369,7 @@ Compute_Ghost_Cells(TETRAHEDRALIZED_VOLUME<T>& tet_volume_aerof,COMPRESSIBLE_FLU
             // High order interpolation
             // TODO inaccurate_union->Inside_Any_Simplex should take simplex_id as a ptr that defaults to null...
             int simplex_id;
-            BOX<TV> domain=grid.Domain();
+            RANGE<TV> domain=grid.Domain();
             if(euler.use_higher_order_solid_extrapolation && !euler.inaccurate_union->Inside_Any_Simplex(reflected_point,simplex_id) && domain.Lazy_Inside(reflected_point))
                 values=interpolation_dimension.Clamped_To_Array(grid,euler.U,reflected_point);
 

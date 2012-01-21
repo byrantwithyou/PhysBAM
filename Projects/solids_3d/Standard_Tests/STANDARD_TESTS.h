@@ -1059,12 +1059,12 @@ void Get_Initial_Data()
             RANDOM_NUMBERS<T> random;random.Set_Seed(65539);
             T thickness=(T).015,max_angle=(T)pi/3,base_height=12;
             VECTOR<int,3> counts(5,5,4);
-            BOX<TV> panel_box(0,aspect_ratio*side_length,0,0,0,side_length);panel_box=panel_box.Thickened(thickness)-panel_box.Center();
-            GRID<TV> grid(counts,BOX<TV>());
+            RANGE<TV> panel_box(0,aspect_ratio*side_length,0,0,0,side_length);panel_box=panel_box.Thickened(thickness)-panel_box.Center();
+            GRID<TV> grid(counts,RANGE<TV>());
             ARRAY<FRAME<TV> ,VECTOR<int,3> > frames(grid.Domain_Indices());
             for(T cell_size=1;;cell_size+=(T).01){
                 LOG::cout<<"trying cell_size = "<<cell_size<<std::endl;
-                grid=GRID<TV>(counts,BOX<TV>(TV(),TV(counts))*cell_size+TV(0,base_height,0),true);
+                grid=GRID<TV>(counts,RANGE<TV>(TV(),TV(counts))*cell_size+TV(0,base_height,0),true);
                 for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){VECTOR<int,3> I=iterator.Cell_Index();
                     frames(I).r=ROTATION<TV>::From_Rotation_Vector(max_angle*random.template Get_Vector_In_Unit_Sphere<TV>());
                     frames(I).t=iterator.Location();}
@@ -1360,7 +1360,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             break;}
         case 35:{
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
-            GRID<TV>* wind_grid=new GRID<TV>(20,20,20,BOX<TV>::Bounding_Box(particles.X));
+            GRID<TV>* wind_grid=new GRID<TV>(20,20,20,RANGE<TV>::Bounding_Box(particles.X));
             ARRAY<TV,VECTOR<int,3> >* wind_V=new ARRAY<TV,VECTOR<int,3> >(wind_grid->Domain_Indices());
             TV wind_center=wind_grid->Domain().Center();
             INTERPOLATION_CURVE<T,T> height_falloff;

@@ -76,7 +76,7 @@ public:
     VECTOR<ARRAY<T,VECTOR<int,TV::dimension-1> >,TV::dimension> lower_dim_velocities;
             
     CYLINDER<T> source_cyl;
-    BOX<TV> source;
+    RANGE<TV> source;
     
     WATER_TESTS(const STREAM_TYPE stream_type,const PARSE_ARGS& parse_args)
         :PLS_REFINEMENT_EXAMPLE<TV>(stream_type),binary_refinement_levels(0),use_direct_solver(false),buffer(1),use_cubic_interpolation(false),surface_solve(true),thread_queue(0),

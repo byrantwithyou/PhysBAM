@@ -25,7 +25,7 @@ int main(int argc,char* argv[])
     if(parse_args.Num_Extra_Args()>=1) start_frame=last_frame=atoi(parse_args.Extra_Arg(0).c_str());
     else FILE_UTILITIES::Read_From_Text_File("last_frame",last_frame);
 
-    BOX<VECTOR<T,1> > volume_box=BOX<VECTOR<T,1> >(FLT_MAX,-FLT_MAX);T rest_volume=(T)4.85889;
+    RANGE<VECTOR<T,1> > volume_box=RANGE<VECTOR<T,1> >(FLT_MAX,-FLT_MAX);T rest_volume=(T)4.85889;
     for(int frame=start_frame;frame<=last_frame;frame++){
         LOG::cout<<"frame "<<frame<<": ";
         // read
@@ -44,7 +44,7 @@ int main(int argc,char* argv[])
             int root=union_find.Find(nodes[1]);
             volumes(root)+=TETRAHEDRON<T>::Signed_Volume(particles.X(nodes[1]),particles.X(nodes[2]),particles.X(nodes[3]),particles.X(nodes[4]));}
         // print volumes
-        BOX<VECTOR<T,1> > fragment_volume_box=BOX<VECTOR<T,1> >(FLT_MAX,-FLT_MAX);
+        RANGE<VECTOR<T,1> > fragment_volume_box=RANGE<VECTOR<T,1> >(FLT_MAX,-FLT_MAX);
         for(int p=0;p<particles.array_collection->Size();p++)if(union_find.Is_Root(p)){
             if(frame==0) rest_volume=volumes(p);
             fragment_volume_box.Enlarge_To_Include_Point(VECTOR<T,1>(volumes(p)/rest_volume-1));

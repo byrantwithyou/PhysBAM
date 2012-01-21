@@ -169,7 +169,7 @@ class RECTANGULAR_RANDOM_PLACEMENT:public RANDOM_PLACEMENT<TV>
 public:
     typedef typename TV::SCALAR T;
 
-    RECTANGULAR_RANDOM_PLACEMENT(const BOX<TV>& box)
+    RECTANGULAR_RANDOM_PLACEMENT(const RANGE<TV>& box)
         :box(box)
     {}
 
@@ -182,7 +182,7 @@ protected:
     body.X().y=random_numbers.Get_Uniform_Number((T)box.min_corner.y,(T)box.max_corner.y);}
 
 private:
-    BOX<TV> box;
+    RANGE<TV> box;
 };
 
 //#####################################################################

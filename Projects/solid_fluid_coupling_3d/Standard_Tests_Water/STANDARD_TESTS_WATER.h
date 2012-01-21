@@ -88,7 +88,7 @@ public:
     T boat_mass;
     bool implicit_springs;
     ARRAY<CYLINDER<T> > fountain_source;
-    ARRAY<BOX<TV> > fountain_source_boxes;
+    ARRAY<RANGE<TV> > fountain_source_boxes;
     ARRAY<TV> fountain_source_velocity;
     MATRIX<T,4> world_to_source;
     int bodies;
@@ -424,9 +424,9 @@ void Parse_Options() PHYSBAM_OVERRIDE
             fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[1][2]=false;
             initial_fluid_height=(T)1.5;
 
-            fountain_source_boxes.Append(BOX<TV>(TV((T)-2,(T)0,(T)-1),TV((T)-1.95,initial_fluid_height,(T)1)));
+            fountain_source_boxes.Append(RANGE<TV>(TV((T)-2,(T)0,(T)-1),TV((T)-1.95,initial_fluid_height,(T)1)));
             fountain_source_velocity.Append(TV((T).5,(T)0,(T)0));
-            fountain_source_boxes.Append(BOX<TV>(TV((T)1.95,(T)0,(T)-1),TV((T)2,initial_fluid_height,(T)1)));
+            fountain_source_boxes.Append(RANGE<TV>(TV((T)1.95,(T)0,(T)-1),TV((T)2,initial_fluid_height,(T)1)));
             fountain_source_velocity.Append(TV((T).5,(T)0,(T)0));
             break;
         case 19:
@@ -566,7 +566,7 @@ void Floppy_Fish()
     T flesh_density=(T)200;
     TETRAHEDRALIZED_VOLUME<T>* fish=0;
     if(!sub_test){
-        BOX<TV> box(-TV((T)3.93278,(T)1.07277,(T)0.384066),TV((T)2.68344,(T)1.1747,(T)0.384353));box*=scale;
+        RANGE<TV> box(-TV((T)3.93278,(T)1.07277,(T)0.384066),TV((T)2.68344,(T)1.1747,(T)0.384353));box*=scale;
         VECTOR<int,3> counts(20,15,5);
         GRID<TV> fish_mattress_grid=GRID<TV>(counts,box);
         solids_tests.Create_Mattress(fish_mattress_grid,true,&fish_state,flesh_density);
@@ -706,13 +706,13 @@ void Get_Source_Velocities(ARRAY<T,FACE_INDEX<3> >& face_velocities,ARRAY<bool,F
 //#####################################################################
 // Function Find_Placement
 //#####################################################################
-FRAME<TV> Find_Placement(RANDOM_NUMBERS<T>& random,const BOX<TV>& bounding_box,ARRAY<ORIENTED_BOX<TV> >& bounding_boxes,const BOX<TV>& world,bool want_rotate)
+FRAME<TV> Find_Placement(RANDOM_NUMBERS<T>& random,const RANGE<TV>& bounding_box,ARRAY<ORIENTED_BOX<TV> >& bounding_boxes,const RANGE<TV>& world,bool want_rotate)
 {
     for(int i=0;i<10000;i++){
         FRAME<TV> frame;
         if(want_rotate) frame.r=random.template Get_Rotation<TV>();
         ORIENTED_BOX<TV> oriented_box(bounding_box,frame.r);
-        BOX<TV> new_box(oriented_box.Bounding_Box());
+        RANGE<TV> new_box(oriented_box.Bounding_Box());
         frame.t=random.Get_Uniform_Vector(world.min_corner-new_box.min_corner,world.max_corner-new_box.max_corner);
         oriented_box.corner+=frame.t;
         bool okay=true;
@@ -784,7 +784,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             else grid=*fluids_parameters.grid;
             
             // TODO Rewrite to not depend on the grid dimensions; may differ in MPI
-            BOX<TV> world(grid.domain.min_corner.x,grid.domain.max_corner.x,grid.domain.min_corner.y+(grid.domain.max_corner.y-grid.domain.min_corner.y)*(T).75,(T)1.5*grid.domain.max_corner.y,grid.domain.min_corner.z,grid.domain.max_corner.z);
+            RANGE<TV> world(grid.domain.min_corner.x,grid.domain.max_corner.x,grid.domain.min_corner.y+(grid.domain.max_corner.y-grid.domain.min_corner.y)*(T).75,(T)1.5*grid.domain.max_corner.y,grid.domain.min_corner.z,grid.domain.max_corner.z);
 
             RANDOM_NUMBERS<T> random;
 
@@ -928,7 +928,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             else grid=*fluids_parameters.grid;
             
             // TODO Rewrite to not depend on the grid dimensions; may differ in MPI
-            BOX<TV> world(grid.domain.min_corner.x,grid.domain.max_corner.x,grid.domain.min_corner.y,grid.domain.min_corner.y+(T).04,grid.domain.min_corner.z,grid.domain.max_corner.z);
+            RANGE<TV> world(grid.domain.min_corner.x,grid.domain.max_corner.x,grid.domain.min_corner.y,grid.domain.min_corner.y+(T).04,grid.domain.min_corner.z,grid.domain.max_corner.z);
 
             // slide all the rigid body walls down
             for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++) rigid_body_collection.rigid_body_particle.X(i).y-=(T).75;
@@ -974,7 +974,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 RIGID_BODY_STATE<TV>(FRAME<TV>(TV(pole_x_location+flag_width,top_of_flag-flag_width/(T)2,(T)0),ROTATION<TV>((T)pi/2,TV::Axis_Vector(1)))));
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(triangulated_surface,solid_density,true);
 
-            BOX<TV> binding_box=BOX<TV>(TV((T)-2,(T)0,(T)-1),TV(pole_x_location+(T).01,(T)2,(T)1));
+            RANGE<TV> binding_box=RANGE<TV>(TV((T)-2,(T)0,(T)-1),TV(pole_x_location+(T).01,(T)2,(T)1));
             for(int i=0;i<triangulated_surface.particles.array_collection->Size();i++){TV& position=triangulated_surface.particles.X(i);
                 if(binding_box.Lazy_Inside(position)){
                     constrained_node_positions.Append(PAIR<int,TV>(i,position));}}

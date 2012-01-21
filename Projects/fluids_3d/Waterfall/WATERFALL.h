@@ -36,7 +36,7 @@ public:
 
     FLUID_COLLISION_BODY_INACCURATE_UNION<T_GRID> inaccurate_union;
 
-    BOX<TV> source_box;
+    RANGE<TV> source_box;
     TV source_velocity;
     MATRIX<T,4> world_to_source;
 
@@ -102,7 +102,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
 
     // Source parameters
     source_velocity=TV(0,-1,1);
-    source_box=BOX<TV>(TV(-2,2,-1),TV(2,3.9,1.5));
+    source_box=RANGE<TV>(TV(-2,2,-1),TV(2,3.9,1.5));
     world_to_source=MATRIX<T,4>::Identity_Matrix();
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}

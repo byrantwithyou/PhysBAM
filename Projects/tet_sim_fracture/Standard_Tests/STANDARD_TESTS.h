@@ -160,8 +160,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
 
     switch(test_number){
-        case 1: Plastic_Mattress(2,2,2,ROTATION<TV>(1,TV(1,1,1)),BOX<TV>(-(T).5,(T).5,-(T).5,(T).5,-(T).5,(T).5),(T)1.2);break;
-        case 2: Plastic_Mattress(2,4,4,ROTATION<TV>(0,TV(1,1,1)),BOX<TV>(-(T).5,(T).5,-(T)1.5,(T)1.5,-(T)1.5,(T)1.5),(T)1.2);break;
+        case 1: Plastic_Mattress(2,2,2,ROTATION<TV>(1,TV(1,1,1)),RANGE<TV>(-(T).5,(T).5,-(T).5,(T).5,-(T).5,(T).5),(T)1.2);break;
+        case 2: Plastic_Mattress(2,4,4,ROTATION<TV>(0,TV(1,1,1)),RANGE<TV>(-(T).5,(T).5,-(T)1.5,(T)1.5,-(T)1.5,(T)1.5),(T)1.2);break;
       default: PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Unrecognized test number %d",test_number));}
 
     tests.Add_Ground();
@@ -205,7 +205,7 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Plastic_Mattress
 //#####################################################################
-void Plastic_Mattress(int nx,int ny,int nz,const ROTATION<TV>& rot,const BOX<TV>& box,T height)
+void Plastic_Mattress(int nx,int ny,int nz,const ROTATION<TV>& rot,const RANGE<TV>& box,T height)
 {
     // initialize forces
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;

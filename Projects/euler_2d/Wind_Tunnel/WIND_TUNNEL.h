@@ -235,7 +235,7 @@ void Set_Dirichlet_Boundary_Conditions(const T time) PHYSBAM_OVERRIDE
     EULER_UNIFORM<T_GRID >& euler=*((dynamic_cast<FLUIDS_PARAMETERS_UNIFORM<T_GRID >&>(fluids_parameters)).euler);
     T_FACE_ARRAYS_BOOL& psi_N=euler.euler_projection.elliptic_solver->psi_N;
     T_FACE_ARRAYS_SCALAR& face_velocities=euler.euler_projection.face_velocities;
-    BOX<TV> domain=fluids_parameters.euler->grid.Domain();
+    RANGE<TV> domain=fluids_parameters.euler->grid.Domain();
     TV domain_center=domain.Center();
 
     //Set Neumann condition for the .2 unit hight step

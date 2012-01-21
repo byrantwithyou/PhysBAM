@@ -79,7 +79,7 @@ Execute_Main_Program()
     world.Render(example.clipping_region, progress);
 
     //TODO: Integrate something similar to this code back in so that we can ray trace with a preview while using best-candidate sampling
-    //BOX<VECTOR<int,2> >& clip=example.clipping_region;
+    //RANGE<VECTOR<int,2> >& clip=example.clipping_region;
     //ARRAY<VECTOR<T,2> > sample_positions;ARRAY<VECTOR<T,3> > sample_values;
     //CAMERA<T>& camera=world.camera;
     //FILM<T>& film=camera.film;

@@ -67,7 +67,7 @@ public:
     T light_sphere_initial_height,heavy_sphere_initial_height;
     T light_sphere_drop_time,heavy_sphere_drop_time;
     T initial_water_level;
-    ARRAY<BOX<TV> > fountain_source;
+    ARRAY<RANGE<TV> > fountain_source;
     ARRAY<TV> fountain_source_velocity;
     MATRIX<T,3> world_to_source;
     int left_fixed_index,right_fixed_index;
@@ -197,12 +197,12 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.rigid_body_collision_parameters.use_push_out=true;
             fluids_parameters.density=(T)1000;
             solids_parameters.rigid_body_collision_parameters.enforce_rigid_rigid_contact_in_cg=true;
-            fountain_source.Append(BOX<TV>((T).45,(T).55,(T).3,(T).35));
-            //fountain_source.Append(BOX<TV>((T).45,(T).55,(T).25,(T).3));
-            //fountain_source.Append(BOX<TV>((T).975,(T)1,(T).1,(T).4)); // TODO: make total input/output sourcing add up to zero
-            //fountain_source.Append(BOX<TV>((T)0,(T).025,(T).1,(T).4));
-            //fountain_source.Append(BOX<TV>((T).1,(T).4,(T).0,(T).05));
-            //fountain_source.Append(BOX<TV>((T).6,(T).9,(T).0,(T).05));
+            fountain_source.Append(RANGE<TV>((T).45,(T).55,(T).3,(T).35));
+            //fountain_source.Append(RANGE<TV>((T).45,(T).55,(T).25,(T).3));
+            //fountain_source.Append(RANGE<TV>((T).975,(T)1,(T).1,(T).4)); // TODO: make total input/output sourcing add up to zero
+            //fountain_source.Append(RANGE<TV>((T)0,(T).025,(T).1,(T).4));
+            //fountain_source.Append(RANGE<TV>((T).1,(T).4,(T).0,(T).05));
+            //fountain_source.Append(RANGE<TV>((T).6,(T).9,(T).0,(T).05));
             fountain_source_velocity.Append(TV((T)0,(T)4));
             //fountain_source_velocity.Append(TV((T)0,(T)-2));
             //fountain_source_velocity.Append(TV((T)0,(T)-2));
@@ -302,13 +302,13 @@ static int Water_Test_Number(const int test_number)
 //#####################################################################
 // Function Find_Placement
 //#####################################################################
-FRAME<TV> Find_Placement(RANDOM_NUMBERS<T>& random,const BOX<TV>& bounding_box,ARRAY<ORIENTED_BOX<TV> >& bounding_boxes,const BOX<TV>& world,bool want_rotate)
+FRAME<TV> Find_Placement(RANDOM_NUMBERS<T>& random,const RANGE<TV>& bounding_box,ARRAY<ORIENTED_BOX<TV> >& bounding_boxes,const RANGE<TV>& world,bool want_rotate)
 {
     for(int i=0;i<10000;i++){
         FRAME<TV> frame;
         if(want_rotate) frame.r=random.template Get_Rotation<TV>();
         ORIENTED_BOX<TV> oriented_box(bounding_box,frame.r);
-        BOX<TV> new_box(oriented_box.Bounding_Box());
+        RANGE<TV> new_box(oriented_box.Bounding_Box());
         frame.t=random.Get_Uniform_Vector(world.min_corner-new_box.min_corner,world.max_corner-new_box.max_corner);
         oriented_box.corner+=frame.t;
         bool okay=true;
@@ -380,7 +380,7 @@ bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
 {
     if(test_number==8)
         if(time<light_sphere_drop_time)
-        {BOX<TV> source_box((T).45,(T).55,(T)1.15,(T)1.25);Adjust_Phi_With_Source(source_box,MATRIX<T,3>::Identity_Matrix());return true;}
+        {RANGE<TV> source_box((T).45,(T).55,(T)1.15,(T)1.25);Adjust_Phi_With_Source(source_box,MATRIX<T,3>::Identity_Matrix());return true;}
     
     ARRAY<T,VECTOR<int,2> >& phi=fluids_parameters.particle_levelset_evolution->phi;
     if(test_number==12)
@@ -535,8 +535,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             ARRAY<ORIENTED_BOX<TV> > bounding_boxes;
             const GRID<TV>& grid=*fluids_parameters.grid;
             
-            //BOX<TV> world(grid.domain.min_corner.x,grid.domain.max_corner.x,grid.domain.min_corner.y+(grid.domain.max_corner.y-grid.domain.min_corner.y)*(T).75,(T)1.5*grid.domain.max_corner.y);
-            BOX<TV> world(grid.domain.min_corner.x,grid.domain.max_corner.x,(T).75,(T)1.5);
+            //RANGE<TV> world(grid.domain.min_corner.x,grid.domain.max_corner.x,grid.domain.min_corner.y+(grid.domain.max_corner.y-grid.domain.min_corner.y)*(T).75,(T)1.5*grid.domain.max_corner.y);
+            RANGE<TV> world(grid.domain.min_corner.x,grid.domain.max_corner.x,(T).75,(T)1.5);
 
             first_coupled_rigid_body=rigid_body_collection.rigid_body_particle.array_collection->Size()+1;
             RANDOM_NUMBERS<T> random;

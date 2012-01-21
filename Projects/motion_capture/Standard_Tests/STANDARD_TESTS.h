@@ -446,7 +446,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         PHYSBAM_ASSERT(!build_tri); // Make baby jesus cry
 
         if(build_tri || build_tet){
-            BOX<TV> grid_domain;
+            RANGE<TV> grid_domain;
             T thickness=(T).2;
             for(int id(1);id<=solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size();id++)
                 grid_domain.Enlarge_To_Include_Box(solid_body_collection.rigid_body_collection.Rigid_Body(id).implicit_object->Box());
