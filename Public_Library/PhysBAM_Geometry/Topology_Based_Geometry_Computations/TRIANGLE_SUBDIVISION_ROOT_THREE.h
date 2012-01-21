@@ -24,7 +24,7 @@ Apply_Root_Three_Subdivision(TRIANGLE_SUBDIVISION& ts,ARRAY_VIEW<const TV> base_
     for(int p=0;p<ts.triangle_mesh.number_nodes;p++){
         int n=(*ts.triangle_mesh.neighbor_nodes)(p).m;if(n<3)continue;T one_over_n=(T)1/n;
         T alpha=T(2./9)*(2-cos(T(2*pi)*one_over_n));
-        TV sum=base_values((*ts.triangle_mesh.neighbor_nodes)(p)(1));for(int i=2;i<=n;i++)sum+=base_values((*ts.triangle_mesh.neighbor_nodes)(p)(i));
+        TV sum=base_values((*ts.triangle_mesh.neighbor_nodes)(p)(0));for(int i=1;i<n;i++)sum+=base_values((*ts.triangle_mesh.neighbor_nodes)(p)(i));
         subdivided_values(p)=(1-alpha)*base_values(p)+alpha*one_over_n*sum;}
     for(int t=0;t<ts.triangle_mesh.elements.m;t++){
         int i,j,k;ts.triangle_mesh.elements(t).Get(i,j,k);

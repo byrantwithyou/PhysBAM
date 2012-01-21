@@ -37,7 +37,7 @@ namespace PhysBAM{
 //#####################################################################
 template<class TV> RIGID_BODY<TV>::
 RIGID_BODY(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,bool create_collision_geometry)
-    :BASE(rigid_body_collection_input.rigid_geometry_collection,create_collision_geometry,0),rigid_body_collection(rigid_body_collection_input),
+    :BASE(rigid_body_collection_input.rigid_geometry_collection,create_collision_geometry,-1),rigid_body_collection(rigid_body_collection_input),
     is_temporarily_static(false),fracture_threshold(FLT_MAX),thin_shell(false),CFL_initialized(false)
 {
     EXTERNAL_ARRAY_COLLECTION* array_collection=dynamic_cast<EXTERNAL_ARRAY_COLLECTION*>(rigid_body_collection.rigid_body_particle.array_collection);
