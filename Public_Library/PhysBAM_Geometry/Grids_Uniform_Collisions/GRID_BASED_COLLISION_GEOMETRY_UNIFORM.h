@@ -87,7 +87,7 @@ public:
     bool Face_Velocity(const int side,const int axis,const TV_INT& face_index,const TV_INT* cells,const int number_of_cells,const TV& X,T& face_velocity) const
     {ARRAY<COLLISION_GEOMETRY_ID> objects;objects_in_cell.Get_Objects_For_Cells(cells,number_of_cells,collision_geometry_collection.bodies.m,objects);if(!objects.m) return false;
     COLLISION_GEOMETRY_ID body_id;int triangle_id;TV intersection_point;
-    if(collision_geometry_collection.Intersection_Between_Points(X,grid.X(side==1?face_index-TV_INT::Axis_Vector(axis):face_index),body_id,triangle_id,intersection_point,&objects)){
+    if(collision_geometry_collection.Intersection_Between_Points(X,grid.X(side==0?face_index-TV_INT::Axis_Vector(axis):face_index),body_id,triangle_id,intersection_point,&objects)){
         face_velocity=collision_geometry_collection(body_id).Pointwise_Object_Velocity(triangle_id,intersection_point)[axis];return true;}
     return false;}
 
@@ -117,7 +117,7 @@ public:
         face_velocity=collision_geometry_collection(body_id).Pointwise_Object_Velocity(aggregate_id,initial_hit_point)[axis];return true;}
     ARRAY<COLLISION_GEOMETRY_ID> objects;objects_in_cell.Get_Objects_For_Cells(face_index,face_index-TV_INT::Axis_Vector(axis),collision_geometry_collection.bodies.m,objects);if(!objects.m) return false;
     int triangle_id;
-    if(collision_geometry_collection.Intersection_Between_Points(grid.Center((side==2)?face_index:(face_index-TV_INT::Axis_Vector(axis))),X,body_id,triangle_id,initial_hit_point,&objects)){
+    if(collision_geometry_collection.Intersection_Between_Points(grid.Center((side==1)?face_index:(face_index-TV_INT::Axis_Vector(axis))),X,body_id,triangle_id,initial_hit_point,&objects)){
         face_velocity=collision_geometry_collection(body_id).Pointwise_Object_Velocity(triangle_id,initial_hit_point)[axis];
         return true;}
     return false;}

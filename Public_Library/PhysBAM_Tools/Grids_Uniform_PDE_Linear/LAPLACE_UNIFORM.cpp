@@ -219,8 +219,8 @@ Compute_Matrix_Indices_Threaded(ARRAY<RANGE<TV_INT> >& domains,ARRAY<ARRAY<INTER
         for(int color=0;color<interior_indices.m;color++) interior_indices(color)(i).max_corner=filled_region_cell_count(color);}
     for(int axis=0;axis<TV::dimension;axis++) for(int side=0;side<2;side++){int s=(axis-1)*2+side;
         RANGE<TV_INT> exterior_domain(grid.Domain_Indices(1));
-        for(int axis2=axis+1;axis2<=TV::dimension;axis2++){exterior_domain.min_corner(axis2)++;exterior_domain.max_corner(axis2)--;}
-        if(side==1) exterior_domain.max_corner(axis)=exterior_domain.min_corner(axis);
+        for(int axis2=axis+1;axis2<TV::dimension;axis2++){exterior_domain.min_corner(axis2)++;exterior_domain.max_corner(axis2)--;}
+        if(side==0) exterior_domain.max_corner(axis)=exterior_domain.min_corner(axis);
         else exterior_domain.min_corner(axis)=exterior_domain.max_corner(axis);
         for(int i=0;i<domains.m;i++){
             RANGE<TV_INT> interior_domain(domains(i));

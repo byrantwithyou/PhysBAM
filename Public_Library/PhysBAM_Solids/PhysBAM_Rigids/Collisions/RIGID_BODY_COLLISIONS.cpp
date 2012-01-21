@@ -342,7 +342,7 @@ Update_Box_Plane_Collision(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,cons
             transformed_point(1)*=.5;
             points.Append(transformed_point);}}
 
-    TV collision_normal=-body1->Rotation().Rotated_Axis(1);
+    TV collision_normal=-body1->Rotation().Rotated_Axis(0);
     if(!intersect){rigid_body_collisions.skip_collision_check.Set_Last_Checked(i1,i2);return false;}
     rigid_body_collisions.pairs_processed_by_collisions.Set(VECTOR<int,2>(i1,i2).Sorted());
     if(TV::Dot_Product(body1->Twist().linear-body2->Twist().linear,collision_normal)>=0) return false;
@@ -375,7 +375,7 @@ Update_Sphere_Plane_Collision(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,c
     SPHERE<TV>& sphere=implicit_sphere->analytic;
 
     TV sphere_center=(body2->Frame()*transform).t;
-    TV collision_normal=-body1->Rotation().Rotated_Axis(1);
+    TV collision_normal=-body1->Rotation().Rotated_Axis(0);
     T separation=TV::Dot_Product(body1->X()-sphere_center,collision_normal);
     if(separation>=sphere.radius){rigid_body_collisions.skip_collision_check.Set_Last_Checked(i1,i2);return false;}
     rigid_body_collisions.pairs_processed_by_collisions.Set(VECTOR<int,2>(i1,i2).Sorted());

@@ -43,7 +43,7 @@ private:
 
 public:
     void Next() PHYSBAM_ALWAYS_INLINE // overloads UNIFORM_GRID_ITERATOR::Next but we don't want that to be virtual to avoid virtual call overhead
-    {if(index(TV::dimension)<region.max_corner(TV::dimension)) index(TV::dimension)++;else Next_Helper();}
+    {if(index(TV::dimension-1)<region.max_corner(TV::dimension-1)) index(TV::dimension-1)++;else Next_Helper();}
 
     int Axis() const
     {return axis;}

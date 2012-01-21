@@ -40,7 +40,7 @@ public:
     LOOKUP Starting_Point_Face(const int side,const int axis,const TV_INT& face) const
     {// do a ray-cast to find which cell center is visible
         // if both are visible, need to know that (binary).  Reflect values so averaging gets it right?
-        TV_INT adjacent_cell_center=side&1?face-TV_INT::Axis_Vector(axis):face;
+        TV_INT adjacent_cell_center=side&1?face:face-TV_INT::Axis_Vector(axis);
         bool both_neighbors_visible=body_list.cell_neighbors_visible(face-TV_INT::Axis_Vector(axis))(axis) && (*valid_value_mask)(axis,face);// && !body_list.Latest_Cell_Crossover(adjacent_cell_center.;
         return LOOKUP(*this,nested_face_lookup.Starting_Point_Face(axis,face),adjacent_cell_center,both_neighbors_visible,axis);}
     

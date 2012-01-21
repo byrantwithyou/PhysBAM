@@ -163,7 +163,7 @@ Initialize_Interface(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,T_ARRAYS_B
         for(int i=0;i<seed_indices->m;i++)Add_To_Initial(done,close_k,(*seed_indices)(i));
         if(add_seed_indices_for_ghost_cells){
             for(int axis=0;axis<TV::dimension;axis++) for(int side=0;side<2;side++){
-                RANGE<TV_INT> ghost_domain=domain;if(side==1) ghost_domain.max_corner(axis)=interior_domain.min_corner(axis)-1;else ghost_domain.min_corner(axis)=interior_domain.max_corner(axis)+1;
+                RANGE<TV_INT> ghost_domain=domain;if(side==0) ghost_domain.max_corner(axis)=interior_domain.min_corner(axis)-1;else ghost_domain.min_corner(axis)=interior_domain.max_corner(axis)+1;
                 for(CELL_ITERATOR iterator(cell_grid,ghost_domain);iterator.Valid();iterator.Next()){TV_INT index=iterator.Cell_Index();
                     for(int i=0;i<T_GRID::number_of_neighbors_per_cell;i++){TV_INT neighbor_index(iterator.Cell_Neighbor(i));
                         if(domain.Lazy_Inside(neighbor_index) && LEVELSET_UTILITIES<T>::Interface(phi_ghost(index),phi_ghost(neighbor_index))){

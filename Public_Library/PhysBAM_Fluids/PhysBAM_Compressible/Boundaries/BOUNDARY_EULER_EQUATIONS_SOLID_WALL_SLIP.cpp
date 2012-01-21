@@ -81,7 +81,7 @@ Attenuate_To_Far_Field_Values_Using_Characteristics(const T_ARRAYS_DIMENSION_BAS
         U=U_far_field(side)+net_inflow_attenuation*(U-U_far_field(side));
         return;}
    
-    int axis=(side+1)/2;
+    int axis=side/2;
     MATRIX<T,d,d> L,R;
     TV_DIMENSION LU,LU_far_field;
     ARRAY<T,VECTOR<int,1> > lambda(0,d),lambda_left(0,d),lambda_right(0,d);
@@ -124,7 +124,7 @@ Fill_Single_Ghost_Region(const T_GRID& grid,T_ARRAYS_DIMENSION_BASE& u_ghost,con
     int total_number_of_ghost_cells=u_ghost.Domain_Indices().max_corner.x-grid.Domain_Indices().max_corner.x;
     int ghost_cells_to_fill=number_of_ghost_cells;
     bool attenuate_dirichlet_cells=true;
-    int axis=(side+1)/2;
+    int axis=side/2;
     if(Constant_Extrapolation(side)){
         RANGE<TV_INT> region_new(region);
         if(!attenuate_dirichlet_cells){
@@ -172,7 +172,7 @@ template<class T_GRID> void BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<T_GRID>::
 Apply_Boundary_Condition_Single_Side(const T_GRID& grid,T_ARRAYS_DIMENSION_BASE& u,const int side,const T time) const 
 {
     if(grid.Is_MAC_Grid()) return;
-    int axis=(side+1)/2;
+    int axis=side/2;
     int axis_side=2-side%2;
     if(!euler->mpi_grid||!euler->mpi_grid->Neighbor(axis,axis_side)){
         if(!Constant_Extrapolation(side)) for(CELL_ITERATOR iterator(grid,0,T_GRID::BOUNDARY_INTERIOR_REGION,side);iterator.Valid();iterator.Next()){

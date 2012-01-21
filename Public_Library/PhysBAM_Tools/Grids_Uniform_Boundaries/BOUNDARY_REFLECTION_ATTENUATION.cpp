@@ -25,7 +25,7 @@ template<class T_GRID,class T2> void BOUNDARY_REFLECTION_ATTENUATION<T_GRID,T2>:
 Fill_Single_Ghost_Region(const T_GRID& grid,T_ARRAYS_T2& u_ghost,const RANGE<TV_INT>& region,const int side,const T dt,const T time,const int number_of_ghost_cells) const
 {
     if(Constant_Extrapolation(side)){
-        int axis=(side+1)/2,boundary=Boundary(side,region);
+        int axis=side/2,boundary=Boundary(side,region);
         for(CELL_ITERATOR iterator(grid,region);iterator.Valid();iterator.Next()){
             TV_INT cell_index=iterator.Cell_Index(),boundary_cell=cell_index;boundary_cell[axis]=boundary;
             T2 boundary_value=u_ghost(boundary_cell);

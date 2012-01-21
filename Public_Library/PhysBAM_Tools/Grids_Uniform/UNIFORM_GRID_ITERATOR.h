@@ -44,10 +44,10 @@ public:
 
     void Next() PHYSBAM_ALWAYS_INLINE
     {if(TV::dimension==0){valid=false;return;}
-    if(index(TV::dimension)<region.max_corner(TV::dimension)) index(TV::dimension)++;else Next_Helper();}
+    if(index(TV::dimension-1)<region.max_corner(TV::dimension-1)) index(TV::dimension-1)++;else Next_Helper();}
 
     int Flat_Index()
-    {int result=index(1)-1;for(int i=2;i<=TV::dimension;i++){result=result*grid.counts(i)+index(i)-1;}return result+1;}
+    {int result=index(0)-1;for(int i=1;i<TV::dimension;i++){result=result*grid.counts(i)+index(i)-1;}return result+1;}
 
 protected:
     void Next_Helper();

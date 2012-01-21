@@ -51,7 +51,7 @@ Fill_Single_Ghost_Region_Threaded(RANGE<TV_INT>& region,const T_GRID& grid,T_ARR
         int axis_side=side%2;
         int axis=side/2;
         RANGE<TV_INT> domain_indices=grid.Domain_Indices();
-        int inward_sign=axis_side==1?1:-1;T dx=grid.dX[axis],half_dx=(T).5*dx;
+        int inward_sign=axis_side==0?1:-1;T dx=grid.dX[axis],half_dx=(T).5*dx;
         int cell_boundary=Boundary(side,region),face_boundary=cell_boundary+axis_side-1;
         for(CELL_ITERATOR iterator(grid,region);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
             TV_INT boundary_cell=cell,boundary_face=cell;boundary_cell[axis]=cell_boundary;boundary_face[axis]=face_boundary;

@@ -95,7 +95,7 @@ MPI_GRID(T_GRID& local_grid_input,const int number_of_ghost_cells_input,const bo
             int side=2*axis-(2-axis_side);
             int neighbor_rank=side_neighbor_ranks(side);
             if(neighbor_rank>=0){
-                TV_INT axis_vector=axis_side==1?-TV_INT::Axis_Vector(axis):TV_INT::Axis_Vector(axis);
+                TV_INT axis_vector=axis_side==0?-TV_INT::Axis_Vector(axis):TV_INT::Axis_Vector(axis);
                 int start_column_index=global_column_index_boundaries(neighbor_rank+1).x;
                 // Make that neighbors local_grid
                 TV_INT proc_coordinates=all_coordinates(neighbor_rank+1);
@@ -721,11 +721,11 @@ Sync_Common_Face_Weights_From(ARRAY<ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >,FA
     for(int axis=0;axis<TV::dimension;axis++) for(int side=0;side<2;side++){
         int other_rank=side_neighbor_ranks(2*(axis-1)+side);if(other_rank<0) continue;
         RANGE<TV_INT> domain=local_grid.Domain_Indices();
-        if(side==1) domain.max_corner(axis)=domain.min_corner(axis)+(ghost_cells-1);
+        if(side==0) domain.max_corner(axis)=domain.min_corner(axis)+(ghost_cells-1);
         else domain.min_corner(axis)=domain.max_corner(axis)-(ghost_cells-1);
         for(int axis2=0;axis2<TV::dimension;axis2++){
             RANGE<TV_INT> face_domain=local_grid.Domain_Indices(ghost_cells);
-            if(side==1) face_domain.min_corner(axis)+=ghost_cells;
+            if(side==0) face_domain.min_corner(axis)+=ghost_cells;
             else face_domain.max_corner(axis)-=ghost_cells;
             if(axis2==axis) face_domain.min_corner(axis)++;
             else face_domain.max_corner(axis2)++;
@@ -777,11 +777,11 @@ Sync_Common_Face_Weights_To(ARRAY<ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >,FACE
     for(int axis=0;axis<TV::dimension;axis++) for(int side=0;side<2;side++){
         int other_rank=side_neighbor_ranks(2*(axis-1)+side);if(other_rank<0) continue;
         RANGE<TV_INT> domain=local_grid.Domain_Indices();
-        if(side==1) domain.max_corner(axis)=domain.min_corner(axis)+(ghost_cells-1);
+        if(side==0) domain.max_corner(axis)=domain.min_corner(axis)+(ghost_cells-1);
         else domain.min_corner(axis)=domain.max_corner(axis)-(ghost_cells-1);
         for(int axis2=0;axis2<TV::dimension;axis2++){
             RANGE<TV_INT> face_domain=local_grid.Domain_Indices(ghost_cells);
-            if(side==1) face_domain.min_corner(axis)+=ghost_cells;
+            if(side==0) face_domain.min_corner(axis)+=ghost_cells;
             else face_domain.max_corner(axis)-=ghost_cells;
             if(axis2==axis) face_domain.min_corner(axis)++;
             else face_domain.max_corner(axis2)++;
@@ -835,9 +835,9 @@ Sync_Common_Cell_Weights_From(ARRAY<ARRAY<PAIR<TV_INT,T> >,TV_INT>& weights_to,A
     for(int axis=0;axis<TV::dimension;axis++) for(int side=0;side<2;side++){
         int other_rank=side_neighbor_ranks(2*(axis-1)+side);if(other_rank<0) continue;
         RANGE<TV_INT> domain=local_grid.Domain_Indices(),ghost_domain=local_grid.Domain_Indices(ghost_cells);
-        if(side==1) ghost_domain.min_corner(axis)+=ghost_cells;
+        if(side==0) ghost_domain.min_corner(axis)+=ghost_cells;
         else ghost_domain.max_corner(axis)-=ghost_cells;
-        if(side==1) domain.max_corner(axis)=domain.min_corner(axis)+(ghost_cells-1);
+        if(side==0) domain.max_corner(axis)=domain.min_corner(axis)+(ghost_cells-1);
         else domain.min_corner(axis)=domain.max_corner(axis)-(ghost_cells-1);
         for(CELL_ITERATOR iterator(local_grid,domain);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
             ARRAY<PAIR<TV_INT,T> >& local_weights=weights_to(cell);
@@ -883,9 +883,9 @@ Sync_Common_Cell_Weights_To(ARRAY<ARRAY<PAIR<TV_INT,T> >,TV_INT>& weights_to,ARR
     for(int axis=0;axis<TV::dimension;axis++) for(int side=0;side<2;side++){
         int other_rank=side_neighbor_ranks(2*(axis-1)+side);if(other_rank<0) continue;
         RANGE<TV_INT> domain=local_grid.Domain_Indices(),ghost_domain=local_grid.Domain_Indices(ghost_cells);
-        if(side==1) ghost_domain.min_corner(axis)+=ghost_cells;
+        if(side==0) ghost_domain.min_corner(axis)+=ghost_cells;
         else ghost_domain.max_corner(axis)-=ghost_cells;
-        if(side==1) domain.max_corner(axis)=domain.min_corner(axis)+(ghost_cells-1);
+        if(side==0) domain.max_corner(axis)=domain.min_corner(axis)+(ghost_cells-1);
         else domain.min_corner(axis)=domain.max_corner(axis)-(ghost_cells-1);
         for(CELL_ITERATOR iterator(local_grid,domain);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
             ARRAY<PAIR<TV_INT,int> >& local_weights=weights_from(cell);

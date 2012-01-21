@@ -39,10 +39,10 @@ Fill_Ghost_Cells_Face(const T_GRID& grid,const T_FACE_ARRAYS_SCALAR& u,T_FACE_AR
 template<class T_GRID> void BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<T_GRID>::
 Reflect_Single_Ghost_Region(const int face_axis,const T_GRID& face_grid,T_ARRAYS_BASE& u_ghost_component,const int side,const RANGE<TV_INT>& region)
 {
-    int axis=(side+1)/2,axis_side=side&1?1:2;
+    int axis=side/2,axis_side=side&1;
     int boundary=Boundary(side,region),reflection_times_two,flip;
     if(face_axis==axis){reflection_times_two=2*boundary;flip=-1;}
-    else{reflection_times_two=2*boundary+(axis_side==1?-1:1);flip=1;}
+    else{reflection_times_two=2*boundary+(axis_side==0?-1:1);flip=1;}
     for(NODE_ITERATOR iterator(face_grid,region);iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index();
         TV_INT reflected_node=node;reflected_node[axis]=reflection_times_two-node[axis];
         u_ghost_component(node)=flip*u_ghost_component(reflected_node);}
@@ -63,10 +63,10 @@ Apply_Boundary_Condition_Face(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& u,const T
 template<class T_GRID> void BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<T_GRID>::
 Zero_Single_Boundary_Side(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& u,const int side)
 {
-    int axis=(side+1)/2,axis_side=side&1?1:2;
+    int axis=side/2,axis_side=side&1;
     FACE_ITERATOR iterator(grid,0,T_GRID::BOUNDARY_REGION,side);
     if(phi){
-        TV_INT interior_cell_offset=axis_side==1?TV_INT():-TV_INT::Axis_Vector(axis);
+        TV_INT interior_cell_offset=axis_side==0?TV_INT():-TV_INT::Axis_Vector(axis);
         for(;iterator.Valid();iterator.Next()){TV_INT face=iterator.Face_Index();
             if((*phi)(face+interior_cell_offset)) u.Component(axis)(face)=0;}}
     else for(;iterator.Valid();iterator.Next())u.Component(axis)(iterator.Face_Index())=0;

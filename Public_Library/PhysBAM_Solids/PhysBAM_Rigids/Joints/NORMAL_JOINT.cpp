@@ -34,7 +34,7 @@ template<class TV> void NORMAL_JOINT<TV>::
 Constrain_Relative_Linear_Velocity(const FRAME<TV>& parent_frame,TV& relative_linear_velocity) const
 {
     ROTATION<TV> joint_orientation=parent_frame.r*F_pj().r;
-    TV u=joint_orientation.Rotated_Axis(1);
+    TV u=joint_orientation.Rotated_Axis(0);
     relative_linear_velocity-=TV::Dot_Product(relative_linear_velocity,u)*u;
 }
 //#####################################################################

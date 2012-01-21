@@ -229,12 +229,12 @@ Cell_Diffusion(const T_GRID& grid,ARRAY<T,TV_INT>& sum_jc_cell,T_ARRAYS_T2& Z,T_
                 for(int side=0;side<2;side++) if(mpi_boundary(axis)(side)){
                     if(evenodd_cell==0){
                         RANGE<TV_INT> domain=grid.Domain_Indices();domain.max_corner(axis)+=1;
-                        if(side==1) domain.max_corner(axis)=domain.min_corner(axis);else domain.min_corner(axis)=domain.max_corner(axis);
+                        if(side==0) domain.max_corner(axis)=domain.min_corner(axis);else domain.min_corner(axis)=domain.max_corner(axis);
                         for(FACE_ITERATOR iterator(grid,domain,axis);iterator.Valid();iterator.Next()) Cell_Diffusion_Helper(iterator,sum_jc_cell_ghost,Z_ghost_local);}
                     else{
                         ARRAY<FACE_ITERATOR*> faces;
                         RANGE<TV_INT> domain=grid.Domain_Indices();domain.max_corner(axis)+=1;
-                        if(side==1) domain.max_corner(axis)=domain.min_corner(axis);else domain.min_corner(axis)=domain.max_corner(axis);
+                        if(side==0) domain.max_corner(axis)=domain.min_corner(axis);else domain.min_corner(axis)=domain.max_corner(axis);
                         for(FACE_ITERATOR iterator(grid,domain,axis);iterator.Valid();iterator.Next()) faces.Append(new FACE_ITERATOR(iterator));
                         for(int i=faces.m-1;i>=0;i--){FACE_ITERATOR& iterator=*faces(i);Cell_Diffusion_Helper(iterator,sum_jc_cell_ghost,Z_ghost_local);}
                         for(int i=faces.m-1;i>=0;i--) delete faces(i);}}
@@ -287,22 +287,22 @@ Face_Diffusion(const T_GRID& grid,ARRAY<T,FACE_INDEX<TV::dimension> >& sum_jc,T_
                     if(evenodd==0){
                         for(int axis2=0;axis2<TV::dimension;axis2++){if(axis==axis2 || !mpi_boundary(axis2)(side)) continue;//handled above
                             RANGE<TV_INT> domain=grid.Domain_Indices();domain.max_corner(axis)++;
-                            if(side==1) domain.max_corner(axis2)=domain.min_corner(axis2);
+                            if(side==0) domain.max_corner(axis2)=domain.min_corner(axis2);
                             else{domain.max_corner(axis2)++;domain.min_corner(axis2)=domain.max_corner(axis2);}
                             for(FACE_ITERATOR iterator(grid,domain,axis2);iterator.Valid();iterator.Next()) Face_Diffusion_Helper(iterator,axis,sum_jc_ghost,Z_ghost_local,inside);}
                         RANGE<TV_INT> domain=grid.Domain_Indices(1);
-                        if(side==1) domain.max_corner(axis)=domain.min_corner(axis)+1;
+                        if(side==0) domain.max_corner(axis)=domain.min_corner(axis)+1;
                         else domain.min_corner(axis)=domain.max_corner(axis)-1;
                         if(mpi_boundary(axis)(side)) for(CELL_ITERATOR iterator(grid,domain);iterator.Valid();iterator.Next()) Face_Diffusion_Helper(iterator,axis,sum_jc_ghost,Z_ghost_local,inside);}
                     else{
                         ARRAY<FACE_ITERATOR*> faces;ARRAY<CELL_ITERATOR*> cells;
                         for(int axis2=0;axis2<TV::dimension;axis2++){if(axis==axis2 || !mpi_boundary(axis2)(side)) continue;//handled above
                             RANGE<TV_INT> domain=grid.Domain_Indices();domain.max_corner(axis)++;
-                            if(side==1) domain.max_corner(axis2)=domain.min_corner(axis2);
+                            if(side==0) domain.max_corner(axis2)=domain.min_corner(axis2);
                             else{domain.max_corner(axis2)++;domain.min_corner(axis2)=domain.max_corner(axis2);}
                             for(FACE_ITERATOR iterator(grid,domain,axis2);iterator.Valid();iterator.Next()) faces.Append(new FACE_ITERATOR(iterator));}
                         RANGE<TV_INT> domain=grid.Domain_Indices(1);
-                        if(side==1) domain.max_corner(axis)=domain.min_corner(axis)+1;
+                        if(side==0) domain.max_corner(axis)=domain.min_corner(axis)+1;
                         else domain.min_corner(axis)=domain.max_corner(axis)-1;
                         if(mpi_boundary(axis)(side)) for(CELL_ITERATOR iterator(grid,domain);iterator.Valid();iterator.Next()) cells.Append(new CELL_ITERATOR(iterator));
                         for(int i=faces.m-1;i>=0;i--){FACE_ITERATOR& iterator=*faces(i);Face_Diffusion_Helper(iterator,axis,sum_jc_ghost,Z_ghost_local,inside);}

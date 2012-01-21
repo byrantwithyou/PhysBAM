@@ -111,10 +111,10 @@ Add_Interface(int face_lookup,const SIDED_FACE_INDEX<d>& face_index,T weight)
     const ARRAY<bool,TV_INT>& psi_D=index_map.boundary_condition_collection.psi_D;
     if(index_map.two_phase){
         if(!ci || psi_D(cell)) return;
-        if(face_index.side==1) weight=-weight;}
+        if(face_index.side==0) weight=-weight;}
     else{
         if(ci) return;
-        if(face_index.side==1) weight=-weight;}
+        if(face_index.side==0) weight=-weight;}
 
     typename BASE::INTERFACE_ENTRY ie={face_lookup,weight};
     interface_gradient.Append(ie);

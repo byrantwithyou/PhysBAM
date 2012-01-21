@@ -417,7 +417,7 @@ Add_Gradient_Entry(int fi,const FACE_INDEX<TV::m>& f,int side,bool outside)
 {
     TV_INT cell=f.Cell_Index(side);
     int cell_index=index_map.cell_indices(cell);
-    TV DX=index_map.grid.Axis_X_Face(f)+TV::Axis_Vector(f.axis)*((side==1?-1:1)*index_map.grid.dX.Min()/6);(void)DX;
+    TV DX=index_map.grid.Axis_X_Face(f)+TV::Axis_Vector(f.axis)*((side==0?-1:1)*index_map.grid.dX.Min()/6);(void)DX;
     if(!cell_index){
         //Add_Debug_Particle(DX,VECTOR<T,3>(1,0,0));
         return;}
@@ -437,11 +437,11 @@ Add_Cut_Gradient_Entry(int fi,const FACE_INDEX<TV::m>& f,int side)
 {
     TV_INT cell=f.Cell_Index(side);
     int cell_index=index_map.cell_indices(cell);
-    TV DX=index_map.grid.Axis_X_Face(f)+TV::Axis_Vector(f.axis)*((side==1?-1:1)*index_map.grid.dX.Min()/6);(void)DX;
+    TV DX=index_map.grid.Axis_X_Face(f)+TV::Axis_Vector(f.axis)*((side==0?-1:1)*index_map.grid.dX.Min()/6);(void)DX;
     if(!cell_index){
         //Add_Debug_Particle(DX,VECTOR<T,3>(1,1,0));
         return;}
-    int sign=side==1?-1:1;
+    int sign=side==0?-1:1;
     T dx=index_map.grid.dX(1);
     const CUT_CELL& cc=cut_cells.Get(cell);
     T len=face_lengths.Get(f);

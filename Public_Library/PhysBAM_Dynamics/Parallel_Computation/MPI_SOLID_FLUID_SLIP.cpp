@@ -374,7 +374,7 @@ Find_Matrix_Indices_In_Region(const GRID<TV>& local_grid,const T_ARRAYS_BOOL& va
 template<class TV> void MPI_SOLID_FLUID_SLIP<TV>::
 Find_Boundary_Indices_In_Region(const GRID<TV>& local_grid,const T_ARRAYS_BOOL& valid_divergence_cells,const int domain_side,const RANGE<TV_INT>& region,const T_ARRAYS_INT& cell_index_to_matrix_index,const T_FACE_ARRAYS_INT& face_ghost_cell_index,const T_FACE_ARRAYS_INT& face_lambdas)
 {
-    int axis=(domain_side-1)/2+1,cell_side=domain_side&1;
+    int axis=domain_side/2,cell_side=domain_side&1;
     RANGE<TV_INT> face_region=region;if(!cell_side) face_region+=TV_INT::Axis_Vector(axis);
     //int side=domain_side%2?2:1;
     TV_INT face_offset=cell_side?TV_INT():TV_INT::Axis_Vector(axis);

@@ -29,7 +29,7 @@ UNIFORM_GRID_ITERATOR(const GRID<TV>& grid_input,const RANGE<TV_INT>& region_inp
 template<class TV> void UNIFORM_GRID_ITERATOR<TV>::
 Next_Helper()
 {
-    index(TV::dimension)=region.min_corner(TV::dimension);
+    index(TV::dimension-1)=region.min_corner(TV::dimension-1);
     for(int i=TV::dimension-2;i>=0;i--){
         if(index(i)<region.max_corner(i)){index(i)++;return;}
         index(i)=region.min_corner(i);}

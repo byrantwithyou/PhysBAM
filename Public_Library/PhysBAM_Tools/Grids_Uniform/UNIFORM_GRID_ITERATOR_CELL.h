@@ -21,7 +21,7 @@ public:
     typedef TV VECTOR_T;
     using UNIFORM_GRID_ITERATOR<TV>::grid;using UNIFORM_GRID_ITERATOR<TV>::index;using UNIFORM_GRID_ITERATOR<TV>::Add_Region;using UNIFORM_GRID_ITERATOR<TV>::Reset;
 
-    UNIFORM_GRID_ITERATOR_CELL(const GRID<TV>& grid_input,const int number_of_ghost_cells=0,const T_REGION& region_type=GRID<TV>::WHOLE_REGION,const int side=0);
+    UNIFORM_GRID_ITERATOR_CELL(const GRID<TV>& grid_input,const int number_of_ghost_cells=0,const T_REGION& region_type=GRID<TV>::WHOLE_REGION,const int side=-1);
 
     UNIFORM_GRID_ITERATOR_CELL(const GRID<TV>& grid_input,const RANGE<TV_INT>& region_input)
         :UNIFORM_GRID_ITERATOR<TV>(grid_input,region_input)

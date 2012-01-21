@@ -17,9 +17,9 @@ template<class TV> UNIFORM_COLLISION_AWARE_ITERATOR_FACE_UNCOUPLED<TV>::
 UNIFORM_COLLISION_AWARE_ITERATOR_FACE_UNCOUPLED(const UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO<TV>& info,const int number_of_ghost_cells_input,bool use_outside_input,
     const T_REGION& region_type_input,const int side_input,int axis_input)
     :BASE(info.grid,number_of_ghost_cells_input,region_type_input,side_input,axis_input),outside_fluid(*info.outside_fluid),
-    collision_index(1),collision_face_info(info.collision_face_info),scan_end(INT_MIN),use_outside(use_outside_input)
+    collision_index(0),collision_face_info(info.collision_face_info),scan_end(INT_MIN),use_outside(use_outside_input)
 {
-    index(TV::dimension)-=2;
+    index(TV::dimension-1)-=2;
     Next_Fluid();
 }
 template<class TV> UNIFORM_COLLISION_AWARE_ITERATOR_FACE_UNCOUPLED<TV>::
@@ -39,7 +39,7 @@ Next_Helper()
     if(collision_index<collision_face_info.Size()){
         const COLLISION_FACE_INFO<TV>& cfi=collision_face_info(collision_index);
         if(axis==cfi.axis && index.Remove_Index(TV::dimension)==cfi.index.Remove_Index(TV::dimension))
-            scan_end=cfi.index(TV::dimension);}
+            scan_end=cfi.index(TV::dimension-1);}
 }
 //#####################################################################
 // Function Compare_Collision_Index

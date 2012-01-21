@@ -45,10 +45,10 @@ public:
     {return index;}
 
     TV_INT Real_Cell_Index() const
-    {return side==1?index-TV_INT::Axis_Vector(axis):index;}
+    {return side==0?index-TV_INT::Axis_Vector(axis):index;}
 
     TV_INT Ghost_Cell_Index() const
-    {return side==2?index-TV_INT::Axis_Vector(axis):index;}
+    {return side==1?index-TV_INT::Axis_Vector(axis):index;}
 };
 }
 #endif

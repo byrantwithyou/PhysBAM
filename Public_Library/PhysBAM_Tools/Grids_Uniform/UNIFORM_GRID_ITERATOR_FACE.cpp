@@ -14,10 +14,10 @@ template<class TV> UNIFORM_GRID_ITERATOR_FACE<TV>::
 UNIFORM_GRID_ITERATOR_FACE(const GRID<TV>& grid_input,const int number_of_ghost_cells_input,const T_REGION& region_type_input,const int side_input,int axis_input)
     :UNIFORM_GRID_ITERATOR<TV>(grid_input),region_type(region_type_input),side(side_input),number_of_ghost_cells(number_of_ghost_cells_input)
 {
-    assert(0<=side&&side<=2*TV::dimension&&(!side||!axis_input||(side+1)/2==axis_input));
+    assert(-1<=side&&side<2*TV::dimension&&(side>=0||axis_input<0||side/2==axis_input));
     assert(region_type!=GRID<TV>::BOUNDARY_INTERIOR_REGION); // TODO: implement this case!
-    if(region_type==GRID<TV>::BOUNDARY_REGION && side) axis_input=(side+1)/2;
-    if(axis_input){single_axis=true;Reset_Axis(axis_input);}else{single_axis=false;Reset_Axis(1);}
+    if(region_type==GRID<TV>::BOUNDARY_REGION && side) axis_input=side/2;
+    if(axis_input){single_axis=true;Reset_Axis(axis_input);}else{single_axis=false;Reset_Axis(0);}
 }
 //#####################################################################
 // Constructor
@@ -55,12 +55,12 @@ Reset_Axis(const int axis_input)
     axis=axis_input;Reset_Regions();
     RANGE<TV_INT> domain(grid.Cell_Indices(number_of_ghost_cells));
     switch(region_type){
-        case GRID<TV>::WHOLE_REGION:{assert(!side);
+        case GRID<TV>::WHOLE_REGION:{assert(side>=0);
             domain.max_corner(axis)++;
             Add_Region(domain);
             break;}
         case GRID<TV>::GHOST_REGION:{
-            if(!side){ // TODO(jontg): Beware of duplicates!
+            if(side>=0){ // TODO(jontg): Beware of duplicates!
                 for(int side_iterator=0;side_iterator<TV::dimension*2;side_iterator++){
                     int axis_of_side=(side_iterator+1)/2;
                     if(side_iterator&1){
@@ -70,19 +70,19 @@ Reset_Axis(const int axis_input)
                         RANGE<TV_INT> domain_copy(domain); domain_copy.max_corner(axis)++;
                         domain_copy.min_corner(axis_of_side)=domain_copy.max_corner(axis_of_side)-number_of_ghost_cells+1;Add_Region(domain_copy);}}}
             else{
-                int axis_of_side=(side+1)/2;
-                if(side&1){
+                int axis_of_side=side/2;
+                if(!(side&1)){
                     RANGE<TV_INT> domain_copy(domain); domain_copy.max_corner(axis)++;
                     domain_copy.max_corner(axis_of_side)=domain_copy.min_corner(axis_of_side)+number_of_ghost_cells-1;Add_Region(domain_copy);}
-                if(!(side&1)){
+                if(side&1){
                     RANGE<TV_INT> domain_copy(domain); domain_copy.max_corner(axis)++;
                     domain_copy.min_corner(axis_of_side)=domain_copy.max_corner(axis_of_side)-number_of_ghost_cells+1;Add_Region(domain_copy);}}
             break;}
         case GRID<TV>::BOUNDARY_REGION:{
-            if(!side || side&1){RANGE<TV_INT> domain_copy(domain);domain_copy.max_corner(axis)=domain.min_corner(axis);Add_Region(domain_copy);}
-            if(!side || !(side&1)){RANGE<TV_INT> domain_copy(domain);domain_copy.min_corner(axis)=domain_copy.max_corner(axis)=domain.max_corner(axis)+1;Add_Region(domain_copy);}
+            if(side>=0 || !(side&1)){RANGE<TV_INT> domain_copy(domain);domain_copy.max_corner(axis)=domain.min_corner(axis);Add_Region(domain_copy);}
+            if(side>=0 || side&1){RANGE<TV_INT> domain_copy(domain);domain_copy.min_corner(axis)=domain_copy.max_corner(axis)=domain.max_corner(axis)+1;Add_Region(domain_copy);}
             break;}
-        default:{assert(region_type==GRID<TV>::INTERIOR_REGION && !side);
+        default:{assert(region_type==GRID<TV>::INTERIOR_REGION && side>=0);
             domain.min_corner(axis)++;
             Add_Region(domain);
             break;}}

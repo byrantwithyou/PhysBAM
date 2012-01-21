@@ -364,9 +364,9 @@ Set_Domain_Boundary_Conditions(LAPLACE_UNIFORM<T_GRID>& elliptic_solver,T_FACE_A
 
     for(int axis=0;axis<T_GRID::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){
         int side=2*(axis-1)+axis_side;
-        TV_INT interior_cell_offset=axis_side==1?TV_INT():-TV_INT::Axis_Vector(axis);
-        TV_INT exterior_cell_offset=axis_side==1?-TV_INT::Axis_Vector(axis):TV_INT();
-        TV_INT boundary_face_offset=axis_side==1?TV_INT::Axis_Vector(axis):-TV_INT::Axis_Vector(axis);
+        TV_INT interior_cell_offset=axis_side==0?TV_INT():-TV_INT::Axis_Vector(axis);
+        TV_INT exterior_cell_offset=axis_side==0?-TV_INT::Axis_Vector(axis):TV_INT();
+        TV_INT boundary_face_offset=axis_side==0?TV_INT::Axis_Vector(axis):-TV_INT::Axis_Vector(axis);
         if(domain_walls(axis)(axis_side)){
             if(number_of_regions>=2){
                 // TODO: clean this up. currently iterating over faces 1 grid cell out from boundary in order to get the corners as well. change iterators to give corners instead.
@@ -509,7 +509,7 @@ Move_Grid(T_FACE_ARRAYS_SCALAR& face_velocities,const T time)
 
     TV_INT shift;
     for(int axis=0;axis<T_GRID::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){
-        int side=2*(axis-1)+axis_side;TV_INT offset=(axis_side==1?-1:1)*moving_grid_number_of_cells*TV_INT::Axis_Vector(axis);
+        int side=2*(axis-1)+axis_side;TV_INT offset=(axis_side==0?-1:1)*moving_grid_number_of_cells*TV_INT::Axis_Vector(axis);
         // loop over boundary region by looping over ghost region and shifting inwards
         for(CELL_ITERATOR iterator(*grid,moving_grid_number_of_cells,T_GRID::GHOST_REGION,side);iterator.Valid();iterator.Next())
             if(particle_levelset_evolution->phi(iterator.Cell_Index()-offset)<=0){shift+=offset;break;}}

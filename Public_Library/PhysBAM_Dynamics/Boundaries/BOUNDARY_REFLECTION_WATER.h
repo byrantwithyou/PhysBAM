@@ -63,9 +63,9 @@ Fill_Ghost_Cells(const T_GRID& grid,const T_ARRAYS_T2& u,T_ARRAYS_T2& u_ghost,co
         int side=2*axis+axis_side-2;
         if(use_extrapolation_mode && Constant_Extrapolation(side)) BOUNDARY_UNIFORM<T_GRID,T>::Fill_Single_Ghost_Region(grid,u_ghost,side,regions(side));
         else{ // either phi=phi_object for a wall, or no wall
-            int inward_sign=axis_side==1?1:-1;T dx=grid.DX()[axis],half_dx=(T).5*dx;
+            int inward_sign=axis_side==0?1:-1;T dx=grid.DX()[axis],half_dx=(T).5*dx;
             int cell_boundary=Boundary(side,regions(side)),face_boundary=cell_boundary+axis_side-1;
-            int reflection_times_two=2*cell_boundary+(axis_side==1?-1:1);
+            int reflection_times_two=2*cell_boundary+(axis_side==0?-1:1);
             for(CELL_ITERATOR iterator(grid,regions(side));iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
                 TV_INT boundary_cell=cell,boundary_face=cell;boundary_cell[axis]=cell_boundary;boundary_face[axis]=face_boundary;
                 if((*phi)(boundary_cell) <= 0 && domain_indices.Lazy_Inside(boundary_cell) && inward_sign*V->Component(axis)(boundary_face) > tolerance){

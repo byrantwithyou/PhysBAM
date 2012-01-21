@@ -211,7 +211,7 @@ Set_Up_For_Projection(T_FACE_ARRAYS_SCALAR& face_velocities,const T time)
         if(projection.elliptic_solver->psi_N(axis,face)) face_velocities(axis,face)=preset_velocities(axis,face);}
     for(int axis=0;axis<T_GRID::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
         if(!fluids_parameters.mpi_grid || !fluids_parameters.mpi_grid->Neighbor(axis,axis_side)){
-            TV_INT interior_cell_offset=axis_side==1?TV_INT():-TV_INT::Axis_Vector(axis);
+            TV_INT interior_cell_offset=axis_side==0?TV_INT():-TV_INT::Axis_Vector(axis);
             for(FACE_ITERATOR iterator(grid,1,T_GRID::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Face_Index()+interior_cell_offset;
                 projection.elliptic_solver->psi_D(cell)=true;projection.p(cell)=0;}}}
 }
@@ -498,7 +498,7 @@ Move_Particles_Off_Grid_Boundaries(T_ARRAYS_PARTICLES& particles,const T toleran
             for(NODE_ITERATOR iterator(grid,0,T_GRID::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
                 TV_INT block=iterator.Node_Index();
                 if(particles(block)) for(int p=0;p<particles(block)->array_collection->Size();p++)
-                    if(axis_side==1) particles(block)->X(p)[axis]=max(grid.domain.Minimum_Corner()[axis]+tolerance,particles(block)->X(p)[axis]);
+                    if(axis_side==0) particles(block)->X(p)[axis]=max(grid.domain.Minimum_Corner()[axis]+tolerance,particles(block)->X(p)[axis]);
                     else particles(block)->X(p)[axis]=min(grid.domain.Maximum_Corner()[axis]-tolerance,particles(block)->X(p)[axis]);}}}
 }
 //#####################################################################

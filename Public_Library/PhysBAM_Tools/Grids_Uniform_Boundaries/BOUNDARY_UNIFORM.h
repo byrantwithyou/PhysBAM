@@ -35,7 +35,7 @@ public:
 
 protected:
     int Boundary(const int side,const RANGE<TV_INT>& region) const
-    {int axis=(side+1)/2;return side&1?region.Maximum_Corner()[axis]+1:region.Minimum_Corner()[axis]-1;}
+    {int axis=side/2;return side&1?region.Minimum_Corner()[axis]-1:region.Maximum_Corner()[axis]+1;}
 public:
 
     void Fill_Ghost_Cells_Cell(const T_GRID& grid,const T_ARRAYS_T2& u,T_ARRAYS_T2& u_ghost,const T time,const int number_of_ghost_cells)

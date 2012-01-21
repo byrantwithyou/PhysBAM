@@ -155,7 +155,7 @@ THREADED_UNIFORM_GRID(ARRAY<THREAD_PACKAGE>& buffers_input,const int tid_input,c
             int side=2*axis-(2-axis_side);
             int neighbor_rank=side_neighbor_ranks(side);
             if(neighbor_rank>=0){
-                TV_INT axis_vector=axis_side==1?-TV_INT::Axis_Vector(axis):TV_INT::Axis_Vector(axis);
+                TV_INT axis_vector=axis_side==0?-TV_INT::Axis_Vector(axis):TV_INT::Axis_Vector(axis);
                 int start_column_index=global_column_index_boundaries(neighbor_rank+1).x;
                 // Make that neighbors local_grid
                 TV_INT proc_coordinates=all_coordinates(neighbor_rank+1);

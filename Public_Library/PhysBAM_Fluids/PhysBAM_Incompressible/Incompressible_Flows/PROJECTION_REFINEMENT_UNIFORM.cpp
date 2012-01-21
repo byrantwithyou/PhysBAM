@@ -113,10 +113,10 @@ Set_Coarse_Boundary_Conditions(T_FACE_ARRAYS_SCALAR& coarse_face_velocities)
 {
     for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
         if(domain_boundary(axis)(axis_side)){ //Need to check mpi as smaller solves are never using mpi (for now)
-            TV_INT interior_cell_offset=axis_side==1?TV_INT():-TV_INT::Axis_Vector(axis);    
+            TV_INT interior_cell_offset=axis_side==0?TV_INT():-TV_INT::Axis_Vector(axis);    
             for(typename GRID<TV>::FACE_ITERATOR local_iterator(coarse_grid,1,GRID<TV>::BOUNDARY_REGION,side);local_iterator.Valid();local_iterator.Next()){
                 TV_INT cell=local_iterator.Face_Index()+interior_cell_offset;
-                TV_INT boundary_face=axis_side==1?local_iterator.Face_Index()+TV_INT::Axis_Vector(axis):local_iterator.Face_Index()-TV_INT::Axis_Vector(axis);
+                TV_INT boundary_face=axis_side==0?local_iterator.Face_Index()+TV_INT::Axis_Vector(axis):local_iterator.Face_Index()-TV_INT::Axis_Vector(axis);
                 if(solid_wall(axis)(axis_side) && coarse_face_velocities.Component(axis).Valid_Index(boundary_face)){
                     elliptic_solver->psi_N(FACE_INDEX<TV::dimension>(axis,boundary_face))=true;coarse_face_velocities(FACE_INDEX<TV::dimension>(axis,boundary_face))=0;}
                 else{

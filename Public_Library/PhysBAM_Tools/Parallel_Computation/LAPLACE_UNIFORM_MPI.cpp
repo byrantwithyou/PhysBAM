@@ -95,8 +95,8 @@ Find_Matrix_Indices_Threaded(ARRAY<RANGE<TV_INT> >& domains,ARRAY<ARRAY<INTERVAL
     for(int axis=0;axis<TV::dimension;axis++) for(int side=0;side<2;side++){int s=(axis-1)*2+side;
         for(int color=0;color<filled_region_ranks.m;color++) partitions(color).ghost_indices(s).min_corner=filled_region_cell_count(color)+1;
         RANGE<TV_INT> exterior_domain(local_grid.Domain_Indices(1));
-        for(int axis2=axis+1;axis2<=TV::dimension;axis2++){exterior_domain.min_corner(axis2)++;exterior_domain.max_corner(axis2)--;}
-        if(side==1) exterior_domain.max_corner(axis)=exterior_domain.min_corner(axis);
+        for(int axis2=axis+1;axis2<TV::dimension;axis2++){exterior_domain.min_corner(axis2)++;exterior_domain.max_corner(axis2)--;}
+        if(side==0) exterior_domain.max_corner(axis)=exterior_domain.min_corner(axis);
         else exterior_domain.min_corner(axis)=exterior_domain.max_corner(axis);
         for(int i=0;i<domains.m;i++){
             RANGE<TV_INT> interior_domain(domains(i));
@@ -131,10 +131,10 @@ template<class T_GRID> void LAPLACE_UNIFORM_MPI<T_GRID>::
 Find_Boundary_Indices_In_Region(const int side,const RANGE<TV_INT>& region,T_ARRAYS_INT& cell_index_to_matrix_index)
 {
     int axis=(side-1)/2+1,cell_side=side&1;
-    RANGE<TV_INT> face_region=region;if(!cell_side) face_region+=TV_INT::Axis_Vector(axis);
+    RANGE<TV_INT> face_region=region;if(cell_side) face_region+=TV_INT::Axis_Vector(axis);
     // count boundary indices
     ARRAY<int> counts(partitions.m);
-    TV_INT face_offset=cell_side?TV_INT():TV_INT::Axis_Vector(axis);
+    TV_INT face_offset=cell_side?TV_INT::Axis_Vector(axis):TV_INT();
     for(CELL_ITERATOR iterator(local_grid,region);iterator.Valid();iterator.Next())if(!psi_N.Component(axis)(iterator.Cell_Index()+face_offset)){
         int color=filled_region_colors(iterator.Cell_Index());
         if(counts.Valid_Index(color)) counts(color)++;}

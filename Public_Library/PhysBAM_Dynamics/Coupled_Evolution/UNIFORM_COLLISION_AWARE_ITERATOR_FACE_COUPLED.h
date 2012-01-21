@@ -43,10 +43,10 @@ public:
     {return collision_face_info(collision_index).simplices;}
 
     TV_INT Real_Cell_Index() const
-    {return side==1?First_Cell_Index():Second_Cell_Index();}
+    {return side==0?First_Cell_Index():Second_Cell_Index();}
 
     TV_INT Ghost_Cell_Index() const
-    {return side==2?First_Cell_Index():Second_Cell_Index();}
+    {return side==1?First_Cell_Index():Second_Cell_Index();}
 
     //void Neighbor_Face_Stencil(VECTOR<SIDED_FACE_INDEX<d>,2*d-2>& neighbor_faces) const
     //{TV_INT real_cell=Real_Cell_Index();

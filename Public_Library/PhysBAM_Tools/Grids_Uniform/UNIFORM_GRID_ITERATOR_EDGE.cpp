@@ -17,7 +17,7 @@ UNIFORM_GRID_ITERATOR_EDGE(const GRID<TV>& grid_input,const int number_of_ghost_
     assert(side==0);
     assert(region_type==GRID<TV>::WHOLE_REGION);
     if(axis_input){single_axis=true;Reset_Axis(axis_input);}
-    else{single_axis=false;Reset_Axis(1);}
+    else{single_axis=false;Reset_Axis(0);}
 }
 //#####################################################################
 // Constructor
@@ -59,7 +59,7 @@ Reset_Axis(const int axis_input)
     RANGE<TV_INT> domain(grid.Node_Indices(number_of_ghost_cells));
     switch(region_type){
         case GRID<TV>::WHOLE_REGION:
-            assert(!side);
+            assert(side>=0);
             domain.max_corner(axis)--;
             Add_Region(domain);
             break;

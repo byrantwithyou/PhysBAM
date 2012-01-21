@@ -59,7 +59,7 @@ Compute(int ghost_cells)
 {
     stencils.Resize(entries.m);
     for(int i=0;i<entries.m;i++){
-        int sign=(entries(i).side==1)?-1:1;
+        int sign=(entries(i).side==0)?-1:1;
         FACE_INDEX<d> face=entries(i).face_index;
         TV_INT cell=face.Cell_Index(entries(i).side);
         T face_X=index_map.grid.Axis_X_Face(face)(face.axis),X=entries(i).X(face.axis),cell_X=index_map.grid.X(cell)(face.axis);

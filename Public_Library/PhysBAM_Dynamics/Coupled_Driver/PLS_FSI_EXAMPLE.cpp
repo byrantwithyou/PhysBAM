@@ -436,7 +436,7 @@ Set_Boundary_Conditions(ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX<TV::dime
     for(int d=0;d<TV::m;d++)
         for(int i=0;i<2;i++)
             if(fluids_parameters.domain_walls(d)(i))
-                for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,0,GRID<TV>::BOUNDARY_REGION,i+2*(d-1),0);it.Valid();it.Next()){
+                for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,0,GRID<TV>::BOUNDARY_REGION,i+2*(d-1),-1);it.Valid();it.Next()){
                     psi_N(it.Full_Index())=true;
                     /*Add_Debug_Particle(it.Location(),VECTOR<T,3>(0,1,0));*/}
 

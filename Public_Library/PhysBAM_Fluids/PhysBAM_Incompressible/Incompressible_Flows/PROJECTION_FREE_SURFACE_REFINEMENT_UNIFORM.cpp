@@ -60,9 +60,9 @@ Set_Coarse_Boundary_Conditions(T_FACE_ARRAYS_SCALAR& coarse_face_velocities)
     phi_boundary->Fill_Ghost_Cells(fine_grid,levelset.phi,phi_ghost,0,0,ghost);
     for(int axis=0;axis<T_GRID::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){
         int side=2*(axis-1)+axis_side;
-        TV_INT interior_cell_offset=axis_side==1?TV_INT():-TV_INT::Axis_Vector(axis);
-        TV_INT exterior_cell_offset=axis_side==1?-TV_INT::Axis_Vector(axis):TV_INT();
-        TV_INT boundary_face_offset=axis_side==1?TV_INT::Axis_Vector(axis):-TV_INT::Axis_Vector(axis);
+        TV_INT interior_cell_offset=axis_side==0?TV_INT():-TV_INT::Axis_Vector(axis);
+        TV_INT exterior_cell_offset=axis_side==0?-TV_INT::Axis_Vector(axis):TV_INT();
+        TV_INT boundary_face_offset=axis_side==0?TV_INT::Axis_Vector(axis):-TV_INT::Axis_Vector(axis);
         if(solid_wall(axis)(axis_side)){
             for(typename GRID<TV>::FACE_ITERATOR iterator(coarse_grid,1,T_GRID::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
                 TV_INT face=iterator.Face_Index()+boundary_face_offset;
@@ -175,9 +175,9 @@ Set_Levelset_Boundary_Conditions(const GRID<TV>& levelset_grid,ARRAY<T,FACE_INDE
 {
     Map_Fine_To_Levelset_For_Constraints(levelset_velocities);
     for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
-        TV_INT interior_cell_offset=axis_side==1?TV_INT():-TV_INT::Axis_Vector(axis);
-        TV_INT exterior_cell_offset=axis_side==1?-TV_INT::Axis_Vector(axis):TV_INT();
-        TV_INT boundary_face_offset=axis_side==1?TV_INT::Axis_Vector(axis):-TV_INT::Axis_Vector(axis);
+        TV_INT interior_cell_offset=axis_side==0?TV_INT():-TV_INT::Axis_Vector(axis);
+        TV_INT exterior_cell_offset=axis_side==0?-TV_INT::Axis_Vector(axis):TV_INT();
+        TV_INT boundary_face_offset=axis_side==0?TV_INT::Axis_Vector(axis):-TV_INT::Axis_Vector(axis);
         if(solid_wall(axis)(axis_side)){
             for(typename GRID<TV>::FACE_ITERATOR iterator(levelset_grid,1,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
                 TV_INT face=iterator.Face_Index()+boundary_face_offset;
@@ -192,8 +192,8 @@ Set_Levelset_Boundary_Conditions(const GRID<TV>& levelset_grid,ARRAY<T,FACE_INDE
             levelset_projection.elliptic_solver->psi_D(iterator.Cell_Index())=true;levelset_projection.p(iterator.Cell_Index())=0;}}
     for(typename GRID<TV>::CELL_ITERATOR iterator(coarse_grid);iterator.Valid();iterator.Next()){ 
         if(!Contains_Outside(iterator.Cell_Index(),levelset_phi,buffer)) for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){
-            TV_INT offset=(axis_side==1?-TV_INT::Axis_Vector(axis):TV_INT::Axis_Vector(axis));
-            TV_INT face=iterator.Cell_Index()+(axis_side==1?TV_INT():TV_INT::Axis_Vector(axis));
+            TV_INT offset=(axis_side==0?-TV_INT::Axis_Vector(axis):TV_INT::Axis_Vector(axis));
+            TV_INT face=iterator.Cell_Index()+(axis_side==0?TV_INT():TV_INT::Axis_Vector(axis));
             if(domain_boundary(axis)(axis_side) && ((iterator.Cell_Index()(axis)+offset(axis))<1 || (iterator.Cell_Index()(axis)+offset(axis))>coarse_grid.Counts()(axis))) continue;
             TV_INT adjacent_cell=iterator.Cell_Index()+offset;
             bool adjacent_outside=false;
