@@ -92,15 +92,11 @@ Create_Left_Balanced_KD_Tree_With_Grouping(ARRAY_VIEW<const TV> points_to_balanc
 template<class TV> void KD_TREE<TV>::
 Balance_Sub_KD_Tree_Using_Internal_Nodes(KD_TREE_NODE<T>* cell,const int first_index,const int last_index,ARRAY_VIEW<const TV> points,ARRAY_VIEW<int> permutation_array,RANGE<TV>& box)
 {
-    LOG::cout<<first_index<<"  "<<last_index<<"   "<<permutation_array<<std::endl;
     if(last_index==first_index+1){cell->split_axis=0;cell->node_index=permutation_array(first_index);return;}
     int partition_index=Choose_Partition_Index_Using_Internal_Nodes(first_index,last_index);
     int axis=Choose_Partition_Axis(box.Edge_Lengths());
-    LOG::cout<<__LINE__<<std::endl;
     Median_Split(partition_index,first_index,last_index,points,permutation_array,axis);
-    LOG::cout<<__LINE__<<std::endl;
     cell->split_axis=axis;cell->split_value=points(permutation_array(partition_index))[axis];cell->node_index=permutation_array(partition_index);
-    LOG::cout<<__LINE__<<std::endl;
     if(partition_index>first_index){
         cell->left=pool.New();
         RANGE<TV> left_box(box);left_box.max_corner[axis]=cell->split_value;
@@ -109,7 +105,6 @@ Balance_Sub_KD_Tree_Using_Internal_Nodes(KD_TREE_NODE<T>* cell,const int first_i
         cell->right=pool.New();
         RANGE<TV> right_box(box);right_box.min_corner[axis]=cell->split_value;
         Balance_Sub_KD_Tree_Using_Internal_Nodes(cell->right,partition_index+1,last_index,points,permutation_array,right_box);}
-    LOG::cout<<__LINE__<<std::endl;
 }
 //#####################################################################
 // Function Balance_Sub_KD_Tree_Using_Leaf_Nodes
@@ -117,7 +112,7 @@ Balance_Sub_KD_Tree_Using_Internal_Nodes(KD_TREE_NODE<T>* cell,const int first_i
 template<class TV> void KD_TREE<TV>::
 Balance_Sub_KD_Tree_Using_Leaf_Nodes(KD_TREE_NODE<T>* cell,const int first_index,const int last_index,ARRAY_VIEW<const TV> points,ARRAY_VIEW<int> permutation_array,RANGE<TV>& box)
 {
-    if(last_index==first_index+1){cell->split_axis=0;cell->node_index=permutation_array(first_index);LOG::cout<<__LINE__<<std::endl;return;}
+    if(last_index==first_index+1){cell->split_axis=0;cell->node_index=permutation_array(first_index);return;}
     int partition_index=Choose_Partition_Index_Using_Leaf_Nodes(first_index,last_index);
     cell->split_axis=Choose_Partition_Axis(box.Edge_Lengths());
     Median_Split(partition_index,first_index,last_index,points,permutation_array,cell->split_axis);
