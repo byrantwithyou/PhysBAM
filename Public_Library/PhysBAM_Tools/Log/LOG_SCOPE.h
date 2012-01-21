@@ -36,16 +36,14 @@ public:
     {int entry;end_on_separate_line=true;log_file_end_on_separate_line=true;
     if(entries.Get(new_scope_identifier,entry)){children(entry)->name=new_name;return children(entry);}
     LOG_ENTRY* new_entry=new LOG_SCOPE(this,depth+1,timer_id,new_scope_identifier,new_name,verbosity_level);
-    children.Append(new_entry);
-    entries.Insert(new_scope_identifier,children.m);
+    entries.Insert(new_scope_identifier,children.Append(new_entry));
     return new_entry;}
 
     LOG_ENTRY* Get_New_Item(LOG_CLASS& instance,const std::string& new_name)
     {int entry;end_on_separate_line=true;log_file_end_on_separate_line=true;
     if(entries.Get(new_name,entry)) return children(entry);
     LOG_ENTRY* new_entry=new LOG_ENTRY(this,depth+1,timer_id,new_name,verbosity_level);
-    children.Append(new_entry);
-    entries.Insert(new_name,children.m);
+    entries.Insert(new_name,children.Append(new_entry));
     return new_entry;}
 
     LOG_ENTRY* Get_Pop_Scope(LOG_CLASS& instance)
