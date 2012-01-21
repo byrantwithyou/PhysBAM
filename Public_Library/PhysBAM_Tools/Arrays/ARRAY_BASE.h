@@ -422,7 +422,7 @@ const T_ARRAY& a_=a.Derived();
 ID m=a_.Size();
 for(ID i(0);i<m;i++){
     output<<a_(i);
-    if(i<m) output<<" ";}
+    if(i<m-1) output<<" ";}
 output<<")";
 return output;}
 //#####################################################################

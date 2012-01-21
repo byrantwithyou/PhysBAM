@@ -25,7 +25,7 @@ Add_Matrix(const SYSTEM_MATRIX_BASE<T>& base,bool trans,int dr,int dc)
 template<class T> void SYSTEM_MATRIX_HELPER<T>::
 Transpose()
 {
-    for(int i=start;i<=data.m;i++) exchange(data(i).x,data(i).y);
+    for(int i=start;i<data.m;i++) exchange(data(i).x,data(i).y);
 }
 //#####################################################################
 // Function Transpose_Add
@@ -33,7 +33,7 @@ Transpose()
 template<class T> void SYSTEM_MATRIX_HELPER<T>::
 Scale(T s)
 {
-    for(int i=start;i<=data.m;i++) data(i).z*=s;
+    for(int i=start;i<data.m;i++) data(i).z*=s;
 }
 //#####################################################################
 // Function Shift_Add
@@ -41,7 +41,7 @@ Scale(T s)
 template<class T> void SYSTEM_MATRIX_HELPER<T>::
 Shift(int dr,int dc)
 {
-    for(int i=start;i<=data.m;i++){data(i).x+=dr;data(i).y+=dc;}
+    for(int i=start;i<data.m;i++){data(i).x+=dr;data(i).y+=dc;}
 }
 //#####################################################################
 // Function Compact
@@ -50,11 +50,11 @@ template<class T> void SYSTEM_MATRIX_HELPER<T>::
 Compact()
 {
     Sort(data,Data_Compare);
-    int k=1;
-    for(int i=2;i<=data.m;i++){
+    int k=0;
+    for(int i=1;i<data.m;i++){
         if(data(k).x==data(i).x && data(k).y==data(i).y) data(k).z+=data(i).z;
         else data(++k)=data(i);}
-    data.Resize(k);
+    data.Resize(k+1);
 }
 //#####################################################################
 // Function Set_Matrix

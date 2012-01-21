@@ -37,7 +37,7 @@ public:
 };
 
 template<class T> inline std::ostream& operator<<(std::ostream& output_stream,const ARRAY<T,FACE_INDEX<1> >& a)
-{for(int i=a.domain_indices.min_corner.x;i<a.domain_indices.max_corner.x+1;i++) output_stream<<a.Component(1)(i)<<" ";output_stream<<std::endl;return output_stream;}
+{for(int i=a.domain_indices.min_corner.x;i<a.domain_indices.max_corner.x+1;i++) output_stream<<a.Component(0)(i)<<" ";output_stream<<std::endl;return output_stream;}
 
 template<class T,int d> inline std::ostream& operator<<(std::ostream& output_stream,const ARRAY<T,FACE_INDEX<d> >& a)
 {for(int i=0;i<d;i++) output_stream<<a.data(i)<<std::endl;return output_stream;}

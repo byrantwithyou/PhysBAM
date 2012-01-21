@@ -14,7 +14,7 @@ namespace PhysBAM{
 
 template<class T,class T_VECTOR> void
 Write_Raw(std::ostream& output,const VECTOR_BASE<T,T_VECTOR>& a)
-{int m=a.Size();for(int i=0;i<m;i++){output<<a(i);if(i<m) output<<" ";}}
+{int m=a.Size();for(int i=0;i<m;i++){output<<a(i);if(i<m-1) output<<" ";}}
 
 template<class T,class T_VECTOR> inline std::ostream&
 operator<<(std::ostream& output,const VECTOR_BASE<T,T_VECTOR>& a)
