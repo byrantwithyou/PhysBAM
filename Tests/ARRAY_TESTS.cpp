@@ -123,7 +123,7 @@ public:
 
         TEST(ar1.Find(ar1(0))==0);
         TEST(ar1.Find(ar1(3))==3);
-        TEST(ar1.Find(ar1(30))==-1);
+        TEST(ar1.Find(30)==-1);
         TEST(ar1.Contains(ar1(0))==true);
         TEST(ar1.Contains(ar1(1))==true);
         TEST(ar1.Contains(ar1(3))==true);
