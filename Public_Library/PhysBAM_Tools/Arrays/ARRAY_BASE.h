@@ -192,10 +192,10 @@ public:
     {return *this*=Inverse(a);}
 
     T& Last()
-    {T_ARRAY& self=Derived();return self(self.Size());}
+    {T_ARRAY& self=Derived();return self(self.Size()-1);}
 
     const T& Last() const
-    {const T_ARRAY& self=Derived();return self(self.Size());}
+    {const T_ARRAY& self=Derived();return self(self.Size()-1);}
 
     ID Size() const
     {return Derived().Size();}
