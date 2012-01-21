@@ -9,8 +9,8 @@
 
 #include <PhysBAM_Tools/Matrices/MATRIX_4X4.h>
 #include <PhysBAM_Tools/Polynomials/CUBIC.h>
-#include <PhysBAM_Geometry/Basic_Geometry/BOX.h>
 #include <PhysBAM_Geometry/Basic_Geometry/ORIENTED_BOX.h>
+#include <PhysBAM_Geometry/Basic_Geometry/BOX.h>
 namespace PhysBAM{
 
 template<class T>

@@ -5,7 +5,6 @@
 // MAIN
 //#####################################################################
 #include <PhysBAM_Tools/Read_Write/Grids_Uniform/READ_WRITE_GRID.h>
-#include <PhysBAM_Geometry/Basic_Geometry/BOX.h>
 #include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Geometry/Read_Write/Grids_Uniform_Level_Sets/READ_WRITE_LEVELSET_3D.h>
@@ -13,6 +12,7 @@
 #include "COMMANDS.h"
 #include "LEVELSET_PROCESSOR.h"
 #include "MISC.h"
+#include <PhysBAM_Geometry/Basic_Geometry/BOX.h>
 using namespace PhysBAM;
 //#####################################################################
 

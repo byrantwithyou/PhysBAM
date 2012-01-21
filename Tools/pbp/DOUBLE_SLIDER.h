@@ -18,13 +18,13 @@
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Math_Tools/clamp.h>
 #include <PhysBAM_Tools/Utilities/TIMER.h>
-#include <PhysBAM_Geometry/Basic_Geometry/BOX.h>
 #include <string>
 #include "VIDEO.h"
 #include "VIDEO_VIEW.h"
 #include <FL/Fl.H>
 #include <FL/fl_draw.H>
 #include <FL/Fl_Gl_Window.H>
+#include <PhysBAM_Geometry/Basic_Geometry/BOX.h>
 
 template<class T>
 class DOUBLE_SLIDER:public Fl_Widget

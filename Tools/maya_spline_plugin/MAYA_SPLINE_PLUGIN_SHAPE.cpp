@@ -4,13 +4,13 @@
 //#####################################################################
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/CATMULL_ROM_SPLINE_INTERPOLATION.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_4X4.h>
-#include <PhysBAM_Geometry/Basic_Geometry/BOX.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include "MAYA_PLUGIN_MACROS.h"
 #include "MAYA_SPLINE_PLUGIN_DATA.h"
 #include "MAYA_SPLINE_PLUGIN_GEOMETRY.h"
 #include "MAYA_SPLINE_PLUGIN_ITERATOR.h"
 #include "MAYA_SPLINE_PLUGIN_SHAPE.h"
+#include <PhysBAM_Geometry/Basic_Geometry/BOX.h>
 
 #include <maya/MAttributeIndex.h>
 #include <maya/MAttributeSpec.h>
