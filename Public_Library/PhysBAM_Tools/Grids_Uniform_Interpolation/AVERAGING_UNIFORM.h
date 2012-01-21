@@ -77,7 +77,7 @@ public:
     int axis=iterator.Axis();typename GRID<VECTOR<T,3> >::INDEX face=iterator.Face_Index(),cell1,cell2;iterator.Unordered_Cell_Indices_Touching_Face(cell1,cell2);
     VECTOR<T,3> value;value[axis]=u_face(axis,face);
     for(int i=0;i<T_GRID::dimension-1;i++){
-        int other_axis=axis_to_other_axis[axis-1][i-1];
+        int other_axis=axis_to_other_axis[axis][i];
         value[other_axis]=(T).25*(u_face(other_axis,grid.First_Face_Index_In_Cell(other_axis,cell1))+u_face(other_axis,grid.Second_Face_Index_In_Cell(other_axis,cell1))+
                             u_face(other_axis,grid.First_Face_Index_In_Cell(other_axis,cell2))+u_face(other_axis,grid.Second_Face_Index_In_Cell(other_axis,cell2)));}
     return value;}
