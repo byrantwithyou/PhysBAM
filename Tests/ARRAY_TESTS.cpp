@@ -168,11 +168,6 @@ public:
         TEST(ar1.m==ar2.m);
         TEST(ar1==ar2);
 
-
-
-
-
-
         return ok?success:failure;
     }
 
