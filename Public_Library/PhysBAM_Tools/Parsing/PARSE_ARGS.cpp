@@ -190,7 +190,7 @@ Override_String_Value(const std::string& arg_str,const std::string& value)
 int PARSE_ARGS::
 Find_Match(const std::string& str) const
 {
-    for(int i=0;i<arg_data_list.m;i++)if(arg_data_list(i).str==str)return i;
+    for(int i=0;i<arg_data_list.m;i++) if(arg_data_list(i).str==str) return i;
     return -1;
 }
 //#####################################################################
