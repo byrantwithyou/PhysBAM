@@ -152,15 +152,15 @@ public:
     void Solve_Backward_Substitution(const VECTOR_ND<T>& b,VECTOR_ND<T>& x,const bool diagonal_is_identity=false,const bool diagonal_is_inverted=false)
     {if(diagonal_is_identity) for(int i=n-1;i>=0;i--){
         SPARSE_VECTOR_ND<T>& row=*A(i);
-        T sum=0;for(int j=(*diagonal_index)(i)+1;j<=row.number_of_active_indices;j++){sum+=row.x[j]*x(row.indices[j]);}
+        T sum=0;for(int j=(*diagonal_index)(i)+1;j<row.number_of_active_indices;j++){sum+=row.x[j]*x(row.indices[j]);}
         x(i)=b(i)-sum;}
     else if(!diagonal_is_inverted) for(int i=n-1;i>=0;i--){
         SPARSE_VECTOR_ND<T>& row=*A(i);
-        T sum=0;for(int j=(*diagonal_index)(i)+1;j<=row.number_of_active_indices;j++){sum+=row.x[j]*x(row.indices[j]);}
+        T sum=0;for(int j=(*diagonal_index)(i)+1;j<row.number_of_active_indices;j++){sum+=row.x[j]*x(row.indices[j]);}
         x(i)=(b(i)-sum)/row.x[(*diagonal_index)(i)];}
     else for(int i=n-1;i>=0;i--){
         SPARSE_VECTOR_ND<T>& row=*A(i);
-        T sum=0;for(int j=(*diagonal_index)(i)+1;j<=row.number_of_active_indices;j++){sum+=row.x[j]*x(row.indices[j]);}
+        T sum=0;for(int j=(*diagonal_index)(i)+1;j<row.number_of_active_indices;j++){sum+=row.x[j]*x(row.indices[j]);}
         x(i)=(b(i)-sum)*row.x[(*diagonal_index)(i)];}}
 
     // actually an LU saving square roots, with an inverted diagonal saving divides

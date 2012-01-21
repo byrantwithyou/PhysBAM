@@ -44,7 +44,7 @@ Intersect_Simplex_With_Old_Simplices_In_Embedding(const int tri,const int new_si
             if(shared_node_weights_in_embedding.Min()<0 || shared_node_weights_in_embedding.Sum()>(T)1) goto NEXT_OLD_SIMPLEX;
             // skip intersection if already added under a different name
             for(int i=0;i<old_simplices.m;i++) if(cutting_simplices->simplices(old_simplices(i)).nodes.Contains(shared_node))
-                for(int j=i+1;j<=old_simplices.m;j++) if(cutting_simplices->simplices(old_simplices(j)).nodes.Contains(shared_node)){
+                for(int j=i+1;j<old_simplices.m;j++) if(cutting_simplices->simplices(old_simplices(j)).nodes.Contains(shared_node)){
                     ARRAY<int> nodes_shared_on_pair;VECTOR<int,2> alternative_simplex=VECTOR<int,2>(old_simplices(i),old_simplices(j));
                     cutting_simplices->Shared_Nodes_On_Simplices(alternative_simplex,nodes_shared_on_pair);
                     if(nodes_shared_on_pair.m>1) continue; // intersection is not a point so skip
@@ -84,7 +84,7 @@ Split_Existing_Polygons()
         ARRAY<int> new_particles_on_simplex;
         // TODO: this next for makes quadratic time
         ARRAY<int> temp_particles;
-        for(int j=cutting_simplices->index_for_last_old_cutting_simplex+1;j<=cutting_simplices->simplices.m;j++) if(!cutting_simplices->Simplex_Is_Fake(j)){
+        for(int j=cutting_simplices->index_for_last_old_cutting_simplex+1;j<cutting_simplices->simplices.m;j++) if(!cutting_simplices->Simplex_Is_Fake(j)){
             temp_particles.Remove_All();Get_Particles_On_Simplices(VECTOR<int,2>(i,j),temp_particles);
             new_particles_on_simplex.Append_Elements(temp_particles);}
         LOG::cout<<"new particles on simplex "<<new_particles_on_simplex<<std::endl;

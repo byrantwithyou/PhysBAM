@@ -57,7 +57,7 @@ Sqr() const
     for(int j=0;j<n;j++) for(int i=j;i<=n;i++){
         for(int k=1;k<j;k++) result(i,j)+=x[((2*n-k)*(k-1)>>1)+i-1]*x[((2*n-k)*(k-1)>>1)+j-1];
         for(int k=j;k<=i;k++) result(i,j)+=x[((2*n-k)*(k-1)>>1)+i-1]*x[((2*n-j)*(j-1)>>1)+k-1];
-        for(int k=i+1;k<=n;k++) result(i,j)+=x[((2*n-i)*(i-1)>>1)+k-1]*x[((2*n-j)*(j-1)>>1)+k-1];}
+        for(int k=i+1;k<n;k++) result(i,j)+=x[((2*n-i)*(i-1)>>1)+k-1]*x[((2*n-j)*(j-1)>>1)+k-1];}
     return result;
 }
 //#####################################################################
@@ -70,7 +70,7 @@ Givens_Conjugate(const int i,const int j,const T c,const T s)
     assert(0<=i && i<j && j<n);
     for(int k=1;k<i;k++){T u=(*this)(i,k),v=(*this)(j,k);(*this)(i,k)=c*u-s*v;(*this)(j,k)=s*u+c*v;}
     for(int k=i+1;k<j;k++){T u=(*this)(k,i),v=(*this)(j,k);(*this)(k,i)=c*u-s*v;(*this)(j,k)=s*u+c*v;}
-    for(int k=j+1;k<=n;k++){T u=(*this)(k,i),v=(*this)(k,j);(*this)(k,i)=c*u-s*v;(*this)(k,j)=s*u+c*v;}
+    for(int k=j+1;k<n;k++){T u=(*this)(k,i),v=(*this)(k,j);(*this)(k,i)=c*u-s*v;(*this)(k,j)=s*u+c*v;}
     T u=(*this)(i,i),v=(*this)(j,i),w=(*this)(j,j);
     (*this)(i,i)=c*c*u-(T)2*c*s*v+s*s*w;
     (*this)(j,i)=(c*c-s*s)*v+c*s*(u-w);
@@ -134,7 +134,7 @@ In_Place_Cholesky_Factorization(MATRIX_MXN<T>& L)
         for(int k=0;k<j-1;k++) for(int i=j;i<=n;i++) Element_Lower(i,j)-=L(j,k)*L(i,k); // subtract off the known stuff in previous columns
         L(j,j)=sqrt(Element_Lower(j,j));
         T diagonal_inverse=1/L(j,j);
-        for(int i=j+1;i<=n;i++) L(i,j)=Element_Lower(i,j)*diagonal_inverse;} // update L
+        for(int i=j+1;i<n;i++) L(i,j)=Element_Lower(i,j)*diagonal_inverse;} // update L
 }
 //#####################################################################
 // Function operator=

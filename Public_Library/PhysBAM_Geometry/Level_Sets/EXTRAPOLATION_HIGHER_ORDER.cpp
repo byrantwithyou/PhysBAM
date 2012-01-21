@@ -131,7 +131,7 @@ template<class TV,class T2> void EXTRAPOLATION_HIGHER_ORDER<TV,T2>::
 Extrapolate_RK2(const MAPPING& m,const ARRAY<VECTOR<STENCIL,TV::m> >& stencil,ARRAY<T2>& u,const ARRAY<T2>* z,ARRAY<T2>& tmp,int o,T dt)
 {
     tmp.Resize(u.m);
-    for(int i=m.max_solve_index(o)+1;i<=u.m;i++) tmp(i)=u(i);
+    for(int i=m.max_solve_index(o)+1;i<u.m;i++) tmp(i)=u(i);
     Extrapolate_FE(m,stencil,u,tmp,z,o,dt,1);
     Extrapolate_FE(m,stencil,tmp,u,z,o,dt,(T).5);
 }
@@ -151,7 +151,7 @@ Extrapolate_Node(const GRID<TV>& grid,const T_LEVELSET& phi,int ghost,ARRAYS_ND_
     ARRAY<T2> du[3];
     du[0].Resize(m.max_solve_index(2*order+1));
     ARRAY<T2> tmp(m.max_solve_index(2*order+1));
-    for(int i=m.max_solve_index(0)+1;i<=m.max_solve_index(2*order+1);i++) du[0](i)=u(m.index_to_node(i));
+    for(int i=m.max_solve_index(0)+1;i<m.max_solve_index(2*order+1);i++) du[0](i)=u(m.index_to_node(i));
     for(int o=1;o<order;o++) Fill_un(m,grid.one_over_dX,normal,du[o],du[o],o,order);
     for(int i=0;i<order;i++) du[i](0)=FLT_MAX/100; // Sentinal values for ENO.
     tmp(0)=FLT_MAX/100;

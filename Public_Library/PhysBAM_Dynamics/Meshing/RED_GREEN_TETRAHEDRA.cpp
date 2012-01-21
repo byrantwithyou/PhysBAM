@@ -647,7 +647,7 @@ Remove_Simplex_List(const ARRAY<int>& tetrahedron_list,ARRAY<HASHTABLE<int,int> 
         if(level>1) for(int i=0;i<children(level-1)->m;i++){for(int j=0;j<4;j++) simplex_map.Get((*children(level-1))(i)(j),(*children(level-1))(i)(j));
             // really we just need the zeros at the end...bubble it?
             VECTOR<int,number_of_red_children>& child_list=(*children(level-1))(i);
-            for(int i=0;i<number_of_red_children;i++) if(child_list(i)==0) for(int j=i+1;j<=number_of_red_children;j++) if(child_list(j)>0){exchange(child_list(j),child_list(i));break;}}
+            for(int i=0;i<number_of_red_children;i++) if(child_list(i)==0) for(int j=i+1;j<number_of_red_children;j++) if(child_list(j)>0){exchange(child_list(j),child_list(i));break;}}
         children(level)->Remove_Sorted_Indices_Lazy(level_tetrahedron_list(level));
         for(int i=0;i<leaf_levels_and_indices.m;i++) if(leaf_levels_and_indices(i)(0)==level) simplex_map.Get(leaf_levels_and_indices(i)(1),leaf_levels_and_indices(i)(1));
         leaf_number(level)->Remove_Sorted_Indices_Lazy(level_tetrahedron_list(level));}

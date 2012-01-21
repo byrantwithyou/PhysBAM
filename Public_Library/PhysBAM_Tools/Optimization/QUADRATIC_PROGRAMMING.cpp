@@ -41,7 +41,7 @@ Update_Upper_Triangular_Matrix_After_Column_Shift(MATRIX_MXN<T>& A,MATRIX_MXN<T>
     for(int i=column;i<A.n;i++){
         assert(abs(A(i+1,i))>tolerance);
         VECTOR<T,2> v(A(i,i),A(i+1,i));A(i,i)=v.Magnitude();A(i+1,i)=0;v.Normalize();
-        for(int j=i+1;j<=A.n;j++) givens_rotate(A(i,j),A(i+1,j),v.x,v.y);
+        for(int j=i+1;j<A.n;j++) givens_rotate(A(i,j),A(i+1,j),v.x,v.y);
         for(int j=0;j<S.n;j++) givens_rotate(S(i,j),S(i+1,j),v.x,v.y);
         for(int j=0;j<N.n;j++) givens_rotate(N(i,j),N(i+1,j),v.x,v.y);
         givens_rotate(b(i),b(i+1),v.x,v.y);}

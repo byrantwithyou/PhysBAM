@@ -158,7 +158,7 @@ Find_Shortest_Spring(const VECTOR<int,4>& element_nodes,T& minimum_signed_distan
     T u_length_squared=u.Magnitude_Squared(),v_length_squared=v.Magnitude_Squared();
     if(abs(maximum_cross_squared)<sqr(sin((T)pi/(T)180))*u_length_squared*v_length_squared){
         VECTOR<int,2> edge_index;T max_distance_squared=0;
-        for(int i=0;i<3;i++) for(int j=i+1;j<=4;j++){
+        for(int i=0;i<3;i++) for(int j=i+1;j<4;j++){
             T distance_squared=(X(element_nodes[i])-X(element_nodes[j])).Magnitude_Squared();
             if(distance_squared>max_distance_squared){edge_index=VECTOR<int,2>(i,j);max_distance_squared=distance_squared;}}
             VECTOR<int,2> other_nodes=element_nodes.Remove_Index(edge_index[1]).Remove_Index(edge_index[0]);

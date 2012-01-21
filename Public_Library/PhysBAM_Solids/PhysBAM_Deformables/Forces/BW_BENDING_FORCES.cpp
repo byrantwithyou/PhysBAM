@@ -72,7 +72,7 @@ template<class TV> void BW_BENDING_FORCES<TV>::
 Add_Dependencies(SEGMENT_MESH& dependency_mesh) const
 {
     for(int q=0;q<constraint_particles.m;q++)
-        for(int i=0;i<3;i++) for(int j=i+1;j<=4;j++) dependency_mesh.Add_Element_If_Not_Already_There(VECTOR<int,2>(constraint_particles(q)[i],constraint_particles(q)[j]));
+        for(int i=0;i<3;i++) for(int j=i+1;j<4;j++) dependency_mesh.Add_Element_If_Not_Already_There(VECTOR<int,2>(constraint_particles(q)[i],constraint_particles(q)[j]));
 }
 //#####################################################################
 // Function Update_Mpi

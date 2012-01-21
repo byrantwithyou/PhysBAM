@@ -699,7 +699,7 @@ Project_Fluid(const T dt_projection,const T time_projection,const int substep)
             if(fluids_parameters.second_order_cut_cell_method){
                 incompressible_multiphase->projection.collidable_solver->Set_Up_Second_Order_Cut_Cell_Method();
                 incompressible_multiphase->projection.collidable_solver->Use_External_Level_Set(levelset_for_dirichlet_regions);}
-            bool add_surface_tension=false;for(int i=0;i<number_of_regions;i++) for(int j=i+1;j<=number_of_regions;j++)
+            bool add_surface_tension=false;for(int i=0;i<number_of_regions;i++) for(int j=i+1;j<number_of_regions;j++)
                 if(fluids_parameters.surface_tensions(i,j) && (fluids_parameters.dirichlet_regions(i) || fluids_parameters.dirichlet_regions(j))) add_surface_tension=true;
             PHYSBAM_ASSERT(!fluids_parameters.variable_surface_tension); // TODO: handle variable surface tensions here
             if(add_surface_tension) fluids_parameters.incompressible_multiphase->Add_Surface_Tension(levelset_for_dirichlet_regions,time_projection+dt_projection);}

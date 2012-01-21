@@ -60,7 +60,7 @@ template<class T,class TV> void Compute_Stiffness_Matrix_Helper(SEGMENT_MESH& me
             VECTOR<T,3> c(1/length12,-1/length12-1/length23,1/length23);
             for(int i=0;i<nodes.m;i++){
                 stiffness_matrix_diagonal(nodes[i])+=scale*sqr(c[i]);
-                for(int j=i+1;j<=nodes.m;j++){int a=nodes[i],b=nodes[j];exchange_sort(a,b);
+                for(int j=i+1;j<nodes.m;j++){int a=nodes[i],b=nodes[j];exchange_sort(a,b);
                     stiffness_matrix_upper(a,b)+=scale*c[i]*c[j];}}}}
 }
 template<class T,class TV> void Compute_Stiffness_Matrix_Helper(TRIANGLE_MESH& mesh,ARRAY_VIEW<const TV> X,ARRAY<T>& stiffness_matrix_diagonal,SPARSE_MATRIX_FLAT_NXN<T>& stiffness_matrix_upper)
@@ -105,7 +105,7 @@ template<class T,class TV> void Compute_Stiffness_Matrix_Helper(TRIANGLE_MESH& m
         VECTOR<T,4> c;c[1]=cot03+cot04;c[2]=cot01+cot02;c[3]=-cot01-cot03;c[0]=-cot02-cot04; // node numbering matches bending quadruple
         for(int i=0;i<nodes.m;i++){
             stiffness_matrix_diagonal(nodes[i])+=scale*sqr(c[i]);
-            for(int j=i+1;j<=nodes.m;j++){int a=nodes[i],b=nodes[j];exchange_sort(a,b);
+            for(int j=i+1;j<nodes.m;j++){int a=nodes[i],b=nodes[j];exchange_sort(a,b);
                 stiffness_matrix_upper(a,b)+=scale*c[i]*c[j];}}}
 }
 }

@@ -132,7 +132,7 @@ namespace GEOMETRIC_PREDICATES_DETAIL{
         VECTOR<TV,m+n> all_vertices=simplex1.Append_Elements(simplex2);
         VECTOR<TV,d> matrix;
         for(int i=0;i<d;i++) matrix[i]=all_vertices[i];
-        for(int i=d+1;i<=m+n;++i) if(Adaptive_Signed_Volume<T_EXACT>(all_vertices[i],matrix).Sign()!=0) return false;
+        for(int i=d;i<m+n;++i) if(Adaptive_Signed_Volume<T_EXACT>(all_vertices[i],matrix).Sign()!=0) return false;
         return true;
     }
     

@@ -62,7 +62,7 @@ Triangulate_Convex_Planar_Polygon(const ARRAY<VECTOR<T,2> >& positions,ARRAY<VEC
         if(!used.Contains(false)) break;
         // add the best segment
         int best_p=-1,best_q=-1;T largest_smallest_relative_angle=0; 
-        for(int p=0;p<positions.m;p++) for(int q=p+1;q<=positions.m;q++) if(!segment_hash.Contains(VECTOR<int,2>(p,q))&&!segment_hash.Contains(VECTOR<int,2>(q,p))){
+        for(int p=0;p<positions.m;p++) for(int q=p+1;q<positions.m;q++) if(!segment_hash.Contains(VECTOR<int,2>(p,q))&&!segment_hash.Contains(VECTOR<int,2>(q,p))){
             bool safe=true;
             for(HASHTABLE_ITERATOR<VECTOR<int,2> > segment_hash_iterator(segment_hash);segment_hash_iterator.Valid();segment_hash_iterator.Next()){
                 const VECTOR<int,2>& existing_segment=segment_hash_iterator.Key();

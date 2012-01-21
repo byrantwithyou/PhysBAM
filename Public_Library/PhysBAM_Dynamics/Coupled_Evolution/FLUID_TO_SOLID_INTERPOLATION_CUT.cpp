@@ -560,9 +560,9 @@ template<class TV> void FLUID_TO_SOLID_INTERPOLATION_CUT<TV>::
 Fill_Extra_Velocities(VECTOR_ND<T>& fluid_velocity_vector) const
 {
     VECTOR_ND<T> div(gradient->gradient.m);
-    for(int i=index_map.indexed_faces.m+1;i<=gradient->gradient.m;i++) fluid_velocity_vector(i)=0;
+    for(int i=index_map.indexed_faces.m;i<gradient->gradient.m;i++) fluid_velocity_vector(i)=0;
     gradient->Transpose_Times(fluid_velocity_vector,div);
-    for(int i=index_map.indexed_faces.m+1;i<=gradient->gradient.m;i++){
+    for(int i=index_map.indexed_faces.m;i<gradient->gradient.m;i++){
         int o=gradient->gradient.offsets(i);
         PHYSBAM_ASSERT(gradient->gradient.offsets(i+1)==o+1+index_map.two_phase);
         T v=-div(gradient->gradient.A(o).j)/gradient->gradient.A(o).a;

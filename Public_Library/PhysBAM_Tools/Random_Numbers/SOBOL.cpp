@@ -35,7 +35,7 @@ SOBOL(const RANGE<TV>& box)
         ARRAY<TI> m(v.m);
         for(int j=0;j<degree;j++) m(j)=m_initial[i][j];
         // fill in rest of m using recurrence
-        for(int j=degree+1;j<=v.m;j++){
+        for(int j=degree;j<v.m;j++){
             m(j)=(m(j-degree)<<degree)^m(j-degree);
             for(int k=1;k<degree;k++) 
                 if(polynomial&(1<<(k-1))) m(j)^=m(j-k)<<k;}

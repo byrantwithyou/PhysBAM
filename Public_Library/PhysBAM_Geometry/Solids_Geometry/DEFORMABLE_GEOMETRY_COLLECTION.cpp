@@ -77,11 +77,11 @@ Read_Static_Variables(const STREAM_TYPE stream_type,const std::string& prefix,co
         int old_number_of_structures=structures.m;structures.Resize(m);
         if(!stream_type.use_doubles){
             for(int k=0;k<old_number_of_structures;k++) Read_Write<STRUCTURE<TV>,float>::Read_Structure(*input_raw,*structures(k));
-            for(int k=old_number_of_structures+1;k<=m;k++) structures(k)=Read_Write<STRUCTURE<TV>,float>::Create_Structure(*input_raw,particles);}
+            for(int k=old_number_of_structures;k<m;k++) structures(k)=Read_Write<STRUCTURE<TV>,float>::Create_Structure(*input_raw,particles);}
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
         else{
             for(int k=0;k<old_number_of_structures;k++) Read_Write<STRUCTURE<TV>,double>::Read_Structure(*input_raw,*structures(k));
-            for(int k=old_number_of_structures+1;k<=m;k++) structures(k)=Read_Write<STRUCTURE<TV>,double>::Create_Structure(*input_raw,particles);}
+            for(int k=old_number_of_structures;k<m;k++) structures(k)=Read_Write<STRUCTURE<TV>,double>::Create_Structure(*input_raw,particles);}
 #endif
     }
     else{

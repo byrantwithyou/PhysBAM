@@ -98,7 +98,7 @@ public:
     template<int n>
     VECTOR(const VECTOR<T,n>& v1,const VECTOR<T,3-n>& v2)
     {
-        for(int i=0;i<n;i++) (*this)(i)=v1(i);for(int i=n+1;i<=3;i++) (*this)(i)=v2(i-n);
+        for(int i=0;i<n;i++) (*this)(i)=v1(i);for(int i=n;i<3;i++) (*this)(i)=v2(i-n);
     }
 
     template<class T_VECTOR> typename ENABLE_IF<AND<IS_SAME<T,typename T_VECTOR::ELEMENT>::value,INTS_EQUAL<T_VECTOR::m,3>::value>::value,VECTOR&>::TYPE
@@ -376,7 +376,7 @@ public:
 
     template<int n> void Split(VECTOR<T,n>& v1,VECTOR<T,3-n>& v2) const
     {for(int i=0;i<n;i++) v1(i)=(*this)(i);
-    for(int i=n+1;i<=3;i++) v2(i-n)=(*this)(i);}
+    for(int i=n;i<3;i++) v2(i-n)=(*this)(i);}
 
     template<class T_VECTOR>
     void Set_Subvector(const int istart,const T_VECTOR& v)

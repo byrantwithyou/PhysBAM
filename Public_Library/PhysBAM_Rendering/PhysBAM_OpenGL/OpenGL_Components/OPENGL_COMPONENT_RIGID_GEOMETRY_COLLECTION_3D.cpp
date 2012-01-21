@@ -120,7 +120,7 @@ Read_Hints(const std::string& filename)
 template<class T,class RW> void OPENGL_COMPONENT_RIGID_GEOMETRY_COLLECTION_3D<T,RW>::
 Resize_Structures(const int size)
 {
-    for(int i=size+1;i<=opengl_triangulated_surface.m;i++){
+    for(int i=size;i<opengl_triangulated_surface.m;i++){
         delete opengl_triangulated_surface(i);
         delete opengl_tetrahedralized_volume(i);
         delete opengl_levelset(i);

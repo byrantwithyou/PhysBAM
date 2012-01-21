@@ -41,7 +41,7 @@ public:
         pair_last_checked.Resize(number_of_rigid_bodies,false,true);
         int old_size=rigid_body_last_moved.m;
         rigid_body_last_moved.Resize(number_of_rigid_bodies,false,true);
-        for(int i=old_size+1;i<=number_of_rigid_bodies;i++) rigid_body_last_moved(i)=1;}}
+        for(int i=old_size;i<number_of_rigid_bodies;i++) rigid_body_last_moved(i)=1;}}
 
     void Set_Last_Checked(const int id_1,const int id_2)
     {if(skip_counter&1) skip_counter++;

@@ -26,10 +26,10 @@ template<class T> ROTATION<VECTOR<T,3> > BSPLINE_QUATERNION<T>::
 Evaluate(const T t)
 {
     ROTATION<TV>  total;
-    int l=1;
+    int l=0;
     for(int i=0;i<control_points.m-k;i++) if(control_points_times(i)>t){l=i-k;break;}
-    if(l<1){l=1;total=ROTATION<TV>::From_Rotation_Vector(control_points(1).Rotation_Vector()*Quaternion_Basis_Function(1,k,t));assert(!closed);}else{total=control_points(l);}
-    for(int i=l+1;i<=control_points.m-k && control_points_times(i)<t;i++) total*=ROTATION<TV>::From_Rotation_Vector(Omega(i).Rotation_Vector()*Quaternion_Basis_Function(i,k,t));
+    if(l<1){l=1;total=ROTATION<TV>::From_Rotation_Vector(control_points(0).Rotation_Vector()*Quaternion_Basis_Function(0,k,t));assert(!closed);}else{total=control_points(l);}
+    for(int i=l+1;i<control_points.m-k && control_points_times(i)<t;i++) total*=ROTATION<TV>::From_Rotation_Vector(Omega(i).Rotation_Vector()*Quaternion_Basis_Function(i,k,t));
     return total;
 }
 //#####################################################################

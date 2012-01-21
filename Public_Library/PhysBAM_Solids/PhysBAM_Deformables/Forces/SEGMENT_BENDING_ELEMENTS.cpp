@@ -20,7 +20,7 @@ template<class T> void SEGMENT_BENDING_ELEMENTS<T>::
 Add_Dependencies(SEGMENT_MESH& dependency_mesh) const
 {
     for(int t=0;t<bending_triples.m;t++)
-        for(int i=0;i<2;i++) for(int j=i+1;j<=3;j++) dependency_mesh.Add_Element_If_Not_Already_There(VECTOR<int,2>(bending_triples(t)[i],bending_triples(t)[j]));
+        for(int i=0;i<2;i++) for(int j=i+1;j<3;j++) dependency_mesh.Add_Element_If_Not_Already_There(VECTOR<int,2>(bending_triples(t)[i],bending_triples(t)[j]));
 }
 //#####################################################################
 // Function Update_Mpi

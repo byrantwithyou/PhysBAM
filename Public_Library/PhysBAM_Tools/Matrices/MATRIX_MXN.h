@@ -91,7 +91,7 @@ public:
     {x=new T[m*n];
     for(int j=0;j<n;j++){
         for(int i=0;i<j;i++) (*this)(i,j)=A(i,j);
-        for(int i=j+1;i<=m;i++) (*this)(i,j)=0;}}
+        for(int i=j+1;i<m;i++) (*this)(i,j)=0;}}
 
     ~MATRIX_MXN()
     {delete[] x;}
@@ -185,8 +185,8 @@ public:
     {assert(m==n && x.n==b.n && x.n==n);
     for(int i=0;i<n;i++){
         T rho=0;
-        for(int j=1;j<i;j++) rho+=(*this)(i,j)*x(j);
-        for(int j=i+1;j<=n;j++) rho+=(*this)(i,j)*x(j);
+        for(int j=0;j<i;j++) rho+=(*this)(i,j)*x(j);
+        for(int j=i+1;j<n;j++) rho+=(*this)(i,j)*x(j);
         x(i)=(b(i)-rho)/(*this)(i,i);}}
 
     void Left_Givens_Rotation(const int i,const int j,const T c,const T s)

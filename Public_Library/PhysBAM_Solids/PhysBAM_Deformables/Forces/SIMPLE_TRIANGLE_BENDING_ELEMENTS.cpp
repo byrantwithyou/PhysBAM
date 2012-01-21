@@ -51,7 +51,7 @@ template<class T> void SIMPLE_TRIANGLE_BENDING_ELEMENTS<T>::
 Add_Dependencies(SEGMENT_MESH& dependency_mesh) const
 {
     for(int q=0;q<bending_quadruples.m;q++)
-        for(int i=0;i<3;i++) for(int j=i+1;j<=4;j++) dependency_mesh.Add_Element_If_Not_Already_There(VECTOR<int,2>(bending_quadruples(q)[i],bending_quadruples(q)[j]));
+        for(int i=0;i<3;i++) for(int j=i+1;j<4;j++) dependency_mesh.Add_Element_If_Not_Already_There(VECTOR<int,2>(bending_quadruples(q)[i],bending_quadruples(q)[j]));
 }
 //#####################################################################
 // Function Update_Mpi

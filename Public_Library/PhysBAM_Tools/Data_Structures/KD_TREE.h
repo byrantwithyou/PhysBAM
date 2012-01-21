@@ -33,11 +33,11 @@ public:
 
 private:
     int Choose_Partition_Index_Using_Internal_Nodes(const int first_index,const int last_index) const 
-    {int elements=last_index-first_index+1,filled_subtree_elements=(1<<(integer_log(elements+1)-1))-1;
+    {int elements=last_index-first_index,filled_subtree_elements=(1<<(integer_log(elements+1)-1))-1;
     return first_index+filled_subtree_elements+min(elements-2*filled_subtree_elements-1,filled_subtree_elements+1);} // this index goes to the root of the subtree
 
     int Choose_Partition_Index_Using_Leaf_Nodes(const int first_index,const int last_index) const
-    {int elements=last_index-first_index+1,filled_subtree_elements=(1<<integer_log(elements));
+    {int elements=last_index-first_index,filled_subtree_elements=(1<<integer_log(elements));
     return first_index+min(elements-filled_subtree_elements/2,filled_subtree_elements);} // this index goes to the right subtree
 
     int Choose_Partition_Axis(const TV& DX) const

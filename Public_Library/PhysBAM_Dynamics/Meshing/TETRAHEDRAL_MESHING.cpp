@@ -373,7 +373,7 @@ Create_Final_Mesh_With_Dynamics(const T time_step,const int number_of_force_step
     // enslaved velocities
     if(verbose) LOG::cout<<"\n\n\n SWITCHING TO SETTING EXTERNAL VELOCITIES RATHER THAN FORCES!!!\n\n"<<std::endl;
     level_set_forces_and_velocities->Use_External_Velocities();
-    for(int k=number_of_force_steps+1;k<=number_of_force_steps+number_of_velocity_steps;k++){
+    for(int k=number_of_force_steps;k<number_of_force_steps+number_of_velocity_steps;k++){
         Advance_Dynamics((k-1)*time_step,k*time_step,verbose);
         if(verbose) LOG::cout<<"TIME STEP = "<<k<<", TIME = "<<" "<<k*time_step<<std::endl;
         Write_Output_Files(++frame);}

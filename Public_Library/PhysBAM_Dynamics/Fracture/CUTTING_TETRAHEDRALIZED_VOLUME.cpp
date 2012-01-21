@@ -352,7 +352,7 @@ Fill_Intersection_Registry_With_Cuts()
     for(int tet=0;tet<current_embedding_tetrahedrons.m;tet++){
         const ARRAY<int>& simplices=simplices_per_current_tet(tet);
         int last_old_simplex_index=last_old_simplex_index_per_current_tet(tet);
-        for(int i=last_old_simplex_index+1;i<=simplices.m;++i){
+        for(int i=last_old_simplex_index+1;i<simplices.m;++i){
             int new_simplex=simplices(i);
             const ARRAY<int>& intersecting_simplices=intersecting_simplices_per_simplex(new_simplex);
             for(int j1=1;j1<intersecting_simplices.m;++j1){
@@ -431,7 +431,7 @@ Perform_Smart_Simplex_Intersection(const VECTOR<int,3>& simplices) // simplices=
             int simplex_i=simplices_containing_shared_node(i);
             for(int j=i+1;j<simplices_containing_shared_node.m;++j){
                 int simplex_j=simplices_containing_shared_node(j);
-                for(int k=j+1;k<=simplices_containing_shared_node.m;++k){
+                for(int k=j+1;k<simplices_containing_shared_node.m;++k){
                     int simplex_k=simplices_containing_shared_node(k);
                     // since new_simplex was added on the end, it will only appear at simplex_k
                     if(simplex_k==new_simplex && ((simplex_i==simplices[0] && simplex_j==simplices[1]) || (simplex_i==simplices[1] && simplex_j==simplices[0])))
@@ -447,7 +447,7 @@ Perform_Smart_Simplex_Intersection(const VECTOR<int,3>& simplices) // simplices=
         Add_Non_Tet_Node_Intersection_To_Registry(simplices,all_weights);
         return;}
     // If any pair of simplices share precisely one node (not on the 3rd simplex), terminate early.
-    for(int i=0;i<2;i++) for(int j=i+1;j<=3;++j){
+    for(int i=0;i<2;i++) for(int j=i+1;j<3;++j){
         shared_nodes.Resize(0);
         cutting_simplices->Shared_Nodes_On_Simplices(VECTOR<int,2>(converted_simplices[i],converted_simplices[j]),shared_nodes);
         if(shared_nodes.m==1) return;}
@@ -531,11 +531,11 @@ template<class T> void CUTTING_TETRAHEDRALIZED_VOLUME<T>::
 Split_Existing_Polygon_Edges()
 {
     // TODO: maybe do this per polygon for parallelization...
-    for(int i=intersection_registry->index_for_last_old_intersection+1;i<=intersection_registry->Number_Of_Intersections();i++){
+    for(int i=intersection_registry->index_for_last_old_intersection+1;i<intersection_registry->Number_Of_Intersections();i++){
         const ARRAY<int>& simplices=intersection_registry->simplices_on_intersection(i);if(!simplices.m) PHYSBAM_FATAL_ERROR("TODO: Kevin & Efty, Why?");
         HASHTABLE<VECTOR<int,2> > edges_seen;
         // loop over every pair of simplices
-        for(int j=0;j<simplices.m;j++) for(int k=j+1;k<=simplices.m;k++){
+        for(int j=0;j<simplices.m;j++) for(int k=j+1;k<simplices.m;k++){
             int simplex_1=simplices(j),simplex_2=simplices(k);
             // TODO: why quit if both are global cut faces
             if(cutting_simplices->simplices(simplex_1).type==CUTTING_SIMPLEX<T,3>::GLOBAL_CUT_FACE && cutting_simplices->simplices(simplex_2).type==CUTTING_SIMPLEX<T,3>::GLOBAL_CUT_FACE) continue;
@@ -620,7 +620,7 @@ Add_Polygons_On_New_Simplices()
         if(verbose) LOG::cout<<"polygons_per_element("<<tet<<")="<<polygons_per_element(tet)<<std::endl;
         const ARRAY<int>& simplices=simplices_per_current_tet(tet);
         int last_old_simplex_index=last_old_simplex_index_per_current_tet(tet);
-        for(int i=last_old_simplex_index+1;i<=simplices.m;++i){
+        for(int i=last_old_simplex_index+1;i<simplices.m;++i){
             int new_simplex=simplices(i);
             if(cutting_simplices->Simplex_Is_Fake(new_simplex)) continue;
             if(verbose) LOG::cout<<"new_simplex="<<new_simplex<<std::endl;
@@ -1195,7 +1195,7 @@ Duplicate_And_Merge_Elements()
         ARRAY<int> tet_indices_for_this_face;
         current_tetrahedralized_volume->mesh.Tetrahedrons_On_Face(particles_on_current_face,tet_indices_for_this_face);
         // look at each possible pair of tets
-        for(int p=0;p<tet_indices_for_this_face.m;p++) for(int q=p+1;q<=tet_indices_for_this_face.m;q++){
+        for(int p=0;p<tet_indices_for_this_face.m;p++) for(int q=p+1;q<tet_indices_for_this_face.m;q++){
             int tet_index_1=tet_indices_for_this_face(p);int tet_index_2=tet_indices_for_this_face(q);
             // look at each possible pair of regions
             for(int j=0;j<regions_per_tet(tet_index_1).m;j++) for(int k=0;k<regions_per_tet(tet_index_2).m;k++){bool join=false;
@@ -1212,7 +1212,7 @@ Duplicate_And_Merge_Elements()
                     if(verbose) LOG::cout<<"Joining original tets "<<tet_index_1<<" and "<<tet_index_2<<" with copies "<<j<<" and "<<k<<std::endl;}}}}
     // collapse dup particles per original particle
     for(int opar=0;opar<uncollapsed_new_particles_per_all_current_particle_ids.m;opar++){
-        for(int i=0;i<uncollapsed_new_particles_per_all_current_particle_ids(opar).m;i++) for(int j=i+1;j<=uncollapsed_new_particles_per_all_current_particle_ids(opar).m;j++){
+        for(int i=0;i<uncollapsed_new_particles_per_all_current_particle_ids(opar).m;i++) for(int j=i+1;j<uncollapsed_new_particles_per_all_current_particle_ids(opar).m;j++){
             int dup_particle_1=uncollapsed_new_particles_per_all_current_particle_ids(opar)(i);int dup_particle_2=uncollapsed_new_particles_per_all_current_particle_ids(opar)(j);
             const ARRAY<int>& parents_1=new_parents_per_new_particle(dup_particle_1);
             const ARRAY<int>& parents_2=new_parents_per_new_particle(dup_particle_2);

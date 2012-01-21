@@ -68,8 +68,8 @@ Initialize_Hierarchy_Using_KD_Tree()
     for(int l=0;l<box_hierarchy.m;l++)centroids(l)=box_hierarchy(l).Center();
     kd_tree.Create_Left_Balanced_KD_Tree(centroids);
     leaves=box_hierarchy.m;parents.Resize(leaves);children.Remove_All();
-    root=Initialize_Hierarchy_Using_KD_Tree_Helper(kd_tree.root_node);assert(root==2*leaves-1);
-    box_hierarchy.Resize(root);
+    root=Initialize_Hierarchy_Using_KD_Tree_Helper(kd_tree.root_node);assert(root==2*leaves-2);
+    box_hierarchy.Resize(root+1);
 }
 //#####################################################################
 // Function Initialize_Hierarchy_Using_KD_Tree_Helper
@@ -82,7 +82,7 @@ Initialize_Hierarchy_Using_KD_Tree_Helper(KD_TREE_NODE<T>* node)
     if(!node->right)return left_child;
     int right_child=Initialize_Hierarchy_Using_KD_Tree_Helper(node->right);
     children.Append(VECTOR<int,2>(left_child,right_child));parents.Append(0);
-    return parents(left_child)=parents(right_child)=children.m+leaves;
+    return parents(left_child)=parents(right_child)=children.m+leaves-1;
 }
 //#####################################################################
 // Function Update_Nonleaf_Boxes
@@ -90,8 +90,8 @@ Initialize_Hierarchy_Using_KD_Tree_Helper(KD_TREE_NODE<T>* node)
 template<class TV> void BOX_HIERARCHY<TV>::
 Update_Nonleaf_Boxes()
 {
-    for(int k=leaves+1;k<=box_hierarchy.m;k++)
-        box_hierarchy(k)=RANGE<TV>::Combine(box_hierarchy(children(k-leaves)(1)),box_hierarchy(children(k-leaves)(2)));
+    for(int k=leaves;k<box_hierarchy.m;k++)
+        box_hierarchy(k)=RANGE<TV>::Combine(box_hierarchy(children(k-leaves)(0)),box_hierarchy(children(k-leaves)(1)));
 }
 //#####################################################################
 // Function Update_Modified_Nonleaf_Boxes
@@ -99,7 +99,7 @@ Update_Nonleaf_Boxes()
 template<class TV> void BOX_HIERARCHY<TV>::
 Update_Modified_Nonleaf_Boxes(ARRAY<bool>& modified)
 {
-    for(int k=leaves+1;k<=box_hierarchy.m;k++){
+    for(int k=leaves;k<box_hierarchy.m;k++){
         const VECTOR<int,2>& child=children(k-leaves);
         modified(k)=modified(child[0]) || modified(child[1]);
         if(modified(k)) box_hierarchy(k)=RANGE<TV>::Combine(box_hierarchy(child[0]),box_hierarchy(child[1]));}
@@ -119,7 +119,7 @@ Calculate_Bounding_Box_Radii(const ARRAY<RANGE<TV> >& bounding_boxes,ARRAY<T>& r
 template<class TV> void BOX_HIERARCHY<TV>::
 Update_Nonleaf_Box_Radii()
 {
-    for(int k=leaves+1;k<=box_radius.m;k++){
+    for(int k=leaves;k<box_radius.m;k++){
         int box1,box2;children(k-leaves).Get(box1,box2);TV center=box_hierarchy(k).Center();
         box_radius(k)=max((box_hierarchy(box1).Center()-center).Magnitude()+box_radius(box1),(box_hierarchy(box2).Center()-center).Magnitude()+box_radius(box2));}
 }

@@ -54,8 +54,8 @@ Initialize_Hierarchy_Using_KD_Tree()
         kd_tree.Create_Left_Balanced_KD_Tree(centroids);
         leaves=triangle_mesh.elements.m;parents.Resize(leaves);}
     children.Remove_All();root=Initialize_Hierarchy_Using_KD_Tree_Helper(kd_tree.root_node);
-    assert(root==2*leaves-1);
-    box_hierarchy.Resize(root);box_radius.Resize(root);
+    assert(root==2*leaves-2);
+    box_hierarchy.Resize(root+1);box_radius.Resize(root+1);
 }
 //#####################################################################
 // Function Calculate_Bounding_Boxes

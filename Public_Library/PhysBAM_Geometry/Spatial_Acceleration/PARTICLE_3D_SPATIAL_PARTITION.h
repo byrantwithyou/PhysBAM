@@ -77,7 +77,7 @@ public:
     {interacting_particle_indices.Remove_All();
     if(main_list_index > main_list->m && !Initialize_Next_Voxels_To_Process()) return false;
     particle_index=(*main_list)(main_list_index);
-    for(int t=main_list_index+1;t<=main_list->m;t++) interacting_particle_indices.Append((*main_list)(t));
+    for(int t=main_list_index+1;t<main_list->m;t++) interacting_particle_indices.Append((*main_list)(t));
     for(int i=0;i<number_neighbor_lists;i++){
         assert(neighbor_lists[i]);
         while(neighbor_lists_index[i] <= neighbor_lists[i]->m && particle_index > (*neighbor_lists[i])(neighbor_lists_index[i])) neighbor_lists_index[i]++;

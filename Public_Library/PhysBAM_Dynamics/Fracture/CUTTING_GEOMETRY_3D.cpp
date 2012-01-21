@@ -30,7 +30,7 @@ Split_Existing_Polygon_Edges()
         const ARRAY<int>& simplices=intersection_registry->simplices_on_intersection(new_intersection);if(!simplices.m) PHYSBAM_FATAL_ERROR("TODO: This should be impossible");
         HASHTABLE<VECTOR<int,2> > edges_seen;
         // loop over every pair of simplices
-        for(int j=0;j<simplices.m;j++) for(int k=j+1;k<=simplices.m;k++){
+        for(int j=0;j<simplices.m;j++) for(int k=j+1;k<simplices.m;k++){
             int simplex_1=simplices(j),simplex_2=simplices(k);
             // TODO: why quit if both are global cut faces
             if(cutting_simplices->simplices(simplex_1).type==T_CUTTING_SIMPLEX::GLOBAL_CUT_FACE
@@ -72,7 +72,7 @@ Split_Existing_Polygons()
         // obtain all new segments on simplex
         ARRAY<VECTOR<int,2> > new_unoriented_segments_on_simplex;
         // TODO: this next for makes quadratic time
-        for(int j=cutting_simplices->index_for_last_old_cutting_simplex+1;j<=cutting_simplices->simplices.m;j++) if(!cutting_simplices->Simplex_Is_Fake(j)){
+        for(int j=cutting_simplices->index_for_last_old_cutting_simplex+1;j<cutting_simplices->simplices.m;j++) if(!cutting_simplices->Simplex_Is_Fake(j)){
             Get_Unoriented_Segments_On_Two_Simplices(i,j,new_unoriented_segments_on_simplex);}
         // operate on each polygon on the simplex
         const ARRAY<int>& cutting_polygons_on_simplex=cutting_polygons_per_cutting_simplex(i);
@@ -125,7 +125,7 @@ template<class TV,int d_input> void CUTTING_GEOMETRY_3D<TV,d_input>::
 Intersect_Simplex_With_Old_Simplices_In_Embedding(const int tet,const int new_simplex)
 {
     ARRAY<int>& old_simplices=simplices_per_current_embedding_simplex(tet);
-    for(int i=0;i<old_simplices.m;i++) for(int j=i+1;j<=old_simplices.m;j++){
+    for(int i=0;i<old_simplices.m;i++) for(int j=i+1;j<old_simplices.m;j++){
         if(verbose) LOG::cout<<" Checking old simplices "<<old_simplices(i)<<" and "<<old_simplices(j)<<" with new simplex "<<new_simplex<<std::endl;
         VECTOR<int,3> simplices(old_simplices(i),old_simplices(j),new_simplex);
         bool converted;VECTOR<int,3> converted_simplices=cutting_simplices->Convert_Simplex_Indices_To_Global_Indices(simplices,converted);
@@ -149,8 +149,8 @@ Intersect_Simplex_With_Old_Simplices_In_Embedding(const int tet,const int new_si
             if(particle_weights_wrt_tet.Min()<0 || particle_weights_wrt_tet.Sum()>(T)1) goto NEXT_OLD_SIMPLEX;
             // it's not outside, so add it if it doesn't already exist (if it already exists, it must be a shared node on child simplices in this tet)
             for(int i=0;i<old_simplices.m;i++) if(cutting_simplices->simplices(old_simplices(i)).nodes.Contains(shared_node))
-                for(int j=i+1;j<=old_simplices.m;j++) if(cutting_simplices->simplices(old_simplices(j)).nodes.Contains(shared_node))
-                    for(int k=j+1;k<=old_simplices.m;k++) if(cutting_simplices->simplices(old_simplices(k)).nodes.Contains(shared_node)){
+                for(int j=i+1;j<old_simplices.m;j++) if(cutting_simplices->simplices(old_simplices(j)).nodes.Contains(shared_node))
+                    for(int k=j+1;k<old_simplices.m;k++) if(cutting_simplices->simplices(old_simplices(k)).nodes.Contains(shared_node)){
                         ARRAY<int> nodes_shared_on_triplet;
                         cutting_simplices->Shared_Nodes_On_Simplices(VECTOR<int,3>(old_simplices(i),old_simplices(j),old_simplices(k)),nodes_shared_on_triplet);
                         if(nodes_shared_on_triplet.m>1) continue; // The intersection does not define a single point
@@ -166,7 +166,7 @@ Intersect_Simplex_With_Old_Simplices_In_Embedding(const int tet,const int new_si
                 // Find if there is another set of simplices that shares the same edge. If there is an intersection, it already has it recorded, if not then no intersection exists.
                 for(int j=0;j<old_simplices.m;j++) if(old_simplices(j)!=converted_simplices(2) && old_simplices(j)!=simplices(2)) // TODO: why could new simplex be in old simplices
                     if(cutting_simplices->simplices(old_simplices(j)).nodes.Contains_All(shared_edge)){
-                        for(int k=j+1;k<=old_simplices.m;k++) if(old_simplices(k)!=converted_simplices(2) && old_simplices(k)!=simplices(2)){
+                        for(int k=j+1;k<old_simplices.m;k++) if(old_simplices(k)!=converted_simplices(2) && old_simplices(k)!=simplices(2)){
                             if(cutting_simplices->simplices(old_simplices(j)).nodes==cutting_simplices->simplices(old_simplices(k)).nodes) continue;
                             if(cutting_simplices->simplices(old_simplices(k)).nodes.Contains_All(shared_edge)){
                                 int old_simplex_index_1=converted?cutting_simplices->simplices(old_simplices(j)).parent:old_simplices(j);
