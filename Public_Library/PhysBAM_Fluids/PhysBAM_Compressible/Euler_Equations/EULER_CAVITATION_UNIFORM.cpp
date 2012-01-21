@@ -57,8 +57,8 @@ Fill_Ghost_Pressures_Along_Neumann_Boundaries()
             TV_INT first_cell_index=iterator.First_Cell_Index(),second_cell_index=iterator.Second_Cell_Index();
             bool first_cell_inside_object=elliptic_solver->psi_D(first_cell_index);
             bool second_cell_inside_object=elliptic_solver->psi_D(second_cell_index);
-            bool first_cell_inside_domain=euler.grid.Domain_Indices().Lazy_Inside(first_cell_index);
-            bool second_cell_inside_domain=euler.grid.Domain_Indices().Lazy_Inside(second_cell_index);
+            bool first_cell_inside_domain=euler.grid.Domain_Indices().Lazy_Inside_Half_Open(first_cell_index);
+            bool second_cell_inside_domain=euler.grid.Domain_Indices().Lazy_Inside_Half_Open(second_cell_index);
 
             if((first_cell_inside_object&&(!second_cell_inside_object))||(second_cell_inside_domain&&(!first_cell_inside_domain)))
                 p_cavitation(first_cell_index)=p_cavitation(second_cell_index);

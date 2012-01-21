@@ -277,7 +277,7 @@ Find_Matrix_Indices_In_Region(const GRID<TV>& local_grid,const T_ARRAYS_BOOL& va
         for(int axis=0;axis<TV::dimension;axis++){
             TV_INT axis_vector=TV_INT::Axis_Vector(axis);
             int first_ghost_cell_index=face_ghost_cell_index(1,axis,cell_index); // looking IN to this cell
-            if(first_ghost_cell_index/* && expanded_domain_indices.Lazy_Inside(cell_index-axis_vector)*/){
+            if(first_ghost_cell_index/* && expanded_domain_indices.Lazy_Inside_Half_Open(cell_index-axis_vector)*/){
                 //if(region_index)
                     //    DEBUG_UTILITIES::Debug_Breakpoint();
 #ifdef BRICK
@@ -288,7 +288,7 @@ Find_Matrix_Indices_In_Region(const GRID<TV>& local_grid,const T_ARRAYS_BOOL& va
                     face_ghost_cell_index_map(first_ghost_cell_index)=++cell_count;
             }
             int second_ghost_cell_index=face_ghost_cell_index(2,axis,cell_index+axis_vector);
-            if(second_ghost_cell_index/* && expanded_domain_indices.Lazy_Inside(cell_index+axis_vector)*/){
+            if(second_ghost_cell_index/* && expanded_domain_indices.Lazy_Inside_Half_Open(cell_index+axis_vector)*/){
 #ifdef BRICK
                 if(!region_index)
                     LOG::cout<<"Found boundary ghost cell across face (2, "<<axis<<", "<<cell_index+axis_vector<<") with temp index "<<second_ghost_cell_index<<std::endl;
@@ -327,7 +327,7 @@ Find_Matrix_Indices_In_Region(const GRID<TV>& local_grid,const T_ARRAYS_BOOL& va
         for(int side=0;side<2;side++){
             TV_INT cell_index=face_index+(1-side)*TV_INT::Axis_Vector(axis);
             int ghost_cell_index=face_ghost_cell_index(side,axis,face_index);
-            if(ghost_cell_index && region.Lazy_Inside(cell_index)){
+            if(ghost_cell_index && region.Lazy_Inside_Half_Open(cell_index)){
                 if(!face_ghost_cell_index_map(ghost_cell_index))
                     face_ghost_cell_index_map(ghost_cell_index)=++cell_count;}}}
 
@@ -337,7 +337,7 @@ Find_Matrix_Indices_In_Region(const GRID<TV>& local_grid,const T_ARRAYS_BOOL& va
         for(int side=0;side<2;side++){
             TV_INT cell_index=face_index+(1-side)*TV_INT::Axis_Vector(axis);
             int ghost_cell_index=face_ghost_cell_index(side,axis,face_index);
-            if(ghost_cell_index && region.Lazy_Inside(cell_index))
+            if(ghost_cell_index && region.Lazy_Inside_Half_Open(cell_index))
             face_ghost_cell_index(side,axis,face_index)=face_ghost_cell_index_map(ghost_cell_index);}}*/
 
     //PHYSBAM_FATAL_ERROR("pretty sure don't want Lazy_Inside");
@@ -347,13 +347,13 @@ Find_Matrix_Indices_In_Region(const GRID<TV>& local_grid,const T_ARRAYS_BOOL& va
         //DEBUG_UTILITIES::Debug_Breakpoint();
         for(int axis=0;axis<TV::dimension;axis++){
             TV_INT axis_vector=TV_INT::Axis_Vector(axis);
-            if(expanded_domain_indices.Lazy_Inside(cell_index-axis_vector) && face_lambdas(2,axis,cell_index)!=0){
+            if(expanded_domain_indices.Lazy_Inside_Half_Open(cell_index-axis_vector) && face_lambdas(2,axis,cell_index)!=0){
 #ifdef BRICK
                 LOG::cout<<"Lambda in ghost region at (2, "<<axis<<", "<<cell_index<<std::endl;
 #endif
                 face_lambdas(2,axis,cell_index)=++cell_count;
             }
-            if(expanded_domain_indices.Lazy_Inside(cell_index+axis_vector) && face_lambdas(1,axis,cell_index+TV_INT::Axis_Vector(axis))!=0){
+            if(expanded_domain_indices.Lazy_Inside_Half_Open(cell_index+axis_vector) && face_lambdas(1,axis,cell_index+TV_INT::Axis_Vector(axis))!=0){
 #ifdef BRICK
                 LOG::cout<<"Lambda in ghost region at (1, "<<axis<<", "<<cell_index+axis_vector<<std::endl;
 #endif

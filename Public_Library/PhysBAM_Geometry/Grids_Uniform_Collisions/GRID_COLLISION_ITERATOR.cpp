@@ -155,7 +155,7 @@ Next_Helper()
     
     if(index.index(index.axis)<-ghost) index.index(index.axis)=-ghost;
     if(last>grid.counts(index.axis)+ghost) last=grid.counts(index.axis)+ghost;
-    if(!face_domain(index.axis).Lazy_Inside(index.index)) Next_Helper();
+    if(!face_domain(index.axis).Lazy_Inside_Half_Open(index.index)) Next_Helper();
 }
 //#####################################################################
 // Constructor

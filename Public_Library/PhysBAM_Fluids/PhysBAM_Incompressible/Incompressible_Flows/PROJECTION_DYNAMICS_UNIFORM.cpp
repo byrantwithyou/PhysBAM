@@ -163,7 +163,8 @@ Update_Potential_Energy(T_FACE_ARRAYS_SCALAR& face_velocities_old,T_FACE_ARRAYS_
     T allowed_energy_gained_tmp=allowed_energy_gained;
     for(FACE_ITERATOR iterator(p_grid,0,GRID<TV>::BOUNDARY_REGION);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> full_index=iterator.Full_Index();
         if(!elliptic_solver->psi_N(full_index)){
-            if(p_grid.Domain_Indices().Lazy_Inside(iterator.First_Cell_Index())) allowed_energy_gained-=density*p(iterator.Second_Cell_Index())*face_velocities(full_index)*one_over_dx[iterator.Axis()];
+            if(p_grid.Domain_Indices().Lazy_Inside_Half_Open(iterator.First_Cell_Index()))
+                allowed_energy_gained-=density*p(iterator.Second_Cell_Index())*face_velocities(full_index)*one_over_dx[iterator.Axis()];
             else allowed_energy_gained+=density*p(iterator.First_Cell_Index())*face_velocities(full_index)*one_over_dx[iterator.Axis()];}}
     PHYSBAM_ASSERT(abs(allowed_energy_gained-allowed_energy_gained_tmp)<1e-5);
     for(CELL_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();

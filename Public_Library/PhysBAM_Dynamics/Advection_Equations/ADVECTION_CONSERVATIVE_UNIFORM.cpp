@@ -60,7 +60,7 @@ Update_Advection_Equation_Cell(const T_GRID& grid,T_ARRAYS_T2& Z,const T_ARRAYS_
     for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) Z(iterator.Cell_Index())=T2();
     for(CELL_ITERATOR iterator(grid,number_of_ghost_cells);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
         ARRAY<PAIR<TV_INT,T> >& local_weights=weights(cell);
-        for(int i=0;i<local_weights.m;i++) if(grid.Domain_Indices().Lazy_Inside(local_weights(i).x)) Z(local_weights(i).x)+=local_weights(i).y*Z_ghost(cell);}
+        for(int i=0;i<local_weights.m;i++) if(grid.Domain_Indices().Lazy_Inside_Half_Open(local_weights(i).x)) Z(local_weights(i).x)+=local_weights(i).y*Z_ghost(cell);}
     T_ARRAYS_T2 Z_ghost2(grid.Domain_Indices(2*number_of_ghost_cells+1));
     boundary.Fill_Ghost_Cells(grid,Z,Z_ghost2,dt,time,2*number_of_ghost_cells+1);
     for(CELL_ITERATOR iterator(grid,number_of_ghost_cells);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
@@ -69,14 +69,14 @@ Update_Advection_Equation_Cell(const T_GRID& grid,T_ARRAYS_T2& Z,const T_ARRAYS_
         TV X=iterator.Location()+dt*V_ghost(cell);
         if(use_second_order) X+=(iterator.Location()-(X-dt*linear.Clamped_To_Array(grid,V_ghost,X)))/2.;
         ARRAY<PAIR<TV_INT,T> > forward_weights=interpolation.Clamped_To_Array_Weights(grid,Z_ghost2,X);
-        for(int i=0;i<forward_weights.m;i++) if(grid.Domain_Indices().Lazy_Inside(forward_weights(i).x)) Z(forward_weights(i).x)+=forward_weights(i).y*remaining;}
+        for(int i=0;i<forward_weights.m;i++) if(grid.Domain_Indices().Lazy_Inside_Half_Open(forward_weights(i).x)) Z(forward_weights(i).x)+=forward_weights(i).y*remaining;}
 }
 
 template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION> void ADVECTION_CONSERVATIVE_UNIFORM<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>::
 Clamp_Weights_To_Objects(const GRID<TV>& grid,ARRAY<PAIR<TV_INT,T> >& weights)
 {
     T delta=(T)1e-5;
-    for(int i=0;i<weights.m;i++) if(ghost_box.Lazy_Inside(grid.Center(weights(i).x))) weights(i).y=0;
+    for(int i=0;i<weights.m;i++) if(ghost_box.Lazy_Inside_Half_Open(grid.Center(weights(i).x))) weights(i).y=0;
     T sum=0;for(int i=0;i<weights.m;i++) sum+=weights(i).y;
     if(sum>delta && sum!=1) for(int i=0;i<weights.m;i++) weights(i).y/=sum;
     assert(sum==0 || sum>delta);
@@ -86,7 +86,7 @@ template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION> void ADV
 Clamp_Weights_To_Objects(const GRID<TV>& grid,ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >& weights)
 {
     T delta=(T)1e-5;
-    for(int i=0;i<weights.m;i++) if(ghost_box.Lazy_Inside(grid.Axis_X_Face(weights(i).x))) weights(i).y=0;
+    for(int i=0;i<weights.m;i++) if(ghost_box.Lazy_Inside_Half_Open(grid.Axis_X_Face(weights(i).x))) weights(i).y=0;
     T sum=0;for(int i=0;i<weights.m;i++) sum+=weights(i).y;
     if(sum>delta && sum!=1) for(int i=0;i<weights.m;i++) weights(i).y/=sum;
     assert(sum==0 || sum>delta);
@@ -96,9 +96,9 @@ template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION> void ADV
 Clamp_Weights_To_Grid(const RANGE<TV_INT>& inside_domain,ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >& weights)
 {
     T delta=(T)1e-5;
-    for(int i=0;i<weights.m;i++) if(!inside_domain.Lazy_Inside(weights(i).x.index)) for(int j=0;j<TV::dimension;j++){
+    for(int i=0;i<weights.m;i++) if(!inside_domain.Lazy_Inside_Half_Open(weights(i).x.index)) for(int j=0;j<TV::dimension;j++){
         TV_INT index=TV_INT::All_Ones_Vector()*2;index(j)=weights(i).x.index(j);
-        if(!inside_domain.Lazy_Inside(index)){
+        if(!inside_domain.Lazy_Inside_Half_Open(index)){
             int side=1;if(index(j)>inside_domain.max_corner(j)) side=2;else assert(index(j)<inside_domain.min_corner(j));
             if(solid_walls_hack_axis(j)(side)) weights(i).y=0;}}
     T sum=0;for(int i=0;i<weights.m;i++) sum+=weights(i).y;
@@ -120,9 +120,9 @@ Clamp_X_To_Grid(const GRID<TV>& grid,TV& X)
 template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION> bool ADVECTION_CONSERVATIVE_UNIFORM<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>::
 Is_Outside(const RANGE<TV_INT>& inside_domain,const FACE_INDEX<TV::dimension>& face)
 {
-    if(!inside_domain.Lazy_Inside(face.index)) for(int i=0;i<TV::dimension;i++){
+    if(!inside_domain.Lazy_Inside_Half_Open(face.index)) for(int i=0;i<TV::dimension;i++){
         TV_INT index=TV_INT::All_Ones_Vector()*2;index(i)=face.index(i);
-        if(!inside_domain.Lazy_Inside(index)){
+        if(!inside_domain.Lazy_Inside_Half_Open(index)){
             int side=1;if(index(i)>inside_domain.max_corner(i)) side=2;else assert(index(i)<inside_domain.min_corner(i));
             if(solid_walls_hack_axis(i)(side)) return true;}}
     return false;
@@ -137,9 +137,9 @@ Is_MPI_Boundary(const RANGE<TV_INT>& inside_domain,const FACE_INDEX<TV::dimensio
 template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION> bool ADVECTION_CONSERVATIVE_UNIFORM<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>::
 Is_MPI_Boundary(const RANGE<TV_INT>& inside_domain,const TV_INT& index)
 {
-    if(!inside_domain.Lazy_Inside(index)) for(int i=0;i<TV::dimension;i++){
+    if(!inside_domain.Lazy_Inside_Half_Open(index)) for(int i=0;i<TV::dimension;i++){
         TV_INT tmp_index=TV_INT::All_Ones_Vector()*2;tmp_index(i)=index(i);
-        if(!inside_domain.Lazy_Inside(tmp_index)){
+        if(!inside_domain.Lazy_Inside_Half_Open(tmp_index)){
             int side=1;if(tmp_index(i)>inside_domain.max_corner(i)) side=2;else assert(tmp_index(i)<inside_domain.min_corner(i));
             if(mpi_boundary(i)(side)) return true;}}
     return false;
@@ -165,8 +165,8 @@ Cell_Diffusion_Helper(FACE_ITERATOR& iterator,ARRAY<T,TV_INT>& sum_jc_cell,T_ARR
     sum_jc_cell(iterator.Second_Cell_Index())+=wjc_diff;sum_jc_cell(iterator.First_Cell_Index())-=wjc_diff;
     T2 local_Z=wjc_diff>0?Z(iterator.First_Cell_Index()):Z(iterator.Second_Cell_Index());
     Z(iterator.Second_Cell_Index())+=local_Z*(Z_diff);Z(iterator.First_Cell_Index())-=local_Z*(Z_diff);
-    if(!grid.Domain_Indices().Lazy_Inside(iterator.First_Cell_Index())){give_jc(iterator.First_Cell_Index())-=wjc_diff;give_Z(iterator.First_Cell_Index())-=local_Z*(Z_diff)}
-    if(!grid.Domain_Indices().Lazy_Inside(iterator.Second_Cell_Index())){give_jc(iterator.Second_Cell_Index())+=wjc_diff;give_Z(iterator.Second_Cell_Index())+=local_Z*(Z_diff)}
+    if(!grid.Domain_Indices().Lazy_Inside_Half_Open(iterator.First_Cell_Index())){give_jc(iterator.First_Cell_Index())-=wjc_diff;give_Z(iterator.First_Cell_Index())-=local_Z*(Z_diff)}
+    if(!grid.Domain_Indices().Lazy_Inside_Half_Open(iterator.Second_Cell_Index())){give_jc(iterator.Second_Cell_Index())+=wjc_diff;give_Z(iterator.Second_Cell_Index())+=local_Z*(Z_diff)}
 }*/
 
 template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION> void ADVECTION_CONSERVATIVE_UNIFORM<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>::
@@ -348,11 +348,11 @@ Update_Advection_Equation_Cell_Lookup(const T_GRID& grid,T_ARRAYS_T2& Z,const T_
         TV X=iterator.Location()-dt*averaging.Face_To_Cell_Vector(grid,cell,face_velocities_ghost_lookup);
         if(use_second_order) X+=(iterator.Location()-(X+dt*linear.Clamped_To_Array_Face(grid,face_velocities_ghost_lookup,X)))/2.;
         if(ghost_box.Lazy_Inside(X)) X=ghost_box.Surface(X);        
-        if(!real_domain.Lazy_Inside(cell) && !real_domain_x.Lazy_Inside(X)) continue;
+        if(!real_domain.Lazy_Inside_Half_Open(cell) && !real_domain_x.Lazy_Inside(X)) continue;
         ARRAY<PAIR<TV_INT,T> > backwards_weights=interpolation.Clamped_To_Array_Weights(grid,Z_ghost,X);
         Clamp_Weights_To_Objects(grid,backwards_weights);
         for(int i=0;i<backwards_weights.m;i++){assert(backwards_weights(i).y>-1e-5);if(backwards_weights(i).y<0) backwards_weights(i).y=0;}
-        for(int i=0;i<backwards_weights.m;i++){if(!ghost_domain.Lazy_Inside(backwards_weights(i).x)){assert(!real_domain.Lazy_Inside(cell));continue;}
+        for(int i=0;i<backwards_weights.m;i++){if(!ghost_domain.Lazy_Inside_Half_Open(backwards_weights(i).x)){assert(!real_domain.Lazy_Inside_Half_Open(cell));continue;}
             weights_to(backwards_weights(i).x).Append(PAIR<TV_INT,T>(cell,backwards_weights(i).y));
             weights_from(cell).Append(PAIR<TV_INT,int>(backwards_weights(i).x,weights_to(backwards_weights(i).x).m));}}
     if(mpi_grid) mpi_grid->Sync_Common_Cell_Weights_To(weights_to,weights_from,number_of_ghost_cells);
@@ -424,11 +424,11 @@ Update_Advection_Equation_Cell_Lookup(const T_GRID& grid,T_ARRAYS_T2& Z,const T_
     for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){if(ghost_box.Lazy_Inside(iterator.Location())) continue;Z(iterator.Cell_Index())=T2();}
     for(CELL_ITERATOR iterator(grid,cfl);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
         ARRAY<PAIR<TV_INT,T> >& local_weights=weights_to(cell);
-        //if((!grid.Domain_Indices().Lazy_Inside(cell) && !Is_MPI_Boundary(grid.Domain_Indices(),cell)) || ghost_box.Lazy_Inside(iterator.Location())){
+        //if((!grid.Domain_Indices().Lazy_Inside_Half_Open(cell) && !Is_MPI_Boundary(grid.Domain_Indices(),cell)) || ghost_box.Lazy_Inside(iterator.Location())){
         //    for(int i=0;i<local_weights.m;i++) total_mass_gained_per_cell(local_weights(i).x)+=local_weights(i).y*Z_ghost(cell);
         //    T sum=0;for(int i=0;i<local_weights.m;i++) sum+=local_weights(i).y;total_mass_gained+=sum*Z_ghost(cell);}
         for(int i=0;i<local_weights.m;i++)
-            if(grid.Domain_Indices().Lazy_Inside(local_weights(i).x) && !ghost_box.Lazy_Inside(grid.Center(local_weights(i).x))) Z(local_weights(i).x)+=local_weights(i).y*Z_ghost(cell);}
+            if(grid.Domain_Indices().Lazy_Inside_Half_Open(local_weights(i).x) && !ghost_box.Lazy_Inside(grid.Center(local_weights(i).x))) Z(local_weights(i).x)+=local_weights(i).y*Z_ghost(cell);}
             //else if(!Is_MPI_Boundary(grid.Domain_Indices(),local_weights(i).x)){
             //    total_mass_lost_per_cell(local_weights(i).x)+=local_weights(i).y*Z_ghost(cell);
             //    total_mass_lost+=local_weights(i).y*Z_ghost(cell);}}
@@ -482,7 +482,7 @@ Update_Advection_Equation_Face_Lookup(T_GRID& grid,T_ARRAYS_SCALAR& phi1,T_ARRAY
         RANGE<TV_INT> inside_domain=grid.Domain_Indices();inside_domain.min_corner+=TV_INT::Axis_Vector(face.axis);
         if(Is_Outside(inside_domain,face)) continue;
         TV X=iterator.Location()-dt*averaging.Face_To_Face_Vector(grid,face.axis,face.index,face_velocities);
-        if(!domain.Lazy_Inside(face.index) && !real_domain.Lazy_Inside(X)) continue;
+        if(!domain.Lazy_Inside_Half_Open(face.index) && !real_domain.Lazy_Inside(X)) continue;
         if(use_second_order) X+=(iterator.Location()-(X+dt*linear.Clamped_To_Array_Face(grid,face_velocities,X)))/2.;
         Clamp_X_To_Grid(grid,X);
         if(ghost_box.Lazy_Inside(X)) X=ghost_box.Surface(X);
@@ -527,14 +527,14 @@ Update_Advection_Equation_Face_Lookup(T_GRID& grid,T_ARRAYS_SCALAR& phi1,T_ARRAY
             assert(sum<=1+delta);
             if(sum<1 && sum>=delta) for(int i=0;i<backwards_weights.m;i++) backwards_weights(i).y=backwards_weights(i).y/sum;
             else if(sum<delta){
-                if(domain.Lazy_Inside(face.index)) PHYSBAM_FATAL_ERROR("Cannot find backward weights for this cell");
+                if(domain.Lazy_Inside_Half_Open(face.index)) PHYSBAM_FATAL_ERROR("Cannot find backward weights for this cell");
                 else for(int i=0;i<backwards_weights.m;i++) backwards_weights(i).y=0;}} //It's ok to not get anything if this is a ghost cell
         sum=0;for(int i=0;i<backwards_weights.m;i++) sum+=backwards_weights(i).y;
-        assert(!domain.Lazy_Inside(face.index)||(sum>delta));
+        assert(!domain.Lazy_Inside_Half_Open(face.index)||(sum>delta));
         for(int i=0;i<backwards_weights.m;i++){//assert(backwards_weights(i).y>-delta);
             if(backwards_weights(i).y<0) backwards_weights(i).y=0;}
         for(int i=0;i<backwards_weights.m;i++){if(backwards_weights(i).y==0) continue;
-            if(!ghost_domain.Lazy_Inside(backwards_weights(i).x.index)){assert(!domain.Lazy_Inside(face.index));continue;}
+            if(!ghost_domain.Lazy_Inside_Half_Open(backwards_weights(i).x.index)){assert(!domain.Lazy_Inside_Half_Open(face.index));continue;}
             weights_to(backwards_weights(i).x).Append(PAIR<FACE_INDEX<TV::dimension>,T>(face,backwards_weights(i).y));
             weights_from(face).Append(PAIR<FACE_INDEX<TV::dimension>,int>(backwards_weights(i).x,weights_to(backwards_weights(i).x).m));}}
     if(mpi_grid) mpi_grid->Sync_Common_Face_Weights_To(weights_to,weights_from,ghost_cells);
@@ -649,10 +649,10 @@ Update_Advection_Equation_Face_Lookup(T_GRID& grid,T_ARRAYS_SCALAR& phi1,T_ARRAY
         RANGE<TV_INT> domain=grid.Domain_Indices();domain.max_corner+=TV_INT::Axis_Vector(face.axis);
         if(Is_Outside(domain,face)) continue;
         ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >& local_weights=weights_to(face);
-        if(!domain.Lazy_Inside(face.index) || ghost_box.Lazy_Inside(grid.Face(face.axis,face.index))){
+        if(!domain.Lazy_Inside_Half_Open(face.index) || ghost_box.Lazy_Inside(grid.Face(face.axis,face.index))){
             if(!ghost_box.Lazy_Inside(grid.Face(face.axis,face.index))){T sum=0;for(int i=0;i<local_weights.m;i++) sum+=local_weights(i).y;total_mass_gained+=sum*Z_ghost(face);}}
         for(int i=0;i<local_weights.m;i++)
-            if(domain.Lazy_Inside(local_weights(i).x.index) && !ghost_box.Lazy_Inside(grid.Face(local_weights(i).x.axis,local_weights(i).x.index))) 
+            if(domain.Lazy_Inside_Half_Open(local_weights(i).x.index) && !ghost_box.Lazy_Inside(grid.Face(local_weights(i).x.axis,local_weights(i).x.index))) 
                 Z(local_weights(i).x)+=local_weights(i).y*Z_ghost(face); 
             else{
                 total_mass_lost+=local_weights(i).y*Z_ghost(face);}}
@@ -692,12 +692,12 @@ Update_Advection_Equation_Face_Lookup(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z
         Clamp_X_To_Grid(grid,X);
         if(use_collision_object && collision_object.Lazy_Inside(X)) X=collision_object.Surface(X);
         if(ghost_box.Lazy_Inside(X)) X=ghost_box.Surface(X);
-        if(!domain.Lazy_Inside(face.index) && !real_domain.Lazy_Inside(X)) continue;
+        if(!domain.Lazy_Inside_Half_Open(face.index) && !real_domain.Lazy_Inside(X)) continue;
         ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> > backwards_weights=interpolation.Clamped_To_Array_Face_Component_Weights(face.axis,grid,Z_ghost.Starting_Point_Face(face.axis,face.index),X);
         Clean_Weights(backwards_weights);
         Clamp_Weights_To_Grid(inside_domain,backwards_weights);
         Clamp_Weights_To_Objects(grid,backwards_weights);
-        for(int i=0;i<backwards_weights.m;i++){if(!ghost_domain.Lazy_Inside(backwards_weights(i).x.index)){assert(!domain.Lazy_Inside(face.index));continue;}
+        for(int i=0;i<backwards_weights.m;i++){if(!ghost_domain.Lazy_Inside_Half_Open(backwards_weights(i).x.index)){assert(!domain.Lazy_Inside_Half_Open(face.index));continue;}
             if(backwards_weights(i).y==0) continue;
             weights_to(backwards_weights(i).x).Append(PAIR<FACE_INDEX<TV::dimension>,T>(face,backwards_weights(i).y));
             weights_from(face).Append(PAIR<FACE_INDEX<TV::dimension>,int>(backwards_weights(i).x,weights_to(backwards_weights(i).x).m));}}
@@ -783,10 +783,10 @@ Update_Advection_Equation_Face_Lookup(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z
         RANGE<TV_INT> inside_domain=grid.Domain_Indices();inside_domain.min_corner+=TV_INT::Axis_Vector(face.axis);
         if(Is_Outside(inside_domain,face)) continue;
         ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >& local_weights=weights_to(face);
-        if((!domain.Lazy_Inside(face.index) && !Is_MPI_Boundary(domain,face)) || ghost_box.Lazy_Inside(grid.Face(face.axis,face.index))){
+        if((!domain.Lazy_Inside_Half_Open(face.index) && !Is_MPI_Boundary(domain,face)) || ghost_box.Lazy_Inside(grid.Face(face.axis,face.index))){
             T sum=0;for(int i=0;i<local_weights.m;i++) sum+=local_weights(i).y;total_mass_gained+=sum*Z_ghost(face);}
         for(int i=0;i<local_weights.m;i++)
-            if(domain.Lazy_Inside(local_weights(i).x.index) && !ghost_box.Lazy_Inside(grid.Face(local_weights(i).x.axis,local_weights(i).x.index))){
+            if(domain.Lazy_Inside_Half_Open(local_weights(i).x.index) && !ghost_box.Lazy_Inside(grid.Face(local_weights(i).x.axis,local_weights(i).x.index))){
                 TV_INT second_face=local_weights(i).x.index+TV_INT::Axis_Vector(local_weights(i).x.axis);
                 if(smoke_density && ((*smoke_density)(iterator.First_Cell_Index())<1e-5 && (*smoke_density)(iterator.Second_Cell_Index())<1e-5)) total_mass_gained+=local_weights(i).y*Z_ghost(face);
                 if(smoke_density && ((*smoke_density)(local_weights(i).x.index)<1e-5 && (*smoke_density)(second_face)<1e-5)) total_mass_lost+=local_weights(i).y*Z_ghost(face);

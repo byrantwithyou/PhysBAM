@@ -430,7 +430,7 @@ public:
     {return Node_Indices(ghost_cells);}
 
     bool Inside_Domain(const TV_INT cell_index,const int ghost_cells=0) const
-    {return Domain_Indices(ghost_cells).Lazy_Inside(cell_index);}
+    {return Domain_Indices(ghost_cells).Lazy_Inside_Half_Open(cell_index);}
 
     VECTOR<RANGE<TV_INT>,TV::dimension> Face_Indices(const int ghost_cells=0) const
     {VECTOR<RANGE<TV_INT>,TV::dimension> v;for(int i=0;i<TV::dimension;i++) v(i)=Get_Face_Grid(i).Node_Indices(ghost_cells);return v;}

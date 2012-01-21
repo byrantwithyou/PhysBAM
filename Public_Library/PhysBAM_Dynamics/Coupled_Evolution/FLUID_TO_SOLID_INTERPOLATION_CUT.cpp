@@ -58,7 +58,7 @@ template<class T> struct FLUID_TO_SOLID_INTERPOLATION_CUT_DISPATCH<VECTOR<T,2> >
         CLIP_ENTRY ce;
         for(ce.i=0;ce.i<curve.mesh.elements.m;ce.i++){
             SEGMENT_2D<T> segment(X(curve.mesh.elements(ce.i).x),X(curve.mesh.elements(ce.i).y));
-            PHYSBAM_ASSERT(index_map.grid.domain.Lazy_Inside(segment.x1) && index_map.grid.domain.Lazy_Inside(segment.x2));
+            PHYSBAM_ASSERT(index_map.grid.domain.Lazy_Inside_Half_Open(segment.x1) && index_map.grid.domain.Lazy_Inside_Half_Open(segment.x2));
             RANGE<TV_INT> box(index_map.grid.Cell(segment.x1,3));
             box.Enlarge_To_Include_Point(index_map.grid.Cell(segment.x2,3));
             for(UNIFORM_ARRAY_ITERATOR<TV::m> it(box);it.Valid();it.Next())

@@ -217,7 +217,7 @@ Modify_Levelset_Using_Escaped_Particles_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_
         BLOCK_UNIFORM<T_GRID> block(levelset.grid,block_index);
         bool near_objects=levelset.collision_body_list?levelset.collision_body_list->Occupied_Block(block):false;if(near_objects) levelset.Enable_Collision_Aware_Interpolation(sign);
         while(cell_particles){for(int k=0;k<cell_particles->array_collection->Size();k++)if(one_over_radius_multiplier*levelset.Phi(cell_particles->X(k))>cell_particles->radius(k)){
-            for(int cell_index=0;cell_index<T_GRID::number_of_cells_per_block;cell_index++){TV_INT cell=block.Cell(cell_index);if(!domain.Lazy_Inside(cell)) continue;
+            for(int cell_index=0;cell_index<T_GRID::number_of_cells_per_block;cell_index++){TV_INT cell=block.Cell(cell_index);if(!domain.Lazy_Inside_Half_Open(cell)) continue;
                 T radius_minus_sign_phi=cell_particles->radius(k)-sign*phi(cell);
                 if(radius_minus_sign_phi>0){TV center=levelset.grid.Center(cell);
                     T distance_squared=(center-cell_particles->X(k)).Magnitude_Squared();
@@ -1247,7 +1247,7 @@ Delete_Particles_Far_From_Interface_Part_Two(RANGE<TV_INT>& domain,T_ARRAYS_CHAR
     for(CELL_ITERATOR iterator(levelset.grid,ghost_domain);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
         for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT neighbor=cell+TV_INT::Axis_Vector(axis);
             if(near_interface.Valid_Index(neighbor) && cell_neighbors_visible(cell)(axis) && (near_interface(cell)|near_interface(neighbor))&old_mask){
-                if(domain.Lazy_Inside(cell)) near_interface(cell)|=new_mask;if(domain.Lazy_Inside(neighbor)) near_interface(neighbor)|=new_mask;}}}
+                if(domain.Lazy_Inside_Half_Open(cell)) near_interface(cell)|=new_mask;if(domain.Lazy_Inside_Half_Open(neighbor)) near_interface(neighbor)|=new_mask;}}}
 }
 //#####################################################################
 // Function Delete_Particles_Far_From_Interface

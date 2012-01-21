@@ -234,40 +234,40 @@ private:
 public:
 
     T& operator()(const int i,const int j,const int ij)
-    {STATIC_ASSERT(d==3);assert(domain.Lazy_Inside(VECTOR<int,3>(i,j,ij)));return base_pointer[(i*counts.y+j)*counts.z+ij];}
+    {STATIC_ASSERT(d==3);assert(domain.Lazy_Inside_Half_Open(VECTOR<int,3>(i,j,ij)));return base_pointer[(i*counts.y+j)*counts.z+ij];}
 
     const T& operator()(const int i,const int j,const int ij) const
-    {STATIC_ASSERT(d==3);assert(domain.Lazy_Inside(VECTOR<int,3>(i,j,ij)));return base_pointer[(i*counts.y+j)*counts.z+ij];}
+    {STATIC_ASSERT(d==3);assert(domain.Lazy_Inside_Half_Open(VECTOR<int,3>(i,j,ij)));return base_pointer[(i*counts.y+j)*counts.z+ij];}
 
     T& operator()(const int i,const int j)
-    {STATIC_ASSERT(d==2);assert(domain.Lazy_Inside(VECTOR<int,2>(i,j)));return base_pointer[i*counts.y+j];}
+    {STATIC_ASSERT(d==2);assert(domain.Lazy_Inside_Half_Open(VECTOR<int,2>(i,j)));return base_pointer[i*counts.y+j];}
 
     const T& operator()(const int i,const int j) const
-    {STATIC_ASSERT(d==2);assert(domain.Lazy_Inside(VECTOR<int,2>(i,j)));return base_pointer[i*counts.y+j];}
+    {STATIC_ASSERT(d==2);assert(domain.Lazy_Inside_Half_Open(VECTOR<int,2>(i,j)));return base_pointer[i*counts.y+j];}
 
     T& operator()(const int i)
-    {STATIC_ASSERT(d==1);assert(domain.Lazy_Inside(VECTOR<int,1>(i)));return base_pointer[i];}
+    {STATIC_ASSERT(d==1);assert(domain.Lazy_Inside_Half_Open(VECTOR<int,1>(i)));return base_pointer[i];}
 
     const T& operator()(const int i) const
-    {STATIC_ASSERT(d==1);assert(domain.Lazy_Inside(VECTOR<int,1>(i)));return base_pointer[i];}
+    {STATIC_ASSERT(d==1);assert(domain.Lazy_Inside_Half_Open(VECTOR<int,1>(i)));return base_pointer[i];}
 
     T& operator()(const TV_INT& index)
-    {assert(domain.Lazy_Inside(index));return base_pointer[Compute_Index(index)];}
+    {assert(domain.Lazy_Inside_Half_Open(index));return base_pointer[Compute_Index(index)];}
 
     const T& operator()(const TV_INT& index) const
-    {assert(domain.Lazy_Inside(index));return base_pointer[Compute_Index(index)];}
+    {assert(domain.Lazy_Inside_Half_Open(index));return base_pointer[Compute_Index(index)];}
 
     bool Valid_Index(const TV_INT& index) const
-    {return domain.Lazy_Inside(index);}
+    {return domain.Lazy_Inside_Half_Open(index);}
 
     bool Valid_Index(const int i,const int j,const int ij) const
-    {STATIC_ASSERT(d==3);return domain.Lazy_Inside(TV_INT(i,j,ij));}
+    {STATIC_ASSERT(d==3);return domain.Lazy_Inside_Half_Open(TV_INT(i,j,ij));}
 
     bool Valid_Index(const int i,const int j) const
-    {STATIC_ASSERT(d==2);return domain.Lazy_Inside(TV_INT(i,j));}
+    {STATIC_ASSERT(d==2);return domain.Lazy_Inside_Half_Open(TV_INT(i,j));}
 
     bool Valid_Index(const int i) const
-    {STATIC_ASSERT(d==1);return domain.Lazy_Inside(TV_INT(i));}
+    {STATIC_ASSERT(d==1);return domain.Lazy_Inside_Half_Open(TV_INT(i));}
 
     int Standard_Index(const TV_INT& index) const
     {assert(Valid_Index(index));return Compute_Index(index-domain.min_corner)+1;}

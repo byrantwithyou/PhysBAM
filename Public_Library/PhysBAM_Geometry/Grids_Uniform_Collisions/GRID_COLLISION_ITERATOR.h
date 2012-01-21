@@ -70,7 +70,7 @@ public:
         {return cur<=faces.m;}
 
         void Next()
-        {cur++;if(cur<=faces.m){index=faces(cur).face;if(!face_domain(index.axis).Lazy_Inside(index.index)) Next();}}
+        {cur++;if(cur<=faces.m){index=faces(cur).face;if(!face_domain(index.axis).Lazy_Inside_Half_Open(index.index)) Next();}}
     };
 
     struct INTERIOR_FACE_ITERATOR

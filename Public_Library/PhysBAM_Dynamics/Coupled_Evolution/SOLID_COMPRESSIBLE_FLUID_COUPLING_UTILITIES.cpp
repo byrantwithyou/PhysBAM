@@ -239,9 +239,9 @@ Project_Fluid_Pressure_At_Neumann_Faces(const T_ARRAYS_SCALAR& p_ghost,T_FACE_AR
             int direction;
             // TODO: This doesn't work with thin-shells
             bool first_cell_inside_solid=euler.euler_projection.elliptic_solver->psi_D(iterator.First_Cell_Index()) ||
-                !domain.Lazy_Inside(iterator.First_Cell_Center());
+                !domain.Lazy_Inside_Half_Open(iterator.First_Cell_Center());
             bool second_cell_inside_solid=euler.euler_projection.elliptic_solver->psi_D(iterator.Second_Cell_Index()) ||
-                !domain.Lazy_Inside(iterator.Second_Cell_Center());
+                !domain.Lazy_Inside_Half_Open(iterator.Second_Cell_Center());
 
             if(!first_cell_inside_solid && second_cell_inside_solid) direction=1; // solid on right
             else if(first_cell_inside_solid && !second_cell_inside_solid) direction=-1; // solid on left

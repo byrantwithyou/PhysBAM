@@ -732,7 +732,7 @@ Sync_Common_Face_Weights_From(ARRAY<ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >,FA
             for(FACE_ITERATOR iterator(local_grid,domain,axis2);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> cell=iterator.Full_Index();
                 ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >& local_weights=weights_to(cell);
                 for(int i=0;i<local_weights.m;i++){
-                    if(!face_domain.Lazy_Inside(local_weights(i).x.index)) 
+                    if(!face_domain.Lazy_Inside_Half_Open(local_weights(i).x.index)) 
                         transfer_per_proc(other_rank+1).Append(TRIPLE<FACE_INDEX<TV::dimension>,FACE_INDEX<TV::dimension>,T>(FACE_INDEX<TV::dimension>(cell.axis,cell.index+local_to_global_offset),
                             FACE_INDEX<TV::dimension>(local_weights(i).x.axis,local_weights(i).x.index+local_to_global_offset),local_weights(i).y));}}}}
     for(int i=0;i<number_of_processes;i++) all_sizes(rank+1,i)=transfer_per_proc(i).m;
@@ -756,7 +756,7 @@ Sync_Common_Face_Weights_From(ARRAY<ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >,FA
             MPI_UTILITIES::Unpack(data.x.index,data.x.axis,data.y.index,data.y.axis,data.z,recv_buffers(i),position,*comm);
             data.x.index-=local_to_global_offset;data.y.index-=local_to_global_offset;
             RANGE<TV_INT> face_domain=local_grid.Domain_Indices();face_domain.max_corner(data.x.axis)++;
-            if(ignore_boundary_faces && face_domain.Lazy_Inside(data.x.index)) continue;
+            if(ignore_boundary_faces && face_domain.Lazy_Inside_Half_Open(data.x.index)) continue;
             int index=0;for(int j=0;j<weights_to(data.x).m;j++) if(weights_to(data.x)(j).x==data.y) index=j;
             assert(data.z>-1e-5);
             if(data.z<0) data.z=0;
@@ -788,7 +788,7 @@ Sync_Common_Face_Weights_To(ARRAY<ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >,FACE
             for(FACE_ITERATOR iterator(local_grid,domain,axis2);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> cell=iterator.Full_Index();
                 ARRAY<PAIR<FACE_INDEX<TV::dimension>,int> >& local_weights=weights_from(cell);
                 for(int i=0;i<local_weights.m;i++){
-                    if(!face_domain.Lazy_Inside(local_weights(i).x.index)) 
+                    if(!face_domain.Lazy_Inside_Half_Open(local_weights(i).x.index)) 
                         transfer_per_proc(other_rank+1).Append(TRIPLE<FACE_INDEX<TV::dimension>,FACE_INDEX<TV::dimension>,T>(FACE_INDEX<TV::dimension>(cell.axis,cell.index+local_to_global_offset),
                             FACE_INDEX<TV::dimension>(local_weights(i).x.axis,local_weights(i).x.index+local_to_global_offset),weights_to(local_weights(i).x)(local_weights(i).y).y));}}}}
     for(int i=0;i<number_of_processes;i++) all_sizes(rank+1,i)=transfer_per_proc(i).m;
@@ -812,7 +812,7 @@ Sync_Common_Face_Weights_To(ARRAY<ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >,FACE
             MPI_UTILITIES::Unpack(data.x.index,data.x.axis,data.y.index,data.y.axis,data.z,recv_buffers(i),position,*comm);
             data.x.index-=local_to_global_offset;data.y.index-=local_to_global_offset;
             RANGE<TV_INT> face_domain=local_grid.Domain_Indices();face_domain.max_corner(data.x.axis)++;
-            if(ignore_boundary_faces && face_domain.Lazy_Inside(data.x.index)) continue;
+            if(ignore_boundary_faces && face_domain.Lazy_Inside_Half_Open(data.x.index)) continue;
             int index=0;for(int j=0;j<weights_to(data.y).m;j++) if(weights_to(data.y)(j).x==data.x) index=j;
             assert(data.z>-1e-5);
             if(data.z<0) data.z=0;
@@ -842,7 +842,7 @@ Sync_Common_Cell_Weights_From(ARRAY<ARRAY<PAIR<TV_INT,T> >,TV_INT>& weights_to,A
         for(CELL_ITERATOR iterator(local_grid,domain);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
             ARRAY<PAIR<TV_INT,T> >& local_weights=weights_to(cell);
             for(int i=0;i<local_weights.m;i++){
-                if(!ghost_domain.Lazy_Inside(local_weights(i).x)) 
+                if(!ghost_domain.Lazy_Inside_Half_Open(local_weights(i).x)) 
                     transfer_per_proc(other_rank+1).Append(TRIPLE<TV_INT,TV_INT,T>(local_to_global_offset+cell,local_to_global_offset+local_weights(i).x,local_weights(i).y));}}}
     for(int i=0;i<number_of_processes;i++) all_sizes(rank+1,i)=transfer_per_proc(i).m;
     for(int i=0;i<number_of_processes;i++) for(int j=0;j<number_of_processes;j++){int output;MPI_UTILITIES::Reduce(all_sizes(i,j),output,MPI::MAX,*comm);all_sizes(i,j)=output;}
@@ -890,7 +890,7 @@ Sync_Common_Cell_Weights_To(ARRAY<ARRAY<PAIR<TV_INT,T> >,TV_INT>& weights_to,ARR
         for(CELL_ITERATOR iterator(local_grid,domain);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
             ARRAY<PAIR<TV_INT,int> >& local_weights=weights_from(cell);
             for(int i=0;i<local_weights.m;i++)
-                if(!ghost_domain.Lazy_Inside(local_weights(i).x)){
+                if(!ghost_domain.Lazy_Inside_Half_Open(local_weights(i).x)){
                     transfer_per_proc(other_rank+1).Append(TRIPLE<TV_INT,TV_INT,T>(local_to_global_offset+cell,local_to_global_offset+local_weights(i).x,weights_to(local_weights(i).x)(local_weights(i).y).y));}}}
     for(int i=0;i<number_of_processes;i++) all_sizes(rank+1,i)=transfer_per_proc(i).m;
     for(int i=0;i<number_of_processes;i++) for(int j=0;j<number_of_processes;j++){int output;MPI_UTILITIES::Reduce(all_sizes(i,j),output,MPI::MAX,*comm);all_sizes(i,j)=output;}

@@ -166,7 +166,7 @@ Initialize_Interface(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,T_ARRAYS_B
                 RANGE<TV_INT> ghost_domain=domain;if(side==0) ghost_domain.max_corner(axis)=interior_domain.min_corner(axis)-1;else ghost_domain.min_corner(axis)=interior_domain.max_corner(axis)+1;
                 for(CELL_ITERATOR iterator(cell_grid,ghost_domain);iterator.Valid();iterator.Next()){TV_INT index=iterator.Cell_Index();
                     for(int i=0;i<T_GRID::number_of_neighbors_per_cell;i++){TV_INT neighbor_index(iterator.Cell_Neighbor(i));
-                        if(domain.Lazy_Inside(neighbor_index) && LEVELSET_UTILITIES<T>::Interface(phi_ghost(index),phi_ghost(neighbor_index))){
+                        if(domain.Lazy_Inside_Half_Open(neighbor_index) && LEVELSET_UTILITIES<T>::Interface(phi_ghost(index),phi_ghost(neighbor_index))){
                             if(!done(index))Add_To_Initial(done,close_k,index);
                             if(!done(neighbor_index))Add_To_Initial(done,close_k,neighbor_index);}}}}}}
     else{
@@ -211,7 +211,7 @@ Initialize_Interface(T_ARRAYS_SCALAR& phi_ghost,T_ARRAYS_BOOL& done,T_ARRAYS_INT
         if(add_seed_indices_for_ghost_cells){RANGE<TV_INT> ghost_domain=cell_grid.Domain_Indices().Thickened(ghost_cells);
             for(CELL_ITERATOR iterator(cell_grid,ghost_cells,T_GRID::GHOST_REGION);iterator.Valid();iterator.Next()){TV_INT index=iterator.Cell_Index();
                 for(int i=0;i<T_GRID::number_of_neighbors_per_cell;i++){TV_INT neighbor_index(iterator.Cell_Neighbor(i));
-                    if(ghost_domain.Lazy_Inside(neighbor_index) && LEVELSET_UTILITIES<T>::Interface(phi_ghost(index),phi_ghost(neighbor_index))){
+                    if(ghost_domain.Lazy_Inside_Half_Open(neighbor_index) && LEVELSET_UTILITIES<T>::Interface(phi_ghost(index),phi_ghost(neighbor_index))){
                         if(!done(index))Add_To_Initial(done,close_k,index);
                         if(!done(neighbor_index))Add_To_Initial(done,close_k,neighbor_index);}}}}}
     else{
@@ -345,7 +345,7 @@ Initialize_Interface(T_ARRAYS_SCALAR& phi_ghost,T_ARRAYS_BOOL& done,T_ARRAYS_INT
     if(add_seed_indices_for_ghost_cells){RANGE<TV_INT> ghost_domain=cell_grid.Domain_Indices().Thickened(ghost_cells);
         for(CELL_ITERATOR iterator(cell_grid,ghost_cells,T_GRID::GHOST_REGION);iterator.Valid();iterator.Next()){TV_INT index=iterator.Cell_Index();
             for(int i=0;i<T_GRID::number_of_neighbors_per_cell;i++){TV_INT neighbor_index(iterator.Cell_Neighbor(i));
-                if(ghost_domain.Lazy_Inside(neighbor_index) && LEVELSET_UTILITIES<T>::Interface(phi_ghost(index),phi_ghost(neighbor_index))){
+                if(ghost_domain.Lazy_Inside_Half_Open(neighbor_index) && LEVELSET_UTILITIES<T>::Interface(phi_ghost(index),phi_ghost(neighbor_index))){
                     if(!done(index))Add_To_Initial(done,close_k,index);
                     if(!done(neighbor_index))Add_To_Initial(done,close_k,neighbor_index);}}}}
 

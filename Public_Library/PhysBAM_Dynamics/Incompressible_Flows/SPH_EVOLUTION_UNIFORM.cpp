@@ -288,7 +288,7 @@ Postprocess_Particles(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T t
                         valid_neighbors++;face_velocity+=face_velocities_ghost(axis,face_neighbor);}}
                 if(valid_neighbors) face_velocities_ghost(axis,face)=face_velocity/(T)valid_neighbors;}}
         const RANGE<TV>& domain=grid.domain;
-        for(int p=0;p<sph_particles.array_collection->Size();p++)if(domain.Lazy_Inside(sph_particles.X(p))){
+        for(int p=0;p<sph_particles.array_collection->Size();p++)if(domain.Lazy_Inside_Half_Open(sph_particles.X(p))){
             sph_particles.V(p)=flip_ratio*sph_particles.V(p)+(1-flip_ratio)*interpolation.Clamped_To_Array_Face(grid,face_velocities_ghost,sph_particles.X(p));}}
 
     if(attraction_strength){

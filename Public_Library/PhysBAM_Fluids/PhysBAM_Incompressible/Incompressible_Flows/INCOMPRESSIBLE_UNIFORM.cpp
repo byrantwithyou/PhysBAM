@@ -233,7 +233,7 @@ Add_Energy_With_Vorticity(T_FACE_ARRAYS_SCALAR& face_velocities,const VECTOR<VEC
         RANGE<TV_INT> domain=grid.Domain_Indices();domain.max_corner(iterator.Axis())++;
         for(int i=0;i<TV::dimension;i++){if(domain_boundary(i)(1)) domain.min_corner(i)++;if(domain_boundary(i)(2)) domain.max_corner(i)--;}
         vorticity_weights(index)=(conserve_kinetic_energy && lsv)?(-1*lsv->Phi(iterator.Location())):1;
-        if(vorticity_weights(index)<energy_clamp) vorticity_weights(index)=0;if(projection.elliptic_solver->psi_N(index) || !domain.Lazy_Inside(index.index)) vorticity_weights(index)=0;}
+        if(vorticity_weights(index)<energy_clamp) vorticity_weights(index)=0;if(projection.elliptic_solver->psi_N(index) || !domain.Lazy_Inside_Half_Open(index.index)) vorticity_weights(index)=0;}
     if(!conserve_kinetic_energy) return;
     //int iterations=1;
     //Advect_With_Vorticity(face_velocities,dt,time,iterations);

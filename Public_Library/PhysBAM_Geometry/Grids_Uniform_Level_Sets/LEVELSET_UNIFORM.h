@@ -77,7 +77,7 @@ public:
     return phi_value<=contour_value;}
 
     bool Lazy_Inside_Extended_Levelset(const TV& unclamped_X,const T contour_value=0) const
-    {if(grid.domain.Lazy_Inside(unclamped_X)) return Lazy_Inside(unclamped_X,contour_value);
+    {if(grid.domain.Lazy_Inside_Half_Open(unclamped_X)) return Lazy_Inside(unclamped_X,contour_value);
     if(contour_value<=0) return false;
     T sqr_contour_value=sqr(contour_value);
     TV clamped_X(grid.Clamp(unclamped_X));
