@@ -12,7 +12,7 @@ namespace PhysBAM{
 //#####################################################################
 DYNAMIC_LIST_CORE::
 DYNAMIC_LIST_CORE(void (*deleter)(void*))
-    :deleter(deleter),last_unique_id(0)
+    :deleter(deleter),next_unique_id(0)
 {}
 //#####################################################################
 // Destructor
@@ -47,7 +47,7 @@ Clean_Memory()
 {
     Delete_All();
     pointer_to_id_map.Clean_Memory();
-    needs_write.Clean_Memory();index_to_id_map.Clean_Memory();id_to_index_map.Clean_Memory();last_unique_id=0;deletion_list.Clean_Memory();
+    needs_write.Clean_Memory();index_to_id_map.Clean_Memory();id_to_index_map.Clean_Memory();next_unique_id=0;deletion_list.Clean_Memory();
 }
 //#####################################################################
 // Function Remove_All
@@ -58,7 +58,7 @@ Remove_All()
     Delete_All();
     pointer_to_id_map.Clean_Memory();
     index_to_id_map.Remove_All();id_to_index_map.Remove_All();
-    needs_write.Remove_All();deletion_list.Remove_All();last_unique_id=0;
+    needs_write.Remove_All();deletion_list.Remove_All();next_unique_id=0;
 }
 //#####################################################################
 // Function Add_Element
@@ -68,9 +68,9 @@ Add_Element(void* element)
 {
     int id;
     if(pointer_to_id_map.Get(element,id)){assert(array(id_to_index_map(id))==element);return id;}
-    array.Append(element);
-    if(deletion_list.m){id=deletion_list.Pop();assert(id_to_index_map(id)==0);id_to_index_map(id)=array.Size();}
-    else{id=++last_unique_id;id_to_index_map.Append(array.Size());assert(id_to_index_map.Size()==id);}
+    int index=array.Append(element);
+    if(deletion_list.m){id=deletion_list.Pop();assert(id_to_index_map(id)<0);id_to_index_map(id)=array.Size();}
+    else{id=next_unique_id++;id_to_index_map.Append(index);assert(id_to_index_map.Size()==id+1);}
     index_to_id_map.Append(id);needs_write.Append(id);
     pointer_to_id_map.Set(element,id);
     return id;
@@ -96,7 +96,7 @@ Deactivate_Element(const int id,const bool delete_element)
     int index=id_to_index_map(id);assert(index);
     pointer_to_id_map.Delete(array(index));
     if(delete_element) Delete_And_Clear(array(index));
-    id_to_index_map(id)=0;array.Remove_Index_Lazy(index);index_to_id_map.Remove_Index_Lazy(index);
+    id_to_index_map(id)=-1;array.Remove_Index_Lazy(index);index_to_id_map.Remove_Index_Lazy(index);
     if(index<array.Size()) id_to_index_map(index_to_id_map(index))=index;
 }
 //#####################################################################
@@ -107,8 +107,8 @@ Swap_Elements(void* element,const int id_number,const int id)
 {
     int index=id_to_index_map(id);assert(index);
     pointer_to_id_map.Delete(array(index));
-    id_to_index_map(id)=0;
-    assert(id_to_index_map(id_number)==0);
+    id_to_index_map(id)=-1;
+    assert(id_to_index_map(id_number)==-1);
     array(index)=element;needs_write.Append(id_number);
     pointer_to_id_map.Set(element,id_number);
     index_to_id_map(index)=id_number;id_to_index_map(id_number)=index;assert(index_to_id_map.Size()==array.Size());
@@ -128,7 +128,7 @@ Remove_Element(const int id,const bool delete_element=true,const bool allow_id_r
 void DYNAMIC_LIST_CORE::
 Purge_Element(const int id)
 {
-    assert(id_to_index_map(id)==0);
+    assert(id_to_index_map(id)<0);
     deletion_list.Append(id);
 }
 //#####################################################################

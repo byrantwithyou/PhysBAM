@@ -124,7 +124,7 @@ public:
     {return Component(index.axis)(index.index);}
 
     bool Valid_Index(const FACE_INDEX<dimension>& index) const
-    {return (1<=index.axis && index.axis<=dimension) && Component(index.axis).Valid_Index(index.index);}
+    {return ((unsigned)index.axis<(unsigned)dimension) && Component(index.axis).Valid_Index(index.index);}
 
     T_ARRAY_VIEW& Component(const int axis)
     {assert((unsigned)axis<dimension);return *(&data.x+(axis-1));}

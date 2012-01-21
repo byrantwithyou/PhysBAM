@@ -31,14 +31,14 @@ public:
     ARRAY<int> index_to_id_map; // ID2 -> ID
     ARRAY<int> id_to_index_map; // ID -> ID2
     ARRAY<int> deletion_list; // ID
-    int last_unique_id; // ID
+    int next_unique_id; // ID
     mutable ARRAY<int> needs_write; // ID
 
     DYNAMIC_LIST_CORE(void (*deleter)(void*));
     ~DYNAMIC_LIST_CORE();
 
     bool Is_Active(const int id) const
-    {return id_to_index_map.Valid_Index(id) && id_to_index_map(id);}
+    {return id_to_index_map.Valid_Index(id) && id_to_index_map(id)>=0;}
 
     void Clean_Memory();
     void Remove_All();
@@ -74,10 +74,10 @@ public:
     {return ID2(core.id_to_index_map(Value(id)));}
 
     int Number_Of_Elements() const // including inactive elements
-    {return core.last_unique_id-core.deletion_list.m;}
+    {return core.next_unique_id-core.deletion_list.m;}
 
     ID Size() const
-    {return ID(core.last_unique_id);}
+    {return ID(core.next_unique_id);}
 
     bool Is_Active(const ID id) const
     {return core.Is_Active(Value(id));}

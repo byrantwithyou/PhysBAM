@@ -47,12 +47,12 @@ Create_KD_Tree(ARRAY_VIEW<const TV> points)
         pool.Delete_All();root_node=pool.New();
         ARRAY<int> permutation_array(IDENTITY_ARRAY<>(points.Size()));
         RANGE<TV> box=RANGE<TV>::Bounding_Box(points);
-        Balance_Sub_KD_Tree_Using_Internal_Nodes(root_node,1,permutation_array.m,points,permutation_array,box);}
+        Balance_Sub_KD_Tree_Using_Internal_Nodes(root_node,0,permutation_array.m-1,points,permutation_array,box);}
     else{
         pool.Delete_All();root_node=pool.New();
         ARRAY<int> permutation_array(IDENTITY_ARRAY<>(points.Size()));
         RANGE<TV> box=RANGE<TV>::Bounding_Box(points);
-        Sub_KD_Tree_Using_Leaf_Nodes(root_node,1,permutation_array.m,points,permutation_array,box);}
+        Sub_KD_Tree_Using_Leaf_Nodes(root_node,0,permutation_array.m-1,points,permutation_array,box);}
 }
 //#####################################################################
 // Function Create_Left_Balanced_KD_Tree
@@ -64,8 +64,8 @@ Create_Left_Balanced_KD_Tree(ARRAY_VIEW<const TV> points_to_balance)
     pool.Delete_All();root_node=pool.New();
     ARRAY<int> permutation_array(IDENTITY_ARRAY<>(points_to_balance.Size()));
     RANGE<TV> box=RANGE<TV>::Bounding_Box(points_to_balance);
-    if(store_values_on_internal_nodes) Balance_Sub_KD_Tree_Using_Internal_Nodes(root_node,1,permutation_array.m,points_to_balance,permutation_array,box);
-    else Balance_Sub_KD_Tree_Using_Leaf_Nodes(root_node,1,permutation_array.m,points_to_balance,permutation_array,box);
+    if(store_values_on_internal_nodes) Balance_Sub_KD_Tree_Using_Internal_Nodes(root_node,0,permutation_array.m-1,points_to_balance,permutation_array,box);
+    else Balance_Sub_KD_Tree_Using_Leaf_Nodes(root_node,0,permutation_array.m-1,points_to_balance,permutation_array,box);
 }
 //#####################################################################
 // Function Create_Left_Balanced_KD_Tree_With_Grouping
@@ -80,7 +80,7 @@ Create_Left_Balanced_KD_Tree_With_Grouping(ARRAY_VIEW<const TV> points_to_balanc
     ARRAY<int> point_group(points_to_balance.Size());int current_group_index=0;
     RANGE<TV> box=RANGE<TV>::Bounding_Box(points_to_balance);
     PHYSBAM_ASSERT(!store_values_on_internal_nodes);
-    Balance_Sub_KD_Tree_Using_Leaf_Nodes_With_Grouping(root_node,1,points_to_balance.Size(),points_to_balance,permutation_array,box,point_group,current_group_index,max_points_in_group);
+    Balance_Sub_KD_Tree_Using_Leaf_Nodes_With_Grouping(root_node,0,points_to_balance.Size()-1,points_to_balance,permutation_array,box,point_group,current_group_index,max_points_in_group);
     int number_of_groups=point_group.Max();
     ARRAY<int> group_size(number_of_groups);for(int i=0;i<point_group.m;i++) group_size(point_group(i))++;
     points_in_group.Resize(number_of_groups);for(int i=0;i<points_in_group.m;i++) points_in_group(i).Resize(group_size(i));
@@ -92,19 +92,25 @@ Create_Left_Balanced_KD_Tree_With_Grouping(ARRAY_VIEW<const TV> points_to_balanc
 template<class TV> void KD_TREE<TV>::
 Balance_Sub_KD_Tree_Using_Internal_Nodes(KD_TREE_NODE<T>* cell,const int first_index,const int last_index,ARRAY_VIEW<const TV> points,ARRAY_VIEW<int> permutation_array,RANGE<TV>& box)
 {
+    LOG::cout<<first_index<<"  "<<last_index<<"   "<<permutation_array<<std::endl;
     if(last_index==first_index){cell->split_axis=0;cell->node_index=permutation_array(first_index);return;}
     int partition_index=Choose_Partition_Index_Using_Internal_Nodes(first_index,last_index);
     int axis=Choose_Partition_Axis(box.Edge_Lengths());
+    LOG::cout<<__LINE__<<std::endl;
     Median_Split(partition_index,first_index,last_index,points,permutation_array,axis);
+    LOG::cout<<__LINE__<<std::endl;
     cell->split_axis=axis;cell->split_value=points(permutation_array(partition_index))[axis];cell->node_index=permutation_array(partition_index);
+    LOG::cout<<__LINE__<<std::endl;
     if(partition_index>first_index){
         cell->left=pool.New();
         RANGE<TV> left_box(box);left_box.max_corner[axis]=cell->split_value;
         Balance_Sub_KD_Tree_Using_Internal_Nodes(cell->left,first_index,partition_index-1,points,permutation_array,left_box);}
+    LOG::cout<<__LINE__<<std::endl;
     if(partition_index<last_index){
         cell->right=pool.New();
         RANGE<TV> right_box(box);right_box.min_corner[axis]=cell->split_value;
         Balance_Sub_KD_Tree_Using_Internal_Nodes(cell->right,partition_index+1,last_index,points,permutation_array,right_box);}
+    LOG::cout<<__LINE__<<std::endl;
 }
 //#####################################################################
 // Function Balance_Sub_KD_Tree_Using_Leaf_Nodes

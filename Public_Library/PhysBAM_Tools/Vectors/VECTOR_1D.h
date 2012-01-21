@@ -202,16 +202,16 @@ public:
     {return abs(x);}
 
     int Arg_Min() const
-    {return 1;}
+    {return 0;}
 
     int Arg_Max() const
-    {return 1;}
+    {return 0;}
 
     bool Elements_Equal() const
     {return true;}
 
     int Dominant_Axis() const
-    {return 1;}
+    {return 0;}
 
     static T Dot_Product(const VECTOR& v1,const VECTOR& v2)
     {return v1.x*v2.x;}

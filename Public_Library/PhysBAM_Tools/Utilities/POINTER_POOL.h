@@ -28,7 +28,7 @@ public:
 
     T* New() // memory will be freed by Delete_All (do not use delete!)
     {if(current>=block_size){pools.Append(new T[block_size]);current=0;}
-    return pools(pools.m)+(current++);}
+    return pools.Last()+(current++);}
 
     void Delete_All()
     {for(int i=0;i<pools.m;i++) delete[] pools(i);
