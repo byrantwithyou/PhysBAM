@@ -83,7 +83,7 @@ public:
     template<int d>
     explicit MATRIX_MXN(const SYMMETRIC_MATRIX<T,d>& A)
         :m(A.Rows()),n(A.Columns())
-    {x=new T[m*n];for(int j=0;j<n;j++) for(int i=0;i<j;i++) (*this)(i,j)=(*this)(j,i)=A.Element_Lower(j,i);}
+    {x=new T[m*n];for(int j=0;j<n;j++) for(int i=0;i<=j;i++) (*this)(i,j)=(*this)(j,i)=A.Element_Lower(j,i);}
 
     template<int d>
     explicit MATRIX_MXN(const UPPER_TRIANGULAR_MATRIX<T,d>& A)
