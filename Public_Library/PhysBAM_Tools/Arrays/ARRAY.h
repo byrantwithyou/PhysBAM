@@ -121,7 +121,7 @@ private:
     buffer_size=buffer_new;}
 
     void Resize_Helper(const ID buffer_new,const bool initialize_new_elements,const bool copy_existing_elements,const T& initialization_value)
-    {if(buffer_size==buffer_new) return;assert(m<buffer_size);
+    {if(buffer_size==buffer_new) return;assert(m<=buffer_size);
     T* p=new T[Value(buffer_new)];
     int m_end=Value(PhysBAM::min(m,buffer_new));
     if(copy_existing_elements) for(int i=0;i<m_end;i++) p[i]=base_pointer[i];
