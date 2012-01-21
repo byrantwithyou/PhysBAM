@@ -46,7 +46,7 @@ public:
     {if(buffer_size<max_size) Reallocate_Buffer(max_size);}
 
     int Add_Element()
-    {Resize(number+1);return number;}
+    {Resize(number+1);return number-1;}
 
     ARRAY_PLUS_SCALAR<int,IDENTITY_ARRAY<> > Add_Elements(const int new_element)
     {int old_number=number;Resize(number+new_element);

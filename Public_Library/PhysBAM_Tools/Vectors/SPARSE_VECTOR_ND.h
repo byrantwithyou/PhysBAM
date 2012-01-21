@@ -49,8 +49,8 @@ public:
     return T();}
 
     void Set_Element(const int i,const T& element)
-    {assert(i>=1 && i<=n);
-    int j=1;for(;j<=number_of_active_indices;j++) if(indices[j] == i){x[j]=element;return;}else if(indices[j]>i) break;
+    {assert((unsigned)i<(unsigned)n);
+    int j=0;for(;j<number_of_active_indices;j++) if(indices[j] == i){x[j]=element;return;}else if(indices[j]>i) break;
     Insert_New_Element(i,j,element);}
 
     void Insert_New_Element(const int index,const int array_position,const T element=T())
@@ -62,16 +62,16 @@ public:
     delete[] indices;delete[] x;indices=new_indices;x=new_x;}
 
     void Add_Element(const int i,const T& element)
-    {assert(i>=1 && i<=n);
-    int j=1;for(;j<=number_of_active_indices;j++) if(indices[j] == i){x[j]+=element;return;}else if(indices[j]>i) break;
+    {assert((unsigned)i<(unsigned)n);
+    int j=0;for(;j<number_of_active_indices;j++) if(indices[j] == i){x[j]+=element;return;}else if(indices[j]>i) break;
     Insert_New_Element(i,j,element);}
 
     bool Element_Present(const int i)
-    {assert(i>=1 && i<=n);for(int j=0;j<number_of_active_indices;j++) if(indices[j] == i) return true;else if(indices[j]>i) return false;
+    {assert((unsigned)i<(unsigned)n);for(int j=0;j<number_of_active_indices;j++) if(indices[j] == i) return true;else if(indices[j]>i) return false;
     return false;}
 
     bool Element_Present_And_Location(const int i,int& location)
-    {assert(i>=1 && i<=n);for(int j=0;j<number_of_active_indices;j++) if(indices[j] == i){location=j;return true;}else if(indices[j]>i) return false;
+    {assert((unsigned)i<(unsigned)n);for(int j=0;j<number_of_active_indices;j++) if(indices[j] == i){location=j;return true;}else if(indices[j]>i) return false;
     return false;}
 
     void Clear()
