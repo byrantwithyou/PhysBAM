@@ -17,9 +17,12 @@ OPENGL_COLOR OPENGL_INDEXED_COLOR_MAP::
 Lookup(int index) const
 {
     if(index_mode==PERIODIC){
-        int periodic_index=color_map.domain.min_corner.x+(((index-color_map.domain.min_corner.x)%color_map.counts.x)+color_map.counts.x)%color_map.counts.x;
-        return color_map(periodic_index);}
-    else return color_map(clamp(index,color_map.domain.min_corner.x,color_map.domain.max_corner.x));
+        int i=index%color_map.m;
+        if(i<0) i+=color_map.m;
+        return color_map(i);}
+    if(index>=color_map.m) return color_map.Last();
+    if(index<=0) return color_map(0);
+    return color_map(index);
 }
 OPENGL_INDEXED_COLOR_MAP* OPENGL_INDEXED_COLOR_MAP::
 Basic_16_Color_Map()
@@ -47,21 +50,21 @@ OPENGL_INDEXED_COLOR_MAP* OPENGL_INDEXED_COLOR_MAP::
 Levelset_Multiple_Color_Map()
 {
     OPENGL_INDEXED_COLOR_MAP* map=new OPENGL_INDEXED_COLOR_MAP;
-    map->Set_Color(1,OPENGL_COLOR::Red(0.6));
-    map->Set_Color(2,OPENGL_COLOR::Green(0.6));
-    map->Set_Color(3,OPENGL_COLOR::Blue(0.6));
-    map->Set_Color(4,OPENGL_COLOR::Magenta(0.6));
-    map->Set_Color(5,OPENGL_COLOR::Cyan(0.6));
-    map->Set_Color(6,OPENGL_COLOR::Gray(0.25));
-    map->Set_Color(7,OPENGL_COLOR::Gray(0.75));
-    map->Set_Color(8,OPENGL_COLOR::Yellow(0.6));
+    map->Set_Color(0,OPENGL_COLOR::Red(0.6));
+    map->Set_Color(1,OPENGL_COLOR::Green(0.6));
+    map->Set_Color(2,OPENGL_COLOR::Blue(0.6));
+    map->Set_Color(3,OPENGL_COLOR::Magenta(0.6));
+    map->Set_Color(4,OPENGL_COLOR::Cyan(0.6));
+    map->Set_Color(5,OPENGL_COLOR::Gray(0.25));
+    map->Set_Color(6,OPENGL_COLOR::Gray(0.75));
+    map->Set_Color(7,OPENGL_COLOR::Yellow(0.6));
     return map;
 }
 OPENGL_INDEXED_COLOR_MAP* OPENGL_INDEXED_COLOR_MAP::
 Particle_Multiple_Color_Map()
 {
     OPENGL_INDEXED_COLOR_MAP* map=Levelset_Multiple_Color_Map();
-    for(int i=map->color_map.domain.min_corner.x;i<map->color_map.domain.max_corner.x;i++){for(int j=0;j<=2;j++) map->color_map(i).rgba[j]+=.35;map->color_map(i).rgba[3]=1;}
+    for(int i=0;i<map->color_map.m;i++){for(int j=0;j<3;j++) map->color_map(i).rgba[j]+=.35;map->color_map(i).rgba[3]=1;}
     return map;
 }
 OPENGL_INDEXED_COLOR_MAP* OPENGL_INDEXED_COLOR_MAP::
@@ -86,6 +89,6 @@ OPENGL_INDEXED_COLOR_MAP* OPENGL_INDEXED_COLOR_MAP::
 Rigid_Body_Back_Color_Map()
 {
     OPENGL_INDEXED_COLOR_MAP* map=Rigid_Body_Color_Map();
-    for(int i=map->color_map.domain.min_corner.x;i<map->color_map.domain.max_corner.x;i++){for(int j=0;j<=2;j++) map->color_map(i).rgba[j]+=.35;map->color_map(i).rgba[3]=1;}
+    for(int i=0;i<map->color_map.m;i++){for(int j=0;j<3;j++) map->color_map(i).rgba[j]+=.35;map->color_map(i).rgba[3]=1;}
     return map;
 }

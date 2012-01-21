@@ -85,7 +85,7 @@ public:
     {REGISTRY& registry=Singleton();
     T_NAME name=T_OBJECT::Static_Name();std::string extension=T_OBJECT::Static_Extension();
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
-    //LOG::cout<<"Registering "<<name<<" to extension "<<extension<<std::endl;
+    LOG::cout<<"Registering '"<<name<<"' to extension '"<<extension<<"'"<<std::endl;
 #endif
 
     FACTORY_BASE<T_BASE_OBJECT>* factory=new FACTORY<T_OBJECT,T_BASE_OBJECT>();
@@ -100,7 +100,7 @@ public:
     FACTORY_BASE<T_BASE_OBJECT>* factory;
     if(!registry.name_registry.Get(name,factory)){
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
-        LOG::cerr<<name<<" is not a registered object name.\nRegisted names are "<<registry.name_registry<<std::endl;
+        LOG::cerr<<"'"<<name<<"' is not a registered object name.\nRegisted names are "<<registry.name_registry<<std::endl;
 #endif
         PHYSBAM_FATAL_ERROR();}
     return factory;}
@@ -110,7 +110,7 @@ public:
     FACTORY_BASE<T_BASE_OBJECT>* factory;
     if(!registry.extension_registry.Get(extension,factory)){
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
-        LOG::cerr<<extension<<" is not a registered object extension.\nRegisted extensions are "<<registry.extension_registry<<std::endl;
+        LOG::cerr<<"'"<<extension<<"' is not a registered object extension.\nRegisted extensions are "<<registry.extension_registry<<std::endl;
 #endif
         PHYSBAM_FATAL_ERROR();}
     return factory;}

@@ -37,11 +37,11 @@ public:
     }
 
     HASHTABLE_ITERATOR(T_HASHTABLE& hashtable,INVALID_ENUM)
-        :hashtable(hashtable),current_h(0)
+        :hashtable(hashtable),current_h(-1)
     {}
 
     void Reset()
-    {for(current_h=0;current_h<hashtable.table.m;current_h++) if(hashtable.table(current_h).state==ENTRY_ACTIVE) return;current_h=0;}
+    {for(current_h=0;current_h<hashtable.table.m;current_h++) if(hashtable.table(current_h).state==ENTRY_ACTIVE) return;current_h=-1;}
 
     const TK& Key() const
     {return hashtable.table(current_h).key;}
@@ -53,11 +53,11 @@ public:
     {return hashtable.table(current_h).data;}
 
     bool Valid() const
-    {return current_h!=0;}
+    {return current_h!=-1;}
 
     void Next()
     {assert(Valid());current_h++;
-    for(;current_h<=hashtable.table.m;current_h++) if(hashtable.table(current_h).state==ENTRY_ACTIVE) return;current_h=0;}
+    for(;current_h<hashtable.table.m;current_h++) if(hashtable.table(current_h).state==ENTRY_ACTIVE) return;current_h=-1;}
 
 //#####################################################################
 };

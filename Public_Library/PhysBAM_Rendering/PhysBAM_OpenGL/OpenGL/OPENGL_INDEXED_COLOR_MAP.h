@@ -17,7 +17,7 @@ class OPENGL_INDEXED_COLOR_MAP:public OPENGL_COLOR_MAP<int>
 public:
     enum INDEX_MODE {PERIODIC,CLAMP};
     INDEX_MODE index_mode;
-    ARRAY<OPENGL_COLOR,VECTOR<int,1> > color_map;
+    ARRAY<OPENGL_COLOR> color_map;
 
     OPENGL_INDEXED_COLOR_MAP();
     virtual ~OPENGL_INDEXED_COLOR_MAP();
@@ -26,7 +26,7 @@ public:
     {index_mode=index_mode_input;}
 
     void Set_Color(int index, const OPENGL_COLOR &color)
-    {color_map.Resize(RANGE<VECTOR<int,1> >(min(color_map.domain.min_corner.x,index),max(color_map.domain.max_corner.x,index)));color_map(index)=color;}
+    {if(index>=color_map.m) color_map.Resize(index+1);color_map(index)=color;}
 
     OPENGL_COLOR Lookup(int index) const PHYSBAM_OVERRIDE;
     static OPENGL_INDEXED_COLOR_MAP* Basic_16_Color_Map();
