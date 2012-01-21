@@ -30,7 +30,7 @@ Lookup(T x) const
 template<class T> void OPENGL_COLOR_RAMP<T>::
 Add_Color(T x,const OPENGL_COLOR& less_color,const OPENGL_COLOR& exact_color,const OPENGL_COLOR& greater_color)
 {
-    assert(color_x.m==0||x>color_x(color_x.m));
+    assert(color_x.m==0||x>color_x.Last());
     color_x.Append(x);
     less_colors.Append(less_color);
     equal_colors.Append(exact_color);

@@ -58,12 +58,12 @@ template<class TV> void MUSCLE<TV>::
 Initialize(ARRAY<T_MUSCLE_SEGMENT_DATA>& segment_data)
 {
     assert(segment_data.m==via_points.m+1);
-    if(!via_points.m) muscle_segments.Append(Create_Muscle_Segment(attachment_point_1,attachment_point_2,segment_data(1).x,segment_data(1).y,segment_data(1).z));
+    if(!via_points.m) muscle_segments.Append(Create_Muscle_Segment(attachment_point_1,attachment_point_2,segment_data(0).x,segment_data(0).y,segment_data(0).z));
     else{
-        muscle_segments.Append(Create_Muscle_Segment(attachment_point_1,via_points(1),segment_data(1).x,segment_data(1).y,segment_data(1).z));
+        muscle_segments.Append(Create_Muscle_Segment(attachment_point_1,via_points(0),segment_data(0).x,segment_data(0).y,segment_data(0).z));
         for(int i=1;i<via_points.m;i++){muscle_segments.Append(Create_Muscle_Segment(via_points(i),via_points(i+1),
             segment_data(i+1).x,segment_data(i+1).y,segment_data(i+1).z));}
-        muscle_segments.Append(Create_Muscle_Segment(via_points(via_points.m),attachment_point_2,segment_data(via_points.m+1).x,segment_data(via_points.m+1).y,segment_data(via_points.m+1).z));}
+        muscle_segments.Append(Create_Muscle_Segment(via_points.Last(),attachment_point_2,segment_data(via_points.m+1).x,segment_data(via_points.m+1).y,segment_data(via_points.m+1).z));}
     for(int i=0;i<muscle_segments.m;i++){muscle_segments(i)->Initialize();}
 }
 //#####################################################################
@@ -76,13 +76,13 @@ Create_Muscle_Segment(ATTACHMENT_POINT<TV>* point_1,ATTACHMENT_POINT<TV>* point_
     MUSCLE_SEGMENT<TV>* muscle_segment_to_return;
     switch(segment_type){
       case MUSCLE_SEGMENT<TV>::NUM_MUSCLE_SEGMENT_TYPE: 
-        muscle_segment_to_return=new ANALYTIC_SURFACE_MUSCLE_SEGMENT<T>(curve_type,point_1,point_2,parameters(1),parameters(2),parameters(3),parameters(4),
-            parameters(5));break;
+        muscle_segment_to_return=new ANALYTIC_SURFACE_MUSCLE_SEGMENT<T>(curve_type,point_1,point_2,parameters(0),parameters(1),parameters(2),parameters(3),
+            parameters(4));break;
       case MUSCLE_SEGMENT<TV>::LINEAR_SEGMENT: 
         muscle_segment_to_return=new MUSCLE_SEGMENT<TV>(point_1,point_2);break;
       case MUSCLE_SEGMENT<TV>::ANALYTIC_SURFACE_SEGMENT: default: 
-        muscle_segment_to_return=new ANALYTIC_SURFACE_MUSCLE_SEGMENT<T>(curve_type,point_1,point_2,parameters(1),parameters(2),parameters(3),parameters(4),
-            parameters(5));break;}
+        muscle_segment_to_return=new ANALYTIC_SURFACE_MUSCLE_SEGMENT<T>(curve_type,point_1,point_2,parameters(0),parameters(1),parameters(2),parameters(3),
+            parameters(4));break;}
     return muscle_segment_to_return;
 }
 //#####################################################################
@@ -92,9 +92,9 @@ template<class TV> typename TV::SCALAR MUSCLE<TV>::
 Total_Length() const
 {
     if(!via_points.m) return (attachment_point_2->Embedded_Position()-attachment_point_1->Embedded_Position()).Magnitude();
-    T length=(via_points(1)->Embedded_Position()-attachment_point_1->Embedded_Position()).Magnitude();
+    T length=(via_points(0)->Embedded_Position()-attachment_point_1->Embedded_Position()).Magnitude();
     for(int i=2;i<=via_points.m;i++) length+=(via_points(i)->Embedded_Position()-via_points(i-1)->Embedded_Position()).Magnitude();
-    length+=(attachment_point_2->Embedded_Position()-via_points(via_points.m)->Embedded_Position()).Magnitude(); 
+    length+=(attachment_point_2->Embedded_Position()-via_points.Last()->Embedded_Position()).Magnitude(); 
     return length;
 }
 //#####################################################################
@@ -166,13 +166,13 @@ Apply_Fixed_Impulse_At_All_Points(const T impulse)
         TV F=impulse*(attachment_point_2->Embedded_Position()-attachment_point_1->Embedded_Position()).Normalized();
         attachment_point_1->Apply_Impulse(F);attachment_point_2->Apply_Impulse(-F);}
     else{
-        TV F=impulse*(via_points(1)->Embedded_Position()-attachment_point_1->Embedded_Position()).Normalized();
-        attachment_point_1->Apply_Impulse(F);via_points(1)->Apply_Impulse(-F);
+        TV F=impulse*(via_points(0)->Embedded_Position()-attachment_point_1->Embedded_Position()).Normalized();
+        attachment_point_1->Apply_Impulse(F);via_points(0)->Apply_Impulse(-F);
         for(int i=0;i<via_points.m-1;i++){
             F=impulse*(via_points(i+1)->Embedded_Position()-via_points(i)->Embedded_Position()).Normalized();
             via_points(i)->Apply_Impulse(F);via_points(i+1)->Apply_Impulse(-F);}
-        F=impulse*(attachment_point_2->Embedded_Position()-via_points(via_points.m)->Embedded_Position()).Normalized();
-        via_points(via_points.m)->Apply_Impulse(F);attachment_point_2->Apply_Impulse(-F);}
+        F=impulse*(attachment_point_2->Embedded_Position()-via_points.Last()->Embedded_Position()).Normalized();
+        via_points.Last()->Apply_Impulse(F);attachment_point_2->Apply_Impulse(-F);}
 }
 //#####################################################################
 // Function Read_Constrained_Point
@@ -198,11 +198,11 @@ Read(TYPED_ISTREAM& input_stream,RIGID_BODY_COLLECTION<TV>& rigid_body_collectio
     for(int i=0;i<via_points.m;i++) via_points(i)=Read_Constrained_Point(input_stream,rigid_body_collection);
     int num_muscle_segments;Read_Binary(input_stream,num_muscle_segments);muscle_segments.Resize(num_muscle_segments);
     for(int i=0;i<muscle_segments.m;i++) muscle_segments(i)=MUSCLE_SEGMENT<TV>::Create_From_Input(input_stream);
-    if(!via_points.m){muscle_segments(1)->point_1=attachment_point_1;
-    muscle_segments(1)->point_2=attachment_point_2;}
-    else{muscle_segments(1)->point_1=attachment_point_1;muscle_segments(1)->point_2=via_points(1);
+    if(!via_points.m){muscle_segments(0)->point_1=attachment_point_1;
+    muscle_segments(0)->point_2=attachment_point_2;}
+    else{muscle_segments(0)->point_1=attachment_point_1;muscle_segments(0)->point_2=via_points(0);
         for(int i=1;i<via_points.m;i++){muscle_segments(i+1)->point_1=via_points(i);muscle_segments(i+1)->point_2=via_points(i+1);}
-        muscle_segments(muscle_segments.m)->point_1=via_points(via_points.m);muscle_segments(muscle_segments.m)->point_2=attachment_point_2;}
+        muscle_segments.Last()->point_1=via_points(via_points.m);muscle_segments(muscle_segments.m)->point_2=attachment_point_2;}
 }
 //#####################################################################
 // Function Write

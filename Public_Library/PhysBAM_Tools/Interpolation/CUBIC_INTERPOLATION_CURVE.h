@@ -67,15 +67,15 @@ public:
     if(control_points.m<=1) return;T2 r,s=T2();T u=T(),v=T();ARRAY<T> h(control_points.m),h_inv(control_points.m),g(control_points.m);
     for(int i=1;i<control_points.m;i++){const CONTROL_POINT &pt=control_points(i),&ptp1=control_points(i+1);
         h(i)=ptp1.t-pt.t;h_inv(i)=1/h(i);r=(ptp1.x-pt.x)*h_inv(i);pt.c=r-s;s=r;}
-    r=s=control_points(1).c=control_points(control_points.m).c=T2();
+    r=s=control_points(1).c=control_points.Last().c=T2();
     for(int i=2;i<control_points.m;i++){const CONTROL_POINT &ptm1=control_points(i-1),&pt=control_points(i),&ptp1=control_points(i+1);
         pt.c+=u*ptm1.c;g(i)=1/((ptm1.t-ptp1.t)*2-u*v);v=h(i);u=v*g(i);}
     for(int i=control_points.m-1;i>1;i--){const CONTROL_POINT &pt=control_points(i),&ptp1=control_points(i+1);
         pt.c=(h(i)*ptp1.c-pt.c)*g(i);}
     for(int i=1;i<control_points.m;i++){const CONTROL_POINT &pt=control_points(i),&ptp1=control_points(i+1);
         pt.b=(ptp1.x-pt.x)*h_inv(i)-(pt.c*2+ptp1.c)*h(i);pt.d=(ptp1.c-pt.c)*h_inv(i);pt.c*=3;}
-    const CONTROL_POINT &pt=control_points(control_points.m),&ptm1=control_points(control_points.m-1);
-    pt.b=(ptm1.d*(3*h(control_points.m-1))+ptm1.c*2)*h(control_points.m-1)+ptm1.b;
+    const CONTROL_POINT &pt=control_points.Last(),&ptm1=control_points(control_points.m-2);
+    pt.b=(ptm1.d*(3*h(control_points.m-2))+ptm1.c*2)*h(control_points.m-2)+ptm1.b;
 }
 //#####################################################################
 };

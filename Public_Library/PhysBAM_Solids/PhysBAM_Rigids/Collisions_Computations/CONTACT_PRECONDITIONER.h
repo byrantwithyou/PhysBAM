@@ -247,7 +247,6 @@ public:
                 fine_to_coarse_bodies_map(id0)=bodies.m;
                 fine_to_coarse_bodies_map(id1)=bodies.m;
                 merged=true;
-//    LOG::cout << "body inertia " << bodies(bodies.m).mass.mass << std::endl;
             }
         }
         for(int i=0;i<fine_bodies.m;i++)

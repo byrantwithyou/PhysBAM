@@ -65,7 +65,7 @@ public:
     for(int i=0;i<shaders.m-1;i++){
         if(r<=weights(i)){shaders(i)->Receive_Photon(ray,exiting_object,entering_object,intersection_object,intersection_point,same_side_normal,power,type,diffuse_bounces,specular_bounces);return;}
         else r-=weights(i);}
-    shaders(shaders.m)->Receive_Photon(ray,exiting_object,entering_object,intersection_object,intersection_point,same_side_normal,power,type,diffuse_bounces,specular_bounces);}
+    shaders.Last()->Receive_Photon(ray,exiting_object,entering_object,intersection_object,intersection_point,same_side_normal,power,type,diffuse_bounces,specular_bounces);}
 
 //#####################################################################
 };

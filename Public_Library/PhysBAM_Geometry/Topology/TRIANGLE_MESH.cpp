@@ -322,7 +322,7 @@ Non_Manifold_Nodes(ARRAY<int>& node_list)
             ordered_neighbors.Append((*neighbor_nodes)(i)(0));
             bool found_neighbor=true;
             while(found_neighbor){found_neighbor=false;
-                int k=ordered_neighbors(ordered_neighbors.m); // looking for a new neighbor of node k
+                int k=ordered_neighbors.Last(); // looking for a new neighbor of node k
                 for(int j=0;j<(*incident_elements)(i).m;j++){
                     int a,b,c;elements((*incident_elements)(i)(j)).Get(a,b,c);
                     if(a == k || b == k || c == k){int index;

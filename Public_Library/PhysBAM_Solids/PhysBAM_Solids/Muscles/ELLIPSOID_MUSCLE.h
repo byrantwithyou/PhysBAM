@@ -45,7 +45,7 @@ public:
         else{
             ellipsoid_list(0)->center=(attachment_point_1->Position()+via_points(0)->Position())/2.0;
             for(int i=1;i<via_points.m;i++)ellipsoid_list(i+1)->center=(via_points(i)->Position()+via_points(i+1)->Position())/2.0;
-            ellipsoid_list(ellipsoid_list.m)->center=(via_points(via_points.m)->Position()+attachment_point_2->Position())/2.0;}
+            ellipsoid_list.Last()->center=(via_points(via_points.m)->Position()+attachment_point_2->Position())/2.0;}
 
         T radius_x,radius_yz;
         if(!via_points.m){
@@ -60,7 +60,7 @@ public:
                 radius_x=((via_points(i)->Position()-via_points(i+1)->Position()).Magnitude())/2.0;
                 radius_yz=sqrt(three_fourths_div_pi*volume_list(i+1)*(1/radius_x));
                 ellipsoid_list(i+1)->radii=DIAGONAL_MATRIX<T,3>(radius_x,radius_yz,radius_yz);}
-            radius_x=((via_points(via_points.m)->Position()-attachment_point_2->Position()).Magnitude())/2.0;
+            radius_x=((via_points.Last()->Position()-attachment_point_2->Position()).Magnitude())/2.0;
             radius_yz=sqrt(three_fourths_div_pi*volume_list(via_points.m+1)*(1/radius_x));
             ellipsoid_list(via_points.m+1)->radii=DIAGONAL_MATRIX<T,3>(radius_x,radius_yz,radius_yz);}
     }
@@ -74,7 +74,7 @@ public:
         else{
             orientations(0)=ROTATION<TV>::Rotation_Quaternion(rotation_vector,attachment_point_1->Position()-via_points(0)->Position());
             for(int i=1;i<via_points.m;i++)orientations(i+1)=ROTATION<TV>::Rotation_Quaternion(rotation_vector,via_points(i)->Position()-via_points(i+1)->Position());
-            orientations(via_points.m+1)=ROTATION<TV>::Rotation_Quaternion(rotation_vector,via_points(via_points.m)->Position()-attachment_point_2->Position());}
+            orientations(via_points.m+1)=ROTATION<TV>::Rotation_Quaternion(rotation_vector,via_points.Last()->Position()-attachment_point_2->Position());}
         return orientations;
     }
 
@@ -135,11 +135,11 @@ public:
         else{
             radius_x=((attachment_point_1->Position()-via_points(0)->Position()).Magnitude())/2.0;
             volume_list(0)=four_thirds_pi_times_shorter_radii_squared*radius_x;
-            for(int i=1;i<via_points.m;i++){
+            for(int i=0;i<via_points.m-1;i++){
                 radius_x=((via_points(i)->Position()-via_points(i+1)->Position()).Magnitude())/2.0;
                 volume_list(i+1)=four_thirds_pi_times_shorter_radii_squared*radius_x;}
 
-            radius_x=((via_points(via_points.m)->Position()-attachment_point_2->Position()).Magnitude())/2.0;
+            radius_x=((via_points.Last()->Position()-attachment_point_2->Position()).Magnitude())/2.0;
             volume_list(via_points.m+1)=four_thirds_pi_times_shorter_radii_squared*radius_x;}
     }
 

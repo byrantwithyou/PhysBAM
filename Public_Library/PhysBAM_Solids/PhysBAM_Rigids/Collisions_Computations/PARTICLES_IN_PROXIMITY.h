@@ -89,8 +89,8 @@ ARRAY<int> Convex_Hull(ARRAY<VECTOR<T,2> >& points)
         }
         else
         {
-            TV last_direction_perpendicular=(points(hull(hull.m))-points(hull(hull.m-1))).Perpendicular();
-            TV direction=points(angles(i).y)-points(hull(hull.m-1));
+            TV last_direction_perpendicular=(points(hull.Last())-points(hull(hull.m-2))).Perpendicular();
+            TV direction=points(angles(i).y)-points(hull(hull.m-2));
             if(TV::Dot_Product(last_direction_perpendicular,direction)>0)
             {
                 hull.Append(angles(i).y);

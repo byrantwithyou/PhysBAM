@@ -260,8 +260,8 @@ Append_Bind_Key(const OPENGL_KEY& key,OPENGL_CALLBACK* callback)
     key_bindings(key.Index()).Append(callback);
     int index;
     for(index=0;index<key_bindings_by_category.m;index++) if(key_bindings_by_category(index).name==current_key_binding_category) break;
-    if(index>key_bindings_by_category.m){ // Insert in location dependent on priority
-        index=1;while (index<=key_bindings_by_category.m && key_bindings_by_category(index).priority<=current_key_binding_category_priority) index++;
+    if(index>=key_bindings_by_category.m){ // Insert in location dependent on priority
+        for(index=0;index<key_bindings_by_category.m && key_bindings_by_category(index).priority<=current_key_binding_category_priority;index++){}
         key_bindings_by_category.Insert(OPENGL_KEY_BINDING_CATEGORY(current_key_binding_category,current_key_binding_category_priority),index);}
     key_bindings_by_category(index).key_bindings.Append(PAIR<OPENGL_KEY,OPENGL_CALLBACK*>(key,callback));
 }

@@ -32,7 +32,7 @@ bool FLOOD_FILL_GRAPH::
 Find_Uncolored_Node(const GRAPH& graph,const ARRAY<int>& colors,ARRAY<int>& uncolored_nodes,int& seed_node)
 {
     while(uncolored_nodes.m>0){
-        int i=uncolored_nodes(uncolored_nodes.m);
+        int i=uncolored_nodes.Last();
         if(graph.valid_nodes(i)&&colors(i)==0){seed_node=i;return true;}
         else uncolored_nodes.Remove_Index_Lazy(uncolored_nodes.m);}
     return false;

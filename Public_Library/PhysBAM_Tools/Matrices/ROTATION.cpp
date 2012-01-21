@@ -216,7 +216,7 @@ Average_Rotation(const ARRAY<ROTATION<TV> >& rotations)
 {
     if(rotations.m==0) return ROTATION<TV>();ARRAY<ROTATION<TV> > r(rotations);
     for(int i=1;i<r.m;i+=2) r.Append(Spherical_Linear_Interpolation(r(i),r(i+1),(T).5));
-    return r(r.m);
+    return r.Last();
 }
 //#####################################################################
 // Function From_Rotated_Vector

@@ -113,6 +113,6 @@ void OPENGL_KEY::Parse_Key_Sequence(const std::string& key_string,ARRAY<OPENGL_K
     unsigned int i=0;
     while(i<key_string.length()){
         key_list.Append(From_String(key_string,i));
-        if(key_list(key_list.m).key==OPENGL_KEY::UNKNOWN){LOG::cerr << "Unknown key sequence reached at index " << i << " of '" << key_string << "'" << std::endl;break;}}
+        if(key_list.Last().key==OPENGL_KEY::UNKNOWN){LOG::cerr << "Unknown key sequence reached at index " << i << " of '" << key_string << "'" << std::endl;break;}}
 }
 //#####################################################################

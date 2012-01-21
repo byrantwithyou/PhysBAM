@@ -669,16 +669,16 @@ Add_To_Rigid_Lists(ARRAY<ARRAY<int> >& rigid_lists,ARRAY<int>& list_index,const 
     // TODO: make this into union find...
 
     // make a new list and add the new nodes
-    rigid_lists.Resize(rigid_lists.m+1);rigid_lists(rigid_lists.m)=nodes;
+    rigid_lists.Resize(rigid_lists.m+1);rigid_lists.Last()=nodes;
 
     // figure out which list it should be combined with
-    int add_list=rigid_lists.m;for(int i=0;i<nodes.m;i++){int j=list_index(rigid_lists(rigid_lists.m)(i));if(j) add_list=min(add_list,j);}
+    int add_list=rigid_lists.m;for(int i=0;i<nodes.m;i++){int j=list_index(rigid_lists.Last()(i));if(j) add_list=min(add_list,j);}
 
     // set up a new list or combine with another
-    if(add_list == rigid_lists.m) for(int i=0;i<nodes.m;i++) list_index(rigid_lists(rigid_lists.m)(i))=rigid_lists.m; // label as a new list
+    if(add_list == rigid_lists.m) for(int i=0;i<nodes.m;i++) list_index(rigid_lists.Last()(i))=rigid_lists.m; // label as a new list
     else{ // combine with a pre-existing list
         for(int i=0;i<nodes.m;i++){
-            int node=rigid_lists(rigid_lists.m)(i),current_list=list_index(node);
+            int node=rigid_lists.Last()(i),current_list=list_index(node);
             if(!current_list){rigid_lists(add_list).Append(node);list_index(node)=add_list;} // add to the add_list
             else if(current_list != add_list){ // not already in the add_list, but in another list - combine current_list with the add_list
                 int new_nodes=rigid_lists(current_list).m;rigid_lists(add_list).Resize(rigid_lists(add_list).m+new_nodes);

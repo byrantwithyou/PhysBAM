@@ -85,11 +85,11 @@ protected:
     T* base_pointer;
 
     ARRAYS_ND_BASE()
-        :domain(TV_INT::All_Ones_Vector(),TV_INT()),array(0,0),base_pointer(0)
+        :domain(TV_INT::Empty_Box(),TV_INT()),array(0,0),base_pointer(0)
     {}
 
     ARRAYS_ND_BASE(const RANGE<TV_INT>& domain_input)
-        :domain(domain_input),counts(domain.Edge_Lengths()+1),array(0,0),base_pointer(0)
+        :domain(domain_input),counts(domain.Edge_Lengths()),array(0,0),base_pointer(0)
     {}
 
 public:

@@ -382,7 +382,7 @@ Print_Deformation_Statistics() const
         T length=(particles.X(i)-particles.X(j)).Magnitude(),rl=visual_restlength(s);
         deformation(s)=rl?abs(length-rl)/rl:length==0?0:FLT_MAX;}
     Sort(deformation);
-    LOG::Stat("maximum deformation",deformation(deformation.m));
+    LOG::Stat("maximum deformation",deformation.Last());
     LOG::Stat("one percent deformation",deformation((int)(.99*deformation.m)+1));
     LOG::Stat("ten percent deformation",deformation((int)(.9*deformation.m)+1));
     LOG::Stat("twenty percent deformation",deformation((int)(.8*deformation.m)+1));
