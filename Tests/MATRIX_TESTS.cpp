@@ -57,8 +57,8 @@ public:
 
     TEST_RESULT Run_Test(int n) PHYSBAM_OVERRIDE
     {switch(n){
-            case 1:if(Dynamic_Tests(6,20)) return success;return failure;
-            case 2:if(TEST_GENERATOR<T,1,6,6*6*6-1>(*this,20).v) return success;return failure;}
+            case 0:if(Dynamic_Tests(6,20)) return success;return failure;
+            case 1:if(TEST_GENERATOR<T,1,6,6*6*6-1>(*this,20).v) return success;return failure;}
     return failure;}
 
     int Number_Of_Tests() const PHYSBAM_OVERRIDE
