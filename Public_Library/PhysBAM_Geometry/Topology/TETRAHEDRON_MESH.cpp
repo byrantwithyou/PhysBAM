@@ -517,10 +517,10 @@ Initialize_Bending_Tetrahedrons(TRIANGLE_MESH& triangle_mesh)
             int s=(*triangle_mesh.adjacent_elements)(t)(a);
             if(s>t){
                 const VECTOR<int,3>& other_nodes=triangle_mesh.elements(s);
-                if(other_nodes.Contains(nodes[1])){
-                    cyclic_shift(nodes[1],nodes[2],nodes[3]);
-                    if(other_nodes.Contains(nodes[1])) cyclic_shift(nodes[1],nodes[2],nodes[3]);}
-                elements.Append(VECTOR<int,4>(nodes[1],nodes[2],nodes[3],triangle_mesh.Other_Node(nodes[2],nodes[3],s)));}}}
+                if(other_nodes.Contains(nodes[0])){
+                    cyclic_shift(nodes[0],nodes[1],nodes[2]);
+                    if(other_nodes.Contains(nodes[0])) cyclic_shift(nodes[0],nodes[1],nodes[2]);}
+                elements.Append(VECTOR<int,4>(nodes[0],nodes[1],nodes[2],triangle_mesh.Other_Node(nodes[1],nodes[2],s)));}}}
 }
 //#####################################################################
 // Function Mark_Face_Connected_Component_Incident_On_A_Node

@@ -170,11 +170,11 @@ template<class T> struct FLUID_TO_SOLID_INTERPOLATION_CUT_DISPATCH<VECTOR<T,2> >
             if(use_cut_volume)
             switch(count){
                 case 0:
-                    cc.inside_volume=dx*dx-(T).5*abs(edges(1)(1)-edges(1)(2))*abs(edges(2)(1)-edges(2)(2));
+                    cc.inside_volume=dx*dx-(T).5*abs(edges(0)(0)-edges(0)(1))*abs(edges(1)(0)-edges(1)(1));
                     break;
                 case 1:
                 case 2:
-                    cc.inside_volume=(T).5*(edges(1)(1)+edges(1)(2))*(edges(2)(1)+edges(2)(2));
+                    cc.inside_volume=(T).5*(edges(0)(0)+edges(0)(1))*(edges(1)(0)+edges(1)(1));
                     break;
                 default:
                     PHYSBAM_FATAL_ERROR("Invalid cut cell!");
