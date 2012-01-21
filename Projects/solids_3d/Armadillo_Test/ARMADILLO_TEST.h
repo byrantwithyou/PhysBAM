@@ -62,7 +62,7 @@ void Get_Initial_Data()
     LEVELSET_MAKER_UNIFORM<T> levelset_maker;
     TRIANGULATED_SURFACE<T>& surface=tests.Create_Triangulated_Object(STRING_UTILITIES::string_sprintf("%s/Triangulated_Surfaces/armadillo_original_400k.tri",data_directory.c_str()),
         RIGID_BODY_STATE<TV>(FRAME<TV>(VECTOR<T,3>(0,(T).6,0))),false,false,(T).01);
-    surface.Update_Bounding_Box();BOX<TV> box=*surface.bounding_box;int size_x=20;
+    surface.Update_Bounding_Box();RANGE<TV> box=*surface.bounding_box;int size_x=20;
     TV lengths=box.Edge_Lengths();TV aspect=lengths/lengths.x;
     VECTOR<int,3> M((T)size_x*aspect);GRID<TV> grid(M.x,M.y,M.z,box);GRID<TV> implicit_grid((VECTOR<int,3>((T)50*aspect)),box);
 

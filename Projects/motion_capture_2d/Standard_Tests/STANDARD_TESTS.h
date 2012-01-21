@@ -275,7 +275,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         if(FILE_UTILITIES::File_Exists(data_directory+STRING_UTILITIES::string_sprintf("/joint_levelset_%d.tet",test_number)))
             FILE_UTILITIES::Read_From_File(stream_type,data_directory+STRING_UTILITIES::string_sprintf("/joint_levelset_%d.tet",test_number),volume);
         else{
-            BOX<TV> grid_domain;
+            RANGE<TV> grid_domain;
             for(int id(1);id<=solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size();id++) grid_domain.Enlarge_To_Include_Box(solid_body_collection.rigid_body_collection.Rigid_Body(id).implicit_object->Box());
             GRID<TV> new_grid((T).02,grid_domain);
             ARRAY<T,VECTOR<int,3> > new_phi(new_grid);new_phi.Fill(FLT_MAX);

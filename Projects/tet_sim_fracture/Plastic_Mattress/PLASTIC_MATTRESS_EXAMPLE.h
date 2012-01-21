@@ -39,7 +39,7 @@ public:
 
     PLASTIC_MATTRESS_EXAMPLE(const STREAM_TYPE stream_type)
         :BASE(stream_type),initial_height((T)1.2),initial_orientation(1,TV(1,1,1)),initial_velocity(0,0,0),initial_angular_velocity(0,0,0),
-        mattress_grid(2,2,2,BOX<TV>(-.5,.5,-.5,.5,-.5,.5)),cube_mesh(true)
+        mattress_grid(2,2,2,RANGE<TV>(-.5,.5,-.5,.5,-.5,.5)),cube_mesh(true)
     {
         last_frame=240;
         output_directory="Plastic_Mattress/output";

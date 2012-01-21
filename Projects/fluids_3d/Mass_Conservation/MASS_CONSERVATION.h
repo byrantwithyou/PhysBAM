@@ -44,7 +44,7 @@ public:
     using BASE::test_number;using BASE::resolution;
 
     SPHERE<TV> source,other_source;
-    BOX<TV> box;
+    RANGE<TV> box;
     MATRIX<T,4> world_to_source;
     TV source_velocity;
     T_FACE_ARRAYS_SCALAR velocity;
@@ -140,8 +140,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
     if(test_number==1 || test_number==2){
         fluids_parameters.analytic_test=true;
         initial_water_level=-1; // no initial height
-        box=BOX<TV>((T).4,(T).6,(T).4,(T).6,(T).4,(T).6);
-        fluids_parameters.grid->Initialize(10*resolution+1,10*resolution+1,10*resolution+1,BOX<TV>::Unit_Box());}
+        box=RANGE<TV>((T).4,(T).6,(T).4,(T).6,(T).4,(T).6);
+        fluids_parameters.grid->Initialize(10*resolution+1,10*resolution+1,10*resolution+1,RANGE<TV>::Unit_Box());}
     else if(test_number==3){
         final_time=628;frame_rate=(T).5;
         zalesak_center=TV(50,75,50);
@@ -154,7 +154,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         fluids_parameters.grid->Initialize(10*resolution+1,10*resolution+1,10*resolution+1,0,100,0,100,0,100);}
     else if(test_number==5){
         fluids_parameters.particle_levelset_evolution->Use_Frozen_Velocity(false);
-        fluids_parameters.grid->Initialize((1<<resolution)+1,(1<<resolution)+1,(1<<resolution)+1,BOX<TV>::Unit_Box());
+        fluids_parameters.grid->Initialize((1<<resolution)+1,(1<<resolution)+1,(1<<resolution)+1,RANGE<TV>::Unit_Box());
         initial_water_level=-1;
         fluids_parameters.cfl=(T).5;
         last_frame=100;
@@ -162,7 +162,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         source=SPHERE<TV>(TV((T).5,(T).75,(T).5),(T).15);}
     else if(test_number==6){
         period=final_time=3;
-        fluids_parameters.grid->Initialize((1<<resolution)+1,(1<<resolution)+1,(1<<resolution)+1,BOX<TV>::Unit_Box());
+        fluids_parameters.grid->Initialize((1<<resolution)+1,(1<<resolution)+1,(1<<resolution)+1,RANGE<TV>::Unit_Box());
         initial_water_level=-1;
         fluids_parameters.cfl=(T).5;
         last_frame=100;
@@ -177,14 +177,14 @@ void Parse_Options() PHYSBAM_OVERRIDE
         fluids_parameters.surface_tension=(T)5e-6;}
     else if(test_number==8){
         frame_rate=100;
-        fluids_parameters.grid->Initialize(10*resolution+1,10*resolution+1,10*resolution+1,BOX<TV>::Unit_Box());
+        fluids_parameters.grid->Initialize(10*resolution+1,10*resolution+1,10*resolution+1,RANGE<TV>::Unit_Box());
         fluids_parameters.gravity=0;
         source=SPHERE<TV>(TV((T).1,(T).5,(T).5),(T).08);
         other_source=SPHERE<TV>(TV((T).9,(T).5,(T).5),(T).08);
         source_velocity=TV((T)2,(T)0,(T)0);
         initial_water_level=-1;}
     else if(test_number==9){
-        fluids_parameters.grid->Initialize(10*resolution+1,10*resolution+1,10*resolution+1,BOX<TV>::Unit_Box());
+        fluids_parameters.grid->Initialize(10*resolution+1,10*resolution+1,10*resolution+1,RANGE<TV>::Unit_Box());
         fluids_parameters.gravity=0;
         fluids_parameters.surface_tension=(T)1e-5;}
 
@@ -238,7 +238,7 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
             fluids_parameters.particle_levelset_evolution->phi(iterator.Cell_Index())=box.Signed_Distance(location);}}
     else if(test_number==3 || test_number==4){
         T radius=15,slot_width=5,slot_depth=(T)12.5;
-        BOX<TV> rect(zalesak_center.x-slot_width/2,zalesak_center.x+slot_width/2,0,zalesak_center.y-radius+slot_depth,0,zalesak_center.y-radius+slot_depth);
+        RANGE<TV> rect(zalesak_center.x-slot_width/2,zalesak_center.x+slot_width/2,0,zalesak_center.y-radius+slot_depth,0,zalesak_center.y-radius+slot_depth);
         for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
             TV location=iterator.Location();
             fluids_parameters.particle_levelset_evolution->phi(iterator.Cell_Index())=max((location-zalesak_center).Magnitude()-radius,-rect.Signed_Distance(location));}}
@@ -266,7 +266,7 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
         T radius_min=(T).02,radius_max=(T).03;
         ARRAY<SPHERE<TV> > sources(drops);
         ARRAY<TV> velocities(drops);
-        BOX<TV> velocity_box(-(T).2,(T).2,-(T).2,(T).2,-(T).2,(T).2);
+        RANGE<TV> velocity_box(-(T).2,(T).2,-(T).2,(T).2,-(T).2,(T).2);
         for(int i=0;i<drops;i++){
             sources(i).center=random.Get_Uniform_Vector(grid.Domain());
             sources(i).radius=random.Get_Uniform_Number(radius_min,radius_max);

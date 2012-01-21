@@ -637,7 +637,7 @@ void Floppy_Fish()
     // add the fish
     RIGID_BODY_STATE<TV> fish_state(FRAME<TV>(TV(0,3,0),ROTATION<TV>((T)half_pi,TV(1,0,0))));
     if(fish_mattress){
-        BOX<TV> box(-TV((T)3.93278,(T)1.07277,(T)0.384066),TV((T)2.68344,(T)1.1747,(T)0.384353));VECTOR<int,3> counts(20,15,5);
+        RANGE<TV> box(-TV((T)3.93278,(T)1.07277,(T)0.384066),TV((T)2.68344,(T)1.1747,(T)0.384353));VECTOR<int,3> counts(20,15,5);
         GRID<TV> mattress_grid=GRID<TV>(counts,box);
         tests.Create_Mattress(mattress_grid,true,&fish_state);}
     else tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/fish_42K.tet",fish_state,true,false,1000,(T)1);

@@ -104,7 +104,7 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
 {
     GRID<TV>& grid=*fluids_parameters.grid;
     ARRAY<T,VECTOR<int,2> >& phi=fluids_parameters.particle_levelset_evolution->phi;
-    BOX<TV> box((T).25,(T).75,(T).4,(T).6);
+    RANGE<TV> box((T).25,(T).75,(T).4,(T).6);
 
     for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++)
         phi(i,j)=box.Signed_Distance(grid.X(i,j));

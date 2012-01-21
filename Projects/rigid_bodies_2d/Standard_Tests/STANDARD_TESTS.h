@@ -217,7 +217,7 @@ void Kinematic()
 //#####################################################################
 void Test_Example()
 {
-    RECTANGULAR_RANDOM_PLACEMENT<TV> random_placement(BOX<TV>(-20,20,1,100));
+    RECTANGULAR_RANDOM_PLACEMENT<TV> random_placement(RANGE<TV>(-20,20,1,100));
     Random_Scene_Generator("circle", 100, 1234, random_placement,rigid_body_collection,tests);
     for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++)
         rigid_body_collection.Rigid_Body(i).Set_Coefficient_Of_Restitution((T)0.5);

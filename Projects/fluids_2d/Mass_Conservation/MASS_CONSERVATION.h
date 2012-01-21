@@ -47,7 +47,7 @@ public:
     using BASE::resolution;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::test_number; // silence -Woverloaded-virtual
 
     SPHERE<TV> source,other_source;
-    BOX<TV> box;
+    RANGE<TV> box;
     MATRIX<T,3> world_to_source;
     TV source_velocity;
     ARRAY<T,FACE_INDEX<2> > velocity;
@@ -142,8 +142,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
 
     if(test_number==1 || test_number==2){
         initial_water_level=-1; // no initial height
-        box=BOX<TV>((T).4,(T).6,(T).4,(T).6);
-        fluids_parameters.grid->Initialize(10*resolution+1,10*resolution+1,BOX<TV>::Unit_Box());}
+        box=RANGE<TV>((T).4,(T).6,(T).4,(T).6);
+        fluids_parameters.grid->Initialize(10*resolution+1,10*resolution+1,RANGE<TV>::Unit_Box());}
     else if(test_number==3){
         final_time=15;frame_rate=(T).5;
         zalesak_center=TV(50,75);
@@ -155,7 +155,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         zalesak_velocity_center=TV(50,75);
         fluids_parameters.grid->Initialize(10*resolution+1,10*resolution+1,0,100,0,100);}
     else if(test_number==5 || test_number==13){
-        fluids_parameters.grid->Initialize((1<<resolution)+1,(1<<resolution)+1,BOX<TV>::Unit_Box());
+        fluids_parameters.grid->Initialize((1<<resolution)+1,(1<<resolution)+1,RANGE<TV>::Unit_Box());
         initial_water_level=-1;
         fluids_parameters.cfl=(T).5;
         last_frame=100;
@@ -179,18 +179,18 @@ void Parse_Options() PHYSBAM_OVERRIDE
         fluids_parameters.surface_tension=(T)5e-6;}
     else if(test_number==8){
         frame_rate=100;
-        fluids_parameters.grid->Initialize(10*resolution+1,10*resolution+1,BOX<TV>::Unit_Box());
+        fluids_parameters.grid->Initialize(10*resolution+1,10*resolution+1,RANGE<TV>::Unit_Box());
         fluids_parameters.gravity=0;
         source=SPHERE<TV>(TV((T).1,(T).5),(T).08);
         other_source=SPHERE<TV>(TV((T).9,(T).5),(T).08);
         source_velocity=TV((T)2,(T)0);
         initial_water_level=-1;}
     else if(test_number==9){
-        fluids_parameters.grid->Initialize(10*resolution+1,10*resolution+1,BOX<TV>::Unit_Box());
+        fluids_parameters.grid->Initialize(10*resolution+1,10*resolution+1,RANGE<TV>::Unit_Box());
         fluids_parameters.gravity=0;
         fluids_parameters.surface_tension=(T)1e-5;}
     else if(test_number==10){
-        fluids_parameters.grid->Initialize(10*resolution+1,10*resolution+1,BOX<TV>::Unit_Box());}
+        fluids_parameters.grid->Initialize(10*resolution+1,10*resolution+1,RANGE<TV>::Unit_Box());}
     else if(test_number==11 || test_number==12){
         final_time=628;frame_rate=(T).5;
         zalesak_center=TV(25,25);
@@ -298,7 +298,7 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
             fluids_parameters.particle_levelset_evolution->phi(iterator.Cell_Index())=box.Signed_Distance(location);}}
     else if(test_number==3 || test_number==4 || test_number==11 || test_number==12){
         T radius=15,slot_width=5,slot_depth=25;
-        BOX<TV> rect(zalesak_center.x-slot_width/2,zalesak_center.x+slot_width/2,0,zalesak_center.y-radius+slot_depth);
+        RANGE<TV> rect(zalesak_center.x-slot_width/2,zalesak_center.x+slot_width/2,0,zalesak_center.y-radius+slot_depth);
         for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
             TV location=iterator.Location();
             fluids_parameters.particle_levelset_evolution->phi(iterator.Cell_Index())=max((location-zalesak_center).Magnitude()-radius,-rect.Signed_Distance(location));}}
@@ -326,7 +326,7 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
         T radius_min=(T).02,radius_max=(T).03;
         ARRAY<SPHERE<TV> > sources(drops);
         ARRAY<TV> velocities(drops);
-        BOX<TV> velocity_box((T)-.2,(T).2,(T)-.2,(T).2);
+        RANGE<TV> velocity_box((T)-.2,(T).2,(T)-.2,(T).2);
         for(int i=0;i<drops;i++){
             sources(i).center=random.Get_Uniform_Vector(grid.Domain());
             sources(i).radius=random.Get_Uniform_Number(radius_min,radius_max);
@@ -378,12 +378,12 @@ bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
     if(test_number==10){
         // should write something to rasterize source mass using our negative material calc in cell
         const T_GRID& grid=*fluids_parameters.grid;
-        BOX<TV> source_one_box((T).2,(T).3,(T).14,(T).16);ORIENTED_BOX<TV> oriented_one_box(source_one_box,ROTATION<TV>::From_Angle((T)pi/4),source_one_box.Minimum_Corner());
+        RANGE<TV> source_one_box((T).2,(T).3,(T).14,(T).16);ORIENTED_BOX<TV> oriented_one_box(source_one_box,ROTATION<TV>::From_Angle((T)pi/4),source_one_box.Minimum_Corner());
         for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
             TV source_X=world_to_source.Homogeneous_Times(iterator.Location());T source_phi=oriented_one_box.Signed_Distance(source_X);
             if(source_phi<0 && fluids_parameters.mass_conservation) fluids_parameters.particle_levelset_evolution->particle_levelset.vof_advection->volume_of_material(iterator.Cell_Index())=1;
             fluids_parameters.particle_levelset_evolution->phi(iterator.Cell_Index())=min(fluids_parameters.particle_levelset_evolution->phi(iterator.Cell_Index()),source_phi);}
-        BOX<TV> source_two_box((T).4,(T).5,(T).14,(T).16);ORIENTED_BOX<TV> oriented_two_box(source_two_box,ROTATION<TV>::From_Angle((T)pi/3),source_two_box.Minimum_Corner());
+        RANGE<TV> source_two_box((T).4,(T).5,(T).14,(T).16);ORIENTED_BOX<TV> oriented_two_box(source_two_box,ROTATION<TV>::From_Angle((T)pi/3),source_two_box.Minimum_Corner());
         for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
             TV source_X=world_to_source.Homogeneous_Times(iterator.Location());T source_phi=oriented_two_box.Signed_Distance(source_X);
             if(source_phi<0 && fluids_parameters.mass_conservation) fluids_parameters.particle_levelset_evolution->particle_levelset.vof_advection->volume_of_material(iterator.Cell_Index())=1;
@@ -396,18 +396,18 @@ bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
 void Get_Source_Velocities(ARRAY<T,FACE_INDEX<2> >& face_velocities,ARRAY<bool,FACE_INDEX<2> >& psi_N,const T time) PHYSBAM_OVERRIDE
 {
     if(test_number==10){
-        BOX<TV> local_box;ORIENTED_BOX<TV> oriented_box;
+        RANGE<TV> local_box;ORIENTED_BOX<TV> oriented_box;
         TV velocity;
         T theta;
 
-        theta=(T)pi/4;local_box=BOX<TV>((T).2,(T).3,(T).14,(T).16);oriented_box=ORIENTED_BOX<TV>(local_box,ROTATION<TV>::From_Angle(theta),local_box.Minimum_Corner());
+        theta=(T)pi/4;local_box=RANGE<TV>((T).2,(T).3,(T).14,(T).16);oriented_box=ORIENTED_BOX<TV>(local_box,ROTATION<TV>::From_Angle(theta),local_box.Minimum_Corner());
         velocity=TV(cos(theta),sin(theta));
         for(FACE_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
             TV source_X=world_to_source.Homogeneous_Times(iterator.Location());
             if(oriented_box.Lazy_Inside(source_X))
                 face_velocities.Component(iterator.Axis())(iterator.Face_Index())=velocity(iterator.Axis());}
 
-        theta=(T)pi/3;local_box=BOX<TV>((T).4,(T).5,(T).14,(T).16);oriented_box=ORIENTED_BOX<TV>(local_box,ROTATION<TV>::From_Angle(theta),local_box.Minimum_Corner());
+        theta=(T)pi/3;local_box=RANGE<TV>((T).4,(T).5,(T).14,(T).16);oriented_box=ORIENTED_BOX<TV>(local_box,ROTATION<TV>::From_Angle(theta),local_box.Minimum_Corner());
         velocity=TV(cos(theta),sin(theta));
         for(FACE_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
             TV source_X=world_to_source.Homogeneous_Times(iterator.Location());

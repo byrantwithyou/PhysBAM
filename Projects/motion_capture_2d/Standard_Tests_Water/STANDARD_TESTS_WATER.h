@@ -85,7 +85,7 @@ public:
     //fluids
     SMOKE_STANDARD_TESTS_2D<T_GRID> smoke_tests;
     TV source_velocity;
-    BOX<TV> source1,source2;
+    RANGE<TV> source1,source2;
     MATRIX<T,3> world_to_source;
     bool use_gravity,use_kinematic_motion,use_deformable,use_embedding;
     RIGID_BODY<TV>* octosquid_body;
@@ -576,7 +576,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             build_tet=true;FILE_UTILITIES::Read_From_File(stream_type,data_directory+STRING_UTILITIES::string_sprintf("/joint_levelset_2d_%d.curve2d",test_number),*surface);}
         else{if(use_embedding) build_tri=true;build_tet=true;} 
         if(build_tri || build_tet){
-            BOX<TV> grid_domain;
+            RANGE<TV> grid_domain;
             T thickness=(T).1;
             for(int id(1);id<=solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size();id++) grid_domain.Enlarge_To_Include_Box(solid_body_collection.rigid_body_collection.Rigid_Body(id).implicit_object->Box());
             T_GRID new_grid((T).02,grid_domain.Thickened(2*thickness));
@@ -1152,16 +1152,16 @@ void Left_Source()
         case 1:
         case 2:
         case 5:
-            source1=BOX<TV>((T)-11.5,(T)-10.5,(T)0,(T)10);
-            source2=BOX<TV>((T)7,(T)8,(T)0,(T)10);
+            source1=RANGE<TV>((T)-11.5,(T)-10.5,(T)0,(T)10);
+            source2=RANGE<TV>((T)7,(T)8,(T)0,(T)10);
             world_to_source=MATRIX<T,3>::Identity_Matrix();
             source_velocity=TV(source_velocity_magnitude,(T)0);
             break;
         case 3:
         case 4:
         case 6:
-            source1=BOX<TV>((T)-4,(T)4,(T)-.5,(T).5);
-            source2=BOX<TV>((T)-4,(T)4,(T)11.5,(T)12.5);
+            source1=RANGE<TV>((T)-4,(T)4,(T)-.5,(T).5);
+            source2=RANGE<TV>((T)-4,(T)4,(T)11.5,(T)12.5);
             world_to_source=MATRIX<T,3>::Identity_Matrix();
             source_velocity=TV((T)0,source_velocity_magnitude);
             break;

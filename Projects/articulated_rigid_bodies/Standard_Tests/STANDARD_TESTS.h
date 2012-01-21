@@ -1061,15 +1061,15 @@ void Kinematic_Angle_Joint_Test()
     // master
     RIGID_BODY<TV>& master=*new RIGID_BODY<TV>(rigid_body_collection,true);
     TV master_edges((T)14.0662,(T)7.12134,(T)14.1081);
-    BOX<TV> master_box(-master_edges,master_edges);
-    master.Add_Structure(*new ANALYTIC_IMPLICIT_OBJECT<BOX<TV> >(master_box));
+    RANGE<TV> master_box(-master_edges,master_edges);
+    master.Add_Structure(*new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(master_box));
     master.Is_Kinematic()=true;
 
     // slave
     RIGID_BODY<TV>& slave=*new RIGID_BODY<TV>(rigid_body_collection,true);
     TV slave_edges((T)2.49461,(T)9.85401,(T)3.84579);
-    BOX<TV> slave_box(-slave_edges,slave_edges);
-    slave.Add_Structure(*new ANALYTIC_IMPLICIT_OBJECT<BOX<TV> >(slave_box));
+    RANGE<TV> slave_box(-slave_edges,slave_edges);
+    slave.Add_Structure(*new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(slave_box));
     slave.Mass()=13;
     slave.Inertia_Tensor()=DIAGONAL_MATRIX<T,3>(932,175,861);
     slave.Set_Frame(FRAME<TV>(TV((T)-335.915,(T)618.673,(T)9.6621),ROTATION<TV>((T)0.9439,TV((T)-0.25355,(T)-0.450801,(T)0.855857))));

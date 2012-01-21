@@ -318,8 +318,8 @@ Material(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         std::string raw_phi_filename=parameters.Get_Parameter("Phi_Filename",std::string("<unknown_phi_file>"));
         IMPLICIT_OBJECT<TV>* implicit_surface;
             {LOG::cout<<"Unknown implicit surface type "<<implicit_surface_type<<std::endl;exit(1);}
-        BOX<VECTOR<T,1> > value_range(parameters.Get_Parameter("Low_Value",(T)0),parameters.Get_Parameter("High_Value",(T)1));
-        BOX<VECTOR<T,1> > weight_range(parameters.Get_Parameter("Min_Weight",(T)0),parameters.Get_Parameter("Max_Weight",(T)1));
+        RANGE<VECTOR<T,1> > value_range(parameters.Get_Parameter("Low_Value",(T)0),parameters.Get_Parameter("High_Value",(T)1));
+        RANGE<VECTOR<T,1> > weight_range(parameters.Get_Parameter("Min_Weight",(T)0),parameters.Get_Parameter("Max_Weight",(T)1));
         shaders.Set(name,new RENDERING_BLEND_IMPLICIT_SURFACE_SHADER<T>(*implicit_surface,value_range,weight_range,*child_shader1,*child_shader2,world));
         LOG::cout<<"Material '"<<name<<"' Range="<<value_range<<" Weight_Range="<<weight_range<<" Shader1="<<shader1_name<<" Shader2="<<shader2_name<<std::endl;}
     else if(type=="Triangulated_Surface_Blend"){

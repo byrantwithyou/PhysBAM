@@ -379,7 +379,7 @@ void Floppy_Fish()
     T flesh_density=(T)200;
     TETRAHEDRALIZED_VOLUME<T>* fish=0;
     if(!sub_test){
-        BOX<TV> box(-TV((T)3.93278,(T)1.07277,(T)0.384066),TV((T)2.68344,(T)1.1747,(T)0.384353));box*=scale;
+        RANGE<TV> box(-TV((T)3.93278,(T)1.07277,(T)0.384066),TV((T)2.68344,(T)1.1747,(T)0.384353));box*=scale;
         VECTOR<int,3> counts(20,15,5);
         GRID<TV> fish_mattress_grid=GRID<TV>(counts,box);
         solids_tests.Create_Mattress(fish_mattress_grid,true,&fish_state,flesh_density);

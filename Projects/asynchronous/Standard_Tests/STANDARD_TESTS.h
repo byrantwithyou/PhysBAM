@@ -1557,7 +1557,7 @@ void Asynchronous_Layered_Box()
             case 2: asynchronous_layer_interval=1;non_layer_interval=1;break;
             case 3: asynchronous_layer_interval=10;non_layer_interval=0;break;
             default: asynchronous_layer_interval=01;non_layer_interval=-1;break;}
-        GRID<TV> grid(VECTOR<int,3>(10,total_layer_number,10),BOX<TV>(TV((T)(-1+3*(box_index-3)),(T).1,-(T)1),TV((T)(1+3*(box_index-3)),(T)1.1,(T)1)));
+        GRID<TV> grid(VECTOR<int,3>(10,total_layer_number,10),RANGE<TV>(TV((T)(-1+3*(box_index-3)),(T).1,-(T)1),TV((T)(1+3*(box_index-3)),(T)1.1,(T)1)));
         particle_index_offset=deformable_body_collection.particles.array_collection->Size()+1;
         primary_tetrahedralized_volumes.Append(&tests.Create_Mattress(grid));
         TETRAHEDRALIZED_VOLUME<T>* volume=primary_tetrahedralized_volumes(box_index);

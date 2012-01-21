@@ -66,7 +66,7 @@ public:
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
     int lighthouse,beach,cove;
 
-    BOX<VECTOR<T,3> > kill_particle_box;
+    RANGE<VECTOR<T,3> > kill_particle_box;
     RANDOM_NUMBERS<T> random;
 
     SPRAY_AND_FOAM(const STREAM_TYPE stream_type)
@@ -130,7 +130,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     time_particles_were_spawned_last=0;
     particle_number_amplification=10; // ~100,000 particles per amplification
     life_foam=5;
-    kill_particle_box=BOX<VECTOR<T,3> >(58,61,0,30,0,80);
+    kill_particle_box=RANGE<VECTOR<T,3> >(58,61,0,30,0,80);
     random.Set_Seed(1);
 
     /*
@@ -237,7 +237,7 @@ void Initialize_Velocities() PHYSBAM_OVERRIDE
 //#####################################################################
 void Get_Source_Velocities(ARRAY<T,FACE_INDEX<3> >& face_velocities,ARRAY<bool,FACE_INDEX<3> >& psi_N,const T time) PHYSBAM_OVERRIDE
 {
-    BOX<VECTOR<T,3> > source_domain=BOX<VECTOR<T,3> >(-61,-57,-1,21,-1,81);
+    RANGE<VECTOR<T,3> > source_domain=RANGE<VECTOR<T,3> >(-61,-57,-1,21,-1,81);
     for(FACE_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
         TV_INT face=iterator.Face_Index();int axis=iterator.Axis();TV X=fluids_parameters.grid->Face(axis,face);
         if(source_domain.Lazy_Inside(X)){
@@ -259,7 +259,7 @@ void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>::Update_Fluid_Parameters(dt,time);
 
 /*
-    BOX<VECTOR<T,3> > source_domain(15,17,15,17,19,21);
+    RANGE<VECTOR<T,3> > source_domain(15,17,15,17,19,21);
     for(int i=0;i<fluids_parameters.grid->m;i++)for(int j=0;j<fluids_parameters.grid->n;j++)for(int ij=0;ij<fluids_parameters.grid->mn;ij++)if(source_domain.Lazy_Inside(fluids_parameters.grid->X(i,j,ij))){
         fluids_parameters.density_container.density(i,j,ij)=1;}
 */

@@ -20,11 +20,11 @@ template<class T>
 void Add_Source(WATER_EXAMPLE<VECTOR<T,2> >* example)
 {
     typedef VECTOR<T,2> TV;
-    TV point1,point2;BOX<TV> source;
+    TV point1,point2;RANGE<TV> source;
     //point1=TV::All_Ones_Vector()*(T).5;point1(1)=.4;point1(2)=.95;point2=TV::All_Ones_Vector()*(T).65;point2(1)=.55;point2(2)=1;
     point1=TV::All_Ones_Vector()*(T).5;point1(1)=.95;point1(2)=.6;point2=TV::All_Ones_Vector()*(T).65;point2(1)=1;point2(2)=.75;
     source.min_corner=point1;source.max_corner=point2;
-    example->sources.Append(new ANALYTIC_IMPLICIT_OBJECT<BOX<TV> >(source));
+    example->sources.Append(new ANALYTIC_IMPLICIT_OBJECT<RANGE<TV> >(source));
 }
 
 template<class T>

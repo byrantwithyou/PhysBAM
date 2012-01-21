@@ -163,7 +163,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         if(test_number==1) Create_Box_Split_Pattern();
         else if(test_number==2) Create_Crossing_Planes_Pattern();
         else if(test_number==3) Create_Grain_Boundary_Surfaces();
-        else if(test_number==4) Create_Pyramid_Pattern(BOX<TV>(TV(-1,-1,-1),TV(1,1,1)),100,2);
+        else if(test_number==4) Create_Pyramid_Pattern(RANGE<TV>(TV(-1,-1,-1),TV(1,1,1)),100,2);
         else if(test_number==5) Create_Wall_Pattern();
         else if(test_number==6) Create_Bunny_Pattern();
         else if(test_number==7) Create_Cylinder_Pattern();
@@ -412,7 +412,7 @@ void Ball_Hitting_Wall()
     solids_parameters.rigid_body_collision_parameters.use_fracture_pattern=true;
 
     TV edge_lengths((T)6,(T).4,(T)4);
-    TV_INT dimensions(31,3,21);BOX<TV> box((T)-.5*edge_lengths,(T).5*edge_lengths);TV dx=edge_lengths/TV(dimensions-1);
+    TV_INT dimensions(31,3,21);RANGE<TV> box((T)-.5*edge_lengths,(T).5*edge_lengths);TV dx=edge_lengths/TV(dimensions-1);
     TV_INT levelset_resolution(151,11,101);TV levelset_dx=edge_lengths/TV(levelset_resolution-1);int ghost_cells=2;
     RIGID_BODY<TV>* rigid_body=new RIGID_BODY<TV>(rigid_body_collection,true);
     TRIANGULATED_SURFACE<T>& simplicial_object=*TRIANGULATED_SURFACE<T>::Create();
@@ -540,7 +540,7 @@ void Raining_Spheres()
     solids_parameters.rigid_body_collision_parameters.use_fracture_pattern=true;
 
     TV edge_lengths((T)6,(T).4,(T)4);
-    TV_INT dimensions(31,3,21);BOX<TV> box((T)-.5*edge_lengths,(T).5*edge_lengths);TV dx=edge_lengths/TV(dimensions-1);
+    TV_INT dimensions(31,3,21);RANGE<TV> box((T)-.5*edge_lengths,(T).5*edge_lengths);TV dx=edge_lengths/TV(dimensions-1);
     TV_INT levelset_resolution(151,11,101);TV levelset_dx=edge_lengths/TV(levelset_resolution-1);int ghost_cells=2;
     RIGID_BODY<TV>* rigid_body=new RIGID_BODY<TV>(rigid_body_collection,true);
     TRIANGULATED_SURFACE<T>& simplicial_object=*TRIANGULATED_SURFACE<T>::Create();
@@ -603,7 +603,7 @@ void Raining_Spheres()
     large_sphere_body.Set_Coefficient_Of_Restitution(0);
     large_sphere_body.Set_Mass((T)10);
     ARRAY<ORIENTED_BOX<TV> > bounding_boxes;
-    BOX<TV> world=BOX<TV>(TV(-(T)2.6,4,-(T)2.6),TV((T)2.6,(T)world_height,(T)2.6));
+    RANGE<TV> world=RANGE<TV>(TV(-(T)2.6,4,-(T)2.6),TV((T)2.6,(T)world_height,(T)2.6));
     T g=(T)9.8,h=world.min_corner.y,base_t=sqrt(2*h/g);
     int num_spheres=0;
 
@@ -648,7 +648,7 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 void Create_Pattern(const int test_number)
 {
-    BOX<TV> domain;int count=100;TV_INT pattern_center;
+    RANGE<TV> domain;int count=100;TV_INT pattern_center;
     rigid_body_collection.rigid_geometry_collection.always_create_structure=true;
 
     // Load in bodies and compute domain
@@ -659,7 +659,7 @@ void Create_Pattern(const int test_number)
                 TV rand_vec=rn.Get_Uniform_Vector(a,b);
                 if(rand_vec.Normalize()<(T).01) continue;
                 seed_points.Append(rand_vec);}
-            GRID<TV> levelset_grid(TV_INT(100,100,100),BOX<TV>(TV((T)-2.5,(T)-2.5,(T)-2.5),TV((T)2.5,(T)2.5,(T)2.5)),false);
+            GRID<TV> levelset_grid(TV_INT(100,100,100),RANGE<TV>(TV((T)-2.5,(T)-2.5,(T)-2.5),TV((T)2.5,(T)2.5,(T)2.5)),false);
             ARRAY<int,VECTOR<int,3> > regions(levelset_grid.Domain_Indices());regions.Fill(-1);
             ARRAY<TV_INT> neighbor_list;
             for(int s=0;s<seed_points.m;s++){
@@ -685,7 +685,7 @@ void Create_Pattern(const int test_number)
             for(int r=0;r<seed_points.m;r++){
                 LOG::cout << "constructing region " << r << std::endl;
                 RANGE<TV_INT> local_counts=RANGE<TV_INT>::Zero_Box().Thickened(-INT_MAX);
-                BOX<TV> local_domain;
+                RANGE<TV> local_domain;
                 for(NODE_ITERATOR iterator(levelset_grid);iterator.Valid();iterator.Next()){
                     if(regions(iterator.index)==r){
                         local_counts.Enlarge_To_Include_Point(iterator.index);
@@ -743,13 +743,13 @@ void Create_Pattern(const int test_number)
         LEVELSET_IMPLICIT_OBJECT<TV>* fragment_implicit_object=LEVELSET_IMPLICIT_OBJECT<TV>::Create();
         TV_INT min_corner_index=grid.Clamped_Index(rigid_body.axis_aligned_bounding_box.min_corner)-TV_INT::All_Ones_Vector();grid.Clamp(min_corner_index);
         TV_INT max_corner_index=grid.Clamped_Index(rigid_body.axis_aligned_bounding_box.max_corner)+TV_INT::All_Ones_Vector();grid.Clamp(max_corner_index);
-        BOX<TV> clamped_domain=BOX<TV>(grid.Node(min_corner_index),grid.Node(max_corner_index));
+        RANGE<TV> clamped_domain=RANGE<TV>(grid.Node(min_corner_index),grid.Node(max_corner_index));
         TV_INT local_counts=max_corner_index-min_corner_index+TV_INT::All_Ones_Vector();
         for(int p=0;p<rigid_body.simplicial_object->particles.array_collection->Size();p++)
             rigid_body.simplicial_object->particles.X(p)=rigid_body.World_Space_Point(rigid_body.simplicial_object->particles.X(p))-clamped_domain.Center();
         rigid_body.simplicial_object->Initialize_Hierarchy();
         rigid_body.simplicial_object->Update_Bounding_Box();
-        BOX<TV> local_domain=BOX<TV>(-TV(local_counts)*dx*(T).5,TV(local_counts)*dx*(T).5);
+        RANGE<TV> local_domain=RANGE<TV>(-TV(local_counts)*dx*(T).5,TV(local_counts)*dx*(T).5);
 
         fragment_implicit_object->levelset.grid.Initialize(local_counts,local_domain,false);
         fragment_implicit_object->levelset.phi.Resize(fragment_implicit_object->levelset.grid.Domain_Indices());
@@ -773,7 +773,7 @@ void Shrink_Levelset(GRID<TV>& grid,ARRAY<T,VECTOR<int,3> >& phi,int boundary,TV
     inside=RANGE<TV_INT>::Intersect(inside.Thickened(boundary),domain);
     min_adjust=inside.min_corner-domain.min_corner;
     center-=min_adjust;
-    GRID<TV> grid_new(inside.Edge_Lengths()+1,BOX<TV>(grid.Node(inside.min_corner),grid.Node(inside.max_corner)),false);
+    GRID<TV> grid_new(inside.Edge_Lengths()+1,RANGE<TV>(grid.Node(inside.min_corner),grid.Node(inside.max_corner)),false);
     ARRAY<T,VECTOR<int,3> > phi_new(grid_new.Domain_Indices());
     for(NODE_ITERATOR iterator(grid_new);iterator.Valid();iterator.Next()) phi_new(iterator.index)=phi(iterator.index+min_adjust);
     grid=grid_new;
@@ -791,7 +791,7 @@ void Create_Wall_Pattern()
     TV half_edge_length(actual_edge_lengths/2);
 
     for(int i=2;i<=26;i++){
-        GRID<TV>& local_grid=*new GRID<TV>(actual_resolution,BOX<TV>(-half_edge_length,half_edge_length),false);
+        GRID<TV>& local_grid=*new GRID<TV>(actual_resolution,RANGE<TV>(-half_edge_length,half_edge_length),false);
         ARRAY<T,VECTOR<int,3> >& local_phi=*new ARRAY<T,VECTOR<int,3> >(local_grid.Domain_Indices());local_phi.Fill(FLT_MAX);
         LEVELSET_IMPLICIT_OBJECT<TV>* refined_lio=LEVELSET_IMPLICIT_OBJECT<TV>::Create();
         FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/Fracture_Patterns/wall/fragment.%d.phi",data_directory.c_str(),i),refined_lio->levelset);
@@ -822,7 +822,7 @@ void Create_Bunny_Pattern()
 
     for(int i=2;i<=49;i++){if(i==42 || i==47) continue;
         LOG::cout << "REGION " << i << std::endl;
-        GRID<TV>& local_grid=*new GRID<TV>(actual_resolution,BOX<TV>(-half_edge_length,half_edge_length),false);
+        GRID<TV>& local_grid=*new GRID<TV>(actual_resolution,RANGE<TV>(-half_edge_length,half_edge_length),false);
         ARRAY<T,VECTOR<int,3> >& local_phi=*new ARRAY<T,VECTOR<int,3> >(local_grid.Domain_Indices());local_phi.Fill(FLT_MAX);
         LEVELSET_IMPLICIT_OBJECT<TV>* refined_lio=LEVELSET_IMPLICIT_OBJECT<TV>::Create();
         FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/Fracture_Patterns/bunny/fragment.%d.phi",data_directory.c_str(),i),refined_lio->levelset);
@@ -853,7 +853,7 @@ void Create_Cylinder_Pattern()
 
     for(int i=2;i<=55;i++){if(i==33 || i==41 || i==46) continue;
         LOG::cout << "REGION " << i << std::endl;
-        GRID<TV>& local_grid=*new GRID<TV>(actual_resolution,BOX<TV>(-half_edge_length,half_edge_length),false);
+        GRID<TV>& local_grid=*new GRID<TV>(actual_resolution,RANGE<TV>(-half_edge_length,half_edge_length),false);
         ARRAY<T,VECTOR<int,3> >& local_phi=*new ARRAY<T,VECTOR<int,3> >(local_grid.Domain_Indices());local_phi.Fill(FLT_MAX);
         LEVELSET_IMPLICIT_OBJECT<TV>* refined_lio=LEVELSET_IMPLICIT_OBJECT<TV>::Create();
         FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/Fracture_Patterns/cylinder/fragment.%d.phi",data_directory.c_str(),i),refined_lio->levelset);
@@ -884,7 +884,7 @@ void Create_Raining_Spheres_Pattern()
 
     for(int i=2;i<=26;i++){if(i==25) continue;
         LOG::cout << "REGION " << i << std::endl;
-        GRID<TV>& local_grid=*new GRID<TV>(actual_resolution,BOX<TV>(-half_edge_length,half_edge_length),false);
+        GRID<TV>& local_grid=*new GRID<TV>(actual_resolution,RANGE<TV>(-half_edge_length,half_edge_length),false);
         ARRAY<T,VECTOR<int,3> >& local_phi=*new ARRAY<T,VECTOR<int,3> >(local_grid.Domain_Indices());local_phi.Fill(FLT_MAX);
         LEVELSET_IMPLICIT_OBJECT<TV>* refined_lio=LEVELSET_IMPLICIT_OBJECT<TV>::Create();
         FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/Fracture_Patterns/raining_spheres/fragment.%d.phi",data_directory.c_str(),i),refined_lio->levelset);
@@ -912,14 +912,14 @@ void Create_Box_Split_Pattern()
         int resolution=100;T edge_length=4;T dx=edge_length/resolution;int ghost_cells=2;
         TV half_edge_length;half_edge_length.Fill(edge_length/2);
         TV_INT counts;counts.Fill(resolution);half_edge_length.Fill(edge_length/2);
-        GRID<TV> original_grid(counts,BOX<TV>(-half_edge_length,half_edge_length),false);
+        GRID<TV> original_grid(counts,RANGE<TV>(-half_edge_length,half_edge_length),false);
         int actual_resolution=resolution+ghost_cells*2;T actual_edge_length=actual_resolution*dx;
         counts.Fill(actual_resolution);half_edge_length.Fill(actual_edge_length/2);
-        GRID<TV> local_grid(counts,BOX<TV>(-half_edge_length,half_edge_length),false);
+        GRID<TV> local_grid(counts,RANGE<TV>(-half_edge_length,half_edge_length),false);
         ARRAY<T,VECTOR<int,3> > local_phi(local_grid.Domain_Indices());local_phi.Fill(FLT_MAX);
         LEVELSET_IMPLICIT_OBJECT<TV>* lio=new LEVELSET_IMPLICIT_OBJECT<TV>(local_grid,local_phi);
         for(NODE_ITERATOR iterator(local_grid);iterator.Valid();iterator.Next())
-            local_phi(iterator.index)=BOX<TV>(original_grid.Domain()).Signed_Distance(iterator.Location());
+            local_phi(iterator.index)=RANGE<TV>(original_grid.Domain()).Signed_Distance(iterator.Location());
         TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
         for(NODE_ITERATOR iterator(original_grid,0,GRID<TV>::BOUNDARY_REGION);iterator.Valid();iterator.Next())
             surface->particles.X(surface->particles.array_collection->Add_Element())=iterator.Location();
@@ -933,7 +933,7 @@ void Create_Box_Split_Pattern()
 //#####################################################################
 // Function Create_Pyramid_Pattern
 //#####################################################################
-void Create_Pyramid_Pattern(BOX<TV> boundary,const int min_resolution,const int subdivision)
+void Create_Pyramid_Pattern(RANGE<TV> boundary,const int min_resolution,const int subdivision)
 {
     T dx=(boundary.Edge_Lengths()/(T)min_resolution).Min();
     boundary.Scale_About_Center((rint(boundary.Edge_Lengths()/dx)*dx)/boundary.Edge_Lengths());
@@ -1003,7 +1003,7 @@ void Create_Crossing_Planes_Pattern()
     TV jitter((T).001,(T).002,(T).003);
     for(int side=-1;side<=1;side+=2){
         for(int x_index=1;x_index<planes_per_side;x_index++){
-            BOX<TV> box=BOX<TV>(-half_edge_length,half_edge_length);
+            RANGE<TV> box=RANGE<TV>(-half_edge_length,half_edge_length);
             TV center=box.Center();
             GRID<TV>& grid=*new GRID<TV>(actual_resolution,box,false);
             ARRAY<T,VECTOR<int,3> >& phi=*new ARRAY<T,VECTOR<int,3> >(grid.Domain_Indices());phi.Fill(FLT_MAX);
@@ -1044,7 +1044,7 @@ void Create_Crossing_Planes_Pattern()
     nodes_per_long_side=(int)(z_x_ratio*50);nodes_per_short_side=(int)(nodes_per_long_side*(z_diff/edge_lengths.z));
     for(int side=-1;side<=1;side+=2){
         for(int z_index=1;z_index<planes_per_side;z_index++){
-            BOX<TV> box=BOX<TV>(-half_edge_length,half_edge_length);
+            RANGE<TV> box=RANGE<TV>(-half_edge_length,half_edge_length);
             TV center=box.Center();
             GRID<TV>& grid=*new GRID<TV>(actual_resolution,box,false);
             ARRAY<T,VECTOR<int,3> >& phi=*new ARRAY<T,VECTOR<int,3> >(grid.Domain_Indices());phi.Fill(FLT_MAX);
@@ -1086,25 +1086,25 @@ void Create_Crossing_Planes_Pattern()
 //#####################################################################
 void Create_Grain_Boundary_Surfaces()
 {
-    BOX<TV> wall_box(TV((T)-3,(T)-.2,(T)-2),TV((T)3,(T).2,(T)2));
+    RANGE<TV> wall_box(TV((T)-3,(T)-.2,(T)-2),TV((T)3,(T).2,(T)2));
     TRIANGULATED_SURFACE<T>* wall_surface=TESSELLATION::Generate_Triangles(wall_box);
     for(int i=0;i<3;i++)
         wall_surface->Linearly_Subdivide();
     FILE_UTILITIES::Write_To_File(stream_type,"wall.tri",*wall_surface);
 
-    BOX<TV> cylinder_box(TV((T)-1,(T)-2,(T)-1),TV((T)1,(T)2,(T)1));
+    RANGE<TV> cylinder_box(TV((T)-1,(T)-2,(T)-1),TV((T)1,(T)2,(T)1));
     TRIANGULATED_SURFACE<T>* cylinder_surface=TESSELLATION::Generate_Triangles(cylinder_box);
     for(int i=0;i<3;i++)
         cylinder_surface->Linearly_Subdivide();
     FILE_UTILITIES::Write_To_File(stream_type,"cylinder.tri",*cylinder_surface);
 
-    BOX<TV> bunny_box(TV((T)-.6,(T)-.6,(T)-.45),TV((T).6,(T).6,(T).45));
+    RANGE<TV> bunny_box(TV((T)-.6,(T)-.6,(T)-.45),TV((T).6,(T).6,(T).45));
     TRIANGULATED_SURFACE<T>* bunny_surface=TESSELLATION::Generate_Triangles(bunny_box);
     for(int i=0;i<3;i++)
         bunny_surface->Linearly_Subdivide();
     FILE_UTILITIES::Write_To_File(stream_type,"bunny.tri",*bunny_surface);
 
-    BOX<TV> raining_box(TV((T)-2,(T)-2,(T)-2),TV((T)2,(T)2,(T)2));
+    RANGE<TV> raining_box(TV((T)-2,(T)-2,(T)-2),TV((T)2,(T)2,(T)2));
     TRIANGULATED_SURFACE<T>* raining_surface=TESSELLATION::Generate_Triangles(raining_box);
     for(int i=0;i<3;i++)
         raining_surface->Linearly_Subdivide();
@@ -1182,11 +1182,11 @@ void Grain_Points()
 {
     last_frame=1;
     RANDOM_NUMBERS<T> random;
-    BOX<TV> box;
-    if(parameter==1) box=BOX<TV>(TV(-3,-(T).2,-2),TV(3,(T).2,2));
-    else if(parameter==2) box=BOX<TV>(TV(-.5,-.5,-.5),TV(.5,(T).5,(T).5));
-    else if(parameter==3) box=BOX<TV>(TV(-(T).2,-(T).2,-(T).15),TV((T).2,(T).2,(T).15));
-    else if(parameter==4) box=BOX<TV>(TV(-(T)2,-(T)2,-(T)2),TV((T)2,(T)2,(T)2));
+    RANGE<TV> box;
+    if(parameter==1) box=RANGE<TV>(TV(-3,-(T).2,-2),TV(3,(T).2,2));
+    else if(parameter==2) box=RANGE<TV>(TV(-.5,-.5,-.5),TV(.5,(T).5,(T).5));
+    else if(parameter==3) box=RANGE<TV>(TV(-(T).2,-(T).2,-(T).15),TV((T).2,(T).2,(T).15));
+    else if(parameter==4) box=RANGE<TV>(TV(-(T)2,-(T)2,-(T)2),TV((T)2,(T)2,(T)2));
     else PHYSBAM_FATAL_ERROR();
 
     // Parameter abuse.
@@ -1247,13 +1247,13 @@ void Friction_Test()
 //#####################################################################
 // Function Find_Placement
 //#####################################################################
-FRAME<TV> Find_Placement(RANDOM_NUMBERS<T>& random,const BOX<TV>& bounding_box,ARRAY<ORIENTED_BOX<TV> >& bounding_boxes,const BOX<TV>& world,bool want_rotate)
+FRAME<TV> Find_Placement(RANDOM_NUMBERS<T>& random,const RANGE<TV>& bounding_box,ARRAY<ORIENTED_BOX<TV> >& bounding_boxes,const RANGE<TV>& world,bool want_rotate)
 {
     for(int i=0;i<10000;i++){
         FRAME<TV> frame;
         if(want_rotate) frame.r=random.template Get_Rotation<TV>();
         ORIENTED_BOX<TV> oriented_box(bounding_box,frame.r);
-        BOX<TV> new_box(oriented_box.Bounding_Box());
+        RANGE<TV> new_box(oriented_box.Bounding_Box());
         frame.t=random.Get_Uniform_Vector(world.min_corner-new_box.min_corner,world.max_corner-new_box.max_corner);
         oriented_box.corner+=frame.t;
         bool okay=true;

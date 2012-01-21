@@ -55,7 +55,7 @@ public:
     T velocity_multiplier;
     T aspect_ratio,side_length;
     T stiffness_multiplier,damping_multiplier,bending_stiffness_multiplier,bending_damping_multiplier;
-    BOX<TV> source_box,smoke_box;
+    RANGE<TV> source_box,smoke_box;
     TV source_velocity;
     DEFORMABLE_BODY_COLLECTION<TV> *rbl_current,*rbl_next,*rbl_prev;
     int list_frame,rigid_body_start_frame;

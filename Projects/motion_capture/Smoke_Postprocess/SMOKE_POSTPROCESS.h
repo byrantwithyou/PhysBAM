@@ -55,7 +55,7 @@ public:
     T velocity_multiplier;
     T aspect_ratio,side_length;
     T stiffness_multiplier,damping_multiplier,bending_stiffness_multiplier,bending_damping_multiplier;
-    BOX<TV> source_box,smoke_box;
+    RANGE<TV> source_box,smoke_box;
     TV source_velocity;
     RIGID_BODY_COLLECTION<TV> *rbl_current,*rbl_next;
     int list_frame,rigid_body_start_frame;
@@ -138,9 +138,9 @@ void Parse_Options() PHYSBAM_OVERRIDE
             velocity_multiplier=(T)15;
             //fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;fluids_parameters.domain_walls[2][1]=true;fluids_parameters.domain_walls[3][1]=true;fluids_parameters.domain_walls[3][2]=true;
             source_velocity=TV((T)0,(T)0,(T)-5);
-            //source_box=BOX<TV>((T)-10,(T)10,(T)-10,(T)10,(T)42,(T)45);
-            source_box=BOX<TV>((T)-3,(T)3,(T)-2,(T)4,(T)42,(T)45);
-            smoke_box=BOX<TV>((T)-3,(T)3,(T)-2,(T)4,(T)42,(T)45);
+            //source_box=RANGE<TV>((T)-10,(T)10,(T)-10,(T)10,(T)42,(T)45);
+            source_box=RANGE<TV>((T)-3,(T)3,(T)-2,(T)4,(T)42,(T)45);
+            smoke_box=RANGE<TV>((T)-3,(T)3,(T)-2,(T)4,(T)42,(T)45);
             break;
         case 2:
             last_frame=600;
@@ -154,7 +154,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;fluids_parameters.domain_walls[2][1]=true;fluids_parameters.domain_walls[3][1]=true;fluids_parameters.domain_walls[3][2]=true;
             smoke_tests.world_to_source=MATRIX<T,4>::Identity_Matrix();
             source_velocity=TV((T)0,(T)5,(T)0);
-            source_box=BOX<TV>((T)-1,(T)1,(T)0,(T)1,(T)-1,(T)1);
+            source_box=RANGE<TV>((T)-1,(T)1,(T)0,(T)1,(T)-1,(T)1);
             smoke_box=source_box;
             break;
         case 3:
@@ -169,7 +169,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;fluids_parameters.domain_walls[2][1]=true;fluids_parameters.domain_walls[3][1]=true;fluids_parameters.domain_walls[3][2]=true;
             smoke_tests.world_to_source=MATRIX<T,4>::Identity_Matrix();
             source_velocity=TV((T)0,(T)5,(T)0);
-            source_box=BOX<TV>((T)-1,(T)1,(T)0,(T)1,(T)-1,(T)1);
+            source_box=RANGE<TV>((T)-1,(T)1,(T)0,(T)1,(T)-1,(T)1);
             smoke_box=source_box;
             break;
         default:

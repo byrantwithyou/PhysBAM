@@ -23,7 +23,7 @@ class WATER_TESTS:public PLS_EXAMPLE<TV>
     typedef PLS_EXAMPLE<TV> BASE;
 
     CYLINDER<T> source_cyl;
-    BOX<TV> source;
+    RANGE<TV> source;
 
 public:
     using BASE::mac_grid; using BASE::incompressible;using BASE::projection;using BASE::output_directory;using BASE::incompressible;using BASE::mpi_grid;using BASE::domain_boundary;using BASE::face_velocities;

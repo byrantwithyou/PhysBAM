@@ -38,7 +38,7 @@ public:
     int particle_id;
     ARRAY<CYLINDER<T> > sph_sources;
     ARRAY<VECTOR<T,3> > sph_sources_velocity;
-    ARRAY<BOX<TV> > sph_sources_bounding_box;
+    ARRAY<RANGE<TV> > sph_sources_bounding_box;
     RANDOM_NUMBERS<T> random;
     T time_pour;
 
@@ -299,13 +299,13 @@ void Add_SPH_Particles_For_Sources(const T dt,const T time) PHYSBAM_OVERRIDE
     ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,VECTOR<int,3> >& removed_negative_particles=fluids_parameters.particle_levelset_evolution->particle_levelset.removed_negative_particles;
     for(int s=0;s<sph_sources.m;s++){
         typedef typename GRID<TV>::NODE_ITERATOR NODE_ITERATOR;
-        BOX<TV> source_bounding_box=sph_sources(s).Bounding_Box();
+        RANGE<TV> source_bounding_box=sph_sources(s).Bounding_Box();
         RANGE<TV_INT> source_bounding_box_int=RANGE<TV_INT>(grid.Block_Index(TV(source_bounding_box.min_corner.x,source_bounding_box.min_corner.y,source_bounding_box.min_corner.z),1),
              grid.Block_Index(TV(source_bounding_box.max_corner.x,source_bounding_box.max_corner.y,source_bounding_box.max_corner.z),1));
         for(NODE_ITERATOR node_iterator(grid,source_bounding_box_int);node_iterator.Valid();node_iterator.Next()){
             TV location=node_iterator.Location();TV_INT block=grid.Block_Index(location,1);
             BLOCK_UNIFORM<GRID<TV> > block_uniform(grid,block);
-            BOX<TV> block_bounding_box=block_uniform.Bounding_Box();
+            RANGE<TV> block_bounding_box=block_uniform.Bounding_Box();
             if(sph_sources(s).Lazy_Inside(location)){
                 if(!removed_negative_particles(block)) removed_negative_particles(block)=new PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>();
                 while(removed_negative_particles(block)->array_collection->Size()<.5*fraction_of_particles_for_sph*fluids_parameters.number_particles_per_cell){

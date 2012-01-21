@@ -146,7 +146,7 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
 void Initialize_Bodies() PHYSBAM_OVERRIDE
 {
     if(test_number!=3) return;
-    BOX<TV> domain=fluids_parameters.grid->Domain();TV grid_size=domain.Edge_Lengths();
+    RANGE<TV> domain=fluids_parameters.grid->Domain();TV grid_size=domain.Edge_Lengths();
     TV epsilon=grid_size*(T).1;
     RIGID_BODY<TV>& rect=tests.Add_Analytic_Box(TV(grid_size.x/(T)4,grid_size.y)+epsilon);
     rect.X()=domain.Minimum_Corner()+TV((T).8*grid_size.x,(T).5*grid_size.y);

@@ -817,11 +817,11 @@ void Add_Destructive_Wall()
     if(fracture_walls) FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),fp),fracture_pattern);
 
     TV edge_lengths((T)1.5,(T).1,(T)1);
-    TV_INT dimensions(31,3,21);BOX<TV> box((T)-.5*edge_lengths,(T).5*edge_lengths);TV dx=edge_lengths/TV(dimensions-1);
+    TV_INT dimensions(31,3,21);RANGE<TV> box((T)-.5*edge_lengths,(T).5*edge_lengths);TV dx=edge_lengths/TV(dimensions-1);
     TV_INT levelset_resolution(151,11,101);TV levelset_dx=edge_lengths/TV(levelset_resolution-1);int ghost_cells=2;
     RIGID_BODY<TV>* rigid_body=new RIGID_BODY<TV>(rigid_body_collection,true);
 
-    rigid_body->Add_Structure(*TESSELLATION::Generate_Triangles(BOX<TV>((T)-.5*edge_lengths,(T).5*edge_lengths)));
+    rigid_body->Add_Structure(*TESSELLATION::Generate_Triangles(RANGE<TV>((T)-.5*edge_lengths,(T).5*edge_lengths)));
     LEVELSET_IMPLICIT_OBJECT<TV>& implicit_object=*LEVELSET_IMPLICIT_OBJECT<TV>::Create();
     implicit_object.levelset.grid.Initialize(levelset_resolution+2*ghost_cells,box.Thickened(levelset_dx.x*ghost_cells),false);
     implicit_object.levelset.phi.Resize(implicit_object.levelset.grid.Domain_Indices());implicit_object.levelset.phi.Fill(FLT_MAX);
@@ -846,11 +846,11 @@ void Add_Room()
 
     for(int i=0;i<4;i++){
         TV edge_lengths((T)1,(T).2,(T)1);
-        TV_INT dimensions(31,3,21);BOX<TV> box((T)-.5*edge_lengths,(T).5*edge_lengths);TV dx=edge_lengths/TV(dimensions-1);
+        TV_INT dimensions(31,3,21);RANGE<TV> box((T)-.5*edge_lengths,(T).5*edge_lengths);TV dx=edge_lengths/TV(dimensions-1);
         TV_INT levelset_resolution(151,11,101);TV levelset_dx=edge_lengths/TV(levelset_resolution-1);int ghost_cells=2;
         RIGID_BODY<TV>* rigid_body=new RIGID_BODY<TV>(rigid_body_collection,true);
 
-        rigid_body->Add_Structure(*TESSELLATION::Generate_Triangles(BOX<TV>((T)-.5*edge_lengths,(T).5*edge_lengths)));
+        rigid_body->Add_Structure(*TESSELLATION::Generate_Triangles(RANGE<TV>((T)-.5*edge_lengths,(T).5*edge_lengths)));
         rigid_body->simplicial_object->mesh.Initialize_Adjacent_Elements();
         LEVELSET_IMPLICIT_OBJECT<TV>& implicit_object=*LEVELSET_IMPLICIT_OBJECT<TV>::Create();
         implicit_object.levelset.grid.Initialize(levelset_resolution+2*ghost_cells,box.Thickened(levelset_dx.x*ghost_cells),false);
@@ -881,11 +881,11 @@ void Add_Enclosed_Room()
 
     for(int i=0;i<4;i++){
         TV edge_lengths((T)1,(T).2,(T)1);
-        TV_INT dimensions(31,3,31);BOX<TV> box((T)-.5*edge_lengths,(T).5*edge_lengths);TV dx=edge_lengths/TV(dimensions-1);
+        TV_INT dimensions(31,3,31);RANGE<TV> box((T)-.5*edge_lengths,(T).5*edge_lengths);TV dx=edge_lengths/TV(dimensions-1);
         TV_INT levelset_resolution(101,21,101);TV levelset_dx=edge_lengths/TV(levelset_resolution-1);int ghost_cells=2;
         RIGID_BODY<TV>* rigid_body=new RIGID_BODY<TV>(rigid_body_collection,true);
 
-        rigid_body->Add_Structure(*TESSELLATION::Generate_Triangles(BOX<TV>((T)-.5*edge_lengths,(T).5*edge_lengths)));
+        rigid_body->Add_Structure(*TESSELLATION::Generate_Triangles(RANGE<TV>((T)-.5*edge_lengths,(T).5*edge_lengths)));
         rigid_body->simplicial_object->mesh.Initialize_Adjacent_Elements();
         LEVELSET_IMPLICIT_OBJECT<TV>& implicit_object=*LEVELSET_IMPLICIT_OBJECT<TV>::Create();
         implicit_object.levelset.grid.Initialize(levelset_resolution+2*ghost_cells,box.Thickened(levelset_dx.x*ghost_cells),false);
@@ -906,11 +906,11 @@ void Add_Enclosed_Room()
                                       (T)1e10,(T)1);}}
     if(0){
         TV edge_lengths((T)1,(T).2,(T)1);
-        TV_INT dimensions(31,3,31);BOX<TV> box((T)-.5*edge_lengths,(T).5*edge_lengths);TV dx=edge_lengths/TV(dimensions-1);
+        TV_INT dimensions(31,3,31);RANGE<TV> box((T)-.5*edge_lengths,(T).5*edge_lengths);TV dx=edge_lengths/TV(dimensions-1);
         TV_INT levelset_resolution(101,21,101);TV levelset_dx=edge_lengths/TV(levelset_resolution-1);int ghost_cells=2;
         RIGID_BODY<TV>* rigid_body=new RIGID_BODY<TV>(rigid_body_collection,true);
 
-        rigid_body->Add_Structure(*TESSELLATION::Generate_Triangles(BOX<TV>((T)-.5*edge_lengths,(T).5*edge_lengths)));
+        rigid_body->Add_Structure(*TESSELLATION::Generate_Triangles(RANGE<TV>((T)-.5*edge_lengths,(T).5*edge_lengths)));
         rigid_body->simplicial_object->mesh.Initialize_Adjacent_Elements();
         LEVELSET_IMPLICIT_OBJECT<TV>& implicit_object=*LEVELSET_IMPLICIT_OBJECT<TV>::Create();
         implicit_object.levelset.grid.Initialize(levelset_resolution+2*ghost_cells,box.Thickened(levelset_dx.x*ghost_cells),false);
@@ -1266,7 +1266,7 @@ void Shrink_Levelset(GRID<TV>& grid,ARRAY<T,VECTOR<int,3> >& phi,int boundary,TV
     inside=RANGE<TV_INT>::Intersect(inside.Thickened(boundary),domain);
     min_adjust=inside.min_corner-domain.min_corner;
     center-=min_adjust;
-    GRID<TV> grid_new(inside.Edge_Lengths()+1,BOX<TV>(grid.Node(inside.min_corner),grid.Node(inside.max_corner)),false);
+    GRID<TV> grid_new(inside.Edge_Lengths()+1,RANGE<TV>(grid.Node(inside.min_corner),grid.Node(inside.max_corner)),false);
     ARRAY<T,VECTOR<int,3> > phi_new(grid_new.Domain_Indices());
     for(NODE_ITERATOR iterator(grid_new);iterator.Valid();iterator.Next()) phi_new(iterator.index)=phi(iterator.index+min_adjust);
     grid=grid_new;
@@ -1284,7 +1284,7 @@ void Create_Wall_Pattern()
     TV half_edge_length(actual_edge_lengths/2);
 
     for(int i=2;i<=26;i++){
-        GRID<TV>& local_grid=*new GRID<TV>(actual_resolution,BOX<TV>(-half_edge_length,half_edge_length),false);
+        GRID<TV>& local_grid=*new GRID<TV>(actual_resolution,RANGE<TV>(-half_edge_length,half_edge_length),false);
         ARRAY<T,VECTOR<int,3> >& local_phi=*new ARRAY<T,VECTOR<int,3> >(local_grid.Domain_Indices());local_phi.Fill(FLT_MAX);
         LEVELSET_IMPLICIT_OBJECT<TV>* refined_lio=LEVELSET_IMPLICIT_OBJECT<TV>::Create();
         FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/Fracture_Patterns/wall/fragment.%d.phi",data_directory.c_str(),i),refined_lio->levelset);
