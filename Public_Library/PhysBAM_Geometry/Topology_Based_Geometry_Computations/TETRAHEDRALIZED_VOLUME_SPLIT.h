@@ -100,7 +100,7 @@ int Split_Connected_Component(TETRAHEDRALIZED_VOLUME<T>& tv,const int node)
         ARRAY<int> empty;tv.mesh.incident_elements->Append(empty);
         ARRAY<int> indices_to_remove(number_marked);int counter=0;
         for(t=0;t<(*tv.mesh.incident_elements)(node).m;t++) if(marked(t)){
-            indices_to_remove(++counter)=t;
+            indices_to_remove(counter++)=t;
             for(int i=0;i<4;i++) if(tv.mesh.elements((*tv.mesh.incident_elements)(node)(t))(i) == node){
                 tv.mesh.elements((*tv.mesh.incident_elements)(node)(t))(i)=new_particle;break;}
             (*tv.mesh.incident_elements)(new_particle).Append((*tv.mesh.incident_elements)(node)(t));}

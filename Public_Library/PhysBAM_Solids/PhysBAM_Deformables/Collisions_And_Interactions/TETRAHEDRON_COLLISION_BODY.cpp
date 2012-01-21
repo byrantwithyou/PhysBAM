@@ -276,7 +276,7 @@ Adjust_Nodes_For_Collisions(ARRAY_VIEW<const TV> X_old,PARTICLES<TV>& collision_
     int count=0;
     for(int pair=0;pair<interaction_pair.m;pair++){
         int p,t;interaction_pair(pair).Get(p,t);
-        if(t) X(p)+=relaxation_factor*position_change(++count);}
+        if(t) X(p)+=relaxation_factor*position_change(count++);}
     if(interactions) soft_bindings.Adjust_Parents_For_Changes_In_Surface_Children(particle_on_surface);
     return interactions;
 }

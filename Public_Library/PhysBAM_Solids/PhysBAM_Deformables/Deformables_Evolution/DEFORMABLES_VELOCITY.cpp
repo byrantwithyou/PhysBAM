@@ -91,7 +91,7 @@ Pack(VECTOR_ND<T> &velocities) const
     int index=0;
     for(int i=0;i<V.Size();i++)
         for(int j=0;j<TV::dimension;j++)
-            velocities(++index)=V.array(i)(j);
+            velocities(index++)=V.array(i)(j);
 }
 //#####################################################################
 // Function Unpack
@@ -103,7 +103,7 @@ Unpack(VECTOR_ND<T> &velocities)
     int index=0;
     for(int i=0;i<V.Size();i++)
         for(int j=0;j<TV::dimension;j++)
-            V.array(i)(j)=velocities(++index);
+            V.array(i)(j)=velocities(index++);
 }
 //#####################################################################
 // Function Unpack_And_Add
@@ -115,7 +115,7 @@ Unpack_And_Add(VECTOR_ND<T> &velocities)
     int index=0;
     for(int i=0;i<V.Size();i++)
         for(int j=0;j<TV::dimension;j++)
-            V.array(i)(j)+=velocities(++index);
+            V.array(i)(j)+=velocities(index++);
 }
 template<class TV> int DEFORMABLES_VELOCITY<TV>::
 Raw_Size() const

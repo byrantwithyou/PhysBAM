@@ -197,7 +197,7 @@ Split_Range(TV_INT& processes_per_dimension,const RANGE<TV>& global_range)
     partition_coordinates_to_rank.Resize(RANGE<TV_INT>(TV_INT::All_Ones_Vector(),processes_per_dimension));
     int count=0;
     for(typename GRID<TV>::NODE_ITERATOR iterator(process_grid);iterator.Valid();iterator.Next()){
-        all_coordinates(++count)=iterator.Node_Index();
+        all_coordinates(count++)=iterator.Node_Index();
         partition_coordinates_to_rank(iterator.Node_Index())=count;}
     TV_INT coordinates=all_coordinates(rank+1);
     TV start,end;

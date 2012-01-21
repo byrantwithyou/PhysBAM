@@ -53,7 +53,7 @@ Set_Triples_From_Segment_Mesh(SEGMENT_MESH& mesh)
                 VECTOR<int,2> segment2=mesh.elements(s);
                 if(segment2.Contains(segment1.x)) cyclic_shift(segment1);
                 if(segment1.Contains(segment2.y)) cyclic_shift(segment2);
-                bending_triples(++index).Set(segment1.x,segment1.y,segment2.y);}}}
+                bending_triples(index++).Set(segment1.x,segment1.y,segment2.y);}}}
 }
 //#####################################################################
 // Function Set_Constants_From_Particles

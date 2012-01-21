@@ -536,7 +536,7 @@ Embed_Surface_In_Tetrahedralized_Volume(BINDING_LIST<TV>& binding_list,SOFT_BIND
     int k=0;
     for(int i=0;i<volume.mesh.elements.m;i++){
         if(tet_color(i)!=3){
-            volume.mesh.elements(++k)=volume.mesh.elements(i);
+            volume.mesh.elements(k++)=volume.mesh.elements(i);
             tet_map(i)=k;}}
     volume.mesh.elements.Resize(k);
     for(int i=0;i<point_to_tet.m;i++) point_to_tet(i)=tet_map(point_to_tet(i));

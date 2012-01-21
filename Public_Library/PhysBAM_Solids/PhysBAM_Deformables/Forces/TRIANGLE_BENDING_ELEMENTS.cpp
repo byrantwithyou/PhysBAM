@@ -61,7 +61,7 @@ Set_Quadruples_From_Triangle_Mesh(TRIANGLE_MESH& mesh)
             if(s>t){
                 int s1,s2,s3;mesh.elements(s).Get(s1,s2,s3);
                 if(t1==s1 || t1==s2 || t1==s3){cyclic_shift(t1,t2,t3);if(t1==s1 || t1==s2 || t1==s3) cyclic_shift(t1,t2,t3);}
-                bending_quadruples(++index).Set(t1,t2,t3,mesh.Other_Node(t2,t3,s));}}}
+                bending_quadruples(index++).Set(t1,t2,t3,mesh.Other_Node(t2,t3,s));}}}
 }
 //#####################################################################
 // Function Set_Quadruples_From_Reference_Triangle_Mesh
@@ -86,7 +86,7 @@ Set_Quadruples_From_Reference_Triangle_Mesh(TRIANGLE_MESH& mesh,const ARRAY<int>
             if(triangle_map_to_reference(s)>triangle_map_to_reference(t)){
                 int s1,s2,s3;mesh.elements(s).Get(s1,s2,s3);
                 if(t1==s1 || t1==s2 || t1==s3){cyclic_shift(t1,t2,t3);if(t1==s1 || t1==s2 || t1==s3) cyclic_shift(t1,t2,t3);}
-                bending_quadruples(++index).Set(t1,t2,t3,mesh.Other_Node(t2,t3,s));}}}
+                bending_quadruples(index++).Set(t1,t2,t3,mesh.Other_Node(t2,t3,s));}}}
 }
 //#####################################################################
 // Function Set_Constants_From_Particles

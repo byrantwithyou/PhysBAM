@@ -62,7 +62,7 @@ Set_Restlength_From_Material_Coordinates(ARRAY_VIEW<const TV> material_coordinat
             TV normal=segment_1.Shortest_Vector_Between_Lines(segment_2,weights);
             param.visual_restlength=param.restlength=normal.Magnitude();}
         int count=0;
-        for(int i=0;i<3;i++) for(int j=i+1;j<4;j++) edge_restlength_squared(t)(++count)=(material_coordinates(element_nodes[j])-material_coordinates(element_nodes[i])).Magnitude_Squared();}
+        for(int i=0;i<3;i++) for(int j=i+1;j<4;j++) edge_restlength_squared(t)(count++)=(material_coordinates(element_nodes[j])-material_coordinates(element_nodes[i])).Magnitude_Squared();}
 }
 //#####################################################################
 // Function CFL_Strain_Rate

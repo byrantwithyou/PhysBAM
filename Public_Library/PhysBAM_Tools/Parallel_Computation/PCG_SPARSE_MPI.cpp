@@ -53,7 +53,7 @@ Serial_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,VECTOR
         global_A.n=global_rows;global_A.offsets.Resize(global_rows+1);
         {int current_row=1,current_index=1;global_A.offsets(1)=1;
         for(int p=0;p<processors;p++) for(int i=partition_array(p).interior_indices.min_corner;i<=partition_array(p).interior_indices.max_corner;i++)
-            global_A.offsets(++current_row)=current_index+=A_array(p).offsets(i+1)-A_array(p).offsets(i);
+            global_A.offsets(current_row++)=current_index+=A_array(p).offsets(i+1)-A_array(p).offsets(i);
         assert(current_row==global_rows+1 && global_A.offsets(current_row)==global_entries+1);}
         // assemble full linear system
         global_A.A.Resize(global_entries);

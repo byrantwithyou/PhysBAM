@@ -70,8 +70,8 @@ Transfer_With_Distance_Averaged_Weights(ARRAY_VIEW<const TV> domain,ARRAY_VIEW<c
             weight_index=0;T normalization=(T)0;
             for(CELL_ITERATOR cell_iterator(grid,index_box);cell_iterator.Valid();cell_iterator.Next()){TV_INT cell=cell_iterator.Cell_Index();
                 const ARRAY<int>& point_indices=points_in_cell(cell);
-                for(int indirect_index=0;indirect_index<point_indices.m;indirect_index++) if(weights(++weight_index) > 0){
-                    int k=point_indices(indirect_index);grid_data(node)+=weights(weight_index)*range(k);normalization+=weights(weight_index);}}
+                for(int indirect_index=0;indirect_index<point_indices.m;indirect_index++) if(weights(weight_index++) > 0){
+                    int k=point_indices(indirect_index-1);grid_data(node)+=weights(weight_index-1)*range(k);normalization+=weights(weight_index-1);}}
             grid_data(node)/=normalization;}}
 }
 //#####################################################################

@@ -65,7 +65,7 @@ int Split_Connected_Component(TRIANGULATED_AREA<T>& ta,const int node)
         ARRAY<int> empty;ta.mesh.incident_elements->Append(empty);
         ARRAY<int> indices_to_remove(number_marked);int counter=0;
         for(t=0;t<(*ta.mesh.incident_elements)(node).m;t++) if(marked(t)){
-            indices_to_remove(++counter)=t;
+            indices_to_remove(counter++)=t;
             for(int i=0;i<3;i++) if(ta.mesh.elements((*ta.mesh.incident_elements)(node)(t))(i) == node){ 
                 ta.mesh.elements((*ta.mesh.incident_elements)(node)(t))(i)=new_particle;break;}
             (*ta.mesh.incident_elements)(new_particle).Append((*ta.mesh.incident_elements)(node)(t));}

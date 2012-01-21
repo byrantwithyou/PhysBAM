@@ -70,7 +70,7 @@ Initialize()
             if(s>t){
                 int s1,s2,s3;triangle_mesh.elements(s).Get(s1,s2,s3);
                 if(t1==s1 || t1==s2 || t1==s3){cyclic_shift(t1,t2,t3);if(t1==s1 || t1==s2 || t1==s3) cyclic_shift(t1,t2,t3);}
-                spring_particles(++index).Set(t2,t3,t1,triangle_mesh.Other_Node(t2,t3,s));}}}
+                spring_particles(index++).Set(t2,t3,t1,triangle_mesh.Other_Node(t2,t3,s));}}}
 
     if(!adjacent_triangles_defined){delete triangle_mesh.adjacent_elements;triangle_mesh.adjacent_elements=0;}
 }

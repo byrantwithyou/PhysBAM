@@ -72,7 +72,7 @@ public:
     void Modify_Levelset_Using_Escaped_Particles(T_FACE_ARRAYS_SCALAR* face_velocities)
     {for(int i=0;i<particle_levelsets.m;i++){
         ARRAY<T_ARRAYS_PARTICLE_LEVELSET_PARTICLES*> other_positive_particles(particle_levelsets.m-1);
-        int index=0;for(int j=0;j<particle_levelsets.m;j++)if(i!=j)other_positive_particles(++index)=&particle_levelsets(j)->negative_particles;
+        int index=0;for(int j=0;j<particle_levelsets.m;j++)if(i!=j)other_positive_particles(index++)=&particle_levelsets(j)->negative_particles;
         particle_levelsets(i)->Modify_Levelset_Using_Escaped_Particles(face_velocities,&other_positive_particles);}}
 
     void Euler_Step_Particles(const T_FACE_ARRAYS_SCALAR& V,const T dt,const T time=0,const bool use_second_order_for_nonremoved_particles=false,const bool update_particle_cells_after_euler_step=true,const bool verbose=true)

@@ -90,7 +90,7 @@ Setup_Mesh()
     T phi1=dual_phi(node1),phi2=dual_phi(node2);
     int first_side=phi1<phi2?prev_face.axis:3-prev_face.axis;
     int next=0;
-    X(++next)=HX.Get(prev_face);
+    X(next++)=HX.Get(prev_face);
     TV_INT cell=prev_face.Cell_Index(first_side);
     typename BASE::CLIP_ENTRY ce={0,0,1};
     T min_length=index_map.grid.dX.Min()*(T).1;
@@ -102,7 +102,7 @@ Setup_Mesh()
         if(next_face==it.Key()) break;
         TV next_X=HX.Get(next_face);
         if((next_X-X(next)).Magnitude()>min_length){
-            X(++next)=next_X;
+            X(next++)=next_X;
             ce.i=curve.mesh.elements.Append(VECTOR<int,2>(next-1,next));
             cut_cells.Get_Or_Insert(cell).clipped_segments.Append(ce);}
         else LOG::cout<<"PRUNE SEGMENT  "<<(next_X-X(next)).Magnitude()<<"  "<<min_length<<"   "<<next<<std::endl;

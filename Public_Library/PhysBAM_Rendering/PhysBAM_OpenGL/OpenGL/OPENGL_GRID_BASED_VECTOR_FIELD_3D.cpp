@@ -63,7 +63,7 @@ Update()
                     vector_field(index)=V(grid_index);
                     vector_locations(index)=grid.X(grid_index);}}}
         else for(int i=0;i<m;i++)for(int j=0;j<n;j++)for(int ij=0;ij<mn;ij++)if(V(i,j,ij)!=VECTOR<T,3>()){
-            vector_field(++index)=V(i,j,ij);vector_locations(index)=grid.X(i,j,ij);}}
+            vector_field(index)=V(i,j,ij);vector_locations(index++)=grid.X(i,j,ij);}}
     else{
         VECTOR<int,3> domain_start(V.domain.min_corner.x,V.domain.min_corner.y,V.domain.min_corner.z),domain_end(V.domain.max_corner.x,V.domain.max_corner.y,V.domain.max_corner.z);
         if ((slice->mode == OPENGL_SLICE::CELL_SLICE && (grid.MAC_offset==0 || slice->index < domain_start[slice->axis] || slice->index > domain_end[slice->axis])) ||

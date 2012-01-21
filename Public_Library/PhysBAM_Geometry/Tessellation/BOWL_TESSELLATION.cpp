@@ -28,11 +28,11 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(const BOWL<T>& bow
         TV radial=radial_basis*COMPLEX<T>::Unit_Polar(T(2*pi/n_radial)*i).Vector();
         for (int j=n_vertical; j>=0; j--){
             TV spherical=radial_basis*COMPLEX<T>::Unit_Polar(T(0.5*pi/n_vertical)*j).Vector();
-            particles.X(++p)=radial*(bowl.hole_radius+spherical.z*bowl.height);
+            particles.X(p++)=radial*(bowl.hole_radius+spherical.z*bowl.height);
             particles.X(p).y=bowl.height*spherical.x;}
         for (int j=0; j<=n_vertical; j++){
             TV spherical=radial_basis*COMPLEX<T>::Unit_Polar(T(0.5*pi/n_vertical)*j).Vector();
-            particles.X(++p)=radial*(bowl.hole_radius+spherical.z*bowl.depth);
+            particles.X(p++)=radial*(bowl.hole_radius+spherical.z*bowl.depth);
             particles.X(p).y=bowl.depth*spherical.x;}
     }
     return surface;

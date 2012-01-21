@@ -82,17 +82,17 @@ Add_Grid_Deformable_Object(DEFORMABLE_BODY_COLLECTION<VECTOR<T,2> >& deformable_
             for(int k=0;k<edge_subdivision-1;k++){
                 int index=particles.array_collection->Add_Element();
                 particles.X(index)=((T)k/edge_subdivision)*VECTOR<T,2>(grid.dX.x,0)+grid.X(i,j);particles.V(index)=VECTOR<T,2>(0,0);
-                mesh.elements(++segment_index).Set(last_index,index);
+                mesh.elements(segment_index++).Set(last_index,index);
                 last_index=index;}
-            mesh.elements(++segment_index).Set(last_index,base_index(i+1,j));}
+            mesh.elements(segment_index++).Set(last_index,base_index(i+1,j));}
         if(j<grid.counts.y){
             int last_index=base_index(i,j);
             for(int k=0;k<edge_subdivision-1;k++){
                 int index=particles.array_collection->Add_Element();
                 particles.X(index)=((T)k/edge_subdivision)*VECTOR<T,2>(0,grid.dX.y)+grid.X(i,j);particles.V(index)=VECTOR<T,2>(0,0);
-                mesh.elements(++segment_index).Set(last_index,index);
+                mesh.elements(segment_index++).Set(last_index,index);
                 last_index=index;}
-            mesh.elements(++segment_index).Set(last_index,base_index(i,j+1));}}
+            mesh.elements(segment_index++).Set(last_index,base_index(i,j+1));}}
     return index;
 }
 //#####################################################################

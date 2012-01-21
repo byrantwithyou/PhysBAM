@@ -82,9 +82,9 @@ Pack(VECTOR_ND<T> &velocities) const
     int index=0;
     for(int i=0;i<rigid_V.Size();i++){
         for(int j=0;j<TV::dimension;j++)
-            velocities(++index)=rigid_V(i).linear(j);
+            velocities(index++)=rigid_V(i).linear(j);
         for(int j=0;j<T_SPIN::dimension;j++)
-            velocities(++index)=rigid_V(i).angular(j);}
+            velocities(index++)=rigid_V(i).angular(j);}
 }
 //#####################################################################
 // Function Unpack
@@ -96,9 +96,9 @@ Unpack(VECTOR_ND<T> &velocities)
     int index=0;
     for(int i=0;i<rigid_V.Size();i++){
         for(int j=0;j<TV::dimension;j++)
-            rigid_V(i).linear(j)=velocities(++index);
+            rigid_V(i).linear(j)=velocities(index++);
         for(int j=0;j<T_SPIN::dimension;j++)
-            rigid_V(i).angular(j)=velocities(++index);}
+            rigid_V(i).angular(j)=velocities(index++);}
 }
 //#####################################################################
 // Function Unpack_And_Add
@@ -110,9 +110,9 @@ Unpack_And_Add(VECTOR_ND<T> &velocities)
     int index=0;
     for(int i=0;i<rigid_V.Size();i++){
         for(int j=0;j<TV::dimension;j++)
-            rigid_V(i).linear(j)+=velocities(++index);
+            rigid_V(i).linear(j)+=velocities(index++);
         for(int j=0;j<T_SPIN::dimension;j++)
-            rigid_V(i).angular(j)+=velocities(++index);}
+            rigid_V(i).angular(j)+=velocities(index++);}
 }
 template<class TV> int RIGIDS_VELOCITY<TV>::
 Raw_Size() const

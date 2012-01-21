@@ -50,30 +50,30 @@ template<class T> void EXPANSION_ARITHMETIC<T>::
 Add_Expansions(const ARRAY<T>& e,const ARRAY<T>& f,ARRAY<T>& h)
 {
   INEXACT T Qnew,hh;
-  T enow=e(1),fnow=f(1),Q;
+  T enow=e(0),fnow=f(0),Q;
   int eindex=1,findex=1;
 
   h.Remove_All();h.Preallocate(e.m+f.m);
-  if((fnow>enow)==(fnow>-enow)){Q=enow;if(++eindex<=e.m)enow=e(eindex);}
+  if((fnow>enow)==(fnow>-enow)){Q=enow;if(++eindex<=e.m)enow=e(eindex-1);}
   else{Q=fnow;if(++findex<=f.m)fnow=f(findex);}
   if((eindex<=e.m)&&(findex<=f.m)){
-      if((fnow>enow)==(fnow>-enow)){Fast_Two_Sum(enow,Q,Qnew,hh);if(++eindex<=e.m)enow=e(eindex);}
-      else{Fast_Two_Sum(fnow,Q,Qnew,hh);if(++findex<=f.m)fnow=f(findex);}
+      if((fnow>enow)==(fnow>-enow)){Fast_Two_Sum(enow,Q,Qnew,hh);if(++eindex<=e.m)enow=e(eindex-1);}
+      else{Fast_Two_Sum(fnow,Q,Qnew,hh);if(++findex<=f.m)fnow=f(findex-1);}
       Q=Qnew;
       if(hh!=0) h.Append(const_cast<T&>(hh)); // NOTE: if(hh!=0) is not equivalent to if(hh) (bool)--(float)0=true
       while((eindex<=e.m)&&(findex<=f.m)){
-          if((fnow>enow)==(fnow>-enow)){Two_Sum(Q,enow,Qnew,hh);if(++eindex<=e.m)enow=e(eindex);}
-          else{Two_Sum(Q,fnow,Qnew,hh);if(++findex<=f.m)fnow=f(findex);}
+          if((fnow>enow)==(fnow>-enow)){Two_Sum(Q,enow,Qnew,hh);if(++eindex<=e.m)enow=e(eindex-1);}
+          else{Two_Sum(Q,fnow,Qnew,hh);if(++findex<=f.m)fnow=f(findex-1);}
           Q=Qnew;
           if(hh!=0) h.Append(const_cast<T&>(hh));}}
   while(eindex<=e.m){
       Two_Sum(Q,enow,Qnew,hh);
-      if(++eindex<=e.m)enow=e(eindex);
+      if(++eindex<=e.m)enow=e(eindex-1);
       Q=Qnew;
       if(hh!=0) h.Append(const_cast<T&>(hh));}
   while(findex<=f.m){
       Two_Sum(Q,fnow,Qnew,hh);
-      if(++findex<=f.m)fnow=f(findex);
+      if(++findex<=f.m)fnow=f(findex-1);
       Q=Qnew;
       if(hh!=0) h.Append(const_cast<T&>(hh));}
   if((Q!=0)||!h.m) h.Append(Q);
@@ -90,7 +90,7 @@ Scale_Expansion(const ARRAY<T>& e,const T b,ARRAY<T>& h)
 
   h.Remove_All();h.Preallocate(2*e.m);
   Split(b,bhi,blo);
-  Two_Product_Presplit(e(1),b,bhi,blo,Q,hh);
+  Two_Product_Presplit(e(0),b,bhi,blo,Q,hh);
   if(hh!=0) h.Append(hh);
   for(eindex=2;eindex<=e.m;eindex++){
       enow=e(eindex);

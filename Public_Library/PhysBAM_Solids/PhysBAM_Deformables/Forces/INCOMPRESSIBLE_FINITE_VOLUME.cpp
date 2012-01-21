@@ -461,7 +461,7 @@ Set_Neumann_Boundary_Conditions(const ARRAY<COLLISION_PARTICLE_STATE<TV> >* part
     int j=0;
     for(int i=0;i<projection_data.neumann_boundary_nodes.m;i++){int p=projection_data.neumann_boundary_nodes(i);
         if(neumann_boundary_count(p)==1) projection_data.neumann_boundary_nodes_isolated.Append(p);
-        else projection_data.neumann_boundary_nodes(++j)=p;}
+        else projection_data.neumann_boundary_nodes(j++)=p;}
     projection_data.neumann_boundary_nodes.m=j;
 
     LOG::cout<<"moving constraints: "<<projection_data.point_face_pairs.m<<std::endl;

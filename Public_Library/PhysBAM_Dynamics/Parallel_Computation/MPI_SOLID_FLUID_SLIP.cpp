@@ -422,7 +422,7 @@ Find_Boundary_Indices_In_Region(const GRID<TV>& local_grid,const T_ARRAYS_BOOL& 
         TV_INT cell_index=iterator.Cell_Index();
         //if(!poisson->psi_N(axis,cell_index+face_offset)){
         if(/*!face_ghost_cell_index(side,axis,cell_index+face_offset) &&*/ !poisson->psi_D(cell_index) && valid_divergence_cells(cell_index)){
-                partition.boundary_indices(domain_side)(++boundary_cell_count)=cell_index_to_matrix_index(cell_index);
+                partition.boundary_indices(domain_side)(boundary_cell_count++)=cell_index_to_matrix_index(cell_index);
         }
             /*else if(face_ghost_cell_index(side,axis,cell_index+face_offset)){
                 DEBUG_UTILITIES::Debug_Breakpoint();
@@ -435,7 +435,7 @@ Find_Boundary_Indices_In_Region(const GRID<TV>& local_grid,const T_ARRAYS_BOOL& 
         TV_INT cell_index=iterator.Cell_Index();
         //if(!poisson->psi_N(axis,cell_index+face_offset)){
         if(/*!face_ghost_cell_index(side,axis,cell_index+face_offset) &&*/ !poisson->psi_D(cell_index) && !valid_divergence_cells(cell_index)){
-                partition.boundary_indices(domain_side)(++boundary_cell_count)=cell_index_to_matrix_index(cell_index);
+                partition.boundary_indices(domain_side)(boundary_cell_count++)=cell_index_to_matrix_index(cell_index);
         }
             /*else if(face_ghost_cell_index(side,axis,cell_index+face_offset)){
                 DEBUG_UTILITIES::Debug_Breakpoint();
@@ -459,7 +459,7 @@ Find_Boundary_Indices_In_Region(const GRID<TV>& local_grid,const T_ARRAYS_BOOL& 
             if(!poisson->psi_N(second_axis,cell_index+second_axis_vector) && face_ghost_cell_index(2,second_axis,cell_index+second_axis_vector) && domain_indices_shrink_axis.Lazy_Outside(cell_index+second_axis_vector))
             partition.boundary_indices(domain_side)(++boundary_cell_count)=face_ghost_cell_index(2,second_axis,cell_index+second_axis_vector);}}*/
     for(int i=0;i<boundary_ghost_cells.m;i++){
-        partition.boundary_indices(domain_side)(++boundary_cell_count)=boundary_ghost_cells(i);
+        partition.boundary_indices(domain_side)(boundary_cell_count++)=boundary_ghost_cells(i);
     }
 
 #ifdef BRICK
@@ -475,13 +475,13 @@ Find_Boundary_Indices_In_Region(const GRID<TV>& local_grid,const T_ARRAYS_BOOL& 
 #ifdef BRICK
                 LOG::cout<<"Lambda in boundary region at (2, "<<second_axis<<", "<<cell_index<<std::endl;
 #endif
-                partition.boundary_indices(domain_side)(++boundary_cell_count)=face_lambdas(2,second_axis,cell_index);
+                partition.boundary_indices(domain_side)(boundary_cell_count++)=face_lambdas(2,second_axis,cell_index);
             }
             if(contracted_domain_indices.Lazy_Outside(cell_index+axis_vector) && face_lambdas(1,second_axis,cell_index+axis_vector)!=0){
 #ifdef BRICK
                 LOG::cout<<"Lambda in boundary region at (1, "<<second_axis<<", "<<cell_index+axis_vector<<std::endl;
 #endif
-                partition.boundary_indices(domain_side)(++boundary_cell_count)=face_lambdas(1,second_axis,cell_index+axis_vector);}}}
+                partition.boundary_indices(domain_side)(boundary_cell_count++)=face_lambdas(1,second_axis,cell_index+axis_vector);}}}
 
 #ifdef BRICK
     LOG::cout<<boundary_cell_count-count_before<<" face lambdas in boundary region "<<domain_side<<std::endl;

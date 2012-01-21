@@ -112,7 +112,7 @@ Active_Subset() const
 {
     ARRAY<int> result(Active_Size());
     int n=0;
-    for(int i=0;i<Size();i++) if(Active(i)) result(++n)=i;
+    for(int i=0;i<Size();i++) if(Active(i)) result(n++)=i;
     return result;
 }
 template<class T> ARRAY<int> FACE_CONTROL_PARAMETERS<T>::
@@ -120,7 +120,7 @@ Active_Kinematic_Subset() const
 {
     ARRAY<int> result(Active_Kinematic_Size());
     int n=0;
-    for(int i=0;i<Size();i++) if(Active_Kinematic(i)) result(++n)=i;
+    for(int i=0;i<Size();i++) if(Active_Kinematic(i)) result(n++)=i;
     return result;
 }
 template<class T> ARRAY<int> FACE_CONTROL_PARAMETERS<T>::
@@ -128,7 +128,7 @@ Active_Nonkinematic_Subset() const
 {
     ARRAY<int> result(Active_Nonkinematic_Size());
     int n=0;
-    for(int i=0;i<Size();i++) if(Active_Nonkinematic(i)) result(++n)=i;
+    for(int i=0;i<Size();i++) if(Active_Nonkinematic(i)) result(n++)=i;
     return result;
 }
 template<class T> void FACE_CONTROL_PARAMETERS<T>::

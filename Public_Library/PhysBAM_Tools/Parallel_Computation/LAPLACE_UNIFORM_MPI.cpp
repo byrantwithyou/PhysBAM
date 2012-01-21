@@ -143,7 +143,7 @@ Find_Boundary_Indices_In_Region(const int side,const RANGE<TV_INT>& region,T_ARR
     counts.Fill(0);
     for(CELL_ITERATOR iterator(local_grid,region);iterator.Valid();iterator.Next())if(!psi_N.Component(axis)(iterator.Cell_Index()+face_offset)){
         int color=filled_region_colors(iterator.Cell_Index());
-        if(counts.Valid_Index(color)) partitions(color).boundary_indices(side)(++counts(color))=cell_index_to_matrix_index(iterator.Cell_Index());}
+        if(counts.Valid_Index(color)) partitions(color).boundary_indices(side)(counts(color)++)=cell_index_to_matrix_index(iterator.Cell_Index());}
 }
 //#####################################################################
 

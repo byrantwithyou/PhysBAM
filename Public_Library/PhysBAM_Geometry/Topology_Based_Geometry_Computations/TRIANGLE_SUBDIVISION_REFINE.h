@@ -31,10 +31,10 @@ Refine_Mesh(TRIANGLE_SUBDIVISION& ts,TRIANGLE_MESH& refined_triangle_mesh,const 
         int i,j,k;ts.triangle_mesh.elements(t).Get(i,j,k);
         int edge_ij,edge_jk,edge_ki;(*ts.triangle_mesh.element_edges)(t).Get(edge_ij,edge_jk,edge_ki);
         int ij=ts.start_index_for_new_nodes-1+edge_ij,jk=ts.start_index_for_new_nodes-1+edge_jk,ki=ts.start_index_for_new_nodes-1+edge_ki;
-        refined_triangle_mesh.elements(++new_t).Set(i,ij,ki);
-        refined_triangle_mesh.elements(++new_t).Set(j,jk,ij);
-        refined_triangle_mesh.elements(++new_t).Set(k,ki,jk);
-        refined_triangle_mesh.elements(++new_t).Set(jk,ki,ij);
+        refined_triangle_mesh.elements(new_t++).Set(i,ij,ki);
+        refined_triangle_mesh.elements(new_t++).Set(j,jk,ij);
+        refined_triangle_mesh.elements(new_t++).Set(k,ki,jk);
+        refined_triangle_mesh.elements(new_t++).Set(jk,ki,ij);
         refined_triangle_mesh.number_nodes=max(refined_triangle_mesh.number_nodes,i,j,k,ij,jk,ki);} // update the number of nodes
     
     if(!triangle_edges_defined){delete ts.triangle_mesh.element_edges;ts.triangle_mesh.element_edges=0;} 
@@ -61,8 +61,8 @@ Refine_Mesh_Dual(TRIANGLE_SUBDIVISION& ts,TRIANGLE_MESH& refined_triangle_mesh,c
             int si,sj,sk;ts.triangle_mesh.elements(s).Get(si,sj,sk);
             if(ti==si||ti==sj||ti==sk){cyclic_shift(ti,tj,tk);if(ti==si||ti==sj||ti==sk)cyclic_shift(ti,tj,tk);}
             int sv=ts.start_index_for_new_nodes-1+s;
-            refined_triangle_mesh.elements(++new_t).Set(tv,tj,sv);
-            refined_triangle_mesh.elements(++new_t).Set(tv,sv,tk);}}
+            refined_triangle_mesh.elements(new_t++).Set(tv,tj,sv);
+            refined_triangle_mesh.elements(new_t++).Set(tv,sv,tk);}}
     refined_triangle_mesh.number_nodes=ts.triangle_mesh.number_nodes+ts.triangle_mesh.elements.m;
     
     if(!adjacent_elements_defined){delete ts.triangle_mesh.adjacent_elements;ts.triangle_mesh.adjacent_elements=0;} 

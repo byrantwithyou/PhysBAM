@@ -45,7 +45,7 @@ Initialize(TRIANGLE_MESH& triangle_mesh)
             if(s > t){
                 int s1,s2,s3;triangle_mesh.elements(s).Get(s1,s2,s3);
                 if(t1==s1||t1==s2||t1==s3){cyclic_shift(t1,t2,t3);if(t1==s1||t1==s2||t1==s3)cyclic_shift(t1,t2,t3);}
-                segment_list(++index).Set(t1,triangle_mesh.Other_Node(t2,t3,s));}}}
+                segment_list(index++).Set(t1,triangle_mesh.Other_Node(t2,t3,s));}}}
     segment_mesh.Initialize_Mesh(triangle_mesh.number_nodes,segment_list);
 }
 //#####################################################################
