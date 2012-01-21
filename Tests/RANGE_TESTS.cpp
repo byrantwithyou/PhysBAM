@@ -70,10 +70,10 @@ public:
 
     TEST_RESULT Run_Test(int n)
     {switch(n){
-            case 1:
+            case 0:
             if(!Test_Static_Members<VECTOR<T,1> >() || !Test_Static_Members<VECTOR<T,2> >() || !Test_Static_Members<VECTOR<T,3> >()) return failure;
             return success;
-        case 2:
+        case 1:
             if(!Test_Box_Booleans<VECTOR<T,1> >() || !Test_Box_Booleans<VECTOR<T,2> >() || !Test_Box_Booleans<VECTOR<T,3> >()) return failure;
             if(!Test_Box_Scaling<VECTOR<T,1> >() || !Test_Box_Scaling<VECTOR<T,2> >() || !Test_Box_Scaling<VECTOR<T,3> >()) return failure;
             if(!Test_Box_Shift<VECTOR<T,1> >() || !Test_Box_Shift<VECTOR<T,2> >() || !Test_Box_Shift<VECTOR<T,3> >()) return failure;
@@ -81,7 +81,7 @@ public:
             if(!Test_Box_Bounds_Adjustment<VECTOR<T,1> >() || !Test_Box_Bounds_Adjustment<VECTOR<T,2> >() || !Test_Box_Bounds_Adjustment<VECTOR<T,3> >()) return failure;
             if(!Test_Box_Expansion<VECTOR<T,1> >() || !Test_Box_Expansion<VECTOR<T,2> >() || !Test_Box_Expansion<VECTOR<T,3> >()) return failure;
             return success;
-        case 3:
+        case 2:
             if(!Test_Box_Containment<VECTOR<T,1> >() || !Test_Box_Containment<VECTOR<T,2> >() || !Test_Box_Containment<VECTOR<T,3> >()) return failure;
             if(!Test_Box_Projection<VECTOR<T,1> >() || !Test_Box_Projection<VECTOR<T,2> >() || !Test_Box_Projection<VECTOR<T,3> >()) return failure;
             if(!Test_Bounding_Box<VECTOR<T,1> >() || !Test_Bounding_Box<VECTOR<T,2> >() || !Test_Bounding_Box<VECTOR<T,3> >()) return failure;
@@ -90,7 +90,7 @@ public:
             if(!Test_Box_Project_Onto_Line<VECTOR<T,1> >() || !Test_Box_Project_Onto_Line<VECTOR<T,2> >() || !Test_Box_Project_Onto_Line<VECTOR<T,3> >()) return failure;
             if(!Test_Horizontal_Box<VECTOR<T,2> >() || !Test_Horizontal_Box<VECTOR<T,3> >()) return failure;
             return success;
-        case 4:
+        case 3:
             if(!Test_Box_Sphere_Intersection<VECTOR<T,2> >() || !Test_Box_Sphere_Intersection<VECTOR<T,3> >()) return failure;
             if(!Test_Box_Signed_Distance<VECTOR<T,1> >() || !Test_Box_Signed_Distance<VECTOR<T,2> >() || !Test_Box_Signed_Distance<VECTOR<T,3> >()) return failure;
             if(!Test_Ray_Box_Intersection<VECTOR<T,1> >() || !Test_Ray_Box_Intersection<VECTOR<T,2> >() || !Test_Ray_Box_Intersection<VECTOR<T,3> >()) return failure;

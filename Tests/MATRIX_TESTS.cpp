@@ -57,8 +57,8 @@ public:
 
     TEST_RESULT Run_Test(int n) PHYSBAM_OVERRIDE
     {switch(n){
-            case 1:if(Dynamic_Tests(6,20)) return success;return failure;
-            case 2:if(TEST_GENERATOR<T,1,6,215>(*this,20).v) return success;return failure;}
+            case 0:if(Dynamic_Tests(6,20)) return success;return failure;
+            case 1:if(TEST_GENERATOR<T,1,6,6*6*6-1>(*this,20).v) return success;return failure;}
     return failure;}
 
     int Number_Of_Tests() const PHYSBAM_OVERRIDE
@@ -168,11 +168,11 @@ public:
     {
         bool ok=true;
         for(int c=0;c<count;c++)
-            for(int i=0;i<size;i++) for(int j=1;j<=size;j++){
+            for(int i=0;i<=size;i++) for(int j=0;j<size;j++){
                 ok=Dynamic_Tests_One_Size(i,j)&ok;
-                for(int k=0;k<size;k++){
+                for(int k=0;k<=size;k++){
                     ok=Dynamic_Tests_Two_Sizes(i,j,k)&ok;
-                    for(int m=0;m<size;m++) ok=Dynamic_Tests_Three_Sizes(i,j,k,m)&ok;}}
+                    for(int m=0;m<=size;m++) ok=Dynamic_Tests_Three_Sizes(i,j,k,m)&ok;}}
 
         return ok;
     }

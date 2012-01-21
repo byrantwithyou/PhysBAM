@@ -25,7 +25,7 @@ using namespace PhysBAM;
 template<class T> MATRIX<T,3>::
 MATRIX(const MATRIX_MXN<T>& matrix_input)
 {
-    assert(matrix_input.n==3 && matrix_input.m==3);for(int i=0;i<3;i++) for(int j=0;j<3;j++) x[i+3*j]=(T)matrix_input(i+1,j+1);
+    assert(matrix_input.n==3 && matrix_input.m==3);for(int i=0;i<3;i++) for(int j=0;j<3;j++) x[i+3*j]=(T)matrix_input(i,j);
 }
 //#####################################################################
 // Function Higham_Iterate
