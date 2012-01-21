@@ -168,7 +168,7 @@ public:
     {assert(m>ID());m--;}
 
     void Remove_Index(const ID index) // preserves ordering of remaining elements
-    {assert((unsigned)Value(index)<(unsigned)Value(m));for(ID i=index;i<m;i++) (*this)(i)=(*this)(i+1);Remove_End();}
+    {assert((unsigned)Value(index)<(unsigned)Value(m));for(ID i=index;i<m-1;i++) (*this)(i)=(*this)(i+1);Remove_End();}
 
     void Remove_Index_Lazy(const ID index)
     {assert((unsigned)Value(index)<(unsigned)Value(m));

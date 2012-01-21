@@ -2,7 +2,7 @@
 // Copyright 2008, Justin Solomon.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-// Class BOX_TESTS
+// Class RANGE_TESTS
 //#####################################################################
 // 1.  Tests statics
 // 2.  Tests box arithmetic/boolean operators, basic operations
@@ -14,10 +14,10 @@
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/cyclic_shift.h>
 #include <PhysBAM_Tools/Math_Tools/pow.h>
+#include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Tools/Utilities/TEST_BASE.h>
-#include <PhysBAM_Geometry/Basic_Geometry/BOX.h>
 #include <PhysBAM_Geometry/Basic_Geometry/RAY.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include <PhysBAM_Geometry/Basic_Geometry_Intersections/BOX_SPHERE_INTERSECTION.h>
@@ -26,7 +26,7 @@
 namespace PhysBAM{
 
 template<class T_input>
-class BOX_TESTS:public TEST_BASE
+class RANGE_TESTS:public TEST_BASE
 {
     typedef T_input T;
     mutable RANDOM_NUMBERS<T> rand;
@@ -48,25 +48,25 @@ class BOX_TESTS:public TEST_BASE
     {return Equal_To_Tolerance((a-b).Magnitude(),(T)0);}
 
     template<class TV>
-    BOX<TV> Make_Random_Valid_Box()
+    RANGE<TV> Make_Random_Valid_Box()
     {TV random_edge1,random_edge2;
     rand.Fill_Uniform(random_edge1,-(T)1,(T)1); // bounds allow box to grow without overflow problems
     rand.Fill_Uniform(random_edge2,-(T)1,(T)1);
     return Construct_Box<TV>(random_edge1,random_edge2);}
 
     template<class TV>
-    BOX<TV> Construct_Box(const TV& vector1,const TV& vector2)
-    {return BOX<TV>(TV::Componentwise_Min(vector1,vector2),TV::Componentwise_Max(vector1,vector2));}
+    RANGE<TV> Construct_Box(const TV& vector1,const TV& vector2)
+    {return RANGE<TV>(TV::Componentwise_Min(vector1,vector2),TV::Componentwise_Max(vector1,vector2));}
 
     bool Test(const bool test,const std::string& message,bool& ok) const
     {if(test) return true;LOG::cout<<"FAILED: "<<message<<std::endl;ok=false;return false;}
 
 public:
-    BOX_TESTS()
+    RANGE_TESTS()
         :TEST_BASE("box"),epsilon((T)20*std::numeric_limits<T>::epsilon())
     {rand.Set_Seed(17);}
 
-    virtual ~BOX_TESTS(){}
+    virtual ~RANGE_TESTS(){}
 
     TEST_RESULT Run_Test(int n)
     {switch(n){
@@ -100,24 +100,24 @@ public:
     template<class TV>
     bool Test_Empty()
     {bool ok=true;
-    Test(!BOX<TV>::Unit_Box().Empty(),"Unit box is not empty.",ok);
-    Test(!BOX<TV>::Zero_Box().Empty(),"Zero box is not empty.",ok);
-    Test(!BOX<TV>::Full_Box().Empty(),"Full box is not empty.",ok);
-    Test(BOX<TV>::Empty_Box().Empty(),"Empty box is empty.",ok);
+    Test(!RANGE<TV>::Unit_Box().Empty(),"Unit box is not empty.",ok);
+    Test(!RANGE<TV>::Zero_Box().Empty(),"Zero box is not empty.",ok);
+    Test(!RANGE<TV>::Full_Box().Empty(),"Full box is not empty.",ok);
+    Test(RANGE<TV>::Empty_Box().Empty(),"Empty box is empty.",ok);
     return ok;}
 
     template<class TV>
     bool Test_Static_Members()
     {TV random_vector;bool ok=true;
-    Test(BOX<TV>::Unit_Box().Size()==1,"Unit box has exactly unit volume.",ok);
-    Test(BOX<TV>::Zero_Box().Lazy_Inside(TV()),"Zero box contains origin.",ok);
+    Test(RANGE<TV>::Unit_Box().Size()==1,"Unit box has exactly unit volume.",ok);
+    Test(RANGE<TV>::Zero_Box().Lazy_Inside(TV()),"Zero box contains origin.",ok);
     for(int i=0;i<num_iterations_per_test && ok;i++){
         rand.Fill_Uniform(random_vector,(T)0,(T)1);
-        Test(BOX<TV>::Unit_Box().Lazy_Inside(random_vector),"Unit box contains random vector with components in [0,1).",ok);
+        Test(RANGE<TV>::Unit_Box().Lazy_Inside(random_vector),"Unit box contains random vector with components in [0,1).",ok);
         rand.Fill_Uniform(random_vector,-(T)1e10,(T)1e10);
-        Test(!BOX<TV>::Empty_Box().Lazy_Inside(random_vector),"Empty box does not contain a random vector.",ok);
-        Test(BOX<TV>::Full_Box().Lazy_Inside(random_vector),"Full box contains a random vector.",ok);
-        Test(random_vector.Magnitude()<=epsilon || !BOX<TV>::Zero_Box().Lazy_Inside(random_vector),"Zero box does not contain vectors outside the origin.",ok);}
+        Test(!RANGE<TV>::Empty_Box().Lazy_Inside(random_vector),"Empty box does not contain a random vector.",ok);
+        Test(RANGE<TV>::Full_Box().Lazy_Inside(random_vector),"Full box contains a random vector.",ok);
+        Test(random_vector.Magnitude()<=epsilon || !RANGE<TV>::Zero_Box().Lazy_Inside(random_vector),"Zero box does not contain vectors outside the origin.",ok);}
     return ok;}
 
     template<class TV>
@@ -126,9 +126,9 @@ public:
     for(int i=0;i<num_iterations_per_test && ok;i++){
         for(int j=0;j<4;j++) rand.Fill_Uniform(random_vectors(j),-(T)1e10,(T)1e10);
         if(random_vectors(0)!=random_vectors(2) || random_vectors(1)!=random_vectors(3)){ // _highly_ unlikely this if would fail...
-            BOX<TV> box1(random_vectors(0),random_vectors(1)),box2(random_vectors(2),random_vectors(3));
+            RANGE<TV> box1(random_vectors(0),random_vectors(1)),box2(random_vectors(2),random_vectors(3));
             Test(box1!=box2,"Two disjoint boxes are not equal.",ok);}
-        BOX<TV> box(random_vectors(0),random_vectors(1)),box_copy(random_vectors(0),random_vectors(1));
+        RANGE<TV> box(random_vectors(0),random_vectors(1)),box_copy(random_vectors(0),random_vectors(1));
         Test(box==box_copy,"Box equals its copy.",ok);}
     return ok;}
 
@@ -136,7 +136,7 @@ public:
     bool Test_Box_Scaling()
     {bool ok=true;
     for(int i=0;i<num_iterations_per_test && ok;i++){
-        BOX<TV> box=Make_Random_Valid_Box<TV>();
+        RANGE<TV> box=Make_Random_Valid_Box<TV>();
         box.max_corner+=(T).1; // Avoid sliver boxes, as these cannot computed accurately enough.
         T random_value=rand.Get_Uniform_Number((T).1,(T)10);
         Test(Equal_To_Tolerance((box*random_value).Size(),box.Size()*pow<TV::dimension,T>(random_value)),"Multiplication affects scaling of volume correctly.",ok);
@@ -147,7 +147,7 @@ public:
     bool Test_Box_Shift()
     {TV test_vector,test_shift;bool ok=true;
     for(int i=0;i<num_iterations_per_test && ok;i++){
-        BOX<TV> box=Make_Random_Valid_Box<TV>();
+        RANGE<TV> box=Make_Random_Valid_Box<TV>();
         T bound=max(box.Minimum_Corner().Magnitude(),box.Maximum_Corner().Magnitude())*2;
         for(int j=0;j<num_iterations_per_subtest && ok;j++){
             rand.Fill_Uniform(test_vector,-bound,bound);
@@ -161,10 +161,10 @@ public:
     bool Test_Box_Volume() // also tested against scaling in Test_Box_Scaling() method and elsewhere
     {bool ok=true;
     for(int i=0;i<num_iterations_per_test && ok;i++){
-        BOX<TV> base_box=Make_Random_Valid_Box<TV>();
+        RANGE<TV> base_box=Make_Random_Valid_Box<TV>();
         TV shifted_min=base_box.Minimum_Corner(),shifted_max=base_box.Maximum_Corner();
         for(int j=0;j<4 && ok;j++){
-            Test(Equal_To_Tolerance(BOX<TV>(shifted_min,shifted_max).Size(),base_box.Size()),"Volume invariant to cyclic permutation.",ok);
+            Test(Equal_To_Tolerance(RANGE<TV>(shifted_min,shifted_max).Size(),base_box.Size()),"Volume invariant to cyclic permutation.",ok);
             cyclic_shift(shifted_min);
             cyclic_shift(shifted_max);}}
     return ok;}
@@ -173,7 +173,7 @@ public:
     bool Test_Box_Bounds_Adjustment()
     {TV random_vector,box_vector;bool ok=true;
     for(int i=0;i<num_iterations_per_test && ok;i++){
-        BOX<TV> box=Make_Random_Valid_Box<TV>(),copy=box;
+        RANGE<TV> box=Make_Random_Valid_Box<TV>(),copy=box;
         rand.Fill_Uniform(random_vector,(T)-10000,(T)10000);
         box.Reset_Bounds(random_vector);
         Test(box.Lazy_Inside(random_vector),"Reset_bounds moves bounds correctly.",ok);
@@ -185,13 +185,13 @@ public:
     for(int i=0;i<num_iterations_per_subtest;i++)
         rand.Fill_Uniform(points(i),(T)-1000,(T)1000);
     for(int i=0;i<num_iterations_per_subtest && ok;i++){
-        BOX<TV> box=Make_Random_Valid_Box<TV>(),copy=box;
+        RANGE<TV> box=Make_Random_Valid_Box<TV>(),copy=box;
         // first test the array method
         box.Enlarge_Nonempty_Box_To_Include_Points(points);
         for(int j=0;j<num_iterations_per_test && ok;j++)
             Test(box.Lazy_Inside(points(j)),"Completely enlarged box contains all points for which it was enlarged.",ok);
         Test(box.Contains(copy),"Enlarged box contains original box.",ok);
-        BOX<TV> new_box=copy;
+        RANGE<TV> new_box=copy;
         for(int j=0;j<num_iterations_per_subtest && ok;j++){ // subtest here to save time...
             new_box.Enlarge_Nonempty_Box_To_Include_Point(points(j));
             Test(new_box.Lazy_Inside(points(j)),"Incrementally enlarged box contains all previous points.",ok);}
@@ -199,7 +199,7 @@ public:
         Test(box==new_box,"Box enlargement approaches agree.",ok);}
 
     for(int i=0;i<num_iterations_per_test && ok;i++){
-        BOX<TV> box1=Make_Random_Valid_Box<TV>(),box2=Make_Random_Valid_Box<TV>(),copy1=box1,copy2=box2,combined=BOX<TV>::Combine(box1,box2);
+        RANGE<TV> box1=Make_Random_Valid_Box<TV>(),box2=Make_Random_Valid_Box<TV>(),copy1=box1,copy2=box2,combined=RANGE<TV>::Combine(box1,box2);
         copy1.Enlarge_To_Include_Box(box2);
         copy2.Enlarge_To_Include_Box(box1);
         Test(copy1.Contains(box1) && copy1.Contains(box2) && copy2.Contains(box1) && copy2.Contains(box2) && combined.Contains(box1) && combined.Contains(box2),
@@ -210,7 +210,7 @@ public:
     bool Test_Box_Expansion()
     {bool ok=true;
     for(int i=0;i<num_iterations_per_test && ok;i++){ // TODO: test Enlarge_By_Sign
-        BOX<TV> box=Make_Random_Valid_Box<TV>()/2,copy=box; // make box smaller so it's more likely that random points end on the border
+        RANGE<TV> box=Make_Random_Valid_Box<TV>()/2,copy=box; // make box smaller so it's more likely that random points end on the border
         T random_delta=rand.Get_Uniform_Number((T)1e-3,(T)10);
         copy.Change_Size(random_delta);
         for(int j=0;j<num_iterations_per_subtest && ok;j++){
@@ -244,7 +244,7 @@ public:
     bool Test_Box_Containment()
     {bool ok=true;
     for(int i=0;i<num_iterations_per_test && ok;i++){ // TODO: test boundary better
-        BOX<TV> box=Make_Random_Valid_Box<TV>();
+        RANGE<TV> box=Make_Random_Valid_Box<TV>();
         for(int j=0;j<num_iterations_per_subtest && ok;j++){
             TV random_vector=rand.Get_Uniform_Vector(box*(T)2);
             T random_value=rand.Get_Uniform_Number((T)0.01,(T)1);
@@ -265,14 +265,14 @@ public:
     bool Test_Box_Projection()
     {bool ok=true;
     for(int i=0;i<num_iterations_per_test && ok;i++){
-        BOX<TV> box=Make_Random_Valid_Box<TV>();
+        RANGE<TV> box=Make_Random_Valid_Box<TV>();
         for(int j=0;j<num_iterations_per_subtest && ok;j++){
             TV random_vector=rand.Get_Uniform_Vector(box*(T)2);
             Test(!((box.Inside(random_vector,epsilon) && box.Clamp(random_vector)!=random_vector) || !box.Lazy_Inside(box.Clamp(random_vector))),
                 "Clamp only does something if the vector is outside the box.",ok);
             rand.Fill_Uniform(random_vector,(T)-2,(T)2); // -2 to 2 so that sometimes it is in the unit box, sometimes not
             TV weighted_vector=box.Point_From_Normalized_Coordinates(random_vector);
-            bool contained=box.Lazy_Inside(weighted_vector),in_unit_box=BOX<TV>::Unit_Box().Inside(random_vector,epsilon),out_of_unit_box=BOX<TV>::Unit_Box().Outside(random_vector,epsilon);
+            bool contained=box.Lazy_Inside(weighted_vector),in_unit_box=RANGE<TV>::Unit_Box().Inside(random_vector,epsilon),out_of_unit_box=RANGE<TV>::Unit_Box().Outside(random_vector,epsilon);
             Test(!((contained && out_of_unit_box) || (!contained && in_unit_box)),"Vector construction from weights places points in right locations.",ok);}}
     return ok;}
 
@@ -288,7 +288,7 @@ public:
         for(int j=0;j<4;j++) random_vectors(j)=rand.template Get_Vector_In_Unit_Sphere<TV>();
         random_vectors(0)*=radius1;random_vectors(1)*=radius1,random_vectors(2)*=radius2;random_vectors(3)*=radius2;
         random_vectors(0)+=center1;random_vectors(1)+=center1;random_vectors(2)+=center2;random_vectors(3)+=center2;
-        BOX<TV> box1=Construct_Box<TV>(random_vectors(0),random_vectors(1)),box2=Construct_Box<TV>(random_vectors(2),random_vectors(3));
+        RANGE<TV> box1=Construct_Box<TV>(random_vectors(0),random_vectors(1)),box2=Construct_Box<TV>(random_vectors(2),random_vectors(3));
         VECTOR<T,2> region1,region2;
         box1.Project_Points_Onto_Line(center1-center2,region1(0),region1(1));
         box2.Project_Points_Onto_Line(center1-center2,region2(0),region2(1));
@@ -300,7 +300,7 @@ public:
     bool Test_Box_Intersection()
     {bool ok=true;
     for(int i=0;i<num_iterations_per_test && ok;i++){
-        BOX<TV> box1=Make_Random_Valid_Box<TV>(),box2=Make_Random_Valid_Box<TV>(),combination=BOX<TV>::Combine(box1,box2),intersection=BOX<TV>::Intersect(box1,box2);
+        RANGE<TV> box1=Make_Random_Valid_Box<TV>(),box2=Make_Random_Valid_Box<TV>(),combination=RANGE<TV>::Combine(box1,box2),intersection=RANGE<TV>::Intersect(box1,box2);
         T volume1=box1.Size(),volume2=box2.Size(),combination_volume=combination.Size(),intersection_volume=intersection.Size();
         Test(!(combination_volume<volume1 || combination_volume<volume2 || (!intersection.Empty() && (intersection_volume>volume1 || intersection_volume>volume2))),
             "\"Boolean\" volume identities hold",ok);
@@ -308,12 +308,12 @@ public:
         TV min1=box1.Minimum_Corner(),min2=box2.Minimum_Corner(),max1=box1.Maximum_Corner(),max2=box2.Maximum_Corner();
         for(int j=0;j<TV::dimension && ok;j++){
             cyclic_shift(min1);cyclic_shift(min2);cyclic_shift(max1);cyclic_shift(max2);
-            BOX<TV> new_box1=BOX<TV>(min1,max1),new_box2=BOX<TV>(min2,max2);
-            Test(Equal_To_Tolerance(intersection_volume,BOX<TV>::Intersect(new_box1,new_box2).Size()) && Equal_To_Tolerance(combination_volume,BOX<TV>::Combine(new_box1,new_box2).Size()),
+            RANGE<TV> new_box1=RANGE<TV>(min1,max1),new_box2=RANGE<TV>(min2,max2);
+            Test(Equal_To_Tolerance(intersection_volume,RANGE<TV>::Intersect(new_box1,new_box2).Size()) && Equal_To_Tolerance(combination_volume,RANGE<TV>::Combine(new_box1,new_box2).Size()),
                 "Intersection volume preserved under cyclic shift.",ok);}
 
         for(int j=0;j<num_iterations_per_subtest && ok;j++){
-            TV random_vector=rand.Get_Uniform_Vector(BOX<TV>::Unit_Box());
+            TV random_vector=rand.Get_Uniform_Vector(RANGE<TV>::Unit_Box());
             bool in1=box1.Lazy_Inside(random_vector),in2=box2.Lazy_Inside(random_vector),in_intersection=intersection.Lazy_Inside(random_vector),
                 in_combination=combination.Lazy_Inside(random_vector);
             Test(!in1 || !in2 || in_intersection,"If a random vector is in two boxes, it is in their intersection.",ok);
@@ -330,8 +330,8 @@ public:
     for(int i=0;i<num_iterations_per_test && ok;i++){
         ARRAY<TV> points(20);
         for(int j=0;j<20;j++) rand.Fill_Uniform(points(j),(T)-1000,(T)1000);
-        BOX<TV> box_two_points=BOX<TV>::Bounding_Box(points(0),points(1)),box_three_points=BOX<TV>::Bounding_Box(points(2),points(3),points(4)),
-            box_four_points=BOX<TV>::Bounding_Box(points(5),points(6),points(7),points(8)),box_full=BOX<TV>::Bounding_Box(points);
+        RANGE<TV> box_two_points=RANGE<TV>::Bounding_Box(points(0),points(1)),box_three_points=RANGE<TV>::Bounding_Box(points(2),points(3),points(4)),
+            box_four_points=RANGE<TV>::Bounding_Box(points(5),points(6),points(7),points(8)),box_full=RANGE<TV>::Bounding_Box(points);
         Test(box_two_points.Lazy_Inside(points(0)) && box_two_points.Lazy_Inside(points(1)),"Bounding box of two points contains those points.",ok);
         Test(box_three_points.Lazy_Inside(points(2)) && box_three_points.Lazy_Inside(points(3)) && box_three_points.Lazy_Inside(points(4)),"Bounding box of two points contains those points.",ok);
         Test(box_four_points.Lazy_Inside(points(5)) && box_four_points.Lazy_Inside(points(6)) && box_four_points.Lazy_Inside(points(7)) && box_four_points.Lazy_Inside(points(9)),
@@ -343,10 +343,10 @@ public:
     bool Test_Horizontal_Box()
     {bool ok=true;
     for(int i=0;i<num_iterations_per_test && ok;i++){
-        BOX<TV> box=Make_Random_Valid_Box<TV>();
-        BOX<VECTOR<T,TV::dimension-1> > horizontal=box.Get_Horizontal_Box();
+        RANGE<TV> box=Make_Random_Valid_Box<TV>();
+        RANGE<VECTOR<T,TV::dimension-1> > horizontal=box.Get_Horizontal_Box();
         Test(Equal_To_Tolerance(horizontal.Size()*(box.Edge_Lengths())(1),box.Size()),"Removing dimension has correct effect on area/volume.",ok);
-        BOX<VECTOR<T,TV::dimension-1> > dimension_removed=box.Remove_Dimension(1);
+        RANGE<VECTOR<T,TV::dimension-1> > dimension_removed=box.Remove_Dimension(1);
         Test(Equal_To_Tolerance(horizontal.Minimum_Corner(),dimension_removed.Minimum_Corner()),"Minimum corner of horizontal box matches that of box with dimension removed.",ok);
         Test(Equal_To_Tolerance(horizontal.Maximum_Corner(),dimension_removed.Maximum_Corner()),"Maximum corner of horizontal box matches that of box with dimension removed.",ok);}
     return ok;}
@@ -355,7 +355,7 @@ public:
     bool Test_Remove_Dimension()
     {bool ok=true;
     for(int i=0;i<num_iterations_per_test && ok;i++){
-        BOX<TV> box=Make_Random_Valid_Box<TV>();
+        RANGE<TV> box=Make_Random_Valid_Box<TV>();
         TV bounds=box.Edge_Lengths();
         T volume=box.Size();
         for(int j=0;j<TV::dimension && ok;j++) Test(Equal_To_Tolerance(volume/bounds(j),box.Remove_Dimension(j).Size()),"Volume changes according to removed dimension.",ok);
@@ -366,11 +366,11 @@ public:
     return ok;}
 
     template<class TV>
-    void Test_Ray_Box_Intersection_3D(const BOX<TV>& box,const TV& direction,const RAY<TV>& ray1,const RAY<TV>& ray2,const RAY<TV>& ray3,RAY<TV>& ray4,bool& ok)
+    void Test_Ray_Box_Intersection_3D(const RANGE<TV>& box,const TV& direction,const RAY<TV>& ray1,const RAY<TV>& ray2,const RAY<TV>& ray3,RAY<TV>& ray4,bool& ok)
     {STATIC_ASSERT(TV::m!=3);}
 
     template<class T>
-    void Test_Ray_Box_Intersection_3D(const BOX<VECTOR<T,3> >& box,const VECTOR<T,3>& direction,RAY<VECTOR<T,3> >& ray1,RAY<VECTOR<T,3> >& ray2,
+    void Test_Ray_Box_Intersection_3D(const RANGE<VECTOR<T,3> >& box,const VECTOR<T,3>& direction,RAY<VECTOR<T,3> >& ray1,RAY<VECTOR<T,3> >& ray2,
         RAY<VECTOR<T,3> >& ray3,RAY<VECTOR<T,3> >& ray4,bool& ok)
     {Test(INTERSECTION::Lazy_Intersects(ray1,box,-epsilon) && INTERSECTION::Lazy_Intersects(ray2,box,-epsilon),"Box intersects rays with one endpoint inside; uses \"Lazy Inside\" routine.",ok);
     if(direction.Magnitude()>epsilon) Test(!INTERSECTION::Lazy_Intersects(ray3,box,epsilon),"Ray outside radius of box does not intersect box; uses \"Lazy Inside\" routine.",ok);
@@ -381,7 +381,7 @@ public:
     bool Test_Ray_Box_Intersection()
     {bool ok=true;
     for(int i=0;i<num_iterations_per_test && ok;i++){
-        BOX<TV> box=Make_Random_Valid_Box<TV>();
+        RANGE<TV> box=Make_Random_Valid_Box<TV>();
         for(int j=0;j<num_iterations_per_subtest && ok;j++){
             TV random_inside1=rand.Get_Uniform_Vector(box),random_inside2=rand.Get_Uniform_Vector(box),random_vector;
             rand.Fill_Uniform(random_vector,(T)-2,(T)2);
@@ -400,7 +400,7 @@ public:
     bool Test_Box_Sphere_Intersection()
     {bool ok=true;
     for(int i=0;i<num_iterations_per_test && ok;i++){
-        BOX<TV> box=Make_Random_Valid_Box<TV>();
+        RANGE<TV> box=Make_Random_Valid_Box<TV>();
         T box_radius=(box.Maximum_Corner()-box.Minimum_Corner()).Magnitude();
         TV box_center=box.Center();
         for(int j=0;j<num_iterations_per_subtest && ok;j++){
@@ -428,7 +428,7 @@ public:
     bool Test_Box_Signed_Distance()
     {bool ok=true;
     for(int i=0;i<num_iterations_per_test && ok;i++){
-        BOX<TV> box=Make_Random_Valid_Box<TV>();
+        RANGE<TV> box=Make_Random_Valid_Box<TV>();
         for(int j=0;j<num_iterations_per_subtest && ok;j++){
             TV random_inside_vector=rand.Get_Uniform_Vector(box);
             TV random_outside_vector;
@@ -450,8 +450,8 @@ public:
 //#####################################################################
 };
 #ifdef COMPILE_WITHOUT_DOUBLE_SUPPORT
-static BOX_TESTS<float> box_tests;
+static RANGE_TESTS<float> box_tests;
 #else
-static BOX_TESTS<double> box_tests;
+static RANGE_TESTS<double> box_tests;
 #endif
 }
