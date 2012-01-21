@@ -51,7 +51,7 @@ public:
     ARRAY<STRUCTURE<TV>*> structures;
     COLLISION_GEOMETRY_IMPULSE_ACCUMULATOR<TV>* impulse_accumulator;
 
-    RIGID_GEOMETRY(RIGID_GEOMETRY_COLLECTION<TV>& rigid_geometry_collection_input,bool create_collision_geometry,int index=0);
+    RIGID_GEOMETRY(RIGID_GEOMETRY_COLLECTION<TV>& rigid_geometry_collection_input,bool create_collision_geometry,int index=-1);
     virtual ~RIGID_GEOMETRY();
 
     template<class T_STRUCTURE>

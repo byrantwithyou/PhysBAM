@@ -40,8 +40,9 @@ Initialize(SEGMENT_MESH& segment_mesh_input)
         for(int a=0;a<adjacent.m;a++){int s2=adjacent(a);
             if(s2>s1){
                 VECTOR<int,2> s2_nodes=segment_mesh_input.elements(s2);
-                for(int i=0;i<2;i++)
-                    if(int j=s2_nodes.Find(s1_nodes[i])) segment_list.Append(s1_nodes.Remove_Index(i).Append(s2_nodes.Remove_Index(j).x));}}}
+                for(int i=0;i<2;i++){
+                    int j=s2_nodes.Find(s1_nodes[i]);
+                    if(j>=0) segment_list.Append(s1_nodes.Remove_Index(i).Append(s2_nodes.Remove_Index(j).x));}}}}
     segment_mesh.Initialize_Mesh(segment_mesh_input.number_nodes,segment_list);
 }
 //#####################################################################

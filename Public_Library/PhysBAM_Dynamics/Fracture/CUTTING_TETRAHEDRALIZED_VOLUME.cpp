@@ -812,7 +812,8 @@ Potential_Segment_Should_Be_Added_To_Polygon(const ARRAY<ARRAY<int > >& particle
     else{
         // both endpoints of segment are on existing points, so operate on nodes[0] arbitrarily
         for(int i=0;i<particles_for_polygon.m;i++){const ARRAY<int>& particles=particles_for_polygon(i);
-            if(int j=particles.Find(nodes[0])){
+            int j=particles.Find(nodes[0]);
+            if(j>=0){
                 int p1=particles(j-1<1?particles.m:j-1),p2=particles(j),p3=particles(j+1>particles.m?1:j+1);
                 VECTOR<T,2> x1=intersection_registry->Get_Simplex_Weights_Of_Intersection(p1,simplex);
                 VECTOR<T,2> x2=intersection_registry->Get_Simplex_Weights_Of_Intersection(p2,simplex);
@@ -1171,8 +1172,8 @@ Compute_Parents_And_Weights_For_Nodes(const int orig_intersection,const VECTOR<i
         for(int i=0;i<2;i++) new_parents.Append(duplicate_particles_for_nodes(vertices_for_tet.Find(shared_nodes(i))));
         const VECTOR<T,2>& weights_on_simplex=intersection_registry->Get_Simplex_Weights_Of_Intersection(orig_intersection,boundaries(0));
         const VECTOR<int,3> nodes_on_simplex=cutting_simplices->simplices(boundaries(0)).nodes;
-        for(int i=0;i<2;i++){int index=nodes_on_simplex.Find(shared_nodes(i));assert(index>0);
-            if(index<=2) parent_weights.Append(weights_on_simplex(index));
+        for(int i=0;i<2;i++){int index=nodes_on_simplex.Find(shared_nodes(i));assert(index>=0);
+            if(index<2) parent_weights.Append(weights_on_simplex(index));
             else parent_weights.Append((T)1-weights_on_simplex.Sum());}}
 }
 //#####################################################################

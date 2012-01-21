@@ -52,7 +52,7 @@ Initialize_Vicinity_Triangles()
                     vicinity_triangles_t.Append_Unique(candidate);
                     const ARRAY<int>& adjacent_to_candidate=adjacent_triangles(candidate);
                     for(int j=0;j<adjacent_to_candidate.m;j++)     
-                        if(vicinity_triangles_t.Find(adjacent_to_candidate(j))==0)next_candidates.Append_Unique(adjacent_to_candidate(j));}}
+                        if(vicinity_triangles_t.Find(adjacent_to_candidate(j))==-1)next_candidates.Append_Unique(adjacent_to_candidate(j));}}
             ++cycle;candidates=next_candidates;next_candidates.Resize(0);}
         average_number_vicinity_triangles+=vicinity_triangles_t.m;
         new_progress=(int)100.0*t/vicinity_triangles.m;if(new_progress>progress){progress=new_progress;LOG::cout<<progress<<"%"<<" ";}}

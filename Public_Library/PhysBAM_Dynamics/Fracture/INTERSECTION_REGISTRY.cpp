@@ -93,7 +93,7 @@ template<class T,int d> VECTOR<T,d-1> INTERSECTION_REGISTRY<T,d>::
 Get_Simplex_Weights_Of_Intersection(const int intersection,const int simplex)
 {
     int index=simplices_on_intersection(intersection).Find(simplex);
-    if(!index) index=simplices_on_intersection(intersection).Find(cutting_simplices.simplices(simplex).parent);assert(index>0);
+    if(!index) index=simplices_on_intersection(intersection).Find(cutting_simplices.simplices(simplex).parent);assert(index>=0);
     return simplex_weights_on_intersection(intersection)(index);
 }
 //#####################################################################
