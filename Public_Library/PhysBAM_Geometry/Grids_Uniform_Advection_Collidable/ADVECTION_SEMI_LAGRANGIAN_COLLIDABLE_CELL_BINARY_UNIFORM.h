@@ -96,7 +96,7 @@ public:
                 if(cell_neighbors_visible(axis,min_cell) && cell_valid_points_current(min_cell)){sum+=values(min_cell);count++;}
                 if(cell_neighbors_visible(axis,invalid_indices(k).x) && cell_valid_points_current(max_cell)){sum+=values(max_cell);count++;}}
             if(count){values(invalid_indices(k).x)=sum/(T)count;invalid_indices(k).y=true;done=false;}}
-        if(!done) for(int k=invalid_indices.m;k>=1;k--) if(invalid_indices(k).y){cell_valid_points_current(invalid_indices(k).x)=true;invalid_indices.Remove_Index_Lazy(k);}}
+        if(!done) for(int k=invalid_indices.m-1;k>=0;k--) if(invalid_indices(k).y){cell_valid_points_current(invalid_indices(k).x)=true;invalid_indices.Remove_Index_Lazy(k);}}
 
     // keep a copy of currently valid cells (used for phi so we can revalidate the remaining cells again after collision aware fast marching)
     // but important to initialize ghost cells to true since currently cell_valid_points_current has them set to false
@@ -117,7 +117,7 @@ public:
                 else{sum+=Compute_Revalidation_Value(grid.X(invalid_indices(k).x),grid.X(max_cell),values(invalid_indices(k).x),default_value);count++;}}
             if(count){values(invalid_indices(k).x)=sum/(T)count;invalid_indices(k).y=true;done=false;}
             else values(invalid_indices(k).x)=default_value;}
-        if(!done) for(int k=invalid_indices.m;k>=1;k--) if(invalid_indices(k).y){cell_valid_points_current(invalid_indices(k).x)=true;invalid_indices.Remove_Index_Lazy(k);}}
+        if(!done) for(int k=invalid_indices.m-1;k>=0;k--) if(invalid_indices(k).y){cell_valid_points_current(invalid_indices(k).x)=true;invalid_indices.Remove_Index_Lazy(k);}}
     T_ARRAYS_BOOL::Put_Ghost(true,cell_valid_points_current,grid,3);} // set valid for future advection
 
 //#####################################################################

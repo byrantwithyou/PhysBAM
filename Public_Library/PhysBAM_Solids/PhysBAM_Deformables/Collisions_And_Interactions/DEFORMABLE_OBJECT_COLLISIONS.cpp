@@ -99,7 +99,7 @@ Compute_Candidate_Nodes_For_Collision_Body_Collisions(const ARRAY<COLLISION_GEOM
             if(check_collision(p)) general_collision_body_candidate_nodes.Append(p);}
         for(COLLISION_GEOMETRY_ID i(0);i<bodies.m;i++) if(bodies(i)) collision_body_candidate_nodes(i)=general_collision_body_candidate_nodes;}
     if(use_structure_collide_collision_body) for(COLLISION_GEOMETRY_ID body_id(0);body_id<bodies.m;body_id++) if(bodies(body_id)){
-        for(int i=collision_body_candidate_nodes(body_id).m;i>=1;i--){
+        for(int i=collision_body_candidate_nodes(body_id).m-1;i>=0;i--){
             int p=collision_body_candidate_nodes(body_id)(i),structure=particle_to_structure(p);
             if(structure && !structure_collide_collision_body(structure).Contains(body_id)) collision_body_candidate_nodes(body_id).Remove_Index_Lazy(i);}}
 }
@@ -120,7 +120,7 @@ Adjust_Nodes_For_Collision_Body_Collisions(BINDING_LIST<TV>& binding_list,SOFT_B
         ARRAY<bool> is_protected(check_collision.m);ARRAY<TV> X_save(particles.X),V_old(particles.V);
         for(COLLISION_GEOMETRY_ID body_id(0);body_id<bodies->m;body_id++) if((*bodies)(body_id)){
             COLLISION_GEOMETRY<TV>& collision_body=*(*bodies)(body_id);
-            for(int j=collision_body_candidate_nodes(body_id).m;j>=1;j--){int node=collision_body_candidate_nodes(body_id)(j);
+            for(int j=collision_body_candidate_nodes(body_id).m-1;j>=0;j--){int node=collision_body_candidate_nodes(body_id)(j);
                 if(protecting_bodies_of_nodes(node).Contains(body_id)){
                     if(!is_protected(node) && collision_body.Implicit_Geometry_Lazy_Inside_Extended_Levelset(X_save(node),(T)protection_thickness)){
                         is_protected(node)=true;particles.X(node)=X_save(node);particles.V(node)=V_old(node);particle_states(node).enforce=false;}}

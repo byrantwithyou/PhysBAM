@@ -62,7 +62,7 @@ Set_Mass_From_Effective_Mass()
 template<class TV> void SOFT_BINDINGS<TV>::
 Remove_Soft_Bound_Particles(ARRAY<int>& particles) const
 {
-    for(int i=particles.m;i>=1;i--) if(Particle_Is_Bound(particles(i))) particles.Remove_Index_Lazy(i);
+    for(int i=particles.m-1;i>=0;i--) if(Particle_Is_Bound(particles(i))) particles.Remove_Index_Lazy(i);
 }
 //#####################################################################
 // Function Adjust_Parents_For_Changes_In_Surface_Children

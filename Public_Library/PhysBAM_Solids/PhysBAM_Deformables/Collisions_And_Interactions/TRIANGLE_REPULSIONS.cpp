@@ -266,7 +266,7 @@ template<class TV> template<class T_ARRAY1,class T_ARRAY2> void TRIANGLE_REPULSI
 Update_Repulsion_Pairs_Using_History(T_ARRAY1& point_face_pairs,T_ARRAY2& edge_edge_pairs,bool prune_separating)
 {
     ARRAY_VIEW<const TV> X(geometry.deformable_body_collection.particles.X),V(geometry.deformable_body_collection.particles.V);
-    for(int pair_index=point_face_pairs.Size();pair_index>=1;pair_index--){
+    for(int pair_index=point_face_pairs.Size()-1;pair_index>=0;pair_index--){
         POINT_FACE_REPULSION_PAIR<TV>& pair=point_face_pairs(pair_index);VECTOR<int,d> face_nodes=pair.nodes.Remove_Index(0);
         T_FACE face(X.Subset(face_nodes));
         if(!face.Point_Face_Interaction(X(pair.nodes(0)),repulsion_thickness_detection_multiplier*pair.Total_Repulsion_Thickness(repulsion_thickness),false,pair.distance) ||
@@ -277,7 +277,7 @@ Update_Repulsion_Pairs_Using_History(T_ARRAY1& point_face_pairs,T_ARRAY2& edge_e
     // TODO: do we need update binding here? (what about the other fragments?)
     geometry.deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Velocities();
 
-    for(int pair_index=edge_edge_pairs.Size();pair_index>=1;pair_index--){
+    for(int pair_index=edge_edge_pairs.Size()-1;pair_index>=0;pair_index--){
         EDGE_EDGE_REPULSION_PAIR<TV>& pair=edge_edge_pairs(pair_index);
         if(!Edge_Edge_Interaction_Helper(X,pair,repulsion_thickness,repulsion_thickness_detection_multiplier) ||
             (prune_separating && Pair_Is_Separating(pair,V))){
@@ -651,8 +651,8 @@ Project_All_Moving_Constraints(const ARRAY<PRECOMPUTE_PROJECT_POINT_FACE<VECTOR<
 {
     for(int i=0;i<point_face_precomputed.m;i++) point_face_precomputed(i).Project(field.Subset(point_face_precomputed(i).nodes));
     for(int i=0;i<edge_edge_precomputed.m;i++) edge_edge_precomputed(i).Project(field.Subset(edge_edge_precomputed(i).nodes));
-    for(int i=edge_edge_precomputed.m-1;i>=1;i--) edge_edge_precomputed(i).Project(field.Subset(edge_edge_precomputed(i).nodes));
-    for(int i=point_face_precomputed.m;i>=1;i--) point_face_precomputed(i).Project(field.Subset(point_face_precomputed(i).nodes));
+    for(int i=edge_edge_precomputed.m-2;i>=0;i--) edge_edge_precomputed(i).Project(field.Subset(edge_edge_precomputed(i).nodes));
+    for(int i=point_face_precomputed.m-1;i>=0;i--) point_face_precomputed(i).Project(field.Subset(point_face_precomputed(i).nodes));
 }
 //#####################################################################
 // Function Set_Collision_Pairs

@@ -57,7 +57,7 @@ template<class T> void BSPLINE_QUATERNION<T>::
 Create_Closed_Points()
 {
     BSPLINE<T,ROTATION<TV> >::Create_Closed_Points();
-    for(int i=k-1;i>=1;i--){
+    for(int i=k-2;i>=0;i--){
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         LOG::cout<<"Comparing "<<i<<": "<<control_points(i)<<" and "<<i+1<<": "<<control_points(i+1)<<std::endl;
 #endif

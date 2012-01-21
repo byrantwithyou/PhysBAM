@@ -26,7 +26,7 @@ void PhysBAM::NR_fourn(const int isign,const ARRAY<int>& dim,ARRAY<float>& data)
 
     for(ntot=0,idim=0;idim<dim.m;idim++) ntot*=dim(idim);
     nprev=1;
-    for(idim=dim.m;idim>=1;idim--){
+    for(idim=dim.m-1;idim>=0;idim--){
         n=dim(idim);nrem=ntot/(n*nprev);ip1=nprev<<1;ip2=ip1*n;ip3=ip2*nrem;i2rev=1;
         for(i2=0;i2<ip2;i2+=ip1){
             if(i2 < i2rev) for(i1=i2;i1<=i2+ip1-2;i1+=2) for(i3=i1;i3<=ip3;i3+=ip2){i3rev=i2rev+i3-i2;exchange(data(i3),data(i3rev));exchange(data(i3+1),data(i3rev+1));}

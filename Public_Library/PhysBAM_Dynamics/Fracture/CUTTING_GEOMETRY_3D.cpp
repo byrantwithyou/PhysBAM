@@ -469,7 +469,7 @@ Inside_Outside_Determination_For_Unconnected_Polygonal_Regions(const int simplex
                 sum+=VECTOR<T,2>::Oriented_Angle_Between(direction_2,direction_1);}
             unjoined_region_orientations(i)=flipped^(sum<0);}
         ARRAY<bool> used(unconnected_polygonal_regions.m);
-        for(int i=regions_in_order.m;i>=1;i--){int region_id=regions_in_order(i);if(!used(region_id)){
+        for(int i=regions_in_order.m-1;i>=0;i--){int region_id=regions_in_order(i);if(!used(region_id)){
             used(region_id)=true; // TODO: Continue from here
             final_polygon_element_particles.Append(ARRAY<ARRAY<int> >());
             ARRAY<ARRAY<int> >& particles_on_polygon=final_polygon_element_particles.Last();

@@ -756,7 +756,7 @@ Project_Contact_Pairs(ARRAY_VIEW<TV> V,ARRAY_VIEW<TWIST<TV> > twist)
     for(int k=0;k<iterations;k++) for(int i=0;i<precompute_contact_projections.m;i++) if(k==1 || !precompute_contact_projections(i)->rigid_body.Has_Infinite_Inertia()){
         PRECOMPUTE_CONTACT_PROJECTION& precompute=*precompute_contact_projections(i);
         Apply_Rigid_Deformable_Contact_Projection(deformable_body_collection.particles.X,V,twist(precompute.rigid_body.particle_index),precompute);}
-    for(int k=0;k<iterations;k++) for(int i=precompute_contact_projections.m;i>=1;i--) if(k==iterations || !precompute_contact_projections(i)->rigid_body.Has_Infinite_Inertia()){
+    for(int k=0;k<iterations;k++) for(int i=precompute_contact_projections.m-1;i>=0;i--) if(k==iterations || !precompute_contact_projections(i)->rigid_body.Has_Infinite_Inertia()){
         PRECOMPUTE_CONTACT_PROJECTION& precompute=*precompute_contact_projections(i);
         Apply_Rigid_Deformable_Contact_Projection(deformable_body_collection.particles.X,V,twist(precompute.rigid_body.particle_index),precompute);}
 }

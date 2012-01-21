@@ -24,8 +24,8 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(const SPHERE<VECTO
     particles.X(0)=TV(-1,0,0);particles.X(1)=TV(1,0,0);particles.X(2)=TV(0,-1,0);
     particles.X(3)=TV(0,1,0);particles.X(4)=TV(0,0,-1);particles.X(5)=TV(0,0,1);
     ARRAY<VECTOR<int,3> >& triangles=surface->mesh.elements;triangles.Exact_Resize(8);
-    triangles(0).Set(1,6,4);triangles(1).Set(1,3,6);triangles(2).Set(6,2,4);triangles(3).Set(6,3,2);
-    triangles(4).Set(5,1,4);triangles(5).Set(5,3,1);triangles(6).Set(2,3,5);triangles(7).Set(2,5,4);
+    triangles(0).Set(0,5,3);triangles(1).Set(0,2,5);triangles(2).Set(5,1,3);triangles(3).Set(5,2,1);
+    triangles(4).Set(4,0,3);triangles(5).Set(4,2,0);triangles(6).Set(1,2,4);triangles(7).Set(1,4,3);
     surface->mesh.number_nodes=6;
     surface->mesh.Initialize_Neighbor_Nodes();
     for(int i=0;i<levels;i++) surface->Root_Three_Subdivide();

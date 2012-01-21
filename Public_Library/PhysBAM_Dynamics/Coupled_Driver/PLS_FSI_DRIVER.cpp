@@ -667,7 +667,7 @@ Delete_Particles_Inside_Objects(ARRAY<T_PARTICLES*,TV_INT>& particles,const PART
         COLLISION_GEOMETRY_ID body_id;int aggregate_id;
         T_PARTICLES& block_particles=*particles(block_index);
         if(example.fluids_parameters.collision_bodies_affecting_fluid->Occupied_Block(block)){
-            for(int k=block_particles.array_collection->Size();k>=1;k--)
+            for(int k=block_particles.array_collection->Size()-1;k>=0;k--)
                 if(example.fluids_parameters.collision_bodies_affecting_fluid->Inside_Any_Simplex_Of_Any_Body(block_particles.X(k),body_id,aggregate_id))
                     block_particles.array_collection->Delete_Element(k);}
         example.fluids_parameters.callbacks->Delete_Particles_Inside_Objects(block_particles,particle_type,time);}}

@@ -182,7 +182,7 @@ Display_3D() const
     if(dominant_axis==1){
         if(view_forward[0]>0){
             ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> colors;
-            for(int i=grid.counts.x;i>=1;i--) for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++){
+            for(int i=grid.counts.x-1;i>=0;i--) for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++){
                 for(int t=0;t<4;t++) OpenGL_Color(Do_Color(i,j,k).rgba,colors);
                 VECTOR<T,3> pos=grid.X(i,j,k);
                 OpenGL_Vertex(VECTOR<T,3>(pos.x,pos.y-0.5*grid.dX.y,pos.z-0.5*grid.dX.z),vertices);
@@ -203,7 +203,7 @@ Display_3D() const
     else if(dominant_axis==2){
         if(view_forward[1]>0){
             ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> colors;
-            for(int j=grid.counts.y;j>=1;j--) for(int i=0;i<grid.counts.x;i++) for(int k=0;k<grid.counts.z;k++){
+            for(int j=grid.counts.y-1;j>=0;j--) for(int i=0;i<grid.counts.x;i++) for(int k=0;k<grid.counts.z;k++){
                 for(int t=0;t<4;t++) OpenGL_Color(Do_Color(i,j,k).rgba,colors);
                 VECTOR<T,3> pos=grid.X(i,j,k);
                 OpenGL_Vertex(VECTOR<T,3>(pos.x-0.5*grid.dX.x,pos.y,pos.z-0.5*grid.dX.z),vertices);
@@ -224,7 +224,7 @@ Display_3D() const
     else if(dominant_axis==3){
         if(view_forward[2]>0){
             ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> colors;
-            for(int k=grid.counts.z;k>=1;k--) for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++){
+            for(int k=grid.counts.z-1;k>=0;k--) for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++){
                 for(int t=0;t<4;t++) OpenGL_Color(Do_Color(i,j,k).rgba,colors);
                 VECTOR<T,3> pos=grid.X(i,j,k);
                 OpenGL_Vertex(VECTOR<T,3>(pos.x-0.5*grid.dX.x,pos.y-0.5*grid.dX.y,pos.z),vertices);

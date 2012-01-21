@@ -85,7 +85,7 @@ Simplex(const VECTOR<int,d+1>& nodes) const
 {
     assert(incident_elements);
     // find shortest list of elements
-    int short_list=nodes[1];VECTOR<int,d> check=nodes.Remove_Index(1);
+    int short_list=nodes[0];VECTOR<int,d> check=nodes.Remove_Index(0);
     for(int i=0;i<d;i++)if((*incident_elements)(check[i]).m < (*incident_elements)(short_list).m) exchange(short_list,check[i]);
     // search short list for other nodes
     for(int k=0;k<(*incident_elements)(short_list).m;k++){int t=(*incident_elements)(short_list)(k);
@@ -135,7 +135,7 @@ Initialize_Adjacent_Elements()
 template<int d> void SIMPLEX_MESH<d>::
 Find_And_Append_Adjacent_Elements(const int simplex,const VECTOR<int,d>& face)
 {
-    int first_node=face[1];VECTOR<int,d-1> other_nodes=face.Remove_Index(1);
+    int first_node=face[0];VECTOR<int,d-1> other_nodes=face.Remove_Index(0);
     for(int t=0;t<(*incident_elements)(first_node).m;t++){
         int simplex2=(*incident_elements)(first_node)(t);
         if(simplex2!=simplex && Nodes_In_Simplex(other_nodes,simplex2))
@@ -155,8 +155,8 @@ Initialize_Neighbor_Elements()
     bool incident_elements_defined=incident_elements!=0;if(!incident_elements) Initialize_Incident_Elements();
     for(int t=0;t<elements.m;t++){VECTOR<int,d+1>& element=elements(t); // for each simplex, make the list of neighbor simplices
         ARRAY<int>& neighbors=(*neighbor_elements)(t);neighbors.Preallocate(expected_neighbors);
-        neighbors.Append_Elements((*incident_elements)(element[1]));
-        for(int i=2;i<=element.m;i++) neighbors.Append_Unique_Elements((*incident_elements)(element[i]));
+        neighbors.Append_Elements((*incident_elements)(element[0]));
+        for(int i=1;i<element.m;i++) neighbors.Append_Unique_Elements((*incident_elements)(element[i]));
         neighbors.Remove_Index_Lazy(neighbors.Find(t));neighbors.Compact();}
     if(!incident_elements_defined){delete incident_elements;incident_elements=0;}
 }
@@ -179,7 +179,7 @@ template<int d> int SIMPLEX_MESH<d>::
 Delete_Elements_With_Missing_Nodes()
 {
     int m_save=elements.m;
-    for(int t=elements.m;t>=1;t--)if(elements(t).Contains(0)) elements.Remove_Index_Lazy(t);
+    for(int t=elements.m-1;t>=0;t--)if(elements(t).Contains(0)) elements.Remove_Index_Lazy(t);
     elements.Compact();Refresh_Auxiliary_Structures();
     return m_save-elements.m;
 }
@@ -202,7 +202,7 @@ Delete_Sorted_Elements(const ARRAY<int>& deletion_list,HASHTABLE<int,int>& index
     int curr=0;
     HASHTABLE<int,int> reverse_index_map;
     ARRAY<int> unique_deletion_list;
-    for(int k=deletion_list.m;k>=1;k--) if(deletion_list(k)!=curr){
+    for(int k=deletion_list.m-1;k>=0;k--) if(deletion_list(k)!=curr){
         curr=deletion_list(k);int previous_index=elements.m;
         unique_deletion_list.Append(curr);
         if(curr!=elements.m){
@@ -320,7 +320,7 @@ Set_Number_Nodes(const int number_nodes_input)
 template<int d> void SIMPLEX_MESH<d>::
 Add_Dependencies(SEGMENT_MESH& dependency_mesh) const
 {
-    for(int t=0;t<elements.m;t++) for(int i=0;i<d;i++) for(int j=i+1;j<=d+1;j++) dependency_mesh.Add_Element_If_Not_Already_There(VECTOR<int,2>(elements(t)[i],elements(t)[j]));
+    for(int t=0;t<elements.m;t++) for(int i=0;i<d;i++) for(int j=i;j<d+1;j++) dependency_mesh.Add_Element_If_Not_Already_There(VECTOR<int,2>(elements(t)[i],elements(t)[j]));
 }
 //#####################################################################
 // Function Mark_Nodes_Referenced
@@ -337,8 +337,8 @@ template<int d> template<int d2> void SIMPLEX_MESH<d>::
 Simplices_On_Subsimplex(const VECTOR<int,d2>& subsimplex_nodes,ARRAY<int>& simplices_on_subsimplex) const
 {
     assert(incident_elements);
-    const ARRAY<int>& incident=(*incident_elements)(subsimplex_nodes[1]);
-    VECTOR<int,d2-1> other_nodes=subsimplex_nodes.Remove_Index(1);
+    const ARRAY<int>& incident=(*incident_elements)(subsimplex_nodes[0]);
+    VECTOR<int,d2-1> other_nodes=subsimplex_nodes.Remove_Index(0);
     for(int i=0;i<incident.m;i++){
         int simplex=incident(i);
         if(Nodes_In_Simplex(other_nodes,simplex)) simplices_on_subsimplex.Append(simplex);}

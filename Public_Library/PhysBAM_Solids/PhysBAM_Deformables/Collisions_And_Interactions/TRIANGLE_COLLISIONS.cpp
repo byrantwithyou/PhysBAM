@@ -368,12 +368,12 @@ template<class TV> int TRIANGLE_COLLISIONS<TV>::
 Prune_Non_Intersecting_Pairs(const T dt,ARRAY<VECTOR<int,d+1> >& point_face_pairs,ARRAY<VECTOR<int,2*d-2> >& edge_edge_pairs,const T attempt_ratio)
 {
     int culled=0;T collision_time;
-    for(int i=point_face_pairs.m;i>=1;i--){const VECTOR<int,d+1>& nodes=point_face_pairs(i);
+    for(int i=point_face_pairs.m-1;i>=0;i--){const VECTOR<int,d+1>& nodes=point_face_pairs(i);
         TV temporary_vector;VECTOR<T,d+1> temporary_weights;T temp_old_speed;
         GAUSS_JACOBI_PF_DATA temp_data(temporary_vector,temporary_weights,temporary_vector,temp_old_speed);
         if(!Point_Face_Collision(temp_data,nodes,dt,POINT_FACE_REPULSION_PAIR<TV>::Total_Repulsion_Thickness(repulsion_thickness,nodes),collision_time,attempt_ratio,true)){
             culled++;point_face_pairs.Remove_Index_Lazy(i);}}
-    for(int i=edge_edge_pairs.m;i>=1;i--){const VECTOR<int,2*d-2>& nodes=edge_edge_pairs(i);
+    for(int i=edge_edge_pairs.m-1;i>=0;i--){const VECTOR<int,2*d-2>& nodes=edge_edge_pairs(i);
         TV temporary_vector;VECTOR<T,2*d-2> temporary_weights;T temp_old_speed;
         GAUSS_JACOBI_EE_DATA temp_data(temporary_vector,temporary_weights,temporary_vector,temp_old_speed);
         if(!Edge_Edge_Collision(temp_data,nodes,dt,collision_time,attempt_ratio,true)){

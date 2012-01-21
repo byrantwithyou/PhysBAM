@@ -539,7 +539,7 @@ template<class T> void TRIANGULATED_SURFACE<T>::
 Remove_Degenerate_Triangles(const T area_threshold)
 {
     T area_threshold_squared=sqr(area_threshold);
-    for(int t=mesh.elements.m;t>=1;t--){
+    for(int t=mesh.elements.m-1;t>=0;t--){
         int i,j,k;mesh.elements(t).Get(i,j,k);
         if(TRIANGLE_3D<T>::Area_Squared(particles.X(i),particles.X(j),particles.X(k))<area_threshold_squared) mesh.elements.Remove_Index_Lazy(t);}
     Refresh_Auxiliary_Structures();

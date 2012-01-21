@@ -30,7 +30,7 @@ template<class TV> void UNIFORM_GRID_ITERATOR<TV>::
 Next_Helper()
 {
     index(TV::dimension)=region.min_corner(TV::dimension);
-    for(int i=TV::dimension-1;i>=1;i--){
+    for(int i=TV::dimension-2;i>=0;i--){
         if(index(i)<region.max_corner(i)){index(i)++;return;}
         index(i)=region.min_corner(i);}
     Reset(current_region+1);

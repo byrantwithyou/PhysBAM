@@ -116,7 +116,7 @@ Initialize_Optimization(const bool verbose)
         if(verbose) LOG::cout<<"layer "<<l<<" has "<<layers(l)->m<<" nodes"<<std::endl;}
     boundary_mesh_normals.Resize(layers(0)->m);
     if(replace_green_refinement_with_embedded_t_junctions)
-        for(int i=0;i<layers.m;i++) for(int j=layers(i)->m;j>=1;j--) if(!(*mesh.incident_elements)((*layers(i))(j)).m) layers(i)->Remove_Index_Lazy(j);
+        for(int i=0;i<layers.m;i++) for(int j=layers(i)->m-1;j>=0;j--) if(!(*mesh.incident_elements)((*layers(i))(j)).m) layers(i)->Remove_Index_Lazy(j);
     Compute_Boundary_Mesh_Normals();
 }
 //#####################################################################
@@ -546,7 +546,7 @@ Create_Initial_Mesh(const T bcc_lattice_cell_size,const bool use_adaptive_refine
             for(int p=0;p<parents.m;p++) (*dependent_nodes)(parents(p)).Append(binding_list.bindings(b)->particle_index);}
         binding_list.Update_Binding_Index_From_Particle_Index();}
     else{
-        for(int t=mesh.elements.m;t>=1;t--) if(!keep_tet_flag(t)) mesh.elements.Remove_Index_Lazy(t);mesh.elements.Compact();
+        for(int t=mesh.elements.m-1;t>=0;t--) if(!keep_tet_flag(t)) mesh.elements.Remove_Index_Lazy(t);mesh.elements.Compact();
         mesh.Delete_Auxiliary_Structures();tetrahedralized_volume.Discard_Valence_Zero_Particles_And_Renumber();}
 
 }

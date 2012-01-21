@@ -57,7 +57,7 @@ Remove_Separating_Cloth_Body_Contacts(BW_BACKWARD_EULER_SYSTEM<TV>& system,KRYLO
     PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     R=B;system.Multiply(V,Q);R-=Q;
     VECTOR_T& actual_R=debug_cast<VECTOR_T&>(R);
-    for(int i=cloth_body_constraints.m;i>=1;i--){
+    for(int i=cloth_body_constraints.m-1;i>=0;i--){
         RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(cloth_body_constraints(i).y);
         int p=cloth_body_constraints(i).x;
         if(TV::Dot_Product(actual_R.V(p),rigid_body.Implicit_Geometry_Normal(particles.X(p)))<=0) // TODO make sure this is the right direction

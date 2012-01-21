@@ -105,7 +105,7 @@ Exact_Signed_Area(const VECTOR<float,2>& x1,const VECTOR<float,2>& x2,const VECT
     terms(0)=((double)x1.x)*((double)x2.y);terms(1)=((double)x2.x)*((double)x3.y);terms(2)=((double)x3.x)*((double)x1.y);
     terms(3)=-((double)x1.y)*((double)x2.x);terms(4)=-((double)x2.y)*((double)x3.x);terms(5)=-((double)x3.y)*((double)x1.x);
     for(int i=0;i<5;i++) for(int j=i+1;j<6;j++) if(abs(terms(i))<abs(terms(j))) exchange(terms(i),terms(j));
-    for(int number_of_terms=5;number_of_terms>=1;number_of_terms--){
+    for(int number_of_terms=4;number_of_terms>=0;number_of_terms--){
         int i=1;for(;i<number_of_terms-1;i++) if(terms(0)*terms(i)<0) break;
         terms(i-1)+=terms(i);for(int j=i;j<number_of_terms-1;j++) terms(j)=terms(j+1);
         for(int j=i-1;j<number_of_terms-2;j++) if(abs(terms(j))<abs(terms(j+1))) exchange(terms(j),terms(j+1));}

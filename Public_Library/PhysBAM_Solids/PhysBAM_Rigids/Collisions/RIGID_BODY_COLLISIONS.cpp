@@ -512,10 +512,10 @@ Compute_Contact_Graph(const T dt,const T time,ARTICULATED_RIGID_BODY<TV>* articu
             if(state(0)==-2 && stack_static_bodies.Contains(PAIR<int,int>(state(1),edge_pairs(i)(0)))) continue;
             if(state(1)==-2 && stack_static_bodies.Contains(PAIR<int,int>(state(0),edge_pairs(i)(1)))) continue;
             for(int j=0;j<2;j++){int& stack_value=body_stack(edge_pairs(i)(j));if(stack_value!=-2) stack_value=-1;}}
-        for(int i=contact_stack.m;i>=1;i--) if(body_stack.Subset(contact_stack(i)).Find(-1)){
+        for(int i=contact_stack.m-1;i>=0;i--) if(body_stack.Subset(contact_stack(i)).Find(-1)){
             for(int j=0;j<contact_stack(i).m;j++) if(body_stack(contact_stack(i)(j))!=-2) body_stack(contact_stack(i)(j))=-1;
             contact_stack.Remove_Index_Lazy(i);}
-        for(int i=edge_pairs.m;i>=1;i--){
+        for(int i=edge_pairs.m-1;i>=0;i--){
             VECTOR<int,2> state(body_stack.Subset(edge_pairs(i)));
             if(!state.Find(-1) && !state.Find(0)) edge_pairs.Remove_Index_Lazy(i);}}
     if(prune_contact_using_velocity)

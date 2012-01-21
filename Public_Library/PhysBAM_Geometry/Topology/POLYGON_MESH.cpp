@@ -194,8 +194,8 @@ Opposite_Oriented_Element(const int element) const
             PAIR<int,bool>& oriented_edge=(*element_oriented_edges)(element)(c)(s);
             int node1,node2;segment_mesh->elements(oriented_edge.x).Get(node1,node2);
             if(oriented_edge.y) exchange(node1,node2);
-            for(int i=candidate_elements.m;i>=1;i--) if(!Oriented_Edge_In_Element(node1,node2,candidate_elements(i))) candidate_elements.Remove_Index_Lazy(i);}}
-    for(int candidate=candidate_elements.m;candidate>=1;candidate--){
+            for(int i=candidate_elements.m-1;i>=0;i--) if(!Oriented_Edge_In_Element(node1,node2,candidate_elements(i))) candidate_elements.Remove_Index_Lazy(i);}}
+    for(int candidate=candidate_elements.m-1;candidate>=0;candidate--){
         for(int c=0;c<(*element_oriented_edges)(candidate_elements(candidate)).m;c++)
             for(int s=0;s<(*element_oriented_edges)(candidate_elements(candidate))(c).m;s++){
                 PAIR<int,bool>& oriented_edge=(*element_oriented_edges)(candidate_elements(candidate))(c)(s);

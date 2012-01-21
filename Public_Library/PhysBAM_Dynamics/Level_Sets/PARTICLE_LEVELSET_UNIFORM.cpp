@@ -252,7 +252,7 @@ Update_Particles_To_Reflect_Mass_Conservation(const T_FAST_LEVELSET& levelset_ol
     for(NODE_ITERATOR iterator(levelset.grid);iterator.Valid();iterator.Next()){TV_INT block_index=iterator.Node_Index();if(particles(block_index)){
         PARTICLE_LEVELSET_PARTICLES<TV>* cell_particles=particles(block_index);
         BLOCK_UNIFORM<T_GRID> block(levelset.grid,block_index);
-        while(cell_particles){for(int k=cell_particles->array_collection->Size();k>=1;k--){
+        while(cell_particles){for(int k=cell_particles->array_collection->Size()-1;k>=0;k--){
             TV X_new=cell_particles->X(k);
             T phi_old=levelset_old.Phi(X_new);
             T phi_new=levelset.Phi(X_new);
@@ -311,10 +311,10 @@ Euler_Step_Removed_Particles(T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES& parti
         PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& cell_particles=*particles(block);
         if(!levelset.collision_body_list->Swept_Occupied_Block(T_BLOCK(levelset.grid,block))){
             number_of_non_occupied_cells++;
-            for(int k=cell_particles.array_collection->Size();k>=1;k--) // since not an occupied block, don't need to adjust for objects
+            for(int k=cell_particles.array_collection->Size()-1;k>=0;k--) // since not an occupied block, don't need to adjust for objects
                 levelset.levelset_callbacks->Adjust_Particle_For_Domain_Boundaries(cell_particles,k,cell_particles.V(k),particle_type,dt,time);}
         else{
-            for(int k=cell_particles.array_collection->Size();k>=1;k--){
+            for(int k=cell_particles.array_collection->Size()-1;k>=0;k--){
                 levelset.levelset_callbacks->Adjust_Particle_For_Domain_Boundaries(cell_particles,k,cell_particles.V(k),particle_type,dt,time);
                 T collision_distance=Particle_Collision_Distance(cell_particles.quantized_collision_distance(k));
                 if(!Adjust_Particle_For_Objects(cell_particles.X(k),cell_particles.V(k),cell_particles.radius(k),collision_distance,particle_type,dt,time)){
@@ -427,7 +427,7 @@ Second_Order_Runge_Kutta_Step_Particles_Threaded(RANGE<TV_INT>& domain,const T_F
                     cell_particles->X(k)+=dt*velocity;}}
             else{ // collision aware advection
                 number_of_occupied_cells++;
-                for(int k=cell_particles->array_collection->Size();k>=1;k--){
+                for(int k=cell_particles->array_collection->Size()-1;k>=0;k--){
                     T collision_distance=Particle_Collision_Distance(cell_particles->quantized_collision_distance(k));
                     // first push particle out
                     if(particle_type==PARTICLE_LEVELSET_NEGATIVE){bool particle_crossover;
@@ -855,7 +855,7 @@ Delete_Deep_Escaped_Particles(const BLOCK_UNIFORM<T_GRID>& block,PARTICLE_LEVELS
     int deleted=0;int minus_sign=-sign;
     while(cell_particles){
         if(need_to_identify_escaped_particles) Identify_Escaped_Particles(block,*cell_particles,escaped,sign);
-        for(int k=cell_particles->array_collection->Size();k>=1;k--) if(escaped(k) && minus_sign*levelset.Phi(particles.X(k))>radius_fraction*particles.radius(k)){Add_Particle_To_Deletion_List(this->deletion_list(block.block_index),*cell_particles,k);deleted++;}}
+        for(int k=cell_particles->array_collection->Size()-1;k>=0;k--) if(escaped(k) && minus_sign*levelset.Phi(particles.X(k))>radius_fraction*particles.radius(k)){Add_Particle_To_Deletion_List(this->deletion_list(block.block_index),*cell_particles,k);deleted++;}}
     Delete_Particles_From_Deletion_List(this->deletion_list(block.block_index),particles); //TODO: Make these deletion list's per domain
     return deleted;
 }
@@ -967,7 +967,7 @@ Delete_Particles_Outside_Grid(const T domain_boundary,const int axis,PARTICLE_LE
 template<class T_GRID> void PARTICLE_LEVELSET_UNIFORM<T_GRID>::
 Delete_Particles_Outside_Grid(const T domain_boundary,const int axis,PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles,const int side)
 {
-    for(int k=particles.array_collection->Size();k>=1;k--) if(side*particles.X(k)[axis]>side*domain_boundary) Delete_Particle_And_Clean_Memory(&particles,particles,k);
+    for(int k=particles.array_collection->Size()-1;k>=0;k--) if(side*particles.X(k)[axis]>side*domain_boundary) Delete_Particle_And_Clean_Memory(&particles,particles,k);
 }
 //#####################################################################
 // Function Identify_And_Remove_Escaped_Particles
@@ -1052,7 +1052,7 @@ Remove_Escaped_Particles(const BLOCK_UNIFORM<T_GRID>& block,PARTICLE_LEVELSET_PA
     ARRAY<PAIR<int,T> > removed_particle_times_local;
     ARRAY<bool> local_escaped(escaped);
     PARTICLE_LEVELSET_PARTICLES<TV>* cell_particles=&particles;
-    while(cell_particles){for(int k=cell_particles->array_collection->Size();k>=1;k--) if(local_escaped(k) && one_over_radius_multiplier*levelset.Phi(cell_particles->X(k))>cell_particles->radius(k)){
+    while(cell_particles){for(int k=cell_particles->array_collection->Size()-1;k>=0;k--) if(local_escaped(k) && one_over_radius_multiplier*levelset.Phi(cell_particles->X(k))>cell_particles->radius(k)){
         if(!removed_particles) removed_particles=Allocate_Particles(template_removed_particles);
         removed++;
         if(id) removed_particle_times_local.Append(PAIR<int,T>((*id)(k),time));
@@ -1094,7 +1094,7 @@ Fix_Momentum_With_Escaped_Particles(const T_FACE_ARRAYS_SCALAR& V,const T_ARRAYS
             else removed_particles=template_removed_particles.Clone();}
         T_LINEAR_INTERPOLATION_COLLIDABLE_FACE_SCALAR linear_interpolation_collidable;
         bool near_objects=levelset.collision_body_list?levelset.collision_body_list->Occupied_Block(block_uniform):false;if(near_objects) levelset.Enable_Collision_Aware_Interpolation(-1);
-        for(int k=removed_particles->array_collection->Size();k>=1;k--){T fraction=local_momentum_lost/removed_particles->array_collection->Size();
+        for(int k=removed_particles->array_collection->Size()-1;k>=0;k--){T fraction=local_momentum_lost/removed_particles->array_collection->Size();
             removed_particles->V(k)+=fraction/mass_scaling;}
         if(!removed_particles->array_collection->Size() && force) Add_Negative_Particle(iterator.Location(),local_momentum_lost/mass_scaling*linear_interpolation_collidable.Clamped_To_Array_Face(levelset.grid,V_lookup_collidable_lookup,iterator.Location()).Normalized(),(unsigned short)(random.Get_Number()*USHRT_MAX));
         if(!removed_particles->array_collection->Size()) done=false;
@@ -1121,7 +1121,7 @@ Fix_Momentum_With_Escaped_Particles(const TV& location,const T_FACE_ARRAYS_SCALA
         if(!force) return false;
         else removed_particles=template_removed_particles.Clone();}
     bool near_objects=levelset.collision_body_list?levelset.collision_body_list->Occupied_Block(block_uniform):false;if(near_objects) levelset.Enable_Collision_Aware_Interpolation(-1);
-    for(int k=removed_particles->array_collection->Size();k>=1;k--){T fraction=momentum_lost/removed_particles->array_collection->Size();
+    for(int k=removed_particles->array_collection->Size()-1;k>=0;k--){T fraction=momentum_lost/removed_particles->array_collection->Size();
         removed_particles->V(k)+=fraction/mass_scaling;}
     if(!removed_particles->array_collection->Size() && force) Add_Negative_Particle(location,momentum_lost/mass_scaling*linear_interpolation_collidable.Clamped_To_Array_Face(levelset.grid,V_lookup_collidable_lookup,location).Normalized(),(unsigned short)(random.Get_Number()*USHRT_MAX));
     if(near_objects) levelset.Disable_Collision_Aware_Interpolation();
@@ -1137,7 +1137,7 @@ Remove_Escaped_Particles(const BLOCK_UNIFORM<T_GRID>& block,PARTICLE_LEVELSET_PA
     bool near_objects=levelset.collision_body_list?levelset.collision_body_list->Occupied_Block(block):false;if(near_objects) levelset.Enable_Collision_Aware_Interpolation(sign);
     int deleted=0;T one_over_radius_multiplier=-sign/radius_fraction;
     PARTICLE_LEVELSET_PARTICLES<TV>* cell_particles=&particles;
-    while(cell_particles){for(int k=cell_particles->array_collection->Size();k>=1;k--) if(escaped(k) && one_over_radius_multiplier*levelset.Phi(cell_particles->X(k))>cell_particles->radius(k)){
+    while(cell_particles){for(int k=cell_particles->array_collection->Size()-1;k>=0;k--) if(escaped(k) && one_over_radius_multiplier*levelset.Phi(cell_particles->X(k))>cell_particles->radius(k)){
         Delete_Particle_And_Clean_Memory(&particles,*cell_particles,k);deleted++;k--;}
         cell_particles=cell_particles->next;}
     if(near_objects) levelset.Disable_Collision_Aware_Interpolation();
@@ -1179,7 +1179,7 @@ Reincorporate_Removed_Particles(const BLOCK_UNIFORM<T_GRID>& block,PARTICLE_LEVE
     bool near_objects=levelset.collision_body_list?levelset.collision_body_list->Occupied_Block(block):false;if(near_objects) levelset.Enable_Collision_Aware_Interpolation(sign);
     T one_over_radius_multiplier=-sign/radius_fraction;
     T half_unit_sphere_size_over_cell_size=(T).5*(T)unit_sphere_size<TV::dimension>::value/levelset.grid.Cell_Size();
-    for(int k=removed_particles.array_collection->Size();k>=1;k--) if(reincorporate_removed_particles_everywhere || (one_over_radius_multiplier*levelset.Phi(removed_particles.X(k))<removed_particles.radius(k))){
+    for(int k=removed_particles.array_collection->Size()-1;k>=0;k--) if(reincorporate_removed_particles_everywhere || (one_over_radius_multiplier*levelset.Phi(removed_particles.X(k))<removed_particles.radius(k))){
         if(!particles) particles=Allocate_Particles(template_particles);
         // rasterize the velocity onto the velocity field
         if(V){

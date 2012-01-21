@@ -41,7 +41,7 @@ Write(const DYNAMIC_LIST_CORE& object,const std::string& prefix)
 {
     const char version=1;
     FILE_UTILITIES::Write_To_File<RW>(STRING_UTILITIES::string_sprintf("%sactive_ids",prefix.c_str()),version,object.last_unique_id,object.index_to_id_map);
-    for(int i=object.needs_write.m;i>=1;i--) if(!object.id_to_index_map(object.needs_write(i))) object.needs_write.Remove_Index_Lazy(i);
+    for(int i=object.needs_write.m-1;i>=0;i--) if(!object.id_to_index_map(object.needs_write(i))) object.needs_write.Remove_Index_Lazy(i);
     // handle case of new element which was removed without being written
 }
 template class Read_Write<DYNAMIC_LIST_CORE,float,void>;

@@ -278,9 +278,9 @@ Delete_Particles_Inside_Objects(typename T_ARRAYS_SCALAR::template REBIND<T_PART
         T_PARTICLES& block_particles=*particles(block_index);
         if(collision_bodies_affecting_fluid->Occupied_Block(block)){
             // TODO: add back contour value??
-            // for(int k=particles.array_collection->Size();k>=1;k--) if(collision_bodies_affecting_fluid->Inside_Any_Simplex_Of_Any_Body(particles.X(k),contour_value,body_id,aggregate_id)) particles.Delete_Particle(k);
+            // for(int k=particles.array_collection->Size()-1;k>=0;k--) if(collision_bodies_affecting_fluid->Inside_Any_Simplex_Of_Any_Body(particles.X(k),contour_value,body_id,aggregate_id)) particles.Delete_Particle(k);
             // TODO(jontg): Shouldn't this delete particles inside the solid, not just on the surface?
-            for(int k=block_particles.array_collection->Size();k>=1;k--) if(collision_bodies_affecting_fluid->Inside_Any_Simplex_Of_Any_Body(block_particles.X(k),body_id,aggregate_id)) block_particles.array_collection->Delete_Element(k);}
+            for(int k=block_particles.array_collection->Size()-1;k>=0;k--) if(collision_bodies_affecting_fluid->Inside_Any_Simplex_Of_Any_Body(block_particles.X(k),body_id,aggregate_id)) block_particles.array_collection->Delete_Element(k);}
         callbacks->Delete_Particles_Inside_Objects(block_particles,particle_type,time);
         if(block_particles.array_collection->Size()==0) particle_levelset_evolution->particle_levelset.Free_Particle_And_Clear_Pointer(particles(block_index));}}
 }

@@ -35,7 +35,7 @@ BASIC_VISUALIZATION::BASIC_VISUALIZATION()
 //#####################################################################
 BASIC_VISUALIZATION::~BASIC_VISUALIZATION() 
 {
-    for(int i=owned_components.m;i>=1;i--) delete owned_components(i);
+    for(int i=owned_components.m-1;i>=0;i--) delete owned_components(i);
     delete opengl_axes;
 }
 //#####################################################################

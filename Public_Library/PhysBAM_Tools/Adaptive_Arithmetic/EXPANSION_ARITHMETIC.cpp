@@ -109,11 +109,11 @@ Compress_Expansion(ARRAY<T>& e)
 {
   INEXACT T Qnew;
   T Q,q,enow, hnow;
-  int eindex, hindex,top=1;
+  int eindex, hindex,top=0;
 
   ARRAY<T> h;h.Preallocate(e.m);
   Q=e.Last();
-  for(eindex=e.m-1;eindex>=1;eindex--){
+  for(eindex=e.m-2;eindex>=0;eindex--){
       enow=e(eindex);
       Fast_Two_Sum(Q,enow,Qnew,q);
       if(q!=0){h.Append(const_cast<T&>(Qnew));Q=q;} else Q=Qnew;}

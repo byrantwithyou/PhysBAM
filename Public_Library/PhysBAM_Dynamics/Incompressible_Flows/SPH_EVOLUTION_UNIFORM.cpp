@@ -47,7 +47,7 @@ template<class T_GRID> void SPH_EVOLUTION_UNIFORM<T_GRID>::
 Euler_Step(const T dt,const T time)
 {
     LOG::cout<<"Number of SPH particles: "<<sph_particles.array_collection->Size()<<std::endl;
-    for(int i=sph_particles.array_collection->Size();i>=1;i--){
+    for(int i=sph_particles.array_collection->Size()-1;i>=0;i--){
         callbacks->Adjust_SPH_Particle_For_Domain_Boundaries(sph_particles,i,sph_particles.V(i),dt,time);
         if(!callbacks->Adjust_SPH_Particle_For_Objects(sph_particles,i,sph_particles.V(i),dt,time)) sph_particles.array_collection->Delete_Element(i);
         else sph_particles.X(i)+=dt*sph_particles.V(i);}

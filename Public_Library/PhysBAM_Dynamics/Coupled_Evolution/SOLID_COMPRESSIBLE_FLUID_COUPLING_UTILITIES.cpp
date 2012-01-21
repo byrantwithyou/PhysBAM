@@ -679,7 +679,7 @@ Update_Cells_Near_Interface(const T dt,const int rk_order,const int rk_substep)
     for(FACE_ITERATOR iterator(euler.grid);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> face_index=iterator.Full_Index();
         if(highest_eno_order(face_index)==saved_order) accumulated_flux(face_index) += euler.conservation->fluxes(face_index);}
 
-    for(int ord=saved_order-1;ord>=1;--ord){
+    for(int ord=saved_order-2;ord>=0;--ord){
         euler.conservation->Set_Order(ord);
         euler.conservation->Update_Conservation_Law(euler.grid,euler.U,euler.U_ghost,euler.psi,dt,euler.eigensystems,euler.eigensystems_default,euler.euler_projection.elliptic_solver->psi_N,
                                                     euler.euler_projection.face_velocities,false,euler.open_boundaries);

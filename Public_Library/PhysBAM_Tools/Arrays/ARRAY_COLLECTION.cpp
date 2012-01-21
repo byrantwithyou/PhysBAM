@@ -87,7 +87,7 @@ Delete_Elements_On_Deletion_List(const bool preserve_order)
             for(int i=deletion_list(k)+1;i<next;i++) Copy_Element_Helper(i,i-k);}}
     else{
         int last=number;
-        for(int k=deletion_list.m;k>=1;k--)
+        for(int k=deletion_list.m-1;k>=0;k--)
             Copy_Element_Helper(last--,deletion_list(k));}
     Resize(number-deletion_list.m);
     deletion_list.Remove_All();

@@ -106,7 +106,7 @@ public:
                     if(neighbors_visible(min_face)(axis) && valid_points(min_face)){sum+=values(min_face);count++;}
                     if(neighbors_visible(invalid_indices(k).x)(axis) && valid_points(max_face)){sum+=values(max_face);count++;}}
                 if(count){values(invalid_indices(k).x)=sum/(T)count;invalid_indices(k).y=true;done=false;}}
-            if(!done) for(int k=invalid_indices.m;k>=1;k--) if(invalid_indices(k).y){valid_points(invalid_indices(k).x)=true;invalid_indices.Remove_Index_Lazy(k);}}
+            if(!done) for(int k=invalid_indices.m-1;k>=0;k--) if(invalid_indices(k).y){valid_points(invalid_indices(k).x)=true;invalid_indices.Remove_Index_Lazy(k);}}
 
         // average values collision aware in Gauss-Jacobi fashion (here we replace non-visible values with special values defined by Compute_Revalidation_Value())
         done=false;
@@ -122,7 +122,7 @@ public:
                     else{sum+=Compute_Revalidation_Value(arrays_axis,grid.X(invalid_indices(k).x),grid.X(max_face),values(invalid_indices(k).x),T());count++;}}
                 if(count){values(invalid_indices(k).x)=sum/(T)count;invalid_indices(k).y=true;done=false;}
                 else values(invalid_indices(k).x)=T();}
-            if(!done) for(int k=invalid_indices.m;k>=1;k--) if(invalid_indices(k).y){valid_points(invalid_indices(k).x)=true;invalid_indices.Remove_Index_Lazy(k);}}
+            if(!done) for(int k=invalid_indices.m-1;k>=0;k--) if(invalid_indices(k).y){valid_points(invalid_indices(k).x)=true;invalid_indices.Remove_Index_Lazy(k);}}
         grid.Put_Ghost(true,valid_points,3);}} // set valid for future advection
 
 //#####################################################################

@@ -26,7 +26,7 @@ Intersection(const VECTOR<int,d>& simplices)
     ARRAY<int> intersection_list;
     if(!Intersection_List(simplices,intersection_list)) return 0;
     if(intersection_list.m>1) PHYSBAM_FATAL_ERROR();
-    return intersection_list(1);
+    return intersection_list(0);
 }
 //#####################################################################
 // Function Intersection_List
@@ -37,11 +37,11 @@ Intersection_List(const VECTOR<int,d2>& simplices,ARRAY<int>& intersection_list,
     VECTOR<int,d2> converted_simplices=cutting_simplices.Convert_Simplex_Indices_To_Global_Indices(simplices); // TODO: make a version that takes already converted simplex indices
     // use the intersection list that has the fewest entries to compare the the others agains
     for(int i=2;i<=d2;i++)
-        if(intersections_on_simplex(converted_simplices[i]).m<intersections_on_simplex(converted_simplices[1]).m)
-            exchange(converted_simplices[1],converted_simplices[i]);
-    intersection_list=intersections_on_simplex(converted_simplices[1]);
+        if(intersections_on_simplex(converted_simplices[i]).m<intersections_on_simplex(converted_simplices[0]).m)
+            exchange(converted_simplices[0],converted_simplices[i]);
+    intersection_list=intersections_on_simplex(converted_simplices[0]);
     for(int i=2;i<=d2;i++)
-        for(int j=intersection_list.m;j>=1;j--)
+        for(int j=intersection_list.m-1;j>=0;j--)
             if(!simplices_on_intersection(intersection_list(j)).Contains(converted_simplices[i]))
                 intersection_list.Remove_Index_Lazy(j);
     return intersection_list.m!=0;
@@ -53,10 +53,10 @@ template<class T,int d> template<int d2> bool INTERSECTION_REGISTRY<T,d>:: // mu
 Intersection_List_For_Cuts(const VECTOR<int,d2>& simplices,const VECTOR<int,d+1>& element_nodes,ARRAY<int>& intersection_list,typename ENABLE_IF<(d2<=d),UNUSABLE>::TYPE unusable)
 {
     VECTOR<int,d2> simplices_copy=simplices;
-    for(int i=2;i<=d2;i++) if(intersections_on_simplex(simplices_copy[i]).m<intersections_on_simplex(simplices_copy[1]).m) exchange(simplices_copy[1],simplices_copy[i]);
-    intersection_list=intersections_on_simplex(simplices_copy[1]);
-    for(int i=2;i<=d2;i++) for(int j=intersection_list.m;j>=1;j--) if(!simplices_on_intersection(intersection_list(j)).Contains(simplices_copy[i])) intersection_list.Remove_Index_Lazy(j);
-    for(int i=intersection_list.m;i>=1;i--){
+    for(int i=2;i<=d2;i++) if(intersections_on_simplex(simplices_copy[i]).m<intersections_on_simplex(simplices_copy[0]).m) exchange(simplices_copy[0],simplices_copy[i]);
+    intersection_list=intersections_on_simplex(simplices_copy[0]);
+    for(int i=2;i<=d2;i++) for(int j=intersection_list.m-1;j>=0;j--) if(!simplices_on_intersection(intersection_list(j)).Contains(simplices_copy[i])) intersection_list.Remove_Index_Lazy(j);
+    for(int i=intersection_list.m-1;i>=0;i--){
         const ARRAY<int>& all_simplices=simplices_on_intersection(intersection_list(i));
         bool ok=false;
         for(int j=0;j<all_simplices.m;j++){ // TODO: why is this necessary?

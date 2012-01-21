@@ -22,7 +22,7 @@ UNIFORM_GRID_ITERATOR_NODE(const GRID<TV>& grid_input,const int number_of_ghost_
             // TODO(jontg): counts doesn't take into account number_of_ghost_cells, so I believe this to be incorrect.
             if(!side){ // don't loop over the same cell twice!
                 TV_INT max_copy(domain.max_corner);
-                for(int axis=TV::dimension;axis>=1;axis--){
+                for(int axis=TV::dimension-1;axis>=0;axis--){
                     domain.max_corner(axis)=0;
                     Add_Region(domain);
                     domain.max_corner(axis)=max_copy(axis);
@@ -35,7 +35,7 @@ UNIFORM_GRID_ITERATOR_NODE(const GRID<TV>& grid_input,const int number_of_ghost_
         case GRID<TV>::BOUNDARY_REGION: // outer boundary of grid with specified ghost cells
             if(!side){ // don't loop over the same node twice!
                 RANGE<TV_INT> domain_copy(domain);
-                for(int axis=TV::dimension;axis>=1;axis--){
+                for(int axis=TV::dimension-1;axis>=0;axis--){
                     domain.max_corner(axis)=domain.min_corner(axis);
                     Add_Region(domain);
                     domain.max_corner(axis)=domain.min_corner(axis)=domain_copy.max_corner(axis);

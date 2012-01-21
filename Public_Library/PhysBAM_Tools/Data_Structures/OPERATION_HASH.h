@@ -40,7 +40,7 @@ public:
 
     void Remove_Duplicates(ARRAY<ID>& list)
     {Next_Operation();
-    for(int i=list.Size();i>=1;i--) if(Is_Marked_Current(list(i))) list.Remove_Index_Lazy(i);else Mark(list(i));
+    for(int i=list.Size()-1;i>=0;i--) if(Is_Marked_Current(list(i))) list.Remove_Index_Lazy(i);else Mark(list(i));
     Next_Operation();}
 
 //#####################################################################

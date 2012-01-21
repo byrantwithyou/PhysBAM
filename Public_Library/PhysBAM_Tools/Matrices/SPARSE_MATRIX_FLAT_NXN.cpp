@@ -276,13 +276,13 @@ Solve_Forward_Substitution(const VECTOR_ND<T>& b,VECTOR_ND<T>& x,const bool diag
 template<class T> void SPARSE_MATRIX_FLAT_NXN<T>::
 Solve_Backward_Substitution(const VECTOR_ND<T>& b,VECTOR_ND<T>& x,const bool diagonal_is_identity,const bool diagonal_is_inverted) const
 {
-    if(diagonal_is_identity) for(int i=n;i>=1;i--){
+    if(diagonal_is_identity) for(int i=n-1;i>=0;i--){
         T sum=0;for(int index=diagonal_index(i)+1;index<offsets(i+1);index++)sum+=A(index).a*x(A(index).j);
         x(i)=b(i)-sum;}
-    else if(!diagonal_is_inverted) for(int i=n;i>=1;i--){
+    else if(!diagonal_is_inverted) for(int i=n-1;i>=0;i--){
         T sum=0;for(int index=diagonal_index(i)+1;index<offsets(i+1);index++)sum+=A(index).a*x(A(index).j);
         x(i)=(b(i)-sum)/A(diagonal_index(i)).a;}
-    else for(int i=n;i>=1;i--){
+    else for(int i=n-1;i>=0;i--){
         T sum=0;for(int index=diagonal_index(i)+1;index<offsets(i+1);index++)sum+=A(index).a*x(A(index).j);
         x(i)=(b(i)-sum)*A(diagonal_index(i)).a;}
 }

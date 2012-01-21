@@ -165,9 +165,12 @@ Insert_Into_Hashtable(const ID index)
 template<class T_COLLISION_GEOMETRY,class T_ARRAY,class ID> bool COLLISION_GEOMETRY_SPATIAL_PARTITION<T_COLLISION_GEOMETRY,T_ARRAY,ID>::
 Remove_From_Cell(const TV_INT& voxel,const ID index)
 {
-    ARRAY<ID>* list=0;if(!hashtable.Get(voxel,list)) return false;
-    if(int found=list->Find(index)){list->Remove_Index_Lazy(found);return true;}
-    return false;
+    ARRAY<ID>* list=0;
+    if(!hashtable.Get(voxel,list)) return false;
+    int found=list->Find(index);
+    if(found==-1) return false;
+    list->Remove_Index_Lazy(found);
+    return true;
 }
 //#####################################################################
 // Function Add_To_Cell

@@ -78,7 +78,7 @@ public:
         ARRAY<int> remove_connections;HASHTABLE<int> visited;bool need_rebuild=false;
         FRACTURE_DATA& data=iterator.Data();
         typename RIGID_BODY_CLUSTER_BINDINGS<TV>::CLUSTER& cluster=*bindings.reverse_bindings.Get(iterator.Key());
-        for(int i=data.connections.m;i>=1;i--){
+        for(int i=data.connections.m-1;i>=0;i--){
             const VECTOR<RIGID_CLUSTER_CONSTITUENT_ID,2>& edge=data.connections(i);
             T rl=data.restlengths(i);
             RIGID_BODY<TV> &child_1=rigid_body_collection.Rigid_Body(cluster.children(edge[0])),&child_2=rigid_body_collection.Rigid_Body(cluster.children(edge[1]));
@@ -96,13 +96,13 @@ public:
                         for(int i=0;i<break_connections.m;i++){
                             VECTOR<int,2> edge=VECTOR<int,2>(graph->Edges(break_connections(i)).x,graph->Edges(break_connections(i)).y).Sorted();
                             graph->Remove_Edge(break_connections(i));
-                            for(int j=data.connections.m;j>=1;j--){
-                                VECTOR<int,2> tmp_edge(Value(data.connections(j)(1)),Value(data.connections(j)(2)));
+                            for(int j=data.connections.m-1;j>=0;j--){
+                                VECTOR<int,2> tmp_edge(Value(data.connections(j)(0)),Value(data.connections(j)(1)));
                                 if(edge==tmp_edge.Sorted()) remove_connections.Append(j);}}}}
                 else data.connections.Remove_Index_Lazy(i);}}
         if(need_rebuild) parents_to_rebuild.Append(iterator.Key());
         Sort(remove_connections);
-        for(int i=remove_connections.m;i>=1;i--) data.connections.Remove_Index_Lazy(remove_connections(i));}}
+        for(int i=remove_connections.m-1;i>=0;i--) data.connections.Remove_Index_Lazy(remove_connections(i));}}
 
     bool Create_New_Clusters()
     {for(int i_dummy=0;i_dummy<parents_to_rebuild.m;i_dummy++){int parent=parents_to_rebuild(i_dummy);

@@ -100,7 +100,7 @@ template<class T>
 void Discard_Tetrahedrons_Outside_Implicit_Surface(TETRAHEDRALIZED_VOLUME<T>& tv,IMPLICIT_OBJECT<VECTOR<T,3> >& implicit_surface)
 {
     typedef VECTOR<T,3> TV;
-    for(int t=tv.mesh.elements.m;t>=1;t--){
+    for(int t=tv.mesh.elements.m-1;t>=0;t--){
         int i,j,k,l;tv.mesh.elements(t).Get(i,j,k,l);
         TV xi=tv.particles.X(i),xj=tv.particles.X(j),xk=tv.particles.X(k),xl=tv.particles.X(l);
         T max_length=TETRAHEDRON<T>::Maximum_Edge_Length(xi,xj,xk,xl);
@@ -115,7 +115,7 @@ template<class T>
 void Discard_Tetrahedrons_Outside_Implicit_Surface_Aggressive(TETRAHEDRALIZED_VOLUME<T>& tv,IMPLICIT_OBJECT<VECTOR<T,3> >& implicit_surface)
 {
     typedef VECTOR<T,3> TV;
-    for(int t=tv.mesh.elements.m;t>=1;t--){
+    for(int t=tv.mesh.elements.m-1;t>=0;t--){
         int i,j,k,l;tv.mesh.elements(t).Get(i,j,k,l);
         TV xi=tv.particles.X(i),xj=tv.particles.X(j),xk=tv.particles.X(k),xl=tv.particles.X(l);
         T max_length=TETRAHEDRON<T>::Maximum_Edge_Length(xi,xj,xk,xl);
@@ -132,7 +132,7 @@ void Discard_Tetrahedrons_Outside_Implicit_Surface_Aggressive(TETRAHEDRALIZED_VO
 {
     typedef VECTOR<T,3> TV;
     for(int b=0;b<bounding_boxes.Size();b++){const RANGE<TV>& box=bounding_boxes(b);
-        for(int t=tv.mesh.elements.m;t>=1;t--){
+        for(int t=tv.mesh.elements.m-1;t>=0;t--){
             int i,j,k,l;tv.mesh.elements(t).Get(i,j,k,l);
             TV xi=tv.particles.X(i),xj=tv.particles.X(j),xk=tv.particles.X(k),xl=tv.particles.X(l);
             if(box.Lazy_Outside(xi)||box.Lazy_Outside(xj)||box.Lazy_Outside(xk)||box.Lazy_Outside(xl)) continue;

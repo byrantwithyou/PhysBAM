@@ -178,7 +178,7 @@ template<class T> RENDERING_OBJECT<T>* RENDER_WORLD<T>::
 Point_Inside_Object(const TV& point)
 {
     RENDERING_OBJECT<T> *inside_object=0,*candidate_object=0;
-    for(int i=standard_objects.m;i>=1;i--)if(standard_objects(i)->Inside(point,&candidate_object))
+    for(int i=standard_objects.m-1;i>=0;i--)if(standard_objects(i)->Inside(point,&candidate_object))
         if(!inside_object||candidate_object->priority>=inside_object->priority) inside_object=candidate_object;
     assert(inside_object);return inside_object;
 }

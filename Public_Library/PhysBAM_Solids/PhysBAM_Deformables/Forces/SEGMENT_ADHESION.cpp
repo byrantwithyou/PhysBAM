@@ -141,7 +141,7 @@ Update_Springs(const bool search_hierarchy)
         for(int i=0;i<deletion_list.m;i++)springs->Delete(deletion_list(i));
         
         // note in the case of new_springs then we will delete the entire boundary list and make it again so we don't do this
-        for(int i=external_springs.m;i>=1;i--){
+        for(int i=external_springs.m-1;i>=0;i--){
             const VECTOR<int,2> &segment1_nodes=curve.mesh.elements(external_spring_segments(i)[0]),&segment2_nodes=curve.mesh.elements(external_spring_segments(i)[1]);
             SPRING_STATE& state=external_springs(i);
             SEGMENT_3D<T> segment1(particles.X.Subset(segment1_nodes)),segment2(particles.X.Subset(segment2_nodes)); 
@@ -154,7 +154,7 @@ Update_Springs(const bool search_hierarchy)
                 intersecting_edge_edge_pairs.Delete_If_Present(VECTOR<int,4>(segment1_nodes[0],segment1_nodes[1],segment2_nodes[0],segment2_nodes[1]));
                 intersecting_edge_edge_pairs.Delete_If_Present(VECTOR<int,4>(segment2_nodes[0],segment2_nodes[1],segment1_nodes[0],segment1_nodes[1]));}}}
     else{// swap springs
-        for(int i=external_springs.m;i>=1;i--){
+        for(int i=external_springs.m-1;i>=0;i--){
             const VECTOR<int,2> &segment1_nodes=curve.mesh.elements(external_spring_segments(i)[0]),&segment2_nodes=curve.mesh.elements(external_spring_segments(i)[1]);
             intersecting_edge_edge_pairs.Delete_If_Present(VECTOR<int,4>(segment1_nodes[0],segment1_nodes[1],segment2_nodes[0],segment2_nodes[1]));
             intersecting_edge_edge_pairs.Delete_If_Present(VECTOR<int,4>(segment2_nodes[0],segment2_nodes[1],segment1_nodes[0],segment1_nodes[1]));}

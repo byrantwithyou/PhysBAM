@@ -86,10 +86,10 @@ Initialize_Square_Mesh(const int m,const int n,const bool reverse_triangles) // 
     Clean_Memory();number_nodes=m*n;elements.Exact_Resize(2*(m-1)*(n-1));
     if(reverse_triangles){
         int t=0;for(int i=0;i<m-1;i++)for(int j=0;j<n-1;j++){ // counterclockwise node ordering
-            elements(++t).Set(i+m*(j-1),i+1+m*(j-1),i+m*j);elements(++t).Set(i+1+m*(j-1),i+1+m*j,i+m*j);}}
+            elements(t++).Set(i+m*(j-1),i+1+m*(j-1),i+m*j);elements(t++).Set(i+1+m*(j-1),i+1+m*j,i+m*j);}}
     else{
         int t=0;for(int i=0;i<m-1;i++)for(int j=0;j<n-1;j++){ // counterclockwise node ordering
-            elements(++t).Set(i+m*(j-1),i+1+m*(j-1),i+1+m*j);elements(++t).Set(i+m*(j-1),i+1+m*j,i+m*j);}}
+            elements(t++).Set(i+m*(j-1),i+1+m*(j-1),i+1+m*j);elements(t++).Set(i+m*(j-1),i+1+m*j,i+m*j);}}
 }
 //#####################################################################
 // Function Initialize_Equilateral_Mesh
@@ -99,8 +99,8 @@ Initialize_Equilateral_Mesh(const int m,const int n)
 {
     Clean_Memory();number_nodes=m*n;elements.Exact_Resize(2*(m-1)*(n-1));
     int t=0;for(int i=0;i<m-1;i++)for(int j=0;j<n-1;j++){ // counterclockwise node ordering
-        if(j%2){elements(++t).Set(i+m*(j-1),i+1+m*(j-1),i+m*j);elements(++t).Set(i+1+m*(j-1),i+1+m*j,i+m*j);}
-        else{elements(++t).Set(i+m*(j-1),i+1+m*(j-1),i+1+m*j);elements(++t).Set(i+m*(j-1),i+1+m*j,i+m*j);}}
+        if(j%2){elements(t++).Set(i+m*(j-1),i+1+m*(j-1),i+m*j);elements(t++).Set(i+1+m*(j-1),i+1+m*j,i+m*j);}
+        else{elements(t++).Set(i+m*(j-1),i+1+m*(j-1),i+1+m*j);elements(t++).Set(i+m*(j-1),i+1+m*j,i+m*j);}}
 }
 //#####################################################################
 // Function Initialize_Torus_Mesh
@@ -111,8 +111,8 @@ Initialize_Torus_Mesh(const int m,const int n)
     Clean_Memory();number_nodes=m*n;elements.Exact_Resize(2*m*n);assert((n&1)==0);
     int t=0;for(int i=0;i<m;i++) for(int j=0;j<n;j++){ // counterclockwise node ordering
         int i1=i==m?1:i+1,j1=j==n?1:j+1;
-        if(j&1){elements(++t).Set(i+m*(j-1),i1+m*(j-1),i+m*(j1-1));elements(++t).Set(i1+m*(j-1),i1+m*(j1-1),i+m*(j1-1));}
-        else{elements(++t).Set(i+m*(j-1),i1+m*(j-1),i1+m*(j1-1));elements(++t).Set(i+m*(j-1),i1+m*(j1-1),i+m*(j1-1));}}
+        if(j&1){elements(t++).Set(i+m*(j-1),i1+m*(j-1),i+m*(j1-1));elements(t++).Set(i1+m*(j-1),i1+m*(j1-1),i+m*(j1-1));}
+        else{elements(t++).Set(i+m*(j-1),i1+m*(j-1),i1+m*(j1-1));elements(t++).Set(i+m*(j-1),i1+m*(j1-1),i+m*(j1-1));}}
 }
 //#####################################################################
 // Function Initialize_Circle_Mesh
@@ -122,8 +122,8 @@ Initialize_Circle_Mesh(const int num_radial,const int num_tangential) // constru
 {
     Clean_Memory();number_nodes=num_radial*num_tangential;elements.Exact_Resize(2*(num_radial-1)*num_tangential);
     int t=0,n=num_tangential;for(int i=0;i<num_radial-1;i++)for(int j=0;j<n;j++){ // counterclockwise node ordering
-        if(j&1){elements(++t).Set(i*n+j,i*n+(j%n)+1,(i+1)*n+j);elements(++t).Set((i+1)*n+j,i*n+(j%n)+1,(i+1)*n+(j%n)+1);}
-        else{elements(++t).Set(i*n+j,i*n+(j%n)+1,(i+1)*n+j%n+1);elements(++t).Set((i+1)*n+j,i*n+j,(i+1)*n+(j%n)+1);}}
+        if(j&1){elements(t++).Set(i*n+j,i*n+(j%n)+1,(i+1)*n+j);elements(t++).Set((i+1)*n+j,i*n+(j%n)+1,(i+1)*n+(j%n)+1);}
+        else{elements(t++).Set(i*n+j,i*n+(j%n)+1,(i+1)*n+j%n+1);elements(t++).Set((i+1)*n+j,i*n+j,(i+1)*n+(j%n)+1);}}
 }
 //#####################################################################
 // Function Initialize_Herring_Bone_Mesh
@@ -133,8 +133,8 @@ Initialize_Herring_Bone_Mesh(const int m,const int n) // construct a regular m-b
 {
     Clean_Memory();number_nodes=m*n;elements.Exact_Resize(2*(m-1)*(n-1));
     int t=0;for(int i=0;i<m-1;i++)for(int j=0;j<n-1;j++){ // counterclockwise node ordering
-        if(i%2){elements(++t).Set(i+m*(j-1),i+1+m*(j-1),i+m*j);elements(++t).Set(i+1+m*(j-1),i+1+m*j,i+m*j);}
-        else{elements(++t).Set(i+m*(j-1),i+1+m*(j-1),i+1+m*j);elements(++t).Set(i+m*(j-1),i+1+m*j,i+m*j);}}
+        if(i%2){elements(t++).Set(i+m*(j-1),i+1+m*(j-1),i+m*j);elements(t++).Set(i+1+m*(j-1),i+1+m*j,i+m*j);}
+        else{elements(t++).Set(i+m*(j-1),i+1+m*(j-1),i+1+m*j);elements(t++).Set(i+m*(j-1),i+1+m*j,i+m*j);}}
 }
 //#####################################################################
 // Function Initialize_Cylinder_Mesh
@@ -145,9 +145,9 @@ Initialize_Cylinder_Mesh(const int m,const int n,const bool create_caps)
     Clean_Memory();int t=0;
     if(create_caps){elements.Exact_Resize(2*m*n);number_nodes=m*n+2;}
     else{elements.Exact_Resize(2*(m-1)*n);number_nodes=m*n;}
-    for(int j=0;j<n;j++){int j_1=j==n?1:j+1;
-        for(int i=0;i<m-1;i++){elements(++t).Set(j+(i-1)*n,j+i*n,j_1+i*n);elements(++t).Set(j+(i-1)*n,j_1+i*n,j_1+(i-1)*n);}
-        if(create_caps){elements(++t).Set(m*n+1,j,j_1);elements(++t).Set(m*n+2,j_1+(m-1)*n,j+(m-1)*n);}}
+    for(int j=0;j<n;j++){int j_1=j==n?0:j;
+        for(int i=0;i<m-1;i++){elements(t++).Set(j+(i-1)*n,j+i*n,j_1+i*n);elements(t++).Set(j+(i-1)*n,j_1+i*n,j_1+(i-1)*n);}
+        if(create_caps){elements(t++).Set(m*n+1,j,j_1);elements(t++).Set(m*n+2,j_1+(m-1)*n,j+(m-1)*n);}}
 }
 //#####################################################################
 // Function Initialize_Topologically_Sorted_Neighbor_Nodes
@@ -168,8 +168,8 @@ Initialize_Topologically_Sorted_Neighbor_Nodes()
     for(int i=0;i<number_nodes;i++) if(neighbors(i).m){
         (*topologically_sorted_neighbor_nodes)(i).Exact_Resize(neighbors(i).m);
         ARRAY<bool> not_first(neighbors(i).m);for(int j=0;j<neighbors(i).m;j++) if(neighbor_links(i)(j)) not_first(neighbor_links(i)(j))=true;
-        int node_index=1;while(node_index <= neighbors(i).m && not_first(node_index)) node_index++; // now find the first node in the linked list
-        if(node_index > neighbors(i).m) node_index=1; // if we have a cycle (i is in the interior), just use 1
+        int node_index=0;while(node_index < neighbors(i).m && not_first(node_index)) node_index++; // now find the first node in the linked list
+        if(node_index > neighbors(i).m) node_index=0; // if we have a cycle (i is in the interior), just use 0
         for(int j=0;j<neighbors(i).m;j++){(*topologically_sorted_neighbor_nodes)(i)(j)=neighbors(i)(node_index);node_index=neighbor_links(i)(node_index);}}
 }
 //#####################################################################
@@ -185,10 +185,10 @@ Initialize_Topologically_Sorted_Incident_Elements()
     for(int p=0;p<number_nodes;p++){
         ARRAY<int>& neighbors=(*topologically_sorted_neighbor_nodes)(p);
         int m=neighbors.m;assert(m>=2);
-        int last_triangle=Triangle(p,neighbors(1),neighbors(m));
-        if(last_triangle){(*topologically_sorted_incident_elements)(p).Exact_Resize(m);(*topologically_sorted_incident_elements)(p)(m)=last_triangle;}
+        int last_triangle=Triangle(p,neighbors(0),neighbors(m-1));
+        if(last_triangle){(*topologically_sorted_incident_elements)(p).Exact_Resize(m);(*topologically_sorted_incident_elements)(p)(m-1)=last_triangle;}
         else (*topologically_sorted_incident_elements)(p).Exact_Resize(m-1);
-        for(int a=1;a<m;a++){int t=Triangle(p,neighbors(a),neighbors(a+1));assert(t);(*topologically_sorted_incident_elements)(p)(a)=t;}}
+        for(int a=0;a<m-1;a++){int t=Triangle(p,neighbors(a),neighbors(a+1));assert(t);(*topologically_sorted_incident_elements)(p)(a)=t;}}
     if(!topologically_sorted_neighbor_nodes_defined){delete topologically_sorted_neighbor_nodes;topologically_sorted_neighbor_nodes=0;}
 }
 //#####################################################################
@@ -239,8 +239,8 @@ Initialize_Edge_Triangles()
     for(int s=0;s<segment_mesh->elements.m;s++){
         (*edge_triangles)(s).Compact();
         if((*edge_triangles)(s).m==2){
-            int s1,s2,t1,t2,t3;segment_mesh->elements(s).Get(s1,s2);elements((*edge_triangles)(s)(1)).Get(t1,t2,t3);
-            if(s2!=(s1==t1?t2:s1==t2?t3:t1))exchange((*edge_triangles)(s)(1),(*edge_triangles)(s)(2));}}
+            int s1,s2,t1,t2,t3;segment_mesh->elements(s).Get(s1,s2);elements((*edge_triangles)(s)(0)).Get(t1,t2,t3);
+            if(s2!=(s1==t1?t2:s1==t2?t3:t1))exchange((*edge_triangles)(s)(0),(*edge_triangles)(s)(1));}}
 }
 //#####################################################################
 // Function Initialize_Boundary_Mesh
@@ -259,8 +259,8 @@ Initialize_Boundary_Mesh()
         const VECTOR<int,dimension+1>& element=elements(e);
         for(int i=0;i<dimension+1;i++){
             VECTOR<int,dimension> face=element.Remove_Index(i);
-            if(i==2) exchange(face.x,face.y); // ensure cyclic order
-            const ARRAY<int>& incident_elements_to_face1=(*incident_elements)(face[1]);
+            if(i==1) exchange(face.x,face.y); // ensure cyclic order
+            const ARRAY<int>& incident_elements_to_face1=(*incident_elements)(face[0]);
             bool another_element_on_face=false;
             for(int j=0;j<incident_elements_to_face1.m&&!another_element_on_face;++j)
                 another_element_on_face=(incident_elements_to_face1(j)!=e&&Nodes_In_Simplex(face,incident_elements_to_face1(j)));
@@ -284,7 +284,7 @@ Initialize_Node_On_Boundary()
         const VECTOR<int,dimension+1>& element=elements(e);
         for(int i=0;i<dimension+1;i++){
             VECTOR<int,dimension> face=element.Remove_Index(i);
-            const ARRAY<int>& incident_elements_to_face1=(*incident_elements)(face[1]);
+            const ARRAY<int>& incident_elements_to_face1=(*incident_elements)(face[0]);
             bool another_element_on_face=false;
             for(int j=0;j<incident_elements_to_face1.m&&!another_element_on_face;++j)
                 another_element_on_face=(incident_elements_to_face1(j)!=e&&Nodes_In_Simplex(face,incident_elements_to_face1(j)));
@@ -319,7 +319,7 @@ Non_Manifold_Nodes(ARRAY<int>& node_list)
         if((*neighbor_nodes)(i).m != (*incident_elements)(i).m) node_list.Append(i);
         else if((*neighbor_nodes)(i).m > 0){
             ARRAY<int> ordered_neighbors;ordered_neighbors.Preallocate((*neighbor_nodes)(i).m);
-            ordered_neighbors.Append((*neighbor_nodes)(i)(1));
+            ordered_neighbors.Append((*neighbor_nodes)(i)(0));
             bool found_neighbor=true;
             while(found_neighbor){found_neighbor=false;
                 int k=ordered_neighbors(ordered_neighbors.m); // looking for a new neighbor of node k
