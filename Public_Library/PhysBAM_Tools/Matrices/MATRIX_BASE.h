@@ -502,7 +502,7 @@ public:
 //#####################################################################
 };
 template<class T,class T_MATRIX> inline std::ostream& operator<<(std::ostream& output_stream,const MATRIX_BASE<T,T_MATRIX>& A)
-{output_stream<<"[";for(int i=0;i<A.Rows();i++){for(int j=0;j<A.Columns();j++){output_stream<<A(i,j);if(j<A.Columns()) output_stream<<" ";}if(i<A.Rows()) output_stream<<"; ";}output_stream<<"]";return output_stream;}
+{output_stream<<"[";for(int i=0;i<A.Rows();i++){for(int j=0;j<A.Columns();j++){output_stream<<A(i,j);if(j<A.Columns()-1) output_stream<<" ";}if(i<A.Rows()-1) output_stream<<"; ";}output_stream<<"]";return output_stream;}
 
 template<class T,class T_MATRIX,int d>
 typename PRODUCT<DIAGONAL_MATRIX<T,d>,T_MATRIX>::TYPE operator*(const DIAGONAL_MATRIX<T,d>& A,const MATRIX_BASE<T,T_MATRIX>& B)

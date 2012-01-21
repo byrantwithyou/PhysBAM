@@ -43,7 +43,7 @@ public:
 
     template<class T_MATRIX>
     explicit MATRIX(const MATRIX_BASE<T,T_MATRIX>& A)
-        :x11(A(1,1))
+        :x11(A(0,0))
     {
         assert(A.Rows()==1 && A.Columns()==1);
     }
