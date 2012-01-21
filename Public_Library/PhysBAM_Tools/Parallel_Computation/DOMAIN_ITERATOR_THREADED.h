@@ -67,8 +67,8 @@ public:
                     domains(count).max_corner=end+domain.min_corner+TV_INT::Constant_Vector(overlap_rows);
                     for(int axis=0;axis<TV::dimension;axis++){
                         domains(count).min_corner(axis)=max(domains(count).min_corner(axis),domain.min_corner(axis));
-                        domains(count).max_corner(axis)=min(domains(count).max_corner(axis),domain.max_corner(axis));
-                    count++}}}
+                        domains(count).max_corner(axis)=min(domains(count).max_corner(axis),domain.max_corner(axis));}
+                    count++;}}
             else PHYSBAM_FATAL_ERROR();}
         else{domains.Resize(1);domains(0)=domain;number_of_domains=1;}
     }
