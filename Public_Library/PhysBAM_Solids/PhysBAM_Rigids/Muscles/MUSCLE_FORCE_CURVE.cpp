@@ -45,7 +45,7 @@ Compute_Slopes(const GRID<VECTOR<T,1> >& grid,const ARRAY<T,VECTOR<int,1> >& val
 {
     assert(!grid.Is_MAC_Grid());
     slope_grid=grid.Get_MAC_Grid();
-    slopes.Resize(1,slope_grid.counts.x);
+    slopes.Resize(0,slope_grid.counts.x);
     for(int i=0;i<slopes.counts.x;i++) slopes(i)=(values(i+1)-values(i))*grid.one_over_dX.x;
 }
 template class MUSCLE_FORCE_CURVE<float>;

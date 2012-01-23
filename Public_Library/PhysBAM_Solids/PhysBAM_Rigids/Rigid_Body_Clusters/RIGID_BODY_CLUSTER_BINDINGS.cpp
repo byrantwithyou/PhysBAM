@@ -402,7 +402,7 @@ Build_Aggregate_Geometry(const int parent)
     ARRAY<T_SIMPLICIAL_OBJECT*> objects;
     ARRAY<FRAME<TV> > relative_frames;
 
-    for(int j=0;j<rigid_body_collection.rigid_body_particle.structure_ids(parent).m;j++) if(rigid_body_collection.rigid_body_particle.structure_ids(parent)(j))
+    for(int j=0;j<rigid_body_collection.rigid_body_particle.structure_ids(parent).m;j++) if(rigid_body_collection.rigid_body_particle.structure_ids(parent)(j)>=0)
         rigid_body_collection.rigid_geometry_collection.structure_list.Remove_Element(rigid_body_collection.rigid_body_particle.structure_ids(parent)(j));
 
     ARRAY<IMPLICIT_OBJECT<TV>*>* implicits=new ARRAY<IMPLICIT_OBJECT<TV>*>;
@@ -501,7 +501,7 @@ Valid_Cluster_Collision(const int rigid_body_1,const int rigid_body_2)
     if(rigid_body_1<0 || rigid_body_2<0) return false;
     int parent_1=((rigid_body_1<binding_index.m) && binding_index(rigid_body_1).m>0)?binding_index(rigid_body_1)(0).x:-1,
         parent_2=((rigid_body_2<binding_index.m) && binding_index(rigid_body_2).m>0)?binding_index(rigid_body_2)(0).x:-1;
-    if(parent_1>=0 && parent_2>=0) return true; // neither bound
+    if(parent_1<0 && parent_2<0) return true; // neither bound
     if(parent_1==parent_2) return false;
     bool decision=Valid_Cluster_Collision_Helper(rigid_body_1,parent_1)&&Valid_Cluster_Collision_Helper(rigid_body_2,parent_2);
     //PHYSBAM_DEBUG_PRINT("query",rigid_body_1,rigid_body_2,parent_1,parent_2,collide_constituent_bodies,decision);
