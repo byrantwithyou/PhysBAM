@@ -64,7 +64,7 @@ public:
     {return dynamic_list.Size();}
 
     bool Is_Active(JOINT_ID &joint_id) const
-    {return (joint_id<=undirected_graph.Last_Edge() && undirected_graph.Edges(joint_id).x!=0 && undirected_graph.Edges(joint_id).y!=0);}
+    {return (joint_id<undirected_graph.Last_Edge() && undirected_graph.Edges(joint_id).x>=0 && undirected_graph.Edges(joint_id).y>=0);}
     
     JOINT_ID Add_Previously_Used_Joint(JOINT<TV>* joint)
     {return dynamic_list.Reactivate_Element(joint,joint->id_number);}

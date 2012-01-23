@@ -56,7 +56,7 @@ public:
     {return particle>=0 && particle<rigid_body_particle.array_collection->Size() && rigid_body_particle.rigid_geometry(particle);}
 
     bool Is_Active(const int particle) const
-    {return Exists(particle) && Rigid_Body(particle).particle_index>0;}
+    {return Exists(particle) && Rigid_Body(particle).particle_index>=0;}
 
     void Reset_Impulse_Accumulators();
     RIGID_BODY<TV>& Rigid_Body(const int particle_index);

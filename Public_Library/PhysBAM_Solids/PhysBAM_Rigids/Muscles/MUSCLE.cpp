@@ -93,7 +93,7 @@ Total_Length() const
 {
     if(!via_points.m) return (attachment_point_2->Embedded_Position()-attachment_point_1->Embedded_Position()).Magnitude();
     T length=(via_points(0)->Embedded_Position()-attachment_point_1->Embedded_Position()).Magnitude();
-    for(int i=2;i<=via_points.m;i++) length+=(via_points(i)->Embedded_Position()-via_points(i-1)->Embedded_Position()).Magnitude();
+    for(int i=1;i<via_points.m;i++) length+=(via_points(i)->Embedded_Position()-via_points(i-1)->Embedded_Position()).Magnitude();
     length+=(attachment_point_2->Embedded_Position()-via_points.Last()->Embedded_Position()).Magnitude(); 
     return length;
 }

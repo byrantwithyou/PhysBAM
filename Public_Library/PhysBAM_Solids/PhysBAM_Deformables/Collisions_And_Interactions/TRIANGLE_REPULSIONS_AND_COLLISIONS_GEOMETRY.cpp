@@ -71,7 +71,7 @@ Build_Collision_Geometry()
     for(int k=0;k<structures.m;k++){
         structure_geometries(k)=new STRUCTURE_INTERACTION_GEOMETRY<TV>(deformable_body_collection.particles);
         structure_geometries(k)->Build_Collision_Geometry(*structures(k));}
-    for(int i=0;i<structures.m;i++) for(int j=i;j<=structures.m;j++) interacting_structure_pairs.Append(VECTOR<int,2>(i,j));
+    for(int i=0;i<structures.m;i++) for(int j=i;j<structures.m;j++) interacting_structure_pairs.Append(VECTOR<int,2>(i,j));
     intersecting_point_face_pairs.Remove_All();
     intersecting_edge_edge_pairs.Remove_All();
 }

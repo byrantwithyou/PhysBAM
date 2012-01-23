@@ -449,11 +449,11 @@ Update_Aggregate_Geometry(const int parent)
 template<class TV> int RIGID_BODY_CLUSTER_BINDINGS<TV>::
 Binding(const int child_particle,FRAME<TV>& frame) const
 {
-    if(child_particle>binding_index.m || binding_index(child_particle).m==0) return 0;
-    int parent=binding_index(child_particle)(1).x;const RIGID_CLUSTER_CONSTITUENT_ID instance=binding_index(child_particle)(1).y;
-    if(!parent) return 0; if(!instance) return parent;
+    if(child_particle>binding_index.m || binding_index(child_particle).m==0) return -1;
+    int parent=binding_index(child_particle)(0).x;const RIGID_CLUSTER_CONSTITUENT_ID instance=binding_index(child_particle)(0).y;
+    if(!parent) return -1; if(!instance) return parent;
     const CLUSTER& binding=*reverse_bindings.Get(parent);assert(binding.children(instance)==child_particle);
-    if(!binding.active) return 0;
+    if(!binding.active) return -1;
     frame=binding.child_to_parent(instance);return parent;
 }
 //#####################################################################
@@ -499,9 +499,9 @@ template<class TV> bool RIGID_BODY_CLUSTER_BINDINGS<TV>::
 Valid_Cluster_Collision(const int rigid_body_1,const int rigid_body_2)
 {
     if(rigid_body_1<0 || rigid_body_2<0) return false;
-    int parent_1=((rigid_body_1<=binding_index.m) && binding_index(rigid_body_1).m>0)?binding_index(rigid_body_1)(1).x:0,
-        parent_2=((rigid_body_2<=binding_index.m) && binding_index(rigid_body_2).m>0)?binding_index(rigid_body_2)(1).x:0;
-    if(!parent_1 && !parent_2) return true; // neither bound
+    int parent_1=((rigid_body_1<binding_index.m) && binding_index(rigid_body_1).m>0)?binding_index(rigid_body_1)(0).x:-1,
+        parent_2=((rigid_body_2<binding_index.m) && binding_index(rigid_body_2).m>0)?binding_index(rigid_body_2)(0).x:-1;
+    if(parent_1>=0 && parent_2>=0) return true; // neither bound
     if(parent_1==parent_2) return false;
     bool decision=Valid_Cluster_Collision_Helper(rigid_body_1,parent_1)&&Valid_Cluster_Collision_Helper(rigid_body_2,parent_2);
     //PHYSBAM_DEBUG_PRINT("query",rigid_body_1,rigid_body_2,parent_1,parent_2,collide_constituent_bodies,decision);

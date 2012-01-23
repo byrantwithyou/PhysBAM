@@ -53,22 +53,22 @@ ARRAY<int> Convex_Hull(ARRAY<VECTOR<T,2> >& points)
 
     ARRAY<int> hull;
 
-    int corner=1;
-    for(int i=2;i<=points.m;i++)
-        if(points(i)(2)<points(corner)(2) || (points(i)(2)==points(corner)(2) && points(i)(1)<points(corner)(1)))
+    int corner=0;
+    for(int i=1;i<points.m;i++)
+        if(points(i)(1)<points(corner)(1) || (points(i)(1)==points(corner)(1) && points(i)(0)<points(corner)(0)))
             corner=i;
 
     ARRAY<PAIR<T,int> > angles(points.m);
-    angles(1).x=(T)(-pi);
-    angles(1).y=1;
+    angles(0).x=(T)(-pi);
+    angles(0).y=1;
 
     /*for(int i=0;i<angles.m;i++)
         LOG::cout << "angle " << i << " " << angles(i).x << " " << angles(i).y << std::endl;*/
 
-    for(int i=2;i<=points.m;i++)
+    for(int i=1;i<points.m;i++)
     {
         TV direction=points(i)-points(corner);
-        T angle=atan2(direction(2),direction(1));
+        T angle=atan2(direction(1),direction(0));
         angles(i)=PAIR<T,int>(angle,i);
     }
     CONVEX_HULL_COMPARATOR<T> comparator;
@@ -205,7 +205,7 @@ PARTICLE_PARTITION<TV> Build_Particle_Partition(ARRAY<TV>& locations,typename TV
     int n=locations.m;
 
     RANGE<TV> box;
-    box.Reset_Bounds(locations(1));
+    box.Reset_Bounds(locations(0));
     for(int i=0;i<n;i++)
         box.Enlarge_To_Include_Point(locations(i));
     box=box.Thickened((T)(region_threshold/2.0));
@@ -257,7 +257,7 @@ void Aggregate_And_Stagger_Convex_Regions(ARRAY<TV>& locations, ARRAY<TV>& norma
                     }
                 }
             }
-            if(min_index>0)
+            if(min_index>=0)
             {
                 //LOG::cout << "found lower point nearby " << min_distance << std::endl;
                 regions_union.Union(i,min_index);
@@ -359,14 +359,14 @@ ARRAY<int> Eliminate_Redundant_Contact_Points(ARRAY<VECTOR<T,3> >& locations,ARR
             ARRAY<VECTOR<T,2> > projected_offsets(region.m);
             for(int k=0;k<region.m;k++)
             {
-                TV offset=locations(region(k))-locations(region(1));
+                TV offset=locations(region(k))-locations(region(0));
                 for(int c=1;c<TV::dimension;c++)
                     projected_offsets(k)(c)=TV::Dot_Product(offset,tangents(c));
             }
             ARRAY<int> convex_hull=Convex_Hull(projected_offsets);
             
-            int deepest=1;
-            for(int k=2;k<=region.m;k++)
+            int deepest=0;
+            for(int k=1;k<region.m;k++)
                 if(distances(region(k))<distances(region(deepest)))
                     deepest=k;
             bool deepest_in_hull=false;

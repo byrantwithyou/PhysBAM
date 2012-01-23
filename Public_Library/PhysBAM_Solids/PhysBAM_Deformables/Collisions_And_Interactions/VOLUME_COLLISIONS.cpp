@@ -49,7 +49,7 @@ Compute_Collision_Triangles()
     hessian.Remove_All();
     for(int i=0;i<objects.m;i++) objects(i)->Initialize_Hierarchy();
     for(int i=0;i<objects.m;i++)
-        for(int j=i;j<=objects.m;j++)
+        for(int j=i;j<objects.m;j++)
             Compute_Collision_Triangles(*objects(i),*objects(j));
 }
 int compute_collision_triangles_order[2][4][3]=

@@ -100,10 +100,10 @@ public:
     void Save_Bindings_State();
     void Restore_Bindings_State();
     int Size() const{return reverse_bindings.Size();}
-    bool Is_Parent(const int rigid_body_index) const{if(rigid_body_index<=binding_index.m && binding_index(rigid_body_index).m>0) return binding_index(rigid_body_index)(1).x==rigid_body_index; return false;}
+    bool Is_Parent(const int rigid_body_index) const{if(rigid_body_index<binding_index.m && binding_index(rigid_body_index).m>0) return binding_index(rigid_body_index)(0).x==rigid_body_index; return false;}
     int Get_Parent_Index(const int rigid_body_index) const
-    {if(rigid_body_index<=binding_index.m && binding_index(rigid_body_index).m>0 && reverse_bindings.Get(binding_index(rigid_body_index)(1).x)->active) return binding_index(rigid_body_index)(1).x; return 0;}
-    RIGID_BODY<TV>& Get_Parent(RIGID_BODY<TV> &body) const{int parent=Get_Parent_Index(body.particle_index);return *(parent?&rigid_body_collection.Rigid_Body(parent):&body);}
+    {if(rigid_body_index<binding_index.m && binding_index(rigid_body_index).m>0 && reverse_bindings.Get(binding_index(rigid_body_index)(0).x)->active) return binding_index(rigid_body_index)(0).x; return -1;}
+    RIGID_BODY<TV>& Get_Parent(RIGID_BODY<TV> &body) const{int parent=Get_Parent_Index(body.particle_index);return *(parent>=0?&rigid_body_collection.Rigid_Body(parent):&body);}
     FRAME<TV> Get_Child_To_Parent_Frame(int particle_index) const;
 
     void Clamp_Particles_To_Embedded_Positions() const;

@@ -50,20 +50,20 @@ public:
     return bindings.m;}
 
     bool Particle_Is_Bound(const int particle_index) const
-    {return particle_index<=binding_index_from_particle_index.m && binding_index_from_particle_index(particle_index);}
+    {return particle_index<binding_index_from_particle_index.m && binding_index_from_particle_index(particle_index)>=0;}
 
     T One_Over_Effective_Mass(const int particle_index) const
     {if(!Particle_Is_Bound(particle_index)) return binding_list.One_Over_Effective_Mass(particle_index);
     return binding_list.One_Over_Effective_Mass(bindings(binding_index_from_particle_index(particle_index)).y);}
 
     int Parent(const int particle_index) const
-    {return Particle_Is_Bound(particle_index)?bindings(binding_index_from_particle_index(particle_index)).y:0;}
+    {return Particle_Is_Bound(particle_index)?bindings(binding_index_from_particle_index(particle_index)).y:-1;}
 
     int Driftless_Particle(const int particle_index) const
     {return Particle_Is_Bound(particle_index)?bindings(binding_index_from_particle_index(particle_index)).y:particle_index;}
 
     int Soft_Binding(const int particle_index) const
-    {return particle_index<=binding_index_from_particle_index.m?binding_index_from_particle_index(particle_index):0;}
+    {return particle_index<binding_index_from_particle_index.m?binding_index_from_particle_index(particle_index)-1:-1;}
 
     BINDING<TV>* Hard_Binding(const int particle_index) const
     {return Particle_Is_Bound(particle_index)?binding_list.Binding(Parent(particle_index)):0;}

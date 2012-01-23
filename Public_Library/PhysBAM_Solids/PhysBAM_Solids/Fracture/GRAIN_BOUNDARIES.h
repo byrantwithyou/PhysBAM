@@ -117,7 +117,7 @@ public:
     ARRAY<VECTOR<T,d> > random_vectors(number_of_node_regions);
     for(int r=0;r<number_of_node_regions;r++) random_vectors(r)=random_numbers.template Get_Direction<VECTOR<T,d> >();
     for(int t=0;t<mesh.elements.m;t++) 
-        if(!Element_Contains_Nodes_From_Different_Regions(t)) fracture_object.fracture_bias_direction(t)=random_vectors(node_regions(mesh.elements(t)(1)));
+        if(!Element_Contains_Nodes_From_Different_Regions(t)) fracture_object.fracture_bias_direction(t)=random_vectors(node_regions(mesh.elements(t)(0)));
         else fracture_object.fracture_bias_direction(t)=VECTOR<T,d>();}
 
     bool Is_On_Border_With_Another_Region(const int element)
@@ -127,7 +127,7 @@ public:
 
     bool Element_Contains_Nodes_From_Different_Regions(const int element)
     {VECTOR<int,d+1> element_node_regions(node_regions.Subset(mesh.elements(element)));
-    for(int i=2;i<=element_node_regions.m;i++) if(element_node_regions[1]!=element_node_regions[i]) return true;
+    for(int i=1;i<element_node_regions.m;i++) if(element_node_regions[0]!=element_node_regions[i]) return true;
     return false;}
 
     int Number_In_Region(const int region)
