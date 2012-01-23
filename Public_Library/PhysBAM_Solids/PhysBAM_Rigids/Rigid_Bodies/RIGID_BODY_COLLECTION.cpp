@@ -80,10 +80,12 @@ template<class TV> int RIGID_BODY_COLLECTION<TV>::
 Add_Rigid_Body(RIGID_BODY<TV>* rigid_body,const int simplicial_boundary_id,const int implicit_object_id,const int simplicial_interior_id)
 {
     int id=rigid_body->particle_index;
-    if(simplicial_boundary_id) rigid_body_particle.structure_ids(id)(1)=simplicial_boundary_id;
-    if(implicit_object_id) rigid_body_particle.structure_ids(id)(2)=implicit_object_id;
-    if(simplicial_interior_id) rigid_body_particle.structure_ids(id)(3)=simplicial_interior_id;
-    for(int i=0;i<rigid_body_particle.structure_ids(id).m;i++) if(rigid_body_particle.structure_ids(id)(i) && !rigid_geometry_collection.structure_list.Element(rigid_body_particle.structure_ids(id)(i))) PHYSBAM_FATAL_ERROR();
+    if(simplicial_boundary_id) rigid_body_particle.structure_ids(id)(0)=simplicial_boundary_id;
+    if(implicit_object_id) rigid_body_particle.structure_ids(id)(1)=implicit_object_id;
+    if(simplicial_interior_id) rigid_body_particle.structure_ids(id)(2)=simplicial_interior_id;
+    for(int i=0;i<rigid_body_particle.structure_ids(id).m;i++)
+        if(rigid_body_particle.structure_ids(id)(i)>=0 && !rigid_geometry_collection.structure_list.Element(rigid_body_particle.structure_ids(id)(i)))
+            PHYSBAM_FATAL_ERROR();
     return id;
 }
 //#####################################################################
@@ -95,7 +97,7 @@ Add_Rigid_Body_And_Geometry(RIGID_BODY<TV>* rigid_body)
 {
     int id=rigid_body->particle_index;
     assert(rigid_body->structures.m<=3);
-    rigid_body_particle.structure_ids(id)=VECTOR<int,3>();
+    rigid_body_particle.structure_ids(id)=VECTOR<int,3>(-1,-1,-1);
     for(int s=0;s<rigid_body->structures.m;s++) rigid_body_particle.structure_ids(id)(s)=rigid_geometry_collection.structure_list.Add_Element(rigid_body->structures(s));
     return id;
 }

@@ -53,7 +53,7 @@ template<class TV> RIGID_GEOMETRY<TV>::
 ~RIGID_GEOMETRY()
 {
     rigid_geometry_collection.collision_body_list->Remove_Body(rigid_geometry_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(particle_index));
-    rigid_geometry_collection.particles.structure_ids(particle_index)=VECTOR<int,3>();
+    rigid_geometry_collection.particles.structure_ids(particle_index)=VECTOR<int,3>(-1,-1,-1);
     rigid_geometry_collection.particles.rigid_geometry(particle_index)=0;
     delete moving_simplex_hierarchy;
     delete implicit_object;

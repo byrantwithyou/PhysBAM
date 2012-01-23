@@ -129,9 +129,9 @@ Add_Rigid_Geometry(RIGID_GEOMETRY<TV>* rigid_geometry,STREAM_TYPE stream_type,co
         if(read_simplicial_interior && !Find_Or_Read_Structure(stream_type,structure_ids,basename+".tet",scaling_factor,structure_center))
             LOG::cout<<"Note: No tet file for "<<basename<<std::endl;}
     assert(structure_ids.m<=3);
-    particles.structure_ids(id)=VECTOR<int,3>();
+    particles.structure_ids(id)=VECTOR<int,3>(-1,-1,-1);
     for(int i=0;i<structure_ids.m;i++){
-        if(structure_ids(i)){
+        if(structure_ids(i)>=0){
             particles.structure_ids(id)(i)=structure_ids(i);
             Rigid_Geometry(id).Add_Structure(*structure_list.Element(structure_ids(i)));}}
 
@@ -192,7 +192,7 @@ template<class TV> void RIGID_GEOMETRY_COLLECTION<TV>::
 Destroy_Unreferenced_Geometry() 
 {
     ARRAY<bool> referenced(structure_list.Number_Of_Active_Elements());
-    for(int i=0;i<particles.array_collection->Size();i++) for(int j=0;j<particles.structure_ids(i).m;j++) if(particles.structure_ids(i)(j))
+    for(int i=0;i<particles.array_collection->Size();i++) for(int j=0;j<particles.structure_ids(i).m;j++) if(particles.structure_ids(i)(j)>=0)
         referenced(structure_list.Element_Index(particles.structure_ids(i)(j)))=true;
     for(int i=structure_list.Number_Of_Active_Elements()-1;i>=0;i--) if(!referenced(i)) structure_list.Remove_Element(structure_list.Active_Element_Id(i));
 }
