@@ -67,8 +67,8 @@ Initialize_Connected_Segments()
     for(int s=0;s<elements.m;s++){
         int bucket=union_find.Find(elements(s)(1));
         int index=buckets.Find(bucket);
-        if(!index){
-            connected_segments->Append(ARRAY<VECTOR<int,2> >());
+        if(index<0){
+            connected_segments->Append(ARRAY<VECTOR<int,2> >(-1,-1));
             buckets.Append(bucket);
             index=connected_segments->m;}
         (*connected_segments)(index).Append(elements(s));}

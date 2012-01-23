@@ -62,9 +62,9 @@ Gather_Phoneme_Statistics()
 template<class T> void PHONEME_CORPUS<T>::
 Get_Next_Kind_Of_Phoneme(PHONEME_SEGMENT<T>& phoneme_segment)
 {
-    int index=0;
-    for(int i=0;i<phoneme_labels.m;i++) if(!phoneme_segment.phoneme_sample->name.compare(phoneme_labels(i))){index=i;break;}
-    if(!index) return;
+    int index=-1;
+    for(int i=0;i<phoneme_labels.m;i++) if(phoneme_segment.phoneme_sample->name.compare(phoneme_labels(i))<0){index=i;break;}
+    if(index<0) return;
     index=(index%phoneme_labels.m)+1;
     ARRAY<PHONEME_SEGMENT<T>*>& phoneme_segments=*Get_Phonemes(phoneme_labels(index));
     phoneme_segment.Set_Sample(*phoneme_segments(1)->phoneme_sample);
@@ -76,9 +76,9 @@ Get_Next_Kind_Of_Phoneme(PHONEME_SEGMENT<T>& phoneme_segment)
 template<class T> void PHONEME_CORPUS<T>::
 Get_Previous_Kind_Of_Phoneme(PHONEME_SEGMENT<T>& phoneme_segment)
 {
-    int index=0;
-    for(int i=0;i<phoneme_labels.m;i++) if(!phoneme_segment.phoneme_sample->name.compare(phoneme_labels(i))){index=i;break;}
-    if(!index) return;
+    int index=-1;
+    for(int i=0;i<phoneme_labels.m;i++) if(phoneme_segment.phoneme_sample->name.compare(phoneme_labels(i))<0){index=i;break;}
+    if(index<0) return;
     index=(index==1?phoneme_labels.m:index-1);
     ARRAY<PHONEME_SEGMENT<T>*>& phoneme_segments=*Get_Phonemes(phoneme_labels(index));
     phoneme_segment.Set_Sample(*phoneme_segments(1)->phoneme_sample);
@@ -91,9 +91,9 @@ template<class T> void PHONEME_CORPUS<T>::
 Get_Next_Phoneme(PHONEME_SEGMENT<T>& phoneme_segment)
 {
     ARRAY<PHONEME_SEGMENT<T>*>& phoneme_segments=*Get_Phonemes(phoneme_segment.phoneme_sample->name);
-    int index=0;
+    int index=-1;
     for(int i=0;i<phoneme_segments.m;i++) if(!phoneme_segment.phoneme_sample_name.compare(phoneme_segments(i)->phoneme_sample_name)){index=i;break;}
-    if(!index) return;
+    if(index<0) return;
     index=(index%phoneme_segments.m)+1;
     phoneme_segment.Set_Sample(*phoneme_segments(index)->phoneme_sample);
     phoneme_segment.phoneme_sample_name=phoneme_segments(index)->phoneme_sample_name;
@@ -105,9 +105,9 @@ template<class T> void PHONEME_CORPUS<T>::
 Get_Previous_Phoneme(PHONEME_SEGMENT<T>& phoneme_segment)
 {
     ARRAY<PHONEME_SEGMENT<T>*>& phoneme_segments=*Get_Phonemes(phoneme_segment.phoneme_sample->name);
-    int index=0;
+    int index=-1;
     for(int i=0;i<phoneme_segments.m;i++) if(!phoneme_segment.phoneme_sample_name.compare(phoneme_segments(i)->phoneme_sample_name)){index=i;break;}
-    if(!index) return;
+    if(index<0) return;
     index=(index==1?phoneme_segments.m:index-1);
     phoneme_segment.Set_Sample(*phoneme_segments(index)->phoneme_sample);
     phoneme_segment.phoneme_sample_name=phoneme_segments(index)->phoneme_sample_name;
@@ -252,7 +252,7 @@ Brute_Force_Phoneme_Arrangement_Helper(const ARRAY<ARRAY<PHONEME_SEGMENT<T>*> >&
         phoneme_arrangement.list(position).Set_Sample(*phoneme_candidates(position)(i)->phoneme_sample);
         phoneme_arrangement.list(position).phoneme_sample_name=phoneme_candidates(position)(i)->phoneme_sample_name;
         T result;
-        if(position==indices.m) {//LOG::cout<<"Trying "<<std::endl;for(int j=0;j<indices.m;j++)LOG::cout<<phoneme_arrangement.list(j).phoneme_sample_name<<"
+        if(position==indices.m-1) {//LOG::cout<<"Trying "<<std::endl;for(int j=0;j<indices.m;j++)LOG::cout<<phoneme_arrangement.list(j).phoneme_sample_name<<"
                                  //";LOG::cout<<std::endl;
             VECTOR_ND<T> scalings=phoneme_arrangement.Optimal_Scaling(sampling_grid,stiffness);
             ARRAY<T> scalings_list(scalings.n);

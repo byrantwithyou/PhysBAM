@@ -177,13 +177,9 @@ Clear_All_Objects()
 void OPENGL_WORLD::
 Add_Object(OPENGL_OBJECT *object,bool include_bounding_box,bool toggle_smooth_shading)
 {
-    int newindex=object_list.m+1;
-    object_list.Resize(newindex);
-    use_bounding_box.Resize(newindex);
-    can_toggle_smooth_shading.Resize(newindex);
-    object_list(newindex)=object;
-    use_bounding_box(newindex)=include_bounding_box;
-    can_toggle_smooth_shading(newindex)=toggle_smooth_shading;
+    object_list.Append(object);
+    use_bounding_box.Append(include_bounding_box);
+    can_toggle_smooth_shading.Append(toggle_smooth_shading);
 }
 //#####################################################################
 // Function Clear_All_Lights
@@ -199,9 +195,7 @@ Clear_All_Lights()
 void OPENGL_WORLD::
 Add_Light(OPENGL_LIGHT *light)
 {
-    int new_light=lights.m+1;
-    lights.Resize(new_light);
-    lights(new_light)=light;
+    lights.Append(light);
 }
 //#####################################################################
 // Function Set_Ambient_Light
@@ -1322,7 +1316,8 @@ Get_Image(ARRAY<VECTOR<T,d> ,VECTOR<int,2> > &image,const bool use_back_buffer)
     glGetIntegerv(GL_VIEWPORT,vp);
     PHYSBAM_ASSERT(window->Width()==vp[2] && window->Height()==vp[3]);
 
-    ARRAY<VECTOR<T,d> ,VECTOR<int,2> > temporary_image(0,window->Height(),0,window->Width());image.Resize(0,window->Width(),0,window->Height()); // temporary is row major
+    ARRAY<VECTOR<T,d> ,VECTOR<int,2> > temporary_image(0,window->Height(),0,window->Width());
+    image.Resize(0,window->Width(),0,window->Height()); // temporary is row major
 #ifndef USE_OPENGLES
     glReadBuffer(use_back_buffer?GL_BACK:GL_FRONT);
 #endif

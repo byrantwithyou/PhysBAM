@@ -522,7 +522,8 @@ Create_Initial_Mesh(const T bcc_lattice_cell_size,const bool use_adaptive_refine
                 parents.Remove_Index_Lazy(i);weights.Remove_Index_Lazy(i);
                 for(int j=0;j<2;j++){
                     int new_parent=t_junction_parents(t_junction)(j);
-                    int index=parents.Find(new_parent);if(!index){index=parents.Append(new_parent);weights.Append((T)0);}
+                    int index=parents.Find(new_parent);
+                    if(index<0){index=parents.Append(new_parent);weights.Append((T)0);}
                     weights(index)+=(T).5*old_weight;}}
             switch(parents.m){
               case 2: binding_list.Add_Binding(new LINEAR_BINDING<TV,2>(particles,p,VECTOR<int,2>(parents(0),parents(1)),VECTOR<T,2>(weights(0),weights(1))));break;

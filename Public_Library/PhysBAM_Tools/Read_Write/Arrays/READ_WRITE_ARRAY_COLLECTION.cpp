@@ -66,7 +66,7 @@ Read_Arrays(std::istream& input,ARRAY_COLLECTION& object)
             PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("No read registered for id %i\n",Value(hashed_id)));
 
         ATTRIBUTE_INDEX index=object.Get_Attribute_Index(Id_Only(hashed_id));
-        if(!index) index=object.Add_Array(Id_Only(hashed_id),read_write_functions->sample_attribute->Clone_Default());
+        if(index<ATTRIBUTE_INDEX()) index=object.Add_Array(Id_Only(hashed_id),read_write_functions->sample_attribute->Clone_Default());
         // TODO: this really ought to know whether we're running in float or double
         else read_write_functions=Read_Write_Array_Collection_Registry().Get_Pointer(Type_Only(object.arrays(index)->Hashed_Id()));
         read_write_functions->Read(input,*object.arrays(index));

@@ -335,7 +335,8 @@ Unrefined_Parents(const int node,ARRAY<int>& parents,ARRAY<T>& weights) const
         parents.Remove_Index_Lazy(i);weights.Remove_Index_Lazy(i);
         for(int j=0;j<2;j++){
             int new_parent=segment(j);
-            int index=parents.Find(new_parent);if(!index){index=parents.Append(new_parent);weights.Append((T)0);}
+            int index=parents.Find(new_parent);
+            if(index<0){index=parents.Append(new_parent);weights.Append((T)0);}
             weights(index)+=(T).5*old_weight;}}
 }
 //#####################################################################

@@ -305,7 +305,7 @@ Process_Hits(GLint hits,GLuint buffer[])
     float current_min_depth=FLT_MAX;
     for(int i=0;i<selections.m;i++){
         int this_priority=Selection_Priority(selections(i)->Actual_Type());
-        if(!this_priority) continue;
+        if(this_priority<0) continue;
 
         // Ties and roundoff are likely, so be careful about it.
         float depth_difference=selections(i)->min_depth-current_min_depth,tolerance=1e-3f;
@@ -360,7 +360,7 @@ Selection_Callback()
 int &BASIC_VISUALIZATION::
 Selection_Priority(OPENGL_SELECTION::TYPE selection_type)
 {
-    int index=(int)selection_type+1; // to allow for zero
-    if(selection_priority.m<index) selection_priority.Resize(index);
+    int index=(int)selection_type; // to allow for zero
+    if(selection_priority.m<=index) selection_priority.Resize(index+1);
     return selection_priority(index);
 }

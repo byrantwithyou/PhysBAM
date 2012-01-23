@@ -122,7 +122,7 @@ public:
     template<class T_ARRAY> int Register_Cut_Intersection(const T_ARRAY& simplices,const typename REBIND<T_ARRAY,T_CUT_WEIGHTS>::TYPE& weights,const int index_input)
     {assert(simplices.Size()==weights.Size());
     int index=index_input;
-    if(!index){
+    if(index<0){
         index=intersection_registry->Number_Of_Intersections()+1; // TODO: check if this is the right index
         cutting_particles.Add_Intersection_Id(index);}        
     intersection_registry->Register_Intersection(simplices,weights,index);

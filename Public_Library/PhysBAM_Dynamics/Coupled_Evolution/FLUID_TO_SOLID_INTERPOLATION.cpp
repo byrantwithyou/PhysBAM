@@ -39,7 +39,7 @@ Compute_Weights(const TV& X,int axis,ARRAY<ENTRY>& array)
         T dist=(it.Location()-X).Magnitude();
         if(dist>limit) continue;
         int index=index_map.face_indices(it.Full_Index());
-        if(!index) continue;
+        if(index<0) continue;
         ENTRY e={LEVELSET_UTILITIES<T>::Delta(dist,limit),index};
         total_weight+=e.w;
         array.Append(e);}
