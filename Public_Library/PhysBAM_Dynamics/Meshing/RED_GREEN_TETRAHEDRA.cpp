@@ -97,7 +97,7 @@ Find_Edge_And_Test_If_Green(const int node1,const int node2,int* segment_output,
     
     // now find a tet that contains this segment!
     int level,tet;
-    for(int j=0;j<meshes.m;j++) if(node1 <= meshes(j)->number_nodes && node2 <= meshes(j)->number_nodes){
+    for(int j=0;j<meshes.m;j++) if(node1 < meshes(j)->number_nodes && node2 < meshes(j)->number_nodes){
         ARRAY<int>& incident_tets=(*meshes(j)->incident_elements)(node1);
         for(int k=0;k<incident_tets.m;k++){
             int a,b,c,d;meshes(j)->elements(incident_tets(k)).Get(a,b,c,d);
@@ -432,14 +432,14 @@ Add_Midpoint(const int segment,const int level,const int tet)
             if(node2 == a || node2 == b || node2 == c || node2 == d){ // not incident on edge
                 stack.Append(VECTOR<int,2>(level,s));(*index_in_stack(level))(s)=stack.m;}}}
     // check previous level for tets incident on the edge
-    if(level > 1 && node1 <= meshes(level-1)->number_nodes) for(i=0;i<(*meshes(level-1)->incident_elements)(node1).m;i++){
+    if(level > 1 && node1 < meshes(level-1)->number_nodes) for(i=0;i<(*meshes(level-1)->incident_elements)(node1).m;i++){
         int s=(*meshes(level-1)->incident_elements)(node1)(i);
         if(!(*index_in_stack(level-1))(s)){
             int a,b,c,d;meshes(level-1)->elements(s).Get(a,b,c,d);
             if(node2 == a || node2 == b || node2 == c || node2 == d){ // not incident on edge
                 stack.Append(VECTOR<int,2>(level-1,s));(*index_in_stack(level-1))(s)=stack.m;}}}
     // check next level for tets incident on the edge
-    if(level < meshes.m && node1 <= meshes(level+1)->number_nodes) for(i=0;i<(*meshes(level+1)->incident_elements)(node1).m;i++){
+    if(level < meshes.m && node1 < meshes(level+1)->number_nodes) for(i=0;i<(*meshes(level+1)->incident_elements)(node1).m;i++){
         int s=(*meshes(level+1)->incident_elements)(node1)(i);
         if(!(*index_in_stack(level+1))(s)){
             int a,b,c,d;meshes(level+1)->elements(s).Get(a,b,c,d);assert(a == node1 || b == node1 || c == node1 || d == node1);
@@ -448,7 +448,7 @@ Add_Midpoint(const int segment,const int level,const int tet)
     // finally make sure that number_nodes in the tet meshes and the segment mesh is up to date
     if(new_node > segment_mesh.number_nodes){
         segment_mesh.number_nodes=new_node;segment_mesh.incident_elements->Resize(new_node);}
-    for(i=level;i<=meshes.m;i++) if(new_node > meshes(i)->number_nodes){
+    for(i=level;i<meshes.m;i++) if(new_node > meshes(i)->number_nodes){
         meshes(i)->number_nodes=new_node;meshes(i)->incident_elements->Resize(new_node);}
     return new_node;
 }

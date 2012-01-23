@@ -61,8 +61,8 @@ public:
     // This finds all the nodes that are shared by /all/ of the cutting simplices
     template<class T_ARRAY>
     void Shared_Nodes_On_Simplices(const T_ARRAY& cutting_simplices,ARRAY<int>& shared_nodes) const
-    {for(int i=0;i<d;i++){int node=simplices(cutting_simplices(1)).nodes[i];if(node==0) continue;
-        for(int j=2;j<=cutting_simplices.m;j++) if(!simplices(cutting_simplices(j)).nodes.Contains(node)) goto Next_Node;
+    {for(int i=0;i<d;i++){int node=simplices(cutting_simplices(0)).nodes[i];if(node==0) continue;
+        for(int j=1;j<cutting_simplices.m;j++) if(!simplices(cutting_simplices(j)).nodes.Contains(node)) goto Next_Node;
         shared_nodes.Append(node);
         Next_Node:;}}
 

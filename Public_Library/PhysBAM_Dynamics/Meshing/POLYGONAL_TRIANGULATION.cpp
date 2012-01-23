@@ -116,7 +116,7 @@ Triangulate_Nonconvex_Planar_Connected_Polygon(const ARRAY<VECTOR<T,2> >& positi
     //    if(float_vertices.Contains(float_vertex)) PHYSBAM_FATAL_ERROR();
     //    float_vertices.Insert(float_vertex);}
     // ensure no 2 segments are intersecting (in float coordinates)
-    //for(int c1=0;c1<segments_input.m;c1++) for(int s1=0;s1<segments_input(c1).m;s1++) for(int c2=c1,s2=s1+1;c2<=segments_input.m;c2++) for(;s2<=segments_input(c2).m;s2++){
+    //for(int c1=0;c1<segments_input.m;c1++) for(int s1=0;s1<segments_input(c1).m;s1++) for(int c2=c1,s2=s1+1;c2<segments_input.m;c2++) for(;s2<=segments_input(c2).m;s2++){
     //    int i,j,k,l;segments_input(c1)(s1).Get(i,j);segments_input(c2)(s2).Get(k,l);
     //    if(i!=k&&i!=l&&j!=k&&j!=l&&EXACT_SIMPLEX_INTERACTIONS::Exact_Segment_Intersection((TV_float)positions(i),(TV_float)positions(j),(TV_float)positions(k),(TV_float)positions(l)))
     //        PHYSBAM_FATAL_ERROR();}
@@ -129,7 +129,7 @@ Triangulate_Nonconvex_Planar_Connected_Polygon(const ARRAY<VECTOR<T,2> >& positi
         incoming_segments(segments_input(i)(j)(1)).Append(segment_index);}
     // make segments to connect holes
     HASHTABLE<VECTOR<int,2> > already_connected_holes;
-    for(int hole=2;hole<=segments_input.m;hole++){
+    for(int hole=1;hole<segments_input.m;hole++){
         for(int j=0;j<segments_input(hole).m;j++){
             int first_node_on_hole_segment=segments_input(hole)(j)(0);
             // find other node on a different component
@@ -286,7 +286,7 @@ Triangulate_Nonconvex_Simple_Polygon(const VECTORT2_ARRAY& coordinates,const INT
     for(int i=0;i<polygon_input.m;i++){
         int inext=i%polygon_input.m+1,v=polygon_input(i),vnext=polygon_input(inext);
         assert(v!=vnext);assert(coordinates(v)!=coordinates(vnext));}
-    for(int i=0;i<polygon_input.m-2;i++) for(int j=i+2;j<=polygon_input.m;++j){
+    for(int i=0;i<polygon_input.m-2;i++) for(int j=i+2;j<polygon_input.m;++j){
         int v1=polygon_input(i),v2=polygon_input(i+1),u1=polygon_input(j),u2=polygon_input(j%polygon_input.m+1);
         if(v1==u1||v1==u2||v2==u1||v2==u2) continue;
         const VECTOR<T,2> &x1=coordinates(v1),&x2=coordinates(v2),&y1=coordinates(u1),&y2=coordinates(u2);
@@ -379,9 +379,9 @@ Triangulate_Nonconvex_Nonsimple_Polygon(const VECTORT2_ARRAY& coordinates,const 
                 ARRAY<int> temp_loop_1;
                 temp_loop_1.Preallocate(loop_1.m+loop_ell.m+2);
                 for(int k=0;k<i;k++) temp_loop_1.Append(loop_1(k));
-                for(int k=j;k<=loop_ell.m;++k) temp_loop_1.Append(loop_ell(k));
+                for(int k=j;k<loop_ell.m;++k) temp_loop_1.Append(loop_ell(k));
                 for(int k=0;k<j;k++) temp_loop_1.Append(loop_ell(k));
-                for(int k=i;k<=loop_1.m;++k) temp_loop_1.Append(loop_1(k));
+                for(int k=i;k<loop_1.m;++k) temp_loop_1.Append(loop_1(k));
                 loop_1.Exchange(temp_loop_1);
                 spliced=true;}}
         if(spliced){ // remove loop ell

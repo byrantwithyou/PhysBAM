@@ -46,7 +46,7 @@ public:
 
     void Calculate_Weights_Helper(int element,int frame,int sanity_check)
     {
-        assert(element>0);assert(element<=surface.mesh.elements.m);
+        assert(element>=0);assert(element<surface.mesh.elements.m);
         if(touched_elements(element)) return;
         touched_elements(element)=true;
         T distance_squared=0;int bone;

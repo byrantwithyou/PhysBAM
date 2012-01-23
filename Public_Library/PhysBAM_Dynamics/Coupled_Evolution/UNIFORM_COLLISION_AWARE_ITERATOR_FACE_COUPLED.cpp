@@ -15,7 +15,7 @@ using namespace PhysBAM;
 template<class TV> UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED<TV>::
 UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED(const UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO<TV>& info,const int number_of_ghost_cells_input,const T_REGION& region_type_input,
     const int side_input,int axis_input)
-    :BASE(info.grid,number_of_ghost_cells_input,region_type_input,side_input,axis_input),collision_index(0),collision_face_info(info.collision_face_info)
+    :BASE(info.grid,number_of_ghost_cells_input,region_type_input,side_input,axis_input),collision_index(-1),collision_face_info(info.collision_face_info)
 {
     Next();
 }

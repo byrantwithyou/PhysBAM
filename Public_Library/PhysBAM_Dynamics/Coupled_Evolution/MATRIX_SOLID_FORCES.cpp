@@ -210,9 +210,9 @@ Add_Raw_Matrix(ARRAY<TRIPLE<int,int,T> >& data) const
     for(int k=0;k<solid_body_collection.deformable_body_collection.deformables_forces.m;k++)
         if(solid_body_collection.deformable_body_collection.deformables_forces(k)->use_velocity_dependent_forces){
             PHYSBAM_ASSERT(solid_body_collection.deformable_body_collection.deformables_forces(k)->compute_half_forces);
-            int start=data.m+1;
+            int start=data.m;
             solid_body_collection.deformable_body_collection.deformables_forces(k)->Add_Raw_Velocity_Dependent_Forces_First_Half(data);
-            for(int i=start;i<=data.m;i++) data(i).x+=offset;
+            for(int i=start;i<data.m;i++) data(i).x+=offset;
             offset+=Value(force_dof_counts(k));}
 
     // TODO: Correct indices for indirect mapping.

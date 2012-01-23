@@ -69,16 +69,16 @@ Create_Final_Mesh_With_Optimization(const int number_of_initial_steps,const int 
         worst_boundary_quality=FLT_MAX;worst_interior_quality=FLT_MAX;
         if(verbose) LOG::cout<<"Working on initial iteration "<<i<<" of "<<number_of_initial_steps<<"+"<<number_of_final_steps<<std::endl;
         Optimize_Boundary_Layer((T).05);if(verbose) LOG::cout<<'.';
-        int j;for(j=2;j<=layers.m;j++){Optimize_Interior_Layer(j);if(verbose) LOG::cout<<'.';}
-        for(j=layers.m;j>=2;j--){Optimize_Interior_Layer(j,true);if(verbose) LOG::cout<<'.';}
+        int j;for(j=1;j<layers.m;j++){Optimize_Interior_Layer(j);if(verbose) LOG::cout<<'.';}
+        for(j=layers.m-1;j>=1;j--){Optimize_Interior_Layer(j,true);if(verbose) LOG::cout<<'.';}
         Optimize_Boundary_Layer((T).05,true);if(verbose) LOG::cout<<'.'<<std::endl;
         Write_Tri_File_Format(*frame_number,output_directory);++*frame_number;}
     for(i=0;i<number_of_final_steps;i++){
         worst_boundary_quality=FLT_MAX;worst_interior_quality=FLT_MAX;
         if(verbose) LOG::cout<<"Working on iteration "<<i<<" of "<<number_of_final_steps<<" (full step towards boundary)"<<std::endl;
         Optimize_Boundary_Layer(1);if(verbose) LOG::cout<<'.';
-        int j;for(j=2;j<=layers.m;j++){Optimize_Interior_Layer(j);if(verbose) LOG::cout<<'.';}
-        for(j=layers.m;j>=2;j--){Optimize_Interior_Layer(j,true);if(verbose) LOG::cout<<'.';}
+        int j;for(j=1;j<layers.m;j++){Optimize_Interior_Layer(j);if(verbose) LOG::cout<<'.';}
+        for(j=layers.m-1;j>=1;j--){Optimize_Interior_Layer(j,true);if(verbose) LOG::cout<<'.';}
         Optimize_Boundary_Layer(1,true);if(verbose) LOG::cout<<'.'<<std::endl;
         Write_Tri_File_Format(*frame_number,output_directory);++*frame_number;}
 }

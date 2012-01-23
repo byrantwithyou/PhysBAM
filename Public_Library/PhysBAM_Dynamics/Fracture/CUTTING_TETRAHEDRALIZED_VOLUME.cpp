@@ -211,10 +211,10 @@ Find_Triangle_Tet_Intersections(const int first_new)
     assert(simplices_per_current_tet.m==current_embedding_tetrahedrons.m);
     for(int tet=0;tet<current_embedding_tetrahedrons.m;tet++)
         last_old_simplex_index_per_current_tet(tet)=simplices_per_current_tet(tet).m;
-    assert(first_new>=1);
+    assert(first_new>=0);
     // real newly added triangles
     ARRAY<int> tet_intersection_list;
-    for(int cutting_triangle_index=first_new;cutting_triangle_index<=cutting_triangles.m;cutting_triangle_index++){
+    for(int cutting_triangle_index=first_new;cutting_triangle_index<cutting_triangles.m;cutting_triangle_index++){
         // insert global cutting face
         const VECTOR<int,3>& cut_nodes=cutting_triangles(cutting_triangle_index);
         int parent=cutting_simplices->Add_Simplex(-cut_nodes,CUTTING_SIMPLEX<T,3>::GLOBAL_CUT_FACE);
@@ -355,10 +355,10 @@ Fill_Intersection_Registry_With_Cuts()
         for(int i=last_old_simplex_index+1;i<simplices.m;++i){
             int new_simplex=simplices(i);
             const ARRAY<int>& intersecting_simplices=intersecting_simplices_per_simplex(new_simplex);
-            for(int j1=1;j1<intersecting_simplices.m;++j1){
+            for(int j1=0;j1<intersecting_simplices.m;++j1){
                 int old_simplex1=intersecting_simplices(j1);
                 if(old_simplex1>=new_simplex) continue; // assume simplices are ordered old first, new last
-                for(int j2=j1+1;j2<=intersecting_simplices.m;++j2){
+                for(int j2=j1+1;j2<intersecting_simplices.m;++j2){
                     int old_simplex2=intersecting_simplices(j2);
                     if(old_simplex2>=new_simplex) continue; // assume simplices are ordered old first, new last
                     // TODO: ensure that old_simplex2 is in intersecting_simplices_per_simplex(old_simplex1) to improve efficiency ?
@@ -464,9 +464,9 @@ Perform_Smart_Simplex_Intersection(const VECTOR<int,3>& simplices) // simplices=
                 int old_simplex=intersecting_simplices(j);
                 if(old_simplex>=new_simplex) continue;
                 if(cutting_simplices->simplices(old_simplex).nodes.Contains_All(shared_edge)) simplices_containing_shared_edge.Append(old_simplex);}
-            for(int j1=1;j1<simplices_containing_shared_edge.m;++j1){
+            for(int j1=0;j1<simplices_containing_shared_edge.m;++j1){
                 int local_simplex1=simplices_containing_shared_edge(j1);
-                for(int j2=j1+1;j2<=simplices_containing_shared_edge.m;++j2){
+                for(int j2=j1+1;j2<simplices_containing_shared_edge.m;++j2){
                     int local_simplex2=simplices_containing_shared_edge(j2);
                     if(cutting_simplices->simplices(local_simplex1).nodes==cutting_simplices->simplices(local_simplex2).nodes) continue;
                     int old_simplex1=converted?cutting_simplices->simplices(local_simplex1).parent:local_simplex1;
@@ -601,7 +601,7 @@ Split_Existing_Polygons()
                     polygon_mesh.elements(cutting_polygon.polygon_index)=final_polygon_element_particles(0);
                     polygons_per_element(tet).Append(cutting_polygon_index);
                     // make all the rest
-                    for(int k=2;k<=final_polygon_element_particles.m;++k){
+                    for(int k=1;k<final_polygon_element_particles.m;++k){
                         int polygon_element_index=polygon_mesh.elements.Append(final_polygon_element_particles(k));
                         int new_cutting_polygon_index=current_cutting_polygons.Append(
                             CUTTING_POLYGON(polygon_element_index,old_simplex,cutting_polygon.flipped,cutting_polygon.polygon_type));
@@ -783,17 +783,17 @@ Get_Oriented_Segments_On_Edge_Of_Two_Simplices(const int simplex_1,const int sim
     // sort the particles
     ARRAY<VECTOR<T,2> > particle_weights;
     for(int k=0;k<particles.m;k++) particle_weights.Append(intersection_registry->Get_Simplex_Weights_Of_Intersection(particles(k),simplex_1));
-    int edge_number=0;
-    if(particle_weights(0)(0)==0 && particle_weights(1)(0)==0) edge_number=2;
-    else if(particle_weights(0)(1)==0 && particle_weights(1)(1)==0) edge_number=3;
-    else edge_number=1;
-    int axis=(edge_number==1 || edge_number==3)?1:2;
-    for(int j=2;j<=particle_weights.m;j++){VECTOR<T,2> object=particle_weights(j);int k=j;int particle=particles(j);
-        while(k>1 && particle_weights(k-1)[axis]>object[axis]){particle_weights(k)=particle_weights(k-1);particles(k)=particles(k-1);k--;}
+    int edge_number=-1;
+    if(particle_weights(0)(0)==0 && particle_weights(1)(0)==0) edge_number=1;
+    else if(particle_weights(0)(1)==0 && particle_weights(1)(1)==0) edge_number=2;
+    else edge_number=0;
+    int axis=(edge_number==0 || edge_number==2)?0:1;
+    for(int j=1;j<particle_weights.m;j++){VECTOR<T,2> object=particle_weights(j);int k=j;int particle=particles(j);
+        while(k>0 && particle_weights(k-1)[axis]>object[axis]){particle_weights(k)=particle_weights(k-1);particles(k)=particles(k-1);k--;}
         particle_weights(k)=object;particles(k)=particle;}
     // make the right way on simplex_1
-    for(int k=1;k<particles.m;k++){
-        if(edge_number==1 || edge_number==2)
+    for(int k=0;k<particles.m-1;k++){
+        if(edge_number==0 || edge_number==1)
             new_oriented_segments_on_simplex.Append_Unique(VECTOR<int,2>(particles(k+1),particles(k)));
         else new_oriented_segments_on_simplex.Append_Unique(VECTOR<int,2>(particles(k),particles(k+1)));}
 }
@@ -1520,7 +1520,7 @@ Add_New_Child_Simplices_And_Create_New_Polygon_Mesh(POLYGON_MESH& new_polygon_me
             int dtet=new_tets_per_current(otet)(region_index);
             int actual_dtet;
             if(!dup_tet_before_to_after_collapse.Get(dtet,actual_dtet)) PHYSBAM_FATAL_ERROR();
-            assert(actual_dtet<=new_embedding_tetrahedrons.m);
+            assert(actual_dtet<new_embedding_tetrahedrons.m);
             ARRAY<int>& simplices_in_actual_dtet=simplices_per_new_tet(actual_dtet);
             simplices_in_actual_dtet.Preallocate(simplices_in_actual_dtet.m+unique_child_simplices.m);
             for(int j=0;j<unique_child_simplices.m;j++){

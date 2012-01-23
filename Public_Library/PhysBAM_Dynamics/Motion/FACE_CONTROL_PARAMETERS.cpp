@@ -30,18 +30,14 @@ template<class T> int FACE_CONTROL_PARAMETERS<T>::
 Active_Size() const
 {
     int n=0;
-    for(int s=1;
-    s<=list.m;
-    s++) for(int c=0;c<list(s)->Size();c++) if(list(s)->Control_Active(c)) n++;
+    for(int s=0;s<list.m;s++) for(int c=0;c<list(s)->Size();c++) if(list(s)->Control_Active(c)) n++;
     return n;
 }
 template<class T> int FACE_CONTROL_PARAMETERS<T>::
 Active_Kinematic_Size() const
 {
     int n=0;
-    for(int s=1;
-    s<=list.m;
-    s++) for(int c=0;c<list(s)->Size();c++) if(list(s)->Control_Active(c)&&list(s)->Positions_Determined_Kinematically(c)) n++;
+    for(int s=0;s<list.m;s++) for(int c=0;c<list(s)->Size();c++) if(list(s)->Control_Active(c)&&list(s)->Positions_Determined_Kinematically(c)) n++;
     return n;
 }
 template<class T> int FACE_CONTROL_PARAMETERS<T>::
@@ -295,9 +291,7 @@ Identity_Controls(VECTOR_ND<T>& values) const
 template<class T> void FACE_CONTROL_PARAMETERS<T>::
 Maximal_Controls()
 {
-    for(int s=1;
-    s<=list.m;
-    s++)list(s)->Maximal_Controls();
+    for(int s=0;s<list.m;s++) list(s)->Maximal_Controls();
 }
 template<class T> template<class RW> void FACE_CONTROL_PARAMETERS<T>::
 Read(std::istream& input_stream)

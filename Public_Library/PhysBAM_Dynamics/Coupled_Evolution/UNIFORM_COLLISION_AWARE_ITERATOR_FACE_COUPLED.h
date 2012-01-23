@@ -34,10 +34,10 @@ public:
         const T_REGION& region_type_input=GRID<TV>::WHOLE_REGION,const int side_input=0,int axis_input=0);
 
     void Next()
-    {if(++collision_index<=collision_face_info.m){index=collision_face_info(collision_index).index;axis=collision_face_info(collision_index).axis;side=collision_face_info(collision_index).side;}}
+    {if(++collision_index<collision_face_info.m){index=collision_face_info(collision_index).index;axis=collision_face_info(collision_index).axis;side=collision_face_info(collision_index).side;}}
 
     bool Valid()
-    {return collision_index<=collision_face_info.m;}
+    {return collision_index<collision_face_info.m;}
 
     const ARRAY<PAIR<COLLISION_GEOMETRY_ID,int> >& Get_Simplices() const
     {return collision_face_info(collision_index).simplices;}

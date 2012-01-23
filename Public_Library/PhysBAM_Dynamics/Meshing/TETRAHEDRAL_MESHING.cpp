@@ -144,8 +144,8 @@ Optimization_Sweep(const T compression_fraction,const bool verbose)
     worst_boundary_quality=worst_interior_quality=FLT_MAX;
     Optimize_Boundary_Layer(compression_fraction);
     if(verbose) LOG::cout<<'.';
-    for(int j=2;j<=layers.m;j++){Optimize_Interior_Layer(j);if(verbose) LOG::cout<<'.';}
-    for(int j=layers.m;j>=2;j--){Optimize_Interior_Layer(j,true);if(verbose) LOG::cout<<'.';}
+    for(int j=1;j<layers.m;j++){Optimize_Interior_Layer(j);if(verbose) LOG::cout<<'.';}
+    for(int j=layers.m-1;j>=1;j--){Optimize_Interior_Layer(j,true);if(verbose) LOG::cout<<'.';}
     Optimize_Boundary_Layer(compression_fraction,true);
     if(verbose) LOG::cout<<'.'<<std::endl;
 }

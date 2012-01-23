@@ -109,7 +109,7 @@ Split_Existing_Polygons()
                 polygon_mesh.elements(cutting_polygon.polygon_index)=final_polygon_element_particles(0);
                 polygons_per_element(tet_owner).Append(cutting_polygon_index);
                 // make all the rest
-                for(int k=2;k<=final_polygon_element_particles.m;k++){
+                for(int k=1;k<final_polygon_element_particles.m;k++){
                     int polygon_element_index=polygon_mesh.elements.Append(final_polygon_element_particles(k));
                     int new_cutting_polygon_index=current_cutting_polygons.Append(CUTTING_POLYGON(polygon_element_index,i,cutting_polygon.flipped,cutting_polygon.polygon_type));
                     polygons_per_element(tet_owner).Append(new_cutting_polygon_index);}}}}
