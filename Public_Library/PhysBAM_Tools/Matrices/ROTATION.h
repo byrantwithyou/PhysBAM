@@ -81,7 +81,7 @@ public:
     {return TV(1);}
 
     TV Rotated_Axis(const int axis) const
-    {assert(axis==1);return TV(1);}
+    {assert(axis==0);return TV(1);}
 
     static ROTATION<TV> From_Rotation_Vector(const VECTOR<T,0>)
     {return ROTATION<TV>();}
@@ -198,7 +198,7 @@ public:
     {return TV(-c.im,c.re);}
 
     TV Rotated_Axis(const int axis) const
-    {assert(axis>=1 && axis<=2);if(axis==1) return Rotated_X_Axis();return Rotated_Y_Axis();}
+    {assert((unsigned)axis<2);if(axis==0) return Rotated_X_Axis();return Rotated_Y_Axis();}
 
     static ROTATION<TV> From_Angle(const T& a)
     {return ROTATION<TV>(COMPLEX<T>::Unit_Polar(a));}
@@ -319,7 +319,7 @@ public:
     {TV euler_angles;Euler_Angles(euler_angles.x,euler_angles.y,euler_angles.z);return euler_angles;}
 
     TV Rotated_Axis(const int axis) const
-    {assert(axis>=1 && axis<=3);if(axis==1) return Rotated_X_Axis();if(axis==2) return Rotated_Y_Axis();return Rotated_Z_Axis();}
+    {assert((unsigned)axis<3);if(axis==0) return Rotated_X_Axis();if(axis==1) return Rotated_Y_Axis();return Rotated_Z_Axis();}
 
 //#####################################################################
     TV Rotation_Vector() const;

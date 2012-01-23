@@ -45,11 +45,11 @@ public:
 
     template<class T_FACE_LOOKUP>
     static T Interpolate_Face_Component(const int axis,const T_BLOCK& block,const T_FACE_LOOKUP& face_velocities,const VECTOR<T,1>& X)
-    {assert(axis==1);return Interpolate_Face_X_Transformed(block,face_velocities,Transformed(block,X));}
+    {assert(axis==0);return Interpolate_Face_X_Transformed(block,face_velocities,Transformed(block,X));}
 
     template<class T_FACE_LOOKUP>
     static ARRAY<PAIR<FACE_INDEX<1>,T> > Interpolate_Face_Component_Weights(const int axis,const T_BLOCK& block,const T_FACE_LOOKUP& face_velocities,const VECTOR<T,1>& X)
-    {assert(axis==1);return Interpolate_Face_X_Transformed_Weights(block,face_velocities,Transformed(block,X));}
+    {assert(axis==0);return Interpolate_Face_X_Transformed_Weights(block,face_velocities,Transformed(block,X));}
 
     template<class T_BLOCK_2,class T_FACE_LOOKUP>
     static VECTOR<T,1> Interpolate_Face_Transformed(const T_BLOCK_2& block,const T_FACE_LOOKUP& face_velocities,const VECTOR<T,1>& DX)
@@ -70,7 +70,7 @@ public:
 
     template<class T_FACE_LOOKUP>
     static VECTOR<T,2> Extrema_Face_Component(const int axis,const T_BLOCK& block,const T_FACE_LOOKUP& u_min,const T_FACE_LOOKUP& u_max,const VECTOR<T,1>& X)
-    {assert(axis==1);return Extrema_Face_X_Transformed(block,u_min,u_max,Transformed(block,X));}
+    {assert(axis==0);return Extrema_Face_X_Transformed(block,u_min,u_max,Transformed(block,X));}
 
     template<class T_BLOCK_2,class T_FACE_LOOKUP>
     static VECTOR<VECTOR<T,1>,2> Extrema_Face_Transformed(const T_BLOCK_2& block,const T_FACE_LOOKUP& u_min,const T_FACE_LOOKUP& u_max,const VECTOR<T,1>& DX)

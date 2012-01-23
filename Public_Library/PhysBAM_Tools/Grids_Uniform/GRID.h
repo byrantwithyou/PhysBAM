@@ -317,7 +317,7 @@ public:
     {assert((unsigned)node<2);TV_INT index=face_index;index[1-axis]+=node-1;return index;}
 
     static TV_INT Face_Node_Index(const int axis,const VECTOR<int,1>& face_index,const int node)
-    {assert(axis==1&&node==1);return face_index;}
+    {assert(axis==0&&node==0);return face_index;}
 
     static TV_INT Node_Face_Index(const int axis,const VECTOR<int,3>& node_index,const int face)
     {static const TV_INT face_from_node_offset[3][4]={

@@ -179,7 +179,7 @@ Display_3D() const
     OPENGL_WORLD::Singleton()->Get_View_Frame(view_forward,view_up,view_right);
     int dominant_axis=1;
 
-    if(dominant_axis==1){
+    if(dominant_axis==0){
         if(view_forward[0]>0){
             ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> colors;
             for(int i=grid.counts.x-1;i>=0;i--) for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++){
@@ -264,7 +264,7 @@ Display_3D_Slice() const
 
     OPENGL_UNIFORM_SLICE* slice=(OPENGL_UNIFORM_SLICE*)this->slice;
 
-    if(slice->axis==1){
+    if(slice->axis==0){
         ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> colors;
         int i=slice->index;
         for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++){

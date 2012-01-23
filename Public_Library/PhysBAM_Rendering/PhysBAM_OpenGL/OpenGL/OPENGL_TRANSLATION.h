@@ -79,8 +79,8 @@ private:
 
     void DrawTranslation() const
     {glDisable(GL_LIGHTING);DrawColor(x_axis,translation_axis,0);DrawAnyRay(translations.x,x_axis,translation_axis==0);
-    DrawColor(y_axis,translation_axis,1);DrawAnyRay(translations.y,y_axis,translation_axis==1);
-    DrawColor(z_axis,translation_axis,2);DrawAnyRay(translations.z,z_axis,translation_axis==2);glEnable(GL_LIGHTING);}
+    DrawColor(y_axis,translation_axis,0);DrawAnyRay(translations.y,y_axis,translation_axis==0);
+    DrawColor(z_axis,translation_axis,1);DrawAnyRay(translations.z,z_axis,translation_axis==1);glEnable(GL_LIGHTING);}
 
     TV MouseOnTranslation(const VECTOR<T,2> &mouse,VECTOR<RAY<TV>,3> &translations,const TV &previous_result){
         RAY<TV> camera_ray=world->Ray_Through_Normalized_Image_Coordinate(mouse);
