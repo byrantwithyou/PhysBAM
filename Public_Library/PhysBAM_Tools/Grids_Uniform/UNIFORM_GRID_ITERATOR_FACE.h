@@ -45,7 +45,7 @@ private:
 
 public:
     void Next() PHYSBAM_ALWAYS_INLINE // overloads UNIFORM_GRID_ITERATOR::Next but we don't want that to be virtual to avoid virtual call overhead
-    {if(index(TV::dimension-1)<region.max_corner(TV::dimension-1)) index(TV::dimension-1)++;else Next_Helper();}
+    {if(index(TV::dimension-1)<region.max_corner(TV::dimension-1)-1) index(TV::dimension-1)++;else Next_Helper();}
 
     int Axis() const
     {return axis;}
@@ -81,7 +81,7 @@ public:
     {return grid.Center(Second_Cell_Index());}
 
     bool First_Boundary() const // returns true if currently on left, bottom, or front boundary
-    {assert(region_type==GRID<TV>::BOUNDARY_REGION);return (side>=0 && current_region%2==0) || (side && (side-1)%2==0);}
+    {assert(region_type==GRID<TV>::BOUNDARY_REGION);return (side<0 && current_region%2==0) || (side && (side-1)%2==0);}
 
     TV_INT Face_Node_Index(const int node) const // 1-based
     {return grid.Face_Node_Index(axis,index,node);}

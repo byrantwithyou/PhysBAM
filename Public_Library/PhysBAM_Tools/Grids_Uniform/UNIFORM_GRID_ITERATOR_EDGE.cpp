@@ -47,7 +47,7 @@ template<class TV> void UNIFORM_GRID_ITERATOR_EDGE<TV>::
 Next_Helper()
 {
     UNIFORM_GRID_ITERATOR<TV>::Next_Helper();
-    if(!valid && !single_axis && axis<TV::dimension) Reset_Axis(axis+1);
+    if(!valid && !single_axis && axis<TV::dimension-1) Reset_Axis(axis+1);
 }
 //#####################################################################
 // Function Reset_Axis
@@ -59,7 +59,7 @@ Reset_Axis(const int axis_input)
     RANGE<TV_INT> domain(grid.Node_Indices(number_of_ghost_cells));
     switch(region_type){
         case GRID<TV>::WHOLE_REGION:
-            assert(side>=0);
+            assert(side<0);
             domain.max_corner(axis)--;
             Add_Region(domain);
             break;

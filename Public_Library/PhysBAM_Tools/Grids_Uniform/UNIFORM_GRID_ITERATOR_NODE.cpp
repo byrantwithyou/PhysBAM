@@ -17,10 +17,10 @@ UNIFORM_GRID_ITERATOR_NODE(const GRID<TV>& grid_input,const int number_of_ghost_
     TV_INT counts=grid.Numbers_Of_Nodes(); // exact number of nodes (even if MAC)
     RANGE<TV_INT> domain(grid.Node_Indices(number_of_ghost_cells));
     switch(region_type){
-        case GRID<TV>::WHOLE_REGION: assert(side>=0);Add_Region(domain);break;
+        case GRID<TV>::WHOLE_REGION: assert(side<0);Add_Region(domain);break;
         case GRID<TV>::GHOST_REGION: assert(number_of_ghost_cells>0); // ghost region of grid with specified ghost cells
             // TODO(jontg): counts doesn't take into account number_of_ghost_cells, so I believe this to be incorrect.
-            if(side>=0){ // don't loop over the same cell twice!
+            if(side<0){ // don't loop over the same cell twice!
                 TV_INT max_copy(domain.max_corner);
                 for(int axis=TV::dimension-1;axis>=0;axis--){
                     domain.max_corner(axis)=0;
@@ -33,7 +33,7 @@ UNIFORM_GRID_ITERATOR_NODE(const GRID<TV>& grid_input,const int number_of_ghost_
             else{int axis=side/2;if(side&1) domain.min_corner(axis)=counts(axis)+1;else domain.max_corner(axis)=0;Add_Region(domain);}
             break;
         case GRID<TV>::BOUNDARY_REGION: // outer boundary of grid with specified ghost cells
-            if(side>=0){ // don't loop over the same node twice!
+            if(side<0){ // don't loop over the same node twice!
                 RANGE<TV_INT> domain_copy(domain);
                 for(int axis=TV::dimension-1;axis>=0;axis--){
                     domain.max_corner(axis)=domain.min_corner(axis);
@@ -44,7 +44,7 @@ UNIFORM_GRID_ITERATOR_NODE(const GRID<TV>& grid_input,const int number_of_ghost_
                     domain.min_corner(axis)=domain_copy.min_corner(axis)+1;}}
             else{int axis=side/2;if(side&1) domain.min_corner(axis)=domain.max_corner(axis);else domain.max_corner(axis)=domain.min_corner(axis);Add_Region(domain);}
             break;
-        default: assert(region_type==GRID<TV>::INTERIOR_REGION && side>=0);domain.Change_Size(-1);Add_Region(domain);break;}
+        default: assert(region_type==GRID<TV>::INTERIOR_REGION && side<0);domain.Change_Size(-1);Add_Region(domain);break;}
     Reset();
 }
 //#####################################################################
