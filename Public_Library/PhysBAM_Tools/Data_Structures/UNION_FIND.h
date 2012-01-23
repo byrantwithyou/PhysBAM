@@ -54,7 +54,7 @@ public:
     template<int d>
     ID Union(const VECTOR<ID,d>& indices)
     {ID root=Find_Without_Path_Compression(indices[0]);T_RANK max_rank=ranks(root);bool max_tie=false;
-    for(int i=2;i<=d;i++){
+    for(int i=1;i<d;i++){
         ID root_i=Find_Without_Path_Compression(indices[i]);
         if(max_rank<ranks(root_i)){max_rank=ranks(root_i);root=root_i;max_tie=false;}
         else if(max_rank==ranks(root_i) && root_i!=root) max_tie=true;}
