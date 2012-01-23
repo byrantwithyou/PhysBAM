@@ -46,11 +46,14 @@ Compute(const T dt,const ARRAY<bool,FACE_INDEX<d> >& psi_N,T mu)
     if(!mu) return;
 
     for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(grid,1);iterator.Valid();iterator.Next()){
-        int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();FACE_INDEX<d> this_face(iterator.Full_Index());
+        int axis=iterator.Axis();
+        TV_INT face_index=iterator.Face_Index();
+        FACE_INDEX<d> this_face(iterator.Full_Index());
         for(int other_axis=0;other_axis<TV::dimension;other_axis++){
             last_id++;
-            FACE_INDEX<d> other_face(axis,face_index+TV_INT::Axis_Vector(other_axis));T weight=coefficient*face_areas(axis);
-            int this_index(0),other_index(0);
+            FACE_INDEX<d> other_face(axis,face_index+TV_INT::Axis_Vector(other_axis));
+            T weight=coefficient*face_areas(axis);
+            int this_index=0,other_index=0;
             if(index_map.face_indices.Valid_Index(this_face)) this_index=index_map.face_indices(this_face);
             else if(index_map.constraint_indices.Contains(SIDED_FACE_INDEX<TV::dimension>(2,this_face))) this_index=index_map.indexed_faces.m+index_map.constraint_indices.Get(SIDED_FACE_INDEX<TV::dimension>(2,this_face));
             if(index_map.face_indices.Valid_Index(other_face)) other_index=index_map.face_indices(other_face);

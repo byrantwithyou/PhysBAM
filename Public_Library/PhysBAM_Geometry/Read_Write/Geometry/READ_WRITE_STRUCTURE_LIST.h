@@ -42,7 +42,7 @@ public:
     {Read_Write<OBJECT_BASE,RW>::Write(object,STRING_UTILITIES::string_sprintf("%s/%d/%s",prefix.c_str(),frame,list_name.c_str()));
     object.names.Resize(Value(object.Size()));
     ARRAY<ID>& needs_write=object.Needs_Write();
-    for(int i=0;i<needs_write.Size();i++){ID id=needs_write(i);int index=object.Element_Index(id);assert(index);
+    for(int i=0;i<needs_write.Size();i++){ID id=needs_write(i);int index=object.Element_Index(id);assert(index>=0);
         object.names(id)=object.Active_Element(index)->Name();
         FILE_UTILITIES::Write_To_File<RW>(STRING_UTILITIES::string_sprintf("%s/common/%s%d.%s",prefix.c_str(),list_name.c_str(),id,object.Active_Element(index)->Extension().c_str()),*object.Active_Element(index));}
     if(frame==0 || needs_write.Size()) FILE_UTILITIES::Write_To_File<RW>(STRING_UTILITIES::string_sprintf("%s/common/%skey",prefix.c_str(),list_name.c_str()),object.names);

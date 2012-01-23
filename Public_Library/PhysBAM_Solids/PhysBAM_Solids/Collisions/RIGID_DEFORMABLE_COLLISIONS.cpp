@@ -378,7 +378,7 @@ Add_Elastic_Collisions(const T dt,const T time,ARRAY<ROTATION<TV> >& rigid_rotat
         // rigid/rigid collisions
         if(!kinematic_rigid_bodies_only && solids_parameters.rigid_body_collision_parameters.perform_collisions){
             // Calls skip_collision_check.Skip_Pair and if necessary skip_collision_check.Set_Last_Checked
-            rigid_body_collisions.Get_Bounding_Box_Collision_Pairs(dt,time,pairs,i==solids_parameters.rigid_body_collision_parameters.collision_iterations,
+            rigid_body_collisions.Get_Bounding_Box_Collision_Pairs(dt,time,pairs,i==solids_parameters.rigid_body_collision_parameters.collision_iterations-1,
                 i==1,solids_parameters.rigid_body_collision_parameters.collision_bounding_box_thickness);
             for(int j=0;j<pairs.m;j++){
                 rigid_body_collisions.added_bodies(0).Remove_All();rigid_body_collisions.added_bodies(1).Remove_All();
@@ -410,8 +410,8 @@ Add_Elastic_Collisions(const T dt,const T time,ARRAY<ROTATION<TV> >& rigid_rotat
                 solid_body_collection.deformable_body_collection.soft_bindings,deformable_body_collection.particles.X,dt,&tetrahedron_collision_bodies);
             if(interactions!=0 && !kinematic_rigid_bodies_only) need_another_iteration=true;}
 
-        if(!need_another_iteration && i<solids_parameters.rigid_body_collision_parameters.collision_iterations){
-            i=solids_parameters.rigid_body_collision_parameters.collision_iterations-1;
+        if(!need_another_iteration && i<solids_parameters.rigid_body_collision_parameters.collision_iterations-1){
+            i=solids_parameters.rigid_body_collision_parameters.collision_iterations-2;
             need_another_iteration=true;}} // force it to the last iteration (so it picks up contact pairs for rigid/rigid one time at least)
     V_save+=deformable_body_collection.particles.V;
 }

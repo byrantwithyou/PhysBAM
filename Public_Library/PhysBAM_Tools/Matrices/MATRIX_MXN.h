@@ -105,7 +105,7 @@ public:
     void Resize(const int m_new,const int n_new)
     {if(m_new==m && n_new==n) return;
     T* x_new=new T[m_new*n_new];for(int t=0;t<m_new*n_new;t++) x_new[t]=(T)0;
-    int m1=min(m,m_new),n1=min(n,n_new);for(int i=0;i<m1;i++) for(int j=0;j<n1;j++) x_new[(j-1)*m_new+(i-1)]=(*this)(i,j);
+    int m1=min(m,m_new),n1=min(n,n_new);for(int i=0;i<m1;i++) for(int j=0;j<n1;j++) x_new[j*m_new+i]=(*this)(i,j);
     delete[] x;x=x_new;m=m_new;n=n_new;}
 
     T& operator()(const int i,const int j)
@@ -161,10 +161,10 @@ public:
     {assert(m==2);return MATRIX<T,1,2>::Cross_Product_Matrix(v)*(*this);}
 
     MATRIX_MXN<T> Times_Cross_Product_Matrix_Transpose(const VECTOR<T,3>& v) const
-    {assert(n==3);MATRIX_MXN<T> matrix(m,3);for(int i=0;i<m;i++) matrix.Set_Row(i,VECTOR<T,3>::Cross_Product(v,VECTOR<T,3>((*this)(i,1),(*this)(i,2),(*this)(i,3))));return matrix;}
+    {assert(n==3);MATRIX_MXN<T> matrix(m,3);for(int i=0;i<m;i++) matrix.Set_Row(i,VECTOR<T,3>::Cross_Product(v,VECTOR<T,3>((*this)(i,0),(*this)(i,1),(*this)(i,2))));return matrix;}
 
     MATRIX_MXN<T> Cross_Product_Matrix_Times(const VECTOR<T,3>& v) const
-    {assert(m==3);MATRIX_MXN<T> matrix(3,n);for(int i=0;i<n;i++) matrix.Set_Column(i,VECTOR<T,3>::Cross_Product(v,VECTOR<T,3>((*this)(1,i),(*this)(2,i),(*this)(3,i))));return matrix;}
+    {assert(m==3);MATRIX_MXN<T> matrix(3,n);for(int i=0;i<n;i++) matrix.Set_Column(i,VECTOR<T,3>::Cross_Product(v,VECTOR<T,3>((*this)(0,i),(*this)(1,i),(*this)(2,i))));return matrix;}
 
     MATRIX_MXN<T> Permute_Columns(const VECTOR_ND<int>& p) const
     {assert(n==p.n);MATRIX_MXN<T> x(m,n);for(int i=0;i<m;i++) for(int j=0;j<n;j++) x(i,j)=(*this)(i,p(j));return x;}

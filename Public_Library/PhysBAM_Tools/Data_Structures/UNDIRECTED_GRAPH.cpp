@@ -26,7 +26,7 @@ void UNDIRECTED_GRAPH_CORE::
 Reset()
 {
     edges.Remove_All();
-    for(int i(0);i<adjacent_edges.m;i++) adjacent_edges(i).Remove_All();adjacent_edges.Remove_All();
+    for(int i=0;i<adjacent_edges.m;i++) adjacent_edges(i).Remove_All();adjacent_edges.Remove_All();
 }
 //#####################################################################
 // Function Add_Edge
@@ -34,10 +34,11 @@ Reset()
 void UNDIRECTED_GRAPH_CORE::
 Add_Edge(const int parent,const int child,const int edge)
 {
-    if(edges.m<edge) edges.Resize(edge);
-    if(adjacent_edges.m<max(parent,child)) adjacent_edges.Resize(max(parent,child));
+    if(edges.m<=edge) edges.Resize(edge+1);
+    if(adjacent_edges.m<=max(parent,child)) adjacent_edges.Resize(max(parent,child)+1);
     edges(edge).x=parent;edges(edge).y=child;
-    if(parent) adjacent_edges(parent).Append(edge);if(child) adjacent_edges(child).Append(edge);
+    if(parent>=0) adjacent_edges(parent).Append(edge);
+    if(child>=0) adjacent_edges(child).Append(edge);
 }
 //#####################################################################
 // Function Remove_Edge
@@ -47,7 +48,7 @@ Remove_Edge(const int edge)
 {
     ARRAY<int> &adjacent_parent=adjacent_edges(edges(edge).x),&adjacent_child=adjacent_edges(edges(edge).y);
     adjacent_parent.Remove_Index_Lazy(adjacent_parent.Find(edge));adjacent_child.Remove_Index_Lazy(adjacent_child.Find(edge));
-    edges(edge)=PAIR<int,int>();
+    edges(edge)=PAIR<int,int>(-1,-1);
 }
 //#####################################################################
 // Function Modify_Edge
@@ -86,7 +87,7 @@ Connected_Components(ARRAY<int,int>& component_id) // returns total number of co
 {
     component_id.Resize(adjacent_edges.Size(),false,false);component_id.Fill(0);
     int component=0;
-    for(int seed=0;seed<component_id.Size();seed++) if(!component_id(seed)){
+    for(int seed=0;seed<component_id.Size();seed++) if(component_id(seed)<0){
         STACK<int> stack;stack.Push(seed);
         component_id(seed)=++component;
         while(!stack.Empty()){
@@ -94,7 +95,7 @@ Connected_Components(ARRAY<int,int>& component_id) // returns total number of co
             for(int j=0;j<adjacent_edges(current).m;j++){
                 int eid=adjacent_edges(current)(j);
                 int other_node=(edges(eid).x==current?edges(eid).y:edges(eid).x);
-                if(!component_id(other_node)){
+                if(component_id(other_node)<0){
                     stack.Push(other_node);
                     component_id(other_node)=component;}}}}
     return component;

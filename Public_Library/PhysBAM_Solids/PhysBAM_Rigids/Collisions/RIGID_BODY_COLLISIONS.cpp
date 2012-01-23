@@ -940,7 +940,7 @@ Check_For_Any_Interpenetration()
         RIGID_COLLISION_GEOMETRY<TV>* rigid_collision_geometry=dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>*>(rigid_body_collection.rigid_geometry_collection.collision_body_list->bodies(i));
         if(rigid_collision_geometry){RIGID_BODY<TV>* rigid_body=dynamic_cast<RIGID_BODY<TV>*>(&rigid_collision_geometry->rigid_geometry);
             if(rigid_body) if(rigid_body_collection.Is_Active(rigid_body->particle_index) && rigid_body_collection.Rigid_Body(rigid_body->particle_index).Is_Simulated()){
-            int particle_body(0),levelset_body(0);
+            int particle_body=0,levelset_body=0;
             spatial_partition->Get_Potential_Collisions(i,object_indices,false);
             for(int t=0;t<object_indices.m;t++) if(object_indices(t)){
                 int id=rigid_body_collection.rigid_geometry_collection.collision_body_list->collision_geometry_id_to_geometry_id.Get(object_indices(t));
@@ -1106,7 +1106,7 @@ Add_Elastic_Collisions(const T dt,const T time)
                 mpi_rigid_velocity_save(p)=rigid_body_collection.rigid_body_particle.twist(p);
                 mpi_rigid_angular_momentum_save(p)=rigid_body_collection.rigid_body_particle.angular_momentum(p);}}
 
-        need_another_iteration=false;Get_Bounding_Box_Collision_Pairs(dt,time,pairs,i==parameters.collision_iterations,i==1);
+        need_another_iteration=false;Get_Bounding_Box_Collision_Pairs(dt,time,pairs,i==parameters.collision_iterations-1,i==1);
         for(int j=0;j<pairs.m;j++){
             int id_1=pairs(j)(0),id_2=pairs(j)(1);
             if(Update_Collision_Pair(id_1,id_2,dt,time,(mpi_rigids && (mpi_rigids->Is_Dynamic_Ghost_Body(rigid_body_collection.Rigid_Body(id_1)) || 
