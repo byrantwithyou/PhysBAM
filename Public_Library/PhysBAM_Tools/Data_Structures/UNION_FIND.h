@@ -63,7 +63,7 @@ public:
 
     void Merge(const UNION_FIND<ID>& union_find)
     {assert(Size()==union_find.Size());
-    for(ID i(0);i<Size();i++){ID j=union_find.parents(i);if(j!=-1) Union(i,j);}}
+    for(ID i(0);i<Size();i++){ID j=union_find.parents(i);if(j!=ID(-1)) Union(i,j);}}
 
     // Okay for map to yield invalid indices for isolated elements
     template<class ID2,class T_ARRAY>
