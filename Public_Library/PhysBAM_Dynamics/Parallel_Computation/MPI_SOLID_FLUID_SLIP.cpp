@@ -42,10 +42,10 @@ MPI_SOLID_FLUID_SLIP()
     group=new MPI::Group(comm->Get_group());
     solid_ranks.Resize(number_of_solid_processes);
     for(int i=0;i<number_of_solid_processes;i++)solid_ranks(i)=i-1;
-    solid_group=new MPI::Group(group->Incl(solid_ranks.n,&solid_ranks(1)));
+    solid_group=new MPI::Group(group->Incl(solid_ranks.n,&solid_ranks(0)));
     fluid_ranks.Resize(number_of_processes-number_of_solid_processes);
     for(int i=0;i<fluid_ranks.n;i++)fluid_ranks(i)=i+number_of_solid_processes-1;
-    fluid_group=new MPI::Group(group->Incl(fluid_ranks.n,&fluid_ranks(1)));
+    fluid_group=new MPI::Group(group->Incl(fluid_ranks.n,&fluid_ranks(0)));
 
 }
 //#####################################################################
@@ -79,13 +79,13 @@ Exchange_Solid_Positions_And_Velocities(SOLID_BODY_COLLECTION<TV>& solid_body_co
             send_buffers(i).Resize(buffer_size);int position=0;
             MPI_UTILITIES::Pack(particles.X,rigid_body_particles.X,rigid_body_particles.rotation,particles.V,rigid_body_particles.twist,rigid_body_particles.angular_momentum,
                 send_buffers(i),position,*comm);
-            requests.Append(comm->Isend(&(send_buffers(i)(1)),position,MPI::PACKED,fluid_ranks(i),tag));}
+            requests.Append(comm->Isend(&(send_buffers(i)(0)),position,MPI::PACKED,fluid_ranks(i),tag));}
         MPI_UTILITIES::Wait_All(requests);}
     else{
         int buffer_size=MPI_UTILITIES::Pack_Size(particles.X,rigid_body_particles.X,rigid_body_particles.rotation,particles.V,rigid_body_particles.twist,
             rigid_body_particles.angular_momentum,*comm)+1;
         ARRAY<char> buffer(buffer_size);int position=0;
-        comm->Recv(&buffer(1),buffer_size,MPI::PACKED,solid_node,tag);
+        comm->Recv(&buffer(0),buffer_size,MPI::PACKED,solid_node,tag);
         MPI_UTILITIES::Unpack(particles.X,rigid_body_particles.X,rigid_body_particles.rotation,particles.V,rigid_body_particles.twist,rigid_body_particles.angular_momentum,
             buffer,position,*comm);}
 }
@@ -192,13 +192,13 @@ Exchange_Coupled_Deformable_Particle_List(ARRAY<int>* fluid_list,ARRAY<ARRAY<int
             comm->Probe(MPI::ANY_SOURCE,tag,status);
             int source=status.Get_source();
             ARRAY<char> buffer(status.Get_count(MPI::PACKED));int position=0;
-            comm->Recv(&buffer(1),buffer.m,MPI::PACKED,source,tag);
+            comm->Recv(&buffer(0),buffer.m,MPI::PACKED,source,tag);
             MPI_UTILITIES::Unpack((*results)(source),buffer,position,*comm);}}
     else{
         int buffer_size=MPI_UTILITIES::Pack_Size(*fluid_list,*comm)+1;
         ARRAY<char> buffer(buffer_size);int position=0;
         MPI_UTILITIES::Pack(*fluid_list,buffer,position,*comm);
-        comm->Send(&buffer(1),buffer_size,MPI::PACKED,solid_node,tag);}
+        comm->Send(&buffer(0),buffer_size,MPI::PACKED,solid_node,tag);}
 }
 //#####################################################################
 // Function Find_Matrix_Indices
@@ -343,7 +343,7 @@ Find_Matrix_Indices_In_Region(const GRID<TV>& local_grid,const T_ARRAYS_BOOL& va
     //PHYSBAM_FATAL_ERROR("pretty sure don't want Lazy_Inside");
     for(CELL_ITERATOR iterator(local_grid,region);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();
-        //if(cell_index(1)==0 && cell_index(2)==1)
+        //if(cell_index(0)==0 && cell_index(1)==1)
         //DEBUG_UTILITIES::Debug_Breakpoint();
         for(int axis=0;axis<TV::dimension;axis++){
             TV_INT axis_vector=TV_INT::Axis_Vector(axis);

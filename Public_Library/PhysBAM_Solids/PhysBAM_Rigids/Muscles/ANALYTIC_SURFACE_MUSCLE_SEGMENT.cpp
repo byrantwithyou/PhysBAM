@@ -153,9 +153,9 @@ Get_Fractional_Curve_Value(const T fraction,const bool initial) const
 template<class T> bool ANALYTIC_SURFACE_MUSCLE_SEGMENT<T>::
 Analytic_Inside_Test(const TV& local_position) const
 {
-    if(local_position(1)<=0 || local_position(1)>=Length()) return false;
-    T distance_from_axis=sqrt(sqr(local_position(2))+sqr(local_position(3)));
-    T curve_height=Get_Fractional_Curve_Value(local_position(1)/Length(),false);
+    if(local_position(0)<=0 || local_position(0)>=Length()) return false;
+    T distance_from_axis=sqrt(sqr(local_position(1))+sqr(local_position(2)));
+    T curve_height=Get_Fractional_Curve_Value(local_position(0)/Length(),false);
     return distance_from_axis<=curve_height;
 }
 //#####################################################################
@@ -169,7 +169,7 @@ Initialize_Inside_Particles(const TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_vol
     for(int t=0;t<tetrahedralized_volume.mesh.elements.m;t++){
         for(int v=0;v<4;v++){int node=tetrahedralized_volume.mesh.elements(t)(v);
             inside_particle_rest_positions(node)=frame.Inverse()*particles.X(node);
-            inside_particle_segments(node)=(int)((2*(inside_particle_rest_positions(node)(1)-tendon_fraction_1*Length())*num_segments_over_2)/Curve_Length()+1);
+            inside_particle_segments(node)=(int)((2*(inside_particle_rest_positions(node)(0)-tendon_fraction_1*Length())*num_segments_over_2)/Curve_Length()+1);
             if(!Analytic_Inside_Test(inside_particle_rest_positions(node))) break;}}
 }
 //#####################################################################

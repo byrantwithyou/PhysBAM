@@ -137,11 +137,11 @@ Compute_Adaptive_Pixel_Color(const TV& center,const T dx,const T dy,const int re
     if(debug_mode&&debug_data){dummy_root.debug_ray=new RENDERING_RAY_DEBUG<T>(dummy_root);debug_data->Set_Ray_Tree(dummy_root.debug_ray);}
     
     ARRAY<TV > positions(5);T dx_2=(T)0.5*dx,dy_2=(T)0.5*dy;
-    positions(1)=center-dx_2*camera.horizontal_vector-dy_2*camera.vertical_vector;
-    positions(2)=center-dx_2*camera.horizontal_vector+dy_2*camera.vertical_vector;
-    positions(3)=center+dx_2*camera.horizontal_vector-dy_2*camera.vertical_vector;
-    positions(4)=center+dx_2*camera.horizontal_vector+dy_2*camera.vertical_vector;
-    positions(5)=center;
+    positions(0)=center-dx_2*camera.horizontal_vector-dy_2*camera.vertical_vector;
+    positions(1)=center-dx_2*camera.horizontal_vector+dy_2*camera.vertical_vector;
+    positions(2)=center+dx_2*camera.horizontal_vector-dy_2*camera.vertical_vector;
+    positions(3)=center+dx_2*camera.horizontal_vector+dy_2*camera.vertical_vector;
+    positions(4)=center;
 
     ARRAY<TV > colors(5);
     for(int i=0;i<5;i++){
@@ -152,13 +152,13 @@ Compute_Adaptive_Pixel_Color(const TV& center,const T dx,const T dy,const int re
         colors(i)=Cast_Ray(rendering_ray,dummy_root);}
     
     if(recursion_depth==adaptive_supersampling_depth_limit)
-        return (T)0.125*colors(1)+(T)0.125*colors(2)+(T)0.125*colors(3)+(T)0.125*colors(4)+(T)0.5*colors(5);
+        return (T)0.125*colors(0)+(T)0.125*colors(1)+(T)0.125*colors(2)+(T)0.125*colors(3)+(T)0.5*colors(4);
 
     for(int i=0;i<4;i++)
-        if((colors(i)-colors(5)).Magnitude()<adaptive_supersampling_tolerance) colors(i)=(T)0.5*colors(i)+(T)0.5*colors(5);
-        else colors(i)=Compute_Adaptive_Pixel_Color((T)0.5*(positions(i)+positions(5)),dx_2,dy_2,recursion_depth+1,colors(i),colors(5),i,debug_data);
+        if((colors(i)-colors(4)).Magnitude()<adaptive_supersampling_tolerance) colors(i)=(T)0.5*colors(i)+(T)0.5*colors(4);
+        else colors(i)=Compute_Adaptive_Pixel_Color((T)0.5*(positions(i)+positions(4)),dx_2,dy_2,recursion_depth+1,colors(i),colors(4),i,debug_data);
 
-    return (T)0.25*colors(1)+(T)0.25*colors(2)+(T)0.25*colors(3)+(T)0.25*colors(4);
+    return (T)0.25*colors(0)+(T)0.25*colors(1)+(T)0.25*colors(2)+(T)0.25*colors(3);
 }
 #endif
 //#####################################################################

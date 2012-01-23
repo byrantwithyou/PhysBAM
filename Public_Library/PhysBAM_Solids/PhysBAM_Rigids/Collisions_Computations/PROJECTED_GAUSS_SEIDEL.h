@@ -194,7 +194,7 @@ bool Solve(
         {
             SOLVE_CONTACT::CONTACT<TV>& contact=contacts(i);
             
-            T normal_violation=T_TWIST::Dot_Product(contact.normal_constraint(1),velocities(contact.id(1)))+T_TWIST::Dot_Product(contact.normal_constraint(2),velocities(contact.id(2)))-contact.normal_relative_velocity;
+            T normal_violation=T_TWIST::Dot_Product(contact.normal_constraint(0),velocities(contact.id(0)))+T_TWIST::Dot_Product(contact.normal_constraint(1),velocities(contact.id(1)))-contact.normal_relative_velocity;
 
             T residual=max(-normal_violation,normal_violation*lambda_normal(i));
             if(residual>maximum_residual)
@@ -208,17 +208,17 @@ bool Solve(
                 lambda_normal_delta=-lambda_normal(i);
             }
             
+            if(!has_infinite_inertia(contact.id(0)))
+                velocities(contact.id(0))+=lambda_normal_delta*contact.inverse_mass_times_normal_constraint(0);
             if(!has_infinite_inertia(contact.id(1)))
                 velocities(contact.id(1))+=lambda_normal_delta*contact.inverse_mass_times_normal_constraint(1);
-            if(!has_infinite_inertia(contact.id(2)))
-                velocities(contact.id(2))+=lambda_normal_delta*contact.inverse_mass_times_normal_constraint(2);
 
             lambda_normal(i)=lambda_normal_new;
 
             if(friction)
                 for(int j=1;j<d;j++)
                 {
-                    T tangent_violation=T_TWIST::Dot_Product(contact.tangent_constraint(1)(j),velocities(contact.id(1)))+T_TWIST::Dot_Product(contact.tangent_constraint(2)(j),velocities(contact.id(2)));
+                    T tangent_violation=T_TWIST::Dot_Product(contact.tangent_constraint(0)(j),velocities(contact.id(0)))+T_TWIST::Dot_Product(contact.tangent_constraint(1)(j),velocities(contact.id(1)));
                     
                     T lambda_tangent_new=lambda_tangent(i)(j)-tangent_violation/contact.tangent_diagonal(j);
                     if(fabs(lambda_tangent_new)>contact.coefficient_of_friction*lambda_normal_new)
@@ -229,10 +229,10 @@ bool Solve(
                             lambda_tangent_new=-contact.coefficient_of_friction*lambda_normal_new;
                     }
                     
+                    if(!has_infinite_inertia(contact.id(0)))
+                        velocities(contact.id(0))+=(lambda_tangent_new-lambda_tangent(i)(j))*contact.inverse_mass_times_tangent_constraint(0)(j);
                     if(!has_infinite_inertia(contact.id(1)))
                         velocities(contact.id(1))+=(lambda_tangent_new-lambda_tangent(i)(j))*contact.inverse_mass_times_tangent_constraint(1)(j);
-                    if(!has_infinite_inertia(contact.id(2)))
-                        velocities(contact.id(2))+=(lambda_tangent_new-lambda_tangent(i)(j))*contact.inverse_mass_times_tangent_constraint(2)(j);
                     
                     lambda_tangent(i)(j)=lambda_tangent_new;
                 }
@@ -296,7 +296,7 @@ bool Solve(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,ARRAY<SOLVE_CONTACT:
         {
             SOLVE_CONTACT::CONTACT<TV>& contact=contacts(i);
             
-            T normal_violation=T_TWIST::Dot_Product(contact.normal_constraint(1),velocities(contact.id(1)))+T_TWIST::Dot_Product(contact.normal_constraint(2),velocities(contact.id(2)))-contact.normal_relative_velocity;
+            T normal_violation=T_TWIST::Dot_Product(contact.normal_constraint(0),velocities(contact.id(0)))+T_TWIST::Dot_Product(contact.normal_constraint(1),velocities(contact.id(1)))-contact.normal_relative_velocity;
 
             T residual=max(-normal_violation,normal_violation*lambda_normal(i));
             if(residual>maximum_residual)
@@ -310,13 +310,13 @@ bool Solve(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,ARRAY<SOLVE_CONTACT:
                 lambda_normal_delta=-lambda_normal(i);
             }
             
+            if(!has_infinite_inertia(contact.id(0)))
+                velocities(contact.id(0))+=lambda_normal_delta*contact.inverse_mass_times_normal_constraint(0);
             if(!has_infinite_inertia(contact.id(1)))
                 velocities(contact.id(1))+=lambda_normal_delta*contact.inverse_mass_times_normal_constraint(1);
-            if(!has_infinite_inertia(contact.id(2)))
-                velocities(contact.id(2))+=lambda_normal_delta*contact.inverse_mass_times_normal_constraint(2);
 
             ////////////////////////
-            /*T new_normal_violation=T_TWIST::Dot_Product(contact.normal_constraint(1),velocities(contact.id(1)))+T_TWIST::Dot_Product(contact.normal_constraint(2),velocities(contact.id(2)))-contact.normal_relative_velocity;
+            /*T new_normal_violation=T_TWIST::Dot_Product(contact.normal_constraint(0),velocities(contact.id(0)))+T_TWIST::Dot_Product(contact.normal_constraint(1),velocities(contact.id(1)))-contact.normal_relative_velocity;
             if(-new_normal_violation>tolerance)
             {
                 LOG::cout << "constraint " << normal_violation << " " << new_normal_violation << std::endl;
@@ -328,7 +328,7 @@ bool Solve(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,ARRAY<SOLVE_CONTACT:
 
             for(int j=1;j<d;j++)
             {
-                T tangent_violation=T_TWIST::Dot_Product(contact.tangent_constraint(1)(j),velocities(contact.id(1)))+T_TWIST::Dot_Product(contact.tangent_constraint(2)(j),velocities(contact.id(2)));
+                T tangent_violation=T_TWIST::Dot_Product(contact.tangent_constraint(0)(j),velocities(contact.id(0)))+T_TWIST::Dot_Product(contact.tangent_constraint(1)(j),velocities(contact.id(1)));
                 
                 T lambda_tangent_new=lambda_tangent(i)(j)-tangent_violation/contact.tangent_diagonal(j);
                 if(fabs(lambda_tangent_new)>contact.coefficient_of_friction*lambda_normal_new)
@@ -339,10 +339,10 @@ bool Solve(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,ARRAY<SOLVE_CONTACT:
                         lambda_tangent_new=-contact.coefficient_of_friction*lambda_normal_new;
                 }
 
+                if(!has_infinite_inertia(contact.id(0)))
+                    velocities(contact.id(0))+=(lambda_tangent_new-lambda_tangent(i)(j))*contact.inverse_mass_times_tangent_constraint(0)(j);
                 if(!has_infinite_inertia(contact.id(1)))
                     velocities(contact.id(1))+=(lambda_tangent_new-lambda_tangent(i)(j))*contact.inverse_mass_times_tangent_constraint(1)(j);
-                if(!has_infinite_inertia(contact.id(2)))
-                    velocities(contact.id(2))+=(lambda_tangent_new-lambda_tangent(i)(j))*contact.inverse_mass_times_tangent_constraint(2)(j);
 
                 lambda_tangent(i)(j)=lambda_tangent_new;
             }
@@ -363,12 +363,12 @@ bool Solve(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,ARRAY<SOLVE_CONTACT:
     {
         SOLVE_CONTACT::CONTACT<TV>& contact=contacts(i);
         
-        int id1=contact.id(1),id2=contact.id(2);
+        int id1=contact.id(0),id2=contact.id(1);
         VECTOR<int,2> pair=VECTOR<int,2>(id1,id2).Sorted();
-        if(pair(1)==1 && pair(2)==6)
+        if(pair(0)==1 && pair(1)==6)
         {
             LOG::cout << "contact " << i << " - " << contact.normal << " - " << contact.location << " - " << contact.distance << " " << contact.normal_relative_velocity << std::endl;
-            LOG::cout << "residual " << TWIST<TV>::Dot_Product(contact.normal_constraint(1),velocities(id1)) << " " << (TWIST<TV>::Dot_Product(contact.normal_constraint(1),velocities(id1))+TWIST<TV>::Dot_Product(contact.normal_constraint(2),velocities(id2))-contact.normal_relative_velocity) << std::endl;
+            LOG::cout << "residual " << TWIST<TV>::Dot_Product(contact.normal_constraint(0),velocities(id1)) << " " << (TWIST<TV>::Dot_Product(contact.normal_constraint(0),velocities(id1))+TWIST<TV>::Dot_Product(contact.normal_constraint(1),velocities(id2))-contact.normal_relative_velocity) << std::endl;
         }
     }*/
 

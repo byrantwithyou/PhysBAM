@@ -47,7 +47,7 @@ public:
         particles.X(index_2)=VECTOR<T,3>(position+u_direction);
         particles.X(index_3)=VECTOR<T,3>(position+v_direction);
         particles.X(index_4)=VECTOR<T,3>(position+u_direction+v_direction);
-        ARRAY<VECTOR<int,3> > triangles(2);triangles(1).Set(index_1,index_2,index_3);triangles(2).Set(index_2,index_4,index_3);
+        ARRAY<VECTOR<int,3> > triangles(2);triangles(0).Set(index_1,index_2,index_3);triangles(1).Set(index_2,index_4,index_3);
         triangulated_surface.mesh.Initialize_Mesh(particles.array_collection->Size(),triangles);
         triangulated_surface.Update_Triangle_List();
         triangulated_surface.Initialize_Hierarchy(true);

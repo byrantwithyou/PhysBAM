@@ -19,14 +19,14 @@ Read(DYNAMIC_LIST_CORE& object,const std::string& prefix,ARRAY<int>& needs_init)
     PHYSBAM_ASSERT(version==1);
     ARRAY<void*> new_array;
     ARRAY<bool> element_copied(object.array.Size());
-    object.id_to_index_map.Resize(object.next_unique_id);
+    object.id_to_index_map.Resize(object.next_unique_id,true,true,-1);
     for(int i=0;i<active_ids.Size();i++){
         int index=object.id_to_index_map(active_ids(i));
-        if(index){new_array.Append(object.array(index));element_copied(index)=true;}
+        if(index>=0){new_array.Append(object.array(index));element_copied(index)=true;}
         else{new_array.Append((void*)(0));needs_init.Append(active_ids(i));}}
     for(int i=0;i<object.array.Size();i++)if(!element_copied(i)) object.Delete_And_Clear(object.array(i));
     object.index_to_id_map.Resize(active_ids.Size());
-    object.id_to_index_map.Fill(0);
+    object.id_to_index_map.Fill(-1);
     for(int i=0;i<new_array.Size();i++){
         object.pointer_to_id_map.Set(new_array(i),active_ids(i));
         object.index_to_id_map(i)=active_ids(i);
@@ -41,7 +41,7 @@ Write(const DYNAMIC_LIST_CORE& object,const std::string& prefix)
 {
     const char version=1;
     FILE_UTILITIES::Write_To_File<RW>(STRING_UTILITIES::string_sprintf("%sactive_ids",prefix.c_str()),version,object.next_unique_id,object.index_to_id_map);
-    for(int i=object.needs_write.m-1;i>=0;i--) if(!object.id_to_index_map(object.needs_write(i))) object.needs_write.Remove_Index_Lazy(i);
+    for(int i=object.needs_write.m-1;i>=0;i--) if(object.id_to_index_map(object.needs_write(i))<0) object.needs_write.Remove_Index_Lazy(i);
     // handle case of new element which was removed without being written
 }
 template class Read_Write<DYNAMIC_LIST_CORE,float,void>;

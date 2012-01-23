@@ -252,7 +252,7 @@ template<class T> void TRIANGLE_3D<T>::
 Cut_With_Hyperplane_And_Discard_Outside_Simplices(const TRIANGLE_3D<T>& triangle,const PLANE<T>& cutting_plane,ARRAY<TRIANGLE_3D<T> >& negative_triangles)
 {
     VECTOR<T,3> phi_nodes;
-    VECTOR<VECTOR<T,3>,3> X_nodes;X_nodes(1)=triangle.x1;X_nodes(2)=triangle.x2;X_nodes(3)=triangle.x3;
+    VECTOR<VECTOR<T,3>,3> X_nodes;X_nodes(0)=triangle.x1;X_nodes(1)=triangle.x2;X_nodes(2)=triangle.x3;
     for(int i=0;i<3;i++){phi_nodes(i)=cutting_plane.Signed_Distance(X_nodes(i));}
 
     // left simplices are in the negative halfspace, right simplices in the positive halfspace
@@ -272,10 +272,10 @@ Cut_With_Hyperplane_And_Discard_Outside_Simplices(const TRIANGLE_3D<T>& triangle
                     other_locations(j)=index;
                     interface_locations(j)=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(X_nodes(i),X_nodes(index),LEVELSET_UTILITIES<T>::Theta(phi_nodes(i),phi_nodes(index)));}
                 if(positive_count==1){ // add two triangles to negative triangles
-                    negative_triangles.Append(TRIANGLE_3D<T>(interface_locations(1),X_nodes(other_locations(1)),X_nodes(other_locations(2))));
-                    negative_triangles.Append(TRIANGLE_3D<T>(interface_locations(1),X_nodes(other_locations(2)),interface_locations(2)));}
+                    negative_triangles.Append(TRIANGLE_3D<T>(interface_locations(0),X_nodes(other_locations(0)),X_nodes(other_locations(1))));
+                    negative_triangles.Append(TRIANGLE_3D<T>(interface_locations(0),X_nodes(other_locations(1)),interface_locations(1)));}
                 else // add triangle to negative_triangles
-                    negative_triangles.Append(TRIANGLE_3D<T>(X_nodes(i),interface_locations(1),interface_locations(2)));
+                    negative_triangles.Append(TRIANGLE_3D<T>(X_nodes(i),interface_locations(0),interface_locations(1)));
                 return;}
         case 3: // in positive halfspace
             break;}

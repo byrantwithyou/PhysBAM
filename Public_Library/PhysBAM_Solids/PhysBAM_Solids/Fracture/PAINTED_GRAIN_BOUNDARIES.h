@@ -122,7 +122,7 @@ public:
                         VECTOR<T,3> blend_point=edge_ratios(edge_index).y/normalizer*particle_positions(edge.x)+edge_ratios(edge_index).x/normalizer*particle_positions(edge.y);
                         points.Append(blend_point);}}}}
         assert(points.m>=3);
-        PLANE<T> cut_plane(points(1),points(2),points(3));
+        PLANE<T> cut_plane(points(0),points(1),points(2));
         for(int v=0;v<d+1;v++){
             int current_node=mesh.elements(element)[v];
             phi[v]=fabs(cut_plane.Signed_Distance(particle_positions(current_node)));

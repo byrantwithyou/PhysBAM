@@ -73,8 +73,8 @@ typename SOLVE_CONTACT::CONTACT<TV> Build_Contact(
     const TV& input_location,const TV& input_normal,const typename TV::SCALAR input_distance,const typename TV::SCALAR dt)
 {
     typename SOLVE_CONTACT::CONTACT<TV> contact;
-    contact.id(1)=id0;
-    contact.id(2)=id1;
+    contact.id(0)=id0;
+    contact.id(1)=id1;
     contact.location=input_location;
     contact.normal=input_normal;
     contact.distance=input_distance;
@@ -85,20 +85,20 @@ typename SOLVE_CONTACT::CONTACT<TV> Build_Contact(
 
     //LOG::cout << "build contact " << body0.frame.t << " " << body1.frame.t << " " << r0 << " " << r1 << std::endl;
     
-    contact.normal_constraint(1).linear=-contact.normal;
-    contact.normal_constraint(1).angular=TV::Cross_Product(contact.normal,r0);
+    contact.normal_constraint(0).linear=-contact.normal;
+    contact.normal_constraint(0).angular=TV::Cross_Product(contact.normal,r0);
     
-    contact.normal_constraint(2).linear=contact.normal;
-    contact.normal_constraint(2).angular=TV::Cross_Product(contact.normal,r1);
+    contact.normal_constraint(1).linear=contact.normal;
+    contact.normal_constraint(1).angular=TV::Cross_Product(contact.normal,r1);
     
-    contact.inverse_mass_times_normal_constraint(1)=body0.World_Space_Mass_Inverse_Times(contact.normal_constraint(1));
-    contact.inverse_mass_times_normal_constraint(2)=body1.World_Space_Mass_Inverse_Times(contact.normal_constraint(2));
+    contact.inverse_mass_times_normal_constraint(0)=body0.World_Space_Mass_Inverse_Times(contact.normal_constraint(0));
+    contact.inverse_mass_times_normal_constraint(1)=body1.World_Space_Mass_Inverse_Times(contact.normal_constraint(1));
     
     contact.normal_diagonal=0;
     if(!infinite_inertia0)
-        contact.normal_diagonal+=TWIST<TV>::Dot_Product(contact.normal_constraint(1),contact.inverse_mass_times_normal_constraint(1));
+        contact.normal_diagonal+=TWIST<TV>::Dot_Product(contact.normal_constraint(0),contact.inverse_mass_times_normal_constraint(0));
     if(!infinite_inertia1)
-        contact.normal_diagonal+=TWIST<TV>::Dot_Product(contact.normal_constraint(2),contact.inverse_mass_times_normal_constraint(2));
+        contact.normal_diagonal+=TWIST<TV>::Dot_Product(contact.normal_constraint(1),contact.inverse_mass_times_normal_constraint(1));
     contact.normal_relative_velocity=-contact.distance/dt;
 
     return contact;
@@ -199,10 +199,10 @@ public:
         for(int i=0;i<contacts_input.m;i++)
         {
             SOLVE_CONTACT::CONTACT<TV> contact=contacts_input(i);
-            if(fine_to_coarse_bodies_map(contact.id(1)) && fine_to_coarse_bodies_map(contact.id(2)))
+            if(fine_to_coarse_bodies_map(contact.id(0)) && fine_to_coarse_bodies_map(contact.id(1)))
             {
+                contact.id(0)=fine_to_coarse_bodies_map(contact.id(0));
                 contact.id(1)=fine_to_coarse_bodies_map(contact.id(1));
-                contact.id(2)=fine_to_coarse_bodies_map(contact.id(2));
                 contact.coefficient_of_friction=0;
                 contacts.Append(contact);
                 coarse_to_fine_contacts_map.Append(i);
@@ -220,7 +220,7 @@ public:
     void Update_Fine_Velocities(RIGID_BODY_COLLECTION<TV>& rigid_body_collection)
     {
         for(int i=0;i<coarse_to_fine_bodies_map.m;i++)
-            rigid_body_collection.Rigid_Body(coarse_to_fine_bodies_map(i)(1)).Twist()=velocities(i);
+            rigid_body_collection.Rigid_Body(coarse_to_fine_bodies_map(i)(0)).Twist()=velocities(i);
         //LOG::cout << "lambda_normal " << lambda_normal << std::endl;
         LOG::cout << "velocities " << velocities << std::endl;
     }
@@ -236,8 +236,8 @@ public:
         for(int i=0;i<fine_contacts.m;i++)
         {
             SOLVE_CONTACT::CONTACT<TV> contact=fine_contacts(i);
-            int id0=contact.id(1);
-            int id1=contact.id(2);
+            int id0=contact.id(0);
+            int id1=contact.id(1);
             if(!fine_to_coarse_bodies_map(id0) && !fine_has_infinite_inertia(id0) && !fine_to_coarse_bodies_map(id1) && !fine_has_infinite_inertia(id1))
             {
                 bodies.Append(Merge_Bodies(fine_bodies(id0),fine_bodies(id1)));
@@ -265,8 +265,8 @@ public:
         for(int i=0;i<fine_contacts.m;i++)
         {
             const SOLVE_CONTACT::CONTACT<TV>& old_contact=fine_contacts(i);
-            int id0=fine_to_coarse_bodies_map(old_contact.id(1));
-            int id1=fine_to_coarse_bodies_map(old_contact.id(2));
+            int id0=fine_to_coarse_bodies_map(old_contact.id(0));
+            int id1=fine_to_coarse_bodies_map(old_contact.id(1));
             if(id0!=id1)
             {
                 contacts.Append(Build_Contact(id0,id1,has_infinite_inertia(id0),has_infinite_inertia(id1),bodies(id0),bodies(id1),old_contact.location,old_contact.normal,0,1));
@@ -298,8 +298,8 @@ public:
             {
                 SOLVE_CONTACT::CONTACT<TV>& contact=contacts(id);
                 SOLVE_CONTACT::CONTACT<TV>& fine_contact=fine_contacts(i);
-                T current_residual=TWIST<TV>::Dot_Product(fine_contact.normal_constraint(1),fine_velocities(fine_contact.id(1)))+TWIST<TV>::Dot_Product(fine_contact.normal_constraint(2),fine_velocities(fine_contact.id(2)))-fine_contact.normal_relative_velocity;
-                //LOG::cout << "coarse_contact " << fine_contact.normal_relative_velocity << " " << fine_velocities(fine_contact.id(1)) << " " << fine_velocities(fine_contact.id(2)) << std::endl;
+                T current_residual=TWIST<TV>::Dot_Product(fine_contact.normal_constraint(0),fine_velocities(fine_contact.id(0)))+TWIST<TV>::Dot_Product(fine_contact.normal_constraint(1),fine_velocities(fine_contact.id(1)))-fine_contact.normal_relative_velocity;
+                //LOG::cout << "coarse_contact " << fine_contact.normal_relative_velocity << " " << fine_velocities(fine_contact.id(0)) << " " << fine_velocities(fine_contact.id(1)) << std::endl;
                 contact.normal_relative_velocity=-current_residual;
             }
         }
@@ -311,7 +311,7 @@ public:
         for(int i=0;i<contacts.m;i++)
         {
             SOLVE_CONTACT::CONTACT<TV>& contact=contacts(i);
-            T violation=TWIST<TV>::Dot_Product(contact.normal_constraint(1),velocities(contact.id(1)))+TWIST<TV>::Dot_Product(contact.normal_constraint(2),velocities(contact.id(2)))-contact.normal_relative_velocity;
+            T violation=TWIST<TV>::Dot_Product(contact.normal_constraint(0),velocities(contact.id(0)))+TWIST<TV>::Dot_Product(contact.normal_constraint(1),velocities(contact.id(1)))-contact.normal_relative_velocity;
             T complementarity_condition=violation*lambda_normal(i);
             T residual=max(-violation,(T)fabs(complementarity_condition));
             maximum_residual=max(maximum_residual,residual);
@@ -337,7 +337,7 @@ public:
         /*for(int i=0;i<contacts.m;i++)
         {
             SOLVE_CONTACT::CONTACT<TV>& contact=contacts(i);
-            T residual=TWIST<TV>::Dot_Product(contact.normal_constraint(1),velocities(contact.id(1)))+TWIST<TV>::Dot_Product(contact.normal_constraint(2),velocities(contact.id(2)))-contact.normal_relative_velocity;
+            T residual=TWIST<TV>::Dot_Product(contact.normal_constraint(0),velocities(contact.id(0)))+TWIST<TV>::Dot_Product(contact.normal_constraint(1),velocities(contact.id(1)))-contact.normal_relative_velocity;
             LOG::cout << "coarse_residual " << residual << " " << contact.normal_relative_velocity << std::endl;
             }*/
         
@@ -355,21 +355,21 @@ public:
             {
                 SOLVE_CONTACT::CONTACT<TV>& fine_contact=fine_contacts(i);
                 //SOLVE_CONTACT::CONTACT<TV>& coarse_contact=contacts(id);
-                //LOG::cout << "contact " << i << " " << id << " " << fine_contact.normal_constraint(2) << " " << coarse_contact.normal_constraint(2) << std::endl;
+                //LOG::cout << "contact " << i << " " << id << " " << fine_contact.normal_constraint(1) << " " << coarse_contact.normal_constraint(1) << std::endl;
 
                 fine_lambda_normal(i)+=lambda_normal(id);
                 //fine_lambda_tangent+=lambda_tangent(id);
+                if(!fine_has_infinite_inertia(fine_contact.id(0)))
+                    fine_velocities(fine_contact.id(0))+=fine_contact.inverse_mass_times_normal_constraint(0)*lambda_normal(id);
                 if(!fine_has_infinite_inertia(fine_contact.id(1)))
                     fine_velocities(fine_contact.id(1))+=fine_contact.inverse_mass_times_normal_constraint(1)*lambda_normal(id);
-                if(!fine_has_infinite_inertia(fine_contact.id(2)))
-                    fine_velocities(fine_contact.id(2))+=fine_contact.inverse_mass_times_normal_constraint(2)*lambda_normal(id);
                 /*for(int i=1;i<d;i++)
                 {
+                    fine_velocities(fine_contact.id(0))+=fine_contact.inverse_mass_times_tangent_constraint(0)(i)*lambda_tangent(id)(i);
                     fine_velocities(fine_contact.id(1))+=fine_contact.inverse_mass_times_tangent_constraint(1)(i)*lambda_tangent(id)(i);
-                    fine_velocities(fine_contact.id(2))+=fine_contact.inverse_mass_times_tangent_constraint(2)(i)*lambda_tangent(id)(i);
                 }*/
 
-                //pair_wrenches.Get_Or_Insert(fine_contact.id.Sorted())+=VECTOR<TWIST<TV>,2>(fine_contact.inverse_mass_times_normal_constraint(1)*lambda_normal(id),fine_contact.inverse_mass_times_normal_constraint(2)*lambda_normal(id));
+                //pair_wrenches.Get_Or_Insert(fine_contact.id.Sorted())+=VECTOR<TWIST<TV>,2>(fine_contact.inverse_mass_times_normal_constraint(0)*lambda_normal(id),fine_contact.inverse_mass_times_normal_constraint(1)*lambda_normal(id));
             }
         }
 
@@ -485,7 +485,7 @@ public:
             //LOG::cout << contacts(i).inverse_mass_times_normal_constraint << std::endl;
             VECTOR<int,2> pair=contacts(i).id.Sorted();
             pair_forces.Get_Or_Insert(pair)+=lambda_normal(i);
-            pair_wrenches.Get_Or_Insert(pair)+=VECTOR<TWIST<TV>,2>(contacts(i).inverse_mass_times_normal_constraint(1)*lambda_normal(i),contacts(i).inverse_mass_times_normal_constraint(2)*lambda_normal(i));
+            pair_wrenches.Get_Or_Insert(pair)+=VECTOR<TWIST<TV>,2>(contacts(i).inverse_mass_times_normal_constraint(0)*lambda_normal(i),contacts(i).inverse_mass_times_normal_constraint(1)*lambda_normal(i));
         }
 
         for(HASHTABLE_ITERATOR<VECTOR<int,2>,T> it(pair_forces);it.Valid();it.Next())

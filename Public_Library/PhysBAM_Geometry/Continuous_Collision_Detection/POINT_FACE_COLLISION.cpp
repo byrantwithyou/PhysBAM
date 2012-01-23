@@ -49,7 +49,7 @@ Point_Face_Collision(const TRIANGLE_3D<T>& tri,const VECTOR<T,3>& x,const VECTOR
                                        (double)VECTOR<T,3>::Dot_Product(No,APv)+VECTOR<T,3>::Dot_Product(Nv,APo),(double)VECTOR<T,3>::Dot_Product(No,APo));
     double xmin=0,xmax=1.000001;
     int num_intervals=0;VECTOR<INTERVAL<double>,3> intervals;
-    cubic.Compute_Intervals(xmin,xmax,num_intervals,intervals(1),intervals(2),intervals(3));
+    cubic.Compute_Intervals(xmin,xmax,num_intervals,intervals(0),intervals(1),intervals(2));
     if(!num_intervals) return false;
   
     // find and check roots

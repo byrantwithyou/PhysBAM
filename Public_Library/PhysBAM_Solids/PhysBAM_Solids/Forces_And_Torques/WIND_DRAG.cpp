@@ -118,7 +118,7 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,
             TV wind_velocity=use_constant_wind?constant_wind:optimization(t).wind_velocity;
             TV relative_velocity=wind_velocity-particles.V.Subset(nodes).Sum()/TV::m;
             TV triangle_force=Add_Velocity_Independent_Forces_Helper(relative_velocity,t);
-            F(nodes(1))+=triangle_force;F(nodes(2))+=triangle_force;F(nodes(3))+=triangle_force;}
+            F(nodes(0))+=triangle_force;F(nodes(1))+=triangle_force;F(nodes(2))+=triangle_force;}
         else{
             if(rigid_body->Has_Infinite_Inertia() || rigid_body->particle_index<0) return;
             LOG::cout<<"M: Adding drag to "<<rigid_body->particle_index<<std::endl;
@@ -153,7 +153,7 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<const TWIST<TV> 
             TV triangle_force=wind_viscosity*(negative_V-TV::Dot_Product(negative_V,optimization(t).inward_normal)*optimization(t).inward_normal);
             // total force
             triangle_force*=optimization(t).area_over_m; // one third of the triangle force is distriduted to each node
-            F(nodes(1))+=triangle_force;F(nodes(2))+=triangle_force;F(nodes(3))+=triangle_force;}
+            F(nodes(0))+=triangle_force;F(nodes(1))+=triangle_force;F(nodes(2))+=triangle_force;}
         else{
             if(rigid_body->Has_Infinite_Inertia() || rigid_body->particle_index<0) return;
             TWIST<TV>& wrench=rigid_F(rigid_body->particle_index);

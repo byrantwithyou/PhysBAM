@@ -71,7 +71,8 @@ Add_Element(void* element)
     int index=array.Append(element);
     if(deletion_list.m){id=deletion_list.Pop();assert(id_to_index_map(id)<0);id_to_index_map(id)=array.Size();}
     else{id=next_unique_id++;id_to_index_map.Append(index);assert(id_to_index_map.Size()==id+1);}
-    index_to_id_map.Append(id);needs_write.Append(id);
+    index_to_id_map.Append(id);
+    needs_write.Append(id);
     pointer_to_id_map.Set(element,id);
     return id;
 }
@@ -81,10 +82,12 @@ Add_Element(void* element)
 int DYNAMIC_LIST_CORE::
 Reactivate_Element(void* element,const int id_number)
 {
-    assert(id_to_index_map(id_number)==0);
-    array.Append(element);needs_write.Append(id_number);
+    assert(id_to_index_map(id_number)<0);
+    id_to_index_map(id_number)=array.Append(element);
+    needs_write.Append(id_number);
     pointer_to_id_map.Set(element,id_number);
-    index_to_id_map.Append(id_number);id_to_index_map(id_number)=array.Size();PHYSBAM_ASSERT(index_to_id_map.Size()==array.Size());
+    index_to_id_map.Append(id_number);
+    PHYSBAM_ASSERT(index_to_id_map.Size()==array.Size());
     return id_number;
 }
 //#####################################################################
@@ -93,10 +96,12 @@ Reactivate_Element(void* element,const int id_number)
 void DYNAMIC_LIST_CORE::
 Deactivate_Element(const int id,const bool delete_element)
 {
-    int index=id_to_index_map(id);assert(index);
+    int index=id_to_index_map(id);assert(index>=0);
     pointer_to_id_map.Delete(array(index));
     if(delete_element) Delete_And_Clear(array(index));
-    id_to_index_map(id)=-1;array.Remove_Index_Lazy(index);index_to_id_map.Remove_Index_Lazy(index);
+    id_to_index_map(id)=-1;
+    array.Remove_Index_Lazy(index);
+    index_to_id_map.Remove_Index_Lazy(index);
     if(index<array.Size()) id_to_index_map(index_to_id_map(index))=index;
 }
 //#####################################################################
@@ -105,13 +110,17 @@ Deactivate_Element(const int id,const bool delete_element)
 int DYNAMIC_LIST_CORE::
 Swap_Elements(void* element,const int id_number,const int id)
 {
-    int index=id_to_index_map(id);assert(index);
+    int index=id_to_index_map(id);
+    assert(index>=0);
     pointer_to_id_map.Delete(array(index));
     id_to_index_map(id)=-1;
     assert(id_to_index_map(id_number)==-1);
-    array(index)=element;needs_write.Append(id_number);
+    array(index)=element;
+    needs_write.Append(id_number);
     pointer_to_id_map.Set(element,id_number);
-    index_to_id_map(index)=id_number;id_to_index_map(id_number)=index;assert(index_to_id_map.Size()==array.Size());
+    index_to_id_map(index)=id_number;
+    id_to_index_map(id_number)=index;
+    assert(index_to_id_map.Size()==array.Size());
     return id_number;
 }
 //#####################################################################

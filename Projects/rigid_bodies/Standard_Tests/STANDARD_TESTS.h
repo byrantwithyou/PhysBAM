@@ -286,7 +286,7 @@ void Bounce(const T angle)
     for(int i=0;i<100;i++){
         RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("sphere",1,(T).5);
         rigid_body.X()=TV(0,5*i,0);rigid_body.Set_Coefficient_Of_Restitution(.1);
-        rigid_body.Set_Name(STRING_UTILITIES::string_sprintf("sphere (cor %g)",i));}
+        rigid_body.Set_Name(STRING_UTILITIES::string_sprintf("sphere %i",i));}
 
     RIGID_BODY<TV>& ground=tests.Add_Ground((T).5,0,1,1);
     ground.Rotation()=ROTATION<TV>(angle,TV(0,0,1));

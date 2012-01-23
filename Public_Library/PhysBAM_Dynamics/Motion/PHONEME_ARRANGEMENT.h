@@ -71,15 +71,15 @@ public:
     {ARRAY<int> segment_list;Segments_Intersecting_Time_Instance(time,segment_list);
     switch(segment_list.m){
       case 0: PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("No value to interpolate from at specified time instance %d",time));
-      case 1: list(segment_list(1)).template Interpolate_Rigid_Body_State<RW>(rigid_body_state,phoneme_data_directory,rigid_transform_filename_prefix,time);return;
+      case 1: list(segment_list(0)).template Interpolate_Rigid_Body_State<RW>(rigid_body_state,phoneme_data_directory,rigid_transform_filename_prefix,time);return;
       case 2:
           {ARRAY<RIGID_BODY_STATE<VECTOR<T,3> > > rigid_body_states(2);for(int i=0;i<2;i++)list(segment_list(i)).template Interpolate_Rigid_Body_State<RW>(rigid_body_states(i),phoneme_data_directory,rigid_transform_filename_prefix,time);
           ARRAY<T> blending_weights(2);for(int i=0;i<2;i++)blending_weights(i)=(*blending_callback)(list(segment_list(i)),time);
-          T blending_fraction=blending_weights(2)/(blending_weights(1)+blending_weights(2));
+          T blending_fraction=blending_weights(1)/(blending_weights(0)+blending_weights(1));
           rigid_body_state.time=time;
-          rigid_body_state.frame=FRAME<TV>::Interpolation(rigid_body_states(1).frame,rigid_body_states(2).frame,blending_fraction);
-          rigid_body_state.velocity=((T)1-blending_fraction)*rigid_body_states(1).velocity+blending_fraction*rigid_body_states(2).velocity;
-          rigid_body_state.angular_velocity=((T)1-blending_fraction)*rigid_body_states(1).angular_velocity+blending_fraction*rigid_body_states(2).angular_velocity;return;}
+          rigid_body_state.frame=FRAME<TV>::Interpolation(rigid_body_states(0).frame,rigid_body_states(1).frame,blending_fraction);
+          rigid_body_state.velocity=((T)1-blending_fraction)*rigid_body_states(0).velocity+blending_fraction*rigid_body_states(1).velocity;
+          rigid_body_state.angular_velocity=((T)1-blending_fraction)*rigid_body_states(0).angular_velocity+blending_fraction*rigid_body_states(1).angular_velocity;return;}
       default: PHYSBAM_FATAL_ERROR("Interpolation between 3 or more phoneme segments is not supported");}}
 
     template <class RW>
@@ -87,13 +87,13 @@ public:
     {ARRAY<int> segment_list;Segments_Intersecting_Time_Instance(time,segment_list);
     switch(segment_list.m){
       case 0: PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("No value to interpolate from at specified time instance %d",time));
-      case 1: list(segment_list(1)).template Interpolate_Positions<RW>(position,phoneme_data_directory,position_filename_prefix,time);return;
+      case 1: list(segment_list(0)).template Interpolate_Positions<RW>(position,phoneme_data_directory,position_filename_prefix,time);return;
       case 2:
           {ARRAY<ARRAY<VECTOR<T,3> > > positions(2);for(int i=0;i<2;i++)list(segment_list(i)).template Interpolate_Positions<RW>(positions(i),phoneme_data_directory,position_filename_prefix,time);
           ARRAY<T> blending_weights(2);for(int i=0;i<2;i++)blending_weights(i)=(*blending_callback)(list(segment_list(i)),time);
-          T blending_fraction=blending_weights(2)/(blending_weights(1)+blending_weights(2));
-          if(!position.m) position.Resize(positions(1).m);
-          ARRAY<VECTOR<T,3> >::copy((T)1-blending_fraction,positions(1),blending_fraction,positions(2),position);return;}
+          T blending_fraction=blending_weights(1)/(blending_weights(0)+blending_weights(1));
+          if(!position.m) position.Resize(positions(0).m);
+          ARRAY<VECTOR<T,3> >::copy((T)1-blending_fraction,positions(0),blending_fraction,positions(1),position);return;}
       default: PHYSBAM_FATAL_ERROR("Interpolation between 3 or more phoneme segments is not supported");}}
 
     VECTOR_ND<T> Controls(const T time) const
@@ -102,7 +102,7 @@ public:
       case 0: 
           {PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("No value to interpolate from at specified time instance %d",time));}
       case 1: 
-          {face_control_parameters->Set(list(segment_list(1)).Controls(time));face_control_parameters->Scale(list(segment_list(1)).scaling);
+          {face_control_parameters->Set(list(segment_list(0)).Controls(time));face_control_parameters->Scale(list(segment_list(0)).scaling);
           VECTOR_ND<T> controls;face_control_parameters->Get(controls);return controls;}
       case 2:
           {ARRAY<VECTOR_ND<T> ,VECTOR<int,1> > blending_controls(1,2);
@@ -112,7 +112,7 @@ public:
               face_control_parameters->Scale(list(segment_list(i)).scaling);
               face_control_parameters->Get(blending_controls(i));}
           ARRAY<T> blending_weights(2);for(int i=0;i<2;i++)blending_weights(i)=(*blending_callback)(list(segment_list(i)),time);
-          T blending_fraction=blending_weights(2)/(blending_weights(1)+blending_weights(2));
+          T blending_fraction=blending_weights(1)/(blending_weights(0)+blending_weights(1));
           GRID<VECTOR<T,1> > blending_grid(2,0,(T)1);
           return interpolation->Clamped_To_Array(blending_grid,blending_controls,blending_fraction);}
       default: PHYSBAM_FATAL_ERROR("Interpolation between 3 or more phoneme segments is not supported");}}
@@ -124,7 +124,7 @@ public:
       case 1: return 0;
       case 2:
         // Fill the face_control_parameters twice, with appropriate scaling, and get good distance
-          {const PHONEME_SEGMENT<T>& seg1=list(segment_list(1)),&seg2=list(segment_list(2));
+          {const PHONEME_SEGMENT<T>& seg1=list(segment_list(0)),&seg2=list(segment_list(1));
           VECTOR_ND<T> controls1=seg1.Controls(time),controls2=seg2.Controls(time);
           face_control_parameters->Set(controls1);
           if(seg1.scaling!=1)face_control_parameters->Scale(seg1.scaling);
@@ -140,7 +140,7 @@ public:
         T time=sampling_grid.Axis_X(sample,1);ARRAY<int> segment_list;Segments_Intersecting_Time_Instance(time,segment_list);
         if(segment_list.m==2){
             if(samples_used)(*samples_used)++;
-            int i=segment_list(1),j=segment_list(2);
+            int i=segment_list(0),j=segment_list(1);
             VECTOR_ND<T> ci=list(i).Controls(time),cj=list(j).Controls(time);
             normal_equations_matrix(i,i)+=VECTOR_ND<T>::Dot_Product(ci,ci);
             normal_equations_matrix(i,j)-=VECTOR_ND<T>::Dot_Product(ci,cj);

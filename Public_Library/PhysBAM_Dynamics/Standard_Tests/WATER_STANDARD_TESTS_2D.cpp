@@ -37,7 +37,7 @@ Initialize(const int test_number_input,const int resolution)
     // set up the standard fluid environment
     example.frame_rate=24;
     example.restart=false;example.restart_frame=0;
-    fluids_parameters.domain_walls(1)(1)=true;fluids_parameters.domain_walls(1)(2)=true;fluids_parameters.domain_walls(2)(1)=true;fluids_parameters.domain_walls(2)(2)=false;
+    fluids_parameters.domain_walls(0)(0)=true;fluids_parameters.domain_walls(0)(1)=true;fluids_parameters.domain_walls(1)(0)=true;fluids_parameters.domain_walls(1)(1)=false;
     fluids_parameters.number_particles_per_cell=16;
     fluids_parameters.viscosity=(T)0;fluids_parameters.implicit_viscosity=false;
     fluids_parameters.write_levelset=true;fluids_parameters.write_velocity=true;fluids_parameters.write_particles=true;fluids_parameters.write_debug_data=true;
@@ -135,12 +135,12 @@ Initialize(const int test_number_input,const int resolution)
     if(test_number==3){
         TV domain_center=grid.domain.Center();domain_center.y=(T)1;
         sources.Resize(2);source_velocity.Resize(2);world_to_source.Resize(2);
-        sources(1)=sources(2)=RANGE<TV>((T).10787,(T).2714532,-(T).10787,(T).10787);
+        sources(0)=sources(2)=RANGE<TV>((T).10787,(T).2714532,-(T).10787,(T).10787);
         ARRAY<MATRIX<T,3> > source_to_world(2);
         MATRIX<T,3> rotation=MATRIX<T,3>::Rotation_Matrix_Z_Axis((T)pi);
         MATRIX<T,3> translation=MATRIX<T,3>::Translation_Matrix(domain_center);
-        source_to_world(1)=translation;
-        source_to_world(2)=translation*rotation;
+        source_to_world(0)=translation;
+        source_to_world(1)=translation*rotation;
         for(int i=0;i<2;i++){source_velocity(i)=source_to_world(i).Extract_Rotation()*TV((T).5,0);world_to_source(i)=source_to_world(i).Inverse();}}
     if(test_number==5){
         world_to_source.Append(MATRIX<T,3>::Rotation_Matrix_Z_Axis((T)pi/(T)4)*MATRIX<T,3>::Translation_Matrix(TV((T)-.03,(T)-.23)));
@@ -149,11 +149,11 @@ Initialize(const int test_number_input,const int resolution)
     if(test_number==8){
         TV domain_center=grid.domain.Center();domain_center.y=(T)1;
         sources.Resize(1);source_velocity.Resize(1);world_to_source.Resize(1);
-        sources(1)=RANGE<TV>(0,(T).1,0,(T).2);
+        sources(0)=RANGE<TV>(0,(T).1,0,(T).2);
         ARRAY<MATRIX<T,3> > source_to_world(1);
         MATRIX<T,3> translation=MATRIX<T,3>::Translation_Matrix(domain_center);
-        source_to_world(1)=translation;world_to_source(1)=source_to_world(1).Inverse();
-        source_velocity(1)=TV(0,-.5);}
+        source_to_world(0)=translation;world_to_source(0)=source_to_world(0).Inverse();
+        source_velocity(0)=TV(0,-.5);}
 
     // set example-specific parameters
     fluids_parameters.object_friction=(test_number==4||test_number==20)?(T)1:0;

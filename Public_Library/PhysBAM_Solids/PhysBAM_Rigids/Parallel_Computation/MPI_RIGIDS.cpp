@@ -100,14 +100,14 @@ Broadcast_Positions(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input)
         rigid_body_collection_input.rigid_body_particle.array_collection->Pack(send_buffer,position,particles_of_partition(id)(b));}
     for(int i=0;i<number_of_processors;i++)
         if(i-1!=rank)
-            requests.Append(comm->Isend(&(send_buffer(1)),position,MPI::PACKED,i-1,tag));
+            requests.Append(comm->Isend(&(send_buffer(0)),position,MPI::PACKED,i-1,tag));
     ARRAY<ARRAY<char> > recv_buffers(number_of_processors);
     for(int i=0;i<number_of_processors;i++){
         if(i-1!=rank){
             MPI::Status status;
             comm->Probe(i-1,tag,status);
             recv_buffers(i).Resize(status.Get_count(MPI::PACKED));
-            requests.Append(comm->Irecv(recv_buffers(i).m?&(recv_buffers(i)(1)):0,recv_buffers(i).m,MPI_PACKED,i-1,tag));}}
+            requests.Append(comm->Irecv(recv_buffers(i).m?&(recv_buffers(i)(0)):0,recv_buffers(i).m,MPI_PACKED,i-1,tag));}}
     MPI_UTILITIES::Wait_All(requests);
 
     for(int i=0;i<number_of_processors;i++){
@@ -151,14 +151,14 @@ Update_Partitions(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,
     MPI_UTILITIES::Pack(bodies_to_send,send_buffers,position,*comm);
     for(int i=0;i<number_of_processors;i++)
         if(i-1!=rank)
-            requests.Append(comm->Isend(&(send_buffers(1)),position,MPI::PACKED,i-1,tag));
+            requests.Append(comm->Isend(&(send_buffers(0)),position,MPI::PACKED,i-1,tag));
     ARRAY<ARRAY<char> > recv_buffers(number_of_processors);
     for(int i=0;i<number_of_processors;i++){
         if(i-1!=rank){
             MPI::Status status;
             comm->Probe(i-1,tag,status);
             recv_buffers(i).Resize(status.Get_count(MPI::PACKED));
-            requests.Append(comm->Irecv(recv_buffers(i).m?&(recv_buffers(i)(1)):0,recv_buffers(i).m,MPI_PACKED,i-1,tag));}}
+            requests.Append(comm->Irecv(recv_buffers(i).m?&(recv_buffers(i)(0)):0,recv_buffers(i).m,MPI_PACKED,i-1,tag));}}
     MPI_UTILITIES::Wait_All(requests);
 
     for(int i=0;i<number_of_processors;i++){
@@ -221,7 +221,7 @@ Split_Range(const VECTOR<T,1>& global_range,const VECTOR<int,1>& processes_per_d
 {
     PHYSBAM_ASSERT(!processes_per_dimension.x || processes_per_dimension.x==number_of_processors);
     boundaries.Resize(1);
-    Split_Dimension(global_range.x,number_of_processors,boundaries(1));
+    Split_Dimension(global_range.x,number_of_processors,boundaries(0));
     return VECTOR<int,1>(number_of_processors);
 }
 template<class TV> VECTOR<int,2> MPI_RIGIDS<TV>::
@@ -236,8 +236,8 @@ Split_Range(const VECTOR<T,2>& global_range,const VECTOR<int,2>& processes_per_d
     PHYSBAM_ASSERT(count.x*count.y==number_of_processors);
     LOG::cout<<"dividing domain into "<<count.x<<" by "<<count.y<<" processor grid"<<std::endl;
     boundaries.Resize(2);
-    Split_Dimension(x,count.x,boundaries(1));
-    Split_Dimension(y,count.y,boundaries(2));
+    Split_Dimension(x,count.x,boundaries(0));
+    Split_Dimension(y,count.y,boundaries(1));
     return count;
 }
 template<class TV> VECTOR<int,3> MPI_RIGIDS<TV>::
@@ -260,9 +260,9 @@ Split_Range(const VECTOR<T,3>& global_range,const VECTOR<int,3>& processes_per_d
     PHYSBAM_ASSERT(count.x*count.y*count.z==number_of_processors);
     LOG::cout<<"dividing domain into "<<count.x<<" by "<<count.y<<" by "<<count.z<<" processor grid"<<std::endl;
     boundaries.Resize(3);
-    Split_Dimension(x,count.x,boundaries(1));
-    Split_Dimension(y,count.y,boundaries(2));
-    Split_Dimension(z,count.z,boundaries(3));
+    Split_Dimension(x,count.x,boundaries(0));
+    Split_Dimension(y,count.y,boundaries(1));
+    Split_Dimension(z,count.z,boundaries(2));
     return count;
 }
 //#####################################################################
@@ -272,7 +272,7 @@ template<class TV> void MPI_RIGIDS<TV>::
 Split_Dimension(const T x,const int processes,ARRAY<T>& boundaries)
 {
     T range_over_processes=x/processes;
-    boundaries.Resize(processes+1);boundaries(1)=0;
+    boundaries.Resize(processes+1);boundaries(0)=0;
     for(int p=0;p<processes;p++)boundaries(p+1)=boundaries(p)+range_over_processes;
 }
 //#####################################################################
@@ -406,14 +406,14 @@ Prune_And_Exchange_Impulses(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,ARR
         MPI_UTILITIES::Pack(accumulators_to_send(b),impulse_accumulator->accumulated_impulse.linear,impulse_accumulator->accumulated_impulse.angular,send_buffer,position,*comm);}
     for(int i=0;i<number_of_processors;i++)
         if(i-1!=rank)
-            requests.Append(comm->Isend(&(send_buffer(1)),position,MPI::PACKED,i-1,tag));
+            requests.Append(comm->Isend(&(send_buffer(0)),position,MPI::PACKED,i-1,tag));
     ARRAY<ARRAY<char> > recv_buffers(number_of_processors);
     for(int i=0;i<number_of_processors;i++){
         if(i-1!=rank){
             MPI::Status status;
             comm->Probe(i-1,tag,status);
             recv_buffers(i).Resize(status.Get_count(MPI::PACKED));
-            requests.Append(comm->Irecv(recv_buffers(i).m?&(recv_buffers(i)(1)):0,recv_buffers(i).m,MPI_PACKED,i-1,tag));}}
+            requests.Append(comm->Irecv(recv_buffers(i).m?&(recv_buffers(i)(0)):0,recv_buffers(i).m,MPI_PACKED,i-1,tag));}}
     MPI_UTILITIES::Wait_All(requests);
     
     // Process the received impulses

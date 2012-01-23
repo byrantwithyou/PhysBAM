@@ -77,8 +77,8 @@ Get_Rigid_Bodies_Intersecting_Rigid_Body(const int particle_index,ARRAY<int>& ri
     const int rigid_body_level=rigid_body_collisions.contact_graph.directed_graph.Level_Of_Node(rigid_body_id);
 
     const ARRAY<VECTOR<int,2> >& level_contact_pairs=rigid_body_collisions.precomputed_contact_pairs_for_level(rigid_body_level);
-    for(int i=0;i<level_contact_pairs.m;i++) if(level_contact_pairs(i)(1)==rigid_body_id || level_contact_pairs(i)(2)==rigid_body_id){
-        const int other_body_id=level_contact_pairs(i)(1)==rigid_body_id?level_contact_pairs(i)(2):level_contact_pairs(i)(1);
+    for(int i=0;i<level_contact_pairs.m;i++) if(level_contact_pairs(i)(0)==rigid_body_id || level_contact_pairs(i)(1)==rigid_body_id){
+        const int other_body_id=level_contact_pairs(i)(0)==rigid_body_id?level_contact_pairs(i)(1):level_contact_pairs(i)(0);
         const RIGID_BODY<TV>& other_rigid_body=rigid_body_collection.Rigid_Body(other_body_id);
         if(rigid_body_collisions.skip_collision_check.Skip_Pair(rigid_body_id,other_body_id)
             || (rigid_body_collisions.collision_manager && !rigid_body_collisions.collision_manager->Either_Body_Collides_With_The_Other(other_rigid_body.particle_index,rigid_body.particle_index))) continue;
@@ -381,8 +381,8 @@ Add_Elastic_Collisions(const T dt,const T time,ARRAY<ROTATION<TV> >& rigid_rotat
             rigid_body_collisions.Get_Bounding_Box_Collision_Pairs(dt,time,pairs,i==solids_parameters.rigid_body_collision_parameters.collision_iterations,
                 i==1,solids_parameters.rigid_body_collision_parameters.collision_bounding_box_thickness);
             for(int j=0;j<pairs.m;j++){
-                rigid_body_collisions.added_bodies(1).Remove_All();rigid_body_collisions.added_bodies(2).Remove_All();
-                int id_1=pairs(j)(1),id_2=pairs(j)(2);
+                rigid_body_collisions.added_bodies(0).Remove_All();rigid_body_collisions.added_bodies(1).Remove_All();
+                int id_1=pairs(j)(0),id_2=pairs(j)(1);
                 if(rigid_body_collisions.Update_Collision_Pair(id_1,id_2,dt,time,false)){
                     rigid_body_collisions.spatial_partition->Update_Body(solid_body_collection.rigid_body_collection.rigid_geometry_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(id_1));
                     rigid_body_collisions.spatial_partition->Update_Body(solid_body_collection.rigid_body_collection.rigid_geometry_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(id_2));
@@ -619,7 +619,7 @@ Process_Contact(const T dt,const T time,ARTICULATED_RIGID_BODY<TV>* articulated_
                     epsilon_scale=(T)iteration*level_iteration/(solids_parameters.rigid_body_collision_parameters.contact_iterations*rigid_body_collisions.contact_level_iterations);
 
                 // rigid/rigid
-                if(solids_parameters.rigid_body_collision_parameters.perform_contact) for(int i=0;i<pairs.m;i++){int id_1=pairs(i)(1),id_2=pairs(i)(2);
+                if(solids_parameters.rigid_body_collision_parameters.perform_contact) for(int i=0;i<pairs.m;i++){int id_1=pairs(i)(0),id_2=pairs(i)(1);
                     if(skip_collision_check.Skip_Pair(id_1,id_2)) continue;
                     if(rigid_body_collisions.prune_contact_using_velocity){
                         TRIPLE<int,int,int>& pair_scale=rigid_body_collisions.pairs_scale.Get(pairs(i).Sorted());

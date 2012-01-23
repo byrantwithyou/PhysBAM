@@ -167,7 +167,7 @@ Inside_Region_Face(const int axis,const TV_INT& face_index) const // does not as
 template<class T_GRID> void LEVELSET_MULTIPLE<T_GRID>::
 Two_Minimum_Regions(const TV_INT& index,int& minimum_region,int& second_minimum_region,T& minimum_phi,T& second_minimum_phi) const
 {
-    T phi1=phis(1)(index),phi2=phis(2)(index);
+    T phi1=phis(0)(index),phi2=phis(1)(index);
     if(phi1<phi2){
         minimum_phi=phi1;
         minimum_region=1;

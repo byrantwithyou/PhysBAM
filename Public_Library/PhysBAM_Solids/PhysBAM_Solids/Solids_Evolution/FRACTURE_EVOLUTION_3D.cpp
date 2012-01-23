@@ -557,12 +557,12 @@ Run_Quasistatics_And_Fracture(const T time,const int max_number_of_fracture_iter
 
         // find three nodes to constrain (the ones furthest away from impulses)
         int max_node1,max_node2,max_node3;
-        if(distance_from_impulse(1)>distance_from_impulse(2) && distance_from_impulse(1)>distance_from_impulse(3)){max_node1=1;
-            if(distance_from_impulse(2)>distance_from_impulse(3)){max_node2=2;max_node3=3;}else{max_node2=3;max_node3=2;}}
-        else if(distance_from_impulse(2)>distance_from_impulse(3)){max_node1=2;
-            if(distance_from_impulse(1)>distance_from_impulse(3)){max_node2=1;max_node3=3;}else{max_node2=3;max_node3=1;}}
+        if(distance_from_impulse(0)>distance_from_impulse(1) && distance_from_impulse(0)>distance_from_impulse(2)){max_node1=1;
+            if(distance_from_impulse(1)>distance_from_impulse(2)){max_node2=2;max_node3=3;}else{max_node2=3;max_node3=2;}}
+        else if(distance_from_impulse(1)>distance_from_impulse(2)){max_node1=2;
+            if(distance_from_impulse(0)>distance_from_impulse(2)){max_node2=1;max_node3=3;}else{max_node2=3;max_node3=1;}}
         else{max_node1=3;
-            if(distance_from_impulse(1)>distance_from_impulse(2)){max_node2=1;max_node3=2;}else{max_node2=2;max_node3=1;}}
+            if(distance_from_impulse(0)>distance_from_impulse(1)){max_node2=1;max_node3=2;}else{max_node2=2;max_node3=1;}}
 
         for(int i=0;i<mesh.number_nodes;i++){
             if(distance_from_impulse(i)>distance_from_impulse(max_node3)){
