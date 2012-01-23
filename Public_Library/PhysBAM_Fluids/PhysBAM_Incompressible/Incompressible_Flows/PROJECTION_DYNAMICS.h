@@ -39,7 +39,7 @@ public:
     {densities=densities_input;}
     
     void Set_Flame_Speed_Constants(const ARRAY<T>& densities_input,const ARRAY<T,VECTOR<int,2> >& normal_flame_speeds,const ARRAY<T,VECTOR<int,2> >& curvature_flame_speeds)
-    {flame_speed_constants.Resize(1,densities_input.m,1,densities_input.m,false,false);flame_speed_constants.Fill(0);
+    {flame_speed_constants.Resize(0,densities_input.m,0,densities_input.m,false,false);flame_speed_constants.Fill(0);
     densities=densities_input;
     for(int i=0;i<densities_input.m;i++)for(int j=0;j<densities_input.m;j++)if(i!=j&&(normal_flame_speeds(i,j)!=0||curvature_flame_speeds(i,j)!=0)){
         flame_speed_constants(i,j).x=normal_flame_speeds(i,j);assert((normal_flame_speeds(i,j)-normal_flame_speeds(j,i))<(T)1e-6); // must be symmetric

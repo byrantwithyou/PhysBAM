@@ -40,7 +40,7 @@ Initialize_Optimization(const bool verbose)
     triangle_mesh.elements(0).Get(i,j,k);xi=particles.X(i);xj=particles.X(j);xk=particles.X(k);
     initial_min_altitude=TRIANGLE_2D<T>::Minimum_Altitude(xi,xj,xk);
     initial_area=TRIANGLE_2D<T>::Area(xi,xj,xk);
-    map_from_nodes_to_boundary_list.Resize(1,triangle_mesh.number_nodes);
+    map_from_nodes_to_boundary_list.Resize(0,triangle_mesh.number_nodes);
     for(i=0;i<triangle_mesh.boundary_nodes->m;i++) map_from_nodes_to_boundary_list((*triangle_mesh.boundary_nodes)(i))=i;
     for(i=0;i<layers.m;i++) delete layers(i);layers.Resize(1);layers(0)=triangle_mesh.boundary_nodes;
     triangle_mesh.boundary_nodes=0; // we don't need it hanging off the mesh object any more
@@ -55,7 +55,7 @@ Initialize_Optimization(const bool verbose)
                 if(!marked(b)){layers(l)->Append(b);marked(b)=true;}}}
         if(layers(l)->m == 0){delete layers(l);layers.Remove_End();break;}
         if(verbose) LOG::cout<<"layer "<<l<<" has "<<layers(l)->m<<" nodes"<<std::endl;}
-    boundary_mesh_normals.Resize(1,layers(0)->m);
+    boundary_mesh_normals.Resize(0,layers(0)->m);
     Compute_Boundary_Mesh_Normals();
 }
 //#####################################################################

@@ -51,7 +51,7 @@ public:
 
     void Initialize(const int number_of_tracks,const GRID<TV>& time_grid_input)
     {time_grid=time_grid_input;trajectories.Resize(number_of_tracks);valid.Resize(number_of_tracks);names.Resize(number_of_tracks);
-    for(int i=0;i<number_of_tracks;i++){trajectories(i).Resize(1,time_grid.m);valid(i).Resize(1,time_grid.m);}}
+    for(int i=0;i<number_of_tracks;i++){trajectories(i).Resize(0,time_grid.m);valid(i).Resize(0,time_grid.m);}}
 
     T2 X(const int marker,const T t) const
     {return Frame_X(marker,(int)((t-time_grid.domain.min_corner.x)/(time_grid.domain.max_corner.x-time_grid.domain.min_corner.x)*(time_grid.counts.x-1)+1));}

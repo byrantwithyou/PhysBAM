@@ -91,9 +91,9 @@ template<class T_GRID> void FLUIDS_PARAMETERS_UNIFORM<T_GRID>::
 Initialize_Number_Of_Regions(const int number_of_regions_input)
 {
     number_of_regions=number_of_regions_input;masses.Resize(number_of_regions);densities.Resize(number_of_regions);viscosities.Resize(number_of_regions);
-    surface_tensions.Resize(1,number_of_regions,1,number_of_regions);dirichlet_regions.Resize(number_of_regions);pseudo_dirichlet_regions.Resize(number_of_regions);
-    fuel_region.Resize(number_of_regions);normal_flame_speeds.Resize(1,number_of_regions,1,number_of_regions);confinement_parameters.Resize(number_of_regions);
-    curvature_flame_speeds.Resize(1,number_of_regions,1,number_of_regions);use_multiphase_strain.Resize(number_of_regions);elastic_moduli.Resize(number_of_regions);
+    surface_tensions.Resize(0,number_of_regions,0,number_of_regions);dirichlet_regions.Resize(number_of_regions);pseudo_dirichlet_regions.Resize(number_of_regions);
+    fuel_region.Resize(number_of_regions);normal_flame_speeds.Resize(0,number_of_regions,0,number_of_regions);confinement_parameters.Resize(number_of_regions);
+    curvature_flame_speeds.Resize(0,number_of_regions,0,number_of_regions);use_multiphase_strain.Resize(number_of_regions);elastic_moduli.Resize(number_of_regions);
     plasticity_alphas.Resize(number_of_regions);plasticity_gammas.Resize(number_of_regions);
 }
 //#####################################################################
