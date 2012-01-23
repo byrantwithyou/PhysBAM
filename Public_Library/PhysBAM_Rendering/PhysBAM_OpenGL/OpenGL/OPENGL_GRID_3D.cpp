@@ -353,8 +353,8 @@ Bounding_Box() const
 {
     PHYSBAM_ASSERT(object);
     const GRID<TV> &grid=((OPENGL_GRID_3D<T> *)object)->grid;
-    VECTOR<T,3> min_corner=grid.Node(indicies(1)),max_corner=min_corner+grid.dX;
-    for(int i=2;i<=indicies.m;i++){
+    VECTOR<T,3> min_corner=grid.Node(indicies(0)),max_corner=min_corner+grid.dX;
+    for(int i=1;i<indicies.m;i++){
         min_corner=TV::Componentwise_Min(min_corner,grid.Node(indicies(i)));
         max_corner=TV::Componentwise_Max(max_corner,grid.Node(indicies(i))+grid.dX);}
     RANGE<VECTOR<float,3> > box((VECTOR<float,3>)min_corner,(VECTOR<float,3>)max_corner);
@@ -381,8 +381,8 @@ Bounding_Box() const
 {
     PHYSBAM_ASSERT(object);
     const GRID<TV> &grid=((OPENGL_GRID_3D<T> *)object)->grid;
-    VECTOR<T,3> min_corner=grid.Node(indicies(1)),max_corner=min_corner;
-    for(int i=2;i<=indicies.m;i++){
+    VECTOR<T,3> min_corner=grid.Node(indicies(0)),max_corner=min_corner;
+    for(int i=1;i<indicies.m;i++){
         if(grid.Node(indicies(i)).x<min_corner.x) min_corner.x=grid.Node(indicies(i)).x;
         if(grid.Node(indicies(i)).y<min_corner.y) min_corner.y=grid.Node(indicies(i)).y;
         if(grid.Node(indicies(i)).z<min_corner.z) min_corner.z=grid.Node(indicies(i)).z;

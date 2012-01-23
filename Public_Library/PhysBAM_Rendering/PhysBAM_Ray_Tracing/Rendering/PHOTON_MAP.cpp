@@ -38,8 +38,8 @@ Locate_Photons(const TV& location,const T max_distance_squared,ARRAY<PHOTON<T>*>
     number_photons_found=0;
     if(photons.m==0)return;
     T temp_max_distance=max_distance_squared;
-    Locate_Photons_Helper(1,location,temp_max_distance,number_photons_found,photons_found,distance_squared_of_photons_found);
-    if(number_photons_found<=photons_found.m){
+    Locate_Photons_Helper(0,location,temp_max_distance,number_photons_found,photons_found,distance_squared_of_photons_found);
+    if(number_photons_found<photons_found.m){
         max_distance_squared_of_found_photons=0;
         for(int i=0;i<photons_found.m;i++) if(distance_squared_of_photons_found(i)>max_distance_squared_of_found_photons)
             max_distance_squared_of_found_photons=distance_squared_of_photons_found(i);}
@@ -153,7 +153,7 @@ Construct_Balanced_KD_Tree()
         if(swap_to==index_of_photon_to_relocate){
             photons(current_index)=photon_to_relocate;
             if(dummy_counter<photons.m){
-                while(index_of_photon_to_relocate<=photons.m&&kdtree_array(index_of_photon_to_relocate)==-1)index_of_photon_to_relocate++;
+                while(index_of_photon_to_relocate<photons.m&&kdtree_array(index_of_photon_to_relocate)==-1)index_of_photon_to_relocate++;
                 photon_to_relocate=photons(index_of_photon_to_relocate);current_index=index_of_photon_to_relocate;}}
         else{
             photons(current_index)=photons(swap_to);

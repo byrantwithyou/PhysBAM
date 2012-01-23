@@ -252,7 +252,7 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection) co
         ARRAY<int> edges=Get_Selected_Edges(); 
         output_stream<<"Curve "<<index<<std::endl;
         output_stream<<std::endl;
-        for (int i=1;i<=edges.m;i++) {curve.mesh.elements(edges(i)).Get(node1,node2);output_stream<<"("<<node1<<", "<<node2<<")"<<std::endl;}}
+        for (int i=0;i<edges.m;i++) {curve.mesh.elements(edges(i)).Get(node1,node2);output_stream<<"("<<node1<<", "<<node2<<")"<<std::endl;}}
 }
 //#####################################################################
 // Function Clear_Highlight

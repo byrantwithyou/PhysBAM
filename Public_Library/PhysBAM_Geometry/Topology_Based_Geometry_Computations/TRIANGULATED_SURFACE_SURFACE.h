@@ -27,14 +27,14 @@ VECTOR<T,3> Surface(const TRIANGULATED_SURFACE<T>& ts,const VECTOR<T,3>& locatio
         RANGE<TV> box(location.x-max_depth,location.x+max_depth,location.y-max_depth,location.y+max_depth,location.z-max_depth,location.z+max_depth);
         ARRAY<int> nearby_triangles;ts.hierarchy->Intersection_List(box,nearby_triangles);
         if(!nearby_triangles.m){ // grab any point assuming far from the interface
-            RAY<TV> ray(location,ts.particles.X(ts.mesh.elements(1)(1))-location);if(closest_triangle) *closest_triangle=1;
+            RAY<TV> ray(location,ts.particles.X(ts.mesh.elements(0)(0))-location);if(closest_triangle) *closest_triangle=0;
             if(INTERSECTION::Intersects(ray,ts,thickness_over_2)){if(distance) *distance=ray.t_max;return ray.Point(ray.t_max);}
-            else{if(distance) *distance=(ts.particles.X(ts.mesh.elements(1)(1))-location).Magnitude();return ts.particles.X(ts.mesh.elements(1)(1));}} 
+            else{if(distance) *distance=(ts.particles.X(ts.mesh.elements(0)(0))-location).Magnitude();return ts.particles.X(ts.mesh.elements(0)(0));}} 
         else{
             TV weights;
-            {TRIANGLE_3D<T>& triangle=(*ts.triangle_list)(nearby_triangles(1));point=triangle.Closest_Point(location,weights);}
-            T distance_temp=(location-point).Magnitude_Squared();if(closest_triangle) *closest_triangle=nearby_triangles(1);
-            for(int k=2;k<=nearby_triangles.m;k++){
+            {TRIANGLE_3D<T>& triangle=(*ts.triangle_list)(nearby_triangles(0));point=triangle.Closest_Point(location,weights);}
+            T distance_temp=(location-point).Magnitude_Squared();if(closest_triangle) *closest_triangle=nearby_triangles(0);
+            for(int k=1;k<nearby_triangles.m;k++){
                 TRIANGLE_3D<T>& triangle=(*ts.triangle_list)(nearby_triangles(k));
                 TV new_point=triangle.Closest_Point(location,weights);
                 T new_distance=(location-new_point).Magnitude_Squared();
@@ -43,9 +43,9 @@ VECTOR<T,3> Surface(const TRIANGULATED_SURFACE<T>& ts,const VECTOR<T,3>& locatio
 
     // slow method
     TV weights;
-    {TRIANGLE_3D<T>& triangle=(*ts.triangle_list)(1);point=triangle.Closest_Point(location,weights);}
-    T distance_temp=(location-point).Magnitude_Squared();if(closest_triangle) *closest_triangle=1;
-    for(int k=2;k<=ts.mesh.elements.m;k++){
+    {TRIANGLE_3D<T>& triangle=(*ts.triangle_list)(0);point=triangle.Closest_Point(location,weights);}
+    T distance_temp=(location-point).Magnitude_Squared();if(closest_triangle) *closest_triangle=0;
+    for(int k=1;k<ts.mesh.elements.m;k++){
         TRIANGLE_3D<T>& triangle=(*ts.triangle_list)(k);
         TV new_point=triangle.Closest_Point(location,weights);
         T new_distance=(location-new_point).Magnitude_Squared();
@@ -64,14 +64,14 @@ VECTOR<T,3> Oriented_Surface(const TRIANGULATED_SURFACE<T>& ts,const VECTOR<T,3>
         RANGE<TV> box(location.x-max_depth,location.x+max_depth,location.y-max_depth,location.y+max_depth,location.z-max_depth,location.z+max_depth);
         ARRAY<int> nearby_triangles;ts.hierarchy->Intersection_List(box,nearby_triangles);
         if(!nearby_triangles.m){ // grab any point ignoring normal assuming far from the interface
-            RAY<TV> ray(location,ts.particles.X(ts.mesh.elements(1)(1))-location);if(closest_triangle) *closest_triangle=1;
+            RAY<TV> ray(location,ts.particles.X(ts.mesh.elements(0)(0))-location);if(closest_triangle) *closest_triangle=0;
             if(INTERSECTION::Intersects(ray,ts,thickness_over_2)){if(distance) *distance=ray.t_max;return ray.Point(ray.t_max);}
-            else{if(distance) *distance=(ts.particles.X(ts.mesh.elements(1)(1))-location).Magnitude();return ts.particles.X(ts.mesh.elements(1)(1));}} 
+            else{if(distance) *distance=(ts.particles.X(ts.mesh.elements(0)(0))-location).Magnitude();return ts.particles.X(ts.mesh.elements(0)(0));}} 
         else{
             TV weights;
-            {TRIANGLE_3D<T>& triangle=(*ts.triangle_list)(nearby_triangles(1));point=triangle.Closest_Point(location,weights);}
-            T distance_temp=(location-point).Magnitude_Squared();if(closest_triangle) *closest_triangle=nearby_triangles(1);
-            for(int k=2;k<=nearby_triangles.m;k++){
+            {TRIANGLE_3D<T>& triangle=(*ts.triangle_list)(nearby_triangles(0));point=triangle.Closest_Point(location,weights);}
+            T distance_temp=(location-point).Magnitude_Squared();if(closest_triangle) *closest_triangle=nearby_triangles(0);
+            for(int k=1;k<nearby_triangles.m;k++){
                 TRIANGLE_3D<T>& triangle=(*ts.triangle_list)(nearby_triangles(k));
                 TV new_point=triangle.Closest_Point(location,weights);
                 T new_distance=(location-new_point).Magnitude_Squared();
@@ -80,9 +80,9 @@ VECTOR<T,3> Oriented_Surface(const TRIANGULATED_SURFACE<T>& ts,const VECTOR<T,3>
 
     // slow method
     TV weights;
-    {TRIANGLE_3D<T>& triangle=(*ts.triangle_list)(1);point=triangle.Closest_Point(location,weights);}
-    T distance_temp=(location-point).Magnitude_Squared();if(closest_triangle) *closest_triangle=1;
-    for(int k=2;k<=ts.mesh.elements.m;k++){
+    {TRIANGLE_3D<T>& triangle=(*ts.triangle_list)(0);point=triangle.Closest_Point(location,weights);}
+    T distance_temp=(location-point).Magnitude_Squared();if(closest_triangle) *closest_triangle=0;
+    for(int k=1;k<ts.mesh.elements.m;k++){
         TRIANGLE_3D<T>& triangle=(*ts.triangle_list)(k);
         TV new_point=triangle.Closest_Point(location,weights);
         T new_distance=(location-new_point).Magnitude_Squared();

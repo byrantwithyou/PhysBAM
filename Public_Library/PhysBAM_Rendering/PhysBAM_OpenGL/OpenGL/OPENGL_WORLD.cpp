@@ -611,7 +611,7 @@ void OPENGL_WORLD::Get_Selections(ARRAY<OPENGL_SELECTION *> &selections,GLint hi
     for(int i=0;i<(int)hits;i++){
         GLint names=buffer[idx];
         int object_id=buffer[idx+3];
-        PHYSBAM_ASSERT(1 <=object_id && object_id <=object_list.m && object_list(object_id)->selectable);
+        PHYSBAM_ASSERT(0<=object_id && object_id<object_list.m && object_list(object_id)->selectable);
         OPENGL_SELECTION *selection=object_list(object_id)->Get_Selection(&buffer[idx+4],names-1);
         if(selection){
             unsigned int denom=0xffffffff;

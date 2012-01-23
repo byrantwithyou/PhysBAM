@@ -34,7 +34,7 @@ public:
 
     void Initialize(ARRAY<PAIR<RANGE<TV>,DATA_T> >& boxes_input,const T thickness_over_two=1e-6)
     {if(boxes_input.m==0){grid.Initialize(2,2,2,RANGE<TV>(0,1,0,1,0,1));cells.Resize(grid.Domain_Indices());return;}
-    bounding_box=boxes_input(1).x;for(int k=2;k<=boxes_input.m;k++) bounding_box.Enlarge_To_Include_Box(boxes_input(k).x.Thickened(thickness_over_two));
+    bounding_box=boxes_input(0).x;for(int k=1;k<boxes_input.m;k++) bounding_box.Enlarge_To_Include_Box(boxes_input(k).x.Thickened(thickness_over_two));
     bounding_box=bounding_box.Thickened(thickness_over_two);
     VECTOR<T,3> lengths=bounding_box.Edge_Lengths();
     VECTOR<int,3> dimensions;

@@ -356,8 +356,8 @@ Triangle_In_Direction_Uninverted(const int node,const VECTOR<T,2>& direction) co
         while(t<neighbor_nodes.m){ // find left edge in left half-space of direction
             if(VECTOR<T,2>::Cross_Product(direction,particles.X(neighbor_nodes(t+1))-xnode).x<0){t++;continue;}
             return t;}
-        return t<=incident_elements.m?incident_elements(t):0;}
-    return t<=incident_elements.m?incident_elements(t):0;
+        return t<incident_elements.m?incident_elements(t)-1:-1;}
+    return t<incident_elements.m?incident_elements(t)-1:-1;
 }
 //#####################################################################
 // Function Triangle_Walk_Uninverted

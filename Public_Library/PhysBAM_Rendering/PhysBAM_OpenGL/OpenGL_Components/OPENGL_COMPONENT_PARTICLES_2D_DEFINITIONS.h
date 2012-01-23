@@ -240,7 +240,7 @@ Get_Particle_Set_Of_Selection(OPENGL_SELECTION *selection) const
 {
     PHYSBAM_ASSERT(selection->type == OPENGL_SELECTION::COMPONENT_PARTICLES_2D && selection->object == this);
     OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T> *real_selection = (OPENGL_SELECTION_COMPONENT_PARTICLES_2D<T>*)selection;
-    PHYSBAM_ASSERT(real_selection->particle_set<=particles_multiple.m);
+    PHYSBAM_ASSERT(real_selection->particle_set<particles_multiple.m);
     return particles_multiple(real_selection->particle_set);
 }
 
