@@ -80,7 +80,7 @@ Exists(const int particle) const
 template<class TV> bool RIGID_GEOMETRY_COLLECTION<TV>::
 Is_Active(const int particle) const
 {
-    return Exists(particle) && particles.rigid_geometry(particle)->particle_index>0;
+    return Exists(particle) && particles.rigid_geometry(particle)->particle_index>=0;
 }
 //#####################################################################
 // Function Update_Kinematic_Particles

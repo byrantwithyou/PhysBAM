@@ -63,7 +63,7 @@ Negative_Material_In_Cell(const GRID<TV>& grid,const TV_INT& cell_index,const bo
                 Refine_Simplex(*this,cell_refinement_simplices,cell_particle_X,simplex);}}
         cell_phis.Resize(cell_particle_X.m);
         // compute phis for extant nodes
-        for(int i=last_node+1;i<=cell_phis.m;i++) cell_phis(i)=Phi(cell_particle_X(i));
+        for(int i=last_node+1;i<cell_phis.m;i++) cell_phis(i)=Phi(cell_particle_X(i));
         last_node=cell_phis.m;}
 
     if(maximum_refinement_depth>0 && cell_phis.m==unrefined_point_count) return minimum_phi<=0?full_cell_size:0;

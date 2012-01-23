@@ -67,10 +67,10 @@ public:
         {return faces(cur);}
 
         bool Valid() const PHYSBAM_ALWAYS_INLINE
-        {return cur<=faces.m;}
+        {return cur<faces.m;}
 
         void Next()
-        {cur++;if(cur<=faces.m){index=faces(cur).face;if(!face_domain(index.axis).Lazy_Inside_Half_Open(index.index)) Next();}}
+        {cur++;if(cur<faces.m){index=faces(cur).face;if(!face_domain(index.axis).Lazy_Inside_Half_Open(index.index)) Next();}}
     };
 
     struct INTERIOR_FACE_ITERATOR
@@ -117,10 +117,10 @@ public:
         {return index;}
 
         bool Valid() const PHYSBAM_ALWAYS_INLINE
-        {return index(TV::m)<=last;}
+        {return index(TV::m-1)<=last;}
 
         void Next() PHYSBAM_ALWAYS_INLINE
-        {if(++index(TV::m)>last) Next_Helper();}
+        {if(++index(TV::m-1)>last) Next_Helper();}
 
         void Next_Helper();
     };

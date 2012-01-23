@@ -162,7 +162,7 @@ Next_Helper()
 //#####################################################################
 template<class TV> GRID_COLLISION_ITERATOR<TV>::CELL_ITERATOR::
 CELL_ITERATOR(GRID_COLLISION_ITERATOR<TV>& gci,int ghost_input)
-    :faces(gci.faces),grid(gci.grid),cur(gci.first_z_face-1),last(0),index(1,1,1),ghost(ghost_input)
+    :faces(gci.faces),grid(gci.grid),cur(gci.first_z_face-1),last(0),index(0,0,0),ghost(ghost_input)
 {
     LOG::cout<<"gci.first_z_face "<<gci.first_z_face<<std::endl;
     Next_Helper();
@@ -187,8 +187,8 @@ Next_Helper()
     index=faces(cur).face.index;
     while(1){
         cur++;
-        PHYSBAM_ASSERT(cur<=faces.m && faces(cur).inside(1));
-        if(!faces(cur).inside(2)) break;}
+        PHYSBAM_ASSERT(cur<faces.m && faces(cur).inside(0));
+        if(!faces(cur).inside(1)) break;}
     PHYSBAM_ASSERT(index.Remove_Index(TV::m)==faces(cur).face.index.Remove_Index(TV::m));
     last=faces(cur).face.index(TV::m)-1;
     if(index(TV::m)<-ghost) index(TV::m)=-ghost;

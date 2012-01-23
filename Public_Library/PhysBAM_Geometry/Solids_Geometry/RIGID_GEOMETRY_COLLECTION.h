@@ -49,10 +49,10 @@ public:
     {return *particles.rigid_geometry(particle_index);}
 
     void Deactivate_Geometry(const int p)
-    {assert(Exists(p) && Rigid_Geometry(p).particle_index>0);Rigid_Geometry(p).particle_index=-Rigid_Geometry(p).particle_index;}
+    {assert(Exists(p) && Rigid_Geometry(p).particle_index>=0);Rigid_Geometry(p).particle_index=~Rigid_Geometry(p).particle_index;}
 
     void Reactivate_Geometry(const int p)
-    {assert(Exists(p) && Rigid_Geometry(p).particle_index<0);Rigid_Geometry(p).particle_index=-Rigid_Geometry(p).particle_index;}
+    {assert(Exists(p) && Rigid_Geometry(p).particle_index<=0);Rigid_Geometry(p).particle_index=~Rigid_Geometry(p).particle_index;}
 
     RIGID_GEOMETRY<TV>* New_Body(int index);
 

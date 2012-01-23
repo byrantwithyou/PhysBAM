@@ -97,7 +97,7 @@ template<class TV,class T2> void EXTRAPOLATION_HIGHER_ORDER<TV,T2>::
 Fill_un(const MAPPING& m,const TV& one_over_dx,const ARRAY<TV>& normal,const ARRAY<T2>& x,ARRAY<T2>& xn,int o,int mo)
 {
     xn.Resize(m.max_solve_index(mo*2-o+1));
-    for(int i=m.max_solve_index(o+1)+1;i<=m.max_solve_index(mo*2-o+1);i++){
+    for(int i=m.max_solve_index(o+1)+1;i<m.max_solve_index(mo*2-o+1);i++){
         const TV_INT& index=m.index_to_node(i);
         T2 v=0;
         for(int d=0;d<TV::m;d++){

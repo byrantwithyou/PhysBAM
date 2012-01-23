@@ -130,9 +130,9 @@ Inside_Region(const TV_INT& index,T& phi) const // assumes exactly one Phi<0 on 
 template<class T_GRID> int LEVELSET_MULTIPLE<T_GRID>::
 Inside_Region(const TV& location) const
 {
-    T minimum_phi=Phi(1,location);
+    T minimum_phi=Phi(0,location);
     int minimum_region=1;
-    for(int k=2;k<=phis.m;k++){T candidate_phi=Phi(k,location);if(candidate_phi<minimum_phi){minimum_phi=candidate_phi;minimum_region=k;}}
+    for(int k=1;k<phis.m;k++){T candidate_phi=Phi(k,location);if(candidate_phi<minimum_phi){minimum_phi=candidate_phi;minimum_region=k;}}
     return minimum_region;
 }
 //#####################################################################
@@ -141,9 +141,9 @@ Inside_Region(const TV& location) const
 template<class T_GRID> int LEVELSET_MULTIPLE<T_GRID>::
 Inside_Region(const TV& location,T& phi) const
 {
-    T minimum_phi=Phi(1,location);
+    T minimum_phi=Phi(0,location);
     int minimum_region=1;
-    for(int k=2;k<=phis.m;k++){T candidate_phi=Phi(k,location);if(candidate_phi<minimum_phi){minimum_phi=candidate_phi;minimum_region=k;}}
+    for(int k=1;k<phis.m;k++){T candidate_phi=Phi(k,location);if(candidate_phi<minimum_phi){minimum_phi=candidate_phi;minimum_region=k;}}
     phi=minimum_phi;
     return minimum_region;
 }
@@ -178,7 +178,7 @@ Two_Minimum_Regions(const TV_INT& index,int& minimum_region,int& second_minimum_
         minimum_region=2;
         second_minimum_phi=phi1;
         second_minimum_region=1;}
-    for(int k=3;k<=phis.m;k++){
+    for(int k=2;k<phis.m;k++){
         T candidate_phi=phis(k)(index);
         if(candidate_phi<minimum_phi){
             second_minimum_phi=minimum_phi;
@@ -195,7 +195,7 @@ Two_Minimum_Regions(const TV_INT& index,int& minimum_region,int& second_minimum_
 template<class T_GRID> void LEVELSET_MULTIPLE<T_GRID>::
 Two_Minimum_Regions(const TV& location,int& minimum_region,int& second_minimum_region,T& minimum_phi,T& second_minimum_phi) const
 {
-    T phi1=Phi(1,location),phi2=Phi(2,location);
+    T phi1=Phi(0,location),phi2=Phi(1,location);
     if(phi1<phi2){
         minimum_phi=phi1;
         minimum_region=1;
@@ -206,7 +206,7 @@ Two_Minimum_Regions(const TV& location,int& minimum_region,int& second_minimum_r
         minimum_region=2;
         second_minimum_phi=phi1;
         second_minimum_region=1;}
-    for(int k=3;k<=phis.m;k++){
+    for(int k=2;k<phis.m;k++){
         T candidate_phi=Phi(k,location);
         if(candidate_phi<minimum_phi){
             second_minimum_phi=minimum_phi;
