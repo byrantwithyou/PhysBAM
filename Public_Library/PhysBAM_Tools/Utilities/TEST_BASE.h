@@ -75,7 +75,7 @@ public:
     {TEST_BASE* test;if(!Test_Registry().Get(test_name,test)) return 0;return test;}
 
     TEST_RESULT Run_Suite_Test(int n,bool verbose=true)
-    {if(n<0 || n>Number_Of_Tests()){if(verbose) Report_Out_Of_Range(n);return out_of_range;}TEST_RESULT result=Run_Test(n);if(verbose) Report_Test_Result(result,n);return result;}
+    {if(n<0 || n>=Number_Of_Tests()){if(verbose) Report_Out_Of_Range(n);return out_of_range;}TEST_RESULT result=Run_Test(n);if(verbose) Report_Test_Result(result,n);return result;}
 
     TEST_RESULT Run_All_Suite_Tests(bool verbose=true)
     {TEST_RESULT result=success;for(int i=0;i<Number_Of_Tests();i++) result=Merge_Results(result,Run_Suite_Test(i,verbose));return result;}

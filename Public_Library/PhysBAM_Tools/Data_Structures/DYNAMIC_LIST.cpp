@@ -69,7 +69,7 @@ Add_Element(void* element)
     int id;
     if(pointer_to_id_map.Get(element,id)){assert(array(id_to_index_map(id))==element);return id;}
     int index=array.Append(element);
-    if(deletion_list.m){id=deletion_list.Pop();assert(id_to_index_map(id)<0);id_to_index_map(id)=array.Size();}
+    if(deletion_list.m){id=deletion_list.Pop();assert(id_to_index_map(id)<0);id_to_index_map(id)=index;}
     else{id=next_unique_id++;id_to_index_map.Append(index);assert(id_to_index_map.Size()==id+1);}
     index_to_id_map.Append(id);
     needs_write.Append(id);
